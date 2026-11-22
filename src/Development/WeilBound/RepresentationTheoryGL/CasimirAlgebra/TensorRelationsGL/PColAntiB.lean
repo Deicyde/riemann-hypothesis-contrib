@@ -23,10 +23,15 @@ def ColInj {m : ℕ} (col : Fin m → ℕ) (I : Fin m → Fin n) : Prop :=
 def rk {m : ℕ} (col : Fin m → ℕ) (I : Fin m → Fin n) (p : Fin m) : ℕ :=
   (Finset.univ.filter fun q => col q = col p ∧ I p < I q).card
 
-theorem rk_le {m : ℕ} (col : Fin m → ℕ) (top : Fin n) (htop : (top : ℕ) + 1 = n) (I : Fin m → Fin n)
-    (hI : ColInj col I) (p : Fin m) : rk col I p ≤ (top : ℕ) - I p := by
+theorem rk_le
+    {m : ℕ} (col : Fin m → ℕ)
+    (top : Fin n) (htop : (top : ℕ) + 1 = n)
+    (I : Fin m → Fin n) (hI : ColInj col I)
+    (p : Fin m)
+    : rk col I p ≤ (top : ℕ) - I p := by
   unfold rk
-  have h1 : (Finset.univ.filter fun q => col q = col p ∧ I p < I q).card ≤ (Finset.Ioi (I p)).card := by
+  have h1
+      : (Finset.univ.filter fun q => col q = col p ∧ I p < I q).card ≤ (Finset.Ioi (I p)).card := by
     apply Finset.card_le_card_of_injOn I
     · intro q hq
       simp at hq ⊢
@@ -37,14 +42,18 @@ theorem rk_le {m : ℕ} (col : Fin m → ℕ) (top : Fin n) (htop : (top : ℕ) 
   rw [Fin.card_Ioi] at h1
   omega
 
-theorem sum_rk {m : ℕ} (col : Fin m → ℕ) (I : Fin m → Fin n) (hI : ColInj col I) :
-    ∑ p, rk col I p = npairs col := by
-  have e1 : ∑ p, rk col I p = (Finset.univ.filter fun x : Fin m × Fin m => col x.2 = col x.1 ∧ I x.1 < I x.2).card := by
+theorem sum_rk {m : ℕ} (col : Fin m → ℕ) (I : Fin m → Fin n) (hI : ColInj col I)
+    : ∑ p, rk col I p = npairs col := by
+  have e1
+      : ∑ p, rk col I p
+        = (Finset.univ.filter fun x : Fin m × Fin m => col x.2 = col x.1 ∧ I x.1 < I x.2).card := by
     unfold rk
     simp only [Finset.card_filter, Fintype.sum_prod_type]
   rw [e1]
   unfold npairs
-  apply Finset.card_bij' (fun x _ => if x.1 < x.2 then x else x.swap) (fun y _ => if I y.1 < I y.2 then y else y.swap)
+  apply Finset.card_bij'
+    (fun x _ => if x.1 < x.2 then x else x.swap)
+    (fun y _ => if I y.1 < I y.2 then y else y.swap)
   · intro x hx
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hx
     by_cases h : x.1 < x.2
@@ -75,26 +84,35 @@ theorem sum_rk {m : ℕ} (col : Fin m → ℕ) (I : Fin m → Fin n) (hI : ColIn
     · try simp only [Prod.fst_swap, Prod.snd_swap]
       exact ⟨hy.2, lt_of_le_of_ne (not_lt.mp h) (Ne.symm hne)⟩
 
-theorem npairs_le {m : ℕ} (col : Fin m → ℕ) (top : Fin n) (htop : (top : ℕ) + 1 = n) (I : Fin m → Fin n)
-    (hI : ColInj col I) : npairs col ≤ ∑ p, ((top : ℕ) - I p) := by
+theorem npairs_le
+    {m : ℕ} (col : Fin m → ℕ)
+    (top : Fin n) (htop : (top : ℕ) + 1 = n)
+    (I : Fin m → Fin n) (hI : ColInj col I)
+    : npairs col ≤ ∑ p, ((top : ℕ) - I p) := by
   rw [← sum_rk col I hI]
   exact Finset.sum_le_sum fun p _ => rk_le col top htop I hI p
 
-theorem eq_of_le {m : ℕ} (col : Fin m → ℕ) (top : Fin n) (htop : (top : ℕ) + 1 = n) (b I : Fin m → Fin n)
-    (hb : IsTab col b) (hI : ColInj col I) (h : ∑ p, ((top : ℕ) - I p) ≤ npairs col) :
-    ∃ σ ∈ colG col, I = b ∘ σ := by
+theorem eq_of_le
+    {m : ℕ} (col : Fin m → ℕ)
+    (top : Fin n) (htop : (top : ℕ) + 1 = n)
+    (b I : Fin m → Fin n)
+    (hb : IsTab col b) (hI : ColInj col I) (h : ∑ p, ((top : ℕ) - I p) ≤ npairs col)
+    : ∃ σ ∈ colG col, I = b ∘ σ := by
   classical
   have heq : ∀ p, rk col I p = (top : ℕ) - I p := by
     have hs : ∑ p, rk col I p = ∑ p, ((top : ℕ) - I p) :=
-      le_antisymm (by rw [sum_rk col I hI]; exact npairs_le col top htop I hI) (by rw [sum_rk col I hI]; exact h)
+      le_antisymm (by rw [sum_rk col I hI]; exact npairs_le col top htop I hI)
+        (by rw [sum_rk col I hI]; exact h)
     intro p
-    exact (Finset.sum_eq_sum_iff_of_le (fun p _ => rk_le col top htop I hI p)).mp hs p (Finset.mem_univ p)
+    exact (Finset.sum_eq_sum_iff_of_le (fun p _ => rk_le col top htop I hI p)).mp hs p
+      (Finset.mem_univ p)
   have hex : ∀ p, ∃ q, col q = col p ∧ b q = I p := by
     intro p
     have hA : (top : ℕ) - I p + 1 ≤ (Finset.univ.filter fun q => col q = col p).card := by
       rw [← heq p]
       unfold rk
-      rw [← Finset.card_insert_of_notMem (s := Finset.univ.filter fun q => col q = col p ∧ I p < I q) (a := p) (by simp)]
+      rw [← Finset.card_insert_of_notMem
+        (s := Finset.univ.filter fun q => col q = col p ∧ I p < I q) (a := p) (by simp)]
       apply Finset.card_le_card
       intro q hq
       simp only [Finset.mem_insert, Finset.mem_filter, Finset.mem_univ, true_and] at hq ⊢

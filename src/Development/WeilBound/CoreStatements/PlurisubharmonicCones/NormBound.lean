@@ -13,10 +13,12 @@ namespace LevelTowerAlt.LocalPrimeBound
 
 section Dvr
 
-variable (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-  [IsFractionRing V K]
+variable
+  (V K : Type)
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
 
-theorem exists_val : ∃ v : Valuation K NNReal, v.Integers V ∧ ∀ x : V, ¬ IsUnit x → v (algebraMap V K x) < 1 := by
+theorem exists_val
+    : ∃ v : Valuation K NNReal, v.Integers V ∧ ∀ x : V, ¬ IsUnit x → v (algebraMap V K x) < 1 := by
   have hmax : IsLocalRing.maximalIdeal V ≠ ⊥ := IsDiscreteValuationRing.not_a_field V
   let P : HeightOneSpectrum V :=
     ⟨IsLocalRing.maximalIdeal V, (IsLocalRing.maximalIdeal.isMaximal V).isPrime, hmax⟩
@@ -25,14 +27,18 @@ theorem exists_val : ∃ v : Valuation K NNReal, v.Integers V ∧ ∀ x : V, ¬ 
   have he : (1 : NNReal) < 2 := one_lt_two
   let f := WithZeroMulInt.toNNReal he.ne_zero
   have hf : StrictMono f := WithZeroMulInt.toNNReal_strictMono he
-  refine ⟨Valuation.map ⟨f, hf.monotone⟩ (P.valuation K),
-    ⟨IsFractionRing.injective V K, fun x => ?_, fun r hr => ?_⟩, fun x hx => ?_⟩
+  refine ⟨
+    Valuation.map ⟨f, hf.monotone⟩ (P.valuation K),
+    ⟨IsFractionRing.injective V K, fun x => ?_, fun r hr => ?_⟩,
+    fun x hx => ?_
+  ⟩
   · rw [Valuation.map_apply, ← map_one f]
     exact hf.monotone (P.valuation_le_one (K := K) x)
   · rw [Valuation.map_apply, ← map_one f] at hr
     have hr' : P.valuation K r ≤ 1 := hf.le_iff_le.1 hr
-    obtain ⟨y, hy⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one (K := K) (x := r)
-      (h := fun w => by rw [hP w]; exact hr')
+    obtain ⟨y, hy⟩ :=
+      HeightOneSpectrum.mem_integers_of_valuation_le_one (K := K) (x := r)
+        (h := fun w => by rw [hP w]; exact hr')
     exact ⟨y, hy⟩
   · rw [Valuation.map_apply, ← map_one f]
     exact hf ((P.valuation_lt_one_iff_mem (K := K) x).2 ((IsLocalRing.mem_maximalIdeal x).2 hx))
@@ -41,9 +47,12 @@ end Dvr
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem const_int {p : ℕ} (hp : p.Prime) {r : L} (h2 : p = 2 → r = 4) (hodd : p ≠ 2 → IsPrimitiveRoot (r + 1) p) :
-    ∃ k : 𝓞 L, algebraMap (𝓞 L) L k = r ∧ k ≠ 0 ∧
-      Real.log (Ideal.absNorm (Ideal.span {k})) ≤ Module.finrank ℚ L * (2 * (Real.log p / ((p : ℝ) - 1))) := by
+theorem const_int
+    {p : ℕ} (hp : p.Prime) {r : L} (h2 : p = 2 → r = 4) (hodd : p ≠ 2 → IsPrimitiveRoot (r + 1) p)
+    : ∃ k : 𝓞 L,
+      algebraMap (𝓞 L) L k = r ∧ k ≠ 0
+        ∧ Real.log (Ideal.absNorm (Ideal.span {k}))
+          ≤ Module.finrank ℚ L * (2 * (Real.log p / ((p : ℝ) - 1))) := by
   have hnormZ : ∀ m : ℕ, Ideal.absNorm (Ideal.span {(m : 𝓞 L)}) = m ^ Module.finrank ℚ L := by
     intro m
     rw [Ideal.absNorm_span_singleton, ← map_natCast (algebraMap ℤ (𝓞 L)) m, Algebra.norm_algebraMap,
@@ -74,35 +83,46 @@ theorem const_int {p : ℕ} (hp : p.Prime) {r : L} (h2 : p = 2 → r = 4) (hodd 
     refine ⟨ζ - 1, ?_, sub_ne_zero.2 (hζ'.ne_one hp.one_lt), ?_⟩
     · rw [map_sub, map_one]
       exact add_sub_cancel_right r 1
-    · have hassoc := GroundTheory.Heights₂.Heights.RootsOfUnityValuation.one_sub_pow_associated hp hζ'
+    · have hassoc :=
+        GroundTheory.Heights₂.Heights.RootsOfUnityValuation.one_sub_pow_associated hp hζ'
       have hsp : Ideal.span {ζ - 1} = Ideal.span {1 - ζ} := by
         rw [← neg_sub, Ideal.span_singleton_neg]
       have hN : Ideal.absNorm (Ideal.span {ζ - 1}) ^ (p - 1) = p ^ Module.finrank ℚ L := by
         rw [← hnormZ, ← Ideal.span_singleton_eq_span_singleton.2 hassoc, ← Ideal.span_singleton_pow,
           map_pow, hsp]
-      have hNr : (Ideal.absNorm (Ideal.span {ζ - 1}) : ℝ) ^ (p - 1) = (p : ℝ) ^ Module.finrank ℚ L := by
+      have hNr
+          : (Ideal.absNorm (Ideal.span {ζ - 1}) : ℝ) ^ (p - 1) = (p : ℝ) ^ Module.finrank ℚ L := by
         exact_mod_cast hN
       have hlog := congrArg Real.log hNr
       rw [Real.log_pow, Real.log_pow, Nat.cast_sub hp.one_le, Nat.cast_one] at hlog
       have hpos : (0 : ℝ) < (p : ℝ) - 1 := by linarith
-      have hL : Real.log (Ideal.absNorm (Ideal.span {ζ - 1})) =
-          Module.finrank ℚ L * (Real.log p / ((p : ℝ) - 1)) := by
+      have hL
+          : Real.log (Ideal.absNorm (Ideal.span {ζ - 1}))
+            = Module.finrank ℚ L * (Real.log p / ((p : ℝ) - 1)) := by
         rw [← mul_div_assoc, eq_div_iff hpos.ne']
         linear_combination hlog
       rw [hL]
       exact mul_le_mul_of_nonneg_left (by linarith) hd
 
-theorem norm_bound {E : Type} [Field E] [NumberField E] (ι : E →+* L) (S : Finset ℕ) (k : ℕ → 𝓞 L)
-    (hk : ∀ p ∈ S, k p ≠ 0 ∧
-      Real.log (Ideal.absNorm (Ideal.span {k p})) ≤ Module.finrank ℚ L * (2 * (Real.log p / ((p : ℝ) - 1)))) :
-    (differentIdeal ℤ (𝓞 E)).map (RingOfIntegers.mapRingHom ι) * Ideal.span {∏ p ∈ S, k p} ≠ ⊥ ∧
-    Real.log (Ideal.absNorm ((differentIdeal ℤ (𝓞 E)).map (RingOfIntegers.mapRingHom ι) *
-        Ideal.span {∏ p ∈ S, k p})) / Module.finrank ℚ L ≤
-      2 * (∑ p ∈ S, Real.log (p : ℝ) / ((p : ℝ) - 1)) +
-        2 * Real.log (|(discr E : ℝ)| ^ (1 / (Module.finrank ℚ E : ℝ))) := by
+theorem norm_bound
+    {E : Type} [Field E] [NumberField E]
+    (ι : E →+* L)
+    (S : Finset ℕ) (k : ℕ → 𝓞 L)
+    (hk : ∀ p ∈ S,
+      k p ≠ 0
+        ∧ Real.log (Ideal.absNorm (Ideal.span {k p}))
+          ≤ Module.finrank ℚ L * (2 * (Real.log p / ((p : ℝ) - 1))))
+    : (differentIdeal ℤ (𝓞 E)).map (RingOfIntegers.mapRingHom ι) * Ideal.span {∏ p ∈ S, k p} ≠ ⊥
+      ∧ Real.log (Ideal.absNorm
+            ((differentIdeal ℤ (𝓞 E)).map (RingOfIntegers.mapRingHom ι)
+              * Ideal.span {∏ p ∈ S, k p}))
+          / Module.finrank ℚ L
+        ≤ 2 * (∑ p ∈ S, Real.log (p : ℝ) / ((p : ℝ) - 1))
+          + 2 * Real.log (|(discr E : ℝ)| ^ (1 / (Module.finrank ℚ E : ℝ))) := by
   obtain ⟨hne, hlog⟩ := GroundTheory.Heights₂.Heights.NineStatements.DifferentExtNorm.full E L ι
   change (differentIdeal ℤ (𝓞 E)).map (RingOfIntegers.mapRingHom ι) ≠ ⊥ at hne
-  change Real.log (Ideal.absNorm ((differentIdeal ℤ (𝓞 E)).map (RingOfIntegers.mapRingHom ι))) = _ at hlog
+  change Real.log (Ideal.absNorm ((differentIdeal ℤ (𝓞 E)).map (RingOfIntegers.mapRingHom ι))) = _
+    at hlog
   set I := (differentIdeal ℤ (𝓞 E)).map (RingOfIntegers.mapRingHom ι) with hI
   have hspan : Ideal.span {∏ p ∈ S, k p} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
@@ -117,8 +137,9 @@ theorem norm_bound {E : Type} [Field E] [NumberField E] (ι : E →+* L) (S : Fi
     exact hne
   rw [map_mul, ← Ideal.prod_span_singleton, map_prod, Nat.cast_mul, Nat.cast_prod,
     Real.log_mul hNI (Finset.prod_ne_zero_iff.2 hN), Real.log_prod hN, hlog]
-  have hB : ∑ p ∈ S, Real.log (Ideal.absNorm (Ideal.span {k p})) ≤
-      Module.finrank ℚ L * (2 * ∑ p ∈ S, Real.log (p : ℝ) / ((p : ℝ) - 1)) := by
+  have hB
+      : ∑ p ∈ S, Real.log (Ideal.absNorm (Ideal.span {k p}))
+        ≤ Module.finrank ℚ L * (2 * ∑ p ∈ S, Real.log (p : ℝ) / ((p : ℝ) - 1)) := by
     rw [Finset.mul_sum, Finset.mul_sum]
     exact Finset.sum_le_sum fun p hp => (hk p hp).2
   have hdE : (discr E : ℝ) ≠ 0 := by exact_mod_cast NumberField.discr_ne_zero E
@@ -127,14 +148,16 @@ theorem norm_bound {E : Type} [Field E] [NumberField E] (ι : E →+* L) (S : Fi
     refine div_nonneg (Real.log_nonneg ?_) (Nat.cast_nonneg _)
     have h1 : (1 : ℤ) ≤ |discr E| := Int.one_le_abs (NumberField.discr_ne_zero E)
     exact_mod_cast h1
-  have hlogd : Real.log (|(discr E : ℝ)| ^ (1 / (Module.finrank ℚ E : ℝ))) =
-      GroundTheory.Heights₂.Heights.NineStatements.logRd E := by
+  have hlogd
+      : Real.log (|(discr E : ℝ)| ^ (1 / (Module.finrank ℚ E : ℝ)))
+        = GroundTheory.Heights₂.Heights.NineStatements.logRd E := by
     unfold GroundTheory.Heights₂.Heights.NineStatements.logRd
     rw [Real.log_rpow (abs_pos.2 hdE)]
     ring
   rw [hlogd, add_div, mul_div_cancel_left₀ _ hn.ne']
-  have hB' : (∑ p ∈ S, Real.log (Ideal.absNorm (Ideal.span {k p}))) / Module.finrank ℚ L ≤
-      2 * ∑ p ∈ S, Real.log (p : ℝ) / ((p : ℝ) - 1) := by
+  have hB'
+      : (∑ p ∈ S, Real.log (Ideal.absNorm (Ideal.span {k p}))) / Module.finrank ℚ L
+        ≤ 2 * ∑ p ∈ S, Real.log (p : ℝ) / ((p : ℝ) - 1) := by
     rw [div_le_iff₀ hn]
     linarith [hB]
   linarith

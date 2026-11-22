@@ -11,14 +11,14 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.SW
 
-
 open scoped Pointwise in
-theorem exists_continuous_modulus_of_continuous_action :
-    ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [LocallyCompactSpace V]
-      [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
-      [IsTopologicalAddGroup V] (μ : Measure V) [μ.IsAddHaarMeasure] (Q : Type) [Group Q]
-      [TopologicalSpace Q] [IsTopologicalGroup Q] [DistribMulAction Q V] [ContinuousSMul Q V],
-      ∃ χ : Q →* ℝ≥0, Continuous χ ∧ ∀ q : Q, μ.map (fun v => q • v) = χ q • μ := by
+theorem exists_continuous_modulus_of_continuous_action
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [LocallyCompactSpace V]
+        [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
+        [IsTopologicalAddGroup V] (μ : Measure V) [μ.IsAddHaarMeasure] (Q : Type) [Group Q]
+        [TopologicalSpace Q] [IsTopologicalGroup Q] [DistribMulAction Q V] [ContinuousSMul Q V],
+      ∃ χ : Q →* ℝ≥0,
+        Continuous χ ∧ ∀ q : Q, μ.map (fun v => q • v) = χ q • μ := by
   intro V _ _ _ _ _ _ _ _ μ _ Q _ _ _ _ _
   letI : SMul Q (Set V) := Set.smulSet
 
@@ -35,7 +35,9 @@ theorem exists_continuous_modulus_of_continuous_action :
     intro b hb
     have hb' : (1 : ℝ≥0∞) < b := by exact_mod_cast hb
     have hlt : μ K < (b : ℝ≥0∞) * μ K := by
-      calc μ K = 1 * μ K := (one_mul _).symm
+      calc
+        μ K
+          = 1 * μ K := (one_mul _).symm
         _ < b * μ K := (ENNReal.mul_lt_mul_iff_left hKpos hKtop).2 hb'
     obtain ⟨O, hKO, hO, hOμ⟩ := Set.exists_isOpen_lt_of_lt K _ hlt
     have hN : IsOpen {p : Q × V | p.1 • p.2 ∈ O} := hO.preimage continuous_smul
@@ -65,9 +67,16 @@ theorem exists_continuous_modulus_of_continuous_action :
       rw [map_inv] at hq
       exact (inv_lt_inv₀ distribHaarChar_pos (pos_iff_ne_zero.2 ha0)).1 hq
   have hcont : Continuous Δ := continuous_of_continuousAt_one Δ hcont1
-  refine ⟨⟨⟨fun q => Δ q⁻¹, by simp⟩, fun a b => by
-    simp only [_root_.mul_inv_rev]
-    rw [map_mul, mul_comm]⟩, hcont.comp continuous_inv, fun q => ?_⟩
+  refine ⟨
+    ⟨
+      ⟨fun q => Δ q⁻¹, by simp⟩,
+      fun a b => by
+        simp only [_root_.mul_inv_rev]
+        rw [map_mul, mul_comm]
+    ⟩,
+    hcont.comp continuous_inv,
+    fun q => ?_
+  ⟩
   ext s hs
   rw [Measure.map_apply (continuous_const_smul q).measurable hs]
   show _ = ((Δ q⁻¹ : ℝ≥0) • μ) s

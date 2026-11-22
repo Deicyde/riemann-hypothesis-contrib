@@ -6,14 +6,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEtPlace
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev
 
 namespace GlobalTheory
 
-theorem exists_compatible_primitive_prime_pow_roots :
-    ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] [CharZero k],
-      ∃ ζ : ℕ → kˣ, (∀ r, IsPrimitiveRoot (ζ r) (p ^ r)) ∧ ∀ r, ζ (r + 1) ^ p = ζ r := by
+theorem exists_compatible_primitive_prime_pow_roots
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] [CharZero k], ∃ ζ : ℕ → kˣ,
+      (∀ r, IsPrimitiveRoot (ζ r) (p ^ r)) ∧ ∀ r, ζ (r + 1) ^ p = ζ r := by
   intro p hp k _ _ _
   have hp' : p.Prime := hp.out
 
@@ -33,8 +36,9 @@ theorem exists_compatible_primitive_prime_pow_roots :
   have hu₁ : IsPrimitiveRoot (Units.mk0 z₁ hz₁0) p := by
     rw [← IsPrimitiveRoot.coe_units_iff]; simpa using hz₁
 
-  have step : ∀ (n : ℕ) (x : kˣ), IsPrimitiveRoot (x ^ p) (p ^ (n + 1)) →
-      IsPrimitiveRoot x (p ^ (n + 2)) := by
+  have step
+      : ∀ (n : ℕ) (x : kˣ),
+        IsPrimitiveRoot (x ^ p) (p ^ (n + 1)) → IsPrimitiveRoot x (p ^ (n + 2)) := by
     intro n x hx
     rw [IsPrimitiveRoot.iff_orderOf] at hx ⊢
     have hdvd : orderOf x ∣ p ^ (n + 2) := by
@@ -61,8 +65,16 @@ theorem exists_compatible_primitive_prime_pow_roots :
     | zero => simpa [g0] using hu₁
     | succ n ih =>
       apply step
-      rw [gs, hf]; exact ih
-  refine ⟨fun r => match r with | 0 => 1 | r + 1 => g r, ?_, ?_⟩
+      rw [gs, hf]
+      exact ih
+  refine ⟨
+    fun r =>
+      match r with
+      | 0 => 1
+      | r + 1 => g r,
+    ?_,
+    ?_
+  ⟩
   · intro r
     cases r with
     | zero => simpa using IsPrimitiveRoot.one

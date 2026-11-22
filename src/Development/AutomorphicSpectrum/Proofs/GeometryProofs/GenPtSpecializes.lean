@@ -13,12 +13,12 @@ open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω]
 
-theorem dom (ξ : Spec (CommRingCat.of Ω) ⟶ X) (h : IsCptGen ξ) (p : Cpt ξ) :
-    IsDomain (X.presheaf.stalk p.1) := by
+theorem dom (ξ : Spec (CommRingCat.of Ω) ⟶ X) (h : IsCptGen ξ) (p : Cpt ξ)
+    : IsDomain (X.presheaf.stalk p.1) := by
   exact Function.Injective.isDomain (genMap ξ p) (h.inj p)
 
-theorem nogen (ξ : Spec (CommRingCat.of Ω) ⟶ X) (h : IsCptGen ξ) (y : X) (hy : y ⤳ genPt ξ) :
-    y = genPt ξ := by
+theorem nogen (ξ : Spec (CommRingCat.of Ω) ⟶ X) (h : IsCptGen ξ) (y : X) (hy : y ⤳ genPt ξ)
+    : y = genPt ξ := by
   have hy' : y ∈ Set.range (X.fromSpecStalk (genPt ξ)) := by
     rw [Scheme.range_fromSpecStalk]
     exact hy

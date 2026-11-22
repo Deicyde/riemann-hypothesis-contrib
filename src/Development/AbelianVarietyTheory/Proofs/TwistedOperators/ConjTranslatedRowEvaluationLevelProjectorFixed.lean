@@ -15,7 +15,11 @@ public import Formalism.LocalToGlobal.GlobalTheory.GL5.FamilyMassVolumeIdentityO
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory
+  NumberField IsDedekindDomain
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -23,22 +27,29 @@ noncomputable section
 
 namespace GlobalTheory.RowEvalHH.LevelFix
 
-theorem castGA_symm_mem {I I' : Formalism.MainNotions.S.AutInst} (p : I = I') (γ : I'.GA) (hγ : γ ∈ I'.GFset) :
-    (castGA p).symm γ ∈ I.GFset := by
+theorem castGA_symm_mem
+    {I I' : Formalism.MainNotions.S.AutInst} (p : I = I') (γ : I'.GA) (hγ : γ ∈ I'.GFset)
+    : (castGA p).symm γ ∈ I.GFset := by
   subst p
   exact hγ
 
-theorem iotaX_symm_rat {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D)
-    (γ : X.B.I.GA) (hγ : γ ∈ X.B.I.GFset) : (iotaX X h).symm γ ∈ GQ (D.sp.Y 0) := by
+theorem iotaX_symm_rat
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+    (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (γ : X.B.I.GA) (hγ : γ ∈ X.B.I.GFset)
+    : (iotaX X h).symm γ ∈ GQ (D.sp.Y 0) := by
   refine (Formalism.IndefR.RationalEmbedding.iota_rat D ((iotaX X h).symm γ)).2 ?_
   show Formalism.IndefR.RationalEmbedding.iota D ((Formalism.IndefR.RationalEmbedding.iota D).symm ((castGA h.symm).symm γ)) ∈ _
   rw [ContinuousMulEquiv.apply_symm_apply]
   exact castGA_symm_mem _ γ hγ
 
-theorem mult_lev {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} {M : DSModel V S}
-    {θ : D.what₂.Tau → TensorProduct (↥D.host.F) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf ↥D.host.F) D.host.E →+* ℂ}
-    {J : Set (GA D V)} {χ : GA D V → ℂ} {T : MMap M} (hT : T ∈ Mult θ M J χ) :
-    ∀ v, ∀ k ∈ J, ∀ g, T v (g * k) = χ k * T v g := by
+theorem mult_lev
+    {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} {M : DSModel V S}
+    {θ : D.what₂.Tau
+      → TensorProduct (↥D.host.F)
+          (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf ↥D.host.F) D.host.E
+        →+* ℂ}
+    {J : Set (GA D V)} {χ : GA D V → ℂ} {T : MMap M} (hT : T ∈ Mult θ M J χ)
+    : ∀ v, ∀ k ∈ J, ∀ g, T v (g * k) = χ k * T v g := by
   induction hT using Submodule.span_induction with
   | mem x hx => exact hx.lev
   | zero => intro v k _ g; simp
@@ -52,18 +63,32 @@ theorem mult_lev {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar} {M : DSModel 
 
 end GlobalTheory.RowEvalHH.LevelFix
 
-
 open GlobalTheory.RowEvalHH GlobalTheory.RowEvalHH.LevelFix in
-theorem GlobalTheory.RowEvalHH.Re_evF : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D), R.toLevCh.Is A.μ0 → R.IsGrp F → R.IsModels → HostHyp D → (∀ x : X.B.I.E, HEq (X.ιE x) x) → ∀ (t : GA D (Yc D 0)) (c : ∀ τ, (MP R).H τ ≃ₗᵢ⋆[ℂ] X.B.H (X.pl.symm τ)), t ∈ GfC (Yc D 0) → LevelMatchA R F X h t → ∀ S ∈ EP R F, ∀ y : ∀ τ, ↥(GlobalTheory.RowEvalHH.Wsub R X c τ), X.B.Re (GlobalTheory.RowEvalHH.evF R X h t c S y) = GlobalTheory.RowEvalHH.evF R X h t c S y := by
+theorem GlobalTheory.RowEvalHH.Re_evF
+    : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A)
+        (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+        (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D),
+      R.toLevCh.Is A.μ0 → R.IsGrp F → R.IsModels → HostHyp D → (∀ x : X.B.I.E, HEq (X.ιE x) x)
+        → ∀ (t : GA D (Yc D 0)) (c : ∀ τ, (MP R).H τ ≃ₗᵢ⋆[ℂ] X.B.H (X.pl.symm τ)),
+          t ∈ GfC (Yc D 0) → LevelMatchA R F X h t
+            → ∀ S ∈ EP R F, ∀ y : ∀ τ, ↥(GlobalTheory.RowEvalHH.Wsub R X c τ),
+              X.B.Re (GlobalTheory.RowEvalHH.evF R X h t c S y)
+                = GlobalTheory.RowEvalHH.evF R X h t c S y := by
   intro D G _ _ Pl0 T A Ks _ _ _ R F X h hLev hGrp hMod hHost hιE t c ht hLM S hS y
   classical
   have hSM := Formalism.IndefR.Mult.goodPart_le _ _ _ _ _ hS
-  have hcl := Formalism.IndefR.PeterssonHilbertSpace.mult_cont_left (MP R) R.θ _ _ hSM (vecOf R X c y)
+  have hcl :=
+    Formalism.IndefR.PeterssonHilbertSpace.mult_cont_left (MP R) R.θ _ _ hSM (vecOf R X c y)
   have hlev := mult_lev hSM (vecOf R X c y)
   let ιY : X.B.I.GA ≃* GA D (Yc D 0) := (iotaX X h).symm.toMulEquiv
   unfold evF
-  by_cases hm : MemLp (fun x => ev (MP R) (vecOf R X c y) S
-      (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm x) t)) 2 (muX X)
+  by_cases hm : MemLp
+    (fun x =>
+      ev (MP R) (vecOf R X c y) S
+        (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm x) t))
+    2 (muX X)
   · rw [dite_eq_left hm]
     set f : X.B.I.GA → ℂ := fun x => ev (MP R) (vecOf R X c y) S
       (@HMul.hMul (GA D (Yc D 0)) (GA D (Yc D 0)) (GA D (Yc D 0)) _ ((iotaX X h).symm x) t) with hf
@@ -97,12 +122,15 @@ theorem GlobalTheory.RowEvalHH.Re_evF : ∀ {D : D7} {G : Type} [Group G] [Finty
       rw [h1, star_mul', star_star, mul_comm]
     have hK := Formalism.L2.SG.Closed.level_subgroup_is_group X
     have hKL := Formalism.L2.SG.Closed.level_subgroup_properties X
-    have hKM : MeasurableSet X.K2 := (Formalism.L2.SG.PoincareInHH.Cut.level_subgroup_isClopen X hK hKL).isOpen.measurableSet
-    have hfix : ∀ᵐ z ∂(X.B.I.muA X.B.μf), ∫ g, X.B.e g * star (f (z * (1, g))) ∂X.B.μf = star (f z) := by
+    have hKM : MeasurableSet X.K2 :=
+      (Formalism.L2.SG.PoincareInHH.Cut.level_subgroup_isClopen X hK hKL).isOpen.measurableSet
+    have hfix
+        : ∀ᵐ z ∂(X.B.I.muA X.B.μf), ∫ g, X.B.e g * star (f (z * (1, g))) ∂X.B.μf = star (f z) := by
       refine Filter.Eventually.of_forall fun z => ?_
       have hvol : (X.B.μf X.K2).toReal ≠ 0 := ENNReal.toReal_ne_zero.2 ⟨hKL.2.2.1.ne', hKL.2.2.2.ne⟩
-      have hfun : (fun g => X.B.e g * star (f (z * (1, g)))) =
-          X.K2.indicator (fun _ => star (f z) / ((X.B.μf X.K2).toReal : ℂ)) := by
+      have hfun
+          : (fun g => X.B.e g * star (f (z * (1, g))))
+            = X.K2.indicator (fun _ => star (f z) / ((X.B.μf X.K2).toReal : ℂ)) := by
         funext g
         rw [X.e_eq g]
         by_cases hg : g ∈ X.K2
@@ -120,7 +148,8 @@ theorem GlobalTheory.RowEvalHH.Re_evF : ∀ {D : D7} {G : Type} [Group G] [Finty
       simp only [measureReal_def, Complex.real_smul]
       have hC : ((X.B.μf X.K2).toReal : ℂ) ≠ 0 := by exact_mod_cast hvol
       rw [mul_div_assoc', mul_div_cancel_left₀ _ hC]
-    exact Formalism.L2.SG.Pf.idempotent_fixes_invariant_L2 X (fun x => star (f x)) hmeas hinv hm0 hfix
+    exact
+      Formalism.L2.SG.Pf.idempotent_fixes_invariant_L2 X (fun x => star (f x)) hmeas hinv hm0 hfix
   · rw [dite_eq_right hm]
     have h0 : (star (0 : L2X X)) = 0 := (Formalism.L2.SG.RowDict.conjL (muX X)).map_zero
     rw [h0, map_zero]

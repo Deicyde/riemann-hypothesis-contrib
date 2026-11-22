@@ -65,7 +65,13 @@ lemma sum_eq (x : ℂ) (hx : x ≠ 0) (h1 : ∀ k : ℕ, x ^ (k + 1) - 1 ≠ 0) 
     push_cast
     simp
 
-theorem sum_gaussian_mul_prod : ∀ (q n : ℕ) (N : ℕ → ℕ), 2 ≤ q → (∀ a, a ≤ n → N a * ∏ i ∈ Finset.range a, (q ^ a - q ^ i) = ∏ i ∈ Finset.range a, (q ^ n - q ^ i)) → ∑ a ∈ Finset.Icc 1 n, (N a : ℂ) * ∏ i ∈ Finset.Ico 1 a, (1 - (q : ℂ) ^ i) = n := by
+theorem sum_gaussian_mul_prod
+    : ∀ (q n : ℕ) (N : ℕ → ℕ),
+      2 ≤ q
+        → (∀ a,
+          a ≤ n
+            → N a * ∏ i ∈ Finset.range a, (q ^ a - q ^ i) = ∏ i ∈ Finset.range a, (q ^ n - q ^ i))
+        → ∑ a ∈ Finset.Icc 1 n, (N a : ℂ) * ∏ i ∈ Finset.Ico 1 a, (1 - (q : ℂ) ^ i) = n := by
   intro q n N hq hN
   have hx : (q : ℂ) ≠ 0 := by exact_mod_cast (by omega : q ≠ 0)
   have h1 : ∀ k : ℕ, (q : ℂ) ^ (k + 1) - 1 ≠ 0 := by
@@ -74,8 +80,11 @@ theorem sum_gaussian_mul_prod : ∀ (q n : ℕ) (N : ℕ → ℕ), 2 ≤ q → (
     have h'' : q ^ (k + 1) = 1 := by exact_mod_cast h'
     have := Nat.one_lt_pow (n := k + 1) (a := q) (by omega) (by omega)
     omega
-  have cast : ∀ m a, a ≤ m → ((∏ i ∈ Finset.range a, (q ^ m - q ^ i) : ℕ) : ℂ)
-      = ∏ i ∈ Finset.range a, ((q : ℂ) ^ m - (q : ℂ) ^ i) := by
+  have cast
+      : ∀ m a,
+        a ≤ m
+          → ((∏ i ∈ Finset.range a, (q ^ m - q ^ i) : ℕ) : ℂ)
+            = ∏ i ∈ Finset.range a, ((q : ℂ) ^ m - (q : ℂ) ^ i) := by
     intro m a ha
     rw [Nat.cast_prod]
     refine Finset.prod_congr rfl fun i hi => ?_

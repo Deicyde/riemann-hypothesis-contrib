@@ -33,8 +33,10 @@ theorem posDefOfDefiniteSignature_holds : SigPos := by
   obtain ⟨e, P, hP⟩ := h
   rw [cT_conj, Jpq_zero] at hP
   generalize hBdef : reindex e e A = B at hP
-  obtain ⟨Q, hQ⟩ : ∃ Q : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ,
-      Q = ((P⁻¹ : GL (Fin M ⊕ Fin 0) ℂ) : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ) := ⟨_, rfl⟩
+  obtain ⟨Q, hQ⟩
+      : ∃ Q : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ,
+        Q = ((P⁻¹ : GL (Fin M ⊕ Fin 0) ℂ) : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ) :=
+    ⟨_, rfl⟩
   have hPQ : (P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ) * Q = 1 := by
     rw [hQ]
     exact Units.mul_inv P
@@ -43,13 +45,16 @@ theorem posDefOfDefiniteSignature_holds : SigPos := by
     have h2 := congrArg (fun v => (P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ) *ᵥ v) hxy
     simpa [Matrix.mulVec_mulVec, hPQ] using h2
   have hBeq : B = Qᴴ * 1 * Q := by
-    calc B = ((P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ) * Q)ᴴ * B
+    calc
+      B = ((P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ) * Q)ᴴ * B
           * ((P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ) * Q) := by
-          rw [hPQ]; simp
-      _ = Qᴴ * ((P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ)ᴴ * B
-          * (P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ)) * Q := by
-          rw [Matrix.conjTranspose_mul]
-          simp only [Matrix.mul_assoc]
+        rw [hPQ]; simp
+      _ = Qᴴ
+          * ((P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ)ᴴ * B
+            * (P : Matrix (Fin M ⊕ Fin 0) (Fin M ⊕ Fin 0) ℂ))
+          * Q := by
+        rw [Matrix.conjTranspose_mul]
+        simp only [Matrix.mul_assoc]
       _ = Qᴴ * 1 * Q := by rw [hP]
   have hBpos : B.PosDef := by
     rw [hBeq]

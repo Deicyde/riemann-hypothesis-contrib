@@ -13,8 +13,9 @@ noncomputable section
 namespace GroundTheory.Global
 namespace Elliptic
 
-theorem meromorphicAt_fun_sum {ι : Type*} (s : Finset ι) {f : ι → ℂ → ℂ} {x : ℂ}
-    (hf : ∀ i, MeromorphicAt (f i) x) : MeromorphicAt (fun z ↦ ∑ i ∈ s, f i z) x := by
+theorem meromorphicAt_fun_sum
+    {ι : Type*} (s : Finset ι) {f : ι → ℂ → ℂ} {x : ℂ} (hf : ∀ i, MeromorphicAt (f i) x)
+    : MeromorphicAt (fun z ↦ ∑ i ∈ s, f i z) x := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -22,8 +23,8 @@ theorem meromorphicAt_fun_sum {ι : Type*} (s : Finset ι) {f : ι → ℂ → �
     simp only [Finset.sum_insert ha]
     exact (hf a).add ih
 
-theorem germ_sum {ι : Type*} (s : Finset ι) {f : ι → ℂ → ℂ} (hf : ∀ i, Meromorphic (f i)) :
-    germ (fun z ↦ ∑ i ∈ s, f i z) = ∑ i ∈ s, germ (f i) := by
+theorem germ_sum {ι : Type*} (s : Finset ι) {f : ι → ℂ → ℂ} (hf : ∀ i, Meromorphic (f i))
+    : germ (fun z ↦ ∑ i ∈ s, f i z) = ∑ i ∈ s, germ (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -31,15 +32,15 @@ theorem germ_sum {ι : Type*} (s : Finset ι) {f : ι → ℂ → ℂ} (hf : ∀
     rw [germ_const, map_zero]
   | insert a s ha ih =>
     simp only [Finset.sum_insert ha]
-    have hs : Meromorphic fun z ↦ ∑ i ∈ s, f i z := fun x ↦
-      meromorphicAt_fun_sum s fun i ↦ hf i x
+    have hs : Meromorphic fun z ↦ ∑ i ∈ s, f i z := fun x ↦ meromorphicAt_fun_sum s fun i ↦ hf i x
     rw [← ih]
     exact germ_add (hf a) hs
 
-theorem lt_meromorphicOrderAt_sum {ι : Type*} (s : Finset ι) {f : ι → ℂ → ℂ} {x : ℂ}
-    (hf : ∀ i, MeromorphicAt (f i) x) {c : ℤ}
-    (hc : ∀ i ∈ s, (c : WithTop ℤ) < meromorphicOrderAt (f i) x) :
-    (c : WithTop ℤ) < meromorphicOrderAt (fun z ↦ ∑ i ∈ s, f i z) x := by
+theorem lt_meromorphicOrderAt_sum
+    {ι : Type*} (s : Finset ι)
+    {f : ι → ℂ → ℂ} {x : ℂ} (hf : ∀ i, MeromorphicAt (f i) x)
+    {c : ℤ} (hc : ∀ i ∈ s, (c : WithTop ℤ) < meromorphicOrderAt (f i) x)
+    : (c : WithTop ℤ) < meromorphicOrderAt (fun z ↦ ∑ i ∈ s, f i z) x := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -53,25 +54,27 @@ theorem lt_meromorphicOrderAt_sum {ι : Type*} (s : Finset ι) {f : ι → ℂ �
     have h2 := ih fun i hi ↦ hc i (Finset.mem_insert_of_mem hi)
     exact lt_of_lt_of_le (lt_min h1 h2) (meromorphicOrderAt_add (hf a) hs)
 
-theorem exists_int_of_real_mul_mem (L : PeriodPair) {r : ℝ} (h : (r : ℂ) * L.ω₁ ∈ L.lattice) :
-    ∃ a : ℤ, r = a := by
+theorem exists_int_of_real_mul_mem (L : PeriodPair) {r : ℝ} (h : (r : ℂ) * L.ω₁ ∈ L.lattice)
+    : ∃ a : ℤ, r = a := by
   obtain ⟨m, n, e⟩ := PeriodPair.mem_lattice.1 h
-  have := LinearIndependent.pair_iff.mp L.indep ((m : ℝ) - r) (n : ℝ) (by
-    simp only [Complex.real_smul, Complex.ofReal_sub, Complex.ofReal_intCast]
-    linear_combination e)
+  have :=
+    LinearIndependent.pair_iff.mp L.indep ((m : ℝ) - r) (n : ℝ) (by
+      simp only [Complex.real_smul, Complex.ofReal_sub, Complex.ofReal_intCast]
+      linear_combination e)
   exact ⟨m, (sub_eq_zero.1 this.1).symm⟩
 
 theorem sqrt_two_ne_zero : (Real.sqrt 2 : ℂ) ≠ 0 := by
   rw [ne_eq, Complex.ofReal_eq_zero]
   exact (Real.sqrt_pos.2 two_pos).ne'
 
-theorem injective_mk_div_sqrt_two (L : PeriodPair) :
-    Function.Injective fun m : ℕ ↦ Torus.mk L ((m : ℂ) * L.ω₁ / (Real.sqrt 2 : ℂ)) := by
+theorem injective_mk_div_sqrt_two (L : PeriodPair)
+    : Function.Injective fun m : ℕ ↦ Torus.mk L ((m : ℂ) * L.ω₁ / (Real.sqrt 2 : ℂ)) := by
   intro m m' hm
   simp only at hm
   rw [Torus.mk_eq_mk_iff] at hm
-  have e : (m : ℂ) * L.ω₁ / (Real.sqrt 2 : ℂ) - (m' : ℂ) * L.ω₁ / (Real.sqrt 2 : ℂ) =
-      ((((m : ℝ) - m') / Real.sqrt 2 : ℝ) : ℂ) * L.ω₁ := by
+  have e
+      : (m : ℂ) * L.ω₁ / (Real.sqrt 2 : ℂ) - (m' : ℂ) * L.ω₁ / (Real.sqrt 2 : ℂ)
+        = ((((m : ℝ) - m') / Real.sqrt 2 : ℝ) : ℂ) * L.ω₁ := by
     push_cast
     ring
   rw [e] at hm
@@ -89,9 +92,9 @@ theorem injective_mk_div_sqrt_two (L : PeriodPair) :
     linear_combination (-1 : ℝ) * ha
   exact irrational_sqrt_two ⟨((m : ℚ) - m') / a, by push_cast; exact hs.symm⟩
 
-theorem meromorphicOrderAt_weierstrassP_sqrt_two (L : PeriodPair) {z₀ : ℂ}
-    (hz : (Real.sqrt 2 : ℂ) * z₀ + 0 ∈ L.lattice) :
-    meromorphicOrderAt (fun z ↦ ℘[L] ((Real.sqrt 2 : ℂ) * z + 0)) z₀ = -2 := by
+theorem meromorphicOrderAt_weierstrassP_sqrt_two
+    (L : PeriodPair) {z₀ : ℂ} (hz : (Real.sqrt 2 : ℂ) * z₀ + 0 ∈ L.lattice)
+    : meromorphicOrderAt (fun z ↦ ℘[L] ((Real.sqrt 2 : ℂ) * z + 0)) z₀ = -2 := by
   have hg : AnalyticAt ℂ (fun z : ℂ ↦ (Real.sqrt 2 : ℂ) * z + 0) z₀ := by fun_prop
   have hd : deriv (fun z : ℂ ↦ (Real.sqrt 2 : ℂ) * z + 0) z₀ ≠ 0 := by
     have h1 := ((hasDerivAt_id' z₀).const_mul (Real.sqrt 2 : ℂ)).add_const 0
@@ -101,20 +104,19 @@ theorem meromorphicOrderAt_weierstrassP_sqrt_two (L : PeriodPair) {z₀ : ℂ}
   rw [Function.comp_def] at this
   rw [this, L.order_weierstrassP _ hz]
 
-theorem ellEval_indep (L : PeriodPair) (p : (weierstrassCurve L).toAffine.FunctionField[X])
-    (hp : p ≠ 0) :
-    (p.map (ellEval L).toRingHom).eval (germ fun z ↦ ℘[L] ((Real.sqrt 2 : ℂ) * z + 0)) ≠ 0 := by
+theorem ellEval_indep
+    (L : PeriodPair) (p : (weierstrassCurve L).toAffine.FunctionField[X]) (hp : p ≠ 0)
+    : (p.map (ellEval L).toRingHom).eval (germ fun z ↦ ℘[L] ((Real.sqrt 2 : ℂ) * z + 0)) ≠ 0 := by
   set t : ℂ := (Real.sqrt 2 : ℂ)
   set h : ℂ → ℂ := fun z ↦ ℘[L] (t * z + 0)
   have mh : Meromorphic h := meromorphic_weierstrassP_affine L t 0
   choose f hf hfe using fun i ↦ exists_isEllipticFunction_ellEval_eq L (p.coeff i)
   set n := p.natDegree
-  have mt : ∀ i, Meromorphic fun z ↦ f i z * h z ^ i := fun i x ↦
-    ((hf i).1 x).mul ((mh x).pow i)
-  have heval : (p.map (ellEval L).toRingHom).eval (germ h) =
-      germ fun z ↦ ∑ i ∈ Finset.range (n + 1), f i z * h z ^ i := by
-    rw [eval_eq_sum_range, natDegree_map_eq_of_injective (ellEval_injective L),
-      germ_sum _ mt]
+  have mt : ∀ i, Meromorphic fun z ↦ f i z * h z ^ i := fun i x ↦ ((hf i).1 x).mul ((mh x).pow i)
+  have heval
+      : (p.map (ellEval L).toRingHom).eval (germ h)
+        = germ fun z ↦ ∑ i ∈ Finset.range (n + 1), f i z * h z ^ i := by
+    rw [eval_eq_sum_range, natDegree_map_eq_of_injective (ellEval_injective L), germ_sum _ mt]
     refine Finset.sum_congr rfl fun i _ ↦ ?_
     rw [coeff_map, show (fun z ↦ f i z * h z ^ i) = f i * h ^ i from rfl,
       germ_mul (hf i).1 (mh.pow (n := i)), germ_pow mh]
@@ -134,8 +136,10 @@ theorem ellEval_indep (L : PeriodPair) (p : (weierstrassCurve L).toAffine.Functi
   set bad : Set ℂ := (⋃ i ∈ Finset.range (n + 1), singularSet (f i)) ∪ singularSet (f n)⁻¹
   have hbad : (Torus.mk L '' bad).Finite := by
     rw [image_union, image_iUnion₂]
-    refine Finite.union (Finite.biUnion (Finset.finite_toSet _) fun i _ ↦
-      finite_image_singularSet L (hf i).1 (hf i).2) ?_
+    refine Finite.union
+      (Finite.biUnion (Finset.finite_toSet _) fun i _ ↦
+        finite_image_singularSet L (hf i).1 (hf i).2)
+      ?_
     exact finite_image_singularSet L (hf n).1.inv fun z l hl ↦ by
       simp only [Pi.inv_apply, (hf n).2 z l hl]
   obtain ⟨m, hm⟩ := (hbad.preimage (injective_mk_div_sqrt_two L).injOn).infinite_compl.nonempty
@@ -167,8 +171,10 @@ theorem ellEval_indep (L : PeriodPair) (p : (weierstrassCurve L).toAffine.Functi
     have : k = 0 := by omega
     rw [this]
     rfl
-  have hterm : ∀ i, meromorphicOrderAt (fun z ↦ f i z * h z ^ i) z₀ =
-      meromorphicOrderAt (f i) z₀ + ((i * (-2) : ℤ) : WithTop ℤ) := fun i ↦ by
+  have hterm
+      : ∀ i,
+        meromorphicOrderAt (fun z ↦ f i z * h z ^ i) z₀
+          = meromorphicOrderAt (f i) z₀ + ((i * (-2) : ℤ) : WithTop ℤ) := fun i ↦ by
     rw [show (fun z ↦ f i z * h z ^ i) = f i * h ^ i from rfl,
       meromorphicOrderAt_mul ((hf i).1 z₀) ((mh z₀).pow i), meromorphicOrderAt_pow (mh z₀), hoh]
     congr 1
@@ -176,8 +182,9 @@ theorem ellEval_indep (L : PeriodPair) (p : (weierstrassCurve L).toAffine.Functi
     rw [hterm, hon, zero_add]
     congr 1
     ring
-  have hrest : ((-2 * n : ℤ) : WithTop ℤ) <
-      meromorphicOrderAt (fun z ↦ ∑ i ∈ Finset.range n, f i z * h z ^ i) z₀ := by
+  have hrest
+      : ((-2 * n : ℤ) : WithTop ℤ)
+        < meromorphicOrderAt (fun z ↦ ∑ i ∈ Finset.range n, f i z * h z ^ i) z₀ := by
     apply lt_meromorphicOrderAt_sum _ (fun i ↦ mt i z₀)
     intro i hi
     rw [hterm]
@@ -192,15 +199,18 @@ theorem ellEval_indep (L : PeriodPair) (p : (weierstrassCurve L).toAffine.Functi
       have : (0 : ℤ) ≤ k := by exact_mod_cast h0
       rw [← WithTop.coe_add, WithTop.coe_lt_coe]
       omega
-  have hsum : meromorphicOrderAt (fun z ↦ ∑ i ∈ Finset.range (n + 1), f i z * h z ^ i) z₀ =
-      ((-2 * n : ℤ) : WithTop ℤ) := by
-    have e : (fun z ↦ ∑ i ∈ Finset.range (n + 1), f i z * h z ^ i) =
-        (fun z ↦ f n z * h z ^ n) + fun z ↦ ∑ i ∈ Finset.range n, f i z * h z ^ i := by
+  have hsum
+      : meromorphicOrderAt (fun z ↦ ∑ i ∈ Finset.range (n + 1), f i z * h z ^ i) z₀
+        = ((-2 * n : ℤ) : WithTop ℤ) := by
+    have e
+        : (fun z ↦ ∑ i ∈ Finset.range (n + 1), f i z * h z ^ i)
+          = (fun z ↦ f n z * h z ^ n) + fun z ↦ ∑ i ∈ Finset.range n, f i z * h z ^ i := by
       funext z
       simp only [Finset.sum_range_succ, Pi.add_apply]
       ring
-    rw [e, meromorphicOrderAt_add_eq_left_of_lt (meromorphicAt_fun_sum _ fun i ↦ mt i z₀)
-      (htop ▸ hrest), htop]
+    rw [e,
+      meromorphicOrderAt_add_eq_left_of_lt (meromorphicAt_fun_sum _ fun i ↦ mt i z₀) (htop ▸ hrest),
+      htop]
   have hzero : meromorphicOrderAt (fun z ↦ ∑ i ∈ Finset.range (n + 1), f i z * h z ^ i) z₀ = ⊤ :=
     meromorphicOrderAt_eq_top_iff.2 (eventuallyEq_zero_codiscrete_iff.1 h0 z₀)
   rw [hsum] at hzero

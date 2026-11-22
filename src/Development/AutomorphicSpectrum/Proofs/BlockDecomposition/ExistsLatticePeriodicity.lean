@@ -17,7 +17,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompac
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG GlobalTheory.CompanionTheory.BZPsiPG.FibKer
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
+  GlobalTheory.CompanionTheory.BZPsiPG.FibKer
 open scoped TensorProduct
 
 noncomputable section
@@ -28,8 +30,8 @@ namespace GlobalTheory.CompanionTheory.BZPsiPG.FibKer.LatInv
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem exists_inv_integer_subset {W : Set k} (hW : W ∈ 𝓝 (0 : k)) :
-    ∃ c : k, c ≠ 0 ∧ ∀ x, c * x ∈ 𝒪[k] → x ∈ W := by
+theorem exists_inv_integer_subset {W : Set k} (hW : W ∈ 𝓝 (0 : k))
+    : ∃ c : k, c ≠ 0 ∧ ∀ x, c * x ∈ 𝒪[k] → x ∈ W := by
   obtain ⟨γ, hγ⟩ := (IsValuativeTopology.mem_nhds_zero_iff _).1 hW
   obtain ⟨a, ha⟩ := ValuativeRel.valuation_surjective (γ : ValueGroupWithZero k)
   obtain ⟨w, hw0, hw1⟩ := Valuation.IsNontrivial.exists_lt_one (v := valuation k)
@@ -43,21 +45,27 @@ theorem exists_inv_integer_subset {W : Set k} (hW : W ∈ 𝓝 (0 : k)) :
   have h2 : valuation k x = valuation k (a * w) * valuation k ((a * w)⁻¹ * x) := by
     rw [← map_mul, mul_inv_cancel_left₀ hd]
   show valuation k x < γ
-  calc valuation k x = valuation k (a * w) * valuation k ((a * w)⁻¹ * x) := h2
+  calc
+    valuation k x
+      = valuation k (a * w) * valuation k ((a * w)⁻¹ * x) := h2
     _ ≤ valuation k (a * w) * 1 := mul_le_mul_right h1 _
     _ = γ * valuation k w := by rw [mul_one, map_mul, ha]
     _ < γ * 1 := mul_lt_mul_of_pos_left hw1 (zero_lt_iff.mpr γ.ne_zero)
     _ = γ := mul_one _
 
-theorem exists_Lc_subset (t : ℕ) {W : Set (Fin t → k)} (hW : W ∈ 𝓝 (0 : Fin t → k)) :
-    ∃ c : k, c ≠ 0 ∧ ∀ o ∈ Lc t c, o.toAdd ∈ W := by
+theorem exists_Lc_subset (t : ℕ) {W : Set (Fin t → k)} (hW : W ∈ 𝓝 (0 : Fin t → k))
+    : ∃ c : k, c ≠ 0 ∧ ∀ o ∈ Lc t c, o.toAdd ∈ W := by
   rw [nhds_pi, Filter.mem_pi] at hW
   obtain ⟨I, -, s, hs, hsub⟩ := hW
   have hU : (⋂ j, s j) ∈ 𝓝 (0 : k) := Filter.iInter_mem.2 hs
   obtain ⟨c, hc, h⟩ := exists_inv_integer_subset hU
   exact ⟨c, hc, fun o ho => hsub fun j _ => Set.mem_iInter.1 (h _ (ho j)) j⟩
 
-theorem exists_Lc_invariant : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (t : ℕ) {Z : Type} [AddCommGroup Z] [Module ℂ Z] (φ : (Fin t → k) → Z), IsLocallyConstant φ → HasCompactSupport φ → ∃ c : k, c ≠ 0 ∧ ∀ o ∈ Lc t c, ∀ v, φ (v + o.toAdd) = φ v := by
+theorem exists_Lc_invariant
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (t : ℕ) {Z : Type} [AddCommGroup Z] [Module ℂ Z] (φ : (Fin t → k) → Z),
+      IsLocallyConstant φ → HasCompactSupport φ
+        → ∃ c : k, c ≠ 0 ∧ ∀ o ∈ Lc t c, ∀ v, φ (v + o.toAdd) = φ v := by
   intro k _ _ _ _ t Z _ _ φ hl hc
   letI uG : UniformSpace (Fin t → k) := IsTopologicalAddGroup.rightUniformSpace _
   haveI : IsUniformAddGroup (Fin t → k) := isUniformAddGroup_of_addCommGroup

@@ -5,14 +5,15 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EtaleLo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-theorem Lat.wedge_eq_span_of_isFrameAt :
-    ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type) [AddCommGroup E]
-      [Module Ω E] (L : Lat ξ E) (r : ℕ) (b : Fin r → E) (p : Cpt ξ), L.IsFrameAt b p →
-      L.wedge r p = Submodule.span (regAt ξ p) {exteriorPower.ιMulti Ω r b} := by
+theorem Lat.wedge_eq_span_of_isFrameAt
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type)
+        [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (r : ℕ) (b : Fin r → E) (p : Cpt ξ),
+      L.IsFrameAt b p → L.wedge r p = Submodule.span (regAt ξ p) {exteriorPower.ιMulti Ω r b} := by
   intro X Ω _ ξ E _ _ L r b p h
   classical
   apply le_antisymm
@@ -27,19 +28,24 @@ theorem Lat.wedge_eq_span_of_isFrameAt :
       funext i
       rw [← hc i]
       rfl
-    have hsum : exteriorPower.ιMulti Ω r v =
-        ∑ f : Fin r → Fin r, (∏ i, c i (f i)) • exteriorPower.ιMulti Ω r (fun i => b (f i)) := by
-      rw [hv']
-      have := (exteriorPower.ιMulti Ω r (M := E)).toMultilinearMap.map_sum
-        (fun i j => ((c i j : Ω)) • b j)
-      refine this.trans (Finset.sum_congr rfl fun f _ => ?_)
-      have h2 := (exteriorPower.ιMulti Ω r (M := E)).toMultilinearMap.map_smul_univ
-        (fun i => (c i (f i) : Ω)) (fun i => b (f i))
-      simp only [RingHom.id_apply] at h2
-      refine h2.trans ?_
-      have h3 : ((∏ i, c i (f i) : regAt ξ p) : Ω) = ∏ i, (c i (f i) : Ω) := by simp
-      rw [← h3]
-      rfl
+    have hsum
+        : exteriorPower.ιMulti Ω r v
+          = ∑ f : Fin r → Fin r, (∏ i, c i (f i)) • exteriorPower.ιMulti Ω r (fun i => b (f i)) :=
+      by
+        rw [hv']
+        have :=
+          (exteriorPower.ιMulti Ω r (M := E)).toMultilinearMap.map_sum
+            (fun i j => ((c i j : Ω)) • b j)
+        refine this.trans (Finset.sum_congr rfl fun f _ => ?_)
+        have h2 :=
+          (exteriorPower.ιMulti Ω r (M := E)).toMultilinearMap.map_smul_univ
+            (fun i => (c i (f i) : Ω))
+            (fun i => b (f i))
+        simp only [RingHom.id_apply] at h2
+        refine h2.trans ?_
+        have h3 : ((∏ i, c i (f i) : regAt ξ p) : Ω) = ∏ i, (c i (f i) : Ω) := by simp
+        rw [← h3]
+        rfl
     rw [SetLike.mem_coe, hsum]
     refine Submodule.sum_mem _ fun f _ => Submodule.smul_mem _ _ ?_
     by_cases hf : Function.Injective f

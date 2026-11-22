@@ -5,13 +5,21 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 
 namespace GlobalTheory.LocalExtField
 
 open Polynomial
 
-theorem dorbit : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (β : Ω), ∃ S : Finset Ω, (∀ x, x ∈ S ↔ ∃ d ∈ Dec (F := E) A, d β = x) ∧ ∃ f : Polynomial Ω, f.Monic ∧ f.natDegree = S.card ∧ (∀ d ∈ Dec (F := E) A, ∀ i, d (f.coeff i) = f.coeff i) ∧ f.eval β = 0 := by
+theorem dorbit
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (β : Ω),
+      ∃ S : Finset Ω,
+        (∀ x, x ∈ S ↔ ∃ d ∈ Dec (F := E) A, d β = x)
+          ∧ ∃ f : Polynomial Ω,
+            f.Monic ∧ f.natDegree = S.card ∧ (∀ d ∈ Dec (F := E) A, ∀ i, d (f.coeff i) = f.coeff i)
+              ∧ f.eval β = 0 := by
   intro E Ω _ _ _ _ _ A β
   classical
   have hint : IsIntegral E β := Algebra.IsIntegral.isIntegral β
@@ -20,10 +28,18 @@ theorem dorbit : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra
     rintro x ⟨d, -, rfl⟩
     rw [Polynomial.mem_rootSet]
     refine ⟨minpoly.ne_zero hint, ?_⟩
-    rw [show d β = (d : Ω →ₐ[E] Ω) β from rfl, Polynomial.aeval_algHom_apply, minpoly.aeval, map_zero]
+    rw [show d β = (d : Ω →ₐ[E] Ω) β from rfl, Polynomial.aeval_algHom_apply, minpoly.aeval,
+      map_zero]
   have hS : ∀ x, x ∈ hfin.toFinset ↔ ∃ d ∈ Dec (F := E) A, d β = x := fun x => hfin.mem_toFinset
-  refine ⟨hfin.toFinset, hS, ∏ x ∈ hfin.toFinset, (X - C x),
-    monic_prod_of_monic _ _ (fun x _ => monic_X_sub_C x), ?_, ?_, ?_⟩
+  refine ⟨
+    hfin.toFinset,
+    hS,
+    ∏ x ∈ hfin.toFinset, (X - C x),
+    monic_prod_of_monic _ _ (fun x _ => monic_X_sub_C x),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [natDegree_prod_of_monic _ _ (fun x _ => monic_X_sub_C x)]; simp
   · intro d hd i
     have hperm : hfin.toFinset.image d = hfin.toFinset := by
@@ -34,7 +50,8 @@ theorem dorbit : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra
         obtain ⟨d', hd', rfl⟩ := (hS y).1 hy
         exact (hS _).2 ⟨d * d', mul_mem hd hd', rfl⟩
       · rw [Finset.card_image_of_injective _ d.injective]
-    have key : (∏ x ∈ hfin.toFinset, (X - C x)).map (d : Ω →+* Ω) = ∏ x ∈ hfin.toFinset, (X - C x) := by
+    have key
+        : (∏ x ∈ hfin.toFinset, (X - C x)).map (d : Ω →+* Ω) = ∏ x ∈ hfin.toFinset, (X - C x) := by
       rw [Polynomial.map_prod]
       simp only [Polynomial.map_sub, map_X, map_C]
       conv_rhs => rw [← hperm]

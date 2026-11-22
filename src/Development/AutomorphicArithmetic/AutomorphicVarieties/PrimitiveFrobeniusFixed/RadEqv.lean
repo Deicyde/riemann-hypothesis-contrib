@@ -4,29 +4,43 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-private theorem cyc_pow {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (m : ℕ)
-    (g : G ℚ Ω) (x : Ω) (hx : x ^ l ^ m = 1) :
-    g x = x ^ (PadicInt.toZModPow m ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l])).val := by
+private theorem cyc_pow
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    (m : ℕ)
+    (g : G ℚ Ω)
+    (x : Ω) (hx : x ^ l ^ m = 1)
+    : g x = x ^ (PadicInt.toZModPow m ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l])).val := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   haveI : NeZero (l : Ω) := ⟨Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero⟩
   exact cyclotomicCharacter.spec l (MulSemiringAction.toRingAut (G ℚ Ω) Ω g) x hx
 
-private theorem dvd_sub_val (l : ℕ) [Fact l.Prime] (m : ℕ) (z : ℤ_[l]) :
-    (l : ℤ_[l]) ^ m ∣ z - ((PadicInt.toZModPow m z).val : ℤ_[l]) := by
-  have h : PadicInt.toZModPow m (z - ((PadicInt.toZModPow m z).val : ℤ_[l])) = 0 := by
-    simp
-  have hk : z - ((PadicInt.toZModPow m z).val : ℤ_[l]) ∈ RingHom.ker (PadicInt.toZModPow (p := l) m) := h
+private theorem dvd_sub_val (l : ℕ) [Fact l.Prime] (m : ℕ) (z : ℤ_[l])
+    : (l : ℤ_[l]) ^ m ∣ z - ((PadicInt.toZModPow m z).val : ℤ_[l]) := by
+  have h : PadicInt.toZModPow m (z - ((PadicInt.toZModPow m z).val : ℤ_[l])) = 0 := by simp
+  have hk
+      : z - ((PadicInt.toZModPow m z).val : ℤ_[l]) ∈ RingHom.ker (PadicInt.toZModPow (p := l) m) :=
+    h
   rw [PadicInt.ker_toZModPow, Ideal.mem_span_singleton] at hk
   exact hk
 
-theorem UpperTheory.V.ML.radEqv :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O W : Type) [CommRing O] [Algebra ℤ_[l] O] [AddCommGroup W] [Module O W] (m F r : ℕ), F ≠ 0 → l ^ m ∣ F → r ≠ 0 → ∀ ρ : Ω, ρ ^ (l ^ m) = (r : Ω) →
-    ∀ (γ : G ℚ Ω →* Oˣ) (f : G ℚ Ω → W), (∀ u ∈ fixMu ℚ Ω F, ∀ v ∈ fixMu ℚ Ω F, f (u * v) = f u + f v) → (∀ g : G ℚ Ω, ∀ u ∈ fixMu ℚ Ω F, f (g * u * g⁻¹) = (γ g : O) • f u) →
-    (∀ u ∈ fixMu ℚ Ω F, (l ^ m) • f u = 0) → (∀ u ∈ fixMu ℚ Ω F, u ρ = ρ → f u = 0) → ∀ g : G ℚ Ω, ∀ u ∈ fixMu ℚ Ω F, ((γ g : O) - (chiO ℚ Ω l O g : O)) • f u = 0 := by
+theorem UpperTheory.V.ML.radEqv
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O W : Type)
+        [CommRing O] [Algebra ℤ_[l] O] [AddCommGroup W] [Module O W] (m F r : ℕ),
+      F ≠ 0 → l ^ m ∣ F → r ≠ 0
+        → ∀ ρ : Ω,
+          ρ ^ (l ^ m) = (r : Ω)
+            → ∀ (γ : G ℚ Ω →* Oˣ) (f : G ℚ Ω → W),
+              (∀ u ∈ fixMu ℚ Ω F, ∀ v ∈ fixMu ℚ Ω F, f (u * v) = f u + f v)
+                → (∀ g : G ℚ Ω, ∀ u ∈ fixMu ℚ Ω F, f (g * u * g⁻¹) = (γ g : O) • f u)
+                → (∀ u ∈ fixMu ℚ Ω F, (l ^ m) • f u = 0) → (∀ u ∈ fixMu ℚ Ω F, u ρ = ρ → f u = 0)
+                → ∀ g : G ℚ Ω, ∀ u ∈ fixMu ℚ Ω F, ((γ g : O) - (chiO ℚ Ω l O g : O)) • f u = 0 := by
   intro Ω _ _ _ l _ O W _ _ _ _ m F r hF hlF hr ρ hρ γ f hadd hconj htor hfixρ g u hu
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   have hmem : ∀ w : G ℚ Ω, w ∈ fixMu ℚ Ω F ↔ ∀ x : Ω, x ^ F = 1 → w x = x := fun w => Iff.rfl
@@ -52,7 +66,8 @@ theorem UpperTheory.V.ML.radEqv :
     | succ n ih =>
       rw [pow_succ', AlgEquiv.mul_apply, ih, map_mul, map_pow, hfix ζ hζ, huρ, pow_succ]
       ring
-  obtain ⟨k, hkdef⟩ : ∃ k, k = (PadicInt.toZModPow m ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l])).val := ⟨_, rfl⟩
+  obtain ⟨k, hkdef⟩ : ∃ k, k = (PadicInt.toZModPow m ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l])).val :=
+    ⟨_, rfl⟩
   have hgζ : g ζ = ζ ^ k := by rw [hkdef]; exact cyc_pow l m g ζ hζ
   have hg : ∀ x : Ω, g (g⁻¹ x) = x := by
     intro x
@@ -66,12 +81,14 @@ theorem UpperTheory.V.ML.radEqv :
   have hgu : g * u * g⁻¹ ∈ fixMu ℚ Ω F := by
     rw [hmem]
     intro x hx
-    rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, (hmem u).mp hu (g⁻¹ x) (by rw [← map_pow, hx, map_one]), hg]
+    rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply,
+      (hmem u).mp hu (g⁻¹ x) (by rw [← map_pow, hx, map_one]), hg]
   have hukm : u ^ k ∈ fixMu ℚ Ω F := Subgroup.pow_mem _ hu k
   obtain ⟨v, hvdef⟩ : ∃ v, v = (u ^ k)⁻¹ * (g * u * g⁻¹) := ⟨_, rfl⟩
   have hv : v ∈ fixMu ℚ Ω F := hvdef ▸ Subgroup.mul_mem _ (Subgroup.inv_mem _ hukm) hgu
   have hvρ : v ρ = ρ := by
-    rw [hvdef, AlgEquiv.mul_apply, hconjρ, ← hpow k, ← AlgEquiv.mul_apply, inv_mul_cancel, AlgEquiv.one_apply]
+    rw [hvdef, AlgEquiv.mul_apply, hconjρ, ← hpow k, ← AlgEquiv.mul_apply, inv_mul_cancel,
+      AlgEquiv.one_apply]
   have hsplit : g * u * g⁻¹ = u ^ k * v := by rw [hvdef, mul_inv_cancel_left]
   have hf1 : f 1 = 0 := by
     have h1 := hadd 1 (Subgroup.one_mem _) 1 (Subgroup.one_mem _)
@@ -87,10 +104,11 @@ theorem UpperTheory.V.ML.radEqv :
   have hχ : (chiO ℚ Ω l O g : O) • f u = k • f u := by
     obtain ⟨t, ht⟩ := dvd_sub_val l m ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l])
     rw [← hkdef] at ht
-    have hz : ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l]) = (k : ℤ_[l]) + (l : ℤ_[l]) ^ m * t := sub_eq_iff_eq_add'.mp ht
+    have hz : ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l]) = (k : ℤ_[l]) + (l : ℤ_[l]) ^ m * t :=
+      sub_eq_iff_eq_add'.mp ht
     have hc : (chiO ℚ Ω l O g : O) = algebraMap ℤ_[l] O ((cycZ ℚ Ω l g : ℤ_[l]ˣ) : ℤ_[l]) := rfl
     have hlm : ((l : O) ^ m) • f u = 0 := by
       rw [← Nat.cast_pow, Nat.cast_smul_eq_nsmul O (l ^ m) (f u), htor u hu]
-    rw [hc, hz, map_add (f := _), map_mul, map_pow, map_natCast, map_natCast, add_smul, mul_comm, mul_smul, hlm,
-      smul_zero, add_zero, Nat.cast_smul_eq_nsmul O k (f u)]
+    rw [hc, hz, map_add (f := _), map_mul, map_pow, map_natCast, map_natCast, add_smul, mul_comm,
+      mul_smul, hlm, smul_zero, add_zero, Nat.cast_smul_eq_nsmul O k (f u)]
   rw [sub_smul, hγ, hχ, sub_self]

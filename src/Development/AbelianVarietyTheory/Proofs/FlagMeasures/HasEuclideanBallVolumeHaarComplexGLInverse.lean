@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PoissonSummat
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.LeviIso
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.LeviIso
 open Formalism.REAL (hs)
 
 noncomputable section
@@ -20,9 +21,10 @@ theorem hs_eq_norm_sq {j : ℕ} (M : Matrix (Fin j) (Fin j) ℂ) : hs M = ‖M�
   rw [Matrix.frobenius_norm_def, ← Real.sqrt_eq_rpow, Real.sq_sqrt (by positivity)]
   simp [hs]
 
-theorem hs_inv_compare {j : ℕ} (x : Matrix (Fin j) (Fin j) ℂ) (hx : x.det ≠ 0) {a : ℝ} (ha : 0 < a)
-    (ha1 : a < 1) (h : hs (x⁻¹ - 1) ≤ (1 - a) ^ 2) :
-    a ^ 2 * hs (x - 1) ≤ hs (x⁻¹ - 1) ∧ a ^ 2 * hs (x⁻¹ - 1) ≤ hs (x - 1) := by
+theorem hs_inv_compare
+    {j : ℕ} (x : Matrix (Fin j) (Fin j) ℂ) (hx : x.det ≠ 0)
+    {a : ℝ} (ha : 0 < a) (ha1 : a < 1) (h : hs (x⁻¹ - 1) ≤ (1 - a) ^ 2)
+    : a ^ 2 * hs (x - 1) ≤ hs (x⁻¹ - 1) ∧ a ^ 2 * hs (x⁻¹ - 1) ≤ hs (x - 1) := by
   simp only [hs_eq_norm_sq] at *
   have e : (x⁻¹ - 1) + (x - 1) = -((x⁻¹ - 1) * (x - 1)) := by
     rw [sub_mul, mul_sub, Matrix.nonsing_inv_mul _ (Ne.isUnit hx)]
@@ -48,8 +50,7 @@ theorem hs_inv_compare {j : ℕ} (x : Matrix (Fin j) (Fin j) ℂ) (hx : x.det �
 
 end
 
-theorem hs_nonneg {j : ℕ} (M : Matrix (Fin j) (Fin j) ℂ) : 0 ≤ hs M := by
-  unfold hs; positivity
+theorem hs_nonneg {j : ℕ} (M : Matrix (Fin j) (Fin j) ℂ) : 0 ≤ hs M := by unfold hs; positivity
 
 theorem continuous_hs {j : ℕ} : Continuous (hs : Matrix (Fin j) (Fin j) ℂ → ℝ) := by
   unfold hs; fun_prop
@@ -60,21 +61,24 @@ theorem measurableSet_unitBallAt (j : ℕ) (s : ℝ) : MeasurableSet (unitBallAt
   refine (isClosed_le (continuous_hs.comp ?_) continuous_const).measurableSet
   exact (continuous_id (X := Matrix (Fin j) (Fin j) ℂ)).sub continuous_const
 
-theorem volume_unitBallAt (j : ℕ) {s : ℝ} (hs0 : 0 < s) :
-    volume (unitBallAt j s) = ENNReal.ofReal (s ^ (2 * j ^ 2)) *
-      volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1) := by
+theorem volume_unitBallAt (j : ℕ) {s : ℝ} (hs0 : 0 < s)
+    : volume (unitBallAt j s)
+      = ENNReal.ofReal (s ^ (2 * j ^ 2))
+        * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1) := by
   have hd : Module.finrank ℝ (EuclideanSpace ℂ (Fin j × Fin j)) = 2 * j ^ 2 := by
     rw [(WithLp.linearEquiv 2 ℝ (Fin j × Fin j → ℂ)).finrank_eq, Module.finrank_pi_fintype]
     simp [Complex.finrank_real_complex]
     ring
   set e := PoissonV.coords (Fin j) (Fin j) with he
   rw [← (PoissonV.measurePreserving_coords (Fin j) (Fin j)).measure_preimage
-    (measurableSet_unitBallAt j s).nullMeasurableSet, ← he]
-  have h1 : e ⁻¹' unitBallAt j s =
-      Metric.closedBall (e.symm (Matrix.of.symm (1 : Matrix (Fin j) (Fin j) ℂ))) s := by
+      (measurableSet_unitBallAt j s).nullMeasurableSet,
+    ← he]
+  have h1
+      : e ⁻¹' unitBallAt j s
+        = Metric.closedBall (e.symm (Matrix.of.symm (1 : Matrix (Fin j) (Fin j) ℂ))) s := by
     ext z
-    rw [mem_closedBall_iff_norm, ← sq_le_sq₀ (norm_nonneg _) hs0.le, ← PoissonV.norm_sq_coords, ← he,
-      map_sub, e.apply_symm_apply]
+    rw [mem_closedBall_iff_norm, ← sq_le_sq₀ (norm_nonneg _) hs0.le, ← PoissonV.norm_sq_coords,
+      ← he, map_sub, e.apply_symm_apply]
     rfl
   rw [h1, Measure.addHaar_closedBall _ _ hs0.le, hd]
   congr 1
@@ -85,9 +89,10 @@ theorem volume_unitBallAt (j : ℕ) {s : ℝ} (hs0 : 0 < s) :
   ext x
   simp
 
-theorem exists_subset {j : ℕ} {P : (Fin j → Fin j → ℂ) → Prop}
-    (h : ∀ᶠ x in nhds (Matrix.of.symm (1 : Matrix (Fin j) (Fin j) ℂ)), P x) :
-    ∃ δ > 0, ∀ s, 0 ≤ s → s < δ → ∀ x ∈ unitBallAt j s, P x := by
+theorem exists_subset
+    {j : ℕ} {P : (Fin j → Fin j → ℂ) → Prop}
+    (h : ∀ᶠ x in nhds (Matrix.of.symm (1 : Matrix (Fin j) (Fin j) ℂ)), P x)
+    : ∃ δ > 0, ∀ s, 0 ≤ s → s < δ → ∀ x ∈ unitBallAt j s, P x := by
   obtain ⟨δ, hδ, H⟩ := Metric.eventually_nhds_iff.1 h
   refine ⟨δ, hδ, fun s hs0 hsδ x hx => H (lt_of_le_of_lt ?_ hsδ)⟩
   rw [dist_eq_norm, pi_norm_le_iff_of_nonneg hs0]
@@ -98,14 +103,16 @@ theorem exists_subset {j : ℕ} {P : (Fin j → Fin j → ℂ) → Prop}
   refine le_trans ?_ hx
   unfold hs
   refine le_trans ?_ (Finset.single_le_sum (fun i _ => by positivity) (Finset.mem_univ r))
-  exact Finset.single_le_sum (f := fun c => ‖(Matrix.of x - 1) r c‖ ^ 2) (fun i _ => by positivity)
+  exact Finset.single_le_sum
+    (f := fun c => ‖(Matrix.of x - 1) r c‖ ^ 2)
+    (fun i _ => by positivity)
     (Finset.mem_univ c)
 
-theorem eventually_good (j : ℕ) {a : ℝ} (ha : 0 < a) (ha1 : a < 1) :
-    ∀ᶠ x : Fin j → Fin j → ℂ in nhds (Matrix.of.symm (1 : Matrix (Fin j) (Fin j) ℂ)),
-      (a ≤ (‖(Matrix.of x).det‖ ^ 2)⁻¹ ^ j ∧ (‖(Matrix.of x).det‖ ^ 2)⁻¹ ^ j ≤ a⁻¹) ∧
-      a ^ 2 * hs (Matrix.of x - 1) ≤ hs ((Matrix.of x)⁻¹ - 1) ∧
-      a ^ 2 * hs ((Matrix.of x)⁻¹ - 1) ≤ hs (Matrix.of x - 1) := by
+theorem eventually_good (j : ℕ) {a : ℝ} (ha : 0 < a) (ha1 : a < 1)
+    : ∀ᶠ x : Fin j → Fin j → ℂ in nhds (Matrix.of.symm (1 : Matrix (Fin j) (Fin j) ℂ)),
+        (a ≤ (‖(Matrix.of x).det‖ ^ 2)⁻¹ ^ j ∧ (‖(Matrix.of x).det‖ ^ 2)⁻¹ ^ j ≤ a⁻¹) ∧
+        a ^ 2 * hs (Matrix.of x - 1) ≤ hs ((Matrix.of x)⁻¹ - 1) ∧
+        a ^ 2 * hs ((Matrix.of x)⁻¹ - 1) ≤ hs (Matrix.of x - 1) := by
   show ∀ᶠ x : Matrix (Fin j) (Fin j) ℂ in nhds 1,
       (a ≤ (‖x.det‖ ^ 2)⁻¹ ^ j ∧ (‖x.det‖ ^ 2)⁻¹ ^ j ≤ a⁻¹) ∧
       a ^ 2 * hs (x - 1) ≤ hs (x⁻¹ - 1) ∧ a ^ 2 * hs (x⁻¹ - 1) ≤ hs (x - 1)
@@ -113,29 +120,31 @@ theorem eventually_good (j : ℕ) {a : ℝ} (ha : 0 < a) (ha1 : a < 1) :
   have h1 : ContinuousAt (fun x : Matrix (Fin j) (Fin j) ℂ => (‖x.det‖ ^ 2)⁻¹ ^ j) 1 :=
     (((hdet.norm.pow 2).continuousAt).inv₀ (by simp)).pow j
   have h2 : ContinuousAt (fun x : Matrix (Fin j) (Fin j) ℂ => hs (x⁻¹ - 1)) 1 := by
-    refine continuous_hs.continuousAt.comp (ContinuousAt.sub (continuousAt_matrix_inv _ ?_) continuousAt_const)
+    refine continuous_hs.continuousAt.comp (ContinuousAt.sub (continuousAt_matrix_inv _ ?_)
+      continuousAt_const)
     rw [Ring.inverse_eq_inv']
     exact continuousAt_inv₀ (by simp)
   have h3 := h1.eventually (lt_mem_nhds (a := a) (by simpa using ha1))
   have h4 := h1.eventually (gt_mem_nhds (a := a⁻¹) (by simpa using (one_lt_inv₀ ha).2 ha1))
-  have h5 := h2.eventually (gt_mem_nhds (a := (1 - a) ^ 2) (by
-    have : 0 < 1 - a := by linarith
-    simpa [hs] using pow_pos this 2))
+  have h5 :=
+    h2.eventually (gt_mem_nhds (a := (1 - a) ^ 2) (by
+      have : 0 < 1 - a := by linarith
+      simpa [hs] using pow_pos this 2))
   have h6 := (hdet.continuousAt (x := 1)).eventually_ne (y := 0) (by simp)
   filter_upwards [h3, h4, h5, h6] with x x3 x4 x5 x6
   exact ⟨⟨x3.le, x4.le⟩, hs_inv_compare x x6 ha ha1 x5.le⟩
 
-theorem sandwich (j : ℕ) {a : ℝ} (ha : 0 < a) (ha1 : a < 1) :
-    ∀ᶠ r : ℝ in nhdsWithin 0 (Set.Ioi 0),
-      ENNReal.ofReal (a ^ (2 * j ^ 2 + 1)) * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1) ≤
+theorem sandwich (j : ℕ) {a : ℝ} (ha : 0 < a) (ha1 : a < 1)
+    : ∀ᶠ r : ℝ in nhdsWithin 0 (Set.Ioi 0),
+        ENNReal.ofReal (a ^ (2 * j ^ 2 + 1)) * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1) ≤
+          (ENNReal.ofReal (2 ^ (j ^ 2)) • haarLoc j)
+            {x | Real.sqrt (hs (Matrix.of x - 1) + hs ((Matrix.of x)⁻¹ - 1)) ≤ r} /
+            ENNReal.ofReal (r ^ (2 * j ^ 2)) ∧
         (ENNReal.ofReal (2 ^ (j ^ 2)) • haarLoc j)
-          {x | Real.sqrt (hs (Matrix.of x - 1) + hs ((Matrix.of x)⁻¹ - 1)) ≤ r} /
-          ENNReal.ofReal (r ^ (2 * j ^ 2)) ∧
-      (ENNReal.ofReal (2 ^ (j ^ 2)) • haarLoc j)
-          {x | Real.sqrt (hs (Matrix.of x - 1) + hs ((Matrix.of x)⁻¹ - 1)) ≤ r} /
-          ENNReal.ofReal (r ^ (2 * j ^ 2)) ≤
-      ENNReal.ofReal (a⁻¹ ^ (2 * j ^ 2 + 1)) *
-        volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1) := by
+            {x | Real.sqrt (hs (Matrix.of x - 1) + hs ((Matrix.of x)⁻¹ - 1)) ≤ r} /
+            ENNReal.ofReal (r ^ (2 * j ^ 2)) ≤
+        ENNReal.ofReal (a⁻¹ ^ (2 * j ^ 2 + 1)) *
+          volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1) := by
   obtain ⟨δ, hδ, H⟩ := exists_subset (eventually_good j ha ha1)
   filter_upwards [Ioo_mem_nhdsGT (mul_pos ha hδ)] with r ⟨hr, hrδ⟩
   have h2 : (0 : ℝ) < √2 := by positivity
@@ -147,11 +156,14 @@ theorem sandwich (j : ℕ) {a : ℝ} (ha : 0 < a) (ha1 : a < 1) :
   have hr3 : a⁻¹ * r / √2 < δ := by
     refine lt_of_le_of_lt (div_le_self (by positivity) h21) ?_
     rwa [inv_mul_lt_iff₀ ha]
-  have hrd : ENNReal.ofReal (r ^ (2 * j ^ 2)) ≠ 0 := by
-    simpa using pow_pos hr _
-  have hvol : ∀ b : ℝ, 0 < b → ENNReal.ofReal (2 ^ (j ^ 2)) * (ENNReal.ofReal b *
-      volume (unitBallAt j (b * r / √2))) = ENNReal.ofReal (b ^ (2 * j ^ 2 + 1)) *
-        volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1) * ENNReal.ofReal (r ^ (2 * j ^ 2)) := by
+  have hrd : ENNReal.ofReal (r ^ (2 * j ^ 2)) ≠ 0 := by simpa using pow_pos hr _
+  have hvol
+      : ∀ b : ℝ,
+        0 < b
+          → ENNReal.ofReal (2 ^ (j ^ 2)) * (ENNReal.ofReal b * volume (unitBallAt j (b * r / √2)))
+            = ENNReal.ofReal (b ^ (2 * j ^ 2 + 1))
+              * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1)
+              * ENNReal.ofReal (r ^ (2 * j ^ 2)) := by
     intro b hb
     rw [volume_unitBallAt j (by positivity), mul_right_comm, ← mul_assoc, ← mul_assoc,
       ← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul (by positivity),
@@ -187,7 +199,8 @@ theorem sandwich (j : ℕ) {a : ℝ} (ha : 0 < a) (ha1 : a < 1) :
       have h6 : a ^ 2 * hs (Matrix.of x - 1) ≤ hs (Matrix.of x - 1) :=
         mul_le_of_le_one_left h0' (by nlinarith)
       show hs (Matrix.of x - 1) ≤ (a⁻¹ * r / √2) ^ 2
-      rw [div_pow, h22, mul_pow, inv_pow, le_div_iff₀ (by norm_num), le_inv_mul_iff₀ (by positivity)]
+      rw [div_pow, h22, mul_pow, inv_pow, le_div_iff₀ (by norm_num),
+        le_inv_mul_iff₀ (by positivity)]
       linarith
     · rw [haarLoc, withDensity_apply _ (measurableSet_unitBallAt j _), ← setLIntegral_const]
       exact setLIntegral_mono' (measurableSet_unitBallAt j _) fun x hx =>
@@ -199,24 +212,32 @@ namespace GlobalTheory.LeviIso
 
 open RadLoc
 
-theorem isRadial_haarLoc (j : ℕ) : IsRadial (ENNReal.ofReal (2 ^ (j ^ 2)) • haarLoc j)
-    (fun x => Formalism.REAL.hs (Matrix.of x - 1) + Formalism.REAL.hs ((Matrix.of x)⁻¹ - 1)) (2 * j ^ 2) := by
+theorem isRadial_haarLoc (j : ℕ)
+    : IsRadial (ENNReal.ofReal (2 ^ (j ^ 2)) • haarLoc j)
+      (fun x => Formalism.REAL.hs (Matrix.of x - 1) + Formalism.REAL.hs ((Matrix.of x)⁻¹ - 1))
+      (2 * j ^ 2) := by
   unfold IsRadial
   set ω := volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (2 * j ^ 2))) 1) with hω
   have hωt : ω ≠ ⊤ := measure_ball_lt_top.ne
-  have hc : Filter.Tendsto (fun a : ℝ => ENNReal.ofReal (a ^ (2 * j ^ 2 + 1)) * ω) (nhds 1) (nhds ω) := by
-    have : Filter.Tendsto (fun a : ℝ => ENNReal.ofReal (a ^ (2 * j ^ 2 + 1))) (nhds 1) (nhds 1) := by
+  have hc : Filter.Tendsto
+      (fun a : ℝ => ENNReal.ofReal (a ^ (2 * j ^ 2 + 1)) * ω)
+      (nhds 1) (nhds ω) := by
+    have : Filter.Tendsto
+        (fun a : ℝ => ENNReal.ofReal (a ^ (2 * j ^ 2 + 1)))
+        (nhds 1) (nhds 1) := by
       simpa using ENNReal.tendsto_ofReal ((continuous_pow (2 * j ^ 2 + 1)).tendsto (1 : ℝ))
     simpa using ENNReal.Tendsto.mul_const this (Or.inl one_ne_zero)
   have hi : Filter.Tendsto (fun a : ℝ => a⁻¹) (nhds 1) (nhds 1) := by
     simpa using Filter.Tendsto.inv₀ (Filter.tendsto_id (x := nhds (1 : ℝ))) one_ne_zero
   refine tendsto_order.2 ⟨fun b hb => ?_, fun b hb => ?_⟩
-  · obtain ⟨a, h1, h2, h3⟩ := (((hc.eventually (lt_mem_nhds hb)).filter_mono nhdsWithin_le_nhds).and
-      (Ioo_mem_nhdsLT (zero_lt_one' ℝ))).exists
+  · obtain ⟨a, h1, h2, h3⟩ :=
+      (((hc.eventually (lt_mem_nhds hb)).filter_mono nhdsWithin_le_nhds).and
+        (Ioo_mem_nhdsLT (zero_lt_one' ℝ))).exists
     filter_upwards [sandwich j h2 h3] with r hr
     exact lt_of_lt_of_le h1 hr.1
-  · obtain ⟨a, h1, h2, h3⟩ := ((((hc.comp hi).eventually (gt_mem_nhds hb)).filter_mono nhdsWithin_le_nhds).and
-      (Ioo_mem_nhdsLT (zero_lt_one' ℝ))).exists
+  · obtain ⟨a, h1, h2, h3⟩ :=
+      ((((hc.comp hi).eventually (gt_mem_nhds hb)).filter_mono nhdsWithin_le_nhds).and
+        (Ioo_mem_nhdsLT (zero_lt_one' ℝ))).exists
     filter_upwards [sandwich j h2 h3] with r hr
     exact lt_of_le_of_lt hr.2 h1
 

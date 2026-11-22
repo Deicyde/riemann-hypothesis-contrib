@@ -10,13 +10,16 @@ open NumberField IsDedekindDomain GlobalTheory.UnitaryBC
 
 namespace GlobalTheory.SplitOfSquare
 
-private theorem valued_v_algebraMap_adicCompletion_foundation {F : Type} [Field F] [NumberField F]
-    (u : HeightOneSpectrum (𝓞 F)) (x : F) :
-    Valued.v (algebraMap F (u.adicCompletion F) x) = u.valuation F x :=
+private theorem valued_v_algebraMap_adicCompletion_foundation
+    {F : Type} [Field F] [NumberField F] (u : HeightOneSpectrum (𝓞 F)) (x : F)
+    : Valued.v (algebraMap F (u.adicCompletion F) x) = u.valuation F x :=
   u.valuedAdicCompletion_eq_valuation' x
 
-theorem exists_valuation_lt_one {F : Type} [Field F] [NumberField F] (u : HeightOneSpectrum (𝓞 F)) (a : F) (ha : a ≠ 0)
-    (h : IsSquare (algebraMap F (u.adicCompletion F) a)) : ∃ c : F, u.valuation F (1 / 4 - c ^ 2 * a) < 1 := by
+theorem exists_valuation_lt_one
+    {F : Type} [Field F] [NumberField F]
+    (u : HeightOneSpectrum (𝓞 F)) (a : F)
+    (ha : a ≠ 0) (h : IsSquare (algebraMap F (u.adicCompletion F) a))
+    : ∃ c : F, u.valuation F (1 / 4 - c ^ 2 * a) < 1 := by
   obtain ⟨s, hs⟩ := h
   have hs0 : s ≠ 0 := by
     rintro rfl
@@ -37,17 +40,22 @@ theorem exists_valuation_lt_one {F : Type} [Field F] [NumberField F] (u : Height
   have hI := Valued.isOpen_integer (u.adicCompletion F)
   have hcont : Continuous (fun y : u.adicCompletion F => (y * s - h2) * p⁻¹) :=
     ((continuous_id.mul continuous_const).sub continuous_const).mul continuous_const
-  obtain ⟨c, hc⟩ := (u.denseRange_algebraMap F).exists_mem_open (hI.preimage hcont) ⟨h2 * s⁻¹, by
-    simp only [Set.mem_preimage, SetLike.mem_coe, Valuation.mem_integer_iff]
-    rw [mul_assoc, inv_mul_cancel₀ hs0, mul_one, sub_self, zero_mul, map_zero]
-    exact zero_le⟩
+  obtain ⟨c, hc⟩ :=
+    (u.denseRange_algebraMap F).exists_mem_open (hI.preimage hcont) ⟨
+      h2 * s⁻¹,
+      by
+        simp only [Set.mem_preimage, SetLike.mem_coe, Valuation.mem_integer_iff]
+        rw [mul_assoc, inv_mul_cancel₀ hs0, mul_one, sub_self, zero_mul, map_zero]
+        exact zero_le
+    ⟩
   refine ⟨c, ?_⟩
   simp only [Set.mem_preimage, SetLike.mem_coe, Valuation.mem_integer_iff] at hc
   set y := algebraMap F (u.adicCompletion F) c
   set z := y * s - h2 with hz_def
   have hz : Valued.v z < 1 := by
-    calc Valued.v z = Valued.v (z * p⁻¹) * Valued.v p := by
-          rw [← map_mul, inv_mul_cancel_right₀ hp0]
+    calc
+      Valued.v z
+        = Valued.v (z * p⁻¹) * Valued.v p := by rw [← map_mul, inv_mul_cancel_right₀ hp0]
       _ ≤ 1 * Valued.v p := by gcongr
       _ < 1 := by rw [one_mul]; exact hvp
   have hhalf : h2 + h2 = 1 := by
@@ -61,40 +69,49 @@ theorem exists_valuation_lt_one {F : Type} [Field F] [NumberField F] (u : Height
     linear_combination (h2 - y * s) * hhalf
   rw [← valued_v_algebraMap_adicCompletion_foundation, hkey]
   have h1z : Valued.v (1 + z) ≤ 1 := by
-    calc Valued.v (1 + z) ≤ max (Valued.v (1 : u.adicCompletion F)) (Valued.v z) :=
-          Valuation.map_add _ _ _
+    calc
+      Valued.v (1 + z)
+        ≤ max (Valued.v (1 : u.adicCompletion F)) (Valued.v z) := Valuation.map_add _ _ _
       _ ≤ 1 := by rw [map_one]; exact max_le le_rfl hz.le
-  calc Valued.v (-z * (1 + z)) = Valued.v z * Valued.v (1 + z) := by
-        rw [map_mul, Valuation.map_neg]
+  calc
+    Valued.v (-z * (1 + z))
+      = Valued.v z * Valued.v (1 + z) := by rw [map_mul, Valuation.map_neg]
     _ ≤ Valued.v z * 1 := by gcongr
     _ < 1 := by rw [mul_one]; exact hz
 
-theorem valuation_complexConj_of_not_split {L : Type} [Field L] [NumberField L] [IsCMField L]
-    (w : HeightOneSpectrum (𝓞 L)) (hw : ¬ IsSplitAt w) (y : L) :
-    w.valuation L (IsCMField.complexConj L y) = w.valuation L y := by
+theorem valuation_complexConj_of_not_split
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    (w : HeightOneSpectrum (𝓞 L)) (hw : ¬ IsSplitAt w)
+    (y : L)
+    : w.valuation L (IsCMField.complexConj L y) = w.valuation L y := by
   set σ : L ≃+* L := (IsCMField.complexConj L).toRingEquiv with hσ
   have hne : w.asIdeal.comap (RingOfIntegers.mapRingEquiv σ) ≠ ⊥ := by
     intro hbot
     apply w.ne_bot
     rw [eq_bot_iff] at hbot ⊢
     intro x hx
-    have hx' : (RingOfIntegers.mapRingEquiv σ).symm x ∈
-        w.asIdeal.comap (RingOfIntegers.mapRingEquiv σ) := by
+    have hx'
+        : (RingOfIntegers.mapRingEquiv σ).symm x
+          ∈ w.asIdeal.comap (RingOfIntegers.mapRingEquiv σ) := by
       rw [Ideal.mem_comap, RingEquiv.apply_symm_apply]
       exact hx
     have h0 := hbot hx'
     rw [Ideal.mem_bot] at h0 ⊢
     simpa using h0
-  obtain ⟨w', hw'⟩ : ∃ w' : HeightOneSpectrum (𝓞 L),
-      w'.asIdeal = w.asIdeal.comap (RingOfIntegers.mapRingEquiv σ) :=
+  obtain ⟨w', hw'⟩
+      : ∃ w' : HeightOneSpectrum (𝓞 L),
+        w'.asIdeal = w.asIdeal.comap (RingOfIntegers.mapRingEquiv σ) :=
     ⟨⟨_, Ideal.comap_isPrime _ _, hne⟩, rfl⟩
-  have hfix : ∀ x : 𝓞 (maximalRealSubfield L),
-      RingOfIntegers.mapRingEquiv σ (algebraMap _ (𝓞 L) x) = algebraMap _ (𝓞 L) x := by
+  have hfix
+      : ∀ x : 𝓞 (maximalRealSubfield L),
+        RingOfIntegers.mapRingEquiv σ (algebraMap _ (𝓞 L) x) = algebraMap _ (𝓞 L) x := by
     intro x
     apply RingOfIntegers.ext
     rw [RingOfIntegers.mapRingEquiv_apply]
-    have hx : ((algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) x : 𝓞 L) : L) =
-        algebraMap (maximalRealSubfield L) L (x : maximalRealSubfield L) := rfl
+    have hx
+        : ((algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) x : 𝓞 L) : L)
+          = algebraMap (maximalRealSubfield L) L (x : maximalRealSubfield L) :=
+      rfl
     rw [hx]
     exact (IsCMField.complexConj L).commutes _
   have hsame : w' = w := by
@@ -107,7 +124,13 @@ theorem valuation_complexConj_of_not_split {L : Type} [Field L] [NumberField L] 
   rw [hsame] at key
   exact key.symm
 
-theorem isSplitAt_of_isSquare : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (a : maximalRealSubfield L) (δ : L), δ ^ 2 = a → δ ∉ maximalRealSubfield L → ∀ w : HeightOneSpectrum (𝓞 L), IsSquare (algebraMap (maximalRealSubfield L) ((w.under (𝓞 (maximalRealSubfield L))).adicCompletion (maximalRealSubfield L)) a) → IsSplitAt w := by
+theorem isSplitAt_of_isSquare
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (a : maximalRealSubfield L) (δ : L),
+      δ ^ 2 = a → δ ∉ maximalRealSubfield L
+        → ∀ w : HeightOneSpectrum (𝓞 L),
+          IsSquare (algebraMap (maximalRealSubfield L)
+              ((w.under (𝓞 (maximalRealSubfield L))).adicCompletion (maximalRealSubfield L)) a)
+            → IsSplitAt w := by
   intro L _ _ _ a δ hδ hδL w hsq
   by_contra hw
   set u := w.under (𝓞 (maximalRealSubfield L)) with hu
@@ -134,8 +157,9 @@ theorem isSplitAt_of_isSquare : ∀ (L : Type) [Field L] [NumberField L] [IsCMFi
   have hsum : x + IsCMField.complexConj L x = 1 := by
     rw [hx', hx]
     ring
-  have hprod : x * IsCMField.complexConj L x =
-      algebraMap (maximalRealSubfield L) L (1 / 4 - c ^ 2 * a) := by
+  have hprod
+      : x * IsCMField.complexConj L x
+        = algebraMap (maximalRealSubfield L) L (1 / 4 - c ^ 2 * a) := by
     rw [hx', hx]
     simp only [map_sub, map_mul, map_pow, map_div₀, map_one, map_ofNat]
     change _ = 1 / 4 - (c : L) ^ 2 * (a : L)

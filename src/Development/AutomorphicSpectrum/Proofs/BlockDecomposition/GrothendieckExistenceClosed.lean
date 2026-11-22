@@ -20,14 +20,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Grothend
 
 set_option autoImplicit false
 noncomputable section
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out PositivityTheory.FormalThickening GroundTheory.Arith.SchemeCoh
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out
+  PositivityTheory.FormalThickening GroundTheory.Arith.SchemeCoh
 namespace GlobalTheory.CompanionTheory.GE
 
-theorem step_integral {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) (hI : IsAdicComplete I A)
+theorem step_integral
+    {A : Type} [CommRing A] [IsNoetherianRing A]
+    (I : Ideal A) (hI : IsAdicComplete I A)
     {X : Scheme.{0}} [X.Over (Spec (.of A))] [IsSeparated (X ↘ Spec (.of A))]
     [LocallyOfFiniteType (X ↘ Spec (.of A))] [QuasiCompact (X ↘ Spec (.of A))]
     (J : X.IdealSheafData) [IsIntegral J.subscheme]
-    (IH : ∀ J' : X.IdealSheafData, J < J' → Statement I J') : Statement I J := by
+    (IH : ∀ J' : X.IdealSheafData, J < J' → Statement I J')
+    : Statement I J := by
   intro E hE S hS hK hP
   have hln : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian (X ↘ Spec (.of A))
   letI : J.subscheme.Over (Spec (.of A)) := ⟨J.subschemeι ≫ (X ↘ Spec (.of A))⟩
@@ -37,21 +41,29 @@ theorem step_integral {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A)
     (inferInstance : LocallyOfFiniteType (J.subschemeι ≫ (X ↘ Spec (.of A))))
   have h3 : QuasiCompact (J.subscheme ↘ Spec (.of A)) :=
     (inferInstance : QuasiCompact (J.subschemeι ≫ (X ↘ Spec (.of A))))
-  obtain ⟨N, Y, i, O, ψ, W, hi, hψ, hcomm, hW, hiso⟩ := GlobalTheory.T.exists_chow_cover_integral (A := A) (X := J.subscheme)
+  obtain ⟨N, Y, i, O, ψ, W, hi, hψ, hcomm, hW, hiso⟩ :=
+    GlobalTheory.T.exists_chow_cover_integral (A := A) (X := J.subscheme)
   letI : (O : Scheme.{0}).Over (Spec (.of A)) := ⟨O.ι ≫ i ≫ ProjSpace.toSpecBase A N⟩
-  have hZ : Statement I (⊥ : (O : Scheme.{0}).IdealSheafData) := GlobalTheory.T.formal_existence_projective_open I hI i hi O
+  have hZ : Statement I (⊥ : (O : Scheme.{0}).IdealSheafData) :=
+    GlobalTheory.T.formal_existence_projective_open I hI i hi O
   have hover : (ψ ≫ J.subschemeι) ≫ (X ↘ Spec (.of A)) = ((O : Scheme.{0}) ↘ Spec (.of A)) := by
     change (ψ ≫ J.subschemeι) ≫ (X ↘ Spec (.of A)) = O.ι ≫ i ≫ ProjSpace.toSpecBase A N
     rw [hcomm, Category.assoc]
     rfl
-  obtain ⟨D, c, J', hDq, hDP, hc, hJ, hkill⟩ := GlobalTheory.T.formal_existence_proper_pushforward I hI J hZ ψ hψ hover W hW hiso hE hS hK hP
+  obtain ⟨D, c, J', hDq, hDP, hc, hJ, hkill⟩ :=
+    GlobalTheory.T.formal_existence_proper_pushforward I hI J hZ ψ hψ hover W hW hiso hE hS hK hP
   obtain ⟨c', hS', hP', halg⟩ := GlobalTheory.T.artin_rees_closed_system I hE hS hP D hDq c hc
-  exact halg (IH J' hJ _ (GlobalTheory.T.coherent_subobject_coherent hE D hDq) _ hS' (GlobalTheory.T.restricted_system_killed_by_ideal I J' D S c' hkill) hP') hDP
+  exact halg
+    (IH J' hJ _ (GlobalTheory.T.coherent_subobject_coherent hE D hDq) _ hS'
+      (GlobalTheory.T.restricted_system_killed_by_ideal I J' D S c' hkill) hP')
+    hDP
 
-theorem statement_bot {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) (hI : IsAdicComplete I A)
+theorem statement_bot
+    {A : Type} [CommRing A] [IsNoetherianRing A]
+    (I : Ideal A) (hI : IsAdicComplete I A)
     (X : Scheme.{0}) [X.Over (Spec (.of A))] [IsSeparated (X ↘ Spec (.of A))]
-    [LocallyOfFiniteType (X ↘ Spec (.of A))] [QuasiCompact (X ↘ Spec (.of A))] :
-    Statement I (⊥ : X.IdealSheafData) := by
+    [LocallyOfFiniteType (X ↘ Spec (.of A))] [QuasiCompact (X ↘ Spec (.of A))]
+    : Statement I (⊥ : X.IdealSheafData) := by
   have hln : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian (X ↘ Spec (.of A))
   have hcs : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace (X ↘ Spec (.of A))
   have hno : IsNoetherian X := ⟨⟩

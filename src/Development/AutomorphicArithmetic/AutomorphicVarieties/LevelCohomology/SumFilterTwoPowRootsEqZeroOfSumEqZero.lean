@@ -5,8 +5,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LevelCohomo
 
 @[expose] public section
 
-theorem UpperTheory.sum_filter_two_pow_roots_eq_zero_of_sum_eq_zero :
-    ∀ (k : Type) [Field k] (l : ℕ) [Fact l.Prime] [CharP k l], l ≠ 2 → ∀ (d e n : ℕ) (a : ℤ), 2 ≤ e → Odd a → ((l ^ d : ℕ) : ℤ) = 1 + 2 ^ e * a → ∀ (ι : Type) [Fintype ι] [DecidableEq k] (z g : ι → k), (∀ i, z i = 0 ∨ z i ^ (2 ^ n) = 1) → (∀ i, g i ^ (l ^ d) = g i) → ∑ i, z i * g i = 0 → ∑ i ∈ Finset.univ.filter (fun i => z i ^ (2 ^ e) = 1), z i * g i = 0 := by
+theorem UpperTheory.sum_filter_two_pow_roots_eq_zero_of_sum_eq_zero
+    : ∀ (k : Type) [Field k] (l : ℕ) [Fact l.Prime] [CharP k l],
+      l ≠ 2
+        → ∀ (d e n : ℕ) (a : ℤ),
+          2 ≤ e → Odd a → ((l ^ d : ℕ) : ℤ) = 1 + 2 ^ e * a
+            → ∀ (ι : Type) [Fintype ι] [DecidableEq k] (z g : ι → k),
+              (∀ i, z i = 0 ∨ z i ^ (2 ^ n) = 1) → (∀ i, g i ^ (l ^ d) = g i) → ∑ i, z i * g i = 0
+                → ∑ i ∈ Finset.univ.filter (fun i => z i ^ (2 ^ e) = 1), z i * g i = 0 := by
   intro k _ l _ _ hl2 d e n a he ha hq ι _ _ z g hz hg hsum
   have hlp : l.Prime := Fact.out
   set N := n + e with hN
@@ -23,7 +29,9 @@ theorem UpperTheory.sum_filter_two_pow_roots_eq_zero_of_sum_eq_zero :
     | succ j ih => rw [pow_succ, pow_mul, ih, hg]
   have hA : ∀ m : ℕ, ∑ i, z i ^ (1 + 2 ^ e * m) * g i = 0 := by
     intro m
-    obtain ⟨j, hj⟩ := UpperTheory.exists_pow_dvd_sub_of_two_pow_dvd_sub_one ((l ^ d : ℕ) : ℤ) a (1 + 2 ^ e * (m : ℤ)) e N he ha hq (by simp)
+    obtain ⟨j, hj⟩ :=
+      UpperTheory.exists_pow_dvd_sub_of_two_pow_dvd_sub_one ((l ^ d : ℕ) : ℤ) a
+        (1 + 2 ^ e * (m : ℤ)) e N he ha hq (by simp)
     have e1 : (l ^ d) ^ j = l ^ (d * j) := (pow_mul l d j).symm
     have hpow : (∑ i, z i * g i) ^ ((l ^ d) ^ j) = ∑ i, z i ^ ((l ^ d) ^ j) * g i := by
       rw [e1, sum_pow_char_pow]
@@ -42,8 +50,13 @@ theorem UpperTheory.sum_filter_two_pow_roots_eq_zero_of_sum_eq_zero :
         rw [Nat.modEq_iff_dvd]
         push_cast
         exact hj
-      rw [← pow_mod_orderOf, show (1 + 2 ^ e * m) % orderOf (z i) = (l ^ d) ^ j % orderOf (z i) from hmod, pow_mod_orderOf]
-  have hB : ∀ i, ∑ m ∈ Finset.range (2 ^ n), z i ^ (1 + 2 ^ e * m) = if z i ^ (2 ^ e) = 1 then (2 ^ n : k) * z i else 0 := by
+      rw [← pow_mod_orderOf,
+        show (1 + 2 ^ e * m) % orderOf (z i) = (l ^ d) ^ j % orderOf (z i) from hmod,
+        pow_mod_orderOf]
+  have hB
+      : ∀ i,
+        ∑ m ∈ Finset.range (2 ^ n), z i ^ (1 + 2 ^ e * m)
+          = if z i ^ (2 ^ e) = 1 then (2 ^ n : k) * z i else 0 := by
     intro i
     have hterm : ∀ m : ℕ, z i ^ (1 + 2 ^ e * m) = z i * (z i ^ 2 ^ e) ^ m := by
       intro m

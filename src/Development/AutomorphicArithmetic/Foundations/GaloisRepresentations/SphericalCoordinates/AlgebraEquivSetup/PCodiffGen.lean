@@ -11,9 +11,9 @@ open NumberField nonZeroDivisors
 
 namespace UpperTheory.Gal.W2.Seed
 
-private theorem exists_ideal (E : Type) [Field E] [NumberField E] :
-    ∃ (a : 𝓞 E) (J : Ideal (𝓞 E)), a ≠ 0 ∧ J ≠ ⊥ ∧
-      ∀ z : E, InCodiff z ↔ ∃ j ∈ J, z = (a : E)⁻¹ * (j : E) := by
+private theorem exists_ideal (E : Type) [Field E] [NumberField E]
+    : ∃ (a : 𝓞 E) (J : Ideal (𝓞 E)),
+      a ≠ 0 ∧ J ≠ ⊥ ∧ ∀ z : E, InCodiff z ↔ ∃ j ∈ J, z = (a : E)⁻¹ * (j : E) := by
   classical
   have h1ne : (1 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := one_ne_zero
   set D : FractionalIdeal (𝓞 E)⁰ E := FractionalIdeal.dual ℤ ℚ 1 with hDdef
@@ -35,7 +35,8 @@ private theorem exists_ideal (E : Type) [Field E] [NumberField E] :
     rw [hddef]
     exact (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).2 (nonZeroDivisors.coe_ne_zero _)
   have key := FractionalIdeal.den_mul_self_eq_num' (𝓞 E)⁰ E D
-  have key2 : D = FractionalIdeal.spanSingleton (𝓞 E)⁰ d⁻¹ * (D.num : FractionalIdeal (𝓞 E)⁰ E) := by
+  have key2
+      : D = FractionalIdeal.spanSingleton (𝓞 E)⁰ d⁻¹ * (D.num : FractionalIdeal (𝓞 E)⁰ E) := by
     rw [← key, ← mul_assoc, FractionalIdeal.spanSingleton_mul_spanSingleton, inv_mul_cancel₀ hd0,
       FractionalIdeal.spanSingleton_one, one_mul]
   refine ⟨(D.den : 𝓞 E), D.num, nonZeroDivisors.coe_ne_zero _, ?_, ?_⟩
@@ -56,7 +57,9 @@ private theorem exists_ideal (E : Type) [Field E] [NumberField E] :
       have h3 : ((D.den : 𝓞 E) : E) = d := rfl
       rw [h3, h2, ← mul_assoc, inv_mul_cancel₀ hd0, one_mul]
     · rintro ⟨j, hj, hz⟩
-      have h4 : d⁻¹ * (j : E) ∈ FractionalIdeal.spanSingleton (𝓞 E)⁰ d⁻¹ * (D.num : FractionalIdeal (𝓞 E)⁰ E) :=
+      have h4
+          : d⁻¹ * (j : E)
+            ∈ FractionalIdeal.spanSingleton (𝓞 E)⁰ d⁻¹ * (D.num : FractionalIdeal (𝓞 E)⁰ E) :=
         FractionalIdeal.mul_mem_mul (FractionalIdeal.mem_spanSingleton_self _ _)
           ((FractionalIdeal.mem_coeIdeal _).2 ⟨j, hj, rfl⟩)
       rw [← key2] at h4
@@ -78,7 +81,8 @@ theorem pCodiffGen : CodiffGen := by
   have hjJ : j ∈ J := by
     rw [← hj]
     exact Ideal.mem_sup_right (Ideal.mem_span_singleton_self j)
-  obtain ⟨K, hK⟩ : J ∣ Ideal.span {j} := Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hjJ)
+  obtain ⟨K, hK⟩ : J ∣ Ideal.span {j} :=
+    Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hjJ)
   have hKM : K ⊔ Ideal.span {(M : 𝓞 E)} = ⊤ := by
     have h1 : J * (Ideal.span {(M : 𝓞 E)} ⊔ K) = J * ⊤ := by
       rw [Ideal.mul_sup, ← hK, hj, Ideal.mul_top]
@@ -119,11 +123,12 @@ theorem pCodiffGen : CodiffGen := by
         exact addOrderOf_nsmul_eq_zero x
       have hu : (q : 𝓞 E ⧸ K) * Ideal.Quotient.mk K t = 1 := by
         have := congrArg (Ideal.Quotient.mk K) hkm
-        rw [map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.2 hk, zero_add, map_mul, map_one, map_natCast] at this
+        rw [map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.2 hk, zero_add, map_mul, map_one,
+            map_natCast]
+          at this
         rw [mul_comm]
         exact this
-      have hx0 : x = 0 := by
-        linear_combination (-x) * hu + (Ideal.Quotient.mk K t) * hqx
+      have hx0 : x = 0 := by linear_combination (-x) * hu + (Ideal.Quotient.mk K t) * hqx
       rw [hx0, addOrderOf_zero] at hx
       exact hq.one_lt.ne hx
   · intro z hz

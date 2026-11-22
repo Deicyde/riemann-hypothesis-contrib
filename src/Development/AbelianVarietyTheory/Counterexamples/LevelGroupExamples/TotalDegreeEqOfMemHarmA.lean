@@ -10,16 +10,19 @@ noncomputable section
 namespace GlobalTheory.ThetaRuleCheck
 open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor NumberField MvPolynomial
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
-theorem inPsi_conjugate_iff (τ : E →+* ℂ) : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
+theorem inPsi_conjugate_iff (τ : E →+* ℂ)
+    : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
   have hd : (0 : ℝ) < H.d := by exact_mod_cast H.d_prime.pos
   have h1 : τ (H.rt : E) ^ 2 = H.rt0 ^ 2 := by
     rw [H.sqrt_neg_disc_sq, ← map_pow]
     have : ((H.rt : E)) ^ 2 = -(H.d : E) := by
       have := congrArg (algebraMap (𝓞 E) E) H.rt_sq
       simpa using this
-    rw [this]; simp
+    rw [this]
+    simp
   have h2 : starRingEnd ℂ H.rt0 = -H.rt0 := by
     have h := H.sqrt_neg_disc_sq
     have hre := congrArg Complex.re h

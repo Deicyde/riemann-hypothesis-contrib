@@ -10,29 +10,34 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
+  ReciprocityTheory.ChartRestriction.G.AI.I4
 
 noncomputable section
-
 
 open ProjFrameFibrePt in
 theorem ProjFrameGenPtRel.proof : ProjFrameGenPtRel.Statement := by
   intro D Ω _ _ κ _ x e _ hF G
   classical
   refine ⟨?_, ?_, ?_, ?_⟩
-  ·
-    intro n hn
-    have h1 : (C (n : ℤ) : MRing (Sum.elim (GlobalTheory κ) (GlobalTheory (Fin (D + 1))))) ∈ graphP x e := by
-      rw [graphP, ← G.genericFibre_ker_target, RingHom.mem_ker, aeval_C, eq_intCast, Int.cast_natCast]
+  · intro n hn
+    have h1
+        : (C (n : ℤ) : MRing (Sum.elim (GlobalTheory κ) (GlobalTheory (Fin (D + 1)))))
+          ∈ graphP x e := by
+      rw [graphP, ← G.genericFibre_ker_target, RingHom.mem_ker, aeval_C, eq_intCast,
+        Int.cast_natCast]
       exact hn
     rw [graphP, graphIdeal, RingHom.mem_ker, graphMap, eval₂Hom_C, eq_intCast, Int.cast_natCast,
-      ← map_natCast (C : (MRing (GlobalTheory κ) ⧸ coordIdeal ℤ x) →+* MvPolynomial Unit _), C_eq_zero,
-      ← map_natCast (Ideal.Quotient.mk (coordIdeal ℤ x)), Ideal.Quotient.eq_zero_iff_mem, coordIdeal,
-      RingHom.mem_ker, map_natCast, ← map_natCast (Polynomial.C : Ω →+* Polynomial Ω), Polynomial.C_eq_zero] at h1
+        ← map_natCast (C : (MRing (GlobalTheory κ) ⧸ coordIdeal ℤ x) →+* MvPolynomial Unit _),
+        C_eq_zero, ← map_natCast (Ideal.Quotient.mk (coordIdeal ℤ x)),
+        Ideal.Quotient.eq_zero_iff_mem, coordIdeal, RingHom.mem_ker, map_natCast,
+        ← map_natCast (Polynomial.C : Ω →+* Polynomial Ω), Polynomial.C_eq_zero]
+      at h1
     exact_mod_cast h1
-  ·
-    have hker : ∀ h : MRing (GlobalTheory κ),
-        aeval (fun p : Ix κ => G.x' ⟨Sum.inl p.1, p.2⟩) h = 0 ↔ h ∈ coordIdeal ℤ x := by
+  · have hker
+        : ∀ h : MRing (GlobalTheory κ),
+          aeval (fun p : Ix κ => G.x' ⟨Sum.inl p.1, p.2⟩) h = 0 ↔ h ∈ coordIdeal ℤ x := by
       intro h
       constructor
       · intro h0
@@ -40,12 +45,14 @@ theorem ProjFrameGenPtRel.proof : ProjFrameGenPtRel.Statement := by
           rw [graphP, ← G.genericFibre_ker_target, RingHom.mem_ker, aeval_rename]
           exact h0
         rwa [graphP, graphIdeal, RingHom.mem_ker, graphMap_rename_inl, C_eq_zero,
-          Ideal.Quotient.eq_zero_iff_mem] at h2
+            Ideal.Quotient.eq_zero_iff_mem]
+          at h2
       · intro hh
         exact aeval_inl_eq_zero G hh
     ext f
-    have hu : f ∈ coordIdeal ℤ (fun p : Ix κ => G.x' ⟨Sum.inl p.1, p.2⟩) ↔
-        ∀ d, homogeneousComponent d f ∈ coordIdeal ℤ x := by
+    have hu
+        : f ∈ coordIdeal ℤ (fun p : Ix κ => G.x' ⟨Sum.inl p.1, p.2⟩)
+          ↔ ∀ d, homogeneousComponent d f ∈ coordIdeal ℤ x := by
       rw [coordIdeal, RingHom.mem_ker, Polynomial.ext_iff]
       simp only [coeff_coneMap, Polynomial.coeff_zero, hker]
     rw [hu]
@@ -55,19 +62,19 @@ theorem ProjFrameGenPtRel.proof : ProjFrameGenPtRel.Statement := by
       exact Ideal.sum_mem _ fun d _ => h d
     · intro h d
       exact coordIdeal_isHomogIdeal ℤ x f h d
-  ·
-    intro k
+  · intro k
     have h := x'_frame_mul G (e := e) k
     change G.x' (bV κ k) * G.x' (aV D (e 0).2) = G.x' (bV κ 0) * G.x' (aV D (e k).2)
     linear_combination -h
-  ·
-    apply le_antisymm
+  · apply le_antisymm
     · intro y hy
       rw [RingHom.mem_fieldRange] at hy
       obtain ⟨c, rfl⟩ := hy
       obtain ⟨f, g, _, rfl⟩ := G.gen c
-      have key : ∀ h : MRing (GlobalTheory (Fin (D + 1))), algebraMap G.Φ G.Φ' (aeval G.x h) ∈
-          Subfield.closure (Set.range fun k : Fin (D + 1) => G.x' ⟨Sum.inr (), k⟩) := by
+      have key
+          : ∀ h : MRing (GlobalTheory (Fin (D + 1))),
+            algebraMap G.Φ G.Φ' (aeval G.x h)
+              ∈ Subfield.closure (Set.range fun k : Fin (D + 1) => G.x' ⟨Sum.inr (), k⟩) := by
         intro h
         induction h using MvPolynomial.induction_on with
         | C a =>

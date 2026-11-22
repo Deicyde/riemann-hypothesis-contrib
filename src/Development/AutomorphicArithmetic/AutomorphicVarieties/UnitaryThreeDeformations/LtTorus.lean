@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
 namespace UpperTheory.V.UnitaryThreeInertia.LtTorus
 
@@ -16,40 +17,44 @@ private theorem sgn_tor (s : ℤˣ) (t : Rˣ) : sgnAct 3 R s (tor R t) = tor R t
   · simp
   · rw [sgnAct_neg_one]
     apply Units.ext
-    have hval (u : Rˣ) : (tor R u : Matrix (Fin 3) (Fin 3) R) =
-        diagonal (fun i => ((u ^ wt1 i : Rˣ) : R)) := rfl
+    have hval (u : Rˣ)
+        : (tor R u : Matrix (Fin 3) (Fin 3) R) = diagonal (fun i => ((u ^ wt1 i : Rˣ) : R)) :=
+      rfl
     rw [theta_val, ← map_inv, hval, hval]
     ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp [Matrix.mul_apply, Fin.sum_univ_three, Jmat, wt1, Matrix.diagonal, Fin.rev]
+    fin_cases i <;> fin_cases j
+      <;> simp [Matrix.mul_apply, Fin.sum_univ_three, Jmat, wt1, Matrix.diagonal, Fin.rev]
 
-private theorem comm_tor (t : Rˣ) (x : GG (m := 3) (R := R)) (hx : x.mat.IsDiag) :
-    GG.ofGL (tor R t) * x = x * GG.ofGL (tor R t) := by
+private theorem comm_tor (t : Rˣ) (x : GG (m := 3) (R := R)) (hx : x.mat.IsDiag)
+    : GG.ofGL (tor R t) * x = x * GG.ofGL (tor R t) := by
   ext1
   · simp only [SemidirectProduct.mul_left, SemidirectProduct.left_inl, SemidirectProduct.right_inl,
       sgn_tor, map_one, MulAut.one_apply]
     apply Units.ext
     have h : (x.left : Matrix (Fin 3) (Fin 3) R) = diagonal (diag x.mat) := hx.diagonal_diag.symm
-    have hval : (tor R t : Matrix (Fin 3) (Fin 3) R) =
-        diagonal (fun i => ((t ^ wt1 i : Rˣ) : R)) := rfl
+    have hval : (tor R t : Matrix (Fin 3) (Fin 3) R) = diagonal (fun i => ((t ^ wt1 i : Rˣ) : R)) :=
+      rfl
     rw [Units.val_mul, Units.val_mul, h, hval, diagonal_mul_diagonal, diagonal_mul_diagonal]
     congr 1
     ext i
     exact mul_comm _ _
   · simp
 
-private def tw (w : D →* GG (m := 3) (R := R)) (hw : ∀ g, (w g).mat.IsDiag) (χ : D →* Rˣ) : D →* GG (m := 3) (R := R) :=
+private def tw (w : D →* GG (m := 3) (R := R)) (hw : ∀ g, (w g).mat.IsDiag) (χ : D →* Rˣ)
+    : D →* GG (m := 3) (R := R) :=
   MonoidHom.mk' (fun g => w g * GG.ofGL (tor R (χ g))) (by
     intro a b
     simp only [map_mul, mul_assoc]
     congr 1
     rw [← mul_assoc, ← mul_assoc, comm_tor _ _ (hw b)])
 
-private theorem tw_apply (w : D →* GG (m := 3) (R := R)) (hw : ∀ g, (w g).mat.IsDiag) (χ : D →* Rˣ) (g : D) :
-    tw w hw χ g = w g * GG.ofGL (tor R (χ g)) := rfl
+private theorem tw_apply
+    (w : D →* GG (m := 3) (R := R)) (hw : ∀ g, (w g).mat.IsDiag) (χ : D →* Rˣ) (g : D)
+    : tw w hw χ g = w g * GG.ofGL (tor R (χ g)) :=
+  rfl
 
-private theorem mat_mul_tor (x : GG (m := 3) (R := R)) (t : Rˣ) (a b : Fin 3) :
-    (x * GG.ofGL (tor R t)).mat a b = x.mat a b * ((t ^ wt1 b : Rˣ) : R) := by
+private theorem mat_mul_tor (x : GG (m := 3) (R := R)) (t : Rˣ) (a b : Fin 3)
+    : (x * GG.ofGL (tor R t)).mat a b = x.mat a b * ((t ^ wt1 b : Rˣ) : R) := by
   show ((x.left * sgnAct 3 R x.right (tor R t) : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) a b = _
   rw [sgn_tor, Units.val_mul]
   change (x.mat * diagonal (fun i => ((t ^ wt1 i : Rˣ) : R))) a b = _
@@ -58,11 +63,14 @@ private theorem mat_mul_tor (x : GG (m := 3) (R := R)) (t : Rˣ) (a b : Fin 3) :
 private def dg (d : Fin 3 → Rˣ) : GL (Fin 3) R where
   val := Matrix.diagonal fun i => (d i : R)
   inv := Matrix.diagonal fun i => (((d i)⁻¹ : Rˣ) : R)
-  val_inv := by rw [Matrix.diagonal_mul_diagonal]; simp only [Units.mul_inv]; exact Matrix.diagonal_one
-  inv_val := by rw [Matrix.diagonal_mul_diagonal]; simp only [Units.inv_mul]; exact Matrix.diagonal_one
+  val_inv := by
+    rw [Matrix.diagonal_mul_diagonal]; simp only [Units.mul_inv]; exact Matrix.diagonal_one
+  inv_val := by
+    rw [Matrix.diagonal_mul_diagonal]; simp only [Units.inv_mul]; exact Matrix.diagonal_one
 
-private theorem dg_val (d : Fin 3 → Rˣ) :
-    (dg d : Matrix (Fin 3) (Fin 3) R) = Matrix.diagonal fun i => (d i : R) := rfl
+private theorem dg_val (d : Fin 3 → Rˣ)
+    : (dg d : Matrix (Fin 3) (Fin 3) R) = Matrix.diagonal fun i => (d i : R) :=
+  rfl
 
 private theorem dg_inv (d : Fin 3 → Rˣ) : (dg d)⁻¹ = dg d⁻¹ := Units.ext rfl
 
@@ -75,10 +83,11 @@ private theorem theta_dg (d : Fin 3 → Rˣ) : theta (dg d) = dg fun a => (d a.r
   apply Units.ext
   rw [theta_val, dg_inv, dg_val, dg_val, diagonal_transpose]
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [Jmat, Matrix.mul_apply, Fin.sum_univ_three, diagonal, Fin.rev]
+  fin_cases i <;> fin_cases j
+    <;> simp [Jmat, Matrix.mul_apply, Fin.sum_univ_three, diagonal, Fin.rev]
 
-private theorem sgn_dg (U : Subgroup Rˣ) (s : ℤˣ) (d : Fin 3 → Rˣ) (hd : ∀ a, d a ∈ U) :
-    ∃ e : Fin 3 → Rˣ, (∀ a, e a ∈ U) ∧ sgnAct 3 R s (dg d) = dg e := by
+private theorem sgn_dg (U : Subgroup Rˣ) (s : ℤˣ) (d : Fin 3 → Rˣ) (hd : ∀ a, d a ∈ U)
+    : ∃ e : Fin 3 → Rˣ, (∀ a, e a ∈ U) ∧ sgnAct 3 R s (dg d) = dg e := by
   rcases Int.units_eq_one_or s with rfl | rfl
   · exact ⟨d, hd, by simp⟩
   · exact ⟨_, fun a => inv_mem (hd a.rev), by rw [sgnAct_neg_one, theta_dg]⟩
@@ -89,14 +98,15 @@ private def dgSub (U : Subgroup Rˣ) : Subgroup (GG (m := 3) (R := R)) where
   mul_mem' := by
     rintro x y ⟨d, hd, hx⟩ ⟨d', hd', hy⟩
     obtain ⟨e, he, h⟩ := sgn_dg U x.right d' hd'
-    exact ⟨d * e, fun a => mul_mem (hd a) (he a), by
-      rw [SemidirectProduct.mul_left, hx, hy, h, dg_mul]⟩
+    exact
+      ⟨d * e, fun a => mul_mem (hd a) (he a), by rw [SemidirectProduct.mul_left, hx, hy, h, dg_mul]⟩
   inv_mem' := by
     rintro x ⟨d, hd, hx⟩
     obtain ⟨e, he, h⟩ := sgn_dg U x.right⁻¹ d⁻¹ fun a => inv_mem (hd a)
     exact ⟨e, he, by rw [SemidirectProduct.inv_left, hx, dg_inv, h]⟩
 
-private theorem diag_unit (x : GG (m := 3) (R := R)) (hx : x.mat.IsDiag) (a : Fin 3) : IsUnit (x.mat a a) := by
+private theorem diag_unit (x : GG (m := 3) (R := R)) (hx : x.mat.IsDiag) (a : Fin 3)
+    : IsUnit (x.mat a a) := by
   have h1 : (x.mat * ((x.left⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R)) a a = 1 := by
     unfold GG.mat
     rw [← Units.val_mul, mul_inv_cancel]
@@ -108,13 +118,13 @@ private theorem diag_unit (x : GG (m := 3) (R := R)) (hx : x.mat.IsDiag) (a : Fi
   · intro h
     exact absurd (Finset.mem_univ a) h
 
-private theorem map_tor {S : Type} [CommRing S] (f : R →+* S) (t : Rˣ) :
-    GG.map f (GG.ofGL (tor R t)) = GG.ofGL (tor S (Units.map f.toMonoidHom t)) := by
+private theorem map_tor {S : Type} [CommRing S] (f : R →+* S) (t : Rˣ)
+    : GG.map f (GG.ofGL (tor R t)) = GG.ofGL (tor S (Units.map f.toMonoidHom t)) := by
   refine SemidirectProduct.ext ?_ ?_
   · apply Units.ext
     ext i j
-    change f (diagonal (fun a => ((t ^ wt1 a : Rˣ) : R)) i j) =
-      diagonal (fun a => ((Units.map f.toMonoidHom t ^ wt1 a : Sˣ) : S)) i j
+    change f (diagonal (fun a => ((t ^ wt1 a : Rˣ) : R)) i j)
+      = diagonal (fun a => ((Units.map f.toMonoidHom t ^ wt1 a : Sˣ) : S)) i j
     simp only [diagonal_apply, apply_ite f, map_zero]
     split_ifs
     · rw [← map_zpow]
@@ -125,17 +135,29 @@ private theorem map_tor {S : Type} [CommRing S] (f : R →+* S) (t : Rˣ) :
 end UpperTheory.V.UnitaryThreeInertia.LtTorus
 
 open UpperTheory.V.UnitaryThreeInertia.LtTorus in
-theorem UpperTheory.V.UnitaryThreeInertia.lt_torus :
-    ∀ {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [Finite R] [CommRing R'] [IsLocalRing R'] [Algebra O R'] [Group D] [TopologicalSpace D] [IsTopologicalGroup D]
-      (A : Subalgebra O R) (p : R →ₐ[O] R'), Function.Surjective p → ∀ (η : D →* ℤˣ) (Ψ : D →* Oˣ) (I : Subgroup D) (φ : D),
-      (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤ →
-      (∀ n : ℕ, 0 < n → ∃ d : D →* Multiplicative (ZMod n), IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1) →
-      IsLocallyConstant η → (∀ s ∈ I, η s = 1) → (IsLocallyConstant fun g => algebraMap O R (Ψ g : O)) →
-      ∀ u' : D →* GG (m := 3) (R := R'), HasMult η u' → IsLocallyConstant (mats u') → (∀ g, (u' g).mat.IsDiag) → (∀ g a, ∃ y ∈ A, p y = (u' g).mat a a) →
-      (∀ s ∈ I, ∀ a, (u' s).mat a a = algebraMap O R' (psi Ψ a s)) →
-      ∃ u : D →* GG (m := 3) (R := R), push p u = u' ∧ IsLocallyConstant (mats u) ∧ (∀ g, (u g).mat.IsDiag) ∧ (∀ g a, (u g).mat a a ∈ A) ∧
-        ∀ s ∈ I, ∀ a, (u s).mat a a = algebraMap O R (psi Ψ a s) := by
-  intro O R R' D _ _ _ _ _ _ _ _ _ _ _ _ A p hp η Ψ I φ hcl hcyc hη hηI hΨ u' hmult hloc hdiag hlift hI
+theorem UpperTheory.V.UnitaryThreeInertia.lt_torus
+    : ∀ {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRing R] [IsLocalRing R] [Algebra O R]
+        [Finite R] [CommRing R'] [IsLocalRing R'] [Algebra O R'] [Group D] [TopologicalSpace D]
+        [IsTopologicalGroup D] (A : Subalgebra O R) (p : R →ₐ[O] R'),
+      Function.Surjective p
+        → ∀ (η : D →* ℤˣ) (Ψ : D →* Oˣ) (I : Subgroup D) (φ : D),
+          (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤
+            → (∀ n : ℕ,
+              0 < n
+                → ∃ d : D →* Multiplicative (ZMod n),
+                  IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1)
+            → IsLocallyConstant η → (∀ s ∈ I, η s = 1)
+            → (IsLocallyConstant fun g => algebraMap O R (Ψ g : O))
+            → ∀ u' : D →* GG (m := 3) (R := R'),
+              HasMult η u' → IsLocallyConstant (mats u') → (∀ g, (u' g).mat.IsDiag)
+                → (∀ g a, ∃ y ∈ A, p y = (u' g).mat a a)
+                → (∀ s ∈ I, ∀ a, (u' s).mat a a = algebraMap O R' (psi Ψ a s))
+                → ∃ u : D →* GG (m := 3) (R := R),
+                  push p u = u' ∧ IsLocallyConstant (mats u) ∧ (∀ g, (u g).mat.IsDiag)
+                    ∧ (∀ g a, (u g).mat a a ∈ A)
+                    ∧ ∀ s ∈ I, ∀ a, (u s).mat a a = algebraMap O R (psi Ψ a s) := by
+  intro O R R' D _ _ _ _ _ _ _ _ _ _ _ _ A p hp η Ψ I φ hcl hcyc hη hηI hΨ u' hmult hloc hdiag hlift
+    hI
   haveI : IsLocalHom (p : R →+* R') := IsLocalHom.of_surjective _ hp
   haveI : Finite (GG (m := 3) (R := R)) := Finite.of_injective (fun x : GG (m := 3) (R := R) => (x.left, x.right))
     (fun x y h => SemidirectProduct.ext (congrArg Prod.fst h) (congrArg Prod.snd h))
@@ -146,13 +168,15 @@ theorem UpperTheory.V.UnitaryThreeInertia.lt_torus :
       eq_inv_of_mul_eq_one_left (by rw [← pow_succ, Nat.sub_add_cancel hn, hvn])
     rw [← hv', Units.val_pow_eq_pow_val]
     exact Subalgebra.pow_mem A hv _
-  let U : Subgroup Rˣ :=
-    { carrier := {v | (v : R) ∈ A ∧ ((v⁻¹ : Rˣ) : R) ∈ A}
-      one_mem' := ⟨by simpa using A.one_mem, by simpa using A.one_mem⟩
-      mul_mem' := fun {a b} ha hb =>
-        ⟨by simpa using A.mul_mem ha.1 hb.1,
-          by rw [_root_.mul_inv_rev]; simpa using A.mul_mem hb.2 ha.2⟩
-      inv_mem' := fun {a} ha => ⟨ha.2, by simpa using ha.1⟩ }
+  let U : Subgroup Rˣ := {
+    carrier := {v | (v : R) ∈ A ∧ ((v⁻¹ : Rˣ) : R) ∈ A}
+    one_mem' := ⟨by simpa using A.one_mem, by simpa using A.one_mem⟩
+    mul_mem' := fun {a b} ha hb => ⟨
+      by simpa using A.mul_mem ha.1 hb.1,
+      by rw [_root_.mul_inv_rev]; simpa using A.mul_mem hb.2 ha.2
+    ⟩
+    inv_mem' := fun {a} ha => ⟨ha.2, by simpa using ha.1⟩
+  }
   have hU : ∀ v : Rˣ, (v : R) ∈ A → v ∈ U := fun v hv => ⟨hv, hinvA v hv⟩
   let χ : D →* Rˣ := (Units.map (algebraMap O R).toMonoidHom).comp Ψ
   let χ' : D →* R'ˣ := (Units.map (algebraMap O R').toMonoidHom).comp Ψ
@@ -170,7 +194,8 @@ theorem UpperTheory.V.UnitaryThreeInertia.lt_torus :
     show ((Units.map (algebraMap O R').toMonoidHom (Ψ g) ^ wt1 a : R'ˣ) : R') = _
     rw [psi, ← map_zpow, Units.coe_map]
     rfl
-  have hw'v : ∀ g, tw u' hdiag χ'⁻¹ g = u' g * GG.ofGL (tor R' (χ' g)⁻¹) := fun g => tw_apply _ _ _ _
+  have hw'v : ∀ g, tw u' hdiag χ'⁻¹ g = u' g * GG.ofGL (tor R' (χ' g)⁻¹) := fun g =>
+    tw_apply _ _ _ _
   have hw'I : ∀ s ∈ I, tw u' hdiag χ'⁻¹ s = 1 := by
     intro s hs
     have hu's : u' s = GG.ofGL (tor R' (χ' s)) := by
@@ -188,7 +213,9 @@ theorem UpperTheory.V.UnitaryThreeInertia.lt_torus :
     simp
   have hu'loc : IsLocallyConstant u' := by
     apply IsLocallyConstant.desc _ (fun x : GG (m := 3) (R := R') => (x.mat, x.right))
-    · have hc : (fun x : GG (m := 3) (R := R') => (x.mat, x.right)) ∘ u' = fun g => (mats u' g, η g) := by
+    · have hc
+          : (fun x : GG (m := 3) (R := R') => (x.mat, x.right)) ∘ u'
+            = fun g => (mats u' g, η g) := by
         funext g
         simp [mats, hmult g]
       rw [hc]
@@ -205,7 +232,9 @@ theorem UpperTheory.V.UnitaryThreeInertia.lt_torus :
     rw [hc]
     exact hχloc.comp _
   have hw'loc : IsLocallyConstant (tw u' hdiag χ'⁻¹) := by
-    have hc : (tw u' hdiag χ'⁻¹ : D → GG (m := 3) (R := R')) = fun g => u' g * GG.ofGL (tor R' (χ' g)⁻¹) := by
+    have hc
+        : (tw u' hdiag χ'⁻¹ : D → GG (m := 3) (R := R'))
+          = fun g => u' g * GG.ofGL (tor R' (χ' g)⁻¹) := by
       funext g
       exact hw'v g
     rw [hc]

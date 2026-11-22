@@ -8,27 +8,38 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem adic_coeffs_tendsto_zero :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (M : Type) [AddCommGroup M] [Module R M] (r : ℕ) (s : Fin r → M), Submodule.span R (Set.range s) = ⊤ → ∀ (X : Type) (z : X → M), (∀ n : ℕ, {χ | z χ ∉ (maximalIdeal R ^ n • ⊤ : Submodule R M)}.Finite) → ∃ c : X → Fin r → R, (∀ χ, z χ = ∑ j, c χ j • s j) ∧ ∀ n : ℕ, {χ | ¬ ∀ j, c χ j ∈ maximalIdeal R ^ n}.Finite := by
+theorem adic_coeffs_tendsto_zero
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (M : Type) [AddCommGroup M]
+        [Module R M] (r : ℕ) (s : Fin r → M),
+      Submodule.span R (Set.range s) = ⊤
+        → ∀ (X : Type) (z : X → M),
+          (∀ n : ℕ, {χ | z χ ∉ (maximalIdeal R ^ n • ⊤ : Submodule R M)}.Finite)
+            → ∃ c : X → Fin r → R,
+              (∀ χ, z χ = ∑ j, c χ j • s j)
+                ∧ ∀ n : ℕ, {χ | ¬ ∀ j, c χ j ∈ maximalIdeal R ^ n}.Finite := by
   intro R _ _ _ M _ _ r s hs X z hz
   classical
   set m := maximalIdeal R
 
-  have coef : ∀ (x : M) (k : ℕ), x ∈ (m ^ k • ⊤ : Submodule R M) →
-      ∃ a : Fin r → R, x = ∑ j, a j • s j ∧ ∀ j, a j ∈ m ^ k := by
+  have coef
+      : ∀ (x : M) (k : ℕ),
+        x ∈ (m ^ k • ⊤ : Submodule R M)
+          → ∃ a : Fin r → R, x = ∑ j, a j • s j ∧ ∀ j, a j ∈ m ^ k := by
     intro x k hx
     rw [← hs, Submodule.mem_ideal_smul_span_iff_exists_sum] at hx
     obtain ⟨a, ha, hsum⟩ := hx
     refine ⟨a, ?_, ha⟩
     rw [← hsum, Finsupp.sum_fintype]
-    intro j; simp
+    intro j
+    simp
   haveI : Module.Finite R M := ⟨by rw [← hs]; exact Submodule.fg_span (Set.finite_range s)⟩
   have krull : (⨅ i : ℕ, m ^ i • ⊤ : Submodule R M) = ⊥ :=
     Ideal.iInf_pow_smul_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal R).ne_top
-  have anti : ∀ {a b : ℕ}, a ≤ b → (m ^ b • ⊤ : Submodule R M) ≤ m ^ a • ⊤ :=
-    fun h => Submodule.smul_mono_left (Ideal.pow_le_pow_right h)
-  have choiceχ : ∀ χ, ∃ a : Fin r → R, z χ = ∑ j, a j • s j ∧
-      ∀ n, (¬ ∀ j, a j ∈ m ^ n) → z χ ∉ (m ^ n • ⊤ : Submodule R M) := by
+  have anti : ∀ {a b : ℕ}, a ≤ b → (m ^ b • ⊤ : Submodule R M) ≤ m ^ a • ⊤ := fun h =>
+    Submodule.smul_mono_left (Ideal.pow_le_pow_right h)
+  have choiceχ
+      : ∀ χ, ∃ a : Fin r → R,
+        z χ = ∑ j, a j • s j ∧ ∀ n, (¬ ∀ j, a j ∈ m ^ n) → z χ ∉ (m ^ n • ⊤ : Submodule R M) := by
     intro χ
     by_cases h : ∃ n, z χ ∉ (m ^ n • ⊤ : Submodule R M)
     · set N := Nat.find h with hN

@@ -36,25 +36,32 @@ private lemma iter_zero (k : Nat) (g : Complex → Complex) (A : Real) (hg : Dif
     ge_of_tendsto ht (Filter.eventually_atTop.2 ⟨1, key⟩)
   exact norm_le_zero_iff.mp this
 
-theorem goal1 :
-  ∀ (k : Nat) (g : Complex → Complex) (A : Real),
-  Differentiable.{0, 0, 0} Complex g →
-    (∀ (t : Complex),
-        LE.le.{0} (Norm.norm.{0} (g t))
-          (HMul.hMul.{0, 0, 0} A (HPow.hPow.{0, 0, 0} (HAdd.hAdd.{0, 0, 0} 1 (Norm.norm.{0} t)) k))) →
-      Exists.{1} fun (P : Polynomial.{0} Complex) ↦
-        And (LE.le.{0} (Polynomial.natDegree.{0} P) k) (∀ (t : Complex), Eq.{1} (g t) (Polynomial.eval.{0} t P)) := by
+theorem goal1
+    : ∀ (k : Nat) (g : Complex → Complex) (A : Real),
+      Differentiable.{0, 0, 0} Complex g
+        → (∀ (t : Complex),
+          LE.le.{0} (Norm.norm.{0} (g t))
+            (HMul.hMul.{0, 0, 0} A
+              (HPow.hPow.{0, 0, 0} (HAdd.hAdd.{0, 0, 0} 1 (Norm.norm.{0} t)) k)))
+        → Exists.{1} fun (P : Polynomial.{0} Complex) ↦
+          And (LE.le.{0} (Polynomial.natDegree.{0} P) k)
+            (∀ (t : Complex), Eq.{1} (g t) (Polynomial.eval.{0} t P)) := by
   intro k g A hg hb
-  refine ⟨∑ n ∈ Finset.range (k + 1),
-    Polynomial.C ((n.factorial : Complex)⁻¹ * iteratedDeriv n g 0) * Polynomial.X ^ n, ?_, ?_⟩
+  refine ⟨
+    ∑ n ∈ Finset.range (k + 1),
+      Polynomial.C ((n.factorial : Complex)⁻¹ * iteratedDeriv n g 0) * Polynomial.X ^ n,
+    ?_,
+    ?_
+  ⟩
   · apply Polynomial.natDegree_sum_le_of_forall_le
     intro n hn
     exact le_trans (Polynomial.natDegree_C_mul_X_pow_le _ n)
       (Nat.lt_succ_iff.mp (Finset.mem_range.mp hn))
   · intro t
     have hs := Complex.hasSum_taylorSeries_of_entire hg 0 t
-    have hz : ∀ n ∉ Finset.range (k + 1),
-        (n.factorial : Complex)⁻¹ • (t - 0) ^ n • iteratedDeriv n g 0 = 0 := by
+    have hz
+        : ∀ n ∉ Finset.range (k + 1),
+          (n.factorial : Complex)⁻¹ • (t - 0) ^ n • iteratedDeriv n g 0 = 0 := by
       intro n hn
       rw [iter_zero k g A hg hb n (by simpa using hn), smul_zero, smul_zero]
     rw [hs.unique (hasSum_sum_of_ne_finset_zero hz), Polynomial.eval_finsetSum]

@@ -16,9 +16,10 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp
 
 open NumberField GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights Polynomial
 
-theorem exists_integral_generator (E : Type) [Field E] [NumberField E] :
-    ∃ (θ : 𝓞 E) (m : ℤ[X]), m.Monic ∧ aeval θ m = 0 ∧ m.natDegree = Module.finrank ℚ E ∧
-      ∀ a : 𝓞 E, ∃ (n : ℤ) (P : ℤ[X]), n ≠ 0 ∧ (n : 𝓞 E) * a = aeval θ P := by
+theorem exists_integral_generator (E : Type) [Field E] [NumberField E]
+    : ∃ (θ : 𝓞 E) (m : ℤ[X]),
+      m.Monic ∧ aeval θ m = 0 ∧ m.natDegree = Module.finrank ℚ E
+        ∧ ∀ a : 𝓞 E, ∃ (n : ℤ) (P : ℤ[X]), n ≠ 0 ∧ (n : 𝓞 E) * a = aeval θ P := by
   obtain ⟨α, hα⟩ := Field.exists_primitive_element ℚ E
   have halg : IsAlgebraic ℤ α :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic α)
@@ -50,22 +51,29 @@ theorem exists_integral_generator (E : Type) [Field E] [NumberField E] :
     rw [Algebra.adjoin_singleton_eq_range_aeval] at ha
     obtain ⟨Q, hQ⟩ := ha
     obtain ⟨b, hbmem, hb⟩ := IsLocalization.integerNormalization_spec (nonZeroDivisors ℤ) Q
-    refine ⟨b, IsLocalization.integerNormalization (nonZeroDivisors ℤ) Q,
-      nonZeroDivisors.coe_ne_zero ⟨b, hbmem⟩, ?_⟩
+    refine ⟨
+      b,
+      IsLocalization.integerNormalization (nonZeroDivisors ℤ) Q,
+      nonZeroDivisors.coe_ne_zero ⟨b, hbmem⟩,
+      ?_
+    ⟩
     apply hinj
     have hQ' : aeval β Q = (a : E) := hQ
-    rw [hcoe, ← aeval_map_algebraMap ℚ, hb, map_mul, map_intCast, zsmul_eq_mul, map_mul, map_intCast, hQ']
+    rw [hcoe, ← aeval_map_algebraMap ℚ, hb, map_mul, map_intCast, zsmul_eq_mul, map_mul,
+      map_intCast, hQ']
 
-theorem ker_aeval_prod_le {L V : Type} [Field L] [AddCommGroup V] [Module L V] (T : Module.End L V) (S : Finset L) :
-    LinearMap.ker (aeval T (∏ c ∈ S, (X - C c))) ≤ ⨆ c ∈ S, Module.End.eigenspace T c := by
+theorem ker_aeval_prod_le
+    {L V : Type} [Field L] [AddCommGroup V] [Module L V] (T : Module.End L V) (S : Finset L)
+    : LinearMap.ker (aeval T (∏ c ∈ S, (X - C c))) ≤ ⨆ c ∈ S, Module.End.eigenspace T c := by
   classical
   induction S using Finset.induction_on with
   | empty => simp [Module.End.one_eq_id]
   | insert c S hc ih =>
     rw [Finset.prod_insert hc]
     have hcop : IsCoprime (X - C c) (∏ d ∈ S, (X - C d)) :=
-      IsCoprime.prod_right fun d hd => isCoprime_X_sub_C_of_isUnit_sub
-        (sub_ne_zero.2 (fun h : c = d => hc (by rw [h]; exact hd))).isUnit
+      IsCoprime.prod_right fun d hd =>
+        isCoprime_X_sub_C_of_isUnit_sub (sub_ne_zero.2 (fun h : c = d =>
+          hc (by rw [h]; exact hd))).isUnit
     rw [← sup_ker_aeval_eq_ker_aeval_mul_of_coprime T hcop, Finset.iSup_insert]
     refine sup_le_sup ?_ ih
     intro x hx
@@ -73,9 +81,13 @@ theorem ker_aeval_prod_le {L V : Type} [Field L] [AddCommGroup V] [Module L V] (
     rw [Module.End.mem_eigenspace_iff]
     simpa [sub_eq_zero] using hx
 
-theorem iSup_eigSp_eq_top {E L V ι : Type} [Field E] [NumberField E] [Field L] [CharZero L] [AddCommGroup V] [Module L V]
-    [Fintype ι] (ρ : 𝓞 E →+* Module.End L V) (σ : ι → (𝓞 E →+* L)) (hσ : Function.Injective σ)
-    (hcard : Fintype.card ι = Module.finrank ℚ E) : ⨆ s, eigSp ρ (σ s) = ⊤ := by
+theorem iSup_eigSp_eq_top
+    {E L V ι : Type}
+    [Field E] [NumberField E] [Field L] [CharZero L] [AddCommGroup V] [Module L V] [Fintype ι]
+    (ρ : 𝓞 E →+* Module.End L V)
+    (σ : ι → (𝓞 E →+* L)) (hσ : Function.Injective σ)
+    (hcard : Fintype.card ι = Module.finrank ℚ E)
+    : ⨆ s, eigSp ρ (σ s) = ⊤ := by
   classical
   obtain ⟨θ, m, hmon, hm0, hdeg, hgen⟩ := exists_integral_generator E
   have hagree : ∀ (τ : 𝓞 E →+* L) (P : ℤ[X]), τ (aeval θ P) = aeval (τ θ) P := fun τ P =>
@@ -133,8 +145,8 @@ theorem iSup_eigSp_eq_top {E L V ι : Type} [Field E] [NumberField E] [Field L] 
     | monomial k a =>
       simp only [aeval_monomial, Module.End.mul_apply, hpow, eq_intCast, map_intCast]
       rw [Module.End.intCast_apply, mul_smul, Int.cast_smul_eq_zsmul]
-  simp only [eigSp, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply,
-    sub_eq_zero]
+  simp only [eigSp, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
+    LinearMap.smul_apply, LinearMap.id_apply, sub_eq_zero]
   intro a
   obtain ⟨n, P, hn, hnP⟩ := hgen a
   have h2 := hP P
@@ -144,33 +156,40 @@ theorem iSup_eigSp_eq_top {E L V ι : Type} [Field E] [NumberField E] [Field L] 
 
 section Lattice
 
-variable {L V : Type} [Field L] [NumberField L] [AddCommGroup V] [Module L V] [Module (𝓞 L) V]
-  [IsScalarTower (𝓞 L) L V]
+variable
+  {L V : Type}
+  [Field L] [NumberField L] [AddCommGroup V] [Module L V] [Module (𝓞 L) V] [IsScalarTower (𝓞 L) L V]
 
-theorem exists_smul_mem_of_span {Λ : Submodule (𝓞 L) V} (h : Submodule.span L (Λ : Set V) = ⊤) (p : V) :
-    ∃ b : 𝓞 L, b ≠ 0 ∧ b • p ∈ Λ :=
-  by apply _root_.UpperTheory.Reformulated.B.ClearDenominatorsLattice.exists_integer_smul_mem_of_span_top <;> assumption
+theorem exists_smul_mem_of_span
+    {Λ : Submodule (𝓞 L) V} (h : Submodule.span L (Λ : Set V) = ⊤) (p : V)
+    : ∃ b : 𝓞 L, b ≠ 0 ∧ b • p ∈ Λ := by
+  apply
+      _root_.UpperTheory.Reformulated.B.ClearDenominatorsLattice.exists_integer_smul_mem_of_span_top
+    <;> assumption
 
 end Lattice
 
 namespace LinPt
 
-variable {E L Ψ : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Fintype Ψ] {V : Type} [AddCommGroup V]
-  [Module L V] [Module (𝓞 L) V] [IsScalarTower (𝓞 L) L V] (A : LinPt E L Ψ V)
+variable
+  {E L Ψ : Type} [Field E] [NumberField E] [Field L] [NumberField L] [Fintype Ψ]
+  {V : Type} [AddCommGroup V] [Module L V] [Module (𝓞 L) V] [IsScalarTower (𝓞 L) L V]
+  (A : LinPt E L Ψ V)
 
-theorem img_eq (s : Ψ ⊕ Ψ) :
-    A.img s = (((eigSp A.ρ (A.σ s)).restrictScalars (𝓞 L)).comap A.Λ.subtype).map A.f := by
+theorem img_eq (s : Ψ ⊕ Ψ)
+    : A.img s = (((eigSp A.ρ (A.σ s)).restrictScalars (𝓞 L)).comap A.Λ.subtype).map A.f := by
   unfold img eig
   rw [Submodule.comap_inf, Submodule.comap_subtype_self, top_inf_eq]
 
-theorem saturation_iSup_img (hcard : 2 * Fintype.card Ψ = Module.finrank ℚ E) :
-    CanonicalFiltration.saturation A.Bq (⨆ s, A.img s) = ⊤ := by
+theorem saturation_iSup_img (hcard : 2 * Fintype.card Ψ = Module.finrank ℚ E)
+    : CanonicalFiltration.saturation A.Bq (⨆ s, A.img s) = ⊤ := by
   have htop := iSup_eigSp_eq_top A.ρ A.σ A.σ_bij.1 (by rw [Fintype.card_sum, ← hcard]; ring)
   have key : ∀ x : V, ∃ b : 𝓞 L, b ≠ 0 ∧ ∃ h : b • x ∈ A.Λ, A.f ⟨b • x, h⟩ ∈ ⨆ s, A.img s := by
     intro x
     have hx : x ∈ ⨆ s, eigSp A.ρ (A.σ s) := htop ▸ Submodule.mem_top
     refine Submodule.iSup_induction _
-      (motive := fun x => ∃ b : 𝓞 L, b ≠ 0 ∧ ∃ h : b • x ∈ A.Λ, A.f ⟨b • x, h⟩ ∈ ⨆ s, A.img s) hx ?_ ?_ ?_
+      (motive := fun x => ∃ b : 𝓞 L, b ≠ 0 ∧ ∃ h : b • x ∈ A.Λ, A.f ⟨b • x, h⟩ ∈ ⨆ s, A.img s)
+      hx ?_ ?_ ?_
     · intro s x hx
       obtain ⟨b, hb, hbx⟩ := exists_smul_mem_of_span A.span x
       refine ⟨b, hb, hbx, Submodule.mem_iSup_of_mem s ?_⟩
@@ -190,7 +209,8 @@ theorem saturation_iSup_img (hcard : 2 * Fintype.card Ψ = Module.finrank ℚ E)
       have h1 : (b * c) • (x + y) ∈ A.Λ := by
         rw [e0]
         exact A.Λ.add_mem (A.Λ.smul_mem _ hbx) (A.Λ.smul_mem _ hcy)
-      have e : (⟨(b * c) • (x + y), h1⟩ : A.Λ) = c • ⟨b • x, hbx⟩ + b • ⟨c • y, hcy⟩ := Subtype.ext e0
+      have e : (⟨(b * c) • (x + y), h1⟩ : A.Λ) = c • ⟨b • x, hbx⟩ + b • ⟨c • y, hcy⟩ :=
+        Subtype.ext e0
       refine ⟨b * c, mul_ne_zero hb hc, h1, ?_⟩
       rw [e, map_add (f := _), map_smul, map_smul]
       exact Submodule.add_mem _ (Submodule.smul_mem _ _ hfx) (Submodule.smul_mem _ _ hfy)

@@ -8,9 +8,11 @@ open Polynomial
 
 namespace GlobalTheory.CharpolyPowIrred
 
-theorem charpoly_dvd_pow_of_aeval {K : Type} [Field K] {ι : Type} [Fintype ι] [DecidableEq ι]
-    (M : Matrix ι ι K) (G : K[X]) (hG : aeval M G = 0) :
-    M.charpoly ∣ G ^ Fintype.card ι := by
+theorem charpoly_dvd_pow_of_aeval
+    {K : Type} [Field K]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (M : Matrix ι ι K) (G : K[X]) (hG : aeval M G = 0)
+    : M.charpoly ∣ G ^ Fintype.card ι := by
   classical
   by_cases h0 : G = 0
   · subst h0
@@ -43,11 +45,12 @@ theorem charpoly_dvd_pow_of_aeval {K : Type} [Field K] {ι : Type} [Fintype ι] 
     rw [hN] at h2
     have h3 : (G.map f).eval μ = 0 := by
       by_contra hne
-      exact (spectrum.mem_iff.1 h2)
-        (by simpa using (IsUnit.mk0 _ hne).map (algebraMap Ω (Matrix ι ι Ω)))
-    have h4 : 1 ≤ (G.map f).roots.count μ :=
-      Multiset.one_le_count_iff_mem.2 ((mem_roots hG0).2 h3)
-    calc N.charpoly.roots.count μ ≤ Multiset.card N.charpoly.roots := Multiset.count_le_card _ _
+      exact (spectrum.mem_iff.1 h2) (by
+        simpa using (IsUnit.mk0 _ hne).map (algebraMap Ω (Matrix ι ι Ω)))
+    have h4 : 1 ≤ (G.map f).roots.count μ := Multiset.one_le_count_iff_mem.2 ((mem_roots hG0).2 h3)
+    calc
+      N.charpoly.roots.count μ
+        ≤ Multiset.card N.charpoly.roots := Multiset.count_le_card _ _
       _ ≤ N.charpoly.natDegree := card_roots' _
       _ = Fintype.card ι := Matrix.charpoly_natDegree_eq_dim N
       _ ≤ Fintype.card ι * (G.map f).roots.count μ := Nat.le_mul_of_pos_right _ h4

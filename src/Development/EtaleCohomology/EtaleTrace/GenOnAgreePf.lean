@@ -139,9 +139,11 @@ theorem GenOnAgree_of : GenOnAgree := by
     ((genericPoint_spec X).mem_open_set_iff U.isOpen).2 ⟨_, trivial, (pullback.fst U.ι U'.ι z).2⟩
   have hη' : genericPoint X ∈ U' :=
     ((genericPoint_spec X).mem_open_set_iff U'.isOpen).2 ⟨_, trivial, (pullback.snd U.ι U'.ι z).2⟩
-  let ι := pullback.lift (U.fromSpecStalkOfMem _ hη) (U'.fromSpecStalkOfMem _ hη')
-    (by rw [Scheme.Opens.fromSpecStalkOfMem_ι, Scheme.Opens.fromSpecStalkOfMem_ι])
-  have : IsReduced (pullback U.ι U'.ι : Scheme.{0}) := isReduced_of_isOpenImmersion (pullback.fst U.ι U'.ι ≫ U.ι)
+  let ι :=
+    pullback.lift (U.fromSpecStalkOfMem _ hη) (U'.fromSpecStalkOfMem _ hη')
+      (by rw [Scheme.Opens.fromSpecStalkOfMem_ι, Scheme.Opens.fromSpecStalkOfMem_ι])
+  have : IsReduced (pullback U.ι U'.ι : Scheme.{0}) :=
+    isReduced_of_isOpenImmersion (pullback.fst U.ι U'.ι ≫ U.ι)
   have : IsDominant ι := by
     constructor
     let e := pullback.fst U.ι U'.ι ≫ U.ι

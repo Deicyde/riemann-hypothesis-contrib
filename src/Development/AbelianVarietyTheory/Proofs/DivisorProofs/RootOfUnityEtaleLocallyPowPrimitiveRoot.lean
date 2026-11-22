@@ -11,8 +11,14 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace GlobalTheory.EtC.RootLoc
 
-theorem root_loc_pow_prim : ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}), IsUnit (q : Γ(U, ⊤)) → ∀ ω : (Γ(U, ⊤))ˣ, ω ^ q = 1 →
-    Loc U fun V g => ∃ (ζ : Prim q Γ(V, ⊤)) (a : ℕ), (Units.map g.appTop.hom.toMonoidHom ω : Γ(V, ⊤)) = ζ.1 ^ a := by
+theorem root_loc_pow_prim
+    : ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}),
+      IsUnit (q : Γ(U, ⊤))
+        → ∀ ω : (Γ(U, ⊤))ˣ,
+          ω ^ q = 1
+            → Loc U fun V g =>
+              ∃ (ζ : Prim q Γ(V, ⊤)) (a : ℕ),
+                (Units.map g.appTop.hom.toMonoidHom ω : Γ(V, ⊤)) = ζ.1 ^ a := by
   intro q _ U hq ω hω
   apply GlobalTheory.EtC.loc_trans
   refine GlobalTheory.EtC.loc_mono _ _ _ ((PrimLoc.prim_loc q U).1 hq) ?_

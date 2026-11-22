@@ -9,14 +9,16 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.CntFormula
 
-open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
+open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
 open Classical
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem fix_X_of {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
-    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (he : ∀ a, n (F0.e a) = F0.e a) :
-    ∀ x ∈ F0.X, n x = x := by
+theorem fix_X_of
+    {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
+    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (he : ∀ a, n (F0.e a) = F0.e a)
+    : ∀ x ∈ F0.X, n x = x := by
   have hle : F0.X ≤ LinearMap.eqLocus (n : (VS D).V →ₗ[D.host.E] (VS D).V) LinearMap.id := by
     show Submodule.span _ (Set.range F0.e) ≤ _
     rw [Submodule.span_le]
@@ -25,18 +27,21 @@ theorem fix_X_of {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS 
   intro x hx
   simpa [LinearMap.mem_eqLocus] using hle hx
 
-theorem Xa_le_X {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (k : ℕ) : F0.Xa k ≤ F0.X := by
+theorem Xa_le_X {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (k : ℕ)
+    : F0.Xa k ≤ F0.X := by
   show Submodule.span _ _ ≤ Submodule.span _ _
   exact Submodule.span_mono (Set.image_subset_range _ _)
 
-theorem mem_orth_iff {D : Formalism.BasicNotions.D7} (U : Submodule D.host.E (VS D).V) (y : (VS D).V) :
-    y ∈ orth (VS D) U ↔ ∀ x ∈ U, (VS D).hT x y = 0 := by
+theorem mem_orth_iff
+    {D : Formalism.BasicNotions.D7} (U : Submodule D.host.E (VS D).V) (y : (VS D).V)
+    : y ∈ orth (VS D) U ↔ ∀ x ∈ U, (VS D).hT x y = 0 := by
   simp [orth, Submodule.mem_iInf, LinearMap.mem_ker]
 
-theorem orth_map_of {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
+theorem orth_map_of
+    {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
     (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hi : ∀ x y, (VS D).hT (n x) (n y) = (VS D).hT x y)
-    (he : ∀ a, n (F0.e a) = F0.e a) (y : (VS D).V) :
-    y ∈ orth (VS D) F0.X ↔ n y ∈ orth (VS D) F0.X := by
+    (he : ∀ a, n (F0.e a) = F0.e a) (y : (VS D).V)
+    : y ∈ orth (VS D) F0.X ↔ n y ∈ orth (VS D) F0.X := by
   rw [mem_orth_iff, mem_orth_iff]
   constructor
   · intro H x hx
@@ -46,21 +51,27 @@ theorem orth_map_of {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (
     rw [← hi, fix_X_of F0 n he x hx]
     exact H x hx
 
-theorem gmap_mem {D : Formalism.BasicNotions.D7} (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (h : Formalism.HermitianLatticesTheory.gmap n Λ = Λ) {y : (VS D).V} (hy : y ∈ Λ) :
-    n y ∈ Λ := by
+theorem gmap_mem
+    {D : Formalism.BasicNotions.D7} (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (h : Formalism.HermitianLatticesTheory.gmap n Λ = Λ)
+    {y : (VS D).V} (hy : y ∈ Λ)
+    : n y ∈ Λ := by
   rw [← h]
   exact ⟨y, hy, rfl⟩
 
-theorem gmap_surj {D : Formalism.BasicNotions.D7} (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (h : Formalism.HermitianLatticesTheory.gmap n Λ = Λ) {x : (VS D).V} (hx : x ∈ Λ) :
-    ∃ y ∈ Λ, n y = x := by
+theorem gmap_surj
+    {D : Formalism.BasicNotions.D7} (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (h : Formalism.HermitianLatticesTheory.gmap n Λ = Λ)
+    {x : (VS D).V} (hx : x ∈ Λ)
+    : ∃ y ∈ Λ, n y = x := by
   rw [← h] at hx
   obtain ⟨y, hy, rfl⟩ := hx
   exact ⟨y, hy, rfl⟩
 
-theorem refl_mem_unipotentIntegral {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V) : LinearEquiv.refl D.host.E (VS D).V ∈ N0 F0 Λ := by
+theorem refl_mem_unipotentIntegral
+    {D : Formalism.BasicNotions.D7} {T : D.host.E}
+    (F0 : FlagG (VS D) D.R.rS T) (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    : LinearEquiv.refl D.host.E (VS D).V ∈ N0 F0 Λ := by
   refine ⟨⟨⟨fun x y => rfl, ?_⟩, fun j x _ => ?_, fun x _ => ?_⟩, fun a => rfl, rfl⟩
   · ext x
     constructor
@@ -71,13 +82,13 @@ theorem refl_mem_unipotentIntegral {D : Formalism.BasicNotions.D7} {T : D.host.E
   · simp
   · simp
 
-theorem symm_mem_unipotentIntegral {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V) (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn : n ∈ N0 F0 Λ) :
-    n.symm ∈ N0 F0 Λ := by
+theorem symm_mem_unipotentIntegral
+    {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
+    (Λ : Submodule (𝓞 D.host.E) (VS D).V) (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn : n ∈ N0 F0 Λ)
+    : n.symm ∈ N0 F0 Λ := by
   obtain ⟨⟨⟨hi, hΛ⟩, -, horth⟩, he, hz⟩ := hn
   have hi' : ∀ x y, (VS D).hT (n x) (n y) = (VS D).hT x y := hi
-  have hfix : ∀ x ∈ F0.X, n.symm x = x := fun x hx =>
-    n.symm_apply_eq.2 (fix_X_of F0 n he x hx).symm
+  have hfix : ∀ x ∈ F0.X, n.symm x = x := fun x hx => n.symm_apply_eq.2 (fix_X_of F0 n he x hx).symm
   refine ⟨⟨⟨fun x y => ?_, ?_⟩, fun j x hx => ?_, fun x hx => ?_⟩, fun a => ?_, ?_⟩
   · rw [← hi' (n.symm x) (n.symm y), LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply]
   · ext x
@@ -102,9 +113,11 @@ theorem symm_mem_unipotentIntegral {D : Formalism.BasicNotions.D7} {T : D.host.E
   · exact n.symm_apply_eq.2 (he a).symm
   · exact n.symm_apply_eq.2 hz.symm
 
-theorem trans_mem_unipotentIntegral {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V) (n m : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn : n ∈ N0 F0 Λ)
-    (hm : m ∈ N0 F0 Λ) : n.trans m ∈ N0 F0 Λ := by
+theorem trans_mem_unipotentIntegral
+    {D : Formalism.BasicNotions.D7} {T : D.host.E}
+    (F0 : FlagG (VS D) D.R.rS T) (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    (n m : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn : n ∈ N0 F0 Λ) (hm : m ∈ N0 F0 Λ)
+    : n.trans m ∈ N0 F0 Λ := by
   obtain ⟨⟨⟨hin, hΛn⟩, -, horthn⟩, hen, hzn⟩ := hn
   obtain ⟨⟨⟨him, hΛm⟩, -, horthm⟩, hem, hzm⟩ := hm
   have hin' : ∀ x y, (VS D).hT (n x) (n y) = (VS D).hT x y := hin
@@ -138,7 +151,10 @@ theorem trans_mem_unipotentIntegral {D : Formalism.BasicNotions.D7} {T : D.host.
 
 theorem unipotent_integral_isGroup : UnipotentIntegralIsGroup := by
   intro D T F0 Λ
-  exact ⟨refl_mem_unipotentIntegral F0 Λ, fun n hn => symm_mem_unipotentIntegral F0 Λ n hn,
-    fun n hn m hm => trans_mem_unipotentIntegral F0 Λ n m hn hm⟩
+  exact ⟨
+    refl_mem_unipotentIntegral F0 Λ,
+    fun n hn => symm_mem_unipotentIntegral F0 Λ n hn,
+    fun n hn m hm => trans_mem_unipotentIntegral F0 Λ n m hn hm
+  ⟩
 
 end PI.UnitaryGroupMassFormula.CntFormula

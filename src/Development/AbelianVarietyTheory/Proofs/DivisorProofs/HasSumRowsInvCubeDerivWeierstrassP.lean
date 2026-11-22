@@ -10,15 +10,18 @@ open GlobalTheory.QFam GlobalTheory.WpFam
 
 namespace GlobalTheory.WpFam
 
-theorem hasSum_prod_derivWeierstrassP (τ : ℍ) (z : ℂ) :
-    HasSum (fun p : ℤ × ℤ => 1 / (z + p.1 * (τ : ℂ) + p.2) ^ 3)
+theorem hasSum_prod_derivWeierstrassP (τ : ℍ) (z : ℂ)
+    : HasSum
+      (fun p : ℤ × ℤ => 1 / (z + p.1 * (τ : ℂ) + p.2) ^ 3)
       (-(1 / 2) * (tauPair τ).derivWeierstrassP z) := by
   have h := ((tauPair τ).hasSum_derivWeierstrassP z).mul_left (-(1 / 2))
   let e : ℤ × ℤ ≃ (tauPair τ).lattice :=
     (Equiv.neg (ℤ × ℤ)).trans (tauPair τ).latticeEquivProd.symm.toEquiv
   rw [← e.hasSum_iff] at h
-  have key : (fun p : ℤ × ℤ => 1 / (z + p.1 * (τ : ℂ) + p.2) ^ 3) =
-      (fun i : (tauPair τ).lattice => -(1 / 2) * (-2 / (z - (i : ℂ)) ^ 3)) ∘ e := ?_
+  have key
+      : (fun p : ℤ × ℤ => 1 / (z + p.1 * (τ : ℂ) + p.2) ^ 3)
+        = (fun i : (tauPair τ).lattice => -(1 / 2) * (-2 / (z - (i : ℂ)) ^ 3)) ∘ e :=
+    ?_
   · rw [key]; exact h
   funext p
   have he : ((e p : (tauPair τ).lattice) : ℂ) = -(p.1 * (τ : ℂ) + p.2) := by
@@ -30,7 +33,11 @@ theorem hasSum_prod_derivWeierstrassP (τ : ℍ) (z : ℂ) :
   rw [show z - -(p.1 * (τ : ℂ) + p.2) = z + p.1 * (τ : ℂ) + p.2 by ring]
   ring
 
-theorem hasSum_rows_derivWeierstrassP : ∀ (τ : ℍ) (z : ℂ), HasSum (fun n : ℤ => ∑' m : ℤ, 1 / (z + n * (τ : ℂ) + m) ^ 3) (-(1 / 2) * (tauPair τ).derivWeierstrassP z) := by
+theorem hasSum_rows_derivWeierstrassP
+    : ∀ (τ : ℍ) (z : ℂ),
+      HasSum
+        (fun n : ℤ => ∑' m : ℤ, 1 / (z + n * (τ : ℂ) + m) ^ 3)
+        (-(1 / 2) * (tauPair τ).derivWeierstrassP z) := by
   intro τ z
   have h := hasSum_prod_derivWeierstrassP τ z
   exact h.prod_fiberwise fun n => (h.summable.prod_factor n).hasSum

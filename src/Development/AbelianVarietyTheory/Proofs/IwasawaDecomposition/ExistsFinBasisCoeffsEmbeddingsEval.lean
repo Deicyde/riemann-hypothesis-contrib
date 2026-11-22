@@ -8,9 +8,9 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem embeddings_eval_onto (L : Type) [Field L] [NumberField L] (K : Type) [Field K] [CharZero K]
-    (z : (L →+* K) → K) :
-    ∃ y : Fin (Module.finrank ℚ L) → K, ∀ σ : L →+* K,
+theorem embeddings_eval_onto
+    (L : Type) [Field L] [NumberField L] (K : Type) [Field K] [CharZero K] (z : (L →+* K) → K)
+    : ∃ y : Fin (Module.finrank ℚ L) → K, ∀ σ : L →+* K,
       ∑ i, σ (Module.finBasis ℚ L i) * y i = z σ := by
   classical
   set b := Module.finBasis ℚ L
@@ -42,8 +42,9 @@ theorem embeddings_eval_onto (L : Type) [Field L] [NumberField L] (K : Type) [Fi
     simp_rw [this, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_eq_zero fun i _ => ?_
-    have h2 : ∑ σ : L →+* K, g σ * ((b.repr x i : K) * σ (b i)) =
-        (b.repr x i : K) * ∑ σ : L →+* K, g σ * σ (b i) := by
+    have h2
+        : ∑ σ : L →+* K, g σ * ((b.repr x i : K) * σ (b i))
+          = (b.repr x i : K) * ∑ σ : L →+* K, g σ * σ (b i) := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl fun σ _ => by ring
     rw [h2, hb i, mul_zero]

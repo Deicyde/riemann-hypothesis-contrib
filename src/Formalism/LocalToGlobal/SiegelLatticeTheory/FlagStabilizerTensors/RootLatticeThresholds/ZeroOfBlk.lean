@@ -15,24 +15,29 @@ variable {m : ℕ}
 def IsUB (blk : Fin m → ℕ) (C : Matrix (Fin m) (Fin m) ℂ) : Prop :=
   (∀ i, C i i = 1) ∧ ∀ i j, C i j ≠ 0 → i ≤ j ∧ blk i = blk j
 
-theorem IsUB.zero_of_lt {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsUB blk C) {i j : Fin m} (hij : j < i) :
-    C i j = 0 := by
+theorem IsUB.zero_of_lt
+    {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsUB blk C) {i j : Fin m} (hij : j < i)
+    : C i j = 0 := by
   by_contra hne
   exact absurd hij (not_lt.mpr (h.2 i j hne).1)
 
-theorem IsUB.zero_of_blk {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsUB blk C) {i j : Fin m}
-    (hij : blk i ≠ blk j) : C i j = 0 := by
+theorem IsUB.zero_of_blk
+    {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsUB blk C)
+    {i j : Fin m} (hij : blk i ≠ blk j)
+    : C i j = 0 := by
   by_contra hne
   exact hij (h.2 i j hne).2
 
-theorem IsUB.det_eq_one {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsUB blk C) : C.det = 1 := by
+theorem IsUB.det_eq_one {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsUB blk C)
+    : C.det = 1 := by
   have hup : C.BlockTriangular id := by
     intro i j hij
     exact h.zero_of_lt hij
   rw [Matrix.det_of_upperTriangular hup]
   exact Finset.prod_eq_one fun i _ => h.1 i
 
-theorem IsUB.inv {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsUB blk C) : IsUB blk C⁻¹ := by
+theorem IsUB.inv {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsUB blk C)
+    : IsUB blk C⁻¹ := by
   have hup : C.BlockTriangular id := by
     intro i j hij
     exact h.zero_of_lt hij
@@ -50,8 +55,7 @@ theorem IsUB.inv {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsU
   have ib1 := Matrix.blockTriangular_inv_of_blockTriangular hb1
   have ib2 := Matrix.blockTriangular_inv_of_blockTriangular hb2
   refine ⟨fun i => ?_, fun i j hij => ⟨?_, ?_⟩⟩
-  · have h1 : (C * C⁻¹) i i = 1 := by
-      rw [Matrix.mul_nonsing_inv _ hdet, one_apply_eq]
+  · have h1 : (C * C⁻¹) i i = 1 := by rw [Matrix.mul_nonsing_inv _ hdet, one_apply_eq]
     rw [Matrix.mul_apply, Finset.sum_eq_single i] at h1
     · rwa [h.1, one_mul] at h1
     · intro k _ hk
@@ -69,8 +73,9 @@ theorem IsUB.inv {blk : Fin m → ℕ} {C : Matrix (Fin m) (Fin m) ℂ} (h : IsU
 
 section Mono
 
-variable (π : Fin m → Fin m) (hπ : ∀ a, π (π a) = a) (Z : Matrix (Fin m) (Fin m) ℂ)
-  (hZ : ∀ c b, Z c b ≠ 0 ↔ c = π b)
+variable
+  (π : Fin m → Fin m) (hπ : ∀ a, π (π a) = a)
+  (Z : Matrix (Fin m) (Fin m) ℂ) (hZ : ∀ c b, Z c b ≠ 0 ↔ c = π b)
 include hπ hZ
 
 theorem Z_ne' (i : Fin m) : Z i (π i) ≠ 0 := (hZ i (π i)).mpr (hπ i).symm
@@ -97,11 +102,11 @@ theorem Z_inv_eq : Z⁻¹ = Zi π Z := Matrix.inv_eq_right_inv (Z_mul_Zi π hπ 
 
 theorem isUnit_Z : IsUnit Z.det := Matrix.isUnit_det_of_right_inverse (Z_mul_Zi π hπ Z hZ)
 
-theorem conj_apply (X : Matrix (Fin m) (Fin m) ℂ) (j i : Fin m) :
-    (Z * X * Z⁻¹) j i = Z j (π j) * X (π j) (π i) * (Z i (π i))⁻¹ := by
+theorem conj_apply (X : Matrix (Fin m) (Fin m) ℂ) (j i : Fin m)
+    : (Z * X * Z⁻¹) j i = Z j (π j) * X (π j) (π i) * (Z i (π i))⁻¹ := by
   rw [Z_inv_eq π hπ Z hZ]
-  simp only [Matrix.mul_apply, Zi, of_apply, mul_ite, mul_zero, Finset.sum_ite_eq',
-    Finset.mem_univ, if_true]
+  simp only [Matrix.mul_apply, Zi, of_apply, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
+    if_true]
   congr 1
   rw [Finset.sum_eq_single (π j)]
   · intro l _ hl
@@ -117,18 +122,18 @@ end Mono
 
 section Pair
 
-variable {blk : Fin m → ℕ} (π : Fin m → Fin m) (hπ : ∀ a, π (π a) = a) (hblk : ∀ a, blk (π a) = blk a)
-  (hanti : ∀ a b, blk a = blk b → a < b → π b < π a) (Z : Matrix (Fin m) (Fin m) ℂ)
-  (hZ : ∀ c b, Z c b ≠ 0 ↔ c = π b)
+variable
+  {blk : Fin m → ℕ} (π : Fin m → Fin m) (hπ : ∀ a, π (π a) = a) (hblk : ∀ a, blk (π a) = blk a)
+  (hanti : ∀ a b, blk a = blk b → a < b → π b < π a)
+  (Z : Matrix (Fin m) (Fin m) ℂ) (hZ : ∀ c b, Z c b ≠ 0 ↔ c = π b)
 include hπ hblk hanti hZ
 
 theorem isUB_A {C : Matrix (Fin m) (Fin m) ℂ} (hC : IsUB blk C) : IsUB blk (Z * C⁻¹ * Z⁻¹)ᴴ := by
   have hD := hC.inv
-  have hM : ∀ j i, (Z * C⁻¹ * Z⁻¹) j i = Z j (π j) * C⁻¹ (π j) (π i) * (Z i (π i))⁻¹ :=
-    fun j i => conj_apply π hπ Z hZ _ j i
+  have hM : ∀ j i, (Z * C⁻¹ * Z⁻¹) j i = Z j (π j) * C⁻¹ (π j) (π i) * (Z i (π i))⁻¹ := fun j i =>
+    conj_apply π hπ Z hZ _ j i
   refine ⟨fun i => ?_, fun i j hij => ?_⟩
-  · rw [conjTranspose_apply, hM, hD.1, mul_one, mul_inv_cancel₀ (Z_ne' π hπ Z hZ i),
-      star_one]
+  · rw [conjTranspose_apply, hM, hD.1, mul_one, mul_inv_cancel₀ (Z_ne' π hπ Z hZ i), star_one]
   · rw [conjTranspose_apply, hM] at hij
     have h1 : C⁻¹ (π j) (π i) ≠ 0 := by
       intro h0
@@ -156,9 +161,11 @@ theorem A_Z_C {C : Matrix (Fin m) (Fin m) ℂ} (hC : IsUB blk C) : (Z * C⁻¹ *
 
 end Pair
 
-theorem gram_last {blk : Fin (m + 1) → ℕ} {A : Matrix (Fin (m + 1)) (Fin (m + 1)) ℂ} (hA : IsUB blk A)
-    (Γ : Matrix (Fin (m + 1)) (Fin (m + 1)) ℂ) (hΓ : ∀ i j, (i ≠ Fin.last m ∨ j ≠ Fin.last m) → Γ i j = 0) :
-    Aᴴ * Γ * A = Γ := by
+theorem gram_last
+    {blk : Fin (m + 1) → ℕ} {A : Matrix (Fin (m + 1)) (Fin (m + 1)) ℂ} (hA : IsUB blk A)
+    (Γ : Matrix (Fin (m + 1)) (Fin (m + 1)) ℂ)
+    (hΓ : ∀ i j, (i ≠ Fin.last m ∨ j ≠ Fin.last m) → Γ i j = 0)
+    : Aᴴ * Γ * A = Γ := by
   have hrow : ∀ j, A (Fin.last m) j = if j = Fin.last m then 1 else 0 := by
     intro j
     by_cases hj : j = Fin.last m

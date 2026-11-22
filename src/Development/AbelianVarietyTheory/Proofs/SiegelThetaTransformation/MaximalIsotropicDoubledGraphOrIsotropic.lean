@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 @[expose] public section
 
-open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open scoped ComplexConjugate ComplexOrder Real Classical
 
 namespace GlobalTheory.SW.DblLag
@@ -16,25 +17,27 @@ namespace GlobalTheory.SW.DblLag
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
 omit [NumberField E] [IsCMField E] in
-theorem mem_botSpan (g : M2 E r) (v : Fin r ⊕ Fin r → E) :
-    v ∈ botSpan g ↔ ∃ c : Fin r → E, Sum.elim 0 c ᵥ* g = v := by
+theorem mem_botSpan (g : M2 E r) (v : Fin r ⊕ Fin r → E)
+    : v ∈ botSpan g ↔ ∃ c : Fin r → E, Sum.elim 0 c ᵥ* g = v := by
   rw [botSpan, Submodule.mem_span_range_iff_exists_fun]
   refine exists_congr fun c => Eq.congr_left ?_
   ext j
   simp [vecMul, dotProduct, Finset.sum_apply]
 
-theorem pair_vecMul (A B : M2 E r) (u v : Fin r ⊕ Fin r → E) :
-    ((u ᵥ* A) ᵥ* B) ⬝ᵥ (fun j => cc ((v ᵥ* A) j)) = (u ᵥ* (A * B * ccT A)) ⬝ᵥ fun j => cc (v j) := by
+theorem pair_vecMul (A B : M2 E r) (u v : Fin r ⊕ Fin r → E)
+    : ((u ᵥ* A) ᵥ* B) ⬝ᵥ (fun j => cc ((v ᵥ* A) j))
+      = (u ᵥ* (A * B * ccT A)) ⬝ᵥ fun j => cc (v j) := by
   have e : (fun j => cc ((v ᵥ* A) j)) = ccT A *ᵥ fun j => cc (v j) := by
     ext j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [vecMul, mulVec, dotProduct, cc, ccT, map_sum, map_mul, transpose_apply, map_apply,
+    simp only [vecMul, mulVec, dotProduct, cc, ccT, map_sum, map_mul, transpose_apply, map_apply,
       mul_comm]
   rw [e, dotProduct_mulVec, vecMul_vecMul, vecMul_vecMul, Matrix.mul_assoc]
 
-theorem iso_of_mem {g : M2 E r} (hg : g ∈ UU E r) {u v : Fin r ⊕ Fin r → E}
-    (hu : u ∈ botSpan g) (hv : v ∈ botSpan g) :
-    (u ᵥ* Matrix.J (Fin r) E) ⬝ᵥ (fun j => cc (v j)) = 0 := by
+theorem iso_of_mem
+    {g : M2 E r} (hg : g ∈ UU E r)
+    {u v : Fin r ⊕ Fin r → E} (hu : u ∈ botSpan g) (hv : v ∈ botSpan g)
+    : (u ᵥ* Matrix.J (Fin r) E) ⬝ᵥ (fun j => cc (v j)) = 0 := by
   obtain ⟨c, rfl⟩ := (mem_botSpan _ _).1 hu
   obtain ⟨d, rfl⟩ := (mem_botSpan _ _).1 hv
   have h : ccT (ccT g) * Matrix.J (Fin r) E * ccT g = Matrix.J (Fin r) E :=
@@ -45,34 +48,38 @@ theorem iso_of_mem {g : M2 E r} (hg : g ∈ UU E r) {u v : Fin r ⊕ Fin r → E
 
 theorem finrank_botSpan {g : M2 E r} (hg : g ∈ UU E r) : Module.finrank E (botSpan g) = r := by
   have h : IsUnit g := (Matrix.isUnit_iff_isUnit_det g).2 (HAct.group_part hg).1
-  have hl := (Matrix.linearIndependent_rows_iff_isUnit.2 h).comp _
-    (Sum.inr_injective (α := Fin r) (β := Fin r))
+  have hl :=
+    (Matrix.linearIndependent_rows_iff_isUnit.2 h).comp _
+      (Sum.inr_injective (α := Fin r) (β := Fin r))
   have := finrank_span_eq_card hl
   rw [Fintype.card_fin] at this
   exact this
 
 variable (X : Data E r)
 
-theorem isUnit_dblT : IsUnit (dblT X) :=
-  IsUnit.of_mul_eq_one_right _ (DblPair.dblT_left X)
+theorem isUnit_dblT : IsUnit (dblT X) := IsUnit.of_mul_eq_one_right _ (DblPair.dblT_left X)
 
-theorem pair_dblT (x y x' y' : Fin r → E) :
-    ((Sum.elim x y ᵥ* dblT X) ᵥ* Matrix.J (Fin r) E) ⬝ᵥ (fun j => cc ((Sum.elim x' y' ᵥ* dblT X) j)) =
-      X.κ0 / 2 * (herm X.Gm x x' - herm X.Gm y y') := by
+theorem pair_dblT (x y x' y' : Fin r → E)
+    : ((Sum.elim x y ᵥ* dblT X) ᵥ* Matrix.J (Fin r) E)
+        ⬝ᵥ (fun j => cc ((Sum.elim x' y' ᵥ* dblT X) j))
+      = X.κ0 / 2 * (herm X.Gm x x' - herm X.Gm y y') := by
   rw [pair_vecMul, DblPair.dblT_form, vecMul_fromBlocks]
   have e : ∀ x y : Fin r → E, herm X.Gm x y = ∑ b, (x ᵥ* X.Gm) b * cc (y b) := fun x y => by
     rw [herm, Finset.sum_comm]
     simp only [vecMul, dotProduct, Finset.sum_mul]
   simp [dotProduct, e, vecMul_neg, vecMul_smul, mul_add, Finset.mul_sum, mul_assoc, sub_eq_add_neg]
 
-theorem mem_iota (γ : GL (Fin r) E) (x y : Fin r → E) :
-    Sum.elim x y ᵥ* dblT X ∈ botSpan (iota X 1 γ) ↔ y = (γ⁻¹).1 *ᵥ x := by
+theorem mem_iota (γ : GL (Fin r) E) (x y : Fin r → E)
+    : Sum.elim x y ᵥ* dblT X ∈ botSpan (iota X 1 γ) ↔ y = (γ⁻¹).1 *ᵥ x := by
   have hinj : Function.Injective fun v => v ᵥ* dblT X :=
     Matrix.vecMul_injective_iff_isUnit.2 (isUnit_dblT X)
   have hk : (2 * (X.κ0 / 4)) ≠ 0 := by simp [DblPair.kappa_ne X]
-  have key : ∀ c : Fin r → E, Sum.elim 0 c ᵥ* iota X 1 γ =
-      Sum.elim (c ᵥ* ((2 * (X.κ0 / 4))⁻¹ • X.Gm⁻¹))
-        ((γ⁻¹).1 *ᵥ (c ᵥ* ((2 * (X.κ0 / 4))⁻¹ • X.Gm⁻¹))) ᵥ* dblT X := fun c => by
+  have key
+      : ∀ c : Fin r → E,
+        Sum.elim 0 c ᵥ* iota X 1 γ
+          = Sum.elim (c ᵥ* ((2 * (X.κ0 / 4))⁻¹ • X.Gm⁻¹))
+              ((γ⁻¹).1 *ᵥ (c ᵥ* ((2 * (X.κ0 / 4))⁻¹ • X.Gm⁻¹)))
+            ᵥ* dblT X := fun c => by
     rw [iota, Matrix.inv_eq_left_inv (DblPair.dblT_left X), ← vecMul_vecMul, ← vecMul_vecMul,
       vecMul_fromBlocks, vecMul_fromBlocks]
     simp only [Sum.elim_comp_inl, Sum.elim_comp_inr, zero_vecMul, vecMul_zero, zero_add, add_zero,
@@ -93,18 +100,23 @@ theorem mem_iota (γ : GL (Fin r) E) (x y : Fin r → E) :
 
 noncomputable def coord : ((Fin r → E) × (Fin r → E)) ≃ₗ[E] (Fin r ⊕ Fin r → E) :=
   (LinearEquiv.sumArrowLequivProdArrow (Fin r) (Fin r) E E).symm.trans
-    (LinearEquiv.ofBijective (dblT X).vecMulLinear
-      ⟨Matrix.vecMul_injective_iff_isUnit.2 (isUnit_dblT X),
-        Matrix.vecMul_surjective_iff_isUnit.2 (isUnit_dblT X)⟩)
+    (LinearEquiv.ofBijective (dblT X).vecMulLinear ⟨
+      Matrix.vecMul_injective_iff_isUnit.2 (isUnit_dblT X),
+      Matrix.vecMul_surjective_iff_isUnit.2 (isUnit_dblT X)
+    ⟩)
 
-theorem coord_apply (p : (Fin r → E) × (Fin r → E)) :
-    coord X p = Sum.elim p.1 p.2 ᵥ* dblT X := rfl
+theorem coord_apply (p : (Fin r → E) × (Fin r → E)) : coord X p = Sum.elim p.1 p.2 ᵥ* dblT X := rfl
 
 end GlobalTheory.SW.DblLag
 
-
 open GlobalTheory.SW.DblLag in
-theorem GlobalTheory.SW.lag_graph_or_isotropic : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r), (∀ γ γ' : GL (Fin r) E, IsUn X γ → IsUn X γ' → botSpan (iota X 1 γ) = botSpan (iota X 1 γ') → γ = γ') ∧ ∀ U : Lag E r, (∃ γ : GL (Fin r) E, IsUn X γ ∧ botSpan (iota X 1 γ) = U.1) ∨ ∃ ξ : Fin r → E, ξ ≠ 0 ∧ herm X.Gm ξ ξ = 0 ∧ Sum.elim ξ 0 ᵥ* dblT X ∈ U.1 := by
+theorem GlobalTheory.SW.lag_graph_or_isotropic
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
+      (∀ γ γ' : GL (Fin r) E,
+          IsUn X γ → IsUn X γ' → botSpan (iota X 1 γ) = botSpan (iota X 1 γ') → γ = γ')
+        ∧ ∀ U : Lag E r,
+          (∃ γ : GL (Fin r) E, IsUn X γ ∧ botSpan (iota X 1 γ) = U.1)
+            ∨ ∃ ξ : Fin r → E, ξ ≠ 0 ∧ herm X.Gm ξ ξ = 0 ∧ Sum.elim ξ 0 ᵥ* dblT X ∈ U.1 := by
   intro E _ _ _ r X
   refine ⟨fun γ γ' _ _ h => ?_, ?_⟩
   · refine inv_injective (Units.ext (Matrix.toLin'.injective (LinearMap.ext fun x => ?_)))

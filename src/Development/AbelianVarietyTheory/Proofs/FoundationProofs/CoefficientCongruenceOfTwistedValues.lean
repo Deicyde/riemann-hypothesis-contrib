@@ -19,13 +19,21 @@ private theorem norm_le_one_of_int' (x : PadicAlgCl l) (hx : IsIntegral ℤ_[l] 
   | exact @_root_.GlobalTheory.IntegralNormAlgebraMap.norm_le_one_of_isIntegral
   | exact _root_.GlobalTheory.IntegralNormAlgebraMap.norm_le_one_of_isIntegral
   | (apply _root_.GlobalTheory.IntegralNormAlgebraMap.norm_le_one_of_isIntegral <;> assumption)
-  | (intros; apply _root_.GlobalTheory.IntegralNormAlgebraMap.norm_le_one_of_isIntegral <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.IntegralNormAlgebraMap.norm_le_one_of_isIntegral <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.IntegralNormAlgebraMap.norm_le_one_of_isIntegral <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.IntegralNormAlgebraMap.norm_le_one_of_isIntegral
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.IntegralNormAlgebraMap.norm_le_one_of_isIntegral ..)
 
 theorem norm_le_one_of_mem (c : Coef l) {x : PadicAlgCl l} (hx : x ∈ c.O) : ‖x‖ ≤ 1 := by
   haveI := c.fin
-  exact norm_le_one_of_int' x ((Algebra.IsIntegral.isIntegral (R := ℤ_[l]) (⟨x, hx⟩ : c.O)).map c.O.val)
+  exact norm_le_one_of_int' x
+    ((Algebra.IsIntegral.isIntegral (R := ℤ_[l]) (⟨x, hx⟩ : c.O)).map c.O.val)
 
 theorem norm_unit (c : Coef l) (u : c.Oˣ) : ‖((u : c.O) : PadicAlgCl l)‖ = 1 := by
   have h1 : ‖((u : c.O) : PadicAlgCl l)‖ * ‖(((u⁻¹ : c.Oˣ) : c.O) : PadicAlgCl l)‖ = 1 := by
@@ -40,8 +48,9 @@ theorem norm_unit (c : Coef l) (u : c.Oˣ) : ‖((u : c.O) : PadicAlgCl l)‖ = 
 theorem norm_l : ‖((l : ℕ) : PadicAlgCl l)‖ = (l : ℝ)⁻¹ := by
   rw [← map_natCast (algebraMap ℚ_[l] (PadicAlgCl l)), norm_algebraMap', Padic.norm_p]
 
-theorem exists_unif (c : Coef l) : ∃ ϖ : PadicAlgCl l, ∃ s : ℕ, 0 < s ∧ ‖((l : ℕ) : PadicAlgCl l)‖ = ‖ϖ‖ ^ s ∧
-    ∀ x ∈ c.O, x = 0 ∨ ∃ j : ℕ, ‖x‖ = ‖ϖ‖ ^ j := by
+theorem exists_unif (c : Coef l)
+    : ∃ ϖ : PadicAlgCl l, ∃ s : ℕ,
+      0 < s ∧ ‖((l : ℕ) : PadicAlgCl l)‖ = ‖ϖ‖ ^ s ∧ ∀ x ∈ c.O, x = 0 ∨ ∃ j : ℕ, ‖x‖ = ‖ϖ‖ ^ j := by
   haveI := c.dvr
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible c.O
   have key : ∀ y : c.O, y ≠ 0 → ∃ j : ℕ, ‖(y : PadicAlgCl l)‖ = ‖(ϖ : PadicAlgCl l)‖ ^ j := by
@@ -57,7 +66,9 @@ theorem exists_unif (c : Coef l) : ∃ ϖ : PadicAlgCl l, ∃ s : ℕ, 0 < s ∧
     exact (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero) this
   obtain ⟨n, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hl0 hϖ
   have hnorm : ‖((l : ℕ) : PadicAlgCl l)‖ = ‖(ϖ : PadicAlgCl l)‖ ^ n := by
-    have h' : (((l : ℕ) : c.O) : PadicAlgCl l) = ((u : c.O) : PadicAlgCl l) * (ϖ : PadicAlgCl l) ^ n := by
+    have h'
+        : (((l : ℕ) : c.O) : PadicAlgCl l)
+          = ((u : c.O) : PadicAlgCl l) * (ϖ : PadicAlgCl l) ^ n := by
       rw [hu, Subalgebra.coe_mul, Subalgebra.coe_pow]
     have h'' : (((l : ℕ) : c.O) : PadicAlgCl l) = ((l : ℕ) : PadicAlgCl l) := by simp
     rw [← h'', h', norm_mul, norm_pow, norm_unit, one_mul]
@@ -78,15 +89,14 @@ theorem norm_eq_one_of_pow {z : PadicAlgCl l} {N : ℕ} (hN : 0 < N) (hz : z ^ N
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hN.ne').1 this
 
 theorem norm_one_sub_pow_le {z : PadicAlgCl l} (hz : ‖z‖ = 1) (b : ℕ) : ‖1 - z ^ b‖ ≤ ‖1 - z‖ := by
-  have : 1 - z ^ b = (1 - z) * ∑ i ∈ Finset.range b, z ^ i := by
-    rw [mul_comm, geom_sum_mul_neg]
+  have : 1 - z ^ b = (1 - z) * ∑ i ∈ Finset.range b, z ^ i := by rw [mul_comm, geom_sum_mul_neg]
   rw [this, norm_mul]
   refine mul_le_of_le_one_right (norm_nonneg _) ?_
   exact IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one
     (fun i _ => by rw [norm_pow, hz, one_pow])
 
-theorem norm_one_sub_prim {z : PadicAlgCl l} {m : ℕ} (hz : IsPrimitiveRoot z (l ^ (m + 1))) :
-    ‖1 - z‖ ^ Nat.totient (l ^ (m + 1)) = ‖((l : ℕ) : PadicAlgCl l)‖ := by
+theorem norm_one_sub_prim {z : PadicAlgCl l} {m : ℕ} (hz : IsPrimitiveRoot z (l ^ (m + 1)))
+    : ‖1 - z‖ ^ Nat.totient (l ^ (m + 1)) = ‖((l : ℕ) : PadicAlgCl l)‖ := by
   have hpos : 0 < l ^ (m + 1) := pow_pos (Fact.out : l.Prime).pos _
   have hcyc := Polynomial.cyclotomic_eq_prod_X_sub_primitiveRoots hz
   have h1 : Polynomial.eval 1 (Polynomial.cyclotomic (l ^ (m + 1)) (PadicAlgCl l)) = l :=
@@ -102,13 +112,17 @@ theorem norm_one_sub_prim {z : PadicAlgCl l} {m : ℕ} (hz : IsPrimitiveRoot z (
     obtain ⟨j, -, hj⟩ := hμ'.eq_pow_of_pow_eq_one hz.pow_eq_one
     apply le_antisymm
     · rw [← hi]; exact norm_one_sub_pow_le hz1 i
-    · calc ‖1 - z‖ = ‖1 - μ ^ j‖ := by rw [hj]
+    · calc
+        ‖1 - z‖
+          = ‖1 - μ ^ j‖ := by rw [hj]
         _ ≤ ‖1 - μ‖ := norm_one_sub_pow_le hμ1 j
   rw [← h1, norm_prod, Finset.prod_congr rfl h2, Finset.prod_const, hz.card_primitiveRoots]
 
-theorem coeff_cg_of_values : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (F : PowerSeries (Qbar l)) (k m₁ : ℕ),
-    (∀ n, F.coeff n ∈ c.O) → (∀ m, m₁ ≤ m → ∀ z : Qbar l, IsPrimitiveRoot z (l ^ m) → Cg k (tval F (l ^ (3 * m)) z) 0) →
-    ∀ n, Cg k (F.coeff n) 0 := by
+theorem coeff_cg_of_values
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (F : PowerSeries (Qbar l)) (k m₁ : ℕ),
+      (∀ n, F.coeff n ∈ c.O)
+        → (∀ m, m₁ ≤ m → ∀ z : Qbar l, IsPrimitiveRoot z (l ^ m) → Cg k (tval F (l ^ (3 * m)) z) 0)
+        → ∀ n, Cg k (F.coeff n) 0 := by
   intro l _ c F k m₁ hF hval n₀
   have hlP : l.Prime := Fact.out
   unfold Cg
@@ -128,8 +142,7 @@ theorem coeff_cg_of_values : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (F : Powe
     rw [h0, zero_pow hs.ne'] at hl0
     exact lt_irrefl _ hl0
   have hq1 : q < 1 := (pow_lt_one_iff_of_nonneg hq0.le hs.ne').1 hl1
-  have hlk : ‖((l : ℕ) : Qbar l) ^ k‖ = q ^ (s * k) := by
-    rw [norm_pow, pow_mul]; congr 1
+  have hlk : ‖((l : ℕ) : Qbar l) ^ k‖ = q ^ (s * k) := by rw [norm_pow, pow_mul]; congr 1
   have hex : ∃ J, ∃ n, ‖F.coeff n‖ = q ^ J := by
     rcases hdisc _ (hF n₀) with h | ⟨j, hj⟩
     · exfalso; rw [h, norm_zero] at hlt; exact absurd hlt (not_lt.2 (norm_nonneg _))
@@ -154,8 +167,7 @@ theorem coeff_cg_of_values : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (F : Powe
       have h2 : j ≠ J := fun h => Nat.find_min hJ hn (by rw [hj, h])
       omega
   have hJk : J + 1 ≤ s * k := by
-    have h1 : q ^ (s * k) < q ^ J := by
-      rw [← hlk]; exact lt_of_lt_of_le hlt (hle n₀)
+    have h1 : q ^ (s * k) < q ^ J := by rw [← hlk]; exact lt_of_lt_of_le hlt (hle n₀)
     have := (pow_lt_pow_iff_right_of_lt_one₀ hq0 hq1).1 h1
     omega
 
@@ -172,7 +184,9 @@ theorem coeff_cg_of_values : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (F : Powe
     rw [Nat.totient_prime_pow_succ hlP]
     have h1 : M < l ^ M := Nat.lt_pow_self hlP.one_lt
     have h2 : 1 ≤ l - 1 := by have := hlP.two_le; omega
-    calc d * s < M := by omega
+    calc
+      d * s
+        < M := by omega
       _ < l ^ M := h1
       _ ≤ l ^ M * (l - 1) := Nat.le_mul_of_pos_right _ h2
   have htpos : 0 < Nat.totient (l ^ (M + 1)) := by omega
@@ -200,36 +214,42 @@ theorem coeff_cg_of_values : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (F : Powe
     have : d ≤ d * s := Nat.le_mul_of_pos_right d hs
     omega
   have hdmem : d ∈ Finset.range N := Finset.mem_range.2 hdN
-  have hsplit : tval F N z = F.coeff d * (z - 1) ^ d +
-      ∑ n ∈ (Finset.range N).erase d, F.coeff n * (z - 1) ^ n := by
+  have hsplit
+      : tval F N z
+        = F.coeff d * (z - 1) ^ d + ∑ n ∈ (Finset.range N).erase d, F.coeff n * (z - 1) ^ n := by
     unfold tval
     exact (Finset.add_sum_erase _ _ hdmem).symm
-  have hmain : ‖F.coeff d * (z - 1) ^ d‖ = q ^ J * a ^ d := by
-    rw [norm_mul, norm_pow, hd]
+  have hmain : ‖F.coeff d * (z - 1) ^ d‖ = q ^ J * a ^ d := by rw [norm_mul, norm_pow, hd]
   have hB : max (q ^ (J + 1)) (q ^ J * a ^ (d + 1)) < q ^ J * a ^ d := by
     have hqJ : 0 < q ^ J := pow_pos hq0 J
     apply max_lt
     · rw [pow_succ]; exact mul_lt_mul_of_pos_left hqa hqJ
     · rw [pow_succ, ← mul_assoc]
       exact mul_lt_of_lt_one_right (mul_pos hqJ (pow_pos ha0 d)) ha1
-  have hrest : ‖∑ n ∈ (Finset.range N).erase d, F.coeff n * (z - 1) ^ n‖ ≤
-      max (q ^ (J + 1)) (q ^ J * a ^ (d + 1)) := by
+  have hrest
+      : ‖∑ n ∈ (Finset.range N).erase d, F.coeff n * (z - 1) ^ n‖
+        ≤ max (q ^ (J + 1)) (q ^ J * a ^ (d + 1)) := by
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity) fun n hn => ?_
     have hnd : n ≠ d := (Finset.mem_erase.1 hn).1
     rw [norm_mul, norm_pow, ← ha]
     rcases lt_or_gt_of_ne hnd with h' | h'
     · refine le_max_of_le_left ?_
-      calc ‖F.coeff n‖ * a ^ n ≤ q ^ (J + 1) * 1 :=
-            mul_le_mul (hbefore n h') (pow_le_one₀ ha0.le ha1.le) (by positivity) (by positivity)
+      calc
+        ‖F.coeff n‖ * a ^ n ≤ q ^ (J + 1) * 1 :=
+          mul_le_mul (hbefore n h') (pow_le_one₀ ha0.le ha1.le) (by positivity) (by positivity)
         _ = q ^ (J + 1) := mul_one _
     · refine le_max_of_le_right ?_
-      exact mul_le_mul (hle n) (pow_le_pow_of_le_one ha0.le ha1.le h') (by positivity) (by positivity)
+      exact mul_le_mul (hle n) (pow_le_pow_of_le_one ha0.le ha1.le h') (by positivity)
+        (by positivity)
   have hval' : ‖tval F N z‖ = q ^ J * a ^ d := by
     rw [hsplit, ← hmain]
-    have hne : ‖F.coeff d * (z - 1) ^ d‖ ≠ ‖∑ n ∈ (Finset.range N).erase d, F.coeff n * (z - 1) ^ n‖ := by
+    have hne
+        : ‖F.coeff d * (z - 1) ^ d‖
+          ≠ ‖∑ n ∈ (Finset.range N).erase d, F.coeff n * (z - 1) ^ n‖ := by
       rw [hmain]; exact (lt_of_le_of_lt hrest hB).ne'
     rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hne, max_eq_left]
-    rw [hmain]; exact hrest.trans hB.le
+    rw [hmain]
+    exact hrest.trans hB.le
   rw [hval'] at h
   have h1 : q ^ (s * k) ≤ q ^ (J + 1) := pow_le_pow_of_le_one hq0.le hq1.le hJk
   have h2 : q ^ (J + 1) < q ^ J * a ^ d := by

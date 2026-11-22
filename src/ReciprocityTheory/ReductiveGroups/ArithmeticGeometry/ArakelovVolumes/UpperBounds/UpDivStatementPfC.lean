@@ -14,9 +14,11 @@ open ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Metric Set Filter
 
 variable {n : ℕ}
 
-theorem dense_nonzero {U : Set (V n)} (hU : IsOpen U) (hUc : IsPreconnected U) {g : V n → ℂ}
-    (hg : DifferentiableOn ℂ g U) (hg0 : ∃ z ∈ U, g z ≠ 0) {z : V n} (hz : z ∈ U) :
-    ∃ᶠ y in 𝓝 z, y ∈ U ∧ g y ≠ 0 := by
+theorem dense_nonzero
+    {U : Set (V n)} (hU : IsOpen U) (hUc : IsPreconnected U)
+    {g : V n → ℂ} (hg : DifferentiableOn ℂ g U) (hg0 : ∃ z ∈ U, g z ≠ 0)
+    {z : V n} (hz : z ∈ U)
+    : ∃ᶠ y in 𝓝 z, y ∈ U ∧ g y ≠ 0 := by
   by_contra hcon
   rw [Filter.not_frequently] at hcon
   have hz0 : ∀ᶠ y in 𝓝 z, g y = 0 := by
@@ -31,26 +33,29 @@ theorem dense_nonzero {U : Set (V n)} (hU : IsOpen U) (hUc : IsPreconnected U) {
     have hbb : b ∈ ball y ε := by
       rw [mem_ball, dist_comm]
       exact hdist
-    have hEq := ReciprocityTheory.L2DbarEstimates.C.ident n (ball y ε) g b isOpen_ball (convex_ball y ε)
-      (hg.mono hball) hbb hb
+    have hEq :=
+      ReciprocityTheory.L2DbarEstimates.C.ident n (ball y ε) g b isOpen_ball (convex_ball y ε)
+        (hg.mono hball) hbb hb
     exact Filter.eventually_of_mem (ball_mem_nhds y hε) (fun w hw => by simpa using hEq hw)
   obtain ⟨w, hwU, hw⟩ := hg0
   exact hw (hsub hwU).self_of_nhds
 
-theorem ext_glue {U : Set (V n)} (hU : IsOpen U) (hUc : IsPreconnected U) {g : V n → ℂ}
-    (hg : DifferentiableOn ℂ g U) (hg0 : ∃ z ∈ U, g z ≠ 0) {H : V n → ℂ}
-    (hH : DifferentiableOn ℂ H (U ∩ {z | g z ≠ 0}))
-    (hloc : ∀ z ∈ U, ∃ r > 0, ball z r ⊆ U ∧
-      IntegrableOn (fun y => ‖H y‖ ^ 2) (ball z r \ {y | g y = 0})) :
-    ∃ H' : V n → ℂ, DifferentiableOn ℂ H' U ∧ EqOn H' H (U ∩ {z | g z ≠ 0}) := by
+theorem ext_glue
+    {U : Set (V n)} (hU : IsOpen U) (hUc : IsPreconnected U)
+    {g : V n → ℂ} (hg : DifferentiableOn ℂ g U) (hg0 : ∃ z ∈ U, g z ≠ 0)
+    {H : V n → ℂ} (hH : DifferentiableOn ℂ H (U ∩ {z | g z ≠ 0}))
+    (hloc : ∀ z ∈ U, ∃ r > 0,
+      ball z r ⊆ U ∧ IntegrableOn (fun y => ‖H y‖ ^ 2) (ball z r \ {y | g y = 0}))
+    : ∃ H' : V n → ℂ, DifferentiableOn ℂ H' U ∧ EqOn H' H (U ∩ {z | g z ≠ 0}) := by
   classical
   choose! r hr hrU hint using hloc
 
-  have hE : ∀ z ∈ U, ∃ E : V n → ℂ, DifferentiableOn ℂ E (ball z (r z)) ∧
-      EqOn E H (ball z (r z) \ {y | g y = 0}) := by
+  have hE
+      : ∀ z ∈ U, ∃ E : V n → ℂ,
+        DifferentiableOn ℂ E (ball z (r z)) ∧ EqOn E H (ball z (r z) \ {y | g y = 0}) := by
     intro z hz
-    exact ReciprocityTheory.L2DbarEstimates.C.ext n (ball z (r z)) g H isOpen_ball (hg.mono (hrU z hz))
-      (hH.mono (fun y hy => ⟨hrU z hz hy.1, hy.2⟩)) (hint z hz)
+    exact ReciprocityTheory.L2DbarEstimates.C.ext n (ball z (r z)) g H isOpen_ball
+      (hg.mono (hrU z hz)) (hH.mono (fun y hy => ⟨hrU z hz hy.1, hy.2⟩)) (hint z hz)
   choose! E hEd hEe using hE
 
   have hagree : ∀ y ∈ U, ∀ z ∈ U, ∀ w ∈ ball y (r y) ∩ ball z (r z), E y w = E z w := by
@@ -62,8 +67,9 @@ theorem ext_glue {U : Set (V n)} (hU : IsOpen U) (hUc : IsPreconnected U) {g : V
     have hc2 : ContinuousAt (E z) w :=
       (hEd z hz).continuousOn.continuousAt (isOpen_ball.mem_nhds hw.2)
     have hfreq : ∃ᶠ v in 𝓝 w, E y v - E z v ∈ ({0} : Set ℂ) := by
-      have h1 := (dense_nonzero hU hUc hg hg0 hwU).and_eventually
-        (hopen.mem_nhds hw : ∀ᶠ v in 𝓝 w, v ∈ ball y (r y) ∩ ball z (r z))
+      have h1 :=
+        (dense_nonzero hU hUc hg hg0 hwU).and_eventually
+          (hopen.mem_nhds hw : ∀ᶠ v in 𝓝 w, v ∈ ball y (r y) ∩ ball z (r z))
       refine h1.mono ?_
       rintro v ⟨⟨-, hgv⟩, hv1, hv2⟩
       rw [Set.mem_singleton_iff, sub_eq_zero, hEe y hy ⟨hv1, hgv⟩, hEe z hz ⟨hv2, hgv⟩]
@@ -76,7 +82,8 @@ theorem ext_glue {U : Set (V n)} (hU : IsOpen U) (hUc : IsPreconnected U) {g : V
         with w hw hwU
       exact hagree w hwU z hz w ⟨mem_ball_self (hr w hwU), hw⟩
     exact (((hEd z hz).differentiableAt
-      (isOpen_ball.mem_nhds (mem_ball_self (hr z hz)))).congr_of_eventuallyEq hev).differentiableWithinAt
+        (isOpen_ball.mem_nhds (mem_ball_self (hr z hz)))).congr_of_eventuallyEq
+      hev).differentiableWithinAt
   · rintro w ⟨hwU, hgw⟩
     exact hEe w hwU ⟨mem_ball_self (hr w hwU), hgw⟩
 

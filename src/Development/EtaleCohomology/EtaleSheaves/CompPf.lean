@@ -13,13 +13,13 @@ open LateralTheory.E.t_E3Cut
 section
 variable {R D : Type} [CommRing R] [CommRing D] (h : R →+* D)
 
-theorem eval_map_rr (p : R[X]) (x : D) :
-    (p.map h.rangeRestrict).eval₂ h.range.subtype x = p.eval₂ h x := by
+theorem eval_map_rr (p : R[X]) (x : D)
+    : (p.map h.rangeRestrict).eval₂ h.range.subtype x = p.eval₂ h x := by
   rw [eval₂_map]; rfl
 
-theorem alg_of (x : D) (p : R[X]) (n : ℕ) (hn : h (p.coeff n) ≠ 0) (hp : p.eval₂ h x = 0) :
-    letI : Algebra h.range D := h.range.subtype.toAlgebra;
-    IsAlgebraic h.range x := by
+theorem alg_of (x : D) (p : R[X]) (n : ℕ) (hn : h (p.coeff n) ≠ 0) (hp : p.eval₂ h x = 0)
+    : letI : Algebra h.range D := h.range.subtype.toAlgebra
+      IsAlgebraic h.range x := by
   letI : Algebra h.range D := h.range.subtype.toAlgebra
   refine ⟨p.map h.rangeRestrict, ?_, ?_⟩
   · intro h0
@@ -28,9 +28,9 @@ theorem alg_of (x : D) (p : R[X]) (n : ℕ) (hn : h (p.coeff n) ≠ 0) (hp : p.e
     simpa using h1
   · rw [aeval_def]; exact (eval_map_rr h p x).trans hp
 
-theorem of_alg (x : D) :
-    letI : Algebra h.range D := h.range.subtype.toAlgebra;
-    IsAlgebraic h.range x → ∃ p : R[X], (∃ n, h (p.coeff n) ≠ 0) ∧ p.eval₂ h x = 0 := by
+theorem of_alg (x : D)
+    : letI : Algebra h.range D := h.range.subtype.toAlgebra
+      IsAlgebraic h.range x → ∃ p : R[X], (∃ n, h (p.coeff n) ≠ 0) ∧ p.eval₂ h x = 0 := by
   letI : Algebra h.range D := h.range.subtype.toAlgebra
   rintro ⟨q, hq0, hq⟩
   obtain ⟨p, rfl⟩ := Polynomial.map_surjective h.rangeRestrict h.rangeRestrict_surjective q
@@ -75,6 +75,7 @@ theorem Comp_of : LateralTheory.E.AlgResPropsPf.Comp := by
   obtain ⟨p, ⟨n, hn⟩, hp⟩ := of_alg fA _ h3
   refine ⟨p, ⟨n, fun hm => hn (Ideal.Quotient.eq_zero_iff_mem.mpr hm)⟩, ?_⟩
   apply Ideal.Quotient.eq_zero_iff_mem.mp
-  rw [hom_eval₂]; exact hp
+  rw [hom_eval₂]
+  exact hp
 
 end LateralTheory.E.CompPf

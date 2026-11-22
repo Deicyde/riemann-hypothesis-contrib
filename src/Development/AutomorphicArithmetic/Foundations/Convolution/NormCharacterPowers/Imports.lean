@@ -10,12 +10,13 @@ public import Development.AbelianVarietyTheory.BlockTheory.AdelicCMFields.Unitar
 open UpperTheory.ConvolutionTheory.R
 
 open NumberField in
-private theorem not_both (F : Type) [Field F] [NumberField F] (h : IsTotallyReal F) (h' : IsTotallyComplex F) : False := by
+private theorem not_both
+    (F : Type) [Field F] [NumberField F] (h : IsTotallyReal F) (h' : IsTotallyComplex F)
+    : False := by
   obtain ⟨v⟩ : Nonempty (InfinitePlace F) := inferInstance
   exact (InfinitePlace.not_isReal_iff_isComplex.2 (h'.isComplex v)) (h.isReal v)
 
-theorem UpperTheory.ConvolutionTheory.R.fibre :
-    FibreCG → Fibre := by
+theorem UpperTheory.ConvolutionTheory.R.fibre : FibreCG → Fibre := by
   intro H K M _ _ _ _ _ _ hK hM hp n hn π P hbc
   rcases π with @⟨_, π⟩ | @⟨hR, π⟩
   swap

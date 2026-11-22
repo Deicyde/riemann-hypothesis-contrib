@@ -4,15 +4,15 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.compact_quotient_submodule :
-    ∀ {LL O W Q : Type} [Field LL] [CommRing O] [Algebra O LL] [AddCommGroup W] [Module LL W] [Module O W]
-        [IsScalarTower O LL W] [TopologicalSpace LL] [TopologicalSpace W] [ContinuousSMul LL W]
-        [IsTopologicalAddGroup W] [T2Space W] [AddCommGroup Q] [Module O Q] [Finite Q]
-        (Z : Submodule O W) (p : O) (f : Z →ₗ[O] Q),
-        IsCompact (Set.range (algebraMap O LL)) →
-        (∀ U ∈ nhds (0 : W), ∃ n : ℕ, ∀ z ∈ Z, p ^ n • z ∈ U) →
-        (∀ z : Z, f z = 0 → ∃ w ∈ Z, (z : W) = p • w) →
-        Z.FG := by
+theorem UpperTheory.compact_quotient_submodule
+    : ∀ {LL O W Q : Type} [Field LL] [CommRing O] [Algebra O LL] [AddCommGroup W] [Module LL W]
+        [Module O W] [IsScalarTower O LL W] [TopologicalSpace LL] [TopologicalSpace W]
+        [ContinuousSMul LL W] [IsTopologicalAddGroup W] [T2Space W] [AddCommGroup Q] [Module O Q]
+        [Finite Q] (Z : Submodule O W) (p : O) (f : Z →ₗ[O] Q),
+      IsCompact (Set.range (algebraMap O LL))
+        → (∀ U ∈ nhds (0 : W), ∃ n : ℕ, ∀ z ∈ Z, p ^ n • z ∈ U)
+        → (∀ z : Z, f z = 0 → ∃ w ∈ Z, (z : W) = p • w)
+        → Z.FG := by
   intro LL O W Q _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ Z p f hK hsmall hker
   classical
   have := Fintype.ofFinite Q

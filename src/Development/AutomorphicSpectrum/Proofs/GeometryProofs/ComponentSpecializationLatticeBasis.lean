@@ -14,8 +14,12 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.EventuallyOn
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+  GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.Ar.Flat.CPoint
@@ -30,11 +34,18 @@ open GlobalTheory.CompanionTheory.Ar.LieTangent GlobalTheory.CompanionTheory.Ar.
 
 section Frame
 
-variable {X : Scheme.{0}} {G : Over X} [GrpObj G] {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {V : Type} [AddCommGroup V]
-  [Module Ω V] {K : Type} [Field K]
+variable
+  {X : Scheme.{0}} {G : Over X} [GrpObj G]
+  {Ω : Type} [Field Ω]
+  {ξ : Sp Ω ⟶ X} {V : Type} [AddCommGroup V] [Module Ω V]
+  {K : Type} [Field K]
 
-theorem valAt_of_isDiffOf {M : LieModel G ξ V} {z : Sp K ⟶ X} (f : G ⟶ G) [IsMonHom f] (A : V →ₗ[Ω] V)
-    (hf : M.IsDiffOf f A) {e : V} {w : epsAt z ⟶ G} (h : M.ValAt z e w) : M.ValAt z (A e) (w ≫ f) := by
+theorem valAt_of_isDiffOf
+    {M : LieModel G ξ V} {z : Sp K ⟶ X}
+    (f : G ⟶ G) [IsMonHom f]
+    (A : V →ₗ[Ω] V) (hf : M.IsDiffOf f A)
+    {e : V} {w : epsAt z ⟶ G} (h : M.ValAt z e w)
+    : M.ValAt z (A e) (w ≫ f) := by
   obtain ⟨hs, v, hv, hw⟩ := h
   refine ⟨hs, v ≫ f, ⟨?_, ?_⟩, ?_⟩
   · change _ ≫ (v ≫ f).left = _
@@ -45,13 +56,18 @@ theorem valAt_of_isDiffOf {M : LieModel G ξ V} {z : Sp K ⟶ X} (f : G ⟶ G) [
   · change (w ≫ f).left = _
     rw [Over.comp_left, hw, Over.comp_left, Category.assoc]
 
-theorem exists_model_of_frame [IsCommMonObj G] [Smooth G.hom] (hξ : IsCptGen ξ) (M : LieModel G ξ V) (z : Sp K ⟶ X)
-    (h : genPt ξ ⤳ centre z) (ψ : regAt ξ ⟨_, h⟩ →+* K) (hψ : ∀ a : regAt ξ ⟨_, h⟩, ValAt ξ z (a : Ω) (ψ a)) {g : ℕ}
-    (ℓ : Fin g → V) (hℓ : M.lat.IsFrameAt ℓ ⟨_, h⟩) :
-    ∃ MY : LieModel G z (Fin g → K), ∀ x : Fin g → regAt ξ ⟨_, h⟩,
+theorem exists_model_of_frame
+    [IsCommMonObj G] [Smooth G.hom]
+    (hξ : IsCptGen ξ)
+    (M : LieModel G ξ V)
+    (z : Sp K ⟶ X) (h : genPt ξ ⤳ centre z) (ψ : regAt ξ ⟨_, h⟩ →+* K)
+    (hψ : ∀ a : regAt ξ ⟨_, h⟩, ValAt ξ z (a : Ω) (ψ a))
+    {g : ℕ} (ℓ : Fin g → V) (hℓ : M.lat.IsFrameAt ℓ ⟨_, h⟩)
+    : ∃ MY : LieModel G z (Fin g → K), ∀ x : Fin g → regAt ξ ⟨_, h⟩,
       M.ValAt z (comb ℓ x) (MY.pt fun i => ψ (x i)) := by
   obtain ⟨F, _, _, ⟨MF⟩⟩ := lieModel_exists X G K z
-  obtain ⟨ev, hev, hsm, hsp⟩ := GlobalTheory.T.lie_lattice_eval_at_local_ring X G Ω ξ V M K z h F MF hξ inferInstance
+  obtain ⟨ev, hev, hsm, hsp⟩ :=
+    GlobalTheory.T.lie_lattice_eval_at_local_ring X G Ω ξ V M K z h F MF hξ inferInstance
   have hmem : ∀ i, ℓ i ∈ M.lat ⟨_, h⟩ := fun i => by
     rw [hℓ.2]
     exact Submodule.subset_span ⟨i, rfl⟩
@@ -80,7 +96,8 @@ theorem exists_model_of_frame [IsCommMonObj G] [Smooth G.hom] (hξ : IsCptGen ξ
     rw [← hsp]
     exact Submodule.span_le.2 hr
   have hcard : Fintype.card (Fin g) = Module.finrank K F := by
-    obtain ⟨_, hU, b', hb'sp, hb'⟩ := (lieLat_isVB_of_smooth X Ω ξ G V M hξ inferInstance).1 ⟨_, h⟩ trivial
+    obtain ⟨_, hU, b', hb'sp, hb'⟩ :=
+      (lieLat_isVB_of_smooth X Ω ξ G V M hξ inferInstance).1 ⟨_, h⟩ trivial
     have hfr := hb' ⟨_, h⟩ trivial hU
     have htop : Submodule.span Ω (Set.range ℓ) = ⊤ := by
       rw [eq_top_iff, ← hb'sp, Submodule.span_le]
@@ -91,7 +108,8 @@ theorem exists_model_of_frame [IsCommMonObj G] [Smooth G.hom] (hξ : IsCptGen ξ
       rw [hℓ.2, Submodule.mem_span_range_iff_exists_fun] at h3
       obtain ⟨x, hx⟩ := h3
       rw [← hx]
-      exact Submodule.sum_mem _ fun i _ => Submodule.smul_of_tower_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+      exact Submodule.sum_mem _ fun i _ =>
+        Submodule.smul_of_tower_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
     have hg : Module.finrank Ω V = g := by
       rw [← finrank_top, ← htop, finrank_span_eq_card hℓ.1, Fintype.card_fin]
     obtain ⟨R', _, x, hx, F', _, _, MR, n, b, hp⟩ := exists_chart G (centre z)
@@ -113,14 +131,19 @@ theorem exists_model_of_frame [IsCommMonObj G] [Smooth G.hom] (hξ : IsCptGen ξ
   rw [e3]
   exact (hev _ _).2 ⟨hcomb x, rfl⟩
 
-theorem isActOf_of_frame {E : Type} [Field E] [NumberField E] (hξ : IsCptGen ξ) {M : LieModel G ξ V} {z : Sp K ⟶ X}
-    {h : genPt ξ ⤳ centre z} {ψ : regAt ξ ⟨_, h⟩ →+* K} {g : ℕ} {ℓ : Fin g → V}
-    (hℓ : M.lat.IsFrameAt ℓ ⟨_, h⟩) (act : OAct (𝓞 E) G) {ρ : 𝓞 E →+* Module.End Ω V}
-    (hact : M.IsActOf act.act ρ) {ρK : 𝓞 E →+* Module.End K (Fin g → K)} (hT : Tied ℓ ψ ρ ρK)
+theorem isActOf_of_frame
+    {E : Type} [Field E] [NumberField E]
+    (hξ : IsCptGen ξ)
+    {M : LieModel G ξ V} {z : Sp K ⟶ X} {h : genPt ξ ⤳ centre z} {ψ : regAt ξ ⟨_, h⟩ →+* K} {g : ℕ}
+    {ℓ : Fin g → V} (hℓ : M.lat.IsFrameAt ℓ ⟨_, h⟩)
+    (act : OAct (𝓞 E) G)
+    {ρ : 𝓞 E →+* Module.End Ω V} (hact : M.IsActOf act.act ρ)
+    {ρK : 𝓞 E →+* Module.End K (Fin g → K)} (hT : Tied ℓ ψ ρ ρK)
     {MY : LieModel G z (Fin g → K)}
-    (hY : ∀ x : Fin g → regAt ξ ⟨_, h⟩, M.ValAt z (comb ℓ x) (MY.pt fun i => ψ (x i))) :
-    MY.IsActOf act.act ρK := by
-  obtain ⟨ρ', hρ', -⟩ := lieModel_exists_unique_act _ G K z _ MY (𝓞 E) act.act act.hom act.one act.mul act.add
+    (hY : ∀ x : Fin g → regAt ξ ⟨_, h⟩, M.ValAt z (comb ℓ x) (MY.pt fun i => ψ (x i)))
+    : MY.IsActOf act.act ρK := by
+  obtain ⟨ρ', hρ', -⟩ :=
+    lieModel_exists_unique_act _ G K z _ MY (𝓞 E) act.act act.hom act.one act.mul act.add
   suffices hq : ρ' = ρK from hq ▸ hρ'
   refine RingHom.ext fun a => (Pi.basisFun K (Fin g)).ext fun i => ?_
   let x : Fin g → regAt ξ ⟨_, h⟩ := Pi.single i 1
@@ -150,30 +173,42 @@ theorem isActOf_of_frame {E : Type} [Field E] [NumberField E] (hξ : IsCptGen ξ
 
 end Frame
 
-theorem tangent_coords : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (β : O →+* c.F) (Y : Model Xo c β) (U : Set (Xo.XF c)) (Z : CptOver Y U) (K : Type) [Field K] (y : Sp K ⟶ Xo.XF c) (h₁ : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j))
-    (ψ : regAt (Z.ξ₀ ≫ Y.j) ⟨_, h₁⟩ →+* K) (g : ℕ) (ℓ : Fin g → Z.V) (ρK : 𝓞 E →+* Module.End K (Fin g → K)),
-    (∀ a : regAt (Z.ξ₀ ≫ Y.j) ⟨_, h₁⟩, ValAt (Z.ξ₀ ≫ Y.j) (y ≫ Y.j) (a : Z.Ω) (ψ a)) → Z.M.lat.IsFrameAt ℓ ⟨_, h₁⟩ → Tied ℓ ψ Z.ρ ρK →
-    ∃ (MU : LieModel Xo.univ.t.G (under y) (Fin g → K)) (MY : LieModel Y.t.G (y ≫ Y.j) (Fin g → K)),
-      (∀ e, SameVec Y y (MU.pt e) (MY.pt e)) ∧
-      (∀ x : Fin g → regAt (Z.ξ₀ ≫ Y.j) ⟨_, h₁⟩, Z.M.ValAt (y ≫ Y.j) (comb ℓ x) (MY.pt (fun i => ψ (x i)))) ∧
-      MU.IsActOf Xo.univ.t.act.act ρK ∧ MY.IsActOf Y.t.act.act ρK := by
+theorem tangent_coords
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] [IsDomain O]
+        [IsDiscreteValuationRing O] (β : O →+* c.F) (Y : Model Xo c β) (U : Set (Xo.XF c))
+        (Z : CptOver Y U) (K : Type) [Field K] (y : Sp K ⟶ Xo.XF c)
+        (h₁ : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j)) (ψ : regAt (Z.ξ₀ ≫ Y.j) ⟨_, h₁⟩ →+* K) (g : ℕ)
+        (ℓ : Fin g → Z.V) (ρK : 𝓞 E →+* Module.End K (Fin g → K)),
+      (∀ a : regAt (Z.ξ₀ ≫ Y.j) ⟨_, h₁⟩, ValAt (Z.ξ₀ ≫ Y.j) (y ≫ Y.j) (a : Z.Ω) (ψ a))
+        → Z.M.lat.IsFrameAt ℓ ⟨_, h₁⟩ → Tied ℓ ψ Z.ρ ρK
+        → ∃ (MU : LieModel Xo.univ.t.G (under y) (Fin g → K))
+            (MY : LieModel Y.t.G (y ≫ Y.j) (Fin g → K)),
+          (∀ e, SameVec Y y (MU.pt e) (MY.pt e))
+            ∧ (∀ x : Fin g → regAt (Z.ξ₀ ≫ Y.j) ⟨_, h₁⟩,
+              Z.M.ValAt (y ≫ Y.j) (comb ℓ x) (MY.pt (fun i => ψ (x i))))
+            ∧ MU.IsActOf Xo.univ.t.act.act ρK ∧ MY.IsActOf Y.t.act.act ρK := by
   intro E _ _ _ H D l Xo c O _ _ _ β Y U Z K _ y h₁ ψ g ℓ ρK hψ hℓ hT
   have : Smooth Y.t.G.hom := Y.t.semi.smooth
   obtain ⟨MY, hMY⟩ := exists_model_of_frame Z.gen Z.M (y ≫ Y.j) h₁ ψ hψ ℓ hℓ
   have hY : MY.IsActOf Y.t.act.act ρK := isActOf_of_frame Z.gen hℓ Y.t.act Z.act hT hMY
   have hp : IsGrpPullback Y.oF.t.G Xo.univ.t.G (pullback.fst _ _) Y.m0.toSABMap.φ := Y.m0.cart
   have hq : IsGrpPullback Y.oF.t.G Y.t.G Y.j Y.m.φ := Y.m.cart
-  obtain ⟨Mo, hMo⟩ := (LiePull.lieModel_pullback _ _ Y.t.G Y.oF.t.G Y.j Y.m.φ hq K y (Fin g → K)).1 MY
-  obtain ⟨MU, hMU⟩ := (LiePull.lieModel_pullback _ _ Xo.univ.t.G Y.oF.t.G (pullback.fst _ _) Y.m0.toSABMap.φ hp
-    K y (Fin g → K)).2 Mo
+  obtain ⟨Mo, hMo⟩ :=
+    (LiePull.lieModel_pullback _ _ Y.t.G Y.oF.t.G Y.j Y.m.φ hq K y (Fin g → K)).1 MY
+  obtain ⟨MU, hMU⟩ :=
+    (LiePull.lieModel_pullback _ _ Xo.univ.t.G Y.oF.t.G (pullback.fst _ _) Y.m0.toSABMap.φ hp K y
+      (Fin g → K)).2 Mo
   have hMoAct : ∀ (a : 𝓞 E) (e : Fin g → K), Mo.pt (ρK a e) = Mo.pt e ≫ Y.oF.t.act.act a := by
     intro a e
     apply Over.OverMorphism.ext
     apply hq.1.hom_ext
-    · rw [hMo, hY a e, Over.comp_left, Over.comp_left, Category.assoc, Y.m.act, ← Category.assoc, hMo]
+    · rw [hMo, hY a e, Over.comp_left, Over.comp_left, Category.assoc, Y.m.act, ← Category.assoc,
+        hMo]
     · rw [Over.w, Over.comp_left, Category.assoc, Over.w, Over.w]
   refine ⟨MU, MY, fun e => ⟨(Mo.pt e).left, Over.w (Mo.pt e), hMU e, hMo e⟩, hMY, fun a e => ?_, hY⟩
   apply Over.OverMorphism.ext
-  rw [← hMU, hMoAct a e, Over.comp_left, Over.comp_left, Category.assoc, Y.m0.act, ← Category.assoc, hMU]
+  rw [← hMU, hMoAct a e, Over.comp_left, Over.comp_left, Category.assoc, Y.m0.act, ← Category.assoc,
+    hMU]
 
 end GlobalTheory.CompanionTheory.Ar.Flat.CPoint

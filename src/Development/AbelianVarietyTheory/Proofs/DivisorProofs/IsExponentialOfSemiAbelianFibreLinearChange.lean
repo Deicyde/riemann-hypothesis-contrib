@@ -16,7 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsDiffere
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.BdArc Filter Topology
+open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj
+  GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.BdArc Filter
+  Topology
 open ReciprocityTheory.ChartRestriction.G.FD (Data Frame Bor rmul lact mat col dmin Wt)
 open scoped CategoryTheory.MonObj
 open GlobalTheory.ShFam.Hor.LogCh
@@ -24,15 +27,21 @@ open scoped Matrix
 
 namespace GlobalTheory.ShFam.Hor.LogCh
 
-theorem isExpAt_mulVec {E : Type} [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
-    (X : Scheme.{0}) (t : SAB H X) (y : Sp ℂ ⟶ X) (g : ℕ) (e : (Fin g → ℂ) → (Over.mk y ⟶ t.G))
-    (M : Matrix (Fin g) (Fin g) ℂ) (hM : IsUnit M.det) (hhol : IsHolTo Set.univ (fun z => (e z).left))
-    (he : IsExpAt t y e) : IsExpAt t y (fun w => e (M *ᵥ w)) := by
-  have hchain : ∀ w v, IsDerivAt0 (fun u => (e (M *ᵥ u)).left) w v ↔
-      IsDerivAt0 (fun u => (e u).left) (M *ᵥ w) v := by
+theorem isExpAt_mulVec
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (X : Scheme.{0})
+    (t : SAB H X) (y : Sp ℂ ⟶ X)
+    (g : ℕ) (e : (Fin g → ℂ) → (Over.mk y ⟶ t.G)) (M : Matrix (Fin g) (Fin g) ℂ)
+    (hM : IsUnit M.det) (hhol : IsHolTo Set.univ (fun z => (e z).left)) (he : IsExpAt t y e)
+    : IsExpAt t y (fun w => e (M *ᵥ w)) := by
+  have hchain
+      : ∀ w v,
+        IsDerivAt0 (fun u => (e (M *ᵥ u)).left) w v
+          ↔ IsDerivAt0 (fun u => (e u).left) (M *ᵥ w) v := by
     intro w v
     rw [GlobalTheory.HolHom.isDerivAt0_iff, GlobalTheory.HolHom.isDerivAt0_iff]
-    exact GlobalTheory.ShFam.BdArc.LatSec.isDerivAt_comp_iff (GlobalTheory.HolHom.holAt_of_isHolTo hhol (Set.mem_univ 0))
+    exact GlobalTheory.ShFam.BdArc.LatSec.isDerivAt_comp_iff
+      (GlobalTheory.HolHom.holAt_of_isHolTo hhol (Set.mem_univ 0))
       (Matrix.mulVecLin M).toContinuousLinearMap w v
   have hMi : M * M⁻¹ = 1 := Matrix.mul_nonsing_inv M hM
   have hiM : M⁻¹ * M = 1 := Matrix.nonsing_inv_mul M hM

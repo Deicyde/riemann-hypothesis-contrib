@@ -50,10 +50,9 @@ theorem lemmaAOf_statement : LemmaAOf := by
   have h1τ' : ∀ v ∈ W₁', τ.restrict h2τ v ∈ W₁' := fun v hv => h1τ (v : V) hv
   have h1F' : ∀ v ∈ W₁', F₂ v ∈ W₁' := fun v hv => h1F (v : V) hv
   obtain ⟨hB1, hB2⟩ := hRR K W₂ (τ.restrict h2τ) F₂ q hF₂ W₁' h1τ' h1F'
-  have hc2 : (LinearMap.charpoly (τ.restrict h2τ)).roots.card = finrank K W₂ :=
+  have hc2 : (LinearMap.charpoly (τ.restrict h2τ)).roots.card = finrank K W₂ := la_card_roots _
+  have hc1 : (LinearMap.charpoly ((τ.restrict h2τ).restrict h1τ')).roots.card = finrank K W₁' :=
     la_card_roots _
-  have hc1 : (LinearMap.charpoly ((τ.restrict h2τ).restrict h1τ')).roots.card
-      = finrank K W₁' := la_card_roots _
   have hW : finrank K W₁' = finrank K W₁ := (Submodule.comapSubtypeEquivOfLe hle).finrank_eq
   set M₂ := (LinearMap.charpoly (τ.restrict h2τ)).roots with hM₂
   set M₁ := (LinearMap.charpoly ((τ.restrict h2τ).restrict h1τ')).roots with hM₁

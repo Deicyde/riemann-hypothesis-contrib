@@ -14,13 +14,18 @@ noncomputable section
 
 namespace GlobalTheory.SlopeRec
 
-open NumberField Finset Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.Indef.Tree GlobalTheory.IndefiniteRowSideFullHecke.DescentConstants Formalism.HN
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt
+open NumberField Finset Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.L2.Theta Formalism.L2.Indef.Tree
+  GlobalTheory.IndefiniteRowSideFullHecke.DescentConstants Formalism.HN
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt
 open Formalism.L2.Pj hiding kap
 open GlobalTheory.CompHt hiding rhoB
 
-variable {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (Q : ParamsT D L P) {T : Par D} {j : ℕ} {l : Level T.H}
-  {Xo : Moduli (T.Dw j) l} {c : Coeff l} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ D.R.r)
+variable
+  {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (Q : ParamsT D L P)
+  {T : Par D} {j : ℕ} {l : Level T.H} {Xo : Moduli (T.Dw j) l} {c : Coeff l}
+  (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ D.R.r)
   (dict : ∀ σ, GA D (D.sp.W j) → Σ k, Frame ((U σ).X k).Ψ D.R.r)
 
 abbrev gKap (T : Par D) (j : ℕ) : WTZ D.host.E := thetaExp D (T.Dw j) (kap D j)
@@ -35,7 +40,8 @@ abbrev gOne (T : Par D) (j : ℕ) : WTZ D.host.E := plainExp D (T.Dw j) (uOne Q 
 
 abbrev gTop (T : Par D) (j : ℕ) : WTZ D.host.E := plainExp D (T.Dw j) (uTop Q j)
 
-abbrev nrmAt (G : WTZ D.host.E) : (c.F →+* ℂ) → cuspW Xo c U G → ℝ := normW U (xiR D) (fun _ => D.sp.W j) dict G
+abbrev nrmAt (G : WTZ D.host.E) : (c.F →+* ℂ) → cuspW Xo c U G → ℝ :=
+  normW U (xiR D) (fun _ => D.sp.W j) dict G
 
 def refConst : ℝ := 1 / 2500
 
@@ -45,11 +51,15 @@ theorem comp_nonempty (h : T.Pins) (hj : InR D j) : Nonempty (Comp Xo c) :=
   (GlobalTheory.GeomIrr.compNe_and_exists_fnAlgClosed _ _ _ _ Xo c (by
     rw [(sig_eq h hj).2.2]
     have := D.R.m_add_three_le_k
-    simp only [Ranks.r]; omega)).1
+    simp only [Ranks.r]
+    omega)).1
 
 set_option synthInstance.maxHeartbeats 100000
 
-variable [StarRing c.F] (h : T.Pins) (hj : InR D j) (CI C2 : ℝ) (Vs : ValFam Xo c) (Hb : Type) [Fintype Hb]
+variable
+  [StarRing c.F]
+  (h : T.Pins) (hj : InR D j) (CI C2 : ℝ) (Vs : ValFam Xo c)
+  (Hb : Type) [Fintype Hb]
   (NN : Submodule (𝓞 c.F) (cuspW Xo c U (gKap T j)))
   (Ph : cuspW Xo c U (gKapMinus T j) →ₗ[c.F] (Hb → cuspW Xo c U (gKap T j)))
   (e : cuspW Xo c U (gKap T j) →ₗ[c.F] cuspW Xo c U (gKap T j)) (g : ℕ)

@@ -39,8 +39,8 @@ theorem uJClassFin_of (hR : RatDense) (hC : ClassFinite) : UJClassFin := by
       funext v
       rw [Matrix.mulVec_mulVec, ← Units.val_mul, ← Subgroup.coe_mul, inv_mul_cancel_right]
     have hk := sfin_of_Lam_eq (σ := σ) (J := J) L hRL _ _ hL
-    exact ⟨emb σ J (g y * (g x)⁻¹), emb_mem (σ := σ) (J := J) _, _, hk,
-      (mul_inv_cancel_left _ _).symm⟩
+    exact
+      ⟨emb σ J (g y * (g x)⁻¹), emb_mem (σ := σ) (J := J) _, _, hk, (mul_inv_cancel_left _ _).symm⟩
   have hQ : Finite (Quotient st) := by
     have hfin : (Set.range f).Finite := hSf.subset (by rintro _ ⟨x, rfl⟩; exact hfS x)
     have : Finite (Set.range f) := hfin.to_subtype
@@ -49,7 +49,8 @@ theorem uJClassFin_of (hR : RatDense) (hC : ClassFinite) : UJClassFin := by
     induction q using Quotient.inductionOn with
     | h x =>
       refine ⟨⟨f x, x, rfl⟩, ?_⟩
-      exact Quotient.sound (s := st) (key _ _ (Exists.choose_spec (⟨x, rfl⟩ : f x ∈ Set.range f)).symm)
+      exact Quotient.sound (s := st)
+        (key _ _ (Exists.choose_spec (⟨x, rfl⟩ : f x ∈ Set.range f)).symm)
   obtain ⟨n, ⟨e⟩⟩ := Finite.exists_equiv_fin (Quotient st)
   refine ⟨n, fun i => (e.symm i).out, ?_, ?_⟩
   · intro x
@@ -61,9 +62,16 @@ theorem uJClassFin_of (hR : RatDense) (hC : ClassFinite) : UJClassFin := by
   · intro i j γ γ' k k' hEq
     simp only at hEq
     have hr : rel (e.symm i).out (e.symm j).out := by
-      refine ⟨(γ : HA (AF F) σ J)⁻¹ * γ', mul_mem (inv_mem γ.2) γ'.2, (k' : HA (AF F) σ J) * (k : HA (AF F) σ J)⁻¹,
-        mul_mem k'.2 (inv_mem k.2), ?_⟩
-      have h0 : (e.symm i).out = (γ : HA (AF F) σ J)⁻¹ * (γ * (e.symm i).out * k) * (k : HA (AF F) σ J)⁻¹ := by
+      refine ⟨
+        (γ : HA (AF F) σ J)⁻¹ * γ',
+        mul_mem (inv_mem γ.2) γ'.2,
+        (k' : HA (AF F) σ J) * (k : HA (AF F) σ J)⁻¹,
+        mul_mem k'.2 (inv_mem k.2),
+        ?_
+      ⟩
+      have h0
+          : (e.symm i).out
+            = (γ : HA (AF F) σ J)⁻¹ * (γ * (e.symm i).out * k) * (k : HA (AF F) σ J)⁻¹ := by
         group
       rw [h0, hEq]
       group

@@ -9,8 +9,9 @@ noncomputable section
 
 namespace LocMassOrdSF
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.LocVol MeasureTheory
-  NumberField IsDedekindDomain Topology Matrix
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.LocVol MeasureTheory NumberField IsDedekindDomain
+  Topology Matrix
 open scoped TensorProduct
 
 section FvTop
@@ -19,13 +20,16 @@ variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 
 theorem secondCountable_Fv : SecondCountableTopology (Fv F v) := by
   have : Countable F := (Module.finBasis ℚ F).equivFun.injective.countable
-  have : TopologicalSpace.SeparableSpace (Fv F v) :=
-    ⟨⟨Set.range (algebraMap F (Fv F v)), Set.countable_range _,
-      IsDedekindDomain.HeightOneSpectrum.denseRange_algebraMap F v⟩⟩
+  have : TopologicalSpace.SeparableSpace (Fv F v) := ⟨⟨
+    Set.range (algebraMap F (Fv F v)),
+    Set.countable_range _,
+    IsDedekindDomain.HeightOneSpectrum.denseRange_algebraMap F v
+  ⟩⟩
   exact UniformSpace.secondCountable_of_separable (Fv F v)
 
 theorem locallyCompact_Fv : LocallyCompactSpace (Fv F v) :=
-  (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F v).locallyCompactSpace_of_mem_nhds_of_addGroup
+  (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F
+      v).locallyCompactSpace_of_mem_nhds_of_addGroup
     ((Valued.isOpen_valuationSubring _).mem_nhds (zero_mem _))
 
 theorem isOpen_units_Fv : IsOpen {r : Fv F v | IsUnit r} := by
@@ -43,18 +47,21 @@ theorem isModTop_tens : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
 
 attribute [local instance] isModTop_tens
 
-theorem isTopRing_tens : IsTopologicalRing (R ⊗[F] E) :=
-  IsModuleTopology.isTopologicalRing R _
+theorem isTopRing_tens : IsTopologicalRing (R ⊗[F] E) := IsModuleTopology.isTopologicalRing R _
 
 attribute [local instance] isTopRing_tens
 
-theorem exists_homeomorph_tens :
-    ∃ (ι : Type) (_ : Fintype ι), Nonempty (R ⊗[F] E ≃ₜ (ι → R)) := by
+theorem exists_homeomorph_tens : ∃ (ι : Type) (_ : Fintype ι), Nonempty (R ⊗[F] E ≃ₜ (ι → R)) := by
   let e := (Algebra.TensorProduct.basis R (Module.finBasis F E)).equivFun
-  exact ⟨Fin (Module.finrank F E), inferInstance,
-    ⟨{ toEquiv := e.toEquiv
-       continuous_toFun := IsModuleTopology.continuous_of_linearMap e.toLinearMap
-       continuous_invFun := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap }⟩⟩
+  exact ⟨
+    Fin (Module.finrank F E),
+    inferInstance,
+    ⟨{
+      toEquiv := e.toEquiv
+      continuous_toFun := IsModuleTopology.continuous_of_linearMap e.toLinearMap
+      continuous_invFun := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap
+    }⟩
+  ⟩
 
 theorem lc_tens [LocallyCompactSpace R] [T2Space R] : LocallyCompactSpace (R ⊗[F] E) := by
   obtain ⟨ι, hι, ⟨h⟩⟩ := exists_homeomorph_tens (F := F) (E := E) R
@@ -84,19 +91,21 @@ theorem lip_field (K : Type) [Field K] : LIP K := by
     exact hW c hc
   obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Matrix.mulVecLin W) hker
   refine ⟨LinearMap.toMatrix' g, ?_⟩
-  have h1 : LinearMap.toMatrix' (g ∘ₗ Matrix.mulVecLin W) = 1 := by
-    rw [hg, LinearMap.toMatrix'_id]
+  have h1 : LinearMap.toMatrix' (g ∘ₗ Matrix.mulVecLin W) = 1 := by rw [hg, LinearMap.toMatrix'_id]
   rwa [LinearMap.toMatrix'_comp,
-    show LinearMap.toMatrix' (Matrix.mulVecLin W) = W from LinearMap.toMatrix'_toLin' W] at h1
+      show LinearMap.toMatrix' (Matrix.mulVecLin W) = W from LinearMap.toMatrix'_toLin' W]
+    at h1
 
-theorem inj_of_isUnit {R : Type} [CommRing R] {m n : Type} [Fintype m] [Fintype n]
-    [DecidableEq n] (W : Matrix m n R) (P : Matrix n m R) (hP : IsUnit (P * W).det)
-    (c : n → R) (hc : W *ᵥ c = 0) : c = 0 := by
-  have h1 : (P * W) *ᵥ c = 0 := by
-    rw [← Matrix.mulVec_mulVec, hc, Matrix.mulVec_zero]
+theorem inj_of_isUnit
+    {R : Type} [CommRing R]
+    {m n : Type} [Fintype m] [Fintype n] [DecidableEq n]
+    (W : Matrix m n R) (P : Matrix n m R) (hP : IsUnit (P * W).det)
+    (c : n → R) (hc : W *ᵥ c = 0)
+    : c = 0 := by
+  have h1 : (P * W) *ᵥ c = 0 := by rw [← Matrix.mulVec_mulVec, hc, Matrix.mulVec_zero]
   obtain ⟨u, hu⟩ := (Matrix.isUnit_iff_isUnit_det _).mpr hP
-  calc c = ((↑u⁻¹ : Matrix n n R) * (P * W)) *ᵥ c := by
-        rw [← hu, Units.inv_mul, Matrix.one_mulVec]
+  calc
+    c = ((↑u⁻¹ : Matrix n n R) * (P * W)) *ᵥ c := by rw [← hu, Units.inv_mul, Matrix.one_mulVec]
     _ = 0 := by rw [← Matrix.mulVec_mulVec, h1, Matrix.mulVec_zero]
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E] {d : ℕ} (b : Module.Basis (Fin d) F E)
@@ -104,23 +113,27 @@ variable {F E : Type} [Field F] [Field E] [Algebra F E] {d : ℕ} (b : Module.Ba
 def crd (R : Type) [CommRing R] [Algebra F R] (y : R ⊗[F] E) (k : Fin d) : R :=
   (Algebra.TensorProduct.basis R b).repr y k
 
-def wMat (R : Type) [CommRing R] [Algebra F R] {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E) :
-    Matrix (Fin M × Fin d) (Fin a × Fin d) R :=
-  fun p q => crd b R (((1 : R) ⊗ₜ[F] b q.2) * X q.1 p.1) p.2
+def wMat (R : Type) [CommRing R] [Algebra F R] {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E)
+    : Matrix (Fin M × Fin d) (Fin a × Fin d) R := fun p q =>
+  crd b R (((1 : R) ⊗ₜ[F] b q.2) * X q.1 p.1) p.2
 
-theorem wMat_mulVec (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
-    (X : Fin a → Fin M → R ⊗[F] E) (c : Fin a × Fin d → R) (j : Fin M) (l : Fin d) :
-    (wMat b R X *ᵥ c) (j, l) =
-      crd b R (∑ i, (∑ k, c (i, k) • ((1 : R) ⊗ₜ[F] b k)) * X i j) l := by
+theorem wMat_mulVec
+    (R : Type) [CommRing R] [Algebra F R]
+    {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E) (c : Fin a × Fin d → R) (j : Fin M)
+    (l : Fin d)
+    : (wMat b R X *ᵥ c) (j, l)
+      = crd b R (∑ i, (∑ k, c (i, k) • ((1 : R) ⊗ₜ[F] b k)) * X i j) l := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, wMat, crd, Finset.sum_mul, smul_mul_assoc, map_sum, map_smul,
-    Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul, Fintype.sum_prod_type]
+    simp only [Matrix.mulVec, dotProduct, wMat, crd, Finset.sum_mul, smul_mul_assoc, map_sum,
+      map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul,
+      Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
   ring
 
-theorem wMat_mulVec_eq_zero (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
-    (X : Fin a → Fin M → R ⊗[F] E) (c : Fin a × Fin d → R) :
-    wMat b R X *ᵥ c = 0 ↔ ∀ j, ∑ i, (∑ k, c (i, k) • ((1 : R) ⊗ₜ[F] b k)) * X i j = 0 := by
+theorem wMat_mulVec_eq_zero
+    (R : Type) [CommRing R] [Algebra F R]
+    {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E) (c : Fin a × Fin d → R)
+    : wMat b R X *ᵥ c = 0 ↔ ∀ j, ∑ i, (∑ k, c (i, k) • ((1 : R) ⊗ₜ[F] b k)) * X i j = 0 := by
   constructor
   · intro h j
     apply (Algebra.TensorProduct.basis R b).repr.injective
@@ -134,9 +147,8 @@ theorem wMat_mulVec_eq_zero (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
     rw [wMat_mulVec, h j]
     simp [crd]
 
-theorem linIndep_iff (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
-    (X : Fin a → Fin M → R ⊗[F] E) :
-    LinearIndependent (R ⊗[F] E) X ↔ ∀ c, wMat b R X *ᵥ c = 0 → c = 0 := by
+theorem linIndep_iff (R : Type) [CommRing R] [Algebra F R] {a M : ℕ} (X : Fin a → Fin M → R ⊗[F] E)
+    : LinearIndependent (R ⊗[F] E) X ↔ ∀ c, wMat b R X *ᵥ c = 0 → c = 0 := by
   classical
   let B := Algebra.TensorProduct.basis R b
   have hBk : ∀ k, B k = (1 : R) ⊗ₜ[F] b k := fun k => Algebra.TensorProduct.basis_apply b k
@@ -179,26 +191,28 @@ theorem linIndep_iff (R : Type) [CommRing R] [Algebra F R] {a M : ℕ}
     have h4 := congrFun h0 (i, k)
     simpa [c] using h4
 
-variable [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
-  [IsTopologicalRing R]
+variable
+  [FiniteDimensional F E]
+  (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
 
 attribute [local instance] isModTop_tens isTopRing_tens
 
 theorem continuous_crd (k : Fin d) : Continuous (fun y : R ⊗[F] E => crd b R y k) :=
   IsModuleTopology.continuous_of_linearMap ((Algebra.TensorProduct.basis R b).coord k)
 
-theorem continuous_wMat {a M : ℕ} :
-    Continuous (fun X : Fin a → Fin M → R ⊗[F] E => wMat b R X) := by
+theorem continuous_wMat {a M : ℕ}
+    : Continuous (fun X : Fin a → Fin M → R ⊗[F] E => wMat b R X) := by
   refine continuous_matrix fun p q => ?_
   exact (continuous_crd b R p.2).comp
     (continuous_const.mul ((continuous_apply p.1).comp (continuous_apply q.1)))
 
 include b in
-theorem isOpen_linIndep (hU : IsOpen {r : R | IsUnit r}) (hL : LIP R) {a M : ℕ} :
-    IsOpen {X : Fin a → Fin M → R ⊗[F] E | LinearIndependent (R ⊗[F] E) X} := by
-  have e : {X : Fin a → Fin M → R ⊗[F] E | LinearIndependent (R ⊗[F] E) X} =
-      ⋃ P : Matrix (Fin a × Fin d) (Fin M × Fin d) R,
-        (fun X => (P * wMat b R X).det) ⁻¹' {r | IsUnit r} := by
+theorem isOpen_linIndep (hU : IsOpen {r : R | IsUnit r}) (hL : LIP R) {a M : ℕ}
+    : IsOpen {X : Fin a → Fin M → R ⊗[F] E | LinearIndependent (R ⊗[F] E) X} := by
+  have e
+      : {X : Fin a → Fin M → R ⊗[F] E | LinearIndependent (R ⊗[F] E) X}
+        = ⋃ P : Matrix (Fin a × Fin d) (Fin M × Fin d) R,
+            (fun X => (P * wMat b R X).det) ⁻¹' {r | IsUnit r} := by
     ext X
     simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_preimage]
     rw [linIndep_iff b]
@@ -216,11 +230,13 @@ end Free
 
 section Fib
 
-theorem sfinite_of_fib {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V]
-    [OpensMeasurableSpace V] [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V]
-    [TopologicalSpace X] [MeasurableSpace X] {μ : Measure V} {f : V → Y} {ι : X → Y}
-    {U : Set V} (hU : IsOpen U) {ν : Measure X} {fib : X → Measure V}
-    (h : IsFibreFamily μ f ι U ν Set.univ fib) (b : X) : SFinite (fib b) := by
+theorem sfinite_of_fib
+    {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [OpensMeasurableSpace V] [T2Space V]
+    [LocallyCompactSpace V] [SecondCountableTopology V] [TopologicalSpace X] [MeasurableSpace X]
+    {μ : Measure V} {f : V → Y} {ι : X → Y} {U : Set V} (hU : IsOpen U)
+    {ν : Measure X} {fib : X → Measure V} (h : IsFibreFamily μ f ι U ν Set.univ fib)
+    (b : X)
+    : SFinite (fib b) := by
   classical
   obtain ⟨hconc, -, hint⟩ := h
   have hsub : Uᶜ ⊆ (f ⁻¹' {ι b} ∩ U)ᶜ := fun x hx hx' => hx hx'.2
@@ -228,8 +244,9 @@ theorem sfinite_of_fib {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V]
   have hK : ∀ K : Set V, IsCompact K → K ⊆ U → fib b K < ⊤ := by
     intro K hKc hKU
     obtain ⟨L, hLc, hKL, hLU⟩ := exists_compact_between hKc hU hKU
-    obtain ⟨g, hg1, hg0, hgc, -⟩ := exists_continuous_one_zero_of_isCompact hKc
-      isOpen_interior.isClosed_compl (Set.disjoint_compl_right_iff_subset.mpr hKL)
+    obtain ⟨g, hg1, hg0, hgc, -⟩ :=
+      exists_continuous_one_zero_of_isCompact hKc isOpen_interior.isClosed_compl
+        (Set.disjoint_compl_right_iff_subset.mpr hKL)
     have hsupp : Function.support g ⊆ interior L := by
       intro x hx
       by_contra hn
@@ -277,12 +294,10 @@ section Main
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
 theorem finDim_FE : FiniteDimensional F E := by
-  first
-  | infer_instance
-  | exact Module.Finite.of_restrictScalars_finite ℚ F E
+  first | infer_instance | exact Module.Finite.of_restrictScalars_finite ℚ F E
 
-theorem isOpen_indep (v : HeightOneSpectrum (𝓞 F)) (n a : ℕ) :
-    IsOpen (IndepV (E := E) (n := n) v a) := by
+theorem isOpen_indep (v : HeightOneSpectrum (𝓞 F)) (n a : ℕ)
+    : IsOpen (IndepV (E := E) (n := n) v a) := by
   haveI : FiniteDimensional F E := finDim_FE
   exact isOpen_linIndep (Module.finBasis F E) (Fv F v) (isOpen_units_Fv v) (lip_field _)
 

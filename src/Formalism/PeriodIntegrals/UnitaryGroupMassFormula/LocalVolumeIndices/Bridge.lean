@@ -11,7 +11,8 @@ noncomputable section
 
 namespace PI.MassDataKppVolLemmas
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures NumberField IsDedekindDomain Formalism.L2.SG.AdBridge
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures NumberField IsDedekindDomain Formalism.L2.SG.AdBridge
 open scoped TensorProduct Matrix
 open Formalism.MainNotions.S (AutInst)
 
@@ -20,35 +21,44 @@ variable (I : AutInst) (hb : AdBridgeIso I)
 def tf (x : I.Gf) : HA (Af I.F) I.cm.sig I.J := (splitA I.cm.sig I.J (toHA I hb (1, x))).2
 
 def tfHom : I.Gf →* HA (Af I.F) I.cm.sig I.J :=
-  (MonoidHom.snd _ _).comp ((splitA I.cm.sig I.J).comp
-    ((toHA I hb : I.GA →* HAd I).comp (MonoidHom.inr _ _)))
+  (MonoidHom.snd _ _).comp
+    ((splitA I.cm.sig I.J).comp ((toHA I hb : I.GA →* HAd I).comp (MonoidHom.inr _ _)))
 
 theorem Bridge_tfHom_apply (x : I.Gf) : tfHom I hb x = tf I hb x := rfl
 
-def swapE : I.E ⊗[I.F] Af I.F ≃ₐ[I.F] Af I.F ⊗[I.F] I.E := Algebra.TensorProduct.comm I.F I.E (Af I.F)
+def swapE : I.E ⊗[I.F] Af I.F ≃ₐ[I.F] Af I.F ⊗[I.F] I.E :=
+  Algebra.TensorProduct.comm I.F I.E (Af I.F)
 
-theorem Bridge_tens_eq (t : AF I.F ⊗[I.F] I.E) :
-    tensMap (E := I.E) (sndA I.F) t = swapE I (tauF I t) := by
+theorem Bridge_tens_eq (t : AF I.F ⊗[I.F] I.E)
+    : tensMap (E := I.E) (sndA I.F) t = swapE I (tauF I t) := by
   induction t using TensorProduct.induction_on with
   | zero => simp
   | tmul a e =>
-    simp [tensMap, tauF, swapE, Algebra.TensorProduct.lift_tmul, Algebra.TensorProduct.tmul_mul_tmul]
+    simp [tensMap, tauF, swapE, Algebra.TensorProduct.lift_tmul,
+      Algebra.TensorProduct.tmul_mul_tmul]
   | add s u hs hu => rw [map_add (f := _), map_add (f := _), map_add (f := _), hs, hu]
 
-
 variable {I} in
-theorem Bridge_HA_ext {R : Type} [CommRing R] [Algebra I.F R] (g h : HA R I.cm.sig I.J)
-    (e : ((HA.mat R I.cm.sig I.J g : GL (Fin I.n) (R ⊗[I.F] I.E)) : Matrix (Fin I.n) (Fin I.n) (R ⊗[I.F] I.E)) =
-      ((HA.mat R I.cm.sig I.J h : GL (Fin I.n) (R ⊗[I.F] I.E)) : Matrix (Fin I.n) (Fin I.n) (R ⊗[I.F] I.E))) :
-    g = h := Subtype.ext (Units.ext e)
+theorem Bridge_HA_ext
+    {R : Type} [CommRing R] [Algebra I.F R]
+    (g h : HA R I.cm.sig I.J)
+    (e : ((HA.mat R I.cm.sig I.J g : GL (Fin I.n) (R ⊗[I.F] I.E))
+        : Matrix (Fin I.n) (Fin I.n) (R ⊗[I.F] I.E))
+      = ((HA.mat R I.cm.sig I.J h : GL (Fin I.n) (R ⊗[I.F] I.E))
+        : Matrix (Fin I.n) (Fin I.n) (R ⊗[I.F] I.E)))
+    : g = h :=
+  Subtype.ext (Units.ext e)
 
-theorem Bridge_mat (x : I.Gf) :
-    ((HA.mat (Af I.F) I.cm.sig I.J (tf I hb x) : GL (Fin I.n) (Af I.F ⊗[I.F] I.E)) :
-      Matrix (Fin I.n) (Fin I.n) _) = (I.fmat x).map (swapE I) := by
+theorem Bridge_mat (x : I.Gf)
+    : ((HA.mat (Af I.F) I.cm.sig I.J (tf I hb x) : GL (Fin I.n) (Af I.F ⊗[I.F] I.E))
+        : Matrix (Fin I.n) (Fin I.n) _)
+      = (I.fmat x).map (swapE I) := by
   have hB : I.fmat x = (hmat I (toHA I hb (1, x))).map (tauF I) := (hb.choose_spec (1, x)).2
-  have h1 : ((HA.mat (Af I.F) I.cm.sig I.J (tf I hb x) : GL (Fin I.n) (Af I.F ⊗[I.F] I.E)) :
-      Matrix (Fin I.n) (Fin I.n) (Af I.F ⊗[I.F] I.E)) =
-      (hmat I (toHA I hb (1, x))).map (tensMap (E := I.E) (sndA I.F)) := rfl
+  have h1
+      : ((HA.mat (Af I.F) I.cm.sig I.J (tf I hb x) : GL (Fin I.n) (Af I.F ⊗[I.F] I.E))
+          : Matrix (Fin I.n) (Fin I.n) (Af I.F ⊗[I.F] I.E))
+        = (hmat I (toHA I hb (1, x))).map (tensMap (E := I.E) (sndA I.F)) :=
+    rfl
   rw [h1, hB, Matrix.map_map]
   ext i j
   exact Bridge_tens_eq I _
@@ -81,12 +91,10 @@ theorem Bridge_tf_surjective : Function.Surjective (tf I hb) := by
   rw [Bridge_mat]
   ext i j
   change swapE I (φ _) = _
-  first
-    | exact (swapE I).apply_symm_apply _
-    | simp [φ]
+  first | exact (swapE I).apply_symm_apply _ | simp [φ]
 
-theorem Bridge_mem_Kf_iff (x : I.Gf) :
-    tf I hb x ∈ Kf I.cm.sig I.J (I.L : Set (Fin I.n → I.E)) ↔ x ∈ I.Kset := by
+theorem Bridge_mem_Kf_iff (x : I.Gf)
+    : tf I hb x ∈ Kf I.cm.sig I.J (I.L : Set (Fin I.n → I.E)) ↔ x ∈ I.Kset := by
   have hF := adelic_compact_finite_places I (toHA I hb (1, x))
   have hx : I.fmat x = ofHAFin I (toHA I hb (1, x)) := (toHA_isBridge I hb (1, x)).2
   have hK : x ∈ I.Kset ↔ ∀ y, y ∈ I.Lf ↔ ofHAFin I (toHA I hb (1, x)) *ᵥ y ∈ I.Lf := by

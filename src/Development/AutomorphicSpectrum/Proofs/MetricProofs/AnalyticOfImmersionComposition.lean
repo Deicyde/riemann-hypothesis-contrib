@@ -7,20 +7,23 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SameOrbitRefl
 
 namespace GlobalTheory.CompanionTheory.Metric.Rigid
 
-theorem analyticAt_of_comp_immersion {e : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
-    [FiniteDimensional ℂ V] (F : (Fin e → ℂ) → Fin e → ℂ) (ψ : (Fin e → ℂ) → V)
-    (H : (Fin e → ℂ) → V) (y₀ : Fin e → ℂ) (hψ : AnalyticAt ℂ ψ (F y₀))
-    (hker : (fderiv ℂ ψ (F y₀)).ker = ⊥) (hH : AnalyticAt ℂ H y₀) (hF : ContinuousAt F y₀)
-    (hEq : ∀ᶠ y in nhds y₀, ψ (F y) = H y) : AnalyticAt ℂ F y₀ := by
+theorem analyticAt_of_comp_immersion
+    {e : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
+    (F : (Fin e → ℂ) → Fin e → ℂ) (ψ : (Fin e → ℂ) → V) (H : (Fin e → ℂ) → V) (y₀ : Fin e → ℂ)
+    (hψ : AnalyticAt ℂ ψ (F y₀)) (hker : (fderiv ℂ ψ (F y₀)).ker = ⊥) (hH : AnalyticAt ℂ H y₀)
+    (hF : ContinuousAt F y₀) (hEq : ∀ᶠ y in nhds y₀, ψ (F y) = H y)
+    : AnalyticAt ℂ F y₀ := by
   classical
-  obtain ⟨P₀, hP₀⟩ := ((fderiv ℂ ψ (F y₀) : (Fin e → ℂ) →L[ℂ] V) :
-    (Fin e → ℂ) →ₗ[ℂ] V).exists_leftInverse_of_injective hker
+  obtain ⟨P₀, hP₀⟩ :=
+    ((fderiv ℂ ψ (F y₀) : (Fin e → ℂ) →L[ℂ] V)
+      : (Fin e → ℂ) →ₗ[ℂ] V).exists_leftInverse_of_injective hker
   let P : V →L[ℂ] (Fin e → ℂ) := LinearMap.toContinuousLinearMap P₀
   have hPL : P.comp (fderiv ℂ ψ (F y₀)) = ContinuousLinearMap.id ℂ _ := by
     ext1 v
     exact LinearMap.congr_fun hP₀ v
   have hψd : HasFDerivAt ψ (fderiv ℂ ψ (F y₀)) (F y₀) := hψ.differentiableAt.hasFDerivAt
-  have hgd : HasFDerivAt (fun x => P (ψ x))
+  have hgd : HasFDerivAt
+      (fun x => P (ψ x))
       ((ContinuousLinearEquiv.refl ℂ (Fin e → ℂ) : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ))) (F y₀) := by
     have h1 := P.hasFDerivAt.comp (F y₀) hψd
     rw [hPL] at h1

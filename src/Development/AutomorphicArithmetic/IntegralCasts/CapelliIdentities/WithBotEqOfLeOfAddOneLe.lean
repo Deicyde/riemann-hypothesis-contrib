@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Ydd3.withBot_eq_of_le_of_add_one_le :
-    ∀ {x : WithBot ℕ∞} {c : ℕ},
-      (↑c : WithBot ℕ∞) ≤ x → x + (1 : WithBot ℕ∞) ≤ (↑(c + (1 : ℕ)) : WithBot ℕ∞) → x = (↑c : WithBot ℕ∞) := by
+theorem UpperTheory.Reformulated.B.Ydd3.withBot_eq_of_le_of_add_one_le
+    : ∀ {x : WithBot ℕ∞} {c : ℕ},
+      (↑c : WithBot ℕ∞) ≤ x → x + (1 : WithBot ℕ∞) ≤ (↑(c + (1 : ℕ)) : WithBot ℕ∞)
+        → x = (↑c : WithBot ℕ∞) := by
   intro x c h1 h2
   induction x using WithBot.recBotCoe with
   | bot => exact le_antisymm bot_le h1

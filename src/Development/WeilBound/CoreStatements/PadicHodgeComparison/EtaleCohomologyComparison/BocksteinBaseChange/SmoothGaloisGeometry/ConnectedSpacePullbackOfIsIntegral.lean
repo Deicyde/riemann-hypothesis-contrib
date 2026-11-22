@@ -13,17 +13,20 @@ open CategoryTheory Limits AlgebraicGeometry TopologicalSpace
 
 namespace CrystallineSemistableComparison
 
-theorem connectedSpace_pullback_of_isIntegral {O : Type} [CommRing O] [IsDomain O] {X T : Scheme.{0}}
-    (p : X ⟶ Spec (CommRingCat.of O)) (j : T ⟶ Spec (CommRingCat.of O)) [IsOpenImmersion j] [Nonempty T]
-    [IsIntegral X] (hp : GeneralizingMap p) : ConnectedSpace ↥(pullback p j) := by
+theorem connectedSpace_pullback_of_isIntegral
+    {O : Type} [CommRing O] [IsDomain O]
+    {X T : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of O)) (j : T ⟶ Spec (CommRingCat.of O))
+    [IsOpenImmersion j] [Nonempty T] [IsIntegral X]
+    (hp : GeneralizingMap p)
+    : ConnectedSpace ↥(pullback p j) := by
   have hne : Nonempty ↥(pullback p j) := by
     obtain ⟨x⟩ := (inferInstance : Nonempty X)
     have hη : genericPoint (Spec (CommRingCat.of O)) ⤳ p x := genericPoint_specializes _
     obtain ⟨x', -, hx'⟩ := hp hη
     have hmem : genericPoint (Spec (CommRingCat.of O)) ∈ Set.range j := by
       obtain ⟨t⟩ := (inferInstance : Nonempty T)
-      exact ((genericPoint_spec (Spec (CommRingCat.of O))).mem_open_set_iff j.isOpenEmbedding.isOpen_range).mpr
-        ⟨j t, trivial, t, rfl⟩
+      exact ((genericPoint_spec (Spec (CommRingCat.of O))).mem_open_set_iff
+        j.isOpenEmbedding.isOpen_range).mpr ⟨j t, trivial, t, rfl⟩
     obtain ⟨t, ht⟩ := hmem
     obtain ⟨z, -, -⟩ := Scheme.Pullback.exists_preimage_pullback x' t (hx'.trans ht.symm)
     exact ⟨z⟩
@@ -38,12 +41,16 @@ variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)}
 
 abbrev Model.sub (M : Model l K) (U : M.X.Opens) : Model l K := ⟨U.toScheme, U.ι ≫ M.p⟩
 
-theorem compM_of (G : Model l K → Prop)
+theorem compM_of
+    (G : Model l K → Prop)
     (hj : IsOpenImmersion (Spec.map (CommRingCat.ofHom (OK l K).subtype)))
     (hsub : ∀ M, G M → ∀ U : M.X.Opens, IsClosed (U : Set M.X) → G (M.sub U))
     (hN : ∀ M, G M → NoetherianSpace M.X)
-    (hF : ∀ M, G M → GlobalTheory.IsNormalScheme M.X ∧ IsLocallyNoetherian M.X ∧ GeneralizingMap M.p ∧ Smooth M.q) :
-    CompM G := by
+    (hF : ∀ M,
+      G M
+        → GlobalTheory.IsNormalScheme M.X ∧ IsLocallyNoetherian M.X ∧ GeneralizingMap M.p
+          ∧ Smooth M.q)
+    : CompM G := by
   intro M hM
   have := hN M hM
   obtain ⟨r, U, hU, hc⟩ := exists_isSum_components M.X

@@ -19,7 +19,8 @@ theorem main : GroundTheory.Heights₂.Heights.NumbersDVR.FlagModelJoinLeftAlt.S
     GroundTheory.Heights₂.Heights.NumbersDVR.JoinVerticalDivisor.proof
     (GroundTheory.Heights₂.Heights.NumbersDVR.FlagPairJoinLeft.proof
       GroundTheory.Heights₂.Heights.NumbersDVR.JoinVerticalDivisorLeft.proof)
-    (GroundTheory.Heights₂.Heights.NumbersDVR.PairNumberJoinLeft.proof GlobalTheory.T.pair_number_pullback
+    (GroundTheory.Heights₂.Heights.NumbersDVR.PairNumberJoinLeft.proof
+      GlobalTheory.T.pair_number_pullback
       GroundTheory.Heights₂.Heights.NumbersDVR.JoinVerticalDivisorLeft.proof
       GroundTheory.Heights₂.Heights.NumbersDVR.BirationalJoin.proof)
 

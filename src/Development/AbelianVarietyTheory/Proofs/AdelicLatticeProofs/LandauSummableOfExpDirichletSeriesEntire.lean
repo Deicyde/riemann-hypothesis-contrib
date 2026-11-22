@@ -9,10 +9,10 @@ open scoped ContDiff nonZeroDivisors
 
 namespace GlobalTheory
 
-private theorem hasSum_prod_fin_pow {ι : Type} (z : ι → ℂ) (g : ℂ)
-    (hz : Summable fun i => ‖z i‖) (h : HasSum z g) (n : ℕ) :
-    HasSum (fun f : Fin n → ι => ∏ k, z (f k)) (g ^ n) ∧
-      Summable fun f : Fin n → ι => ‖∏ k, z (f k)‖ := by
+private theorem hasSum_prod_fin_pow
+    {ι : Type} (z : ι → ℂ) (g : ℂ) (hz : Summable fun i => ‖z i‖) (h : HasSum z g) (n : ℕ)
+    : HasSum (fun f : Fin n → ι => ∏ k, z (f k)) (g ^ n)
+      ∧ Summable fun f : Fin n → ι => ‖∏ k, z (f k)‖ := by
   induction n with
   | zero =>
     refine ⟨?_, (hasSum_fintype _).summable⟩
@@ -25,71 +25,86 @@ private theorem hasSum_prod_fin_pow {ι : Type} (z : ι → ℂ) (g : ℂ)
       change ∏ k, z ((Fin.cons x.1 x.2 : Fin (n + 1) → ι) k) = _
       rw [Fin.prod_univ_succ]
       simp only [Fin.cons_zero, Fin.cons_succ]
-    have hfun : (fun f : Fin (n + 1) → ι => ∏ k, z (f k)) ∘ e =
-        fun x : ι × (Fin n → ι) => z x.1 * ∏ k, z (x.2 k) := funext key
-    have hnorm : (fun f : Fin (n + 1) → ι => ‖∏ k, z (f k)‖) ∘ e =
-        fun x : ι × (Fin n → ι) => ‖z x.1‖ * ‖∏ k, z (x.2 k)‖ := by
+    have hfun
+        : (fun f : Fin (n + 1) → ι => ∏ k, z (f k)) ∘ e
+          = fun x : ι × (Fin n → ι) => z x.1 * ∏ k, z (x.2 k) :=
+      funext key
+    have hnorm
+        : (fun f : Fin (n + 1) → ι => ‖∏ k, z (f k)‖) ∘ e
+          = fun x : ι × (Fin n → ι) => ‖z x.1‖ * ‖∏ k, z (x.2 k)‖ := by
       funext x
       rw [← norm_mul, ← key x]
       rfl
     refine ⟨?_, ?_⟩
     · have H : HasSum (fun x : ι × (Fin n → ι) => z x.1 * ∏ k, z (x.2 k)) (g * g ^ n) :=
-        HasSum.mul (f := z) (g := fun f : Fin n → ι => ∏ k, z (f k)) h ih₁
+        HasSum.mul (f := z)
+          (g := fun f : Fin n → ι => ∏ k, z (f k))
+          h ih₁
           (summable_mul_of_summable_norm (f := z) (g := fun f : Fin n → ι => ∏ k, z (f k)) hz ih₂)
       rw [← hfun] at H
       rw [pow_succ']
       exact (Equiv.hasSum_iff e).mp H
     · have H : Summable (fun x : ι × (Fin n → ι) => ‖z x.1‖ * ‖∏ k, z (x.2 k)‖) :=
-        Summable.mul_of_nonneg (f := fun i => ‖z i‖) (g := fun f : Fin n → ι => ‖∏ k, z (f k)‖)
-          hz ih₂ (fun i => norm_nonneg (z i)) (fun f => norm_nonneg _)
+        Summable.mul_of_nonneg
+          (f := fun i => ‖z i‖)
+          (g := fun f : Fin n → ι => ‖∏ k, z (f k)‖)
+          hz ih₂
+          (fun i => norm_nonneg (z i))
+          (fun f => norm_nonneg _)
       rw [← hnorm] at H
       exact (Equiv.summable_iff e).mp H
 
-
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
-theorem _root_.GlobalTheory.hasSum_tuple_prod_exp {ι : Type} (z : ι → ℂ) (g : ℂ) (h : HasSum z g) :
-    HasSum (fun p : (Σ n : ℕ, Fin n → ι) => (∏ k, z (p.2 k)) / (p.1.factorial : ℂ))
+theorem _root_.GlobalTheory.hasSum_tuple_prod_exp {ι : Type} (z : ι → ℂ) (g : ℂ) (h : HasSum z g)
+    : HasSum
+      (fun p : (Σ n : ℕ, Fin n → ι) => (∏ k, z (p.2 k)) / (p.1.factorial : ℂ))
       (Complex.exp g) := by
   have hz : Summable fun i => ‖z i‖ := summable_norm_iff.mpr h.summable
   have hz' : HasSum (fun i => ((‖z i‖ : ℝ) : ℂ)) ((∑' i, ‖z i‖ : ℝ) : ℂ) :=
     Complex.hasSum_ofReal.mpr hz.hasSum
-  have hzn : Summable fun i => ‖((‖z i‖ : ℝ) : ℂ)‖ := by
-    simpa using hz
+  have hzn : Summable fun i => ‖((‖z i‖ : ℝ) : ℂ)‖ := by simpa using hz
   have fibr : ∀ n, HasSum (fun f : Fin n → ι => ‖∏ k, z (f k)‖) ((∑' i, ‖z i‖) ^ n) := by
     intro n
     have h1 := (hasSum_prod_fin_pow _ _ hzn hz' n).1
-    have h2 : (fun f : Fin n → ι => ∏ k, ((‖z (f k)‖ : ℝ) : ℂ)) =
-        fun f => ((‖∏ k, z (f k)‖ : ℝ) : ℂ) := by
+    have h2
+        : (fun f : Fin n → ι => ∏ k, ((‖z (f k)‖ : ℝ) : ℂ))
+          = fun f => ((‖∏ k, z (f k)‖ : ℝ) : ℂ) := by
       funext f
       rw [norm_prod, Complex.ofReal_prod]
     rw [h2, ← Complex.ofReal_pow] at h1
     exact Complex.hasSum_ofReal.mp h1
-  have hsum : Summable fun p : (Σ n : ℕ, Fin n → ι) =>
-      (∏ k, z (p.2 k)) / (p.1.factorial : ℂ) := by
+  have hsum : Summable fun p : (Σ n : ℕ, Fin n → ι) => (∏ k, z (p.2 k)) / (p.1.factorial : ℂ) := by
     apply Summable.of_norm
     rw [summable_sigma_of_nonneg (fun _ => norm_nonneg _)]
     refine ⟨fun n => ?_, ?_⟩
     · simp only [norm_div, Complex.norm_natCast]
       exact (fibr n).summable.div_const _
     · simp only [norm_div, Complex.norm_natCast]
-      have hn : ∀ n : ℕ, ∑' f : Fin n → ι, ‖∏ k, z (f k)‖ / (n.factorial : ℝ) =
-          (∑' i, ‖z i‖) ^ n / n.factorial := fun n => ((fibr n).div_const _).tsum_eq
+      have hn
+          : ∀ n : ℕ,
+            ∑' f : Fin n → ι, ‖∏ k, z (f k)‖ / (n.factorial : ℝ)
+              = (∑' i, ‖z i‖) ^ n / n.factorial := fun n =>
+        ((fibr n).div_const _).tsum_eq
       simp only [hn]
       exact Real.summable_pow_div_factorial _
   have hexp : HasSum (fun n : ℕ => g ^ n / (n.factorial : ℂ)) (Complex.exp g) := by
     rw [Complex.exp_eq_exp_ℂ]
     exact NormedSpace.expSeries_div_hasSum_exp g
   exact HasSum.sigma_of_hasSum hexp
-    (fun n => ((hasSum_prod_fin_pow z g hz h n).1.div_const (n.factorial : ℂ))) hsum
-
+    (fun n => ((hasSum_prod_fin_pow z g hz h n).1.div_const (n.factorial : ℂ)))
+    hsum
 
 open NumberField IsDedekindDomain NumberField.mixedEmbedding MeasureTheory Complex Classical in
 open scoped ContDiff nonZeroDivisors in
-theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → ℝ) (F : ℂ → ℂ),
-    (∀ i, 0 ≤ a i) → (∀ i, 0 ≤ l i) → Differentiable ℂ F →
-    (∀ s : ℂ, 1 < s.re → ∃ g : ℂ, HasSum (fun i => (a i : ℂ) * Complex.exp (-(l i : ℂ) * s)) g ∧
-      F s = Complex.exp g) → Summable a := by
+theorem _root_.GlobalTheory.landau_exp_summable
+    : ∀ (ι : Type) (a l : ι → ℝ) (F : ℂ → ℂ),
+      (∀ i, 0 ≤ a i) → (∀ i, 0 ≤ l i) → Differentiable ℂ F
+        → (∀ s : ℂ,
+          1 < s.re
+            → ∃ g : ℂ,
+              HasSum (fun i => (a i : ℂ) * Complex.exp (-(l i : ℂ) * s)) g ∧ F s = Complex.exp g)
+        → Summable a := by
   intro ι a l F ha hl hF hD
   let b : (Σ n : ℕ, Fin n → ι) → ℝ := fun p => (∏ k, a (p.2 k)) / (p.1.factorial : ℝ)
   let L : (Σ n : ℕ, Fin n → ι) → ℝ := fun p => ∑ k, l (p.2 k)
@@ -97,15 +112,16 @@ theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → 
     div_nonneg (Finset.prod_nonneg fun k _ => ha _) (Nat.cast_nonneg _)
   have hL : ∀ p, 0 ≤ L p := fun p => Finset.sum_nonneg fun k _ => hl _
 
-  have hA : ∀ s : ℂ, 1 < s.re →
-      HasSum (fun p => (b p : ℂ) * Complex.exp (-(L p : ℂ) * s)) (F s) := by
+  have hA
+      : ∀ s : ℂ, 1 < s.re → HasSum (fun p => (b p : ℂ) * Complex.exp (-(L p : ℂ) * s)) (F s) := by
     intro s hs
     obtain ⟨g, hg, hFg⟩ := hD s hs
     rw [hFg]
     have H := _root_.GlobalTheory.hasSum_tuple_prod_exp _ g hg
-    have heq : (fun p : (Σ n : ℕ, Fin n → ι) =>
-        (∏ k, (a (p.2 k) : ℂ) * Complex.exp (-(l (p.2 k) : ℂ) * s)) / (p.1.factorial : ℂ)) =
-        fun p => (b p : ℂ) * Complex.exp (-(L p : ℂ) * s) := by
+    have heq
+        : (fun p : (Σ n : ℕ, Fin n → ι) =>
+            (∏ k, (a (p.2 k) : ℂ) * Complex.exp (-(l (p.2 k) : ℂ) * s)) / (p.1.factorial : ℂ))
+          = fun p => (b p : ℂ) * Complex.exp (-(L p : ℂ) * s) := by
       funext p
       have hsum : ∑ k, (-(l (p.2 k) : ℂ) * s) = -(L p : ℂ) * s := by
         simp only [L, Complex.ofReal_sum, Finset.sum_mul, Finset.sum_neg_distrib, neg_mul]
@@ -117,8 +133,9 @@ theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → 
   have hB : ∀ σ : ℝ, 1 < σ → Summable fun p => b p * Real.exp (-(L p * σ)) := by
     intro σ hσ
     have H := (hA σ (by simpa using hσ)).summable
-    have heq : (fun p => (b p : ℂ) * Complex.exp (-(L p : ℂ) * (σ : ℂ))) =
-        fun p => ((b p * Real.exp (-(L p * σ)) : ℝ) : ℂ) := by
+    have heq
+        : (fun p => (b p : ℂ) * Complex.exp (-(L p : ℂ) * (σ : ℂ)))
+          = fun p => ((b p * Real.exp (-(L p * σ)) : ℝ) : ℂ) := by
       funext p
       rw [Complex.ofReal_mul, Complex.ofReal_exp]
       push_cast
@@ -147,21 +164,23 @@ theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → 
     exact H
   have hK : ∀ t, 0 ≤ t → ∀ n, Summable fun p => T t (p, n) := by
     intro t ht n
-    refine Summable.of_nonneg_of_le (fun p => hT t ht (p, n)) (fun p => ?_)
+    refine Summable.of_nonneg_of_le
+      (fun p => hT t ht (p, n))
+      (fun p => ?_)
       ((hB (7 / 4) (by norm_num)).mul_left ((4 * t) ^ n))
     have hLp := hL p
     have h1 : (L p * t) ^ n / (n.factorial : ℝ) = (4 * t) ^ n * ((L p / 4) ^ n / n.factorial) := by
       rw [show L p * t = (4 * t) * (L p / 4) by ring, mul_pow, mul_div_assoc]
     have h2 : (L p / 4) ^ n / (n.factorial : ℝ) ≤ Real.exp (L p / 4) :=
       Real.pow_div_factorial_le_exp _ (by positivity) n
-    have h3 : b p * Real.exp (-(2 * L p)) * ((4 * t) ^ n * Real.exp (L p / 4)) =
-        (4 * t) ^ n * (b p * Real.exp (-(L p * (7 / 4)))) := by
+    have h3
+        : b p * Real.exp (-(2 * L p)) * ((4 * t) ^ n * Real.exp (L p / 4))
+          = (4 * t) ^ n * (b p * Real.exp (-(L p * (7 / 4)))) := by
       rw [show -(L p * (7 / 4)) = -(2 * L p) + L p / 4 by ring, Real.exp_add]
       ring
     change b p * Real.exp (-(2 * L p)) * ((L p * t) ^ n / (n.factorial : ℝ)) ≤ _
     rw [h1, ← h3]
-    exact mul_le_mul_of_nonneg_left
-      (mul_le_mul_of_nonneg_left h2 (pow_nonneg (by linarith) n))
+    exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h2 (pow_nonneg (by linarith) n))
       (mul_nonneg (hb p) (Real.exp_pos _).le)
   have hK2 : ∀ t, 0 ≤ t → t < 1 → Summable (T t) := by
     intro t ht ht1
@@ -169,11 +188,9 @@ theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → 
     refine ⟨fun p => (hfib t p).summable, ?_⟩
     simp only [fun p => (hfib t p).tsum_eq]
     exact hB (2 - t) (by linarith)
-  have hK2' : ∀ t, 0 ≤ t → t < 1 →
-      Summable fun n => ∑' p, T t (p, n) := by
+  have hK2' : ∀ t, 0 ≤ t → t < 1 → Summable fun n => ∑' p, T t (p, n) := by
     intro t ht ht1
-    have hs : Summable fun q : ℕ × (Σ n : ℕ, Fin n → ι) => T t q.swap :=
-      (hK2 t ht ht1).prod_symm
+    have hs : Summable fun q : ℕ × (Σ n : ℕ, Fin n → ι) => T t q.swap := (hK2 t ht ht1).prod_symm
     exact ((summable_prod_of_nonneg (fun q => hT t ht q.swap)).mp hs).2
 
   let r : ℕ → ℝ := fun n => ∑' p, T 1 (p, n)
@@ -183,13 +200,12 @@ theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → 
     refine ENNReal.le_of_forall_nnreal_lt fun ρ hρ => ?_
     have hρ1 : (ρ : ℝ) < 1 := by exact_mod_cast hρ
     have hρ0 : (0 : ℝ) ≤ ρ := ρ.2
-    refine FormalMultilinearSeries.le_radius_of_bound _
-      (∑' m, ∑' p, T ρ (p, m)) fun n => ?_
-    rw [FormalMultilinearSeries.ofScalars_norm_eq_mul,
-      ContinuousMultilinearMap.norm_mkPiAlgebraFin, mul_one]
+    refine FormalMultilinearSeries.le_radius_of_bound _ (∑' m, ∑' p, T ρ (p, m)) fun n => ?_
+    rw [FormalMultilinearSeries.ofScalars_norm_eq_mul, ContinuousMultilinearMap.norm_mkPiAlgebraFin,
+      mul_one]
     have hcn : ‖c n‖ = r n := by
-      simp only [c, norm_mul, norm_pow, norm_neg, norm_one, one_pow, one_mul,
-        Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (hr n)]
+      simp only [c, norm_mul, norm_pow, norm_neg, norm_one, one_pow, one_mul, Complex.norm_real,
+        Real.norm_eq_abs, abs_of_nonneg (hr n)]
     have hrn : r n * (ρ : ℝ) ^ n = ∑' p, T ρ (p, n) := by
       simp only [r, ← tsum_mul_right]
       congr 1
@@ -214,12 +230,13 @@ theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → 
       refine Summable.of_norm ?_
       simp only [hEn]
       exact hK2 ‖y‖ (norm_nonneg _) hy1
-    have hfibE : ∀ p, HasSum (fun n => E (p, n))
-        ((b p : ℂ) * Complex.exp (-(L p : ℂ) * (2 + y))) := by
+    have hfibE
+        : ∀ p, HasSum (fun n => E (p, n)) ((b p : ℂ) * Complex.exp (-(L p : ℂ) * (2 + y))) := by
       intro p
       have H := (hexpC (-(L p : ℂ) * y)).mul_left ((b p * Real.exp (-(2 * L p)) : ℝ) : ℂ)
-      have heq : ((b p * Real.exp (-(2 * L p)) : ℝ) : ℂ) * Complex.exp (-(L p : ℂ) * y) =
-          (b p : ℂ) * Complex.exp (-(L p : ℂ) * (2 + y)) := by
+      have heq
+          : ((b p * Real.exp (-(2 * L p)) : ℝ) : ℂ) * Complex.exp (-(L p : ℂ) * y)
+            = (b p : ℂ) * Complex.exp (-(L p : ℂ) * (2 + y)) := by
         rw [Complex.ofReal_mul, Complex.ofReal_exp, mul_assoc, ← Complex.exp_add]
         push_cast
         ring_nf
@@ -230,8 +247,7 @@ theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → 
       rw [Complex.add_re]
       norm_num
       linarith [abs_le.mp this]
-    have hEsum : ∑' q, E q = F (2 + y) :=
-      (hEs.hasSum.prod_fiberwise hfibE).unique (hA _ hre)
+    have hEsum : ∑' q, E q = F (2 + y) := (hEs.hasSum.prod_fiberwise hfibE).unique (hA _ hre)
     have hsw : HasSum (fun q : ℕ × (Σ n : ℕ, Fin n → ι) => E q.swap) (F (2 + y)) := by
       have ht : ∑' q : ℕ × (Σ n : ℕ, Fin n → ι), E q.swap = ∑' q, E q := by
         rw [← (Equiv.prodComm (Σ n : ℕ, Fin n → ι) ℕ).tsum_eq]
@@ -281,8 +297,8 @@ theorem _root_.GlobalTheory.landau_exp_summable : ∀ (ι : Type) (a l : ι → 
     simpa using this
   have hbsum : Summable b := by
     have := ((summable_prod_of_nonneg (hT 2 (by norm_num))).mp hall').2
-    simp only [fun p => (hfib 2 p).tsum_eq, sub_self, mul_zero, neg_zero, Real.exp_zero,
-      mul_one] at this
+    simp only [fun p => (hfib 2 p).tsum_eq, sub_self, mul_zero, neg_zero, Real.exp_zero, mul_one]
+      at this
     exact this
 
   let j : ι → (Σ n : ℕ, Fin n → ι) := fun i => ⟨1, fun _ => i⟩

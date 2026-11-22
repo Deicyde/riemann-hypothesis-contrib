@@ -12,15 +12,18 @@ noncomputable section
 
 open scoped ENNReal
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology Polynomial
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs GlobalTheory.CompanionTheory.Conc
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.AutomorphicForm
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+  GlobalTheory.CompanionTheory.Conc
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.AutomorphicForm
 open PositivityTheory.Rg.Rs.An PositivityTheory.Rg.Rs.ctstepglue
 
 namespace GlobalTheory.CompanionTheory.Conc
 
-theorem ubnd_ctn {K : Type} [Field K] [NumberField K] {n : ℕ} {ι : Type}
-    {r : ℕ} {f : ι → AdelicGLn.AdelicGL K n → ℂ} {m : ℕ → ℝ} (h : UBnd f m) :
-    UBnd (fun i => An.ctn r (f i)) m := by
+theorem ubnd_ctn
+    {K : Type} [Field K] [NumberField K]
+    {n : ℕ} {ι : Type} {r : ℕ} {f : ι → AdelicGLn.AdelicGL K n → ℂ} {m : ℕ → ℝ} (h : UBnd f m)
+    : UBnd (fun i => An.ctn r (f i)) m := by
   intro ω hω hωB t₀ Q hQ
   obtain ⟨D, hD, hFD⟩ := exists_isCompact_superset_unipFundamentalDomain (K := K) (n := n) (r := r)
   set ω' := (fun p : (UPos n r → NumberField.AdeleRing (𝓞 K) K) × AdelicGLn.AdelicGL K n => unipGL p.1 * p.2) '' (D ×ˢ ω)
@@ -36,10 +39,14 @@ theorem ubnd_ctn {K : Type} [Field K] [NumberField K] {n : ℕ} {ι : Type}
   rw [← mul_assoc, ← mul_assoc]
   exact this.trans (mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.exp_pos _).le)
 
-theorem ubnd_ctn_step : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (ι : Type) (f : ι → AdelicGLn.AdelicGL K n → ℂ) (m : ℕ → ℝ) (r D : ℕ) (κ' κ : ℝ) (p : ι → ℂ[X]),
-  0 < r → r < n → UFam f → UBnd f m → κ' < κ →
-  (∀ i, (p i).Monic ∧ (p i).natDegree ≤ D ∧ An.Kill r (f i) (p i) ∧ ∀ z, (p i).IsRoot z → ‖z‖ ≤ Real.exp κ') →
-  UBnd (fun i => An.ctn r (f i)) (Function.update m r κ) := by
+theorem ubnd_ctn_step
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (ι : Type) (f : ι → AdelicGLn.AdelicGL K n → ℂ)
+        (m : ℕ → ℝ) (r D : ℕ) (κ' κ : ℝ) (p : ι → ℂ[X]),
+      0 < r → r < n → UFam f → UBnd f m → κ' < κ
+        → (∀ i,
+          (p i).Monic ∧ (p i).natDegree ≤ D ∧ An.Kill r (f i) (p i)
+            ∧ ∀ z, (p i).IsRoot z → ‖z‖ ≤ Real.exp κ')
+        → UBnd (fun i => An.ctn r (f i)) (Function.update m r κ) := by
   intro K _ _ n ι f m r D κ' κ pf hr hrn hf hB hκ hpf ω hω hωB t₀ Q hQ
   obtain ⟨C₁, hC₁⟩ := ubnd_ctn (r := r) hB ω hω hωB t₀ Q hQ
   obtain ⟨C₂, hC₂0, hC₂⟩ := GlobalTheory.T.linear_recurrence_growth_bound D κ' κ hκ
@@ -52,8 +59,10 @@ theorem ubnd_ctn_step : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (ι :
   set d := p.natDegree with hd
   set S : ℝ := ∑ r' ∈ (Finset.range n).erase r, m r' * sr x r' with hS
   have hrmem : r ∈ Finset.range n := Finset.mem_range.2 hrn
-  have hsum : ∀ (f : ℕ → ℝ) (y : Fin n → ℝ), (∀ r' ≠ r, f r' = m r') → (∀ r' ≠ r, sr y r' = sr x r') →
-      ∑ r' ∈ Finset.range n, f r' * sr y r' = f r * sr y r + S := by
+  have hsum
+      : ∀ (f : ℕ → ℝ) (y : Fin n → ℝ),
+        (∀ r' ≠ r, f r' = m r') → (∀ r' ≠ r, sr y r' = sr x r')
+          → ∑ r' ∈ Finset.range n, f r' * sr y r' = f r * sr y r + S := by
     intro f y hf hy
     rw [← Finset.add_sum_erase _ _ hrmem, hS]
     congr 1
@@ -73,9 +82,12 @@ theorem ubnd_ctn_step : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (ι :
     refine Finset.sum_congr rfl fun j _ => ?_
     simp only [hu, ← mul_assoc, aR_mul]
     congr 4
-    push_cast; ring
+    push_cast
+    ring
 
-  have hmove : ∀ (t : ℝ) (h : AdelicGLn.AdelicGL K n), ctn r φ (aR K n r t * (b * h)) = ctn r φ (b * (aR K n r t * h)) := by
+  have hmove
+      : ∀ (t : ℝ) (h : AdelicGLn.AdelicGL K n),
+        ctn r φ (aR K n r t * (b * h)) = ctn r φ (b * (aR K n r t * h)) := by
     intro t h
     obtain ⟨X, hX⟩ := borel_aR (r := r) (hωB hb) t
     have : aR K n r t * b = unipGL (-X) * (b * aR K n r t) := by
@@ -90,7 +102,8 @@ theorem ubnd_ctn_step : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (ι :
       rw [hmove, ← mul_assoc (aR K n r j), ← tor_shift, hx',
         show shift r (shift r x (-(i : ℝ))) (j : ℝ) = shift r x ((j : ℝ) - i) from by
           funext l; simp only [shift]; split_ifs <;> ring]
-    have hsr : ∀ r', sr (shift r x ((j : ℝ) - i)) r' = sr x r' + if r' = r then (j : ℝ) - i else 0 :=
+    have hsr
+        : ∀ r', sr (shift r x ((j : ℝ) - i)) r' = sr x r' + if r' = r then (j : ℝ) - i else 0 :=
       sr_shift hr hrn x _
     have hx2 : ∀ r', -t₀ ≤ sr (shift r x ((j : ℝ) - i)) r' := by
       intro r'
@@ -107,16 +120,18 @@ theorem ubnd_ctn_step : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (ι :
     have hv : |sr x r + ((j : ℝ) - i)| ≤ |t₀| + 1 + D := by
       rw [abs_le]; constructor <;> cases abs_cases t₀ <;> linarith
     have hexp : Real.exp (m r * (sr x r + ((j : ℝ) - i))) ≤ E := by
-      rw [hE]; apply Real.exp_le_exp.2
-      calc m r * (sr x r + ((j : ℝ) - i)) ≤ |m r * (sr x r + ((j : ℝ) - i))| := le_abs_self _
+      rw [hE]
+      apply Real.exp_le_exp.2
+      calc
+        m r * (sr x r + ((j : ℝ) - i))
+          ≤ |m r * (sr x r + ((j : ℝ) - i))| := le_abs_self _
         _ = |m r| * |sr x r + ((j : ℝ) - i)| := abs_mul _ _
         _ ≤ |m r| * (|t₀| + 1 + D) := mul_le_mul_of_nonneg_left hv (abs_nonneg _)
     have hC : C₁ ≤ max C₁ 0 := le_max_left _ _
     gcongr
   have hmain := hC₂ p hp hdD hroot u M hrecu hinit hM0 i
   have heq : ctn r φ (b * tor K x * q) = u i := by
-    have : x = shift r x' (i : ℝ) := by
-      funext l; simp only [hx', shift]; split_ifs <;> ring
+    have : x = shift r x' (i : ℝ) := by funext l; simp only [hx', shift]; split_ifs <;> ring
     simp only [hu, hg₀]
     conv_lhs => rw [this, tor_shift]
     rw [mul_assoc b (tor K x') q, hmove]
@@ -127,7 +142,8 @@ theorem ubnd_ctn_step : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (ι :
   rw [hsum (Function.update m r κ) x (fun r' h => Function.update_of_ne h _ _) (fun _ _ => rfl),
     Function.update_self, Real.exp_add, hM]
   have hk : Real.exp (κ * i) ≤ Real.exp (κ * sr x r) * Real.exp (|κ| * (|t₀| + 1)) := by
-    rw [← Real.exp_add]; apply Real.exp_le_exp.2
+    rw [← Real.exp_add]
+    apply Real.exp_le_exp.2
     have : |(i : ℝ) - sr x r| ≤ |t₀| + 1 := by
       rw [abs_le]; constructor <;> cases abs_cases t₀ <;> linarith
     have := mul_le_mul_of_nonneg_left this (abs_nonneg κ)
@@ -135,10 +151,14 @@ theorem ubnd_ctn_step : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (ι :
       rw [← abs_mul]; exact le_abs_self _
     nlinarith
   have hE0 : 0 ≤ max C₁ 0 * E := by positivity
-  calc C₂ * Real.exp (κ * i) * (max C₁ 0 * E * Real.exp S)
-      ≤ C₂ * (Real.exp (κ * sr x r) * Real.exp (|κ| * (|t₀| + 1))) * (max C₁ 0 * E * Real.exp S) := by
-        gcongr
-    _ = C₂ * (max C₁ 0 * E) * Real.exp (|κ| * (|t₀| + 1)) * (Real.exp (κ * sr x r) * Real.exp S) := by ring
+  calc
+    C₂ * Real.exp (κ * i) * (max C₁ 0 * E * Real.exp S)
+        ≤ C₂ * (Real.exp (κ * sr x r) * Real.exp (|κ| * (|t₀| + 1)))
+          * (max C₁ 0 * E * Real.exp S) := by
+      gcongr
+    _ = C₂ * (max C₁ 0 * E) * Real.exp (|κ| * (|t₀| + 1))
+        * (Real.exp (κ * sr x r) * Real.exp S) := by
+      ring
 
 end GlobalTheory.CompanionTheory.Conc
 

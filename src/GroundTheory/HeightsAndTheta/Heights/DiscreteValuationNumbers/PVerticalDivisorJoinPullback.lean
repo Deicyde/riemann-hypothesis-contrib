@@ -18,13 +18,17 @@ section JoinPullback
 
 variable {K K' : Type} {ι : K → Type} {ι' : K' → Type}
 
-theorem joinCoords_inl {Ω : Type*} [Field Ω] (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) (k : K)
-    (i : ι k) : joinCoords y y' ⟨Sum.inl k, i⟩ = y ⟨k, i⟩ := rfl
+theorem joinCoords_inl
+    {Ω : Type*} [Field Ω] (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) (k : K) (i : ι k)
+    : joinCoords y y' ⟨Sum.inl k, i⟩ = y ⟨k, i⟩ :=
+  rfl
 
-theorem pointConeMap_joinCoords_joinForm {Ω : Type*} [Field Ω] (R : Type*) [CommRing R]
-    [Algebra R Ω] (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) (f : MRing ι R) :
-    pointConeMap R (joinCoords y y') (joinForm f) =
-      rename (Sum.inl : K → K ⊕ K') (pointConeMap R y f) := by
+theorem pointConeMap_joinCoords_joinForm
+    {Ω : Type*} [Field Ω]
+    (R : Type*) [CommRing R] [Algebra R Ω]
+    (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) (f : MRing ι R)
+    : pointConeMap R (joinCoords y y') (joinForm f)
+      = rename (Sum.inl : K → K ⊕ K') (pointConeMap R y f) := by
   simp only [pointConeMap, joinForm, aeval_rename]
   induction f using MvPolynomial.induction_on with
   | C a => simp [algebraMap_eq]
@@ -33,15 +37,19 @@ theorem pointConeMap_joinCoords_joinForm {Ω : Type*} [Field Ω] (R : Type*) [Co
     obtain ⟨k, i⟩ := v
     simp [hp, joinCoords_inl]
 
-theorem joinForm_mem_pointIdeal_iff {Ω : Type*} [Field Ω] (R : Type*) [CommRing R] [Algebra R Ω]
-    (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) (f : MRing ι R) :
-    joinForm f ∈ pointIdeal R (joinCoords y y') ↔ f ∈ pointIdeal R y := by
+theorem joinForm_mem_pointIdeal_iff
+    {Ω : Type*} [Field Ω]
+    (R : Type*) [CommRing R] [Algebra R Ω]
+    (y : (Σ k, ι k) → Ω) (y' : (Σ k, ι' k) → Ω) (f : MRing ι R)
+    : joinForm f ∈ pointIdeal R (joinCoords y y') ↔ f ∈ pointIdeal R y := by
   simp only [pointIdeal, RingHom.mem_ker, pointConeMap_joinCoords_joinForm]
   exact map_eq_zero_iff _ (rename_injective _ Sum.inl_injective)
 
-theorem isMultiHomog_joinForm [DecidableEq K] [DecidableEq K'] {R : Type*} [CommRing R]
-    {f : MRing ι R} {bf : K → ℕ} (hf : IsMultiHomog f bf) :
-    IsMultiHomog (joinForm (ι' := ι') f) (Sum.elim bf 0) := by
+theorem isMultiHomog_joinForm
+    [DecidableEq K] [DecidableEq K']
+    {R : Type*} [CommRing R]
+    {f : MRing ι R} {bf : K → ℕ} (hf : IsMultiHomog f bf)
+    : IsMultiHomog (joinForm (ι' := ι') f) (Sum.elim bf 0) := by
   unfold IsMultiHomog at hf ⊢
   induction hf using IsWeightedHomogeneous.induction_on with
   | zero => simpa [joinForm] using isWeightedHomogeneous_zero R _ _

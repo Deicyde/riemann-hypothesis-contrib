@@ -29,16 +29,24 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.MiTop GlobalTheory.Fam GlobalTheory.Mem.Col2 ValuativeRel IsLocalRing
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS
+  GlobalTheory.MiTop GlobalTheory.Fam GlobalTheory.Mem.Col2 ValuativeRel IsLocalRing
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.FinPl.MovesEntries
 
-theorem map_mulVec_single {A B : Type} [CommRing A] [CommRing B] (f : A →+* B) {n : ℕ}
-    (M : Matrix (Fin n) (Fin n) A) (y : Fin n → A) (r s : Fin n) (h1 : f (y s) = 1)
-    (h0 : ∀ b, b ≠ s → y b = 0) : f ((M *ᵥ y) r) = f (M r s) := by
+theorem map_mulVec_single
+    {A B : Type} [CommRing A] [CommRing B]
+    (f : A →+* B)
+    {n : ℕ} (M : Matrix (Fin n) (Fin n) A) (y : Fin n → A) (r s : Fin n) (h1 : f (y s) = 1)
+    (h0 : ∀ b, b ≠ s → y b = 0)
+    : f ((M *ᵥ y) r) = f (M r s) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Matrix.mulVec, dotProduct, map_sum, map_mul]
   rw [Finset.sum_eq_single s]
@@ -48,20 +56,21 @@ theorem map_mulVec_single {A B : Type} [CommRing A] [CommRing B] (f : A →+* B)
   · intro hs
     exact (hs (Finset.mem_univ _)).elim
 
-theorem toEAf_pair (D : D7) (α : Af D.host.F) (e : D.host.E) :
-    toEAf D (pairA D.host.F 0 α ⊗ₜ[D.host.F] e) = e ⊗ₜ[D.host.F] α := by
+theorem toEAf_pair (D : D7) (α : Af D.host.F) (e : D.host.E)
+    : toEAf D (pairA D.host.F 0 α ⊗ₜ[D.host.F] e) = e ⊗ₜ[D.host.F] α := by
   rfl
 
-theorem infPart_pair (D : D7) (α : Af D.host.F) (e : D.host.E) :
-    infPart D (pairA D.host.F 0 α ⊗ₜ[D.host.F] e) = 0 := by
-  have : infPart D (pairA D.host.F 0 α ⊗ₜ[D.host.F] e)
-      = (0 : Ainf D.host.F) ⊗ₜ[D.host.F] e := rfl
+theorem infPart_pair (D : D7) (α : Af D.host.F) (e : D.host.E)
+    : infPart D (pairA D.host.F 0 α ⊗ₜ[D.host.F] e) = 0 := by
+  have : infPart D (pairA D.host.F 0 α ⊗ₜ[D.host.F] e) = (0 : Ainf D.host.F) ⊗ₜ[D.host.F] e := rfl
   rw [this, TensorProduct.zero_tmul]
 
-theorem coord_int (D : D7) (S : HSp D) (L : GlobalTheory.FinPl.Lat S)
+theorem coord_int
+    (D : D7) (S : HSp D) (L : GlobalTheory.FinPl.Lat S)
     (hL : ∀ z, z ∈ L ↔ z ∈ GlobalTheory.AdForm.intVec D S.rank) (v : HeightOneSpectrum (𝓞 D.host.F))
-    (y : Fin S.rank → AE D) (hy : y ∈ GlobalTheory.FinPl.latV S L (fun _ => True)) (i : Fin S.rank) :
-    Formalism.UG.prV (E := D.host.E) v (toEAf D (y i)) ∈ Formalism.BasicNotions.intV D.host.E v := by
+    (y : Fin S.rank → AE D) (hy : y ∈ GlobalTheory.FinPl.latV S L (fun _ => True)) (i : Fin S.rank)
+    : Formalism.UG.prV (E := D.host.E) v (toEAf D (y i))
+      ∈ Formalism.BasicNotions.intV D.host.E v := by
   unfold GlobalTheory.FinPl.latV GlobalTheory.FinPl.latMul at hy
   induction hy using AddSubgroup.closure_induction with
   | mem y hy =>
@@ -69,10 +78,10 @@ theorem coord_int (D : D7) (S : HSp D) (L : GlobalTheory.FinPl.Lat S)
     rw [Set.mem_singleton_iff] at ha
     subst ha
     have hxi : IsIntegral ℤ (x i) := (hL x).1 hx i
-    have h1 : Formalism.UG.prV (E := D.host.E) v
-        (toEAf D (pairA D.host.F 0 α ⊗ₜ[D.host.F] (1 * x i)))
-        = ((x i) ⊗ₜ[D.host.F] (1 : v.adicCompletion D.host.F))
-          * ((1 : D.host.E) ⊗ₜ[D.host.F] (evalV D.host.F v α : v.adicCompletion D.host.F)) := by
+    have h1
+        : Formalism.UG.prV (E := D.host.E) v (toEAf D (pairA D.host.F 0 α ⊗ₜ[D.host.F] (1 * x i)))
+          = ((x i) ⊗ₜ[D.host.F] (1 : v.adicCompletion D.host.F))
+            * ((1 : D.host.E) ⊗ₜ[D.host.F] (evalV D.host.F v α : v.adicCompletion D.host.F)) := by
       rw [toEAf_pair, Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_one, one_mul]
       rfl
     show Formalism.UG.prV (E := D.host.E) v
@@ -90,7 +99,14 @@ theorem coord_int (D : D7) (S : HSp D) (L : GlobalTheory.FinPl.Lat S)
     rw [Pi.neg_apply, (toEAf D).map_neg, (Formalism.UG.prV (E := D.host.E) v).map_neg]
     exact Subring.neg_mem _ ha
 
-theorem finM_entry_int : ∀ (D : D7) (S : HSp D) {n : ℕ} (hn : S.rank = n) (L : GlobalTheory.FinPl.Lat S), (∀ z, z ∈ L ↔ z ∈ GlobalTheory.AdForm.intVec D S.rank) → ∀ κ : GA D S, GlobalTheory.FinPl.Moves S κ L L (fun _ => True) → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (r s : Fin n), Formalism.UG.prV (E := D.host.E) v (GlobalTheory.AdForm.finM S hn κ r s) ∈ Formalism.BasicNotions.intV D.host.E v := by
+theorem finM_entry_int
+    : ∀ (D : D7) (S : HSp D) {n : ℕ} (hn : S.rank = n) (L : GlobalTheory.FinPl.Lat S),
+      (∀ z, z ∈ L ↔ z ∈ GlobalTheory.AdForm.intVec D S.rank)
+        → ∀ κ : GA D S,
+          GlobalTheory.FinPl.Moves S κ L L (fun _ => True)
+            → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (r s : Fin n),
+              Formalism.UG.prV (E := D.host.E) v (GlobalTheory.AdForm.finM S hn κ r s)
+                ∈ Formalism.BasicNotions.intV D.host.E v := by
   intro D S n hn L hL κ hκ v r s
   subst hn
   let x : Fin S.rank → D.host.E := Pi.single s 1
@@ -116,7 +132,8 @@ theorem finM_entry_int : ∀ (D : D7) (S : HSp D) {n : ℕ} (hn : S.rank = n) (L
     intro w
     exact (w.2 trivial).elim
   have h := coord_int D S L hL v _ ((hκ y hid).1 hy) r
-  have h2 : toEAf D ((Formalism.L2.Theta.mt S κ *ᵥ y) r) = toEAf D (Formalism.L2.Theta.mt S κ r s) := by
+  have h2
+      : toEAf D ((Formalism.L2.Theta.mt S κ *ᵥ y) r) = toEAf D (Formalism.L2.Theta.mt S κ r s) := by
     refine map_mulVec_single (toEAf D) _ y r s ?_ ?_
     · simp only [y, x, toEAf_pair, Pi.single_eq_same, one_mul]
       rfl

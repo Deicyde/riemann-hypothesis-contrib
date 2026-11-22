@@ -80,10 +80,13 @@ end GlobalTheory.WeberCubicAlgebra
 
 namespace GlobalTheory.WeberCubicAlgebra
 
-
 open GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber in
-theorem weberCubic_of_halfPeriodDiff : ∀ τ : UpperHalfPlane, GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.HalfPeriodDiff τ →
-    GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.JacobiProduct τ → GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.ThetaWeber τ → GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.WeberCubic τ := by
+theorem weberCubic_of_halfPeriodDiff
+    : ∀ τ : UpperHalfPlane,
+      GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.HalfPeriodDiff τ
+        → GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.JacobiProduct τ
+        → GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.ThetaWeber τ
+        → GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.WeberCubic τ := by
   intro τ hd hj hw
   obtain ⟨d1, d2, d3⟩ := hd
   obtain ⟨w0, w1, w2⟩ := hw
@@ -97,20 +100,28 @@ theorem weberCubic_of_halfPeriodDiff : ∀ τ : UpperHalfPlane, GlobalTheory.Ind
   have t1 : thetaConst 0 1 τ ≠ 0 := fun h => hprod (by simp [h])
   have t2 : thetaConst 1 0 τ ≠ 0 := fun h => hprod (by simp [h])
   obtain ⟨n1, n2, n3⟩ := halfPeriods_notMem τ
-  have mem : ∀ p q : ℤ, ((p : ℂ) * (τ : ℂ) + q) ∈ (GlobalTheory.periodPairOfTau τ).lattice := fun p q => by
+  have mem
+      : ∀ p q : ℤ,
+        ((p : ℂ) * (τ : ℂ) + q) ∈ (GlobalTheory.periodPairOfTau τ).lattice := fun p q => by
     rw [GlobalTheory.mem_lattice_periodPairOfTau]
     exact ⟨p, q, by ring⟩
   have r1 := half_root (GlobalTheory.periodPairOfTau τ) (t := 1 / 2) (by simpa using mem 0 1) n1
-  have r2 := half_root (GlobalTheory.periodPairOfTau τ) (t := (τ : ℂ) / 2) (by
-    have := mem 1 0
-    convert this using 1
-    push_cast
-    ring) n2
-  have r3 := half_root (GlobalTheory.periodPairOfTau τ) (t := (1 + (τ : ℂ)) / 2) (by
-    have := mem 1 1
-    convert this using 1
-    push_cast
-    ring) n3
+  have r2 :=
+    half_root (GlobalTheory.periodPairOfTau τ) (t := (τ : ℂ) / 2)
+      (by
+        have := mem 1 0
+        convert this using 1
+        push_cast
+        ring)
+      n2
+  have r3 :=
+    half_root (GlobalTheory.periodPairOfTau τ) (t := (1 + (τ : ℂ)) / 2)
+      (by
+        have := mem 1 1
+        convert this using 1
+        push_cast
+        ring)
+      n3
   have hP : ((Real.pi : ℂ) ^ 2) ≠ 0 := pow_ne_zero _ hp
   have h12 : wp τ (1 / 2) ≠ wp τ ((τ : ℂ) / 2) := by
     rw [← sub_ne_zero, d1]
@@ -125,20 +136,26 @@ theorem weberCubic_of_halfPeriodDiff : ∀ τ : UpperHalfPlane, GlobalTheory.Ind
     exact mul_ne_zero hP (pow_ne_zero _ t2) h'
   have hw1 : wp τ (1 / 2) = (GlobalTheory.periodPairOfTau τ).weierstrassP (1 / 2) := rfl
   have hw2 : wp τ ((τ : ℂ) / 2) = (GlobalTheory.periodPairOfTau τ).weierstrassP ((τ : ℂ) / 2) := rfl
-  have hw3 : wp τ ((1 + (τ : ℂ)) / 2) = (GlobalTheory.periodPairOfTau τ).weierstrassP ((1 + (τ : ℂ)) / 2) := rfl
+  have hw3
+      : wp τ ((1 + (τ : ℂ)) / 2)
+        = (GlobalTheory.periodPairOfTau τ).weierstrassP ((1 + (τ : ℂ)) / 2) :=
+    rfl
   rw [← hw1] at r1
   rw [← hw2] at r2
   rw [← hw3] at r3
   obtain ⟨hg, hdisc⟩ := roots_alg h12 h13 h23 r1 r2 r3 d1 d2 d3
-  have hjl : jLat τ * ((GlobalTheory.periodPairOfTau τ).g₂ ^ 3 - 27 * (GlobalTheory.periodPairOfTau τ).g₃ ^ 2) =
-      1728 * (GlobalTheory.periodPairOfTau τ).g₂ ^ 3 := by
+  have hjl
+      : jLat τ
+          * ((GlobalTheory.periodPairOfTau τ).g₂ ^ 3 - 27 * (GlobalTheory.periodPairOfTau τ).g₃ ^ 2)
+        = 1728 * (GlobalTheory.periodPairOfTau τ).g₂ ^ 3 := by
     rw [jLat_eq, div_mul_cancel₀ _ (disc_ne_zero τ)]
   rw [hdisc, hg] at hjl
   have hs : thetaConst 0 0 τ ^ 4 = thetaConst 0 1 τ ^ 4 + thetaConst 1 0 τ ^ 4 := by
     apply mul_left_cancel₀ hP
     linear_combination -d1 + d2 + d3
-  have hJ4 : thetaConst 0 0 τ ^ 4 * thetaConst 0 1 τ ^ 4 * thetaConst 1 0 τ ^ 4 =
-      16 * ModularForm.eta (τ : ℂ) ^ 12 := by
+  have hJ4
+      : thetaConst 0 0 τ ^ 4 * thetaConst 0 1 τ ^ 4 * thetaConst 1 0 τ ^ 4
+        = 16 * ModularForm.eta (τ : ℂ) ^ 12 := by
     have := congrArg (· ^ 4) hj
     linear_combination this
   have a0 : (thetaConst 0 0 τ ^ 4) ^ 3 = ModularForm.eta (τ : ℂ) ^ 12 * weberF τ ^ 24 := by
@@ -158,7 +175,8 @@ theorem weberCubic_of_halfPeriodDiff : ∀ τ : UpperHalfPlane, GlobalTheory.Ind
     linear_combination weberF₁ τ ^ 24 * hJ4 - 16 * a1
   · apply mul_left_cancel₀ D0
     linear_combination weberF₂ τ ^ 24 * hJ4 - 16 * a2
-  · have h16 : (16 : ℂ) * ((Real.pi : ℂ) ^ 2) ^ 6 ≠ 0 := mul_ne_zero (by norm_num) (pow_ne_zero _ hP)
+  · have h16 : (16 : ℂ) * ((Real.pi : ℂ) ^ 2) ^ 6 ≠ 0 :=
+      mul_ne_zero (by norm_num) (pow_ne_zero _ hP)
     apply mul_left_cancel₀ h16
     linear_combination hjl
 

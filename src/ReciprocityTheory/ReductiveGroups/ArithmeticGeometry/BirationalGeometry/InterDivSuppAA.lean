@@ -10,25 +10,26 @@ namespace ReciprocityTheory.ChartRestriction.G.Geo.DimF
 
 variable {A : Type*} [CommRing A]
 
-theorem isPrime_map_mk {q M : Ideal A} [M.IsPrime] (h : q ≤ M) :
-    (M.map (Ideal.Quotient.mk q)).IsPrime :=
+theorem isPrime_map_mk {q M : Ideal A} [M.IsPrime] (h : q ≤ M)
+    : (M.map (Ideal.Quotient.mk q)).IsPrime :=
   Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rw [Ideal.mk_ker]; exact h)
 
-theorem comap_map_mk {q M : Ideal A} (h : q ≤ M) :
-    (M.map (Ideal.Quotient.mk q)).comap (Ideal.Quotient.mk q) = M := by
+theorem comap_map_mk {q M : Ideal A} (h : q ≤ M)
+    : (M.map (Ideal.Quotient.mk q)).comap (Ideal.Quotient.mk q) = M := by
   exact Ideal.comap_map_mk h
 
-theorem finiteHeight_of_dim_lt_top {B : Type*} [CommRing B] (I : Ideal B) (hI : I ≠ ⊤)
-    (h : ringKrullDim B < ⊤) : I.FiniteHeight := by
+theorem finiteHeight_of_dim_lt_top
+    {B : Type*} [CommRing B] (I : Ideal B) (hI : I ≠ ⊤) (h : ringKrullDim B < ⊤)
+    : I.FiniteHeight := by
   refine Ideal.FiniteHeight.mk (Or.inr fun htop => ?_)
   have h1 := Ideal.height_le_ringKrullDim_of_ne_top hI
   rw [htop] at h1
   have h2 := lt_of_le_of_lt h1 h
   simp at h2
 
-theorem height_add_height_map_le [IsNoetherianRing A] [FiniteRingKrullDim A] {q M : Ideal A}
-    [q.IsPrime] [M.IsPrime] (h : q ≤ M) :
-    q.height + (M.map (Ideal.Quotient.mk q)).height ≤ M.height := by
+theorem height_add_height_map_le
+    [IsNoetherianRing A] [FiniteRingKrullDim A] {q M : Ideal A} [q.IsPrime] [M.IsPrime] (h : q ≤ M)
+    : q.height + (M.map (Ideal.Quotient.mk q)).height ≤ M.height := by
   have : (M.map (Ideal.Quotient.mk q)).IsPrime := isPrime_map_mk h
   have : (M.map (Ideal.Quotient.mk q)).FiniteHeight :=
     finiteHeight_of_dim_lt_top _ Ideal.IsPrime.ne_top'
@@ -50,15 +51,19 @@ theorem height_add_height_map_le [IsNoetherianRing A] [FiniteRingKrullDim A] {q 
     exact Ideal.zero_mem _
   rw [← hlenp, ← hlenq, ← Nat.cast_add, (⟨M, ‹_›⟩ : PrimeSpectrum A).height_eq_orderHeight]
   rcases eq_or_lt_of_le hle with e | lt
-  · calc ((lp.length + lq.length : ℕ) : ℕ∞) = ((lp.smash l' e).length : ℕ∞) := by simp [l']
+  · calc
+      ((lp.length + lq.length : ℕ) : ℕ∞)
+        = ((lp.smash l' e).length : ℕ∞) := by simp [l']
       _ ≤ _ := Order.length_le_height (by simp [hlast])
-  · calc ((lp.length + lq.length : ℕ) : ℕ∞) ≤ ((lp.append l' lt).length : ℕ∞) := by
-          simp [l']
+  · calc
+      ((lp.length + lq.length : ℕ) : ℕ∞)
+        ≤ ((lp.append l' lt).length : ℕ∞) := by simp [l']
       _ ≤ _ := Order.length_le_height (by simp [hlast])
 
-theorem height_map_le_height_map {I q M : Ideal A} [q.IsPrime] [M.IsPrime] (hIq : I ≤ q)
-    (hqM : q ≤ M) (H : ∀ P : Ideal A, P.IsPrime → I ≤ P → P ≤ M → q ≤ P) :
-    (M.map (Ideal.Quotient.mk I)).height ≤ (M.map (Ideal.Quotient.mk q)).height := by
+theorem height_map_le_height_map
+    {I q M : Ideal A} [q.IsPrime] [M.IsPrime]
+    (hIq : I ≤ q) (hqM : q ≤ M) (H : ∀ P : Ideal A, P.IsPrime → I ≤ P → P ≤ M → q ≤ P)
+    : (M.map (Ideal.Quotient.mk I)).height ≤ (M.map (Ideal.Quotient.mk q)).height := by
   have hMI : (M.map (Ideal.Quotient.mk I)).IsPrime := isPrime_map_mk (hIq.trans hqM)
   have hMq : (M.map (Ideal.Quotient.mk q)).IsPrime := isPrime_map_mk hqM
   rw [(⟨_, hMI⟩ : PrimeSpectrum (A ⧸ I)).height_eq_orderHeight,
@@ -67,7 +72,8 @@ theorem height_map_le_height_map {I q M : Ideal A} [q.IsPrime] [M.IsPrime] (hIq 
   have hbelow : ∀ i, (p i).asIdeal.comap (Ideal.Quotient.mk I) ≤ M := fun i => by
     have : p i ≤ p.last := p.monotone (Fin.le_last _)
     rw [hp, ← PrimeSpectrum.asIdeal_le_asIdeal] at this
-    calc _ ≤ (M.map (Ideal.Quotient.mk I)).comap (Ideal.Quotient.mk I) := Ideal.comap_mono this
+    calc
+      _ ≤ (M.map (Ideal.Quotient.mk I)).comap (Ideal.Quotient.mk I) := Ideal.comap_mono this
       _ = M := comap_map_mk (hIq.trans hqM)
   have hmem : ∀ i, q ≤ (p i).asIdeal.comap (Ideal.Quotient.mk I) := fun i => by
     refine H _ (Ideal.comap_isPrime _ _) ?_ (hbelow i)
@@ -78,10 +84,12 @@ theorem height_map_le_height_map {I q M : Ideal A} [q.IsPrime] [M.IsPrime] (hIq 
     ⟨((p i).asIdeal.comap (Ideal.Quotient.mk I)).map (Ideal.Quotient.mk q), isPrime_map_mk (hmem i)⟩
   have step : ∀ i : Fin p.length, f i.castSucc < f i.succ := by
     intro i
-    have h2 : (p i.castSucc).asIdeal.comap (Ideal.Quotient.mk I) <
-        (p i.succ).asIdeal.comap (Ideal.Quotient.mk I) := by
-      have := RingHom.strictMono_comap_of_surjective (f := Ideal.Quotient.mk I)
-        Ideal.Quotient.mk_surjective (p.step i)
+    have h2
+        : (p i.castSucc).asIdeal.comap (Ideal.Quotient.mk I)
+          < (p i.succ).asIdeal.comap (Ideal.Quotient.mk I) := by
+      have :=
+        RingHom.strictMono_comap_of_surjective (f := Ideal.Quotient.mk I)
+          Ideal.Quotient.mk_surjective (p.step i)
       exact this
     refine lt_of_le_of_ne (Ideal.map_mono h2.le) fun e => h2.ne ?_
     have := congrArg (fun J => J.comap (Ideal.Quotient.mk q)) (congrArg PrimeSpectrum.asIdeal e)
@@ -99,9 +107,11 @@ theorem le_natSub_of_add_le {k n : ℕ} {x : ℕ∞} (h : (k : ℕ∞) + x ≤ n
     have h1 : k + m ≤ n := by exact_mod_cast h
     exact_mod_cast (by omega : m ≤ n - k)
 
-theorem dim_quot_add_height [IsNoetherianRing A] [IsJacobsonRing A] [FiniteRingKrullDim A]
-    (hA : ∀ M N : Ideal A, M.IsMaximal → N.IsMaximal → M.height = N.height) (q : Ideal A)
-    [q.IsPrime] : ringKrullDim (A ⧸ q) + (q.height : WithBot ℕ∞) = ringKrullDim A := by
+theorem dim_quot_add_height
+    [IsNoetherianRing A] [IsJacobsonRing A] [FiniteRingKrullDim A]
+    (hA : ∀ M N : Ideal A, M.IsMaximal → N.IsMaximal → M.height = N.height)
+    (q : Ideal A) [q.IsPrime]
+    : ringKrullDim (A ⧸ q) + (q.height : WithBot ℕ∞) = ringKrullDim A := by
   obtain ⟨M₀, hM₀, hqM₀⟩ := Ideal.exists_le_maximal q Ideal.IsPrime.ne_top'
   set N := M₀.height with hN
   have hNtop : N ≠ ⊤ := Ideal.height_ne_top_of_isPrime
@@ -172,8 +182,9 @@ theorem dim_quot_add_height [IsNoetherianRing A] [IsJacobsonRing A] [FiniteRingK
         have : n ≤ y + k := by exact_mod_cast h2
         exact_mod_cast (by omega : n - k ≤ y)
     have : (Ideal.map (Ideal.Quotient.mk q) M).IsPrime := isPrime_map_mk hqM
-    calc ((n - k : ℕ) : WithBot ℕ∞) ≤ ((Ideal.map (Ideal.Quotient.mk q) M).height : WithBot ℕ∞) := by
-          rw [← WithBot.coe_natCast]; exact WithBot.coe_le_coe.mpr h3
+    calc
+      ((n - k : ℕ) : WithBot ℕ∞) ≤ ((Ideal.map (Ideal.Quotient.mk q) M).height : WithBot ℕ∞) := by
+        rw [← WithBot.coe_natCast]; exact WithBot.coe_le_coe.mpr h3
       _ ≤ _ := Ideal.height_le_ringKrullDim_of_ne_top Ideal.IsPrime.ne_top'
   have hkn : k ≤ n := by
     have := height_add_height_map_le (q := q) (M := M₀) hqM₀

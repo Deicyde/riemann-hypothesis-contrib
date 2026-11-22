@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
-open ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.G.AI.I1.SwapLoc IsLocalRing
+open ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.G.AI.I1.SwapLoc
+  IsLocalRing
 
 noncomputable section
 
@@ -19,49 +20,56 @@ namespace DimTwoSumReading
 
 variable {A : Type*} [CommRing A]
 
-theorem length_loc_eq_ordLoc (W : Ideal A) [hW : W.IsPrime] (a : A) :
-    Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (A ⧸ Ideal.span {a})) =
-      ordLoc ⟨W, hW⟩ a := by
-  have h := length_localizedModule_quot_eq (T := Localization.AtPrime W) W.primeCompl ⊥ a
-    (fun s hs => IsLocalization.map_units _ (⟨s, hs⟩ : W.primeCompl))
-    (fun y => by
-      obtain ⟨⟨r, s⟩, hy⟩ := IsLocalization.surj W.primeCompl y
-      exact ⟨r, s, s.2, hy.symm⟩)
-    (fun r hr => by
-      obtain ⟨s, hs⟩ := (IsLocalization.map_eq_zero_iff W.primeCompl _ r).mp hr
-      exact ⟨s, s.2, (Ideal.mem_bot).mpr hs⟩)
-    (fun v hv => by rw [(Ideal.mem_bot).mp hv, map_zero])
+theorem length_loc_eq_ordLoc (W : Ideal A) [hW : W.IsPrime] (a : A)
+    : Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (A ⧸ Ideal.span {a}))
+      = ordLoc ⟨W, hW⟩ a := by
+  have h :=
+    length_localizedModule_quot_eq (T := Localization.AtPrime W) W.primeCompl ⊥ a
+      (fun s hs => IsLocalization.map_units _ (⟨s, hs⟩ : W.primeCompl))
+      (fun y => by
+        obtain ⟨⟨r, s⟩, hy⟩ := IsLocalization.surj W.primeCompl y
+        exact ⟨r, s, s.2, hy.symm⟩)
+      (fun r hr => by
+        obtain ⟨s, hs⟩ := (IsLocalization.map_eq_zero_iff W.primeCompl _ r).mp hr
+        exact ⟨s, s.2, (Ideal.mem_bot).mpr hs⟩)
+      (fun v hv => by rw [(Ideal.mem_bot).mp hv, map_zero])
   rw [bot_sup_eq] at h
   exact h
 
-theorem length_max_eq_ordMod [IsLocalRing A] (W : Ideal A) [hW : W.IsPrime] (b : A) :
-    Module.length (Localization.AtPrime (maximalIdeal A))
-        (LocalizedModule (maximalIdeal A).primeCompl (A ⧸ (W ⊔ Ideal.span {b}))) =
-      ordMod ⟨W, hW⟩ b := by
-  have h := length_localizedModule_quot_eq (T := A ⧸ W) (maximalIdeal A).primeCompl W b
-    (fun s hs => (notMem_maximalIdeal.mp hs).map _)
-    (fun y => by
-      obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective y
-      exact ⟨r, 1, (maximalIdeal A).primeCompl.one_mem, by simp⟩)
-    (fun r hr => ⟨1, (maximalIdeal A).primeCompl.one_mem, by
-      rw [one_mul]; exact Ideal.Quotient.eq_zero_iff_mem.mp hr⟩)
-    (fun v hv => Ideal.Quotient.eq_zero_iff_mem.mpr hv)
+theorem length_max_eq_ordMod [IsLocalRing A] (W : Ideal A) [hW : W.IsPrime] (b : A)
+    : Module.length (Localization.AtPrime (maximalIdeal A))
+        (LocalizedModule (maximalIdeal A).primeCompl (A ⧸ (W ⊔ Ideal.span {b})))
+      = ordMod ⟨W, hW⟩ b := by
+  have h :=
+    length_localizedModule_quot_eq (T := A ⧸ W) (maximalIdeal A).primeCompl W b
+      (fun s hs => (notMem_maximalIdeal.mp hs).map _)
+      (fun y => by
+        obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective y
+        exact ⟨r, 1, (maximalIdeal A).primeCompl.one_mem, by simp⟩)
+      (fun r hr => ⟨
+        1,
+        (maximalIdeal A).primeCompl.one_mem,
+        by rw [one_mul]; exact Ideal.Quotient.eq_zero_iff_mem.mp hr
+      ⟩)
+      (fun v hv => Ideal.Quotient.eq_zero_iff_mem.mpr hv)
   rw [h, ordMod, Ring.ord, Ideal.Quotient.algebraMap_eq]
 
 variable [IsDomain A] [IsNoetherianRing A]
 
-theorem mem_minimalPrimes_iff {a : A} (ha : a ≠ 0) (W : Ideal A) [W.IsPrime] :
-    W ∈ (Ideal.span {a}).minimalPrimes ↔ W.height = 1 ∧ a ∈ W := by
+theorem mem_minimalPrimes_iff {a : A} (ha : a ≠ 0) (W : Ideal A) [W.IsPrime]
+    : W ∈ (Ideal.span {a}).minimalPrimes ↔ W.height = 1 ∧ a ∈ W := by
   have : (⊥ : Ideal A).IsPrime := Ideal.isPrime_bot
   constructor
   · intro hW
     have haW : a ∈ W := hW.1.2 (Ideal.subset_span rfl)
     have h1 := Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes (Ideal.span {a}) W hW
-    have h0 : W.height ≠ 0 := fun h => ha ((Ideal.mem_bot).mp (Ideal.height_eq_zero_iff_eq_bot.mp h ▸ haW))
+    have h0 : W.height ≠ 0 := fun h =>
+      ha ((Ideal.mem_bot).mp (Ideal.height_eq_zero_iff_eq_bot.mp h ▸ haW))
     exact ⟨le_antisymm h1 (Order.one_le_iff_ne_zero.mpr h0), haW⟩
   · rintro ⟨h1, haW⟩
-    obtain ⟨Q, hQ, hQW⟩ := Ideal.exists_minimalPrimes_le (I := Ideal.span {a}) (J := W)
-      ((Ideal.span_singleton_le_iff_mem W).mpr haW)
+    obtain ⟨Q, hQ, hQW⟩ :=
+      Ideal.exists_minimalPrimes_le (I := Ideal.span {a}) (J := W)
+        ((Ideal.span_singleton_le_iff_mem W).mpr haW)
     rcases hQW.lt_or_eq with hlt | rfl
     · have := hQ.1.1
       have haQ : a ∈ Q := hQ.1.2 (Ideal.subset_span rfl)
@@ -74,19 +82,23 @@ theorem mem_minimalPrimes_iff {a : A} (ha : a ≠ 0) (W : Ideal A) [W.IsPrime] :
       exact absurd this (by decide)
     · exact hQ
 
-
 omit [IsDomain A] [IsNoetherianRing A] in
-theorem max_mem_minimalPrimes [IsLocalRing A] (h2 : ringKrullDim A = 2) (W : Ideal A) [hW : W.IsPrime]
-    (h1 : W.height = 1) {b : A} (hbW : b ∉ W) (hbm : b ∈ maximalIdeal A) :
-    maximalIdeal A ∈ (W ⊔ Ideal.span {b}).minimalPrimes := by
+theorem max_mem_minimalPrimes
+    [IsLocalRing A]
+    (h2 : ringKrullDim A = 2)
+    (W : Ideal A) [hW : W.IsPrime]
+    (h1 : W.height = 1)
+    {b : A} (hbW : b ∉ W) (hbm : b ∈ maximalIdeal A)
+    : maximalIdeal A ∈ (W ⊔ Ideal.span {b}).minimalPrimes := by
   have hle : W ⊔ Ideal.span {b} ≤ maximalIdeal A :=
     sup_le (le_maximalIdeal hW.ne_top) ((Ideal.span_singleton_le_iff_mem _).mpr hbm)
   refine ⟨⟨(maximalIdeal.isMaximal A).isPrime, hle⟩, fun Q hQ hQm => ?_⟩
   have := hQ.1
   by_contra hne
   have hlt : Q < maximalIdeal A := lt_of_le_of_ne hQm fun h => hne (h ▸ le_rfl)
-  have hWQ : W < Q := lt_of_le_of_ne (le_sup_left.trans hQ.2) fun h =>
-    hbW (h ▸ hQ.2 (Ideal.mem_sup_right (Ideal.subset_span rfl)))
+  have hWQ : W < Q :=
+    lt_of_le_of_ne (le_sup_left.trans hQ.2) fun h =>
+      hbW (h ▸ hQ.2 (Ideal.mem_sup_right (Ideal.subset_span rfl)))
   have e1 := Ideal.height_add_one_le_of_lt_of_isPrime hWQ
   have e2 := Ideal.height_add_one_le_of_lt_of_isPrime hlt
   have hm := maximalIdeal_height_eq_ringKrullDim (R := A)
@@ -98,19 +110,19 @@ theorem max_mem_minimalPrimes [IsLocalRing A] (h2 : ringKrullDim A = 2) (W : Ide
 
 end DimTwoSumReading
 
-
 open DimTwoSumReading in
 theorem DimTwoSumReading.proof : DimTwoSumReading.Statement := by
   intro A _ _ _ _ h2 a b ha hab
   classical
   have hT : {p : PrimeSpectrum A | p.asIdeal.height = 1 ∧ a ∈ p.asIdeal}.Finite :=
-    ((Ideal.finite_minimalPrimes_of_isNoetherianRing A (Ideal.span {a})).preimage
-      (fun p _ q _ h => PrimeSpectrum.ext h)).subset
-      (fun p hp => (mem_minimalPrimes_iff ha p.asIdeal).mpr hp)
-  have key : ∀ p : PrimeSpectrum A, p.asIdeal.height = 1 ∧ a ∈ p.asIdeal →
-      (locCycle (Ideal.span {a}) p.asIdeal = ((ordLoc p a).toNat : ℤ) ∧ ordLoc p a ≠ ⊤) ∧
-      (locCycle (p.asIdeal ⊔ Ideal.span {b}) (maximalIdeal A) = ((ordMod p b).toNat : ℤ) ∧
-        ordMod p b ≠ ⊤) := by
+    ((Ideal.finite_minimalPrimes_of_isNoetherianRing A (Ideal.span {a})).preimage (fun p _ q _ h =>
+      PrimeSpectrum.ext h)).subset (fun p hp => (mem_minimalPrimes_iff ha p.asIdeal).mpr hp)
+  have key
+      : ∀ p : PrimeSpectrum A,
+        p.asIdeal.height = 1 ∧ a ∈ p.asIdeal
+          → (locCycle (Ideal.span {a}) p.asIdeal = ((ordLoc p a).toNat : ℤ) ∧ ordLoc p a ≠ ⊤)
+            ∧ (locCycle (p.asIdeal ⊔ Ideal.span {b}) (maximalIdeal A) = ((ordMod p b).toNat : ℤ)
+              ∧ ordMod p b ≠ ⊤) := by
     intro p hp
     have hmin := (mem_minimalPrimes_iff ha p.asIdeal).mpr hp
     have hlA := length_loc_eq_ordLoc p.asIdeal a
@@ -128,10 +140,14 @@ theorem DimTwoSumReading.proof : DimTwoSumReading.Statement := by
         hbm (h.1.2 (Ideal.mem_sup_right (Ideal.subset_span rfl)))
       rw [h0]
       refine ⟨?_, ENat.zero_ne_top⟩
-      unfold locCycle; rw [dite_eq_right hnm]; rfl
-  have hsupp : Function.support (fun W : Ideal A => locCycle (Ideal.span {a}) W *
-      locCycle (W ⊔ Ideal.span {b}) (maximalIdeal A)) ⊆
-      (hT.toFinset.map ⟨PrimeSpectrum.asIdeal, by intro p q h; exact PrimeSpectrum.ext h⟩ : Finset (Ideal A)) := by
+      unfold locCycle
+      rw [dite_eq_right hnm]
+      rfl
+  have hsupp
+      : Function.support (fun W : Ideal A =>
+          locCycle (Ideal.span {a}) W * locCycle (W ⊔ Ideal.span {b}) (maximalIdeal A))
+        ⊆ (hT.toFinset.map ⟨PrimeSpectrum.asIdeal, by intro p q h; exact PrimeSpectrum.ext h⟩
+          : Finset (Ideal A)) := by
     intro W hW
     have hne : locCycle (Ideal.span {a}) W ≠ 0 := left_ne_zero_of_mul hW
     have hmin : W ∈ (Ideal.span {a}).minimalPrimes := by

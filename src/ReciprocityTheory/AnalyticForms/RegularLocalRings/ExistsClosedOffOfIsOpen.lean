@@ -26,8 +26,8 @@ theorem exists_mem_pres_V (x : w.W) : ∃ c : w.Idx, x ∈ (w.pres c.1 c.2).V :=
   obtain ⟨i, hi⟩ := TopologicalSpace.Opens.mem_iSup.1 hx
   exact ⟨⟨p, i⟩, hi⟩
 
-theorem exists_closed_off_of_isOpen (N : Set w.W) (hN : IsOpen N) (hne : N.Nonempty) :
-    ∃ x' : w.M, x'.1 ∈ N ∧ w.π.base x'.1 ∉ (projB P D hP : Set (projX P hP)) := by
+theorem exists_closed_off_of_isOpen (N : Set w.W) (hN : IsOpen N) (hne : N.Nonempty)
+    : ∃ x' : w.M, x'.1 ∈ N ∧ w.π.base x'.1 ∉ (projB P D hP : Set (projX P hP)) := by
   haveI := w.jacobsonSpace_W
   obtain ⟨x0, hx0N, hx0c⟩ := nonempty_inter_closedPoints hne hN.isLocallyClosed
   obtain ⟨c, hc⟩ := w.exists_mem_pres_V x0
@@ -46,35 +46,40 @@ theorem exists_closed_off_of_isOpen (N : Set w.W) (hN : IsOpen N) (hne : N.Nonem
     rw [w.mem_basicOpen_iff c x' hx'V G, w.coord_of_mem c x' hx'V]; exact hx'G
   exact (hT x'.1 hx'V).mpr ⟨G, hGT, hmem⟩
 
-theorem eval_bind_lift_ne_zero (hD : IsMultiHomogIdeal D) (f : MvPolynomial (Σ k, ι k) ℂ)
-    (hzero : ∀ z ∈ conePts P, eval z f = 0 → z ∈ conePts D)
-    (c : w.Idx) (x : w.M) (hx : x ∈ w.src c)
-    (hxB : w.π.base x.1 ∉ (projB P D hP : Set (projX P hP))) :
-    eval (w.coord c x) (bind₁ (w.lift c) f) ≠ 0 := by
-  have h1 : eval (w.coord c x) (bind₁ (w.lift c) f) =
-      eval (fun q => eval (w.coord c x) (w.lift c q)) f := by
+theorem eval_bind_lift_ne_zero
+    (hD : IsMultiHomogIdeal D)
+    (f : MvPolynomial (Σ k, ι k) ℂ) (hzero : ∀ z ∈ conePts P, eval z f = 0 → z ∈ conePts D)
+    (c : w.Idx) (x : w.M)
+    (hx : x ∈ w.src c) (hxB : w.π.base x.1 ∉ (projB P D hP : Set (projX P hP)))
+    : eval (w.coord c x) (bind₁ (w.lift c) f) ≠ 0 := by
+  have h1
+      : eval (w.coord c x) (bind₁ (w.lift c) f)
+        = eval (fun q => eval (w.coord c x) (w.lift c q)) f := by
     show aeval (w.coord c x) (bind₁ (w.lift c) f) = aeval (fun q => aeval (w.coord c x) (w.lift c q)) f
     exact aeval_bind₁ _ _ _
   rw [h1]
   intro h0
   exact hxB ((w.mem_projB_iff_lift hD c x hx).mpr (hzero _ (w.lift_mem c x hx) h0))
 
-theorem germ_lift_ne_zero (hD : IsMultiHomogIdeal D)
-    (hcomp : ∀ Q ∈ P.minimalPrimes, IsRelevant Q → ¬ D ≤ Q)
+theorem germ_lift_ne_zero
+    (hD : IsMultiHomogIdeal D) (hcomp : ∀ Q ∈ P.minimalPrimes, IsRelevant Q → ¬ D ≤ Q)
     (f : MvPolynomial (Σ k, ι k) ℂ) (a : K → ℕ) (hf : IsMultiHomog f a)
     (hzero : ∀ z ∈ conePts P, eval z f = 0 → z ∈ conePts D)
-    (c : w.Idx) (x : w.W) (hx : x ∈ (w.pres c.1 c.2).V) :
-    w.W.presheaf.germ _ x hx ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f)) ≠ 0 := by
+    (c : w.Idx) (x : w.W) (hx : x ∈ (w.pres c.1 c.2).V)
+    : w.W.presheaf.germ _ x hx ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f)) ≠ 0 := by
   intro h0
-  have h0' : w.W.presheaf.germ _ x hx ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f)) =
-      w.W.presheaf.germ _ x hx 0 := by rw [h0, map_zero]
+  have h0'
+      : w.W.presheaf.germ _ x hx ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f))
+        = w.W.presheaf.germ _ x hx 0 := by
+    rw [h0, map_zero]
   obtain ⟨O, hxO, iO, iO', hO⟩ := TopCat.Presheaf.germ_eq w.W.presheaf x hx hx _ _ h0'
   obtain ⟨x', hx'O, hx'B⟩ := w.exists_closed_off_of_isOpen O O.isOpen ⟨x, hxO⟩
   have hx'V : x'.1 ∈ (w.pres c.1 c.2).V := iO.le hx'O
   have hnot : x'.1 ∉ w.W.basicOpen ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f)) := by
     intro hm
-    have hres : x'.1 ∈ w.W.basicOpen
-        (w.W.presheaf.map iO.op ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f))) := by
+    have hres
+        : x'.1 ∈ w.W.basicOpen (w.W.presheaf.map iO.op
+          ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f))) := by
       rw [Scheme.basicOpen_res]; exact ⟨hx'O, hm⟩
     rw [hO, map_zero, Scheme.basicOpen_zero] at hres
     exact hres
@@ -82,12 +87,13 @@ theorem germ_lift_ne_zero (hD : IsMultiHomogIdeal D)
   by_contra hne
   exact hnot ((w.mem_basicOpen_iff c x' hx'V _).mpr hne)
 
-theorem germ_lift_isUnit (hD : IsMultiHomogIdeal D)
+theorem germ_lift_isUnit
+    (hD : IsMultiHomogIdeal D)
     (f : MvPolynomial (Σ k, ι k) ℂ) (a : K → ℕ) (hf : IsMultiHomog f a)
     (hzero : ∀ z ∈ conePts P, eval z f = 0 → z ∈ conePts D)
-    (c : w.Idx) (x : w.W) (hx : x ∈ (w.pres c.1 c.2).V)
-    (hxB : w.π.base x ∉ (projB P D hP : Set (projX P hP))) :
-    IsUnit (w.W.presheaf.germ _ x hx ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f))) := by
+    (c : w.Idx) (x : w.W)
+    (hx : x ∈ (w.pres c.1 c.2).V) (hxB : w.π.base x ∉ (projB P D hP : Set (projX P hP)))
+    : IsUnit (w.W.presheaf.germ _ x hx ((w.pres c.1 c.2).secHom (bind₁ (w.lift c) f))) := by
   haveI := w.jacobsonSpace_W
   refine (w.W.mem_basicOpen _ x hx).mp ?_
   by_contra hxs

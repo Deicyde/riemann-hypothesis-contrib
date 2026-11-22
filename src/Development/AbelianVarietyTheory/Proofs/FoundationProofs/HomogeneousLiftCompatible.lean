@@ -10,14 +10,26 @@ open scoped MatrixGroups
 
 namespace GlobalTheory.KZ.H3
 
-theorem homogeneous_lift_compatible : ∀ (l : ℕ) [Fact l.Prime] (w : ℕ) (p : (n : ℕ) → MvPolynomial (Fin 2) (ZMod (l ^ n))), (∀ n, (p n).IsHomogeneous w) → (∀ n, MvPolynomial.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ n)) (ZMod (l ^ n))) (p (n + 1)) = p n) → ∃ q : MvPolynomial (Fin 2) ℤ_[l], q.IsHomogeneous w ∧ (∀ n, MvPolynomial.map (PadicInt.toZModPow n) q = p n) ∧ ∀ q' : MvPolynomial (Fin 2) ℤ_[l], (∀ n, MvPolynomial.map (PadicInt.toZModPow n) q' = p n) → q' = q := by
+theorem homogeneous_lift_compatible
+    : ∀ (l : ℕ) [Fact l.Prime] (w : ℕ) (p : (n : ℕ) → MvPolynomial (Fin 2) (ZMod (l ^ n))),
+      (∀ n, (p n).IsHomogeneous w)
+        → (∀ n,
+          MvPolynomial.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ n)) (ZMod (l ^ n))) (p (n + 1))
+            = p n)
+        → ∃ q : MvPolynomial (Fin 2) ℤ_[l],
+          q.IsHomogeneous w ∧ (∀ n, MvPolynomial.map (PadicInt.toZModPow n) q = p n)
+            ∧ ∀ q' : MvPolynomial (Fin 2) ℤ_[l],
+              (∀ n, MvPolynomial.map (PadicInt.toZModPow n) q' = p n) → q' = q := by
   intro l _ w p hhom hcomp
-  have hc1 : ∀ (m : Fin 2 →₀ ℕ) (n : ℕ),
-      ZMod.castHom (pow_dvd_pow l (Nat.le_succ n)) (ZMod (l ^ n)) ((p (n + 1)).coeff m) = (p n).coeff m := by
+  have hc1
+      : ∀ (m : Fin 2 →₀ ℕ) (n : ℕ),
+        ZMod.castHom (pow_dvd_pow l (Nat.le_succ n)) (ZMod (l ^ n)) ((p (n + 1)).coeff m)
+          = (p n).coeff m := by
     intro m n
     rw [← hcomp n, MvPolynomial.coeff_map]
-  have hc : ∀ (m : Fin 2 →₀ ℕ) (k₁ k₂ : ℕ) (hk : k₁ ≤ k₂),
-      ZMod.castHom (pow_dvd_pow l hk) (ZMod (l ^ k₁)) ((p k₂).coeff m) = (p k₁).coeff m := by
+  have hc
+      : ∀ (m : Fin 2 →₀ ℕ) (k₁ k₂ : ℕ) (hk : k₁ ≤ k₂),
+        ZMod.castHom (pow_dvd_pow l hk) (ZMod (l ^ k₁)) ((p k₂).coeff m) = (p k₁).coeff m := by
     intro m k₁ k₂ hk
     induction k₂, hk using Nat.le_induction with
     | base => simp
@@ -29,8 +41,9 @@ theorem homogeneous_lift_compatible : ∀ (l : ℕ) [Fact l.Prime] (w : ℕ) (p 
 
   let f : ∀ k, MvPolynomial (Fin 2 →₀ ℕ) ℤ →+* ZMod (l ^ k) := fun k =>
     MvPolynomial.eval₂Hom (Int.castRingHom _) (fun m => (p k).coeff m)
-  have hf : ∀ k₁ k₂ (hk : k₁ ≤ k₂),
-      (ZMod.castHom (pow_dvd_pow l hk) (ZMod (l ^ k₁))).comp (f k₂) = f k₁ := by
+  have hf
+      : ∀ k₁ k₂ (hk : k₁ ≤ k₂),
+        (ZMod.castHom (pow_dvd_pow l hk) (ZMod (l ^ k₁))).comp (f k₂) = f k₁ := by
     intro k₁ k₂ hk
     apply MvPolynomial.ringHom_ext
     · intro r; simp [f]

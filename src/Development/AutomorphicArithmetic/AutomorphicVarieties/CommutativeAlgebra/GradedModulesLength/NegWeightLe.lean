@@ -6,14 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Filter Formalism.MainNotions.V.Pf.V2.Calc UpperTheory.V.Alg UpperTheory.V.Alg.M
 
-private theorem UpperTheory.V.Alg.M.neg_weight_le {τ : Type} (wt : τ → ℤ) (ν : τ →₀ ℕ) :
-    -Finsupp.weight wt ν ≤ ((Finsupp.weight (negW wt) ν : ℕ) : ℤ) := by
+private theorem UpperTheory.V.Alg.M.neg_weight_le {τ : Type} (wt : τ → ℤ) (ν : τ →₀ ℕ)
+    : - Finsupp.weight wt ν ≤ ((Finsupp.weight (negW wt) ν : ℕ) : ℤ) := by
   simp only [Finsupp.weight_apply, Finsupp.sum]
   push_cast
   rw [← Finset.sum_neg_distrib]
   apply Finset.sum_le_sum
   intro i _
-  have hi : -wt i ≤ ((negW wt i : ℕ) : ℤ) := by
+  have hi : - wt i ≤ ((negW wt i : ℕ) : ℤ) := by
     simp only [negW]
     exact Int.self_le_toNat _
   have hc : (0 : ℤ) ≤ (ν i : ℤ) := Int.natCast_nonneg _
@@ -21,9 +21,10 @@ private theorem UpperTheory.V.Alg.M.neg_weight_le {τ : Type} (wt : τ → ℤ) 
   push_cast
   nlinarith
 
-theorem UpperTheory.V.Alg.M.fil_holds :
-    ∀ (E τ : Type) [CommRing E] (wt : τ → ℤ) (a b : ℕ) (g h : MvPowerSeries τ E), g ∈ fil E wt a → h ∈ fil E wt b →
-      g * h ∈ fil E wt (a + b) ∧ ∀ j : ℤ, g ∈ wtPart E wt j → g ∈ fil E wt (-j).toNat := by
+theorem UpperTheory.V.Alg.M.fil_holds
+    : ∀ (E τ : Type) [CommRing E] (wt : τ → ℤ) (a b : ℕ) (g h : MvPowerSeries τ E),
+      g ∈ fil E wt a → h ∈ fil E wt b
+        → g * h ∈ fil E wt (a + b) ∧ ∀ j : ℤ, g ∈ wtPart E wt j → g ∈ fil E wt (-j).toNat := by
   intro E τ _ wt a b g h hg hh
   classical
   refine ⟨?_, ?_⟩
@@ -32,8 +33,9 @@ theorem UpperTheory.V.Alg.M.fil_holds :
     apply Finset.sum_eq_zero
     intro p hp
     rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
-    have hw : Finsupp.weight (negW wt) p.1 + Finsupp.weight (negW wt) p.2 =
-        Finsupp.weight (negW wt) ν := by
+    have hw
+        : Finsupp.weight (negW wt) p.1 + Finsupp.weight (negW wt) p.2
+          = Finsupp.weight (negW wt) ν := by
       rw [← hp, map_add (f := _)]
     by_cases h1 : Finsupp.weight (negW wt) p.1 < a
     · rw [hg p.1 h1, zero_mul]

@@ -24,13 +24,13 @@ def diagMap (a : n → E) : (n → 𝓞 E) →ₗ[𝓞 E] (n → E) where
     simp only [Pi.smul_apply, smul_eq_mul, map_mul, RingHom.id_apply, Algebra.smul_def]
     ring
 
-@[simp] theorem diagMap_apply (a : n → E) (x : n → 𝓞 E) (i : n) :
-    diagMap a x i = a i * (x i : E) := rfl
+@[simp]
+theorem diagMap_apply (a : n → E) (x : n → 𝓞 E) (i : n) : diagMap a x i = a i * (x i : E) := rfl
 
 def diagLat (a : n → E) : Submodule (𝓞 E) (n → E) := LinearMap.range (diagMap a)
 
-theorem mem_diagLat {a : n → E} {x : n → E} :
-    x ∈ diagLat a ↔ ∀ i, ∃ c : 𝓞 E, x i = a i * (c : E) := by
+theorem mem_diagLat {a : n → E} {x : n → E}
+    : x ∈ diagLat a ↔ ∀ i, ∃ c : 𝓞 E, x i = a i * (c : E) := by
   constructor
   · rintro ⟨c, rfl⟩ i
     exact ⟨c i, rfl⟩
@@ -60,8 +60,8 @@ variable (σ : E →+* E)
 theorem map_int_mem (c : 𝓞 E) : σ (c : E) ∈ (algebraMap (𝓞 E) E).range :=
   ⟨RingOfIntegers.mapRingHom σ c, rfl⟩
 
-theorem mem_dualSet_diagLat {a : n → E} {y : n → E} :
-    y ∈ dualSet σ 1 (diagLat a) ↔ ∀ i, σ (a i) * y i ∈ (algebraMap (𝓞 E) E).range := by
+theorem mem_dualSet_diagLat {a : n → E} {y : n → E}
+    : y ∈ dualSet σ 1 (diagLat a) ↔ ∀ i, σ (a i) * y i ∈ (algebraMap (𝓞 E) E).range := by
   constructor
   · intro h i
     have h1 := h _ (single_mem_diagLat a i)
@@ -77,8 +77,8 @@ theorem mem_dualSet_diagLat {a : n → E} {y : n → E} :
     rw [diagMap_apply, map_mul, mul_right_comm]
     exact Subring.mul_mem _ (h i) (map_int_mem σ (c i))
 
-theorem dualSet_diagLat {a : n → E} (ha : ∀ i, a i ≠ 0) :
-    dualSet σ 1 (diagLat a) = (diagLat fun i => (σ (a i))⁻¹ : Set (n → E)) := by
+theorem dualSet_diagLat {a : n → E} (ha : ∀ i, a i ≠ 0)
+    : dualSet σ 1 (diagLat a) = (diagLat fun i => (σ (a i))⁻¹ : Set (n → E)) := by
   ext y
   rw [mem_dualSet_diagLat σ, SetLike.mem_coe, mem_diagLat]
   refine forall_congr' fun i => ?_
@@ -97,10 +97,10 @@ variable {E : Type} [Field E] [NumberField E] {n : Type} [Fintype n] [DecidableE
 
 def vecAt (i0 : n) (z : E) : n → E := Function.update (fun _ => (1 : E)) i0 z
 
-@[simp] theorem vecAt_same (i0 : n) (z : E) : vecAt i0 z i0 = z := Function.update_self ..
+@[simp]
+theorem vecAt_same (i0 : n) (z : E) : vecAt i0 z i0 = z := Function.update_self ..
 
-theorem vecAt_ne {i0 i : n} (h : i ≠ i0) (z : E) : vecAt i0 z i = 1 :=
-  Function.update_of_ne h ..
+theorem vecAt_ne {i0 i : n} (h : i ≠ i0) (z : E) : vecAt i0 z i = 1 := Function.update_of_ne h ..
 
 theorem vecAt_ne_zero {i0 : n} {z : E} (hz : z ≠ 0) (i : n) : vecAt i0 z i ≠ 0 := by
   by_cases h : i = i0
@@ -111,9 +111,10 @@ theorem vecAt_ne_zero {i0 : n} {z : E} (hz : z ≠ 0) (i : n) : vecAt i0 z i ≠
 
 def latT (i0 : n) (pz : 𝓞 E) : Submodule (𝓞 E) (n → E) := diagLat (vecAt i0 (pz : E))
 
-theorem mem_latT {i0 : n} {pz : 𝓞 E} {x : n → E} :
-    x ∈ latT i0 pz ↔ (∃ c : 𝓞 E, x i0 = (pz : E) * (c : E)) ∧
-      ∀ i, i ≠ i0 → x i ∈ (algebraMap (𝓞 E) E).range := by
+theorem mem_latT {i0 : n} {pz : 𝓞 E} {x : n → E}
+    : x ∈ latT i0 pz
+      ↔ (∃ c : 𝓞 E, x i0 = (pz : E) * (c : E))
+        ∧ ∀ i, i ≠ i0 → x i ∈ (algebraMap (𝓞 E) E).range := by
   rw [latT, mem_diagLat]
   constructor
   · intro h
@@ -129,8 +130,8 @@ theorem mem_latT {i0 : n} {pz : 𝓞 E} {x : n → E} :
 
 variable (σ : E →+* E) {i0 : n} {pz : 𝓞 E} {T : ℕ}
 
-theorem dualSet_latT (hz : (pz : E) ≠ 0) :
-    dualSet σ 1 (latT i0 pz) = (diagLat (vecAt i0 (σ (pz : E))⁻¹) : Set (n → E)) := by
+theorem dualSet_latT (hz : (pz : E) ≠ 0)
+    : dualSet σ 1 (latT i0 pz) = (diagLat (vecAt i0 (σ (pz : E))⁻¹) : Set (n → E)) := by
   rw [latT, dualSet_diagLat σ (vecAt_ne_zero hz)]
   congr 2
   funext i
@@ -139,8 +140,8 @@ theorem dualSet_latT (hz : (pz : E) ≠ 0) :
     simp
   · simp [vecAt_ne hi]
 
-theorem span_dualSet_latT (hz : (pz : E) ≠ 0) :
-    Submodule.span (𝓞 E) (dualSet σ 1 (latT i0 pz)) = diagLat (vecAt i0 (σ (pz : E))⁻¹) := by
+theorem span_dualSet_latT (hz : (pz : E) ≠ 0)
+    : Submodule.span (𝓞 E) (dualSet σ 1 (latT i0 pz)) = diagLat (vecAt i0 (σ (pz : E))⁻¹) := by
   rw [dualSet_latT σ hz, Submodule.span_eq]
 
 end LatT

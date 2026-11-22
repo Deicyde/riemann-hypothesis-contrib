@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem inf_pow_bot (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (I : Ideal R)
-    (h : maximalIdeal R * I = ⊥) : ∃ N : ℕ, ∀ x ∈ I, x ∈ maximalIdeal R ^ N → x = 0 := by
+private theorem inf_pow_bot
+    (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    (I : Ideal R) (h : maximalIdeal R * I = ⊥)
+    : ∃ N : ℕ, ∀ x ∈ I, x ∈ maximalIdeal R ^ N → x = 0 := by
   obtain ⟨k, hk⟩ := Ideal.exists_pow_inf_eq_pow_smul (maximalIdeal R) (I : Submodule R R)
   refine ⟨k + 1, fun x hxI hxm => ?_⟩
   have hx : x ∈ maximalIdeal R ^ (k + 1) • (⊤ : Submodule R R) ⊓ (I : Submodule R R) := by
@@ -15,15 +17,22 @@ private theorem inf_pow_bot (R : Type) [CommRing R] [IsLocalRing R] [IsNoetheria
     rw [Ideal.smul_eq_mul, Ideal.mul_top]
     exact hxm
   rw [hk (k + 1) (by omega), Nat.add_sub_cancel_left, pow_one] at hx
-  have hle : maximalIdeal R • (maximalIdeal R ^ k • (⊤ : Submodule R R) ⊓ (I : Submodule R R))
-      ≤ maximalIdeal R • (I : Submodule R R) :=
+  have hle
+      : maximalIdeal R • (maximalIdeal R ^ k • (⊤ : Submodule R R) ⊓ (I : Submodule R R))
+        ≤ maximalIdeal R • (I : Submodule R R) :=
     Submodule.smul_mono le_rfl inf_le_right
   have hx' := hle hx
   rw [Ideal.smul_eq_mul, h] at hx'
   exact (Submodule.mem_bot R).1 hx'
 
-theorem UpperTheory.V.Fr.pr_sec :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O], ∀ (C' : Type) [CommRing C'] [Algebra O C'] [IsCO O C'] (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (p : C' →ₐ[O] C), Function.Surjective p → maximalIdeal C' * RingHom.ker p = ⊥ → ∀ (Γ : Type) [TopologicalSpace Γ] (x : Γ → C), AdicCont (maximalIdeal C) x → ∃ y : Γ → C', AdicCont (maximalIdeal C') y ∧ ∀ g, p (y g) = x g := by
+theorem UpperTheory.V.Fr.pr_sec
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O],
+      ∀ (C' : Type) [CommRing C'] [Algebra O C'] [IsCO O C'] (C : Type) [CommRing C] [Algebra O C]
+          [IsCO O C] (p : C' →ₐ[O] C),
+        Function.Surjective p → maximalIdeal C' * RingHom.ker p = ⊥
+          → ∀ (Γ : Type) [TopologicalSpace Γ] (x : Γ → C),
+            AdicCont (maximalIdeal C) x
+              → ∃ y : Γ → C', AdicCont (maximalIdeal C') y ∧ ∀ g, p (y g) = x g := by
   intro O _ _ C' _ _ _ C _ _ _ p hp hker Γ _ x hx
   have hmem : ∀ z : C', p z ∈ maximalIdeal C ↔ z ∈ maximalIdeal C' := by
     intro z
@@ -49,16 +58,17 @@ theorem UpperTheory.V.Fr.pr_sec :
     intro c
     apply Ideal.Quotient.eq.1
     exact (Function.surjInv_eq hq (Ideal.Quotient.mk _ c)).symm
-  have hw : ∀ c : C, ∃ w ∈ maximalIdeal C' ^ N₀, p w = c - p (σ (Ideal.Quotient.mk _ c)) :=
-    fun c => hpow N₀ _ (hσ c)
+  have hw : ∀ c : C, ∃ w ∈ maximalIdeal C' ^ N₀, p w = c - p (σ (Ideal.Quotient.mk _ c)) := fun c =>
+    hpow N₀ _ (hσ c)
   choose w hwm hwp using hw
   let s : C → C' := fun c => σ (Ideal.Quotient.mk (maximalIdeal C ^ N₀) c) + w c
   have hs : ∀ c, p (s c) = c := by
     intro c
     simp only [s, map_add (f := _), hwp]
     ring
-  have hsd : ∀ n ≥ N₀, ∀ c₁ c₂ : C, c₁ - c₂ ∈ maximalIdeal C ^ n →
-      s c₁ - s c₂ ∈ maximalIdeal C' ^ n := by
+  have hsd
+      : ∀ n ≥ N₀, ∀ c₁ c₂ : C,
+        c₁ - c₂ ∈ maximalIdeal C ^ n → s c₁ - s c₂ ∈ maximalIdeal C' ^ n := by
     intro n hn c₁ c₂ h
     have hcl : Ideal.Quotient.mk (maximalIdeal C ^ N₀) c₁ = Ideal.Quotient.mk _ c₂ :=
       Ideal.Quotient.eq.2 (Ideal.pow_le_pow_right hn h)

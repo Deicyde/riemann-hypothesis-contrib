@@ -12,16 +12,25 @@ open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.LatVal
 
 namespace GlobalTheory.ClassInvAny
 
-
 open GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates in
-theorem classInv_of_unit_trivial : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Type) [Fintype I] (φ : I → E →+* ℂ), IsCMType φ → ∀ (s : ℕ) (κ : I → ℕ) (c : Ideal (OF E)) (χ : HChar E), HasInf χ φ (fun i => (κ i : ℤ) + s) → (∀ u ∈ hatOUnits c, finPart χ u = 1) → ∀ (y y' : (Af E)ˣ) (S S' : ℂ → ℂ), (QuotientGroup.mk y : PicO c) = QuotientGroup.mk y' → IsLatSum φ (2 * s) κ (lattice c y) S → IsLatSum φ (2 * s) κ (lattice c y') S' → ((finPart χ y : ℂ) * ((modF y ^ s : ℝ) : ℂ))⁻¹ * S 0 = ((finPart χ y' : ℂ) * ((modF y' ^ s : ℝ) : ℂ))⁻¹ * S' 0 := by
+theorem classInv_of_unit_trivial
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Type) [Fintype I] (φ : I → E →+* ℂ),
+      IsCMType φ
+        → ∀ (s : ℕ) (κ : I → ℕ) (c : Ideal (OF E)) (χ : HChar E),
+          HasInf χ φ (fun i => (κ i : ℤ) + s) → (∀ u ∈ hatOUnits c, finPart χ u = 1)
+            → ∀ (y y' : (Af E)ˣ) (S S' : ℂ → ℂ),
+              (QuotientGroup.mk y : PicO c) = QuotientGroup.mk y'
+                → IsLatSum φ (2 * s) κ (lattice c y) S → IsLatSum φ (2 * s) κ (lattice c y') S'
+                → ((finPart χ y : ℂ) * ((modF y ^ s : ℝ) : ℂ))⁻¹ * S 0
+                  = ((finPart χ y' : ℂ) * ((modF y' ^ s : ℝ) : ℂ))⁻¹ * S' 0 := by
   intro E _ _ _ I _ φ hφ s κ c χ hχ hunit y y' S S' hq hS hS'
   classical
   obtain ⟨a, ⟨α, rfl⟩, u, hu, hau⟩ := Subgroup.mem_sup.1 (QuotientGroup.eq.1 hq)
   set a : (Af E)ˣ := Units.map (algebraMap E (Af E)).toMonoidHom α with ha
   have hy' : y' = a * y * u := by
     have : y' = y * (a * u) := by rw [hau]; group
-    rw [this]; exact (by ac_rfl : y * (a * u) = a * y * u)
+    rw [this]
+    exact (by ac_rfl : y * (a * u) = a * y * u)
   subst hy'
   have hL := GlobalTheory.ClassInv.lattice_princ_mul_unit (c := c) y α hu
   rw [hL] at hS'
@@ -37,7 +46,8 @@ theorem classInv_of_unit_trivial : ∀ (E : Type) [Field E] [NumberField E] [IsC
     exact abs_ne_zero.2 (by exact_mod_cast h0)
   have hmy : modF y ≠ 0 := (IdeleModule.modF_pos y).ne'
   rw [hS0, GlobalTheory.ClassInv.lamInf_eq hφ hχ α]
-  rw [map_mul, map_mul, hfu, mul_one, IdeleModule.modF_mul, IdeleModule.modF_mul, hmu, mul_one, hma, Units.val_mul]
+  rw [map_mul, map_mul, hfu, mul_one, IdeleModule.modF_mul, IdeleModule.modF_mul, hmu, mul_one, hma,
+    Units.val_mul]
   have hF : ((finPart χ y : ℂˣ) : ℂ) ≠ 0 := Units.ne_zero _
   have hA : ((finPart χ a : ℂˣ) : ℂ) ≠ 0 := Units.ne_zero _
   have hB : ((χ.inf α : ℂˣ) : ℂ) ≠ 0 := Units.ne_zero _

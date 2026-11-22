@@ -10,9 +10,9 @@ namespace GlobalTheory.BinaryFormUniversal
 
 open Polynomial
 
-theorem binary_form_universal {k : Type u_1} [Field k] [Finite k] {a n : k}
-    (hD : a ^ (2 : ℕ) - (4 : k) * n ≠ (0 : k)) (u : k) :
-    ∃ (r : k) (s : k), r ^ (2 : ℕ) + a * r * s + n * s ^ (2 : ℕ) = u := by
+theorem binary_form_universal
+    {k : Type u_1} [Field k] [Finite k] {a n : k} (hD : a ^ (2 : ℕ) - (4 : k) * n ≠ (0 : k)) (u : k)
+    : ∃ (r : k) (s : k), r ^ (2 : ℕ) + a * r * s + n * s ^ (2 : ℕ) = u := by
   classical
   by_cases h2 : ringChar k = 2
   · obtain ⟨r, hr⟩ := FiniteField.isSquare_of_char_two h2 u

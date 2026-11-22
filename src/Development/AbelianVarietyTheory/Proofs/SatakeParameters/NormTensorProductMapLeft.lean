@@ -8,9 +8,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem norm_tensorProduct_map_left {R B L : Type} [Field R] [CommRing B] [Algebra R B] [Field L]
-    [Algebra R L] [FiniteDimensional R L] (f : B →ₐ[R] B) (w : B ⊗[R] L) :
-    Algebra.norm B (Algebra.TensorProduct.map f (AlgHom.id R L) w) = f (Algebra.norm B w) := by
+theorem norm_tensorProduct_map_left
+    {R B L : Type}
+    [Field R] [CommRing B] [Algebra R B] [Field L] [Algebra R L] [FiniteDimensional R L]
+    (f : B →ₐ[R] B) (w : B ⊗[R] L)
+    : Algebra.norm B (Algebra.TensorProduct.map f (AlgHom.id R L) w) = f (Algebra.norm B w) := by
   classical
   let e := Module.finBasis R L
   let b := Algebra.TensorProduct.basis B e

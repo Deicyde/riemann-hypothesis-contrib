@@ -10,7 +10,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ResidualSpectrum.Iwas
 
 namespace PositivityTheory.Rg.Rs
 
-theorem locSub_holds2 : LocSub := LsTop.locSub_of C3.Rap.restrictAtPoint_holds existsProj2 frobRecip_holds
+theorem locSub_holds2 : LocSub :=
+  LsTop.locSub_of C3.Rap.restrictAtPoint_holds existsProj2 frobRecip_holds
 
 theorem ascSeed_holds2 : AscSeed := ascSeed_of_locSub locSub_holds2
 

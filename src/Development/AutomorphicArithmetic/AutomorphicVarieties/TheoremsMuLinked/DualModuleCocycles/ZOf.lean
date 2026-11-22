@@ -5,12 +5,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuL
 
 @[expose] public section
 
-open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa UpperTheory.V.Th UpperTheory.V.Th.Coc
+open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa
+  UpperTheory.V.Th UpperTheory.V.Th.Coc
 
-theorem UpperTheory.V.Th.Coc.zOf :
-    ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) {O R X : Type} [CommRing O] [CommRing R] [Algebra O R] [CommRing X] [Algebra O X] {n : ℕ} [Algebra ℤ_[l] O] (x : R →ₐ[O] O) (δ : R →ₗ[O] X) (ρ : F.G₀ →* GL (Fin n) O) (P : GL (Fin n) O) (τ : MonoidAlgebra R F.G₀ → R) (c : O) (d : MonoidAlgebra R F.G₀ →+ Matrix (Fin n) (Fin n) X) (z : F.G₀ → Matrix (Fin n) (Fin n) X), IsDer x δ → F.IsForm O n ρ P → IsLift x δ (repR x (mat ρ)) τ c d → (∀ a, bar X (P : Matrix (Fin n) (Fin n) O) * d (F.star O R n a) = (d a)ᵀ * bar X (P : Matrix (Fin n) (Fin n) O)) → (∀ g, z g = d (MonoidAlgebra.single g 1) * bar X (mat ρ g⁻¹)) → d 1 = 0 ∧ (∀ g g', z (g * g') = z g + bar X (mat ρ g) * z g' * bar X (mat ρ g⁻¹)) ∧ (∀ g, bar X (P : Matrix (Fin n) (Fin n) O) * z (F.conj g) = -((z g)ᵀ * bar X (P : Matrix (Fin n) (Fin n) O))) ∧ ∀ g, (z g * bar X (mat ρ g)).trace = c • δ (τ (MonoidAlgebra.single g 1)) := by
+theorem UpperTheory.V.Th.Coc.zOf
+    : ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) {O R X : Type} [CommRing O] [CommRing R] [Algebra O R]
+        [CommRing X] [Algebra O X] {n : ℕ} [Algebra ℤ_[l] O] (x : R →ₐ[O] O) (δ : R →ₗ[O] X)
+        (ρ : F.G₀ →* GL (Fin n) O) (P : GL (Fin n) O) (τ : MonoidAlgebra R F.G₀ → R) (c : O)
+        (d : MonoidAlgebra R F.G₀ →+ Matrix (Fin n) (Fin n) X)
+        (z : F.G₀ → Matrix (Fin n) (Fin n) X),
+      IsDer x δ → F.IsForm O n ρ P → IsLift x δ (repR x (mat ρ)) τ c d
+        → (∀ a,
+          bar X (P : Matrix (Fin n) (Fin n) O) * d (F.star O R n a)
+            = (d a)ᵀ * bar X (P : Matrix (Fin n) (Fin n) O))
+        → (∀ g, z g = d (MonoidAlgebra.single g 1) * bar X (mat ρ g⁻¹))
+        → d 1 = 0 ∧ (∀ g g', z (g * g') = z g + bar X (mat ρ g) * z g' * bar X (mat ρ g⁻¹))
+          ∧ (∀ g,
+            bar X (P : Matrix (Fin n) (Fin n) O) * z (F.conj g)
+              = -((z g)ᵀ * bar X (P : Matrix (Fin n) (Fin n) O)))
+          ∧ ∀ g, (z g * bar X (mat ρ g)).trace = c • δ (τ (MonoidAlgebra.single g 1)) := by
   intro l _ F O R X _ _ _ _ _ n _ x δ ρ P τ c d z hδ hF hL hst hz
-  have bmul : ∀ A B : Matrix (Fin n) (Fin n) O, bar X (A * B) = bar X A * bar X B := fun A B => Matrix.map_mul
+  have bmul : ∀ A B : Matrix (Fin n) (Fin n) O, bar X (A * B) = bar X A * bar X B := fun A B =>
+    Matrix.map_mul
   have bone : bar X (1 : Matrix (Fin n) (Fin n) O) = 1 := Matrix.map_one _ (map_zero _) (map_one _)
   have bsm : ∀ (e : O) (A : Matrix (Fin n) (Fin n) O), bar X (e • A) = e • bar X A := by
     intro e A
@@ -37,11 +53,16 @@ theorem UpperTheory.V.Th.Coc.zOf :
   have δa : ∀ e : O, δ (algebraMap O R e) = 0 := by
     intro e
     rw [Algebra.algebraMap_eq_smul_one, map_smul, δ1, smul_zero]
-  have dmul : ∀ g g', d (MonoidAlgebra.single (g * g') 1) =
-      d (MonoidAlgebra.single g 1) * bar X (mat ρ g') + bar X (mat ρ g) * d (MonoidAlgebra.single g' 1) := by
+  have dmul
+      : ∀ g g',
+        d (MonoidAlgebra.single (g * g') 1)
+          = d (MonoidAlgebra.single g 1) * bar X (mat ρ g')
+            + bar X (mat ρ g) * d (MonoidAlgebra.single g' 1) := by
     intro g g'
     have h := hL.mul (MonoidAlgebra.single g 1) (MonoidAlgebra.single g' 1)
-    rw [MonoidAlgebra.single_mul_single, mul_one, repR_single, repR_single, map_one, one_smul, one_smul] at h
+    rw [MonoidAlgebra.single_mul_single, mul_one, repR_single, repR_single, map_one, one_smul,
+        one_smul]
+      at h
     exact h
   have hd : ∀ g, d (MonoidAlgebra.single g 1) = z g * bar X (mat ρ g) := by
     intro g
@@ -64,18 +85,22 @@ theorem UpperTheory.V.Th.Coc.zOf :
     rw [(starFacts F (O := O) (R := R) (n := n)).2.2.2.2.1 g] at h
     have hf := congrArg (bar X) (hF g)
     generalize ((F.eps O O g ^ (1 - (n : ℤ)) : Oˣ) : O) = e at h hf
-    have hs : (MonoidAlgebra.single (F.conj g)⁻¹ (algebraMap O R e) : MonoidAlgebra R F.G₀) =
-        algebraMap O R e • MonoidAlgebra.single (F.conj g)⁻¹ 1 := by
+    have hs
+        : (MonoidAlgebra.single (F.conj g)⁻¹ (algebraMap O R e) : MonoidAlgebra R F.G₀)
+          = algebraMap O R e • MonoidAlgebra.single (F.conj g)⁻¹ 1 := by
       rw [MonoidAlgebra.smul_single, smul_eq_mul, mul_one]
-    rw [hs, hL.smul, δa, smul_zero, zero_smul, add_zero, AlgHom.commutes, dinv, hd, transpose_mul] at h
+    rw [hs, hL.smul, δa, smul_zero, zero_smul, add_zero, AlgHom.commutes, dinv, hd, transpose_mul]
+      at h
     rw [bmul, bmul, bsm] at hf
     have ht : bar X (mat ρ g)ᵀ = (bar X (mat ρ g))ᵀ := rfl
     rw [ht] at hf
-    have hf2 : (bar X (mat ρ g))ᵀ * bar X (P : Matrix (Fin n) (Fin n) O) =
-        e • (bar X (P : Matrix (Fin n) (Fin n) O) * bar X (mat ρ (F.conj g)⁻¹)) := by
+    have hf2
+        : (bar X (mat ρ g))ᵀ * bar X (P : Matrix (Fin n) (Fin n) O)
+          = e • (bar X (P : Matrix (Fin n) (Fin n) O) * bar X (mat ρ (F.conj g)⁻¹)) := by
       rw [← smul_mul_assoc, ← hf, mul_assoc, rinv', mul_one]
-    have h3 : (bar X (mat ρ g))ᵀ * (bar X (P : Matrix (Fin n) (Fin n) O) * z (F.conj g)) =
-        (bar X (mat ρ g))ᵀ * -((z g)ᵀ * bar X (P : Matrix (Fin n) (Fin n) O)) := by
+    have h3
+        : (bar X (mat ρ g))ᵀ * (bar X (P : Matrix (Fin n) (Fin n) O) * z (F.conj g))
+          = (bar X (mat ρ g))ᵀ * -((z g)ᵀ * bar X (P : Matrix (Fin n) (Fin n) O)) := by
       rw [mul_neg, ← mul_assoc, ← mul_assoc, ← h, hf2]
       simp [mul_assoc]
     have h4 : (bar X (mat ρ g⁻¹))ᵀ * (bar X (mat ρ g))ᵀ = 1 := by

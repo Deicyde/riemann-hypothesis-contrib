@@ -40,8 +40,8 @@ theorem cO_cO (x : 𝓞 K) : cO K (cO K x) = x := by
 theorem cO_mem_Tw {w : HeightOneSpectrum (𝓞 K)} {s : 𝓞 K} (hs : s ∈ Tw w) : cO K s ∈ Tw w :=
   ⟨hs.2, by rw [cO_cO]; exact hs.1⟩
 
-theorem hcompl_le_Tw (w : HeightOneSpectrum (𝓞 K)) :
-    Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal ≤ Tw w := by
+theorem hcompl_le_Tw (w : HeightOneSpectrum (𝓞 K))
+    : Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal ≤ Tw w := by
   refine Submonoid.closure_le.2 ?_
   rintro s ⟨hs, hs'⟩
   exact ⟨hs, hs' (cO K s) rfl⟩
@@ -49,15 +49,14 @@ theorem hcompl_le_Tw (w : HeightOneSpectrum (𝓞 K)) :
 theorem smul_coe {m : Type*} (r : 𝓞 K) (v : m → K) : r • v = (r : K) • v :=
   (algebraMap_smul K r v).symm
 
-theorem vw_mul (w : HeightOneSpectrum (𝓞 K)) {a b : K} (ha : a ≠ 0) (hb : b ≠ 0) :
-    vw w (a * b) = vw w a + vw w b := by
+theorem vw_mul (w : HeightOneSpectrum (𝓞 K)) {a b : K} (ha : a ≠ 0) (hb : b ≠ 0)
+    : vw w (a * b) = vw w a + vw w b := by
   unfold vw
   rw [← FractionalIdeal.spanSingleton_mul_spanSingleton,
     FractionalIdeal.count_mul K w (mt FractionalIdeal.spanSingleton_eq_zero_iff.1 ha)
       (mt FractionalIdeal.spanSingleton_eq_zero_iff.1 hb)]
 
-theorem vw_pow (w : HeightOneSpectrum (𝓞 K)) (a : K) (m : ℕ) :
-    vw w (a ^ m) = (m : ℤ) * vw w a := by
+theorem vw_pow (w : HeightOneSpectrum (𝓞 K)) (a : K) (m : ℕ) : vw w (a ^ m) = (m : ℤ) * vw w a := by
   unfold vw
   rw [← FractionalIdeal.spanSingleton_pow, FractionalIdeal.count_pow]
 
@@ -66,8 +65,8 @@ theorem vw_int_nonneg (w : HeightOneSpectrum (𝓞 K)) (r : 𝓞 K) : 0 ≤ vw w
   rw [show (r : K) = algebraMap (𝓞 K) K r from rfl, ← FractionalIdeal.coeIdeal_span_singleton]
   exact FractionalIdeal.count_coe_nonneg K w _
 
-theorem vw_unit (w : HeightOneSpectrum (𝓞 K)) (r : 𝓞 K) (hr : r ∉ w.asIdeal) :
-    vw w (r : K) = 0 := by
+theorem vw_unit (w : HeightOneSpectrum (𝓞 K)) (r : 𝓞 K) (hr : r ∉ w.asIdeal)
+    : vw w (r : K) = 0 := by
   classical
   have hr0 : r ≠ 0 := fun h => hr (h ▸ w.asIdeal.zero_mem)
   have hJ : Ideal.span {r} ≠ (0 : Ideal (𝓞 K)) := by
@@ -85,13 +84,16 @@ theorem Tw_ne_zero {w : HeightOneSpectrum (𝓞 K)} {s : 𝓞 K} (hs : s ∈ Tw 
   intro h
   apply hs.1
   have : s = 0 := RingOfIntegers.ext (by simpa using h)
-  rw [this]; exact w.asIdeal.zero_mem
+  rw [this]
+  exact w.asIdeal.zero_mem
 
-theorem main {n D : ℕ} (H : Matrix (Fin n) (Fin n) K) (P : Matrix (Fin D) (Fin n) K)
-    (M : Submodule (𝓞 K) (Fin n → K)) (hM : M.FG) (l g : ℕ) (hl : 0 < l)
+theorem main
+    {n D : ℕ} (H : Matrix (Fin n) (Fin n) K) (P : Matrix (Fin D) (Fin n) K)
+    (M : Submodule (𝓞 K) (Fin n → K)) (hM : M.FG)
+    (l g : ℕ) (hl : 0 < l)
     (hdual : ∀ x ∈ Formalism.HermitianLatticesTheory.dual (hform H) M, ((l : 𝓞 K) ^ g) • x ∈ M)
-    (w : HeightOneSpectrum (𝓞 K)) (e : Fin D → Fin D → K) (he : IsLocBasis (matLat P M) w e) :
-    vw w (gramR (quotGram P H) e) ≤ (g : ℤ) * (D : ℤ) * vw w (l : K) :=
+    (w : HeightOneSpectrum (𝓞 K)) (e : Fin D → Fin D → K) (he : IsLocBasis (matLat P M) w e)
+    : vw w (gramR (quotGram P H) e) ≤ (g : ℤ) * (D : ℤ) * vw w (l : K) :=
   _root_.UpperTheory.Reformulated.B.SelectionLemmas.main H P M hM l g hl hdual w e he
 
 end ReductionFirst

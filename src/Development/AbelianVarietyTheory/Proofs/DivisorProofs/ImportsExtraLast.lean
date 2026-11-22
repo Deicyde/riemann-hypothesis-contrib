@@ -6,12 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.NonzeroSmulMembership
 
-theorem exists_ne_zero_smul_mem {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E)) (hL : Submodule.IsFullLattice E L)
-    (x : Fin n → E) :
-    ∃ (d : NumberField.RingOfIntegers E), d ≠ (0 : NumberField.RingOfIntegers E) ∧ d • x ∈ L := by
-  have hx : x ∈ Submodule.span E (L : Set (Fin n → E)) := by
-    rw [hL.span_eq_top]; trivial
+theorem exists_ne_zero_smul_mem
+    {E : Type} [inst : Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E))
+    (hL : Submodule.IsFullLattice E L) (x : Fin n → E)
+    : ∃ (d : NumberField.RingOfIntegers E), d ≠ (0 : NumberField.RingOfIntegers E) ∧ d • x ∈ L := by
+  have hx : x ∈ Submodule.span E (L : Set (Fin n → E)) := by rw [hL.span_eq_top]; trivial
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -30,8 +30,12 @@ theorem exists_ne_zero_smul_mem {E : Type} [inst : Field E] [NumberField E] {n :
       intro h
       exact hq0 (IsFractionRing.injective (NumberField.RingOfIntegers E) E (by simpa using h))
     refine ⟨q * a, mul_ne_zero hq0 ha, ?_⟩
-    have key : (q * a) • ((algebraMap (NumberField.RingOfIntegers E) E p /
-        algebraMap (NumberField.RingOfIntegers E) E q) • y) = p • a • y := by
+    have key
+        : (q * a)
+            • ((algebraMap (NumberField.RingOfIntegers E) E p
+                / algebraMap (NumberField.RingOfIntegers E) E q)
+              • y)
+          = p • a • y := by
       funext i
       simp only [Pi.smul_apply, smul_eq_mul]
       simp only [Algebra.smul_def, map_mul]

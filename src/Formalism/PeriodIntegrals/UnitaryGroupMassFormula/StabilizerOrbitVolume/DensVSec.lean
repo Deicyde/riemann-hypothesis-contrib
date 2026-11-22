@@ -10,19 +10,22 @@ noncomputable section
 
 namespace PI.VolStabSW
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct
 
-theorem exists_leftInv_of_linIndep {K : Type} [CommRing K] [IsSemisimpleRing K] {a M : ℕ}
-    (Z : Fin a → Fin M → K) (hZ : LinearIndependent K Z) :
-    ∃ q : Fin M → Fin a → K, ∀ i i', ∑ k, Z i k * q k i' = if i = i' then 1 else 0 := by
+theorem exists_leftInv_of_linIndep
+    {K : Type} [CommRing K] [IsSemisimpleRing K]
+    {a M : ℕ} (Z : Fin a → Fin M → K) (hZ : LinearIndependent K Z)
+    : ∃ q : Fin M → Fin a → K, ∀ i i', ∑ k, Z i k * q k i' = if i = i' then 1 else 0 := by
   classical
   let f : (Fin a → K) →ₗ[K] (Fin M → K) := ∑ i, (LinearMap.proj i).smulRight (Z i)
   have hf_apply : ∀ c, f c = ∑ i, c i • Z i := by
     intro c
     simp [f, LinearMap.sum_apply]
   have hf : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro c hc
     rw [hf_apply] at hc
     funext i
@@ -30,11 +33,15 @@ theorem exists_leftInv_of_linIndep {K : Type} [CommRing K] [IsSemisimpleRing K] 
   obtain ⟨g, hg⟩ : ∃ g : (Fin M → K) →ₗ[K] (Fin a → K), g ∘ₗ f = LinearMap.id := by
     first
     | exact IsSemisimpleModule.extension_property f hf LinearMap.id
-    | (obtain ⟨C, hC⟩ := exists_isCompl (LinearMap.range f)
-       exact ⟨(LinearEquiv.ofInjective f hf).symm.toLinearMap ∘ₗ
-         Submodule.linearProjOfIsCompl _ _ hC, by
-           ext c : 1
-           simp [Submodule.linearProjOfIsCompl_apply_left]⟩)
+    | (
+        obtain ⟨C, hC⟩ := exists_isCompl (LinearMap.range f)
+        exact ⟨
+          (LinearEquiv.ofInjective f hf).symm.toLinearMap ∘ₗ Submodule.linearProjOfIsCompl _ _ hC,
+          by
+            ext c : 1
+            simp [Submodule.linearProjOfIsCompl_apply_left]
+        ⟩
+      )
   refine ⟨fun k i' => g (fun j => if k = j then 1 else 0) i', fun i i' => ?_⟩
   have hZi : Z i = ∑ k, Z i k • (fun j => if k = j then (1 : K) else 0) := pi_eq_sum_univ (Z i)
   have key : g (Z i) = fun j => if i = j then 1 else 0 := by
@@ -63,7 +70,8 @@ theorem secGram_holds : SecGram := by
     intro k l
     simp [JR, inclR, sigR, hJ]
   have hJunit : IsUnit (JR (F := F) R J).det := by
-    have hd : (JR (F := F) R J).det = inclR (F := F) R J.det := (RingHom.map_det (inclR (F := F) R) J).symm
+    have hd : (JR (F := F) R J).det = inclR (F := F) R J.det :=
+      (RingHom.map_det (inclR (F := F) R) J).symm
     rw [hd]
     exact (isUnit_iff_ne_zero.2 hdet).map _
   set s := sigR R σ with hs
@@ -95,18 +103,21 @@ theorem secGram_holds : SecGram := by
   have hS' : ∀ i j, s (S j i) = S i j := hS
   set c : R ⊗[F] E := algebraMap F (R ⊗[F] E) (1 / 2) with hc
   set Y : Fin a → Fin M → R ⊗[F] E := fun j k => ∑ i', c * S i' j * q k i' with hY
-  have hsum3 : ∀ f : Fin M → Fin M → Fin a → R ⊗[F] E,
-      ∑ k, ∑ l, ∑ i', f k l i' = ∑ i', ∑ l, ∑ k, f k l i' := by
+  have hsum3
+      : ∀ f : Fin M → Fin M → Fin a → R ⊗[F] E,
+        ∑ k, ∑ l, ∑ i', f k l i' = ∑ i', ∑ l, ∑ k, f k l i' := by
     intro f
     rw [Finset.sum_congr rfl fun k _ => Finset.sum_comm, Finset.sum_comm]
     exact Finset.sum_congr rfl fun i' _ => Finset.sum_comm
   have h1 : ∀ i j, hR R σ J (x i) (Y j) = c * S i j := by
     intro i j
-    have e1 : hR R σ J (x i) (Y j) =
-        ∑ k, ∑ l, ∑ i', s (x i k) * JR (F := F) R J k l * (c * S i' j * q l i') := by
+    have e1
+        : hR R σ J (x i) (Y j)
+          = ∑ k, ∑ l, ∑ i', s (x i k) * JR (F := F) R J k l * (c * S i' j * q l i') := by
       simp only [hR, Formalism.UG.hform, hY, Finset.mul_sum, ← hs]
-    have e2 : ∑ i', c * S i' j * ∑ l, w i l * q l i' =
-        ∑ i', ∑ l, ∑ k, s (x i k) * JR (F := F) R J k l * (c * S i' j * q l i') := by
+    have e2
+        : ∑ i', c * S i' j * ∑ l, w i l * q l i'
+          = ∑ i', ∑ l, ∑ k, s (x i k) * JR (F := F) R J k l * (c * S i' j * q l i') := by
       refine Finset.sum_congr rfl fun i' _ => ?_
       simp only [w, Finset.mul_sum, Finset.sum_mul]
       exact Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun k _ => by ring

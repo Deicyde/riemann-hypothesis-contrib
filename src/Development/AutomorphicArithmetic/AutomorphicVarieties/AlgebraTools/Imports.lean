@@ -8,9 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.exists_diag :
-    ∀ (F : Filter ℕ), F ≤ atTop → ∀ P : ℕ → ℕ → Prop, (∀ j, ∀ᶠ N in F, P j N) →
-      ∃ ν : ℕ → ℕ, Tendsto ν F atTop ∧ ∀ᶠ N in F, ∀ j ≤ ν N, P j N := by
+theorem UpperTheory.V.AlgebraTools.exists_diag
+    : ∀ (F : Filter ℕ),
+      F ≤ atTop
+        → ∀ P : ℕ → ℕ → Prop,
+          (∀ j, ∀ᶠ N in F, P j N)
+            → ∃ ν : ℕ → ℕ, Tendsto ν F atTop ∧ ∀ᶠ N in F, ∀ j ≤ ν N, P j N := by
   classical
   intro F hF P hP
   have hall : ∀ j, ∀ᶠ N in F, ∀ i ≤ j, P i N := fun j =>

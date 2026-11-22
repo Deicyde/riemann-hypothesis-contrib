@@ -14,13 +14,13 @@ section SlopeTestRemainingChoices
 
 variable {V : Type*} [AddCommGroup V] [Module ℂ V]
 
-theorem herm_sub_swap (H : Sesq V) (hH : IsHerm H) (x y : V) :
-    H x y - H y x = 2 * Complex.I * (altE H x y : ℂ) := by
+theorem herm_sub_swap (H : Sesq V) (hH : IsHerm H) (x y : V)
+    : H x y - H y x = 2 * Complex.I * (altE H x y : ℂ) := by
   rw [hH x y, Complex.sub_conj, altE]
   push_cast
   ring
 
-theorem altE_swap (H : Sesq V) (hH : IsHerm H) (x y : V) : altE H y x = -altE H x y := by
+theorem altE_swap (H : Sesq V) (hH : IsHerm H) (x y : V) : altE H y x = - altE H x y := by
   simp only [altE, hH x y, Complex.conj_im]
 
 theorem re_swap (H : Sesq V) (hH : IsHerm H) (x y : V) : (H y x).re = (H x y).re := by
@@ -83,8 +83,8 @@ theorem semicharacterBasic : SemiCharBasic := by
       simp only [altE] at h' ⊢
       rw [map_neg, Complex.neg_im, h', neg_zero]
     rw [add_neg_cancel, h0, hA, Complex.ofReal_zero, mul_zero, Complex.exp_zero, mul_one] at h
-    rcases hpm x hx with h1 | h1 <;> rcases hpm (-x) (Λ.neg_mem hx) with h2 | h2 <;>
-      rw [h1, h2] at h ⊢ <;> try norm_num at h
+    rcases hpm x hx with h1 | h1 <;> rcases hpm (-x) (Λ.neg_mem hx) with h2 | h2
+      <;> rw [h1, h2] at h ⊢ <;> try norm_num at h
   have hdual : Λ ≤ dualLat H Λ := by
     intro x hx
     show ∀ y ∈ Λ, ∃ m : ℤ, altE H x y = (m : ℝ)
@@ -94,8 +94,9 @@ theorem semicharacterBasic : SemiCharBasic := by
     rw [add_comm y x, altE_swap H hH] at e2
     have hxne : α x ≠ 0 := by rcases hpm x hx with h | h <;> rw [h] <;> norm_num
     have hyne : α y ≠ 0 := by rcases hpm y hy with h | h <;> rw [h] <;> norm_num
-    have he : Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H x y : ℂ)) =
-        Complex.exp ((Real.pi : ℂ) * Complex.I * ((-altE H x y : ℝ) : ℂ)) := by
+    have he
+        : Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H x y : ℂ))
+          = Complex.exp ((Real.pi : ℂ) * Complex.I * ((- altE H x y : ℝ) : ℂ)) := by
       have h := e1.symm.trans e2
       rw [mul_comm (α y) (α x)] at h
       exact mul_left_cancel₀ (mul_ne_zero hxne hyne) h
@@ -117,8 +118,9 @@ theorem semicharacterHom : SemiHom := by
     simp only [opU]; ring
   have hd : x ∈ dualLat H Λ := (semicharacterBasic V H hH Λ α hα).2.2 hx
   obtain ⟨m, hm⟩ := (show ∀ y ∈ Λ, ∃ m : ℤ, altE H x y = (m : ℝ) from hd) y hy
-  have hexp : Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H x y : ℂ)) =
-      Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H x y : ℂ)) := by
+  have hexp
+      : Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H x y : ℂ))
+        = Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H x y : ℂ)) := by
     rw [Complex.exp_eq_exp_iff_exists_int]
     refine ⟨-m, ?_⟩
     rw [hm]
@@ -129,21 +131,25 @@ theorem semicharacterHom : SemiHom := by
 
 theorem heisenbergAnalytic : OpUAnalytic := by
   intro V _ _ _ H x F hF z _
-  let L : V →ₗ[ℂ] ℂ :=
-    { toFun := fun v => H v x
-      map_add' := fun a b => by simp only [map_add (f := _), LinearMap.add_apply]
-      map_smul' := fun c a => by simp only [map_smul, LinearMap.smul_apply, RingHom.id_apply] }
+  let L : V →ₗ[ℂ] ℂ := {
+    toFun := fun v => H v x
+    map_add' := fun a b => by simp only [map_add (f := _), LinearMap.add_apply]
+    map_smul' := fun c a => by simp only [map_smul, LinearMap.smul_apply, RingHom.id_apply]
+  }
   have hlin : AnalyticAt ℂ (fun v => H v x) z := (LinearMap.toContinuousLinearMap L).analyticAt z
   have hF' : AnalyticAt ℂ (fun v => F (v + x)) z :=
-    AnalyticAt.comp (x := z) (f := fun v => v + x) (hF (z + x) (Set.mem_univ _))
-      (analyticAt_id.add analyticAt_const)
+    AnalyticAt.comp (x := z)
+      (f := fun v => v + x)
+      (hF (z + x) (Set.mem_univ _)) (analyticAt_id.add analyticAt_const)
   have hE : AnalyticAt ℂ
-      (fun v => Complex.exp (-(Real.pi : ℂ) * H v x - (Real.pi : ℂ) * H x x / 2)) z :=
+      (fun v => Complex.exp (-(Real.pi : ℂ) * H v x - (Real.pi : ℂ) * H x x / 2))
+      z :=
     ((analyticAt_const.mul hlin).sub analyticAt_const).cexp
   exact hF'.mul hE
 
-theorem matH_apply {n : Type*} [Fintype n] (h : Matrix n n ℂ) (z w : n → ℂ) :
-    matH h z w = ∑ i, ∑ j, z i * h i j * conj (w j) := rfl
+theorem matH_apply {n : Type*} [Fintype n] (h : Matrix n n ℂ) (z w : n → ℂ)
+    : matH h z w = ∑ i, ∑ j, z i * h i j * conj (w j) :=
+  rfl
 
 theorem matrixFormBasic : MatHBasic := by
   intro n _ h
@@ -160,8 +166,8 @@ theorem matrixFormBasic : MatHBasic := by
   rw [hc]
   ring
 
-theorem stdH_apply (L : PeriodPair) (n : Type*) [Fintype n] [DecidableEq n] (z w : n → ℂ) :
-    stdH L n z w = ∑ i, Formalism.L2.Th1.F.herm L (z i) (w i) := by
+theorem stdH_apply (L : PeriodPair) (n : Type*) [Fintype n] [DecidableEq n] (z w : n → ℂ)
+    : stdH L n z w = ∑ i, Formalism.L2.Th1.F.herm L (z i) (w i) := by
   rw [stdH, matH_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_eq_single i (fun j _ hj => by simp [Matrix.one_apply, Ne.symm hj]) (by simp)]
@@ -177,8 +183,10 @@ theorem standardFormBasic : StdHBasic := by
     refine Finset.sum_congr rfl fun i _ => ?_
     simp only [Formalism.L2.Th1.F.herm, map_div₀, map_mul, Complex.conj_conj, Complex.conj_ofReal]
     ring
-  · have hi : ∀ i, Formalism.L2.Th1.F.herm L (x i) (x i) =
-        ((Complex.normSq (x i) / Formalism.L2.Th1.F.area L : ℝ) : ℂ) := by
+  · have hi
+        : ∀ i,
+          Formalism.L2.Th1.F.herm L (x i) (x i)
+            = ((Complex.normSq (x i) / Formalism.L2.Th1.F.area L : ℝ) : ℂ) := by
       intro i
       simp only [Formalism.L2.Th1.F.herm, Complex.mul_conj]
       push_cast
@@ -189,7 +197,8 @@ theorem standardFormBasic : StdHBasic := by
       by_contra h
       push_neg at h
       exact hx (funext h)
-    exact Finset.sum_pos' (fun j _ => div_nonneg (Complex.normSq_nonneg _) harea.le)
+    exact Finset.sum_pos'
+      (fun j _ => div_nonneg (Complex.normSq_nonneg _) harea.le)
       ⟨i, Finset.mem_univ _, div_pos (Complex.normSq_pos.mpr hi0) harea⟩
 
 theorem heisenbergStandard : OpUStd := by
@@ -198,8 +207,8 @@ theorem heisenbergStandard : OpUStd := by
   rw [Finset.prod_mul_distrib, ← Complex.exp_sum, Finset.mul_sum, Finset.mul_sum, Finset.sum_div,
     ← Finset.sum_sub_distrib]
 
-theorem matrixForm_fourfoldBlock {n : Type*} [Fintype n] (h : Matrix n n ℂ) (z w : Fin 4 × n → ℂ) :
-    matH (blk4 h) z w = ∑ a, matH h (slice a z) (slice a w) := by
+theorem matrixForm_fourfoldBlock {n : Type*} [Fintype n] (h : Matrix n n ℂ) (z w : Fin 4 × n → ℂ)
+    : matH (blk4 h) z w = ∑ a, matH h (slice a z) (slice a w) := by
   simp only [matH_apply, slice, blk4, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_eq_single a (fun b _ hb => by simp [Ne.symm hb]) (by simp)]

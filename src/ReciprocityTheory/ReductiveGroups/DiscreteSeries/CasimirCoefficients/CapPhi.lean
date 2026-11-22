@@ -77,10 +77,11 @@ lemma negE_apply_out (a b : Fin n) (G : smoothS n) {z : Matrix (Fin n) (Fin n) �
     ((negE a b G : smoothS n) : Matrix (Fin n) (Fin n) ℂ → ℂ) z = 0 := by
   exact ltOp_of_not_mem _ hz
 
-def phiS (μ : Fin n → ℤ) : smoothS n :=
-  ⟨(OmegaSet n).indicator (PhiM μ),
-    (show ContDiffOn ℂ ∞ (PhiM μ) (OmegaSet n) from fun _ hz => (contDiffAt_phiM μ hz).contDiffWithinAt).congr
-      fun _ hz => Set.indicator_of_mem hz _⟩
+def phiS (μ : Fin n → ℤ) : smoothS n := ⟨
+  (OmegaSet n).indicator (PhiM μ),
+  (show ContDiffOn ℂ ∞ (PhiM μ) (OmegaSet n) from fun _ hz =>
+    (contDiffAt_phiM μ hz).contDiffWithinAt).congr fun _ hz => Set.indicator_of_mem hz _
+⟩
 
 lemma phiS_eqOn (μ : Fin n → ℤ) : Set.EqOn (PhiM μ) ((phiS μ : smoothS n) : Matrix (Fin n) (Fin n) ℂ → ℂ)
     (OmegaSet n) :=
@@ -165,15 +166,19 @@ lemma qdet_eq (u : ℂ) (F : Matrix (Fin n) (Fin n) ℂ → ℂ) (G : smoothS n)
 end CapPhi
 
 open CapPhi in
-theorem cap_phiM (μ : Fin n → ℤ) (lam : Fin n → ℝ) (hμ : IsMu lam μ) (Y : ℂ) {z : Matrix (Fin n) (Fin n) ℂ}
-    (hz : z ∈ OmegaSet n) :
-    Formalism.QuantumDeterminants.qdetOp negL (Y + ((n : ℂ) - 1) / 2) (PhiM μ) z =
-      Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) Y * PhiM μ z := by
+theorem cap_phiM
+    (μ : Fin n → ℤ) (lam : Fin n → ℝ) (hμ : IsMu lam μ)
+    (Y : ℂ)
+    {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n)
+    : Formalism.QuantumDeterminants.qdetOp negL (Y + ((n : ℂ) - 1) / 2) (PhiM μ) z
+      = Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) Y * PhiM μ z := by
   rw [qdet_eq (Y + ((n : ℂ) - 1) / 2) (PhiM μ) (phiS μ) (phiS_eqOn μ) hz, capelliC_phiS,
     Submodule.coe_smul, Pi.smul_apply, ← phiS_eqOn μ hz, smul_eq_mul]
   congr 1
-  have hfac : ∀ a : Fin n, ((n : ℂ) - 1 - (Y + ((n : ℂ) - 1) / 2) + -(μ a : ℂ) - ((a : ℕ) : ℂ)) =
-      (-1) * (Y + (lam a : ℂ)) := by
+  have hfac
+      : ∀ a : Fin n,
+        ((n : ℂ) - 1 - (Y + ((n : ℂ) - 1) / 2) + -(μ a : ℂ) - ((a : ℕ) : ℂ))
+          = (-1) * (Y + (lam a : ℂ)) := by
     intro a
     have h1 : (μ a : ℝ) = lam a + (((n : ℝ) - 1) / 2 - (a : ℕ)) := hμ a
     have h2 : (μ a : ℂ) = (lam a : ℂ) + (((n : ℂ) - 1) / 2 - ((a : ℕ) : ℂ)) := by

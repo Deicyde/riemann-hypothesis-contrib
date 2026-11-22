@@ -14,14 +14,18 @@ namespace GlobalTheory.PD.ResVan
 
 variable {F : Type} [Field F] {d : ℕ}
 
-theorem prod_zpow_add (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (m n : Fin (d + 1) → ℤ) :
-    ∏ j, x j ^ (m j + n j) = (∏ j, x j ^ m j) * ∏ j, x j ^ n j := by
+theorem prod_zpow_add (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (m n : Fin (d + 1) → ℤ)
+    : ∏ j, x j ^ (m j + n j) = (∏ j, x j ^ m j) * ∏ j, x j ^ n j := by
   first
   | exact @_root_.GlobalTheory.ProductZpowAdd.prod_zpow_add
   | exact _root_.GlobalTheory.ProductZpowAdd.prod_zpow_add
   | (apply _root_.GlobalTheory.ProductZpowAdd.prod_zpow_add <;> assumption)
   | (intros; apply _root_.GlobalTheory.ProductZpowAdd.prod_zpow_add <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.ProductZpowAdd.prod_zpow_add <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.ProductZpowAdd.prod_zpow_add
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.ProductZpowAdd.prod_zpow_add ..)
 
 def monoA (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (I : Finset (Fin (d + 1))) : Submonoid F where
@@ -33,16 +37,17 @@ def monoA (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (I : Finset (Fin (d + 
     · simp [Finset.sum_add_distrib, hm, hn]
     · simp only [Pi.add_apply]; exact (prod_zpow_add x hx m n).symm
 
-theorem prod_single_sub (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (i j : Fin (d + 1)) :
-    ∏ l, x l ^ ((Pi.single j 1 : Fin (d + 1) → ℤ) l - (Pi.single i 1 : Fin (d + 1) → ℤ) l) = x j / x i := by
+theorem prod_single_sub (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (i j : Fin (d + 1))
+    : ∏ l, x l ^ ((Pi.single j 1 : Fin (d + 1) → ℤ) l - (Pi.single i 1 : Fin (d + 1) → ℤ) l)
+      = x j / x i := by
   simp_rw [zpow_sub₀ (hx _)]
   rw [Finset.prod_div_distrib]
   congr 1
   · rw [Fintype.prod_eq_single j (fun l hl => by simp [Pi.single_apply, hl])]; simp
   · rw [Fintype.prod_eq_single i (fun l hl => by simp [Pi.single_apply, hl])]; simp
 
-theorem prod_exp (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (i0 : Fin (d + 1)) :
-    (∏ j, x j ^ ((1 : ℤ) - if j = i0 then ((d : ℤ) + 1) else 0)) * ∏ j, x i0 / x j = 1 := by
+theorem prod_exp (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (i0 : Fin (d + 1))
+    : (∏ j, x j ^ ((1 : ℤ) - if j = i0 then ((d : ℤ) + 1) else 0)) * ∏ j, x i0 / x j = 1 := by
   simp_rw [zpow_sub₀ (hx _), zpow_one]
   rw [Finset.prod_div_distrib, Finset.prod_div_distrib]
   have hq : ∏ j, x j ^ (if j = i0 then ((d : ℤ) + 1) else 0) = x i0 ^ (d + 1) := by
@@ -54,9 +59,13 @@ theorem prod_exp (x : Fin (d + 1) → F) (hx : ∀ i, x i ≠ 0) (i0 : Fin (d + 
   have h1 := hx i0
   field_simp
 
-theorem resvan : ∀ (k : Type) [Field k] (F : Type) [Field F] [Algebra k F] (d : ℕ) (x : Fin (d + 1) → F), IsPd k x →
-    ∀ ρ : F →ₗ[k] k, IsRes k x ρ → ∀ (i : Fin (d + 1)) (I : Finset (Fin (d + 1))), I.Nonempty → i ∉ I →
-    ∀ y ∈ omA k x I, ρ y = 0 := by
+theorem resvan
+    : ∀ (k : Type) [Field k] (F : Type) [Field F] [Algebra k F] (d : ℕ) (x : Fin (d + 1) → F),
+      IsPd k x
+        → ∀ ρ : F →ₗ[k] k,
+          IsRes k x ρ
+            → ∀ (i : Fin (d + 1)) (I : Finset (Fin (d + 1))),
+              I.Nonempty → i ∉ I → ∀ y ∈ omA k x I, ρ y = 0 := by
   intro k _ F _ _ d x hx ρ hρ i I hI hi y hy
   obtain ⟨i0, hi0⟩ := hI
   have hne := hx.ne
@@ -69,13 +78,20 @@ theorem resvan : ∀ (k : Type) [Field k] (F : Type) [Field F] [Algebra k F] (d 
     rw [rA, ← Subalgebra.mem_toSubmodule, Algebra.adjoin_eq_span] at h1
     refine Submodule.span_mono (Submonoid.closure_le.2 ?_) h1
     rintro _ ⟨i', hi', j, rfl⟩
-    refine ⟨(Pi.single j 1 : Fin (d + 1) → ℤ) - Pi.single i' 1, by simp, fun l hl => ?_,
-      (prod_single_sub x hne i' j).symm⟩
+    refine ⟨
+      (Pi.single j 1 : Fin (d + 1) → ℤ) - Pi.single i' 1,
+      by simp,
+      fun l hl => ?_,
+      (prod_single_sub x hne i' j).symm
+    ⟩
     have hl' : l ≠ i' := fun h => hl (h ▸ hi')
     simp only [Pi.sub_apply, Pi.single_apply, hl', if_false, sub_zero]
     split_ifs <;> omega
   have hP := prod_exp x hne i0
-  have hy' : y = (∏ j, x j ^ ((1 : ℤ) - if j = i0 then ((d : ℤ) + 1) else 0)) * ((∏ j, x i0 / x j) * y) := by
+  have hy'
+      : y
+        = (∏ j, x j ^ ((1 : ℤ) - if j = i0 then ((d : ℤ) + 1) else 0))
+          * ((∏ j, x i0 / x j) * y) := by
     rw [← mul_assoc, hP, one_mul]
   rw [hy']
   generalize (∏ j, x i0 / x j) * y = z at hz

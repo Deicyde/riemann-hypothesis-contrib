@@ -12,9 +12,12 @@ namespace GlobalTheory.UTrans
 
 open GlobalTheory.UTrans.Calc
 
-private theorem sigma_hf_eq_hf_swap {R : Type} [CommRing R] {n : ℕ} (σ : R →+* R)
-    (G : Matrix (Fin n) (Fin n) R) (hσ : ∀ a, σ (σ a) = a) (hG : ∀ a b, σ (G a b) = G b a)
-    (x y : Fin n → R) : σ (GlobalTheory.UTrans.hf σ G x y) = GlobalTheory.UTrans.hf σ G y x := by
+private theorem sigma_hf_eq_hf_swap
+    {R : Type} [CommRing R]
+    {n : ℕ}
+    (σ : R →+* R) (G : Matrix (Fin n) (Fin n) R)
+    (hσ : ∀ a, σ (σ a) = a) (hG : ∀ a b, σ (G a b) = G b a) (x y : Fin n → R)
+    : σ (GlobalTheory.UTrans.hf σ G x y) = GlobalTheory.UTrans.hf σ G y x := by
   unfold GlobalTheory.UTrans.hf
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_mul, hσ, hG]
@@ -22,20 +25,30 @@ private theorem sigma_hf_eq_hf_swap {R : Type} [CommRing R] {n : ℕ} (σ : R �
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ring
 
-private theorem hf_add_smul_self {R : Type} [CommRing R] {n : ℕ} (σ : R →+* R)
-    (G : Matrix (Fin n) (Fin n) R) (x y : Fin n → R) (c : R) (hc : σ c = c) :
-    GlobalTheory.UTrans.hf σ G (x + c • y) (x + c • y) = GlobalTheory.UTrans.hf σ G x x
-      + c * (GlobalTheory.UTrans.hf σ G y x + GlobalTheory.UTrans.hf σ G x y) + c * c * GlobalTheory.UTrans.hf σ G y y := by
+private theorem hf_add_smul_self
+    {R : Type} [CommRing R]
+    {n : ℕ}
+    (σ : R →+* R)
+    (G : Matrix (Fin n) (Fin n) R) (x y : Fin n → R)
+    (c : R) (hc : σ c = c)
+    : GlobalTheory.UTrans.hf σ G (x + c • y) (x + c • y)
+      = GlobalTheory.UTrans.hf σ G x x
+        + c * (GlobalTheory.UTrans.hf σ G y x + GlobalTheory.UTrans.hf σ G x y)
+        + c * c * GlobalTheory.UTrans.hf σ G y y := by
   unfold GlobalTheory.UTrans.hf
-  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, map_add (f := _), map_mul, hc, Finset.mul_sum,
-    ← Finset.sum_add_distrib]
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, map_add (f := _), map_mul, hc,
+    Finset.mul_sum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ring
 
-private theorem exists_eq_algebraMap_of_fixed' {K L : Type} [Field K] [Field L] [CharZero L] [Algebra K L]
-    (σ : L →+* L) (δ : L) (hK : ∀ a : K, σ (algebraMap K L a) = algebraMap K L a)
-    (hσδ : σ δ = -δ) (hspan : ∀ x : L, ∃ a b : K, x = algebraMap K L a + algebraMap K L b * δ)
-    (z : L) (hz : σ z = z) : ∃ k : K, z = algebraMap K L k := by
+private theorem exists_eq_algebraMap_of_fixed'
+    {K L : Type} [Field K] [Field L] [CharZero L] [Algebra K L]
+    (σ : L →+* L)
+    (δ : L)
+    (hK : ∀ a : K, σ (algebraMap K L a) = algebraMap K L a) (hσδ : σ δ = -δ)
+    (hspan : ∀ x : L, ∃ a b : K, x = algebraMap K L a + algebraMap K L b * δ)
+    (z : L) (hz : σ z = z)
+    : ∃ k : K, z = algebraMap K L k := by
   obtain ⟨a, b, rfl⟩ := hspan z
   refine ⟨a, ?_⟩
   rw [map_add (f := _), map_mul, hK, hK, hσδ] at hz
@@ -44,22 +57,38 @@ private theorem exists_eq_algebraMap_of_fixed' {K L : Type} [Field K] [Field L] 
   · exact absurd h two_ne_zero
   · rw [h, add_zero]
 
-private theorem involutive_of_anti_fixed_generator {K L : Type} [Field K] [Field L] [Algebra K L]
-    (σ : L →+* L) (δ : L) (hK : ∀ a : K, σ (algebraMap K L a) = algebraMap K L a)
-    (hσδ : σ δ = -δ) (hspan : ∀ x : L, ∃ a b : K, x = algebraMap K L a + algebraMap K L b * δ)
-    (x : L) : σ (σ x) = x := by
+private theorem involutive_of_anti_fixed_generator
+    {K L : Type} [Field K] [Field L] [Algebra K L]
+    (σ : L →+* L) (δ : L)
+    (hK : ∀ a : K, σ (algebraMap K L a) = algebraMap K L a) (hσδ : σ δ = -δ)
+    (hspan : ∀ x : L, ∃ a b : K, x = algebraMap K L a + algebraMap K L b * δ) (x : L)
+    : σ (σ x) = x := by
   obtain ⟨a, b, rfl⟩ := hspan x
   simp only [map_add (f := _), map_mul, hK, hσδ, map_neg, neg_neg]
 
-private theorem hf_smul_smul' {R : Type} [CommRing R] {n : ℕ} (σ : R →+* R)
-    (G : Matrix (Fin n) (Fin n) R) (y : Fin n → R) (c : R) (hc : σ c = c) :
-    GlobalTheory.UTrans.hf σ G (c • y) (c • y) = c * c * GlobalTheory.UTrans.hf σ G y y := by
+private theorem hf_smul_smul'
+    {R : Type} [CommRing R]
+    {n : ℕ}
+    (σ : R →+* R)
+    (G : Matrix (Fin n) (Fin n) R) (y : Fin n → R)
+    (c : R) (hc : σ c = c)
+    : GlobalTheory.UTrans.hf σ G (c • y) (c • y) = c * c * GlobalTheory.UTrans.hf σ G y y := by
   unfold GlobalTheory.UTrans.hf
   simp only [Pi.smul_apply, smul_eq_mul, map_mul, hc, Finset.mul_sum]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ring
 
-theorem real_isotropic_or_one_class : ∀ (K L : Type) [Field K] [Field L] [CharZero L] [Algebra K L] (σ : L →+* L) (δ : L), (∀ a : K, σ (algebraMap K L a) = algebraMap K L a) → δ ≠ 0 → σ δ = -δ → (∀ x : L, ∃ a b : K, x = algebraMap K L a + algebraMap K L b * δ) → Nonempty (K ≃+* ℝ) → ∀ (n : ℕ) (G : Matrix (Fin n) (Fin n) L), (∀ a b, σ (G a b) = G b a) → (∃ z : Fin n → L, z ≠ 0 ∧ GlobalTheory.UTrans.hf σ G z z = 0) ∨ ∀ x y : Fin n → L, GlobalTheory.UTrans.hf σ G x x ≠ 0 → GlobalTheory.UTrans.hf σ G y y ≠ 0 → ∃ a : L, GlobalTheory.UTrans.hf σ G y y = σ a * a * GlobalTheory.UTrans.hf σ G x x := by
+theorem real_isotropic_or_one_class
+    : ∀ (K L : Type) [Field K] [Field L] [CharZero L] [Algebra K L] (σ : L →+* L) (δ : L),
+      (∀ a : K, σ (algebraMap K L a) = algebraMap K L a) → δ ≠ 0 → σ δ = -δ
+        → (∀ x : L, ∃ a b : K, x = algebraMap K L a + algebraMap K L b * δ) → Nonempty (K ≃+* ℝ)
+        → ∀ (n : ℕ) (G : Matrix (Fin n) (Fin n) L),
+          (∀ a b, σ (G a b) = G b a)
+            → (∃ z : Fin n → L, z ≠ 0 ∧ GlobalTheory.UTrans.hf σ G z z = 0)
+              ∨ ∀ x y : Fin n → L,
+                GlobalTheory.UTrans.hf σ G x x ≠ 0 → GlobalTheory.UTrans.hf σ G y y ≠ 0
+                  → ∃ a : L,
+                    GlobalTheory.UTrans.hf σ G y y = σ a * a * GlobalTheory.UTrans.hf σ G x x := by
   intro K L _ _ _ _ σ δ hK hδ hσδ hspan ⟨e⟩ n G hG
   have hσ : ∀ a : L, σ (σ a) = a := involutive_of_anti_fixed_generator σ δ hK hσδ hspan
   have hfix : ∀ z : L, σ z = z → ∃ k : K, z = algebraMap K L k :=
@@ -71,8 +100,9 @@ theorem real_isotropic_or_one_class : ∀ (K L : Type) [Field K] [Field L] [Char
   intro x y hx hy
   obtain ⟨p, hp⟩ := hfix _ (sigma_hf_eq_hf_swap σ G hσ hG x x)
   obtain ⟨q, hq⟩ := hfix _ (sigma_hf_eq_hf_swap σ G hσ hG y y)
-  obtain ⟨m, hm⟩ := hfix (GlobalTheory.UTrans.hf σ G y x + GlobalTheory.UTrans.hf σ G x y)
-    (by rw [map_add (f := _), sigma_hf_eq_hf_swap σ G hσ hG, sigma_hf_eq_hf_swap σ G hσ hG, add_comm])
+  obtain ⟨m, hm⟩ :=
+    hfix (GlobalTheory.UTrans.hf σ G y x + GlobalTheory.UTrans.hf σ G x y) (by
+      rw [map_add (f := _), sigma_hf_eq_hf_swap σ G hσ hG, sigma_hf_eq_hf_swap σ G hσ hG, add_comm])
   have hp0 : e p ≠ 0 := by
     intro h
     apply hx
@@ -93,10 +123,13 @@ theorem real_isotropic_or_one_class : ∀ (K L : Type) [Field K] [Field L] [Char
     have hd : 0 ≤ discrim (e q) (e m) (e p) := by
       unfold discrim
       nlinarith [sq_nonneg (e m)]
-    have hs : discrim (e q) (e m) (e p) = Real.sqrt (discrim (e q) (e m) (e p))
-        * Real.sqrt (discrim (e q) (e m) (e p)) := (Real.mul_self_sqrt hd).symm
-    have ht := (quadratic_eq_zero_iff hq0 hs ((-(e m) + Real.sqrt (discrim (e q) (e m) (e p)))
-      / (2 * e q))).mpr (Or.inl rfl)
+    have hs
+        : discrim (e q) (e m) (e p)
+          = Real.sqrt (discrim (e q) (e m) (e p)) * Real.sqrt (discrim (e q) (e m) (e p)) :=
+      (Real.mul_self_sqrt hd).symm
+    have ht :=
+      (quadratic_eq_zero_iff hq0 hs
+        ((-(e m) + Real.sqrt (discrim (e q) (e m) (e p))) / (2 * e q))).mpr (Or.inl rfl)
     set t : ℝ := (-(e m) + Real.sqrt (discrim (e q) (e m) (e p))) / (2 * e q) with ht_def
     have hT : q * (e.symm t * e.symm t) + m * e.symm t + p = 0 := by
       apply e.injective
@@ -114,8 +147,8 @@ theorem real_isotropic_or_one_class : ∀ (K L : Type) [Field K] [Field L] [Char
       simp only [map_mul, RingEquiv.apply_symm_apply] at hpk
       rw [hpk] at hlt
       nlinarith [mul_self_nonneg (t * e q)]
-    · rw [hf_add_smul_self σ G x y _ hTK, hm, hp, hq, ← map_mul, ← map_mul, ← map_mul, ← map_add (f := _),
-        ← map_add, ← map_zero (algebraMap K L)]
+    · rw [hf_add_smul_self σ G x y _ hTK, hm, hp, hq, ← map_mul, ← map_mul, ← map_mul,
+        ← map_add (f := _), ← map_add, ← map_zero (algebraMap K L)]
       congr 1
       linear_combination hT
 

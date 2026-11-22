@@ -16,14 +16,17 @@ variable {n : ℕ}
 
 section One
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem exists_datum_of_isKTypeOf (hσ : IsURepOn (UJset ε) σ) {Λ : Fin n → ℝ} {S : Submodule ℂ H}
-    (hS : Formalism.MainNotions.S.IsKTypeOf ε σ Λ S) :
-    ∃ V : Submodule ℂ (smD ε σ), IsKIrrHW ε (smE ε σ) Λ V ∧ V ≠ ⊥ ∧
-      (∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) ∧
-      V.map (smD ε σ).subtype ≤ sSup {S' : Submodule ℂ H | Formalism.MainNotions.S.IsKTypeOf ε σ Λ S'} := by
+theorem exists_datum_of_isKTypeOf
+    (hσ : IsURepOn (UJset ε) σ)
+    {Λ : Fin n → ℝ} {S : Submodule ℂ H} (hS : Formalism.MainNotions.S.IsKTypeOf ε σ Λ S)
+    : ∃ V : Submodule ℂ (smD ε σ),
+      IsKIrrHW ε (smE ε σ) Λ V ∧ V ≠ ⊥ ∧ (∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+        ∧ V.map (smD ε σ).subtype
+          ≤ sSup {S' : Submodule ℂ H | Formalism.MainNotions.S.IsKTypeOf ε σ Λ S'} := by
   haveI : FiniteDimensional ℂ S := hS.1
   obtain ⟨α, hadd, hsmul, hαK, hαsm, hαS⟩ := exists_moll_data hσ S
   let A : H →ₗ[ℂ] H := { toFun := opConv ε σ α, map_add' := hadd, map_smul' := hsmul }
@@ -40,7 +43,9 @@ theorem exists_datum_of_isKTypeOf (hσ : IsURepOn (UJset ε) σ) {Λ : Fin n →
   have hS₁D : S₁ ≤ smD ε σ := by
     rintro _ ⟨w, _, rfl⟩
     exact hsm w
-  have hirr : ∀ S' : Submodule ℂ H, S' ≤ S₁ → Formalism.MainNotions.S.IsKStableOn ε σ S' → S' = ⊥ ∨ S' = S₁ := by
+  have hirr
+      : ∀ S' : Submodule ℂ H,
+        S' ≤ S₁ → Formalism.MainNotions.S.IsKStableOn ε σ S' → S' = ⊥ ∨ S' = S₁ := by
     intro S' hS' hK'
     have hTK : Formalism.MainNotions.S.IsKStableOn ε σ (S ⊓ S'.comap A) := by
       intro g hg v hv
@@ -74,8 +79,11 @@ theorem exists_datum_of_isKTypeOf (hσ : IsURepOn (UJset ε) σ) {Λ : Fin n →
     · rintro μ _ ⟨w, hw, rfl⟩ hne hwt
       refine hS.2.2.2.2 μ w hw (fun h => hne (by rw [h, map_zero])) ?_
       intro θ hθ
-      have h1 : A (σ (Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I))) w -
-          Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • w) = 0 := by
+      have h1
+          : A
+              (σ (Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I))) w
+                - Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • w)
+            = 0 := by
         rw [map_sub, map_smul, ← hcomm _ hθ, hwt θ hθ, sub_self]
       have h2 := hinj _ (Submodule.sub_mem _ (hS.2.1 _ hθ w hw) (Submodule.smul_mem _ _ hw)) h1
       exact sub_eq_zero.1 h2
@@ -99,9 +107,11 @@ theorem exists_datum_of_isKTypeOf (hσ : IsURepOn (UJset ε) σ) {Λ : Fin n →
     rcases hirr (S'.map (smD ε σ).subtype) ((Submodule.map_mono hS'V).trans hVmap.le) (by
         rintro g hg _ ⟨x, hx, rfl⟩
         obtain ⟨y, hy, hyx⟩ := hK' g hg x hx
-        exact ⟨y, hy, hyx⟩) with h | h
+        exact ⟨y, hy, hyx⟩)
+      with h | h
     · left
-      exact Submodule.map_injective_of_injective (smD ε σ).injective_subtype (by rw [h, Submodule.map_bot])
+      exact Submodule.map_injective_of_injective (smD ε σ).injective_subtype
+        (by rw [h, Submodule.map_bot])
     · right
       exact Submodule.map_injective_of_injective (smD ε σ).injective_subtype (by rw [h, hVmap])
   · intro h
@@ -113,10 +123,11 @@ theorem exists_datum_of_isKTypeOf (hσ : IsURepOn (UJset ε) σ) {Λ : Fin n →
 
 variable {lam : Fin n → ℝ}
 
-theorem arb_datum (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hcas : CasOnSmooth ε lam σ) :
-    ∃ V : Submodule ℂ (smD ε σ), IsKIrrHW ε (smE ε σ) (lowK ε lam) V ∧ V ≠ ⊥ ∧
-      (∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) ∧
-      (∀ v ∈ V, casimir (smE ε σ) v = (casVal lam : ℂ) • v) := by
+theorem arb_datum (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hcas : CasOnSmooth ε lam σ)
+    : ∃ V : Submodule ℂ (smD ε σ),
+      IsKIrrHW ε (smE ε σ) (lowK ε lam) V ∧ V ≠ ⊥
+        ∧ (∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+        ∧ (∀ v ∈ V, casimir (smE ε σ) v = (casVal lam : ℂ) • v) := by
   have hσ : IsURepOn (UJset ε) σ := hDS.2.2.1
   obtain ⟨S, hS⟩ := hDS.2.2.2.2.2.1
   obtain ⟨V, hV, hV0, hVK, -⟩ := exists_datum_of_isKTypeOf hσ hS
@@ -125,19 +136,24 @@ theorem arb_datum (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hcas : CasOnSm
   rw [← casU_eq_casimir (isDerivedOn_smE hσ) v]
   exact hcas _ ((mem_smD_iff ε σ _).1 v.2)
 
-theorem lowKMultOne_of_cas (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hcas : CasOnSmooth ε lam σ)
-    (S S' : Submodule ℂ H) (hS : Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S)
-    (hS' : Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S') : S = S' := by
+theorem lowKMultOne_of_cas
+    (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hcas : CasOnSmooth ε lam σ)
+    (S S' : Submodule ℂ H)
+    (hS : Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S)
+    (hS' : Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S')
+    : S = S' := by
   have hσ : IsURepOn (UJset ε) σ := hDS.2.2.1
   obtain ⟨V, hV, hV0, hVK, hc⟩ := arb_datum hDS hcas
   have htop := data_closGen_eq_top hgap hσ (isDerivedOn_smE hσ) hV hc hVK hDS.2.2.2.1 hV0
   rw [data_lowK_eq hgap hσ (isDerivedOn_smE hσ) hV hc hVK S (htop ▸ le_top) hS,
     data_lowK_eq hgap hσ (isDerivedOn_smE hσ) hV hc hVK S' (htop ▸ le_top) hS']
 
-theorem equiv_sigLam_of_cas (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hcas : CasOnSmooth ε lam σ)
+theorem equiv_sigLam_of_cas
+    (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hcas : CasOnSmooth ε lam σ)
     {T : S7.KType ε (lowK ε lam)} {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} {v₀ : T.V}
-    (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0) :
-    ∃ U : Hlam ε Ψ v₀ ≃ₗᵢ[ℂ] H, ∀ g ∈ UJset ε, ∀ x : Hlam ε Ψ v₀, U (sigLam ε Ψ v₀ g x) = σ g (U x) := by
+    (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
+    : ∃ U : Hlam ε Ψ v₀ ≃ₗᵢ[ℂ] H, ∀ g ∈ UJset ε, ∀ x : Hlam ε Ψ v₀,
+      U (sigLam ε Ψ v₀ g x) = σ g (U x) := by
   have hσ : IsURepOn (UJset ε) σ := hDS.2.2.1
   obtain ⟨V, hV, hV0, hVK, hc⟩ := arb_datum hDS hcas
   have htop := data_closGen_eq_top hgap hσ (isDerivedOn_smE hσ) hV hc hVK hDS.2.2.2.1 hV0
@@ -148,23 +164,28 @@ theorem equiv_sigLam_of_cas (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap
 
 end One
 
-theorem dsUnique_of_cas {ε : Fin n → Bool} {lam : Fin n → ℝ} (hgap : StdGap ε lam)
+theorem dsUnique_of_cas
+    {ε : Fin n → Bool} {lam : Fin n → ℝ} (hgap : StdGap ε lam)
     {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hcas : CasOnSmooth ε lam σ)
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+    (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hcas : CasOnSmooth ε lam σ)
     {H' : Type*} [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] [CompleteSpace H']
-    {σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')} (hDS' : Formalism.MainNotions.S.IsDS ε lam σ')
-    (hcas' : CasOnSmooth ε lam σ') :
-    ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ UJset ε, ∀ x : H, U (σ g x) = σ' g (U x) := by
+    {σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')}
+    (hDS' : Formalism.MainNotions.S.IsDS ε lam σ') (hcas' : CasOnSmooth ε lam σ')
+    : ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ UJset ε, ∀ x : H, U (σ g x) = σ' g (U x) := by
   have hσ : IsURepOn (UJset ε) σ := hDS.2.2.1
   have hσ' : IsURepOn (UJset ε) σ' := hDS'.2.2.1
   obtain ⟨V, hV, hV0, hVK, hc⟩ := arb_datum hDS hcas
   obtain ⟨V', hV', hV0', hVK', hc'⟩ := arb_datum hDS' hcas'
   have htop := data_closGen_eq_top hgap hσ (isDerivedOn_smE hσ) hV hc hVK hDS.2.2.2.1 hV0
   have htop' := data_closGen_eq_top hgap hσ' (isDerivedOn_smE hσ') hV' hc' hVK' hDS'.2.2.2.1 hV0'
-  obtain ⟨U, hU⟩ := data_unitary_equiv hgap hσ (isDerivedOn_smE hσ) hV hc hVK hV0
-    hσ' (isDerivedOn_smE hσ') hV' hc' hVK' hV0'
-  refine ⟨((LinearIsometryEquiv.ofTop _ _ htop).symm.trans U).trans (LinearIsometryEquiv.ofTop _ _ htop'),
-    fun g hg x => ?_⟩
+  obtain ⟨U, hU⟩ :=
+    data_unitary_equiv hgap hσ (isDerivedOn_smE hσ) hV hc hVK hV0 hσ' (isDerivedOn_smE hσ') hV' hc'
+      hVK' hV0'
+  refine ⟨
+    ((LinearIsometryEquiv.ofTop _ _ htop).symm.trans U).trans (LinearIsometryEquiv.ofTop _ _ htop'),
+    fun g hg x => ?_
+  ⟩
   simp only [LinearIsometryEquiv.trans_apply, LinearIsometryEquiv.ofTop_apply]
   apply hU g hg
   simp only [LinearIsometryEquiv.ofTop_symm_apply_coe]

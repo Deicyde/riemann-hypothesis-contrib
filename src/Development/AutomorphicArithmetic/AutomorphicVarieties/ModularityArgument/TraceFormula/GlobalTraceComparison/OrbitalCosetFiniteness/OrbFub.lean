@@ -15,7 +15,8 @@ section SlopeTestRemainingChoices
 
 variable {T : Type} [Group T]
 
-private abbrev omk (T : Type) [Group T] {Z : Type} [MulAction T Z] (z : Z) : orbitRel.Quotient T Z :=
+private abbrev omk (T : Type) [Group T] {Z : Type} [MulAction T Z] (z : Z)
+    : orbitRel.Quotient T Z :=
   Quotient.mk (orbitRel T Z) z
 
 private lemma omk_eq_iff {Z : Type} [MulAction T Z] (a b : Z) :
@@ -192,9 +193,10 @@ theorem orbFub : OrbFub := by
     inv_out (fun z : X × Y => F z.1 z.2) (fun t z => hF t z.1 z.2)
   have hFp' : ∀ z : Y × X, F (Quotient.out (omk T z)).2 (Quotient.out (omk T z)).1 = F z.2 z.1 :=
     inv_out (fun z : Y × X => F z.2 z.1) (fun t z => hF t z.2 z.1)
-  have hP : {p : orbitRel.Quotient T (X × Y) | F (Quotient.out p).1 (Quotient.out p).2 ≠ 0}.Finite := by
-    refine (hq.biUnion fun q _ => (hx (Quotient.out q)).image
-      (fun y => omk T ((Quotient.out q, y) : X × Y))).subset ?_
+  have hP
+      : {p : orbitRel.Quotient T (X × Y) | F (Quotient.out p).1 (Quotient.out p).2 ≠ 0}.Finite := by
+    refine (hq.biUnion fun q _ =>
+      (hx (Quotient.out q)).image (fun y => omk T ((Quotient.out q, y) : X × Y))).subset ?_
     intro p hp
     obtain ⟨t, ht⟩ := exists_smul_out (T := T) (Quotient.out p).1
     have hne : F (Quotient.out (omk T (Quotient.out p).1)) (t • (Quotient.out p).2) ≠ 0 := by
@@ -213,7 +215,8 @@ theorem orbFub : OrbFub := by
       · rintro ⟨t, ht⟩
         exact ⟨t, (Equiv.prodComm X Y).injective ht⟩)
   have he : ∀ z : X × Y, e (omk T z) = omk T (z.2, z.1) := fun z => rfl
-  have hP' : {p : orbitRel.Quotient T (Y × X) | F (Quotient.out p).2 (Quotient.out p).1 ≠ 0}.Finite := by
+  have hP'
+      : {p : orbitRel.Quotient T (Y × X) | F (Quotient.out p).2 (Quotient.out p).1 ≠ 0}.Finite := by
     refine (hP.image e).subset ?_
     intro p hp
     obtain ⟨⟨y, x⟩, rfl⟩ := Quotient.exists_rep p
@@ -230,10 +233,16 @@ theorem orbFub : OrbFub := by
   rw [← finsum_comp_equiv e]
   refine finsum_congr fun p => ?_
   obtain ⟨⟨x, y⟩, rfl⟩ := Quotient.exists_rep p
-  have h1 := inv_out (T := T) (fun z : X × Y => (((stabilizer T z).relIndex C : ℕ) : ℂ) * F z.1 z.2)
-    (fun t z => by rw [relIndex_stab_smul]; simp only [Prod.smul_fst, Prod.smul_snd, hF]) (x, y)
-  have h2 := inv_out (T := T) (fun z : Y × X => (((stabilizer T z).relIndex C : ℕ) : ℂ) * F z.2 z.1)
-    (fun t z => by rw [relIndex_stab_smul]; simp only [Prod.smul_fst, Prod.smul_snd, hF]) (y, x)
+  have h1 :=
+    inv_out (T := T)
+      (fun z : X × Y => (((stabilizer T z).relIndex C : ℕ) : ℂ) * F z.1 z.2)
+      (fun t z => by rw [relIndex_stab_smul]; simp only [Prod.smul_fst, Prod.smul_snd, hF])
+      (x, y)
+  have h2 :=
+    inv_out (T := T)
+      (fun z : Y × X => (((stabilizer T z).relIndex C : ℕ) : ℂ) * F z.2 z.1)
+      (fun t z => by rw [relIndex_stab_smul]; simp only [Prod.smul_fst, Prod.smul_snd, hF])
+      (y, x)
   refine (h1.trans ?_).trans h2.symm
   simp only
   rw [stab_swap x y]

@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.A
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped NumberField CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -17,8 +19,12 @@ noncomputable section
 
 namespace GlobalTheory.AV.OActDeg
 
-def endHom {k : Type} [Field k] (X : GlobalTheory.AV.AbVar k) (F : Type) [Field F] [NumberField F] (ρ : OAct (𝓞 F) X.X) :
-    𝓞 F →+* CategoryTheory.End X where
+def endHom
+    {k : Type} [Field k]
+    (X : GlobalTheory.AV.AbVar k)
+    (F : Type) [Field F] [NumberField F]
+    (ρ : OAct (𝓞 F) X.X)
+    : 𝓞 F →+* CategoryTheory.End X where
   toFun c := End.of (GlobalTheory.AV.AbVar.Hom.mk (A := X) (B := X) (ρ.act c) (h := ρ.hom c))
   map_one' := by
     refine End.ext (Subtype.ext ?_)
@@ -38,18 +44,23 @@ def endHom {k : Type} [Field k] (X : GlobalTheory.AV.AbVar k) (F : Type) [Field 
     exact ρ.add a b
 
 open Polynomial GlobalTheory.AV.AbVar in
-theorem isFinite_and_finrank_eq_norm_pow : ∀ (k : Type) [Field k] [IsAlgClosed k] (A : Over (Sp k)) [GrpObj A], IsAbelianScheme A →
-    ∀ (F : Type) [Field F] [NumberField F] (ρ : OAct (𝓞 F) A) (l d : ℕ), l.Prime → (l : k) ≠ 0 →
-    Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ A // x ^ l = 1} = l ^ (d * Module.finrank ℚ F) →
-    ∀ c : 𝓞 F, c ≠ 0 → IsFinite (ρ.act c).left ∧
-      (ρ.act c).left.finrank ((1 : Over.mk (𝟙 (Sp k)) ⟶ A).left (IsLocalRing.closedPoint k)) =
-        (Algebra.norm ℤ c).natAbs ^ d := by
+theorem isFinite_and_finrank_eq_norm_pow
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (A : Over (Sp k)) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ (F : Type) [Field F] [NumberField F] (ρ : OAct (𝓞 F) A) (l d : ℕ),
+          l.Prime → (l : k) ≠ 0
+            → Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ A // x ^ l = 1} = l ^ (d * Module.finrank ℚ F)
+            → ∀ c : 𝓞 F,
+              c ≠ 0
+                → IsFinite (ρ.act c).left
+                  ∧ (ρ.act c).left.finrank
+                      ((1 : Over.mk (𝟙 (Sp k)) ⟶ A).left (IsLocalRing.closedPoint k))
+                    = (Algebra.norm ℤ c).natAbs ^ d := by
   intro k _ _ A _ hA F _ _ ρ l d hl hl0 hcard c hc
   let X : GlobalTheory.AV.AbVar k := GlobalTheory.TateHondaBridge.toAbVar A hA
   have h2 := GlobalTheory.abMulN_holds k A X.dim l hA X.smooth hl0
   rw [hcard] at h2
-  have hdim : 2 * X.dim = d * Module.finrank ℚ F :=
-    (Nat.pow_right_injective hl.two_le h2).symm
+  have hdim : 2 * X.dim = d * Module.finrank ℚ F := (Nat.pow_right_injective hl.two_le h2).symm
   let actionHom := endHom X F ρ
   let f := actionHom c
   let m := minpoly ℤ c
@@ -59,21 +70,25 @@ theorem isFinite_and_finrank_eq_norm_pow : ∀ (k : Type) [Field k] [IsAlgClosed
   have hf : aeval f m = 0 := by
     have h := Polynomial.hom_eval₂ m (algebraMap ℤ (𝓞 F)) actionHom c
     rw [← aeval_def, show aeval c m = 0 from minpoly.aeval ℤ c, map_zero,
-      Subsingleton.elim (actionHom.comp (algebraMap ℤ (𝓞 F))) (algebraMap ℤ _), ← aeval_def] at h
+        Subsingleton.elim (actionHom.comp (algebraMap ℤ (𝓞 F))) (algebraMap ℤ _), ← aeval_def]
+      at h
     exact h.symm
-  have ⟨e, he, hdeg⟩ : ∃ e : ℕ, e * m.natDegree = 2 * X.dim ∧
-      (deg f.asHom : ℤ) = m.coeff 0 ^ e := by
+  have ⟨e, he, hdeg⟩
+      : ∃ e : ℕ, e * m.natDegree = 2 * X.dim ∧ (deg f.asHom : ℤ) = m.coeff 0 ^ e := by
     have : Fact l.Prime := ⟨hl⟩
     obtain ⟨-, -, -, hfin, hrank⟩ := tl_free_finrank k l hl0 X
-    have hchar (g : End X) :
-        (charpoly g).map (algebraMap ℤ ℚ_[l]) = (vmap l g.asHom).charpoly := by
+    have hchar (g : End X) : (charpoly g).map (algebraMap ℤ ℚ_[l]) = (vmap l g.asHom).charpoly := by
       obtain ⟨⟨hmonic, hdegree, heval⟩, -⟩ := GlobalTheory.T.abelianVarietyEndCharpoly_spec k X g
-      have h := GlobalTheory.T.abelianVariety_degreePolynomial_map_eq_charpoly_rationalTate
-        k l hl0 X g ((charpoly g).map (algebraMap ℤ ℚ)) (hmonic.map _)
-        (by rw [Polynomial.natDegree_map_eq_of_injective (RingHom.injective_int (algebraMap ℤ ℚ)), hdegree])
-        (fun n => by simpa using congrArg (algebraMap ℤ ℚ) (heval n))
+      have h :=
+        GlobalTheory.T.abelianVariety_degreePolynomial_map_eq_charpoly_rationalTate k l hl0 X g
+          ((charpoly g).map (algebraMap ℤ ℚ)) (hmonic.map _)
+          (by
+            rw [Polynomial.natDegree_map_eq_of_injective (RingHom.injective_int (algebraMap ℤ ℚ)),
+              hdegree])
+          (fun n => by simpa using congrArg (algebraMap ℤ ℚ) (heval n))
       rw [← h, Polynomial.map_map,
-        show (algebraMap ℚ ℚ_[l]).comp (algebraMap ℤ ℚ) = algebraMap ℤ ℚ_[l] from Subsingleton.elim _ _]
+        show (algebraMap ℚ ℚ_[l]).comp (algebraMap ℤ ℚ) = algebraMap ℤ ℚ_[l] from
+          Subsingleton.elim _ _]
     have hdet : LinearMap.det (vmap l f.asHom) = (deg f.asHom : ℚ_[l]) := by
       have hneg : (-f).asHom = -f.asHom := map_neg (End.addEquiv (X := X)) f
       have hv : vmap l f.asHom = (-1 : ℚ_[l]) • vmap l (-f).asHom := by
@@ -81,7 +96,8 @@ theorem isFinite_and_finrank_eq_norm_pow : ∀ (k : Type) [Field k] [IsAlgClosed
       have hev := (GlobalTheory.T.abelianVarietyEndCharpoly_spec k X (-f)).1.2.2 0
       rw [Int.cast_zero, zero_sub, neg_neg] at hev
       rw [hv, LinearMap.det_smul, LinearMap.det_eq_sign_charpoly_coeff, ← hchar (-f),
-        Polynomial.coeff_map, Polynomial.coeff_zero_eq_eval_zero, hev, hrank, pow_mul, neg_one_sq, one_pow]
+        Polynomial.coeff_map, Polynomial.coeff_zero_eq_eval_zero, hev, hrank, pow_mul, neg_one_sq,
+        one_pow]
       simp
     have hinj : Function.Injective (algebraMap ℤ ℚ_[l]) := RingHom.injective_int _
     let ψ : End X →+* Module.End ℚ_[l] (Vl l X) :=
@@ -90,20 +106,24 @@ theorem isFinite_and_finrank_eq_norm_pow : ∀ (k : Type) [Field k] [IsAlgClosed
       change aeval (ψ f) m = 0
       have h := Polynomial.hom_eval₂ m (algebraMap ℤ (End X)) ψ f
       rw [← aeval_def, hf, map_zero,
-        Subsingleton.elim (ψ.comp (algebraMap ℤ (End X))) (algebraMap ℤ _), ← aeval_def] at h
+          Subsingleton.elim (ψ.comp (algebraMap ℤ (End X))) (algebraMap ℤ _), ← aeval_def]
+        at h
       exact h.symm
-    have hdvd := GlobalTheory.CharpolyDvd.charpoly_dvd_pow_finrank (vmap l f.asHom) (m.map (algebraMap ℤ ℚ_[l]))
-      (by rw [aeval_map_algebraMap]; exact hT)
+    have hdvd :=
+      GlobalTheory.CharpolyDvd.charpoly_dvd_pow_finrank (vmap l f.asHom)
+        (m.map (algebraMap ℤ ℚ_[l])) (by rw [aeval_map_algebraMap]; exact hT)
     rw [← hchar f, ← Polynomial.map_pow] at hdvd
     obtain ⟨⟨hmonic, hdegree, -⟩, -⟩ := GlobalTheory.T.abelianVarietyEndCharpoly_spec k X f
     rw [Polynomial.map_dvd_map _ hinj hmonic] at hdvd
     obtain ⟨i, -, hassociated⟩ := (dvd_prime_pow hp _).1 hdvd
-    have hpow : charpoly f = m ^ i := Polynomial.eq_of_monic_of_associated hmonic (hm.pow i) hassociated
+    have hpow : charpoly f = m ^ i :=
+      Polynomial.eq_of_monic_of_associated hmonic (hm.pow i) hassociated
     refine ⟨i, ?_, ?_⟩
     · rw [← hdegree, hpow, hm.natDegree_pow]
     · have h := LinearMap.det_eq_sign_charpoly_coeff (vmap l f.asHom)
       rw [hdet, ← hchar f, coeff_map, hrank, pow_mul, neg_one_sq, one_pow, _root_.one_mul, hpow,
-        coeff_zero_eq_eval_zero, eval_pow, ← coeff_zero_eq_eval_zero] at h
+          coeff_zero_eq_eval_zero, eval_pow, ← coeff_zero_eq_eval_zero]
+        at h
       apply Int.cast_injective (α := ℚ_[l])
       rw [Int.cast_natCast, h, eq_intCast, Int.cast_pow]
   obtain ⟨r, hr, hnorm⟩ := norm_natAbs_eq_minpoly_coeff_zero_pow c

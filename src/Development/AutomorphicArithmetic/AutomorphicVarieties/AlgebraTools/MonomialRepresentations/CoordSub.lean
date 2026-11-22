@@ -6,9 +6,11 @@ public import Mathlib
 
 open Polynomial Matrix
 
-theorem UpperTheory.V.AlgebraTools.coordSub :
-    ∀ (C ι : Type) [CommRing C] [Fintype ι] [DecidableEq ι] (d : ι → C), (∀ i j, i ≠ j → IsUnit (d i - d j)) →
-      ∀ W : Submodule C (ι → C), (∀ w ∈ W, diagonal d *ᵥ w ∈ W) → ∀ w ∈ W, ∀ i, Pi.single i (w i) ∈ W := by
+theorem UpperTheory.V.AlgebraTools.coordSub
+    : ∀ (C ι : Type) [CommRing C] [Fintype ι] [DecidableEq ι] (d : ι → C),
+      (∀ i j, i ≠ j → IsUnit (d i - d j))
+        → ∀ W : Submodule C (ι → C),
+          (∀ w ∈ W, diagonal d *ᵥ w ∈ W) → ∀ w ∈ W, ∀ i, Pi.single i (w i) ∈ W := by
   intro C ι _ _ _ d hd W hD w hw i
   have key : ∀ S : Finset ι, (fun k => (∏ j ∈ S, (d k - d j)) * w k) ∈ W := by
     intro S
@@ -18,8 +20,8 @@ theorem UpperTheory.V.AlgebraTools.coordSub :
       have h2 := W.sub_mem (hD _ ih) (W.smul_mem (d j) ih)
       convert h2 using 1
       funext k
-      simp only [Finset.prod_insert hj, Pi.sub_apply, Matrix.mulVec_diagonal,
-        Pi.smul_apply, smul_eq_mul, mul_assoc, sub_mul]
+      simp only [Finset.prod_insert hj, Pi.sub_apply, Matrix.mulVec_diagonal, Pi.smul_apply,
+        smul_eq_mul, mul_assoc, sub_mul]
   have hu : IsUnit (∏ j ∈ Finset.univ.erase i, (d i - d j)) :=
     IsUnit.prod_iff.mpr fun j hj => hd i j (Finset.ne_of_mem_erase hj).symm
   have h3 := W.smul_mem (↑hu.unit⁻¹ : C) (key (Finset.univ.erase i))

@@ -18,13 +18,16 @@ section Degree
 
 variable (K : Type u) [Field K] (A : Type v) [Ring A] [Algebra K A]
 
-theorem exists_algEquiv_matrix_algebraicClosure [Algebra.IsCentral K A] [IsSimpleRing A]
-    [FiniteDimensional K A] :
-    ∃ n : ℕ, NeZero n ∧ finrank K A = n ^ 2 ∧
-      Nonempty (AlgebraicClosure K ⊗[K] A ≃ₐ[AlgebraicClosure K]
-        Matrix (Fin n) (Fin n) (AlgebraicClosure K)) := by
-  obtain ⟨n, hn, ⟨e⟩⟩ := IsSimpleRing.exists_algEquiv_matrix_of_isAlgClosed
-    (AlgebraicClosure K) (AlgebraicClosure K ⊗[K] A)
+theorem exists_algEquiv_matrix_algebraicClosure
+    [Algebra.IsCentral K A] [IsSimpleRing A] [FiniteDimensional K A]
+    : ∃ n : ℕ,
+      NeZero n ∧ finrank K A = n ^ 2
+        ∧ Nonempty
+          (AlgebraicClosure K ⊗[K] A ≃ₐ[AlgebraicClosure K]
+            Matrix (Fin n) (Fin n) (AlgebraicClosure K)) := by
+  obtain ⟨n, hn, ⟨e⟩⟩ :=
+    IsSimpleRing.exists_algEquiv_matrix_of_isAlgClosed (AlgebraicClosure K)
+      (AlgebraicClosure K ⊗[K] A)
   refine ⟨n, hn, ?_, ⟨e⟩⟩
   rw [← finrank_baseChange_eq K (AlgebraicClosure K) A, e.toLinearEquiv.finrank_eq,
     Module.finrank_matrix, Module.finrank_self]

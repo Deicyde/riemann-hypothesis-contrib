@@ -11,7 +11,9 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
@@ -20,10 +22,12 @@ theorem one_le_sizeE_of_nonneg {r : ℕ} (x : Fin r → ℝ) (hx : ∀ i, 0 ≤ 
   have := Finset.sum_nonneg (fun i (_ : i ∈ Finset.univ) => hx i)
   linarith
 
-theorem linF_comparable_sizeE {ι : Type} {r : ℕ} (a : ι → Fin r → ℝ) (b : ι → ℝ) (j : ι)
-    (ha : ∀ i, 0 < a j i) (hb : 0 < b j) :
-    ∃ c C : ℝ, 0 < c ∧ 0 < C ∧ ∀ x : Fin r → ℝ, (∀ i, 0 ≤ x i) →
-      c * sizeE x ≤ linF a b j x ∧ linF a b j x ≤ C * sizeE x := by
+theorem linF_comparable_sizeE
+    {ι : Type} {r : ℕ} (a : ι → Fin r → ℝ) (b : ι → ℝ) (j : ι) (ha : ∀ i, 0 < a j i) (hb : 0 < b j)
+    : ∃ c C : ℝ,
+      0 < c ∧ 0 < C
+        ∧ ∀ x : Fin r → ℝ,
+          (∀ i, 0 ≤ x i) → c * sizeE x ≤ linF a b j x ∧ linF a b j x ≤ C * sizeE x := by
   let f : Option (Fin r) → ℝ := fun o => o.elim (b j) (a j)
   obtain ⟨p, hp⟩ := Finite.exists_min f
   obtain ⟨q, hq⟩ := Finite.exists_max f
@@ -42,9 +46,10 @@ theorem linF_comparable_sizeE {ι : Type} {r : ℕ} (a : ι → Fin r → ℝ) (
     exact add_le_add (hq none)
       (Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_right (hq (some i)) (hx i))
 
-theorem rpow_le_of_comparable (c C T : ℝ) (hc : 0 < c) (hC : 0 < C) (hT : 0 ≤ T) :
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ L E t D : ℝ, 1 ≤ E → c * E ≤ L → L ≤ C * E → |t| ≤ T → t ≤ D →
-      L ^ t ≤ K * E ^ D := by
+theorem rpow_le_of_comparable (c C T : ℝ) (hc : 0 < c) (hC : 0 < C) (hT : 0 ≤ T)
+    : ∃ K : ℝ,
+      0 ≤ K
+        ∧ ∀ L E t D : ℝ, 1 ≤ E → c * E ≤ L → L ≤ C * E → |t| ≤ T → t ≤ D → L ^ t ≤ K * E ^ D := by
   refine ⟨Real.exp ((|Real.log c| + |Real.log C|) * T), (Real.exp_pos _).le, ?_⟩
   intro L E t D hE h1 h2 ht htD
   have hE0 : 0 < E := by linarith
@@ -67,28 +72,37 @@ theorem rpow_le_of_comparable (c C T : ℝ) (hc : 0 < c) (hC : 0 < C) (hT : 0 �
   have hfirst : (L / E) ^ t ≤ Real.exp ((|Real.log c| + |Real.log C|) * T) := by
     rw [Real.rpow_def_of_pos hu]
     apply Real.exp_le_exp.2
-    calc Real.log (L / E) * t ≤ |Real.log (L / E) * t| := le_abs_self _
+    calc
+      Real.log (L / E) * t
+        ≤ |Real.log (L / E) * t| := le_abs_self _
       _ = |Real.log (L / E)| * |t| := abs_mul _ _
-      _ ≤ (|Real.log c| + |Real.log C|) * T :=
-        mul_le_mul habs ht (abs_nonneg _) (by positivity)
+      _ ≤ (|Real.log c| + |Real.log C|) * T := mul_le_mul habs ht (abs_nonneg _) (by positivity)
   have hsecond : E ^ t ≤ E ^ D := Real.rpow_le_rpow_of_exponent_le hE htD
-  calc L ^ t = (L / E) ^ t * E ^ t := by
-        rw [← Real.mul_rpow hu.le hE0.le, ← hLE]
+  calc
+    L ^ t
+      = (L / E) ^ t * E ^ t := by rw [← Real.mul_rpow hu.le hE0.le, ← hLE]
     _ ≤ Real.exp ((|Real.log c| + |Real.log C|) * T) * E ^ D :=
-        mul_le_mul hfirst hsecond (Real.rpow_nonneg hE0.le _) (Real.exp_pos _).le
+      mul_le_mul hfirst hsecond (Real.rpow_nonneg hE0.le _) (Real.exp_pos _).le
 
-theorem prod_zpow_eq_zpow_sum {ι : Type} (E : ℝ) (hE : E ≠ 0) (S : Finset ι) (f : ι → ℤ) :
-    ∏ j ∈ S, E ^ f j = E ^ ∑ j ∈ S, f j := by
+theorem prod_zpow_eq_zpow_sum {ι : Type} (E : ℝ) (hE : E ≠ 0) (S : Finset ι) (f : ι → ℤ)
+    : ∏ j ∈ S, E ^ f j = E ^ ∑ j ∈ S, f j := by
   classical
   induction S using Finset.induction_on with
   | empty => simp
-  | insert j S hj ih =>
-    rw [Finset.prod_insert hj, Finset.sum_insert hj, ih, zpow_add₀ hE]
+  | insert j S hj ih => rw [Finset.prod_insert hj, Finset.sum_insert hj, ih, zpow_add₀ hE]
 
-theorem norm_factor_le {ι : Type} (r : ℕ) (a : ι → Fin r → ℝ) (b : ι → ℝ) (j : ι)
-    (ha : ∀ i, 0 < a j i) (hb : 0 < b j) (B R β : ℕ) :
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ s : ℂ, ‖s‖ ≤ R → -(B : ℝ) ≤ s.re → ∀ x : Fin r → ℝ, (∀ i, 0 ≤ x i) →
-      ‖((linF a b j x : ℝ) : ℂ) ^ (-s - (β : ℂ))‖ ≤ K * sizeE x ^ ((B : ℤ) - (β : ℤ)) := by
+theorem norm_factor_le
+    {ι : Type} (r : ℕ) (a : ι → Fin r → ℝ)
+    (b : ι → ℝ) (j : ι) (ha : ∀ i, 0 < a j i) (hb : 0 < b j)
+    (B R β : ℕ)
+    : ∃ K : ℝ,
+      0 ≤ K
+        ∧ ∀ s : ℂ,
+          ‖s‖ ≤ R → -(B : ℝ) ≤ s.re
+            → ∀ x : Fin r → ℝ,
+              (∀ i, 0 ≤ x i)
+                → ‖((linF a b j x : ℝ) : ℂ) ^ (-s - (β : ℂ))‖
+                  ≤ K * sizeE x ^ ((B : ℤ) - (β : ℤ)) := by
   obtain ⟨c, C, hc, hC, hcmp⟩ := linF_comparable_sizeE a b j ha hb
   obtain ⟨K, hK0, hK⟩ := rpow_le_of_comparable c C ((R : ℝ) + β) hc hC (by positivity)
   refine ⟨K, hK0, fun s hs hs' x hx => ?_⟩
@@ -108,9 +122,17 @@ theorem norm_factor_le {ι : Type} (r : ℕ) (a : ι → Fin r → ℝ) (b : ι 
   rw [Complex.norm_cpow_eq_rpow_re_of_pos hL, hre, ← Real.rpow_intCast]
   exact hK _ _ _ _ hE h1 h2 ht htD
 
-theorem baseBound : ∀ (ι : Type) [Fintype ι] (r : ℕ) (a : ι → Fin r → ℝ) (b : ι → ℝ), (∀ j i, 0 < a j i) → (∀ j, 0 < b j) → ∀ (B R : ℕ) (β : ι → ℕ), ∃ C : ℝ, 0 ≤ C ∧ ∀ s : ℂ, ‖s‖ ≤ R → -(B : ℝ) ≤ s.re →
-  ∀ x : Fin r → ℝ, (∀ i, 0 ≤ x i) →
-    ‖Fr a b s β x‖ ≤ C * sizeE x ^ ((Fintype.card ι : ℤ) * (B : ℤ) - ∑ j, (β j : ℤ)) := by
+theorem baseBound
+    : ∀ (ι : Type) [Fintype ι] (r : ℕ) (a : ι → Fin r → ℝ) (b : ι → ℝ),
+      (∀ j i, 0 < a j i) → (∀ j, 0 < b j)
+        → ∀ (B R : ℕ) (β : ι → ℕ), ∃ C : ℝ,
+          0 ≤ C
+            ∧ ∀ s : ℂ,
+              ‖s‖ ≤ R → -(B : ℝ) ≤ s.re
+                → ∀ x : Fin r → ℝ,
+                  (∀ i, 0 ≤ x i)
+                    → ‖Fr a b s β x‖
+                      ≤ C * sizeE x ^ ((Fintype.card ι : ℤ) * (B : ℤ) - ∑ j, (β j : ℤ)) := by
   intro ι _ r a b ha hb B R β
   have hj := fun j => norm_factor_le r a b j (ha j) (hb j) B R (β j)
   choose K hK0 hK using hj
@@ -121,11 +143,12 @@ theorem baseBound : ∀ (ι : Type) [Fintype ι] (r : ℕ) (a : ι → Fin r →
     linarith
   unfold Fr
   rw [norm_prod]
-  calc ∏ j, ‖((linF a b j x : ℝ) : ℂ) ^ (-s - (β j : ℂ))‖
-      ≤ ∏ j, (K j * sizeE x ^ ((B : ℤ) - (β j : ℤ))) :=
-        Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) (fun j _ => hK j s hs hs' x hx)
+  calc
+    ∏ j, ‖((linF a b j x : ℝ) : ℂ) ^ (-s - (β j : ℂ))‖
+        ≤ ∏ j, (K j * sizeE x ^ ((B : ℤ) - (β j : ℤ))) :=
+      Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) (fun j _ => hK j s hs hs' x hx)
     _ = (∏ j, K j) * sizeE x ^ ((Fintype.card ι : ℤ) * (B : ℤ) - ∑ j, (β j : ℤ)) := by
-        rw [Finset.prod_mul_distrib, prod_zpow_eq_zpow_sum _ hE0, Finset.sum_sub_distrib]
-        simp
+      rw [Finset.prod_mul_distrib, prod_zpow_eq_zpow_sum _ hE0, Finset.sum_sub_distrib]
+      simp
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel

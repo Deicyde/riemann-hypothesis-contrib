@@ -6,26 +6,47 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CoordConj
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 open GlobalTheory.Sl2Ad
 
 namespace GlobalTheory
 
-theorem ad_invariant_eq_zero_of_isIrr {K : Type} [Field K] [IsAlgClosed K] [CharZero K] {Γ : Type} [Group Γ]
-    (ρ : Γ →* GL (Fin 2) K) (hρ : IsIrr ρ) (v : Fin 3 → K) (hv : ∀ g, ad (ρ g) *ᵥ v = v) : v = 0 := by
+theorem ad_invariant_eq_zero_of_isIrr
+    {K : Type} [Field K] [IsAlgClosed K] [CharZero K]
+    {Γ : Type} [Group Γ]
+    (ρ : Γ →* GL (Fin 2) K) (hρ : IsIrr ρ)
+    (v : Fin 3 → K) (hv : ∀ g, ad (ρ g) *ᵥ v = v)
+    : v = 0 := by
   set Y : Matrix (Fin 2) (Fin 2) K := ofCoord v with hY
 
-  have hcomm : ∀ g, ((ρ g : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * Y = Y * (ρ g : Matrix (Fin 2) (Fin 2) K) := by
+  have hcomm
+      : ∀ g,
+        ((ρ g : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * Y
+          = Y * (ρ g : Matrix (Fin 2) (Fin 2) K) := by
     intro g
-    have h1 : coord ((ρ g : Matrix (Fin 2) (Fin 2) K) * Y * (((ρ g)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)) = coord Y := by
+    have h1
+        : coord
+            ((ρ g : Matrix (Fin 2) (Fin 2) K) * Y
+              * (((ρ g)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K))
+          = coord Y := by
       rw [coord_conj_ofCoord, hv g, coord_ofCoord]
-    have h2 : (ρ g : Matrix (Fin 2) (Fin 2) K) * Y * (((ρ g)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = Y := by
+    have h2
+        : (ρ g : Matrix (Fin 2) (Fin 2) K) * Y
+            * (((ρ g)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
+          = Y := by
       have := congrArg ofCoord h1
-      rwa [ofCoord_coord (by rw [trace_conj, trace_ofCoord]), ofCoord_coord (trace_ofCoord v)] at this
-    calc (ρ g : Matrix (Fin 2) (Fin 2) K) * Y
-        = (ρ g : Matrix (Fin 2) (Fin 2) K) * Y * (((ρ g)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * (ρ g : Matrix (Fin 2) (Fin 2) K) := by
-          rw [Matrix.mul_assoc _ _ (ρ g : Matrix (Fin 2) (Fin 2) K), ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.mul_one]
+      rwa [ofCoord_coord (by rw [trace_conj, trace_ofCoord]), ofCoord_coord (trace_ofCoord v)] at
+        this
+    calc
+      (ρ g : Matrix (Fin 2) (Fin 2) K) * Y
+          = (ρ g : Matrix (Fin 2) (Fin 2) K) * Y
+            * (((ρ g)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
+            * (ρ g : Matrix (Fin 2) (Fin 2) K) := by
+        rw [Matrix.mul_assoc _ _ (ρ g : Matrix (Fin 2) (Fin 2) K), ← Units.val_mul, inv_mul_cancel,
+          Units.val_one, Matrix.mul_one]
       _ = Y * (ρ g : Matrix (Fin 2) (Fin 2) K) := by rw [h2]
   obtain ⟨μ, hμ⟩ := Module.End.exists_eigenvalue (Matrix.toLin' Y)
   set W := Module.End.eigenspace (Matrix.toLin' Y) μ with hW
@@ -58,6 +79,7 @@ theorem ad_invariant_eq_zero_of_isIrr {K : Type} [Field K] [IsAlgClosed K] [Char
     · exact h
   have hY0 : Y = 0 := by rw [hYμ, hμ0, zero_smul]
   rw [← coord_ofCoord v, ← hY, hY0]
-  ext i; fin_cases i <;> simp [coord]
+  ext i
+  fin_cases i <;> simp [coord]
 
 end GlobalTheory

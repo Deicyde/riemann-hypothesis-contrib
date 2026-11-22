@@ -10,15 +10,17 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.CuspGL
 
-theorem card_nonregular_residues_le (q n : ℕ) (hq : 2 ≤ q) (hn : 0 < n) :
-    ((Finset.Ioo 0 (q ^ n - 1)).filter
-      (fun j => ∃ e ∈ Finset.Ioo 0 n, j * q ^ e ≡ j [MOD q ^ n - 1])).card ≤
-      ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2) := by
+theorem card_nonregular_residues_le (q n : ℕ) (hq : 2 ≤ q) (hn : 0 < n)
+    : ((Finset.Ioo 0 (q ^ n - 1)).filter
+        (fun j => ∃ e ∈ Finset.Ioo 0 n, j * q ^ e ≡ j [MOD q ^ n - 1])).card
+      ≤ ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2) := by
   classical
-  have hsub : ((Finset.Ioo 0 (q ^ n - 1)).filter
-      (fun j => ∃ e ∈ Finset.Ioo 0 n, j * q ^ e ≡ j [MOD q ^ n - 1])) ⊆
-      n.primeFactors.biUnion (fun p => (Finset.Ioo 0 (q ^ (n / p) - 1)).image
-        (fun k => k * ((q ^ n - 1) / (q ^ (n / p) - 1)))) := by
+  have hsub
+      : ((Finset.Ioo 0 (q ^ n - 1)).filter
+          (fun j => ∃ e ∈ Finset.Ioo 0 n, j * q ^ e ≡ j [MOD q ^ n - 1]))
+        ⊆ n.primeFactors.biUnion (fun p =>
+          (Finset.Ioo 0 (q ^ (n / p) - 1)).image
+            (fun k => k * ((q ^ n - 1) / (q ^ (n / p) - 1)))) := by
     intro j hj
     rw [Finset.mem_filter, Finset.mem_Ioo] at hj
     obtain ⟨⟨hj0, hjN⟩, e, he, hje⟩ := hj
@@ -43,8 +45,7 @@ theorem card_nonregular_residues_le (q n : ℕ) (hq : 2 ≤ q) (hn : 0 < n) :
     have hpn : p ∣ n := ⟨_, hnp⟩
     have hd0 : n / p ≠ 0 := (Nat.div_pos (Nat.le_of_dvd hn hpn) hp.pos).ne'
     have h3 : q ^ n - 1 ∣ j * (q ^ (n / p) - 1) :=
-      h2.trans (Nat.mul_dvd_mul_left j
-        (Nat.pow_sub_one_dvd_pow_sub_one q ⟨r, hd⟩))
+      h2.trans (Nat.mul_dvd_mul_left j (Nat.pow_sub_one_dvd_pow_sub_one q ⟨r, hd⟩))
     have h4 : q ^ (n / p) - 1 ∣ q ^ n - 1 :=
       Nat.pow_sub_one_dvd_pow_sub_one q (Nat.div_dvd_of_dvd hpn)
     have hD : 0 < q ^ (n / p) - 1 := by

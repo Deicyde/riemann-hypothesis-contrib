@@ -7,9 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.spanpsd :
-    ∀ (L : Type) [Field L] [NumberField L] (N : ℕ) (M : Set (Lat L N)),
-    (∀ k ∈ Psd L N, (∀ y ∈ M, q k y = 0) → k = 0) → Spans M := by
+theorem UpperTheory.V.KT.spanpsd
+    : ∀ (L : Type) [Field L] [NumberField L] (N : ℕ) (M : Set (Lat L N)),
+      (∀ k ∈ Psd L N, (∀ y ∈ M, q k y = 0) → k = 0) → Spans M := by
   intro L _ _ N M hM
   classical
   by_contra hS

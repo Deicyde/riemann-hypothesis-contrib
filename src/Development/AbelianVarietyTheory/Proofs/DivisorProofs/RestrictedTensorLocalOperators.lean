@@ -14,18 +14,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LatAtVAtStab
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix ENNReal
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.DblEval
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.DblEval
 namespace GlobalTheory.EvKer
 
-theorem ker_trivial : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (e : ((κ → AF F) → ℂ) →ₗ[ℂ] ((κ → AF F) → ℂ)) (ei : SInf F κ →L[ℂ] SInf F κ)
-    (ev : ∀ v : Pl (F := F), ((κ → Fv F v) → ℂ) →ₗ[ℂ] (κ → Fv F v) → ℂ),
-    (∀ v, ∀ φ ∈ SB (κ → Fv F v), ev v φ ∈ SB (κ → Fv F v)) →
-    (∀ᶠ v in cofinite, ev v (stdInd F κ v) = stdInd F κ v) →
-    (∀ (f : SInf F κ) (φ : ∀ v : Pl (F := F), (κ → Fv F v) → ℂ), (∀ v, φ v ∈ SB (κ → Fv F v)) →
-      (∀ᶠ v in cofinite, φ v = stdInd F κ v) → e (pure f φ) = pure (ei f) fun v => ev v (φ v)) →
-    Set.InjOn e (schA F κ : Set ((κ → AF F) → ℂ)) →
-    ∀ v, ∀ ψ ∈ SB (κ → Fv F v), ev v ψ = 0 → ψ = 0 := by
+theorem ker_trivial
+    : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
+        (e : ((κ → AF F) → ℂ) →ₗ[ℂ] ((κ → AF F) → ℂ)) (ei : SInf F κ →L[ℂ] SInf F κ)
+        (ev : ∀ v : Pl (F := F), ((κ → Fv F v) → ℂ) →ₗ[ℂ] (κ → Fv F v) → ℂ),
+      (∀ v, ∀ φ ∈ SB (κ → Fv F v), ev v φ ∈ SB (κ → Fv F v))
+        → (∀ᶠ v in cofinite, ev v (stdInd F κ v) = stdInd F κ v)
+        → (∀ (f : SInf F κ) (φ : ∀ v : Pl (F := F), (κ → Fv F v) → ℂ),
+          (∀ v, φ v ∈ SB (κ → Fv F v)) → (∀ᶠ v in cofinite, φ v = stdInd F κ v)
+            → e (pure f φ) = pure (ei f) fun v => ev v (φ v))
+        → Set.InjOn e (schA F κ : Set ((κ → AF F) → ℂ))
+        → ∀ v, ∀ ψ ∈ SB (κ → Fv F v), ev v ψ = 0 → ψ = 0 := by
   intro F _ _ κ _ e ei ev hSB hstd hpure hinj v ψ hψ hev
   classical
   by_contra hne
@@ -35,17 +40,20 @@ theorem ker_trivial : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fint
     intro w
     by_cases h : w = v
     · subst h; simpa [φ] using hψ
-    · simpa [φ, Function.update_of_ne h, stdInd] using GlobalTheory.StdVacuum.indicator_mem_SB (κ := κ) w
+    · simpa [φ, Function.update_of_ne h, stdInd] using
+        GlobalTheory.StdVacuum.indicator_mem_SB (κ := κ) w
   have hφev : ∀ᶠ w in cofinite, φ w = stdInd F κ w := by
     exact (Filter.eventually_cofinite_ne v).mono fun w h => by simp [φ, Function.update_of_ne h]
-  have hmem : pure f₀ φ ∈ schA F κ := GlobalTheory.TensUniq.pure_mem_schA f₀ φ hφSB (by simpa [stdInd] using hφev)
+  have hmem : pure f₀ φ ∈ schA F κ :=
+    GlobalTheory.TensUniq.pure_mem_schA f₀ φ hφSB (by simpa [stdInd] using hφev)
   have hcomp : (fun w => ev w (φ w)) = Function.update (fun w => ev w (stdInd F κ w)) v 0 := by
     funext w
     by_cases h : w = v
     · subst h; simp [φ, hev]
     · simp [φ, Function.update_of_ne h]
-  have hevstd : ∀ᶠ w in cofinite, (fun w => ev w (stdInd F κ w)) w =
-      {x : κ → Fv F w | ∀ i, x i ∈ HeightOneSpectrum.adicCompletionIntegers F w}.indicator 1 := by
+  have hevstd
+      : ∀ᶠ w in cofinite, (fun w => ev w (stdInd F κ w)) w =
+        {x : κ → Fv F w | ∀ i, x i ∈ HeightOneSpectrum.adicCompletionIntegers F w}.indicator 1 := by
     simpa [stdInd] using hstd
   obtain ⟨r, -, hr⟩ := GlobalTheory.PureFactor.exists_rest_factor v (ei f₀) _ hevstd
   have hzero : e (pure f₀ φ) = 0 := by

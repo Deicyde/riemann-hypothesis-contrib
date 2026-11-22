@@ -15,18 +15,40 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg
 
 namespace GlobalTheory.Reg
 
-theorem frShFin_of_divFin_of_finset : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∀ [Fintype (Comp Xo c)] (d : ReciprocityTheory.ChartRestriction.G.T0.Data c.F (Comp Xo c) (fun Z => Om Z) (WTZ E) (fun Z => AC Z)) (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ), DivFin d → (∀ Z : Comp Xo c, ∃ S : Finset (Om Z), (∀ s ∈ S, s ≠ 0) ∧ ∀ v : AddValuation (Om Z) (WithTop ℤ), ReciprocityTheory.ChartRestriction.G.T0.IsNormDiscrete v → ((∃ la, ReciprocityTheory.ChartRestriction.G.T0.IsOver (K := c.F) v la) ∨ ReciprocityTheory.ChartRestriction.G.T0.IsTrivOn c.F v) → (∀ s ∈ S, v s = 0) → δ Z v = 0) → FrShFin d δ := by
+theorem frShFin_of_divFin_of_finset
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      ∀ [Fintype (Comp Xo c)]
+          (d : ReciprocityTheory.ChartRestriction.G.T0.Data c.F (Comp Xo c)
+            (fun Z => Om Z)
+            (WTZ E)
+            (fun Z => AC Z))
+          (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ),
+        DivFin d
+          → (∀ Z : Comp Xo c, ∃ S : Finset (Om Z),
+            (∀ s ∈ S, s ≠ 0)
+              ∧ ∀ v : AddValuation (Om Z) (WithTop ℤ),
+                ReciprocityTheory.ChartRestriction.G.T0.IsNormDiscrete v
+                  → ((∃ la, ReciprocityTheory.ChartRestriction.G.T0.IsOver (K := c.F) v la)
+                    ∨ ReciprocityTheory.ChartRestriction.G.T0.IsTrivOn c.F v)
+                  → (∀ s ∈ S, v s = 0)
+                  → δ Z v = 0)
+          → FrShFin d δ := by
   intro E _ _ _ H Dw l Xo c _ d δ hd hS
   unfold FrShFin
   unfold DivFin at hd
   intro Z
   obtain ⟨S, hS0, hSv⟩ := hS Z
-  refine (Set.Finite.biUnion (t := fun s => {v | d.admitted Z v ∧ v s ≠ 0}) S.finite_toSet
+  refine (Set.Finite.biUnion
+    (t := fun s => {v | d.admitted Z v ∧ v s ≠ 0})
+    S.finite_toSet
     fun s hs => hd Z s (hS0 s hs)).subset ?_
   rintro v ⟨hadm, hδ⟩
   have hnot : ¬ ∀ s ∈ S, v s = 0 := by

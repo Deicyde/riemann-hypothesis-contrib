@@ -6,20 +6,24 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.EigCoordApply
 @[expose] public section
 
 open scoped NNReal
-open NumberField GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Flat.ExG
+open NumberField GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+  GlobalTheory.CompanionTheory.Ar.Flat.ExG
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.ExG.DualFil
 
 section
-variable {E : Type} [Field E] [NumberField E] {C : Type} [Field C] {W : Type} [AddCommGroup W]
-  [Module C W]
+variable
+  {E : Type} [Field E] [NumberField E] {C : Type} [Field C] {W : Type} [AddCommGroup W] [Module C W]
 
-theorem eigProj_comp_bar [Fintype (E →+* C)] (bar : 𝓞 E ≃+* 𝓞 E) (σ σ' : E →+* C)
+theorem eigProj_comp_bar
+    [Fintype (E →+* C)]
+    (bar : 𝓞 E ≃+* 𝓞 E) (σ σ' : E →+* C)
     (ρ : 𝓞 E →+* Module.End C W) (hsum : ∀ y, ∑ s, HT.eigProj ρ s y = y)
-    (hσ : ∀ a : 𝓞 E, σ' (a : E) = σ (bar a : 𝓞 E)) (hbar : ∀ a, bar (bar a) = a) (x : W) :
-    HT.eigProj (ρ.comp (bar : 𝓞 E →+* 𝓞 E)) σ x = HT.eigProj ρ σ' x := by
+    (hσ : ∀ a : 𝓞 E, σ' (a : E) = σ (bar a : 𝓞 E)) (hbar : ∀ a, bar (bar a) = a) (x : W)
+    : HT.eigProj (ρ.comp (bar : 𝓞 E →+* 𝓞 E)) σ x = HT.eigProj ρ σ' x := by
   classical
   conv_lhs => rw [← hsum x]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -38,8 +42,7 @@ theorem eigProj_comp_bar [Fintype (E →+* C)] (bar : 𝓞 E ≃+* 𝓞 E) (σ �
       apply IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E))
       refine RingHom.ext fun a => ?_
       have h := DFunLike.congr_fun e (bar a)
-      have h2 : σ ((bar a : 𝓞 E) : E) = s (a : E) := by
-        simpa [hbar] using h
+      have h2 : σ ((bar a : 𝓞 E) : E) = s (a : E) := by simpa [hbar] using h
       change s (a : E) = σ' (a : E)
       rw [hσ, h2]
     · rw [GlobalTheory.EigenSplit.mem_eigenSub]
@@ -48,10 +51,13 @@ theorem eigProj_comp_bar [Fintype (E →+* C)] (bar : 𝓞 E ≃+* 𝓞 E) (σ �
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem eigProj_zero_form (bar : 𝓞 E ≃+* 𝓞 E) (σ : E →+* C) (ρ : 𝓞 E →+* Module.End C W)
-    (ρH : 𝓞 E →+* Module.End C (W × Module.Dual C W))
-    (hact : ∀ a φ, ρH a (0, φ) = (0, φ ∘ₗ ρ (bar a))) (φ : Module.Dual C W) :
-    HT.eigProj ρH σ (0, φ) = (0, φ ∘ₗ HT.eigProj (ρ.comp (bar : 𝓞 E →+* 𝓞 E)) σ) := by
+theorem eigProj_zero_form
+    (bar : 𝓞 E ≃+* 𝓞 E)
+    (σ : E →+* C)
+    (ρ : 𝓞 E →+* Module.End C W) (ρH : 𝓞 E →+* Module.End C (W × Module.Dual C W))
+    (hact : ∀ a φ, ρH a (0, φ) = (0, φ ∘ₗ ρ (bar a)))
+    (φ : Module.Dual C W)
+    : HT.eigProj ρH σ (0, φ) = (0, φ ∘ₗ HT.eigProj (ρ.comp (bar : 𝓞 E →+* 𝓞 E)) σ) := by
   simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, hact]
   refine Prod.ext ?_ ?_
   · simp [Prod.fst_sum]
@@ -60,10 +66,27 @@ theorem eigProj_zero_form (bar : 𝓞 E ≃+* 𝓞 E) (σ : E →+* C) (ρ : �
 
 end
 
-theorem span_iff_proj : ∀ (E : Type) [Field E] [NumberField E] (V C : Type) [CommRing V] [Field C] [Algebra V C] [Fintype (E →+* C)] (bar : 𝓞 E ≃+* 𝓞 E) (σ σ' : E →+* C) (W : Type) [AddCommGroup W] [Module C W] [Module V W] [IsScalarTower V C W] (ρ : 𝓞 E →+* Module.End C W) (ρH : 𝓞 E →+* Module.End C (W × Module.Dual C W)) (HV : Submodule V (W × Module.Dual C W)) (Lie : Submodule V W) (n : ℕ) (w : Fin n → W) (ψ : Fin n → W × Module.Dual C W), (∀ y, ∑ s, HT.eigProj ρ s y = y) → (∀ a : 𝓞 E, σ' (a : E) = σ (bar a : 𝓞 E)) → (∀ a, bar (bar a) = a) → (∀ a y, (ρH a y).1 = ρ a y.1) → (∀ a φ, ρH a (0, φ) = (0, φ ∘ₗ ρ (bar a))) → (∀ φ : Module.Dual C W, (0, φ) ∈ HV ↔ ∀ e ∈ Lie, φ e ∈ (algebraMap V C).range) → Submodule.span C (Set.range w) = HT.eigSp ρ σ' → (∀ j, w j ∈ Lie) → (∀ j, ψ j ∈ HT.eigSp ρH σ ∧ (ψ j).1 = 0 ∧ ∀ j', (ψ j).2 (w j') = if j = j' then 1 else 0) → (∀ j, ∃ φ : Module.Dual C W, (∀ y ∈ Lie, φ y ∈ (algebraMap V C).range) ∧ ∀ k, φ (w k) = if k = j then 1 else 0) → ∀ y, y ∈ Submodule.span V (Set.range ψ) ↔ ∃ φ : Module.Dual C W, ((0, φ) : W × Module.Dual C W) ∈ HV ∧ HT.eigProj ρH σ (0, φ) = y := by
-  intro E _ _ V C _ _ _ _ bar σ σ' W _ _ _ _ ρ ρH HV Lie n w ψ hsum hσ hbar _ hact hlat hspan hwL hψ hint y
+theorem span_iff_proj
+    : ∀ (E : Type) [Field E] [NumberField E] (V C : Type) [CommRing V] [Field C] [Algebra V C]
+        [Fintype (E →+* C)] (bar : 𝓞 E ≃+* 𝓞 E) (σ σ' : E →+* C) (W : Type) [AddCommGroup W]
+        [Module C W] [Module V W] [IsScalarTower V C W] (ρ : 𝓞 E →+* Module.End C W)
+        (ρH : 𝓞 E →+* Module.End C (W × Module.Dual C W)) (HV : Submodule V (W × Module.Dual C W))
+        (Lie : Submodule V W) (n : ℕ) (w : Fin n → W) (ψ : Fin n → W × Module.Dual C W),
+      (∀ y, ∑ s, HT.eigProj ρ s y = y) → (∀ a : 𝓞 E, σ' (a : E) = σ (bar a : 𝓞 E))
+        → (∀ a, bar (bar a) = a) → (∀ a y, (ρH a y).1 = ρ a y.1)
+        → (∀ a φ, ρH a (0, φ) = (0, φ ∘ₗ ρ (bar a)))
+        → (∀ φ : Module.Dual C W, (0, φ) ∈ HV ↔ ∀ e ∈ Lie, φ e ∈ (algebraMap V C).range)
+        → Submodule.span C (Set.range w) = HT.eigSp ρ σ' → (∀ j, w j ∈ Lie)
+        → (∀ j, ψ j ∈ HT.eigSp ρH σ ∧ (ψ j).1 = 0 ∧ ∀ j', (ψ j).2 (w j') = if j = j' then 1 else 0)
+        → (∀ j, ∃ φ : Module.Dual C W,
+          (∀ y ∈ Lie, φ y ∈ (algebraMap V C).range) ∧ ∀ k, φ (w k) = if k = j then 1 else 0)
+        → ∀ y,
+          y ∈ Submodule.span V (Set.range ψ)
+            ↔ ∃ φ : Module.Dual C W,
+              ((0, φ) : W × Module.Dual C W) ∈ HV ∧ HT.eigProj ρH σ (0, φ) = y := by
+  intro E _ _ V C _ _ _ _ bar σ σ' W _ _ _ _ ρ ρH HV Lie n w ψ hsum hσ hbar _ hact hlat hspan hwL hψ
+    hint y
   classical
-
   have hform : ∀ φ : Module.Dual C W, HT.eigProj ρH σ (0, φ) = (0, φ ∘ₗ HT.eigProj ρ σ') := by
     intro φ
     rw [eigProj_zero_form bar σ ρ ρH hact φ]

@@ -9,11 +9,12 @@ namespace GlobalTheory.ProjectiveRetraction
 
 open NumberField
 
-theorem exists_retraction_of_projective {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
-    (N : Submodule R M) [Module.Projective R (M ⧸ N)] :
-    ∃ p : M →ₗ[R] M, (∀ x, p x ∈ N) ∧ ∀ x ∈ N, p x = x := by
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property N.mkQ (LinearMap.id : (M ⧸ N) →ₗ[R] (M ⧸ N))
-    N.mkQ_surjective
+theorem exists_retraction_of_projective
+    {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
+    (N : Submodule R M) [Module.Projective R (M ⧸ N)]
+    : ∃ p : M →ₗ[R] M, (∀ x, p x ∈ N) ∧ ∀ x ∈ N, p x = x := by
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property N.mkQ (LinearMap.id : (M ⧸ N) →ₗ[R] (M ⧸ N)) N.mkQ_surjective
   refine ⟨LinearMap.id - s ∘ₗ N.mkQ, fun x => ?_, fun x hx => ?_⟩
   · have h1 : N.mkQ (s (N.mkQ x)) = N.mkQ x := LinearMap.congr_fun hs (N.mkQ x)
     have h2 : N.mkQ (x - s (N.mkQ x)) = 0 := by rw [map_sub, h1, sub_self]
@@ -22,10 +23,11 @@ theorem exists_retraction_of_projective {R M : Type*} [Ring R] [AddCommGroup M] 
     show x - s (N.mkQ x) = x
     rw [h0, map_zero, sub_zero]
 
-theorem exists_retraction {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Module E V]
-    [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V] (M0 L : Submodule (𝓞 E) V) (hL : L.FG)
-    (h : Formalism.MainNotions.S.Lat.IsPrimitiveSub M0 L) :
-    ∃ r : L →ₗ[𝓞 E] M0, ∀ x : M0, r ⟨(x : V), h.1 x.2⟩ = x := by
+theorem exists_retraction
+    {E : Type} [Field E] [NumberField E]
+    {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+    (M0 L : Submodule (𝓞 E) V) (hL : L.FG) (h : Formalism.MainNotions.S.Lat.IsPrimitiveSub M0 L)
+    : ∃ r : L →ₗ[𝓞 E] M0, ∀ x : M0, r ⟨(x : V), h.1 x.2⟩ = x := by
   set N : Submodule (𝓞 E) L := M0.comap L.subtype with hN
   have hsat : ∀ (a : 𝓞 E), a ≠ 0 → ∀ x : L, a • x ∈ N → x ∈ N := by
     intro a ha x hx
@@ -36,8 +38,7 @@ theorem exists_retraction {E : Type} [Field E] [NumberField E] {V : Type} [AddCo
     have h1 : (algebraMap (𝓞 E) E a) • (x : V) ∈ Submodule.span E (M0 : Set V) := by
       rw [algebraMap_smul]
       exact Submodule.subset_span hx'
-    have h2 : (x : V) ∈ Submodule.span E (M0 : Set V) :=
-      (Submodule.smul_mem_iff _ ha').1 h1
+    have h2 : (x : V) ∈ Submodule.span E (M0 : Set V) := (Submodule.smul_mem_iff _ ha').1 h1
     show (x : V) ∈ M0
     rw [h.2]
     exact ⟨x.2, h2⟩

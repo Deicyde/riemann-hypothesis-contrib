@@ -4,28 +4,39 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.RecTT
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
 
-private theorem one_add_pow_expansion' {R : Type} [CommRing R] (z : R) (N : ℕ) :
-    ∃ r : R, (1 + z) ^ N = 1 + N * z + z ^ 2 * r := by
+private theorem one_add_pow_expansion' {R : Type} [CommRing R] (z : R) (N : ℕ)
+    : ∃ r : R, (1 + z) ^ N = 1 + N * z + z ^ 2 * r := by
   induction N with
   | zero => exact ⟨0, by simp⟩
   | succ n ih =>
     obtain ⟨r, hr⟩ := ih
     refine ⟨n + r + z * r, ?_⟩
-    rw [pow_succ, hr]; push_cast; ring
+    rw [pow_succ, hr]
+    push_cast
+    ring
 
-theorem UpperTheory.exists_unit_residue_logarithm_of_roots_of_unity :
-    ∀ {C Γ K : Type} [Field C] [LinearOrderedCommGroupWithZero Γ] [Field K] (v : Valuation C Γ) (ϖ : C),
-        ϖ ≠ 0 → v ϖ < 1 → (∀ x, v x < 1 → v x ≤ v ϖ) → ∀ (ρ : v.valuationSubring →+* K), Function.Surjective ρ →
-        (∀ x : v.valuationSubring, ρ x = 0 ↔ v (x : C) < 1) → ∀ N : ℕ, 0 < N → (∀ z : K, z ≠ 0 → z ^ N = 1) → (N : K) = -1 →
-        ∃ abelian₂ : Cˣ → K,
-          (∀ a b : Cˣ, v (a : C) = 1 → v (b : C) = 1 → abelian₂ (a * b) = abelian₂ a + abelian₂ b) ∧
-          (∀ y : K, ∃ a : Cˣ, v (a : C) = 1 ∧ abelian₂ a = y) ∧
-          (∀ a : Cˣ, v ((a : C) - 1) < v ϖ → abelian₂ a = 0) ∧
-          ∀ (i : C ≃+* C) (f : K ≃+* K), i ϖ = ϖ → (∀ x, v (i x) = v x) →
-            (∀ (x y : v.valuationSubring), (y : C) = i x → ρ y = f (ρ x)) →
-            ∀ a : Cˣ, v (a : C) = 1 → abelian₂ (Units.map i.toRingHom.toMonoidHom a) = f (abelian₂ a) := by
+theorem UpperTheory.exists_unit_residue_logarithm_of_roots_of_unity
+    : ∀ {C Γ K : Type} [Field C] [LinearOrderedCommGroupWithZero Γ] [Field K] (v : Valuation C Γ)
+        (ϖ : C),
+      ϖ ≠ 0 → v ϖ < 1 → (∀ x, v x < 1 → v x ≤ v ϖ)
+        → ∀ (ρ : v.valuationSubring →+* K),
+          Function.Surjective ρ → (∀ x : v.valuationSubring, ρ x = 0 ↔ v (x : C) < 1)
+            → ∀ N : ℕ,
+              0 < N → (∀ z : K, z ≠ 0 → z ^ N = 1) → (N : K) = -1
+                → ∃ abelian₂ : Cˣ → K,
+                  (∀ a b : Cˣ,
+                      v (a : C) = 1 → v (b : C) = 1 → abelian₂ (a * b) = abelian₂ a + abelian₂ b)
+                    ∧ (∀ y : K, ∃ a : Cˣ, v (a : C) = 1 ∧ abelian₂ a = y)
+                    ∧ (∀ a : Cˣ, v ((a : C) - 1) < v ϖ → abelian₂ a = 0)
+                    ∧ ∀ (i : C ≃+* C) (f : K ≃+* K),
+                      i ϖ = ϖ → (∀ x, v (i x) = v x)
+                        → (∀ (x y : v.valuationSubring), (y : C) = i x → ρ y = f (ρ x))
+                        → ∀ a : Cˣ,
+                          v (a : C) = 1
+                            → abelian₂ (Units.map i.toRingHom.toMonoidHom a) = f (abelian₂ a) := by
   intro C Γ K _ _ _ v ϖ h0 h1 hmax ρ hsurj hker N hN hpow hNK
   classical
   have hv0 : v ϖ ≠ 0 := by simpa using h0
@@ -34,8 +45,7 @@ theorem UpperTheory.exists_unit_residue_logarithm_of_roots_of_unity :
     if hy : ((a : C) ^ N - 1) / ϖ ∈ v.valuationSubring then ρ ⟨_, hy⟩ else 0
   have hlt : ∀ a : C, v a = 1 → v (a ^ N - 1) < 1 := by
     intro a ha
-    have hm : a ∈ v.valuationSubring := by
-      rw [Valuation.mem_valuationSubring_iff]; exact ha.le
+    have hm : a ∈ v.valuationSubring := by rw [Valuation.mem_valuationSubring_iff]; exact ha.le
     have hne : ρ ⟨a, hm⟩ ≠ 0 := by
       intro h
       have := (hker _).1 h
@@ -48,14 +58,15 @@ theorem UpperTheory.exists_unit_residue_logarithm_of_roots_of_unity :
     intro a ha
     rw [Valuation.mem_valuationSubring_iff, map_div₀, div_le_one₀ hvpos]
     exact hmax _ (hlt a ha)
-  have key : ∀ (a : Cˣ) (y : v.valuationSubring), (y : C) = ((a : C) ^ N - 1) / ϖ → abelian₂ a = ρ y := by
+  have key
+      : ∀ (a : Cˣ) (y : v.valuationSubring),
+        (y : C) = ((a : C) ^ N - 1) / ϖ → abelian₂ a = ρ y := by
     intro a y hy
     have hm : ((a : C) ^ N - 1) / ϖ ∈ v.valuationSubring := hy ▸ y.2
     simp only [abelian₂, dif_pos hm]
     congr 1
     exact Subtype.ext hy.symm
-  have hϖm : ϖ ∈ v.valuationSubring := by
-    rw [Valuation.mem_valuationSubring_iff]; exact h1.le
+  have hϖm : ϖ ∈ v.valuationSubring := by rw [Valuation.mem_valuationSubring_iff]; exact h1.le
   have hρϖ : ρ ⟨ϖ, hϖm⟩ = 0 := (hker _).2 h1
   refine ⟨abelian₂, ?_, ?_, ?_, ?_⟩
   · intro a b ha hb

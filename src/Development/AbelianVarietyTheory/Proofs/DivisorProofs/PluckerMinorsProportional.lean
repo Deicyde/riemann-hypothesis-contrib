@@ -8,9 +8,11 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem det_mul_det_toBlocks₂₂_of_mul_eq_one {K : Type} [Field K] {m n : Type} [Fintype m] [Fintype n]
-    [DecidableEq m] [DecidableEq n] (X Y : Matrix (m ⊕ n) (m ⊕ n) K) (h : X * Y = 1) :
-    X.det * Y.toBlocks₂₂.det = X.toBlocks₁₁.det := by
+theorem det_mul_det_toBlocks₂₂_of_mul_eq_one
+    {K : Type} [Field K]
+    {m n : Type} [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
+    (X Y : Matrix (m ⊕ n) (m ⊕ n) K) (h : X * Y = 1)
+    : X.det * Y.toBlocks₂₂.det = X.toBlocks₁₁.det := by
   obtain ⟨A, B, C, D, rfl⟩ : ∃ A B C D, X = fromBlocks A B C D :=
     ⟨_, _, _, _, (fromBlocks_toBlocks X).symm⟩
   obtain ⟨A', B', C', D', rfl⟩ : ∃ A B C D, Y = fromBlocks A B C D :=

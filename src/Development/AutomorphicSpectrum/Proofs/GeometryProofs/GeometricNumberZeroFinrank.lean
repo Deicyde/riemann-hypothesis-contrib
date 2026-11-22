@@ -5,23 +5,31 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrimeIsMaxim
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.FunctionField GroundTheory.Heights₂.Heights.Inter IsLocalRing GlobalTheory.CompanionTheory.Ar.GeoDeg
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.FunctionField
+  GroundTheory.Heights₂.Heights.Inter IsLocalRing GlobalTheory.CompanionTheory.Ar.GeoDeg
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.GeoDeg.ResDeg
 
-open GroundTheory.Heights₂.Heights.Targets.CurveVerticalPointResidue (exists_homog exists_homog_mem aeval_div)
-open GroundTheory.Heights₂.Heights.HilbertSamuel.SmallSectionsNonzero (chartMono isMultiHomog_chartMono mem_mCoordIdeal_of_aeval_eq_zero)
+open GroundTheory.Heights₂.Heights.Targets.CurveVerticalPointResidue
+  (exists_homog exists_homog_mem aeval_div)
+open GroundTheory.Heights₂.Heights.HilbertSamuel.SmallSectionsNonzero
+  (chartMono isMultiHomog_chartMono mem_mCoordIdeal_of_aeval_eq_zero)
 open GroundTheory.Heights₂.Heights.Targets.CurveVerticalPointChart (chartMono_notMem)
-open GroundTheory.Heights₂.Heights.Inter.regularityLocalFlat_holds (homog_X fracHom fracHom_apply fracHom_eq_zero_iff mem_locRing_iff div_mem_locRing)
+open GroundTheory.Heights₂.Heights.Inter.regularityLocalFlat_holds
+  (homog_X fracHom fracHom_apply fracHom_eq_zero_iff mem_locRing_iff div_mem_locRing)
 
-theorem length_toNat_of_addEquiv {M κ : Type*} [AddCommGroup M] [Module ℤ M] [Field κ] (e : M ≃+ κ)
-    (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) κ] :
-    (Module.length ℤ M).toNat = Module.finrank (ZMod p) κ := by
+theorem length_toNat_of_addEquiv
+    {M κ : Type*} [AddCommGroup M] [Module ℤ M] [Field κ]
+    (e : M ≃+ κ)
+    (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) κ]
+    : (Module.length ℤ M).toNat = Module.finrank (ZMod p) κ := by
   let l : M ≃ₗ[ℤ] κ := { e with map_smul' := fun n x => by simpa using map_intCast_smul e ℤ ℤ n x }
-  rw [l.length_eq, Module.length_eq_of_surjective (R := ZMod p) (S := ℤ) (M := κ)
-    (fun z => ⟨(z.cast : ℤ), by simp⟩), Module.length_eq_rank, Cardinal.toNat_toENat]
+  rw [l.length_eq,
+    Module.length_eq_of_surjective (R := ZMod p) (S := ℤ) (M := κ)
+      (fun z => ⟨(z.cast : ℤ), by simp⟩),
+    Module.length_eq_rank, Cardinal.toNat_toENat]
   rfl
 
 attribute [local instance 2000] Ring.toIntAlgebra
@@ -29,35 +37,45 @@ attribute [local instance 2000] Ring.toIntAlgebra
 variable {B : Type} [Fintype B] {J : B → Type} [∀ k, Fintype (J k)]
 variable {P W : Ideal (MRing J)} [P.IsPrime] [W.IsPrime]
 
-def dehom (hPW : P ≤ W) (c : ∀ k, J k) (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) : MRing J →+* locRing P W := by
+def dehom (hPW : P ≤ W) (c : ∀ k, J k) (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
+    : MRing J →+* locRing P W := by
   classical
   exact (aeval (R := ℤ) fun p : Σ k, J k =>
-    (⟨fracHom P (X p) / fracHom P (X ⟨p.1, c p.1⟩),
-      div_mem_locRing hPW (homog_X p.1 p.2) (homog_X p.1 (c p.1)) (hc p.1)⟩ : locRing P W)).toRingHom
+    (⟨
+       fracHom P (X p) / fracHom P (X ⟨p.1, c p.1⟩),
+       div_mem_locRing hPW (homog_X p.1 p.2) (homog_X p.1 (c p.1)) (hc p.1)
+     ⟩
+      : locRing P W)).toRingHom
 
-theorem frac_chart_ne_zero (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (k : B) :
-    fracHom P (X ⟨k, c k⟩ : MRing J) ≠ 0 := fun h =>
+theorem frac_chart_ne_zero
+    (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (k : B)
+    : fracHom P (X ⟨k, c k⟩ : MRing J) ≠ 0 := fun h =>
   hc k (hPW (fracHom_eq_zero_iff.1 h))
 
-theorem coe_dehom (hPW : P ≤ W) (c : ∀ k, J k) (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (f : MRing J) :
-    ((dehom hPW c hc f : locRing P W) : FractionRing (MRing J ⧸ P)) =
-      aeval (fun p : Σ k, J k => fracHom P (X p) / fracHom P (X ⟨p.1, c p.1⟩)) f := by
+theorem coe_dehom (hPW : P ≤ W) (c : ∀ k, J k) (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (f : MRing J)
+    : ((dehom hPW c hc f : locRing P W) : FractionRing (MRing J ⧸ P))
+      = aeval (fun p : Σ k, J k => fracHom P (X p) / fracHom P (X ⟨p.1, c p.1⟩)) f := by
   classical
-  have h : (locRing P W).subtype.comp (dehom hPW c hc) =
-      (aeval (R := ℤ) (fun p : Σ k, J k => fracHom P (X p) / fracHom P (X ⟨p.1, c p.1⟩))).toRingHom := by
+  have h
+      : (locRing P W).subtype.comp (dehom hPW c hc)
+        = (aeval (R := ℤ)
+          (fun p : Σ k, J k => fracHom P (X p) / fracHom P (X ⟨p.1, c p.1⟩))).toRingHom := by
     refine MvPolynomial.ringHom_ext' (RingHom.ext_int _ _) fun p => ?_
     simp [dehom]
   exact RingHom.congr_fun h f
 
-theorem fracHom_eq_aeval (f : MRing J) :
-    fracHom P f = aeval (fun p : Σ k, J k => fracHom P (X p)) f := by
+theorem fracHom_eq_aeval (f : MRing J)
+    : fracHom P f = aeval (fun p : Σ k, J k => fracHom P (X p)) f := by
   have h : fracHom P = (aeval (R := ℤ) (fun p : Σ k, J k => fracHom P (X p))).toRingHom :=
     MvPolynomial.ringHom_ext' (RingHom.ext_int _ _) fun p => by simp
   exact RingHom.congr_fun h f
 
-theorem dehom_form (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) {G : MRing J} {n : B → ℕ}
-    (hG : IsMultiHomog G n) :
-    ((dehom hPW c hc G : locRing P W) : FractionRing (MRing J ⧸ P)) * fracHom P (chartMono c n) = fracHom P G := by
+theorem dehom_form
+    (hPW : P ≤ W)
+    {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
+    {G : MRing J} {n : B → ℕ} (hG : IsMultiHomog G n)
+    : ((dehom hPW c hc G : locRing P W) : FractionRing (MRing J ⧸ P)) * fracHom P (chartMono c n)
+      = fracHom P G := by
   have hD : fracHom P (chartMono c n) = ∏ k, fracHom P (X ⟨k, c k⟩ : MRing J) ^ n k := by
     simp [chartMono, map_prod, map_pow]
   have hD0 : ∏ k, fracHom P (X ⟨k, c k⟩ : MRing J) ^ n k ≠ 0 :=
@@ -65,35 +83,41 @@ theorem dehom_form (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩
   rw [coe_dehom, aeval_div (fun p : Σ k, J k => fracHom P (X p)) c G n hG, hD, ← fracHom_eq_aeval,
     mul_assoc, inv_mul_cancel₀ hD0, mul_one]
 
-theorem dehom_X_chart (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (k : B) :
-    dehom hPW c hc (X ⟨k, c k⟩) = 1 := by
+theorem dehom_X_chart (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (k : B)
+    : dehom hPW c hc (X ⟨k, c k⟩) = 1 := by
   apply Subtype.ext
   rw [coe_dehom, aeval_X]
   exact div_self (frac_chart_ne_zero hPW hc k)
 
 variable [IsLocalRing (locRing P W)]
 
-theorem dehom_mem_maximalIdeal_iff (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
-    {G : MRing J} {n : B → ℕ} (hG : IsMultiHomog G n) :
-    dehom hPW c hc G ∈ maximalIdeal (locRing P W) ↔ G ∈ W :=
+theorem dehom_mem_maximalIdeal_iff
+    (hPW : P ≤ W)
+    {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
+    {G : MRing J} {n : B → ℕ} (hG : IsMultiHomog G n)
+    : dehom hPW c hc G ∈ maximalIdeal (locRing P W) ↔ G ∈ W :=
   regularityLocalFlat_holds.mem_maximalIdeal_iff hPW _ hG (isMultiHomog_chartMono c n)
     (chartMono_notMem ‹W.IsPrime› hc n) (dehom_form hPW hc hG)
 
-def theta (hPW : P ≤ W) (c : ∀ k, J k) (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) :
-    MRing J →+* ResidueField (locRing P W) :=
+def theta (hPW : P ≤ W) (c : ∀ k, J k) (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
+    : MRing J →+* ResidueField (locRing P W) :=
   (residue (locRing P W)).comp (dehom hPW c hc)
 
-theorem theta_eq_zero_iff (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
-    {G : MRing J} {n : B → ℕ} (hG : IsMultiHomog G n) : theta hPW c hc G = 0 ↔ G ∈ W :=
+theorem theta_eq_zero_iff
+    (hPW : P ≤ W)
+    {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
+    {G : MRing J} {n : B → ℕ} (hG : IsMultiHomog G n)
+    : theta hPW c hc G = 0 ↔ G ∈ W :=
   (residue_eq_zero_iff _).trans (dehom_mem_maximalIdeal_iff hPW hc hG)
 
-theorem theta_X_chart (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (k : B) :
-    theta hPW c hc (X ⟨k, c k⟩) = 1 := by
+theorem theta_X_chart (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (k : B)
+    : theta hPW c hc (X ⟨k, c k⟩) = 1 := by
   simp [theta, dehom_X_chart]
 
-theorem ker_theta (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
-    (hWh : IsMultiHomogIdeal W) :
-    RingHom.ker (theta hPW c hc) = W ⊔ Ideal.span (Set.range fun k => (X ⟨k, c k⟩ : MRing J) - 1) := by
+theorem ker_theta
+    (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (hWh : IsMultiHomogIdeal W)
+    : RingHom.ker (theta hPW c hc)
+      = W ⊔ Ideal.span (Set.range fun k => (X ⟨k, c k⟩ : MRing J) - 1) := by
   set I0 := Ideal.span (Set.range fun k => (X ⟨k, c k⟩ : MRing J) - 1) with hI0
   have hIk : I0 ≤ RingHom.ker (theta hPW c hc) := by
     refine Ideal.span_le.2 ?_
@@ -117,8 +141,11 @@ theorem ker_theta (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ 
     rw [RingHom.mem_ker, ← e]
     exact (theta_eq_zero_iff hPW hc hG).2 hGW
 
-theorem theta_surjective (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
-    (hmax : (RingHom.ker (theta hPW c hc)).IsMaximal) : Function.Surjective (theta hPW c hc) := by
+theorem theta_surjective
+    (hPW : P ≤ W)
+    {c : ∀ k, J k}
+    (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (hmax : (RingHom.ker (theta hPW c hc)).IsMaximal)
+    : Function.Surjective (theta hPW c hc) := by
   intro z
   obtain ⟨x, rfl⟩ := residue_surjective z
   obtain ⟨u, v, a, hu, hv, hvW, hx⟩ := (mem_locRing_iff hPW).1 x.2
@@ -138,30 +165,35 @@ theorem theta_surjective (hPW : P ≤ W) {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, 
     simp only [theta, RingHom.comp_apply, h1, map_mul]
   rw [map_mul, h3, mul_assoc, mul_comm (theta hPW c hc v), h2, mul_one]
 
-
 omit [P.IsPrime] [W.IsPrime] in
-def chartHom {K : Type} [Field K] (w : (Σ k, J k) → K) (c : ∀ k, J k) : MRing J →+* chartRingZ w c :=
+def chartHom {K : Type} [Field K] (w : (Σ k, J k) → K) (c : ∀ k, J k)
+    : MRing J →+* chartRingZ w c :=
   (aeval (R := ℤ) fun p : Σ k, J k =>
     (⟨w p / w ⟨p.1, c p.1⟩, Algebra.subset_adjoin ⟨p, rfl⟩⟩ : chartRingZ w c)).toRingHom
 
-theorem coe_chartHom {K : Type} [Field K] (w : (Σ k, J k) → K) (c : ∀ k, J k) (f : MRing J) :
-    ((chartHom w c f : chartRingZ w c) : K) = aeval (fun p : Σ k, J k => w p / w ⟨p.1, c p.1⟩) f := by
-  have h : (chartRingZ w c).val.toRingHom.comp (chartHom w c) =
-      (aeval (R := ℤ) (fun p : Σ k, J k => w p / w ⟨p.1, c p.1⟩)).toRingHom := by
+theorem coe_chartHom {K : Type} [Field K] (w : (Σ k, J k) → K) (c : ∀ k, J k) (f : MRing J)
+    : ((chartHom w c f : chartRingZ w c) : K)
+      = aeval (fun p : Σ k, J k => w p / w ⟨p.1, c p.1⟩) f := by
+  have h
+      : (chartRingZ w c).val.toRingHom.comp (chartHom w c)
+        = (aeval (R := ℤ) (fun p : Σ k, J k => w p / w ⟨p.1, c p.1⟩)).toRingHom := by
     refine MvPolynomial.ringHom_ext' (RingHom.ext_int _ _) fun p => ?_
     simp [chartHom]
   exact RingHom.congr_fun h f
 
-theorem chartHom_surjective {K : Type} [Field K] (w : (Σ k, J k) → K) (c : ∀ k, J k) :
-    Function.Surjective (chartHom w c) := by
+theorem chartHom_surjective {K : Type} [Field K] (w : (Σ k, J k) → K) (c : ∀ k, J k)
+    : Function.Surjective (chartHom w c) := by
   rintro ⟨r, hr⟩
   rw [chartRingZ, Algebra.adjoin_range_eq_range_aeval] at hr
   obtain ⟨f, hf⟩ := (AlgHom.mem_range _).mp hr
   exact ⟨f, Subtype.ext ((coe_chartHom w c f).trans hf)⟩
 
-theorem ker_chartHom_le {K : Type} [Field K] {w : (Σ k, J k) → K} {c : ∀ k, J k} {W : Ideal (MRing J)}
-    (hPW : mCoordIdeal w ≤ W) (hwc : ∀ k, w ⟨k, c k⟩ ≠ 0) :
-    RingHom.ker (chartHom w c) ≤ W ⊔ Ideal.span (Set.range fun k => (X ⟨k, c k⟩ : MRing J) - 1) := by
+theorem ker_chartHom_le
+    {K : Type} [Field K]
+    {w : (Σ k, J k) → K} {c : ∀ k, J k} {W : Ideal (MRing J)}
+    (hPW : mCoordIdeal w ≤ W) (hwc : ∀ k, w ⟨k, c k⟩ ≠ 0)
+    : RingHom.ker (chartHom w c)
+      ≤ W ⊔ Ideal.span (Set.range fun k => (X ⟨k, c k⟩ : MRing J) - 1) := by
   set I0 := Ideal.span (Set.range fun k => (X ⟨k, c k⟩ : MRing J) - 1) with hI0
   have hspan : I0 ≤ RingHom.ker (chartHom w c) := by
     refine Ideal.span_le.2 ?_
@@ -187,12 +219,16 @@ theorem ker_chartHom_le {K : Type} [Field K] {w : (Σ k, J k) → K} {c : ∀ k,
   rw [e]
   exact sub_mem (Ideal.mem_sup_left hGW) (Ideal.mem_sup_right hd)
 
-theorem ker_theta_isMaximal {p : ℕ} [Fact p.Prime] {K : Type} [Field K] [Algebra (ZMod p) K]
-    [IsFunctionField (ZMod p) K] {w : (Σ k, J k) → K} {W : Ideal (MRing J)} [(mCoordIdeal w).IsPrime] [W.IsPrime]
-    [IsLocalRing (locRing (mCoordIdeal w) W)] (hbir : Birational w) (hPW : mCoordIdeal w ≤ W)
-    {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W) (hWh : IsMultiHomogIdeal W)
-    {k : B} {i : J k} (hw : w ⟨k, i⟩ ≠ 0) (hX : (X ⟨k, i⟩ : MRing J) ∈ W) :
-    (RingHom.ker (theta hPW c hc)).IsMaximal := by
+theorem ker_theta_isMaximal
+    {p : ℕ} [Fact p.Prime]
+    {K : Type} [Field K] [Algebra (ZMod p) K] [IsFunctionField (ZMod p) K]
+    {w : (Σ k, J k) → K} {W : Ideal (MRing J)}
+    [(mCoordIdeal w).IsPrime] [W.IsPrime] [IsLocalRing (locRing (mCoordIdeal w) W)]
+    (hbir : Birational w) (hPW : mCoordIdeal w ≤ W)
+    {c : ∀ k, J k} (hc : ∀ k, (X ⟨k, c k⟩ : MRing J) ∉ W)
+    (hWh : IsMultiHomogIdeal W)
+    {k : B} {i : J k} (hw : w ⟨k, i⟩ ≠ 0) (hX : (X ⟨k, i⟩ : MRing J) ∈ W)
+    : (RingHom.ker (theta hPW c hc)).IsMaximal := by
   have hwc : ∀ k, w ⟨k, c k⟩ ≠ 0 := fun k h => hc k (hPW ((X_mem_iff w k _).2 h))
   have hs := chartHom_surjective w c
   have hker := ker_theta hPW hc hWh
@@ -213,12 +249,23 @@ theorem ker_theta_isMaximal {p : ℕ} [Fact p.Prime] {K : Type} [Field K] [Algeb
     rw [coe_chartHom, aeval_X] at h2
     exact div_ne_zero hw (hwc k) h2
   haveI := chart_prime_isMaximal (p := p) w hbir c hwc _ hq h0
-  have h3 := Ideal.comap_isMaximal_of_surjective (chartHom w c) hs
-    (K := Ideal.map (chartHom w c) (RingHom.ker (theta hPW c hc)))
+  have h3 :=
+    Ideal.comap_isMaximal_of_surjective (chartHom w c) hs
+      (K := Ideal.map (chartHom w c) (RingHom.ker (theta hPW c hc)))
   have hle' : Ideal.comap (chartHom w c) ⊥ ≤ RingHom.ker (theta hPW c hc) := hle
   rwa [Ideal.comap_map_of_surjective (chartHom w c) hs, sup_eq_left.2 hle'] at h3
 
-theorem geoNum_zero_eq_finrank : ∀ (B : Type) [Fintype B] (J : B → Type) [∀ k, Fintype (J k)] (p : ℕ) [Fact p.Prime] (K : Type) [Field K] [Algebra (ZMod p) K] [IsFunctionField (ZMod p) K] (w : (Σ k, J k) → K), Birational w → ∀ (k : B) (c : J k), w ⟨k, c⟩ ≠ 0 → ∀ W ∈ divSupp (mCoordIdeal w) (X ⟨k, c⟩), ∀ (b : Fin 0 → B → ℤ) [IsLocalRing (locRing (mCoordIdeal w) W)] [Algebra (ZMod p) (locRing (mCoordIdeal w) W)], geoNum 0 W b = (Module.finrank (ZMod p) (ResidueField (locRing (mCoordIdeal w) W)) : ℤ) := by
+theorem geoNum_zero_eq_finrank
+    : ∀ (B : Type) [Fintype B] (J : B → Type) [∀ k, Fintype (J k)] (p : ℕ) [Fact p.Prime] (K : Type)
+        [Field K] [Algebra (ZMod p) K] [IsFunctionField (ZMod p) K] (w : (Σ k, J k) → K),
+      Birational w
+        → ∀ (k : B) (c : J k),
+          w ⟨k, c⟩ ≠ 0
+            → ∀ W ∈ divSupp (mCoordIdeal w) (X ⟨k, c⟩),
+              ∀ (b : Fin 0 → B → ℤ) [IsLocalRing (locRing (mCoordIdeal w) W)]
+                  [Algebra (ZMod p) (locRing (mCoordIdeal w) W)],
+                geoNum 0 W b
+                  = (Module.finrank (ZMod p) (ResidueField (locRing (mCoordIdeal w) W)) : ℤ) := by
   intro B _ J _ p _ K _ _ _ w hbir k i hw W hW b _ _
   classical
   obtain ⟨hmin, hrel⟩ := hW
@@ -227,8 +274,8 @@ theorem geoNum_zero_eq_finrank : ∀ (B : Type) [Fintype B] (J : B → Type) [�
   have hPW : mCoordIdeal w ≤ W := le_sup_left.trans hmin.1.2
   have hX : (X ⟨k, i⟩ : MRing J) ∈ W := hmin.1.2 (Ideal.mem_sup_right (Ideal.subset_span rfl))
   have hWh : IsMultiHomogIdeal W :=
-    isMultiHomogIdeal_of_mem_minimalPrimes (GroundTheory.Heights₂.Heights.CoordinateConeArithVar.isMultiHomogIdeal w)
-      (homog_X k i) hmin
+    isMultiHomogIdeal_of_mem_minimalPrimes
+      (GroundTheory.Heights₂.Heights.CoordinateConeArithVar.isMultiHomogIdeal w) (homog_X k i) hmin
   have hc : ∀ k, (X ⟨k, (hrel k).choose⟩ : MRing J) ∉ W := fun k => (hrel k).choose_spec
   have hmax := ker_theta_isMaximal (p := p) hbir hPW hc hWh hw hX
   have hsurj := theta_surjective hPW hc hmax
@@ -236,6 +283,7 @@ theorem geoNum_zero_eq_finrank : ∀ (B : Type) [Fintype B] (J : B → Type) [�
   congr 1
   exact length_toNat_of_addEquiv
     ((Ideal.quotEquivOfEq (ker_theta hPW hc hWh).symm).trans
-      (RingHom.quotientKerEquivOfSurjective hsurj)).toAddEquiv p
+      (RingHom.quotientKerEquivOfSurjective hsurj)).toAddEquiv
+    p
 
 end GlobalTheory.CompanionTheory.Ar.GeoDeg.ResDeg

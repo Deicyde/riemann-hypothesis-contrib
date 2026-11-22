@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ExistsUniqueI
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Pdiv
 
 namespace GlobalTheory.HodgeTateTest
 
@@ -25,15 +26,14 @@ noncomputable def taut (p : ℕ) : Tv (GmO O) p where
 
 noncomputable def dlogT (x : LieG (GmO O)) : O := (unitOf x.1 : DualNumber O).snd
 
-theorem unitOf_one' {R : Type} [CommRing R] [Algebra O R] :
-    unitOf (1 : specO O R ⟶ GmO O) = 1 := by
+theorem unitOf_one' {R : Type} [CommRing R] [Algebra O R] : unitOf (1 : specO O R ⟶ GmO O) = 1 := by
   have h := unitOf_mul (1 : specO O R ⟶ GmO O) 1
   rw [_root_.mul_one] at h
   exact left_eq_mul.mp h
 
-theorem lie_iff (w : specO O (DualNumber O) ⟶ GmO O) :
-    ptMap (TrivSqZeroExt.fstHom O O O) ≫ w = toUnit (specO O O) ≫ η[GmO O] ↔
-      (unitOf w : DualNumber O).fst = 1 := by
+theorem lie_iff (w : specO O (DualNumber O) ⟶ GmO O)
+    : ptMap (TrivSqZeroExt.fstHom O O O) ≫ w = toUnit (specO O O) ≫ η[GmO O]
+      ↔ (unitOf w : DualNumber O).fst = 1 := by
   have h4 := unitOf_ptMap (TrivSqZeroExt.fstHom O O O) w
   constructor
   · intro h
@@ -83,7 +83,8 @@ theorem dlogT_bijective : Function.Bijective (dlogT (O := O)) := by
     obtain ⟨w, hw⟩ := (unitOf_bijective (O := O) (R := DualNumber O)).2 hu.unit
     refine ⟨⟨w, (lie_iff w).2 (by rw [hw]; simp)⟩, ?_⟩
     show (unitOf w : DualNumber O).snd = a
-    rw [hw]; simp
+    rw [hw]
+    simp
 
 theorem omega_le_span : omega (GmO O) ≤ Submodule.span O {dlogT} := by
   intro f hf

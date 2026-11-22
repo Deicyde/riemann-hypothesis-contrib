@@ -13,13 +13,14 @@ namespace Formalism.L2
 
 abbrev Fld : Type := IntermediateField ℚ (AlgebraicClosure ℚ)
 
-def mapPl {F L : Type} [Field F] [Field L] (j : F ≃+* L) (v : HeightOneSpectrum (𝓞 F)) :
-    HeightOneSpectrum (𝓞 L) :=
+def mapPl {F L : Type} [Field F] [Field L] (j : F ≃+* L) (v : HeightOneSpectrum (𝓞 F))
+    : HeightOneSpectrum (𝓞 L) :=
   HeightOneSpectrum.comap ((RingOfIntegers.mapRingEquiv j).symm : 𝓞 L →+* 𝓞 F)
     (RingOfIntegers.mapRingEquiv j).symm.surjective v
 
-theorem mem_mapPl {F L : Type} [Field F] [Field L] (j : F ≃+* L) (v : HeightOneSpectrum (𝓞 F)) (x : 𝓞 F) :
-    RingOfIntegers.mapRingEquiv j x ∈ (mapPl j v).asIdeal ↔ x ∈ v.asIdeal := by
+theorem mem_mapPl
+    {F L : Type} [Field F] [Field L] (j : F ≃+* L) (v : HeightOneSpectrum (𝓞 F)) (x : 𝓞 F)
+    : RingOfIntegers.mapRingEquiv j x ∈ (mapPl j v).asIdeal ↔ x ∈ v.asIdeal := by
   show (RingOfIntegers.mapRingEquiv j).symm (RingOfIntegers.mapRingEquiv j x) ∈ v.asIdeal ↔ _
   rw [RingEquiv.symm_apply_apply]
 

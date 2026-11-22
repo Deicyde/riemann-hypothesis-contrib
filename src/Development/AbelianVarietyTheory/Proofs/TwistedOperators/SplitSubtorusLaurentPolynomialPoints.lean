@@ -24,18 +24,18 @@ def chi (t : Fin s → Fˣ) : Multiplicative (Fin s → ℤ) →* F where
 def ev (t : Fin s → Fˣ) : AddMonoidAlgebra F (Fin s → ℤ) →ₐ[F] F :=
   AddMonoidAlgebra.lift F F (Fin s → ℤ) (chi t)
 
-theorem ev_single (t : Fin s → Fˣ) (a : Fin s → ℤ) (c : F) :
-    ev t (AddMonoidAlgebra.single a c) = c * ((∏ j, t j ^ a j : Fˣ) : F) := by
+theorem ev_single (t : Fin s → Fˣ) (a : Fin s → ℤ) (c : F)
+    : ev t (AddMonoidAlgebra.single a c) = c * ((∏ j, t j ^ a j : Fˣ) : F) := by
   rw [ev, AddMonoidAlgebra.lift_single]; rfl
 
 def univ (F : Type) [Field F] (s : ℕ) (j : Fin s) : (AddMonoidAlgebra F (Fin s → ℤ))ˣ where
   val := AddMonoidAlgebra.single (Pi.single j 1) 1
-  inv := AddMonoidAlgebra.single (-Pi.single j 1) 1
+  inv := AddMonoidAlgebra.single (- Pi.single j 1) 1
   val_inv := by rw [AddMonoidAlgebra.single_mul_single]; simp [AddMonoidAlgebra.one_def]
   inv_val := by rw [AddMonoidAlgebra.single_mul_single]; simp [AddMonoidAlgebra.one_def]
 
-theorem map_univ (t : Fin s → Fˣ) (j : Fin s) :
-    Units.map (ev t : AddMonoidAlgebra F (Fin s → ℤ) →* F) (univ F s j) = t j := by
+theorem map_univ (t : Fin s → Fˣ) (j : Fin s)
+    : Units.map (ev t : AddMonoidAlgebra F (Fin s → ℤ) →* F) (univ F s j) = t j := by
   refine Units.ext ?_
   change ev t (AddMonoidAlgebra.single (Pi.single j 1) 1) = _
   rw [ev_single, one_mul, Finset.prod_eq_single j]
@@ -43,21 +43,22 @@ theorem map_univ (t : Fin s → Fˣ) (j : Fin s) :
   · intro b _ hb; simp [hb]
   · simp
 
-theorem exists_coeff {E : Type} [CommRing E] [Algebra F E]
-    (x : E ⊗[F] AddMonoidAlgebra F (Fin s → ℤ)) :
-    ∃ c : (Fin s → ℤ) →₀ E ⊗[F] F, ∀ t : Fin s → Fˣ,
-      Algebra.TensorProduct.map (AlgHom.id F E) (ev t) x =
-        c.sum fun a y => ((∏ j, t j ^ a j : Fˣ) : F) • y := by
-  have hadd : ∀ x y : E ⊗[F] AddMonoidAlgebra F (Fin s → ℤ),
-      (∃ c : (Fin s → ℤ) →₀ E ⊗[F] F, ∀ t : Fin s → Fˣ,
-        Algebra.TensorProduct.map (AlgHom.id F E) (ev t) x =
-          c.sum fun a y => ((∏ j, t j ^ a j : Fˣ) : F) • y) →
-      (∃ c : (Fin s → ℤ) →₀ E ⊗[F] F, ∀ t : Fin s → Fˣ,
-        Algebra.TensorProduct.map (AlgHom.id F E) (ev t) y =
-          c.sum fun a y => ((∏ j, t j ^ a j : Fˣ) : F) • y) →
-      (∃ c : (Fin s → ℤ) →₀ E ⊗[F] F, ∀ t : Fin s → Fˣ,
-        Algebra.TensorProduct.map (AlgHom.id F E) (ev t) (x + y) =
-          c.sum fun a y => ((∏ j, t j ^ a j : Fˣ) : F) • y) := by
+theorem exists_coeff
+    {E : Type} [CommRing E] [Algebra F E] (x : E ⊗[F] AddMonoidAlgebra F (Fin s → ℤ))
+    : ∃ c : (Fin s → ℤ) →₀ E ⊗[F] F, ∀ t : Fin s → Fˣ,
+      Algebra.TensorProduct.map (AlgHom.id F E) (ev t) x
+        = c.sum fun a y => ((∏ j, t j ^ a j : Fˣ) : F) • y := by
+  have hadd
+      : ∀ x y : E ⊗[F] AddMonoidAlgebra F (Fin s → ℤ),
+        (∃ c : (Fin s → ℤ) →₀ E ⊗[F] F, ∀ t : Fin s → Fˣ,
+            Algebra.TensorProduct.map (AlgHom.id F E) (ev t) x
+              = c.sum fun a y => ((∏ j, t j ^ a j : Fˣ) : F) • y)
+          → (∃ c : (Fin s → ℤ) →₀ E ⊗[F] F, ∀ t : Fin s → Fˣ,
+            Algebra.TensorProduct.map (AlgHom.id F E) (ev t) y
+              = c.sum fun a y => ((∏ j, t j ^ a j : Fˣ) : F) • y)
+          → (∃ c : (Fin s → ℤ) →₀ E ⊗[F] F, ∀ t : Fin s → Fˣ,
+            Algebra.TensorProduct.map (AlgHom.id F E) (ev t) (x + y)
+              = c.sum fun a y => ((∏ j, t j ^ a j : Fˣ) : F) • y) := by
     rintro x y ⟨c, hc⟩ ⟨d, hd⟩
     refine ⟨c + d, fun t => ?_⟩
     rw [map_add (f := _), hc, hd, Finsupp.sum_add_index' (by simp) (by simp [smul_add])]
@@ -83,18 +84,23 @@ theorem subtorusLaurent : SubtorusLaurent := by
   classical
   choose c hc using fun i j : n => exists_coeff (F := F) (s := s)
     ((A.hom _ (univ F s) : Matrix n n (E ⊗[F] AddMonoidAlgebra F (Fin s → ℤ))) i j)
-  refine ⟨Finset.univ.biUnion fun p : n × n => (c p.1 p.2).support,
-    fun a => Matrix.of fun i j => c i j a, fun t => ?_⟩
+  refine ⟨
+    Finset.univ.biUnion fun p : n × n => (c p.1 p.2).support,
+    fun a => Matrix.of fun i j => c i j a,
+    fun t => ?_
+  ⟩
   have h := A.natural _ F (ev t) (univ F s)
   simp only [map_univ] at h
   ext i j
-  have h2 : (A.hom F t : Matrix n n (E ⊗[F] F)) i j =
-      Algebra.TensorProduct.map (AlgHom.id F E) (ev t)
-        ((A.hom _ (univ F s) : Matrix n n (E ⊗[F] AddMonoidAlgebra F (Fin s → ℤ))) i j) := by
+  have h2
+      : (A.hom F t : Matrix n n (E ⊗[F] F)) i j
+        = Algebra.TensorProduct.map (AlgHom.id F E) (ev t)
+          ((A.hom _ (univ F s) : Matrix n n (E ⊗[F] AddMonoidAlgebra F (Fin s → ℤ))) i j) := by
     rw [h]; rfl
-  rw [h2, hc, Matrix.sum_apply, Finsupp.sum_of_support_subset _
-    (Finset.subset_biUnion_of_mem (fun p : n × n => (c p.1 p.2).support) (Finset.mem_univ (i, j)))
-    _ (by simp)]
+  rw [h2, hc, Matrix.sum_apply,
+    Finsupp.sum_of_support_subset _
+      (Finset.subset_biUnion_of_mem (fun p : n × n => (c p.1 p.2).support) (Finset.mem_univ (i, j)))
+      _ (by simp)]
   rfl
 
 end GlobalTheory.RegSS

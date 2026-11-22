@@ -6,14 +6,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.Gal.InertialTypesAlt.unrOfIne :
-    UnrOfIne := by
+theorem UpperTheory.Gal.InertialTypesAlt.unrOfIne : UnrOfIne := by
   intro K M Ω _ _ _ _ _ _ _ _ _ _ _ A v w hv hw hI
   have hunder : HeightOneSpectrum.under (𝓞 K) w = v := by
     apply HeightOneSpectrum.ext
@@ -51,8 +53,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.unrOfIne :
       exact he
     have hle : Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal ≤ w.asIdeal :=
       Ideal.map_le_iff_le_comap.2 hcomap.ge
-    have hnot : ¬ Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal ≤ w.asIdeal ^ 2 :=
-      fun h => ((Ideal.ramificationIdx'_ne_one_iff hle).2 h) hv1
+    have hnot : ¬ Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal ≤ w.asIdeal ^ 2 := fun h =>
+      ((Ideal.ramificationIdx'_ne_one_iff hle).2 h) hv1
     by_cases hxv : x ∈ v.asIdeal
     · obtain ⟨J, hJ⟩ : v.asIdeal ∣ Ideal.span {x} :=
         Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hxv)
@@ -78,12 +80,14 @@ theorem UpperTheory.Gal.InertialTypesAlt.unrOfIne :
         exact hmem
       have hr : Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal * w.asIdeal ^ 2 ≤ w.asIdeal ^ 2 :=
         Ideal.mul_le_right
-      calc Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal
-          = Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal *
-              (Ideal.map (algebraMap (𝓞 K) (𝓞 M)) J ⊔ w.asIdeal ^ 2) := by rw [hsup2, Ideal.mul_top]
-        _ = Ideal.map (algebraMap (𝓞 K) (𝓞 M)) (Ideal.span {x}) ⊔
-              Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal * w.asIdeal ^ 2 := by
-            rw [Ideal.mul_sup, hJ, Ideal.map_mul]
+      calc
+        Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal
+            = Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal
+              * (Ideal.map (algebraMap (𝓞 K) (𝓞 M)) J ⊔ w.asIdeal ^ 2) := by
+          rw [hsup2, Ideal.mul_top]
+        _ = Ideal.map (algebraMap (𝓞 K) (𝓞 M)) (Ideal.span {x})
+            ⊔ Ideal.map (algebraMap (𝓞 K) (𝓞 M)) v.asIdeal * w.asIdeal ^ 2 := by
+          rw [Ideal.mul_sup, hJ, Ideal.map_mul]
         _ ≤ w.asIdeal ^ 2 := sup_le hx2 hr
     · apply hxv
       rw [← hcomap, Ideal.mem_comap]

@@ -58,12 +58,16 @@ open Formalism.MainNotions.BridgeLemma
 
 namespace GlobalTheory.AmpRec
 
-theorem exists_threshold_adm9_of_ties : ∀ Cg cb Cu cT CT C0 : ℝ, ∀ Cn : ℝ, ∃ thr : ℝ, ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl : ℝ),
-    thr ≤ C' → thr ≤ Cl → Ties D → VanishingOnXAndXPlusBranching.adm9 D large₂ C' Cl Cg cb Cu cT CT C0 Cn 1 := by
+theorem exists_threshold_adm9_of_ties
+    : ∀ Cg cb Cu cT CT C0 : ℝ, ∀ Cn : ℝ, ∃ thr : ℝ, ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl : ℝ),
+      thr ≤ C' → thr ≤ Cl → Ties D
+        → VanishingOnXAndXPlusBranching.adm9 D large₂ C' Cl Cg cb Cu cT CT C0 Cn 1 := by
   intro Cg cb Cu cT CT C0 Cn
-  have hH : GlobalTheory.GapIn.Hyp := GlobalTheory.GapIn.hyp_of_uniqGap GlobalTheory.uniqGap_and_besselOfW.1
-  obtain ⟨m₀, hm⟩ := GlobalTheory.Amp.OpenCellNormGap.norm_eq_const_div_deg_gap hH (GlobalTheory.AmpOrbGap.ampKF hH)
-    GlobalTheory.CellMaj.cellConv Cg cb Cu cT CT C0 1 Cn
+  have hH : GlobalTheory.GapIn.Hyp :=
+    GlobalTheory.GapIn.hyp_of_uniqGap GlobalTheory.uniqGap_and_besselOfW.1
+  obtain ⟨m₀, hm⟩ :=
+    GlobalTheory.Amp.OpenCellNormGap.norm_eq_const_div_deg_gap hH (GlobalTheory.AmpOrbGap.ampKF hH)
+      GlobalTheory.CellMaj.cellConv Cg cb Cu cT CT C0 1 Cn
   obtain ⟨thr, hthr⟩ := GlobalTheory.Core.Deg.elementary_size_bounds_of_size_hypotheses (max m₀ 1)
   refine ⟨thr, fun D large₂ C' Cl hC' hCl hT => ?_⟩
   intro hH0

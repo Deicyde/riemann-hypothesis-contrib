@@ -16,8 +16,11 @@ section Local
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem eq_of_nu_eq {Δ Δ' : Segment k} (hΔ : PositivityTheory.UdReth2.IsCentred Δ) (hΔ' : PositivityTheory.UdReth2.IsCentred Δ')
-    {s s' : ℝ} (h : Δ.nu (s : ℂ) = Δ'.nu (s' : ℂ)) : s = s' ∧ Δ = Δ' := by
+theorem eq_of_nu_eq
+    {Δ Δ' : Segment k}
+    (hΔ : PositivityTheory.UdReth2.IsCentred Δ) (hΔ' : PositivityTheory.UdReth2.IsCentred Δ')
+    {s s' : ℝ} (h : Δ.nu (s : ℂ) = Δ'.nu (s' : ℂ))
+    : s = s' ∧ Δ = Δ' := by
   have nn : ∀ (Γ : Segment k) (a b : ℂ), (Γ.nu a).nu b = Γ.nu (a + b) := by
     intro Γ a b
     apply GlobalTheory.SmGL.Segment.ext_first
@@ -65,7 +68,9 @@ theorem eq_of_nu_eq {Δ Δ' : Segment k} (hΔ : PositivityTheory.UdReth2.IsCentr
   simp only [nn, add_neg_cancel, n0] at this
   exact this
 
-theorem eq_of_isLSeg' {Δ : Segment k} {δ δ' : IrrGL (k := k)} (h : IsLSeg Δ δ.rep) (h' : IsLSeg Δ δ'.rep) : δ = δ' :=
+theorem eq_of_isLSeg'
+    {Δ : Segment k} {δ δ' : IrrGL (k := k)} (h : IsLSeg Δ δ.rep) (h' : IsLSeg Δ δ'.rep)
+    : δ = δ' :=
   PositivityTheory.Lit1.eq_of_isLSeg h h'
 
 end Local

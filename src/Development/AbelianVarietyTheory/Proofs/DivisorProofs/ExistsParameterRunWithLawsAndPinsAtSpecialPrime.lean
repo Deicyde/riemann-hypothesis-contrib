@@ -29,39 +29,69 @@ set_option autoImplicit false
 noncomputable section
 
 open NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.IndefR.FWT
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.DIV
+  Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Cx Formalism.IndefR.FWT
 open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped TensorProduct
-open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies
+open GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.OntoChain GlobalTheory.RealIndexBound
+  GlobalTheory.OnTies
 
 namespace GlobalTheory.RunOnto
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem cjFin_val_eq (D : D7) (y : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ) :
-    ((cjFin D y : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ) : Af D.host.F ⊗[D.host.F] D.host.E) =
-      sigR (Af D.host.F) D.sp.cm.sig (y : Af D.host.F ⊗[D.host.F] D.host.E) := by
+theorem cjFin_val_eq (D : D7) (y : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ)
+    : ((cjFin D y : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ) : Af D.host.F ⊗[D.host.F] D.host.E)
+      = sigR (Af D.host.F) D.sp.cm.sig (y : Af D.host.F ⊗[D.host.F] D.host.E) := by
   have h : D.conjF = D.sp.cm.sig :=
     AlgHom.ext fun a => (D.conjF_eq a).trans (GlobalTheory.TwistFieldCompare.cF_eq a).symm
   unfold cjFin sigR
   rw [h]
   rfl
 
-theorem xi_det_of_isDetRoot {D : D7} {xi de : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ →* ℂˣ} (h : XiTilde xi de)
-    (V : Formalism.BasicNotions.TH.HSp D) (g : Formalism.L2.Theta.GA D V) (x : (Formalism.L2.Theta.AE D)ˣ) (hx : Formalism.L2.Theta.IsDetRoot V g x) :
-    xi (Matrix.GeneralLinearGroup.det (Formalism.L2.Theta.finHom V g)) =
-      de (Units.map (Formalism.L2.Theta.finPart D).toMonoidHom x) := by
+theorem xi_det_of_isDetRoot
+    {D : D7} {xi de : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ →* ℂˣ}
+    (h : XiTilde xi de) (V : Formalism.BasicNotions.TH.HSp D) (g : Formalism.L2.Theta.GA D V)
+    (x : (Formalism.L2.Theta.AE D)ˣ) (hx : Formalism.L2.Theta.IsDetRoot V g x)
+    : xi (Matrix.GeneralLinearGroup.det (Formalism.L2.Theta.finHom V g))
+      = de (Units.map (Formalism.L2.Theta.finPart D).toMonoidHom x) := by
   rw [← GlobalTheory.AntiCycRead.quo_of_isDetRoot D V g x hx, ← h]
   congr 1
   apply GlobalTheory.AntiCycRead.quo_eq_of
-  have e : (Formalism.L2.Theta.finPart D (x : Formalism.L2.Theta.AE D)) =
-      ((Units.map (Formalism.L2.Theta.finPart D).toMonoidHom x : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ) : _) := rfl
+  have e
+      : (Formalism.L2.Theta.finPart D (x : Formalism.L2.Theta.AE D))
+        = ((Units.map (Formalism.L2.Theta.finPart D).toMonoidHom x
+            : (Af D.host.F ⊗[D.host.F] D.host.E)ˣ)
+          : _) :=
+    rfl
   rw [e, ← cjFin_val_eq, ← Units.val_mul, div_mul_cancel]
 
-theorem exists_run_pins : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Formalism.MainNotions.G.Inst D L) (Gl : Formalism.MainNotions.G.LatInst D) (Kc : Formalism.MainNotions.G.Consts) (Y : DivX D) (cX : ExtraC) (ex : Extra D L hT Gi Gl Kc Y cX) (Csz : ℝ) (p : PtAt ex Csz), Links2 p → CoreTies L ex.errX p.T (R2 p) → ∀ l : ℕ, (l = D.host.pde ∨ l = D.host.pde') → ∃ r : GlobalTheory.RealIndexBound.RunData p.T, LawsFull r.full ∧ (∀ i : Fin D.R.m, GlobalTheory.FormTies.OneCover r.full.toTop ((i : ℕ) + 1)) ∧ (∀ j n : ℕ, InR D j → (r.full.dδ j n).pd = l) ∧ (∀ i : Fin D.R.m, ∀ γ₀ ∈ Formalism.L2.Theta.GQ (r.full.V ((i : ℕ) + 1) r.full.σ₀), r.full.xi (Matrix.GeneralLinearGroup.det (Formalism.L2.Theta.finHom (r.full.V ((i : ℕ) + 1) r.full.σ₀) γ₀)) = 1) ∧ ∀ v ∈ (R2 p).twPl, ownAt D v = l → ∀ i : Fin D.R.m, letI : Algebra r.full.J.Q.c.F D.what₂.LL := p.alg; RunPin (T := r.full) (R2 p) i (p.κ i).n v (ownAt D v) := by
+theorem exists_run_pins
+    : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Formalism.MainNotions.G.Inst D L)
+        (Gl : Formalism.MainNotions.G.LatInst D) (Kc : Formalism.MainNotions.G.Consts) (Y : DivX D)
+        (cX : ExtraC) (ex : Extra D L hT Gi Gl Kc Y cX) (Csz : ℝ) (p : PtAt ex Csz),
+      Links2 p → CoreTies L ex.errX p.T (R2 p)
+        → ∀ l : ℕ,
+          (l = D.host.pde ∨ l = D.host.pde')
+            → ∃ r : GlobalTheory.RealIndexBound.RunData p.T,
+              LawsFull r.full
+                ∧ (∀ i : Fin D.R.m, GlobalTheory.FormTies.OneCover r.full.toTop ((i : ℕ) + 1))
+                ∧ (∀ j n : ℕ, InR D j → (r.full.dδ j n).pd = l)
+                ∧ (∀ i : Fin D.R.m, ∀ γ₀ ∈ Formalism.L2.Theta.GQ (r.full.V ((i : ℕ) + 1) r.full.σ₀),
+                  r.full.xi (Matrix.GeneralLinearGroup.det (Formalism.L2.Theta.finHom
+                      (r.full.V ((i : ℕ) + 1) r.full.σ₀) γ₀))
+                    = 1)
+                ∧ ∀ v ∈ (R2 p).twPl,
+                  ownAt D v = l
+                    → ∀ i : Fin D.R.m,
+                      letI : Algebra r.full.J.Q.c.F D.what₂.LL := p.alg
+                      RunPin (T := r.full) (R2 p) i (p.κ i).n v (ownAt D v) := by
   intro D L hT Gi Gl Kc Y cX ex Csz p _ hC l hl
 
-  obtain ⟨δ, hδdef⟩ : ∃ δ : Formalism.L2.Host.HChar D.host.E, δ = if l = D.host.pde then (R2 p).C.del else (R2 p).C.del' :=
+  obtain ⟨δ, hδdef⟩
+      : ∃ δ : Formalism.L2.Host.HChar D.host.E,
+        δ = if l = D.host.pde then (R2 p).C.del else (R2 p).C.del' :=
     ⟨_, rfl⟩
   have hδ : Formalism.L2.Host.IsDelta (H := D.host) l δ := by
     rcases hl with rfl | rfl
@@ -78,9 +108,13 @@ theorem exists_run_pins : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi 
     exacts [hC.field₁, hC.field₂]
 
   obtain ⟨Pk, hPk⟩ := hC.oneHalf
-  obtain ⟨P, hP, hPv⟩ : ∃ P : HeightOneSpectrum (𝓞 D.host.K), ((l : ℕ) : 𝓞 D.host.K) ∈ P.asIdeal ∧
-      ∀ v ∈ (R2 p).twPl, ownAt D v = l → ∀ PP ∈ placesOver (R2 p) ((R2 p).mu v) (ownAt D v),
-        P.asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) ≤ PP.asIdeal := by
+  obtain ⟨P, hP, hPv⟩
+      : ∃ P : HeightOneSpectrum (𝓞 D.host.K),
+        ((l : ℕ) : 𝓞 D.host.K) ∈ P.asIdeal
+          ∧ ∀ v ∈ (R2 p).twPl,
+            ownAt D v = l
+              → ∀ PP ∈ placesOver (R2 p) ((R2 p).mu v) (ownAt D v),
+                P.asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) ≤ PP.asIdeal := by
     by_cases hex : ∃ v ∈ (R2 p).twPl, ownAt D v = l
     · obtain ⟨v, hv, hvl⟩ := hex
       refine ⟨Pk l, by rw [← hvl]; exact (hPk v hv).1, fun w hw hwl PP hPP => ?_⟩
@@ -93,7 +127,8 @@ theorem exists_run_pins : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi 
       exact ⟨P, hP, fun w hw hwl => absurd ⟨w, hw, hwl⟩ hex⟩
 
   have hJ : LawsJ p.T := (fw2 p).laws
-  obtain ⟨T, hT, hTc⟩ := GlobalTheory.FinalJoin.exists_top_of_core D p.T.toCore hC.laws hC.rank hF.kpsi
+  obtain ⟨T, hT, hTc⟩ :=
+    GlobalTheory.FinalJoin.exists_top_of_core D p.T.toCore hC.laws hC.rank hF.kpsi
   have hcan : T.Q.Canon := by
     have e : T.toCore.Q = p.T.toCore.Q := congrArg (fun C => C.Q) hTc
     rw [show T.Q = p.T.Q from e]

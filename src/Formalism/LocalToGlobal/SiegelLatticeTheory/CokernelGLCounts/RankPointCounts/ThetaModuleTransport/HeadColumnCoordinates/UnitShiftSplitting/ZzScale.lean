@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon Formalism.L2.SG.LocalCountModules.ThetaMbe0GWork
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon Formalism.L2.SG.LocalCountModules.ThetaMbe0GWork
 
 namespace Formalism.L2.SG.LocalCountModules.AlgGSplit
 
@@ -15,16 +16,20 @@ variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableS
 variable {M : Model F E} {g : SplitG M.L} {r : ℕ} (hs : M.split = some g)
 
 include hs in
-theorem zz_scale (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
-    (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) M.R) (hZ : Z.map M.R.subtype = HermSp.ZZplusOf M Zh T T')
-    (u : F) (hu0 : u ≠ 0) (δ₁ δ₂ cc : M.R) (α : E) (he1 : g.e (δ₁ : E) = (u, 1))
-    (he2 : g.e (δ₂ : E) = (1, u⁻¹)) (hcc : g.e (cc : E) = ((1 - u) * T / (g.q : F), (1 - u) * T' / (g.q : F)))
-    (hα : g.e α = (u, u⁻¹)) :
-    (dlast r δ₂ * (Z * dlast r δ₁ + Matrix.of fun a b => if a = Fin.last r ∧ b = Fin.last r then cc else 0)).map
-        M.R.subtype = HermSp.ZZplusOf M (Zh * dlast r α) T T' := by
+theorem zz_scale
+    (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
+    (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) M.R)
+    (hZ : Z.map M.R.subtype = HermSp.ZZplusOf M Zh T T')
+    (u : F) (hu0 : u ≠ 0)
+    (δ₁ δ₂ cc : M.R) (α : E) (he1 : g.e (δ₁ : E) = (u, 1)) (he2 : g.e (δ₂ : E) = (1, u⁻¹))
+    (hcc : g.e (cc : E) = ((1 - u) * T / (g.q : F), (1 - u) * T' / (g.q : F)))
+    (hα : g.e α = (u, u⁻¹))
+    : (dlast r δ₂
+        * (Z * dlast r δ₁
+          + Matrix.of fun a b => if a = Fin.last r ∧ b = Fin.last r then cc else 0)).map M.R.subtype
+      = HermSp.ZZplusOf M (Zh * dlast r α) T T' := by
   ext a b
-  have hZab : ((Z a b : M.R) : E) = HermSp.ZZplusOf M Zh T T' a b := by
-    rw [← hZ]; rfl
+  have hZab : ((Z a b : M.R) : E) = HermSp.ZZplusOf M Zh T T' a b := by rw [← hZ]; rfl
   have hq : ((g.q : F)) ≠ 0 := by
     intro h
     exact g.q_irr.ne_zero (Subtype.ext h)
@@ -33,7 +38,8 @@ theorem zz_scale (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
     Matrix.mul_diagonal, Matrix.add_apply, Subring.coe_subtype]
   apply g.e.injective
   by_cases ha : a = Fin.last r <;> by_cases hb : b = Fin.last r
-  · subst ha; subst hb
+  · subst ha
+    subst hb
     simp only [and_self, if_true] at hZab ⊢
     push_cast
     rw [map_sub, map_mul, map_add (f := _), map_mul, hZab]

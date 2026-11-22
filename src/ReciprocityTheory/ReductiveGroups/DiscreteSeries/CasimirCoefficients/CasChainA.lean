@@ -139,31 +139,38 @@ lemma cca_local_formula [CompleteSpace E] {F : X → E} {U : Set X} (hU : IsOpen
   exact ⟨δ, hδ, ρ, hρ, fun z hz θ => h z hz _ (cca_mem_disc hρ θ),
     fun z hz => cca_fderiv_eq hU hF hρ (h z hz)⟩
 
-theorem cca_continuousOn_fderiv [FiniteDimensional ℂ X] [CompleteSpace E] {F : X → E} {U : Set X}
-    (hU : IsOpen U) (hF : DifferentiableOn ℂ F U) : ContinuousOn (fderiv ℂ F) U := by
+theorem cca_continuousOn_fderiv
+    [FiniteDimensional ℂ X] [CompleteSpace E]
+    {F : X → E} {U : Set X} (hU : IsOpen U) (hF : DifferentiableOn ℂ F U)
+    : ContinuousOn (fderiv ℂ F) U := by
   rw [continuousOn_clm_apply]
   intro u z₀ hz₀
   obtain ⟨δ, hδ, ρ, hρ, hsub, heq⟩ := cca_local_formula hU hF hz₀ u
   have hc := cca_contAt hU hF.continuousOn (cca_kappa_cont hρ) (continuous_circleMap 0 ρ) hδ hsub
-  have hev : (fun z => fderiv ℂ F z u) =ᶠ[𝓝 z₀] fun z => (2 * π * I)⁻¹ •
-      ∫ θ in (0 : ℝ)..2 * π, ccaKappa ρ θ • F (z + circleMap 0 ρ θ • u) := by
+  have hev
+      : (fun z => fderiv ℂ F z u) =ᶠ[𝓝 z₀] fun z => (2 * π * I)⁻¹ •
+        ∫ θ in (0 : ℝ)..2 * π, ccaKappa ρ θ • F (z + circleMap 0 ρ θ • u) := by
     filter_upwards [closedBall_mem_nhds z₀ hδ] with z hz using heq z hz
   exact ((hc.const_smul ((2 * π * I)⁻¹)).congr hev.symm).continuousWithinAt
 
-theorem cca_differentiableOn_fderiv_apply [FiniteDimensional ℂ X] [CompleteSpace E] {F : X → E}
-    {U : Set X} (hU : IsOpen U) (hF : DifferentiableOn ℂ F U) (u : X) :
-    DifferentiableOn ℂ (fun z => fderiv ℂ F z u) U := by
+theorem cca_differentiableOn_fderiv_apply
+    [FiniteDimensional ℂ X] [CompleteSpace E]
+    {F : X → E} {U : Set X} (hU : IsOpen U) (hF : DifferentiableOn ℂ F U)
+    (u : X)
+    : DifferentiableOn ℂ (fun z => fderiv ℂ F z u) U := by
   intro z₀ hz₀
   obtain ⟨δ, hδ, ρ, hρ, hsub, heq⟩ := cca_local_formula hU hF hz₀ u
   have hD := cca_continuousOn_fderiv hU hF
   have hfd := cca_hasFDerivAt hU hF hD (cca_kappa_cont hρ) (continuous_circleMap 0 ρ) hδ hsub
-  have hev : (fun z => fderiv ℂ F z u) =ᶠ[𝓝 z₀] fun z => (2 * π * I)⁻¹ •
-      ∫ θ in (0 : ℝ)..2 * π, ccaKappa ρ θ • F (z + circleMap 0 ρ θ • u) := by
+  have hev
+      : (fun z => fderiv ℂ F z u) =ᶠ[𝓝 z₀] fun z => (2 * π * I)⁻¹ •
+        ∫ θ in (0 : ℝ)..2 * π, ccaKappa ρ θ • F (z + circleMap 0 ρ θ • u) := by
     filter_upwards [closedBall_mem_nhds z₀ hδ] with z hz using heq z hz
-  exact ((hfd.const_smul ((2 * π * I)⁻¹)).differentiableAt.congr_of_eventuallyEq hev).differentiableWithinAt
+  exact ((hfd.const_smul ((2 * π * I)⁻¹)).differentiableAt.congr_of_eventuallyEq
+    hev).differentiableWithinAt
 
-theorem cca_contDiffOn_nat [FiniteDimensional ℂ X] [CompleteSpace E] {U : Set X} (hU : IsOpen U) :
-    ∀ (k : ℕ) {F : X → E}, DifferentiableOn ℂ F U → ContDiffOn ℂ k F U := by
+theorem cca_contDiffOn_nat [FiniteDimensional ℂ X] [CompleteSpace E] {U : Set X} (hU : IsOpen U)
+    : ∀ (k : ℕ) {F : X → E}, DifferentiableOn ℂ F U → ContDiffOn ℂ k F U := by
   intro k
   induction k with
   | zero => intro F hF; exact contDiffOn_zero.2 hF.continuousOn
@@ -174,11 +181,12 @@ theorem cca_contDiffOn_nat [FiniteDimensional ℂ X] [CompleteSpace E] {U : Set 
       intro u
       exact ih (cca_differentiableOn_fderiv_apply hU hF u)
     rw [Nat.cast_succ, contDiffOn_succ_iff_fderiv_of_isOpen hU]
-    first
-      | exact ⟨hF, fun h => absurd h (by simp), hk⟩
-      | exact ⟨hF, hk⟩
+    first | exact ⟨hF, fun h => absurd h (by simp), hk⟩ | exact ⟨hF, hk⟩
 
-theorem cca_contDiffOn [FiniteDimensional ℂ X] [CompleteSpace E] {F : X → E} {U : Set X}
-    (hU : IsOpen U) (hF : DifferentiableOn ℂ F U) : ContDiffOn ℂ ∞ F U := contDiffOn_infty.2 fun k => cca_contDiffOn_nat hU k hF
+theorem cca_contDiffOn
+    [FiniteDimensional ℂ X] [CompleteSpace E]
+    {F : X → E} {U : Set X} (hU : IsOpen U) (hF : DifferentiableOn ℂ F U)
+    : ContDiffOn ℂ ∞ F U :=
+  contDiffOn_infty.2 fun k => cca_contDiffOn_nat hU k hF
 
 end ReciprocityTheory.ChartRestriction.DS.S7

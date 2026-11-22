@@ -54,8 +54,9 @@ theorem phiRes_holds : PhiRes := by
   have hT : F.Φ r = T := F.res r hr
   let q : C₀(ℝ, ℂ) := ⟨⟨hg c g, h0.1⟩, h0.2⟩
   have hq : ∀ y, q y = hg c g y := fun y => rfl
-  have key : ∀ M : ℕ, ∃ p : C₀(ℝ, ℂ),
-      (∀ y, p y = ((((1 + y ^ 2) ^ M)⁻¹ : ℝ) : ℂ) * hg c g y) ∧ F.Φ p = F.Φ q * T ^ M := by
+  have key
+      : ∀ M : ℕ, ∃ p : C₀(ℝ, ℂ),
+        (∀ y, p y = ((((1 + y ^ 2) ^ M)⁻¹ : ℝ) : ℂ) * hg c g y) ∧ F.Φ p = F.Φ q * T ^ M := by
     intro M
     induction M with
     | zero => exact ⟨q, fun y => by simp [hq], by simp⟩

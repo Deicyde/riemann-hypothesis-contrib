@@ -5,7 +5,8 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsGener
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.TensDeg
 
@@ -41,9 +42,13 @@ lemma zpow_finset_sum {Ω I : Type} [Field Ω] {x : Ω} (hx : x ≠ 0) (s : Fins
 
 end GlobalTheory.CompanionTheory.Ar.TensDeg
 
-
 open GlobalTheory.CompanionTheory.Ar.TensDeg in
-theorem GlobalTheory.CompanionTheory.Ar.Lat.tens_isDegOn : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (K : Type) [Fintype K] (J : K → Type) (y : (Σ k, J k) → Ω) (I : Type) [Fintype I] (Λ : I → Lat ξ Ω) (T : Set (Cpt ξ)) (d : I → K → ℤ) (e : I → Ω), (∀ i, (Λ i).IsDegOn T y (d i) (e i)) → ∀ a : I → ℤ, (Lat.tens Λ a).IsDegOn T y (∑ i, a i • d i) (∏ i, e i ^ a i) := by
+theorem GlobalTheory.CompanionTheory.Ar.Lat.tens_isDegOn
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (K : Type)
+        [Fintype K] (J : K → Type) (y : (Σ k, J k) → Ω) (I : Type) [Fintype I] (Λ : I → Lat ξ Ω)
+        (T : Set (Cpt ξ)) (d : I → K → ℤ) (e : I → Ω),
+      (∀ i, (Λ i).IsDegOn T y (d i) (e i))
+        → ∀ a : I → ℤ, (Lat.tens Λ a).IsDegOn T y (∑ i, a i • d i) (∏ i, e i ^ a i) := by
   intro X Ω _ ξ K _ J y I _ Λ T d e h a
   have he : ∀ i, e i ≠ 0 := fun i => (h i).1
   refine ⟨Finset.prod_ne_zero_iff.2 fun i _ => zpow_ne_zero _ (he i), ?_⟩
@@ -69,8 +74,7 @@ theorem GlobalTheory.CompanionTheory.Ar.Lat.tens_isDegOn : ∀ (X : Scheme.{0}) 
     rintro t ⟨s, hs, rfl⟩
     choose u hu hu' hsu using fun i =>
       exists_unit_of_span_eq (regAt ξ p) (hg0 i) ((hs i).2.symm.trans (hgen i).2)
-    have hm : ∏ i, u i ^ a i ∈ regAt ξ p :=
-      prod_mem fun i _ => zpow_mem_of_unit _ (hu i) (hu' i) _
+    have hm : ∏ i, u i ^ a i ∈ regAt ξ p := prod_mem fun i _ => zpow_mem_of_unit _ (hu i) (hu' i) _
     refine Submodule.mem_span_singleton.2 ⟨⟨_, hm⟩, ?_⟩
     show (∏ i, u i ^ a i) * ∏ i, g i ^ a i = ∏ i, s i ^ a i
     rw [← Finset.prod_mul_distrib]

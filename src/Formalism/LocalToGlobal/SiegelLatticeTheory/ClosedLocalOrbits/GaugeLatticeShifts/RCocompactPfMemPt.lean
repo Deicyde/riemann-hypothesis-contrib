@@ -9,7 +9,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Gaug
 noncomputable section
 
 open scoped Classical
-open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
 open Formalism.L2.SG.Pf.UnipB Formalism.L2.SG.Pf.Unip
 
 namespace Formalism.L2.SG.TermOp.Vanish

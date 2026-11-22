@@ -14,9 +14,11 @@ def Compat (A : ValuationSubring Ω) (ι : Ω →+* PadicAlgCl p) : Prop := ∀ 
 
 variable {p}
 
-def Kloc (F : Type) [Field F] [Algebra F Ω] (ι : Ω →+* PadicAlgCl p) : IntermediateField ℚ_[p] (PadicAlgCl p) :=
+def Kloc (F : Type) [Field F] [Algebra F Ω] (ι : Ω →+* PadicAlgCl p)
+    : IntermediateField ℚ_[p] (PadicAlgCl p) :=
   IntermediateField.adjoin ℚ_[p] (Set.range (ι.comp (algebraMap F Ω)))
 
-abbrev GK (F : Type) [Field F] [Algebra F Ω] (ι : Ω →+* PadicAlgCl p) := PadicAlgCl p ≃ₐ[Kloc F ι] PadicAlgCl p
+abbrev GK (F : Type) [Field F] [Algebra F Ω] (ι : Ω →+* PadicAlgCl p) :=
+  PadicAlgCl p ≃ₐ[Kloc F ι] PadicAlgCl p
 
 end ReciprocityTheory.Neutral.Cmp

@@ -10,17 +10,37 @@ open scoped Pointwise
 
 namespace GlobalTheory.CompactQuotientFourier
 
-theorem setIntegral_translate {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
-    [MeasurableSpace G] [BorelSpace G] (Γ : AddSubgroup G) [Countable Γ]
-    (μ : Measure G) [μ.IsAddHaarMeasure] (𝓕 : Set G) (h𝓕 : IsAddFundamentalDomain Γ 𝓕 μ) (h : G → ℂ)
-    (hp : ∀ γ ∈ Γ, ∀ w, h (γ + w) = h w) (u : G) : ∫ w in 𝓕, h (w + u) ∂μ = ∫ w in 𝓕, h w ∂μ := by
+theorem setIntegral_translate
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [MeasurableSpace G]
+    [BorelSpace G]
+    (Γ : AddSubgroup G) [Countable Γ]
+    (μ : Measure G) [μ.IsAddHaarMeasure]
+    (𝓕 : Set G) (h𝓕 : IsAddFundamentalDomain Γ 𝓕 μ)
+    (h : G → ℂ) (hp : ∀ γ ∈ Γ, ∀ w, h (γ + w) = h w)
+    (u : G)
+    : ∫ w in 𝓕, h (w + u) ∂μ = ∫ w in 𝓕, h w ∂μ := by
   have h1 : IsAddFundamentalDomain Γ (u +ᵥ 𝓕) μ := h𝓕.vadd_of_comm u
   rw [h𝓕.setIntegral_eq h1 (f := h) fun γ w => hp γ γ.2 w]
-  have h2 := (measurePreserving_add_left μ u).setIntegral_image_emb (measurableEmbedding_addLeft u) h 𝓕
+  have h2 :=
+    (measurePreserving_add_left μ u).setIntegral_image_emb (measurableEmbedding_addLeft u) h 𝓕
   simp only [add_comm _ u]
   exact h2.symm
 
-theorem inversion_at_zero : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Set G), IsCompact K → (∀ x, ∃ γ ∈ Γ, γ + x ∈ K) → ∀ (A : Type) [AddCommGroup A] [Countable A] (χ : A → G → ℂ), (∀ a, Continuous (χ a)) → (∀ a x y, χ a (x + y) = χ a x * χ a y) → (∀ a b x, χ (a + b) x = χ a x * χ b x) → (∀ a x, ‖χ a x‖ = 1) → (∀ x, (∀ a, χ a x = 1) ↔ x ∈ Γ) → (∀ a, (∀ x, χ a x = 1) → a = 0) → ∀ (μ : Measure G) (𝓕 : Set G), μ.IsAddHaarMeasure → IsAddFundamentalDomain Γ 𝓕 μ → μ 𝓕 = 1 → ∀ Φ : G → ℂ, Continuous Φ → (∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x) → Summable (fun a => ‖∫ x in 𝓕, χ a x * Φ x ∂μ‖) → Φ 0 = ∑' a, ∫ x in 𝓕, χ a x * Φ x ∂μ := by
+theorem inversion_at_zero
+    : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+        (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Set G),
+      IsCompact K → (∀ x, ∃ γ ∈ Γ, γ + x ∈ K)
+        → ∀ (A : Type) [AddCommGroup A] [Countable A] (χ : A → G → ℂ),
+          (∀ a, Continuous (χ a)) → (∀ a x y, χ a (x + y) = χ a x * χ a y)
+            → (∀ a b x, χ (a + b) x = χ a x * χ b x) → (∀ a x, ‖χ a x‖ = 1)
+            → (∀ x, (∀ a, χ a x = 1) ↔ x ∈ Γ) → (∀ a, (∀ x, χ a x = 1) → a = 0)
+            → ∀ (μ : Measure G) (𝓕 : Set G),
+              μ.IsAddHaarMeasure → IsAddFundamentalDomain Γ 𝓕 μ → μ 𝓕 = 1
+                → ∀ Φ : G → ℂ,
+                  Continuous Φ → (∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x)
+                    → Summable (fun a => ‖∫ x in 𝓕, χ a x * Φ x ∂μ‖)
+                    → Φ 0 = ∑' a, ∫ x in 𝓕, χ a x * Φ x ∂μ := by
   intro G _ _ _ _ _ _ _ _ Γ _ K hK hcov A _ _ χ hc hx ha hn hker hinj μ 𝓕 hμ h𝓕 h1 Φ hΦ hper hsum
   classical
   haveI := hμ
@@ -43,7 +63,8 @@ theorem inversion_at_zero : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G]
     rw [hx, (hker γ).2 hγ a, one_mul]
   have horth : ∀ a b, ∫ x in 𝓕, χ b x * star (χ a x) ∂μ = if a = b then 1 else 0 := by
     intro a b
-    have he : ∀ x, χ b x * star (χ a x) = χ (b - a) x := fun x => by rw [hstar, ← ha, sub_eq_add_neg]
+    have he : ∀ x, χ b x * star (χ a x) = χ (b - a) x := fun x => by
+      rw [hstar, ← ha, sub_eq_add_neg]
     simp_rw [he]
     split_ifs with hab
     · subst hab
@@ -72,11 +93,12 @@ theorem inversion_at_zero : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G]
   let S : G → ℂ := fun x => ∑' a, c a * star (χ a x)
   have hScont : Continuous S :=
     continuous_tsum (fun a => continuous_const.mul (hc a).star) hsum (fun a x => (hterm a x).le)
-  have hSper : ∀ γ ∈ Γ, ∀ x, S (γ + x) = S x := fun γ hγ x => by
-    simp only [S, hperχ _ γ hγ]
+  have hSper : ∀ γ ∈ Γ, ∀ x, S (γ + x) = S x := fun γ hγ x => by simp only [S, hperχ _ γ hγ]
   have hSb : ∀ x, ‖S x‖ ≤ ∑' a, ‖c a‖ := fun x => by
     have hs : Summable (fun a => ‖c a * star (χ a x)‖) := by simp_rw [hterm]; exact hsum
-    calc ‖S x‖ ≤ ∑' a, ‖c a * star (χ a x)‖ := norm_tsum_le_tsum_norm hs
+    calc
+      ‖S x‖
+        ≤ ∑' a, ‖c a * star (χ a x)‖ := norm_tsum_le_tsum_norm hs
       _ = ∑' a, ‖c a‖ := by simp_rw [hterm]
   have hcS : ∀ b, ∫ x in 𝓕, χ b x * S x ∂μ = c b := by
     intro b
@@ -88,7 +110,9 @@ theorem inversion_at_zero : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G]
     have hFs : Summable fun a => ∫ x in 𝓕, ‖χ b x * (c a * star (χ a x))‖ ∂μ := by
       simp_rw [hnorm]
       simpa [hvol] using hsum
-    have e2 : ∀ a, ∫ x in 𝓕, χ b x * (c a * star (χ a x)) ∂μ = c a * (if a = b then 1 else 0) := fun a => by
+    have e2
+        : ∀ a,
+          ∫ x in 𝓕, χ b x * (c a * star (χ a x)) ∂μ = c a * (if a = b then 1 else 0) := fun a => by
       rw [← horth, ← integral_const_mul]
       congr 1
       funext x
@@ -97,15 +121,17 @@ theorem inversion_at_zero : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G]
     rw [← integral_tsum_of_summable_integral_norm hFi hFs]
     simp_rw [e2, mul_ite, mul_one, mul_zero]
     simp
-  have hdiff := GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero G Γ K hK hcov A χ hc hx ha hχ0 hn hker
-    μ 𝓕 hμ h𝓕 (Φ - S) (hΦ.sub hScont) (fun γ hγ x => by simp only [Pi.sub_apply, hper γ hγ, hSper γ hγ])
-    (fun a => by
-      simp only [Pi.sub_apply, mul_sub]
-      have i1 : Integrable (fun x => χ a x * Φ x) (μ.restrict 𝓕) :=
-        hint _ ((hc a).mul hΦ) C fun x => by rw [norm_mul, hn, one_mul]; exact hΦb x
-      have i2 : Integrable (fun x => χ a x * S x) (μ.restrict 𝓕) :=
-        hint _ ((hc a).mul hScont) _ fun x => by rw [norm_mul, hn, one_mul]; exact hSb x
-      rw [integral_sub i1 i2, hcS, sub_self])
+  have hdiff :=
+    GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero G Γ K hK hcov A χ hc hx ha hχ0
+      hn hker μ 𝓕 hμ h𝓕 (Φ - S) (hΦ.sub hScont)
+      (fun γ hγ x => by simp only [Pi.sub_apply, hper γ hγ, hSper γ hγ])
+      (fun a => by
+        simp only [Pi.sub_apply, mul_sub]
+        have i1 : Integrable (fun x => χ a x * Φ x) (μ.restrict 𝓕) :=
+          hint _ ((hc a).mul hΦ) C fun x => by rw [norm_mul, hn, one_mul]; exact hΦb x
+        have i2 : Integrable (fun x => χ a x * S x) (μ.restrict 𝓕) :=
+          hint _ ((hc a).mul hScont) _ fun x => by rw [norm_mul, hn, one_mul]; exact hSb x
+        rw [integral_sub i1 i2, hcS, sub_self])
   have h0 := congrFun hdiff 0
   simp only [Pi.sub_apply, Pi.zero_apply, sub_eq_zero] at h0
   rw [h0]

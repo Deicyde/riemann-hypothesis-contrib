@@ -23,7 +23,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.QCoh
 open IsLocalRing
@@ -31,22 +32,28 @@ open GlobalTheory.CompanionTheory.KoszulCount
 
 namespace GlobalTheory.CompanionTheory.KoszulCount
 
-theorem goodStalks_structureModule {X : Scheme.{0}} [IsLocallyNoetherian X] {L : LB X} {d : ℕ}
-    (t : Fin d → L.Sec) (hreg : ∀ x : X, IsRegularLocalRing (X.presheaf.stalk x))
-    (hdim : ∀ x : X, ringKrullDim (X.presheaf.stalk x) ≤ d) (h : CotIndep t) :
-    GoodStalks (structureModule X) t := by
+theorem goodStalks_structureModule
+    {X : Scheme.{0}} [IsLocallyNoetherian X]
+    {L : LB X} {d : ℕ} (t : Fin d → L.Sec)
+    (hreg : ∀ x : X, IsRegularLocalRing (X.presheaf.stalk x))
+    (hdim : ∀ x : X, ringKrullDim (X.presheaf.stalk x) ≤ d) (h : CotIndep t)
+    : GoodStalks (structureModule X) t := by
   intro x i hx
   have := hreg x
-  obtain ⟨h₁, h₂⟩ := GlobalTheory.T.weakly_regular_of_cotangent_indep (X.presheaf.stalk x) d (fun j => germSec (t j) hx) (hdim x)
-    (h x i hx)
+  obtain ⟨h₁, h₂⟩ :=
+    GlobalTheory.T.weakly_regular_of_cotangent_indep (X.presheaf.stalk x) d
+      (fun j => germSec (t j) hx)
+      (hdim x) (h x i hx)
   have e : ((structureModule X).presheaf.stalk x :) ≃ₗ[X.presheaf.stalk x] X.presheaf.stalk x :=
     structureModuleStalkEquiv x
   refine ⟨(LinearEquiv.isWeaklyRegular_congr e _).2 h₁, ?_⟩
   set I := Ideal.span (Set.range fun j => germSec (t j) hx) with hI
-  have hmap : (I • (⊤ : Submodule (X.presheaf.stalk x) ((structureModule X).presheaf.stalk x :))).map
-      e.toLinearMap = I := by
-    rw [Submodule.map_smul'', Submodule.map_top, LinearMap.range_eq_top.2 e.surjective,
-      smul_eq_mul, Ideal.mul_top]
+  have hmap
+      : (I • (⊤ : Submodule (X.presheaf.stalk x) ((structureModule X).presheaf.stalk x :))).map
+          e.toLinearMap
+        = I := by
+    rw [Submodule.map_smul'', Submodule.map_top, LinearMap.range_eq_top.2 e.surjective, smul_eq_mul,
+      Ideal.mul_top]
   rw [(Submodule.Quotient.equiv _ I e hmap).length_eq]
   exact h₂
 
@@ -54,13 +61,19 @@ end GlobalTheory.CompanionTheory.KoszulCount
 
 namespace GlobalTheory.CompanionTheory.KoszulCount
 
-theorem interNum_eq_ncard {K : Type} [Field K] [IsAlgClosed K] {X : Scheme.{0}}
-    [Algebra K Γ(X, ⊤)] (hp : IsProjOver (strHom K (X := X))) {L : LB X} (hL : L.IsLB) (d : ℕ) :
-    ∀ (F : X.Modules) [IsFiniteQC F], FiniteCohTwists K F → suppDim F ≤ (d : ℕ) →
-      ∀ t : Fin d → L.Sec, GoodStalks F t →
-        interNum K F (fun _ : Fin d => L) =
-            ((support F ∩ {x | ∀ j, x ∉ nonzeroLocus (t j)}).ncard : ℤ) ∧
-          ∀ x ∈ support F ∩ {x | ∀ j, x ∉ nonzeroLocus (t j)}, IsClosed ({x} : Set X) := by
+theorem interNum_eq_ncard
+    {K : Type} [Field K] [IsAlgClosed K]
+    {X : Scheme.{0}} [Algebra K Γ(X, ⊤)]
+    (hp : IsProjOver (strHom K (X := X)))
+    {L : LB X} (hL : L.IsLB)
+    (d : ℕ)
+    : ∀ (F : X.Modules) [IsFiniteQC F],
+      FiniteCohTwists K F → suppDim F ≤ (d : ℕ)
+        → ∀ t : Fin d → L.Sec,
+          GoodStalks F t
+            → interNum K F (fun _ : Fin d => L)
+                = ((support F ∩ {x | ∀ j, x ∉ nonzeroLocus (t j)}).ncard : ℤ)
+              ∧ ∀ x ∈ support F ∩ {x | ∀ j, x ∉ nonzeroLocus (t j)}, IsClosed ({x} : Set X) := by
   have := isNoetherian_of_isProjOver hp
   induction d with
   | zero =>
@@ -84,8 +97,9 @@ theorem interNum_eq_ncard {K : Type} [Field K] [IsAlgClosed K] {X : Scheme.{0}}
     have e : (fun _ : Fin (d + 1) => L) = Fin.cons L (fun _ : Fin d => L) := by
       funext j
       exact Fin.cases rfl (fun _ => rfl) j
-    have hS : support F ∩ {x | ∀ j, x ∉ nonzeroLocus (t j)} =
-        support (cut F hL (t 0)) ∩ {x | ∀ j, x ∉ nonzeroLocus (Fin.tail t j)} := by
+    have hS
+        : support F ∩ {x | ∀ j, x ∉ nonzeroLocus (t j)}
+          = support (cut F hL (t 0)) ∩ {x | ∀ j, x ∉ nonzeroLocus (Fin.tail t j)} := by
       rw [support_cut]
       ext x
       simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_diff, Fin.forall_fin_succ, Fin.tail]
@@ -97,15 +111,21 @@ end GlobalTheory.CompanionTheory.KoszulCount
 
 namespace GlobalTheory.CompanionTheory.KoszulCount
 
-theorem secVal_comb (Y : Var ℂ) (L : LB Y.X) {n : ℕ} (c : Fin n → ℂ) (b : Fin n → L.Sec) (i : L.ι)
-    (y : CxPts Y.str (RingHom.id ℂ)) :
-    secVal Y.str (RingHom.id ℂ) (∑ j, algebraMap ℂ Γ(Y.X, ⊤) (c j) • b j) i y =
-      ∑ j, c j * secVal Y.str (RingHom.id ℂ) (b j) i y := by
-  have e : ∀ a : ℂ, algebraMap ℂ Γ(Y.X, ⊤) a = ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX Y.str ⊤ a := fun a => by
+theorem secVal_comb
+    (Y : Var ℂ) (L : LB Y.X)
+    {n : ℕ} (c : Fin n → ℂ) (b : Fin n → L.Sec)
+    (i : L.ι) (y : CxPts Y.str (RingHom.id ℂ))
+    : secVal Y.str (RingHom.id ℂ) (∑ j, algebraMap ℂ Γ(Y.X, ⊤) (c j) • b j) i y
+      = ∑ j, c j * secVal Y.str (RingHom.id ℂ) (b j) i y := by
+  have e
+      : ∀ a : ℂ,
+        algebraMap ℂ Γ(Y.X, ⊤) a
+          = ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX Y.str ⊤ a := fun a => by
     rw [← GlobalTheory.strHom_eq Y.algebraMap_Γ]
     exact (GlobalTheory.GeomConnConst.algX_top_strHom ℂ Y.X a).symm
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [e, map_sum, secVal_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+  simp only [e, map_sum, secVal_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
+    RingHom.id_apply]
 
 theorem koszul_count : ∀ (Y : Var ℂ) (Δ : Y.Dv) (L : LB Y.X) (r : L.ι → Y.Fnˣ) (hL : L.IsLB) (n : ℕ) (b : Fin n → L.Sec) (hb : ⨆ j, nonzeroLocus (b j) = ⊤), Presents Δ L r → ∀ᵐ C ∂(volume : Measure (Fin Y.dim → Fin n → ℂ)), ((({y : CxPts Y.str (RingHom.id ℂ) | ∀ (k : Fin Y.dim) (i : L.ι), y ∈ ptsIn Y.str (RingHom.id ℂ) (L.U i) → ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i y = 0}).ncard : ℕ) : ℤ) = Y.inter fun _ => Δ := by
   intro Y Δ L r hL n b hb hP

@@ -16,18 +16,22 @@ variable {X : Type*} [TopologicalSpace X]
 
 def supportedIn (U : Set X) : Submodule ℂ (X → ℂ) where
   carrier := {f | f ∈ locallyConstantCompactSupport X ℂ ℂ ∧ Function.support f ⊆ U}
-  add_mem' {f g} hf hg := ⟨(locallyConstantCompactSupport X ℂ ℂ).add_mem hf.1 hg.1,
-    (Function.support_add f g).trans (union_subset hf.2 hg.2)⟩
+  add_mem' {f g} hf hg := ⟨
+    (locallyConstantCompactSupport X ℂ ℂ).add_mem hf.1 hg.1,
+    (Function.support_add f g).trans (union_subset hf.2 hg.2)
+  ⟩
   zero_mem' := ⟨(locallyConstantCompactSupport X ℂ ℂ).zero_mem, by simp⟩
-  smul_mem' c f hf := ⟨(locallyConstantCompactSupport X ℂ ℂ).smul_mem c hf.1,
-    (Function.support_const_smul_subset c f).trans hf.2⟩
+  smul_mem' c f hf := ⟨
+    (locallyConstantCompactSupport X ℂ ℂ).smul_mem c hf.1,
+    (Function.support_const_smul_subset c f).trans hf.2
+  ⟩
 
-theorem mem_supportedIn {U : Set X} {f : X → ℂ} :
-    f ∈ supportedIn U ↔ f ∈ locallyConstantCompactSupport X ℂ ℂ ∧ Function.support f ⊆ U :=
+theorem mem_supportedIn {U : Set X} {f : X → ℂ}
+    : f ∈ supportedIn U ↔ f ∈ locallyConstantCompactSupport X ℂ ℂ ∧ Function.support f ⊆ U :=
   Iff.rfl
 
-theorem supportedIn_mono {U V : Set X} (h : U ⊆ V) : supportedIn U ≤ supportedIn V :=
-  fun _ hf => ⟨hf.1, hf.2.trans h⟩
+theorem supportedIn_mono {U V : Set X} (h : U ⊆ V) : supportedIn U ≤ supportedIn V := fun _ hf =>
+  ⟨hf.1, hf.2.trans h⟩
 
 def vanishingOn (Z : Set X) : Submodule ℂ (X → ℂ) where
   carrier := {f | ∀ x ∈ Z, f x = 0}
@@ -36,24 +40,22 @@ def vanishingOn (Z : Set X) : Submodule ℂ (X → ℂ) where
   smul_mem' c f hf x hx := by simp [hf x hx]
 
 omit [TopologicalSpace X] in
-theorem mem_vanishingOn {Z : Set X} {f : X → ℂ} : f ∈ vanishingOn Z ↔ ∀ x ∈ Z, f x = 0 :=
-  Iff.rfl
+theorem mem_vanishingOn {Z : Set X} {f : X → ℂ} : f ∈ vanishingOn Z ↔ ∀ x ∈ Z, f x = 0 := Iff.rfl
 
-
-theorem isClosed_support_of_isLocallyConstant {f : X → ℂ} (hf : IsLocallyConstant f) :
-    IsClosed (Function.support f) := by
+theorem isClosed_support_of_isLocallyConstant {f : X → ℂ} (hf : IsLocallyConstant f)
+    : IsClosed (Function.support f) := by
   have : Function.support f = (f ⁻¹' {0})ᶜ := by
     ext x
     simp [Function.mem_support]
   rw [this]
   exact (hf.isOpen_fiber 0).isClosed_compl
 
-theorem isCompact_support {f : X → ℂ} (hf : f ∈ locallyConstantCompactSupport X ℂ ℂ) :
-    IsCompact (Function.support f) :=
+theorem isCompact_support {f : X → ℂ} (hf : f ∈ locallyConstantCompactSupport X ℂ ℂ)
+    : IsCompact (Function.support f) :=
   hf.2.of_isClosed_subset (isClosed_support_of_isLocallyConstant hf.1) (subset_tsupport f)
 
-theorem indicator_mul_mem {U A : Set X} (hA : IsClopen A) {f : X → ℂ}
-    (hf : f ∈ supportedIn U) : (fun x => A.indicator 1 x * f x) ∈ supportedIn U := by
+theorem indicator_mul_mem {U A : Set X} (hA : IsClopen A) {f : X → ℂ} (hf : f ∈ supportedIn U)
+    : (fun x => A.indicator 1 x * f x) ∈ supportedIn U := by
   refine ⟨⟨?_, ?_⟩, ?_⟩
   · have h1 : IsLocallyConstant (A.indicator (1 : X → ℂ)) :=
       (LocallyConstant.indicator (LocallyConstant.const X (1 : ℂ)) hA).isLocallyConstant
@@ -67,8 +69,8 @@ theorem indicator_mul_mem {U A : Set X} (hA : IsClopen A) {f : X → ℂ}
     exact hx (by simp [Function.notMem_support.1 h])
 
 omit [TopologicalSpace X] in
-theorem support_indicator_mul_subset {A : Set X} {f : X → ℂ} :
-    Function.support (fun x => A.indicator 1 x * f x) ⊆ A ∩ Function.support f := by
+theorem support_indicator_mul_subset {A : Set X} {f : X → ℂ}
+    : Function.support (fun x => A.indicator 1 x * f x) ⊆ A ∩ Function.support f := by
   intro x hx
   refine ⟨?_, fun h => hx (by simp [h])⟩
   by_contra h
@@ -78,19 +80,29 @@ section LSpace
 
 variable [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X]
 
-theorem exists_isCompact_isOpen_between {A V : Set X} (hA : IsCompact A) (hV : IsOpen V)
-    (hAV : A ⊆ V) : ∃ B : Set X, IsCompact B ∧ IsOpen B ∧ A ⊆ B ∧ B ⊆ V := by
+theorem exists_isCompact_isOpen_between
+    {A V : Set X} (hA : IsCompact A) (hV : IsOpen V) (hAV : A ⊆ V)
+    : ∃ B : Set X, IsCompact B ∧ IsOpen B ∧ A ⊆ B ∧ B ⊆ V := by
   have h : ∀ x ∈ A, ∃ B : Set X, IsCompact B ∧ IsOpen B ∧ x ∈ B ∧ B ⊆ V := fun x hx =>
     exists_isCompact_isOpen_subset (hV.mem_nhds (hAV hx))
   choose B hBc hBo hxB hBV using h
-  obtain ⟨s, hs⟩ := hA.elim_finite_subcover (fun x : A => B x x.2) (fun x => hBo x x.2)
-    (fun x hx => mem_iUnion.2 ⟨⟨x, hx⟩, hxB x hx⟩)
-  refine ⟨⋃ x ∈ s, B x x.2, s.isCompact_biUnion fun x _ => hBc x x.2,
-    isOpen_biUnion fun x _ => hBo x x.2, hs, iUnion₂_subset fun x _ => hBV x x.2⟩
+  obtain ⟨s, hs⟩ :=
+    hA.elim_finite_subcover
+      (fun x : A => B x x.2)
+      (fun x => hBo x x.2)
+      (fun x hx => mem_iUnion.2 ⟨⟨x, hx⟩, hxB x hx⟩)
+  refine ⟨
+    ⋃ x ∈ s, B x x.2,
+    s.isCompact_biUnion fun x _ => hBc x x.2,
+    isOpen_biUnion fun x _ => hBo x x.2,
+    hs,
+    iUnion₂_subset fun x _ => hBV x x.2
+  ⟩
 
-theorem exists_isCompact_isOpen_inter_eq {U O A : Set X} (hU : IsOpen U) (hOU : O ⊆ U)
-    (hAO : A ⊆ O) (hAc : IsCompact A) (hAo : IsOpen ((Subtype.val : O → X) ⁻¹' A)) :
-    ∃ B : Set X, IsCompact B ∧ IsOpen B ∧ B ⊆ U ∧ B ∩ O = A := by
+theorem exists_isCompact_isOpen_inter_eq
+    {U O A : Set X} (hU : IsOpen U) (hOU : O ⊆ U) (hAO : A ⊆ O) (hAc : IsCompact A)
+    (hAo : IsOpen ((Subtype.val : O → X) ⁻¹' A))
+    : ∃ B : Set X, IsCompact B ∧ IsOpen B ∧ B ⊆ U ∧ B ∩ O = A := by
   obtain ⟨V, hVo, hV⟩ := isOpen_induced_iff.1 hAo
   have hAV : A ⊆ V := fun x hx => by
     have : (⟨x, hAO hx⟩ : O) ∈ (Subtype.val : O → X) ⁻¹' V := by rw [hV]; exact hx
@@ -104,12 +116,14 @@ theorem exists_isCompact_isOpen_inter_eq {U O A : Set X} (hU : IsOpen U) (hOU : 
     exact this
   · exact fun x hx => ⟨hAB hx, hAO hx⟩
 
-theorem exists_lift {U O : Set X} (hU : IsOpen U) (hOU : O ⊆ U) {φ : O → ℂ}
-    (hφ : φ ∈ locallyConstantCompactSupport O ℂ ℂ) :
-    ∃ f ∈ supportedIn U, ∀ x : O, f x = φ x := by
+theorem exists_lift
+    {U O : Set X} (hU : IsOpen U) (hOU : O ⊆ U)
+    {φ : O → ℂ} (hφ : φ ∈ locallyConstantCompactSupport O ℂ ℂ)
+    : ∃ f ∈ supportedIn U, ∀ x : O, f x = φ x := by
   classical
-  have key : ∀ c : ℂ, ∃ B : Set X, IsCompact B ∧ IsOpen B ∧ B ⊆ U ∧
-      (c ≠ 0 → ∀ x : O, (x : X) ∈ B ↔ φ x = c) := by
+  have key
+      : ∀ c : ℂ, ∃ B : Set X,
+        IsCompact B ∧ IsOpen B ∧ B ⊆ U ∧ (c ≠ 0 → ∀ x : O, (x : X) ∈ B ↔ φ x = c) := by
     intro c
     by_cases hc : c = 0
     · exact ⟨∅, isCompact_empty, isOpen_empty, empty_subset _, fun h => absurd hc h⟩
@@ -118,8 +132,8 @@ theorem exists_lift {U O : Set X} (hU : IsOpen U) (hOU : O ⊆ U) {φ : O → �
       hFc.image continuous_subtype_val
     have hAo : IsOpen ((Subtype.val : O → X) ⁻¹' ((Subtype.val : O → X) '' {x | φ x = c})) := by
       rwa [preimage_image_eq _ Subtype.val_injective]
-    obtain ⟨B, hBc, hBo, hBU, hBO⟩ := exists_isCompact_isOpen_inter_eq hU hOU
-      (by rintro _ ⟨x, -, rfl⟩; exact x.2) hAc hAo
+    obtain ⟨B, hBc, hBo, hBU, hBO⟩ :=
+      exists_isCompact_isOpen_inter_eq hU hOU (by rintro _ ⟨x, -, rfl⟩; exact x.2) hAc hAo
     refine ⟨B, hBc, hBo, hBU, fun _ x => ?_⟩
     constructor
     · intro hx
@@ -150,17 +164,21 @@ theorem exists_lift {U O : Set X} (hU : IsOpen U) (hOU : O ⊆ U) {φ : O → �
     · rw [Finset.sum_eq_single (φ x)]
       · exact Set.indicator_of_mem ((hBO _ hx x).2 rfl) _
       · intro c hc hcx
-        exact Set.indicator_of_notMem
-          (fun h => hcx ((hBO c (Finset.mem_filter.1 hc).2 x).1 h).symm) _
+        exact
+          Set.indicator_of_notMem (fun h => hcx ((hBO c (Finset.mem_filter.1 hc).2 x).1 h).symm) _
       · intro h
         exact absurd (Finset.mem_filter.2 ⟨(Set.Finite.mem_toFinset _).2 (mem_range_self x), hx⟩) h
 
-theorem exists_lift_indicator {U O A : Set X} (hU : IsOpen U) (hOU : O ⊆ U) (hAO : A ⊆ O)
-    (hAc : IsCompact A) (hAo : IsOpen ((Subtype.val : O → X) ⁻¹' A)) :
-    ∃ f ∈ supportedIn U, ∀ x ∈ O, f x = A.indicator 1 x := by
+theorem exists_lift_indicator
+    {U O A : Set X} (hU : IsOpen U) (hOU : O ⊆ U) (hAO : A ⊆ O) (hAc : IsCompact A)
+    (hAo : IsOpen ((Subtype.val : O → X) ⁻¹' A))
+    : ∃ f ∈ supportedIn U, ∀ x ∈ O, f x = A.indicator 1 x := by
   obtain ⟨B, hBc, hBo, hBU, hBO⟩ := exists_isCompact_isOpen_inter_eq hU hOU hAO hAc hAo
-  refine ⟨B.indicator 1, ⟨indicator_mem_locallyConstantCompactSupport hBc hBo 1,
-    Set.support_indicator_subset.trans hBU⟩, fun x hx => ?_⟩
+  refine ⟨
+    B.indicator 1,
+    ⟨indicator_mem_locallyConstantCompactSupport hBc hBo 1, Set.support_indicator_subset.trans hBU⟩,
+    fun x hx => ?_
+  ⟩
   by_cases hxA : x ∈ A
   · have hxB : x ∈ B := by
       have : x ∈ B ∩ O := by rw [hBO]; exact hxA
@@ -170,23 +188,24 @@ theorem exists_lift_indicator {U O A : Set X} (hU : IsOpen U) (hOU : O ⊆ U) (h
     intro hxB
     exact hxA (hBO ▸ (⟨hxB, hx⟩ : x ∈ B ∩ O))
 
-theorem exists_isClopen_mem_disjoint {Q : Set X} (hQ : IsCompact Q) {y : X} (hy : y ∉ Q) :
-    ∃ V : Set X, IsClopen V ∧ y ∈ V ∧ Disjoint V Q := by
+theorem exists_isClopen_mem_disjoint {Q : Set X} (hQ : IsCompact Q) {y : X} (hy : y ∉ Q)
+    : ∃ V : Set X, IsClopen V ∧ y ∈ V ∧ Disjoint V Q := by
   obtain ⟨V, hVc, hVo, hyV, hVQ⟩ :=
     exists_isCompact_isOpen_subset (hQ.isClosed.isOpen_compl.mem_nhds hy)
   exact ⟨V, ⟨hVc.isClosed, hVo⟩, hyV, Set.subset_compl_iff_disjoint_right.mp hVQ⟩
 
-
 omit [T2Space X] [LocallyCompactSpace X] [TotallyDisconnectedSpace X] in
-theorem mem_of_forall_fiber {Y : Type*} [TopologicalSpace Y] [T2Space Y] [LocallyCompactSpace Y]
-    [TotallyDisconnectedSpace Y] {U C : Set X} (hC : IsClosed C) {p : X → Y}
-    (hp : Continuous p) {W : Submodule ℂ (X → ℂ)}
-    (hWK : supportedIn U ⊓ vanishingOn C ≤ W)
+theorem mem_of_forall_fiber
+    {Y : Type*}
+    [TopologicalSpace Y] [T2Space Y] [LocallyCompactSpace Y] [TotallyDisconnectedSpace Y]
+    {U C : Set X} (hC : IsClosed C)
+    {p : X → Y} (hp : Continuous p)
+    {W : Submodule ℂ (X → ℂ)} (hWK : supportedIn U ⊓ vanishingOn C ≤ W)
     (hWmul : ∀ V : Set Y, IsClopen V → ∀ w ∈ W, (fun x => (p ⁻¹' V).indicator 1 x * w x) ∈ W)
-    {g : X → ℂ} (hg : g ∈ supportedIn U)
-    (hfib : ∀ y, g ∈ W ⊔ (supportedIn U ⊓ vanishingOn (C ∩ p ⁻¹' {y}))) : g ∈ W := by
+    {g : X → ℂ}
+    (hg : g ∈ supportedIn U) (hfib : ∀ y, g ∈ W ⊔ (supportedIn U ⊓ vanishingOn (C ∩ p ⁻¹' {y})))
+    : g ∈ W := by
   classical
-
   let good : Set Y → Prop := fun V => (fun x => (p ⁻¹' V).indicator 1 x * g x) ∈ W
   have hloc : ∀ y, ∃ V : Set Y, IsClopen V ∧ y ∈ V ∧ good V := by
     intro y
@@ -198,8 +217,10 @@ theorem mem_of_forall_fiber {Y : Type*} [TopologicalSpace Y] [T2Space Y] [Locall
       exact hxk (hk.2 x ⟨hxC, hxy⟩)
     obtain ⟨V, hV, hyV, hVQ⟩ := exists_isClopen_mem_disjoint hQ hyQ
     refine ⟨V, hV, hyV, ?_⟩
-    have hsplit : (fun x => (p ⁻¹' V).indicator 1 x * g x) =
-        (fun x => (p ⁻¹' V).indicator 1 x * c x) + (fun x => (p ⁻¹' V).indicator 1 x * k x) := by
+    have hsplit
+        : (fun x => (p ⁻¹' V).indicator 1 x * g x)
+          = (fun x => (p ⁻¹' V).indicator 1 x * c x)
+            + (fun x => (p ⁻¹' V).indicator 1 x * k x) := by
       funext x
       simp only [Pi.add_apply, ← mul_add, ← hck]
     show _ ∈ W
@@ -216,8 +237,8 @@ theorem mem_of_forall_fiber {Y : Type*} [TopologicalSpace Y] [T2Space Y] [Locall
 
   have hQ : IsCompact (p '' (C ∩ Function.support g)) :=
     ((isCompact_support hg.1).inter_left hC).image hp
-  obtain ⟨s, hs⟩ := hQ.elim_finite_subcover V (fun y => (hVc y).isOpen)
-    (fun y _ => mem_iUnion.2 ⟨y, hyV y⟩)
+  obtain ⟨s, hs⟩ :=
+    hQ.elim_finite_subcover V (fun y => (hVc y).isOpen) (fun y _ => mem_iUnion.2 ⟨y, hyV y⟩)
 
   have hunion : ∀ t : Finset Y, IsClopen (⋃ y ∈ t, V y) ∧ good (⋃ y ∈ t, V y) := by
     intro t
@@ -234,21 +255,21 @@ theorem mem_of_forall_fiber {Y : Type*} [TopologicalSpace Y] [T2Space Y] [Locall
       refine ⟨by simpa [Finset.set_biUnion_insert] using hcl, ?_⟩
       show _ ∈ W
       have hmul := hWmul (V a) (hVc a) _ hgt
-      have e : (fun x => (p ⁻¹' ⋃ y ∈ insert a t, V y).indicator 1 x * g x) =
-          (fun x => (p ⁻¹' V a).indicator 1 x * g x) +
-            (fun x => (p ⁻¹' ⋃ y ∈ t, V y).indicator 1 x * g x) -
-            (fun x => (p ⁻¹' V a).indicator 1 x *
-              ((p ⁻¹' ⋃ y ∈ t, V y).indicator 1 x * g x)) := by
+      have e
+          : (fun x => (p ⁻¹' ⋃ y ∈ insert a t, V y).indicator 1 x * g x)
+            = (fun x => (p ⁻¹' V a).indicator 1 x * g x)
+              + (fun x => (p ⁻¹' ⋃ y ∈ t, V y).indicator 1 x * g x)
+              - (fun x =>
+                (p ⁻¹' V a).indicator 1 x * ((p ⁻¹' ⋃ y ∈ t, V y).indicator 1 x * g x)) := by
         funext x
         simp only [Finset.set_biUnion_insert, Pi.add_apply, Pi.sub_apply, preimage_union]
-        by_cases h1 : x ∈ p ⁻¹' V a <;> by_cases h2 : x ∈ p ⁻¹' ⋃ y ∈ t, V y <;>
-          simp_all [Set.indicator_of_mem, Set.indicator_of_notMem]
+        by_cases h1 : x ∈ p ⁻¹' V a <;> by_cases h2 : x ∈ p ⁻¹' ⋃ y ∈ t, V y
+          <;> simp_all [Set.indicator_of_mem, Set.indicator_of_notMem]
       rw [e]
       exact W.sub_mem (W.add_mem (hVg a) hgt) hmul
   obtain ⟨-, hgood⟩ := hunion s
   have hrest : (g - fun x => (p ⁻¹' ⋃ y ∈ s, V y).indicator 1 x * g x) ∈ W := by
-    refine hWK ⟨(supportedIn U).sub_mem hg
-      (indicator_mul_mem ((hunion s).1.preimage hp) hg), ?_⟩
+    refine hWK ⟨(supportedIn U).sub_mem hg (indicator_mul_mem ((hunion s).1.preimage hp) hg), ?_⟩
     intro x hxC
     by_cases hgx : g x = 0
     · simp [hgx]
@@ -258,9 +279,10 @@ theorem mem_of_forall_fiber {Y : Type*} [TopologicalSpace Y] [T2Space Y] [Locall
   have := W.add_mem hrest hgood
   simpa using this
 
-theorem supportedIn_le_of_local {V : Set X} {M : Submodule ℂ (X → ℂ)}
-    (hloc : ∀ x ∈ V, ∃ V' : Set X, IsOpen V' ∧ x ∈ V' ∧ supportedIn V' ≤ M) :
-    supportedIn V ≤ M := by
+theorem supportedIn_le_of_local
+    {V : Set X} {M : Submodule ℂ (X → ℂ)}
+    (hloc : ∀ x ∈ V, ∃ V' : Set X, IsOpen V' ∧ x ∈ V' ∧ supportedIn V' ≤ M)
+    : supportedIn V ≤ M := by
   classical
   intro f hf
   have hB : ∀ x ∈ V, ∃ B : Set X, IsClopen B ∧ x ∈ B ∧ supportedIn B ≤ M := by
@@ -269,11 +291,13 @@ theorem supportedIn_le_of_local {V : Set X} {M : Submodule ℂ (X → ℂ)}
     obtain ⟨B, hBc, hBo, hxB, hBV'⟩ := exists_isCompact_isOpen_subset (hV'o.mem_nhds hxV')
     exact ⟨B, ⟨hBc.isClosed, hBo⟩, hxB, (supportedIn_mono hBV').trans hV'M⟩
   choose! B hBc hxB hBM using hB
-  obtain ⟨s, hsV, hsfin, hs⟩ := (isCompact_support hf.1).elim_finite_subcover_image
-    (b := V) (c := B) (fun x hx => (hBc x hx).isOpen)
-    (fun x hx => mem_iUnion₂.2 ⟨x, hf.2 hx, hxB x (hf.2 hx)⟩)
-  have key : ∀ t : Finset X, (↑t : Set X) ⊆ V → ∀ g ∈ supportedIn V,
-      Function.support g ⊆ ⋃ x ∈ t, B x → g ∈ M := by
+  obtain ⟨s, hsV, hsfin, hs⟩ :=
+    (isCompact_support hf.1).elim_finite_subcover_image (b := V) (c := B)
+      (fun x hx => (hBc x hx).isOpen)
+      (fun x hx => mem_iUnion₂.2 ⟨x, hf.2 hx, hxB x (hf.2 hx)⟩)
+  have key
+      : ∀ t : Finset X,
+        (↑t : Set X) ⊆ V → ∀ g ∈ supportedIn V, Function.support g ⊆ ⋃ x ∈ t, B x → g ∈ M := by
     intro t
     induction t using Finset.induction_on with
     | empty =>
@@ -287,8 +311,8 @@ theorem supportedIn_le_of_local {V : Set X} {M : Submodule ℂ (X → ℂ)}
     | insert a t hat ih =>
       intro htV g hg hgs
       have haV : a ∈ V := htV (by simp)
-      have e : g = (fun x => (B a).indicator 1 x * g x) +
-          (fun x => (B a)ᶜ.indicator 1 x * g x) := by
+      have e
+          : g = (fun x => (B a).indicator 1 x * g x) + (fun x => (B a)ᶜ.indicator 1 x * g x) := by
         funext x
         by_cases h : x ∈ B a <;> simp [Set.indicator_of_mem, Set.indicator_of_notMem, h]
       rw [e]

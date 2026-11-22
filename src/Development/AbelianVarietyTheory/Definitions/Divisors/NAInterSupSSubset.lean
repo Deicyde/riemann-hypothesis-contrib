@@ -32,7 +32,8 @@ theorem mem_NA_iff (u : GA E a) : u ∈ NA (E := E) (a := a) ↔ ∃ X : Pos a �
     · rw [coe_uGL, uMat_apply, if_neg (ne_of_gt h), dite_eq_right (not_lt.2 h.le)]
     · rw [coe_uGL, uMat_apply, if_pos rfl]
 
-theorem superDiag_uGL (X : Pos a → Ad E) : GlobalTheory.Whittaker.superDiag (uGL X) = supSum 0 X := by
+theorem superDiag_uGL (X : Pos a → Ad E)
+    : GlobalTheory.Whittaker.superDiag (uGL X) = supSum 0 X := by
   classical
   unfold GlobalTheory.Whittaker.superDiag supSum
   refine (Finset.sum_sigma' _ _ _).trans ?_
@@ -51,22 +52,30 @@ theorem superDiag_uGL (X : Pos a → Ad E) : GlobalTheory.Whittaker.superDiag (u
     simp only [coe_uGL, uMat_apply]
     rw [if_neg (ne_of_lt p.2), dite_eq_left p.2]
 
-theorem whit_mul {F : GA E a → ℂ} (hc : Continuous F) (hl : AutomorphicForm.IsLeftInvariant F) {u : GA E a}
-    (hu : u ∈ NA (E := E) (a := a)) (g : GA E a) : whit F (u * g) = psiN u * whit F g := by
+theorem whit_mul
+    {F : GA E a → ℂ} (hc : Continuous F) (hl : AutomorphicForm.IsLeftInvariant F)
+    {u : GA E a} (hu : u ∈ NA (E := E) (a := a))
+    (g : GA E a)
+    : whit F (u * g) = psiN u * whit F g := by
   obtain ⟨X, rfl⟩ := (mem_NA_iff u).1 hu
   rw [psiN, superDiag_uGL]
   exact MultiplicityOne.whittaker_uGL_mul hc hl X g
 
-theorem psiLoc_eq (w : HeightOneSpectrum (𝓞 E)) (x : w.adicCompletion E) :
-    psiLoc w x = (GroundTheory.Global.localAdelicChar E w x : ℂ) := by
+theorem psiLoc_eq (w : HeightOneSpectrum (𝓞 E)) (x : w.adicCompletion E)
+    : psiLoc w x = (GroundTheory.Global.localAdelicChar E w x : ℂ) := by
   classical
   rw [psiLoc, GroundTheory.Global.localAdelicChar_apply]
   congr 2
 
-theorem loc_mem_supS (S : Finset (HeightOneSpectrum (𝓞 E))) (w : HeightOneSpectrum (𝓞 E))
-    (g : GL (Fin a) (w.adicCompletion E)) : finGL E a (locGL E a w g) ∈ supS (E := E) (a := a) S ↔ w ∈ S ∨ g = 1 := by
-  have hc : ∀ v, ∀ g : GA E a, GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) g =
-      GeneralLinearGroup.map (pLoc E v) (GeneralLinearGroup.map (pFin E) g) := fun _ _ => rfl
+theorem loc_mem_supS
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    (w : HeightOneSpectrum (𝓞 E)) (g : GL (Fin a) (w.adicCompletion E))
+    : finGL E a (locGL E a w g) ∈ supS (E := E) (a := a) S ↔ w ∈ S ∨ g = 1 := by
+  have hc
+      : ∀ v, ∀ g : GA E a,
+        GeneralLinearGroup.map ((pLoc E v).comp (pFin E)) g
+          = GeneralLinearGroup.map (pLoc E v) (GeneralLinearGroup.map (pFin E) g) := fun _ _ =>
+    rfl
   constructor
   · intro h
     by_cases hw : w ∈ S

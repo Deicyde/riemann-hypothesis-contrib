@@ -6,16 +6,18 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 @[expose] public section
 
 open MeasureTheory Set Filter Polynomial NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots GlobalTheory.TrEll
 open GlobalTheory.IndefiniteRowSideFullHecke.AdelicUnitaryGroups (mapH diagH)
 open scoped TensorProduct ComplexConjugate Matrix
 
 namespace GlobalTheory.TrEll
 
-theorem charpoly_eq_sharp (F E : Type) [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) (n : ℕ)
-    (J : Matrix (Fin n) (Fin n) E) (hJ : J.det ≠ 0) (γ : GRat σ J) :
-    γ.1.1.charpoly = sharp σ n γ.1.1.charpoly := by
+theorem charpoly_eq_sharp
+    (F E : Type) [Field F] [Field E] [Algebra F E]
+    (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (hJ : J.det ≠ 0) (γ : GRat σ J)
+    : γ.1.1.charpoly = sharp σ n γ.1.1.charpoly := by
   have h : (γ.1.1.map (σ : E →+* E))ᵀ * J * γ.1.1 = J := γ.2
   have hJu : IsUnit J := (Matrix.isUnit_iff_isUnit_det J).2 (Ne.isUnit hJ)
   obtain ⟨U, hU⟩ := hJu
@@ -45,6 +47,7 @@ theorem charpoly_eq_sharp (F E : Type) [Field F] [Field E] [Algebra F E] (σ : E
       rwa [hdeg] at this
     rw [e, h3, coeff_C_mul, coeff_reflect, revAt_zero, m, mul_one]
   unfold sharp
-  rw [h4, h3, reflect_C_mul, reflect_reflect, ← mul_assoc, ← C_mul, inv_mul_cancel₀ hc0, C_1, one_mul]
+  rw [h4, h3, reflect_C_mul, reflect_reflect, ← mul_assoc, ← C_mul, inv_mul_cancel₀ hc0, C_1,
+    one_mul]
 
 end GlobalTheory.TrEll

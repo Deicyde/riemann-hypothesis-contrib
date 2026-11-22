@@ -7,13 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValRS
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZH GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.FlagPush
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZH GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.FlagPush
 open Classical
 
 namespace GlobalTheory.FlagPush
 
-theorem Dbl.p_comp_eq_of_isHom : ∀ (F : Type) [Field F] (X Y : Var F) (φ : X.Fn →ₐ[F] Y.Fn) (f : Y.X ⟶ X.X), (ratOf X).IsHom (ratOf Y) φ f → ∀ W : Dbl Y, (∀ u : X.Fn, W.α₁ (φ u) = W.α₂ (φ u)) → W.p₁ ≫ f = W.p₂ ≫ f := by
+theorem Dbl.p_comp_eq_of_isHom
+    : ∀ (F : Type) [Field F] (X Y : Var F) (φ : X.Fn →ₐ[F] Y.Fn) (f : Y.X ⟶ X.X),
+      (ratOf X).IsHom (ratOf Y) φ f
+        → ∀ W : Dbl Y, (∀ u : X.Fn, W.α₁ (φ u) = W.α₂ (φ u)) → W.p₁ ≫ f = W.p₂ ≫ f := by
   intro F _ X Y φ f hf W hW
   haveI : IsDominant (W.Z.fromSpecStalk (genericPoint W.Z)) := ⟨by
     rw [DenseRange, dense_iff_closure_eq]
@@ -29,15 +34,16 @@ theorem Dbl.p_comp_eq_of_isHom : ∀ (F : Type) [Field F] (X Y : Var F) (φ : X.
     have e₂ := specMap_functionFieldMap W.p₂
     have hφ : (functionFieldMap W.p₁).comp φ.toRingHom = (functionFieldMap W.p₂).comp φ.toRingHom :=
       RingHom.ext hW
-    have key : ∀ (α : Y.Fn →+* W.Z.functionField),
-        Spec.map (CommRingCat.ofHom α) ≫ genericFieldPoint Y.X ≫ f =
-          Spec.map (CommRingCat.ofHom (α.comp φ.toRingHom)) ≫ (ratOf X).pt := by
+    have key
+        : ∀ (α : Y.Fn →+* W.Z.functionField),
+          Spec.map (CommRingCat.ofHom α) ≫ genericFieldPoint Y.X ≫ f
+            = Spec.map (CommRingCat.ofHom (α.comp φ.toRingHom)) ≫ (ratOf X).pt := by
       intro α
       have hf' : genericFieldPoint Y.X ≫ f = spMap φ.toRingHom ≫ (ratOf X).pt := hf
       rw [hf', CommRingCat.ofHom_comp, Spec.map_comp, Category.assoc]
       rfl
     change genericFieldPoint W.Z ≫ W.p₁ ≫ f = genericFieldPoint W.Z ≫ W.p₂ ≫ f
-    rw [← Category.assoc, ← e₁, Category.assoc, ← Category.assoc (genericFieldPoint W.Z), ← e₂, Category.assoc,
-      key, key, hφ]
+    rw [← Category.assoc, ← e₁, Category.assoc, ← Category.assoc (genericFieldPoint W.Z), ← e₂,
+      Category.assoc, key, key, hφ]
 
 end GlobalTheory.FlagPush

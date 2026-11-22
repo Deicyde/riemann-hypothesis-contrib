@@ -13,8 +13,13 @@ variable {F : Type} [Field F] [Fintype F] {k : ℕ}
 
 abbrev Pairs (k : ℕ) := {p : Fin k × Fin k // p.1 < p.2}
 
-def uniMat (f : Pairs k → F) : Matrix (Fin k) (Fin k) F :=
-  fun i j => if i = j then 1 else if h : i < j then f ⟨(i, j), h⟩ else 0
+def uniMat (f : Pairs k → F) : Matrix (Fin k) (Fin k) F := fun i j =>
+  if i = j then
+    1
+  else if h : i < j then
+    f ⟨(i, j), h⟩
+  else
+    0
 
 theorem uniMat_upper (f : Pairs k → F) : (uniMat f).IsUpperTriangular := by
   intro i j hji
@@ -28,7 +33,9 @@ theorem uniMat_det (f : Pairs k → F) : (uniMat f).det = 1 := by
 noncomputable def uniGL (f : Pairs k → F) : GL (Fin k) F :=
   GeneralLinearGroup.mkOfDetNeZero (uniMat f) (by rw [uniMat_det]; exact one_ne_zero)
 
-theorem uniGL_coe (f : Pairs k → F) : ((uniGL f : GL (Fin k) F) : Matrix (Fin k) (Fin k) F) = uniMat f := rfl
+theorem uniGL_coe (f : Pairs k → F)
+    : ((uniGL f : GL (Fin k) F) : Matrix (Fin k) (Fin k) F) = uniMat f :=
+  rfl
 
 theorem isUni_uniGL (f : Pairs k → F) : IsUni k (uniGL f) := by
   unfold IsUni
@@ -64,7 +71,8 @@ theorem card_pairs (k : ℕ) : Fintype.card (Pairs k) = k * (k - 1) / 2 := by
     exact Fin.card_Iio j
   rw [Fintype.card_subtype, Finset.card_filter, Fintype.sum_prod_type_right]
   simp only [hI]
-  have h3 : ∑ j : Fin k, (j : ℕ) = ∑ j ∈ Finset.range k, j := Fin.sum_univ_eq_sum_range (fun i => i) k
+  have h3 : ∑ j : Fin k, (j : ℕ) = ∑ j ∈ Finset.range k, j :=
+    Fin.sum_univ_eq_sum_range (fun i => i) k
   rw [h3, Finset.sum_range_id]
 
 theorem cardUni : CardUni := by

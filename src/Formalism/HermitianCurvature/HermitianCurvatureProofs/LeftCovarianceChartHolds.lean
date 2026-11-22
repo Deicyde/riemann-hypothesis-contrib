@@ -4,7 +4,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ConjugationA
 
 @[expose] public section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt NumberField Matrix Polynomial
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt NumberField Matrix
+  Polynomial
 open scoped ContDiff
 
 namespace Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity

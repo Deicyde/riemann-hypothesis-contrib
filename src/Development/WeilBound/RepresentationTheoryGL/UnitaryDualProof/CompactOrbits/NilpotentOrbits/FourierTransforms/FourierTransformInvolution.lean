@@ -12,22 +12,30 @@ namespace PositivityTheory.RgUd.T.Nil.Four.Phi2
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
-  {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)}
-  [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) (ν : Measure k) [ν.IsAddHaarMeasure]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {n : ℕ} {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} [MeasurableSpace k] [BorelSpace k]
+  (ψ : AddChar k Circle)
+  (ν : Measure k) [ν.IsAddHaarMeasure]
   (hZ : CR Z) (h : Hyp Z)
 
 include hZ h
 
-theorem fourier_transform_involution {c : kˣ} (hc : HasConductor ψ c) {f : Sp k n → ℂ}
-    (hf : f ∈ supportedIn (Set.univ : Set (Sp k n))) (p : Sp k n) :
-    phi0 ψ ν hZ h (phi0 ψ ν hZ h f) p =
-      ((distribHaarChar k (Matrix.GeneralLinearGroup.det (Gu hZ h)) : ℝ) : ℂ)⁻¹ *
-        ((((ν.real (𝒪[k] : Set k) ^ 2 * nabs k c) ^ (d Z) : ℝ)) : ℂ) * f (Refl (Z := Z) p) := by
+theorem fourier_transform_involution
+    {c : kˣ} (hc : HasConductor ψ c)
+    {f : Sp k n → ℂ} (hf : f ∈ supportedIn (Set.univ : Set (Sp k n)))
+    (p : Sp k n)
+    : phi0 ψ ν hZ h (phi0 ψ ν hZ h f) p
+      = ((distribHaarChar k (Matrix.GeneralLinearGroup.det (Gu hZ h)) : ℝ) : ℂ)⁻¹
+        * ((((ν.real (𝒪[k] : Set k) ^ 2 * nabs k c) ^ (d Z) : ℝ)) : ℂ) * f (Refl (Z := Z) p) := by
   have h1 : (fun q => f (F1 hZ h q)) ∈ SB (TT Z × (Fin (d Z) → k)) :=
     (GlobalTheory.SplitDict.bijOn_comp (F1 hZ h)).1 hf.1
-  have e : ∀ q, phi0 ψ ν hZ h f (F1 hZ h q) =
-      GlobalTheory.SplitDict.pf ψ (Measure.pi fun _ => ν) (fun q => f (F1 hZ h q)) (q.1, G Z *ᵥ q.2) := by
+  have e
+      : ∀ q,
+        phi0 ψ ν hZ h f (F1 hZ h q)
+          = GlobalTheory.SplitDict.pf ψ (Measure.pi fun _ => ν)
+            (fun q => f (F1 hZ h q))
+            (q.1, G Z *ᵥ q.2) := by
     intro q
     show GlobalTheory.SplitDict.pf _ _ _ (Hb hZ h (F1 hZ h q)) = _
     rw [partial_fourier_first_coordinates]
@@ -37,8 +45,9 @@ theorem fourier_transform_involution {c : kˣ} (hc : HasConductor ψ c) {f : Sp 
       (ψ (u ⬝ᵥ (Hb hZ h p).2) : ℂ) ∂(Measure.pi fun _ => ν) = _
   rw [pf_G ψ ν hZ h, GlobalTheory.SplitDict.pf_pf ν hc h1]
   simp only [real_test_function_apply, Fintype.card_fin]
-  have e2 : ((Hb hZ h p).1.1 : Matrix (Fin n) (Fin n) k) + E Z (-((G Z)⁻¹ *ᵥ (Hb hZ h p).2)) =
-      p.1 - (2 : k) • Pr Z p.1 := by
+  have e2
+      : ((Hb hZ h p).1.1 : Matrix (Fin n) (Fin n) k) + E Z (-((G Z)⁻¹ *ᵥ (Hb hZ h p).2))
+        = p.1 - (2 : k) • Pr Z p.1 := by
     rw [E_neg]
     show p.1 - Pr Z p.1 + -(E Z ((G Z)⁻¹ *ᵥ D Z p.1)) = _
     rw [← Pr, two_smul]
@@ -48,7 +57,8 @@ theorem fourier_transform_involution {c : kˣ} (hc : HasConductor ψ c) {f : Sp 
   simp only [Refl]
   ring
 
-def Tu (t : kˣ) : GL (Fin (d Z)) k := Units.map (Matrix.scalar (Fin (d Z)) : k →+* Matrix (Fin (d Z)) (Fin (d Z)) k) t
+def Tu (t : kˣ) : GL (Fin (d Z)) k :=
+  Units.map (Matrix.scalar (Fin (d Z)) : k →+* Matrix (Fin (d Z)) (Fin (d Z)) k) t
 
 omit hZ h [MeasurableSpace k] [BorelSpace k] [ν.IsAddHaarMeasure] in
 theorem Tu_mulVec (t : kˣ) (u : Fin (d Z) → k) : (Tu (Z := Z) t).val *ᵥ u = (t : k) • u := by
@@ -60,9 +70,9 @@ theorem Tu_det (t : kˣ) : Matrix.GeneralLinearGroup.det (Tu (Z := Z) t) = t ^ d
   ext
   simp [Tu, Matrix.scalar_apply, Matrix.GeneralLinearGroup.val_det_apply, det_diagonal]
 
-theorem fourier_transform_scaling (t : kˣ) (f : Sp k n → ℂ) {p : Sp k n} (hp : p ∈ Bz Z ×ˢ Set.univ) :
-    phi0 ψ ν hZ h f (sig Z t p) =
-      ((((nabs k t)⁻¹ ^ d Z : ℝ)) : ℂ) * phi0 ψ ν hZ h (fun q => f (sig Z t⁻¹ q)) p := by
+theorem fourier_transform_scaling (t : kˣ) (f : Sp k n → ℂ) {p : Sp k n} (hp : p ∈ Bz Z ×ˢ Set.univ)
+    : phi0 ψ ν hZ h f (sig Z t p)
+      = ((((nabs k t)⁻¹ ^ d Z : ℝ)) : ℂ) * phi0 ψ ν hZ h (fun q => f (sig Z t⁻¹ q)) p := by
   obtain ⟨x, v⟩ := p
   have hx : x ∈ Bz Z := hp.1
   have hDy : D Z (x - Pr Z x) = 0 := D_sub_Pr hZ h x
@@ -80,14 +90,18 @@ theorem fourier_transform_scaling (t : kˣ) (f : Sp k n → ℂ) {p : Sp k n} (h
     (BzL Z).add_mem ((BzL Z).sub_mem hx (Pr_mem x).1) (E_mem Z u).1
   have hpi2 : ∀ u, piZ Z (x - Pr Z x + E Z u) = x - Pr Z x := fun u => by
     rw [piZ_eq_sub hZ h (hyB u), Pr_add, hPy, Pr_E hZ h, zero_add, add_sub_cancel_right]
-  have hs : ∀ u, sig Z t⁻¹ (x - Pr Z x + E Z u, v) = (x - Pr Z x + E Z ((t⁻¹ : k) • u), v) := fun u => by
+  have hs
+      : ∀ u,
+        sig Z t⁻¹ (x - Pr Z x + E Z u, v) = (x - Pr Z x + E Z ((t⁻¹ : k) • u), v) := fun u => by
     simp only [sig, hpi2, add_sub_cancel_left, E_smul, Units.val_inv_eq_inv_val]
   simp only [hs]
-  have key := GlobalTheory.WeilM.integral_comp_mulVec ν (Tu (Z := Z) t)
-    (fun u => f (x - Pr Z x + E Z ((t⁻¹ : k) • u), v) * (ψ (u ⬝ᵥ D Z x) : ℂ))
+  have key :=
+    GlobalTheory.WeilM.integral_comp_mulVec ν (Tu (Z := Z) t)
+      (fun u => f (x - Pr Z x + E Z ((t⁻¹ : k) • u), v) * (ψ (u ⬝ᵥ D Z x) : ℂ))
   have ht : (t : k) ≠ 0 := t.ne_zero
   simp only [Tu_mulVec, Tu_det, map_pow, smul_smul, inv_mul_cancel₀ ht, one_smul, smul_dotProduct,
-    ← dotProduct_smul] at key
+      ← dotProduct_smul]
+    at key
   rw [← key]
   have hn : (nabs k t : ℝ) = ((distribHaarChar k t : NNReal) : ℝ) := rfl
   have hpos : (nabs k t : ℝ) ≠ 0 := by rw [hn]; exact_mod_cast (distribHaarChar_pos).ne'

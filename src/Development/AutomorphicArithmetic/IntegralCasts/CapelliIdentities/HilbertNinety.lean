@@ -4,25 +4,31 @@ public import Mathlib
 
 @[expose] public section
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G.{u_1, u_2} :
-    (F : Type u_1) → (Ω : Type u_2) → [inst : Field F] → [inst_1 : Field Ω] → [Algebra F Ω] → Type u_2 :=
-    fun (F : Type u_1) (Ω : Type u_2) [Field F] [Field Ω] [Algebra F Ω] ↦ Gal(Ω/F)
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G.{u_1, u_2}
+    : (F : Type u_1) → (Ω : Type u_2) → [inst : Field F] → [inst_1 : Field Ω] → [Algebra F Ω]
+      → Type u_2 := fun (F : Type u_1) (Ω : Type u_2) [Field F] [Field Ω] [Algebra F Ω] ↦
+  Gal(Ω/F)
 
-theorem UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.h90 :
-    ∀ (K Ω : Type) [inst : Field K] [NumberField K] [inst_2 : Field Ω] [inst_3 : Algebra K Ω] [IsAlgClosure K Ω]
-      (f : UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G K Ω → Ω),
-      IsLocallyConstant f →
-        (∀ (g : UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G K Ω), f g ≠ (0 : Ω)) →
-          (∀ (g h : UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G K Ω), f (g * h) = f g * (g : Ω → Ω) (f h)) →
-            ∃ (β : Ω), β ≠ (0 : Ω) ∧ ∀ (g : UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G K Ω), (g : Ω → Ω) β = f g * β := by
+theorem UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.h90
+    : ∀ (K Ω : Type) [inst : Field K] [NumberField K] [inst_2 : Field Ω] [inst_3 : Algebra K Ω]
+        [IsAlgClosure K Ω]
+        (f : UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G K Ω → Ω),
+      IsLocallyConstant f
+        → (∀ (g : UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G K Ω), f g ≠ (0 : Ω))
+        → (∀ (g h : UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G K Ω),
+          f (g * h) = f g * (g : Ω → Ω) (f h))
+        → ∃ (β : Ω),
+          β ≠ (0 : Ω)
+            ∧ ∀ (g : UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.G K Ω),
+              (g : Ω → Ω) β = f g * β := by
   intro K Ω _ _ _ _ _ f hlc h0 hc
   classical
   have h1 : f 1 = 1 := by
     have h := hc 1 1
     rw [mul_one, AlgEquiv.one_apply] at h
     exact (mul_eq_left₀ (h0 1)).1 h.symm
-  have hU : f ⁻¹' {1} ∈ nhds (1 : Gal(Ω/K)) :=
-    (hlc {1}).mem_nhds h1
+  have hU : f ⁻¹' {1} ∈ nhds (1 : Gal(Ω/K)) := (hlc {1}).mem_nhds h1
   obtain ⟨L, hL, hLU⟩ := (krullTopology_mem_nhds_one_iff K Ω _).1 hU
   have hH : ∀ (g h : Gal(Ω/K)), h ∈ L.fixingSubgroup → f (g * h) = f g := by
     intro g h hh
@@ -50,13 +56,16 @@ theorem UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.h90 :
   have hex : ∃ x : L, ∑ q, f q.out * χ q x ≠ 0 := by
     by_contra hne
     push Not at hne
-    have := Fintype.linearIndependent_iff.1 hli (fun q => f q.out) (by
-      funext x
-      simpa [Finset.sum_apply] using hne x) (QuotientGroup.mk 1)
+    have :=
+      Fintype.linearIndependent_iff.1 hli
+        (fun q => f q.out)
+        (by
+          funext x
+          simpa [Finset.sum_apply] using hne x)
+        (QuotientGroup.mk 1)
     exact h0 _ this
   obtain ⟨x, hx⟩ := hex
-  have key : ∀ g : Gal(Ω/K),
-      f g * g (∑ q, f q.out * χ q x) = ∑ q, f q.out * χ q x := by
+  have key : ∀ g : Gal(Ω/K), f g * g (∑ q, f q.out * χ q x) = ∑ q, f q.out * χ q x := by
     intro g
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finset.mul_sum]

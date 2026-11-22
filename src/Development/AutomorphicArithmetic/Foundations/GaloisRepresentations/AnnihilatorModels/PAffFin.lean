@@ -6,12 +6,12 @@ public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.Exis
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst TensorProduct Module Matrix
+open CategoryTheory AlgebraicGeometry Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst TensorProduct Module Matrix
 open scoped Formalism.Per
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.affFin_of :
-    AffFinProj := by
+theorem UpperTheory.Gal.crystallineComparison.affFin_of : AffFinProj := by
   intro R _ Y f hf s
   haveI : GlobalTheory.FiniteSubsetsInAffineOpens Y := GlobalTheory.FiniteSubsetsInAffineOpens.of_isProjOver hf
   obtain ⟨U, hU, hsub⟩ :=

@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LeviEmbMu
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.InertSupp ValuativeRel Matrix MeasureTheory
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.InertSupp ValuativeRel
+  Matrix MeasureTheory
 open GlobalTheory.IwahoriInj (Deep)
 open Filter Topology
 
@@ -26,8 +27,8 @@ theorem isOpen_deep (a : ℤ) : IsOpen {x : k | Deep a x} := by
   rw [sub_add_cancel] at h
   exact h.trans (max_le hz.le hx)
 
-theorem eventually_deep_subset {s : Set k} (hs : s ∈ 𝓝 (0 : k)) :
-    ∀ᶠ M : ℕ in atTop, ∀ x : k, Deep (M : ℤ) x → x ∈ s := by
+theorem eventually_deep_subset {s : Set k} (hs : s ∈ 𝓝 (0 : k))
+    : ∀ᶠ M : ℕ in atTop, ∀ x : k, Deep (M : ℤ) x → x ∈ s := by
   obtain ⟨γ, hγ⟩ := (IsValuativeTopology.mem_nhds_zero_iff s).1 hs
 
   obtain ⟨M₀, hM₀⟩ := exists_pow_lt₀ (uniformizer_lt_one (R := k)) γ
@@ -40,13 +41,15 @@ theorem eventually_deep_subset {s : Set k} (hs : s ∈ 𝓝 (0 : k)) :
   have hM₀' : uniformizer k ^ (M₀ : ℤ) < γ := by rwa [zpow_natCast]
   exact hx.trans_lt (hle.trans_lt hM₀')
 
-theorem exists_deep_subset {n : Type} [Fintype n] {s : Set (Matrix n n k)} (hs : s ∈ 𝓝 (0 : Matrix n n k)) :
-    ∃ M : ℕ, ∀ y : Matrix n n k, (∀ i j, Deep (M : ℤ) (y i j)) → y ∈ s := by
+theorem exists_deep_subset
+    {n : Type} [Fintype n] {s : Set (Matrix n n k)} (hs : s ∈ 𝓝 (0 : Matrix n n k))
+    : ∃ M : ℕ, ∀ y : Matrix n n k, (∀ i j, Deep (M : ℤ) (y i j)) → y ∈ s := by
   have hs' : s ∈ 𝓝 (0 : n → n → k) := hs
   rw [nhds_pi] at hs'
   obtain ⟨I, -, t, ht, hts⟩ := Filter.mem_pi.1 hs'
 
-  have ht' : ∀ i, ∃ J : Set n, J.Finite ∧ ∃ u : n → Set k, (∀ j, u j ∈ 𝓝 (0 : k)) ∧ J.pi u ⊆ t i := by
+  have ht'
+      : ∀ i, ∃ J : Set n, J.Finite ∧ ∃ u : n → Set k, (∀ j, u j ∈ 𝓝 (0 : k)) ∧ J.pi u ⊆ t i := by
     intro i
     have hi : t i ∈ 𝓝 (0 : n → k) := ht i
     rw [nhds_pi] at hi
@@ -59,7 +62,8 @@ theorem exists_deep_subset {n : Type} [Fintype n] {s : Set (Matrix n n k)} (hs :
     intro j
     exact eventually_deep_subset (hu i j)
   obtain ⟨M, hM⟩ := hev.exists
-  exact ⟨M, fun y hy => hts (Set.mem_pi.2 fun i _ => hJu i (Set.mem_pi.2 fun j _ => hM i j _ (hy i j)))⟩
+  exact
+    ⟨M, fun y hy => hts (Set.mem_pi.2 fun i _ => hJu i (Set.mem_pi.2 fun j _ => hM i j _ (hy i j)))⟩
 
 private theorem deep_neg {a : ℤ} {x : k} (h : Deep a x) : Deep a (-x) := by
   unfold Deep at h ⊢
@@ -90,16 +94,19 @@ private theorem exists_deep_neg_natCast (x : k) : ∃ N : ℕ, Deep (-(N : ℤ))
   rw [_root_.zpow_neg, zpow_natCast]
   exact ((lt_inv_comm₀ hpos hx0).1 hN).le
 
-private theorem isOpen_setOf_forall_deep {n : Type} [Fintype n] (a : ℤ) :
-    IsOpen {y : Matrix n n k | ∀ i j, Deep a (y i j)} := by
+private theorem isOpen_setOf_forall_deep {n : Type} [Fintype n] (a : ℤ)
+    : IsOpen {y : Matrix n n k | ∀ i j, Deep a (y i j)} := by
   simp only [Set.ofPred_forall]
-  exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-    (isOpen_deep (k := k) a).preimage (continuous_id.matrix_elem i j)
+  exact isOpen_iInter_of_finite fun i =>
+    isOpen_iInter_of_finite fun j =>
+      (isOpen_deep (k := k) a).preimage (continuous_id.matrix_elem i j)
 
-theorem exists_bound_period : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] [DecidableEq n], ∀ Φ ∈ SB (Matrix n n k),
-    ∃ N M : ℕ, (∀ x, Φ x ≠ 0 → ∀ i j, Deep (-(N : ℤ)) (x i j)) ∧
-      ∀ x y : Matrix n n k, (∀ i j, Deep (M : ℤ) (y i j)) → Φ (x + y) = Φ x := by
+theorem exists_bound_period
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : Type) [Fintype n] [DecidableEq n],
+      ∀ Φ ∈ SB (Matrix n n k), ∃ N M : ℕ,
+        (∀ x, Φ x ≠ 0 → ∀ i j, Deep (-(N : ℤ)) (x i j))
+          ∧ ∀ x y : Matrix n n k, (∀ i j, Deep (M : ℤ) (y i j)) → Φ (x + y) = Φ x := by
   intro k _ _ _ _ n _ _ Φ hΦ
   have hΦ' : IsLocallyConstant Φ ∧ HasCompactSupport Φ := hΦ
   obtain ⟨hlc, hcs⟩ := hΦ'
@@ -123,10 +130,11 @@ theorem exists_bound_period : ∀ (k : Type) [Field k] [ValuativeRel k] [Topolog
       exact deep_of_le' (neg_le_neg (by exact_mod_cast hN)) hN₀
     obtain ⟨N, hN⟩ := hev.exists
     exact Set.mem_iUnion.2 ⟨N, hN⟩
-  obtain ⟨N, hN⟩ := hC.elim_directed_cover U (fun N => isOpen_setOf_forall_deep _) hUcov hUm.directed_le
+  obtain ⟨N, hN⟩ :=
+    hC.elim_directed_cover U (fun N => isOpen_setOf_forall_deep _) hUcov hUm.directed_le
 
-  let W : ℕ → Set (Matrix n n k) :=
-    fun M => {x | ∀ y : Matrix n n k, (∀ i j, Deep (M : ℤ) (y i j)) → Φ (x + y) = Φ x}
+  let W : ℕ → Set (Matrix n n k) := fun M =>
+    {x | ∀ y : Matrix n n k, (∀ i j, Deep (M : ℤ) (y i j)) → Φ (x + y) = Φ x}
   have hWm : Monotone W := fun M M' h x hx y hy =>
     hx y fun i j => deep_of_le' (by exact_mod_cast h) (hy i j)
   have hWo : ∀ M, IsOpen (W M) := by

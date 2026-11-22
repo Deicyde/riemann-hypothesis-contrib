@@ -8,10 +8,14 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 open PositivityTheory.Rg.Rsw PositivityTheory.Rg.Rsw.L
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -27,9 +31,11 @@ end Abstract
 
 variable {D : D7} {N r t n : ℕ}
 
-abbrev XS (e : AE D) (N r t : ℕ) : Type := {z : Mx D N r × Mx D N t // e • z.1 = z.1 ∧ e • z.2 = z.2}
+abbrev XS (e : AE D) (N r t : ℕ) : Type :=
+  {z : Mx D N r × Mx D N t // e • z.1 = z.1 ∧ e • z.2 = z.2}
 
-def phiU (V : HSp D) (r t : ℕ) (h : GA D V) : (Mx D V.rank r × Mx D V.rank t) ≃ₜ (Mx D V.rank r × Mx D V.rank t) where
+def phiU (V : HSp D) (r t : ℕ) (h : GA D V)
+    : (Mx D V.rank r × Mx D V.rank t) ≃ₜ (Mx D V.rank r × Mx D V.rank t) where
   toFun z := (mm (mt V h) z.1, mm (mt V h) z.2)
   invFun z := (mm (mt V h⁻¹) z.1, mm (mt V h⁻¹) z.2)
   left_inv z := by
@@ -50,16 +56,20 @@ def phiU (V : HSp D) (r t : ℕ) (h : GA D V) : (Mx D V.rank r × Mx D V.rank t)
       rw [← Matrix.mul_assoc, e₁, Matrix.one_mul]
     · change (mt V h * (mt V h⁻¹ * z.2 : Matrix _ _ _) : Matrix _ _ _) = z.2
       rw [← Matrix.mul_assoc, e₁, Matrix.one_mul]
-  continuous_toFun := (continuous_const.matrix_mul continuous_fst).prodMk (continuous_const.matrix_mul continuous_snd)
-  continuous_invFun := (continuous_const.matrix_mul continuous_fst).prodMk (continuous_const.matrix_mul continuous_snd)
+  continuous_toFun :=
+    (continuous_const.matrix_mul continuous_fst).prodMk (continuous_const.matrix_mul continuous_snd)
+  continuous_invFun :=
+    (continuous_const.matrix_mul continuous_fst).prodMk (continuous_const.matrix_mul continuous_snd)
 
 def phiS (N : ℕ) (y : Mx D r t) : (Mx D N r × Mx D N t) ≃ₜ (Mx D N r × Mx D N t) where
   toFun z := (z.1, z.2 + mm z.1 y)
   invFun z := (z.1, z.2 + mm z.1 (-y))
   left_inv z := by simp [Matrix.mul_neg]
   right_inv z := by simp [Matrix.mul_neg]
-  continuous_toFun := continuous_fst.prodMk (continuous_snd.add (continuous_fst.matrix_mul continuous_const))
-  continuous_invFun := continuous_fst.prodMk (continuous_snd.add (continuous_fst.matrix_mul continuous_const))
+  continuous_toFun :=
+    continuous_fst.prodMk (continuous_snd.add (continuous_fst.matrix_mul continuous_const))
+  continuous_invFun :=
+    continuous_fst.prodMk (continuous_snd.add (continuous_fst.matrix_mul continuous_const))
 
 def phiG (N r : ℕ) (g : GL (Fin t) (AE D)) : (Mx D N r × Mx D N t) ≃ₜ (Mx D N r × Mx D N t) where
   toFun z := (z.1, mm z.2 g.1)
@@ -84,8 +94,11 @@ variable {D : D7} {N r t n : ℕ}
 
 def liftU {e : AE D} (V : HSp D) (r t : ℕ) (h : GA D V) : XS e V.rank r t ≃ₜ XS e V.rank r t :=
   (phiU V r t h).subtype (fun z => by
-    have a : ∀ {k : ℕ} (x : Mx D V.rank k), e • mm (mt V h) x = mm (mt V h) (e • x) := fun x => (Matrix.mul_smul _ _ _).symm
-    have b : ∀ {k : ℕ} (x : Mx D V.rank k), e • mm (mt V h) x = mm (mt V h) x → e • x = x := fun {k} x hx => by
+    have a : ∀ {k : ℕ} (x : Mx D V.rank k), e • mm (mt V h) x = mm (mt V h) (e • x) := fun x =>
+      (Matrix.mul_smul _ _ _).symm
+    have b
+        : ∀ {k : ℕ} (x : Mx D V.rank k),
+          e • mm (mt V h) x = mm (mt V h) x → e • x = x := fun {k} x hx => by
       have i := congrArg (fun y => mm (mt V h⁻¹) y) hx
       have l : ∀ y : Mx D V.rank k, mm (mt V h⁻¹) (mm (mt V h) y) = y := fun y =>
         congrArg Prod.fst ((phiU V k k h).left_inv (y, y))

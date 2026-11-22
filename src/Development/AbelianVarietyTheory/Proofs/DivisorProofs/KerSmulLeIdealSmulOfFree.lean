@@ -9,7 +9,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem ker_smul_le_ideal_smul_of_free : ∀ (Λ : Type) [CommRing Λ] (t : Λ), (∀ x : Λ, t * x = 0 → x ∈ Ideal.span {t}) → ∀ (M : Type 1) [AddCommGroup M] [Module Λ M], Module.Free Λ M → ∀ m : M, t • m = 0 → m ∈ Ideal.span {t} • (⊤ : Submodule Λ M) := by
+theorem ker_smul_le_ideal_smul_of_free
+    : ∀ (Λ : Type) [CommRing Λ] (t : Λ),
+      (∀ x : Λ, t * x = 0 → x ∈ Ideal.span {t})
+        → ∀ (M : Type 1) [AddCommGroup M] [Module Λ M],
+          Module.Free Λ M → ∀ m : M, t • m = 0 → m ∈ Ideal.span {t} • (⊤ : Submodule Λ M) := by
   intro Λ _ t ht M _ _ hfree m hm
   let b := Module.Free.chooseBasis Λ M
   have hc : ∀ i, ∃ d, b.repr m i = t * d := by

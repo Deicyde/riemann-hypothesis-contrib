@@ -4,7 +4,10 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocOf
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.SnFam
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt Formalism.L2.SG.RowsConc
+  Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.SnFam
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -86,10 +89,17 @@ end GlobalTheory.SnFam.CvScal
 namespace GlobalTheory.SnFam.CvScal
 variable {D : D7}
 
-theorem pair_scalar (D : D7) {T T' : D.host.E} (Λ : Submodule (𝓞 D.host.E) (VS D).V) (F : LFlag (D.sp.Y 0) D.R.rS T)
-    (F' F'' : LFlag (D.sp.Y 0) D.R.rS T') (_hΛ : Submodule.IsLattice D.host.E Λ) (hF : F.zt = F.fl.z)
-    (hF' : F'.zt = F'.fl.z) (hF'' : F''.zt = F''.fl.z) (n) (hn : n ∈ NRat F) (m) (hm : m ∈ NRat F')
-    (hfr : ∀ a, frame F'' a = (n * m) (frame F' a)) : IsScalar Λ F F' F'' (n * m) := by
+theorem pair_scalar
+    (D : D7)
+    {T T' : D.host.E}
+    (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    (F : LFlag (D.sp.Y 0) D.R.rS T)
+    (F' F'' : LFlag (D.sp.Y 0) D.R.rS T')
+    (_hΛ : Submodule.IsLattice D.host.E Λ) (hF : F.zt = F.fl.z) (hF' : F'.zt = F'.fl.z)
+    (hF'' : F''.zt = F''.fl.z)
+    (n) (hn : n ∈ NRat F)
+    (m) (hm : m ∈ NRat F') (hfr : ∀ a, frame F'' a = (n * m) (frame F' a))
+    : IsScalar Λ F F' F'' (n * m) := by
   have hnm : ∀ v, (n * m) v = n (m v) := fun v => rfl
   have he : ∀ a, F''.fl.e a = n (m (F'.fl.e a)) := by
     intro a
@@ -100,7 +110,10 @@ theorem pair_scalar (D : D7) {T T' : D.host.E} (Λ : Submodule (𝓞 D.host.E) (
     simpa [frame, FlagG.fvec, Fin.snoc_last, hnm] using this
 
   have hX'' : Xsp F'' = (Xsp F').map (n : (VS D).V →ₗ[D.host.E] (VS D).V) := by
-    have h1 : Xsp F'' = (Xsp F').map ((n : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ (m : (VS D).V →ₗ[D.host.E] (VS D).V)) := by
+    have h1
+        : Xsp F''
+          = (Xsp F').map
+            ((n : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ (m : (VS D).V →ₗ[D.host.E] (VS D).V)) := by
       show Submodule.span _ _ = Submodule.map _ (Submodule.span _ _)
       rw [Submodule.map_span, ← Set.range_comp]
       congr 2
@@ -116,23 +129,38 @@ theorem pair_scalar (D : D7) {T T' : D.host.E} (Λ : Submodule (𝓞 D.host.E) (
   have oy1' : y1' ∈ orth (VS D) (Xsp F') := orth_anti (Xsp_le_Xplus F') hy1'.2
   have A : y2 - n y1 ∈ Xsp F := by
     have := add_mem h12 (hn.2.2 y1 oy1)
-    rw [← neg_mem_iff]; convert this using 1; abel
+    rw [← neg_mem_iff]
+    convert this using 1
+    abel
   have B : y2'' - n y1' ∈ Xsp F'' := by
     have := add_mem h12' (nX' _ (hm.2.2 y1' oy1'))
-    convert this using 1; rw [hnm, map_sub]; abel
+    convert this using 1
+    rw [hnm, map_sub]
+    abel
   have C : F.fl.z - n F.fl.z ∈ Xsp F := by
     have := hn.2.2 _ (z_mem_orth F)
-    rw [← neg_mem_iff]; convert this using 1; abel
+    rw [← neg_mem_iff]
+    convert this using 1
+    abel
   have Dd : F''.fl.z - n F'.fl.z ∈ Xsp F'' := by
     have := nX' _ (hm.2.2 _ (z_mem_orth F'))
-    convert this using 1; rw [hz, map_sub]
+    convert this using 1
+    rw [hz, map_sub]
   set d1 := y1 - y1' - (al • F.fl.z + al' • F'.fl.z) with hd1
   set d2 := y2 - y2'' - (al • F.fl.z + al' • F''.fl.z) with hd2
-  have key : d2 = n d1 + ((y2 - n y1) - (y2'' - n y1') - al • (F.fl.z - n F.fl.z) - al' • (F''.fl.z - n F'.fl.z)) := by
+  have key
+      : d2
+        = n d1
+          + ((y2 - n y1) - (y2'' - n y1') - al • (F.fl.z - n F.fl.z)
+            - al' • (F''.fl.z - n F'.fl.z)) := by
     simp only [hd1, hd2, map_sub, map_add (f := _), map_smul, smul_sub]; abel
-  have kmem : (y2 - n y1) - (y2'' - n y1') - al • (F.fl.z - n F.fl.z) - al' • (F''.fl.z - n F'.fl.z) ∈ Xsp F ⊔ Xsp F'' :=
-    sub_mem (sub_mem (sub_mem (Submodule.mem_sup_left A) (Submodule.mem_sup_right B))
-      (Submodule.smul_mem _ _ (Submodule.mem_sup_left C))) (Submodule.smul_mem _ _ (Submodule.mem_sup_right Dd))
+  have kmem
+      : (y2 - n y1) - (y2'' - n y1') - al • (F.fl.z - n F.fl.z) - al' • (F''.fl.z - n F'.fl.z)
+        ∈ Xsp F ⊔ Xsp F'' :=
+    sub_mem
+      (sub_mem (sub_mem (Submodule.mem_sup_left A) (Submodule.mem_sup_right B))
+        (Submodule.smul_mem _ _ (Submodule.mem_sup_left C)))
+      (Submodule.smul_mem _ _ (Submodule.mem_sup_right Dd))
   rw [key, Submodule.add_mem_iff_left _ kmem, ← hsup]
   constructor
   · intro h; exact Submodule.mem_map_of_mem h

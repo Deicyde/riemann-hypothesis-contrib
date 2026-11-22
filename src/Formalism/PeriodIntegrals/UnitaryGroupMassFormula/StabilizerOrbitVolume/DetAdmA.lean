@@ -17,8 +17,8 @@ noncomputable section
 
 namespace PI.VolStabSW.DeterminantAdmissible
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField IsDedekindDomain MeasureTheory Topology Filter Set
-  PI.VolStabSW.PositiveNearLattice MeasurableSpace
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField IsDedekindDomain
+  MeasureTheory Topology Filter Set PI.VolStabSW.PositiveNearLattice MeasurableSpace
 open scoped TensorProduct ENNReal RestrictedProduct
 
 section Borel
@@ -27,8 +27,10 @@ variable {F : Type} [Field F] [NumberField F]
 
 instance borel_Af : BorelSpace (Af F) := ⟨rfl⟩
 instance borel_Fv (v : HeightOneSpectrum (𝓞 F)) : BorelSpace (Fv F v) := ⟨rfl⟩
-instance borel_tens {E : Type} [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    [TopologicalSpace R] : BorelSpace (R ⊗[F] E) := ⟨rfl⟩
+instance borel_tens
+    {E : Type} [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
+    : BorelSpace (R ⊗[F] E) :=
+  ⟨rfl⟩
 
 end Borel
 
@@ -39,8 +41,10 @@ variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 theorem isCompact_intV : IsCompact (v.adicCompletionIntegers F : Set (Fv F v)) :=
   ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isCompact_integers v
 
-theorem isClopen_intV : IsClopen (v.adicCompletionIntegers F : Set (Fv F v)) :=
-  ⟨(isCompact_intV v).isClosed, ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isOpen_integers v⟩
+theorem isClopen_intV : IsClopen (v.adicCompletionIntegers F : Set (Fv F v)) := ⟨
+  (isCompact_intV v).isClosed,
+  ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isOpen_integers v
+⟩
 
 instance lc_Fv : LocallyCompactSpace (Fv F v) :=
   (isCompact_intV v).locallyCompactSpace_of_mem_nhds_of_addGroup

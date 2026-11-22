@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Exist
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -18,20 +21,28 @@ noncomputable section
 
 namespace GlobalTheory.Poinc.IntTerm
 
-theorem gs_comp_stalkMap {X Y Z : Scheme.{0}} (f : Z ⟶ Y) (g : Y ⟶ X) (z : Z) (U : X.Opens) (h : g (f z) ∈ U)
-    (a : Γ(X, U)) : gs (f ≫ g) z U a = (f.stalkMap z).hom (gs g (f z) U a) := by
+theorem gs_comp_stalkMap
+    {X Y Z : Scheme.{0}}
+    (f : Z ⟶ Y) (g : Y ⟶ X) (z : Z) (U : X.Opens) (h : g (f z) ∈ U) (a : Γ(X, U))
+    : gs (f ≫ g) z U a = (f.stalkMap z).hom (gs g (f z) U a) := by
   rw [← gs_pull f g z U h a, gs_eq f z _ h, gs_eq g (f z) U h]
   exact (Scheme.Hom.germ_stalkMap_apply f _ z h _).symm
 
-theorem formEq_famφB_zero {V : Type} [CommRing V] [IsDomain V] (D : DegPre V) {Y : Scheme.{0}} (h : Y ⟶ D.P.A.left) :
-    FormEq (fun i => h ≫ D.famφB 0 i) (DegPre.famε 1) (fun _ : Fin 1 => h) (fun _ => (1 : ℤ)) := by
+theorem formEq_famφB_zero
+    {V : Type} [CommRing V] [IsDomain V] (D : DegPre V) {Y : Scheme.{0}} (h : Y ⟶ D.P.A.left)
+    : FormEq
+      (fun i => h ≫ D.famφB 0 i)
+      (DegPre.famε 1)
+      (fun _ : Fin 1 => h)
+      (fun _ => (1 : ℤ)) := by
   intro U _ hh
   have e0 : D.famφB 0 0 = 𝟙 _ := rfl
   have e1 : D.famφB 0 1 = 𝟙 _ := by
     show (padd D.P.A (𝟙 D.P.A) (toUnit _ ≫ D.c 0)).left = _
     rw [ThetaOne.c_zero, MonObj.comp_one]
     show ((𝟙 D.P.A) * 1).left = _
-    rw [_root_.mul_one]; rfl
+    rw [_root_.mul_one]
+    rfl
   have e2 : D.famφB 0 2 = D.famφB 0 3 := by
     show (toUnit D.P.A ≫ D.c 0).left = (toUnit D.P.A ≫ η[D.P.A]).left
     rw [ThetaOne.c_zero, MonObj.comp_one]
@@ -39,7 +50,14 @@ theorem formEq_famφB_zero {V : Type} [CommRing V] [IsDomain V] (D : DegPre V) {
   simp only [Fin.prod_univ_four, Fin.prod_univ_one, e0, e1, e2]
   simp [DegPre.famε]
 
-theorem exists_unitAt_mul : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V] (D : DegPre V) (θ : D.SecB 1 0), IntTerm.IsTheta D θ → ∀ N : ℕ, 2 ≤ N → IsUnit (N : V) → ∀ (C : Type) (b : C → (𝟙_ (Over (Sp V)) ⟶ D.P.A)), IntTerm.Exhausts D.P N b → ∀ a : 𝟙_ (Over (Sp V)) ⟶ D.P.A, ∃ c, IntTerm.UnitAt D θ (a * b c) := by
+theorem exists_unitAt_mul
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V] (D : DegPre V) (θ : D.SecB 1 0),
+      IntTerm.IsTheta D θ
+        → ∀ N : ℕ,
+          2 ≤ N → IsUnit (N : V)
+            → ∀ (C : Type) (b : C → (𝟙_ (Over (Sp V)) ⟶ D.P.A)),
+              IntTerm.Exhausts D.P N b
+                → ∀ a : 𝟙_ (Over (Sp V)) ⟶ D.P.A, ∃ c, IntTerm.UnitAt D θ (a * b c) := by
   intro V _ _ _ D θ hθ N hN hNV C b hb a
   have hL := GlobalTheory.abelianSchemeLaws_all.1
   let k := AlgebraicClosure (ResidueField V)
@@ -63,17 +81,22 @@ theorem exists_unitAt_mul : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRin
     have gz : ∀ {Y : Scheme.{0}} (y : Y) (U : Y.Opens), gs (𝟙 Y) y U 0 = 0 := fun y U => by
       unfold gs; split_ifs <;> simp only [map_zero]
     exact (gz _ _).trans (gz _ _).symm
-  obtain ⟨y, hy, hu⟩ := GlobalTheory.UT.ExactTerm.exists_good_point hL.goodPt hL.polBaseChange D.P r hN hNk th hne
-    (toUnit (Over.mk r) ≫ a)
+  obtain ⟨y, hy, hu⟩ :=
+    GlobalTheory.UT.ExactTerm.exists_good_point hL.goodPt hL.polBaseChange D.P r hN hNk th hne
+      (toUnit (Over.mk r) ≫ a)
   obtain ⟨c, hc⟩ := hb k r y hy
   refine ⟨c, ?_⟩
-  have hmul : (toUnit (Over.mk r) ≫ a) * y = toUnit (Over.mk r) ≫ (a * b c) := by rw [hc, MonObj.comp_mul]
+  have hmul : (toUnit (Over.mk r) ≫ a) * y = toUnit (Over.mk r) ≫ (a * b c) := by
+    rw [hc, MonObj.comp_mul]
   rw [hmul] at hu
   let g := a * b c
   let q : Sp k := closedPoint k
-  obtain ⟨J, hJ, -⟩ := exists_good D.P.L D.P.isLB q (K := Empty) Empty.elim Empty.elim (·.elim) (·.elim)
+  obtain ⟨J, hJ, -⟩ :=
+    exists_good D.P.L D.P.isLB q (K := Empty) Empty.elim Empty.elim (·.elim) (·.elim)
   have h1 := hu q J hJ
-  have hρ : (ptSecT D.P.A (toUnit (Over.mk r) ≫ g)).left ≫ (snd (Over.mk r) D.P.A).left = r ≫ g.left := by
+  have hρ
+      : (ptSecT D.P.A (toUnit (Over.mk r) ≫ g)).left ≫ (snd (Over.mk r) D.P.A).left
+        = r ≫ g.left := by
     rw [← Over.comp_left, ptSecT, lift_snd, Over.comp_left]
     congr 1
   have hθ'e : θ' = H1.SectionArithmetic.pullSec θ (snd (Over.mk r) D.P.A).left :=
@@ -89,13 +112,19 @@ theorem exists_unitAt_mul : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRin
   refine ⟨fun σ => J (r ≫ σ), fun σ => ?_, ?_⟩
   · have := hJ (r ≫ σ)
     rwa [Scheme.Hom.comp_apply, hrq] at this
-  · rw [sval_of θ (r ≫ g.left) q J (fun i => J (r ≫ g.left ≫ D.famφB 0 i)) (fun i => by rw [Category.assoc])] at h2
-    have hm : g.left (r q) ∈ (LB.LinComb D.P.L (D.famφB 0) (DegPre.famε 1)).U
-        (fun i => J (r ≫ g.left ≫ D.famφB 0 i)) :=
-      show g.left (r q) ∈ LB.wchart D.P.L (D.famφB 0) (fun i => J (r ≫ g.left ≫ D.famφB 0 i)) from Set.mem_iInter.2 fun i => by
-        have := hJ (r ≫ g.left ≫ D.famφB 0 i)
-        simpa [Scheme.Hom.comp_apply] using this
-    have h2' : IsUnit ((r.stalkMap q).hom (gs g.left (r q) _ (θ.f (fun i => J (r ≫ g.left ≫ D.famφB 0 i))))) := by
+  · rw [sval_of θ (r ≫ g.left) q J
+        (fun i => J (r ≫ g.left ≫ D.famφB 0 i))
+        (fun i => by rw [Category.assoc])]
+      at h2
+    have hm
+        : g.left (r q) ∈ (LB.LinComb D.P.L (D.famφB 0) (DegPre.famε 1)).U
+          (fun i => J (r ≫ g.left ≫ D.famφB 0 i)) :=
+      show g.left (r q) ∈ LB.wchart D.P.L (D.famφB 0) (fun i => J (r ≫ g.left ≫ D.famφB 0 i)) from
+        Set.mem_iInter.2 fun i => by
+          have := hJ (r ≫ g.left ≫ D.famφB 0 i)
+          simpa [Scheme.Hom.comp_apply] using this
+    have h2' : IsUnit ((r.stalkMap q).hom
+        (gs g.left (r q) _ (θ.f (fun i => J (r ≫ g.left ≫ D.famφB 0 i))))) := by
       rw [← gs_comp_stalkMap r g.left q _ hm]; exact h2
     have h3 := isUnit_of_map_unit (r.stalkMap q).hom _ h2'
     rw [hrq] at h3

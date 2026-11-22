@@ -4,15 +4,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LiftSemi
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.PerfVB
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.PerfVB
 
 namespace GlobalTheory.CompanionTheory.PerfVB
 
-theorem rankAtStalk_eq_of_finrank_fibres :
-    ∀ (R K : Type) [CommRing R] [AddCommGroup K] [Module R K] [Module.Finite R K]
-      [Module.Projective R K] (g : ℕ),
-      (∀ (k : Type) [Field k] [Algebra R k], Module.finrank k (k ⊗[R] K) = g) →
-      ∀ p : PrimeSpectrum R, Module.rankAtStalk K p = g := by
+theorem rankAtStalk_eq_of_finrank_fibres
+    : ∀ (R K : Type) [CommRing R] [AddCommGroup K] [Module R K] [Module.Finite R K]
+        [Module.Projective R K] (g : ℕ),
+      (∀ (k : Type) [Field k] [Algebra R k], Module.finrank k (k ⊗[R] K) = g)
+        → ∀ p : PrimeSpectrum R, Module.rankAtStalk K p = g := by
   intro R K _ _ _ _ _ g hg p
   haveI : Module.Free (Localization.AtPrime p.asIdeal) (Localization.AtPrime p.asIdeal ⊗[R] K) :=
     Module.free_of_flat_of_isLocalRing

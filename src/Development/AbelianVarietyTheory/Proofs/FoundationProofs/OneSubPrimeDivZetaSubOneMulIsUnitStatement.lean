@@ -9,8 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KummerTow
 
 open GlobalTheory.K5 GlobalTheory.KumDlog
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.one_sub_prime_div_zeta_sub_one_mul_isUnit : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω → ∀ (T : Tower p Ω) (j : ℕ), 1 ≤ j → ∀ y : Ω, IsInt (p := p) y →
-  1 - (p : Ω) / (T.ζ j - 1) * y ≠ 0 ∧ IsInt (p := p) (1 - (p : Ω) / (T.ζ j - 1) * y)⁻¹ := by
+theorem _root_.GlobalTheory.T.one_sub_prime_div_zeta_sub_one_mul_isUnit
+    : ∀ (p : ℕ) [Fact p.Prime],
+      p ≠ 2
+        → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+          IsClo p Ω
+            → ∀ (T : Tower p Ω) (j : ℕ),
+              1 ≤ j
+                → ∀ y : Ω,
+                  IsInt (p := p) y
+                    → 1 - (p : Ω) / (T.ζ j - 1) * y ≠ 0
+                      ∧ IsInt (p := p) (1 - (p : Ω) / (T.ζ j - 1) * y)⁻¹ := by
   intro p hp hp2 Ω _ _ _ T j hj y hy
   classical
   set A := integralClosure (O0 p) Ω
@@ -19,12 +28,14 @@ theorem _root_.GlobalTheory.T.one_sub_prime_div_zeta_sub_one_mul_isUnit : ∀ (p
   have hτ0 : T.ζ j - 1 ≠ 0 := sub_ne_zero.2 hζ1
   have hζint : IsIntegral (O0 p) (T.ζ j) := by
     refine IsIntegral.of_pow (n := p ^ j) (by omega) ?_
-    rw [(T.prim j).pow_eq_one]; exact isIntegral_one
+    rw [(T.prim j).pow_eq_one]
+    exact isIntegral_one
   have htot : 2 ≤ Nat.totient (p ^ j) := by
     rw [Nat.totient_prime_pow hp.out (by omega)]
     have : 3 ≤ p := by have := hp.out.two_le; omega
     have h1 : 1 ≤ p ^ (j - 1) := Nat.one_le_pow _ _ hp.out.pos
-    calc 2 = 1 * 2 := by ring
+    calc
+      2 = 1 * 2 := by ring
       _ ≤ p ^ (j - 1) * (p - 1) := Nat.mul_le_mul h1 (by omega)
   have hdiv : IsIntegral (O0 p) ((p : Ω) / (T.ζ j - 1) ^ 2) :=
     GlobalTheory.K5.PDiv.pdiv p Ω T j 2 hj htot
@@ -54,23 +65,23 @@ theorem _root_.GlobalTheory.T.one_sub_prime_div_zeta_sub_one_mul_isUnit : ∀ (p
     have : Nontrivial (A ⧸ M) := Ideal.Quotient.nontrivial_iff.2 hM.ne_top
     have : CharP (A ⧸ M) p := by
       rw [CharP.charP_iff_prime_eq_zero hp.out]
-      rw [← map_natCast (Ideal.Quotient.mk M), Ideal.Quotient.eq_zero_iff_mem]; exact hpM
+      rw [← map_natCast (Ideal.Quotient.mk M), Ideal.Quotient.eq_zero_iff_mem]
+      exact hpM
     have hζp : ζ' ^ (p ^ j) = 1 := Subtype.ext (by simp [ζ', (T.prim j).pow_eq_one])
     have h3 : (Ideal.Quotient.mk M τ) ^ (p ^ j) = 0 := by
       let q := Ideal.Quotient.mk M
       change (q (ζ' - 1)) ^ (p ^ j) = 0
-      rw [q.map_sub, q.map_one, sub_pow_char_pow (p := p) (q ζ') 1 j,
-        ← q.map_pow, hζp, q.map_one, one_pow, sub_self]
+      rw [q.map_sub, q.map_one, sub_pow_char_pow (p := p) (q ζ') 1 j, ← q.map_pow, hζp, q.map_one,
+        one_pow, sub_self]
     rw [← Ideal.Quotient.eq_zero_iff_mem]
     exact pow_eq_zero_iff (by omega) |>.1 h3
   have hunit : IsUnit u := by
     by_contra h
-    obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal (Ideal.span {u})
-      (by rwa [Ne, Ideal.span_singleton_eq_top])
+    obtain ⟨M, hM, hle⟩ :=
+      Ideal.exists_le_maximal (Ideal.span {u}) (by rwa [Ne, Ideal.span_singleton_eq_top])
     have h1 : u ∈ M := hle (Ideal.mem_span_singleton_self _)
     have h2 : τ * w ∈ M := M.mul_mem_right _ (hτM M hM)
-    have : (1 : A) ∈ M := by
-      have := M.add_mem h1 h2; simpa [u] using this
+    have : (1 : A) ∈ M := by have := M.add_mem h1 h2; simpa [u] using this
     exact hM.ne_top ((Ideal.eq_top_iff_one _).2 this)
   obtain ⟨v, hv⟩ := hunit
   have hval : (u : Ω) * (((v⁻¹ : Aˣ) : A) : Ω) = 1 := by

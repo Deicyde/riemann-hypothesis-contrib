@@ -6,8 +6,12 @@ public import Mathlib
 
 open IsLocalRing
 
-theorem UpperTheory.krullDim_quotient_le_card_of_radical_parameters :
-    ∀ (B : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B] (q : Ideal B) (κ : Type) [Finite κ] (x : κ → B), (∀ k, x k ∈ maximalIdeal B) → (∀ p : Ideal B, p.IsPrime → q ≤ p → (∀ k, x k ∈ p) → maximalIdeal B ≤ p) → ringKrullDim (B ⧸ q) ≤ Nat.card κ := by
+theorem UpperTheory.krullDim_quotient_le_card_of_radical_parameters
+    : ∀ (B : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B] (q : Ideal B) (κ : Type)
+        [Finite κ] (x : κ → B),
+      (∀ k, x k ∈ maximalIdeal B)
+        → (∀ p : Ideal B, p.IsPrime → q ≤ p → (∀ k, x k ∈ p) → maximalIdeal B ≤ p)
+        → ringKrullDim (B ⧸ q) ≤ Nat.card κ := by
   intro B _ _ _ q κ _ x hx h
   classical
   by_cases hq : q = ⊤
@@ -41,7 +45,8 @@ theorem UpperTheory.krullDim_quotient_le_card_of_radical_parameters :
       exact fun hu => hy (hu.map _)
   have h2 := Ideal.height_le_card_of_mem_minimalPrimes_span hs hmin
   have h3 : s.ncard ≤ Nat.card κ := by
-    rw [← Set.ncard_univ, show s = (fun k => Ideal.Quotient.mk q (x k)) '' Set.univ from Set.image_univ.symm]
+    rw [← Set.ncard_univ,
+      show s = (fun k => Ideal.Quotient.mk q (x k)) '' Set.univ from Set.image_univ.symm]
     exact Set.ncard_image_le Set.finite_univ
   rw [← IsLocalRing.maximalIdeal_height_eq_ringKrullDim]
   have h4 : (maximalIdeal (B ⧸ q)).height ≤ (Nat.card κ : ℕ∞) := h2.trans (by exact_mod_cast h3)

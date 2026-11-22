@@ -8,12 +8,12 @@ open Matrix PositivityTheory.AutomorphicGaloisHodgeTate.Div
 namespace LateralTheory.DivDb.TanLiePf
 open LateralTheory.DivDb
 
-theorem DX_X {C : Type} [Field C] {N : ℕ} (Y : Mat C N) (p : Fin N × Fin N) :
-    DX Y (MvPolynomial.X p) = ∑ k, MvPolynomial.C (Y p.1 k) * MvPolynomial.X (k, p.2) := by
+theorem DX_X {C : Type} [Field C] {N : ℕ} (Y : Mat C N) (p : Fin N × Fin N)
+    : DX Y (MvPolynomial.X p) = ∑ k, MvPolynomial.C (Y p.1 k) * MvPolynomial.X (k, p.2) := by
   simp [DX, MvPolynomial.mkDerivation_X]
 
-theorem DX_comm {C : Type} [Field C] {N : ℕ} (Y Z : Mat C N) :
-    ⁅DX Y, DX Z⁆ = DX (Z * Y - Y * Z) := by
+theorem DX_comm {C : Type} [Field C] {N : ℕ} (Y Z : Mat C N)
+    : ⁅DX Y, DX Z⁆ = DX (Z * Y - Y * Z) := by
   apply MvPolynomial.derivation_ext
   intro p
   rw [Derivation.commutator_apply, DX_X, DX_X, DX_X]
@@ -22,7 +22,8 @@ theorem DX_comm {C : Type} [Field C] {N : ℕ} (Y Z : Mat C N) :
   simp only [Matrix.sub_apply, Matrix.mul_apply, ← Finset.sum_sub_distrib]
   simp only [sub_smul, Finset.sum_smul, ← Finset.sum_sub_distrib]
   rw [Finset.sum_comm]
-  apply Finset.sum_congr rfl; intro a _
+  apply Finset.sum_congr rfl
+  intro a _
   rw [Derivation.map_smul, Derivation.map_smul, DX_X, DX_X]
   simp only [MvPolynomial.C_mul', Finset.smul_sum, smul_smul, ← Finset.sum_sub_distrib]
 

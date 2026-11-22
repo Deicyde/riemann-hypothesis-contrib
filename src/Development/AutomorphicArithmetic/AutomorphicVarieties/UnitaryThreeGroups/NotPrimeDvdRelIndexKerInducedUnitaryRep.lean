@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 open Matrix IsLocalRing UpperTheory.V.U3 UpperTheory.V.Alg
 
-theorem UpperTheory.not_prime_dvd_relIndex_ker_inducedUnitaryRep :
-    ∀ (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] [CharP k l], l ≠ 2 → ∀ {Γ : Type} [Group Γ] (η : Γ →* ℤˣ) (Ψ : Γ →* kˣ) (I : Subgroup Γ),
+theorem UpperTheory.not_prime_dvd_relIndex_ker_inducedUnitaryRep
+    : ∀ (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] [CharP k l],
+      l ≠ 2
+        → ∀ {Γ : Type} [Group Γ] (η : Γ →* ℤˣ) (Ψ : Γ →* kˣ) (I : Subgroup Γ),
           ¬ l ∣ (I ⊓ (r0 η Ψ).ker).relIndex I := by
   intro l _ k _ _ _ hl2 Γ _ η Ψ I
   haveI := Fintype.ofFinite k
@@ -26,8 +28,8 @@ theorem UpperTheory.not_prime_dvd_relIndex_ker_inducedUnitaryRep :
   have h2 : (φ.domRestrict I).ker.index ∣ (Nat.card k - 1) * 2 := by
     rw [Subgroup.index_ker]
     have hd := Subgroup.card_subgroup_dvd_card (φ.domRestrict I).range
-    rwa [Nat.card_prod, Nat.card_units, Nat.card_eq_fintype_card (α := ℤˣ),
-      Fintype.card_units_int] at hd
+    rwa [Nat.card_prod, Nat.card_units, Nat.card_eq_fintype_card (α := ℤˣ), Fintype.card_units_int]
+      at hd
   rw [Nat.card_eq_fintype_card, hcard] at h2
   intro hdvd
   have h3 := dvd_trans hdvd (dvd_trans h1 h2)

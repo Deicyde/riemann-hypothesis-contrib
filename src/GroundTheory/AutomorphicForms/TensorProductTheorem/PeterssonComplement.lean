@@ -12,13 +12,15 @@ namespace PeterssonComplement
 
 open Polynomial
 
-variable {V : Type*} [AddCommGroup V] [Module ℂ V]
-  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ι : V →ₗ[ℂ] H)
+variable
+  {V : Type*} [AddCommGroup V] [Module ℂ V]
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  (ι : V →ₗ[ℂ] H)
 
 variable {ι}
 
-theorem aeval_mem {T : Module.End ℂ V} {Z : Submodule ℂ V} (hZ : ∀ z ∈ Z, T z ∈ Z) (q : ℂ[X]) :
-    ∀ z ∈ Z, aeval T q z ∈ Z := by
+theorem aeval_mem {T : Module.End ℂ V} {Z : Submodule ℂ V} (hZ : ∀ z ∈ Z, T z ∈ Z) (q : ℂ[X])
+    : ∀ z ∈ Z, aeval T q z ∈ Z := by
   induction q using Polynomial.induction_on with
   | C a =>
     intro z hz
@@ -33,7 +35,8 @@ theorem aeval_mem {T : Module.End ℂ V} {Z : Submodule ℂ V} (hZ : ∀ z ∈ Z
     rw [pow_succ, ← mul_assoc, map_mul, aeval_X, Module.End.mul_apply]
     exact ih _ (hZ z hz)
 
-theorem apply_aeval_comm (T : Module.End ℂ V) (q : ℂ[X]) (z : V) : T (aeval T q z) = aeval T q (T z) := by
+theorem apply_aeval_comm (T : Module.End ℂ V) (q : ℂ[X]) (z : V)
+    : T (aeval T q z) = aeval T q (T z) := by
   have h := (Commute.all (X : ℂ[X]) q).map (aeval T)
   rw [aeval_X] at h
   exact congrArg (fun L : Module.End ℂ V => L z) h.eq

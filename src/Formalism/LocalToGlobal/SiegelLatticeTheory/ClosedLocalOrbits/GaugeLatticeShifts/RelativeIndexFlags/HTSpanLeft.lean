@@ -17,11 +17,12 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E}
 
-theorem gmap_eq_iff (g : S.V ≃ₗ[E] S.V) (L : Submodule (𝓞 E) S.V) :
-    Formalism.HermitianLatticesTheory.gmap g L = L ↔ ∀ y, y ∈ L ↔ g y ∈ L := by
+theorem gmap_eq_iff (g : S.V ≃ₗ[E] S.V) (L : Submodule (𝓞 E) S.V)
+    : Formalism.HermitianLatticesTheory.gmap g L = L ↔ ∀ y, y ∈ L ↔ g y ∈ L := by
   have hm : ∀ x, x ∈ Formalism.HermitianLatticesTheory.gmap g L ↔ g.symm x ∈ L := by
     intro x
-    simp only [Formalism.HermitianLatticesTheory.gmap, Submodule.mem_map, LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
+    simp only [Formalism.HermitianLatticesTheory.gmap, Submodule.mem_map,
+      LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
     constructor
     · rintro ⟨y, hy, rfl⟩
       simpa using hy
@@ -39,8 +40,8 @@ theorem gmap_eq_iff (g : S.V ≃ₗ[E] S.V) (L : Submodule (𝓞 E) S.V) :
 
 variable (Λ : Submodule (𝓞 E) S.V)
 
-theorem isAutLam_mul {a b : S.V ≃ₗ[E] S.V} (ha : IsAutLam S Λ a) (hb : IsAutLam S Λ b) :
-    IsAutLam S Λ (a * b) := by
+theorem isAutLam_mul {a b : S.V ≃ₗ[E] S.V} (ha : IsAutLam S Λ a) (hb : IsAutLam S Λ b)
+    : IsAutLam S Λ (a * b) := by
   refine ⟨mul_mem ha.1 hb.1, (gmap_eq_iff _ _).2 fun y => ?_⟩
   rw [(gmap_eq_iff _ _).1 hb.2 y, (gmap_eq_iff _ _).1 ha.2 (b y)]
   rfl

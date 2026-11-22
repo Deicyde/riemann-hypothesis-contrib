@@ -11,7 +11,8 @@ open PowerSeries GlobalTheory.Honda Formalism.L2.Th1.CM
 
 namespace GlobalTheory
 
-theorem omegaK_quadratic : ∀ d : ℕ, d % 4 = 3 → omegaK d ^ 2 - omegaK d + (((d + 1) / 4 : ℕ) : ℂ) = 0 := by
+theorem omegaK_quadratic
+    : ∀ d : ℕ, d % 4 = 3 → omegaK d ^ 2 - omegaK d + (((d + 1) / 4 : ℕ) : ℂ) = 0 := by
   intro d hd
   have h4 : 4 ∣ d + 1 := by omega
   obtain ⟨k, hk⟩ := h4

@@ -11,10 +11,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.RegSS
 
-theorem exists_sq_of_not_isField_tensor {F E K : Type} [Field F] [CommRing E] [Algebra F E]
-    [Field K] [Algebra F K] (b : Module.Basis (Fin 2) F E) (d : F) (h0 : b 0 = 1)
-    (h1 : b 1 * b 1 = algebraMap F E d) (h : ¬ IsField (K ⊗[F] E)) :
-    ∃ c : K, c * c = algebraMap F K d := by
+theorem exists_sq_of_not_isField_tensor
+    {F E K : Type} [Field F] [CommRing E] [Algebra F E] [Field K] [Algebra F K]
+    (b : Module.Basis (Fin 2) F E) (d : F)
+    (h0 : b 0 = 1) (h1 : b 1 * b 1 = algebraMap F E d) (h : ¬ IsField (K ⊗[F] E))
+    : ∃ c : K, c * c = algebraMap F K d := by
   by_contra hc
   push_neg at hc
   apply h
@@ -39,8 +40,8 @@ theorem exists_sq_of_not_isField_tensor {F E K : Type} [Field F] [CommRing E] [A
         field_simp
         linear_combination hn
     refine ⟨(s * s - algebraMap F K d * (t * t))⁻¹ • (s • (1 : K ⊗[F] E) - t • B 1), ?_⟩
-    have : x * (s • (1 : K ⊗[F] E) - t • B 1) =
-        (s * s - algebraMap F K d * (t * t)) • (1 : K ⊗[F] E) := by
+    have : x * (s • (1 : K ⊗[F] E) - t • B 1)
+        = (s * s - algebraMap F K d * (t * t)) • (1 : K ⊗[F] E) := by
       rw [← hs]
       simp only [add_mul, mul_sub, smul_mul_assoc, mul_smul_comm, hB1, one_mul, mul_one]
       module
@@ -50,7 +51,8 @@ theorem splitIdempotents : SplitIdempotents := by
   intro F E _ _ _ _ σ hσ P _ _ k K _ _ ⟨e⟩
   classical
   obtain ⟨b, d, h0, hb, hd, h1⟩ := quad_exists_basis hσ
-  have hc : ∀ i : {i : Fin k // ¬ IsField (K i ⊗[F] E)}, ∃ c : K i, c * c * algebraMap F _ d = 1 := by
+  have hc
+      : ∀ i : {i : Fin k // ¬ IsField (K i ⊗[F] E)}, ∃ c : K i, c * c * algebraMap F _ d = 1 := by
     intro i
     obtain ⟨c, hc⟩ := exists_sq_of_not_isField_tensor b d h0 h1 i.2
     have hc0 : c ≠ 0 := by
@@ -60,10 +62,14 @@ theorem splitIdempotents : SplitIdempotents := by
   choose c hc using hc
   let u : {i : Fin k // ¬ IsField (K i ⊗[F] E)} → P := fun i => e.symm (Pi.single i.1 1)
   let v : {i : Fin k // ¬ IsField (K i ⊗[F] E)} → P := fun i => e.symm (Pi.single i.1 (c i))
-  have same : ∀ (i : Fin k) (x y : K i), e.symm (Pi.single i x) * e.symm (Pi.single i y) =
-      e.symm (Pi.single i (x * y)) := fun i x y => by rw [← map_mul, Pi.single_mul]
-  have diff : ∀ (i j : Fin k) (x : K i) (y : K j), i ≠ j →
-      e.symm (Pi.single i x) * e.symm (Pi.single j y) = 0 := fun i j x y hij => by
+  have same
+      : ∀ (i : Fin k) (x y : K i),
+        e.symm (Pi.single i x) * e.symm (Pi.single i y)
+          = e.symm (Pi.single i (x * y)) := fun i x y => by
+    rw [← map_mul, Pi.single_mul]
+  have diff
+      : ∀ (i j : Fin k) (x : K i) (y : K j),
+        i ≠ j → e.symm (Pi.single i x) * e.symm (Pi.single j y) = 0 := fun i j x y hij => by
     rw [← map_mul, ← map_zero e.symm]
     congr 1
     ext l
@@ -80,11 +86,18 @@ theorem splitIdempotents : SplitIdempotents := by
     congr 1
     simp only [u, v, same]
     rw [← map_smul, ← Pi.single_smul, Algebra.smul_def, mul_comm, hc]
-  have hconj : ∀ j, tConj P σ ((2⁻¹ : F) • (u j ⊗ₜ[F] (1 : E) + v j ⊗ₜ[F] b 1)) =
-      (2⁻¹ : F) • (u j ⊗ₜ[F] (1 : E) - v j ⊗ₜ[F] b 1) := fun j => by
+  have hconj
+      : ∀ j,
+        tConj P σ ((2⁻¹ : F) • (u j ⊗ₜ[F] (1 : E) + v j ⊗ₜ[F] b 1))
+          = (2⁻¹ : F) • (u j ⊗ₜ[F] (1 : E) - v j ⊗ₜ[F] b 1) := fun j => by
     simp [tConj, hb, TensorProduct.tmul_neg, sub_eq_add_neg]
-  refine ⟨fun i => (2⁻¹ : F) • (u i ⊗ₜ[F] (1 : E) + v i ⊗ₜ[F] b 1), fun i hi => ?_, fun i => ?_,
-    fun i j hij => ?_, fun i j => ?_⟩
+  refine ⟨
+    fun i => (2⁻¹ : F) • (u i ⊗ₜ[F] (1 : E) + v i ⊗ₜ[F] b 1),
+    fun i hi => ?_,
+    fun i => ?_,
+    fun i j hij => ?_,
+    fun i j => ?_
+  ⟩
   · have hi' : u i ⊗ₜ[F] (b 0) + v i ⊗ₜ[F] b 1 = 0 := by
       rw [h0]; exact (smul_eq_zero.1 hi).resolve_left (inv_ne_zero two_ne_zero)
     have h2 := congrArg (fun x => (Algebra.TensorProduct.basis P b).repr x 0) hi'

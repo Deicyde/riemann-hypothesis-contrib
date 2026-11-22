@@ -10,8 +10,8 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-private theorem mem_bor_iff {F : Type} [Field F] [NumberField F] (g : G1 F) :
-    g ∈ M.Bor F ↔ g 1 0 = 0 := by
+private theorem mem_bor_iff {F : Type} [Field F] [NumberField F] (g : G1 F)
+    : g ∈ M.Bor F ↔ g 1 0 = 0 := by
   constructor
   · intro h
     exact h (show (id (0 : Fin 2)) < id (1 : Fin 2) by decide)
@@ -22,26 +22,32 @@ private theorem mem_bor_iff {F : Type} [Field F] [NumberField F] (g : G1 F) :
     subst hi hj
     exact h
 
-private theorem nm_val {F : Type} [Field F] [NumberField F] (a : (A F)ˣ) (b : A F) :
-    (nU b * mD a).1 = !![(a : A F), b * ((a⁻¹ : (A F)ˣ) : A F); 0, ((a⁻¹ : (A F)ˣ) : A F)] := by
+private theorem nm_val {F : Type} [Field F] [NumberField F] (a : (A F)ˣ) (b : A F)
+    : (nU b * mD a).1 = !![(a : A F), b * ((a⁻¹ : (A F)ˣ) : A F); 0, ((a⁻¹ : (A F)ˣ) : A F)] := by
   rw [M.val_mul]
   ext i j
   fin_cases i <;> fin_cases j <;> simp [nU, mD, Matrix.mul_apply, Fin.sum_univ_two]
 
-private theorem upperTriangular_diagonal_product {F : Type} [Field F] [NumberField F] (g : G1 F) (h : g 1 0 = 0) :
-    g 0 0 * g 1 1 = 1 := by
+private theorem upperTriangular_diagonal_product
+    {F : Type} [Field F] [NumberField F] (g : G1 F) (h : g 1 0 = 0)
+    : g 0 0 * g 1 1 = 1 := by
   have hd := g.det_coe
   rw [Matrix.det_fin_two] at hd
   have h' : g.1 1 0 = 0 := h
   rw [h', mul_zero, sub_zero] at hd
   exact hd
 
-private def dg {F : Type} [Field F] [NumberField F] (g : M.Bor F) : IdeleGroup F :=
-  ⟨g.1 0 0, g.1 1 1, upperTriangular_diagonal_product g.1 ((mem_bor_iff g.1).1 g.2),
-    (mul_comm _ _).trans (upperTriangular_diagonal_product g.1 ((mem_bor_iff g.1).1 g.2))⟩
+private def dg {F : Type} [Field F] [NumberField F] (g : M.Bor F) : IdeleGroup F := ⟨
+  g.1 0 0,
+  g.1 1 1,
+  upperTriangular_diagonal_product g.1 ((mem_bor_iff g.1).1 g.2),
+  (mul_comm _ _).trans (upperTriangular_diagonal_product g.1 ((mem_bor_iff g.1).1 g.2))
+⟩
 
-theorem UpperTheory.ConvolutionTheory.R2.M.borHomeo :
-    ∀ (F : Type) [Field F] [NumberField F], IsClosed (M.Bor F : Set (G1 F)) ∧ ∃ e : IdeleGroup F × A F ≃ₜ M.Bor F, ∀ p, (e p : G1 F) = nU p.2 * mD p.1 := by
+theorem UpperTheory.ConvolutionTheory.R2.M.borHomeo
+    : ∀ (F : Type) [Field F] [NumberField F],
+      IsClosed (M.Bor F : Set (G1 F))
+        ∧ ∃ e : IdeleGroup F × A F ≃ₜ M.Bor F, ∀ p, (e p : G1 F) = nU p.2 * mD p.1 := by
   intro F _ _
   refine ⟨?_, ?_⟩
   · have : (M.Bor F : Set (G1 F)) = {g | g 1 0 = 0} := Set.ext mem_bor_iff
@@ -52,19 +58,26 @@ theorem UpperTheory.ConvolutionTheory.R2.M.borHomeo :
       show (nU p.2 * mD p.1).1 1 0 = 0
       rw [nm_val]
       simp
-    refine ⟨{ toFun := fun p => ⟨nU p.2 * mD p.1, hmem p⟩
-              invFun := fun g => (dg g, g.1 0 1 * g.1 0 0)
-              left_inv := ?_
-              right_inv := ?_
-              continuous_toFun := ?_
-              continuous_invFun := ?_ }, fun p => rfl⟩
+    refine ⟨
+      {
+        toFun := fun p => ⟨nU p.2 * mD p.1, hmem p⟩
+        invFun := fun g => (dg g, g.1 0 1 * g.1 0 0)
+        left_inv := ?_
+        right_inv := ?_
+        continuous_toFun := ?_
+        continuous_invFun := ?_
+      },
+      fun p => rfl
+    ⟩
     · rintro ⟨a, b⟩
       have e00 : (nU b * mD a) 0 0 = (a : A F) := by
         show (nU b * mD a).1 0 0 = _
-        rw [nm_val]; simp
+        rw [nm_val]
+        simp
       have e01 : (nU b * mD a) 0 1 = b * ((a⁻¹ : (A F)ˣ) : A F) := by
         show (nU b * mD a).1 0 1 = _
-        rw [nm_val]; simp
+        rw [nm_val]
+        simp
       refine Prod.ext (Units.ext e00) ?_
       show (nU b * mD a) 0 1 * (nU b * mD a) 0 0 = b
       rw [e00, e01, mul_assoc, Units.inv_mul, mul_one]

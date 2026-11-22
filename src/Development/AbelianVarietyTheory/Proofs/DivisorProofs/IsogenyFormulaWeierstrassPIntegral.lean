@@ -12,13 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIntegralWe
 @[expose] public section
 
 open scoped UpperHalfPlane MatrixGroups Matrix ModularForm ComplexConjugate
-open NumberField GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
+open NumberField GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal
+  ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
 open GlobalTheory.CMVal GlobalTheory.HeckeGal
 open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.IsogFormula
 
-theorem main : ∀ (L : PeriodPair) (α β Ω P : ℂ) (M n : ℕ), MulStable L β → β.im ≠ 0 → Ω ^ 12 = latDisc L → MulStable L α → Complex.normSq α = n → 0 < n → 0 < M → P ∉ L.lattice → (M : ℂ) * P ∈ L.lattice → IsIntegral ℤ (((M * n : ℕ) : ℂ) ^ 2 * ((α ^ 2 - n) * ((s2 L + L.weierstrassP P) / Ω ^ 2) - (α ^ 2 - 1) * (L.weierstrassP P / Ω ^ 2))) := by
+theorem main
+    : ∀ (L : PeriodPair) (α β Ω P : ℂ) (M n : ℕ),
+      MulStable L β → β.im ≠ 0 → Ω ^ 12 = latDisc L → MulStable L α → Complex.normSq α = n → 0 < n
+        → 0 < M → P ∉ L.lattice → (M : ℂ) * P ∈ L.lattice
+        → IsIntegral ℤ
+          (((M * n : ℕ) : ℂ) ^ 2
+            * ((α ^ 2 - n) * ((s2 L + L.weierstrassP P) / Ω ^ 2)
+              - (α ^ 2 - 1) * (L.weierstrassP P / Ω ^ 2))) := by
   intro L α β Ω P M n hβ hβim hΩ hα hnorm hn hM hP hMP
   have hα0 : α ≠ 0 := by
     rintro rfl
@@ -32,7 +40,9 @@ theorem main : ∀ (L : PeriodPair) (α β Ω P : ℂ) (M n : ℕ), MulStable L 
   have hcardn : S.card + 1 = n := by
     rw [hnorm] at hcard
     exact_mod_cast hcard
-  have hVL := (GlobalTheory.T.isIntegral_weierstrassP_torsion_nonreal_multiplier L β Ω (M * n) hβ hβim hΩ (Nat.mul_pos hM hn)).2
+  have hVL :=
+    (GlobalTheory.T.isIntegral_weierstrassP_torsion_nonreal_multiplier L β Ω (M * n) hβ hβim hΩ
+      (Nat.mul_pos hM hn)).2
   have hnat : ∀ (k : ℕ) (x : ℂ), x ∈ L.lattice → (k : ℂ) * x ∈ L.lattice := by
     intro k x hx
     have := L.lattice.nsmul_mem hx k
@@ -56,15 +66,22 @@ theorem main : ∀ (L : PeriodPair) (α β Ω P : ℂ) (M n : ℕ), MulStable L 
     rw [← hs2, hnorm]
     simp
   have hnc : (n : ℂ) = (S.card : ℂ) + 1 := by exact_mod_cast hcardn.symm
-  have key : ((M * n : ℕ) : ℂ) ^ 2 * ((α ^ 2 - n) * ((s2 L + L.weierstrassP P) / Ω ^ 2)
-      - (α ^ 2 - 1) * (L.weierstrassP P / Ω ^ 2))
-      = ∑ T ∈ S, ((M * n : ℕ) : ℂ) ^ 2 * (L.weierstrassP T - L.weierstrassP P) / Ω ^ 2 := by
-    have e1 : ∑ T ∈ S, ((M * n : ℕ) : ℂ) ^ 2 * (L.weierstrassP T - L.weierstrassP P) / Ω ^ 2
-        = ((M * n : ℕ) : ℂ) ^ 2 * (∑ T ∈ S, L.weierstrassP T - (S.card : ℂ) * L.weierstrassP P) / Ω ^ 2 := by
-      rw [← Finset.sum_div, ← Finset.mul_sum, Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul]
+  have key
+      : ((M * n : ℕ) : ℂ) ^ 2
+          * ((α ^ 2 - n) * ((s2 L + L.weierstrassP P) / Ω ^ 2)
+            - (α ^ 2 - 1) * (L.weierstrassP P / Ω ^ 2))
+        = ∑ T ∈ S, ((M * n : ℕ) : ℂ) ^ 2 * (L.weierstrassP T - L.weierstrassP P) / Ω ^ 2 := by
+    have e1
+        : ∑ T ∈ S, ((M * n : ℕ) : ℂ) ^ 2 * (L.weierstrassP T - L.weierstrassP P) / Ω ^ 2
+          = ((M * n : ℕ) : ℂ) ^ 2 * (∑ T ∈ S, L.weierstrassP T - (S.card : ℂ) * L.weierstrassP P)
+            / Ω ^ 2 := by
+      rw [← Finset.sum_div, ← Finset.mul_sum, Finset.sum_sub_distrib, Finset.sum_const,
+        nsmul_eq_mul]
     rw [e1, ← hs2']
-    rw [show (α ^ 2 - (n : ℂ)) * ((s2 L + L.weierstrassP P) / Ω ^ 2) - (α ^ 2 - 1) * (L.weierstrassP P / Ω ^ 2)
-        = ((α ^ 2 - (n : ℂ)) * s2 L + (1 - (n : ℂ)) * L.weierstrassP P) / Ω ^ 2 by ring]
+    rw [show (α ^ 2 - (n : ℂ)) * ((s2 L + L.weierstrassP P) / Ω ^ 2)
+          - (α ^ 2 - 1) * (L.weierstrassP P / Ω ^ 2)
+        = ((α ^ 2 - (n : ℂ)) * s2 L + (1 - (n : ℂ)) * L.weierstrassP P) / Ω ^ 2 by
+      ring]
     rw [hnc]
     ring
   rw [key]

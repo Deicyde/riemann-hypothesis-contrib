@@ -8,24 +8,30 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 open scoped Matrix
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.V.Z.Sym.Ga.conjOn :
-    ∀ (k : Type) [Field k] [IsAlgClosed k] (H : Type) [Group H] (n : ℕ) (R R' : H →* GL (Fin n) k), IsIrr R → ∀ x₀ y₀ : GL (Fin n) k, (∀ h, Ga.tr (x₀ * R h) = Ga.tr (y₀ * R' h)) → RepIso R R' := by
+theorem UpperTheory.V.Z.Sym.Ga.conjOn
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (H : Type) [Group H] (n : ℕ)
+        (R R' : H →* GL (Fin n) k),
+      IsIrr R
+        → ∀ x₀ y₀ : GL (Fin n) k, (∀ h, Ga.tr (x₀ * R h) = Ga.tr (y₀ * R' h)) → RepIso R R' := by
   intro k _ _ H _ n R R' hR x₀ y₀ htr
   classical
   let φ : H →* Matrix (Fin n) (Fin n) k := (Units.coeHom _).comp R'
   let ψ : H →* Matrix (Fin n) (Fin n) k := (Units.coeHom _).comp R
   let f : Matrix (Fin n) (Fin n) k →ₗ[k] k :=
     (Matrix.traceLinearMap (Fin n) k k) ∘ₗ LinearMap.mulLeft k (y₀ : Matrix (Fin n) (Fin n) k)
-  obtain ⟨hdim, hker⟩ := Ga.kerLe k H n R hR x₀ (Matrix (Fin n) (Fin n) k) φ f
-    (fun h => by simpa [f, φ, Ga.tr] using htr h)
+  obtain ⟨hdim, hker⟩ :=
+    Ga.kerLe k H n R hR x₀ (Matrix (Fin n) (Fin n) k) φ f
+      (fun h => by simpa [f, φ, Ga.tr] using htr h)
   have htop : Algebra.adjoin k (Set.range φ) = ⊤ := by
     apply Subalgebra.toSubmodule_injective
     apply Submodule.eq_top_of_finrank_eq
@@ -47,12 +53,14 @@ theorem UpperTheory.V.Z.Sym.Ga.conjOn :
       (Ideal.quotientKerAlgEquivOfSurjective hs).symm.toAlgHom
   have hT : ∀ h, T (φ h) = ψ h := by
     intro h
-    have h1 : (Ideal.quotientKerAlgEquivOfSurjective hs).symm (φ h) =
-        Ideal.Quotient.mk (RingHom.ker P) (MonoidAlgebra.of k H h) := by
+    have h1
+        : (Ideal.quotientKerAlgEquivOfSurjective hs).symm (φ h)
+          = Ideal.Quotient.mk (RingHom.ker P) (MonoidAlgebra.of k H h) := by
       rw [AlgEquiv.symm_apply_eq]
       simp [P]
     change Ideal.Quotient.liftₐ (RingHom.ker P) Q hk
-      ((Ideal.quotientKerAlgEquivOfSurjective hs).symm (φ h)) = ψ h
+        ((Ideal.quotientKerAlgEquivOfSurjective hs).symm (φ h))
+      = ψ h
     rw [h1]
     change Q (MonoidAlgebra.of k H h) = ψ h
     simp [Q]

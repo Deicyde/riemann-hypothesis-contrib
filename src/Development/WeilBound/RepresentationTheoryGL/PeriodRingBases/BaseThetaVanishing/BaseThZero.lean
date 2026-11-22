@@ -27,8 +27,8 @@ theorem th_alg (b : BdRp l) : th l (algebraMap (BdRp l) (BdR l) b) = θD l b := 
   congr 1
   exact IsFractionRing.injective (BdRp l) (BdR l) (RingHom.mem_range.1 hm).choose_spec
 
-theorem σD_alg (g : GQ l) (b : BdRp l) :
-    σD g (algebraMap (BdRp l) (BdR l) b) = algebraMap (BdRp l) (BdR l) (toBot g • b) :=
+theorem σD_alg (g : GQ l) (b : BdRp l)
+    : σD g (algebraMap (BdRp l) (BdR l) b) = algebraMap (BdRp l) (BdR l) (toBot g • b) :=
   galBdRField_algebraMap _ _
 
 theorem tQ_alg : tQ l = algebraMap (BdRp l) (BdR l) (tBdR l) := DeRhamTwist.Twist.tQ_eq
@@ -44,7 +44,8 @@ theorem orbit_alg (y : PadicAlgCl l) : Continuous fun g : GQ l => g y := by
   rw [mul_smul, inv_smul_eq_iff] at h
   exact h
 
-theorem σC_coe (g : GQ l) (y : PadicAlgCl l) : σC g (y : ℂ_[l]) = ((g y : PadicAlgCl l) : ℂ_[l]) := by
+theorem σC_coe (g : GQ l) (y : PadicAlgCl l)
+    : σC g (y : ℂ_[l]) = ((g y : PadicAlgCl l) : ℂ_[l]) := by
   show toBot g • (y : ℂ_[l]) = _
   rw [gal_smul_coe]
   rfl
@@ -85,8 +86,8 @@ theorem base_σC_mul : ∀ (g h : GQ l) x, σC (g * h) x = σC g (σC h x) := by
 theorem base_σ_u : ∀ g : GQ l, σD g (uQ l) = uQ l + qQ l (κ g) * tQ l := by
   intro g
   show σD g (algebraMap (BdRp l) (BdR l) (uBdR l)) = _
-  rw [σD_alg, gal_smul_uBdR_eq untilt_epsilon untilt_frobeniusEquiv_symm_epsilon_ne_one (toBot g), map_add (f := _),
-    map_mul, tQ_alg]
+  rw [σD_alg, gal_smul_uBdR_eq untilt_epsilon untilt_frobeniusEquiv_symm_epsilon_ne_one (toBot g),
+    map_add (f := _), map_mul, tQ_alg]
   rfl
 
 theorem base_κ_mul : ∀ g h : GQ l, κ (g * h) = κ g + χ g * κ h := by
@@ -136,12 +137,21 @@ theorem base_th_zero : ∀ x ∈ Plus l, (th l x = 0 ↔ ∃ y ∈ Plus l, x = t
     refine ⟨c, IsFractionRing.injective (BdRp l) (BdR l) ?_⟩
     rw [h, tQ_alg, ← map_mul, mul_comm]
 
-theorem base_val : ∀ x : BdR l, x ≠ 0 → ∃ (i : ℤ) (u v : BdR l), u ∈ Plus l ∧ v ∈ Plus l ∧ u * v = 1 ∧
-    x = tQ l ^ i * u := by
+theorem base_val
+    : ∀ x : BdR l,
+      x ≠ 0 → ∃ (i : ℤ) (u v : BdR l), u ∈ Plus l ∧ v ∈ Plus l ∧ u * v = 1 ∧ x = tQ l ^ i * u := by
   intro x hx
-  obtain ⟨i, u, h⟩ := ACris.exists_eq_zpow_mul_unit untilt_epsilon untilt_frobeniusEquiv_symm_epsilon_ne_one hx
-  refine ⟨i, algebraMap (BdRp l) (BdR l) (u : BdRp l), algebraMap (BdRp l) (BdR l) ((u⁻¹ : (BdRp l)ˣ) : BdRp l),
-    ⟨_, rfl⟩, ⟨_, rfl⟩, by rw [← map_mul, Units.mul_inv, map_one], ?_⟩
+  obtain ⟨i, u, h⟩ :=
+    ACris.exists_eq_zpow_mul_unit untilt_epsilon untilt_frobeniusEquiv_symm_epsilon_ne_one hx
+  refine ⟨
+    i,
+    algebraMap (BdRp l) (BdR l) (u : BdRp l),
+    algebraMap (BdRp l) (BdR l) ((u⁻¹ : (BdRp l)ˣ) : BdRp l),
+    ⟨_, rfl⟩,
+    ⟨_, rfl⟩,
+    by rw [← map_mul, Units.mul_inv, map_one],
+    ?_
+  ⟩
   rw [h, tQ_alg]
   rfl
 
@@ -151,14 +161,16 @@ theorem base_orbit : ∀ x : ℂ_[l], Continuous fun g : GQ l => σC g x := by
   intro g₀
   rw [ContinuousAt, Metric.tendsto_nhds]
   intro ε hε
-  obtain ⟨_, ⟨y, rfl⟩, hxy⟩ := Metric.mem_closure_iff.1 (UniformSpace.Completion.denseRange_coe x) (ε / 3)
-    (by positivity)
+  obtain ⟨_, ⟨y, rfl⟩, hxy⟩ :=
+    Metric.mem_closure_iff.1 (UniformSpace.Completion.denseRange_coe x) (ε / 3) (by positivity)
   have hc := (UniformSpace.Completion.continuous_coe (PadicAlgCl l)).comp (orbit_alg (l := l) y)
   filter_upwards [Metric.tendsto_nhds.1 (hc.tendsto g₀) (ε / 3) (by positivity)] with g hg
   have h1 : dist (((g y : PadicAlgCl l) : ℂ_[l])) (((g₀ y : PadicAlgCl l) : ℂ_[l])) < ε / 3 := hg
-  calc dist (σC g x) (σC g₀ x)
-      ≤ dist (σC g x) (σC g (y : ℂ_[l])) + dist (σC g (y : ℂ_[l])) (σC g₀ (y : ℂ_[l])) +
-          dist (σC g₀ (y : ℂ_[l])) (σC g₀ x) := dist_triangle4 _ _ _ _
+  calc
+    dist (σC g x) (σC g₀ x)
+        ≤ dist (σC g x) (σC g (y : ℂ_[l])) + dist (σC g (y : ℂ_[l])) (σC g₀ (y : ℂ_[l]))
+          + dist (σC g₀ (y : ℂ_[l])) (σC g₀ x) :=
+      dist_triangle4 _ _ _ _
     _ < ε := by
       rw [σC_dist, σC_dist, σC_coe, σC_coe, dist_comm (y : ℂ_[l]) x]
       linarith

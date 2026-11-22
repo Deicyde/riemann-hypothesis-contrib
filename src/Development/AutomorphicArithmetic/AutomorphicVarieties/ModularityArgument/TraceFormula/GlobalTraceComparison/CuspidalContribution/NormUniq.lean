@@ -8,10 +8,11 @@ public import Development.WeilBound.RepresentationTheoryGL.ResidualSpectrum.Slic
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.LFun UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.LFun
+  UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp.normUniq :
-    NormUniq := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp.normUniq : NormUniq := by
   intro E _ _ _ N hN π π₀ z hπ h₀ e
   have hI : π.Iso (π₀.twist (Model.absC E z)) := Quotient.exact e.symm
   have hz : z = 0 := PositivityTheory.Rg.Rs.StrStepB.eq_zero_of_iso_twist hN hπ h₀ hI

@@ -7,19 +7,23 @@ public import GroundTheory.LocalFields.KroneckerWeber
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
 theorem ordIs_padic_self (l : ℕ) [Fact l.Prime] : OrdIs ℚ_[l] l 1 := by
   unfold OrdIs
-  rw [IsDiscreteValuationRing.addVal_uniformizer (GroundTheory.LocalField.Padic.irreducible_natCast_integer l)]
+  rw [IsDiscreteValuationRing.addVal_uniformizer
+    (GroundTheory.LocalField.Padic.irreducible_natCast_integer l)]
   rfl
 
-theorem ordIs_eq_card_inertia : ∀ (l : ℕ) [Fact l.Prime] (L : Type) [Field L] [ValuativeRel L] [TopologicalSpace L]
-    [IsNonarchimedeanLocalField L] [Algebra ℚ_[l] L] [ValuativeExtension ℚ_[l] L] [FiniteDimensional ℚ_[l] L]
-    [IsGalois ℚ_[l] L] [Algebra L (Om l)] [IsScalarTower ℚ_[l] L (Om l)],
-    OrdIs L l (Nat.card ↥(lowerRamificationGroup ℚ_[l] L 0)) := by
+theorem ordIs_eq_card_inertia
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Type) [Field L] [ValuativeRel L] [TopologicalSpace L]
+        [IsNonarchimedeanLocalField L] [Algebra ℚ_[l] L] [ValuativeExtension ℚ_[l] L]
+        [FiniteDimensional ℚ_[l] L] [IsGalois ℚ_[l] L] [Algebra L (Om l)]
+        [IsScalarTower ℚ_[l] L (Om l)],
+      OrdIs L l (Nat.card ↥(lowerRamificationGroup ℚ_[l] L 0)) := by
   intro l _ L _ _ _ _ _ _ _ _ _ _
   have hlL : (l : L) ≠ 0 := by
     rw [← map_natCast (algebraMap ℚ_[l] L)]
@@ -33,7 +37,8 @@ theorem ordIs_eq_card_inertia : ∀ (l : ℕ) [Fact l.Prime] (L : Type) [Field L
     rwa [Ne, IsDiscreteValuationRing.addVal_eq_top_iff]
   obtain ⟨E, hE⟩ := WithTop.ne_top_iff_exists.1 htop
   have hL : OrdIs L l E := by unfold OrdIs; rw [← hE]; rfl
-  obtain ⟨e, he, hEe, hram⟩ := GlobalTheory.T.normalizedValuationOfPrime_of_galoisExtension ℚ_[l] L l E hL
+  obtain ⟨e, he, hEe, hram⟩ :=
+    GlobalTheory.T.normalizedValuationOfPrime_of_galoisExtension ℚ_[l] L l E hL
   have h1 := ordIs_padic_self l
   unfold OrdIs at he h1
   have he1 : e = 1 := by

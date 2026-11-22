@@ -6,15 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSelfDualFo
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.WeylFour
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.WeylFour
 open scoped GlobalTheory.VacAny
 
 namespace GlobalTheory.WeylFour
 
-theorem schr_fourV_loc : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsStd ψ → ∀ (v : Pl (F := F)) (κ : Type) [Fintype κ]
-    (w : (κ → Fv F v) × (κ → Fv F v)) (φ : (κ → Fv F v) → ℂ),
-    fourV ψ v (schr (GlobalTheory.LatVac.psiAt ψ v) w φ) = schr (GlobalTheory.LatVac.psiAt ψ v) (w.2, -w.1) (fourV ψ v φ) := by
+theorem schr_fourV_loc
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+      IsStd ψ
+        → ∀ (v : Pl (F := F)) (κ : Type) [Fintype κ] (w : (κ → Fv F v) × (κ → Fv F v))
+            (φ : (κ → Fv F v) → ℂ),
+          fourV ψ v (schr (GlobalTheory.LatVac.psiAt ψ v) w φ)
+            = schr (GlobalTheory.LatVac.psiAt ψ v) (w.2, -w.1) (fourV ψ v φ) := by
   intro F _ _ ψ _ v κ _ w φ
   haveI hOc : CompactSpace (v.adicCompletionIntegers F) :=
     GlobalTheory.AdelicUnitaryTop.compactSpace_adicCompletionIntegers F v
@@ -43,18 +49,22 @@ theorem schr_fourV_loc : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar 
   set μ := Measure.pi fun _ : κ => measV ψ v
   let g : (κ → Fv F v) → ℂ := fun x =>
     χ ((x - w.1) ⬝ᵥ w.2 + ⅟(2 : Fv F v) * (w.1 ⬝ᵥ w.2)) * φ x * χ ((x - w.1) ⬝ᵥ y)
-  have hg : ∀ x, χ (x ⬝ᵥ w.2 + ⅟(2 : Fv F v) * (w.1 ⬝ᵥ w.2)) * φ (x + w.1) * χ (x ⬝ᵥ y) = g (x + w.1) := by
+  have hg
+      : ∀ x,
+        χ (x ⬝ᵥ w.2 + ⅟(2 : Fv F v) * (w.1 ⬝ᵥ w.2)) * φ (x + w.1) * χ (x ⬝ᵥ y) = g (x + w.1) := by
     intro x; simp only [g, add_sub_cancel_right]
   simp_rw [hg]
   rw [integral_add_right_eq_self g w.1, ← integral_const_mul]
   refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
   simp only [g]
-  have key : (x - w.1) ⬝ᵥ w.2 + ⅟(2 : Fv F v) * (w.1 ⬝ᵥ w.2) + (x - w.1) ⬝ᵥ y =
-      y ⬝ᵥ (-w.1) + ⅟(2 : Fv F v) * (w.2 ⬝ᵥ (-w.1)) + x ⬝ᵥ (y + w.2) := by
+  have key
+      : (x - w.1) ⬝ᵥ w.2 + ⅟(2 : Fv F v) * (w.1 ⬝ᵥ w.2) + (x - w.1) ⬝ᵥ y
+        = y ⬝ᵥ (-w.1) + ⅟(2 : Fv F v) * (w.2 ⬝ᵥ (-w.1)) + x ⬝ᵥ (y + w.2) := by
     simp only [sub_dotProduct, dotProduct_add, dotProduct_neg]
     rw [dotProduct_comm y w.1, dotProduct_comm w.2 w.1]
     linear_combination (w.1 ⬝ᵥ w.2) * h2
-  calc χ ((x - w.1) ⬝ᵥ w.2 + ⅟(2 : Fv F v) * (w.1 ⬝ᵥ w.2)) * φ x * χ ((x - w.1) ⬝ᵥ y)
+  calc
+    χ ((x - w.1) ⬝ᵥ w.2 + ⅟(2 : Fv F v) * (w.1 ⬝ᵥ w.2)) * φ x * χ ((x - w.1) ⬝ᵥ y)
       = φ x * (χ ((x - w.1) ⬝ᵥ w.2 + ⅟(2 : Fv F v) * (w.1 ⬝ᵥ w.2)) * χ ((x - w.1) ⬝ᵥ y)) := by ring
     _ = φ x * χ (y ⬝ᵥ (-w.1) + ⅟(2 : Fv F v) * (w.2 ⬝ᵥ (-w.1)) + x ⬝ᵥ (y + w.2)) := by
       rw [← AddChar.map_add_eq_mul, key]

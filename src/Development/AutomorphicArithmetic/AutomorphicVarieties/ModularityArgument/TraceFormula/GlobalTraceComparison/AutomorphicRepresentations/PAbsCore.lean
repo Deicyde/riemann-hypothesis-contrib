@@ -6,7 +6,8 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.Trace
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.AC
 
@@ -106,15 +107,15 @@ private lemma prod_single {I R : Type} [Monoid R] (u : I → R) (i : I) (l : Lis
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.AC
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.AC in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
-    TraceForm → AbsCore := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf : TraceForm → AbsCore := by
   intro hT I _ J M _ _ _ Y _ _ _ _ α a b A hM hrel haa hab hAA hAb hY
   classical
-  have hA : ∀ i p, A * FreeAlgebra.lift ℂ (a i) p = FreeAlgebra.lift ℂ (b i) p * A :=
-    fun i p => lift_conj _ _ A (hAb i) p
+  have hA : ∀ i p, A * FreeAlgebra.lift ℂ (a i) p = FreeAlgebra.lift ℂ (b i) p * A := fun i p =>
+    lift_conj _ _ A (hAb i) p
   have hAB : ∀ i k p q, Commute (FreeAlgebra.lift ℂ (a i) p) (FreeAlgebra.lift ℂ (b k) q) :=
     fun i k p q => lift_comm2 _ _ (hab i k) p q
-  have hAC : ∀ i k, i ≠ k → ∀ p q, Commute (FreeAlgebra.lift ℂ (a i) p) (FreeAlgebra.lift ℂ (a k) q) :=
+  have hAC
+      : ∀ i k, i ≠ k → ∀ p q, Commute (FreeAlgebra.lift ℂ (a i) p) (FreeAlgebra.lift ℂ (a k) q) :=
     fun i k h p q => lift_comm2 _ _ (haa i k h) p q
   have hnt : ∀ i, Nontrivial (M i) := by
     intro i
@@ -127,11 +128,13 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
     rw [map_one] at h1
     obtain ⟨y, hy⟩ := exists_ne (0 : Y)
     exact hy (by simpa using LinearMap.congr_fun h1 y)
-  have key : ∀ (x : ∀ i, FreeAlgebra ℂ (J i)) (l : List I), l.Nodup →
-      (l.map fun i => (Module.finrank ℂ (M i) : ℂ)).prod *
-          LinearMap.trace ℂ Y ((l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A) =
-        (l.map fun i => LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) (x i))).prod *
-          LinearMap.trace ℂ Y A := by
+  have key
+      : ∀ (x : ∀ i, FreeAlgebra ℂ (J i)) (l : List I),
+        l.Nodup
+          → (l.map fun i => (Module.finrank ℂ (M i) : ℂ)).prod
+              * LinearMap.trace ℂ Y ((l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A)
+            = (l.map fun i => LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) (x i))).prod
+              * LinearMap.trace ℂ Y A := by
     intro x l
     induction l with
     | nil => intro _; simp
@@ -139,58 +142,82 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
       intro hl
       have hn := List.nodup_cons.1 hl
       have ihl := ih hn.2
-      have c1 : ∀ p, Commute (FreeAlgebra.lift ℂ (a i) p)
-          (l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod := fun p =>
+      have c1
+          : ∀ p,
+            Commute (FreeAlgebra.lift ℂ (a i) p)
+              (l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod := fun p =>
         Commute.list_prod_right _ _ (by
           intro z hz
           obtain ⟨k, hk, rfl⟩ := List.mem_map.1 hz
           exact hAC i k (fun e => hn.1 (e ▸ hk)) p _)
-      have c2 : ∀ p, Commute (FreeAlgebra.lift ℂ (b i) p)
-          (l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod := fun p =>
+      have c2
+          : ∀ p,
+            Commute (FreeAlgebra.lift ℂ (b i) p)
+              (l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod := fun p =>
         Commute.list_prod_right _ _ (by
           intro z hz
           obtain ⟨k, hk, rfl⟩ := List.mem_map.1 hz
           exact (hAB k i _ p).symm)
       haveI := hnt i
-      have t := hT (J i) (M i) Y (α i) (a i)
-        ((l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A) (hM i) (hrel i)
-        (fun p p' => pullbackSymmetry_lift_map_comm _ _ (FreeAlgebra.lift ℂ (b i) p') _ A (hA i p') hAA (c1 p')
-          (hAB i i p p').symm (c2 p')) (x i)
+      have t :=
+        hT (J i) (M i) Y (α i) (a i) ((l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A)
+          (hM i) (hrel i)
+          (fun p p' =>
+            pullbackSymmetry_lift_map_comm _ _ (FreeAlgebra.lift ℂ (b i) p') _ A (hA i p') hAA
+              (c1 p') (hAB i i p p').symm (c2 p'))
+          (x i)
       simp only [List.map_cons, List.prod_cons]
       rw [mul_assoc (FreeAlgebra.lift ℂ (a i) (x i))]
       generalize (l.map fun i => (Module.finrank ℂ (M i) : ℂ)).prod = D at *
-      generalize (l.map fun i => LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) (x i))).prod = T at *
-      calc _ = D * ((Module.finrank ℂ (M i) : ℂ) * LinearMap.trace ℂ Y
-              (FreeAlgebra.lift ℂ (a i) (x i) * ((l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A))) := by ring
-        _ = LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) (x i)) * (D * LinearMap.trace ℂ Y
-              ((l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A)) := by rw [t]; ring
+      generalize (l.map fun i => LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) (x i))).prod = T
+        at *
+      calc
+        _ = D
+            * ((Module.finrank ℂ (M i) : ℂ) * LinearMap.trace ℂ Y
+              (FreeAlgebra.lift ℂ (a i) (x i)
+                * ((l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A))) := by
+          ring
+        _ = LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) (x i))
+            * (D * LinearMap.trace ℂ Y
+              ((l.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A)) := by
+          rw [t]; ring
         _ = _ := by rw [ihl]; ring
   have hDne : (∏ i, (Module.finrank ℂ (M i) : ℂ)) ≠ 0 := by
     refine Finset.prod_ne_zero_iff.2 fun i _ => ?_
     haveI := hnt i
     exact_mod_cast (Module.finrank_pos (R := ℂ) (M := M i)).ne'
-  have key' : ∀ x : ∀ i, FreeAlgebra ℂ (J i), (∏ i, (Module.finrank ℂ (M i) : ℂ)) *
-      LinearMap.trace ℂ Y (((Finset.univ : Finset I).toList.map
-        fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A) =
-      (∏ i, LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) (x i))) * LinearMap.trace ℂ Y A := by
+  have key'
+      : ∀ x : ∀ i, FreeAlgebra ℂ (J i),
+        (∏ i, (Module.finrank ℂ (M i) : ℂ)) * LinearMap.trace ℂ Y
+            (((Finset.univ : Finset I).toList.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod * A)
+          = (∏ i, LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) (x i)))
+            * LinearMap.trace ℂ Y A := by
     intro x
     have := key x (Finset.univ : Finset I).toList (Finset.nodup_toList _)
     simpa only [Finset.prod_map_toList] using this
-  have hPm : ∀ x y : ∀ i, FreeAlgebra ℂ (J i),
-      ((Finset.univ : Finset I).toList.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod *
-        ((Finset.univ : Finset I).toList.map fun i => FreeAlgebra.lift ℂ (a i) (y i)).prod =
-      ((Finset.univ : Finset I).toList.map fun i => FreeAlgebra.lift ℂ (a i) ((x * y) i)).prod := by
+  have hPm
+      : ∀ x y : ∀ i, FreeAlgebra ℂ (J i),
+        ((Finset.univ : Finset I).toList.map fun i => FreeAlgebra.lift ℂ (a i) (x i)).prod
+            * ((Finset.univ : Finset I).toList.map fun i => FreeAlgebra.lift ℂ (a i) (y i)).prod
+          = ((Finset.univ : Finset I).toList.map fun i =>
+            FreeAlgebra.lift ℂ (a i) ((x * y) i)).prod := by
     intro x y
     rw [prod_mul_prod _ _ _ (Finset.nodup_toList _) (fun i k h => hAC i k h _ _)]
     simp only [Pi.mul_apply, map_mul]
-  have hP1 : ((Finset.univ : Finset I).toList.map
-      fun i => FreeAlgebra.lift ℂ (a i) ((1 : ∀ i, FreeAlgebra ℂ (J i)) i)).prod = 1 :=
+  have hP1
+      : ((Finset.univ : Finset I).toList.map fun i =>
+          FreeAlgebra.lift ℂ (a i) ((1 : ∀ i, FreeAlgebra ℂ (J i)) i)).prod
+        = 1 :=
     List.prod_eq_one (by
       intro z hz
       obtain ⟨k, _, rfl⟩ := List.mem_map.1 hz
       simp)
-  have hPs : ∀ i f, ((Finset.univ : Finset I).toList.map fun k => FreeAlgebra.lift ℂ (a k)
-      ((Pi.mulSingle i (FreeAlgebra.ι ℂ f) : ∀ i, FreeAlgebra ℂ (J i)) k)).prod = a i f := by
+  have hPs
+      : ∀ i f,
+        ((Finset.univ : Finset I).toList.map fun k =>
+            FreeAlgebra.lift ℂ (a k)
+              ((Pi.mulSingle i (FreeAlgebra.ι ℂ f) : ∀ i, FreeAlgebra ℂ (J i)) k)).prod
+          = a i f := by
     intro i f
     rw [prod_single _ i _ (Finset.nodup_toList _) (Finset.mem_toList.2 (Finset.mem_univ i))
       (fun k hk => by simp [Pi.mulSingle_eq_of_ne hk])]
@@ -205,9 +232,10 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
       obtain ⟨k, _, rfl⟩ := List.mem_map.1 hz
       rw [hbl' i f]
       exact (hAB k i _ _).symm)
-  let Lin : Submodule ℂ (Module.End ℂ Y) := Submodule.span ℂ
-    (Set.range fun xy : (∀ i, FreeAlgebra ℂ (J i)) × (∀ i, FreeAlgebra ℂ (J i)) =>
-      P xy.1 * (A * P xy.2 * A))
+  let Lin : Submodule ℂ (Module.End ℂ Y) :=
+    Submodule.span ℂ
+      (Set.range fun xy : (∀ i, FreeAlgebra ℂ (J i)) × (∀ i, FreeAlgebra ℂ (J i)) =>
+        P xy.1 * (A * P xy.2 * A))
   let Sg : Set (Module.End ℂ Y) := {z | ∃ i f, z = a i f ∨ z = b i f}
   have hgen : ∀ g ∈ Sg, ∀ w ∈ Lin, g * w ∈ Lin := by
     intro g hg w hw
@@ -233,11 +261,12 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
     | zero => simp
     | add u v _ _ hu hv => rw [mul_add]; exact add_mem hu hv
     | smul r u _ hu => rw [mul_smul_comm]; exact Submodule.smul_mem _ _ hu
-  have hsurj := DiscreteGroups.T1.Desc.Swap3.burnside (Algebra.adjoin ℂ Sg).val (by
-    intro W hW
-    refine hY W fun i f x hx => ⟨?_, ?_⟩
-    · exact hW ⟨a i f, Algebra.subset_adjoin ⟨i, f, Or.inl rfl⟩⟩ x hx
-    · exact hW ⟨b i f, Algebra.subset_adjoin ⟨i, f, Or.inr rfl⟩⟩ x hx)
+  have hsurj :=
+    DiscreteGroups.T1.Desc.Swap3.burnside (Algebra.adjoin ℂ Sg).val (by
+      intro W hW
+      refine hY W fun i f x hx => ⟨?_, ?_⟩
+      · exact hW ⟨a i f, Algebra.subset_adjoin ⟨i, f, Or.inl rfl⟩⟩ x hx
+      · exact hW ⟨b i f, Algebra.subset_adjoin ⟨i, f, Or.inr rfl⟩⟩ x hx)
   have hall : ∀ z ∈ Algebra.adjoin ℂ Sg, ∀ w ∈ Lin, z * w ∈ Lin := by
     intro z hz
     induction hz using Algebra.adjoin_induction with
@@ -254,10 +283,14 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
       intro w hw
       rw [mul_assoc]
       exact hu _ (hv w hw)
-  have h1 : (1 : Module.End ℂ Y) ∈ Lin := Submodule.subset_span ⟨(1, 1), by
-    show P 1 * (A * P 1 * A) = 1
-    have : P 1 = 1 := hP1
-    rw [this, one_mul, mul_one, hAA]⟩
+  have h1 : (1 : Module.End ℂ Y) ∈ Lin :=
+    Submodule.subset_span ⟨
+      (1, 1),
+      by
+        show P 1 * (A * P 1 * A) = 1
+        have : P 1 = 1 := hP1
+        rw [this, one_mul, mul_one, hAA]
+    ⟩
   have hLin : ∀ z, z ∈ Lin := fun z => by
     obtain ⟨⟨z', hz'⟩, rfl⟩ := hsurj z
     simpa using hall z' hz' 1 h1
@@ -270,7 +303,9 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
         obtain ⟨⟨x, y⟩, rfl⟩ := hw
         show LinearMap.trace ℂ Y (P x * (A * P y * A) * A) = 0
         have e : P x * (A * P y * A) * A = (P x * A) * P y := by
-          calc P x * (A * P y * A) * A = P x * A * P y * (A * A) := by simp only [mul_assoc]
+          calc
+            P x * (A * P y * A) * A
+              = P x * A * P y * (A * A) := by simp only [mul_assoc]
             _ = _ := by rw [hAA, mul_one]
         rw [e, LinearMap.trace_mul_comm, ← mul_assoc]
         have e2 : P y * P x = P (y * x) := hPm y x
@@ -284,11 +319,13 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
     have := hz A (hLin A)
     rw [hAA, LinearMap.trace_one] at this
     exact (Nat.cast_ne_zero.2 (Module.finrank_pos (R := ℂ) (M := Y)).ne') this
-  refine ⟨LinearMap.trace ℂ Y A / ∏ i, (Module.finrank ℂ (M i) : ℂ), div_ne_zero htr hDne, fun f g => ?_⟩
+  refine
+    ⟨LinearMap.trace ℂ Y A / ∏ i, (Module.finrank ℂ (M i) : ℂ), div_ne_zero htr hDne, fun f g => ?_⟩
   let fi : ∀ i, FreeAlgebra ℂ (J i) := fun i => FreeAlgebra.ι ℂ (f i)
   let gi : ∀ i, FreeAlgebra ℂ (J i) := fun i => FreeAlgebra.ι ℂ (g i)
-  have e1 : ((Finset.univ : Finset I).toList.map fun i => a i (f i) * b i (g i)).prod =
-      P fi * ((Finset.univ : Finset I).toList.map fun i => b i (g i)).prod := by
+  have e1
+      : ((Finset.univ : Finset I).toList.map fun i => a i (f i) * b i (g i)).prod
+        = P fi * ((Finset.univ : Finset I).toList.map fun i => b i (g i)).prod := by
     rw [← show ((Finset.univ : Finset I).toList.map fun i => a i (f i)).prod = P fi by
       simp only [P, fi, FreeAlgebra.lift_ι_apply]]
     exact (prod_mul_prod _ _ _ (Finset.nodup_toList _) (fun i k _ => (hab k i _ _).symm)).symm
@@ -297,14 +334,18 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absCore_pf :
       simp only [P, gi, FreeAlgebra.lift_ι_apply]
     rw [this]
     exact conj_list _ _ A (fun i => (hAb i (g i)).symm) _
-  have e3 : LinearMap.trace ℂ Y (((Finset.univ : Finset I).toList.map
-      fun i => a i (f i) * b i (g i)).prod * A) = LinearMap.trace ℂ Y (P (gi * fi) * A) := by
+  have e3
+      : LinearMap.trace ℂ Y
+          (((Finset.univ : Finset I).toList.map fun i => a i (f i) * b i (g i)).prod * A)
+        = LinearMap.trace ℂ Y (P (gi * fi) * A) := by
     rw [e1, mul_assoc, e2, ← mul_assoc, LinearMap.trace_mul_comm, ← mul_assoc]
     have : P gi * P fi = P (gi * fi) := hPm gi fi
     rw [this]
   have e4 := key' (gi * fi)
-  have e5 : ∀ i, LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) ((gi * fi) i)) =
-      LinearMap.trace ℂ (M i) (α i (f i) * α i (g i)) := by
+  have e5
+      : ∀ i,
+        LinearMap.trace ℂ (M i) (FreeAlgebra.lift ℂ (α i) ((gi * fi) i))
+          = LinearMap.trace ℂ (M i) (α i (f i) * α i (g i)) := by
     intro i
     simp only [gi, fi, Pi.mul_apply, map_mul, FreeAlgebra.lift_ι_apply]
     exact LinearMap.trace_mul_comm _ _ _

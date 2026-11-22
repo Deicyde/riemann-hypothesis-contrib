@@ -8,23 +8,27 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem lam_push {n : ℕ} {R S H G : Type} [CommRing R] [CommRing S] [Group H] [Group G]
-    {E : GDet n R H} {D : GDet n S G} {f : R →+* S} {φ : H →* G}
-    (h : E.map f = D.comap φ) (i : ℕ) (y : MonoidAlgebra R H) :
-    f (E.lam i y) = D.lam i (MonoidAlgebra.mapDomainRingHom S φ (MonoidAlgebra.mapRingHom H f y)) := by
+private theorem lam_push
+    {n : ℕ} {R S H G : Type} [CommRing R] [CommRing S] [Group H] [Group G]
+    {E : GDet n R H} {D : GDet n S G} {f : R →+* S} {φ : H →* G} (h : E.map f = D.comap φ)
+    (i : ℕ) (y : MonoidAlgebra R H)
+    : f (E.lam i y)
+      = D.lam i (MonoidAlgebra.mapDomainRingHom S φ (MonoidAlgebra.mapRingHom H f y)) := by
   rw [← ((UpperTheory.V.CA.d_gmap E).2.2.1 f y).2 i, h]
   unfold GDet.lam
   generalize MonoidAlgebra.mapRingHom H f y = z
   congr 2
-  change (D.D (Polynomial S) (MonoidAlgebra.mapDomainRingHom (Polynomial S) φ _)).coeff =
-    (D.D (Polynomial S) _).coeff
+  change (D.D (Polynomial S) (MonoidAlgebra.mapDomainRingHom (Polynomial S) φ _)).coeff
+    = (D.D (Polynomial S) _).coeff
   ext k
-  have hcomm : ∀ z : MonoidAlgebra S H,
-      MonoidAlgebra.mapDomainRingHom (Polynomial S) φ (MonoidAlgebra.mapRingHom H Polynomial.C z) =
-        MonoidAlgebra.mapRingHom G Polynomial.C (MonoidAlgebra.mapDomainRingHom S φ z) := by
+  have hcomm
+      : ∀ z : MonoidAlgebra S H,
+        MonoidAlgebra.mapDomainRingHom (Polynomial S) φ (MonoidAlgebra.mapRingHom H Polynomial.C z)
+          = MonoidAlgebra.mapRingHom G Polynomial.C (MonoidAlgebra.mapDomainRingHom S φ z) := by
     intro z
     induction z using MonoidAlgebra.induction_linear with
     | zero => simp

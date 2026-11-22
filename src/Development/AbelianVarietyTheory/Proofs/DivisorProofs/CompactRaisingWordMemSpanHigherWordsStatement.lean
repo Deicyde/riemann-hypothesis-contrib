@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 open Matrix GlobalTheory.HolDS
 open Formalism.REAL (GlRel IsUnitary IsWeight KHighest root Jm inG)
 open Formalism.QuantumDeterminants (lowK IsHCParam)
-open Formalism.MainNotions.S (IsURepOn IsIrredOn UJset IsKFin IsKTypeOf IsKStableOn IsDS lowKSub vNormSq)
+open Formalism.MainNotions.S
+  (IsURepOn IsIrredOn UJset IsKFin IsKTypeOf IsKStableOn IsDS lowKSub vNormSq)
 open CompanionTheory.D.DSIC (KRel KUnit KStab IsSmMod)
 open CompanionTheory.D.LK (IsKMod IsMin)
 open scoped InnerProductSpace

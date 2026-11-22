@@ -8,7 +8,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 noncomputable section
 
 open scoped nonZeroDivisors Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 namespace UpperTheory.Gal.TP.Skew
 
@@ -35,9 +36,10 @@ theorem lineSkew : LineSkew := by
         intro x hx
         by_contra hx0
         exact h ⟨x, hx, hx0⟩
-      have h1 : (1 : E) ∈ 𝔞 := (hl.dual 1).2 (by
-        intro x hx o
-        simpa [hz x hx] using (isIntegral_zero : IsIntegral ℤ (0 : ℚ)))
+      have h1 : (1 : E) ∈ 𝔞 :=
+        (hl.dual 1).2 (by
+          intro x hx o
+          simpa [hz x hx] using (isIntegral_zero : IsIntegral ℤ (0 : ℚ)))
       exact h ⟨1, h1, one_ne_zero⟩
     obtain ⟨a, ha, ha0⟩ := ha
     refine ⟨?_⟩
@@ -53,7 +55,9 @@ theorem lineSkew : LineSkew := by
       by_cases h : j = i
       · subst j; simpa using ha
       · simp [h]
-    have hm := (Submodule.span E ((skewSpc F δ 𝔞 d).L : Set (Fin d → E))).smul_mem (x i / a) (Submodule.subset_span hs)
+    have hm :=
+      (Submodule.span E ((skewSpc F δ 𝔞 d).L : Set (Fin d → E))).smul_mem (x i / a)
+        (Submodule.subset_span hs)
     simpa [← Pi.single_smul, smul_eq_mul, div_mul_cancel₀ _ ha0] using hm
   case dual =>
     intro y
@@ -86,7 +90,9 @@ theorem lineSkew : LineSkew := by
   case cartan =>
     intro w
     obtain ⟨c, hc, he⟩ := hpos w
-    have hM : Complex.I • (skewSpc F δ 𝔞 d).J.map ⇑(B.emb w : E →+* ℂ) = (c : ℂ) • (1 : Matrix (Fin d) (Fin d) ℂ) := by
+    have hM
+        : Complex.I • (skewSpc F δ 𝔞 d).J.map ⇑(B.emb w : E →+* ℂ)
+          = (c : ℂ) • (1 : Matrix (Fin d) (Fin d) ℂ) := by
       ext i j
       by_cases h : i = j
       · subst h; simp [skewSpc, he]
@@ -94,30 +100,44 @@ theorem lineSkew : LineSkew := by
     have hθ : (skewSpc F δ 𝔞 d).θ w = 1 := rfl
     rw [hM, hθ]
     refine ⟨by simp, by simp, fun x hx => ?_⟩
-    have key : (1 : Matrix (Fin d) (Fin d) ℂ) *ᵥ x ⬝ᵥ ((c : ℂ) • (1 : Matrix (Fin d) (Fin d) ℂ)) *ᵥ star x = ((c * ∑ i, Complex.normSq (x i) : ℝ) : ℂ) := by
+    have key
+        : (1 : Matrix (Fin d) (Fin d) ℂ) *ᵥ x
+            ⬝ᵥ ((c : ℂ) • (1 : Matrix (Fin d) (Fin d) ℂ)) *ᵥ star x
+          = ((c * ∑ i, Complex.normSq (x i) : ℝ) : ℂ) := by
       simp [Matrix.smul_mulVec, dotProduct, Finset.mul_sum, Complex.mul_conj]
       refine Finset.sum_congr rfl (fun j _ => ?_)
       rw [← Complex.mul_conj]
       ring
     rw [key, Complex.ofReal_re]
     obtain ⟨i, hi⟩ := Function.ne_iff.1 hx
-    exact mul_pos hc (Finset.sum_pos' (fun j _ => Complex.normSq_nonneg _) ⟨i, Finset.mem_univ _, Complex.normSq_pos.2 hi⟩)
+    exact mul_pos hc
+      (Finset.sum_pos'
+        (fun j _ => Complex.normSq_nonneg _)
+        ⟨i, Finset.mem_univ _, Complex.normSq_pos.2 hi⟩)
   case sig =>
     intro w
     obtain ⟨c, hc, he⟩ := hpos w
-    have hM : Complex.I • (skewSpc F δ 𝔞 d).J.map ⇑(B.emb w : E →+* ℂ) = (c : ℂ) • (1 : Matrix (Fin d) (Fin d) ℂ) := by
+    have hM
+        : Complex.I • (skewSpc F δ 𝔞 d).J.map ⇑(B.emb w : E →+* ℂ)
+          = (c : ℂ) • (1 : Matrix (Fin d) (Fin d) ℂ) := by
       ext i j
       by_cases h : i = j
       · subst h; simp [skewSpc, he]
       · simp [skewSpc, h]
     rw [hM]
-    refine ⟨by simp, Matrix.of fun (k : Fin d) (p : Fin d ⊕ Fin 0) => Sum.elim (fun i => if k = i then (((Real.sqrt c)⁻¹ : ℝ) : ℂ) else 0) (fun z => z.elim0) p, ?_⟩
+    refine ⟨
+      by simp,
+      Matrix.of fun (k : Fin d) (p : Fin d ⊕ Fin 0) =>
+        Sum.elim (fun i => if k = i then (((Real.sqrt c)⁻¹ : ℝ) : ℂ) else 0) (fun z => z.elim0) p,
+      ?_
+    ⟩
     rw [Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul]
     ext (i | i) (j | j)
     · simp [Matrix.mul_apply, Matrix.one_apply, Function.swap_def, Sum.elim]
       split_ifs with h
       · rw [map_inv₀, Complex.conj_ofReal, ← mul_inv]
-        have hs : ((√c : ℝ) : ℂ) * (√c : ℂ) = c := by rw [← Complex.ofReal_mul, Real.mul_self_sqrt hc.le]
+        have hs : ((√c : ℝ) : ℂ) * (√c : ℂ) = c := by
+          rw [← Complex.ofReal_mul, Real.mul_self_sqrt hc.le]
         rw [hs, mul_inv_cancel₀ (by exact_mod_cast hc.ne')]
       · simp
     all_goals (first | exact i.elim0 | exact j.elim0)

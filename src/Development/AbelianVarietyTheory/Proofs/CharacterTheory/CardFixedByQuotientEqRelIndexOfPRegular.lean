@@ -6,10 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem conj_mem_zpowers_of_mem_of_pRegular {G : Type} [Group G] (c : G) (p : ℕ) (H : Subgroup G)
-    (hc : Nat.Coprime (orderOf c) p)
-    (hp : ∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ Subgroup.zpowers c) (g : G)
-    (hg : g⁻¹ * c * g ∈ H) : g⁻¹ * c * g ∈ Subgroup.zpowers c := by
+theorem conj_mem_zpowers_of_mem_of_pRegular
+    {G : Type} [Group G]
+    (c : G)
+    (p : ℕ)
+    (H : Subgroup G)
+    (hc : Nat.Coprime (orderOf c) p) (hp : ∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ Subgroup.zpowers c)
+    (g : G) (hg : g⁻¹ * c * g ∈ H)
+    : g⁻¹ * c * g ∈ Subgroup.zpowers c := by
   obtain ⟨k, hk⟩ := hp _ hg
   have ho : orderOf (g⁻¹ * c * g) = orderOf c := by
     have := (MulAut.conj g⁻¹).orderOf_eq c
@@ -21,8 +25,12 @@ theorem conj_mem_zpowers_of_mem_of_pRegular {G : Type} [Group G] (c : G) (p : �
   rw [← hm]
   exact Subgroup.pow_mem _ hk m
 
-theorem card_fixedBy_quotient_eq_relIndex_of_pRegular :
-    ∀ (G : Type) [Group G] [Finite G] (c : G) (p : ℕ) (H N : Subgroup G), Nat.Coprime (orderOf c) p → Subgroup.zpowers c ≤ H → (∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ Subgroup.zpowers c) → (∀ g : G, g ∈ N ↔ ∀ d ∈ Subgroup.zpowers c, g * d * g⁻¹ ∈ Subgroup.zpowers c) → Nat.card (MulAction.fixedBy (G ⧸ H) c) = H.relIndex N := by
+theorem card_fixedBy_quotient_eq_relIndex_of_pRegular
+    : ∀ (G : Type) [Group G] [Finite G] (c : G) (p : ℕ) (H N : Subgroup G),
+      Nat.Coprime (orderOf c) p → Subgroup.zpowers c ≤ H
+        → (∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ Subgroup.zpowers c)
+        → (∀ g : G, g ∈ N ↔ ∀ d ∈ Subgroup.zpowers c, g * d * g⁻¹ ∈ Subgroup.zpowers c)
+        → Nat.card (MulAction.fixedBy (G ⧸ H) c) = H.relIndex N := by
   intro G _ _ c p H N hc hH hp hN
   have key : ∀ g : G, c • (g : G ⧸ H) = (g : G ⧸ H) ↔ g ∈ N := by
     intro g
@@ -35,8 +43,7 @@ theorem card_fixedBy_quotient_eq_relIndex_of_pRegular :
       rw [← N.inv_mem_iff, hN]
       rintro d ⟨n, rfl⟩
       have h2 := Subgroup.zpow_mem _ hy n
-      have h3 : (g⁻¹ * c * g) ^ n = g⁻¹ * c ^ n * g⁻¹⁻¹ := by
-        rw [← conj_zpow, inv_inv]
+      have h3 : (g⁻¹ * c * g) ^ n = g⁻¹ * c ^ n * g⁻¹⁻¹ := by rw [← conj_zpow, inv_inv]
       rw [h3] at h2
       exact h2
     · intro hg
@@ -54,12 +61,12 @@ theorem card_fixedBy_quotient_eq_relIndex_of_pRegular :
     · intro x y
       induction x using QuotientGroup.induction_on with
       | H a =>
-      induction y using QuotientGroup.induction_on with
-      | H b =>
-      intro hab
-      have h : ((a : G) : G ⧸ H) = ((b : G) : G ⧸ H) := congrArg Subtype.val hab
-      rw [QuotientGroup.eq] at h ⊢
-      simpa [Subgroup.mem_subgroupOf] using h
+        induction y using QuotientGroup.induction_on with
+        | H b =>
+          intro hab
+          have h : ((a : G) : G ⧸ H) = ((b : G) : G ⧸ H) := congrArg Subtype.val hab
+          rw [QuotientGroup.eq] at h ⊢
+          simpa [Subgroup.mem_subgroupOf] using h
     · rintro ⟨x, hx⟩
       induction x using QuotientGroup.induction_on with
       | H g => exact ⟨((⟨g, (key g).1 hx⟩ : N) : N ⧸ H.subgroupOf N), rfl⟩

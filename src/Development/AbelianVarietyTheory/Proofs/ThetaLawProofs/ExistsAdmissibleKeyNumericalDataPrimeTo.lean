@@ -12,26 +12,35 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyKa
 
 namespace GlobalTheory.KeyKa
 
-theorem exists_quaternion_matrix (m : ℕ) : ∃ A : Matrix (Fin 4) (Fin 4) ℤ,
-    A.transpose * A = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ) := by
+theorem exists_quaternion_matrix (m : ℕ)
+    : ∃ A : Matrix (Fin 4) (Fin 4) ℤ,
+      A.transpose * A = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ) := by
   obtain ⟨a, b, c, d, h⟩ := Nat.sum_four_squares m
   have h' : (m : ℤ) = (a : ℤ) ^ 2 + (b : ℤ) ^ 2 + (c : ℤ) ^ 2 + (d : ℤ) ^ 2 := by
     rw [← h]; push_cast; ring
   refine ⟨!![(a : ℤ), -b, -c, -d; b, a, -d, c; c, d, a, -b; d, -c, b, a], ?_⟩
   rw [h']
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Matrix.mul_apply, Fin.sum_univ_four, Matrix.transpose_apply, Matrix.one_apply] <;> ring
+  fin_cases i <;> fin_cases j
+    <;> simp [Matrix.mul_apply, Fin.sum_univ_four, Matrix.transpose_apply, Matrix.one_apply]
+    <;> ring
 
-theorem exists_admissibleKeyNumericalData_prime_to : ∀ g p : ℕ, 1 ≤ g → p.Prime → ∃ (n l l' : ℕ) (al : ℕ → Matrix (Fin 4) (Fin 4) ℤ), admitted g n l l' al ∧ ¬ p ∣ degProd g n l l' ∧ 1 ≤ degProd g n l l' ∧ 1 ≤ kaExp g n l l' := by
+theorem exists_admissibleKeyNumericalData_prime_to
+    : ∀ g p : ℕ,
+      1 ≤ g → p.Prime
+        → ∃ (n l l' : ℕ) (al : ℕ → Matrix (Fin 4) (Fin 4) ℤ),
+          admitted g n l l' al ∧ ¬ p ∣ degProd g n l l' ∧ 1 ≤ degProd g n l l'
+            ∧ 1 ≤ kaExp g n l l' := by
   intro g p hg hp
   choose al hal using exists_quaternion_matrix
   have hp0 := hp.pos
@@ -51,8 +60,16 @@ theorem exists_admissibleKeyNumericalData_prime_to : ∀ g p : ℕ, 1 ≤ g → 
     · exact hp.one_lt.ne' (Nat.dvd_one.mp ((Nat.dvd_add_right (dvd_mul_right _ _)).mp h))
   have hpos : 0 < degProd g (4 * p) (g * (4 * p) + 1) (g * (4 * p) + 1 + p) :=
     Nat.pos_of_ne_zero fun h => hnd (h ▸ dvd_zero p)
-  refine ⟨4 * p, g * (4 * p) + 1, g * (4 * p) + 1 + p, al, ⟨by omega, by omega, by omega, hal⟩,
-    hnd, hpos, ?_⟩
+  refine ⟨
+    4 * p,
+    g * (4 * p) + 1,
+    g * (4 * p) + 1 + p,
+    al,
+    ⟨by omega, by omega, by omega, hal⟩,
+    hnd,
+    hpos,
+    ?_
+  ⟩
   unfold kaExp
   have h1 : 0 < g * (4 * p) + 1 + p - (g * (4 * p) + 1) := by omega
   have h2 := Nat.factorial_pos g

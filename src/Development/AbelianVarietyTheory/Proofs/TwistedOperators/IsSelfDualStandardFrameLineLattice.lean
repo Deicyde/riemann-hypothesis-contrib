@@ -5,11 +5,16 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
+open GlobalTheory.FinPl
+  (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 
@@ -17,11 +22,13 @@ noncomputable section
 
 namespace GlobalTheory.AscFin
 
-theorem isSelfDualC_span_of_norm {D : D7} (S : HSp D) (hS : S.rank = 1) (ζ : Fin S.rank → D.host.E)
-    (hζ : star ζ ⬝ᵥ (HSpace.gram S *ᵥ ζ) = -1) :
-    IsSelfDualC S (Submodule.span (𝓞 D.host.E) {ζ}) := by
-  have hform : ∀ x y : Fin S.rank → D.host.E,
-      ∑ i, ∑ j, star (x i) * HSpace.gram S i j * y j = star x ⬝ᵥ (HSpace.gram S *ᵥ y) := by
+theorem isSelfDualC_span_of_norm
+    {D : D7} (S : HSp D) (hS : S.rank = 1) (ζ : Fin S.rank → D.host.E)
+    (hζ : star ζ ⬝ᵥ (HSpace.gram S *ᵥ ζ) = -1)
+    : IsSelfDualC S (Submodule.span (𝓞 D.host.E) {ζ}) := by
+  have hform
+      : ∀ x y : Fin S.rank → D.host.E,
+        ∑ i, ∑ j, star (x i) * HSpace.gram S i j * y j = star x ⬝ᵥ (HSpace.gram S *ᵥ y) := by
     intro x y
     simp only [dotProduct, mulVec, Finset.mul_sum, Pi.star_apply, mul_assoc]
   have hne : ζ ≠ 0 := by
@@ -38,7 +45,7 @@ theorem isSelfDualC_span_of_norm {D : D7} (S : HSp D) (hS : S.rank = 1) (ζ : Fi
     rw [star_smul, mulVec_smul, smul_dotProduct, dotProduct_smul, hζ, smul_eq_mul, smul_eq_mul]
     ring
   have hstar : ∀ a : 𝓞 D.host.E, IsIntegral ℤ (star (a : D.host.E)) := fun a =>
-    (map_isIntegral_int (starRingEnd D.host.E) a.2 : )
+    (map_isIntegral_int (starRingEnd D.host.E) a.2 :)
   refine ⟨⟨Submodule.fg_span_singleton _, ?_⟩, fun y => ?_⟩
   · exact fun _ _ => (LinearIndependent.iff_fractionRing (𝓞 D.host.E) D.host.E).mp
   · obtain ⟨c, rfl⟩ := hall y
@@ -63,12 +70,18 @@ theorem isSelfDualC_span_of_norm {D : D7} (S : HSp D) (hS : S.rank = 1) (ζ : Fi
       rw [map_neg]
       exact neg_eq_iff_eq_neg.mpr hb
 
-theorem isSelfDualC_line : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} (F : Frames G), Std F → IsSelfDualC (negSp F.Lz) (Submodule.span (𝓞 D.host.E) {F.ζ 0}) := by
+theorem isSelfDualC_line
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} (F : Frames G),
+      Std F → IsSelfDualC (negSp F.Lz) (Submodule.span (𝓞 D.host.E) {F.ζ 0}) := by
   intro D T L sc G F hF
   refine isSelfDualC_span_of_norm (negSp F.Lz) F.rk (F.ζ 0) ?_
   have h1 := congrFun (congrFun G.sp.dec0.gram 0) 0
-  have h2 : star (fun i => G.sp.dec0.a i 0) ⬝ᵥ (HSpace.gram (G.V (Node.core 0)) *ᵥ (fun i => G.sp.dec0.a i 0)) = 1 := by
-    have h3 : antiDiagonalSignGramMatrix 1 (1 : D.host.E) 0 0 = 1 := by simp [antiDiagonalSignGramMatrix]
+  have h2
+      : star (fun i => G.sp.dec0.a i 0)
+          ⬝ᵥ (HSpace.gram (G.V (Node.core 0)) *ᵥ (fun i => G.sp.dec0.a i 0))
+        = 1 := by
+    have h3 : antiDiagonalSignGramMatrix 1 (1 : D.host.E) 0 0 = 1 := by
+      simp [antiDiagonalSignGramMatrix]
     rw [h3, Matrix.mul_assoc] at h1
     exact h1
   rw [← hF.zB, star_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec, F.oz.isoB] at h2

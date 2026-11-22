@@ -14,7 +14,8 @@ open MvPolynomial
 
 noncomputable section
 
-theorem ChartFracSeparable.proof (h : ChartPointSeparable.Statement) : ChartFracSeparable.Statement := by
+theorem ChartFracSeparable.proof (h : ChartPointSeparable.Statement)
+    : ChartFracSeparable.Statement := by
   intro F _ _ n e I f t p _ K L _ _ _ _ _ _ _ _ _ _ hI hf _
 
   let S := MvPolynomial (Fin e × Fin n) F
@@ -28,7 +29,8 @@ theorem ChartFracSeparable.proof (h : ChartPointSeparable.Statement) : ChartFrac
   let u : Fin e × Fin n → K := fun q => φ (X q)
   let ψ : Sg →+* L := (algebraMap CL L).comp (algebraMap Sg CL)
   let mk : MvPolynomial (Fin n ⊕ Fin e × Fin n) F →+* Sg := Ideal.Quotient.mk (chartIncIdeal I t e)
-  have hmk0 : ∀ P, P ∈ chartIncIdeal I t e → mk P = 0 := fun P hP => Ideal.Quotient.eq_zero_iff_mem.2 hP
+  have hmk0 : ∀ P, P ∈ chartIncIdeal I t e → mk P = 0 := fun P hP =>
+    Ideal.Quotient.eq_zero_iff_mem.2 hP
   let η : Fin n → L := fun m => ψ (chartX I t e (X m))
   have hφinj : Function.Injective φ :=
     (IsFractionRing.injective O K).comp
@@ -45,8 +47,7 @@ theorem ChartFracSeparable.proof (h : ChartPointSeparable.Statement) : ChartFrac
     simp only [ψ, φ, RingHom.comp_apply]
     rw [← IsScalarTower.algebraMap_apply S Sg CL, IsScalarTower.algebraMap_apply S O CL,
       ← IsScalarTower.algebraMap_apply O CL L, IsScalarTower.algebraMap_apply O K L]
-  have hmkS : ∀ s : S, mk (rename Sum.inr s) = algebraMap S Sg s :=
-    fun s => rfl
+  have hmkS : ∀ s : S, mk (rename Sum.inr s) = algebraMap S Sg s := fun s => rfl
   have hC : ∀ c : F, ψ (mk (C c)) = algebraMap F L c := by
     intro c
     rw [← rename_C Sum.inr, hmkS, hψS]
@@ -62,10 +63,12 @@ theorem ChartFracSeparable.proof (h : ChartPointSeparable.Statement) : ChartFrac
   have hψX : ∀ g, ψ (chartX I t e g) = aeval η g := by
     intro g
     have : ψ.comp (chartX I t e) = (aeval η : MvPolynomial (Fin n) F →ₐ[F] L).toRingHom :=
-      MvPolynomial.ringHom_ext (fun c => by
-        show ψ (mk (rename Sum.inl (C c))) = _
-        rw [rename_C, hC]
-        simp) (fun m => by simp [η])
+      MvPolynomial.ringHom_ext
+        (fun c => by
+          show ψ (mk (rename Sum.inl (C c))) = _
+          rw [rename_C, hC]
+          simp)
+        (fun m => by simp [η])
     exact congrArg (fun r : MvPolynomial (Fin n) F →+* L => r g) this
   have hzero : ∀ g ∈ I ⊔ Ideal.span {linForm t - 1}, chartX I t e g = 0 := by
     intro g hg
@@ -100,9 +103,10 @@ theorem ChartFracSeparable.proof (h : ChartPointSeparable.Statement) : ChartFrac
     have hmemO : ∀ a : O, algebraMap O K a ∈ IntermediateField.adjoin F (Set.range u) := fun a => by
       obtain ⟨⟨s, s', hs'⟩, rfl⟩ := IsLocalization.mk'_surjective p.primeCompl a
       dsimp only
-      have hs0 : φ s' ≠ 0 := fun h0 => hs' (by
-        rw [hφinj (h0.trans (map_zero φ).symm)]
-        exact p.zero_mem)
+      have hs0 : φ s' ≠ 0 := fun h0 =>
+        hs' (by
+          rw [hφinj (h0.trans (map_zero φ).symm)]
+          exact p.zero_mem)
       have hspec := congrArg (algebraMap O K) (IsLocalization.mk'_spec O s ⟨s', hs'⟩)
       rw [map_mul] at hspec
       rw [eq_div_of_mul_eq hs0 hspec]
@@ -132,8 +136,8 @@ theorem ChartFracSeparable.proof (h : ChartPointSeparable.Statement) : ChartFrac
         · rw [hXr]
           exact E.algebraMap_mem _
     have hmemCL : ∀ c : CL, algebraMap CL L c ∈ E := fun c => by
-      obtain ⟨⟨σ, s⟩, rfl⟩ := IsLocalization.mk'_surjective
-        (Algebra.algebraMapSubmonoid Sg p.primeCompl) c
+      obtain ⟨⟨σ, s⟩, rfl⟩ :=
+        IsLocalization.mk'_surjective (Algebra.algebraMapSubmonoid Sg p.primeCompl) c
       dsimp only
       obtain ⟨s0, hs0, hs⟩ := s.2
       have hne : ψ s.1 ≠ 0 := by

@@ -8,10 +8,12 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem infinitePlace_eq_of_embedding_comp_algebraMap_eq (F E : Type) [Field F] [NumberField F]
-    [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [IsTotallyComplex E]
-    [Algebra.IsQuadraticExtension F E] (w₁ w₂ : InfinitePlace E)
-    (h : w₁.embedding.comp (algebraMap F E) = w₂.embedding.comp (algebraMap F E)) : w₁ = w₂ := by
+theorem infinitePlace_eq_of_embedding_comp_algebraMap_eq
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F]
+    [IsTotallyComplex E] [Algebra.IsQuadraticExtension F E]
+    (w₁ w₂ : InfinitePlace E)
+    (h : w₁.embedding.comp (algebraMap F E) = w₂.embedding.comp (algebraMap F E))
+    : w₁ = w₂ := by
   classical
   set τ : F →+* ℂ := w₁.embedding.comp (algebraMap F E) with hτ
   have hτreal : ComplexEmbedding.IsReal τ := by
@@ -19,16 +21,23 @@ theorem infinitePlace_eq_of_embedding_comp_algebraMap_eq (F E : Type) [Field F] 
     exact InfinitePlace.isReal_mk_iff.mp this
   letI : Algebra F ℂ := τ.toAlgebra
   have mkAlg : ∀ σ : E →+* ℂ, σ.comp (algebraMap F E) = τ → ∃ a : E →ₐ[F] ℂ, (a : E →+* ℂ) = σ :=
-    fun σ hσ => ⟨{ σ with
-      commutes' := fun r => by
-        change σ (algebraMap F E r) = τ r
-        rw [← hσ]; rfl }, rfl⟩
+    fun σ hσ => ⟨
+      {
+        σ with
+        commutes' := fun r => by
+          change σ (algebraMap F E r) = τ r
+          rw [← hσ]
+          rfl
+      },
+      rfl
+    ⟩
   obtain ⟨a, ha⟩ := mkAlg w₁.embedding rfl
-  obtain ⟨b, hb⟩ := mkAlg (ComplexEmbedding.conjugate w₁.embedding) (by
-    ext r
-    have := RingHom.congr_fun hτreal r
-    simp only [RingHom.comp_apply, ComplexEmbedding.conjugate_coe_eq, Function.comp_apply]
-    simpa [ComplexEmbedding.conjugate_coe_eq, hτ] using this)
+  obtain ⟨b, hb⟩ :=
+    mkAlg (ComplexEmbedding.conjugate w₁.embedding) (by
+      ext r
+      have := RingHom.congr_fun hτreal r
+      simp only [RingHom.comp_apply, ComplexEmbedding.conjugate_coe_eq, Function.comp_apply]
+      simpa [ComplexEmbedding.conjugate_coe_eq, hτ] using this)
   obtain ⟨c, hc⟩ := mkAlg w₂.embedding h.symm
   have hab : a ≠ b := by
     intro hab

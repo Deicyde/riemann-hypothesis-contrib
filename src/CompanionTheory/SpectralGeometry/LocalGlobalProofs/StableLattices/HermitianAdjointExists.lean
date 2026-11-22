@@ -12,9 +12,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Iwahori
 
-theorem exists_adjoint_herm : ∀ {L V : Type} [NontriviallyNormedField L] [AddCommGroup V] [Module L V]
-    [FiniteDimensional L V] (s : L →+* L), IsInv s → ∀ h : V → V → L, IsHerm s h →
-    ∀ g : Module.End L V, ∃ g' : Module.End L V, ∀ x y, h (g x) y = h x (g' y) := by
+theorem exists_adjoint_herm
+    : ∀ {L V : Type} [NontriviallyNormedField L] [AddCommGroup V] [Module L V]
+        [FiniteDimensional L V] (s : L →+* L),
+      IsInv s
+        → ∀ h : V → V → L,
+          IsHerm s h
+            → ∀ g : Module.End L V, ∃ g' : Module.End L V, ∀ x y, h (g x) y = h x (g' y) := by
   intro L V _ _ _ _ s hs h hh g
   obtain ⟨hadd2, hsmul2, hsymm, hnd⟩ := hh
   have hss := hs.1
@@ -25,14 +29,16 @@ theorem exists_adjoint_herm : ∀ {L V : Type} [NontriviallyNormedField L] [AddC
     intro a x y
     rw [hsymm y (a • x), hsmul2, map_mul, ← hsymm]
 
-  let ψ₀ : V → Module.Dual L V := fun x =>
-    { toFun := h x
-      map_add' := hadd2 x
-      map_smul' := fun a y => by simpa using hsmul2 a x y }
+  let ψ₀ : V → Module.Dual L V := fun x => {
+    toFun := h x
+    map_add' := hadd2 x
+    map_smul' := fun a y => by simpa using hsmul2 a x y
+  }
   have ψ₀_apply : ∀ x y, ψ₀ x y = h x y := fun _ _ => rfl
-  let ψ : V →+ Module.Dual L V := AddMonoidHom.mk' ψ₀ (fun x x' => by
-    ext y
-    simp [ψ₀_apply, hadd1])
+  let ψ : V →+ Module.Dual L V :=
+    AddMonoidHom.mk' ψ₀ (fun x x' => by
+      ext y
+      simp [ψ₀_apply, hadd1])
   have ψ_apply : ∀ x y, ψ x y = h x y := fun _ _ => rfl
   have ψ_smul : ∀ (a : L) x, ψ (a • x) = s a • ψ x := by
     intro a x
@@ -64,8 +70,7 @@ theorem exists_adjoint_herm : ∀ {L V : Type} [NontriviallyNormedField L] [AddC
     simp
   have ψ_surj : ∀ f : Module.Dual L V, ∃ z, ψ z = f := by
     intro f
-    have hf : f ∈ Submodule.span L (Set.range fun i => ψ (b i)) := by
-      rw [hspan]; trivial
+    have hf : f ∈ Submodule.span L (Set.range fun i => ψ (b i)) := by rw [hspan]; trivial
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun L).mp hf
     refine ⟨∑ j, s (c j) • b j, ?_⟩
     set_option synthInstance.maxHeartbeats 100000 in

@@ -6,8 +6,7 @@ public import Mathlib
 
 namespace GroundTheory.Variant₂.N1
 
-theorem eq_one_of_forall_norm_zpow_sub_one_lt {z : ℂ} (h : ∀ m : ℤ, ‖z ^ m - 1‖ < 1) :
-    z = 1 := by
+theorem eq_one_of_forall_norm_zpow_sub_one_lt {z : ℂ} (h : ∀ m : ℤ, ‖z ^ m - 1‖ < 1) : z = 1 := by
   have hpow : ∀ n : ℕ, ‖z ^ n - 1‖ < 1 := fun n => by simpa using h n
   have hle : ‖z‖ ≤ 1 := by
     by_contra hlt
@@ -62,7 +61,9 @@ theorem eq_one_of_forall_norm_zpow_sub_one_lt {z : ℂ} (h : ∀ m : ℤ, ‖z ^
     | succ k ih =>
       have h4 := key (z ^ (2 ^ k)) (by rw [norm_pow, hn1, one_pow]) (hpow _)
       rw [pow_succ 2 k, pow_mul]
-      calc (3 : ℝ) ^ (k + 1) * ‖z - 1‖ ^ 2 = 3 * (3 ^ k * ‖z - 1‖ ^ 2) := by ring
+      calc
+        (3 : ℝ) ^ (k + 1) * ‖z - 1‖ ^ 2
+          = 3 * (3 ^ k * ‖z - 1‖ ^ 2) := by ring
         _ ≤ 3 * ‖z ^ (2 ^ k) - 1‖ ^ 2 := by gcongr
         _ ≤ _ := h4
   by_contra hne

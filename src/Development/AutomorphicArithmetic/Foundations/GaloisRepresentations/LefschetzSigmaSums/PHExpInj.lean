@@ -26,13 +26,15 @@ theorem hExpInj_of : HExpInj := by
       exfalso
       omega
   · rw [hh i, hh k] at hik
-    have si : ∑ j ∈ Finset.univ.erase i, lam (NumberField.ComplexEmbedding.conjugate t₀) j +
-        lam (NumberField.ComplexEmbedding.conjugate t₀) i =
-        ∑ j, lam (NumberField.ComplexEmbedding.conjugate t₀) j :=
+    have si
+        : ∑ j ∈ Finset.univ.erase i, lam (NumberField.ComplexEmbedding.conjugate t₀) j
+            + lam (NumberField.ComplexEmbedding.conjugate t₀) i
+          = ∑ j, lam (NumberField.ComplexEmbedding.conjugate t₀) j :=
       Finset.sum_erase_add _ _ (Finset.mem_univ i)
-    have sk : ∑ j ∈ Finset.univ.erase k, lam (NumberField.ComplexEmbedding.conjugate t₀) j +
-        lam (NumberField.ComplexEmbedding.conjugate t₀) k =
-        ∑ j, lam (NumberField.ComplexEmbedding.conjugate t₀) j :=
+    have sk
+        : ∑ j ∈ Finset.univ.erase k, lam (NumberField.ComplexEmbedding.conjugate t₀) j
+            + lam (NumberField.ComplexEmbedding.conjugate t₀) k
+          = ∑ j, lam (NumberField.ComplexEmbedding.conjugate t₀) j :=
       Finset.sum_erase_add _ _ (Finset.mem_univ k)
     rcases lt_trichotomy i k with hlt | heq | hgt
     · have hle := hanti (NumberField.ComplexEmbedding.conjugate t₀) hlt.le

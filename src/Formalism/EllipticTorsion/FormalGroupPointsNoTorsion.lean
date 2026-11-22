@@ -48,14 +48,17 @@ theorem deuringInv : DeuringInv.{u} := deuring_invariant
 theorem modelLegendre : ModelLegendre.{u} := legendre_model
 theorem modelDeuring : ModelDeuring.{u} := deuring_model
 theorem modelUnit : ModelUnit.{u} := by
-  apply modelUnit_of <;> first | exact modelLegendre | exact modelDeuring | exact legendreInv | exact deuringInv
+  apply modelUnit_of
+    <;> first | exact modelLegendre | exact modelDeuring | exact legendreInv | exact deuringInv
 theorem intValuedZp : IntValuedZp.{u} := integer_valued_padic_integers
 theorem nAddSubgroup : NAddSubgroup.{u} := N_additive_subgroup
 theorem nZpSmul : NZpSmul.{u} := N_padic_integer_smul
 theorem nPderiv : NPderiv.{u} := N_partial_derivative
 
-theorem formal_group_points_subgroup : FormalGroupPointsSubgroup'.{u} := formal_group_points_subgroup_holds
-theorem formal_group_points_no_torsion : FormalGroupPointsTorsionFree.{u} := formal_group_points_no_prime_to_p_torsion
+theorem formal_group_points_subgroup : FormalGroupPointsSubgroup'.{u} :=
+  formal_group_points_subgroup_holds
+theorem formal_group_points_no_torsion : FormalGroupPointsTorsionFree.{u} :=
+  formal_group_points_no_prime_to_p_torsion
 theorem torsionIntegral : TorsionIntegral.{u} := torsionIntegral_of formal_group_points_no_torsion
 
 theorem isoExpand : IsoExpand.{u} := isogeny_expansion
@@ -78,12 +81,46 @@ theorem wPoint : WPoint.{u} := wSeriesNonsingularPoint_holds
 theorem wChordSeries : WChordSeries.{u} := wChordSeries_of wSubstUnique
 theorem wChordSubst : WChordSubst.{u} := wChordSubst_of wSeriesSubstUnique_holds
 theorem wFormalGroup : WFormalGroup.{u} := by
-  apply wFormalGroup_of <;> first | exact wChordSeries | exact wChordSubst | exact wPoint | exact wSubstUnique | exact wSeriesUnique | exact wSeriesLead
+  apply wFormalGroup_of <;> first
+    | exact wChordSeries
+    | exact wChordSubst
+    | exact wPoint
+    | exact wSubstUnique
+    | exact wSeriesUnique
+    | exact wSeriesLead
 
 theorem formal_group_points_param : FormalGroupPointsParametrisation.{u} := by
-  apply formal_group_points_param_of <;> first | exact intValuedZp | exact nAddSubgroup | exact nZpSmul | exact nPderiv | exact lwP₂ | exact unitCancel | exact compExpWeight | exact lemma2Weights | exact frobExpand | exact wFormalGroup | exact formal_group_points_subgroup | exact formal_group_points_no_torsion | exact isoExpand | exact isoVanish | exact changeIntegral | exact wPoint | exact wSubstUnique | exact wChordSubst | exact wChordSeries | exact veluIntegralModel | exact veluUSeries | exact modelUnit
+  apply formal_group_points_param_of <;> first
+    | exact intValuedZp
+    | exact nAddSubgroup
+    | exact nZpSmul
+    | exact nPderiv
+    | exact lwP₂
+    | exact unitCancel
+    | exact compExpWeight
+    | exact lemma2Weights
+    | exact frobExpand
+    | exact wFormalGroup
+    | exact formal_group_points_subgroup
+    | exact formal_group_points_no_torsion
+    | exact isoExpand
+    | exact isoVanish
+    | exact changeIntegral
+    | exact wPoint
+    | exact wSubstUnique
+    | exact wChordSubst
+    | exact wChordSeries
+    | exact veluIntegralModel
+    | exact veluUSeries
+    | exact modelUnit
 theorem formal_group_points_hom : FormalGroupPointsHomomorphism.{u} := by
-  apply formal_group_points_hom_of <;> first | exact wSubstUnique | exact wChordSubst | exact formal_group_points_param | exact wFormalGroup | exact wChordSeries | exact wPoint
+  apply formal_group_points_hom_of <;> first
+    | exact wSubstUnique
+    | exact wChordSubst
+    | exact formal_group_points_param
+    | exact wFormalGroup
+    | exact wChordSeries
+    | exact wPoint
 
 theorem veluIntegralModel : VeluIntegralModel.{u} := velu_integral_model
 theorem veluUSeries : VeluUSeries.{u} := velu_u_series

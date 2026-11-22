@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Integra
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
@@ -17,9 +19,10 @@ section abstract
 
 variable {R : Type} [CommRing R] [IsDomain R] {π : R} (O : Subring R)
 
-theorem pid_of_fact (hπ : Irreducible π) (hO : π ∈ O)
-    (h4 : ∀ w ∈ O, w ≠ 0 → ∃ (k : ℕ) (v v' : R), v ∈ O ∧ v' ∈ O ∧ v * v' = 1 ∧ w = π ^ k * v) :
-    IsPrincipalIdealRing O := by
+theorem pid_of_fact
+    (hπ : Irreducible π) (hO : π ∈ O)
+    (h4 : ∀ w ∈ O, w ≠ 0 → ∃ (k : ℕ) (v v' : R), v ∈ O ∧ v' ∈ O ∧ v * v' = 1 ∧ w = π ^ k * v)
+    : IsPrincipalIdealRing O := by
   have hu : ∀ a : O, IsUnit (a : R) → IsUnit a := by
     intro a ha
     obtain ⟨k, v, v', hv, hv', h1, h2⟩ := h4 a a.2 ha.ne_zero
@@ -36,12 +39,17 @@ theorem pid_of_fact (hπ : Irreducible π) (hO : π ∈ O)
     refine IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization ⟨_, hirr, ?_⟩
     intro x hx
     obtain ⟨k, v, v', hv, hv', h1, h2⟩ := h4 x x.2 (fun h => hx (Subtype.ext h))
-    refine ⟨k, ⟨⟨v, hv⟩, ⟨v', hv'⟩, Subtype.ext h1, Subtype.ext (by simp [mul_comm v' v, h1])⟩, Subtype.ext ?_⟩
+    refine ⟨
+      k,
+      ⟨⟨v, hv⟩, ⟨v', hv'⟩, Subtype.ext h1, Subtype.ext (by simp [mul_comm v' v, h1])⟩,
+      Subtype.ext ?_
+    ⟩
     simp [h2]
   infer_instance
 
-theorem sat_pow (hπ : π ≠ 0) (h1 : ∀ w ∈ O, π ∣ w → ∃ v ∈ O, w = π * v) (n : ℕ) (x : R)
-    (hx : π ^ n * x ∈ O) : x ∈ O := by
+theorem sat_pow
+    (hπ : π ≠ 0) (h1 : ∀ w ∈ O, π ∣ w → ∃ v ∈ O, w = π * v) (n : ℕ) (x : R) (hx : π ^ n * x ∈ O)
+    : x ∈ O := by
   induction n with
   | zero => simpa using hx
   | succ n ih =>
@@ -52,8 +60,7 @@ theorem sat_pow (hπ : π ≠ 0) (h1 : ∀ w ∈ O, π ∣ w → ∃ v ∈ O, w 
 
 def divSub {d : ℕ} (Y : Matrix (Fin d) (Fin d) R) (a : R) : Submodule O (Fin d → O) where
   carrier := {x | ∀ i, a ∣ (Y *ᵥ fun j => (x j : R)) i}
-  zero_mem' i := by
-    simp [Matrix.mulVec, dotProduct]
+  zero_mem' i := by simp [Matrix.mulVec, dotProduct]
   add_mem' {x y} hx hy i := by
     have : (fun j => ((x + y) j : R)) = (fun j => (x j : R)) + fun j => (y j : R) := rfl
     rw [this, Matrix.mulVec_add]
@@ -63,11 +70,15 @@ def divSub {d : ℕ} (Y : Matrix (Fin d) (Fin d) R) (a : R) : Submodule O (Fin d
     rw [this, Matrix.mulVec_smul]
     exact Dvd.dvd.mul_left (hx i) _
 
-theorem exists_basis_matrix [IsPrincipalIdealRing O] {d : ℕ} (Y : Matrix (Fin d) (Fin d) R) (a : R) (ha : a ≠ 0)
-    (haO : a ∈ O) :
-    ∃ P : Matrix (Fin d) (Fin d) R, (∀ i j, P i j ∈ O) ∧ P.det ≠ 0 ∧ (∀ i j, a ∣ (Y * P) i j) ∧
-      ∀ x : Fin d → R, (∀ i, x i ∈ O) → (∀ i, a ∣ (Y *ᵥ x) i) →
-        ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ x = P *ᵥ w := by
+theorem exists_basis_matrix
+    [IsPrincipalIdealRing O]
+    {d : ℕ} (Y : Matrix (Fin d) (Fin d) R)
+    (a : R) (ha : a ≠ 0) (haO : a ∈ O)
+    : ∃ P : Matrix (Fin d) (Fin d) R,
+      (∀ i j, P i j ∈ O) ∧ P.det ≠ 0 ∧ (∀ i j, a ∣ (Y * P) i j)
+        ∧ ∀ x : Fin d → R,
+          (∀ i, x i ∈ O) → (∀ i, a ∣ (Y *ᵥ x) i)
+            → ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ x = P *ᵥ w := by
   set N := divSub O Y a with hN
   have hmem : ∀ v : Fin d → O, (⟨a, haO⟩ : O) • v ∈ N := by
     intro v i
@@ -86,8 +97,9 @@ theorem exists_basis_matrix [IsPrincipalIdealRing O] {d : ℕ} (Y : Matrix (Fin 
     · simpa using LinearMap.finrank_le_finrank_of_injective hf
   let b := Module.finBasisOfFinrankEq O N hr
   let P : Matrix (Fin d) (Fin d) R := Matrix.of fun i j => ((b j).1 i : R)
-  have hspan : ∀ x : Fin d → R, (∀ i, x i ∈ O) → (∀ i, a ∣ (Y *ᵥ x) i) →
-        ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ x = P *ᵥ w := by
+  have hspan
+      : ∀ x : Fin d → R,
+        (∀ i, x i ∈ O) → (∀ i, a ∣ (Y *ᵥ x) i) → ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ x = P *ᵥ w := by
     intro x hx hd
     let z : N := ⟨fun i => ⟨x i, hx i⟩, hd⟩
     refine ⟨fun j => (b.repr z j : R), fun j => (b.repr z j).2, funext fun i => ?_⟩
@@ -96,7 +108,9 @@ theorem exists_basis_matrix [IsPrincipalIdealRing O] {d : ℕ} (Y : Matrix (Fin 
     rw [Submodule.coe_sum, Finset.sum_apply, AddSubmonoidClass.coe_finsetSum]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   refine ⟨P, fun i j => ((b j).1 i).2, ?_, fun i j => (b j).2 i, hspan⟩
-  have hcol : ∀ j : Fin d, ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ a • (Pi.single j 1 : Fin d → R) = P *ᵥ w := by
+  have hcol
+      : ∀ j : Fin d, ∃ w : Fin d → R,
+        (∀ i, w i ∈ O) ∧ a • (Pi.single j 1 : Fin d → R) = P *ᵥ w := by
     intro j
     refine hspan _ (fun i => ?_) (fun i => ?_)
     · by_cases h : i = j
@@ -115,20 +129,31 @@ theorem exists_basis_matrix [IsPrincipalIdealRing O] {d : ℕ} (Y : Matrix (Fin 
   rw [Matrix.det_mul, h0, zero_mul, Matrix.det_smul, Matrix.det_one, mul_one] at this
   exact pow_ne_zero _ ha this.symm
 
-theorem lattice_abstract [IsPrincipalIdealRing O] (hπ : π ≠ 0) (hO : π ∈ O)
-    (h1 : ∀ w ∈ O, π ∣ w → ∃ v ∈ O, w = π * v) {d : ℕ} (Y : Matrix (Fin d) (Fin d) R) (c : ℕ) (u : Rˣ)
-    (hdet : Y.det = π ^ c * u) :
-    ∃ (m : ℕ) (P Y' : Matrix (Fin d) (Fin d) R), (∀ i j, P i j ∈ O) ∧ P.det ≠ 0 ∧ π ^ m • Y' = Y * P ∧
-      (∀ v : Fin d → R, (∀ i, v i ∈ O) → ∀ n : ℕ, (∀ i, π ^ n ∣ (Y *ᵥ v) i) →
-        ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ π ^ m • v = π ^ n • (P *ᵥ w)) ∧
-      ∀ w : Fin d → R, (∀ i, w i ∈ O) → (∀ i, π ∣ (Y' *ᵥ w) i) → ∀ i, π ∣ w i := by
-  obtain ⟨P, hPO, hP, hdv, hspan⟩ := exists_basis_matrix O Y (π ^ c) (pow_ne_zero _ hπ) (O.pow_mem hO c)
+theorem lattice_abstract
+    [IsPrincipalIdealRing O]
+    (hπ : π ≠ 0) (hO : π ∈ O) (h1 : ∀ w ∈ O, π ∣ w → ∃ v ∈ O, w = π * v)
+    {d : ℕ} (Y : Matrix (Fin d) (Fin d) R)
+    (c : ℕ) (u : Rˣ) (hdet : Y.det = π ^ c * u)
+    : ∃ (m : ℕ) (P Y' : Matrix (Fin d) (Fin d) R),
+      (∀ i j, P i j ∈ O) ∧ P.det ≠ 0 ∧ π ^ m • Y' = Y * P
+        ∧ (∀ v : Fin d → R,
+          (∀ i, v i ∈ O)
+            → ∀ n : ℕ,
+              (∀ i, π ^ n ∣ (Y *ᵥ v) i)
+                → ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ π ^ m • v = π ^ n • (P *ᵥ w))
+        ∧ ∀ w : Fin d → R, (∀ i, w i ∈ O) → (∀ i, π ∣ (Y' *ᵥ w) i) → ∀ i, π ∣ w i := by
+  obtain ⟨P, hPO, hP, hdv, hspan⟩ :=
+    exists_basis_matrix O Y (π ^ c) (pow_ne_zero _ hπ) (O.pow_mem hO c)
   choose y hy using hdv
   have hY' : π ^ c • Matrix.of y = Y * P := by
     ext i j
     simp [hy]
-  have key : ∀ v : Fin d → R, (∀ i, v i ∈ O) → ∀ n : ℕ, (∀ i, π ^ n ∣ (Y *ᵥ v) i) →
-        ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ π ^ c • v = π ^ n • (P *ᵥ w) := by
+  have key
+      : ∀ v : Fin d → R,
+        (∀ i, v i ∈ O)
+          → ∀ n : ℕ,
+            (∀ i, π ^ n ∣ (Y *ᵥ v) i)
+              → ∃ w : Fin d → R, (∀ i, w i ∈ O) ∧ π ^ c • v = π ^ n • (P *ᵥ w) := by
     intro v hv n hn
     choose z hz using hn
     have hz' : Y *ᵥ v = π ^ n • z := funext hz
@@ -136,25 +161,34 @@ theorem lattice_abstract [IsPrincipalIdealRing O] (hπ : π ≠ 0) (hO : π ∈ 
     have hx : π ^ c • v = π ^ n • x := by
       have h := congrArg (fun t => ((u⁻¹ : Rˣ) : R) • (Y.adjugate *ᵥ t)) hz'
       simp only [Matrix.mulVec_mulVec, Matrix.adjugate_mul, Matrix.mulVec_smul, Matrix.smul_mulVec,
-        Matrix.one_mulVec, hdet] at h
+          Matrix.one_mulVec, hdet]
+        at h
       rw [smul_smul, mul_left_comm, Units.inv_mul, mul_one, smul_comm] at h
       exact h
     have hYx : Y *ᵥ x = π ^ c • z := by
-      simp only [x, Matrix.mulVec_mulVec, Matrix.mul_adjugate, Matrix.mulVec_smul, Matrix.smul_mulVec,
-        Matrix.one_mulVec, hdet]
+      simp only [x, Matrix.mulVec_mulVec, Matrix.mul_adjugate, Matrix.mulVec_smul,
+        Matrix.smul_mulVec, Matrix.one_mulVec, hdet]
       rw [smul_smul, mul_left_comm, Units.inv_mul, mul_one]
-    obtain ⟨w, hw, hxw⟩ := hspan x (fun i => sat_pow O hπ h1 n _ (by
-      have := congrFun hx i
-      simp only [Pi.smul_apply, smul_eq_mul] at this
-      rw [← this]
-      exact O.mul_mem (O.pow_mem hO c) (hv i))) (fun i => by rw [hYx]; exact Dvd.intro _ rfl)
+    obtain ⟨w, hw, hxw⟩ :=
+      hspan x
+        (fun i =>
+          sat_pow O hπ h1 n _ (by
+            have := congrFun hx i
+            simp only [Pi.smul_apply, smul_eq_mul] at this
+            rw [← this]
+            exact O.mul_mem (O.pow_mem hO c) (hv i)))
+        (fun i => by rw [hYx]; exact Dvd.intro _ rfl)
     exact ⟨w, hw, by rw [hx, hxw]⟩
   refine ⟨c, P, Matrix.of y, hPO, hP, hY', key, fun w hw hd => ?_⟩
-  obtain ⟨w', -, h⟩ := key (P *ᵥ w) (fun i => by
-    simp only [Matrix.mulVec, dotProduct]
-    exact O.sum_mem fun j _ => O.mul_mem (hPO i j) (hw j)) (c + 1) (fun i => by
-    rw [Matrix.mulVec_mulVec, ← hY', Matrix.smul_mulVec, pow_succ]
-    exact mul_dvd_mul_left _ (hd i))
+  obtain ⟨w', -, h⟩ :=
+    key (P *ᵥ w)
+      (fun i => by
+        simp only [Matrix.mulVec, dotProduct]
+        exact O.sum_mem fun j _ => O.mul_mem (hPO i j) (hw j))
+      (c + 1)
+      (fun i => by
+        rw [Matrix.mulVec_mulVec, ← hY', Matrix.smul_mulVec, pow_succ]
+        exact mul_dvd_mul_left _ (hd i))
   have h2 : P *ᵥ (w - π • w') = 0 := by
     funext i
     have := congrFun h i
@@ -169,7 +203,20 @@ theorem lattice_abstract [IsPrincipalIdealRing O] (hπ : π ≠ 0) (hO : π ∈ 
 
 end abstract
 
-theorem exists_lattice_basis : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d : ℕ) (Y1 : Matrix (Fin d) (Fin d) (WCb l)), Y1.det ≠ 0 → ∃ (m : ℕ) (P Y' : Matrix (Fin d) (Fin d) (WCb l)), (∀ i j, P i j ∈ bk.OE) ∧ P.det ≠ 0 ∧ (l : WCb l) ^ m • Y' = Y1 * P ∧ (∀ v : Fin d → WCb l, (∀ i, v i ∈ bk.OE) → ∀ n : ℕ, (∀ i, (l : WCb l) ^ n ∣ (Y1 *ᵥ v) i) → ∃ w : Fin d → WCb l, (∀ i, w i ∈ bk.OE) ∧ (l : WCb l) ^ m • v = (l : WCb l) ^ n • (P *ᵥ w)) ∧ ∀ w : Fin d → WCb l, (∀ i, w i ∈ bk.OE) → (∀ i, (l : WCb l) ∣ (Y' *ᵥ w) i) → ∀ i, (l : WCb l) ∣ w i := by
+theorem exists_lattice_basis
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d : ℕ)
+        (Y1 : Matrix (Fin d) (Fin d) (WCb l)),
+      Y1.det ≠ 0
+        → ∃ (m : ℕ) (P Y' : Matrix (Fin d) (Fin d) (WCb l)),
+          (∀ i j, P i j ∈ bk.OE) ∧ P.det ≠ 0 ∧ (l : WCb l) ^ m • Y' = Y1 * P
+            ∧ (∀ v : Fin d → WCb l,
+              (∀ i, v i ∈ bk.OE)
+                → ∀ n : ℕ,
+                  (∀ i, (l : WCb l) ^ n ∣ (Y1 *ᵥ v) i)
+                    → ∃ w : Fin d → WCb l,
+                      (∀ i, w i ∈ bk.OE) ∧ (l : WCb l) ^ m • v = (l : WCb l) ^ n • (P *ᵥ w))
+            ∧ ∀ w : Fin d → WCb l,
+              (∀ i, w i ∈ bk.OE) → (∀ i, (l : WCb l) ∣ (Y' *ᵥ w) i) → ∀ i, (l : WCb l) ∣ w i := by
   intro l _ K bk d Y1 hY
   obtain ⟨h1, -, -, h4, -⟩ := GlobalTheory.T.integral_elements_unit_factorization l K bk
   have hirr : Irreducible (l : WCb l) := WittVector.irreducible l
@@ -178,8 +225,10 @@ theorem exists_lattice_basis : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk :
     obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := OCb l) x
     obtain ⟨a', rfl⟩ := surjective_frobenius (OCb l) l a
     obtain ⟨b', rfl⟩ := surjective_frobenius (OCb l) l b
-    exact ⟨algebraMap (OCb l) (Cb l) a' / algebraMap (OCb l) (Cb l) b', by
-      simp [frobenius_def, div_pow, map_pow]⟩
+    exact ⟨
+      algebraMap (OCb l) (Cb l) a' / algebraMap (OCb l) (Cb l) b',
+      by simp [frobenius_def, div_pow, map_pow]
+    ⟩
   obtain ⟨c, u, hu⟩ := WittVector.exists_eq_pow_p_mul' Y1.det hY
   have := pid_of_fact bk.OE hirr (natCast_mem _ l) h4
   exact lattice_abstract bk.OE hirr.ne_zero (natCast_mem _ l) h1 Y1 c u hu

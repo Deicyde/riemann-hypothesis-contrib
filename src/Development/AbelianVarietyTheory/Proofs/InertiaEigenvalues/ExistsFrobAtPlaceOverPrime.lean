@@ -9,10 +9,13 @@ open ReciprocityTheory.Gal Pointwise NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem exists_frob_at_place_over_prime : ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω]
-    [Algebra F Ω] [IsAlgClosure F Ω] {p : ℕ} [Fact p.Prime] (A : ValuationSubring Ω),
-    A.valuation (p : Ω) < 1 → ∃ σ : Ω ≃ₐ[F] Ω, σ • A = A ∧ ∃ q : ℕ, q ≠ 1 ∧
-      ∀ x : Ω, A.valuation x ≤ 1 → A.valuation (σ x - x ^ q) < 1 := by
+theorem exists_frob_at_place_over_prime
+    : ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {p : ℕ}
+        [Fact p.Prime] (A : ValuationSubring Ω),
+      A.valuation (p : Ω) < 1
+        → ∃ σ : Ω ≃ₐ[F] Ω,
+          σ • A = A
+            ∧ ∃ q : ℕ, q ≠ 1 ∧ ∀ x : Ω, A.valuation x ≤ 1 → A.valuation (σ x - x ^ q) < 1 := by
   intro F Ω _ _ _ _ _ p hp A hpA
   set f : 𝓞 F →+* Ω := (algebraMap F Ω).comp (algebraMap (𝓞 F) F) with hf
   have fA : ∀ r : 𝓞 F, f r ∈ A := fun r =>
@@ -21,8 +24,7 @@ theorem exists_frob_at_place_over_prime : ∀ {F Ω : Type} [Field F] [NumberFie
   have memI : ∀ r, r ∈ I ↔ A.valuation (algebraMap F Ω (r : F)) < 1 := fun r => by
     simp only [I, Ideal.mem_comap]; exact A.valuation_lt_one_iff _
   have hIp : I.IsPrime := Ideal.comap_isPrime _ _
-  have hpI : (p : 𝓞 F) ∈ I := by
-    rw [memI]; simpa using hpA
+  have hpI : (p : 𝓞 F) ∈ I := by rw [memI]; simpa using hpA
   have hIne : I ≠ ⊥ := fun h => by
     have h' := hpI
     rw [h, Ideal.mem_bot] at h'

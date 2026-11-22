@@ -62,7 +62,8 @@ noncomputable section
 
 namespace GlobalTheory.Core.RkFamModel
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.Examples₂ Formalism.BasicNotions.Examples₂.NZ GlobalTheory.Core.Rk NumberField Module
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.Examples₂
+  Formalism.BasicNotions.Examples₂.NZ GlobalTheory.Core.Rk NumberField Module
 
 theorem xu_pos (D : D7) (u : D.what₂.Word) : 0 < (D.mem u).A.Xu := by
   have h1 := (D.mem u).A.Dstar_pos
@@ -76,15 +77,16 @@ theorem fk_pos (R : Ranks) : (0 : ℝ) < (R.f : ℝ) * R.k := by
   have h2 : 0 < R.f := Nat.mul_pos two_pos R.ord_pos
   positivity
 
-theorem log_tstar (D : D7) (u : D.what₂.Word) : Real.log (D.mem u).A.Tstar =
-    Real.log (D.mem u).A.Xu - 2 / ((D.R.f : ℝ) * D.R.k) * Real.log (D.mem u).A.GamP := by
+theorem log_tstar (D : D7) (u : D.what₂.Word)
+    : Real.log (D.mem u).A.Tstar
+      = Real.log (D.mem u).A.Xu - 2 / ((D.R.f : ℝ) * D.R.k) * Real.log (D.mem u).A.GamP := by
   have hG : 0 < (D.mem u).A.GamP := lt_trans one_pos (D.mem u).A.one_lt_gammaP
   unfold ColumnsAtT.Tstar
   rw [Real.log_mul (xu_pos D u).ne' (Real.rpow_pos_of_pos hG _).ne', Real.log_rpow hG]
   ring
 
-theorem log_T_lt (D : D7) (u : D.what₂.Word) :
-    Real.log ((D.mem u).A.T : ℝ) < Real.log (D.mem u).A.Xu + 1 / ((D.R.f : ℝ) * D.R.k) := by
+theorem log_T_lt (D : D7) (u : D.what₂.Word)
+    : Real.log ((D.mem u).A.T : ℝ) < Real.log (D.mem u).A.Xu + 1 / ((D.R.f : ℝ) * D.R.k) := by
   have hT : (0 : ℝ) < (D.mem u).A.T := by exact_mod_cast (D.mem u).A.T_prime.pos
   have hf := fk_pos D.R
   have hG : 0 < (D.mem u).A.GamP := lt_trans one_pos (D.mem u).A.one_lt_gammaP
@@ -96,13 +98,11 @@ theorem log_T_lt (D : D7) (u : D.what₂.Word) :
     mul_pos (by positivity) (Real.log_pos (D.mem u).A.one_lt_gammaP)
   linarith
 
-
 section Rank
 
 variable {R : Ranks} {Tau : Type} [Fintype Tau] (hc : Tau → HCParam R) (N : ℕ)
 
 variable (T : ℕ) [Fact T.Prime] (Dst : ℝ) (hD : 0 < Dst) (hT : T ≠ 2) (s : ℂ)
-
 
 end Rank
 

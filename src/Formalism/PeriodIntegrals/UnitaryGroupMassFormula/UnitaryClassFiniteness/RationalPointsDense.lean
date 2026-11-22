@@ -15,8 +15,8 @@ open PI.UJClassFin
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {M : ℕ}
 
-theorem single_tmul (l : Fin M) (a : Af F) (t : E) :
-    Pi.single l (a ⊗ₜ[F] t) = fun i => a ⊗ₜ[F] ((Pi.single l t : Fin M → E) i) := by
+theorem single_tmul (l : Fin M) (a : Af F) (t : E)
+    : Pi.single l (a ⊗ₜ[F] t) = fun i => a ⊗ₜ[F] ((Pi.single l t : Fin M → E) i) := by
   funext i
   by_cases h : i = l
   · subst h
@@ -26,17 +26,22 @@ theorem single_tmul (l : Fin M) (a : Af F) (t : E) :
 theorem nsmul_tmul_F (N : ℕ) (a : Af F) (e : E) : N • (a ⊗ₜ[F] e) = a ⊗ₜ[F] ((N : F) • e) := by
   first
   | (rw [Nat.cast_smul_eq_nsmul, TensorProduct.tmul_smul])
-  | (induction N with
+  | (
+      induction N with
       | zero => simp
-      | succ n ih => simp [succ_nsmul, ih, add_smul, TensorProduct.tmul_add])
+      | succ n ih => simp [succ_nsmul, ih, add_smul, TensorProduct.tmul_add]
+    )
 
-theorem mulVec_single' (g : Matrix (Fin M) (Fin M) (Af F ⊗[F] E)) (j : Fin M) (x : Af F ⊗[F] E) :
-    g.mulVec (Pi.single j x) = fun l => g l j * x := by
+theorem mulVec_single' (g : Matrix (Fin M) (Fin M) (Af F ⊗[F] E)) (j : Fin M) (x : Af F ⊗[F] E)
+    : g.mulVec (Pi.single j x) = fun l => g l j * x := by
   funext l
   simp [Matrix.mulVec, dotProduct, Pi.single_apply]
 
-theorem latHat_smul (L : Set (Fin M → E)) {a : Af F} (ha : a ∈ intAf F) {y : Fin M → Af F ⊗[F] E}
-    (hy : y ∈ latHat F E L) : (a ⊗ₜ[F] (1 : E)) • y ∈ latHat F E L := by
+theorem latHat_smul
+    (L : Set (Fin M → E))
+    {a : Af F} (ha : a ∈ intAf F)
+    {y : Fin M → Af F ⊗[F] E} (hy : y ∈ latHat F E L)
+    : (a ⊗ₜ[F] (1 : E)) • y ∈ latHat F E L := by
   unfold latHat at hy ⊢
   induction hy using AddSubgroup.closure_induction with
   | mem y hy =>
@@ -54,25 +59,30 @@ theorem latHat_smul (L : Set (Fin M → E)) {a : Af F} (ha : a ∈ intAf F) {y :
   | add y1 y2 _ _ h1 h2 => rw [smul_add]; exact add_mem h1 h2
   | neg y _ h => rw [smul_neg]; exact neg_mem h
 
-theorem single_mem (L : Set (Fin M → E)) {k : ℕ}
-    (hk : ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((k : F) • e) ∈ L)
-    {p : Af F ⊗[F] E} (hp : p ∈ Oh F E) (l : Fin M) : Pi.single l (k • p) ∈ latHat F E L := by
-  let S' : AddSubgroup (Af F ⊗[F] E) :=
-    { carrier := {q | Pi.single l (k • q) ∈ latHat F E L}
-      add_mem' := fun {a b} ha hb => by
-        show Pi.single l (k • (a + b)) ∈ latHat F E L
-        rw [smul_add, Pi.single_add]
-        exact add_mem ha hb
-      zero_mem' := by
-        show Pi.single l (k • (0 : Af F ⊗[F] E)) ∈ latHat F E L
-        rw [smul_zero, Pi.single_zero]
-        exact zero_mem _
-      neg_mem' := fun {a} ha => by
-        show Pi.single l (k • (-a)) ∈ latHat F E L
-        rw [smul_neg, Pi.single_neg]
-        exact neg_mem ha }
-  have hsub : {r : Af F ⊗[F] E | ∃ a ∈ intAf F, ∃ e : E, IsIntegral ℤ e ∧ r = a ⊗ₜ[F] e} ⊆
-      (S' : Set _) := by
+theorem single_mem
+    (L : Set (Fin M → E))
+    {k : ℕ} (hk : ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((k : F) • e) ∈ L)
+    {p : Af F ⊗[F] E} (hp : p ∈ Oh F E)
+    (l : Fin M)
+    : Pi.single l (k • p) ∈ latHat F E L := by
+  let S' : AddSubgroup (Af F ⊗[F] E) := {
+    carrier := {q | Pi.single l (k • q) ∈ latHat F E L}
+    add_mem' := fun {a b} ha hb => by
+      show Pi.single l (k • (a + b)) ∈ latHat F E L
+      rw [smul_add, Pi.single_add]
+      exact add_mem ha hb
+    zero_mem' := by
+      show Pi.single l (k • (0 : Af F ⊗[F] E)) ∈ latHat F E L
+      rw [smul_zero, Pi.single_zero]
+      exact zero_mem _
+    neg_mem' := fun {a} ha => by
+      show Pi.single l (k • (-a)) ∈ latHat F E L
+      rw [smul_neg, Pi.single_neg]
+      exact neg_mem ha
+  }
+  have hsub
+      : {r : Af F ⊗[F] E | ∃ a ∈ intAf F, ∃ e : E, IsIntegral ℤ e ∧ r = a ⊗ₜ[F] e}
+        ⊆ (S' : Set _) := by
     rintro r ⟨a, ha, e, he, rfl⟩
     show Pi.single l (k • (a ⊗ₜ[F] e)) ∈ latHat F E L
     rw [nsmul_tmul_F, single_tmul]
@@ -109,7 +119,9 @@ theorem rational_points_dense : RatDense := by
       rw [nsmul_tmul_F, single_tmul]
       refine AddSubgroup.subset_closure ⟨a, ha, _, ?_, rfl⟩
       show g'.mulVec (vinc (Pi.single j (((k * m : ℕ) : F) • e))) ∈ latHat F E L
-      have hv : vinc (F := F) (Pi.single j (((k * m : ℕ) : F) • e)) = Pi.single j ((k * m) • ((1 : Af F) ⊗ₜ[F] e)) := by
+      have hv
+          : vinc (F := F) (Pi.single j (((k * m : ℕ) : F) • e))
+            = Pi.single j ((k * m) • ((1 : Af F) ⊗ₜ[F] e)) := by
         rw [nsmul_tmul_F, single_tmul]
         rfl
       rw [hv]

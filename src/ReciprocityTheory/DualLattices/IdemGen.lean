@@ -45,7 +45,10 @@ theorem idemGen : IdemGenStatement := by
     simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply]
     rw [← h]
     exact Finset.sum_congr rfl fun k _ => mul_comm _ _
-  refine ⟨fun i => ⟨M i, LinearMap.mem_range.mpr ⟨M i, by rw [Matrix.mulVecLin_apply]; exact hrow i⟩⟩, ?_⟩
+  refine ⟨
+    fun i => ⟨M i, LinearMap.mem_range.mpr ⟨M i, by rw [Matrix.mulVecLin_apply]; exact hrow i⟩⟩,
+    ?_
+  ⟩
   rw [eq_top_iff]
   rintro ⟨w, hw⟩ -
   obtain ⟨v, rfl⟩ := LinearMap.mem_range.mp hw
@@ -53,8 +56,8 @@ theorem idemGen : IdemGenStatement := by
   have key : mulVecLin Pᵀ v = ∑ i, (Nᵀ *ᵥ v) i • M i := by
     rw [Matrix.mulVecLin_apply, hPNM, Matrix.transpose_mul, ← Matrix.mulVec_mulVec]
     funext j
-    simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply, Finset.sum_apply,
-      Pi.smul_apply, smul_eq_mul]
+    simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply, Finset.sum_apply, Pi.smul_apply,
+      smul_eq_mul]
     exact Finset.sum_congr rfl fun k _ => mul_comm _ _
   refine (Submodule.mem_span_range_iff_exists_fun R).mpr ⟨fun i => (Nᵀ *ᵥ v) i, ?_⟩
   apply Subtype.ext

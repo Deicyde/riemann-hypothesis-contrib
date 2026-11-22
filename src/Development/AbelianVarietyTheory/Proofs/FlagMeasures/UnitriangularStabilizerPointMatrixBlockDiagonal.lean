@@ -14,14 +14,17 @@ namespace GlobalTheory.PointStab
 
 open Formalism.MainNotions.S
 
-theorem ptEntry_monomial {K : Type} [Field K] (bs : List (K × ℕ)) (hbs : ∀ b ∈ bs, b.1 ≠ 0) :
-    ∃ (σ : ℕ → ℕ) (t : ℕ → K), ∀ a, a < (bs.map Prod.snd).sum →
-      σ a < (bs.map Prod.snd).sum ∧ σ (σ a) = a ∧
-      Formalism.L2.SG.RealObj.blkOf bs (σ a) = Formalism.L2.SG.RealObj.blkOf bs a ∧ t a ≠ 0 ∧
-      ∀ b, b < (bs.map Prod.snd).sum →
-        (a ≤ b → Formalism.L2.SG.RealObj.blkOf bs a ≤ Formalism.L2.SG.RealObj.blkOf bs b) ∧
-        (Formalism.L2.SG.RealObj.blkOf bs a = Formalism.L2.SG.RealObj.blkOf bs b → a + σ a = b + σ b) ∧
-        ptEntry bs a b = if b = σ a then t a else 0 := by
+theorem ptEntry_monomial {K : Type} [Field K] (bs : List (K × ℕ)) (hbs : ∀ b ∈ bs, b.1 ≠ 0)
+    : ∃ (σ : ℕ → ℕ) (t : ℕ → K), ∀ a,
+      a < (bs.map Prod.snd).sum
+        → σ a < (bs.map Prod.snd).sum ∧ σ (σ a) = a
+          ∧ Formalism.L2.SG.RealObj.blkOf bs (σ a) = Formalism.L2.SG.RealObj.blkOf bs a ∧ t a ≠ 0
+          ∧ ∀ b,
+            b < (bs.map Prod.snd).sum
+              → (a ≤ b → Formalism.L2.SG.RealObj.blkOf bs a ≤ Formalism.L2.SG.RealObj.blkOf bs b)
+                ∧ (Formalism.L2.SG.RealObj.blkOf bs a = Formalism.L2.SG.RealObj.blkOf bs b
+                  → a + σ a = b + σ b)
+                ∧ ptEntry bs a b = if b = σ a then t a else 0 := by
   induction bs with
   | nil => exact ⟨id, fun _ => 1, fun a ha => by simp at ha⟩
   | cons x bs ih =>
@@ -30,8 +33,11 @@ theorem ptEntry_monomial {K : Type} [Field K] (bs : List (K × ℕ)) (hbs : ∀ 
     obtain ⟨σ, t, h⟩ := ih (fun b hb => hbs b (List.mem_cons_of_mem _ hb))
     simp only [List.map_cons, List.sum_cons]
     generalize (bs.map Prod.snd).sum = N at h ⊢
-    refine ⟨fun a => if a < m then m - 1 - a else σ (a - m) + m,
-      fun a => if a < m then t0 else t (a - m), fun a ha => ?_⟩
+    refine ⟨
+      fun a => if a < m then m - 1 - a else σ (a - m) + m,
+      fun a => if a < m then t0 else t (a - m),
+      fun a ha => ?_
+    ⟩
     simp only [Formalism.L2.SG.RealObj.blkOf, ptEntry]
     by_cases h1 : a < m
     · have h2 : m - 1 - a < m := by omega
@@ -63,10 +69,12 @@ theorem ptEntry_monomial {K : Type} [Field K] (bs : List (K × ℕ)) (hbs : ∀ 
         · have := f1 (by omega); omega
         · have := f2 (by omega); omega
 
-theorem mul_mono {E : Type} [CommRing E] {n : ℕ} (σ : Fin n → Fin n) (hσ : ∀ a, σ (σ a) = a) (c : Fin n → E)
-    (Z : Matrix (Fin n) (Fin n) E) (hZ : ∀ a b, Z a b = if b = σ a then c a else 0)
-    (X Y : Matrix (Fin n) (Fin n) E) :
-    X * Z = Z * Y ↔ ∀ i a, X i a * c a = c i * Y (σ i) (σ a) := by
+theorem mul_mono
+    {E : Type} [CommRing E]
+    {n : ℕ}
+    (σ : Fin n → Fin n) (hσ : ∀ a, σ (σ a) = a) (c : Fin n → E) (Z : Matrix (Fin n) (Fin n) E)
+    (hZ : ∀ a b, Z a b = if b = σ a then c a else 0) (X Y : Matrix (Fin n) (Fin n) E)
+    : X * Z = Z * Y ↔ ∀ i a, X i a * c a = c i * Y (σ i) (σ a) := by
   have h1 : ∀ i a, (X * Z) i (σ a) = X i a * c a := by
     intro i a
     rw [Matrix.mul_apply, Finset.sum_eq_single a]
@@ -88,14 +96,33 @@ namespace GlobalTheory.PointStab
 
 open Formalism.MainNotions.S
 
-theorem stab_blockDiag : ∀ {K : Type} [Field K] (sig : K →+* K), (∀ x, sig (sig x) = x) → ∀ (r : ℕ) (w : Formalism.MainNotions.S.Point K (r + 1)) (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K), Formalism.MainNotions.S.ZhatOM Z = Formalism.MainNotions.S.ptMat w → (∀ s s' : Matrix (Fin (r + 1)) (Fin (r + 1)) K, Formalism.MainNotions.S.IsUpUni s → Formalism.MainNotions.S.IsUpUni s' → (s.map sig).transpose * Z * s' = Z → ∀ a b : Fin (r + 1), Formalism.L2.SG.RealObj.blkOf w.1 a.1 ≠ Formalism.L2.SG.RealObj.blkOf w.1 b.1 → s' a b = 0) ∧ ∀ s' : Matrix (Fin (r + 1)) (Fin (r + 1)) K, Formalism.MainNotions.S.IsUpUni s' → (∀ a b : Fin (r + 1), Formalism.L2.SG.RealObj.blkOf w.1 a.1 ≠ Formalism.L2.SG.RealObj.blkOf w.1 b.1 → s' a b = 0) → ∃ s : Matrix (Fin (r + 1)) (Fin (r + 1)) K, Formalism.MainNotions.S.IsUpUni s ∧ (s.map sig).transpose * Z * s' = Z := by
+theorem stab_blockDiag
+    : ∀ {K : Type} [Field K] (sig : K →+* K),
+      (∀ x, sig (sig x) = x)
+        → ∀ (r : ℕ) (w : Formalism.MainNotions.S.Point K (r + 1))
+            (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K),
+          Formalism.MainNotions.S.ZhatOM Z = Formalism.MainNotions.S.ptMat w
+            → (∀ s s' : Matrix (Fin (r + 1)) (Fin (r + 1)) K,
+                Formalism.MainNotions.S.IsUpUni s → Formalism.MainNotions.S.IsUpUni s'
+                  → (s.map sig).transpose * Z * s' = Z
+                  → ∀ a b : Fin (r + 1),
+                    Formalism.L2.SG.RealObj.blkOf w.1 a.1 ≠ Formalism.L2.SG.RealObj.blkOf w.1 b.1
+                      → s' a b = 0)
+              ∧ ∀ s' : Matrix (Fin (r + 1)) (Fin (r + 1)) K,
+                Formalism.MainNotions.S.IsUpUni s'
+                  → (∀ a b : Fin (r + 1),
+                    Formalism.L2.SG.RealObj.blkOf w.1 a.1 ≠ Formalism.L2.SG.RealObj.blkOf w.1 b.1
+                      → s' a b = 0)
+                  → ∃ s : Matrix (Fin (r + 1)) (Fin (r + 1)) K,
+                    Formalism.MainNotions.S.IsUpUni s ∧ (s.map sig).transpose * Z * s' = Z := by
   intro K _ sig hsig r w Z hZ
   obtain ⟨σ, t, h⟩ := ptEntry_monomial w.1 (fun b hb => (w.2.1 b hb).1)
   rw [w.2.2] at h
   let σ' : Fin (r + 1) → Fin (r + 1) := fun a => ⟨σ a, (h a a.2).1⟩
   let β : Fin (r + 1) → ℕ := fun a => Formalism.L2.SG.RealObj.blkOf w.1 a.1
   let c : Fin (r + 1) → K := fun a => (-1) ^ (r - σ a) * t a
-  have hc : ∀ a, c a ≠ 0 := fun a => mul_ne_zero (pow_ne_zero _ (neg_ne_zero.2 one_ne_zero)) (h a a.2).2.2.2.1
+  have hc : ∀ a, c a ≠ 0 := fun a =>
+    mul_ne_zero (pow_ne_zero _ (neg_ne_zero.2 one_ne_zero)) (h a a.2).2.2.2.1
   have hσ : ∀ a, σ' (σ' a) = a := fun a => Fin.ext (h a a.2).2.1
   have hβσ : ∀ a, β (σ' a) = β a := fun a => (h a a.2).2.2.1
   have hlt : ∀ a b, β a < β b → a < b := fun a b hab => by
@@ -118,8 +145,10 @@ theorem stab_blockDiag : ∀ {K : Type} [Field K] (sig : K →+* K), (∀ x, sig
     · have h3 : ¬ (b : ℕ) = σ a := fun h' => hb (Fin.ext h')
       simp [hb, h3]
   have hmm := mul_mono σ' hσ c Z hZ'
-  have hLapp : ∀ s : Matrix (Fin (r + 1)) (Fin (r + 1)) K, ∀ i a, (s.map sig).transpose i a = sig (s a i) :=
-    fun s i a => rfl
+  have hLapp
+      : ∀ s : Matrix (Fin (r + 1)) (Fin (r + 1)) K, ∀ i a,
+        (s.map sig).transpose i a = sig (s a i) := fun s i a =>
+    rfl
   refine ⟨fun s s' hs hs' hE a b hab => ?_, fun s' hs' hbd => ?_⟩
   · generalize hLdef : (s.map sig).transpose = L at hE
     have hLapp' : ∀ i a, L i a = sig (s a i) := fun i a => by rw [← hLdef]; rfl
@@ -134,7 +163,9 @@ theorem stab_blockDiag : ∀ {K : Type} [Field K] (sig : K →+* K), (∀ x, sig
     letI : Invertible L := Matrix.invertibleOfIsUnitDet L hu
     have hBT := Matrix.blockTriangular_inv_of_blockTriangular hLT
     have e : L⁻¹ * Z = Z * s' := by
-      calc L⁻¹ * Z = L⁻¹ * (L * Z * s') := by rw [hE]
+      calc
+        L⁻¹ * Z
+          = L⁻¹ * (L * Z * s') := by rw [hE]
         _ = Z * s' := by
           rw [Matrix.mul_assoc L, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hu, Matrix.one_mul]
     rw [hmm] at e

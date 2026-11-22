@@ -5,14 +5,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CosetRefinem
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds GlobalTheory.ColNorms
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds
+  GlobalTheory.ColNorms
 open scoped ComplexOrder
 
 namespace GlobalTheory.SemilocalClasses
 
-theorem card_finset_le {V A Q : Type} [AddCommGroup V] [Module ℚ V] [Module.Finite ℚ V] [AddCommGroup A] [AddCommGroup Q]
-    (f : A →+ V) (hf : Function.Injective f) (π : A →+ Q) (hπ : Function.Surjective π) (n : ℕ) (hn : 0 < n)
-    (h0 : ∀ x : A, π (n • x) = 0) (s : Finset Q) : s.card ≤ n ^ Module.finrank ℚ V := by
+theorem card_finset_le
+    {V A Q : Type}
+    [AddCommGroup V] [Module ℚ V] [Module.Finite ℚ V] [AddCommGroup A] [AddCommGroup Q]
+    (f : A →+ V) (hf : Function.Injective f)
+    (π : A →+ Q) (hπ : Function.Surjective π)
+    (n : ℕ) (hn : 0 < n) (h0 : ∀ x : A, π (n • x) = 0)
+    (s : Finset Q)
+    : s.card ≤ n ^ Module.finrank ℚ V := by
   classical
   obtain ⟨σ, hσ⟩ := hπ.hasRightInverse
   let F : Submodule ℤ A := Submodule.span ℤ (↑(s.image σ) : Set A)
@@ -41,14 +48,20 @@ theorem card_finset_le {V A Q : Type} [AddCommGroup V] [Module ℚ V] [Module.Fi
   haveI : Finite p.range := Nat.finite_of_card_ne_zero hne
   have hsub : (↑s : Set Q) ⊆ (p.range : Set Q) := fun q hq =>
     ⟨⟨σ q, Submodule.subset_span (by simpa using ⟨q, hq, rfl⟩)⟩, hσ q⟩
-  calc s.card = Nat.card (↑s : Set Q) := by simp
+  calc
+    s.card
+      = Nat.card (↑s : Set Q) := by simp
     _ ≤ Nat.card p.range := Nat.card_mono (Set.toFinite _) hsub
     _ ≤ n ^ Module.finrank ℤ F := Nat.le_of_dvd hpos hdvd
     _ ≤ n ^ Module.finrank ℚ V := Nat.pow_le_pow_right hn hr
 
-theorem finite_card_le {V A Q : Type} [AddCommGroup V] [Module ℚ V] [Module.Finite ℚ V] [AddCommGroup A] [AddCommGroup Q]
-    (f : A →+ V) (hf : Function.Injective f) (π : A →+ Q) (hπ : Function.Surjective π) (n : ℕ) (hn : 0 < n)
-    (h0 : ∀ x : A, π (n • x) = 0) : Finite Q ∧ Nat.card Q ≤ n ^ Module.finrank ℚ V := by
+theorem finite_card_le
+    {V A Q : Type}
+    [AddCommGroup V] [Module ℚ V] [Module.Finite ℚ V] [AddCommGroup A] [AddCommGroup Q]
+    (f : A →+ V) (hf : Function.Injective f)
+    (π : A →+ Q) (hπ : Function.Surjective π)
+    (n : ℕ) (hn : 0 < n) (h0 : ∀ x : A, π (n • x) = 0)
+    : Finite Q ∧ Nat.card Q ≤ n ^ Module.finrank ℚ V := by
   have h := card_finset_le f hf π hπ n hn h0
   have hfin : Finite Q := by
     by_contra hinf
@@ -61,14 +74,24 @@ theorem finite_card_le {V A Q : Type} [AddCommGroup V] [Module ℚ V] [Module.Fi
   rw [Nat.card_eq_fintype_card]
   exact h Finset.univ
 
-theorem finite_card_classes : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (a b : ℕ) (S : Finset (HeightOneSpectrum (𝓞 E))) (L : Submodule (𝓞 E) (Sp E a)) (L' : Submodule (𝓞 E) (Sp E b)) (cA c : ℕ), Submodule.IsLattice E L → Submodule.IsLattice E L' → 0 < cA → 0 < c → Finite (↥(divLat cA (homAt S L L')) ⧸ (mulLat c (homAt S L L')).comap (divLat cA (homAt S L L')).subtype) ∧ Nat.card (↥(divLat cA (homAt S L L')) ⧸ (mulLat c (homAt S L L')).comap (divLat cA (homAt S L L')).subtype) ≤ (cA * c) ^ (Module.finrank ℚ E * a * b) := by
+theorem finite_card_classes
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (a b : ℕ)
+        (S : Finset (HeightOneSpectrum (𝓞 E))) (L : Submodule (𝓞 E) (Sp E a))
+        (L' : Submodule (𝓞 E) (Sp E b)) (cA c : ℕ),
+      Submodule.IsLattice E L → Submodule.IsLattice E L' → 0 < cA → 0 < c
+        → Finite
+            (↥(divLat cA (homAt S L L')) ⧸ (mulLat c (homAt S L L')).comap (divLat cA (homAt S L L')).subtype)
+          ∧ Nat.card
+              (↥(divLat cA (homAt S L L')) ⧸ (mulLat c (homAt S L L')).comap (divLat cA (homAt S L L')).subtype)
+            ≤ (cA * c) ^ (Module.finrank ℚ E * a * b) := by
   intro E _ _ _ a b S L L' cA c _ _ hA hc
   haveI : Module.Finite ℚ (HomE E a b) := Module.Finite.trans E (HomE E a b)
   have hd : Module.finrank ℚ (HomE E a b) = Module.finrank ℚ E * a * b := by
     rw [← Module.finrank_mul_finrank ℚ E (HomE E a b), Module.finrank_linearMap]
     simp [mul_assoc]
   rw [← hd]
-  refine finite_card_le (divLat cA (homAt S L L')).subtype.toAddMonoidHom (Submodule.subtype_injective _)
+  refine finite_card_le (divLat cA (homAt S L L')).subtype.toAddMonoidHom
+    (Submodule.subtype_injective _)
     ((mulLat c (homAt S L L')).comap (divLat cA (homAt S L L')).subtype).mkQ.toAddMonoidHom
     (Submodule.mkQ_surjective _) (cA * c) (Nat.mul_pos hA hc) fun x => ?_
   refine (Submodule.Quotient.mk_eq_zero _).2 ⟨(cA : 𝓞 E) • (x : HomE E a b), x.2, ?_⟩

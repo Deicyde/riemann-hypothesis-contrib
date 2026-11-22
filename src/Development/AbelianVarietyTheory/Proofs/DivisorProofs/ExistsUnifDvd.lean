@@ -9,15 +9,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.ShortWeightBounds GlobalTheory.ExpFrame
+open Formalism.CohomologicalDescent.DepthNonnegative
+  Formalism.CohomologicalDescent.ShortWeightBounds GlobalTheory.ExpFrame
 
 namespace GlobalTheory.ExpModel
 
 open GlobalTheory.ExpTie
 
-theorem exists_unif_dvd (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (l : ℕ)
-    (hl : l ≠ 0) (hu : ¬ IsUnit ((l : ℕ) : O)) :
-    ∃ (ϖ : O) (n : ℕ), Irreducible ϖ ∧ ϖ ∣ (l : O) ∧ (l : O) ∣ ϖ ^ n := by
+theorem exists_unif_dvd
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O]
+    (l : ℕ) (hl : l ≠ 0) (hu : ¬ IsUnit ((l : ℕ) : O))
+    : ∃ (ϖ : O) (n : ℕ), Irreducible ϖ ∧ ϖ ∣ (l : O) ∧ (l : O) ∣ ϖ ^ n := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have h0 : ((l : ℕ) : O) ≠ 0 := Nat.cast_ne_zero.2 hl
   obtain ⟨n, hn⟩ := IsDiscreteValuationRing.associated_pow_irreducible h0 hϖ
@@ -45,9 +47,10 @@ abbrev SimpMod (μ : SimpIx X ϖ) : Type := μ.1 ⧸ μ.2.1
 
 variable {X ϖ}
 
-theorem exists_simpMod (Gm : Type) [AddCommGroup Gm] [Module X.A Gm] [IsSimpleModule X.A Gm]
-    (h : IsSubquot X.A (Red X ϖ) Gm) :
-    ∃ μ : SimpIx X ϖ, Nonempty (Gm ≃ₗ[X.A] SimpMod X ϖ μ) := by
+theorem exists_simpMod
+    (Gm : Type) [AddCommGroup Gm] [Module X.A Gm] [IsSimpleModule X.A Gm]
+    (h : IsSubquot X.A (Red X ϖ) Gm)
+    : ∃ μ : SimpIx X ϖ, Nonempty (Gm ≃ₗ[X.A] SimpMod X ϖ μ) := by
   obtain ⟨E, ψ, hψ⟩ := h
   let e := ψ.quotKerEquivOfSurjective hψ
   haveI : IsSimpleModule X.A (E ⧸ LinearMap.ker ψ) := IsSimpleModule.congr e
@@ -61,10 +64,15 @@ namespace GlobalTheory.ExpModel
 
 section SubF
 
-variable {l : ℕ} [Fact l.Prime] {ι : Type} [DecidableEq ι] {N : ℕ} (F : Frame l ι N) (lam : ι → ℕ → ℕ)
-  (jK : F.K →* alg F.O N lam) [mT : Module F.T (Forms F.O (A := alg F.O N lam) F.Γ jK (NablaT F.O N lam))]
+variable
+  {l : ℕ} [Fact l.Prime]
+  {ι : Type} [DecidableEq ι]
+  {N : ℕ} (F : Frame l ι N)
+  (lam : ι → ℕ → ℕ) (jK : F.K →* alg F.O N lam)
+  [mT : Module F.T (Forms F.O (A := alg F.O N lam) F.Γ jK (NablaT F.O N lam))]
   [@IsScalarTower F.O F.T (Forms F.O (A := alg F.O N lam) F.Γ jK (NablaT F.O N lam)) _ mT.toSMul _]
-  (m : Ideal F.T) [m.IsPrime] (ϖ : F.O)
+  (m : Ideal F.T) [m.IsPrime]
+  (ϖ : F.O)
 
 end SubF
 

@@ -36,12 +36,11 @@ lemma dslopeIter_comp_add (G : ℂ → ℂ) (a w₀ : ℂ) (k : ℕ) :
     funext w
     rw [dslopeIter_succ']
 
-theorem residue_comp_add {f : ℂ → ℂ} {a w₀ : ℂ} (hf : MeromorphicAt f (w₀ + a)) :
-    residue (fun w ↦ f (w + a)) w₀ = residue f (w₀ + a) := by
+theorem residue_comp_add {f : ℂ → ℂ} {a w₀ : ℂ} (hf : MeromorphicAt f (w₀ + a))
+    : residue (fun w ↦ f (w + a)) w₀ = residue f (w₀ + a) := by
   set n := meromorphicShift f (w₀ + a)
   set G : ℂ → ℂ := fun z ↦ (z - (w₀ + a)) ^ (n + 1) * f z with hGdef
-  have hG : AnalyticAt ℂ G (w₀ + a) :=
-    analyticAt_pow_mul_of_meromorphicShift_le hf (Nat.le_succ n)
+  have hG : AnalyticAt ℂ G (w₀ + a) := analyticAt_pow_mul_of_meromorphicShift_le hf (Nat.le_succ n)
   have e : (fun w ↦ (w - w₀) ^ (n + 1) * f (w + a)) = fun w ↦ G (w + a) := by
     funext w
     simp only [hGdef]
@@ -54,8 +53,9 @@ theorem residue_comp_add {f : ℂ → ℂ} {a w₀ : ℂ} (hf : MeromorphicAt f 
   rw [residue_eq_dslopeIter hana, e, dslopeIter_comp_add]
   rfl
 
-theorem residue_eq_zero_of_meromorphicOrderAt_nonneg {f : ℂ → ℂ} {p : ℂ} (hf : MeromorphicAt f p)
-    (h : 0 ≤ meromorphicOrderAt f p) : residue f p = 0 := by
+theorem residue_eq_zero_of_meromorphicOrderAt_nonneg
+    {f : ℂ → ℂ} {p : ℂ} (hf : MeromorphicAt f p) (h : 0 ≤ meromorphicOrderAt f p)
+    : residue f p = 0 := by
   by_cases htop : meromorphicOrderAt f p = ⊤
   · rw [meromorphicOrderAt_eq_top_iff] at htop
     rw [residue_congr hf htop]
@@ -79,22 +79,28 @@ lemma analyticAt_principalPart (f : ℂ → ℂ) {p u : ℂ} (hu : u ≠ p) :
   rw [this]
   exact Finset.analyticAt_fun_sum _ fun j _ ↦ analyticAt_const.mul (h _)
 
-theorem rectIntegral_principalPart (f : ℂ → ℂ) {z w p : ℂ} (h1 : z.re < p.re) (h2 : p.re < w.re)
-    (h3 : z.im < p.im) (h4 : p.im < w.im) :
-    rectIntegral (principalPart f p) z w = 2 * π * I * residue f p := by
-  have hp : p ∉ rectBoundary z w := notMem_rectBoundary_of_mem_Ioo
-    ⟨(min_le_left _ _).trans_lt h1, h2.trans_le (le_max_right _ _)⟩
-    ⟨(min_le_left _ _).trans_lt h3, h4.trans_le (le_max_right _ _)⟩
+theorem rectIntegral_principalPart
+    (f : ℂ → ℂ)
+    {z w p : ℂ} (h1 : z.re < p.re) (h2 : p.re < w.re) (h3 : z.im < p.im) (h4 : p.im < w.im)
+    : rectIntegral (principalPart f p) z w = 2 * π * I * residue f p := by
+  have hp : p ∉ rectBoundary z w :=
+    notMem_rectBoundary_of_mem_Ioo ⟨(min_le_left _ _).trans_lt h1, h2.trans_le (le_max_right _ _)⟩
+      ⟨(min_le_left _ _).trans_lt h3, h4.trans_le (le_max_right _ _)⟩
   have hne : ∀ u ∈ rectBoundary z w, u ≠ p := fun u hu h ↦ hp (h ▸ hu)
   have hc : ∀ k : ℕ, ContinuousOn (fun u ↦ ((u - p) ^ k)⁻¹) (rectBoundary z w) := fun k u hu ↦
     ((((continuous_id.sub continuous_const).pow k).continuousAt).inv₀
       (pow_ne_zero _ (sub_ne_zero.2 (hne u hu)))).continuousWithinAt
   set n := meromorphicShift f p
-  have e : principalPart f p = fun u ↦ ∑ j ∈ Finset.range (n + 1),
-      laurentCoeff f p j * ((u - p) ^ (n + 1 - j))⁻¹ := rfl
-  rw [e, rectIntegral_finset_sum (Finset.range (n + 1))
-    (f := fun j u ↦ laurentCoeff f p j * ((u - p) ^ (n + 1 - j))⁻¹)
-    (fun j _ ↦ continuousOn_const.mul (hc _))]
+  have e
+      : principalPart f p
+        = fun u ↦
+          ∑ j ∈ Finset.range (n + 1),
+            laurentCoeff f p j * ((u - p) ^ (n + 1 - j))⁻¹ :=
+    rfl
+  rw [e,
+    rectIntegral_finset_sum (Finset.range (n + 1))
+      (f := fun j u ↦ laurentCoeff f p j * ((u - p) ^ (n + 1 - j))⁻¹)
+      (fun j _ ↦ continuousOn_const.mul (hc _))]
   simp_rw [rectIntegral_const_mul]
   rw [Finset.sum_range_succ, Finset.sum_eq_zero, zero_add]
   · rw [Nat.add_sub_cancel_left]
@@ -109,11 +115,12 @@ theorem rectIntegral_principalPart (f : ℂ → ℂ) {z w p : ℂ} (h1 : z.re < 
     rw [e2, rectIntegral_zpow_sub _ hp, mul_zero]
     omega
 
-theorem rectIntegral_eq_sum_residue {f : ℂ → ℂ} {z w : ℂ} (S : Finset ℂ)
-    (hS : ∀ p ∈ S, z.re < p.re ∧ p.re < w.re ∧ z.im < p.im ∧ p.im < w.im)
+theorem rectIntegral_eq_sum_residue
+    {f : ℂ → ℂ} {z w : ℂ}
+    (S : Finset ℂ) (hS : ∀ p ∈ S, z.re < p.re ∧ p.re < w.re ∧ z.im < p.im ∧ p.im < w.im)
     (hmero : ∀ p ∈ S, MeromorphicAt f p)
-    (hana : ∀ u ∈ [[z.re, w.re]] ×ℂ [[z.im, w.im]], u ∉ S → AnalyticAt ℂ f u) :
-    rectIntegral f z w = 2 * π * I * ∑ p ∈ S, residue f p := by
+    (hana : ∀ u ∈ [[z.re, w.re]] ×ℂ [[z.im, w.im]], u ∉ S → AnalyticAt ℂ f u)
+    : rectIntegral f z w = 2 * π * I * ∑ p ∈ S, residue f p := by
   classical
   set F : ℂ → ℂ := fun u ↦ f u - ∑ q ∈ S, principalPart f q u with hF
   set E : ℂ → ℂ → ℂ := fun p u ↦ regularPart f p u - ∑ q ∈ S.erase p, principalPart f q u
@@ -144,8 +151,8 @@ theorem rectIntegral_eq_sum_residue {f : ℂ → ℂ} {z w : ℂ} (S : Finset �
     · have hnhds : ((S : Set ℂ))ᶜ ∈ 𝓝 u :=
         S.finite_toSet.isClosed.isOpen_compl.mem_nhds (by simpa using huS)
       have hFana : AnalyticAt ℂ F u :=
-        (hana u hu huS).sub (Finset.analyticAt_fun_sum _ fun q hq ↦
-          analyticAt_principalPart f (fun h ↦ huS (h ▸ hq)))
+        (hana u hu huS).sub
+          (Finset.analyticAt_fun_sum _ fun q hq ↦ analyticAt_principalPart f (fun h ↦ huS (h ▸ hq)))
       refine hFana.congr ?_
       filter_upwards [hnhds] with v hv
       have hvS : v ∉ S := by simpa using hv
@@ -170,13 +177,16 @@ theorem rectIntegral_eq_sum_residue {f : ℂ → ℂ} {z w : ℂ} (S : Finset �
     have huS : u ∉ S := fun h ↦ hSb u h hu
     simp only [hG, if_neg huS]
   have hPc : ∀ q ∈ S, ContinuousOn (principalPart f q) (rectBoundary z w) := fun q hq u hu ↦
-    (analyticAt_principalPart f (fun (h : u = q) ↦ hSb q hq (h ▸ hu))).continuousAt.continuousWithinAt
+    (analyticAt_principalPart f
+      (fun (h : u = q) ↦ hSb q hq (h ▸ hu))).continuousAt.continuousWithinAt
   have hFc : ContinuousOn F (rectBoundary z w) := fun u hu ↦ by
     have huS : u ∉ S := fun h ↦ hSb u h hu
-    exact ((hana u (hbK hu) huS).sub (Finset.analyticAt_fun_sum _ fun q hq ↦
-      analyticAt_principalPart f (fun h ↦ huS (h ▸ hq)))).continuousAt.continuousWithinAt
-  have hsplit : rectIntegral f z w =
-      rectIntegral F z w + ∑ q ∈ S, rectIntegral (principalPart f q) z w := by
+    exact ((hana u (hbK hu) huS).sub
+      (Finset.analyticAt_fun_sum _ fun q hq ↦
+        analyticAt_principalPart f (fun h ↦ huS (h ▸ hq)))).continuousAt.continuousWithinAt
+  have hsplit
+      : rectIntegral f z w
+        = rectIntegral F z w + ∑ q ∈ S, rectIntegral (principalPart f q) z w := by
     rw [← rectIntegral_finset_sum S hPc, ← rectIntegral_add hFc (continuousOn_finsetSum S hPc)]
     congr 1
     funext u

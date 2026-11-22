@@ -9,10 +9,10 @@ open Matrix Finset Real
 
 namespace GlobalTheory
 
-theorem cumulant_lower_bound_of_bounded_centred :
-    ∀ (ι : Type) [Fintype ι] (w y : ι → ℝ) (R : ℝ), 0 < R → (∀ J, 0 ≤ w J) → ∑ J, w J = 1 →
-      ∑ J, w J * y J = 0 → (∀ J, w J ≠ 0 → |y J| ≤ R) →
-      min 1 (1 / R) * (∑ J, w J * y J ^ 2) / 4 ≤ Real.log (∑ J, w J * Real.exp (y J)) := by
+theorem cumulant_lower_bound_of_bounded_centred
+    : ∀ (ι : Type) [Fintype ι] (w y : ι → ℝ) (R : ℝ),
+      0 < R → (∀ J, 0 ≤ w J) → ∑ J, w J = 1 → ∑ J, w J * y J = 0 → (∀ J, w J ≠ 0 → |y J| ≤ R)
+        → min 1 (1 / R) * (∑ J, w J * y J ^ 2) / 4 ≤ Real.log (∑ J, w J * Real.exp (y J)) := by
   intro ι _ w y R hR hw hs hm hb
   obtain ⟨hexp, hlog⟩ := GlobalTheory.T.exp_quadratic_lower_and_log_linear_lower'
   set t : ℝ := min 1 (1 / R) with ht
@@ -38,10 +38,14 @@ theorem cumulant_lower_bound_of_bounded_centred :
       nlinarith
   have hlow : 1 + t ^ 2 * V / 3 ≤ ∑ J, w J * Real.exp (t * y J) := by
     have e : 1 + t ^ 2 * V / 3 = ∑ J, w J * (1 + t * y J + (t * y J) ^ 2 / 3) := by
-      have e2 : ∀ J, w J * (1 + t * y J + (t * y J) ^ 2 / 3)
-          = w J + t * (w J * y J) + t ^ 2 / 3 * (w J * y J ^ 2) := fun J => by ring
+      have e2
+          : ∀ J,
+            w J * (1 + t * y J + (t * y J) ^ 2 / 3)
+              = w J + t * (w J * y J) + t ^ 2 / 3 * (w J * y J ^ 2) := fun J => by
+        ring
       simp only [e2, Finset.sum_add_distrib, ← Finset.mul_sum, hs, hm]
-      rw [← hV]; ring
+      rw [← hV]
+      ring
     rw [e]
     refine Finset.sum_le_sum fun J _ => ?_
     by_cases hJ : w J = 0
@@ -51,32 +55,31 @@ theorem cumulant_lower_bound_of_bounded_centred :
     have : ∑ J, w J * (y J + 1) = 1 := by
       simp only [mul_add, mul_one, Finset.sum_add_distrib, hs, hm, zero_add]
     rw [← this]
-    exact Finset.sum_le_sum fun J _ =>
-      mul_le_mul_of_nonneg_left (Real.add_one_le_exp _) (hw J)
+    exact Finset.sum_le_sum fun J _ => mul_le_mul_of_nonneg_left (Real.add_one_le_exp _) (hw J)
   have hS0 : 0 < S := by linarith
   set F : ℝ := Real.log S with hF
   have hEF : Real.exp F = S := Real.exp_log hS0
-  have hpt : ∀ J, Real.exp (t * y J)
-      ≤ Real.exp (t * F) * (t * (Real.exp (y J) / S) + (1 - t)) := by
+  have hpt : ∀ J, Real.exp (t * y J) ≤ Real.exp (t * F) * (t * (Real.exp (y J) / S) + (1 - t)) := by
     intro J
-    have h := convexOn_exp.2 (Set.mem_univ (y J - F)) (Set.mem_univ 0) ht0.le
-      (sub_nonneg.2 ht1) (by ring)
+    have h :=
+      convexOn_exp.2 (Set.mem_univ (y J - F)) (Set.mem_univ 0) ht0.le (sub_nonneg.2 ht1) (by ring)
     simp only [smul_eq_mul, mul_zero, add_zero, Real.exp_zero, mul_one] at h
     rw [Real.exp_sub, hEF] at h
     have e : t * y J = t * F + t * (y J - F) := by ring
     rw [e, Real.exp_add]
     exact mul_le_mul_of_nonneg_left h (Real.exp_pos _).le
   have hup : ∑ J, w J * Real.exp (t * y J) ≤ Real.exp (t * F) := by
-    calc ∑ J, w J * Real.exp (t * y J)
-        ≤ ∑ J, w J * (Real.exp (t * F) * (t * (Real.exp (y J) / S) + (1 - t))) :=
-          Finset.sum_le_sum fun J _ => mul_le_mul_of_nonneg_left (hpt J) (hw J)
+    calc
+      ∑ J, w J * Real.exp (t * y J)
+          ≤ ∑ J, w J * (Real.exp (t * F) * (t * (Real.exp (y J) / S) + (1 - t))) :=
+        Finset.sum_le_sum fun J _ => mul_le_mul_of_nonneg_left (hpt J) (hw J)
       _ = ∑ J, (Real.exp (t * F) * t / S * (w J * Real.exp (y J))
             + Real.exp (t * F) * (1 - t) * w J) :=
-          Finset.sum_congr rfl fun J _ => by ring
+        Finset.sum_congr rfl fun J _ => by ring
       _ = Real.exp (t * F) := by
-          rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hs, ← hS]
-          field_simp
-          ring
+        rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hs, ← hS]
+        field_simp
+        ring
   have hu0 : 0 ≤ t ^ 2 * V / 3 := by positivity
   have h1 := hlog (t ^ 2 * V / 3) hu0 (by linarith)
   have h2 : Real.log (1 + t ^ 2 * V / 3) ≤ t * F := by

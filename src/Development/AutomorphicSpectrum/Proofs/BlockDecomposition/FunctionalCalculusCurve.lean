@@ -276,12 +276,13 @@ lemma coe_toC0 {f : ℝ → ℂ} (h1 : Continuous f) (h2 : Tendsto f (cocompact 
 
 theorem fcurve : Fcurve := by
   intro c N j hj t
-  have hC : ∀ {k : ℕ}, k + 1 ≤ 4 * N → ∀ τ : ℝ, ⇑(toC0 (wv c N k τ)) = wv c N k τ :=
-    fun hk τ => coe_toC0 (wv_continuous c N _ τ) (wv_tendsto c hk τ)
+  have hC : ∀ {k : ℕ}, k + 1 ≤ 4 * N → ∀ τ : ℝ, ⇑(toC0 (wv c N k τ)) = wv c N k τ := fun hk τ =>
+    coe_toC0 (wv_continuous c N _ τ) (wv_tendsto c hk τ)
   refine ⟨⟨wv_continuous c N j t, wv_tendsto c (by omega) t⟩, ?_⟩
   rw [hasDerivAt_iff_isLittleO_nhds_zero]
-  have hO : (fun h : ℝ => toC0 (wv c N j (t + h)) - toC0 (wv c N j t) -
-      h • toC0 (wv c N (j + 1) t)) =O[𝓝 0] fun h : ℝ => h ^ 2 := by
+  have hO
+      : (fun h : ℝ => toC0 (wv c N j (t + h)) - toC0 (wv c N j t) -
+        h • toC0 (wv c N (j + 1) t)) =O[𝓝 0] fun h : ℝ => h ^ 2 := by
     refine IsBigO.of_bound (Real.exp ((|t| + 1) * Real.sqrt (max (c + 1) 0))) ?_
     filter_upwards [Metric.ball_mem_nhds (0 : ℝ) one_pos] with h hh
     have hh1 : |h| ≤ 1 := by
@@ -290,14 +291,13 @@ theorem fcurve : Fcurve := by
     rw [← ZeroAtInftyContinuousMap.norm_toBCF_eq_norm, Real.norm_eq_abs,
       abs_of_nonneg (sq_nonneg h)]
     refine (BoundedContinuousFunction.norm_le (by positivity)).2 fun y => ?_
-    have e : (toC0 (wv c N j (t + h)) - toC0 (wv c N j t) -
-        h • toC0 (wv c N (j + 1) t)).toBCF y =
-        wv c N j (t + h) y - wv c N j t y - (h : ℂ) * wv c N (j + 1) t y := by
+    have e
+        : (toC0 (wv c N j (t + h)) - toC0 (wv c N j t) - h • toC0 (wv c N (j + 1) t)).toBCF y
+          = wv c N j (t + h) y - wv c N j t y - (h : ℂ) * wv c N (j + 1) t y := by
       show (toC0 (wv c N j (t + h)) - toC0 (wv c N j t) -
         h • toC0 (wv c N (j + 1) t) : C₀(ℝ, ℂ)) y = _
-      simp only [ZeroAtInftyContinuousMap.coe_sub, ZeroAtInftyContinuousMap.coe_smul,
-        Pi.sub_apply, Pi.smul_apply, hC (k := j) (by omega), hC (k := j + 1) (by omega),
-        Complex.real_smul]
+      simp only [ZeroAtInftyContinuousMap.coe_sub, ZeroAtInftyContinuousMap.coe_smul, Pi.sub_apply,
+        Pi.smul_apply, hC (k := j) (by omega), hC (k := j + 1) (by omega), Complex.real_smul]
     rw [e]
     exact wv_taylor c hj t h y hh1
   refine hO.trans_isLittleO ?_

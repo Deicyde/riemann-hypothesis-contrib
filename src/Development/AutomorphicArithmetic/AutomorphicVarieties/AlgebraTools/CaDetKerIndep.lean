@@ -11,10 +11,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open IsLocalRing UpperTheory.V.AlgebraTools
 
 private theorem UpperTheory.V.AlgebraTools.generic_kernel_monotone
-    (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι]
-    (z : Matrix ι ι P) (m : ι → P)
-    (h : CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m)) (c d : ι) :
-    genKer z m c ≤ genKer z m d := by
+    (P : Type) [CommRing P] [IsRegularLocalRing P]
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (z : Matrix ι ι P) (m : ι → P) (h : CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m))
+    (c d : ι)
+    : genKer z m c ≤ genKer z m d := by
   classical
   intro f hf
   haveI hQ : (Ideal.map (MvPolynomial.C : P →+* MvPolynomial ι P) (maximalIdeal P)).IsPrime :=
@@ -98,7 +99,9 @@ private theorem UpperTheory.V.AlgebraTools.generic_kernel_monotone
     intro j
     show φ (m j) = w * l j * φ (m c)
     rw [hm c, hm j]
-    calc l j * φ (m d) = l j * φ (m d) * (w * l c) := by rw [hw, mul_one]
+    calc
+      l j * φ (m d)
+        = l j * φ (m d) * (w * l c) := by rw [hw, mul_one]
       _ = w * l j * (l c * φ (m d)) := by ring
   have hk := genKer_le_ker P ι z m h c (L ⧸ J) φ l' hl' hmul' hm' hf
   rw [RingHom.mem_ker] at hk
@@ -115,9 +118,10 @@ private theorem UpperTheory.V.AlgebraTools.generic_kernel_monotone
     rw [h6]
     exact Ideal.mul_mem_left _ _ ha
 
-theorem UpperTheory.V.AlgebraTools.genKer_eq :
-    ∀ (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι] (z : Matrix ι ι P) (m : ι → P),
-      CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m) →
-      ∀ c d : ι, genKer z m c = genKer z m d := by
+theorem UpperTheory.V.AlgebraTools.genKer_eq
+    : ∀ (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι]
+        (z : Matrix ι ι P) (m : ι → P),
+      CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m)
+        → ∀ c d : ι, genKer z m c = genKer z m d := by
   intro P _ _ ι _ _ z m h c d
   exact le_antisymm (generic_kernel_monotone P ι z m h c d) (generic_kernel_monotone P ι z m h d c)

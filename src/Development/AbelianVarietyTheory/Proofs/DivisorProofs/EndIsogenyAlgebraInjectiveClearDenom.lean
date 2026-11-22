@@ -8,21 +8,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HomTorsionFr
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AV.AbVar
 
-theorem isLocalizedModule_ratTensor (M : Type) [AddCommGroup M] :
-    IsLocalizedModule (nonZeroDivisors ℤ) (TensorProduct.mk ℤ ℚ M 1) :=
+theorem isLocalizedModule_ratTensor (M : Type) [AddCommGroup M]
+    : IsLocalizedModule (nonZeroDivisors ℤ) (TensorProduct.mk ℤ ℚ M 1) :=
   (isLocalizedModule_iff_isBaseChange (nonZeroDivisors ℤ) ℚ _).2 (TensorProduct.isBaseChange ℤ M ℚ)
 
-theorem toEnd0_apply {K : Type} [Field K] (A : AbVar K) (f : End A) :
-    toEnd0 A f = TensorProduct.mk ℤ ℚ (End A) 1 f := rfl
+theorem toEnd0_apply {K : Type} [Field K] (A : AbVar K) (f : End A)
+    : toEnd0 A f = TensorProduct.mk ℤ ℚ (End A) 1 f :=
+  rfl
 
-theorem toEnd0_injective_and_fraction : ∀ (K : Type) [Field K] (A : AbVar K),
-    Function.Injective (toEnd0 A) ∧ ∀ x : End0 A, ∃ (n : ℕ) (f : End A), 0 < n ∧ n • x = toEnd0 A f := by
+theorem toEnd0_injective_and_fraction
+    : ∀ (K : Type) [Field K] (A : AbVar K),
+      Function.Injective (toEnd0 A)
+        ∧ ∀ x : End0 A, ∃ (n : ℕ) (f : End A), 0 < n ∧ n • x = toEnd0 A f := by
   intro K _ A
   haveI := isLocalizedModule_ratTensor (End A)
   refine ⟨fun f g h => ?_, fun x => ?_⟩
@@ -38,7 +43,8 @@ theorem toEnd0_injective_and_fraction : ∀ (K : Type) [Field K] (A : AbVar K),
     have hh := congrArg (End.addEquiv (X := A)) h1
     rw [map_zsmul, map_zero] at hh
     exact hh
-  · obtain ⟨⟨m, c⟩, hc⟩ := IsLocalizedModule.surj (nonZeroDivisors ℤ) (TensorProduct.mk ℤ ℚ (End A) 1) x
+  · obtain ⟨⟨m, c⟩, hc⟩ :=
+      IsLocalizedModule.surj (nonZeroDivisors ℤ) (TensorProduct.mk ℤ ℚ (End A) 1) x
     have hc0 : (c : ℤ) ≠ 0 := nonZeroDivisors.coe_ne_zero c
     simp only [Submonoid.smul_def] at hc
     rcases Int.natAbs_eq (c : ℤ) with h | h

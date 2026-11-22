@@ -15,9 +15,21 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemOfSumM
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col
 
-theorem GlobalTheory.ZetaPoly.exists_poly : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω), OverL l A → ∀ (n : ℕ) (ζ : Ω), IsPrimitiveRoot ζ (l ^ n) → ∀ u ∈ A, (∀ s ∈ Ine (F := ℚ) A, s ζ = ζ → s u = u) → ∃ Q : Polynomial Ω, (∀ d, Q.coeff d ∈ A ∧ ∀ s ∈ Ine (F := ℚ) A, s (Q.coeff d) = Q.coeff d) ∧ Q.eval ζ = u := by
+theorem GlobalTheory.ZetaPoly.exists_poly
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+        (A : ValuationSubring Ω),
+      OverL l A
+        → ∀ (n : ℕ) (ζ : Ω),
+          IsPrimitiveRoot ζ (l ^ n)
+            → ∀ u ∈ A,
+              (∀ s ∈ Ine (F := ℚ) A, s ζ = ζ → s u = u)
+                → ∃ Q : Polynomial Ω,
+                  (∀ d, Q.coeff d ∈ A ∧ ∀ s ∈ Ine (F := ℚ) A, s (Q.coeff d) = Q.coeff d)
+                    ∧ Q.eval ζ = u := by
   intro l _ Ω _ _ _ A hA n ζ hζ u hu hfix
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   rcases Nat.eq_zero_or_pos n with rfl | hn
@@ -35,8 +47,7 @@ theorem GlobalTheory.ZetaPoly.exists_poly : ∀ (l : ℕ) [Fact l.Prime] (Ω : T
   set Φ := Polynomial.cyclotomic (l ^ n) Ω with hΦ
   have hΦm : Φ.Monic := Polynomial.cyclotomic.monic _ _
   have hΦdeg : Φ.natDegree = N := Polynomial.natDegree_cyclotomic _ _
-  have hΦ1 : Φ ≠ 1 := by
-    intro h; rw [h, Polynomial.natDegree_one] at hΦdeg; omega
+  have hΦ1 : Φ ≠ 1 := by intro h; rw [h, Polynomial.natDegree_one] at hΦdeg; omega
   set P' := P %ₘ Φ with hP'
   have hroot : Φ.eval ζ = 0 := (hζ.isRoot_cyclotomic hlpos)
   have hev : P'.eval ζ = u := by
@@ -61,9 +72,14 @@ theorem GlobalTheory.ZetaPoly.exists_poly : ∀ (l : ℕ) [Fact l.Prime] (Ω : T
     simpa using this
   have hl0 : (l : Ω) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
   have hcA : ∀ i < N, T.coeff i ∈ A := by
-    refine GlobalTheory.T.coeff_mem_of_sum_mul_pow_mem_of_valuation_zpow Ω A N (ζ - 1) (l : Ω) (fun i => T.coeff i) hNpos hl0 hl1
-      (GlobalTheory.T.valuationSubring_primitiveRoot_sub_one_pow_totient_ratAlg l Ω A n ζ hn hζ) (fun i _ hc => ?_) (hsum ▸ hu)
-    refine GlobalTheory.T.inertiaFixed_valuation_eq_zpow_prime_ratAlgClosure l Ω A ⟨v, hv, hlv⟩ _ hc (fun s hs => ?_)
+    refine GlobalTheory.T.coeff_mem_of_sum_mul_pow_mem_of_valuation_zpow Ω A N (ζ - 1) (l : Ω)
+      (fun i => T.coeff i)
+      hNpos hl0 hl1
+      (GlobalTheory.T.valuationSubring_primitiveRoot_sub_one_pow_totient_ratAlg l Ω A n ζ hn hζ)
+      (fun i _ hc => ?_)
+      (hsum ▸ hu)
+    refine GlobalTheory.T.inertiaFixed_valuation_eq_zpow_prime_ratAlgClosure l Ω A ⟨v, hv, hlv⟩ _ hc
+      (fun s hs => ?_)
     have := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p i) (hTmap s hs)
     simpa [Polynomial.coeff_map] using this
   have hcA' : ∀ i, T.coeff i ∈ A := fun i => by
@@ -78,7 +94,8 @@ theorem GlobalTheory.ZetaPoly.exists_poly : ∀ (l : ℕ) [Fact l.Prime] (Ω : T
   refine ⟨P', fun d => ⟨?_, fun s hs => ?_⟩, hev⟩
   · rw [← hback, ← hT₀]
     have : ((-1 : A) : Ω) = -1 := by simp
-    rw [← this, show ((-1 : A) : Ω) = A.subtype (-1) from rfl, ← Polynomial.map_taylor, Polynomial.coeff_map]
+    rw [← this, show ((-1 : A) : Ω) = A.subtype (-1) from rfl, ← Polynomial.map_taylor,
+      Polynomial.coeff_map]
     exact (Polynomial.taylor (-1 : A) T₀).coeff d |>.2
   · have := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p d) (hP'map s hs)
     simpa [Polynomial.coeff_map] using this

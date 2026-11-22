@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CocompactOfMe
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
+open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
 open Formalism.UG (cT)
 open scoped TensorProduct NNReal ENNReal
 
@@ -14,13 +15,13 @@ namespace GlobalTheory.CompanionTheory.UnipCocompact
 
 open GlobalTheory.UnipFlagCore
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {r : ℕ}
 
-
 omit [NumberField E] in
-theorem unipMin_eq_radSet (X : Matrix (Fin n) (Fin r) E) :
-    unipMin σ J X = radSet σ J X Fin.val := by
+theorem unipMin_eq_radSet (X : Matrix (Fin n) (Fin r) E)
+    : unipMin σ J X = radSet σ J X Fin.val := by
   ext u
   constructor
   · rintro ⟨B, hB, hd, hX, hz⟩
@@ -45,9 +46,12 @@ theorem unipMin_eq_radSet (X : Matrix (Fin n) (Fin r) E) :
     · rw [Matrix.mul_add, Matrix.mul_one, ← e, Matrix.sub_mul, Matrix.one_mul]
       exact (add_sub_cancel _ _).symm
 
-theorem closure_radSet_subset (hσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) {X : Matrix (Fin n) (Fin r) E}
-    (hC : LinearIndependent E Xᵀ) (h0 : cT (σ : E →+* E) X * J * X = 0) {g : HA (AF F) σ J}
-    (hg : g ∈ Subgroup.closure (radSet σ J X Fin.val)) : g ∈ radSet σ J X Fin.val := by
+theorem closure_radSet_subset
+    (hσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J)
+    {X : Matrix (Fin n) (Fin r) E}
+    (hC : LinearIndependent E Xᵀ) (h0 : cT (σ : E →+* E) X * J * X = 0)
+    {g : HA (AF F) σ J} (hg : g ∈ Subgroup.closure (radSet σ J X Fin.val))
+    : g ∈ radSet σ J X Fin.val := by
   obtain ⟨L, hL, hLL⟩ := exists_dual hσ hJ X hC h0
   have hd : ∀ j : Fin r, (j : ℕ) < r := fun j => j.2
   have he := idem_complete hσ hJ X L hL h0 hLL
@@ -69,16 +73,31 @@ theorem closure_radSet_subset (hσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) 
     have := raise_st (adj_mul hσ hJ) (adj_adj hσ hJ) hs 0 hx
     rwa [map_sub, adj_mat hσ hJ, h1] at this
 
-theorem linearIndependent_of_isWittFrame (hσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J)
-    {X Y : Matrix (Fin n) (Fin r) E} (hW : IsWittFrame σ J X Y) : LinearIndependent E Xᵀ := by
+theorem linearIndependent_of_isWittFrame
+    (hσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J)
+    {X Y : Matrix (Fin n) (Fin r) E} (hW : IsWittFrame σ J X Y)
+    : LinearIndependent E Xᵀ := by
   have e : cT (σ : E →+* E) Y * J * X = 1 := by
     have := congrArg (cT (σ : E →+* E)) hW.xy
-    rwa [Formalism.UG.cT_mul, Formalism.UG.cT_mul, cT_cT' hσ hJ, cT_gram hJ, Formalism.UG.cT_one, ← Matrix.mul_assoc] at this
+    rwa [Formalism.UG.cT_mul, Formalism.UG.cT_mul, cT_cT' hσ hJ, cT_gram hJ, Formalism.UG.cT_one,
+        ← Matrix.mul_assoc]
+      at this
   refine Matrix.mulVec_injective_iff.1 fun v w h => ?_
   have := congrArg ((cT (σ : E →+* E) Y * J) *ᵥ ·) h
   simpa only [Matrix.mulVec_mulVec, e, Matrix.one_mulVec] using this
 
-theorem unipMin_cocompact : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J → ∀ (r : ℕ) (X Y : Matrix (Fin n) (Fin r) E), IsWittFrame σ J X Y → ∃ C : Set (GAd σ J), IsCompact C ∧ ∀ u ∈ unipMin σ J X, ∃ δ ∈ ratPts σ J, δ ∈ unipMin σ J X ∧ ∃ c ∈ C, c ∈ unipMin σ J X ∧ u = δ * c := by
+theorem unipMin_cocompact
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+          IsHermND σ J
+            → ∀ (r : ℕ) (X Y : Matrix (Fin n) (Fin r) E),
+              IsWittFrame σ J X Y
+                → ∃ C : Set (GAd σ J),
+                  IsCompact C
+                    ∧ ∀ u ∈ unipMin σ J X, ∃ δ ∈ ratPts σ J,
+                      δ ∈ unipMin σ J X ∧ ∃ c ∈ C, c ∈ unipMin σ J X ∧ u = δ * c := by
   intro F E _ _ _ _ _ σ h n J hJ r X Y hW
   have hσ := sigma_sigma h
   have hC := linearIndependent_of_isWittFrame hσ hJ hW

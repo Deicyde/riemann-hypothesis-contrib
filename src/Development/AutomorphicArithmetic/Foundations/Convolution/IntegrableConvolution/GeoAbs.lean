@@ -122,12 +122,16 @@ theorem geoAbs : GeoAbs := by
   have CV := changeVar G μ m δ
   obtain ⟨pc, -, pne, -, -, -⟩ := pushTest G μ m Φ hΦ hΦc
   have CP := closedProper G γ hcl
-  let dg : (Subgroup.centralizer {γ} : Subgroup G) →* (Fin (m + 1) → G) :=
-    { toFun := fun t _ => (t : G), map_one' := rfl, map_mul' := fun _ _ => rfl }
+  let dg : (Subgroup.centralizer {γ} : Subgroup G) →* (Fin (m + 1) → G) := {
+    toFun := fun t _ => (t : G)
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
   have hdg : Continuous dg := continuous_pi fun _ => continuous_subtype_val
   let F : (Fin (m + 1) → G) → ℂ := fun x => Φ fun i => (x i)⁻¹ * δ i * x (i + 1)
-  have hFc : Continuous F := hΦ.comp (continuous_pi fun i =>
-    ((continuous_apply i).inv.mul continuous_const).mul (continuous_apply (i + 1)))
+  have hFc : Continuous F :=
+    hΦ.comp (continuous_pi fun i =>
+      ((continuous_apply i).inv.mul continuous_const).mul (continuous_apply (i + 1)))
   have hFinv : ∀ t x, F (dg t * x) = F x := by
     intro t x
     show (Φ fun i => ((t : G) * x i)⁻¹ * δ i * ((t : G) * x (i + 1))) = Φ fun i => (x i)⁻¹ * δ i * x (i + 1)
@@ -135,61 +139,95 @@ theorem geoAbs : GeoAbs := by
     funext i
     have hc := hcomm t t.2 (δ i) (hδ i)
     have h2 : (t : G)⁻¹ * δ i * t = δ i := by rw [mul_assoc, ← hc, inv_mul_cancel_left]
-    calc ((t : G) * x i)⁻¹ * δ i * ((t : G) * x (i + 1)) = (x i)⁻¹ * ((t : G)⁻¹ * δ i * t) * x (i + 1) := by group
+    calc
+      ((t : G) * x i)⁻¹ * δ i * ((t : G) * x (i + 1))
+        = (x i)⁻¹ * ((t : G)⁻¹ * δ i * t) * x (i + 1) := by group
       _ = _ := by rw [h2]
   let f : G → ℂ := fun x => push μ m Φ (x⁻¹ * γ * x)
   have hfc : Continuous f := pc.comp ((continuous_inv.mul continuous_const).mul continuous_id)
-  have hfinv : ∀ (t : (Subgroup.centralizer {γ} : Subgroup G)) x, f ((Subgroup.centralizer {γ} : Subgroup G).subtype t * x) = f x := by
+  have hfinv
+      : ∀ (t : (Subgroup.centralizer {γ} : Subgroup G)) x,
+        f ((Subgroup.centralizer {γ} : Subgroup G).subtype t * x) = f x := by
     intro t x
     show push μ m Φ (((t : G) * x)⁻¹ * γ * ((t : G) * x)) = push μ m Φ (x⁻¹ * γ * x)
     have hc : (t : G) * γ = γ * t := Subgroup.mem_centralizer_singleton_iff.1 t.2
     have h2 : (t : G)⁻¹ * γ * t = γ := by rw [mul_assoc, ← hc, inv_mul_cancel_left]
     congr 1
-    calc ((t : G) * x)⁻¹ * γ * ((t : G) * x) = x⁻¹ * ((t : G)⁻¹ * γ * t) * x := by group
+    calc
+      ((t : G) * x)⁻¹ * γ * ((t : G) * x)
+        = x⁻¹ * ((t : G)⁻¹ * γ * t) * x := by group
       _ = _ := by rw [h2]
-  have hw : ∀ x : Fin (m + 1) → G, (List.ofFn fun i => (x i)⁻¹ * δ i * x (i + 1)).prod = (x 0)⁻¹ * γ * x 0 := by
+  have hw
+      : ∀ x : Fin (m + 1) → G,
+        (List.ofFn fun i => (x i)⁻¹ * δ i * x (i + 1)).prod = (x 0)⁻¹ * γ * x 0 := by
     intro x
     rw [CV.2 x, prod_fib, hprod]
-  obtain ⟨C, hC, hCx⟩ := supp_bound γ _ hcomm δ hδ (tsupport Φ) hΦc
-    (fun x hx => ⟨_, hx, hw x⟩) CP
+  obtain ⟨C, hC, hCx⟩ := supp_bound γ _ hcomm δ hδ (tsupport Φ) hΦc (fun x hx => ⟨_, hx, hw x⟩) CP
   obtain ⟨C', hC', hCx'⟩ := CP _ (hΦc.image (cont_prod (m + 1)))
-  have fin1 : ∀ ρ, IsNormAlong id dg ν ρ → ∫⁻ x, ‖F x‖ₑ * ρ x ∂(Measure.pi fun _ => μ) < ⊤ := fun ρ hρ =>
+  have fin1
+      : ∀ ρ, IsNormAlong id dg ν ρ → ∫⁻ x, ‖F x‖ₑ * ρ x ∂(Measure.pi fun _ => μ) < ⊤ := fun ρ hρ =>
     quotFin (Fin (m + 1) → G) _ (Measure.pi fun _ => μ) ν dg hdg F ρ hFc hFinv
-      ⟨C, hC, fun x hx => by
-        obtain ⟨t, y, hy, e⟩ := hCx x (subset_tsupport _ (Function.mem_support.2 hx))
-        exact ⟨t, y, hy, e⟩⟩ hρ
-  have fin2 : ∀ ρ, IsNormAlong id (Subgroup.centralizer {γ} : Subgroup G).subtype ν ρ → ∫⁻ x, ‖f x‖ₑ * ρ x ∂μ < ⊤ := fun ρ hρ =>
-    quotFin G _ μ ν (Subgroup.centralizer {γ} : Subgroup G).subtype continuous_subtype_val f ρ hfc hfinv
-      ⟨C', hC', fun x hx => by
-        obtain ⟨g, hg, e⟩ := pne _ hx
-        obtain ⟨t, ht, y, hy, e'⟩ := hCx' x ⟨g, subset_tsupport _ (Function.mem_support.2 hg), e⟩
-        exact ⟨⟨t, ht⟩, y, hy, e'⟩⟩ hρ
+      ⟨
+        C,
+        hC,
+        fun x hx => by
+          obtain ⟨t, y, hy, e⟩ := hCx x (subset_tsupport _ (Function.mem_support.2 hx))
+          exact ⟨t, y, hy, e⟩
+      ⟩
+      hρ
+  have fin2
+      : ∀ ρ,
+        IsNormAlong id (Subgroup.centralizer {γ} : Subgroup G).subtype ν ρ
+          → ∫⁻ x, ‖f x‖ₑ * ρ x ∂μ < ⊤ := fun ρ hρ =>
+    quotFin G _ μ ν (Subgroup.centralizer {γ} : Subgroup G).subtype continuous_subtype_val f ρ hfc
+      hfinv
+      ⟨
+        C',
+        hC',
+        fun x hx => by
+          obtain ⟨g, hg, e⟩ := pne _ hx
+          obtain ⟨t, ht, y, hy, e'⟩ := hCx' x ⟨g, subset_tsupport _ (Function.mem_support.2 hg), e⟩
+          exact ⟨⟨t, ht⟩, y, hy, e'⟩
+      ⟩
+      hρ
   refine ⟨fin1, ?_⟩
-  by_cases hex : ∃ ρ', IsNormAlong id (fun t : (Subgroup.centralizer {γ} : Subgroup G) => (t : G)) ν ρ'
+  by_cases hex
+    : ∃ ρ', IsNormAlong id (fun t : (Subgroup.centralizer {γ} : Subgroup G) => (t : G)) ν ρ'
   · obtain ⟨ρ', hρ'⟩ := hex
     have hρ : IsNormAlong id dg ν (fun x => ρ' (x 0)) :=
       ⟨hρ'.1.comp (measurable_pi_apply 0), fun x => hρ'.2 (x 0)⟩
-    have L : quotInt (Measure.pi fun _ => μ) id (fun t : (Subgroup.centralizer {γ} : Subgroup G) => fun _ : Fin (m + 1) => (t : G)) ν F =
-        ∫ x, F x * ((ρ' (x 0)).toReal : ℂ) ∂(Measure.pi fun _ => μ) :=
-      quotAny (Fin (m + 1) → G) _ (Measure.pi fun _ => μ) ν dg hdg.measurable F _ hFc.measurable hFinv hρ (fin1 _ hρ)
-    have R : quotInt μ id (fun t : (Subgroup.centralizer {γ} : Subgroup G) => (t : G)) ν f =
-        ∫ x, f x * ((ρ' x).toReal : ℂ) ∂μ :=
-      quotAny G _ μ ν (Subgroup.centralizer {γ} : Subgroup G).subtype continuous_subtype_val.measurable f _ hfc.measurable hfinv hρ' (fin2 _ hρ')
+    have L
+        : quotInt (Measure.pi fun _ => μ) id
+            (fun t : (Subgroup.centralizer {γ} : Subgroup G) => fun _ : Fin (m + 1) => (t : G))
+            ν F
+          = ∫ x, F x * ((ρ' (x 0)).toReal : ℂ) ∂(Measure.pi fun _ => μ) :=
+      quotAny (Fin (m + 1) → G) _ (Measure.pi fun _ => μ) ν dg hdg.measurable F _ hFc.measurable
+        hFinv hρ (fin1 _ hρ)
+    have R
+        : quotInt μ id (fun t : (Subgroup.centralizer {γ} : Subgroup G) => (t : G)) ν f
+          = ∫ x, f x * ((ρ' x).toReal : ℂ) ∂μ :=
+      quotAny G _ μ ν (Subgroup.centralizer {γ} : Subgroup G).subtype
+        continuous_subtype_val.measurable f _ hfc.measurable hfinv hρ' (fin2 _ hρ')
     refine L.trans (Eq.trans ?_ R.symm)
     let H : G × (Fin m → G) → ℂ := fun p => Φ (fib p.2 (p.1⁻¹ * γ * p.1)) * ((ρ' p.1).toReal : ℂ)
     have hHm : Measurable H := by
       have h1 : Continuous fun p : G × (Fin m → G) => Φ (fib p.2 (p.1⁻¹ * γ * p.1)) :=
-        hΦ.comp ((cont_fib m).comp (continuous_snd.prodMk
-          ((continuous_fst.inv.mul continuous_const).mul continuous_fst)))
-      exact h1.measurable.mul (Complex.measurable_ofReal.comp (hρ'.1.comp measurable_fst).ennreal_toReal)
-    let φ : (Fin (m + 1) → G) → G × (Fin m → G) :=
-      fun x => (x 0, fun i : Fin m => (x i.castSucc)⁻¹ * δ i.castSucc * x i.succ)
+        hΦ.comp ((cont_fib m).comp
+          (continuous_snd.prodMk ((continuous_fst.inv.mul continuous_const).mul continuous_fst)))
+      exact h1.measurable.mul (Complex.measurable_ofReal.comp (hρ'.1.comp
+        measurable_fst).ennreal_toReal)
+    let φ : (Fin (m + 1) → G) → G × (Fin m → G) := fun x =>
+      (x 0, fun i : Fin m => (x i.castSucc)⁻¹ * δ i.castSucc * x i.succ)
     have hcomp : ∀ x, H (φ x) = F x * ((ρ' (x 0)).toReal : ℂ) := by
       intro x
       show Φ _ * _ = Φ _ * _
       rw [CV.2 x, hprod]
     have hint : Integrable (fun x => F x * ((ρ' (x 0)).toReal : ℂ)) (Measure.pi fun _ => μ) := by
-      refine ⟨(hFc.measurable.mul (Complex.measurable_ofReal.comp hρ.1.ennreal_toReal)).aestronglyMeasurable, ?_⟩
+      refine ⟨
+        (hFc.measurable.mul (Complex.measurable_ofReal.comp
+          hρ.1.ennreal_toReal)).aestronglyMeasurable,
+        ?_
+      ⟩
       refine lt_of_le_of_lt (lintegral_mono fun x => ?_) (fin1 _ hρ)
       rw [enorm_mul]
       gcongr
@@ -198,7 +236,8 @@ theorem geoAbs : GeoAbs := by
     have hHint : Integrable H (μ.prod (Measure.pi fun _ => μ)) := by
       refine (CV.1.integrable_comp hHm.aestronglyMeasurable).1 ?_
       exact hint.congr (Filter.Eventually.of_forall fun x => (hcomp x).symm)
-    calc ∫ x, F x * ((ρ' (x 0)).toReal : ℂ) ∂(Measure.pi fun _ => μ)
+    calc
+      ∫ x, F x * ((ρ' (x 0)).toReal : ℂ) ∂(Measure.pi fun _ => μ)
         = ∫ x, H (φ x) ∂(Measure.pi fun _ => μ) := by simp only [hcomp]
       _ = ∫ p, H p ∂(μ.prod (Measure.pi fun _ => μ)) := by
         rw [← CV.1.map_eq]
@@ -210,9 +249,13 @@ theorem geoAbs : GeoAbs := by
         show ∫ v, Φ (fib v (a⁻¹ * γ * a)) * ((ρ' a).toReal : ℂ) ∂(Measure.pi fun _ => μ) =
           (∫ v, Φ (fib v (a⁻¹ * γ * a)) ∂(Measure.pi fun _ => μ)) * ((ρ' a).toReal : ℂ)
         rw [integral_mul_const]
-  · have no : ¬∃ ρ, IsNormAlong id (fun t : (Subgroup.centralizer {γ} : Subgroup G) => fun _ : Fin (m + 1) => (t : G)) ν ρ := by
+  · have no : ¬ ∃ ρ,
+        IsNormAlong id
+          (fun t : (Subgroup.centralizer {γ} : Subgroup G) => fun _ : Fin (m + 1) => (t : G))
+          ν ρ := by
       rintro ⟨ρ, hρ⟩
-      refine hex ⟨fun g => ρ fun _ => g, hρ.1.comp (Measurable.of_eval fun _ => measurable_id), fun x => ?_⟩
+      refine hex
+        ⟨fun g => ρ fun _ => g, hρ.1.comp (Measurable.of_eval fun _ => measurable_id), fun x => ?_⟩
       exact hρ.2 fun _ => x
     unfold quotInt
     rw [dite_eq_right no, dite_eq_right hex]

@@ -18,9 +18,9 @@ noncomputable section
 
 namespace GlobalTheory.Alc
 
-theorem rename_rowPerm_eq_rowAct (R : Type) [CommRing R] (r n : ℕ) (σ : Equiv.Perm (Fin r)) :
-    (rename (fun v : Fin r × Fin n => (σ v.1, v.2)) : MvPolynomial (Fin r × Fin n) R →ₐ[R] _) =
-      rowAct R (n := n) (Matrix.of fun a b : Fin r => if b = σ a then (1 : R) else 0) := by
+theorem rename_rowPerm_eq_rowAct (R : Type) [CommRing R] (r n : ℕ) (σ : Equiv.Perm (Fin r))
+    : (rename (fun v : Fin r × Fin n => (σ v.1, v.2)) : MvPolynomial (Fin r × Fin n) R →ₐ[R] _)
+      = rowAct R (n := n) (Matrix.of fun a b : Fin r => if b = σ a then (1 : R) else 0) := by
   apply MvPolynomial.algHom_ext
   intro v
   simp [rowAct]
@@ -36,8 +36,11 @@ theorem good_nablaSq (k : Type) [Field k] (N : ℕ) (lam : DomWeight N) : Good (
     rw [rename_rowPerm_eq_rowAct]
     exact dualWeylRowStable k N N _ _ f hf
 
-theorem good_of_isGLSubmodule (k : Type) [Field k] (N : ℕ) (lam : DomWeight N)
-    (M : Submodule k (MvPolynomial (Fin N × Fin N) k)) (hM : GlobalTheory.Published.IsGLSubmodule k N lam M) : Good M := by
+theorem good_of_isGLSubmodule
+    (k : Type) [Field k]
+    (N : ℕ) (lam : DomWeight N) (M : Submodule k (MvPolynomial (Fin N × Fin N) k))
+    (hM : GlobalTheory.Published.IsGLSubmodule k N lam M)
+    : Good M := by
   have hw : ∀ μ : Fin N → ℕ, ∀ f ∈ M, weightedHomogeneousComponent (rowW N N) μ f ∈ M :=
     GlobalTheory.T.weightedHomogeneousComponent_mem_of_GLSchemeSubmodule k N lam M hM
   refine ⟨?_, hw, GlobalTheory.T.GLSchemeSubmodule_stable_under_row_perm k N lam M hM⟩
@@ -50,12 +53,16 @@ theorem good_of_isGLSubmodule (k : Type) [Field k] (N : ℕ) (lam : DomWeight N)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← hsum, map_sum]
     refine Submodule.sum_mem _ fun μ _ => ?_
-    rw [((GlobalTheory.T.rowPolarizationOperators_action_on_rowWeight k N N μ _ (weightedHomogeneousComponent_isWeightedHomogeneous μ f)).1 a)]
+    rw [((GlobalTheory.T.rowPolarizationOperators_action_on_rowWeight k N N μ _
+      (weightedHomogeneousComponent_isWeightedHomogeneous μ f)).1 a)]
     exact Submodule.smul_mem _ _ (hw μ f hf)
   · exact GlobalTheory.T.rowPolarization_mem_of_isGLSchemeSubmodule k N lam M hM a b hab f hf
 
-theorem good_nablaSq_and_submodules : ∀ (k : Type) [Field k] (N : ℕ) (lam : DomWeight N), Good (nablaSq k N lam) ∧
-    ∀ M : Submodule k (MvPolynomial (Fin N × Fin N) k), GlobalTheory.Published.IsGLSubmodule k N lam M → Good M :=
-  fun k _ N lam => ⟨good_nablaSq k N lam, good_of_isGLSubmodule k N lam⟩
+theorem good_nablaSq_and_submodules
+    : ∀ (k : Type) [Field k] (N : ℕ) (lam : DomWeight N),
+      Good (nablaSq k N lam)
+        ∧ ∀ M : Submodule k (MvPolynomial (Fin N × Fin N) k),
+          GlobalTheory.Published.IsGLSubmodule k N lam M → Good M := fun k _ N lam =>
+  ⟨good_nablaSq k N lam, good_of_isGLSubmodule k N lam⟩
 
 end GlobalTheory.Alc

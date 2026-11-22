@@ -9,8 +9,15 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Bij
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.LiftSys GlobalTheory.Published
+open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift
+  GlobalTheory.LiftSys GlobalTheory.Published
 attribute [local instance] Over.cartesianMonoidalCategory
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.abelianSchemeSquareZeroLifts_of_deRhamCohomology : AbelianHodgeDeRham → AbelianSchemeLifts := by
-  first | exact @GlobalTheory.LiftSys.abelianSchemeLifts_of_abelianHodgeDeRham | exact GlobalTheory.LiftSys.abelianSchemeLifts_of_abelianHodgeDeRham | (intros; apply GlobalTheory.LiftSys.abelianSchemeLifts_of_abelianHodgeDeRham <;> assumption)
+theorem _root_.GlobalTheory.T.abelianSchemeSquareZeroLifts_of_deRhamCohomology
+    : AbelianHodgeDeRham → AbelianSchemeLifts := by
+  first
+  | exact @GlobalTheory.LiftSys.abelianSchemeLifts_of_abelianHodgeDeRham
+  | exact GlobalTheory.LiftSys.abelianSchemeLifts_of_abelianHodgeDeRham
+  | (intros; apply GlobalTheory.LiftSys.abelianSchemeLifts_of_abelianHodgeDeRham <;> assumption)

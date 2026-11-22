@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HomFiniteFre
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.AV GlobalTheory.AV.AbVar
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.AV GlobalTheory.AV.AbVar
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] CategoryTheory.Over.cartesianMonoidalCategory
 
@@ -24,8 +25,11 @@ open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace GlobalTheory.AV.AbVar
 
-theorem eq_zero_of_forall_pow_dvd {M : Type} [AddCommGroup M] [Module.Free ℤ M] {p : ℕ}
-    (hp : 1 < p) (x : M) (h : ∀ n : ℕ, ∃ y : M, x = p ^ n • y) : x = 0 := by
+theorem eq_zero_of_forall_pow_dvd
+    {M : Type} [AddCommGroup M] [Module.Free ℤ M]
+    {p : ℕ} (hp : 1 < p)
+    (x : M) (h : ∀ n : ℕ, ∃ y : M, x = p ^ n • y)
+    : x = 0 := by
   let b := Module.Free.chooseBasis ℤ M
   refine b.repr.injective (Finsupp.ext fun i => ?_)
   rw [map_zero, Finsupp.coe_zero, Pi.zero_apply]
@@ -41,14 +45,16 @@ theorem eq_zero_of_forall_pow_dvd {M : Type} [AddCommGroup M] [Module.Free ℤ M
   rw [Int.natAbs_pow, Int.natAbs_natCast]
   exact Nat.lt_pow_self hp
 
-theorem eq_pow_smul_of_torsionTower_map : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] (A B : AbVar k)
-    (G H : PDivGroup p k) (t : G.TorsionTower A.X) (t' : H.TorsionTower B.X) (f : A ⟶ B),
-    (∀ (n : ℕ) (g : G ⟶ H), t.map t' f.hom = (p : ℤ_[p]) ^ n • g → ∃ f' : A ⟶ B, f = p ^ n • f') ∧
-    (t.map t' f.hom = 0 → f = 0) := by
+theorem eq_pow_smul_of_torsionTower_map
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] (A B : AbVar k) (G H : PDivGroup p k)
+        (t : G.TorsionTower A.X) (t' : H.TorsionTower B.X) (f : A ⟶ B),
+      (∀ (n : ℕ) (g : G ⟶ H), t.map t' f.hom = (p : ℤ_[p]) ^ n • g → ∃ f' : A ⟶ B, f = p ^ n • f')
+        ∧ (t.map t' f.hom = 0 → f = 0) := by
   intro p _ k _ A B G H t t' f
   have hp : 1 < p := (Fact.out : p.Prime).one_lt
-  have key : ∀ (n : ℕ) (g : G ⟶ H), t.map t' f.hom = (p : ℤ_[p]) ^ n • g →
-      ∃ f' : A ⟶ B, f = p ^ n • f' := by
+  have key
+      : ∀ (n : ℕ) (g : G ⟶ H),
+        t.map t' f.hom = (p : ℤ_[p]) ^ n • g → ∃ f' : A ⟶ B, f = p ^ n • f' := by
     intro n g hg
 
     have happ : (t.map t' f.hom).app n = (0 : G ⟶ H).app n := by
@@ -58,13 +64,12 @@ theorem eq_pow_smul_of_torsionTower_map : ∀ (p : ℕ) [Fact p.Prime] (k : Type
     have hy : t.y n ≫ f.hom = 1 := by
       rw [← t.map_y t' f.hom n, happ]
       exact _root_.map_one (t'.pts n _)
-    have hpn : ((p ^ n : ℕ) : ℤ) ≠ 0 := by
-      exact_mod_cast (pow_pos (by omega : 0 < p) n).ne'
+    have hpn : ((p ^ n : ℕ) : ℤ) ≠ 0 := by exact_mod_cast (pow_pos (by omega : 0 < p) n).ne'
     have hiso : IsIsogeny ((p ^ n : ℕ) • 𝟙 A) := by
       have := (GlobalTheory.MulIsogeny.mul_isogeny k A ((p ^ n : ℕ) : ℤ) hpn).1
       rwa [natCast_zsmul] at this
-    obtain ⟨f', hf'⟩ := exists_factor_of_isogeny k A A B ((p ^ n : ℕ) • 𝟙 A) f hiso
-      (fun T x hx => by
+    obtain ⟨f', hf'⟩ :=
+      exists_factor_of_isogeny k A A B ((p ^ n : ℕ) • 𝟙 A) f hiso (fun T x hx => by
         have hx' : x ≫ mulN A.X (p ^ n) = SemiCartesianMonoidalCategory.toUnit T ≫ MonObj.one := by
           rw [nsmul_hom, id_hom, MonObj.comp_pow, Category.comp_id] at hx
           rw [GrpTangent.comp_mulN, hx, CategoryTheory.Hom.one_def]

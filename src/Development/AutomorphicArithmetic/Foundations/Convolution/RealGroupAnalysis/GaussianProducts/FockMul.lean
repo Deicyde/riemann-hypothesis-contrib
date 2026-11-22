@@ -5,13 +5,16 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.G
 open scoped Classical ENNReal nonZeroDivisors
 
-private theorem poly_pull {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
-    {p : (Fin 2 → A F) → ℂ} (hp : p ∈ polyOn F (Fin 2)) :
-    (fun v : V4 F => p ![v 0, v 1]) ∈ polyFn (F := F) := by
+private theorem poly_pull
+    {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
+    {p : (Fin 2 → A F) → ℂ} (hp : p ∈ polyOn F (Fin 2))
+    : (fun v : V4 F => p ![v 0, v 1]) ∈ polyFn (F := F) := by
   induction hp using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨i, w, rfl⟩ := hx
@@ -23,16 +26,18 @@ private theorem poly_pull {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
   | add x y _ _ hx hy => exact add_mem hx hy
   | mul x y _ _ hx hy => exact mul_mem hx hy
 
-private theorem ind_mul_mem {F : Type} [Field F] [NumberField F]
+private theorem ind_mul_mem
+    {F : Type} [Field F] [NumberField F]
     {T : Set (Fin 2 → FiniteAdeleRing (𝓞 F) F)} (hc : IsCompact T) (ho : IsOpen T)
-    {g : (Fin 4 → FiniteAdeleRing (𝓞 F) F) → ℂ} (hg : g ∈ finiteSchwartzBruhatPi F (ι := Fin 4)) :
-    (fun y : Fin 4 → FiniteAdeleRing (𝓞 F) F =>
-      (T.indicator (1 : (Fin 2 → FiniteAdeleRing (𝓞 F) F) → ℂ) ![y 0, y 1]) * g y) ∈
-        finiteSchwartzBruhatPi F (ι := Fin 4) := by
+    {g : (Fin 4 → FiniteAdeleRing (𝓞 F) F) → ℂ} (hg : g ∈ finiteSchwartzBruhatPi F (ι := Fin 4))
+    : (fun y : Fin 4 → FiniteAdeleRing (𝓞 F) F =>
+        (T.indicator (1 : (Fin 2 → FiniteAdeleRing (𝓞 F) F) → ℂ) ![y 0, y 1]) * g y)
+      ∈ finiteSchwartzBruhatPi F (ι := Fin 4) := by
   obtain ⟨h1, h2⟩ := (mem_finiteSchwartzBruhatPi F).1 hg
   have hcl : IsClopen T := ⟨hc.isClosed, ho⟩
   have hi : IsLocallyConstant (T.indicator (1 : (Fin 2 → FiniteAdeleRing (𝓞 F) F) → ℂ)) := by
-    exact ((LocallyConstant.const (Fin 2 → FiniteAdeleRing (𝓞 F) F) (1 : ℂ)).indicator hcl).isLocallyConstant
+    exact ((LocallyConstant.const (Fin 2 → FiniteAdeleRing (𝓞 F) F) (1 : ℂ)).indicator
+      hcl).isLocallyConstant
   have hcont : Continuous fun y : Fin 4 → FiniteAdeleRing (𝓞 F) F => (![y 0, y 1] : Fin 2 → _) := by
     refine continuous_pi fun i => ?_
     fin_cases i
@@ -40,9 +45,13 @@ private theorem ind_mul_mem {F : Type} [Field F] [NumberField F]
     · exact continuous_apply 1
   exact (mem_finiteSchwartzBruhatPi F).2 ⟨(hi.comp_continuous hcont).mul h1, h2.mul_left⟩
 
-theorem UpperTheory.ConvolutionTheory.R2.G.fockMul :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (δ : F), (∀ χ ∈ FockFn δ, ∀ p ∈ polyOn F (Fin 2), ∀ T : Set (Fin 2 → FiniteAdeleRing (𝓞 F) F), IsCompact T → IsOpen T →
-    (fun v : V4 F => p ![v 0, v 1] * T.indicator 1 (finPartPi ![v 0, v 1]) * χ v) ∈ FockFn δ) ∧ ∀ v₀ : V4 F, ∃ χ ∈ FockFn δ, χ v₀ ≠ 0 := by
+theorem UpperTheory.ConvolutionTheory.R2.G.fockMul
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (δ : F),
+      (∀ χ ∈ FockFn δ, ∀ p ∈ polyOn F (Fin 2), ∀ T : Set (Fin 2 → FiniteAdeleRing (𝓞 F) F),
+          IsCompact T → IsOpen T
+            → (fun v : V4 F => p ![v 0, v 1] * T.indicator 1 (finPartPi ![v 0, v 1]) * χ v)
+              ∈ FockFn δ)
+        ∧ ∀ v₀ : V4 F, ∃ χ ∈ FockFn δ, χ v₀ ≠ 0 := by
   intro F _ _ _ δ
   refine ⟨?_, ?_⟩
   · intro χ hχ p hp T hc ho
@@ -57,7 +66,9 @@ theorem UpperTheory.ConvolutionTheory.R2.G.fockMul :
       simp only [hfin, Pi.mul_apply]
       ring
     | zero =>
-      have : (fun v : V4 F => p ![v 0, v 1] * T.indicator 1 (finPartPi ![v 0, v 1]) * (0 : V4 F → ℂ) v) = 0 := by
+      have : (fun v : V4 F =>
+            p ![v 0, v 1] * T.indicator 1 (finPartPi ![v 0, v 1]) * (0 : V4 F → ℂ) v)
+          = 0 := by
         funext v
         simp
       rw [this]
@@ -75,13 +86,25 @@ theorem UpperTheory.ConvolutionTheory.R2.G.fockMul :
       simp only [Pi.smul_apply, smul_eq_mul]
       ring
   · intro v₀
-    refine ⟨_, Submodule.subset_span ⟨1, one_mem _,
-      finiteTensor fun i => cosetIndicator (1 : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (v₀ i).2,
-      finiteTensor_mem fun i => cosetIndicator_mem_finiteSchwartzBruhat _ _, rfl⟩, ?_⟩
-    have hone : finiteTensor (fun i => cosetIndicator (1 : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (v₀ i).2)
-        (finPartPi v₀) = 1 := by
-      have hself : ∀ a : FiniteAdeleRing (𝓞 F) F,
-          cosetIndicator (1 : (FractionalIdeal (𝓞 F)⁰ F)ˣ) a a = 1 := fun a => by
+    refine ⟨
+      _,
+      Submodule.subset_span ⟨
+        1,
+        one_mem _,
+        finiteTensor fun i => cosetIndicator (1 : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (v₀ i).2,
+        finiteTensor_mem fun i => cosetIndicator_mem_finiteSchwartzBruhat _ _,
+        rfl
+      ⟩,
+      ?_
+    ⟩
+    have hone
+        : finiteTensor
+            (fun i => cosetIndicator (1 : (FractionalIdeal (𝓞 F)⁰ F)ˣ) (v₀ i).2)
+            (finPartPi v₀)
+          = 1 := by
+      have hself
+          : ∀ a : FiniteAdeleRing (𝓞 F) F,
+            cosetIndicator (1 : (FractionalIdeal (𝓞 F)⁰ F)ˣ) a a = 1 := fun a => by
         rw [cosetIndicator_apply, if_pos]
         rw [sub_self]
         exact zero_mem _

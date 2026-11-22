@@ -11,14 +11,16 @@ noncomputable section
 
 namespace Formalism.MainNotions.N
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.WeaklyAdmissibleFiltrations
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.WeaklyAdmissibleFiltrations
 
 open NumberField IsDedekindDomain
 
 section Phi
 
-variable (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i))
-
+variable
+  (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
+  (hw : w ∈ placesOver D.host.E (D.nd.l i))
 
 set_option synthInstance.maxHeartbeats 400000 in
 theorem phi_injective (k : ℕ) : Function.Injective (Br.phi (D.nbr i w hw) k) := by
@@ -40,15 +42,21 @@ theorem phi_injective (k : ℕ) : Function.Injective (Br.phi (D.nbr i w hw) k) :
   rw [Br.toLLK_alg, RingEquiv.apply_symm_apply]
   exact this
 
-
 set_option synthInstance.maxHeartbeats 400000 in
-theorem phi_act {k : ℕ} (M : Gw D.nd w →* Matrix (Fin k) (Fin k) (D.nd.O i)) (g : ↥(GK (D.nbr i w hw).Kw))
-    (x : KOG (D.nd.O i) k) :
-    Br.phi (D.nbr i w hw) k (actD (stdLatG (IsFractionRing.injective (D.nd.O i) (FractionRing (D.nd.O i))) M)
-      (Br.ι (D.nbr i w hw) g) x) = actD (Br.lat (D.nbr i w hw) M) g (Br.phi (D.nbr i w hw) k x) := by
+theorem phi_act
+    {k : ℕ} (M : Gw D.nd w →* Matrix (Fin k) (Fin k) (D.nd.O i))
+    (g : ↥(GK (D.nbr i w hw).Kw)) (x : KOG (D.nd.O i) k)
+    : Br.phi (D.nbr i w hw) k
+        (actD (stdLatG (IsFractionRing.injective (D.nd.O i) (FractionRing (D.nd.O i))) M)
+          (Br.ι (D.nbr i w hw) g) x)
+      = actD (Br.lat (D.nbr i w hw) M) g (Br.phi (D.nbr i w hw) k x) := by
   obtain ⟨u, rfl⟩ := Submodule.mkQ_surjective _ x
-  have key : Br.vecS (D.nbr i w hw) k ((matRep (mapM (algebraMap (D.nd.O i) (FractionRing (D.nd.O i))) M)
-      (Br.ι (D.nbr i w hw) g)) u) = (matRep (Br.locM (D.nbr i w hw) M) g) (Br.vecS (D.nbr i w hw) k u) := by
+  have key
+      : Br.vecS (D.nbr i w hw) k
+          ((matRep (mapM (algebraMap (D.nd.O i) (FractionRing (D.nd.O i))) M)
+              (Br.ι (D.nbr i w hw) g))
+            u)
+        = (matRep (Br.locM (D.nbr i w hw) M) g) (Br.vecS (D.nbr i w hw) k u) := by
     funext p
     show Br.toLLK (D.nbr i w hw) (((mapM (algebraMap (D.nd.O i) (FractionRing (D.nd.O i))) M
         (Br.ι (D.nbr i w hw) g)).mulVec u) p) =
@@ -60,18 +68,25 @@ theorem phi_act {k : ℕ} (M : Gw D.nd w →* Matrix (Fin k) (Fin k) (D.nd.O i))
     show Br.toLLK (D.nbr i w hw) (algebraMap (D.nd.O i) (FractionRing (D.nd.O i)) (M (Br.ι (D.nbr i w hw) g) p q)) = _
     rw [Br.toLLK_alg]
     rfl
-  exact congrArg (fun z : Fin k → Br.LLw (D.nbr i w hw) =>
-    (Submodule.Quotient.mk z : (Fin k → Br.LLw (D.nbr i w hw)) ⧸ stdG (Br.Ow (D.nbr i w hw)) (Br.LLw (D.nbr i w hw)) k)) key
+  exact congrArg
+    (fun z : Fin k → Br.LLw (D.nbr i w hw) =>
+      (Submodule.Quotient.mk z
+        : (Fin k → Br.LLw (D.nbr i w hw)) ⧸ stdG (Br.Ow (D.nbr i w hw)) (Br.LLw (D.nbr i w hw)) k))
+    key
 
 end Phi
 
-def wLat (D : D7) (i : D.nd.Loc) (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i)
+def wLat
+    (D : D7) (i : D.nd.Loc) (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i)
     (u : HeightOneSpectrum (𝓞 D.host.E)) (hu : u ∈ placesOver D.host.E (D.nd.l i))
-    (hc : ∀ v, Continuous fun g => matRep (Br.locM (D.nbr i u hu) ((WpO D.nd i ρ π).comp (decS D.nd u))) g v) :
-    LocLat ↥(GK (D.nbr i u hu).Kw) ℚ_[D.nd.l i] (Br.LLw (D.nbr i u hu)) (Br.Ow (D.nbr i u hu)) :=
-  { V := Fin D.R.r → Br.LLw (D.nbr i u hu)
-    ρ := matRep (Br.locM (D.nbr i u hu) ((WpO D.nd i ρ π).comp (decS D.nd u)))
-    cont := hc
-    L := Br.lat (D.nbr i u hu) ((WpO D.nd i ρ π).comp (decS D.nd u)) }
+    (hc : ∀ v,
+      Continuous fun g => matRep (Br.locM (D.nbr i u hu) ((WpO D.nd i ρ π).comp (decS D.nd u))) g v)
+    : LocLat ↥(GK (D.nbr i u hu).Kw) ℚ_[D.nd.l i] (Br.LLw (D.nbr i u hu))
+      (Br.Ow (D.nbr i u hu)) := {
+  V := Fin D.R.r → Br.LLw (D.nbr i u hu)
+  ρ := matRep (Br.locM (D.nbr i u hu) ((WpO D.nd i ρ π).comp (decS D.nd u)))
+  cont := hc
+  L := Br.lat (D.nbr i u hu) ((WpO D.nd i ρ π).comp (decS D.nd u))
+}
 
 end Formalism.MainNotions.N

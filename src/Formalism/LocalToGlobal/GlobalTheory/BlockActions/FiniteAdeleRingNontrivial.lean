@@ -23,20 +23,24 @@ local notation "ι" => inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)
 omit [Field E] [NumberField E] [Algebra F E] in
 theorem finiteAdeleRing_nontrivial : Nontrivial (FiniteAdeleRing (𝓞 F) F) := by
   obtain ⟨M, hM⟩ := Ideal.exists_maximal (𝓞 F)
-  let v : HeightOneSpectrum (𝓞 F) :=
-    ⟨M, hM.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hM (NumberField.RingOfIntegers.not_isField F)⟩
+  let v : HeightOneSpectrum (𝓞 F) := ⟨
+    M,
+    hM.isPrime,
+    Ring.ne_bot_of_isMaximal_of_not_isField hM (NumberField.RingOfIntegers.not_isField F)
+  ⟩
   refine ⟨⟨0, 1, fun h => ?_⟩⟩
   have h' := congrArg (evalV F v) h
   rw [map_zero, map_one] at h'
   exact zero_ne_one h'
 
-theorem latS_mono_fin {Λ Λ' : Submodule (𝓞 E) (Fin n → E)} (h : Λ ≤ Λ') :
-    latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ ≤ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ' :=
+theorem latS_mono_fin {Λ Λ' : Submodule (𝓞 E) (Fin n → E)} (h : Λ ≤ Λ')
+    : latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ ≤ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ' :=
   Submodule.span_mono (Set.image_mono h)
 
-theorem latS_functional (Λ : Submodule (𝓞 E) (Fin n → E)) (f : Module.Dual E (Fin n → E))
-    (hf : ∀ y ∈ Λ, f y = 0) (x : Fin n → E)
-    (hx : (fun i => ι (x i)) ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ) : f x = 0 := by
+theorem latS_functional
+    (Λ : Submodule (𝓞 E) (Fin n → E)) (f : Module.Dual E (Fin n → E)) (hf : ∀ y ∈ Λ, f y = 0)
+    (x : Fin n → E) (hx : (fun i => ι (x i)) ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ)
+    : f x = 0 := by
   set c : Fin n → E := fun i => f (Pi.single i 1)
   have hfc : ∀ y : Fin n → E, f y = ∑ i, c i * y i := by
     intro y
@@ -56,7 +60,8 @@ theorem latS_functional (Λ : Submodule (𝓞 E) (Fin n → E)) (f : Module.Dual
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [← map_mul, ← map_sum]
       rw [← hfc, hf y hy, map_zero]
-    | zero => simp
+    | zero =>
+      simp
     | add u w _ _ hu hw =>
       simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
       rw [hu, hw, add_zero]
@@ -78,9 +83,10 @@ where
     have := finiteAdeleRing_nontrivial (F := F)
     Formalism.UG.P.inclE_injective F E (FiniteAdeleRing (𝓞 F) F) (by rw [h, map_zero])
 
-theorem latS_mem_span (Λ : Submodule (𝓞 E) (Fin n → E)) (x : Fin n → E)
-    (hx : (fun i => ι (x i)) ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ) :
-    x ∈ Submodule.span E (Λ : Set (Fin n → E)) := by
+theorem latS_mem_span
+    (Λ : Submodule (𝓞 E) (Fin n → E)) (x : Fin n → E)
+    (hx : (fun i => ι (x i)) ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ)
+    : x ∈ Submodule.span E (Λ : Set (Fin n → E)) := by
   by_contra hxV
   obtain ⟨f, hfx, hf⟩ := Submodule.exists_dual_map_eq_bot_of_notMem hxV inferInstance
   refine hfx (latS_functional (F := F) Λ f (fun y hy => ?_) x hx)
@@ -89,17 +95,18 @@ theorem latS_mem_span (Λ : Submodule (𝓞 E) (Fin n → E)) (x : Fin n → E)
   rw [hf] at h2
   exact (Submodule.mem_bot E).1 h2
 
-theorem latLocGlob_main (Λ : Submodule (𝓞 E) (Fin n → E)) (hfin : Module.Finite (𝓞 E) Λ)
-    (x : Fin n → E)
-    (hx : (fun i => ι (x i)) ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ) : x ∈ Λ := by
+theorem latLocGlob_main
+    (Λ : Submodule (𝓞 E) (Fin n → E)) (hfin : Module.Finite (𝓞 E) Λ)
+    (x : Fin n → E) (hx : (fun i => ι (x i)) ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ)
+    : x ∈ Λ := by
   have hxV := latS_mem_span (F := F) Λ x hx
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl (Submodule.span E (Λ : Set (Fin n → E)))
   let b := Module.finBasis E C
-  let W : Submodule (𝓞 E) (Fin n → E) :=
-    Submodule.span (𝓞 E) (Set.range fun i => (b i : Fin n → E))
+  let W : Submodule (𝓞 E) (Fin n → E) := Submodule.span (𝓞 E) (Set.range fun i => (b i : Fin n → E))
   let Λ' : Submodule (𝓞 E) (Fin n → E) := Λ ⊔ W
   have hfin' : Module.Finite (𝓞 E) Λ' :=
-    Module.Finite.iff_fg.mpr ((Module.Finite.iff_fg.mp hfin).sup (Submodule.fg_span (Set.finite_range _)))
+    Module.Finite.iff_fg.mpr ((Module.Finite.iff_fg.mp hfin).sup
+      (Submodule.fg_span (Set.finite_range _)))
   have hV' : Submodule.span E (Λ : Set (Fin n → E)) ≤ Submodule.span E (Λ' : Set (Fin n → E)) :=
     Submodule.span_mono (fun y hy => Submodule.mem_sup_left hy)
   have hC' : C ≤ Submodule.span E (Λ' : Set (Fin n → E)) := by

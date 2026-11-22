@@ -6,14 +6,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 open scoped nonZeroDivisors Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.Gal.TP.Skew
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GroundTheory.Global
+  GroundTheory.Global.IdeleGroup UpperTheory.Gal.TP.Skew
 
-private theorem le_one_of_count {E : Type} [Field E] [NumberField E] (J : FractionalIdeal (𝓞 E)⁰ E) (hJ : J ≠ 0)
-    (h : ∀ w : HeightOneSpectrum (𝓞 E), 0 ≤ FractionalIdeal.count E w J) : J ≤ 1 := by
+private theorem le_one_of_count
+    {E : Type} [Field E] [NumberField E]
+    (J : FractionalIdeal (𝓞 E)⁰ E)
+    (hJ : J ≠ 0) (h : ∀ w : HeightOneSpectrum (𝓞 E), 0 ≤ FractionalIdeal.count E w J)
+    : J ≤ 1 := by
   rw [← FractionalIdeal.finprod_heightOneSpectrum_factorization' E hJ]
   refine finprod_induction (p := fun X : FractionalIdeal (𝓞 E)⁰ E => X ≤ 1) le_rfl ?_ ?_
   · intro a b ha hb
-    calc a * b ≤ 1 * b := mul_le_mul_left ha b
+    calc
+      a * b
+        ≤ 1 * b := mul_le_mul_left ha b
       _ ≤ 1 * 1 := mul_le_mul_right hb 1
       _ = 1 := one_mul 1
   · intro v
@@ -21,9 +28,13 @@ private theorem le_one_of_count {E : Type} [Field E] [NumberField E] (J : Fracti
     rw [hn, zpow_natCast, ← FractionalIdeal.coeIdeal_pow]
     exact FractionalIdeal.coeIdeal_le_one
 
-private theorem mem_iff {E : Type} [Field E] [NumberField E] (I : FractionalIdeal (𝓞 E)⁰ E) (hI : I ≠ 0)
-    (y : E) (hy : y ≠ 0) : y ∈ I ↔ ∀ w, FractionalIdeal.count E w I ≤ ordE w y := by
-  have hs : FractionalIdeal.spanSingleton (𝓞 E)⁰ y ≠ 0 := FractionalIdeal.spanSingleton_ne_zero_iff.mpr hy
+private theorem mem_iff
+    {E : Type} [Field E] [NumberField E]
+    (I : FractionalIdeal (𝓞 E)⁰ E) (hI : I ≠ 0)
+    (y : E) (hy : y ≠ 0)
+    : y ∈ I ↔ ∀ w, FractionalIdeal.count E w I ≤ ordE w y := by
+  have hs : FractionalIdeal.spanSingleton (𝓞 E)⁰ y ≠ 0 :=
+    FractionalIdeal.spanSingleton_ne_zero_iff.mpr hy
   constructor
   · intro h w
     exact FractionalIdeal.count_mono E w hs ((FractionalIdeal.spanSingleton_le_iff_mem).mpr h)
@@ -36,15 +47,19 @@ private theorem mem_iff {E : Type} [Field E] [NumberField E] (I : FractionalIdea
       unfold ordE at this
       omega
     have h2 : FractionalIdeal.spanSingleton (𝓞 E)⁰ y ≤ I := by
-      calc FractionalIdeal.spanSingleton (𝓞 E)⁰ y
-          = (FractionalIdeal.spanSingleton (𝓞 E)⁰ y * I⁻¹) * I := by
-            rw [mul_assoc, inv_mul_cancel₀ hI, mul_one]
+      calc
+        FractionalIdeal.spanSingleton (𝓞 E)⁰ y
+            = (FractionalIdeal.spanSingleton (𝓞 E)⁰ y * I⁻¹) * I := by
+          rw [mul_assoc, inv_mul_cancel₀ hI, mul_one]
         _ ≤ 1 * I := mul_le_mul_left hle I
         _ = I := one_mul I
     exact (FractionalIdeal.spanSingleton_le_iff_mem).mp h2
 
-private theorem attained {E : Type} [Field E] [NumberField E] (I : FractionalIdeal (𝓞 E)⁰ E) (hI : I ≠ 0)
-    (w : HeightOneSpectrum (𝓞 E)) : ∃ x ∈ I, x ≠ 0 ∧ ordE w x = FractionalIdeal.count E w I := by
+private theorem attained
+    {E : Type} [Field E] [NumberField E]
+    (I : FractionalIdeal (𝓞 E)⁰ E) (hI : I ≠ 0)
+    (w : HeightOneSpectrum (𝓞 E))
+    : ∃ x ∈ I, x ≠ 0 ∧ ordE w x = FractionalIdeal.count E w I := by
   by_contra hcon
   push_neg at hcon
   have hP : ((w.asIdeal : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by
@@ -69,11 +84,11 @@ private theorem attained {E : Type} [Field E] [NumberField E] (I : FractionalIde
   rw [FractionalIdeal.count_mul E w hP hI, FractionalIdeal.count_self] at h3
   omega
 
-private theorem lattice {E : Type} [Field E] [NumberField E] (I : FractionalIdeal (𝓞 E)⁰ E) (hI : I ≠ 0) :
-    (I : Submodule (𝓞 E) E).IsLattice E := by
+private theorem lattice
+    {E : Type} [Field E] [NumberField E] (I : FractionalIdeal (𝓞 E)⁰ E) (hI : I ≠ 0)
+    : (I : Submodule (𝓞 E) E).IsLattice E := by
   exact Submodule.IsLattice.of_fg E (FractionalIdeal.fg_of_isUnit I (IsUnit.mk0 I hI))
 
-theorem UpperTheory.Gal.TP.Skew.memOrd :
-    UpperTheory.Gal.TP.Skew.MemOrd := by
+theorem UpperTheory.Gal.TP.Skew.memOrd : UpperTheory.Gal.TP.Skew.MemOrd := by
   intro E _ _ I hI
   exact ⟨mem_iff I hI, attained I hI, lattice I hI⟩

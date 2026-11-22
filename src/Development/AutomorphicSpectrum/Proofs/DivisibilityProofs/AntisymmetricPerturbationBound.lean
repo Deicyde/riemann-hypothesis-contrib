@@ -14,16 +14,20 @@ public import Development.WeilBound.CoreStatements.FlagImmersions.DegLApply
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 open RootFieldNumerics
 
 namespace GlobalTheory.CompanionTheory.Ar.Top
 
-theorem inv_linear_eval (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (l : MvPolynomial (Ψ × Fin N) ℝ)
-    (hl : l ∈ GroundTheory.Heights₂.Heights.antisymInv Ψ N j) :
-    ∃ a b : Ψ → ℝ, ∀ x : Ψ × Fin N → ℝ, eval x l =
-      ∑ τ, (a τ - b τ) * ∑ i ∈ Finset.univ.filter (fun i : Fin N => (i : ℕ) < j), x (τ, i) +
-        ∑ τ, b τ * ∑ i, x (τ, i) := by
+theorem inv_linear_eval
+    (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ]
+    (N j : ℕ) (l : MvPolynomial (Ψ × Fin N) ℝ)
+    (hl : l ∈ GroundTheory.Heights₂.Heights.antisymInv Ψ N j)
+    : ∃ a b : Ψ → ℝ, ∀ x : Ψ × Fin N → ℝ,
+      eval x l
+        = ∑ τ, (a τ - b τ) * ∑ i ∈ Finset.univ.filter (fun i : Fin N => (i : ℕ) < j), x (τ, i)
+          + ∑ τ, b τ * ∑ i, x (τ, i) := by
   obtain ⟨h1, h2⟩ := hl
   rw [homogeneousSubmodule_one_eq_span_X] at h1
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℝ).1 h1
@@ -47,7 +51,8 @@ theorem inv_linear_eval (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (l
       · subst e2
         exact ⟨rfl, hik⟩
       · exact ⟨rfl, Iff.rfl⟩
-    have h3 := coeff_rename_mapDomain _ (Equiv.swap (τ, i) (τ, k)).injective l (Finsupp.single (τ, i) 1)
+    have h3 :=
+      coeff_rename_mapDomain _ (Equiv.swap (τ, i) (τ, k)).injective l (Finsupp.single (τ, i) 1)
     rw [h2 _ hmem, Finsupp.mapDomain_single, Equiv.swap_apply_left, hcoef, hcoef] at h3
     exact h3.symm
   have ha : ∀ τ, ∃ a : ℝ, ∀ i : Fin N, (i : ℕ) < j → c (τ, i) = a := by
@@ -77,12 +82,20 @@ theorem inv_linear_eval (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (l
   · rw [hb τ i hi]
     ring
 
-theorem flagDeg_eq_delta (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) :
-    ∃ c : ℝ, 0 < c ∧ ∀ x : Ψ × Fin N → ℝ,
-      flagDeg (fun τ i => x (τ, i) : Wt Ψ N) = c * eval x (GroundTheory.Heights₂.Heights.antisymDelta Ψ N) := by
-  refine ⟨((dimFl Ψ N).factorial : ℝ) * ∏ _τ : Ψ, ∏ i : Fin N, ∏ k ∈ Finset.Ioi i, ((k : ℝ) - (i : ℝ))⁻¹, ?_, ?_⟩
-  · refine mul_pos (by positivity) (Finset.prod_pos fun _ _ => Finset.prod_pos fun i _ =>
-      Finset.prod_pos fun k hk => inv_pos.2 (sub_pos.2 ?_))
+theorem flagDeg_eq_delta (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ)
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ x : Ψ × Fin N → ℝ,
+          flagDeg (fun τ i => x (τ, i) : Wt Ψ N)
+            = c * eval x (GroundTheory.Heights₂.Heights.antisymDelta Ψ N) := by
+  refine ⟨
+    ((dimFl Ψ N).factorial : ℝ) * ∏ _τ : Ψ, ∏ i : Fin N, ∏ k ∈ Finset.Ioi i, ((k : ℝ) - (i : ℝ))⁻¹,
+    ?_,
+    ?_
+  ⟩
+  · refine mul_pos (by positivity)
+      (Finset.prod_pos fun _ _ =>
+        Finset.prod_pos fun i _ => Finset.prod_pos fun k hk => inv_pos.2 (sub_pos.2 ?_))
     exact_mod_cast (Finset.mem_Ioi.1 hk)
   · intro x
     rw [(GlobalTheory.T.flag_degree_weight_formula Ψ N _).1, mul_assoc]
@@ -96,7 +109,16 @@ theorem flagDeg_eq_delta (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) :
     refine Finset.prod_congr (by ext k; simp) fun k _ => ?_
     rw [map_sub, eval_X, eval_X, div_eq_inv_mul]
 
-theorem cor_b_poly_functional : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (j : ℕ) (R : RP Ψ N →ₗ[ℝ] ℝ) (v ε : ℝ) (Pl l : MvPolynomial (Ψ × Fin N) ℝ), 0 < v → (∀ lam : Wt Ψ N, eval (fun x => lam x.1 x.2) Pl = R (linRoot lam ^ (dimFl Ψ N + 1))) → Pl.IsHomogeneous (dimFl Ψ N + 1) → l ∈ GroundTheory.Heights₂.Heights.antisymInv Ψ N j → (∀ m, |(Pl - GroundTheory.Heights₂.Heights.antisymDelta Ψ N * l).coeff m| ≤ ε) → ∃ α β : Ψ → ℝ, ∀ m : Ψ × Fin N →₀ ℕ, m.degree = dimFl Ψ N + 1 → |R (monomial m 1) + v * (∑ τ, (α τ - β τ) * Sh j τ (monomial m 1) + ∑ τ, β τ * Tot τ (monomial m 1))| ≤ ε := by
+theorem cor_b_poly_functional
+    : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (j : ℕ) (R : RP Ψ N →ₗ[ℝ] ℝ) (v ε : ℝ)
+        (Pl l : MvPolynomial (Ψ × Fin N) ℝ),
+      0 < v → (∀ lam : Wt Ψ N, eval (fun x => lam x.1 x.2) Pl = R (linRoot lam ^ (dimFl Ψ N + 1)))
+        → Pl.IsHomogeneous (dimFl Ψ N + 1) → l ∈ GroundTheory.Heights₂.Heights.antisymInv Ψ N j
+        → (∀ m, |(Pl - GroundTheory.Heights₂.Heights.antisymDelta Ψ N * l).coeff m| ≤ ε)
+        → ∃ α β : Ψ → ℝ, ∀ m : Ψ × Fin N →₀ ℕ,
+          m.degree = dimFl Ψ N + 1
+            → |R (monomial m 1) + v * (∑ τ, (α τ - β τ) * Sh j τ (monomial m 1) + ∑ τ, β τ * Tot τ (monomial m 1))|
+              ≤ ε := by
   intro Ψ _ _ N j R v ε Pl l hv hP _ hl hε
   obtain ⟨a, b, hab⟩ := inv_linear_eval Ψ N j l hl
   obtain ⟨c, hc0, hc⟩ := flagDeg_eq_delta Ψ N
@@ -105,17 +127,20 @@ theorem cor_b_poly_functional : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N
   refine ⟨fun τ => a τ / K, fun τ => b τ / K, fun m hm => ?_⟩
   let Φ : RP Ψ N →ₗ[ℝ] ℝ :=
     R + v • (∑ τ, (a τ / K - b τ / K) • Lin.shL j τ + ∑ τ, (b τ / K) • Lin.totL τ)
-  have hΦ : ∀ F, Φ F = R F + v * (∑ τ, (a τ / K - b τ / K) * Sh j τ F + ∑ τ, b τ / K * Tot τ F) := by
+  have hΦ
+      : ∀ F, Φ F = R F + v * (∑ τ, (a τ / K - b τ / K) * Sh j τ F + ∑ τ, b τ / K * Tot τ F) := by
     intro F
     simp only [Φ, LinearMap.add_apply, LinearMap.smul_apply, LinearMap.sum_apply, Lin.shL_apply,
       Lin.totL_apply, smul_eq_mul]
-  obtain ⟨P', -, hP', -, hle⟩ := GlobalTheory.T.polarization_polynomial_coeff_bound (Ψ × Fin N) (dimFl Ψ N + 1) Φ
+  obtain ⟨P', -, hP', -, hle⟩ :=
+    GlobalTheory.T.polarization_polynomial_coeff_bound (Ψ × Fin N) (dimFl Ψ N + 1) Φ
   have heq : P' = Pl - GroundTheory.Heights₂.Heights.antisymDelta Ψ N * l := by
     refine MvPolynomial.funext fun x => ?_
-    have e1 : (-∑ y, C (x y) * X y : RP Ψ N) = linRoot (fun τ i => x (τ, i) : Wt Ψ N) := rfl
+    have e1 : (- ∑ y, C (x y) * X y : RP Ψ N) = linRoot (fun τ i => x (τ, i) : Wt Ψ N) := rfl
     have e2 := hP (fun τ i => x (τ, i))
     rw [hP', e1, hΦ, map_sub, map_mul, hab, ← e2]
-    simp only [(GlobalTheory.T.flag_shift_total_lin_root_power Ψ N j _ _).1, (GlobalTheory.T.flag_shift_total_lin_root_power Ψ N j _ _).2, hc]
+    simp only [(GlobalTheory.T.flag_shift_total_lin_root_power Ψ N j _ _).1,
+      (GlobalTheory.T.flag_shift_total_lin_root_power Ψ N j _ _).2, hc]
     rw [sub_eq_add_neg (eval x Pl)]
     congr 1
     rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum,

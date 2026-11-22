@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.Discr
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped ComplexOrder
 
 noncomputable section
@@ -14,18 +15,16 @@ namespace GlobalTheory.IwaInt
 
 variable {n : ℕ}
 
-def crd (p : Fin n × Fin n × Bool → Prop) :
-    Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] ({t // p t} → ℝ) where
+def crd (p : Fin n × Fin n × Bool → Prop) : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] ({t // p t} → ℝ) where
   toFun x t := if t.1.2.2 then (x t.1.1 t.1.2.1).im else (x t.1.1 t.1.2.1).re
-  map_add' x y := by
-    funext t; by_cases h : t.1.2.2 <;> simp [h]
-  map_smul' a x := by
-    funext t; by_cases h : t.1.2.2 <;> simp [h]
+  map_add' x y := by funext t; by_cases h : t.1.2.2 <;> simp [h]
+  map_smul' a x := by funext t; by_cases h : t.1.2.2 <;> simp [h]
 
-def emb (p : Fin n × Fin n × Bool → Prop) [DecidablePred p] :
-    ({t // p t} → ℝ) →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ where
-  toFun v := Matrix.of fun i j =>
-    ⟨if h : p (i, j, false) then v ⟨_, h⟩ else 0, if h : p (i, j, true) then v ⟨_, h⟩ else 0⟩
+def emb (p : Fin n × Fin n × Bool → Prop) [DecidablePred p]
+    : ({t // p t} → ℝ) →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ where
+  toFun v :=
+    Matrix.of fun i j =>
+      ⟨if h : p (i, j, false) then v ⟨_, h⟩ else 0, if h : p (i, j, true) then v ⟨_, h⟩ else 0⟩
   map_add' x y := by
     ext i j
     apply Complex.ext <;> simp <;> split_ifs <;> simp
@@ -33,12 +32,12 @@ def emb (p : Fin n × Fin n × Bool → Prop) [DecidablePred p] :
     ext i j
     apply Complex.ext <;> simp
 
-def Lc (p : Fin n × Fin n × Bool → Prop) [DecidablePred p] (x : Matrix (Fin n) (Fin n) ℂ) :
-    ({t // p t} → ℝ) →ₗ[ℝ] ({t // p t} → ℝ) :=
+def Lc (p : Fin n × Fin n × Bool → Prop) [DecidablePred p] (x : Matrix (Fin n) (Fin n) ℂ)
+    : ({t // p t} → ℝ) →ₗ[ℝ] ({t // p t} → ℝ) :=
   crd p ∘ₗ LinearMap.mulLeft ℝ x ∘ₗ emb p
 
-def Rc (p : Fin n × Fin n × Bool → Prop) [DecidablePred p] (x : Matrix (Fin n) (Fin n) ℂ) :
-    ({t // p t} → ℝ) →ₗ[ℝ] ({t // p t} → ℝ) :=
+def Rc (p : Fin n × Fin n × Bool → Prop) [DecidablePred p] (x : Matrix (Fin n) (Fin n) ℂ)
+    : ({t // p t} → ℝ) →ₗ[ℝ] ({t // p t} → ℝ) :=
   crd p ∘ₗ LinearMap.mulRight ℝ x ∘ₗ emb p
 
 abbrev pV (ε : Fin n → Bool) (t : Fin n × Fin n × Bool) : Prop := ε t.1 = ε t.2.1
@@ -127,7 +126,8 @@ def GC (ε : Fin n → Bool) : Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ where
     exact hg'.units_inv_left
 
 def BC (ε : Fin n → Bool) : Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ where
-  carrier := {g | g ∈ GC ε ∧ IsLo (g : Matrix (Fin n) (Fin n) ℂ) ∧ ∀ l, 0 < (g : Matrix (Fin n) (Fin n) ℂ) l l}
+  carrier :=
+    {g | g ∈ GC ε ∧ IsLo (g : Matrix (Fin n) (Fin n) ℂ) ∧ ∀ l, 0 < (g : Matrix (Fin n) (Fin n) ℂ) l l}
   mul_mem' := by
     intro g h hg hh
     refine ⟨mul_mem hg.1 hh.1, isLo_mul hg.2.1 hh.2.1, fun l => ?_⟩
@@ -151,7 +151,8 @@ lemma isEmbedding_val : Topology.IsEmbedding
   have := NormedRing.inverse_continuousAt (Units.mk0 _ h)
   simpa using this
 
-instance instSecondCountableSub (Γ : Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ) : SecondCountableTopology Γ := by
+instance instSecondCountableSub (Γ : Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ)
+    : SecondCountableTopology Γ := by
   have : SecondCountableTopology (Matrix (Fin n) (Fin n) ℂ) :=
     inferInstanceAs (SecondCountableTopology (Fin n → Fin n → ℂ))
   exact (isEmbedding_val.comp Topology.IsEmbedding.subtypeVal).isInducing.secondCountableTopology

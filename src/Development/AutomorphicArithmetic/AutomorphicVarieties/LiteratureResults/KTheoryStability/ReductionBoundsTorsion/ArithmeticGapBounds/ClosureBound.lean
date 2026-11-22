@@ -242,8 +242,10 @@ theorem hilb_holds : Hilb := by
   have c123 : IsClosed ((W₁ ⊓ W₂ ⊓ W₃ : Submodule ℝ H) : Set H) := by
     rw [Submodule.coe_inf, Submodule.coe_inf]; exact (c1.inter c2).inter c3
   have : CompleteSpace ↥(W₁ ⊓ W₂ ⊓ W₃) := c123.completeSpace_coe
-  let D : H →L[ℝ] H := (ContinuousLinearMap.id ℝ H - W₁.starProjection) +
-    (ContinuousLinearMap.id ℝ H - W₂.starProjection) + (ContinuousLinearMap.id ℝ H - W₃.starProjection)
+  let D : H →L[ℝ] H :=
+    (ContinuousLinearMap.id ℝ H - W₁.starProjection)
+      + (ContinuousLinearMap.id ℝ H - W₂.starProjection)
+      + (ContinuousLinearMap.id ℝ H - W₃.starProjection)
   have hD : ∀ x, D x = q W₁ x + q W₂ x + q W₃ x := fun x => by simp [D, q]
   have hself : ∀ x, ⟪D x, x⟫_ℝ = ‖q W₁ x‖ ^ 2 + ‖q W₂ x‖ ^ 2 + ‖q W₃ x‖ ^ 2 := by
     intro x
@@ -263,12 +265,17 @@ theorem hilb_holds : Hilb := by
   have hker : ∀ u, ⟪D u, u⟫_ℝ = 0 → u ∈ W₁ ⊓ W₂ ⊓ W₃ := by
     intro u hu
     rw [hself] at hu
-    have z1 : ‖q W₁ u‖ ^ 2 = 0 := by nlinarith [sq_nonneg ‖q W₁ u‖, sq_nonneg ‖q W₂ u‖, sq_nonneg ‖q W₃ u‖]
-    have z2 : ‖q W₂ u‖ ^ 2 = 0 := by nlinarith [sq_nonneg ‖q W₁ u‖, sq_nonneg ‖q W₂ u‖, sq_nonneg ‖q W₃ u‖]
-    have z3 : ‖q W₃ u‖ ^ 2 = 0 := by nlinarith [sq_nonneg ‖q W₁ u‖, sq_nonneg ‖q W₂ u‖, sq_nonneg ‖q W₃ u‖]
-    simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff, norm_eq_zero] at z1 z2 z3
+    have z1 : ‖q W₁ u‖ ^ 2 = 0 := by
+      nlinarith [sq_nonneg ‖q W₁ u‖, sq_nonneg ‖q W₂ u‖, sq_nonneg ‖q W₃ u‖]
+    have z2 : ‖q W₂ u‖ ^ 2 = 0 := by
+      nlinarith [sq_nonneg ‖q W₁ u‖, sq_nonneg ‖q W₂ u‖, sq_nonneg ‖q W₃ u‖]
+    have z3 : ‖q W₃ u‖ ^ 2 = 0 := by
+      nlinarith [sq_nonneg ‖q W₁ u‖, sq_nonneg ‖q W₂ u‖, sq_nonneg ‖q W₃ u‖]
+    simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff, norm_eq_zero]
+      at z1 z2 z3
     exact Submodule.mem_inf.2 ⟨Submodule.mem_inf.2 ⟨mem_of_q W₁ z1, mem_of_q W₂ z2⟩, mem_of_q W₃ z3⟩
-  have hcl : ∀ z ∈ (W₁ ⊓ W₂ ⊓ W₃)ᗮ, 3 / 5 * ‖z‖ ^ 2 ≤ ‖q W₁ z‖ ^ 2 + ‖q W₂ z‖ ^ 2 + ‖q W₃ z‖ ^ 2 := by
+  have hcl
+      : ∀ z ∈ (W₁ ⊓ W₂ ⊓ W₃)ᗮ, 3 / 5 * ‖z‖ ^ 2 ≤ ‖q W₁ z‖ ^ 2 + ‖q W₂ z‖ ^ 2 + ‖q W₃ z‖ ^ 2 := by
     intro z hz
     rw [← hself]
     exact closure_bound D _ hker (range_bound D hsym hpos hsum) z hz
@@ -277,7 +284,8 @@ theorem hilb_holds : Hilb := by
   have hw' : q (W₁ ⊓ W₂ ⊓ W₃) w ∈ W₁ ⊓ W₃ := Submodule.sub_mem _ hw (hle hPw)
   have hw'p : q (W₁ ⊓ W₂ ⊓ W₃) w ∈ (W₁ ⊓ W₂ ⊓ W₃)ᗮ := Submodule.sub_starProjection_mem_orthogonal w
   have hvw : ⟪v, w⟫_ℝ = ⟪v, q (W₁ ⊓ W₂ ⊓ W₃) w⟫_ℝ := by
-    have h0 : ⟪v, (W₁ ⊓ W₂ ⊓ W₃).starProjection w⟫_ℝ = 0 := (Submodule.mem_orthogonal' _ _).1 hvp _ hPw
+    have h0 : ⟪v, (W₁ ⊓ W₂ ⊓ W₃).starProjection w⟫_ℝ = 0 :=
+      (Submodule.mem_orthogonal' _ _).1 hvp _ hPw
     simp only [q, inner_sub_right, h0, sub_zero]
   have hnw : ‖q (W₁ ⊓ W₂ ⊓ W₃) w‖ ≤ ‖w‖ := by
     have := norm_split (W₁ ⊓ W₂ ⊓ W₃) w

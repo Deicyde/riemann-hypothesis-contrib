@@ -11,9 +11,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Tor
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -23,20 +26,35 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.FourierDescent
 
-theorem cst_eq_gs_scal {R : Type} [CommRing R] {Z : Scheme.{0}} (p : Z ⟶ Sp R) (z : Z) (C : R) :
-    cst p z C = gs (𝟙 _) z ⊤ (scal p C) := by
+theorem cst_eq_gs_scal {R : Type} [CommRing R] {Z : Scheme.{0}} (p : Z ⟶ Sp R) (z : Z) (C : R)
+    : cst p z C = gs (𝟙 _) z ⊤ (scal p C) := by
   have h := gs_pull (𝟙 Z) p z ⊤ trivial ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom C)
   rw [Category.id_comp] at h
   exact h.symm
 
-theorem values_identity : ∀ (R : Type) [CommRing R] [IsDomain R] (Q : DegPre R) (O : Type) [CommRing O] [StarRing O] [Module O Q.X] (oa : Q.OAct O) (Y : Ray oa) (k : ℕ) (α : Q.X) (σ σ' σ'' : Q.SecB k α) (C : R), (∀ (y : Y.H.left) J, Good Q.P.L y J → sval σ' Y.q.left y J = sval σ'' Y.q.left y J + gs (𝟙 _) y ⊤ (scal Y.H.hom C) * sval σ Y.q.left y J) → ∀ (T : Over (Sp R)) (x : T ⟶ Q.P.A) z J, Good Q.P.L z J → sval σ' x.left z J = sval σ'' x.left z J + gs (𝟙 _) z ⊤ (scal T.hom C) * sval σ x.left z J := by
+theorem values_identity
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (Q : DegPre R) (O : Type) [CommRing O] [StarRing O]
+        [Module O Q.X] (oa : Q.OAct O) (Y : Ray oa) (k : ℕ) (α : Q.X) (σ σ' σ'' : Q.SecB k α)
+        (C : R),
+      (∀ (y : Y.H.left) J,
+          Good Q.P.L y J
+            → sval σ' Y.q.left y J
+              = sval σ'' Y.q.left y J + gs (𝟙 _) y ⊤ (scal Y.H.hom C) * sval σ Y.q.left y J)
+        → ∀ (T : Over (Sp R)) (x : T ⟶ Q.P.A) z J,
+          Good Q.P.L z J
+            → sval σ' x.left z J
+              = sval σ'' x.left z J + gs (𝟙 _) z ⊤ (scal T.hom C) * sval σ x.left z J := by
   intro R _ _ Q O _ _ _ oa Y k α σ σ' σ'' C hyp T x z J hJ
   classical
   have hL := Q.P.isLB
   have : Smooth Y.q.left := GlobalTheory.RayEv.Ray.smooth_q Y
   have : Surjective Y.q.left := (GlobalTheory.RayEv.Ray.surjective_quasiCompact_q Y).1
-  have key : ∀ j : Fin 4 → Q.P.L.ι, σ'.f j =
-      σ''.f j + constFn Q.P.A.hom ((LB.LinComb Q.P.L (DegPre.famφB Q α) (DegPre.famε k)).U j) C * σ.f j := by
+  have key
+      : ∀ j : Fin 4 → Q.P.L.ι,
+        σ'.f j
+          = σ''.f j
+            + constFn Q.P.A.hom ((LB.LinComb Q.P.L (DegPre.famφB Q α) (DegPre.famε k)).U j) C
+              * σ.f j := by
     intro j
     apply GlobalTheory.EigenDescent.app_injective_of_flat_surjective Y.q.left
     apply fn_ext

@@ -7,19 +7,25 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsGivenS
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct nonZeroDivisors Pointwise
 
 namespace GlobalTheory.FunObj.LocTest
 
-open GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StepData GlobalTheory.StdFrames Formalism.L2.Host Formalism.L2.DIV ValuativeRel
+open GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StepData
+  GlobalTheory.StdFrames Formalism.L2.Host Formalism.L2.DIV ValuativeRel
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts}
 
-theorem intM_of_stepFn (t : T) (w : Pl D.host.E) (j : ℕ) {x} (h : stepFn L t w j x ≠ 0) : IntM x := by
+theorem intM_of_stepFn (t : T) (w : Pl D.host.E) (j : ℕ) {x} (h : stepFn L t w j x ≠ 0)
+    : IntM x := by
   unfold stepFn at h
   split_ifs at h
   · intro i l

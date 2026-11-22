@@ -5,18 +5,28 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem yPrime_approx {R σ : Type} [CommRing R] {y : σ → R} {f : R} {BB : Type} [CommRing BB]
-    [Algebra R BB] (h : IsYCpl y f BB) (n : ℕ) (J : Ideal R) (x : BB) (hx : x ∈ J.map (algebraMap R BB)) :
-    ∃ (k : ℕ) (a : R), a ∈ J ∧
-      algebraMap R BB f ^ k * x - algebraMap R BB a ∈ (Ideal.span (Set.range y) ^ n).map (algebraMap R BB) :=
+private theorem yPrime_approx
+    {R σ : Type} [CommRing R]
+    {y : σ → R} {f : R} {BB : Type} [CommRing BB] [Algebra R BB]
+    (h : IsYCpl y f BB) (n : ℕ)
+    (J : Ideal R) (x : BB) (hx : x ∈ J.map (algebraMap R BB))
+    : ∃ (k : ℕ) (a : R),
+      a ∈ J
+        ∧ algebraMap R BB f ^ k * x - algebraMap R BB a
+          ∈ (Ideal.span (Set.range y) ^ n).map (algebraMap R BB) :=
   _root_.UpperTheory.Reformulated.B.PrimeApproximation.yPrime_approx h n J x hx
 
-private theorem yPrime_back {R σ : Type} [CommRing R] {y : σ → R} {f : R} {BB : Type} [CommRing BB]
-    [Algebra R BB] (h : IsYCpl y f BB) (n : ℕ) (J : Ideal R) (hJ : Ideal.span (Set.range y) ^ n ≤ J)
-    (r : R) (hr : algebraMap R BB r ∈ J.map (algebraMap R BB)) : ∃ k : ℕ, f ^ k * r ∈ J := by
+private theorem yPrime_back
+    {R σ : Type} [CommRing R]
+    {y : σ → R} {f : R} {BB : Type} [CommRing BB] [Algebra R BB]
+    (h : IsYCpl y f BB)
+    (n : ℕ) (J : Ideal R) (hJ : Ideal.span (Set.range y) ^ n ≤ J)
+    (r : R) (hr : algebraMap R BB r ∈ J.map (algebraMap R BB))
+    : ∃ k : ℕ, f ^ k * r ∈ J := by
   obtain ⟨k, a, ha, h1⟩ := yPrime_approx h n J _ hr
   rw [← map_pow, ← map_mul, ← map_sub] at h1
   obtain ⟨m, hm⟩ := h.strict n _ h1
@@ -24,8 +34,20 @@ private theorem yPrime_back {R σ : Type} [CommRing R] {y : σ → R} {f : R} {B
   convert J.add_mem (hJ hm) (J.mul_mem_left (f ^ m) ha) using 1
   ring
 
-theorem UpperTheory.V.Pa.Core.yPrime :
-    ∀ (R σ : Type) [CommRing R] [Fintype σ] (y : σ → R) (f : R) (BB : Type) [CommRing BB] [Algebra R BB], IsYCpl y f BB → ∀ q : Ideal R, q.IsPrime → f ∉ q → (∀ a, y a ∈ q) → (q.map (algebraMap R BB)).IsPrime ∧ (q.map (algebraMap R BB)).comap (algebraMap R BB) = q ∧ (∀ P : Ideal BB, P.IsPrime → (∀ a, algebraMap R BB (y a) ∈ P) → P.comap (algebraMap R BB) ≤ q → P ≤ q.map (algebraMap R BB)) ∧ ∀ (B : Type) [CommRing B] [IsLocalRing B] [Algebra BB B] [Algebra R B] [IsScalarTower R BB B], IsCplAt BB (q.map (algebraMap R BB)) B → IsCplAt R q B := by
+theorem UpperTheory.V.Pa.Core.yPrime
+    : ∀ (R σ : Type) [CommRing R] [Fintype σ] (y : σ → R) (f : R) (BB : Type) [CommRing BB]
+        [Algebra R BB],
+      IsYCpl y f BB
+        → ∀ q : Ideal R,
+          q.IsPrime → f ∉ q → (∀ a, y a ∈ q)
+            → (q.map (algebraMap R BB)).IsPrime
+              ∧ (q.map (algebraMap R BB)).comap (algebraMap R BB) = q
+              ∧ (∀ P : Ideal BB,
+                P.IsPrime → (∀ a, algebraMap R BB (y a) ∈ P) → P.comap (algebraMap R BB) ≤ q
+                  → P ≤ q.map (algebraMap R BB))
+              ∧ ∀ (B : Type) [CommRing B] [IsLocalRing B] [Algebra BB B] [Algebra R B]
+                  [IsScalarTower R BB B],
+                IsCplAt BB (q.map (algebraMap R BB)) B → IsCplAt R q B := by
   intro R σ _ _ y f BB _ _ h q hq hf hy
   have hI : Ideal.span (Set.range y) ≤ q := by
     rw [Ideal.span_le]
@@ -40,17 +62,24 @@ theorem UpperTheory.V.Pa.Core.yPrime :
     exact (hq.mem_or_mem hk).resolve_left (hfk k)
   have hcomap : (q.map (algebraMap R BB)).comap (algebraMap R BB) = q :=
     le_antisymm (fun r hr => hcom r hr) Ideal.le_comap_map
-  have hIn : ∀ n : ℕ, (Ideal.span (Set.range y) ^ n).map (algebraMap R BB) ≤
-      (q ^ n).map (algebraMap R BB) := fun n => Ideal.map_mono (Ideal.pow_right_mono hI n)
-  have hI1 : ∀ n : ℕ, (Ideal.span (Set.range y) ^ (n + 1)).map (algebraMap R BB) ≤
-      q.map (algebraMap R BB) := fun n =>
-    Ideal.map_mono ((Ideal.pow_le_self (Nat.succ_ne_zero n)).trans hI)
-  have hI2 : ∀ n : ℕ, (Ideal.span (Set.range y) ^ (n + 1)).map (algebraMap R BB) ≤
-      (q ^ n).map (algebraMap R BB) := fun n =>
+  have hIn
+      : ∀ n : ℕ,
+        (Ideal.span (Set.range y) ^ n).map (algebraMap R BB) ≤ (q ^ n).map (algebraMap R BB) :=
+    fun n => Ideal.map_mono (Ideal.pow_right_mono hI n)
+  have hI1
+      : ∀ n : ℕ,
+        (Ideal.span (Set.range y) ^ (n + 1)).map (algebraMap R BB) ≤ q.map (algebraMap R BB) :=
+    fun n => Ideal.map_mono ((Ideal.pow_le_self (Nat.succ_ne_zero n)).trans hI)
+  have hI2
+      : ∀ n : ℕ,
+        (Ideal.span (Set.range y) ^ (n + 1)).map (algebraMap R BB)
+          ≤ (q ^ n).map (algebraMap R BB) := fun n =>
     (Ideal.map_mono (Ideal.pow_le_pow_right (Nat.le_succ n))).trans (hIn n)
-  have hiff : ∀ (n k : ℕ) (x : BB) (r : R), algebraMap R BB f ^ k * x - algebraMap R BB r ∈
-      (Ideal.span (Set.range y) ^ (n + 1)).map (algebraMap R BB) →
-      (x ∈ q.map (algebraMap R BB) ↔ r ∈ q) := by
+  have hiff
+      : ∀ (n k : ℕ) (x : BB) (r : R),
+        algebraMap R BB f ^ k * x - algebraMap R BB r
+            ∈ (Ideal.span (Set.range y) ^ (n + 1)).map (algebraMap R BB)
+          → (x ∈ q.map (algebraMap R BB) ↔ r ∈ q) := by
     intro n k x r hx
     have h1 := hI1 n hx
     constructor
@@ -89,8 +118,9 @@ theorem UpperTheory.V.Pa.Core.yPrime :
     rw [Ideal.mem_comap]
     simpa using this
   · intro B _ _ _ _ _ hB
-    have hm : ∀ (n : ℕ) (x : BB), x ∈ (q ^ n).map (algebraMap R BB) →
-        algebraMap BB B x ∈ maximalIdeal B ^ n := by
+    have hm
+        : ∀ (n : ℕ) (x : BB),
+          x ∈ (q ^ n).map (algebraMap R BB) → algebraMap BB B x ∈ maximalIdeal B ^ n := by
       intro n x hx
       have h1 : (q.map (algebraMap R BB)).map (algebraMap BB B) ≤ maximalIdeal B := by
         rw [Ideal.map_le_iff_le_comap, hB.comap_eq]

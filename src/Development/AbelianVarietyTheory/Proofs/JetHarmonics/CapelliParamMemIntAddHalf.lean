@@ -11,7 +11,12 @@ open Formalism.FourierDecayAlt Formalism.QuantumDeterminants
 
 namespace GlobalTheory
 
-theorem capelliParam_mem_int_add_half : ∀ (k r : ℕ) (Wp : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp] (z : Fin (2 * r + k + 1) → ℂ) (π : Q.Mx k r → (Wp →L[ℂ] Wp)) (u : ℕ → ℝ), inWb k r z → 0 < Tz k r z → Q.IsType k r z π u → ∀ i ∈ Finset.Icc 1 k, ∃ m : ℤ, u i = (m : ℝ) + ((k : ℝ) - 1) / 2 := by
+theorem capelliParam_mem_int_add_half
+    : ∀ (k r : ℕ) (Wp : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+        [FiniteDimensional ℂ Wp] (z : Fin (2 * r + k + 1) → ℂ) (π : Q.Mx k r → (Wp →L[ℂ] Wp))
+        (u : ℕ → ℝ),
+      inWb k r z → 0 < Tz k r z → Q.IsType k r z π u
+        → ∀ i ∈ Finset.Icc 1 k, ∃ m : ℤ, u i = (m : ℝ) + ((k : ℝ) - 1) / 2 := by
   intro k r Wp _ _ _ z π u hz hT hπ i hi
   obtain ⟨u₀, h₀⟩ := GlobalTheory.besType_hcParam k r Wp z π u hz hT hπ
   have ha := (GlobalTheory.BesselMapCompare.isHCParam_of_isHCTypeW h₀).2

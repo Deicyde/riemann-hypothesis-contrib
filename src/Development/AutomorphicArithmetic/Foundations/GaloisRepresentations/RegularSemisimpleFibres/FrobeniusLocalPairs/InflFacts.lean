@@ -9,9 +9,12 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 noncomputable section
 
-open MeasureTheory NumberField IsDedekindDomain ValuativeRel Matrix GroundTheory.Global GroundTheory.Global.SemiLocal
+open MeasureTheory NumberField IsDedekindDomain ValuativeRel Matrix GroundTheory.Global
+  GroundTheory.Global.SemiLocal
 open PositivityTheory.Rg.Tf.Geo (incFin galFin)
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C Formalism.BasicNotions GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DZA UpperTheory.V.Published UpperTheory.CBC
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C Formalism.BasicNotions
+  GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DZA UpperTheory.V.Published
+  UpperTheory.CBC
 open scoped Classical
 
 namespace UpperTheory.Gal.InertialTypesAlt.L
@@ -20,46 +23,66 @@ section Alg
 
 variable {k : Type} [Field k] [ValuativeRel k] {F₀ : Type} [Field F₀] {n : ℕ}
 
-private theorem incl_inj :
-    Function.Injective (GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k)) := fun a b h =>
-  Units.ext <| Matrix.ext fun i j => Subtype.ext
-    (congrArg (fun g : GL (Fin n) k => (g : Matrix (Fin n) (Fin n) k) i j) h)
+private theorem incl_inj
+    : Function.Injective (GeneralLinearGroup.map (n := Fin n) (algebraMap 𝒪[k] k)) := fun a b h =>
+  Units.ext <| Matrix.ext fun i j =>
+    Subtype.ext (congrArg (fun g : GL (Fin n) k => (g : Matrix (Fin n) (Fin n) k) i j) h)
 
-private theorem infl_incl (rd : 𝒪[k] →+* F₀) (fb : GL (Fin n) F₀ → ℂ) (y : GL (Fin n) 𝒪[k]) :
-    infl rd fb (GeneralLinearGroup.map (algebraMap 𝒪[k] k) y) = fb (GeneralLinearGroup.map rd y) := by
-  have h : ∃ y' : GL (Fin n) 𝒪[k], GeneralLinearGroup.map (algebraMap 𝒪[k] k) y' =
-      GeneralLinearGroup.map (algebraMap 𝒪[k] k) y := ⟨y, rfl⟩
+private theorem infl_incl (rd : 𝒪[k] →+* F₀) (fb : GL (Fin n) F₀ → ℂ) (y : GL (Fin n) 𝒪[k])
+    : infl rd fb (GeneralLinearGroup.map (algebraMap 𝒪[k] k) y)
+      = fb (GeneralLinearGroup.map rd y) := by
+  have h
+      : ∃ y' : GL (Fin n) 𝒪[k],
+        GeneralLinearGroup.map (algebraMap 𝒪[k] k) y'
+          = GeneralLinearGroup.map (algebraMap 𝒪[k] k) y :=
+    ⟨y, rfl⟩
   unfold infl
   rw [dite_eq_left h, incl_inj h.choose_spec]
 
-private theorem infl_not_mem (rd : 𝒪[k] →+* F₀) (fb : GL (Fin n) F₀ → ℂ) {x : GL (Fin n) k}
-    (hx : x ∉ KO k n) : infl rd fb x = 0 :=
+private theorem infl_not_mem
+    (rd : 𝒪[k] →+* F₀) (fb : GL (Fin n) F₀ → ℂ) {x : GL (Fin n) k} (hx : x ∉ KO k n)
+    : infl rd fb x = 0 :=
   dif_neg hx
 
 private theorem principal_congruence_le_maximal_compact (rd : 𝒪[k] →+* F₀) : K1 rd n ≤ KO k n := by
   rintro _ ⟨y, -, rfl⟩
   exact ⟨y, rfl⟩
 
-private theorem infl_left (rd : 𝒪[k] →+* F₀) (fb : GL (Fin n) F₀ → ℂ) {c : GL (Fin n) k}
-    (hc : c ∈ K1 rd n) (x : GL (Fin n) k) : infl rd fb (c * x) = infl rd fb x := by
+private theorem infl_left
+    (rd : 𝒪[k] →+* F₀)
+    (fb : GL (Fin n) F₀ → ℂ)
+    {c : GL (Fin n) k} (hc : c ∈ K1 rd n)
+    (x : GL (Fin n) k)
+    : infl rd fb (c * x) = infl rd fb x := by
   by_cases hx : x ∈ KO k n
   · obtain ⟨u, hu, rfl⟩ := hc
     obtain ⟨y, rfl⟩ := hx
     rw [← map_mul, infl_incl, infl_incl, map_mul, MonoidHom.mem_ker.1 hu, one_mul]
   · rw [infl_not_mem rd fb hx, infl_not_mem rd fb]
-    exact fun h => hx (by simpa using (KO k n).mul_mem ((KO k n).inv_mem (principal_congruence_le_maximal_compact rd hc)) h)
+    exact fun h =>
+      hx (by
+        simpa using
+          (KO k n).mul_mem ((KO k n).inv_mem (principal_congruence_le_maximal_compact rd hc)) h)
 
-private theorem infl_right (rd : 𝒪[k] →+* F₀) (fb : GL (Fin n) F₀ → ℂ) {c : GL (Fin n) k}
-    (hc : c ∈ K1 rd n) (x : GL (Fin n) k) : infl rd fb (x * c) = infl rd fb x := by
+private theorem infl_right
+    (rd : 𝒪[k] →+* F₀)
+    (fb : GL (Fin n) F₀ → ℂ)
+    {c : GL (Fin n) k} (hc : c ∈ K1 rd n)
+    (x : GL (Fin n) k)
+    : infl rd fb (x * c) = infl rd fb x := by
   by_cases hx : x ∈ KO k n
   · obtain ⟨u, hu, rfl⟩ := hc
     obtain ⟨y, rfl⟩ := hx
     rw [← map_mul, infl_incl, infl_incl, map_mul, MonoidHom.mem_ker.1 hu, mul_one]
   · rw [infl_not_mem rd fb hx, infl_not_mem rd fb]
-    exact fun h => hx (by simpa using (KO k n).mul_mem h ((KO k n).inv_mem (principal_congruence_le_maximal_compact rd hc)))
+    exact fun h =>
+      hx (by
+        simpa using
+          (KO k n).mul_mem h ((KO k n).inv_mem (principal_congruence_le_maximal_compact rd hc)))
 
-private theorem rd_eq_zero (rd : 𝒪[k] →+* F₀) (hrd : Function.Surjective rd) (x : 𝒪[k])
-    (hx : valuation k (x : k) < 1) : rd x = 0 := by
+private theorem rd_eq_zero
+    (rd : 𝒪[k] →+* F₀) (hrd : Function.Surjective rd) (x : 𝒪[k]) (hx : valuation k (x : k) < 1)
+    : rd x = 0 := by
   by_contra h0
   obtain ⟨y, hy⟩ := hrd (rd x)⁻¹
   have hxy : rd (1 - x * y) = 0 := by
@@ -81,8 +104,7 @@ private theorem rd_eq_zero (rd : 𝒪[k] →+* F₀) (hrd : Function.Surjective 
 
 end Alg
 
-theorem inflFacts :
-    UpperTheory.Gal.InertialTypesAlt.L.InflFacts := by
+theorem inflFacts : UpperTheory.Gal.InertialTypesAlt.L.InflFacts := by
   intro k _ _ _ _ F₀ _ _ rd hrd n
   have hKO : KO k n = GroundTheory.Automorphic.GLnLocal.integralGL k n := rfl
   have hU : KO k n = PositivityTheory.Rg.Tf.Loc.unitGL k := rfl
@@ -98,7 +120,9 @@ theorem inflFacts :
   obtain ⟨B, hB, hBo, -⟩ := UpperTheory.ConvolutionTheory.Loc.ballSub k n r hr0 hr1
   have hent : ∀ g ∈ B, ∀ i j, valuation k ((g : Matrix (Fin n) (Fin n) k) i j) ≤ 1 := by
     intro g hg i j
-    have hb : valuation k ((g : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j) ≤ r := by
+    have hb
+        : valuation k ((g : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j)
+          ≤ r := by
       have : g ∈ (B : Set (GL (Fin n) k)) := hg
       rw [hB] at this
       exact this i j
@@ -109,20 +133,29 @@ theorem inflFacts :
   have hBK : B ≤ K1 rd n := by
     intro g hg
     have hgO : g ∈ GroundTheory.Automorphic.GLnLocal.integralGL k n :=
-      (GroundTheory.Automorphic.GLnLocal.mem_integralGL_iff k n).2 ⟨hent g hg, hent _ (B.inv_mem hg)⟩
+      (GroundTheory.Automorphic.GLnLocal.mem_integralGL_iff k n).2
+        ⟨hent g hg, hent _ (B.inv_mem hg)⟩
     obtain ⟨y, rfl⟩ : g ∈ KO k n := hgO
     refine ⟨y, ?_, rfl⟩
     change GeneralLinearGroup.map rd y = 1
     refine Units.ext (Matrix.ext fun i j => ?_)
-    have hb : valuation k (((GeneralLinearGroup.map (algebraMap 𝒪[k] k) y : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j -
-        (1 : Matrix (Fin n) (Fin n) k) i j) ≤ r := by
+    have hb
+        : valuation k
+            (((GeneralLinearGroup.map (algebraMap 𝒪[k] k) y : GL (Fin n) k)
+                  : Matrix (Fin n) (Fin n) k)
+                i j
+              - (1 : Matrix (Fin n) (Fin n) k) i j)
+          ≤ r := by
       have : GeneralLinearGroup.map (algebraMap 𝒪[k] k) y ∈ (B : Set (GL (Fin n) k)) := hg
       rw [hB] at this
       exact this i j
-    have h0 := rd_eq_zero rd hrd ((y : Matrix (Fin n) (Fin n) 𝒪[k]) i j - (1 : Matrix (Fin n) (Fin n) 𝒪[k]) i j) (by
-      refine lt_of_le_of_lt (le_of_eq ?_) (hb.trans_lt hr1)
-      congr 1
-      by_cases hij : i = j <;> simp [Matrix.one_apply, hij] <;> rfl)
+    have h0 :=
+      rd_eq_zero rd hrd
+        ((y : Matrix (Fin n) (Fin n) 𝒪[k]) i j - (1 : Matrix (Fin n) (Fin n) 𝒪[k]) i j)
+        (by
+          refine lt_of_le_of_lt (le_of_eq ?_) (hb.trans_lt hr1)
+          congr 1
+          by_cases hij : i = j <;> simp [Matrix.one_apply, hij] <;> rfl)
     rw [map_sub, sub_eq_zero] at h0
     simp only [GeneralLinearGroup.map_apply, Units.val_one]
     rw [h0]
@@ -134,8 +167,21 @@ theorem inflFacts :
   have hclosedKO : IsClosed (KO k n : Set (GL (Fin n) k)) := Subgroup.isClosed_of_isOpen _ hopenKO
   have hsupp : ∀ fb : GL (Fin n) F₀ → ℂ, HasCompactSupport (infl rd fb) := fun fb =>
     HasCompactSupport.intro' hcompKO hclosedKO fun x hx => infl_not_mem rd fb hx
-  refine ⟨hU, hopen, hcomp, principal_congruence_le_maximal_compact rd, fun fb y => infl_incl rd fb y, fun fb => ⟨⟨hsupp fb, fun c hc x => ⟨infl_left rd fb hc x, infl_right rd fb hc x⟩⟩, ⟨?_, hsupp fb⟩, ?_⟩⟩
-  · refine (IsLocallyConstant.iff_exists_open _).2 fun x => ⟨(fun z => x⁻¹ * z) ⁻¹' (K1 rd n : Set (GL (Fin n) k)), hopen.preimage (continuous_const.mul continuous_id), by simp [(K1 rd n).one_mem], fun z hz => ?_⟩
+  refine ⟨
+    hU,
+    hopen,
+    hcomp,
+    principal_congruence_le_maximal_compact rd,
+    fun fb y => infl_incl rd fb y,
+    fun fb =>
+      ⟨⟨hsupp fb, fun c hc x => ⟨infl_left rd fb hc x, infl_right rd fb hc x⟩⟩, ⟨?_, hsupp fb⟩, ?_⟩
+  ⟩
+  · refine (IsLocallyConstant.iff_exists_open _).2 fun x => ⟨
+      (fun z => x⁻¹ * z) ⁻¹' (K1 rd n : Set (GL (Fin n) k)),
+      hopen.preimage (continuous_const.mul continuous_id),
+      by simp [(K1 rd n).one_mem],
+      fun z hz => ?_
+    ⟩
     have := infl_right rd fb hz x
     simpa using this
   · intro x hx

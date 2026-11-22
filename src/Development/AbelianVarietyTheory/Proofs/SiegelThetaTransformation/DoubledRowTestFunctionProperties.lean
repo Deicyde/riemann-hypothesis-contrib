@@ -30,74 +30,81 @@ theorem rowM_glue_one (a b : Matrix (Fin n) (Fin g) ℚ) : rowM 1 (glue a b) = b
 theorem glue_rowM (x : Matrix (Fin 2) (Fin n × Fin g) ℚ) : glue (rowM 0 x) (rowM 1 x) = x := by
   ext j p; fin_cases j <;> simp [rowM, glue]
 
-theorem dup_apply (φ : Matrix (Fin n) (Fin g) ℚ → ℂ) (x : Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    dup φ x = φ (rowM 0 x) * φ (rowM 1 x) := rfl
+theorem dup_apply (φ : Matrix (Fin n) (Fin g) ℚ → ℂ) (x : Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : dup φ x = φ (rowM 0 x) * φ (rowM 1 x) :=
+  rfl
 
-theorem rowM_add (j : Fin 2) (x y : Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    rowM j (x + y) = rowM j x + rowM j y := rfl
+theorem rowM_add (j : Fin 2) (x y : Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : rowM j (x + y) = rowM j x + rowM j y :=
+  rfl
 
-theorem rowM_sub (j : Fin 2) (x y : Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    rowM j (x - y) = rowM j x - rowM j y := rfl
+theorem rowM_sub (j : Fin 2) (x y : Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : rowM j (x - y) = rowM j x - rowM j y :=
+  rfl
 
-theorem rowM_smul (j : Fin 2) (c : ℚ) (x : Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    rowM j (c • x) = c • rowM j x := rfl
+theorem rowM_smul (j : Fin 2) (c : ℚ) (x : Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : rowM j (c • x) = c • rowM j x :=
+  rfl
 
-def rowEquiv (n g : ℕ) : Matrix (Fin 2) (Fin n × Fin g) ℚ ≃
-    Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ where
+def rowEquiv (n g : ℕ)
+    : Matrix (Fin 2) (Fin n × Fin g) ℚ ≃ Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ where
   toFun x := (rowM 0 x, rowM 1 x)
   invFun p := glue p.1 p.2
   left_inv x := glue_rowM x
   right_inv p := by simp [rowM_glue_zero, rowM_glue_one]
 
-theorem dot_row (j : Fin 2) (x y : Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    x j ⬝ᵥ y j = ∑ k, rowM j x k ⬝ᵥ rowM j y k := by
+theorem dot_row (j : Fin 2) (x y : Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : x j ⬝ᵥ y j = ∑ k, rowM j x k ⬝ᵥ rowM j y k := by
   simp [dotProduct, rowM, Fintype.sum_prod_type]
 
-def comp (j : Fin 2) : Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ →+
-    Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ where
+def comp (j : Fin 2)
+    : Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ
+      →+ Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ where
   toFun y := (rowM j y.1, rowM j y.2)
   map_zero' := rfl
   map_add' _ _ := rfl
 
-def glueP : (Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ) ×
-    (Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ) →+
-    Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ where
+def glueP
+    : (Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ)
+        × (Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ)
+      →+ Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ where
   toFun z := (glue z.1.1 z.2.1, glue z.1.2 z.2.2)
-  map_zero' := by
-    refine Prod.ext ?_ ?_ <;> ext j p <;> simp [glue]
-  map_add' a b := by
-    refine Prod.ext ?_ ?_ <;> ext j p <;> fin_cases j <;> simp [glue]
+  map_zero' := by refine Prod.ext ?_ ?_ <;> ext j p <;> simp [glue]
+  map_add' a b := by refine Prod.ext ?_ ?_ <;> ext j p <;> fin_cases j <;> simp [glue]
 
-theorem comp_glueP_zero (a b : Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ) :
-    comp 0 (glueP (a, b)) = a := by
+theorem comp_glueP_zero (a b : Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ)
+    : comp 0 (glueP (a, b)) = a := by
   show (rowM 0 (glue a.1 b.1), rowM 0 (glue a.2 b.2)) = a
   simp [rowM_glue_zero]
 
-theorem comp_glueP_one (a b : Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ) :
-    comp 1 (glueP (a, b)) = b := by
+theorem comp_glueP_one (a b : Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ)
+    : comp 1 (glueP (a, b)) = b := by
   show (rowM 1 (glue a.1 b.1), rowM 1 (glue a.2 b.2)) = b
   simp [rowM_glue_one]
 
-theorem glueP_comp (y : Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    glueP (comp 0 y, comp 1 y) = y := by
+theorem glueP_comp (y : Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : glueP (comp 0 y, comp 1 y) = y := by
   show (glue (rowM 0 y.1) (rowM 1 y.1), glue (rowM 0 y.2) (rowM 1 y.2)) = y
   simp [glue_rowM]
 
-theorem om_eq (y y' : Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    om y y' = om (comp 0 y) (comp 0 y') + om (comp 1 y) (comp 1 y') := by
+theorem om_eq (y y' : Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : om y y' = om (comp 0 y) (comp 0 y') + om (comp 1 y) (comp 1 y') := by
   simp only [om, Fin.sum_univ_two, dot_row, Finset.sum_sub_distrib]
   exact add_sub_add_comm _ _ _ _
 
 theorem om_zero_right (y : Matrix (Fin n) (Fin g) ℚ × Matrix (Fin n) (Fin g) ℚ) : om y 0 = 0 := by
   simp [om, dotProduct]
 
-theorem heisS_dup (y : Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ)
-    (φ : Matrix (Fin n) (Fin g) ℚ → ℂ) (x : Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    heisS y.1 y.2 (dup φ) x = heisS (comp 0 y).1 (comp 0 y).2 φ (rowM 0 x) *
-      heisS (comp 1 y).1 (comp 1 y).2 φ (rowM 1 x) := by
-  have h : (∑ k, (2 * (x k ⬝ᵥ y.1 k) - y.1 k ⬝ᵥ y.2 k) : ℚ) =
-      (∑ k, (2 * (rowM 0 x k ⬝ᵥ rowM 0 y.1 k) - rowM 0 y.1 k ⬝ᵥ rowM 0 y.2 k) : ℚ) +
-      (∑ k, (2 * (rowM 1 x k ⬝ᵥ rowM 1 y.1 k) - rowM 1 y.1 k ⬝ᵥ rowM 1 y.2 k) : ℚ) := by
+theorem heisS_dup
+    (y : Matrix (Fin 2) (Fin n × Fin g) ℚ × Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    (φ : Matrix (Fin n) (Fin g) ℚ → ℂ) (x : Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : heisS y.1 y.2 (dup φ) x
+      = heisS (comp 0 y).1 (comp 0 y).2 φ (rowM 0 x)
+        * heisS (comp 1 y).1 (comp 1 y).2 φ (rowM 1 x) := by
+  have h
+      : (∑ k, (2 * (x k ⬝ᵥ y.1 k) - y.1 k ⬝ᵥ y.2 k) : ℚ)
+        = (∑ k, (2 * (rowM 0 x k ⬝ᵥ rowM 0 y.1 k) - rowM 0 y.1 k ⬝ᵥ rowM 0 y.2 k) : ℚ)
+          + (∑ k, (2 * (rowM 1 x k ⬝ᵥ rowM 1 y.1 k) - rowM 1 y.1 k ⬝ᵥ rowM 1 y.2 k) : ℚ) := by
     simp only [Fin.sum_univ_two, dot_row, Finset.sum_sub_distrib, Finset.mul_sum]
     exact add_sub_add_comm _ _ _ _
   unfold heisS
@@ -127,8 +134,10 @@ theorem ph_mul {a b : ℂ} (ha : Ph a) (hb : Ph b) : Ph (a * b) := by
 
 theorem pv_dup {φ : Matrix (Fin n) (Fin g) ℚ → ℂ} (h : PV φ) : PV (dup φ) := by
   obtain ⟨⟨A, ε, hV⟩, hP⟩ := h
-  refine ⟨⟨(A.prod A).map glueP, fun y => ε (comp 0 y) * ε (comp 1 y), ?_⟩,
-    fun x => ph_mul (hP _) (hP _)⟩
+  refine ⟨
+    ⟨(A.prod A).map glueP, fun y => ε (comp 0 y) * ε (comp 1 y), ?_⟩,
+    fun x => ph_mul (hP _) (hP _)
+  ⟩
   have mem : ∀ y, y ∈ (A.prod A).map glueP ↔ comp 0 y ∈ A ∧ comp 1 y ∈ A := by
     intro y
     constructor
@@ -137,7 +146,8 @@ theorem pv_dup {φ : Matrix (Fin n) (Fin g) ℚ → ℂ} (h : PV φ) : PV (dup �
       exact ⟨ha, hb⟩
     · rintro ⟨ha, hb⟩
       exact ⟨(comp 0 y, comp 1 y), ⟨ha, hb⟩, glueP_comp y⟩
-  refine ⟨?_, fun y => ?_, fun y hy => ?_, fun y hy y' hy' => ?_, ?_, isSB_dup hV.sb, fun y hy => ?_⟩
+  refine
+    ⟨?_, fun y => ?_, fun y hy => ?_, fun y hy y' hy' => ?_, ?_, isSB_dup hV.sb, fun y hy => ?_⟩
   · have := (hV.fg.prod hV.fg)
     rw [AddSubgroup.fg_iff] at this ⊢
     obtain ⟨S, hS, hf⟩ := this
@@ -160,8 +170,8 @@ theorem pv_dup {φ : Matrix (Fin n) (Fin g) ℚ → ℂ} (h : PV φ) : PV (dup �
   · rw [mem] at hy
     rw [norm_mul, hV.norm _ hy.1, hV.norm _ hy.2, one_mul]
   · rw [mem] at hy hy'
-    rw [map_add (f := _), map_add (f := _), hV.semi _ hy.1 _ hy'.1, hV.semi _ hy.2 _ hy'.2, om_eq y y',
-      Rat.cast_add, mul_add, Complex.exp_add]
+    rw [map_add (f := _), map_add (f := _), hV.semi _ hy.1 _ hy'.1, hV.semi _ hy.2 _ hy'.2,
+      om_eq y y', Rat.cast_add, mul_add, Complex.exp_add]
     ring
   · obtain ⟨m, hm, h⟩ := hV.ord
     refine ⟨m, hm, fun y hy => ?_⟩
@@ -181,8 +191,8 @@ theorem blk_eq (τ : Matrix (Fin g) (Fin g) ℂ) : blk n τ = (1 : Matrix (Fin n
   ext p q
   by_cases h : p.1 = q.1 <;> simp [blk, h, Matrix.one_apply, Matrix.kroneckerMap_apply]
 
-theorem blk_siegel {τ : Matrix (Fin g) (Fin g) ℂ} (h : τ ∈ Siegel (Fin g)) :
-    blk n τ ∈ Siegel (Fin n × Fin g) := by
+theorem blk_siegel {τ : Matrix (Fin g) (Fin g) ℂ} (h : τ ∈ Siegel (Fin g))
+    : blk n τ ∈ Siegel (Fin n × Fin g) := by
   refine ⟨?_, ?_⟩
   · ext p q
     have := h.1.apply p.2 q.2
@@ -195,28 +205,34 @@ theorem blk_siegel {τ : Matrix (Fin g) (Fin g) ℂ} (h : τ ∈ Siegel (Fin g))
     rw [this]
     exact Matrix.PosDef.one.kronecker h.2
 
-theorem blk_inv (τ : Matrix (Fin g) (Fin g) ℂ) :
-    ((blk n τ).map fun z => (z.im : ℂ))⁻¹ = blk n ((τ.map fun z => (z.im : ℂ))⁻¹) := by
+theorem blk_inv (τ : Matrix (Fin g) (Fin g) ℂ)
+    : ((blk n τ).map fun z => (z.im : ℂ))⁻¹ = blk n ((τ.map fun z => (z.im : ℂ))⁻¹) := by
   have : ((blk n τ).map fun z => (z.im : ℂ)) = blk n (τ.map fun z => (z.im : ℂ)) := by
     ext p q
     by_cases h : p.1 = q.1 <;> simp [blk, h]
   rw [this, blk_eq, blk_eq, Matrix.inv_kronecker, inv_one]
 
-theorem expo_row (τ : Matrix (Fin g) (Fin g) ℂ) (ζ : Fin 2 → Fin n × Fin g → ℂ) (j : Fin 2)
-    (x : Matrix (Fin 2) (Fin n × Fin g) ℚ) :
-    qv (x j) ⬝ᵥ blk n τ *ᵥ qv (x j) + 2 * (qv (x j) ⬝ᵥ ζ j) =
-      ∑ k, (qv (rowM j x k) ⬝ᵥ τ *ᵥ qv (rowM j x k) +
-        2 * (qv (rowM j x k) ⬝ᵥ (fun k i => ζ j (k, i)) k)) := by
+theorem expo_row
+    (τ : Matrix (Fin g) (Fin g) ℂ) (ζ : Fin 2 → Fin n × Fin g → ℂ) (j : Fin 2)
+    (x : Matrix (Fin 2) (Fin n × Fin g) ℚ)
+    : qv (x j) ⬝ᵥ blk n τ *ᵥ qv (x j) + 2 * (qv (x j) ⬝ᵥ ζ j)
+      = ∑ k, (qv (rowM j x k) ⬝ᵥ τ *ᵥ qv (rowM j x k) +
+          2 * (qv (rowM j x k) ⬝ᵥ (fun k i => ζ j (k, i)) k)) := by
   simp [dotProduct, mulVec, qv, rowM, blk, Fintype.sum_prod_type, Finset.sum_add_distrib,
     Finset.mul_sum]
 
-theorem thS_dup {φ : Matrix (Fin n) (Fin g) ℚ → ℂ} (h : IsSB φ) {τ : Matrix (Fin g) (Fin g) ℂ}
-    (hτ : τ ∈ Siegel (Fin g)) (ζ : Fin 2 → Fin n × Fin g → ℂ) :
-    thS (dup φ) (blk n τ) ζ = thS φ τ (fun k i => ζ 0 (k, i)) * thS φ τ (fun k i => ζ 1 (k, i)) := by
-  have s0 := GlobalTheory.SW.SiegelSum.summable_norm_thetaTerm (Fin n) (Fin g) φ h τ hτ
-    (fun k i => ζ 0 (k, i))
-  have s1 := GlobalTheory.SW.SiegelSum.summable_norm_thetaTerm (Fin n) (Fin g) φ h τ hτ
-    (fun k i => ζ 1 (k, i))
+theorem thS_dup
+    {φ : Matrix (Fin n) (Fin g) ℚ → ℂ} (h : IsSB φ)
+    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ Siegel (Fin g))
+    (ζ : Fin 2 → Fin n × Fin g → ℂ)
+    : thS (dup φ) (blk n τ) ζ
+      = thS φ τ (fun k i => ζ 0 (k, i)) * thS φ τ (fun k i => ζ 1 (k, i)) := by
+  have s0 :=
+    GlobalTheory.SW.SiegelSum.summable_norm_thetaTerm (Fin n) (Fin g) φ h τ hτ
+      (fun k i => ζ 0 (k, i))
+  have s1 :=
+    GlobalTheory.SW.SiegelSum.summable_norm_thetaTerm (Fin n) (Fin g) φ h τ hτ
+      (fun k i => ζ 1 (k, i))
   unfold thS
   rw [tsum_mul_tsum_of_summable_norm s0 s1, ← (rowEquiv n g).tsum_eq]
   refine tsum_congr fun x => ?_
@@ -224,10 +240,25 @@ theorem thS_dup {φ : Matrix (Fin n) (Fin g) ℚ → ℂ} (h : IsSB φ) {τ : Ma
   simp only [rowEquiv, Equiv.coe_fn_mk]
   ring
 
-theorem doubling : ∀ (n g : ℕ) (φ : Matrix (Fin n) (Fin g) ℚ → ℂ), (PV φ → PV (dup φ)) ∧ (φ ≠ 0 → dup φ ≠ 0) ∧ (IsSB φ → IsSB (dup φ)) ∧ (∀ u : ℂ, dup (u • φ) = u ^ 2 • dup φ) ∧ ∀ τ ∈ Siegel (Fin g), blk n τ ∈ Siegel (Fin n × Fin g) ∧ (IsSB φ → ∀ ζ : Fin 2 → Fin n × Fin g → ℂ, thS (dup φ) (blk n τ) ζ = thS φ τ (fun k i => ζ 0 (k, i)) * thS φ τ (fun k i => ζ 1 (k, i))) ∧ ((blk n τ).map fun z => (z.im : ℂ))⁻¹ = blk n ((τ.map fun z => (z.im : ℂ))⁻¹) := by
+theorem doubling
+    : ∀ (n g : ℕ) (φ : Matrix (Fin n) (Fin g) ℚ → ℂ),
+      (PV φ → PV (dup φ)) ∧ (φ ≠ 0 → dup φ ≠ 0) ∧ (IsSB φ → IsSB (dup φ))
+        ∧ (∀ u : ℂ, dup (u • φ) = u ^ 2 • dup φ)
+        ∧ ∀ τ ∈ Siegel (Fin g),
+          blk n τ ∈ Siegel (Fin n × Fin g)
+            ∧ (IsSB φ
+              → ∀ ζ : Fin 2 → Fin n × Fin g → ℂ,
+                thS (dup φ) (blk n τ) ζ
+                  = thS φ τ (fun k i => ζ 0 (k, i)) * thS φ τ (fun k i => ζ 1 (k, i)))
+            ∧ ((blk n τ).map fun z => (z.im : ℂ))⁻¹ = blk n ((τ.map fun z => (z.im : ℂ))⁻¹) := by
   intro n g φ
-  refine ⟨pv_dup, fun h h' => h ?_, isSB_dup, fun u => ?_, fun τ hτ =>
-    ⟨blk_siegel hτ, fun h ζ => thS_dup h hτ ζ, blk_inv τ⟩⟩
+  refine ⟨
+    pv_dup,
+    fun h h' => h ?_,
+    isSB_dup,
+    fun u => ?_,
+    fun τ hτ => ⟨blk_siegel hτ, fun h ζ => thS_dup h hτ ζ, blk_inv τ⟩
+  ⟩
   · funext a
     have := congrFun h' (glue a a)
     rw [dup_apply, rowM_glue_zero, rowM_glue_one] at this

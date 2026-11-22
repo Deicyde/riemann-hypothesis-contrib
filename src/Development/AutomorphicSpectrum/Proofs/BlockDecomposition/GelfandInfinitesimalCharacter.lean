@@ -13,8 +13,8 @@ namespace GlobalTheory.CompanionTheory.GelfAct
 variable {n : ℕ}
 
 open scoped Matrix.Norms.Operator in
-theorem hasDerivAt_exp_entry (X : Mat n) (a b : Fin n) :
-    HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X) a b) (X a b) 0 := by
+theorem hasDerivAt_exp_entry (X : Mat n) (a b : Fin n)
+    : HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X) a b) (X a b) 0 := by
   have hsmul (t : ℝ) : (t : ℂ) • X = t • X := by ext; simp
   simp only [hsmul]
   have h := hasDerivAt_exp_smul_const (𝕂 := ℝ) X (0 : ℝ)

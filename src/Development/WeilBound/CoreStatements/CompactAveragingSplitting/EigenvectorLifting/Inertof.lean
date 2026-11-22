@@ -11,9 +11,11 @@ namespace PositivityTheory.ThK
 
 open NumberField IsDedekindDomain GlobalTheory.AdelicU
 
-theorem map_eq_of_ncard_eq_one {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    [Algebra.Unramified (𝓞 F) (𝓞 E)] (v : HeightOneSpectrum (𝓞 F)) (h : (v.asIdeal.primesOver (𝓞 E)).ncard = 1) :
-    ∃ w : HeightOneSpectrum (𝓞 E), Ideal.map (algebraMap (𝓞 F) (𝓞 E)) v.asIdeal = w.asIdeal := by
+theorem map_eq_of_ncard_eq_one
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    [Algebra.Unramified (𝓞 F) (𝓞 E)]
+    (v : HeightOneSpectrum (𝓞 F)) (h : (v.asIdeal.primesOver (𝓞 E)).ncard = 1)
+    : ∃ w : HeightOneSpectrum (𝓞 E), Ideal.map (algebraMap (𝓞 F) (𝓞 E)) v.asIdeal = w.asIdeal := by
   classical
   haveI := v.isMaximal
   obtain ⟨P, hP⟩ := Set.ncard_eq_one.1 h
@@ -34,7 +36,8 @@ theorem inert_of_local : InertOf := by
   have h1 := ncard_primesOver_le_two hB.cm v
   have h2 : (v.asIdeal.primesOver (𝓞 E)).ncard ≠ 2 := fun h =>
     not_nonempty_iff.2 he ((nonempty_split_iff hB.cm).2 h)
-  have h3 : 0 < (v.asIdeal.primesOver (𝓞 E)).ncard := Nat.pos_of_ne_zero (IsDedekindDomain.primesOver_ncard_ne_zero _ _)
+  have h3 : 0 < (v.asIdeal.primesOver (𝓞 E)).ncard :=
+    Nat.pos_of_ne_zero (IsDedekindDomain.primesOver_ncard_ne_zero _ _)
   exact map_eq_of_ncard_eq_one v (by omega)
 
 end PositivityTheory.ThK

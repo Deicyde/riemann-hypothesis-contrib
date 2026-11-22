@@ -6,17 +6,23 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2
 
-theorem galoisRepRankTwoTateDual_eq_one_of_mem_ker_unramified : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ) (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l), Nf e S A W → ∀ a ∈ (toGS Ω (S : Set Pl)).ker, dual1 W a = 1 := by
+theorem galoisRepRankTwoTateDual_eq_one_of_mem_ker_unramified
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
+        (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l),
+      Nf e S A W → ∀ a ∈ (toGS Ω (S : Set Pl)).ker, dual1 W a = 1 := by
   intro l _ Ω _ _ _ e S A W hW a ha
   set T : Subgroup (G ℚ Ω) := W.ker ⊓ (cycZ ℚ Ω l).ker with hT
   have hTc : IsClosed (T : Set (G ℚ Ω)) := by
     have h1 : IsClosed (W.ker : Set (G ℚ Ω)) := isClosed_singleton.preimage hW.cont
-    have h2 : IsClosed ((cycZ ℚ Ω l).ker : Set (G ℚ Ω)) := isClosed_singleton.preimage (continuous_cycZ ℚ Ω l)
+    have h2 : IsClosed ((cycZ ℚ Ω l).ker : Set (G ℚ Ω)) :=
+      isClosed_singleton.preimage (continuous_cycZ ℚ Ω l)
     exact h1.inter h2
   have hNS : NS Ω (S : Set Pl) ≤ T := by
     refine Subgroup.topologicalClosure_minimal _ ?_ hTc

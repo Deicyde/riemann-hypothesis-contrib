@@ -11,20 +11,26 @@ open scoped ContDiff Topology
 
 namespace PositivityTheory.RgBcC.LfSt.Kchain.KbDer
 
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.LfSt PositivityTheory.RgBcC.LfSt.Kchain PositivityTheory.RgBcC.LfSt.Kchain.KbBase
-  PositivityTheory.RgBcC.LfSt.Kchain.KbCurve PositivityTheory.RgBcC.LfSt.Kchain.KbFr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.LfSt PositivityTheory.RgBcC.LfSt.Kchain
+  PositivityTheory.RgBcC.LfSt.Kchain.KbBase PositivityTheory.RgBcC.LfSt.Kchain.KbCurve
+  PositivityTheory.RgBcC.LfSt.Kchain.KbFr
 open PositivityTheory.RgTw (Mat)
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-theorem contDiffAt_mat {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {A : E → Mat n} {x : E}
-    (h : ContDiffAt ℝ ∞ A x) (a b : Fin n) : ContDiffAt ℝ ∞ (fun z => A z a b) x :=
+theorem contDiffAt_mat
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {A : E → Mat n} {x : E} (h : ContDiffAt ℝ ∞ A x)
+    (a b : Fin n)
+    : ContDiffAt ℝ ∞ (fun z => A z a b) x :=
   (entL a b).contDiff.contDiffAt.comp x h
 
-theorem contDiffAt_matmul {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {A B : E → Mat n} {x : E}
-    (hA : ContDiffAt ℝ ∞ A x) (hB : ContDiffAt ℝ ∞ B x) : ContDiffAt ℝ ∞ (fun z => A z * B z) x := by
+theorem contDiffAt_matmul
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {A B : E → Mat n} {x : E} (hA : ContDiffAt ℝ ∞ A x) (hB : ContDiffAt ℝ ∞ B x)
+    : ContDiffAt ℝ ∞ (fun z => A z * B z) x := by
   refine contDiffAt_of_entries fun a b => ?_
   simp only [Matrix.mul_apply]
   exact ContDiffAt.sum fun c _ => (contDiffAt_mat hA a c).mul (contDiffAt_mat hB c b)
@@ -51,13 +57,19 @@ theorem mul_mem {x y : Mat n} (hx : x ∈ GLs n) (hy : y ∈ GLs n) : x * y ∈ 
 
 section
 
-variable {lam : Fin n → ℤ} {E : KMod n} {Fr : Mat n → (E.V →L[ℂ] E.V)} {ε ι : Mat n →ₗ[ℝ] (E.V →L[ℂ] E.V)}
+variable
+  {lam : Fin n → ℤ} {E : KMod n} {Fr : Mat n → (E.V →L[ℂ] E.V)} {ε ι : Mat n →ₗ[ℝ] (E.V →L[ℂ] E.V)}
   {S : ℝ → (E.V →L[ℂ] E.V)} {Γ T : E.V →L[ℂ] E.V}
 
-theorem derOne_at (h : CxData lam E Fr ε ι S Γ T) {k : Mat n → (E.V →L[ℂ] E.V)} (hk : ContDiffOn ℝ ∞ k (GLs n))
-    {d y : Mat n} (hd : d ∈ GLs n) (hy : y ∈ GLs n) {x : Mat n} (hx : x ∈ GLs n) (X : Mat n) :
-    fderiv ℝ (fun x' => Kf Fr k Γ T d x' y) x (x * X) =
-      Fr x * (fderiv ℝ Fr 1 X * k (x⁻¹ * d * yᴴ⁻¹) + Ld X k (x⁻¹ * d * yᴴ⁻¹)) * Γ * T * Fr y⁻¹ := by
+theorem derOne_at
+    (h : CxData lam E Fr ε ι S Γ T)
+    {k : Mat n → (E.V →L[ℂ] E.V)} (hk : ContDiffOn ℝ ∞ k (GLs n))
+    {d y : Mat n} (hd : d ∈ GLs n) (hy : y ∈ GLs n)
+    {x : Mat n} (hx : x ∈ GLs n)
+    (X : Mat n)
+    : fderiv ℝ (fun x' => Kf Fr k Γ T d x' y) x (x * X)
+      = Fr x * (fderiv ℝ Fr 1 X * k (x⁻¹ * d * yᴴ⁻¹) + Ld X k (x⁻¹ * d * yᴴ⁻¹)) * Γ * T
+        * Fr y⁻¹ := by
   set w := x⁻¹ * d * yᴴ⁻¹ with hwdef
   have hw : w ∈ GLs n := mul_mem (mul_mem (inv_mem hx) hd) (inv_mem (conjT_mem hy))
   have hkw : DifferentiableAt ℝ k w := diffAt_of hk hw
@@ -78,17 +90,20 @@ theorem derOne_at (h : CxData lam E Fr ε ι S Γ T) {k : Mat n → (E.V →L[�
   have hK : HasDerivAt (fun t : ℝ => k ((1 + t • X)⁻¹ * w)) (fderiv ℝ k w ((-X) * w)) 0 :=
     hkw.hasFDerivAt.comp_hasDerivAt_of_eq (0 : ℝ) hc (by simp)
   have h2 := (((hF.fun_mul hK).mul_const Γ).mul_const T).mul_const (Fr y⁻¹)
-  have e : (fun t : ℝ => Kf Fr k Γ T d (x + t • (x * X)) y) =
-      fun t : ℝ => Fr (x * (1 + t • X)) * k ((1 + t • X)⁻¹ * w) * Γ * T * Fr y⁻¹ := by
+  have e
+      : (fun t : ℝ => Kf Fr k Γ T d (x + t • (x * X)) y)
+        = fun t : ℝ => Fr (x * (1 + t • X)) * k ((1 + t • X)⁻¹ * w) * Γ * T * Fr y⁻¹ := by
     funext t
-    have e1 : x + t • (x * X) = x * (1 + t • X) := by rw [Matrix.mul_add, Matrix.mul_one, Matrix.mul_smul]
+    have e1 : x + t • (x * X) = x * (1 + t • X) := by
+      rw [Matrix.mul_add, Matrix.mul_one, Matrix.mul_smul]
     simp only [Kf, e1, Matrix.mul_inv_rev, hwdef, Matrix.mul_assoc]
   rw [e] at h1
   rw [h1.unique h2]
   simp only [zero_smul, add_zero, inv_one, Matrix.one_mul, Matrix.mul_one, Ld, neg_mul, map_neg]
   noncomm_ring
 
-theorem derOne : DerOne := fun _ _ _ _ _ _ _ _ _ h _ hk _ _ hd hy _ hx X => derOne_at h hk hd hy hx X
+theorem derOne : DerOne := fun _ _ _ _ _ _ _ _ _ h _ hk _ _ hd hy _ hx X =>
+  derOne_at h hk hd hy hx X
 
 end
 

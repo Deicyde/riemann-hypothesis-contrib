@@ -67,15 +67,29 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace PositivityTheory.AdelicQuotientData
 
-theorem rsPole_of_inputs (eJS2G0 : jumpWindows.G0) (eCAUCHY : CAUCHY) (eJS2S1 : jumpWindows.S1) (eJS1L7 : JacquetShalikaLocal.L7) (eJS1L12 : JacquetShalikaLocal.lift_levelP_alt₂) (eJS2G5 : jumpWindows.G5) (eJS2S7 : jumpWindows.S7) (eJS2S10 : jumpWindows.MirabolicColumnBlock) (eJS2G5b : jumpWindows.G5b) (eJS2S2 : jumpWindows.S2) (eJS2S9 : jumpWindows.S9) (eJS2G1 : jumpWindows.G1) (eJS2G1b : jumpWindows.AlmostEverywhereSpherical) (eJS2G2c : jumpWindows.G2c) (eJS2G2a : jumpWindows.G2a) (eJS2G11 : jumpWindows.FourierUniquenessMirabolic) (eJS2S4 : jumpWindows.S4) (eJS2S8 : jumpWindows.S8) (eJS2G14 : jumpWindows.CuspidalIrreducibleSubrep) (eJS2SmoNorm : jumpWindows.SmoNorm) (eBlkJacquetShalikaBound : GlobalTheory.Published.JacquetShalikaBound) (eJS2G10 : jumpWindows.StandardCharacterExists) : RSPole :=
+theorem rsPole_of_inputs
+    (eJS2G0 : jumpWindows.G0) (eCAUCHY : CAUCHY) (eJS2S1 : jumpWindows.S1)
+    (eJS1L7 : JacquetShalikaLocal.L7) (eJS1L12 : JacquetShalikaLocal.lift_levelP_alt₂)
+    (eJS2G5 : jumpWindows.G5) (eJS2S7 : jumpWindows.S7) (eJS2S10 : jumpWindows.MirabolicColumnBlock)
+    (eJS2G5b : jumpWindows.G5b) (eJS2S2 : jumpWindows.S2) (eJS2S9 : jumpWindows.S9)
+    (eJS2G1 : jumpWindows.G1) (eJS2G1b : jumpWindows.AlmostEverywhereSpherical)
+    (eJS2G2c : jumpWindows.G2c) (eJS2G2a : jumpWindows.G2a)
+    (eJS2G11 : jumpWindows.FourierUniquenessMirabolic) (eJS2S4 : jumpWindows.S4)
+    (eJS2S8 : jumpWindows.S8) (eJS2G14 : jumpWindows.CuspidalIrreducibleSubrep)
+    (eJS2SmoNorm : jumpWindows.SmoNorm)
+    (eBlkJacquetShalikaBound : GlobalTheory.Published.JacquetShalikaBound)
+    (eJS2G10 : jumpWindows.StandardCharacterExists)
+    : RSPole :=
   have hQ1 : Q1 := isUnit_last_join
   have hQ2 : Q2 := closedSubgroup_cutoff_exists
   have hD0 : D0 := determinant_basic_of_G0 eJS2G0
@@ -118,7 +132,8 @@ theorem rsPole_of_inputs (eJS2G0 : jumpWindows.G0) (eCAUCHY : CAUCHY) (eJS2S1 : 
   have hK7 : K7 := local_unramified_of eJS1L7 eJS1L12 eJS2G0 eJS2G5
   have hK8 : K8 := spherical_function_of eJS2G0 eJS2G5 hC0 hK7
   have hK4a : InfinitePlaceStep := infinite_place_step_of eJS2S7 eJS2S10 eJS2G0 eJS2G5 eJS2G5b hP2
-  have hK4b : FinitePlaceStep := finite_place_of_jump_windows eJS2S2 eJS2S9 eJS2S10 eJS2G0 eJS2G5 eJS2G5b hP2
+  have hK4b : FinitePlaceStep :=
+    finite_place_of_jump_windows eJS2S2 eJS2S9 eJS2S10 eJS2G0 eJS2G5 eJS2G5b hP2
   have hK4 : K4 := kept_block_at_of_pair_level_chain_threshold eJS2S10 eJS2G0 hK4a hK4b
   have hK9 : K9 := global_level_of eJS2G0 eJS2G1 eJS2G1b eJS2G2c eJS2G5 hK8
   have hKIR : KIR := kir_of eJS2S2 eJS2G0 eJS2G2a eJS2G2c eJS2G5 eJS2G5b hK2 hK3 hK4 hK9
@@ -128,15 +143,19 @@ theorem rsPole_of_inputs (eJS2G0 : jumpWindows.G0) (eCAUCHY : CAUCHY) (eJS2S1 : 
   have hK5c : ShortRowsEmbedding := short_rows_embedding_of hD0 hG2m hK1 hK5e
   have hK6 : K6 := last_row_integral_of eJS2G0 hK5e hK8
   have hKU : KU := ku_of eJS2G5 hD0
-  have hKLt1 : KLt1 := kernel_less_first_of eJS2G0 eJS2G5 hD0 hP2 hC0 hK1 hK5e hK5a hK5b hK5c hK6 hK7 hK8 hK8a hKU
+  have hKLt1 : KLt1 :=
+    kernel_less_first_of eJS2G0 eJS2G5 hD0 hP2 hC0 hK1 hK5e hK5a hK5b hK5c hK6 hK7 hK8 hK8a hKU
   have hKLt2 : KLt2 := kernel_less_second_of hD0 hN0 hH0 hG5t hK1 hK5e hK5a hK5b hK5c hK6
   have hK11 : LastRowCutoff := last_row_cutoff_of eJS2S4 eJS2S8 eJS2G0
   have hK12 : PoissonCutoffFormula := poisson_cutoff_of hD0 hMOD0 hN0 hH0 hG3t hK1
-  have hKEq1 : KEq1 := kernel_equality_first_of eJS2G0 eJS2G5 hD0 hN0 hP2 hP3 hC0 hG5t hK1 hK7 hK8 hK8a hKU
+  have hKEq1 : KEq1 :=
+    kernel_equality_first_of eJS2G0 eJS2G5 hD0 hN0 hP2 hP3 hC0 hG5t hK1 hK7 hK8 hK8a hKU
   have hKEq2 : KEq2 := kernel_equality_second_of hD0 hN0 hH0 hG4t hG5t hK12
   have hORT : ORT := cusp_orthogonality_of eJS2G14 eJS2SmoNorm hQ2 hD0 hN3 hW0
   have hKY : KY := ky_of hW0
-  have hRSPole : RSPole := rspole_of eBlkJacquetShalikaBound eJS2G1 eJS2G10 hW0 hE2 hM1 hKIR hKSec hK5e hKLt1 hKLt2 hK11 hKEq1 hKEq2 hORT hKY
+  have hRSPole : RSPole :=
+    rspole_of eBlkJacquetShalikaBound eJS2G1 eJS2G10 hW0 hE2 hM1 hKIR hKSec hK5e hKLt1 hKLt2 hK11
+      hKEq1 hKEq2 hORT hKY
   hRSPole
 
 end PositivityTheory.AdelicQuotientData

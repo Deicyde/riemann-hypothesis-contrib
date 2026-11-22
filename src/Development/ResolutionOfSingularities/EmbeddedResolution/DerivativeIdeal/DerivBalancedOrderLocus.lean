@@ -15,13 +15,13 @@ open AlgebraicGeometry CategoryTheory TopologicalSpace
 
 namespace FunctorialResolution.EmbeddedResolution
 
-variable (k : Type u) [Field k] [CharZero k] {X : Scheme.{u}}
-  (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+variable
+  (k : Type u) [Field k] [CharZero k]
+  {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
   (I : X.IdealSheafData) (m : ℕ)
 
-theorem orderAt_eq_zero_or_le_orderAt_of_isDerivBalanced
-    (h : IsDerivBalanced k p I m) (x : X) :
-    orderAt I x = 0 ∨ (m : ℕ∞) ≤ orderAt I x := by
+theorem orderAt_eq_zero_or_le_orderAt_of_isDerivBalanced (h : IsDerivBalanced k p I m) (x : X)
+    : orderAt I x = 0 ∨ (m : ℕ∞) ≤ orderAt I x := by
   rcases Nat.eq_zero_or_pos m with rfl | hpos
   · right
     simp
@@ -50,9 +50,8 @@ theorem orderAt_eq_zero_or_le_orderAt_of_isDerivBalanced
     exact hmem
   exact (mem_orderAtLeastLocus_iff I m x).mp hx
 
-theorem orderAtLeastLocus_eq_support_of_isDerivBalanced
-    (h : IsDerivBalanced k p I m) (hm : 1 ≤ m) :
-    orderAtLeastLocus I m = (I.support : Set X) := by
+theorem orderAtLeastLocus_eq_support_of_isDerivBalanced (h : IsDerivBalanced k p I m) (hm : 1 ≤ m)
+    : orderAtLeastLocus I m = (I.support : Set X) := by
   ext x
   rw [mem_orderAtLeastLocus_iff]
   constructor
@@ -61,8 +60,7 @@ theorem orderAtLeastLocus_eq_support_of_isDerivBalanced
     exact (one_le_orderAt_iff_mem_support I x).mp h1
   · intro hx
     have hx' : x ∈ I.support := hx
-    have hne : orderAt I x ≠ 0 := fun h0 =>
-      (orderAt_eq_zero_iff_not_mem_support I x).mp h0 hx'
+    have hne : orderAt I x ≠ 0 := fun h0 => (orderAt_eq_zero_iff_not_mem_support I x).mp h0 hx'
     rcases orderAt_eq_zero_or_le_orderAt_of_isDerivBalanced k p I m h x with h0 | h0
     · exact absurd h0 hne
     · exact h0

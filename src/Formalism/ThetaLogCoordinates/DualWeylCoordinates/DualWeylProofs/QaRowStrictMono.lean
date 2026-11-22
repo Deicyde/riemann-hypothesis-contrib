@@ -14,8 +14,9 @@ namespace Formalism.InvariantFactorPaths.ColumnFamilies
 
 def qa_nu {n : ℕ} [NeZero n] (mu : Fin n → ℤ) : Fin n → ℕ := fun t => (mu t - mu (lastIdx n)).toNat
 
-def qa_row {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (I : TIdx mu) (c : ↥(TCols mu)) : Fin (colH mu c) → Fin n :=
-  fun p => (I c).1.orderEmbOfFin (I c).2 p
+def qa_row {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (I : TIdx mu) (c : ↥(TCols mu))
+    : Fin (colH mu c) → Fin n := fun p =>
+  (I c).1.orderEmbOfFin (I c).2 p
 
 lemma qa_row_strictMono {n : ℕ} [NeZero n] {mu : Fin n → ℤ} (I : TIdx mu) (c : ↥(TCols mu)) :
     StrictMono (qa_row I c) := ((I c).1.orderEmbOfFin (I c).2).strictMono

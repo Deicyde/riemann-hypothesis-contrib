@@ -6,5 +6,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HeckeLocalProduc
 
 @[expose] public section
 
-theorem hecke_product_rule : ∀ (L : Type) [Field L] [NumberField L] (χ : Formalism.L2.Host.HChar L), χ.ProductRule :=
+theorem hecke_product_rule
+    : ∀ (L : Type) [Field L] [NumberField L] (χ : Formalism.L2.Host.HChar L), χ.ProductRule :=
   fun _ _ _ χ => PI.HeckeProdW.productRule χ

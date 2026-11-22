@@ -29,7 +29,8 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TorsionPoints
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -38,7 +39,8 @@ namespace GlobalTheory.RealCompare
 open GlobalTheory.IndefiniteRowSideFullHecke.UniformityLowerBounds hiding fn PsiNorm
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
 
-theorem one_le_rN (S : ThetaSys o Ω) : 1 ≤ S.r * S.N := Nat.mul_pos S.r_pos (by have := S.N_ge; omega)
+theorem one_le_rN (S : ThetaSys o Ω) : 1 ≤ S.r * S.N :=
+  Nat.mul_pos S.r_pos (by have := S.N_ge; omega)
 
 end GlobalTheory.RealCompare
 end

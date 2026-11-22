@@ -13,7 +13,10 @@ noncomputable section
 
 namespace Formalism.LFunctionChainParameters.LChain
 
-open Formalism Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open Formalism Formalism.D5 Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
 
 theorem size_windows_split : SizeWindowsSplit := by
   intro C ε x n nT nT2 m b k aE Err
@@ -42,7 +45,10 @@ end Check
 
 namespace Formalism.LFunctionChainParameters.LChain
 
-open Formalism Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open Formalism Formalism.D5 Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
 
 lemma errX5at_le {U0 : Type} [Fintype U0] {W : U0 → Type} [∀ u0, Fintype (W u0)] [∀ u0, Nonempty (W u0)]
     {Top : Type} [Fintype Top] {m f : ℕ} (D : Data U0 W Top m f) (C : Consts) (Xpp eK K : ℝ)
@@ -111,7 +117,6 @@ open Model
 
 section
 variable {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
-
 
 end
 

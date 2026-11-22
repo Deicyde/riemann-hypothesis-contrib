@@ -6,15 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory.AdaptedFamilyIwasawaDecomposition
 
-theorem exists_adapted_family (g r : ℕ) (I L : Submodule ℚ (Fin r → ℚ)) (hIL : I ≤ L)
-    (hg : Module.finrank ℚ ↥L = g) :
-    ∃ rk ≤ g, ∃ (ε : Fin g → Fin r → ℚ), LinearIndependent ℚ ε ∧ (∀ (i : Fin g), ε i ∈ L) ∧
-      (∀ (i : Fin g), (↑i : ℕ) < rk → ε i ∈ I) ∧
-      ∀ x ∈ I, x ∈ Submodule.span ℚ (ε '' {i : Fin g | (↑i : ℕ) < rk}) := by
+theorem exists_adapted_family
+    (g r : ℕ) (I L : Submodule ℚ (Fin r → ℚ)) (hIL : I ≤ L) (hg : Module.finrank ℚ ↥L = g)
+    : ∃ rk ≤ g, ∃ (ε : Fin g → Fin r → ℚ),
+      LinearIndependent ℚ ε ∧ (∀ (i : Fin g), ε i ∈ L) ∧ (∀ (i : Fin g), (↑i : ℕ) < rk → ε i ∈ I)
+        ∧ ∀ x ∈ I, x ∈ Submodule.span ℚ (ε '' {i : Fin g | (↑i : ℕ) < rk}) := by
   obtain ⟨C₀, hC₀⟩ := I.exists_isCompl
   have hdis : Disjoint I (C₀ ⊓ L) := hC₀.disjoint.mono_right inf_le_left
-  have hsup : I ⊔ (C₀ ⊓ L) = L := by
-    rw [← sup_inf_assoc_of_le C₀ hIL, hC₀.sup_eq_top, top_inf_eq]
+  have hsup : I ⊔ (C₀ ⊓ L) = L := by rw [← sup_inf_assoc_of_le C₀ hIL, hC₀.sup_eq_top, top_inf_eq]
   have hCL : C₀ ⊓ L ≤ L := inf_le_right
   generalize C₀ ⊓ L = C at hdis hsup hCL
   have hdim : Module.finrank ℚ I + Module.finrank ℚ C = g := by
@@ -24,7 +23,8 @@ theorem exists_adapted_family (g r : ℕ) (I L : Submodule ℚ (Fin r → ℚ)) 
   obtain ⟨k, ⟨bI⟩⟩ : ∃ k, Nonempty (Module.Basis (Fin k) ℚ I) := ⟨_, ⟨Module.finBasis ℚ I⟩⟩
   obtain ⟨m, ⟨bC⟩⟩ : ∃ m, Nonempty (Module.Basis (Fin m) ℚ C) := ⟨_, ⟨Module.finBasis ℚ C⟩⟩
   rw [Module.finrank_eq_card_basis bI, Module.finrank_eq_card_basis bC, Fintype.card_fin,
-    Fintype.card_fin] at hdim
+      Fintype.card_fin]
+    at hdim
   clear hg
   subst hdim
   let u : Fin k → Fin r → ℚ := I.subtype ∘ bI
@@ -42,8 +42,15 @@ theorem exists_adapted_family (g r : ℕ) (I L : Submodule ℚ (Fin r → ℚ)) 
     exact hvC i
   have hli : LinearIndependent ℚ (Sum.elim u v) :=
     hu.sum_type hv (by rw [hus]; exact hdis.mono_right hvs)
-  refine ⟨k, Nat.le_add_right k m, Sum.elim u v ∘ finSumFinEquiv.symm,
-    hli.comp _ finSumFinEquiv.symm.injective, ?_, ?_, ?_⟩
+  refine ⟨
+    k,
+    Nat.le_add_right k m,
+    Sum.elim u v ∘ finSumFinEquiv.symm,
+    hli.comp _ finSumFinEquiv.symm.injective,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro i
     obtain ⟨j, rfl⟩ := finSumFinEquiv.surjective i
     rcases j with j | j

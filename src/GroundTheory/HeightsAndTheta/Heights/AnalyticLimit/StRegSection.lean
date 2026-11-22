@@ -14,10 +14,11 @@ open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Regular (RegChar
 
 def RegSection.Statement : Prop :=
   ∀ {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (D : ℕ) (A : FinHolAtlas D X)
-    (R : RegChartData A), ∃ (L : LocPot X) (s : X → X → ℂ), IsPotential A L ∧ IsSection A L s ∧
-      (∀ y, ‖s y y‖ * Real.exp (-L.φ y y) ≤ 1) ∧ secOpen s = R.Yo ∧ Dense R.Yo ∧
-      ContinuousOn R.r R.Yo ∧ ContinuousOn (rSec L s) R.Yo ∧
-      ∃ B : ℝ, ∀ y ∈ R.Yo, |R.r y - rSec L s y| ≤ B
+      (R : RegChartData A),
+    ∃ (L : LocPot X) (s : X → X → ℂ),
+      IsPotential A L ∧ IsSection A L s ∧ (∀ y, ‖s y y‖ * Real.exp (- L.φ y y) ≤ 1)
+        ∧ secOpen s = R.Yo ∧ Dense R.Yo ∧ ContinuousOn R.r R.Yo ∧ ContinuousOn (rSec L s) R.Yo
+        ∧ ∃ B : ℝ, ∀ y ∈ R.Yo, |R.r y - rSec L s y| ≤ B
 
 section Inhabitants
 

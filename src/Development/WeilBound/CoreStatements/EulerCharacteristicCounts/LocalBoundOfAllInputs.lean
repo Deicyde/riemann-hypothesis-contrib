@@ -35,7 +35,9 @@ public import Development.WeilBound.CoreStatements.EulerCharacteristicCounts.Exi
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module TensorProduct GlobalTheory.CompanionTheory.LocDual
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module TensorProduct
+  GlobalTheory.CompanionTheory.LocDual
 
 noncomputable section
 
@@ -43,14 +45,16 @@ namespace PositivityTheory.LocalTateOrthogonality.Bk
 
 section Cochains
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    {O : Type} [CommRing O] [Algebra O LL]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
+  {O : Type} [CommRing O] [Algebra O LL]
 
 theorem B1_le_Z1f (A : GRep G Qp LL O) : B1 A.ρ ≤ finiteCocycles PD A.ρ := by
   rintro _ ⟨v, rfl⟩
@@ -64,13 +68,16 @@ theorem B1_le_Z1f (A : GRep G Qp LL O) : B1 A.ρ ≤ finiteCocycles PD A.ρ := b
   · change (A.ρ g v - v) ⊗ₜ[Qp] (1 : B) = A.ρ g v ⊗ₜ[Qp] PD.actB g 1 - _
     rw [map_one, sub_tmul]
 
-theorem lc_mk {V X : Type} [AddCommGroup V] [Module O V] [TopologicalSpace V] [ContinuousAdd V]
-    [TopologicalSpace X] {M : Submodule O V} (hM : IsOpen (M : Set V)) {c : X → V}
-    (hc : Continuous c) : IsLocallyConstant fun g => (Submodule.Quotient.mk (c g) : V ⧸ M) := by
+theorem lc_mk
+    {V X : Type}
+    [AddCommGroup V] [Module O V] [TopologicalSpace V] [ContinuousAdd V] [TopologicalSpace X]
+    {M : Submodule O V} (hM : IsOpen (M : Set V))
+    {c : X → V} (hc : Continuous c)
+    : IsLocallyConstant fun g => (Submodule.Quotient.mk (c g) : V ⧸ M) := by
   refine IsLocallyConstant.iff_isOpen_fiber.mpr fun y => ?_
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ y
-  have : (fun g => (Submodule.Quotient.mk (c g) : V ⧸ M)) ⁻¹' {Submodule.Quotient.mk y} =
-      (fun g => c g + -y) ⁻¹' (M : Set V) := by
+  have : (fun g => (Submodule.Quotient.mk (c g) : V ⧸ M)) ⁻¹' {Submodule.Quotient.mk y}
+      = (fun g => c g + -y) ⁻¹' (M : Set V) := by
     ext g
     simp [Submodule.Quotient.eq, sub_eq_add_neg]
   rw [this]
@@ -78,47 +85,59 @@ theorem lc_mk {V X : Type} [AddCommGroup V] [Module O V] [TopologicalSpace V] [C
 
 variable {PD}
 
-theorem cobO_of_cobL [ContinuousAdd LL] {L1 : Lattice (O := O) (charRep (cycLL PD LL))}
-    (hL1 : IsOpen (L1.T : Set LL)) {z : G × G → LL} (h : CobL PD z) : CobO PD L1 z := by
+theorem cobO_of_cobL
+    [ContinuousAdd LL]
+    {L1 : Lattice (O := O) (charRep (cycLL PD LL))} (hL1 : IsOpen (L1.T : Set LL))
+    {z : G × G → LL} (h : CobL PD z)
+    : CobO PD L1 z := by
   obtain ⟨f, hf, rfl⟩ := h
   exact ⟨fun g => Submodule.Quotient.mk (f g), ⟨lc_mk hL1 hf, fun _ => trivial⟩, rfl⟩
 
-variable {A A' : GRep G Qp LL O} {LA : Lattice (O := O) A.ρ} {LA' : Lattice (O := O) A'.ρ}
+variable
+  {A A' : GRep G Qp LL O} {LA : Lattice (O := O) A.ρ} {LA' : Lattice (O := O) A'.ρ}
   {m : A.V →ₗ[LL] A'.V →ₗ[LL] LL} {L1 : Lattice (O := O) (charRep (cycLL PD LL))}
 
 omit [TopologicalSpace G] [TopologicalSpace LL] in
-theorem mk_liftD {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
-    {ρ : Representation LL G V} (L : Lattice (O := O) ρ) (c : V ⧸ L.T) :
-    Submodule.Quotient.mk (liftD L c) = c := (Submodule.Quotient.mk_surjective L.T c).choose_spec
+theorem mk_liftD
+    {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
+    {ρ : Representation LL G V} (L : Lattice (O := O) ρ) (c : V ⧸ L.T)
+    : Submodule.Quotient.mk (liftD L c) = c :=
+  (Submodule.Quotient.mk_surjective L.T c).choose_spec
 
-def pairD (hL1 : L1.T = LinearMap.range (Algebra.linearMap O LL)) (hm : IsDualLat1 PD LA LA' m) :
-    ↥LA.T →+ (A'.V ⧸ LA'.T) →ₗ[O] (LL ⧸ L1.T) :=
-  AddMonoidHom.mk' (fun t => LA'.T.mapQ L1.T ((m t.1).restrictScalars O) fun y hy => by
-      obtain ⟨a, ha⟩ := (hm.2 y).1 hy t.1 t.2
-      rw [hL1]
-      exact ⟨a, ha.symm⟩)
+def pairD (hL1 : L1.T = LinearMap.range (Algebra.linearMap O LL)) (hm : IsDualLat1 PD LA LA' m)
+    : ↥LA.T →+ (A'.V ⧸ LA'.T) →ₗ[O] (LL ⧸ L1.T) :=
+  AddMonoidHom.mk'
+    (fun t =>
+      LA'.T.mapQ L1.T ((m t.1).restrictScalars O) fun y hy => by
+        obtain ⟨a, ha⟩ := (hm.2 y).1 hy t.1 t.2
+        rw [hL1]
+        exact ⟨a, ha.symm⟩)
     fun t t' => by
       apply Submodule.linearMap_qext
       ext y
       simp
 
-theorem mk_cupLD (hL1 : L1.T = LinearMap.range (Algebra.linearMap O LL))
-    (hm : IsDualLat1 PD LA LA' m) (d : G → A.V) (hd : ∀ g, d g ∈ LA.T) (c : G → A'.V ⧸ LA'.T)
-    (p : G × G) : (Submodule.Quotient.mk (cupLD LA' m d c p) : LL ⧸ L1.T) =
-      pairD hL1 hm ⟨d p.1, hd _⟩ (actD LA' p.1 (c p.2)) := by
+theorem mk_cupLD
+    (hL1 : L1.T = LinearMap.range (Algebra.linearMap O LL)) (hm : IsDualLat1 PD LA LA' m)
+    (d : G → A.V) (hd : ∀ g, d g ∈ LA.T)
+    (c : G → A'.V ⧸ LA'.T) (p : G × G)
+    : (Submodule.Quotient.mk (cupLD LA' m d c p) : LL ⧸ L1.T)
+      = pairD hL1 hm ⟨d p.1, hd _⟩ (actD LA' p.1 (c p.2)) := by
   conv_rhs => rw [← mk_liftD LA' (c p.2)]
   rfl
 
-theorem cobO_cup_iff (hL1 : L1.T = LinearMap.range (Algebra.linearMap O LL))
-    (hm : IsDualLat1 PD LA LA' m) (d : G → A.V) (hd : ∀ g, d g ∈ LA.T) (b : G → A'.V) :
-    CobO PD L1 (cupLD LA' m d fun g => Submodule.Quotient.mk (b g)) ↔
-      CobO PD L1 (cupL A'.ρ m d b) := by
+theorem cobO_cup_iff
+    (hL1 : L1.T = LinearMap.range (Algebra.linearMap O LL)) (hm : IsDualLat1 PD LA LA' m)
+    (d : G → A.V) (hd : ∀ g, d g ∈ LA.T)
+    (b : G → A'.V)
+    : CobO PD L1 (cupLD LA' m d fun g => Submodule.Quotient.mk (b g))
+      ↔ CobO PD L1 (cupL A'.ρ m d b) := by
   unfold CobO
   simp only [mk_cupLD hL1 hm d hd]
   rfl
 
-theorem exists_of_mem_HfD {c : G → A'.V ⧸ LA'.T} (hc : c ∈ HfD PD LA') :
-    ∃ b ∈ finiteCocycles PD A'.ρ, c = fun g => Submodule.Quotient.mk (b g) := by
+theorem exists_of_mem_HfD {c : G → A'.V ⧸ LA'.T} (hc : c ∈ HfD PD LA')
+    : ∃ b ∈ finiteCocycles PD A'.ρ, c = fun g => Submodule.Quotient.mk (b g) := by
   obtain ⟨_, ⟨b, hb, rfl⟩, _, ⟨x, rfl⟩, rfl⟩ := Submodule.mem_sup.1 hc
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   exact ⟨b + cob A'.ρ x, (finiteCocycles PD A'.ρ).add_mem hb (B1_le_Z1f PD A' ⟨x, rfl⟩), rfl⟩

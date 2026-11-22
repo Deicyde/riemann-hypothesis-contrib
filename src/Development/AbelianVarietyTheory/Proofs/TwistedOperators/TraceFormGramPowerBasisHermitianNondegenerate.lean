@@ -7,14 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.StarStarO
 @[expose] public section
 
 open MeasureTheory Set Filter Polynomial NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots GlobalTheory.TrEll
 open GlobalTheory.IndefiniteRowSideFullHecke.AdelicUnitaryGroups (mapH diagH)
 open scoped TensorProduct ComplexConjugate Matrix
 
 namespace GlobalTheory.TrUnitLat
 
-theorem gramOne_herm_nd : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (r : ℕ) (P : PPol σ r), IsHermND σ (GlobalTheory.TrUnitLat.gramOne P) := by
+theorem gramOne_herm_nd
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ → ∀ (r : ℕ) (P : PPol σ r), IsHermND σ (GlobalTheory.TrUnitLat.gramOne P) := by
   intro F E _ _ _ _ _ σ hcm r P
   have hσ : ∀ e, σ (σ e) = e := by
     intro x
@@ -52,8 +56,8 @@ theorem gramOne_herm_nd : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [
         rw [hu, Finset.mul_sum, map_sum]
       refine Finset.sum_eq_zero fun i _ => ?_
       rw [mul_smul_comm, map_smul, h1, smul_zero]
-    have hz0 : z = 0 := (traceForm_nondegenerate E (Fld P)).1 z fun u => by
-      rw [Algebra.traceForm_apply]; exact h2 u
+    have hz0 : z = 0 :=
+      (traceForm_nondegenerate E (Fld P)).1 z fun u => by rw [Algebra.traceForm_apply]; exact h2 u
     funext j
     exact Fintype.linearIndependent_iff.1 b.linearIndependent w (by rw [← hz0]) j
 

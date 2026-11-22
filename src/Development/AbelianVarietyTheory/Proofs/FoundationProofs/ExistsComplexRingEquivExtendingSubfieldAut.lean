@@ -15,17 +15,18 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem exists_ringEquiv_extend_of_embedding :
-    ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (s : Ω ≃+* Ω), ∃ g : ℂ ≃+* ℂ, ∀ x, g (ε x) = ε (s x) := by
+theorem exists_ringEquiv_extend_of_embedding
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (s : Ω ≃+* Ω), ∃ g : ℂ ≃+* ℂ, ∀ x,
+      g (ε x) = ε (s x) := by
   intro Ω _ ε s
   letI : Algebra Ω ℂ := ε.toAlgebra
   obtain ⟨B, hB⟩ := exists_isTranscendenceBasis Ω ℂ
   let := IsAlgClosed.isAlgClosure_of_transcendence_basis _ hB
-  let e := hB.1.aevalEquiv.symm.toRingEquiv.trans
-    ((MvPolynomial.mapEquiv B s).trans hB.1.aevalEquiv.toRingEquiv)
+  let e :=
+    hB.1.aevalEquiv.symm.toRingEquiv.trans ((MvPolynomial.mapEquiv B s).trans
+      hB.1.aevalEquiv.toRingEquiv)
   refine ⟨IsAlgClosure.equivOfEquiv ℂ ℂ e, fun x => ?_⟩
-  have h1 : ∀ y : Ω,
-      algebraMap _ ℂ (hB.1.aevalEquiv (MvPolynomial.C y)) = ε y := fun y => by
+  have h1 : ∀ y : Ω, algebraMap _ ℂ (hB.1.aevalEquiv (MvPolynomial.C y)) = ε y := fun y => by
     rw [hB.1.algebraMap_aevalEquiv, MvPolynomial.aeval_C]
     rfl
   conv_lhs => rw [← h1 x]

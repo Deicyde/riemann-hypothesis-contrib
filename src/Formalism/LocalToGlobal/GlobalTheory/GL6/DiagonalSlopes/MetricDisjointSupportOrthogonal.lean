@@ -9,16 +9,21 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0
 
-open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.L2.Forms NumberField Classical
+open Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.L2.Forms NumberField Classical
 
 variable {D : D7} {u : D.what₂.Word}
 
-theorem rational_span_map_surjective {n : ℕ} (lam : D.what₂.Tau → DomWeight n) (P : MvPolynomial (D.what₂.Tau × Fin n × Fin n) ℂ)
-    (hP : P ∈ RatSpan D lam) :
-    ∃ Q : MvPolynomial (D.what₂.Tau × Fin n × Fin n) D.what₂.LL, MvPolynomial.map D.what₂.embLL Q = P := by
-  have hle : RatSpan D lam ≤
-      (MvPolynomial.map D.what₂.embLL : MvPolynomial (D.what₂.Tau × Fin n × Fin n) D.what₂.LL →+*
-        MvPolynomial (D.what₂.Tau × Fin n × Fin n) ℂ).range.toAddSubgroup := by
+theorem rational_span_map_surjective
+    {n : ℕ} (lam : D.what₂.Tau → DomWeight n) (P : MvPolynomial (D.what₂.Tau × Fin n × Fin n) ℂ)
+    (hP : P ∈ RatSpan D lam)
+    : ∃ Q : MvPolynomial (D.what₂.Tau × Fin n × Fin n) D.what₂.LL,
+      MvPolynomial.map D.what₂.embLL Q = P := by
+  have hle
+      : RatSpan D lam
+        ≤ (MvPolynomial.map D.what₂.embLL
+          : MvPolynomial (D.what₂.Tau × Fin n × Fin n) D.what₂.LL
+            →+* MvPolynomial (D.what₂.Tau × Fin n × Fin n) ℂ).range.toAddSubgroup := by
     refine (AddSubgroup.closure_le _).2 ?_
     rintro _ ⟨r, f, -, rfl⟩
     refine ⟨r • ten (fun τ => MvPolynomial.map (Int.castRingHom D.what₂.LL) (f τ)), ?_⟩
@@ -29,11 +34,14 @@ theorem rational_span_map_surjective {n : ℕ} (lam : D.what₂.Tau → DomWeigh
   obtain ⟨Q, hQ⟩ := hle hP
   exact ⟨Q, hQ⟩
 
-theorem polynomial_rep_of_rational_form (Tf : Forms0 D u) (x : ((D.fm u).lat 0).V) :
-    ∃ Pc : (D.mem u).C.cls 0 → MvPolynomial (D.what₂.Tau × Fin (D.R.N 0) × Fin (D.R.N 0)) D.what₂.LL,
-      (∀ c, (D.fm u).emb 0 x c = 0 → Pc c = 0) ∧
-      ∀ c z, (D.fm u).emb 0 x c z = fnOf _ (shiftOf (lamT u 0)) 1 (MvPolynomial.map D.what₂.embLL (Pc c))
-        ((Tf.val 0 (Nat.zero_le _) rfl).eY z) := by
+theorem polynomial_rep_of_rational_form (Tf : Forms0 D u) (x : ((D.fm u).lat 0).V)
+    : ∃ Pc
+        : (D.mem u).C.cls 0 → MvPolynomial (D.what₂.Tau × Fin (D.R.N 0) × Fin (D.R.N 0)) D.what₂.LL,
+      (∀ c, (D.fm u).emb 0 x c = 0 → Pc c = 0)
+        ∧ ∀ c z,
+          (D.fm u).emb 0 x c z
+            = fnOf _ (shiftOf (lamT u 0)) 1 (MvPolynomial.map D.what₂.embLL (Pc c))
+              ((Tf.val 0 (Nat.zero_le _) rfl).eY z) := by
   have hr := ((Tf.val 0 (Nat.zero_le _) rfl).rat ((D.fm u).emb 0 x)).1 ⟨x, rfl⟩
   choose P hP hPe using hr.2
   choose Q hQ using fun c => rational_span_map_surjective _ (P c) (hP c)
@@ -47,9 +55,11 @@ theorem polynomial_rep_of_rational_form (Tf : Forms0 D u) (x : ((D.fm u).lat 0).
 theorem norm_form_zero {n : ℕ} (lam : D.what₂.Tau → DomWeight n) : nfAll lam 0 0 = 0 := by
   simp [nfAll, Formalism.REAL.fockF]
 
-theorem majAt_swap_eq_conj {V ι : Type} [AddCommGroup V] [Module D.what₂.LL V] [Fintype ι] [DecidableEq ι] (b : Module.Basis ι D.what₂.LL V)
-    (X : InfinitePlace D.what₂.LL → Matrix ι ι ℂ) (v : InfinitePlace D.what₂.LL) (x y : V) :
-    majAt b X v y x = starRingEnd ℂ (majAt b X v x y) := by
+theorem majAt_swap_eq_conj
+    {V ι : Type} [AddCommGroup V] [Module D.what₂.LL V] [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι D.what₂.LL V) (X : InfinitePlace D.what₂.LL → Matrix ι ι ℂ)
+    (v : InfinitePlace D.what₂.LL) (x y : V)
+    : majAt b X v y x = starRingEnd ℂ (majAt b X v x y) := by
   unfold majAt
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -63,23 +73,34 @@ theorem metric_disjoint_support_orthogonal (Tf : Forms0 D u) : MetricOrthogonalC
   have hv : InfinitePlace.mk s = v := InfinitePlace.mk_embedding v
   obtain ⟨C, hC, -, -⟩ := (Tf.val 0 (Nat.zero_le _) rfl).de
   letI := D.host.cmStar
-  obtain ⟨o, ho⟩ := exists_isON_of_gram (sigD D : D.host.E →+* D.host.E) (embS D s)
-    (fun τ x => D.sp.cm.cmUnram.2.1 (embS D s τ) x) (gramN D 0 (Nat.zero_le _)) C hC
+  obtain ⟨o, ho⟩ :=
+    exists_isON_of_gram (sigD D : D.host.E →+* D.host.E) (embS D s)
+      (fun τ x => D.sp.cm.cmUnram.2.1 (embS D s τ) x)
+      (gramN D 0 (Nat.zero_le _)) C hC
   obtain ⟨Px, hPx0, hPx⟩ := polynomial_rep_of_rational_form Tf x
   obtain ⟨Py, hPy0, hPy⟩ := polynomial_rep_of_rational_form Tf y
-  have hay : ∀ (a : D.what₂.LL) c z, (D.fm u).emb 0 (a • y) c z =
-      fnOf _ (shiftOf (lamT u 0)) 1 (MvPolynomial.map D.what₂.embLL (MvPolynomial.C a * Py c))
-        ((Tf.val 0 (Nat.zero_le _) rfl).eY z) := by
+  have hay
+      : ∀ (a : D.what₂.LL) c z,
+        (D.fm u).emb 0 (a • y) c z
+          = fnOf _ (shiftOf (lamT u 0)) 1 (MvPolynomial.map D.what₂.embLL (MvPolynomial.C a * Py c))
+            ((Tf.val 0 (Nat.zero_le _) rfl).eY z) := by
     intro a c z
-    rw [map_smulₛₗ, Pi.smul_apply, Pi.smul_apply, hPy, map_mul, MvPolynomial.map_C, ← MvPolynomial.smul_eq_C_mul,
-      map_smul, Pi.smul_apply]
-  have hxay : ∀ (a : D.what₂.LL) c z, (D.fm u).emb 0 (x + a • y) c z =
-      fnOf _ (shiftOf (lamT u 0)) 1 (MvPolynomial.map D.what₂.embLL (Px c + MvPolynomial.C a * Py c))
-        ((Tf.val 0 (Nat.zero_le _) rfl).eY z) := by
+    rw [map_smulₛₗ, Pi.smul_apply, Pi.smul_apply, hPy, map_mul, MvPolynomial.map_C,
+      ← MvPolynomial.smul_eq_C_mul, map_smul, Pi.smul_apply]
+  have hxay
+      : ∀ (a : D.what₂.LL) c z,
+        (D.fm u).emb 0 (x + a • y) c z
+          = fnOf _ (shiftOf (lamT u 0)) 1
+            (MvPolynomial.map D.what₂.embLL (Px c + MvPolynomial.C a * Py c))
+            ((Tf.val 0 (Nat.zero_le _) rfl).eY z) := by
     intro a c z
-    rw [map_add (f := _), Pi.add_apply, Pi.add_apply, hPx, hay, map_add (f := _), map_add (f := _), Pi.add_apply]
-  have key : ∀ a : D.what₂.LL, (majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v (x + a • y) (x + a • y)).re =
-      (majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x x).re + (majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v (a • y) (a • y)).re := by
+    rw [map_add (f := _), Pi.add_apply, Pi.add_apply, hPx, hay, map_add (f := _), map_add (f := _),
+      Pi.add_apply]
+  have key
+      : ∀ a : D.what₂.LL,
+        (majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v (x + a • y) (x + a • y)).re
+          = (majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x x).re
+            + (majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v (a • y) (a • y)).re := by
     intro a
     have e1 := Tf.norm 0 (Nat.zero_le _) rfl s (x + a • y) _ (hxay a) o ho
     have e2 := Tf.norm 0 (Nat.zero_le _) rfl s x Px hPx o ho
@@ -92,16 +113,25 @@ theorem metric_disjoint_support_orthogonal (Tf : Forms0 D u) : MetricOrthogonalC
       simp only [zero_add, map_zero, norm_form_zero, Complex.zero_re, mul_zero]
     · rw [hPy0 c h]
       simp only [mul_zero, add_zero, map_zero, norm_form_zero, Complex.zero_re]
-  have a1 : ∀ x x' y : ((D.fm u).lat 0).V, majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v (x + x') y =
-      majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y + majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x' y :=
+  have a1
+      : ∀ x x' y : ((D.fm u).lat 0).V,
+        majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v (x + x') y
+          = majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y
+            + majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x' y :=
     (isSesq_maj ((D.fm u).lat 0).b ((D.fm u).lat 0).X v).1
-  have a2 : ∀ x y y' : ((D.fm u).lat 0).V, majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x (y + y') =
-      majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y + majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y' :=
+  have a2
+      : ∀ x y y' : ((D.fm u).lat 0).V,
+        majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x (y + y')
+          = majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y
+            + majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y' :=
     (isSesq_maj ((D.fm u).lat 0).b ((D.fm u).lat 0).X v).2.1
-  have s2 : ∀ (a : D.what₂.LL) (x y : ((D.fm u).lat 0).V), majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x (a • y) =
-      s a * majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y :=
+  have s2
+      : ∀ (a : D.what₂.LL) (x y : ((D.fm u).lat 0).V),
+        majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x (a • y)
+          = s a * majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y :=
     (isSesq_maj ((D.fm u).lat 0).b ((D.fm u).lat 0).X v).2.2.2
-  have hre : ∀ a : D.what₂.LL, (s a * majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y).re = 0 := by
+  have hre
+      : ∀ a : D.what₂.LL, (s a * majAt ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x y).re = 0 := by
     intro a
     have k := key a
     rw [a1, a2, a2, majAt_swap_eq_conj ((D.fm u).lat 0).b ((D.fm u).lat 0).X v x (a • y)] at k

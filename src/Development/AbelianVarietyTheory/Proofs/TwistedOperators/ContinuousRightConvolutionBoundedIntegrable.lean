@@ -8,11 +8,13 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-theorem conv_right_continuous {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] {H : Subgroup G}
-    (m : Measure H) (α : H → ℂ) (hα : Integrable α m) (φ : G → ℂ) (hφ : Continuous φ)
-    (B : ℝ) (hB : ∀ g, ‖φ g‖ ≤ B) :
-    Continuous (fun x => ∫ h, α h * φ (x * (h : G)) ∂m) := by
+theorem conv_right_continuous
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+    [MeasurableSpace G] [BorelSpace G]
+    {H : Subgroup G} (m : Measure H) (α : H → ℂ) (hα : Integrable α m)
+    (φ : G → ℂ) (hφ : Continuous φ)
+    (B : ℝ) (hB : ∀ g, ‖φ g‖ ≤ B)
+    : Continuous (fun x => ∫ h, α h * φ (x * (h : G)) ∂m) := by
   refine continuous_of_dominated (bound := fun h => B * ‖α h‖) ?_ ?_ ?_ ?_
   · intro x
     refine hα.aestronglyMeasurable.mul ?_

@@ -12,8 +12,9 @@ noncomputable section
 namespace Formalism.REAL
 
 section WDA
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n : ℕ}
-  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V}
+variable
+  {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+  {n : ℕ} {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V}
 
 lemma WDA_sgn_symm (ε : Fin n → Bool) (a b : Fin n) : sgn ε a b = sgn ε b a := by
   unfold sgn; simp only [eq_comm]
@@ -39,8 +40,8 @@ section WDA2
 theorem sumOfSquaresIdentity_holds : SumSq := by
   intro V _ _ n ε E w hU
   rw [WDA_op]
-  simp only [LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply,
-    inner_sum, inner_smul_right]
+  simp only [LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply, inner_sum,
+    inner_smul_right]
   simp only [Complex.ofReal_sum]
   simp only [WDA_norm hU]
   rw [Finset.sum_comm]

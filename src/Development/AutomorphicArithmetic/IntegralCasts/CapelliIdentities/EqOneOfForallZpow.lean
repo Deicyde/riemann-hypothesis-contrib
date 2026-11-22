@@ -4,7 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.Qk23.half_le_re {w : ℂ} (h : ‖w⁻¹ - 1‖ < 1) : (1 / 2 : ℝ) ≤ w.re := by
+private theorem UpperTheory.Reformulated.B.Qk23.half_le_re {w : ℂ} (h : ‖w⁻¹ - 1‖ < 1)
+    : (1 / 2 : ℝ) ≤ w.re := by
   have hw : w ≠ 0 := by
     rintro rfl
     simp at h
@@ -17,8 +18,8 @@ private theorem UpperTheory.Reformulated.B.Qk23.half_le_re {w : ℂ} (h : ‖w�
   simp only [Complex.sub_re, Complex.sub_im, Complex.one_re, Complex.one_im] at h2
   nlinarith
 
-theorem UpperTheory.Reformulated.B.Qk23.eq_one_of_forall_zpow :
-    ∀ {z : ℂ}, (∀ (k : ℤ), ‖z ^ k - (1 : ℂ)‖ < (1 : ℝ)) → z = (1 : ℂ) := by
+theorem UpperTheory.Reformulated.B.Qk23.eq_one_of_forall_zpow
+    : ∀ {z : ℂ}, (∀ (k : ℤ), ‖z ^ k - (1 : ℂ)‖ < (1 : ℝ)) → z = (1 : ℂ) := by
   intro z h
   by_contra hz
   have hd : 0 < ‖z - 1‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hz)
@@ -32,8 +33,8 @@ theorem UpperTheory.Reformulated.B.Qk23.eq_one_of_forall_zpow :
   have h1 : (n : ℝ) * (1 / 2) ≤ ‖∑ k ∈ Finset.range n, z ^ k‖ := by
     refine le_trans ?_ (Complex.re_le_norm _)
     rw [Complex.re_sum]
-    have := Finset.card_nsmul_le_sum (Finset.range n) (fun k => (z ^ k).re) (1 / 2 : ℝ)
-      (fun k _ => hre k)
+    have :=
+      Finset.card_nsmul_le_sum (Finset.range n) (fun k => (z ^ k).re) (1 / 2 : ℝ) (fun k _ => hre k)
     rwa [Finset.card_range, nsmul_eq_mul] at this
   have h2 : ‖∑ k ∈ Finset.range n, z ^ k‖ * ‖z - 1‖ < 1 := by
     rw [← norm_mul, geom_sum_mul]

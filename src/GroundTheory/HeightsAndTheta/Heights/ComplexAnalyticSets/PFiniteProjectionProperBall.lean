@@ -37,7 +37,8 @@ theorem FiniteProjectionProperBall.proof : FiniteProjectionProperBall.Statement 
     funext i
     simpa using this.2 i
   have hCcl : IsClosed C := by
-    refine ContinuousOn.preimage_isClosed_of_isClosed ?_ Metric.isClosed_closedBall isClosed_singleton
+    refine ContinuousOn.preimage_isClosed_of_isClosed ?_ Metric.isClosed_closedBall
+      isClosed_singleton
     exact continuousOn_pi.mpr fun i => ((hf i).continuousOn).mono hBN
   have hC : IsCompact C := (isCompact_closedBall w ρ).of_isClosed_subset hCcl Set.inter_subset_left
 

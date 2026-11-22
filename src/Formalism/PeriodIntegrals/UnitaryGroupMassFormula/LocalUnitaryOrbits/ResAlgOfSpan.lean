@@ -9,28 +9,39 @@ noncomputable section
 
 namespace PI.OmLocU.Red
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Formalism.UG
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Formalism.UG
 open PI.VolStabSW PI.OmLocU
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-  (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
 
 set_option linter.deprecated false
 
 def ThetaSpan : Prop :=
-  StdHyp σ J ψ → UnramAt (E := E) v → ∀ θ : 𝓞 E,
-    (∀ q : QE (E := E) v, ∃ a0 a1 : 𝓞 F ⧸ v.asIdeal,
-      q = algebraMap _ (QE (E := E) v) a0 + algebraMap _ (QE (E := E) v) a1 * Ideal.Quotient.mk (IE (E := E) v) θ) →
-    ∀ x ∈ OEv (E := E) v, ∃ a0 a1 : v.adicCompletionIntegers F,
-      x = sc (E := E) v (a0 : Fv F v) + sc (E := E) v (a1 : Fv F v) * inclR (F := F) (Fv F v) (θ : E)
+  StdHyp σ J ψ → UnramAt (E := E) v
+    → ∀ θ : 𝓞 E,
+      (∀ q : QE (E := E) v, ∃ a0 a1 : 𝓞 F ⧸ v.asIdeal,
+          q = algebraMap _ (QE (E := E) v) a0
+            + algebraMap _ (QE (E := E) v) a1 * Ideal.Quotient.mk (IE (E := E) v) θ)
+        → ∀ x ∈ OEv (E := E) v, ∃ a0 a1 : v.adicCompletionIntegers F,
+          x = sc (E := E) v (a0 : Fv F v)
+            + sc (E := E) v (a1 : Fv F v) * inclR (F := F) (Fv F v) (θ : E)
 
-theorem theta_exists (h : IsCMExt F E σ) : ∃ θ : 𝓞 E,
-    (∀ a0 a1 : 𝓞 F ⧸ v.asIdeal, algebraMap _ (QE (E := E) v) a0 + algebraMap _ (QE (E := E) v) a1 *
-      Ideal.Quotient.mk (IE (E := E) v) θ = 0 → a0 = 0 ∧ a1 = 0) ∧
-    (∀ q : QE (E := E) v, ∃ a0 a1 : 𝓞 F ⧸ v.asIdeal,
-      q = algebraMap _ (QE (E := E) v) a0 + algebraMap _ (QE (E := E) v) a1 * Ideal.Quotient.mk (IE (E := E) v) θ) := by
+theorem theta_exists (h : IsCMExt F E σ)
+    : ∃ θ : 𝓞 E,
+      (∀ a0 a1 : 𝓞 F ⧸ v.asIdeal,
+          algebraMap _ (QE (E := E) v) a0
+                + algebraMap _ (QE (E := E) v) a1 * Ideal.Quotient.mk (IE (E := E) v) θ
+              = 0
+            → a0 = 0 ∧ a1 = 0)
+        ∧ (∀ q : QE (E := E) v, ∃ a0 a1 : 𝓞 F ⧸ v.asIdeal,
+          q = algebraMap _ (QE (E := E) v) a0
+            + algebraMap _ (QE (E := E) v) a1 * Ideal.Quotient.mk (IE (E := E) v) θ) := by
   classical
   haveI : Finite (𝓞 F ⧸ v.asIdeal) := finite_res v
   haveI : v.asIdeal.IsMaximal := v.isMaximal
@@ -53,8 +64,12 @@ theorem theta_exists (h : IsCMExt F E σ) : ∃ θ : 𝓞 E,
     nlinarith
   obtain ⟨x, hx⟩ := hx
   obtain ⟨θ, rfl⟩ := Ideal.Quotient.mk_surjective x
-  have hind : ∀ a0 a1 : 𝓞 F ⧸ v.asIdeal, algebraMap _ (QE (E := E) v) a0 + algebraMap _ (QE (E := E) v) a1 *
-      Ideal.Quotient.mk (IE (E := E) v) θ = 0 → a0 = 0 ∧ a1 = 0 := by
+  have hind
+      : ∀ a0 a1 : 𝓞 F ⧸ v.asIdeal,
+        algebraMap _ (QE (E := E) v) a0
+              + algebraMap _ (QE (E := E) v) a1 * Ideal.Quotient.mk (IE (E := E) v) θ
+            = 0
+          → a0 = 0 ∧ a1 = 0 := by
     intro a0 a1 h0
     by_cases ha1 : a1 = 0
     · subst ha1
@@ -63,52 +78,63 @@ theorem theta_exists (h : IsCMExt F E σ) : ∃ θ : 𝓞 E,
     · exfalso
       apply hx
       refine ⟨-(a0 * a1⁻¹), ?_⟩
-      have hinv : algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) a1⁻¹ *
-          algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) a1 = 1 := by
+      have hinv
+          : algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) a1⁻¹
+              * algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) a1
+            = 1 := by
         rw [← map_mul, inv_mul_cancel₀ ha1, map_one]
       rw [map_neg, map_mul]
       linear_combination (-(algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) a1⁻¹)) * h0 +
         (Ideal.Quotient.mk (IE (E := E) v) θ) * hinv
   refine ⟨θ, hind, ?_⟩
   let f : (𝓞 F ⧸ v.asIdeal) × (𝓞 F ⧸ v.asIdeal) → QE (E := E) v := fun p =>
-    algebraMap _ (QE (E := E) v) p.1 + algebraMap _ (QE (E := E) v) p.2 * Ideal.Quotient.mk (IE (E := E) v) θ
+    algebraMap _ (QE (E := E) v) p.1
+      + algebraMap _ (QE (E := E) v) p.2 * Ideal.Quotient.mk (IE (E := E) v) θ
   have hinj : Function.Injective f := by
     intro p p' hpp
-    have h0 := hind (p.1 - p'.1) (p.2 - p'.2) (by
-      simp only [f] at hpp
-      rw [map_sub, map_sub]
-      linear_combination hpp)
+    have h0 :=
+      hind (p.1 - p'.1) (p.2 - p'.2) (by
+        simp only [f] at hpp
+        rw [map_sub, map_sub]
+        linear_combination hpp)
     exact Prod.ext (sub_eq_zero.mp h0.1) (sub_eq_zero.mp h0.2)
   have hbij := bij_of_card f hinj (by rw [Nat.card_prod, hcard, sq])
   intro q
   obtain ⟨p, hp⟩ := hbij.2 q
   exact ⟨p.1, p.2, hp.symm⟩
 
-theorem theta_indep (h : IsCMExt F E σ) (θ : 𝓞 E)
-    (h3 : ∀ a0 a1 : 𝓞 F ⧸ v.asIdeal, algebraMap _ (QE (E := E) v) a0 + algebraMap _ (QE (E := E) v) a1 *
-      Ideal.Quotient.mk (IE (E := E) v) θ = 0 → a0 = 0 ∧ a1 = 0) :
-    ∀ a0 a1 : Fv F v, sc (E := E) v a0 + sc (E := E) v a1 * inclR (F := F) (Fv F v) (θ : E) = 0 →
-      a0 = 0 ∧ a1 = 0 := by
+theorem theta_indep
+    (h : IsCMExt F E σ)
+    (θ : 𝓞 E)
+    (h3 : ∀ a0 a1 : 𝓞 F ⧸ v.asIdeal,
+      algebraMap _ (QE (E := E) v) a0
+            + algebraMap _ (QE (E := E) v) a1 * Ideal.Quotient.mk (IE (E := E) v) θ
+          = 0
+        → a0 = 0 ∧ a1 = 0)
+    : ∀ a0 a1 : Fv F v,
+      sc (E := E) v a0 + sc (E := E) v a1 * inclR (F := F) (Fv F v) (θ : E) = 0
+        → a0 = 0 ∧ a1 = 0 := by
   classical
   intro a0 a1 h0
   haveI : v.asIdeal.IsMaximal := v.isMaximal
   letI : Field (𝓞 F ⧸ v.asIdeal) := Ideal.Quotient.field _
   have hθ : ∀ f : F, algebraMap F E f ≠ (θ : E) := by
     intro f hf
-    have hint : IsIntegral ℤ f := (isIntegral_algHom_iff ((algebraMap F E).toIntAlgHom)
-        (algebraMap F E).injective).mp (by
-      show IsIntegral ℤ (algebraMap F E f)
-      rw [hf]
-      exact RingOfIntegers.isIntegral_coe θ)
+    have hint : IsIntegral ℤ f :=
+      (isIntegral_algHom_iff ((algebraMap F E).toIntAlgHom) (algebraMap F E).injective).mp (by
+        show IsIntegral ℤ (algebraMap F E f)
+        rw [hf]
+        exact RingOfIntegers.isIntegral_coe θ)
     have hg : θ = algebraMap (𝓞 F) (𝓞 E) ⟨f, hint⟩ := by
       apply RingOfIntegers.ext
       rw [← hf]
       rfl
-    have hz := h3 (-(Ideal.Quotient.mk _ ⟨f, hint⟩)) 1 (by
-      rw [map_neg, map_one, one_mul, hg]
-      show -Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) ⟨f, hint⟩) +
-        Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) ⟨f, hint⟩) = 0
-      exact neg_add_cancel _)
+    have hz :=
+      h3 (-(Ideal.Quotient.mk _ ⟨f, hint⟩)) 1 (by
+        rw [map_neg, map_one, one_mul, hg]
+        show -Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) ⟨f, hint⟩) +
+          Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) ⟨f, hint⟩) = 0
+        exact neg_add_cancel _)
     exact one_ne_zero hz.2
   have hli : LinearIndependent F ![(1 : E), (θ : E)] := by
     rw [LinearIndependent.pair_iff]
@@ -128,13 +154,15 @@ theorem theta_indep (h : IsCMExt F E σ) (θ : 𝓞 E)
   let b' := Algebra.TensorProduct.basis (Fv F v) b
   have hb : ![(1 : Fv F v) ⊗ₜ[F] (1 : E), (1 : Fv F v) ⊗ₜ[F] (θ : E)] = ⇑b' := by
     ext i
-    fin_cases i <;>
-      simp [b', b, Algebra.TensorProduct.basis_apply, coe_basisOfLinearIndependentOfCardEqFinrank]
-  have hli' : LinearIndependent (Fv F v) ![(1 : Fv F v) ⊗ₜ[F] (1 : E), (1 : Fv F v) ⊗ₜ[F] (θ : E)] := by
+    fin_cases i <;> simp [b', b, Algebra.TensorProduct.basis_apply,
+      coe_basisOfLinearIndependentOfCardEqFinrank]
+  have hli'
+      : LinearIndependent (Fv F v) ![(1 : Fv F v) ⊗ₜ[F] (1 : E), (1 : Fv F v) ⊗ₜ[F] (θ : E)] := by
     rw [hb]
     exact b'.linearIndependent
   apply LinearIndependent.pair_iff.mp hli' a0 a1
-  rw [TensorProduct.smul_tmul', TensorProduct.smul_tmul', smul_eq_mul, smul_eq_mul, mul_one, mul_one]
+  rw [TensorProduct.smul_tmul', TensorProduct.smul_tmul', smul_eq_mul, smul_eq_mul, mul_one,
+    mul_one]
   rw [← h0]
   simp [sc, inclR, Algebra.TensorProduct.tmul_mul_tmul]
 

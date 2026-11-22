@@ -13,81 +13,89 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.ContractionTensorModels
 
 section Hilbert
 
-variable {H₁ H₂ FF : Type}
-  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
-  [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
-  [NormedAddCommGroup FF] [InnerProductSpace ℂ FF]
+variable
+  {H₁ H₂ FF : Type} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [NormedAddCommGroup H₂]
+  [InnerProductSpace ℂ H₂] [NormedAddCommGroup FF] [InnerProductSpace ℂ FF]
 
 def IsIsoBilin (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF) : Prop :=
   ∀ x x' y y', ⟪Tm x y, Tm x' y'⟫_ℂ = ⟪x, x'⟫_ℂ * ⟪y, y'⟫_ℂ
 
-def IsEquivBilin {G₁ G₂ : Type} [Group G₁] [Group G₂] (π₁ : G₁ →* (H₁ ≃ₗᵢ[ℂ] H₁)) (π₂ : G₂ →* (H₂ ≃ₗᵢ[ℂ] H₂))
-    (ρ : G₁ × G₂ →* (FF ≃ₗᵢ[ℂ] FF)) (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF) : Prop :=
+def IsEquivBilin
+    {G₁ G₂ : Type} [Group G₁] [Group G₂]
+    (π₁ : G₁ →* (H₁ ≃ₗᵢ[ℂ] H₁)) (π₂ : G₂ →* (H₂ ≃ₗᵢ[ℂ] H₂)) (ρ : G₁ × G₂ →* (FF ≃ₗᵢ[ℂ] FF))
+    (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF)
+    : Prop :=
   ∀ g h x y, Tm (π₁ g x) (π₂ h y) = ρ (g, h) (Tm x y)
 
 def IsContr (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF) (It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁) : Prop :=
   ∀ φ y x, ⟪x, It φ y⟫_ℂ = ⟪Tm x y, φ⟫_ℂ
 
-def HasWeakDer {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (c : ℝ → H) (v' : H) : Prop :=
+def HasWeakDer {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (c : ℝ → H) (v' : H)
+    : Prop :=
   ∀ w : H, HasDerivAt (fun t : ℝ => ⟪w, c t⟫_ℂ) ⟪w, v'⟫_ℂ 0
 
-def IsFiniteVec {G H : Type} [Group G] [AddCommGroup H] [Module ℂ H] (K : Subgroup G) (π : G → H → H) (v : H) : Prop :=
+def IsFiniteVec
+    {G H : Type} [Group G] [AddCommGroup H] [Module ℂ H] (K : Subgroup G) (π : G → H → H) (v : H)
+    : Prop :=
   FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun k : K => π k v))
 
 def imSpan (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF) : Submodule ℂ FF :=
   Submodule.span ℂ (Set.range fun p : H₁ × H₂ => Tm p.1 p.2)
 
-structure ContrProps {G₁ G₂ : Type} [Group G₁] [Group G₂] (π₁ : G₁ →* (H₁ ≃ₗᵢ[ℂ] H₁))
-    (π₂ : G₂ →* (H₂ ≃ₗᵢ[ℂ] H₂)) (ρ : G₁ × G₂ →* (FF ≃ₗᵢ[ℂ] FF)) (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF)
-    (It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁) : Prop where
-
+structure ContrProps
+    {G₁ G₂ : Type} [Group G₁] [Group G₂]
+    (π₁ : G₁ →* (H₁ ≃ₗᵢ[ℂ] H₁)) (π₂ : G₂ →* (H₂ ≃ₗᵢ[ℂ] H₂)) (ρ : G₁ × G₂ →* (FF ≃ₗᵢ[ℂ] FF))
+    (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF) (It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁)
+    : Prop where
   norm_le : ∀ φ y, ‖It φ y‖ ≤ ‖φ‖ * ‖y‖
-
   equiv : ∀ g φ y, It (ρ (g, 1) φ) y = π₁ g (It φ y)
-
   inv : ∀ h φ y, It (ρ (1, h) φ) (π₂ h y) = It φ y
-
-  der₁ : ∀ (c : Multiplicative ℝ →* G₁) φ φ' y,
-    HasDerivAt (fun t : ℝ => ρ (c (Multiplicative.ofAdd t), 1) φ) φ' 0 →
-      HasDerivAt (fun t : ℝ => π₁ (c (Multiplicative.ofAdd t)) (It φ y)) (It φ' y) 0
-
-  weakDer₁ : ∀ (c : Multiplicative ℝ →* G₁) φ φ' y,
-    HasWeakDer (fun t : ℝ => ρ (c (Multiplicative.ofAdd t), 1) φ) φ' →
-      HasWeakDer (fun t : ℝ => π₁ (c (Multiplicative.ofAdd t)) (It φ y)) (It φ' y)
-
-  der₂ : ∀ (c : Multiplicative ℝ →* G₂) φ φ' y y',
-    HasWeakDer (fun t : ℝ => ρ (1, c (Multiplicative.ofAdd t)) φ) φ' →
-      HasWeakDer (fun t : ℝ => π₂ (c (Multiplicative.ofAdd t)) y) y' → It φ' y + It φ y' = 0
-
+  der₁
+    : ∀ (c : Multiplicative ℝ →* G₁) φ φ' y,
+      HasDerivAt (fun t : ℝ => ρ (c (Multiplicative.ofAdd t), 1) φ) φ' 0
+        → HasDerivAt (fun t : ℝ => π₁ (c (Multiplicative.ofAdd t)) (It φ y)) (It φ' y) 0
+  weakDer₁
+    : ∀ (c : Multiplicative ℝ →* G₁) φ φ' y,
+      HasWeakDer (fun t : ℝ => ρ (c (Multiplicative.ofAdd t), 1) φ) φ'
+        → HasWeakDer (fun t : ℝ => π₁ (c (Multiplicative.ofAdd t)) (It φ y)) (It φ' y)
+  der₂
+    : ∀ (c : Multiplicative ℝ →* G₂) φ φ' y y',
+      HasWeakDer (fun t : ℝ => ρ (1, c (Multiplicative.ofAdd t)) φ) φ'
+        → HasWeakDer (fun t : ℝ => π₂ (c (Multiplicative.ofAdd t)) y) y'
+        → It φ' y + It φ y' = 0
   ne : ∀ φ, φ ∉ (imSpan Tm)ᗮ → ∀ Y : Set H₂, Dense Y → ∃ y ∈ Y, It φ y ≠ 0
-
-  fin : ∀ (K : Subgroup G₁) φ y, IsFiniteVec K (fun g => ρ (g, 1)) φ → IsFiniteVec K (fun g => π₁ g) (It φ y)
+  fin
+    : ∀ (K : Subgroup G₁) φ y,
+      IsFiniteVec K (fun g => ρ (g, 1)) φ → IsFiniteVec K (fun g => π₁ g) (It φ y)
 
 end Hilbert
 
 def ContrHilbert : Prop :=
-  ∀ (H₁ H₂ FF : Type)
-    [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁]
-    [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂]
-    [NormedAddCommGroup FF] [InnerProductSpace ℂ FF] [CompleteSpace FF]
-    (G₁ G₂ : Type) [Group G₁] [Group G₂] (π₁ : G₁ →* (H₁ ≃ₗᵢ[ℂ] H₁)) (π₂ : G₂ →* (H₂ ≃ₗᵢ[ℂ] H₂))
-    (ρ : G₁ × G₂ →* (FF ≃ₗᵢ[ℂ] FF)) (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF),
-    IsIsoBilin Tm → IsEquivBilin π₁ π₂ ρ Tm →
-      (∃! It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁, IsContr Tm It) ∧
-      ∀ It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁, IsContr Tm It → ContrProps π₁ π₂ ρ Tm It
+  ∀ (H₁ H₂ FF : Type) [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁]
+      [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂] [NormedAddCommGroup FF]
+      [InnerProductSpace ℂ FF] [CompleteSpace FF] (G₁ G₂ : Type) [Group G₁] [Group G₂]
+      (π₁ : G₁ →* (H₁ ≃ₗᵢ[ℂ] H₁)) (π₂ : G₂ →* (H₂ ≃ₗᵢ[ℂ] H₂)) (ρ : G₁ × G₂ →* (FF ≃ₗᵢ[ℂ] FF))
+      (Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF),
+    IsIsoBilin Tm → IsEquivBilin π₁ π₂ ρ Tm
+      → (∃! It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁, IsContr Tm It)
+        ∧ ∀ It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁, IsContr Tm It → ContrProps π₁ π₂ ρ Tm It
 
-def IsTensorIt {ι : Type} [Fintype ι] {σ : ι → Type} {Var : Type} (e : (Σ τ, σ τ) ≃ Var) {A B : ι → Type}
+def IsTensorIt
+    {ι : Type} [Fintype ι]
+    {σ : ι → Type} {Var : Type} (e : (Σ τ, σ τ) ≃ Var)
+    {A B : ι → Type}
     [∀ τ, AddCommGroup (A τ)] [∀ τ, Module ℂ (A τ)] [∀ τ, AddCommGroup (B τ)] [∀ τ, Module ℂ (B τ)]
     (Itl : ∀ τ, MvPolynomial (σ τ) ℂ →ₗ[ℂ] A τ →ₗ[ℂ] B τ)
-    (It : MvPolynomial Var ℂ →ₗ[ℂ] (⨂[ℂ] τ, A τ) →ₗ[ℂ] ⨂[ℂ] τ, B τ) : Prop :=
+    (It : MvPolynomial Var ℂ →ₗ[ℂ] (⨂[ℂ] τ, A τ) →ₗ[ℂ] ⨂[ℂ] τ, B τ)
+    : Prop :=
   ∀ (P : ∀ τ, MvPolynomial (σ τ) ℂ) (v : ∀ τ, A τ),
-    It (∏ τ, MvPolynomial.rename (fun s => e ⟨τ, s⟩) (P τ)) (PiTensorProduct.tprod ℂ v) =
-      PiTensorProduct.tprod ℂ fun τ => Itl τ (P τ) (v τ)
+    It (∏ τ, MvPolynomial.rename (fun s => e ⟨τ, s⟩) (P τ)) (PiTensorProduct.tprod ℂ v)
+      = PiTensorProduct.tprod ℂ fun τ => Itl τ (P τ) (v τ)
 
 def ContrTensor : Prop :=
   ∀ (ι : Type) [Fintype ι] (σ : ι → Type) (Var : Type) (e : (Σ τ, σ τ) ≃ Var) (A B : ι → Type)
-    [∀ τ, AddCommGroup (A τ)] [∀ τ, Module ℂ (A τ)] [∀ τ, AddCommGroup (B τ)] [∀ τ, Module ℂ (B τ)]
-    (Itl : ∀ τ, MvPolynomial (σ τ) ℂ →ₗ[ℂ] A τ →ₗ[ℂ] B τ),
+      [∀ τ, AddCommGroup (A τ)] [∀ τ, Module ℂ (A τ)] [∀ τ, AddCommGroup (B τ)]
+      [∀ τ, Module ℂ (B τ)] (Itl : ∀ τ, MvPolynomial (σ τ) ℂ →ₗ[ℂ] A τ →ₗ[ℂ] B τ),
     ∃ It : MvPolynomial Var ℂ →ₗ[ℂ] (⨂[ℂ] τ, A τ) →ₗ[ℂ] ⨂[ℂ] τ, B τ,
       IsTensorIt e Itl It ∧ ((∀ τ, Itl τ ≠ 0) → It ≠ 0)
 
@@ -95,24 +103,28 @@ def Contraction : Prop := ContrHilbert ∧ ContrTensor
 
 section Models
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 end Models
 
-theorem contrProps_of {H₁ H₂ FF : Type}
-    [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁]
-    [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂]
-    [NormedAddCommGroup FF] [InnerProductSpace ℂ FF]
-    {G₁ G₂ : Type} [Group G₁] [Group G₂] {π₁ : G₁ →* (H₁ ≃ₗᵢ[ℂ] H₁)} {π₂ : G₂ →* (H₂ ≃ₗᵢ[ℂ] H₂)}
-    {ρ : G₁ × G₂ →* (FF ≃ₗᵢ[ℂ] FF)} {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm)
-    (hE : IsEquivBilin π₁ π₂ ρ Tm) {It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁} (hC : IsContr Tm It) :
-    ContrProps π₁ π₂ ρ Tm It := by
+theorem contrProps_of
+    {H₁ H₂ FF : Type}
+    [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁] [NormedAddCommGroup H₂]
+    [InnerProductSpace ℂ H₂] [CompleteSpace H₂] [NormedAddCommGroup FF] [InnerProductSpace ℂ FF]
+    {G₁ G₂ : Type} [Group G₁] [Group G₂]
+    {π₁ : G₁ →* (H₁ ≃ₗᵢ[ℂ] H₁)} {π₂ : G₂ →* (H₂ ≃ₗᵢ[ℂ] H₂)} {ρ : G₁ × G₂ →* (FF ≃ₗᵢ[ℂ] FF)}
+    {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) (hE : IsEquivBilin π₁ π₂ ρ Tm)
+    {It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁} (hC : IsContr Tm It)
+    : ContrProps π₁ π₂ ρ Tm It := by
   have hn : ∀ x y, ‖Tm x y‖ = ‖x‖ * ‖y‖ := by
     intro x y
     have h := hI x x y y
-    rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, ← mul_pow] at h
+    rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K,
+        ← mul_pow]
+      at h
     have h2 : ‖Tm x y‖ ^ 2 = (‖x‖ * ‖y‖) ^ 2 := by exact_mod_cast h
     exact (pow_left_inj₀ (norm_nonneg _) (by positivity) two_ne_zero).1 h2
   have hb : ∀ φ y, ‖It φ y‖ ≤ ‖φ‖ * ‖y‖ := by
@@ -144,20 +156,24 @@ theorem contrProps_of {H₁ H₂ FF : Type}
   · intro c φ φ' y y' hd hd'
     apply ext_inner_left ℂ
     intro x
-    let ℓ : H₂ →L[ℂ] ℂ := ((innerₛₗ ℂ φ) ∘ₗ Tm x).mkContinuous (‖φ‖ * ‖x‖) fun y => by
-      simpa [hn, mul_assoc] using norm_inner_le_norm (𝕜 := ℂ) φ (Tm x y)
+    let ℓ : H₂ →L[ℂ] ℂ :=
+      ((innerₛₗ ℂ φ) ∘ₗ Tm x).mkContinuous (‖φ‖ * ‖x‖) fun y => by
+        simpa [hn, mul_assoc] using norm_inner_le_norm (𝕜 := ℂ) φ (Tm x y)
     obtain ⟨w, hw⟩ := (InnerProductSpace.toDual ℂ H₂).surjective ℓ
     have hw' : ∀ z, ⟪w, z⟫_ℂ = ⟪φ, Tm x z⟫_ℂ := fun z => by
       have := congrArg (fun f : H₂ →L[ℂ] ℂ => f z) hw
       simpa [ℓ] using this
     have h1 := hd (Tm x y)
     have h2 := ((hd' w).scomp_of_eq (0 : ℝ) (hasDerivAt_neg (0 : ℝ)) (by simp)).star
-    have h3 : (fun t : ℝ => ⟪Tm x y, ρ (1, c (Multiplicative.ofAdd t)) φ⟫_ℂ) =
-        fun t : ℝ => star (((fun t : ℝ => ⟪w, π₂ (c (Multiplicative.ofAdd t)) y⟫_ℂ) ∘ Neg.neg) t) := by
+    have h3
+        : (fun t : ℝ => ⟪Tm x y, ρ (1, c (Multiplicative.ofAdd t)) φ⟫_ℂ)
+          = fun t : ℝ =>
+            star (((fun t : ℝ => ⟪w, π₂ (c (Multiplicative.ofAdd t)) y⟫_ℂ) ∘ Neg.neg) t) := by
       funext t
       have hy : y = π₂ (c (Multiplicative.ofAdd t)) (π₂ (c (Multiplicative.ofAdd (-t))) y) := by
         change y = (π₂ _ * π₂ _) y
-        rw [← map_mul, ← map_mul, ← ofAdd_add]; simp
+        rw [← map_mul, ← map_mul, ← ofAdd_add]
+        simp
       simp only [Function.comp, hw']
       rw [← hC, Complex.star_def, inner_conj_symm, ← hC]
       conv_lhs => rw [hy, hi]
@@ -181,7 +197,8 @@ theorem contrProps_of {H₁ H₂ FF : Type}
     | smul a b _ hb => simp [inner_smul_left, hb]
   · intro K φ y hf
     unfold IsFiniteVec at *
-    have : (Set.range fun k : K => π₁ k (It φ y)) = It.flip y '' Set.range fun k : K => ρ (k, 1) φ := by
+    have : (Set.range fun k : K => π₁ k (It φ y))
+        = It.flip y '' Set.range fun k : K => ρ (k, 1) φ := by
       rw [← Set.range_comp]; congr 1; funext k; simp [he]
     rw [this, ← Submodule.map_span]
     infer_instance

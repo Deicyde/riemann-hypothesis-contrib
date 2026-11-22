@@ -13,15 +13,24 @@ public import Development.AbelianVarietyTheory.Counterexamples.DegenerateExample
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
+open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
+  GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
 
 namespace GlobalTheory.Mem.StdSize
 
-theorem vstd_size_ev : Top.Ev fun K => ∀ X : Stages, K.Over X.B.toPre →
-    (∀ i, Formalism.IndefR.FWT.VStd X.toD7 i) ∧ 8 * X.toD7.R.f * X.toD7.R.r + 4 ≤ X.toD7.R.nV := by
+theorem vstd_size_ev
+    : Top.Ev fun K =>
+      ∀ X : Stages,
+        K.Over X.B.toPre
+          → (∀ i, Formalism.IndefR.FWT.VStd X.toD7 i)
+            ∧ 8 * X.toD7.R.f * X.toD7.R.r + 4 ≤ X.toD7.R.nV := by
   refine GlobalTheory.Mem.Top.V4.TwoPass.ev_mono ?_ GlobalTheory.Mem.HostFrames.hostHyp_frames_ev
   intro K hK X hX
   obtain ⟨-, -, -, -, -, -, hVf, -⟩ := hK X hX
@@ -35,7 +44,8 @@ theorem vstd_size_ev : Top.Ev fun K => ∀ X : Stages, K.Over X.B.toPre →
       refine forall_congr' fun a => ?_
       constructor
       · rintro ⟨y, hy⟩
-        rw [← hy]; exact y.2
+        rw [← hy]
+        exact y.2
       · intro h
         exact ⟨⟨x a, h⟩, rfl⟩
   · have h4 := hR.2.2.2

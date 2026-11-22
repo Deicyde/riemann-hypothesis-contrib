@@ -9,7 +9,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ExponentialTrian
 
 namespace PI.ET
 
-theorem expTri_of_horn (hH : Horn) : PI.ExpTri :=
-  expTri_of specExists hsEq hH abelSq euclTri
+theorem expTri_of_horn (hH : Horn) : PI.ExpTri := expTri_of specExists hsEq hH abelSq euclTri
 
 end PI.ET

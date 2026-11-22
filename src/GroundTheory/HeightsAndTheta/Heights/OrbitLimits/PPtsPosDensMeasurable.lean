@@ -21,9 +21,11 @@ theorem PtsPosDensMeasurable.proof : PtsPosDensMeasurable.Statement := by
   have hfin := fibreFinite K ι P e Ψ hP hΨ
   obtain ⟨B, γ, hBo, hlift, hcov⟩ := PtsSumMeasurable.exists_lift_family (P := P) (Ψ := Ψ) hfin
 
-  have hd1 : IsDegZeroSmooth (fun _ : (Σ k, ι k) → ℂ => (1 : ℝ)) := ⟨contDiffOn_const, fun _ _ _ => rfl⟩
-  have hind := sheetIndep K ι P e Ψ L _ 1 hP hΨ hL (PtsPosDens.isSmoothHerm_ofWeight hd1)
-    (PtsPosDens.isSectionOn_ofWeight_one hP hd1)
+  have hd1 : IsDegZeroSmooth (fun _ : (Σ k, ι k) → ℂ => (1 : ℝ)) :=
+    ⟨contDiffOn_const, fun _ _ _ => rfl⟩
+  have hind :=
+    sheetIndep K ι P e Ψ L _ 1 hP hΨ hL (PtsPosDens.isSmoothHerm_ofWeight hd1)
+      (PtsPosDens.isSectionOn_ofWeight_one hP hd1)
   rw [PtsPosDens.logNorm_ofWeight_one hd1] at hind
   simp only [one_mul] at hind
   have hsheet : ∀ m, ∀ y ∈ B m, IsSheet P Ψ y (segre (γ m y)) (γ m) := fun m y hy =>
@@ -36,8 +38,7 @@ theorem PtsPosDensMeasurable.proof : PtsPosDensMeasurable.Statement := by
     continuous_pi fun i => continuous_finsetProd _ fun k _ => continuous_apply _
   set σ : ℕ → (Fin e → ℂ) → ((k : K) → ι k) → ℂ := fun m =>
     (B m).piecewise (fun y => segre (γ m y)) 0 with hσdef
-  have hσB : ∀ m, ∀ y ∈ B m, σ m y = segre (γ m y) := fun m y hy =>
-    Set.piecewise_eq_of_mem _ _ _ hy
+  have hσB : ∀ m, ∀ y ∈ B m, σ m y = segre (γ m y) := fun m y hy => Set.piecewise_eq_of_mem _ _ _ hy
   have hσm : ∀ m, Measurable (σ m) := fun m =>
     (hseg.comp_continuousOn (hγc m)).measurable_piecewise continuousOn_const (hBo m).measurableSet
 
@@ -48,8 +49,9 @@ theorem PtsPosDensMeasurable.proof : PtsPosDensMeasurable.Statement := by
     max (g (γt m y) * maDensity (fun j y' => pot L j (γ m y')) y) 0 with hddef
   have hdm : ∀ m, Measurable (dens m) := fun m =>
     ((hg.comp (hγtm m)).mul (PtsSumMeasurable.measurable_maDensity _)).max measurable_const
-  have hdens : ∀ m, ∀ y ∈ B m,
-      dens m y = max (g (γ m y) * maDensity (fun j y' => pot L j (γ m y')) y) 0 := by
+  have hdens
+      : ∀ m, ∀ y ∈ B m,
+        dens m y = max (g (γ m y) * maDensity (fun j y' => pot L j (γ m y')) y) 0 := by
     intro m y hy
     simp only [hddef, hγtdef, Set.piecewise_eq_of_mem _ _ _ hy]
   set S : ℕ → Set (Fin e → ℂ) := fun m =>
@@ -60,16 +62,21 @@ theorem PtsPosDensMeasurable.proof : PtsPosDensMeasurable.Statement := by
       ext y
       simp [hSdef, not_and_or, imp_iff_not_or]
     rw [this]
-    exact (hBo m).measurableSet.inter (Finset.measurableSet_biInter _ fun m' _ =>
-      ((hBo m').measurableSet.inter (measurableSet_eq_fun (hσm m') (hσm m))).compl)
+    exact (hBo m).measurableSet.inter
+      (Finset.measurableSet_biInter _ fun m' _ =>
+        ((hBo m').measurableSet.inter (measurableSet_eq_fun (hσm m') (hσm m))).compl)
   set f : ℕ → (Fin e → ℂ) → ℝ := fun m => (S m).indicator (dens m) with hfdef
   have hfm : ∀ m, Measurable (f m) := fun m => (hdm m).indicator (hSm m)
   have key : AEStronglyMeasurable (ptsPosDens P Ψ (pot L) g) volume := by
-    have hpp : ptsPosDens P Ψ (pot L) g =
-        fun y => ∑ᶠ w ∈ fibre P Ψ y, max (sheetDensity P Ψ (pot L) g y w) 0 := rfl
+    have hpp
+        : ptsPosDens P Ψ (pot L) g
+          = fun y => ∑ᶠ w ∈ fibre P Ψ y, max (sheetDensity P Ψ (pot L) g y w) 0 :=
+      rfl
     rw [hpp]
-    refine aestronglyMeasurable_of_tendsto_ae atTop (f := fun N y => ∑ m ∈ Finset.range N, f m y)
-      (fun N => (Finset.measurable_sum _ fun m _ => hfm m).aestronglyMeasurable) ?_
+    refine aestronglyMeasurable_of_tendsto_ae atTop
+      (f := fun N y => ∑ m ∈ Finset.range N, f m y)
+      (fun N => (Finset.measurable_sum _ fun m _ => hfm m).aestronglyMeasurable)
+      ?_
     filter_upwards [hind] with y hy
     have hterm : ∀ m, y ∈ S m → f m y = max (sheetDensity P Ψ (pot L) g y (σ m y)) 0 := by
       intro m hm
@@ -83,8 +90,7 @@ theorem PtsPosDensMeasurable.proof : PtsPosDensMeasurable.Statement := by
       rw [dite_eq_left hex, hy _ _ _ hex.choose_spec hsh]
 
       choose i0 hi0 using hO m hm.1
-      have hs : segre (γ m y) = segre (hex.choose y) := by
-        rw [hex.choose_spec.1, hσB m y hm.1]
+      have hs : segre (γ m y) = segre (hex.choose y) := by rw [hex.choose_spec.1, hσB m y hm.1]
       obtain ⟨hc', hrel⟩ := eq_bsmul_of_segre_eq i0 hi0 hs
       have hgy : g (hex.choose y) = g (γ m y) := by
         rw [hrel]
@@ -104,9 +110,11 @@ theorem PtsPosDensMeasurable.proof : PtsPosDensMeasurable.Statement := by
         · rw [hfdef]
           simp only
           rw [Set.indicator_of_notMem hm]
-    have hev : ∀ w ∈ (hfin y).toFinset, ∀ᶠ N in atTop,
-        max (sheetDensity P Ψ (pot L) g y w) 0 =
-          ∑ m ∈ Finset.range N, if σ m y = w then f m y else 0 := by
+    have hev
+        : ∀ w ∈ (hfin y).toFinset,
+          ∀ᶠ N in atTop,
+            max (sheetDensity P Ψ (pot L) g y w) 0 =
+              ∑ m ∈ Finset.range N, if σ m y = w then f m y else 0 := by
       intro w _
       by_cases hex : ∃ γ', IsSheet P Ψ y w γ'
       · obtain ⟨γ', hγ'⟩ := hex
@@ -144,8 +152,9 @@ theorem PtsPosDensMeasurable.proof : PtsPosDensMeasurable.Statement := by
             simp only
             rw [Set.indicator_of_notMem hmS]
         · rfl
-    have hsum : ∑ᶠ w ∈ fibre P Ψ y, max (sheetDensity P Ψ (pot L) g y w) 0 =
-        ∑ w ∈ (hfin y).toFinset, max (sheetDensity P Ψ (pot L) g y w) 0 :=
+    have hsum
+        : ∑ᶠ w ∈ fibre P Ψ y, max (sheetDensity P Ψ (pot L) g y w) 0
+          = ∑ w ∈ (hfin y).toFinset, max (sheetDensity P Ψ (pot L) g y w) 0 :=
       finsum_mem_eq_finite_toFinset_sum _ (hfin y)
     refine tendsto_const_nhds.congr' ?_
     filter_upwards [(eventually_all_finset _).2 hev] with N hN

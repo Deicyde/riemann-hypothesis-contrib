@@ -7,8 +7,11 @@ public import Formalism.WachLatticeTwists.RealClassMaps.RealClassMapProofs.RowCh
 
 variable [hT2Core : Fact ReciprocityTheory.ChartRestriction.T2.Core]
 
-open Formalism.NG Formalism.RepresentationBoundsCohomology.BR Formalism.RepresentationBoundsCohomology.JT Formalism.RepresentationBoundsCohomology.LocallyConstantCohomology
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC
+open Formalism.NG Formalism.RepresentationBoundsCohomology.BR
+  Formalism.RepresentationBoundsCohomology.JT
+  Formalism.RepresentationBoundsCohomology.LocallyConstantCohomology
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.RepresentationBoundsCohomology.LOC
 open ReciprocityTheory.ChartRestriction.T2 (GK PadicCoeff FracTop IsCyc IsCycOn IsFGTop cupFG)
 
 noncomputable section
@@ -24,19 +27,24 @@ theorem ko_tors (O : Type) [CommRing O] [IsDomain O] (z : KO O) : ∃ c : O, c �
   rw [Algebra.smul_def, mul_comm]
   exact hq.symm
 
-theorem psiCont (p : ℕ) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
-    [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)]
-    (A : Type) [Ring A] [Algebra O A] [TopologicalSpace A] [IsTopologicalAddGroup A]
-    [ContinuousConstSMul O A] (Y : Submodule A A) (hO : PadicCoeff p O) (hA : IsFGTop O A)
-    (ψ : Y →ₗ[O] KO O) : Continuous ψ := by
+theorem psiCont
+    (p : ℕ)
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
+    [TopologicalSpace (FractionRing O)] [IsTopologicalAddGroup (FractionRing O)]
+    [ContinuousSMul O (FractionRing O)]
+    (A : Type)
+    [Ring A] [Algebra O A] [TopologicalSpace A] [IsTopologicalAddGroup A] [ContinuousConstSMul O A]
+    (Y : Submodule A A)
+    (hO : PadicCoeff p O) (hA : IsFGTop O A) (ψ : Y →ₗ[O] KO O)
+    : Continuous ψ := by
   have hfg : IsFGTop O Y := by
     have := hA.fg
     have := hA.t2
     have := hA.csmul
     refine ⟨?_, inferInstance, ?_⟩
     · exact Module.Finite.of_injective (Y.subtype.restrictScalars O) Subtype.val_injective
-    · exact ⟨Continuous.subtype_mk (f := fun q : O × Y => q.1 • (q.2 : A))
+    · exact ⟨Continuous.subtype_mk
+        (f := fun q : O × Y => q.1 • (q.2 : A))
         (continuous_fst.smul (continuous_subtype_val.comp continuous_snd)) _⟩
   obtain ⟨a, ha, hka⟩ : ∃ a : O, a ≠ 0 ∧ ∀ y : Y, a • ψ y = 0 := by
     obtain ⟨s, hs⟩ := hfg.fg.fg_top
@@ -63,29 +71,45 @@ theorem psiCont (p : ℕ) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuat
   rw [map_smul, hka]
   exact hU0
 
-theorem inRowReal_of (p : ℕ) {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
-    [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)]
-    {A T' G : Type} [Ring A] [Algebra O A] [CommRing T'] [Algebra T' A] [Group G] [TopologicalSpace A]
-    [IsTopologicalAddGroup A] [ContinuousConstSMul O A] [ContinuousMul A]
-    {VT VT' : Type}
-    [AddCommGroup VT] [Module O VT] [TopologicalSpace VT] [IsTopologicalAddGroup VT] [ContinuousSMul O VT]
-    [AddCommGroup VT'] [Module O VT'] [TopologicalSpace VT'] [IsTopologicalAddGroup VT'] [ContinuousSMul O VT']
-    (r : G →* A) (χ : G →* T'ˣ) (E : A) (Dw : Subgroup G) [TopologicalSpace Dw]
+theorem inRowReal_of
+    (p : ℕ)
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
+    [TopologicalSpace (FractionRing O)] [IsTopologicalAddGroup (FractionRing O)]
+    [ContinuousSMul O (FractionRing O)]
+    {A T' G : Type} [Ring A] [Algebra O A] [CommRing T'] [Algebra T' A] [Group G]
+    [TopologicalSpace A] [IsTopologicalAddGroup A] [ContinuousConstSMul O A] [ContinuousMul A]
+    {VT VT' : Type} [AddCommGroup VT] [Module O VT] [TopologicalSpace VT] [IsTopologicalAddGroup VT]
+    [ContinuousSMul O VT] [AddCommGroup VT'] [Module O VT'] [TopologicalSpace VT']
+    [IsTopologicalAddGroup VT'] [ContinuousSMul O VT']
+    (r : G →* A) (χ : G →* T'ˣ)
+    (E : A)
+    (Dw : Subgroup G) [TopologicalSpace Dw]
     {T₁ T₂ : Type} [AddCommGroup T₁] [Module O T₁] [AddCommGroup T₂] [Module O T₂]
     [TopologicalSpace T₁] [IsTopologicalAddGroup T₁] [ContinuousConstSMul O T₁]
-    (ρ₁ : Representation O G T₁) (inc : T₁ →ₗ[O] A) (π : T₁ →ₗ[O] T₂)
-    (D : LatData O Dw VT VT') (v : T₂ ≃ₗ[O] D.T') (hc : Continuous fun t => v (π t))
-    (he : ∀ g t, v (π (resRep ρ₁ Dw g t)) = D.ρTl' g (v (π t)))
-    (Fs : Submodule O (H1 D.ρTl')) (Hf₁ : Submodule O (H1 (resRep ρ₁ Dw)))
+    (ρ₁ : Representation O G T₁)
+    (inc : T₁ →ₗ[O] A)
+    (π : T₁ →ₗ[O] T₂) (D : LatData O Dw VT VT') (v : T₂ ≃ₗ[O] D.T')
+    (hc : Continuous fun t => v (π t)) (he : ∀ g t, v (π (resRep ρ₁ Dw g t)) = D.ρTl' g (v (π t)))
+    (Fs : Submodule O (H1 D.ρTl'))
+    (Hf₁ : Submodule O (H1 (resRep ρ₁ Dw)))
     (hO : PadicCoeff p O) (hA : IsFGTop O A) (hinc : Continuous inc)
-    (hur : Continuous fun g : Dw => uElt r χ (g : G)) (hIm : Hf₁.map (gRow D _ π v hc he) ≤ Fs) :
-    InRowReal r χ E Dw ρ₁ inc π D v Fs (Hf₁.map (gRow D _ π v hc he)) := by
-  refine ⟨fun a => Continuous a, fun a ha => ?_, fun a ha => ?_, fun ψ f hf => ?_, fun a ha => hc.comp ha, ?_, hIm⟩
-  · refine Continuous.subtype_mk (f := fun q : Dw × Dw =>
-      inc (a q.1) * (uElt r χ (q.1 : G) * ((uElt r χ (q.2 : G) - 1) * E))) ?_ _
-    exact (hinc.comp (ha.comp continuous_fst)).mul ((hur.comp continuous_fst).mul
-      (((hur.comp continuous_snd).sub continuous_const).mul continuous_const))
+    (hur : Continuous fun g : Dw => uElt r χ (g : G)) (hIm : Hf₁.map (gRow D _ π v hc he) ≤ Fs)
+    : InRowReal r χ E Dw ρ₁ inc π D v Fs (Hf₁.map (gRow D _ π v hc he)) := by
+  refine ⟨
+    fun a => Continuous a,
+    fun a ha => ?_,
+    fun a ha => ?_,
+    fun ψ f hf => ?_,
+    fun a ha => hc.comp ha,
+    ?_,
+    hIm
+  ⟩
+  · refine Continuous.subtype_mk
+      (f := fun q : Dw × Dw => inc (a q.1) * (uElt r χ (q.1 : G) * ((uElt r χ (q.2 : G) - 1) * E)))
+      ?_ _
+    exact (hinc.comp (ha.comp continuous_fst)).mul
+      ((hur.comp continuous_fst).mul
+        (((hur.comp continuous_snd).sub continuous_const).mul continuous_const))
   · exact ((hinc.comp ha).mul (hur.mul continuous_const)).neg
   · exact (psiCont p O A (Ymod r χ E) hO hA ψ).comp hf
   · rintro _ ⟨y, _, rfl⟩

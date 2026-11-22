@@ -10,11 +10,12 @@ open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem haar_map_mul_right_eq_of_fundamentalDomain (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
-    [LocallyCompactSpace H] [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H]
+theorem haar_map_mul_right_eq_of_fundamentalDomain
+    (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
+    [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H]
     (Γ N : Subgroup H) (hΓ : Countable Γ) (hNc : IsClosed (N : Set H)) (κ : Measure N) (𝓝 : Set N)
-    (hκ : κ.IsHaarMeasure) (h𝓝 : IsFundamentalDomain (Γ.subgroupOf N) 𝓝 κ) (hfin : κ 𝓝 ≠ ⊤) (n₀ : N) :
-    κ.map (· * n₀) = κ := by
+    (hκ : κ.IsHaarMeasure) (h𝓝 : IsFundamentalDomain (Γ.subgroupOf N) 𝓝 κ) (hfin : κ 𝓝 ≠ ⊤) (n₀ : N)
+    : κ.map (· * n₀) = κ := by
   haveI : LocallyCompactSpace N := hNc.locallyCompactSpace
   haveI : SecondCountableTopology N := TopologicalSpace.Subtype.secondCountableTopology (N : Set H)
   haveI : Countable (Γ.subgroupOf N) := by
@@ -34,7 +35,9 @@ theorem haar_map_mul_right_eq_of_fundamentalDomain (H : Type) [Group H] [Topolog
   have hmap : (κ.map (· * n₀)) 𝓝 = κ ((· * n₀) ⁻¹' 𝓝) :=
     MeasurableEquiv.map_apply (MeasurableEquiv.mulRight n₀) 𝓝
   have h1 : (c : ENNReal) * κ 𝓝 = 1 * κ 𝓝 := by
-    calc (c : ENNReal) * κ 𝓝 = (c • κ) 𝓝 := by simp [Measure.smul_apply]
+    calc
+      (c : ENNReal) * κ 𝓝
+        = (c • κ) 𝓝 := by simp [Measure.smul_apply]
       _ = (κ.map (· * n₀)) 𝓝 := by rw [hc]
       _ = 1 * κ 𝓝 := by rw [one_mul]; exact hmap.trans hm
   have hc1 : c = 1 := by

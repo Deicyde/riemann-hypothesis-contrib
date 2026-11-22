@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LintegralTra
 
 @[expose] public section
 
-open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open GlobalTheory.SW hiding Level
 open scoped ComplexConjugate ComplexOrder Real Classical
 
@@ -18,8 +19,8 @@ open ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData GlobalTheory.SW.Sla
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-noncomputable def tri (x : Frame X.Ψ r) : Frame X.Ψ r :=
-  fun τ => ((mat (bOf X x) τ)⁻¹ : Matrix (Fin r) (Fin r) ℂ)
+noncomputable def tri (x : Frame X.Ψ r) : Frame X.Ψ r := fun τ =>
+  ((mat (bOf X x) τ)⁻¹ : Matrix (Fin r) (Fin r) ℂ)
 
 end GlobalTheory.Ker.Ortho
 
@@ -72,7 +73,6 @@ private lemma continuous_bOf :
       (Complex.continuous_re.comp (hd k)))) fun p => (Real.sqrt_pos.2 (_root_.ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData.abs_re_pos X p.2 τ k)).ne'
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData.bOf
   exact (hU τ).matrix_mul hs.matrix_diagonal
-
 
 open Matrix Complex NumberField MeasureTheory in
 open scoped ComplexConjugate ComplexOrder Real Classical in

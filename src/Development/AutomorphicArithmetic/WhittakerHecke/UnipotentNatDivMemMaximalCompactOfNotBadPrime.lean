@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Xg
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
+  UpperTheory.ConvolutionTheory.RankTwoDescent.Xg
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
 open UpperTheory.V.Af.Smo (EigAt)
@@ -76,13 +79,17 @@ private lemma completion_adele_natural {E : Type} [Field E] [NumberField E] (w :
   show SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w (((a : A ℚ) * iota L).2 (AdeleBaseChange.below ℚ w)) = _
   rw [h, map_mul, map_inv₀, map_natCast, map_natCast]
 
-theorem UpperTheory.unipotent_natDiv_mem_maximalCompact_of_not_badPrime :
-    ∀ (E : Type) [Field E] [NumberField E] (D : Dat ℚ E) (L a : ℕ) (w : H.P E), ¬ Bad L (w.under (𝓞 ℚ)) → Valued.v (H.cp w (rt D.θ)) ≤ 1 → H.KAt w (nu D ((a : A ℚ) * iota L)) := by
+theorem UpperTheory.unipotent_natDiv_mem_maximalCompact_of_not_badPrime
+    : ∀ (E : Type) [Field E] [NumberField E] (D : Dat ℚ E) (L a : ℕ) (w : H.P E),
+      ¬ Bad L (w.under (𝓞 ℚ)) → Valued.v (H.cp w (rt D.θ)) ≤ 1
+        → H.KAt w (nu D ((a : A ℚ) * iota L)) := by
   intro E _ _ D L a w hL hθ
   have hL1 := val_nat_one w L (not_mem_of_bad w L hL)
   have hz : Valued.v (H.cp w (D.mkE 0 ((a : A ℚ) * iota L))) ≤ 1 := by
-    rw [Dat.mkE, map_zero, zero_add, map_mul, map_mul, completion_adele_natural, map_mul, map_inv₀, hL1, inv_one, mul_one]
-    calc _ ≤ (1 : _) * 1 := mul_le_mul' (val_nat_le w a) hθ
+    rw [Dat.mkE, map_zero, zero_add, map_mul, map_mul, completion_adele_natural, map_mul, map_inv₀,
+      hL1, inv_one, mul_one]
+    calc
+      _ ≤ (1 : _) * 1 := mul_le_mul' (val_nat_le w a) hθ
       _ = 1 := mul_one 1
   show Matrix.GeneralLinearGroup.map (H.cp w) (gl (nU (D.mkE 0 ((a : A ℚ) * iota L)))) ∈ GlobalTheory.LFun.KGL w (n := 2)
   rw [map_gl_nU]

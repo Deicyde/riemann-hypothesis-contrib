@@ -71,10 +71,14 @@ lemma geom_step (z : ℂ) (κ c M : ℝ) (hz : ‖z‖ < Real.exp κ) (hc : 0 �
       _ ≤ (D * Real.exp κ) * (Real.exp (κ * i) * M) := mul_le_mul_of_nonneg_right hD hEM
       _ = _ := by ring
 
-theorem bound_of_natDegree (n : ℕ) : ∀ (p : ℂ[X]) (κ : ℝ), p.Monic → p.natDegree = n →
-    (∀ z, p.IsRoot z → ‖z‖ < Real.exp κ) →
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ (u : ℕ → ℂ) (M : ℝ), aeval shift p u = 0 →
-      (∀ j < n, ‖u j‖ ≤ M) → 0 ≤ M → ∀ i : ℕ, ‖u i‖ ≤ C * Real.exp (κ * i) * M := by
+theorem bound_of_natDegree (n : ℕ)
+    : ∀ (p : ℂ[X]) (κ : ℝ),
+      p.Monic → p.natDegree = n → (∀ z, p.IsRoot z → ‖z‖ < Real.exp κ)
+        → ∃ C : ℝ,
+          0 ≤ C
+            ∧ ∀ (u : ℕ → ℂ) (M : ℝ),
+              aeval shift p u = 0 → (∀ j < n, ‖u j‖ ≤ M) → 0 ≤ M
+                → ∀ i : ℕ, ‖u i‖ ≤ C * Real.exp (κ * i) * M := by
   induction n with
   | zero =>
     intro p κ hp hd _
@@ -89,31 +93,42 @@ theorem bound_of_natDegree (n : ℕ) : ∀ (p : ℂ[X]) (κ : ℝ), p.Monic → 
     simp [hu0]
   | succ n ih =>
     intro p κ hp hd hr
-    obtain ⟨z, hz⟩ : ∃ z, p.IsRoot z := IsAlgClosed.exists_root p (by
-      intro h0
-      have : p.natDegree = 0 := natDegree_eq_zero_iff_degree_le_zero.2 h0.le
-      omega)
+    obtain ⟨z, hz⟩ : ∃ z, p.IsRoot z :=
+      IsAlgClosed.exists_root p (by
+        intro h0
+        have : p.natDegree = 0 := natDegree_eq_zero_iff_degree_le_zero.2 h0.le
+        omega)
     have hzlt := hr z hz
     obtain ⟨q, rfl⟩ := dvd_iff_isRoot.2 hz
     have hq : q.Monic := (monic_X_sub_C z).of_mul_monic_left hp
     have hqd : q.natDegree = n := by
       rw [(monic_X_sub_C z).natDegree_mul hq, natDegree_X_sub_C] at hd
       omega
-    obtain ⟨C', hC', hB⟩ := ih q κ hq hqd fun w hw => hr w (by
-      have hw' : eval w q = 0 := hw
-      simp [IsRoot, hw'])
+    obtain ⟨C', hC', hB⟩ :=
+      ih q κ hq hqd fun w hw =>
+        hr w (by
+          have hw' : eval w q = 0 := hw
+          simp [IsRoot, hw'])
     have hpos : 0 < Real.exp κ - ‖z‖ := sub_pos.2 hzlt
     have hc : 0 ≤ C' * (1 + ‖z‖) := by positivity
     refine ⟨1 + C' * (1 + ‖z‖) / (Real.exp κ - ‖z‖), by positivity, fun u M hu hM hM0 i => ?_⟩
     refine geom_step z κ _ M hzlt hc hM0 u (hM 0 (Nat.succ_pos n)) (fun i => ?_) i
-    have hb := hB (fun i => u (i + 1) - z * u i) ((1 + ‖z‖) * M) (aeval_diff q z u hu)
-      (fun j hj => ?_) (by positivity) i
-    · calc ‖u (i + 1) - z * u i‖ ≤ C' * Real.exp (κ * i) * ((1 + ‖z‖) * M) := hb
+    have hb :=
+      hB
+        (fun i => u (i + 1) - z * u i)
+        ((1 + ‖z‖) * M) (aeval_diff q z u hu)
+        (fun j hj => ?_)
+        (by positivity) i
+    · calc
+        ‖u (i + 1) - z * u i‖
+          ≤ C' * Real.exp (κ * i) * ((1 + ‖z‖) * M) := hb
         _ = _ := by ring
-    · calc ‖u (j + 1) - z * u j‖ ≤ ‖u (j + 1)‖ + ‖z * u j‖ := norm_sub_le _ _
+    · calc
+        ‖u (j + 1) - z * u j‖
+          ≤ ‖u (j + 1)‖ + ‖z * u j‖ := norm_sub_le _ _
         _ = ‖u (j + 1)‖ + ‖z‖ * ‖u j‖ := by rw [norm_mul]
-        _ ≤ M + ‖z‖ * M := add_le_add (hM _ (by omega))
-            (mul_le_mul_of_nonneg_left (hM _ (by omega)) (norm_nonneg _))
+        _ ≤ M + ‖z‖ * M :=
+          add_le_add (hM _ (by omega)) (mul_le_mul_of_nonneg_left (hM _ (by omega)) (norm_nonneg _))
         _ = _ := by ring
 
 theorem recBound : PositivityTheory.Rg.Rs.An.RecBound := by

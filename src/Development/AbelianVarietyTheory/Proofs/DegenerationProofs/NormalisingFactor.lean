@@ -13,8 +13,8 @@ open scoped BigOperators
 
 namespace GlobalTheory.Ex.SymLift
 
-theorem odd_root_iff {U : Type} [CommGroup U] (j : ℕ) (E P w : U) (h : E ^ (2 * j + 1) = P ^ 2) :
-    w = P / E ^ j ↔ (w ^ 2 = E ∧ w ^ (2 * j + 1) = P) := by
+theorem odd_root_iff {U : Type} [CommGroup U] (j : ℕ) (E P w : U) (h : E ^ (2 * j + 1) = P ^ 2)
+    : w = P / E ^ j ↔ (w ^ 2 = E ∧ w ^ (2 * j + 1) = P) := by
   constructor
   · rintro rfl
     have h' := congrArg Additive.ofMul h
@@ -31,19 +31,21 @@ theorem odd_root_iff {U : Type} [CommGroup U] (j : ℕ) (E P w : U) (h : E ^ (2 
 
 variable {O : Type} [CommRing O] (N : NumD O)
 
-theorem tk_pow {k : ℕ} (p p' : N.QT k) :
-    N.tk p p' ^ k = N.τ p.1.1.toAdd p'.1.1.toAdd *
-      (cubN N.θ k 1 p.1.2.b (p'.1.2.b ^ k) * cubN N.θ k 1 p'.1.2.b p.1.2.b ^ k) := by
+theorem tk_pow {k : ℕ} (p p' : N.QT k)
+    : N.tk p p' ^ k
+      = N.τ p.1.1.toAdd p'.1.1.toAdd
+        * (cubN N.θ k 1 p.1.2.b (p'.1.2.b ^ k) * cubN N.θ k 1 p'.1.2.b p.1.2.b ^ k) := by
   have a := NumD.Gt.pow_s p.1.2 k p'.1.1.toAdd
   rw [N.mem_QT.1 p.2, NumD.io_s, ← N.QT_pow_b p'] at a
   rw [NumD.tk, mul_pow, ← a, mul_assoc]
 
-theorem tk_mul_left {k : ℕ} (p p' p'' : N.QT k) :
-    N.tk (p * p') p'' * N.θ p''.1.2.b p.1.2.b p'.1.2.b ^ k = N.tk p p'' * N.tk p' p'' := by
+theorem tk_mul_left {k : ℕ} (p p' p'' : N.QT k)
+    : N.tk (p * p') p'' * N.θ p''.1.2.b p.1.2.b p'.1.2.b ^ k = N.tk p p'' * N.tk p' p'' := by
   have a := N.cub.N_add k 1 p''.1.2.b p.1.2.b p'.1.2.b
   rw [N.cub.face, mul_one, one_mul, N.QT_pow_b p''] at a
-  change p.1.2.s p''.1.1.toAdd * p'.1.2.s p''.1.1.toAdd / N.θ (N.c p''.1.1.toAdd) p.1.2.b p'.1.2.b *
-    cubN N.θ k 1 p''.1.2.b (p.1.2.b * p'.1.2.b) * _ = _
+  change p.1.2.s p''.1.1.toAdd * p'.1.2.s p''.1.1.toAdd / N.θ (N.c p''.1.1.toAdd) p.1.2.b p'.1.2.b
+      * cubN N.θ k 1 p''.1.2.b (p.1.2.b * p'.1.2.b) * _
+    = _
   replace a := congrArg Additive.ofMul a
   apply Additive.ofMul.injective
   simp only [NumD.tk, ofMul_mul, ofMul_div] at a ⊢
@@ -53,12 +55,15 @@ theorem tk_one_left {k : ℕ} (p : N.QT k) : N.tk 1 p = 1 := by
   change 1 * cubN N.θ k 1 p.1.2.b 1 = 1
   rw [N.cub.N_one, one_mul]
 
-theorem wQ_iff {k : ℕ} (hk : Odd k) (p : N.QT k) (w : Oˣ) :
-    w = N.wQ p ↔ (w ^ 2 * dbl N.θ N.σ p.1.2.b ^ k = N.tk p p ∧
-      w ^ k = N.ψ p.1.1.toAdd * mulq N.θ N.σ k p.1.2.b) := by
+theorem wQ_iff {k : ℕ} (hk : Odd k) (p : N.QT k) (w : Oˣ)
+    : w = N.wQ p
+      ↔ (w ^ 2 * dbl N.θ N.σ p.1.2.b ^ k = N.tk p p
+        ∧ w ^ k = N.ψ p.1.1.toAdd * mulq N.θ N.σ k p.1.2.b) := by
   obtain ⟨j, rfl⟩ := hk
-  have e : N.wQ p = N.ψ p.1.1.toAdd * mulq N.θ N.σ (2 * j + 1) p.1.2.b /
-      (N.tk p p / dbl N.θ N.σ p.1.2.b ^ (2 * j + 1)) ^ j := by
+  have e
+      : N.wQ p
+        = N.ψ p.1.1.toAdd * mulq N.θ N.σ (2 * j + 1) p.1.2.b
+          / (N.tk p p / dbl N.θ N.σ p.1.2.b ^ (2 * j + 1)) ^ j := by
     have : (2 * j + 1 - 1) / 2 = j := by omega
     simp only [NumD.wQ, NumB.wS, NumD.tk, this]
   rw [e, odd_root_iff, eq_div_iff_mul_eq']
@@ -73,13 +78,15 @@ theorem wQ_iff {k : ℕ} (hk : Odd k) (p : N.QT k) (w : Oˣ) :
   simp only [ofMul_mul, ofMul_div, ofMul_pow] at a b c ⊢
   linear_combination (norm := module) a + b + c
 
-theorem dbl_mul (x y : N.A) :
-    dbl N.θ N.σ (x * y) * (N.θ (x * y) x y * N.θ x x y * N.θ y x y) = dbl N.θ N.σ x * dbl N.θ N.σ y := by
+theorem dbl_mul (x y : N.A)
+    : dbl N.θ N.σ (x * y) * (N.θ (x * y) x y * N.θ x x y * N.θ y x y)
+      = dbl N.θ N.σ x * dbl N.θ N.σ y := by
   have a := (GlobalTheory.T.mulq_dbl_cubN_relations O N.toNumB 2 0 x y).2.1
   have c := N.cub.coc x y y x
   rw [N.cub.s12 (x * y), N.cub.s12 x y x, N.cub.s12 x (y * y), N.cub.s12 y y x] at c
-  simp only [mulq, cubN, Finset.prod_range_succ, Finset.prod_range_zero, pow_zero, pow_one, one_mul, mul_one,
-    N.cub.face, div_one, sq] at a
+  simp only [mulq, cubN, Finset.prod_range_succ, Finset.prod_range_zero, pow_zero, pow_one, one_mul,
+      mul_one, N.cub.face, div_one, sq]
+    at a
   rw [N.cub.s12 y y x] at a
   replace a := congrArg Additive.ofMul a
   replace c := congrArg Additive.ofMul c
@@ -87,8 +94,8 @@ theorem dbl_mul (x y : N.A) :
   simp only [ofMul_mul, ofMul_div, ofMul_one] at a c ⊢
   linear_combination (norm := abel) c - a
 
-theorem wQ_mul {k : ℕ} (hk : Odd k) (p p' : N.QT k) :
-    N.wQ p * N.wQ p' * N.tk p p' = N.wp p p' ^ ((k + 1) / 2) * N.wQ (p * p') := by
+theorem wQ_mul {k : ℕ} (hk : Odd k) (p p' : N.QT k)
+    : N.wQ p * N.wQ p' * N.tk p p' = N.wp p p' ^ ((k + 1) / 2) * N.wQ (p * p') := by
   obtain ⟨a₁, a₂⟩ := (wQ_iff N hk p _).1 rfl
   obtain ⟨b₁, b₂⟩ := (wQ_iff N hk p' _).1 rfl
   rw [← div_eq_iff_eq_mul', wQ_iff N hk]
@@ -106,8 +113,15 @@ theorem wQ_mul {k : ℕ} (hk : Odd k) (p p' : N.QT k) :
     obtain ⟨j, rfl⟩ := hk
     have : (2 * j + 1 + 1) / 2 = j + 1 := by omega
     rw [this]
-    have a₁ := E a₁; have b₁ := E b₁; have k₁ := E k₁; have t₁ := E t₁; have t₂ := E t₂; have t₃ := E t₃
-    have w₂ := E w₂; have w₃ := E w₃; have d := E d
+    have a₁ := E a₁
+    have b₁ := E b₁
+    have k₁ := E k₁
+    have t₁ := E t₁
+    have t₂ := E t₂
+    have t₃ := E t₃
+    have w₂ := E w₂
+    have w₃ := E w₃
+    have d := E d
     apply Additive.ofMul.injective
     simp only [NumD.wp, ofMul_mul, ofMul_div, ofMul_pow, ofMul_one] at a₁ b₁ k₁ t₁ t₂ t₃ w₂ w₃ d ⊢
     linear_combination (norm := module) a₁ + b₁ - k₁ - t₁ - t₂ - t₃ + w₂ + w₃ + (2 * j + 1) • d
@@ -115,7 +129,12 @@ theorem wQ_mul {k : ℕ} (hk : Odd k) (p p' : N.QT k) :
     have m := (GlobalTheory.T.mulq_dbl_cubN_relations O N.toNumB k 0 p.1.2.b p'.1.2.b).2.1
     have s := N.ψ_add p.1.1.toAdd p'.1.1.toAdd
     change _ = N.ψ (p.1.1.toAdd + p'.1.1.toAdd) * mulq N.θ N.σ k (p.1.2.b * p'.1.2.b)
-    have a₂ := E a₂; have b₂ := E b₂; have k₁ := E k₁; have t := E t; have m := E m; have s := E s
+    have a₂ := E a₂
+    have b₂ := E b₂
+    have k₁ := E k₁
+    have t := E t
+    have m := E m
+    have s := E s
     apply Additive.ofMul.injective
     simp only [ofMul_mul, ofMul_div, ofMul_pow, ofMul_one] at a₂ b₂ k₁ t m s ⊢
     linear_combination (norm := module) a₂ + b₂ - ((k + 1) / 2) • k₁ + t - m - s
@@ -137,7 +156,11 @@ theorem wQ_inv {k : ℕ} (hk : Odd k) (p : N.QT k) : N.wQ p⁻¹ * N.σ p.1.2.b 
     rw [tk_one_left, e] at t₁ t₂
     rw [N.cub.s01 p.1.2.b p.1.2.b p.1.2.b⁻¹, N.cub.s12 p.1.2.b p.1.2.b p.1.2.b⁻¹] at t₂
     rw [e]
-    have a₁ := E a₁; have t₁ := E t₁; have t₂ := E t₂; have w₁ := E w₁; have s := E s
+    have a₁ := E a₁
+    have t₁ := E t₁
+    have t₂ := E t₂
+    have w₁ := E w₁
+    have s := E s
     apply Additive.ofMul.injective
     simp only [NumD.wp, dbl, inv_inv, ofMul_mul, ofMul_div, ofMul_pow, ofMul_one] at a₁ t₁ t₂ w₁ s ⊢
     linear_combination (norm := module) a₁ + t₁ - t₂ + w₁ - k • s
@@ -145,12 +168,23 @@ theorem wQ_inv {k : ℕ} (hk : Odd k) (p : N.QT k) : N.wQ p⁻¹ * N.σ p.1.2.b 
     have s := N.even p.1.1.toAdd
     rw [← N.QT_pow_b p] at s
     change _ = N.ψ (-p.1.1.toAdd) * mulq N.θ N.σ k p.1.2.b⁻¹
-    have a₂ := E a₂; have m := E m; have s := E s
+    have a₂ := E a₂
+    have m := E m
+    have s := E s
     apply Additive.ofMul.injective
     simp only [ofMul_mul, ofMul_div, ofMul_pow] at a₂ m s ⊢
     linear_combination (norm := module) a₂ - m - s
 
-theorem normalising_factor : ∀ (O : Type) [CommRing O] (N : NumD O), ∀ (k : ℕ), Odd k → ∀ p p' : N.QT k, (∀ w : Oˣ, w = N.wQ p ↔ (w ^ 2 * dbl N.θ N.σ p.1.2.b ^ k = N.tk p p ∧ w ^ k = N.ψ p.1.1.toAdd * mulq N.θ N.σ k p.1.2.b)) ∧ N.wQ p * N.wQ p' * N.tk p p' = N.wp p p' ^ ((k + 1) / 2) * N.wQ (p * p') ∧ N.wQ p⁻¹ * N.σ p.1.2.b ^ k = N.wQ p :=
-  fun _ _ N _ hk p p' => ⟨wQ_iff N hk p, wQ_mul N hk p p', wQ_inv N hk p⟩
+theorem normalising_factor
+    : ∀ (O : Type) [CommRing O] (N : NumD O), ∀ (k : ℕ),
+      Odd k
+        → ∀ p p' : N.QT k,
+          (∀ w : Oˣ,
+              w = N.wQ p
+                ↔ (w ^ 2 * dbl N.θ N.σ p.1.2.b ^ k = N.tk p p
+                  ∧ w ^ k = N.ψ p.1.1.toAdd * mulq N.θ N.σ k p.1.2.b))
+            ∧ N.wQ p * N.wQ p' * N.tk p p' = N.wp p p' ^ ((k + 1) / 2) * N.wQ (p * p')
+            ∧ N.wQ p⁻¹ * N.σ p.1.2.b ^ k = N.wQ p := fun _ _ N _ hk p p' =>
+  ⟨wQ_iff N hk p, wQ_mul N hk p p', wQ_inv N hk p⟩
 
 end GlobalTheory.Ex.SymLift

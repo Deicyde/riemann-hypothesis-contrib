@@ -8,12 +8,18 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EtaleEmpty
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.OTY
 
-theorem jdet_isFrameOn_kap : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La] (A : WeightedAtlas n Y ι La), ∀ (U : Set Y) (z : Y → V n), Etale A U z → A.IsFrameOn A.kap U (jdet A z) := by
+theorem jdet_isFrameOn_kap
+    : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
+        [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La]
+        (A : WeightedAtlas n Y ι La),
+      ∀ (U : Set Y) (z : Y → V n),
+        Etale A U z → A.IsFrameOn A.kap U (jdet A z) := by
   intro n Y _ _ _ _ _ ι La _ A U z hz
   refine ⟨⟨fun i => ?_, fun i j y hy hi hj => ?_⟩, fun y hy => hz.det_ne _ y hy (A.mem_pick y)⟩
   · set S := (A.chart i).target ∩ (A.chart i).symm ⁻¹' U with hS
@@ -45,13 +51,17 @@ theorem jdet_isFrameOn_kap : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Sp
       (A.chart j).isOpen_inter_preimage_symm hz.isOpen
     have hmj : A.chart j y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' U :=
       ⟨(A.chart j).map_source hj, by simp [(A.chart j).left_inv hj, hy]⟩
-    have hzj : DifferentiableAt ℂ (z ∘ (A.chart j).symm) ((A.chart j ∘ (A.chart i).symm) (A.chart i y)) := by
+    have hzj : DifferentiableAt ℂ (z ∘ (A.chart j).symm)
+        ((A.chart j ∘ (A.chart i).symm) (A.chart i y)) := by
       rw [hτy]; exact (hz.holo j).differentiableAt (hSo.mem_nhds hmj)
-    have hev : z ∘ (A.chart i).symm =ᶠ[𝓝 (A.chart i y)]
-        (z ∘ (A.chart j).symm) ∘ (A.chart j ∘ (A.chart i).symm) := by
+    have hev
+        : z ∘ (A.chart i).symm =ᶠ[𝓝 (A.chart i y)]
+          (z ∘ (A.chart j).symm) ∘ (A.chart j ∘ (A.chart i).symm) := by
       filter_upwards [hov.mem_nhds hmov] with v hv
       simp only [Function.comp_apply, (A.chart j).left_inv hv.2]
-    have hjz : jz A z i y = (jz A z j y).comp (fderiv ℂ (A.chart j ∘ (A.chart i).symm) (A.chart i y)) := by
+    have hjz
+        : jz A z i y
+          = (jz A z j y).comp (fderiv ℂ (A.chart j ∘ (A.chart i).symm) (A.chart i y)) := by
       unfold jz
       rw [hev.fderiv_eq, fderiv_comp _ hzj hτ, hτy]
     simp only [jdet]

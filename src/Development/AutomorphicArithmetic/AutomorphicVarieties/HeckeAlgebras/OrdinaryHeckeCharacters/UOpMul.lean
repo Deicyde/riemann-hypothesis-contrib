@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 open IsLocalRing Matrix UpperTheory.V.Hi
 
-private theorem UpperTheory.V.Hi.uOpMul_mem {G : Type} [Group G] (I : Iwa G) (a x : G) :
-    x ∈ I.Nconj a ↔ a⁻¹ * x * a ∈ I.N := by
+private theorem UpperTheory.V.Hi.uOpMul_mem {G : Type} [Group G] (I : Iwa G) (a x : G)
+    : x ∈ I.Nconj a ↔ a⁻¹ * x * a ∈ I.N := by
   constructor
   · intro h
     obtain ⟨n, hn, e⟩ := Subgroup.mem_map.1 h
@@ -20,10 +20,16 @@ private theorem UpperTheory.V.Hi.uOpMul_mem {G : Type} [Group G] (I : Iwa G) (a 
     show a * (a⁻¹ * x * a) * a⁻¹ = x
     group
 
-private theorem UpperTheory.V.Hi.uOpMul_sum {G : Type} [Group G] (I : Iwa G) {A M : Type} [CommRing A] [AddCommGroup M]
-    [Module A M] (π : Representation A G M) {a : G} (ha : a ∈ I.P) {ι : Type} (s : Finset ι) (f : ι → G)
-    (hf : ∀ i ∈ s, f i ∈ I.N) (hu : ∀ x ∈ I.N, ∃! i, i ∈ s ∧ a⁻¹ * ((f i)⁻¹ * x) * a ∈ I.N)
-    {v : M} (hv : v ∈ fixd π I.N) : I.uOp π a v = ∑ i ∈ s, π (f i * a) v := by
+private theorem UpperTheory.V.Hi.uOpMul_sum
+    {G : Type} [Group G]
+    (I : Iwa G)
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (π : Representation A G M)
+    {a : G} (ha : a ∈ I.P)
+    {ι : Type} (s : Finset ι) (f : ι → G) (hf : ∀ i ∈ s, f i ∈ I.N)
+    (hu : ∀ x ∈ I.N, ∃! i, i ∈ s ∧ a⁻¹ * ((f i)⁻¹ * x) * a ∈ I.N)
+    {v : M} (hv : v ∈ fixd π I.N)
+    : I.uOp π a v = ∑ i ∈ s, π (f i * a) v := by
   classical
   have inj : Set.InjOn f s := by
     intro i hi j hj e
@@ -39,14 +45,20 @@ private theorem UpperTheory.V.Hi.uOpMul_sum {G : Type} [Group G] (I : Iwa G) {A 
     obtain ⟨j, hj, rfl⟩ := Finset.mem_image.1 h1
     rw [hun j ⟨hj, (uOpMul_mem I a _).1 h2⟩]
 
-private theorem UpperTheory.V.Hi.uOpMul_ex {G : Type} [Group G] (I : Iwa G) {a : G} (ha : a ∈ I.P) :
-    ∃ s : Finset G, (∀ u ∈ s, u ∈ I.N) ∧ ∀ x ∈ I.N, ∃! u, u ∈ s ∧ a⁻¹ * (u⁻¹ * x) * a ∈ I.N := by
+private theorem UpperTheory.V.Hi.uOpMul_ex {G : Type} [Group G] (I : Iwa G) {a : G} (ha : a ∈ I.P)
+    : ∃ s : Finset G, (∀ u ∈ s, u ∈ I.N) ∧ ∀ x ∈ I.N, ∃! u, u ∈ s ∧ a⁻¹ * (u⁻¹ * x) * a ∈ I.N := by
   obtain ⟨s, h1, h2⟩ := (uOpSum G I ℤ ℤ (Representation.trivial ℤ G ℤ) a ha).1
   refine ⟨s, h1, fun x hx => ?_⟩
   simpa only [uOpMul_mem] using h2 x hx
 
-theorem UpperTheory.V.Hi.uOpMul :
-    ∀ (G : Type) [Group G] (I : Iwa G) (A M : Type) [CommRing A] [AddCommGroup M] [Module A M] (π : Representation A G M) (a b : G), a ∈ I.P → b ∈ I.P → ∀ v ∈ fixd π I.N, I.uOp π a v ∈ fixd π I.N ∧ I.uOp π a (I.uOp π b v) = I.uOp π (a * b) v ∧ I.uOp π 1 v = v ∧ (∀ t ∈ I.T, π t (I.uOp π a v) = I.uOp π a (π t v)) ∧ (a⁻¹ ∈ I.P → I.uOp π a v = π a v) := by
+theorem UpperTheory.V.Hi.uOpMul
+    : ∀ (G : Type) [Group G] (I : Iwa G) (A M : Type) [CommRing A] [AddCommGroup M] [Module A M]
+        (π : Representation A G M) (a b : G),
+      a ∈ I.P → b ∈ I.P
+        → ∀ v ∈ fixd π I.N,
+          I.uOp π a v ∈ fixd π I.N ∧ I.uOp π a (I.uOp π b v) = I.uOp π (a * b) v ∧ I.uOp π 1 v = v
+            ∧ (∀ t ∈ I.T, π t (I.uOp π a v) = I.uOp π a (π t v))
+            ∧ (a⁻¹ ∈ I.P → I.uOp π a v = π a v) := by
   intro G _ I A M _ _ _ π a b ha hb v hv
   have mul : ∀ (g h : G) (w : M), π g (π h w) = π (g * h) w := fun g h w => by
     rw [map_mul π g h, Module.End.mul_apply]
@@ -54,9 +66,14 @@ theorem UpperTheory.V.Hi.uOpMul :
     intro c hc n hn
     obtain ⟨s, hs, hu⟩ := uOpMul_ex I hc
     have e1 := uOpMul_sum I π hc s id hs hu hv
-    have e2 := uOpMul_sum I π hc s (fun u => n * u) (fun u h => mul_mem hn (hs u h)) (fun x hx => by
-      have := hu (n⁻¹ * x) (mul_mem (inv_mem hn) hx)
-      simpa only [_root_.mul_inv_rev, mul_assoc] using this) hv
+    have e2 :=
+      uOpMul_sum I π hc s
+        (fun u => n * u)
+        (fun u h => mul_mem hn (hs u h))
+        (fun x hx => by
+          have := hu (n⁻¹ * x) (mul_mem (inv_mem hn) hx)
+          simpa only [_root_.mul_inv_rev, mul_assoc] using this)
+        hv
     conv_lhs => rw [e1]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [e2, map_sum]
@@ -71,7 +88,8 @@ theorem UpperTheory.V.Hi.uOpMul :
   · obtain ⟨s, hs, hu⟩ := uOpMul_ex I ha
     obtain ⟨r, hr, hw⟩ := uOpMul_ex I hb
     rw [uOpMul_sum I π ha s id hs hu (fix b hb), uOpMul_sum I π hb r id hr hw hv,
-      uOpMul_sum I π (mul_mem ha hb) (s ×ˢ r) (fun p => p.1 * (a * p.2 * a⁻¹)) ?_ ?_ hv, Finset.sum_product]
+      uOpMul_sum I π (mul_mem ha hb) (s ×ˢ r) (fun p => p.1 * (a * p.2 * a⁻¹)) ?_ ?_ hv,
+      Finset.sum_product]
     · refine Finset.sum_congr rfl fun u _ => ?_
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
@@ -84,8 +102,11 @@ theorem UpperTheory.V.Hi.uOpMul :
       rw [Finset.mem_product] at hp
       exact mul_mem (hs _ hp.1) (I.P_N a ha _ (hr _ hp.2))
     · intro x hx
-      have e : ∀ u w : G, (a * b)⁻¹ * ((u * (a * w * a⁻¹))⁻¹ * x) * (a * b) =
-          b⁻¹ * (w⁻¹ * (a⁻¹ * (u⁻¹ * x) * a)) * b := fun u w => by group
+      have e
+          : ∀ u w : G,
+            (a * b)⁻¹ * ((u * (a * w * a⁻¹))⁻¹ * x) * (a * b)
+              = b⁻¹ * (w⁻¹ * (a⁻¹ * (u⁻¹ * x) * a)) * b := fun u w => by
+        group
       obtain ⟨u, ⟨hus, hux⟩, hun⟩ := hu x hx
       obtain ⟨w, ⟨hwr, hwx⟩, hwn⟩ := hw _ hux
       refine ⟨(u, w), ⟨Finset.mem_product.2 ⟨hus, hwr⟩, by rw [e]; exact hwx⟩, ?_⟩
@@ -111,18 +132,23 @@ theorem UpperTheory.V.Hi.uOpMul :
       rw [mul, this, ← mul, hv _ (hN n hn)]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [uOpMul_sum I π ha s id hs hu hv,
-      uOpMul_sum I π ha s (fun u => t * u * t⁻¹) (fun u h => I.T_N t ht u (hs u h)) ?_ htv, map_sum]
+        uOpMul_sum I π ha s (fun u => t * u * t⁻¹) (fun u h => I.T_N t ht u (hs u h)) ?_ htv,
+        map_sum]
     · refine Finset.sum_congr rfl fun u _ => ?_
       rw [mul, mul, mul_assoc _ a t, ← hc]
       congr 2
       simp only [id]
       group
     · intro x hx
-      have e : ∀ u : G, a⁻¹ * ((t * u * t⁻¹)⁻¹ * x) * a = t * (a⁻¹ * (u⁻¹ * (t⁻¹ * x * t)) * a) * t⁻¹ := by
+      have e
+          : ∀ u : G,
+            a⁻¹ * ((t * u * t⁻¹)⁻¹ * x) * a = t * (a⁻¹ * (u⁻¹ * (t⁻¹ * x * t)) * a) * t⁻¹ := by
         intro u
         have h1 : a⁻¹ * t = t * a⁻¹ := (Commute.inv_left (show Commute a t from hc.symm)).eq
         have h2 : a = t * a * t⁻¹ := by rw [hc]; group
-        calc a⁻¹ * ((t * u * t⁻¹)⁻¹ * x) * a = (a⁻¹ * t) * (u⁻¹ * t⁻¹ * x) * a := by group
+        calc
+          a⁻¹ * ((t * u * t⁻¹)⁻¹ * x) * a
+            = (a⁻¹ * t) * (u⁻¹ * t⁻¹ * x) * a := by group
           _ = (t * a⁻¹) * (u⁻¹ * t⁻¹ * x) * (t * a * t⁻¹) := by rw [h1, ← h2]
           _ = _ := by group
       have e' : ∀ y : G, t * y * t⁻¹ ∈ I.N ↔ y ∈ I.N := fun y =>

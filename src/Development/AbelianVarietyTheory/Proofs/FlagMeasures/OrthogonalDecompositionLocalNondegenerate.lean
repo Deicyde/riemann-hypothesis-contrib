@@ -7,16 +7,20 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocCl
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.DecompOrth
 
 variable {D : D7}
 
-theorem mem_orth_of_basis {n : ℕ} (U : Submodule D.host.E (VS D).V)
-    (b : Module.Basis (Fin n) D.host.E U) (y : (VS D).V)
-    (hy : ∀ i, (VS D).hT (b i : (VS D).V) y = 0) : y ∈ orth (VS D) U := by
+theorem mem_orth_of_basis
+    {n : ℕ} (U : Submodule D.host.E (VS D).V) (b : Module.Basis (Fin n) D.host.E U)
+    (y : (VS D).V) (hy : ∀ i, (VS D).hT (b i : (VS D).V) y = 0)
+    : y ∈ orth (VS D) U := by
   simp only [orth, Submodule.mem_iInf, LinearMap.mem_ker]
   intro u hu
   have hu' : u = ∑ i, b.repr ⟨u, hu⟩ i • (b i : (VS D).V) := by
@@ -28,8 +32,8 @@ theorem mem_orth_of_basis {n : ℕ} (U : Submodule D.host.E (VS D).V)
     rw [hu', map_sum]
   simp [hy]
 
-theorem exists_decomp (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth (VS D) U = ⊥)
-    (x : (VS D).V) : ∃ a ∈ orth (VS D) U, ∃ b ∈ U, x = a + b := by
+theorem exists_decomp (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth (VS D) U = ⊥) (x : (VS D).V)
+    : ∃ a ∈ orth (VS D) U, ∃ b ∈ U, x = a + b := by
   let b := Module.finBasis D.host.E U
   let L : U →ₗ[D.host.E] (Fin (Module.finrank D.host.E U) → D.host.E) :=
     LinearMap.pi (fun i => ((VS D).hT (b i : (VS D).V)).comp U.subtype)
@@ -49,9 +53,10 @@ theorem exists_decomp (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth (VS D) 
   simp only [L, LinearMap.pi_apply, LinearMap.comp_apply, Submodule.subtype_apply] at this
   rw [map_sub, this, sub_self]
 
-theorem gram_det_ne_zero {n : ℕ} (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth (VS D) U = ⊥)
-    (b : Module.Basis (Fin n) D.host.E U) :
-    (Matrix.of fun i j => (VS D).hT (b i : (VS D).V) (b j : (VS D).V)).det ≠ 0 := by
+theorem gram_det_ne_zero
+    {n : ℕ} (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth (VS D) U = ⊥)
+    (b : Module.Basis (Fin n) D.host.E U)
+    : (Matrix.of fun i j => (VS D).hT (b i : (VS D).V) (b j : (VS D).V)).det ≠ 0 := by
   intro h
   obtain ⟨α, hα0, hα⟩ := Matrix.exists_mulVec_eq_zero_iff.2 h
   apply hα0
@@ -75,21 +80,26 @@ namespace GlobalTheory.DecompOrth
 
 variable {D : D7}
 
-noncomputable def formLeft (Z : LocDat D) (p : PlF D) (w : Vp D p) : Vp D p →ₗ[(D.s.atP p).Ep] (D.s.atP p).Ep where
+noncomputable def formLeft (Z : LocDat D) (p : PlF D) (w : Vp D p)
+    : Vp D p →ₗ[(D.s.atP p).Ep] (D.s.atP p).Ep where
   toFun v := LocFacts₂ Z.M p v w
   map_add' x y := (locH Z p).h_add_left x y w
   map_smul' a x := (locH Z p).h_smul_left a x w
 
-theorem formLeft_apply (Z : LocDat D) (p : PlF D) (w v : Vp D p) :
-    formLeft Z p w v = LocFacts₂ Z.M p v w := rfl
+theorem formLeft_apply (Z : LocDat D) (p : PlF D) (w v : Vp D p)
+    : formLeft Z p w v = LocFacts₂ Z.M p v w :=
+  rfl
 
-theorem eq_zero_of_local_orth (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth (VS D) U = ⊥)
+theorem eq_zero_of_local_orth
+    (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth (VS D) U = ⊥)
     (Z : LocDat D) (p : PlF D) (v : Vp D p)
     (hv : v ∈ Submodule.span (D.s.atP p).Ep (baseChange₂ D p '' (U : Set (VS D).V)))
-    (horth : ∀ u ∈ U, LocFacts₂ Z.M p v (baseChange₂ D p u) = 0) : v = 0 := by
+    (horth : ∀ u ∈ U, LocFacts₂ Z.M p v (baseChange₂ D p u) = 0)
+    : v = 0 := by
   let b := Module.finBasis D.host.E U
-  have hspan : Submodule.span (D.s.atP p).Ep (baseChange₂ D p '' (U : Set (VS D).V)) ≤
-      Submodule.span (D.s.atP p).Ep (Set.range fun j => baseChange₂ D p (b j : (VS D).V)) := by
+  have hspan
+      : Submodule.span (D.s.atP p).Ep (baseChange₂ D p '' (U : Set (VS D).V))
+        ≤ Submodule.span (D.s.atP p).Ep (Set.range fun j => baseChange₂ D p (b j : (VS D).V)) := by
     rw [Submodule.span_le]
     rintro _ ⟨u, hu, rfl⟩
     have hu' : u = ∑ i, b.repr ⟨u, hu⟩ i • (b i : (VS D).V) := by
@@ -108,13 +118,18 @@ theorem eq_zero_of_local_orth (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth
   have hAβ : Matrix.mulVec A β = 0 := by
     funext i
     have h1 := horth (b i) (b i).2
-    have h2 : LocFacts₂ Z.M p (∑ j, β j • baseChange₂ D p (b j : (VS D).V)) (baseChange₂ D p (b i : (VS D).V)) =
-        formLeft Z p (baseChange₂ D p (b i : (VS D).V)) (∑ j, β j • baseChange₂ D p (b j : (VS D).V)) := rfl
+    have h2
+        : LocFacts₂ Z.M p (∑ j, β j • baseChange₂ D p (b j : (VS D).V))
+            (baseChange₂ D p (b i : (VS D).V))
+          = formLeft Z p (baseChange₂ D p (b i : (VS D).V))
+            (∑ j, β j • baseChange₂ D p (b j : (VS D).V)) :=
+      rfl
     set_option synthInstance.maxHeartbeats 100000 in
       rw [h2, map_sum] at h1
     simp only [map_smul, smul_eq_mul] at h1
     simp only [formLeft_apply, baseChangeAt_form Z.M p (Z.hcj p), brS] at h1
-    simp only [Matrix.mulVec, dotProduct, hA, hGdef, Matrix.map_apply, Matrix.of_apply, Pi.zero_apply]
+    simp only [Matrix.mulVec, dotProduct, hA, hGdef, Matrix.map_apply, Matrix.of_apply,
+      Pi.zero_apply]
     simpa [mul_comm] using h1
   have hdet : IsUnit A.det := by
     rw [hA, ← RingHom.mapMatrix_apply, ← RingHom.map_det]
@@ -122,12 +137,21 @@ theorem eq_zero_of_local_orth (U : Submodule D.host.E (VS D).V) (hU : U ⊓ orth
   have hβ : β = 0 := by
     have := congrArg (fun w => Matrix.mulVec A⁻¹ w) hAβ
     simp only [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul A hdet, Matrix.one_mulVec,
-      Matrix.mulVec_zero] at this
+        Matrix.mulVec_zero]
+      at this
     exact this
   simp [hβ]
 
 end GlobalTheory.DecompOrth
 
-theorem GlobalTheory.decomp_orth_complement : ∀ (D : D7) (U : Submodule D.host.E (VS D).V), U ⊓ orth (VS D) U = ⊥ → (∀ x : (VS D).V, ∃ a ∈ orth (VS D) U, ∃ b ∈ U, x = a + b) ∧ ∀ (Z : LocDat D) (p : PlF D) (v : Vp D p), v ∈ Submodule.span (D.s.atP p).Ep (baseChange₂ D p '' (U : Set (VS D).V)) → (∀ u ∈ U, LocFacts₂ Z.M p v (baseChange₂ D p u) = 0) → v = 0 :=
-  fun _ U hU => ⟨GlobalTheory.DecompOrth.exists_decomp U hU,
-    fun Z p v hv horth => GlobalTheory.DecompOrth.eq_zero_of_local_orth U hU Z p v hv horth⟩
+theorem GlobalTheory.decomp_orth_complement
+    : ∀ (D : D7) (U : Submodule D.host.E (VS D).V),
+      U ⊓ orth (VS D) U = ⊥
+        → (∀ x : (VS D).V, ∃ a ∈ orth (VS D) U, ∃ b ∈ U, x = a + b)
+          ∧ ∀ (Z : LocDat D) (p : PlF D) (v : Vp D p),
+            v ∈ Submodule.span (D.s.atP p).Ep (baseChange₂ D p '' (U : Set (VS D).V))
+              → (∀ u ∈ U, LocFacts₂ Z.M p v (baseChange₂ D p u) = 0)
+              → v = 0 := fun _ U hU => ⟨
+  GlobalTheory.DecompOrth.exists_decomp U hU,
+  fun Z p v hv horth => GlobalTheory.DecompOrth.eq_zero_of_local_orth U hU Z p v hv horth
+⟩

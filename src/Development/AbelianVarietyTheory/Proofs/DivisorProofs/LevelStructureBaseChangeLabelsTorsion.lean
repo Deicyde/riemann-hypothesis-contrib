@@ -9,16 +9,23 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Torsion
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.LevelCarry
 
-theorem linComb_prod' {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A] {T : Over S} {n : ℕ}
-    (y : Fin n → (T ⟶ A)) (a : Fin n → ℕ) : linComb y a = ∏ i, y i ^ a i := List.prod_ofFn
+theorem linComb_prod'
+    {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A]
+    {T : Over S} {n : ℕ} (y : Fin n → (T ⟶ A)) (a : Fin n → ℕ)
+    : linComb y a = ∏ i, y i ^ a i :=
+  List.prod_ofFn
 
 theorem unitOn_zpow' {R : Type} [CommRing R] (u : Rˣ) (n : ℤ) : unitOn (u ^ n) = unitOn u ^ n :=
   map_zpow _ _ _
@@ -32,25 +39,31 @@ theorem unitOn_inj' {R : Type} [CommRing R] : Function.Injective (unitOn (R := R
 
 end GlobalTheory.LevelCarry
 
-
 open GlobalTheory.LevelCarry in
-theorem GlobalTheory.levelPoint_baseChange_label : ∀ (K C : Type) [Field K] [Field C] [IsAlgClosed C] (f : K →+* C) (P : PolAV (Sp K))
-    (P' : PolAV (Sp C)) (io : (Over.mk (spMap f) ⟶ P.A) ≃* (baseOver (Sp C) ⟶ P'.A)),
-    (∀ (k : ℕ) a b (z : Γ(Sp C, ⊤)ˣ), WeilIs P'.A P'.L k (io a) (io b) z → WeilIs P.A P.L k a b z) →
-    ∀ (g k : ℕ) (hg : P'.g = g) (ζ : Cˣ) (lev : Out.Level P' k (unitOn ζ)), 2 ≤ k →
-      IsPrimitiveRoot ζ k ∧
-      (∀ a b, io.symm (levelPoint lev hg (a + b)) = io.symm (levelPoint lev hg a) * io.symm (levelPoint lev hg b)) ∧
-      Function.Injective (fun a => io.symm (levelPoint lev hg a)) ∧
-      (∀ z : Over.mk (spMap f) ⟶ P.A, z ^ k = 1 → ∃ a, io.symm (levelPoint lev hg a) = z) ∧
-      ∀ i j, WeilIs P.A P.L k (io.symm (levelPoint lev hg (Pi.single i 1))) (io.symm (levelPoint lev hg (Pi.single j 1)))
-        (unitOn (ζ ^ stdSymp g i j)) := by
+theorem GlobalTheory.levelPoint_baseChange_label
+    : ∀ (K C : Type) [Field K] [Field C] [IsAlgClosed C] (f : K →+* C) (P : PolAV (Sp K))
+        (P' : PolAV (Sp C)) (io : (Over.mk (spMap f) ⟶ P.A) ≃* (baseOver (Sp C) ⟶ P'.A)),
+      (∀ (k : ℕ) a b (z : Γ(Sp C, ⊤)ˣ), WeilIs P'.A P'.L k (io a) (io b) z → WeilIs P.A P.L k a b z)
+        → ∀ (g k : ℕ) (hg : P'.g = g) (ζ : Cˣ) (lev : Out.Level P' k (unitOn ζ)),
+          2 ≤ k
+            → IsPrimitiveRoot ζ k
+              ∧ (∀ a b,
+                io.symm (levelPoint lev hg (a + b))
+                  = io.symm (levelPoint lev hg a) * io.symm (levelPoint lev hg b))
+              ∧ Function.Injective (fun a => io.symm (levelPoint lev hg a))
+              ∧ (∀ z : Over.mk (spMap f) ⟶ P.A, z ^ k = 1 → ∃ a, io.symm (levelPoint lev hg a) = z)
+              ∧ ∀ i j,
+                WeilIs P.A P.L k (io.symm (levelPoint lev hg (Pi.single i 1)))
+                  (io.symm (levelPoint lev hg (Pi.single j 1))) (unitOn (ζ ^ stdSymp g i j)) := by
   intro K C _ _ _ f P P' io hW g k hg ζ lev hk
   subst hg
   have := P'.isAb.comm
   have hk0 : NeZero k := ⟨by omega⟩
-  have E : ∀ c : Fin (2 * P'.g) → ℕ,
-      linComb (fun i => (Over.homMk (𝟙 _) (by simp) : Over.mk (𝟙 _) ⟶ baseOver _) ≫ lev.pt i) c =
-      linComb lev.pt c := fun c => congrArg (linComb · _) (funext fun i => Category.id_comp (lev.pt i))
+  have E
+      : ∀ c : Fin (2 * P'.g) → ℕ,
+        linComb (fun i => (Over.homMk (𝟙 _) (by simp) : Over.mk (𝟙 _) ⟶ baseOver _) ≫ lev.pt i) c
+          = linComb lev.pt c := fun c =>
+    congrArg (linComb · _) (funext fun i => Category.id_comp (lev.pt i))
   have LP : ∀ a, levelPoint lev rfl a = ∏ i, lev.pt i ^ (a i).val := fun a => by
     rw [levelPoint_rfl]; exact linComb_prod' _ _
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
@@ -61,11 +74,15 @@ theorem GlobalTheory.levelPoint_baseChange_label : ∀ (K C : Type) [Field K] [F
     congr 1
     rw [LP, LP, LP, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun i _ => ?_
-    rw [← pow_add, pow_eq_pow_mod ((a i).val + (b i).val) (lev.torsion i), Pi.add_apply, ZMod.val_add]
+    rw [← pow_add, pow_eq_pow_mod ((a i).val + (b i).val) (lev.torsion i), Pi.add_apply,
+      ZMod.val_add]
   · have inj : Function.Injective (levelPoint lev rfl) := by
       intro a b h
-      have h₀ := lev.indep C (𝟙 _) (fun i => ⟨(a i).val, ZMod.val_lt _⟩) (fun i => ⟨(b i).val, ZMod.val_lt _⟩)
-        ((E _).trans (h.trans (E _).symm))
+      have h₀ :=
+        lev.indep C (𝟙 _)
+          (fun i => ⟨(a i).val, ZMod.val_lt _⟩)
+          (fun i => ⟨(b i).val, ZMod.val_lt _⟩)
+          ((E _).trans (h.trans (E _).symm))
       exact funext fun i => ZMod.val_injective k (congrArg Fin.val (congrFun h₀ i))
     exact io.symm.injective.comp inj
   · intro z hz

@@ -12,17 +12,24 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.VolProofs
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
 
 namespace GlobalTheory.Member
 
-theorem exists_root_near_one : ∀ (D : D7), ∀ W ∈ 𝓝 (1 : (AE D)ˣ), ∃ N ∈ 𝓝 (1 : (AE D)ˣ), ∀ u ∈ N, (u : AE D) * sigR (AF D.host.F) D.sp.cm.sig (u : AE D) = 1 → ∃ x ∈ W, (x : AE D) = (u : AE D) * sigR (AF D.host.F) D.sp.cm.sig (x : AE D) := by
+theorem exists_root_near_one
+    : ∀ (D : D7), ∀ W ∈ 𝓝 (1 : (AE D)ˣ), ∃ N ∈ 𝓝 (1 : (AE D)ˣ), ∀ u ∈ N,
+      (u : AE D) * sigR (AF D.host.F) D.sp.cm.sig (u : AE D) = 1
+        → ∃ x ∈ W, (x : AE D) = (u : AE D) * sigR (AF D.host.F) D.sp.cm.sig (x : AE D) := by
   intro D
-  have hP : ∀ P : Ideal (𝓞 D.host.E), P.IsMaximal →
-      ∃ t s : 𝓞 D.host.E, (s : D.host.E) = cF D (t : D.host.E) ∧ t - s ∉ P := by
+  have hP
+      : ∀ P : Ideal (𝓞 D.host.E),
+        P.IsMaximal → ∃ t s : 𝓞 D.host.E, (s : D.host.E) = cF D (t : D.host.E) ∧ t - s ∉ P := by
     intro P hP
     obtain ⟨θ, t, ht, hθ⟩ := D.sp.cm.cmUnram.2.2 P hP
     exact ⟨θ, t, ht, hθ⟩

@@ -29,8 +29,10 @@ def VT (z : Frame X.Ψ r) (ξ : Fin r → E) : Type := ↥(Usub (X := X) z ξ)
 
 variable (z : Frame X.Ψ r) (ξ : Fin r → E)
 
-noncomputable instance : AddCommGroup (VT (X := X) z ξ) := inferInstanceAs (AddCommGroup ↥(Usub (X := X) z ξ))
-noncomputable instance : Module ℝ (VT (X := X) z ξ) := inferInstanceAs (Module ℝ ↥(Usub (X := X) z ξ))
+noncomputable instance : AddCommGroup (VT (X := X) z ξ) :=
+  inferInstanceAs (AddCommGroup ↥(Usub (X := X) z ξ))
+noncomputable instance : Module ℝ (VT (X := X) z ξ) :=
+  inferInstanceAs (Module ℝ ↥(Usub (X := X) z ξ))
 instance : FiniteDimensional ℝ (VT (X := X) z ξ) :=
   inferInstanceAs (FiniteDimensional ℝ ↥(Usub (X := X) z ξ))
 
@@ -40,24 +42,33 @@ def VT.val {z : Frame X.Ψ r} {ξ : Fin r → E} (u : VT (X := X) z ξ) : X.Ψ �
 theorem VT.val_mem {z : Frame X.Ψ r} {ξ : Fin r → E} (u : VT (X := X) z ξ) : u.val ∈ X.Uz z ξ := by
   exact (u : ↥(Usub (X := X) z ξ)).2
 
-def VT.mk {z : Frame X.Ψ r} {ξ : Fin r → E} (u : X.Ψ → Fin r → ℂ) (hu : u ∈ X.Uz z ξ) :
-    VT (X := X) z ξ := (⟨u, hu⟩ : ↥(Usub (X := X) z ξ))
+def VT.mk {z : Frame X.Ψ r} {ξ : Fin r → E} (u : X.Ψ → Fin r → ℂ) (hu : u ∈ X.Uz z ξ)
+    : VT (X := X) z ξ :=
+  (⟨u, hu⟩ : ↥(Usub (X := X) z ξ))
 
-@[simp] theorem VT.val_mk {z : Frame X.Ψ r} {ξ : Fin r → E} (u : X.Ψ → Fin r → ℂ)
-    (hu : u ∈ X.Uz z ξ) : (VT.mk u hu).val = u := rfl
+@[simp]
+theorem VT.val_mk {z : Frame X.Ψ r} {ξ : Fin r → E} (u : X.Ψ → Fin r → ℂ) (hu : u ∈ X.Uz z ξ)
+    : (VT.mk u hu).val = u :=
+  rfl
 
-theorem VT.ext {z : Frame X.Ψ r} {ξ : Fin r → E} {u v : VT (X := X) z ξ} (h : u.val = v.val) :
-    u = v := by
+theorem VT.ext {z : Frame X.Ψ r} {ξ : Fin r → E} {u v : VT (X := X) z ξ} (h : u.val = v.val)
+    : u = v := by
   exact Subtype.ext h
 
-@[simp] theorem VT.val_add {z : Frame X.Ψ r} {ξ : Fin r → E} (u v : VT (X := X) z ξ) :
-    (u + v).val = u.val + v.val := rfl
+@[simp]
+theorem VT.val_add {z : Frame X.Ψ r} {ξ : Fin r → E} (u v : VT (X := X) z ξ)
+    : (u + v).val = u.val + v.val :=
+  rfl
 
-@[simp] theorem VT.val_smul {z : Frame X.Ψ r} {ξ : Fin r → E} (c : ℝ) (u : VT (X := X) z ξ) :
-    (c • u).val = c • u.val := rfl
+@[simp]
+theorem VT.val_smul {z : Frame X.Ψ r} {ξ : Fin r → E} (c : ℝ) (u : VT (X := X) z ξ)
+    : (c • u).val = c • u.val :=
+  rfl
 
-@[simp] theorem VT.val_sub {z : Frame X.Ψ r} {ξ : Fin r → E} (u v : VT (X := X) z ξ) :
-    (u - v).val = u.val - v.val := rfl
+@[simp]
+theorem VT.val_sub {z : Frame X.Ψ r} {ξ : Fin r → E} (u v : VT (X := X) z ξ)
+    : (u - v).val = u.val - v.val :=
+  rfl
 
 variable [hz : Fact (z ∈ X.dom)]
 
@@ -100,13 +111,13 @@ theorem norm_sq_eq (u : VT (X := X) z ξ) : ‖u‖ ^ 2 = ∑ τ, X.maj z τ (u.
 
 theorem maj_le_norm_sq (u : VT (X := X) z ξ) (τ : X.Ψ) : X.maj z τ (u.val τ) ≤ ‖u‖ ^ 2 := by
   rw [norm_sq_eq]
-  exact Finset.single_le_sum (fun σ _ => MajorantOperators.maj_nonneg hz.out σ _) (Finset.mem_univ τ)
+  exact
+    Finset.single_le_sum (fun σ _ => MajorantOperators.maj_nonneg hz.out σ _) (Finset.mem_univ τ)
 
 omit hz in
-theorem ucomp_add (u v : X.Ψ → Fin r → ℂ) :
-    X.ucomp z ξ (u + v) = X.ucomp z ξ u + X.ucomp z ξ v := by
-  have hHf : ∀ (σ : X.Ψ) (a b w : Fin r → ℂ),
-      X.Hf z σ (a + b) w = X.Hf z σ a w + X.Hf z σ b w := by
+theorem ucomp_add (u v : X.Ψ → Fin r → ℂ)
+    : X.ucomp z ξ (u + v) = X.ucomp z ξ u + X.ucomp z ξ v := by
+  have hHf : ∀ (σ : X.Ψ) (a b w : Fin r → ℂ), X.Hf z σ (a + b) w = X.Hf z σ a w + X.Hf z σ b w := by
     intro σ a b w
     rw [Data.Hf, Data.Hf, Data.Hf, Data.ppos_add, ← hermC_add_left]
     congr 1
@@ -121,7 +132,8 @@ theorem ucomp_smul (a : ℝ) (u : X.Ψ → Fin r → ℂ) : X.ucomp z ξ (a • 
   have hHf : ∀ (σ : X.Ψ) (c : ℂ) (v w : Fin r → ℂ), X.Hf z σ (c • v) w = c * X.Hf z σ v w := by
     intro σ c v w
     have hp : X.ppos z σ (c • v) = c • X.ppos z σ v := by
-      simp only [Data.ppos, hermC_smul_left, Finset.smul_sum, smul_smul, mul_assoc, ← Finset.mul_sum]
+      simp only [Data.ppos, hermC_smul_left, Finset.smul_sum, smul_smul, mul_assoc,
+        ← Finset.mul_sum]
     rw [Data.Hf, Data.Hf, hp, ← hermC_smul_left]
     congr 1
     rw [smul_sub, smul_smul, smul_smul, mul_comm]
@@ -143,11 +155,14 @@ theorem embV_mem_Iperp {μ : Fin r → E} (hμ : μ ∈ X.Λp ξ) : X.embV μ �
   rw [hermC_emb, hk, map_zero]
 
 noncomputable def phi (hξ : X.IsIso ξ) : X.Λp ξ →+ VT (X := X) z ξ :=
-  AddMonoidHom.mk' (fun μ => VT.mk (X.ucomp z ξ (X.embV μ))
-      (orthogonal_lattice_decomposition r X ξ hξ z hz.out _ (embV_mem_Iperp ξ μ.2)))
-    (fun μ ν => VT.ext (by
-      simp only [VT.val_mk, VT.val_add, AddSubgroup.coe_add]
-      rw [embV_add, ucomp_add]))
+  AddMonoidHom.mk'
+    (fun μ =>
+      VT.mk (X.ucomp z ξ (X.embV μ))
+        (orthogonal_lattice_decomposition r X ξ hξ z hz.out _ (embV_mem_Iperp ξ μ.2)))
+    (fun μ ν =>
+      VT.ext (by
+        simp only [VT.val_mk, VT.val_add, AddSubgroup.coe_add]
+        rw [embV_add, ucomp_add]))
 
 theorem phi_val (hξ : X.IsIso ξ) (μ : X.Λp ξ) : (phi z ξ hξ μ).val = X.ucomp z ξ (X.embV μ) := by
   rfl
@@ -155,7 +170,8 @@ theorem phi_val (hξ : X.IsIso ξ) (μ : X.Λp ξ) : (phi z ξ hξ μ).val = X.u
 noncomputable def Lat (hξ : X.IsIso ξ) : Submodule ℤ (VT (X := X) z ξ) :=
   (phi z ξ hξ).range.toIntSubmodule
 
-theorem mem_Lat (hξ : X.IsIso ξ) {a : VT (X := X) z ξ} : a ∈ Lat z ξ hξ ↔ ∃ μ, phi z ξ hξ μ = a := by
+theorem mem_Lat (hξ : X.IsIso ξ) {a : VT (X := X) z ξ}
+    : a ∈ Lat z ξ hξ ↔ ∃ μ, phi z ξ hξ μ = a := by
   show a ∈ (phi z ξ hξ).range ↔ _
   exact AddMonoidHom.mem_range
 
@@ -181,21 +197,23 @@ theorem ucomp_line (hξ : X.IsIso ξ) (e : E) : X.ucomp z ξ (X.embV (e • ξ))
   have hw : X.embV (e • ξ) τ = τ.1 e • Data.emb τ.1 ξ := by
     funext a
     simp [Data.embV, Data.emb]
-  simp only [Data.ucomp, Data.aproj, Data.lineV, Pi.sub_apply, Pi.zero_apply, hw, Hf_smul_left_frame,
-    mul_div_assoc, div_self hpos, mul_one, sub_self]
+  simp only [Data.ucomp, Data.aproj, Data.lineV, Pi.sub_apply, Pi.zero_apply, hw,
+    Hf_smul_left_frame, mul_div_assoc, div_self hpos, mul_one, sub_self]
 
-theorem span_Lat (hD3 : IntegerApproximationCount (E := E)) (hξ : X.IsIso ξ) :
-    Submodule.span ℝ (Lat z ξ hξ : Set (VT (X := X) z ξ)) = ⊤ := by
+theorem span_Lat (hD3 : IntegerApproximationCount (E := E)) (hξ : X.IsIso ξ)
+    : Submodule.span ℝ (Lat z ξ hξ : Set (VT (X := X) z ξ)) = ⊤ := by
   rw [eq_top_iff]
   intro v _
-  let S : VT (X := X) z ξ →ₗ[ℝ] (X.Ψ → Fin r → ℂ) :=
-    { toFun := fun a => a.val
-      map_add' := fun a b => VT.val_add a b
-      map_smul' := fun c a => VT.val_smul c a }
+  let S : VT (X := X) z ξ →ₗ[ℝ] (X.Ψ → Fin r → ℂ) := {
+    toFun := fun a => a.val
+    map_add' := fun a b => VT.val_add a b
+    map_smul' := fun c a => VT.val_smul c a
+  }
   have hS : Function.Injective S := fun a b h => VT.ext h
   have h1 := LatticeSpanMembership.Uz_le_span hD3 hξ v.val_mem
-  have h2 : Submodule.span ℝ (Set.range fun μ : X.Λp ξ => X.ucomp z ξ (X.embV μ)) ≤
-      Submodule.map S (Submodule.span ℝ (Lat z ξ hξ : Set (VT (X := X) z ξ))) := by
+  have h2
+      : Submodule.span ℝ (Set.range fun μ : X.Λp ξ => X.ucomp z ξ (X.embV μ))
+        ≤ Submodule.map S (Submodule.span ℝ (Lat z ξ hξ : Set (VT (X := X) z ξ))) := by
     rw [Submodule.span_le]
     rintro _ ⟨μ, rfl⟩
     exact Submodule.mem_map_of_mem (Submodule.subset_span ((mem_Lat z ξ hξ).mpr ⟨μ, rfl⟩))

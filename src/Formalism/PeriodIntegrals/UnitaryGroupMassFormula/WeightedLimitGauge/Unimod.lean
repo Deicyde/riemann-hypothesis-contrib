@@ -21,17 +21,20 @@ namespace PI.RhsWLim.W
 open PI.RhsWLim
 
 def UnitInv : Prop :=
-  ∀ (k r : ℕ) (ν : Measure (Mt k r)), 1 ≤ k → IsGaugeOn k r (UWb k r) ν →
-    ∀ q ∈ UWb k r, qᴴ * q = 1 → ν.map (rmulM q) = ν
+  ∀ (k r : ℕ) (ν : Measure (Mt k r)),
+    1 ≤ k → IsGaugeOn k r (UWb k r) ν → ∀ q ∈ UWb k r, qᴴ * q = 1 → ν.map (rmulM q) = ν
 
 def HermInv : Prop :=
-  ∀ (k r : ℕ) (ν : Measure (Mt k r)), 1 ≤ k → IsGaugeOn k r (UWb k r) ν →
-    ∀ B₀ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ, B₀ᴴ * Hb k * B₀ = Hb k → B₀ᴴ = B₀ →
-      ν.map (rmulM (embWb k r B₀)) = ν
+  ∀ (k r : ℕ) (ν : Measure (Mt k r)),
+    1 ≤ k → IsGaugeOn k r (UWb k r) ν
+      → ∀ B₀ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ,
+        B₀ᴴ * Hb k * B₀ = Hb k → B₀ᴴ = B₀ → ν.map (rmulM (embWb k r B₀)) = ν
 
 def PolarDecW : Prop :=
-  ∀ (k r : ℕ) (p : Mat k r), p ∈ UWb k r → ∃ B₀ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ,
-    B₀ᴴ * Hb k * B₀ = Hb k ∧ B₀ᴴ = B₀ ∧ ∃ q ∈ UWb k r, qᴴ * q = 1 ∧ p = embWb k r B₀ * q
+  ∀ (k r : ℕ) (p : Mat k r),
+    p ∈ UWb k r
+      → ∃ B₀ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ,
+        B₀ᴴ * Hb k * B₀ = Hb k ∧ B₀ᴴ = B₀ ∧ ∃ q ∈ UWb k r, qᴴ * q = 1 ∧ p = embWb k r B₀ * q
 
 theorem rmulM_comp {k r : ℕ} (a b : Mat k r) : rmulM b ∘ rmulM a = rmulM (a * b) := by
   funext x

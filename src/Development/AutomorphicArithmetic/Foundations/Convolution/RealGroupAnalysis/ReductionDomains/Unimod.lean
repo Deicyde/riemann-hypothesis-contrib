@@ -11,8 +11,9 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.M.unimod :
-    ∀ (F : Type) [Field F] [NumberField F], ∀ (μ : Measure (G1 F)) [μ.IsHaarMeasure], μ.IsMulRightInvariant := by
+theorem UpperTheory.ConvolutionTheory.R2.M.unimod
+    : ∀ (F : Type) [Field F] [NumberField F], ∀ (μ : Measure (G1 F)) [μ.IsHaarMeasure],
+      μ.IsMulRightInvariant := by
   intro F _ _ μ _
   have h0 : ∀ g : G1 F, (Measure.modularCharacter g : ℝ≥0) ≠ 0 := fun g h => by
     have e := map_mul (Measure.modularCharacter (G := G1 F)) g g⁻¹
@@ -22,7 +23,9 @@ theorem UpperTheory.ConvolutionTheory.R2.M.unimod :
   have h3F : (3 : F) ≠ 0 := by norm_num
   let two : (A F)ˣ := Units.map (algebraMap F (A F)).toMonoidHom (Units.mk0 2 h2F)
   have h2 : (two : A F) = 2 := map_ofNat (algebraMap F (A F)) 2
-  have h4 : ∀ b : A F, (Measure.modularCharacter (nU (4 * b)) : ℝ≥0) = Measure.modularCharacter (nU b) := by
+  have h4
+      : ∀ b : A F,
+        (Measure.modularCharacter (nU (4 * b)) : ℝ≥0) = Measure.modularCharacter (nU b) := by
     intro b
     have e := congrArg (Measure.modularCharacter (G := G1 F)) (M.mD_mul_nU two b)
     rw [map_mul, map_mul, mul_comm] at e
@@ -34,7 +37,8 @@ theorem UpperTheory.ConvolutionTheory.R2.M.unimod :
     intro c
     have h3 : (3 : A F) * (rt (3⁻¹ : F) * c) = c := by
       have : (3 : A F) * rt (3⁻¹ : F) = 1 := by
-        rw [show (3 : A F) = rt (3 : F) from (map_ofNat (algebraMap F (A F)) 3).symm, ← map_mul, mul_inv_cancel₀ h3F, map_one]
+        rw [show (3 : A F) = rt (3 : F) from (map_ofNat (algebraMap F (A F)) 3).symm, ← map_mul,
+          mul_inv_cancel₀ h3F, map_one]
       rw [← mul_assoc, this, one_mul]
     set b : A F := rt (3⁻¹ : F) * c with hb
     have e := h4 b
@@ -44,7 +48,8 @@ theorem UpperTheory.ConvolutionTheory.R2.M.unimod :
     have e : wW F * wW F * (wW F * wW F) = 1 := by
       refine Subtype.ext ?_
       rw [M.val_mul, M.val_mul]
-      ext i j; fin_cases i <;> fin_cases j <;> simp [wW, Matrix.mul_apply, Fin.sum_univ_two]
+      ext i j
+      fin_cases i <;> fin_cases j <;> simp [wW, Matrix.mul_apply, Fin.sum_univ_two]
     have e' := congrArg (Measure.modularCharacter (G := G1 F)) e
     rw [map_mul, map_mul, map_one] at e'
     have e4 : (Measure.modularCharacter (wW F) : ℝ≥0) ^ 4 = 1 := by rw [← e']; ring
@@ -58,8 +63,10 @@ theorem UpperTheory.ConvolutionTheory.R2.M.unimod :
       rcases hx with ⟨c, rfl⟩ | hx
       · exact hn c
       · rw [Set.mem_singleton_iff.1 hx]; exact hw
-    | one => exact map_one _
-    | mul x y _ _ hx hy => rw [map_mul, hx, hy, one_mul]
+    | one =>
+      exact map_one _
+    | mul x y _ _ hx hy =>
+      rw [map_mul, hx, hy, one_mul]
     | inv x _ hx =>
       have e := map_mul (Measure.modularCharacter (G := G1 F)) x x⁻¹
       rw [mul_inv_cancel, map_one, hx, one_mul] at e

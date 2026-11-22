@@ -5,16 +5,19 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.G3 (sp)
 open GlobalTheory.UPel.HT.HeckeAd (IsTranslA heckeSubA)
 open scoped TensorProduct
 open UpperTheory.Gal.FiniteEtaleModels
 
-private theorem gen_facts {A : Type} [CommRing A] {a : A} {n : ℕ} {𝔟 : Ideal A} (G : IsGen a n 𝔟) :
-    (n : A) ∈ 𝔟 ∧ ∀ c ∈ 𝔟, ∃ d, c * a = (n : A) * d := by
+private theorem gen_facts {A : Type} [CommRing A] {a : A} {n : ℕ} {𝔟 : Ideal A} (G : IsGen a n 𝔟)
+    : (n : A) ∈ 𝔟 ∧ ∀ c ∈ 𝔟, ∃ d, c * a = (n : A) * d := by
   have G' : (Ideal.span {a} ⊔ Ideal.span {(n : A)}) * 𝔟 = Ideal.span {(n : A)} := G
   have hle : (Ideal.span {a} ⊔ Ideal.span {(n : A)}) * 𝔟 ≤ 𝔟 :=
     Ideal.mul_le.mpr fun x _ y hy => 𝔟.mul_mem_left x hy
@@ -29,26 +32,37 @@ private theorem gen_facts {A : Type} [CommRing A] {a : A} {n : ℕ} {𝔟 : Idea
   obtain ⟨d, hd⟩ := hmem
   exact ⟨d, by rw [mul_comm]; exact hd⟩
 
-private theorem reindex_lattice_of_ideals {A O L : Type} [CommRing A] [Ring O] [Algebra A O] [AddCommGroup L] [Module O L]
+private theorem reindex_lattice_of_ideals
+    {A O L : Type} [CommRing A] [Ring O] [Algebra A O] [AddCommGroup L] [Module O L]
     (cancel : ∀ k : ℕ, 0 < k → ∀ x y : L, k • x = k • y → x = y)
-    (𝔟₁ 𝔟₂ : Ideal A) (W₁ W₂ : Submodule O L) (n m₁ : ℕ) (a₁ a₂ : A) (hn : 0 < n) (hm : 0 < m₁) (hle : 𝔟₁ ≤ 𝔟₂)
-    (hn2 : (n : A) ∈ 𝔟₂) (hc2 : ∀ c ∈ 𝔟₂, ∃ d, c * a₂ = n * d)
-    (BaseTypeSubspacesMapOntoBothSides : ∀ y : L, (∃ z, algebraMap A O a₁ • y = (n * m₁) • z) ↔ y ∈ W₁)
-    (PairingFactorsThroughPeriods : ∀ x : L, (∀ c ∈ 𝔟₁, ∃ z, algebraMap A O c • x = (n * m₁) • z) →
-      ∃ y z, x = algebraMap A O a₁ • y + (n * m₁) • z)
+    (𝔟₁ 𝔟₂ : Ideal A) (W₁ W₂ : Submodule O L)
+    (n m₁ : ℕ)
+    (a₁ a₂ : A)
+    (hn : 0 < n) (hm : 0 < m₁) (hle : 𝔟₁ ≤ 𝔟₂) (hn2 : (n : A) ∈ 𝔟₂)
+    (hc2 : ∀ c ∈ 𝔟₂, ∃ d, c * a₂ = n * d)
+    (BaseTypeSubspacesMapOntoBothSides
+      : ∀ y : L, (∃ z, algebraMap A O a₁ • y = (n * m₁) • z) ↔ y ∈ W₁)
+    (PairingFactorsThroughPeriods : ∀ x : L,
+      (∀ c ∈ 𝔟₁, ∃ z, algebraMap A O c • x = (n * m₁) • z)
+        → ∃ y z, x = algebraMap A O a₁ • y + (n * m₁) • z)
     (ProjectionSandwichLength : ∀ y : L, (∃ z, algebraMap A O a₂ • y = n • z) ↔ y ∈ W₂)
-    (DegreeKernelLowerBound : ∀ x : L, (∀ c ∈ 𝔟₂, ∃ z, algebraMap A O c • x = n • z) → ∃ y z, x = algebraMap A O a₂ • y + n • z)
+    (DegreeKernelLowerBound : ∀ x : L,
+      (∀ c ∈ 𝔟₂, ∃ z, algebraMap A O c • x = n • z) → ∃ y z, x = algebraMap A O a₂ • y + n • z)
     (g : L →+ L) (h1 : ∀ (a : O) x, ∃ z, g (a • x) = a • g x + n • z)
-    (h2 : ∀ x z, g x = n • z → ∃ v, x = n • v) (h3 : ∀ x, ∃ y z, g y = x + n • z) :
-    ∃ β : L → L, (∀ x y, β (x + y) - (β x + β y) ∈ W₁) ∧ (∀ (c : O) x, β (c • x) - c • β x ∈ W₁) ∧
-      (∀ y, β y ∈ W₁ ↔ y ∈ W₂) ∧
-      (∀ x, (∀ c ∈ 𝔟₂, algebraMap A O c • x ∈ W₁) → ∃ y, x - β y ∈ W₁) ∧
-      ∀ y, ∃ z, m₁ • g (algebraMap A O a₂ • y) = algebraMap A O a₁ • β y + (n * m₁) • z := by
+    (h2 : ∀ x z, g x = n • z → ∃ v, x = n • v) (h3 : ∀ x, ∃ y z, g y = x + n • z)
+    : ∃ β : L → L,
+      (∀ x y, β (x + y) - (β x + β y) ∈ W₁) ∧ (∀ (c : O) x, β (c • x) - c • β x ∈ W₁)
+        ∧ (∀ y, β y ∈ W₁ ↔ y ∈ W₂)
+        ∧ (∀ x, (∀ c ∈ 𝔟₂, algebraMap A O c • x ∈ W₁) → ∃ y, x - β y ∈ W₁)
+        ∧ ∀ y, ∃ z, m₁ • g (algebraMap A O a₂ • y) = algebraMap A O a₁ • β y + (n * m₁) • z := by
   have hnm : ∀ v : L, m₁ • (n • v) = (n * m₁) • v := by
     intro v
     rw [mul_comm, mul_smul]
-  have memW1 : ∀ v : L, (∃ z, algebraMap A O a₁ • v = (n * m₁) • z) → v ∈ W₁ := fun v h => (BaseTypeSubspacesMapOntoBothSides v).mp h
-  have ex : ∀ y : L, ∃ y' z, m₁ • g (algebraMap A O a₂ • y) = algebraMap A O a₁ • y' + (n * m₁) • z := by
+  have memW1 : ∀ v : L, (∃ z, algebraMap A O a₁ • v = (n * m₁) • z) → v ∈ W₁ := fun v h =>
+    (BaseTypeSubspacesMapOntoBothSides v).mp h
+  have ex
+      : ∀ y : L, ∃ y' z,
+        m₁ • g (algebraMap A O a₂ • y) = algebraMap A O a₁ • y' + (n * m₁) • z := by
     intro y
     apply PairingFactorsThroughPeriods
     intro c hc
@@ -80,7 +94,9 @@ private theorem reindex_lattice_of_ideals {A O L : Type} [CommRing A] [Ring O] [
       rw [smul_smul, smul_smul, Algebra.commutes]
     refine ⟨w - z0 (c • x) + c • z0 x, ?_⟩
     rw [comm1, hw, smul_add, hnm] at hc
-    have hx' : c • (m₁ • g (algebraMap A O a₂ • x)) = c • (algebraMap A O a₁ • β x + (n * m₁) • z0 x) := by
+    have hx'
+        : c • (m₁ • g (algebraMap A O a₂ • x))
+          = c • (algebraMap A O a₁ • β x + (n * m₁) • z0 x) := by
       rw [hβ x]
     rw [smul_add, smul_comm c m₁, smul_comm c (n * m₁)] at hx'
     rw [hx'] at hc
@@ -129,21 +145,21 @@ private theorem reindex_lattice_of_ideals {A O L : Type} [CommRing A] [Ring O] [
     simp only [smul_add, smul_sub]
     abel
 
-theorem UpperTheory.Gal.FiniteEtaleModels.betaLat_holds :
-    LatGen → BetaLat := by
+theorem UpperTheory.Gal.FiniteEtaleModels.betaLat_holds : LatGen → BetaLat := by
   intro hL q _ D 𝔟₁ 𝔟₂ n m₁ a₁ a₂ hn hm hle G1 G2 g h1 h2 h3
   have cancel : ∀ k : ℕ, 0 < k → ∀ x y : D.La, k • x = k • y → x = y := by
     intro k hk x y h
     haveI := D.freeLa
-    have h' : (k : ℤ) • (x - y) = 0 := by
-      rw [smul_sub, natCast_zsmul, natCast_zsmul, h, sub_self]
+    have h' : (k : ℤ) • (x - y) = 0 := by rw [smul_sub, natCast_zsmul, natCast_zsmul, h, sub_self]
     rcases smul_eq_zero.mp h' with h0 | h0
     · exact absurd h0 (by exact_mod_cast hk.ne')
     · exact sub_eq_zero.mp h0
-  obtain ⟨BaseTypeSubspacesMapOntoBothSides, PairingFactorsThroughPeriods⟩ := hL q D a₁ (n * m₁) 𝔟₁ (Nat.mul_pos hn hm) G1
+  obtain ⟨BaseTypeSubspacesMapOntoBothSides, PairingFactorsThroughPeriods⟩ :=
+    hL q D a₁ (n * m₁) 𝔟₁ (Nat.mul_pos hn hm) G1
   obtain ⟨ProjectionSandwichLength, DegreeKernelLowerBound⟩ := hL q D a₂ n 𝔟₂ hn G2
   obtain ⟨hn2, hc2⟩ := gen_facts G2
   obtain ⟨β, hadd, hlin, hker, honto, hmain⟩ :=
     reindex_lattice_of_ideals cancel 𝔟₁ 𝔟₂ (wSub D 𝔟₁ 1) (wSub D 𝔟₂ 1) n m₁ a₁ a₂ hn hm hle hn2 hc2
-      BaseTypeSubspacesMapOntoBothSides PairingFactorsThroughPeriods ProjectionSandwichLength DegreeKernelLowerBound g h1 h2 h3
+      BaseTypeSubspacesMapOntoBothSides PairingFactorsThroughPeriods ProjectionSandwichLength
+      DegreeKernelLowerBound g h1 h2 h3
   exact ⟨β, ⟨hadd, hlin, hker, honto⟩, hmain⟩

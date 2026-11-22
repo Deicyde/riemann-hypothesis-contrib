@@ -9,15 +9,18 @@ public import Development.AbelianVarietyTheory.BlockTheory.ExistenceTori.Generat
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.Member.TameDivOrd
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing in
 open scoped CategoryTheory.Obj in
 set_option autoImplicit false in
 private lemma ord_vw_unit_mul_uniformiser_pow {W : Type} [CommRing W] [IsDomain W]
@@ -36,7 +39,8 @@ private lemma ord_vw_unit_mul_uniformiser_pow {W : Type} [CommRing W] [IsDomain 
     push_cast
     ring
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing in
 open scoped CategoryTheory.Obj in
 set_option autoImplicit false in
 private lemma eq_one_of_pow_eq_one_of_ne_zero {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] {a : Γ}
@@ -46,7 +50,8 @@ private lemma eq_one_of_pow_eq_one_of_ne_zero {Γ : Type*} [LinearOrderedCommGro
   · exact h1
   · exact absurd h (one_lt_pow₀ h1 hk).ne'
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing in
 open scoped CategoryTheory.Obj in
 set_option autoImplicit false in
 private lemma one_le_valuation_root_of_unity_sub_one {F : Type} [Field F] (O : ValuationSubring F) {k : ℕ}
@@ -71,18 +76,25 @@ private lemma one_le_valuation_root_of_unity_sub_one {F : Type} [Field F] (O : V
   rw [← hvk, hkF, map_mul]
   exact mul_le_of_le_one_right' ((O.valuation_le_one_iff _).2 hcO)
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing in
 open scoped CategoryTheory.Obj in
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.Member.TameDivOrd.tame_fixed_dvd_ord : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
-    (F : Type) [Field F] [Algebra (FractionRing W) F] (ϖ : W), Irreducible ϖ →
-    ∀ (k : ℕ) (O : ValuationSubring F) (φ : W →+* O) (σ : F →ₐ[FractionRing W] F) (π : F), IsUnit (k : O) →
-      IsLocalHom φ → (∀ w, (φ w : F) = algebraMap (FractionRing W) F (algebraMap W (FractionRing W) w)) →
-      (∀ x ∈ O, O.valuation (σ x - x) < 1) → π ^ k = algebraMap (FractionRing W) F (algebraMap W (FractionRing W) ϖ) →
-      IsPrimitiveRoot (σ π / π) k →
-      ∀ (d : F) (z : (FractionRing W)ˣ), σ d = d → O.valuation d ^ k = O.valuation (algebraMap (FractionRing W) F z) →
-        (k : ℤ) ∣ (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.ord_vw W).toFun z := by
+theorem _root_.GlobalTheory.Member.TameDivOrd.tame_fixed_dvd_ord
+    : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] (F : Type) [Field F]
+        [Algebra (FractionRing W) F] (ϖ : W),
+      Irreducible ϖ
+        → ∀ (k : ℕ) (O : ValuationSubring F) (φ : W →+* O) (σ : F →ₐ[FractionRing W] F) (π : F),
+          IsUnit (k : O) → IsLocalHom φ
+            → (∀ w, (φ w : F) = algebraMap (FractionRing W) F (algebraMap W (FractionRing W) w))
+            → (∀ x ∈ O, O.valuation (σ x - x) < 1)
+            → π ^ k = algebraMap (FractionRing W) F (algebraMap W (FractionRing W) ϖ)
+            → IsPrimitiveRoot (σ π / π) k
+            → ∀ (d : F) (z : (FractionRing W)ˣ),
+              σ d = d → O.valuation d ^ k = O.valuation (algebraMap (FractionRing W) F z)
+                → (k : ℤ)
+                  ∣ (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.ord_vw W).toFun
+                    z := by
   intro W _ _ _ F _ _ ϖ hϖ k O φ σ π hk _ hφ hσ hπ hζ d z hd hdz
   have hk0 : k ≠ 0 := by
     rintro rfl
@@ -109,23 +121,33 @@ theorem _root_.GlobalTheory.Member.TameDivOrd.tame_fixed_dvd_ord : ∀ (W : Type
   obtain ⟨m, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha0 hϖ
   obtain ⟨m', u', rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hb0 hϖ
 
-  have hU : z * (Units.map (algebraMap W (FractionRing W) : W →* FractionRing W) u' *
-      _root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.toUnitK ϖ h0 ^ m') =
-      Units.map (algebraMap W (FractionRing W) : W →* FractionRing W) u *
-        _root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.toUnitK ϖ h0 ^ m := by
+  have hU
+      : z * (Units.map (algebraMap W (FractionRing W) : W →* FractionRing W) u'
+          * _root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.toUnitK ϖ h0 ^ m')
+        = Units.map (algebraMap W (FractionRing W) : W →* FractionRing W) u
+          * _root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.toUnitK ϖ h0 ^ m := by
     ext
     simp only [Units.val_mul, Units.val_pow_eq_pow_val, Units.coe_map, MonoidHom.coe_coe]
-    rw [show ((_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.toUnitK ϖ h0 : (FractionRing W)ˣ) : FractionRing W) =
-      algebraMap W _ ϖ from rfl, ← map_pow, ← map_mul, ← map_pow, ← map_mul, key]
-  have hord : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.ord_vw W).toFun z + m' = m := by
-    have := congrArg (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.ord_vw W).toFun hU
+    rw [show ((_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.toUnitK ϖ h0
+              : (FractionRing W)ˣ)
+            : FractionRing W)
+          = algebraMap W _ ϖ from
+        rfl,
+      ← map_pow, ← map_mul, ← map_pow, ← map_mul, key]
+  have hord
+      : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.ord_vw W).toFun z + m'
+        = m := by
+    have :=
+      congrArg (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.ord_vw W).toFun hU
     rwa [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.LatticeVal.map_mul,
-      ord_vw_unit_mul_uniformiser_pow hϖ, ord_vw_unit_mul_uniformiser_pow hϖ] at this
+        ord_vw_unit_mul_uniformiser_pow hϖ, ord_vw_unit_mul_uniformiser_pow hϖ]
+      at this
 
   have hφu : ∀ x : Wˣ, O.valuation (φ x : F) = 1 := fun x => by
     simpa using O.valuation_unit (Units.map (φ : W →* O) x)
-  have keyF : algebraMap _ F (z : FractionRing W) * ((φ u' : F) * (φ ϖ : F) ^ m') =
-      (φ u : F) * (φ ϖ : F) ^ m := by
+  have keyF
+      : algebraMap _ F (z : FractionRing W) * ((φ u' : F) * (φ ϖ : F) ^ m')
+        = (φ u : F) * (φ ϖ : F) ^ m := by
     have := congrArg (algebraMap (FractionRing W) F) key
     simpa only [hφ, map_mul, map_pow] using this
   have hP : O.valuation (φ ϖ : F) = O.valuation π ^ k := by rw [hφ, ← hπ, map_pow]
@@ -157,7 +179,10 @@ theorem _root_.GlobalTheory.Member.TameDivOrd.tame_fixed_dvd_ord : ∀ (W : Type
   have hdvd : (k : ℤ) ∣ (m' : ℤ) - m := by
     rw [← hζ.zpow_eq_one_iff_dvd, zpow_sub₀ (hζ.ne_zero hk0), zpow_natCast, zpow_natCast]
     exact hw
-  have hn : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.ord_vw W).toFun z = m - m' := by omega
+  have hn
+      : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.ord_vw W).toFun z
+        = m - m' := by
+    omega
   rw [hn, ← dvd_neg, neg_sub]
   exact hdvd
 

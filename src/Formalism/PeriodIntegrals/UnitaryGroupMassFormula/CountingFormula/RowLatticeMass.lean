@@ -11,7 +11,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.
 
 @[expose] public section
 
-open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions Formalism.L2.SG.CntLocal Formalism.L2.SG.Pf.Cnt
+open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions
+  Formalism.L2.SG.CntLocal Formalism.L2.SG.Pf.Cnt
 open Classical
 
 noncomputable section
@@ -32,8 +33,9 @@ theorem row_lattice_mass : RowsMass := by
   have hrl : ∀ Λ ∈ what₂, IsRowLat D F0 Λ := hrows.1
   have hinj : Set.InjOn (Mof D F0) (what₂ : Set (Submodule (𝓞 D.host.E) (VS D).V)) := by
     intro Λ₁ h₁ Λ₂ h₂ he
-    obtain ⟨γ, hγ, hγe⟩ := (row_class_holds D u F0 Λ₁ Λ₂ (hrl Λ₁ h₁) (hrl Λ₂ h₂)).2
-      ⟨1, one_mem_hz D _ _, by rw [gmap_one' D, he]⟩
+    obtain ⟨γ, hγ, hγe⟩ :=
+      (row_class_holds D u F0 Λ₁ Λ₂ (hrl Λ₁ h₁) (hrl Λ₂ h₂)).2
+        ⟨1, one_mem_hz D _ _, by rw [gmap_one' D, he]⟩
     obtain ⟨Λ', _, hu⟩ := hrows.2 Λ₂ (hrl Λ₂ h₂)
     have e1 := hu Λ₁ ⟨h₁, γ, hγ, hγe⟩
     have e2 := hu Λ₂ ⟨h₂, 1, one_mem_stabF D F0, gmap_one' D Λ₂⟩
@@ -48,15 +50,19 @@ theorem row_lattice_mass : RowsMass := by
       refine ⟨Mof D F0 Λ', ⟨Finset.mem_image_of_mem _ hΛ'm, σ, hσ, hσM⟩, ?_⟩
       rintro M'' ⟨hM'', σ', hσ', hσ'M⟩
       obtain ⟨Λ'', hΛ''m, rfl⟩ := Finset.mem_image.1 hM''
-      obtain ⟨γ'', hγ'', hγ''Λ⟩ := (row_class_holds D u F0 Λ'' Λ (hrl Λ'' hΛ''m) hΛ).2 ⟨σ', hσ', hσ'M⟩
+      obtain ⟨γ'', hγ'', hγ''Λ⟩ :=
+        (row_class_holds D u F0 Λ'' Λ (hrl Λ'' hΛ''m) hΛ).2 ⟨σ', hσ', hσ'M⟩
       rw [hu Λ'' ⟨hΛ''m, γ'', hγ'', hγ''Λ⟩]
   have hk2 : 2 ≤ finrank D.host.E (wPerp (hWb D F0) (zbar D F0)) := by
     rw [hk]
     have := D.R.m_add_three_le_k
     omega
   have hne : ∃ M, IsGlueLat (hWb D F0) (zbar D F0) M :=
-    GluedLatticeMass.glued_exists hGH hk2 ⟨Mof D F0 (VS D).L0, RowMPf.Mof_isLattice D F0 _ (VS D).standardTuple_isLattice,
-      RowMPf.Mof_unimod D F0 _ (VS D).standardTuple_isLattice (VS D).baseLattice_isUnimodular⟩
+    GluedLatticeMass.glued_exists hGH hk2 ⟨
+      Mof D F0 (VS D).L0,
+      RowMPf.Mof_isLattice D F0 _ (VS D).standardTuple_isLattice,
+      RowMPf.Mof_unimod D F0 _ (VS D).standardTuple_isLattice (VS D).baseLattice_isUnimodular
+    ⟩
   have e := GluedLatticeMass.glued_lattice_mass_formula hGH (by omega) hne hreps
   rw [hk] at e
   rw [← e, Finset.sum_image hinj]

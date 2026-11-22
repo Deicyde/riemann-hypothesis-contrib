@@ -9,18 +9,24 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Adeli
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Mult
+  Formalism.IndefR.Lev Formalism.IndefR.Datum
 open scoped ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CocompactIntegrable
 
-theorem integrableOn_of_cocompact {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [MeasurableSpace G] [BorelSpace G] (Γ : Subgroup G) [Countable Γ] (μ : Measure G)
-    [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ] (𝓕 C : Set G)
-    (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (hC : IsCompact C)
-    (hcov : ∀ h : G, ∃ γ ∈ Γ, ∃ c ∈ C, h = γ * c) (F : G → ℂ) (hF : Continuous F)
-    (hinv : ∀ γ ∈ Γ, ∀ h, F (γ * h) = F h) : IntegrableOn F 𝓕 μ := by
+theorem integrableOn_of_cocompact
+    {G : Type*}
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+    (Γ : Subgroup G) [Countable Γ]
+    (μ : Measure G) [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ]
+    (𝓕 C : Set G) (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (hC : IsCompact C)
+    (hcov : ∀ h : G, ∃ γ ∈ Γ, ∃ c ∈ C, h = γ * c)
+    (F : G → ℂ) (hF : Continuous F) (hinv : ∀ γ ∈ Γ, ∀ h, F (γ * h) = F h)
+    : IntegrableOn F 𝓕 μ := by
   have hle : μ 𝓕 ≤ μ C := by
     rw [h𝓕.measure_eq_tsum C]
     refine le_trans (measure_mono ?_) (measure_iUnion_le _)
@@ -35,7 +41,12 @@ theorem integrableOn_of_cocompact {G : Type*} [Group G] [TopologicalSpace G] [Is
   rw [hinv γ hγ]
   exact hM c hc
 
-theorem integrableOn_fundamentalDomain : ∀ {D : D7} (V : HSp D) (μ : Measure (GA D V)) (𝓕 C : Set (GA D V)), μ.IsHaarMeasure → IsFundamentalDomain (GQ V) 𝓕 μ → IsCompact C → (∀ h : GA D V, ∃ γ ∈ GQ V, ∃ c ∈ C, h = γ * c) → ∀ F : GA D V → ℂ, Continuous F → (∀ γ ∈ GQ V, ∀ h, F (γ * h) = F h) → IntegrableOn F 𝓕 μ := by
+theorem integrableOn_fundamentalDomain
+    : ∀ {D : D7} (V : HSp D) (μ : Measure (GA D V)) (𝓕 C : Set (GA D V)),
+      μ.IsHaarMeasure → IsFundamentalDomain (GQ V) 𝓕 μ → IsCompact C
+        → (∀ h : GA D V, ∃ γ ∈ GQ V, ∃ c ∈ C, h = γ * c)
+        → ∀ F : GA D V → ℂ,
+          Continuous F → (∀ γ ∈ GQ V, ∀ h, F (γ * h) = F h) → IntegrableOn F 𝓕 μ := by
   intro D V μ 𝓕 C hμ h𝓕 hC hcov F hF hinv
   obtain ⟨-, -, -, _, _, -, _⟩ := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
   exact integrableOn_of_cocompact (GQ V) μ 𝓕 C h𝓕 hC hcov F hF hinv

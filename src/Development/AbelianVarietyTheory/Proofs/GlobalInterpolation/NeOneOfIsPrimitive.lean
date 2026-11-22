@@ -6,12 +6,16 @@ public import Formalism.LandauZeroFreeBounds.Statement
 
 @[expose] public section
 
-open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory
+open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology
+  Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory
 
 namespace GlobalTheory.ZeroFreeHalf
 
-theorem inRegion_of_max {c : ℝ} (hc : 0 < c) {N : ℕ} (hN : 3 ≤ N) {ρ : ℂ}
-    (h : 1 - c / 2 / Real.log (max (N : ℝ) (N * |ρ.im|)) ≤ ρ.re) : Formalism.ZeroFreeDirichlet.InRegion c N ρ := by
+theorem inRegion_of_max
+    {c : ℝ} (hc : 0 < c)
+    {N : ℕ} (hN : 3 ≤ N)
+    {ρ : ℂ} (h : 1 - c / 2 / Real.log (max (N : ℝ) (N * |ρ.im|)) ≤ ρ.re)
+    : Formalism.ZeroFreeDirichlet.InRegion c N ρ := by
   unfold Formalism.ZeroFreeDirichlet.InRegion
   set M := max (N : ℝ) (N * |ρ.im|) with hM
   have hN3 : (3 : ℝ) ≤ N := by exact_mod_cast hN
@@ -40,20 +44,33 @@ theorem isRealChar_of_sq {N : ℕ} (χ : DirichletCharacter ℂ N) (h : χ ^ 2 =
     rcases mul_self_eq_one_iff.mp h2 with e | e <;> simp [e]
   · simp [MulChar.map_nonunit χ ha]
 
-theorem ne_one_of_isPrimitive {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive)
-    (hN : 3 ≤ N) : χ ≠ 1 := by
+theorem ne_one_of_isPrimitive
+    {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive) (hN : 3 ≤ N)
+    : χ ≠ 1 := by
   intro h1
   rw [DirichletCharacter.isPrimitive_def, h1, DirichletCharacter.conductor_one] at hp
   omega
 
-theorem main : Formalism.ZeroFreeDirichlet.ZFRDirichlet → ∃ c : ℝ, 0 < c ∧ (∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), χ.IsPrimitive → 3 ≤ N → ∀ ρ : ℂ, LFunction χ ρ = 0 → 1 - c / Real.log (max (N : ℝ) (N * |ρ.im|)) ≤ ρ.re → IsRealChar χ ∧ ρ.im = 0 ∧ analyticOrderNatAt (LFunction χ) ρ = 1 ∧ ∀ ρ' : ℂ, LFunction χ ρ' = 0 → 1 - c / Real.log (max (N : ℝ) (N * |ρ'.im|)) ≤ ρ'.re → ρ' = ρ) ∧ (∀ ρ : ℂ, riemannZeta ρ = 0 → 0 < ρ.re → ρ.re < 1 → ρ.re ≤ 1 - c / Real.log (|ρ.im| + 3)) := by
+theorem main
+    : Formalism.ZeroFreeDirichlet.ZFRDirichlet
+      → ∃ c : ℝ,
+        0 < c
+          ∧ (∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+            χ.IsPrimitive → 3 ≤ N
+              → ∀ ρ : ℂ,
+                LFunction χ ρ = 0 → 1 - c / Real.log (max (N : ℝ) (N * |ρ.im|)) ≤ ρ.re
+                  → IsRealChar χ ∧ ρ.im = 0 ∧ analyticOrderNatAt (LFunction χ) ρ = 1
+                    ∧ ∀ ρ' : ℂ,
+                      LFunction χ ρ' = 0 → 1 - c / Real.log (max (N : ℝ) (N * |ρ'.im|)) ≤ ρ'.re
+                        → ρ' = ρ)
+          ∧ (∀ ρ : ℂ,
+            riemannZeta ρ = 0 → 0 < ρ.re → ρ.re < 1 → ρ.re ≤ 1 - c / Real.log (|ρ.im| + 3)) := by
   intro hZ
   obtain ⟨c, hc, hZ⟩ := hZ
   refine ⟨c / 2, by positivity, ?_, ?_⟩
   · intro N _ χ hp hN ρ hρ hreg
     have hχ1 : χ ≠ 1 := ne_one_of_isPrimitive χ hp hN
-    obtain ⟨hsq, -, him, hder, huniq⟩ :=
-      hZ N χ ρ (inRegion_of_max hc hN hreg) ⟨Or.inl hχ1, hρ⟩
+    obtain ⟨hsq, -, him, hder, huniq⟩ := hZ N χ ρ (inRegion_of_max hc hN hreg) ⟨Or.inl hχ1, hρ⟩
     refine ⟨isRealChar_of_sq χ hsq, him, ?_, ?_⟩
     · have han : AnalyticAt ℂ (LFunction χ) ρ :=
         (DirichletCharacter.differentiable_LFunction hχ1).analyticAt ρ

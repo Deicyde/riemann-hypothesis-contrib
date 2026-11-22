@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.For
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory AlgebraicGeometry NumberField MonoidalCategory CartesianMonoidalCategory MonObj
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory CategoryTheory.Hom.group
 
 namespace GlobalTheory.OActFinEt
@@ -24,17 +25,22 @@ theorem act_natCast (act : OAct O A) : ∀ n : ℕ, act.act (n : O) = 𝟙 A ^ n
   | 0 => by rw [Nat.cast_zero, act_zero, pow_zero]
   | n + 1 => by rw [Nat.cast_succ, act.add, act_natCast act n, act.one, pow_succ]
 
-theorem exists_natCast_dvd {E : Type} [Field E] [NumberField E] (b : 𝓞 E) (hb : b ≠ 0) :
-    ∃ n : ℕ, n ≠ 0 ∧ b ∣ (n : 𝓞 E) := by
+theorem exists_natCast_dvd {E : Type} [Field E] [NumberField E] (b : 𝓞 E) (hb : b ≠ 0)
+    : ∃ n : ℕ, n ≠ 0 ∧ b ∣ (n : 𝓞 E) := by
   refine ⟨Ideal.absNorm (Ideal.span {b}), ?_, ?_⟩
   · rw [Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]; exact hb
   · exact Ideal.mem_span_singleton.1 (Ideal.absNorm_mem _)
 
-theorem finite_etale_act (E : Type) [Field E] [NumberField E] (k : Type) [Field k] [IsAlgClosed k]
-    [CharZero k] (A : Over (Sp k)) [GrpObj A] (act : OAct (𝓞 E) A) (g : ℕ) :
-    IsAbelianScheme A → SmoothOfRelativeDimension g A.hom → ∀ b : 𝓞 E, b ≠ 0 →
-      IsFinite (act.act b).left ∧ Etale (act.act b).left ∧
-        Finite {x : 𝟙_ (Over (Sp k)) ⟶ A // x ≫ act.act b = 1} := by
+theorem finite_etale_act
+    (E : Type) [Field E] [NumberField E]
+    (k : Type) [Field k] [IsAlgClosed k] [CharZero k]
+    (A : Over (Sp k)) [GrpObj A]
+    (act : OAct (𝓞 E) A) (g : ℕ)
+    : IsAbelianScheme A → SmoothOfRelativeDimension g A.hom
+      → ∀ b : 𝓞 E,
+        b ≠ 0
+          → IsFinite (act.act b).left ∧ Etale (act.act b).left
+            ∧ Finite {x : 𝟙_ (Over (Sp k)) ⟶ A // x ≫ act.act b = 1} := by
   intro hA hg b hb
   haveI := hA.comm
   haveI := hA.smooth
@@ -68,8 +74,7 @@ theorem finite_etale_act (E : Type) [Field E] [NumberField E] (k : Type) [Field 
     GlobalTheory.TangentCrit.locallyOfFinitePresentation_of_comp _ A.hom
   refine ⟨hfin, Etale.of_formallyUnramified_of_flat _, ?_⟩
   have hfinN := GlobalTheory.Published.AbMulNSt.finite GlobalTheory.abMulN_holds hA hg hnk
-  refine Finite.of_injective (β := {x : 𝟙_ (Over (Sp k)) ⟶ A // x ^ n = 1})
-    (fun x => ⟨x.1, ?_⟩) ?_
+  refine Finite.of_injective (β := {x : 𝟙_ (Over (Sp k)) ⟶ A // x ^ n = 1}) (fun x => ⟨x.1, ?_⟩) ?_
   · have := congrArg (· ≫ act.act b') x.2
     simp only [Category.assoc, h1, one_comp] at this
     rwa [comp_pow, Category.comp_id] at this

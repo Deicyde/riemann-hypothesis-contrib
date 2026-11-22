@@ -17,7 +17,9 @@ end Formalism.MainNotions.Ext
 
 namespace Formalism.MainNotions.UnusedSlot33
 
-theorem division_rational_lattice (D : Formalism.BasicNotions.D7) : division_rows_rational_lattice D :=
-  finiteModel_of_heckeEstimate D (finite_order_of_totally_real Formalism.MainNotions.Ext.finOrdG_holds D)
+theorem division_rational_lattice (D : Formalism.BasicNotions.D7)
+    : division_rows_rational_lattice D :=
+  finiteModel_of_heckeEstimate D
+    (finite_order_of_totally_real Formalism.MainNotions.Ext.finOrdG_holds D)
 
 end Formalism.MainNotions.UnusedSlot33

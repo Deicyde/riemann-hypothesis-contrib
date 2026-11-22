@@ -15,27 +15,32 @@ namespace LevelTowerAlt.Reg
 
 variable {n : ℕ}
 
-theorem usc_comp {U : Set (Fin n → ℂ)} {φ : (Fin n → ℂ) → ℝ} (h : UpperSemicontinuousOn φ U)
-    {g : (Fin n → ℂ) → Fin n → ℂ} (hg : Continuous g) : UpperSemicontinuousOn (fun t => φ (g t)) (g ⁻¹' U) := by
+theorem usc_comp
+    {U : Set (Fin n → ℂ)} {φ : (Fin n → ℂ) → ℝ} (h : UpperSemicontinuousOn φ U)
+    {g : (Fin n → ℂ) → Fin n → ℂ} (hg : Continuous g)
+    : UpperSemicontinuousOn (fun t => φ (g t)) (g ⁻¹' U) := by
   intro z hz y hy
   have h1 : ∀ᶠ x in 𝓝[U] (g z), φ x < y := h _ hz y hy
   exact (hg.continuousWithinAt.tendsto_nhdsWithin (Set.mapsTo_preimage g U)).eventually h1
 
-theorem isPsh_aff {U : Set (Fin n → ℂ)} {φ : (Fin n → ℂ) → ℝ} (h : IsPsh U φ) (t₀ : Fin n → ℂ) (c : ℂ) :
-    IsPsh ((fun t => t₀ + c • t) ⁻¹' U) fun t => φ (t₀ + c • t) := by
+theorem isPsh_aff
+    {U : Set (Fin n → ℂ)} {φ : (Fin n → ℂ) → ℝ} (h : IsPsh U φ) (t₀ : Fin n → ℂ) (c : ℂ)
+    : IsPsh ((fun t => t₀ + c • t) ⁻¹' U) fun t => φ (t₀ + c • t) := by
   refine ⟨usc_comp h.1 (by fun_prop), fun z w hd => ?_⟩
   have e : ∀ ζ : ℂ, t₀ + c • (z + ζ • w) = t₀ + c • z + ζ • (c • w) := fun ζ => by
     rw [smul_add, smul_comm c ζ, add_assoc]
   simp only [e]
   exact h.2 _ _ fun ζ hζ => e ζ ▸ hd ζ hζ
 
-theorem isPsh_star {U : Set (Fin n → ℂ)} {φ : (Fin n → ℂ) → ℝ} (h : IsPsh U φ) :
-    IsPsh (star ⁻¹' U) fun t => φ (star t) := by
+theorem isPsh_star {U : Set (Fin n → ℂ)} {φ : (Fin n → ℂ) → ℝ} (h : IsPsh U φ)
+    : IsPsh (star ⁻¹' U) fun t => φ (star t) := by
   refine ⟨usc_comp h.1 continuous_star, fun z w hd => ?_⟩
-  have e : ∀ ζ : ℂ, star (z + ζ • w) = star z + star ζ • star w := fun ζ => by rw [star_add, star_smul]
-  obtain ⟨h1, h2⟩ := h.2 (star z) (star w) fun ζ hζ => by
-    have := hd (star ζ) (by rwa [norm_star])
-    rwa [Set.mem_preimage, e, star_star] at this
+  have e : ∀ ζ : ℂ, star (z + ζ • w) = star z + star ζ • star w := fun ζ => by
+    rw [star_add, star_smul]
+  obtain ⟨h1, h2⟩ :=
+    h.2 (star z) (star w) fun ζ hζ => by
+      have := hd (star ζ) (by rwa [norm_star])
+      rwa [Set.mem_preimage, e, star_star] at this
   have hc : ∀ θ : ℝ, star (circleMap 0 1 θ) = circleMap 0 1 (2 * Real.pi - θ) := fun θ => by
     rw [sub_eq_add_neg, add_comm, periodic_circleMap]
     simp [circleMap, ← Complex.exp_conj]
@@ -49,34 +54,44 @@ theorem isPsh_star {U : Set (Fin n → ℂ)} {φ : (Fin n → ℂ) → ℝ} (h :
     rw [intervalIntegral.integral_comp_sub_left (fun θ => φ (star z + circleMap 0 1 θ • star w))]
     simp
 
-variable {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {P : Ideal (MRing J)}
-  {Bd : Set ((Σ k, J k) → ℂ)} (χ : SncChart P n Bd)
+variable
+  {K : Type} [Fintype K]
+  {J : K → Type} [∀ k, Fintype (J k)]
+  {P : Ideal (MRing J)} {Bd : Set ((Σ k, J k) → ℂ)} (χ : SncChart P n Bd)
 
 theorem exp_le_logR {t : Fin n → ℂ} (ht : ‖t‖ < 1) : Real.exp 1 ≤ χ.logR t := by
   refine le_add_of_nonneg_right (Finset.sum_nonneg fun i _ => ?_)
   split_ifs
   · rw [one_div, Real.log_inv, neg_nonneg]
-    exact Real.log_nonpos (by positivity) (pow_le_one₀ (norm_nonneg _) ((norm_le_pi_norm t i).trans ht.le))
+    exact Real.log_nonpos (by positivity)
+      (pow_le_one₀ (norm_nonneg _) ((norm_le_pi_norm t i).trans ht.le))
   · exact le_rfl
 
-theorem piece {F : (Fin n → ℂ) → ℝ} (hO : IsOpen {t | t ∈ ball (0 : Fin n → ℂ) 1 ∧ χ.γ t ∉ Bd})
+theorem piece
+    {F : (Fin n → ℂ) → ℝ}
+    (hO : IsOpen {t | t ∈ ball (0 : Fin n → ℂ) 1 ∧ χ.γ t ∉ Bd})
     (hFs : ContDiffOn ℝ ∞ F {t | t ∈ ball (0 : Fin n → ℂ) 1 ∧ χ.γ t ∉ Bd})
-    (hFp : IsPsh {t | t ∈ ball (0 : Fin n → ℂ) 1 ∧ χ.γ t ∉ Bd} F) {t₀ : Fin n → ℂ} {ε C Q : ℝ}
-    (h₀ : ‖t₀‖ ≤ 1 / 2) (hε : 0 < ε) (hε' : ε ≤ 1 / 4) (hsep : ∀ i, t₀ i ≠ 0 → 2 * ε ≤ ‖t₀ i‖) (hC : 0 < C)
-    (hb : ∀ t ∈ {t | t ∈ ball (0 : Fin n → ℂ) 1 ∧ χ.γ t ∉ Bd}, ‖t - t₀‖ < 2 * ε →
-      -(C * Real.log (χ.logR t)) ≤ F t ∧ F t ≤ C ∧
-        ‖fderiv ℝ F t‖ ≤ C * χ.logR t ^ C * Real.exp (χ.logR t / 2))
-    (L : (Fin n → ℂ) →L[ℝ] Fin n → ℂ) (hL : ∀ t i, ‖L t i‖ = ‖t i‖)
-    (hLp : ∀ U φ, IsPsh U φ → IsPsh (L ⁻¹' U) fun t => φ (L t))
-    {S : Finset (Fin n)} (hS : ∀ i, i ∈ S ↔ (i : ℕ) < χ.a ∧ t₀ i = 0) {q p : (Fin n → ℂ) → ℝ}
-    (hq : ∀ t ∈ ball (0 : Fin n → ℂ) 1, |q t| ≤ Q)
-    (hu : ∀ t ∈ ball (0 : Fin n → ℂ) 1, χ.γ (t₀ + (ε : ℂ) • L t) ∉ Bd → q t + p t = F (t₀ + (ε : ℂ) • L t)) :
-    ContDiffOn ℝ ∞ (fun y => q y + p y) (ball 0 1 \ coordDiv S) ∧
-      IsPsh (ball 0 1 \ coordDiv S) (fun y => q y + p y) ∧
-      ∃ C' c : ℝ, 0 < C' ∧ ∀ t ∈ ball (0 : Fin n → ℂ) 1 \ coordDiv S, ∀ ρ : ℝ,
-        Real.exp 1 + c + ∑ i ∈ S, Real.log (‖t i‖ ^ 2)⁻¹ ≤ ρ →
-          p t ≤ C' ∧ -C' * Real.log ρ ≤ p t ∧
-            ‖fderiv ℝ (fun y => q y + p y) t‖ ≤ C' * ρ ^ C' * Real.exp (ρ / 2) := by
+    (hFp : IsPsh {t | t ∈ ball (0 : Fin n → ℂ) 1 ∧ χ.γ t ∉ Bd} F)
+    {t₀ : Fin n → ℂ} {ε C Q : ℝ} (h₀ : ‖t₀‖ ≤ 1 / 2) (hε : 0 < ε) (hε' : ε ≤ 1 / 4)
+    (hsep : ∀ i, t₀ i ≠ 0 → 2 * ε ≤ ‖t₀ i‖) (hC : 0 < C)
+    (hb : ∀ t ∈ {t | t ∈ ball (0 : Fin n → ℂ) 1 ∧ χ.γ t ∉ Bd},
+      ‖t - t₀‖ < 2 * ε
+        → -(C * Real.log (χ.logR t)) ≤ F t ∧ F t ≤ C
+          ∧ ‖fderiv ℝ F t‖ ≤ C * χ.logR t ^ C * Real.exp (χ.logR t / 2))
+    (L : (Fin n → ℂ) →L[ℝ] Fin n → ℂ)
+    (hL : ∀ t i, ‖L t i‖ = ‖t i‖) (hLp : ∀ U φ, IsPsh U φ → IsPsh (L ⁻¹' U) fun t => φ (L t))
+    {S : Finset (Fin n)} (hS : ∀ i, i ∈ S ↔ (i : ℕ) < χ.a ∧ t₀ i = 0)
+    {q p : (Fin n → ℂ) → ℝ} (hq : ∀ t ∈ ball (0 : Fin n → ℂ) 1, |q t| ≤ Q)
+    (hu : ∀ t ∈ ball (0 : Fin n → ℂ) 1,
+      χ.γ (t₀ + (ε : ℂ) • L t) ∉ Bd → q t + p t = F (t₀ + (ε : ℂ) • L t))
+    : ContDiffOn ℝ ∞ (fun y => q y + p y) (ball 0 1 \ coordDiv S)
+      ∧ IsPsh (ball 0 1 \ coordDiv S) (fun y => q y + p y)
+      ∧ ∃ C' c : ℝ,
+        0 < C'
+          ∧ ∀ t ∈ ball (0 : Fin n → ℂ) 1 \ coordDiv S, ∀ ρ : ℝ,
+            Real.exp 1 + c + ∑ i ∈ S, Real.log (‖t i‖ ^ 2)⁻¹ ≤ ρ
+              → p t ≤ C' ∧ -C' * Real.log ρ ≤ p t
+                ∧ ‖fderiv ℝ (fun y => q y + p y) t‖ ≤ C' * ρ ^ C' * Real.exp (ρ / 2) := by
   classical
   set O := {t | t ∈ ball (0 : Fin n → ℂ) 1 ∧ χ.γ t ∉ Bd} with hOdef
   have hLn : ∀ t, ‖L t‖ ≤ ‖t‖ := fun t =>
@@ -86,7 +101,9 @@ theorem piece {F : (Fin n → ℂ) → ℝ} (hO : IsOpen {t | t ∈ ball (0 : Fi
     rw [norm_smul, hεn]; exact mul_le_mul_of_nonneg_left (hLn t) hε.le
   have hTi : ∀ t i, ‖((ε : ℂ) • L t) i‖ = ε * ‖t i‖ := fun t i => by
     rw [Pi.smul_apply, norm_smul, hεn, hL]
-  have hlow : ∀ t : Fin n → ℂ, ‖t‖ < 1 → ∀ i, t₀ i ≠ 0 → ε ≤ ‖(t₀ + (ε : ℂ) • L t) i‖ := fun t ht i hi => by
+  have hlow
+      : ∀ t : Fin n → ℂ,
+        ‖t‖ < 1 → ∀ i, t₀ i ≠ 0 → ε ≤ ‖(t₀ + (ε : ℂ) • L t) i‖ := fun t ht i hi => by
     have h1 := hsep i hi
     have h2 := hTi t i
     have h3 := norm_sub_le ((t₀ + (ε : ℂ) • L t) i) (((ε : ℂ) • L t) i)
@@ -113,7 +130,8 @@ theorem piece {F : (Fin n → ℂ) → ℝ} (hO : IsOpen {t | t ∈ ball (0 : Fi
       linarith
   have hV : IsOpen (ball (0 : Fin n → ℂ) 1 \ coordDiv S) :=
     isOpen_ball.sdiff (ReciprocityTheory.AnForm.A.PlurisubharmonicExtension.coordDiv_closed _)
-  have heq : Set.EqOn (fun t => F (t₀ + (ε : ℂ) • L t)) (fun y => q y + p y) (ball 0 1 \ coordDiv S) :=
+  have heq
+      : Set.EqOn (fun t => F (t₀ + (ε : ℂ) • L t)) (fun y => q y + p y) (ball 0 1 \ coordDiv S) :=
     fun t ht => (hu t ht.1 (hmap t ht).2).symm
   have hσ : ContDiff ℝ ∞ fun t => t₀ + (ε : ℂ) • L t := contDiff_const.add (L.contDiff.const_smul _)
   have hpsh : IsPsh (ball 0 1 \ coordDiv S) (fun t => F (t₀ + (ε : ℂ) • L t)) := by
@@ -121,35 +139,44 @@ theorem piece {F : (Fin n → ℂ) → ℝ} (hO : IsOpen {t | t ∈ ball (0 : Fi
     exact ⟨h.1.mono hmap, fun z w hd => h.2 z w fun ζ hζ => hmap _ (hd ζ hζ)⟩
   have hpsh' : IsPsh (ball 0 1 \ coordDiv S) (fun t => q t + p t) := by
     refine ⟨fun z hz y hy => ?_, fun z w hd => ?_⟩
-    · have h1 := hpsh.1 z hz y (by
-        change F (t₀ + (ε : ℂ) • L z) < y
-        simpa only [heq hz] using hy)
+    · have h1 :=
+        hpsh.1 z hz y (by
+          change F (t₀ + (ε : ℂ) • L z) < y
+          simpa only [heq hz] using hy)
       filter_upwards [h1, self_mem_nhdsWithin] with x hx hxU
       simpa only [heq hxU] using hx
-    · have hs : Set.EqOn (fun ζ : ℂ => F (t₀ + (ε : ℂ) • L (z + ζ • w)))
-          (fun ζ => q (z + ζ • w) + p (z + ζ • w)) (sphere 0 |(1 : ℝ)|) :=
-        fun ζ hζ => heq (hd ζ (by simp at hζ; rw [hζ]))
+    · have hs : Set.EqOn
+          (fun ζ : ℂ => F (t₀ + (ε : ℂ) • L (z + ζ • w)))
+          (fun ζ => q (z + ζ • w) + p (z + ζ • w))
+          (sphere 0 |(1 : ℝ)|) := fun ζ hζ =>
+        heq (hd ζ (by simp at hζ; rw [hζ]))
       obtain ⟨h1, h2⟩ := hpsh.2 z w hd
       refine ⟨(circleIntegrable_congr hs).1 h1, ?_⟩
       have hz : z ∈ ball 0 1 \ coordDiv S := by simpa using hd 0 (by simp)
       rw [← Real.circleAverage_congr_sphere hs, ← heq hz]
       exact h2
-  refine ⟨(hFs.comp hσ.contDiffOn hmap).congr fun t ht => (heq ht).symm,
-    hpsh', C + |Q|, n * Real.log (1 / ε ^ 2), by positivity,
-    fun t ht ρ hρ => ?_⟩
+  refine ⟨
+    (hFs.comp hσ.contDiffOn hmap).congr fun t ht => (heq ht).symm,
+    hpsh',
+    C + |Q|,
+    n * Real.log (1 / ε ^ 2),
+    by positivity,
+    fun t ht ρ hρ => ?_
+  ⟩
   have ht1 : ‖t‖ < 1 := mem_ball_zero_iff.1 ht.1
   set s := t₀ + (ε : ℂ) • L t with hs
   have hsO : s ∈ O := hmap t ht
-  obtain ⟨b1, b2, b3⟩ := hb s hsO (by
-    rw [hs, add_sub_cancel_left]
-    nlinarith [hT t, norm_nonneg t])
+  obtain ⟨b1, b2, b3⟩ :=
+    hb s hsO (by
+      rw [hs, add_sub_cancel_left]
+      nlinarith [hT t, norm_nonneg t])
   have hRe := exp_le_logR χ (hball t ht1)
   have hRρ : χ.logR s ≤ ρ := by
     refine le_trans ?_ hρ
-    have hl0 : 0 ≤ Real.log (1 / ε ^ 2) := Real.log_nonneg (by
-      rw [le_div_iff₀ (by positivity)]; nlinarith)
-    have : ∑ i : Fin n, (if (i : ℕ) < χ.a then Real.log (1 / ‖s i‖ ^ 2) else 0) ≤
-        ∑ i : Fin n, (Real.log (1 / ε ^ 2) + if i ∈ S then Real.log (‖t i‖ ^ 2)⁻¹ else 0) := by
+    have hl0 : 0 ≤ Real.log (1 / ε ^ 2) :=
+      Real.log_nonneg (by rw [le_div_iff₀ (by positivity)]; nlinarith)
+    have : ∑ i : Fin n, (if (i : ℕ) < χ.a then Real.log (1 / ‖s i‖ ^ 2) else 0)
+        ≤ ∑ i : Fin n, (Real.log (1 / ε ^ 2) + if i ∈ S then Real.log (‖t i‖ ^ 2)⁻¹ else 0) := by
       refine Finset.sum_le_sum fun i _ => ?_
       by_cases hi : (i : ℕ) < χ.a
       · by_cases h1 : t₀ i = 0
@@ -167,12 +194,12 @@ theorem piece {F : (Fin n → ℂ) → ℝ} (hO : IsOpen {t | t ∈ ball (0 : Fi
       · rw [if_neg hi, if_neg fun h => hi ((hS i).1 h).1, add_zero]
         exact hl0
     rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul,
-      Finset.sum_ite_mem, Finset.univ_inter] at this
+        Finset.sum_ite_mem, Finset.univ_inter]
+      at this
     unfold SncChart.logR
     linarith
   have he1 : (1 : ℝ) ≤ Real.exp 1 := Real.one_le_exp zero_le_one
-  have hl1 : 1 ≤ Real.log ρ := by
-    rw [Real.le_log_iff_exp_le (by linarith)]; linarith
+  have hl1 : 1 ≤ Real.log ρ := by rw [Real.le_log_iff_exp_le (by linarith)]; linarith
   have hl2 : Real.log (χ.logR s) ≤ Real.log ρ := Real.log_le_log (by linarith) hRρ
   have hqt := abs_le.1 ((hq t ht.1).trans (le_abs_self Q))
   have hut : q t + p t = F s := hu t ht.1 hsO.2

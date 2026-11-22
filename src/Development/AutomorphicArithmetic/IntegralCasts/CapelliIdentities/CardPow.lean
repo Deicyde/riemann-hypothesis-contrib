@@ -4,12 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qi54.card_pow :
-    ∀ {E : Type} [inst : Field E] [NumberField E]
-    (w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)) (q : ℕ),
-    Nat.Prime q →
-      (↑q : NumberField.RingOfIntegers E) ∈ w.asIdeal →
-        ∃ (f : ℕ), Nat.card (NumberField.RingOfIntegers E ⧸ w.asIdeal) = q ^ f := by
+theorem UpperTheory.Reformulated.B.Qi54.card_pow
+    : ∀ {E : Type} [inst : Field E] [NumberField E]
+        (w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)) (q : ℕ),
+      Nat.Prime q → (↑q : NumberField.RingOfIntegers E) ∈ w.asIdeal
+        → ∃ (f : ℕ), Nat.card (NumberField.RingOfIntegers E ⧸ w.asIdeal) = q ^ f := by
   intro E _ _ w q hq hmem
   haveI : w.asIdeal.IsMaximal := w.isMaximal
   haveI : Finite (NumberField.RingOfIntegers E ⧸ w.asIdeal) :=

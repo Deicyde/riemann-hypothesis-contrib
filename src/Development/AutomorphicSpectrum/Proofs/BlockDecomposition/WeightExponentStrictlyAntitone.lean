@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IwahoriPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC Formalism.UG
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC
+  Formalism.UG
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -30,21 +31,24 @@ theorem cone_strictAnti {m : ℕ} {l : Fin m → ℤ} (hl : Cone l) : StrictAnti
   have hij' : (i : ℕ) < j := hij
   exact key ((j : ℕ) - i - 1) i j (by omega)
 
-theorem wexp_of_lt {n : ℕ} (l : Fin (n / 2) → ℤ) (i : Fin n) (h : (i : ℕ) < n / 2) :
-    wexp n l i = l ⟨i, h⟩ := by
+theorem wexp_of_lt {n : ℕ} (l : Fin (n / 2) → ℤ) (i : Fin n) (h : (i : ℕ) < n / 2)
+    : wexp n l i = l ⟨i, h⟩ := by
   simp only [wexp, dif_pos h]
 
-theorem wexp_of_rev_lt {n : ℕ} (l : Fin (n / 2) → ℤ) (i : Fin n) (h' : n - 1 - (i : ℕ) < n / 2) :
-    wexp n l i = -l ⟨n - 1 - i, h'⟩ := by
+theorem wexp_of_rev_lt {n : ℕ} (l : Fin (n / 2) → ℤ) (i : Fin n) (h' : n - 1 - (i : ℕ) < n / 2)
+    : wexp n l i = - l ⟨n - 1 - i, h'⟩ := by
   have h : ¬ (i : ℕ) < n / 2 := by have := i.isLt; omega
   simp only [wexp, dif_neg h, dif_pos h']
 
-theorem wexp_of_middle {n : ℕ} (l : Fin (n / 2) → ℤ) (i : Fin n) (h : ¬ (i : ℕ) < n / 2)
-    (h' : ¬ n - 1 - (i : ℕ) < n / 2) : wexp n l i = 0 := by
+theorem wexp_of_middle
+    {n : ℕ}
+    (l : Fin (n / 2) → ℤ) (i : Fin n) (h : ¬ (i : ℕ) < n / 2) (h' : ¬ n - 1 - (i : ℕ) < n / 2)
+    : wexp n l i = 0 := by
   simp only [wexp, dif_neg h, dif_neg h']
 
-theorem wexp_strictAnti_rev : ∀ (n : ℕ) (l : Fin (n / 2) → ℤ), Cone l →
-    StrictAnti (wexp n l) ∧ ∀ i, wexp n l (Fin.rev i) = -wexp n l i := by
+theorem wexp_strictAnti_rev
+    : ∀ (n : ℕ) (l : Fin (n / 2) → ℤ),
+      Cone l → StrictAnti (wexp n l) ∧ ∀ i, wexp n l (Fin.rev i) = - wexp n l i := by
   intro n l hl
   have hs := cone_strictAnti hl
   have hp := hl.2
@@ -75,8 +79,7 @@ theorem wexp_strictAnti_rev : ∀ (n : ℕ) (l : Fin (n / 2) → ℤ), Cone l �
         omega
   · intro i
     have hi := i.isLt
-    have hr : ((Fin.rev i : Fin n) : ℕ) = n - 1 - i := by
-      rw [Fin.val_rev]; omega
+    have hr : ((Fin.rev i : Fin n) : ℕ) = n - 1 - i := by rw [Fin.val_rev]; omega
     by_cases h1 : (i : ℕ) < n / 2
     · have h' : n - 1 - ((Fin.rev i : Fin n) : ℕ) < n / 2 := by omega
       rw [wexp_of_rev_lt l _ h', wexp_of_lt l i h1]

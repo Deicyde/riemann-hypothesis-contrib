@@ -16,20 +16,26 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RootOriginWeig
 @[expose] public section
 
 open NumberField IsDedekindDomain Filter Topology
-open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
-open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec GlobalTheory.CompanionTheory.Ar.Plug
+open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.BasicNotions Formalism.MainNotions
+open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
+  GlobalTheory.CompanionTheory.Ar.Plug
 attribute [-instance] GlobalTheory.CompHt.fintypePsi
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.VsReg
 
-theorem le_exp_mul_pow_of_log_le {P r A B : ℝ} {M : ℕ} (hP : 0 < P) (hr : 1 ≤ r) (hB : B ≤ M)
-    (h : Real.log P ≤ A + B * Real.log r) : P ≤ Real.exp A * r ^ M := by
+theorem le_exp_mul_pow_of_log_le
+    {P r A B : ℝ} {M : ℕ}
+    (hP : 0 < P) (hr : 1 ≤ r) (hB : B ≤ M) (h : Real.log P ≤ A + B * Real.log r)
+    : P ≤ Real.exp A * r ^ M := by
   have hr0 : 0 < r := lt_of_lt_of_le one_pos hr
   have hl : 0 ≤ Real.log r := Real.log_nonneg hr
   have h1 : Real.log P ≤ A + (M : ℝ) * Real.log r := by nlinarith
-  calc P = Real.exp (Real.log P) := (Real.exp_log hP).symm
+  calc
+    P = Real.exp (Real.log P) := (Real.exp_log hP).symm
     _ ≤ Real.exp (A + (M : ℝ) * Real.log r) := Real.exp_le_exp.2 h1
     _ = Real.exp A * r ^ M := by rw [Real.exp_add, Real.exp_nat_mul, Real.exp_log hr0]
 

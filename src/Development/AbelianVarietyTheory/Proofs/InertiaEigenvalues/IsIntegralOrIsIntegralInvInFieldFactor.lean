@@ -14,20 +14,26 @@ namespace GlobalTheory.UnitLemma.Desc
 
 open GlobalTheory.UnitLemma Polynomial
 
-theorem idem_mul_aeval_idem_mul {R A : Type} [CommRing R] [CommRing A] [Algebra R A] {f : A}
-    (hf : IsIdempotentElem f) (w : A) (p : R[X]) :
-    f * aeval (f * w) p = f * aeval w p := by
+theorem idem_mul_aeval_idem_mul
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
+    {f : A} (hf : IsIdempotentElem f)
+    (w : A) (p : R[X])
+    : f * aeval (f * w) p = f * aeval w p := by
   induction p using Polynomial.induction_on' with
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), mul_add, mul_add, hp, hq]
   | monomial n a =>
     rw [aeval_monomial, aeval_monomial, mul_pow]
-    calc f * (algebraMap R A a * (f ^ n * w ^ n)) = algebraMap R A a * ((f * f ^ n) * w ^ n) := by ring
+    calc
+      f * (algebraMap R A a * (f ^ n * w ^ n))
+        = algebraMap R A a * ((f * f ^ n) * w ^ n) := by ring
       _ = algebraMap R A a * (f * w ^ n) := by rw [← pow_succ', hf.pow_succ_eq]
       _ = f * (algebraMap R A a * w ^ n) := by ring
 
-theorem isIntegral_idem_mul_of_quot {R A : Type} [CommRing R] [CommRing A] [Algebra R A] {f : A}
-    (hf : IsIdempotentElem f) (w : A)
-    (h : IsIntegral R (Ideal.Quotient.mk (Ideal.span {1 - f}) w)) : IsIntegral R (f * w) := by
+theorem isIntegral_idem_mul_of_quot
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
+    {f : A} (hf : IsIdempotentElem f)
+    (w : A) (h : IsIntegral R (Ideal.Quotient.mk (Ideal.span {1 - f}) w))
+    : IsIntegral R (f * w) := by
   obtain ⟨q, hq, hqw⟩ := h
   have h0 : aeval w q ∈ Ideal.span {1 - f} := by
     rw [← Ideal.Quotient.eq_zero_iff_mem]
@@ -37,15 +43,19 @@ theorem isIntegral_idem_mul_of_quot {R A : Type} [CommRing R] [CommRing A] [Alge
   have h1 : f * aeval w q = 0 := by
     rw [hc, ← mul_assoc, mul_sub, mul_one, hf.eq, sub_self, zero_mul]
   refine ⟨X * q, monic_X.mul hq, ?_⟩
-  rw [← aeval_def, map_mul, aeval_X, mul_assoc, mul_left_comm, idem_mul_aeval_idem_mul hf w q, h1, mul_zero]
+  rw [← aeval_def, map_mul, aeval_X, mul_assoc, mul_left_comm, idem_mul_aeval_idem_mul hf w q, h1,
+    mul_zero]
 
-theorem isIntegral_or_isIntegral_of_fieldFactor : ∀ (K : UQ) (B : InvAlg K) (f y z : B.A), IsIdempotentElem f →
-    (∀ w, f * w ≠ 0 → ∃ v, f * w * v = f) → f * y * z = f → IsIntegral K.O (f * y) ∨ IsIntegral K.O (f * z) := by
+theorem isIntegral_or_isIntegral_of_fieldFactor
+    : ∀ (K : UQ) (B : InvAlg K) (f y z : B.A),
+      IsIdempotentElem f → (∀ w, f * w ≠ 0 → ∃ v, f * w * v = f) → f * y * z = f
+        → IsIntegral K.O (f * y) ∨ IsIntegral K.O (f * z) := by
   intro K B f y z hf hinv hyz
   by_cases hf0 : f = 0
   · left; rw [hf0, zero_mul]; exact isIntegral_zero
   set I : Ideal B.A := Ideal.span {1 - f} with hI
-  have hmk : ∀ a b : B.A, Ideal.Quotient.mk I a = Ideal.Quotient.mk I b ↔ ∃ c, a - b = (1 - f) * c := by
+  have hmk
+      : ∀ a b : B.A, Ideal.Quotient.mk I a = Ideal.Quotient.mk I b ↔ ∃ c, a - b = (1 - f) * c := by
     intro a b
     rw [Ideal.Quotient.eq, hI, Ideal.mem_span_singleton]
     rfl
@@ -74,7 +84,8 @@ theorem isIntegral_or_isIntegral_of_fieldFactor : ∀ (K : UQ) (B : InvAlg K) (f
   letI : Field (B.A ⧸ I) := Ideal.Quotient.field I
   haveI : CharZero K.O :=
     ⟨fun m n h => Nat.cast_injective (R := K.E) (by simpa using congrArg (algebraMap K.O K.E) h)⟩
-  let e : FractionRing K.O ≃ₐ[K.O] K.E := IsLocalization.algEquiv (nonZeroDivisors K.O) (FractionRing K.O) K.E
+  let e : FractionRing K.O ≃ₐ[K.O] K.E :=
+    IsLocalization.algEquiv (nonZeroDivisors K.O) (FractionRing K.O) K.E
   letI : Algebra (FractionRing K.O) (B.A ⧸ I) :=
     ((algebraMap K.E (B.A ⧸ I)).comp (e : FractionRing K.O →+* K.E)).toAlgebra
   haveI : IsScalarTower K.O (FractionRing K.O) (B.A ⧸ I) := by
@@ -94,8 +105,10 @@ theorem isIntegral_or_isIntegral_of_fieldFactor : ∀ (K : UQ) (B : InvAlg K) (f
       simp
   have hinv' : Ideal.Quotient.mk I (f * z) = (Ideal.Quotient.mk I (f * y))⁻¹ := by
     apply eq_inv_of_mul_eq_one_left
-    rw [← map_mul, ← hfm, show f * (f * z * (f * y)) = f * y * z * f * f by ring, hyz, hf.eq, hf.eq, hf1]
-  rcases GlobalTheory.LN.isIntegral_or_isIntegral_inv K.O (B.A ⧸ I) (Ideal.Quotient.mk I (f * y)) with h | h
+    rw [← map_mul, ← hfm, show f * (f * z * (f * y)) = f * y * z * f * f by ring, hyz, hf.eq, hf.eq,
+      hf1]
+  rcases GlobalTheory.LN.isIntegral_or_isIntegral_inv K.O (B.A ⧸ I) (Ideal.Quotient.mk I (f * y))
+    with h | h
   · left
     have := isIntegral_idem_mul_of_quot hf (f * y) h
     rwa [← mul_assoc, hf.eq] at this

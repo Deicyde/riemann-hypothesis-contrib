@@ -15,22 +15,26 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
-theorem GenFibreChartDeg.isMultiHomogIdeal_ker_rat {K' : Type} {ι' : K' → Type} [∀ k, Fintype (ι' k)]
-    {Ω : Type} [Field Ω] [CharZero Ω] (x' : (Σ k', ι' k') → Ω)
-    (h : IsMultiHomogIdeal (RingHom.ker (aeval x' : MRing ι' →ₐ[ℤ] Ω))) :
-    IsMultiHomogIdeal (RingHom.ker (aeval x' : MRingOver ℚ ι' →ₐ[ℚ] Ω)) := by
+theorem GenFibreChartDeg.isMultiHomogIdeal_ker_rat
+    {K' : Type} {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (x' : (Σ k', ι' k') → Ω) (h : IsMultiHomogIdeal (RingHom.ker (aeval x' : MRing ι' →ₐ[ℤ] Ω)))
+    : IsMultiHomogIdeal (RingHom.ker (aeval x' : MRingOver ℚ ι' →ₐ[ℚ] Ω)) := by
   have hmap : ∀ g : MRing ι', aeval x' (qmap g) = aeval x' g := fun g => by
     rw [qmap, ← algebraMap_int_eq, MvPolynomial.aeval_map_algebraMap]
-  have hker : RingHom.ker (aeval x' : MRingOver ℚ ι' →ₐ[ℚ] Ω) =
-      (RingHom.ker (aeval x' : MRing ι' →ₐ[ℤ] Ω)).map qmap := by
+  have hker
+      : RingHom.ker (aeval x' : MRingOver ℚ ι' →ₐ[ℚ] Ω)
+        = (RingHom.ker (aeval x' : MRing ι' →ₐ[ℤ] Ω)).map qmap := by
     apply le_antisymm
     · intro f hf
       obtain ⟨N, hN, g, hg⟩ := exists_int_mul_eq_qmap f
       have hg0 : g ∈ RingHom.ker (aeval x' : MRing ι' →ₐ[ℤ] Ω) := by
         rw [RingHom.mem_ker, ← hmap, ← hg, map_mul, RingHom.mem_ker.mp hf, mul_zero]
-      have hmem : (N : MRingOver ℚ ι') * f ∈ (RingHom.ker (aeval x' : MRing ι' →ₐ[ℤ] Ω)).map qmap := by
+      have hmem
+          : (N : MRingOver ℚ ι') * f ∈ (RingHom.ker (aeval x' : MRing ι' →ₐ[ℤ] Ω)).map qmap := by
         rw [hg]
         exact Ideal.mem_map_of_mem _ hg0
       have hu : IsUnit (N : MRingOver ℚ ι') := by
@@ -49,8 +53,10 @@ theorem GenFibreChartDeg.isMultiHomogIdeal_ker_rat {K' : Type} {ι' : K' → Typ
   obtain ⟨a, ha⟩ := hT f hf
   exact ⟨a, fun m hm k => ha m (MvPolynomial.support_map_subset _ f hm) k⟩
 
-theorem GenFibreChartDeg.proof (hT : GroundTheory.Heights₂.Heights.Inter.ChartScalingIndep.Statement)
-    (hC : GroundTheory.Heights₂.Heights.Inter.AdjoinIndepRelfinrank.Statement) : GenFibreChartDeg.Statement := by
+theorem GenFibreChartDeg.proof
+    (hT : GroundTheory.Heights₂.Heights.Inter.ChartScalingIndep.Statement)
+    (hC : GroundTheory.Heights₂.Heights.Inter.AdjoinIndepRelfinrank.Statement)
+    : GenFibreChartDeg.Statement := by
   intro K _ ι _ K' _ ι' _ κ v P' G _ c i hv hP hc hi
   have : CharZero G.Φ := (algebraMap G.Φ G.Φ').charZero
   have hx'0 : ∀ k, G.x' (v ⟨k, c k⟩) ≠ 0 := fun k => by
@@ -73,14 +79,16 @@ theorem GenFibreChartDeg.proof (hT : GroundTheory.Heights₂.Heights.Inter.Chart
   let F₁ := blockFnField G.x'
   let F₀ := blockFnField (G.x' ∘ v)
   let E := IntermediateField.adjoin ℚ (Set.range t)
-  let S := Set.range fun q : Σ k : FibreBlock κ, fibreIdx ι' κ k => G.x' ⟨q.1.1, q.2⟩ / G.x' ⟨q.1.1, i q.1⟩
-  have hF : ∀ p q : Σ k', ι' k', p.1 = q.1 → G.x' p / G.x' q ∈ F₁ :=
-    fun p q h => IntermediateField.subset_adjoin _ _ ⟨p, q, h, rfl⟩
-  have hF0 : ∀ p q : Σ k, ι k, p.1 = q.1 → G.x' (v p) / G.x' (v q) ∈ F₀ :=
-    fun p q h => IntermediateField.subset_adjoin _ _ ⟨p, q, h, rfl⟩
-  have hF01 : F₀ ≤ F₁ := IntermediateField.adjoin_le_iff.2 (by
-    rintro _ ⟨p, q, h, rfl⟩
-    exact hF (v p) (v q) (by rw [hv.2.2.1, hv.2.2.1, h]))
+  let S :=
+    Set.range fun q : Σ k : FibreBlock κ, fibreIdx ι' κ k => G.x' ⟨q.1.1, q.2⟩ / G.x' ⟨q.1.1, i q.1⟩
+  have hF : ∀ p q : Σ k', ι' k', p.1 = q.1 → G.x' p / G.x' q ∈ F₁ := fun p q h =>
+    IntermediateField.subset_adjoin _ _ ⟨p, q, h, rfl⟩
+  have hF0 : ∀ p q : Σ k, ι k, p.1 = q.1 → G.x' (v p) / G.x' (v q) ∈ F₀ := fun p q h =>
+    IntermediateField.subset_adjoin _ _ ⟨p, q, h, rfl⟩
+  have hF01 : F₀ ≤ F₁ :=
+    IntermediateField.adjoin_le_iff.2 (by
+      rintro _ ⟨p, q, h, rfl⟩
+      exact hF (v p) (v q) (by rw [hv.2.2.1, hv.2.2.1, h]))
   have hmem : ∀ c, algebraMap G.Φ G.Φ' c ∈ Φ₁ := fun c => AlgHom.mem_fieldRange.2 ⟨c, rfl⟩
 
   have hchart : ∀ k, ∃ p₀ : Σ k, ι k, p₀.1 = k ∧ v p₀ = ⟨κ k, i' (κ k)⟩ := fun k => by
@@ -98,7 +106,8 @@ theorem GenFibreChartDeg.proof (hT : GroundTheory.Heights₂.Heights.Inter.Chart
     exact hF0 p p₀ h1.symm
 
   have hΦ₁ : F₀ ⊔ E = Φ₁ := by
-    refine le_antisymm (sup_le (IntermediateField.adjoin_le_iff.2 ?_) (IntermediateField.adjoin_le_iff.2 ?_)) ?_
+    refine le_antisymm
+      (sup_le (IntermediateField.adjoin_le_iff.2 ?_) (IntermediateField.adjoin_le_iff.2 ?_)) ?_
     · rintro _ ⟨p, q, -, rfl⟩
       show G.x' (v p) / G.x' (v q) ∈ Φ₁
       rw [G.compat, G.compat]
@@ -142,8 +151,9 @@ theorem GenFibreChartDeg.proof (hT : GroundTheory.Heights₂.Heights.Inter.Chart
       · obtain ⟨k, rfl⟩ := ha
         obtain ⟨p, hp⟩ := hv.2.2.2 ⟨κ k, j⟩ ⟨k, rfl⟩
         obtain ⟨q, hq⟩ := hv.2.2.2 ⟨κ k, l⟩ ⟨k, rfl⟩
-        have hpq : p.1 = q.1 := hv.1 ((hv.2.2.1 p).symm.trans
-          ((congrArg Sigma.fst hp).trans ((congrArg Sigma.fst hq).symm.trans (hv.2.2.1 q))))
+        have hpq : p.1 = q.1 :=
+          hv.1 ((hv.2.2.1 p).symm.trans
+            ((congrArg Sigma.fst hp).trans ((congrArg Sigma.fst hq).symm.trans (hv.2.2.1 q))))
         rw [← hp, ← hq]
         exact (le_sup_left : Φ₁ ≤ _) (hΦ₁.le ((le_sup_left : F₀ ≤ F₀ ⊔ E) (hF0 p q hpq)))
       · rw [← div_div_div_cancel_right₀ (hi ⟨a, ha⟩) (G.x' ⟨a, j⟩) (G.x' ⟨a, l⟩)]
@@ -153,7 +163,9 @@ theorem GenFibreChartDeg.proof (hT : GroundTheory.Heights₂.Heights.Inter.Chart
     · rw [← hΦ₁]
       exact le_sup_right.trans le_sup_left
 
-  have hy : IntermediateField.adjoin ℚ (Set.range fun q : Σ k', ι' k' => G.x' q / G.x' ⟨q.1, i' q.1⟩) = F₁ := by
+  have hy
+      : IntermediateField.adjoin ℚ (Set.range fun q : Σ k', ι' k' => G.x' q / G.x' ⟨q.1, i' q.1⟩)
+        = F₁ := by
     refine le_antisymm (IntermediateField.adjoin_le_iff.2 ?_) (IntermediateField.adjoin_le_iff.2 ?_)
     · rintro _ ⟨q, rfl⟩
       exact hF _ _ rfl
@@ -163,10 +175,12 @@ theorem GenFibreChartDeg.proof (hT : GroundTheory.Heights₂.Heights.Inter.Chart
       rw [← div_div_div_cancel_right₀ (hi' a) (G.x' ⟨a, j⟩) (G.x' ⟨a, l⟩)]
       exact div_mem (IntermediateField.subset_adjoin _ _ ⟨⟨a, j⟩, rfl⟩)
         (IntermediateField.subset_adjoin _ _ ⟨⟨a, l⟩, rfl⟩)
-  have hker := GenFibreChartDeg.isMultiHomogIdeal_ker_rat G.x' (by rw [G.genericFibre_ker_target]; exact hP)
+  have hker :=
+    GenFibreChartDeg.isMultiHomogIdeal_ker_rat G.x' (by rw [G.genericFibre_ker_target]; exact hP)
   have hindep : AlgebraicIndependent F₁ t := by
-    have key : ∀ L : IntermediateField ℚ G.Φ', L = F₁ → AlgebraicIndependent L t →
-        AlgebraicIndependent F₁ t := by
+    have key
+        : ∀ L : IntermediateField ℚ G.Φ',
+          L = F₁ → AlgebraicIndependent L t → AlgebraicIndependent F₁ t := by
       rintro L rfl h
       exact h
     exact key _ hy ((hT ℚ G.Φ' K' ι' G.x' i' hi' hker).comp κ hv.1)

@@ -9,11 +9,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
-private theorem exists_finite_residue_reps_mod_natCast {G : Type} [CommGroup G] (K : Subgroup G) (P : G → Prop) (C : Finset G)
-    (hC : ∀ u, P u → ∃ t ∈ C, P t ∧ u / t ∈ K) :
-    ∃ R : Finset G, (∀ e ∈ R, e ∈ C ∧ P e) ∧ ∀ u, P u → ∃! e, e ∈ R ∧ u / e ∈ K := by
+private theorem exists_finite_residue_reps_mod_natCast
+    {G : Type} [CommGroup G]
+    (K : Subgroup G) (P : G → Prop) (C : Finset G) (hC : ∀ u, P u → ∃ t ∈ C, P t ∧ u / t ∈ K)
+    : ∃ R : Finset G, (∀ e ∈ R, e ∈ C ∧ P e) ∧ ∀ u, P u → ∃! e, e ∈ R ∧ u / e ∈ K := by
   classical
   have hq : ∀ u, P u → ∃ t, t ∈ C ∧ P t ∧ (QuotientGroup.mk t : G ⧸ K) = QuotientGroup.mk u := by
     intro u hu
@@ -21,11 +24,16 @@ private theorem exists_finite_residue_reps_mod_natCast {G : Type} [CommGroup G] 
     refine ⟨t, ht, hPt, ?_⟩
     rw [QuotientGroup.eq, mul_comm, ← div_eq_mul_inv]
     exact hut
-  let f : G ⧸ K → G := fun q => if h : ∃ t, t ∈ C ∧ P t ∧ (QuotientGroup.mk t : G ⧸ K) = q then h.choose else 1
-  have hf : ∀ t, t ∈ C → P t → f (QuotientGroup.mk t) ∈ C ∧ P (f (QuotientGroup.mk t)) ∧
-      (QuotientGroup.mk (f (QuotientGroup.mk t)) : G ⧸ K) = QuotientGroup.mk t := by
+  let f : G ⧸ K → G := fun q =>
+    if h : ∃ t, t ∈ C ∧ P t ∧ (QuotientGroup.mk t : G ⧸ K) = q then h.choose else 1
+  have hf
+      : ∀ t,
+        t ∈ C → P t
+          → f (QuotientGroup.mk t) ∈ C ∧ P (f (QuotientGroup.mk t))
+            ∧ (QuotientGroup.mk (f (QuotientGroup.mk t)) : G ⧸ K) = QuotientGroup.mk t := by
     intro t ht hPt
-    have h : ∃ s, s ∈ C ∧ P s ∧ (QuotientGroup.mk s : G ⧸ K) = QuotientGroup.mk t := ⟨t, ht, hPt, rfl⟩
+    have h : ∃ s, s ∈ C ∧ P s ∧ (QuotientGroup.mk s : G ⧸ K) = QuotientGroup.mk t :=
+      ⟨t, ht, hPt, rfl⟩
     simp only [f, dif_pos h]
     exact h.choose_spec
   refine ⟨(C.filter P).image (fun t : G => f (QuotientGroup.mk t)), ?_, ?_⟩
@@ -55,8 +63,8 @@ private theorem exists_finite_residue_reps_mod_natCast {G : Type} [CommGroup G] 
 
 theorem UpperTheory.V.Z.Sym.Sig.finFacts : UpperTheory.V.Z.Sym.Sig.FinFacts := by
   intro k _ _ _ _ V
-  let φ : kˣ →* GL (Fin 1) k := (diagT k (Fin 1)).comp
-    { toFun := fun u _ => u, map_one' := rfl, map_mul' := fun _ _ => rfl }
+  let φ : kˣ →* GL (Fin 1) k :=
+    (diagT k (Fin 1)).comp { toFun := fun u _ => u, map_one' := rfl, map_mul' := fun _ _ => rfl }
   have hφc : Subgroup.comap φ (Kc k 1 (V.c + 1)) = Uc k (V.c + 1) := by
     ext u
     rw [Subgroup.mem_comap]
@@ -86,28 +94,37 @@ theorem UpperTheory.V.Z.Sym.Sig.finFacts : UpperTheory.V.Z.Sym.Sig.FinFacts := b
     intro u hu
     show u ^ 2 ∈ V.H
     exact V.H.pow_mem hu 2
-  obtain ⟨T, hTU, hT⟩ : ∃ T : Finset kˣ, (∀ t ∈ T, t ∈ Uo k) ∧ ∀ u ∈ Uo k, ∃ t ∈ T, u / t ∈ V.H := by
+  obtain ⟨T, hTU, hT⟩
+      : ∃ T : Finset kˣ, (∀ t ∈ T, t ∈ Uo k) ∧ ∀ u ∈ Uo k, ∃ t ∈ T, u / t ∈ V.H := by
     classical
     haveI : (V.H.subgroupOf (Uo k)).FiniteIndex := ⟨hH⟩
     haveI := Fintype.ofFinite (Uo k ⧸ V.H.subgroupOf (Uo k))
-    refine ⟨Finset.univ.image (fun q : Uo k ⧸ V.H.subgroupOf (Uo k) => ((Quotient.out q : Uo k) : kˣ)), ?_, ?_⟩
+    refine ⟨
+      Finset.univ.image (fun q : Uo k ⧸ V.H.subgroupOf (Uo k) => ((Quotient.out q : Uo k) : kˣ)),
+      ?_,
+      ?_
+    ⟩
     · intro t ht
       obtain ⟨q, -, rfl⟩ := Finset.mem_image.mp ht
       exact (Quotient.out q).2
     · intro u hu
-      refine ⟨((Quotient.out (QuotientGroup.mk ⟨u, hu⟩ : Uo k ⧸ V.H.subgroupOf (Uo k)) : Uo k) : kˣ),
-        Finset.mem_image.mpr ⟨_, Finset.mem_univ _, rfl⟩, ?_⟩
+      refine ⟨
+        ((Quotient.out (QuotientGroup.mk ⟨u, hu⟩ : Uo k ⧸ V.H.subgroupOf (Uo k)) : Uo k) : kˣ),
+        Finset.mem_image.mpr ⟨_, Finset.mem_univ _, rfl⟩,
+        ?_
+      ⟩
       have h := QuotientGroup.out_eq' (QuotientGroup.mk ⟨u, hu⟩ : Uo k ⧸ V.H.subgroupOf (Uo k))
       rw [QuotientGroup.eq, Subgroup.mem_subgroupOf] at h
       rw [div_eq_mul_inv, mul_comm]
       simpa using h
   refine ⟨hH, hH2, hHH2, ?_, ?_, ?_⟩
-  · obtain ⟨R, hR1, hR2⟩ := exists_finite_residue_reps_mod_natCast V.H (· ∈ V.H2) T (by
-      intro u hu
-      obtain ⟨t, ht, hut⟩ := hT u (hH2 hu)
-      refine ⟨t, ht, ?_, hut⟩
-      rw [← div_div_cancel u t]
-      exact V.H2.div_mem hu (hHH2 hut))
+  · obtain ⟨R, hR1, hR2⟩ :=
+      exists_finite_residue_reps_mod_natCast V.H (· ∈ V.H2) T (by
+        intro u hu
+        obtain ⟨t, ht, hut⟩ := hT u (hH2 hu)
+        refine ⟨t, ht, ?_, hut⟩
+        rw [← div_div_cancel u t]
+        exact V.H2.div_mem hu (hHH2 hut))
     exact ⟨R, fun e he => (hR1 e he).2, hR2⟩
   · classical
     let S : Subgroup kˣ := V.H ⊔ (powMonoidHom 2 : kˣ →* kˣ).range
@@ -140,12 +157,20 @@ theorem UpperTheory.V.Z.Sym.Sig.finFacts : UpperTheory.V.Z.Sym.Sig.FinFacts := b
       · refine ⟨t0, Finset.mem_union_left _ ht0, trivial, (hS u t0).mpr ⟨s, ?_⟩⟩
         rw [hu_eq, hr, zpow_zero, mul_one, mul_div_mul_right_eq_div]
         exact hwt
-      · refine ⟨unif k * t0, Finset.mem_union_right _ (Finset.mem_image.mpr ⟨t0, ht0, rfl⟩), trivial,
-          (hS u _).mpr ⟨s, ?_⟩⟩
-        rw [hu_eq, hr, zpow_one, mul_div_mul_right_eq_div, mul_comm (unif k) t0, mul_div_mul_right_eq_div]
+      · refine ⟨
+          unif k * t0,
+          Finset.mem_union_right _ (Finset.mem_image.mpr ⟨t0, ht0, rfl⟩),
+          trivial,
+          (hS u _).mpr ⟨s, ?_⟩
+        ⟩
+        rw [hu_eq, hr, zpow_one, mul_div_mul_right_eq_div, mul_comm (unif k) t0,
+          mul_div_mul_right_eq_div]
         exact hwt
-    obtain ⟨R, hR1, hR2⟩ := exists_finite_residue_reps_mod_natCast S (fun _ => True) (T ∪ T.image (fun t => unif k * t))
-      (fun u _ => hcov u)
+    obtain ⟨R, hR1, hR2⟩ :=
+      exists_finite_residue_reps_mod_natCast S
+        (fun _ => True)
+        (T ∪ T.image (fun t => unif k * t))
+        (fun u _ => hcov u)
     refine ⟨R, ?_, ?_⟩
     · intro y hy
       have hyC := (hR1 y hy).1
@@ -168,12 +193,14 @@ theorem UpperTheory.V.Z.Sym.Sig.finFacts : UpperTheory.V.Z.Sym.Sig.FinFacts := b
   · intro n
     have hopen : IsOpen (V.J n : Set (GL (Fin n) k)) := Subgroup.isOpen_mono (kc_le V) (isOpen_Kc _)
     have hcpt : IsCompact (V.J n : Set (GL (Fin n) k)) :=
-      GlobalTheory.SplitFlip.isCompact_KO.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ hopen) V.J_le_KO
+      GlobalTheory.SplitFlip.isCompact_KO.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ hopen)
+        V.J_le_KO
     refine ⟨?_, hopen, hcpt, V.J_le_KO⟩
     intro x
     show (MulAction.orbit (V.J n) (x : GL (Fin n) k ⧸ V.J n)).Finite
     haveI := QuotientGroup.discreteTopology hopen
-    refine ((hcpt.image (f := fun g => ((g * x : GL (Fin n) k) : GL (Fin n) k ⧸ V.J n))
+    refine ((hcpt.image
+      (f := fun g => ((g * x : GL (Fin n) k) : GL (Fin n) k ⧸ V.J n))
       (QuotientGroup.continuous_mk.comp (continuous_mul_const x))).finite_of_discrete).subset ?_
     rintro _ ⟨j, rfl⟩
     exact ⟨j, j.2, rfl⟩

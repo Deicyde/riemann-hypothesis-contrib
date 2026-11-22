@@ -18,22 +18,37 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TestValueEqC
 @[expose] public section
 
 open NumberField IsDedekindDomain Filter Topology
-open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
-open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec GlobalTheory.CompanionTheory.Ar.Plug
+open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.BasicNotions Formalism.MainNotions
+open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
+  GlobalTheory.CompanionTheory.Ar.Plug
 attribute [-instance] GlobalTheory.CompHt.fintypePsi
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Plug.FinTr
 
-theorem ev_genValue_ne_zero : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (h : GenFrEx Xo c) (e : Comp Xo c → Rul Xo c), CompLaws U h e → ∀ (Z : Comp Xo c) (ex : Ix Dw → ℤ) (f : Rul Xo c), f ∈ GlobalTheory.AllWt.secZ Xo c ex → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (A : Subring (Om Z)) (ev : A →+* T.Fr), FinTr.RegAt h Z io A ev y.1 → evI y f ≠ 0 → ∀ hb : evC h Z f ∈ A, ev ⟨_, hb⟩ ≠ 0 := by
+theorem ev_genValue_ne_zero
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r)
+        (h : GenFrEx Xo c) (e : Comp Xo c → Rul Xo c),
+      CompLaws U h e
+        → ∀ (Z : Comp Xo c) (ex : Ix Dw → ℤ) (f : Rul Xo c),
+          f ∈ GlobalTheory.AllWt.secZ Xo c ex
+            → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (A : Subring (Om Z))
+                (ev : A →+* T.Fr),
+              FinTr.RegAt h Z io A ev y.1 → evI y f ≠ 0 → ∀ hb : evC h Z f ∈ A, ev ⟨_, hb⟩ ≠ 0 := by
   intro E _ _ _ H Dw l Xo c r U h e hL Z ex f hf T io y A ev hR hy hb h0
   letI := io.toAlgebra
   obtain ⟨-, q, φ, ψ, yq, z, t, h1, h2, h3, h4⟩ := hR
   have hg : evC h Z f = φ (f q yq) :=
-    ReciprocityTheory.ChartRestriction.G.PullbackSections.evalAt_eq_of _ _ hL.evalWD f hf.1 q φ yq (genFr h Z) h1
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.evalAt_eq_of _ _ hL.evalWD f hf.1 q φ yq
+      (genFr h Z) h1
   have hz : evR Xo c f z = ψ (f q yq) :=
-    ReciprocityTheory.ChartRestriction.G.PullbackSections.evalAt_eq_of _ _ hL.evalWD f hf.1 q ψ yq z h2
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.evalAt_eq_of _ _ hL.evalWD f hf.1 q ψ yq z
+      h2
   obtain ⟨hr, hψ⟩ := h3 (f q yq)
   have hψ0 : ψ (f q yq) = 0 := by
     rw [hψ, ← h0]

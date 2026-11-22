@@ -21,37 +21,38 @@ theorem norm_zc (a : ℤ_[q]) : ‖zc a‖ = ‖a‖ := by
   unfold zc
   rw [norm_algebraMap', PadicInt.norm_def]
 
-theorem coeff_DT (f : ℂ_[q]⟦X⟧) (n : ℕ) :
-    coeff n (DT f) = coeff (n + 1) f * (n + 1) + coeff n f * n := by
+theorem coeff_DT (f : ℂ_[q]⟦X⟧) (n : ℕ)
+    : coeff n (DT f) = coeff (n + 1) f * (n + 1) + coeff n f * n := by
   rw [DT, add_mul, one_mul, map_add (f := _), coeff_derivative]
   cases n with
   | zero => simp
   | succ n => rw [coeff_succ_X_mul, coeff_derivative]; simp
 
-theorem coeff_one_add_mulS (a : ℤ_[q]) (n : ℕ) :
-    coeff n (1 + mulS a : ℂ_[q]⟦X⟧) = zcHom (Ring.choose a n) := by
+theorem coeff_one_add_mulS (a : ℤ_[q]) (n : ℕ)
+    : coeff n (1 + mulS a : ℂ_[q]⟦X⟧) = zcHom (Ring.choose a n) := by
   cases n with
   | zero => simp [mulS]
   | succ n => simp [mulS, coeff_one, zc_eq]
 
-theorem constantCoeff_mulS (a : ℤ_[q]) : constantCoeff (mulS a : ℂ_[q]⟦X⟧) = 0 := by
-  simp [mulS]
+theorem constantCoeff_mulS (a : ℤ_[q]) : constantCoeff (mulS a : ℂ_[q]⟦X⟧) = 0 := by simp [mulS]
 
 theorem hasSubst_mulS (a : ℤ_[q]) : HasSubst (mulS a : ℂ_[q]⟦X⟧) :=
   HasSubst.of_constantCoeff_zero' (constantCoeff_mulS a)
 
-theorem choose_step (c : ℤ_[q]) (n : ℕ) :
-    Ring.choose c (n + 1) * (n + 1) + Ring.choose c n * n = c * Ring.choose c n := by
+theorem choose_step (c : ℤ_[q]) (n : ℕ)
+    : Ring.choose c (n + 1) * (n + 1) + Ring.choose c n * n = c * Ring.choose c n := by
   have h1 := Ring.descPochhammer_eq_factorial_smul_choose c (n + 1)
-  rw [descPochhammer_succ_right, Polynomial.smeval_mul, Ring.descPochhammer_eq_factorial_smul_choose] at h1
-  simp only [Polynomial.smeval_sub, Polynomial.smeval_X, Polynomial.smeval_natCast, pow_one, pow_zero,
-    nsmul_eq_mul, mul_one, Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one] at h1
+  rw [descPochhammer_succ_right, Polynomial.smeval_mul,
+      Ring.descPochhammer_eq_factorial_smul_choose]
+    at h1
+  simp only [Polynomial.smeval_sub, Polynomial.smeval_X, Polynomial.smeval_natCast, pow_one,
+      pow_zero, nsmul_eq_mul, mul_one, Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
+    at h1
   have h0 : (n.factorial : ℤ_[q]) ≠ 0 := by exact_mod_cast n.factorial_ne_zero
   apply mul_left_cancel₀ h0
   linear_combination -h1
 
-theorem DT_one_add_mulS (a : ℤ_[q]) :
-    DT (1 + mulS a : ℂ_[q]⟦X⟧) = C (zc a) * (1 + mulS a) := by
+theorem DT_one_add_mulS (a : ℤ_[q]) : DT (1 + mulS a : ℂ_[q]⟦X⟧) = C (zc a) * (1 + mulS a) := by
   ext n
   rw [coeff_DT, coeff_C_mul, coeff_one_add_mulS, coeff_one_add_mulS, zc_eq]
   have := congrArg zcHom (choose_step a n)
@@ -60,8 +61,11 @@ theorem DT_one_add_mulS (a : ℤ_[q]) :
 theorem DT_mulS (a : ℤ_[q]) : DT (mulS a : ℂ_[q]⟦X⟧) = C (zc a) * (1 + mulS a) := by
   rw [← DT_one_add_mulS]; simp [DT]
 
-theorem ode_unique (c : ℂ_[q]) (h : ℂ_[q]⟦X⟧) {f g : ℂ_[q]⟦X⟧} (hf : DT f = C c * f + h)
-    (hg : DT g = C c * g + h) (h0 : constantCoeff f = constantCoeff g) : f = g := by
+theorem ode_unique
+    (c : ℂ_[q]) (h : ℂ_[q]⟦X⟧)
+    {f g : ℂ_[q]⟦X⟧}
+    (hf : DT f = C c * f + h) (hg : DT g = C c * g + h) (h0 : constantCoeff f = constantCoeff g)
+    : f = g := by
   ext n
   induction n with
   | zero => simpa using h0
@@ -87,26 +91,26 @@ theorem DT_logS : DT (logS : ℂ_[q]⟦X⟧) = 1 := by
     field_simp
     ring
 
-theorem DT_subst_mulS (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧) :
-    DT (f.subst (mulS a : ℂ_[q]⟦X⟧)) = C (zc a) * (DT f).subst (mulS a : ℂ_[q]⟦X⟧) := by
+theorem DT_subst_mulS (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧)
+    : DT (f.subst (mulS a : ℂ_[q]⟦X⟧)) = C (zc a) * (DT f).subst (mulS a : ℂ_[q]⟦X⟧) := by
   have hs := hasSubst_mulS a
   have h2 := DT_mulS a
-  have h1 : (DT f).subst (mulS a : ℂ_[q]⟦X⟧) =
-      (1 + mulS a) * (derivative f).subst (mulS a : ℂ_[q]⟦X⟧) := by
+  have h1
+      : (DT f).subst (mulS a : ℂ_[q]⟦X⟧)
+        = (1 + mulS a) * (derivative f).subst (mulS a : ℂ_[q]⟦X⟧) := by
     rw [DT, ← coe_substAlgHom hs, map_mul, map_add (f := _), map_one, substAlgHom_X]
   rw [h1]
   unfold DT at h2 ⊢
   rw [derivative_subst hs]
   linear_combination ((derivative f).subst (mulS a : ℂ_[q]⟦X⟧)) * h2
 
-theorem constantCoeff_subst_mulS (a : ℤ_[q]) {f : ℂ_[q]⟦X⟧} (hf : constantCoeff f = 0) :
-    constantCoeff (f.subst (mulS a : ℂ_[q]⟦X⟧)) = 0 := by
+theorem constantCoeff_subst_mulS (a : ℤ_[q]) {f : ℂ_[q]⟦X⟧} (hf : constantCoeff f = 0)
+    : constantCoeff (f.subst (mulS a : ℂ_[q]⟦X⟧)) = 0 := by
   have hs := hasSubst_mulS a
   obtain ⟨b, rfl⟩ : (X : ℂ_[q]⟦X⟧) ∣ f := X_dvd_iff.2 hf
   rw [← coe_substAlgHom hs, map_mul, substAlgHom_X, map_mul, constantCoeff_mulS, zero_mul]
 
-theorem logS_subst (a : ℤ_[q]) :
-    (logS : ℂ_[q]⟦X⟧).subst (mulS a : ℂ_[q]⟦X⟧) = C (zc a) * logS := by
+theorem logS_subst (a : ℤ_[q]) : (logS : ℂ_[q]⟦X⟧).subst (mulS a : ℂ_[q]⟦X⟧) = C (zc a) * logS := by
   have hs := hasSubst_mulS a
   have h0 : constantCoeff (logS : ℂ_[q]⟦X⟧) = 0 := by simp [logS]
   refine ode_unique 0 (C (zc a)) ?_ ?_ ?_
@@ -118,12 +122,13 @@ theorem logS_subst (a : ℤ_[q]) :
     linear_combination (C (zc a)) * this
   · rw [constantCoeff_subst_mulS a h0, map_mul, h0, mul_zero]
 
-theorem mulS_subst (a b : ℤ_[q]) :
-    (mulS a : ℂ_[q]⟦X⟧).subst (mulS b : ℂ_[q]⟦X⟧) = mulS (a * b) := by
+theorem mulS_subst (a b : ℤ_[q])
+    : (mulS a : ℂ_[q]⟦X⟧).subst (mulS b : ℂ_[q]⟦X⟧) = mulS (a * b) := by
   have hs := hasSubst_mulS b
   have hz : zc (a * b) = zc a * zc b := by simp [zc_eq]
   refine ode_unique (zc (a * b)) (C (zc (a * b))) ?_ ?_ ?_
-  · rw [DT_subst_mulS, DT_mulS, ← coe_substAlgHom hs, map_mul, map_add (f := _), map_one, hz, map_mul]
+  · rw [DT_subst_mulS, DT_mulS, ← coe_substAlgHom hs, map_mul, map_add (f := _), map_one, hz,
+      map_mul]
     have : (substAlgHom hs : ℂ_[q]⟦X⟧ →ₐ[ℂ_[q]] ℂ_[q]⟦X⟧) (C (zc a)) = C (zc a) :=
       (substAlgHom hs : ℂ_[q]⟦X⟧ →ₐ[ℂ_[q]] ℂ_[q]⟦X⟧).commutes (zc a)
     rw [this]
@@ -154,8 +159,8 @@ theorem bd_one_pow {h : ℂ_[q]⟦X⟧} (hh : Bd 1 h) (d : ℕ) : Bd 1 (h ^ d) :
     rw [norm_mul]
     exact mul_le_one₀ (ih _) (norm_nonneg _) (hh _)
 
-theorem bd_subst {f h : ℂ_[q]⟦X⟧} {A : ℝ} (hf : Bd A f) (hh : Bd 1 h) (h0 : constantCoeff h = 0) :
-    Bd A (f.subst h) := by
+theorem bd_subst {f h : ℂ_[q]⟦X⟧} {A : ℝ} (hf : Bd A f) (hh : Bd 1 h) (h0 : constantCoeff h = 0)
+    : Bd A (f.subst h) := by
   classical
   intro n
   have hs : HasSubst h := HasSubst.of_constantCoeff_zero' h0
@@ -167,16 +172,32 @@ theorem bd_subst {f h : ℂ_[q]⟦X⟧} {A : ℝ} (hf : Bd A f) (hh : Bd 1 h) (h
     exact (mul_le_of_le_one_right (norm_nonneg _) (bd_one_pow hh d n)).trans (hf d)
   · simpa using hA
 
-theorem bd_subst_mulS_iff (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧) (B : ℝ) (ha : ‖a‖ = 1) :
-    Bd B (f.subst (mulS a : ℂ_[q]⟦X⟧)) ↔ Bd B f := by
+theorem bd_subst_mulS_iff (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧) (B : ℝ) (ha : ‖a‖ = 1)
+    : Bd B (f.subst (mulS a : ℂ_[q]⟦X⟧)) ↔ Bd B f := by
   refine ⟨fun h => ?_, fun h => bd_subst h (bd_mulS a) (constantCoeff_mulS a)⟩
   obtain ⟨b, hb⟩ := (PadicInt.isUnit_iff.2 ha).exists_right_inv
   have h1 := bd_subst h (bd_mulS b) (constantCoeff_mulS b)
   rwa [subst_comp_subst_apply (hasSubst_mulS a) (hasSubst_mulS b), mulS_subst, hb, mulS_one,
-    X_subst] at h1
+      X_subst]
+    at h1
 
-theorem mulS_laws : ∀ (q : ℕ) [Fact q.Prime], (∀ a : ℤ_[q], Bd 1 (mulS a : ℂ_[q]⟦X⟧) ∧ constantCoeff (mulS a : ℂ_[q]⟦X⟧) = 0 ∧ coeff 1 (mulS a : ℂ_[q]⟦X⟧) = zc a ∧ (logS : ℂ_[q]⟦X⟧).subst (mulS a : ℂ_[q]⟦X⟧) = C (zc a) * logS) ∧ (∀ a b : ℤ_[q], (mulS a : ℂ_[q]⟦X⟧).subst (mulS b : ℂ_[q]⟦X⟧) = mulS (a * b)) ∧ (mulS (1 : ℤ_[q]) : ℂ_[q]⟦X⟧) = X ∧ (∀ (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧) (B : ℝ), ‖a‖ = 1 → (Bd B (f.subst (mulS a : ℂ_[q]⟦X⟧)) ↔ Bd B f)) ∧ DT (logS : ℂ_[q]⟦X⟧) = 1 ∧ (∀ a : ℤ_[q], ‖zc a‖ = ‖a‖) :=
-  fun _ _ => ⟨fun a => ⟨bd_mulS a, constantCoeff_mulS a, by simp [mulS], logS_subst a⟩, mulS_subst,
-    mulS_one, bd_subst_mulS_iff, DT_logS, norm_zc⟩
+theorem mulS_laws
+    : ∀ (q : ℕ) [Fact q.Prime],
+      (∀ a : ℤ_[q],
+          Bd 1 (mulS a : ℂ_[q]⟦X⟧) ∧ constantCoeff (mulS a : ℂ_[q]⟦X⟧) = 0
+            ∧ coeff 1 (mulS a : ℂ_[q]⟦X⟧) = zc a
+            ∧ (logS : ℂ_[q]⟦X⟧).subst (mulS a : ℂ_[q]⟦X⟧) = C (zc a) * logS)
+        ∧ (∀ a b : ℤ_[q], (mulS a : ℂ_[q]⟦X⟧).subst (mulS b : ℂ_[q]⟦X⟧) = mulS (a * b))
+        ∧ (mulS (1 : ℤ_[q]) : ℂ_[q]⟦X⟧) = X
+        ∧ (∀ (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧) (B : ℝ),
+          ‖a‖ = 1 → (Bd B (f.subst (mulS a : ℂ_[q]⟦X⟧)) ↔ Bd B f))
+        ∧ DT (logS : ℂ_[q]⟦X⟧) = 1 ∧ (∀ a : ℤ_[q], ‖zc a‖ = ‖a‖) := fun _ _ => ⟨
+  fun a => ⟨bd_mulS a, constantCoeff_mulS a, by simp [mulS], logS_subst a⟩,
+  mulS_subst,
+  mulS_one,
+  bd_subst_mulS_iff,
+  DT_logS,
+  norm_zc
+⟩
 
 end GlobalTheory.MomOne.MulSeries

@@ -7,7 +7,9 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix NNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum MeasureTheory
 open GlobalTheory.AdelicU GlobalTheory.StdUnn MvPolynomial
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 
@@ -20,12 +22,16 @@ variable {D : D7} {n : ℕ}
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 4000000
 
-theorem const_of_annS {θ : InfFam D} (hθ : IsInfFam θ) {V : HSp D} {τ : D.what₂.Tau}
-    {s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ} {ε : Fin V.rank → Bool} {fr : Matrix (Fin V.rank) (Fin V.rank) ℂ}
-    (hfr : IsTauFrame V τ s ε fr) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian) (l : D.what₂.Tau → ℝ)
-    (Q : PX V.rank n) (h : ∀ X, annS V l s θ τ X (tens θ τ fr (fP (cLoc l τ) Q) (psi0 θ V n l s τ)) = 0) :
-    Q = C (evX Q 0) := by
-  have hk : ∀ u W : Matrix (Fin V.rank) (Fin n) ℂ, ∑ k, ptX W k * eval (ptX u) (pderiv k Q) = 0 := by
+theorem const_of_annS
+    {θ : InfFam D} (hθ : IsInfFam θ)
+    {V : HSp D} {τ : D.what₂.Tau} {s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ}
+    {ε : Fin V.rank → Bool} {fr : Matrix (Fin V.rank) (Fin V.rank) ℂ}
+    (hfr : IsTauFrame V τ s ε fr) (hM : ∀ τ, (gramAt D V τ * s τ).IsHermitian)
+    (l : D.what₂.Tau → ℝ) (Q : PX V.rank n)
+    (h : ∀ X, annS V l s θ τ X (tens θ τ fr (fP (cLoc l τ) Q) (psi0 θ V n l s τ)) = 0)
+    : Q = C (evX Q 0) := by
+  have hk
+      : ∀ u W : Matrix (Fin V.rank) (Fin n) ℂ, ∑ k, ptX W k * eval (ptX u) (pderiv k Q) = 0 := by
     intro u W
     have e := congrFun (h (fr * W)) (xL θ τ (fr * u))
     rw [annS_tens hθ hfr hM l] at e
@@ -46,9 +52,13 @@ theorem const_of_annS {θ : InfFam D} (hθ : IsInfFam θ) {V : HSp D} {τ : D.wh
     let F : ℝ → ℂ := fun t => eval (ptX (0 : Matrix (Fin V.rank) (Fin n) ℂ) + (t : ℂ) • ptX u) Q
     have hF : ∀ t, HasDerivAt F 0 t := by
       intro t
-      have hd := GlobalTheory.FockAnnKill.hasDerivAt_eval_line Q (ptX (0 : Matrix (Fin V.rank) (Fin n) ℂ)) (ptX u) t
+      have hd :=
+        GlobalTheory.FockAnnKill.hasDerivAt_eval_line Q (ptX (0 : Matrix (Fin V.rank) (Fin n) ℂ))
+          (ptX u) t
       refine hd.congr_deriv ?_
-      have e2 : ptX (0 : Matrix (Fin V.rank) (Fin n) ℂ) + (t : ℂ) • ptX u = ptX ((0 : Matrix (Fin V.rank) (Fin n) ℂ) + (t : ℂ) • u) :=
+      have e2
+          : ptX (0 : Matrix (Fin V.rank) (Fin n) ℂ) + (t : ℂ) • ptX u
+            = ptX ((0 : Matrix (Fin V.rank) (Fin n) ℂ) + (t : ℂ) • u) :=
         (ptX_add_smul _ _ t).symm
       rw [e2]
       exact hk _ u

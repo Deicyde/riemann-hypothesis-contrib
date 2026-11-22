@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CombM
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
 open Matrix
 open scoped ComplexOrder Topology
@@ -21,7 +24,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem hermForm_eq_of_im_eq_on_span : ∀ (g r : ℕ) (Hm Hm' : Matrix (Fin g) (Fin g) ℂ) (l : Fin r → Fin g → ℂ), Submodule.span ℝ (Set.range l) = ⊤ → (∀ i j, (hermForm Hm (l i) (l j)).im = (hermForm Hm' (l i) (l j)).im) → Hm = Hm' := by
+theorem hermForm_eq_of_im_eq_on_span
+    : ∀ (g r : ℕ) (Hm Hm' : Matrix (Fin g) (Fin g) ℂ) (l : Fin r → Fin g → ℂ),
+      Submodule.span ℝ (Set.range l) = ⊤
+        → (∀ i j, (hermForm Hm (l i) (l j)).im = (hermForm Hm' (l i) (l j)).im)
+        → Hm = Hm' := by
   intro g r Hm Hm' l hspan h
   have h1 : ∀ z, ∀ j, (hermForm Hm z (l j)).im = (hermForm Hm' z (l j)).im := by
     intro z j
@@ -30,7 +37,8 @@ theorem hermForm_eq_of_im_eq_on_span : ∀ (g r : ℕ) (Hm Hm' : Matrix (Fin g) 
     | mem x hx =>
       obtain ⟨i, rfl⟩ := hx
       exact h i j
-    | zero => simp [hermForm]
+    | zero =>
+      simp [hermForm]
     | add x y _ _ hx hy =>
       simp only [hermForm, add_dotProduct, Complex.add_im] at hx hy ⊢
       rw [hx, hy]
@@ -44,7 +52,8 @@ theorem hermForm_eq_of_im_eq_on_span : ∀ (g r : ℕ) (Hm Hm' : Matrix (Fin g) 
     | mem x hx =>
       obtain ⟨j, rfl⟩ := hx
       exact h1 z j
-    | zero => simp [hermForm]
+    | zero =>
+      simp [hermForm]
     | add x y _ _ hx hy =>
       simp only [hermForm, star_add, Matrix.mulVec_add, dotProduct_add, Complex.add_im] at hx hy ⊢
       rw [hx, hy]

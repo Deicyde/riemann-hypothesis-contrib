@@ -13,9 +13,11 @@ open Matrix
 
 namespace PSymplOmegaMem
 
-theorem mul_J_mul_transpose_apply {R : Type*} [CommRing R] {l : Type*} [Fintype l]
-    [DecidableEq l] (M : Matrix (l ⊕ l) (l ⊕ l) R) (x y : l ⊕ l) :
-    (M * J l R * Mᵀ) x y = symplOmega (M x) (M y) := by
+theorem mul_J_mul_transpose_apply
+    {R : Type*} [CommRing R]
+    {l : Type*} [Fintype l] [DecidableEq l]
+    (M : Matrix (l ⊕ l) (l ⊕ l) R) (x y : l ⊕ l)
+    : (M * J l R * Mᵀ) x y = symplOmega (M x) (M y) := by
   rw [symplOmega, dotProduct_mulVec, Matrix.mul_apply]
   rfl
 

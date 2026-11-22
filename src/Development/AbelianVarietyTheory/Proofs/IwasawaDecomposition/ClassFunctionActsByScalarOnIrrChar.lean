@@ -11,10 +11,12 @@ open Module
 
 namespace GlobalTheory
 
-theorem classFun_char_scalar {G : Type} [Group G] [Fintype G] (e : MonoidAlgebra ℂ G)
-    (he : ∀ x y : G, e.coeff (y * x * y⁻¹) = e.coeff x) (ψ : G → ℂ)
-    (hψ : ψ ∈ Formalism.L2.Col.gxIrrSet (G := G) ℂ) (x : G) :
-    ψ 1 * ∑ g, e.coeff g * ψ (g * x) = (∑ g, e.coeff g * ψ g) * ψ x := by
+theorem classFun_char_scalar
+    {G : Type} [Group G] [Fintype G]
+    (e : MonoidAlgebra ℂ G) (he : ∀ x y : G, e.coeff (y * x * y⁻¹) = e.coeff x)
+    (ψ : G → ℂ) (hψ : ψ ∈ Formalism.L2.Col.gxIrrSet (G := G) ℂ)
+    (x : G)
+    : ψ 1 * ∑ g, e.coeff g * ψ (g * x) = (∑ g, e.coeff g * ψ g) * ψ x := by
   classical
   have hψ' := hψ
   obtain ⟨n, ρ, hρ, rfl⟩ := hψ
@@ -32,7 +34,8 @@ theorem classFun_char_scalar {G : Type} [Group G] [Fintype G] (e : MonoidAlgebra
     apply hab
     apply Subrepresentation.toSubmodule_injective
     exact Subsingleton.elim _ _
-  let idI : ρ.IntertwiningMap ρ := ⟨LinearMap.id, fun g => by rw [LinearMap.id_comp, LinearMap.comp_id]⟩
+  let idI : ρ.IntertwiningMap ρ :=
+    ⟨LinearMap.id, fun g => by rw [LinearMap.id_comp, LinearMap.comp_id]⟩
   have hid0 : idI ≠ 0 := by
     obtain ⟨v, hv⟩ := exists_ne (0 : Fin n → ℂ)
     intro h
@@ -56,7 +59,8 @@ theorem classFun_char_scalar {G : Type} [Group G] [Fintype G] (e : MonoidAlgebra
     simpa [idI, TI] using this.symm
   have htr : ∀ y : G, ∑ g, e.coeff g * ρ.character (g * y) = c * ρ.character y := by
     intro y
-    have h2 : T * ρ y = c • ρ y := by rw [hT, smul_mul_assoc]; exact congrArg _ (LinearMap.id_comp _)
+    have h2 : T * ρ y = c • ρ y := by
+      rw [hT, smul_mul_assoc]; exact congrArg _ (LinearMap.id_comp _)
     have h3 := congrArg (LinearMap.trace ℂ (Fin n → ℂ)) h2
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [T, Finset.sum_mul, smul_mul_assoc, ← map_mul, map_sum, map_smul, smul_eq_mul] at h3

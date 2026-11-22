@@ -9,9 +9,12 @@ open Matrix Polynomial
 
 namespace GlobalTheory.SimSep
 
-theorem mulVec_aeval_eq_zero_iff {R : Type} [Field R] {m : ℕ} (A : Matrix (Fin m) (Fin m) R)
-    (v : Fin m → R) (hv : ∀ u : Fin m → R, ∃ p : R[X], u = aeval A p *ᵥ v) (p : R[X]) :
-    aeval A p *ᵥ v = 0 ↔ A.charpoly ∣ p := by
+theorem mulVec_aeval_eq_zero_iff
+    {R : Type} [Field R]
+    {m : ℕ} (A : Matrix (Fin m) (Fin m) R) (v : Fin m → R)
+    (hv : ∀ u : Fin m → R, ∃ p : R[X], u = aeval A p *ᵥ v)
+    (p : R[X])
+    : aeval A p *ᵥ v = 0 ↔ A.charpoly ∣ p := by
   constructor
   · intro h
     have hA : aeval A p = 0 := by
@@ -23,10 +26,11 @@ theorem mulVec_aeval_eq_zero_iff {R : Type} [Field R] {m : ℕ} (A : Matrix (Fin
     have hmon : (minpoly R A).Monic := minpoly.monic (Matrix.isIntegral A)
 
     set d := (minpoly R A).natDegree with hd
-    let ψ : (Fin d → R) →ₗ[R] (Fin m → R) :=
-      { toFun := fun c => aeval A (((degreeLTEquiv R d).symm c : degreeLT R d) : R[X]) *ᵥ v
-        map_add' := fun a b => by simp [Matrix.add_mulVec]
-        map_smul' := fun c a => by simp [Matrix.smul_mulVec] }
+    let ψ : (Fin d → R) →ₗ[R] (Fin m → R) := {
+      toFun := fun c => aeval A (((degreeLTEquiv R d).symm c : degreeLT R d) : R[X]) *ᵥ v
+      map_add' := fun a b => by simp [Matrix.add_mulVec]
+      map_smul' := fun c a => by simp [Matrix.smul_mulVec]
+    }
     have hψ : Function.Surjective ψ := by
       intro u
       obtain ⟨q, rfl⟩ := hv u
@@ -52,20 +56,23 @@ end GlobalTheory.SimSep
 
 namespace GlobalTheory.SimSep
 
-theorem conj_of_charpoly_eq_of_separable : ∀ (R : Type) [Field R] (m : ℕ)
-    (N U : Matrix (Fin m) (Fin m) R), N.charpoly = U.charpoly → N.charpoly.Separable →
-    ∃ P : GL (Fin m) R, N * P.val = P.val * U := by
+theorem conj_of_charpoly_eq_of_separable
+    : ∀ (R : Type) [Field R] (m : ℕ) (N U : Matrix (Fin m) (Fin m) R),
+      N.charpoly = U.charpoly → N.charpoly.Separable
+        → ∃ P : GL (Fin m) R, N * P.val = P.val * U := by
   intro R _ m N U hc hs
   obtain ⟨v, hv⟩ := GlobalTheory.LatOrb.exists_cyclicVector_of_separable_charpoly m N hs
   obtain ⟨w, hw⟩ := GlobalTheory.LatOrb.exists_cyclicVector_of_separable_charpoly m U (hc ▸ hs)
-  let φ : R[X] →ₗ[R] (Fin m → R) :=
-    { toFun := fun p => aeval N p *ᵥ v
-      map_add' := fun a b => by simp [Matrix.add_mulVec]
-      map_smul' := fun c a => by simp [Matrix.smul_mulVec] }
-  let ψ : R[X] →ₗ[R] (Fin m → R) :=
-    { toFun := fun p => aeval U p *ᵥ w
-      map_add' := fun a b => by simp [Matrix.add_mulVec]
-      map_smul' := fun c a => by simp [Matrix.smul_mulVec] }
+  let φ : R[X] →ₗ[R] (Fin m → R) := {
+    toFun := fun p => aeval N p *ᵥ v
+    map_add' := fun a b => by simp [Matrix.add_mulVec]
+    map_smul' := fun c a => by simp [Matrix.smul_mulVec]
+  }
+  let ψ : R[X] →ₗ[R] (Fin m → R) := {
+    toFun := fun p => aeval U p *ᵥ w
+    map_add' := fun a b => by simp [Matrix.add_mulVec]
+    map_smul' := fun c a => by simp [Matrix.smul_mulVec]
+  }
   have hφ : Function.Surjective φ := fun u => let ⟨p, hp⟩ := hv u; ⟨p, hp.symm⟩
   have hψ : Function.Surjective ψ := fun u => let ⟨p, hp⟩ := hw u; ⟨p, hp.symm⟩
   have hker : LinearMap.ker ψ = LinearMap.ker φ := by
@@ -92,14 +99,14 @@ theorem conj_of_charpoly_eq_of_separable : ∀ (R : Type) [Field R] (m : ℕ)
       show N *ᵥ (aeval N p *ᵥ v) = aeval N (X * p) *ᵥ v
       rw [map_mul, aeval_X, Matrix.mulVec_mulVec]
     rw [e1, hT, hT, e2]
-  have hl : T.toLinearMap.comp T.symm.toLinearMap = LinearMap.id :=
-    LinearMap.ext fun x => by simp
-  have hr : T.symm.toLinearMap.comp T.toLinearMap = LinearMap.id :=
-    LinearMap.ext fun x => by simp
-  let P : GL (Fin m) R :=
-    ⟨LinearMap.toMatrix' T.toLinearMap, LinearMap.toMatrix' T.symm.toLinearMap,
-      by rw [← LinearMap.toMatrix'_comp, hl, LinearMap.toMatrix'_id],
-      by rw [← LinearMap.toMatrix'_comp, hr, LinearMap.toMatrix'_id]⟩
+  have hl : T.toLinearMap.comp T.symm.toLinearMap = LinearMap.id := LinearMap.ext fun x => by simp
+  have hr : T.symm.toLinearMap.comp T.toLinearMap = LinearMap.id := LinearMap.ext fun x => by simp
+  let P : GL (Fin m) R := ⟨
+    LinearMap.toMatrix' T.toLinearMap,
+    LinearMap.toMatrix' T.symm.toLinearMap,
+    by rw [← LinearMap.toMatrix'_comp, hl, LinearMap.toMatrix'_id],
+    by rw [← LinearMap.toMatrix'_comp, hr, LinearMap.toMatrix'_id]
+  ⟩
   refine ⟨P, Matrix.toLin'.injective (LinearMap.ext fun x => ?_)⟩
   simp only [P, Matrix.toLin'_mul, LinearMap.comp_apply, Matrix.toLin'_toMatrix',
     Matrix.toLin'_apply, LinearEquiv.coe_coe]

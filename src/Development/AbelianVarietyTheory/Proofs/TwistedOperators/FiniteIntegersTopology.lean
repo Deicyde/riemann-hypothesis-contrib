@@ -7,12 +7,15 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 
 @[expose] public section
 
-open MeasureTheory Topology Matrix NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.ModuLR
+open MeasureTheory Topology Matrix NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.ModuLR
 open scoped NNReal ENNReal TensorProduct
 
 namespace GlobalTheory.ModuLR
 
-theorem finiteIntegers_compact_secondCountable_t2 : ∀ (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F))), CompactSpace (OPart F S) ∧ SecondCountableTopology (OPart F S) ∧ T2Space (OPart F S) := by
+theorem finiteIntegers_compact_secondCountable_t2
+    : ∀ (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F))),
+      CompactSpace (OPart F S) ∧ SecondCountableTopology (OPart F S) ∧ T2Space (OPart F S) := by
   intro F _ _ S
   haveI := GlobalTheory.AdelicUnitaryTop.properSpace_adicCompletion F
   haveI := GlobalTheory.AdelicUnitaryTop.countable_heightOneSpectrum F

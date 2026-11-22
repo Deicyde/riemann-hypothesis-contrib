@@ -13,13 +13,19 @@ public import Development.AutomorphicSpectrum.PublishedTheorems.Geometry₂.NefR
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry GroundTheory.Heights₂.Heights.HilbertSamuel Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry GroundTheory.Heights₂.Heights.HilbertSamuel
+  Filter Topology
 
 namespace GlobalTheory.CompanionTheory.Ar.ChartDenom
 
-theorem exists_nat_mul_mem_chartRingZ {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type}
-    [Field Ω] [CharZero Ω] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) {x : Ω} (hx : x ∈ chartRingQ y c) :
-    ∃ n : ℕ, n ≠ 0 ∧ (n : Ω) * x ∈ chartRingZ y c := by
+theorem exists_nat_mul_mem_chartRingZ
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k)
+    {x : Ω} (hx : x ∈ chartRingQ y c)
+    : ∃ n : ℕ, n ≠ 0 ∧ (n : Ω) * x ∈ chartRingZ y c := by
   unfold chartRingQ at hx
   induction hx using Algebra.adjoin_induction with
   | mem x hx =>
@@ -46,19 +52,21 @@ theorem exists_nat_mul_mem_chartRingZ {K : Type} [Fintype K] {ι : K → Type} [
     obtain ⟨m, hm, hmu⟩ := hu
     obtain ⟨n, hn, hnv⟩ := hv
     refine ⟨m * n, mul_ne_zero hm hn, ?_⟩
-    have e : ((m * n : ℕ) : Ω) * (u * v) = ((m : Ω) * u) * ((n : Ω) * v) := by
-      push_cast; ring
+    have e : ((m * n : ℕ) : Ω) * (u * v) = ((m : Ω) * u) * ((n : Ω) * v) := by push_cast; ring
     rw [e]
     exact mul_mem hmu hnv
 
-theorem chartLatQ_le_span_chartLatNm :
-    ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [CharZero Ω]
-      (y : (Σ k, ι k) → Ω) (a : K → ℤ) (τ : ℕ),
+theorem chartLatQ_le_span_chartLatNm
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [CharZero Ω]
+        (y : (Σ k, ι k) → Ω) (a : K → ℤ) (τ : ℕ),
       chartLatQ y a τ ≤ Submodule.span ℚ (chartLatNm y a τ : Set Ω) := by
   intro K _ ι _ Ω _ _ y a τ s hs
   classical
-  have hex : ∀ c : ∀ k, ι k, ∃ n : ℕ, n ≠ 0 ∧ ((∀ k, y ⟨k, c k⟩ ≠ 0) →
-      (n : Ω) * (s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k))) ∈ chartRingZ y c) := by
+  have hex
+      : ∀ c : ∀ k, ι k, ∃ n : ℕ,
+        n ≠ 0
+          ∧ ((∀ k, y ⟨k, c k⟩ ≠ 0)
+            → (n : Ω) * (s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k))) ∈ chartRingZ y c) := by
     intro c
     by_cases hc : ∀ k, y ⟨k, c k⟩ ≠ 0
     · obtain ⟨n, hn, h⟩ := exists_nat_mul_mem_chartRingZ y c (hs c hc)
@@ -69,14 +77,18 @@ theorem chartLatQ_le_span_chartLatNm :
   have hNΩ : (((∏ c, n c : ℕ)) : Ω) ≠ 0 := Nat.cast_ne_zero.2 hN
   have hmem : (((∏ c, n c : ℕ)) : Ω) * s ∈ chartLatNm y a τ := by
     intro c hc
-    have e : ((((∏ c, n c : ℕ)) : Ω) * s) * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k)) =
-        (((∏ c' ∈ Finset.univ.erase c, n c' : ℕ)) : Ω) *
-          ((n c : Ω) * (s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k)))) := by
+    have e
+        : ((((∏ c, n c : ℕ)) : Ω) * s) * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k))
+          = (((∏ c' ∈ Finset.univ.erase c, n c' : ℕ)) : Ω)
+            * ((n c : Ω) * (s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k)))) := by
       rw [← Finset.prod_erase_mul _ _ (Finset.mem_univ c)]
-      push_cast; ring
+      push_cast
+      ring
     rw [e]
-    have h : (((∏ c' ∈ Finset.univ.erase c, n c' : ℕ)) : Ω) *
-        ((n c : Ω) * (s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k)))) ∈ chartRingZ y c :=
+    have h
+        : (((∏ c' ∈ Finset.univ.erase c, n c' : ℕ)) : Ω)
+            * ((n c : Ω) * (s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k))))
+          ∈ chartRingZ y c :=
       mul_mem (natCast_mem _ _) (hn c hc)
     exact Subalgebra.algebraMap_mem (integralClosure (chartRingZ y c) Ω) (⟨_, h⟩ : chartRingZ y c)
   have h1 : (((∏ c, n c : ℕ)) : Ω) * s ∈ Submodule.span ℚ (chartLatNm y a τ : Set Ω) :=

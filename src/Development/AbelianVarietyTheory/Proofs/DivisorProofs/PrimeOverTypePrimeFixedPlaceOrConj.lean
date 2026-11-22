@@ -7,18 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CmTyp
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Module ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.CovTop Formalism.L2.Pj GlobalTheory.FormTies GlobalTheory.Shares GlobalTheory.ShareOn
+open NumberField IsDedekindDomain Module ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.IndefR
+  Formalism.IndefR.Links GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.CovTop Formalism.L2.Pj
+  GlobalTheory.FormTies GlobalTheory.Shares GlobalTheory.ShareOn
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TypePrimesOnto
 
-theorem prime_eq_plGw_or_conj : ∀ (D : D7) (k : Fin 2) (P : Ideal (𝓞 D.host.E)), P.IsPrime → ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ P →
-    ∃ v : D.nd.PlG k, P = (D.naut.plGw k v).asIdeal ∨
-      P = (D.naut.plGw k v).asIdeal.map
-        ((RingOfIntegers.mapRingEquiv (IsCMField.complexConj D.host.E).toRingEquiv : 𝓞 D.host.E ≃+* 𝓞 D.host.E) :
-          𝓞 D.host.E →+* 𝓞 D.host.E) := by
+theorem prime_eq_plGw_or_conj
+    : ∀ (D : D7) (k : Fin 2) (P : Ideal (𝓞 D.host.E)),
+      P.IsPrime → ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ P
+        → ∃ v : D.nd.PlG k,
+          P = (D.naut.plGw k v).asIdeal
+            ∨ P
+              = (D.naut.plGw k v).asIdeal.map
+                ((RingOfIntegers.mapRingEquiv (IsCMField.complexConj D.host.E).toRingEquiv
+                    : 𝓞 D.host.E ≃+* 𝓞 D.host.E)
+                  : 𝓞 D.host.E →+* 𝓞 D.host.E) := by
   intro D k P hP hg
   have hne : P ≠ ⊥ := by
     intro h

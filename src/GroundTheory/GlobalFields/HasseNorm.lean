@@ -15,12 +15,12 @@ universe u
 
 section
 
-variable {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L]
+variable
+  {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
 
-theorem mem_range_norm_of_diagonal_mem_range_ideleNorm [IsCyclic Gal(L/K)] {x : Kˣ}
-    (hx : IdeleGroup.diagonal K x ∈ (ideleNorm K L).range) :
-    x ∈ (Units.map (Algebra.norm K : L →* K)).range := by
+theorem mem_range_norm_of_diagonal_mem_range_ideleNorm
+    [IsCyclic Gal(L/K)] {x : Kˣ} (hx : IdeleGroup.diagonal K x ∈ (ideleNorm K L).range)
+    : x ∈ (Units.map (Algebra.norm K : L →* K)).range := by
   obtain ⟨σ, hσ⟩ := IsCyclic.exists_generator (α := Gal(L/K))
   obtain ⟨j, hj⟩ := hx
   set ρ := Representation.ofMulDistribMulAction Gal(L/K) (IdeleClassGroup L)
@@ -50,19 +50,20 @@ theorem mem_range_norm_of_diagonal_mem_range_ideleNorm [IsCyclic Gal(L/K)] {x : 
   rw [← ideleNorm_diagonal, ha, map_mul, map_inv, map_div, ideleNorm_smul, div_self', inv_one,
     one_mul, hj]
 
-theorem mem_range_norm_iff_diagonal_mem_range_ideleNorm [IsCyclic Gal(L/K)] (x : Kˣ) :
-    x ∈ (Units.map (Algebra.norm K : L →* K)).range ↔
-      IdeleGroup.diagonal K x ∈ (ideleNorm K L).range := by
+theorem mem_range_norm_iff_diagonal_mem_range_ideleNorm [IsCyclic Gal(L/K)] (x : Kˣ)
+    : x ∈ (Units.map (Algebra.norm K : L →* K)).range
+      ↔ IdeleGroup.diagonal K x ∈ (ideleNorm K L).range := by
   refine ⟨?_, mem_range_norm_of_diagonal_mem_range_ideleNorm⟩
   rintro ⟨a, rfl⟩
   exact ⟨IdeleGroup.diagonal L a, ideleNorm_diagonal a⟩
 
-theorem mem_range_norm_iff_forall_local [IsCyclic Gal(L/K)] (x : Kˣ) :
-    x ∈ (Units.map (Algebra.norm K : L →* K)).range ↔
-      (∀ v, IdeleGroup.finiteProj v (IdeleGroup.diagonal K x) ∈
-          (IdeleNorm.finiteLocalNorm L v).range) ∧
-        ∀ v, IdeleGroup.infiniteProj v (IdeleGroup.diagonal K x) ∈
-          (IdeleNorm.infiniteLocalNorm L v).range := by
+theorem mem_range_norm_iff_forall_local [IsCyclic Gal(L/K)] (x : Kˣ)
+    : x ∈ (Units.map (Algebra.norm K : L →* K)).range
+      ↔ (∀ v,
+          IdeleGroup.finiteProj v (IdeleGroup.diagonal K x) ∈ (IdeleNorm.finiteLocalNorm L v).range)
+        ∧ ∀ v,
+          IdeleGroup.infiniteProj v (IdeleGroup.diagonal K x)
+            ∈ (IdeleNorm.infiniteLocalNorm L v).range := by
   rw [mem_range_norm_iff_diagonal_mem_range_ideleNorm, IdeleNorm.mem_range_ideleNorm_iff_forall]
 
 end
@@ -71,24 +72,25 @@ section Quadratic
 
 variable {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
 
-theorem isGalois_isCyclic_of_finrank_eq_two (h : finrank K L = 2) :
-    IsGalois K L ∧ IsCyclic Gal(L/K) := by
+theorem isGalois_isCyclic_of_finrank_eq_two (h : finrank K L = 2)
+    : IsGalois K L ∧ IsCyclic Gal(L/K) := by
   have : Algebra.IsQuadraticExtension K L := ⟨h⟩
   exact ⟨inferInstance, inferInstance⟩
 
 theorem mem_range_norm_iff_diagonal_mem_range_ideleNorm_of_finrank_eq_two
-    (h : finrank K L = 2) (x : Kˣ) :
-    x ∈ (Units.map (Algebra.norm K : L →* K)).range ↔
-      IdeleGroup.diagonal K x ∈ (ideleNorm K L).range := by
+    (h : finrank K L = 2) (x : Kˣ)
+    : x ∈ (Units.map (Algebra.norm K : L →* K)).range
+      ↔ IdeleGroup.diagonal K x ∈ (ideleNorm K L).range := by
   obtain ⟨_, _⟩ := isGalois_isCyclic_of_finrank_eq_two h
   exact mem_range_norm_iff_diagonal_mem_range_ideleNorm x
 
-theorem mem_range_norm_iff_forall_local_of_finrank_eq_two (h : finrank K L = 2) (x : Kˣ) :
-    x ∈ (Units.map (Algebra.norm K : L →* K)).range ↔
-      (∀ v, IdeleGroup.finiteProj v (IdeleGroup.diagonal K x) ∈
-          (IdeleNorm.finiteLocalNorm L v).range) ∧
-        ∀ v, IdeleGroup.infiniteProj v (IdeleGroup.diagonal K x) ∈
-          (IdeleNorm.infiniteLocalNorm L v).range := by
+theorem mem_range_norm_iff_forall_local_of_finrank_eq_two (h : finrank K L = 2) (x : Kˣ)
+    : x ∈ (Units.map (Algebra.norm K : L →* K)).range
+      ↔ (∀ v,
+          IdeleGroup.finiteProj v (IdeleGroup.diagonal K x) ∈ (IdeleNorm.finiteLocalNorm L v).range)
+        ∧ ∀ v,
+          IdeleGroup.infiniteProj v (IdeleGroup.diagonal K x)
+            ∈ (IdeleNorm.infiniteLocalNorm L v).range := by
   obtain ⟨_, _⟩ := isGalois_isCyclic_of_finrank_eq_two h
   exact mem_range_norm_iff_forall_local x
 

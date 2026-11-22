@@ -8,7 +8,9 @@ set_option synthInstance.maxHeartbeats 100000
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Matrix NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Matrix NumberField
 open scoped TensorProduct
 
 namespace Formalism.IndefR.Fin
@@ -19,7 +21,8 @@ variable {D : D7}
 
 variable (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)) (βT : GL (Fin T.rank) (EAf D))
 
-theorem frMapO_add (x y : WO S T) : frMapO S T βS βT (x + y) = frMapO S T βS βT x + frMapO S T βS βT y := by
+theorem frMapO_add (x y : WO S T)
+    : frMapO S T βS βT (x + y) = frMapO S T βS βT x + frMapO S T βS βT y := by
   unfold frMapO
   rw [Matrix.map_add (toEAf D) (fun a b => (toEAf D).map_add a b), Matrix.mul_add, Matrix.add_mul]
 

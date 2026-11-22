@@ -27,8 +27,13 @@ theorem ModelFibreFinite.proof : ModelFibreFinite.Statement := by
     have hq : modelQ M Ψ x = y := hxy
     have hl := (modelLift_spec M x).1 x (mem_modelU M x)
     have hlam : Ψ (segre (modelLift M x x)) 0 ≠ 0 := fun h => hx0 (Or.inl h)
-    refine ⟨fun p => Function.update (1 : K → ℂ) k0 (Ψ (segre (modelLift M x x)) 0)⁻¹ p.1 *
-      modelLift M x x p, mcPts_smul hH _ ?_ hl.1, ?_, ?_⟩
+    refine ⟨
+      fun p =>
+        Function.update (1 : K → ℂ) k0 (Ψ (segre (modelLift M x x)) 0)⁻¹ p.1 * modelLift M x x p,
+      mcPts_smul hH _ ?_ hl.1,
+      ?_,
+      ?_
+    ⟩
     · intro k
       by_cases hk : k = k0
       · subst hk
@@ -48,9 +53,10 @@ theorem ModelFibreFinite.proof : ModelFibreFinite.Statement := by
     have l2 := (modelLift_spec M x2).1 x2 (mem_modelU M x2)
     have hlam1 : Ψ (segre (modelLift M x1 x1)) 0 ≠ 0 := fun h => h1 (Or.inl h)
     have hlam2 : Ψ (segre (modelLift M x2 x2)) 0 ≠ 0 := fun h => h2 (Or.inl h)
-    have hseg : segre (modelLift M x1 x1) =
-        (Ψ (segre (modelLift M x1 x1)) 0 / Ψ (segre (modelLift M x2 x2)) 0) •
-          segre (modelLift M x2 x2) := by
+    have hseg
+        : segre (modelLift M x1 x1)
+          = (Ψ (segre (modelLift M x1 x1)) 0 / Ψ (segre (modelLift M x2 x2)) 0)
+            • segre (modelLift M x2 x2) := by
       have := congrArg (fun w => Ψ (segre (modelLift M x1 x1)) 0 • w) heq
       simp only [f, smul_smul, mul_inv_cancel₀ hlam1, one_smul] at this
       rw [div_eq_mul_inv]

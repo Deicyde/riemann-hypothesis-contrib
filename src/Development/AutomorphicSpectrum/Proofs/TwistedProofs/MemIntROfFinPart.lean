@@ -14,45 +14,55 @@ public import Development.AutomorphicSpectrum.Proofs.TwistedProofs.NormDetLeFact
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped Pointwise TensorProduct InnerProductSpace ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.Grid GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle GlobalTheory.ConstRatio
+open GlobalTheory.Grid GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle
+  GlobalTheory.ConstRatio
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Ipf.Bdd
 variable {D : D7}
 
-def _root_.GlobalTheory.CompanionTheory.Ipf.mul {a b c : ℕ} (x : Mx D a b) (y : Mx D b c) : Mx D a c :=
+def _root_.GlobalTheory.CompanionTheory.Ipf.mul {a b c : ℕ} (x : Mx D a b) (y : Mx D b c)
+    : Mx D a c :=
   HMul.hMul (x : Matrix (Fin a) (Fin b) (AE D)) (y : Matrix (Fin b) (Fin c) (AE D))
 
-def _root_.GlobalTheory.CompanionTheory.Ipf.rat {a b : ℕ} (γ : Matrix (Fin a) (Fin b) D.host.E) : Mx D a b := γ.map (incA D)
+def _root_.GlobalTheory.CompanionTheory.Ipf.rat {a b : ℕ} (γ : Matrix (Fin a) (Fin b) D.host.E)
+    : Mx D a b :=
+  γ.map (incA D)
 
-theorem infPart_incA (c : D.host.E) : infPart D (incA D c) = (1 : Ainf D.host.F) ⊗ₜ[D.host.F] c := by
+theorem infPart_incA (c : D.host.E)
+    : infPart D (incA D c) = (1 : Ainf D.host.F) ⊗ₜ[D.host.F] c := by
   simp [infPart, incA, inclR]
 
-theorem infPart_cA (z : AE D) : infPart D (cA D z) = sigR (Ainf D.host.F) D.sp.cm.sig (infPart D z) := by
+theorem infPart_cA (z : AE D)
+    : infPart D (cA D z) = sigR (Ainf D.host.F) D.sp.cm.sig (infPart D z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul a x => rfl
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-theorem compAt_mulM {m k n : ℕ} (θ : InfFam D) (τ : D.what₂.Tau) (A : Mx D m k) (B : Mx D k n) :
-    compAt θ τ (mul A B) = compAt θ τ A * compAt θ τ B := by
+theorem compAt_mulM {m k n : ℕ} (θ : InfFam D) (τ : D.what₂.Tau) (A : Mx D m k) (B : Mx D k n)
+    : compAt θ τ (mul A B) = compAt θ τ A * compAt θ τ B := by
   unfold compAt mul
   exact Matrix.map_mul (f := (θ τ).comp (infPart D))
 
-theorem compAt_rat {m k : ℕ} {θ : InfFam D} (hθ : IsInfFam θ) (τ : D.what₂.Tau) (γ : Matrix (Fin m) (Fin k) D.host.E) :
-    compAt θ τ (rat γ) = γ.map (tauE D τ) := by
+theorem compAt_rat
+    {m k : ℕ} {θ : InfFam D} (hθ : IsInfFam θ)
+    (τ : D.what₂.Tau) (γ : Matrix (Fin m) (Fin k) D.host.E)
+    : compAt θ τ (rat γ) = γ.map (tauE D τ) := by
   ext i j
   simp only [compAt, rat, Matrix.map_apply]
   rw [infPart_incA]
   exact (hθ τ).1 _
 
-theorem norm_det_compAt {θ : InfFam D} (hθ : IsInfFam θ) (τ : D.what₂.Tau) (V : HSp D) (g : GA D V) :
-    ‖(compAt θ τ (mt V g)).det‖ = 1 := by
+theorem norm_det_compAt {θ : InfFam D} (hθ : IsInfFam θ) (τ : D.what₂.Tau) (V : HSp D) (g : GA D V)
+    : ‖(compAt θ τ (mt V g)).det‖ = 1 := by
   have h : ((mt V g).map (cA D))ᵀ * V.gram.map (incA D) * mt V g = V.gram.map (incA D) := g.2
   set ρ : AE D →+* ℂ := (θ τ).comp (infPart D) with hρ
   have hc : ∀ z, ρ (cA D z) = starRingEnd ℂ (ρ z) := fun z => by
@@ -79,7 +89,8 @@ theorem norm_det_compAt {θ : InfFam D} (hθ : IsInfFam θ) (τ : D.what₂.Tau)
   rw [e1] at hd
   have h4 : starRingEnd ℂ (ρ (mt V g).det) * ρ (mt V g).det = 1 := by
     refine mul_right_cancel₀ e2 ?_
-    calc _ = starRingEnd ℂ (ρ (mt V g).det) * ρ (V.gram.map (incA D)).det * ρ (mt V g).det := by ring
+    calc
+      _ = starRingEnd ℂ (ρ (mt V g).det) * ρ (V.gram.map (incA D)).det * ρ (mt V g).det := by ring
       _ = ρ (V.gram.map (incA D)).det := hd
       _ = _ := by ring
   rw [Complex.conj_mul'] at h4
@@ -87,26 +98,39 @@ theorem norm_det_compAt {θ : InfFam D} (hθ : IsInfFam θ) (τ : D.what₂.Tau)
   have h6 : (0 : ℝ) ≤ ‖ρ (mt V g).det‖ := norm_nonneg _
   nlinarith [sq_nonneg (‖ρ (mt V g).det‖ - 1), sq_nonneg (‖ρ (mt V g).det‖ + 1)]
 
-theorem isOpen_nsmul_mem (N : ℕ) :
-    IsOpen {y : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E | N • y ∈ intAE D} := by
-  have := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.StabFin.addGrpF (F := D.host.F) (E := D.host.E)
-  have h1 : IsOpen {z : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E | z ∈ intAE D} := by
-    have := GlobalTheory.IdeleParts.isOpen_nsmul_adelicCompletion_integers D.host.F D.host.E 1 one_pos
-    rw [← GlobalTheory.IdeleParts.integralFiniteAdeles_eq_adelicCompletion_integers] at this
-    have e : {z : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E | z ∈ intAE D} = {z | ∃ y ∈ intAE D, z = 1 • y} := by
-      ext z
-      simp
-    rw [e]
-    exact this
+theorem isOpen_nsmul_mem (N : ℕ)
+    : IsOpen
+      {y : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E | N • y ∈ intAE D} := by
+  have :=
+    Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.StabFin.addGrpF (F := D.host.F) (E := D.host.E)
+  have h1 : IsOpen
+      {z : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E | z ∈ intAE D} :=
+    by
+      have :=
+        GlobalTheory.IdeleParts.isOpen_nsmul_adelicCompletion_integers D.host.F D.host.E 1 one_pos
+      rw [← GlobalTheory.IdeleParts.integralFiniteAdeles_eq_adelicCompletion_integers] at this
+      have e
+          : {z : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E | z ∈ intAE D}
+            = {z | ∃ y ∈ intAE D, z = 1 • y} := by
+        ext z
+        simp
+      rw [e]
+      exact this
   exact h1.preimage (continuous_nsmul N)
 
-theorem den_one (z : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) : ∃ N : ℕ, 0 < N ∧ N • z ∈ intAE D := by
+theorem den_one
+    (z : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)
+    : ∃ N : ℕ, 0 < N ∧ N • z ∈ intAE D := by
   obtain ⟨n, hn, h⟩ := GlobalTheory.IwaPlace.SdComap.exists_natCast_mul_mem_intAE (D := D) z
   exact ⟨n, hn, by rwa [nsmul_eq_mul]⟩
 
-theorem exists_den {K : Set (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)} (hK : IsCompact K) :
-    ∃ N : ℕ, 0 < N ∧ ∀ x ∈ K, N • x ∈ intAE D := by
-  refine hK.induction_on (p := fun S => ∃ N : ℕ, 0 < N ∧ ∀ x ∈ S, N • x ∈ intAE D)
+theorem exists_den
+    {K : Set
+      (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)}
+    (hK : IsCompact K)
+    : ∃ N : ℕ, 0 < N ∧ ∀ x ∈ K, N • x ∈ intAE D := by
+  refine hK.induction_on
+    (p := fun S => ∃ N : ℕ, 0 < N ∧ ∀ x ∈ S, N • x ∈ intAE D)
     ⟨1, one_pos, by simp⟩ ?_ ?_ ?_
   · rintro s t hst ⟨N, hN, h⟩
     exact ⟨N, hN, fun x hx => h x (hst hx)⟩
@@ -124,7 +148,8 @@ theorem exists_den {K : Set (Formalism.MainNotions.GlobalTheoryTheory.GenusMassV
 def intR (D : D7) : Subring D.host.E := (algebraMap (𝓞 D.host.E) D.host.E).range
 
 theorem mem_intR_of_finPart {a : D.host.E} (h : finPart D (incA D a) ∈ intAE D) : a ∈ intR D := by
-  have h1 := (GlobalTheory.SplitDec.rat_int_iff (D := D) a).1 ((GlobalTheory.SplitDec.int_iff _).1 h)
+  have h1 :=
+    (GlobalTheory.SplitDec.rat_int_iff (D := D) a).1 ((GlobalTheory.SplitDec.int_iff _).1 h)
   obtain ⟨y, hy⟩ := Submodule.mem_one.1 h1
   exact ⟨y, hy⟩
 
@@ -132,11 +157,13 @@ theorem one_le_prod_tauE (z : D.host.E) (hz : z ∈ intR D) (h0 : z ≠ 0) : 1 �
   obtain ⟨r, rfl⟩ := hz
   have h1 := NumberField.InfinitePlace.prod_eq_abs_norm (algebraMap (𝓞 D.host.E) D.host.E r)
   have hb := Formalism.L2.Fam.ThC.plE_bij D
-  have h2 : ∏ w : InfinitePlace D.host.E, w (algebraMap (𝓞 D.host.E) D.host.E r) ^ w.mult =
-      ∏ τ, ‖tauE D τ (algebraMap (𝓞 D.host.E) D.host.E r)‖ ^ 2 := by
+  have h2
+      : ∏ w : InfinitePlace D.host.E, w (algebraMap (𝓞 D.host.E) D.host.E r) ^ w.mult
+        = ∏ τ, ‖tauE D τ (algebraMap (𝓞 D.host.E) D.host.E r)‖ ^ 2 := by
     rw [← hb.prod_comp]
     refine Finset.prod_congr rfl fun τ _ => ?_
-    rw [InfinitePlace.mult, if_neg (by simpa [InfinitePlace.isComplex_iff] using Formalism.L2.Fam.ThC.plE_complex τ)]
+    rw [InfinitePlace.mult,
+      if_neg (by simpa [InfinitePlace.isComplex_iff] using Formalism.L2.Fam.ThC.plE_complex τ)]
     rfl
   have hr : r ≠ 0 := fun e => h0 (by rw [e, map_zero])
   have h3 : (1 : ℝ) ≤ |((Algebra.norm ℚ (algebraMap (𝓞 D.host.E) D.host.E r) : ℚ) : ℝ)| := by
@@ -154,16 +181,24 @@ theorem one_le_prod_tauE (z : D.host.E) (hz : z ∈ intR D) (h0 : z ≠ 0) : 1 �
     Finset.prod_nonneg fun _ _ => norm_nonneg _
   nlinarith
 
-theorem mul_mem_int {x y : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E} (hx : x ∈ intAE D) (hy : y ∈ intAE D) :
-    x * y ∈ intAE D := by
+theorem mul_mem_int
+    {x y
+      : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E}
+    (hx : x ∈ intAE D) (hy : y ∈ intAE D)
+    : x * y ∈ intAE D := by
   rw [GlobalTheory.IdemSupport.mem_intAE_iff] at *
   rw [map_mul]
   exact mul_mem hx hy
 
-theorem exists_den_matrix {a b : ℕ}
-    {K : Set (Matrix (Fin a) (Fin b) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E))} (hK : IsCompact K) :
-    ∃ N : ℕ, 0 < N ∧ ∀ m ∈ K, ∀ i j, N • m i j ∈ intAE D := by
-  have h : ∀ p : Fin a × Fin b, ∃ N : ℕ, 0 < N ∧ ∀ x ∈ (fun m : Matrix (Fin a) (Fin b) _ => m p.1 p.2) '' K, N • x ∈ intAE D :=
+theorem exists_den_matrix
+    {a b : ℕ}
+    {K : Set (Matrix (Fin a) (Fin b)
+      (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E))}
+    (hK : IsCompact K)
+    : ∃ N : ℕ, 0 < N ∧ ∀ m ∈ K, ∀ i j, N • m i j ∈ intAE D := by
+  have h
+      : ∀ p : Fin a × Fin b, ∃ N : ℕ,
+        0 < N ∧ ∀ x ∈ (fun m : Matrix (Fin a) (Fin b) _ => m p.1 p.2) '' K, N • x ∈ intAE D :=
     fun p => exists_den (hK.image (continuous_id.matrix_elem p.1 p.2))
   choose N hN h using h
   refine ⟨∏ p, N p, Finset.prod_pos fun p _ => hN p, fun m hm i j => ?_⟩

@@ -9,27 +9,29 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH (Cell cellMon IsMGraded)
 
 namespace SectionMapInj
 
 variable {S : Type} [CommRing S] {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-noncomputable def chartMon (S : Type) [CommRing S] (c : ∀ k, ι k) : MRingOver S ι :=
-  ∏ k, X ⟨k, c k⟩
+noncomputable def chartMon (S : Type) [CommRing S] (c : ∀ k, ι k) : MRingOver S ι := ∏ k, X ⟨k, c k⟩
 
 def chartCell (c : ∀ k, ι k) : Cell K ι 0 :=
   ⟨fun k => {c k}, fun _ => Finset.singleton_nonempty _, by simp⟩
 
-theorem dvd_pow_of_mem_cellMon (c : ∀ k, ι k) {t : MRingOver S ι} (ht : t ∈ cellMon S (chartCell c).1) :
-    ∃ n : ℕ, t ∣ chartMon S c ^ n := by
+theorem dvd_pow_of_mem_cellMon
+    (c : ∀ k, ι k) {t : MRingOver S ι} (ht : t ∈ cellMon S (chartCell c).1)
+    : ∃ n : ℕ, t ∣ chartMon S c ^ n := by
   induction ht using Submonoid.closure_induction with
   | mem f hf =>
     obtain ⟨k, i, hi, rfl⟩ := hf
     rw [show i = c k from Finset.mem_singleton.mp hi]
     exact ⟨1, by rw [pow_one]; exact Finset.dvd_prod_of_mem _ (Finset.mem_univ k)⟩
-  | one => exact ⟨0, one_dvd _⟩
+  | one =>
+    exact ⟨0, one_dvd _⟩
   | mul a b _ _ ha hb =>
     obtain ⟨m, hm⟩ := ha
     obtain ⟨n, hn⟩ := hb
@@ -37,18 +39,20 @@ theorem dvd_pow_of_mem_cellMon (c : ∀ k, ι k) {t : MRingOver S ι} (ht : t �
 
 variable {M : Type} [AddCommGroup M] [Module (MRingOver S ι) M]
 
-theorem pow_smul_eq_zero_of_le {r : MRingOver S ι} {y : M} {m n : ℕ} (h : r ^ m • y = 0) (hmn : m ≤ n) :
-    r ^ n • y = 0 := by
+theorem pow_smul_eq_zero_of_le
+    {r : MRingOver S ι} {y : M} {m n : ℕ} (h : r ^ m • y = 0) (hmn : m ≤ n)
+    : r ^ n • y = 0 := by
   rw [← Nat.sub_add_cancel hmn, pow_add, mul_smul, h, smul_zero]
 
-theorem exists_pow_smul_eq_zero (c : ∀ k, ι k) {t : MRingOver S ι} (ht : t ∈ cellMon S (chartCell c).1) {y : M}
-    (hy : t • y = 0) : ∃ n : ℕ, chartMon S c ^ n • y = 0 := by
+theorem exists_pow_smul_eq_zero
+    (c : ∀ k, ι k) {t : MRingOver S ι} (ht : t ∈ cellMon S (chartCell c).1) {y : M} (hy : t • y = 0)
+    : ∃ n : ℕ, chartMon S c ^ n • y = 0 := by
   obtain ⟨n, q, hq⟩ := dvd_pow_of_mem_cellMon c ht
   exact ⟨n, by rw [hq, mul_comm, mul_smul, hy, smul_zero]⟩
 
-theorem exists_chart_dvd (N : ℕ) (μ : (Σ k, ι k) →₀ ℕ) (r : S)
-    (hμ : ∀ k, Fintype.card (ι k) * N + 1 ≤ ∑ i, μ ⟨k, i⟩) :
-    ∃ c : ∀ k, ι k, chartMon S c ^ N ∣ (monomial μ r : MRingOver S ι) := by
+theorem exists_chart_dvd
+    (N : ℕ) (μ : (Σ k, ι k) →₀ ℕ) (r : S) (hμ : ∀ k, Fintype.card (ι k) * N + 1 ≤ ∑ i, μ ⟨k, i⟩)
+    : ∃ c : ∀ k, ι k, chartMon S c ^ N ∣ (monomial μ r : MRingOver S ι) := by
   classical
   have hex : ∀ k, ∃ i, N ≤ μ ⟨k, i⟩ := by
     intro k
@@ -63,17 +67,20 @@ theorem exists_chart_dvd (N : ℕ) (μ : (Σ k, ι k) →₀ ℕ) (r : S)
   rw [monomial_eq, Finsupp.prod_fintype _ _ (fun q => pow_zero _), Fintype.prod_sigma, chartMon,
     ← Finset.prod_pow]
   refine Dvd.dvd.mul_left (Finset.prod_dvd_prod_of_dvd _ _ fun k _ => ?_) _
-  exact (pow_dvd_pow _ (hc k)).trans (Finset.dvd_prod_of_mem (fun i => (X ⟨k, i⟩ : MRingOver S ι) ^ μ ⟨k, i⟩)
-    (Finset.mem_univ (c k)))
+  exact (pow_dvd_pow _ (hc k)).trans
+    (Finset.dvd_prod_of_mem
+      (fun i => (X ⟨k, i⟩ : MRingOver S ι) ^ μ ⟨k, i⟩)
+      (Finset.mem_univ (c k)))
 
 variable [Module S M] [IsScalarTower S (MRingOver S ι) M]
 
 def killedSet (𝓜 : (K → ℤ) → Submodule S M) : Set M :=
   {y | (∃ d, y ∈ 𝓜 d) ∧ ∃ n : ℕ, ∀ c : ∀ k, ι k, chartMon S c ^ n • y = 0}
 
-theorem bound_finset (𝓜 : (K → ℤ) → Submodule S M) (F : Finset M) (hF : (↑F : Set M) ⊆ killedSet (ι := ι) 𝓜) :
-    ∃ (D : ℤ) (N : ℕ), ∀ f ∈ F, ∃ d : K → ℤ, f ∈ 𝓜 d ∧ (∀ k, d k ≤ D) ∧
-      ∀ c : ∀ k, ι k, chartMon S c ^ N • f = 0 := by
+theorem bound_finset
+    (𝓜 : (K → ℤ) → Submodule S M) (F : Finset M) (hF : (↑F : Set M) ⊆ killedSet (ι := ι) 𝓜)
+    : ∃ (D : ℤ) (N : ℕ), ∀ f ∈ F, ∃ d : K → ℤ,
+      f ∈ 𝓜 d ∧ (∀ k, d k ≤ D) ∧ ∀ c : ∀ k, ι k, chartMon S c ^ N • f = 0 := by
   classical
   revert hF
   induction F using Finset.induction_on with
@@ -86,25 +93,35 @@ theorem bound_finset (𝓜 : (K → ℤ) → Submodule S M) (F : Finset M) (hF :
     refine ⟨max D (∑ k, |d k|), max N n, fun f hf => ?_⟩
     rcases Finset.mem_insert.mp hf with rfl | hf
     · refine ⟨d, hd, fun k => ?_, fun c => pow_smul_eq_zero_of_le (hn c) (le_max_right _ _)⟩
-      exact ((le_abs_self _).trans (Finset.single_le_sum (f := fun k => |d k|) (fun l _ => abs_nonneg _)
-        (Finset.mem_univ k))).trans (le_max_right _ _)
+      exact ((le_abs_self _).trans
+        (Finset.single_le_sum
+          (f := fun k => |d k|)
+          (fun l _ => abs_nonneg _)
+          (Finset.mem_univ k))).trans (le_max_right _ _)
     · obtain ⟨e, he, heD, heN⟩ := hDN f hf
-      exact ⟨e, he, fun k => (heD k).trans (le_max_left _ _),
-        fun c => pow_smul_eq_zero_of_le (heN c) (le_max_left _ _)⟩
+      exact ⟨
+        e,
+        he,
+        fun k => (heD k).trans (le_max_left _ _),
+        fun c => pow_smul_eq_zero_of_le (heN c) (le_max_left _ _)
+      ⟩
 
-theorem exists_finset_span [IsNoetherian (MRingOver S ι) M] (𝓜 : (K → ℤ) → Submodule S M) :
-    ∃ F : Finset M, (↑F : Set M) ⊆ killedSet (ι := ι) 𝓜 ∧
-      ∀ y ∈ killedSet (ι := ι) 𝓜, y ∈ Submodule.span (MRingOver S ι) (↑F : Set M) := by
+theorem exists_finset_span [IsNoetherian (MRingOver S ι) M] (𝓜 : (K → ℤ) → Submodule S M)
+    : ∃ F : Finset M,
+      (↑F : Set M) ⊆ killedSet (ι := ι) 𝓜
+        ∧ ∀ y ∈ killedSet (ι := ι) 𝓜, y ∈ Submodule.span (MRingOver S ι) (↑F : Set M) := by
   classical
-  obtain ⟨W, ⟨F, hFH, rfl⟩, hmax⟩ := (set_has_maximal_iff_noetherian (R := MRingOver S ι) (M := M)).mpr ‹_›
-    {W | ∃ F : Finset M, (↑F : Set M) ⊆ killedSet (ι := ι) 𝓜 ∧ W = Submodule.span (MRingOver S ι) (↑F : Set M)}
-    ⟨_, ∅, by simp, rfl⟩
+  obtain ⟨W, ⟨F, hFH, rfl⟩, hmax⟩ :=
+    (set_has_maximal_iff_noetherian (R := MRingOver S ι) (M := M)).mpr ‹_›
+      {W | ∃ F : Finset M, (↑F : Set M) ⊆ killedSet (ι := ι) 𝓜 ∧ W = Submodule.span (MRingOver S ι) (↑F : Set M)}
+      ⟨_, ∅, by simp, rfl⟩
   refine ⟨F, hFH, fun y hy => ?_⟩
   by_contra hn
   refine hmax (Submodule.span _ ↑(insert y F)) ⟨insert y F, ?_, rfl⟩ ?_
   · rw [Finset.coe_insert]; exact Set.insert_subset hy hFH
   · refine lt_of_le_of_ne (Submodule.span_mono (by simp)) fun h => hn ?_
-    rw [h]; exact Submodule.subset_span (by simp)
+    rw [h]
+    exact Submodule.subset_span (by simp)
 
 end SectionMapInj
 
@@ -127,8 +144,10 @@ theorem SectionMapInj.full : SectionMapInj.Statement := by
       rw [one_smul, one_smul, smul_zero] at hu
       exact SectionMapInj.exists_pow_smul_eq_zero ch u.2 hu
     choose n hn using hch
-    exact ⟨Finset.univ.sup n, fun ch =>
-      SectionMapInj.pow_smul_eq_zero_of_le (hn ch) (Finset.le_sup (Finset.mem_univ ch))⟩
+    exact ⟨
+      Finset.univ.sup n,
+      fun ch => SectionMapInj.pow_smul_eq_zero_of_le (hn ch) (Finset.le_sup (Finset.mem_univ ch))
+    ⟩
   obtain ⟨g, -, hg⟩ := Submodule.mem_span_finset.mp (hspan x hxH)
   have hV : x ∈ ⨆ (e : K → ℤ) (_ : e ≠ c), 𝓜 e := by
     rw [← hg]
@@ -137,7 +156,8 @@ theorem SectionMapInj.full : SectionMapInj.Statement := by
     rw [MvPolynomial.as_sum (g f), Finset.sum_smul]
     refine Submodule.sum_mem _ fun μ _ => ?_
     set a : K → ℕ := fun k => ∑ i, μ ⟨k, i⟩ with ha
-    have hhom : IsMultiHomog (monomial μ (AddMonoidAlgebra.coeff (g f) μ) : MRingOver S ι) a := fun m hm k => by
+    have hhom : IsMultiHomog (monomial μ (AddMonoidAlgebra.coeff (g f) μ) : MRingOver S ι)
+        a := fun m hm k => by
       rw [Finset.mem_singleton.mp (MvPolynomial.support_monomial_subset hm)]
     have hmem := hM.2 a d _ f hhom hfd
     by_cases he : (d + fun k => (a k : ℤ)) = c
@@ -147,14 +167,18 @@ theorem SectionMapInj.full : SectionMapInj.Statement := by
         have h2 := hc k
         have h3 := hdD k
         have h4 : Fintype.card (ι k) ≤ L :=
-          Finset.single_le_sum (f := fun k => Fintype.card (ι k)) (fun _ _ => Nat.zero_le _) (Finset.mem_univ k)
+          Finset.single_le_sum
+            (f := fun k => Fintype.card (ι k))
+            (fun _ _ => Nat.zero_le _)
+            (Finset.mem_univ k)
         have h5 : ((Fintype.card (ι k) * N : ℕ) : ℤ) ≤ ((L * N : ℕ) : ℤ) := by
           exact_mod_cast Nat.mul_le_mul_right _ h4
         simp only [Pi.add_apply] at h1
         push_cast at h5
         have h6 : ((Fintype.card (ι k) * N + 1 : ℕ) : ℤ) ≤ (a k : ℤ) := by push_cast; linarith
         exact_mod_cast h6
-      obtain ⟨ch, q, hq⟩ := SectionMapInj.exists_chart_dvd (S := S) N μ (AddMonoidAlgebra.coeff (g f) μ) hdeg
+      obtain ⟨ch, q, hq⟩ :=
+        SectionMapInj.exists_chart_dvd (S := S) N μ (AddMonoidAlgebra.coeff (g f) μ) hdeg
       rw [hq, mul_comm, mul_smul, hfN ch, smul_zero]
       exact Submodule.zero_mem _
     · exact (le_iSup₂ (f := fun (e : K → ℤ) (_ : e ≠ c) => 𝓜 e) _ he) hmem

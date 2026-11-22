@@ -10,13 +10,19 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.TailKExp
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-theorem kappaC :
-    ∃ C : ℝ, 0 < C ∧ ∀ ε : ℝ, 0 < ε → ε ≤ 1 → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀, ∀ (Q : ℝ) (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
-      Y ^ (ε / 6) ≤ Real.log Q → Real.log Q ≤ Y ^ (ε / 4) → GoodC Q χ → ‖logDerivLAtOne χ‖ ≤ C * Real.log Y := by
+theorem kappaC
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ ε : ℝ,
+          0 < ε → ε ≤ 1
+            → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀, ∀ (Q : ℝ) (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+              Y ^ (ε / 6) ≤ Real.log Q → Real.log Q ≤ Y ^ (ε / 4) → GoodC Q χ
+                → ‖logDerivLAtOne χ‖ ≤ C * Real.log Y := by
   obtain ⟨C0, hC0, hM⟩ := Formalism.HermitianLattices.Ext.BoxTail.tail_mertens
   refine ⟨400 * C0 + 1, by positivity, ?_⟩
   intro ε hε hε1
@@ -44,8 +50,11 @@ theorem kappaC :
       simpa using this
     have : Y * ‖tailL χ z‖ ≤ Y * 1 := by linarith
     exact le_of_mul_le_mul_left this hY0
-  have hsum : ‖∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖ ≤ 400 * C0 * Real.log Y := by
-    calc ‖∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖
+  have hsum
+      : ‖∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖
+        ≤ 400 * C0 * Real.log Y := by
+    calc
+      ‖∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖
         ≤ ∑ n ∈ Icc 1 ⌊z⌋₊, ‖(ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖ := norm_sum_le _ _
       _ ≤ ∑ n ∈ Icc 1 ⌊z⌋₊, ArithmeticFunction.vonMangoldt n / n := by
         apply Finset.sum_le_sum
@@ -58,14 +67,17 @@ theorem kappaC :
         nlinarith
       _ ≤ C0 * Real.log z := hM z hz2
       _ = 400 * C0 * Real.log Y := by rw [hz, Real.log_pow]; push_cast; ring
-  have hL : logDerivLAtOne χ = -tailL χ z - ∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n := by
+  have hL
+      : logDerivLAtOne χ
+        = - tailL χ z - ∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n := by
     unfold tailL
     ring
   rw [hL]
-  calc ‖-tailL χ z - ∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖
-      ≤ ‖tailL χ z‖ + ‖∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖ := by
-        refine (norm_sub_le _ _).trans ?_
-        rw [norm_neg]
+  calc
+    ‖-tailL χ z - ∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖
+        ≤ ‖tailL χ z‖ + ‖∑ n ∈ Icc 1 ⌊z⌋₊, (ArithmeticFunction.vonMangoldt n : ℂ) * χ n / n‖ := by
+      refine (norm_sub_le _ _).trans ?_
+      rw [norm_neg]
     _ ≤ 1 + 400 * C0 * Real.log Y := add_le_add htail hsum
     _ ≤ (400 * C0 + 1) * Real.log Y := by nlinarith
 

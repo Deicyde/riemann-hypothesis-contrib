@@ -8,17 +8,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
-private theorem map_map_appTop {A B C : Scheme.{0}} {d : ℕ} (f : A ⟶ B) (g : B ⟶ C)
-    (M : Matrix (Fin d) (Fin d) Γ(C, ⊤)) :
-    (M.map g.appTop.hom).map f.appTop.hom = M.map (f ≫ g).appTop.hom := by
+private theorem map_map_appTop
+    {A B C : Scheme.{0}} {d : ℕ} (f : A ⟶ B) (g : B ⟶ C) (M : Matrix (Fin d) (Fin d) Γ(C, ⊤))
+    : (M.map g.appTop.hom).map f.appTop.hom = M.map (f ≫ g).appTop.hom := by
   ext m n
   simp only [Matrix.map_apply, Scheme.Hom.comp_appTop]
   rfl
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.gMatComp :
-    ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) {V : Scheme.{0}} (a b k : V ⟶ WP B) (M M' : Matrix (Fin d) (Fin d) Γ(V, ⊤)), a ≫ cP B = b ≫ cP B → GMat B a b M → GMat B b k M' → GMat B a k (M' * M) := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.gMatComp
+    : ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
+        {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) {V : Scheme.{0}}
+        (a b k : V ⟶ WP B) (M M' : Matrix (Fin d) (Fin d) Γ(V, ⊤)),
+      a ≫ cP B = b ≫ cP B → GMat B a b M → GMat B b k M' → GMat B a k (M' * M) := by
   intro K _ W Z Y q i π D d B V a b k M M' hab h₁ h₂ x
   obtain ⟨U, α, β, a₁, b₁, hx, ha, hb, hL⟩ := h₁ x
   obtain ⟨U', β', γ, b₂, k₂, hx', hb', hk', hL'⟩ := h₂ x
@@ -27,8 +31,9 @@ theorem UpperTheory.Gal.KunnethLefschetz.G.PX.gMatComp :
   have he : e ≫ U.ι = (U ⊓ U').ι := V.homOfLE_ι _
   have he' : e' ≫ U'.ι = (U ⊓ U').ι := V.homOfLE_ι _
   have hβ : β = β' := by
-    refine UpperTheory.Gal.KunnethLefschetz.G.PX.sigmaDisj (fun α : B.ι => (oW B α : Scheme.{0})) (e ≫ b₁) (e' ≫ b₂)
-      (⟨x, hx, hx'⟩ : ((U ⊓ U' : V.Opens) : Scheme.{0})) ?_
+    refine UpperTheory.Gal.KunnethLefschetz.G.PX.sigmaDisj
+      (fun α : B.ι => (oW B α : Scheme.{0}))
+      (e ≫ b₁) (e' ≫ b₂) (⟨x, hx, hx'⟩ : ((U ⊓ U' : V.Opens) : Scheme.{0})) ?_
     change (e ≫ b₁) ≫ wI B β = (e' ≫ b₂) ≫ wI B β'
     rw [Category.assoc, Category.assoc, ← hb, ← hb', ← Category.assoc, ← Category.assoc, he, he']
   subst hβ

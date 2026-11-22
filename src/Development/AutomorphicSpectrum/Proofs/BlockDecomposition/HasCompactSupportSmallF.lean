@@ -44,8 +44,7 @@ lemma radial_zero_of_ge {x : ℝ} (h : 3 / 2 ≤ x) : radial x = 0 := by
   change (1 / 2 : ℝ) ≤ _
   linarith
 
-def angular {δ : ℝ} (hδ : 0 < δ) : ContDiffBump (1 : ℝ) :=
-  ⟨δ / 2, δ, by positivity, by linarith⟩
+def angular {δ : ℝ} (hδ : 0 < δ) : ContDiffBump (1 : ℝ) := ⟨δ / 2, δ, by positivity, by linarith⟩
 
 lemma angular_one {δ : ℝ} (hδ : 0 < δ) : angular hδ 1 = 1 :=
   (angular hδ).one_of_mem_closedBall (Metric.mem_closedBall_self (angular hδ).rIn_pos.le)
@@ -100,13 +99,23 @@ lemma hasCompactSupport_smallF : HasCompactSupport smallF := by
 
 end GlobalTheory.CompanionTheory.TestBump
 
-
 open GlobalTheory.CompanionTheory.TestBump in
 theorem GlobalTheory.CompanionTheory.TestBump.cplxBump : CplxBump := by
   classical
   intro ι _ _ i₀ δ hδ
-  refine ⟨bigF i₀ hδ, smallF, contDiff_bigF i₀ hδ, hasCompactSupport_bigF i₀ hδ, contDiff_smallF,
-    hasCompactSupport_smallF, ?_, ?_, fun t => radial.nonneg, fun v => mul_nonneg radial.nonneg (angular hδ).nonneg, ?_⟩
+  refine ⟨
+    bigF i₀ hδ,
+    smallF,
+    contDiff_bigF i₀ hδ,
+    hasCompactSupport_bigF i₀ hδ,
+    contDiff_smallF,
+    hasCompactSupport_smallF,
+    ?_,
+    ?_,
+    fun t => radial.nonneg,
+    fun v => mul_nonneg radial.nonneg (angular hδ).nonneg,
+    ?_
+  ⟩
   · have h1 : nsq (Pi.single i₀ 1 : ι → ℂ) = 1 := by
       simp only [nsq]
       rw [Finset.sum_eq_single i₀]
@@ -119,8 +128,7 @@ theorem GlobalTheory.CompanionTheory.TestBump.cplxBump : CplxBump := by
     simp [smallF, ht, radial_one]
   · intro v hv
     have hv1 : nsq v = 1 := hv
-    have hFv : bigF i₀ hδ v = angular hδ (‖v i₀‖ ^ 2) := by
-      simp [bigF, hv1, radial_one]
+    have hFv : bigF i₀ hδ v = angular hδ (‖v i₀‖ ^ 2) := by simp [bigF, hv1, radial_one]
     refine ⟨fun t => ?_, fun h => ?_⟩
     · rw [hFv]
       by_cases ht : t = 0

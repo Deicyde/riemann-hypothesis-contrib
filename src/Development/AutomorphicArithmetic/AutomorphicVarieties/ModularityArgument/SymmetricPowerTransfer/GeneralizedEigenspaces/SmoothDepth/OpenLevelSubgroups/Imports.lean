@@ -7,23 +7,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL Formalism.BasicNotions
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  Formalism.BasicNotions
 open UpperTheory.V.W (Plc Lp)
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open UpperTheory.V.Z.Sym.Al
 
-theorem UpperTheory.V.Z.Sym.Al.proj :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (R : Representation ℂ (InfinitePlace L → GL (Fin n) ℂ) V), ContCoef R → ∀ U, IsLevel U → ∀ φ : UA L n → V, φ ≠ 0 → IsAF R U φ →
-        ∃ (σ : Submodule ℂ (UA L n → ℂ)) (φ' : UA L n → V), IsAutRepU σ ∧ φ' ≠ 0 ∧ IsAF R U φ' ∧ CoefIn φ' σ ∧
-          ∀ w W d c, EigAt φ w W d c → EigAt φ' w W d c := by
+theorem UpperTheory.V.Z.Sym.Al.proj
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (V : Type) [AddCommGroup V]
+        [Module ℂ V] [FiniteDimensional ℂ V]
+        (R : Representation ℂ (InfinitePlace L → GL (Fin n) ℂ) V),
+      ContCoef R
+        → ∀ U,
+          IsLevel U
+            → ∀ φ : UA L n → V,
+              φ ≠ 0 → IsAF R U φ
+                → ∃ (σ : Submodule ℂ (UA L n → ℂ)) (φ' : UA L n → V),
+                  IsAutRepU σ ∧ φ' ≠ 0 ∧ IsAF R U φ' ∧ CoefIn φ' σ
+                    ∧ ∀ w W d c, EigAt φ w W d c → EigAt φ' w W d c := by
   classical
   intro L _ _ _ n V _ _ _ R hR U hU φ hφ hAF
-  let C : (V →ₗ[ℂ] ℂ) →ₗ[ℂ] GlobalTheory.DefU.autU L n :=
-    { toFun := fun f => ⟨f ∘ φ, coefAut L n V R hR U hU φ hAF f⟩
-      map_add' := fun f f' => Subtype.ext rfl
-      map_smul' := fun c f => Subtype.ext rfl }
+  let C : (V →ₗ[ℂ] ℂ) →ₗ[ℂ] GlobalTheory.DefU.autU L n := {
+    toFun := fun f => ⟨f ∘ φ, coefAut L n V R hR U hU φ hAF f⟩
+    map_add' := fun f f' => Subtype.ext rfl
+    map_smul' := fun c f => Subtype.ext rfl
+  }
   obtain ⟨κ, _, σ, P, hσ, hPσ, hPe, hPs⟩ := autProj L n (LinearMap.range C) inferInstance
   let b := Module.finBasis ℂ V
   let F : κ → UA L n → V := fun k g => ∑ i, (P k (C (b.coord i))).1 g • b i
@@ -32,7 +43,7 @@ theorem UpperTheory.V.Z.Sym.Al.proj :
     conv_rhs => rw [← b.sum_dual_apply_smul_coord f]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [F, map_sum, map_smul, smul_eq_mul, Submodule.coe_sum, Finset.sum_apply,
-      Submodule.coe_smul, Pi.smul_apply, AddSubmonoidClass.coe_finsetSum]
+        Submodule.coe_smul, Pi.smul_apply, AddSubmonoidClass.coe_finsetSum]
     exact Finset.sum_congr rfl fun i _ => mul_comm _ _
   have hext : ∀ {v v' : V}, (∀ f : V →ₗ[ℂ] ℂ, f v = f v') → v = v' := fun h =>
     b.ext_elem fun i => h (b.coord i)
@@ -49,15 +60,18 @@ theorem UpperTheory.V.Z.Sym.Al.proj :
     rw [← hF, h k]
     simp
   obtain ⟨k, hk⟩ := hne
-  have htr : ∀ x (f : V →ₗ[ℂ] ℂ) g, (P k (C f)).1 (g * x) = (P k (GlobalTheory.DefU.autRep L n x (C f))).1 g := by
+  have htr
+      : ∀ x (f : V →ₗ[ℂ] ℂ) g,
+        (P k (C f)).1 (g * x) = (P k (GlobalTheory.DefU.autRep L n x (C f))).1 g := by
     intro x f g
     rw [hPe]
     rfl
   have hcoef : ∀ f : V →ₗ[ℂ] ℂ, f ∘ F k = (P k (C f)).1 := fun f => funext (hF k f)
   refine ⟨σ k, F k, hσ k, hk, ⟨?_, ?_, ?_⟩, ?_, ?_⟩
-  · exact fun γ hγ g => hext fun f => by
-      rw [hF, hF]
-      exact (P k (C f)).2.left γ hγ g
+  · exact fun γ hγ g =>
+      hext fun f => by
+        rw [hF, hF]
+        exact (P k (C f)).2.left γ hγ g
   · refine fun x hx g => hext fun f => ?_
     have e : GlobalTheory.DefU.autRep L n x (C f) = C (f ∘ₗ R (infC L n x⁻¹)) :=
       Subtype.ext (funext fun g => by
@@ -78,26 +92,31 @@ theorem UpperTheory.V.Z.Sym.Al.proj :
     let ρV := (rightReg ℂ (UA L n) V).comp (secW n w)
     let ρC := (rightReg ℂ (UA L n) ℂ).comp (secW n w)
     let ρA := (GlobalTheory.DefU.autRep L n).comp (secW n w)
-    have e1 : ∀ (f : V →ₗ[ℂ] ℂ) (ψ : UA L n → V) a,
-        f ∘ (Hi.dc ρV (W.J n) (W.J n) a ψ) = Hi.dc ρC (W.J n) (W.J n) a (f ∘ ψ) := fun f ψ a =>
+    have e1
+        : ∀ (f : V →ₗ[ℂ] ℂ) (ψ : UA L n → V) a,
+          f ∘ (Hi.dc ρV (W.J n) (W.J n) a ψ) = Hi.dc ρC (W.J n) (W.J n) a (f ∘ ψ) := fun f ψ a =>
       dcMap W ρV ρC (f.compLeft (UA L n)) (fun _ _ => rfl) a ψ
-    have e2 : ∀ (x : GlobalTheory.DefU.autU L n) a,
-        (Hi.dc ρA (W.J n) (W.J n) a x).1 = Hi.dc ρC (W.J n) (W.J n) a x.1 := fun x a =>
+    have e2
+        : ∀ (x : GlobalTheory.DefU.autU L n) a,
+          (Hi.dc ρA (W.J n) (W.J n) a x).1 = Hi.dc ρC (W.J n) (W.J n) a x.1 := fun x a =>
       dcMap W ρA ρC (GlobalTheory.DefU.autU L n).subtype (fun _ _ => rfl) a x
-    have e3 : ∀ (x : GlobalTheory.DefU.autU L n) a,
-        P k (Hi.dc ρA (W.J n) (W.J n) a x) = Hi.dc ρA (W.J n) (W.J n) a (P k x) := fun x a =>
+    have e3
+        : ∀ (x : GlobalTheory.DefU.autU L n) a,
+          P k (Hi.dc ρA (W.J n) (W.J n) a x) = Hi.dc ρA (W.J n) (W.J n) a (P k x) := fun x a =>
       dcMap W ρA ρA (P k) (fun _ _ => hPe k _ _) a x
     change Hi.dc ρV (W.J n) (W.J n) (Sig.dg d) φ = c • φ at h
     change Hi.dc ρV (W.J n) (W.J n) (Sig.dg d) (F k) = c • F k
     refine funext fun g => hext fun f => ?_
-    have hC : Hi.dc ρA (W.J n) (W.J n) (Sig.dg d) (C f) = c • C f := Subtype.ext (by
-      rw [e2]
-      change Hi.dc ρC (W.J n) (W.J n) (Sig.dg d) (f ∘ φ) = c • (f ∘ φ)
-      rw [← e1, h]
-      funext g
-      simp)
-    have e4 : f ∘ (Hi.dc ρV (W.J n) (W.J n) (Sig.dg d) (F k)) =
-        (Hi.dc ρA (W.J n) (W.J n) (Sig.dg d) (P k (C f))).1 := by
+    have hC : Hi.dc ρA (W.J n) (W.J n) (Sig.dg d) (C f) = c • C f :=
+      Subtype.ext (by
+        rw [e2]
+        change Hi.dc ρC (W.J n) (W.J n) (Sig.dg d) (f ∘ φ) = c • (f ∘ φ)
+        rw [← e1, h]
+        funext g
+        simp)
+    have e4
+        : f ∘ (Hi.dc ρV (W.J n) (W.J n) (Sig.dg d) (F k))
+          = (Hi.dc ρA (W.J n) (W.J n) (Sig.dg d) (P k (C f))).1 := by
       rw [e1, e2, hcoef]
     have e5 := congrFun e4 g
     rw [← e3, hC, map_smul] at e5

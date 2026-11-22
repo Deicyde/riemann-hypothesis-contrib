@@ -27,11 +27,17 @@ def shift {M : ℕ} (d : Fin M → ℕ) (i : Fin M) : ℂ :=
   ((d i : ℂ) - 1) / 2 - (modExp (fun i => Fin (d i)) i : ℂ) / 2
 
 def fb {M n : ℕ} (d : Fin M → ℕ) (h : ∑ i, d i = n) (Y : ℂ) : FreeAlgebra ℂ (Fin n × Fin n) :=
-  (List.ofFn fun i : Fin M => qdet (fun p q : Fin (d i) => lt (stdBlocks d h ⟨i, p⟩) (stdBlocks d h ⟨i, q⟩))
-    (Y + shift d i)).prod
+  (List.ofFn fun i : Fin M =>
+    qdet
+      (fun p q : Fin (d i) => lt (stdBlocks d h ⟨i, p⟩) (stdBlocks d h ⟨i, q⟩))
+      (Y + shift d i)).prod
 
-theorem map_qdet {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B] (ψ : A →ₐ[ℂ] B) {n : ℕ}
-    (X : Fin n → Fin n → A) (u : ℂ) : ψ (qdet X u) = qdet (fun p q => ψ (X p q)) u := by
+theorem map_qdet
+    {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B]
+    (ψ : A →ₐ[ℂ] B)
+    {n : ℕ} (X : Fin n → Fin n → A)
+    (u : ℂ)
+    : ψ (qdet X u) = qdet (fun p q => ψ (X p q)) u := by
   unfold qdet qminor
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -44,8 +50,11 @@ theorem map_qdet {A B : Type} [Ring A] [Algebra ℂ A] [Ring B] [Algebra ℂ B] 
     simp [Function.comp, Tm]
     split_ifs <;> simp
 
-abbrev lL {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End ℂ V)
-    (l : Fin n × Fin n) : Module.End ℂ (Cn n V) := if lev l.1 = lev l.2 then lF E l.1 l.2 else 0
+abbrev lL
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End ℂ V) (l : Fin n × Fin n)
+    : Module.End ℂ (Cn n V) :=
+  if lev l.1 = lev l.2 then lF E l.1 l.2 else 0
 
 section Spaces
 variable {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
@@ -67,7 +76,8 @@ def cyc (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End ℂ V) (j : �
   smul_mem' := by
     rintro c x ⟨h1, h2, h3⟩
     have hne : ∀ A, (c • x) A ≠ 0 → x A ≠ 0 := fun A hA hx => hA (by simp [hx])
-    exact ⟨fun A hA => h1 A (hne A hA), fun A hA => h2 A (hne A hA), by rw [map_smul, h3, smul_zero]⟩
+    exact
+      ⟨fun A hA => h1 A (hne A hA), fun A hA => h2 A (hne A hA), by rw [map_smul, h3, smul_zero]⟩
 
 def bdy (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End ℂ V) (j : ℕ) : Submodule ℂ (Cn n V) where
   carrier := {x | ∃ w : Cn n V, SuppIn (inU lev) w ∧ Deg (j + 1) w ∧ bd (allT n) E w = x}
@@ -90,6 +100,7 @@ def bdy (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End ℂ V) (j : �
 
 end Spaces
 
-def sz {n : ℕ} (lev : Fin n → ℕ) (M : ℕ) : Fin M → ℕ := fun i => (univ.filter fun a => lev a = (i : ℕ)).card
+def sz {n : ℕ} (lev : Fin n → ℕ) (M : ℕ) : Fin M → ℕ := fun i =>
+  (univ.filter fun a => lev a = (i : ℕ)).card
 
 end GlobalTheory.CompanionTheory.RgCOBlock

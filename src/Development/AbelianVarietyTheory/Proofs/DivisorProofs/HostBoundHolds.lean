@@ -11,14 +11,19 @@ public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClas
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR.Links ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV
+  Formalism.L2.Pj Formalism.IndefR.Links ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop
+  GlobalTheory.CovTop
 open Formalism.MainNotions.Gaps.EtaleWeightGaps.Num
 
 namespace GlobalTheory.CovTop.Sizes
 
-theorem eventually_scale {eps : ℝ} (he : 0 < eps) (A M : ℝ) : ∃ x0 : ℝ, ∀ x : ℝ, x0 ≤ x →
-    M ≤ x ^ eps ∧ 10 ≤ x ^ eps ∧ 1 ≤ Real.log (Real.log x) ∧ (x ^ A) ^ M ≤ Real.exp (x ^ eps) ∧ 5 ≤ x ^ (eps / 5) ∧
-      (10 : ℝ) ^ 60 ≤ x := by
+theorem eventually_scale {eps : ℝ} (he : 0 < eps) (A M : ℝ)
+    : ∃ x0 : ℝ, ∀ x : ℝ,
+      x0 ≤ x
+        → M ≤ x ^ eps ∧ 10 ≤ x ^ eps ∧ 1 ≤ Real.log (Real.log x) ∧ (x ^ A) ^ M ≤ Real.exp (x ^ eps)
+          ∧ 5 ≤ x ^ (eps / 5) ∧ (10 : ℝ) ^ 60 ≤ x := by
   have h1 := (tendsto_rpow_atTop he).eventually_ge_atTop M
   have h2 := (tendsto_rpow_atTop he).eventually_ge_atTop 10
   have h3 := (Real.tendsto_log_atTop.comp Real.tendsto_log_atTop).eventually_ge_atTop 1
@@ -36,12 +41,16 @@ theorem eventually_scale {eps : ℝ} (he : 0 < eps) (A M : ℝ) : ∃ x0 : ℝ, 
   exact (le_abs_self _).trans a4
 
 theorem coprime_fifteen {g : ℕ} (hg : g.Prime) (h : 15 < g) : Nat.Coprime 15 g :=
-  ((Nat.Prime.coprime_iff_not_dvd hg).2 fun hd => absurd (Nat.le_of_dvd (by norm_num) hd) (not_le.2 h)).symm
+  ((Nat.Prime.coprime_iff_not_dvd hg).2 fun hd =>
+    absurd (Nat.le_of_dvd (by norm_num) hd) (not_le.2 h)).symm
 
-theorem hostNum_of_sizes {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (T : ParamsT D L P) (S : SizesAt L) {A M : ℝ}
-    (hg : ∀ k, Real.log (D.host.g k : ℝ) ≤ 9 * L.sc.L + 1) (hA : 22 + L.Ct ≤ A)
-    (a1 : M ≤ L.sc.L) (a2 : 10 ≤ L.sc.L) (a3 : 1 ≤ Real.log (Real.log L.sc.x)) (a4 : (L.sc.x ^ A) ^ M ≤ L.sc.b)
-    (a5 : 5 ≤ L.sc.x ^ (L.sc.ez / 5)) (hx : (10 : ℝ) ^ 60 ≤ L.sc.x) : HostNum D L T.PP A M := by
+theorem hostNum_of_sizes
+    {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (T : ParamsT D L P) (S : SizesAt L)
+    {A M : ℝ}
+    (hg : ∀ k, Real.log (D.host.g k : ℝ) ≤ 9 * L.sc.L + 1) (hA : 22 + L.Ct ≤ A) (a1 : M ≤ L.sc.L)
+    (a2 : 10 ≤ L.sc.L) (a3 : 1 ≤ Real.log (Real.log L.sc.x)) (a4 : (L.sc.x ^ A) ^ M ≤ L.sc.b)
+    (a5 : 5 ≤ L.sc.x ^ (L.sc.ez / 5)) (hx : (10 : ℝ) ^ 60 ≤ L.sc.x)
+    : HostNum D L T.PP A M := by
   have hfr := Pm.fr_le_pow S hx
   obtain ⟨sN, -, -, -, -, -, sQD, -, -, -, -, -, -, -, -, -, -, sW, -, -, sG, -, -⟩ := S
   have hx1 := L.sc.one_lt_alt.le
@@ -53,7 +62,9 @@ theorem hostNum_of_sizes {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
   have hr := Pm.six_le_r D
   have hrt := Pm.r_le_alt_alt D
   have hLx : L.sc.L ≤ L.sc.x := by
-    calc L.sc.L = L.sc.x ^ L.sc.eps := rfl
+    calc
+      L.sc.L
+        = L.sc.x ^ L.sc.eps := rfl
       _ ≤ L.sc.x ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
       _ = L.sc.x := Real.rpow_one _
   have hnV : (D.R.nV : ℝ) ≤ 2 * D.R.t := by
@@ -78,15 +89,20 @@ theorem hostNum_of_sizes {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
     have h3 : (2 : ℝ) ^ 8 ≤ D.host.g k := (pow_le_pow_left₀ (by norm_num) h2 8).trans (sG k k).1
     have h4 : ((15 : ℕ) : ℝ) < D.host.g k := lt_of_lt_of_le (by norm_num) h3
     exact_mod_cast h4
-  refine ⟨⟨a1, a2, hLx, a3⟩, ?_, ?_, ⟨?_, ?_⟩, hg, ?_, ?_, ?_, ?_, ?_, ⟨by linarith, ?_, ?_⟩, a4, sW⟩
+  refine
+    ⟨⟨a1, a2, hLx, a3⟩, ?_, ?_, ⟨?_, ?_⟩, hg, ?_, ?_, ?_, ?_, ?_, ⟨by linarith, ?_, ?_⟩, a4, sW⟩
   · have h1 : L.sc.x ≤ L.sc.x ^ (2 + 8 * L.sc.eps - szTh L) := by
-      calc L.sc.x = L.sc.x ^ (1 : ℝ) := (Real.rpow_one _).symm
+      calc
+        L.sc.x
+          = L.sc.x ^ (1 : ℝ) := (Real.rpow_one _).symm
         _ ≤ _ := Real.rpow_le_rpow_of_exponent_le hx1 (by unfold szTh; linarith)
     have h2 : (4 : ℝ) ≤ D.R.n := le_trans (by norm_num) (hx.trans (h1.trans sN.1))
     have h3 : ((8 : ℕ) : ℝ) ≤ D.R.f := by rw [Pm.f_eq]; push_cast; linarith
     exact_mod_cast h3
   · have h1 : Module.finrank ℚ D.host.E = 4 * D.R.ord := D.host.finrank_cmField
-    rw [h1]; unfold Ranks.f Ranks.n; ring
+    rw [h1]
+    unfold Ranks.f Ranks.n
+    ring
   · rw [Real.log_mul (by linarith) (by linarith)]
     linarith [Pm.log_f_le P, Pm.log_r_le P]
   · have h1 := Real.log_le_log hnV0 hnV
@@ -96,7 +112,8 @@ theorem hostNum_of_sizes {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
     nlinarith
   · exact sQD.2.2.2.2.1.trans (Real.rpow_le_rpow_of_exponent_le hx1 (by unfold szTh; linarith))
   · exact le_trans (Nat.le_floor (by exact_mod_cast a5)) L.split_tie
-  · exact Nat.Coprime.mul_right (coprime_fifteen (D.host.g_prime 0) (hgl 0)) (coprime_fifteen (D.host.g_prime 1) (hgl 1))
+  · exact Nat.Coprime.mul_right (coprime_fifteen (D.host.g_prime 0) (hgl 0))
+      (coprime_fifteen (D.host.g_prime 1) (hgl 1))
   · have hZ := Pm.one_le_Z L
     have h1 : zBase L ^ 12 ≤ zBase L ^ T.eP := by
       rw [← Real.rpow_natCast]
@@ -106,18 +123,22 @@ theorem hostNum_of_sizes {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
   · exact T.PP_poly.trans (Real.rpow_le_rpow_of_exponent_le hx1 (by linarith))
   · have h2 : (D.R.nV : ℝ) ≤ L.sc.x * L.sc.x ^ L.Ct :=
       hnV.trans (mul_le_mul (le_trans (by norm_num) hx) L.t_win.2 (by positivity) hx0.le)
-    calc (D.R.f : ℝ) * D.R.r * D.R.nV * L.sc.L ≤ L.sc.x ^ (20 : ℝ) * (L.sc.x * L.sc.x ^ L.Ct) * L.sc.x := by gcongr
+    calc
+      (D.R.f : ℝ) * D.R.r * D.R.nV * L.sc.L
+        ≤ L.sc.x ^ (20 : ℝ) * (L.sc.x * L.sc.x ^ L.Ct) * L.sc.x := by gcongr
       _ = L.sc.x ^ (20 + (1 + L.Ct) + 1) := by
         rw [Real.rpow_add hx0, Real.rpow_add hx0, Real.rpow_add hx0, Real.rpow_one]
       _ ≤ _ := Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
 
 theorem hostN : ∀ M : ℝ, HostN M := by
   intro M
-  refine ⟨1, one_pos, fun eps he _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm CH hF _ => ?_⟩⟩
+  refine
+    ⟨1, one_pos, fun eps he _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm CH hF _ => ?_⟩⟩
   obtain ⟨x0, hx0⟩ := eventually_scale he (22 + |Fm.Ct|) M
   have hez : 0 < Fm.ez := div_pos he (lt_of_lt_of_le one_pos Fm.toFamCore.one_le_J)
-  obtain ⟨x2, hx2⟩ := Filter.eventually_atTop.1
-    ((tendsto_rpow_atTop (by positivity : 0 < Fm.ez / 5)).eventually_ge_atTop 5)
+  obtain ⟨x2, hx2⟩ :=
+    Filter.eventually_atTop.1
+      ((tendsto_rpow_atTop (by positivity : 0 < Fm.ez / 5)).eventually_ge_atTop 5)
   refine ⟨22 + |Fm.Ct|, by positivity, max x0 x2, fun x hx hle ι p _ _ => ?_⟩
   obtain ⟨a1, a2, a3, a4, -, a6⟩ := hx0 x ((le_max_left _ _).trans hle)
   have a5 : 5 ≤ x ^ (Fm.ez / 5) := hx2 x ((le_max_right _ _).trans hle)
@@ -126,10 +147,12 @@ theorem hostN : ∀ M : ℝ, HostN M := by
   have hse : (Fm.L x ι).sc.eps = eps := Fm.L_eps x ι
   have hsL : (Fm.L x ι).sc.L = x ^ eps := by unfold Scale.L; rw [hsx, hse]
   have hg : ∀ k, Real.log ((Fm.D x ι).host.g k) ≤ 9 * (Fm.L x ι).sc.L + 1 := fun k => by
-    have hlo : 0 < ((((Fm.D x ι).host.g k : ℕ)) : ℝ) := by exact_mod_cast ((Fm.D x ι).host.g_prime k).pos
+    have hlo : 0 < ((((Fm.D x ι).host.g k : ℕ)) : ℝ) := by
+      exact_mod_cast ((Fm.D x ι).host.g_prime k).pos
     have := (Real.log_le_iff_le_exp hlo).2 ((hF.1.2.2.2.2.2.2.2.2 x hx ι).2.2.1 k)
     linarith
-  refine hostNum_of_sizes (Fm.params x hx ι) (Fm.parT x hx ι) (Fm.sizes x hx ι) hg ?_ ?_ ?_ ?_ ?_ ?_ ?_
+  refine hostNum_of_sizes (Fm.params x hx ι) (Fm.parT x hx ι) (Fm.sizes x hx ι) hg ?_ ?_ ?_ ?_ ?_ ?_
+    ?_
   · rw [Fm.Ct_eq]; linarith [le_abs_self Fm.Ct]
   · rwa [hsL]
   · rwa [hsL]

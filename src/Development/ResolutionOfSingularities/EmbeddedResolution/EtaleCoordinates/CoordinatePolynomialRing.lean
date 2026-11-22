@@ -9,32 +9,38 @@ universe u
 
 namespace FunctorialResolution.EmbeddedResolution
 
-@[reducible] def CoordPolynomialRing (k : Type u) [Field k] (m : ℕ) : Type u :=
+@[reducible]
+def CoordPolynomialRing (k : Type u) [Field k] (m : ℕ) : Type u :=
   MvPolynomial (ULift.{u} (Fin m)) k
 
-noncomputable def etaleChartCoord (k : Type u) [Field k] (m : ℕ) (S : Type u) [CommRing S]
-    [Algebra (CoordPolynomialRing k m) S] (j : Fin m) : S :=
+noncomputable def etaleChartCoord
+    (k : Type u) [Field k]
+    (m : ℕ) (S : Type u) [CommRing S] [Algebra (CoordPolynomialRing k m) S]
+    (j : Fin m)
+    : S :=
   algebraMap (CoordPolynomialRing k m) S (MvPolynomial.X (ULift.up.{u} j))
 
-theorem etaleChartCoord_def (k : Type u) [Field k] (m : ℕ) (S : Type u) [CommRing S]
-    [Algebra (CoordPolynomialRing k m) S] (j : Fin m) :
-    etaleChartCoord k m S j =
-      algebraMap (CoordPolynomialRing k m) S (MvPolynomial.X (ULift.up.{u} j)) :=
+theorem etaleChartCoord_def
+    (k : Type u) [Field k]
+    (m : ℕ) (S : Type u) [CommRing S] [Algebra (CoordPolynomialRing k m) S]
+    (j : Fin m)
+    : etaleChartCoord k m S j
+      = algebraMap (CoordPolynomialRing k m) S (MvPolynomial.X (ULift.up.{u} j)) :=
   rfl
 
-private theorem isRegularLocalRing_localization_coordPolynomialRing (k : Type u) [Field k] (m : ℕ)
-    (p : Ideal (CoordPolynomialRing k m)) (hp : p.IsPrime) :
-    IsRegularLocalRing (Localization.AtPrime p) := by
+private theorem isRegularLocalRing_localization_coordPolynomialRing
+    (k : Type u) [Field k] (m : ℕ) (p : Ideal (CoordPolynomialRing k m)) (hp : p.IsPrime)
+    : IsRegularLocalRing (Localization.AtPrime p) := by
   have := hp
   infer_instance
 
-private theorem isRegularLocalRing_and_ringKrullDim_eq_of_etale (P S : Type u) [CommRing P] [CommRing S] [Algebra P S]
-    [Algebra.Etale P S] [IsNoetherianRing P]
+private theorem isRegularLocalRing_and_ringKrullDim_eq_of_etale
+    (P S : Type u) [CommRing P] [CommRing S] [Algebra P S] [Algebra.Etale P S] [IsNoetherianRing P]
     (hreg : ∀ (p : Ideal P) [p.IsPrime], IsRegularLocalRing (Localization.AtPrime p))
-    (q : Ideal S) [q.IsPrime] (A : Type u) [CommRing A] [Algebra S A]
-    [IsLocalization q.primeCompl A] :
-    IsRegularLocalRing A ∧
-      ringKrullDim A = ringKrullDim (Localization.AtPrime (q.comap (algebraMap P S))) := by
+    (q : Ideal S) [q.IsPrime]
+    (A : Type u) [CommRing A] [Algebra S A] [IsLocalization q.primeCompl A]
+    : IsRegularLocalRing A
+      ∧ ringKrullDim A = ringKrullDim (Localization.AtPrime (q.comap (algebraMap P S))) := by
   have : Algebra.FiniteType P S := inferInstance
   have : IsNoetherianRing S := Algebra.FiniteType.isNoetherianRing P S
   have : IsNoetherianRing A := IsLocalization.isNoetherianRing q.primeCompl A inferInstance
@@ -45,8 +51,7 @@ private theorem isRegularLocalRing_and_ringKrullDim_eq_of_etale (P S : Type u) [
   have : Module.Flat S A := IsLocalization.flat A q.primeCompl
   have : Module.Flat P A := Module.Flat.trans P S A
   have : Algebra.FormallyUnramified P S := inferInstance
-  have : Algebra.FormallyUnramified S A :=
-    Algebra.FormallyUnramified.of_isLocalization q.primeCompl
+  have : Algebra.FormallyUnramified S A := Algebra.FormallyUnramified.of_isLocalization q.primeCompl
   have : Algebra.FormallyUnramified P A := Algebra.FormallyUnramified.comp P S A
   have : Algebra.EssFiniteType P S := inferInstance
   have : Algebra.EssFiniteType S A := Algebra.EssFiniteType.of_isLocalization A q.primeCompl
@@ -68,21 +73,19 @@ private theorem isRegularLocalRing_and_ringKrullDim_eq_of_etale (P S : Type u) [
     Algebra.FormallyUnramified.localization_base (M := (q.comap (algebraMap P S)).primeCompl)
   have : Algebra.EssFiniteType (Localization.AtPrime (q.comap (algebraMap P S))) A :=
     Algebra.EssFiniteType.of_comp P (Localization.AtPrime (q.comap (algebraMap P S))) A
-  have : IsRegularLocalRing (Localization.AtPrime (q.comap (algebraMap P S))) :=
-    hreg _
+  have : IsRegularLocalRing (Localization.AtPrime (q.comap (algebraMap P S))) := hreg _
   have : IsLocalHom (algebraMap (Localization.AtPrime (q.comap (algebraMap P S))) A) := by
     constructor
     intro r hr
-    obtain ⟨⟨x, s⟩, hx⟩ :=
-      IsLocalization.surj (M := (q.comap (algebraMap P S)).primeCompl) r
-    have hxA : algebraMap (Localization.AtPrime (q.comap (algebraMap P S))) A r
-        * algebraMap P A (s : P) = algebraMap P A x := by
+    obtain ⟨⟨x, s⟩, hx⟩ := IsLocalization.surj (M := (q.comap (algebraMap P S)).primeCompl) r
+    have hxA
+        : algebraMap (Localization.AtPrime (q.comap (algebraMap P S))) A r * algebraMap P A (s : P)
+          = algebraMap P A x := by
       have h := congrArg (algebraMap (Localization.AtPrime (q.comap (algebraMap P S))) A) hx
       rw [map_mul] at h
-      rw [IsScalarTower.algebraMap_apply P
-            (Localization.AtPrime (q.comap (algebraMap P S))) A (s : P),
-        IsScalarTower.algebraMap_apply P
-            (Localization.AtPrime (q.comap (algebraMap P S))) A x]
+      rw [IsScalarTower.algebraMap_apply P (Localization.AtPrime (q.comap (algebraMap P S))) A
+          (s : P),
+        IsScalarTower.algebraMap_apply P (Localization.AtPrime (q.comap (algebraMap P S))) A x]
       exact h
     have h2 : IsUnit (algebraMap P A x) := by
       rw [← hxA]
@@ -97,23 +100,28 @@ private theorem isRegularLocalRing_and_ringKrullDim_eq_of_etale (P S : Type u) [
       IsLocalization.map_units _ ⟨x, h5⟩
     rw [← hx] at h6
     exact (IsUnit.mul_iff.mp h6).1
-  exact ⟨isRegularLocalRing_of_flat_formallyUnramified
-      (Localization.AtPrime (q.comap (algebraMap P S))) A,
-    ringKrullDim_eq_of_flat_formallyUnramified
-      (Localization.AtPrime (q.comap (algebraMap P S))) A⟩
+  exact ⟨
+    isRegularLocalRing_of_flat_formallyUnramified (Localization.AtPrime (q.comap (algebraMap P S)))
+      A,
+    ringKrullDim_eq_of_flat_formallyUnramified (Localization.AtPrime (q.comap (algebraMap P S))) A
+  ⟩
 
-theorem isRegularLocalRing_of_isLocalization_etale (k : Type u) [Field k] (m : ℕ) (S : Type u)
+theorem isRegularLocalRing_of_isLocalization_etale
+    (k : Type u) [Field k]
+    (m : ℕ) (S : Type u)
     [CommRing S] [Algebra (CoordPolynomialRing k m) S] [Algebra.Etale (CoordPolynomialRing k m) S]
-    (q : Ideal S) [q.IsPrime] (A : Type u) [CommRing A] [Algebra S A]
-    [IsLocalization q.primeCompl A] :
-    IsRegularLocalRing A :=
+    (q : Ideal S) [q.IsPrime]
+    (A : Type u) [CommRing A] [Algebra S A] [IsLocalization q.primeCompl A]
+    : IsRegularLocalRing A :=
   (isRegularLocalRing_and_ringKrullDim_eq_of_etale (CoordPolynomialRing k m) S
     (by intro p hp; exact isRegularLocalRing_localization_coordPolynomialRing k m p hp) q A).1
 
-theorem isRegularLocalRing_localization_atPrime_etale (k : Type u) [Field k] (m : ℕ) (S : Type u)
+theorem isRegularLocalRing_localization_atPrime_etale
+    (k : Type u) [Field k]
+    (m : ℕ) (S : Type u)
     [CommRing S] [Algebra (CoordPolynomialRing k m) S] [Algebra.Etale (CoordPolynomialRing k m) S]
-    (q : Ideal S) [q.IsPrime] :
-    IsRegularLocalRing (Localization.AtPrime q) :=
+    (q : Ideal S) [q.IsPrime]
+    : IsRegularLocalRing (Localization.AtPrime q) :=
   isRegularLocalRing_of_isLocalization_etale k m S q (Localization.AtPrime q)
 
 end FunctorialResolution.EmbeddedResolution

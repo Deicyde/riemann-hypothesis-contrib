@@ -10,10 +10,11 @@ open scoped MatrixGroups ModularForm Manifold
 
 namespace GlobalTheory.Hk
 
-theorem hasSum_cuspFunction_of_hasSum {f : ℍ → ℂ} {a : ℕ → ℂ}
+theorem hasSum_cuspFunction_of_hasSum
+    {f : ℍ → ℂ} {a : ℕ → ℂ}
     (hs : ∀ τ : ℍ, HasSum (fun m => a m • Function.Periodic.qParam 1 τ ^ m) (f τ))
-    {q : ℂ} (hq0 : q ≠ 0) (hq1 : ‖q‖ < 1) :
-    HasSum (fun m => a m • q ^ m) (cuspFunction 1 f q) := by
+    {q : ℂ} (hq0 : q ≠ 0) (hq1 : ‖q‖ < 1)
+    : HasSum (fun m => a m • q ^ m) (cuspFunction 1 f q) := by
   have h1 := Function.Periodic.im_invQParam_pos_of_norm_lt_one one_pos hq1 hq0
   let τ : ℍ := ⟨Function.Periodic.invQParam 1 q, h1⟩
   have h2 := Function.Periodic.cuspFunction_eq_of_nonzero 1 (f ∘ ofComplex) hq0
@@ -24,9 +25,10 @@ theorem hasSum_cuspFunction_of_hasSum {f : ℍ → ℂ} {a : ℕ → ℂ}
   rw [h3, ← h4]
   exact hs τ
 
-theorem analyticAt_cuspFunction_of_hasSum {f : ℍ → ℂ} {a : ℕ → ℂ}
-    (hs : ∀ τ : ℍ, HasSum (fun m => a m • Function.Periodic.qParam 1 τ ^ m) (f τ)) :
-    AnalyticAt ℂ (cuspFunction 1 f) 0 := by
+theorem analyticAt_cuspFunction_of_hasSum
+    {f : ℍ → ℂ} {a : ℕ → ℂ}
+    (hs : ∀ τ : ℍ, HasSum (fun m => a m • Function.Periodic.qParam 1 τ ^ m) (f τ))
+    : AnalyticAt ℂ (cuspFunction 1 f) 0 := by
   set p : FormalMultilinearSeries ℂ ℂ ℂ := FormalMultilinearSeries.ofScalars ℂ a with hp
   have hrad : 1 ≤ p.radius := by
     refine ENNReal.le_of_forall_nnreal_lt fun r hr => ?_
@@ -66,9 +68,10 @@ theorem analyticAt_cuspFunction_of_hasSum {f : ℍ → ℂ} {a : ℕ → ℂ}
   · exact h0.symm
   · exact (hne q hq0 (by simpa using hq)).symm
 
-theorem coef_of_hasSum : ∀ (f : ℍ → ℂ) (a : ℕ → ℂ),
-    (∀ τ : ℍ, HasSum (fun m => a m • Function.Periodic.qParam 1 τ ^ m) (f τ)) →
-      ∀ n, GlobalTheory.Hk.coef f n = a n := by
+theorem coef_of_hasSum
+    : ∀ (f : ℍ → ℂ) (a : ℕ → ℂ),
+      (∀ τ : ℍ, HasSum (fun m => a m • Function.Periodic.qParam 1 τ ^ m) (f τ))
+        → ∀ n, GlobalTheory.Hk.coef f n = a n := by
   intro f a hs n
   have han := analyticAt_cuspFunction_of_hasSum hs
   have h1 := (hasFPowerSeriesOnBall_cuspFunction one_pos han hs).hasFPowerSeriesAt

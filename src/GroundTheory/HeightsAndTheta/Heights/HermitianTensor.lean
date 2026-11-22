@@ -17,8 +17,7 @@ section SMul
 
 variable (σ : K →+* ℂ) (E : Type*) [AddCommGroup E] [Module (𝓞 K) E]
 
-theorem fibre_smul_eq (a : ComplexAt σ) (x : Fibre σ E) :
-    a • x = (ofComplex σ).symm a • x := by
+theorem fibre_smul_eq (a : ComplexAt σ) (x : Fibre σ E) : a • x = (ofComplex σ).symm a • x := by
   induction x using TensorProduct.induction_on with
   | zero => simp only [smul_zero]
   | tmul z e => rw [smul_tmul', smul_tmul', complex_smul_def, smul_eq_mul]; rfl
@@ -28,8 +27,8 @@ end SMul
 
 variable [NumberField K]
 
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E]
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
 
 def FibreSpace (_h : HermitianMetric K E) (σ : K →+* ℂ) : Type _ := Fibre σ E
 
@@ -49,13 +48,14 @@ instance : InnerProductSpace ℂ (FibreSpace h σ) := InnerProductSpace.ofCore _
 
 def equiv : Fibre σ E ≃ₗ[ℂ] FibreSpace h σ := LinearEquiv.refl ℂ _
 
-theorem inner_equiv (x y : Fibre σ E) :
-    inner ℂ (equiv h σ x) (equiv h σ y) = (h.form σ).inner x y := rfl
+theorem inner_equiv (x y : Fibre σ E)
+    : inner ℂ (equiv h σ x) (equiv h σ y) = (h.form σ).inner x y :=
+  rfl
 
 end FibreSpace
 
-variable {F : Type*} [AddCommGroup F] [Module (𝓞 K) F] [Module.Finite (𝓞 K) F]
-  [Module.Projective (𝓞 K) F]
+variable
+  {F : Type*} [AddCommGroup F] [Module (𝓞 K) F] [Module.Finite (𝓞 K) F] [Module.Projective (𝓞 K) F]
 
 variable (hE : HermitianMetric K E) (hF : HermitianMetric K F)
 

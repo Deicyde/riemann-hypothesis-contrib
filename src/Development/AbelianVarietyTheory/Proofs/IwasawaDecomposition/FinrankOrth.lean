@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ChainWide
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 
 namespace GlobalTheory.WittLow
@@ -20,7 +22,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Lin
 
-variable {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+variable
+  {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
   {h : V →ₗ⋆[K] V →ₗ[K] K}
 
 theorem exists_repr (hnd : h.Nondegenerate) (f : V →ₗ[K] K) : ∃ w, h w = f := by
@@ -34,8 +37,10 @@ theorem exists_repr (hnd : h.Nondegenerate) (f : V →ₗ[K] K) : ∃ w, h w = f
   have : f ∈ LinearMap.range h := by rw [← h1]; trivial
   exact this
 
-theorem mem_of_orth (hs : h.IsSymm) (hnd : h.Nondegenerate) (I : Submodule K V) (v : V)
-    (hv : ∀ x, (∀ y ∈ I, h y x = 0) → h x v = 0) : v ∈ I := by
+theorem mem_of_orth
+    (hs : h.IsSymm) (hnd : h.Nondegenerate)
+    (I : Submodule K V) (v : V) (hv : ∀ x, (∀ y ∈ I, h y x = 0) → h x v = 0)
+    : v ∈ I := by
   by_contra hn
   obtain ⟨f, hf, hI⟩ := Submodule.exists_dual_map_eq_bot_of_notMem hn inferInstance
   obtain ⟨w, rfl⟩ := exists_repr hnd f
@@ -45,8 +50,10 @@ theorem mem_of_orth (hs : h.IsSymm) (hnd : h.Nondegenerate) (I : Submodule K V) 
     rwa [hI] at this
   rw [← hs.eq w y, this, map_zero]
 
-theorem finrank_orth (hs : h.IsSymm) (hnd : h.Nondegenerate) {i : ℕ} (e : Fin i → V) (he : LinearIndependent K e) :
-    i + Module.finrank K (LinearMap.ker (LinearMap.pi fun j => h (e j))) = Module.finrank K V := by
+theorem finrank_orth
+    (hs : h.IsSymm) (hnd : h.Nondegenerate) {i : ℕ} (e : Fin i → V) (he : LinearIndependent K e)
+    : i + Module.finrank K (LinearMap.ker (LinearMap.pi fun j => h (e j)))
+      = Module.finrank K V := by
   have hsurj : LinearMap.range (LinearMap.pi fun j => h (e j)) = ⊤ := by
     rw [eq_top_iff]
     intro c _
@@ -54,7 +61,9 @@ theorem finrank_orth (hs : h.IsSymm) (hnd : h.Nondegenerate) {i : ℕ} (e : Fin 
     obtain ⟨w, rfl⟩ := exists_repr hnd f
     refine ⟨w, funext fun j => ?_⟩
     have h1 := LinearMap.congr_fun hf (Module.Basis.span he j)
-    rw [Module.Basis.constr_basis, LinearMap.comp_apply, Submodule.subtype_apply, Module.Basis.span_apply] at h1
+    rw [Module.Basis.constr_basis, LinearMap.comp_apply, Submodule.subtype_apply,
+        Module.Basis.span_apply]
+      at h1
     rw [LinearMap.pi_apply, ← hs.eq w (e j), h1]
     exact star_star _
   have := LinearMap.finrank_range_add_finrank_ker (LinearMap.pi fun j => h (e j))
@@ -67,17 +76,20 @@ section Lat
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-
 omit [NumberField E] in
-theorem mem_dual {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
-    (h : V →ₗ⋆[E] V →ₗ[E] E) (L : Submodule (𝓞 E) V) (x : V) :
-    x ∈ Formalism.HermitianLatticesTheory.dual h L ↔ ∀ y ∈ L, h y x ∈ (1 : Submodule (𝓞 E) E) := by
+theorem mem_dual
+    {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+    (h : V →ₗ⋆[E] V →ₗ[E] E) (L : Submodule (𝓞 E) V) (x : V)
+    : x ∈ Formalism.HermitianLatticesTheory.dual h L
+      ↔ ∀ y ∈ L, h y x ∈ (1 : Submodule (𝓞 E) E) := by
   simp [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf]
 
-theorem exists_lower (hst : ∀ x : E, IsIntegral ℤ x → IsIntegral ℤ (star x)) (V : HSpace E) {i : ℕ} (e : Fin i → V.V)
-    (he : LinearIndependent E e) (hiso : ∀ a b, V.hT (e a) (e b) = 0) :
-    ∃ (V' : HSpace E) (ι : V'.V →ₗ[E] V.V), V'.rank + 2 * i = V.rank ∧ HSpace.IsIsomEmb V' V ι ∧
-      ∀ x a, V.hT (ι x) (e a) = 0 := by
+theorem exists_lower
+    (hst : ∀ x : E, IsIntegral ℤ x → IsIntegral ℤ (star x))
+    (V : HSpace E)
+    {i : ℕ} (e : Fin i → V.V) (he : LinearIndependent E e) (hiso : ∀ a b, V.hT (e a) (e b) = 0)
+    : ∃ (V' : HSpace E) (ι : V'.V →ₗ[E] V.V),
+      V'.rank + 2 * i = V.rank ∧ HSpace.IsIsomEmb V' V ι ∧ ∀ x a, V.hT (ι x) (e a) = 0 := by
   have hs := V.herm
   have hnd := V.nondeg
   have hfg : V.L0.FG := V.standardTuple_isLattice.fg
@@ -106,8 +118,7 @@ theorem exists_lower (hst : ∀ x : E, IsIntegral ℤ x → IsIntegral ℤ (star
       rw [hL]
       intro y hy
       have hy0 : f y = 0 := by
-        have : f y ∈ (Submodule.span E (V.L0 : Set V.V)).map f :=
-          ⟨y, Submodule.subset_span hy, rfl⟩
+        have : f y ∈ (Submodule.span E (V.L0 : Set V.V)).map f := ⟨y, Submodule.subset_span hy, rfl⟩
         simpa [hfL] using this
       rw [map_smul, ← hs.eq w y, hw, hy0, map_zero, smul_zero]
       exact Submodule.zero_mem _
@@ -140,10 +151,12 @@ theorem exists_lower (hst : ∀ x : E, IsIntegral ℤ x → IsIntegral ℤ (star
   obtain ⟨σ, σI, σid, σL⟩ := GlobalTheory.ColPeriodCompare.exists_proj V.L0 hfg hsp I
   obtain ⟨π, πP, πid, πL⟩ := GlobalTheory.ColPeriodCompare.exists_proj V.L0 hfg hsp P
   set W : Submodule E V.V := P ⊓ LinearMap.ker σ with hW
-  have hsub : ∀ z ∈ P, z - σ z ∈ W := fun z hz =>
-    ⟨P.sub_mem hz (hIP (σI z)), by
+  have hsub : ∀ z ∈ P, z - σ z ∈ W := fun z hz => ⟨
+    P.sub_mem hz (hIP (σI z)),
+    by
       change σ (z - σ z) = 0
-      rw [map_sub, σid _ (σI z), sub_self]⟩
+      rw [map_sub, σid _ (σI z), sub_self]
+  ⟩
   have hsup : I ⊔ W = P := by
     refine le_antisymm (sup_le hIP inf_le_left) fun z hz => ?_
     rw [← add_sub_cancel (σ z) z]
@@ -165,16 +178,18 @@ theorem exists_lower (hst : ∀ x : E, IsIntegral ℤ x → IsIntegral ℤ (star
     rw [map_sub, LinearMap.sub_apply, (hP v).1 hv.1 _ (σI z), sub_zero]
   have hrad : ∀ v : W, (∀ y : W, V.hT y v = 0) → v = 0 := by
     intro v hv
-    have : (v : V.V) ∈ I := mem_of_orth hs hnd I v fun x hx => by
-      rw [hWz v v.2 x ((hP x).2 hx)]
-      exact hv ⟨_, hsub x ((hP x).2 hx)⟩
+    have : (v : V.V) ∈ I :=
+      mem_of_orth hs hnd I v fun x hx => by
+        rw [hWz v v.2 x ((hP x).2 hx)]
+        exact hv ⟨_, hsub x ((hP x).2 hx)⟩
     have h2 : (v : V.V) ∈ I ⊓ W := ⟨this, v.2⟩
     rw [hinf] at h2
     exact Subtype.ext h2
   have hden : ∀ v : V.V, ∃ d : 𝓞 E, d ≠ 0 ∧ d • v ∈ V.L0 := by
     intro v
     have hv : v ∈ Submodule.span E (V.L0 : Set V.V) := by rw [hsp]; trivial
-    obtain ⟨d, hd⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 E)) E (V.L0 : Set V.V) v hv
+    obtain ⟨d, hd⟩ :=
+      multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 E)) E (V.L0 : Set V.V) v hv
     rw [Submodule.span_eq] at hd
     exact ⟨d, nonZeroDivisors.coe_ne_zero d, hd⟩
   let h' : W →ₗ⋆[E] W →ₗ[E] E := V.hT.domRestrict₁₂ W W
@@ -197,32 +212,54 @@ theorem exists_lower (hst : ∀ x : E, IsIntegral ℤ x → IsIntegral ℤ (star
       intro y hy
       rw [← hs.eq w y, hw', starRingEnd_apply, ← starRingEnd_apply, hs.eq, hWz v v.2 _ (πP y)]
       exact hv ⟨_, hsub _ (πP y)⟩ (V.L0.sub_mem (πL y hy) (σL _ (πL y hy)))
-    have hwv : w - v ∈ I := mem_of_orth hs hnd I _ fun x hx => by
-      rw [← hs.eq, map_sub, LinearMap.sub_apply, hw', πid x ((hP x).2 hx), sub_self, map_zero]
+    have hwv : w - v ∈ I :=
+      mem_of_orth hs hnd I _ fun x hx => by
+        rw [← hs.eq, map_sub, LinearMap.sub_apply, hw', πid x ((hP x).2 hx), sub_self, map_zero]
     have h1 := σid _ hwv
     rw [map_sub, show σ v = 0 from v.2.2, sub_zero] at h1
     rw [hL', show (v : V.V) = w - σ w by rw [h1]; abel]
     exact V.L0.sub_mem hwL (σL w hwL)
   have hs' : h'.IsSymm := ⟨fun x y => hs.eq _ _⟩
-  have hnd' : h'.Nondegenerate := ⟨fun x hx => hrad x fun y => by
-    rw [← hs.eq, ← hh, hx, map_zero], fun x hx => hrad x hx⟩
-  exact ⟨⟨W, h', hs', hnd', Module.finrank E W, rfl, Module.finBasis E W, fun _ => (0, 0), L', hlat, hun⟩, W.subtype,
-    hrk, fun _ _ => rfl, fun x a => hPI _ x.2.1 _ (Submodule.subset_span ⟨a, rfl⟩)⟩
+  have hnd' : h'.Nondegenerate :=
+    ⟨fun x hx => hrad x fun y => by rw [← hs.eq, ← hh, hx, map_zero], fun x hx => hrad x hx⟩
+  exact ⟨
+    ⟨
+      W,
+      h',
+      hs',
+      hnd',
+      Module.finrank E W,
+      rfl,
+      Module.finBasis E W,
+      fun _ => (0, 0),
+      L',
+      hlat,
+      hun
+    ⟩,
+    W.subtype,
+    hrk,
+    fun _ _ => rfl,
+    fun x a => hPI _ x.2.1 _ (Submodule.subset_span ⟨a, rfl⟩)
+  ⟩
 
 end Lat
 
 variable {D : D7}
 
-theorem exists_sig (V : HSp D) (τ : D.host.E →+* ℂ) : ∃ s : ℕ × ℕ, Formalism.UG.HasSignature (V.gram.map τ) s.1 s.2 := by
+theorem exists_sig (V : HSp D) (τ : D.host.E →+* ℂ)
+    : ∃ s : ℕ × ℕ, Formalism.UG.HasSignature (V.gram.map τ) s.1 s.2 := by
   have hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a) := D.sp.cm.cmUnram.2.1 τ
-  obtain ⟨p, q, h⟩ := Formalism.UG.P.signature_exists _ (V.gram.map τ) (by
-    unfold Formalism.UG.IsHerm Formalism.UG.cT
-    ext a b
-    simp only [Matrix.transpose_apply, Matrix.map_apply, HSpace.gram]
-    rw [← hτ]
-    exact congrArg τ (V.herm.eq _ _)) (by
-    rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, isUnit_iff_ne_zero]
-    exact (map_ne_zero _).2 (Formalism.L2.Theta.gram_det_ne V))
+  obtain ⟨p, q, h⟩ :=
+    Formalism.UG.P.signature_exists _ (V.gram.map τ)
+      (by
+        unfold Formalism.UG.IsHerm Formalism.UG.cT
+        ext a b
+        simp only [Matrix.transpose_apply, Matrix.map_apply, HSpace.gram]
+        rw [← hτ]
+        exact congrArg τ (V.herm.eq _ _))
+      (by
+        rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, isUnit_iff_ne_zero]
+        exact (map_ne_zero _).2 (Formalism.L2.Theta.gram_det_ne V))
   exact ⟨(p, q), h⟩
 
 theorem wittLowEx : ∀ D : D7, WittLowEx D := by

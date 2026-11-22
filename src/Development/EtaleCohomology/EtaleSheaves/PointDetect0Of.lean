@@ -9,15 +9,18 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTh
 
 namespace LateralTheory.E.PointDetect0Pf
 
-def EtSep : Prop := ∀ (R : Type) [CommRing R] (F : Shv R) (X : Scheme.{0}) (s : Sec F X),
-  (∀ x : X, ∃ (U : Scheme.{0}) (g : U ⟶ X), Etale g ∧ x ∈ Set.range g.base ∧ Sec.res g s = 0) → s = 0
+def EtSep : Prop :=
+  ∀ (R : Type) [CommRing R] (F : Shv R) (X : Scheme.{0}) (s : Sec F X),
+    (∀ x : X, ∃ (U : Scheme.{0}) (g : U ⟶ X), Etale g ∧ x ∈ Set.range g.base ∧ Sec.res g s = 0)
+      → s = 0
 
 theorem etSep : EtSep := by
   intro R _ F X s h
   choose U g hE hx h0 using h
   have hR : Presieve.ofArrows U g ∈ Scheme.precoverage @Etale X := by
     exact (Scheme.ofArrows_mem_precoverage_iff @Etale).2 ⟨fun x => ⟨x, hx x⟩, hE⟩
-  have hT : Presieve.IsSheaf Scheme.etaleTopology (F.obj ⋙ forget (ModuleCat.{1} (ULift.{1} R))) := by
+  have hT
+      : Presieve.IsSheaf Scheme.etaleTopology (F.obj ⋙ forget (ModuleCat.{1} (ULift.{1} R))) := by
     have := (Presheaf.isSheaf_iff_isSheaf_forget Scheme.etaleTopology F.obj (forget _)).1 F.property
     exact (isSheaf_iff_isSheaf_of_type _ _).1 this
   apply (hT.isSheafFor_of_mem_precoverage hR).isSeparatedFor.ext

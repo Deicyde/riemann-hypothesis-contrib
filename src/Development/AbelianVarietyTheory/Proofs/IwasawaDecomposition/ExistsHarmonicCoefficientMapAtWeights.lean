@@ -12,7 +12,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HcPar
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -132,17 +136,29 @@ lemma lamV_eq : ∃ s : ℤ, ∀ n : Fin (Vc D i).rank, (lamV D i τ).w n =
       push_cast
       ring
 
-theorem exists_io_record : ∀ (D : D7) (Q : Formalism.L2.Pj.Par D), Q.Pins → ∀ (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)), KapIs κ → ∀ (i : Fin D.R.m) (c' : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff Q.l), ∃ (io : VsV D i c'.F →ₗ[c'.F] MvPolynomial (LtN (Q.Dw ((i : ℕ) + 1)) (Vc D i).rank) c'.F) (hw : VsV D i c'.F), IoLFRec c' (fun τ => embF c' (tauE D τ)) (lamV D i) (wtA (κ i)) io hw := by
+theorem exists_io_record
+    : ∀ (D : D7) (Q : Formalism.L2.Pj.Par D),
+      Q.Pins
+        → ∀ (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)),
+          KapIs κ
+            → ∀ (i : Fin D.R.m) (c' : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff Q.l),
+              ∃ (io
+                  : VsV D i c'.F →ₗ[c'.F] MvPolynomial (LtN (Q.Dw ((i : ℕ) + 1)) (Vc D i).rank) c'.F)
+                  (hw : VsV D i c'.F),
+                IoLFRec c' (fun τ => embF c' (tauE D τ)) (lamV D i) (wtA (κ i)) io hw := by
   intro D Q hQ κ hκ i c'
   have hk := D.R.m_add_three_le_k
   have hi := i.2
-  obtain ⟨-, hinj, hΨ, -, hval⟩ := GlobalTheory.WeightExponents.weight_exponents D Q hQ _ (inR i) (κ i)
+  obtain ⟨-, hinj, hΨ, -, hval⟩ :=
+    GlobalTheory.WeightExponents.weight_exponents D Q hQ _ (inR i) (κ i)
   obtain ⟨hp, hq, -⟩ := hQ.2.2.2 _ (inR i)
   have hp1 : (D.R.sigW ((i : ℕ) + 1)).1 = D.R.k + i := rfl
   have hq1 : (D.R.sigW ((i : ℕ) + 1)).2 = D.R.m - (i + 1) := rfl
   choose s hs using lamV_eq D i
-  refine GlobalTheory.FrameRead.CoefMap.exists_ioLFRec D.host.E Q.H (Q.Dw ((i : ℕ) + 1)) (Vc D i).rank D.what₂.Tau (DV.tauEmb D)
-    ⟨hinj, fun τ => (hΨ τ).trans (exists_congr fun _ => eq_comm)⟩ ?_ Q.l c' (wtA (κ i)) s (lamV D i) (dom_wtA (κ i)).1 ?_
+  refine GlobalTheory.FrameRead.CoefMap.exists_ioLFRec D.host.E Q.H (Q.Dw ((i : ℕ) + 1))
+    (Vc D i).rank D.what₂.Tau (DV.tauEmb D)
+    ⟨hinj, fun τ => (hΨ τ).trans (exists_congr fun _ => eq_comm)⟩ ?_ Q.l c' (wtA (κ i)) s (lamV D i)
+    (dom_wtA (κ i)).1 ?_
   · refine le_trans ?_ (r_le_V i)
     rw [hp, hq, hp1, hq1, Ranks.r]
     omega
@@ -150,10 +166,12 @@ theorem exists_io_record : ∀ (D : D7) (Q : Formalism.L2.Pj.Par D), Q.Pins → 
     have ht := hQ.1.2.2.2 τ
     have hc : ¬ ComplexEmbedding.conjugate (DV.tauEmb D τ) (Q.H.rt : D.host.E) = Q.H.rt0 :=
       GlobalTheory.WeightExponents.not_inPsi_conj hQ.1 τ
-    have hsig : (Wc D i).sig (tauE D τ) = D.R.sigW ((i : ℕ) + 1) := D.sp.W_sigval _ (inR i).1 (inR i).2 _
+    have hsig : (Wc D i).sig (tauE D τ) = D.R.sigW ((i : ℕ) + 1) :=
+      D.sp.W_sigval _ (inR i).1 (inR i).2 _
     obtain ⟨h1, h2, -⟩ := hκ i τ
     rw [hsig] at h1 h2
-    rw [ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum.mult, ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum.mult, if_pos ht, if_neg hc, hp, hq, hs τ n,
+    rw [ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum.mult,
+      ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum.mult, if_pos ht, if_neg hc, hp, hq, hs τ n,
       (hval τ _).1, (hval τ _).2]
     congr 1
     · congr 1

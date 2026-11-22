@@ -22,8 +22,8 @@ variable {n : ℕ}
 
 def dOne (f : V n → ℂ) (v : V n) : Alt n := ∑ a, del f v (coordVec a) • dz a
 
-theorem delAt_eq_sum_dOne (β : V n → Alt n) (u : V n) :
-    delAt β u = ∑ T, dOne (fun x => (bas n).repr (β x) T) u * bas n T := by
+theorem delAt_eq_sum_dOne (β : V n → Alt n) (u : V n)
+    : delAt β u = ∑ T, dOne (fun x => (bas n).repr (β x) T) u * bas n T := by
   simp only [delAt, coefwise, dOne, Finset.mul_sum, Finset.sum_mul, mul_smul_comm, smul_mul_assoc]
   exact Finset.sum_comm
 

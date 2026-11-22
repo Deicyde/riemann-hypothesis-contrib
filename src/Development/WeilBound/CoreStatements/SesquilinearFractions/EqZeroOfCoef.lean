@@ -4,8 +4,10 @@ public import Development.WeilBound.CoreStatements.SesquilinearFractions.DTrans
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Matrix GlobalTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
 
 noncomputable section
@@ -13,8 +15,10 @@ noncomputable section
 namespace PositivityTheory.Xgf.DPer
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D : Datum H)
-variable {Ix : Type} [Fintype Ix] (x : Ix → D.La) (hx : LinearIndependent (𝓞 E) x) (n : ℕ)
-  (hn : ∀ y : D.La, n • y ∈ Submodule.span (𝓞 E) (Set.range x))
+variable
+  {Ix : Type} [Fintype Ix]
+  (x : Ix → D.La) (hx : LinearIndependent (𝓞 E) x)
+  (n : ℕ) (hn : ∀ y : D.La, n • y ∈ Submodule.span (𝓞 E) (Set.range x))
 
 def toSpan : D.La →ₗ[𝓞 E] Submodule.span (𝓞 E) (Set.range x) where
   toFun y := ⟨n • y, hn y⟩
@@ -28,8 +32,12 @@ theorem coef_sum (y : D.La) : ∑ m, coef D x hx n hn y m • x m = n • y := b
   rw [Finsupp.linearCombination_apply, Finsupp.sum_fintype _ _ (by simp)] at h
   exact h
 
-theorem planeCoef_mulVec_smul_x_eq_zero_of_ne (m : Ix) : coef D x hx n hn (x m) = Finsupp.single m (n : 𝓞 E) := by
-  have e : toSpan D x n hn (x m) = (n : 𝓞 E) • (⟨x m, Submodule.subset_span ⟨m, rfl⟩⟩ : Submodule.span (𝓞 E) (Set.range x)) := by
+theorem planeCoef_mulVec_smul_x_eq_zero_of_ne (m : Ix)
+    : coef D x hx n hn (x m) = Finsupp.single m (n : 𝓞 E) := by
+  have e
+      : toSpan D x n hn (x m)
+        = (n : 𝓞 E)
+          • (⟨x m, Submodule.subset_span ⟨m, rfl⟩⟩ : Submodule.span (𝓞 E) (Set.range x)) := by
     apply Subtype.ext
     simp [toSpan, Nat.cast_smul_eq_nsmul]
   show hx.repr (toSpan D x n hn (x m)) = _

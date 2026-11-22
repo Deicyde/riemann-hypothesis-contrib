@@ -8,8 +8,11 @@ namespace GlobalTheory.UpperUnipotentMul
 
 open Matrix
 
-theorem isUpUni_mul {K : Type} [Field K] {n : ℕ} {A B : Matrix (Fin n) (Fin n) K}
-    (hA : Formalism.MainNotions.S.IsUpUni A) (hB : Formalism.MainNotions.S.IsUpUni B) : Formalism.MainNotions.S.IsUpUni (A * B) := by
+theorem isUpUni_mul
+    {K : Type} [Field K]
+    {n : ℕ} {A B : Matrix (Fin n) (Fin n) K}
+    (hA : Formalism.MainNotions.S.IsUpUni A) (hB : Formalism.MainNotions.S.IsUpUni B)
+    : Formalism.MainNotions.S.IsUpUni (A * B) := by
   intro i j
   refine ⟨fun hji => ?_, fun hij => ?_⟩
   · rw [Matrix.mul_apply]

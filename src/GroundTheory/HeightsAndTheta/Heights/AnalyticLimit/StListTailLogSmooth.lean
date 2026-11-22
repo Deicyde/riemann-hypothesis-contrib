@@ -14,10 +14,10 @@ open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Regular (RegChar
 
 def ListTailLogSmooth.Statement : Prop :=
   ∀ {D : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas D X)
-    (R : RegChartData A) (Om : KaehlerForm A) (C₁ : ℝ), ∃ CE : ℝ,
-    ∀ (th : Fin D → LocPot X) (u : Fin D → X → ℝ),
-      (∀ i, IsSmoothPotForm A R.Yo R.r Om C₁ (th i) (u i)) →
-        TailLogBound A R.Yo R.r (fun i => potForm (th i) (u i)) CE
+      (R : RegChartData A) (Om : KaehlerForm A) (C₁ : ℝ),
+    ∃ CE : ℝ, ∀ (th : Fin D → LocPot X) (u : Fin D → X → ℝ),
+      (∀ i, IsSmoothPotForm A R.Yo R.r Om C₁ (th i) (u i))
+        → TailLogBound A R.Yo R.r (fun i => potForm (th i) (u i)) CE
 
 section Inhabitants
 

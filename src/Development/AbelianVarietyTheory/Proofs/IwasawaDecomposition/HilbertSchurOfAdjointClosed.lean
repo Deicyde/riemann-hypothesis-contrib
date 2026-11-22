@@ -7,12 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.HilbertSchurU
 
 namespace GlobalTheory
 
-private theorem exists_real_scalar_of_selfAdjoint_commute_irreducible {G H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] (σ : G → (H →L[ℂ] H))
-    (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ v ∈ S, σ g v ∈ S) →
-      S = ⊥ ∨ S = ⊤)
-    (A : H →L[ℂ] H) (hA : IsSelfAdjoint A) (hc : ∀ g, Commute A (σ g)) :
-    ∃ c : ℝ, A = algebraMap ℝ (H →L[ℂ] H) c := by
+private theorem exists_real_scalar_of_selfAdjoint_commute_irreducible
+    {G H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : G → (H →L[ℂ] H))
+    (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ v ∈ S, σ g v ∈ S) → S = ⊥ ∨ S = ⊤)
+    (A : H →L[ℂ] H) (hA : IsSelfAdjoint A) (hc : ∀ g, Commute A (σ g))
+    : ∃ c : ℝ, A = algebraMap ℝ (H →L[ℂ] H) c := by
   have key : ∀ x ∈ spectrum ℝ A, ∀ y ∈ spectrum ℝ A, x < y → False := by
     intro x hx y hy hxy
     obtain ⟨m, hxm, hmy⟩ : ∃ m : ℝ, x < m ∧ m < y := ⟨(x + y) / 2, by linarith, by linarith⟩
@@ -76,12 +76,17 @@ private theorem exists_real_scalar_of_selfAdjoint_commute_irreducible {G H : Typ
     · exact ⟨0, fun x hx => (hne ⟨x, hx⟩).elim⟩
   obtain ⟨c, hc'⟩ := hsub
   refine ⟨c, ?_⟩
-  calc A = cfc (id : ℝ → ℝ) A := (cfc_id ℝ A hA).symm
+  calc
+    A = cfc (id : ℝ → ℝ) A := (cfc_id ℝ A hA).symm
     _ = cfc (fun _ : ℝ => c) A := cfc_congr fun x hx => hc' x hx
     _ = algebraMap ℝ (H →L[ℂ] H) c := cfc_const c A hA
 
-theorem hilbert_schur_of_adjoint_closed :
-    ∀ (G H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : G → (H →L[ℂ] H)), (∀ g, ∃ g', σ g' = ContinuousLinearMap.adjoint (σ g)) → (∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ v ∈ S, σ g v ∈ S) → S = ⊥ ∨ S = ⊤) → ∀ T : H →L[ℂ] H, (∀ g, T ∘L σ g = σ g ∘L T) → ∃ c : ℂ, T = c • (1 : H →L[ℂ] H) := by
+theorem hilbert_schur_of_adjoint_closed
+    : ∀ (G H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        (σ : G → (H →L[ℂ] H)),
+      (∀ g, ∃ g', σ g' = ContinuousLinearMap.adjoint (σ g))
+        → (∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ v ∈ S, σ g v ∈ S) → S = ⊥ ∨ S = ⊤)
+        → ∀ T : H →L[ℂ] H, (∀ g, T ∘L σ g = σ g ∘L T) → ∃ c : ℂ, T = c • (1 : H →L[ℂ] H) := by
   intro G H _ _ _ σ hadj hirr T hT
   have hcomm : ∀ g, Commute T (σ g) := fun g => hT g
   have hcomm' : ∀ g, Commute (star T) (σ g) := by
@@ -90,19 +95,24 @@ theorem hilbert_schur_of_adjoint_closed :
     have h1 := congrArg star (hcomm g').eq
     rw [star_mul, star_mul, hg', ← ContinuousLinearMap.star_eq_adjoint, star_star] at h1
     exact h1.symm
-  obtain ⟨a, ha⟩ := exists_real_scalar_of_selfAdjoint_commute_irreducible σ hirr (realPart T : H →L[ℂ] H)
-    (realPart T).prop fun g => by
-      rw [realPart_apply_coe]
-      exact ((hcomm g).add_left (hcomm' g)).smul_left _
-  obtain ⟨b, hb⟩ := exists_real_scalar_of_selfAdjoint_commute_irreducible σ hirr (imaginaryPart T : H →L[ℂ] H)
-    (imaginaryPart T).prop fun g => by
-      rw [imaginaryPart_apply_coe]
-      exact (((hcomm g).sub_left (hcomm' g)).smul_left _).smul_left _
+  obtain ⟨a, ha⟩ :=
+    exists_real_scalar_of_selfAdjoint_commute_irreducible σ hirr (realPart T : H →L[ℂ] H)
+      (realPart T).prop
+      fun g => by
+        rw [realPart_apply_coe]
+        exact ((hcomm g).add_left (hcomm' g)).smul_left _
+  obtain ⟨b, hb⟩ :=
+    exists_real_scalar_of_selfAdjoint_commute_irreducible σ hirr (imaginaryPart T : H →L[ℂ] H)
+      (imaginaryPart T).prop
+      fun g => by
+        rw [imaginaryPart_apply_coe]
+        exact (((hcomm g).sub_left (hcomm' g)).smul_left _).smul_left _
   refine ⟨(a : ℂ) + Complex.I * b, ?_⟩
-  calc T = (realPart T : H →L[ℂ] H) + Complex.I • (imaginaryPart T : H →L[ℂ] H) :=
-        (realPart_add_I_smul_imaginaryPart T).symm
+  calc
+    T = (realPart T : H →L[ℂ] H) + Complex.I • (imaginaryPart T : H →L[ℂ] H) :=
+      (realPart_add_I_smul_imaginaryPart T).symm
     _ = ((a : ℂ) + Complex.I * b) • (1 : H →L[ℂ] H) := by
-        rw [ha, hb, Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, add_smul,
-          mul_smul, ← Complex.coe_smul, ← Complex.coe_smul]
+      rw [ha, hb, Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, add_smul,
+        mul_smul, ← Complex.coe_smul, ← Complex.coe_smul]
 
 end GlobalTheory

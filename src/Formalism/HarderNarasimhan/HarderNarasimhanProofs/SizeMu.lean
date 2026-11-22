@@ -14,9 +14,10 @@ noncomputable section
 
 namespace Formalism.HN
 
-theorem sizeMu_rpow_eq (f J C d : ℝ) (hf : 0 < f) (hJ : 0 < J) (hC : 0 < C) (hd : 0 < d) :
-    ((2 : ℝ) ^ (f * J) * d ^ (-J / 2) * C) ^ ((1 : ℝ) / (2 * f * J)) =
-      Real.exp (Real.log 2 / 2 - Real.log d / (2 * (2 * f)) - (-Real.log C) / ((2 * f) * J)) := by
+theorem sizeMu_rpow_eq (f J C d : ℝ) (hf : 0 < f) (hJ : 0 < J) (hC : 0 < C) (hd : 0 < d)
+    : ((2 : ℝ) ^ (f * J) * d ^ (-J / 2) * C) ^ ((1 : ℝ) / (2 * f * J))
+      = Real.exp
+        (Real.log 2 / 2 - Real.log d / (2 * (2 * f)) - (- Real.log C) / ((2 * f) * J)) := by
   have h2 : (0 : ℝ) < 2 ^ (f * J) := Real.rpow_pos_of_pos two_pos _
   have hd' : 0 < d ^ (-J / 2) := Real.rpow_pos_of_pos hd _
   rw [Real.rpow_def_of_pos (mul_pos (mul_pos h2 hd') hC), Real.log_mul (mul_pos h2 hd').ne' hC.ne',
@@ -25,8 +26,9 @@ theorem sizeMu_rpow_eq (f J C d : ℝ) (hf : 0 < f) (hJ : 0 < J) (hC : 0 < C) (h
   field_simp
   ring
 
-theorem sizeMu_finrank_eq (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] :
-    Module.finrank ℚ K = 2 * nPl K := by
+theorem sizeMu_finrank_eq
+    (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    : Module.finrank ℚ K = 2 * nPl K := by
   have h1 := NumberField.InfinitePlace.card_add_two_mul_card_eq_rank K
   haveI : IsEmpty {w : InfinitePlace K // w.IsReal} := by
     refine ⟨fun w => ?_⟩
@@ -49,8 +51,7 @@ theorem sizeMu_of (h1 : PlLat) : SizeMu := by
   obtain ⟨hlat, hrkL, hhtL⟩ := h1 K V ι b X hX L hLfg
   have hSB := saturation_basic_properties (𝓞 K) V _ ρ L hlat
 
-  have hrk_pos : ∀ N : Submodule (𝓞 K) V, N.FG → N ≠ ⊥ →
-      0 < (nPl K : ℝ) ∧ 0 < (rkK N : ℝ) := by
+  have hrk_pos : ∀ N : Submodule (𝓞 K) V, N.FG → N ≠ ⊥ → 0 < (nPl K : ℝ) ∧ 0 < (rkK N : ℝ) := by
     intro N hN hN0
     obtain ⟨hlN, hrkN, -⟩ := h1 K V ι b X hX N hN
     have h0 : rk ρ N ≠ 0 := fun h =>
@@ -62,8 +63,7 @@ theorem sizeMu_of (h1 : PlLat) : SizeMu := by
     · have : rkK N ≠ 0 := fun h => h0 (by simp [h])
       exact_mod_cast Nat.pos_of_ne_zero this
 
-  have hsize : ∀ N : Submodule (𝓞 K) V, N.FG → N ≠ ⊥ →
-      size b X N = Real.exp (c - slope ρ N) := by
+  have hsize : ∀ N : Submodule (𝓞 K) V, N.FG → N ≠ ⊥ → size b X N = Real.exp (c - slope ρ N) := by
     intro N hN hN0
     obtain ⟨hf, hj⟩ := hrk_pos N hN hN0
     obtain ⟨hlN, hrkN, -⟩ := h1 K V ι b X hX N hN
@@ -76,9 +76,10 @@ theorem sizeMu_of (h1 : PlLat) : SizeMu := by
     rw [sizeMu_rpow_eq _ _ _ _ hf hj hC hd]
     congr 1
     have hr : (Formalism.F.rk (zl ρ N) : ℝ) = 2 * (nPl K : ℝ) * rkK N := by
-      have : Formalism.F.rk (zl ρ N) = 2 * nPl K * rkK N := by
-        rw [← hnf]; exact hrkN
-      rw [this]; push_cast; ring
+      have : Formalism.F.rk (zl ρ N) = 2 * nPl K * rkK N := by rw [← hnf]; exact hrkN
+      rw [this]
+      push_cast
+      ring
     simp only [c, slope, Formalism.F.slope, Formalism.F.deg, logDisc, hr, hnf]
     push_cast
     ring
@@ -90,8 +91,11 @@ theorem sizeMu_of (h1 : PlLat) : SizeMu := by
     · exact h
     · exact absurd (hSB.2.2.1 S L hS hS.1 le_rfl h.symm).symm hSL
 
-  have hsizeQ : ∀ S : Submodule (𝓞 K) V, IsSat ρ L S → S ≠ L →
-      sizeQ b X L S = Real.exp (c - Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ S))) := by
+  have hsizeQ
+      : ∀ S : Submodule (𝓞 K) V,
+        IsSat ρ L S → S ≠ L
+          → sizeQ b X L S
+            = Real.exp (c - Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ S))) := by
     intro S hS hSL
     have hSfg : S.FG := Submodule.FG.of_le hLfg hS.1
     obtain ⟨-, hrkS, -⟩ := h1 K V ι b X hX S hSfg
@@ -109,21 +113,21 @@ theorem sizeMu_of (h1 : PlLat) : SizeMu := by
     unfold sizeQ htQ
     rw [sizeMu_rpow_eq _ _ _ _ hf hJ hCq hd]
     congr 1
-    have hr : (Formalism.F.rk (Formalism.F.quot (zl ρ L) (zl ρ S)) : ℝ) =
-        2 * (nPl K : ℝ) * ((rkK L : ℝ) - rkK S) := by
+    have hr
+        : (Formalism.F.rk (Formalism.F.quot (zl ρ L) (zl ρ S)) : ℝ)
+          = 2 * (nPl K : ℝ) * ((rkK L : ℝ) - rkK S) := by
       rw [hqrk, Nat.cast_sub hSle, hrkS, hrkL, hnf]
-      push_cast; ring
+      push_cast
+      ring
     simp only [c, Formalism.F.slope, Formalism.F.deg, logDisc, hr, hnf]
     push_cast
     ring
   have hMC := slope_characterization (𝓞 K) V _ ρ L hlat hL0
   refine ⟨hsize L hLfg hL0, ?_, hsizeQ, ?_, ?_, ?_⟩
-  ·
-    rw [hsize L hLfg hL0, Real.log_exp]
+  · rw [hsize L hLfg hL0, Real.log_exp]
     simp only [muDef, c]
     ring
-  ·
-    obtain ⟨N, hNs, hN0, hNslope⟩ := hMC.2.2.1
+  · obtain ⟨N, hNs, hN0, hNslope⟩ := hMC.2.2.1
     have hbound : ∀ R : Submodule (𝓞 K) V, R ≤ L → R ≠ ⊥ → slope ρ R ≤ muMax ρ L := by
       intro R hRL hR0
       have h := (hMC.1 (muMax ρ L)).1 le_rfl R hRL
@@ -141,11 +145,12 @@ theorem sizeMu_of (h1 : PlLat) : SizeMu := by
     · rintro t ⟨R, hRL, hR0, rfl⟩
       rw [hsize R (Submodule.FG.of_le hLfg hRL) hR0]
       exact Real.exp_le_exp.2 (by linarith [hbound R hRL hR0])
-  ·
-    unfold largestSize
-    have hset : {t | ∃ S : Submodule (𝓞 K) V, IsSat ρ L S ∧ S ≠ L ∧ sizeQ b X L S = t} =
-        (fun s => Real.exp (c - s)) '' {t | ∃ N : Submodule (𝓞 K) V, IsSat ρ L N ∧ N ≠ L ∧
-          Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ N)) = t} := by
+  · unfold largestSize
+    have hset
+        : {t | ∃ S : Submodule (𝓞 K) V, IsSat ρ L S ∧ S ≠ L ∧ sizeQ b X L S = t}
+          = (fun s => Real.exp (c - s))
+            '' {t | ∃ N : Submodule (𝓞 K) V, IsSat ρ L N ∧ N ≠ L ∧
+              Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ N)) = t} := by
       ext t
       constructor
       · rintro ⟨S, hS, hSL, rfl⟩
@@ -166,8 +171,7 @@ theorem sizeMu_of (h1 : PlLat) : SizeMu := by
       show _ ≤ Formalism.F.deg _ / (Formalism.F.rk _ : ℝ)
       rw [hqrk, hqdeg, Nat.cast_sub hSle, le_div_iff₀ (by linarith)]
       exact h
-  ·
-    intro L' hLL' hL'fg hrk'
+  · intro L' hLL' hL'fg hrk'
     obtain ⟨hlat', hrkL', -⟩ := h1 K V ι b X hX L' hL'fg
     unfold ht
     rw [hrk']
@@ -175,7 +179,6 @@ theorem sizeMu_of (h1 : PlLat) : SizeMu := by
     exact Formalism.F.covolAntiSameRank _ (zl ρ L) (zl ρ L') hlat'.2 (muChar_zl_mono ρ hLL')
       (by show rk ρ L = rk ρ L'; rw [hrkL, hrkL', hrk'])
 
-theorem size_maximal_slope : SizeMu := by
-  exact sizeMu_of place_lattice_structure
+theorem size_maximal_slope : SizeMu := by exact sizeMu_of place_lattice_structure
 
 end Formalism.HN

@@ -13,7 +13,6 @@ open MvPolynomial ReciprocityTheory.AnForm.M OnePoint Filter Topology MeasureThe
 
 namespace ProjectiveLineResolution
 
-
 end ProjectiveLineResolution
 
 end ReciprocityTheory.ChartRestriction.G.Geo

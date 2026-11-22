@@ -6,11 +6,13 @@ public import Development.AutomorphicArithmetic.DedekindLFunctions.LandauTheorem
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
-theorem UpperTheory.Comparison₂.formB :
-    ∀ Λ : Level, Λ.FormB := by
+theorem UpperTheory.Comparison₂.formB : ∀ Λ : Level, Λ.FormB := by
   intro Λ la hla θ hθ0 hθ1 hW
   classical
   let weight (ψ : PChar) : ℝ := if ψ = PChar.one then 1 else Λ.wt ψ
@@ -28,8 +30,12 @@ theorem UpperTheory.Comparison₂.formB :
       exact hp.symm
     · exact Or.inr h
   let F : Deduction.CharFamily :=
-    @Deduction.CharFamily.mk Λ.KEPT _ (fun i => i.1.N) (fun i => i.1.ne)
-      (fun i => i.1.χ) (fun i => weight i.1) (fun i => weight_pos i.1)
+    @Deduction.CharFamily.mk Λ.KEPT _
+      (fun i => i.1.N)
+      (fun i => i.1.ne)
+      (fun i => i.1.χ)
+      (fun i => weight i.1)
+      (fun i => weight_pos i.1)
       (fun i => admissible i.1)
   have hG (y : ℝ) : Deduction.Gm F y = Λ.Gm y := by
     change (∑ i : Λ.KEPT, weight i.1 * (Deduction.Gchi i.1.χ y).re) = Λ.Gm y
@@ -38,8 +44,9 @@ theorem UpperTheory.Comparison₂.formB :
     congr 1
     · have hGz : Formalism.Gz y = An.G y := by
         unfold Formalism.Gz Formalism.Sz An.G
-        have hsum : (∑ n ∈ Finset.Icc 1 ⌊y⌋₊, ArithmeticFunction.vonMangoldt n * (y / n - 1)) =
-            ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, An.abelian₂ n * max (y / n - 1) 0 := by
+        have hsum
+            : (∑ n ∈ Finset.Icc 1 ⌊y⌋₊, ArithmeticFunction.vonMangoldt n * (y / n - 1))
+              = ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, An.abelian₂ n * max (y / n - 1) 0 := by
           apply Finset.sum_congr rfl
           intro n hn
           obtain ⟨hn₁, hn₂⟩ := Finset.mem_Icc.mp hn
@@ -61,7 +68,8 @@ theorem UpperTheory.Comparison₂.formB :
     intro ψ hψ s hs
     exact h ⟨ψ, hψ⟩ s hs
   apply hZ
-  refine Deduction.zeroFree_of_rpow_window F (δ := la - 1) (C := 1) hθ0 hθ1 (by linarith) fun Y₀ => ?_
+  refine Deduction.zeroFree_of_rpow_window F (δ := la - 1) (C := 1) hθ0 hθ1 (by linarith) fun Y₀ =>
+    ?_
   obtain ⟨Y, hY, hx⟩ := hW Y₀
   refine ⟨Y, hY, fun y hy => ?_⟩
   have h1 : (1 : ℝ) + (la - 1) = la := by ring

@@ -9,8 +9,8 @@ open scoped TensorProduct
 
 namespace GlobalTheory.FinRedTensor
 
-theorem formallyUnramified_int_of_finite_field (K : Type) [Field K] [Finite K] :
-    Algebra.FormallyUnramified ℤ K := by
+theorem formallyUnramified_int_of_finite_field (K : Type) [Field K] [Finite K]
+    : Algebra.FormallyUnramified ℤ K := by
   obtain ⟨p, hp⟩ := CharP.exists K
   haveI : NeZero p := ⟨CharP.char_ne_zero_of_finite K p⟩
   haveI : Fact p.Prime := CharP.char_is_prime_of_pos K p
@@ -22,8 +22,8 @@ theorem formallyUnramified_int_of_finite_field (K : Type) [Field K] [Finite K] :
     Algebra.FormallyUnramified.of_surjective (Algebra.ofId ℤ (ZMod p)) (ZMod.intCast_surjective)
   exact Algebra.FormallyUnramified.comp ℤ (ZMod p) K
 
-theorem formallyUnramified_int_of_finite_isReduced (A : Type) [CommRing A] [Finite A]
-    [IsReduced A] : Algebra.FormallyUnramified ℤ A := by
+theorem formallyUnramified_int_of_finite_isReduced (A : Type) [CommRing A] [Finite A] [IsReduced A]
+    : Algebra.FormallyUnramified ℤ A := by
   haveI : IsArtinianRing A := inferInstance
   have h : Algebra.FormallyUnramified ℤ (∀ I : MaximalSpectrum A, A ⧸ I.asIdeal) := by
     rw [Algebra.FormallyUnramified.pi_iff]
@@ -35,8 +35,8 @@ theorem formallyUnramified_int_of_finite_isReduced (A : Type) [CommRing A] [Fini
     exact formallyUnramified_int_of_finite_field _
   exact Algebra.FormallyUnramified.of_equiv ((IsArtinianRing.equivPi A).restrictScalars ℤ).symm
 
-theorem isReduced_field_tensor_finite :
-    ∀ (A : Type) [CommRing A] [Finite A] [IsReduced A] (k : Type) [Field k],
+theorem isReduced_field_tensor_finite
+    : ∀ (A : Type) [CommRing A] [Finite A] [IsReduced A] (k : Type) [Field k],
       IsReduced (k ⊗[ℤ] A) := by
   intro A _ _ _ k _
   haveI := formallyUnramified_int_of_finite_isReduced A

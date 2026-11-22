@@ -8,23 +8,28 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.USt
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.Axis
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+  GlobalTheory.CompanionTheory.Axis
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.Axis
 
-theorem exists_finite_sys_of_separated_quasiCompact :
-    ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R), IsSeparated s → QuasiCompact s →
-    ∃ (P : Type) (_ : SemilatticeInf P) (_ : Finite P), Nonempty (Sys X P) := by
+theorem exists_finite_sys_of_separated_quasiCompact
+    : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R),
+      IsSeparated s → QuasiCompact s
+        → ∃ (P : Type) (_ : SemilatticeInf P) (_ : Finite P), Nonempty (Sys X P) := by
   intro R _ X s hsep hqc
   haveI : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace s
   have hdiag : IsAffineHom (Limits.pullback.diagonal s) := inferInstance
-  have hinf : ∀ U V : X.Opens, IsAffineOpen U → IsAffineOpen V → IsAffineOpen (U ⊓ V) :=
-    fun U V hU hV => isAffineHom_diagonal_iff.mp hdiag ⊤ (isAffineOpen_top _) U (by simp) V
-      (by simp) hU hV
-  obtain ⟨S, hS, e⟩ := (isCompact_iff_finite_and_eq_biUnion_affineOpens (U := (⊤ : X.Opens))).mp
-    (by simpa using isCompact_univ)
+  have hinf
+      : ∀ U V : X.Opens, IsAffineOpen U → IsAffineOpen V → IsAffineOpen (U ⊓ V) := fun U V hU hV =>
+    isAffineHom_diagonal_iff.mp hdiag ⊤ (isAffineOpen_top _) U (by simp) V (by simp) hU hV
+  obtain ⟨S, hS, e⟩ :=
+    (isCompact_iff_finite_and_eq_biUnion_affineOpens (U := (⊤ : X.Opens))).mp
+      (by simpa using isCompact_univ)
   let A : Set X.Opens := infClosure ((fun i : X.affineOpens => i.1) '' S)
   have hA : ∀ U ∈ A, IsAffineOpen U :=
     infClosure_min (t := {U | IsAffineOpen U}) (by rintro _ ⟨i, -, rfl⟩; exact i.2)

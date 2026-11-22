@@ -9,7 +9,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeReference
 
 namespace PI.ScRefExists.Id
 
-theorem idemLift : PI.ScRefExists.Sk.IdemLift :=
-  idemLift_of_steps locIdem adOfLoc fixInt tenStep
+theorem idemLift : PI.ScRefExists.Sk.IdemLift := idemLift_of_steps locIdem adOfLoc fixInt tenStep
 
 end PI.ScRefExists.Id

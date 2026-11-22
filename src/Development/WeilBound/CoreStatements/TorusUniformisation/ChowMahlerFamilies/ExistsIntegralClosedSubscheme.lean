@@ -6,17 +6,22 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LocRatio
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.TorusUnif
 open scoped CategoryTheory.Obj
 
 namespace PositivityTheory.Xgn.IntegralClosedSubscheme
 
-theorem reduced_sub {S : Scheme.{0}} (Z : TopologicalSpace.Closeds S) :
-    AlgebraicGeometry.IsReduced (Scheme.IdealSheafData.vanishingIdeal Z).subscheme := by
-  have hU : ∀ U : S.affineOpens, IsReduced
-      (Spec (CommRingCat.of (Γ(S, U) ⧸ (Scheme.IdealSheafData.vanishingIdeal Z).ideal U))) := by
+theorem reduced_sub {S : Scheme.{0}} (Z : TopologicalSpace.Closeds S)
+    : AlgebraicGeometry.IsReduced (Scheme.IdealSheafData.vanishingIdeal Z).subscheme := by
+  have hU
+      : ∀ U : S.affineOpens,
+        IsReduced (Spec (CommRingCat.of
+          (Γ(S, U) ⧸ (Scheme.IdealSheafData.vanishingIdeal Z).ideal U))) := by
     intro U
     have h : ((Scheme.IdealSheafData.vanishingIdeal Z).ideal U).IsRadical := by
       rw [Scheme.IdealSheafData.vanishingIdeal_ideal]
@@ -27,9 +32,11 @@ theorem reduced_sub {S : Scheme.{0}} (Z : TopologicalSpace.Closeds S) :
   haveI : ∀ i, IsReduced ((Scheme.IdealSheafData.vanishingIdeal Z).subschemeCover.openCover.X i) := hU
   exact IsReduced.of_openCover _ (Scheme.IdealSheafData.vanishingIdeal Z).subschemeCover.openCover
 
-theorem le_ker {S Y : Scheme.{0}} (Z : TopologicalSpace.Closeds S) (g : Y ⟶ S) [QuasiCompact g]
-    [AlgebraicGeometry.IsReduced Y] (h : Set.range g ⊆ Z) :
-    Scheme.IdealSheafData.vanishingIdeal Z ≤ g.ker := by
+theorem le_ker
+    {S Y : Scheme.{0}} (Z : TopologicalSpace.Closeds S) (g : Y ⟶ S)
+    [QuasiCompact g] [AlgebraicGeometry.IsReduced Y]
+    (h : Set.range g ⊆ Z)
+    : Scheme.IdealSheafData.vanishingIdeal Z ≤ g.ker := by
   have h1 : g.ker.support ≤ Z := by
     intro x hx
     have hx' : x ∈ (g.ker.support : Set S) := hx
@@ -47,9 +54,13 @@ theorem le_ker {S Y : Scheme.{0}} (Z : TopologicalSpace.Closeds S) (g : Y ⟶ S)
 
 end PositivityTheory.Xgn.IntegralClosedSubscheme
 
-theorem PositivityTheory.Xgn.exists_integral_closed_subscheme_of_irreducible : ∀ (S : Scheme.{0}) (F : Set S), IsClosed F → IsIrreducible F →
-    ∃ (Z : Scheme.{0}) (_ : IsIntegral Z) (i : Z ⟶ S), IsClosedImmersion i ∧ Set.range i = F ∧
-      ∀ (k : Type) [Field k] (x : Sp k ⟶ S), x (IsLocalRing.closedPoint k) ∈ F → ∃ x' : Sp k ⟶ Z, x' ≫ i = x := by
+theorem PositivityTheory.Xgn.exists_integral_closed_subscheme_of_irreducible
+    : ∀ (S : Scheme.{0}) (F : Set S),
+      IsClosed F → IsIrreducible F
+        → ∃ (Z : Scheme.{0}) (_ : IsIntegral Z) (i : Z ⟶ S),
+          IsClosedImmersion i ∧ Set.range i = F
+            ∧ ∀ (k : Type) [Field k] (x : Sp k ⟶ S),
+              x (IsLocalRing.closedPoint k) ∈ F → ∃ x' : Sp k ⟶ Z, x' ≫ i = x := by
   intro S F hF hirr
   let Zc : TopologicalSpace.Closeds S := ⟨F, hF⟩
   let I := Scheme.IdealSheafData.vanishingIdeal Zc

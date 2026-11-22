@@ -20,13 +20,15 @@ abbrev Jet : Type := MvPolynomial ι R ⧸ orig R ι ^ (m + 1)
 
 variable {R ι m}
 
-theorem map_orig_pow {B : Type} [CommRing B] (f : MvPolynomial ι R →+* B) (k : ℕ) :
-    Ideal.map f (orig R ι ^ k) = Ideal.span (Set.range fun i => f (X i)) ^ k := by
+theorem map_orig_pow {B : Type} [CommRing B] (f : MvPolynomial ι R →+* B) (k : ℕ)
+    : Ideal.map f (orig R ι ^ k) = Ideal.span (Set.range fun i => f (X i)) ^ k := by
   rw [orig, Ideal.map_pow, Ideal.map_span, ← Set.range_comp]
   rfl
 
-def liftJet {B : Type} [CommRing B] [Algebra R B] (f : MvPolynomial ι R →ₐ[R] B)
-    (h : Ideal.span (Set.range fun i => f (X i)) ^ (m + 1) = ⊥) : Jet R ι m →ₐ[R] B :=
+def liftJet
+    {B : Type} [CommRing B] [Algebra R B]
+    (f : MvPolynomial ι R →ₐ[R] B) (h : Ideal.span (Set.range fun i => f (X i)) ^ (m + 1) = ⊥)
+    : Jet R ι m →ₐ[R] B :=
   Ideal.Quotient.liftₐ _ f fun a ha => by
     have : f a ∈ Ideal.map (f : MvPolynomial ι R →+* B) (orig R ι ^ (m + 1)) :=
       Ideal.mem_map_of_mem _ ha
@@ -34,13 +36,14 @@ def liftJet {B : Type} [CommRing B] [Algebra R B] (f : MvPolynomial ι R →ₐ[
     rw [map_orig_pow, h'] at this
     exact (Submodule.mem_bot _).1 this
 
-def jetMap {ι' : Type} (φ : ι → MvPolynomial ι' R) (hφ : ∀ i, φ i ∈ orig R ι') :
-    Jet R ι m →ₐ[R] Jet R ι' m :=
+def jetMap {ι' : Type} (φ : ι → MvPolynomial ι' R) (hφ : ∀ i, φ i ∈ orig R ι')
+    : Jet R ι m →ₐ[R] Jet R ι' m :=
   liftJet ((Ideal.Quotient.mkₐ R (orig R ι' ^ (m + 1))).comp (aeval φ)) (by
     apply le_bot_iff.1
-    have h1 : Ideal.span (Set.range fun i =>
-        ((Ideal.Quotient.mkₐ R (orig R ι' ^ (m + 1))).comp (aeval φ)) (X i)) =
-        Ideal.map (Ideal.Quotient.mk (orig R ι' ^ (m + 1))) (Ideal.span (Set.range φ)) := by
+    have h1
+        : Ideal.span (Set.range fun i =>
+            ((Ideal.Quotient.mkₐ R (orig R ι' ^ (m + 1))).comp (aeval φ)) (X i))
+          = Ideal.map (Ideal.Quotient.mk (orig R ι' ^ (m + 1))) (Ideal.span (Set.range φ)) := by
       rw [Ideal.map_span, ← Set.range_comp]
       congr 1
       ext x
@@ -62,7 +65,8 @@ def jetScale (c : ι → R) : Jet R ι m →ₐ[R] Jet R ι m :=
 
 def jetAug : Jet R ι m →ₐ[R] R :=
   liftJet (aeval fun _ => (0 : R)) (by
-    have : Ideal.span (Set.range fun i => (aeval fun _ => (0 : R)) (X i : MvPolynomial ι R)) = ⊥ := by
+    have : Ideal.span (Set.range fun i => (aeval fun _ => (0 : R)) (X i : MvPolynomial ι R))
+        = ⊥ := by
       rw [Ideal.span_eq_bot]
       rintro _ ⟨i, rfl⟩
       simp
@@ -71,9 +75,11 @@ def jetAug : Jet R ι m →ₐ[R] R :=
 def jetTan [DecidableEq ι] (ℓ : ι) : Jet R ι (m + 1) →ₐ[R] DualNumber R :=
   liftJet (aeval fun i => if i = ℓ then (DualNumber.eps : DualNumber R) else 0) (by
     apply le_bot_iff.1
-    have h1 : Ideal.span (Set.range fun i =>
-        (aeval fun i => if i = ℓ then (DualNumber.eps : DualNumber R) else 0) (X i : MvPolynomial ι R))
-        ≤ Ideal.span {(DualNumber.eps : DualNumber R)} := by
+    have h1
+        : Ideal.span (Set.range fun i =>
+            (aeval fun i => if i = ℓ then (DualNumber.eps : DualNumber R) else 0)
+              (X i : MvPolynomial ι R))
+          ≤ Ideal.span {(DualNumber.eps : DualNumber R)} := by
       rw [Ideal.span_le]
       rintro _ ⟨i, rfl⟩
       by_cases h : i = ℓ
@@ -84,14 +90,14 @@ def jetTan [DecidableEq ι] (ℓ : ι) : Jet R ι (m + 1) →ₐ[R] DualNumber R
     rw [Ideal.span_singleton_pow]
     simp)
 
-theorem sub_const_mem_orig (P : MvPolynomial ι R) :
-    P - C (MvPolynomial.constantCoeff P) ∈ orig R ι := by
+theorem sub_const_mem_orig (P : MvPolynomial ι R)
+    : P - C (MvPolynomial.constantCoeff P) ∈ orig R ι := by
   induction P using MvPolynomial.induction_on
-  next a =>
-    simp
+  next a => simp
   next p q hp hq =>
-    have h : p + q - C (MvPolynomial.constantCoeff (p + q)) =
-        (p - C (MvPolynomial.constantCoeff p)) + (q - C (MvPolynomial.constantCoeff q)) := by
+    have h
+        : p + q - C (MvPolynomial.constantCoeff (p + q))
+          = (p - C (MvPolynomial.constantCoeff p)) + (q - C (MvPolynomial.constantCoeff q)) := by
       simp only [map_add (f := _)]
       ring
     rw [h]
@@ -110,8 +116,10 @@ def psTrunc [Fintype ι] [DecidableEq ι] (m : ℕ) (f : MvPowerSeries ι R) : M
 def psJet [Fintype ι] [DecidableEq ι] (m : ℕ) (f : MvPowerSeries ι R) : Jet R ι m :=
   Ideal.Quotient.mk _ (psTrunc m f)
 
-def jetSubstPS {ι' : Type} [Fintype ι'] [DecidableEq ι'] (φ : ι → MvPowerSeries ι' R) : Jet R ι m →ₐ[R] Jet R ι' m :=
-  jetMap (fun i => psTrunc m (φ i) - C (MvPolynomial.constantCoeff (psTrunc m (φ i))))
+def jetSubstPS {ι' : Type} [Fintype ι'] [DecidableEq ι'] (φ : ι → MvPowerSeries ι' R)
+    : Jet R ι m →ₐ[R] Jet R ι' m :=
+  jetMap
+    (fun i => psTrunc m (φ i) - C (MvPolynomial.constantCoeff (psTrunc m (φ i))))
     fun i => sub_const_mem_orig _
 
 def jetTrunc : Jet R ι (m + 1) →ₐ[R] Jet R ι m :=

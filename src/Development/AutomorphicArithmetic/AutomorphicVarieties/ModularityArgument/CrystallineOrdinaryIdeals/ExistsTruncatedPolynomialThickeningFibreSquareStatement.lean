@@ -5,9 +5,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module
+  UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_truncated_polynomial_thickening_fibre_square : ∀ {E B : Type} [Field E] [CommRing B] [Algebra E B] [Module.Finite E B] (π : B →ₐ[E] E), (∀ a, π a = 0 → IsNilpotent a) → ∀ J : ℕ, ∃ (C : Type) (_ : CommRing C) (_ : Algebra E C) (_ : Module.Finite E C) (T : Type) (_ : CommRing T) (_ : Algebra E T) (_ : Module.Finite E T) (πC : C →ₐ[E] E) (p₁ : T →ₐ[E] B) (p₂ : T →ₐ[E] C) (t : C), IsNilpotent t ∧ (∀ a, πC a = 0 → IsNilpotent a) ∧ (∀ a, π (p₁ a) = 0 → IsNilpotent a) ∧ π.comp p₁ = πC.comp p₂ ∧ (∀ b c, π b = πC c → ∃ s, p₁ s = b ∧ p₂ s = c) ∧ ∀ (P y : T) (j : ℕ) (v : Cˣ), j ≤ J → p₂ P = t ^ j * v → P * y = 0 → p₁ y = 0 := by
+theorem _root_.GlobalTheory.T.exists_truncated_polynomial_thickening_fibre_square
+    : ∀ {E B : Type} [Field E] [CommRing B] [Algebra E B] [Module.Finite E B] (π : B →ₐ[E] E),
+      (∀ a, π a = 0 → IsNilpotent a)
+        → ∀ J : ℕ,
+          ∃ (C : Type) (_ : CommRing C) (_ : Algebra E C) (_ : Module.Finite E C) (T : Type)
+              (_ : CommRing T) (_ : Algebra E T) (_ : Module.Finite E T) (πC : C →ₐ[E] E)
+              (p₁ : T →ₐ[E] B) (p₂ : T →ₐ[E] C) (t : C),
+            IsNilpotent t ∧ (∀ a, πC a = 0 → IsNilpotent a) ∧ (∀ a, π (p₁ a) = 0 → IsNilpotent a)
+              ∧ π.comp p₁ = πC.comp p₂ ∧ (∀ b c, π b = πC c → ∃ s, p₁ s = b ∧ p₂ s = c)
+              ∧ ∀ (P y : T) (j : ℕ) (v : Cˣ), j ≤ J → p₂ P = t ^ j * v → P * y = 0 → p₁ y = 0 := by
   intro E B _ _ _ _ π hπ J
   classical
   haveI : IsArtinianRing B := IsArtinianRing.of_finite E B
@@ -37,8 +47,7 @@ theorem _root_.GlobalTheory.T.exists_truncated_polynomial_thickening_fibre_squar
   have hp1 : ∀ q : B[X], p1 (AdjoinRoot.mk _ q) = q.coeff 0 := by
     intro q
     simp [p1, AdjoinRoot.liftAlgHom_mk, eval₂_at_zero]
-  have hp1of : ∀ b : B, p1 (AdjoinRoot.of _ b) = b := fun b =>
-    AdjoinRoot.liftAlgHom_of _ _ _ _ _
+  have hp1of : ∀ b : B, p1 (AdjoinRoot.of _ b) = b := fun b => AdjoinRoot.liftAlgHom_of _ _ _ _ _
   have hπC : ∀ q : E[X], πC (AdjoinRoot.mk _ q) = q.coeff 0 := by
     intro q
     simp [πC, AdjoinRoot.liftAlgHom_mk, eval₂_at_zero]
@@ -79,8 +88,12 @@ theorem _root_.GlobalTheory.T.exists_truncated_polynomial_thickening_fibre_squar
     intro b c hbc
     obtain ⟨q, rfl⟩ := AdjoinRoot.mk_surjective c
     rw [hπC] at hbc
-    refine ⟨AdjoinRoot.of _ b + AdjoinRoot.mk _ (q.map (algebraMap E B)) -
-      AdjoinRoot.of _ (algebraMap E B (q.coeff 0)), ?_, ?_⟩
+    refine ⟨
+      AdjoinRoot.of _ b + AdjoinRoot.mk _ (q.map (algebraMap E B))
+        - AdjoinRoot.of _ (algebraMap E B (q.coeff 0)),
+      ?_,
+      ?_
+    ⟩
     · rw [map_sub, map_add (f := _), ← AdjoinRoot.mk_C, ← AdjoinRoot.mk_C, hp1, hp1, hp1]
       simp
     · rw [map_sub, map_add (f := _), hp2map, ← AdjoinRoot.mk_C, ← AdjoinRoot.mk_C, hp2, hp2]
@@ -105,9 +118,26 @@ theorem _root_.GlobalTheory.T.exists_truncated_polynomial_thickening_fibre_squar
     have := Ideal.mem_map_of_mem (AdjoinRoot.mk ((X : B[X]) ^ N)) hin
     rw [Ideal.map_map] at this
     exact this
-  refine ⟨AdjoinRoot ((X : E[X]) ^ N), inferInstance, inferInstance, inferInstance,
-    AdjoinRoot ((X : B[X]) ^ N), inferInstance, inferInstance, inferInstance, πC, p1, p2,
-    AdjoinRoot.root _, ⟨N, hrootE⟩, hnilC, hnilT, hcomm, hsurj, ?_⟩
+  refine ⟨
+    AdjoinRoot ((X : E[X]) ^ N),
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    AdjoinRoot ((X : B[X]) ^ N),
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    πC,
+    p1,
+    p2,
+    AdjoinRoot.root _,
+    ⟨N, hrootE⟩,
+    hnilC,
+    hnilT,
+    hcomm,
+    hsurj,
+    ?_
+  ⟩
   intro P y j v hj hP hPy
   obtain ⟨qv, hqv⟩ := AdjoinRoot.mk_surjective (v : AdjoinRoot ((X : E[X]) ^ N))
   set V := AdjoinRoot.mk ((X : B[X]) ^ N) (qv.map (algebraMap E B)) with hVdef
@@ -126,8 +156,7 @@ theorem _root_.GlobalTheory.T.exists_truncated_polynomial_thickening_fibre_squar
     simpa using this
   obtain ⟨Vi, hVi⟩ : ∃ Vi, V * Vi = 1 := hVu.exists_right_inv
   set Q := P - AdjoinRoot.root ((X : B[X]) ^ N) ^ j * V with hQdef
-  have hQ2 : p2 Q = 0 := by
-    rw [hQdef, map_sub, map_mul, map_pow, hV, hP, hp2root, sub_self]
+  have hQ2 : p2 Q = 0 := by rw [hQdef, map_sub, map_mul, map_pow, hV, hP, hp2root, sub_self]
   set K := I.map (AdjoinRoot.of ((X : B[X]) ^ N)) with hK
   have hQK : Q ∈ K := hker Q hQ2
   set R := -(Q * Vi) with hR
@@ -141,22 +170,24 @@ theorem _root_.GlobalTheory.T.exists_truncated_polynomial_thickening_fibre_squar
     induction k with
     | zero => simp
     | succ k ih =>
-      have hsplit : AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * (k + 1)) =
-          AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * k) * AdjoinRoot.root ((X : B[X]) ^ N) ^ j := by
+      have hsplit
+          : AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * (k + 1))
+            = AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * k)
+              * AdjoinRoot.root ((X : B[X]) ^ N) ^ j := by
         rw [← pow_add]
         congr 1
-      calc AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * (k + 1)) * y
-          = AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * k) *
-              (AdjoinRoot.root ((X : B[X]) ^ N) ^ j * y) := by
-            rw [hsplit, mul_assoc]
+      calc
+        AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * (k + 1)) * y
+            = AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * k)
+              * (AdjoinRoot.root ((X : B[X]) ^ N) ^ j * y) := by
+          rw [hsplit, mul_assoc]
         _ = R * (AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * k) * y) := by rw [hxR]; ring
         _ = R ^ (k + 1) * y := by rw [ih]; ring
   have hRe : R ^ e = 0 := by
     have h3 : R ^ e ∈ K ^ e := Ideal.pow_mem_pow hRK e
     rw [hK, ← Ideal.map_pow, he, Ideal.zero_eq_bot, Ideal.map_bot] at h3
     exact (Ideal.mem_bot).1 h3
-  have hy0 : AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * e) * y = 0 := by
-    rw [hpow, hRe, zero_mul]
+  have hy0 : AdjoinRoot.root ((X : B[X]) ^ N) ^ (j * e) * y = 0 := by rw [hpow, hRe, zero_mul]
   have hlt : j * e < N := by
     have := Nat.mul_le_mul_right e hj
     omega

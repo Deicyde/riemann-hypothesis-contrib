@@ -8,12 +8,17 @@ public import Development.AutomorphicSpectrum.Statements.MetricStatements.Agreem
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.G.AI.I1
+  ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+  GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 
 namespace PositivityTheory.Xgp.tsg_smul
 
-theorem toWt_inj (Ψ : Type) (N : ℕ) :
-    Function.Injective (toWt : MvPolynomial (Ψ × Fin N) ℝ → MvPolynomial (Ψ × Fin N) ℝ) := by
+theorem toWt_inj (Ψ : Type) (N : ℕ)
+    : Function.Injective (toWt : MvPolynomial (Ψ × Fin N) ℝ → MvPolynomial (Ψ × Fin N) ℝ) := by
   classical
   let S : Ψ × Fin N → MvPolynomial (Ψ × Fin N) ℝ := fun p => ∑ k ∈ Finset.Ici p.2, X (p.1, k)
   have key : ∀ p, aeval S (gapX p) = X p := by
@@ -24,7 +29,8 @@ theorem toWt_inj (Ψ : Type) (N : ℕ) :
     split_ifs with h
     · have h2 : Finset.Ioi i = Finset.Ici (⟨i.1 + 1, h⟩ : Fin N) := by
         ext k
-        simp only [Finset.mem_Ioi, Finset.mem_Ici, Fin.lt_iff_val_lt_val, Fin.le_iff_val_le_val, Fin.val_mk]
+        simp only [Finset.mem_Ioi, Finset.mem_Ici, Fin.lt_iff_val_lt_val, Fin.le_iff_val_le_val,
+          Fin.val_mk]
         omega
       have hn : i ∉ Finset.Ici (⟨i.1 + 1, h⟩ : Fin N) := by
         simp only [Finset.mem_Ici, Fin.le_iff_val_le_val, Fin.val_mk]
@@ -50,14 +56,19 @@ theorem toWt_inj (Ψ : Type) (N : ℕ) :
     rw [AlgHom.comp_apply, AlgHom.id_apply]
     show aeval S (aeval gapX (X p)) = X p
     rw [aeval_X, key]
-  have e : ∀ q, aeval S (toWt q) = q := fun q => by
-    simpa using AlgHom.congr_fun hcomp q
+  have e : ∀ q, aeval S (toWt q) = q := fun q => by simpa using AlgHom.congr_fun hcomp q
   intro f g hfg
   rw [← e f, ← e g, hfg]
 
 end PositivityTheory.Xgp.tsg_smul
 
-theorem PositivityTheory.Xgp.t_tsg_smul : (∀ (D : ℕ) (κ : ℕ → ℝ) (v : ℝ) (Q : Polynomial ℝ), tsgPoly D κ (Polynomial.C v * Q) = Polynomial.C v * tsgPoly D κ Q) ∧ (∀ (σ : Type) (c : σ → ℝ) (e : σ → ℤ) (v : ℝ) (Q : MvPolynomial σ ℝ), linePoly c e (C v * Q) = Polynomial.C v * linePoly c e Q) ∧ ∀ (Ψ : Type) (N : ℕ), Function.Injective (toWt : MvPolynomial (Ψ × Fin N) ℝ → MvPolynomial (Ψ × Fin N) ℝ) := by
+theorem PositivityTheory.Xgp.t_tsg_smul
+    : (∀ (D : ℕ) (κ : ℕ → ℝ) (v : ℝ) (Q : Polynomial ℝ),
+        tsgPoly D κ (Polynomial.C v * Q) = Polynomial.C v * tsgPoly D κ Q)
+      ∧ (∀ (σ : Type) (c : σ → ℝ) (e : σ → ℤ) (v : ℝ) (Q : MvPolynomial σ ℝ),
+        linePoly c e (C v * Q) = Polynomial.C v * linePoly c e Q)
+      ∧ ∀ (Ψ : Type) (N : ℕ),
+        Function.Injective (toWt : MvPolynomial (Ψ × Fin N) ℝ → MvPolynomial (Ψ × Fin N) ℝ) := by
   refine ⟨?_, ?_, fun Ψ N => PositivityTheory.Xgp.tsg_smul.toWt_inj Ψ N⟩
   · intro D κ v Q
     by_cases hv : v = 0

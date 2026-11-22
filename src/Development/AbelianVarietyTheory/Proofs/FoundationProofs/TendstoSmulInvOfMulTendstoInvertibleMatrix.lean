@@ -11,16 +11,18 @@ open scoped MatrixGroups ModularForm Manifold Topology
 
 namespace GlobalTheory.OddFrame
 
-theorem tendsto_smul_inv_of_mul_tendsto_invertible (r : ℕ) (A U : ℍ → Matrix (Fin r) (Fin r) ℂ)
-    (L : Matrix (Fin r) (Fin r) ℂ) (d : ℍ → ℂ) (hL : L.det ≠ 0)
-    (hAU : Tendsto (fun τ => A τ * U τ) atImInfty (𝓝 L))
-    (hdU : Tendsto (fun τ => d τ • U τ) atImInfty (𝓝 0)) :
-    Tendsto (fun τ => d τ • (A τ)⁻¹) atImInfty (𝓝 0) := by
+theorem tendsto_smul_inv_of_mul_tendsto_invertible
+    (r : ℕ) (A U : ℍ → Matrix (Fin r) (Fin r) ℂ) (L : Matrix (Fin r) (Fin r) ℂ)
+    (d : ℍ → ℂ)
+    (hL : L.det ≠ 0) (hAU : Tendsto (fun τ => A τ * U τ) atImInfty (𝓝 L))
+    (hdU : Tendsto (fun τ => d τ • U τ) atImInfty (𝓝 0))
+    : Tendsto (fun τ => d τ • (A τ)⁻¹) atImInfty (𝓝 0) := by
   have hdet : Tendsto (fun τ => (A τ * U τ).det) atImInfty (𝓝 L.det) :=
     ((continuous_id.matrix_det).tendsto L).comp hAU
   have hev : ∀ᶠ τ in atImInfty, (A τ * U τ).det ≠ 0 := hdet.eventually_ne hL
 
-  have hinvdet : Tendsto (fun τ => Ring.inverse (A τ * U τ).det) atImInfty (𝓝 (Ring.inverse L.det)) := by
+  have hinvdet
+      : Tendsto (fun τ => Ring.inverse (A τ * U τ).det) atImInfty (𝓝 (Ring.inverse L.det)) := by
     simp only [Ring.inverse_eq_inv']
     exact hdet.inv₀ hL
   have hadj : Tendsto (fun τ => (A τ * U τ).adjugate) atImInfty (𝓝 L.adjugate) :=

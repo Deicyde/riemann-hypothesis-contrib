@@ -14,13 +14,16 @@ open scoped ENNReal
 
 noncomputable section
 
-theorem map_eq_smul_of_coordinates {N V : Type*} [Group N] [TopologicalSpace N]
-    [IsTopologicalGroup N] [LocallyCompactSpace N] [SecondCountableTopology N] [MeasurableSpace N]
-    [BorelSpace N] [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V] (lam : Measure V)
-    [IsFiniteMeasureOnCompacts lam] [lam.IsOpenPosMeasure] (φ : V ≃ₜ N)
-    (hL : ∀ n : N, MeasurePreserving (fun x => φ.symm (n * φ x)) lam lam)
-    (T : V → V) (hT : Measurable T) (k : ℝ≥0∞) (hC : lam.map T = k • lam)
-    (μ : Measure N) [μ.IsHaarMeasure] : μ.map (φ ∘ T ∘ φ.symm) = k • μ := by
+theorem map_eq_smul_of_coordinates
+    {N V : Type*} [Group N] [TopologicalSpace N] [IsTopologicalGroup N] [LocallyCompactSpace N]
+    [SecondCountableTopology N] [MeasurableSpace N] [BorelSpace N] [TopologicalSpace V]
+    [MeasurableSpace V] [BorelSpace V]
+    (lam : Measure V) [IsFiniteMeasureOnCompacts lam] [lam.IsOpenPosMeasure]
+    (φ : V ≃ₜ N) (hL : ∀ n : N, MeasurePreserving (fun x => φ.symm (n * φ x)) lam lam)
+    (T : V → V) (hT : Measurable T)
+    (k : ℝ≥0∞) (hC : lam.map T = k • lam)
+    (μ : Measure N) [μ.IsHaarMeasure]
+    : μ.map (φ ∘ T ∘ φ.symm) = k • μ := by
   have hφ : Measurable φ := φ.continuous.measurable
   have hinv : (lam.map φ).IsMulLeftInvariant := by
     refine ⟨fun n => ?_⟩
@@ -48,12 +51,13 @@ theorem map_eq_smul_of_coordinates {N V : Type*} [Group N] [TopologicalSpace N]
   rw [e, ← Measure.map_map hφ hT, hC, Measure.map_smul, smul_comm]
   all_goals fun_prop
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-theorem RadicalTorusModulus.proof (h : HermitianForm F E W) (v : Basis ι E W) :
-    RadicalTorusModulus.Statement h v := by
+theorem RadicalTorusModulus.proof (h : HermitianForm F E W) (v : Basis ι E W)
+    : RadicalTorusModulus.Statement h v := by
   intro x₀ w₀ hp g α hga _ hgy μ _ f hf
   have : BorelSpace (unipRadical h v x₀) :=
     Subtype.borelSpace (fun x' => x' ∈ (unipRadical h v x₀ : Set (archUnitary h v)))
@@ -66,8 +70,10 @@ theorem RadicalTorusModulus.proof (h : HermitianForm F E W) (v : Basis ι E W) :
   have hα : ∀ w, α w ≠ 0 := by
     intro w h0
     obtain ⟨-, -, -, -, hab⟩ := hyperbolic_at_place h v hp w
-    have e := congrArg (fun z => ((((g : InfinitePlace E → GL ι ℂ) w)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) *ᵥ z)
-      (hga w)
+    have e :=
+      congrArg
+        (fun z => ((((g : InfinitePlace E → GL ι ℂ) w)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) *ᵥ z)
+        (hga w)
     simp only [h0, zero_smul, mulVec_zero, mulVec_mulVec, Units.inv_mul, one_mulVec] at e
     rw [e, hForm, star_zero, zero_dotProduct] at hab
     exact zero_ne_one hab
@@ -102,10 +108,14 @@ theorem RadicalTorusModulus.proof (h : HermitianForm F E W) (v : Basis ι E W) :
       simp only [hf]
       abel
     rw [e]
-    have hfc : Continuous f := continuous_pi fun w => Complex.continuous_im.comp
-      (continuous_hForm_right _ _ ((continuous_apply w).comp continuous_subtype_val))
-    refine MeasurePreserving.skew_product (f := fun y => p.1 + y)
-      (g := fun y t => (p.2 - f y) + t) (measurePreserving_add_left _ p.1) ?_
+    have hfc : Continuous f :=
+      continuous_pi fun w =>
+        Complex.continuous_im.comp (continuous_hForm_right _ _
+          ((continuous_apply w).comp continuous_subtype_val))
+    refine MeasurePreserving.skew_product
+      (f := fun y => p.1 + y)
+      (g := fun y t => (p.2 - f y) + t)
+      (measurePreserving_add_left _ p.1) ?_
       (Filter.Eventually.of_forall fun y => (measurePreserving_add_left volume _).map_eq)
     exact ((continuous_const.sub (hfc.comp continuous_fst)).add continuous_snd).measurable
   have hmap := map_eq_smul_of_coordinates lam φ hL L hLc _ hLm μ
@@ -116,21 +126,22 @@ theorem RadicalTorusModulus.proof (h : HermitianForm F E W) (v : Basis ι E W) :
   have hcm : Measurable (φ ∘ L ∘ φ.symm) :=
     φ.continuous.measurable.comp (hLc.comp φ.symm.continuous.measurable)
   have hfm : Measurable fun n : unipRadical h v x₀ => f n := hf.comp measurable_subtype_coe
-  have hk : ENNReal.ofReal |(LinearMap.det L)⁻¹| =
-      ∏ w, ‖α w‖ₑ⁻¹ ^ (2 * (finrank E W - 1)) := by
+  have hk : ENNReal.ofReal |(LinearMap.det L)⁻¹| = ∏ w, ‖α w‖ₑ⁻¹ ^ (2 * (finrank E W - 1)) := by
     rw [abs_of_pos (inv_pos.2 hpos), hdet, ← Finset.prod_inv_distrib,
-      ENNReal.ofReal_prod_of_nonneg fun w _ => inv_nonneg.2 (pow_nonneg (Complex.normSq_nonneg _) _),
+      ENNReal.ofReal_prod_of_nonneg fun w _ =>
+        inv_nonneg.2 (pow_nonneg (Complex.normSq_nonneg _) _),
       Module.finrank_eq_card_basis v]
     refine Finset.prod_congr rfl fun w _ => ?_
     have hp' : 0 < ‖α w‖ := norm_pos_iff.2 (hα w)
     rw [Complex.normSq_eq_norm_sq, ← pow_mul, ← inv_pow, ENNReal.ofReal_pow (inv_nonneg.2 hp'.le),
       ENNReal.ofReal_inv_of_pos hp', ofReal_norm]
-  calc ∫⁻ n, f (g * n * g⁻¹) ∂μ
-      = ∫⁻ n, f (((φ ∘ L ∘ φ.symm) n : unipRadical h v x₀) : archUnitary h v) ∂μ :=
-        lintegral_congr fun n => by rw [hc]
+  calc
+    ∫⁻ n, f (g * n * g⁻¹) ∂μ
+        = ∫⁻ n, f (((φ ∘ L ∘ φ.symm) n : unipRadical h v x₀) : archUnitary h v) ∂μ :=
+      lintegral_congr fun n => by rw [hc]
     _ = ∫⁻ n, f n ∂(μ.map (φ ∘ L ∘ φ.symm)) := (lintegral_map hfm hcm).symm
     _ = (∏ w, ‖α w‖ₑ⁻¹ ^ (2 * (finrank E W - 1))) * ∫⁻ n, f n ∂μ := by
-        rw [hmap, lintegral_smul_measure, hk, smul_eq_mul]
+      rw [hmap, lintegral_smul_measure, hk, smul_eq_mul]
 
 end
 

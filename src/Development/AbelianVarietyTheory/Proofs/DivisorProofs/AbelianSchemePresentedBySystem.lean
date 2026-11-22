@@ -14,16 +14,21 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.LiftSys GlobalTheory.Published
+open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift
+  GlobalTheory.LiftSys GlobalTheory.Published
 open TensorProduct
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.LiftSys
 
-theorem exists_isCompl_ker_of_projective {R : Type} {M N : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    [AddCommGroup N] [Module R N] [Module.Projective R N] (f : M →ₗ[R] N) (hf : Function.Surjective f) :
-    ∃ C : Submodule R M, IsCompl (LinearMap.ker f) C := by
+theorem exists_isCompl_ker_of_projective
+    {R : Type} {M N : Type*}
+    [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N] [Module.Projective R N]
+    (f : M →ₗ[R] N) (hf : Function.Surjective f)
+    : ∃ C : Submodule R M, IsCompl (LinearMap.ker f) C := by
   obtain ⟨g, hg⟩ := Module.projective_lifting_property f LinearMap.id hf
   have hfg : ∀ y, f (g y) = y := fun y ↦ LinearMap.congr_fun hg y
   refine ⟨LinearMap.range g, ?_, ?_⟩
@@ -38,9 +43,12 @@ theorem exists_isCompl_ker_of_projective {R : Type} {M N : Type*} [CommRing R] [
     refine Submodule.add_mem_sup ?_ (LinearMap.mem_range_self g _)
     rw [LinearMap.mem_ker, map_sub, hfg, sub_self]
 
-theorem mem_smul_top_of_tmul_eq_zero {R R₀ M : Type} [CommRing R] [CommRing R₀] [AddCommGroup M] [Module R M]
-    (π : R →+* R₀) (hπ : Function.Surjective π) {I : Ideal R} (hk : RingHom.ker π = I) (x : M)
-    (h : letI := π.toAlgebra; (1 : R₀) ⊗ₜ[R] x = 0) : x ∈ I • (⊤ : Submodule R M) := by
+theorem mem_smul_top_of_tmul_eq_zero
+    {R R₀ M : Type} [CommRing R] [CommRing R₀] [AddCommGroup M] [Module R M]
+    (π : R →+* R₀) (hπ : Function.Surjective π)
+    {I : Ideal R} (hk : RingHom.ker π = I)
+    (x : M) (h : letI := π.toAlgebra; (1 : R₀) ⊗ₜ[R] x = 0)
+    : x ∈ I • (⊤ : Submodule R M) := by
   letI := π.toAlgebra
   subst hk
   let f : (R ⧸ RingHom.ker π) ≃ₐ[R] R₀ :=
@@ -55,19 +63,30 @@ theorem mem_smul_top_of_tmul_eq_zero {R R₀ M : Type} [CommRing R] [CommRing R�
   rw [h, map_zero, eq_comm, Submodule.Quotient.mk_eq_zero] at h1
   exact h1
 
-theorem full_and_isCompl : CrystallineSmoothLift → AbelianHodgeDeRham → ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀) (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (g : ℕ) (A₀ : Over (Sp R₀)) [GrpObj A₀] (A' : Over (Sp R)) [GrpObj A'] (i' : A₀.left ⟶ A'.left) (h' : IsGrpPullback A₀ A' (spMap π) i'), IsAbelianScheme A' → SmoothOfRelativeDimension g A'.hom → ∀ S : Sys I π A₀.hom, S.Presents A'.hom i' → S.Full hI ∧ ∃ N, IsCompl (S.K hI) N := by
+theorem full_and_isCompl
+    : CrystallineSmoothLift → AbelianHodgeDeRham
+      → ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀)
+          (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (g : ℕ) (A₀ : Over (Sp R₀))
+          [GrpObj A₀] (A' : Over (Sp R)) [GrpObj A'] (i' : A₀.left ⟶ A'.left)
+          (h' : IsGrpPullback A₀ A' (spMap π) i'),
+        IsAbelianScheme A' → SmoothOfRelativeDimension g A'.hom
+          → ∀ S : Sys I π A₀.hom, S.Presents A'.hom i' → S.Full hI ∧ ∃ N, IsCompl (S.K hI) N := by
   intro H HD R R₀ _ _ I hI π hπ hk g A₀ _ A' _ i' h' hA hg S hS
   have hpb : IsPullback i' A₀.hom A'.hom (spMap π) := h'.1
-  obtain ⟨e, he1, he2⟩ := GlobalTheory.T.hodge_cohomology_iso_presented_crystal R R₀ I hI π hπ hk A₀.left A₀.hom S A'.left A'.hom i' hpb hS
+  obtain ⟨e, he1, he2⟩ :=
+    GlobalTheory.T.hodge_cohomology_iso_presented_crystal R R₀ I hI π hπ hk A₀.left A₀.hom S A'.left
+      A'.hom i' hpb hS
   have hsm : Smooth A'.hom := hA.smooth
   haveI : IsProper A'.hom := hA.proper
   have hsep : IsSeparated A'.hom := inferInstance
   have hqc : QuasiCompact A'.hom := inferInstance
   have hw : i' ≫ A'.hom = (A₀.hom ≫ spMap π) ≫ spMap (RingHom.id R) := by
     rw [Cris.spMap_id, Category.comp_id]; exact hpb.w
-  let m : IsMor (dp0 R) A'.hom (divided₂ hI) (A₀.hom ≫ spMap π) (RingHom.id R) i' := IsMor.of_dividedPowersZeroIdeal _ hw
-  have hm := (H.toCrystallineDeRham R I (divided₂ hI) (isDPNilpotent_squareZero hI) R₀ π hπ hk A'.left A₀.left A'.hom A₀.hom i'
-    hsm hsep hqc hpb m).1
+  let m : IsMor (dp0 R) A'.hom (divided₂ hI) (A₀.hom ≫ spMap π) (RingHom.id R) i' :=
+    IsMor.of_dividedPowersZeroIdeal _ hw
+  have hm :=
+    (H.toCrystallineDeRham R I (divided₂ hI) (isDPNilpotent_squareZero hI) R₀ π hπ hk A'.left
+      A₀.left A'.hom A₀.hom i' hsm hsep hqc hpb m).1
   have hc := H.bijective_cechDeRhamComparison_degreeOne A'.hom hsm hsep hqc
   obtain ⟨-, -, -, ⟨-, hproj, -⟩, ⟨-, -, hto⟩, hbc⟩ := HD R A' g hA hg
   have key : ∀ c, S.r hI (m.pull1 c) = e (toHO1 A'.hom (cmp1 A'.hom c)) := fun c ↦ (he1 m c).symm
@@ -83,8 +102,7 @@ theorem full_and_isCompl : CrystallineSmoothLift → AbelianHodgeDeRham → ∀ 
   have hz0 : S.redO.pullbackOneCocycle z = 0 := by
     refine Subtype.ext (funext fun U ↦ funext fun V ↦ funext fun a ↦ ?_)
     exact (S.ker V _).2 (hz U V a)
-  have h0 : S.redO.pull1 (H1.mk _ z) = 0 := by
-    rw [CoefMap.pullCohomologyOne_class, hz0, map_zero]
+  have h0 : S.redO.pull1 (H1.mk _ z) = 0 := by rw [CoefMap.pullCohomologyOne_class, hz0, map_zero]
   set x := e.symm (H1.mk _ z) with hxdef
   have hx0 : IsPullO hpb.w x 0 := by
     have := he2 x
@@ -103,7 +121,8 @@ theorem full_and_isCompl : CrystallineSmoothLift → AbelianHodgeDeRham → ∀ 
     have hm' : e.toLinearMap x ∈ Submodule.map e.toLinearMap (I • ⊤) := Submodule.mem_map_of_mem hxI
     rw [Submodule.map_smul''] at hm'
     exact Submodule.smul_mono le_rfl le_top hm'
-  have hsurjI : Submodule.map (S.r hI) (I • ⊤) = I • (⊤ : Submodule R (GlobalTheory.CatCoh.H1 S.F)) := by
+  have hsurjI
+      : Submodule.map (S.r hI) (I • ⊤) = I • (⊤ : Submodule R (GlobalTheory.CatCoh.H1 S.F)) := by
     rw [Submodule.map_smul'', Submodule.map_top, LinearMap.range_eq_top.2 hr]
   rw [← hsurjI] at hzI
   obtain ⟨c, hc, hcz⟩ := hzI

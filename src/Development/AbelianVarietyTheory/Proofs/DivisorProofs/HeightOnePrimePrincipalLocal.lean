@@ -9,13 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Intersection
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 namespace GlobalTheory
 
-theorem heightOne_prime_locallyPrincipal_of_factorial_localization : ∀ (R S : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [CommRing S] [IsDomain S] [Algebra R S] (p P : Ideal R) [p.IsPrime] [IsLocalization.AtPrime S p] [UniqueFactorizationMonoid S], P.IsPrime → P ≤ p → P ≠ ⊥ → (∀ Q : Ideal R, Q.IsPrime → Q ≠ ⊥ → Q ≤ P → Q = P) → ∃ a ∈ P, a ≠ 0 ∧ ∃ t ∉ p, ∀ g ∈ P, ∃ r, t * g = a * r := by
+theorem heightOne_prime_locallyPrincipal_of_factorial_localization
+    : ∀ (R S : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [CommRing S] [IsDomain S]
+        [Algebra R S] (p P : Ideal R) [p.IsPrime] [IsLocalization.AtPrime S p]
+        [UniqueFactorizationMonoid S],
+      P.IsPrime → P ≤ p → P ≠ ⊥ → (∀ Q : Ideal R, Q.IsPrime → Q ≠ ⊥ → Q ≤ P → Q = P)
+        → ∃ a ∈ P, a ≠ 0 ∧ ∃ t ∉ p, ∀ g ∈ P, ∃ r, t * g = a * r := by
   intro R S _ _ _ _ _ _ p P _ _ _ hP hPp hP0 hmin
   classical
   have hdisj : Disjoint (p.primeCompl : Set R) (P : Set R) := by
@@ -83,18 +90,19 @@ theorem heightOne_prime_locallyPrincipal_of_factorial_localization : ∀ (R S : 
     rw [← hG] at hg
     induction hg using Submodule.span_induction with
     | mem x hx =>
-        have hxP : x ∈ P := by rw [← hG]; exact Submodule.subset_span hx
-        obtain ⟨k, hk⟩ := Finset.dvd_prod_of_mem (fun x => (u x : R)) hx
-        refine ⟨k * r x, ?_⟩
-        rw [hk, mul_comm (u x : R) k, mul_assoc, hur x hxP]
-        ring
-    | zero => exact ⟨0, by simp⟩
+      have hxP : x ∈ P := by rw [← hG]; exact Submodule.subset_span hx
+      obtain ⟨k, hk⟩ := Finset.dvd_prod_of_mem (fun x => (u x : R)) hx
+      refine ⟨k * r x, ?_⟩
+      rw [hk, mul_comm (u x : R) k, mul_assoc, hur x hxP]
+      ring
+    | zero =>
+      exact ⟨0, by simp⟩
     | add x y _ _ hx hy =>
-        obtain ⟨r1, h1⟩ := hx
-        obtain ⟨r2, h2⟩ := hy
-        exact ⟨r1 + r2, by rw [mul_add, h1, h2, mul_add]⟩
+      obtain ⟨r1, h1⟩ := hx
+      obtain ⟨r2, h2⟩ := hy
+      exact ⟨r1 + r2, by rw [mul_add, h1, h2, mul_add]⟩
     | smul c x _ hx =>
-        obtain ⟨r1, h1⟩ := hx
-        exact ⟨c * r1, by rw [smul_eq_mul, mul_left_comm, h1]; ring⟩
+      obtain ⟨r1, h1⟩ := hx
+      exact ⟨c * r1, by rw [smul_eq_mul, mul_left_comm, h1]; ring⟩
 
 end GlobalTheory

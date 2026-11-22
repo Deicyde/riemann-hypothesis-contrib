@@ -9,22 +9,29 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.GunrResCard
 
-open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain PositivityTheory.PfSWUS.Loc PositivityTheory.SiegelWeilFormula.Gunr
+open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain PositivityTheory.PfSWUS.Loc
+  PositivityTheory.SiegelWeilFormula.Gunr
 open scoped TensorProduct
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def redCoord {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-    (S : Subring (Fv F v ⊗[F] E)) (hS : (S : Set (Fv F v ⊗[F] E)) = Rv bs v)
-    (ϖ : v.adicCompletionIntegers F) (x : S) (k : Fin d) :
-    v.adicCompletionIntegers F ⧸ Ideal.span {ϖ} :=
-  Ideal.Quotient.mk _ ⟨(Algebra.TensorProduct.basis (Fv F v) bs).repr x k,
-    (show (x : Fv F v ⊗[F] E) ∈ Rv bs v from hS ▸ x.2) k⟩
+def redCoord
+    {d : ℕ} (bs : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (S : Subring (Fv F v ⊗[F] E))
+    (hS : (S : Set (Fv F v ⊗[F] E)) = Rv bs v) (ϖ : v.adicCompletionIntegers F) (x : S)
+    (k : Fin d)
+    : v.adicCompletionIntegers F ⧸ Ideal.span {ϖ} :=
+  Ideal.Quotient.mk _ ⟨
+    (Algebra.TensorProduct.basis (Fv F v) bs).repr x k,
+    (show (x : Fv F v ⊗[F] E) ∈ Rv bs v from hS ▸ x.2) k
+  ⟩
 
-theorem redCoord_eq_iff {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-    (S : Subring (Fv F v ⊗[F] E)) (hS : (S : Set (Fv F v ⊗[F] E)) = Rv bs v)
-    (ϖ : v.adicCompletionIntegers F) (hϖ : algebraMap (Fv F v) (Fv F v ⊗[F] E) ϖ ∈ S) (x y : S) :
-    redCoord bs v S hS ϖ x = redCoord bs v S hS ϖ y ↔ x - y ∈ lev (⟨_, hϖ⟩ : S) 1 := by
+theorem redCoord_eq_iff
+    {d : ℕ} (bs : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (S : Subring (Fv F v ⊗[F] E))
+    (hS : (S : Set (Fv F v ⊗[F] E)) = Rv bs v) (ϖ : v.adicCompletionIntegers F)
+    (hϖ : algebraMap (Fv F v) (Fv F v ⊗[F] E) ϖ ∈ S) (x y : S)
+    : redCoord bs v S hS ϖ x = redCoord bs v S hS ϖ y ↔ x - y ∈ lev (⟨_, hϖ⟩ : S) 1 := by
   set B := Algebra.TensorProduct.basis (Fv F v) bs with hB
   have hsm : ∀ z : Fv F v ⊗[F] E, z * algebraMap (Fv F v) (Fv F v ⊗[F] E) ϖ = (ϖ : Fv F v) • z := by
     intro z
@@ -33,7 +40,8 @@ theorem redCoord_eq_iff {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : HeightOne
     Ideal.mem_span_singleton']
   constructor
   · intro h
-    have hk : ∀ k, ∃ t : v.adicCompletionIntegers F, (t : Fv F v) * ϖ = B.repr x k - B.repr y k := by
+    have hk
+        : ∀ k, ∃ t : v.adicCompletionIntegers F, (t : Fv F v) * ϖ = B.repr x k - B.repr y k := by
       intro k
       have h1 := congrFun h k
       simp only [redCoord] at h1
@@ -77,9 +85,11 @@ theorem redCoord_eq_iff {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : HeightOne
     simp only [map_sub, Finsupp.sub_apply, map_smul, Finsupp.smul_apply, smul_eq_mul] at h3
     rw [mul_comm, ← h3]
 
-theorem redCoord_surjective {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-    (S : Subring (Fv F v ⊗[F] E)) (hS : (S : Set (Fv F v ⊗[F] E)) = Rv bs v)
-    (ϖ : v.adicCompletionIntegers F) : Function.Surjective (redCoord bs v S hS ϖ) := by
+theorem redCoord_surjective
+    {d : ℕ} (bs : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (S : Subring (Fv F v ⊗[F] E))
+    (hS : (S : Set (Fv F v ⊗[F] E)) = Rv bs v) (ϖ : v.adicCompletionIntegers F)
+    : Function.Surjective (redCoord bs v S hS ϖ) := by
   intro g
   set B := Algebra.TensorProduct.basis (Fv F v) bs with hB
   choose t ht using fun k => Ideal.Quotient.mk_surjective (g k)
@@ -101,10 +111,13 @@ theorem redCoord_surjective {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : Heigh
   congr 1
   exact Subtype.ext (hz k)
 
-theorem card_quot {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
-    (S : Subring (Fv F v ⊗[F] E)) (hS : (S : Set (Fv F v ⊗[F] E)) = Rv bs v)
-    (ϖ : v.adicCompletionIntegers F) (hϖ : algebraMap (Fv F v) (Fv F v ⊗[F] E) ϖ ∈ S) :
-    Nat.card (S ⧸ lev (⟨_, hϖ⟩ : S) 1) = Nat.card (v.adicCompletionIntegers F ⧸ Ideal.span {ϖ}) ^ d := by
+theorem card_quot
+    {d : ℕ} (bs : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (S : Subring (Fv F v ⊗[F] E))
+    (hS : (S : Set (Fv F v ⊗[F] E)) = Rv bs v) (ϖ : v.adicCompletionIntegers F)
+    (hϖ : algebraMap (Fv F v) (Fv F v ⊗[F] E) ϖ ∈ S)
+    : Nat.card (S ⧸ lev (⟨_, hϖ⟩ : S) 1)
+      = Nat.card (v.adicCompletionIntegers F ⧸ Ideal.span {ϖ}) ^ d := by
   have hsurj := Ideal.Quotient.mk_surjective (I := lev (⟨_, hϖ⟩ : S) 1)
   let sec := Function.surjInv hsurj
   have hsec : ∀ q, Ideal.Quotient.mk _ (sec q) = q := Function.surjInv_eq hsurj
@@ -126,8 +139,7 @@ theorem card_quot {d : ℕ} (bs : Module.Basis (Fin d) F E) (v : HeightOneSpectr
 theorem q3 : PositivityTheory.SiegelWeilFormula.Gunr.Q3 := by
   intro F E _ _ _ _ _ σ d bs v S σS ϖ hQ hϖ
   obtain ⟨hCM, -, hS, -, -, -, -, hcard⟩ := hQ
-  have hd : d = 2 := by
-    rw [← hCM.2.2.1, Module.finrank_eq_card_basis bs, Fintype.card_fin]
+  have hd : d = 2 := by rw [← hCM.2.2.1, Module.finrank_eq_card_basis bs, Fintype.card_fin]
   subst hd
   rw [card_quot bs v S hS ϖ hϖ, hcard]
 

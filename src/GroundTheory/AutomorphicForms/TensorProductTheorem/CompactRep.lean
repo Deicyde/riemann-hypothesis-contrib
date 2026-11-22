@@ -13,17 +13,17 @@ namespace CompactRep
 
 open MeasureTheory Module Set
 
-variable {K : Type*} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
-  [T2Space K] {W : Type*} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+variable
+  {K : Type*} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K] [T2Space K]
+  {W : Type*} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
   {σ : Representation ℂ K W}
 
-theorem exists_isCompl_stable (hσ : Representation.HasContinuousCoeff σ) (U : Submodule ℂ W)
-    (hU : ∀ k, ∀ u ∈ U, σ k u ∈ U) :
-    ∃ C : Submodule ℂ W, IsCompl U C ∧ ∀ k, ∀ c ∈ C, σ k c ∈ C := by
+theorem exists_isCompl_stable
+    (hσ : Representation.HasContinuousCoeff σ) (U : Submodule ℂ W) (hU : ∀ k, ∀ u ∈ U, σ k u ∈ U)
+    : ∃ C : Submodule ℂ W, IsCompl U C ∧ ∀ k, ∀ c ∈ C, σ k c ∈ C := by
   classical
   borelize K
-  let K₀ : TopologicalSpace.PositiveCompacts K :=
-    ⟨⟨univ, isCompact_univ⟩, by simp [interior_univ]⟩
+  let K₀ : TopologicalSpace.PositiveCompacts K := ⟨⟨univ, isCompact_univ⟩, by simp [interior_univ]⟩
   set μ : Measure K := Measure.haarMeasure K₀
   have hμ1 : μ univ = 1 := by
     have := Measure.haarMeasure_self (K₀ := K₀)
@@ -35,8 +35,7 @@ theorem exists_isCompl_stable (hσ : Representation.HasContinuousCoeff σ) (U : 
 
   let S : K → ((Fin d → ℂ) →L[ℂ] (Fin d → ℂ)) := fun k =>
     LinearMap.toContinuousLinearMap (e.toLinearMap ∘ₗ σ k ∘ₗ e.symm.toLinearMap)
-  have hSapply : ∀ k w, S k (e w) = e (σ k w) := fun k w => by
-    simp [S]
+  have hSapply : ∀ k w, S k (e w) = e (σ k w) := fun k w => by simp [S]
   have hSmul : ∀ a c, S (a * c) = (S a).comp (S c) := fun a c => by
     ext x : 1
     simp [S, map_mul]
@@ -80,11 +79,12 @@ theorem exists_isCompl_stable (hσ : Representation.HasContinuousCoeff σ) (U : 
   have hPmem : ∀ w, e.symm (P (e w)) ∈ U := by
     intro w
     have h1 : R (P (e w)) = 0 := by
-      rw [ContinuousLinearMap.integral_apply hfi, ← ContinuousLinearMap.integral_comp_comm _ (hfx _)]
+      rw [ContinuousLinearMap.integral_apply hfi,
+        ← ContinuousLinearMap.integral_comp_comm _ (hfx _)]
       have : ∀ k, R (f k (e w)) = 0 := fun k => by
         rw [hfapply]
-        simp only [R, LinearMap.coe_toContinuousLinearMap', LinearMap.coe_comp,
-          LinearEquiv.coe_coe, Function.comp_apply, LinearEquiv.symm_apply_apply, LinearMap.sub_apply,
+        simp only [R, LinearMap.coe_toContinuousLinearMap', LinearMap.coe_comp, LinearEquiv.coe_coe,
+          Function.comp_apply, LinearEquiv.symm_apply_apply, LinearMap.sub_apply,
           LinearMap.id_apply, hpU _ (hU _ _ (hpmem _)), sub_self, map_zero]
       simp [this]
     have h2 : e.symm (P (e w)) - p (e.symm (P (e w))) = 0 := by
@@ -109,10 +109,9 @@ theorem exists_isCompl_stable (hσ : Representation.HasContinuousCoeff σ) (U : 
     simp only [h1, h2]
     exact (integral_mul_left_eq_self (μ := μ) (fun y => S y (P₀ (S (y⁻¹ * g) x))) g).symm
 
-  let Q : W →ₗ[ℂ] U := LinearMap.codRestrict U
-    (e.symm.toLinearMap ∘ₗ P.toLinearMap ∘ₗ e.toLinearMap) fun w => hPmem w
-  have hQ : ∀ x : U, Q x = x := fun x => Subtype.ext (by
-    simp [Q, hPU _ x.2])
+  let Q : W →ₗ[ℂ] U :=
+    LinearMap.codRestrict U (e.symm.toLinearMap ∘ₗ P.toLinearMap ∘ₗ e.toLinearMap) fun w => hPmem w
+  have hQ : ∀ x : U, Q x = x := fun x => Subtype.ext (by simp [Q, hPU _ x.2])
   refine ⟨LinearMap.ker Q, LinearMap.isCompl_of_proj hQ, fun k c hc => ?_⟩
   rw [LinearMap.mem_ker] at hc ⊢
   have hc' : P (e c) = 0 := by

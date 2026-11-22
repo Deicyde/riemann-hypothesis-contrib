@@ -26,12 +26,7 @@ namespace AInf
 variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K]
 variable {p : ℕ} [hp : Fact p.Prime] [IsPerfectoidField K p]
 
-
-
-
-theorem isAdicComplete_p : IsAdicComplete (Ideal.span {(p : AInf K p)}) (AInf K p) :=
-  inferInstance
-
+theorem isAdicComplete_p : IsAdicComplete (Ideal.span {(p : AInf K p)}) (AInf K p) := inferInstance
 
 end AInf
 

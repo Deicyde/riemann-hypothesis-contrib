@@ -12,11 +12,16 @@ namespace PositivityTheory.Rg.Cz
 
 namespace SWS
 
-variable {n : ℕ} {ι Γ : Type} [Fintype ι] [DecidableEq ι] [Group Γ] [TopologicalSpace Γ]
+variable
+  {n : ℕ} {ι Γ : Type} [Fintype ι] [DecidableEq ι] [Group Γ] [TopologicalSpace Γ]
   {bar : ι → ι} {κ : ι → Γ → Matrix (Fin n) (Fin n) ℂ}
 
-theorem dense [CompactSpace Γ] [T2Space Γ] (hK : IsKD bar κ) {H : Set ι} (hH : ∀ τ, τ ∈ H ↔ bar τ ∉ H)
-    (g : C(Γ, ℂ)) : g ∈ closure {h : C(Γ, ℂ) | ⇑h ∈ Submodule.span ℂ (Mono κ H)} := by
+theorem dense
+    [CompactSpace Γ] [T2Space Γ]
+    (hK : IsKD bar κ)
+    {H : Set ι} (hH : ∀ τ, τ ∈ H ↔ bar τ ∉ H)
+    (g : C(Γ, ℂ))
+    : g ∈ closure {h : C(Γ, ℂ) | ⇑h ∈ Submodule.span ℂ (Mono κ H)} := by
   let S : Set C(Γ, ℂ) := {g | ∃ τ i j, (g : Γ → ℂ) = fun k => κ τ k i j}
   let A : StarSubalgebra ℂ C(Γ, ℂ) := StarAlgebra.adjoin ℂ S
   have hsep : A.SeparatesPoints := by
@@ -29,8 +34,11 @@ theorem dense [CompactSpace Γ] [T2Space Γ] (hK : IsKD bar κ) {H : Set ι} (hH
       by_contra h
       push Not at h
       exact hτ (Matrix.ext h)
-    exact ⟨fun k => κ τ k i j, ⟨⟨fun k => κ τ k i j, hK.cont τ i j⟩,
-      StarAlgebra.subset_adjoin ℂ S ⟨τ, i, j, rfl⟩, rfl⟩, hij⟩
+    exact ⟨
+      fun k => κ τ k i j,
+      ⟨⟨fun k => κ τ k i j, hK.cont τ i j⟩, StarAlgebra.subset_adjoin ℂ S ⟨τ, i, j, rfl⟩, rfl⟩,
+      hij
+    ⟩
   have hsub : A.toSubalgebra ≤ (monoAlg hK H).comap (ContinuousMap.coeFnAlgHom ℂ) := by
     rw [StarAlgebra.adjoin_toSubalgebra]
     apply Algebra.adjoin_le
@@ -54,9 +62,14 @@ theorem dense [CompactSpace Γ] [T2Space Γ] (hK : IsKD bar κ) {H : Set ι} (hH
   rw [← SetLike.mem_coe, StarSubalgebra.topologicalClosure_coe] at hg
   exact closure_mono (fun h hh => hle h hh) hg
 
-theorem nonvanish [MeasurableSpace Γ] [BorelSpace Γ] [CompactSpace Γ] [T2Space Γ] (μ : Measure Γ) [IsFiniteMeasure μ]
-    [μ.IsOpenPosMeasure] (hK : IsKD bar κ) {H : Set ι} (hH : ∀ τ, τ ∈ H ↔ bar τ ∉ H)
-    {f : Γ → ℂ} (hf : Continuous f) (x : Γ) (hx : f x ≠ 0) : ∃ g ∈ Mono κ H, ∫ k, g k * f k ∂μ ≠ 0 := by
+theorem nonvanish
+    [MeasurableSpace Γ] [BorelSpace Γ] [CompactSpace Γ] [T2Space Γ]
+    (μ : Measure Γ) [IsFiniteMeasure μ] [μ.IsOpenPosMeasure]
+    (hK : IsKD bar κ)
+    {H : Set ι} (hH : ∀ τ, τ ∈ H ↔ bar τ ∉ H)
+    {f : Γ → ℂ} (hf : Continuous f)
+    (x : Γ) (hx : f x ≠ 0)
+    : ∃ g ∈ Mono κ H, ∫ k, g k * f k ∂μ ≠ 0 := by
   by_contra hcon
   push Not at hcon
   have hspan : ∀ g ∈ Submodule.span ℂ (Mono κ H), Continuous g ∧ ∫ k, g k * f k ∂μ = 0 := by
@@ -66,13 +79,14 @@ theorem nonvanish [MeasurableSpace Γ] [BorelSpace Γ] [CompactSpace Γ] [T2Spac
       refine ⟨?_, hcon g hg⟩
       obtain ⟨m, lab, c, I, K, -, rfl⟩ := hg
       exact mono_cont hK lab c I K
-    | zero => exact ⟨continuous_const, by simp⟩
+    | zero =>
+      exact ⟨continuous_const, by simp⟩
     | add g g' _ _ h h' =>
       refine ⟨h.1.add h'.1, ?_⟩
       simp only [Pi.add_apply, add_mul]
       rw [integral_add (integrable_of_cont μ (f := fun k => g k * f k) (h.1.mul hf))
-        (integrable_of_cont μ (f := fun k => g' k * f k) (h'.1.mul hf)), h.2, h'.2,
-        add_zero]
+          (integrable_of_cont μ (f := fun k => g' k * f k) (h'.1.mul hf)),
+        h.2, h'.2, add_zero]
     | smul a g _ h =>
       refine ⟨h.1.const_smul a, ?_⟩
       simp only [Pi.smul_apply, smul_eq_mul, mul_assoc]
@@ -85,9 +99,9 @@ theorem nonvanish [MeasurableSpace Γ] [BorelSpace Γ] [CompactSpace Γ] [T2Spac
     obtain ⟨b, hb, hdist⟩ := Metric.mem_closure_iff.1 hclose ε hε
     have hb' := hspan b hb
     have heq : ∫ k, F k * f k ∂μ = ∫ k, (F k - b k) * f k ∂μ := by
-      rw [← sub_zero (∫ k, F k * f k ∂μ), ← hb'.2, ← integral_sub
-        (integrable_of_cont μ (f := fun k => F k * f k) (F.continuous.mul hf))
-        (integrable_of_cont μ (f := fun k => b k * f k) (b.continuous.mul hf))]
+      rw [← sub_zero (∫ k, F k * f k ∂μ), ← hb'.2,
+        ← integral_sub (integrable_of_cont μ (f := fun k => F k * f k) (F.continuous.mul hf))
+          (integrable_of_cont μ (f := fun k => b k * f k) (b.continuous.mul hf))]
       congr 1
       funext k
       ring

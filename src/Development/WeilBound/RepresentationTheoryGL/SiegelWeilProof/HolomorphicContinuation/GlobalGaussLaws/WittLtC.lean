@@ -21,23 +21,27 @@ theorem cc_one : FD.cc (1 : E) = 1 := map_one (IsCMField.complexConj E)
 
 theorem cc_zero : FD.cc (0 : E) = 0 := map_zero (IsCMField.complexConj E)
 
-theorem cc_neg (t : E) : FD.cc (-t) = -FD.cc t := map_neg (IsCMField.complexConj E) t
+theorem cc_neg (t : E) : FD.cc (-t) = - FD.cc t := map_neg (IsCMField.complexConj E) t
 
 theorem cc_div_two (t : E) : FD.cc (t / 2) = FD.cc t / 2 := by
   show IsCMField.complexConj E (t / 2) = _
   rw [map_div₀, map_ofNat]
   rfl
 
-theorem exists_pair {n : Type} [Fintype n] [DecidableEq n] {G : Matrix n n E} (hG : ∀ a b, FD.cc (G a b) = G b a)
-    (hd : G.det ≠ 0) {z : n → E} (hz0 : z ≠ 0) (hz : hf G z z = 0) :
-    ∃ w : n → E, hf G z w = 1 ∧ hf G w w = 0 := by
+theorem exists_pair
+    {n : Type} [Fintype n] [DecidableEq n]
+    {G : Matrix n n E} (hG : ∀ a b, FD.cc (G a b) = G b a) (hd : G.det ≠ 0)
+    {z : n → E} (hz0 : z ≠ 0) (hz : hf G z z = 0)
+    : ∃ w : n → E, hf G z w = 1 ∧ hf G w w = 0 := by
   have hu : z ᵥ* G ≠ 0 := by
     intro h
     apply hz0
     have h1 := congrArg (· ᵥ* G⁻¹) h
     simp only [Matrix.vecMul_vecMul, Matrix.zero_vecMul] at h1
-    rwa [Matrix.mul_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det G).1 ((Matrix.isUnit_iff_isUnit_det G).2 hd.isUnit)),
-      Matrix.vecMul_one] at h1
+    rwa [Matrix.mul_nonsing_inv _
+          ((Matrix.isUnit_iff_isUnit_det G).1 ((Matrix.isUnit_iff_isUnit_det G).2 hd.isUnit)),
+        Matrix.vecMul_one]
+      at h1
   obtain ⟨b, hb⟩ : ∃ b, (z ᵥ* G) b ≠ 0 := by
     by_contra h
     push Not at h
@@ -56,35 +60,40 @@ theorem exists_pair {n : Type} [Fintype n] [DecidableEq n] {G : Matrix n n E} (h
   refine ⟨w0 + (-(a / 2)) • z, ?_, ?_⟩
   · rw [hf_add_right, hf_smul_right, hz, hw0]; ring
   · have hzw : hf G w0 z = 1 := by rw [hf_symm hG, hw0, cc_one]
-    rw [hf_add_left, hf_add_right, hf_add_right, hf_smul_left, hf_smul_left, hf_smul_right, hf_smul_right, hz, hw0, hzw,
-      cc_neg, cc_div_two, haa, ← ha]
+    rw [hf_add_left, hf_add_right, hf_add_right, hf_smul_left, hf_smul_left, hf_smul_right,
+      hf_smul_right, hz, hw0, hzw, cc_neg, cc_div_two, haa, ← ha]
     ring
 
-
 set_option maxHeartbeats 1600000 in
-theorem split {n : Type} [Fintype n] [DecidableEq n] {G : Matrix n n E} (hG : ∀ a b, FD.cc (G a b) = G b a)
-    (hd : G.det ≠ 0) {z : n → E} (hz0 : z ≠ 0) (hz : hf G z z = 0) :
-    ∃ (m : ℕ) (e : Fin 2 ⊕ Fin m ≃ n) (G2 : Matrix (Fin m) (Fin m) E) (P : Matrix n n E), P.det ≠ 0 ∧
-      Pᵀ * G * P.map FD.cc = (fromBlocks hyp 0 0 G2).submatrix e.symm e.symm ∧ (∀ a b, FD.cc (G2 a b) = G2 b a) ∧
-        G2.det ≠ 0 := by
+theorem split
+    {n : Type} [Fintype n] [DecidableEq n]
+    {G : Matrix n n E} (hG : ∀ a b, FD.cc (G a b) = G b a) (hd : G.det ≠ 0)
+    {z : n → E} (hz0 : z ≠ 0) (hz : hf G z z = 0)
+    : ∃ (m : ℕ) (e : Fin 2 ⊕ Fin m ≃ n) (G2 : Matrix (Fin m) (Fin m) E) (P : Matrix n n E),
+      P.det ≠ 0 ∧ Pᵀ * G * P.map FD.cc = (fromBlocks hyp 0 0 G2).submatrix e.symm e.symm
+        ∧ (∀ a b, FD.cc (G2 a b) = G2 b a) ∧ G2.det ≠ 0 := by
   obtain ⟨w, hzw, hww⟩ := exists_pair hG hd hz0 hz
   have hwz : hf G w z = 1 := by rw [hf_symm hG, hzw, cc_one]
-  let L : (n → E) →ₗ[E] (Fin 2 → E) :=
-    { toFun := fun x => ![hf G x z, hf G x w]
-      map_add' := fun x y => by ext i; fin_cases i <;> simp [hf_add_left]
-      map_smul' := fun t x => by ext i; fin_cases i <;> simp [hf_smul_left] }
+  let L : (n → E) →ₗ[E] (Fin 2 → E) := {
+    toFun := fun x => ![hf G x z, hf G x w]
+    map_add' := fun x y => by ext i; fin_cases i <;> simp [hf_add_left]
+    map_smul' := fun t x => by ext i; fin_cases i <;> simp [hf_smul_left]
+  }
   have hLz : L z = ![0, 1] := by ext i; fin_cases i <;> simp [L, hz, hzw]
   have hLw : L w = ![1, 0] := by ext i; fin_cases i <;> simp [L, hwz, hww]
   have hLs : Function.Surjective L := by
     intro v
     refine ⟨v 0 • w + v 1 • z, ?_⟩
     rw [map_add (f := _), map_smul, map_smul, hLz, hLw]
-    ext i; fin_cases i <;> simp
+    ext i
+    fin_cases i <;> simp
   set K := LinearMap.ker L
   have hrk : Module.finrank E K + 2 = Fintype.card n := by
     show Module.finrank E (LinearMap.ker L) + 2 = _
     have h := LinearMap.finrank_range_add_finrank_ker L
-    rw [LinearMap.range_eq_top.mpr hLs, finrank_top, Module.finrank_fin_fun, Module.finrank_fintype_fun_eq_card] at h
+    rw [LinearMap.range_eq_top.mpr hLs, finrank_top, Module.finrank_fin_fun,
+        Module.finrank_fintype_fun_eq_card]
+      at h
     omega
   set m := Module.finrank E K
   let bK : Module.Basis (Fin m) E K := Module.finBasis E K
@@ -114,13 +123,15 @@ theorem split {n : Type} [Fintype n] [DecidableEq n] {G : Matrix n n E} (hG : �
     ext a b
     rw [GlobalTheory.HermDiag.transpose_mul_mul_map_apply]
     exact hentry (e.symm a) (e.symm b)
-  have hlin : ∀ (γ : Fin 2 ⊕ Fin m → E) (y : n → E),
-      hf G (∑ s, γ s • cols s) y = ∑ s, γ s * hf G (cols s) y := by
+  have hlin
+      : ∀ (γ : Fin 2 ⊕ Fin m → E) (y : n → E),
+        hf G (∑ s, γ s • cols s) y = ∑ s, γ s * hf G (cols s) y := by
     intro γ y
-    let Ly : (n → E) →ₗ[E] E :=
-      { toFun := fun x => hf G x y
-        map_add' := fun x x' => hf_add_left G x x' y
-        map_smul' := fun t x => hf_smul_left G t x y }
+    let Ly : (n → E) →ₗ[E] E := {
+      toFun := fun x => hf G x y
+      map_add' := fun x x' => hf_add_left G x x' y
+      map_smul' := fun t x => hf_smul_left G t x y
+    }
     have h1 : hf G (∑ s, γ s • cols s) y = Ly (∑ s, γ s • cols s) := rfl
     set_option synthInstance.maxHeartbeats 100000 in
       rw [h1, map_sum]
@@ -144,8 +155,10 @@ theorem split {n : Type} [Fintype n] [DecidableEq n] {G : Matrix n n E} (hG : �
         have h := hlin (fun s => γ (e s)) z
         rw [hsum] at h
         have h' : ∑ s, γ (e s) * hf G (cols s) z = γ (e (Sum.inl 1)) := by
-          have hc : ∀ s, hf G (cols s) z = fromBlocks hyp 0 0 G2 s (Sum.inl 0) := fun s => hentry s (Sum.inl 0)
-          simp only [hc, Fintype.sum_sum_type, Fin.sum_univ_two, fromBlocks_apply₁₁, fromBlocks_apply₂₁, hyp]
+          have hc : ∀ s, hf G (cols s) z = fromBlocks hyp 0 0 G2 s (Sum.inl 0) := fun s =>
+            hentry s (Sum.inl 0)
+          simp only [hc, Fintype.sum_sum_type, Fin.sum_univ_two, fromBlocks_apply₁₁,
+            fromBlocks_apply₂₁, hyp]
           simp
         rw [← h', ← h]
         simp [hf]
@@ -153,8 +166,10 @@ theorem split {n : Type} [Fintype n] [DecidableEq n] {G : Matrix n n E} (hG : �
         have h := hlin (fun s => γ (e s)) w
         rw [hsum] at h
         have h' : ∑ s, γ (e s) * hf G (cols s) w = γ (e (Sum.inl 0)) := by
-          have hc : ∀ s, hf G (cols s) w = fromBlocks hyp 0 0 G2 s (Sum.inl 1) := fun s => hentry s (Sum.inl 1)
-          simp only [hc, Fintype.sum_sum_type, Fin.sum_univ_two, fromBlocks_apply₁₁, fromBlocks_apply₂₁, hyp]
+          have hc : ∀ s, hf G (cols s) w = fromBlocks hyp 0 0 G2 s (Sum.inl 1) := fun s =>
+            hentry s (Sum.inl 1)
+          simp only [hc, Fintype.sum_sum_type, Fin.sum_univ_two, fromBlocks_apply₁₁,
+            fromBlocks_apply₂₁, hyp]
           simp
         rw [← h', ← h]
         simp [hf]

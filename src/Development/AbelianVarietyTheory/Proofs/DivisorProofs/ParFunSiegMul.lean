@@ -13,10 +13,22 @@ open MeasureTheory Matrix GlobalTheory.KSp GlobalTheory.SplitUnitary
 open GlobalTheory.WeilM (UG IsQuad IsHerm ResEtaPow)
 open GlobalTheory.SplitWeil (SB nabs)
 
-theorem GlobalTheory.KSp.parFun_sieg_mul : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (E : Type) [Field E] [Algebra F E] [TopologicalSpace E] [IsModuleTopology F E] (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (α : Type) [Fintype α] [DecidableEq α] (ν : Type) [Fintype ν] [DecidableEq ν] (Q : Matrix α α E) (_ : IsHerm c Q) (ψ : AddChar F ℂ) (hψ : Continuous ψ) (_ : ∀ t, ‖ψ t‖ = 1) (_ : ψ ≠ 1) (χ : Eˣ →* Circle) (_ : Continuous χ) (_ : ResEtaPow (R := F) ⊥ χ (Fintype.card α)), (∀ φ : Matrix α ν E → ℂ, parFun c ψ χ Q (mat c (1 : UG c (stdJ ν E))) φ = φ) ∧ ∀ p ∈ sieg c ν, ∀ q ∈ sieg c ν, ∀ φ : Matrix α ν E → ℂ, parFun c ψ χ Q (mat c (p * q)) φ = parFun c ψ χ Q (mat c p) (parFun c ψ χ Q (mat c q) φ) := by
+theorem GlobalTheory.KSp.parFun_sieg_mul
+    : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F]
+        [IsNonarchimedeanLocalField F] (E : Type) [Field E] [Algebra F E] [TopologicalSpace E]
+        [IsModuleTopology F E] (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (α : Type) [Fintype α]
+        [DecidableEq α] (ν : Type) [Fintype ν] [DecidableEq ν] (Q : Matrix α α E) (_ : IsHerm c Q)
+        (ψ : AddChar F ℂ) (hψ : Continuous ψ) (_ : ∀ t, ‖ψ t‖ = 1) (_ : ψ ≠ 1) (χ : Eˣ →* Circle)
+        (_ : Continuous χ) (_ : ResEtaPow (R := F) ⊥ χ (Fintype.card α)),
+      (∀ φ : Matrix α ν E → ℂ, parFun c ψ χ Q (mat c (1 : UG c (stdJ ν E))) φ = φ)
+        ∧ ∀ p ∈ sieg c ν, ∀ q ∈ sieg c ν, ∀ φ : Matrix α ν E → ℂ,
+          parFun c ψ χ Q (mat c (p * q)) φ
+            = parFun c ψ χ Q (mat c p) (parFun c ψ χ Q (mat c q) φ) := by
   intro F _ _ _ _ _ E _ _ _ _ c δ hE α _ _ ν _ _ Q hQ ψ hψ hψ1 hψ0 χ hχ hres
-  obtain ⟨β, hβ, hsymm, -, hadj, -⟩ := GlobalTheory.T.hermitianMatrixColumnPairing_algebraic_properties F E c δ hE α ν Q hQ
-  obtain ⟨hsc1, hscmul, -⟩ := GlobalTheory.T.unitaryCharacterAbsScalar_basic_properties F E c δ hE (Fintype.card α) χ hres
+  obtain ⟨β, hβ, hsymm, -, hadj, -⟩ :=
+    GlobalTheory.T.hermitianMatrixColumnPairing_algebraic_properties F E c δ hE α ν Q hQ
+  obtain ⟨hsc1, hscmul, -⟩ :=
+    GlobalTheory.T.unitaryCharacterAbsScalar_basic_properties F E c δ hE (Fintype.card α) χ hres
   refine ⟨?_, ?_⟩
   · intro φ
     funext x
@@ -32,10 +44,15 @@ theorem GlobalTheory.KSp.parFun_sieg_mul : ∀ (F : Type) [Field F] [CharZero F]
   · intro p hp q hq φ
     funext x
     have hmul : mat c (p * q) = mat c p * mat c q := rfl
-    obtain ⟨hq1, -, -⟩ := GlobalTheory.T.splitUnitarySiegelParabolic_block_relations F E c δ hE ν q hq
-    have hP : mat c p = fromBlocks (mat c p).toBlocks₁₁ (mat c p).toBlocks₁₂ 0 (mat c p).toBlocks₂₂ := by
+    obtain ⟨hq1, -, -⟩ :=
+      GlobalTheory.T.splitUnitarySiegelParabolic_block_relations F E c δ hE ν q hq
+    have hP
+        : mat c p
+          = fromBlocks (mat c p).toBlocks₁₁ (mat c p).toBlocks₁₂ 0 (mat c p).toBlocks₂₂ := by
       rw [← (mem_sieg c).mp hp]; exact (fromBlocks_toBlocks _).symm
-    have hQ' : mat c q = fromBlocks (mat c q).toBlocks₁₁ (mat c q).toBlocks₁₂ 0 (mat c q).toBlocks₂₂ := by
+    have hQ'
+        : mat c q
+          = fromBlocks (mat c q).toBlocks₁₁ (mat c q).toBlocks₁₂ 0 (mat c q).toBlocks₂₂ := by
       rw [← (mem_sieg c).mp hq]; exact (fromBlocks_toBlocks _).symm
     set A := (mat c p).toBlocks₁₁
     set B := (mat c p).toBlocks₁₂
@@ -59,6 +76,6 @@ theorem GlobalTheory.KSp.parFun_sieg_mul : ∀ (F : Type) [Field F] [CharZero F]
       intro u v w; rw [← hβ, ← hβ, ← hβ, map_add (f := _)]
     have hkey : pr c Q (x * A * A') (x * B * D') = pr c Q (x * A) (x * B) := by
       rw [← hβ, ← hβ, hadj, Matrix.mul_assoc (x * B), hDA, Matrix.mul_one]
-    simp only [parFun, e11, e12, det_mul, hscmul, Matrix.mul_add, ← Matrix.mul_assoc, hadd, hkey, mul_add,
-      AddChar.map_add_eq_mul]
+    simp only [parFun, e11, e12, det_mul, hscmul, Matrix.mul_add, ← Matrix.mul_assoc, hadd, hkey,
+      mul_add, AddChar.map_add_eq_mul]
     ring

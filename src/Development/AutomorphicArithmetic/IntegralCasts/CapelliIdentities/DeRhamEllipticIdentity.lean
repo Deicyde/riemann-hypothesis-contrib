@@ -4,33 +4,34 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.InvariantSumOfTranslates.main :
-    ∀ {K S : Type} [inst : Group K] [inst_1 : TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
-      [inst_4 : AddCommGroup S] [inst_5 : _root_.Module ℂ S] (ω : K →* Module.End ℂ S) (f₀ : S),
-      (∃ U ∈ nhds (1 : K), ∀ k ∈ U, ((ω : K → Module.End ℂ S) k : S → S) f₀ = f₀) →
-        ∃ (m : ℕ) (k : Fin (m + (1 : ℕ)) → K),
-          ∀ (g : K),
-            ((ω : K → Module.End ℂ S) g : S → S) (∑ i : Fin (m + (1 : ℕ)), ((ω : K → Module.End ℂ S) (k i) : S → S) f₀) =
-              ∑ i : Fin (m + (1 : ℕ)), ((ω : K → Module.End ℂ S) (k i) : S → S) f₀ := by
+theorem UpperTheory.Reformulated.B.InvariantSumOfTranslates.main
+    : ∀ {K S : Type} [inst : Group K] [inst_1 : TopologicalSpace K] [IsTopologicalGroup K]
+        [CompactSpace K] [inst_4 : AddCommGroup S] [inst_5 : _root_.Module ℂ S]
+        (ω : K →* Module.End ℂ S) (f₀ : S),
+      (∃ U ∈ nhds (1 : K), ∀ k ∈ U, ((ω : K → Module.End ℂ S) k : S → S) f₀ = f₀)
+        → ∃ (m : ℕ) (k : Fin (m + (1 : ℕ)) → K), ∀ (g : K),
+          ((ω : K → Module.End ℂ S) g : S → S)
+              (∑ i : Fin (m + (1 : ℕ)), ((ω : K → Module.End ℂ S) (k i) : S → S) f₀)
+            = ∑ i : Fin (m + (1 : ℕ)), ((ω : K → Module.End ℂ S) (k i) : S → S) f₀ := by
   intro K S _ _ _ _ _ _ ω f₀ h
   obtain ⟨U, hU, hfix⟩ := h
   have hmul : ∀ (a b : K) (v : S), ω (a * b) v = ω a (ω b v) := by
     intro a b v
     rw [map_mul, Module.End.mul_apply]
 
-  let H : Subgroup K :=
-    { carrier := {k | ω k f₀ = f₀}
-      one_mem' := by simp
-      mul_mem' := by
-        intro a b ha hb
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
-        rw [hmul, hb, ha]
-      inv_mem' := by
-        intro a ha
-        simp only [Set.mem_setOf_eq] at ha ⊢
-        have h1 : ω a⁻¹ (ω a f₀) = f₀ := by
-          rw [← hmul]; simp
-        rwa [ha] at h1 }
+  let H : Subgroup K := {
+    carrier := {k | ω k f₀ = f₀}
+    one_mem' := by simp
+    mul_mem' := by
+      intro a b ha hb
+      simp only [Set.mem_setOf_eq] at ha hb ⊢
+      rw [hmul, hb, ha]
+    inv_mem' := by
+      intro a ha
+      simp only [Set.mem_setOf_eq] at ha ⊢
+      have h1 : ω a⁻¹ (ω a f₀) = f₀ := by rw [← hmul]; simp
+      rwa [ha] at h1
+  }
   have hmem : ∀ k, k ∈ H ↔ ω k f₀ = f₀ := fun k => Iff.rfl
   have hopen : IsOpen (H : Set K) :=
     H.isOpen_of_mem_nhds (g := 1) (Filter.mem_of_superset hU (fun k hk => hfix k hk))

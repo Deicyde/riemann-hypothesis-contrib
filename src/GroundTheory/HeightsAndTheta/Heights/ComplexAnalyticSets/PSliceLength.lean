@@ -14,9 +14,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial Matrix ComplexSets
 
-theorem SliceLength.proof (hV : IndefiniteRowSideFullHecke.ComplexSets.VanishNearPoint.Statement)
-    (hR : SliceReducedGeneral.Statement) (hM : SliceMultGeneral.Statement) :
-    SliceLength.Statement := by
+theorem SliceLength.proof
+    (hV : IndefiniteRowSideFullHecke.ComplexSets.VanishNearPoint.Statement)
+    (hR : SliceReducedGeneral.Statement) (hM : SliceMultGeneral.Statement)
+    : SliceLength.Statement := by
   intro n d J W u hJ hdim hu hW
   have hWp : W.IsPrime := hW.1.1
   obtain ⟨f₁, hf₁W, hf₁⟩ := hR n d J W u hJ hdim hu hW
@@ -25,8 +26,7 @@ theorem SliceLength.proof (hV : IndefiniteRowSideFullHecke.ComplexSets.VanishNea
   have hUo : IsOpen {x : Fin n → ℂ | eval x (f₁ * f₂) ≠ 0} :=
     isOpen_ne_fun (MvPolynomial.continuous_eval (p := f₁ * f₂)) continuous_const
   refine ⟨{x | eval x (f₁ * f₂) ≠ 0}, hUo, ?_, ?_⟩
-  ·
-    intro x hx
+  · intro x hx
     rw [mem_closure_iff_nhds]
     intro t ht
     by_contra hempty
@@ -38,11 +38,11 @@ theorem SliceLength.proof (hV : IndefiniteRowSideFullHecke.ComplexSets.VanishNea
     have hy : y ∈ t ∩ (zeroSet W ∩ {x | eval x (f₁ * f₂) ≠ 0}) := ⟨hyt, hyW, hne⟩
     rw [hempty] at hy
     exact hy
-  ·
-    rintro q ⟨hqW, hqf⟩
+  · rintro q ⟨hqW, hqf⟩
     rw [Set.mem_ofPred_eq, map_mul, mul_ne_zero_iff] at hqf
     obtain ⟨O₁, hO₁o, hO₁d, hO₁⟩ := hf₁ q hqW hqf.1
     obtain ⟨O₂, -, hO₂d, hO₂⟩ := hf₂ q hqW hqf.2
-    exact (hO₁d.inter_of_isOpen_left hO₂d hO₁o).mono fun L (hL : L ∈ O₁ ∩ O₂) => ⟨hO₁ L hL.1, hO₂ L hL.2⟩
+    exact (hO₁d.inter_of_isOpen_left hO₂d hO₁o).mono fun L (hL : L ∈ O₁ ∩ O₂) =>
+      ⟨hO₁ L hL.1, hO₂ L hL.2⟩
 
 end GroundTheory.Heights₂.Heights

@@ -171,12 +171,16 @@ private lemma mem_of_irred_lemma_2 {k V : Type*} [Field k] [IsAlgClosed k] [AddC
   rw [hSm] at hmem
   exact hmem _
 
-theorem burnside_surj_of_irred {k A V : Type*} [Field k] [IsAlgClosed k] [Ring A] [Algebra k A] [AddCommGroup V]
-    [Module k V] [FiniteDimensional k V] (ρ : A →ₐ[k] Module.End k V) [Nontrivial V]
-    (hirr : ∀ W : Submodule k V, (∀ a : A, ∀ w ∈ W, ρ a w ∈ W) → W = ⊥ ∨ W = ⊤) : Function.Surjective ρ := by
+theorem burnside_surj_of_irred
+    {k A V : Type*} [Field k] [IsAlgClosed k] [Ring A] [Algebra k A] [AddCommGroup V] [Module k V]
+    [FiniteDimensional k V]
+    (ρ : A →ₐ[k] Module.End k V)
+    [Nontrivial V]
+    (hirr : ∀ W : Submodule k V, (∀ a : A, ∀ w ∈ W, ρ a w ∈ W) → W = ⊥ ∨ W = ⊤)
+    : Function.Surjective ρ := by
   intro f
-  have hB : ∀ W : Submodule k V, (∀ b ∈ ρ.range, ∀ w ∈ W, b w ∈ W) → W = ⊥ ∨ W = ⊤ :=
-    fun W hW => hirr W fun a w hw => hW (ρ a) (AlgHom.mem_range_self ρ a) w hw
+  have hB : ∀ W : Submodule k V, (∀ b ∈ ρ.range, ∀ w ∈ W, b w ∈ W) → W = ⊥ ∨ W = ⊤ := fun W hW =>
+    hirr W fun a w hw => hW (ρ a) (AlgHom.mem_range_self ρ a) w hw
   exact (AlgHom.mem_range ρ).1 (mem_of_irred_lemma_2 ρ.range hB f)
 
 end ReciprocityTheory.GC

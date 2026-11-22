@@ -10,14 +10,18 @@ namespace MassDataIdxFrA
 
 open Matrix
 
-variable {F k : Type} [Field F] [Field k] (O : ValuationSubring F) (π : O →+* k) (γ : O)
+variable
+  {F k : Type} [Field F] [Field k]
+  (O : ValuationSubring F) (π : O →+* k) (γ : O)
   {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem clause_iff (hker : RingHom.ker π = Ideal.span {γ}) (Y : Matrix ι ι O) {β : Type} (u : β → ι → F)
-    (pos : β → ι) (hu : ∀ b, ∃ z, IntVec O z ∧ u b = Pi.single (pos b) 1 + (γ : F) • z) (s : Set β)
-    (w : ι → F) (j : ι) (hw : ∃ z, IntVec O z ∧ w = Pi.single j 1 + (γ : F) • z) :
-    CongSpan O γ (u '' s) ((Y.map ((↑) : O → F) - 1) *ᵥ w) ↔
-      ∀ i, i ∉ pos '' s → π (Y i j) = if i = j then 1 else 0 := by
+theorem clause_iff
+    (hker : RingHom.ker π = Ideal.span {γ}) (Y : Matrix ι ι O)
+    {β : Type} (u : β → ι → F) (pos : β → ι)
+    (hu : ∀ b, ∃ z, IntVec O z ∧ u b = Pi.single (pos b) 1 + (γ : F) • z) (s : Set β)
+    (w : ι → F) (j : ι) (hw : ∃ z, IntVec O z ∧ w = Pi.single j 1 + (γ : F) • z)
+    : CongSpan O γ (u '' s) ((Y.map ((↑) : O → F) - 1) *ᵥ w)
+      ↔ ∀ i, i ∉ pos '' s → π (Y i j) = if i = j then 1 else 0 := by
   classical
   have hdiv : ∀ a : O, π a = 0 ↔ ∃ c : O, a = γ * c := by
     intro a
@@ -47,8 +51,10 @@ theorem clause_iff (hker : RingHom.ker π = Ideal.span {γ}) (Y : Matrix ι ι O
     split_ifs
     · exact one_mem O
     · exact zero_mem O
-  have hentry : ∀ i, ((Y' - 1) *ᵥ (Pi.single j 1 + (γ : F) • z)) i =
-      (cO i : F) + (γ : F) * ((Y' - 1) *ᵥ z) i := by
+  have hentry
+      : ∀ i,
+        ((Y' - 1) *ᵥ (Pi.single j 1 + (γ : F) • z)) i
+          = (cO i : F) + (γ : F) * ((Y' - 1) *ᵥ z) i := by
     intro i
     rw [Matrix.mulVec_add, Matrix.mulVec_smul, Pi.add_apply, Pi.smul_apply, smul_eq_mul, hcol,
       Finset.sum_apply]
@@ -64,7 +70,8 @@ theorem clause_iff (hker : RingHom.ker π = Ideal.span {γ}) (Y : Matrix ι ι O
         refine ⟨⟨zb i, hzb i⟩, ?_⟩
         have hne : i ≠ pos b := fun h => hi ⟨b, hb, h.symm⟩
         simp [hub, Pi.single_apply, hne]
-      | zero => exact ⟨0, by simp⟩
+      | zero =>
+        exact ⟨0, by simp⟩
       | add x y _ _ hx hy =>
         obtain ⟨c1, h1⟩ := hx
         obtain ⟨c2, h2⟩ := hy
@@ -78,8 +85,9 @@ theorem clause_iff (hker : RingHom.ker π = Ideal.span {γ}) (Y : Matrix ι ι O
     obtain ⟨c, hc⟩ := key W hW
     have hvi := congrFun hv i
     rw [hentry i, Pi.add_apply, Pi.smul_apply, smul_eq_mul, hc] at hvi
-    have hO : cO i = γ * ⟨(c : F) + z' i - ((Y' - 1) *ᵥ z) i,
-        sub_mem (add_mem c.2 (hz' i)) (hint i)⟩ := by
+    have hO
+        : cO i
+          = γ * ⟨(c : F) + z' i - ((Y' - 1) *ᵥ z) i, sub_mem (add_mem c.2 (hz' i)) (hint i)⟩ := by
       apply Subtype.ext
       show (cO i : F) = (γ : F) * ((c : F) + z' i - ((Y' - 1) *ᵥ z) i)
       linear_combination hvi
@@ -97,9 +105,15 @@ theorem clause_iff (hker : RingHom.ker π = Ideal.span {γ}) (Y : Matrix ι ι O
       split_ifs <;> simp
     choose dsel hdsel using hout
     choose zb hzb hub using hu
-    refine ⟨∑ i, (if h : i ∈ pos '' s then cO i • u (bsel i h) else 0), ?_,
+    refine ⟨
+      ∑ i, (if h : i ∈ pos '' s then cO i • u (bsel i h) else 0),
+      ?_,
       ∑ i, ((if h : i ∈ pos '' s then 0 else (dsel i h : F) • Pi.single i (1 : F)) -
-        (if h : i ∈ pos '' s then (cO i : F) • zb (bsel i h) else 0)) + (Y' - 1) *ᵥ z, ?_, ?_⟩
+        (if h : i ∈ pos '' s then (cO i : F) • zb (bsel i h) else 0))
+        + (Y' - 1) *ᵥ z,
+      ?_,
+      ?_
+    ⟩
     · refine _root_.sum_mem fun i _ => ?_
       split_ifs with h
       · exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨bsel i h, hbs i h, rfl⟩)
@@ -112,7 +126,8 @@ theorem clause_iff (hker : RingHom.ker π = Ideal.span {γ}) (Y : Matrix ι ι O
       · split_ifs with h
         · exact zero_mem O
         · rw [Pi.smul_apply, smul_eq_mul]
-          exact mul_mem (dsel i h).2 (by rw [Pi.single_apply]; split_ifs; exacts [one_mem O, zero_mem O])
+          exact mul_mem (dsel i h).2
+            (by rw [Pi.single_apply]; split_ifs; exacts [one_mem O, zero_mem O])
       · split_ifs with h
         · rw [Pi.smul_apply, smul_eq_mul]
           exact mul_mem (cO i).2 (hzb _ l)
@@ -122,7 +137,8 @@ theorem clause_iff (hker : RingHom.ker π = Ideal.span {γ}) (Y : Matrix ι ι O
       congr 1
       refine Finset.sum_congr rfl fun i _ => ?_
       by_cases h : i ∈ pos '' s
-      · simp only [h, dif_pos, hsm, hub, hpos i h, sub_zero, zero_sub, smul_add, smul_neg, smul_smul]
+      · simp only [h, dif_pos, hsm, hub, hpos i h, sub_zero, zero_sub, smul_add, smul_neg,
+          smul_smul]
         rw [mul_comm]
         abel
       · simp only [h, dif_neg, not_false_eq_true, sub_zero, zero_add, smul_smul]

@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Fla
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -32,13 +34,15 @@ lemma gtCoord_i_comp_q {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] [IsN
   have := g'.i_hom
   exact splitTorus_hom_proper_trivial_local _ D'.X _ _ inferInstance
 
-theorem unifPre_abelianPart_iso :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (I : Ideal R), AdmBase R I →
-      ∀ (D D' : DegData R I) (A A' : PolAV (Spec (CommRingCat.of (FractionRing R))))
-        (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G →
-        ∀ (U : UnifPre I D A G) (U' : UnifPre I D' A' G) (e : ℕ),
-          ∃ (β : thickObj R I e D'.toPre.P.A ≅ thickObj R I e D.toPre.P.A),
-            IsMonHom β.hom ∧ (U'.gt e).q ≫ β.hom = (U.gt e).q := by
+theorem unifPre_abelianPart_iso
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (I : Ideal R),
+      AdmBase R I
+        → ∀ (D D' : DegData R I) (A A' : PolAV (Spec (CommRingCat.of (FractionRing R))))
+            (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G],
+          IsSemiAbelian G
+            → ∀ (U : UnifPre I D A G) (U' : UnifPre I D' A' G) (e : ℕ),
+              ∃ (β : thickObj R I e D'.toPre.P.A ≅ thickObj R I e D.toPre.P.A),
+                IsMonHom β.hom ∧ (U'.gt e).q ≫ β.hom = (U.gt e).q := by
   intro R _ _ _ I hR D D' A A' G _ _ _ U U' e
   obtain ⟨hN, -, -, hC⟩ := hR
   have hI : I ≠ ⊤ := by

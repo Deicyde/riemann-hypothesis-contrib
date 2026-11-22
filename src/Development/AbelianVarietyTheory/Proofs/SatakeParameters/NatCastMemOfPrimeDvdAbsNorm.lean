@@ -5,12 +5,16 @@ public import Formalism.LocalToGlobal.KernelLattices.FirstKernelLawReading
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.L2.DIV Classical
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.L2.DIV Classical
 
 namespace GlobalTheory.KerTie
 
-theorem natCast_mem_of_prime_dvd_absNorm {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) {q : ℕ}
-    (hq : q.Prime) (h : q ∣ Ideal.absNorm P.asIdeal) : (q : 𝓞 E) ∈ P.asIdeal := by
+theorem natCast_mem_of_prime_dvd_absNorm
+    {E : Type} [Field E] [NumberField E]
+    (P : HeightOneSpectrum (𝓞 E))
+    {q : ℕ} (hq : q.Prime) (h : q ∣ Ideal.absNorm P.asIdeal)
+    : (q : 𝓞 E) ∈ P.asIdeal := by
   have : Fact q.Prime := ⟨hq⟩
   have := P.isPrime
   have : Finite (𝓞 E ⧸ P.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot P.asIdeal P.ne_bot
@@ -26,10 +30,12 @@ theorem natCast_mem_of_prime_dvd_absNorm {E : Type} [Field E] [NumberField E] (P
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
   exact h2
 
-theorem sNum_qOf_rowSG :
-    ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : G.Inst D L) (Gl : G.LatInst D) (K : G.Consts) (Y : DivX D) (cX : ExtraC)
-      (ex : Extra D L hT Gi Gl K Y cX) (t : KerEntTied ex),
-      ∀ u μ (P : rowSG t.Pr t.sel (t.tup μ)), SNum (t.O u μ).S (qOf P.1) := by
+theorem sNum_qOf_rowSG
+    : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : G.Inst D L) (Gl : G.LatInst D)
+        (K : G.Consts) (Y : DivX D) (cX : ExtraC) (ex : Extra D L hT Gi Gl K Y cX)
+        (t : KerEntTied ex),
+      ∀ u μ (P : rowSG t.Pr t.sel (t.tup μ)),
+        SNum (t.O u μ).S (qOf P.1) := by
   intro D L hT Gi Gl K Y cX ex t u μ P
   refine ⟨Nat.pos_of_ne_zero ?_, fun q hq hP => ?_⟩
   · simpa [Formalism.L2.Col.qOf, Ideal.absNorm_eq_zero_iff] using P.1.ne_bot

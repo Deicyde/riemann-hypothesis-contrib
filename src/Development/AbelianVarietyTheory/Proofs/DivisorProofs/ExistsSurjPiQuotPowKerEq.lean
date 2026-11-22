@@ -9,11 +9,15 @@ open TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_surj_pi_quot_pow_ker_eq {A M : Type} [CommRing A] [IsDedekindDomain A] [AddCommGroup M]
-    [Module A M] [Module.Finite A M] [Module.Projective A M] (P : Ideal A) :
-    P.IsMaximal → ∀ (r d : ℕ), Module.finrank A M = d →
-      ∃ g : M →ₗ[A] (Fin d → A ⧸ P ^ r), Function.Surjective g ∧
-        ∀ x, g x = 0 ↔ x ∈ (P ^ r) • (⊤ : Submodule A M) := by
+theorem exists_surj_pi_quot_pow_ker_eq
+    {A M : Type} [CommRing A] [IsDedekindDomain A] [AddCommGroup M] [Module A M] [Module.Finite A M]
+    [Module.Projective A M]
+    (P : Ideal A)
+    : P.IsMaximal
+      → ∀ (r d : ℕ),
+        Module.finrank A M = d
+          → ∃ g : M →ₗ[A] (Fin d → A ⧸ P ^ r),
+            Function.Surjective g ∧ ∀ x, g x = 0 ↔ x ∈ (P ^ r) • (⊤ : Submodule A M) := by
   intro hP r d hd
   rcases Nat.eq_zero_or_pos r with rfl | hr
   · refine ⟨0, ?_, ?_⟩
@@ -31,8 +35,8 @@ theorem exists_surj_pi_quot_pow_ker_eq {A M : Type} [CommRing A] [IsDedekindDoma
     exact hP.ne_top (eq_top_iff.mpr (h ▸ Ideal.pow_le_self hr.ne'))
   haveI : Nontrivial (A ⧸ P ^ r) := Ideal.Quotient.nontrivial_iff.2 hPr
   let Ap := Localization.AtPrime P
-  let φ : Ap →ₐ[A] A ⧸ P ^ r := IsLocalization.liftAlgHom (M := P.primeCompl)
-    (f := Ideal.Quotient.mkₐ A (P ^ r)) fun u ↦
+  let φ : Ap →ₐ[A] A ⧸ P ^ r :=
+    IsLocalization.liftAlgHom (M := P.primeCompl) (f := Ideal.Quotient.mkₐ A (P ^ r)) fun u ↦
       Ideal.Quotient.isUnit_mk_pow_of_notMem _ (Ideal.mem_primeCompl_iff.mp u.prop)
   letI : Algebra Ap (A ⧸ P ^ r) := φ.toRingHom.toAlgebra
   haveI : IsScalarTower A Ap (A ⧸ P ^ r) := IsScalarTower.of_algebraMap_eq fun a ↦ (φ.commutes a).symm
@@ -52,10 +56,10 @@ theorem exists_surj_pi_quot_pow_ker_eq {A M : Type} [CommRing A] [IsDedekindDoma
   let g : M →ₗ[A] (Fin d → A ⧸ P ^ r) :=
     (e.restrictScalars A).toLinearMap ∘ₗ TensorProduct.mk A (A ⧸ P ^ r) M 1
   refine ⟨g, ?_, ?_⟩
-  · exact e.surjective.comp (TensorProduct.mk_surjective A M (A ⧸ P ^ r) Ideal.Quotient.mk_surjective)
+  · exact e.surjective.comp (TensorProduct.mk_surjective A M (A ⧸ P ^ r)
+      Ideal.Quotient.mk_surjective)
   · intro x
-    have h1 : g x = 0 ↔ (1 : A ⧸ P ^ r) ⊗ₜ[A] x = 0 := by
-      simp [g, e.map_eq_zero_iff]
+    have h1 : g x = 0 ↔ (1 : A ⧸ P ^ r) ⊗ₜ[A] x = 0 := by simp [g, e.map_eq_zero_iff]
     rw [h1, ← (quotTensorEquivQuotSMul M (P ^ r)).map_eq_zero_iff]
     have h2 : (1 : A ⧸ P ^ r) = Ideal.Quotient.mk (P ^ r) 1 := rfl
     rw [h2, quotTensorEquivQuotSMul_mk_tmul, one_smul, Submodule.Quotient.mk_eq_zero]

@@ -13,16 +13,20 @@ open GlobalTheory.PhiGam
 section
 variable (k : Type) [Field k]
 
-theorem algebraMap_eq (c : k) : algebraMap k k⸨X⸩ c = HahnSeries.C c := by rw [HahnSeries.algebraMap_apply', ← HahnSeries.ofPowerSeries_C]; rfl
+theorem algebraMap_eq (c : k) : algebraMap k k⸨X⸩ c = HahnSeries.C c := by
+  rw [HahnSeries.algebraMap_apply', ← HahnSeries.ofPowerSeries_C]; rfl
 
-theorem smul_eq (c : k) (x : k⸨X⸩) : c • x = algebraMap k k⸨X⸩ c * x := by rw [algebraMap_eq, HahnSeries.C_mul_eq_smul]
+theorem smul_eq (c : k) (x : k⸨X⸩) : c • x = algebraMap k k⸨X⸩ c * x := by
+  rw [algebraMap_eq, HahnSeries.C_mul_eq_smul]
 
-instance towerA : IsScalarTower k k⸨X⸩ k⸨X⸩ := ⟨fun c x y => by
-  rw [smul_eq, smul_eq k c, smul_eq_mul, smul_eq_mul, mul_assoc]⟩
+instance towerA : IsScalarTower k k⸨X⸩ k⸨X⸩ :=
+  ⟨fun c x y => by rw [smul_eq, smul_eq k c, smul_eq_mul, smul_eq_mul, mul_assoc]⟩
 
-instance towerB : IsScalarTower k k⟦X⟧ k⸨X⸩ := ⟨fun c a y => by
-  rw [smul_eq k c, Algebra.smul_def (c • a), Algebra.smul_def a, Algebra.smul_def c, map_mul, mul_assoc]
-  rfl⟩
+instance towerB : IsScalarTower k k⟦X⟧ k⸨X⸩ :=
+  ⟨fun c a y => by
+    rw [smul_eq k c, Algebra.smul_def (c • a), Algebra.smul_def a, Algebra.smul_def c, map_mul,
+      mul_assoc]
+    rfl⟩
 
 end
 
@@ -34,10 +38,11 @@ end
 section
 variable {k : Type} [Field k]
 
-theorem gmult_top_bot {U : Type} [AddCommGroup U] [Module k U] (T : Module.End k U) (x : k) :
-    gmult T ⊤ ⊥ x = Module.finrank k (T.maxGenEigenspace x) := by
-  have hS : (⨆ m : ℕ, (⊥ : Submodule k U).comap ((T - algebraMap k (Module.End k U) x) ^ m))
-      = T.maxGenEigenspace x := by
+theorem gmult_top_bot {U : Type} [AddCommGroup U] [Module k U] (T : Module.End k U) (x : k)
+    : gmult T ⊤ ⊥ x = Module.finrank k (T.maxGenEigenspace x) := by
+  have hS
+      : (⨆ m : ℕ, (⊥ : Submodule k U).comap ((T - algebraMap k (Module.End k U) x) ^ m))
+        = T.maxGenEigenspace x := by
     apply le_antisymm
     · refine iSup_le fun m y hy => ?_
       rw [Submodule.mem_comap, Submodule.mem_bot, Algebra.algebraMap_eq_smul_one] at hy

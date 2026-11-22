@@ -28,16 +28,21 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.HasseN
 @[expose] public section
 
 open NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Dict
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Dict
 open GlobalTheory.SW hiding Level
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.AdTh
 variable {D : D7} {r g : ℕ}
 
-theorem isMod_of (W : HSp D) (hr : W.rank = r) (X : Data D.host.E r) (hm : Formalism.L2.Pj.ModelW W hr X)
-    (hp : ∀ ρ, tauE D ρ ∈ X.Ψ) : IsMod W hr X := by
+theorem isMod_of
+    (W : HSp D) (hr : W.rank = r)
+    (X : Data D.host.E r) (hm : Formalism.L2.Pj.ModelW W hr X) (hp : ∀ ρ, tauE D ρ ∈ X.Ψ)
+    : IsMod W hr X := by
   have hpsi : ∀ τ : D.host.E →+* ℂ, τ ∈ X.Ψ ↔ ∃ ρ, τ = tauE D ρ := by
     intro τ
     refine ⟨fun h => ?_, fun ⟨ρ, h⟩ => h ▸ hp ρ⟩

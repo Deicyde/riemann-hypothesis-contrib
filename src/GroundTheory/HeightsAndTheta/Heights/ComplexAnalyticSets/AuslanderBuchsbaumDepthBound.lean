@@ -16,10 +16,11 @@ universe u
 
 variable {R : Type u} [CommRing R]
 
-theorem exists_ne_zero_mul_eq_zero_of_forall_not_isSMulRegular [IsLocalRing R] [IsNoetherianRing R]
-    (h : ∀ y ∈ maximalIdeal R, ¬ IsSMulRegular R y) :
-    ∃ s : R, s ≠ 0 ∧ ∀ a ∈ maximalIdeal R, a * s = 0 := by
-  have hmk : ∀ y : R, y • (1 : R ⧸ maximalIdeal R) = Ideal.Quotient.mk (maximalIdeal R) y := fun y ↦ by
+theorem exists_ne_zero_mul_eq_zero_of_forall_not_isSMulRegular
+    [IsLocalRing R] [IsNoetherianRing R] (h : ∀ y ∈ maximalIdeal R, ¬ IsSMulRegular R y)
+    : ∃ s : R, s ≠ 0 ∧ ∀ a ∈ maximalIdeal R, a * s = 0 := by
+  have hmk
+      : ∀ y : R, y • (1 : R ⧸ maximalIdeal R) = Ideal.Quotient.mk (maximalIdeal R) y := fun y ↦ by
     rw [Algebra.smul_def, mul_one, Ideal.Quotient.algebraMap_eq]
   have hns : ¬ Subsingleton ((R ⧸ maximalIdeal R) →ₗ[R] R) := by
     rw [IsSMulRegular.subsingleton_linearMap_iff]
@@ -34,22 +35,29 @@ theorem exists_ne_zero_mul_eq_zero_of_forall_not_isSMulRegular [IsLocalRing R] [
     rw [← hmk, map_smul, h0, smul_zero, LinearMap.zero_apply]
   · rw [← smul_eq_mul, ← map_smul, hmk, Ideal.Quotient.eq_zero_iff_mem.mpr ha, map_zero]
 
-theorem hasProjectiveDimensionLE_zero_of_forall_not_isSMulRegular [IsLocalRing R] [IsNoetherianRing R]
-    (h : ∀ y ∈ maximalIdeal R, ¬ IsSMulRegular R y) (M : Type u) [AddCommGroup M] [Module R M]
-    [Module.Finite R M] (k : ℕ) (hM : HasProjectiveDimensionLT (ModuleCat.of R M) (k + 1)) :
-    HasProjectiveDimensionLE (ModuleCat.of R M) 0 := by
+theorem hasProjectiveDimensionLE_zero_of_forall_not_isSMulRegular
+    [IsLocalRing R] [IsNoetherianRing R]
+    (h : ∀ y ∈ maximalIdeal R, ¬ IsSMulRegular R y)
+    (M : Type u) [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (k : ℕ) (hM : HasProjectiveDimensionLT (ModuleCat.of R M) (k + 1))
+    : HasProjectiveDimensionLE (ModuleCat.of R M) 0 := by
   obtain ⟨s, hs, hms⟩ := exists_ne_zero_mul_eq_zero_of_forall_not_isSMulRegular h
-  have : Module.Free R M := GroundTheory.Arith.SchemeCoh.free_of_hasProjectiveDimensionLT_of_mul_eq_zero hs hms k M hM
-  exact (projective_iff_hasProjectiveDimensionLE_zero _).mp (by
-    rw [← IsProjective.iff_projective]; infer_instance)
+  have : Module.Free R M :=
+    GroundTheory.Arith.SchemeCoh.free_of_hasProjectiveDimensionLT_of_mul_eq_zero hs hms k M hM
+  exact (projective_iff_hasProjectiveDimensionLE_zero _).mp
+    (by rw [← IsProjective.iff_projective]; infer_instance)
 
-theorem hasProjectiveDimensionLT_of_quotSMulTop [IsLocalRing R] [IsNoetherianRing R] {x : R}
-    (hx : x ∈ maximalIdeal R) (hxR : IsSMulRegular R x) (k : ℕ) (M : Type u) [AddCommGroup M]
-    [Module R M] [Module.Finite R M] (hxM : IsSMulRegular M x)
-    (hM : HasProjectiveDimensionLT (ModuleCat.of (R ⧸ span {x}) (QuotSMulTop x M)) (k + 1)) :
-    HasProjectiveDimensionLT (ModuleCat.of R M) (k + 1) := by
-  have hne : span {x} ≠ ⊤ := fun h ↦ (IsLocalRing.maximalIdeal.isMaximal R).ne_top
-    (top_le_iff.mp (h ▸ (span_singleton_le_iff_mem _).mpr hx))
+theorem hasProjectiveDimensionLT_of_quotSMulTop
+    [IsLocalRing R] [IsNoetherianRing R]
+    {x : R} (hx : x ∈ maximalIdeal R) (hxR : IsSMulRegular R x)
+    (k : ℕ)
+    (M : Type u) [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (hxM : IsSMulRegular M x)
+    (hM : HasProjectiveDimensionLT (ModuleCat.of (R ⧸ span {x}) (QuotSMulTop x M)) (k + 1))
+    : HasProjectiveDimensionLT (ModuleCat.of R M) (k + 1) := by
+  have hne : span {x} ≠ ⊤ := fun h ↦
+    (IsLocalRing.maximalIdeal.isMaximal R).ne_top
+      (top_le_iff.mp (h ▸ (span_singleton_le_iff_mem _).mpr hx))
   have : Nontrivial (R ⧸ span {x}) := Ideal.Quotient.nontrivial_iff.mpr hne
   have : IsLocalRing (R ⧸ span {x}) := .of_surjective' _ Ideal.Quotient.mk_surjective
   induction k generalizing M with
@@ -61,7 +69,8 @@ theorem hasProjectiveDimensionLT_of_quotSMulTop [IsLocalRing R] [IsNoetherianRin
     have hfree : Module.Free (R ⧸ span {x}) (QuotSMulTop x M) := Module.free_of_flat_of_isLocalRing
     have := Module.finitePresentation_of_finite R M
     have : Module.Free R M :=
-      (Module.free_quotSMulTop_iff_free R M (IsLocalRing.ringJacobson_eq_maximalIdeal R ▸ hx) hxM).mp hfree
+      (Module.free_quotSMulTop_iff_free R M (IsLocalRing.ringJacobson_eq_maximalIdeal R ▸ hx)
+        hxM).mp hfree
     infer_instance
   | succ k ih =>
     obtain ⟨n, π, hπ⟩ := Module.Finite.exists_fin' R M
@@ -86,7 +95,8 @@ theorem hasProjectiveDimensionLT_of_quotSMulTop [IsLocalRing R] [IsNoetherianRin
       obtain ⟨y, rfl⟩ := Submodule.mkQ_surjective _ y
       rw [LinearMap.mem_ker] at hy
       simp only [f₁, Submodule.mkQ_apply, QuotSMulTop.map_apply_mk, Submodule.Quotient.mk_eq_zero,
-        Submodule.mem_smul_pointwise_iff_exists] at hy
+          Submodule.mem_smul_pointwise_iff_exists]
+        at hy
       obtain ⟨b, -, hb⟩ := hy
       have hπb : π b = 0 := by
         apply hxM
@@ -98,20 +108,22 @@ theorem hasProjectiveDimensionLT_of_quotSMulTop [IsLocalRing R] [IsNoetherianRin
       exact ⟨⟨b, hπb⟩, Submodule.mem_top, Subtype.ext hb⟩
     let g₁ := f₁.extendScalarsOfSurjective (Ideal.Quotient.mk_surjective (I := span {x}))
     let g₂ := f₂.extendScalarsOfSurjective (Ideal.Quotient.mk_surjective (I := span {x}))
-    let T := ModuleCat.shortComplexOfCompEqZero g₁ g₂
-      (LinearMap.ext fun y ↦ ex.apply_apply_eq_zero y)
+    let T :=
+      ModuleCat.shortComplexOfCompEqZero g₁ g₂ (LinearMap.ext fun y ↦ ex.apply_apply_eq_zero y)
     have hT : T.ShortExact := ModuleCat.shortComplex_shortExact T ex inj surj
-    have hproj2 : Projective T.X₂ := by
-      rw [← IsProjective.iff_projective]; infer_instance
+    have hproj2 : Projective T.X₂ := by rw [← IsProjective.iff_projective]; infer_instance
     have hK' : HasProjectiveDimensionLT (ModuleCat.of (R ⧸ span {x}) (QuotSMulTop x K)) (k + 1) :=
       (hT.hasProjectiveDimensionLT_X₃_iff k hproj2).mp hM
     exact (hS.hasProjectiveDimensionLT_X₃_iff k hproj).mpr (ih K hxK hK')
 
-theorem length_le_of_isWeaklyRegular_quotient_span_singleton [IsLocalRing R] {x : R}
-    (hx : x ∈ maximalIdeal R) (hxR : IsSMulRegular R x) [IsLocalRing (R ⧸ span {x})] (d : ℕ)
+theorem length_le_of_isWeaklyRegular_quotient_span_singleton
+    [IsLocalRing R]
+    {x : R} (hx : x ∈ maximalIdeal R) (hxR : IsSMulRegular R x) [IsLocalRing (R ⧸ span {x})]
+    (d : ℕ)
     (hd : ∀ rs : List R, (∀ r ∈ rs, r ∈ maximalIdeal R) → IsWeaklyRegular R rs → rs.length ≤ d + 1)
-    (rs : List (R ⧸ span {x})) (hrs : ∀ r ∈ rs, r ∈ maximalIdeal (R ⧸ span {x}))
-    (hreg : IsWeaklyRegular (R ⧸ span {x}) rs) : rs.length ≤ d := by
+    (rs : List (R ⧸ span {x}))
+    (hrs : ∀ r ∈ rs, r ∈ maximalIdeal (R ⧸ span {x})) (hreg : IsWeaklyRegular (R ⧸ span {x}) rs)
+    : rs.length ≤ d := by
   let lift : R ⧸ span {x} → R := Function.surjInv Ideal.Quotient.mk_surjective
   have hlift : ∀ b, Ideal.Quotient.mk (span {x}) (lift b) = b :=
     Function.surjInv_eq Ideal.Quotient.mk_surjective
@@ -121,8 +133,9 @@ theorem length_le_of_isWeaklyRegular_quotient_span_singleton [IsLocalRing R] {x 
     exact List.map_congr_left fun b _ ↦ by simp [Ideal.Quotient.algebraMap_eq, hlift]
   have hloc : IsLocalHom (Ideal.Quotient.mk (span {x})) :=
     IsLocalHom.of_surjective _ Ideal.Quotient.mk_surjective
-  have hcomap : (maximalIdeal (R ⧸ span {x})).comap (Ideal.Quotient.mk (span {x})) =
-      maximalIdeal R := IsLocalRing.maximalIdeal_comap _
+  have hcomap
+      : (maximalIdeal (R ⧸ span {x})).comap (Ideal.Quotient.mk (span {x})) = maximalIdeal R :=
+    IsLocalRing.maximalIdeal_comap _
   have hmem : ∀ r ∈ x :: rs.map lift, r ∈ maximalIdeal R := by
     intro r hr
     rcases List.mem_cons.mp hr with rfl | hr
@@ -131,8 +144,8 @@ theorem length_le_of_isWeaklyRegular_quotient_span_singleton [IsLocalRing R] {x 
       rw [← hcomap, Ideal.mem_comap, hlift]
       exact hrs b hb
   have e : (R ⧸ span {x}) ≃ₗ[R] QuotSMulTop x R :=
-    Submodule.quotEquivOfEq _ _ (by
-      rw [← Submodule.ideal_span_singleton_smul, smul_eq_mul, Ideal.mul_top])
+    Submodule.quotEquivOfEq _ _
+      (by rw [← Submodule.ideal_span_singleton_smul, smul_eq_mul, Ideal.mul_top])
   have hreg' : IsWeaklyRegular R (x :: rs.map lift) := by
     rw [isWeaklyRegular_cons_iff]
     refine ⟨hxR, (e.isWeaklyRegular_congr _).mp ?_⟩
@@ -142,12 +155,12 @@ theorem length_le_of_isWeaklyRegular_quotient_span_singleton [IsLocalRing R] {x 
   simp only [List.length_cons, List.length_map] at this
   omega
 
-theorem hasProjectiveDimensionLE_of_forall_isWeaklyRegular_length_le (d : ℕ) :
-    ∀ (R : Type u) [CommRing R] [IsLocalRing R] [IsNoetherianRing R],
-      (∀ rs : List R, (∀ r ∈ rs, r ∈ maximalIdeal R) → IsWeaklyRegular R rs → rs.length ≤ d) →
-      ∀ (M : Type u) [AddCommGroup M] [Module R M] [Module.Finite R M] (k : ℕ),
-        HasProjectiveDimensionLT (ModuleCat.of R M) (k + 1) →
-          HasProjectiveDimensionLE (ModuleCat.of R M) d := by
+theorem hasProjectiveDimensionLE_of_forall_isWeaklyRegular_length_le (d : ℕ)
+    : ∀ (R : Type u) [CommRing R] [IsLocalRing R] [IsNoetherianRing R],
+      (∀ rs : List R, (∀ r ∈ rs, r ∈ maximalIdeal R) → IsWeaklyRegular R rs → rs.length ≤ d)
+        → ∀ (M : Type u) [AddCommGroup M] [Module R M] [Module.Finite R M] (k : ℕ),
+          HasProjectiveDimensionLT (ModuleCat.of R M) (k + 1)
+            → HasProjectiveDimensionLE (ModuleCat.of R M) d := by
   induction d with
   | zero =>
     intro R _ _ _ hd M _ _ _ k hM
@@ -162,8 +175,9 @@ theorem hasProjectiveDimensionLE_of_forall_isWeaklyRegular_length_le (d : ℕ) :
       have := hasProjectiveDimensionLE_zero_of_forall_not_isSMulRegular hex M k hM
       exact hasProjectiveDimensionLT_of_ge _ (0 + 1) (d + 1 + 1) (by omega)
     obtain ⟨x, hx, hxR⟩ := hex
-    have hne : span {x} ≠ ⊤ := fun h ↦ (IsLocalRing.maximalIdeal.isMaximal R).ne_top
-      (top_le_iff.mp (h ▸ (span_singleton_le_iff_mem _).mpr hx))
+    have hne : span {x} ≠ ⊤ := fun h ↦
+      (IsLocalRing.maximalIdeal.isMaximal R).ne_top
+        (top_le_iff.mp (h ▸ (span_singleton_le_iff_mem _).mpr hx))
     have : Nontrivial (R ⧸ span {x}) := Ideal.Quotient.nontrivial_iff.mpr hne
     have : IsLocalRing (R ⧸ span {x}) := .of_surjective' _ Ideal.Quotient.mk_surjective
     have hd' := length_le_of_isWeaklyRegular_quotient_span_singleton hx hxR d hd

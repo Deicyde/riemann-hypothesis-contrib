@@ -10,18 +10,21 @@ section SlopeTestRemainingChoices
 
 variable {A X : Type} [CommRing A] [CommRing X] [Algebra A X] {n a : ℕ}
 
-private theorem od_iff (Y : Matrix (Fin n) (Fin n) X) :
-    Y ∈ Od A X n a ↔ ∀ i j : Fin n, (((i : ℕ) < a) ↔ ((j : ℕ) < a)) → Y i j = 0 :=
-  ⟨fun h i j e => (Submodule.mem_bot A).1 ((h i j).1 e),
-    fun h i j => ⟨fun e => (Submodule.mem_bot A).2 (h i j e), fun _ => Submodule.mem_top⟩⟩
+private theorem od_iff (Y : Matrix (Fin n) (Fin n) X)
+    : Y ∈ Od A X n a ↔ ∀ i j : Fin n, (((i : ℕ) < a) ↔ ((j : ℕ) < a)) → Y i j = 0 := ⟨
+  fun h i j e => (Submodule.mem_bot A).1 ((h i j).1 e),
+  fun h i j => ⟨fun e => (Submodule.mem_bot A).2 (h i j e), fun _ => Submodule.mem_top⟩
+⟩
 
-private theorem ev_iff (Y : Matrix (Fin n) (Fin n) X) :
-    Y ∈ Ev A X n a ↔ ∀ i j : Fin n, ¬ (((i : ℕ) < a) ↔ ((j : ℕ) < a)) → Y i j = 0 :=
-  ⟨fun h i j e => (Submodule.mem_bot A).1 ((h i j).2 e),
-    fun h i j => ⟨fun _ => Submodule.mem_top, fun e => (Submodule.mem_bot A).2 (h i j e)⟩⟩
+private theorem ev_iff (Y : Matrix (Fin n) (Fin n) X)
+    : Y ∈ Ev A X n a ↔ ∀ i j : Fin n, ¬(((i : ℕ) < a) ↔ ((j : ℕ) < a)) → Y i j = 0 := ⟨
+  fun h i j e => (Submodule.mem_bot A).1 ((h i j).2 e),
+  fun h i j => ⟨fun _ => Submodule.mem_top, fun e => (Submodule.mem_bot A).2 (h i j e)⟩
+⟩
 
-private theorem ev_mul_od {E Y : Matrix (Fin n) (Fin n) X} (hE : E ∈ Ev A X n a) (hY : Y ∈ Od A X n a) :
-    E * Y ∈ Od A X n a := by
+private theorem ev_mul_od
+    {E Y : Matrix (Fin n) (Fin n) X} (hE : E ∈ Ev A X n a) (hY : Y ∈ Od A X n a)
+    : E * Y ∈ Od A X n a := by
   rw [od_iff] at hY ⊢
   rw [ev_iff] at hE
   intro i j e
@@ -31,8 +34,9 @@ private theorem ev_mul_od {E Y : Matrix (Fin n) (Fin n) X} (hE : E ∈ Ev A X n 
   · rw [hY k j (h.symm.trans e), mul_zero]
   · rw [hE i k h, zero_mul]
 
-private theorem od_mul_ev {E Y : Matrix (Fin n) (Fin n) X} (hE : E ∈ Ev A X n a) (hY : Y ∈ Od A X n a) :
-    Y * E ∈ Od A X n a := by
+private theorem od_mul_ev
+    {E Y : Matrix (Fin n) (Fin n) X} (hE : E ∈ Ev A X n a) (hY : Y ∈ Od A X n a)
+    : Y * E ∈ Od A X n a := by
   rw [od_iff] at hY ⊢
   rw [ev_iff] at hE
   intro i j e
@@ -42,20 +46,27 @@ private theorem od_mul_ev {E Y : Matrix (Fin n) (Fin n) X} (hE : E ∈ Ev A X n 
   · rw [hY i k (e.trans h.symm), zero_mul]
   · rw [hE k j h, mul_zero]
 
-private theorem ev_map {E : Matrix (Fin n) (Fin n) A} (hE : E ∈ Ev A A n a) :
-    E.map (algebraMap A X) ∈ Ev A X n a := by
+private theorem ev_map {E : Matrix (Fin n) (Fin n) A} (hE : E ∈ Ev A A n a)
+    : E.map (algebraMap A X) ∈ Ev A X n a := by
   rw [ev_iff] at hE ⊢
   intro i j h
   simp [Matrix.map_apply, hE i j h]
 
-private theorem comm_span {M : Type} [AddCommGroup M] (φ : Od A X n a →+ M) (S : Set (Matrix (Fin n) (Fin n) A))
-    (hS : ∀ E ∈ S, E ∈ Ev A A n a ∧ ∀ Y Y₁ Y₂ : Od A X n a,
-      (Y₁ : Matrix (Fin n) (Fin n) X) = E.map (algebraMap A X) * Y →
-      (Y₂ : Matrix (Fin n) (Fin n) X) = Y * E.map (algebraMap A X) → φ Y₁ = φ Y₂)
-    (R : Matrix (Fin n) (Fin n) A) (hR : R ∈ Submodule.span A S) :
-    R ∈ Ev A A n a ∧ ∀ Y Y₁ Y₂ : Od A X n a,
-      (Y₁ : Matrix (Fin n) (Fin n) X) = R.map (algebraMap A X) * Y →
-      (Y₂ : Matrix (Fin n) (Fin n) X) = Y * R.map (algebraMap A X) → φ Y₁ = φ Y₂ := by
+private theorem comm_span
+    {M : Type} [AddCommGroup M]
+    (φ : Od A X n a →+ M) (S : Set (Matrix (Fin n) (Fin n) A))
+    (hS : ∀ E ∈ S,
+      E ∈ Ev A A n a
+        ∧ ∀ Y Y₁ Y₂ : Od A X n a,
+          (Y₁ : Matrix (Fin n) (Fin n) X) = E.map (algebraMap A X) * Y
+            → (Y₂ : Matrix (Fin n) (Fin n) X) = Y * E.map (algebraMap A X)
+            → φ Y₁ = φ Y₂)
+    (R : Matrix (Fin n) (Fin n) A) (hR : R ∈ Submodule.span A S)
+    : R ∈ Ev A A n a
+      ∧ ∀ Y Y₁ Y₂ : Od A X n a,
+        (Y₁ : Matrix (Fin n) (Fin n) X) = R.map (algebraMap A X) * Y
+          → (Y₂ : Matrix (Fin n) (Fin n) X) = Y * R.map (algebraMap A X)
+          → φ Y₁ = φ Y₂ := by
   induction hR using Submodule.span_induction with
   | mem x hx => exact hS x hx
   | zero =>
@@ -80,15 +91,15 @@ private theorem comm_span {M : Type} [AddCommGroup M] (φ : Od A X n a →+ M) (
     apply hx.2 (c • Y) Y₁ Y₂
     · rw [h₁]
       ext i j
-      simp only [Matrix.mul_apply, Matrix.map_apply, Matrix.smul_apply, Submodule.coe_smul, smul_eq_mul,
-        map_mul]
+      simp only [Matrix.mul_apply, Matrix.map_apply, Matrix.smul_apply, Submodule.coe_smul,
+        smul_eq_mul, map_mul]
       simp only [Algebra.smul_def]
       refine Finset.sum_congr rfl fun k _ => ?_
       ring
     · rw [h₂]
       ext i j
-      simp only [Matrix.mul_apply, Matrix.map_apply, Matrix.smul_apply, Submodule.coe_smul, smul_eq_mul,
-        map_mul]
+      simp only [Matrix.mul_apply, Matrix.map_apply, Matrix.smul_apply, Submodule.coe_smul,
+        smul_eq_mul, map_mul]
       simp only [Algebra.smul_def]
       refine Finset.sum_congr rfl fun k _ => ?_
       ring
@@ -104,15 +115,20 @@ private theorem first_raising_mem_equivariant : e1 X n a ∈ Ev A X n a := by
     exact h Iff.rfl
   simp [e1, Matrix.diagonal_apply_ne _ hij]
 
-private theorem kill {M : Type} [AddCommGroup M] (φ : Od A X n a →+ M) (c : A)
+private theorem kill
+    {M : Type} [AddCommGroup M]
+    (φ : Od A X n a →+ M) (c : A)
     (h : ∀ Y Y₁ Y₂ : Od A X n a,
-      (Y₁ : Matrix (Fin n) (Fin n) X) = (c • e1 A n a).map (algebraMap A X) * Y →
-      (Y₂ : Matrix (Fin n) (Fin n) X) = Y * (c • e1 A n a).map (algebraMap A X) → φ Y₁ = φ Y₂)
-    (Y : Od A X n a) : φ (c • Y) = 0 := by
+      (Y₁ : Matrix (Fin n) (Fin n) X) = (c • e1 A n a).map (algebraMap A X) * Y
+        → (Y₂ : Matrix (Fin n) (Fin n) X) = Y * (c • e1 A n a).map (algebraMap A X)
+        → φ Y₁ = φ Y₂)
+    (Y : Od A X n a)
+    : φ (c • Y) = 0 := by
   have hY := (od_iff (Y : Matrix (Fin n) (Fin n) X)).1 Y.2
   let U : Od A X n a := ⟨e1 X n a * Y, ev_mul_od (first_raising_mem_equivariant (A := A)) Y.2⟩
   let W : Od A X n a := ⟨Y * e1 X n a, od_mul_ev (first_raising_mem_equivariant (A := A)) Y.2⟩
-  let dc : Matrix (Fin n) (Fin n) X := diagonal fun i : Fin n => if (i : ℕ) < a then algebraMap A X c else 0
+  let dc : Matrix (Fin n) (Fin n) X :=
+    diagonal fun i : Fin n => if (i : ℕ) < a then algebraMap A X c else 0
   have hm : (c • e1 A n a).map (algebraMap A X) = dc := by
     ext i j
     by_cases hij : i = j
@@ -168,9 +184,10 @@ private theorem kill {M : Type} [AddCommGroup M] (φ : Od A X n a →+ M) (c : A
 private noncomputable def pol {K : Type} [Field K] {s : ℕ} (c : Fin s → K) : PowerSeries K :=
   PowerSeries.mk fun k => if h : k < s then c ⟨k, h⟩ else 0
 
-private theorem pol_spec {K : Type} [Field K] (s : ℕ) (b : PowerSeries K) :
-    ∃ (c : Fin s → K) (d : PowerSeries K), b = pol c + PowerSeries.X ^ s * d := by
-  refine ⟨fun k => PowerSeries.coeff (k : ℕ) b, PowerSeries.mk fun k => PowerSeries.coeff (k + s) b, ?_⟩
+private theorem pol_spec {K : Type} [Field K] (s : ℕ) (b : PowerSeries K)
+    : ∃ (c : Fin s → K) (d : PowerSeries K), b = pol c + PowerSeries.X ^ s * d := by
+  refine
+    ⟨fun k => PowerSeries.coeff (k : ℕ) b, PowerSeries.mk fun k => PowerSeries.coeff (k + s) b, ?_⟩
   ext k
   rw [map_add (f := _), PowerSeries.coeff_X_pow_mul', pol, PowerSeries.coeff_mk]
   by_cases hk : k < s
@@ -178,20 +195,24 @@ private theorem pol_spec {K : Type} [Field K] (s : ℕ) (b : PowerSeries K) :
   · have hle : s ≤ k := Nat.le_of_not_lt hk
     simp [hk, hle, PowerSeries.coeff_mk, Nat.sub_add_cancel hle]
 
-private def odOf (a : ℕ) (Z : Fin n → Fin n → A) : Od A X n a :=
-  ⟨Matrix.of fun i j => if (((i : ℕ) < a) ↔ ((j : ℕ) < a)) then 0 else algebraMap A X (Z i j),
-    (od_iff _).2 fun i j e => by simp [e]⟩
+private def odOf (a : ℕ) (Z : Fin n → Fin n → A) : Od A X n a := ⟨
+  Matrix.of fun i j => if (((i : ℕ) < a) ↔ ((j : ℕ) < a)) then 0 else algebraMap A X (Z i j),
+  (od_iff _).2 fun i j e => by simp [e]
+⟩
 
-private theorem od_dec {K : Type} [Field K] {X : Type} [CommRing X] [Algebra (PowerSeries K) X]
-    (hX : Function.Surjective (algebraMap (PowerSeries K) X)) (s : ℕ) (Y : Od (PowerSeries K) X n a) :
-    ∃ (c : Fin n → Fin n → Fin s → K) (Y' : Od (PowerSeries K) X n a),
+private theorem od_dec
+    {K : Type} [Field K]
+    {X : Type} [CommRing X] [Algebra (PowerSeries K) X]
+    (hX : Function.Surjective (algebraMap (PowerSeries K) X)) (s : ℕ) (Y : Od (PowerSeries K) X n a)
+    : ∃ (c : Fin n → Fin n → Fin s → K) (Y' : Od (PowerSeries K) X n a),
       Y = odOf a (fun i j => pol (c i j)) + (PowerSeries.X : PowerSeries K) ^ s • Y' := by
   choose b hb using fun i j => hX ((Y : Matrix (Fin n) (Fin n) X) i j)
   choose c d hcd using fun i j => pol_spec (K := K) s (b i j)
   refine ⟨c, odOf (A := PowerSeries K) (X := X) a d, ?_⟩
   apply Subtype.ext
   ext i j
-  simp only [odOf, Submodule.coe_add, Submodule.coe_smul, Matrix.add_apply, Matrix.smul_apply, Matrix.of_apply]
+  simp only [odOf, Submodule.coe_add, Submodule.coe_smul, Matrix.add_apply, Matrix.smul_apply,
+    Matrix.of_apply]
   by_cases hij : ((i : ℕ) < a ↔ (j : ℕ) < a)
   · simp [hij, (od_iff _).1 Y.2 i j hij]
   · simp only [hij, if_false]
@@ -199,11 +220,13 @@ private theorem od_dec {K : Type} [Field K] {X : Type} [CommRing X] [Algebra (Po
 
 end SlopeTestRemainingChoices
 
-private theorem card_zmod_nsmul_eq_zero_le (l : ℕ) [Fact l.Prime] (N : ℕ) (hN : 0 < N) :
-    Nat.card {y : ZMod l // N • y = 0} ≤ N := by
+private theorem card_zmod_nsmul_eq_zero_le (l : ℕ) [Fact l.Prime] (N : ℕ) (hN : 0 < N)
+    : Nat.card {y : ZMod l // N • y = 0} ≤ N := by
   by_cases hd : (N : ZMod l) = 0
   · have hdvd : l ∣ N := (ZMod.natCast_eq_zero_iff N l).mp hd
-    calc Nat.card {y : ZMod l // N • y = 0} ≤ Nat.card (ZMod l) := Finite.card_subtype_le _
+    calc
+      Nat.card {y : ZMod l // N • y = 0}
+        ≤ Nat.card (ZMod l) := Finite.card_subtype_le _
       _ = l := Nat.card_zmod l
       _ ≤ N := Nat.le_of_dvd hN hdvd
   · have hsub : Subsingleton {y : ZMod l // N • y = 0} := by
@@ -215,14 +238,17 @@ private theorem card_zmod_nsmul_eq_zero_le (l : ℕ) [Fact l.Prime] (N : ℕ) (h
       exact Subtype.ext (hy0.trans hz0.symm)
     exact (Finite.card_le_one_iff_subsingleton.mpr hsub).trans hN
 
-private theorem f_symm_eq_of_left_right_mul_mat {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} (hom : G.Hom G0) {n : ℕ}
-    (x : NP G0.frame n) (e : ℕ) (D : Dat x.A (plOf G)) (hD : IsOd hom x (x.Am e) D)
-    (f : D.M.X →+ ZMod l)
+private theorem f_symm_eq_of_left_right_mul_mat
+    {l : ℕ} [Fact l.Prime]
+    {L : Loc} {G G0 : Glob l L} (hom : G.Hom G0)
+    {n : ℕ} (x : NP G0.frame n)
+    (e : ℕ) (D : Dat x.A (plOf G)) (hD : IsOd hom x (x.Am e) D) (f : D.M.X →+ ZMod l)
     (hf : ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m)
-    (g' : G0.frame.G₀) (hg' : g' ∈ G0.frame.G') (Y Y₁ Y₂ : Od x.A (x.Am e) n x.a)
+    (g' : G0.frame.G₀) (hg' : g' ∈ G0.frame.G')
+    (Y Y₁ Y₂ : Od x.A (x.Am e) n x.a)
     (h₁ : (Y₁ : Matrix (Fin n) (Fin n) (x.Am e)) = (mat x.ρ g').map (algebraMap x.A (x.Am e)) * Y)
-    (h₂ : (Y₂ : Matrix (Fin n) (Fin n) (x.Am e)) = Y * (mat x.ρ g').map (algebraMap x.A (x.Am e))) :
-    f (hD.e.symm Y₁) = f (hD.e.symm Y₂) := by
+    (h₂ : (Y₂ : Matrix (Fin n) (Fin n) (x.Am e)) = Y * (mat x.ρ g').map (algebraMap x.A (x.Am e)))
+    : f (hD.e.symm Y₁) = f (hD.e.symm Y₂) := by
   obtain ⟨γ, hγ⟩ := hom.surj (g' : G0.Γ)
   have hγk : γ ∈ G.η.ker := by
     rw [MonoidHom.mem_ker, ← hom.η, hγ]
@@ -245,49 +271,69 @@ private theorem f_symm_eq_of_left_right_mul_mat {l : ℕ} [Fact l.Prime] {L : Lo
     rw [LinearEquiv.apply_symm_apply]
     apply Subtype.ext
     have := hD.act g (hD.e.symm Y₂)
-    rw [this, LinearEquiv.apply_symm_apply, map_inv, hpg, h₁, h₂, hρ, mul_assoc, mul_assoc, hinv, mul_one]
+    rw [this, LinearEquiv.apply_symm_apply, map_inv, hpg, h₁, h₂, hρ, mul_assoc, mul_assoc, hinv,
+      mul_one]
   rw [hY, hf']
 
 set_option maxHeartbeats 800000 in
-theorem UpperTheory.V.Pa.B2.dualBound :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (n : ℕ) (x : NP G0.frame n), ∃ C : ℕ, ∀ (G : Glob l L) (h : G.Hom G0) (e : ℕ) (D : Dat x.A (plOf G)), IsOd h x (x.Am e) D → Nat.card {f : D.M.X →+ ZMod l // ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m} ≤ Nat.card x.K ^ C := by
+theorem UpperTheory.V.Pa.B2.dualBound
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (n : ℕ) (x : NP G0.frame n), ∃ C : ℕ,
+      ∀ (G : Glob l L) (h : G.Hom G0) (e : ℕ) (D : Dat x.A (plOf G)),
+        IsOd h x (x.Am e) D
+          → Nat.card
+              {f : D.M.X →+ ZMod l
+                // ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m}
+            ≤ Nat.card x.K ^ C := by
   intro l _ L G0 n x
   obtain ⟨s, hs⟩ := x.span (e1 x.A n x.a) first_raising_mem_equivariant
   refine ⟨Nat.card x.K * (n * n * s), ?_⟩
   intro G hom e D hD
-  let Ψ : (Fin n × Fin n × Fin s → x.K) →+ Od x.A (x.Am e) n x.a :=
-    { toFun := fun c => odOf x.a (fun i j => pol (fun k => c (i, j, k)))
-      map_zero' := by
-        apply Subtype.ext
-        ext i j
-        simp only [odOf, Matrix.of_apply, Submodule.coe_zero, Matrix.zero_apply]
-        split_ifs
-        · rfl
-        · have : pol (s := s) (fun _ => (0 : x.K)) = 0 := by
-            ext k
-            simp [pol, PowerSeries.coeff_mk]
-          exact (congrArg (algebraMap x.A (x.Am e)) this).trans (map_zero _)
-      map_add' := fun c c' => by
-        apply Subtype.ext
-        ext i j
-        simp only [odOf, Matrix.of_apply, Submodule.coe_add, Matrix.add_apply]
-        split_ifs
-        · simp
-        · have : pol (fun k => (c + c') (i, j, k)) = pol (fun k => c (i, j, k)) + pol (fun k => c' (i, j, k)) := by
-            ext k
-            simp only [pol, PowerSeries.coeff_mk, map_add (f := _), Pi.add_apply]
-            split_ifs <;> simp
-          rw [this, map_add (f := _)] }
-  have hkill : ∀ f : {f : D.M.X →+ ZMod l // ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m},
-      ∀ Y : Od x.A (x.Am e) n x.a, f.1 (hD.e.symm ((PowerSeries.X : x.A) ^ s • Y)) = 0 := by
+  let Ψ : (Fin n × Fin n × Fin s → x.K) →+ Od x.A (x.Am e) n x.a := {
+    toFun := fun c => odOf x.a (fun i j => pol (fun k => c (i, j, k)))
+    map_zero' := by
+      apply Subtype.ext
+      ext i j
+      simp only [odOf, Matrix.of_apply, Submodule.coe_zero, Matrix.zero_apply]
+      split_ifs
+      · rfl
+      · have : pol (s := s) (fun _ => (0 : x.K)) = 0 := by
+          ext k
+          simp [pol, PowerSeries.coeff_mk]
+        exact (congrArg (algebraMap x.A (x.Am e)) this).trans (map_zero _)
+    map_add' := fun c c' => by
+      apply Subtype.ext
+      ext i j
+      simp only [odOf, Matrix.of_apply, Submodule.coe_add, Matrix.add_apply]
+      split_ifs
+      · simp
+      · have : pol (fun k => (c + c') (i, j, k))
+            = pol (fun k => c (i, j, k)) + pol (fun k => c' (i, j, k)) := by
+          ext k
+          simp only [pol, PowerSeries.coeff_mk, map_add (f := _), Pi.add_apply]
+          split_ifs <;> simp
+        rw [this, map_add (f := _)]
+  }
+  have hkill
+      : ∀ f
+          : {f : D.M.X →+ ZMod l
+            // ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m},
+        ∀ Y : Od x.A (x.Am e) n x.a,
+          f.1 (hD.e.symm ((PowerSeries.X : x.A) ^ s • Y)) = 0 := by
     intro f Y
     let φ : Od x.A (x.Am e) n x.a →+ ZMod l := f.1.comp hD.e.symm.toLinearMap.toAddMonoidHom
-    have hS : ∀ E ∈ mat x.ρ '' (G0.frame.G' : Set G0.frame.G₀), E ∈ Ev x.A x.A n x.a ∧
-        ∀ Y Y₁ Y₂ : Od x.A (x.Am e) n x.a,
-          (Y₁ : Matrix (Fin n) (Fin n) (x.Am e)) = E.map (algebraMap x.A (x.Am e)) * Y →
-          (Y₂ : Matrix (Fin n) (Fin n) (x.Am e)) = Y * E.map (algebraMap x.A (x.Am e)) → φ Y₁ = φ Y₂ := by
+    have hS
+        : ∀ E ∈ mat x.ρ '' (G0.frame.G' : Set G0.frame.G₀),
+          E ∈ Ev x.A x.A n x.a
+            ∧ ∀ Y Y₁ Y₂ : Od x.A (x.Am e) n x.a,
+              (Y₁ : Matrix (Fin n) (Fin n) (x.Am e)) = E.map (algebraMap x.A (x.Am e)) * Y
+                → (Y₂ : Matrix (Fin n) (Fin n) (x.Am e)) = Y * E.map (algebraMap x.A (x.Am e))
+                → φ Y₁ = φ Y₂ := by
       rintro E ⟨g', hg', rfl⟩
-      exact ⟨x.blk g', fun Y Y₁ Y₂ h₁ h₂ => f_symm_eq_of_left_right_mul_mat hom x e D hD f.1 f.2 g' hg' Y Y₁ Y₂ h₁ h₂⟩
+      exact ⟨
+        x.blk g',
+        fun Y Y₁ Y₂ h₁ h₂ =>
+          f_symm_eq_of_left_right_mul_mat hom x e D hD f.1 f.2 g' hg' Y Y₁ Y₂ h₁ h₂
+      ⟩
     have hcs := comm_span (A := x.A) (X := x.Am e) φ _ hS _ hs
     exact kill φ (PowerSeries.X ^ s) hcs.2 Y
   have hK : 0 < Nat.card x.K := Nat.card_pos
@@ -296,37 +342,52 @@ theorem UpperTheory.V.Pa.B2.dualBound :
     ext t
     simp only [Pi.smul_apply, Pi.zero_apply]
     exact card_nsmul_eq_zero'
-  let Φ : {f : D.M.X →+ ZMod l // ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m} →
-      (Fin n × Fin n × Fin s → x.K → {y : ZMod l // Nat.card x.K • y = 0}) :=
-    fun f t v => ⟨f.1 (hD.e.symm (Ψ (Pi.single t v))), by
-      change Nat.card x.K • (f.1.comp (hD.e.symm.toLinearMap.toAddMonoidHom.comp Ψ)) (Pi.single t v) = 0
-      rw [← map_nsmul, hsmul0, map_zero]⟩
+  let Φ
+      : {f : D.M.X →+ ZMod l
+          // ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m}
+        → (Fin n × Fin n × Fin s → x.K → {y : ZMod l // Nat.card x.K • y = 0}) := fun f t v => ⟨
+    f.1 (hD.e.symm (Ψ (Pi.single t v))),
+    by
+      change Nat.card x.K • (f.1.comp (hD.e.symm.toLinearMap.toAddMonoidHom.comp Ψ)) (Pi.single t v)
+        = 0
+      rw [← map_nsmul, hsmul0, map_zero]
+  ⟩
   have hinj : Function.Injective Φ := by
     intro f f' hff
     apply Subtype.ext
     ext m
-    obtain ⟨c, Y', hY⟩ := od_dec (K := x.K) (X := x.Am e) (n := n) (a := x.a)
-      (fun y => Ideal.Quotient.mk_surjective y) s (hD.e m)
-    have key : ∀ f : {f : D.M.X →+ ZMod l // ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m},
-        f.1 m = ∑ t, (Φ f t (c t.1 t.2.1 t.2.2)).1 := by
+    obtain ⟨c, Y', hY⟩ :=
+      od_dec (K := x.K) (X := x.Am e) (n := n) (a := x.a)
+        (fun y => Ideal.Quotient.mk_surjective y)
+        s (hD.e m)
+    have key
+        : ∀ f
+            : {f : D.M.X →+ ZMod l
+              // ∀ g m, f (D.M.ρ g m) = PadicInt.toZMod ((G.ε g : ℤ_[l]ˣ) : ℤ_[l]) * f m},
+          f.1 m = ∑ t, (Φ f t (c t.1 t.2.1 t.2.2)).1 := by
       intro f
-      have hm : m = hD.e.symm (Ψ (fun t => c t.1 t.2.1 t.2.2))
-          + hD.e.symm ((PowerSeries.X : x.A) ^ s • Y') := by
+      have hm
+          : m
+            = hD.e.symm (Ψ (fun t => c t.1 t.2.1 t.2.2))
+              + hD.e.symm ((PowerSeries.X : x.A) ^ s • Y') := by
         rw [← map_add (f := _)]
         apply hD.e.injective
         rw [LinearEquiv.apply_symm_apply, hY]
         rfl
       conv_lhs => rw [hm]
-      have hsum : (fun t => c t.1 t.2.1 t.2.2 : Fin n × Fin n × Fin s → x.K)
-          = ∑ t, Pi.single t (c t.1 t.2.1 t.2.2) := (Finset.univ_sum_single _).symm
+      have hsum
+          : (fun t => c t.1 t.2.1 t.2.2 : Fin n × Fin n × Fin s → x.K)
+            = ∑ t, Pi.single t (c t.1 t.2.1 t.2.2) :=
+        (Finset.univ_sum_single _).symm
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), hkill f Y', add_zero, hsum, map_sum, map_sum, map_sum]
+      rw [map_add (f := _), hkill f Y', add_zero, hsum, map_sum, map_sum, map_sum]
     rw [key f, key f', hff]
-  calc _ ≤ Nat.card (Fin n × Fin n × Fin s → x.K → {y : ZMod l // Nat.card x.K • y = 0}) :=
-        Nat.card_le_card_of_injective Φ hinj
+  calc
+    _ ≤ Nat.card (Fin n × Fin n × Fin s → x.K → {y : ZMod l // Nat.card x.K • y = 0}) :=
+      Nat.card_le_card_of_injective Φ hinj
     _ = (Nat.card {y : ZMod l // Nat.card x.K • y = 0} ^ Nat.card x.K) ^ (n * n * s) := by
-        rw [Nat.card_fun, Nat.card_fun]
-        simp [Nat.card_prod, mul_assoc]
+      rw [Nat.card_fun, Nat.card_fun]
+      simp [Nat.card_prod, mul_assoc]
     _ ≤ (Nat.card x.K ^ Nat.card x.K) ^ (n * n * s) :=
-        Nat.pow_le_pow_left (Nat.pow_le_pow_left (card_zmod_nsmul_eq_zero_le l _ hK) _) _
+      Nat.pow_le_pow_left (Nat.pow_le_pow_left (card_zmod_nsmul_eq_zero_le l _ hK) _) _
     _ = Nat.card x.K ^ (Nat.card x.K * (n * n * s)) := by rw [← pow_mul]

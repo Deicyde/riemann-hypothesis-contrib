@@ -59,12 +59,13 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.ForSecondHalf
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1
+  ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
 open GroundTheory.Heights₂.Heights.Inter
 
-theorem projDeg_all :
-    ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
-      (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)],
+theorem projDeg_all
+    : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (K' : Type)
+        [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)],
       ReciprocityTheory.ChartRestriction.G.AI.I1.ProjDegStatement F ι ι' := by
   intro F _ K _ ι _ K' _ ι' _
   exact GroundTheory.Heights₂.Heights.Targets.ProjDeg.of_found
@@ -74,12 +75,14 @@ theorem projDeg_all :
         GroundTheory.Heights₂.Heights.NumbersDVR.DivPushForwardLocalZero))
     GroundTheory.Heights₂.Heights.Targets.FnDegRelDeg.proof F ι ι'
 
-theorem semilocMaxIdeals_of_fibreIncomp (hFI : FibreIncomp.Statement) : SemilocMaxIdeals.Statement :=
+theorem semilocMaxIdeals_of_fibreIncomp (hFI : FibreIncomp.Statement)
+    : SemilocMaxIdeals.Statement :=
   SemilocMaxIdeals.proof (FibreOverFinite.proof hFI) hFI SemilocIntegral.full LocRingDimOne.full
 
-theorem semilocResidueDeg_of_fibreIncomp (hFI : FibreIncomp.Statement) (hFD : FibreDimStatement) :
-    SemilocResidueDeg.Statement :=
-  SemilocResidueDeg.proof (SemilocResidueFibreDim.proof (FibreDivSupp.proof hFI) hFD FibreDimensionZero.full)
+theorem semilocResidueDeg_of_fibreIncomp (hFI : FibreIncomp.Statement) (hFD : FibreDimStatement)
+    : SemilocResidueDeg.Statement :=
+  SemilocResidueDeg.proof
+    (SemilocResidueFibreDim.proof (FibreDivSupp.proof hFI) hFD FibreDimensionZero.full)
     (SemilocResidueAdjoin.proof
       (SemilocResidueFrac.proof SemilocFinite.full (semilocMaxIdeals_of_fibreIncomp hFI))
       ChartScalingIndep.full)

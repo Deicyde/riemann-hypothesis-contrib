@@ -8,6 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.Int.Geo
 
-theorem geoOne_of_parts (h₁ : Steps) (h₂ : KSAll) (h₃ : PlanEx) : GeoOne := geoOne_of h₁ (packEx_of h₂ h₃)
+theorem geoOne_of_parts (h₁ : Steps) (h₂ : KSAll) (h₃ : PlanEx) : GeoOne :=
+  geoOne_of h₁ (packEx_of h₂ h₃)
 
 end UpperTheory.Gal.Int.Geo

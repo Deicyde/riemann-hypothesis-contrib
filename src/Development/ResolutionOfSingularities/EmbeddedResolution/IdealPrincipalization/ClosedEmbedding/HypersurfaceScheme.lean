@@ -29,27 +29,33 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-private def chartOnOpenSubscheme {Y : Scheme.{u}} {k : Type u} [Field k] {q : Y ⟶ Spec (CommRingCat.of k)}
-    {V : Y.Opens} {m : ℕ} (c : EtaleChart q V m)
-    (hEt : AlgebraicGeometry.Etale ((⊤ : V.toScheme.Opens).ι ≫ c.map)) :
-    EtaleChart (V.ι ≫ q) (⊤ : V.toScheme.Opens) m where
+private def chartOnOpenSubscheme
+    {Y : Scheme.{u}} {k : Type u} [Field k]
+    {q : Y ⟶ Spec (CommRingCat.of k)} {V : Y.Opens} {m : ℕ}
+    (c : EtaleChart q V m) (hEt : AlgebraicGeometry.Etale ((⊤ : V.toScheme.Opens).ι ≫ c.map))
+    : EtaleChart (V.ι ≫ q) (⊤ : V.toScheme.Opens) m where
   map := (⊤ : V.toScheme.Opens).ι ≫ c.map
   comp_struct := by rw [Category.assoc, c.comp_struct]
   isEtale := hEt
 
-private theorem restrictIdeal_top_coordIdeal {Y : Scheme.{u}} {k : Type u} [Field k]
+private theorem restrictIdeal_top_coordIdeal
+    {Y : Scheme.{u}} {k : Type u} [Field k]
     {q : Y ⟶ Spec (CommRingCat.of k)} {V : Y.Opens} {m : ℕ} (c : EtaleChart q V m)
-    (hEt : AlgebraicGeometry.Etale ((⊤ : V.toScheme.Opens).ι ≫ c.map))
-    (S : Finset (Fin m)) :
-    restrictIdeal (c.coordIdeal S) (⊤ : V.toScheme.Opens) = (chartOnOpenSubscheme c hEt).coordIdeal S := by
+    (hEt : AlgebraicGeometry.Etale ((⊤ : V.toScheme.Opens).ι ≫ c.map)) (S : Finset (Fin m))
+    : restrictIdeal (c.coordIdeal S) (⊤ : V.toScheme.Opens)
+      = (chartOnOpenSubscheme c hEt).coordIdeal S := by
   simp only [restrictIdeal_eq_comap_ι, EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal]
   exact (Scheme.IdealSheafData.comap_comp _ _ _).symm
 
-private theorem false_of_forall_mem_support_of_coordIdeal_singleton {Z : Scheme.{u}} {k : Type u} [Field k]
-    (p : Z ⟶ Spec (CommRingCat.of k)) (hZ : IsAffineOpen (⊤ : Z.Opens)) {m : ℕ}
-    (c : EtaleChart p (⊤ : Z.Opens) m) (j : Fin m) (D : Z.IdealSheafData)
-    (hD : restrictIdeal D (⊤ : Z.Opens) = c.coordIdeal {j})
-    (hsupp : ∀ y : ↥Z, y ∈ D.support) (y₀ : ↥Z) : False := by
+private theorem false_of_forall_mem_support_of_coordIdeal_singleton
+    {Z : Scheme.{u}} {k : Type u} [Field k]
+    (p : Z ⟶ Spec (CommRingCat.of k))
+    (hZ : IsAffineOpen (⊤ : Z.Opens))
+    {m : ℕ} (c : EtaleChart p (⊤ : Z.Opens) m) (j : Fin m)
+    (D : Z.IdealSheafData)
+    (hD : restrictIdeal D (⊤ : Z.Opens) = c.coordIdeal {j}) (hsupp : ∀ y : ↥Z, y ∈ D.support)
+    (y₀ : ↥Z)
+    : False := by
   have hnzd := coord_mem_nonZeroDivisors hZ c j
   have hno : ∀ y : ↥Z, y ∉ Z.basicOpen (c.coord j) := by
     intro y hy
@@ -75,59 +81,68 @@ private theorem false_of_forall_mem_support_of_coordIdeal_singleton {Z : Scheme.
   rw [hstalk1]
   exact Submodule.zero_mem _
 
-theorem nonzeroOnComponents_of_locally_eq_coordIdeal {Y : Scheme.{u}} {k : Type u} [Field k]
+theorem nonzeroOnComponents_of_locally_eq_coordIdeal
+    {Y : Scheme.{u}} {k : Type u} [Field k]
     (q : Y ⟶ Spec (CommRingCat.of k)) (K : Y.IdealSheafData)
     (hfin : (irreducibleComponents ↥Y).Finite)
-    (hloc : ∀ y : ↥Y, y ∈ K.support → ∃ (U : Y.Opens) (_ : y ∈ U) (m : ℕ)
-      (ch : EtaleChart q U m) (S : Finset (Fin m)),
-      S.Nonempty ∧ restrictIdeal K U = ch.coordIdeal S) :
-    NonzeroOnComponents K := by
+    (hloc : ∀ y : ↥Y,
+      y ∈ K.support
+        → ∃ (U : Y.Opens) (_ : y ∈ U) (m : ℕ) (ch : EtaleChart q U m) (S : Finset (Fin m)),
+          S.Nonempty ∧ restrictIdeal K U = ch.coordIdeal S)
+    : NonzeroOnComponents K := by
   rw [nonzeroOnComponents_iff]
   intro T hT hTsub
   have hTirr : IsIrreducible T := hT.1
   have hOfin : (irreducibleComponents ↥Y \ {T}).Finite := hfin.subset Set.sdiff_subset
-  have hOclosed : IsClosed (⋃₀ (irreducibleComponents ↥Y \ {T})) := by
+  have hOclosed : IsClosed (⋃₀(irreducibleComponents ↥Y \ {T})) := by
     rw [Set.sUnion_eq_biUnion]
     exact Set.Finite.isClosed_biUnion hOfin
       (fun s hs => isClosed_of_mem_irreducibleComponents s hs.1)
-  have hOsub : ∀ z : ↥Y, z ∉ (⋃₀ (irreducibleComponents ↥Y \ {T})) → z ∈ T := by
+  have hOsub : ∀ z : ↥Y, z ∉ (⋃₀(irreducibleComponents ↥Y \ {T})) → z ∈ T := by
     intro z hz
     by_cases hEq : irreducibleComponent z = T
     · rw [← hEq]
       exact mem_irreducibleComponent
-    · exact (hz (Set.mem_sUnion.mpr ⟨irreducibleComponent z,
-        ⟨irreducibleComponent_mem_irreducibleComponents z,
-          fun hmem => hEq (Set.mem_singleton_iff.mp hmem)⟩,
-        mem_irreducibleComponent⟩)).elim
-  obtain ⟨x, hxT, hxO⟩ :
-      ∃ x : ↥Y, x ∈ T ∧ x ∉ (⋃₀ (irreducibleComponents ↥Y \ {T})) := by
+    · exact (hz (Set.mem_sUnion.mpr ⟨
+        irreducibleComponent z,
+        ⟨
+          irreducibleComponent_mem_irreducibleComponents z,
+          fun hmem => hEq (Set.mem_singleton_iff.mp hmem)
+        ⟩,
+        mem_irreducibleComponent
+      ⟩)).elim
+  obtain ⟨x, hxT, hxO⟩ : ∃ x : ↥Y, x ∈ T ∧ x ∉ (⋃₀(irreducibleComponents ↥Y \ {T})) := by
     by_contra hcon
     push Not at hcon
-    have hsub : T ⊆ ⋃₀ ((hOfin.toFinset : Finset (Set ↥Y)) : Set (Set ↥Y)) := by
+    have hsub : T ⊆ ⋃₀((hOfin.toFinset : Finset (Set ↥Y)) : Set (Set ↥Y)) := by
       intro t ht
       rw [Set.Finite.coe_toFinset]
       exact hcon t ht
-    obtain ⟨C, hCmem, hTsubC⟩ := isIrreducible_iff_sUnion_isClosed.mp hTirr hOfin.toFinset
-      (fun C hC => isClosed_of_mem_irreducibleComponents C (hOfin.mem_toFinset.mp hC).1) hsub
+    obtain ⟨C, hCmem, hTsubC⟩ :=
+      isIrreducible_iff_sUnion_isClosed.mp hTirr hOfin.toFinset
+        (fun C hC => isClosed_of_mem_irreducibleComponents C (hOfin.mem_toFinset.mp hC).1)
+        hsub
     have hC := hOfin.mem_toFinset.mp hCmem
     exact hC.2 (Set.mem_singleton_iff.mpr (Set.Subset.antisymm (hT.2 hC.1.1 hTsubC) hTsubC))
   obtain ⟨U, hxU, m, ch, S, hSne, hKU⟩ := hloc x (hTsub hxT)
   obtain ⟨j, hjS⟩ := hSne
-  have hWopen : IsOpen ((U : Set ↥Y) ∩ (⋃₀ (irreducibleComponents ↥Y \ {T}))ᶜ) :=
+  have hWopen : IsOpen ((U : Set ↥Y) ∩ (⋃₀(irreducibleComponents ↥Y \ {T}))ᶜ) :=
     U.isOpen.inter hOclosed.isOpen_compl
-  obtain ⟨V, hVaff, hxV, hVle⟩ := exists_isAffineOpen_mem_and_subset
-    (show x ∈ (⟨(U : Set ↥Y) ∩ (⋃₀ (irreducibleComponents ↥Y \ {T}))ᶜ, hWopen⟩ : Y.Opens) from
+  obtain ⟨V, hVaff, hxV, hVle⟩ :=
+    exists_isAffineOpen_mem_and_subset (show x
+        ∈ (⟨(U : Set ↥Y) ∩ (⋃₀(irreducibleComponents ↥Y \ {T}))ᶜ, hWopen⟩ : Y.Opens) from
       ⟨hxU, hxO⟩)
-  have hVsub : (V : Set ↥Y) ⊆ ((U : Set ↥Y) ∩ (⋃₀ (irreducibleComponents ↥Y \ {T}))ᶜ) := hVle
+  have hVsub : (V : Set ↥Y) ⊆ ((U : Set ↥Y) ∩ (⋃₀(irreducibleComponents ↥Y \ {T}))ᶜ) := hVle
   have hVU : V ≤ U := fun z hz => (hVsub hz).1
-  have hVdisj : ∀ z : ↥Y, z ∈ V → z ∉ (⋃₀ (irreducibleComponents ↥Y \ {T})) :=
-    fun z hz => (hVsub hz).2
+  have hVdisj : ∀ z : ↥Y, z ∈ V → z ∉ (⋃₀(irreducibleComponents ↥Y \ {T})) := fun z hz =>
+    (hVsub hz).2
   let cV : EtaleChart q V m := {
     map := Y.homOfLE hVU ≫ ch.map
     comp_struct := by rw [Category.assoc, ch.comp_struct, ← Category.assoc, Scheme.homOfLE_ι]
     isEtale := by
       have := ch.isEtale
-      infer_instance }
+      infer_instance
+  }
   have hKV : restrictIdeal K V = cV.coordIdeal S := by
     have h' : K.comap U.ι = (coordSubspaceIdeal k m S).comap ch.map := by
       rw [← restrictIdeal_eq_comap_ι, hKU, EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal]
@@ -146,8 +161,7 @@ theorem nonzeroOnComponents_of_locally_eq_coordIdeal {Y : Scheme.{u}} {k : Type 
       rw [← Scheme.Opens.range_ι V]
       exact ⟨y, rfl⟩
     exact h
-  have hsupp : ∀ y : ↥V.toScheme,
-      y ∈ (cV.coordIdeal ({j} : Finset (Fin m))).support := by
+  have hsupp : ∀ y : ↥V.toScheme, y ∈ (cV.coordIdeal ({j} : Finset (Fin m))).support := by
     intro y
     have hyV : (V.ι).base y ∈ V := hmemV y
     have hyT : (V.ι).base y ∈ T := hOsub _ (hVdisj _ hyV)
@@ -159,41 +173,44 @@ theorem nonzeroOnComponents_of_locally_eq_coordIdeal {Y : Scheme.{u}} {k : Type 
       rw [← hKV, restrictIdeal_eq_comap_ι]
       exact h2
     rw [← one_le_orderAt_iff_mem_support] at h3 ⊢
-    exact le_trans h3 (orderAt_le_of_le
-      (cV.coordIdeal_mono (Finset.singleton_subset_iff.mpr hjS)) y)
+    exact le_trans h3
+      (orderAt_le_of_le (cV.coordIdeal_mono (Finset.singleton_subset_iff.mpr hjS)) y)
   have y₀ : ↥V.toScheme := (⟨x, hxV⟩ : ↥V)
-  exact false_of_forall_mem_support_of_coordIdeal_singleton (V.ι ≫ q) haffineTop (chartOnOpenSubscheme cV hEt) j
-    (cV.coordIdeal ({j} : Finset (Fin m)))
+  exact false_of_forall_mem_support_of_coordIdeal_singleton (V.ι ≫ q) haffineTop
+    (chartOnOpenSubscheme cV hEt) j (cV.coordIdeal ({j} : Finset (Fin m)))
     (restrictIdeal_top_coordIdeal cV hEt ({j} : Finset (Fin m))) hsupp y₀
 
 namespace MaximalContactCover
 
-variable {X X' : Scheme.{u}} {k : Type u} [Field k] {p : X' ⟶ Spec (CommRingCat.of k)}
-  {τ : X ⟶ X'} {I : X.IdealSheafData} {c : ℕ}
+variable
+  {X X' : Scheme.{u}} {k : Type u} [Field k]
+  {p : X' ⟶ Spec (CommRingCat.of k)} {τ : X ⟶ X'} {I : X.IdealSheafData} {c : ℕ}
 
 abbrev hypersurfaceScheme (C : MaximalContactCover p τ I c) : Scheme.{u} :=
   C.toCoverData.iInfImageIdeal.subscheme
 
-abbrev hypersurfaceStructureMap (C : MaximalContactCover p τ I c) :
-    C.hypersurfaceScheme ⟶ Spec (CommRingCat.of k) :=
+abbrev hypersurfaceStructureMap (C : MaximalContactCover p τ I c)
+    : C.hypersurfaceScheme ⟶ Spec (CommRingCat.of k) :=
   C.toCoverData.iInfImageIdeal.subschemeι ≫ C.projection ≫ p
 
-theorem smooth_hypersurfaceStructureMap (C : MaximalContactCover p τ I c) :
-    AlgebraicGeometry.Smooth C.hypersurfaceStructureMap :=
+theorem smooth_hypersurfaceStructureMap (C : MaximalContactCover p τ I c)
+    : AlgebraicGeometry.Smooth C.hypersurfaceStructureMap :=
   ((isSmoothDivisor_iff (C.projection ≫ p) C.toCoverData.iInfImageIdeal).mp
     C.isSmoothDivisor_iInfImageIdeal).2
 
-theorem nonzeroOnComponents_iInfImageIdeal (C : MaximalContactCover p τ I c)
-    [TopologicalSpace.NoetherianSpace ↥C.toCoverData.disjointUnion] :
-    NonzeroOnComponents C.toCoverData.iInfImageIdeal := by
-  refine nonzeroOnComponents_of_locally_eq_coordIdeal (C.projection ≫ p) C.toCoverData.iInfImageIdeal
-    TopologicalSpace.NoetherianSpace.finite_irreducibleComponents ?_
+theorem nonzeroOnComponents_iInfImageIdeal
+    (C : MaximalContactCover p τ I c)
+    [TopologicalSpace.NoetherianSpace ↥C.toCoverData.disjointUnion]
+    : NonzeroOnComponents C.toCoverData.iInfImageIdeal := by
+  refine nonzeroOnComponents_of_locally_eq_coordIdeal (C.projection ≫ p)
+    C.toCoverData.iInfImageIdeal TopologicalSpace.NoetherianSpace.finite_irreducibleComponents ?_
   intro y hy
   obtain ⟨i, hi⟩ := C.toCoverData.exists_mem_summandOpen y
   rcases C.hypersurface i with htop | ⟨n, ch, j, hch⟩
   · exfalso
     have h1 : restrictIdeal C.toCoverData.iInfImageIdeal (C.toCoverData.summandOpen i) = ⊤ := by
-      rw [MaxContactReduction.FiniteOpenCoverWithIdeals.restrictIdeal_iInfImageIdeal_summandOpen, htop]
+      rw [MaxContactReduction.FiniteOpenCoverWithIdeals.restrictIdeal_iInfImageIdeal_summandOpen,
+        htop]
       simp
     exact notMem_support_of_mem_opens_of_restrictIdeal_eq_top _ _ h1 y hi hy
   · let D := C.toCoverData
@@ -205,22 +222,25 @@ theorem nonzeroOnComponents_iInfImageIdeal (C : MaximalContactCover p τ I c)
           Category.assoc]
       isEtale := by
         have := ch.isEtale
-        infer_instance }
+        infer_instance
+    }
     refine ⟨D.summandOpen i, hi, n, c, {j}, ⟨j, Finset.mem_singleton_self j⟩, ?_⟩
     rw [MaxContactReduction.FiniteOpenCoverWithIdeals.restrictIdeal_iInfImageIdeal_summandOpen, hch,
-      EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal, EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal]
+      EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal,
+      EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal]
     change _ = (coordSubspaceIdeal k n {j}).comap ((D.summandIso i).inv ≫ ch.map)
     rw [Scheme.IdealSheafData.comap_comp]
 
-theorem ker_pullbackFiberToHypersurface_le_idealOnHypersurface (C : MaximalContactCover p τ I c) [IsClosedImmersion τ] :
-    Scheme.Hom.ker C.pullbackFiberToHypersurface ≤ C.idealOnHypersurface := by
+theorem ker_pullbackFiberToHypersurface_le_idealOnHypersurface
+    (C : MaximalContactCover p τ I c) [IsClosedImmersion τ]
+    : Scheme.Hom.ker C.pullbackFiberToHypersurface ≤ C.idealOnHypersurface := by
   rw [C.idealOnHypersurface_eq_imageIdealSheaf]
   exact ker_le_map_idealSheaf C.pullbackFiberToHypersurface (I.comap C.pullbackFiberToBase)
 
-theorem support_idealOnHypersurface_subset_support_ker (C : MaximalContactCover p τ I c)
-    [IsClosedImmersion τ] :
-    (C.idealOnHypersurface.support : Set ↥C.hypersurfaceScheme) ⊆
-      ((Scheme.Hom.ker C.pullbackFiberToHypersurface).support : Set ↥C.hypersurfaceScheme) := by
+theorem support_idealOnHypersurface_subset_support_ker
+    (C : MaximalContactCover p τ I c) [IsClosedImmersion τ]
+    : (C.idealOnHypersurface.support : Set ↥C.hypersurfaceScheme)
+      ⊆ ((Scheme.Hom.ker C.pullbackFiberToHypersurface).support : Set ↥C.hypersurfaceScheme) := by
   intro x hx
   have hx' : x ∈ C.idealOnHypersurface.support := hx
   rw [mem_support_iff_stalkIdeal_ne_top] at hx'
@@ -231,46 +251,51 @@ theorem support_idealOnHypersurface_subset_support_ker (C : MaximalContactCover 
   rw [hker, top_le_iff] at h1
   exact hx' h1
 
-theorem nonzeroOnComponents_ker_pullbackFiberToHypersurface (C : MaximalContactCover p τ I c) [IsClosedImmersion τ]
-    [TopologicalSpace.NoetherianSpace ↥C.hypersurfaceScheme]
-    (hloc : ∀ x : ↥C.pullbackFiber, ∃ (W : C.hypersurfaceScheme.Opens)
-      (_ : C.pullbackFiberToHypersurface.base x ∈ W) (m : ℕ) (ch : EtaleChart C.hypersurfaceStructureMap W m)
-      (S : Finset (Fin m)),
-      S.Nonempty ∧ restrictIdeal (Scheme.Hom.ker C.pullbackFiberToHypersurface) W = ch.coordIdeal S) :
-    NonzeroOnComponents (Scheme.Hom.ker C.pullbackFiberToHypersurface) := by
-  refine nonzeroOnComponents_of_locally_eq_coordIdeal C.hypersurfaceStructureMap (Scheme.Hom.ker C.pullbackFiberToHypersurface)
+theorem nonzeroOnComponents_ker_pullbackFiberToHypersurface
+    (C : MaximalContactCover p τ I c)
+    [IsClosedImmersion τ] [TopologicalSpace.NoetherianSpace ↥C.hypersurfaceScheme]
+    (hloc : ∀ x : ↥C.pullbackFiber,
+      ∃ (W : C.hypersurfaceScheme.Opens) (_ : C.pullbackFiberToHypersurface.base x ∈ W) (m : ℕ)
+          (ch : EtaleChart C.hypersurfaceStructureMap W m) (S : Finset (Fin m)),
+        S.Nonempty
+          ∧ restrictIdeal (Scheme.Hom.ker C.pullbackFiberToHypersurface) W = ch.coordIdeal S)
+    : NonzeroOnComponents (Scheme.Hom.ker C.pullbackFiberToHypersurface) := by
+  refine nonzeroOnComponents_of_locally_eq_coordIdeal C.hypersurfaceStructureMap
+    (Scheme.Hom.ker C.pullbackFiberToHypersurface)
     TopologicalSpace.NoetherianSpace.finite_irreducibleComponents ?_
   intro y hy
   obtain ⟨x, hx⟩ : ∃ x : ↥C.pullbackFiber, C.pullbackFiberToHypersurface.base x = y := by
-    have hr : ((Scheme.Hom.ker C.pullbackFiberToHypersurface).support : Set ↥C.hypersurfaceScheme)
-        = Set.range (⇑C.pullbackFiberToHypersurface) := by
+    have hr
+        : ((Scheme.Hom.ker C.pullbackFiberToHypersurface).support : Set ↥C.hypersurfaceScheme)
+          = Set.range (⇑C.pullbackFiberToHypersurface) := by
       rw [Scheme.Hom.support_ker]
       exact (AlgebraicGeometry.IsClosedImmersion.isClosedEmbedding
         C.pullbackFiberToHypersurface).isClosed_range.closure_eq
-    have hy' : y ∈ Set.range (⇑C.pullbackFiberToHypersurface) := by
-      rw [← hr]; exact hy
+    have hy' : y ∈ Set.range (⇑C.pullbackFiberToHypersurface) := by rw [← hr]; exact hy
     exact hy'
   obtain ⟨W, hW, m, ch, S, hS, hres⟩ := hloc x
   exact ⟨W, hx ▸ hW, m, ch, S, hS, hres⟩
 
-theorem nonzeroOnComponents_idealOnHypersurface (C : MaximalContactCover p τ I c) [IsClosedImmersion τ]
-    [TopologicalSpace.NoetherianSpace ↥C.hypersurfaceScheme]
-    (hloc : ∀ x : ↥C.pullbackFiber, ∃ (W : C.hypersurfaceScheme.Opens)
-      (_ : C.pullbackFiberToHypersurface.base x ∈ W) (m : ℕ) (ch : EtaleChart C.hypersurfaceStructureMap W m)
-      (S : Finset (Fin m)),
-      S.Nonempty ∧ restrictIdeal (Scheme.Hom.ker C.pullbackFiberToHypersurface) W = ch.coordIdeal S) :
-    NonzeroOnComponents C.idealOnHypersurface := by
+theorem nonzeroOnComponents_idealOnHypersurface
+    (C : MaximalContactCover p τ I c)
+    [IsClosedImmersion τ] [TopologicalSpace.NoetherianSpace ↥C.hypersurfaceScheme]
+    (hloc : ∀ x : ↥C.pullbackFiber,
+      ∃ (W : C.hypersurfaceScheme.Opens) (_ : C.pullbackFiberToHypersurface.base x ∈ W) (m : ℕ)
+          (ch : EtaleChart C.hypersurfaceStructureMap W m) (S : Finset (Fin m)),
+        S.Nonempty
+          ∧ restrictIdeal (Scheme.Hom.ker C.pullbackFiberToHypersurface) W = ch.coordIdeal S)
+    : NonzeroOnComponents C.idealOnHypersurface := by
   have hker := C.nonzeroOnComponents_ker_pullbackFiberToHypersurface hloc
   rw [nonzeroOnComponents_iff] at hker ⊢
   intro T hT hTsub
   exact hker T hT (hTsub.trans (C.support_idealOnHypersurface_subset_support_ker))
 
-theorem krullDimSucc_hypersurfaceScheme_lt (C : MaximalContactCover p τ I c)
-    [AlgebraicGeometry.LocallyOfFiniteType p]
-    [TopologicalSpace.NoetherianSpace ↥C.toCoverData.disjointUnion]
-    [Nonempty ↥C.hypersurfaceScheme] :
-    krullDimSucc C.hypersurfaceScheme < krullDimSucc C.toCoverData.disjointUnion := by
-  have : AlgebraicGeometry.LocallyOfFiniteType (C.projection ≫ p) := C.locallyOfFiniteType_projection_comp
+theorem krullDimSucc_hypersurfaceScheme_lt
+    (C : MaximalContactCover p τ I c) [AlgebraicGeometry.LocallyOfFiniteType p]
+    [TopologicalSpace.NoetherianSpace ↥C.toCoverData.disjointUnion] [Nonempty ↥C.hypersurfaceScheme]
+    : krullDimSucc C.hypersurfaceScheme < krullDimSucc C.toCoverData.disjointUnion := by
+  have : AlgebraicGeometry.LocallyOfFiniteType (C.projection ≫ p) :=
+    C.locallyOfFiniteType_projection_comp
   have : AlgebraicGeometry.QuasiCompact (C.projection ≫ p) := C.quasiCompact_projection_comp
   have hker : NonzeroOnComponents (Scheme.Hom.ker C.toCoverData.iInfImageIdeal.subschemeι) := by
     rw [Scheme.IdealSheafData.ker_subschemeι]

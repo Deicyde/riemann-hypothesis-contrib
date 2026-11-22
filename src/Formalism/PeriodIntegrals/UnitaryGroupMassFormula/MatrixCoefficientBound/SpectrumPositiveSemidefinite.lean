@@ -18,9 +18,10 @@ namespace PI.GGMatBoundW
 
 theorem spectrum_positive_semidefinite : SpecPSD := by
   intro X _ M c hM hev
-  have gen : ∀ (A : Matrix X X ℂ) (hA : A.IsHermitian) (b : ℝ),
-      (∀ (w : X → ℂ) (μ : ℂ), w ≠ 0 → A *ᵥ w = μ • w → ∃ r : ℝ, μ = r ∧ b ≤ r) →
-      ∀ j, b ≤ hA.eigenvalues j := by
+  have gen
+      : ∀ (A : Matrix X X ℂ) (hA : A.IsHermitian) (b : ℝ),
+        (∀ (w : X → ℂ) (μ : ℂ), w ≠ 0 → A *ᵥ w = μ • w → ∃ r : ℝ, μ = r ∧ b ≤ r)
+          → ∀ j, b ≤ hA.eigenvalues j := by
     intro A hA b h j
     have hv := hA.mulVec_eigenvectorBasis j
     have hne := hA.eigenvectorBasis.orthonormal.ne_zero j
@@ -34,15 +35,16 @@ theorem spectrum_positive_semidefinite : SpecPSD := by
   have h1 : ((c : ℂ) • (1 : Matrix X X ℂ)).IsHermitian := by
     simp [Matrix.IsHermitian, Matrix.conjTranspose_smul]
   have hN : ((c : ℂ) • (1 : Matrix X X ℂ) - M).IsHermitian := h1.sub hM
-  have hNev : ∀ (w : X → ℂ) (μ : ℂ), w ≠ 0 → ((c : ℂ) • (1 : Matrix X X ℂ) - M) *ᵥ w = μ • w →
-      ∃ r : ℝ, μ = r ∧ 0 ≤ r := by
+  have hNev
+      : ∀ (w : X → ℂ) (μ : ℂ),
+        w ≠ 0 → ((c : ℂ) • (1 : Matrix X X ℂ) - M) *ᵥ w = μ • w → ∃ r : ℝ, μ = r ∧ 0 ≤ r := by
     intro w μ hw h
     have hMw : M *ᵥ w = ((c : ℂ) - μ) • w := by
       rw [Matrix.sub_mulVec] at h
       first
-        | rw [Matrix.smul_mulVec] at h
-        | rw [Matrix.smul_mulVec_assoc] at h
-        | simp only [Matrix.smul_mulVec_assoc] at h
+      | rw [Matrix.smul_mulVec] at h
+      | rw [Matrix.smul_mulVec_assoc] at h
+      | simp only [Matrix.smul_mulVec_assoc] at h
       rw [Matrix.one_mulVec] at h
       rw [sub_smul, ← h]
       abel

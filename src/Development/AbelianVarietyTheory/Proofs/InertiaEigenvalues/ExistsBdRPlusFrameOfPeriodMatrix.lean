@@ -9,18 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LinearI
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 noncomputable section
 
 namespace GlobalTheory.PMon.FrameOne
 
-theorem adapted_basis_fin {L : Type} [Field L] {n : Type} [Fintype n] [DecidableEq n]
+theorem adapted_basis_fin
+    {L : Type} [Field L]
+    {n : Type} [Fintype n] [DecidableEq n]
     (A : ℤ → Submodule L (n → L)) (hA : Antitone A) (hsep : ∀ x, (∀ a, x ∈ A a) → x = 0)
-    (a0 : ℤ) (htop : A a0 = ⊤) :
-    ∃ (d : n → n → L) (k : n → ℤ), LinearIndependent L d ∧
-      ∀ a, A a = Submodule.span L (d '' {j | a ≤ k j}) := by
+    (a0 : ℤ) (htop : A a0 = ⊤)
+    : ∃ (d : n → n → L) (k : n → ℤ),
+      LinearIndependent L d ∧ ∀ a, A a = Submodule.span L (d '' {j | a ≤ k j}) := by
   obtain ⟨m, d, k, hli, hsp⟩ := GlobalTheory.filtration_adapted_basis A hA inferInstance hsep
   have hspan : ⊤ ≤ Submodule.span L (Set.range d) := by
     rw [← htop, hsp a0]
@@ -52,8 +55,8 @@ theorem fil_zero (a : ℤ) : (0 : P.R.BdR) ∈ Fil P a := ((P.PD (botExt l)).Fil
 theorem fil_add {a : ℤ} {x y : P.R.BdR} (hx : x ∈ Fil P a) (hy : y ∈ Fil P a) : x + y ∈ Fil P a :=
   ((P.PD (botExt l)).Fil a).add_mem hx hy
 
-theorem fil_sum {ι : Type} (s : Finset ι) {a : ℤ} (f : ι → P.R.BdR) (h : ∀ i ∈ s, f i ∈ Fil P a) :
-    ∑ i ∈ s, f i ∈ Fil P a :=
+theorem fil_sum {ι : Type} (s : Finset ι) {a : ℤ} (f : ι → P.R.BdR) (h : ∀ i ∈ s, f i ∈ Fil P a)
+    : ∑ i ∈ s, f i ∈ Fil P a :=
   Submodule.sum_mem ((P.PD (botExt l)).Fil a) h
 
 theorem fil_anti {a b : ℤ} (hab : a ≤ b) {x : P.R.BdR} (hx : x ∈ Fil P b) : x ∈ Fil P a := by
@@ -71,10 +74,23 @@ namespace GlobalTheory.PMon.FrameOne
 
 open Matrix
 
-theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI) (n : Type) [Fintype n] [DecidableEq n] (K : FinExt l) (A : ↥(GK K) → Matrix n n P.R.BdR) (Q : GL n P.R.BdR), (∀ g i j, A g i j ∈ Fil P 0) → (∀ g : ↥(GK K), A g * (Q : Matrix n n P.R.BdR).map (P.actQdR (g : GQ l)) = Q) → ∃ (U : GL n P.R.BdR) (w : n → ℤ), UnitM P U ∧ ∀ g : ↥(GK K), A g * (U : Matrix n n P.R.BdR).map (P.actQdR (g : GQ l)) = (U : Matrix n n P.R.BdR) * Matrix.diagonal fun j => algebraMap ℚ_[l] P.R.BdR ((P.χQ (g : GQ l) ^ w j : ℚ_[l]ˣ) : ℚ_[l]) := by
+theorem frame_of_period_matrix
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI) (n : Type)
+        [Fintype n] [DecidableEq n] (K : FinExt l) (A : ↥(GK K) → Matrix n n P.R.BdR)
+        (Q : GL n P.R.BdR),
+      (∀ g i j, A g i j ∈ Fil P 0)
+        → (∀ g : ↥(GK K), A g * (Q : Matrix n n P.R.BdR).map (P.actQdR (g : GQ l)) = Q)
+        → ∃ (U : GL n P.R.BdR) (w : n → ℤ),
+          UnitM P U
+            ∧ ∀ g : ↥(GK K),
+              A g * (U : Matrix n n P.R.BdR).map (P.actQdR (g : GQ l))
+                = (U : Matrix n n P.R.BdR) * Matrix.diagonal fun j =>
+                  algebraMap ℚ_[l] P.R.BdR ((P.χQ (g : GQ l) ^ w j : ℚ_[l]ˣ) : ℚ_[l]) := by
   intro l _ P AI T n _ _ K A Q hA0 hAQ
-  obtain ⟨S, θ, hS, -, hθ0, hθOm, hθg⟩ := GlobalTheory.T.exists_theta_deRhamFilZero_surjective l P AI T
-  obtain ⟨hfield, -, htz, hinv, -, hmul, -, htzact, -, -, -⟩ := GlobalTheory.T.deRhamPeriodRing_field_tPow_filtration_units l P AI T
+  obtain ⟨S, θ, hS, -, hθ0, hθOm, hθg⟩ :=
+    GlobalTheory.T.exists_theta_deRhamFilZero_surjective l P AI T
+  obtain ⟨hfield, -, htz, hinv, -, hmul, -, htzact, -, -, -⟩ :=
+    GlobalTheory.T.deRhamPeriodRing_field_tPow_filtration_units l P AI T
   haveI : Nontrivial P.R.BdR := ⟨hfield.exists_pair_ne⟩
   set Q' : Matrix n n P.R.BdR := (Q : Matrix n n P.R.BdR) with hQ'
   let eK : ↥K.1 →+* P.R.BdR := (algebraMap (Om l) P.R.BdR).comp (K.1.val : ↥K.1 →+* Om l)
@@ -92,24 +108,26 @@ theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
   have hE00 : eK 0 = 0 := map_zero eK
   have hEsum : ∀ (f : n → ↥K.1), eK (∑ j, f j) = ∑ j, eK (f j) := fun f => map_sum eK f _
   let vec : (n → ↥K.1) → n → P.R.BdR := fun c => Q' *ᵥ fun j => eK (c j)
-  let Af : ℤ → Submodule ↥K.1 (n → ↥K.1) := fun a =>
-    { carrier := {c | ∀ i, vec c i ∈ Fil P a}
-      add_mem' := by
-        intro c d hc hd i
-        have : vec (c + d) = vec c + vec d := by
-          simp only [vec, Pi.add_apply, hEadd, ← Matrix.mulVec_add]; rfl
-        rw [this]; exact fil_add P (hc i) (hd i)
-      zero_mem' := by
-        intro i
-        have : vec 0 = 0 := by
-          simp only [vec, Pi.zero_apply, hE00]; exact Matrix.mulVec_zero _
-        rw [this]; exact fil_zero P a
-      smul_mem' := by
-        intro k c hc i
-        have : vec (k • c) = eK k • vec c := by
-          simp only [vec, Pi.smul_apply, smul_eq_mul, hEmul, ← Matrix.mulVec_smul]; rfl
-        rw [this]
-        simpa using hmul 0 a _ _ (hE0 k) (hc i) }
+  let Af : ℤ → Submodule ↥K.1 (n → ↥K.1) := fun a => {
+    carrier := {c | ∀ i, vec c i ∈ Fil P a}
+    add_mem' := by
+      intro c d hc hd i
+      have : vec (c + d) = vec c + vec d := by
+        simp only [vec, Pi.add_apply, hEadd, ← Matrix.mulVec_add]; rfl
+      rw [this]
+      exact fil_add P (hc i) (hd i)
+    zero_mem' := by
+      intro i
+      have : vec 0 = 0 := by simp only [vec, Pi.zero_apply, hE00]; exact Matrix.mulVec_zero _
+      rw [this]
+      exact fil_zero P a
+    smul_mem' := by
+      intro k c hc i
+      have : vec (k • c) = eK k • vec c := by
+        simp only [vec, Pi.smul_apply, smul_eq_mul, hEmul, ← Matrix.mulVec_smul]; rfl
+      rw [this]
+      simpa using hmul 0 a _ _ (hE0 k) (hc i)
+  }
 
   have hAnti : Antitone Af := by
     intro a b hab c hc i
@@ -125,13 +143,14 @@ theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
     funext j
     exact hEinj _ (congrFun h2 j)
   choose f hf using fun p : n × n => fil_exh P (Q' p.1 p.2)
-  let a0 : ℤ := -∑ p : n × n, |f p|
+  let a0 : ℤ := - ∑ p : n × n, |f p|
   have ha0 : ∀ p, a0 ≤ f p := by
     intro p
     have h1 : |f p| ≤ ∑ q : n × n, |f q| :=
       Finset.single_le_sum (f := fun q => |f q|) (fun q _ => abs_nonneg _) (Finset.mem_univ p)
     have h2 := neg_abs_le (f p)
-    simp only [a0]; linarith
+    simp only [a0]
+    linarith
   have hTop : Af a0 = ⊤ := by
     rw [eq_top_iff]
     intro c _ i
@@ -151,26 +170,35 @@ theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
     have := (htz (k j) (-(k j)) _).1 (hdk j i)
     rwa [add_neg_cancel] at this
 
-  have hvg : ∀ (g : ↥(GK K)) j, (A g) *ᵥ (fun m => P.actQdR (g : GQ l) (vec (d j) m)) = vec (d j) := by
+  have hvg
+      : ∀ (g : ↥(GK K)) j, (A g) *ᵥ (fun m => P.actQdR (g : GQ l) (vec (d j) m)) = vec (d j) := by
     intro g j
-    have : (fun m => P.actQdR (g : GQ l) (vec (d j) m)) = (Q'.map (P.actQdR (g : GQ l))) *ᵥ (fun p => eK (d j p)) := by
+    have : (fun m => P.actQdR (g : GQ l) (vec (d j) m))
+        = (Q'.map (P.actQdR (g : GQ l))) *ᵥ (fun p => eK (d j p)) := by
       funext m
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [vec, Matrix.mulVec, dotProduct, map_sum, map_mul, hEg, Matrix.map_apply]
+      simp only [vec, Matrix.mulVec, dotProduct, map_sum, map_mul, hEg, Matrix.map_apply]
     rw [this, Matrix.mulVec_mulVec, hAQ]
-  have hEig : ∀ g : ↥(GK K), A g * U0.map (P.actQdR (g : GQ l)) = U0 * Matrix.diagonal fun j =>
-      algebraMap ℚ_[l] P.R.BdR ((P.χQ (g : GQ l) ^ (-(k j)) : ℚ_[l]ˣ) : ℚ_[l]) := by
+  have hEig
+      : ∀ g : ↥(GK K),
+        A g * U0.map (P.actQdR (g : GQ l))
+          = U0 * Matrix.diagonal fun j =>
+            algebraMap ℚ_[l] P.R.BdR ((P.χQ (g : GQ l) ^ (-(k j)) : ℚ_[l]ˣ) : ℚ_[l]) := by
     intro g
     ext i j
     rw [Matrix.mul_diagonal, Matrix.mul_apply]
-    have key : ∀ X : P.R.BdR, (∑ m, A g i m * (X * P.actQdR (g : GQ l) (vec (d j) m))) = X * vec (d j) i := by
+    have key
+        : ∀ X : P.R.BdR,
+          (∑ m, A g i m * (X * P.actQdR (g : GQ l) (vec (d j) m))) = X * vec (d j) i := by
       intro X
       rw [← congrFun (hvg g j) i, Matrix.mulVec, dotProduct, Finset.mul_sum]
       exact Finset.sum_congr rfl fun _ _ => by ring
     simp only [U0, Matrix.map_apply, Matrix.of_apply, map_mul, htzact]
-    rw [key]; ring
+    rw [key]
+    ring
 
-  have hq : ∀ q : ℚ_[l], ∃ h : algebraMap ℚ_[l] P.R.BdR q ∈ S, θ ⟨_, h⟩ = algebraMap ℚ_[l] ℂ_[l] q := by
+  have hq
+      : ∀ q : ℚ_[l], ∃ h : algebraMap ℚ_[l] P.R.BdR q ∈ S, θ ⟨_, h⟩ = algebraMap ℚ_[l] ℂ_[l] q := by
     intro q
     obtain ⟨h, hh⟩ := hθOm (algebraMap ℚ_[l] (Om l) q)
     have e : algebraMap ℚ_[l] P.R.BdR q = algebraMap (Om l) P.R.BdR (algebraMap ℚ_[l] (Om l) q) :=
@@ -185,21 +213,26 @@ theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
   have hgS : ∀ (g : GQ l) i j, P.actQdR g (U0 i j) ∈ S := fun g i j => (hθg g (U0S i j)).1
   let Aθ : ↥(GK K) → Matrix n n ℂ_[l] := fun g =>
     (Matrix.of fun i j => (⟨A g i j, (hS _).2 (hA0 g i j)⟩ : ↥S)).map θ
-  have hc1 : ∀ (g : ↥(GK K)) (j : n), (Aθ g) *ᵥ (fun i => Formalism.Per.σC (g : GQ l) (M i j)) =
-      algebraMap ℚ_[l] ℂ_[l] ((P.χQ (g : GQ l) ^ (-(k j)) : ℚ_[l]ˣ) : ℚ_[l]) • (fun i => M i j) := by
+  have hc1
+      : ∀ (g : ↥(GK K)) (j : n),
+        (Aθ g) *ᵥ (fun i => Formalism.Per.σC (g : GQ l) (M i j))
+          = algebraMap ℚ_[l] ℂ_[l] ((P.χQ (g : GQ l) ^ (-(k j)) : ℚ_[l]ˣ) : ℚ_[l])
+            • (fun i => M i j) := by
     intro g j
     funext i
     obtain ⟨hc, hcθ⟩ := hq ((P.χQ (g : GQ l) ^ (-(k j)) : ℚ_[l]ˣ) : ℚ_[l])
     have hE := congrFun (congrFun (hEig g) i) j
     rw [Matrix.mul_apply, Matrix.mul_diagonal] at hE
-    have hsum : (∑ m, (⟨A g i m, (hS _).2 (hA0 g i m)⟩ : ↥S) * ⟨P.actQdR (g : GQ l) (U0 m j), hgS g m j⟩) =
-        U0S i j * ⟨_, hc⟩ := by
+    have hsum
+        : (∑ m, (⟨A g i m, (hS _).2 (hA0 g i m)⟩ : ↥S) * ⟨P.actQdR (g : GQ l) (U0 m j), hgS g m j⟩)
+          = U0S i j * ⟨_, hc⟩ := by
       apply Subtype.ext
       simpa [U0S] using hE
     have h3 := congrArg θ hsum
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, map_mul, hcθ] at h3
-    simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, Aθ, M, Matrix.map_apply, Matrix.of_apply]
+    simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, Aθ, M, Matrix.map_apply,
+      Matrix.of_apply]
     rw [mul_comm, ← h3]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [map_mul]
@@ -207,12 +240,15 @@ theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
     exact ((hθg _ (U0S m j)).2).symm
   have hvecx : ∀ (c' : n → ↥K.1) i, vec (∑ j, c' j • d j) i = ∑ j, eK (c' j) * vec (d j) i := by
     intro c' i
-    simp only [vec, Matrix.mulVec, dotProduct, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hEsum, hEmul]
+    simp only [vec, Matrix.mulVec, dotProduct, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hEsum,
+      hEmul]
     simp_rw [Finset.mul_sum]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
-  have hc2 : ∀ (a : ℤ) (c : n → Om l), (∀ j, c j ∈ K.1) → (∀ j, -(k j) ≠ a → c j = 0) →
-      ∑ j, (c j : ℂ_[l]) • (fun i => M i j) = 0 → c = 0 := by
+  have hc2
+      : ∀ (a : ℤ) (c : n → Om l),
+        (∀ j, c j ∈ K.1) → (∀ j, -(k j) ≠ a → c j = 0) → ∑ j, (c j : ℂ_[l]) • (fun i => M i j) = 0
+          → c = 0 := by
     intro a c hcK hcw hsum
     let c' : n → ↥K.1 := fun j => ⟨c j, hcK j⟩
     have hc'0 : ∀ j, -(k j) ≠ a → c' j = 0 := fun j hj => Subtype.ext (hcw j hj)
@@ -228,15 +264,17 @@ theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
         simp only [map_mul, hθc]
         simpa [M] using hi
       have h1 := (hθ0 _).1 h0
-      have h2 : ((∑ j, (⟨eK (c' j), hmemc j⟩ : ↥S) * U0S i j : ↥S) : P.R.BdR) =
-          tz P a * vec (∑ j, c' j • d j) i := by
+      have h2
+          : ((∑ j, (⟨eK (c' j), hmemc j⟩ : ↥S) * U0S i j : ↥S) : P.R.BdR)
+            = tz P a * vec (∑ j, c' j • d j) i := by
         rw [hvecx, Finset.mul_sum]
         simp only [AddSubmonoidClass.coe_finsetSum, MulMemClass.coe_mul, U0S, U0, Matrix.of_apply]
         refine Finset.sum_congr rfl fun j _ => ?_
         by_cases hj : -(k j) = a
         · rw [hj]; ring
         · rw [hc'0 j hj, hE00]; ring
-      rw [← h2]; exact h1
+      rw [← h2]
+      exact h1
     have hxA : (∑ j, c' j • d j) ∈ Af (1 - a) := by
       intro i
       have := (htz (1 - a) a (vec (∑ j, c' j • d j) i)).2 (by rw [sub_add_cancel]; exact hx1 i)
@@ -246,15 +284,19 @@ theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
       by_cases hj : -(k j) = a
       · exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, show k j = -a by omega, rfl⟩)
       · rw [hc'0 j hj, zero_smul]; exact Submodule.zero_mem _
-    have hdisj := hli.disjoint_span_image (s := {j | 1 - a ≤ k j}) (t := {j | k j = -a})
-      (Set.disjoint_left.2 fun j h1 h2 => by simp only [Set.mem_setOf_eq] at h1 h2; omega)
+    have hdisj :=
+      hli.disjoint_span_image (s := {j | 1 - a ≤ k j}) (t := {j | k j = -a})
+        (Set.disjoint_left.2 fun j h1 h2 => by simp only [Set.mem_setOf_eq] at h1 h2; omega)
     rw [hsp] at hxA
     have hx0 : (∑ j, c' j • d j) = 0 := (Submodule.disjoint_def.1 hdisj) _ hxA hxB
     have := Fintype.linearIndependent_iff.1 hli c' hx0
     funext j
     exact congrArg Subtype.val (this j)
   have hliC : LinearIndependent ℂ_[l] (fun j i => M i j) :=
-    GlobalTheory.T.linearIndependent_cyclotomicEigenvectors_weights l P n K Aθ n (fun j i => M i j) (fun j => -(k j)) hc1 hc2
+    GlobalTheory.T.linearIndependent_cyclotomicEigenvectors_weights l P n K Aθ n
+      (fun j i => M i j)
+      (fun j => -(k j))
+      hc1 hc2
   have hunit : IsUnit M := Matrix.linearIndependent_cols_iff_isUnit.1 hliC
   have hdet : θ U0S.det ≠ 0 := by
     rw [RingHom.map_det]
@@ -272,9 +314,12 @@ theorem frame_of_period_matrix : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (
     intro i j
     rw [e]
     exact (hS _).1 (U0S.adjugate i j).2
-  let U : GL n P.R.BdR := ⟨U0, y • U0.adjugate,
+  let U : GL n P.R.BdR := ⟨
+    U0,
+    y • U0.adjugate,
     by rw [Matrix.mul_smul, Matrix.mul_adjugate, smul_smul, mul_comm y, hy, one_smul],
-    by rw [Matrix.smul_mul, Matrix.adjugate_mul, smul_smul, mul_comm y, hy, one_smul]⟩
+    by rw [Matrix.smul_mul, Matrix.adjugate_mul, smul_smul, mul_comm y, hy, one_smul]
+  ⟩
   refine ⟨U, fun j => -(k j), ⟨hU0, fun i j => ?_⟩, hEig⟩
   show (y • U0.adjugate) i j ∈ Fil P 0
   rw [Matrix.smul_apply, smul_eq_mul]

@@ -91,8 +91,11 @@ lemma phi_bound {u H X b U : ℝ} (hu : 0 ≤ u) (hH : 0 < H) (hHX : H ≤ X * b
 
 namespace Data
 
-variable {U0 : Type} [Fintype U0] {W : U0 → Type} [∀ u0, Fintype (W u0)]
-  [∀ u0, Nonempty (W u0)] {Top : Type} [Fintype Top] {m f : ℕ}
+variable
+  {U0 : Type} [Fintype U0]
+  {W : U0 → Type} [∀ u0, Fintype (W u0)] [∀ u0, Nonempty (W u0)]
+  {Top : Type} [Fintype Top]
+  {m f : ℕ}
 variable (D : Data U0 W Top m f) (C : Consts)
 
 def abelian₂ (u0 : U0) : ℝ :=
@@ -101,8 +104,7 @@ def abelian₂ (u0 : U0) : ℝ :=
 
 def SDiv : ℝ := ∑ t, (m : ℝ) * (ph (D.aT t) - D.aT t * D.logOm)
 
-def EDiv : ℝ :=
-  C.cDiv * D.nT * D.a * D.La + C.cDiv * (m : ℝ) * (D.B0 + D.Nc) * D.x ^ (C.eDiv * D.ε)
+def EDiv : ℝ := C.cDiv * D.nT * D.a * D.La + C.cDiv * (m : ℝ) * (D.B0 + D.Nc) * D.x ^ (C.eDiv * D.ε)
 
 def K3 : ℝ :=
   C.cSlope * D.nT * D.a * D.La * (2 + (m : ℝ) / D.k) + D.Vvar C + C.cSl1 * (m : ℝ) * D.B0

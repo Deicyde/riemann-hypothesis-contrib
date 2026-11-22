@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.sum_log_primeFactors_mul_two_add_logb_le :
-    ∀ (Q : ℕ) (y : ℝ), Q ≠ 0 → 1 ≤ y → Real.log Q ≤ y →
-      (∑ p ∈ Q.primeFactors, Real.log (p : ℝ)) * (2 + Real.logb 2 Q) ≤ 11 * y ^ 4 := by
+theorem UpperTheory.sum_log_primeFactors_mul_two_add_logb_le
+    : ∀ (Q : ℕ) (y : ℝ),
+      Q ≠ 0 → 1 ≤ y → Real.log Q ≤ y
+        → (∑ p ∈ Q.primeFactors, Real.log (p : ℝ)) * (2 + Real.logb 2 Q) ≤ 11 * y ^ 4 := by
   intro Q y hQ hy hlog
   have hQ1 : (1 : ℝ) ≤ Q := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr hQ
   have hl0 : 0 ≤ Real.log Q := Real.log_nonneg hQ1
@@ -26,7 +27,8 @@ theorem UpperTheory.sum_log_primeFactors_mul_two_add_logb_le :
     nlinarith
   have h3 : 0 ≤ Real.logb 2 Q := Real.logb_nonneg (by norm_num) hQ1
   have h4 : y ^ 2 ≤ y ^ 4 := pow_le_pow_right₀ hy (by norm_num)
-  calc (∑ p ∈ Q.primeFactors, Real.log (p : ℝ)) * (2 + Real.logb 2 Q)
+  calc
+    (∑ p ∈ Q.primeFactors, Real.log (p : ℝ)) * (2 + Real.logb 2 Q)
       ≤ y * (2 + Real.logb 2 Q) := mul_le_mul_of_nonneg_right h1 (by linarith)
     _ ≤ y * (4 * y) := mul_le_mul_of_nonneg_left (by linarith) (by linarith)
     _ ≤ 11 * y ^ 4 := by nlinarith

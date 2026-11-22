@@ -42,11 +42,14 @@ open ReciprocityTheory.AnForm.R (conePts)
 
 open MeasureTheory CxInt CxComp
 
-theorem cxSheetSimpleNull : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    (Q : Ideal (MRingOver ℂ ι)) (e : ℕ) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)),
-    IsCxVar Q e → IsSetGoodProj (conePts Q) Ψ →
-    volume {y : Fin e → ℂ | ∃ w ∈ setFibre (conePts Q) Ψ y, (∃ γ, IsSetSheet (conePts Q) Ψ y w γ) ∧
-      ¬ cxSimple (conePts Q) Ψ w} = 0 := by
+theorem cxSheetSimpleNull
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Q : Ideal (MRingOver ℂ ι))
+        (e : ℕ) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)),
+      IsCxVar Q e → IsSetGoodProj (conePts Q) Ψ
+        → volume
+            {y : Fin e → ℂ | ∃ w ∈ setFibre (conePts Q) Ψ y, (∃ γ, IsSetSheet (conePts Q) Ψ y w γ) ∧
+              ¬ cxSimple (conePts Q) Ψ w}
+          = 0 := by
   intro K _ ι _ Q e Ψ hQ hΨ
   obtain ⟨d, hbd, hnull⟩ := cxGenericCount hQ Ψ hΨ
   refine measure_mono_null (fun y hy => ?_) hnull

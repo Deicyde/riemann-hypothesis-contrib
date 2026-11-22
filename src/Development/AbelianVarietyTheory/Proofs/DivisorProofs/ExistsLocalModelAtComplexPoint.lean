@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotDominates
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -18,12 +20,14 @@ noncomputable section
 
 namespace GlobalTheory.FieldPair
 
-theorem exists_locModel_at_point :
-    ∀ (A : Type) [CommRing A] [IsDomain A] [Algebra ℂ A] [Algebra.EssFiniteType ℂ A] (ε : A →ₐ[ℂ] ℂ),
-      ∃ T : Subring (FractionRing A), IsLocModel (algebraMap ℂ (FractionRing A)) T ∧
-        RatRes (algebraMap ℂ (FractionRing A)) T ∧
-        ∀ a : A, algebraMap A (FractionRing A) a ∈ T ∧
-          (ε a = 0 → NonUnit T (algebraMap A (FractionRing A) a)) := by
+theorem exists_locModel_at_point
+    : ∀ (A : Type) [CommRing A] [IsDomain A] [Algebra ℂ A] [Algebra.EssFiniteType ℂ A]
+        (ε : A →ₐ[ℂ] ℂ),
+      ∃ T : Subring (FractionRing A),
+        IsLocModel (algebraMap ℂ (FractionRing A)) T ∧ RatRes (algebraMap ℂ (FractionRing A)) T
+          ∧ ∀ a : A,
+            algebraMap A (FractionRing A) a ∈ T
+              ∧ (ε a = 0 → NonUnit T (algebraMap A (FractionRing A) a)) := by
   intro A _ _ _ _ ε
   let K := FractionRing A
   let P : Ideal A := RingHom.ker (ε : A →+* ℂ)
@@ -37,13 +41,14 @@ theorem exists_locModel_at_point :
     exact RingHom.mem_ker.2 h
   let ψ : B →+* ℂ := IsLocalization.lift hu
   have hψ : ∀ x, ψ (b x) = ε x := IsLocalization.lift_eq hu
-  have hcK : ∀ z : ℂ, algebraMap ℂ K z = algebraMap A K (algebraMap ℂ A z) :=
-    fun z => IsScalarTower.algebraMap_apply ℂ A K z
+  have hcK : ∀ z : ℂ, algebraMap ℂ K z = algebraMap A K (algebraMap ℂ A z) := fun z =>
+    IsScalarTower.algebraMap_apply ℂ A K z
   have hc : ∀ z : ℂ, algebraMap ℂ K z ∈ B.toSubring := fun z => by
     rw [hcK]; exact B.algebraMap_mem _
   have hψc : ∀ z : ℂ, ψ ⟨algebraMap ℂ K z, hc z⟩ = z := fun z => by
     have : (⟨algebraMap ℂ K z, hc z⟩ : B) = b (algebraMap ℂ A z) := Subtype.ext (hcK z)
-    rw [this, hψ]; exact ε.commutes z
+    rw [this, hψ]
+    exact ε.commutes z
   have key : ∀ x : B, ψ x = 0 → NonUnit B.toSubring (x : K) := fun x hx => by
     refine (nonUnit_iff (R := B.toSubring) x).2 fun h => ?_
     have := h.map ψ

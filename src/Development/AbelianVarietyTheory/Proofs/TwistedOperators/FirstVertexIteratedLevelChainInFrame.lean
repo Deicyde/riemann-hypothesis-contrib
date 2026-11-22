@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.SimpleSum
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix Topology GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
+open MeasureTheory ValuativeRel Matrix Topology GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
 
 noncomputable section
 namespace GlobalTheory.FirstVertexFrame
@@ -25,8 +26,8 @@ def epsEquiv (κ : ℕ) (t : Type) : Fin κ ≃ XIx (Fin κ) t 0 where
 section
 variable {k : Type} [Field k] {t : Type} [Fintype t] [DecidableEq t] {κ l : ℕ}
 
-def read (t : Type) [Fintype t] [DecidableEq t] (ϖ : kˣ) (H : 0 + l = l) :
-    GL (XIx (Fin κ) t 0 ⊕ Fin l) k ≃* GL (Fin κ ⊕ Fin l) k :=
+def read (t : Type) [Fintype t] [DecidableEq t] (ϖ : kˣ) (H : 0 + l = l)
+    : GL (XIx (Fin κ) t 0 ⊕ Fin l) k ≃* GL (Fin κ ⊕ Fin l) k :=
   (typeFrame ϖ (stdOrd (Fin κ) t 0 l H)).conj.symm.trans (reGL (ixZero (Fin κ ⊕ Fin l) t)).symm
 
 variable [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
@@ -227,60 +228,82 @@ private lemma simpleSum_read_eq_mul_simpleSum {k : Type} [Field k] (t : Type) [F
     ring
   · simp
 
-
 open MeasureTheory ValuativeRel Matrix Topology in
-theorem _root_.GlobalTheory.FirstVertexFrame.firstVertex_typeChain : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle) (ϖ : kˣ) (s : ℕ) (t : Type) [Fintype t] [DecidableEq t]
-    (κ : ℕ) (P : _root_.GlobalTheory.StepData.TypeDatum k (Fin κ ⊕ Fin (s + 1))),
-    ((∀ u ∈ _root_.GlobalTheory.RootEx.N k (Fin κ) (s + 1) 1, ∀ γ : GL (Fin κ) k,
-        u * _root_.GlobalTheory.RootEx.embX (s + 1) γ ∈ P.J →
-          ∃ gb, _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip Fin.val gb.val) ∧
-      (∀ (γ : GL (Fin κ) k) (gb : GL (Fin κ) 𝓀[k]), _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb →
-        _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip Fin.val gb.val →
-          ∃ hm : _root_.GlobalTheory.RootEx.embX (s + 1) γ ∈ P.J,
-            (P.lam ⟨_, hm⟩ : ℂ) =
-              ψ ((ϖ⁻¹ : kˣ) * _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.superSum Fin.val γ.val)) ∧
-      ∀ u ∈ _root_.GlobalTheory.RootEx.N k (Fin κ) (s + 1) 1,
-        ∀ hm : u ∈ P.J,
-          (P.lam ⟨u, hm⟩ : ℂ) = ψ ((ϖ⁻¹ : kˣ) * _root_.GlobalTheory.RootEx.simpleSum u)) →
-    ∀ (μ : ℕ → kˣ →* ℂˣ) (hμ : ∀ j, _root_.GlobalTheory.SplitWeil.IsTame (μ j)) (c : ℕ) (H : 0 + c = s + 1),
-      (_root_.GlobalTheory.StepData.prX (_root_.GlobalTheory.StepData.Cgrp
-          ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).J 1) :
-          Set (GL (_root_.GlobalTheory.StepData.XIx (Fin κ) t 0) k)) = _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colGroup k κ t ∧
-      (∀ γ ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colGroup k κ t, ∃ hm : _root_.GlobalTheory.RootEx.embX c γ ∈
-          ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).J,
-        (((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).lam ⟨_, hm⟩ : ℂ) =
-          _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colChar ψ ϖ γ) ∧
-      ∀ u ∈ _root_.GlobalTheory.RootEx.N k (_root_.GlobalTheory.StepData.XIx (Fin κ) t 0) c 1,
-        ∀ hm : u ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).J,
-          (((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).lam ⟨u, hm⟩ : ℂ) =
-            ψ (_root_.GlobalTheory.RootEx.simpleSum u) := by
+theorem _root_.GlobalTheory.FirstVertexFrame.firstVertex_typeChain
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle) (ϖ : kˣ) (s : ℕ) (t : Type) [Fintype t] [DecidableEq t] (κ : ℕ)
+        (P : _root_.GlobalTheory.StepData.TypeDatum k (Fin κ ⊕ Fin (s + 1))),
+      ((∀ u ∈ _root_.GlobalTheory.RootEx.N k (Fin κ) (s + 1) 1, ∀ γ : GL (Fin κ) k,
+            u * _root_.GlobalTheory.RootEx.embX (s + 1) γ ∈ P.J
+              → ∃ gb,
+                _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb
+                  ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip
+                    Fin.val gb.val)
+          ∧ (∀ (γ : GL (Fin κ) k) (gb : GL (Fin κ) 𝓀[k]),
+            _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb
+              → _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip Fin.val
+                gb.val
+              → ∃ hm : _root_.GlobalTheory.RootEx.embX (s + 1) γ ∈ P.J,
+                (P.lam ⟨_, hm⟩ : ℂ)
+                  = ψ
+                    ((ϖ⁻¹ : kˣ)
+                      * _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.superSum
+                        Fin.val γ.val))
+          ∧ ∀ u ∈ _root_.GlobalTheory.RootEx.N k (Fin κ) (s + 1) 1, ∀ hm : u ∈ P.J,
+            (P.lam ⟨u, hm⟩ : ℂ) = ψ ((ϖ⁻¹ : kˣ) * _root_.GlobalTheory.RootEx.simpleSum u))
+        → ∀ (μ : ℕ → kˣ →* ℂˣ) (hμ : ∀ j, _root_.GlobalTheory.SplitWeil.IsTame (μ j)) (c : ℕ)
+            (H : 0 + c = s + 1),
+          (_root_.GlobalTheory.StepData.prX (_root_.GlobalTheory.StepData.Cgrp
+                  ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).J 1)
+                : Set (GL (_root_.GlobalTheory.StepData.XIx (Fin κ) t 0) k))
+              = _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colGroup k κ t
+            ∧ (∀ γ ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colGroup k κ t,
+              ∃ hm : _root_.GlobalTheory.RootEx.embX c γ
+                  ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).J,
+                (((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).lam ⟨_, hm⟩ : ℂ)
+                  = _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colChar ψ ϖ γ)
+            ∧ ∀ u
+                ∈ _root_.GlobalTheory.RootEx.N k (_root_.GlobalTheory.StepData.XIx (Fin κ) t 0) c 1,
+              ∀ hm : u ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).J,
+                (((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).lam ⟨u, hm⟩ : ℂ)
+                  = ψ (_root_.GlobalTheory.RootEx.simpleSum u) := by
   intro k _ _ _ _ ψ ϖ s t _ _ κ P hP μ hμ c H
   obtain ⟨h1, h2, h3⟩ := hP
   obtain rfl : c = s + 1 := by omega
-  have hmem : ∀ x, x ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 (s + 1)
-      H).J ↔
-      _root_.GlobalTheory.FirstVertexFrame.read t ϖ H x ∈ P.J := by
+  have hmem
+      : ∀ x,
+        x ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 (s + 1) H).J
+          ↔ _root_.GlobalTheory.FirstVertexFrame.read t ϖ H x ∈ P.J := by
     intro x
-    unfold _root_.GlobalTheory.StepData.typeChain _root_.GlobalTheory.StepData.Chain.lev _root_.GlobalTheory.StepData.Chain.ofType
+    unfold _root_.GlobalTheory.StepData.typeChain _root_.GlobalTheory.StepData.Chain.lev
+      _root_.GlobalTheory.StepData.Chain.ofType
     dsimp only
-    rw [_root_.GlobalTheory.StepData.Level.mem_map, _root_.GlobalTheory.StepData.TypeDatum.iter_zero]
+    rw [_root_.GlobalTheory.StepData.Level.mem_map,
+      _root_.GlobalTheory.StepData.TypeDatum.iter_zero]
     exact _root_.GlobalTheory.StepData.Level.mem_map
-  have hlam : ∀ x (hx : x ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 (s + 1)
-      H).J),
-      ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 (s + 1) H).lam ⟨x, hx⟩ =
-        P.lam ⟨_, (hmem x).1 hx⟩ := fun x hx => rfl
+  have hlam
+      : ∀ x (hx : x ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 (s + 1) H).J),
+        ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 (s + 1) H).lam ⟨x, hx⟩
+          = P.lam ⟨_, (hmem x).1 hx⟩ := fun x hx =>
+    rfl
   refine ⟨?_, ?_, ?_⟩
   · ext γ
-    simp only [SetLike.mem_coe, _root_.GlobalTheory.StepData.mem_prX, _root_.GlobalTheory.StepData.mem_Cgrp, inv_one,
-      one_mul, mul_one]
-    change _ ↔ ∃ gb, _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb ∧
-      _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip (_root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colPos κ t) gb.val
+    simp only [SetLike.mem_coe, _root_.GlobalTheory.StepData.mem_prX,
+      _root_.GlobalTheory.StepData.mem_Cgrp, inv_one, one_mul, mul_one]
+    change _
+      ↔ ∃ gb,
+        _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces γ gb
+          ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip
+            (_root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colPos κ t) gb.val
     constructor
     · rintro ⟨u, hu, -, hJ⟩
       rw [hmem, map_mul, read_embX_eq_embX_reGL_symm] at hJ
       obtain ⟨gb, hr, hup⟩ := h1 _ ((read_mem_N_iff t ϖ H u).2 hu) _ hJ
-      refine ⟨_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ t) gb, ?_, ?_⟩
+      refine ⟨
+        _root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ t) gb,
+        ?_,
+        ?_
+      ⟩
       · simpa using reduces_reGL_of_reduces (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ t) hr
       · rw [isUpperUnip_reGL_iff]
         exact hup
@@ -290,24 +313,31 @@ theorem _root_.GlobalTheory.FirstVertexFrame.firstVertex_typeChain : ∀ (k : Ty
         unfold _root_.GlobalTheory.RootEx.R
         exact Subgroup.mem_sup_left ⟨γ, rfl⟩
       · rw [one_mul, hmem, read_embX_eq_embX_reGL_symm]
-        refine (h2 _ ((_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ t)).symm gb) ?_ ?_).1
+        refine (h2 _
+          ((_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ
+            t)).symm gb)
+          ?_ ?_).1
         · rw [reGL_symm_apply, reGL_symm_apply]
           exact reduces_reGL_of_reduces _ hr
         · rw [reGL_symm_apply, isUpperUnip_reGL_iff, val_comp_epsEquiv_symm_eq_colPos]
           exact hup
   · rintro γ ⟨gb, hr, hup⟩
     have hr' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.Reduces
-        ((_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ t)).symm γ)
-        ((_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ t)).symm gb) := by
+        ((_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ
+          t)).symm γ)
+        ((_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ
+          t)).symm gb) := by
       rw [reGL_symm_apply, reGL_symm_apply]
       exact reduces_reGL_of_reduces _ hr
     have hup' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUpperUnip Fin.val
-        ((_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ t)).symm gb).val := by
+        ((_root_.GlobalTheory.StepData.reGL (_root_.GlobalTheory.FirstVertexFrame.epsEquiv κ
+          t)).symm gb).val := by
       rw [reGL_symm_apply, isUpperUnip_reGL_iff, val_comp_epsEquiv_symm_eq_colPos]
       exact hup
     obtain ⟨hm, hv⟩ := h2 _ _ hr' hup'
-    have hm' : _root_.GlobalTheory.RootEx.embX (s + 1) γ ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 (s + 1)
-        H).J := by
+    have hm'
+        : _root_.GlobalTheory.RootEx.embX (s + 1) γ
+          ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 (s + 1) H).J := by
       rw [hmem, read_embX_eq_embX_reGL_symm]
       exact hm
     refine ⟨hm', ?_⟩
@@ -316,7 +346,8 @@ theorem _root_.GlobalTheory.FirstVertexFrame.firstVertex_typeChain : ∀ (k : Ty
       Subtype.ext (read_embX_eq_embX_reGL_symm t ϖ H γ)
     rw [he, hv]
     unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.colChar
-    rw [_root_.GlobalTheory.StepData.reGL_symm_val, superSum_submatrix_eq_superSum_comp_symm, val_comp_epsEquiv_symm_eq_colPos]
+    rw [_root_.GlobalTheory.StepData.reGL_symm_val, superSum_submatrix_eq_superSum_comp_symm,
+      val_comp_epsEquiv_symm_eq_colPos]
   · intro u hu hm
     rw [hlam, h3 _ ((read_mem_N_iff t ϖ H u).2 hu) ((hmem u).1 hm), simpleSum_read_eq_mul_simpleSum,
       Units.val_inv_eq_inv_val, ← mul_assoc, inv_mul_cancel₀ ϖ.ne_zero, one_mul]

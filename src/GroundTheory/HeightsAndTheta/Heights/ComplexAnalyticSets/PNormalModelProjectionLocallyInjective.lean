@@ -14,7 +14,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial Topology IndefiniteRowSideFullHecke.ComplexSets
 
-theorem NormalModelProjectionLocallyInjective.proof : NormalModelProjectionLocallyInjective.Statement := by
+theorem NormalModelProjectionLocallyInjective.proof
+    : NormalModelProjectionLocallyInjective.Statement := by
   intro n J M w hJ hdim hw
   choose a b hbJ hab using M.birational
   set B : MvPolynomial (Fin n) ℂ := ∏ i, b i with hB
@@ -24,16 +25,18 @@ theorem NormalModelProjectionLocallyInjective.proof : NormalModelProjectionLocal
     exact hbJ i hi
 
   set S : Set (Fin n → ℂ) := ComplexSets.zeroSet J ∩ ComplexSets.zeroSet (Ideal.span {B}) with hS
-  have hSfin : S.Finite := CurveProperClosedFinite.proof n J _ hJ hdim
-    (fun h => hBJ (h (Ideal.subset_span rfl)))
+  have hSfin : S.Finite :=
+    CurveProperClosedFinite.proof n J _ hJ hdim (fun h => hBJ (h (Ideal.subset_span rfl)))
 
   choose P hPm hP using M.integral
   set F : Set (Fin n ⊕ Fin M.m → ℂ) := {z | z ∈ zeroSetIn M.ideal ∧ firstCoords z ∈ S} with hF
   have hFfin : F.Finite := by
-    have hT : (⋃ x ∈ S, ({x} : Set (Fin n → ℂ)) ×ˢ
-        Set.pi Set.univ (fun i => {y : ℂ | ((P i).map (eval x)).IsRoot y})).Finite :=
-      hSfin.biUnion fun x _ => (Set.finite_singleton x).prod
-        (Set.Finite.pi fun i => Polynomial.finite_setOfPred_isRoot ((hPm i).map (eval x)).ne_zero)
+    have hT
+        : (⋃ x ∈ S, ({x} : Set (Fin n → ℂ)) ×ˢ
+            Set.pi Set.univ (fun i => {y : ℂ | ((P i).map (eval x)).IsRoot y})).Finite :=
+      hSfin.biUnion fun x _ =>
+        (Set.finite_singleton x).prod
+          (Set.Finite.pi fun i => Polynomial.finite_setOfPred_isRoot ((hPm i).map (eval x)).ne_zero)
     refine (hT.image fun p => Sum.elim p.1 p.2).subset ?_
     intro z hz
     refine ⟨(firstCoords z, fun i => z (Sum.inr i)), ?_, ?_⟩
@@ -41,10 +44,14 @@ theorem NormalModelProjectionLocallyInjective.proof : NormalModelProjectionLocal
       exact isRoot_map_eval_of_mem_zeroSetIn hz.1 i (P i) (hP i)
     · funext s
       rcases s with j | i <;> rfl
-  refine ⟨(F \ {w})ᶜ, (hFfin.subset Set.sdiff_subset).isClosed.isOpen_compl.mem_nhds
-    (fun h => h.2 rfl), ?_⟩
+  refine ⟨
+    (F \ {w})ᶜ,
+    (hFfin.subset Set.sdiff_subset).isClosed.isOpen_compl.mem_nhds (fun h => h.2 rfl),
+    ?_
+  ⟩
 
-  have hnear : ∀ z ∈ zeroSetIn M.ideal ∩ (F \ {w})ᶜ, (∃ i, eval (firstCoords z) (b i) = 0) → z = w := by
+  have hnear
+      : ∀ z ∈ zeroSetIn M.ideal ∩ (F \ {w})ᶜ, (∃ i, eval (firstCoords z) (b i) = 0) → z = w := by
     rintro z ⟨hz, hzU⟩ ⟨i, hi⟩
     have hxJ : firstCoords z ∈ ComplexSets.zeroSet J := fun q hq => by
       rw [← M.comap_eq, Ideal.mem_comap] at hq
@@ -59,7 +66,8 @@ theorem NormalModelProjectionLocallyInjective.proof : NormalModelProjectionLocal
   intro z hz z' hz' hzz
   by_cases hbz : ∀ i, eval (firstCoords z) (b i) ≠ 0
   · have hbz' : ∀ i, eval (firstCoords z') (b i) ≠ 0 := hzz ▸ hbz
-    rw [M.eq_graph_of_mem_zeroSetIn a b hab z hz.1 hbz, M.eq_graph_of_mem_zeroSetIn a b hab z' hz'.1 hbz', hzz]
+    rw [M.eq_graph_of_mem_zeroSetIn a b hab z hz.1 hbz,
+      M.eq_graph_of_mem_zeroSetIn a b hab z' hz'.1 hbz', hzz]
   · simp only [not_forall, not_not] at hbz
     have hbz' : ∃ i, eval (firstCoords z') (b i) = 0 := hzz ▸ hbz
     rw [hnear z hz hbz, hnear z' hz' hbz']

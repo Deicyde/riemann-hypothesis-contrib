@@ -9,22 +9,31 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SquareStandi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField MeasureTheory Matrix
 open Classical
 open scoped TensorProduct ComplexConjugate GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames Formalism.L2.DIV
-open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation (spV spW spW₁ spV₁ alpha beta Num skewGram blk conjU)
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model HasExp SplitsFully Chars)
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StdFrames Formalism.L2.DIV
+open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation
+  (spV spW spW₁ spV₁ alpha beta Num skewGram blk conjU)
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  (Base Spc Model HasExp SplitsFully Chars)
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 noncomputable section
 
 namespace GlobalTheory.ChiGrid
 
-theorem rankV_add_lt_two_e_add_two_cen {D : D7} (C : ℝ) (τ : D.what₂.Tau) (i j : ℕ) (hi : i < D.R.m) (hj : j < D.R.m) :
-    ((rankV D (i + 1) (j + 1) + rankV D i j : ℕ) : ℚ) < 2 * (D.hc τ).e ⟨j, hj⟩ + 2 * (cen D C τ (D.R.m - i) : ℚ) := by
+theorem rankV_add_lt_two_e_add_two_cen
+    {D : D7} (C : ℝ) (τ : D.what₂.Tau) (i j : ℕ) (hi : i < D.R.m) (hj : j < D.R.m)
+    : ((rankV D (i + 1) (j + 1) + rankV D i j : ℕ) : ℚ)
+      < 2 * (D.hc τ).e ⟨j, hj⟩ + 2 * (cen D C τ (D.R.m - i) : ℚ) := by
   set P := D.hc τ with hP
   set G := GlobalTheory.SignedHC.GridData.ofHCParam P (sLen D) (gap D C) 0 with hG
   obtain ⟨hv, hb, -⟩ := GlobalTheory.SignedHC.GridData.ofHCParam_spec P (sLen D) (gap D C) 0
@@ -41,7 +50,8 @@ theorem rankV_add_lt_two_e_add_two_cen {D : D7} (C : ℝ) (τ : D.what₂.Tau) (
     rcases Nat.eq_zero_or_pos j with rfl | hj0
     · exact le_rfl
     · have := G.b_mono 1 (j + 1) le_rfl (by omega) (by rw [hGm]; omega)
-      rw [e0, ej]; exact_mod_cast this.le
+      rw [e0, ej]
+      exact_mod_cast this.le
 
   have hu2 := P.u_last_gt (by omega) (by omega)
   have hu1 := P.v_gt_u ⟨D.R.k - 2, by omega⟩
@@ -61,7 +71,8 @@ theorem rankV_add_lt_two_e_add_two_cen {D : D7} (C : ℝ) (τ : D.what₂.Tau) (
   have hmid : G.mid (D.R.m - i) = G.a (D.R.m - i) + G.ga / 2 := G.mid_eq (by omega)
   have ha : G.a (D.R.m - i) = (G.v 2 : ℚ) + 1 / 2 + ((i : ℚ) + 1) * (gap D C : ℚ) := by
     simp only [GlobalTheory.SignedHC.GridData.a, hGm, hGga]
-    rw [Nat.cast_sub hi.le]; ring
+    rw [Nat.cast_sub hi.le]
+    ring
   rw [hmid, ha, hGga] at hc
 
   have hg := (isLeast_gap D C).1.2.1
@@ -71,10 +82,10 @@ theorem rankV_add_lt_two_e_add_two_cen {D : D7} (C : ℝ) (τ : D.what₂.Tau) (
   have m2 : j * D.R.t ≤ D.R.m * D.R.t := Nat.mul_le_mul_right _ (by omega)
   have m3 : (i + 1) * sLen D ≤ D.R.m * sLen D := Nat.mul_le_mul_right _ (by omega)
   have m4 : i * sLen D ≤ D.R.m * sLen D := Nat.mul_le_mul_right _ (by omega)
-  have hrank : rankV D (i + 1) (j + 1) + rankV D i j ≤ 2 * bigN D := by
-    unfold rankV bigN; nlinarith
+  have hrank : rankV D (i + 1) (j + 1) + rankV D i j ≤ 2 * bigN D := by unfold rankV bigN; nlinarith
   have hR : rankV D (i + 1) (j + 1) + rankV D i j + 1 ≤ gap D C := by omega
-  have hR' : ((rankV D (i + 1) (j + 1) + rankV D i j : ℕ) : ℚ) + 1 ≤ (gap D C : ℚ) := by exact_mod_cast hR
+  have hR' : ((rankV D (i + 1) (j + 1) + rankV D i j : ℕ) : ℚ) + 1 ≤ (gap D C : ℚ) := by
+    exact_mod_cast hR
   have hpos : (0 : ℚ) ≤ (i : ℚ) * (gap D C : ℚ) := by positivity
   have ht : (0 : ℚ) ≤ D.R.t := by positivity
   have h0 : (0 : ℚ) ≤ ((rankV D (i + 1) (j + 1) + rankV D i j : ℕ) : ℚ) := by positivity

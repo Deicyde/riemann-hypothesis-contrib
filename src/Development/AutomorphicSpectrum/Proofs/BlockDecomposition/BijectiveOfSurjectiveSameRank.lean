@@ -5,13 +5,17 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IotaQInj
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.WedgeOf
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.WedgeOf
 
 namespace GlobalTheory.CompanionTheory.WedgeOf
 
-theorem bijective_of_surjective_of_VB : ∀ (R A B : Type) [CommRing R] [AddCommGroup A] [Module R A]
-    [AddCommGroup B] [Module R B] (n : ℕ), VB R A n → VB R B n → ∀ f : A →ₗ[R] B,
-    Function.Surjective f → Function.Bijective f := by
+theorem bijective_of_surjective_of_VB
+    : ∀ (R A B : Type) [CommRing R] [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
+        (n : ℕ),
+      VB R A n → VB R B n → ∀ f : A →ₗ[R] B, Function.Surjective f → Function.Bijective f := by
   intro R A B _ _ _ _ _ n hA hB f hf
   obtain ⟨fA, pA, rA⟩ := hA
   obtain ⟨fB, pB, rB⟩ := hB
@@ -19,8 +23,8 @@ theorem bijective_of_surjective_of_VB : ∀ (R A B : Type) [CommRing R] [AddComm
   have hg' : ∀ b, f (g b) = b := fun b => LinearMap.congr_fun hg b
 
   let s : A →ₗ[R] LinearMap.ker f :=
-    LinearMap.codRestrict (LinearMap.ker f) (LinearMap.id - g ∘ₗ f) (fun a => by
-      simp [LinearMap.mem_ker, hg'])
+    LinearMap.codRestrict (LinearMap.ker f) (LinearMap.id - g ∘ₗ f)
+      (fun a => by simp [LinearMap.mem_ker, hg'])
   have hs : s ∘ₗ (LinearMap.ker f).subtype = LinearMap.id := by
     ext x
     have hx : f x.1 = 0 := x.2
@@ -32,10 +36,7 @@ theorem bijective_of_surjective_of_VB : ∀ (R A B : Type) [CommRing R] [AddComm
 
   let E : (LinearMap.ker f × B) ≃ₗ[R] A :=
     LinearEquiv.ofLinear ((LinearMap.ker f).subtype.coprod g) (s.prod f)
-      (by
-        ext a <;> simp [s, hg'])
-      (by
-        ext x <;> simp [s, hg'])
+      (by ext a <;> simp [s, hg']) (by ext x <;> simp [s, hg'])
   have hsub : Subsingleton (LinearMap.ker f) := by
     rw [← Module.rankAtStalk_eq_zero_iff_subsingleton (R := R)]
     funext p
@@ -46,7 +47,8 @@ theorem bijective_of_surjective_of_VB : ∀ (R A B : Type) [CommRing R] [AddComm
     rw [h1, rA p, rB p] at h3
     simpa using h3
   refine ⟨?_, hf⟩
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   have : (⟨a, ha⟩ : LinearMap.ker f) = 0 := Subsingleton.elim _ _
   simpa using congrArg Subtype.val this

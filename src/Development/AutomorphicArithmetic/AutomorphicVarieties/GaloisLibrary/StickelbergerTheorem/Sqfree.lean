@@ -7,9 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain UpperTheory.V.Kum UpperTheory.V.Stick
 open scoped nonZeroDivisors
 
-private theorem sub_prod {R : Type} [CommRing R] [IsDedekindDomain R] {ι : Type} (P : ι → Ideal R)
-    (hP : ∀ i, Prime (P i)) (t : Finset ι) :
-    ∀ I : Ideal R, I ∣ ∏ i ∈ t, P i → ∃ u : Finset ι, u ⊆ t ∧ I = ∏ i ∈ u, P i := by
+private theorem sub_prod
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    {ι : Type} (P : ι → Ideal R) (hP : ∀ i, Prime (P i)) (t : Finset ι)
+    : ∀ I : Ideal R, I ∣ ∏ i ∈ t, P i → ∃ u : Finset ι, u ⊆ t ∧ I = ∏ i ∈ u, P i := by
   classical
   refine Finset.induction_on t ?_ ?_
   · intro I h
@@ -30,14 +31,16 @@ private theorem sub_prod {R : Type} [CommRing R] [IsDedekindDomain R] {ι : Type
       rw [Finset.prod_insert (fun h => ha (hu h))]
     · have hk : P a ∣ K := (hpa.dvd_or_dvd ⟨_, hK.symm⟩).resolve_left hd
       obtain ⟨L, rfl⟩ := hk
-      have h' : I ∣ ∏ i ∈ t, P i := ⟨L, mul_left_cancel₀ hpa.ne_zero (by rw [hK]; exact mul_left_comm _ _ _)⟩
+      have h' : I ∣ ∏ i ∈ t, P i :=
+        ⟨L, mul_left_cancel₀ hpa.ne_zero (by rw [hK]; exact mul_left_comm _ _ _)⟩
       obtain ⟨u, hu, e⟩ := ih I h'
       exact ⟨u, hu.trans (Finset.subset_insert a t), e⟩
 
-theorem UpperTheory.V.Stick.sqfree :
-    ∀ (R : Type) [CommRing R] [IsDedekindDomain R] (ι : Type) [Fintype ι] (P : ι → Ideal R),
-    Function.Injective P → (∀ i, Prime (P i)) → ∀ (x : R) (s : Finset ι), Ideal.span {x} ∣ ∏ i, P i →
-    (∀ i, i ∈ s ↔ x ∈ P i) → Ideal.span {x} = ∏ i ∈ s, P i := by
+theorem UpperTheory.V.Stick.sqfree
+    : ∀ (R : Type) [CommRing R] [IsDedekindDomain R] (ι : Type) [Fintype ι] (P : ι → Ideal R),
+      Function.Injective P → (∀ i, Prime (P i))
+        → ∀ (x : R) (s : Finset ι),
+          Ideal.span {x} ∣ ∏ i, P i → (∀ i, i ∈ s ↔ x ∈ P i) → Ideal.span {x} = ∏ i ∈ s, P i := by
   classical
   intro R _ _ ι _ P hinj hP x s hdiv hs
   obtain ⟨u, -, hu⟩ := sub_prod P hP Finset.univ _ hdiv

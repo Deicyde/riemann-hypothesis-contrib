@@ -25,22 +25,33 @@ theorem smoothLog_contDiffOn {φ : ℝ → ℝ} (hφ : LE.SmoothLog φ) : ContDi
 
 section mem
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-theorem phi_mem_FFl (Bs : B.RealPlaceData k r Wp Wq) {φ : ℝ → ℝ} (hφ : LE.SmoothLog φ)
-    {Dm : Set (Q.Mx k r)} (hD : ∀ g ∈ Dm, 0 < Gf k r Bs.z Bs.z' g) {J : Q.Mx k r → (Wq →L[ℂ] Wp)}
-    (hJ : J ∈ Q.FFl k r Bs.z Bs.z' Bs.π Bs.π' 0 Dm) :
-    (fun g => ((φ (Gf k r Bs.z Bs.z' g) : ℝ) : ℂ) • J g) ∈ Q.FFl k r Bs.z Bs.z' Bs.π Bs.π' 0 Dm := by
+theorem phi_mem_FFl
+    (Bs : B.RealPlaceData k r Wp Wq)
+    {φ : ℝ → ℝ} (hφ : LE.SmoothLog φ)
+    {Dm : Set (Q.Mx k r)} (hD : ∀ g ∈ Dm, 0 < Gf k r Bs.z Bs.z' g)
+    {J : Q.Mx k r → (Wq →L[ℂ] Wp)} (hJ : J ∈ Q.FFl k r Bs.z Bs.z' Bs.π Bs.π' 0 Dm)
+    : (fun g => ((φ (Gf k r Bs.z Bs.z' g) : ℝ) : ℂ) • J g)
+      ∈ Q.FFl k r Bs.z Bs.z' Bs.π Bs.π' 0 Dm := by
   obtain ⟨hS, hL, hR, hU⟩ := hJ
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro g₀ hg₀
     obtain ⟨U, F, hU, hgU, hF, hFJ⟩ := hS g₀ hg₀
     have hGc : Continuous (fun g : Q.Mx k r => Gf k r Bs.z Bs.z' g) :=
       (Formalism.FourierDecayAlt.P.JCx1.contDiff_Gf Bs.z Bs.z').continuous
-    refine ⟨U ∩ {g | 0 < Gf k r Bs.z Bs.z' g}, fun g => ((φ (Gf k r Bs.z Bs.z' g) : ℝ) : ℂ) • F g,
-      hU.inter (isOpen_lt continuous_const hGc), ⟨hgU, hD g₀ hg₀.2⟩, ?_, ?_⟩
-    · have hc : ContDiffOn ℝ ∞ (fun g : Q.Mx k r => ((φ (Gf k r Bs.z Bs.z' g) : ℝ) : ℂ))
+    refine ⟨
+      U ∩ {g | 0 < Gf k r Bs.z Bs.z' g},
+      fun g => ((φ (Gf k r Bs.z Bs.z' g) : ℝ) : ℂ) • F g,
+      hU.inter (isOpen_lt continuous_const hGc),
+      ⟨hgU, hD g₀ hg₀.2⟩,
+      ?_,
+      ?_
+    ⟩
+    · have hc : ContDiffOn ℝ ∞
+          (fun g : Q.Mx k r => ((φ (Gf k r Bs.z Bs.z' g) : ℝ) : ℂ))
           (U ∩ {g | 0 < Gf k r Bs.z Bs.z' g}) :=
         Complex.ofRealCLM.contDiff.comp_contDiffOn ((smoothLog_contDiffOn hφ).comp
           (Formalism.FourierDecayAlt.P.JCx1.contDiff_Gf Bs.z Bs.z').contDiffOn fun g hg => hg.2)
@@ -74,13 +85,18 @@ theorem phi_operator_transfer_holds : JAPhiOp := by
     (hB.1.2.2.2.1.2 v).2.2.2.1
   have hTT : (D.parOf S v).TT = Tz S.G.k S.G.r (T v).base.z * Tz S.G.k S.G.r (T v).base.z' := by
     rw [hPl.2.2.2.1, hPl.2.2.2.2.1]; rfl
-  have hQ : ∀ x ∈ MA.Qset (D.parOf S v).r (D.parOf S v).TT, x ∈ JF.QDom S.G.k S.G.r (T v).base.z (T v).base.z' :=
-    fun x hx => ⟨hx.1, hTT ▸ hx.2⟩
-  have hOm : ∀ q ∈ JF.QDom S.G.k S.G.r (T v).base.z (T v).base.z', B.gq (T v).base q ∈ OmP S T v := by
+  have hQ
+      : ∀ x ∈ MA.Qset (D.parOf S v).r (D.parOf S v).TT,
+        x ∈ JF.QDom S.G.k S.G.r (T v).base.z (T v).base.z' := fun x hx =>
+    ⟨hx.1, hTT ▸ hx.2⟩
+  have hOm
+      : ∀ q ∈ JF.QDom S.G.k S.G.r (T v).base.z (T v).base.z', B.gq (T v).base q ∈ OmP S T v := by
     intro q hq
     have h := (Formalism.FourierDecayAlt.P.BigCellHermitian.gqDom (T v).base hq).2
     exact ⟨h.2, fun a => h.1 _ (by simp)⟩
-  have hJ' : J ∈ Q.FFl S.G.k S.G.r (T v).base.z (T v).base.z' (T v).base.π (T v).base.π' 0 (OmP S T v) := hJ
+  have hJ'
+      : J ∈ Q.FFl S.G.k S.G.r (T v).base.z (T v).base.z' (T v).base.π (T v).base.π' 0 (OmP S T v) :=
+    hJ
   refine ⟨phi_mem_FFl (T v).base hφ (fun g (hg : g ∈ OmP S T v) => hg.1) hJ', ?_⟩
   funext ρ
   set u : MA.Qp (D.parOf S v).r (D.parOf S v).TT → ℂ := fun q =>
@@ -88,21 +104,26 @@ theorem phi_operator_transfer_holds : JAPhiOp := by
       inner ℂ (B.hsVec (e ρ q.1.2)) (B.hsVec (J (B.gq (T v).base q.1))) with hu_def
   have hu : u ∈ MA.smSub (D.parOf S v).r (D.parOf S v).TT := by
     show ContDiffOn ℝ MA.sm (MA.ext u) (MA.Qset _ _)
-    have hg : ContDiffOn ℝ ∞ (fun x : MA.E (D.parOf S v).r => J (B.gq (T v).base x))
+    have hg : ContDiffOn ℝ ∞
+        (fun x : MA.E (D.parOf S v).r => J (B.gq (T v).base x))
         (MA.Qset (D.parOf S v).r (D.parOf S v).TT) :=
       (cutTr_jgq_smooth (T v).base _ _ hJ'.1 hOm).mono hQ
-    have he' : ContDiffOn ℝ ∞ (fun x : MA.E (D.parOf S v).r => e ρ x.2) (MA.Qset (D.parOf S v).r (D.parOf S v).TT) :=
+    have he' : ContDiffOn ℝ ∞
+        (fun x : MA.E (D.parOf S v).r => e ρ x.2)
+        (MA.Qset (D.parOf S v).r (D.parOf S v).TT) :=
       (he.1 ρ).comp contDiff_snd.contDiffOn fun x hx => hx.2
     have hwc : ContDiff ℝ ∞ (fun x : MA.E (D.parOf S v).r => MA.wq S.G.k x (D.parOf S v).TT) := by
       have hn := cutTr_normSq_contDiff
       unfold MA.wq
       fun_prop
-    have hwp : ∀ x ∈ MA.Qset (D.parOf S v).r (D.parOf S v).TT, MA.wq S.G.k x (D.parOf S v).TT ≠ 0 := by
+    have hwp
+        : ∀ x ∈ MA.Qset (D.parOf S v).r (D.parOf S v).TT, MA.wq S.G.k x (D.parOf S v).TT ≠ 0 := by
       intro x hx
       unfold MA.wq
       exact (mul_pos (Finset.prod_pos fun l _ => pow_pos (Complex.normSq_pos.2 (hx.1 l)) _)
         (pow_pos (sub_pos.2 hx.2) _)).ne'
-    have hw : ContDiffOn ℝ ∞ (fun x : MA.E (D.parOf S v).r => ((Real.sqrt (MA.wq S.G.k x (D.parOf S v).TT) : ℝ) : ℂ))
+    have hw : ContDiffOn ℝ ∞
+        (fun x : MA.E (D.parOf S v).r => ((Real.sqrt (MA.wq S.G.k x (D.parOf S v).TT) : ℝ) : ℂ))
         (MA.Qset (D.parOf S v).r (D.parOf S v).TT) :=
       Complex.ofRealCLM.contDiff.comp_contDiffOn (hwc.contDiffOn.sqrt hwp)
     refine (hw.mul ((cutTr_hsVec_contDiff.comp_contDiffOn he').inner ℂ
@@ -116,12 +137,15 @@ theorem phi_operator_transfer_holds : JAPhiOp := by
         (∏ l, Complex.normSq (x.1 l)) * (Complex.normSq x.2 - (D.parOf S v).TT)) := by
       have hn := cutTr_normSq_contDiff
       fun_prop
-    have hGp : ∀ x ∈ MA.Qset (D.parOf S v).r (D.parOf S v).TT,
-        (∏ l, Complex.normSq (x.1 l)) * (Complex.normSq x.2 - (D.parOf S v).TT) ∈ Set.Ioi (0 : ℝ) := by
+    have hGp
+        : ∀ x ∈ MA.Qset (D.parOf S v).r (D.parOf S v).TT,
+          (∏ l, Complex.normSq (x.1 l)) * (Complex.normSq x.2 - (D.parOf S v).TT)
+            ∈ Set.Ioi (0 : ℝ) := by
       intro x hx
       exact mul_pos (Finset.prod_pos fun l _ => Complex.normSq_pos.2 (hx.1 l)) (sub_pos.2 hx.2)
-    have hc : ContDiffOn ℝ ∞ (fun x : MA.E (D.parOf S v).r =>
-        ((φ ((∏ l, Complex.normSq (x.1 l)) * (Complex.normSq x.2 - (D.parOf S v).TT)) : ℝ) : ℂ))
+    have hc : ContDiffOn ℝ ∞
+        (fun x : MA.E (D.parOf S v).r =>
+          ((φ ((∏ l, Complex.normSq (x.1 l)) * (Complex.normSq x.2 - (D.parOf S v).TT)) : ℝ) : ℂ))
         (MA.Qset (D.parOf S v).r (D.parOf S v).TT) :=
       Complex.ofRealCLM.contDiff.comp_contDiffOn ((smoothLog_contDiffOn hφ).comp hG.contDiffOn hGp)
     refine hc.congr ?_
@@ -142,7 +166,8 @@ theorem phi_operator_transfer_holds : JAPhiOp := by
     unfold MA.toSm
     rw [dite_eq_left hp]
   rw [hL, hR, hP]
-  have hm : (fun q => p q * u q) ∈ MA.smSub (D.parOf S v).r (D.parOf S v).TT := Subalgebra.mul_mem _ hp hu
+  have hm : (fun q => p q * u q) ∈ MA.smSub (D.parOf S v).r (D.parOf S v).TT :=
+    Subalgebra.mul_mem _ hp hu
   unfold MA.toSm
   rw [dite_eq_left hm]
   rfl

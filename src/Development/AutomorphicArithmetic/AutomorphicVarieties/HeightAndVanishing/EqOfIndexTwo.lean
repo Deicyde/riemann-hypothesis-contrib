@@ -9,17 +9,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem mem_of_int {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {y : Ω} (hy : IsIntegral ℤ y) : y ∈ A := by
+private theorem mem_of_int
+    {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {y : Ω} (hy : IsIntegral ℤ y)
+    : y ∈ A := by
   have h2 : IsIntegral A y := hy.tower_top
   obtain ⟨z, hz⟩ := IsIntegrallyClosed.isIntegral_iff.mp h2
   rw [← hz]
   exact z.2
 
-private theorem det_lt {Ω ι : Type} [Field Ω] [Fintype ι] [DecidableEq ι] (A : ValuationSubring Ω) (M : Matrix ι ι Ω)
-    (hM : ∀ i j, M i j ∈ A) {a b : ι} (hab : a ≠ b) (h : ∀ i, A.valuation (M i a - M i b) < 1) :
-    A.valuation M.det < 1 := by
+private theorem det_lt
+    {Ω ι : Type} [Field Ω] [Fintype ι] [DecidableEq ι]
+    (A : ValuationSubring Ω) (M : Matrix ι ι Ω) (hM : ∀ i j, M i j ∈ A)
+    {a b : ι} (hab : a ≠ b) (h : ∀ i, A.valuation (M i a - M i b) < 1)
+    : A.valuation M.det < 1 := by
   classical
   set M' : Matrix ι ι Ω := M.updateCol a (fun k => M k a + (-1 : Ω) • M k b) with hM'
   have hdet : M'.det = M.det := Matrix.det_updateCol_add_smul_self M hab (-1)
@@ -37,21 +42,28 @@ private theorem det_lt {Ω ι : Type} [Field Ω] [Fintype ι] [DecidableEq ι] (
   refine Valuation.map_sum_lt _ one_ne_zero (fun σ _ => ?_)
   rw [← Finset.mul_prod_erase Finset.univ (fun i => M' (σ i) i) (Finset.mem_univ a)]
   have hs : ((Equiv.Perm.sign σ : ℤ) : Ω) ∈ A := intCast_mem A.toSubring _
-  have hp : (∏ i ∈ Finset.univ.erase a, M' (σ i) i) ∈ A := A.toSubring.prod_mem (fun i _ => hent _ _)
+  have hp : (∏ i ∈ Finset.univ.erase a, M' (σ i) i) ∈ A :=
+    A.toSubring.prod_mem (fun i _ => hent _ _)
   rw [Valuation.map_mul, Valuation.map_mul]
   have e1 := (A.valuation_le_one_iff _).mpr hs
   have e2 := (A.valuation_le_one_iff _).mpr hp
-  calc A.valuation ((Equiv.Perm.sign σ : ℤ) : Ω) * (A.valuation (M' (σ a) a) * A.valuation (∏ i ∈ Finset.univ.erase a, M' (σ i) i))
+  calc
+    A.valuation ((Equiv.Perm.sign σ : ℤ) : Ω)
+        * (A.valuation (M' (σ a) a) * A.valuation (∏ i ∈ Finset.univ.erase a, M' (σ i) i))
       ≤ 1 * (A.valuation (M' (σ a) a) * 1) := by gcongr
     _ < 1 := by rw [one_mul, mul_one]; exact hcol _
 
-private theorem ine_le (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K]
-    [Algebra K Ω] {l : ℕ} (hl : l.Prime) (hd : ¬ l ∣ (discr K).natAbs) (A : ValuationSubring Ω)
-    (hA : A.valuation (l : Ω) < 1) : Ine (F := ℚ) A ≤ galOf ℚ K Ω := by
+private theorem ine_le
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (K : Type) [Field K] [NumberField K] [Algebra K Ω]
+    {l : ℕ} (hl : l.Prime) (hd : ¬ l ∣ (discr K).natAbs)
+    (A : ValuationSubring Ω) (hA : A.valuation (l : Ω) < 1)
+    : Ine (F := ℚ) A ≤ galOf ℚ K Ω := by
   classical
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   intro σ hσ
-  have hin : ∀ x : Ω, A.valuation x ≤ 1 → A.valuation (σ x - x) < 1 := (show σ ∈ Inertia A from hσ).2
+  have hin : ∀ x : Ω, A.valuation x ≤ 1 → A.valuation (σ x - x) < 1 :=
+    (show σ ∈ Inertia A from hσ).2
   show ∀ x : K, σ (algebraMap K Ω x) = algebraMap K Ω x
   by_contra hne
   push_neg at hne
@@ -99,19 +111,29 @@ private theorem ine_le (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω
   have hv : A.valuation (v : Ω) ≤ 1 := (A.valuation_le_one_iff _).mpr (intCast_mem A.toSubring _)
   have h1 : A.valuation ((u : Ω) * (l : Ω)) < 1 := by
     rw [Valuation.map_mul]
-    calc A.valuation (u : Ω) * A.valuation (l : Ω) ≤ 1 * A.valuation (l : Ω) := by gcongr
+    calc
+      A.valuation (u : Ω) * A.valuation (l : Ω)
+        ≤ 1 * A.valuation (l : Ω) := by gcongr
       _ < 1 := by rw [one_mul]; exact hA
   have h2 : A.valuation ((v : Ω) * ((discr K : ℤ) : Ω)) < 1 := by
     rw [Valuation.map_mul]
-    calc A.valuation (v : Ω) * A.valuation ((discr K : ℤ) : Ω) ≤ 1 * A.valuation ((discr K : ℤ) : Ω) := by gcongr
+    calc
+      A.valuation (v : Ω) * A.valuation ((discr K : ℤ) : Ω)
+        ≤ 1 * A.valuation ((discr K : ℤ) : Ω) := by gcongr
       _ < 1 := by rw [one_mul]; exact hdv
   have := Valuation.map_add_lt _ h1 h2
   rw [hΩ, Valuation.map_one] at this
   exact lt_irrefl _ this
 
-private theorem exists_neg (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (hl : l ≠ 2)
-    {O : Type} [CommRing O] [IsDomain O] {N : ℕ} [NeZero N] (ψ : DirichletCharacter O N) (w : G ℚ Ω →* Oˣ)
-    (hw : w.ker = (Chr.cls ℚ Ω l).ker) : ∃ σ : G ℚ Ω, w σ = -1 ∧ ((Chr.dirG ℚ Ω ψ σ : Oˣ) : O) = ψ (-1) := by
+private theorem exists_neg
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    (hl : l ≠ 2)
+    {O : Type} [CommRing O] [IsDomain O]
+    {N : ℕ} [NeZero N]
+    (ψ : DirichletCharacter O N)
+    (w : G ℚ Ω →* Oˣ) (hw : w.ker = (Chr.cls ℚ Ω l).ker)
+    : ∃ σ : G ℚ Ω, w σ = -1 ∧ ((Chr.dirG ℚ Ω ψ σ : Oˣ) : O) = ψ (-1) := by
   have hp : l.Prime := Fact.out
   haveI : NeZero l := ⟨hp.ne_zero⟩
   haveI : NeZero (l * N) := ⟨Nat.mul_ne_zero hp.ne_zero (NeZero.ne N)⟩
@@ -142,15 +164,22 @@ private theorem exists_neg (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure �
   · show ((MulChar.toUnitHom ψ (Chr.cls ℚ Ω N σ) : Oˣ) : O) = ψ (-1)
     rw [MulChar.coe_toUnitHom, hN1, Units.val_neg, Units.val_one]
 
-private theorem eq_of_index_two {Γ M : Type} [Group Γ] [CommRing M] [IsDomain M] (H : Subgroup Γ) (hH : H.index = 2)
-    (θ : Γ →* Mˣ) (hθ : H ≤ θ.ker) {τ : Γ} (hτ : θ τ ≠ 1) {σ : Γ} (hσ : σ ∉ H) : θ σ = -1 := by
+private theorem eq_of_index_two
+    {Γ M : Type} [Group Γ] [CommRing M] [IsDomain M]
+    (H : Subgroup Γ) (hH : H.index = 2)
+    (θ : Γ →* Mˣ) (hθ : H ≤ θ.ker)
+    {τ : Γ} (hτ : θ τ ≠ 1)
+    {σ : Γ} (hσ : σ ∉ H)
+    : θ σ = -1 := by
   have hτH : τ ∉ H := fun h => hτ (hθ h)
   have h1 : σ * σ ∈ H := (Subgroup.mul_mem_iff_of_index_two hH).mpr (Iff.rfl)
   have h2 : σ * τ ∈ H := (Subgroup.mul_mem_iff_of_index_two hH).mpr (iff_of_false hσ hτH)
   have e1 : θ σ * θ σ = 1 := by rw [← map_mul]; exact hθ h1
   have e2 : θ σ * θ τ = 1 := by rw [← map_mul]; exact hθ h2
   have e3 : θ τ = θ σ := by
-    calc θ τ = θ σ * θ σ * θ τ := by rw [e1, one_mul]
+    calc
+      θ τ
+        = θ σ * θ σ * θ τ := by rw [e1, one_mul]
       _ = θ σ * (θ σ * θ τ) := mul_assoc _ _ _
       _ = θ σ := by rw [e2, mul_one]
   have e4 : ((θ σ : Mˣ) : M) * (θ σ : M) = 1 := by rw [← Units.val_mul, e1, Units.val_one]
@@ -158,13 +187,23 @@ private theorem eq_of_index_two {Γ M : Type} [Group Γ] [CommRing M] [IsDomain 
   · exact absurd (by rw [e3]; exact Units.ext h) hτ
   · exact Units.ext (by rw [h, Units.val_neg, Units.val_one])
 
-theorem UpperTheory.V.HV.gdLoc :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) (e N : ℕ) [NeZero N]
-      (ψ : DirichletCharacter c.O N) (w η : G ℚ Ω →* c.Oˣ) (a : ℕ), GDlit c K e ψ w η a →
-      (∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → Ine (F := ℚ) A ≤ galOf ℚ K Ω ∧ ∃ σ ∈ Ine (F := ℚ) A,
-        ((Chr.Psi l e (Chr.dirG ℚ Ω ψ) σ ^ 2 : c.Oˣ) : c.O) - 1 ∉ IsLocalRing.maximalIdeal c.O) ∧
-      (∃ σ ∈ galOf ℚ K Ω, ((w σ * Chr.Psi l e (Chr.dirG ℚ Ω ψ) σ : c.Oˣ) : c.O) - 1 ∉ IsLocalRing.maximalIdeal c.O) ∧
-      (∃ σ ∈ galOf ℚ K Ω, (((w σ)⁻¹ * Chr.Psi l e (Chr.dirG ℚ Ω ψ) σ : c.Oˣ) : c.O) - 1 ∉ IsLocalRing.maximalIdeal c.O) := by
+theorem UpperTheory.V.HV.gdLoc
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K]
+        [Algebra K Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) (e N : ℕ) [NeZero N]
+        (ψ : DirichletCharacter c.O N) (w η : G ℚ Ω →* c.Oˣ) (a : ℕ),
+      GDlit c K e ψ w η a
+        → (∀ A : ValuationSubring Ω,
+            A.valuation (l : Ω) < 1
+              → Ine (F := ℚ) A ≤ galOf ℚ K Ω
+                ∧ ∃ σ ∈ Ine (F := ℚ) A,
+                  ((Chr.Psi l e (Chr.dirG ℚ Ω ψ) σ ^ 2 : c.Oˣ) : c.O) - 1
+                    ∉ IsLocalRing.maximalIdeal c.O)
+          ∧ (∃ σ ∈ galOf ℚ K Ω,
+            ((w σ * Chr.Psi l e (Chr.dirG ℚ Ω ψ) σ : c.Oˣ) : c.O) - 1
+              ∉ IsLocalRing.maximalIdeal c.O)
+          ∧ (∃ σ ∈ galOf ℚ K Ω,
+            (((w σ)⁻¹ * Chr.Psi l e (Chr.dirG ℚ Ω ψ) σ : c.Oˣ) : c.O) - 1
+              ∉ IsLocalRing.maximalIdeal c.O) := by
   intro Ω _ _ _ K _ _ _ l _ c e N _ ψ w η a hG
   have hp : l.Prime := Fact.out
   have hl2 : l ≠ 2 := hG.l_odd
@@ -200,8 +239,9 @@ theorem UpperTheory.V.HV.gdLoc :
     · exact hG.ord h
   have hpow : ∀ j : ℕ, (w ^ j * D) ^ m = 1 := by
     intro j
-    rw [mul_pow, ← pow_mul, hmdef, show j * ((l - 1) * orderOf D) = (l - 1) * (j * orderOf D) by ring,
-      pow_mul, hw1, one_pow, one_mul, mul_comm, pow_mul, pow_orderOf_eq_one, one_pow]
+    rw [mul_pow, ← pow_mul, hmdef,
+      show j * ((l - 1) * orderOf D) = (l - 1) * (j * orderOf D) by ring, pow_mul, hw1, one_pow,
+      one_mul, mul_comm, pow_mul, pow_orderOf_eq_one, one_pow]
   obtain ⟨σ₀, hwσ₀, hDσ₀⟩ := exists_neg Ω l hl2 ψ w hOm.2.1
   have hev : ψ (-1) = (-1) ^ e := ((psiBar Ω l c w hom N ψ).2.1 e).mpr hG.par
   have hne1 : ((-1 : (c.O)ˣ)) ≠ 1 := by
@@ -211,10 +251,13 @@ theorem UpperTheory.V.HV.gdLoc :
     norm_num at h2
   have hθ0 : ∀ j : ℕ, (((w ^ j * D) σ₀ : (c.O)ˣ) : c.O) = (-1) ^ j * (-1) ^ e := by
     intro j
-    rw [MonoidHom.mul_apply, MonoidHom.pow_apply, hwσ₀, Units.val_mul, Units.val_pow_eq_pow_val, hDσ₀, hev,
-      Units.val_neg, Units.val_one]
-  have key : ∀ j : ℕ, (∀ σ ∈ galOf ℚ K Ω, (((w ^ j * D) σ : (c.O)ˣ) : c.O) - 1 ∈ IsLocalRing.maximalIdeal c.O) →
-      (-1 : c.O) ^ j * (-1) ^ e = -1 → η = w ^ j * D := by
+    rw [MonoidHom.mul_apply, MonoidHom.pow_apply, hwσ₀, Units.val_mul, Units.val_pow_eq_pow_val,
+      hDσ₀, hev, Units.val_neg, Units.val_one]
+  have key
+      : ∀ j : ℕ,
+        (∀ σ ∈ galOf ℚ K Ω, (((w ^ j * D) σ : (c.O)ˣ) : c.O) - 1 ∈ IsLocalRing.maximalIdeal c.O)
+          → (-1 : c.O) ^ j * (-1) ^ e = -1
+          → η = w ^ j * D := by
     intro j hj hv
     have hle : galOf ℚ K Ω ≤ (w ^ j * D).ker := by
       intro σ hσ
@@ -248,8 +291,9 @@ theorem UpperTheory.V.HV.gdLoc :
     have hx : (w ^ (2 * (e + a))) σ = ((w ^ e * D) σ) ^ 2 := by
       rw [MonoidHom.mul_apply, MonoidHom.pow_apply, MonoidHom.pow_apply, hD, hG.ine A hA σ hσ,
         ← pow_add, ← pow_mul, mul_comm 2]
-    have hm1 : (((w ^ (2 * (e + a))) σ : (c.O)ˣ) : c.O) - (((Chr.Psi l e D σ) ^ 2 : (c.O)ˣ) : c.O)
-        ∈ IsLocalRing.maximalIdeal c.O := by
+    have hm1
+        : (((w ^ (2 * (e + a))) σ : (c.O)ˣ) : c.O) - (((Chr.Psi l e D σ) ^ 2 : (c.O)ˣ) : c.O)
+          ∈ IsLocalRing.maximalIdeal c.O := by
       rw [hx, Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val, sq_sub_sq]
       apply Ideal.mul_mem_left
       have := hΨc σ
@@ -263,20 +307,23 @@ theorem UpperTheory.V.HV.gdLoc :
       simpa using this
   · by_contra hcon
     push_neg at hcon
-    have hθ := key (e + 1) (fun σ hσ => by
-        have h1 := hcon σ hσ
-        have h2 : (((w ^ (e + 1) * D) σ : (c.O)ˣ) : c.O) - ((w σ * Chr.Psi l e D σ : (c.O)ˣ) : c.O)
-            ∈ IsLocalRing.maximalIdeal c.O := by
-          have hu : (w ^ (e + 1) * D) σ = w σ * ((w ^ e * D) σ) := by
-            rw [MonoidHom.mul_apply, MonoidHom.mul_apply, MonoidHom.pow_apply, MonoidHom.pow_apply, pow_succ',
-              mul_assoc]
-          rw [hu, Units.val_mul, Units.val_mul, ← mul_sub]
-          apply Ideal.mul_mem_left
-          rw [← neg_sub]
-          exact Submodule.neg_mem _ (hΨc σ)
-        have := Ideal.add_mem _ h2 h1
-        rwa [sub_add_sub_cancel] at this)
-      (by rw [← pow_add]; exact Odd.neg_one_pow ⟨e, by ring⟩)
+    have hθ :=
+      key (e + 1)
+        (fun σ hσ => by
+          have h1 := hcon σ hσ
+          have h2
+              : (((w ^ (e + 1) * D) σ : (c.O)ˣ) : c.O) - ((w σ * Chr.Psi l e D σ : (c.O)ˣ) : c.O)
+                ∈ IsLocalRing.maximalIdeal c.O := by
+            have hu : (w ^ (e + 1) * D) σ = w σ * ((w ^ e * D) σ) := by
+              rw [MonoidHom.mul_apply, MonoidHom.mul_apply, MonoidHom.pow_apply,
+                MonoidHom.pow_apply, pow_succ', mul_assoc]
+            rw [hu, Units.val_mul, Units.val_mul, ← mul_sub]
+            apply Ideal.mul_mem_left
+            rw [← neg_sub]
+            exact Submodule.neg_mem _ (hΨc σ)
+          have := Ideal.add_mem _ h2 h1
+          rwa [sub_add_sub_cancel] at this)
+        (by rw [← pow_add]; exact Odd.neg_one_pow ⟨e, by ring⟩)
     apply hG.eta (e + 1 + a) 1
     have hg : w ^ (e + 1 + a) * (D * (w ^ a)⁻¹) ^ 1 = w ^ (e + 1) * D := by
       rw [pow_one, pow_add w (e + 1) a, mul_comm D, ← mul_assoc, mul_inv_cancel_right]
@@ -285,20 +332,23 @@ theorem UpperTheory.V.HV.gdLoc :
   · by_contra hcon
     push_neg at hcon
     obtain ⟨e', he⟩ : ∃ e', e = e' + 1 := ⟨e - 1, by have := hG.e_pos; omega⟩
-    have hθ := key e' (fun σ hσ => by
-        have h1 := hcon σ hσ
-        have h2 : (((w ^ e' * D) σ : (c.O)ˣ) : c.O) - (((w σ)⁻¹ * Chr.Psi l e D σ : (c.O)ˣ) : c.O)
-            ∈ IsLocalRing.maximalIdeal c.O := by
-          have hu : (w ^ e' * D) σ = (w σ)⁻¹ * ((w ^ e * D) σ) := by
-            rw [he, MonoidHom.mul_apply, MonoidHom.mul_apply, MonoidHom.pow_apply, MonoidHom.pow_apply, pow_succ',
-              mul_assoc, inv_mul_cancel_left]
-          rw [hu, Units.val_mul, Units.val_mul, ← mul_sub]
-          apply Ideal.mul_mem_left
-          rw [← neg_sub]
-          exact Submodule.neg_mem _ (hΨc σ)
-        have := Ideal.add_mem _ h2 h1
-        rwa [sub_add_sub_cancel] at this)
-      (by rw [he, ← pow_add]; exact Odd.neg_one_pow ⟨e', by ring⟩)
+    have hθ :=
+      key e'
+        (fun σ hσ => by
+          have h1 := hcon σ hσ
+          have h2
+              : (((w ^ e' * D) σ : (c.O)ˣ) : c.O) - (((w σ)⁻¹ * Chr.Psi l e D σ : (c.O)ˣ) : c.O)
+                ∈ IsLocalRing.maximalIdeal c.O := by
+            have hu : (w ^ e' * D) σ = (w σ)⁻¹ * ((w ^ e * D) σ) := by
+              rw [he, MonoidHom.mul_apply, MonoidHom.mul_apply, MonoidHom.pow_apply,
+                MonoidHom.pow_apply, pow_succ', mul_assoc, inv_mul_cancel_left]
+            rw [hu, Units.val_mul, Units.val_mul, ← mul_sub]
+            apply Ideal.mul_mem_left
+            rw [← neg_sub]
+            exact Submodule.neg_mem _ (hΨc σ)
+          have := Ideal.add_mem _ h2 h1
+          rwa [sub_add_sub_cancel] at this)
+        (by rw [he, ← pow_add]; exact Odd.neg_one_pow ⟨e', by ring⟩)
     apply hG.eta (e' + a) 1
     have hg : w ^ (e' + a) * (D * (w ^ a)⁻¹) ^ 1 = w ^ e' * D := by
       rw [pow_one, pow_add w e' a, mul_comm D, ← mul_assoc, mul_inv_cancel_right]

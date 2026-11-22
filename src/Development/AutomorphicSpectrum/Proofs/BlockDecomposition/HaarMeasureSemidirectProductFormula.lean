@@ -11,8 +11,18 @@ open scoped NNReal ENNReal
 
 namespace GlobalTheory.CompanionTheory.ModChar
 
-theorem modularCharacterFun_semidirect :
-    ∀ (Q : Type) [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q] [LocallyCompactSpace Q] [T2Space Q] [SecondCountableTopology Q] [MeasurableSpace Q] [BorelSpace Q] (N M : Subgroup Q) [N.Normal] [LocallyCompactSpace N] [LocallyCompactSpace M], IsClosed (N : Set Q) → IsClosed (M : Set Q) → (∀ q, ∃ n ∈ N, ∃ m ∈ M, q = n * m) → (∀ x, x ∈ N → x ∈ M → x = 1) → ∀ (νN : Measure N) (νM : Measure M), νN.IsHaarMeasure → νN.IsMulRightInvariant → νM.IsHaarMeasure → νM.IsMulRightInvariant → ∀ δ : Q →* ℝ≥0, (∀ n ∈ N, δ n = 1) → (∀ m ∈ M, νN.map (fun n : N => MulAut.conjNormal m n) = (δ m)⁻¹ • νN) → ∀ q : Q, Measure.modularCharacterFun q = δ q := by
+theorem modularCharacterFun_semidirect
+    : ∀ (Q : Type) [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q] [LocallyCompactSpace Q]
+        [T2Space Q] [SecondCountableTopology Q] [MeasurableSpace Q] [BorelSpace Q]
+        (N M : Subgroup Q) [N.Normal] [LocallyCompactSpace N] [LocallyCompactSpace M],
+      IsClosed (N : Set Q) → IsClosed (M : Set Q) → (∀ q, ∃ n ∈ N, ∃ m ∈ M, q = n * m)
+        → (∀ x, x ∈ N → x ∈ M → x = 1)
+        → ∀ (νN : Measure N) (νM : Measure M),
+          νN.IsHaarMeasure → νN.IsMulRightInvariant → νM.IsHaarMeasure → νM.IsMulRightInvariant
+            → ∀ δ : Q →* ℝ≥0,
+              (∀ n ∈ N, δ n = 1)
+                → (∀ m ∈ M, νN.map (fun n : N => MulAut.conjNormal m n) = (δ m)⁻¹ • νN)
+                → ∀ q : Q, Measure.modularCharacterFun q = δ q := by
   intro Q _ _ _ _ _ _ _ _ N M _ _ _ hN hM hgen hdisj νN νM hNH hNR hMH hMR δ hδN hδM q
   haveI := hNH
   haveI := hNR
@@ -24,13 +34,14 @@ theorem modularCharacterFun_semidirect :
     TopologicalSpace.Subtype.secondCountableTopology (N : Set Q)
   haveI : SecondCountableTopology M :=
     TopologicalSpace.Subtype.secondCountableTopology (M : Set Q)
-  obtain ⟨Φ, hΦ⟩ := GlobalTheory.T.semidirect_product_homeomorph_of_closed_complement Q N M hN hM hgen hdisj
+  obtain ⟨Φ, hΦ⟩ :=
+    GlobalTheory.T.semidirect_product_homeomorph_of_closed_complement Q N M hN hM hgen hdisj
   let Ψ : (M × N) ≃ₜ Q := (Homeomorph.prodComm M N).trans Φ
   have hΨ : ∀ p : M × N, Ψ p = (p.2 : Q) * (p.1 : Q) := fun p => hΦ (p.2, p.1)
   have hΨm : Measurable Ψ := Ψ.continuous.measurable
   set ρ : Measure Q := (νM.prod νN).map Ψ with hρ
-  have hconj : ∀ (m : Q) (n : N), ((MulAut.conjNormal m n : N) : Q) = m * n * m⁻¹ :=
-    fun m n => MulAut.conjNormal_apply m n
+  have hconj : ∀ (m : Q) (n : N), ((MulAut.conjNormal m n : N) : Q) = m * n * m⁻¹ := fun m n =>
+    MulAut.conjNormal_apply m n
   haveI : IsFiniteMeasureOnCompacts ρ := by
     refine ⟨fun K hK => ?_⟩
     rw [hρ, show ((νM.prod νN).map Ψ) K = (νM.prod νN) (Ψ ⁻¹' K) from
@@ -70,8 +81,7 @@ theorem modularCharacterFun_semidirect :
   have hmul : Measurable (fun y : Q => Ψ (m₀, n₀) * y) := measurable_const_mul _
   have hcm : Continuous (fun n : N => (MulAut.conjNormal (m₀ : Q) n : N)) := by
     have h : Continuous (fun n : N => (m₀ : Q) * n * (m₀ : Q)⁻¹) := by fun_prop
-    exact Topology.IsInducing.subtypeVal.continuous_iff.2
-      (h.congr fun p => (hconj _ _).symm)
+    exact Topology.IsInducing.subtypeVal.continuous_iff.2 (h.congr fun p => (hconj _ _).symm)
   let f₁ : M → M := fun m => m₀ * m
   let f₂ : N → N := fun n => n₀ * MulAut.conjNormal (m₀ : Q) n
   have hf₁ : Measurable f₁ := measurable_const_mul _
@@ -84,15 +94,15 @@ theorem modularCharacterFun_semidirect :
   have hνN : νN.map f₂ = (δ m₀)⁻¹ • νN := by
     have : f₂ = (fun n : N => n₀ * n) ∘ (fun n : N => (MulAut.conjNormal (m₀ : Q) n : N)) := rfl
     rw [this, ← Measure.map_map (measurable_const_mul _) hcm.measurable, hδM _ m₀.2,
-      Measure.map_smul (c := (δ m₀)⁻¹) (f := fun x : N => n₀ * x)
+      Measure.map_smul (c := (δ m₀)⁻¹)
+        (f := fun x : N => n₀ * x)
         (measurable_const_mul _).aemeasurable,
       (measurePreserving_mul_left νN n₀).map_eq]
   have hδ : δ (Ψ (m₀, n₀)) = δ m₀ := by
     rw [hΨ]
     simp [map_mul, hδN _ n₀.2]
-  rw [hρ, Measure.map_map hmul hΨm, hcomp,
-    ← Measure.map_map hΨm (hf₁.prodMap hf₂), ← Measure.map_prod_map νM νN hf₁ hf₂, hνM, hνN,
-    Measure.prod_smul_right,
+  rw [hρ, Measure.map_map hmul hΨm, hcomp, ← Measure.map_map hΨm (hf₁.prodMap hf₂),
+    ← Measure.map_prod_map νM νN hf₁ hf₂, hνM, hνN, Measure.prod_smul_right,
     Measure.map_smul (c := (δ m₀)⁻¹) (f := Ψ) hΨm.aemeasurable, hδ]
 
 end GlobalTheory.CompanionTheory.ModChar

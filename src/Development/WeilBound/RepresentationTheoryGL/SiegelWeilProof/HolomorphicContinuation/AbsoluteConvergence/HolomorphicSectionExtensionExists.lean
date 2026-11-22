@@ -27,8 +27,9 @@ theorem det_Ac (X : Fin n → ℝ) (z : ℂ) : (Ac X z).det = 1 := by
   rw [← Complex.exp_add]
   try simp
 
-theorem holomorphic_section_extension_eq (p q : ℕ) (e : ℤ) (X : Fin n → ℝ) (a : ℝ → GR n) (ha : ∀ s, IsDil X s (a s)) (h : GR n) (s : ℝ) :
-    holomorphicSectionExtension p q e X h s = F0 p q e (h * a s) := by
+theorem holomorphic_section_extension_eq
+    (p q : ℕ) (e : ℤ) (X : Fin n → ℝ) (a : ℝ → GR n) (ha : ∀ s, IsDil X s (a s)) (h : GR n) (s : ℝ)
+    : holomorphicSectionExtension p q e X h s = F0 p q e (h * a s) := by
   unfold holomorphicSectionExtension F0 f0
   rw [mR_mul, mR_dil X s (a s) (ha s), det_mul, det_Ac, mul_one, mul_assoc]
 
@@ -38,13 +39,17 @@ theorem continuous_Ac (X : Fin n → ℝ) : Continuous (Ac X) := by
   · exact Continuous.matrix_diagonal (continuous_pi fun j => by fun_prop)
   · exact Continuous.matrix_diagonal (continuous_pi fun j => by fun_prop)
 
-theorem differentiable_Ac_entry (X : Fin n → ℝ) (a b : Fin n ⊕ Fin n) : Differentiable ℂ fun z => Ac X z a b := by
-  rcases a with a | a <;> rcases b with b | b <;> by_cases hab : a = b <;>
-    simp [Ac, diagonal_apply, hab] <;> fun_prop
+theorem differentiable_Ac_entry (X : Fin n → ℝ) (a b : Fin n ⊕ Fin n)
+    : Differentiable ℂ fun z => Ac X z a b := by
+  rcases a with a | a <;> rcases b with b | b <;> by_cases hab : a = b
+    <;> simp [Ac, diagonal_apply, hab] <;> fun_prop
 
-theorem differentiable_det_entries {m : Type} [Fintype m] [DecidableEq m] (A : ℂ → Matrix m m ℂ)
-    (hA : ∀ i j, Differentiable ℂ fun z => A z i j) : Differentiable ℂ fun z => (A z).det := by
-  have : (fun z => (A z).det) = fun z => ∑ σ : Equiv.Perm m, ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, A z (σ i) i := by
+theorem differentiable_det_entries
+    {m : Type} [Fintype m] [DecidableEq m]
+    (A : ℂ → Matrix m m ℂ) (hA : ∀ i j, Differentiable ℂ fun z => A z i j)
+    : Differentiable ℂ fun z => (A z).det := by
+  have : (fun z => (A z).det)
+      = fun z => ∑ σ : Equiv.Perm m, ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, A z (σ i) i := by
     funext z
     rw [det_apply]
     refine Finset.sum_congr rfl fun σ _ => ?_
@@ -53,25 +58,31 @@ theorem differentiable_det_entries {m : Type} [Fintype m] [DecidableEq m] (A : �
   refine Differentiable.fun_sum fun σ _ => ?_
   exact (differentiable_const _).mul (Differentiable.fun_finsetProd fun i _ => hA _ _)
 
-theorem differentiable_u_det (M : M2 n) (X : Fin n → ℝ) (w : ℂ) :
-    Differentiable ℂ fun z => (w • (M * Ac X z).toBlocks₂₁ + (M * Ac X z).toBlocks₂₂).det := by
+theorem differentiable_u_det (M : M2 n) (X : Fin n → ℝ) (w : ℂ)
+    : Differentiable ℂ fun z => (w • (M * Ac X z).toBlocks₂₁ + (M * Ac X z).toBlocks₂₂).det := by
   apply differentiable_det_entries
   intro i j
   have hm : ∀ a b, Differentiable ℂ fun z => (M * Ac X z) a b := by
     intro a b
     simp only [Matrix.mul_apply]
-    exact Differentiable.fun_sum fun k _ => (differentiable_const _).mul (differentiable_Ac_entry X k b)
+    exact Differentiable.fun_sum fun k _ =>
+      (differentiable_const _).mul (differentiable_Ac_entry X k b)
   simp only [Matrix.add_apply, Matrix.smul_apply, toBlocks₂₁, toBlocks₂₂, of_apply, smul_eq_mul]
   exact ((differentiable_const _).mul (hm _ _)).add (hm _ _)
 
-theorem continuous_u_det (X : Fin n → ℝ) (w : ℂ) :
-    Continuous fun y : GR n × ℂ => (w • (mR y.1 * Ac X y.2).toBlocks₂₁ + (mR y.1 * Ac X y.2).toBlocks₂₂).det := by
+theorem continuous_u_det (X : Fin n → ℝ) (w : ℂ)
+    : Continuous fun y : GR n × ℂ =>
+      (w • (mR y.1 * Ac X y.2).toBlocks₂₁ + (mR y.1 * Ac X y.2).toBlocks₂₂).det := by
   have hM : Continuous fun y : GR n × ℂ => mR y.1 * Ac X y.2 :=
     (continuous_mR.comp continuous_fst).matrix_mul ((continuous_Ac X).comp continuous_snd)
   have h21 : Continuous fun y : GR n × ℂ => (mR y.1 * Ac X y.2).toBlocks₂₁ :=
-    hM.matrix_submatrix (fun i : Fin n => (Sum.inr i : Fin n ⊕ Fin n)) (fun j : Fin n => (Sum.inl j : Fin n ⊕ Fin n))
+    hM.matrix_submatrix
+      (fun i : Fin n => (Sum.inr i : Fin n ⊕ Fin n))
+      (fun j : Fin n => (Sum.inl j : Fin n ⊕ Fin n))
   have h22 : Continuous fun y : GR n × ℂ => (mR y.1 * Ac X y.2).toBlocks₂₂ :=
-    hM.matrix_submatrix (fun i : Fin n => (Sum.inr i : Fin n ⊕ Fin n)) (fun j : Fin n => (Sum.inr j : Fin n ⊕ Fin n))
+    hM.matrix_submatrix
+      (fun i : Fin n => (Sum.inr i : Fin n ⊕ Fin n))
+      (fun j : Fin n => (Sum.inr j : Fin n ⊕ Fin n))
   exact ((h21.const_smul w).add h22).matrix_det
 
 theorem first_cayley_block_eq (M : M2 n) : u1 M = Complex.I • M.toBlocks₂₁ + M.toBlocks₂₂ := rfl
@@ -79,16 +90,19 @@ theorem first_cayley_block_eq (M : M2 n) : u1 M = Complex.I • M.toBlocks₂₁
 theorem second_cayley_block_eq (M : M2 n) : u2 M = (-Complex.I) • M.toBlocks₂₁ + M.toBlocks₂₂ := by
   simp [u2, neg_smul]
 
-theorem holomorphic_section_extension_exists (p q : ℕ) (e : ℤ) (X : Fin n → ℝ) (S : Set (GR n)) (hS : IsCompact S) :
-    ∃ V : Set ℂ, IsOpen V ∧ (∀ s : ℝ, (s : ℂ) ∈ V) ∧
-      ContinuousOn (fun y : GR n × ℂ => holomorphicSectionExtension p q e X y.1 y.2) (S ×ˢ V) ∧
-      ∀ h ∈ S, DifferentiableOn ℂ (holomorphicSectionExtension p q e X h) V := by
+theorem holomorphic_section_extension_exists
+    (p q : ℕ) (e : ℤ) (X : Fin n → ℝ) (S : Set (GR n)) (hS : IsCompact S)
+    : ∃ V : Set ℂ,
+      IsOpen V ∧ (∀ s : ℝ, (s : ℂ) ∈ V)
+        ∧ ContinuousOn (fun y : GR n × ℂ => holomorphicSectionExtension p q e X y.1 y.2) (S ×ˢ V)
+        ∧ ∀ h ∈ S, DifferentiableOn ℂ (holomorphicSectionExtension p q e X h) V := by
   have c1 : Continuous fun y : GR n × ℂ => (u1 (mR y.1 * Ac X y.2)).det := by
     simpa only [first_cayley_block_eq] using continuous_u_det X Complex.I
   have c2 : Continuous fun y : GR n × ℂ => (u2 (mR y.1 * Ac X y.2)).det := by
     simpa only [second_cayley_block_eq] using continuous_u_det X (-Complex.I)
   set Z := {y : GR n × ℂ | (u1 (mR y.1 * Ac X y.2)).det ≠ 0 ∧ (u2 (mR y.1 * Ac X y.2)).det ≠ 0}
-  have hZ : IsOpen Z := (isOpen_ne_fun c1 continuous_const).inter (isOpen_ne_fun c2 continuous_const)
+  have hZ : IsOpen Z :=
+    (isOpen_ne_fun c1 continuous_const).inter (isOpen_ne_fun c2 continuous_const)
   have hreal : ∀ (h : GR n) (s : ℝ), ((h, (s : ℂ)) : GR n × ℂ) ∈ Z := by
     intro h s
     have hm : mR h * Ac X s = mR (h * aD X s) := by rw [mR_mul, mR_dil X s _ (isDil_aD X s)]
@@ -101,8 +115,8 @@ theorem holomorphic_section_extension_exists (p q : ℕ) (e : ℤ) (X : Fin n �
       exact automorphy_second_det_ne_zero _
   have tube : ∀ s : ℝ, ∃ v : Set ℂ, IsOpen v ∧ (s : ℂ) ∈ v ∧ S ×ˢ v ⊆ Z := by
     intro s
-    obtain ⟨u, v, -, hv, hSu, hsv, huv⟩ := generalized_tube_lemma hS (isCompact_singleton (x := (s : ℂ))) hZ
-      (by
+    obtain ⟨u, v, -, hv, hSu, hsv, huv⟩ :=
+      generalized_tube_lemma hS (isCompact_singleton (x := (s : ℂ))) hZ (by
         rintro ⟨h, z⟩ ⟨-, hz⟩
         simp only [Set.mem_singleton_iff] at hz
         rw [hz]
@@ -133,8 +147,10 @@ theorem holomorphic_section_extension_exists (p q : ℕ) (e : ℤ) (X : Fin n �
     have d2 : Differentiable ℂ fun z => (u2 (mR h * Ac X z)).det := by
       simpa only [second_cayley_block_eq] using differentiable_u_det (mR h) X (-Complex.I)
     unfold holomorphicSectionExtension
-    have g1 : DifferentiableAt ℂ (fun z => (u1 (mR h * Ac X z)).det ^ (-(p : ℤ))) z := (d1 z).zpow (Or.inl hyZ.1)
-    have g2 : DifferentiableAt ℂ (fun z => (u2 (mR h * Ac X z)).det ^ (-(q : ℤ))) z := (d2 z).zpow (Or.inl hyZ.2)
+    have g1 : DifferentiableAt ℂ (fun z => (u1 (mR h * Ac X z)).det ^ (-(p : ℤ))) z :=
+      (d1 z).zpow (Or.inl hyZ.1)
+    have g2 : DifferentiableAt ℂ (fun z => (u2 (mR h * Ac X z)).det ^ (-(q : ℤ))) z :=
+      (d2 z).zpow (Or.inl hyZ.2)
     exact (((differentiableAt_const _).mul g1).mul g2).differentiableWithinAt
 
 end PositivityTheory.Rg.Sw.AbsSt

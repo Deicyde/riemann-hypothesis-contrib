@@ -24,11 +24,12 @@ theorem mem_gr_iff (φ : GIso F G) (m : Deg k) (x : F.M) : φ.e x ∈ G.gr m ↔
     exact ⟨x, hx, rfl⟩
 
 def grEquiv (φ : GIso F G) (m : Deg k) : F.gr m ≃ₗ[B] G.gr m :=
-  LinearEquiv.ofSubmodules (φ.e.restrictScalars B) (F.gr m) (G.gr m) (by
-    rw [← φ.map_gr m]; rfl)
+  LinearEquiv.ofSubmodules (φ.e.restrictScalars B) (F.gr m) (G.gr m) (by rw [← φ.map_gr m]; rfl)
 
-def sub (φ : GIso F G) (N : Submodule R F.M) (N' : Submodule R G.M)
-    (h : N.map (φ.e : F.M →ₗ[R] G.M) = N') : GIso (F.sub N) (G.sub N') where
+def sub
+    (φ : GIso F G) (N : Submodule R F.M) (N' : Submodule R G.M)
+    (h : N.map (φ.e : F.M →ₗ[R] G.M) = N')
+    : GIso (F.sub N) (G.sub N') where
   e := LinearEquiv.ofSubmodules φ.e N N' h
   map_gr m := by
     ext y
@@ -38,16 +39,17 @@ def sub (φ : GIso F G) (N : Submodule R F.M) (N' : Submodule R G.M)
     · intro hy
       refine ⟨(LinearEquiv.ofSubmodules φ.e N N' h).symm y, ?_, ?_⟩
       · have h1 : φ.e ((LinearEquiv.ofSubmodules φ.e N N' h).symm y).1 = y.1 := by
-          have := congrArg Subtype.val
-            ((LinearEquiv.ofSubmodules φ.e N N' h).apply_symm_apply y)
+          have := congrArg Subtype.val ((LinearEquiv.ofSubmodules φ.e N N' h).apply_symm_apply y)
           exact this
         have h2 : φ.e ((LinearEquiv.ofSubmodules φ.e N N' h).symm y).1 ∈ G.gr m := by
           rw [h1]; exact hy
         exact (φ.mem_gr_iff m _).1 h2
       · exact (LinearEquiv.ofSubmodules φ.e N N' h).apply_symm_apply y
 
-def quo (φ : GIso F G) (N : Submodule R F.M) (N' : Submodule R G.M)
-    (h : N.map (φ.e : F.M →ₗ[R] G.M) = N') : GIso (F.quo N) (G.quo N') where
+def quo
+    (φ : GIso F G) (N : Submodule R F.M) (N' : Submodule R G.M)
+    (h : N.map (φ.e : F.M →ₗ[R] G.M) = N')
+    : GIso (F.quo N) (G.quo N') where
   e := Submodule.Quotient.equiv N N' φ.e h
   map_gr m := by
     ext y
@@ -57,7 +59,8 @@ def quo (φ : GIso F G) (N : Submodule R F.M) (N' : Submodule R G.M)
     · rintro ⟨z, hz, rfl⟩
       refine ⟨N.mkQ (φ.e.symm z), ⟨φ.e.symm z, ?_, rfl⟩, ?_⟩
       · apply (φ.mem_gr_iff m _).1
-        rw [LinearEquiv.apply_symm_apply]; exact hz
+        rw [LinearEquiv.apply_symm_apply]
+        exact hz
       · show N'.mkQ (φ.e (φ.e.symm z)) = N'.mkQ z
         rw [LinearEquiv.apply_symm_apply]
 
@@ -92,8 +95,8 @@ def ann (φ : GIso F G) (s : R) (d : Deg k) : GIso (F.ann s d) (G.ann s d) :=
 
 end GIso
 
-theorem chi_congr (ts : List (Deg k × R)) : ∀ (F G : GMod B R k), GIso F G →
-    ∀ m, chi ts F m = chi ts G m := by
+theorem chi_congr (ts : List (Deg k × R))
+    : ∀ (F G : GMod B R k), GIso F G → ∀ m, chi ts F m = chi ts G m := by
   induction ts with
   | nil =>
     intro F G φ m

@@ -13,13 +13,16 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Semista
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
 theorem zhSt_holds : GlobalTheory.ZH.ZHSt :=
-  GlobalTheory.T.zarhinProjectiveModel_of_semistableReduction GlobalTheory.T.semistableReduction_ppav_padicField
+  GlobalTheory.T.zarhinProjectiveModel_of_semistableReduction
+    GlobalTheory.T.semistableReduction_ppav_padicField
 
 end GlobalTheory

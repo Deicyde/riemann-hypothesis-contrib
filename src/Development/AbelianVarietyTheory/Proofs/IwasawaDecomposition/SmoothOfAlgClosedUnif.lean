@@ -36,44 +36,78 @@ noncomputable section
 
 namespace GlobalTheory.FlagBundle
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier
 
-theorem step {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (M : RatModel F Ω) (d : ℕ) {ι : Type} [Finite ι]
-    {m k : ι → ℕ} (S : Fr M m k) (hM : Good M d) (τ : ι) (hk : k τ < m τ) (k' : ι → ℕ) (h1 : k' τ = k τ + 1)
-    (h2 : ∀ τ', τ' ≠ τ → k' τ' = k τ') :
-    ∃ (Ω' : Type) (_ : Field Ω') (_ : Algebra F Ω') (M' : RatModel F Ω') (φ : Ω →ₐ[F] Ω') (f : M'.Z ⟶ M.Z)
-      (S' : Fr M' m k'), Good M' (d + (m τ - k τ - 1)) ∧ Refines S S' φ f := by
+theorem step
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    (M : RatModel F Ω)
+    (d : ℕ)
+    {ι : Type} [Finite ι]
+    {m k : ι → ℕ} (S : Fr M m k)
+    (hM : Good M d)
+    (τ : ι) (hk : k τ < m τ)
+    (k' : ι → ℕ) (h1 : k' τ = k τ + 1) (h2 : ∀ τ', τ' ≠ τ → k' τ' = k τ')
+    : ∃ (Ω' : Type) (_ : Field Ω') (_ : Algebra F Ω') (M' : RatModel F Ω') (φ : Ω →ₐ[F] Ω')
+        (f : M'.Z ⟶ M.Z) (S' : Fr M' m k'),
+      Good M' (d + (m τ - k τ - 1)) ∧ Refines S S' φ f := by
   obtain ⟨A₀, hA₀⟩ := S.nonempty (genericPoint M.Z)
-  obtain ⟨EE, hE⟩ := GlobalTheory.T.exists_lattice_dualBasisQuotientFrameBlock F Ω M ι m k S τ A₀ hA₀
+  obtain ⟨EE, hE⟩ :=
+    GlobalTheory.T.exists_lattice_dualBasisQuotientFrameBlock F Ω M ι m k S τ A₀ hA₀
   have : Nonempty (Rest m k τ) := ⟨⟨⟨k τ, hk⟩, le_rfl⟩⟩
-  obtain ⟨Ω', _, _, M', φ, f, s, hP, hpr⟩ := GlobalTheory.T.exists_projectiveBundleOfLattice_isProjOver F Ω M _ EE hM.1
+  obtain ⟨Ω', _, _, M', φ, f, s, hP, hpr⟩ :=
+    GlobalTheory.T.exists_projectiveBundleOfLattice_isProjOver F Ω M _ EE hM.1
   have hc : Fintype.card (Rest m k τ) = m τ - k τ := by
     rw [Fintype.card_subtype, ← Fin.card_Ici ⟨k τ, hk⟩]
     exact congrArg _ (Finset.ext fun j => by simp [Fin.le_def])
   have hA := GlobalTheory.T.isAffineSpaceCoveredMorphism F Ω Ω' M M' φ f _ EE s hP
   rw [hc] at hA
   have hp := GlobalTheory.T.projective_bundle_points_of_rational_model F Ω Ω' M M' φ f _ EE s hP
-  obtain ⟨S', hS'⟩ := GlobalTheory.T.exists_adaptedFrameFamily_longerFlag_genericLine F Ω Ω' M M' φ f ι m k k' S τ hk A₀ EE s h1 h2 hA₀ hE hp
-  refine ⟨Ω', _, _, M', φ, f, S', ⟨hpr, GlobalTheory.T.affineSpaceCovered_smoothOfRelativeDimension_add F Ω Ω' M M' φ f _ d hA hM.2.1, GlobalTheory.T.geometricallyIntegral_of_affCover F Ω Ω' M M' φ f _ hA hM.2.2⟩,
-    fun τ' => ?_, hP.hom, fun z' A' hA' => ?_, GlobalTheory.T.preservesRadicalPrincipalIdeals_of_affineSpaceCovered F Ω Ω' M M' φ f _ hA,
-    GlobalTheory.T.existsUnique_projectiveBundle_flagRefinement F Ω Ω' M M' φ f ι m k k' S S' τ hk A₀ EE s h1 h2 hA₀ hE hp hS'⟩
+  obtain ⟨S', hS'⟩ :=
+    GlobalTheory.T.exists_adaptedFrameFamily_longerFlag_genericLine F Ω Ω' M M' φ f ι m k k' S τ hk
+      A₀ EE s h1 h2 hA₀ hE hp
+  refine ⟨
+    Ω',
+    _,
+    _,
+    M',
+    φ,
+    f,
+    S',
+    ⟨
+      hpr,
+      GlobalTheory.T.affineSpaceCovered_smoothOfRelativeDimension_add F Ω Ω' M M' φ f _ d hA hM.2.1,
+      GlobalTheory.T.geometricallyIntegral_of_affCover F Ω Ω' M M' φ f _ hA hM.2.2
+    ⟩,
+    fun τ' => ?_,
+    hP.hom,
+    fun z' A' hA' => ?_,
+    GlobalTheory.T.preservesRadicalPrincipalIdeals_of_affineSpaceCovered F Ω Ω' M M' φ f _ hA,
+    GlobalTheory.T.existsUnique_projectiveBundle_flagRefinement F Ω Ω' M M' φ f ι m k k' S S' τ hk
+      A₀ EE s h1 h2 hA₀ hE hp hS'
+  ⟩
   · by_cases h : τ' = τ
     · subst h; exact h1 ▸ Nat.le_succ _
     · exact (h2 τ' h).ge
   · rw [hS'] at hA'
     exact hA'.1
 
-theorem tower {F : Type} [Field F] {ι : Type} [Fintype ι] {m : ι → ℕ} (n : ℕ) :
-    ∀ {Ω : Type} [Field Ω] [Algebra F Ω] (M : RatModel F Ω) (d : ℕ) {k : ι → ℕ} (S : Fr M m k), Good M d → k ≤ m →
-      ∑ τ, (m τ - k τ) = n → ∃ (Y : GlobalTheory.ProjVar.Var F) (φ : Ω →ₐ[F] Y.Fn) (f : Y.X ⟶ M.Z) (S' : Fr (ratOf Y) m m),
-        Y.dim = d + ∑ τ, (m τ - k τ).choose 2 ∧ Refines S S' φ f := by
+theorem tower {F : Type} [Field F] {ι : Type} [Fintype ι] {m : ι → ℕ} (n : ℕ)
+    : ∀ {Ω : Type} [Field Ω] [Algebra F Ω] (M : RatModel F Ω) (d : ℕ) {k : ι → ℕ} (S : Fr M m k),
+      Good M d → k ≤ m → ∑ τ, (m τ - k τ) = n
+        → ∃ (Y : GlobalTheory.ProjVar.Var F) (φ : Ω →ₐ[F] Y.Fn) (f : Y.X ⟶ M.Z)
+            (S' : Fr (ratOf Y) m m),
+          Y.dim = d + ∑ τ, (m τ - k τ).choose 2 ∧ Refines S S' φ f := by
   classical
   induction n with
   | zero =>
     intro Ω _ _ M d k S hM hk hn
-    obtain rfl : k = m := funext fun τ => le_antisymm (hk τ)
-      (Nat.sub_eq_zero_iff_le.1 (Finset.sum_eq_zero_iff.1 hn τ (Finset.mem_univ _)))
-    obtain ⟨Y, φ, f, S', h1, h2⟩ := GlobalTheory.T.exists_variety_flagRefinementBundle_of_goodModel F Ω M d ι k k S hM
+    obtain rfl : k = m :=
+      funext fun τ =>
+        le_antisymm (hk τ)
+          (Nat.sub_eq_zero_iff_le.1 (Finset.sum_eq_zero_iff.1 hn τ (Finset.mem_univ _)))
+    obtain ⟨Y, φ, f, S', h1, h2⟩ :=
+      GlobalTheory.T.exists_variety_flagRefinementBundle_of_goodModel F Ω M d ι k k S hM
     exact ⟨Y, φ, f, S', by simpa using h1, h2⟩
   | succ n ih =>
     intro Ω _ _ M d k S hM hk hn
@@ -83,15 +117,30 @@ theorem tower {F : Type} [Field F] {ι : Type} [Fintype ι] {m : ι → ℕ} (n 
     have h1 : k' τ = k τ + 1 := Function.update_self _ _ _
     have h2 : ∀ τ', τ' ≠ τ → k' τ' = k τ' := fun τ' h => Function.update_of_ne h _ _
     obtain ⟨Ω', _, _, M', φ, f, S', hM', hR⟩ := step M d S hM τ hτ' k' h1 h2
-    have key : ∀ g : ℕ → ℕ, ∑ t, g (m t - k' t) + g (m τ - k τ) = ∑ t, g (m t - k t) + g (m τ - k τ - 1) := fun g => by
-      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ τ), ← Finset.add_sum_erase _ (fun t => g (m t - k t)) (Finset.mem_univ τ),
-        h1, Finset.sum_congr rfl fun t ht => by rw [h2 t (Finset.ne_of_mem_erase ht)], Nat.sub_add_eq]
+    have key
+        : ∀ g : ℕ → ℕ,
+          ∑ t, g (m t - k' t) + g (m τ - k τ)
+            = ∑ t, g (m t - k t) + g (m τ - k τ - 1) := fun g => by
+      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ τ),
+        ← Finset.add_sum_erase _ (fun t => g (m t - k t)) (Finset.mem_univ τ), h1,
+        Finset.sum_congr rfl fun t ht => by rw [h2 t (Finset.ne_of_mem_erase ht)], Nat.sub_add_eq]
       ring
-    obtain ⟨Y, φ', f', S'', hd, hR'⟩ := ih M' _ S' hM' (fun t => by
-      by_cases h : t = τ
-      · subst h; rw [h1]; exact hτ'
-      · rw [h2 t h]; exact hk t) (by have := key id; simp only [id] at this; omega)
-    refine ⟨Y, φ'.comp φ, f' ≫ f, S'', ?_, GlobalTheory.T.isFlagRefinementBundle_comp F Ω Ω' M M' φ f Y.Fn (ratOf Y) φ' f' ι m k k' m S S' S'' hR hR'⟩
+    obtain ⟨Y, φ', f', S'', hd, hR'⟩ :=
+      ih M' _ S' hM'
+        (fun t => by
+          by_cases h : t = τ
+          · subst h; rw [h1]; exact hτ'
+          · rw [h2 t h]; exact hk t)
+        (by have := key id; simp only [id] at this; omega)
+    refine ⟨
+      Y,
+      φ'.comp φ,
+      f' ≫ f,
+      S'',
+      ?_,
+      GlobalTheory.T.isFlagRefinementBundle_comp F Ω Ω' M M' φ f Y.Fn (ratOf Y) φ' f' ι m k k' m S
+        S' S'' hR hR'
+    ⟩
     have := key fun a => a.choose 2
     obtain ⟨a, ha⟩ : ∃ a, m τ - k τ = a + 1 := ⟨m τ - k τ - 1, by omega⟩
     rw [ha, Nat.choose_succ_succ' a 1, Nat.choose_one_right, Nat.add_sub_cancel] at this
@@ -99,34 +148,55 @@ theorem tower {F : Type} [Field F] {ι : Type} [Fintype ι] {m : ι → ℕ} (n 
     simp only [Nat.reduceAdd] at this
     omega
 
-open Limits NumberField Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam
+open Limits NumberField Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam
 
 section Component
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F} (Z : Model Xo c β)
-  {F : Type} [Field F] (e : F ≃+* c.F)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F} (Z : Model Xo c β)
+  {F : Type} [Field F]
+  (e : F ≃+* c.F)
 
-theorem genericPoint_mem {B : Scheme.{0}} [IsIntegral B] (j : B ⟶ gen Z) [IsOpenImmersion j] :
-    j (genericPoint B) ∈ Set.range Z.jQ := by
+theorem genericPoint_mem {B : Scheme.{0}} [IsIntegral B] (j : B ⟶ gen Z) [IsOpenImmersion j]
+    : j (genericPoint B) ∈ Set.range Z.jQ := by
   have := Z.jQ_open
-  obtain ⟨_, ⟨b, rfl⟩, hb⟩ := Z.jQ_dense.inter_open_nonempty _ j.isOpenEmbedding.isOpen_range ⟨_, genericPoint B, rfl⟩
-  exact ((genericPoint_specializes b).map j.continuous).mem_open Z.jQ.isOpenEmbedding.isOpen_range hb
+  obtain ⟨_, ⟨b, rfl⟩, hb⟩ :=
+    Z.jQ_dense.inter_open_nonempty _ j.isOpenEmbedding.isOpen_range ⟨_, genericPoint B, rfl⟩
+  exact ((genericPoint_specializes b).map j.continuous).mem_open Z.jQ.isOpenEmbedding.isOpen_range
+    hb
 
-theorem exists_flagCpt (hS : ReciprocityTheory.AnForm.R.FinalTheorems.Snc (genBdIdeal Z)) (B : GlobalTheory.ProjVar.Var F) (j : B.X ⟶ gen Z)
-    [IsOpenImmersion j] (hj : j ≫ genStr Z ≫ spMap e.toRingHom = B.str) :
-    ∃ (C : FlagCpt Z e) (f : C.Y.X ⟶ B.X), C.π = f ≫ j ∧ C.Y.dim = B.dim + ∑ τ : E →+* ℂ, (Dw.mult τ).choose 2 ∧
-      ∀ (K : Type) [Field K] (χ : c.F →+* K) (x : Sp K ⟶ gen Z) (x' : Sp K ⟶ B.X), x' ≫ j = x →
-        x ≫ genStr Z = spMap χ → ∀ g : EigFrame Z χ (x ≫ genι Z), ∃! p : Sp K ⟶ C.Y.X, p ≫ f = x' ∧ C.Carries p g := by
+theorem exists_flagCpt
+    (hS : ReciprocityTheory.AnForm.R.FinalTheorems.Snc (genBdIdeal Z))
+    (B : GlobalTheory.ProjVar.Var F) (j : B.X ⟶ gen Z) [IsOpenImmersion j]
+    (hj : j ≫ genStr Z ≫ spMap e.toRingHom = B.str)
+    : ∃ (C : FlagCpt Z e) (f : C.Y.X ⟶ B.X),
+      C.π = f ≫ j ∧ C.Y.dim = B.dim + ∑ τ : E →+* ℂ, (Dw.mult τ).choose 2
+        ∧ ∀ (K : Type) [Field K] (χ : c.F →+* K) (x : Sp K ⟶ gen Z) (x' : Sp K ⟶ B.X),
+          x' ≫ j = x → x ≫ genStr Z = spMap χ
+            → ∀ g : EigFrame Z χ (x ≫ genι Z), ∃! p : Sp K ⟶ C.Y.X, p ≫ f = x' ∧ C.Carries p g := by
   have := Z.jQ_open
-  obtain ⟨f₀, S, A₀, hT⟩ := GlobalTheory.T.exists_lieEigenparts_frame_family_over_variety E H Dw l Xo c O β Z F e B j hj
-  obtain ⟨Y, φ, f, S', hd, hR⟩ := tower _ (ratOf B) B.dim S (good_ratOf B) (fun _ => Nat.zero_le _) rfl
+  obtain ⟨f₀, S, A₀, hT⟩ :=
+    GlobalTheory.T.exists_lieEigenparts_frame_family_over_variety E H Dw l Xo c O β Z F e B j hj
+  obtain ⟨Y, φ, f, S', hd, hR⟩ :=
+    tower _ (ratOf B) B.dim S (good_ratOf B) (fun _ => Nat.zero_le _) rfl
   change Y.X ⟶ B.X at f
-  obtain ⟨g₀, A₁, hT', hC⟩ := GlobalTheory.T.tautologicalFamily_refinement_compatible_lieAlgebraFrame E H Dw l Xo c O β Z F e B Y j f₀ S A₀ _ S' φ f hT hR
-  obtain ⟨gr, hgr⟩ := GlobalTheory.T.exists_graded_line_divisors_full_flag E H Dw l Xo c O β Z F e Y (f ≫ j) g₀ S' A₁ hT'
+  obtain ⟨g₀, A₁, hT', hC⟩ :=
+    GlobalTheory.T.tautologicalFamily_refinement_compatible_lieAlgebraFrame E H Dw l Xo c O β Z F e
+      B Y j f₀ S A₀ _ S' φ f hT hR
+  obtain ⟨gr, hgr⟩ :=
+    GlobalTheory.T.exists_graded_line_divisors_full_flag E H Dw l Xo c O β Z F e Y (f ≫ j) g₀ S' A₁
+      hT'
   have hgen := genericPoint_mem Z j
-  obtain ⟨D, hD1, hD2, hD3⟩ := GlobalTheory.T.exists_reduced_cartierDivisor_of_snc_closed (gen Z) B.X j (genBd Z) hS fun h => h hgen
-  obtain ⟨D', hD1', hD2', hD3'⟩ := GlobalTheory.T.exists_reduced_effective_cartierDivisor_pullback F B Y φ f D hR.hom hR.rad hD1 hD3
+  obtain ⟨D, hD1, hD2, hD3⟩ :=
+    GlobalTheory.T.exists_reduced_cartierDivisor_of_snc_closed (gen Z) B.X j (genBd Z) hS fun h =>
+      h hgen
+  obtain ⟨D', hD1', hD2', hD3'⟩ :=
+    GlobalTheory.T.exists_reduced_effective_cartierDivisor_pullback F B Y φ f D hR.hom hR.rad hD1
+      hD3
   have hstr : (f ≫ j) ≫ genStr Z ≫ spMap e.toRingHom = Y.str := by
     rw [Category.assoc, hj]; exact hR.hom.inducedModelMorphism_comp_structureMap
   have hrange : Set.range (genericPt Y ≫ f ≫ j) ⊆ Set.range Z.jQ := by
@@ -146,14 +216,32 @@ theorem exists_flagCpt (hS : ReciprocityTheory.AnForm.R.FinalTheorems.Snc (genBd
     refine Eq.trans ?_ ((congrArg (· ≫ spMap e.symm.toRingHom) h1).trans (Spec.map_comp _ _).symm)
     rw [← hstr]
     simp only [Category.assoc]
-  obtain ⟨y0, hy1, hy2⟩ := GlobalTheory.T.exists_framed_point_over_of_lie_eigenspace_frame E H Dw l Xo c O β Z Y.Fn (constF e Y) z _ g₀ hzs (by
-    rw [← Category.assoc, hz]; simp only [Category.assoc])
-  let C : FlagCpt Z e :=
-    { Y := Y, π := f ≫ j, π_str := hstr, y0 := y0, f0 := g₀, y0_x := by rw [hy1, hz], flagComponentFramedPoint_frame := by rw [hy1]; exact hy2, gr := gr,
-      gr_spec := hgr, bd := D', bd_eff := hD1', bd_red := hD3'
-      bd_supp := fun y => (hD2' y).trans ((hD2 _).trans (by rw [Scheme.Hom.comp_apply])) }
-  exact ⟨C, f, rfl, by simpa using hd,
-    GlobalTheory.T.eigenFrameBasePoint_lifts_unique_flagSpace E H Dw l Xo c O β Z F e C B j f₀ S A₀ S' A₁ φ f hj rfl hT hT' hC hR⟩
+  obtain ⟨y0, hy1, hy2⟩ :=
+    GlobalTheory.T.exists_framed_point_over_of_lie_eigenspace_frame E H Dw l Xo c O β Z Y.Fn
+      (constF e Y) z _ g₀ hzs (by rw [← Category.assoc, hz]; simp only [Category.assoc])
+  let C : FlagCpt Z e := {
+    Y := Y
+    π := f ≫ j
+    π_str := hstr
+    y0 := y0
+    f0 := g₀
+    y0_x := by rw [hy1, hz]
+    flagComponentFramedPoint_frame := by rw [hy1]; exact hy2
+    gr := gr
+    gr_spec := hgr
+    bd := D'
+    bd_eff := hD1'
+    bd_red := hD3'
+    bd_supp := fun y => (hD2' y).trans ((hD2 _).trans (by rw [Scheme.Hom.comp_apply]))
+  }
+  exact ⟨
+    C,
+    f,
+    rfl,
+    by simpa using hd,
+    GlobalTheory.T.eigenFrameBasePoint_lifts_unique_flagSpace E H Dw l Xo c O β Z F e C B j f₀ S A₀
+      S' A₁ φ f hj rfl hT hT' hC hR
+  ⟩
 
 end Component
 

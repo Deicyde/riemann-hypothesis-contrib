@@ -28,9 +28,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsA
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.PointSurjectivity
 
@@ -44,8 +47,7 @@ theorem pic_eq_zero (k : Type) [Field k] (c : Pic (Sp k)) : c = 0 := by
   obtain ⟨p⟩ : Nonempty (Sp k) := inferInstance
   obtain ⟨V, hV, hc⟩ := GlobalTheory.AbDual.exists_pull_eq_zero c p
   have hV' : V = ⊤ := by
-    have hs : Subsingleton (Sp k) := by
-      unfold Sp; infer_instance
+    have hs : Subsingleton (Sp k) := by unfold Sp; infer_instance
     ext x
     simp only [TopologicalSpace.Opens.coe_top, Set.mem_univ, iff_true]
     exact (Subsingleton.elim x p) ▸ hV

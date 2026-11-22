@@ -18,7 +18,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ZsEqMulDe
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.DepletedValue
@@ -302,15 +303,36 @@ end GlobalTheory.DepletedValue
 
 namespace GlobalTheory.EisM
 
-theorem val_depleted_ne_zero : ∀ (e N l : ℕ) (χ θ : DirichletCharacter ℂ N) (ψ : DirichletCharacter ℂ l) (φ : DirichletCharacter ℂ (N * l)) (t : ℕ → ℂ) (α c₀ c₁ : ℂ) (B : ℕ) (c : ℕ → ℂ), 1 ≤ e → 0 < N → l.Prime → ¬ l ∣ N → α ≠ 0 → EigF (2 * e + 1) N l χ⁻¹ t α B c → θ (-1) = (-1) ^ e * ψ (-1) → χ (-1) = -1 → θ * χ ≠ 1 → (∀ d : ℤ, ch φ d = ch (θ * χ) d * ch ψ d) → MF e (N * l) (fun d => ch ψ d * ch θ d) (eis e c₀ (ch ψ) (ch θ)) → MF (e + 1) (N * l) (ch φ⁻¹) (eis (e + 1) c₁ (hat φ) fun _ => 1) → lam B c (mul (eis e c₀ (ch ψ) (ch θ)) (eis (e + 1) c₁ (hat φ) fun _ => 1)) ≠ 0 → α ≠ θ l → α ≠ (l : ℂ) ^ e * χ⁻¹ l → val B c l α 1 (Zs (2 * e + 1) l (ch θ) (hat ⇑(θ * χ)) (fun x y => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e)) ≠ 0 := by
+theorem val_depleted_ne_zero
+    : ∀ (e N l : ℕ) (χ θ : DirichletCharacter ℂ N) (ψ : DirichletCharacter ℂ l)
+        (φ : DirichletCharacter ℂ (N * l)) (t : ℕ → ℂ) (α c₀ c₁ : ℂ) (B : ℕ) (c : ℕ → ℂ),
+      1 ≤ e → 0 < N → l.Prime → ¬ l ∣ N → α ≠ 0 → EigF (2 * e + 1) N l χ⁻¹ t α B c
+        → θ (-1) = (-1) ^ e * ψ (-1) → χ (-1) = -1 → θ * χ ≠ 1
+        → (∀ d : ℤ, ch φ d = ch (θ * χ) d * ch ψ d)
+        → MF e (N * l) (fun d => ch ψ d * ch θ d) (eis e c₀ (ch ψ) (ch θ))
+        → MF (e + 1) (N * l) (ch φ⁻¹) (eis (e + 1) c₁ (hat φ) fun _ => 1)
+        → lam B c (mul (eis e c₀ (ch ψ) (ch θ)) (eis (e + 1) c₁ (hat φ) fun _ => 1)) ≠ 0 → α ≠ θ l
+        → α ≠ (l : ℂ) ^ e * χ⁻¹ l
+        → val B c l α 1
+            (Zs (2 * e + 1) l (ch θ) (hat ⇑(θ * χ)) (fun x y => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e))
+          ≠ 0 := by
   intro e N l χ θ ψ φ t α c₀ c₁ B c he hN hl hlN hα0 hEig hθ hχ hθχ hφ hF hE hlam hαθ hαχ
-  obtain ⟨c', hmf, hne⟩ : ∃ c' : ℂ, MF (2 * e + 1) (N * l) (ch χ⁻¹) (mul (eis e c₀ (ch ψ) (ch θ)) (eis (e + 1) c' (fun y => ch ψ⁻¹ y * hat ⇑(θ * χ) y) fun _ => 1)) ∧
-      lam B c (mul (eis e c₀ (ch ψ) (ch θ)) (eis (e + 1) c' (fun y => ch ψ⁻¹ y * hat ⇑(θ * χ) y) fun _ => 1)) ≠ 0 := by
+  obtain ⟨c', hmf, hne⟩
+      : ∃ c' : ℂ,
+        MF (2 * e + 1) (N * l) (ch χ⁻¹)
+            (mul (eis e c₀ (ch ψ) (ch θ))
+              (eis (e + 1) c' (fun y => ch ψ⁻¹ y * hat ⇑(θ * χ) y) fun _ => 1))
+          ∧ lam B c
+              (mul (eis e c₀ (ch ψ) (ch θ))
+                (eis (e + 1) c' (fun y => ch ψ⁻¹ y * hat ⇑(θ * χ) y) fun _ => 1))
+            ≠ 0 := by
     rcases eq_or_ne ψ 1 with rfl | hψ
-    · exact GlobalTheory.DepletedValue.good_one e N l χ θ φ α c₀ c₁ B c he hN hl hlN hα0 hEig.U hθ hχ hθχ hφ hF hE hlam hαχ
+    · exact GlobalTheory.DepletedValue.good_one e N l χ θ φ α c₀ c₁ B c he hN hl hlN hα0 hEig.U hθ
+        hχ hθχ hφ hF hE hlam hαχ
     · exact GlobalTheory.DepletedValue.good_ne e N l χ θ ψ φ c₀ c₁ B c he hN hl hlN hψ hφ hF hE hlam
   rw [GlobalTheory.DepletedValue.zs_eq e l he θ χ ψ c₀ c']
-  exact GlobalTheory.DepletedValue.core hl.pos B c α (θ l) _ _ (GlobalTheory.DepletedValue.U_FF e N l he hN hl θ ψ c₀ hF) (GlobalTheory.DepletedValue.U_EE e N l hl (θ * χ) ψ c')
-    (hEig.U _ hmf) hne hαθ hα0
+  exact GlobalTheory.DepletedValue.core hl.pos B c α (θ l) _ _
+    (GlobalTheory.DepletedValue.U_FF e N l he hN hl θ ψ c₀ hF)
+    (GlobalTheory.DepletedValue.U_EE e N l hl (θ * χ) ψ c') (hEig.U _ hmf) hne hαθ hα0
 
 end GlobalTheory.EisM

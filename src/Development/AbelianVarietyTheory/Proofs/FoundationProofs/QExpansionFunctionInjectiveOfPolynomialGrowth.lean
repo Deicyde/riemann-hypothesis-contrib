@@ -6,21 +6,26 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
 
 namespace GlobalTheory.EisM
 
-theorem polyB_summable_norm_mul_pow {a : ℕ → ℂ} (ha : PolyB a) {r : ℝ} (hr0 : 0 ≤ r) (hr1 : r < 1) :
-    Summable fun n : ℕ => ‖a n‖ * r ^ n := by
+theorem polyB_summable_norm_mul_pow {a : ℕ → ℂ} (ha : PolyB a) {r : ℝ} (hr0 : 0 ≤ r) (hr1 : r < 1)
+    : Summable fun n : ℕ => ‖a n‖ * r ^ n := by
   obtain ⟨C, A, h⟩ := ha
   have hs : Summable fun n : ℕ => C * 2 ^ A * ((n : ℝ) ^ A * r ^ n + r ^ n) := by
     refine Summable.mul_left _ (Summable.add ?_ ?_)
-    · exact summable_pow_mul_geometric_of_norm_lt_one A (by rwa [Real.norm_eq_abs, abs_of_nonneg hr0])
+    · exact summable_pow_mul_geometric_of_norm_lt_one A
+        (by rwa [Real.norm_eq_abs, abs_of_nonneg hr0])
     · exact summable_geometric_of_lt_one hr0 hr1
-  refine Summable.of_nonneg_of_le (fun n => mul_nonneg (norm_nonneg _) (pow_nonneg hr0 _)) (fun n => ?_) hs
+  refine Summable.of_nonneg_of_le
+    (fun n => mul_nonneg (norm_nonneg _) (pow_nonneg hr0 _))
+    (fun n => ?_)
+    hs
   have hb : ((n : ℝ) + 1) ^ A ≤ 2 ^ A * ((n : ℝ) ^ A + 1) := by
     rcases Nat.eq_zero_or_pos n with rfl | hn
     · simp only [Nat.cast_zero, zero_add, one_pow]
@@ -31,13 +36,14 @@ theorem polyB_summable_norm_mul_pow {a : ℕ → ℂ} (ha : PolyB a) {r : ℝ} (
       rw [mul_pow] at this
       nlinarith [pow_nonneg (show (0:ℝ) ≤ 2 by norm_num) A]
   have hC : 0 ≤ C := le_trans (norm_nonneg _) ((h 0).trans (by simp))
-  calc ‖a n‖ * r ^ n ≤ C * ((n : ℝ) + 1) ^ A * r ^ n :=
-        mul_le_mul_of_nonneg_right (h n) (pow_nonneg hr0 _)
+  calc
+    ‖a n‖ * r ^ n
+      ≤ C * ((n : ℝ) + 1) ^ A * r ^ n := mul_le_mul_of_nonneg_right (h n) (pow_nonneg hr0 _)
     _ ≤ C * (2 ^ A * ((n : ℝ) ^ A + 1)) * r ^ n := by gcongr
     _ = C * 2 ^ A * ((n : ℝ) ^ A * r ^ n + r ^ n) := by ring
 
-theorem exists_upperHalfPlane_exp_eq {q : ℂ} (h0 : q ≠ 0) (h1 : ‖q‖ < 1) :
-    ∃ τ : ℍ, ∀ n : ℕ, cexp (2 * π * Complex.I * n * τ) = q ^ n := by
+theorem exists_upperHalfPlane_exp_eq {q : ℂ} (h0 : q ≠ 0) (h1 : ‖q‖ < 1)
+    : ∃ τ : ℍ, ∀ n : ℕ, cexp (2 * π * Complex.I * n * τ) = q ^ n := by
   have hπ : (2 * π * Complex.I : ℂ) ≠ 0 := by simp [Real.pi_ne_zero, Complex.I_ne_zero]
   have him : 0 < (Complex.log q / (2 * π * Complex.I)).im := by
     have e : Complex.log q / (2 * π * Complex.I) = -Complex.I * Complex.log q / (2 * π) := by
@@ -45,7 +51,7 @@ theorem exists_upperHalfPlane_exp_eq {q : ℂ} (h0 : q ≠ 0) (h1 : ‖q‖ < 1)
       ring_nf
       simp [Complex.I_sq]
     rw [e]
-    have : (-Complex.I * Complex.log q / (2 * π)).im = - (Complex.log q).re / (2 * π) := by
+    have : (-Complex.I * Complex.log q / (2 * π)).im = -(Complex.log q).re / (2 * π) := by
       rw [show (2 * π : ℂ) = ((2 * π : ℝ) : ℂ) by push_cast; ring, Complex.div_ofReal_im]
       simp
     rw [this, Complex.log_re]
@@ -53,8 +59,7 @@ theorem exists_upperHalfPlane_exp_eq {q : ℂ} (h0 : q ≠ 0) (h1 : ‖q‖ < 1)
     have : 0 < 2 * π := by positivity
     apply div_pos (by simpa using hl) this
   refine ⟨⟨_, him⟩, fun n => ?_⟩
-  have : 2 * π * Complex.I * (n : ℂ) * ((⟨_, him⟩ : ℍ) : ℂ) = n * Complex.log q := by
-    field_simp
+  have : 2 * π * Complex.I * (n : ℂ) * ((⟨_, him⟩ : ℍ) : ℂ) = n * Complex.log q := by field_simp
   rw [this, Complex.exp_nat_mul, Complex.exp_log h0]
 
 theorem qs_injective : ∀ a b : ℕ → ℂ, PolyB a → PolyB b → qs a = qs b → a = b := by
@@ -62,7 +67,9 @@ theorem qs_injective : ∀ a b : ℕ → ℂ, PolyB a → PolyB b → qs a = qs 
   set c : ℕ → ℂ := fun n => a n - b n with hcdef
   have hsum : ∀ r : ℝ, 0 ≤ r → r < 1 → Summable fun n : ℕ => ‖c n‖ * r ^ n := by
     intro r h0 h1
-    refine Summable.of_nonneg_of_le (fun n => mul_nonneg (norm_nonneg _) (pow_nonneg h0 _)) (fun n => ?_)
+    refine Summable.of_nonneg_of_le
+      (fun n => mul_nonneg (norm_nonneg _) (pow_nonneg h0 _))
+      (fun n => ?_)
       ((polyB_summable_norm_mul_pow ha h0 h1).add (polyB_summable_norm_mul_pow hb h0 h1))
     rw [← add_mul]
     exact mul_le_mul_of_nonneg_right (norm_sub_le _ _) (pow_nonneg h0 _)
@@ -78,10 +85,12 @@ theorem qs_injective : ∀ a b : ℕ → ℂ, PolyB a → PolyB b → qs a = qs 
   have hval : ∀ q : ℂ, q ≠ 0 → ‖q‖ < 1 → p.sum q = 0 := by
     intro q h0 h1
     obtain ⟨τ, hτ⟩ := exists_upperHalfPlane_exp_eq h0 h1
-    have ha' : Summable fun n => a n * q ^ n := Summable.of_norm (by
-      simpa [norm_mul, norm_pow] using polyB_summable_norm_mul_pow ha (norm_nonneg q) h1)
-    have hb' : Summable fun n => b n * q ^ n := Summable.of_norm (by
-      simpa [norm_mul, norm_pow] using polyB_summable_norm_mul_pow hb (norm_nonneg q) h1)
+    have ha' : Summable fun n => a n * q ^ n :=
+      Summable.of_norm (by
+        simpa [norm_mul, norm_pow] using polyB_summable_norm_mul_pow ha (norm_nonneg q) h1)
+    have hb' : Summable fun n => b n * q ^ n :=
+      Summable.of_norm (by
+        simpa [norm_mul, norm_pow] using polyB_summable_norm_mul_pow hb (norm_nonneg q) h1)
     have e := congrFun hab τ
     simp only [qs, hτ] at e
     show ∑' n, p n (fun _ => q) = 0

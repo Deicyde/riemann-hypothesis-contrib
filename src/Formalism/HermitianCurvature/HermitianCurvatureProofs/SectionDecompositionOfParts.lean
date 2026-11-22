@@ -27,8 +27,10 @@ theorem c2_section_decomp_of_pieces : C2.SectionDecompOfParts := by
       rw [← (hU.1 x hx).2.2 _ hxi, Matrix.mul_nonsing_inv _ hxu, hu1]
     exact (Matrix.inv_eq_right_inv this).symm
 
-  have huSg : ∀ σ ∈ C2.Sg k r z z' γ, σ ∈ Sset k r z ∧ ∃ v, v ∈ C2.UTset (r + 1) ∧ vᴴ ∈ C2.LPg (Zhat k r z z' γ) ∧
-      C2.uMap k r z σ = v := by
+  have huSg
+      : ∀ σ ∈ C2.Sg k r z z' γ,
+        σ ∈ Sset k r z
+          ∧ ∃ v, v ∈ C2.UTset (r + 1) ∧ vᴴ ∈ C2.LPg (Zhat k r z z' γ) ∧ C2.uMap k r z σ = v := by
     rintro σ ⟨n0, hn0, v, hv, hvL, h, hh, rfl⟩
     obtain ⟨hτN, _, hτu⟩ := hTM k r z hz v hv
     have hn0S : n0 ∈ Sset k r z := N_sub_S hn0.1
@@ -36,13 +38,17 @@ theorem c2_section_decomp_of_pieces : C2.SectionDecompOfParts := by
     have hhS : h ∈ Sset k r z := UW_sub_S hh
     have hs1 := hSg.2.1 _ hn0S _ hτS
     refine ⟨hSg.2.1 _ hs1 _ hhS, v, hv, hvL, ?_⟩
-    rw [(hU.1 _ hs1).2.2 h hhS, (hU.1 _ hn0S).2.2 _ hτS, hn0.2, hτu, hU.2 h hh, Matrix.one_mul, Matrix.mul_one]
+    rw [(hU.1 _ hs1).2.2 h hhS, (hU.1 _ hn0S).2.2 _ hτS, hn0.2, hτu, hU.2 h hh, Matrix.one_mul,
+      Matrix.mul_one]
 
-  have hRimg : ∀ ρ ∈ C2.Rst k r z z' γ, C2.uMap k r z ρ ∈ C2.UTset (r + 1) ∧ (C2.uMap k r z ρ)ᴴ ∈ C2.Lstg (Zhat k r z z' γ) := by
+  have hRimg
+      : ∀ ρ ∈ C2.Rst k r z z' γ,
+        C2.uMap k r z ρ ∈ C2.UTset (r + 1) ∧ (C2.uMap k r z ρ)ᴴ ∈ C2.Lstg (Zhat k r z z' γ) := by
     intro ρ hρ
     have hmap := (hC1iii k r z z' γ hstd hpos).1.mapsTo hρ
     obtain ⟨h1, h2, h3⟩ := hmap
-    have : C2.uMap k r z ρ ∈ {u | u ∈ C2.UTset (r + 1) ∧ ∃ u' ∈ C2.UTset (r + 1), uᴴ * Zhat k r z z' γ * u' = Zhat k r z z' γ} :=
+    have : C2.uMap k r z ρ
+        ∈ {u | u ∈ C2.UTset (r + 1) ∧ ∃ u' ∈ C2.UTset (r + 1), uᴴ * Zhat k r z z' γ * u' = Zhat k r z z' γ} :=
       ⟨h1, _, h2, h3⟩
     rw [hURI (r + 1) (Zhat k r z z' γ) hmono] at this
     exact this
@@ -51,11 +57,15 @@ theorem c2_section_decomp_of_pieces : C2.SectionDecompOfParts := by
   obtain ⟨⟨uρ, v⟩, ⟨huρ, hv, huρL, hvL, hue⟩, huniq⟩ := hUp (r + 1) (Zhat k r z z' γ) hmono _ husUT
   simp only at huρ hv huρL hvL hue
 
-  have huρR : uρ ∈ {u | u ∈ C2.UTset (r + 1) ∧ ∃ u' ∈ C2.UTset (r + 1), uᴴ * Zhat k r z z' γ * u' = Zhat k r z z' γ} := by
-    rw [hURI (r + 1) (Zhat k r z z' γ) hmono]; exact ⟨huρ, huρL⟩
+  have huρR
+      : uρ
+        ∈ {u | u ∈ C2.UTset (r + 1) ∧ ∃ u' ∈ C2.UTset (r + 1), uᴴ * Zhat k r z z' γ * u' = Zhat k r z z' γ} :=
+    by rw [hURI (r + 1) (Zhat k r z z' γ) hmono]; exact ⟨huρ, huρL⟩
   obtain ⟨u', hu', hu'e⟩ := huρR.2
-  have hmemT : (uρ, u') ∈ {p : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ × Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ |
-      p.1 ∈ C2.UTset (r + 1) ∧ p.2 ∈ C2.UTset (r + 1) ∧ p.1ᴴ * Zhat k r z z' γ * p.2 = Zhat k r z z' γ} :=
+  have hmemT
+      : (uρ, u')
+        ∈ {p : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ × Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ |
+          p.1 ∈ C2.UTset (r + 1) ∧ p.2 ∈ C2.UTset (r + 1) ∧ p.1ᴴ * Zhat k r z z' γ * p.2 = Zhat k r z z' γ} :=
     ⟨huρ, hu', hu'e⟩
   obtain ⟨ρ, hρ, hρe⟩ := (hC1iii k r z z' γ hstd hpos).1.surjOn hmemT
   have hρu : C2.uMap k r z ρ = uρ := congrArg Prod.fst hρe
@@ -75,8 +85,8 @@ theorem c2_section_decomp_of_pieces : C2.SectionDecompOfParts := by
   have hh1u : IsUnit h1.det := WeylGroupFacts.isUnit_of_uh hh1.1
   have hn2 : h1 * n1 * h1⁻¹ ∈ Nset k r := (unitary_weyl_normal_holds k r z hz.1 h1 hh1 n1 hn1).1
   have hn2u : C2.uMap k r z (h1 * n1 * h1⁻¹) = v := by
-    rw [(hU.1 _ (hSg.2.1 _ hh1S _ hn1S)).2.2 _ (UW_sub_S hh1inv), (hU.1 _ hh1S).2.2 _ hn1S, hU.2 _ hh1,
-      hU.2 _ hh1inv, hn1u, Matrix.one_mul, Matrix.mul_one]
+    rw [(hU.1 _ (hSg.2.1 _ hh1S _ hn1S)).2.2 _ (UW_sub_S hh1inv), (hU.1 _ hh1S).2.2 _ hn1S,
+      hU.2 _ hh1, hU.2 _ hh1inv, hn1u, Matrix.one_mul, Matrix.mul_one]
   obtain ⟨hτN, _, hτu⟩ := hTM k r z hz v hv
   obtain ⟨τv, hτv⟩ : ∃ τv, τv = C2.tauM k r z v := ⟨_, rfl⟩
   rw [← hτv] at hτN hτu
@@ -88,8 +98,8 @@ theorem c2_section_decomp_of_pieces : C2.SectionDecompOfParts := by
     rw [hn0, (hU.1 _ (N_sub_S hn2)).2.2 _ (hSg.2.2 _ hτS), huinv _ hτS, hn2u, hτu,
       Matrix.mul_nonsing_inv _ (C2x2.ut_unit hv)]
   have hσdec : σ = n0 * τv * h1 := by
-    rw [hσe, hn0, Matrix.mul_assoc (h1 * n1 * h1⁻¹), Matrix.nonsing_inv_mul _ hτunit, Matrix.mul_one,
-      Matrix.mul_assoc (h1 * n1), Matrix.nonsing_inv_mul _ hh1u, Matrix.mul_one]
+    rw [hσe, hn0, Matrix.mul_assoc (h1 * n1 * h1⁻¹), Matrix.nonsing_inv_mul _ hτunit,
+      Matrix.mul_one, Matrix.mul_assoc (h1 * n1), Matrix.nonsing_inv_mul _ hh1u, Matrix.mul_one]
   have hσSg : σ ∈ C2.Sg k r z z' γ := ⟨n0, ⟨hn0N, hn0u⟩, v, hv, hvL, h1, hh1, by rw [hσdec, hτv]⟩
   refine ⟨(ρ, σ), ⟨hρ, hσSg, ?_⟩, ?_⟩
   · show s = ρ * σ

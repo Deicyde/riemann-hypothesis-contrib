@@ -11,8 +11,8 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory
 
-theorem youngDiagram_card_eq_sum_rowLen_range (μ : YoungDiagram) (n : ℕ) (h : μ.colLen 0 ≤ n) :
-    μ.card = ∑ r ∈ Finset.range n, μ.rowLen r := by
+theorem youngDiagram_card_eq_sum_rowLen_range (μ : YoungDiagram) (n : ℕ) (h : μ.colLen 0 ≤ n)
+    : μ.card = ∑ r ∈ Finset.range n, μ.rowLen r := by
   have hmap : ∀ c ∈ μ.cells, c.1 ∈ Finset.range n := by
     intro c hc
     rw [Finset.mem_range]
@@ -25,7 +25,12 @@ theorem youngDiagram_card_eq_sum_rowLen_range (μ : YoungDiagram) (n : ℕ) (h :
   rw [YoungDiagram.rowLen_eq_card]
   rfl
 
-theorem nuD_card_eq_sum_nuRow : ∀ (D : D7), NuRowOK D → ∀ (u : D.what₂.Word), ∀ j < D.R.m, ∀ (z : Bool × HH D), (((nuD D u j z).card : ℕ) : ℝ) = ∑ r ∈ Finset.range (D.R.N j), DV.nuRow D u (j + 1) (tauPl D z) r := by
+theorem nuD_card_eq_sum_nuRow
+    : ∀ (D : D7),
+      NuRowOK D
+        → ∀ (u : D.what₂.Word), ∀ j < D.R.m, ∀ (z : Bool × HH D),
+          (((nuD D u j z).card : ℕ) : ℝ)
+            = ∑ r ∈ Finset.range (D.R.N j), DV.nuRow D u (j + 1) (tauPl D z) r := by
   intro D hD u j hj z
   rw [youngDiagram_card_eq_sum_rowLen_range _ _ (nuD_rows D u j z), Nat.cast_sum]
   refine Finset.sum_congr rfl fun r hr => ?_

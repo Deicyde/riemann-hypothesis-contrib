@@ -9,18 +9,34 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.Bal
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan.StarDepthDenominator
 
-theorem starDepth_den : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O),
-    CMOrd O bar → ∀ (q : ℕ) (ψ w : InvFun O), IsPolyFan bar q ψ → IsCentreSet bar q ψ w → ∃ D₀ : ℕ, 0 < D₀ ∧
-      ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X], Module.finrank O X ≤ q →
-        ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → ∃ n : ℤ, (D₀ : ℝ) * (starDepth bar ψ w).evalZ β = n := by
+theorem starDepth_den
+    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O),
+      CMOrd O bar
+        → ∀ (q : ℕ) (ψ w : InvFun O),
+          IsPolyFan bar q ψ → IsCentreSet bar q ψ w
+            → ∃ D₀ : ℕ,
+              0 < D₀
+                ∧ ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X]
+                    [Module.Projective O X],
+                  Module.finrank O X ≤ q
+                    → ∀ β ∈ balForms bar X,
+                      (∀ y, 0 ≤ β y y) → ∃ n : ℤ, (D₀ : ℝ) * (starDepth bar ψ w).evalZ β = n := by
   intro O _ _ _ _ bar hb q ψ w hψ hw
   obtain ⟨n, R, hR, hcls⟩ := hb.classes q
-  have key : ∀ k : Fin n, ∃ D : ℕ, 0 < D ∧ ∀ x ∈ {x : ℝ | ∃ β ∈ balForms bar (R k), (∀ y, 0 ≤ β y y) ∧
-      haveI := (hR k).1; x = (starDepth bar ψ w).evalZ β}, ∃ z : ℤ, (D : ℝ) * x = z := fun k => by
+  have key
+      : ∀ k : Fin n, ∃ D : ℕ,
+        0 < D
+          ∧ ∀ x
+              ∈ {x : ℝ | ∃ β ∈ balForms bar (R k), (∀ y, 0 ≤ β y y) ∧
+                haveI := (hR k).1; x = (starDepth bar ψ w).evalZ β},
+            ∃ z : ℤ,
+              (D : ℝ) * x = z := fun k => by
     haveI := (hR k).1
     haveI := (hR k).2.1
     obtain ⟨-, h2, h3⟩ := hw (R k) (hR k).2.2

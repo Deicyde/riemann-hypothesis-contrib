@@ -71,12 +71,14 @@ theorem IntNumAddFirst.full : IntNumAddFirst.Statement.{u} :=
   IntNumAddFirst.proof FieldNumbers.IntNumAdd.full FieldNumbers.IntNumZeroSlot.full
     FieldNumbers.HilbDegreeBound.full
 
-theorem EffectiveCase.of_steps (h₀ : NoCommonComponentCase.Statement.{u}) (h₁ : CommonFactorInduction.Statement.{u}) :
-    EffectiveCase.Statement.{u} :=
+theorem EffectiveCase.of_steps
+    (h₀ : NoCommonComponentCase.Statement.{u}) (h₁ : CommonFactorInduction.Statement.{u})
+    : EffectiveCase.Statement.{u} :=
   EffectiveCase.proof h₀ h₁
 
-theorem CutByEffectiveDivisor.of_steps (h₀ : NoCommonComponentCase.Statement.{u})
-    (h₁ : CommonFactorInduction.Statement.{u}) : CutByEffectiveDivisor.Statement.{u} :=
+theorem CutByEffectiveDivisor.of_steps
+    (h₀ : NoCommonComponentCase.Statement.{u}) (h₁ : CommonFactorInduction.Statement.{u})
+    : CutByEffectiveDivisor.Statement.{u} :=
   CutByEffectiveDivisor.proof (EffectiveCase.of_steps h₀ h₁) UniformiserCase.full
     ShiftByUniformiser.full EffectiveShift.full
 

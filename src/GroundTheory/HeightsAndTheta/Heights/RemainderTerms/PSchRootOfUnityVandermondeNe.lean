@@ -12,7 +12,8 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open Finset
 
-theorem SchRootOfUnityVandermondeNe.rootOfUnity_isPrimitiveRoot {k : ℕ} (hk : 1 ≤ k) : IsPrimitiveRoot (rootOfUnity k) k := by
+theorem SchRootOfUnityVandermondeNe.rootOfUnity_isPrimitiveRoot {k : ℕ} (hk : 1 ≤ k)
+    : IsPrimitiveRoot (rootOfUnity k) k := by
   unfold rootOfUnity
   exact Complex.isPrimitiveRoot_exp k (by omega)
 

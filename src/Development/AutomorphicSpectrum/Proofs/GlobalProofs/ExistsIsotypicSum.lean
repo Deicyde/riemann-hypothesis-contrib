@@ -7,25 +7,34 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.IsSmoothVec
 
 noncomputable section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.LinRed GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.CompanionTheory.Hypotheses₂ GlobalTheory.CompanionTheory.Hypotheses₂.HCA
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.LinRed
+  GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.CompanionTheory.Hypotheses₂
+  GlobalTheory.CompanionTheory.Hypotheses₂.HCA
 open scoped InnerProductSpace ContDiff
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.HCA.Isotypic
 
-variable {n : ℕ} {G : Set (Matrix (Fin n) (Fin n) ℂ)} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {G : Set (Matrix (Fin n) (Fin n) ℂ)} {H : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-def IsIrrK (G : Set (Matrix (Fin n) (Fin n) ℂ)) (π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
-    (S : Submodule ℂ H) : Prop :=
-  FiniteDimensional ℂ S ∧ IsKStable G π S ∧
-    ∀ S' : Submodule ℂ H, S' ≤ S → IsKStable G π S' → S' = ⊥ ∨ S' = S
+def IsIrrK
+    (G : Set (Matrix (Fin n) (Fin n) ℂ)) (π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (S : Submodule ℂ H)
+    : Prop :=
+  FiniteDimensional ℂ S ∧ IsKStable G π S
+    ∧ ∀ S' : Submodule ℂ H, S' ≤ S → IsKStable G π S' → S' = ⊥ ∨ S' = S
 
-def isoGens (G : Set (Matrix (Fin n) (Fin n) ℂ)) (π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
-    (S : Submodule ℂ H) : Set (Submodule ℂ H) :=
+def isoGens
+    (G : Set (Matrix (Fin n) (Fin n) ℂ)) (π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (S : Submodule ℂ H)
+    : Set (Submodule ℂ H) :=
   {S' | ∃ T : H →ₗ[ℂ] H, S' = S.map T ∧ ∀ k ∈ maxCpt G, ∀ w ∈ S, T (π k w) = π k (T w)}
 
-theorem orthogonal_kstable (hG : IsLinRed G) (hA : IsAdmOn G π) {S : Submodule ℂ H}
-    (hS : IsKStable G π S) : IsKStable G π Sᗮ := by
+theorem orthogonal_kstable
+    (hG : IsLinRed G) (hA : IsAdmOn G π) {S : Submodule ℂ H} (hS : IsKStable G π S)
+    : IsKStable G π Sᗮ := by
   intro k hk y hy
   rw [Submodule.mem_orthogonal]
   intro s hs
@@ -39,16 +48,17 @@ theorem orthogonal_kstable (hG : IsLinRed G) (hA : IsAdmOn G π) {S : Submodule 
   rw [← h1, h2]
   exact Submodule.inner_right_of_mem_orthogonal (hS _ hk' s hs) hy
 
-theorem sSup_kstable {A : Set (Submodule ℂ H)} (hA : ∀ S ∈ A, IsKStable G π S) :
-    IsKStable G π (sSup A) := by
+theorem sSup_kstable {A : Set (Submodule ℂ H)} (hA : ∀ S ∈ A, IsKStable G π S)
+    : IsKStable G π (sSup A) := by
   intro k hk w hw
   have h : sSup A ≤ (sSup A).comap (π k : H →ₗ[ℂ] H) :=
     sSup_le fun S hS x hx => Submodule.mem_comap.2 (le_sSup hS (hA S hS k hk x hx))
   exact h hw
 
-theorem exists_irr_family (hG : IsLinRed G) (hA : IsAdmOn G π) (m : ℕ) :
-    ∀ S : Submodule ℂ H, FiniteDimensional ℂ S → Module.finrank ℂ S = m → IsKStable G π S →
-      ∃ F : Set (Submodule ℂ H), F.Finite ∧ (∀ I ∈ F, IsIrrK G π I) ∧ S ≤ sSup F := by
+theorem exists_irr_family (hG : IsLinRed G) (hA : IsAdmOn G π) (m : ℕ)
+    : ∀ S : Submodule ℂ H,
+      FiniteDimensional ℂ S → Module.finrank ℂ S = m → IsKStable G π S
+        → ∃ F : Set (Submodule ℂ H), F.Finite ∧ (∀ I ∈ F, IsIrrK G π I) ∧ S ≤ sSup F := by
   induction m using Nat.strong_induction_on with
   | _ m ih =>
     intro S hfin hm hS
@@ -84,24 +94,29 @@ theorem exists_irr_family (hG : IsLinRed G) (hA : IsAdmOn G π) (m : ℕ) :
         have hp : ((S'.orthogonalProjection v : S') : H) ∈ S' := (S'.orthogonalProjection v).2
         have hq : v - (S'.orthogonalProjection v : H) ∈ S ⊓ S'ᗮ :=
           ⟨S.sub_mem hv (hle hp), Submodule.sub_starProjection_mem_orthogonal (K := S') v⟩
-        have e : v = (S'.orthogonalProjection v : H) + (v - (S'.orthogonalProjection v : H)) := by abel
+        have e : v = (S'.orthogonalProjection v : H) + (v - (S'.orthogonalProjection v : H)) := by
+          abel
         rw [e, sSup_union]
-        exact Submodule.add_mem _ (Submodule.mem_sup_left (hle₁ hp)) (Submodule.mem_sup_right (hle₂ hq))
+        exact Submodule.add_mem _ (Submodule.mem_sup_left (hle₁ hp))
+          (Submodule.mem_sup_right (hle₂ hq))
 
-theorem isoGens_kstable {S S' : Submodule ℂ H} (hS : IsKStable G π S) (h : S' ∈ isoGens G π S) :
-    IsKStable G π S' := by
+theorem isoGens_kstable {S S' : Submodule ℂ H} (hS : IsKStable G π S) (h : S' ∈ isoGens G π S)
+    : IsKStable G π S' := by
   obtain ⟨T, rfl, hT⟩ := h
   rintro k hk _ ⟨s, hs, rfl⟩
   exact ⟨π k s, hS k hk s hs, hT k hk s hs⟩
 
 theorem le_sSup_isoGens (S : Submodule ℂ H) : S ≤ sSup (isoGens G π S) := by
-  refine le_trans (le_of_eq ?_) (le_sSup (show S.map LinearMap.id ∈ isoGens G π S from
-    ⟨LinearMap.id, rfl, fun k _ w _ => rfl⟩))
+  refine le_trans (le_of_eq ?_)
+    (le_sSup (show S.map LinearMap.id ∈ isoGens G π S from ⟨LinearMap.id, rfl, fun k _ w _ => rfl⟩))
   simp
 
-theorem map_mem_of_gen {Y S S' : Submodule ℂ H} (hSY : sSup (isoGens G π S) ≤ Y) (h : S' ∈ isoGens G π S)
-    (D : Y →ₗ[ℂ] H) (hD : ∀ k ∈ maxCpt G, ∀ y y' : Y, (y' : H) = π k y → D y' = π k (D y))
-    (hS : IsKStable G π S) {x : H} (hx : x ∈ S') (hxY : x ∈ Y) : D ⟨x, hxY⟩ ∈ Y := by
+theorem map_mem_of_gen
+    {Y S S' : Submodule ℂ H}
+    (hSY : sSup (isoGens G π S) ≤ Y) (h : S' ∈ isoGens G π S) (D : Y →ₗ[ℂ] H)
+    (hD : ∀ k ∈ maxCpt G, ∀ y y' : Y, (y' : H) = π k y → D y' = π k (D y)) (hS : IsKStable G π S)
+    {x : H} (hx : x ∈ S') (hxY : x ∈ Y)
+    : D ⟨x, hxY⟩ ∈ Y := by
   obtain ⟨T, rfl, hT⟩ := h
   obtain ⟨s, hs, rfl⟩ := hx
   have hTY : ∀ w ∈ S, T w ∈ Y := fun w hw =>
@@ -118,7 +133,14 @@ theorem map_mem_of_gen {Y S S' : Submodule ℂ H} (hSY : sSup (isoGens G π S) �
   have : T' s ∈ Y := hSY (le_sSup hmem ⟨s, hs, rfl⟩)
   rwa [hval s hs] at this
 
-theorem exists_isotypic_sum : ∀ {n : ℕ} {G : Set (Matrix (Fin n) (Fin n) ℂ)} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hG : IsLinRed G) (hA : IsAdmOn G π) {v : H} (hv : IsKFinOn G π v), ∃ Y : Submodule ℂ H, FiniteDimensional ℂ Y ∧ v ∈ Y ∧ IsKStable G π Y ∧ ∀ D : Y →ₗ[ℂ] H, (∀ k ∈ maxCpt G, ∀ y y' : Y, (y' : H) = π k y → D y' = π k (D y)) → ∀ y, D y ∈ Y := by
+theorem exists_isotypic_sum
+    : ∀ {n : ℕ} {G : Set (Matrix (Fin n) (Fin n) ℂ)} {H : Type} [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H] [CompleteSpace H] {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+        (hG : IsLinRed G) (hA : IsAdmOn G π) {v : H} (hv : IsKFinOn G π v),
+      ∃ Y : Submodule ℂ H,
+        FiniteDimensional ℂ Y ∧ v ∈ Y ∧ IsKStable G π Y
+          ∧ ∀ D : Y →ₗ[ℂ] H,
+            (∀ k ∈ maxCpt G, ∀ y y' : Y, (y' : H) = π k y → D y' = π k (D y)) → ∀ y, D y ∈ Y := by
   intro n G H _ _ _ π hG hA v hv
   obtain ⟨S, hfin, hvS, hS⟩ := hv
   obtain ⟨F, hF, hI, hle⟩ := exists_irr_family hG hA _ S hfin rfl hS

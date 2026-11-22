@@ -14,8 +14,8 @@ namespace Formalism.InvariantFactorPaths.INST
 
 open Formalism.GradedWeylDivisibility
 
-theorem dsc_denominator (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν) :
-    ∃ N : ℤ, N ≠ 0 ∧ ∀ g ∈ dualWeyl ℤ r n ν, N • g ∈ weyl ℤ r n hn ν := by
+theorem dsc_denominator (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν)
+    : ∃ N : ℤ, N ≠ 0 ∧ ∀ g ∈ dualWeyl ℤ r n ν, N • g ∈ weyl ℤ r n hn ν := by
   obtain ⟨b, ⟨_, hspan, _⟩, _⟩ := sSBasis ℤ r n ν
   have : Fintype (ssIdx r n ν) := (sSIdxFinite r n ν).fintype
   have hb : ∀ i, b i ∈ dualWeyl ℤ r n ν := fun i => hspan ▸ Submodule.subset_span ⟨i, rfl⟩
@@ -31,16 +31,19 @@ theorem dsc_denominator (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ) (hν : A
   | add x y _ _ hx hy => rw [smul_add]; exact Submodule.add_mem _ hx hy
   | smul a x _ hx => rw [smul_comm]; exact Submodule.smul_mem _ _ hx
 
-theorem dsc_split (p : ℕ) [hp : Fact p.Prime] (N : ℤ) (hN : N ≠ 0) :
-    ∃ (k : ℕ) (c : ℤ), N = (p : ℤ) ^ k * c ∧ ¬ (p : ℤ) ∣ c := by
+theorem dsc_split (p : ℕ) [hp : Fact p.Prime] (N : ℤ) (hN : N ≠ 0)
+    : ∃ (k : ℕ) (c : ℤ), N = (p : ℤ) ^ k * c ∧ ¬ (p : ℤ) ∣ c := by
   have hfin : FiniteMultiplicity (p : ℤ) N :=
     Int.finiteMultiplicity_iff.mpr ⟨by simpa using hp.out.ne_one, hN⟩
   obtain ⟨c, h1, h2⟩ := hfin.exists_eq_pow_mul_and_not_dvd
   exact ⟨_, c, h1, h2⟩
 
-theorem dsc_approx (p : ℕ) [Fact p.Prime] (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ) (k : ℕ)
-    (y : MvPolynomial (Fin r × Fin n) ℤ_[p]) (hy : y ∈ weyl ℤ_[p] r n hn ν) :
-    ∃ d ∈ weyl ℤ r n hn ν, ∃ z : MvPolynomial (Fin r × Fin n) ℤ_[p],
+theorem dsc_approx
+    (p : ℕ) [Fact p.Prime]
+    (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ)
+    (k : ℕ)
+    (y : MvPolynomial (Fin r × Fin n) ℤ_[p]) (hy : y ∈ weyl ℤ_[p] r n hn ν)
+    : ∃ d ∈ weyl ℤ r n hn ν, ∃ z : MvPolynomial (Fin r × Fin n) ℤ_[p],
       y = map (Int.castRingHom ℤ_[p]) d + ((p : ℤ_[p]) ^ k) • z := by
   induction hy using Submodule.span_induction with
   | mem x hx =>
@@ -48,31 +51,40 @@ theorem dsc_approx (p : ℕ) [Fact p.Prime] (r n : ℕ) (hn : n ≤ r) (ν : Fin
     refine ⟨applyWord ℤ w (hw ℤ hn ν), Submodule.subset_span ⟨w, rfl⟩, 0, ?_⟩
     simp only [smul_zero, add_zero]
     rw [← lclosedeq_applyWord_map, lclosedeq_hw_map]
-  | zero => exact ⟨0, Submodule.zero_mem _, 0, by simp⟩
+  | zero =>
+    exact ⟨0, Submodule.zero_mem _, 0, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨d1, hd1, z1, rfl⟩ := hx
     obtain ⟨d2, hd2, z2, rfl⟩ := hy
     refine ⟨d1 + d2, Submodule.add_mem _ hd1 hd2, z1 + z2, ?_⟩
-    rw [map_add (f := _), smul_add]; abel
+    rw [map_add (f := _), smul_add]
+    abel
   | smul a x _ hx =>
     obtain ⟨d, hd, z, rfl⟩ := hx
     obtain ⟨a', ha'⟩ := Ideal.mem_span_singleton.mp (PadicInt.appr_spec k a)
-    have ha : a = ((PadicInt.appr a k : ℕ) : ℤ_[p]) + (p : ℤ_[p]) ^ k * a' := by
-      rw [← ha']; ring
-    refine ⟨((PadicInt.appr a k : ℕ) : ℤ) • d, Submodule.smul_mem _ _ hd,
-      a' • map (Int.castRingHom ℤ_[p]) d + a • z, ?_⟩
-    have hm : map (Int.castRingHom ℤ_[p]) (((PadicInt.appr a k : ℕ) : ℤ) • d) =
-        ((PadicInt.appr a k : ℕ) : ℤ_[p]) • map (Int.castRingHom ℤ_[p]) d := by
+    have ha : a = ((PadicInt.appr a k : ℕ) : ℤ_[p]) + (p : ℤ_[p]) ^ k * a' := by rw [← ha']; ring
+    refine ⟨
+      ((PadicInt.appr a k : ℕ) : ℤ) • d,
+      Submodule.smul_mem _ _ hd,
+      a' • map (Int.castRingHom ℤ_[p]) d + a • z,
+      ?_
+    ⟩
+    have hm
+        : map (Int.castRingHom ℤ_[p]) (((PadicInt.appr a k : ℕ) : ℤ) • d)
+          = ((PadicInt.appr a k : ℕ) : ℤ_[p]) • map (Int.castRingHom ℤ_[p]) d := by
       rw [smul_eq_C_mul, smul_eq_C_mul, map_mul, map_C]; simp
-    have h1 : a • map (Int.castRingHom ℤ_[p]) d =
-        ((PadicInt.appr a k : ℕ) : ℤ_[p]) • map (Int.castRingHom ℤ_[p]) d +
-          ((p : ℤ_[p]) ^ k * a') • map (Int.castRingHom ℤ_[p]) d := by
+    have h1
+        : a • map (Int.castRingHom ℤ_[p]) d
+          = ((PadicInt.appr a k : ℕ) : ℤ_[p]) • map (Int.castRingHom ℤ_[p]) d
+            + ((p : ℤ_[p]) ^ k * a') • map (Int.castRingHom ℤ_[p]) d := by
       rw [← add_smul, ← ha]
     rw [hm, smul_add, smul_add, smul_smul, smul_smul, smul_smul, mul_comm a, h1, add_assoc]
 
-theorem dsc_divide (p : ℕ) [Fact p.Prime] {σ : Type*} (k : ℕ) (g : MvPolynomial σ ℤ)
-    (z : MvPolynomial σ ℤ_[p]) (h : map (Int.castRingHom ℤ_[p]) g = ((p : ℤ_[p]) ^ k) • z) :
-    ∃ g1 : MvPolynomial σ ℤ, g = ((p : ℤ) ^ k) • g1 := by
+theorem dsc_divide
+    (p : ℕ) [Fact p.Prime]
+    {σ : Type*} (k : ℕ) (g : MvPolynomial σ ℤ) (z : MvPolynomial σ ℤ_[p])
+    (h : map (Int.castRingHom ℤ_[p]) g = ((p : ℤ_[p]) ^ k) • z)
+    : ∃ g1 : MvPolynomial σ ℤ, g = ((p : ℤ) ^ k) • g1 := by
   have hd : C ((p : ℤ) ^ k) ∣ g := by
     rw [C_dvd_iff_dvd_coeff]
     intro m
@@ -93,7 +105,8 @@ theorem descent_over_integers : DescentZ := by
   have hmap : map (Int.castRingHom ℤ_[p]) (((p : ℤ) ^ e) • f - d) = ((p : ℤ_[p]) ^ k) • z := by
     rw [map_sub, smul_eq_C_mul, map_mul, map_C, ← smul_eq_C_mul]
     have : (Int.castRingHom ℤ_[p]) ((p : ℤ) ^ e) = (p : ℤ_[p]) ^ e := by simp
-    rw [this, hz]; abel
+    rw [this, hz]
+    abel
   obtain ⟨g1, hg1⟩ := dsc_divide p k _ z hmap
   have hg0 : ((p : ℤ) ^ e) • f - d ∈ dualWeyl ℤ r n ν :=
     Submodule.sub_mem _ (Submodule.smul_mem _ _ hf) (weylLeDual ℤ r n hn ν hν hd)

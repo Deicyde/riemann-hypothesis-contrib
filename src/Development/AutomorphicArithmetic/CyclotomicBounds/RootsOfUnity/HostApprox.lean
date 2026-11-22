@@ -11,8 +11,15 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.RootsOfUnity.Au
 
 open NumberField Formalism.HC KStar.Tree
 
-theorem UpperTheory.Mu.hostApprox :
-    ∀ (φ : Frame) (H : HostRaw φ) (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra H.E Ω] [IsAlgClosure H.E Ω] (v : (ZMod H.condN)ˣ), H.art v = 1 → ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ H.condN.factorization l ∣ (u : ℤ_[l]) - (((v : ZMod H.condN).val : ℕ) : ℤ_[l]) → ∀ k : ℕ, ∃ g : Ω ≃ₐ[H.E] Ω, (l : ℤ_[l]) ^ k ∣ ((cyc l H.E Ω g : ℤ_[l]ˣ) : ℤ_[l]) - u := by
+theorem UpperTheory.Mu.hostApprox
+    : ∀ (φ : Frame) (H : HostRaw φ) (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra H.E Ω]
+        [IsAlgClosure H.E Ω] (v : (ZMod H.condN)ˣ),
+      H.art v = 1
+        → ∀ u : ℤ_[l]ˣ,
+          (l : ℤ_[l]) ^ H.condN.factorization l
+              ∣ (u : ℤ_[l]) - (((v : ZMod H.condN).val : ℕ) : ℤ_[l])
+            → ∀ k : ℕ, ∃ g : Ω ≃ₐ[H.E] Ω,
+              (l : ℤ_[l]) ^ k ∣ ((cyc l H.E Ω g : ℤ_[l]ˣ) : ℤ_[l]) - u := by
   intro φ H l _ Ω _ _ _ v hv u hu k
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap H.E Ω).injective
   haveI : IsScalarTower ℚ H.E Ω := IsScalarTower.of_algebraMap_eq' (Subsingleton.elim _ _)
@@ -35,8 +42,7 @@ theorem UpperTheory.Mu.hostApprox :
     Algebra.IsAlgebraic.tower_top (K := ℚ) H.E
   let ι : CyclotomicField (H.QS * H.q * H.d) ℚ →ₐ[H.E] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let ιQ : CyclotomicField (H.QS * H.q * H.d) ℚ →ₐ[ℚ] Ω := ι.restrictScalars ℚ
   have hι : ∀ x : H.E, ιQ (H.cycEmb x) = algebraMap H.E Ω x := fun x => ι.commutes x

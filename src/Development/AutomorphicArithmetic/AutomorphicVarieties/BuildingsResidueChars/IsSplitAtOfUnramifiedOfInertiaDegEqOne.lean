@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SpehSha
 
 open NumberField IsDedekindDomain GlobalTheory.UnitaryBC
 
-theorem UpperTheory.isSplitAt_of_unramified_of_inertiaDeg_eq_one :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : HeightOneSpectrum (𝓞 E)), Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield E)) w.asIdeal → w.asIdeal.inertiaDeg ℤ = 1 → IsSplitAt w := by
+theorem UpperTheory.isSplitAt_of_unramified_of_inertiaDeg_eq_one
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : HeightOneSpectrum (𝓞 E)),
+      Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield E)) w.asIdeal → w.asIdeal.inertiaDeg ℤ = 1
+        → IsSplitAt w := by
   intro E _ _ _ w hun hf
   classical
   set F := maximalRealSubfield E

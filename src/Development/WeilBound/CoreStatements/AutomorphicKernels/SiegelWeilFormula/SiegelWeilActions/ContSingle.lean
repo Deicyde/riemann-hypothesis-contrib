@@ -14,27 +14,45 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix Classical ComplexOrder
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.Act
 
-def CLawEx : Prop := ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (d : SD σ) (R : RD d) (L : LD d),
-  ∃ (w₁ : d.G) (cM : (Fin L.n → AE F E) × AF F → d.G) (κ : Measure ((Fin L.n → AE F E) × AF F)),
-    CLaw R L w₁ cM κ ∧ w₁ ∈ rat2 σ d.Y ∧
-    (∃ a b : E, a ≠ 0 ∧ b ≠ 0 ∧ inFrame d.b w₁ = 1 - Matrix.single (Sum.inl L.i₀) (Sum.inl L.i₀) 1 -
-      Matrix.single (Sum.inr L.i₀) (Sum.inr L.i₀) 1 + Matrix.single (Sum.inl L.i₀) (Sum.inr L.i₀) (inclR (F := F) (AF F) a) +
-      Matrix.single (Sum.inr L.i₀) (Sum.inl L.i₀) (inclR (F := F) (AF F) b)) ∧
-    Continuous cM ∧ κ.IsAddHaarMeasure ∧
-    ∃ δ : E, δ ≠ 0 ∧ ∀ c, ∃ A', inFrame d.b (cM c) = Matrix.fromBlocks (1 + ∑ j, Matrix.single L.i₀ (L.em j) (c.1 j))
-      (Matrix.single L.i₀ L.i₀ (c.2 • inclR (F := F) (AF F) δ)) 0 A'
+def CLawEx : Prop :=
+  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
+      (d : SD σ) (R : RD d) (L : LD d),
+    ∃ (w₁ : d.G) (cM : (Fin L.n → AE F E) × AF F → d.G) (κ : Measure ((Fin L.n → AE F E) × AF F)),
+      CLaw R L w₁ cM κ ∧ w₁ ∈ rat2 σ d.Y
+        ∧ (∃ a b : E,
+          a ≠ 0 ∧ b ≠ 0
+            ∧ inFrame d.b w₁
+              = 1 - Matrix.single (Sum.inl L.i₀) (Sum.inl L.i₀) 1
+                - Matrix.single (Sum.inr L.i₀) (Sum.inr L.i₀) 1
+                + Matrix.single (Sum.inl L.i₀) (Sum.inr L.i₀) (inclR (F := F) (AF F) a)
+                + Matrix.single (Sum.inr L.i₀) (Sum.inl L.i₀) (inclR (F := F) (AF F) b))
+        ∧ Continuous cM ∧ κ.IsAddHaarMeasure
+        ∧ ∃ δ : E,
+          δ ≠ 0
+            ∧ ∀ c, ∃ A',
+              inFrame d.b (cM c)
+                = Matrix.fromBlocks (1 + ∑ j, Matrix.single L.i₀ (L.em j) (c.1 j))
+                  (Matrix.single L.i₀ L.i₀ (c.2 • inclR (F := F) (AF F) δ)) 0 A'
 
-theorem cont_single {X α : Type} [TopologicalSpace X] [TopologicalSpace α] [Zero α] {m p : Type} [DecidableEq m]
-    [DecidableEq p] (i : m) (j : p) {f : X → α} (hf : Continuous f) : Continuous fun x => Matrix.single i j (f x) :=
-  continuous_pi fun a => continuous_pi fun b => by
-    simp only [Matrix.single_apply]
-    split_ifs
-    exacts [hf, continuous_const]
+theorem cont_single
+    {X α : Type} [TopologicalSpace X] [TopologicalSpace α] [Zero α]
+    {m p : Type} [DecidableEq m] [DecidableEq p]
+    (i : m) (j : p)
+    {f : X → α} (hf : Continuous f)
+    : Continuous fun x => Matrix.single i j (f x) :=
+  continuous_pi fun a =>
+    continuous_pi fun b => by
+      simp only [Matrix.single_apply]
+      split_ifs
+      exacts [hf, continuous_const]
 
 theorem cLawEx : CLawEx := by
   intro F E _ _ _ _ _ σ d R L
@@ -65,21 +83,30 @@ theorem cLawEx : CLawEx := by
   have hw₁' : inFrame d.b w₁ = CL.wM L.i₀ (1 : AE F E) e := hw₁.trans hW
 
   set δ' : AE F E := inclR (F := F) (AF F) δ with hδ'
-  let Mc : (Fin L.n → AE F E) × AF F → Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E) := fun c =>
-    CL.cB L.i₀ L.em c.1 (fun j => cA σ (c.1 j)) (c.2 • δ')
-  let Mc' : (Fin L.n → AE F E) × AF F → Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E) := fun c =>
-    CL.cB L.i₀ L.em (-c.1) (-fun j => cA σ (c.1 j)) (-(c.2 • δ'))
-  have hcont : ∀ s : AF F → AF F, Continuous s → ∀ t : (Fin L.n → AE F E) → (Fin L.n → AE F E), Continuous t →
-      Continuous fun c : (Fin L.n → AE F E) × AF F =>
-        CL.cB L.i₀ L.em (t c.1) (fun j => cA σ (t c.1 j)) (s c.2 • δ') := by
+  let Mc : (Fin L.n → AE F E) × AF F → Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E) :=
+    fun c => CL.cB L.i₀ L.em c.1 (fun j => cA σ (c.1 j)) (c.2 • δ')
+  let Mc' : (Fin L.n → AE F E) × AF F → Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E) :=
+    fun c => CL.cB L.i₀ L.em (-c.1) (- fun j => cA σ (c.1 j)) (-(c.2 • δ'))
+  have hcont
+      : ∀ s : AF F → AF F,
+        Continuous s
+          → ∀ t : (Fin L.n → AE F E) → (Fin L.n → AE F E),
+            Continuous t
+              → Continuous fun c : (Fin L.n → AE F E) × AF F =>
+                CL.cB L.i₀ L.em (t c.1) (fun j => cA σ (t c.1 j)) (s c.2 • δ') := by
     intro s hs t ht
     refine Continuous.matrix_fromBlocks ?_ ?_ continuous_const ?_
     · exact continuous_const.add (continuous_finsetSum _ fun j _ =>
         cont_single _ _ ((continuous_apply j).comp (ht.comp continuous_fst)))
-    · exact cont_single _ _ (Continuous.smul (f := fun c : (Fin L.n → AE F E) × AF F => s c.2) (g := fun _ => δ')
-        (hs.comp continuous_snd) continuous_const)
-    · exact continuous_const.sub (continuous_finsetSum _ fun j _ => cont_single _ _
-        ((GlobalTheory.EisBL.DoubledGroupTopology.continuous_cA σ).comp ((continuous_apply j).comp (ht.comp continuous_fst))))
+    · exact cont_single _ _
+        (Continuous.smul
+          (f := fun c : (Fin L.n → AE F E) × AF F => s c.2)
+          (g := fun _ => δ')
+          (hs.comp continuous_snd) continuous_const)
+    · exact continuous_const.sub (continuous_finsetSum _ fun j _ =>
+        cont_single _ _
+          ((GlobalTheory.EisBL.DoubledGroupTopology.continuous_cA σ).comp
+            ((continuous_apply j).comp (ht.comp continuous_fst))))
   have hMc : Continuous Mc := hcont id continuous_id id continuous_id
   have hMc' : Continuous Mc' := by
     have := hcont (fun a => -a) continuous_neg (fun u => -u) continuous_neg
@@ -95,34 +122,43 @@ theorem cLawEx : CLawEx := by
     | tmul a x =>
       show Algebra.TensorProduct.map (AlgHom.id (AF F) (AF F)) σ
         (Algebra.TensorProduct.map (AlgHom.id (AF F) (AF F)) σ (a ⊗ₜ[F] x)) = a ⊗ₜ[F] x
-      rw [Algebra.TensorProduct.map_tmul, Algebra.TensorProduct.map_tmul, AlgHom.id_apply, AlgHom.id_apply, CL.sigma_sigma_cm d.cm]
+      rw [Algebra.TensorProduct.map_tmul, Algebra.TensorProduct.map_tmul, AlgHom.id_apply,
+        AlgHom.id_apply, CL.sigma_sigma_cm d.cm]
     | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
   have hcA_z : ∀ a : AF F, cA σ (a • δ') = -(e * (a • δ')) := by
     intro a
     rw [map_smul, hδ', cA_inclR δ, hδ, map_neg, map_mul, map_intCast, smul_neg, mul_smul_comm]
-  obtain ⟨cM, hcMc, hcM⟩ := CL.ptEx' d hε Mc Mc' hMc hMc'
-    (fun c => CL.cB_mul hem c.1 _ _) (fun c => CL.cB_unitary hem (cA σ).toRingHom
-      cA_invol e hee c.1 (c.2 • δ') (hcA_z c.2))
+  obtain ⟨cM, hcMc, hcM⟩ :=
+    CL.ptEx' d hε Mc Mc' hMc hMc'
+      (fun c => CL.cB_mul hem c.1 _ _)
+      (fun c => CL.cB_unitary hem (cA σ).toRingHom cA_invol e hee c.1 (c.2 • δ') (hcA_z c.2))
   have hfr := fun x y => GlobalTheory.EisBL.DoubledParabolic.inFrame_mul (σ := σ) (Y := d.Y) d.b x y
-  refine ⟨w₁, cM, κ, ⟨?_, ?_, ?_⟩, kunf.rat_of_inFrame hw₁, ⟨1, (R.ε : ℤ), one_ne_zero, ?_, ?_⟩, hcMc, hκ,
-    ⟨δ, hδ0, fun c => ⟨_, hcM c⟩⟩⟩
-  ·
-    intro w τ y g hy
+  refine ⟨
+    w₁,
+    cM,
+    κ,
+    ⟨?_, ?_, ?_⟩,
+    kunf.rat_of_inFrame hw₁,
+    ⟨1, (R.ε : ℤ), one_ne_zero, ?_, ?_⟩,
+    hcMc,
+    hκ,
+    ⟨δ, hδ0, fun c => ⟨_, hcM c⟩⟩
+  ⟩
+  · intro w τ y g hy
     obtain ⟨r, hr0, hr1, -, hrw, hro, hrf⟩ := CL.rEx d w
     apply kunf.inFrame_injective d.b
     rw [hfr, hfr, CL.frame_dil d R w r hrw hro hrf L.i₀ hy]
     exact CL.comm_dM L.i₀ _ (L.j_out g) _ _
-  ·
-    intro w τ y hy
+  · intro w τ y hy
     obtain ⟨r, hr0, hr1, -, hrw, hro, hrf⟩ := CL.rEx d w
     have hy' := CL.isDil_inv hy
     obtain ⟨t, ht, ha, hχ⟩ := CL.par_dil d R w L.i₀ hy'
     refine ⟨R.ι w y⁻¹, t, ht, by rw [ha]; ring_nf, hχ, ?_⟩
     apply kunf.inFrame_injective d.b
-    rw [hfr, hfr, hw₁', CL.frame_dil d R w r hrw hro hrf L.i₀ hy, CL.frame_dil d R w r hrw hro hrf L.i₀ hy', neg_neg]
+    rw [hfr, hfr, hw₁', CL.frame_dil d R w r hrw hro hrf L.i₀ hy,
+      CL.frame_dil d R w r hrw hro hrf L.i₀ hy', neg_neg]
     exact CL.wM_dM L.i₀ _ _ _ _
-  ·
-    intro w τ y hy
+  · intro w τ y hy
     obtain ⟨r, hr0, hr1, hrm, hrw, hro, hrf⟩ := CL.rEx d w
     obtain ⟨sc, hsc1, hsc2⟩ := hsc (r (-τ))
     refine ⟨sc, fun c => ?_, ?_⟩
@@ -139,7 +175,8 @@ theorem cLawEx : CLawEx := by
       · rw [mul_assoc, smul_one_mul, smul_one_mul, smul_assoc, mul_smul]
     · rw [hsc2, hrm, ← Real.exp_neg, neg_neg, ← Real.exp_nat_mul, ← Atop.LD.n_succ L]
       congr 2
-      push_cast; ring
+      push_cast
+      ring
   · simp [map_intCast]
   · rw [hw₁']; simp [CL.wM, map_intCast, map_one, he_def]
 

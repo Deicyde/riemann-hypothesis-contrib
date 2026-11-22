@@ -10,10 +10,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory.AdelicComp
 
-theorem coord_compAt (L : Type) [Field L] [NumberField L] [IsCMField L] {ι : Type} [DecidableEq ι] [Finite ι]
+theorem coord_compAt
+    (L : Type) [Field L] [NumberField L] [IsCMField L]
+    {ι : Type} [DecidableEq ι] [Finite ι]
     (b : Module.Basis ι (maximalRealSubfield L) L)
-    (w : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (i : ι) (z : AL L) :
-    TensorProduct.lid (maximalRealSubfield L) _ ((b.coord i).rTensor _ (compAt L w z))
+    (w : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (i : ι) (z : AL L)
+    : TensorProduct.lid (maximalRealSubfield L) _ ((b.coord i).rTensor _ (compAt L w z))
       = evalAt L w (TensorProduct.lid (maximalRealSubfield L) _ ((b.coord i).rTensor _ z)) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
@@ -23,9 +25,11 @@ theorem coord_compAt (L : Type) [Field L] [NumberField L] [IsCMField L] {ι : Ty
     simp only [LinearMap.rTensor_tmul, TensorProduct.lid_tmul, map_smul]
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-theorem eq_sum_coord {K V M : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup M] [Module K M]
-    {ι : Type} [Fintype ι] (b : Module.Basis ι K V) (z : V ⊗[K] M) :
-    z = ∑ i, b i ⊗ₜ[K] TensorProduct.lid K M ((b.coord i).rTensor M z) := by
+theorem eq_sum_coord
+    {K V M : Type} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup M] [Module K M]
+    {ι : Type} [Fintype ι]
+    (b : Module.Basis ι K V) (z : V ⊗[K] M)
+    : z = ∑ i, b i ⊗ₜ[K] TensorProduct.lid K M ((b.coord i).rTensor M z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul x a =>
@@ -35,8 +39,9 @@ theorem eq_sum_coord {K V M : Type} [Field K] [AddCommGroup V] [Module K V] [Add
     simp only [map_add (f := _), TensorProduct.tmul_add, Finset.sum_add_distrib]
     rw [← hx, ← hy]
 
-theorem eq_zero_of_compAt_eq_zero :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (z : AL L), (∀ w, compAt L w z = 0) → z = 0 := by
+theorem eq_zero_of_compAt_eq_zero
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (z : AL L),
+      (∀ w, compAt L w z = 0) → z = 0 := by
   intro L _ _ _ z hz
   classical
   let b := Module.finBasis (maximalRealSubfield L) L

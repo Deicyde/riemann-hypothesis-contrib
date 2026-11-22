@@ -15,18 +15,25 @@ section
 noncomputable section
 namespace SiegelEisensteinSeries.BRoad
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
-theorem eisBL_of_k (hH : _root_.SiegelEisensteinSeries.EisHalf_k) (hM : _root_.SiegelEisensteinSeries.BRoad.SiegelMult_k) (hF : OneVarFactor) : _root_.GlobalTheory.ThK.Dbl.EisBL_k := by
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+theorem eisBL_of_k
+    (hH : _root_.SiegelEisensteinSeries.EisHalf_k)
+    (hM : _root_.SiegelEisensteinSeries.BRoad.SiegelMult_k) (hF : OneVarFactor)
+    : _root_.GlobalTheory.ThK.Dbl.EisBL_k := by
   intro F E _ _ _ _ _ σ B n Y r s hB hn hY χ hχ c hc b K a hb hK ha s₁ f hf
   obtain ⟨t₀, v, hv, hvh⟩ := hH F E σ B n Y r s hB hn hY χ hχ c hc b K a hb hK ha s₁ f hf
-  obtain ⟨A, H, t₁, hA, hAne, hHh, hHs⟩ := hM F E σ B n Y r s hB hn hY χ hχ c hc b K a hb hK ha s₁ f hf
+  obtain ⟨A, H, t₁, hA, hAne, hHh, hHs⟩ :=
+    hM F E σ B n Y r s hB hn hY χ hχ c hc b K a hb hK ha s₁ f hf
   have hHv : ∀ s' : ℂ, max t₀ t₁ < s'.re → ∀ x, (H s').1 x = A s' * (v s').1 x := by
     intro s' hs' x
     have h1 := hHs s' (lt_of_le_of_lt (le_max_right _ _) hs') x
     have h2 := (hv s' (lt_of_le_of_lt (le_max_left _ _) hs') x).mul_left (A s')
     exact h1.unique h2
-  let Ehat : ℂ → G2 σ Y → ℂ := fun s' x => if max t₀ t₁ < s'.re then (v s').1 x else (H s').1 x / A s'
+  let Ehat : ℂ → G2 σ Y → ℂ := fun s' x =>
+    if max t₀ t₁ < s'.re then (v s').1 x else (H s').1 x / A s'
   refine ⟨Ehat, ⟨max t₀ t₁, ?_, ?_⟩, ?_⟩
   · intro s' hs' x
     simp only [Ehat, if_pos hs']
@@ -35,7 +42,8 @@ theorem eisBL_of_k (hH : _root_.SiegelEisensteinSeries.EisHalf_k) (hM : _root_.S
     have hd : DifferentiableOn ℂ (fun s' => evAt x (v s')) {s' : ℂ | t₀ < s'.re} :=
       hvh (evAt x) (isGrowForm_evAt x)
     have hd' : DifferentiableOn ℂ (fun s' => (v s').1 x) {s' : ℂ | max t₀ t₁ < s'.re} :=
-      (hd.mono fun s' (hs' : max t₀ t₁ < s'.re) => (show t₀ < s'.re from lt_of_le_of_lt (le_max_left _ _) hs'))
+      (hd.mono fun s' (hs' : max t₀ t₁ < s'.re) =>
+        (show t₀ < s'.re from lt_of_le_of_lt (le_max_left _ _) hs'))
     refine hd'.congr fun s' hs' => ?_
     simp only [Ehat, if_pos (show max t₀ t₁ < s'.re from hs')]
   · intro s₀

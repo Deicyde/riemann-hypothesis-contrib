@@ -22,8 +22,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Propo
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
@@ -33,9 +35,23 @@ noncomputable section
 
 namespace GlobalTheory.UU.SchurComp
 
-
 set_option maxHeartbeats 1000000 in
-theorem components_proportional : Laws → Laws2 → (AllPre fun {V} _ _ _ {D} {_} {_} _ _ U => ∀ N : ℕ, 1 ≤ N → ∀ (α mu : D.X) (u : LB.Gen (LB.LinComb D.P.L (DegPre.deltaφ D (Kbar V) N α mu) (DegPre.deltaε N))), u.IsGen → U.Supp (Kbar V) N α → ∃ a : Kbar V, ∀ t s, U.ExpF (Kbar V) N t s → ∀ z J, Good D.P.L z J → sval (s (α + N • mu)) (𝟙 _) z J = gs (𝟙 _) z ⊤ (DegPre.constBF D (Kbar V) a ⊤) * (sval (s α) (DegPre.trF D (Kbar V) mu).left z J * (val u (𝟙 _) z J).val)) := by
+theorem components_proportional
+    : Laws → Laws2
+      → (AllPre fun {V} _ _ _ {D} {_} {_} _ _ U =>
+        ∀ N : ℕ,
+          1 ≤ N
+            → ∀ (α mu : D.X)
+                (u : LB.Gen (LB.LinComb D.P.L (DegPre.deltaφ D (Kbar V) N α mu) (DegPre.deltaε N))),
+              u.IsGen → U.Supp (Kbar V) N α
+                → ∃ a : Kbar V, ∀ t s,
+                  U.ExpF (Kbar V) N t s
+                    → ∀ z J,
+                      Good D.P.L z J
+                        → sval (s (α + N • mu)) (𝟙 _) z J
+                          = gs (𝟙 _) z ⊤ (DegPre.constBF D (Kbar V) a ⊤)
+                            * (sval (s α) (DegPre.trF D (Kbar V) mu).left z J
+                              * (val u (𝟙 _) z J).val)) := by
   intro hL hL2 V _ _ _ hV D A G _ _ U N hN α mu u hu hS
   have := hV.1
   have := hV.2.2
@@ -44,7 +60,8 @@ theorem components_proportional : Laws → Laws2 → (AllPre fun {V} _ _ _ {D} {
   obtain ⟨Φ, e, hfr, hθ, hmul, hcomm, hnd⟩ :=
     GlobalTheory.ThetaRep.exists_projective_rep hL hL2 _ A (Kbar V) (jFK (R := V) (Kbar V)) N hNF
   obtain ⟨m, hm, hact, -⟩ := GlobalTheory.UU.Eqv.main hL hL2 V hV D A G U N hN
-  obtain ⟨hw1, hw2, hw3⟩ := GlobalTheory.T.lineBundleSections_torusTorsion_weightSpaces hL hL2 V hV D A G U N hN
+  obtain ⟨hw1, hw2, hw3⟩ :=
+    GlobalTheory.T.lineBundleSections_torusTorsion_weightSpaces hL hL2 V hV D A G U N hN
   have huniq := GlobalTheory.UU.ExpFUniq.main V hV D A G U (Kbar V) N
   choose xp hxp using GlobalTheory.UU.ExpTotal.expF_total hL hL2 V hV D A G U (Kbar V) N hN
   have hcA := (hL.mulN _ A N hN).2.2.2.2 (Kbar V) (jFK (R := V) (Kbar V)) hNF
@@ -58,13 +75,17 @@ theorem components_proportional : Laws → Laws2 → (AllPre fun {V} _ _ _ {D} {
   let S : Subgroup (TFK (R := V) (Kbar V) ⟶ A.A) := (powMonoidHom N).ker
   have hcS : Nat.card S = N ^ (2 * A.g) := hcA
   have : Finite S := Nat.finite_of_card_ne_zero (hcS ▸ pow_ne_zero _ hN0)
-  obtain ⟨x, hx⟩ : ∃ x : SecM A.A A.L N (TFK (R := V) (Kbar V)) → Raw D (Kbar V) N,
-    ∀ v, U.ExpF (Kbar V) N (SecM.toSec A.A v) (x v) := ⟨_, fun v => hxp _⟩
-  have hxe : ∀ t s, U.ExpF (Kbar V) N t s → x (SecM.ofSec A.A t) = s := fun t s h => (huniq _ _ _ _ (hx _) h).1 rfl
+  obtain ⟨x, hx⟩
+      : ∃ x : SecM A.A A.L N (TFK (R := V) (Kbar V)) → Raw D (Kbar V) N, ∀ v,
+        U.ExpF (Kbar V) N (SecM.toSec A.A v) (x v) :=
+    ⟨_, fun v => hxp _⟩
+  have hxe : ∀ t s, U.ExpF (Kbar V) N t s → x (SecM.ofSec A.A t) = s := fun t s h =>
+    (huniq _ _ _ _ (hx _) h).1 rfl
   have hsupp : ∀ β, U.Supp (Kbar V) N β ↔ ∃ v j, (x v β).f j ≠ 0 := fun β =>
     ⟨fun ⟨t, s, h, hj⟩ => ⟨SecM.ofSec A.A t, by rwa [hxe t s h]⟩, fun ⟨v, hv⟩ => ⟨_, _, hx v, hv⟩⟩
   refine (proportional_raw (D := D) (k := Γ((TFK (R := V) (Kbar V)).left, ⊤)) (A := S)
-    (E := SecM A.A A.L N (TFK (R := V) (Kbar V))) hL.globalFns iso e Φ ?_ ?_ ?_ ?_ hN0 (fun g => ⟨m g, (hact g).1⟩)
+    (E := SecM A.A A.L N (TFK (R := V) (Kbar V))) hL.globalFns iso e Φ ?_ ?_ ?_ ?_ hN0
+    (fun g => ⟨m g, (hact g).1⟩)
     ?_ ?_ (n := N ^ D.P.g) ?_ x ?_ ?_ ?_ ?_ ?_ ?_ ?_ α mu u hu ((hsupp _).1 hS)).elim fun a ha => ?_
   · rw [hcS, mul_comm, pow_mul]; exact congrArg (· ^ 2) hfr
   · exact fun a b => hmul a b (a * b : S) rfl
@@ -77,7 +98,8 @@ theorem components_proportional : Laws → Laws2 → (AllPre fun {V} _ _ _ {D} {
     obtain ⟨c, rfl⟩ := iso.symm.surjective c
     choose s hs using fun β => exists_comb ((fst (TF (R := V) (Kbar V)) D.P.A).left.appTop.hom (iso.symm c))
       (x v β) (x v' β)
-    have := hlinF _ _ (SecM.toSec A.A (iso.symm c • v + v' :)) _ _ s c (hx v) (hx v') (fun _ => rfl) hs
+    have :=
+      hlinF _ _ (SecM.toSec A.A (iso.symm c • v + v' :)) _ _ s c (hx v) (hx v') (fun _ => rfl) hs
     rw [(huniq _ _ _ _ (hx _) this).1 rfl, iso.apply_symm_apply]
     exact hs β
   · exact fun v v' h => congrArg (SecM.ofSec A.A) ((huniq _ _ _ _ (hx v) (hx v')).2 h)

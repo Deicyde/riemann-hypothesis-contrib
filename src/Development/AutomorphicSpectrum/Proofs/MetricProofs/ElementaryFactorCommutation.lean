@@ -4,35 +4,50 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PullbackPullba
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.MoveTransvection
 
-theorem exists_conj : ∀ (L : Type) [Field L] (N j : ℕ) (ca cb : Fin N) (U : Matrix (Fin N) (Fin N) L) (X' s : L), (cb : ℕ) = ca + 1 → ((ca : ℕ) < N - j ↔ (cb : ℕ) < N - j) → IsBlockDiag j U → U.BlockTriangular id → (∀ c, U c c ≠ 0) → U ca ca + s * U ca cb ≠ 0 → X' * (U ca ca + s * U ca cb) = s * U cb cb → ∃ V : Matrix (Fin N) (Fin N) L, IsBlockDiag j V ∧ V.BlockTriangular id ∧ (∀ c, c ≠ cb → V c c ≠ 0) ∧ (1 + Matrix.single cb ca X') * V = U * (1 + Matrix.single cb ca s) := by
+theorem exists_conj
+    : ∀ (L : Type) [Field L] (N j : ℕ) (ca cb : Fin N) (U : Matrix (Fin N) (Fin N) L) (X' s : L),
+      (cb : ℕ) = ca + 1 → ((ca : ℕ) < N - j ↔ (cb : ℕ) < N - j) → IsBlockDiag j U
+        → U.BlockTriangular id → (∀ c, U c c ≠ 0) → U ca ca + s * U ca cb ≠ 0
+        → X' * (U ca ca + s * U ca cb) = s * U cb cb
+        → ∃ V : Matrix (Fin N) (Fin N) L,
+          IsBlockDiag j V ∧ V.BlockTriangular id ∧ (∀ c, c ≠ cb → V c c ≠ 0)
+            ∧ (1 + Matrix.single cb ca X') * V = U * (1 + Matrix.single cb ca s) := by
   intro L _ N j ca cb U X' s hcb hblk hU hT hd hne hX
   have hlt : ca < cb := by rw [Fin.lt_def]; omega
   have hne' : cb ≠ ca := hlt.ne'
-  have hR : ∀ (M : Matrix (Fin N) (Fin N) L) (t : L) (r c : Fin N),
-      (M * Matrix.single cb ca t) r c = if c = ca then M r cb * t else 0 := by
+  have hR
+      : ∀ (M : Matrix (Fin N) (Fin N) L) (t : L) (r c : Fin N),
+        (M * Matrix.single cb ca t) r c = if c = ca then M r cb * t else 0 := by
     intro M t r c
     by_cases h : c = ca
     · subst h; simp [Matrix.mul_apply, Matrix.single_apply]
     · simp [Matrix.mul_apply, h, Ne.symm h]
-  have hL : ∀ (M : Matrix (Fin N) (Fin N) L) (t : L) (r c : Fin N),
-      (Matrix.single cb ca t * M) r c = if r = cb then t * M ca c else 0 := by
+  have hL
+      : ∀ (M : Matrix (Fin N) (Fin N) L) (t : L) (r c : Fin N),
+        (Matrix.single cb ca t * M) r c = if r = cb then t * M ca c else 0 := by
     intro M t r c
     by_cases h : r = cb
     · subst h; simp [Matrix.mul_apply, Matrix.single_apply]
     · simp [Matrix.mul_apply, h, Ne.symm h]
-  have hW : ∀ r c : Fin N, ((1 + Matrix.single cb ca (-X')) * U) r c
-      = U r c + if r = cb then -X' * U ca c else 0 := by
+  have hW
+      : ∀ r c : Fin N,
+        ((1 + Matrix.single cb ca (-X')) * U) r c = U r c + if r = cb then -X' * U ca c else 0 := by
     intro r c
     rw [add_mul, one_mul, Matrix.add_apply, hL]
-  have hV : ∀ r c : Fin N,
-      ((1 + Matrix.single cb ca (-X')) * U * (1 + Matrix.single cb ca s)) r c
-      = U r c + (if r = cb then -X' * U ca c else 0)
-        + if c = ca then (U r cb + if r = cb then -X' * U ca cb else 0) * s else 0 := by
+  have hV
+      : ∀ r c : Fin N,
+        ((1 + Matrix.single cb ca (-X')) * U * (1 + Matrix.single cb ca s)) r c
+          = U r c + (if r = cb then -X' * U ca c else 0)
+            + if c = ca then (U r cb + if r = cb then -X' * U ca cb else 0) * s else 0 := by
     intro r c
     rw [mul_add, mul_one, Matrix.add_apply, hR, hW, hW]
   have hTv : ∀ t : L, IsBlockDiag j (1 + Matrix.single cb ca t : Matrix (Fin N) (Fin N) L) := by
@@ -44,8 +59,13 @@ theorem exists_conj : ∀ (L : Type) [Field L] (N j : ℕ) (ca cb : Fin N) (U : 
     rw [if_neg]
     rintro ⟨rfl, rfl⟩
     exact h hblk.symm
-  refine ⟨(1 + Matrix.single cb ca (-X')) * U * (1 + Matrix.single cb ca s),
-    ((hTv _).mul hU).mul (hTv _), ?_, ?_, ?_⟩
+  refine ⟨
+    (1 + Matrix.single cb ca (-X')) * U * (1 + Matrix.single cb ca s),
+    ((hTv _).mul hU).mul (hTv _),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro r c hrc
     have hrc' : c < r := hrc
     rw [hV]
@@ -83,10 +103,12 @@ theorem exists_conj : ∀ (L : Type) [Field L] (N j : ℕ) (ca cb : Fin N) (U : 
       apply hne
       linear_combination h
     · simpa [hc, hca] using hd c
-  · have hinv : (1 + Matrix.single cb ca X') * (1 + Matrix.single cb ca (-X'))
-        = (1 : Matrix (Fin N) (Fin N) L) := by
-      have h0 : Matrix.single cb ca X' * Matrix.single cb ca (-X')
-          = (0 : Matrix (Fin N) (Fin N) L) := by
+  · have hinv
+        : (1 + Matrix.single cb ca X') * (1 + Matrix.single cb ca (-X'))
+          = (1 : Matrix (Fin N) (Fin N) L) := by
+      have h0
+          : Matrix.single cb ca X' * Matrix.single cb ca (-X')
+            = (0 : Matrix (Fin N) (Fin N) L) := by
         ext r c
         rw [hL, Matrix.single_apply]
         simp [hne']

@@ -13,7 +13,8 @@ set_option linter.unusedVariables false
 set_option linter.style.longLine false
 set_option linter.unusedSimpArgs false
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.Whittaker Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.Whittaker
+  Matrix
 
 namespace DiscreteGroups.sglob.LConvGenM
 
@@ -28,24 +29,33 @@ def sdS (m : ℕ) (M : Matrix (Fin n) (Fin n) k) : k :=
 def Good (j : ℕ) (x : Matrix (Fin n) (Fin n) k) : Prop :=
   ∀ i l : Fin n, (j ≤ i.val ∨ j + 1 ≤ l.val) → x i l = (1 : Matrix (Fin n) (Fin n) k) i l
 
-theorem mul_col_of_good {j : ℕ} {Y : Matrix (Fin n) (Fin n) k} (hY : Good j Y) (M : Matrix (Fin n) (Fin n) k)
-    {i l : Fin n} (hl : j + 1 ≤ l.val) : (M * Y) i l = M i l := by
+theorem mul_col_of_good
+    {j : ℕ} {Y : Matrix (Fin n) (Fin n) k} (hY : Good j Y)
+    (M : Matrix (Fin n) (Fin n) k)
+    {i l : Fin n} (hl : j + 1 ≤ l.val)
+    : (M * Y) i l = M i l := by
   rw [Matrix.mul_apply, Finset.sum_eq_single l]
   · rw [hY l l (Or.inr hl), one_apply_eq, mul_one]
   · intro b _ hb; rw [hY b l (Or.inr hl), one_apply_ne hb, mul_zero]
   · simp
 
-theorem mul_row_of_good {j : ℕ} {X : Matrix (Fin n) (Fin n) k} (hX : Good j X) (M : Matrix (Fin n) (Fin n) k)
-    {i l : Fin n} (hi : j ≤ i.val) : (X * M) i l = M i l := by
+theorem mul_row_of_good
+    {j : ℕ} {X : Matrix (Fin n) (Fin n) k} (hX : Good j X)
+    (M : Matrix (Fin n) (Fin n) k)
+    {i l : Fin n} (hi : j ≤ i.val)
+    : (X * M) i l = M i l := by
   rw [Matrix.mul_apply, Finset.sum_eq_single i]
   · rw [hX i i (Or.inl hi), one_apply_eq, one_mul]
   · intro b _ hb; rw [hX i b (Or.inl hi), one_apply_ne (Ne.symm hb), zero_mul]
   · simp
 
-theorem good_conj {j : ℕ} (x : GL (Fin n) k) (hx : Good j (x : Matrix (Fin n) (Fin n) k))
-    (hy : Good j ((x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) {g : GL (Fin n) k} (hg : g ∈ Nset (j + 1)) :
-    x * g * x⁻¹ ∈ Nset (j + 1) ∧ sdS (j + 1) ((x * g * x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) =
-      sdS (j + 1) (g : Matrix (Fin n) (Fin n) k) := by
+theorem good_conj
+    {j : ℕ} (x : GL (Fin n) k) (hx : Good j (x : Matrix (Fin n) (Fin n) k))
+    (hy : Good j ((x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))
+    {g : GL (Fin n) k} (hg : g ∈ Nset (j + 1))
+    : x * g * x⁻¹ ∈ Nset (j + 1)
+      ∧ sdS (j + 1) ((x * g * x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
+        = sdS (j + 1) (g : Matrix (Fin n) (Fin n) k) := by
   set X := (x : Matrix (Fin n) (Fin n) k)
   set Y := ((x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
   set G := (g : Matrix (Fin n) (Fin n) k)
@@ -53,7 +63,8 @@ theorem good_conj {j : ℕ} (x : GL (Fin n) k) (hx : Good j (x : Matrix (Fin n) 
   have hval : ((x * g * x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) = X * G * Y := by
     simp only [Units.val_mul, X, Y, G]
 
-  have hA : ∀ i l : Fin n, l.val < j + 1 → (X * G * Y) i l = (1 : Matrix (Fin n) (Fin n) k) i l := by
+  have hA
+      : ∀ i l : Fin n, l.val < j + 1 → (X * G * Y) i l = (1 : Matrix (Fin n) (Fin n) k) i l := by
     intro i l hl
     have hGY : ∀ a, (G * Y) a l = Y a l := by
       intro a

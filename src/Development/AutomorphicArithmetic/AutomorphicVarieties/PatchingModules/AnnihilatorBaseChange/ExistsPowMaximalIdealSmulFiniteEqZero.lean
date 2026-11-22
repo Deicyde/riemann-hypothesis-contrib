@@ -7,17 +7,22 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem exists_pow_maximalIdeal_smul_finite_eq_zero (R Q : Type) [CommRing R] [IsLocalRing R] [AddCommGroup Q] [Module R Q] [Finite Q] :
-    ∃ c : ℕ, ∀ a ∈ maximalIdeal R ^ c, ∀ z : Q, a • z = 0 :=
-  _root_.UpperTheory.Reformulated.B.FiniteModuleMaximalIdealAnnihilation.exists_pow_maximalIdeal_smul_finite_eq_zero R Q
+private theorem exists_pow_maximalIdeal_smul_finite_eq_zero
+    (R Q : Type) [CommRing R] [IsLocalRing R] [AddCommGroup Q] [Module R Q] [Finite Q]
+    : ∃ c : ℕ, ∀ a ∈ maximalIdeal R ^ c, ∀ z : Q, a • z = 0 :=
+  _root_.UpperTheory.Reformulated.B.FiniteModuleMaximalIdealAnnihilation.exists_pow_maximalIdeal_smul_finite_eq_zero
+    R Q
 
-private theorem finite_quotient_of_power_maximal_ideal_le (Λ R X : Type) [CommRing Λ] [IsLocalRing Λ] [CommRing R] [IsNoetherianRing Λ]
-    [Finite (ResidueField Λ)] [AddCommGroup X] [Module R X] [Module Λ X] [Module.Finite Λ X] (t : Λ →+* R)
-    (ht : ∀ (a : Λ) (x : X), a • x = t a • x) (j : ℕ) (K : Ideal R) (hK : (maximalIdeal Λ).map t ^ j ≤ K) :
-    Finite (X ⧸ (K • ⊤ : Submodule R X)) := by
+private theorem finite_quotient_of_power_maximal_ideal_le
+    (Λ R X : Type) [CommRing Λ] [IsLocalRing Λ] [CommRing R] [IsNoetherianRing Λ]
+    [Finite (ResidueField Λ)] [AddCommGroup X] [Module R X] [Module Λ X] [Module.Finite Λ X]
+    (t : Λ →+* R) (ht : ∀ (a : Λ) (x : X), a • x = t a • x)
+    (j : ℕ) (K : Ideal R) (hK : (maximalIdeal Λ).map t ^ j ≤ K)
+    : Finite (X ⧸ (K • ⊤ : Submodule R X)) := by
   haveI h0 : Finite (Λ ⧸ maximalIdeal Λ) := ‹Finite (ResidueField Λ)›
   haveI h1 : Finite (Λ ⧸ maximalIdeal Λ ^ j) := Ideal.finite_quotient_pow (IsNoetherian.noetherian _) j
   haveI h2 : Finite (X ⧸ (maximalIdeal Λ ^ j • ⊤ : Submodule Λ X)) :=
@@ -33,7 +38,8 @@ private theorem finite_quotient_of_power_maximal_ideal_le (Λ R X : Type) [CommR
     · intro a b ha hb
       exact Submodule.add_mem _ ha hb
   let g : (X ⧸ (maximalIdeal Λ ^ j • ⊤ : Submodule Λ X)) → (X ⧸ (K • ⊤ : Submodule R X)) := fun q =>
-    Quotient.liftOn' q (fun x => Submodule.Quotient.mk x)
+    Quotient.liftOn' q
+      (fun x => Submodule.Quotient.mk x)
       (fun a b h => (Submodule.Quotient.eq _).2 (hle _ ((Submodule.quotientRel_def _).1 h)))
   refine Finite.of_surjective g fun z => ?_
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ z

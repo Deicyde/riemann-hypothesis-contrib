@@ -13,19 +13,19 @@ open scoped ComplexConjugate Real
 
 namespace GlobalTheory.Phase
 
-private theorem quotient_out_sub_mem' {G : Type} [AddCommGroup G] (N : AddSubgroup G) (x : G) :
-    (x : G ⧸ N).out - x ∈ N := by
+private theorem quotient_out_sub_mem' {G : Type} [AddCommGroup G] (N : AddSubgroup G) (x : G)
+    : (x : G ⧸ N).out - x ∈ N := by
   have h := QuotientAddGroup.eq.mp (QuotientAddGroup.out_eq' (x : G ⧸ N)).symm
   rwa [neg_add_eq_sub] at h
 
-
 open scoped Classical in
 open Classical in
-theorem ph_finsum_quotient {A : Type} [AddCommGroup A] (P S : AddSubgroup A) (φ f : A → ℂ) (c : ℂ) (a : A)
-    (hper : ∀ x, ∀ y ∈ P, φ (x + y) = φ x)
-    (hfin : (Function.support fun q : A ⧸ P => φ q.out).Finite)
-    (hc : Ph c) (hf : Quad S f) (hφ : ∀ x, φ x = if x - a ∈ S then c * f (x - a) else 0) :
-    Ph (∑ᶠ q : A ⧸ P, φ q.out) := by
+theorem ph_finsum_quotient
+    {A : Type} [AddCommGroup A]
+    (P S : AddSubgroup A) (φ f : A → ℂ) (c : ℂ) (a : A) (hper : ∀ x, ∀ y ∈ P, φ (x + y) = φ x)
+    (hfin : (Function.support fun q : A ⧸ P => φ q.out).Finite) (hc : Ph c) (hf : Quad S f)
+    (hφ : ∀ x, φ x = if x - a ∈ S then c * f (x - a) else 0)
+    : Ph (∑ᶠ q : A ⧸ P, φ q.out) := by
   by_cases hc0 : c = 0
   · have h0 : ∀ x, φ x = 0 := fun x => by rw [hφ x]; split_ifs <;> simp [hc0]
     simp only [h0, finsum_zero]
@@ -47,8 +47,7 @@ theorem ph_finsum_quotient {A : Type} [AddCommGroup A] (P S : AddSubgroup A) (φ
   have hι : Function.Injective ι' := QuotientAddGroup.kerLift_injective ψ
   let j : S ⧸ ψ.ker → A ⧸ P := fun m => (a : A ⧸ P) + ι' m
   have hj : Function.Injective j := fun m m' h => hι (add_left_cancel h)
-  have hjmk : ∀ u : S, j (u : S ⧸ ψ.ker) = ((a + u : A) : A ⧸ P) := fun u => by
-    simp [j, ι', ψ]
+  have hjmk : ∀ u : S, j (u : S ⧸ ψ.ker) = ((a + u : A) : A ⧸ P) := fun u => by simp [j, ι', ψ]
   let fb : S ⧸ ψ.ker → ℂ := fun m => f (m.out : A)
   have hfb : ∀ u : S, fb (u : S ⧸ ψ.ker) = f u := by
     intro u
@@ -62,8 +61,10 @@ theorem ph_finsum_quotient {A : Type} [AddCommGroup A] (P S : AddSubgroup A) (φ
     obtain ⟨u, rfl⟩ := QuotientAddGroup.mk_surjective m
     rw [hjmk, hfb]
     have hk := quotient_out_sub_mem' P (a + (u : A))
-    have e : ((a + (u : A) : A) : A ⧸ P).out =
-        (a + u) + (((a + (u : A) : A) : A ⧸ P).out - (a + u)) := by abel
+    have e
+        : ((a + (u : A) : A) : A ⧸ P).out
+          = (a + u) + (((a + (u : A) : A) : A ⧸ P).out - (a + u)) := by
+      abel
     rw [e, hper _ _ hk, hφ, add_sub_cancel_left, if_pos u.2]
   have hfbne : ∀ m, fb m ≠ 0 := fun m h => by
     have h1 := (hf.1 _ (m.out).2).norm_eq_one
@@ -90,12 +91,15 @@ theorem ph_finsum_quotient {A : Type} [AddCommGroup A] (P S : AddSubgroup A) (φ
       simp
     · exact absurd rfl hq
   have hsum : ∑ᶠ q : A ⧸ P, φ q.out = c * ∑ m : S ⧸ ψ.ker, fb m := by
-    rw [← finsum_mem_univ, finsum_mem_inter_support_eq' _ Set.univ (Set.range j)
-        (fun q hq => ⟨fun _ => hsupp hq, fun _ => Set.mem_univ q⟩), finsum_mem_range hj,
-      finsum_eq_sum_of_fintype, Finset.mul_sum]
+    rw [← finsum_mem_univ,
+      finsum_mem_inter_support_eq' _ Set.univ (Set.range j)
+        (fun q hq => ⟨fun _ => hsupp hq, fun _ => Set.mem_univ q⟩),
+      finsum_mem_range hj, finsum_eq_sum_of_fintype, Finset.mul_sum]
     exact Finset.sum_congr rfl fun m _ => hval m
   rw [hsum]
-  refine Ph.mul hc (GlobalTheory.T.isZeroOrPosMulRootOfUnity_finite_gaussSum (S ⧸ ψ.ker) fb ⟨fun x _ => hf.1 _ (x.out).2, fun x _ y _ z _ => ?_⟩)
+  refine Ph.mul hc
+    (GlobalTheory.T.isZeroOrPosMulRootOfUnity_finite_gaussSum (S ⧸ ψ.ker) fb
+      ⟨fun x _ => hf.1 _ (x.out).2, fun x _ y _ z _ => ?_⟩)
   obtain ⟨u, rfl⟩ := QuotientAddGroup.mk_surjective x
   obtain ⟨v, rfl⟩ := QuotientAddGroup.mk_surjective y
   obtain ⟨w, rfl⟩ := QuotientAddGroup.mk_surjective z
@@ -105,19 +109,23 @@ theorem ph_finsum_quotient {A : Type} [AddCommGroup A] (P S : AddSubgroup A) (φ
   simp only [hfb]
   simpa using hf.2 _ u.2 _ v.2 _ w.2
 
-theorem ph_haar_of_shape : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι],
-    ∀ φ : Matrix κ ι ℚ → ℂ, Shape φ → Ph (haar φ) := by
+theorem ph_haar_of_shape
+    : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι], ∀ φ : Matrix κ ι ℚ → ℂ,
+      Shape φ → Ph (haar φ) := by
   intro κ ι _ _ _ φ hφ
   obtain ⟨hsb, c, a, S, f, hc, hf, hφx⟩ := hφ
   have hR := hsb.choose_spec
   unfold haar
   rw [dite_eq_left hsb]
   unfold haarAt
-  refine Ph.mul ?_ (ph_finsum_quotient (perSub ℚ κ ι hsb.choose) S φ f c a
-    (GlobalTheory.SW.HaarLevel.periodic hR.2) (GlobalTheory.SW.HaarLevel.finite_support hR.1 hR.2) hc hf hφx)
+  refine Ph.mul ?_
+    (ph_finsum_quotient (perSub ℚ κ ι hsb.choose) S φ f c a
+      (GlobalTheory.SW.HaarLevel.periodic hR.2) (GlobalTheory.SW.HaarLevel.finite_support hR.1 hR.2)
+      hc hf hφx)
 
-  have h := GlobalTheory.T.complex_phase_calculus_rootOfUnity.2.2.1
-    (((hsb.choose : ℝ) ^ (Module.finrank ℚ ℚ * (Fintype.card κ * Fintype.card ι)))⁻¹)
+  have h :=
+    GlobalTheory.T.complex_phase_calculus_rootOfUnity.2.2.1 (((hsb.choose : ℝ)
+      ^ (Module.finrank ℚ ℚ * (Fintype.card κ * Fintype.card ι)))⁻¹)
   convert h using 1
   push_cast
   rfl

@@ -18,8 +18,10 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem hs_uniq : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C C' C'' : ℝ) (φ φ' : ℂ → ℂ) (h h' : HahnSeries ℚ Ω),
-    Den h → Den h' → HS ε C φ h → HS ε C' φ' h' → (∀ z : ℂ, C'' < z.im → φ z = φ' z) → h = h' := by
+theorem hs_uniq
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C C' C'' : ℝ) (φ φ' : ℂ → ℂ) (h h' : HahnSeries ℚ Ω),
+      Den h → Den h' → HS ε C φ h → HS ε C' φ' h' → (∀ z : ℂ, C'' < z.im → φ z = φ' z)
+        → h = h' := by
   intro Ω _ ε C C' C'' φ φ' h h' hd hd' hs hs' heq
   obtain ⟨hmono, hadd, -, hcongr⟩ := GlobalTheory.T.hasQExpansionSumAbove_basic_properties Ω ε
   set C₀ : ℝ := max C (max C' C'') with hC₀
@@ -31,10 +33,12 @@ theorem hs_uniq : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C C' C'' : ℝ
     intro z hz
     have : C'' < z.im := lt_of_le_of_lt (le_trans (le_max_right _ _) (le_max_right _ _)) hz
     simp [heq z this]
-  have hdd : Den (h - h') := (((GlobalTheory.T.hasCommonExponentDenominator_ring_operations Ω).1 h h' hd hd').2.1)
+  have hdd : Den (h - h') :=
+    (((GlobalTheory.T.hasCommonExponentDenominator_ring_operations Ω).1 h h' hd hd').2.1)
   by_contra hne
   have hne' : h - h' ≠ 0 := sub_ne_zero.mpr hne
-  obtain ⟨D, hD⟩ := GlobalTheory.T.exists_im_gt_ne_zero_of_hs Ω ε C₀ (fun _ => (0 : ℂ)) (h - h') hdd hne' h4
+  obtain ⟨D, hD⟩ :=
+    GlobalTheory.T.exists_im_gt_ne_zero_of_hs Ω ε C₀ (fun _ => (0 : ℂ)) (h - h') hdd hne' h4
   exact hD ((D + 1 : ℝ) * Complex.I) (by simp) rfl
 
 end GlobalTheory.FN

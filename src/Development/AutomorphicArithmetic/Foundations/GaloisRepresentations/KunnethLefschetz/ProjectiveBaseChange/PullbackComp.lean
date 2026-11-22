@@ -5,30 +5,35 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace CrystallineSemistableComparison ReciprocityTheory.ChartRestriction.G.Geo.Tor UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  CrystallineSemistableComparison ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 
-private theorem pb_id_projective_base_change (l : ℕ) [Fact l.Prime] (X : Scheme.{0}) (n : ℤ) (z : V l X n) :
-    pb l (𝟙 X) n z = z := by
+private theorem pb_id_projective_base_change
+    (l : ℕ) [Fact l.Prime] (X : Scheme.{0}) (n : ℤ) (z : V l X n)
+    : pb l (𝟙 X) n z = z := by
   show LinearMap.baseChange ℚ_[l] (pullHl l (sch.map (𝟙 X)) n 0) z = z
   rw [CategoryTheory.Functor.map_id, pullHl_id, LinearMap.baseChange_id, LinearMap.id_apply]
 
-private theorem pb_comp_projective_base_change (l : ℕ) [Fact l.Prime] {A B C : Scheme.{0}} (f : A ⟶ B) (g : B ⟶ C) (n : ℤ)
-    (v : V l C n) : pb l (f ≫ g) n v = pb l f n (pb l g n v) := by
+private theorem pb_comp_projective_base_change
+    (l : ℕ) [Fact l.Prime] {A B C : Scheme.{0}} (f : A ⟶ B) (g : B ⟶ C) (n : ℤ) (v : V l C n)
+    : pb l (f ≫ g) n v = pb l f n (pb l g n v) := by
   rw [pb_comp]; rfl
 
-private theorem pb_iso_inj (l : ℕ) [Fact l.Prime] {A B : Scheme.{0}} (e : A ≅ B) (n : ℤ) :
-    Function.Injective (pb l e.hom n) := by
+private theorem pb_iso_inj (l : ℕ) [Fact l.Prime] {A B : Scheme.{0}} (e : A ≅ B) (n : ℤ)
+    : Function.Injective (pb l e.hom n) := by
   intro x y h
   have h2 := congrArg (pb l e.inv n) h
-  rw [← pb_comp_projective_base_change, ← pb_comp_projective_base_change, e.inv_hom_id, pb_id_projective_base_change, pb_id_projective_base_change] at h2
+  rw [← pb_comp_projective_base_change, ← pb_comp_projective_base_change, e.inv_hom_id,
+      pb_id_projective_base_change, pb_id_projective_base_change]
+    at h2
   exact h2
 
-theorem UpperTheory.Gal.KunnethLefschetz.perm_holds :
-    UpperTheory.Gal.KunnethLefschetz.Perm := by
+theorem UpperTheory.Gal.KunnethLefschetz.perm_holds : UpperTheory.Gal.KunnethLefschetz.Perm := by
   intro l _ X r Y j w hinj g hg φ π θ hc s
-  have hval : ∀ t, pb l (j t) w (pb l φ w (g (π s))) =
-      pb l (θ t).hom w (pb l (j (π t)) w (g (π s))) := by
+  have hval
+      : ∀ t, pb l (j t) w (pb l φ w (g (π s))) = pb l (θ t).hom w (pb l (j (π t)) w (g (π s))) := by
     intro t
     rw [← pb_comp_projective_base_change, hc, pb_comp_projective_base_change]
   obtain ⟨z, hz⟩ := hg.line s (pb l (θ s).hom w (pb l (j (π s)) w (g (π s))))

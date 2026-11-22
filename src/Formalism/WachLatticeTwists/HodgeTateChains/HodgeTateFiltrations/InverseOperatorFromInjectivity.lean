@@ -20,8 +20,7 @@ theorem t2 : InjectivityOnLayerOfPower := by
     have h1 : (g ^ k - 1) x = 0 := by
       rw [← e2, Module.End.mul_apply]
       simp [hx]
-    have h2 : z • α x = 0 := by
-      rw [← h x]; simpa using h1
+    have h2 : z • α x = 0 := by rw [← h x]; simpa using h1
     exact α.map_eq_zero_iff.1 (hz _ h2)
   · intro x
     refine ⟨(∑ j ∈ Finset.range k, g ^ j) (α.symm x), ?_⟩
@@ -85,8 +84,9 @@ theorem eigen : StatEigen := by
   refine ⟨-(((c⁻¹ : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) • aeval g R' x), ?_⟩
   have h5 : ((Rpoly ℓ w U i).eval 1) • x = -(g (aeval g R' x) - aeval g R' x) :=
     eq_neg_of_add_eq_zero_left h4.symm
-  have h6 : ((ℓ : ℤ_[ℓ]) ^ rI ℓ m U i) • x
-      = ((c⁻¹ : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) • (((Rpoly ℓ w U i).eval 1) • x) := by
+  have h6
+      : ((ℓ : ℤ_[ℓ]) ^ rI ℓ m U i) • x
+        = ((c⁻¹ : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) • (((Rpoly ℓ w U i).eval 1) • x) := by
     rw [smul_smul]
     conv_rhs => rw [hu, ← mul_assoc, Units.inv_mul, one_mul]
   rw [h6, h5]

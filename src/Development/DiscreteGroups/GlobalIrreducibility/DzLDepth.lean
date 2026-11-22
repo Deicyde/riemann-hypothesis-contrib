@@ -8,7 +8,8 @@ public import Development.DiscreteGroups.GlobalIrreducibility.ExistsOfMemKOne
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.GLp GlobalTheory.GLq GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.LocLanglands
+open NumberField IsDedekindDomain GlobalTheory.GLp GlobalTheory.GLq GlobalTheory.PRep
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.LocLanglands
 
 namespace DiscreteGroups.sglob.DzType
 
@@ -28,7 +29,9 @@ theorem lDepth : LDepth := by
     rw [hk, map_one, Module.End.one_apply] at this
     exact this.symm
   intro hbot
-  have hv : e.toIntertwiningMap (φ u) ∈ fixed (cls σ).rep (KOne (w.adicCompletion E) (Fin (cls σ).1)) := by
+  have hv
+      : e.toIntertwiningMap (φ u)
+        ∈ fixed (cls σ).rep (KOne (w.adicCompletion E) (Fin (cls σ).1)) := by
     intro m
     simp only [MonoidHom.one_apply, Units.val_one, one_smul]
     rw [← e.toIntertwiningMap.isIntertwining, hfix m m.2]

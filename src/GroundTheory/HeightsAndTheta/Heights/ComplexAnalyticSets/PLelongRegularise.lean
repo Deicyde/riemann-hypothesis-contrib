@@ -18,8 +18,9 @@ noncomputable section
 
 namespace LelongRegularise
 
-theorem mdisc_eq_zero_of_eq_zero {D : ℕ} (B : Fin (D + 1) → Matrix (Fin (D + 1)) (Fin (D + 1)) ℂ)
-    (h : B 0 = 0) : ReciprocityTheory.AnForm.mdisc B = 0 := by
+theorem mdisc_eq_zero_of_eq_zero
+    {D : ℕ} (B : Fin (D + 1) → Matrix (Fin (D + 1)) (Fin (D + 1)) ℂ) (h : B 0 = 0)
+    : ReciprocityTheory.AnForm.mdisc B = 0 := by
   classical
   unfold ReciprocityTheory.AnForm.mdisc
   refine mul_eq_zero_of_right _ ?_
@@ -28,7 +29,8 @@ theorem mdisc_eq_zero_of_eq_zero {D : ℕ} (B : Fin (D + 1) → Matrix (Fin (D +
   rw [← Finset.powerset_univ, hu, Finset.sum_powerset_insert (Finset.notMem_erase 0 _),
     ← Finset.sum_add_distrib]
   refine Finset.sum_eq_zero fun t ht => ?_
-  have h0t : (0 : Fin (D + 1)) ∉ t := fun h0 => Finset.notMem_erase 0 _ (Finset.mem_powerset.1 ht h0)
+  have h0t : (0 : Fin (D + 1)) ∉ t := fun h0 =>
+    Finset.notMem_erase 0 _ (Finset.mem_powerset.1 ht h0)
   have hc : t.card ≤ D := by
     have := Finset.card_le_card (Finset.mem_powerset.1 ht)
     rw [Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, Fintype.card_fin] at this
@@ -38,8 +40,10 @@ theorem mdisc_eq_zero_of_eq_zero {D : ℕ} (B : Fin (D + 1) → Matrix (Fin (D +
   rw [he, pow_succ]
   ring
 
-theorem maDens_eq_zero_of_eventually {D : ℕ} (F : Fin (D + 1) → (Fin (D + 1) → ℂ) → ℝ)
-    {y : Fin (D + 1) → ℂ} (h : F 0 =ᶠ[𝓝 y] fun _ => 0) : ReciprocityTheory.AnForm.maDens F y = 0 := by
+theorem maDens_eq_zero_of_eventually
+    {D : ℕ} (F : Fin (D + 1) → (Fin (D + 1) → ℂ) → ℝ)
+    {y : Fin (D + 1) → ℂ} (h : F 0 =ᶠ[𝓝 y] fun _ => 0)
+    : ReciprocityTheory.AnForm.maDens F y = 0 := by
   have h2 : fderiv ℝ (fderiv ℝ (F 0)) y = 0 := by
     rw [(h.fderiv (𝕜 := ℝ)).fderiv_eq (𝕜 := ℝ)]
     simp
@@ -50,8 +54,8 @@ theorem maDens_eq_zero_of_eventually {D : ℕ} (F : Fin (D + 1) → (Fin (D + 1)
   rw [mdisc_eq_zero_of_eq_zero (fun k => ReciprocityTheory.AnForm.hessC (F k) y) hH]
   simp
 
-theorem abs_half_log_le {t ε : ℝ} (ht : 0 < t) (hε : 0 < ε) (hε1 : ε ≤ 1) :
-    |Real.log (t ^ 2 + ε) / 2| ≤ |Real.log t| + |Real.log (2 * t)| := by
+theorem abs_half_log_le {t ε : ℝ} (ht : 0 < t) (hε : 0 < ε) (hε1 : ε ≤ 1)
+    : |Real.log (t ^ 2 + ε) / 2| ≤ |Real.log t| + |Real.log (2 * t)| := by
   have ht2 : 0 < t ^ 2 := by positivity
   have hlo : Real.log t ≤ Real.log (t ^ 2 + ε) / 2 := by
     have : Real.log (t ^ 2) ≤ Real.log (t ^ 2 + ε) := Real.log_le_log ht2 (by linarith)
@@ -59,16 +63,19 @@ theorem abs_half_log_le {t ε : ℝ} (ht : 0 < t) (hε : 0 < ε) (hε1 : ε ≤ 
     push_cast at this
     linarith
   have hup : Real.log (t ^ 2 + ε) ≤ 2 * (|Real.log t| + |Real.log (2 * t)|) := by
-    have h1 : Real.log (t ^ 2 + ε) ≤ Real.log (t ^ 2 + 1) := Real.log_le_log (by positivity) (by linarith)
+    have h1 : Real.log (t ^ 2 + ε) ≤ Real.log (t ^ 2 + 1) :=
+      Real.log_le_log (by positivity) (by linarith)
     have h2t : Real.log (2 * t) = Real.log 2 + Real.log t := Real.log_mul (by norm_num) ht.ne'
     rcases le_total t 1 with h | h
-    · have : Real.log (t ^ 2 + 1) ≤ Real.log (2 ^ 2) := Real.log_le_log (by positivity) (by nlinarith)
+    · have : Real.log (t ^ 2 + 1) ≤ Real.log (2 ^ 2) :=
+        Real.log_le_log (by positivity) (by nlinarith)
       rw [Real.log_pow] at this
       push_cast at this
       have a1 := le_abs_self (Real.log (2 * t))
       have a2 := neg_abs_le (Real.log t)
       linarith
-    · have : Real.log (t ^ 2 + 1) ≤ Real.log ((2 * t) ^ 2) := Real.log_le_log (by positivity) (by nlinarith)
+    · have : Real.log (t ^ 2 + 1) ≤ Real.log ((2 * t) ^ 2) :=
+        Real.log_le_log (by positivity) (by nlinarith)
       rw [Real.log_pow] at this
       push_cast at this
       have a1 := le_abs_self (Real.log (2 * t))
@@ -81,18 +88,19 @@ theorem abs_half_log_le {t ε : ℝ} (ht : 0 < t) (hε : 0 < ε) (hε1 : ε ≤ 
     linarith
   · linarith
 
-theorem exists_poly_of_linEval_eq_zero {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
-    {A : Matrix (Fin d) (Fin n) ℂ} {u : Fin n → ℂ} (hJ : J.IsPrime) (hA : IsFiniteProjection J A)
-    (hu : linForm u ∉ J) :
-    ∃ P : MvPolynomial (Fin d) ℂ, P ≠ 0 ∧
-      ∀ y x, x ∈ fibre J A y → linEval u x = 0 → MvPolynomial.eval y P = 0 := by
+theorem exists_poly_of_linEval_eq_zero
+    {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin d) (Fin n) ℂ} {u : Fin n → ℂ}
+    (hJ : J.IsPrime) (hA : IsFiniteProjection J A) (hu : linForm u ∉ J)
+    : ∃ P : MvPolynomial (Fin d) ℂ,
+      P ≠ 0 ∧ ∀ y x, x ∈ fibre J A y → linEval u x = 0 → MvPolynomial.eval y P = 0 := by
   classical
   have := hJ
   set a := Ideal.Quotient.mk J (linForm u) with ha_def
   have ha : a ≠ 0 := fun h => hu (Ideal.Quotient.eq_zero_iff_mem.1 h)
   have hint : (projHom J A).toRingHom.IsIntegralElem a := hA.finite.to_isIntegral _
-  have hex : ∃ k, ∃ p : Polynomial (MvPolynomial (Fin d) ℂ), p.Monic ∧ p.natDegree = k ∧
-      p.eval₂ (projHom J A).toRingHom a = 0 := by
+  have hex
+      : ∃ k, ∃ p : Polynomial (MvPolynomial (Fin d) ℂ),
+        p.Monic ∧ p.natDegree = k ∧ p.eval₂ (projHom J A).toRingHom a = 0 := by
     obtain ⟨p, hpm, hp⟩ := hint
     exact ⟨_, p, hpm, rfl, hp⟩
   obtain ⟨p, hpm, hpk, hp⟩ := Nat.find_spec hex
@@ -108,34 +116,42 @@ theorem exists_poly_of_linEval_eq_zero {n d : ℕ} {J : Ideal (MvPolynomial (Fin
     exact Nat.find_min hex hlt ⟨q, hqm, rfl, hq⟩
   · rintro y x ⟨hx, hxy⟩ hux
     have h := congrArg (Ideal.Quotient.lift J (MvPolynomial.eval x) fun q hq => hx q hq) hp
-    rw [Polynomial.hom_eval₂, IndefiniteRowSideFullHecke.ComplexSets.lift_eval_comp_projHom J A hx, map_zero] at h
+    rw [Polynomial.hom_eval₂, IndefiniteRowSideFullHecke.ComplexSets.lift_eval_comp_projHom J A hx,
+        map_zero]
+      at h
     have hax : (Ideal.Quotient.lift J (MvPolynomial.eval x) fun q hq => hx q hq) a = 0 := by
       rw [ha_def, Ideal.Quotient.lift_mk, ← hux]
       simp [linForm, linEval]
     rw [hax, Polynomial.eval₂_at_zero, hxy] at h
     exact h
 
-theorem ae_eval_ne_zero {ι : Type*} [Fintype ι] (g : MvPolynomial ι ℂ) (hg : g ≠ 0) :
-    ∀ᵐ w : ι → ℂ, MvPolynomial.eval w g ≠ 0 := by
+theorem ae_eval_ne_zero {ι : Type*} [Fintype ι] (g : MvPolynomial ι ℂ) (hg : g ≠ 0)
+    : ∀ᵐ w : ι → ℂ, MvPolynomial.eval w g ≠ 0 := by
   have hU : (⋃ r : ℕ, LogInt.polydisc ι r) = Set.univ := by
     refine Set.eq_univ_of_forall fun w => ?_
     obtain ⟨r, hr⟩ := exists_nat_ge ‖w‖
     refine Set.mem_iUnion.mpr ⟨r, Set.mem_univ_pi.mpr fun i => ?_⟩
     rw [Metric.mem_closedBall, dist_zero_right]
     exact (norm_le_pi_norm w i).trans hr
-  have h := (ae_restrict_iUnion_iff (fun r : ℕ => LogInt.polydisc ι r)
-    (fun w => MvPolynomial.eval w g ≠ 0)).mpr fun r => LogInt.ae_eval_ne_zero g hg r
+  have h :=
+    (ae_restrict_iUnion_iff
+      (fun r : ℕ => LogInt.polydisc ι r)
+      (fun w => MvPolynomial.eval w g ≠ 0)).mpr fun r => LogInt.ae_eval_ne_zero g hg r
   rwa [hU, Measure.restrict_univ] at h
 
-theorem norm_chartDens_le {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
-    {A : Matrix (Fin (d + 1)) (Fin n) ℂ} (hA : IsFiniteProjection J A) {u : Fin n → ℂ}
-    {f : (Fin n → ℂ) → ℝ} (φ : Fin d → (Fin n → ℂ) → ℝ) {R : ℝ}
-    (hR : tsupport f ⊆ Metric.closedBall 0 R) {ε : ℝ} (hε : 0 < ε) (hε1 : ε ≤ 1) {y : Fin (d + 1) → ℂ}
-    (hy : ∀ x ∈ fibre J A y, linEval u x ≠ 0) :
-    ‖chartDens J A (logReg u ε) (vecCons f φ) y‖ ≤
-      chartAbsDens J A ((Metric.closedBall 0 R).indicator fun x => Real.log ‖linEval u x‖)
-          (vecCons f φ) y +
-        chartAbsDens J A ((Metric.closedBall 0 R).indicator fun x => Real.log ‖linEval ((2 : ℂ) • u) x‖)
+theorem norm_chartDens_le
+    {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin (d + 1)) (Fin n) ℂ}
+    (hA : IsFiniteProjection J A)
+    {u : Fin n → ℂ} {f : (Fin n → ℂ) → ℝ}
+    (φ : Fin d → (Fin n → ℂ) → ℝ)
+    {R : ℝ} (hR : tsupport f ⊆ Metric.closedBall 0 R)
+    {ε : ℝ} (hε : 0 < ε) (hε1 : ε ≤ 1)
+    {y : Fin (d + 1) → ℂ} (hy : ∀ x ∈ fibre J A y, linEval u x ≠ 0)
+    : ‖chartDens J A (logReg u ε) (vecCons f φ) y‖
+      ≤ chartAbsDens J A ((Metric.closedBall 0 R).indicator fun x => Real.log ‖linEval u x‖)
+          (vecCons f φ) y
+        + chartAbsDens J A
+          ((Metric.closedBall 0 R).indicator fun x => Real.log ‖linEval ((2 : ℂ) • u) x‖)
           (vecCons f φ) y := by
   have hfin := IndefiniteRowSideFullHecke.ComplexSets.fibre_finite hA y
   unfold chartDens chartAbsDens sheetSum

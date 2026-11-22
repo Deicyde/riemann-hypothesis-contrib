@@ -21,14 +21,16 @@ open CompanionTheory.RgExh.Dec ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem keeps_iff_forall_mem (g : (Matrix (Fin n) (Fin n) ℂ)ˣ) (S : Submodule ℂ (Fin n → ℂ)) :
-    Keeps (g : Matrix (Fin n) (Fin n) ℂ) S ↔
-      ∀ v ∈ S, (g : Matrix (Fin n) (Fin n) ℂ) *ᵥ v ∈ S := by
+theorem keeps_iff_forall_mem (g : (Matrix (Fin n) (Fin n) ℂ)ˣ) (S : Submodule ℂ (Fin n → ℂ))
+    : Keeps (g : Matrix (Fin n) (Fin n) ℂ) S
+      ↔ ∀ v ∈ S, (g : Matrix (Fin n) (Fin n) ℂ) *ᵥ v ∈ S := by
   unfold Keeps
   constructor
   · intro h v hv
-    have hm : Matrix.toLin' (g : Matrix (Fin n) (Fin n) ℂ) v ∈
-        Submodule.map (Matrix.toLin' (g : Matrix (Fin n) (Fin n) ℂ)) S := Submodule.mem_map_of_mem hv
+    have hm
+        : Matrix.toLin' (g : Matrix (Fin n) (Fin n) ℂ) v
+          ∈ Submodule.map (Matrix.toLin' (g : Matrix (Fin n) (Fin n) ℂ)) S :=
+      Submodule.mem_map_of_mem hv
     rw [h] at hm
     simpa [Matrix.toLin'_apply] using hm
   · intro h
@@ -41,14 +43,15 @@ theorem keeps_iff_forall_mem (g : (Matrix (Fin n) (Fin n) ℂ)ˣ) (S : Submodule
         (Matrix.toLin' ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ))
         (by rw [← Matrix.toLin'_mul, Units.mul_inv, Matrix.toLin'_one])
         (by rw [← Matrix.toLin'_mul, Units.inv_mul, Matrix.toLin'_one])
-    have hfr : Module.finrank ℂ (Submodule.map (Matrix.toLin' (g : Matrix (Fin n) (Fin n) ℂ)) S) =
-        Module.finrank ℂ S := LinearEquiv.finrank_map_eq e S
+    have hfr
+        : Module.finrank ℂ (Submodule.map (Matrix.toLin' (g : Matrix (Fin n) (Fin n) ℂ)) S)
+          = Module.finrank ℂ S :=
+      LinearEquiv.finrank_map_eq e S
     exact Submodule.eq_of_le_of_finrank_eq hle hfr
 
-theorem isClosed_keeps (ε : Fin n → Bool) (S : Submodule ℂ (Fin n → ℂ)) :
-    IsClosed {g : S7.UJ ε | Keeps (S7.toM g) S} := by
-  have hset : {g : S7.UJ ε | Keeps (S7.toM g) S} =
-      ⋂ v ∈ S, {g : S7.UJ ε | S7.toM g *ᵥ v ∈ S} := by
+theorem isClosed_keeps (ε : Fin n → Bool) (S : Submodule ℂ (Fin n → ℂ))
+    : IsClosed {g : S7.UJ ε | Keeps (S7.toM g) S} := by
+  have hset : {g : S7.UJ ε | Keeps (S7.toM g) S} = ⋂ v ∈ S, {g : S7.UJ ε | S7.toM g *ᵥ v ∈ S} := by
     ext g
     simp only [Set.mem_setOf_eq, Set.mem_iInter]
     exact keeps_iff_forall_mem (g : (Matrix (Fin n) (Fin n) ℂ)ˣ) S
@@ -59,19 +62,19 @@ theorem isClosed_keeps (ε : Fin n → Bool) (S : Submodule ℂ (Fin n → ℂ))
     (S7.continuous_toM ε).matrix_mulVec continuous_const
   exact IsClosed.preimage hc hS
 
-theorem isClosed_pSub (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ) :
-    IsClosed (PSub ε A : Set (S7.UJ ε)) := by
+theorem isClosed_pSub (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ)
+    : IsClosed (PSub ε A : Set (S7.UJ ε)) := by
   exact (isClosed_keeps ε (Vm A)).inter (isClosed_keeps ε (Wm A))
 
 instance (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ) : LocallyCompactSpace (PSub ε A) :=
   (isClosed_pSub ε A).isClosedEmbedding_subtypeVal.locallyCompactSpace
 
-theorem haar_pSub_isHaar (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ) :
-    (Measure.haar : Measure (PSub ε A)).IsHaarMeasure := by
+theorem haar_pSub_isHaar (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ)
+    : (Measure.haar : Measure (PSub ε A)).IsHaarMeasure := by
   infer_instance
 
-theorem haarExists (n : ℕ) (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ)
-    (_ : IsGrad ε A) : ∃ ν : Measure (PSub ε A), ν.IsHaarMeasure := by
+theorem haarExists (n : ℕ) (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ) (_ : IsGrad ε A)
+    : ∃ ν : Measure (PSub ε A), ν.IsHaarMeasure := by
   exact ⟨Measure.haar, haar_pSub_isHaar ε A⟩
 
 end GlobalTheory.CompanionTheory.ParabolicHaar

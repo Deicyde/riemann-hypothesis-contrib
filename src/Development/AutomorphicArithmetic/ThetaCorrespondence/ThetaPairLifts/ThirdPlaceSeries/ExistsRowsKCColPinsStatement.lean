@@ -23,6 +23,6 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-theorem GlobalTheory.T.exists_square_integrable_columns_of_heq_data :
-    type_of% @GlobalTheory.Mem.R3.SelC.square_integrable_columns_of_witnesses :=
+theorem GlobalTheory.T.exists_square_integrable_columns_of_heq_data
+    : type_of% @GlobalTheory.Mem.R3.SelC.square_integrable_columns_of_witnesses :=
   @GlobalTheory.Mem.R3.SelC.square_integrable_columns_of_witnesses

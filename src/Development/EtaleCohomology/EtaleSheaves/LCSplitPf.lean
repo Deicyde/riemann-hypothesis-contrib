@@ -10,15 +10,24 @@ open CategoryTheory Limits AlgebraicGeometry Opposite
 namespace LateralTheory.E.LCSplitPf
 open LateralTheory.E.t_E1Cut
 
-def Idem : Prop := ∀ (q : ℕ) [NeZero q] (R : Type) [CommRing R] (φ : LocallyConstant (PrimeSpectrum R) (ZMod q)),
-  ∃ ε : ZMod q → R, CompleteOrthogonalIdempotents ε ∧ ∀ (p : PrimeSpectrum R) (c : ZMod q), φ p = c ↔ ε c ∉ p.asIdeal
+def Idem : Prop :=
+  ∀ (q : ℕ) [NeZero q] (R : Type) [CommRing R] (φ : LocallyConstant (PrimeSpectrum R) (ZMod q)),
+    ∃ ε : ZMod q → R,
+      CompleteOrthogonalIdempotents ε
+        ∧ ∀ (p : PrimeSpectrum R) (c : ZMod q), φ p = c ↔ ε c ∉ p.asIdeal
 
-def Torsor : Prop := ∀ (q : ℕ) [NeZero q] (S : Type) [CommRing S] (f g : S), Ideal.span {f, g} = ⊤ →
-  ∀ (φ : LocallyConstant (PrimeSpectrum (Localization.Away (f * g))) (ZMod q)) (ε : ZMod q → Localization.Away (f * g)),
-  CompleteOrthogonalIdempotents ε → (∀ (p : PrimeSpectrum (Localization.Away (f * g))) (c : ZMod q), φ p = c ↔ ε c ∉ p.asIdeal) →
-  ∃ (C : Type) (_ : CommRing C) (_ : Algebra S C), Algebra.Etale S C ∧ Module.Finite S C ∧
-    Function.Surjective (PrimeSpectrum.comap (algebraMap S C)) ∧
-    (Nonempty (C →ₐ[S] S) → ∃ a b, φ = lcMap (rL f g) a - lcMap (rR f g) b)
+def Torsor : Prop :=
+  ∀ (q : ℕ) [NeZero q] (S : Type) [CommRing S] (f g : S),
+    Ideal.span {f, g} = ⊤
+      → ∀ (φ : LocallyConstant (PrimeSpectrum (Localization.Away (f * g))) (ZMod q))
+          (ε : ZMod q → Localization.Away (f * g)),
+        CompleteOrthogonalIdempotents ε
+          → (∀ (p : PrimeSpectrum (Localization.Away (f * g))) (c : ZMod q),
+            φ p = c ↔ ε c ∉ p.asIdeal)
+          → ∃ (C : Type) (_ : CommRing C) (_ : Algebra S C),
+            Algebra.Etale S C ∧ Module.Finite S C
+              ∧ Function.Surjective (PrimeSpectrum.comap (algebraMap S C))
+              ∧ (Nonempty (C →ₐ[S] S) → ∃ a b, φ = lcMap (rL f g) a - lcMap (rR f g) b)
 
 theorem LCSplit_of_idem (hF : FinEtSection) (hI : Idem) (hT : Torsor) : LCSplit := by
   intro q _ S _ hS f g hfg φ
@@ -29,10 +38,14 @@ theorem LCSplit_of_idem (hF : FinEtSection) (hI : Idem) (hT : Torsor) : LCSplit 
 theorem idem_of : Idem := by
   intro q _ R _ φ
   classical
-  let E := fun c : ZMod q => PrimeSpectrum.isIdempotentElemEquivClopens (R := R) |>.symm
-    ⟨{x | φ x = c}, φ.isLocallyConstant.isClopen_fiber c⟩
-  have hB : ∀ c, PrimeSpectrum.basicOpen (E c).1 = ⟨{x | φ x = c}, (φ.isLocallyConstant.isClopen_fiber c).isOpen⟩ :=
-    fun c => PrimeSpectrum.basicOpen_isIdempotentElemEquivClopens_symm _
+  let E := fun c : ZMod q =>
+    PrimeSpectrum.isIdempotentElemEquivClopens (R := R)
+      |>.symm ⟨{x | φ x = c}, φ.isLocallyConstant.isClopen_fiber c⟩
+  have hB
+      : ∀ c,
+        PrimeSpectrum.basicOpen (E c).1
+          = ⟨{x | φ x = c}, (φ.isLocallyConstant.isClopen_fiber c).isOpen⟩ := fun c =>
+    PrimeSpectrum.basicOpen_isIdempotentElemEquivClopens_symm _
   have hmem : ∀ (p : PrimeSpectrum R) c, φ p = c ↔ (E c).1 ∉ p.asIdeal := by
     intro p c
     have := congrArg (fun U : TopologicalSpace.Opens (PrimeSpectrum R) => p ∈ U) (hB c)
@@ -82,47 +95,61 @@ def twist (hε : CompleteOrthogonalIdempotents ε) : (ZMod q → A) →+* (ZMod 
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [Finset.sum_eq_single c]
-    · rw [show ε c * x (k + c) * (ε c * y (k + c)) = (ε c * ε c) * (x (k + c) * y (k + c)) by ring, (hε.idem c).eq]
+    · rw [show ε c * x (k + c) * (ε c * y (k + c)) = (ε c * ε c) * (x (k + c) * y (k + c)) by ring,
+        (hε.idem c).eq]
     · intro d _ hdc
-      rw [show ε c * x (k + c) * (ε d * y (k + d)) = (ε c * ε d) * (x (k + c) * y (k + d)) by ring, hε.ortho (Ne.symm hdc), zero_mul]
+      rw [show ε c * x (k + c) * (ε d * y (k + d)) = (ε c * ε d) * (x (k + c) * y (k + d)) by ring,
+        hε.ortho (Ne.symm hdc), zero_mul]
     · simp
 end Conc
 
 section Tor
-variable {q : ℕ} [NeZero q] {S : Type} [CommRing S] (f g : S) {ε : ZMod q → Localization.Away (f * g)}
+variable
+  {q : ℕ} [NeZero q] {S : Type} [CommRing S] (f g : S) {ε : ZMod q → Localization.Away (f * g)}
 
 abbrev Amb (q : ℕ) := (ZMod q → Localization.Away f) × (ZMod q → Localization.Away g)
 
 def h1 : Amb f g q →+* (ZMod q → Localization.Away (f * g)) :=
   Pi.ringHom fun k => (rL f g).comp ((Pi.evalRingHom _ k).comp (RingHom.fst _ _))
 
-def h2 (hε : CompleteOrthogonalIdempotents ε) : Amb f g q →+* (ZMod q → Localization.Away (f * g)) :=
+def h2 (hε : CompleteOrthogonalIdempotents ε)
+    : Amb f g q →+* (ZMod q → Localization.Away (f * g)) :=
   (twist hε).comp (Pi.ringHom fun k => (rR f g).comp ((Pi.evalRingHom _ k).comp (RingHom.snd _ _)))
 
-def Tor (hε : CompleteOrthogonalIdempotents ε) : Subring (Amb f g q) := RingHom.eqLocus (h1 f g) (h2 f g hε)
+def Tor (hε : CompleteOrthogonalIdempotents ε) : Subring (Amb f g q) :=
+  RingHom.eqLocus (h1 f g) (h2 f g hε)
 
 def torMap (hε : CompleteOrthogonalIdempotents ε) : S →+* Tor f g hε :=
-  RingHom.codRestrict (RingHom.prod ((Pi.constRingHom (ZMod q) _).comp (algebraMap S _))
-    ((Pi.constRingHom (ZMod q) _).comp (algebraMap S _))) (Tor f g hε) (by
-    intro s
-    show h1 f g _ = h2 f g hε _
-    funext k
-    change rL f g (algebraMap S _ s) = ∑ c, ε c * rR f g (algebraMap S _ s)
-    unfold rL rR
-    rw [IsLocalization.Away.awayToAwayRight_eq, IsLocalization.Away.awayToAwayLeft_eq, ← Finset.sum_mul, hε.complete, one_mul])
+  RingHom.codRestrict
+    (RingHom.prod ((Pi.constRingHom (ZMod q) _).comp (algebraMap S _))
+      ((Pi.constRingHom (ZMod q) _).comp (algebraMap S _)))
+    (Tor f g hε)
+    (by
+      intro s
+      show h1 f g _ = h2 f g hε _
+      funext k
+      change rL f g (algebraMap S _ s) = ∑ c, ε c * rR f g (algebraMap S _ s)
+      unfold rL rR
+      rw [IsLocalization.Away.awayToAwayRight_eq, IsLocalization.Away.awayToAwayLeft_eq,
+        ← Finset.sum_mul, hε.complete, one_mul])
 end Tor
 
-def TorEt : Prop := ∀ (q : ℕ) [NeZero q] (S : Type) [CommRing S] (f g : S), Ideal.span {f, g} = ⊤ →
-  ∀ (ε : ZMod q → Localization.Away (f * g)) (hε : CompleteOrthogonalIdempotents ε),
-  letI := (torMap f g hε).toAlgebra
-  Algebra.Etale S (Tor f g hε) ∧ Module.Finite S (Tor f g hε) ∧
-    Function.Surjective (PrimeSpectrum.comap (algebraMap S (Tor f g hε)))
+def TorEt : Prop :=
+  ∀ (q : ℕ) [NeZero q] (S : Type) [CommRing S] (f g : S),
+    Ideal.span {f, g} = ⊤
+      → ∀ (ε : ZMod q → Localization.Away (f * g)) (hε : CompleteOrthogonalIdempotents ε),
+        letI := (torMap f g hε).toAlgebra
+        Algebra.Etale S (Tor f g hε) ∧ Module.Finite S (Tor f g hε)
+          ∧ Function.Surjective (PrimeSpectrum.comap (algebraMap S (Tor f g hε)))
 
-def TorSec : Prop := ∀ (q : ℕ) [NeZero q] (S : Type) [CommRing S] (f g : S), Ideal.span {f, g} = ⊤ →
-  ∀ (φ : LocallyConstant (PrimeSpectrum (Localization.Away (f * g))) (ZMod q)) (ε : ZMod q → Localization.Away (f * g))
-  (hε : CompleteOrthogonalIdempotents ε), (∀ (p : PrimeSpectrum (Localization.Away (f * g))) (c : ZMod q), φ p = c ↔ ε c ∉ p.asIdeal) →
-  letI := (torMap f g hε).toAlgebra
-  Nonempty (Tor f g hε →ₐ[S] S) → ∃ a b, φ = lcMap (rL f g) a - lcMap (rR f g) b
+def TorSec : Prop :=
+  ∀ (q : ℕ) [NeZero q] (S : Type) [CommRing S] (f g : S),
+    Ideal.span {f, g} = ⊤
+      → ∀ (φ : LocallyConstant (PrimeSpectrum (Localization.Away (f * g))) (ZMod q))
+          (ε : ZMod q → Localization.Away (f * g)) (hε : CompleteOrthogonalIdempotents ε),
+        (∀ (p : PrimeSpectrum (Localization.Away (f * g))) (c : ZMod q), φ p = c ↔ ε c ∉ p.asIdeal)
+          → letI := (torMap f g hε).toAlgebra
+            Nonempty (Tor f g hε →ₐ[S] S) → ∃ a b, φ = lcMap (rL f g) a - lcMap (rR f g) b
 
 theorem torsor_of (hE : TorEt) (hS : TorSec) : Torsor := by
   intro q _ S _ f g hfg φ ε hε hφ
@@ -130,6 +157,7 @@ theorem torsor_of (hE : TorEt) (hS : TorSec) : Torsor := by
   obtain ⟨h1, h2, h3⟩ := hE q S f g hfg ε hε
   exact ⟨Tor f g hε, inferInstance, (torMap f g hε).toAlgebra, h1, h2, h3, hS q S f g hfg φ ε hε hφ⟩
 
-theorem LCSplit_of_tor (hF : FinEtSection) (hE : TorEt) (hS : TorSec) : LCSplit := LCSplit_of hF (torsor_of hE hS)
+theorem LCSplit_of_tor (hF : FinEtSection) (hE : TorEt) (hS : TorSec) : LCSplit :=
+  LCSplit_of hF (torsor_of hE hS)
 
 end LateralTheory.E.LCSplitPf

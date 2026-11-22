@@ -23,7 +23,8 @@ theorem finrank_eq (G : GDatum) : Module.finrank G.F (ℚ ⊗[ℤ] G.O) = G.m ^ 
   have h2 := Module.finrank_mul_finrank ℚ G.F (ℚ ⊗[ℤ] G.O)
   rw [h1, G.rankO] at h2
   have hd : 0 < Module.finrank ℚ G.F := Module.finrank_pos
-  have : Module.finrank ℚ G.F * Module.finrank G.F (ℚ ⊗[ℤ] G.O) = Module.finrank ℚ G.F * G.m ^ 2 := by
+  have : Module.finrank ℚ G.F * Module.finrank G.F (ℚ ⊗[ℤ] G.O)
+      = Module.finrank ℚ G.F * G.m ^ 2 := by
     rw [h2, mul_comm]
   exact Nat.eq_of_mul_eq_mul_left hd this
 
@@ -46,14 +47,17 @@ theorem isCentral (G : GDatum) : Algebra.IsCentral G.F (ℚ ⊗[ℤ] G.O) := by
   have hq : ((e * N : ℤ) : ℚ) ≠ 0 := by exact_mod_cast mul_ne_zero he hN
   refine ⟨((e * N : ℤ) : ℚ)⁻¹ • (c : G.F), ?_⟩
   show algebraMap G.F (ℚ ⊗[ℤ] G.O) (((e * N : ℤ) : ℚ)⁻¹ • (c : G.F)) = z
-  rw [Algebra.smul_def, map_mul, ← IsScalarTower.algebraMap_apply, ← Algebra.smul_def, ← hM, smul_smul, inv_mul_cancel₀ hq, one_smul]
+  rw [Algebra.smul_def, map_mul, ← IsScalarTower.algebraMap_apply, ← Algebra.smul_def, ← hM,
+    smul_smul, inv_mul_cancel₀ hq, one_smul]
 
 theorem ordB_finite (G : GDatum) : Module.Finite ℤ (ordB G) := by
   haveI := G.finO
   let f := (Algebra.TensorProduct.includeRight (R := ℤ) (A := ℚ) (B := G.O)).toRingHom
-  exact Module.Finite.of_surjective f.rangeRestrict.toIntAlgHom.toLinearMap f.rangeRestrict_surjective
+  exact Module.Finite.of_surjective f.rangeRestrict.toIntAlgHom.toLinearMap
+    f.rangeRestrict_surjective
 
-theorem ordB_denom (G : GDatum) (b : ℚ ⊗[ℤ] G.O) : ∃ n : ℕ, 0 < n ∧ (n : ℚ ⊗[ℤ] G.O) * b ∈ ordB G := by
+theorem ordB_denom (G : GDatum) (b : ℚ ⊗[ℤ] G.O)
+    : ∃ n : ℕ, 0 < n ∧ (n : ℚ ⊗[ℤ] G.O) * b ∈ ordB G := by
   obtain ⟨N, hN, x, hx⟩ := GDatum.exists_smul_eq_tmul G b
   obtain ⟨n, rfl | rfl⟩ := Int.eq_nat_or_neg N
   · refine ⟨n, by omega, x, ?_⟩
@@ -63,19 +67,27 @@ theorem ordB_denom (G : GDatum) (b : ℚ ⊗[ℤ] G.O) : ∃ n : ℕ, 0 < n ∧ 
     show (1 : ℚ) ⊗ₜ[ℤ] (-x) = _
     rw [TensorProduct.tmul_neg, ← hx, neg_smul, neg_neg, natCast_zsmul, nsmul_eq_mul]
 
-theorem splitAE : ∀ (G : GDatum), ∃ M : ℕ, 0 < M ∧ ∀ (p : ℕ) [Fact p.Prime], ¬ p ∣ M →
-    Nonempty ((G.O ⊗[ℤ] ℤ_[p]) ≃ₐ[𝓞 G.F] Matrix (Fin G.m) (Fin G.m) (𝓞 G.F ⊗[ℤ] ℤ_[p])) := by
+theorem splitAE
+    : ∀ (G : GDatum), ∃ M : ℕ,
+      0 < M
+        ∧ ∀ (p : ℕ) [Fact p.Prime],
+          ¬ p ∣ M
+            → Nonempty
+              ((G.O ⊗[ℤ] ℤ_[p]) ≃ₐ[𝓞 G.F] Matrix (Fin G.m) (Fin G.m) (𝓞 G.F ⊗[ℤ] ℤ_[p])) := by
   intro G
   haveI := G.freeO
   haveI := G.finO
   haveI := isCentral G
   haveI := GDatum.isSimpleRing G
   haveI : FiniteDimensional G.F (ℚ ⊗[ℤ] G.O) := Module.Finite.of_restrictScalars_finite ℚ G.F _
-  obtain ⟨N, hN, hloc⟩ := GlobalTheory.T.adjoinLocalOrderTensorPadic_matrix_almost_all G.F (ℚ ⊗[ℤ] G.O) G.m (finrank_eq G) (ordB G) (ordB_finite G) (ordB_denom G)
+  obtain ⟨N, hN, hloc⟩ :=
+    GlobalTheory.T.adjoinLocalOrderTensorPadic_matrix_almost_all G.F (ℚ ⊗[ℤ] G.O) G.m (finrank_eq G)
+      (ordB G) (ordB_finite G) (ordB_denom G)
   refine ⟨N, hN, fun p _ hp => ?_⟩
   obtain ⟨ψ, hψ⟩ := hloc p hp
-  obtain ⟨ι, hι⟩ : ∃ ι : G.O ⊗[ℤ] ℤ_[p] ≃+* locOrder p (ordB G),
-      ∀ o : G.O, (ι (o ⊗ₜ[ℤ] 1) : ℚ_[p] ⊗[ℚ] (ℚ ⊗[ℤ] G.O)) = (1 : ℚ_[p]) ⊗ₜ[ℚ] ((1 : ℚ) ⊗ₜ[ℤ] o) :=
+  obtain ⟨ι, hι⟩
+      : ∃ ι : G.O ⊗[ℤ] ℤ_[p] ≃+* locOrder p (ordB G), ∀ o : G.O,
+        (ι (o ⊗ₜ[ℤ] 1) : ℚ_[p] ⊗[ℚ] (ℚ ⊗[ℤ] G.O)) = (1 : ℚ_[p]) ⊗ₜ[ℚ] ((1 : ℚ) ⊗ₜ[ℤ] o) :=
     GlobalTheory.T.exists_tensorPadicInt_equiv_adjoin_of_free_finite G.O p
   obtain ⟨κ, hκ⟩ := GlobalTheory.T.exists_ringOfIntegersTensorPadic_equiv_adjoin G.F p
   let Φ : G.O ⊗[ℤ] ℤ_[p] ≃+* Matrix (Fin G.m) (Fin G.m) (𝓞 G.F ⊗[ℤ] ℤ_[p]) :=

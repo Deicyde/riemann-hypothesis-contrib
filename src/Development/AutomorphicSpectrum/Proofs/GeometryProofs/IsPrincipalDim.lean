@@ -18,8 +18,11 @@ public import Development.AbelianVarietyTheory.Counterexamples.ModuliSurvey.Modu
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 noncomputable section
 
@@ -27,8 +30,8 @@ namespace GlobalTheory.CompanionTheory.Ar.SabModel
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem isPrincipal_dim {K : Type} [Field K] {t : SAB H (Sp K)} (_h : IsPrincipal t) :
-    ∃ d, SmoothOfRelativeDimension d t.G.hom := by
+theorem isPrincipal_dim {K : Type} [Field K] {t : SAB H (Sp K)} (_h : IsPrincipal t)
+    : ∃ d, SmoothOfRelativeDimension d t.G.hom := by
   letI := t.grp
   haveI hs : IsSemiAbelian t.G := t.semi
   haveI : Smooth t.G.hom := hs.smooth

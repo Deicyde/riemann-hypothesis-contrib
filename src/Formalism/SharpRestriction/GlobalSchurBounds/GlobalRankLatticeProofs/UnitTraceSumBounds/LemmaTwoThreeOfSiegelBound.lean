@@ -14,11 +14,13 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProo
 
 namespace Formalism.MainNotions.Ext
 
-open Polynomial Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.MainNotions.UnusedSlot33.HK
+open Polynomial Formalism.BasicNotions Formalism.FrobeniusOrbits
+  Formalism.MainNotions.UnusedSlot33.HK
 
 variable {R : Ranks} (H : Host R)
 
-theorem exists_gen_K : ∃ x : H.K, x ^ 2 = ((-(H.d : ℤ) : ℤ) : H.K) ∧ IntermediateField.adjoin ℚ {x} = ⊤ := by
+theorem exists_gen_K
+    : ∃ x : H.K, x ^ 2 = ((-(H.d : ℤ) : ℤ) : H.K) ∧ IntermediateField.adjoin ℚ {x} = ⊤ := by
   have hb2 : H.sqd ^ 2 = ((-(H.d : ℤ) : ℤ) : H.E) := by
     push_cast
     exact H.sqd_sq

@@ -8,10 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.Pa.B2
+open Matrix Filter ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+  UpperTheory.V.Pa.B2
 
-private theorem finite_cocycles_of_finite_H1 {A Γ : Type} [CommRing A] [Group Γ] [TopologicalSpace Γ] (M : FRep A Γ)
-    (hH : Finite (H1 M.ρ)) : Finite (Z1 M.ρ) := by
+private theorem finite_cocycles_of_finite_H1
+    {A Γ : Type} [CommRing A] [Group Γ] [TopologicalSpace Γ] (M : FRep A Γ) (hH : Finite (H1 M.ρ))
+    : Finite (Z1 M.ρ) := by
   classical
   set N := Submodule.comap (Z1 M.ρ).subtype (B1 M.ρ) with hN
   have hB : Finite (B1 M.ρ) := by
@@ -30,14 +32,19 @@ private theorem finite_cocycles_of_finite_H1 {A Γ : Type} [CommRing A] [Group �
   rw [hc]
   exact Nat.mul_ne_zero Nat.card_pos.ne' Nat.card_pos.ne'
 
-private def trRep {A Γ M N : Type} [CommRing A] [Group Γ] [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
-    (ρ : Representation A Γ M) (e : M ≃ₗ[A] N) : Representation A Γ N where
+private def trRep
+    {A Γ M N : Type}
+    [CommRing A] [Group Γ] [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
+    (ρ : Representation A Γ M) (e : M ≃ₗ[A] N)
+    : Representation A Γ N where
   toFun g := e.toLinearMap ∘ₗ ρ g ∘ₗ e.symm.toLinearMap
   map_one' := by ext; simp
   map_mul' g h := by ext; simp
 
-theorem UpperTheory.finite_selmerModule_of_finite_cohomology :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ) (x : NP G0.frame n) (e : ℕ), FinH l G.Γ → (SelM h x (x.Am e)).Finite := by
+theorem UpperTheory.finite_selmerModule_of_finite_cohomology
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ)
+        (x : NP G0.frame n) (e : ℕ),
+      FinH l G.Γ → (SelM h x (x.Am e)).Finite := by
   intro l _ L G G0 h n x e hF
   classical
   have hA := finAm l G0.frame n x e e
@@ -52,7 +59,8 @@ theorem UpperTheory.finite_selmerModule_of_finite_cohomology :
     rfl
   have hZl : Finite (Zl rep) := by
     refine Finite.of_injective (β := Z1 D.M.ρ)
-      (fun y => ⟨fun g => a.e.symm (y.1 g), ⟨(y.2.1.comp a.e.symm).continuous, ?_⟩⟩) ?_
+      (fun y => ⟨fun g => a.e.symm (y.1 g), ⟨(y.2.1.comp a.e.symm).continuous, ?_⟩⟩)
+      ?_
     · intro g k
       have := y.2.2 g k
       simp only [this, map_add (f := _), hrepv, LinearEquiv.symm_apply_apply]
@@ -61,7 +69,10 @@ theorem UpperTheory.finite_selmerModule_of_finite_cohomology :
       funext g
       have := congrFun (congrArg Subtype.val hyy) g
       exact a.e.symm.injective this
-  have hAd : IsAd G.frame (fun g => x.ρX (x.Am e) (h.p₀ g)) (fun _ => (1 : x.Am e)) (Od x.A (x.Am e) n x.a) rep := by
+  have hAd : IsAd G.frame
+      (fun g => x.ρX (x.Am e) (h.p₀ g))
+      (fun _ => (1 : x.Am e))
+      (Od x.A (x.Am e) n x.a) rep := by
     refine ⟨?_, ?_⟩
     · intro g Z
       rw [one_smul, hrepv, a.act]
@@ -69,9 +80,13 @@ theorem UpperTheory.finite_selmerModule_of_finite_cohomology :
     · intro Z
       rw [one_smul, hrepv, a.actc]
       simp
-  have hP := (polZ l G.frame x.A (x.Am e) n (fun g => x.ρX (x.Am e) (h.p₀ g)) (fun _ => (1 : x.Am e))
-    (Od x.A (x.Am e) n x.a) rep hAd).1
-  refine (Set.finite_range (fun y : Zl rep => fun g : G.frame.G₀ => ((y.1 (g : G.Γ)) : Matrix (Fin n) (Fin n) (x.Am e)))).subset ?_
+  have hP :=
+    (polZ l G.frame x.A (x.Am e) n
+      (fun g => x.ρX (x.Am e) (h.p₀ g))
+      (fun _ => (1 : x.Am e))
+      (Od x.A (x.Am e) n x.a) rep hAd).1
+  refine (Set.finite_range (fun y : Zl rep => fun g : G.frame.G₀ =>
+    ((y.1 (g : G.Γ)) : Matrix (Fin n) (Fin n) (x.Am e)))).subset ?_
   intro z hz
   obtain ⟨hV, hC, hco, hcj, -, -⟩ := hz
   have hLC : IsLocallyConstant z := by
@@ -84,6 +99,7 @@ theorem UpperTheory.finite_selmerModule_of_finite_cohomology :
       simp [Matrix.ext_iff.symm, funext_iff]
     rw [this]
     exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j => (hij i j).isOpen_fiber _
-  obtain ⟨y, hy, -, hyz⟩ := hP z hV hLC (by intro g k; rw [one_smul]; exact hco g k)
-    (by intro g; rw [one_smul]; exact hcj g)
+  obtain ⟨y, hy, -, hyz⟩ :=
+    hP z hV hLC (by intro g k; rw [one_smul]; exact hco g k)
+      (by intro g; rw [one_smul]; exact hcj g)
   exact ⟨⟨y, hy⟩, funext hyz⟩

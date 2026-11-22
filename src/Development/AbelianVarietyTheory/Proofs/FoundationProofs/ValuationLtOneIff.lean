@@ -14,7 +14,8 @@ public import ReciprocityTheory.GaloisValuations.ContinuousConstSMulQuotient
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
 
 noncomputable section
 
@@ -45,15 +46,17 @@ theorem mem_OL_iff (LL : FinExt l) (x : ↥LL.1) : x ∈ OL LL ↔ ‖(x : Om l)
   rw [← isIntegral_iff_norm, OL, mem_integralClosure_iff]
   exact (isIntegral_algHom_iff (LL.1.val.restrictScalars ℤ_[l]) LL.1.val.toRingHom.injective).symm
 
-theorem norm_algHom (K L : FinExt l) (τ : ↥K.1 →ₐ[ℚ_[l]] ↥L.1) (x : ↥K.1) :
-    ‖((τ x : ↥L.1) : Om l)‖ = ‖(x : Om l)‖ := by
+theorem norm_algHom (K L : FinExt l) (τ : ↥K.1 →ₐ[ℚ_[l]] ↥L.1) (x : ↥K.1)
+    : ‖((τ x : ↥L.1) : Om l)‖ = ‖(x : Om l)‖ := by
   rw [← PadicAlgCl.spectralNorm_eq, ← PadicAlgCl.spectralNorm_eq, spectralNorm, spectralNorm]
   have h1 := minpoly.algHom_eq (L.1.val.comp τ) (L.1.val.comp τ).toRingHom.injective x
   have h2 := minpoly.algHom_eq K.1.val K.1.val.toRingHom.injective x
   exact congrArg spectralValue (h1.trans h2.symm)
 
-variable {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω] {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type}
-  [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (B : _root_.Formalism.BasicNotions.LocBridge l E Ω Gw O)
+variable
+  {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+  {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+  (B : _root_.Formalism.BasicNotions.LocBridge l E Ω Gw O)
 
 theorem norm_le_one_iff (y : ↥B.LL.1) : ‖(y : Om l)‖ ≤ 1 ↔ ∃ n : O, y = B.toLL n := by
   rw [← mem_OL_iff]
@@ -83,17 +86,20 @@ theorem exists_frac (y : ↥B.LL.1) : ∃ n d : O, d ≠ 0 ∧ B.toLL d * y = B.
     rw [h1, map_zero] at hd
     exact hy (inv_eq_zero.1 hd)
 
-theorem algHom_ext (τ τ' : ↥B.Kw.1 →ₐ[ℚ_[l]] ↥B.LL.1)
-    (h : ∀ x : E, τ ⟨B.j (algebraMap E Ω x), B.j_E x⟩ = τ' ⟨B.j (algebraMap E Ω x), B.j_E x⟩) :
-    τ = τ' := by
+theorem algHom_ext
+    (τ τ' : ↥B.Kw.1 →ₐ[ℚ_[l]] ↥B.LL.1)
+    (h : ∀ x : E, τ ⟨B.j (algebraMap E Ω x), B.j_E x⟩ = τ' ⟨B.j (algebraMap E Ω x), B.j_E x⟩)
+    : τ = τ' := by
   ext y
   by_contra hne
-  have hpos : 0 < ‖((τ y : ↥B.LL.1) : Om l) - (τ' y : ↥B.LL.1)‖ := norm_pos_iff.2 (sub_ne_zero.2 hne)
+  have hpos : 0 < ‖((τ y : ↥B.LL.1) : Om l) - (τ' y : ↥B.LL.1)‖ :=
+    norm_pos_iff.2 (sub_ne_zero.2 hne)
   obtain ⟨_, ⟨x, rfl⟩, hx⟩ := Metric.mem_closure_iff.1 (B.j_dense y.2) _ (half_pos hpos)
   rw [dist_eq_norm] at hx
   set z : ↥B.Kw.1 := ⟨B.j (algebraMap E Ω x), B.j_E x⟩ with hz
-  have e : ((τ y : ↥B.LL.1) : Om l) - (τ' y : ↥B.LL.1) =
-      ((τ (y - z) : ↥B.LL.1) : Om l) - (τ' (y - z) : ↥B.LL.1) := by
+  have e
+      : ((τ y : ↥B.LL.1) : Om l) - (τ' y : ↥B.LL.1)
+        = ((τ (y - z) : ↥B.LL.1) : Om l) - (τ' (y - z) : ↥B.LL.1) := by
     rw [map_sub, map_sub, hz, h x]
     push_cast
     ring

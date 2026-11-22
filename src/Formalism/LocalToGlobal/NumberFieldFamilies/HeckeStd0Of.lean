@@ -29,8 +29,9 @@ theorem span_latJ (j : ℕ) (w : what₂.places.Pl) : Submodule.span what₂.LL 
   obtain ⟨x, rfl⟩ := what₂.MtLat_sub _ _ v hv
   exact ⟨x, hv, rfl⟩
 
-theorem span_iV (j : ℕ) (w : what₂.places.Pl) :
-    Submodule.span (FractionRing (B.Oc j w)) (B.iV j w '' latJ j w) = ⊤ :=
-  span_image_top (B.ec j w) (B.iV j w) (Module.Free.chooseBasis what₂.LL _) (B.iV_basis j w _).2 _ (span_latJ j w)
+theorem span_iV (j : ℕ) (w : what₂.places.Pl)
+    : Submodule.span (FractionRing (B.Oc j w)) (B.iV j w '' latJ j w) = ⊤ :=
+  span_image_top (B.ec j w) (B.iV j w) (Module.Free.chooseBasis what₂.LL _) (B.iV_basis j w _).2 _
+    (span_latJ j w)
 
 end Formalism.L2.Fam.NPC.LatticeFinitenessFree

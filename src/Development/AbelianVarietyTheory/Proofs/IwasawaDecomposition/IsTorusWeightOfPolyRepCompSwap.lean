@@ -9,8 +9,9 @@ open Matrix Formalism.L2.NG ReciprocityTheory.Aut Formalism.AUTREP NumberField G
 
 namespace GlobalTheory
 
-theorem isWt_comp_swap : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ),
-    IsPolyRep Φ → ∀ μ : Fin n → ℤ, IsWt Φ μ → ∀ i j : Fin n, IsWt Φ (μ ∘ Equiv.swap i j) := by
+theorem isWt_comp_swap
+    : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ),
+      IsPolyRep Φ → ∀ μ : Fin n → ℤ, IsWt Φ μ → ∀ i j : Fin n, IsWt Φ (μ ∘ Equiv.swap i j) := by
   intro n ι _ _ Φ hΦ μ ⟨w, hw0, hw⟩ i j
   set σ : Equiv.Perm (Fin n) := Equiv.swap i j with hσ
   set P : Matrix (Fin n) (Fin n) ℂ := σ.toPEquiv.toMatrix with hP

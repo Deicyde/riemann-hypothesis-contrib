@@ -15,33 +15,32 @@ namespace Elliptic
 
 noncomputable section
 
-open NumberField IsDedekindDomain Module IntermediateField WeierstrassCurve GroundTheory.Arith.Abelian
+open NumberField IsDedekindDomain Module IntermediateField WeierstrassCurve
+  GroundTheory.Arith.Abelian
 open scoped nonZeroDivisors
 
 section Restrict
 
-variable {K Ω : Type*} [Field K] [Field Ω] [Algebra K Ω] {H L : IntermediateField K Ω}
-  (h : H ≤ L)
+variable {K Ω : Type*} [Field K] [Field Ω] [Algebra K Ω] {H L : IntermediateField K Ω} (h : H ≤ L)
 
 def galRestrict [Normal K H] : (L ≃ₐ[K] L) →* (H ≃ₐ[K] H) :=
   letI : Algebra H L := (inclusion h).toAlgebra
   haveI : IsScalarTower K H L := IsScalarTower.of_algebraMap_eq fun _ ↦ rfl
   AlgEquiv.restrictNormalHom H
 
-theorem galRestrict_apply [Normal K H] (σ : L ≃ₐ[K] L) (z : H) :
-    ((galRestrict h σ z : H) : Ω) = (σ (inclusion h z) : Ω) := by
+theorem galRestrict_apply [Normal K H] (σ : L ≃ₐ[K] L) (z : H)
+    : ((galRestrict h σ z : H) : Ω) = (σ (inclusion h z) : Ω) := by
   letI : Algebra H L := (inclusion h).toAlgebra
   haveI : IsScalarTower K H L := IsScalarTower.of_algebraMap_eq fun _ ↦ rfl
   exact congrArg Subtype.val (AlgEquiv.restrictNormal_commutes σ H z)
 
-theorem galRestrict_surjective [Normal K H] [Normal K L] :
-    Function.Surjective (galRestrict h) := by
+theorem galRestrict_surjective [Normal K H] [Normal K L] : Function.Surjective (galRestrict h) := by
   letI : Algebra H L := (inclusion h).toAlgebra
   haveI : IsScalarTower K H L := IsScalarTower.of_algebraMap_eq fun _ ↦ rfl
   exact AlgEquiv.restrictNormalHom_surjective (F := K) (K₁ := H) (E := L)
 
-theorem mem_fixingSubgroup_restrict_iff [Normal K H] (σ : L ≃ₐ[K] L) :
-    σ ∈ (restrict h).fixingSubgroup ↔ galRestrict h σ = 1 := by
+theorem mem_fixingSubgroup_restrict_iff [Normal K H] (σ : L ≃ₐ[K] L)
+    : σ ∈ (restrict h).fixingSubgroup ↔ galRestrict h σ = 1 := by
   rw [IntermediateField.mem_fixingSubgroup_iff]
   constructor
   · intro hσ
@@ -59,12 +58,13 @@ section Frobenius
 
 variable {K : Type} [Field K] [NumberField K] [Algebra K ℂ]
 
-theorem exists_isArithFrobAt_galRestrict {H L : IntermediateField K ℂ} [NumberField H]
-    [NumberField L] [IsGalois K H] [IsGalois K L] (h : H ≤ L) (v : HeightOneSpectrum (𝓞 K))
-    (w : HeightOneSpectrum (𝓞 L)) [w.asIdeal.LiesOver v.asIdeal] (σ : L ≃ₐ[K] L)
-    (hσ : IsArithFrobAt (𝓞 K) σ w.asIdeal) :
-    ∃ w' : HeightOneSpectrum (𝓞 H), w'.asIdeal.LiesOver v.asIdeal ∧
-      IsArithFrobAt (𝓞 K) (galRestrict h σ) w'.asIdeal := by
+theorem exists_isArithFrobAt_galRestrict
+    {H L : IntermediateField K ℂ} [NumberField H] [NumberField L] [IsGalois K H] [IsGalois K L]
+    (h : H ≤ L)
+    (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 L)) [w.asIdeal.LiesOver v.asIdeal]
+    (σ : L ≃ₐ[K] L) (hσ : IsArithFrobAt (𝓞 K) σ w.asIdeal)
+    : ∃ w' : HeightOneSpectrum (𝓞 H),
+      w'.asIdeal.LiesOver v.asIdeal ∧ IsArithFrobAt (𝓞 K) (galRestrict h σ) w'.asIdeal := by
   letI : Algebra H L := (inclusion h).toAlgebra
   haveI : IsScalarTower K H L := IsScalarTower.of_algebraMap_eq fun _ ↦ rfl
   refine ⟨HeightOneSpectrum.under (𝓞 H) w, ?_, ?_⟩
@@ -74,11 +74,12 @@ theorem exists_isArithFrobAt_galRestrict {H L : IntermediateField K ℂ} [Number
   · rw [HeightOneSpectrum.under_asIdeal]
     exact IsArithFrobAt.restrictNormalHom (F := H) hσ
 
-theorem galRestrict_eq_of_isArithFrobAt {L : IntermediateField K ℂ} [NumberField L] [IsGalois K L]
-    (hHL : hilbertClassField K ℂ ≤ L) (v : HeightOneSpectrum (𝓞 K))
-    (w : HeightOneSpectrum (𝓞 L)) [w.asIdeal.LiesOver v.asIdeal] (σ : L ≃ₐ[K] L)
-    (hσ : IsArithFrobAt (𝓞 K) σ w.asIdeal) :
-    galRestrict hHL σ = hilbertClassFieldArtinEquiv K ℂ (primeClass v) := by
+theorem galRestrict_eq_of_isArithFrobAt
+    {L : IntermediateField K ℂ} [NumberField L] [IsGalois K L]
+    (hHL : hilbertClassField K ℂ ≤ L)
+    (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 L)) [w.asIdeal.LiesOver v.asIdeal]
+    (σ : L ≃ₐ[K] L) (hσ : IsArithFrobAt (𝓞 K) σ w.asIdeal)
+    : galRestrict hHL σ = hilbertClassFieldArtinEquiv K ℂ (primeClass v) := by
   obtain ⟨w', hw', h1⟩ := exists_isArithFrobAt_galRestrict hHL v w σ hσ
   rw [hilbertClassFieldArtinEquiv_mk0 K ℂ v w']
   have hram : w'.asIdeal.ramificationIdx (𝓞 K) = 1 :=
@@ -92,28 +93,33 @@ end Frobenius
 
 section Main
 
-variable {K : Type} [Field K] [NumberField K] [Algebra K ℂ] (hK : finrank ℚ K = 2)
+variable
+  {K : Type} [Field K] [NumberField K] [Algebra K ℂ]
+  (hK : finrank ℚ K = 2)
   [_root_.NumberField.IsTotallyComplex K]
 
-
 include hK in
-theorem galClassOf_eq_artin (L : IntermediateField K ℂ) [FiniteDimensional K L] [IsGalois K L]
+theorem galClassOf_eq_artin
+    (L : IntermediateField K ℂ) [FiniteDimensional K L] [IsGalois K L]
     (hHL : hilbertClassField K ℂ ≤ L) (hL : ∀ x : ELL K, ELL.j x ∈ L)
     (E : ELL K → WeierstrassCurve L) [∀ x, (E x).IsElliptic]
     (hE : ∀ x, ∃ h : Nonempty (isogEnd ((E x).baseChange ℂ) ≃+* 𝓞 K),
       (⟨(E x).baseChange ℂ, h⟩ : CMCurve K).toEll = x)
-    (hiso : ∀ x y, Nonempty (Isogeny (E x) (E y))) (τ : L ≃ₐ[K] L) :
-    galClassOf hK L hL τ = (hilbertClassFieldArtinEquiv K ℂ).symm (galRestrict hHL τ) := by
+    (hiso : ∀ x y, Nonempty (Isogeny (E x) (E y))) (τ : L ≃ₐ[K] L)
+    : galClassOf hK L hL τ = (hilbertClassFieldArtinEquiv K ℂ).symm (galRestrict hHL τ) := by
   classical
   haveI : NumberField L := NumberField.of_module_finite K L
   set β : (L ≃ₐ[K] L) →* ClassGroup (𝓞 K) :=
     (hilbertClassFieldArtinEquiv K ℂ).symm.toMonoidHom.comp (galRestrict hHL)
   change galClassOf hK L hL τ = β τ
   obtain ⟨S, hS, hfrob⟩ := frobenius_at_primes_of_degree_one hK hL E hE hiso
-  have key : ∀ v : HeightOneSpectrum (𝓞 K), v ∉ S → v ∈ degreeOnePrimes ℚ K →
-      ∀ w : HeightOneSpectrum (𝓞 L), w.asIdeal.LiesOver v.asIdeal →
-        galClassOf hK L hL (arithFrobAt (𝓞 K) (L ≃ₐ[K] L) w.asIdeal) =
-          β (arithFrobAt (𝓞 K) (L ≃ₐ[K] L) w.asIdeal) := by
+  have key
+      : ∀ v : HeightOneSpectrum (𝓞 K),
+        v ∉ S → v ∈ degreeOnePrimes ℚ K
+          → ∀ w : HeightOneSpectrum (𝓞 L),
+            w.asIdeal.LiesOver v.asIdeal
+              → galClassOf hK L hL (arithFrobAt (𝓞 K) (L ≃ₐ[K] L) w.asIdeal)
+                = β (arithFrobAt (𝓞 K) (L ≃ₐ[K] L) w.asIdeal) := by
     intro v hvS hv1 w hw
     have hσ := IsArithFrobAt.arithFrobAt (𝓞 K) (L ≃ₐ[K] L) w.asIdeal
     rw [((hfrob v hvS hv1 w).2.1 _ hσ).1]
@@ -127,10 +133,12 @@ theorem galClassOf_eq_artin (L : IntermediateField K ℂ) [FiniteDimensional K L
   haveI : Nonempty C := ⟨⟨τ, IsConj.refl τ⟩⟩
   have hpos : (0 : ℝ) < Nat.card C / Nat.card (L ≃ₐ[K] L) :=
     div_pos (Nat.cast_pos.2 Nat.card_pos) (Nat.cast_pos.2 Nat.card_pos)
-  obtain ⟨v, ⟨hvA, hv1⟩, hvS⟩ :
-      (({v : HeightOneSpectrum (𝓞 K) | ∀ w : HeightOneSpectrum (𝓞 L),
-        w.asIdeal.LiesOver v.asIdeal → w.asIdeal.ramificationIdx (𝓞 K) = 1 ∧
-          arithFrobAt (𝓞 K) (L ≃ₐ[K] L) w.asIdeal ∈ C} ∩ degreeOnePrimes ℚ K) \ S).Nonempty := by
+  obtain ⟨v, ⟨hvA, hv1⟩, hvS⟩
+      : (({v : HeightOneSpectrum (𝓞 K) | ∀ w : HeightOneSpectrum (𝓞 L),
+          w.asIdeal.LiesOver v.asIdeal → w.asIdeal.ramificationIdx (𝓞 K) = 1 ∧
+            arithFrobAt (𝓞 K) (L ≃ₐ[K] L) w.asIdeal ∈ C}
+          ∩ degreeOnePrimes ℚ K)
+        \ S).Nonempty := by
     by_contra hne
     rw [Set.not_nonempty_iff_eq_empty, Set.diff_eq_empty] at hne
     have h0 := hasDirichletDensity_zero_of_finite (hS.subset hne)

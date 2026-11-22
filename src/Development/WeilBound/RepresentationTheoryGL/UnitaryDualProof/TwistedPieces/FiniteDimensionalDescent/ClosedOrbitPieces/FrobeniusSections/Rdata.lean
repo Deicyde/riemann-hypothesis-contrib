@@ -11,22 +11,26 @@ namespace PositivityTheory.RgUd.TP.Desc.Piece.PSect
 
 open Module Polynomial
 
-theorem rdata {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDimensional k R] [IsPrincipalIdealRing R]
+theorem rdata
+    {k R : Type*}
+    [Field k] [CommRing R] [Algebra k R] [FiniteDimensional k R] [IsPrincipalIdealRing R]
     (p c : ℕ) [Fact p.Prime] [CharP k p] [FiniteDimensional k (Tw k p c)]
     (hnil : ∀ r : R, IsNilpotent r → r ^ (p ^ c) = 0)
-    (hroot : ∀ a : k, ∃ w : R, w ^ (p ^ c) = algebraMap k R a) :
-    ∃ (r : ℕ) (s : Fin r → R) (c' : Fin r → Fin r → Fin r → k) (u : Fin r → k) (ε : R) (m : ℕ)
-      (κ : Fin m → Fin r → k),
-      (∀ j j', s j * s j' = ∑ t, c' j j' t • s t) ∧ ∑ j, u j • s j = 1 ∧ ε ^ (p ^ c) = 0 ∧
-      (∀ y : R, ∃ γ : Fin (p ^ c) → Fin r → k, y = ∑ l, ∑ j, γ l j • (s j * ε ^ (l : ℕ))) ∧
-      (∀ t, IsIdempotentElem (∑ j, κ t j • s j)) ∧ (∑ t, ∑ j, κ t j • s j) = 1 ∧
-      (∀ t t', t ≠ t' → (∑ j, κ t j • s j) * (∑ j, κ t' j • s j) = 0) ∧
-      ∀ t (v : Fin r → k), (∑ j, v j • s j) * (∑ j, κ t j • s j) = 0 ∨
-        ∃ w : R, (∑ j, v j • s j) * (∑ j, κ t j • s j) * w = ∑ j, κ t j • s j := by
+    (hroot : ∀ a : k, ∃ w : R, w ^ (p ^ c) = algebraMap k R a)
+    : ∃ (r : ℕ) (s : Fin r → R) (c' : Fin r → Fin r → Fin r → k) (u : Fin r → k) (ε : R) (m : ℕ)
+        (κ : Fin m → Fin r → k),
+      (∀ j j', s j * s j' = ∑ t, c' j j' t • s t) ∧ ∑ j, u j • s j = 1 ∧ ε ^ (p ^ c) = 0
+        ∧ (∀ y : R, ∃ γ : Fin (p ^ c) → Fin r → k, y = ∑ l, ∑ j, γ l j • (s j * ε ^ (l : ℕ)))
+        ∧ (∀ t, IsIdempotentElem (∑ j, κ t j • s j)) ∧ (∑ t, ∑ j, κ t j • s j) = 1
+        ∧ (∀ t t', t ≠ t' → (∑ j, κ t j • s j) * (∑ j, κ t' j • s j) = 0)
+        ∧ ∀ t (v : Fin r → k),
+          (∑ j, v j • s j) * (∑ j, κ t j • s j) = 0
+            ∨ ∃ w : R, (∑ j, v j • s j) * (∑ j, κ t j • s j) * w = ∑ j, κ t j • s j := by
   classical
   obtain ⟨S, hSred, hSlift⟩ := sectionEx p c hnil hroot
   have : IsReduced S := ⟨fun x hx => Subtype.ext (hSred x x.2 (hx.map S.val))⟩
-  have : FiniteDimensional k S := FiniteDimensional.finiteDimensional_submodule (Subalgebra.toSubmodule S)
+  have : FiniteDimensional k S :=
+    FiniteDimensional.finiteDimensional_submodule (Subalgebra.toSubmodule S)
   obtain ⟨m, e, he1, he2, he3, he4⟩ := idem (k := k) (S := S)
   obtain ⟨ε, hεn, hε⟩ := sEps S hSlift (p ^ c) hnil
   let b := Module.finBasis k S
@@ -36,10 +40,26 @@ theorem rdata {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDimensio
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum] at h
     simpa using h
-  refine ⟨finrank k S, fun j => (b j : R), fun j j' t => b.repr (b j * b j') t, fun j => b.repr 1 j, ε, m,
-    fun t j => b.repr (e t) j, ?_, ?_, hnil ε hεn, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    finrank k S,
+    fun j => (b j : R),
+    fun j j' t => b.repr (b j * b j') t,
+    fun j => b.repr 1 j,
+    ε,
+    m,
+    fun t j => b.repr (e t) j,
+    ?_,
+    ?_,
+    hnil ε hεn,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro j j'
-    rw [hsum]; rfl
+    rw [hsum]
+    rfl
   · rw [hsum]; rfl
   · intro y
     obtain ⟨σ, hσ, hy⟩ := hε y
@@ -61,8 +81,7 @@ theorem rdata {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDimensio
     exact congrArg Subtype.val (he3 t t' htt)
   · intro t v
     simp only [hsum]
-    have hx : ∑ j, v j • ((b j : S) : R) = ((∑ j, v j • b j : S) : R) := by
-      simp
+    have hx : ∑ j, v j • ((b j : S) : R) = ((∑ j, v j • b j : S) : R) := by simp
     rw [hx]
     rcases he4 t (∑ j, v j • b j) with h0 | ⟨w, hw⟩
     · left; exact congrArg Subtype.val h0

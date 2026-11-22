@@ -9,18 +9,20 @@ public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.TwoAdicFirst
 
-theorem cont_coe : Continuous fun z : ℤ_[2] => algebraMap ℚ_[2] ℂ_[2] (z : ℚ_[2]) := by
-  fun_prop
+theorem cont_coe : Continuous fun z : ℤ_[2] => algebraMap ℚ_[2] ℂ_[2] (z : ℚ_[2]) := by fun_prop
 
-theorem coe_mem_closure (z : ℤ_[2]) :
-    algebraMap ℚ_[2] ℂ_[2] (z : ℚ_[2]) ∈ closure (Set.range (Nat.cast : ℕ → ℂ_[2])) := by
-  refine map_mem_closure (f := fun z : ℤ_[2] => algebraMap ℚ_[2] ℂ_[2] (z : ℚ_[2])) cont_coe
-    (PadicInt.denseRange_natCast z) ?_
+theorem coe_mem_closure (z : ℤ_[2])
+    : algebraMap ℚ_[2] ℂ_[2] (z : ℚ_[2]) ∈ closure (Set.range (Nat.cast : ℕ → ℂ_[2])) := by
+  refine map_mem_closure
+    (f := fun z : ℤ_[2] => algebraMap ℚ_[2] ℂ_[2] (z : ℚ_[2]))
+    cont_coe (PadicInt.denseRange_natCast z) ?_
   rintro _ ⟨n, rfl⟩
   exact ⟨n, by simp⟩
 
@@ -33,7 +35,8 @@ theorem exists_root (k : ℕ) : ∃ z : ℤ_[2], z ^ 2 - z + 2 * (k : ℤ_[2]) =
     have h2 : ‖(2 : ℤ_[2])‖ < 1 := by
       have := PadicInt.norm_p (p := 2)
       norm_num at this
-      rw [this]; norm_num
+      rw [this]
+      norm_num
     have hk : ‖(k : ℤ_[2])‖ ≤ 1 := PadicInt.norm_le_one _
     nlinarith [norm_nonneg (k : ℤ_[2]), norm_nonneg (2 : ℤ_[2])]
   obtain ⟨z, hz, -⟩ := hensels_lemma hn
@@ -42,15 +45,16 @@ theorem exists_root (k : ℕ) : ∃ z : ℤ_[2], z ^ 2 - z + 2 * (k : ℤ_[2]) =
 
 open GlobalTheory.CompletedBasis
 
-theorem sq_neg_mem (d : ℕ) (hd : d % 8 = 7) {s : ℂ_[2]} (hs : s ^ 2 = -(d : ℂ_[2])) :
-    s ∈ (algebraMap ℚ_[2] ℂ_[2]).fieldRange := by
+theorem sq_neg_mem (d : ℕ) (hd : d % 8 = 7) {s : ℂ_[2]} (hs : s ^ 2 = -(d : ℂ_[2]))
+    : s ∈ (algebraMap ℚ_[2] ℂ_[2]).fieldRange := by
   obtain ⟨k, hk⟩ : ∃ k : ℕ, d + 1 = 8 * k := ⟨(d + 1) / 8, by omega⟩
   obtain ⟨z, hz⟩ := exists_root k
   let φ : ℤ_[2] →+* ℂ_[2] := (algebraMap ℚ_[2] ℂ_[2]).comp PadicInt.Coe.ringHom
   set u : ℂ_[2] := φ (2 * z - 1) with hu
   have hz' : φ z ^ 2 - φ z + 2 * (k : ℂ_[2]) = 0 := by
     have := congrArg φ hz
-    simpa only [map_add (f := _), map_sub, map_mul, map_pow, map_ofNat, map_natCast, map_zero] using this
+    simpa only [map_add (f := _), map_sub, map_mul, map_pow, map_ofNat, map_natCast, map_zero] using
+      this
   have hk' : (d : ℂ_[2]) + 1 = 8 * (k : ℂ_[2]) := by exact_mod_cast hk
   have hu2 : u ^ 2 = -(d : ℂ_[2]) := by
     rw [hu]
@@ -66,12 +70,14 @@ theorem sq_neg_mem (d : ℕ) (hd : d % 8 = 7) {s : ℂ_[2]} (hs : s ^ 2 = -(d : 
 
 variable (D : D7) (lam : Qbar →+* ℂ_[2])
 
-theorem rhoBase_mem_of_K (x : D.host.K) : rhoBase D lam (x : D.host.E) ∈ (algebraMap ℚ_[2] ℂ_[2]).fieldRange := by
+theorem rhoBase_mem_of_K (x : D.host.K)
+    : rhoBase D lam (x : D.host.E) ∈ (algebraMap ℚ_[2] ℂ_[2]).fieldRange := by
   let S : Subfield D.host.E := ((algebraMap ℚ_[2] ℂ_[2]).fieldRange).comap (rhoBase D lam)
-  let F : IntermediateField ℚ D.host.E := S.toIntermediateField fun q => by
-    refine ⟨(q : ℚ_[2]), ?_⟩
-    change _ = rhoBase D lam (algebraMap ℚ D.host.E q)
-    rw [eq_ratCast, map_ratCast, map_ratCast]
+  let F : IntermediateField ℚ D.host.E :=
+    S.toIntermediateField fun q => by
+      refine ⟨(q : ℚ_[2]), ?_⟩
+      change _ = rhoBase D lam (algebraMap ℚ D.host.E q)
+      rw [eq_ratCast, map_ratCast, map_ratCast]
   have hd16 : D.host.d % 16 = 7 := D.host.hyp.2.2.2.1
   have hb : D.host.sqd ∈ F := by
     change rhoBase D lam (D.host.sqd) ∈ (algebraMap ℚ_[2] ℂ_[2]).fieldRange
@@ -80,8 +86,8 @@ theorem rhoBase_mem_of_K (x : D.host.K) : rhoBase D lam (x : D.host.E) ∈ (alge
   have hle : D.host.K ≤ F := IntermediateField.adjoin_simple_le_iff.2 hb
   exact hle x.2
 
-theorem rhoK_mem (a : 𝓞 D.host.K) :
-    rhoK D lam (a : D.host.K) ∈ closure (Set.range (Nat.cast : ℕ → ℂ_[2])) := by
+theorem rhoK_mem (a : 𝓞 D.host.K)
+    : rhoK D lam (a : D.host.K) ∈ closure (Set.range (Nat.cast : ℕ → ℂ_[2])) := by
   obtain ⟨q, hq⟩ := rhoBase_mem_of_K D lam (a : D.host.K)
   have hq' : algebraMap ℚ_[2] ℂ_[2] q = rhoK D lam (a : D.host.K) := hq
   have hn : ‖q‖ ≤ 1 := by
@@ -90,8 +96,8 @@ theorem rhoK_mem (a : 𝓞 D.host.K) :
   have := coe_mem_closure ⟨q, hn⟩
   rwa [show ((⟨q, hn⟩ : ℤ_[2]) : ℚ_[2]) = q from rfl, hq'] at this
 
-theorem fst_mem_closure_natCast :
-    ∀ (D : D7) (lam : Qbar →+* ℂ_[2]), ∀ α ∈ GL3Theta.OKp D lam,
+theorem fst_mem_closure_natCast
+    : ∀ (D : D7) (lam : Qbar →+* ℂ_[2]), ∀ α ∈ GL3Theta.OKp D lam,
       α.1 ∈ closure (Set.range (Nat.cast : ℕ → ℂ_[2])) := by
   intro D lam α hα
   have h1 : α.1 ∈ (intClosure (rhoK D lam) : Set ℂ_[2]) := by

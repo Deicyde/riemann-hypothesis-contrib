@@ -4,8 +4,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
 open UpperTheory.Gal.Gen
 
@@ -78,8 +80,7 @@ end CoefLeLemmas
 
 end UpperTheory.Gal.Gen
 
-theorem UpperTheory.Gal.Gen.blockBound_pf :
-    UpperTheory.Gal.Gen.BlockBound := by
+theorem UpperTheory.Gal.Gen.blockBound_pf : UpperTheory.Gal.Gen.BlockBound := by
   intro l _ ι T n A R hR hA D x hx h1
   classical
   have hR0 : 0 ≤ R := zero_le_one.trans hR
@@ -87,20 +88,23 @@ theorem UpperTheory.Gal.Gen.blockBound_pf :
     fun v => ∑ b : Fin n, MvPolynomial.C (A v.1 v.2.1 b) * MvPolynomial.X (v.1, (b, v.2.2)) with hydef
   have hy : ∀ v, CoefLe ι R (y v) := fun v =>
     coefLe_sum ι _ _ hR0 fun b _ => coefLe_C_mul_X ι hR (hA _ _ _) _
-  have e : Formalism.GradedWeylDivisibility.blockAct ℂ A x =
-      ∑ m ∈ x.support, MvPolynomial.C (AddMonoidAlgebra.coeff x m) * (m.prod fun v e => y v ^ e) := by
-    conv_lhs => rw [x.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    refine Finset.sum_congr rfl fun m _ => ?_
-    rw [Formalism.GradedWeylDivisibility.blockAct, MvPolynomial.aeval_monomial]
-    rfl
+  have e
+      : Formalism.GradedWeylDivisibility.blockAct ℂ A x
+        = ∑ m ∈ x.support, MvPolynomial.C (AddMonoidAlgebra.coeff x m) * (m.prod fun v e => y v ^ e) :=
+    by
+      conv_lhs => rw [x.as_sum]
+      set_option synthInstance.maxHeartbeats 100000 in
+        rw [map_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      rw [Formalism.GradedWeylDivisibility.blockAct, MvPolynomial.aeval_monomial]
+      rfl
   rw [e]
   refine coefLe_sum ι _ _ (pow_nonneg hR0 _) fun m hm k => ?_
   rw [MvPolynomial.coeff_C_mul, map_mul, norm_mul]
   have hdeg : (m.sum fun _ e => e) ≤ D := (MvPolynomial.le_totalDegree hm).trans hx
-  calc _ ≤ 1 * R ^ (m.sum fun _ e => e) :=
-        mul_le_mul (h1 m) (coefLe_monomial_image ι hR0 hy m k) (norm_nonneg _) zero_le_one
+  calc
+    _ ≤ 1 * R ^ (m.sum fun _ e => e) :=
+      mul_le_mul (h1 m) (coefLe_monomial_image ι hR0 hy m k) (norm_nonneg _) zero_le_one
     _ ≤ R ^ D := by
-        rw [one_mul]
-        exact pow_le_pow_right₀ hR hdeg
+      rw [one_mul]
+      exact pow_le_pow_right₀ hR hdeg

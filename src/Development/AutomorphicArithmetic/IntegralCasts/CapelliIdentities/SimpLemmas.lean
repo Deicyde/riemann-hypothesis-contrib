@@ -91,36 +91,49 @@ private lemma core {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Al
 
 end UpperTheory.Reformulated.B.ApproximationIntegralOutsideFinset
 
-theorem UpperTheory.Reformulated.B.ApproximationIntegralOutsideFinset.approxF :
-    ∀ {F E : Type} [inst : Field F] [inst_1 : NumberField F] [inst_2 : Field E] [inst_3 : NumberField E]
-      [inst_4 : Algebra F E] {sig : E →ₐ[F] E}
-      (A : (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) → Formalism.MainNotions.S.Loc.LocAt F E sig p)
-      (S : Finset (IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F))) (c : NumberField.RingOfIntegers F),
-      c ≠ (0 : NumberField.RingOfIntegers F) →
-        ∀ (b : (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) → (A p).Fp),
+theorem UpperTheory.Reformulated.B.ApproximationIntegralOutsideFinset.approxF
+    : ∀ {F E : Type} [inst : Field F] [inst_1 : NumberField F] [inst_2 : Field E]
+        [inst_3 : NumberField E] [inst_4 : Algebra F E] {sig : E →ₐ[F] E}
+        (A : (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F))
+          → Formalism.MainNotions.S.Loc.LocAt F E sig p)
+        (S : Finset (IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)))
+        (c : NumberField.RingOfIntegers F),
+      c ≠ (0 : NumberField.RingOfIntegers F)
+        → ∀ (b
+            : (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) → (A p).Fp),
           ∃ (f : F),
             (∀ p ∈ S,
-                (ValuativeRel.valuation (A p).Fp : (A p).Fp → ValuativeRel.ValueGroupWithZero (A p).Fp)
-                    (((A p).ιF : F → (A p).Fp) f - b p) ≤
-                  (ValuativeRel.valuation (A p).Fp : (A p).Fp → ValuativeRel.ValueGroupWithZero (A p).Fp)
+                (ValuativeRel.valuation (A p).Fp
+                      : (A p).Fp → ValuativeRel.ValueGroupWithZero (A p).Fp)
+                    (((A p).ιF : F → (A p).Fp) f - b p)
+                  ≤ (ValuativeRel.valuation (A p).Fp
+                      : (A p).Fp → ValuativeRel.ValueGroupWithZero (A p).Fp)
                     (((A p).ιF : F → (A p).Fp)
-                      ((Algebra.algebraMap (NumberField.RingOfIntegers F) F : NumberField.RingOfIntegers F → F) c))) ∧
-              ∀ p ∉ S, ((A p).ιF : F → (A p).Fp) f ∈ (ValuativeRel.valuation (A p).Fp).integer := by
+                      ((Algebra.algebraMap (NumberField.RingOfIntegers F) F
+                          : NumberField.RingOfIntegers F → F)
+                        c)))
+              ∧ ∀ p ∉ S,
+                ((A p).ιF : F → (A p).Fp) f ∈ (ValuativeRel.valuation (A p).Fp).integer := by
   intro F E _ _ _ _ _ sig A S c hc b
   have hc' : ∀ p, (A p).ιF (algebraMap (NumberField.RingOfIntegers F) F c) ≠ 0 := fun p => by
     simpa using hc
-  have happ : ∀ p, ∃ a : F, valuation (A p).Fp ((A p).ιF a - b p) ≤
-      valuation (A p).Fp ((A p).ιF (algebraMap (NumberField.RingOfIntegers F) F c)) := fun p => by
+  have happ
+      : ∀ p, ∃ a : F,
+        valuation (A p).Fp ((A p).ιF a - b p)
+          ≤ valuation (A p).Fp
+            ((A p).ιF (algebraMap (NumberField.RingOfIntegers F) F c)) := fun p => by
     haveI := (A p).lf
-    exact UpperTheory.Reformulated.B.ApproximationIntegralOutsideFinset.approx_one (A p).ιF (A p).dense (b p) _ (hc' p)
+    exact UpperTheory.Reformulated.B.ApproximationIntegralOutsideFinset.approx_one (A p).ιF
+      (A p).dense (b p) _ (hc' p)
   choose a ha using happ
-  obtain ⟨f, hf1, hf2⟩ := UpperTheory.Reformulated.B.ApproximationIntegralOutsideFinset.core (K := F) S c hc a
+  obtain ⟨f, hf1, hf2⟩ :=
+    UpperTheory.Reformulated.B.ApproximationIntegralOutsideFinset.core (K := F) S c hc a
   refine ⟨f, fun p hp => ?_, fun p hp => ?_⟩
   · have h1 := ((A p).val _ _).2 (hf1 p hp)
     rw [(valuation (A p).Fp).vle_iff_le, map_sub] at h1
     have h2 : (A p).ιF f - b p = ((A p).ιF f - (A p).ιF (a p)) + ((A p).ιF (a p) - b p) := by ring
-    change valuation (A p).Fp ((A p).ιF f - b p) ≤
-      valuation (A p).Fp ((A p).ιF (algebraMap (NumberField.RingOfIntegers F) F c))
+    change valuation (A p).Fp ((A p).ιF f - b p)
+      ≤ valuation (A p).Fp ((A p).ιF (algebraMap (NumberField.RingOfIntegers F) F c))
     rw [h2]
     exact Valuation.map_add_le _ h1 (ha p)
   · have h1 : p.valuation F f ≤ p.valuation F 1 := by simpa using hf2 p hp

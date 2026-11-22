@@ -25,12 +25,12 @@ lemma hcl_neg_one (e : ℕ) : hcl e (-1) = 1 := by
   rw [QuotientGroup.eq_one_iff]
   exact Subgroup.mem_zpowers _
 
-theorem conj_main (hGal : HostGalois) (hSpec : HostGalSpec) (hqd : HypOdd q d)
-    (h : IsLayer (e + 2) q d ζ a b) :
-    ∃ (τ : L ≃ₐ[ℚ] L) (σc : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b),
-      galMap h.1 a b τ = JJ (e + 2) ∧ (∀ x : hostE ζ a b, ((σc x : hostE ζ a b) : L) = τ x) ∧
-      galE e ζ a b σc = cc e ∧
-      ∀ (φ : hostE ζ a b →+* ℂ) (x : hostE ζ a b), φ (σc x) = starRingEnd ℂ (φ x) := by
+theorem conj_main
+    (hGal : HostGalois) (hSpec : HostGalSpec) (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b)
+    : ∃ (τ : L ≃ₐ[ℚ] L) (σc : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b),
+      galMap h.1 a b τ = JJ (e + 2) ∧ (∀ x : hostE ζ a b, ((σc x : hostE ζ a b) : L) = τ x)
+        ∧ galE e ζ a b σc = cc e
+        ∧ ∀ (φ : hostE ζ a b →+* ℂ) (x : hostE ζ a b), φ (σc x) = starRingEnd ℂ (φ x) := by
   obtain ⟨hG, _, _, _⟩ := hGal e q d hqd L ζ a b h
   have := hG
   obtain ⟨τ, hτ⟩ := (layerGalois (e + 2) q d (by omega) hqd L ζ a b h).2.2.2.2 (JJ (e + 2))

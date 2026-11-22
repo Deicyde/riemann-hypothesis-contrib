@@ -18,8 +18,10 @@ open Formalism.MainNotions.S Formalism.REAL Formalism.MainNotions.BridgeCPX
 
 variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-def aop (D : Submodule ℂ H) (T : H → H) (hadd : ∀ u ∈ D, ∀ v ∈ D, T (u + v) = T u + T v)
-    (hsm : ∀ (c : ℂ), ∀ v ∈ D, T (c • v) = c • T v) : D →ₗ[ℂ] H where
+def aop
+    (D : Submodule ℂ H) (T : H → H)
+    (hadd : ∀ u ∈ D, ∀ v ∈ D, T (u + v) = T u + T v) (hsm : ∀ (c : ℂ), ∀ v ∈ D, T (c • v) = c • T v)
+    : D →ₗ[ℂ] H where
   toFun u := T u + Complex.I • (u : H)
   map_add' u v := by
     simp only [Submodule.coe_add, hadd u u.2 v v.2, smul_add]
@@ -27,15 +29,19 @@ def aop (D : Submodule ℂ H) (T : H → H) (hadd : ∀ u ∈ D, ∀ v ∈ D, T 
   map_smul' c u := by
     simp only [Submodule.coe_smul, hsm c u u.2, RingHom.id_apply, smul_add, smul_comm c Complex.I]
 
-theorem aop_apply (D : Submodule ℂ H) (T : H → H) (hadd : ∀ u ∈ D, ∀ v ∈ D, T (u + v) = T u + T v)
-    (hsm : ∀ (c : ℂ), ∀ v ∈ D, T (c • v) = c • T v) (u : D) :
-    aop D T hadd hsm u = T u + Complex.I • (u : H) := rfl
+theorem aop_apply
+    (D : Submodule ℂ H) (T : H → H)
+    (hadd : ∀ u ∈ D, ∀ v ∈ D, T (u + v) = T u + T v) (hsm : ∀ (c : ℂ), ∀ v ∈ D, T (c • v) = c • T v)
+    (u : D)
+    : aop D T hadd hsm u = T u + Complex.I • (u : H) :=
+  rfl
 
 theorem im_inner_self (T : H → H) (u : H) (h : ⟪T u, u⟫_ℂ = ⟪u, T u⟫_ℂ) : (⟪T u, u⟫_ℂ).im = 0 := by
   rw [← Complex.conj_eq_iff_im, inner_conj_symm]
   exact h.symm
 
-theorem norm_le_aop (T : H → H) (u : H) (h : ⟪T u, u⟫_ℂ = ⟪u, T u⟫_ℂ) : ‖u‖ ≤ ‖T u + Complex.I • u‖ := by
+theorem norm_le_aop (T : H → H) (u : H) (h : ⟪T u, u⟫_ℂ = ⟪u, T u⟫_ℂ)
+    : ‖u‖ ≤ ‖T u + Complex.I • u‖ := by
   have h1 : ‖T u + Complex.I • u‖ ^ 2 = ‖T u‖ ^ 2 + ‖u‖ ^ 2 := by
     rw [@norm_add_sq ℂ, inner_smul_right, norm_smul, Complex.norm_I, one_mul]
     have h2 : RCLike.re (Complex.I * ⟪T u, u⟫_ℂ) = 0 := by
@@ -53,7 +59,8 @@ end Formalism.L2.SG.Pf.admitted.BoundedOperators
 
 namespace Formalism.L2.SG.Pf.admitted
 
-open Formalism.MainNotions.S Formalism.REAL Formalism.MainNotions.BridgeCPX Formalism.L2.SG.Pf.admitted.BoundedOperators
+open Formalism.MainNotions.S Formalism.REAL Formalism.MainNotions.BridgeCPX
+  Formalism.L2.SG.Pf.admitted.BoundedOperators
 
 theorem c3 : SchurSymmetricDense := by
   intro n ε H _ _ _ σ hU hI D _hD hst T hadd hsm hsym hcomm
@@ -82,8 +89,10 @@ theorem c3 : SchurSymmetricDense := by
     rw [← inv_inv g, ← rep_inner_left hU g⁻¹, hAg]
     exact (Submodule.mem_orthogonal _ _).1 hx _ ⟨_, rfl⟩
   have hdense : DenseRange A := by
-    rcases Formalism.MainNotions.BridgeCSchur.irr_of hI S (Submodule.isClosed_orthogonal _) hSst with h | h
-    · have h2 : (LinearMap.range A).topologicalClosure = ⊤ := Submodule.topologicalClosure_eq_top_iff.2 h
+    rcases Formalism.MainNotions.BridgeCSchur.irr_of hI S (Submodule.isClosed_orthogonal _) hSst
+      with h | h
+    · have h2 : (LinearMap.range A).topologicalClosure = ⊤ :=
+        Submodule.topologicalClosure_eq_top_iff.2 h
       have h3 := (Submodule.dense_iff_topologicalClosure_eq_top).2 h2
       exact h3
     · exfalso
@@ -109,8 +118,10 @@ theorem c3 : SchurSymmetricDense := by
     rw [ContinuousLinearMap.star_eq_adjoint, ContinuousLinearMap.eq_adjoint_iff]
     intro x y
     rw [rep_inner_left hU, inv_inv]
-  have hirr : ∀ S' : Submodule ℂ H, IsClosed (S' : Set H) → (∀ V ∈ U, ∀ v ∈ S', V v ∈ S') → S' = ⊥ ∨ S' = ⊤ :=
-    fun S' hS' h => Formalism.MainNotions.BridgeCSchur.irr_of hI S' hS' (fun g v hv => h _ ⟨g, rfl⟩ v hv)
+  have hirr
+      : ∀ S' : Submodule ℂ H,
+        IsClosed (S' : Set H) → (∀ V ∈ U, ∀ v ∈ S', V v ∈ S') → S' = ⊥ ∨ S' = ⊤ := fun S' hS' h =>
+    Formalism.MainNotions.BridgeCSchur.irr_of hI S' hS' (fun g v hv => h _ ⟨g, rfl⟩ v hv)
   have hcommR : ∀ V ∈ U, Commute R V := by
     rintro V ⟨g, rfl⟩
     exact hRg g
@@ -130,7 +141,9 @@ theorem c3 : SchurSymmetricDense := by
     intro v hv
     have h1 : v = lam • (T v + Complex.I • v) := hkey ⟨v, hv⟩
     have h2 : lam⁻¹ • v = T v + Complex.I • v := by
-      calc lam⁻¹ • v = lam⁻¹ • (lam • (T v + Complex.I • v)) := congrArg _ h1
+      calc
+        lam⁻¹ • v
+          = lam⁻¹ • (lam • (T v + Complex.I • v)) := congrArg _ h1
         _ = T v + Complex.I • v := by rw [smul_smul, inv_mul_cancel₀ hlam0, one_smul]
     rw [hmu, sub_smul, h2]
     abel

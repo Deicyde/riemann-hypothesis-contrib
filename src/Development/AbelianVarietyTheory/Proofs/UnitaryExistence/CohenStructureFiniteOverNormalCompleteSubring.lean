@@ -16,12 +16,13 @@ open IsLocalRing MvPowerSeries
 
 namespace GlobalTheory.CohenStructure
 
-theorem isDomain_mvPowerSeries (R : Type) [CommRing R] [IsDomain R] (n : ℕ) :
-    IsDomain (MvPowerSeries (Fin n) R) :=
+theorem isDomain_mvPowerSeries (R : Type) [CommRing R] [IsDomain R] (n : ℕ)
+    : IsDomain (MvPowerSeries (Fin n) R) :=
   NoZeroDivisors.to_isDomain _
 
-theorem isIntegrallyClosed_mvPowerSeries (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R]
-    [IsIntegrallyClosed R] (n : ℕ) : IsIntegrallyClosed (MvPowerSeries (Fin n) R) := by
+theorem isIntegrallyClosed_mvPowerSeries
+    (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsIntegrallyClosed R] (n : ℕ)
+    : IsIntegrallyClosed (MvPowerSeries (Fin n) R) := by
   induction n with
   | zero => exact IsIntegrallyClosed.of_equiv (isEmptyEquiv (Fin 0) R).toRingEquiv.symm
   | succ n ih =>
@@ -29,24 +30,29 @@ theorem isIntegrallyClosed_mvPowerSeries (R : Type) [CommRing R] [IsDomain R] [I
     have := GlobalTheory.PowerSeriesNormal.isIntegrallyClosed_powerSeries (MvPowerSeries (Fin n) R)
     exact IsIntegrallyClosed.of_equiv (finSuccEquiv R n).toRingEquiv.symm
 
-theorem isAdicComplete_of_ringEquiv {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A]
-    [IsLocalRing B] (e : A ≃+* B) [h : IsAdicComplete (maximalIdeal A) A] :
-    IsAdicComplete (maximalIdeal B) B := by
+theorem isAdicComplete_of_ringEquiv
+    {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B]
+    (e : A ≃+* B)
+    [h : IsAdicComplete (maximalIdeal A) A]
+    : IsAdicComplete (maximalIdeal B) B := by
   rw [← map_ringEquiv_maximalIdeal e, IsAdicComplete.congr_ringEquiv]
   exact h
 
-theorem isAdicComplete_mvPowerSeries (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    [IsAdicComplete (maximalIdeal R) R] (n : ℕ) :
-    IsAdicComplete (maximalIdeal (MvPowerSeries (Fin n) R)) (MvPowerSeries (Fin n) R) := by
+theorem isAdicComplete_mvPowerSeries
+    (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R]
+    (n : ℕ)
+    : IsAdicComplete (maximalIdeal (MvPowerSeries (Fin n) R)) (MvPowerSeries (Fin n) R) := by
   induction n with
   | zero => exact isAdicComplete_of_ringEquiv (isEmptyEquiv (Fin 0) R).toRingEquiv.symm
   | succ n ih =>
     have := ReciprocityTheory.P1.isAdicComplete_ps (R := MvPowerSeries (Fin n) R)
     exact isAdicComplete_of_ringEquiv (finSuccEquiv R n).toRingEquiv.symm
 
-theorem finite_quotient_of_pow_le {A S : Type} [CommRing A] [CommRing S] [Algebra A S]
-    [IsNoetherianRing S] {I J : Ideal S} (h : ∀ s : S, ∃ a : A, s - algebraMap A S a ∈ I) {N : ℕ}
-    (hN : I ^ N ≤ J) : Module.Finite A (S ⧸ J) := by
+theorem finite_quotient_of_pow_le
+    {A S : Type} [CommRing A] [CommRing S] [Algebra A S] [IsNoetherianRing S]
+    {I J : Ideal S} (h : ∀ s : S, ∃ a : A, s - algebraMap A S a ∈ I)
+    {N : ℕ} (hN : I ^ N ≤ J)
+    : Module.Finite A (S ⧸ J) := by
   have key : ∀ N : ℕ, ∃ F : Submodule A S, F.FG ∧ F ⊔ (I ^ N).restrictScalars A = ⊤ := by
     intro N
     induction N with
@@ -74,32 +80,40 @@ theorem finite_quotient_of_pow_le {A S : Type} [CommRing A] [CommRing S] [Algebr
   obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 (hF'.ge (Submodule.mem_top (x := s)))
   exact ⟨⟨y, hy⟩, Ideal.Quotient.eq.2 (by simpa using hN hz)⟩
 
-theorem injective_of_ringKrullDim_eq {A S : Type} [CommRing A] [IsDomain A] [CommRing S]
-    [Algebra A S] [Module.Finite A S] {n : ℕ} (hA : ringKrullDim A = n) (hS : ringKrullDim S = n) :
-    Function.Injective (algebraMap A S) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem injective_of_ringKrullDim_eq
+    {A S : Type} [CommRing A] [IsDomain A] [CommRing S] [Algebra A S] [Module.Finite A S]
+    {n : ℕ} (hA : ringKrullDim A = n) (hS : ringKrullDim S = n)
+    : Function.Injective (algebraMap A S) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro r hr
   by_contra hr0
-  have h1 := ReciprocityTheory.CA.ringKrullDim_quotient_eq_quotient_comap_of_isIntegral (A := A) (⊥ : Ideal S)
-  have h2 := ringKrullDim_succ_le_of_surjective
-    (Ideal.Quotient.mk ((⊥ : Ideal S).comap (algebraMap A S))) Ideal.Quotient.mk_surjective
-    (mem_nonZeroDivisors_of_ne_zero hr0) (Ideal.Quotient.eq_zero_iff_mem.2 hr)
+  have h1 :=
+    ReciprocityTheory.CA.ringKrullDim_quotient_eq_quotient_comap_of_isIntegral (A := A)
+      (⊥ : Ideal S)
+  have h2 :=
+    ringKrullDim_succ_le_of_surjective (Ideal.Quotient.mk ((⊥ : Ideal S).comap (algebraMap A S)))
+      Ideal.Quotient.mk_surjective (mem_nonZeroDivisors_of_ne_zero hr0)
+      (Ideal.Quotient.eq_zero_iff_mem.2 hr)
   rw [← h1, ringKrullDim_eq_of_ringEquiv (RingEquiv.quotientBot S), hA, hS] at h2
   norm_cast at h2
   omega
 
-theorem exists_finite_injective_of_isAdicComplete :
-    ∀ (S : Type) [CommRing S] [IsDomain S] [IsLocalRing S] [CharZero S] (p : ℕ), p.Prime →
-      (p : S) ∈ maximalIdeal S → IsNoetherianRing S → IsAdicComplete (maximalIdeal S) S →
-      ∃ (A : Type) (_ : CommRing A) (_ : IsDomain A) (_ : IsLocalRing A) (i : A →+* S),
-        Function.Injective i ∧ i.Finite ∧ IsNoetherianRing A ∧ IsIntegrallyClosed A ∧
-          IsAdicComplete (maximalIdeal A) A := by
+theorem exists_finite_injective_of_isAdicComplete
+    : ∀ (S : Type) [CommRing S] [IsDomain S] [IsLocalRing S] [CharZero S] (p : ℕ),
+      p.Prime → (p : S) ∈ maximalIdeal S → IsNoetherianRing S → IsAdicComplete (maximalIdeal S) S
+        → ∃ (A : Type) (_ : CommRing A) (_ : IsDomain A) (_ : IsLocalRing A) (i : A →+* S),
+          Function.Injective i ∧ i.Finite ∧ IsNoetherianRing A ∧ IsIntegrallyClosed A
+            ∧ IsAdicComplete (maximalIdeal A) A := by
   intro S _ _ _ _ p hp h0 hn hc
   have hp0 : (p : S) ≠ 0 := Nat.cast_ne_zero.2 hp.ne_zero
-  obtain ⟨B, hB, hB'⟩ := GlobalTheory.PBasis.exists_pBasis (ResidueField S) p hp
-    (by rw [← map_natCast (residue S), residue_eq_zero_iff]; exact h0)
+  obtain ⟨B, hB, hB'⟩ :=
+    GlobalTheory.PBasis.exists_pBasis (ResidueField S) p hp
+      (by rw [← map_natCast (residue S), residue_eq_zero_iff]; exact h0)
   obtain ⟨Λ, h1, h2, h3⟩ := CoeffSubring.exists_coeffSubring hp hp0 h0 hB hB'
-  obtain ⟨_, hm, hΛ⟩ := GlobalTheory.isDVR_of_closed_subring_principal S Λ p (by simpa using hp0) (by simpa using h0) hc h1 h2 h3
+  obtain ⟨_, hm, hΛ⟩ :=
+    GlobalTheory.isDVR_of_closed_subring_principal S Λ p (by simpa using hp0) (by simpa using h0) hc
+      h1 h2 h3
   obtain ⟨n, x, hx, hd, N, hN⟩ := GlobalTheory.exists_systemOfParameters_insert S p hp0 h0
   let A := MvPowerSeries (Fin n) Λ
   let φ : A →ₐ[Λ] S := mvEvalAdic Λ (maximalIdeal S) x hx
@@ -108,8 +122,8 @@ theorem exists_finite_injective_of_isAdicComplete :
   have hA := isAdicComplete_mvPowerSeries Λ n
   have hle : (maximalIdeal A).map (algebraMap A S) ≤ maximalIdeal S := by
     refine Ideal.map_le_iff_le_comap.2 fun g hg => ?_
-    have h4 := algHom_sub_constantCoeff_mem φ (K := maximalIdeal S)
-      (fun j => by simpa [φ] using hx j) g
+    have h4 :=
+      algHom_sub_constantCoeff_mem φ (K := maximalIdeal S) (fun j => by simpa [φ] using hx j) g
     have h5 := FormalIsogeny.mem_maximalIdeal_iff_constantCoeff.1 hg
     rw [hm, Ideal.mem_span_singleton] at h5
     obtain ⟨c, hc⟩ := h5
@@ -136,9 +150,18 @@ theorem exists_finite_injective_of_isAdicComplete :
     refine ⟨C ⟨a, ha⟩, ?_⟩
     rwa [show algebraMap A S (C ⟨a, ha⟩) = a from mvEvalAdic_C _ x hx _]
   have hfin : Module.Finite A S := FormalIsogeny.finite_of_finite_quotient_map (maximalIdeal A)
-  refine ⟨A, inferInstance, inferInstance, inferInstance, algebraMap A S,
-    injective_of_ringKrullDim_eq (n := n + 1) ?_ (by rw [hd]; norm_cast), hfin, inferInstance,
-    isIntegrallyClosed_mvPowerSeries Λ n, hA⟩
+  refine ⟨
+    A,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    algebraMap A S,
+    injective_of_ringKrullDim_eq (n := n + 1) ?_ (by rw [hd]; norm_cast),
+    hfin,
+    inferInstance,
+    isIntegrallyClosed_mvPowerSeries Λ n,
+    hA
+  ⟩
   rw [FormalIsogeny.ringKrullDim_mvPowerSeries, IsDiscreteValuationRing.ringKrullDim_eq_one,
     Nat.card_eq_fintype_card, Fintype.card_fin, add_comm]
   norm_cast

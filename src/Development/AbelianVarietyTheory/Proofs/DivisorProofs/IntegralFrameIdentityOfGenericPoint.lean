@@ -13,30 +13,51 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Exist
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.UPoinc GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+  GlobalTheory.UPoinc GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.USep
 open GlobalTheory.Poinc.ThetaOne GlobalTheory.Poinc.Sep GlobalTheory.FieldBaseChange GlobalTheory.UT
-open ReciprocityTheory.ChartRestriction.G.DVR GlobalTheory.Poinc.Sep.Frames GlobalTheory.UT.CoefBasic
+open ReciprocityTheory.ChartRestriction.G.DVR GlobalTheory.Poinc.Sep.Frames
+  GlobalTheory.UT.CoefBasic
 
 namespace GlobalTheory.Poinc.Sep.FrameInt
 
-theorem kap_of_generic : ∀ (V : Type) [CommRing V] [IsDomain V] (D : DegPre V) (N : ℕ) (b : 𝟙_ (Over (Sp V)) ⟶ D.P.A), b ^ N = 1 → ∀ (t : LB.Gen (LB.LinComb D.P.L ![(η[D.P.A]).left, b.left] (DegPre.lineε 1))), t.IsGen → ∀ (κ : LB.Gen (kapLB D (𝟙 D.P.A ^ N) (N ^ 2) 1)), Normd κ → (∀ z J, Good D.P.L z J → val t (toUnit (TF (R := V) (FractionRing V))).left z J ^ (N ^ 2) * val κ ((toUnit (TF (R := V) (FractionRing V))).left ≫ b.left) z J = 1) → ∀ (Z : Scheme.{0}) (r : Z ⟶ Sp V) (z : Z) J, Good D.P.L z J → val t r z J ^ (N ^ 2) * val κ (r ≫ b.left) z J = 1 := by
+theorem kap_of_generic
+    : ∀ (V : Type) [CommRing V] [IsDomain V] (D : DegPre V) (N : ℕ) (b : 𝟙_ (Over (Sp V)) ⟶ D.P.A),
+      b ^ N = 1
+        → ∀ (t : LB.Gen (LB.LinComb D.P.L ![(η[D.P.A]).left, b.left] (DegPre.lineε 1))),
+          t.IsGen
+            → ∀ (κ : LB.Gen (kapLB D (𝟙 D.P.A ^ N) (N ^ 2) 1)),
+              Normd κ
+                → (∀ z J,
+                  Good D.P.L z J
+                    → val t (toUnit (TF (R := V) (FractionRing V))).left z J ^ (N ^ 2)
+                        * val κ ((toUnit (TF (R := V) (FractionRing V))).left ≫ b.left) z J
+                      = 1)
+                → ∀ (Z : Scheme.{0}) (r : Z ⟶ Sp V) (z : Z) J,
+                  Good D.P.L z J → val t r z J ^ (N ^ 2) * val κ (r ≫ b.left) z J = 1 := by
   intro V _ _ D N b hbN t ht κ hκn hgen Z r z J hJ
   have G := ((SymFrame.grep_gen t ht (𝟙 _)).pow (N ^ 2)).mul (SymFrame.grep_kap κ hκn.1 b)
-  obtain ⟨s, hs, vs⟩ := G.out D.P.isLB (K := PEmpty) PEmpty.elim PEmpty.elim
-    (fun U _ h => Eq.trans (by
-      rw [Fin.prod_univ_two, hbN, ← SymFrame.eta_eq]
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, DegPre.lineε, Category.comp_id,
-        Category.id_comp]
-      apply Additive.ofMul.injective
-      simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow, ofMul_one]
-      rw [← natCast_zsmul]
-      push_cast
-      module) (Fintype.prod_empty _).symm)
+  obtain ⟨s, hs, vs⟩ :=
+    G.out D.P.isLB (K := PEmpty) PEmpty.elim PEmpty.elim (fun U _ h =>
+      Eq.trans
+        (by
+          rw [Fin.prod_univ_two, hbN, ← SymFrame.eta_eq]
+          simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, DegPre.lineε,
+            Category.comp_id, Category.id_comp]
+          apply Additive.ofMul.injective
+          simp only [ofMul_mul, ofMul_inv, ofMul_zpow, ofMul_pow, ofMul_one]
+          rw [← natCast_zsmul]
+          push_cast
+          module)
+        (Fintype.prod_empty _).symm)
   obtain ⟨ρ, hρ⟩ := exists_ratio D.P.isLB rfl s (LB.oneGen D.P.L) hs (oneGen_gen _)
   have hρ1 : ρ = 1 := by
     obtain ⟨z₀⟩ := exists_pt (R := V) (F := FractionRing V)

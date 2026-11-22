@@ -7,11 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FinAl
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.Mem.Col2.JetEx
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker
+  GlobalTheory.Mem.Col2.JetEx
 
 namespace GlobalTheory.Mem.Col2.JetEx
 
-theorem exists_finset_sdLat_reps : ∀ (X : Fields), X.Ok → ∀ n : ℕ, ∃ T : Finset (Submodule (𝓞 X.E) (Sp X.E n)), (∀ N ∈ T, IsSdLat N) ∧ ∀ N : Submodule (𝓞 X.E) (Sp X.E n), IsSdLat N → ∃ N₀ ∈ T, ∃ γ : UF X.E n, N = gmap γ.1 N₀ := by
+theorem exists_finset_sdLat_reps
+    : ∀ (X : Fields),
+      X.Ok
+        → ∀ n : ℕ, ∃ T : Finset (Submodule (𝓞 X.E) (Sp X.E n)),
+          (∀ N ∈ T, IsSdLat N)
+            ∧ ∀ N : Submodule (𝓞 X.E) (Sp X.E n),
+              IsSdLat N → ∃ N₀ ∈ T, ∃ γ : UF X.E n, N = gmap γ.1 N₀ := by
   intro X hX n
   obtain ⟨s, hs, H⟩ := unimod_finite (E := X.E) (posStar_of_conj hX.conjE) n
   refine ⟨s, hs, fun N hN => ?_⟩

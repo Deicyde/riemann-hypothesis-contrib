@@ -14,24 +14,26 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
 
 variable (d : Data K ι Ω WT A)
 
-theorem disc_pointwise (hd : d.AxH 𝒜) (h : d.S1) (a b : KTp K d.D d.N) (hab : d.IsPres hd h a b)
-    (sg : K →+* ℂ) :
-    ∀ᵐ z ∂(ReciprocityTheory.MultiplicativeHeights.blockSphereProb d.D (d.N + 1)),
-      Real.log ‖d.evT sg 0 (d.tOf z) a‖ - Real.log ‖d.evT sg 0 (d.tOf z) b‖ ≤
-        d.del * Real.log d.del + 2 * ∑ k, Real.log (d.supN sg d.wF (d.thp (hd.sel k))) +
-          2 * ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg (d.tOf z)),
-            -Real.log (d.nrm c d.wF (hd.a4.choose c) P) := by
+theorem disc_pointwise
+    (hd : d.AxH 𝒜) (h : d.S1) (a b : KTp K d.D d.N) (hab : d.IsPres hd h a b) (sg : K →+* ℂ)
+    : ∀ᵐ z ∂(ReciprocityTheory.MultiplicativeHeights.blockSphereProb d.D (d.N + 1)),
+        Real.log ‖d.evT sg 0 (d.tOf z) a‖ - Real.log ‖d.evT sg 0 (d.tOf z) b‖ ≤
+          d.del * Real.log d.del + 2 * ∑ k, Real.log (d.supN sg d.wF (d.thp (hd.sel k))) +
+            2 * ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg (d.tOf z)),
+              -Real.log (d.nrm c d.wF (hd.a4.choose c) P) := by
   classical
   obtain ⟨hb0, habE, m, hm0, hma, hmb⟩ := hab
   have hDe := d.de_ne_zero hd h
@@ -40,8 +42,9 @@ theorem disc_pointwise (hd : d.AxH 𝒜) (h : d.S1) (a b : KTp K d.D d.N) (hab :
     rw [map_zero] at habE
     exact mul_ne_zero hDe ((map_ne_zero_iff _ (IsFractionRing.injective _ _)).mpr hb0) habE.symm
   have heW : ∀ c, hd.a4.choose c ∈ 𝒜 c d.wF ∧ hd.a4.choose c ≠ 0 := hd.a4.choose_spec.1
-  have hST : ∀ᵐ z ∂(ReciprocityTheory.MultiplicativeHeights.blockSphereProb d.D (d.N + 1)),
-      ∀ c, (d.ST c sg (d.tOf z)).Finite ∧ (d.ST c sg (d.tOf z)).ncard = d.delc c := by
+  have hST
+      : ∀ᵐ z ∂(ReciprocityTheory.MultiplicativeHeights.blockSphereProb d.D (d.N + 1)),
+        ∀ c, (d.ST c sg (d.tOf z)).Finite ∧ (d.ST c sg (d.tOf z)).ncard = d.delc c := by
     have : Countable K := countable_numberField K
     filter_upwards [NPB.ae_gen (D := d.D) (N := d.N) sg] with z hz
     obtain ⟨y, -, hpt⟩ := NPB.exists_gen sg (fun q => d.tOf z q.1 q.2) hz 1 one_ne_zero
@@ -56,8 +59,10 @@ theorem disc_pointwise (hd : d.AxH 𝒜) (h : d.S1) (a b : KTp K d.D d.N) (hab :
     have := d.KT_finiteDimensional hd c
     let e : KTf K d.D d.N ≃+* d.KT c :=
       (d.KTtoS h c).rangeRestrictFieldEquiv.trans (RingEquiv.subfieldCongr (d.KTtoS_fieldRange h c))
-    have he : (algebraMap (KTf K d.D d.N) (OmS (Ω c) d.D d.N)).comp e.symm.toRingHom =
-        (RingEquiv.refl (OmS (Ω c) d.D d.N)).toRingHom.comp (algebraMap (d.KT c) (OmS (Ω c) d.D d.N)) := by
+    have he
+        : (algebraMap (KTf K d.D d.N) (OmS (Ω c) d.D d.N)).comp e.symm.toRingHom
+          = (RingEquiv.refl (OmS (Ω c) d.D d.N)).toRingHom.comp
+            (algebraMap (d.KT c) (OmS (Ω c) d.D d.N)) := by
       refine RingHom.ext fun x => ?_
       change d.KTtoS h c (e.symm x) = (x : OmS (Ω c) d.D d.N)
       exact congrArg (fun u : d.KT c => (u : OmS (Ω c) d.D d.N)) (e.apply_symm_apply x)
@@ -70,8 +75,8 @@ theorem disc_pointwise (hd : d.AxH 𝒜) (h : d.S1) (a b : KTp K d.D d.N) (hab :
       Algebra.IsSeparable.of_integral _ _
     let restrict (σ : OmS (Ω c) d.D d.N →ₐ[KTf K d.D d.N] ℂ) :=
       (σ : OmS (Ω c) d.D d.N →+* ℂ).comp (algebraMap (Ω c) (OmS (Ω c) d.D d.N))
-    have hcomm (σ : OmS (Ω c) d.D d.N →ₐ[KTf K d.D d.N] ℂ) :
-        (σ : OmS (Ω c) d.D d.N →+* ℂ).comp (d.KTtoS h c) = tauPev sg pt hpt :=
+    have hcomm (σ : OmS (Ω c) d.D d.N →ₐ[KTf K d.D d.N] ℂ)
+        : (σ : OmS (Ω c) d.D d.N →+* ℂ).comp (d.KTtoS h c) = tauPev sg pt hpt :=
       RingHom.ext fun x => σ.commutes x
     have hinj : Function.Injective restrict := fun σ₁ σ₂ hσ =>
       AlgHom.coe_ringHom_injective (d.emb_ext h c sg pt hpt _ _ (hcomm σ₁) (hcomm σ₂) hσ)
@@ -107,8 +112,9 @@ theorem disc_pointwise (hd : d.AxH 𝒜) (h : d.S1) (a b : KTp K d.D d.N) (hab :
     rintro ⟨c, P, hP⟩ k
     have hth : d.thp (hd.sel k) c ∈ 𝒜 c d.wF := hd.thp_mem _ c
     have hline := eq_ratio_smul_on_line d (hd := hd) hth (heW c).1 (heW c).2
-    have h1 : ‖P (ratio (Ω := Ω c) (d.thp (hd.sel k) c) (e c))‖ * d.nrm c d.wF (e c) P ≤
-        d.nrm c d.wF (d.thp (hd.sel k) c) P := by
+    have h1
+        : ‖P (ratio (Ω := Ω c) (d.thp (hd.sel k) c) (e c))‖ * d.nrm c d.wF (e c) P
+          ≤ d.nrm c d.wF (d.thp (hd.sel k) c) P := by
       by_cases hr : ratio (Ω := Ω c) (d.thp (hd.sel k) c) (e c) = 0
       · rw [hr, map_zero, norm_zero, zero_mul]
         rw [hr, zero_smul] at hline
@@ -120,18 +126,23 @@ theorem disc_pointwise (hd : d.AxH 𝒜) (h : d.S1) (a b : KTp K d.D d.N) (hab :
       rw [hd.Thp_span]
       exact Submodule.subset_span ⟨_, rfl⟩
     have h3 : d.nrm c d.wF (d.thp (hd.sel k) c) P ≤ s k :=
-      le_ciSup (f := fun p : (Σ c, PT (Ω := Ω c) sg) => d.nrm p.1 d.wF (d.thp (hd.sel k) p.1) p.2)
+      le_ciSup
+        (f := fun p : (Σ c, PT (Ω := Ω c) sg) => d.nrm p.1 d.wF (d.thp (hd.sel k) p.1) p.2)
         (hd.bdd sg d.wF (d.thp (hd.sel k)) (Or.inr (Or.inl ⟨hmem, rfl⟩))) ⟨c, ⟨P, hP.1⟩⟩
     exact h1.trans h3
-  have hG : (Matrix.of fun k l : Fin d.del => ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg t),
-        P (ratio (Ω := Ω c) (d.thp (hd.sel k) c) (e c)) *
-          P (ratio (Ω := Ω c) (d.thp (hd.sel l) c) (e c))) =
-      Matrix.of fun k l => ∑ r, M r k * M r l := by
+  have hG
+      : (Matrix.of fun k l : Fin d.del =>
+          ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg t),
+            P (ratio (Ω := Ω c) (d.thp (hd.sel k) c) (e c)) *
+              P (ratio (Ω := Ω c) (d.thp (hd.sel l) c) (e c)))
+        = Matrix.of fun k l => ∑ r, M r k * M r l := by
     ext k l
     simp only [Matrix.of_apply, Fintype.sum_sigma]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [← finsum_set_coe_eq_finsum_mem, finsum_eq_sum_of_fintype]
-  have hq : d.evT sg 0 t a / d.evT sg 0 t b = (Matrix.of fun k l : Fin d.del => ∑ r, M r k * M r l).det := by
+  have hq
+      : d.evT sg 0 t a / d.evT sg 0 t b
+        = (Matrix.of fun k l : Fin d.del => ∑ r, M r k * M r l).det := by
     rw [hfib hbz, hG]
   set D0 := (Matrix.of fun k l : Fin d.del => ∑ r, M r k * M r l).det with hD0
   have hD0ne : D0 ≠ 0 := by
@@ -148,18 +159,22 @@ theorem disc_pointwise (hd : d.AxH 𝒜) (h : d.S1) (a b : KTp K d.D d.N) (hab :
     (Finset.prod_ne_zero_iff.mp (right_ne_zero_of_mul hRpos.ne')) k (Finset.mem_univ _)
   have hdel : (d.del : ℝ) ^ d.del ≠ 0 := left_ne_zero_of_mul hRpos.ne'
   rw [Real.log_mul (norm_ne_zero_iff.mpr hD0ne)
-      (Finset.prod_ne_zero_iff.mpr fun r _ => pow_ne_zero 2 (hν r).ne'),
-    Real.log_prod (fun r _ => pow_ne_zero 2 (hν r).ne'),
-    Real.log_mul hdel (Finset.prod_ne_zero_iff.mpr fun k _ => hs k),
-    Real.log_prod (fun k _ => hs k)] at hlog
+        (Finset.prod_ne_zero_iff.mpr fun r _ => pow_ne_zero 2 (hν r).ne'),
+      Real.log_prod (fun r _ => pow_ne_zero 2 (hν r).ne'),
+      Real.log_mul hdel (Finset.prod_ne_zero_iff.mpr fun k _ => hs k),
+      Real.log_prod (fun k _ => hs k)]
+    at hlog
   simp only [Real.log_pow, Nat.cast_ofNat] at hlog
-  have hsumν : ∑ r, Real.log (ν r) = ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg t),
-      Real.log (d.nrm c d.wF (e c) P) := by
+  have hsumν
+      : ∑ r, Real.log (ν r)
+        = ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg t),
+          Real.log (d.nrm c d.wF (e c) P) := by
     rw [Fintype.sum_sigma]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [← finsum_set_coe_eq_finsum_mem, finsum_eq_sum_of_fintype]
-  have hsumneg : ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg t), -Real.log (d.nrm c d.wF (e c) P) =
-      -∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg t), Real.log (d.nrm c d.wF (e c) P) := by
+  have hsumneg
+      : ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg t), -Real.log (d.nrm c d.wF (e c) P)
+        = - ∑ c, ∑ᶠ (P : Ω c →+* ℂ) (_ : P ∈ d.ST c sg t), Real.log (d.nrm c d.wF (e c) P) := by
     rw [← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [← finsum_set_coe_eq_finsum_mem, ← finsum_set_coe_eq_finsum_mem, finsum_eq_sum_of_fintype,

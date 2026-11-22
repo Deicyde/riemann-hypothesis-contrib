@@ -15,12 +15,15 @@ set_option linter.unusedVariables false
 
 namespace Formalism.MainNotions.BridgeCS3d
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates Formalism.MainNotions.BridgeLemma₄
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates Formalism.MainNotions.BridgeLemma₄
 
-theorem dsigW_eq {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+theorem dsigW_eq
+    {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H))
-    (w : List (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)) (v : H) :
-    PI.UpqRep.dsigW (k := k) (r := r) σ w v = Formalism.MainNotions.S.dsigW (k := k) (r := r) σ w v := by
+    (w : List (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)) (v : H)
+    : PI.UpqRep.dsigW (k := k) (r := r) σ w v
+      = Formalism.MainNotions.S.dsigW (k := k) (r := r) σ w v := by
   induction w generalizing v with
   | nil => rfl
   | cons X w ih =>
@@ -29,15 +32,16 @@ theorem dsigW_eq {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpac
     rw [ih]
     rfl
 
-theorem isBesselMapSm_iff {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] (z : Fin (2 * r + k + 1) → ℂ)
-    (ψ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → ℂ)
+theorem isBesselMapSm_iff
+    {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+    (z : Fin (2 * r + k + 1) → ℂ) (ψ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → ℂ)
     (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H))
-    (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp)) (l : H → Wp) :
-    Formalism.MainNotions.S.IsBesselMapSm (k := k) (r := r) z ψ σ π l ↔
-      PI.BesselMapUniq.IsBesselMapSm (k := k) (r := r) z ψ σ π l := by
-  simp only [PI.BesselMapUniq.IsBesselMapSm, Formalism.MainNotions.S.IsBesselMapSm, PI.BesselMapUniq.IsCWCont,
-    Formalism.MainNotions.S.IsCWCont, dsigW_eq]
+    (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp)) (l : H → Wp)
+    : Formalism.MainNotions.S.IsBesselMapSm (k := k) (r := r) z ψ σ π l
+      ↔ PI.BesselMapUniq.IsBesselMapSm (k := k) (r := r) z ψ σ π l := by
+  simp only [PI.BesselMapUniq.IsBesselMapSm, Formalism.MainNotions.S.IsBesselMapSm,
+    PI.BesselMapUniq.IsCWCont, Formalism.MainNotions.S.IsCWCont, dsigW_eq]
   exact Iff.rfl
 
 section Family

@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.LocalGro
 @[expose] public section
 
 open PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory.G UpperTheory.ConvolutionTheory.T4
-open NumberField IsDedekindDomain GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global GroundTheory.Global.SemiLocal Topology
+open NumberField IsDedekindDomain GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Global GroundTheory.Global.SemiLocal Topology
 open scoped NumberField.AdeleRing
 
 noncomputable section
@@ -21,14 +22,15 @@ private def emb : GL (Fin n) (InfiniteAdeleRing E) →* GA E n where
     rw [← map_mul (AdelicGLn.prodEquiv E n).symm]
     simp
 
-private theorem emb_apply (x : GL (Fin n) (InfiniteAdeleRing E)) :
-    emb E n x = (AdelicGLn.prodEquiv E n).symm (x, 1) := rfl
+private theorem emb_apply (x : GL (Fin n) (InfiniteAdeleRing E))
+    : emb E n x = (AdelicGLn.prodEquiv E n).symm (x, 1) :=
+  rfl
 
 private theorem continuous_emb : Continuous (emb E n) :=
   (AdelicGLn.prodEquiv E n).symm.continuous.comp (continuous_id.prodMk continuous_const)
 
-private theorem prod_emb (x : GL (Fin n) (InfiniteAdeleRing E)) :
-    AdelicGLn.prodEquiv E n (emb E n x) = (x, 1) := by
+private theorem prod_emb (x : GL (Fin n) (InfiniteAdeleRing E))
+    : AdelicGLn.prodEquiv E n (emb E n x) = (x, 1) := by
   rw [emb_apply]; exact (AdelicGLn.prodEquiv E n).apply_symm_apply _
 
 private theorem pI_emb (x : GL (Fin n) (InfiniteAdeleRing E)) : pI E n (emb E n x) = x := by
@@ -38,8 +40,10 @@ private theorem pI_emb (x : GL (Fin n) (InfiniteAdeleRing E)) : pI E n (emb E n 
   rw [prod_emb] at h
   exact h.symm
 
-private theorem pE_emb {F : Type} [Field F] [NumberField F] [Algebra F E] (v : Pl F)
-    (x : GL (Fin n) (InfiniteAdeleRing E)) : pE E n v (emb E n x) = 1 := by
+private theorem pE_emb
+    {F : Type} [Field F] [NumberField F] [Algebra F E]
+    (v : Pl F) (x : GL (Fin n) (InfiniteAdeleRing E))
+    : pE E n v (emb E n x) = 1 := by
   refine Units.ext (Matrix.ext fun a b => funext fun w => ?_)
   have h := AdelicGLn.prodEquiv_apply_snd E n (emb E n x) a b
   rw [prod_emb] at h
@@ -51,8 +55,8 @@ private theorem pE_emb {F : Type} [Field F] [NumberField F] [Algebra F E] (v : P
 end UpperTheory.Bnd
 
 open UpperTheory.Bnd in
-theorem UpperTheory.adelicBound_of_centralizer_localization :
-    N5 → Compat → CentLoc → RPE → BoundE := by
+theorem UpperTheory.adelicBound_of_centralizer_localization
+    : N5 → Compat → CentLoc → RPE → BoundE := by
   intro hN hC hCL hR F E _ _ _ _ _ _ σ hσ n hn δ D hD
   have hRP := hR F E n
   obtain ⟨hC1, hC2, -⟩ := hC F E σ n
@@ -77,8 +81,10 @@ theorem UpperTheory.adelicBound_of_centralizer_localization :
   have hp : ∀ y, (d y : ℝ) ≠ 0 := fun y => (d y).2.ne'
   have hcont : Continuous fun y => Real.log ((d y : ℝ) / (d δ : ℝ)) :=
     (hdc.div_const _).log fun y => div_ne_zero (hp y) (hp δ)
-  refine ⟨(fun y => Real.log ((d y : ℝ) / (d δ : ℝ))) '' D, hD.image hcont, fun s x hx => ⟨_, hx, ?_⟩⟩
-  have e : d (pI E n (zA E n s) * (x⁻¹ * δ * mapGL n (galInf σ) x)) = d (pI E n (zA E n s)) * d δ := by
+  refine
+    ⟨(fun y => Real.log ((d y : ℝ) / (d δ : ℝ))) '' D, hD.image hcont, fun s x hx => ⟨_, hx, ?_⟩⟩
+  have e
+      : d (pI E n (zA E n s) * (x⁻¹ * δ * mapGL n (galInf σ) x)) = d (pI E n (zA E n s)) * d δ := by
     rw [map_mul, map_mul, map_mul, hds, map_inv]
     congr 1
     rw [mul_comm (d x)⁻¹, mul_assoc, inv_mul_cancel, mul_one]

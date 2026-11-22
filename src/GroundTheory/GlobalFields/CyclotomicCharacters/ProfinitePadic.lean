@@ -20,11 +20,11 @@ section Padic
 
 variable {ℓ : ℕ} [hℓ : Fact ℓ.Prime]
 
-theorem norm_sub_le_of_toZModPow_eq {x y : ℤ_[ℓ]} {n : ℕ}
-    (h : PadicInt.toZModPow n x = PadicInt.toZModPow n y) :
-    ‖x - y‖ ≤ (ℓ : ℝ) ^ (-(n : ℤ)) := by
-  rw [PadicInt.norm_le_pow_iff_mem_span_pow, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub,
-    h, sub_self]
+theorem norm_sub_le_of_toZModPow_eq
+    {x y : ℤ_[ℓ]} {n : ℕ} (h : PadicInt.toZModPow n x = PadicInt.toZModPow n y)
+    : ‖x - y‖ ≤ (ℓ : ℝ) ^ (-(n : ℤ)) := by
+  rw [PadicInt.norm_le_pow_iff_mem_span_pow, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, h,
+    sub_self]
 
 theorem exists_zpow_neg_lt {ε : ℝ} (hε : 0 < ε) : ∃ n : ℕ, (ℓ : ℝ) ^ (-(n : ℤ)) < ε := by
   have h1 : (1 : ℝ) < ℓ := by exact_mod_cast hℓ.out.one_lt
@@ -34,8 +34,10 @@ theorem exists_zpow_neg_lt {ε : ℝ} (hε : 0 < ε) : ∃ n : ℕ, (ℓ : ℝ) 
 theorem continuous_toZModPow (n : ℕ) : Continuous (PadicInt.toZModPow (p := ℓ) n) :=
   _root_.UpperTheory.Reformulated.B.Yde3.continuous_toZModPow n
 
-theorem continuous_of_continuous_toZModPow {X : Type*} [TopologicalSpace X] {f : X → ℤ_[ℓ]}
-    (h : ∀ n, Continuous fun x => PadicInt.toZModPow n (f x)) : Continuous f := by
+theorem continuous_of_continuous_toZModPow
+    {X : Type*} [TopologicalSpace X]
+    {f : X → ℤ_[ℓ]} (h : ∀ n, Continuous fun x => PadicInt.toZModPow n (f x))
+    : Continuous f := by
   refine continuous_iff_continuousAt.2 fun x => Metric.tendsto_nhds.2 fun ε hε => ?_
   obtain ⟨n, hn⟩ := exists_zpow_neg_lt (ℓ := ℓ) hε
   have hU : IsOpen {y | PadicInt.toZModPow n (f y) = PadicInt.toZModPow n (f x)} :=
@@ -43,7 +45,6 @@ theorem continuous_of_continuous_toZModPow {X : Type*} [TopologicalSpace X] {f :
   filter_upwards [hU.mem_nhds rfl] with y hy
   rw [dist_eq_norm]
   exact (norm_sub_le_of_toZModPow_eq hy).trans_lt hn
-
 
 variable (ℓ) in
 theorem continuous_toPadicInt : Continuous (toPadicInt ℓ) :=
@@ -55,48 +56,56 @@ end Padic
 
 section CRT
 
-theorem equivPi_apply {n : ℕ} (hn : n ≠ 0) (z : ZMod n) (p : n.primeFactors) :
-    ZMod.equivPi n hn z p = ZMod.castHom (Nat.ordProj_dvd n p) _ z :=
-  RingHom.congr_fun (Subsingleton.elim
-    ((Pi.evalRingHom (fun p : n.primeFactors => ZMod ((p : ℕ) ^ n.factorization p)) p).comp
-      (ZMod.equivPi n hn).toRingHom) (ZMod.castHom (Nat.ordProj_dvd n p) _)) z
+theorem equivPi_apply {n : ℕ} (hn : n ≠ 0) (z : ZMod n) (p : n.primeFactors)
+    : ZMod.equivPi n hn z p = ZMod.castHom (Nat.ordProj_dvd n p) _ z :=
+  RingHom.congr_fun
+    (Subsingleton.elim
+      ((Pi.evalRingHom (fun p : n.primeFactors => ZMod ((p : ℕ) ^ n.factorization p)) p).comp
+        (ZMod.equivPi n hn).toRingHom)
+      (ZMod.castHom (Nat.ordProj_dvd n p) _))
+    z
 
-theorem eq_of_castHom_ordProj_eq {n : ℕ} (hn : n ≠ 0) {a b : ZMod n}
+theorem eq_of_castHom_ordProj_eq
+    {n : ℕ} (hn : n ≠ 0)
+    {a b : ZMod n}
     (h : ∀ p ∈ n.primeFactors,
-      ZMod.castHom (Nat.ordProj_dvd n p) (ZMod (p ^ n.factorization p)) a =
-        ZMod.castHom (Nat.ordProj_dvd n p) _ b) : a = b :=
+      ZMod.castHom (Nat.ordProj_dvd n p) (ZMod (p ^ n.factorization p)) a
+        = ZMod.castHom (Nat.ordProj_dvd n p) _ b)
+    : a = b :=
   (ZMod.equivPi n hn).injective (funext fun p => by rw [equivPi_apply, equivPi_apply, h p p.2])
 
-theorem castHom_castHom {k m n : ℕ} (h₁ : k ∣ m) (h₂ : m ∣ n) (h₃ : k ∣ n) (z : ZMod n) :
-    ZMod.castHom h₁ (ZMod k) (ZMod.castHom h₂ (ZMod m) z) = ZMod.castHom h₃ (ZMod k) z :=
-  RingHom.congr_fun (Subsingleton.elim ((ZMod.castHom h₁ (ZMod k)).comp (ZMod.castHom h₂ (ZMod m)))
-    (ZMod.castHom h₃ (ZMod k))) z
+theorem castHom_castHom {k m n : ℕ} (h₁ : k ∣ m) (h₂ : m ∣ n) (h₃ : k ∣ n) (z : ZMod n)
+    : ZMod.castHom h₁ (ZMod k) (ZMod.castHom h₂ (ZMod m) z) = ZMod.castHom h₃ (ZMod k) z :=
+  RingHom.congr_fun
+    (Subsingleton.elim ((ZMod.castHom h₁ (ZMod k)).comp (ZMod.castHom h₂ (ZMod m)))
+      (ZMod.castHom h₃ (ZMod k)))
+    z
 
 end CRT
 
 section Product
 
-noncomputable def padicReduceHom (n : ℕ) :
-    (∀ q : Nat.Primes, ℤ_[q]) →+* ∀ p : n.primeFactors, ZMod ((p : ℕ) ^ n.factorization p) :=
-  RingHom.pi fun p => (@PadicInt.toZModPow (p : ℕ) ⟨Nat.prime_of_mem_primeFactors p.2⟩
-    (n.factorization p)).comp
+noncomputable def padicReduceHom (n : ℕ)
+    : (∀ q : Nat.Primes, ℤ_[q]) →+* ∀ p : n.primeFactors, ZMod ((p : ℕ) ^ n.factorization p) :=
+  RingHom.pi fun p =>
+    (@PadicInt.toZModPow (p : ℕ) ⟨Nat.prime_of_mem_primeFactors p.2⟩ (n.factorization p)).comp
       (Pi.evalRingHom (fun q : Nat.Primes => ℤ_[q]) ⟨p, Nat.prime_of_mem_primeFactors p.2⟩)
 
 noncomputable def ofPadicsFamily (x : ∀ q : Nat.Primes, ℤ_[q]) (n : ℕ+) : ZMod n :=
   (ZMod.equivPi (n : ℕ) n.ne_zero).symm (padicReduceHom n x)
 
-theorem castHom_ofPadicsFamily (x : ∀ q : Nat.Primes, ℤ_[q]) (n : ℕ+) {p : ℕ}
-    (hp : p ∈ (n : ℕ).primeFactors) :
-    ZMod.castHom (Nat.ordProj_dvd n p) _ (ofPadicsFamily x n) =
-      @PadicInt.toZModPow p ⟨Nat.prime_of_mem_primeFactors hp⟩
-        ((n : ℕ).factorization p) (x ⟨p, Nat.prime_of_mem_primeFactors hp⟩) := by
+theorem castHom_ofPadicsFamily
+    (x : ∀ q : Nat.Primes, ℤ_[q]) (n : ℕ+) {p : ℕ} (hp : p ∈ (n : ℕ).primeFactors)
+    : ZMod.castHom (Nat.ordProj_dvd n p) _ (ofPadicsFamily x n)
+      = @PadicInt.toZModPow p ⟨Nat.prime_of_mem_primeFactors hp⟩ ((n : ℕ).factorization p)
+        (x ⟨p, Nat.prime_of_mem_primeFactors hp⟩) := by
   have := equivPi_apply n.ne_zero (ofPadicsFamily x n) ⟨p, hp⟩
   rw [ofPadicsFamily, RingEquiv.apply_symm_apply] at this
   rw [ofPadicsFamily, ← this]
   rfl
 
-theorem ofPadicsFamily_mem (x : ∀ q : Nat.Primes, ℤ_[q]) :
-    ofPadicsFamily x ∈ profiniteIntegers := by
+theorem ofPadicsFamily_mem (x : ∀ q : Nat.Primes, ℤ_[q])
+    : ofPadicsFamily x ∈ profiniteIntegers := by
   rw [mem_profiniteIntegers]
   intro m n h
   refine eq_of_castHom_ordProj_eq m.ne_zero fun p hp => ?_
@@ -111,18 +120,18 @@ theorem ofPadicsFamily_mem (x : ∀ q : Nat.Primes, ℤ_[q]) :
 
 noncomputable def ofPadics : (∀ q : Nat.Primes, ℤ_[q]) →+* ℤ̂ :=
   RingHom.codRestrict
-    (RingHom.pi fun n : ℕ+ => (ZMod.equivPi (n : ℕ) n.ne_zero).symm.toRingHom.comp
-      (padicReduceHom n)) profiniteIntegers ofPadicsFamily_mem
+    (RingHom.pi fun n : ℕ+ =>
+      (ZMod.equivPi (n : ℕ) n.ne_zero).symm.toRingHom.comp (padicReduceHom n))
+    profiniteIntegers ofPadicsFamily_mem
 
-theorem proj_ofPadics (x : ∀ q : Nat.Primes, ℤ_[q]) (n : ℕ+) :
-    ProfiniteInteger.proj n (ofPadics x) = ofPadicsFamily x n :=
+theorem proj_ofPadics (x : ∀ q : Nat.Primes, ℤ_[q]) (n : ℕ+)
+    : ProfiniteInteger.proj n (ofPadics x) = ofPadicsFamily x n :=
   rfl
 
-noncomputable def toPadics : ℤ̂ →+* ∀ q : Nat.Primes, ℤ_[q] :=
-  RingHom.pi fun q => toPadicInt q
+noncomputable def toPadics : ℤ̂ →+* ∀ q : Nat.Primes, ℤ_[q] := RingHom.pi fun q => toPadicInt q
 
-@[simp] theorem toPadics_apply (x : ℤ̂) (q : Nat.Primes) : toPadics x q = toPadicInt q x :=
-  rfl
+@[simp]
+theorem toPadics_apply (x : ℤ̂) (q : Nat.Primes) : toPadics x q = toPadicInt q x := rfl
 
 theorem toPadics_ofPadics (x : ∀ q : Nat.Primes, ℤ_[q]) : toPadics (ofPadics x) = x := by
   funext q
@@ -155,29 +164,26 @@ noncomputable def padicEquiv : ℤ̂ ≃+* ∀ q : Nat.Primes, ℤ_[q] :=
   RingEquiv.ofRingHom toPadics ofPadics (RingHom.ext toPadics_ofPadics)
     (RingHom.ext ofPadics_toPadics)
 
-@[simp] theorem padicEquiv_apply (x : ℤ̂) : padicEquiv x = toPadics x := rfl
+@[simp]
+theorem padicEquiv_apply (x : ℤ̂) : padicEquiv x = toPadics x := rfl
 
-theorem continuous_toPadics : Continuous toPadics :=
-  continuous_pi fun q => continuous_toPadicInt q
+theorem continuous_toPadics : Continuous toPadics := continuous_pi fun q => continuous_toPadicInt q
 
 noncomputable def padicHomeomorph : ℤ̂ ≃ₜ ∀ q : Nat.Primes, ℤ_[q] :=
   Continuous.homeoOfEquivCompactToT2 (f := padicEquiv.toEquiv) continuous_toPadics
 
-theorem continuous_ofPadics : Continuous ofPadics :=
-  padicHomeomorph.symm.continuous
+theorem continuous_ofPadics : Continuous ofPadics := padicHomeomorph.symm.continuous
 
-theorem toPadics_injective : Function.Injective toPadics :=
-  padicEquiv.injective
+theorem toPadics_injective : Function.Injective toPadics := padicEquiv.injective
 
-theorem ext_toPadicInt {x y : ℤ̂} (h : ∀ q : Nat.Primes, toPadicInt q x = toPadicInt q y) :
-    x = y :=
+theorem ext_toPadicInt {x y : ℤ̂} (h : ∀ q : Nat.Primes, toPadicInt q x = toPadicInt q y) : x = y :=
   toPadics_injective (funext h)
 
 noncomputable def unitsPadicEquiv : ℤ̂ˣ ≃* ∀ q : Nat.Primes, ℤ_[q]ˣ :=
   (Units.mapEquiv padicEquiv.toMulEquiv).trans MulEquiv.piUnits
 
-theorem unitsPadicEquiv_apply (u : ℤ̂ˣ) (q : Nat.Primes) :
-    unitsPadicEquiv u q = Units.map (toPadicInt q).toMonoidHom u :=
+theorem unitsPadicEquiv_apply (u : ℤ̂ˣ) (q : Nat.Primes)
+    : unitsPadicEquiv u q = Units.map (toPadicInt q).toMonoidHom u :=
   Units.ext rfl
 
 end Product

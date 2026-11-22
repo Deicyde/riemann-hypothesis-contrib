@@ -12,7 +12,8 @@ set_option linter.all false
 noncomputable section
 
 open NumberField Matrix
-open GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.UnitaryBC GroundTheory.Global GroundTheory.Global.IdeleGroup GroundTheory.Automorphic
+open GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.UnitaryBC
+  GroundTheory.Global GroundTheory.Global.IdeleGroup GroundTheory.Automorphic
   GroundTheory.Automorphic.Reduction
 open PositivityTheory.Rg.BcB PositivityTheory.Rg.Rs.JInitBnd
 
@@ -43,9 +44,11 @@ theorem eq_zero_of_nat_mul_le {a C : ℝ} (h : ∀ m : ℕ, (m : ℝ) * |a| ≤ 
   rw [div_mul_cancel₀ _ hpos.ne'] at h2
   linarith
 
-theorem lAbs_maxCompact {k : GA E n} (hk : k ∈ maxCompact (K := E) (n := n)) : logAbs k.val.det = 0 := by
-  obtain ⟨C, hC⟩ := (isCompact_maxCompact (K := E) (n := n)).exists_bound_of_continuousOn
-    (DiscreteGroups.T1.G.continuous_logAbs_det (E := E) (n := n)).continuousOn
+theorem lAbs_maxCompact {k : GA E n} (hk : k ∈ maxCompact (K := E) (n := n))
+    : logAbs k.val.det = 0 := by
+  obtain ⟨C, hC⟩ :=
+    (isCompact_maxCompact (K := E) (n := n)).exists_bound_of_continuousOn
+      (DiscreteGroups.T1.G.continuous_logAbs_det (E := E) (n := n)).continuousOn
   refine eq_zero_of_nat_mul_le (C := C) fun m => ?_
   have h := hC (k ^ m) (pow_mem hk m)
   rw [Real.norm_eq_abs, lAbs_pow, abs_mul, Nat.abs_cast] at h

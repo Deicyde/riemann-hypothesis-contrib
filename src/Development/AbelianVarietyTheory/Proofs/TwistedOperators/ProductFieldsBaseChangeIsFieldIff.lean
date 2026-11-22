@@ -11,8 +11,8 @@ open scoped TensorProduct
 
 namespace GlobalTheory.RegSS
 
-theorem isField_pi_fin_iff {k : ℕ} (A : Fin k → Type) [∀ i, CommRing (A i)]
-    [∀ i, Nontrivial (A i)] : IsField (∀ i, A i) ↔ k = 1 ∧ ∀ i, IsField (A i) := by
+theorem isField_pi_fin_iff {k : ℕ} (A : Fin k → Type) [∀ i, CommRing (A i)] [∀ i, Nontrivial (A i)]
+    : IsField (∀ i, A i) ↔ k = 1 ∧ ∀ i, IsField (A i) := by
   constructor
   · intro h
 

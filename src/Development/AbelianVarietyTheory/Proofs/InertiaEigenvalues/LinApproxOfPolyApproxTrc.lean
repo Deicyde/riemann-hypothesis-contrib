@@ -10,8 +10,10 @@ open Formalism.MainNotions.N GlobalTheory.Cong GlobalTheory.PsChar
 
 namespace GlobalTheory.Cong
 
-theorem linApprox_of_polyApprox_trc : ∀ (k Γ : Type) [NormedField k] [IsUltrametricDist k] [Group Γ] (a : ℕ)
-    (r : Γ →* GL (Fin a) k) (C : Set (Γ →* GL (Fin a) k)), PolyApprox (trc r) (trc '' C) → LinApprox r C := by
+theorem linApprox_of_polyApprox_trc
+    : ∀ (k Γ : Type) [NormedField k] [IsUltrametricDist k] [Group Γ] (a : ℕ) (r : Γ →* GL (Fin a) k)
+        (C : Set (Γ →* GL (Fin a) k)),
+      PolyApprox (trc r) (trc '' C) → LinApprox r C := by
   intro k Γ _ _ _ a r C h ε hε
   classical
   obtain ⟨s, c, hs, hP⟩ := h ε hε

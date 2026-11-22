@@ -14,8 +14,11 @@ private lemma sum_swap {A : Type} (s : Finset A) (a : A → ℂ) (g : A → ℂ 
   | cons b R ih =>
     simp only [Multiset.map_cons, Multiset.sum_cons, ih, mul_add, Finset.sum_add_distrib]
 
-theorem UpperTheory.Gal.LocalSmoothExtension.groupTop_of :
-    GlobalTheory.RootSumWeights.MarkWeightedFixedPointEqDefinitePairOdd → GlobalTheory.LKDef.TraceDefinitePairsEqAutomorphicTrace → RootW → InvRoots → InvPolProps → MarkRoots → DPairPol → DSumCongr → TestOf → TestOne → GroupTop := by
+theorem UpperTheory.Gal.LocalSmoothExtension.groupTop_of
+    : GlobalTheory.RootSumWeights.MarkWeightedFixedPointEqDefinitePairOdd
+      → GlobalTheory.LKDef.TraceDefinitePairsEqAutomorphicTrace → RootW → InvRoots → InvPolProps
+      → MarkRoots → DPairPol → DSumCongr → TestOf → TestOne
+      → GroupTop := by
   classical
   intro hW hT hR hInv hProps hMark hDP hDS hTest hOne p _ D G L lam i₀ h hh
   have hcj : NumberField.ComplexEmbedding.conjugate (D.tau i₀) ≠ D.tau i₀ := fun e =>
@@ -29,9 +32,12 @@ theorem UpperTheory.Gal.LocalSmoothExtension.groupTop_of :
   have hTf := hTest _ _ f hf
   have hO := hOne p G
   rw [hW p G hga hodd v hv _ Lv f hTf.1 hG.reg (Kp G) (oneP G) hO.1 hG.pairs]
-  have key : ∀ P : GlobalTheory.LKDef.DPair G,
-      GlobalTheory.RootSumWeights.rootSum G v (fun P μ => c.sum fun α r => r * cW L i₀ v α y P μ) P.pol =
-        (fun P => schW lam (endPol L P)) P.pol * ∑ i, y ^ h i := by
+  have key
+      : ∀ P : GlobalTheory.LKDef.DPair G,
+        GlobalTheory.RootSumWeights.rootSum G v
+            (fun P μ => c.sum fun α r => r * cW L i₀ v α y P μ)
+            P.pol
+          = (fun P => schW lam (endPol L P)) P.pol * ∑ i, y ^ h i := by
     intro P
     obtain ⟨h0, q, hq⟩ := hDP p G P v
     have hroots := hMark p D G L ha i₀ v hv hInv P.pol h0
@@ -44,14 +50,14 @@ theorem UpperTheory.Gal.LocalSmoothExtension.groupTop_of :
       rw [d1, Polynomial.natDegree_map]
       exact P.reg.1
     have hsep : (endPol L P.pol).Separable := d3 (P.reg.2.map)
-    have habs : ∃ q : ℝ, ∀ z ∈ UpperTheory.Gal.W2.rts (endPol L P.pol) (D.tau i₀),
-        z * (starRingEnd ℂ) z = q := by
+    have habs
+        : ∃ q : ℝ, ∀ z ∈ UpperTheory.Gal.W2.rts (endPol L P.pol) (D.tau i₀),
+          z * (starRingEnd ℂ) z = q := by
       refine ⟨q⁻¹, fun z hz => ?_⟩
       rw [← hroots, Multiset.mem_map] at hz
       obtain ⟨μ, hμ, rfl⟩ := hz
       have hm := hq μ hμ
-      have hq' : ((q⁻¹ : ℝ) : ℂ) = (μ * (starRingEnd ℂ) μ)⁻¹ := by
-        rw [hm]; push_cast; rfl
+      have hq' : ((q⁻¹ : ℝ) : ℂ) = (μ * (starRingEnd ℂ) μ)⁻¹ := by rw [hm]; push_cast; rfl
       rw [hq']
       unfold markOf
       split_ifs
@@ -66,5 +72,9 @@ theorem UpperTheory.Gal.LocalSmoothExtension.groupTop_of :
     refine Finset.sum_congr rfl fun α _ => ?_
     rw [← hroots, Multiset.map_map]
     rfl
-  rw [hDS p G _ (fun P => schW lam (endPol L P)) (∑ i, y ^ h i) key Lv.K.toSubgroup f 1 (Kp G) (oneP G)]
-  rw [hT p G hga V ξ (fun P => schW lam (endPol L P)) hξ Lv f hTf.1 hTf.2 (Kp G) (oneP G) hO.1 hO.2 hG.forms]
+  rw [hDS p G _
+    (fun P => schW lam (endPol L P))
+    (∑ i, y ^ h i) key Lv.K.toSubgroup f 1 (Kp G) (oneP G)]
+  rw [hT p G hga V ξ
+    (fun P => schW lam (endPol L P))
+    hξ Lv f hTf.1 hTf.2 (Kp G) (oneP G) hO.1 hO.2 hG.forms]

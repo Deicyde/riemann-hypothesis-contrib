@@ -40,7 +40,8 @@ def frobR (r : ℕ) : Kn p K r →+* Kn p K r where
   map_zero' := Subtype.ext (by simp)
   map_add' x y := Subtype.ext (by simp)
 
-def intR (r : ℕ) : Subring (Kn p K r) := (Obar p).toSubring.comap (algebraMap (Kn p K r) (PadicAlgCl p))
+def intR (r : ℕ) : Subring (Kn p K r) :=
+  (Obar p).toSubring.comap (algebraMap (Kn p K r) (PadicAlgCl p))
 
 def intK : Subring K := (Obar p).toSubring.comap (algebraMap K (PadicAlgCl p))
 
@@ -50,7 +51,6 @@ def sig (n r : ℕ) : GL (Fin n) (Kn p K r) →* GL (Fin n) (Kn p K r) :=
 def Kint (n r : ℕ) : Subgroup (GL (Fin n) (Kn p K r)) :=
   (GeneralLinearGroup.map (intR p K r).subtype).range
 
-def KintK (n : ℕ) : Subgroup (GL (Fin n) K) :=
-  (GeneralLinearGroup.map (intK p K).subtype).range
+def KintK (n : ℕ) : Subgroup (GL (Fin n) K) := (GeneralLinearGroup.map (intK p K).subtype).range
 
 end GlobalTheory.LKLoc

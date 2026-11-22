@@ -27,12 +27,14 @@ theorem sigA_extends (g : Per.Gq l) : Extends (Per.σA g) (sigA g) := by
 theorem phiA_sigA (g : Per.Gq l) (x : Per.Acris l) : phiA l (sigA g x) = sigA g (phiA l x) := by
   rw [phiA_eq, sigA_eq]; exact frob_gal g x
 
-theorem φB_phiA (l : ℕ) [Fact l.Prime] (x : Per.Acris l) :
-    Per.φB l (algebraMap (Per.Acris l) (Per.Bcris l) x) = algebraMap (Per.Acris l) (Per.Bcris l) (phiA l x) := by
+theorem φB_phiA (l : ℕ) [Fact l.Prime] (x : Per.Acris l)
+    : Per.φB l (algebraMap (Per.Acris l) (Per.Bcris l) x)
+      = algebraMap (Per.Acris l) (Per.Bcris l) (phiA l x) := by
   rw [phiA_eq]; exact φB_algebraMap l x
 
-theorem σB_sigA (g : Per.Gq l) (x : Per.Acris l) :
-    Per.σB g (algebraMap (Per.Acris l) (Per.Bcris l) x) = algebraMap (Per.Acris l) (Per.Bcris l) (sigA g x) := by
+theorem σB_sigA (g : Per.Gq l) (x : Per.Acris l)
+    : Per.σB g (algebraMap (Per.Acris l) (Per.Bcris l) x)
+      = algebraMap (Per.Acris l) (Per.Bcris l) (sigA g x) := by
   rw [sigA_eq]; exact σB_algebraMap g x
 
 end GlobalTheory.CrisMaps

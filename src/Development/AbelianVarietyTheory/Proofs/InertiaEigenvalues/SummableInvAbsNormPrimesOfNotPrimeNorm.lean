@@ -36,37 +36,37 @@ private lemma exists_prime_liesOver_absNorm_eq_pow (K : Type) [Field K] [NumberF
       ⟨by rw [Int.span_natAbs, Ideal.span_singleton_generator]⟩
     exact ⟨_, (Ideal.absNorm_eq_pow_inertiaDeg P.asIdeal hpr).trans (by rw [Int.natAbs_natCast])⟩
 
-
 open NumberField IsDedekindDomain in
 open scoped Classical in
-theorem _root_.GlobalTheory.summable_inv_absNorm_of_not_prime :
-    ∀ (K : Type) [Field K] [NumberField K],
-      Summable fun P : {P : HeightOneSpectrum (𝓞 K) // ¬ (Ideal.absNorm P.asIdeal).Prime} =>
+theorem _root_.GlobalTheory.summable_inv_absNorm_of_not_prime
+    : ∀ (K : Type) [Field K] [NumberField K],
+      Summable fun P : {P : HeightOneSpectrum (𝓞 K) // ¬(Ideal.absNorm P.asIdeal).Prime} =>
         ((Ideal.absNorm P.1.asIdeal : ℕ) : ℝ)⁻¹ := by
   intro K _ _
   choose q hq hlies f hf using exists_prime_liesOver_absNorm_eq_pow K
   set d := Module.finrank ℚ K
-  have hfib : ∀ (T : Finset {P : HeightOneSpectrum (𝓞 K) // ¬ (Ideal.absNorm P.asIdeal).Prime})
-      (r : ℕ), (T.filter fun P => q P.1 = r).card ≤ d := by
+  have hfib
+      : ∀ (T : Finset {P : HeightOneSpectrum (𝓞 K) // ¬(Ideal.absNorm P.asIdeal).Prime}) (r : ℕ),
+        (T.filter fun P => q P.1 = r).card ≤ d := by
     intro T r
     by_cases hr : ∃ P ∈ T, q P.1 = r
     · obtain ⟨P₀, -, rfl⟩ := hr
-      have hspan : Ideal.span {((q P₀.1 : ℕ) : ℤ)} ≠ ⊥ := by
-        simpa using (hq P₀.1).ne_zero
+      have hspan : Ideal.span {((q P₀.1 : ℕ) : ℤ)} ≠ ⊥ := by simpa using (hq P₀.1).ne_zero
       haveI hsp : (Ideal.span {((q P₀.1 : ℕ) : ℤ)}).IsPrime :=
         (Ideal.span_singleton_prime (by simpa using (hq P₀.1).ne_zero)).mpr
           (Nat.prime_iff_prime_int.mp (hq P₀.1))
       haveI : (Ideal.span {((q P₀.1 : ℕ) : ℤ)}).IsMaximal := hsp.isMaximal hspan
-      calc (T.filter fun P => q P.1 = q P₀.1).card
-          ≤ (IsDedekindDomain.primesOverFinset (Ideal.span {((q P₀.1 : ℕ) : ℤ)}) (𝓞 K)).card := by
-            refine Finset.card_le_card_of_injOn (fun P => P.1.asIdeal) ?_ ?_
-            · intro P hP
-              rw [Finset.mem_coe, IsDedekindDomain.mem_primesOverFinset_iff hspan]
-              have hPq := (Finset.mem_filter.mp hP).2
-              haveI := hlies P.1
-              exact ⟨P.1.isPrime, by rw [← hPq]; infer_instance⟩
-            · intro P _ P' _ h
-              exact Subtype.ext (HeightOneSpectrum.ext h)
+      calc
+        (T.filter fun P => q P.1 = q P₀.1).card
+            ≤ (IsDedekindDomain.primesOverFinset (Ideal.span {((q P₀.1 : ℕ) : ℤ)}) (𝓞 K)).card := by
+          refine Finset.card_le_card_of_injOn (fun P => P.1.asIdeal) ?_ ?_
+          · intro P hP
+            rw [Finset.mem_coe, IsDedekindDomain.mem_primesOverFinset_iff hspan]
+            have hPq := (Finset.mem_filter.mp hP).2
+            haveI := hlies P.1
+            exact ⟨P.1.isPrime, by rw [← hPq]; infer_instance⟩
+          · intro P _ P' _ h
+            exact Subtype.ext (HeightOneSpectrum.ext h)
         _ ≤ d := Ideal.card_primesOverFinset_le_finrank (𝓞 K) ℚ K hspan
     · push_neg at hr
       rw [Finset.card_eq_zero.mpr (Finset.filter_eq_empty_iff.mpr hr)]
@@ -87,22 +87,23 @@ theorem _root_.GlobalTheory.summable_inv_absNorm_of_not_prime :
     apply inv_anti₀ (by have := (hq P.1).pos; positivity)
     rw [hf P.1]
     exact_mod_cast Nat.pow_le_pow_right (hq P.1).pos hf2
-  calc ∑ P ∈ T, ((Ideal.absNorm P.1.asIdeal : ℕ) : ℝ)⁻¹
+  calc
+    ∑ P ∈ T, ((Ideal.absNorm P.1.asIdeal : ℕ) : ℝ)⁻¹
       ≤ ∑ P ∈ T, 1 / ((q P.1 : ℕ) : ℝ) ^ 2 := Finset.sum_le_sum hle
     _ = ∑ r ∈ T.image (fun P => q P.1), ∑ P ∈ T with q P.1 = r, 1 / ((q P.1 : ℕ) : ℝ) ^ 2 :=
-        (Finset.sum_fiberwise_of_maps_to (fun P hP => Finset.mem_image_of_mem _ hP) _).symm
+      (Finset.sum_fiberwise_of_maps_to (fun P hP => Finset.mem_image_of_mem _ hP) _).symm
     _ = ∑ r ∈ T.image (fun P => q P.1),
           ((T.filter fun P => q P.1 = r).card : ℝ) * (1 / (r : ℝ) ^ 2) := by
-        refine Finset.sum_congr rfl fun r _ => ?_
-        rw [Finset.sum_congr rfl (fun P hP => by rw [(Finset.mem_filter.mp hP).2]), Finset.sum_const,
-          nsmul_eq_mul]
+      refine Finset.sum_congr rfl fun r _ => ?_
+      rw [Finset.sum_congr rfl (fun P hP => by rw [(Finset.mem_filter.mp hP).2]), Finset.sum_const,
+        nsmul_eq_mul]
     _ ≤ ∑ r ∈ T.image (fun P => q P.1), (d : ℝ) * (1 / (r : ℝ) ^ 2) := by
-        refine Finset.sum_le_sum fun r _ => ?_
-        gcongr
-        exact_mod_cast hfib T r
+      refine Finset.sum_le_sum fun r _ => ?_
+      gcongr
+      exact_mod_cast hfib T r
     _ = d * ∑ r ∈ T.image (fun P => q P.1), 1 / (r : ℝ) ^ 2 := by rw [Finset.mul_sum]
     _ ≤ d * ∑' n : ℕ, 1 / (n : ℝ) ^ 2 := by
-        gcongr
-        exact hsum.sum_le_tsum _ (fun n _ => by positivity)
+      gcongr
+      exact hsum.sum_le_tsum _ (fun n _ => by positivity)
 
 end GlobalTheory

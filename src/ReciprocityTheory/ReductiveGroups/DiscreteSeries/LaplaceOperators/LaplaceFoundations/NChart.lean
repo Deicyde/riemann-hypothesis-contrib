@@ -13,7 +13,12 @@ open Matrix Formalism.QuantumDeterminants
 open scoped Matrix.Norms.Operator
 
 def levB (k r : ℕ) (a : Fin (2 * r + k + 1)) : ℕ :=
-  if a.val < r then a.val else if a.val ≤ r + k then r else a.val - k
+  if a.val < r then
+    a.val
+  else if a.val ≤ r + k then
+    r
+  else
+    a.val - k
 
 def flipB (k r : ℕ) (a : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) :=
   if a.val < r ∨ r + k < a.val then ⟨2 * r + k - a.val, by omega⟩ else a
@@ -27,8 +32,8 @@ theorem levB_le (a : Fin (2 * r + k + 1)) : levB k r a ≤ 2 * r := by
   unfold levB
   split_ifs <;> omega
 
-theorem flipB_val (a : Fin (2 * r + k + 1)) :
-    (flipB k r a).val = if a.val < r ∨ r + k < a.val then 2 * r + k - a.val else a.val := by
+theorem flipB_val (a : Fin (2 * r + k + 1))
+    : (flipB k r a).val = if a.val < r ∨ r + k < a.val then 2 * r + k - a.val else a.val := by
   unfold flipB
   split_ifs <;> rfl
 
@@ -38,8 +43,8 @@ theorem flipB_flipB (a : Fin (2 * r + k + 1)) : flipB k r (flipB k r a) = a := b
   rw [flipB_val, flipB_val]
   split_ifs <;> omega
 
-theorem Hpk_apply (i j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if j = flipB k r i then sgnB k r i else 0 := by
+theorem Hpk_apply (i j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if j = flipB k r i then sgnB k r i else 0 := by
   have hi := i.isLt
   have hj := j.isLt
   simp only [Hpk, sgnB, Fin.ext_iff, flipB_val]
@@ -50,12 +55,12 @@ theorem sgnB_flip (a : Fin (2 * r + k + 1)) : sgnB k r (flipB k r a) = sgnB k r 
   simp only [sgnB, flipB_val]
   split_ifs <;> first | rfl | omega
 
-theorem Hpk_mul_apply (X : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i j) :
-    (Hpk k r * X) i j = sgnB k r i * X (flipB k r i) j := by
+theorem Hpk_mul_apply (X : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i j)
+    : (Hpk k r * X) i j = sgnB k r i * X (flipB k r i) j := by
   simp [Matrix.mul_apply, Hpk_apply, ite_mul]
 
-theorem mul_Hpk_apply (X : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i j) :
-    (X * Hpk k r) i j = X i (flipB k r j) * sgnB k r j := by
+theorem mul_Hpk_apply (X : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i j)
+    : (X * Hpk k r) i j = X i (flipB k r j) * sgnB k r j := by
   have h : ∀ l, (j = flipB k r l) ↔ (l = flipB k r j) := fun l =>
     ⟨fun h => by rw [h, flipB_flipB], fun h => by rw [h, flipB_flipB]⟩
   simp [Matrix.mul_apply, Hpk_apply, h, mul_ite, sgnB_flip]
@@ -129,9 +134,14 @@ theorem Nset_eq : Nset k r = grpN (levF (levB k r)) (adjH (Hpk k r)) := by
   · rintro ⟨hU, he, hm⟩
     refine ⟨?_, hU⟩
 
-    have hf : ∀ (j : Fin (2 * r + k + 1)) (a : ℕ) (ha : a < r), j.val + a ≤ 2 * r + k →
-        g ⟨2 * r + k - a, by omega⟩ j = if (⟨2 * r + k - a, by omega⟩ : Fin (2 * r + k + 1)) = j
-          then 1 else 0 := by
+    have hf
+        : ∀ (j : Fin (2 * r + k + 1)) (a : ℕ) (ha : a < r),
+          j.val + a ≤ 2 * r + k
+            → g ⟨2 * r + k - a, by omega⟩ j
+              = if (⟨2 * r + k - a, by omega⟩ : Fin (2 * r + k + 1)) = j then
+                  1
+                else
+                  0 := by
       intro j a
       induction a using Nat.strong_induction_on with
       | _ a ih =>
@@ -151,7 +161,10 @@ theorem Nset_eq : Nset k r = grpN (levF (levB k r)) (adjH (Hpk k r)) := by
           · have e1 : flipB k r c = ⟨2 * r + k - c.val, by omega⟩ :=
               Fin.ext (by rw [flipB_val, if_pos (Or.inl (by omega))])
             rw [Hpk_mul_apply, e1, ih c.val hca (by omega) (by omega), if_neg, mul_zero, mul_zero]
-            intro h; have := congrArg Fin.val h; simp only at this; omega
+            intro h
+            have := congrArg Fin.val h
+            simp only at this
+            omega
           · rw [he ⟨a, ha⟩ c (by simp only; omega), if_neg hc, star_zero, zero_mul]
         · simp
     intro a b h
@@ -176,36 +189,45 @@ theorem Nset_eq : Nset k r = grpN (levF (levB k r)) (adjH (Hpk k r)) := by
       rwa [Matrix.sub_apply, sub_eq_zero, Matrix.one_apply] at this
     refine ⟨hU, fun a i h => key _ _ ?_, fun i j h1 h2 h3 => key _ _ ?_⟩
     · have := a.isLt
-      unfold levB eI; simp only; split_ifs <;> omega
+      unfold levB eI
+      simp only
+      split_ifs <;> omega
     · unfold levB; split_ifs <;> omega
 
-theorem lieOf_Nset_eq : Formalism.MainNotions.S.lieOf (Nset k r) =
-    (lieN (levF (levB k r)) (adjH (Hpk k r)) : Set _) := by
+theorem lieOf_Nset_eq
+    : Formalism.MainNotions.S.lieOf (Nset k r)
+      = (lieN (levF (levB k r)) (adjH (Hpk k r)) : Set _) := by
   ext Y
   rw [Nset_eq]
   constructor
   · intro h
     have hd := hasDerivAt_exp_smul_const (𝕂 := ℝ) Y 0
     rw [zero_smul, NormedSpace.exp_zero, one_mul] at hd
-    have h' : ∀ t : ℝ, NormedSpace.exp (t • Y) ∈ grpN (levF (levB k r)) (adjH (Hpk k r)) :=
-      fun t => by have := h t; rw [Complex.coe_smul] at this; exact this
+    have h'
+        : ∀ t : ℝ, NormedSpace.exp (t • Y) ∈ grpN (levF (levB k r)) (adjH (Hpk k r)) := fun t => by
+      have := h t; rw [Complex.coe_smul] at this; exact this
     refine mem_lieN.mpr ⟨?_, ?_⟩
     · have h2 := hasDerivAt_iff_tendsto_slope_zero.mp hd
       refine (levF (levB k r) 0).closed_of_finiteDimensional.mem_of_tendsto h2
         (Filter.Eventually.of_forall fun t => (levF (levB k r) 0).smul_mem _ ?_)
       simp only [zero_add, zero_smul, NormedSpace.exp_zero]
       exact (h' t).1
-    · have h3 := ((LinearMap.toContinuousLinearMap (adjH (Hpk k r))).hasFDerivAt.comp_hasDerivAt
-        (0 : ℝ) hd).mul hd
-      have h4 : HasDerivAt (fun _ : ℝ => (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))
-          0 0 := hasDerivAt_const _ _
-      have h5 := h4.unique (h3.congr_of_eventuallyEq
-        (Filter.Eventually.of_forall fun t => ((h' t).2).symm))
+    · have h3 :=
+        ((LinearMap.toContinuousLinearMap (adjH (Hpk k r))).hasFDerivAt.comp_hasDerivAt (0 : ℝ)
+          hd).mul hd
+      have h4 : HasDerivAt
+          (fun _ : ℝ => (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))
+          0 0 :=
+        hasDerivAt_const _ _
+      have h5 :=
+        h4.unique (h3.congr_of_eventuallyEq (Filter.Eventually.of_forall fun t => ((h' t).2).symm))
       simp only [Function.comp, zero_smul, NormedSpace.exp_zero, mul_one,
-        LinearMap.coe_toContinuousLinearMap', isAdjB.one, one_mul] at h5
+          LinearMap.coe_toContinuousLinearMap', isAdjB.one, one_mul]
+        at h5
       exact eq_neg_of_add_eq_zero_left h5.symm
   · intro h t
     have := exp_mem_grpN isFilB isAdjB ((lieN _ _).smul_mem t h)
-    rw [Complex.coe_smul]; exact this
+    rw [Complex.coe_smul]
+    exact this
 
 end ReciprocityTheory.ChartRestriction.DS.Lap.Base

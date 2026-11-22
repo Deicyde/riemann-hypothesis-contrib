@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SupportOutFi
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.SimpleFixedVectors
 
@@ -25,7 +26,8 @@ private theorem mem_Mg (N : Subgroup G) (g m : G) : m ∈ Mg N g ↔ m ∈ N ∧
 
 private def dc (N : Subgroup G) (g : G) : Set G := {y | ∃ a ∈ N, ∃ b ∈ N, y = a * g * b}
 
-private theorem dc_left (N : Subgroup G) (g : G) {k : G} (hk : k ∈ N) (x : G) : k * x ∈ dc N g ↔ x ∈ dc N g := by
+private theorem dc_left (N : Subgroup G) (g : G) {k : G} (hk : k ∈ N) (x : G)
+    : k * x ∈ dc N g ↔ x ∈ dc N g := by
   constructor
   · rintro ⟨a, ha, b, hb, e⟩
     refine ⟨k⁻¹ * a, N.mul_mem (N.inv_mem hk) ha, b, hb, ?_⟩
@@ -35,7 +37,8 @@ private theorem dc_left (N : Subgroup G) (g : G) {k : G} (hk : k ∈ N) (x : G) 
   · rintro ⟨a, ha, b, hb, rfl⟩
     exact ⟨k * a, N.mul_mem hk ha, b, hb, by simp only [mul_assoc]⟩
 
-private theorem dc_right (N : Subgroup G) (g : G) {k : G} (hk : k ∈ N) (x : G) : x * k ∈ dc N g ↔ x ∈ dc N g := by
+private theorem dc_right (N : Subgroup G) (g : G) {k : G} (hk : k ∈ N) (x : G)
+    : x * k ∈ dc N g ↔ x ∈ dc N g := by
   constructor
   · rintro ⟨a, ha, b, hb, e⟩
     refine ⟨a, ha, b * k⁻¹, N.mul_mem hb (N.inv_mem hk), ?_⟩
@@ -46,15 +49,16 @@ private theorem dc_right (N : Subgroup G) (g : G) {k : G} (hk : k ∈ N) (x : G)
 
 variable [TopologicalSpace G] [IsTopologicalGroup G]
 
-private theorem isOpen_Mg (N : Subgroup G) (hNo : IsOpen (N : Set G)) (g : G) : IsOpen (Mg N g : Set G) := by
+private theorem isOpen_Mg (N : Subgroup G) (hNo : IsOpen (N : Set G)) (g : G)
+    : IsOpen (Mg N g : Set G) := by
   have e : (Mg N g : Set G) = (N : Set G) ∩ (fun m => g⁻¹ * m * g) ⁻¹' (N : Set G) := by
     ext m
     simp [mem_Mg]
   rw [e]
   exact hNo.inter (hNo.preimage (by fun_prop))
 
-private theorem hecke_dc (N : Subgroup G) (hNc : IsCompact (N : Set G)) (g : G) :
-    IsHecke N ((dc N g).indicator 1) := by
+private theorem hecke_dc (N : Subgroup G) (hNc : IsCompact (N : Set G)) (g : G)
+    : IsHecke N ((dc N g).indicator 1) := by
   refine ⟨?_, ?_⟩
   · have hc : IsCompact (dc N g) := by
       have e : dc N g = (fun p : G × G => p.1 * g * p.2) '' ((N : Set G) ×ˢ (N : Set G)) := by
@@ -72,26 +76,32 @@ private theorem hecke_dc (N : Subgroup G) (hNc : IsCompact (N : Set G)) (g : G) 
     · by_cases h : x ∈ dc N g
       · rw [Set.indicator_of_mem h, Set.indicator_of_mem ((dc_left N g hk x).2 h)]
         rfl
-      · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem fun h' => h ((dc_left N g hk x).1 h')]
+      · rw [Set.indicator_of_notMem h,
+          Set.indicator_of_notMem fun h' => h ((dc_left N g hk x).1 h')]
     · by_cases h : x ∈ dc N g
       · rw [Set.indicator_of_mem h, Set.indicator_of_mem ((dc_right N g hk x).2 h)]
         rfl
-      · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem fun h' => h ((dc_right N g hk x).1 h')]
+      · rw [Set.indicator_of_notMem h,
+          Set.indicator_of_notMem fun h' => h ((dc_right N g hk x).1 h')]
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-private theorem fixed_Mg (ρ : Representation ℂ G V) (N : Subgroup G) (g : G) (x : V) (hx : x ∈ fixed ρ N) :
-    ρ g x ∈ fixed ρ (Mg N g) := by
+private theorem fixed_Mg
+    (ρ : Representation ℂ G V) (N : Subgroup G) (g : G) (x : V) (hx : x ∈ fixed ρ N)
+    : ρ g x ∈ fixed ρ (Mg N g) := by
   rw [mem_fixed_iff] at hx ⊢
   intro m hm
   have h := hx _ ((mem_Mg N g m).1 hm).2
   have e : m * g = g * (g⁻¹ * m * g) := by group
   rw [← Module.End.mul_apply, ← map_mul, e, map_mul, Module.End.mul_apply, h]
 
-private theorem lv_dc (ρ : Representation ℂ G V) (N : Subgroup G) (hNo : IsOpen (N : Set G))
-    (hNc : IsCompact (N : Set G)) (g : G) (x : V) (hx : x ∈ fixed ρ N) :
-    levOp ρ N N ((dc N g).indicator 1) LinearMap.id x =
-      ∑ᶠ j : N ⧸ (Mg N g).subgroupOf N, ρ (j.out : G) (ρ g x) := by
+private theorem lv_dc
+    (ρ : Representation ℂ G V)
+    (N : Subgroup G) (hNo : IsOpen (N : Set G)) (hNc : IsCompact (N : Set G))
+    (g : G)
+    (x : V) (hx : x ∈ fixed ρ N)
+    : levOp ρ N N ((dc N g).indicator 1) LinearMap.id x
+      = ∑ᶠ j : N ⧸ (Mg N g).subgroupOf N, ρ (j.out : G) (ρ g x) := by
   have hH := hecke_dc N hNc g
   have hs := finite_supp N hNo _ hH.1
   have hx' := (mem_fixed_iff ρ N x).1 hx
@@ -109,7 +119,8 @@ private theorem lv_dc (ρ : Representation ℂ G V) (N : Subgroup G) (hNo : IsOp
     rw [← QuotientGroup.out_eq' a, ← QuotientGroup.out_eq' b]
     refine QuotientGroup.eq.2 (Subgroup.mem_subgroupOf.2 ((mem_Mg N g _).2 ⟨?_, ?_⟩))
     · exact N.mul_mem (N.inv_mem (a.out).2) (b.out).2
-    · have e : g⁻¹ * (((a.out⁻¹ * b.out : N)) : G) * g = ((a.out : G) * g)⁻¹ * ((b.out : G) * g) := by
+    · have e
+          : g⁻¹ * (((a.out⁻¹ * b.out : N)) : G) * g = ((a.out : G) * g)⁻¹ * ((b.out : G) * g) := by
         simp [mul_assoc]
       rw [e]
       exact h1
@@ -128,15 +139,16 @@ private theorem lv_dc (ρ : Representation ℂ G V) (N : Subgroup G) (hNo : IsOp
     show QuotientGroup.mk (((QuotientGroup.mk (⟨a, ha⟩ : N) : N ⧸ (Mg N g).subgroupOf N).out : G) * g) = q
     rw [hm, ← QuotientGroup.out_eq' q, e]
     refine QuotientGroup.eq.2 ?_
-    have e2 : ((((⟨a, ha⟩ : N) * (m : N) : N) : G) * g)⁻¹ * (a * g * b) =
-        (g⁻¹ * ((m : N) : G) * g)⁻¹ * b := by
+    have e2
+        : ((((⟨a, ha⟩ : N) * (m : N) : N) : G) * g)⁻¹ * (a * g * b)
+          = (g⁻¹ * ((m : N) : G) * g)⁻¹ * b := by
       simp [mul_assoc]
     rw [e2]
     exact N.mul_mem (N.inv_mem hm'.2) hb
   change ∑ᶠ q : G ⧸ N, F q.out = _
   have hR : ∑ᶠ q ∈ Set.range Φ, F (Quotient.out q) = ∑ᶠ q : G ⧸ N, F (Quotient.out q) := by
-    rw [← finsum_mem_inter_support (fun q : G ⧸ N => F (Quotient.out q)) (Set.range Φ), Set.inter_eq_right.2 hsup,
-      finsum_mem_support]
+    rw [← finsum_mem_inter_support (fun q : G ⧸ N => F (Quotient.out q)) (Set.range Φ),
+      Set.inter_eq_right.2 hsup, finsum_mem_support]
   rw [← hR, finsum_mem_range hinj]
   refine finsum_congr fun j => ?_
   have h1 : F (Φ j).out = F ((j.out : G) * g) := out_eq_of_inv N F (fun y h hh => hFr y h hh) _
@@ -144,15 +156,22 @@ private theorem lv_dc (ρ : Representation ℂ G V) (N : Subgroup G) (hNo : IsOp
   have hmem : (j.out : G) * g ∈ dc N g := ⟨j.out, (j.out).2, 1, N.one_mem, by simp⟩
   simp [hF, hf, Set.indicator_of_mem hmem, map_mul, Module.End.mul_apply]
 
-private theorem avg_dc (ρ : Representation ℂ G V) (N : Subgroup G) (hNo : IsOpen (N : Set G))
-    (hNc : IsCompact (N : Set G)) (g : G) (x : V) (hx : x ∈ fixed ρ N) [Finite (N ⧸ (Mg N g).subgroupOf N)] :
-    avgOp ρ N (Mg N g) (ρ g x) =
-      (((Mg N g).relIndex N : ℕ) : ℂ)⁻¹ • levOp ρ N N ((dc N g).indicator 1) LinearMap.id x := by
+private theorem avg_dc
+    (ρ : Representation ℂ G V)
+    (N : Subgroup G) (hNo : IsOpen (N : Set G)) (hNc : IsCompact (N : Set G))
+    (g : G)
+    (x : V) (hx : x ∈ fixed ρ N)
+    [Finite (N ⧸ (Mg N g).subgroupOf N)]
+    : avgOp ρ N (Mg N g) (ρ g x)
+      = (((Mg N g).relIndex N : ℕ) : ℂ)⁻¹ • levOp ρ N N ((dc N g).indicator 1) LinearMap.id x := by
   rw [avgOp_apply, lv_dc ρ N hNo hNc g x hx]
 
-private theorem avg_level (ρ : Representation ℂ G V) (N M M' : Subgroup G) (hNo : IsOpen (N : Set G))
-    (hNc : IsCompact (N : Set G)) (hMo : IsOpen (M : Set G)) (hM'o : IsOpen (M' : Set G)) (hMN : M ≤ N)
-    (hle : M' ≤ M) (v : V) (hv : v ∈ fixed ρ M) : avgOp ρ N M' v = avgOp ρ N M v := by
+private theorem avg_level
+    (ρ : Representation ℂ G V)
+    (N M M' : Subgroup G) (hNo : IsOpen (N : Set G)) (hNc : IsCompact (N : Set G))
+    (hMo : IsOpen (M : Set G)) (hM'o : IsOpen (M' : Set G)) (hMN : M ≤ N) (hle : M' ≤ M)
+    (v : V) (hv : v ∈ fixed ρ M)
+    : avgOp ρ N M' v = avgOp ρ N M v := by
   haveI h1 := finite_quot N N M' hNc hNo hM'o le_rfl
   haveI h2 := finite_quot N N M hNc hNo hMo le_rfl
   haveI h3 := finite_quot N M M' hNc hMo hM'o hMN
@@ -166,17 +185,21 @@ private theorem avg_level (ρ : Representation ℂ G V) (N M M' : Subgroup G) (h
   have e2 := levOp_le ρ N M M' hle hMN hMo hM'o _ hHM v hvM'
   rw [avgOp_fix ρ M M' v hv] at e2
   have e3 := levOp_le ρ N N M hMN le_rfl hNo hMo _ hH v hv
-  have back : ∀ y ∈ fixed ρ N, y = (((Mg N 1).relIndex N : ℕ) : ℂ)⁻¹ •
-      levOp ρ N N ((dc N 1).indicator 1) LinearMap.id y := by
+  have back
+      : ∀ y ∈ fixed ρ N,
+        y = (((Mg N 1).relIndex N : ℕ) : ℂ)⁻¹
+          • levOp ρ N N ((dc N 1).indicator 1) LinearMap.id y := by
     intro y hy
     rw [← avg_dc ρ N hNo hNc 1 y hy, map_one, Module.End.one_apply, avgOp_fix ρ N _ y hy]
   rw [back _ (avgOp_mem ρ N M' v hvM'), back _ (avgOp_mem ρ N M v hv), ← e1, e2, e3]
 
-private theorem core (ρ : Representation ℂ G V) (N : Subgroup G) (hNo : IsOpen (N : Set G))
-    (hNc : IsCompact (N : Set G))
+private theorem core
+    (ρ : Representation ℂ G V)
+    (N : Subgroup G) (hNo : IsOpen (N : Set G)) (hNc : IsCompact (N : Set G))
     (hirr : ∀ W : Submodule ℂ V, (∀ g x, x ∈ W → ρ g x ∈ W) → W = ⊥ ∨ W = ⊤)
-    (W : Submodule ℂ V) (hW : W ≤ fixed ρ N)
-    (hst : ∀ f, IsHecke N f → ∀ x ∈ W, levOp ρ N N f LinearMap.id x ∈ W) : W = ⊥ ∨ W = fixed ρ N := by
+    (W : Submodule ℂ V)
+    (hW : W ≤ fixed ρ N) (hst : ∀ f, IsHecke N f → ∀ x ∈ W, levOp ρ N N f LinearMap.id x ∈ W)
+    : W = ⊥ ∨ W = fixed ρ N := by
   by_cases hb : W = ⊥
   · exact Or.inl hb
   refine Or.inr (le_antisymm hW ?_)
@@ -201,10 +224,14 @@ private theorem core (ρ : Representation ℂ G V) (N : Subgroup G) (hNo : IsOpe
     rcases hirr O hinv with h | h
     · exact absurd (by simpa [h] using hxO) hx0
     · exact h
-  have hp : ∀ v ∈ O, ∃ M : Subgroup G, IsOpen (M : Set G) ∧ M ≤ N ∧ v ∈ fixed ρ M ∧ avgOp ρ N M v ∈ W := by
+  have hp
+      : ∀ v ∈ O, ∃ M : Subgroup G,
+        IsOpen (M : Set G) ∧ M ≤ N ∧ v ∈ fixed ρ M ∧ avgOp ρ N M v ∈ W := by
     intro v hv
-    refine Submodule.span_induction (p := fun v _ => ∃ M : Subgroup G, IsOpen (M : Set G) ∧ M ≤ N ∧
-      v ∈ fixed ρ M ∧ avgOp ρ N M v ∈ W) ?_ ?_ ?_ ?_ hv
+    refine Submodule.span_induction
+      (p := fun v _ =>
+        ∃ M : Subgroup G, IsOpen (M : Set G) ∧ M ≤ N ∧ v ∈ fixed ρ M ∧ avgOp ρ N M v ∈ W)
+      ?_ ?_ ?_ ?_ hv
     · rintro _ ⟨g, rfl⟩
       haveI := finite_quot N N (Mg N g) hNc hNo (isOpen_Mg N hNo g) le_rfl
       refine ⟨Mg N g, isOpen_Mg N hNo g, inf_le_left, fixed_Mg ρ N g x hxN, ?_⟩
@@ -214,12 +241,18 @@ private theorem core (ρ : Representation ℂ G V) (N : Subgroup G) (hNo : IsOpe
     · exact ⟨N, hNo, le_rfl, (fixed ρ N).zero_mem, by simp⟩
     · rintro a b _ _ ⟨M₁, ho₁, hl₁, hf₁, hw₁⟩ ⟨M₂, ho₂, hl₂, hf₂, hw₂⟩
       have ho : IsOpen ((M₁ ⊓ M₂ : Subgroup G) : Set G) := ho₁.inter ho₂
-      have hm : ∀ (M : Subgroup G) (y : V), M₁ ⊓ M₂ ≤ M → y ∈ fixed ρ M → y ∈ fixed ρ (M₁ ⊓ M₂) := by
+      have hm
+          : ∀ (M : Subgroup G) (y : V), M₁ ⊓ M₂ ≤ M → y ∈ fixed ρ M → y ∈ fixed ρ (M₁ ⊓ M₂) := by
         intro M y hle hy
         rw [mem_fixed_iff] at hy ⊢
         exact fun h hh => hy h (hle hh)
-      refine ⟨M₁ ⊓ M₂, ho, inf_le_left.trans hl₁,
-        (fixed ρ _).add_mem (hm _ _ inf_le_left hf₁) (hm _ _ inf_le_right hf₂), ?_⟩
+      refine ⟨
+        M₁ ⊓ M₂,
+        ho,
+        inf_le_left.trans hl₁,
+        (fixed ρ _).add_mem (hm _ _ inf_le_left hf₁) (hm _ _ inf_le_right hf₂),
+        ?_
+      ⟩
       rw [map_add (f := _), avg_level ρ N M₁ _ hNo hNc ho₁ ho hl₁ inf_le_left a hf₁,
         avg_level ρ N M₂ _ hNo hNc ho₂ ho hl₂ inf_le_right b hf₂]
       exact W.add_mem hw₁ hw₂
@@ -236,12 +269,14 @@ end
 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.SimpleFixedVectors
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.simpleFix_pf :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.CvOp → SimpleFix := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.simpleFix_pf
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.CvOp → SimpleFix := by
   intro _ E _ _ _ n w τ N hNo hNle
   have hKc := (UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.unitHecke E n 0 0 w).2.2.2.1
   have hNc : IsCompact (N : Set (GlobalTheory.BCT.GLw n w)) :=
     hKc.of_isClosed_subset (Subgroup.isClosed_of_isOpen N hNo) hNle
   obtain ⟨-, hirr⟩ := (GlobalTheory.CuspRep.isIrreducible_iff τ.ρ).1 τ.irred
-  refine ⟨fun f hf x hx => GlobalTheory.TraceLevel.levOp_mem_fixed τ.ρ N N N f hf hNo le_rfl x hx, ?_⟩
-  exact fun W hW hst => UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.SimpleFixedVectors.core τ.ρ N hNo hNc hirr W hW hst
+  refine
+    ⟨fun f hf x hx => GlobalTheory.TraceLevel.levOp_mem_fixed τ.ρ N N N f hf hNo le_rfl x hx, ?_⟩
+  exact fun W hW hst =>
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.SimpleFixedVectors.core τ.ρ N hNo hNc hirr W hW hst

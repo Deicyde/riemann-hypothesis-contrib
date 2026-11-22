@@ -17,7 +17,8 @@ end T1
 end Formalism.HermitianLattices.OneDimInversion
 
 namespace Formalism.HermitianLattices.RamifiedLatticeOperators
-open Formalism.LogVandermondeBounds.product_first_zeroth_parts Formalism.HermitianLattices.OneDimInversion
+open Formalism.LogVandermondeBounds.product_first_zeroth_parts
+  Formalism.HermitianLattices.OneDimInversion
 
 end Formalism.HermitianLattices.RamifiedLatticeOperators
 
@@ -111,8 +112,9 @@ theorem fubini_over_orbits : Fubini_orbits := by
       exact (hRP p).unique (hrep p) ⟨hr, h⟩
   choose repQ hrepQ using fun y => (hRQ y).exists
 
-  have hinner : ∀ y, ∑ p ∈ fib y, Ψ p =
-      ∑ r ∈ RP, (((fib y).filter (fun p => rep p = r)).card : ℚ) • Ψ r := by
+  have hinner
+      : ∀ y,
+        ∑ p ∈ fib y, Ψ p = ∑ r ∈ RP, (((fib y).filter (fun p => rep p = r)).card : ℚ) • Ψ r := by
     intro y
     rw [← Finset.sum_fiberwise_of_maps_to (g := rep) (t := RP) (fun p _ => (hrep p).1)]
     refine Finset.sum_congr rfl (fun r hr => ?_)
@@ -122,17 +124,20 @@ theorem fubini_over_orbits : Fubini_orbits := by
     obtain ⟨γ, hγ⟩ := (hrep p).2
     rw [← hp.2, ← hγ, hΨ]
 
-  have hweight : ∀ r ∈ RP, ∑ y ∈ RQ, ((Nat.card (MulAction.stabilizer Γ y) : ℚ))⁻¹ *
-      (((fib y).filter (fun p => rep p = r)).card : ℚ) =
-      ((Nat.card (MulAction.stabilizer Γ r) : ℚ))⁻¹ := by
+  have hweight
+      : ∀ r ∈ RP,
+        ∑ y ∈ RQ, ((Nat.card (MulAction.stabilizer Γ y) : ℚ))⁻¹ *
+            (((fib y).filter (fun p => rep p = r)).card : ℚ)
+          = ((Nat.card (MulAction.stabilizer Γ r) : ℚ))⁻¹ := by
     intro r hr
     obtain ⟨hy0, g, hg⟩ := hrepQ (pr r)
     set y0 := repQ (pr r) with hy0def
     rw [Finset.sum_eq_single y0]
     · set s := g • r with hsdef
       have hs : pr s = y0 := by rw [hsdef, hpr]; exact hg
-      have hT : ∀ p, p ∈ (fib y0).filter (fun p => rep p = r) ↔
-          pr p = y0 ∧ p ∈ MulAction.orbit Γ s := by
+      have hT
+          : ∀ p,
+            p ∈ (fib y0).filter (fun p => rep p = r) ↔ pr p = y0 ∧ p ∈ MulAction.orbit Γ s := by
         intro p
         rw [Finset.mem_filter, hfib, hrep_iff p r hr]
         refine and_congr Iff.rfl ?_
@@ -149,12 +154,12 @@ theorem fubini_over_orbits : Fubini_orbits := by
       have hpos : 0 < Nat.card (MulAction.stabilizer Γ y0) := by
         haveI := hfinQ y0
         exact Nat.card_pos
-      have hcq : ((Nat.card (MulAction.stabilizer Γ y0) : ℕ) : ℚ) =
-          (((fib y0).filter (fun p => rep p = r)).card : ℚ) *
-            (Nat.card (MulAction.stabilizer Γ r) : ℚ) := by
+      have hcq
+          : ((Nat.card (MulAction.stabilizer Γ y0) : ℕ) : ℚ)
+            = (((fib y0).filter (fun p => rep p = r)).card : ℚ)
+              * (Nat.card (MulAction.stabilizer Γ r) : ℚ) := by
         rw [← hc]; push_cast; ring
-      have hne : ((Nat.card (MulAction.stabilizer Γ y0) : ℕ) : ℚ) ≠ 0 := by
-        exact_mod_cast hpos.ne'
+      have hne : ((Nat.card (MulAction.stabilizer Γ y0) : ℕ) : ℚ) ≠ 0 := by exact_mod_cast hpos.ne'
       rw [hcq] at hne ⊢
       have h1 : (((fib y0).filter (fun p => rep p = r)).card : ℚ) ≠ 0 := left_ne_zero_of_mul hne
       have h2 : (Nat.card (MulAction.stabilizer Γ r) : ℚ) ≠ 0 := right_ne_zero_of_mul hne
@@ -191,10 +196,13 @@ theorem count_of_orbits : Count_orbits := by
       one_smul := fun x => Subtype.ext (Prod.ext (one_smul Γ x.1.1) (one_smul Γ x.1.2))
       mul_smul := fun a b x => Subtype.ext (Prod.ext (mul_smul a b x.1.1) (mul_smul a b x.1.2)) }
   let fibA : A → Finset {x : A × B // x.2 ∈ up x.1} := fun a =>
-    (up a).attach.map ⟨fun b => ⟨(a, b.1), b.2⟩, fun b b' h => Subtype.ext (congrArg (fun x => x.1.2) h)⟩
+    (up a).attach.map
+      ⟨fun b => ⟨(a, b.1), b.2⟩, fun b b' h => Subtype.ext (congrArg (fun x => x.1.2) h)⟩
   let fibB : B → Finset {x : A × B // x.2 ∈ up x.1} := fun b =>
-    (down b).attach.map ⟨fun a => ⟨(a.1, b), (hud a.1 b).2 a.2⟩,
-      fun a a' h => Subtype.ext (congrArg (fun x => x.1.1) h)⟩
+    (down b).attach.map ⟨
+      fun a => ⟨(a.1, b), (hud a.1 b).2 a.2⟩,
+      fun a a' h => Subtype.ext (congrArg (fun x => x.1.1) h)
+    ⟩
   have hfibA : ∀ p a, p ∈ fibA a ↔ p.1.1 = a := by
     intro p a
     constructor
@@ -214,14 +222,26 @@ theorem count_of_orbits : Count_orbits := by
       refine Finset.mem_map.2 ⟨⟨p.1.1, (hud _ _).1 (h ▸ p.2)⟩, Finset.mem_attach _ _, ?_⟩
       exact Subtype.ext (Prod.ext rfl h.symm)
   let Ψ : {x : A × B // x.2 ∈ up x.1} → V := fun x => G x.1.1 x.1.2
-  have hΨ : ∀ (γ : Γ) (x : {x : A × B // x.2 ∈ up x.1}), Ψ (γ • x) = Ψ x :=
-    fun γ x => hG γ x.1.1 x.1.2 x.2
-  obtain ⟨RP, hRP⟩ := exists_reps (Γ := Γ) (fun x : {x : A × B // x.2 ∈ up x.1} => x.1.1) fibA
-    (fun _ _ => rfl) hfibA RA hRA
-  have h1 := fubini_over_orbits Γ {x : A × B // x.2 ∈ up x.1} A V (fun x => x.1.1) fibA Ψ RP RA
-    (fun _ _ => rfl) hfibA hΨ hfA hRP hRA
-  have h2 := fubini_over_orbits Γ {x : A × B // x.2 ∈ up x.1} B V (fun x => x.1.2) fibB Ψ RP RB
-    (fun _ _ => rfl) hfibB hΨ hfB hRP hRB
+  have hΨ : ∀ (γ : Γ) (x : {x : A × B // x.2 ∈ up x.1}), Ψ (γ • x) = Ψ x := fun γ x =>
+    hG γ x.1.1 x.1.2 x.2
+  obtain ⟨RP, hRP⟩ :=
+    exists_reps (Γ := Γ)
+      (fun x : {x : A × B // x.2 ∈ up x.1} => x.1.1)
+      fibA
+      (fun _ _ => rfl)
+      hfibA RA hRA
+  have h1 :=
+    fubini_over_orbits Γ {x : A × B // x.2 ∈ up x.1} A V
+      (fun x => x.1.1)
+      fibA Ψ RP RA
+      (fun _ _ => rfl)
+      hfibA hΨ hfA hRP hRA
+  have h2 :=
+    fubini_over_orbits Γ {x : A × B // x.2 ∈ up x.1} B V
+      (fun x => x.1.2)
+      fibB Ψ RP RB
+      (fun _ _ => rfl)
+      hfibB hΨ hfB hRP hRB
   have sA : ∀ a, ∑ p ∈ fibA a, Ψ p = ∑ b ∈ up a, G a b := by
     intro a
     rw [Finset.sum_map]

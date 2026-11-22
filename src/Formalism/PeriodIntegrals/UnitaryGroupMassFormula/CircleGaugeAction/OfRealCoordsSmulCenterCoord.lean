@@ -68,8 +68,8 @@ lemma eq_dz_of_lie {X : Mat 0 r} (hX : X ∈ lieOf (UWb 0 r)) : X = dz r (X (cI 
       simp [hi]
     · rfl
 
-theorem lieOf_iff (X : Mat 0 r) :
-    X ∈ lieOf (UWb 0 r) ↔ ∃ s : ℝ, X = dz r ((s : ℂ) * Complex.I) := by
+theorem lieOf_iff (X : Mat 0 r)
+    : X ∈ lieOf (UWb 0 r) ↔ ∃ s : ℝ, X = dz r ((s : ℂ) * Complex.I) := by
   constructor
   · intro hX
     have hX' := eq_dz_of_lie hX

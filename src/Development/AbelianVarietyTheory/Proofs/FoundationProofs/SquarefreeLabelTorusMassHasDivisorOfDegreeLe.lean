@@ -120,22 +120,31 @@ private lemma exists_invariant_finset_card_of_le_cycleType {n : ℕ} (σ : Equiv
       rw [hT' x hx]
       exact Finset.mem_union_right _ hx
 
-
 open Polynomial Classical in
-theorem _root_.GlobalTheory.BadShare.mass_hasDiv_le : ∀ (g : ℕ) [Fact g.Prime], ∀ N a : ℕ, 0 < a → a < N →
-    _root_.GlobalTheory.BadShare.mass g N (_root_.GlobalTheory.BadShare.HasDiv g a) ≤ 7 / 8 := by
+theorem _root_.GlobalTheory.BadShare.mass_hasDiv_le
+    : ∀ (g : ℕ) [Fact g.Prime], ∀ N a : ℕ,
+      0 < a → a < N
+        → _root_.GlobalTheory.BadShare.mass g N (_root_.GlobalTheory.BadShare.HasDiv g a)
+          ≤ 7 / 8 := by
   intro g _ N a ha haN
   have hmono := (_root_.GlobalTheory.BadShare.mass_union_bounds g N).1
-  refine (hmono _ (fun f => (fun μ : Multiset ℕ => ∃ ν ≤ μ, ν.sum = a) (_root_.GlobalTheory.BadShare.degType g f))
+  refine (hmono _
+    (fun f => (fun μ : Multiset ℕ => ∃ ν ≤ μ, ν.sum = a) (_root_.GlobalTheory.BadShare.degType g f))
     (fun f hf hd => exists_le_degType_sum_eq_of_hasDiv hf hd)).trans ?_
-  refine (_root_.GlobalTheory.BadShare.mass_degType_le_cycleType g N (fun μ => ∃ ν ≤ μ, ν.sum = a)).trans ?_
+  refine
+    (_root_.GlobalTheory.BadShare.mass_degType_le_cycleType g N (fun μ => ∃ ν ≤ μ, ν.sum = a)).trans
+      ?_
   have h := _root_.GlobalTheory.StableSubset.card_exists_stable_subset_le N a ha haN
-  have hc := Finset.card_le_card (s := Finset.univ.filter fun σ : Equiv.Perm (Fin N) => ∃ ν ≤ σ.partition.parts, ν.sum = a)
-    (t := Finset.univ.filter fun σ : Equiv.Perm (Fin N) => ∃ A : Finset (Fin N), A.card = a ∧ A.map σ.toEmbedding = A)
-    (fun σ hσ => by
-      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ ⊢
-      obtain ⟨ν, hν, rfl⟩ := hσ
-      exact exists_invariant_finset_card_of_le_cycleType σ ν hν)
+  have hc :=
+    Finset.card_le_card
+      (s := Finset.univ.filter fun σ : Equiv.Perm (Fin N) => ∃ ν ≤ σ.partition.parts, ν.sum = a)
+      (t :=
+        Finset.univ.filter fun σ : Equiv.Perm (Fin N) =>
+          ∃ A : Finset (Fin N), A.card = a ∧ A.map σ.toEmbedding = A)
+      (fun σ hσ => by
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ ⊢
+        obtain ⟨ν, hν, rfl⟩ := hσ
+        exact exists_invariant_finset_card_of_le_cycleType σ ν hν)
   have hf : (0 : ℝ) < N.factorial := by exact_mod_cast N.factorial_pos
   rw [div_le_iff₀ hf]
   have h' := (Nat.cast_le (α := ℝ)).mpr h

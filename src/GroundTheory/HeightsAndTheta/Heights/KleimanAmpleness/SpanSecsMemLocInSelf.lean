@@ -18,13 +18,16 @@ section Local
 
 variable {F : Type} [Field F] {Ω : Type} [Field Ω] [Algebra F Ω]
 
-theorem spanSecs_mem_locIn_self {A : Subalgebra F Ω} {p : Ideal A} [hp : p.IsPrime] {a : Ω} (ha : a ∈ A) :
-    a ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn A p :=
+theorem spanSecs_mem_locIn_self
+    {A : Subalgebra F Ω} {p : Ideal A} [hp : p.IsPrime] {a : Ω} (ha : a ∈ A)
+    : a ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn A p :=
   mem_locIn.mpr ⟨⟨a, ha⟩, 1, one_not_mem_of_prime hp, by simp⟩
 
-theorem spanSecs_mul_step {B : Subalgebra F Ω} {q : Ideal B} [hq : q.IsPrime] {T : Set Ω} {u g : Ω}
-    (hg : g ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn B q) (hu : ∃ b : B, b ∉ q ∧ (b : Ω) * u ∈ Submodule.span B T) :
-    ∃ b : B, b ∉ q ∧ (b : Ω) * (g * u) ∈ Submodule.span B T := by
+theorem spanSecs_mul_step
+    {B : Subalgebra F Ω} {q : Ideal B} [hq : q.IsPrime]
+    {T : Set Ω} {u g : Ω} (hg : g ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn B q)
+    (hu : ∃ b : B, b ∉ q ∧ (b : Ω) * u ∈ Submodule.span B T)
+    : ∃ b : B, b ∉ q ∧ (b : Ω) * (g * u) ∈ Submodule.span B T := by
   obtain ⟨b, hb, hbu⟩ := hu
   obtain ⟨a, b', hb', rfl⟩ := mem_locIn.mp hg
   refine ⟨b' * b, fun h => (hq.mem_or_mem h).elim hb' hb, ?_⟩
@@ -35,9 +38,12 @@ theorem spanSecs_mul_step {B : Subalgebra F Ω} {q : Ideal B} [hq : q.IsPrime] {
   rw [e]
   exact Submodule.smul_mem _ _ hbu
 
-theorem spanSecs_exists_mul_mem (B C : Subalgebra F Ω) (q : Ideal B) [hq : q.IsPrime]
-    (hC : ∀ a ∈ C, a ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn B q) (T : Set Ω) {u : Ω} (hu : u ∈ Submodule.span C T) :
-    ∃ b : B, b ∉ q ∧ (b : Ω) * u ∈ Submodule.span B T := by
+theorem spanSecs_exists_mul_mem
+    (B C : Subalgebra F Ω) (q : Ideal B) [hq : q.IsPrime]
+    (hC : ∀ a ∈ C, a ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn B q)
+    (T : Set Ω)
+    {u : Ω} (hu : u ∈ Submodule.span C T)
+    : ∃ b : B, b ∉ q ∧ (b : Ω) * u ∈ Submodule.span B T := by
   induction hu using Submodule.span_induction with
   | mem z hz => exact ⟨1, one_not_mem_of_prime hq, by simpa using Submodule.subset_span hz⟩
   | zero => exact ⟨1, one_not_mem_of_prime hq, by simp⟩
@@ -54,9 +60,10 @@ theorem spanSecs_exists_mul_mem (B C : Subalgebra F Ω) (q : Ideal B) [hq : q.Is
     rw [Subalgebra.smul_def, smul_eq_mul]
     exact spanSecs_mul_step (hC _ a.2) hz
 
-theorem spanSecs_mem_of_local (B : Subalgebra F Ω) (T : Set Ω) (u : Ω)
-    (h : ∀ q : Ideal B, q.IsMaximal → ∃ b : B, b ∉ q ∧ (b : Ω) * u ∈ Submodule.span B T) :
-    u ∈ Submodule.span B T := by
+theorem spanSecs_mem_of_local
+    (B : Subalgebra F Ω) (T : Set Ω) (u : Ω)
+    (h : ∀ q : Ideal B, q.IsMaximal → ∃ b : B, b ∉ q ∧ (b : Ω) * u ∈ Submodule.span B T)
+    : u ∈ Submodule.span B T := by
   let J : Ideal B := (Submodule.span B T).comap (LinearMap.toSpanSingleton B Ω u)
   have hJ : ∀ b : B, b ∈ J ↔ (b : Ω) * u ∈ Submodule.span B T := fun b => Iff.rfl
   by_cases hJt : J = ⊤
@@ -73,8 +80,13 @@ theorem SpanSecs.proof : SpanSecs.Statement := by
   have hxv : ∀ i, x i = y ⟨k₀, e.symm i⟩ := fun i => by rw [hx]; rfl
 
   let B : ι k₀ → Subalgebra F Ω := fun i' =>
-    chartRingOver F (IndefiniteRowSideFullHecke.Kleiman2.oneBlock (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀)) (fun _ => i')
-  have hB : ∀ (i : Fin (N + 1)) (hi : x i ≠ 0), Kleiman.chartRing F x (Kleiman.singleChart hi) = B (e.symm i) := by
+    chartRingOver F
+      (IndefiniteRowSideFullHecke.Kleiman2.oneBlock (IndefiniteRowSideFullHecke.Kleiman2.blockVec y
+        k₀))
+      (fun _ => i')
+  have hB
+      : ∀ (i : Fin (N + 1)) (hi : x i ≠ 0),
+        Kleiman.chartRing F x (Kleiman.singleChart hi) = B (e.symm i) := by
     intro i hi
     rw [← chartRingOver_oneBlock_eq_chartRing (S := F) x (fun _ => i) hi]
     unfold B chartRingOver
@@ -82,9 +94,19 @@ theorem SpanSecs.proof : SpanSecs.Statement := by
     ext z
     constructor
     · rintro ⟨⟨_, l⟩, rfl⟩
-      exact ⟨⟨(), e.symm l⟩, by simp [IndefiniteRowSideFullHecke.Kleiman2.oneBlock, IndefiniteRowSideFullHecke.Kleiman2.blockVec, hxv]⟩
+      exact ⟨
+        ⟨(), e.symm l⟩,
+        by
+          simp [IndefiniteRowSideFullHecke.Kleiman2.oneBlock,
+            IndefiniteRowSideFullHecke.Kleiman2.blockVec, hxv]
+      ⟩
     · rintro ⟨⟨_, l⟩, rfl⟩
-      exact ⟨⟨(), e l⟩, by simp [IndefiniteRowSideFullHecke.Kleiman2.oneBlock, IndefiniteRowSideFullHecke.Kleiman2.blockVec, hxv]⟩
+      exact ⟨
+        ⟨(), e l⟩,
+        by
+          simp [IndefiniteRowSideFullHecke.Kleiman2.oneBlock,
+            IndefiniteRowSideFullHecke.Kleiman2.blockVec, hxv]
+      ⟩
 
   have hBc : ∀ c : ∀ k, ι k, B (c k₀) ≤ chartRingOver F y c := by
     intro c
@@ -95,17 +117,19 @@ theorem SpanSecs.proof : SpanSecs.Statement := by
   · intro hs c hc
     have hi : x (e (c k₀)) ≠ 0 := by rw [hxv, Equiv.symm_apply_apply]; exact hc k₀
     set A := Kleiman.chartRing F x (Kleiman.singleChart hi) with hA
-    have hAc : A ≤ chartRingOver F y c := by
-      rw [hA, hB, Equiv.symm_apply_apply]; exact hBc c
+    have hAc : A ≤ chartRingOver F y c := by rw [hA, hB, Equiv.symm_apply_apply]; exact hBc c
     have hs' := Submodule.mem_iInf _ |>.mp hs (Kleiman.singleChart hi)
     rw [Submodule.restrictScalars_mem,
-      Kleiman.twistMod_eq_span d _ (Finset.mem_singleton_self (e (c k₀)))] at hs'
+        Kleiman.twistMod_eq_span d _ (Finset.mem_singleton_self (e (c k₀)))]
+      at hs'
     have hv : y ⟨k₀, c k₀⟩ = x (e (c k₀)) := by rw [hxv, Equiv.symm_apply_apply]
     rw [hv]
     refine Submodule.mul_induction_on hs' ?_ ?_
     · intro m hm n hn
       obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hn
-      have e1 : m * (a • x (e (c k₀)) ^ d) * x (e (c k₀)) ^ (-d) = (⟨a, hAc a.2⟩ : chartRingOver F y c) • m := by
+      have e1
+          : m * (a • x (e (c k₀)) ^ d) * x (e (c k₀)) ^ (-d)
+            = (⟨a, hAc a.2⟩ : chartRingOver F y c) • m := by
         rw [Subalgebra.smul_def, Subalgebra.smul_def, smul_eq_mul, smul_eq_mul, zpow_neg]
         field_simp
       rw [e1]
@@ -122,7 +146,8 @@ theorem SpanSecs.proof : SpanSecs.Statement := by
     have hle : Kleiman.chartRing F x (Kleiman.singleChart hi) ≤ Kleiman.chartRing F x I :=
       Kleiman.chartRing_mono (Finset.singleton_subset_iff.mpr hiI)
 
-    suffices key : s * x i ^ (-d) ∈ Submodule.span (Kleiman.chartRing F x (Kleiman.singleChart hi)) T by
+    suffices key
+        : s * x i ^ (-d) ∈ Submodule.span (Kleiman.chartRing F x (Kleiman.singleChart hi)) T by
       have e1 : s = s * x i ^ (-d) * x i ^ d := by
         rw [zpow_neg, mul_assoc, inv_mul_cancel₀ (zpow_ne_zero d hi), mul_one]
       rw [e1]
@@ -132,13 +157,18 @@ theorem SpanSecs.proof : SpanSecs.Statement := by
     refine spanSecs_mem_of_local _ T _ fun q hq => ?_
     have := hq.isPrime
 
-    have hz : IndefiniteRowSideFullHecke.Kleiman2.locIn (B (e.symm i)) q ∈
-        IndefiniteRowSideFullHecke.Kleiman2.modelPts F (IndefiniteRowSideFullHecke.Kleiman2.oneBlock (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀)) :=
+    have hz
+        : IndefiniteRowSideFullHecke.Kleiman2.locIn (B (e.symm i)) q
+          ∈ IndefiniteRowSideFullHecke.Kleiman2.modelPts F
+            (IndefiniteRowSideFullHecke.Kleiman2.oneBlock
+              (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀)) :=
       ⟨fun _ => e.symm i, fun _ => hxi', q, hq.isPrime, rfl⟩
     rw [← hmod.2] at hz
     obtain ⟨c, hc, p, hp, hzp⟩ := hz
     have := hp
-    have hCz : ∀ a ∈ chartRingOver F y c, a ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn (B (e.symm i)) q := by
+    have hCz
+        : ∀ a ∈ chartRingOver F y c,
+          a ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn (B (e.symm i)) q := by
       intro a ha
       rw [hzp]
       exact spanSecs_mem_locIn_self ha

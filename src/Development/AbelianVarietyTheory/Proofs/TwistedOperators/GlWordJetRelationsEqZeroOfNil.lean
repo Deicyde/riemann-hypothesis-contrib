@@ -7,22 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.GlWordJet
 
 @[expose] public section
 
-open Matrix MeasureTheory Filter Topology Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.SphJet
+open Matrix MeasureTheory Filter Topology Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.SphJet
 open scoped InnerProductSpace ComplexOrder Matrix.Norms.L2Operator
 
 namespace GlobalTheory.SphJet
 
 section
 
-variable {V W : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [NormedAddCommGroup W]
-  [InnerProductSpace ℂ W] {n : ℕ} {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {Λ : Fin n → ℝ}
-  {u : V} {j : W →ₗᵢ[ℂ] V}
+variable
+  {V W : Type}
+  [NormedAddCommGroup V] [InnerProductSpace ℂ V] [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+  {n : ℕ}
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ V} {Λ : Fin n → ℝ} {u : V} {j : W →ₗᵢ[ℂ] V}
 
 theorem LowData.mem_kSpan (hL : LowData ε E Λ u j) (x : W) : j x ∈ Formalism.REAL.kSpan ε E u := by
   rw [← hL.2.2.2.2]; exact ⟨x, rfl⟩
 
-theorem LowData.exists_of_mem (hL : LowData ε E Λ u j) {v : V} (hv : v ∈ Formalism.REAL.kSpan ε E u) :
-    ∃ x : W, j x = v := by
+theorem LowData.exists_of_mem (hL : LowData ε E Λ u j) {v : V} (hv : v ∈ Formalism.REAL.kSpan ε E u)
+    : ∃ x : W, j x = v := by
   rw [← hL.2.2.2.2] at hv
   exact hv
 
@@ -31,8 +34,8 @@ theorem LowData.finiteDimensional (hL : LowData ε E Λ u j) : FiniteDimensional
   rw [← hL.2.2.2.2] at h
   exact (LinearEquiv.ofInjective j.toLinearMap j.injective).symm.finiteDimensional
 
-theorem LowData.exists_arr (hL : LowData ε E Λ u j) {k : ℕ} {F : Arr V n k} (hF : F ∈ arrV0 ε E u k) :
-    ∃ G : (Fin k → Fin n × Fin n) → W, arrTo V n k (fun α => j (G α)) = F := by
+theorem LowData.exists_arr (hL : LowData ε E Λ u j) {k : ℕ} {F : Arr V n k} (hF : F ∈ arrV0 ε E u k)
+    : ∃ G : (Fin k → Fin n × Fin n) → W, arrTo V n k (fun α => j (G α)) = F := by
   have h : ∀ α, ∃ x : W, j x = F α := by
     intro α
     have h1 := (mem_admissibleArrays ε E u F).mp hF α
@@ -43,14 +46,17 @@ theorem LowData.exists_arr (hL : LowData ε E Λ u j) {k : ℕ} {F : Arr V n k} 
   choose G hG using h
   exact ⟨G, indexArray_ext fun α => hG α⟩
 
-theorem arrTo_apply_jet {k : ℕ} (f : (Fin k → Fin n × Fin n) → V) (α : Fin k → Fin n × Fin n) :
-    arrTo V n k f α = f α := rfl
+theorem arrTo_apply_jet {k : ℕ} (f : (Fin k → Fin n × Fin n) → V) (α : Fin k → Fin n × Fin n)
+    : arrTo V n k f α = f α :=
+  rfl
 
-theorem riesz_arr_mem_Nset {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ} {m : ℕ} (hL : LowData ε E Λ u j)
-    (hB : JetRel ε E Λ u j B) (h0 : ∀ l : List (Fin n × Fin n), l.length ≤ m → B l = 0) (y : W)
-    (g : (Fin (m + 1) → Fin n × Fin n) → W)
-    (hg : ∀ α x, ⟪g α, x⟫_ℂ = B (List.ofFn α).reverse y x) :
-    arrTo V n (m + 1) (fun α => j (g α)) ∈ Nset ε E Λ u m := by
+theorem riesz_arr_mem_Nset
+    {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ} {m : ℕ}
+    (hL : LowData ε E Λ u j) (hB : JetRel ε E Λ u j B)
+    (h0 : ∀ l : List (Fin n × Fin n), l.length ≤ m → B l = 0)
+    (y : W) (g : (Fin (m + 1) → Fin n × Fin n) → W)
+    (hg : ∀ α x, ⟪g α, x⟫_ℂ = B (List.ofFn α).reverse y x)
+    : arrTo V n (m + 1) (fun α => j (g α)) ∈ Nset ε E Λ u m := by
   obtain ⟨hperm, hcomp⟩ := jetRel_perm_and_compact_vanish V W n ε E Λ u j B m hL hB h0
   have hz : ∀ α : Fin (m + 1) → Fin n × Fin n, (∃ i, ε (α i).1 = ε (α i).2) → g α = 0 := by
     rintro α ⟨i, hi⟩
@@ -65,7 +71,8 @@ theorem riesz_arr_mem_Nset {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →
     split_ifs with h
     · exact hL.mem_kSpan _
     · push Not at h
-      rw [hz α h]; simp
+      rw [hz α h]
+      simp
   refine ⟨⟨hV0, ?_⟩, ?_⟩
   · simp only [symSub, SetLike.mem_coe, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
       Module.End.one_apply, sub_eq_zero]
@@ -77,7 +84,8 @@ theorem riesz_arr_mem_Nset {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →
     apply ext_inner_right ℂ
     intro x
     rw [hg, hg, hperm _ (List.ofFn α).reverse _ (by simp)]
-    exact (List.reverse_perm _).trans ((Equiv.Perm.ofFn_comp_perm σ α).trans (List.reverse_perm _).symm)
+    exact (List.reverse_perm _).trans
+      ((Equiv.Perm.ofFn_comp_perm σ α).trans (List.reverse_perm _).symm)
   · simp only [SetLike.mem_coe, Submodule.mem_iInf, Submodule.mem_comap]
     intro α'
     obtain ⟨horth, hsup⟩ := typesSplit V n ε E Λ u hL.1 hL.2.1 hL.2.2.1 hL.2.2.2.1
@@ -92,7 +100,8 @@ theorem riesz_arr_mem_Nset {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →
       · exact hL.mem_kSpan _
       · push Not at h
         obtain ⟨i, hi⟩ := h
-        rw [hz _ ⟨0, by simpa [Subsingleton.elim i 0] using hi⟩]; simp
+        rw [hz _ ⟨0, by simpa [Subsingleton.elim i 0] using hi⟩]
+        simp
     have hSo : ∀ Q ∈ Vminus ε E Λ u, ⟪S, Q⟫_ℂ = 0 := by
       intro Q hQ
       have hQ0 : Q ∈ arrV0 ε E u 1 := by rw [← hsup]; exact Submodule.mem_sup_right hQ
@@ -115,20 +124,25 @@ theorem riesz_arr_mem_Nset {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →
     rw [← hPQ, h1, add_zero]
     exact hP
 
-theorem riesz_arr_casimir {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ} {m : ℕ} (hL : LowData ε E Λ u j)
-    (hB : JetRel ε E Λ u j B) (y : W) (g : (Fin (m + 1) → Fin n × Fin n) → W)
-    (hg : ∀ α x, ⟪g α, x⟫_ℂ = B (List.ofFn α).reverse y x) (F : Arr V n (m + 1))
-    (hF : arrTo V n (m + 1) (fun α => j (g α)) = F) (hN : F ∈ Nset ε E Λ u m) :
-    ⟪F, CasK ε (arrE E (m + 1)) F⟫_ℂ = ((ckv ε Λ : ℝ) : ℂ) * ⟪F, F⟫_ℂ := by
-  have hpair : ∀ G : (Fin (m + 1) → Fin n × Fin n) → W,
-      ⟪F, arrTo V n (m + 1) (fun α => j (G α))⟫_ℂ = ∑ α, B (List.ofFn α).reverse y (G α) := by
+theorem riesz_arr_casimir
+    {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ} {m : ℕ}
+    (hL : LowData ε E Λ u j) (hB : JetRel ε E Λ u j B)
+    (y : W) (g : (Fin (m + 1) → Fin n × Fin n) → W)
+    (hg : ∀ α x, ⟪g α, x⟫_ℂ = B (List.ofFn α).reverse y x)
+    (F : Arr V n (m + 1)) (hF : arrTo V n (m + 1) (fun α => j (g α)) = F) (hN : F ∈ Nset ε E Λ u m)
+    : ⟪F, CasK ε (arrE E (m + 1)) F⟫_ℂ = ((ckv ε Λ : ℝ) : ℂ) * ⟪F, F⟫_ℂ := by
+  have hpair
+      : ∀ G : (Fin (m + 1) → Fin n × Fin n) → W,
+        ⟪F, arrTo V n (m + 1) (fun α => j (G α))⟫_ℂ = ∑ α, B (List.ofFn α).reverse y (G α) := by
     intro G
     rw [indexArray_inner, ← hF]
     simp only [arrTo_apply_jet, LinearIsometry.inner_map_map, hg]
   have hst := compact_span_compact_stable ε E u
-  have hy : ∀ c d : Fin n, ∃ z : W, j z = (if ε c = ε d then E c d (E d c (j y)) else 0) ∧
-      ⟪F, if ε c = ε d then arrE E (m + 1) c d (arrE E (m + 1) d c F) else 0⟫_ℂ =
-        ∑ α, B (List.ofFn α).reverse z (g α) := by
+  have hy
+      : ∀ c d : Fin n, ∃ z : W,
+        j z = (if ε c = ε d then E c d (E d c (j y)) else 0)
+          ∧ ⟪F, if ε c = ε d then arrE E (m + 1) c d (arrE E (m + 1) d c F) else 0⟫_ℂ
+            = ∑ α, B (List.ofFn α).reverse z (g α) := by
     intro c d
     split_ifs with h
     · have h1 := nStable V n ε E Λ u m d c h.symm F hN
@@ -139,28 +153,32 @@ theorem riesz_arr_casimir {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →�
       obtain ⟨y₂, hy₂⟩ := hL.exists_of_mem (hst c d h _ (hL.mem_kSpan y₁))
       refine ⟨y₂, by rw [hy₂, hy₁], ?_⟩
       rw [← hG₂, hpair,
-        GlobalTheory.T.glWordJetRelations_multiplication_equivariant V W n ε E Λ u j B (m + 1) hL hB c d h y y₁ hy₁ G₁ G₂ (by rw [hG₂, hG₁]),
-        GlobalTheory.T.glWordJetRelations_multiplication_equivariant V W n ε E Λ u j B (m + 1) hL hB d c h.symm y₁ y₂ hy₂ g G₁ (by rw [hG₁, hF])]
+        GlobalTheory.T.glWordJetRelations_multiplication_equivariant V W n ε E Λ u j B (m + 1) hL hB
+          c d h y y₁ hy₁ G₁ G₂ (by rw [hG₂, hG₁]),
+        GlobalTheory.T.glWordJetRelations_multiplication_equivariant V W n ε E Λ u j B (m + 1) hL hB
+          d c h.symm y₁ y₂ hy₂ g G₁ (by rw [hG₁, hF])]
     · exact ⟨0, by simp, by simp⟩
   choose z hz hz' using hy
   have hsum : ∑ c, ∑ d, z c d = ((ckv ε Λ : ℝ) : ℂ) • y := by
     apply j.injective
-    rw [map_smul, ← kCasSpan V n ε E Λ u (glRel_kRel ε E hL.1) hL.2.2.1 _ (hL.mem_kSpan y), compactCasimir_apply]
+    rw [map_smul, ← kCasSpan V n ε E Λ u (glRel_kRel ε E hL.1) hL.2.2.1 _ (hL.mem_kSpan y),
+      compactCasimir_apply]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, hz]
-  have hFF : ⟪F, F⟫_ℂ = ∑ α, B (List.ofFn α).reverse y (g α) := by
-    rw [← hpair, hF]
+    simp only [map_sum, hz]
+  have hFF : ⟪F, F⟫_ℂ = ∑ α, B (List.ofFn α).reverse y (g α) := by rw [← hpair, hF]
   rw [compactCasimir_apply, hFF]
   simp only [inner_sum, hz']
   rw [Finset.mul_sum]
-  have hα : ∀ α : Fin (m + 1) → Fin n × Fin n,
-      ((ckv ε Λ : ℝ) : ℂ) * B (List.ofFn α).reverse y (g α) =
-        ∑ c, ∑ d, B (List.ofFn α).reverse (z c d) (g α) := by
+  have hα
+      : ∀ α : Fin (m + 1) → Fin n × Fin n,
+        ((ckv ε Λ : ℝ) : ℂ) * B (List.ofFn α).reverse y (g α)
+          = ∑ c, ∑ d, B (List.ofFn α).reverse (z c d) (g α) := by
     intro α
     have := congrArg (fun w => B (List.ofFn α).reverse w (g α)) hsum
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-      Complex.conj_ofReal] at this
+      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
+          smul_eq_mul, Complex.conj_ofReal]
+        at this
     exact this.symm
   simp only [hα]
   rw [Finset.sum_comm (s := Finset.univ (α := Fin (m + 1) → Fin n × Fin n))]
@@ -169,8 +187,14 @@ theorem riesz_arr_casimir {B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →�
 
 end
 
-theorem jetRel_eq_zero_of_nil :
-    ∀ (V W : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [NormedAddCommGroup W] [InnerProductSpace ℂ W] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ) (u : V) (j : W →ₗᵢ[ℂ] V) (B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ), LowData ε E (LamOf ε lam) u j → (∀ a b : Fin n, a < b → ε a ≠ ε b → 2 * (n : ℝ) + 1 ≤ lam a - lam b) → JetRel ε E (LamOf ε lam) u j B → B [] = 0 → ∀ l, B l = 0 := by
+theorem jetRel_eq_zero_of_nil
+    : ∀ (V W : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [NormedAddCommGroup W]
+        [InnerProductSpace ℂ W] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V)
+        (lam : Fin n → ℝ) (u : V) (j : W →ₗᵢ[ℂ] V) (B : List (Fin n × Fin n) → W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ),
+      LowData ε E (LamOf ε lam) u j
+        → (∀ a b : Fin n, a < b → ε a ≠ ε b → 2 * (n : ℝ) + 1 ≤ lam a - lam b)
+        → JetRel ε E (LamOf ε lam) u j B → B [] = 0
+        → ∀ l, B l = 0 := by
   intro V W _ _ _ _ n ε E lam u j B hL hgap hB hnil
   haveI := hL.finiteDimensional
   haveI : CompleteSpace W := FiniteDimensional.complete ℂ W
@@ -188,20 +212,27 @@ theorem jetRel_eq_zero_of_nil :
       · exact ih l hle
       have hlen : l.reverse.length = m + 1 := by rw [List.length_reverse]; omega
       ext y x
-      have hex : ∀ α : Fin (m + 1) → Fin n × Fin n, ∃ w : W, ∀ x, ⟪w, x⟫_ℂ = B (List.ofFn α).reverse y x :=
-        fun α => ⟨(InnerProductSpace.toDual ℂ W).symm
-          (LinearMap.toContinuousLinearMap (B (List.ofFn α).reverse y)), fun x => by
-            rw [InnerProductSpace.toDual_symm_apply]; rfl⟩
+      have hex
+          : ∀ α : Fin (m + 1) → Fin n × Fin n, ∃ w : W, ∀ x,
+            ⟪w, x⟫_ℂ = B (List.ofFn α).reverse y x := fun α => ⟨
+        (InnerProductSpace.toDual ℂ W).symm
+          (LinearMap.toContinuousLinearMap (B (List.ofFn α).reverse y)),
+        fun x => by rw [InnerProductSpace.toDual_symm_apply]; rfl
+      ⟩
       choose g hg using hex
       have hN := riesz_arr_mem_Nset hL hB ih y g hg
       have hc := riesz_arr_casimir hL hB y g hg _ rfl hN
       have hp := nPos V n ε E lam (2 * (n : ℝ) + 1) u m hL.1 hL.2.1 hL.2.2.1 hL.2.2.2.1 hgap _ hN
       set F := arrTo V n (m + 1) (fun α => j (g α)) with hF
       rw [hc, inner_self_eq_norm_sq_to_K] at hp
-      have hre : (((ckv ε (LamOf ε lam) : ℝ) : ℂ) * ((‖F‖ : ℝ) : ℂ) ^ 2).re = ckv ε (LamOf ε lam) * ‖F‖ ^ 2 := by
+      have hre
+          : (((ckv ε (LamOf ε lam) : ℝ) : ℂ) * ((‖F‖ : ℝ) : ℂ) ^ 2).re
+            = ckv ε (LamOf ε lam) * ‖F‖ ^ 2 := by
         rw [← Complex.ofReal_pow, ← Complex.ofReal_mul, Complex.ofReal_re]
-      have hp' : (ckv ε (LamOf ε lam) + 2 * ((m : ℝ) + 1) * (2 * (n : ℝ) + 1 - 2 * (n : ℝ))) * ‖F‖ ^ 2 ≤
-          ckv ε (LamOf ε lam) * ‖F‖ ^ 2 := hp.trans_eq hre
+      have hp'
+          : (ckv ε (LamOf ε lam) + 2 * ((m : ℝ) + 1) * (2 * (n : ℝ) + 1 - 2 * (n : ℝ))) * ‖F‖ ^ 2
+            ≤ ckv ε (LamOf ε lam) * ‖F‖ ^ 2 :=
+        hp.trans_eq hre
       have hF0 : F = 0 := by
         have hm : (0 : ℝ) ≤ m := Nat.cast_nonneg m
         have : ‖F‖ ^ 2 ≤ 0 := by nlinarith [sq_nonneg ‖F‖, mul_nonneg hm (sq_nonneg ‖F‖)]
@@ -214,10 +245,12 @@ theorem jetRel_eq_zero_of_nil :
       have hgα : g α = 0 := by
         apply j.injective
         have : F α = j (g α) := rfl
-        rw [← this, hF0, map_zero]; rfl
+        rw [← this, hF0, map_zero]
+        rfl
       have := hg α x
       rw [hgα, hα, List.reverse_reverse, inner_zero_left] at this
-      rw [← this]; rfl
+      rw [← this]
+      rfl
   exact fun l => key l.length l le_rfl
 
 end GlobalTheory.SphJet

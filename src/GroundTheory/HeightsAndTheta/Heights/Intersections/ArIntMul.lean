@@ -12,15 +12,18 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2
+open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem arInt_mul (hInt : PtsIntegrableStatement) {P : Ideal (MRing ι)} {n : ℕ}
-    (hP : IsArithVar P (n + 1)) {L : Fin n → HermLine ι} (hL : ∀ j, IsSmoothHerm (L j))
-    {A B : HermLine ι} (hA : IsSmoothHerm A) (hB : IsSmoothHerm B) {s t : MRing ι}
-    (hs : IsSectionOn P A s) (ht : IsSectionOn P B t) :
-    arInt P (s * t) (A.tensor B) L = arInt P s A L + arInt P t B L := by
+theorem arInt_mul
+    (hInt : PtsIntegrableStatement)
+    {P : Ideal (MRing ι)} {n : ℕ} (hP : IsArithVar P (n + 1))
+    {L : Fin n → HermLine ι} (hL : ∀ j, IsSmoothHerm (L j))
+    {A B : HermLine ι} (hA : IsSmoothHerm A) (hB : IsSmoothHerm B)
+    {s t : MRing ι} (hs : IsSectionOn P A s) (ht : IsSectionOn P B t)
+    : arInt P (s * t) (A.tensor B) L = arInt P s A L + arInt P t B L := by
   obtain ⟨a, -, hsa, hsP⟩ := id hs
   obtain ⟨b, -, htb, htP⟩ := id ht
   show ptsIntegral P (pot L) _ = ptsIntegral P (pot L) _ + ptsIntegral P (pot L) _
@@ -28,7 +31,8 @@ theorem arInt_mul (hInt : PtsIntegrableStatement) {P : Ideal (MRing ι)} {n : �
   split_ifs with hΨ
   · have hΨg : IsGoodProj P hΨ.choose := hΨ.choose_spec
     unfold ptsIntegralAt
-    rw [← integral_add (hInt K ι P n _ L A s hP hΨg hL hA hs) (hInt K ι P n _ L B t hP hΨg hL hB ht)]
+    rw [← integral_add (hInt K ι P n _ L A s hP hΨg hL hA hs)
+      (hInt K ι P n _ L B t hP hΨg hL hB ht)]
     refine integral_congr_ae ?_
     filter_upwards [ae_eval_ne_zero hP hΨg ⟨a, hsa⟩ hsP, ae_eval_ne_zero hP hΨg ⟨b, htb⟩ htP]
       with y hys hyt

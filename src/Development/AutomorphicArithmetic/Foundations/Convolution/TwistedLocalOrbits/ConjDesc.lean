@@ -5,11 +5,14 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets PositivityTheory.Rg.Tf.Loc UpperTheory.ConvolutionTheory.Loc
+open MeasureTheory ValuativeRel GlobalTheory.PRep GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets PositivityTheory.Rg.Tf.Loc
+  UpperTheory.ConvolutionTheory.Loc
 
-theorem UpperTheory.ConvolutionTheory.Loc.conjDesc :
-    ∀ (k E : Type) [Field k] [Field E] [Algebra k E] (n : ℕ) (γ γ' : GL (Fin n) k), IsRegSemisimple γ →
-      (∃ h : GL (Fin n) E, incl γ' = h * incl γ * h⁻¹) → ∃ y : GL (Fin n) k, γ' = y * γ * y⁻¹ := by
+theorem UpperTheory.ConvolutionTheory.Loc.conjDesc
+    : ∀ (k E : Type) [Field k] [Field E] [Algebra k E] (n : ℕ) (γ γ' : GL (Fin n) k),
+      IsRegSemisimple γ → (∃ h : GL (Fin n) E, incl γ' = h * incl γ * h⁻¹)
+        → ∃ y : GL (Fin n) k, γ' = y * γ * y⁻¹ := by
   intro k E _ _ _ n γ γ' hγ ⟨h, hh⟩
   have hc : (γ' : Matrix (Fin n) (Fin n) k).charpoly = (γ : Matrix (Fin n) (Fin n) k).charpoly := by
     apply Polynomial.map_injective (algebraMap k E) (algebraMap k E).injective

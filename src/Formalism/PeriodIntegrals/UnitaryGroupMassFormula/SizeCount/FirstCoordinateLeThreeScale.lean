@@ -17,8 +17,10 @@ theorem five_le_k (D : D7) : 5 ≤ D.R.k := by
   have h2 := D.R.two_le_m
   omega
 
-theorem cloudU_le (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (τ : D.what₂.Tau) (i : ℕ) (h : i < D.R.k)
-    (h1 : 1 ≤ i) : (((D.hcW u τ).u ⟨i, h⟩ : ℚ) : ℝ) ≤ L.Sc := by
+theorem cloudU_le
+    (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (τ : D.what₂.Tau)
+    (i : ℕ) (h : i < D.R.k) (h1 : 1 ≤ i)
+    : (((D.hcW u τ).u ⟨i, h⟩ : ℚ) : ℝ) ≤ L.Sc := by
   by_cases hi : i + 1 < D.R.k
   · exact (L.cloud_u u τ ⟨i, h⟩ h1 hi).2
   · have hk := five_le_k D
@@ -32,8 +34,10 @@ theorem cloudU_le (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (τ : D.what
         Fin.ext (show D.R.k - 1 = D.R.k - 2 + 1 by omega)
       rw [e2]
       exact hgt
-    have hgtR : (((D.hc τ).u ⟨D.R.k - 1, by omega⟩ : ℚ) : ℝ) <
-        (((D.hc τ).v ⟨D.R.k - 2, by omega⟩ : ℚ) : ℝ) := by exact_mod_cast hgt'
+    have hgtR
+        : (((D.hc τ).u ⟨D.R.k - 1, by omega⟩ : ℚ) : ℝ)
+          < (((D.hc τ).v ⟨D.R.k - 2, by omega⟩ : ℚ) : ℝ) := by
+      exact_mod_cast hgt'
     rw [e1, hlast]
     linarith
 
@@ -68,10 +72,12 @@ private lemma hcW_e_cast_eq_wj_succ (D : D7) (u : D.what₂.Word) (τ : D.what�
   have e : (⟨q + 1 - 1, by omega⟩ : Fin D.R.m) = ⟨q, hq⟩ := Fin.ext (show q + 1 - 1 = q by omega)
   rw [e]
 
-theorem blocks_le (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (j : ℕ) (τ : D.what₂.Tau)
-    (hj : 1 ≤ j) (hm : j ≤ D.R.m) :
-    ∑ i ∈ Finset.Ico D.R.k (D.R.N (j - 1)), DV.nuRow D u j τ i ≤
-      2 * (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) * L.etaSz := by
+theorem blocks_le
+    (D : D7) (L : SizeData₂ D) (u : D.what₂.Word)
+    (j : ℕ)
+    (τ : D.what₂.Tau) (hj : 1 ≤ j) (hm : j ≤ D.R.m)
+    : ∑ i ∈ Finset.Ico D.R.k (D.R.N (j - 1)), DV.nuRow D u j τ i
+      ≤ 2 * (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) * L.etaSz := by
   obtain ⟨lo, hlo⟩ := exists_wj_mem_Icc_add_etaSz D L τ
   have hη : 0 ≤ L.etaSz := L.etaSz_pos.le
   have ht0 : (0 : ℝ) ≤ (D.R.t : ℝ) := Nat.cast_nonneg _
@@ -92,8 +98,10 @@ theorem blocks_le (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (j : ℕ) (�
     obtain ⟨hlo0, -⟩ := hlo ((i - D.R.k) / (D.R.t + 1) + 1) (Nat.succ_pos _) hq1
     obtain ⟨-, hhi⟩ := hlo j hj hm
     have hw := wSz_eq_wj' D j τ hj hm
-    have hiR : (i : ℝ) = (D.R.k : ℝ) + ((D.R.t : ℝ) + 1) * (((i - D.R.k) / (D.R.t + 1) : ℕ) : ℝ) +
-        (((i - D.R.k) % (D.R.t + 1) : ℕ) : ℝ) := by
+    have hiR
+        : (i : ℝ)
+          = (D.R.k : ℝ) + ((D.R.t : ℝ) + 1) * (((i - D.R.k) / (D.R.t + 1) : ℕ) : ℝ)
+            + (((i - D.R.k) % (D.R.t + 1) : ℕ) : ℝ) := by
       have hsplit : ∀ A : ℕ, A = i - D.R.k → i = D.R.k + A := fun A hA => by omega
       have h' := hsplit _ hdm
       conv_lhs => rw [h']
@@ -107,39 +115,41 @@ theorem blocks_le (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (j : ℕ) (�
       show ((D.R.k + j * (D.R.t + 1) : ℕ) : ℝ) = _
       push_cast
       ring
-    have hqj : ((((i - D.R.k) / (D.R.t + 1) : ℕ) : ℝ)) + 2 ≤ (j : ℝ) := by
-      exact_mod_cast hq2
+    have hqj : ((((i - D.R.k) / (D.R.t + 1) : ℕ) : ℝ)) + 2 ≤ (j : ℝ) := by exact_mod_cast hq2
     have hprod : 0 ≤ ((D.R.t : ℝ) + 1) * ((j : ℝ) - (((i - D.R.k) / (D.R.t + 1) : ℕ) : ℝ) - 2) :=
       mul_nonneg (by linarith) (by linarith)
     unfold DV.nuRow DV.srcPar
     rw [dite_eq_right hnk, dite_eq_left hqm, hw, hN1R, hN2R, hiR]
     push_cast
     nlinarith
-  calc ∑ i ∈ Finset.Ico D.R.k (D.R.N (j - 1)), DV.nuRow D u j τ i
+  calc
+    ∑ i ∈ Finset.Ico D.R.k (D.R.N (j - 1)), DV.nuRow D u j τ i
       ≤ ∑ _i ∈ Finset.Ico D.R.k (D.R.N (j - 1)), L.etaSz := Finset.sum_le_sum hterm
     _ = ((D.R.N (j - 1) - D.R.k : ℕ) : ℝ) * L.etaSz := by
-        rw [Finset.sum_const, Nat.card_Ico, nsmul_eq_mul]
+      rw [Finset.sum_const, Nat.card_Ico, nsmul_eq_mul]
     _ ≤ 2 * (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) * L.etaSz := by
-        have hN : D.R.N (j - 1) - D.R.k = (j - 1) * (D.R.t + 1) := by
-          rw [hN1]
-          exact Nat.add_sub_cancel_left _ _
-        rw [hN, Nat.cast_mul, Nat.cast_sub hj]
-        push_cast
-        have hjm : (j : ℝ) ≤ (D.R.m : ℝ) := by exact_mod_cast hm
-        have hj1 : (1 : ℝ) ≤ (j : ℝ) := by exact_mod_cast hj
-        have hp : 0 ≤ (2 * (D.R.m : ℝ) - ((j : ℝ) - 1)) * ((D.R.t : ℝ) + 1) * L.etaSz :=
-          mul_nonneg (mul_nonneg (by linarith) (by linarith)) hη
-        nlinarith
+      have hN : D.R.N (j - 1) - D.R.k = (j - 1) * (D.R.t + 1) := by
+        rw [hN1]
+        exact Nat.add_sub_cancel_left _ _
+      rw [hN, Nat.cast_mul, Nat.cast_sub hj]
+      push_cast
+      have hjm : (j : ℝ) ≤ (D.R.m : ℝ) := by exact_mod_cast hm
+      have hj1 : (1 : ℝ) ≤ (j : ℝ) := by exact_mod_cast hj
+      have hp : 0 ≤ (2 * (D.R.m : ℝ) - ((j : ℝ) - 1)) * ((D.R.t : ℝ) + 1) * L.etaSz :=
+        mul_nonneg (mul_nonneg (by linarith) (by linarith)) hη
+      nlinarith
 
-theorem nuAbs_split (D : D7) (u : D.what₂.Word) (j : ℕ) (τ : D.what₂.Tau) :
-    nuAbs D u j τ = (∑ i ∈ Finset.range (D.R.k - 1), DV.nuRow D u j τ (i + 1)) + DV.nuRow D u j τ 0 +
-      ∑ i ∈ Finset.Ico D.R.k (D.R.N (j - 1)), DV.nuRow D u j τ i := by
+theorem nuAbs_split (D : D7) (u : D.what₂.Word) (j : ℕ) (τ : D.what₂.Tau)
+    : nuAbs D u j τ
+      = (∑ i ∈ Finset.range (D.R.k - 1), DV.nuRow D u j τ (i + 1)) + DV.nuRow D u j τ 0
+        + ∑ i ∈ Finset.Ico D.R.k (D.R.N (j - 1)), DV.nuRow D u j τ i := by
   have hk := five_le_k D
   have hN : D.R.k ≤ D.R.N (j - 1) := by
     unfold Formalism.BasicNotions.Ranks.N
     exact Nat.le_add_right _ _
-  have hr : ∑ i ∈ Finset.range D.R.k, DV.nuRow D u j τ i =
-      (∑ i ∈ Finset.range (D.R.k - 1), DV.nuRow D u j τ (i + 1)) + DV.nuRow D u j τ 0 := by
+  have hr
+      : ∑ i ∈ Finset.range D.R.k, DV.nuRow D u j τ i
+        = (∑ i ∈ Finset.range (D.R.k - 1), DV.nuRow D u j τ (i + 1)) + DV.nuRow D u j τ 0 := by
     have h := Finset.sum_range_succ' (fun i => DV.nuRow D u j τ i) (D.R.k - 1)
     rw [Nat.sub_add_cancel (by omega : 1 ≤ D.R.k)] at h
     exact h
@@ -160,20 +170,21 @@ private lemma nuRow_le_Sc_add_wSz (D : D7) (L : SizeData₂ D) (u : D.what₂.Wo
   rw [dite_eq_left hi]
   linarith
 
-theorem cloudRows_le (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (j : ℕ) (τ : D.what₂.Tau) :
-    ∑ i ∈ Finset.range (D.R.k - 1), DV.nuRow D u j τ (i + 1) ≤
-      ((D.R.k : ℝ) - 1) * (L.Sc + DV.wSz D j τ) := by
+theorem cloudRows_le (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (j : ℕ) (τ : D.what₂.Tau)
+    : ∑ i ∈ Finset.range (D.R.k - 1), DV.nuRow D u j τ (i + 1)
+      ≤ ((D.R.k : ℝ) - 1) * (L.Sc + DV.wSz D j τ) := by
   have hk := five_le_k D
-  calc ∑ i ∈ Finset.range (D.R.k - 1), DV.nuRow D u j τ (i + 1)
-      ≤ ∑ _i ∈ Finset.range (D.R.k - 1), (L.Sc + DV.wSz D j τ) := by
-        apply Finset.sum_le_sum
-        intro i hi
-        rw [Finset.mem_range] at hi
-        exact nuRow_le_Sc_add_wSz D L u j τ (i + 1) (by omega) (by omega)
+  calc
+    ∑ i ∈ Finset.range (D.R.k - 1), DV.nuRow D u j τ (i + 1)
+        ≤ ∑ _i ∈ Finset.range (D.R.k - 1), (L.Sc + DV.wSz D j τ) := by
+      apply Finset.sum_le_sum
+      intro i hi
+      rw [Finset.mem_range] at hi
+      exact nuRow_le_Sc_add_wSz D L u j τ (i + 1) (by omega) (by omega)
     _ = ((D.R.k : ℝ) - 1) * (L.Sc + DV.wSz D j τ) := by
-        rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul, Nat.cast_sub (by omega : 1 ≤ D.R.k)]
-        push_cast
-        ring
+      rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul, Nat.cast_sub (by omega : 1 ≤ D.R.k)]
+      push_cast
+      ring
 
 theorem rowA : RowA := by
   intro D L j hj u τ
@@ -186,14 +197,17 @@ theorem rowA : RowA := by
   have hbl := blocks_le D L u j τ hj1 hj2
   have hr1 := nuRow_le_Sc_add_wSz D L u j τ 1 le_rfl (by omega)
   rw [hw] at hcl hr1
-  have e : ((D.R.k : ℝ) - 1) * (L.Sc + wj D j τ) + (L.Sc + wj D j τ) =
-      (D.R.k : ℝ) * (L.Sc + wj D j τ) := by ring
+  have e
+      : ((D.R.k : ℝ) - 1) * (L.Sc + wj D j τ) + (L.Sc + wj D j τ)
+        = (D.R.k : ℝ) * (L.Sc + wj D j τ) := by
+    ring
   rw [hsplit]
   linarith
 
-theorem first_coordinate_le_three_scale (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (u : D.what₂.Word) (τ : D.what₂.Tau)
-    (hτ : (D.eTau τ : D.R.GG) ∉ D.host.topPlaces) :
-    (((D.hcW u τ).u ⟨0, by have := five_le_k D; omega⟩ : ℚ) : ℝ) ≤ 3 * L.Sc := by
+theorem first_coordinate_le_three_scale
+    (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (u : D.what₂.Word) (τ : D.what₂.Tau)
+    (hτ : (D.eTau τ : D.R.GG) ∉ D.host.topPlaces)
+    : (((D.hcW u τ).u ⟨0, by have := five_le_k D; omega⟩ : ℚ) : ℝ) ≤ 3 * L.Sc := by
   have hk := five_le_k D
   have hfirst := D.hcW_first u τ (by omega)
   have h2 := P.cloud_place_bound τ (by omega) hτ
@@ -231,8 +245,10 @@ theorem rowB : RowB := by
   have hcl := cloudRows_le D L u j τ
   have hbl := blocks_le D L u j τ hj1 hj2
   rw [hw] at hcl
-  have e : ((D.R.k : ℝ) - 1) * (L.Sc + wj D j τ) + (3 * L.Sc + wj D j τ) =
-      ((D.R.k : ℝ) + 2) * L.Sc + (D.R.k : ℝ) * wj D j τ := by ring
+  have e
+      : ((D.R.k : ℝ) - 1) * (L.Sc + wj D j τ) + (3 * L.Sc + wj D j τ)
+        = ((D.R.k : ℝ) + 2) * L.Sc + (D.R.k : ℝ) * wj D j τ := by
+    ring
   rw [hsplit]
   linarith
 

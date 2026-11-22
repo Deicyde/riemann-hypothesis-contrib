@@ -10,8 +10,9 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-private theorem card_map_dvd {G G' : Type*} [Group G] [Group G'] (a : G →* G') {A B : Subgroup G} (h : A ≤ B) :
-    Nat.card (B.map a) ∣ Nat.card (A.map a) * A.relIndex B := by
+private theorem card_map_dvd
+    {G G' : Type*} [Group G] [Group G'] (a : G →* G') {A B : Subgroup G} (h : A ≤ B)
+    : Nat.card (B.map a) ∣ Nat.card (A.map a) * A.relIndex B := by
   have hAB : A.map a ≤ B.map a := Subgroup.map_mono h
   have hc : Nat.card (B.map a) = Nat.card (A.map a) * (A.map a).relIndex (B.map a) := by
     rw [Subgroup.relIndex, ← Subgroup.card_mul_index ((A.map a).subgroupOf (B.map a))]
@@ -22,8 +23,8 @@ private theorem card_map_dvd {G G' : Type*} [Group G] [Group G'] (a : G →* G')
   rw [← Subgroup.relIndex_comap]
   exact Subgroup.relIndex_dvd_of_le_left B (Subgroup.le_comap_map a A)
 
-private theorem index_unitsOne {φ : Frame} (H : HostRaw φ) {f : ℕ} (hf : f ∣ H.condN) :
-    (H.unitsOne f).index = f.totient := by
+private theorem index_unitsOne {φ : Frame} (H : HostRaw φ) {f : ℕ} (hf : f ∣ H.condN)
+    : (H.unitsOne f).index = f.totient := by
   have hN : H.condN ≠ 0 := H.condN_ne_zero
   have hf0 : f ≠ 0 := by
     rintro rfl
@@ -34,8 +35,10 @@ private theorem index_unitsOne {φ : Frame} (H : HostRaw φ) {f : ℕ} (hf : f �
   rw [Subgroup.index_ker, MonoidHom.range_eq_top.2 (ZMod.unitsMap_surjective _), Subgroup.card_top,
     Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, hg]
 
-theorem UpperTheory.HF.card_imgOne_dvd :
-    ∀ {φ : Frame} (H : HostRaw φ) {f g : ℕ}, f ∣ g → g ∣ H.condN → Nat.card (H.imgOne f) ∣ Nat.card (H.imgOne g) * (g.totient / f.totient) := by
+theorem UpperTheory.HF.card_imgOne_dvd
+    : ∀ {φ : Frame} (H : HostRaw φ) {f g : ℕ},
+      f ∣ g → g ∣ H.condN
+        → Nat.card (H.imgOne f) ∣ Nat.card (H.imgOne g) * (g.totient / f.totient) := by
   intro φ H f g hfg hg
   have hf : f ∣ H.condN := hfg.trans hg
   have hle : H.unitsOne g ≤ H.unitsOne f := by

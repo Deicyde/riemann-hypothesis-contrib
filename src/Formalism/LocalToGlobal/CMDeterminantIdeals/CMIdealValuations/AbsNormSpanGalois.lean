@@ -47,29 +47,35 @@ theorem lambda_endomorphism : LamEnd := by
   unfold LamEnd
   intro K _ _ NN cf S B hG hcf hmem hS hB hlen
   have hI0 : NN.I ≠ 0 := hG.1
-  have hJ0 : FractionalIdeal.spanSingleton (𝓞 K)⁰ cf ≠ 0 := FractionalIdeal.spanSingleton_eq_zero_iff.not.mpr hcf
-  have hJI : FractionalIdeal.spanSingleton (𝓞 K)⁰ cf ≤ NN.I := FractionalIdeal.spanSingleton_le_iff_mem.mpr hmem
+  have hJ0 : FractionalIdeal.spanSingleton (𝓞 K)⁰ cf ≠ 0 :=
+    FractionalIdeal.spanSingleton_eq_zero_iff.not.mpr hcf
+  have hJI : FractionalIdeal.spanSingleton (𝓞 K)⁰ cf ≤ NN.I :=
+    FractionalIdeal.spanSingleton_le_iff_mem.mpr hmem
   have hle := absNorm_le_absNorm_of_le NN.I _ hJ0 hJI
   rw [FractionalIdeal.absNorm_span_singleton] at hle
-  have hNpos : (0:ℝ) < ((FractionalIdeal.absNorm NN.I : ℚ) : ℝ) := by
-    have h0 : (0:ℚ) < FractionalIdeal.absNorm NN.I :=
+  have hNpos : (0 : ℝ) < ((FractionalIdeal.absNorm NN.I : ℚ) : ℝ) := by
+    have h0 : (0 : ℚ) < FractionalIdeal.absNorm NN.I :=
       lt_of_le_of_ne (FractionalIdeal.absNorm_nonneg _) (Ne.symm ((map_ne_zero _).mpr hI0))
     exact_mod_cast h0
   have hle' : ((FractionalIdeal.absNorm NN.I : ℚ) : ℝ) ≤ ∏ σ : K →+* ℂ, ‖σ cf‖ := by
     rw [prod_norm_embedding_eq_abs_norm]
     exact_mod_cast hle
   have hσ : ∀ σ : K →+* ℂ, 0 < ‖σ cf‖ := fun σ => norm_pos_iff.mpr ((map_ne_zero σ).mpr hcf)
-  have hlog1 : Real.log ((FractionalIdeal.absNorm NN.I : ℚ) : ℝ) ≤ ∑ σ : K →+* ℂ, Real.log ‖σ cf‖ := by
+  have hlog1
+      : Real.log ((FractionalIdeal.absNorm NN.I : ℚ) : ℝ) ≤ ∑ σ : K →+* ℂ, Real.log ‖σ cf‖ := by
     rw [← Real.log_prod (fun σ _ => (hσ σ).ne')]
     exact Real.log_le_log hNpos hle'
-  have hlog2 : ∀ σ : K →+* ℂ, Real.log ‖σ cf‖ + Real.log (NN.n σ) ≤ Real.log (S σ) + Real.log B := by
+  have hlog2
+      : ∀ σ : K →+* ℂ, Real.log ‖σ cf‖ + Real.log (NN.n σ) ≤ Real.log (S σ) + Real.log B := by
     intro σ
     rw [← Real.log_mul (hσ σ).ne' (hG.2 σ).ne', ← Real.log_mul (hS σ).ne' hB.ne']
     exact Real.log_le_log (mul_pos (hσ σ) (hG.2 σ)) (hlen σ)
   have hsum := Finset.sum_le_sum (fun σ (_ : σ ∈ Finset.univ) => hlog2 σ)
   rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
-    NumberField.Embeddings.card K ℂ, nsmul_eq_mul] at hsum
-  have e : NN.deg = - Real.log ((FractionalIdeal.absNorm NN.I : ℚ) : ℝ) - ∑ σ, Real.log (NN.n σ) := rfl
+      NumberField.Embeddings.card K ℂ, nsmul_eq_mul]
+    at hsum
+  have e : NN.deg = - Real.log ((FractionalIdeal.absNorm NN.I : ℚ) : ℝ) - ∑ σ, Real.log (NN.n σ) :=
+    rfl
   rw [e]
   linarith
 
@@ -93,13 +99,12 @@ theorem degree_delta_base : DegDe0 := by
   intro K _ _ g abelian₂ ℓ de La logOm h
   unfold CMNumbers0 at h
   obtain ⟨-, -, -, hLa, hsum, hnd, hdd⟩ := h
-  have hd : (0:ℝ) < (Module.finrank ℚ K : ℝ) := finrank_pos_real K
+  have hd : (0 : ℝ) < (Module.finrank ℚ K : ℝ) := finrank_pos_real K
   have hdeg : ∀ j, (ℓ j).deg = logOm / 2 * (Module.finrank ℚ K : ℝ) := fun j => by
     have e : (ℓ j).ndeg = (ℓ j).deg / (Module.finrank ℚ K : ℝ) := rfl
     rw [← hnd j, e, div_mul_cancel₀ _ hd.ne']
-  have hs : ∑ j, (ℓ j).deg = (g : ℝ) * (logOm / 2 * (Module.finrank ℚ K : ℝ)) := by
-    simp [hdeg]
-  have hdual : abelian₂.dual.ndeg = - abelian₂.ndeg := by
+  have hs : ∑ j, (ℓ j).deg = (g : ℝ) * (logOm / 2 * (Module.finrank ℚ K : ℝ)) := by simp [hdeg]
+  have hdual : abelian₂.dual.ndeg = -abelian₂.ndeg := by
     have e1 : abelian₂.dual.ndeg = abelian₂.dual.deg / (Module.finrank ℚ K : ℝ) := rfl
     have e2 : abelian₂.ndeg = abelian₂.deg / (Module.finrank ℚ K : ℝ) := rfl
     rw [e1, e2, mLine_deg_dual, neg_div]
@@ -108,10 +113,12 @@ theorem degree_delta_base : DegDe0 := by
     rw [e2, le_div_iff₀ hd]
     rw [hs] at hsum
     linarith
-  have hg : (0:ℝ) ≤ g := Nat.cast_nonneg g
-  have h1 : (g:ℝ) * Real.log (2 * Real.pi) ≤ (g:ℝ) * 2 := mul_le_mul_of_nonneg_left log_two_pi_le_two hg
-  have h2 : (g:ℝ) * (-logOm) ≤ (g:ℝ) * |logOm| := mul_le_mul_of_nonneg_left (neg_le_abs logOm) hg
-  have h3 : (0:ℝ) ≤ (g:ℝ) * |logOm| := mul_nonneg hg (abs_nonneg logOm)
+  have hg : (0 : ℝ) ≤ g := Nat.cast_nonneg g
+  have h1 : (g : ℝ) * Real.log (2 * Real.pi) ≤ (g : ℝ) * 2 :=
+    mul_le_mul_of_nonneg_left log_two_pi_le_two hg
+  have h2 : (g : ℝ) * (-logOm) ≤ (g : ℝ) * |logOm| :=
+    mul_le_mul_of_nonneg_left (neg_le_abs logOm) hg
+  have h3 : (0 : ℝ) ≤ (g : ℝ) * |logOm| := mul_nonneg hg (abs_nonneg logOm)
   unfold pDeg
   rw [hdual] at hdd
   linarith
@@ -173,15 +180,17 @@ theorem degree_norm_base : DegNN0 := by
   have hdn : (de.pow n).Good := mLine_good_pow _ hde n
   have hG : (lineNN de ℓ c μ n).Good := mLine_good_tensor _ _ hdn hPd
   refine ⟨hG, ?_⟩
-  have hd : (0:ℝ) < (Module.finrank ℚ K : ℝ) := finrank_pos_real K
+  have hd : (0 : ℝ) < (Module.finrank ℚ K : ℝ) := finrank_pos_real K
   have hd0 : (Module.finrank ℚ K : ℝ) ≠ 0 := hd.ne'
   have hdeg : ∀ j, (ℓ j).deg = logOm / 2 * (Module.finrank ℚ K : ℝ) := fun j => by
     have e : (ℓ j).ndeg = (ℓ j).deg / (Module.finrank ℚ K : ℝ) := rfl
     rw [← hnd j, e, div_mul_cancel₀ _ hd0]
-  have hD : (lineNN de ℓ c μ n).deg =
-      n * de.deg - (∑ v, (μ v : ℝ)) * (logOm / 2 * (Module.finrank ℚ K : ℝ)) := by
+  have hD
+      : (lineNN de ℓ c μ n).deg
+        = n * de.deg - (∑ v, (μ v : ℝ)) * (logOm / 2 * (Module.finrank ℚ K : ℝ)) := by
     have e : lineNN de ℓ c μ n = (de.pow n).tensor (MLine.prodPow (fun v => ℓ (c v)) μ).dual := rfl
-    rw [e, mLine_deg_tensor _ _ hdn hPd, mLine_deg_dual, mLine_deg_pow, mLine_deg_prodPow _ _ (fun v => hℓ (c v))]
+    rw [e, mLine_deg_tensor _ _ hdn hPd, mLine_deg_dual, mLine_deg_pow,
+      mLine_deg_prodPow _ _ (fun v => hℓ (c v))]
     simp only [hdeg, Finset.sum_mul]
     ring
   have hlog : 0 ≤ Real.log La := Real.log_nonneg hLa
@@ -189,10 +198,13 @@ theorem degree_norm_base : DegNN0 := by
     unfold pDeg
     have := neg_le_abs logOm
     linarith
-  have hsμ : (0:ℝ) ≤ ∑ v, (μ v : ℝ) := Finset.sum_nonneg (fun v _ => Nat.cast_nonneg _)
-  have hn : (0:ℝ) ≤ n := Nat.cast_nonneg n
-  have h1 : (n:ℝ) * de.ndeg ≤ n * (g * (pDeg logOm + (1 / 2) * Real.log La)) := mul_le_mul_of_nonneg_left hde0 hn
-  have h2 : (∑ v, (μ v : ℝ)) * (-(logOm / 2)) ≤ (∑ v, (μ v : ℝ)) * (pDeg logOm + (1 / 2) * Real.log La) :=
+  have hsμ : (0 : ℝ) ≤ ∑ v, (μ v : ℝ) := Finset.sum_nonneg (fun v _ => Nat.cast_nonneg _)
+  have hn : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+  have h1 : (n : ℝ) * de.ndeg ≤ n * (g * (pDeg logOm + (1 / 2) * Real.log La)) :=
+    mul_le_mul_of_nonneg_left hde0 hn
+  have h2
+      : (∑ v, (μ v : ℝ)) * (-(logOm / 2))
+        ≤ (∑ v, (μ v : ℝ)) * (pDeg logOm + (1 / 2) * Real.log La) :=
     mul_le_mul_of_nonneg_left hPl hsμ
   have e2 : (lineNN de ℓ c μ n).ndeg = (lineNN de ℓ c μ n).deg / (Module.finrank ℚ K : ℝ) := rfl
   have e3 : de.ndeg = de.deg / (Module.finrank ℚ K : ℝ) := rfl
@@ -248,27 +260,41 @@ theorem coeff_cauchy_bound : CoeffCauchy := by
     intro k v
     simp only [z, norm_mul, norm_pow, hζn, one_pow, mul_one, Complex.norm_real, Real.norm_eq_abs]
     exact le_of_eq (abs_of_pos (hρ v))
-  have inner : ∀ ν ∈ G.support, ∑ k : V → Fin N,
-      AddMonoidAlgebra.coeff G ν * (∏ v, z k v ^ ν v) * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v) =
-      if ν = μ then (N : ℂ) ^ Fintype.card V * (AddMonoidAlgebra.coeff G μ * ∏ v, (ρ v : ℂ) ^ μ v) else 0 := by
+  have inner
+      : ∀ ν ∈ G.support,
+        ∑ k : V → Fin N,
+            AddMonoidAlgebra.coeff G ν * (∏ v, z k v ^ ν v) * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)
+          = if ν = μ then
+              (N : ℂ) ^ Fintype.card V * (AddMonoidAlgebra.coeff G μ * ∏ v, (ρ v : ℂ) ^ μ v)
+            else
+              0 := by
     intro ν hν
-    have hprod : ∀ k : V → Fin N, (∏ v, z k v ^ ν v) * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v) =
-        (∏ v, (ρ v : ℂ) ^ ν v) * ∏ v, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (k v : ℕ) := by
+    have hprod
+        : ∀ k : V → Fin N,
+          (∏ v, z k v ^ ν v) * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)
+            = (∏ v, (ρ v : ℂ) ^ ν v) * ∏ v, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (k v : ℕ) := by
       intro k
       rw [← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
       exact Finset.prod_congr rfl (fun v _ => by simp only [z]; ring)
-    have hsum1 : ∑ k : V → Fin N, AddMonoidAlgebra.coeff G ν * (∏ v, z k v ^ ν v) * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v) =
-        AddMonoidAlgebra.coeff G ν * ((∏ v, (ρ v : ℂ) ^ ν v) *
-          ∑ k : V → Fin N, ∏ v, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (k v : ℕ)) := by
+    have hsum1
+        : ∑ k : V → Fin N, AddMonoidAlgebra.coeff G ν * (∏ v, z k v ^ ν v) * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)
+          = AddMonoidAlgebra.coeff G ν
+            * ((∏ v, (ρ v : ℂ) ^ ν v)
+              * ∑ k : V → Fin N, ∏ v, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (k v : ℕ)) := by
       rw [Finset.mul_sum, Finset.mul_sum]
       exact Finset.sum_congr rfl (fun k _ => by rw [mul_assoc, hprod k])
-    have hsumk : ∑ k : V → Fin N, ∏ v, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (k v : ℕ) =
-        ∏ v, ∑ j : Fin N, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (j : ℕ) := by
+    have hsumk
+        : ∑ k : V → Fin N, ∏ v, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (k v : ℕ)
+          = ∏ v, ∑ j : Fin N, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (j : ℕ) := by
       rw [Fintype.prod_sum]
-    have hgeom : ∀ v, ∑ j : Fin N, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (j : ℕ) = if ν v = μ v then (N : ℂ) else 0 := fun v =>
-      (Fin.sum_univ_eq_sum_range (fun j => (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ j) N).trans
-        (geom_root_sum hζ (hνN ν hν v) (hμN v))
-    have hprodif : ∏ v, (if ν v = μ v then (N : ℂ) else 0) = if ν = μ then (N : ℂ) ^ Fintype.card V else 0 := by
+    have hgeom
+        : ∀ v, ∑ j : Fin N, (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ (j : ℕ) = if ν v = μ v then (N : ℂ) else 0 :=
+      fun v =>
+        (Fin.sum_univ_eq_sum_range (fun j => (ζ ^ ν v * ζ⁻¹ ^ μ v) ^ j) N).trans
+          (geom_root_sum hζ (hνN ν hν v) (hμN v))
+    have hprodif
+        : ∏ v, (if ν v = μ v then (N : ℂ) else 0)
+          = if ν = μ then (N : ℂ) ^ Fintype.card V else 0 := by
       split_ifs with h
       · simp [h]
       · obtain ⟨v, hv⟩ : ∃ v, ν v ≠ μ v := by
@@ -281,35 +307,47 @@ theorem coeff_cauchy_bound : CoeffCauchy := by
     · rw [h]
       ring
     · simp
-  have hexp : ∀ k : V → Fin N, MvPolynomial.eval (z k) G * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v) =
-      ∑ ν ∈ G.support, AddMonoidAlgebra.coeff G ν * (∏ v, z k v ^ ν v) * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v) := by
-    intro k
-    rw [MvPolynomial.eval_eq', Finset.sum_mul]
-  have key : ∑ k : V → Fin N, MvPolynomial.eval (z k) G * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v) =
-      (N : ℂ) ^ Fintype.card V * (AddMonoidAlgebra.coeff G μ * ∏ v, (ρ v : ℂ) ^ μ v) := by
+  have hexp
+      : ∀ k : V → Fin N,
+        MvPolynomial.eval (z k) G * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)
+          = ∑ ν ∈ G.support, AddMonoidAlgebra.coeff G ν * (∏ v, z k v ^ ν v) * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v) :=
+    by
+      intro k
+      rw [MvPolynomial.eval_eq', Finset.sum_mul]
+  have key
+      : ∑ k : V → Fin N, MvPolynomial.eval (z k) G * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)
+        = (N : ℂ) ^ Fintype.card V * (AddMonoidAlgebra.coeff G μ * ∏ v, (ρ v : ℂ) ^ μ v) := by
     rw [Finset.sum_congr rfl (fun k _ => hexp k), Finset.sum_comm, Finset.sum_congr rfl inner]
-    rw [Finset.sum_eq_single μ (fun ν _ hν => if_neg hν) (fun hμ => by
-      have h0 : AddMonoidAlgebra.coeff G μ = 0 := by
-        by_contra h
-        exact hμ (MvPolynomial.mem_support_iff.mpr h)
-      rw [if_pos rfl, h0]
-      simp)]
+    rw [Finset.sum_eq_single μ
+      (fun ν _ hν => if_neg hν)
+      (fun hμ => by
+        have h0 : AddMonoidAlgebra.coeff G μ = 0 := by
+          by_contra h
+          exact hμ (MvPolynomial.mem_support_iff.mpr h)
+        rw [if_pos rfl, h0]
+        simp)]
     rw [if_pos rfl]
-  have hbound : ‖(N : ℂ) ^ Fintype.card V * (AddMonoidAlgebra.coeff G μ * ∏ v, (ρ v : ℂ) ^ μ v)‖ ≤
-      (N : ℝ) ^ Fintype.card V * S := by
+  have hbound
+      : ‖(N : ℂ) ^ Fintype.card V * (AddMonoidAlgebra.coeff G μ * ∏ v, (ρ v : ℂ) ^ μ v)‖
+        ≤ (N : ℝ) ^ Fintype.card V * S := by
     rw [← key]
-    calc ‖∑ k : V → Fin N, MvPolynomial.eval (z k) G * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)‖
-        ≤ ∑ k : V → Fin N, ‖MvPolynomial.eval (z k) G * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)‖ := norm_sum_le _ _
+    calc
+      ‖∑ k : V → Fin N, MvPolynomial.eval (z k) G * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)‖
+          ≤ ∑ k : V → Fin N, ‖MvPolynomial.eval (z k) G * ∏ v, ζ⁻¹ ^ ((k v : ℕ) * μ v)‖ :=
+        norm_sum_le _ _
       _ ≤ ∑ _k : V → Fin N, S := by
-          apply Finset.sum_le_sum
-          intro k _
-          rw [norm_mul, norm_prod]
-          simp only [norm_pow, norm_inv, hζn, inv_one, one_pow, Finset.prod_const_one, mul_one]
-          exact hS (z k) (hz k)
+        apply Finset.sum_le_sum
+        intro k _
+        rw [norm_mul, norm_prod]
+        simp only [norm_pow, norm_inv, hζn, inv_one, one_pow, Finset.prod_const_one, mul_one]
+        exact hS (z k) (hz k)
       _ = (N : ℝ) ^ Fintype.card V * S := by
-          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fun, Fintype.card_fin, nsmul_eq_mul, Nat.cast_pow]
-  simp only [norm_mul, norm_pow, norm_prod, Complex.norm_real, Real.norm_eq_abs, Complex.norm_natCast] at hbound
-  have hpos : (0:ℝ) < (N : ℝ) ^ Fintype.card V := pow_pos (Nat.cast_pos.mpr hN) _
+        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fun, Fintype.card_fin, nsmul_eq_mul,
+          Nat.cast_pow]
+  simp only [norm_mul, norm_pow, norm_prod, Complex.norm_real, Real.norm_eq_abs,
+      Complex.norm_natCast]
+    at hbound
+  have hpos : (0 : ℝ) < (N : ℝ) ^ Fintype.card V := pow_pos (Nat.cast_pos.mpr hN) _
   have habs : ∏ v, |ρ v| ^ μ v = ∏ v, ρ v ^ μ v :=
     Finset.prod_congr rfl (fun v _ => by rw [abs_of_pos (hρ v)])
   rw [habs] at hbound
@@ -323,31 +361,40 @@ theorem lambda_number_base : LamNumber0 := by
   have hde := h.2.2.1
   have hℓ := h.2.1
   have hBpos : (0 : ℝ) < Rr ^ (∑ v, μ v) := pow_pos hRr _
-  have hlen : ∀ σ, (lineNN de ℓ c μ n).len σ (AddMonoidAlgebra.coeff G μ) ≤ S σ * Rr ^ (∑ v, μ v) := by
+  have hlen
+      : ∀ σ, (lineNN de ℓ c μ n).len σ (AddMonoidAlgebra.coeff G μ) ≤ S σ * Rr ^ (∑ v, μ v) := by
     intro σ
     have hnv : ∀ v, 0 < (ℓ (c v)).n σ := fun v => (hℓ (c v)).2 σ
     have hdn : 0 < de.n σ ^ n := pow_pos (hde.2 σ) n
-    have hC := coeff_cauchy_bound V (MvPolynomial.map σ G) (fun v => 1 / (ℓ (c v)).n σ)
-      (S σ * Rr ^ (∑ v, μ v) / de.n σ ^ n) μ
-      (fun v => one_div_pos.mpr (hnv v)) (fun z hz => by
-        rw [le_div_iff₀ hdn]
-        exact hev σ z (fun v => (le_div_iff₀ (hnv v)).mp (hz v)))
+    have hC :=
+      coeff_cauchy_bound V (MvPolynomial.map σ G)
+        (fun v => 1 / (ℓ (c v)).n σ)
+        (S σ * Rr ^ (∑ v, μ v) / de.n σ ^ n) μ
+        (fun v => one_div_pos.mpr (hnv v))
+        (fun z hz => by
+          rw [le_div_iff₀ hdn]
+          exact hev σ z (fun v => (le_div_iff₀ (hnv v)).mp (hz v)))
     rw [MvPolynomial.coeff_map, le_div_iff₀ hdn] at hC
     have hprod : ∏ v, (1 / (ℓ (c v)).n σ) ^ μ v = (∏ v, (ℓ (c v)).n σ ^ μ v)⁻¹ := by
       rw [← Finset.prod_inv_distrib]
       simp [one_div, inv_pow]
     rw [hprod] at hC
     simp only [MLine.len, lineNN, MLine.tensor, MLine.dual, MLine.pow, MLine.prodPow]
-    calc ‖σ (AddMonoidAlgebra.coeff G μ)‖ * (de.n σ ^ n * (∏ v, (ℓ (c v)).n σ ^ μ v)⁻¹)
+    calc
+      ‖σ (AddMonoidAlgebra.coeff G μ)‖ * (de.n σ ^ n * (∏ v, (ℓ (c v)).n σ ^ μ v)⁻¹)
         = ‖σ (AddMonoidAlgebra.coeff G μ)‖ * (∏ v, (ℓ (c v)).n σ ^ μ v)⁻¹ * de.n σ ^ n := by ring
       _ ≤ S σ * Rr ^ (∑ v, μ v) := hC
-  have hE := lambda_endomorphism K (lineNN de ℓ c μ n) (AddMonoidAlgebra.coeff G μ) S _ hNg hcf hmem hS hBpos hlen
+  have hE :=
+    lambda_endomorphism K (lineNN de ℓ c μ n) (AddMonoidAlgebra.coeff G μ) S _ hNg hcf hmem hS hBpos
+      hlen
   have hd := finrank_pos_real K
   have hlogB : Real.log (Rr ^ (∑ v, μ v)) = (∑ v, (μ v : ℝ)) * Real.log Rr := by
     rw [Real.log_pow]; push_cast; ring
   rw [le_div_iff₀ hd]
-  have hN2 : (lineNN de ℓ c μ n).deg ≤
-      ((pDeg logOm + (1 / 2) * Real.log La) * ((∑ v, (μ v : ℝ)) + (g : ℝ) * n)) * Module.finrank ℚ K := by
+  have hN2
+      : (lineNN de ℓ c μ n).deg
+        ≤ ((pDeg logOm + (1 / 2) * Real.log La) * ((∑ v, (μ v : ℝ)) + (g : ℝ) * n))
+          * Module.finrank ℚ K := by
     have := hNd
     simp only [MLine.ndeg] at this
     rwa [div_le_iff₀ hd] at this
@@ -409,9 +456,10 @@ theorem coeff_mem_of_local : CoeffMemOfLoc := by
     exact (ht.pow' n).mul' hG.inv' (pow_ne_zero _ hde.1) (inv_ne_zero hP0)
   · have hne : p.valuation K (∏ v, cl (c v) ^ μ v) ≠ 0 := (Valuation.ne_zero_iff _).mpr hG.1
     rw [map_mul, map_inv₀]
-    calc p.valuation K cf
-        = p.valuation K (cf * ∏ v, cl (c v) ^ μ v) * (p.valuation K (∏ v, cl (c v) ^ μ v))⁻¹ := by
-          rw [map_mul, mul_assoc, mul_inv_cancel₀ hne, mul_one]
+    calc
+      p.valuation K cf
+          = p.valuation K (cf * ∏ v, cl (c v) ^ μ v) * (p.valuation K (∏ v, cl (c v) ^ μ v))⁻¹ := by
+        rw [map_mul, mul_assoc, mul_inv_cancel₀ hne, mul_one]
       _ ≤ _ := by gcongr
 
 section galois

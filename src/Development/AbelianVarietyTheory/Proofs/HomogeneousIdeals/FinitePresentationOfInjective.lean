@@ -22,15 +22,14 @@ def cosetComb : letI := mapAlgebra R u; ((X ⧸ u.range) →₀ R[Y]) →ₗ[R[Y
   letI := mapAlgebra R u
   Finsupp.linearCombination R[Y] (fun c : X ⧸ u.range => (single c.out 1 : R[X]))
 
-theorem cosetComb_single (c : X ⧸ u.range) (y : Y) (r : R) :
-    cosetComb R u (Finsupp.single c (single y r)) = single (u y + c.out) r := by
+theorem cosetComb_single (c : X ⧸ u.range) (y : Y) (r : R)
+    : cosetComb R u (Finsupp.single c (single y r)) = single (u y + c.out) r := by
   letI := mapAlgebra R u
   rw [cosetComb, Finsupp.linearCombination_single, Algebra.smul_def]
   change mapDomain u (single y r) * _ = _
   rw [mapDomain_single, single_mul_single, mul_one]
 
-theorem exists_add_out (x : X) :
-    ∃ y, u y + (QuotientAddGroup.mk x : X ⧸ u.range).out = x := by
+theorem exists_add_out (x : X) : ∃ y, u y + (QuotientAddGroup.mk x : X ⧸ u.range).out = x := by
   obtain ⟨⟨_, y, rfl⟩, h⟩ := QuotientAddGroup.mk_out_eq_mul u.range x
   exact ⟨-y, by rw [h]; simp⟩
 
@@ -46,15 +45,15 @@ theorem cosetComb_surjective : Function.Surjective (cosetComb R u) := by
     obtain ⟨y, hy⟩ := exists_add_out u x
     exact ⟨_, (cosetComb_single R u _ y r).trans (by rw [hy])⟩
 
-theorem coset_bijective (hu : Function.Injective u) :
-    Function.Bijective (fun p : (Σ _ : X ⧸ u.range, Y) => u p.2 + p.1.out) := by
+theorem coset_bijective (hu : Function.Injective u)
+    : Function.Bijective (fun p : (Σ _ : X ⧸ u.range, Y) => u p.2 + p.1.out) := by
   refine ⟨?_, fun x => ?_⟩
   · rintro ⟨c, y⟩ ⟨d, z⟩ h
     dsimp only at h
     have h1 : ∀ (c : X ⧸ u.range) y, (QuotientAddGroup.mk (u y + c.out) : X ⧸ u.range) = c := by
       intro c y
-      rw [QuotientAddGroup.mk_add, (QuotientAddGroup.eq_zero_iff (N := u.range) (u y)).2 ⟨y, rfl⟩, zero_add,
-        QuotientAddGroup.out_eq']
+      rw [QuotientAddGroup.mk_add, (QuotientAddGroup.eq_zero_iff (N := u.range) (u y)).2 ⟨y, rfl⟩,
+        zero_add, QuotientAddGroup.out_eq']
     obtain rfl : c = d := by rw [← h1 c y, h, h1]
     obtain rfl : y = z := hu (add_right_cancel h)
     rfl
@@ -76,19 +75,19 @@ theorem cosetComb_injective (hu : Function.Injective u) : Function.Injective (co
   rw [h2]
   exact e.injective
 
-def cosetBasis (hu : Function.Injective u) :
-    letI := mapAlgebra R u; Module.Basis (X ⧸ u.range) R[Y] R[X] :=
+def cosetBasis (hu : Function.Injective u)
+    : letI := mapAlgebra R u; Module.Basis (X ⧸ u.range) R[Y] R[X] :=
   letI := mapAlgebra R u
   .ofRepr (LinearEquiv.ofBijective (cosetComb R u)
     ⟨cosetComb_injective R u hu, cosetComb_surjective R u⟩).symm
 
-theorem free_of_injective (hu : Function.Injective u) :
-    letI := mapAlgebra R u; Module.Free R[Y] R[X] :=
+theorem free_of_injective (hu : Function.Injective u)
+    : letI := mapAlgebra R u; Module.Free R[Y] R[X] :=
   letI := mapAlgebra R u
   .of_basis (cosetBasis R u hu)
 
-theorem faithfullyFlat_of_injective (hu : Function.Injective u) :
-    (mapDomainRingHom R u).FaithfullyFlat := by
+theorem faithfullyFlat_of_injective (hu : Function.Injective u)
+    : (mapDomainRingHom R u).FaithfullyFlat := by
   letI := mapAlgebra R u
   have := free_of_injective R u hu
   change Module.FaithfullyFlat R[Y] R[X]
@@ -101,16 +100,17 @@ theorem finite_of_finiteIndex [u.range.FiniteIndex] : (mapDomainRingHom R u).Fin
   letI := mapAlgebra R u
   exact Module.Finite.of_surjective (cosetComb R u) (cosetComb_surjective R u)
 
-theorem finitePresentation_of_injective (hu : Function.Injective u) [u.range.FiniteIndex] :
-    (mapDomainRingHom R u).FinitePresentation := by
+theorem finitePresentation_of_injective (hu : Function.Injective u) [u.range.FiniteIndex]
+    : (mapDomainRingHom R u).FinitePresentation := by
   letI := mapAlgebra R u
   have := free_of_injective R u hu
   have : Module.Finite R[Y] R[X] := finite_of_finiteIndex R u
   have : Module.FinitePresentation R[Y] R[X] := Module.finitePresentation_of_projective _ _
   exact (inferInstance : Algebra.FinitePresentation R[Y] R[X])
 
-theorem finrank_of_injective (hu : Function.Injective u) [u.range.FiniteIndex]
-    (p : PrimeSpectrum R[Y]) : (mapDomainRingHom R u).finrank p = u.range.index := by
+theorem finrank_of_injective
+    (hu : Function.Injective u) [u.range.FiniteIndex] (p : PrimeSpectrum R[Y])
+    : (mapDomainRingHom R u).finrank p = u.range.index := by
   letI := mapAlgebra R u
   have := free_of_injective R u hu
   have : Module.Finite R[Y] R[X] := finite_of_finiteIndex R u
@@ -119,8 +119,8 @@ theorem finrank_of_injective (hu : Function.Injective u) [u.range.FiniteIndex]
   rw [Module.rankAtStalk_eq_finrank_of_free, Module.finrank_eq_nat_card_basis (cosetBasis R u hu)]
   rfl
 
-theorem surjective_of_surjective (hu : Function.Surjective u) :
-    Function.Surjective (mapDomainRingHom R u) := by
+theorem surjective_of_surjective (hu : Function.Surjective u)
+    : Function.Surjective (mapDomainRingHom R u) := by
   intro p
   induction p using AddMonoidAlgebra.induction_linear with
   | zero => exact ⟨0, map_zero _⟩
@@ -132,8 +132,8 @@ theorem surjective_of_surjective (hu : Function.Surjective u) :
     obtain ⟨y, rfl⟩ := hu x
     exact ⟨single y r, mapDomain_single⟩
 
-theorem formallyUnramified_of_isUnit (n : ℕ) (hn : IsUnit (n : R)) (hX : ∀ x : X, n • x = 0) :
-    Algebra.FormallyUnramified R R[X] := by
+theorem formallyUnramified_of_isUnit (n : ℕ) (hn : IsUnit (n : R)) (hX : ∀ x : X, n • x = 0)
+    : Algebra.FormallyUnramified R R[X] := by
   rw [Algebra.FormallyUnramified.iff_comp_injective]
   intro B _ _ I hI f g h
   ext x

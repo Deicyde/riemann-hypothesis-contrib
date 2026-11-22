@@ -8,18 +8,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-private theorem kum_lagr {K L : Type} [Field K] [Field L] [Algebra K L] [IsGalois K L]
+private theorem kum_lagr
+    {K L : Type} [Field K] [Field L] [Algebra K L] [IsGalois K L]
     (c : (L ≃ₐ[K] L) → K) (h0 : ∀ g, c g ≠ 0) (hm : ∀ g h, c (g * h) = c g * c h)
-    (B : Finset L) (hB : ∀ g h : L ≃ₐ[K] L, (∀ b ∈ B, g b = h b) → c g = c h) :
-    ∃ θ : L, θ ≠ 0 ∧ ∀ g : L ≃ₐ[K] L, g θ = algebraMap K L (c g) * θ := by
+    (B : Finset L) (hB : ∀ g h : L ≃ₐ[K] L, (∀ b ∈ B, g b = h b) → c g = c h)
+    : ∃ θ : L, θ ≠ 0 ∧ ∀ g : L ≃ₐ[K] L, g θ = algebraMap K L (c g) * θ := by
   classical
-  let F : IntermediateField K L := (FiniteGaloisIntermediateField.adjoin K (B : Set L)).toIntermediateField
+  let F : IntermediateField K L :=
+    (FiniteGaloisIntermediateField.adjoin K (B : Set L)).toIntermediateField
   haveI : FiniteDimensional K F := (FiniteGaloisIntermediateField.adjoin K (B : Set L)).finiteDimensional
   haveI : IsGalois K F := (FiniteGaloisIntermediateField.adjoin K (B : Set L)).isGalois
   have hBF : ∀ b ∈ B, b ∈ F := fun b hb =>
     FiniteGaloisIntermediateField.subset_adjoin K (B : Set L) hb
-  have hagree : ∀ (g : L ≃ₐ[K] L) (σ : F ≃ₐ[K] F), (∀ x : F, g (x : L) = (σ x : L)) →
-      c g = c (σ.liftNormal L) := by
+  have hagree
+      : ∀ (g : L ≃ₐ[K] L) (σ : F ≃ₐ[K] F),
+        (∀ x : F, g (x : L) = (σ x : L)) → c g = c (σ.liftNormal L) := by
     intro g σ hgσ
     apply hB
     intro b hb
@@ -40,8 +43,7 @@ private theorem kum_lagr {K L : Type} [Field K] [Field L] [Algebra K L] [IsGaloi
       intro x
       simp only [AlgEquiv.mul_apply, hlift]
     simp only [cE, this, hm]
-  have hcE0 : ∀ σ, algebraMap K F (cE σ) ≠ 0 := fun σ => by
-    simpa using h0 (σ.liftNormal L)
+  have hcE0 : ∀ σ, algebraMap K F (cE σ) ≠ 0 := fun σ => by simpa using h0 (σ.liftNormal L)
   let f : (F ≃ₐ[K] F) → Fˣ := fun σ => Units.mk0 _ (hcE0 σ)
   have hcoc : groupCohomology.IsMulCocycle₁ f := by
     intro σ τ
@@ -61,8 +63,7 @@ private theorem kum_lagr {K L : Type} [Field K] [Field L] [Algebra K L] [IsGaloi
   rw [hgσ, hσβ, hagree g σ hgσ]
   simp [cE]
 
-theorem UpperTheory.V.Z.Kato.Sym.kum :
-    UpperTheory.V.Z.Kato.Sym.Kum := by
+theorem UpperTheory.V.Z.Kato.Sym.kum : UpperTheory.V.Z.Kato.Sym.Kum := by
   intro Ω _ _ _ ε X m hm
   classical
   haveI : NeZero m := ⟨hm.ne'⟩
@@ -83,8 +84,8 @@ theorem UpperTheory.V.Z.Kato.Sym.kum :
   have hpowmod : ∀ n, ζK ^ (n % m) = ζK ^ n := fun n => by
     conv_rhs => rw [← Nat.mod_add_div n m, pow_add, pow_mul, hζm, one_pow, mul_one]
   have hInDalg : ∀ g : Kb X ≃ₐ[X.K] Kb X, InD X g.toRingEquiv := fun g x => g.commutes x
-  let toAlg : ∀ h : RingAut (Kb X), InD X h → (Kb X ≃ₐ[X.K] Kb X) :=
-    fun h hh => AlgEquiv.ofRingEquiv (f := h) hh
+  let toAlg : ∀ h : RingAut (Kb X), InD X h → (Kb X ≃ₐ[X.K] Kb X) := fun h hh =>
+    AlgEquiv.ofRingEquiv (f := h) hh
   have htoAlg : ∀ h hh, (toAlg h hh).toRingEquiv = h := fun h hh => rfl
   have hfixed : ∀ x : Kb X, (∀ h : RingAut (Kb X), InD X h → h x = x) → ∃ a : X.K, io X a = x := by
     intro x hx
@@ -96,8 +97,10 @@ theorem UpperTheory.V.Z.Kato.Sym.kum :
     intro θ f hθ h0
     rw [h0, zero_pow hm.ne'] at hθ
     exact f.ne_zero (hinj (by rw [← hθ, map_zero]))
-  have hact : ∀ (θ : Kb X) (f : X.Kˣ), θ ^ m = io X (f : X.K) → ∀ h : RingAut (Kb X), InD X h →
-      h θ = zt X m ^ (ka X m θ h).val * θ := by
+  have hact
+      : ∀ (θ : Kb X) (f : X.Kˣ),
+        θ ^ m = io X (f : X.K)
+          → ∀ h : RingAut (Kb X), InD X h → h θ = zt X m ^ (ka X m θ h).val * θ := by
     intro θ f hθ h hh
     apply hL2 _ _ (hne θ f hθ)
     rw [← map_pow, hθ, hh]
@@ -113,10 +116,11 @@ theorem UpperTheory.V.Z.Kato.Sym.kum :
       intro g h hgh
       simp only [c, hB _ _ (hInDalg g) (hInDalg h) hgh]
     obtain ⟨θ, hθ0, hθ⟩ := kum_lagr c hc0 hcm B hcB
-    obtain ⟨a, ha⟩ := hfixed (θ ^ m) (by
-      intro h hh
-      rw [map_pow, show h θ = (toAlg h hh) θ from rfl, hθ, mul_pow, ← map_pow, ← pow_mul,
-        mul_comm _ m, pow_mul, hζm, one_pow, map_one, one_mul])
+    obtain ⟨a, ha⟩ :=
+      hfixed (θ ^ m) (by
+        intro h hh
+        rw [map_pow, show h θ = (toAlg h hh) θ from rfl, hθ, mul_pow, ← map_pow, ← pow_mul,
+          mul_comm _ m, pow_mul, hζm, one_pow, map_one, one_mul])
     have ha0 : a ≠ 0 := by
       intro h0
       rw [h0, map_zero] at ha
@@ -133,10 +137,11 @@ theorem UpperTheory.V.Z.Kato.Sym.kum :
     constructor
     · rintro ⟨θ', hθ'm, hθ'⟩
       have hθ'0 := hne θ' f' hθ'm
-      obtain ⟨u, hu⟩ := hfixed (θ' / θ) (by
-        intro h hh
-        rw [map_div₀, hθact h hh, hact θ' f' hθ'm h hh, hθ' h hh, ← hφ h hh]
-        field_simp [hθ0, hθ'0, pow_ne_zero _ (hprim.ne_zero hm.ne')])
+      obtain ⟨u, hu⟩ :=
+        hfixed (θ' / θ) (by
+          intro h hh
+          rw [map_div₀, hθact h hh, hact θ' f' hθ'm h hh, hθ' h hh, ← hφ h hh]
+          field_simp [hθ0, hθ'0, pow_ne_zero _ (hprim.ne_zero hm.ne')])
       have hu0 : u ≠ 0 := by
         intro h0
         rw [h0, map_zero, eq_comm, div_eq_zero_iff] at hu

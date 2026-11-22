@@ -9,8 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open Polynomial UpperTheory.V.Z.Sym.Wt
 
-private theorem tr1_two_eq_hq_trace_det (g : GL (Fin 2) ℂ) (n : ℕ) :
-    tr1 2 n g = hq (↑g : Matrix (Fin 2) (Fin 2) ℂ).trace (↑g : Matrix (Fin 2) (Fin 2) ℂ).det n := by
+private theorem tr1_two_eq_hq_trace_det (g : GL (Fin 2) ℂ) (n : ℕ)
+    : tr1 2 n g
+      = hq (↑g : Matrix (Fin 2) (Fin 2) ℂ).trace (↑g : Matrix (Fin 2) (Fin 2) ℂ).det n := by
   set A : Matrix (Fin 2) (Fin 2) ℂ := ↑g with hA
   have hs : A.charpoly.Splits := IsAlgClosed.splits _
   have hcard : Multiset.card A.charpoly.roots = 2 := by
@@ -19,14 +20,11 @@ private theorem tr1_two_eq_hq_trace_det (g : GL (Fin 2) ℂ) (n : ℕ) :
   have hp : A.charpoly = ∏ i, (X - C (![a, b] i)) := by
     rw [hs.eq_prod_roots_of_monic (Matrix.charpoly_monic A), hab]
     simp [Fin.prod_univ_two]
-  have htr : A.trace = a + b := by
-    rw [Matrix.trace_eq_sum_roots_charpoly, hab]; simp
-  have hdet : A.det = a * b := by
-    rw [Matrix.det_eq_prod_roots_charpoly, hab]; simp
+  have htr : A.trace = a + b := by rw [Matrix.trace_eq_sum_roots_charpoly, hab]; simp
+  have hdet : A.det = a * b := by rw [Matrix.det_eq_prod_roots_charpoly, hab]; simp
   rw [trOne 2 n g ![a, b] hp, hqTwo, htr, hdet]
 
-theorem UpperTheory.V.Z.Sym.Wt.trDC :
-    UpperTheory.V.Z.Sym.Wt.TrDC := by
+theorem UpperTheory.V.Z.Sym.Wt.trDC : UpperTheory.V.Z.Sym.Wt.TrDC := by
   intro I _ n e g
   rw [repD_apply, map_smul, smul_eq_mul]
   have h := trProd I 2 (fun _ => n) g

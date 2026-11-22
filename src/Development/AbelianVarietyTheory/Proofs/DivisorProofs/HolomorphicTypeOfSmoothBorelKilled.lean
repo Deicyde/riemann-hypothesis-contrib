@@ -10,7 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjInvol
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -422,12 +426,16 @@ end GlobalTheory.HolDict.HolOf
 
 namespace GlobalTheory.HolDict
 
-
 open TorusLaw HolOf in
-theorem holFn_of_killed : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Hm : ι → Mt n) (q : ι → ℕ) (x₀ : ι → Mt n) (w : ι → Fin n → ℤ), (∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ)) → ∀ f, SmFn Hm f → KilledFn Hm x₀ w f → HolFn Hm q x₀ w f := by
+theorem holFn_of_killed
+    : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Hm : ι → Mt n) (q : ι → ℕ) (x₀ : ι → Mt n)
+        (w : ι → Fin n → ℤ),
+      (∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ))
+        → ∀ f, SmFn Hm f → KilledFn Hm x₀ w f → HolFn Hm q x₀ w f := by
   intro n ι _ _ Hm q x₀ w h f hs hk
   choose β hβ hβ' using fun τ => GlobalTheory.HolDict.GS.smooth_gramSchmidt n (Hm τ) (q τ) (x₀ τ) (h τ)
-  obtain ⟨hopen, -, hstab, hx₀⟩ := GlobalTheory.HolDict.frDoms_open_preconnected_stable n ι Hm q x₀ h
+  obtain ⟨hopen, -, hstab, hx₀⟩ :=
+    GlobalTheory.HolDict.frDoms_open_preconnected_stable n ι Hm q x₀ h
   let bb : (ι → Fin n → Fin n → ℂ) → ι → Mt n := fun x τ => Matrix.of (β τ (x τ))
   let γ : (ι → Fin n → Fin n → ℂ) → ι → Mt n := fun x τ => Matrix.of (x τ) * (bb x τ)⁻¹ * (x₀ τ)⁻¹
   let P : (ι → Fin n → Fin n → ℂ) → ℂ := fun x => chi w (bb x) * f (γ x)
@@ -436,9 +444,12 @@ theorem holFn_of_killed : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι
   have hdec : ∀ x ∈ frDoms Hm q, ∀ τ, γ x τ * x₀ τ * bb x τ = Matrix.of (x τ) := by
     intro x hx τ
     simp only [γ]
-    rw [nonsing_inv_mul_cancel_right _ _ (units_of_orth (h τ)).1, nonsing_inv_mul_cancel_right _ _ (hbb x hx τ).1.isUnit]
-  have hdec' : ∀ x ∈ frDoms Hm q, co (γ x * x₀ * bb x) = x := fun x hx => funext fun τ => hdec x hx τ
-  have hP : ∀ u ∈ UG Hm, ∀ b : ι → Mt n, (∀ τ, UpT (b τ)) → P (co (u * x₀ * b)) = chi w b * f u := by
+    rw [nonsing_inv_mul_cancel_right _ _ (units_of_orth (h τ)).1,
+      nonsing_inv_mul_cancel_right _ _ (hbb x hx τ).1.isUnit]
+  have hdec' : ∀ x ∈ frDoms Hm q, co (γ x * x₀ * bb x) = x := fun x hx =>
+    funext fun τ => hdec x hx τ
+  have hP
+      : ∀ u ∈ UG Hm, ∀ b : ι → Mt n, (∀ τ, UpT (b τ)) → P (co (u * x₀ * b)) = chi w b * f u := by
     intro u hu b hb
     have hx : co (u * x₀ * b) ∈ frDoms Hm q := hstab u hu b hb _ hx₀
     set x := co (u * x₀ * b) with hxd
@@ -446,7 +457,8 @@ theorem holFn_of_killed : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι
       intro τ
       change (u τ * x₀ τ * b τ) * (bb x τ)⁻¹ * (x₀ τ)⁻¹ = _
       simp only [Matrix.mul_assoc]
-    have h1 : ∀ τ, x₀ τ * (b τ * (bb x τ)⁻¹) * (x₀ τ)⁻¹ ∈ Formalism.QuantumDeterminants.UH (Hm τ) := by
+    have h1
+        : ∀ τ, x₀ τ * (b τ * (bb x τ)⁻¹) * (x₀ τ)⁻¹ ∈ Formalism.QuantumDeterminants.UH (Hm τ) := by
       intro τ
       have hH := (units_of_orth (h τ)).2
       have := uh_mul (uh_inv hH (hu τ)) (hγ x hx τ)
@@ -454,7 +466,8 @@ theorem holFn_of_killed : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι
     choose s hs' using fun τ => GlobalTheory.HolDict.diag_of_upT_unitary n (Hm τ) (q τ) (x₀ τ) (h τ) _ (upT_mul (hb τ) (upT_inv (hbb x hx τ))) (h1 τ)
     have e2 : γ x = u * torEl x₀ s := by
       funext τ
-      rw [e, hs']; rfl
+      rw [e, hs']
+      rfl
     have e3 : chi w b = torCh w s * chi w (bb x) := by
       have e4 : b = fun τ => (b τ * (bb x τ)⁻¹) * bb x τ := by
         funext τ
@@ -473,12 +486,20 @@ theorem holFn_of_killed : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι
     exact contDiffOn_pi.1 (contDiffOn_pi.1 h1 a) c
   have hγs : ContDiffOn ℝ ∞ (fun x => co (γ x)) (frDoms Hm q) := by
     refine contDiffOn_pi.2 fun τ => contDiffOn_pi.2 fun a => contDiffOn_pi.2 fun c => ?_
-    refine cd_mulM (g' := fun _ => (x₀ τ)⁻¹) (cd_mulM (g := fun x : ι → Fin n → Fin n → ℂ => Matrix.of (x τ)) (fun a c => ?_)
-      (cd_inv (hbs τ) fun x hx => (hbb x hx τ).1)) (fun _ _ => contDiffOn_const) a c
+    refine cd_mulM
+      (g' := fun _ => (x₀ τ)⁻¹)
+      (cd_mulM
+        (g := fun x : ι → Fin n → Fin n → ℂ => Matrix.of (x τ))
+        (fun a c => ?_)
+        (cd_inv (hbs τ) fun x hx => (hbb x hx τ).1))
+      (fun _ _ => contDiffOn_const)
+      a c
     simp only [of_apply]
     fun_prop
   have hfs : ContDiffOn ℝ ∞ (fun x => f (γ x)) (frDoms Hm q) :=
-    (GlobalTheory.HolDict.Chart.main n ι Hm (fun τ => ⟨herm_of_orth (h τ), (units_of_orth (h τ)).2.ne_zero⟩) f hs _ _ _ hopen hγs hγ).1
+    (GlobalTheory.HolDict.Chart.main n ι Hm
+      (fun τ => ⟨herm_of_orth (h τ), (units_of_orth (h τ)).2.ne_zero⟩)
+      f hs _ _ _ hopen hγs hγ).1
   have hcs : ContDiffOn ℝ ∞ (fun x => chi w (bb x)) (frDoms Hm q) := by
     unfold chi
     refine contDiffOn_prod fun τ _ => contDiffOn_prod fun a _ => ?_
@@ -497,7 +518,8 @@ theorem holFn_of_killed : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι
   · have h1 := hP (γ x) (hγ x hx) (fun τ => bb x τ * b τ) fun τ => upT_mul (hbb x hx τ) (hb τ)
     have e : co (γ x * x₀ * fun τ => bb x τ * b τ) = fun τ => (Matrix.of (x τ) * b τ : Mt n) := by
       funext τ
-      rw [← hdec x hx τ, Matrix.mul_assoc]; rfl
+      rw [← hdec x hx τ, Matrix.mul_assoc]
+      rfl
     rw [e, chi_mul w (hbb x hx) hb] at h1
     rw [h1]
     change _ = chi w b * (chi w (bb x) * f (γ x))

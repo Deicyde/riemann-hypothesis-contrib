@@ -9,15 +9,19 @@ namespace KStar.Ram
 
 open NumberField DirichletCharacter IsCyclotomicExtension.Rat
 
-noncomputable def fieldUnits (N : ℕ) [NeZero N] {K : Type*} [Field K] [NumberField K]
-    [IsCyclotomicExtension {N} ℚ K] (E : IntermediateField ℚ K) : Subgroup (ZMod N)ˣ :=
+noncomputable def fieldUnits
+    (N : ℕ) [NeZero N]
+    {K : Type*} [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K]
+    (E : IntermediateField ℚ K)
+    : Subgroup (ZMod N)ˣ :=
   E.fixingSubgroup.map (galEquivZMod N K).toMonoidHom
 
-noncomputable def fieldChars (N : ℕ) [NeZero N] {K : Type*} [Field K] [NumberField K]
-    [IsCyclotomicExtension {N} ℚ K] (E : IntermediateField ℚ K) :
-    Subgroup (DirichletCharacter ℂ N) :=
+noncomputable def fieldChars
+    (N : ℕ) [NeZero N]
+    {K : Type*} [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K]
+    (E : IntermediateField ℚ K)
+    : Subgroup (DirichletCharacter ℂ N) :=
   annihilator ℂ (fieldUnits N E : Set (ZMod N)ˣ)
-
 
 open Classical in
 noncomputable def rootWeight (l m : ℕ) : ℚ := by

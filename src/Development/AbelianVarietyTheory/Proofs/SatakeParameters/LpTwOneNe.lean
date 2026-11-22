@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TemperedR
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL
 open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -21,9 +22,10 @@ noncomputable section
 
 namespace GlobalTheory
 
-theorem WeilDeligne.WD.lpTw_one_ne {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
-    (x : WD h) : 0 < x.lpDim → x.lpTw 1 ≠ x := by
+theorem WeilDeligne.WD.lpTw_one_ne
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w} (x : WD h)
+    : 0 < x.lpDim → x.lpTw 1 ≠ x := by
   obtain ⟨n, a, rfl⟩ := WD.exists_rep x
   intro hn heq
   rw [WD.lpTw_mk, WD.mk_eq_mk] at heq
@@ -32,12 +34,13 @@ theorem WeilDeligne.WD.lpTw_one_ne {E Ω : Type} [Field E] [NumberField E] [Fiel
   set σ := frob h
   set T := (a.tw 1).ρ σ
   set B := a.ρ σ
-  have hconj : (e : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)) ∘ₗ T ∘ₗ (e.symm : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)) = B := by
+  have hconj
+      : (e : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)) ∘ₗ T ∘ₗ (e.symm : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))
+        = B := by
     refine LinearMap.ext fun v => ?_
     show e ((a.tw 1).ρ σ (e.symm v)) = a.ρ σ v
     rw [he, LinearEquiv.apply_symm_apply]
-  have hdet : LinearMap.det T = LinearMap.det B := by
-    rw [← hconj, LinearMap.det_conj]
+  have hdet : LinearMap.det T = LinearMap.det B := by rw [← hconj, LinearMap.det_conj]
   have hT : T = ((normV w : ℕ) : ℂ) • B := by
     show (a.tw 1).ρ σ = _
     rw [WDRep.tw_ρ, deg_frob]

@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SquarefreeLa
 
 @[expose] public section
 
-open CategoryTheory Polynomial Formalism.IrreducibleCountingLemmas.TYPES Formalism.BasicNotions Formalism.L2.DIV
+open CategoryTheory Polynomial Formalism.IrreducibleCountingLemmas.TYPES Formalism.BasicNotions
+  Formalism.L2.DIV
 
 noncomputable section
 namespace GlobalTheory.GoodFactor
@@ -23,12 +24,12 @@ open Formalism.L2.NT
 
 variable {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)]
 
-theorem isChar_prod [DecidableEq ι] {ψ : ∀ i, G i → ℂ} (h : ∀ i, IsChar (ψ i)) :
-    IsChar (fun g : (∀ i, G i) => ∏ i, ψ i (g i)) := by
+theorem isChar_prod [DecidableEq ι] {ψ : ∀ i, G i → ℂ} (h : ∀ i, IsChar (ψ i))
+    : IsChar (fun g : (∀ i, G i) => ∏ i, ψ i (g i)) := by
   choose n ρ hρ using h
   let J := ∀ i, Fin (n i)
-  let Mf : (∀ i, G i) → Matrix J J ℂ := fun g => Matrix.of fun p q =>
-    ∏ i, (ρ i (g i) : Matrix (Fin (n i)) (Fin (n i)) ℂ) (p i) (q i)
+  let Mf : (∀ i, G i) → Matrix J J ℂ := fun g =>
+    Matrix.of fun p q => ∏ i, (ρ i (g i) : Matrix (Fin (n i)) (Fin (n i)) ℂ) (p i) (q i)
   have hM1 : Mf 1 = 1 := by
     ext p q
     simp only [Mf, Matrix.of_apply, Pi.one_apply, map_one, Units.val_one, Matrix.one_apply]
@@ -64,14 +65,15 @@ theorem isChar_prod [DecidableEq ι] {ψ : ∀ i, G i → ℂ} (h : ∀ i, IsCha
 
 variable [∀ i, Fintype (G i)]
 
-theorem ipG_prod [DecidableEq ι] (ψ ψ' : ∀ i, G i → ℂ) :
-    ipG (fun g : (∀ i, G i) => ∏ i, ψ i (g i)) (fun g => ∏ i, ψ' i (g i)) = ∏ i, ipG (ψ i) (ψ' i) := by
+theorem ipG_prod [DecidableEq ι] (ψ ψ' : ∀ i, G i → ℂ)
+    : ipG (fun g : (∀ i, G i) => ∏ i, ψ i (g i)) (fun g => ∏ i, ψ' i (g i))
+      = ∏ i, ipG (ψ i) (ψ' i) := by
   unfold ipG
   rw [Finset.prod_univ_sum]
   simp only [Fintype.piFinset_univ, Finset.prod_mul_distrib, star_prod]
 
-theorem isIrrChar_prod [DecidableEq ι] {ψ : ∀ i, G i → ℂ} (h : ∀ i, IsIrrChar (ψ i)) :
-    IsIrrChar (fun g : (∀ i, G i) => ∏ i, ψ i (g i)) := by
+theorem isIrrChar_prod [DecidableEq ι] {ψ : ∀ i, G i → ℂ} (h : ∀ i, IsIrrChar (ψ i))
+    : IsIrrChar (fun g : (∀ i, G i) => ∏ i, ψ i (g i)) := by
   refine ⟨isChar_prod fun i => (h i).1, ?_⟩
   rw [ipG_prod, Finset.prod_congr rfl fun i _ => (h i).2, Fintype.card_pi]
   push_cast
@@ -93,8 +95,9 @@ theorem irr_one_ne_zero {ψ : H → ℂ} (h : IsIrrChar ψ) : ψ 1 ≠ 0 := by
   rw [FDRep.char_one]
   exact_mod_cast Module.finrank_pos.ne'
 
-theorem eq_of_sum_ne_zero {χ ψ : H → ℂ} (hχ : IsIrrChar χ) (hψ : IsIrrChar ψ)
-    (h : ∑ x, χ x * ψ x⁻¹ ≠ 0) : χ = ψ := by
+theorem eq_of_sum_ne_zero
+    {χ ψ : H → ℂ} (hχ : IsIrrChar χ) (hψ : IsIrrChar ψ) (h : ∑ x, χ x * ψ x⁻¹ ≠ 0)
+    : χ = ψ := by
   classical
   obtain ⟨V, hV, rfl⟩ := exists_simple hχ
   obtain ⟨W, hW, rfl⟩ := exists_simple hψ
@@ -116,22 +119,26 @@ theorem sum_single (e : MonoidAlgebra ℂ H) : ∑ g : H, MonoidAlgebra.single g
   rw [MonoidAlgebra.coeff_sum, Finset.sum_apply']
   simp [Finsupp.single_apply]
 
-theorem asAlg_eq {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ H V) (e : MonoidAlgebra ℂ H) :
-    ρ.asAlgebraHom e = ∑ g : H, e.coeff g • ρ g := by
+theorem asAlg_eq
+    {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ H V) (e : MonoidAlgebra ℂ H)
+    : ρ.asAlgebraHom e = ∑ g : H, e.coeff g • ρ g := by
   conv_lhs => rw [← sum_single e]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   exact Finset.sum_congr rfl fun g _ => Representation.asAlgebraHom_single ρ g _
 
-theorem coeff_conj {e : MonoidAlgebra ℂ H} (he : ∀ x, e * x = x * e) (g k : H) :
-    e.coeff (k * g * k⁻¹) = e.coeff g := by
+theorem coeff_conj {e : MonoidAlgebra ℂ H} (he : ∀ x, e * x = x * e) (g k : H)
+    : e.coeff (k * g * k⁻¹) = e.coeff g := by
   have h := congrArg (fun x : MonoidAlgebra ℂ H => x.coeff (k * g)) (he (MonoidAlgebra.single k 1))
-  simp only [MonoidAlgebra.coeff_mul_single_apply, MonoidAlgebra.coeff_single_mul_apply, mul_one, one_mul,
-    inv_mul_cancel_left] at h
+  simp only [MonoidAlgebra.coeff_mul_single_apply, MonoidAlgebra.coeff_single_mul_apply, mul_one,
+      one_mul, inv_mul_cancel_left]
+    at h
   exact h
 
-theorem central_idem_term {e : MonoidAlgebra ℂ H} (hc : ∀ x, e * x = x * e) (hi : e * e = e) {ψ : H → ℂ}
-    (hψ : IsIrrChar ψ) : ∑ g, e.coeff g * ψ g = ψ 1 ∨ ∑ g, e.coeff g * ψ g = 0 := by
+theorem central_idem_term
+    {e : MonoidAlgebra ℂ H} (hc : ∀ x, e * x = x * e) (hi : e * e = e)
+    {ψ : H → ℂ} (hψ : IsIrrChar ψ)
+    : ∑ g, e.coeff g * ψ g = ψ 1 ∨ ∑ g, e.coeff g * ψ g = 0 := by
   classical
   obtain ⟨V, hVs, rfl⟩ := exists_simple hψ
   haveI := hVs
@@ -142,7 +149,8 @@ theorem central_idem_term {e : MonoidAlgebra ℂ H} (hc : ∀ x, e * x = x * e) 
   have hT : Representation.asAlgebraHom V.ρ e = μ • (1 : Module.End ℂ V) := by
     rw [asAlg_eq V.ρ e]; exact hμ
   have hμμ : μ * μ = μ := by
-    have h2 : Representation.asAlgebraHom V.ρ (e * e) = Representation.asAlgebraHom V.ρ e := by rw [hi]
+    have h2 : Representation.asAlgebraHom V.ρ (e * e) = Representation.asAlgebraHom V.ρ e := by
+      rw [hi]
     rw [map_mul, hT, smul_mul_smul_comm, one_mul] at h2
     obtain ⟨v, hv⟩ := exists_ne (0 : V)
     have h3 := congrArg (fun f : Module.End ℂ V => f v) h2
@@ -152,7 +160,7 @@ theorem central_idem_term {e : MonoidAlgebra ℂ H} (hc : ∀ x, e * x = x * e) 
   have htr : ∑ g, e.coeff g * V.character g = μ * V.character 1 := by
     have h1 : LinearMap.trace ℂ V (∑ g, e.coeff g • V.ρ g) = ∑ g, e.coeff g * V.character g := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [FDRep.character, map_sum, map_smul, smul_eq_mul]
+      simp only [FDRep.character, map_sum, map_smul, smul_eq_mul]
     rw [← h1, hμ]
     simp [FDRep.character]
   have hμ01 : μ * (μ - 1) = 0 := by linear_combination hμμ
@@ -162,22 +170,26 @@ theorem central_idem_term {e : MonoidAlgebra ℂ H} (hc : ∀ x, e * x = x * e) 
 
 end One
 
-theorem exists_factor [DecidableEq ι] {χ : (∀ i, G i) → ℂ} (hχ : IsIrrChar χ) :
-    ∃ ψ : ∀ i, G i → ℂ, (∀ i, IsIrrChar (ψ i)) ∧ ∀ g, χ g = ∏ i, ψ i (g i) := by
+theorem exists_factor [DecidableEq ι] {χ : (∀ i, G i) → ℂ} (hχ : IsIrrChar χ)
+    : ∃ ψ : ∀ i, G i → ℂ, (∀ i, IsIrrChar (ψ i)) ∧ ∀ g, χ g = ∏ i, ψ i (g i) := by
   classical
-  let Z : ∀ i, Finset (MonoidAlgebra ℂ (G i)) := fun i => (GlobalTheory.SerOSys.ZSum.zIdem_set_finite (Γ := G i)).toFinset
+  let Z : ∀ i, Finset (MonoidAlgebra ℂ (G i)) := fun i =>
+    (GlobalTheory.SerOSys.ZSum.zIdem_set_finite (Γ := G i)).toFinset
   have hZ : ∀ i, ∑ z ∈ Z i, z = 1 := fun i => by
     rw [← finsum_mem_eq_finite_toFinset_sum]
     exact GlobalTheory.SerOSys.ZSum.zIdem_set_finsum
   have hone : ∀ (i) (t : G i), ∑ z ∈ Z i, z.coeff t = if t = 1 then 1 else 0 := fun i t => by
     have h := congrArg (fun a : MonoidAlgebra ℂ (G i) => a.coeff t) (hZ i)
     simp only [MonoidAlgebra.coeff_sum, Finset.sum_apply', MonoidAlgebra.one_def,
-      MonoidAlgebra.coeff_single, Finsupp.single_apply] at h
+        MonoidAlgebra.coeff_single, Finsupp.single_apply]
+      at h
     rw [h]
     by_cases ht : t = 1
     · rw [if_pos ht.symm, if_pos ht]
     · rw [if_neg (Ne.symm ht), if_neg ht]
-  have hdelta : ∀ x : (∀ i, G i), ∑ p ∈ Fintype.piFinset Z, ∏ i, (p i).coeff (x i) = if x = 1 then 1 else 0 := by
+  have hdelta
+      : ∀ x : (∀ i, G i),
+        ∑ p ∈ Fintype.piFinset Z, ∏ i, (p i).coeff (x i) = if x = 1 then 1 else 0 := by
     intro x
     rw [← Finset.prod_univ_sum Z (fun i z => z.coeff (x i))]
     simp only [hone]
@@ -203,8 +215,11 @@ theorem exists_factor [DecidableEq ι] {χ : (∀ i, G i) → ℂ} (hχ : IsIrrC
   have hP := isIrrChar_prod hirr
   have := eq_of_sum_ne_zero hχ hP (fun h0 => hne ?_)
   · exact congrFun this g
-  · have hco : ∀ x : (∀ i, G i), ∏ i, (p i).coeff (x i) =
-        (∏ i, ((Module.finrank ℂ (τ i) : ℂ) / Fintype.card (G i))) * ∏ i, (τ i).character (x⁻¹ i) := by
+  · have hco
+        : ∀ x : (∀ i, G i),
+          ∏ i, (p i).coeff (x i)
+            = (∏ i, ((Module.finrank ℂ (τ i) : ℂ) / Fintype.card (G i)))
+              * ∏ i, (τ i).character (x⁻¹ i) := by
       intro x
       rw [← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun i _ => ?_
@@ -214,15 +229,18 @@ theorem exists_factor [DecidableEq ι] {χ : (∀ i, G i) → ℂ} (hχ : IsIrrC
     simp only [mul_left_comm _ (∏ i, ((Module.finrank ℂ (τ i) : ℂ) / Fintype.card (G i))) _]
     rw [← Finset.mul_sum, h0, mul_zero]
 
-theorem exists_good_factor {A : ι → Type} [∀ i, Fintype (A i)] [inst : Fintype (∀ i, G i)]
+theorem exists_good_factor
+    {A : ι → Type} [∀ i, Fintype (A i)] [inst : Fintype (∀ i, G i)]
     (E : ∀ i, A i → MonoidAlgebra ℂ (G i))
     (hI : ∀ i b, E i b * E i b = E i b) (hC : ∀ i b x, E i b * x = x * E i b)
-    (P : (∀ i, A i) → Prop) [DecidablePred P] (e : MonoidAlgebra ℂ (∀ i, G i))
+    (P : (∀ i, A i) → Prop) [DecidablePred P]
+    (e : MonoidAlgebra ℂ (∀ i, G i))
     [DecidableEq ι]
     (he : ∀ g, e.coeff g = ∑ a : (∀ i, A i), if P a then ∏ i, (E i (a i)).coeff (g i) else 0)
-    {χ : (∀ i, G i) → ℂ} (hχ : IsIrrChar χ) (h : ∑ g, e.coeff g * χ g = χ 1) :
-    ∃ (ψ : ∀ i, G i → ℂ) (a : ∀ i, A i), P a ∧ (∀ i, IsIrrChar (ψ i)) ∧
-      (∀ i, ∑ x, (E i (a i)).coeff x * ψ i x = ψ i 1) ∧ ∀ g, χ g = ∏ i, ψ i (g i) := by
+    {χ : (∀ i, G i) → ℂ} (hχ : IsIrrChar χ) (h : ∑ g, e.coeff g * χ g = χ 1)
+    : ∃ (ψ : ∀ i, G i → ℂ) (a : ∀ i, A i),
+      P a ∧ (∀ i, IsIrrChar (ψ i)) ∧ (∀ i, ∑ x, (E i (a i)).coeff x * ψ i x = ψ i 1)
+        ∧ ∀ g, χ g = ∏ i, ψ i (g i) := by
   obtain rfl : inst = Pi.instFintype := Subsingleton.elim _ _
   obtain ⟨ψ, hψ, hχe⟩ := exists_factor hχ
   by_contra hno
@@ -233,7 +251,9 @@ theorem exists_good_factor {A : ι → Type} [∀ i, Fintype (A i)] [inst : Fint
     rcases central_idem_term (hC i (a i)) (hI i (a i)) (hψ i) with h1 | h1
     · exact h1
     · exact absurd (Finset.prod_eq_zero (Finset.mem_univ i) h1) hne
-  have hsum : ∑ g, e.coeff g * χ g = ∑ a : (∀ i, A i), if P a then ∏ i, ∑ x, (E i (a i)).coeff x * ψ i x else 0 := by
+  have hsum
+      : ∑ g, e.coeff g * χ g
+        = ∑ a : (∀ i, A i), if P a then ∏ i, ∑ x, (E i (a i)).coeff x * ψ i x else 0 := by
     simp only [he, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun a _ => ?_
@@ -247,29 +267,51 @@ theorem exists_good_factor {A : ι → Type} [∀ i, Fintype (A i)] [inst : Fint
     · exact hz a ha
     · rfl
 
-theorem irreducible_character_good_idempotent_cuspidal_product : ∀ (D : D7) [Fintype (G0g D.nd)], (∀ k : Fin 2, haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩; ∃ (C : Formalism.IrreducibleCountingLemmas.TYPES.LabelConv (ZMod (D.host.g k))) (O : Formalism.IrreducibleCountingLemmas.TYPES.LabelMap (ZMod (D.host.g k)) C), ∀ f, D.ntypes.eSer k f = Formalism.L2.NT.eSerO O D.R.r f) → ∀ χ : G0g D.nd → ℂ, Formalism.L2.NT.IsIrrChar χ → ∑ g, D.ntypes.e0.coeff g * χ g = χ 1 → ∃ θ : ∀ kv : (Σ k : Fin 2, D.nd.PlG k), GL (Fin D.R.r) (ZMod (D.host.g kv.1)) → ℂ, (∀ kv : (Σ k : Fin 2, D.nd.PlG k), haveI : Fact (D.host.g kv.1).Prime := ⟨D.host.g_prime kv.1⟩; GlobalTheory.IndefiniteRowSideFullHecke.CuspidalProductMultiplicity.IsCuspProdChar (θ kv)) ∧ ∀ g, χ g = ∏ kv : (Σ k : Fin 2, D.nd.PlG k), θ kv (g kv) := by
+theorem irreducible_character_good_idempotent_cuspidal_product
+    : ∀ (D : D7) [Fintype (G0g D.nd)],
+      (∀ k : Fin 2,
+          haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+          ∃ (C : Formalism.IrreducibleCountingLemmas.TYPES.LabelConv (ZMod (D.host.g k)))
+              (O : Formalism.IrreducibleCountingLemmas.TYPES.LabelMap (ZMod (D.host.g k)) C),
+            ∀ f,
+              D.ntypes.eSer k f = Formalism.L2.NT.eSerO O D.R.r f)
+        → ∀ χ : G0g D.nd → ℂ,
+          Formalism.L2.NT.IsIrrChar χ → ∑ g, D.ntypes.e0.coeff g * χ g = χ 1
+            → ∃ θ : ∀ kv : (Σ k : Fin 2, D.nd.PlG k), GL (Fin D.R.r) (ZMod (D.host.g kv.1)) → ℂ,
+              (∀ kv : (Σ k : Fin 2, D.nd.PlG k),
+                  haveI : Fact (D.host.g kv.1).Prime := ⟨D.host.g_prime kv.1⟩
+                  GlobalTheory.IndefiniteRowSideFullHecke.CuspidalProductMultiplicity.IsCuspProdChar
+                    (θ kv))
+                ∧ ∀ g, χ g = ∏ kv : (Σ k : Fin 2, D.nd.PlG k), θ kv (g kv) := by
   intro D _ hO χ hχ h
   classical
   haveI hF : ∀ k, Fact (D.host.g k).Prime := fun k => ⟨D.host.g_prime k⟩
   haveI hN : ∀ k, NeZero (D.host.g k) := fun k => ⟨(D.host.g_prime k).ne_zero⟩
   choose C O hCO using hO
-  obtain ⟨ψ, a, hP, hψ, hs, hχe⟩ := exists_good_factor
-    (ι := Σ k : Fin 2, D.nd.PlG k) (G := fun kv => GL (Fin D.R.r) (ZMod (D.host.g kv.1)))
-    (A := fun kv => Fin D.R.r → ZMod (D.host.g kv.1))
-    (fun kv b => D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf b))
-    (fun _ _ => D.ntypes.eSer_idem _ _) (fun _ _ => D.ntypes.eSer_central _ _)
-    (fun a => D.ntypes.goodTuple (fun k v => Formalism.CyclotomicNorms.monicOf (a ⟨k, v⟩))) D.ntypes.e0
-    (fun g => by
-      unfold Formalism.BasicNotions.NTypes.e0
-      rw [MonoidAlgebra.coeff_ofCoeff, Finsupp.coe_equivFunOnFinite_symm, finsum_eq_sum_of_fintype])
-    hχ h
+  obtain ⟨ψ, a, hP, hψ, hs, hχe⟩ :=
+    exists_good_factor (ι := Σ k : Fin 2, D.nd.PlG k)
+      (G := fun kv => GL (Fin D.R.r) (ZMod (D.host.g kv.1)))
+      (A := fun kv => Fin D.R.r → ZMod (D.host.g kv.1))
+      (fun kv b => D.ntypes.eSer kv.1 (Formalism.CyclotomicNorms.monicOf b))
+      (fun _ _ => D.ntypes.eSer_idem _ _)
+      (fun _ _ => D.ntypes.eSer_central _ _)
+      (fun a => D.ntypes.goodTuple (fun k v => Formalism.CyclotomicNorms.monicOf (a ⟨k, v⟩)))
+      D.ntypes.e0
+      (fun g => by
+        unfold Formalism.BasicNotions.NTypes.e0
+        rw [MonoidAlgebra.coeff_ofCoeff, Finsupp.coe_equivFunOnFinite_symm,
+          finsum_eq_sum_of_fintype])
+      hχ h
   refine ⟨ψ, fun kv => ?_, hχe⟩
   have hsq : Squarefree (Formalism.CyclotomicNorms.monicOf (a kv)) := (hP kv.1).1.2.1 kv.2
   have h1 := hs kv
   simp only [hCO] at h1
-  obtain ⟨τ, hτ, hl, hc⟩ := GlobalTheory.T.exists_simple_label_of_seriesIdempotent_pair (D.host.g kv.1) (C kv.1) (O kv.1) D.R.r (Formalism.CyclotomicNorms.monicOf (a kv)) (ψ kv)
-    (hψ kv) h1
-  have h2 := GlobalTheory.T.squarefreeLabel_isCuspidalParabolicProductCharacter (ZMod (D.host.g kv.1)) (C kv.1) (O kv.1) D.R.r τ _ hτ hl hsq
+  obtain ⟨τ, hτ, hl, hc⟩ :=
+    GlobalTheory.T.exists_simple_label_of_seriesIdempotent_pair (D.host.g kv.1) (C kv.1) (O kv.1)
+      D.R.r (Formalism.CyclotomicNorms.monicOf (a kv)) (ψ kv) (hψ kv) h1
+  have h2 :=
+    GlobalTheory.T.squarefreeLabel_isCuspidalParabolicProductCharacter (ZMod (D.host.g kv.1))
+      (C kv.1) (O kv.1) D.R.r τ _ hτ hl hsq
   have e : ψ kv = fun x => τ.character x := funext fun x => (hc x).symm
   rw [e]
   exact h2

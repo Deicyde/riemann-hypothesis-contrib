@@ -12,7 +12,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.JetIntegrality.S
 theorem jets_high_generation : PI.JetsPhW.HighG :=
   PI.JetsPhW.W.highG_of PI.JetsPhW.W.derivative_chain_rule PI.JetsPhW.W.derivative_self
     PI.JetsPhW.W.pderiv_subst_ne PI.JetsPhW.W.pderiv_subst_self PI.JetsPhW.W.evaluation_at_zero
-    PI.JetsPhW.W.jet_derivative_integrality PI.JetsPhW.W.log_derivative_integral_jet_integrality PI.JetsPhW.W.derivative_integral
+    PI.JetsPhW.W.jet_derivative_integrality PI.JetsPhW.W.log_derivative_integral_jet_integrality
+    PI.JetsPhW.W.derivative_integral
 
 theorem jets_phase_weights : PI.JetsPhW.Target :=
   PI.JetsPhW.W.glue_holds_var PI.JetsPhW.Inv.inverse_omega_holds jets_high_generation

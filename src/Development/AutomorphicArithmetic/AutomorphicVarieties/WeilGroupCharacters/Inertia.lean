@@ -10,23 +10,30 @@ open IsLocalRing UpperTheory.V.Alg
 
 namespace UpperTheory.V.W
 
-def muG (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] : Subgroup G :=
+def muG (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    : Subgroup G :=
   (CommGroup.primaryComponent (TopologicalAbelianization G) l).comap (QuotientGroup.mk' _)
 
-structure LocAb (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (I : Subgroup G)
-    (d : ℕ) where
+structure LocAb
+    (l : ℕ) [Fact l.Prime]
+    (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (I : Subgroup G) (d : ℕ) where
   a : G →* Multiplicative ((Fin d → ℤ_[l]) × ℤ_[l])
   cont : Continuous a
   surj : Function.Surjective a
   inertia : ∀ x : (Fin d → ℤ_[l]) × ℤ_[l], (∃ g ∈ I, a g = Multiplicative.ofAdd x) ↔ x.2 = 0
-  univ : ∀ (C : Type) [CommGroup C] [Finite C], IsPGroup l C → ∀ χ : G →* C, IsOpen (χ.ker : Set G) →
-    muG l G ≤ χ.ker → a.ker ≤ χ.ker
+  univ
+    : ∀ (C : Type) [CommGroup C] [Finite C],
+      IsPGroup l C → ∀ χ : G →* C, IsOpen (χ.ker : Set G) → muG l G ≤ χ.ker → a.ker ≤ χ.ker
   b : G →* CommGroup.primaryComponent (TopologicalAbelianization G) l
   b_open : IsOpen (b.ker : Set G)
   b_mu : ∀ g ∈ muG l G, (b g : TopologicalAbelianization G) = QuotientGroup.mk' _ g
 
-structure DetObj (O : Type) [CommRing O] [IsLocalRing O] {n : ℕ} {G : Type} [Group G] [TopologicalSpace G]
-    (Dbar : GDet n (ResidueField O) G) : Type 1 where
+structure DetObj
+    (O : Type) [CommRing O] [IsLocalRing O]
+    {n : ℕ} {G : Type} [Group G] [TopologicalSpace G]
+    (Dbar : GDet n (ResidueField O) G)
+    : Type 1 where
   R : Type
   [ring : CommRing R]
   [alg : Algebra O R]
@@ -34,13 +41,17 @@ structure DetObj (O : Type) [CommRing O] [IsLocalRing O] {n : ℕ} {G : Type} [G
   D : GDet n R G
   cont : D.IsCont (maximalIdeal R)
   red : D.map (res O R : R →+* ResidueField O) = Dbar
-  univ : ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (D' : GDet n R' G), D'.IsCont (maximalIdeal R') →
-    D'.map (res O R' : R' →+* ResidueField O) = Dbar → ∃! f : R →ₐ[O] R', D.map (f : R →+* R') = D'
+  univ
+    : ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (D' : GDet n R' G),
+      D'.IsCont (maximalIdeal R') → D'.map (res O R' : R' →+* ResidueField O) = Dbar
+        → ∃! f : R →ₐ[O] R', D.map (f : R →+* R') = D'
 
 attribute [instance] DetObj.ring DetObj.alg DetObj.co
 
-variable {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ}
-  (r : Resid F O n)
+variable
+  {l : ℕ} [Fact l.Prime]
+  {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+  {n : ℕ} (r : Resid F O n)
 
 structure LamTObj : Type 1 where
   Λ : Type
@@ -49,14 +60,16 @@ structure LamTObj : Type 1 where
   [co : IsCO O Λ]
   ψ : ∀ v, Fin n → F.Gv v →* Λˣ
   psi : ∀ v i, r.IsPsi v i (ψ v i)
-  univ : ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (ψ' : ∀ v, Fin n → F.Gv v →* Rˣ),
-    (∀ v i, r.IsPsi v i (ψ' v i)) → ∃! f : Λ →ₐ[O] R, ∀ v i, pushCh (f : Λ →+* R) (ψ v i) = ψ' v i
+  univ
+    : ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (ψ' : ∀ v, Fin n → F.Gv v →* Rˣ),
+      (∀ v i, r.IsPsi v i (ψ' v i)) → ∃! f : Λ →ₐ[O] R, ∀ v i, pushCh (f : Λ →+* R) (ψ v i) = ψ' v i
 
 attribute [instance] LamTObj.ring LamTObj.alg LamTObj.co
 
 def Resid.Ok : Prop :=
-  (∀ v (g : Fin n → F.Gv v) (h : F.G₀), r.Dbar.tr (MonoidAlgebra.single h 1 * F.oEl v (r.psib v) g) = 0) ∧
-    ∀ v i (g : F.mu v), r.psib v i g = Units.map (residue O : O →* ResidueField O) (r.th v i g)
+  (∀ v (g : Fin n → F.Gv v) (h : F.G₀),
+      r.Dbar.tr (MonoidAlgebra.single h 1 * F.oEl v (r.psib v) g) = 0)
+    ∧ ∀ v i (g : F.mu v), r.psib v i g = Units.map (residue O : O →* ResidueField O) (r.th v i g)
 
 structure FHom (F' F : GFrame l) where
   π : F'.Γ →* F.Γ
@@ -74,8 +87,7 @@ namespace FHom
 
 variable {F' : GFrame l} (h : FHom F' F)
 
-def π₀ : F'.G₀ →* F.G₀ :=
-  (h.π.comp F'.η.ker.subtype).codRestrict _ fun g => (h.hη g).trans g.2
+def π₀ : F'.G₀ →* F.G₀ := (h.π.comp F'.η.ker.subtype).codRestrict _ fun g => (h.hη g).trans g.2
 
 structure Compat (r' : Resid F' O n) (r : Resid F O n) : Prop where
   chib : ∀ i, r'.chib i = (r.chib i).comp h.π₀

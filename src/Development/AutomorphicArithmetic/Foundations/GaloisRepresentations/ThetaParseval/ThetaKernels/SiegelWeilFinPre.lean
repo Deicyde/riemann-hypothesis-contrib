@@ -29,13 +29,33 @@ section
 noncomputable section
 open GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
 namespace PositivityTheory.SiegelWeilFormula.Fin
-theorem tWeyl_of_k (hP : _root_.PositivityTheory.SiegelWeilFormula.TW.Poisson_k) : _root_.PositivityTheory.SiegelWeilFormula.TWeyl_k :=
-  _root_.PositivityTheory.SiegelWeilFormula.TW.tWeyl_of_k _root_.PositivityTheory.SiegelWeilFormula.TBij_k.tBij _root_.PositivityTheory.SiegelWeilFormula.Fin.tTheta_k (_root_.PositivityTheory.SiegelWeilFormula.TW.UpToPf.upTo_of_k _root_.PositivityTheory.SiegelWeilFormula.TW.Twu.uniq_k) hP _root_.PositivityTheory.SiegelWeilFormula.TW.ThetaWPf.thetaW_k
-theorem siegelWeilStd_pre_k (hP : _root_.PositivityTheory.SiegelWeilFormula.TW.Poisson_k) (hCT : _root_.PositivityTheory.SiegelWeilFormula.CTSplit_k) : _root_.GlobalTheory.ThK.Dbl.SiegelWeilStd_k :=
-  have hT := _root_.PositivityTheory.SiegelWeilFormula.Fin.tAll_of_k (_root_.PositivityTheory.SiegelWeilFormula.Fin.tWeyl_of_k hP)
-  _root_.PositivityTheory.SiegelWeilFormula.Fin.siegelWeilStd_mid_k (_root_.PositivityTheory.SiegelWeilFormula.Fin.tWeyl_of_k hP)
-    (_root_.PositivityTheory.SiegelWeilFormula.KFP.kFinPoly_of_k hT _root_.PositivityTheory.SiegelWeilFormula.Tunit.tUnit_k _root_.PositivityTheory.SiegelWeilFormula.Tunit.tHeis_k _root_.PositivityTheory.SiegelWeilFormula.kfour.auxiliaryExistence_holds _root_.PositivityTheory.SiegelWeilFormula.KFock.fockMem_k (_root_.PositivityTheory.SiegelWeilFormula.locOpEx_of_tAll_k hT) (_root_.PositivityTheory.SiegelWeilFormula.Fin.locInst_of_k hT))
-    (_root_.PositivityTheory.SiegelWeilFormula.Ald.ldEx_of_k hT _root_.PositivityTheory.SiegelWeilFormula.kfour.auxiliaryExistence_holds) hCT
+theorem tWeyl_of_k (hP : _root_.PositivityTheory.SiegelWeilFormula.TW.Poisson_k)
+    : _root_.PositivityTheory.SiegelWeilFormula.TWeyl_k :=
+  _root_.PositivityTheory.SiegelWeilFormula.TW.tWeyl_of_k
+    _root_.PositivityTheory.SiegelWeilFormula.TBij_k.tBij
+    _root_.PositivityTheory.SiegelWeilFormula.Fin.tTheta_k
+    (_root_.PositivityTheory.SiegelWeilFormula.TW.UpToPf.upTo_of_k
+      _root_.PositivityTheory.SiegelWeilFormula.TW.Twu.uniq_k)
+    hP _root_.PositivityTheory.SiegelWeilFormula.TW.ThetaWPf.thetaW_k
+theorem siegelWeilStd_pre_k
+    (hP : _root_.PositivityTheory.SiegelWeilFormula.TW.Poisson_k)
+    (hCT : _root_.PositivityTheory.SiegelWeilFormula.CTSplit_k)
+    : _root_.GlobalTheory.ThK.Dbl.SiegelWeilStd_k :=
+  have hT :=
+    _root_.PositivityTheory.SiegelWeilFormula.Fin.tAll_of_k
+      (_root_.PositivityTheory.SiegelWeilFormula.Fin.tWeyl_of_k hP)
+  _root_.PositivityTheory.SiegelWeilFormula.Fin.siegelWeilStd_mid_k
+    (_root_.PositivityTheory.SiegelWeilFormula.Fin.tWeyl_of_k hP)
+    (_root_.PositivityTheory.SiegelWeilFormula.KFP.kFinPoly_of_k hT
+      _root_.PositivityTheory.SiegelWeilFormula.Tunit.tUnit_k
+      _root_.PositivityTheory.SiegelWeilFormula.Tunit.tHeis_k
+      _root_.PositivityTheory.SiegelWeilFormula.kfour.auxiliaryExistence_holds
+      _root_.PositivityTheory.SiegelWeilFormula.KFock.fockMem_k
+      (_root_.PositivityTheory.SiegelWeilFormula.locOpEx_of_tAll_k hT)
+      (_root_.PositivityTheory.SiegelWeilFormula.Fin.locInst_of_k hT))
+    (_root_.PositivityTheory.SiegelWeilFormula.Ald.ldEx_of_k hT
+      _root_.PositivityTheory.SiegelWeilFormula.kfour.auxiliaryExistence_holds)
+    hCT
 end PositivityTheory.SiegelWeilFormula.Fin
 end
 end

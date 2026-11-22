@@ -19,7 +19,12 @@ public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniq
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.IndefR.Links IsDedekindDomain NumberField GlobalTheory.ExportSeries Formalism.L2.Pj GlobalTheory.CoverRead GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels GlobalTheory.ConjTwist
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.FWT
+  Formalism.IndefR.Links IsDedekindDomain NumberField GlobalTheory.ExportSeries Formalism.L2.Pj
+  GlobalTheory.CoverRead GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels
+  GlobalTheory.ConjTwist
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -28,15 +33,24 @@ namespace GlobalTheory.ExtCoeff
 
 open TensorProduct
 
-theorem exists_ext_map {K' : Type} [Field K'] (σ' : K' →+* ℂ) {X : Type} (V : Submodule K' (MvPolynomial X K'))
-    (V' : Submodule ℂ (MvPolynomial X ℂ)) {W : Type*} [AddCommGroup W] [Module ℂ W] (c0 : V →ₛₗ[σ'] W) :
-    ∃ c : V' →ₗ[ℂ] W, ∀ (v : V) (v' : V'), (v' : MvPolynomial X ℂ) = MvPolynomial.map σ' (v : MvPolynomial X K') → c v' = c0 v := by
+theorem exists_ext_map
+    {K' : Type} [Field K']
+    (σ' : K' →+* ℂ)
+    {X : Type} (V : Submodule K' (MvPolynomial X K')) (V' : Submodule ℂ (MvPolynomial X ℂ))
+    {W : Type*} [AddCommGroup W] [Module ℂ W]
+    (c0 : V →ₛₗ[σ'] W)
+    : ∃ c : V' →ₗ[ℂ] W, ∀ (v : V) (v' : V'),
+      (v' : MvPolynomial X ℂ) = MvPolynomial.map σ' (v : MvPolynomial X K') → c v' = c0 v := by
   letI : Algebra K' ℂ := σ'.toAlgebra
   letI : Module K' W := Module.compHom W σ'
   haveI : IsScalarTower K' ℂ W := ⟨fun k a w => by
     show (σ' k * a) • w = σ' k • a • w
     rw [mul_smul]⟩
-  let c0l : V →ₗ[K'] W := { toFun := c0, map_add' := c0.map_add, map_smul' := fun k v => c0.map_smulₛₗ k v }
+  let c0l : V →ₗ[K'] W := {
+    toFun := c0
+    map_add' := c0.map_add
+    map_smul' := fun k v => c0.map_smulₛₗ k v
+  }
   let F : ℂ ⊗[K'] V →ₗ[ℂ] W := c0l.liftBaseChange ℂ
   let ψ : ℂ ⊗[K'] V →ₗ[ℂ] MvPolynomial X ℂ :=
     (MvPolynomial.algebraTensorAlgEquiv K' ℂ).toLinearMap.comp (V.subtype.baseChange ℂ)
@@ -56,10 +70,17 @@ theorem exists_ext_map {K' : Type} [Field K'] (σ' : K' →+* ℂ) {X : Type} (V
     rw [LinearEquiv.symm_apply_eq]
     ext
     simp [e, LinearEquiv.ofInjective_apply, hψ1, h]
-  simp only [LinearMap.comp_apply, Submodule.subtype_apply, key, he, F, LinearMap.liftBaseChange_tmul, one_smul]
+  simp only [LinearMap.comp_apply, Submodule.subtype_apply, key, he, F,
+    LinearMap.liftBaseChange_tmul, one_smul]
   rfl
 
-theorem exists_extC : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T1 : Type) (A : FamIn D.what₂.LL G Pl0 T1 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL] (R : RealDat D A T.Q.c.F) (j : Fin D.R.m) (Tp : Type) (tup : Tp → T1) (O : OMDat T.toCore R j Tp tup), ∃ c : VsV D j ℂ →ₗ[ℂ] (R.cV j).W, ExtC R j (inC O.c') O.c0' c := by
+theorem exists_extC
+    : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T1 : Type)
+        (A : FamIn D.what₂.LL G Pl0 T1 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
+        (R : RealDat D A T.Q.c.F) (j : Fin D.R.m) (Tp : Type) (tup : Tp → T1)
+        (O : OMDat T.toCore R j Tp tup),
+      ∃ c : VsV D j ℂ →ₗ[ℂ] (R.cV j).W,
+        ExtC R j (inC O.c') O.c0' c := by
   intro D G _ _ Pl0 T1 A T _ R j Tp tup O
   obtain ⟨c, hc⟩ := exists_ext_map (inC O.c') (VV O.c'.F (lamV D j)) (VV ℂ (lamV D j)) O.c0'
   exact ⟨c, fun v v' h => hc v v' h⟩

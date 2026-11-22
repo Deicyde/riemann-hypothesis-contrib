@@ -13,12 +13,17 @@ open Matrix
 
 namespace PSymplDetSchur
 
-noncomputable def clearCol {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) :
-    Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ :=
-  Matrix.of fun i j => if i = j then 1 else if j = 0 then -A i 0 / A 0 0 else 0
+noncomputable def clearCol {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+    : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ :=
+  Matrix.of fun i j =>
+    if i = j then
+      1
+    else if j = 0 then
+      - A i 0 / A 0 0
+    else
+      0
 
-theorem det_clearCol {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) :
-    (clearCol A).det = 1 := by
+theorem det_clearCol {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) : (clearCol A).det = 1 := by
   rw [Matrix.det_of_isLowerTriangular _ ?_]
   · simp [clearCol]
   · intro i j hij
@@ -29,26 +34,24 @@ theorem det_clearCol {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) :
       simp at hij'
     simp [clearCol, hne, hj]
 
-theorem clearCol_mul_zero {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (j : Fin (n + 1)) :
-    (clearCol A * A) 0 j = A 0 j := by
+theorem clearCol_mul_zero {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (j : Fin (n + 1))
+    : (clearCol A * A) 0 j = A 0 j := by
   rw [Matrix.mul_apply, Fin.sum_univ_succ]
   simp [clearCol, (Fin.succ_ne_zero _).symm, Fin.succ_ne_zero]
 
-theorem clearCol_mul_succ {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (i : Fin n)
-    (j : Fin (n + 1)) :
-    (clearCol A * A) i.succ j = A i.succ j - A i.succ 0 / A 0 0 * A 0 j := by
+theorem clearCol_mul_succ
+    {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (i : Fin n) (j : Fin (n + 1))
+    : (clearCol A * A) i.succ j = A i.succ j - A i.succ 0 / A 0 0 * A 0 j := by
   rw [Matrix.mul_apply, Fin.sum_univ_succ]
   simp [clearCol, Fin.succ_ne_zero, Fin.succ_inj]
   ring
 
 end PSymplDetSchur
 
-
 open PSymplDetSchur in
 theorem SymplDetSchur.proof : SymplDetSchur.Statement := by
   intro n A ha
-  have hdet : A.det = (clearCol A * A).det := by
-    rw [Matrix.det_mul, det_clearCol, one_mul]
+  have hdet : A.det = (clearCol A * A).det := by rw [Matrix.det_mul, det_clearCol, one_mul]
   rw [hdet, Matrix.det_succ_column_zero, Fin.sum_univ_succ]
   have hcol : ∀ i : Fin n, (clearCol A * A) i.succ 0 = 0 := by
     intro i

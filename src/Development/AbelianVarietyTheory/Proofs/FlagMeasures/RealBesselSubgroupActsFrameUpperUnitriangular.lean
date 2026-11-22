@@ -15,7 +15,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StabUMapEqOfR
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2
+  Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Matrix
 
@@ -25,8 +27,10 @@ namespace GlobalTheory.LoopAct
 
 open scoped Classical
 
-theorem exists_coeff_of_mem_span_image {r n : ℕ} (e : Fin r → Fin n → ℂ) (s : Set (Fin r)) (x : Fin n → ℂ)
-    (hx : x ∈ Submodule.span ℂ (e '' s)) : ∃ c : Fin r → ℂ, (∀ b, b ∉ s → c b = 0) ∧ x = ∑ b, c b • e b := by
+theorem exists_coeff_of_mem_span_image
+    {r n : ℕ}
+    (e : Fin r → Fin n → ℂ) (s : Set (Fin r)) (x : Fin n → ℂ) (hx : x ∈ Submodule.span ℂ (e '' s))
+    : ∃ c : Fin r → ℂ, (∀ b, b ∉ s → c b = 0) ∧ x = ∑ b, c b • e b := by
   rw [Finsupp.mem_span_image_iff_linearCombination] at hx
   obtain ⟨l, hl, rfl⟩ := hx
   refine ⟨l, fun b hb => ?_, ?_⟩
@@ -36,13 +40,15 @@ theorem exists_coeff_of_mem_span_image {r n : ℕ} (e : Fin r → Fin n → ℂ)
     intro b
     exact zero_smul ℂ (e b)
 
-theorem exists_upUni_of_inS {r n : ℕ} (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ)
-    (hg : Formalism.L2.SG.HidaSetting.InS e z g) :
-    ∃ M : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ, IsUpUni M ∧
-      IsMatOn g (Fin.snoc (α := fun _ => Fin n → ℂ) e z) M := by
+theorem exists_upUni_of_inS
+    {r n : ℕ} (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ)
+    (hg : Formalism.L2.SG.HidaSetting.InS e z g)
+    : ∃ M : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ,
+      IsUpUni M ∧ IsMatOn g (Fin.snoc (α := fun _ => Fin n → ℂ) e z) M := by
   set f : Fin (r + 1) → Fin n → ℂ := Fin.snoc (α := fun _ => Fin n → ℂ) e z with hf
 
-  have hcol : ∀ b : Fin (r + 1), (g - 1) *ᵥ f b ∈ Submodule.span ℂ (e '' {c : Fin r | c.1 < b.1}) := by
+  have hcol
+      : ∀ b : Fin (r + 1), (g - 1) *ᵥ f b ∈ Submodule.span ℂ (e '' {c : Fin r | c.1 < b.1}) := by
     intro b
     refine Fin.lastCases ?_ (fun a => ?_) b
     · simpa [hf, Formalism.L2.SG.HidaSetting.spanLt] using hg.2
@@ -74,12 +80,22 @@ theorem exists_upUni_of_inS {r n : ℕ} (e : Fin r → Fin n → ℂ) (z : Fin n
     rw [add_comm, Fin.sum_univ_castSucc]
     simp [hf]
 
-theorem sinfU_frame_upUni : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (y : X.B.I.Ginf), y ∈ X.SinfU u → ∀ v : NumberField.InfinitePlace X.B.I.F, ∃ M : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) ℂ, IsUpUni M ∧ GlobalTheory.LoopAct.IsMatOn (uMat (y v)) (Formalism.L2.SG.RealObj.frm X u 1 v) M := by
+theorem sinfU_frame_upUni
+    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (y : X.B.I.Ginf),
+      y ∈ X.SinfU u
+        → ∀ v : NumberField.InfinitePlace X.B.I.F,
+          ∃ M : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) ℂ,
+            IsUpUni M ∧ GlobalTheory.LoopAct.IsMatOn (uMat (y v))
+              (Formalism.L2.SG.RealObj.frm X u 1 v) M := by
   intro D X u y hy v
   obtain ⟨M, hM, hMat⟩ := exists_upUni_of_inS _ _ _ (hy v)
   refine ⟨M, hM, ?_⟩
-  have hfr : Formalism.L2.SG.RealObj.frm X u 1 v = Fin.snoc (α := fun _ => Fin X.B.I.n → ℂ)
-      (fun a => Formalism.L2.SG.HidaSetting.rv X.B.I v (X.eR a)) (Formalism.L2.SG.HidaSetting.rv X.B.I v (X.zR u)) := by
+  have hfr
+      : Formalism.L2.SG.RealObj.frm X u 1 v
+        = Fin.snoc
+          (α := fun _ => Fin X.B.I.n → ℂ)
+          (fun a => Formalism.L2.SG.HidaSetting.rv X.B.I v (X.eR a))
+          (Formalism.L2.SG.HidaSetting.rv X.B.I v (X.zR u)) := by
     funext a
     simp [Formalism.L2.SG.RealObj.frm, Formalism.L2.SG.RealObj.famSc, Formalism.L2.SG.RealObj.fam]
   rw [hfr]

@@ -21,8 +21,8 @@ end Pairing
 
 variable {K : Type} [Field K] [NumberField K]
 
-noncomputable def realCoords {M : ℕ} (e : Fin M ≃ (K →+* ℂ)) (ε : ℝ) :
-    K →ₗ[ℚ] EuclideanSpace ℝ (Fin M) where
+noncomputable def realCoords {M : ℕ} (e : Fin M ≃ (K →+* ℂ)) (ε : ℝ)
+    : K →ₗ[ℚ] EuclideanSpace ℝ (Fin M) where
   toFun x := WithLp.toLp 2 fun i => (e i x).re + ε * (e i x).im
   map_add' x y := by
     ext i
@@ -76,13 +76,15 @@ private lemma norm_sq_realCoords_eq_sum_norm_sq {K : Type} [Field K] [NumberFiel
   rw [Complex.sq_norm, Complex.normSq_apply]
   linear_combination (σ x).im ^ 2 * hε
 
-
 open NumberField Module Submodule in
 open scoped nonZeroDivisors in
-theorem _root_.GlobalTheory.exists_short_independent_integers (K : Type) [Field K] [NumberField K] :
-    ∃ ω : Fin (Module.finrank ℚ K) → 𝓞 K, LinearIndependent ℚ (fun k => (ω k : K)) ∧
-      ∀ (s : K →+* ℂ) k, ‖s (ω k : K)‖ ≤ (Module.finrank ℚ K : ℝ) ^ 3 *
-        |((NumberField.discr K : ℤ) : ℝ)| ^ (1 / (Module.finrank ℚ K : ℝ)) := by
+theorem _root_.GlobalTheory.exists_short_independent_integers (K : Type) [Field K] [NumberField K]
+    : ∃ ω : Fin (Module.finrank ℚ K) → 𝓞 K,
+      LinearIndependent ℚ (fun k => (ω k : K))
+        ∧ ∀ (s : K →+* ℂ) k,
+          ‖s (ω k : K)‖
+            ≤ (Module.finrank ℚ K : ℝ) ^ 3
+              * |((NumberField.discr K : ℤ) : ℝ)| ^ (1 / (Module.finrank ℚ K : ℝ)) := by
   set n := Module.finrank ℚ K with hn
   let e : Fin n ≃ (K →+* ℂ) := (Fintype.equivFinOfCardEq (NumberField.Embeddings.card K ℂ)).symm
   let φ := _root_.GlobalTheory.ShortIntegers.realCoords e 1
@@ -115,8 +117,9 @@ theorem _root_.GlobalTheory.exists_short_independent_integers (K : Type) [Field 
   have hα_int : ∀ j, α j = algebraMap (𝓞 K) K (RingOfIntegers.basis K (eι.symm j)) := by
     intro j
     simp [α, NumberField.integralBasis_apply]
-  have hdual : ∀ c : Fin n → ℤ,
-      (∑ i, (c i : ℚ) • β i) ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 K) K) := by
+  have hdual
+      : ∀ c : Fin n → ℤ,
+        (∑ i, (c i : ℚ) • β i) ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 K) K) := by
     intro c
     rw [Submodule.mem_traceDual]
     intro a ha
@@ -125,8 +128,8 @@ theorem _root_.GlobalTheory.exists_short_independent_integers (K : Type) [Field 
       rw [show Set.range α = Set.range (NumberField.integralBasis K) from
         Module.Basis.range_reindex _ _]
       exact (NumberField.mem_span_integralBasis K).mpr ⟨a', rfl⟩
-    refine Submodule.span_induction (p := fun x _ =>
-      (Algebra.traceForm ℚ K) (∑ i, (c i : ℚ) • β i) x ∈ (algebraMap ℤ ℚ).range)
+    refine Submodule.span_induction
+      (p := fun x _ => (Algebra.traceForm ℚ K) (∑ i, (c i : ℚ) • β i) x ∈ (algebraMap ℤ ℚ).range)
       ?_ ?_ ?_ ?_ hspan
     · rintro _ ⟨k, rfl⟩
       refine ⟨c k, ?_⟩
@@ -166,7 +169,8 @@ theorem _root_.GlobalTheory.exists_short_independent_integers (K : Type) [Field 
       rw [this]
       exact le_mul_of_one_le_left (Real.rpow_nonneg hD.le _) hn1
     exact le_of_pow_le_pow_left₀ two_ne_zero (norm_nonneg _) (hlam2.trans hle)
-  obtain ⟨y, hyli, hyint, hynorm⟩ := _root_.ReciprocityTheory.ChartRestriction.G.T0.transference_dual b lam hlam0 hmin
+  obtain ⟨y, hyli, hyint, hynorm⟩ :=
+    _root_.ReciprocityTheory.ChartRestriction.G.T0.transference_dual b lam hlam0 hmin
   choose m hm using hyint
   let ω : Fin n → 𝓞 K := fun i => ∑ j, m i j • RingOfIntegers.basis K (eι.symm j)
   have hω : ∀ i, ((ω i : 𝓞 K) : K) = ∑ j, (m i j : ℚ) • α j := by
@@ -185,16 +189,18 @@ theorem _root_.GlobalTheory.exists_short_independent_integers (K : Type) [Field 
   · intro s k
     have hsq : ‖s (ω k : K)‖ ^ 2 ≤ ‖y k‖ ^ 2 := by
       rw [hy, norm_sq_realCoords_eq_sum_norm_sq e (ε := 1) (by norm_num)]
-      exact Finset.single_le_sum (f := fun σ : K →+* ℂ => ‖σ (ω k : K)‖ ^ 2)
-        (fun σ _ => sq_nonneg _) (Finset.mem_univ s)
-    have h1 : ‖s (ω k : K)‖ ≤ ‖y k‖ :=
-      le_of_pow_le_pow_left₀ two_ne_zero (norm_nonneg _) hsq
+      exact Finset.single_le_sum
+        (f := fun σ : K →+* ℂ => ‖σ (ω k : K)‖ ^ 2)
+        (fun σ _ => sq_nonneg _)
+        (Finset.mem_univ s)
+    have h1 : ‖s (ω k : K)‖ ≤ ‖y k‖ := le_of_pow_le_pow_left₀ two_ne_zero (norm_nonneg _) hsq
     have h2 : (n : ℝ) ^ 2 / lam = (n : ℝ) ^ 2 * D ^ (1 / (n : ℝ)) := by
       rw [hlam, Real.rpow_neg hD.le, div_inv_eq_mul]
-    calc ‖s (ω k : K)‖ ≤ (n : ℝ) ^ 2 / lam := h1.trans (hynorm k)
+    calc
+      ‖s (ω k : K)‖
+        ≤ (n : ℝ) ^ 2 / lam := h1.trans (hynorm k)
       _ = (n : ℝ) ^ 2 * D ^ (1 / (n : ℝ)) := h2
       _ ≤ (n : ℝ) ^ 3 * D ^ (1 / (n : ℝ)) :=
-        mul_le_mul_of_nonneg_right (pow_le_pow_right₀ hn1 (by norm_num))
-          (Real.rpow_nonneg hD.le _)
+        mul_le_mul_of_nonneg_right (pow_le_pow_right₀ hn1 (by norm_num)) (Real.rpow_nonneg hD.le _)
 
 end GlobalTheory

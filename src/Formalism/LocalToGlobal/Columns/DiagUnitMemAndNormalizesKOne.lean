@@ -19,15 +19,20 @@ section TwK1b
 
 variable {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K] (P : HeightOneSpectrum (𝓞 E))
 
-theorem twLamQB_red_one (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) {kj n' N : ℕ} (hn : n' ≤ N) (y : Sp E N ≃ₗ[E] Sp E N)
-    (hent : ∀ s t : Fin N, kj ≤ s.1 → s.1 < n' → kj ≤ t.1 → t.1 < n' →
-      IntAt P (y (Pi.single t 1) s) ∧ redP P (y (Pi.single t 1) s) = if s = t then 1 else 0) :
-    LocE.lamQB ξ kj n' (y : Sp E N →ₗ[E] Sp E N) = 1 := by
+theorem twLamQB_red_one
+    (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
+    {kj n' N : ℕ} (hn : n' ≤ N) (y : Sp E N ≃ₗ[E] Sp E N)
+    (hent : ∀ s t : Fin N,
+      kj ≤ s.1 → s.1 < n' → kj ≤ t.1 → t.1 < n'
+        → IntAt P (y (Pi.single t 1) s) ∧ redP P (y (Pi.single t 1) s) = if s = t then 1 else 0)
+    : LocE.lamQB ξ kj n' (y : Sp E N →ₗ[E] Sp E N) = 1 := by
   classical
   have hlt : ∀ u : Fin (n' - kj), kj + u.1 < N := fun u => by have := u.2; omega
   have hlt' : ∀ u : Fin (n' - kj), kj + u.1 < n' := fun u => by have := u.2; omega
-  have hM : ∀ s t : Fin (n' - kj), Loc.atN ((y : Sp E N →ₗ[E] Sp E N) (Loc.eN E N (kj + t.1))) (kj + s.1)
-      = y (Pi.single (⟨kj + t.1, hlt t⟩ : Fin N) 1) ⟨kj + s.1, hlt s⟩ := by
+  have hM
+      : ∀ s t : Fin (n' - kj),
+        Loc.atN ((y : Sp E N →ₗ[E] Sp E N) (Loc.eN E N (kj + t.1))) (kj + s.1)
+          = y (Pi.single (⟨kj + t.1, hlt t⟩ : Fin N) 1) ⟨kj + s.1, hlt s⟩ := by
     intro s t
     have he : Loc.eN E N (kj + t.1) = Pi.single (⟨kj + t.1, hlt t⟩ : Fin N) 1 := by
       funext l
@@ -37,11 +42,16 @@ theorem twLamQB_red_one (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) {kj n' N : ℕ}
     rfl
   have hent' := fun s t : Fin (n' - kj) =>
     hent ⟨kj + s.1, hlt s⟩ ⟨kj + t.1, hlt t⟩ (by simp) (hlt' s) (by simp) (hlt' t)
-  have hdet : redP P (Matrix.of fun s t : Fin (n' - kj) =>
-      Loc.atN ((y : Sp E N →ₗ[E] Sp E N) (Loc.eN E N (kj + t.1))) (kj + s.1)).det = 1 := by
+  have hdet
+      : redP P
+          (Matrix.of fun s t : Fin (n' - kj) =>
+            Loc.atN ((y : Sp E N →ₗ[E] Sp E N) (Loc.eN E N (kj + t.1))) (kj + s.1)).det
+        = 1 := by
     rw [reduction_det_eq_det_reduction]
-    · have h1 : (Matrix.of fun s t : Fin (n' - kj) =>
-          redP P (Loc.atN ((y : Sp E N →ₗ[E] Sp E N) (Loc.eN E N (kj + t.1))) (kj + s.1))) = 1 := by
+    · have h1
+          : (Matrix.of fun s t : Fin (n' - kj) =>
+              redP P (Loc.atN ((y : Sp E N →ₗ[E] Sp E N) (Loc.eN E N (kj + t.1))) (kj + s.1)))
+            = 1 := by
         ext s t
         rw [Matrix.of_apply, hM, (hent' s t).2, Matrix.one_apply]
         simp [Fin.ext_iff]
@@ -80,7 +90,9 @@ theorem twRed0_of_val {w : E} (hw : P.valuation E w < 1) : IntAt P w ∧ redP P 
     rw [← P.intValuation_le_pow_iff_mem, ← hm, ← HeightOneSpectrum.valuation_of_algebraMap (K := E),
       ← HeightOneSpectrum.valuation_of_algebraMap (K := E)]
     change P.valuation E (algebraMap (𝓞 E) E x) ≤ P.valuation E (algebraMap (𝓞 E) E s)
-    have e : algebraMap (𝓞 E) E x = (algebraMap (𝓞 E) E x / algebraMap (𝓞 E) E s) * algebraMap (𝓞 E) E s := by
+    have e
+        : algebraMap (𝓞 E) E x
+          = (algebraMap (𝓞 E) E x / algebraMap (𝓞 E) E s) * algebraMap (𝓞 E) E s := by
       field_simp
     rw [e, map_mul]
     exact mul_le_of_le_one_left' hw.le
@@ -88,9 +100,13 @@ theorem twRed0_of_val {w : E} (hw : P.valuation E w < 1) : IntAt P w ∧ redP P 
     rw [hJ]
     exact Ideal.mul_mem_mul hx htJ
   obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.mp hxt
-  have hz' : algebraMap (𝓞 E) E x / algebraMap (𝓞 E) E s = algebraMap (𝓞 E) E z / algebraMap (𝓞 E) E t := by
+  have hz'
+      : algebraMap (𝓞 E) E x / algebraMap (𝓞 E) E s
+        = algebraMap (𝓞 E) E z / algebraMap (𝓞 E) E t := by
     rw [div_eq_div_iff hsE htE, ← map_mul, ← map_mul, ← hz, mul_comm]
-  have hrel : algebraMap (𝓞 E) E t * (algebraMap (𝓞 E) E x / algebraMap (𝓞 E) E s) = algebraMap (𝓞 E) E z := by
+  have hrel
+      : algebraMap (𝓞 E) E t * (algebraMap (𝓞 E) E x / algebraMap (𝓞 E) E s)
+        = algebraMap (𝓞 E) E z := by
     rw [hz']
     field_simp
   have ht1 : P.valuation E (algebraMap (𝓞 E) E t) = 1 := by

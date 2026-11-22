@@ -5,9 +5,10 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.MulLinearAe.mulL_ae.{u_1} :
-    ∀ {X : Type u_1} [inst : MeasurableSpace X] {ν : MeasureTheory.Measure X} (c : X → ℝ) (hc : Measurable c)
-      (hb : ∀ (x : X), |c x| ≤ (1 : ℝ)) (f : ↥(MeasureTheory.Lp ℂ (2 : ENNReal) ν)),
+theorem UpperTheory.Reformulated.B.MulLinearAe.mulL_ae.{u_1}
+    : ∀ {X : Type u_1} [inst : MeasurableSpace X] {ν : MeasureTheory.Measure X} (c : X → ℝ)
+        (hc : Measurable c) (hb : ∀ (x : X), |c x| ≤ (1 : ℝ))
+        (f : ↥(MeasureTheory.Lp ℂ (2 : ENNReal) ν)),
       (↑(↑((UpperTheory.Reformulated.B.MultiplicationNormBound.mulL c hc hb : ↥(MeasureTheory.Lp ℂ (2 : ENNReal) ν) → ↥(MeasureTheory.Lp ℂ (2 : ENNReal) ν))
                         f) :
               X →ₘ[ν] ℂ) :

@@ -9,15 +9,23 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem ext_of_prod {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+private theorem ext_of_prod
+    {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
     [T2Space Γ] [CommRing R] [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M]
-    (ρ : Representation R Γ M) (C U : Subgroup Γ) [hN : U.Normal] (hC : IsClosed (C : Set Γ))
-    (hU : IsClosed (U : Set Γ)) (hCU : ∀ g : Γ, ∃ p : C × U, p.1.1 * p.2.1 = g) (φ : U → M) (hρ : ContAction ρ)
-    (htr : ∀ u ∈ U, ∀ m, ρ u m = m) (hφ : Continuous φ) (hadd : ∀ a b, φ (a * b) = φ a + φ b)
-    (heq : ∀ (g : Γ) (u u' : U), u'.1 * g = g * u.1 → φ u' = ρ g (φ u)) (hv : ∀ x : U, x.1 ∈ C → φ x = 0) :
-    ∃ z ∈ Z1 ρ, ∀ u : U, z u.1 = φ u := by
+    (ρ : Representation R Γ M)
+    (C U : Subgroup Γ) [hN : U.Normal]
+    (hC : IsClosed (C : Set Γ)) (hU : IsClosed (U : Set Γ))
+    (hCU : ∀ g : Γ, ∃ p : C × U, p.1.1 * p.2.1 = g)
+    (φ : U → M)
+    (hρ : ContAction ρ) (htr : ∀ u ∈ U, ∀ m, ρ u m = m) (hφ : Continuous φ)
+    (hadd : ∀ a b, φ (a * b) = φ a + φ b)
+    (heq : ∀ (g : Γ) (u u' : U), u'.1 * g = g * u.1 → φ u' = ρ g (φ u))
+    (hv : ∀ x : U, x.1 ∈ C → φ x = 0)
+    : ∃ z ∈ Z1 ρ, ∀ u : U, z u.1 = φ u := by
   classical
   obtain ⟨f, hf⟩ : ∃ f : C × U → Γ, ∀ p, f p = p.1.1 * p.2.1 := ⟨_, fun _ => rfl⟩
   have hwd : ∀ p q : C × U, f p = f q → ρ p.1.1 (φ p.2) = ρ q.1.1 (φ q.2) := by
@@ -47,7 +55,8 @@ private theorem ext_of_prod {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [Is
   have hfc : Continuous f := by
     have : f = fun p : C × U => p.1.1 * p.2.1 := funext hf
     rw [this]
-    exact (continuous_subtype_val.comp continuous_fst).mul (continuous_subtype_val.comp continuous_snd)
+    exact (continuous_subtype_val.comp continuous_fst).mul
+      (continuous_subtype_val.comp continuous_snd)
   have hfs : Function.Surjective f := fun g => ⟨s g, by rw [hf, hs]⟩
   have hq : Topology.IsQuotientMap f := hfc.isClosedMap.isQuotientMap hfc hfs
   have hzc : Continuous z := by
@@ -65,12 +74,14 @@ private theorem ext_of_prod {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [Is
     obtain ⟨⟨⟨c, hc⟩, ⟨u, hu⟩⟩, rfl⟩ := hfs g
     obtain ⟨⟨⟨d, hd⟩, ⟨v, hv'⟩⟩, rfl⟩ := hfs h
     have hu0 : d⁻¹ * u * d ∈ U := by simpa using hN.conj_mem u hu d⁻¹
-    have hprod : f (⟨c, hc⟩, ⟨u, hu⟩) * f (⟨d, hd⟩, ⟨v, hv'⟩)
-        = f (⟨c * d, C.mul_mem hc hd⟩, ⟨d⁻¹ * u * d, hu0⟩ * ⟨v, hv'⟩) := by
+    have hprod
+        : f (⟨c, hc⟩, ⟨u, hu⟩) * f (⟨d, hd⟩, ⟨v, hv'⟩)
+          = f (⟨c * d, C.mul_mem hc hd⟩, ⟨d⁻¹ * u * d, hu0⟩ * ⟨v, hv'⟩) := by
       simp only [hf, Subgroup.coe_mul]
       group
     rw [hprod, hzf, hzf, hzf, hf]
-    change ρ (c * d) (φ (⟨d⁻¹ * u * d, hu0⟩ * ⟨v, hv'⟩)) = ρ c (φ ⟨u, hu⟩) + ρ (c * u) (ρ d (φ ⟨v, hv'⟩))
+    change ρ (c * d) (φ (⟨d⁻¹ * u * d, hu0⟩ * ⟨v, hv'⟩))
+      = ρ c (φ ⟨u, hu⟩) + ρ (c * u) (ρ d (φ ⟨v, hv'⟩))
     have hconj : φ ⟨u, hu⟩ = ρ d (φ ⟨d⁻¹ * u * d, hu0⟩) :=
       heq d ⟨d⁻¹ * u * d, hu0⟩ ⟨u, hu⟩ (by show u * d = d * (d⁻¹ * u * d); group)
     rw [hadd, map_add (f := _), hconj]
@@ -78,9 +89,14 @@ private theorem ext_of_prod {Γ R M : Type} [Group Γ] [TopologicalSpace Γ] [Is
     rw [htr u hu]
   exact ⟨z, ⟨hzc, hcoc⟩, hzU⟩
 
-theorem UpperTheory.V.Kum.extCocycle :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R (G F Ω) M) (φ : Uinf F Ω l → M), Procyc F Ω l → ContAction ρ → (∀ u ∈ Uinf F Ω l, ∀ m, ρ u m = m) → (∀ m : M, ∃ k : ℕ, l ^ k • m = 0) →
-    IsLocallyConstant φ → (∀ a b, φ (a * b) = φ a + φ b) → (∀ g : G F Ω, φ ∈ conjCond (Uinf F Ω l) g.toRingEquiv (ρ g)) → ∃ z ∈ Z1 ρ, ∀ u : Uinf F Ω l, z u.1 = φ u := by
+theorem UpperTheory.V.Kum.extCocycle
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] [TopologicalSpace M]
+        [DiscreteTopology M] (ρ : Representation R (G F Ω) M) (φ : Uinf F Ω l → M),
+      Procyc F Ω l → ContAction ρ → (∀ u ∈ Uinf F Ω l, ∀ m, ρ u m = m)
+        → (∀ m : M, ∃ k : ℕ, l ^ k • m = 0) → IsLocallyConstant φ → (∀ a b, φ (a * b) = φ a + φ b)
+        → (∀ g : G F Ω, φ ∈ conjCond (Uinf F Ω l) g.toRingEquiv (ρ g))
+        → ∃ z ∈ Z1 ρ, ∀ u : Uinf F Ω l, z u.1 = φ u := by
   intro F Ω _ _ _ _ _ l _ R M _ _ _ _ _ ρ φ hP hρ htr htors hloc hadd hconj
   classical
   have hVc : IsClosed ((cycZ F Ω l).range : Set ℤ_[l]ˣ) := by
@@ -99,8 +115,9 @@ theorem UpperTheory.V.Kum.extCocycle :
     obtain ⟨n, hn, hpow⟩ := isOfFinOrder_iff_pow_eq_one.mp hfin
     have hS : ∀ u ∈ (cycZ F Ω l).range, u ^ n = 1 := by
       intro u hu
-      have hsub : closure ((Subgroup.zpowers (cycZ F Ω l γ) : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ)
-          ⊆ {x | x ^ n = 1} := by
+      have hsub
+          : closure ((Subgroup.zpowers (cycZ F Ω l γ) : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ)
+            ⊆ {x | x ^ n = 1} := by
         apply closure_minimal
         · intro x hx
           obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
@@ -133,15 +150,18 @@ theorem UpperTheory.V.Kum.extCocycle :
     intro x hx
     show x ∈ (⊤ ⊓ (cycZ F Ω l).ker : Subgroup (G F Ω))
     exact Subgroup.mem_inf.mpr ⟨Subgroup.mem_top x, MonoidHom.mem_ker.mpr hx⟩
-  have hCU : ∀ g : G F Ω, ∃ p : (Subgroup.zpowers γ).topologicalClosure × Uinf F Ω l,
-      p.1.1 * p.2.1 = g := by
+  have hCU
+      : ∀ g : G F Ω, ∃ p : (Subgroup.zpowers γ).topologicalClosure × Uinf F Ω l,
+        p.1.1 * p.2.1 = g := by
     intro g
-    have himg : closure ((Subgroup.zpowers (cycZ F Ω l γ) : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ)
-        ⊆ (cycZ F Ω l) '' ((Subgroup.zpowers γ).topologicalClosure : Set (G F Ω)) := by
+    have himg
+        : closure ((Subgroup.zpowers (cycZ F Ω l γ) : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ)
+          ⊆ (cycZ F Ω l) '' ((Subgroup.zpowers γ).topologicalClosure : Set (G F Ω)) := by
       apply closure_minimal
       · intro x hx
         obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
-        exact ⟨γ ^ k, Subgroup.le_topologicalClosure _ (Subgroup.zpow_mem_zpowers γ k), map_zpow _ _ _⟩
+        exact
+          ⟨γ ^ k, Subgroup.le_topologicalClosure _ (Subgroup.zpow_mem_zpowers γ k), map_zpow _ _ _⟩
       · exact (hCc.isCompact.image (continuous_cycZ F Ω l)).isClosed
     have hg := hgen (MonoidHom.mem_range.mpr ⟨g, rfl⟩)
     rw [← SetLike.mem_coe, Subgroup.topologicalClosure_coe] at hg
@@ -154,6 +174,6 @@ theorem UpperTheory.V.Kum.extCocycle :
     intro x
     have h3 := congrArg (fun e : G F Ω => e x) h
     simpa [AlgEquiv.mul_apply] using h3
-  have hv : ∀ x : Uinf F Ω l, x.1 ∈ (Subgroup.zpowers γ).topologicalClosure → φ x = 0 :=
-    fun x hx => vanishCyc F Ω l M φ γ hloc hadd htors hnf x hx
+  have hv : ∀ x : Uinf F Ω l, x.1 ∈ (Subgroup.zpowers γ).topologicalClosure → φ x = 0 := fun x hx =>
+    vanishCyc F Ω l M φ γ hloc hadd htors hnf x hx
   exact ext_of_prod ρ _ _ hCc hUc hCU φ hρ htr hloc.continuous hadd heq hv

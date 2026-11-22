@@ -31,12 +31,15 @@ theorem homothetic_lattice_integral_of : HomotheticLatticeIntegralS2 := by
   have hlp : l.Prime := Fact.out
 
   have hc0 : ι.symm lam ≠ 0 := by
-    intro h; apply hlam
+    intro h
+    apply hlam
     have := congrArg ι h
     simpa using this
   have hc : (ι.symm lam)⁻¹ ≠ 0 := inv_ne_zero hc0
   obtain ⟨-, -, -, -, -, -, hs2, -, -, hg2, hg3⟩ := Formalism.L2.Th1.F.homogeneity L _ hc
-  have es : ι (Formalism.L2.Th1.F.s2 (Formalism.L2.Th1.F.scalePair L _ hc)) = lam ^ 2 * ι (Formalism.L2.Th1.F.s2 L) := by
+  have es
+      : ι (Formalism.L2.Th1.F.s2 (Formalism.L2.Th1.F.scalePair L _ hc))
+        = lam ^ 2 * ι (Formalism.L2.Th1.F.s2 L) := by
     rw [hs2]; simp
   refine ⟨(ι.symm lam)⁻¹, hc, ?_, ?_, ?_⟩
   · rw [hg2, e2]; simp
@@ -50,18 +53,24 @@ theorem homothetic_lattice_integral_of : HomotheticLatticeIntegralS2 := by
   have hsum' : -(2 * (dK : ℂ)) * Formalism.L2.Th1.F.s2 L = ∑ P ∈ S, L.weierstrassP P := by
     rw [← hsum]; push_cast; ring
 
-  have hP : ∀ P ∈ S, lam ^ 2 * ι (L.weierstrassP P) ∈ MaximalUnramifiedExtension l ∧ ‖lam ^ 2 * ι (L.weierstrassP P)‖ ≤ 1 := by
+  have hP
+      : ∀ P ∈ S,
+        lam ^ 2 * ι (L.weierstrassP P) ∈ MaximalUnramifiedExtension l
+          ∧ ‖lam ^ 2 * ι (L.weierstrassP P)‖ ≤ 1 := by
     intro P hPS
     obtain ⟨h1, h2⟩ := hS.1 P hPS
     have h3 : (dK : ℂ) * P ∈ L.lattice := by
       have h4 := hst _ h1
-      have h5 : (dK : ℂ) * P
-          = -((((-1 : ℤ) : ℂ) + ((2 : ℤ) : ℂ) * omegaK dK)
+      have h5
+          : (dK : ℂ) * P
+            = -((((-1 : ℤ) : ℂ) + ((2 : ℤ) : ℂ) * omegaK dK)
               * ((((-1 : ℤ) : ℂ) + ((2 : ℤ) : ℂ) * omegaK dK) * P)) := by
         rw [← mul_assoc, ← sq, HomotheticLatticeIntegrality.alpha_sq]; ring
-      rw [h5]; exact neg_mem h4
-    obtain ⟨a, -, b, -⟩ := cm4 dK L hsq h4 hcm l hl5 hld ι lam hlam (e2 ▸ k2) (e3 ▸ k3) (e2 ▸ n2)
-      (e3 ▸ n3) (by rw [← e2, ← e3]; exact nd) P dK hd0 hld h3 h2
+      rw [h5]
+      exact neg_mem h4
+    obtain ⟨a, -, b, -⟩ :=
+      cm4 dK L hsq h4 hcm l hl5 hld ι lam hlam (e2 ▸ k2) (e3 ▸ k3) (e2 ▸ n2) (e3 ▸ n3)
+        (by rw [← e2, ← e3]; exact nd) P dK hd0 hld h3 h2
     exact ⟨a, b⟩
   have hn : ¬ l ∣ 2 * dK := by
     intro h
@@ -69,11 +78,12 @@ theorem homothetic_lattice_integral_of : HomotheticLatticeIntegralS2 := by
     · have := Nat.le_of_dvd (by norm_num) h; omega
     · exact hld h
   have hN : ‖((2 * dK : ℕ) : ℂ_[l])‖ = 1 :=
-    Formalism.DworkPowerSeriesWeights.norm_natCast_eq_one_of_not_dvd hlp (UnramifiedCompletion.normL_lt_one l) hn
-  have hN0 : ((2 * dK : ℕ) : ℂ_[l]) ≠ 0 := by
-    intro h; rw [h, norm_zero] at hN; exact zero_ne_one hN
-  have key : lam ^ 2 * ι (Formalism.L2.Th1.F.s2 L)
-      = -(((2 * dK : ℕ) : ℂ_[l])⁻¹ * ∑ P ∈ S, lam ^ 2 * ι (L.weierstrassP P)) := by
+    Formalism.DworkPowerSeriesWeights.norm_natCast_eq_one_of_not_dvd hlp
+      (UnramifiedCompletion.normL_lt_one l) hn
+  have hN0 : ((2 * dK : ℕ) : ℂ_[l]) ≠ 0 := by intro h; rw [h, norm_zero] at hN; exact zero_ne_one hN
+  have key
+      : lam ^ 2 * ι (Formalism.L2.Th1.F.s2 L)
+        = -(((2 * dK : ℕ) : ℂ_[l])⁻¹ * ∑ P ∈ S, lam ^ 2 * ι (L.weierstrassP P)) := by
     have h := congrArg ι hsum'
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_mul, map_neg, map_mul, map_sum, map_ofNat, map_natCast] at h

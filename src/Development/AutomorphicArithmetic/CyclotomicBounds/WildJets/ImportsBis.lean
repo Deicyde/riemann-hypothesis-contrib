@@ -15,18 +15,29 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.WildJets.MoveRo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
 open Formalism.DivisionValues (vw lw)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem UpperTheory.WildA.move :
-    ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} {G : GlobalTheory.ChiGrid.GridData L sc} {W : G.Weil} {U₀ : Set T} {N : Std G U₀} (Z : Normal W N) {μ₀ : T}, L.Is μ₀ → ∀ (t : T) (p : GlobalTheory.ChiGrid.Pair T), DefPair D.R.m p →
-      ∀ (d : FinDatum G t p) (x r : FinPt G (p).small) (y r' : FinPt G (p).big)
-        (U : Matrix.unitaryGroup (Fin (G.V (p).small).rank) D.host.E) (U' : Matrix.unitaryGroup (Fin (G.V (p).big).rank) D.host.E),
-        GlobalTheory.RatMoveJets.RatCoord _ (N.fr (p).small) r U → GlobalTheory.RatMoveJets.RatCoord _ (N.fr (p).big) r' U' →
-        Z.kkMap 1 d (r * x) (r' * y) ∘ₗ rhoVr (tauE D) (wt G (p).small) (Unitary.toUnits U) =
-          rhoVr (tauE D) (wt G (p).big) (Unitary.toUnits U') ∘ₗ Z.kkMap 1 d x y := by
+theorem UpperTheory.WildA.move
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts}
+        {G : GlobalTheory.ChiGrid.GridData L sc} {W : G.Weil} {U₀ : Set T} {N : Std G U₀}
+        (Z : Normal W N) {μ₀ : T},
+      L.Is μ₀
+        → ∀ (t : T) (p : GlobalTheory.ChiGrid.Pair T),
+          DefPair D.R.m p
+            → ∀ (d : FinDatum G t p) (x r : FinPt G (p).small) (y r' : FinPt G (p).big)
+                (U : Matrix.unitaryGroup (Fin (G.V (p).small).rank) D.host.E)
+                (U' : Matrix.unitaryGroup (Fin (G.V (p).big).rank) D.host.E),
+              GlobalTheory.RatMoveJets.RatCoord _ (N.fr (p).small) r U
+                → GlobalTheory.RatMoveJets.RatCoord _ (N.fr (p).big) r' U'
+                → Z.kkMap 1 d (r * x) (r' * y)
+                    ∘ₗ rhoVr (tauE D) (wt G (p).small) (Unitary.toUnits U)
+                  = rhoVr (tauE D) (wt G (p).big) (Unitary.toUnits U') ∘ₗ Z.kkMap 1 d x y := by
   intro D T L sc G W U₀ N Z μ₀ hL t p hp
   cases p with
   | chi i j =>

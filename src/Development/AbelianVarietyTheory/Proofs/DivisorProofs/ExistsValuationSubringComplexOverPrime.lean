@@ -8,13 +8,13 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.CMModel
 
-theorem exists_valuationSubring_complex_over_prime :
-    ∀ (F : IntermediateField ℚ ℂ) [NumberField F] (w : HeightOneSpectrum (𝓞 F)),
-      ∃ V : ValuationSubring ℂ, ∀ x : F, (x : ℂ) ∈ V ↔ x ∈ w.valuationSubringAtPrime F := by
+theorem exists_valuationSubring_complex_over_prime
+    : ∀ (F : IntermediateField ℚ ℂ) [NumberField F] (w : HeightOneSpectrum (𝓞 F)),
+      ∃ V : ValuationSubring ℂ, ∀ x : F,
+        (x : ℂ) ∈ V ↔ x ∈ w.valuationSubringAtPrime F := by
   intro F _ w
   set R := w.valuationSubringAtPrime F with hR
-  obtain ⟨V, hV, hloc⟩ := IsLocalRing.exists_factor_valuationRing
-    ((algebraMap F ℂ).comp R.subtype)
+  obtain ⟨V, hV, hloc⟩ := IsLocalRing.exists_factor_valuationRing ((algebraMap F ℂ).comp R.subtype)
   refine ⟨V, fun x => ⟨fun hx => ?_, fun hx => hV ⟨x, hx⟩⟩⟩
   by_contra hxR
   have hx0 : x ≠ 0 := by
@@ -22,7 +22,8 @@ theorem exists_valuationSubring_complex_over_prime :
     exact hxR R.zero_mem
   have hinv : x⁻¹ ∈ R := (R.mem_or_inv_mem x).resolve_left hxR
   have hx0' : (x : ℂ) ≠ 0 := by exact_mod_cast hx0
-  have hu : IsUnit ((((algebraMap F ℂ).comp R.subtype).codRestrict V.toSubring hV) ⟨x⁻¹, hinv⟩) := by
+  have hu
+      : IsUnit ((((algebraMap F ℂ).comp R.subtype).codRestrict V.toSubring hV) ⟨x⁻¹, hinv⟩) := by
     refine IsUnit.of_mul_eq_one ⟨(x : ℂ), hx⟩ ?_
     apply Subtype.ext
     change ((x⁻¹ : F) : ℂ) * (x : ℂ) = 1

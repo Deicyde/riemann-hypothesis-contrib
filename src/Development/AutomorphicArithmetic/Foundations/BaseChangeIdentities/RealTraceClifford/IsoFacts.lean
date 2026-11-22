@@ -10,26 +10,31 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
 private theorem dot_rt {n : ℕ} (x : Wt n) (a b : Fin n) : ∑ c, x c * rt a b c = x a - x b := by
   simp [rt, mul_sub, Finset.sum_sub_distrib, Pi.single_apply]
 
-private theorem dot_add {n : ℕ} (x u v : Wt n) :
-    ∑ c, x c * (u + v) c = ∑ c, x c * u c + ∑ c, x c * v c := by
+private theorem dot_add {n : ℕ} (x u v : Wt n)
+    : ∑ c, x c * (u + v) c = ∑ c, x c * u c + ∑ c, x c * v c := by
   simp [mul_add, Finset.sum_add_distrib]
 
-private theorem wt_shift {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-    {F : Fin n → Fin n → Module.End ℂ V} (hg : GlRel F) {μ : Wt n} {y : V}
-    (hy : IsWeight F μ y) (a b : Fin n) : IsWeight F (μ + rt a b) (F a b y) := by
+private theorem wt_shift
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    {F : Fin n → Fin n → Module.End ℂ V} (hg : GlRel F)
+    {μ : Wt n} {y : V} (hy : IsWeight F μ y)
+    (a b : Fin n)
+    : IsWeight F (μ + rt a b) (F a b y) := by
   intro c
   have h := LinearMap.congr_fun (hg c c a b) y
   simp only [LinearMap.sub_apply, Module.End.mul_apply] at h
   rw [hy c, map_smul, sub_eq_iff_eq_add] at h
   rw [h]
   by_cases hca : c = a <;> by_cases hcb : c = b
-  · subst hca; subst hcb
+  · subst hca
+    subst hcb
     simp [rt]
   · subst hca
     simp [rt, Pi.single_apply, hcb, Ne.symm hcb, add_smul]
@@ -39,10 +44,12 @@ private theorem wt_shift {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
     abel
   · simp [rt, Pi.single_apply, hca, hcb, Ne.symm hcb]
 
-private theorem wt_word {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-    {F : Fin n → Fin n → Module.End ℂ V} (hg : GlRel F) {μ : Wt n} {x : V}
-    (hx : IsWeight F μ x) (w : List (Fin n × Fin n)) :
-    IsWeight F (μ + (w.map fun p => rt p.1 p.2).sum) (Formalism.REAL.ew F w x) := by
+private theorem wt_word
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    {F : Fin n → Fin n → Module.End ℂ V} (hg : GlRel F)
+    {μ : Wt n} {x : V} (hx : IsWeight F μ x)
+    (w : List (Fin n × Fin n))
+    : IsWeight F (μ + (w.map fun p => rt p.1 p.2).sum) (Formalism.REAL.ew F w x) := by
   induction w with
   | nil => simpa [Formalism.REAL.ew] using hx
   | cons p w ih =>
@@ -51,9 +58,9 @@ private theorem wt_word {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
     simp only [List.map_cons, List.sum_cons, Module.End.mul_apply]
     rwa [show ∀ u v : Wt n, μ + (u + v) = (μ + v) + u from fun u v => by abel]
 
-private theorem maj_word {n : ℕ} (ν x : Wt n) (hx : Antitone x) (w : List (Fin n × Fin n))
-    (hw : ∀ p ∈ w, p.2 < p.1) :
-    ∑ a, x a * (ν + (w.map fun p => rt p.1 p.2).sum) a ≤ ∑ a, x a * ν a := by
+private theorem maj_word
+    {n : ℕ} (ν x : Wt n) (hx : Antitone x) (w : List (Fin n × Fin n)) (hw : ∀ p ∈ w, p.2 < p.1)
+    : ∑ a, x a * (ν + (w.map fun p => rt p.1 p.2).sum) a ≤ ∑ a, x a * ν a := by
   induction w with
   | nil => simp
   | cons p w ih =>
@@ -82,9 +89,16 @@ private theorem rhoV_anti (n : ℕ) : Antitone (rhoV n) := by
   simp only [rhoV]
   linarith
 
-theorem UpperTheory.RealTr.isoFacts :
-    ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (F : Fin n → Fin n → Module.End ℂ V), UF F → ∀ S : Submodule ℂ V, FiniteDimensional ℂ S → Stb F S → ∀ ν : Wt n, (∀ μ, μ ≠ ν → hw F μ ⊓ S = ⊥) →
-      (∀ x ∈ S, Cas F x = ((nsq (ν + rhoV n) - nsq (rhoV n) : ℝ) : ℂ) • x) ∧ (∀ μ, wsp F μ ⊓ S ≠ ⊥ → Maj μ ν) ∧ wsp F ν ⊓ S = hw F ν ⊓ S := by
+theorem UpperTheory.RealTr.isoFacts
+    : ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+        (F : Fin n → Fin n → Module.End ℂ V),
+      UF F
+        → ∀ S : Submodule ℂ V,
+          FiniteDimensional ℂ S → Stb F S
+            → ∀ ν : Wt n,
+              (∀ μ, μ ≠ ν → hw F μ ⊓ S = ⊥)
+                → (∀ x ∈ S, Cas F x = ((nsq (ν + rhoV n) - nsq (rhoV n) : ℝ) : ℂ) • x)
+                  ∧ (∀ μ, wsp F μ ⊓ S ≠ ⊥ → Maj μ ν) ∧ wsp F ν ⊓ S = hw F ν ⊓ S := by
   intro n V _ _ F hF S hS hst ν hν
   have hK : Formalism.REAL.KRel (fun _ : Fin n => true) F := Formalism.REAL.glRel_kRel _ F hF.gl
   have hU : Formalism.REAL.KUnit (fun _ : Fin n => true) F := fun a b _ x y => hF.unit a b x y
@@ -104,7 +118,9 @@ theorem UpperTheory.RealTr.isoFacts :
       simp only [Formalism.REAL.ckv, rhoC_true, nsq_eq]
     intro y hy
     rw [← hsup] at hy
-    refine Submodule.iSup_induction _ (motive := fun y => Cas F y = ((nsq (ν + rhoV n) - nsq (rhoV n) : ℝ) : ℂ) • y) hy ?_ ?_ ?_
+    refine Submodule.iSup_induction _
+      (motive := fun y => Cas F y = ((nsq (ν + rhoV n) - nsq (rhoV n) : ℝ) : ℂ) • y)
+      hy ?_ ?_ ?_
     · intro i z hz
       have hz' := Formalism.REAL.kCasSpan V n _ F (μ i) (x i) hK (hx i).2.2 z hz
       rw [hCas, hμ i, hck] at hz'
@@ -124,7 +140,8 @@ theorem UpperTheory.RealTr.isoFacts :
       rw [← hsup]
       apply iSup_le
       intro i
-      rw [(Formalism.REAL.kLow V n _ F (μ i) (x i) hK (hx i).2.2).1, Formalism.REAL.lowSpan, Submodule.span_le]
+      rw [(Formalism.REAL.kLow V n _ F (μ i) (x i) hK (hx i).2.2).1, Formalism.REAL.lowSpan,
+        Submodule.span_le]
       rintro z ⟨w, hwl, rfl⟩
       have hwt := wt_word hF.gl (hx i).2.2.1 w
       rw [hμ i] at hwt
@@ -146,10 +163,11 @@ theorem UpperTheory.RealTr.isoFacts :
       by_contra hne
       have hmem : F a b y ∈ wsp F (ν + rt a b) ⊓ S :=
         Submodule.mem_inf.mpr ⟨wt_shift hF.gl hyw a b, hst a b y hyS⟩
-      have hM' := hM (ν + rt a b) (by
-        intro h
-        rw [h] at hmem
-        exact hne ((Submodule.mem_bot ℂ).mp hmem))
+      have hM' :=
+        hM (ν + rt a b) (by
+          intro h
+          rw [h] at hmem
+          exact hne ((Submodule.mem_bot ℂ).mp hmem))
       have h1 := hM' (rhoV n) (rhoV_anti n)
       rw [dot_add, dot_rt] at h1
       have hlt : (a : ℝ) < (b : ℝ) := by exact_mod_cast hab

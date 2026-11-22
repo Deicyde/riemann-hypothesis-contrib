@@ -6,20 +6,27 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemIdemp
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.CompDich
 
-theorem one_sub_mem_compI {S : Type} [CommRing S] {P : Ideal S} (hP : P.IsPrime) {e : S}
-    (he : IsIdempotentElem e) (heP : e ∉ P) : 1 - e ∈ compI P := by
+theorem one_sub_mem_compI
+    {S : Type} [CommRing S]
+    {P : Ideal S} (hP : P.IsPrime)
+    {e : S} (he : IsIdempotentElem e) (heP : e ∉ P)
+    : 1 - e ∈ compI P := by
   refine Ideal.subset_span ⟨he.one_sub, ?_⟩
   have h0 : e * (1 - e) = 0 := by rw [mul_sub, mul_one, he.eq, sub_self]
   have h1 : e * (1 - e) ∈ P := by rw [h0]; exact P.zero_mem
   exact (hP.mem_or_mem h1).resolve_left heP
 
-theorem dich_comp : ∀ {S : Type} [CommRing S] (ϖ : S) (P : Ideal S), P.IsPrime →
-    (Val ϖ → Dich (Ideal.Quotient.mk (compI P) ϖ)) ∧
-    (ϖ ∈ nonZeroDivisors S → Ideal.Quotient.mk (compI P) ϖ ∈ nonZeroDivisors (S ⧸ compI P)) := by
+theorem dich_comp
+    : ∀ {S : Type} [CommRing S] (ϖ : S) (P : Ideal S),
+      P.IsPrime
+        → (Val ϖ → Dich (Ideal.Quotient.mk (compI P) ϖ))
+          ∧ (ϖ ∈ nonZeroDivisors S
+            → Ideal.Quotient.mk (compI P) ϖ ∈ nonZeroDivisors (S ⧸ compI P)) := by
   intro S _ ϖ P hP
   refine ⟨fun hV => ?_, fun hϖ => ?_⟩
   · rintro f g ⟨N, hN⟩
@@ -66,6 +73,7 @@ theorem dich_comp : ∀ {S : Type} [CommRing S] (ϖ : S) (P : Ideal S), P.IsPrim
     obtain ⟨e, he, heP, hez⟩ := (GlobalTheory.CompanionTheory.CompIdeal.mem_compI_iff P hP _).1 h1
     have h2 : e * x = 0 :=
       (mul_right_mem_nonZeroDivisors_eq_zero_iff hϖ).1 (by rw [mul_assoc]; exact hez)
-    exact Ideal.Quotient.eq_zero_iff_mem.2 ((GlobalTheory.CompanionTheory.CompIdeal.mem_compI_iff P hP x).2 ⟨e, he, heP, h2⟩)
+    exact Ideal.Quotient.eq_zero_iff_mem.2
+      ((GlobalTheory.CompanionTheory.CompIdeal.mem_compI_iff P hP x).2 ⟨e, he, heP, h2⟩)
 
 end GlobalTheory.CompanionTheory.CompDich

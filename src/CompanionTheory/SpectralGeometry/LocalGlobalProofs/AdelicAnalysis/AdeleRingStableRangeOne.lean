@@ -9,10 +9,13 @@ open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.AdeleStableRange
 
-theorem local_val {K Γ : Type*} [Field K] [LinearOrderedCommGroupWithZero Γ] (w : Valuation K Γ)
-    (a b x y : K) (h : x * a + y * b = 1) :
-    ∃ t : K, (t = 0 ∨ t = 1) ∧ a + t * b ≠ 0 ∧
-      (w a ≤ 1 → w b ≤ 1 → w x ≤ 1 → w y ≤ 1 → w (a + t * b) = 1) := by
+theorem local_val
+    {K Γ : Type*} [Field K] [LinearOrderedCommGroupWithZero Γ]
+    (w : Valuation K Γ)
+    (a b x y : K) (h : x * a + y * b = 1)
+    : ∃ t : K,
+      (t = 0 ∨ t = 1) ∧ a + t * b ≠ 0
+        ∧ (w a ≤ 1 → w b ≤ 1 → w x ≤ 1 → w y ≤ 1 → w (a + t * b) = 1) := by
   have hb0 : a = 0 → b ≠ 0 := by
     rintro rfl rfl
     simp at h
@@ -50,8 +53,8 @@ theorem local_val {K Γ : Type*} [Field K] [LinearOrderedCommGroupWithZero Γ] (
       simpa [ha0] using hb0 ha0
     · refine ⟨0, Or.inl rfl, by simpa using ha0, fun h1 h2 h3 h4 => absurd ⟨h1, h2, h3, h4⟩ hint⟩
 
-theorem local_field {K : Type*} [Field K] (a b x y : K) (h : x * a + y * b = 1) :
-    ∃ t : K, IsUnit (a + t * b) := by
+theorem local_field {K : Type*} [Field K] (a b x y : K) (h : x * a + y * b = 1)
+    : ∃ t : K, IsUnit (a + t * b) := by
   by_cases ha : a = 0
   · refine ⟨1, ?_⟩
     rw [isUnit_iff_ne_zero, ha]
@@ -60,9 +63,10 @@ theorem local_field {K : Type*} [Field K] (a b x y : K) (h : x * a + y * b = 1) 
     simp [ha, hb] at h
   · exact ⟨0, by simpa [isUnit_iff_ne_zero] using ha⟩
 
-theorem finite_part (R K : Type*) [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
-    [IsFractionRing R K] (a b : FiniteAdeleRing R K) (hab : IsCoprime a b) :
-    ∃ t : FiniteAdeleRing R K, IsUnit (a + t * b) := by
+theorem finite_part
+    (R K : Type*) [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    (a b : FiniteAdeleRing R K) (hab : IsCoprime a b)
+    : ∃ t : FiniteAdeleRing R K, IsUnit (a + t * b) := by
   obtain ⟨x, y, hxy⟩ := hab
   have hloc : ∀ v : HeightOneSpectrum R, x v * a v + y v * b v = 1 := fun v =>
     congrArg (fun z : FiniteAdeleRing R K => z v) hxy
@@ -80,16 +84,18 @@ theorem finite_part (R K : Type*) [CommRing R] [IsDedekindDomain R] [Field K] [A
   filter_upwards [a.2, b.2, x.2, y.2] with v h1 h2 h3 h4
   exact hval v h1 h2 h3 h4
 
-theorem infinite_part (K : Type*) [Field K] [NumberField K] (a b : InfiniteAdeleRing K)
-    (hab : IsCoprime a b) : ∃ t : InfiniteAdeleRing K, IsUnit (a + t * b) := by
+theorem infinite_part
+    (K : Type*) [Field K] [NumberField K] (a b : InfiniteAdeleRing K) (hab : IsCoprime a b)
+    : ∃ t : InfiniteAdeleRing K, IsUnit (a + t * b) := by
   obtain ⟨x, y, hxy⟩ := hab
   have hloc : ∀ v : InfinitePlace K, x v * a v + y v * b v = 1 := fun v =>
     congrArg (fun z : InfiniteAdeleRing K => z v) hxy
   choose t ht using fun v : InfinitePlace K => local_field (a v) (b v) (x v) (y v) (hloc v)
   exact ⟨t, Pi.isUnit_iff.2 ht⟩
 
-theorem adeleRing_stableRange_one : ∀ (F : Type) [Field F] [NumberField F] (a b : AdeleRing (𝓞 F) F),
-    IsCoprime a b → ∃ t, IsUnit (a + t * b) := by
+theorem adeleRing_stableRange_one
+    : ∀ (F : Type) [Field F] [NumberField F] (a b : AdeleRing (𝓞 F) F),
+      IsCoprime a b → ∃ t, IsUnit (a + t * b) := by
   intro F _ _ a b hab
   obtain ⟨x, y, hxy⟩ := hab
   obtain ⟨t₁, u₁⟩ := infinite_part F a.1 b.1 ⟨x.1, y.1, congrArg Prod.fst hxy⟩

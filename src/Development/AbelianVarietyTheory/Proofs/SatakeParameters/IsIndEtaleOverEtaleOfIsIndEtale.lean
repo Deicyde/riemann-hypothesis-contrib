@@ -11,18 +11,21 @@ open scoped TensorProduct
 
 namespace GlobalTheory.IndEtaleCancel
 
-theorem isIndEtale_of_etale_of_isIndEtale : ∀ (A W O : Type) [CommRing A] [CommRing W]
-    [CommRing O] [Algebra A W] [Algebra A O] [Algebra W O] [IsScalarTower A W O]
-    [Algebra.Etale A W], GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap A O) →
-      GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap W O) := by
+theorem isIndEtale_of_etale_of_isIndEtale
+    : ∀ (A W O : Type) [CommRing A] [CommRing W] [CommRing O] [Algebra A W] [Algebra A O]
+        [Algebra W O] [IsScalarTower A W O] [Algebra.Etale A W],
+      GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap A O)
+        → GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap W
+          O) := by
   intro A W O _ _ _ _ _ _ _ _ h
-  have hT : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap W (W ⊗[A] O)) :=
+  have hT : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap W
+      (W ⊗[A] O)) :=
     GlobalTheory.isIndEtale_tensorProduct_left A O W h
   obtain ⟨t, ht1, ht2⟩ :=
     (Algebra.FormallyUnramified.iff_exists_tensorProduct (R := A) (S := W)).1 inferInstance
   let g : W →ₐ[A] O := IsScalarTower.toAlgHom A W O
-  let μ : W ⊗[A] O →ₐ[W] O := Algebra.TensorProduct.lift (Algebra.ofId W O) (AlgHom.id A O)
-    (fun _ _ => Commute.all _ _)
+  let μ : W ⊗[A] O →ₐ[W] O :=
+    Algebra.TensorProduct.lift (Algebra.ofId W O) (AlgHom.id A O) (fun _ _ => Commute.all _ _)
   have hμ : ∀ w o, μ (w ⊗ₜ o) = algebraMap W O w * o := fun w o => by simp [μ]
   let e : W ⊗[A] O := Algebra.TensorProduct.map (AlgHom.id A W) g t
   have he1 : ∀ s : W, ((1 : W) ⊗ₜ[A] (algebraMap W O s) - s ⊗ₜ[A] (1 : O)) * e = 0 := by
@@ -30,8 +33,9 @@ theorem isIndEtale_of_etale_of_isIndEtale : ∀ (A W O : Type) [CommRing A] [Com
     have := congrArg (Algebra.TensorProduct.map (AlgHom.id A W) g) (ht1 s)
     simpa [map_mul, map_sub, e, g] using this
   have hμe : μ e = 1 := by
-    have H : (μ.restrictScalars A).comp (Algebra.TensorProduct.map (AlgHom.id A W) g) =
-        g.comp (Algebra.TensorProduct.lmul' A) := by
+    have H
+        : (μ.restrictScalars A).comp (Algebra.TensorProduct.map (AlgHom.id A W) g)
+          = g.comp (Algebra.TensorProduct.lmul' A) := by
       apply Algebra.TensorProduct.ext'
       intro a b
       simp [μ, g, Algebra.TensorProduct.lmul'_apply_tmul, IsScalarTower.algebraMap_apply A W O]
@@ -45,8 +49,10 @@ theorem isIndEtale_of_etale_of_isIndEtale : ∀ (A W O : Type) [CommRing A] [Com
     | tmul w o =>
       rw [hμ]
       have h1 : (w ⊗ₜ[A] o : W ⊗[A] O) = (w ⊗ₜ[A] (1 : O)) * ((1 : W) ⊗ₜ[A] o) := by simp
-      have h2 : ((1 : W) ⊗ₜ[A] (algebraMap W O w * o) : W ⊗[A] O) =
-          ((1 : W) ⊗ₜ[A] algebraMap W O w) * ((1 : W) ⊗ₜ[A] o) := by simp
+      have h2
+          : ((1 : W) ⊗ₜ[A] (algebraMap W O w * o) : W ⊗[A] O)
+            = ((1 : W) ⊗ₜ[A] algebraMap W O w) * ((1 : W) ⊗ₜ[A] o) := by
+        simp
       linear_combination e * h1 - e * h2 - ((1 : W) ⊗ₜ[A] o) * he1 w
     | add x y hx hy => rw [mul_add, hx, hy, map_add (f := _), TensorProduct.tmul_add, mul_add]
   have hidem : IsIdempotentElem e := by

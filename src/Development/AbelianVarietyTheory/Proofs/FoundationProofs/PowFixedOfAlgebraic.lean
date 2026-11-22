@@ -8,9 +8,11 @@ open Polynomial
 
 namespace GlobalTheory.ResiduePowerFixed
 
-theorem pow_fixed_of_algebraic (l : ℕ) [Fact (Nat.Prime l)] {k : Type} [Field k]
-    [Algebra (ZMod l) k] (y : k) (hy : IsAlgebraic (ZMod l) y) :
-    ∃ N : ℕ, 0 < N ∧ y ^ l ^ N = y := by
+theorem pow_fixed_of_algebraic
+    (l : ℕ) [Fact (Nat.Prime l)]
+    {k : Type} [Field k] [Algebra (ZMod l) k]
+    (y : k) (hy : IsAlgebraic (ZMod l) y)
+    : ∃ N : ℕ, 0 < N ∧ y ^ l ^ N = y := by
   let F := IntermediateField.adjoin (ZMod l) {y}
   haveI : FiniteDimensional (ZMod l) F := IntermediateField.adjoin.finiteDimensional hy.isIntegral
   haveI : Finite F := Module.finite_of_finite (ZMod l)
@@ -22,8 +24,8 @@ theorem pow_fixed_of_algebraic (l : ℕ) [Fact (Nat.Prime l)] {k : Type} [Field 
   rw [hcard] at h
   simpa using congrArg Subtype.val h
 
-theorem exists_primitive {Ω : Type} [Field Ω] [Algebra ℚ Ω] (x : Ω) (hx : IsAlgebraic ℚ x) :
-    ∃ p : ℤ[X], p.IsPrimitive ∧ aeval x p = 0 := by
+theorem exists_primitive {Ω : Type} [Field Ω] [Algebra ℚ Ω] (x : Ω) (hx : IsAlgebraic ℚ x)
+    : ∃ p : ℤ[X], p.IsPrimitive ∧ aeval x p = 0 := by
   have hx' : IsAlgebraic ℤ x := (IsFractionRing.isAlgebraic_iff ℤ ℚ Ω).mpr hx
   obtain ⟨p, hp0, hp⟩ := hx'
   refine ⟨p.primPart, p.isPrimitive_primPart, ?_⟩
@@ -36,11 +38,12 @@ theorem exists_primitive {Ω : Type} [Field Ω] [Algebra ℚ Ω] (x : Ω) (hx : 
   rw [Polynomial.eq_C_content_mul_primPart p, map_mul, aeval_C] at hp
   exact (mul_eq_zero.mp hp).resolve_left hc
 
-theorem residue_pow_fixed (l : ℕ) [Fact (Nat.Prime l)] {Ω : Type} [Field Ω] [Algebra ℚ Ω]
-    [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω) (hl : A.valuation (l : Ω) < 1) (xA : A) :
-    ∃ N : ℕ, 0 < N ∧ IsLocalRing.residue A xA ^ l ^ N = IsLocalRing.residue A xA := by
+theorem residue_pow_fixed
+    (l : ℕ) [Fact (Nat.Prime l)]
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (A : ValuationSubring Ω) (hl : A.valuation (l : Ω) < 1) (xA : A)
+    : ∃ N : ℕ, 0 < N ∧ IsLocalRing.residue A xA ^ l ^ N = IsLocalRing.residue A xA := by
   classical
-
   have hlm : (l : A) ∈ IsLocalRing.maximalIdeal A := by
     rw [ValuationSubring.valuation_lt_one_iff]
     simpa using hl
@@ -83,8 +86,9 @@ theorem residue_pow_fixed (l : ℕ) [Fact (Nat.Prime l)] {Ω : Type} [Field Ω] 
         rw [← h]
         exact hp
       exact Subtype.ext h2
-    have e : aeval (IsLocalRing.residue A xA) (p.map (Int.castRingHom (ZMod l))) =
-        aeval (IsLocalRing.residue A xA) p := by
+    have e
+        : aeval (IsLocalRing.residue A xA) (p.map (Int.castRingHom (ZMod l)))
+          = aeval (IsLocalRing.residue A xA) p := by
       rw [Polynomial.aeval_def, Polynomial.aeval_def, Polynomial.eval₂_map]
       congr 1
       exact RingHom.ext_int _ _

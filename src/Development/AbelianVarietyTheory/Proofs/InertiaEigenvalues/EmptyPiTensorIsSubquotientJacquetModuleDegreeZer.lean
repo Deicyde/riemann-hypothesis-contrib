@@ -17,11 +17,15 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.Loc
 
 namespace GlobalTheory
 
-theorem piTensor_isSubquotient_jac_degZero : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (N : ℕ), N = 0 → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [Nontrivial V]
-    (π : Representation ℂ (GL (Fin N) k) V) (d : Fin 0 → ℕ) (X : Fin 0 → Type) [∀ a, AddCommGroup (X a)]
-    [∀ a, Module ℂ (X a)] (ρ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a)) (e : (Σ a, Fin (d a)) ≃ Fin N),
-    IsSubquotient (piTensor ρ) (jac e π) := by
+theorem piTensor_isSubquotient_jac_degZero
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ),
+      N = 0
+        → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [Nontrivial V]
+            (π : Representation ℂ (GL (Fin N) k) V) (d : Fin 0 → ℕ) (X : Fin 0 → Type)
+            [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
+            (ρ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a)) (e : (Σ a, Fin (d a)) ≃ Fin N),
+          IsSubquotient (piTensor ρ) (jac e π) := by
   intro k _ _ _ _ N hN V _ _ _ π d X _ _ ρ e
   subst hN
   have hK : twKer π (unipRad k e) 1 = ⊥ := by
@@ -32,8 +36,8 @@ theorem piTensor_isSubquotient_jac_degZero : ∀ (k : Type) [Field k] [Valuative
   obtain ⟨v, hv⟩ := exists_ne (0 : V)
   have hx : (Submodule.Quotient.mk v : Jacquet π (unipRad k e)) ≠ 0 := by
     rw [Ne, Submodule.Quotient.mk_eq_zero, hK, Submodule.mem_bot]; exact hv
-  obtain ⟨φ, hφ⟩ : ∃ φ : Module.Dual ℂ (Jacquet π (unipRad k e)),
-      φ (Submodule.Quotient.mk v) ≠ 0 := by
+  obtain ⟨φ, hφ⟩
+      : ∃ φ : Module.Dual ℂ (Jacquet π (unipRad k e)), φ (Submodule.Quotient.mk v) ≠ 0 := by
     by_contra h
     push_neg at h
     exact hx ((Module.forall_dual_apply_eq_zero_iff ℂ _).1 h)

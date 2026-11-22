@@ -7,31 +7,39 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IwahoriPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC Formalism.UG
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC
+  Formalism.UG
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.CompanionTheory.DiagBd
 
-theorem valued_eq_one_of_isCompact_closure_zpowers (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (w : Pl E) (n : ℕ) (H : Subgroup (GLw n w)) (g : H) (p : GLw n w)
-    (s : Fin n → (w.adicCompletion E)ˣ) (hg : g.1 = p * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s * p⁻¹)
-    (hc : IsCompact (closure (Subgroup.zpowers g : Set H))) (i : Fin n) :
-    Valued.v (s i : w.adicCompletion E) = 1 := by
+theorem valued_eq_one_of_isCompact_closure_zpowers
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (w : Pl E) (n : ℕ)
+    (H : Subgroup (GLw n w)) (g : H) (p : GLw n w) (s : Fin n → (w.adicCompletion E)ˣ)
+    (hg : g.1 = p * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s * p⁻¹)
+    (hc : IsCompact (closure (Subgroup.zpowers g : Set H))) (i : Fin n)
+    : Valued.v (s i : w.adicCompletion E) = 1 := by
   set φ : H → w.adicCompletion E :=
     fun x => ((p⁻¹ * x.1 * p : GLw n w) : Matrix (Fin n) (Fin n) _) i i with hφdef
   have hφ : Continuous φ := by
     have h1 : Continuous fun x : H => (p⁻¹ * x.1 * p : GLw n w) :=
       (continuous_const.mul continuous_subtype_val).mul continuous_const
-    have h2 : Continuous fun x : H => ((p⁻¹ * x.1 * p : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) :=
+    have h2 : Continuous fun x : H =>
+        ((p⁻¹ * x.1 * p : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) :=
       Units.continuous_val.comp h1
     exact (continuous_apply i).comp ((continuous_apply i).comp h2)
   have hpow : ∀ m : ℤ, φ (g ^ m) = ((s i ^ m : (w.adicCompletion E)ˣ) : w.adicCompletion E) := by
     intro m
-    have h1 : p⁻¹ * ((g ^ m : H) : GLw n w) * p = GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) (s ^ m) := by
+    have h1
+        : p⁻¹ * ((g ^ m : H) : GLw n w) * p
+          = GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) (s ^ m) := by
       rw [Subgroup.coe_zpow, hg, map_zpow]
-      rw [show p * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s * p⁻¹ =
-        MulAut.conj p (GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s) from rfl, ← map_zpow]
+      rw [show p * GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s * p⁻¹
+            = MulAut.conj p (GlobalTheory.SmGL.diagT (w.adicCompletion E) (Fin n) s) from
+          rfl,
+        ← map_zpow]
       simp [MulAut.conj_apply, mul_assoc]
     simp only [hφdef, h1, GlobalTheory.SmGL.val_diagT, Matrix.diagonal_apply_eq, Pi.pow_apply]
   obtain ⟨R, hR⟩ := (hc.image hφ).isBounded.exists_norm_le

@@ -47,9 +47,11 @@ theorem TermFun_holds : Formalism.L2.SG.TermDef.TermFun D u u' := term_function_
 
 theorem TermInSFun_holds : Formalism.L2.SG.FourParts.TermInSFun D u u' := in_s_class_constant D u u'
 theorem TermInSRel_holds : Formalism.L2.SG.FourParts.TermInSRel D u u' := in_s_relevant D u u'
-theorem TermIdIffInS_holds : Formalism.L2.SG.FourParts.TermIdIffInS D u u' := term_id_iff_in_s D u u'
+theorem TermIdIffInS_holds : Formalism.L2.SG.FourParts.TermIdIffInS D u u' :=
+  term_id_iff_in_s D u u'
 
-theorem ScalarEquiv_holds : Formalism.L2.SG.Corank.ScalarEquiv D u u' := Formalism.L2.SG.Corank.scalarEquiv_of_G (D := D) scalar_equiv_general u u'
+theorem ScalarEquiv_holds : Formalism.L2.SG.Corank.ScalarEquiv D u u' :=
+  Formalism.L2.SG.Corank.scalarEquiv_of_G (D := D) scalar_equiv_general u u'
 theorem ScalarRepFree_holds : Formalism.L2.SG.Corank.ScalarRepFree D u u' := scalar_rep_free D u u'
 theorem BetaFree_holds : Formalism.L2.SG.Corank.BetaFree D u u' := scalPairs_betaFree D u u'
 
@@ -63,7 +65,9 @@ end Terms
 theorem CorankPosG_holds : PI.PairCorankPos.CorankPosG := pair_corank_pos
 theorem ScalarEquivG_holds : Formalism.L2.SG.Corank.ScalarEquivG := scalar_equiv_general
 
-theorem GelfandGraevMultOne_holds : Formalism.L2.SG.GGMirabolic.GelfandGraevMultOne := whittaker_functional_dual Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.gelfand_graev_multiplicity_one
+theorem GelfandGraevMultOne_holds : Formalism.L2.SG.GGMirabolic.GelfandGraevMultOne :=
+  whittaker_functional_dual
+    Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.gelfand_graev_multiplicity_one
 theorem MirabolicBound_holds : Formalism.L2.SG.GGMirabolic.MirabolicBound := mirabolic_bound
 theorem GGMatrixBoundOfLit_holds : Formalism.L2.SG.GGMirabolic.GGMatrixBoundOfLit := gg_matrix_bound
 theorem GGMatrixBound_holds : Formalism.L2.SG.GGMirabolic.GGMatrixBound :=
@@ -71,8 +75,10 @@ theorem GGMatrixBound_holds : Formalism.L2.SG.GGMirabolic.GGMatrixBound :=
 theorem TermsGGBound_holds : Formalism.L2.SG.GGMirabolic.TermsGGBound :=
   Formalism.L2.SG.GGMirabolic.termsGGBound_of_matrix GGMatrixBound_holds
 
-theorem IsSplitRow_holds (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS ((Lat.Tu D u : ℕ) : D.host.E))
-    (Λ : Submodule (NumberField.RingOfIntegers D.host.E) (VS D).V) (hΛ : IsRowLat D F0 Λ) :
-    Formalism.L2.SG.Saturated.IsSplitRow D F0 Λ := split_row_iso D u F0 Λ hΛ
+theorem IsSplitRow_holds
+    (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS ((Lat.Tu D u : ℕ) : D.host.E))
+    (Λ : Submodule (NumberField.RingOfIntegers D.host.E) (VS D).V) (hΛ : IsRowLat D F0 Λ)
+    : Formalism.L2.SG.Saturated.IsSplitRow D F0 Λ :=
+  split_row_iso D u F0 Λ hΛ
 
 end Formalism.L2.SG.Closed

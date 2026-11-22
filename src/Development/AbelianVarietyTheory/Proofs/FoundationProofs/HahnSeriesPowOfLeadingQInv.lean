@@ -11,21 +11,20 @@ open GlobalTheory.KZ
 
 namespace GlobalTheory
 
-theorem hahn_pow_neg_one_lead {R : Type} [CommRing R] (x : HahnSeries ℚ R)
-    (h1 : x.coeff (-1) = 1) (hlt : ∀ r : ℚ, r < -1 → x.coeff r = 0) :
-    ∀ m : ℕ, (x ^ m).coeff (-(m : ℚ)) = 1 ∧ ∀ r : ℚ, r < -(m : ℚ) → (x ^ m).coeff r = 0 := by
+theorem hahn_pow_neg_one_lead
+    {R : Type} [CommRing R]
+    (x : HahnSeries ℚ R) (h1 : x.coeff (-1) = 1) (hlt : ∀ r : ℚ, r < -1 → x.coeff r = 0)
+    : ∀ m : ℕ, (x ^ m).coeff (-(m : ℚ)) = 1 ∧ ∀ r : ℚ, r < -(m : ℚ) → (x ^ m).coeff r = 0 := by
   intro m
   rcases subsingleton_or_nontrivial R with hR | hR
   · exact ⟨Subsingleton.elim _ _, fun r _ => Subsingleton.elim _ _⟩
-  have hx0 : x ≠ 0 := by
-    intro h; rw [h] at h1; simp at h1
+  have hx0 : x ≠ 0 := by intro h; rw [h] at h1; simp at h1
   have hxo : x.order = -1 := by
     refine le_antisymm (HahnSeries.order_le_of_coeff_ne_zero (by rw [h1]; exact one_ne_zero)) ?_
     by_contra hc
     push_neg at hc
     exact hx0 (HahnSeries.coeff_order_eq_zero.mp (hlt _ hc))
-  have hxl : x.leadingCoeff = 1 := by
-    rw [HahnSeries.leadingCoeff_eq, hxo, h1]
+  have hxl : x.leadingCoeff = 1 := by rw [HahnSeries.leadingCoeff_eq, hxo, h1]
   have key : ∀ n : ℕ, (x ^ n).order = -(n : ℚ) ∧ (x ^ n).leadingCoeff = 1 := by
     intro n
     induction n with

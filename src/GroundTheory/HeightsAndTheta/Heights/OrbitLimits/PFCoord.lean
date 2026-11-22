@@ -13,13 +13,16 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4
 
-theorem PFCoord.of_found (hGD : GenDegStatement)
+theorem PFCoord.of_found
+    (hGD : GenDegStatement)
     (hR4 : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)],
       ExistsUniqueStatement F ι)
-    (hGF : GenFibreExistsStatement) (hFD : FibreDimStatement) (hCF : CoordFibreDeg.Statement) :
-    ReciprocityTheory.ChartRestriction.G.AI.I4.PFCoordStatement := by
+    (hGF : GenFibreExistsStatement) (hFD : FibreDimStatement) (hCF : CoordFibreDeg.Statement)
+    : ReciprocityTheory.ChartRestriction.G.AI.I4.PFCoordStatement := by
   intro I hI K _ ι _ K' _ ι' _ κ v Ω _ _ y d L L' hv hP' hP hL hLL'
   obtain ⟨G⟩ := hGF K ι K' ι' κ v (mCoordIdeal y) d hv hP'
   obtain ⟨J, hJ, -⟩ := hR4 G.Φ (FibreBlock κ) (fibreIdx ι' κ)

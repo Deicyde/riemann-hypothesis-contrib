@@ -6,14 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem cut_conj {F : Type} [Field F] {n : ℕ} (p q : Fin n → Prop) [DecidablePred p] [DecidablePred q]
-    [∀ i j, Decidable (p i ∧ q j)] (A Z B : Matrix (Fin n) (Fin n) F)
-    (hA : ∀ i k, ¬ (p i ↔ p k) → A i k = 0) (hB : ∀ i k, ¬ (q i ↔ q k) → B i k = 0) :
-    (Matrix.of fun i j => if p i ∧ q j then (A * Z * B) i j else 0) =
-      A * (Matrix.of fun i j => if p i ∧ q j then Z i j else 0) * B := by
+private theorem cut_conj
+    {F : Type} [Field F]
+    {n : ℕ} (p q : Fin n → Prop) [DecidablePred p] [DecidablePred q] [∀ i j, Decidable (p i ∧ q j)]
+    (A Z B : Matrix (Fin n) (Fin n) F)
+    (hA : ∀ i k, ¬(p i ↔ p k) → A i k = 0) (hB : ∀ i k, ¬(q i ↔ q k) → B i k = 0)
+    : (Matrix.of fun i j => if p i ∧ q j then (A * Z * B) i j else 0)
+      = A * (Matrix.of fun i j => if p i ∧ q j then Z i j else 0) * B := by
   ext i j
-  have key : (if p i ∧ q j then (A * Z * B) i j else 0) =
-      ∑ m, ∑ k, if p i ∧ q j then A i k * Z k m * B m j else 0 := by
+  have key
+      : (if p i ∧ q j then (A * Z * B) i j else 0)
+        = ∑ m, ∑ k, if p i ∧ q j then A i k * Z k m * B m j else 0 := by
     split_ifs
     · simp only [Matrix.mul_apply, Finset.sum_mul]
     · simp
@@ -28,29 +31,54 @@ private theorem cut_conj {F : Type} [Field F] {n : ℕ} (p q : Fin n → Prop) [
     · simp [hB m j h2]
   · simp [hA i k h1]
 
-private theorem cV_conj {F : Type} [Field F] {n a : ℕ} {A B : Matrix (Fin n) (Fin n) F}
-    (hA : A ∈ Ev F F n a) (hB : B ∈ Ev F F n a) (Z : Matrix (Fin n) (Fin n) F) :
-    cV a (A * Z * B) = A * cV a Z * B ∧ cV' a (A * Z * B) = A * cV' a Z * B := by
-  have hA' : ∀ i k : Fin n, ¬ ((i : ℕ) < a ↔ (k : ℕ) < a) → A i k = 0 := fun i k h => by
+private theorem cV_conj
+    {F : Type} [Field F]
+    {n a : ℕ} {A B : Matrix (Fin n) (Fin n) F}
+    (hA : A ∈ Ev F F n a) (hB : B ∈ Ev F F n a) (Z : Matrix (Fin n) (Fin n) F)
+    : cV a (A * Z * B) = A * cV a Z * B ∧ cV' a (A * Z * B) = A * cV' a Z * B := by
+  have hA' : ∀ i k : Fin n, ¬((i : ℕ) < a ↔ (k : ℕ) < a) → A i k = 0 := fun i k h => by
     simpa using (hA i k).2 h
-  have hB' : ∀ i k : Fin n, ¬ ((i : ℕ) < a ↔ (k : ℕ) < a) → B i k = 0 := fun i k h => by
+  have hB' : ∀ i k : Fin n, ¬((i : ℕ) < a ↔ (k : ℕ) < a) → B i k = 0 := fun i k h => by
     simpa using (hB i k).2 h
-  exact ⟨cut_conj (fun i => (i : ℕ) < a) (fun i => ¬ (i : ℕ) < a) A Z B hA'
+  exact ⟨
+    cut_conj
+      (fun i => (i : ℕ) < a)
+      (fun i => ¬ (i : ℕ) < a)
+      A Z B hA'
       (fun i k h => hB' i k (fun e => h (not_congr e))),
-    cut_conj (fun i => ¬ (i : ℕ) < a) (fun i => (i : ℕ) < a) A Z B
-      (fun i k h => hA' i k (fun e => h (not_congr e))) hB'⟩
+    cut_conj
+      (fun i => ¬ (i : ℕ) < a)
+      (fun i => (i : ℕ) < a)
+      A Z B
+      (fun i k h => hA' i k (fun e => h (not_congr e)))
+      hB'
+  ⟩
 
-private theorem cV_lin {F : Type} [Field F] {n : ℕ} (a : ℕ) (c : F) (Y Z : Matrix (Fin n) (Fin n) F) :
-    (cV a (Y + c • Z) = cV a Y + c • cV a Z ∧ cV' a (Y + c • Z) = cV' a Y + c • cV' a Z) ∧
-    (cV a (c • Z - Y) = c • cV a Z - cV a Y ∧ cV' a (c • Z - Y) = c • cV' a Z - cV' a Y) := by
-  refine ⟨⟨?_, ?_⟩, ?_, ?_⟩ <;> ext i j <;>
-    simp only [cV, cV', Matrix.of_apply, Matrix.add_apply, Matrix.sub_apply, Matrix.smul_apply] <;>
-    split_ifs <;> simp
+private theorem cV_lin {F : Type} [Field F] {n : ℕ} (a : ℕ) (c : F) (Y Z : Matrix (Fin n) (Fin n) F)
+    : (cV a (Y + c • Z) = cV a Y + c • cV a Z ∧ cV' a (Y + c • Z) = cV' a Y + c • cV' a Z)
+      ∧ (cV a (c • Z - Y) = c • cV a Z - cV a Y ∧ cV' a (c • Z - Y) = c • cV' a Z - cV' a Y) := by
+  refine ⟨⟨?_, ?_⟩, ?_, ?_⟩ <;> ext i j
+    <;> simp only [cV, cV', Matrix.of_apply, Matrix.add_apply, Matrix.sub_apply, Matrix.smul_apply]
+    <;> split_ifs <;> simp
 
-theorem UpperTheory.V.Pa.Det.cornerCoc :
-    ∀ {F G : Type} [Field F] [Group G] {n : ℕ} (D : DetFr F G n) (χ : G → F) (S : Set G) (z : G → Matrix (Fin n) (Fin n) F), TwCoc χ D.r S z → (TwCoc χ D.r S fun g => cV D.a (z g)) ∧ (TwCoc χ D.r S fun g => cV' D.a (z g)) ∧ (∀ Y g, cV D.a (dTw χ D.r Y g) = dTw χ D.r (cV D.a Y) g ∧ cV' D.a (dTw χ D.r Y g) = dTw χ D.r (cV' D.a Y) g) ∧ ∀ Z : Matrix (Fin n) (Fin n) F, cV D.a Z ∈ Od F F n D.a ∧ cV' D.a Z ∈ Od F F n D.a ∧ (cV D.a Z)ᵀ = cV' D.a Zᵀ ∧ (Z ∈ Od F F n D.a → cV D.a Z + cV' D.a Z = Z) := by
+theorem UpperTheory.V.Pa.Det.cornerCoc
+    : ∀ {F G : Type} [Field F] [Group G] {n : ℕ} (D : DetFr F G n) (χ : G → F) (S : Set G)
+        (z : G → Matrix (Fin n) (Fin n) F),
+      TwCoc χ D.r S z
+        → (TwCoc χ D.r S fun g => cV D.a (z g)) ∧ (TwCoc χ D.r S fun g => cV' D.a (z g))
+          ∧ (∀ Y g,
+            cV D.a (dTw χ D.r Y g) = dTw χ D.r (cV D.a Y) g
+              ∧ cV' D.a (dTw χ D.r Y g) = dTw χ D.r (cV' D.a Y) g)
+          ∧ ∀ Z : Matrix (Fin n) (Fin n) F,
+            cV D.a Z ∈ Od F F n D.a ∧ cV' D.a Z ∈ Od F F n D.a ∧ (cV D.a Z)ᵀ = cV' D.a Zᵀ
+              ∧ (Z ∈ Od F F n D.a → cV D.a Z + cV' D.a Z = Z) := by
   intro F G _ _ n D χ S z hz
-  refine ⟨fun g hg h hh => ?_, fun g hg h hh => ?_, fun Y g => ⟨?_, ?_⟩, fun Z => ⟨?_, ?_, ?_, fun hZ => ?_⟩⟩
+  refine ⟨
+    fun g hg h hh => ?_,
+    fun g hg h hh => ?_,
+    fun Y g => ⟨?_, ?_⟩,
+    fun Z => ⟨?_, ?_, ?_, fun hZ => ?_⟩
+  ⟩
   · beta_reduce
     rw [hz g hg h hh, (cV_lin _ _ _ _).1.1, (cV_conj (D.ev _) (D.ev _) _).1]
   · beta_reduce

@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.CharacterBoxes.TwistForm
 
 open Formalism.HC UpperTheory.Top
 
-theorem UpperTheory.Top.isChiField :
-    ∀ (ψ : PChar) (φ : Frame) (H : HostRaw φ), KerChi ψ H → IsChiField ψ φ.e H.q H.d H.E := by
+theorem UpperTheory.Top.isChiField
+    : ∀ (ψ : PChar) (φ : Frame) (H : HostRaw φ), KerChi ψ H → IsChiField ψ φ.e H.q H.d H.E := by
   intro ψ φ H h
   obtain ⟨hψ, hart⟩ := h
   have hyp := H.hyp

@@ -15,6 +15,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Lit.Geo
 
-theorem UpperTheory.V.Lit.Geo.pairFacts :
-    PairFacts :=
-  Pf.pairFacts_of_steps Pf.bddInt Pf.csBdd Pf.levInv Pf.ptInv Pf.adjInt Pf.ptD Pf.rapidBdd Pf.zeroInt Pf.ptPos
+theorem UpperTheory.V.Lit.Geo.pairFacts : PairFacts :=
+  Pf.pairFacts_of_steps Pf.bddInt Pf.csBdd Pf.levInv Pf.ptInv Pf.adjInt Pf.ptD Pf.rapidBdd
+    Pf.zeroInt Pf.ptPos

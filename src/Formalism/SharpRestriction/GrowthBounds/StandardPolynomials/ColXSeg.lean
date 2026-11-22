@@ -15,23 +15,24 @@ variable (X : Loc) (j : Fin (numSeg X.TT))
 
 theorem posS_zero : posS X j 0 = ((segStart X.TT j).val : ℤ) := rfl
 
-theorem posS_succ_lt (a : Fin (2 * segS X.TT j + 1)) (h : (a : ℕ) < 2 * segS X.TT j) :
-    posS X j a.succ = ((segStart X.TT j).val : ℤ) +
-      ((segDists X.TT j).get (⟨(a : ℕ) / 2, by omega⟩ : Fin (segS X.TT j)) : ℕ) := by
+theorem posS_succ_lt (a : Fin (2 * segS X.TT j + 1)) (h : (a : ℕ) < 2 * segS X.TT j)
+    : posS X j a.succ
+      = ((segStart X.TT j).val : ℤ)
+        + ((segDists X.TT j).get (⟨(a : ℕ) / 2, by omega⟩ : Fin (segS X.TT j)) : ℕ) := by
   simp only [posS, Fin.cons_succ, dif_pos h]
 
-theorem posS_succ_ge (a : Fin (2 * segS X.TT j + 1)) (h : ¬ (a : ℕ) < 2 * segS X.TT j) :
-    posS X j a.succ = ((segStart X.TT j).val : ℤ) + (segG X.TT j : ℕ) := by
+theorem posS_succ_ge (a : Fin (2 * segS X.TT j + 1)) (h : ¬ (a : ℕ) < 2 * segS X.TT j)
+    : posS X j a.succ = ((segStart X.TT j).val : ℤ) + (segG X.TT j : ℕ) := by
   simp only [posS, Fin.cons_succ, dif_neg h]
 
 theorem lamS_zero : lamS X j 0 = (topStart X j, true) := rfl
 
-theorem lamS_succ_lt (a : Fin (2 * segS X.TT j + 1)) (h : (a : ℕ) < 2 * segS X.TT j) :
-    lamS X j a.succ = (topOdd X j ⟨(a : ℕ) / 2, by omega⟩, decide ((a : ℕ) % 2 = 0)) := by
+theorem lamS_succ_lt (a : Fin (2 * segS X.TT j + 1)) (h : (a : ℕ) < 2 * segS X.TT j)
+    : lamS X j a.succ = (topOdd X j ⟨(a : ℕ) / 2, by omega⟩, decide ((a : ℕ) % 2 = 0)) := by
   simp only [lamS, Fin.cons_succ, dif_pos h]
 
-theorem lamS_succ_ge (a : Fin (2 * segS X.TT j + 1)) (h : ¬ (a : ℕ) < 2 * segS X.TT j) :
-    lamS X j a.succ = (topEnd X j, true) := by
+theorem lamS_succ_ge (a : Fin (2 * segS X.TT j + 1)) (h : ¬ (a : ℕ) < 2 * segS X.TT j)
+    : lamS X j a.succ = (topEnd X j, true) := by
   simp only [lamS, Fin.cons_succ, dif_neg h]
 
 theorem segG_pos' : 0 < segG X.TT j := by
@@ -44,7 +45,8 @@ theorem position_le_segment_end (i : Fin (2 * segS X.TT j + 1 + 1)) : posS X j i
   refine Fin.cases ?_ (fun a => ?_) i
   · rw [posS_zero]; unfold zS; omega
   · by_cases h : (a : ℕ) < 2 * segS X.TT j
-    · rw [posS_succ_lt X j a h]; unfold zS
+    · rw [posS_succ_lt X j a h]
+      unfold zS
       have := (dist_pos_lt X.TT j ⟨(a : ℕ) / 2, by omega⟩).2
       omega
     · rw [posS_succ_ge X j a h]; unfold zS; exact le_rfl
@@ -64,15 +66,16 @@ theorem posS_mono : Monotone (posS X j) := by
       by_cases h' : (a' : ℕ) < 2 * segS X.TT j
       · have h : (a : ℕ) < 2 * segS X.TT j := by omega
         rw [posS_succ_lt X j a h, posS_succ_lt X j a' h']
-        have := (dist_strictMono X.TT j).monotone
-          (show (⟨(a : ℕ) / 2, by omega⟩ : Fin (segS X.TT j)) ≤ ⟨(a' : ℕ) / 2, by omega⟩ from by
-            simp only [Fin.le_def]; omega)
+        have :=
+          (dist_strictMono X.TT j).monotone
+            (show (⟨(a : ℕ) / 2, by omega⟩ : Fin (segS X.TT j)) ≤ ⟨(a' : ℕ) / 2, by omega⟩ from by
+              simp only [Fin.le_def]; omega)
         omega
       · rw [posS_succ_ge X j a' h']
         exact position_le_segment_end X j a.succ
 
-theorem posS_lt (i i' : Fin (2 * segS X.TT j + 1 + 1)) (hlt : i < i') (hv : (lamS X j i').2 = true) :
-    posS X j i < posS X j i' := by
+theorem posS_lt (i i' : Fin (2 * segS X.TT j + 1 + 1)) (hlt : i < i') (hv : (lamS X j i').2 = true)
+    : posS X j i < posS X j i' := by
   revert hlt hv
   refine Fin.cases ?_ (fun a' => ?_) i'
   · intro h; exact absurd h (by simp)
@@ -90,8 +93,9 @@ theorem posS_lt (i i' : Fin (2 * segS X.TT j + 1 + 1)) (hlt : i < i') (hv : (lam
       · intro hlt
         have hlt' : (a : ℕ) < (a' : ℕ) := Fin.succ_lt_succ_iff.mp hlt
         rw [posS_succ_lt X j a (by omega)]
-        have := (dist_strictMono X.TT j)
-          (show (⟨(a : ℕ) / 2, by omega⟩ : Fin (segS X.TT j)) < ⟨(a' : ℕ) / 2, by omega⟩ from by
+        have :=
+          (dist_strictMono X.TT j) (show (⟨(a : ℕ) / 2, by omega⟩ : Fin (segS X.TT j))
+              < ⟨(a' : ℕ) / 2, by omega⟩ from by
             simp only [Fin.lt_def]; omega)
         omega
     · rw [posS_succ_ge X j a' h']
@@ -110,22 +114,30 @@ theorem posS_lt (i i' : Fin (2 * segS X.TT j + 1 + 1)) (hlt : i < i') (hv : (lam
 
 theorem next_val : ((segStart X.TT j).val + segG X.TT j) % X.n' = (segNext X.TT j).val := by
   have e := congrArg Fin.val (posAdd_cdist (segStart X.TT j) (segNext X.TT j))
-  have e' : ((segStart X.TT j).val + cdist (segStart X.TT j) (segNext X.TT j)) % X.n' = (segNext X.TT j).val := e
+  have e'
+      : ((segStart X.TT j).val + cdist (segStart X.TT j) (segNext X.TT j)) % X.n'
+        = (segNext X.TT j).val :=
+    e
   unfold segG
   split_ifs with h
   · rw [h, Nat.add_zero] at e'
-    rw [Nat.add_mod_right]; exact e'
+    rw [Nat.add_mod_right]
+    exact e'
   · exact e'
 
-theorem pos_congr (i : Fin (2 * segS X.TT j + 1 + 1)) :
-    (hhLetters X.TT).pos (lamS X j i) % (X.n' : ℤ) = posS X j i % (X.n' : ℤ) := by
+theorem pos_congr (i : Fin (2 * segS X.TT j + 1 + 1))
+    : (hhLetters X.TT).pos (lamS X j i) % (X.n' : ℤ) = posS X j i % (X.n' : ℤ) := by
   refine Fin.cases ?_ (fun a => ?_) i
   · rfl
   · by_cases h : (a : ℕ) < 2 * segS X.TT j
     · rw [lamS_succ_lt X j a h, posS_succ_lt X j a h]
       show (((segPos X.TT j ⟨(a : ℕ) / 2, by omega⟩).val : ℕ) : ℤ) % (X.n' : ℤ) = _
-      have e : (segPos X.TT j ⟨(a : ℕ) / 2, by omega⟩).val =
-          ((segStart X.TT j).val + (segDists X.TT j).get (⟨(a : ℕ) / 2, by omega⟩ : Fin (segS X.TT j))) % X.n' := rfl
+      have e
+          : (segPos X.TT j ⟨(a : ℕ) / 2, by omega⟩).val
+            = ((segStart X.TT j).val
+                + (segDists X.TT j).get (⟨(a : ℕ) / 2, by omega⟩ : Fin (segS X.TT j)))
+              % X.n' :=
+        rfl
       simp only [e, Int.natCast_mod, Int.emod_emod_of_dvd _ (dvd_refl _), Nat.cast_add]
     · rw [lamS_succ_ge X j a h, posS_succ_ge X j a h]
       show (((segNext X.TT j).val : ℕ) : ℤ) % (X.n' : ℤ) = _
@@ -138,7 +150,8 @@ theorem topOdd_inj (i i' : Fin (segS X.TT j)) (h : topOdd X j i = topOdd X j i')
   rw [h1, a2] at a1
   exact (dist_strictMono X.TT j).injective a1.symm
 
-theorem topOdd_ne_end (i : Fin (segS X.TT j)) (j' : Fin (numSeg X.TT)) : topOdd X j i ≠ topEnd X j' := by
+theorem topOdd_ne_end (i : Fin (segS X.TT j)) (j' : Fin (numSeg X.TT))
+    : topOdd X j i ≠ topEnd X j' := by
   intro h
   have h1 : segPos X.TT j i = segNext X.TT j' := congrArg Subtype.val h
   have a1 := (pos_mem X.TT j i).2
@@ -197,8 +210,8 @@ theorem lamS_injective (h2 : 2 ≤ numSeg X.TT) : Function.Injective (lamS X j) 
     · ext
       omega
 
-theorem lamS_ne_endFalse (i : Fin (2 * segS X.TT j + 1 + 1)) (j' : Fin (numSeg X.TT)) :
-    lamS X j i ≠ (topEnd X j', false) := by
+theorem lamS_ne_endFalse (i : Fin (2 * segS X.TT j + 1 + 1)) (j' : Fin (numSeg X.TT))
+    : lamS X j i ≠ (topEnd X j', false) := by
   refine Fin.cases ?_ (fun a => ?_) i
   · rw [lamS_zero]
     simp
@@ -209,12 +222,14 @@ theorem lamS_ne_endFalse (i : Fin (2 * segS X.TT j + 1 + 1)) (j' : Fin (numSeg X
     · rw [lamS_succ_ge X j a h]
       simp
 
-theorem lev_succ (C0 CE1 CE2 : ℝ) (a : Fin (2 * segS X.TT j + 1)) (b : Fin X.m) :
-    X.p ^ (zS X j - posS X j a.succ).toNat = symLev X.p C0 CE1 CE2 X j (Sum.inl (a.castSucc, b)) := by
+theorem lev_succ (C0 CE1 CE2 : ℝ) (a : Fin (2 * segS X.TT j + 1)) (b : Fin X.m)
+    : X.p ^ (zS X j - posS X j a.succ).toNat
+      = symLev X.p C0 CE1 CE2 X j (Sum.inl (a.castSucc, b)) := by
   by_cases h : (a : ℕ) < 2 * segS X.TT j
   · rw [posS_succ_lt X j a h]
-    have e : symLev X.p C0 CE1 CE2 X j (Sum.inl (a.castSucc, b)) =
-        (X.seg C0 CE1 CE2 j).P X.p ⟨(a : ℕ) / 2, by omega⟩ := by
+    have e
+        : symLev X.p C0 CE1 CE2 X j (Sum.inl (a.castSucc, b))
+          = (X.seg C0 CE1 CE2 j).P X.p ⟨(a : ℕ) / 2, by omega⟩ := by
       unfold symLev
       simp only [Fin.val_castSucc]
       rw [dif_pos h]
@@ -232,25 +247,25 @@ theorem lev_succ (C0 CE1 CE2 : ℝ) (a : Fin (2 * segS X.TT j + 1)) (b : Fin X.m
     unfold zS
     simp
 
-theorem lev_zero (C0 CE1 CE2 : ℝ) : X.p ^ (zS X j - posS X j 0).toNat = (X.seg C0 CE1 CE2 j).Qj X.p := by
+theorem lev_zero (C0 CE1 CE2 : ℝ)
+    : X.p ^ (zS X j - posS X j 0).toNat = (X.seg C0 CE1 CE2 j).Qj X.p := by
   rw [posS_zero]
   show _ = X.p ^ segG X.TT j
   congr 1
   unfold zS
   omega
 
-theorem lev_le (hp : 0 < X.p) (hG : segG X.TT j ≤ X.G') (i : Fin (2 * segS X.TT j + 1 + 1)) :
-    X.p ^ (zS X j - posS X j i).toNat ≤ X.p ^ X.G' := by
+theorem lev_le (hp : 0 < X.p) (hG : segG X.TT j ≤ X.G') (i : Fin (2 * segS X.TT j + 1 + 1))
+    : X.p ^ (zS X j - posS X j i).toNat ≤ X.p ^ X.G' := by
   refine Nat.pow_le_pow_right hp ?_
   have h0 : posS X j 0 ≤ posS X j i := posS_mono X j (Fin.zero_le _)
   rw [posS_zero] at h0
   unfold zS
   omega
 
-theorem phiS_succ (C0 CE1 CE2 : ℝ) (a : Fin (2 * segS X.TT j + 1)) (b : Fin X.m) :
-    phiS X j (a.succ, Fin.natAdd 1 b) = symVar C0 CE1 CE2 X j (Sum.inl (a.castSucc, b)) := by
-  have ec : Fin.cast (Nat.add_comm 1 X.m) (Fin.natAdd 1 b) = b.succ := by
-    apply Fin.ext; simp
+theorem phiS_succ (C0 CE1 CE2 : ℝ) (a : Fin (2 * segS X.TT j + 1)) (b : Fin X.m)
+    : phiS X j (a.succ, Fin.natAdd 1 b) = symVar C0 CE1 CE2 X j (Sum.inl (a.castSucc, b)) := by
+  have ec : Fin.cast (Nat.add_comm 1 X.m) (Fin.natAdd 1 b) = b.succ := by apply Fin.ext; simp
   unfold phiS
   simp only [ec]
   by_cases h : (a : ℕ) < 2 * segS X.TT j
@@ -270,10 +285,13 @@ theorem phiS_zero [NeZero X.m] : phiS X j (0, Fin.castAdd X.m 0) = ((topStart X 
   rw [lamS_zero]
   rfl
 
-theorem phiS_odd (l : Fin (segS X.TT j)) :
-    phiS X j (⟨2 * l.val + 1, by have := l.2; omega⟩, Fin.castAdd X.m 0) = ((topOdd X j l, true), 0) := by
-  have e : (⟨2 * l.val + 1, by have := l.2; omega⟩ : Fin (2 * segS X.TT j + 1 + 1)) =
-      (⟨2 * l.val, by have := l.2; omega⟩ : Fin (2 * segS X.TT j + 1)).succ := rfl
+theorem phiS_odd (l : Fin (segS X.TT j))
+    : phiS X j (⟨2 * l.val + 1, by have := l.2; omega⟩, Fin.castAdd X.m 0)
+      = ((topOdd X j l, true), 0) := by
+  have e
+      : (⟨2 * l.val + 1, by have := l.2; omega⟩ : Fin (2 * segS X.TT j + 1 + 1))
+        = (⟨2 * l.val, by have := l.2; omega⟩ : Fin (2 * segS X.TT j + 1)).succ :=
+    rfl
   unfold phiS
   simp only [e]
   rw [lamS_succ_lt X j _ (by have := l.2; simp only; omega)]

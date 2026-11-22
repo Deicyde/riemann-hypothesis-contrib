@@ -7,12 +7,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConeCoordina
 
 @[expose] public section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory
+  GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
 
 namespace GlobalTheory
 
-noncomputable def upperConeRescale {E : Type} [Field E] (a : ℕ) (N : Matrix (Fin a) (Fin a) ℝ)
-    (M : Matrix (Fin a) (Fin a) (Cinf E)) : Matrix (Fin a) (Fin a) (Cinf E) :=
+noncomputable def upperConeRescale
+    {E : Type} [Field E]
+    (a : ℕ) (N : Matrix (Fin a) (Fin a) ℝ) (M : Matrix (Fin a) (Fin a) (Cinf E))
+    : Matrix (Fin a) (Fin a) (Cinf E) :=
   Matrix.of fun p q => (fun _ => ((N p q : ℝ) : ℂ)) * M p q
 
 lemma continuous_upperConeRescale {E : Type} [Field E] (a : ℕ) :
@@ -53,7 +56,18 @@ lemma upperCone_conj_diag_eq {E : Type} [Field E] (a : ℕ) (r : Fin a → ℝ) 
 
 end GlobalTheory
 
-theorem GlobalTheory.upperCone_conj_compact : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (ω : Set (GL (Fin a) (Cinf E))), IsCompact ω → (∀ b ∈ ω, b.val.BlockTriangular id) → ∀ t : ℝ, 0 < t → ∃ Ω : Set (GL (Fin a) (Cinf E)), IsCompact Ω ∧ ∀ (r : Fin a → ℝ) (d : GL (Fin a) (Cinf E)), (∀ i, 0 < r i) → (∀ i j : Fin a, (j : ℕ) = i + 1 → t * r j ≤ r i) → d.val = Matrix.diagonal (fun i => fun _ => (r i : ℂ)) → ∀ b ∈ ω, d⁻¹ * b * d ∈ Ω := by
+theorem GlobalTheory.upperCone_conj_compact
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (ω : Set (GL (Fin a) (Cinf E))),
+      IsCompact ω → (∀ b ∈ ω, b.val.BlockTriangular id)
+        → ∀ t : ℝ,
+          0 < t
+            → ∃ Ω : Set (GL (Fin a) (Cinf E)),
+              IsCompact Ω
+                ∧ ∀ (r : Fin a → ℝ) (d : GL (Fin a) (Cinf E)),
+                  (∀ i, 0 < r i) → (∀ i j : Fin a, (j : ℕ) = i + 1 → t * r j ≤ r i)
+                    → d.val = Matrix.diagonal (fun i => fun _ => (r i : ℂ))
+                    → ∀ b ∈ ω, d⁻¹ * b * d ∈ Ω := by
   intro E _ _ _ a ω hω htri t ht
   obtain ⟨C, hC0, hC⟩ := GlobalTheory.T.cone_coordinate_ratio_bounded a t ht
   set K : Set (Matrix (Fin a) (Fin a) ℝ) := Set.univ.pi (fun _ => Set.univ.pi (fun _ => Set.Icc (0:ℝ) C)) with hK
@@ -62,13 +76,17 @@ theorem GlobalTheory.upperCone_conj_compact : ∀ (E : Type) [Field E] [NumberFi
     (fun x : Matrix (Fin a) (Fin a) ℝ × GL (Fin a) (Cinf E) => GlobalTheory.upperConeRescale a x.1 x.2.val) '' (K ×ˢ ω)
   set B : Set (Matrix (Fin a) (Fin a) (Cinf E)) :=
     (fun x : Matrix (Fin a) (Fin a) ℝ × GL (Fin a) (Cinf E) => GlobalTheory.upperConeRescale a x.1 (x.2⁻¹).val) '' (K ×ˢ ω)
-  have hAc : IsCompact A := (hKc.prod hω).image
-    ((GlobalTheory.continuous_upperConeRescale (E := E) a).comp (continuous_fst.prodMk (Units.continuous_val.comp continuous_snd)))
-  have hBc : IsCompact B := (hKc.prod hω).image
-    ((GlobalTheory.continuous_upperConeRescale (E := E) a).comp (continuous_fst.prodMk (Units.continuous_coe_inv.comp continuous_snd)))
+  have hAc : IsCompact A :=
+    (hKc.prod hω).image
+      ((GlobalTheory.continuous_upperConeRescale (E := E) a).comp
+        (continuous_fst.prodMk (Units.continuous_val.comp continuous_snd)))
+  have hBc : IsCompact B :=
+    (hKc.prod hω).image
+      ((GlobalTheory.continuous_upperConeRescale (E := E) a).comp
+        (continuous_fst.prodMk (Units.continuous_coe_inv.comp continuous_snd)))
   refine ⟨Units.embedProduct _ ⁻¹' (A ×ˢ (MulOpposite.op '' B)), ?_, ?_⟩
-  · exact Units.isClosedEmbedding_embedProduct.isCompact_preimage
-      (hAc.prod (hBc.image MulOpposite.continuous_op))
+  · exact Units.isClosedEmbedding_embedProduct.isCompact_preimage (hAc.prod (hBc.image
+      MulOpposite.continuous_op))
   intro r d hr hcone hd b hb
   have hN : (fun p q : Fin a => if p ≤ q then r q / r p else 0) ∈ K := by
     simp only [hK, Set.mem_pi]

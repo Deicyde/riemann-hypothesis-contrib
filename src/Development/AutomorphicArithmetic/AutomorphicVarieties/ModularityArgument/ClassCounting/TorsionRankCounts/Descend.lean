@@ -17,8 +17,8 @@ theorem UpperTheory.V.ZK.Up.descend : UpperTheory.V.ZK.Up.Descend := by
   let g : (n : ℕ) → ↥(bd ℤ (GL (Fin n) R) k).ker →+ B := fun n =>
     ((Φ n).toAddMonoidHom.comp (rq q (GL (Fin n) R) (k + 1))).comp
       (bd ℤ (GL (Fin n) R) k).ker.subtype.toAddMonoidHom
-  have hg : ∀ n (z : ↥(bd ℤ (GL (Fin n) R) k).ker),
-      g n z = Φ n (rq q (GL (Fin n) R) (k + 1) z) := fun _ _ => rfl
+  have hg : ∀ n (z : ↥(bd ℤ (GL (Fin n) R) k).ker), g n z = Φ n (rq q (GL (Fin n) R) (k + 1) z) :=
+    fun _ _ => rfl
   have hker : ∀ n, (cls (GL (Fin n) R)).ker ≤ (g n).ker := by
     intro n z hz
     rw [AddMonoidHom.mem_ker] at hz ⊢
@@ -31,17 +31,20 @@ theorem UpperTheory.V.ZK.Up.descend : UpperTheory.V.ZK.Up.Descend := by
   let φ : (n : ℕ) → ↑(grpH (GL (Fin n) R) (k + 1)) →+ B := fun n =>
     (cls (GL (Fin n) R)).liftOfRightInverse (Function.surjInv (hcls.surj _))
       (Function.rightInverse_surjInv _) ⟨g n, hker n⟩
-  have hφ : ∀ n (z : ↥(bd ℤ (GL (Fin n) R) k).ker),
-      φ n (cls (GL (Fin n) R) z) = Φ n (rq q (GL (Fin n) R) (k + 1) z) := fun n z =>
+  have hφ
+      : ∀ n (z : ↥(bd ℤ (GL (Fin n) R) k).ker),
+        φ n (cls (GL (Fin n) R) z) = Φ n (rq q (GL (Fin n) R) (k + 1) z) := fun n z =>
     AddMonoidHom.liftOfRightInverse_comp_apply _ _ _ _ z
-  have hcyc : ∀ n (z : ↥(bd ℤ (GL (Fin n) R) k).ker),
-      Cyc (rq q (GL (Fin n) R) (k + 1) (z : Ch ℤ (GL (Fin n) R) (k + 1))) := by
+  have hcyc
+      : ∀ n (z : ↥(bd ℤ (GL (Fin n) R) k).ker),
+        Cyc (rq q (GL (Fin n) R) (k + 1) (z : Ch ℤ (GL (Fin n) R) (k + 1))) := by
     intro n z
     show bd (ZMod q) _ k _ = 0
     rw [hrq.1, LinearMap.mem_ker.mp z.2, map_zero]
-  have hnat : ∀ n n' (f : GL (Fin n) R →* GL (Fin n') R) (z : ↥(bd ℤ (GL (Fin n) R) k).ker),
-      ∃ z' : ↥(bd ℤ (GL (Fin n') R) k).ker,
-        (z' : Ch ℤ (GL (Fin n') R) (k + 1)) = cm ℤ f (k + 1) z := by
+  have hnat
+      : ∀ n n' (f : GL (Fin n) R →* GL (Fin n') R) (z : ↥(bd ℤ (GL (Fin n) R) k).ker),
+        ∃ z' : ↥(bd ℤ (GL (Fin n') R) k).ker,
+          (z' : Ch ℤ (GL (Fin n') R) (k + 1)) = cm ℤ f (k + 1) z := by
     intro n n' f z
     refine ⟨⟨cm ℤ f (k + 1) z, ?_⟩, rfl⟩
     rw [LinearMap.mem_ker, hsc.2.1, LinearMap.mem_ker.mp z.2, map_zero]

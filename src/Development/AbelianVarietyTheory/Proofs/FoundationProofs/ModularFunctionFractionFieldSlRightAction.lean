@@ -17,7 +17,9 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem frac_sl_right_action : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Frac Ω ε), (∀ f, T.sl 1 f = f) ∧ ∀ g h f, T.sl (g * h) f = T.sl h (T.sl g f) := by
+theorem frac_sl_right_action
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Frac Ω ε),
+      (∀ f, T.sl 1 f = f) ∧ ∀ g h f, T.sl (g * h) f = T.sl h (T.sl g f) := by
   intro Ω _ _ _ ε T
   obtain ⟨hext, hcl, -, -⟩ := GlobalTheory.T.fractionField_ext_closure_injective Ω ε T
   obtain ⟨c1, cmul, -, -⟩ := GlobalTheory.T.cmp_mul_ofSL_and_up_cmp_eq_up_mob
@@ -27,8 +29,10 @@ theorem frac_sl_right_action : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAl
       intro a
       exact T.sl_io 1 a a (c1 a).symm
     exact congrArg (fun φ : T.K →+* T.K => φ f) e
-  · have e : (T.sl (g * h) : T.K ≃ₐ[Ω] T.K).toRingEquiv.toRingHom =
-        ((T.sl h : T.K ≃ₐ[Ω] T.K).toRingEquiv.toRingHom).comp ((T.sl g : T.K ≃ₐ[Ω] T.K).toRingEquiv.toRingHom) := by
+  · have e
+        : (T.sl (g * h) : T.K ≃ₐ[Ω] T.K).toRingEquiv.toRingHom
+          = ((T.sl h : T.K ≃ₐ[Ω] T.K).toRingEquiv.toRingHom).comp
+            ((T.sl g : T.K ≃ₐ[Ω] T.K).toRingEquiv.toRingHom) := by
       apply hext
       intro a
       obtain ⟨a', ha', hga⟩ := hcl g a

@@ -7,17 +7,33 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TameH
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 Matrix
 
 namespace GlobalTheory.Mem.Col2
 
-
 open Classical GlobalTheory.TopStep in
-theorem cosetIn_smul_unitary : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) (S : Set ℕ) (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (u : Pr.Word) (j : ℕ), X.Ok → Pr.Ok → ∀ (q q' : PtAt R sel mu cst u j) (γ : UF X.E (R.N j)), q'.1.1 = ((γ, 1, 1) : UF X.E (R.N j) × GLG (E := X.E) (n := R.N j) (SG := Pr.vGs) × GLQ X.E (R.N j) (QE sel (mu : Chr X.F X.E X.K))) • q.1.1 → q'.1.2 = (fun z => γ.1 z) '' q.1.2 → cosetIn q' = cosetIn q := by
+theorem cosetIn_smul_unitary
+    : ∀ (X : Fields) (Pr : Primes X) (R : Ranks)
+        (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) (S : Set ℕ)
+        (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (u : Pr.Word) (j : ℕ),
+      X.Ok → Pr.Ok
+        → ∀ (q q' : PtAt R sel mu cst u j) (γ : UF X.E (R.N j)),
+          q'.1.1
+              = ((γ, 1, 1)
+                  : UF X.E (R.N j) × GLG (E := X.E) (n := R.N j) (SG := Pr.vGs)
+                    × GLQ X.E (R.N j) (QE sel (mu : Chr X.F X.E X.K)))
+                • q.1.1
+            → q'.1.2 = (fun z => γ.1 z) '' q.1.2
+            → cosetIn q' = cosetIn q := by
   intro X Pr R sel S mu cst u j hX hPr q q' γ h1 h2
   funext P
-  have key : ∀ y ∈ q.1.2, ((qOf P.1 : X.E) ^ (if P.1 ∈ Pr.vGs then 0 else cst.M))⁻¹ •
-      ((frsF sel mu q'.1.1 P).symm (γ.1 y) - (frsF sel mu q.1.1 P).symm y) ∈ stdAt X.E (R.N j) P.1 := by
+  have key
+      : ∀ y ∈ q.1.2,
+        ((qOf P.1 : X.E) ^ (if P.1 ∈ Pr.vGs then 0 else cst.M))⁻¹
+            • ((frsF sel mu q'.1.1 P).symm (γ.1 y) - (frsF sel mu q.1.1 P).symm y)
+          ∈ stdAt X.E (R.N j) P.1 := by
     intro y hy
     by_cases hP : P.1 ∈ Pr.vGs
     · rw [if_pos hP, pow_zero, inv_one, one_smul]
@@ -30,15 +46,20 @@ theorem cosetIn_smul_unitary : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (sel
         rw [h0] at hy
         exact absurd hy (Set.notMem_empty y)
       obtain ⟨y0, hy0, hY⟩ := PtAt.mem_ybSet q hj
-      have hy' : y - y0 ∈ locLat (rowSG Pr sel mu) q.1.1.deco.1.N
-          (fun P => if P.1 ∈ Pr.vGs then 0 else (cst.M : ℤ)) := by
+      have hy'
+          : y - y0 ∈ locLat (rowSG Pr sel mu) q.1.1.deco.1.N
+            (fun P => if P.1 ∈ Pr.vGs then 0 else (cst.M : ℤ)) := by
         rw [hY] at hy
         exact hy
-      have hA : (qOf P.1 : X.E) • y0 ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal q.1.1.deco.1.N := by
+      have hA
+          : (qOf P.1 : X.E) • y0
+            ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal q.1.1.deco.1.N := by
         have := Submodule.mem_iInf _ |>.1 hy0 P
         rw [Submodule.mem_comap] at this
         simpa [hP] using this
-      have hB : y - y0 ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal q.1.1.deco.1.N := by
+      have hB
+          : y - y0
+            ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal q.1.1.deco.1.N := by
         have := Submodule.mem_iInf _ |>.1 hy' P
         rw [Submodule.mem_comap] at this
         simpa [hP] using this
@@ -81,7 +102,8 @@ theorem cosetIn_smul_unitary : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (sel
       refine mem_stdAt.2 fun i => ?_
       have hi1 := mem_stdAt.1 (glint_mem κ hv0) i
       have hi2 := mem_stdAt.1 hv0 i
-      have hr : redP P.1 ((κ.1 ((qOf P.1 : X.E) • f.symm y) - (qOf P.1 : X.E) • f.symm y) i) = 0 := by
+      have hr
+          : redP P.1 ((κ.1 ((qOf P.1 : X.E) • f.symm y) - (qOf P.1 : X.E) • f.symm y) i) = 0 := by
         rw [Pi.sub_apply, reduction_sub hi1 hi2, sub_eq_zero]
         exact congrFun hred i
       have := intAt_div_of_redP hq (intAt_sub hi1 hi2) hr

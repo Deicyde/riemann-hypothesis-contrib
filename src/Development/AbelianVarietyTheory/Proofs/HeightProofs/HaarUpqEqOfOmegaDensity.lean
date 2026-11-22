@@ -17,8 +17,9 @@ noncomputable section
 
 namespace GlobalTheory.CompactDualUnique
 
-theorem isOmegaLeb_unique {P Q : ℕ} {lam lam' : Measure (lieU P Q)}
-    (h : IsOmegaLeb lam) (h' : IsOmegaLeb lam') : lam = lam' := by
+theorem isOmegaLeb_unique
+    {P Q : ℕ} {lam lam' : Measure (lieU P Q)} (h : IsOmegaLeb lam) (h' : IsOmegaLeb lam')
+    : lam = lam' := by
   haveI : BorelSpace (lieU P Q) := ⟨rfl⟩
   haveI : LocallyCompactSpace (Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) :=
     inferInstanceAs (LocallyCompactSpace ((Fin P ⊕ Fin Q) → (Fin P ⊕ Fin Q) → ℂ))
@@ -33,9 +34,11 @@ theorem isOmegaLeb_unique {P Q : ℕ} {lam lam' : Measure (lieU P Q)}
   obtain ⟨t, ht⟩ : ∃ t : ℝ≥0, lam = t • lam' := ⟨_, Measure.isAddLeftInvariant_eq_smul lam lam'⟩
   have hp : lam.prod lam = (t * t) • lam'.prod lam' := by
     rw [ht, Measure.prod_smul_left, Measure.prod_smul_right, smul_smul]
-  have hf : AEMeasurable (fun ab : lieU P Q × lieU P Q =>
-      entries ((ab.1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) +
-        Complex.I • (ab.2 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)))
+  have hf : AEMeasurable
+      (fun ab : lieU P Q × lieU P Q =>
+        entries
+          ((ab.1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)
+            + Complex.I • (ab.2 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)))
       (lam'.prod lam') := by
     apply Continuous.aemeasurable
     apply continuous_pi fun ij => ?_
@@ -45,8 +48,8 @@ theorem isOmegaLeb_unique {P Q : ℕ} {lam lam' : Measure (lieU P Q)}
       (continuous_apply ij.2).comp ((continuous_apply ij.1).comp continuous_subtype_val)
     exact (hc.comp continuous_fst).add (continuous_const.mul (hc.comp continuous_snd))
   rw [hp, Measure.map_smul _ hf, h2'] at h2
-  have h3 := congrArg (fun m : Measure ((Fin P ⊕ Fin Q) × (Fin P ⊕ Fin Q) → ℂ) =>
-    m (Metric.ball 0 1)) h2
+  have h3 :=
+    congrArg (fun m : Measure ((Fin P ⊕ Fin Q) × (Fin P ⊕ Fin Q) → ℂ) => m (Metric.ball 0 1)) h2
   simp only [Measure.smul_apply] at h3
   have hpos : (volume : Measure ((Fin P ⊕ Fin Q) × (Fin P ⊕ Fin Q) → ℂ)) (Metric.ball 0 1) ≠ 0 :=
     (Metric.measure_ball_pos _ _ one_pos).ne'
@@ -63,23 +66,25 @@ theorem isOmegaLeb_unique {P Q : ℕ} {lam lam' : Measure (lieU P Q)}
     exact_mod_cast this
   rw [ht, h6, one_smul]
 
-theorem omegaDensity_unique {P Q : ℕ} {μ : Measure (UpqT P Q)} {c c' : ℝ≥0∞}
-    (h : OmegaDensity μ c) (h' : OmegaDensity μ c') : c = c' := by
+theorem omegaDensity_unique
+    {P Q : ℕ} {μ : Measure (UpqT P Q)} {c c' : ℝ≥0∞} (h : OmegaDensity μ c) (h' : OmegaDensity μ c')
+    : c = c' := by
   obtain ⟨lam, h1, h2⟩ := h
   obtain ⟨lam', h1', h2'⟩ := h'
   obtain rfl := isOmegaLeb_unique h1 h1'
   exact tendsto_nhds_unique h2 h2'
 
-theorem omegaDensity_smul {P Q : ℕ} {μ : Measure (UpqT P Q)} {c : ℝ≥0∞} (t : ℝ≥0)
-    (h : OmegaDensity μ c) : OmegaDensity (t • μ) (t * c) := by
+theorem omegaDensity_smul
+    {P Q : ℕ} {μ : Measure (UpqT P Q)} {c : ℝ≥0∞} (t : ℝ≥0) (h : OmegaDensity μ c)
+    : OmegaDensity (t • μ) (t * c) := by
   obtain ⟨lam, h1, h2⟩ := h
   refine ⟨lam, h1, ?_⟩
   have := ENNReal.Tendsto.const_mul (a := (t : ℝ≥0∞)) h2 (Or.inr ENNReal.coe_ne_top)
   refine this.congr fun r => ?_
   rw [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul, mul_div_assoc]
 
-theorem exists_eq_smul {P Q : ℕ} (μ ν : Measure (UpqT P Q)) [μ.IsHaarMeasure] [ν.IsHaarMeasure] :
-    ∃ t : ℝ≥0, μ = t • ν := by
+theorem exists_eq_smul {P Q : ℕ} (μ ν : Measure (UpqT P Q)) [μ.IsHaarMeasure] [ν.IsHaarMeasure]
+    : ∃ t : ℝ≥0, μ = t • ν := by
   haveI : IsTopologicalGroup (UpqT P Q) := inferInstanceAs (IsTopologicalGroup (Formalism.UG.Upq P Q))
   haveI : BorelSpace (UpqT P Q) := ⟨rfl⟩
   haveI : LocallyCompactSpace (UpqT P Q) :=
@@ -88,10 +93,13 @@ theorem exists_eq_smul {P Q : ℕ} (μ ν : Measure (UpqT P Q)) [μ.IsHaarMeasur
     (UpqUnimodular.modelEquiv P Q).toHomeomorph.secondCountableTopology
   exact ⟨_, Measure.isMulLeftInvariant_eq_smul μ ν⟩
 
-theorem eq_cd (cd : CDHaar) (P Q : ℕ) (ν : Measure (UpqT P Q)) (νc : Measure (UpqT (P + Q) 0))
-    (c : ENNReal) (hν : ν.IsHaarMeasure) (hνc : νc.IsHaarMeasure) (hp : IsProbabilityMeasure νc)
-    (_h0 : c ≠ 0) (_ht : c ≠ ⊤) (h1 : OmegaDensity ν c) (h2 : OmegaDensity νc c) :
-    ν = cd.cd P Q := by
+theorem eq_cd
+    (cd : CDHaar)
+    (P Q : ℕ) (ν : Measure (UpqT P Q)) (νc : Measure (UpqT (P + Q) 0))
+    (c : ENNReal)
+    (hν : ν.IsHaarMeasure) (hνc : νc.IsHaarMeasure) (hp : IsProbabilityMeasure νc) (_h0 : c ≠ 0)
+    (_ht : c ≠ ⊤) (h1 : OmegaDensity ν c) (h2 : OmegaDensity νc c)
+    : ν = cd.cd P Q := by
   haveI := cd.haar P Q
   haveI := cd.haar (P + Q) 0
   haveI := cd.prob (P + Q)

@@ -9,8 +9,10 @@ open GlobalTheory.AffineCurveNbhd
 
 namespace GlobalTheory.AffineCurveNbhd
 
-theorem isNbhd_away_of_add_mul_eq_one (B A' : Type) [CommRing B] [CommRing A'] [Algebra B A'] (f : B) (h c : A')
-    (hN : IsNbhd B A' f) (hh : h + algebraMap B A' f * c = 1) : IsNbhd B (Localization.Away h) f := by
+theorem isNbhd_away_of_add_mul_eq_one
+    (B A' : Type) [CommRing B] [CommRing A'] [Algebra B A']
+    (f : B) (h c : A') (hN : IsNbhd B A' f) (hh : h + algebraMap B A' f * c = 1)
+    : IsNbhd B (Localization.Away h) f := by
   set F := algebraMap B A' f with hF
   have hpow : ∀ m : ℕ, F ∣ h ^ m - 1 := by
     intro m
@@ -18,8 +20,10 @@ theorem isNbhd_away_of_add_mul_eq_one (B A' : Type) [CommRing B] [CommRing A'] [
     have := sub_dvd_pow_sub_pow h 1 m
     rw [one_pow] at this
     exact h1.trans this
-  have hL : ∀ b : B, algebraMap B (Localization.Away h) b =
-      algebraMap A' (Localization.Away h) (algebraMap B A' b) := fun b =>
+  have hL
+      : ∀ b : B,
+        algebraMap B (Localization.Away h) b
+          = algebraMap A' (Localization.Away h) (algebraMap B A' b) := fun b =>
     IsScalarTower.algebraMap_apply B A' (Localization.Away h) b
   refine ⟨?_, ?_⟩
   · intro a'
@@ -32,7 +36,8 @@ theorem isNbhd_away_of_add_mul_eq_one (B A' : Type) [CommRing B] [CommRing A'] [
     obtain ⟨d, hd⟩ := hb
     refine ⟨b, ?_⟩
     rw [Ideal.mem_span_singleton, hL b, hL f]
-    obtain ⟨u, hu⟩ := IsLocalization.Away.algebraMap_isUnit (S := Localization.Away h) h |>.exists_right_inv
+    obtain ⟨u, hu⟩ :=
+      IsLocalization.Away.algebraMap_isUnit (S := Localization.Away h) h |>.exists_right_inv
     have hu1 : algebraMap A' (Localization.Away h) F ∣ u - 1 := by
       refine ⟨algebraMap A' (Localization.Away h) c * u, ?_⟩
       have := congrArg (algebraMap A' (Localization.Away h)) hh
@@ -44,12 +49,14 @@ theorem isNbhd_away_of_add_mul_eq_one (B A' : Type) [CommRing B] [CommRing A'] [
       exact hu1.trans this
     obtain ⟨e, he⟩ := hun
     have ha' : a' = algebraMap A' (Localization.Away h) x * u ^ n := by
-      have : a' * (algebraMap A' (Localization.Away h) h * u) ^ n = a' := by rw [hu, one_pow, mul_one]
+      have : a' * (algebraMap A' (Localization.Away h) h * u) ^ n = a' := by
+        rw [hu, one_pow, mul_one]
       rw [← this, mul_pow, ← mul_assoc, ← map_pow, hs]
     refine ⟨algebraMap A' (Localization.Away h) x * e + algebraMap A' (Localization.Away h) d, ?_⟩
-    have hx : algebraMap A' (Localization.Away h) x =
-        algebraMap A' (Localization.Away h) (algebraMap B A' b) + algebraMap A' (Localization.Away h) F *
-          algebraMap A' (Localization.Away h) d := by
+    have hx
+        : algebraMap A' (Localization.Away h) x
+          = algebraMap A' (Localization.Away h) (algebraMap B A' b)
+            + algebraMap A' (Localization.Away h) F * algebraMap A' (Localization.Away h) d := by
       rw [← map_mul, ← map_add (f := _), ← hd]; ring_nf
     rw [ha']
     linear_combination (algebraMap A' (Localization.Away h) x) * he + hx
@@ -59,8 +66,9 @@ theorem isNbhd_away_of_add_mul_eq_one (B A' : Type) [CommRing B] [CommRing A'] [
     obtain ⟨⟨x, s⟩, hs⟩ := IsLocalization.surj (Submonoid.powers h) y
     obtain ⟨n, hn⟩ := (Submonoid.mem_powers_iff _ _).mp s.2
     simp only at hs
-    have heq : algebraMap A' (Localization.Away h) (algebraMap B A' a * h ^ n) =
-        algebraMap A' (Localization.Away h) (F * x) := by
+    have heq
+        : algebraMap A' (Localization.Away h) (algebraMap B A' a * h ^ n)
+          = algebraMap A' (Localization.Away h) (F * x) := by
       rw [map_mul, map_mul, hy, ← hs, hn]; ring
     obtain ⟨⟨k, hk⟩, hk'⟩ := (IsLocalization.eq_iff_exists (Submonoid.powers h) _).mp heq
     obtain ⟨m, rfl⟩ := (Submonoid.mem_powers_iff _ _).mp hk

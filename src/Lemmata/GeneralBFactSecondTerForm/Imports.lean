@@ -46,15 +46,16 @@ private lemma aux {V : Type} [AddCommGroup V] [Module ℂ V] {ι : Type u_1}
   · exact absurd (sub_eq_zero.1 h) hw
   · exact h
 
-theorem goal1 :
-  ∀ {V : Type} [inst : AddCommGroup.{0} V] [inst_1 : Module.{0, 0} Complex V] {ι : Type u_1}
-  (C : Complex → Module.End.{0, 0} Complex V) (χ : ι → Complex → Complex),
-  Function.Injective.{u_1 + 1, 1} χ →
-    ∀ (p : ι → Submodule.{0, 0} Complex V),
-      (∀ (i : ι) (v : V),
-          Iff (Membership.mem.{0, 0} (p i) v)
-            (∀ (w : Complex), Eq.{1} (DFunLike.coe.{1, 1, 1} (C w) v) (HSMul.hSMul.{0, 0, 0} (χ i w) v))) →
-        iSupIndep.{u_1 + 1, 0} p := by
+theorem goal1
+    : ∀ {V : Type} [inst : AddCommGroup.{0} V] [inst_1 : Module.{0, 0} Complex V] {ι : Type u_1}
+        (C : Complex → Module.End.{0, 0} Complex V) (χ : ι → Complex → Complex),
+      Function.Injective.{u_1 + 1, 1} χ
+        → ∀ (p : ι → Submodule.{0, 0} Complex V),
+          (∀ (i : ι) (v : V),
+              Iff (Membership.mem.{0, 0} (p i) v)
+                (∀ (w : Complex),
+                  Eq.{1} (DFunLike.coe.{1, 1, 1} (C w) v) (HSMul.hSMul.{0, 0, 0} (χ i w) v)))
+            → iSupIndep.{u_1 + 1, 0} p := by
   intro V _ _ ι C χ hχ p hp
   classical
   rw [iSupIndep_iff_supIndep]

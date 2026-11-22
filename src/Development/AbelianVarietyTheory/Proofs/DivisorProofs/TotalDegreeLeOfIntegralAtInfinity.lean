@@ -66,13 +66,18 @@ lemma common_order {y : Fin D → K} {j : Fin D} (c : ℕ → K) (hc : ∀ k, �
 
 end GlobalTheory.DegreeBound
 
-
 open GlobalTheory.DegreeBound in
-theorem GlobalTheory.totalDegree_le_of_integral_at_infinity : ∀ {K : Type} [Field K] {D : ℕ} (y : Fin D → K),
-    AlgebraicIndependent ℤ y → ∀ (j : Fin D), y j ≠ 0 → ∀ (T₀ : MvPolynomial (Fin D) ℤ) (q : ℕ)
-    {ι : Type} (z : ι → K), (∀ i, ∃ (N : ℕ) (C : MvPolynomial (Fin D) ℤ), C.totalDegree ≤ N ∧
-    z i * y j ^ N = aeval y C) → ∀ (f : Polynomial (MvPolynomial ι ℤ)), f.Monic →
-    f.eval₂ (aeval z).toRingHom (aeval y T₀ / y j ^ q) = 0 → T₀.totalDegree ≤ q := by
+theorem GlobalTheory.totalDegree_le_of_integral_at_infinity
+    : ∀ {K : Type} [Field K] {D : ℕ} (y : Fin D → K),
+      AlgebraicIndependent ℤ y
+        → ∀ (j : Fin D),
+          y j ≠ 0
+            → ∀ (T₀ : MvPolynomial (Fin D) ℤ) (q : ℕ) {ι : Type} (z : ι → K),
+              (∀ i, ∃ (N : ℕ) (C : MvPolynomial (Fin D) ℤ),
+                  C.totalDegree ≤ N ∧ z i * y j ^ N = aeval y C)
+                → ∀ (f : Polynomial (MvPolynomial ι ℤ)),
+                  f.Monic → f.eval₂ (aeval z).toRingHom (aeval y T₀ / y j ^ q) = 0
+                    → T₀.totalDegree ≤ q := by
   intro K _ D y hind j hu T₀ q ι z hz f hf heq
   by_contra hlt
   push_neg at hlt
@@ -87,8 +92,9 @@ theorem GlobalTheory.totalDegree_le_of_integral_at_infinity : ∀ {K : Type} [Fi
   rcases Nat.eq_zero_or_pos n with hn0 | hnpos
   · subst hn0; simp at hsum
   obtain ⟨N, hN⟩ := common_order (y := y) (j := j) c (fun k => aeval_good hz (f.coeff k)) n
-  have hC : ∀ k, ∃ C : MvPolynomial (Fin D) ℤ, k < n →
-      C.totalDegree ≤ N ∧ c k * y j ^ N = aeval y C := by
+  have hC
+      : ∀ k, ∃ C : MvPolynomial (Fin D) ℤ,
+        k < n → C.totalDegree ≤ N ∧ c k * y j ^ N = aeval y C := by
     intro k
     by_cases hk : k < n
     · obtain ⟨C, h1, h2⟩ := hN k hk; exact ⟨C, fun _ => ⟨h1, h2⟩⟩
@@ -100,8 +106,8 @@ theorem GlobalTheory.totalDegree_le_of_integral_at_infinity : ∀ {K : Type} [Fi
     ∑ k ∈ Finset.range n, Cf k * T₀ ^ k * X j ^ (q * (n - k) + N * (n - 1)) with hB
   have hP : aeval y (B + A) = aeval y (0 : MvPolynomial (Fin D) ℤ) := by
     rw [map_zero]
-    have : aeval y (B + A) =
-        y j ^ (q * n + N * n) * ((∑ k ∈ Finset.range n, c k * s ^ k) + s ^ n) := by
+    have : aeval y (B + A)
+        = y j ^ (q * n + N * n) * ((∑ k ∈ Finset.range n, c k * s ^ k) + s ^ n) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [mul_add, Finset.mul_sum, map_add (f := _), map_sum]
       congr 1
@@ -120,8 +126,7 @@ theorem GlobalTheory.totalDegree_le_of_integral_at_infinity : ∀ {K : Type} [Fi
     intro m
     induction m with
     | zero => simp
-    | succ m ih =>
-      rw [pow_succ, totalDegree_mul_of_isDomain (pow_ne_zero _ hT0) hT0, ih]; ring
+    | succ m ih => rw [pow_succ, totalDegree_mul_of_isDomain (pow_ne_zero _ hT0) hT0, ih]; ring
   have hAdeg : A.totalDegree = N * n + n * T₀.totalDegree := by
     rw [hA, totalDegree_mul_of_isDomain (pow_ne_zero _ (X_ne_zero _)) (pow_ne_zero _ hT0),
       totalDegree_X_pow, hpow]
@@ -135,18 +140,19 @@ theorem GlobalTheory.totalDegree_le_of_integral_at_infinity : ∀ {K : Type} [Fi
     obtain ⟨m, hm⟩ : ∃ m, n = k + m + 1 := ⟨n - k - 1, by omega⟩
     have h1 : n - k = m + 1 := by omega
     have h2 : n - 1 = k + m := by omega
-    calc (Cf k * T₀ ^ k * X j ^ (q * (n - k) + N * (n - 1))).totalDegree
-        ≤ N + k * T₀.totalDegree + (q * (n - k) + N * (n - 1)) := by
-          refine (totalDegree_mul _ _).trans ?_
-          rw [totalDegree_X_pow]
-          have := (totalDegree_mul (Cf k) (T₀ ^ k)).trans
-            (add_le_add (hCf k hk').1 (totalDegree_pow T₀ k))
-          linarith
+    calc
+      (Cf k * T₀ ^ k * X j ^ (q * (n - k) + N * (n - 1))).totalDegree
+          ≤ N + k * T₀.totalDegree + (q * (n - k) + N * (n - 1)) := by
+        refine (totalDegree_mul _ _).trans ?_
+        rw [totalDegree_X_pow]
+        have :=
+          (totalDegree_mul (Cf k) (T₀ ^ k)).trans (add_le_add (hCf k hk').1 (totalDegree_pow T₀ k))
+        linarith
       _ < N * n + n * T₀.totalDegree := by
-          rw [h1, h2, hm]
-          have h3 : q * (m + 1) < T₀.totalDegree * (m + 1) :=
-            Nat.mul_lt_mul_of_pos_right hlt (Nat.succ_pos m)
-          nlinarith
+        rw [h1, h2, hm]
+        have h3 : q * (m + 1) < T₀.totalDegree * (m + 1) :=
+          Nat.mul_lt_mul_of_pos_right hlt (Nat.succ_pos m)
+        nlinarith
   have hAB : A = -B := eq_neg_of_add_eq_zero_right hBA
   have := congrArg MvPolynomial.totalDegree hAB
   rw [totalDegree_neg, hAdeg] at this

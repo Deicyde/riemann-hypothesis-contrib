@@ -8,7 +8,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.QuasiDetermi
 
 @[expose] public section
 
-open Matrix Formalism.YangianSpanCharacter.T Formalism.YangianSpanCharacter.Y Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr
+open Matrix Formalism.YangianSpanCharacter.T Formalism.YangianSpanCharacter.Y
+  Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr
 
 namespace Formalism.FourierDecayAlt.P.Fr3
 
@@ -117,7 +118,8 @@ lemma eeConj_abs {B : Type} [Ring B] (G Gi x xi l0 z κ κi e D : B)
 
 section Frame
 
-variable {A S : Type} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A] [Fintype S] [DecidableEq S]
+variable
+  {A S : Type} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A] [Fintype S] [DecidableEq S]
   {r : ℕ} {L : LevelData A r} {f : FrameData S A}
 
 lemma io_alg (c : ℂ) : (io (algebraMap ℂ A c) : SlopeTestRemainingChoices S A) = algebraMap ℂ (SlopeTestRemainingChoices S A) c := by
@@ -223,17 +225,20 @@ theorem start_ee : Formalism.FourierDecayAlt.Fr.StartEe := by
   have cz := (RuleSS.comm_fns_D L (zsub L (mζ L))).1
   have czb := (RuleSS.comm_fns_D L (zsub L (mζbi L))).1
   unfold LevelData.D LevelData.Dbi
-  calc L.Dr * L.ζ * (L.ζbi * L.Drbi) * (L.Drb * L.Dri * SS)
+  calc
+    L.Dr * L.ζ * (L.ζbi * L.Drbi) * (L.Drb * L.Dri * SS)
       = L.Dr * (L.ζ * L.ζbi) * (L.Drbi * L.Drb) * L.Dri * SS := by simp only [mul_assoc]
     _ = (L.ζ * L.ζbi) * (L.Dr * L.Dri) * SS := by
-        rw [RuleGD.Drbi_Drb, mul_one, ← (cz.mul_left czb).eq]; simp only [mul_assoc]
+      rw [RuleGD.Drbi_Drb, mul_one, ← (cz.mul_left czb).eq]; simp only [mul_assoc]
     _ = L.ζ * L.ζbi * SS := by rw [RuleGD.Dr_Dri, mul_one]
 
 theorem ee_conjugation : Formalism.FourierDecayAlt.Fr.EeConj := by
   intro A S _ _ _ _ _ _ r L f Y Ya hf hY hY1 hYa hYa1 hne
   obtain ⟨H, Hl⟩ := frame_gives_one_letter_hyps A S r L f hf
-  have y1 := Formalism.YangianSpanCharacter.P.wedgeMapInLieAlgebra ℂ (SlopeTestRemainingChoices S A) f.hatT (fun Y => io L.GGi * f.xi Y) f.hatQ f.inv H Ya Y hYa hY
-    hne.symm
+  have y1 :=
+    Formalism.YangianSpanCharacter.P.wedgeMapInLieAlgebra ℂ (SlopeTestRemainingChoices S A) f.hatT
+      (fun Y => io L.GGi * f.xi Y)
+      f.hatQ f.inv H Ya Y hYa hY hne.symm
   have hη := divided_difference_l A S r L f Ya Y hne.symm
   have hDD : f.DD Ya Y = f.DD Y Ya := by
     unfold FrameData.DD
@@ -241,30 +246,36 @@ theorem ee_conjugation : Formalism.FourierDecayAlt.Fr.EeConj := by
   unfold eta at y1
   rw [Hl Y hY hY1, Hl Ya hYa hYa1, hη, hat_τ hf (hf.inv_reg hYa), hDD] at y1
   unfold FrameData.l at y1
-  refine eeConj_abs (io L.GG) (io L.GGi) (f.x Ya) (f.xi Ya) (io (L.l0 Y)) (io (L.ζb * L.GGi)) (kapL L)
-    (io (L.GG * L.ζ * L.ζbi)) (f.ee Y) (f.DD Y Ya) ?_ ?_ (hf.x_xi Ya hYa).2 ?_ (commute_x_l0 hf Ya Y) ?_ ?_ ?_
-    (hf.ee_fn Y _ (mGG L)) y1
+  refine eeConj_abs (io L.GG) (io L.GGi) (f.x Ya) (f.xi Ya) (io (L.l0 Y)) (io (L.ζb * L.GGi))
+    (kapL L) (io (L.GG * L.ζ * L.ζbi)) (f.ee Y) (f.DD Y Ya) ?_ ?_ (hf.x_xi Ya hYa).2 ?_
+    (commute_x_l0 hf Ya Y) ?_ ?_ ?_ (hf.ee_fn Y _ (mGG L)) y1
   · rw [← io_mul, L.GGi_GG, io_one]
   · unfold kapL
     rw [← io_mul]
     have e : L.GG * L.ζ * L.ζbi * (L.ζb * L.ζi * L.GGi) = 1 := by
-      calc L.GG * L.ζ * L.ζbi * (L.ζb * L.ζi * L.GGi)
+      calc
+        L.GG * L.ζ * L.ζbi * (L.ζb * L.ζi * L.GGi)
           = L.GG * (L.ζ * ((L.ζbi * L.ζb) * L.ζi)) * L.GGi := by simp only [mul_assoc]
         _ = 1 := by rw [L.ζbi_ζb, one_mul, L.ζ_ζi, mul_one, L.GG_GGi]
     rw [e, io_one]
   · rw [← io_mul, l0_mul_gg_eq_gg_mul_sub, io_mul]; simp only [io, map_sub]
   · rw [io_mul]; exact (hf.x_fn Ya _ (mζb L)).mul_right (hf.x_fn Ya _ (mGGi L))
-  · unfold kapL; rw [io_mul, io_mul]
-    exact ((hf.x_fn Ya _ (mζb L)).mul_right (hf.x_fn Ya _ (mζi L))).mul_right (hf.x_fn Ya _ (mGGi L))
-  · exact io_comm (((zc L (mζb L) (mGG L)).mul_left (zc L (mζi L) (mGG L))).mul_left (zc L (mGGi L) (mGG L)))
+  · unfold kapL
+    rw [io_mul, io_mul]
+    exact ((hf.x_fn Ya _ (mζb L)).mul_right (hf.x_fn Ya _ (mζi L))).mul_right
+      (hf.x_fn Ya _ (mGGi L))
+  · exact io_comm (((zc L (mζb L) (mGG L)).mul_left (zc L (mζi L) (mGG L))).mul_left
+      (zc L (mGGi L) (mGG L)))
 
 theorem frame_adjoint_m : Formalism.FourierDecayAlt.Fr.FrameM := by
   intro A S _ _ _ _ _ _ r L f Y hL hf hr hY hYm
   obtain ⟨H, Hl⟩ := frame_gives_one_letter_hyps A S r L f hf
   have hr' : star (Y - 1) = Y - 1 := by rw [star_sub, hr, star_one]
   have hY' : Y - 1 + 1 ∈ f.inv := by rwa [sub_add_cancel]
-  have adj := adjoint_l_shift_relation ℂ (SlopeTestRemainingChoices S A) f.hatT (fun Y => io L.GGi * f.xi Y) f.hatQ f.inv (f.d L) H
-    (d_star hL hf) (Y - 1) hYm hY' (hat_herm hf (hf.inv_reg hYm) hr')
+  have adj :=
+    adjoint_l_shift_relation ℂ (SlopeTestRemainingChoices S A) f.hatT
+      (fun Y => io L.GGi * f.xi Y)
+      f.hatQ f.inv (f.d L) H (d_star hL hf) (Y - 1) hYm hY' (hat_herm hf (hf.inv_reg hYm) hr')
   rw [Hl (Y - 1) hYm hY', sub_add_cancel] at adj
   have hm : mf f.hatT (fun Y => io L.GGi * f.xi Y) Y = f.m L Y := by
     unfold FrameData.m
@@ -274,12 +285,14 @@ theorem frame_adjoint_m : Formalism.FourierDecayAlt.Fr.FrameM := by
     rwa [hat_τ hf (hf.inv_reg hY)] at this
   rw [← hm]
   unfold mf
-  rw [← mul_assoc (io L.GG * f.x Y), hτ, one_mul, hat_apply (hf.inv_reg hY), mul_assoc, hf.Fi_F, mul_one]
+  rw [← mul_assoc (io L.GG * f.x Y), hτ, one_mul, hat_apply (hf.inv_reg hY), mul_assoc, hf.Fi_F,
+    mul_one]
 
 theorem minus_letter_last_entry : Formalism.FourierDecayAlt.Fr.MinusLast := by
   intro A S _ _ _ _ _ _ r L f b Yb hH Y hY hY1
   obtain ⟨hL, hf, hfree, hre, i0, i1, im1, hq⟩ := hH
-  have e := ee_conjugation A S r L f Y Yb hf hY.1 hY1.1 i0 i1 (by intro e; apply hY.2.1; rw [e]; ring)
+  have e :=
+    ee_conjugation A S r L f Y Yb hf hY.1 hY1.1 i0 i1 (by intro e; apply hY.2.1; rw [e]; ring)
   simp only [FrameData.minus]
   rw [e]
 
@@ -290,28 +303,36 @@ theorem new_vector_letter_plus : Formalism.FourierDecayAlt.Fr.NewLetterPlus := b
     rw [mul_assoc, ← mul_assoc L.Dri, RuleGD.Dri_Dr, one_mul]
   have a2 : L.Dbi * L.R0 Y = L.ζbi * L.GG * (L.l0 Y * L.Ar Y + L.Br Y) := by
     unfold LevelData.Dbi LevelData.R0
-    simp only [mul_assoc]; rw [← mul_assoc L.Drbi, RuleGD.Drbi_Drb, one_mul]
+    simp only [mul_assoc]
+    rw [← mul_assoc L.Drbi, RuleGD.Drbi_Drb, one_mul]
   have k0 : L.ζbi * L.GG * (L.ζb * L.ζi * L.GGi) = L.ζi := by
-    calc L.ζbi * L.GG * (L.ζb * L.ζi * L.GGi) = L.ζbi * (L.GG * (L.ζb * L.ζi)) * L.GGi := by
-          simp only [mul_assoc]
+    calc
+      L.ζbi * L.GG * (L.ζb * L.ζi * L.GGi)
+        = L.ζbi * (L.GG * (L.ζb * L.ζi)) * L.GGi := by simp only [mul_assoc]
       _ = L.ζbi * ((L.ζb * L.ζi) * L.GG) * L.GGi := by
-          rw [((zc L (mGG L) (mζb L)).mul_right (zc L (mGG L) (mζi L))).eq]
+        rw [((zc L (mGG L) (mζb L)).mul_right (zc L (mGG L) (mζi L))).eq]
       _ = (L.ζbi * L.ζb) * L.ζi * (L.GG * L.GGi) := by simp only [mul_assoc]
       _ = L.ζi := by rw [L.ζbi_ζb, L.GG_GGi, one_mul, mul_one]
   have k : (io L.ζbi : SlopeTestRemainingChoices S A) * io L.GG * kapL L = io L.ζi := by
     unfold kapL; rw [← io_mul, ← io_mul, k0]
-  have key : (io L.ζbi : SlopeTestRemainingChoices S A) * (io L.GG * f.l L Y) * io (L.Ar Y) + io L.ζbi * io L.GG * io (L.Br Y) =
-      io L.ζbi * io L.GG * (io (L.l0 Y) * io (L.Ar Y) + io (L.Br Y)) +
-        f.ee Y * (io L.ζi * io (L.Ar Y)) := by
+  have key
+      : (io L.ζbi : SlopeTestRemainingChoices S A) * (io L.GG * f.l L Y) * io (L.Ar Y)
+          + io L.ζbi * io L.GG * io (L.Br Y)
+        = io L.ζbi * io L.GG * (io (L.l0 Y) * io (L.Ar Y) + io (L.Br Y))
+          + f.ee Y * (io L.ζi * io (L.Ar Y)) := by
     unfold FrameData.l
-    calc (io L.ζbi : SlopeTestRemainingChoices S A) * (io L.GG * (io (L.l0 Y) + kapL L * f.ee Y)) * io (L.Ar Y) +
-          io L.ζbi * io L.GG * io (L.Br Y)
-        = io L.ζbi * io L.GG * (io (L.l0 Y) * io (L.Ar Y) + io (L.Br Y)) +
-          (io L.ζbi * io L.GG * kapL L) * f.ee Y * io (L.Ar Y) := by noncomm_ring
+    calc
+      (io L.ζbi : SlopeTestRemainingChoices S A) * (io L.GG * (io (L.l0 Y) + kapL L * f.ee Y))
+              * io (L.Ar Y)
+            + io L.ζbi * io L.GG * io (L.Br Y)
+          = io L.ζbi * io L.GG * (io (L.l0 Y) * io (L.Ar Y) + io (L.Br Y))
+            + (io L.ζbi * io L.GG * kapL L) * f.ee Y * io (L.Ar Y) := by
+        noncomm_ring
       _ = _ := by rw [k, ← (hee _ (mζi L)).eq, mul_assoc (f.ee Y)]
   ext1 i
   fin_cases i
   · simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.mul_apply, a1, io_mul]
-  · simpa [Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.mul_apply, a1, a2, io_mul, io_add] using key
+  · simpa [Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.mul_apply, a1, a2, io_mul, io_add]
+      using key
 
 end Formalism.FourierDecayAlt.P

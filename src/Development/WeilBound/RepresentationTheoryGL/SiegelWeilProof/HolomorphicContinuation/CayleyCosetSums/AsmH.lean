@@ -9,7 +9,6 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 
 namespace PositivityTheory.Rg.Sw.HSt
 
-theorem asmH : AsmH :=
-  asmH_of farId Conv.smoothX topHol rcCongr (fun _ x Z t hx => expLie x Z t hx)
+theorem asmH : AsmH := asmH_of farId Conv.smoothX topHol rcCongr (fun _ x Z t hx => expLie x Z t hx)
 
 end PositivityTheory.Rg.Sw.HSt

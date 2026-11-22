@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicValu
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.NormVal
@@ -100,7 +102,25 @@ lemma order_dvd {f r N : ℕ} (h : r ≤ 2 * N) :
   · apply Nat.factorial_dvd_factorial
     nlinarith
 
-theorem norm_mem_and_le : ∀ (D : D7), Inp D → ∀ (S : Finset ℕ) (dl : ℕ → ℝ), Letters D S dl → ∀ (δ t0 : ℂ) (Q : ℕ), Crv D ⊤ δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D ⊤ δ) t0 → GoodLevel D Q → ∀ (P : Pair D ⊤ δ t0 Q) (N : ℕ) (B : ℝ), P.Small N B → ∀ (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]), ((P.norm : ℝ) : ℂ) ∈ Qbar ∧ ‖lamC lam ((P.norm : ℝ) : ℂ)‖ ≤ (p : ℝ) ^ (3 * ((padicValNat p (8 ^ (4 * fF D * N) * (8 * fF D * N).factorial) : ℝ) + 4 * fF D * N * B * (dl p + (if p = D.host.d then 1 / 4 else 0) + (padicValNat p Q : ℝ)) + 4 * (N : ℝ) ^ 2 * (padicValNat p Q : ℝ))) := by
+theorem norm_mem_and_le
+    : ∀ (D : D7),
+      Inp D
+        → ∀ (S : Finset ℕ) (dl : ℕ → ℝ),
+          Letters D S dl
+            → ∀ (δ t0 : ℂ) (Q : ℕ),
+              Crv D ⊤ δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D ⊤ δ) t0 → GoodLevel D Q
+                → ∀ (P : Pair D ⊤ δ t0 Q) (N : ℕ) (B : ℝ),
+                  P.Small N B
+                    → ∀ (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]),
+                      ((P.norm : ℝ) : ℂ) ∈ Qbar
+                        ∧ ‖lamC lam ((P.norm : ℝ) : ℂ)‖
+                          ≤ (p : ℝ)
+                            ^ (3
+                              * ((padicValNat p (8 ^ (4 * fF D * N) * (8 * fF D * N).factorial) : ℝ)
+                                + 4 * fF D * N * B
+                                  * (dl p + (if p = D.host.d then 1 / 4 else 0)
+                                    + (padicValNat p Q : ℝ))
+                                + 4 * (N : ℝ) ^ 2 * (padicValNat p Q : ℝ))) := by
   intro D hI S dl hL δ t0 Q hC hT hQ P N B hS p _ lam
   set M : ℕ := 8 ^ (4 * fF D * N) * (8 * fF D * N).factorial with hMdef
   have hM : M ≠ 0 := by positivity
@@ -123,40 +143,57 @@ theorem norm_mem_and_le : ∀ (D : D7), Inp D → ∀ (S : Finset ℕ) (dl : ℕ
     have hcard := (GlobalTheory.T.derivationDenominators_and_hostField_sizes D hI.g1).2.2.2.2.1
     have h1 : ((∑ τ, P.n τ : ℕ) : ℝ) ≤ fF D * (2 * B) := by
       rw [Nat.cast_sum, ← hcard]
-      have := Finset.sum_le_card_nsmul Finset.univ (fun τ => (P.n τ : ℝ)) (2 * B)
-        (fun τ _ => hS.2 τ)
+      have :=
+        Finset.sum_le_card_nsmul Finset.univ (fun τ => (P.n τ : ℝ)) (2 * B) (fun τ _ => hS.2 τ)
       simpa using this
     have haR : (P.a : ℝ) ≤ 2 * N := by exact_mod_cast ha
     have hdR : (P.d : ℝ) ≤ 2 * N := by exact_mod_cast hS.1
     have h2 : ((P.a * ∑ τ, P.n τ : ℕ) : ℝ) ≤ 4 * fF D * N * B := by
       rw [Nat.cast_mul]
-      calc (P.a : ℝ) * ((∑ τ, P.n τ : ℕ) : ℝ) ≤ (2 * N) * (fF D * (2 * B)) :=
-            mul_le_mul haR h1 (Nat.cast_nonneg _) (by positivity)
+      calc
+        (P.a : ℝ) * ((∑ τ, P.n τ : ℕ) : ℝ)
+          ≤ (2 * N) * (fF D * (2 * B)) := mul_le_mul haR h1 (Nat.cast_nonneg _) (by positivity)
         _ = _ := by ring
     have h3 : ((P.a * P.d : ℕ) : ℝ) ≤ 4 * (N : ℝ) ^ 2 := by
       rw [Nat.cast_mul]
-      calc (P.a : ℝ) * (P.d : ℝ) ≤ (2 * N) * (2 * N) :=
-            mul_le_mul haR hdR (Nat.cast_nonneg _) (by positivity)
+      calc
+        (P.a : ℝ) * (P.d : ℝ)
+          ≤ (2 * N) * (2 * N) := mul_le_mul haR hdR (Nat.cast_nonneg _) (by positivity)
         _ = _ := by ring
     exact add_le_add (mul_le_mul_of_nonneg_right h2 hc0) (mul_le_mul_of_nonneg_right h3 hw0)
-  obtain ⟨hterm, hsq, -⟩ := GlobalTheory.T.definiteThetaPair_terms_norms_independent_representatives D hI ⊤ δ t0 Q hC hT P hQ.1
-  have hgam : ∀ (r : ℕ), r ≤ 2 * N → ∀ (J : Subgroup (GA D r)), J ≤ intG D r → ∀ g,
-      Bd p ((p : ℝ) ^ v) ((gam D J g : ℂ)⁻¹) := fun r hr J hJ g =>
-    Bd.inv_nat hM ((GlobalTheory.T.unitaryRationalConjIntersectionCard_dvd_invariant D r J hJ g).2.1.trans (order_dvd hr))
-  have hcoord : ∀ (h k' : GA D P.d), k' ∈ intG D P.d →
-      TrivAt D p ((h * k' : GA D P.d) : GL (Fin P.d) (AE D)) → ∀ T,
-      Bd p ((p : ℝ) ^ v * (p : ℝ) ^ e) (P.coord h T) := by
+  obtain ⟨hterm, hsq, -⟩ :=
+    GlobalTheory.T.definiteThetaPair_terms_norms_independent_representatives D hI ⊤ δ t0 Q hC hT P
+      hQ.1
+  have hgam
+      : ∀ (r : ℕ),
+        r ≤ 2 * N
+          → ∀ (J : Subgroup (GA D r)),
+            J ≤ intG D r → ∀ g, Bd p ((p : ℝ) ^ v) ((gam D J g : ℂ)⁻¹) := fun r hr J hJ g =>
+    Bd.inv_nat hM
+      ((GlobalTheory.T.unitaryRationalConjIntersectionCard_dvd_invariant D r J hJ g).2.1.trans
+        (order_dvd hr))
+  have hcoord
+      : ∀ (h k' : GA D P.d),
+        k' ∈ intG D P.d → TrivAt D p ((h * k' : GA D P.d) : GL (Fin P.d) (AE D))
+          → ∀ T, Bd p ((p : ℝ) ^ v * (p : ℝ) ^ e) (P.coord h T) := by
     intro h k' hk' htr T
     unfold Pair.coord
     refine finsum_induction (Bd p ((p : ℝ) ^ v * (p : ℝ) ^ e)) (Bd.zero (by positivity))
-      (fun x y => Bd.add) (fun x => ?_)
+      (fun x y => Bd.add)
+      (fun x => ?_)
     refine Bd.mul (hgam _ ha _ le_rfl _) ?_
     obtain ⟨γ, k, γ', h1, h2, h3⟩ := hI.rep P.a p Fact.out x.out
     rw [← hterm γ (Subgroup.subset_closure ⟨γ', h1⟩) k (Subgroup.subset_closure h2)]
-    exact ⟨(GlobalTheory.T.padicValuation_thetaKernelJet_bound D hI S dl hL δ t0 Q hC hT hQ P p lam _ h k' hk' h3 htr T).1,
-      fun lam' => (GlobalTheory.T.padicValuation_thetaKernelJet_bound D hI S dl hL δ t0 Q hC hT hQ P p lam' _ h k' hk' h3 htr T).2⟩
-  have hsqb : ∀ h : GA D P.d,
-      Bd p (((p : ℝ) ^ v * (p : ℝ) ^ e) * ((p : ℝ) ^ v * (p : ℝ) ^ e)) ((P.sq h : ℝ) : ℂ) := by
+    exact ⟨
+      (GlobalTheory.T.padicValuation_thetaKernelJet_bound D hI S dl hL δ t0 Q hC hT hQ P p lam _ h
+        k' hk' h3 htr T).1,
+      fun lam' =>
+        (GlobalTheory.T.padicValuation_thetaKernelJet_bound D hI S dl hL δ t0 Q hC hT hQ P p lam' _
+          h k' hk' h3 htr T).2
+    ⟩
+  have hsqb
+      : ∀ h : GA D P.d,
+        Bd p (((p : ℝ) ^ v * (p : ℝ) ^ e) * ((p : ℝ) ^ v * (p : ℝ) ^ e)) ((P.sq h : ℝ) : ℂ) := by
     intro h
     obtain ⟨γ, k, γ', h1, h2, h3⟩ := hI.rep P.d p Fact.out h
     rw [← hsq γ (Subgroup.subset_closure ⟨γ', h1⟩) 1 (one_mem _) h, mul_one]
@@ -169,8 +206,12 @@ theorem norm_mem_and_le : ∀ (D : D7), Inp D → ∀ (S : Finset ℕ) (dl : ℕ
   have hfin : Bd p ((p : ℝ) ^ v * (((p : ℝ) ^ v * (p : ℝ) ^ e) * ((p : ℝ) ^ v * (p : ℝ) ^ e)))
       ((P.norm : ℝ) : ℂ) := by
     unfold Pair.norm
-    refine finsum_induction (fun x : ℝ => Bd p ((p : ℝ) ^ v * (((p : ℝ) ^ v * (p : ℝ) ^ e) *
-      ((p : ℝ) ^ v * (p : ℝ) ^ e))) (x : ℂ)) ?_ (fun x y hx hy => ?_) (fun x => ?_)
+    refine finsum_induction
+      (fun x : ℝ =>
+        Bd p ((p : ℝ) ^ v * (((p : ℝ) ^ v * (p : ℝ) ^ e) * ((p : ℝ) ^ v * (p : ℝ) ^ e))) (x : ℂ))
+      ?_
+      (fun x y hx hy => ?_)
+      (fun x => ?_)
     · rw [Complex.ofReal_zero]
       exact Bd.zero (by positivity)
     · rw [Complex.ofReal_add]

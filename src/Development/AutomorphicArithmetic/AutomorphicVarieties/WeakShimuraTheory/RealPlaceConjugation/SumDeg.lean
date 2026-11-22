@@ -5,11 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Two
 open scoped Classical
 
-theorem UpperTheory.V.Ws.sum_local_degree_above_l_le_finrank :
-    ∀ (F : Type) [Field F] [NumberField F] (l : ℕ) [Fact l.Prime] (S : Finset (HeightOneSpectrum (𝓞 F))), (∑ v ∈ S, if ((l : ℕ) : 𝓞 F) ∈ v.asIdeal then locDeg v else 0) ≤ Module.finrank ℚ F := by
+theorem UpperTheory.V.Ws.sum_local_degree_above_l_le_finrank
+    : ∀ (F : Type) [Field F] [NumberField F] (l : ℕ) [Fact l.Prime]
+        (S : Finset (HeightOneSpectrum (𝓞 F))),
+      (∑ v ∈ S, if ((l : ℕ) : 𝓞 F) ∈ v.asIdeal then locDeg v else 0) ≤ Module.finrank ℚ F := by
   intro F _ _ l hl S
   have hl0 : (l : ℤ) ≠ 0 := by exact_mod_cast hl.out.ne_zero
   set p : Ideal ℤ := Ideal.span {(l : ℤ)} with hpdef
@@ -22,14 +26,17 @@ theorem UpperTheory.V.Ws.sum_local_degree_above_l_le_finrank :
   rw [NumberField.RingOfIntegers.rank] at key
   rw [← key, ← Finset.sum_filter]
   set g : Ideal (𝓞 F) → ℕ := fun I => I.ramificationIdx ℤ * I.inertiaDeg ℤ with hg
-  have h1 : ∑ v ∈ S.filter (fun v => ((l : ℕ) : 𝓞 F) ∈ v.asIdeal), locDeg v
-      = ∑ I ∈ (S.filter (fun v => ((l : ℕ) : 𝓞 F) ∈ v.asIdeal)).image (fun v => v.asIdeal), g I := by
-    rw [Finset.sum_image]
-    · rfl
-    · intro a _ b _ hab
-      exact HeightOneSpectrum.ext hab
-  have h2 : ∑ q : p.primesOver (𝓞 F), q.1.ramificationIdx ℤ * q.1.inertiaDeg ℤ
-      = ∑ I ∈ (Finset.univ : Finset (p.primesOver (𝓞 F))).image Subtype.val, g I := by
+  have h1
+      : ∑ v ∈ S.filter (fun v => ((l : ℕ) : 𝓞 F) ∈ v.asIdeal), locDeg v
+        = ∑ I ∈ (S.filter (fun v => ((l : ℕ) : 𝓞 F) ∈ v.asIdeal)).image (fun v => v.asIdeal), g I :=
+    by
+      rw [Finset.sum_image]
+      · rfl
+      · intro a _ b _ hab
+        exact HeightOneSpectrum.ext hab
+  have h2
+      : ∑ q : p.primesOver (𝓞 F), q.1.ramificationIdx ℤ * q.1.inertiaDeg ℤ
+        = ∑ I ∈ (Finset.univ : Finset (p.primesOver (𝓞 F))).image Subtype.val, g I := by
     rw [Finset.sum_image]
     intro a _ b _ hab
     exact Subtype.ext hab

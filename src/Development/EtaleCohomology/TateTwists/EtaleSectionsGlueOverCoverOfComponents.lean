@@ -5,7 +5,10 @@ public import Development.EtaleCohomology.TateTwists.EtaleSheafSectionsGlueOfFor
 @[expose] public section
 
 namespace LateralTheory.Fin.EtaleSheafSectionsSeparatedAndGlue
-theorem etale_sections_glue_over_cover_of_components : LateralTheory.EtaleFoundations.EtaleSheafSectionsSeparatedAndGlue := by
+theorem etale_sections_glue_over_cover_of_components
+    : LateralTheory.EtaleFoundations.EtaleSheafSectionsSeparatedAndGlue := by
   apply LateralTheory.EtaleFoundations.etale_sheaf_sections_glue_of_forget_isSheaf
-theorem intersectionNumber_baseChange : LateralTheory.EtaleFoundations.EtaleSheafSectionsSeparatedAndGlue := etale_sections_glue_over_cover_of_components
+theorem intersectionNumber_baseChange
+    : LateralTheory.EtaleFoundations.EtaleSheafSectionsSeparatedAndGlue :=
+  etale_sections_glue_over_cover_of_components
 end LateralTheory.Fin.EtaleSheafSectionsSeparatedAndGlue

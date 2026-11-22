@@ -25,8 +25,8 @@ lemma lvl_succ_le {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e :
   | zero => exact le_top
   | succ e => exact hS e
 
-def incl {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : ℕ) :
-    (lvl S (e + 1) : X.Modules) ⟶ (lvl S e : X.Modules) :=
+def incl {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : ℕ)
+    : (lvl S (e + 1) : X.Modules) ⟶ (lvl S e : X.Modules) :=
   Subobject.ofLE _ _ (lvl_succ_le hS e)
 
 @[reassoc (attr := simp)]
@@ -34,11 +34,10 @@ lemma incl_arrow {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : 
     incl hS e ≫ (lvl S e).arrow = (lvl S (e + 1)).arrow :=
   Subobject.ofLE_arrow _
 
-def gr {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : ℕ) : X.Modules :=
-  cokernel (incl hS e)
+def gr {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : ℕ) : X.Modules := cokernel (incl hS e)
 
-def grπ {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : ℕ) :
-    (lvl S e : X.Modules) ⟶ gr hS e :=
+def grπ {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : ℕ)
+    : (lvl S e : X.Modules) ⟶ gr hS e :=
   cokernel.π _
 
 lemma incl_grπ {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : ℕ) :
@@ -48,8 +47,8 @@ lemma incl_grπ {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) (e : �
 def MapsDown (S : ℕ → Subobject P) (r : Γ(X, ⊤)) : Prop :=
   ∀ e, (lvl S (e + 1)).Factors ((lvl S e).arrow ≫ GroundTheory.Arith.SchemeCoh.smulHom P r)
 
-def mulLvl {S : ℕ → Subobject P} {r : Γ(X, ⊤)} (hr : MapsDown S r) (e : ℕ) :
-    (lvl S e : X.Modules) ⟶ (lvl S (e + 1) : X.Modules) :=
+def mulLvl {S : ℕ → Subobject P} {r : Γ(X, ⊤)} (hr : MapsDown S r) (e : ℕ)
+    : (lvl S e : X.Modules) ⟶ (lvl S (e + 1) : X.Modules) :=
   (lvl S (e + 1)).factorThru _ (hr e)
 
 @[reassoc (attr := simp)]
@@ -63,10 +62,10 @@ lemma incl_mulLvl {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) {r :
   rw [← cancel_mono (lvl S (e + 1)).arrow]
   simp only [Category.assoc, mulLvl_arrow, incl_arrow, incl_arrow_assoc]
 
-def grT {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) {r : Γ(X, ⊤)} (hr : MapsDown S r)
-    (e : ℕ) : gr hS e ⟶ gr hS (e + 1) :=
-  cokernel.desc _ (mulLvl hr e ≫ grπ hS (e + 1)) (by
-    rw [← Category.assoc, incl_mulLvl, Category.assoc, incl_grπ, comp_zero])
+def grT {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) {r : Γ(X, ⊤)} (hr : MapsDown S r) (e : ℕ)
+    : gr hS e ⟶ gr hS (e + 1) :=
+  cokernel.desc _ (mulLvl hr e ≫ grπ hS (e + 1))
+    (by rw [← Category.assoc, incl_mulLvl, Category.assoc, incl_grπ, comp_zero])
 
 @[reassoc (attr := simp)]
 lemma grπ_grT {S : ℕ → Subobject P} (hS : ∀ e, S (e + 1) ≤ S e) {r : Γ(X, ⊤)}
@@ -99,11 +98,18 @@ lemma twist_smulHom_app (L : ReciprocityTheory.ChartRestriction.G.Semi.LB X) (F 
   congr 1
   exact (restrictTop_restrict (homOfLE inf_le_left) r).symm
 
-def Lifts {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) [X.Over (Spec (.of A))]
-    (H : ReciprocityTheory.ChartRestriction.G.Semi.LB X) {S : ℕ → Subobject P} (hS : ClosedSys I P S) (n : ℤ) (e : ℕ) :
-    Prop :=
-  ∀ y : Γ(GlobalTheory.twistZ (gr (anti hS) e) H n, ⊤), ∃ c : Γ(GlobalTheory.twistZ (lvl S e : X.Modules) H n, ⊤),
-    (GlobalTheory.Twist.map (GlobalTheory.lbZPow H n) (grπ (anti hS) e)).app ⊤ c = y ∧
-      (GlobalTheory.Twist.map (GlobalTheory.lbZPow H n) (lvl S e).arrow).app ⊤ c ∈ twPow I H n P e
+def Lifts
+    {A : Type} [CommRing A] [IsNoetherianRing A]
+    (I : Ideal A)
+    [X.Over (Spec (.of A))]
+    (H : ReciprocityTheory.ChartRestriction.G.Semi.LB X)
+    {S : ℕ → Subobject P} (hS : ClosedSys I P S)
+    (n : ℤ) (e : ℕ)
+    : Prop :=
+  ∀ y : Γ(GlobalTheory.twistZ (gr (anti hS) e) H n, ⊤),
+    ∃ c : Γ(GlobalTheory.twistZ (lvl S e : X.Modules) H n, ⊤),
+      (GlobalTheory.Twist.map (GlobalTheory.lbZPow H n) (grπ (anti hS) e)).app ⊤ c = y
+        ∧ (GlobalTheory.Twist.map (GlobalTheory.lbZPow H n) (lvl S e).arrow).app ⊤ c
+          ∈ twPow I H n P e
 
 end GlobalTheory.CompanionTheory.GE.Step

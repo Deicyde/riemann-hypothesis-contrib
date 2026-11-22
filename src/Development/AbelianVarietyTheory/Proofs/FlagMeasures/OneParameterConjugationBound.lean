@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UnipotentRadi
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 namespace GlobalTheory.TorusLip
@@ -150,9 +151,9 @@ lemma torus_lipschitz_l2_bound {G ι : Type} [Fintype ι] [TopologicalSpace G] [
 
 section Abstract
 
-variable {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [NormedAddCommGroup H]
+variable
+  {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [NormedAddCommGroup H]
   [InnerProductSpace ℂ H]
-
 
 omit [TopologicalSpace G] [IsTopologicalGroup G] in
 lemma decay_shift {δ : G → ℝ} (hinv : ∀ g, δ g⁻¹ = δ g) (hsub : ∀ g g', δ (g * g') ≤ δ g + δ g') {c C : ℝ}
@@ -492,15 +493,47 @@ lemma norm_shift (hn : 1 ≤ n) {W : Submodule ℂ (Fin n → ℂ)} {ν : Measur
         ((∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * (‖u‖ ^ 2 / d)) := by ring
     _ = _ := by rw [he, mul_one]
 
-theorem torus_lipschitz : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ (Fin n → ℂ)) (ν : Measure (UJ ε)), IsIsoC ε W → IsHaarSub (NW ε W) ν → ∀ β : UJ ε → ENNReal, Measurable β → (∀ y, β y ≠ ⊤) → (∀ y, ∫⁻ m, β (m⁻¹ * y) ∂ν = 1) → ∀ (a : ℝ → UJ ε) (Hm : Matrix (Fin n) (Fin n) ℂ), inP ε Hm → (∀ s : ℝ, umat (a s) = NormedSpace.exp ((s : ℂ) • Hm)) → (∀ g : UJ ε, ∃ k : UJ ε, umat k ∈ Kset ε ∧ ∀ s, a s * g * (k⁻¹ * a s * k)⁻¹ * g⁻¹ ∈ NW ε W) → ∀ κ : ℝ, (∀ s, ν.map (fun m => a s * m * (a s)⁻¹) = ENNReal.ofReal (Real.exp (κ * s)) • ν) → ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (d c : ℝ) (w : H) (L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] H), IsURepOn (UJset ε) σ → IsFdeg (muG ε) σ d → 8 * n * rkR ε < c → (∀ X, inG ε X → HasDerivAt (fun s : ℝ => σ (NormedSpace.exp ((s : ℂ) • X)) w) (L X) 0) → ∃ C₀ : ℝ, ∀ v : H, (∃ C : ℝ, ∀ g : UJ ε, ‖⟪v, σ (umat g) w⟫_ℂ‖ ≤ C * Real.exp (-(c * dOp (umat g)))) → (∃ C : ℝ, ∀ g : UJ ε, ‖⟪v, σ (umat g) v⟫_ℂ‖ ≤ C * Real.exp (-(c * dOp (umat g)))) → (∀ X, inG ε X → (∃ C : ℝ, ∀ g : UJ ε, ‖⟪v, σ (umat g) (L X)⟫_ℂ‖ ≤ C * Real.exp (-(c * dOp (umat g))))) → ∀ s : ℝ, |s| ≤ 1 → ∫ g : UJ ε, (β g).toReal * ‖(∫ m, ⟪v, σ (umat (m * (a s * g))) w⟫_ℂ ∂ν) - (∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν)‖ ^ 2 ∂(muG ε) ≤ C₀ * s ^ 2 * (∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re := by
+theorem torus_lipschitz
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ (Fin n → ℂ)) (ν : Measure (UJ ε)),
+      IsIsoC ε W → IsHaarSub (NW ε W) ν
+        → ∀ β : UJ ε → ENNReal,
+          Measurable β → (∀ y, β y ≠ ⊤) → (∀ y, ∫⁻ m, β (m⁻¹ * y) ∂ν = 1)
+            → ∀ (a : ℝ → UJ ε) (Hm : Matrix (Fin n) (Fin n) ℂ),
+              inP ε Hm → (∀ s : ℝ, umat (a s) = NormedSpace.exp ((s : ℂ) • Hm))
+                → (∀ g : UJ ε, ∃ k : UJ ε,
+                  umat k ∈ Kset ε ∧ ∀ s, a s * g * (k⁻¹ * a s * k)⁻¹ * g⁻¹ ∈ NW ε W)
+                → ∀ κ : ℝ,
+                  (∀ s, ν.map (fun m => a s * m * (a s)⁻¹) = ENNReal.ofReal (Real.exp (κ * s)) • ν)
+                    → ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+                        (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (d c : ℝ) (w : H)
+                        (L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] H),
+                      IsURepOn (UJset ε) σ → IsFdeg (muG ε) σ d → 8 * n * rkR ε < c
+                        → (∀ X,
+                          inG ε X
+                            → HasDerivAt (fun s : ℝ => σ (NormedSpace.exp ((s : ℂ) • X)) w) (L X) 0)
+                        → ∃ C₀ : ℝ, ∀ v : H,
+                          (∃ C : ℝ, ∀ g : UJ ε,
+                              ‖⟪v, σ (umat g) w⟫_ℂ‖ ≤ C * Real.exp (-(c * dOp (umat g))))
+                            → (∃ C : ℝ, ∀ g : UJ ε,
+                              ‖⟪v, σ (umat g) v⟫_ℂ‖ ≤ C * Real.exp (-(c * dOp (umat g))))
+                            → (∀ X,
+                              inG ε X
+                                → (∃ C : ℝ, ∀ g : UJ ε,
+                                  ‖⟪v, σ (umat g) (L X)⟫_ℂ‖ ≤ C * Real.exp (-(c * dOp (umat g)))))
+                            → ∀ s : ℝ,
+                              |s| ≤ 1
+                                → ∫ g : UJ ε, (β g).toReal * ‖(∫ m, ⟪v, σ (umat (m * (a s * g))) w⟫_ℂ ∂ν) - (∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν)‖ ^ 2 ∂(muG ε)
+                                  ≤ C₀ * s ^ 2 * (∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re := by
   intro n ε W ν hW hν β hβ hβt hβ1 a Hm hHm ha hconj κ hκ H _ _ _ σ d c w L hσ hd hc hL
   obtain ⟨E, hE1, -, hE3⟩ := GlobalTheory.LieONB.exists_orthonormal_basis n ε
   refine ⟨((Hm * Hmᴴ).trace).re * Real.exp |κ| * ∑ i, ‖L (E i)‖ ^ 2 / d, ?_⟩
   intro v hvw hvv hvL s hs
   rcases Nat.eq_zero_or_pos n with hn0 | hnpos
   · subst hn0
-    have e : ∀ g : UJ ε, (∫ m, ⟪v, σ (umat (m * (a s * g))) w⟫_ℂ ∂ν) -
-        (∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν) = 0 := by
+    have e
+        : ∀ g : UJ ε,
+          (∫ m, ⟪v, σ (umat (m * (a s * g))) w⟫_ℂ ∂ν) - (∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν)
+            = 0 := by
       intro g; rw [sub_eq_zero]; congr 1
     have hz : ∑ i : Fin (0 ^ 2), ‖L (E i)‖ ^ 2 / d = 0 :=
       Finset.sum_eq_zero (fun i _ => absurd i.2 (by simp))
@@ -510,10 +543,10 @@ theorem torus_lipschitz : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ
   have hρ : IsURep (fun g : UJ ε => σ (umat g)) := isURep_umat hσ
   have cd := GlobalTheory.Count.Cartan.cartan_distances n ε
   have hinv : ∀ g : UJ ε, dOp (umat g⁻¹) = dOp (umat g) := fun g => (cd.2.1 g g hn).2.1
-  have hsub : ∀ g g' : UJ ε, dOp (umat (g * g')) ≤ dOp (umat g) + dOp (umat g') :=
-    fun g g' => (cd.2.1 g g' hn).2.2.1
+  have hsub : ∀ g g' : UJ ε, dOp (umat (g * g')) ≤ dOp (umat g) + dOp (umat g') := fun g g' =>
+    (cd.2.1 g g' hn).2.2.1
   have hδc : Continuous fun g : UJ ε => dOp (umat g) := cd.2.2.2.2
-  have hnr : (0:ℝ) ≤ (n:ℝ) * (rkR ε : ℝ) := mul_nonneg (Nat.cast_nonneg n) (Nat.cast_nonneg _)
+  have hnr : (0 : ℝ) ≤ (n : ℝ) * (rkR ε : ℝ) := mul_nonneg (Nat.cast_nonneg n) (Nat.cast_nonneg _)
   have hc0 : 0 ≤ c := by nlinarith
   have hνint : Integrable (fun m : UJ ε => Real.exp (-(c * dOp (umat m)))) ν :=
     (GlobalTheory.T.unipotentRadical_volume_growth n ε W ν hW hν).2 c (by nlinarith)
@@ -531,7 +564,9 @@ theorem torus_lipschitz : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ
     intro X hX
     have hXe := hE3 X hX
     have h1 : X * Xᴴ = ∑ i, ((((X * (E i)ᴴ).trace).re : ℝ) : ℂ) • (E i * Xᴴ) := by
-      calc X * Xᴴ = (∑ i, ((((X * (E i)ᴴ).trace).re : ℝ) : ℂ) • E i) * Xᴴ := by rw [← hXe]
+      calc
+        X * Xᴴ
+          = (∑ i, ((((X * (E i)ᴴ).trace).re : ℝ) : ℂ) • E i) * Xᴴ := by rw [← hXe]
         _ = _ := by rw [Finset.sum_mul]; simp_rw [Matrix.smul_mul]
     have h2 : ∀ i, ((E i * Xᴴ).trace).re = ((X * (E i)ᴴ).trace).re := by
       intro i
@@ -543,22 +578,32 @@ theorem torus_lipschitz : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ
     rw [Matrix.trace_smul, smul_eq_mul, Complex.re_ofReal_mul, h2, sq]
   have hM : 0 ≤ ((Hm * Hmᴴ).trace).re := by
     rw [hnorm Hm hHm.1]; exact Finset.sum_nonneg (fun i _ => sq_nonneg _)
-  have hΦ : ∀ i, Continuous fun p : ℝ × UJ ε =>
-      ∫ m, ⟪v, σ (umat (m * (a p.1 * p.2))) (L (E i))⟫_ℂ ∂ν := by
+  have hΦ
+      : ∀ i,
+        Continuous fun p : ℝ × UJ ε => ∫ m, ⟪v, σ (umat (m * (a p.1 * p.2))) (L (E i))⟫_ℂ ∂ν := by
     intro i
     have hu := hvL (E i) (hE1 i).1
-    have hc' := (GlobalTheory.T.unitary_rep_matrix_coefficient_bound n ε W ν hW hν β hβ hβt hβ1 H σ d c (L (E i)) v v hσ hd hc hu hu hvv).1
+    have hc' :=
+      (GlobalTheory.T.unitary_rep_matrix_coefficient_bound n ε W ν hW hν β hβ hβt hβ1 H σ d c
+        (L (E i)) v v hσ hd hc hu hu hvv).1
     exact hc'.comp ((haC.comp continuous_fst).mul continuous_snd)
-  have hB : ∀ i (t : ℝ), |t| ≤ 1 →
-      Integrable (fun g => (β g).toReal * ‖∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν‖ ^ 2) (muG ε) ∧
-      ∫ g, (β g).toReal * ‖∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν‖ ^ 2 ∂(muG ε) ≤
-        Real.exp |κ| * ((∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * (‖L (E i)‖ ^ 2 / d)) := by
+  have hB
+      : ∀ i (t : ℝ),
+        |t| ≤ 1
+          → Integrable
+              (fun g => (β g).toReal * ‖∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν‖ ^ 2)
+              (muG ε)
+            ∧ ∫ g, (β g).toReal * ‖∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν‖ ^ 2 ∂(muG ε)
+              ≤ Real.exp |κ| * ((∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * (‖L (E i)‖ ^ 2 / d)) := by
     intro i t ht
-    have h2 : ν.map (fun m => (a t)⁻¹ * m * (a t)⁻¹⁻¹) = ENNReal.ofReal (Real.exp (-(κ * t))) • ν := by
+    have h2
+        : ν.map (fun m => (a t)⁻¹ * m * (a t)⁻¹⁻¹) = ENNReal.ofReal (Real.exp (-(κ * t))) • ν := by
       have := hκ (-t); rw [← hainv t, mul_neg] at this; exact this
     obtain ⟨hI, hE⟩ := norm_shift hn hW hν hβ hβt hβ1 (hκ t) h2 hσ hd hc (hvL (E i) (hE1 i).1) hvv
     refine ⟨hI, ?_⟩
-    have h0 : 0 ≤ ∫ g, (β g).toReal * ‖∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν‖ ^ 2 ∂(muG ε) :=
+    have h0
+        : 0
+          ≤ ∫ g, (β g).toReal * ‖∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν‖ ^ 2 ∂(muG ε) :=
       integral_nonneg (fun g => mul_nonneg ENNReal.toReal_nonneg (sq_nonneg _))
     rw [hE] at h0 ⊢
     have hexp : Real.exp (-(κ * t)) ≤ Real.exp |κ| := by
@@ -566,9 +611,11 @@ theorem torus_lipschitz : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ
       have : |κ * t| ≤ |κ| := by rw [abs_mul]; exact mul_le_of_le_one_right (abs_nonneg κ) ht
       linarith [neg_le_abs (κ * t)]
     exact mul_le_mul_of_nonneg_right hexp ((mul_nonneg_iff_of_pos_left (Real.exp_pos _)).1 h0)
-  have hD : ∀ g : UJ ε, ∃ y : Fin (n ^ 2) → ℝ, ∑ i, y i ^ 2 ≤ ((Hm * Hmᴴ).trace).re ∧
-      (∫ m, ⟪v, σ (umat (m * (a s * g))) w⟫_ℂ ∂ν) - (∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν) =
-        ∫ t in (0:ℝ)..s, ∑ i, (y i : ℂ) * ∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν := by
+  have hD
+      : ∀ g : UJ ε, ∃ y : Fin (n ^ 2) → ℝ,
+        ∑ i, y i ^ 2 ≤ ((Hm * Hmᴴ).trace).re
+          ∧ (∫ m, ⟪v, σ (umat (m * (a s * g))) w⟫_ℂ ∂ν) - (∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν)
+            = ∫ t in (0:ℝ)..s, ∑ i, (y i : ℂ) * ∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν := by
     intro g
     obtain ⟨k, hk, hkn⟩ := hconj g
     obtain ⟨hXg, htr, hexpg⟩ := conj_facts hk hHm.1
@@ -584,43 +631,61 @@ theorem torus_lipschitz : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ
       rw [ha t]
     obtain ⟨hbc, hb0, hbh, -⟩ := onePar hbX
     have hder : HasDerivAt (fun t : ℝ => σ (umat (b t)) w) (L Xg) 0 := by
-      have e : (fun t : ℝ => σ (umat (b t)) w) = fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • Xg)) w := by
+      have e
+          : (fun t : ℝ => σ (umat (b t)) w)
+            = fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • Xg)) w := by
         funext t; rw [hbX]
-      rw [e]; exact hL Xg hXg
-    have hF : (∫ m, ⟪v, σ (umat (m * (g * b s))) w⟫_ℂ ∂ν) - ∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν =
-        ∫ t in (0:ℝ)..s, ∫ m, ⟪v, σ (umat (m * (g * b t))) (L Xg)⟫_ℂ ∂ν :=
-      ftc (ρ := fun g : UJ ε => σ (umat g)) (δ := fun g : UJ ε => dOp (umat g)) hρ hδc hinv hsub hc0
-        hνint hbc hb0 hbh hder hvw (hvL Xg hXg) g s
-    have hinvar : ∀ (t : ℝ) (u : H), ∫ m, ⟪v, σ (umat (m * (g * b t))) u⟫_ℂ ∂ν =
-        ∫ m, ⟪v, σ (umat (m * (a t * g))) u⟫_ℂ ∂ν := by
+      rw [e]
+      exact hL Xg hXg
+    have hF
+        : (∫ m, ⟪v, σ (umat (m * (g * b s))) w⟫_ℂ ∂ν) - ∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν
+          = ∫ t in (0:ℝ)..s, ∫ m, ⟪v, σ (umat (m * (g * b t))) (L Xg)⟫_ℂ ∂ν :=
+      ftc
+        (ρ := fun g : UJ ε => σ (umat g))
+        (δ := fun g : UJ ε => dOp (umat g))
+        hρ hδc hinv hsub hc0 hνint hbc hb0 hbh hder hvw (hvL Xg hXg) g s
+    have hinvar
+        : ∀ (t : ℝ) (u : H),
+          ∫ m, ⟪v, σ (umat (m * (g * b t))) u⟫_ℂ ∂ν
+            = ∫ m, ⟪v, σ (umat (m * (a t * g))) u⟫_ℂ ∂ν := by
       intro t u
       have hn' : a t * g * (b t)⁻¹ * g⁻¹ ∈ NW ε W := by rw [hbdef]; exact hkn t
       have key := integral_right (hNW.1 _ hn') (fun m => ⟪v, σ (umat (m * (g * b t))) u⟫_ℂ)
       rw [← key]
-      congr 1; funext m
+      congr 1
+      funext m
       have e : m * (a t * g * (b t)⁻¹ * g⁻¹) * (g * b t) = m * (a t * g) := by group
       simp only [e]
     have hint_i : ∀ (t : ℝ) i, Integrable (fun m => ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ) ν :=
-      fun t i => integrable_coef (ρ := fun g : UJ ε => σ (umat g)) (δ := fun g : UJ ε => dOp (umat g))
-        hρ hinv hsub hc0 hνint (hvL (E i) (hE1 i).1) (a t * g)
+      fun t i =>
+        integrable_coef
+          (ρ := fun g : UJ ε => σ (umat g))
+          (δ := fun g : UJ ε => dOp (umat g))
+          hρ hinv hsub hc0 hνint (hvL (E i) (hE1 i).1) (a t * g)
     have hLX : L Xg = ∑ i, (((Xg * (E i)ᴴ).trace).re) • L (E i) := by
       conv_lhs => rw [hE3 Xg hXg]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
       refine Finset.sum_congr rfl (fun i _ => ?_)
-      rw [← map_smul]; congr 1
-    have hDform : ∀ t : ℝ, ∫ m, ⟪v, σ (umat (m * (a t * g))) (L Xg)⟫_ℂ ∂ν =
-        ∑ i, ((((Xg * (E i)ᴴ).trace).re : ℝ) : ℂ) *
-          ∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν := by
+      rw [← map_smul]
+      congr 1
+    have hDform
+        : ∀ t : ℝ,
+          ∫ m, ⟪v, σ (umat (m * (a t * g))) (L Xg)⟫_ℂ ∂ν
+            = ∑ i, ((((Xg * (E i)ᴴ).trace).re : ℝ) : ℂ) *
+                ∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν := by
       intro t
       rw [hLX]
-      have hpt : ∀ m : UJ ε, ⟪v, σ (umat (m * (a t * g))) (∑ i, (((Xg * (E i)ᴴ).trace).re) • L (E i))⟫_ℂ =
-          ∑ i, ((((Xg * (E i)ᴴ).trace).re : ℝ) : ℂ) * ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ := by
-        intro m
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, inner_sum]
-        refine Finset.sum_congr rfl (fun i _ => ?_)
-        rw [ContinuousLinearMap.map_smul_of_tower, ← Complex.coe_smul, inner_smul_right]
+      have hpt
+          : ∀ m : UJ ε,
+            ⟪v, σ (umat (m * (a t * g))) (∑ i, (((Xg * (E i)ᴴ).trace).re) • L (E i))⟫_ℂ
+              = ∑ i, ((((Xg * (E i)ᴴ).trace).re : ℝ) : ℂ) * ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ :=
+        by
+          intro m
+          set_option synthInstance.maxHeartbeats 100000 in
+            rw [map_sum, inner_sum]
+          refine Finset.sum_congr rfl (fun i _ => ?_)
+          rw [ContinuousLinearMap.map_smul_of_tower, ← Complex.coe_smul, inner_smul_right]
       simp only [hpt]
       rw [integral_finsetSum _ (fun i _ => (hint_i t i).const_mul _)]
       simp_rw [integral_const_mul]
@@ -628,17 +693,26 @@ theorem torus_lipschitz : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ
       ∫ t in (0:ℝ)..s, ∑ i, ((((Xg * (E i)ᴴ).trace).re : ℝ) : ℂ) *
         ∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν
     rw [← hinvar s w, hF]
-    congr 1; funext t
+    congr 1
+    funext t
     rw [hinvar t, hDform t]
-  have key := torus_lipschitz_l2_bound (muG ε) (fun g => (β g).toReal) hβ.ennreal_toReal (fun g => ENNReal.toReal_nonneg)
-    (fun i t g => ∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν) hΦ
-    (fun g => (∫ m, ⟪v, σ (umat (m * (a s * g))) w⟫_ℂ ∂ν) - ∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν)
-    ((Hm * Hmᴴ).trace).re s hM hs
-    (fun i => Real.exp |κ| * ((∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * (‖L (E i)‖ ^ 2 / d))) hD hB
+  have key :=
+    torus_lipschitz_l2_bound (muG ε)
+      (fun g => (β g).toReal)
+      hβ.ennreal_toReal
+      (fun g => ENNReal.toReal_nonneg)
+      (fun i t g => ∫ m, ⟪v, σ (umat (m * (a t * g))) (L (E i))⟫_ℂ ∂ν)
+      hΦ
+      (fun g => (∫ m, ⟪v, σ (umat (m * (a s * g))) w⟫_ℂ ∂ν) - ∫ m, ⟪v, σ (umat (m * g)) w⟫_ℂ ∂ν)
+      ((Hm * Hmᴴ).trace).re s hM hs
+      (fun i => Real.exp |κ| * ((∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * (‖L (E i)‖ ^ 2 / d)))
+      hD hB
   refine key.trans (le_of_eq ?_)
-  have hs' : ∑ i, Real.exp |κ| * ((∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * (‖L (E i)‖ ^ 2 / d)) =
-      Real.exp |κ| * (∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * ∑ i, ‖L (E i)‖ ^ 2 / d := by
+  have hs'
+      : ∑ i, Real.exp |κ| * ((∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * (‖L (E i)‖ ^ 2 / d))
+        = Real.exp |κ| * (∫ m, ⟪v, σ (umat m) v⟫_ℂ ∂ν).re * ∑ i, ‖L (E i)‖ ^ 2 / d := by
     rw [Finset.mul_sum]; exact Finset.sum_congr rfl (fun i _ => by ring)
-  rw [hs']; ring
+  rw [hs']
+  ring
 
 end GlobalTheory.TorusLip

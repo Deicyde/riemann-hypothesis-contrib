@@ -21,7 +21,9 @@ noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsLocalRing TopologicalSpace
 open MonoidalCategory CartesianMonoidalCategory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R Formalism.L2.Pj
 open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam
 open scoped CategoryTheory.Obj Classical
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -36,13 +38,16 @@ open GlobalTheory.FramePull GlobalTheory.ConstFam
 
 section Move
 
-variable {S Z : Scheme.{0}} {G₀ : Over S} {G : Over Z} {L₀ : LB G₀.left} {L : LB G.left} {F : G.left ⟶ G₀.left}
-  {π : Z ⟶ S} {N : ℕ} {w : LB.Iso L (L₀.pull F)}
+variable
+  {S Z : Scheme.{0}} {G₀ : Over S} {G : Over Z} {L₀ : LB G₀.left} {L : LB G.left}
+  {F : G.left ⟶ G₀.left} {π : Z ⟶ S} {N : ℕ} {w : LB.Iso L (L₀.pull F)}
 
 end Move
 
-theorem exists_pt {S : Scheme.{0}} {G : Over S} (T : Over S) {Y : Scheme.{0}} (a : Y ⟶ T.left) (b : Y ⟶ G.left)
-    (h : a ≫ T.hom = b ≫ G.hom) : ∃ ρ : Y ⟶ (T ⊗ G).left, ρ ≫ (fst T G).left = a ∧ ρ ≫ (snd T G).left = b :=
+theorem exists_pt
+    {S : Scheme.{0}} {G : Over S} (T : Over S)
+    {Y : Scheme.{0}} (a : Y ⟶ T.left) (b : Y ⟶ G.left) (h : a ≫ T.hom = b ≫ G.hom)
+    : ∃ ρ : Y ⟶ (T ⊗ G).left, ρ ≫ (fst T G).left = a ∧ ρ ≫ (snd T G).left = b :=
   ⟨pullback.lift a b h, pullback.lift_fst _ _ _, pullback.lift_snd _ _ _⟩
 
 end Frames

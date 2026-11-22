@@ -15,13 +15,16 @@ variable {X : Scheme.{0}} {Ω : Type} [Field Ω]
 
 variable {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem not_mem_flagStep {r : ℕ} (b : Fin r → E) (hb : LinearIndependent Ω b) (i : Fin r) :
-    b i ∉ flagStep Ω b i := by
+theorem not_mem_flagStep {r : ℕ} (b : Fin r → E) (hb : LinearIndependent Ω b) (i : Fin r)
+    : b i ∉ flagStep Ω b i := by
   exact hb.notMem_span_image (by simp)
 
-theorem gr_isGenAt {r : ℕ} (L : Lat ξ E) (b b₀ : Fin r → E) (p : Cpt ξ) (hL : L.IsFrameAt b p)
-    (hF : ∀ i, flagStep Ω b i = flagStep Ω b₀ i) (i : Fin r) (c : Ω)
-    (hc : b i - c • b₀ i ∈ flagStep Ω b₀ i) : (L.gr b₀ i).IsGenAt p c := by
+theorem gr_isGenAt
+    {r : ℕ}
+    (L : Lat ξ E) (b b₀ : Fin r → E) (p : Cpt ξ) (hL : L.IsFrameAt b p)
+    (hF : ∀ i, flagStep Ω b i = flagStep Ω b₀ i)
+    (i : Fin r) (c : Ω) (hc : b i - c • b₀ i ∈ flagStep Ω b₀ i)
+    : (L.gr b₀ i).IsGenAt p c := by
   obtain ⟨hb, hLp⟩ := hL
   have hbi : b i ∉ flagStep Ω b i := not_mem_flagStep b hb i
   have hc0 : c ≠ 0 := by
@@ -45,12 +48,14 @@ theorem gr_isGenAt {r : ℕ} (L : Lat ξ E) (b b₀ : Fin r → E) (p : Cpt ξ) 
       exact lt_irrefl (k : ℕ) hk
     have h1 : c • (∑ k, (d k : Ω) • b k - t • b₀ i) ∈ S := S.smul_mem c (hFS het')
     have h2 : c • ∑ k ∈ Finset.univ.erase i, (d k : Ω) • b k ∈ S :=
-      S.smul_mem c (Submodule.sum_mem _ fun k hk =>
-        Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, Finset.ne_of_mem_erase hk, rfl⟩))
+      S.smul_mem c
+        (Submodule.sum_mem _ fun k hk =>
+          Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, Finset.ne_of_mem_erase hk, rfl⟩))
     have h3 : t • (b i - c • b₀ i) ∈ S := S.smul_mem t (hFS hc)
-    have heq : (c * (d i : Ω) - t) • b i =
-        c • (∑ k, (d k : Ω) • b k - t • b₀ i) - c • ∑ k ∈ Finset.univ.erase i, (d k : Ω) • b k -
-          t • (b i - c • b₀ i) := by
+    have heq
+        : (c * (d i : Ω) - t) • b i
+          = c • (∑ k, (d k : Ω) • b k - t • b₀ i) - c • ∑ k ∈ Finset.univ.erase i, (d k : Ω) • b k
+            - t • (b i - c • b₀ i) := by
       rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i)]
       module
     have key : (c * (d i : Ω) - t) • b i ∈ S := by
@@ -71,8 +76,9 @@ theorem gr_isGenAt {r : ℕ} (L : Lat ξ E) (b b₀ : Fin r → E) (p : Cpt ξ) 
     rw [hLp]
     exact Submodule.subset_span ⟨i, rfl⟩
 
-theorem zpow_ratio (Λ : Lat ξ Ω) (p : Cpt ξ) (s t : Ω) (hs : Λ.IsGenAt p s) (ht : Λ.IsGenAt p t) (n : ℤ) :
-    (t / s) ^ n ∈ regAt ξ p := by
+theorem zpow_ratio
+    (Λ : Lat ξ Ω) (p : Cpt ξ) (s t : Ω) (hs : Λ.IsGenAt p s) (ht : Λ.IsGenAt p t) (n : ℤ)
+    : (t / s) ^ n ∈ regAt ξ p := by
   obtain ⟨hs0, hsp⟩ := hs
   obtain ⟨ht0, htp⟩ := ht
   have h1 : t ∈ Submodule.span (regAt ξ p) {s} := by
@@ -95,8 +101,12 @@ theorem zpow_ratio (Λ : Lat ξ Ω) (p : Cpt ξ) (s t : Ω) (hs : Λ.IsGenAt p s
   · rw [zpow_negSucc, ← inv_pow, inv_div, hst]
     exact pow_mem a'.2 _
 
-theorem tens_isGenAt {I : Type} [Fintype I] (Λ : I → Lat ξ Ω) (a : I → ℤ) (p : Cpt ξ) (s : I → Ω)
-    (hs : ∀ i, (Λ i).IsGenAt p (s i)) : (Lat.tens Λ a).IsGenAt p (∏ i, s i ^ a i) := by
+theorem tens_isGenAt
+    {I : Type} [Fintype I]
+    (Λ : I → Lat ξ Ω)
+    (a : I → ℤ)
+    (p : Cpt ξ) (s : I → Ω) (hs : ∀ i, (Λ i).IsGenAt p (s i))
+    : (Lat.tens Λ a).IsGenAt p (∏ i, s i ^ a i) := by
   refine ⟨Finset.prod_ne_zero_iff.mpr fun i _ => zpow_ne_zero _ (hs i).1, le_antisymm ?_ ?_⟩
   · refine Submodule.span_le.mpr ?_
     rintro t ⟨s', hs', rfl⟩

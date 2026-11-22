@@ -6,12 +6,14 @@ public import Mathlib
 
 namespace Bl.general_b_fact_second_last
 
-theorem goal1 :
-  ∀ (B : Int) {S : Nat} (c : Fin S → Int),
-  (∀ (m : Fin S), LT.lt.{0} (abs.{0} (c m)) B) →
-    Eq.{1} (Finset.sum.{0, 0} Finset.univ.{0} fun (m : Fin S) ↦ HMul.hMul.{0, 0, 0} (c m) (HPow.hPow.{0, 0, 0} B m.val))
-        0 →
-      ∀ (m : Fin S), Eq.{1} (c m) 0 := by
+theorem goal1
+    : ∀ (B : Int) {S : Nat} (c : Fin S → Int),
+      (∀ (m : Fin S), LT.lt.{0} (abs.{0} (c m)) B)
+        → Eq.{1}
+          (Finset.sum.{0, 0} Finset.univ.{0} fun (m : Fin S) ↦
+            HMul.hMul.{0, 0, 0} (c m) (HPow.hPow.{0, 0, 0} B m.val))
+          0
+        → ∀ (m : Fin S), Eq.{1} (c m) 0 := by
   intro B S
   induction S with
   | zero => intro c _ _ m; exact m.elim0

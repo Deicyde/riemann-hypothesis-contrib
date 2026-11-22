@@ -20,12 +20,12 @@ noncomputable section
 
 universe u
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 4000000 in
-theorem SemilocalResidueLength.proof (hRes : DegZeroLocResidue.Statement.{u})
-    (hFR : SemilocalFiniteRank.Statement.{u}) (hLoc : DegZeroLocLocalize.Statement.{u}) :
-    SemilocalResidueLength.Statement.{u} := by
+theorem SemilocalResidueLength.proof
+    (hRes : DegZeroLocResidue.Statement.{u}) (hFR : SemilocalFiniteRank.Statement.{u})
+    (hLoc : DegZeroLocLocalize.Statement.{u})
+    : SemilocalResidueLength.Statement.{u} := by
   intro F _ K K' _ _ _ _ j ι' _ P' hP' n hP'n hPn W hW hWn hPW
   have := hP'.isPrime
   intro W' hW'
@@ -56,10 +56,16 @@ theorem SemilocalResidueLength.proof (hRes : DegZeroLocResidue.Statement.{u})
   haveI : IsScalarTower (degZeroLoc (contractPrime j P') {contractPrime j W'}) L M :=
     IsScalarTower.of_algebraMap_eq (fun _ => rfl)
 
-  have hcomp : ∀ a : degZeroLoc (contractPrime j P') {contractPrime j W'}, τ (algebraMap _ _ a) = algebraMap _ M a := by
+  have hcomp
+      : ∀ a : degZeroLoc (contractPrime j P') {contractPrime j W'},
+        τ (algebraMap _ _ a) = algebraMap _ M a := by
     intro a
-    obtain ⟨b, f, g, hf, hg, -, hgW, hx⟩ := DegZeroLocQuot.proof F K (fun k => ι' (j k))
-      (contractPrime j P') {contractPrime j W'} (fun V hV => by rw [hV]; infer_instance) a.1 a.2
+    obtain ⟨b, f, g, hf, hg, -, hgW, hx⟩ :=
+      DegZeroLocQuot.proof F K
+        (fun k => ι' (j k))
+        (contractPrime j P') {contractPrime j W'}
+        (fun V hV => by rw [hV]; infer_instance)
+        a.1 a.2
     apply Subtype.ext
     show ρO ⟨contractFracMap j P' a, _⟩ = contractFracMap j W' (ρA a)
     rw [hρAv a b f g hf hg (hgW _ rfl) hx, map_div₀, contractFracMap_algebraMap,
@@ -67,7 +73,8 @@ theorem SemilocalResidueLength.proof (hRes : DegZeroLocResidue.Statement.{u})
     apply hρOv _ _ _ _ (isMultiHomog_rename j ι' hf) (isMultiHomog_rename j ι' hg) (hgW _ rfl)
     show contractFracMap j P' a = _
     rw [hx, map_div₀, contractFracMap_algebraMap, contractFracMap_algebraMap]
-  let τA : degZeroLoc P' (fibrePrimes j P' (contractPrime j W')) →ₐ[degZeroLoc (contractPrime j P') {contractPrime j W'}] M :=
+  let τA
+      : degZeroLoc P' (fibrePrimes j P' (contractPrime j W')) →ₐ[degZeroLoc (contractPrime j P') {contractPrime j W'}] M :=
     { τ with commutes' := hcomp }
 
   have hmem : ∀ l : L, algebraMap L M l ∈ τ.rangeS := by
@@ -78,8 +85,8 @@ theorem SemilocalResidueLength.proof (hRes : DegZeroLocResidue.Statement.{u})
   have hsurj : Function.Surjective τ := by
     rintro ⟨z, hz⟩
     obtain ⟨y, rfl⟩ := (hρOr z).mp hz
-    obtain ⟨b, hb, s, hs, ⟨t, ht, hst⟩, hys⟩ := hLoc F K' ι' P' hP' _ h𝒲
-      (fun V hV => ⟨hV.1, hV.2.1⟩) W' hW' y.1 y.2
+    obtain ⟨b, hb, s, hs, ⟨t, ht, hst⟩, hys⟩ :=
+      hLoc F K' ι' P' hP' _ h𝒲 (fun V hV => ⟨hV.1, hV.2.1⟩) W' hW' y.1 y.2
     have hs0 : τ ⟨s, hs⟩ ≠ 0 := by
       intro h0
       have h1 : ρO ⟨s, hBO hs⟩ * ρO ⟨t, ht⟩ = 1 := by
@@ -101,7 +108,8 @@ theorem SemilocalResidueLength.proof (hRes : DegZeroLocResidue.Statement.{u})
   refine ⟨RingHom.ker τ, fun x => ?_, ?_⟩
   · rw [RingHom.mem_ker, ← ZeroMemClass.coe_eq_zero]
     exact hρOk ⟨x, hBO x.2⟩
-  · let e : (degZeroLoc P' (fibrePrimes j P' (contractPrime j W')) ⧸ RingHom.ker τ) ≃ₐ[degZeroLoc (contractPrime j P') {contractPrime j W'}] M :=
+  · let e
+        : (degZeroLoc P' (fibrePrimes j P' (contractPrime j W')) ⧸ RingHom.ker τ) ≃ₐ[degZeroLoc (contractPrime j P') {contractPrime j W'}] M :=
       AlgEquiv.ofRingEquiv (f := RingHom.quotientKerEquivOfSurjective hsurj) (fun a => by
         rw [← Ideal.Quotient.mk_algebraMap, RingHom.quotientKerEquivOfSurjective_apply_mk]
         exact hcomp a)
@@ -110,9 +118,9 @@ theorem SemilocalResidueLength.proof (hRes : DegZeroLocResidue.Statement.{u})
     haveI : Module.Finite L M :=
       Module.Finite.of_restrictScalars_finite (degZeroLoc (contractPrime j P') {contractPrime j W'}) L M
     refine e.toLinearEquiv.length_eq.trans ?_
-    refine (Module.length_eq_of_surjective (S := degZeroLoc (contractPrime j P') {contractPrime j W'}) (R := L) (M := M) hσs).trans ?_
-    rw [Module.length_eq_finrank L M, relDeg,
-      IntermediateField.relfinrank_eq_finrank_of_le hLE]
+    refine (Module.length_eq_of_surjective
+      (S := degZeroLoc (contractPrime j P') {contractPrime j W'}) (R := L) (M := M) hσs).trans ?_
+    rw [Module.length_eq_finrank L M, relDeg, IntermediateField.relfinrank_eq_finrank_of_le hLE]
 
 end
 

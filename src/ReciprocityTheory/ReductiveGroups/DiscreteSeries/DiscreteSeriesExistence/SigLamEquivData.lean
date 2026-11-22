@@ -11,25 +11,30 @@ open Finset Matrix MeasureTheory
 
 namespace ReciprocityTheory.ChartRestriction.DS
 
-variable {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)}
+variable
+  {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)}
   {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} {v₀ : T.V}
 
-theorem sigLam_equiv_data (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
+theorem sigLam_equiv_data
+    (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
     {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H} {E : Fin n → Fin n → Module.End ℂ D}
-    {V : Submodule ℂ D} (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) (hV0 : V ≠ ⊥) :
-    ∃ U : Hlam ε Ψ v₀ ≃ₗᵢ[ℂ] closGen E V, ∀ g ∈ UJset ε, ∀ x : Hlam ε Ψ v₀,
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
+    {E : Fin n → Fin n → Module.End ℂ D} {V : Submodule ℂ D}
+    (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
+    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) (hV0 : V ≠ ⊥)
+    : ∃ U : Hlam ε Ψ v₀ ≃ₗᵢ[ℂ] closGen E V, ∀ g ∈ UJset ε, ∀ x : Hlam ε Ψ v₀,
       ((U (sigLam ε Ψ v₀ g x) : closGen E V) : H) = σ g ((U x : closGen E V) : H) := by
   have hσ₁ := rreg_isURepOn ε
-  obtain ⟨U, hU⟩ := data_unitary_equiv hgap hσ₁ (isDerivedOn_smE hσ₁) (datumV_isKIrrHW hP hv₀)
-    (datumV_casimir hP v₀) (datumV_kStable hP v₀) (datumV_ne_bot hP hv₀) hσ hD hV hc hVK hV0
+  obtain ⟨U, hU⟩ :=
+    data_unitary_equiv hgap hσ₁ (isDerivedOn_smE hσ₁) (datumV_isKIrrHW hP hv₀)
+      (datumV_casimir hP v₀) (datumV_kStable hP v₀) (datumV_ne_bot hP hv₀) hσ hD hV hc hVK hV0
   exact ⟨U, fun g hg x => hU g hg (sigLam ε Ψ v₀ g x) x (sigLam_coe hgap hP hv₀ hg x)⟩
 
-theorem puniq_exists_h {lam' : Fin n → ℝ} (hgap : StdGap ε lam) (hgap' : StdGap ε lam') :
-    ∃ h : ℝ, GapAtLeast ε lam h ∧ GapAtLeast ε lam' h ∧
-      (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h ∧ (n : ℝ) - 1 < h := by
+theorem puniq_exists_h {lam' : Fin n → ℝ} (hgap : StdGap ε lam) (hgap' : StdGap ε lam')
+    : ∃ h : ℝ,
+      GapAtLeast ε lam h ∧ GapAtLeast ε lam' h ∧ (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h
+        ∧ (n : ℝ) - 1 < h := by
   obtain ⟨-, h1, hg1, hb1⟩ := hgap
   obtain ⟨-, h2, hg2, hb2⟩ := hgap'
   have hpq0 : (0 : ℝ) ≤ (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) := by positivity
@@ -60,30 +65,48 @@ theorem puniq_exists_h {lam' : Fin n → ℝ} (hgap : StdGap ε lam) (hgap' : St
     have hq' : (1 : ℝ) ≤ (qOf ε : ℝ) := by exact_mod_cast hq
     have hn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
     have hpq : (1 : ℝ) ≤ (pOf ε : ℝ) * (qOf ε : ℝ) := by nlinarith
-    have hle : (n : ℝ) * 1 ≤ (n : ℝ) * ((pOf ε : ℝ) * (qOf ε : ℝ)) := mul_le_mul_of_nonneg_left hpq hn
+    have hle : (n : ℝ) * 1 ≤ (n : ℝ) * ((pOf ε : ℝ) * (qOf ε : ℝ)) :=
+      mul_le_mul_of_nonneg_left hpq hn
     have hm := lt_min hb1 hb2
-    refine ⟨min h1 h2, fun a b hab => le_trans (min_le_left _ _) (hg1 a b hab),
-      fun a b hab => le_trans (min_le_right _ _) (hg2 a b hab), hm, ?_⟩
+    refine ⟨
+      min h1 h2,
+      fun a b hab => le_trans (min_le_left _ _) (hg1 a b hab),
+      fun a b hab => le_trans (min_le_right _ _) (hg2 a b hab),
+      hm,
+      ?_
+    ⟩
     nlinarith
   · push_neg at hex
-    refine ⟨(n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + (n : ℝ) + 2, fun a b h => absurd (hex a b) h,
-      fun a b h => absurd (hex a b) h, by linarith, ?_⟩
+    refine ⟨
+      (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + (n : ℝ) + 2,
+      fun a b h => absurd (hex a b) h,
+      fun a b h => absurd (hex a b) h,
+      by linarith,
+      ?_
+    ⟩
     linarith
 
-theorem sigLam_inj (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0) {lam' : Fin n → ℝ} {T' : S7.KType ε (lowK ε lam')}
+theorem sigLam_inj
+    (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
+    {lam' : Fin n → ℝ} {T' : S7.KType ε (lowK ε lam')}
     {Ψ' : Matrix (Fin n) (Fin n) ℂ → (T'.V →L[ℂ] T'.V)} {v₀' : T'.V} (hgap' : StdGap ε lam')
     (hP' : IsPsiFor ε lam' T' Ψ') (hv₀' : v₀' ≠ 0) (U : Hlam ε Ψ v₀ ≃ₗᵢ[ℂ] Hlam ε Ψ' v₀')
-    (hU : ∀ g ∈ UJset ε, ∀ x : Hlam ε Ψ v₀, U (sigLam ε Ψ v₀ g x) = sigLam ε Ψ' v₀' g (U x)) :
-    lam = lam' := by
+    (hU : ∀ g ∈ UJset ε, ∀ x : Hlam ε Ψ v₀, U (sigLam ε Ψ v₀ g x) = sigLam ε Ψ' v₀' g (U x))
+    : lam = lam' := by
   obtain ⟨h, hg, hg', hb, hn⟩ := puniq_exists_h hgap hgap'
-  have hU' : ∀ g ∈ UJset ε, ∀ y : Hlam ε Ψ' v₀', U.symm (sigLam ε Ψ' v₀' g y) = sigLam ε Ψ v₀ g (U.symm y) := by
+  have hU'
+      : ∀ g ∈ UJset ε, ∀ y : Hlam ε Ψ' v₀',
+        U.symm (sigLam ε Ψ' v₀' g y) = sigLam ε Ψ v₀ g (U.symm y) := by
     intro g hgU y
     have := hU g hgU (U.symm y)
     rw [LinearIsometryEquiv.apply_symm_apply] at this
     rw [← this, LinearIsometryEquiv.symm_apply_apply]
-  have hK1 := puniq_isKTypeOf_map U (fun g hgK x => hU g (puniq_kset hgK) x) (sigLam_lowK hgap hP hv₀).1
-  have hK2 := puniq_isKTypeOf_map U.symm (fun g hgK y => hU' g (puniq_kset hgK) y)
-    (sigLam_lowK hgap' hP' hv₀').1
+  have hK1 :=
+    puniq_isKTypeOf_map U (fun g hgK x => hU g (puniq_kset hgK) x) (sigLam_lowK hgap hP hv₀).1
+  have hK2 :=
+    puniq_isKTypeOf_map U.symm
+      (fun g hgK y => hU' g (puniq_kset hgK) y)
+      (sigLam_lowK hgap' hP' hv₀').1
   have b1 := (sigLam_kType_bounds hgap' hP' hv₀' _ hK1).2 h hg' hb
   have b2 := (sigLam_kType_bounds hgap hP hv₀ _ hK2).2 h hg hb
   rw [mir_lowK_eq] at b1 b2
@@ -99,22 +122,30 @@ theorem sigLam_inj (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : v
   have c2 := b2 (Ne.symm hne')
   linarith
 
-theorem puniq_psi_eq (hgap : StdGap ε lam) {Ψ' : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
-    (hP : IsPsiFor ε lam T Ψ) (hP' : IsPsiFor ε lam T Ψ') (hv₀ : v₀ ≠ 0) :
-    ∀ g ∈ UJset ε, Ψ' g = Ψ g := by
+theorem puniq_psi_eq
+    (hgap : StdGap ε lam)
+    {Ψ' : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
+    (hP : IsPsiFor ε lam T Ψ) (hP' : IsPsiFor ε lam T Ψ') (hv₀ : v₀ ≠ 0)
+    : ∀ g ∈ UJset ε, Ψ' g = Ψ g := by
   have hσ₁ := rreg_isURepOn ε
-  obtain ⟨U, hU⟩ := sigLam_equiv_data (Ψ := Ψ) hgap hP hv₀ hσ₁ (isDerivedOn_smE hσ₁)
-    (datumV_isKIrrHW hP' hv₀) (datumV_casimir hP' v₀) (datumV_kStable hP' v₀) (datumV_ne_bot hP' hv₀)
+  obtain ⟨U, hU⟩ :=
+    sigLam_equiv_data (Ψ := Ψ) hgap hP hv₀ hσ₁ (isDerivedOn_smE hσ₁) (datumV_isKIrrHW hP' hv₀)
+      (datumV_casimir hP' v₀) (datumV_kStable hP' v₀) (datumV_ne_bot hP' hv₀)
   let U' : Hlam ε Ψ v₀ ≃ₗᵢ[ℂ] Hlam ε Ψ' v₀ := U
   have hUi : ∀ g ∈ UJset ε, ∀ x, U' (sigLam ε Ψ v₀ g x) = sigLam ε Ψ' v₀ g (U' x) := fun g hg x =>
     Subtype.ext ((hU g hg x).trans (sigLam_coe hgap hP' hv₀ hg (U' x)).symm)
-  have hK := puniq_isKTypeOf_map U' (fun g hgK x => hUi g (puniq_kset hgK) x) (sigLam_lowK hgap hP hv₀).1
+  have hK :=
+    puniq_isKTypeOf_map U' (fun g hgK x => hUi g (puniq_kset hgK) x) (sigLam_lowK hgap hP hv₀).1
   have hKeq := (sigLam_lowK hgap hP' hv₀).2 _ hK
   let xv : T.V → Hlam ε Ψ v₀ := fun v => ⟨uniformisationL2 ε Ψ v₀ v, datumEmbedding_mem_Hlam hP v⟩
   have hxv_mem : ∀ v, xv v ∈ lowKSubLam ε Ψ v₀ := by
     intro v
     show (xv v : L2 ε) ∈ (datumV ε Ψ v₀).map (smD ε (rreg ε)).subtype
-    exact ⟨⟨uniformisationL2 ε Ψ v₀ v, datumEmbedding_mem_smooth hP v₀ v⟩, (mem_datumV_iff hP v₀ _).2 ⟨v, rfl⟩, rfl⟩
+    exact ⟨
+      ⟨uniformisationL2 ε Ψ v₀ v, datumEmbedding_mem_smooth hP v₀ v⟩,
+      (mem_datumV_iff hP v₀ _).2 ⟨v, rfl⟩,
+      rfl
+    ⟩
   have hA : ∀ v, ∃ v', ((U' (xv v) : Hlam ε Ψ' v₀) : L2 ε) = uniformisationL2 ε Ψ' v₀ v' := by
     intro v
     have h1 : U' (xv v) ∈ lowKSubLam ε Ψ' v₀ := by
@@ -141,18 +172,21 @@ theorem puniq_psi_eq (hgap : StdGap ε lam) {Ψ' : Matrix (Fin n) (Fin n) ℂ �
     intro k v
     have hk : S7.toMK k ∈ UJset ε := (k : S7.UJ ε).2
     have e1 : xv (T.op k v) = sigLam ε Ψ v₀ (S7.toMK k) (xv v) :=
-      Subtype.ext ((sigLam_coe hgap hP hv₀ hk (xv v)).trans (rightRegular_datumEmbedding hP v₀ v k)).symm
+      Subtype.ext ((sigLam_coe hgap hP hv₀ hk (xv v)).trans
+        (rightRegular_datumEmbedding hP v₀ v k)).symm
     apply hj'
-    rw [← hAv, e1, hUi _ hk, sigLam_coe hgap hP' hv₀ hk, hAv, rightRegular_datumEmbedding hP' v₀ (A v) k]
+    rw [← hAv, e1, hUi _ hk, sigLam_coe hgap hP' hv₀ hk, hAv,
+      rightRegular_datumEmbedding hP' v₀ (A v) k]
   let Alin : T.V →ₗ[ℂ] T.V := { toFun := A, map_add' := hAadd, map_smul' := hAsmul }
   obtain ⟨c, hc⟩ := puniq_schur T Alin hAk
   have hc' : ∀ v, A v = c • v := hc
-  have key : ∀ g ∈ UJset ε, ∀ v v' : T.V,
-      ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ) * inner ℂ v' (Ψ g v) =
-        ((‖uniformisationL2 ε Ψ' v₀ T.w‖ ^ 2 : ℝ) : ℂ) * inner ℂ (A v') (Ψ' g (A v)) := by
+  have key
+      : ∀ g ∈ UJset ε, ∀ v v' : T.V,
+        ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ) * inner ℂ v' (Ψ g v)
+          = ((‖uniformisationL2 ε Ψ' v₀ T.w‖ ^ 2 : ℝ) : ℂ) * inner ℂ (A v') (Ψ' g (A v)) := by
     intro g hg v v'
-    rw [← formulaF_sigLam hgap hP hv₀ hg v v', ← formulaF hgap hP' hv₀ hg (A v) (A v'), ← hAv, ← hAv,
-      ← U'.inner_map_map (xv v') (sigLam ε Ψ v₀ g (xv v)), hUi g hg, Submodule.coe_inner,
+    rw [← formulaF_sigLam hgap hP hv₀ hg v v', ← formulaF hgap hP' hv₀ hg (A v) (A v'), ← hAv,
+      ← hAv, ← U'.inner_map_map (xv v') (sigLam ε Ψ v₀ g (xv v)), hUi g hg, Submodule.coe_inner,
       sigLam_coe hgap hP' hv₀ hg]
   have hr : ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ) ≠ 0 := by
     have := datumEmbedding_highest_ne_zero hgap hP hv₀
@@ -169,8 +203,9 @@ theorem puniq_psi_eq (hgap : StdGap ε lam) {Ψ' : Matrix (Fin n) (Fin n) ℂ �
   have e1 := key 1 h1 T.w T.w
   rw [hP.2.1, hP'.2.1] at e1
   simp only [hc', map_smul, ContinuousLinearMap.one_apply, inner_smul_left, inner_smul_right] at e1
-  have hrr : ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ) =
-      ((‖uniformisationL2 ε Ψ' v₀ T.w‖ ^ 2 : ℝ) : ℂ) * ((starRingEnd ℂ) c * c) := by
+  have hrr
+      : ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ)
+        = ((‖uniformisationL2 ε Ψ' v₀ T.w‖ ^ 2 : ℝ) : ℂ) * ((starRingEnd ℂ) c * c) := by
     apply mul_right_cancel₀ hW
     rw [e1]
     ring
@@ -178,8 +213,9 @@ theorem puniq_psi_eq (hgap : StdGap ε lam) {Ψ' : Matrix (Fin n) (Fin n) ℂ �
   refine ContinuousLinearMap.ext fun v => ext_inner_left ℂ fun v' => ?_
   have e := key g hg v v'
   simp only [hc', map_smul, inner_smul_left, inner_smul_right] at e
-  have e' : ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ) * inner ℂ v' (Ψ g v) =
-      ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ) * inner ℂ v' (Ψ' g v) := by
+  have e'
+      : ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ) * inner ℂ v' (Ψ g v)
+        = ((‖uniformisationL2 ε Ψ v₀ T.w‖ ^ 2 : ℝ) : ℂ) * inner ℂ v' (Ψ' g v) := by
     rw [e, hrr]
     ring
   exact (mul_left_cancel₀ hr e').symm

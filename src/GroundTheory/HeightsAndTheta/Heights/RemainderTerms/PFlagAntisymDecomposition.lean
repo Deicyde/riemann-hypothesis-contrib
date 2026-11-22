@@ -13,14 +13,15 @@ namespace RestTerms
 
 open MvPolynomial Finset
 
-theorem antisymmetrize_finset_sum (f N : ℕ) {ι : Type*} (s : Finset ι) (g : ι → RootRing f N) :
-    antisymmetrize f N (∑ i ∈ s, g i) = ∑ i ∈ s, antisymmetrize f N (g i) := by
+theorem antisymmetrize_finset_sum (f N : ℕ) {ι : Type*} (s : Finset ι) (g : ι → RootRing f N)
+    : antisymmetrize f N (∑ i ∈ s, g i) = ∑ i ∈ s, antisymmetrize f N (g i) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [antisymmetrize, map_sum, Finset.smul_sum]
   exact Finset.sum_comm
 
-theorem FlagAntisymDecomposition.proof (h1 : FlagSymmetricMulAntisym.Statement)
-    (h2 : FlagPowerSumSymmetric.Statement) : FlagAntisymDecomposition.Statement := by
+theorem FlagAntisymDecomposition.proof
+    (h1 : FlagSymmetricMulAntisym.Statement) (h2 : FlagPowerSumSymmetric.Statement)
+    : FlagAntisymDecomposition.Statement := by
   intro f N F G Q R hF hR
   rw [hF, Finset.mul_sum, antisymmetrize_finset_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun l _ => ?_

@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGlLatC
 open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.SplitFlip
 open scoped Pointwise
 
-theorem UpperTheory.exists_mem_KO_eq_stdFrame_mul_of_isPrimFrame :
-    ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {A A' D : Type} [Fintype A] [DecidableEq A] [Fintype A'] [DecidableEq A'] [Fintype D] [DecidableEq D] (σ : A ⊕ A' ≃ D) (X : Matrix A D k), IsPrimFrame (stdLat k D) X → ∃ u ∈ KO k D, X = X0 k σ * (invT u).val := by
+theorem UpperTheory.exists_mem_KO_eq_stdFrame_mul_of_isPrimFrame
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {A A' D : Type} [Fintype A] [DecidableEq A] [Fintype A'] [DecidableEq A'] [Fintype D]
+        [DecidableEq D] (σ : A ⊕ A' ≃ D) (X : Matrix A D k),
+      IsPrimFrame (stdLat k D) X → ∃ u ∈ KO k D, X = X0 k σ * (invT u).val := by
   intro k _ _ _ _ A A' D _ _ _ _ _ _ σ X hX
   obtain ⟨R, hR, hXR⟩ := GlobalTheory.PrimFrameMove.exists_rightInverse hX
   let X' : Matrix A D 𝒪[k] := Matrix.of fun i j => ⟨X i j, mem_matLat_stdLat.1 hX.2.1 i j⟩
@@ -30,8 +33,9 @@ theorem UpperTheory.exists_mem_KO_eq_stdFrame_mul_of_isPrimFrame :
     rwa [h2, Matrix.rank_one] at this
   obtain ⟨h, hh⟩ := (rank_eq_card_iff_exists_frameMatrixFirstColumnBlock σ _).1 h3
   choose l hl using IsLocalRing.residue_surjective (R := 𝒪[k])
-  let C : Matrix D D 𝒪[k] := Matrix.of fun r j =>
-    Sum.elim (fun i => X' i j) (fun i => l ((invT h).val (σ (Sum.inr i)) j)) (σ.symm r)
+  let C : Matrix D D 𝒪[k] :=
+    Matrix.of fun r j =>
+      Sum.elim (fun i => X' i j) (fun i => l ((invT h).val (σ (Sum.inr i)) j)) (σ.symm r)
   have h4 : ρ.mapMatrix C = (invT h).val := by
     ext r j
     obtain ⟨i | i, rfl⟩ := σ.surjective r

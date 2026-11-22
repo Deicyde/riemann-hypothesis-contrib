@@ -11,10 +11,14 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 
 open ReciprocityTheory.AnForm.M
 
-theorem continuousOn_of_chart_continuousOn {X : Type} [TopologicalSpace X] {D : ℕ} (A : FinHolAtlas D X)
-    {U : Set X} (hU : IsOpen U) {E : Type} [TopologicalSpace E] (h : X → E)
-    (hc : ∀ j, ContinuousOn (h ∘ (A.chart j).symm) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U)) :
-    ContinuousOn h U := by
+theorem continuousOn_of_chart_continuousOn
+    {X : Type} [TopologicalSpace X]
+    {D : ℕ} (A : FinHolAtlas D X)
+    {U : Set X} (hU : IsOpen U)
+    {E : Type} [TopologicalSpace E]
+    (h : X → E)
+    (hc : ∀ j, ContinuousOn (h ∘ (A.chart j).symm) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
+    : ContinuousOn h U := by
   intro x hx
   obtain ⟨m, hm⟩ := A.cover x
   set c := A.chart m

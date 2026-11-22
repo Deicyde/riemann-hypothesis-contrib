@@ -7,8 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-theorem UpperTheory.V.CA.d_comm :
-    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (S : Type) [CommRing S] [Algebra A S] (x y : S ⊗[A] E), D.D S (1 + x * y) = D.D S (1 + y * x) := by
+theorem UpperTheory.V.CA.d_comm
+    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (S : Type)
+        [CommRing S] [Algebra A S] (x y : S ⊗[A] E),
+      D.D S (1 + x * y) = D.D S (1 + y * x) := by
   intro n A E _ _ _ D S _ _ x y
   let i : S →ₐ[A] S[X] := IsScalarTower.toAlgHom A S S[X]
   let ι := Algebra.TensorProduct.map i (AlgHom.id A E)

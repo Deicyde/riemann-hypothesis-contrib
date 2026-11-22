@@ -12,7 +12,8 @@ noncomputable section
 
 variable {A S : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype S] [DecidableEq S]
 
-def dg (g : Ix S → ℂ) : SlopeTestRemainingChoices S A := Matrix.diagonal fun e => algebraMap ℂ A (g e)
+def dg (g : Ix S → ℂ) : SlopeTestRemainingChoices S A :=
+  Matrix.diagonal fun e => algebraMap ℂ A (g e)
 
 lemma dg_mul (g h : Ix S → ℂ) : (dg g * dg h : SlopeTestRemainingChoices S A) = dg (fun e => g e * h e) := by
   unfold dg
@@ -238,7 +239,8 @@ end Formalism.FourierDecayAlt.P.Fr11
 
 namespace Formalism.FourierDecayAlt.P
 
-open Matrix Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr Formalism.FourierDecayAlt.P.Fr11
+open Matrix Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr
+  Formalism.FourierDecayAlt.P.Fr11
 
 theorem fr_residue_form : Formalism.FourierDecayAlt.Fr.ResidueForm := by
   intro hFA hEC A S _ _ _ _ _ _ r L st J _ Z γ w hL hst
@@ -280,30 +282,44 @@ theorem fr_residue_form : Formalism.FourierDecayAlt.Fr.ResidueForm := by
     have hEY := ih' Y hY.1 hY1.1 hYγ
     have hEa := ih' l.pt hYa hYa1 (hγ l (by simp))
     have hYw := ne_of_mem_inv L st Y w hpw hY.1
-    have hposition : ∀ l' ∈ w, l.intersection_update_fsHerm_neg_one ≠ l'.intersection_update_fsHerm_neg_one := by
+    have hposition
+        : ∀ l' ∈ w,
+          l.intersection_update_fsHerm_neg_one ≠ l'.intersection_update_fsHerm_neg_one := by
       rw [List.map_cons] at hs
       intro l' hl he
       exact (List.nodup_cons.1 hs).1 (he ▸ List.mem_map_of_mem hl)
-    have hls := letterSum_step (A := A) l Y hne w [] fun l' hl =>
-      ⟨hposition l' hl, hYw l' hl, fun he => by simpa [he] using hpair l' hl 0 (by simp)⟩
+    have hls :=
+      letterSum_step (A := A) l Y hne w [] fun l' hl =>
+        ⟨hposition l' hl, hYw l' hl, fun he => by simpa [he] using hpair l' hl 0 (by simp)⟩
 
-    have e1 : ((ofWord L st w).plus L l.intersection_update_fsHerm_neg_one l.pt).ee Y =
-        Ph (eU l.intersection_update_fsHerm_neg_one 0 0) (eU l.intersection_update_fsHerm_neg_one 1 1) (Y - l.pt)⁻¹ ((ofWord L st w).ee Y) ((ofWord L st w).ee l.pt) +
-          eU l.intersection_update_fsHerm_neg_one 0 0 * tz L - (Y - l.pt)⁻¹ • eU l.intersection_update_fsHerm_neg_one 0 1 := by
-      have e2 : ((ofWord L st w).plus L l.intersection_update_fsHerm_neg_one l.pt).ee Y =
-        ins l.intersection_update_fsHerm_neg_one !![(ofWord L st w).ee Y - (ofWord L st w).DD Y l.pt + tz L, -((Y - l.pt)⁻¹ • 1); 0,
-          (ofWord L st w).xi l.pt * (ofWord L st w).ee Y * (ofWord L st w).x l.pt] := rfl
+    have e1
+        : ((ofWord L st w).plus L l.intersection_update_fsHerm_neg_one l.pt).ee Y
+          = Ph (eU l.intersection_update_fsHerm_neg_one 0 0)
+              (eU l.intersection_update_fsHerm_neg_one 1 1) (Y - l.pt)⁻¹ ((ofWord L st w).ee Y)
+              ((ofWord L st w).ee l.pt)
+            + eU l.intersection_update_fsHerm_neg_one 0 0 * tz L
+            - (Y - l.pt)⁻¹ • eU l.intersection_update_fsHerm_neg_one 0 1 := by
+      have e2
+          : ((ofWord L st w).plus L l.intersection_update_fsHerm_neg_one l.pt).ee Y
+            = ins l.intersection_update_fsHerm_neg_one
+              !![(ofWord L st w).ee Y - (ofWord L st w).DD Y l.pt + tz L, -((Y - l.pt)⁻¹ • 1); 0,
+                (ofWord L st w).xi l.pt * (ofWord L st w).ee Y * (ofWord L st w).x l.pt] :=
+        rfl
       rw [e2, ins_upper, eq_add_of_sub_eq hconj, Ph, FrameData.DD]
       simp only [mul_add, mul_neg, mul_smul_comm, mul_one]
       abel
-    rw [e1, hEY, hEa, Ph_sub, Ph_add, Ph_const _ _ _ (eU_sum l.intersection_update_fsHerm_neg_one), Ph_sum, hls, Kw_cons]
-    have e3 : ∀ j, Ph (eU l.intersection_update_fsHerm_neg_one 0 0 : SlopeTestRemainingChoices S A) (eU l.intersection_update_fsHerm_neg_one 1 1) (Y - l.pt)⁻¹
-        ((Y - γ j)⁻¹ • (io (L.ζ * L.ζbi * Z j) * mult w (γ j)))
-        ((l.pt - γ j)⁻¹ • (io (L.ζ * L.ζbi * Z j) * mult w (γ j))) =
-        (Y - γ j)⁻¹ • (io (L.ζ * L.ζbi * Z j) * mult (l :: w) (γ j)) := by
+    rw [e1, hEY, hEa, Ph_sub, Ph_add, Ph_const _ _ _ (eU_sum l.intersection_update_fsHerm_neg_one),
+      Ph_sum, hls, Kw_cons]
+    have e3
+        : ∀ j,
+          Ph (eU l.intersection_update_fsHerm_neg_one 0 0 : SlopeTestRemainingChoices S A)
+              (eU l.intersection_update_fsHerm_neg_one 1 1) (Y - l.pt)⁻¹
+              ((Y - γ j)⁻¹ • (io (L.ζ * L.ζbi * Z j) * mult w (γ j)))
+              ((l.pt - γ j)⁻¹ • (io (L.ζ * L.ζbi * Z j) * mult w (γ j)))
+            = (Y - γ j)⁻¹ • (io (L.ζ * L.ζbi * Z j) * mult (l :: w) (γ j)) := by
       intro j
-      rw [Ph_res _ _ _ _ _ _ (hYγ j) (hγ l (by simp) j) hne, ← mult_single, ← mul_assoc, mult_eq [l], dg_io,
-        ← mult_eq, mul_assoc, ← mult_cons]
+      rw [Ph_res _ _ _ _ _ _ (hYγ j) (hγ l (by simp) j) hne, ← mult_single, ← mul_assoc,
+        mult_eq [l], dg_io, ← mult_eq, mul_assoc, ← mult_cons]
     simp only [e3, letterSum, mult_nil, mul_one, List.nil_append]
     abel
 

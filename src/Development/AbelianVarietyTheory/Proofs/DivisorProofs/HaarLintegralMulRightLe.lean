@@ -11,16 +11,17 @@ noncomputable section
 
 namespace GlobalTheory.HaarRightTranslate
 
-variable {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
+variable
+  {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
   [SecondCountableTopology H] [MeasurableSpace H] [BorelSpace H]
 
-theorem map_mul_right_eq_modular (μ : Measure H) [IsHaarMeasure μ] (g : H) :
-    map (· * g) μ = modularCharacterFun g • μ := by
+theorem map_mul_right_eq_modular (μ : Measure H) [IsHaarMeasure μ] (g : H)
+    : map (· * g) μ = modularCharacterFun g • μ := by
   rw [modularCharacterFun_eq_haarScalarFactor μ g]
   exact isMulLeftInvariant_eq_smul _ μ
 
-theorem modular_bdd_on_compact {V : Set H} (hV : IsCompact V) :
-    ∃ M : ℝ≥0, ∀ v ∈ V, modularCharacterFun v ≤ M := by
+theorem modular_bdd_on_compact {V : Set H} (hV : IsCompact V)
+    : ∃ M : ℝ≥0, ∀ v ∈ V, modularCharacterFun v ≤ M := by
   set μ : Measure H := haar
   have K : PositiveCompacts H := Classical.arbitrary _
   set A : Set H := closure (K : Set H) with hA
@@ -47,11 +48,14 @@ theorem modular_bdd_on_compact {V : Set H} (hV : IsCompact V) :
 
 end HaarRightTranslate
 
-theorem haar_lintegral_mul_right_le :
-    ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
-      [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H] (μ : Measure H),
-      μ.IsHaarMeasure → ∀ K : Set H, IsCompact K → ∃ B : NNReal, ∀ y ∈ K, ∀ φ : H → ENNReal,
-        Measurable φ → ∫⁻ x, φ (x * y) ∂μ ≤ B * ∫⁻ x, φ x ∂μ := by
+theorem haar_lintegral_mul_right_le
+    : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
+        [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H] (μ : Measure H),
+      μ.IsHaarMeasure
+        → ∀ K : Set H,
+          IsCompact K
+            → ∃ B : NNReal, ∀ y ∈ K, ∀ φ : H → ENNReal,
+              Measurable φ → ∫⁻ x, φ (x * y) ∂μ ≤ B * ∫⁻ x, φ x ∂μ := by
   intro H _ _ _ _ _ _ _ _ μ hμ K hK
   obtain ⟨M, hM⟩ := HaarRightTranslate.modular_bdd_on_compact hK
   refine ⟨M, fun y hy φ hφ => ?_⟩

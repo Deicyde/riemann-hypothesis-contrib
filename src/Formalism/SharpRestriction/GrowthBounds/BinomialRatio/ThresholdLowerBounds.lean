@@ -15,10 +15,11 @@ theorem numSeg_le_card {n' : ℕ} (TT : Finset (Fin n')) : numSeg TT ≤ TT.card
   rw [Finset.length_sort]
   exact Finset.card_filter_le _ _
 
-theorem error_ratio_le_epsilon {p k N1 La Q c a b' CE1 CE2 : ℝ} (hk : 1 ≤ k) (hp : k ^ 2 ≤ p) (hN1 : 1 ≤ N1) (hLa : 1 ≤ La)
+theorem error_ratio_le_epsilon
+    {p k N1 La Q c a b' CE1 CE2 : ℝ} (hk : 1 ≤ k) (hp : k ^ 2 ≤ p) (hN1 : 1 ≤ N1) (hLa : 1 ≤ La)
     (hQ : 1 ≤ Q) (_hc : 0 ≤ c) (hb : 0 < b') (hab : k * b' ≤ a) (hHc : k ^ 3 * Q ^ 2 * c ≤ b')
-    (hHb : k ^ 3 * Q ≤ b') (h1 : 0 ≤ CE1) (h2 : 0 ≤ CE2) (hk2 : 4 * CE1 + CE2 + 1 ≤ k) :
-    errorTermBound CE1 CE2 p k N1 Q c a b' La / a + Q / a ≤ N1 * La / k := by
+    (hHb : k ^ 3 * Q ≤ b') (h1 : 0 ≤ CE1) (h2 : 0 ≤ CE2) (hk2 : 4 * CE1 + CE2 + 1 ≤ k)
+    : errorTermBound CE1 CE2 p k N1 Q c a b' La / a + Q / a ≤ N1 * La / k := by
   have hk0 : 0 < k := by linarith
   have hkne : k ≠ 0 := hk0.ne'
   have hksq : 0 < k ^ 2 := pow_pos hk0 2
@@ -71,7 +72,8 @@ theorem error_ratio_le_epsilon {p k N1 La Q c a b' CE1 CE2 : ℝ} (hk : 1 ≤ k)
     exact le_of_mul_le_mul_left h hksq
   rw [← add_div, div_le_iff₀ ha]
   unfold errorTermBound
-  have s1 : CE1 * (a / p ^ 2 + b' / p + La * N1 * a / (p * k) + La * b' / k) ≤ CE1 * (4 * (a * A)) :=
+  have s1
+      : CE1 * (a / p ^ 2 + b' / p + La * N1 * a / (p * k) + La * b' / k) ≤ CE1 * (4 * (a * A)) :=
     mul_le_mul_of_nonneg_left (by linarith) h1
   have s2 : CE2 * (k ^ 2 * N1 * Q ^ 2 * c) ≤ CE2 * (a * A) := mul_le_mul_of_nonneg_left t5 h2
   have s3 : (4 * CE1 + CE2 + 1) * (a * A) ≤ k * (a * A) := mul_le_mul_of_nonneg_right hk2 haA
@@ -80,9 +82,10 @@ theorem error_ratio_le_epsilon {p k N1 La Q c a b' CE1 CE2 : ℝ} (hk : 1 ≤ k)
 
 def T2 (CE1 CE2 Cc H : ℝ) : ℝ := 1000 * (CE1 + CE2 + 1) * (Cc + 1) * H
 
-theorem chordCoeffCubic_inversionDenom_inv {CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (h1 : 1 ≤ CE1) (h2 : 1 ≤ CE2) (hH : 1 ≤ H) :
-    1000 ≤ T2 CE1 CE2 Cc H ∧ 4 * CE1 + CE2 + 1 ≤ T2 CE1 CE2 Cc H ∧ 2 * Cc * H ≤ T2 CE1 CE2 Cc H ∧
-      H ≤ T2 CE1 CE2 Cc H := by
+theorem chordCoeffCubic_inversionDenom_inv
+    {CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (h1 : 1 ≤ CE1) (h2 : 1 ≤ CE2) (hH : 1 ≤ H)
+    : 1000 ≤ T2 CE1 CE2 Cc H ∧ 4 * CE1 + CE2 + 1 ≤ T2 CE1 CE2 Cc H ∧ 2 * Cc * H ≤ T2 CE1 CE2 Cc H
+      ∧ H ≤ T2 CE1 CE2 Cc H := by
   unfold T2
   have hP : 3 ≤ CE1 + CE2 + 1 := by linarith
   have hM1 : 1 ≤ (Cc + 1) * H := by nlinarith
@@ -96,17 +99,49 @@ theorem chordCoeffCubic_inversionDenom_inv {CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc)
   refine ⟨by nlinarith, by nlinarith, by nlinarith, by nlinarith⟩
 
 set_option maxHeartbeats 1000000 in
-theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 1 ≤ C0) (h1 : 1 ≤ CE1) (h2 : 1 ≤ CE2)
-    (hH : 1 ≤ H) (t1 : T2 CE1 CE2 Cc H ≤ CYb) (t2 : T2 CE1 CE2 Cc H ≤ Cde) (t3 : T2 CE1 CE2 Cc H ≤ Ck)
-    (t4 : T2 CE1 CE2 Cc H ≤ CD) (t5 : T2 CE1 CE2 Cc H ≤ Cb) {X : Loc} (hD : D1num X)
-    (hI : HIext C0 CYb Cde Ck CD Cb X) (hc : CBound Cc X) : Std C0 Cde CE1 CE2 H X := by
+theorem std_of
+    {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 1 ≤ C0) (h1 : 1 ≤ CE1)
+    (h2 : 1 ≤ CE2) (hH : 1 ≤ H) (t1 : T2 CE1 CE2 Cc H ≤ CYb) (t2 : T2 CE1 CE2 Cc H ≤ Cde)
+    (t3 : T2 CE1 CE2 Cc H ≤ Ck) (t4 : T2 CE1 CE2 Cc H ≤ CD) (t5 : T2 CE1 CE2 Cc H ≤ Cb)
+    {X : Loc} (hD : D1num X) (hI : HIext C0 CYb Cde Ck CD Cb X) (hc : CBound Cc X)
+    : Std C0 Cde CE1 CE2 H X := by
   have om : ∀ x y : ℝ, 1 ≤ x → 1 ≤ y → 1 ≤ x * y := fun x y hx hy => by nlinarith
   obtain ⟨hT1, hT2, hT3, hT4⟩ := chordCoeffCubic_inversionDenom_inv hCc h1 h2 hH
   unfold D1num at hD
   obtain ⟨hpP, hp5, hn2, hnEv⟩ := hD
   unfold HIext WindowHypotheses InWin at hI
-  obtain ⟨⟨hY1, hpk, _hEv, hseg, hsegB, hN1, hm, hLaNY, hb, hbl, hbh, _hYbw, _hw2, hCYb, hYbk, hab16,
-    hde, hpab, hCk, hband, hccl0, _hccl, hDLP, hcs, hCb⟩, hwA, hwB⟩ := hI
+  obtain ⟨
+      ⟨
+        hY1,
+        hpk,
+        _hEv,
+        hseg,
+        hsegB,
+        hN1,
+        hm,
+        hLaNY,
+        hb,
+        hbl,
+        hbh,
+        _hYbw,
+        _hw2,
+        hCYb,
+        hYbk,
+        hab16,
+        hde,
+        hpab,
+        hCk,
+        hband,
+        hccl0,
+        _hccl,
+        hDLP,
+        hcs,
+        hCb
+      ⟩,
+      hwA,
+      hwB
+    ⟩ :=
+    hI
   unfold CBound at hc
 
   have hkdef : X.k = (X.m : ℝ) + 1 := rfl
@@ -134,14 +169,23 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
       linarith
     exact_mod_cast Nat.one_le_iff_ne_zero.mpr hne
   have hlogb : 0 ≤ Real.logb X.p X.a := Real.logb_nonneg (by linarith) ha1
-  have hDLP0 : 0 ≤ X.DLP := le_trans (mul_nonneg (mul_nonneg (mul_nonneg (mul_nonneg (by linarith) hN0)
-    (sq_nonneg _)) (add_nonneg (pow_nonneg (Nat.cast_nonneg _) 5) (pow_nonneg hk0.le 3))) hlogb) hDLP
+  have hDLP0 : 0 ≤ X.DLP :=
+    le_trans
+      (mul_nonneg
+        (mul_nonneg (mul_nonneg (mul_nonneg (by linarith) hN0) (sq_nonneg _))
+          (add_nonneg (pow_nonneg (Nat.cast_nonneg _) 5) (pow_nonneg hk0.le 3)))
+        hlogb)
+      hDLP
   have hNc : 0 ≤ X.N * X.ccl := mul_nonneg hN0 hccl0
   have hnc : 0 ≤ (X.n' : ℝ) * X.ccl := mul_nonneg (Nat.cast_nonneg _) hccl0
   have hF8 : 8 ≤ X.cs + X.N * X.ccl + X.n' * X.ccl := by linarith
   have hprod : 1 ≤ Cb * X.k ^ 3 * X.N * X.Q ^ 4 * (X.cs + X.N * X.ccl + X.n' * X.ccl) * X.Y :=
-    om _ _ (om _ _ (om _ _ (om _ _ (om _ _ (by linarith) (one_le_pow₀ (by linarith))) (by linarith))
-      (one_le_pow₀ hQ1)) (by linarith)) hY1
+    om _ _
+      (om _ _
+        (om _ _ (om _ _ (om _ _ (by linarith) (one_le_pow₀ (by linarith))) (by linarith))
+          (one_le_pow₀ hQ1))
+        (by linarith))
+      hY1
   have hb1 : 1 ≤ X.b' := le_trans hprod hCb
   have ha5 : (5 : ℝ) ≤ X.a := by
     have h := hpab
@@ -154,8 +198,8 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
     norm_num at h ⊢
     linarith
   have hl4 : Real.log ((2 : ℝ) ^ 2) = 2 * Real.log 2 := by rw [Real.log_pow]; norm_num
-  have hla : Real.log ((2 : ℝ) ^ 2) ≤ Real.log X.a := Real.log_le_log (by norm_num)
-    (by rw [show (2 : ℝ) ^ 2 = 4 by norm_num]; linarith)
+  have hla : Real.log ((2 : ℝ) ^ 2) ≤ Real.log X.a :=
+    Real.log_le_log (by norm_num) (by rw [show (2 : ℝ) ^ 2 = 4 by norm_num]; linarith)
   have hloga : 1 ≤ Real.log X.a := by linarith
 
   have hLadef : X.La C0 = C0 * (X.N1 : ℝ) ^ 2 * Real.log X.a := rfl
@@ -164,7 +208,8 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
 
   have h16 := hab16
   rw [le_div_iff₀ hb] at h16
-  have hm1 : 1 ≤ X.Y * X.Yb * X.N * Real.log X.a := om _ _ (om _ _ (om _ _ hY1 hYb1) (by linarith)) hloga
+  have hm1 : 1 ≤ X.Y * X.Yb * X.N * Real.log X.a :=
+    om _ _ (om _ _ (om _ _ hY1 hYb1) (by linarith)) hloga
   have hP1 : 1 ≤ X.Y ^ 2 * X.Yb * X.N * X.La C0 * Real.log X.a :=
     om _ _ (om _ _ (om _ _ (om _ _ hY2 hYb1) (by linarith)) hLa1) hloga
   have hkb : X.k * X.b' ≤ X.a := by
@@ -175,8 +220,9 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
     mul_le_mul_of_nonneg_left hm1 hYLa
   have hK2 : 2 * (X.Y * X.La C0 * X.b') ≤ X.k * (X.Y * X.La C0 * X.b') :=
     mul_le_mul_of_nonneg_right (by linarith) (mul_nonneg hYLa hb.le)
-  have hK3 : X.k * (X.Y * X.La C0 * 1) * X.b' ≤
-      X.k * (X.Y * X.La C0 * (X.Y * X.Yb * X.N * Real.log X.a)) * X.b' :=
+  have hK3
+      : X.k * (X.Y * X.La C0 * 1) * X.b'
+        ≤ X.k * (X.Y * X.La C0 * (X.Y * X.Yb * X.N * Real.log X.a)) * X.b' :=
     mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hK1 hk0.le) hb.le
   have hKA : 2 * X.Y * X.La C0 * X.b' ≤ X.a := by linarith
 
@@ -210,7 +256,8 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
     intro s hs
     obtain ⟨h1s, h2s⟩ := hwA s hs
     refine ⟨h1s, ?_⟩
-    have e : (X.a : ℝ) * (1 + 2 / (X.k * X.Y)) = X.a + X.a / (X.k * X.Y) + X.a / (X.k * X.Y) := by ring
+    have e : (X.a : ℝ) * (1 + 2 / (X.k * X.Y)) = X.a + X.a / (X.k * X.Y) + X.a / (X.k * X.Y) := by
+      ring
     linarith
   have eB1 : X.b' * (1 + be X C0) = X.b' + (X.bh - X.bl) + 2 * X.J0 C0 := by
     rw [eb, eJ0]; field_simp; try ring
@@ -232,12 +279,16 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
   have hL1 : X.N * Real.logb X.p X.a * X.k ≤ X.N * Real.logb X.p X.a * (X.k * X.k ^ 2) := by
     have := mul_le_mul_of_nonneg_left hkk3 hz
     linarith
-  have hs0 : 0 ≤ (X.N1 : ℝ) ^ 5 + X.k ^ 3 := add_nonneg (pow_nonneg (Nat.cast_nonneg _) 5) (pow_nonneg hk0.le 3)
-  have hL2 : X.N * Real.logb X.p X.a * X.k ^ 3 ≤ X.N * Real.logb X.p X.a * ((X.N1 : ℝ) ^ 5 + X.k ^ 3) :=
-    mul_le_mul_of_nonneg_left (by have := pow_nonneg (Nat.cast_nonneg X.N1 : (0 : ℝ) ≤ X.N1) 5; linarith) hz
+  have hs0 : 0 ≤ (X.N1 : ℝ) ^ 5 + X.k ^ 3 :=
+    add_nonneg (pow_nonneg (Nat.cast_nonneg _) 5) (pow_nonneg hk0.le 3)
+  have hL2
+      : X.N * Real.logb X.p X.a * X.k ^ 3 ≤ X.N * Real.logb X.p X.a * ((X.N1 : ℝ) ^ 5 + X.k ^ 3) :=
+    mul_le_mul_of_nonneg_left
+      (by have := pow_nonneg (Nat.cast_nonneg X.N1 : (0 : ℝ) ≤ X.N1) 5; linarith) hz
   have hCY : 1 ≤ CD * X.Y ^ 2 := om _ _ (by linarith) hY2
-  have hL3 : X.N * Real.logb X.p X.a * ((X.N1 : ℝ) ^ 5 + X.k ^ 3) * 1 ≤
-      X.N * Real.logb X.p X.a * ((X.N1 : ℝ) ^ 5 + X.k ^ 3) * (CD * X.Y ^ 2) :=
+  have hL3
+      : X.N * Real.logb X.p X.a * ((X.N1 : ℝ) ^ 5 + X.k ^ 3) * 1
+        ≤ X.N * Real.logb X.p X.a * ((X.N1 : ℝ) ^ 5 + X.k ^ 3) * (CD * X.Y ^ 2) :=
     mul_le_mul_of_nonneg_left hCY (mul_nonneg hz hs0)
   have hNkL : X.N * X.k * Real.logb X.p X.a ≤ X.DLP := by linarith
   have hF0 : 0 ≤ X.cs + X.N * X.ccl + X.n' * X.ccl := by linarith
@@ -269,8 +320,9 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
     · exact div_nonneg (mul_nonneg (mul_nonneg hLa0 (Nat.cast_nonneg _)) (Nat.cast_nonneg _))
         (mul_nonneg (Nat.cast_nonneg _) hk0.le)
     · exact div_nonneg (mul_nonneg hLa0 hb.le) hk0.le
-    · exact mul_nonneg (mul_nonneg (mul_nonneg (mul_nonneg hCE2 (sq_nonneg _)) (Nat.cast_nonneg _))
-        (sq_nonneg _)) (Nat.cast_nonneg _)
+    · exact mul_nonneg
+        (mul_nonneg (mul_nonneg (mul_nonneg hCE2 (sq_nonneg _)) (Nat.cast_nonneg _)) (sq_nonneg _))
+        (Nat.cast_nonneg _)
 
   have hp' : X.k ^ 2 ≤ (X.p : ℝ) := by
     have := mul_le_mul_of_nonneg_left hY2 (sq_nonneg X.k)
@@ -283,7 +335,8 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
     have := mul_le_mul_of_nonneg_left hf hg
     linarith
   have hHb3 : X.k ^ 3 * X.Q ≤ X.b' := by
-    have hf : 1 ≤ H * X.N * X.Q ^ 3 * X.Y := om _ _ (om _ _ (om _ _ hH (by linarith)) (one_le_pow₀ hQ1)) hY1
+    have hf : 1 ≤ H * X.N * X.Q ^ 3 * X.Y :=
+      om _ _ (om _ _ (om _ _ hH (by linarith)) (one_le_pow₀ hQ1)) hY1
     have hg : 0 ≤ X.k ^ 3 * X.Q := mul_nonneg (pow_nonneg hk0.le 3) hQ0
     have := mul_le_mul_of_nonneg_left hf hg
     linarith
@@ -294,23 +347,50 @@ theorem std_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc H : ℝ} (hCc : 0 ≤ Cc) (hC0 : 
   have hk1 : (1 : ℝ) ≤ X.k := by linarith
   have hc0 : (0 : ℝ) ≤ (X.c : ℝ) := Nat.cast_nonneg _
   have hN5 := error_ratio_le_epsilon hk1 hp' hN1R hLa1 hQ1 hc0 hb hkb hHc3 hHb3 hCE1 hCE2 hk2'
-  exact ⟨hpP, hp5, hn2, hnEv, hY1, hpk, sq_level_le_degree, hN1, hseg, hN2, hsegB, hb, hloga, hLa1, hLaNY, hLaN,
-    hLaK, hde, hbeLe, hbe0, hwinA, hwinB, hpab, hab, hband, hHcF, hHbF, hE0, hN5⟩
+  exact ⟨
+    hpP,
+    hp5,
+    hn2,
+    hnEv,
+    hY1,
+    hpk,
+    sq_level_le_degree,
+    hN1,
+    hseg,
+    hN2,
+    hsegB,
+    hb,
+    hloga,
+    hLa1,
+    hLaNY,
+    hLaN,
+    hLaK,
+    hde,
+    hbeLe,
+    hbe0,
+    hwinA,
+    hwinB,
+    hpab,
+    hab,
+    hband,
+    hHcF,
+    hHbF,
+    hE0,
+    hN5
+  ⟩
 
 namespace Std
 
 variable {C0 Cde CE1 CE2 H : ℝ} {X : Loc}
 
-theorem one_le_level_alt (S : Std C0 Cde CE1 CE2 H X) : (1 : ℝ) ≤ X.N1 := by
-  exact_mod_cast S.N1pos
+theorem one_le_level_alt (S : Std C0 Cde CE1 CE2 H X) : (1 : ℝ) ≤ X.N1 := by exact_mod_cast S.N1pos
 
 theorem k5 (S : Std C0 Cde CE1 CE2 H X) : 5 ≤ X.k := by
   have h := S.N1k
   have h' := one_le_level_alt S
   linarith
 
-theorem p5r (S : Std C0 Cde CE1 CE2 H X) : (5 : ℝ) ≤ X.p := by
-  exact_mod_cast S.p5
+theorem p5r (S : Std C0 Cde CE1 CE2 H X) : (5 : ℝ) ≤ X.p := by exact_mod_cast S.p5
 
 theorem Q1 (S : Std C0 Cde CE1 CE2 H X) : 1 ≤ X.Q := by
   show (1 : ℝ) ≤ (X.p : ℝ) ^ X.G'
@@ -340,8 +420,7 @@ theorem kYLab (S : Std C0 Cde CE1 CE2 H X) : X.k * X.Y * X.La C0 * X.b' ≤ X.a 
   have hlog := S.loga
   have hYN : 1 ≤ X.Y * X.N := by nlinarith
   have hv : 1 * 1 ≤ X.Y * X.N * Real.log X.a := mul_le_mul hYN hlog zero_le_one (by linarith)
-  have hu : 0 ≤ X.k * X.Y * X.La C0 :=
-    mul_nonneg (mul_nonneg hk0 (by linarith)) (by linarith)
+  have hu : 0 ≤ X.k * X.Y * X.La C0 := mul_nonneg (mul_nonneg hk0 (by linarith)) (by linarith)
   have h1 : X.k * X.Y * X.La C0 * (1 * 1) ≤ X.k * X.Y * X.La C0 * (X.Y * X.N * Real.log X.a) :=
     mul_le_mul_of_nonneg_left hv hu
   have h2 : X.k * X.Y * X.La C0 ≤ X.a / X.b' := by
@@ -366,7 +445,8 @@ theorem ba (S : Std C0 Cde CE1 CE2 H X) : X.b' ≤ X.a := by
   have h' : 1 * X.b' ≤ X.k * X.b' := mul_le_mul_of_nonneg_right hk S.bpos.le
   linarith
 
-theorem Hc2 (S : Std C0 Cde CE1 CE2 H X) (hH : 0 ≤ H) : H * (X.k ^ 3 * X.Q ^ 2 * X.c * X.Y) ≤ X.b' := by
+theorem Hc2 (S : Std C0 Cde CE1 CE2 H X) (hH : 0 ≤ H)
+    : H * (X.k ^ 3 * X.Q ^ 2 * X.c * X.Y) ≤ X.b' := by
   have hS := S.Hc
   have hQ := Q1 S
   have hN := S.N2
@@ -375,8 +455,10 @@ theorem Hc2 (S : Std C0 Cde CE1 CE2 H X) (hH : 0 ≤ H) : H * (X.k ^ 3 * X.Q ^ 2
   have hQ2 : 1 ≤ X.Q ^ 2 := by nlinarith
   have hNQ : 1 ≤ X.N * X.Q ^ 2 := by nlinarith
   have hw : 0 ≤ H * X.k ^ 3 * X.Q ^ 2 * (X.c : ℝ) * X.Y :=
-    mul_nonneg (mul_nonneg (mul_nonneg (mul_nonneg hH (pow_nonneg hk0 3)) (pow_nonneg (by linarith) 2))
-      (Nat.cast_nonneg _)) hY0
+    mul_nonneg
+      (mul_nonneg (mul_nonneg (mul_nonneg hH (pow_nonneg hk0 3)) (pow_nonneg (by linarith) 2))
+        (Nat.cast_nonneg _))
+      hY0
   have h' := mul_le_mul_of_nonneg_left hNQ hw
   nlinarith
 

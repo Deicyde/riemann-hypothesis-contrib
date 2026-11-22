@@ -7,14 +7,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-theorem UpperTheory.Gal.Int.Geo.geoSide_of :
-    UpperTheory.Gal.crystallineComparison.Br.FinAll → CrystallineSemistableComparison.SmoothModelCrystalline → UpperTheory.Ru.crystallineComparison.GeoSide := by
+theorem UpperTheory.Gal.Int.Geo.geoSide_of
+    : UpperTheory.Gal.crystallineComparison.Br.FinAll
+      → CrystallineSemistableComparison.SmoothModelCrystalline
+      → UpperTheory.Ru.crystallineComparison.GeoSide := by
   intro hFin hCr E Ω _ _ _ _ _ l _ H θ hN a ρ₀ hMat w hw n ϑ hCong P AI hT A hA O _ _ _ Bw hj
   obtain ⟨hD, hDV, hf, hnorm, hcard, C, hOnto, hCg⟩ :=
     UpperTheory.Ru.crystallineComparison.congBC E Ω l _ H θ w hw n ϑ hCong A hA O Bw hj
   obtain ⟨ρ₁, hM₁, hρ₁⟩ :=
-    UpperTheory.Gal.Seam.locTower_holds l E ↥Bw.Kw.1 Ω _
-      (UpperTheory.Gal.Seam.kOf Bw) Bw.j (fun _ => rfl) H hN _ θ a ρ₀ hMat
+    UpperTheory.Gal.Seam.locTower_holds l E ↥Bw.Kw.1 Ω _ (UpperTheory.Gal.Seam.kOf Bw) Bw.j
+      (fun _ => rfl)
+      H hN _ θ a ρ₀ hMat
   obtain ⟨V, i₁, i₂, i₃, ρ, T, b, hcr, hann, hinj, hact, heig⟩ :=
     UpperTheory.Ru.crystallineComparison.geoLoc hFin hCr l P AI hT Bw.Kw _ hf hcard
       (UpperTheory.Gal.Int.Geo.bcAlong H (UpperTheory.Gal.Seam.kOf Bw)) θ

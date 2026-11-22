@@ -10,20 +10,25 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsPlaceW
 
 @[expose] public section
 
-open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 GlobalTheory.CompanionTheory.Ar.Flat
+open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2 GlobalTheory.CompanionTheory.Ar.Flat
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem isOpen_blockNonzero {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] :
-    IsOpen {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
+theorem isOpen_blockNonzero {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
+    : IsOpen {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
   simp only [Set.setOf_forall, Set.setOf_exists]
-  exact isOpen_iInter_of_finite fun k => isOpen_iUnion fun i =>
-    isOpen_ne_fun (continuous_apply _) continuous_const
+  exact isOpen_iInter_of_finite fun k =>
+    isOpen_iUnion fun i => isOpen_ne_fun (continuous_apply _) continuous_const
 
-theorem PtOver.eventually_ptOver {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
-    {F : Type} [Field F] [NumberField F] {y : (Σ k, ι k) → Ω} {φ : F →+* Ω} (hO : OverInt y φ)
-    {σ : F →+* ℂ} {z : (Σ k, ι k) → ℂ} (hz : PtOver y φ σ z) :
-    ∀ᶠ w in nhds z, w ∈ mcPts (mCoordIdeal y) → PtOver y φ σ w := by
+theorem PtOver.eventually_ptOver
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω]
+    {F : Type} [Field F] [NumberField F]
+    {y : (Σ k, ι k) → Ω} {φ : F →+* Ω} (hO : OverInt y φ)
+    {σ : F →+* ℂ} {z : (Σ k, ι k) → ℂ} (hz : PtOver y φ σ z)
+    : ∀ᶠ w in nhds z, w ∈ mcPts (mCoordIdeal y) → PtOver y φ σ w := by
   classical
   let e := Finite.equivFin (F →+* ℂ)
   let t : (F →+* ℂ) → ℝ := fun τ => ((e τ : ℕ) : ℝ)
@@ -38,23 +43,35 @@ theorem PtOver.eventually_ptOver {K : Type} [Fintype K] {ι : K → Type} [∀ k
   have h2 : τ = σ := ht (h1.symm.trans hw)
   exact h2 ▸ hτ
 
-theorem FlatHerm.exists_rep : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] (y : (Σ k, ι k) → Ω) (φ : F →+* Ω) (A : HermLine ι) (S : FlatHerm y φ A) (d : ℕ) (W : Ideal (MRing ι)), OverInt y φ → IsArithVar (mCoordIdeal y) d → IsSmoothHerm A → IsMultiProjPrime W → mCoordIdeal y ≤ W → ∃ (f' g' : MRing ι) (df' dg' : K → ℕ), IsMultiHomog f' df' ∧ IsMultiHomog g' dg' ∧ (∀ k, (df' k : ℤ) - dg' k = S.M * A.a k) ∧ f' ∉ W ∧ g' ∉ W ∧ f' * S.g - g' * S.f ∈ mCoordIdeal y ∧ IsUnitSec (mCoordIdeal y) f' g' ∧ ∀ σ z, PtOver y φ σ z → ‖evC z f'‖ = (S.κ σ * A.h z) ^ S.M * ‖evC z g'‖ := by
+theorem FlatHerm.exists_rep
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (F : Type)
+        [Field F] [NumberField F] (y : (Σ k, ι k) → Ω) (φ : F →+* Ω) (A : HermLine ι)
+        (S : FlatHerm y φ A) (d : ℕ) (W : Ideal (MRing ι)),
+      OverInt y φ → IsArithVar (mCoordIdeal y) d → IsSmoothHerm A → IsMultiProjPrime W
+        → mCoordIdeal y ≤ W
+        → ∃ (f' g' : MRing ι) (df' dg' : K → ℕ),
+          IsMultiHomog f' df' ∧ IsMultiHomog g' dg' ∧ (∀ k, (df' k : ℤ) - dg' k = S.M * A.a k)
+            ∧ f' ∉ W ∧ g' ∉ W ∧ f' * S.g - g' * S.f ∈ mCoordIdeal y
+            ∧ IsUnitSec (mCoordIdeal y) f' g'
+            ∧ ∀ σ z, PtOver y φ σ z → ‖evC z f'‖ = (S.κ σ * A.h z) ^ S.M * ‖evC z g'‖ := by
   intro K _ ι _ Ω _ F _ _ y φ A S d W hO hV hA hW hPW
   obtain ⟨f', g', df', dg', hf', hg', hdeg, hfW, hgW, hrel, hunit⟩ :=
-    GlobalTheory.T.unit_section_avoid_prime K ι (mCoordIdeal y) W S.f S.g S.df S.dg hV.2.1 hW hPW S.hf S.hg S.g_ne S.unit
+    GlobalTheory.T.unit_section_avoid_prime K ι (mCoordIdeal y) W S.f S.g S.df S.dg hV.2.1 hW hPW
+      S.hf S.hg S.g_ne S.unit
   refine ⟨f', g', df', dg', hf', hg', fun k => (hdeg k).trans (S.deg k), hfW, hgW, hrel, hunit, ?_⟩
   intro σ z hz
-  have hcl := GlobalTheory.T.complex_points_dense_nonvanishing K ι (mCoordIdeal y) d S.g hV S.g_ne hz.1
+  have hcl :=
+    GlobalTheory.T.complex_points_dense_nonvanishing K ι (mCoordIdeal y) d S.g hV S.g_ne hz.1
   have hfreq := mem_closure_iff_frequently.mp hcl
   have hnear := PtOver.eventually_ptOver hO hz
   have hcontA : ContinuousAt A.h z :=
     (hA.continuousOn).continuousAt (isOpen_blockNonzero.mem_nhds hz.1.1)
   have hcf : Continuous fun w : (Σ k, ι k) → ℂ => evC w f' := MvPolynomial.continuous_eval _
   have hcg : Continuous fun w : (Σ k, ι k) → ℂ => evC w g' := MvPolynomial.continuous_eval _
-  have hL : Filter.Tendsto (fun w => ‖evC w f'‖) (nhds z) (nhds ‖evC z f'‖) :=
-    hcf.norm.continuousAt
-  have hR : Filter.Tendsto (fun w => (S.κ σ * A.h w) ^ S.M * ‖evC w g'‖) (nhds z)
-      (nhds ((S.κ σ * A.h z) ^ S.M * ‖evC z g'‖)) :=
+  have hL : Filter.Tendsto (fun w => ‖evC w f'‖) (nhds z) (nhds ‖evC z f'‖) := hcf.norm.continuousAt
+  have hR : Filter.Tendsto
+      (fun w => (S.κ σ * A.h w) ^ S.M * ‖evC w g'‖)
+      (nhds z) (nhds ((S.κ σ * A.h z) ^ S.M * ‖evC z g'‖)) :=
     (((continuousAt_const.mul hcontA).pow S.M).mul hcg.norm.continuousAt)
   refine tendsto_nhds_unique_of_frequently_eq hL hR ?_
   refine (hfreq.and_eventually hnear).mono ?_

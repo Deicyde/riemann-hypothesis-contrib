@@ -8,10 +8,11 @@ open Filter Topology GlobalTheory.VolBr
 
 namespace GlobalTheory.VolBr
 
-theorem isBallFam_mono_neg_add :
-    ∀ (G : Type) [AddCommGroup G] (Λ : AddSubgroup G) (B : ℝ → Set G), IsBallFam Λ B →
-      (∀ r r', r ≤ r' → B r ⊆ B r') ∧ (∀ r x, x ∈ B r → -x ∈ B r) ∧
-        (∀ r r' x y, x ∈ B r → y ∈ B r' → x + y ∈ B (r + r')) := by
+theorem isBallFam_mono_neg_add
+    : ∀ (G : Type) [AddCommGroup G] (Λ : AddSubgroup G) (B : ℝ → Set G),
+      IsBallFam Λ B
+        → (∀ r r', r ≤ r' → B r ⊆ B r') ∧ (∀ r x, x ∈ B r → -x ∈ B r)
+          ∧ (∀ r r' x y, x ∈ B r → y ∈ B r' → x + y ∈ B (r + r')) := by
   intro G _ Λ B hB
   have hneg : ∀ r x, x ∈ B r → -x ∈ B r := by
     intro r x hx

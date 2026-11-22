@@ -9,7 +9,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.F.RS
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField

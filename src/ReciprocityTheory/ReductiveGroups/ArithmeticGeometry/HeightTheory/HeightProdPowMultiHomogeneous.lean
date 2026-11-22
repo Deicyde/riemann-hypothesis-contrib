@@ -9,17 +9,19 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField ReciprocityTheory.MultiplicativeHeights
 
-theorem isMultiHomogeneous_mul' {R : Type*} [CommSemiring R] {B n : ℕ} {a a' : Fin B → ℕ}
-    {f g : MvPolynomial (Fin B × Fin n) R} (hf : IsMultiHomogeneous a f)
-    (hg : IsMultiHomogeneous a' g) : IsMultiHomogeneous (a + a') (f * g) := by
+theorem isMultiHomogeneous_mul'
+    {R : Type*} [CommSemiring R]
+    {B n : ℕ} {a a' : Fin B → ℕ} {f g : MvPolynomial (Fin B × Fin n) R}
+    (hf : IsMultiHomogeneous a f) (hg : IsMultiHomogeneous a' g)
+    : IsMultiHomogeneous (a + a') (f * g) := by
   classical
   unfold IsMultiHomogeneous at *
   intro s hs b
   obtain ⟨s1, hs1, s2, hs2, rfl⟩ := Finset.mem_add.mp (MvPolynomial.support_mul f g hs)
   simp only [Finsupp.add_apply, Finset.sum_add_distrib, Pi.add_apply, hf s1 hs1 b, hg s2 hs2 b]
 
-theorem isMultiHomogeneous_one {R : Type*} [CommSemiring R] {B n : ℕ} :
-    IsMultiHomogeneous (0 : Fin B → ℕ) (1 : MvPolynomial (Fin B × Fin n) R) := by
+theorem isMultiHomogeneous_one {R : Type*} [CommSemiring R] {B n : ℕ}
+    : IsMultiHomogeneous (0 : Fin B → ℕ) (1 : MvPolynomial (Fin B × Fin n) R) := by
   classical
   unfold IsMultiHomogeneous
   intro s hs b
@@ -29,31 +31,39 @@ theorem isMultiHomogeneous_one {R : Type*} [CommSemiring R] {B n : ℕ} :
     simp
   · exact absurd rfl hs
 
-theorem height_one_eq_zero {K : Type} [Field K] [NumberField K] {B n : ℕ} (hn : 0 < n) :
-    h0 (1 : MvPolynomial (Fin B × Fin n) K) = 0 := by
+theorem height_one_eq_zero {K : Type} [Field K] [NumberField K] {B n : ℕ} (hn : 0 < n)
+    : h0 (1 : MvPolynomial (Fin B × Fin n) K) = 0 := by
   classical
   first
-    | simp [h0, gaussAbs, blockSphereMean]
-    | simp [h0, gaussAbs, blockSphereMean, MvPolynomial.support_one]
+  | simp [h0, gaussAbs, blockSphereMean]
+  | simp [h0, gaussAbs, blockSphereMean, MvPolynomial.support_one]
 
-theorem height_pow_multiHomogeneous {K : Type} [Field K] [NumberField K] {B n : ℕ} (hn : 0 < n)
-    {g : MvPolynomial (Fin B × Fin n) K} {a : Fin B → ℕ} (hg0 : g ≠ 0)
-    (hg : IsMultiHomogeneous a g) (e : ℕ) :
-    g ^ e ≠ 0 ∧ IsMultiHomogeneous (e • a) (g ^ e) ∧ h0 (g ^ e) = e * h0 g := by
+theorem height_pow_multiHomogeneous
+    {K : Type} [Field K] [NumberField K]
+    {B n : ℕ} (hn : 0 < n)
+    {g : MvPolynomial (Fin B × Fin n) K} {a : Fin B → ℕ} (hg0 : g ≠ 0) (hg : IsMultiHomogeneous a g)
+    (e : ℕ)
+    : g ^ e ≠ 0 ∧ IsMultiHomogeneous (e • a) (g ^ e) ∧ h0 (g ^ e) = e * h0 g := by
   induction e with
   | zero => simp [height_one_eq_zero hn, isMultiHomogeneous_one]
   | succ e ih =>
     obtain ⟨h1, h2, h3⟩ := ih
     refine ⟨pow_ne_zero _ hg0, ?_, ?_⟩
     · rw [pow_succ, succ_nsmul]; exact isMultiHomogeneous_mul' h2 hg
-    · rw [pow_succ, (ReciprocityTheory.MultiplicativeHeights.Closed.gauss_height_additivity K B n _ _ _ _ hn h1 hg0 h2 hg).1, h3]
-      push_cast; ring
+    · rw [pow_succ,
+        (ReciprocityTheory.MultiplicativeHeights.Closed.gauss_height_additivity K B n _ _ _ _ hn h1
+          hg0 h2 hg).1,
+        h3]
+      push_cast
+      ring
 
-theorem height_prod_pow_multiHomogeneous {K : Type} [Field K] [NumberField K] {B n : ℕ} (hn : 0 < n) {ι' : Type*}
-    (T : Finset ι') (g : ι' → MvPolynomial (Fin B × Fin n) K) (e : ι' → ℕ)
-    (hg : ∀ i ∈ T, g i ≠ 0 ∧ ∃ a, IsMultiHomogeneous a (g i)) :
-    (∏ i ∈ T, g i ^ e i) ≠ 0 ∧ (∃ a, IsMultiHomogeneous a (∏ i ∈ T, g i ^ e i)) ∧
-      h0 (∏ i ∈ T, g i ^ e i) = ∑ i ∈ T, (e i : ℝ) * h0 (g i) := by
+theorem height_prod_pow_multiHomogeneous
+    {K : Type} [Field K] [NumberField K]
+    {B n : ℕ} (hn : 0 < n)
+    {ι' : Type*} (T : Finset ι') (g : ι' → MvPolynomial (Fin B × Fin n) K) (e : ι' → ℕ)
+    (hg : ∀ i ∈ T, g i ≠ 0 ∧ ∃ a, IsMultiHomogeneous a (g i))
+    : (∏ i ∈ T, g i ^ e i) ≠ 0 ∧ (∃ a, IsMultiHomogeneous a (∏ i ∈ T, g i ^ e i))
+      ∧ h0 (∏ i ∈ T, g i ^ e i) = ∑ i ∈ T, (e i : ℝ) * h0 (g i) := by
   classical
   induction T using Finset.induction_on with
   | empty => simp [height_one_eq_zero hn]; exact ⟨0, isMultiHomogeneous_one⟩
@@ -63,15 +73,19 @@ theorem height_prod_pow_multiHomogeneous {K : Type} [Field K] [NumberField K] {B
     obtain ⟨p1, p2, p3⟩ := height_pow_multiHomogeneous hn hq0 hqa (e q)
     rw [Finset.prod_insert hq, Finset.sum_insert hq]
     refine ⟨mul_ne_zero p1 h1, ⟨_, isMultiHomogeneous_mul' p2 h2⟩, ?_⟩
-    rw [(ReciprocityTheory.MultiplicativeHeights.Closed.gauss_height_additivity K B n _ _ _ _ hn p1 h1 p2 h2).1, p3, h3]
+    rw [(ReciprocityTheory.MultiplicativeHeights.Closed.gauss_height_additivity K B n _ _ _ _ hn p1
+        h1 p2 h2).1,
+      p3, h3]
 
 namespace Data
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 variable (d : Data K ι Ω WT A)
@@ -84,9 +98,9 @@ private lemma ratio_eq_of_eq_smul' {Ω' V : Type*} [Field Ω'] [AddCommGroup V] 
   have hc := hex.choose_spec
   exact smul_left_injective Ω' hg (hc.symm.trans h)
 
-theorem ratio_linearCombination_expand (hd : d.AxH 𝒜) (x : Fin (d.N + 1) → K) (c : ι) :
-    ratio (Ω := Ω c) (d.wx x c) (d.w (d.jc c) c) =
-      ∑ j, algebraMap K (Ω c) (x j) * ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c) := by
+theorem ratio_linearCombination_expand (hd : d.AxH 𝒜) (x : Fin (d.N + 1) → K) (c : ι)
+    : ratio (Ω := Ω c) (d.wx x c) (d.w (d.jc c) c)
+      = ∑ j, algebraMap K (Ω c) (x j) * ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c) := by
   haveI := hd.tower c
   have hg : d.w (d.jc c) c ≠ 0 := hd.w_base c
   have hspan : ∀ f ∈ 𝒜 c d.wL, ∃ a : Ω c, f = a • d.w (d.jc c) c := by
@@ -97,7 +111,8 @@ theorem ratio_linearCombination_expand (hd : d.AxH 𝒜) (x : Fin (d.N + 1) → 
     obtain ⟨a, ha⟩ := (finrank_eq_one_iff_of_nonzero' _ hne).mp (hd.finrank_one c d.wL) ⟨f, hf⟩
     exact ⟨a, (congrArg Subtype.val ha).symm⟩
   choose r hr using fun j => hspan (d.w j c) (hd.w_mem j c)
-  have hrat : ∀ j, ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c) = r j := fun j => ratio_eq_of_eq_smul' hg (hr j)
+  have hrat : ∀ j, ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c) = r j := fun j =>
+    ratio_eq_of_eq_smul' hg (hr j)
   simp only [hrat]
   apply ratio_eq_of_eq_smul' hg
   rw [Finset.sum_smul]
@@ -108,16 +123,18 @@ theorem ratio_linearCombination_expand (hd : d.AxH 𝒜) (x : Fin (d.N + 1) → 
   rw [Pi.smul_apply, mul_smul, algebraMap_smul]
   conv_lhs => rw [hr j]
 
-theorem untopD_le_untopD {u v : WithTop ℤ} (hu : u ≠ ⊤) (hv : v ≠ ⊤) (h : u ≤ v) :
-    u.untopD 0 ≤ v.untopD 0 := by
+theorem untopD_le_untopD {u v : WithTop ℤ} (hu : u ≠ ⊤) (hv : v ≠ ⊤) (h : u ≤ v)
+    : u.untopD 0 ≤ v.untopD 0 := by
   lift u to ℤ using hu
   lift v to ℤ using hv
   simpa using h
 
-theorem ordMinMax_nonneg (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N + 1) → K) (c : ι)
-    (hx : d.wx x c ≠ 0) {p : Ideal (KTp K d.D d.N)} (hp : p ∈ d.HtOne)
-    {w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)} (hw : w ∈ d.GoodP c p) :
-    0 ≤ d.ordMM c (d.Wres c w) (d.wx x c) := by
+theorem ordMinMax_nonneg
+    (hd : d.AxH 𝒜) (h : d.S1)
+    (x : Fin (d.N + 1) → K) (c : ι) (hx : d.wx x c ≠ 0)
+    {p : Ideal (KTp K d.D d.N)} (hp : p ∈ d.HtOne)
+    {w : AddValuation (OmS (Ω c) d.D d.N) (WithTop ℤ)} (hw : w ∈ d.GoodP c p)
+    : 0 ≤ d.ordMM c (d.Wres c w) (d.wx x c) := by
   rcases d.PlaceTrivialOrPositive hd h c p hp w hw.1 with htr | ⟨hA, htriv, j0, hj0, hint, _⟩
   · obtain ⟨a, ha, hne⟩ := hw.2
     exact absurd (htr a ha) hne
@@ -137,26 +154,28 @@ theorem ordMinMax_nonneg (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N + 1) → K) 
     d.ratio_mul_ratio_height hd c (hd.w_mem j c) (hd.w_mem j0 c) hm hj0 hb, v.map_mul]
   exact le_add_of_nonneg_left (hint j)
 
-theorem multiplicity_nonneg (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N + 1) → K) (c : ι)
-    (hx : d.wx x c ≠ 0) {p : Ideal (KTp K d.D d.N)} (hp : p ∈ d.HtOne) :
-    0 ≤ d.nPMM h c (d.wx x c) p := by
+theorem multiplicity_nonneg
+    (hd : d.AxH 𝒜) (h : d.S1)
+    (x : Fin (d.N + 1) → K) (c : ι) (hx : d.wx x c ≠ 0)
+    {p : Ideal (KTp K d.D d.N)} (hp : p ∈ d.HtOne)
+    : 0 ≤ d.nPMM h c (d.wx x c) p := by
   unfold Data.nPMM
   apply finsum_nonneg
   intro w
   apply finsum_nonneg
   intro hw
   refine mul_nonneg ?_ (d.ordMinMax_nonneg hd h x c hx hp hw)
-  first
-    | positivity
-    | exact Nat.cast_nonneg _
+  first | positivity | exact Nat.cast_nonneg _
 
-theorem height_substituted_eq_finsum (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N + 1) → K)
-    (hx : ∀ c, d.wx x c ≠ 0) (c : ι) (F : KTp K d.D d.N)
-    (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c) :
-    d.translatedForm x F ≠ 0 ∧
-    ∑ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-        (d.nPMM h c (d.wx x c) p : ℝ) * ReciprocityTheory.MultiplicativeHeights.h0 (d.gen p) =
-      ReciprocityTheory.MultiplicativeHeights.h0 (d.translatedForm x F) := by
+theorem height_substituted_eq_finsum
+    (hd : d.AxH 𝒜)
+    (h : d.S1)
+    (x : Fin (d.N + 1) → K) (hx : ∀ c, d.wx x c ≠ 0)
+    (c : ι) (F : KTp K d.D d.N) (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c)
+    : d.translatedForm x F ≠ 0
+      ∧ ∑ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+            (d.nPMM h c (d.wx x c) p : ℝ) * ReciprocityTheory.MultiplicativeHeights.h0 (d.gen p)
+        = ReciprocityTheory.MultiplicativeHeights.h0 (d.translatedForm x F) := by
   classical
   have hmem := d.linearCombination_mem_section hd x c
   obtain ⟨κ1, hκ1, e1⟩ := d.SpecialFibreFactorization hd h c F hF x (hx c)
@@ -173,10 +192,12 @@ theorem height_substituted_eq_finsum (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N 
   set e : Ideal (KTp K d.D d.N) → ℕ := fun p => (n p).toNat with he
   have hne : ∀ p ∈ d.HtOne, n p = (e p : ℤ) := fun p hp =>
     (Int.toNat_of_nonneg (d.multiplicity_nonneg hd h x c (hx c) hp)).symm
-  obtain ⟨P0, ⟨aP, hPm⟩, hPh⟩ := height_prod_pow_multiHomogeneous (K := K) (Nat.succ_pos d.N) T (fun p => d.gen p) e hgood
-  have hprod : (∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-      algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ n p) =
-      algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (∏ p ∈ T, d.gen p ^ e p) := by
+  obtain ⟨P0, ⟨aP, hPm⟩, hPh⟩ :=
+    height_prod_pow_multiHomogeneous (K := K) (Nat.succ_pos d.N) T (fun p => d.gen p) e hgood
+  have hprod
+      : (∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+          algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ n p)
+        = algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (∏ p ∈ T, d.gen p ^ e p) := by
     rw [finprod_mem_eq_prod_of_inter_mulSupport_eq _ (t := T), map_prod]
     · refine Finset.prod_congr rfl fun p hpT => ?_
       rw [hne p ((hT p).mp hpT).1, zpow_natCast, map_pow]
@@ -193,8 +214,10 @@ theorem height_substituted_eq_finsum (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N 
     rw [e1, hprod, map_mul, ← MvPolynomial.algebraMap_eq,
       ← IsScalarTower.algebraMap_apply K (KTp K d.D d.N) (KTf K d.D d.N)]
   refine ⟨by rw [hFx]; exact mul_ne_zero (MvPolynomial.C_ne_zero.mpr hκ1) P0, ?_⟩
-  rw [hFx, (ReciprocityTheory.MultiplicativeHeights.Closed.gauss_height_additivity K (d.D + 1) (d.N + 1) aP aP _ _ (Nat.succ_pos _) P0 P0 hPm hPm).2
-    κ1 hκ1, hPh]
+  rw [hFx,
+    (ReciprocityTheory.MultiplicativeHeights.Closed.gauss_height_additivity K (d.D + 1) (d.N + 1) aP
+      aP _ _ (Nat.succ_pos _) P0 P0 hPm hPm).2 κ1 hκ1,
+    hPh]
   rw [finsum_mem_eq_sum_of_inter_support_eq _ (t := T)]
   · refine Finset.sum_congr rfl fun p hpT => ?_
     rw [show ((d.nPMM h c (d.wx x c) p : ℤ) : ℝ) = ((e p : ℤ) : ℝ) from
@@ -205,19 +228,21 @@ theorem height_substituted_eq_finsum (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N 
     constructor
     · rintro ⟨hp, h1⟩
       refine ⟨⟨hp, fun h0 => h1 ?_⟩, h1⟩
-      simp only [hn] at h0; rw [h0]; simp
+      simp only [hn] at h0
+      rw [h0]
+      simp
     · rintro ⟨⟨hp, _⟩, h1⟩; exact ⟨hp, h1⟩
 
-theorem fZ_and_substituted_ne_zero (hd : d.AxH 𝒜) (h : d.S1) (x : Fin (d.N + 1) → K)
-    (hx : ∀ c, d.wx x c ≠ 0) (c : ι) (F : KTp K d.D d.N)
-    (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c) :
-    F ≠ 0 ∧ d.translatedForm x F ≠ 0 := by
+theorem fZ_and_substituted_ne_zero
+    (hd : d.AxH 𝒜)
+    (h : d.S1)
+    (x : Fin (d.N + 1) → K) (hx : ∀ c, d.wx x c ≠ 0)
+    (c : ι) (F : KTp K d.D d.N) (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c)
+    : F ≠ 0 ∧ d.translatedForm x F ≠ 0 := by
   have hne := (d.height_substituted_eq_finsum hd h x hx c F hF).1
   refine ⟨fun h0 => hne ?_, hne⟩
   rw [h0]
-  first
-    | simp [Data.translatedForm]
-    | exact map_zero _
+  first | simp [Data.translatedForm] | exact map_zero _
 
 end Data
 

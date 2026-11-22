@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem padicNorm_prime_mul_sq_ne_sq (p : ℕ) [hp : Fact p.Prime] (s t : ℚ) (ht : t ≠ 0) :
-    padicNorm p (s ^ 2) ≠ padicNorm p ((p : ℚ) * t ^ 2) := by
+theorem padicNorm_prime_mul_sq_ne_sq (p : ℕ) [hp : Fact p.Prime] (s t : ℚ) (ht : t ≠ 0)
+    : padicNorm p (s ^ 2) ≠ padicNorm p ((p : ℚ) * t ^ 2) := by
   have hp0 : (p : ℚ) ≠ 0 := by exact_mod_cast hp.out.ne_zero
   have hp1 : (1 : ℚ) < p := by exact_mod_cast hp.out.one_lt
   have hpt : (p : ℚ) * t ^ 2 ≠ 0 := mul_ne_zero hp0 (pow_ne_zero _ ht)
@@ -18,15 +18,16 @@ theorem padicNorm_prime_mul_sq_ne_sq (p : ℕ) [hp : Fact p.Prime] (s t : ℚ) (
     exact padicNorm.nonzero hpt h.symm
   · intro h
     rw [padicNorm.eq_zpow_of_nonzero (pow_ne_zero _ hs), padicNorm.eq_zpow_of_nonzero hpt,
-      padicValRat.mul hp0 (pow_ne_zero _ ht), padicValRat.pow s, padicValRat.pow t,
-      padicValRat.self hp.out.one_lt] at h
+        padicValRat.mul hp0 (pow_ne_zero _ ht), padicValRat.pow s, padicValRat.pow t,
+        padicValRat.self hp.out.one_lt]
+      at h
     have := zpow_right_injective₀ (by linarith) hp1.ne' h
     push_cast at this
     omega
 
-theorem padicNorm_of_sq_add_prime_mul_sq (p : ℕ) [hp : Fact p.Prime] (s t : ℚ)
-    (h : padicNorm p (s ^ 2 + (p : ℚ) * t ^ 2) = 1) :
-    padicNorm p s ≤ 1 ∧ padicNorm p ((p : ℚ) * t ^ 2) < 1 := by
+theorem padicNorm_of_sq_add_prime_mul_sq
+    (p : ℕ) [hp : Fact p.Prime] (s t : ℚ) (h : padicNorm p (s ^ 2 + (p : ℚ) * t ^ 2) = 1)
+    : padicNorm p s ≤ 1 ∧ padicNorm p ((p : ℚ) * t ^ 2) < 1 := by
   have key : padicNorm p (s ^ 2) ≤ 1 ∧ padicNorm p ((p : ℚ) * t ^ 2) < 1 := by
     by_cases ht : t = 0
     · subst ht
@@ -42,8 +43,23 @@ theorem padicNorm_of_sq_add_prime_mul_sq (p : ℕ) [hp : Fact p.Prime] (s t : �
   have := padicNorm.nonneg (p := p) s
   nlinarith
 
-theorem selfDual_lattice_exists_norm_one_mod :
-    ∀ (K V : Type) [Field K] [CharZero K] [AddCommGroup V] [Module K V] (σ : K →+* K) (h : V →ₗ[K] V →ₛₗ[σ] K) (p d : ℕ) (θ : K) (O : Subring K) (L : AddSubgroup V), p.Prime → d.Prime → θ ^ 2 = -(d : K) → σ θ = -θ → (∀ x : K, ∃ a b : ℚ, x = (a : K) + (b : K) * θ) → (∀ x ∈ O, σ x ∈ O) → (1 + θ) / 2 ∈ O → (∀ r : ℚ, (r : K) ∈ O ↔ padicNorm p r ≤ 1) → (∀ x y : V, h y x = σ (h x y)) → (∀ x : V, h x x = 0 → x = 0) → (∀ a ∈ O, ∀ x ∈ L, a • x ∈ L) → (∀ x ∈ L, ∀ y ∈ L, h x y ∈ O) → (∀ x : V, ∃ m : ℕ, (p : K) ^ m • x ∈ L) → (∀ u v : ℚ, padicNorm p u = 1 → padicNorm p v = 1 → ∃ a b : ℤ, padicNorm p (u * (a : ℚ) ^ 2 + v * (b : ℚ) ^ 2 - 1) < 1) → (∀ W : Submodule K V, (∀ x ∈ W, (∀ y ∈ L, y ∈ W → h x y ∈ O) → x ∈ L) → (∃ x ∈ W, x ≠ 0) → ∃ y ∈ L, y ∈ W ∧ ∃ u : ℚ, h y y = (u : K) ∧ padicNorm p u = 1) → ∀ W : Submodule K V, (∀ x ∈ W, (∀ y ∈ L, y ∈ W → h x y ∈ O) → x ∈ L) → (∃ e ∈ W, h e e = 1) → ∃ y ∈ L, y ∈ W ∧ ∃ u : ℚ, h y y = (u : K) ∧ padicNorm p (u - 1) < 1 := by
+theorem selfDual_lattice_exists_norm_one_mod
+    : ∀ (K V : Type) [Field K] [CharZero K] [AddCommGroup V] [Module K V] (σ : K →+* K)
+        (h : V →ₗ[K] V →ₛₗ[σ] K) (p d : ℕ) (θ : K) (O : Subring K) (L : AddSubgroup V),
+      p.Prime → d.Prime → θ ^ 2 = -(d : K) → σ θ = -θ
+        → (∀ x : K, ∃ a b : ℚ, x = (a : K) + (b : K) * θ) → (∀ x ∈ O, σ x ∈ O) → (1 + θ) / 2 ∈ O
+        → (∀ r : ℚ, (r : K) ∈ O ↔ padicNorm p r ≤ 1) → (∀ x y : V, h y x = σ (h x y))
+        → (∀ x : V, h x x = 0 → x = 0) → (∀ a ∈ O, ∀ x ∈ L, a • x ∈ L)
+        → (∀ x ∈ L, ∀ y ∈ L, h x y ∈ O) → (∀ x : V, ∃ m : ℕ, (p : K) ^ m • x ∈ L)
+        → (∀ u v : ℚ,
+          padicNorm p u = 1 → padicNorm p v = 1
+            → ∃ a b : ℤ, padicNorm p (u * (a : ℚ) ^ 2 + v * (b : ℚ) ^ 2 - 1) < 1)
+        → (∀ W : Submodule K V,
+          (∀ x ∈ W, (∀ y ∈ L, y ∈ W → h x y ∈ O) → x ∈ L) → (∃ x ∈ W, x ≠ 0)
+            → ∃ y ∈ L, y ∈ W ∧ ∃ u : ℚ, h y y = (u : K) ∧ padicNorm p u = 1)
+        → ∀ W : Submodule K V,
+          (∀ x ∈ W, (∀ y ∈ L, y ∈ W → h x y ∈ O) → x ∈ L) → (∃ e ∈ W, h e e = 1)
+            → ∃ y ∈ L, y ∈ W ∧ ∃ u : ℚ, h y y = (u : K) ∧ padicNorm p (u - 1) < 1 := by
   intro K V _ _ _ _ σ h p d θ O L hp hd hθ hσθ hK hσO hω hO hh hdef hL hLO hbig hab hun W hW
     ⟨e, heW, he⟩
   haveI : Fact p.Prime := ⟨hp⟩
@@ -69,11 +85,13 @@ theorem selfDual_lattice_exists_norm_one_mod :
     simp only [map_sub, map_smul, LinearMap.sub_apply, LinearMap.smul_apply, smul_eq_mul, hu1]
     field_simp
     ring
-  have hnorm : ∀ s t : ℚ, h (((s : K) + (t : K) * θ) • y1) (((s : K) + (t : K) * θ) • y1)
-      = (((s ^ 2 + (d : ℚ) * t ^ 2) * u1 : ℚ) : K) := by
+  have hnorm
+      : ∀ s t : ℚ,
+        h (((s : K) + (t : K) * θ) • y1) (((s : K) + (t : K) * θ) • y1)
+          = (((s ^ 2 + (d : ℚ) * t ^ 2) * u1 : ℚ) : K) := by
     intro s t
-    simp only [map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul, hu1, map_add (f := _),
-      map_mul, map_ratCast, hσθ]
+    simp only [map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul, hu1,
+      map_add (f := _), map_mul, map_ratCast, hσθ]
     push_cast
     linear_combination (-(t : K) ^ 2 * (u1 : K)) * hθ
   set W' : Submodule K V := W ⊓ LinearMap.ker (h.flip y1) with hW'
@@ -85,17 +103,23 @@ theorem selfDual_lattice_exists_norm_one_mod :
       intro x hx hxO
       obtain ⟨hxW, hx1⟩ := (hmem x).1 hx
       refine hW x hxW fun y hyL hyW => ?_
-      have := hxO (y - (h y y1 * (u1 : K)⁻¹) • y1)
-        (L.sub_mem hyL (hL _ (O.mul_mem (hLO _ hyL _ hy1L) hinv) _ hy1L))
-        ((hmem _).2 ⟨W.sub_mem hyW (W.smul_mem _ hy1W), hperp y⟩)
+      have :=
+        hxO (y - (h y y1 * (u1 : K)⁻¹) • y1)
+          (L.sub_mem hyL (hL _ (O.mul_mem (hLO _ hyL _ hy1L) hinv) _ hy1L))
+          ((hmem _).2 ⟨W.sub_mem hyW (W.smul_mem _ hy1W), hperp y⟩)
       simpa [map_sub, LinearMap.map_smulₛₗ, hx1] using this
     obtain ⟨y2, hy2L, hy2W', u2, hu2, hu2n⟩ := hun W' hsd hne
     obtain ⟨hy2W, h21⟩ := (hmem y2).1 hy2W'
     have h12 : h y1 y2 = 0 := by rw [hh, h21, map_zero]
     obtain ⟨a, b, hab'⟩ := hab u1 u2 hu1n hu2n
-    refine ⟨(a : K) • y1 + (b : K) • y2,
+    refine ⟨
+      (a : K) • y1 + (b : K) • y2,
       L.add_mem (hL _ (intCast_mem O a) _ hy1L) (hL _ (intCast_mem O b) _ hy2L),
-      W.add_mem (W.smul_mem _ hy1W) (W.smul_mem _ hy2W), _, ?_, hab'⟩
+      W.add_mem (W.smul_mem _ hy1W) (W.smul_mem _ hy2W),
+      _,
+      ?_,
+      hab'
+    ⟩
     simp only [map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply,
       LinearMap.map_smulₛₗ, smul_eq_mul, hu1, hu2, h12, h21, map_intCast]
     push_cast

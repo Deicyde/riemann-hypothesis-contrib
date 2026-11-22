@@ -11,14 +11,16 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MvPolynomial
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  MvPolynomial
 
 noncomputable section
 
 namespace PullSectionIntegralInt
 
-theorem aeval_mem_of_forall {σ Ω : Type} [Field Ω] (V : Subring Ω) (y' : σ → Ω) (hy : ∀ p, y' p ∈ V)
-    (b : MvPolynomial σ ℤ) : aeval y' b ∈ V := by
+theorem aeval_mem_of_forall
+    {σ Ω : Type} [Field Ω] (V : Subring Ω) (y' : σ → Ω) (hy : ∀ p, y' p ∈ V) (b : MvPolynomial σ ℤ)
+    : aeval y' b ∈ V := by
   induction b using MvPolynomial.induction_on with
   | C a => simp
   | add p q hp hq => rw [map_add (f := _)]; exact V.add_mem hp hq
@@ -40,8 +42,8 @@ theorem proof : PullSectionIntegralInt.Statement := by
   have hmax : ∀ k, ∃ c : ι k, ∀ i, V.valuation (y ⟨k, i⟩) ≤ V.valuation (y ⟨k, c⟩) := by
     intro k
     obtain ⟨i0, -⟩ := hrel k
-    obtain ⟨c, -, hc⟩ := Finset.exists_max_image Finset.univ (fun i => V.valuation (y ⟨k, i⟩))
-      ⟨i0, Finset.mem_univ _⟩
+    obtain ⟨c, -, hc⟩ :=
+      Finset.exists_max_image Finset.univ (fun i => V.valuation (y ⟨k, i⟩)) ⟨i0, Finset.mem_univ _⟩
     exact ⟨c, fun i => hc i (Finset.mem_univ _)⟩
   choose c hc using hmax
   have hc0 : ∀ k, y ⟨k, c k⟩ ≠ 0 := by
@@ -67,7 +69,8 @@ theorem proof : PullSectionIntegralInt.Statement := by
   have : IsIntegrallyClosedIn V.toSubring Ω := inferInstanceAs (IsIntegrallyClosedIn V Ω)
   have hxV : s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * ((q * e k : ℕ) : ℤ))) ∈ V.toSubring :=
     (Subring.integralClosure_le_iff (R := chartRingZ y c) (T := V.toSubring)).mpr
-      (fun r => hchart r.2) (hs c hc0)
+      (fun r => hchart r.2)
+      (hs c hc0)
   have hprod : ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * ((q * e k : ℕ) : ℤ))) = (Mc ^ (q * τ))⁻¹ := by
     rw [← Finset.prod_pow, ← Finset.prod_inv_distrib]
     refine Finset.prod_congr rfl fun k _ => ?_
@@ -79,7 +82,9 @@ theorem proof : PullSectionIntegralInt.Statement := by
   have hd : ∀ k, e k + N * Fintype.card (ι k) ≤ ((w + 1) • e) k := by
     intro k
     have h1 : Fintype.card (ι k) ≤ ∑ k, Fintype.card (ι k) :=
-      Finset.single_le_sum (f := fun k => Fintype.card (ι k)) (fun _ _ => Nat.zero_le _)
+      Finset.single_le_sum
+        (f := fun k => Fintype.card (ι k))
+        (fun _ _ => Nat.zero_le _)
         (Finset.mem_univ k)
     have h2 : N * Fintype.card (ι k) ≤ w := Nat.mul_le_mul_left N h1
     have h3 : w ≤ w * e k := Nat.le_mul_of_pos_right w (he k)
@@ -104,9 +109,10 @@ theorem proof : PullSectionIntegralInt.Statement := by
     refine Finset.prod_congr rfl fun k _ => ?_
     rw [inv_pow, ← pow_mul, mul_comm]
 
-  have hsum : Mc / ℓ = (M : Ω)⁻¹ * ∑ i, aeval (fun p => t p.1 * y p) (a i) * (aeval y (L i) / ℓ) := by
-    have : ∑ i, aeval (fun p => t p.1 * y p) (a i) * (aeval y (L i) / ℓ) =
-        (Mc ^ w)⁻¹ * (∑ i, aeval y (a i) * aeval y (L i)) / ℓ := by
+  have hsum
+      : Mc / ℓ = (M : Ω)⁻¹ * ∑ i, aeval (fun p => t p.1 * y p) (a i) * (aeval y (L i) / ℓ) := by
+    have : ∑ i, aeval (fun p => t p.1 * y p) (a i) * (aeval y (L i) / ℓ)
+        = (Mc ^ w)⁻¹ * (∑ i, aeval y (a i) * aeval y (L i)) / ℓ := by
       simp only [hscale, Finset.mul_sum, Finset.sum_div]
       refine Finset.sum_congr rfl fun i _ => ?_
       ring
@@ -115,8 +121,11 @@ theorem proof : PullSectionIntegralInt.Statement := by
     ring
   have hMV : Mc / ℓ ∈ V := by
     rw [hsum]
-    refine mul_mem (hBV _ (Algebra.subset_adjoin (Set.mem_insert _ _))) (sum_mem fun i _ => mul_mem ?_ ?_)
-    · exact aeval_mem_of_forall V.toSubring _ (fun p => by simpa [t, div_eq_inv_mul] using hratio p) (a i)
+    refine mul_mem (hBV _ (Algebra.subset_adjoin (Set.mem_insert _ _)))
+      (sum_mem fun i _ => mul_mem ?_ ?_)
+    · exact aeval_mem_of_forall V.toSubring _
+        (fun p => by simpa [t, div_eq_inv_mul] using hratio p)
+        (a i)
     · exact hBV _ (Algebra.subset_adjoin (Set.mem_insert_of_mem _ ⟨i, rfl⟩))
   apply htV
   have hMn : Mc ^ (q * τ) ≠ 0 := pow_ne_zero _ hMc0

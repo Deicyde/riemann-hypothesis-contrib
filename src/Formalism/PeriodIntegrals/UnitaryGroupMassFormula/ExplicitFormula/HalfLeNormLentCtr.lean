@@ -167,9 +167,12 @@ lemma le_exp_Mfun {A C : ℝ} (hC : 0 < C) (N : ℕ) [NeZero N] (t : ℝ) :
       _ ≤ _ := Real.exp_le_exp.mpr (le_abs_self _)
   exact mul_le_mul_of_nonneg_right h2C (Real.exp_pos _).le
 
-theorem Lent_disc_bound {A C : ℝ} (hA : 0 < A) (hC : 0 < C) (hG : LGrowth A C) (hI : PI.LInvRight)
-    {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive) (t : ℝ) :
-    ∀ z ∈ closedBall (ctr t) 6, ‖Lent χ z‖ ≤ Real.exp (Mfun A C N t) * ‖Lent χ (ctr t)‖ := by
+theorem Lent_disc_bound
+    {A C : ℝ} (hA : 0 < A) (hC : 0 < C) (hG : LGrowth A C)
+    (hI : PI.LInvRight)
+    {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive)
+    (t : ℝ)
+    : ∀ z ∈ closedBall (ctr t) 6, ‖Lent χ z‖ ≤ Real.exp (Mfun A C N t) * ‖Lent χ (ctr t)‖ := by
   intro z hz
   have hz' : ‖z - ctr t‖ ≤ 6 := by rwa [Metric.mem_closedBall, dist_eq_norm] at hz
   have hre := (Complex.abs_re_le_norm (z - ctr t)).trans hz'

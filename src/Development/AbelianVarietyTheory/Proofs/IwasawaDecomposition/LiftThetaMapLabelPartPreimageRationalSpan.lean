@@ -14,22 +14,31 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanR
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3
+open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
+  GlobalTheory.Mem.R3
 open Classical
 open GlobalTheory.Mem.R3.HasLabelling
 
 namespace GlobalTheory.Mem.R3.PartSpan
 
-theorem mem_span_rat {K V E : Type} [Field K] [AddCommGroup V] [Module ℂ V] [AddCommGroup E] [Module ℂ E]
-    {τ : K →+* ℂ} {n : ℕ} (u : (Fin n → K) →ₛₗ[τ] V) (Φ : V →ₗ[ℂ] E) (P : Submodule ℂ E)
+theorem mem_span_rat
+    {K V E : Type} [Field K] [AddCommGroup V] [Module ℂ V] [AddCommGroup E] [Module ℂ E]
+    {τ : K →+* ℂ} {n : ℕ} (u : (Fin n → K) →ₛₗ[τ] V)
+    (Φ : V →ₗ[ℂ] E) (P : Submodule ℂ E)
     (hinj : ∀ c : Fin n → ℂ, Φ (∑ k, c k • u (Pi.single k 1)) = 0 → c = 0)
-    (hspan : ∀ c : Fin n → ℂ, Φ (∑ k, c k • u (Pi.single k 1)) ∈ P →
-      Φ (∑ k, c k • u (Pi.single k 1)) ∈ Submodule.span ℂ (Φ '' {y | ∃ a, Φ (u a) ∈ P ∧ u a = y}))
-    (x : V) (hx : x ∈ Submodule.span ℂ (Set.range u)) (hP : Φ x ∈ P) :
-    x ∈ Submodule.span ℂ {y | ∃ a, Φ (u a) ∈ P ∧ u a = y} := by
+    (hspan : ∀ c : Fin n → ℂ,
+      Φ (∑ k, c k • u (Pi.single k 1)) ∈ P
+        → Φ (∑ k, c k • u (Pi.single k 1))
+          ∈ Submodule.span ℂ (Φ '' {y | ∃ a, Φ (u a) ∈ P ∧ u a = y}))
+    (x : V) (hx : x ∈ Submodule.span ℂ (Set.range u)) (hP : Φ x ∈ P)
+    : x ∈ Submodule.span ℂ {y | ∃ a, Φ (u a) ∈ P ∧ u a = y} := by
   have hexp : ∀ a : Fin n → K, u a = ∑ k, τ (a k) • u (Pi.single k 1) := by
     intro a
     have ha : a = ∑ k, a k • (Pi.single k 1 : Fin n → K) := by
@@ -37,10 +46,14 @@ theorem mem_span_rat {K V E : Type} [Field K] [AddCommGroup V] [Module ℂ V] [A
       simp [Finset.sum_apply, Pi.single_apply]
     conv_lhs => rw [ha]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smulₛₗ]
-  have hsp : ∀ z ∈ Submodule.span ℂ (Set.range u), ∃ c : Fin n → ℂ, z = ∑ k, c k • u (Pi.single k 1) := by
+    simp only [map_sum, map_smulₛₗ]
+  have hsp
+      : ∀ z ∈ Submodule.span ℂ (Set.range u), ∃ c : Fin n → ℂ,
+        z = ∑ k, c k • u (Pi.single k 1) := by
     intro z hz
-    have hle : Submodule.span ℂ (Set.range u) ≤ Submodule.span ℂ (Set.range fun k => u (Pi.single k 1)) := by
+    have hle
+        : Submodule.span ℂ (Set.range u)
+          ≤ Submodule.span ℂ (Set.range fun k => u (Pi.single k 1)) := by
       rw [Submodule.span_le]
       rintro _ ⟨a, rfl⟩
       rw [SetLike.mem_coe, hexp]
@@ -59,7 +72,6 @@ theorem mem_span_rat {K V E : Type} [Field K] [AddCommGroup V] [Module ℂ V] [A
     simp only [Pi.sub_apply, sub_smul, Finset.sum_sub_distrib, map_sub, hwe, sub_self]
   rw [sub_eq_zero.1 hcd]
   exact hw
-
 
 set_option maxHeartbeats 4000000 in
 theorem mem_span_part : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type) (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat3 D A3 Ks) (F : Face3 D A3) (cG : G0 R.Pg D.R.r ≃* G0g D.nd) (X0 : BaseLevelRowSide D) (Y : Read (A3 := A3) R.toRealDat F.lv2 X0) (Z : ReadL R F X0 Y), Pins R F cG → Holds R F → ∀ (i : Fin D.R.m) (t : T) (p : A3.fam3.base3.Ix), ∀ x ∈ Submodule.span ℂ (Set.range fun a => D.what₂.jMt (Y.tup t) ((i : ℕ) + 1) (Y.eMt i t (lZ0 D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t *ᵥ a))), Y.mj.eW i (D.what₂.thetaP (Y.tup t) ((i : ℕ) + 1) x) ∈ R.Wp3 i p → x ∈ Submodule.span ℂ {y | ∃ a, Y.mj.eW i (D.what₂.thetaP (Y.tup t) ((i : ℕ) + 1) (D.what₂.jMt (Y.tup t) ((i : ℕ) + 1) (Y.eMt i t (lZ0 D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t *ᵥ a)))) ∈ R.Wp3 i p ∧ D.what₂.jMt (Y.tup t) ((i : ℕ) + 1) (Y.eMt i t (lZ0 D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t *ᵥ a)) = y} := by

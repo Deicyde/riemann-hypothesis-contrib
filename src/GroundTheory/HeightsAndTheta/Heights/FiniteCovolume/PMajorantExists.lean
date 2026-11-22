@@ -12,9 +12,10 @@ open scoped ComplexOrder
 
 noncomputable section
 
-theorem exists_posDef_mul_inv_mul_eq {n : Type*} [Fintype n] [DecidableEq n] {H : Matrix n n ℂ}
-    (hH : H.IsHermitian) (hdet : IsUnit H.det) :
-    ∃ P : Matrix n n ℂ, P.PosDef ∧ P * H⁻¹ * P = H := by
+theorem exists_posDef_mul_inv_mul_eq
+    {n : Type*} [Fintype n] [DecidableEq n]
+    {H : Matrix n n ℂ} (hH : H.IsHermitian) (hdet : IsUnit H.det)
+    : ∃ P : Matrix n n ℂ, P.PosDef ∧ P * H⁻¹ * P = H := by
   set U : Matrix n n ℂ := (hH.eigenvectorUnitary : Matrix n n ℂ) with hUdef
   set d : n → ℝ := hH.eigenvalues with hddef
   have hUU : star U * U = 1 := Unitary.coe_star_mul_self _
@@ -56,7 +57,9 @@ theorem exists_posDef_mul_inv_mul_eq {n : Type*} [Fintype n] [DecidableEq n] {H 
     funext i
     rw [← Complex.ofReal_mul, ← Complex.ofReal_mul]
     congr 1
-    calc |d i| * (d i)⁻¹ * |d i| = |d i| * |d i| * (d i)⁻¹ := by ring
+    calc
+      |d i| * (d i)⁻¹ * |d i|
+        = |d i| * |d i| * (d i)⁻¹ := by ring
       _ = d i * d i * (d i)⁻¹ := by rw [abs_mul_abs_self]
       _ = d i := mul_inv_cancel_right₀ (hd i) _
 
@@ -65,8 +68,9 @@ section Spaces
 variable {F E : Type*} [Field F] [Field E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-theorem MajorantExists.proof (h : HermitianForm F E W) (v : Basis ι E W)
-    (h₁ : GramAtData.Statement h v) : MajorantExists.Statement h v := by
+theorem MajorantExists.proof
+    (h : HermitianForm F E W) (v : Basis ι E W) (h₁ : GramAtData.Statement h v)
+    : MajorantExists.Statement h v := by
   choose P hP hPH using fun w => exists_posDef_mul_inv_mul_eq (h₁ w).1 (h₁ w).2
   exact ⟨⟨P, hP, hPH⟩⟩
 

@@ -15,26 +15,32 @@ open PowerSeries
 
 section Pure
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 
 def deA (l b₀ y : ℕ) : ℕ :=
-  (b₀ / l + 1) - min (b₀ / l + 1) (y - 1) + padicValNat l ((b₀ / l + 1).choose (min (b₀ / l + 1) (y - 1)))
+  (b₀ / l + 1) - min (b₀ / l + 1) (y - 1)
+    + padicValNat l ((b₀ / l + 1).choose (min (b₀ / l + 1) (y - 1)))
 
-theorem expand (l a : ℕ) {P Q w ε : O⟦X⟧} (hP : P = C (l : O) * ε + w * Q ^ l) (x : O) :
-    C x * (w * Q ^ l) ^ a =
-      ∑ i ∈ Finset.range (a + 1), (-ε) ^ (a - i) * C (x * ((a.choose i : O) * (l : O) ^ (a - i))) * P ^ i := by
-  have hw : w * Q ^ l = P + (-(C (l : O) * ε)) := by rw [hP]; ring
-  rw [hw, add_pow, Finset.mul_sum]
-  refine Finset.sum_congr rfl fun i _ => ?_
-  simp only [map_mul, map_pow, map_natCast]
-  ring
+theorem expand (l a : ℕ) {P Q w ε : O⟦X⟧} (hP : P = C (l : O) * ε + w * Q ^ l) (x : O)
+    : C x * (w * Q ^ l) ^ a
+      = ∑ i ∈ Finset.range (a + 1), (-ε) ^ (a - i) * C (x * ((a.choose i : O) * (l : O) ^ (a - i))) * P ^ i :=
+  by
+    have hw : w * Q ^ l = P + (-(C (l : O) * ε)) := by rw [hP]; ring
+    rw [hw, add_pow, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    simp only [map_mul, map_pow, map_natCast]
+    ring
 
-theorem content_div {l : ℕ} [hlp : Fact l.Prime] (hl : (l : O) ∈ IsLocalRing.maximalIdeal O)
-    (hl0 : (l : O) ≠ 0) {P Q w ε U₀ U₁ : O⟦X⟧} (hε : IsUnit ε)
-    (hP : P = C (l : O) * ε + w * Q ^ l) (hPd : IsDist P) (hPw : 1 ≤ wdeg P) (b₀ y κ : ℕ) (hy : 1 ≤ y)
-    (x : O) (heq : C (l : O) ^ κ * U₀ - Q ^ b₀ * C x = P ^ y * U₁) :
-    ∃ x' : O, x = (l : O) ^ (κ - deA l b₀ y) * x' := by
+theorem content_div
+    {l : ℕ} [hlp : Fact l.Prime]
+    (hl : (l : O) ∈ IsLocalRing.maximalIdeal O) (hl0 : (l : O) ≠ 0)
+    {P Q w ε U₀ U₁ : O⟦X⟧}
+    (hε : IsUnit ε) (hP : P = C (l : O) * ε + w * Q ^ l) (hPd : IsDist P) (hPw : 1 ≤ wdeg P)
+    (b₀ y κ : ℕ) (hy : 1 ≤ y)
+    (x : O) (heq : C (l : O) ^ κ * U₀ - Q ^ b₀ * C x = P ^ y * U₁)
+    : ∃ x' : O, x = (l : O) ^ (κ - deA l b₀ y) * x' := by
   classical
   by_cases hx0 : x = 0
   · exact ⟨0, by rw [hx0, mul_zero]⟩
@@ -46,27 +52,35 @@ theorem content_div {l : ℕ} [hlp : Fact l.Prime] (hl : (l : O) ∈ IsLocalRing
   have hla : b₀ ≤ l * a := by
     have h1 := Nat.div_add_mod b₀ l
     have h2 := Nat.mod_lt b₀ hlp.out.pos
-    rw [ha, mul_add, mul_one]; omega
+    rw [ha, mul_add, mul_one]
+    omega
   have hmem : C x * (w * Q ^ l) ^ a ∈ Ideal.span {P ^ y, C ϖ ^ (E * κ)} := by
     have h1 : Q ^ b₀ * C x ∈ Ideal.span {P ^ y, C ϖ ^ (E * κ)} := by
       have e : Q ^ b₀ * C x = C ((v : O) ^ κ) * C ϖ ^ (E * κ) * U₀ - P ^ y * U₁ := by
         rw [← heq, hv]; simp only [map_mul, map_pow]; ring
       rw [e]
-      refine Ideal.sub_mem _ (Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _
-        (Ideal.subset_span (Set.mem_insert_of_mem _ rfl)))) (Ideal.mul_mem_right _ _
-        (Ideal.subset_span (Set.mem_insert _ _)))
+      refine Ideal.sub_mem _
+        (Ideal.mul_mem_right _ _
+          (Ideal.mul_mem_left _ _ (Ideal.subset_span (Set.mem_insert_of_mem _ rfl))))
+        (Ideal.mul_mem_right _ _ (Ideal.subset_span (Set.mem_insert _ _)))
     have h2 : C x * (w * Q ^ l) ^ a = w ^ a * Q ^ (l * a - b₀) * (Q ^ b₀ * C x) := by
-      have hsplit : Q ^ (l * a) = Q ^ (l * a - b₀) * Q ^ b₀ := by rw [← pow_add, Nat.sub_add_cancel hla]
-      rw [mul_pow, ← pow_mul, hsplit]; ring
-    rw [h2]; exact Ideal.mul_mem_left _ _ h1
+      have hsplit : Q ^ (l * a) = Q ^ (l * a - b₀) * Q ^ b₀ := by
+        rw [← pow_add, Nat.sub_add_cancel hla]
+      rw [mul_pow, ← pow_mul, hsplit]
+      ring
+    rw [h2]
+    exact Ideal.mul_mem_left _ _ h1
   rw [expand l a hP x] at hmem
   have hu : ∀ i ∈ Finset.range (a + 1), IsUnit ((-ε) ^ (a - i)) := fun i _ => hε.neg.pow _
   have hc : ∀ i ∈ Finset.range (a + 1), x * ((a.choose i : O) * (l : O) ^ (a - i)) ≠ 0 := by
     intro i hi
     exact mul_ne_zero hx0 (ContPA.coef_ne_zero hl hl0 (Nat.lt_succ_iff.mp (Finset.mem_range.mp hi)))
-  have key := (Mprime hϖ hPd hPw (Finset.range (a + 1)) (fun i => (-ε) ^ (a - i)) hu
-    (fun i => x * ((a.choose i : O) * (l : O) ^ (a - i))) hc y (E * κ)).mp hmem i₀
-    (Finset.mem_range.mpr (by omega)) (by omega)
+  have key :=
+    (Mprime hϖ hPd hPw (Finset.range (a + 1))
+      (fun i => (-ε) ^ (a - i))
+      hu
+      (fun i => x * ((a.choose i : O) * (l : O) ^ (a - i)))
+      hc y (E * κ)).mp hmem i₀ (Finset.mem_range.mpr (by omega)) (by omega)
   rw [IsDiscreteValuationRing.addVal_mul, ContPA.addVal_coef hl hl0 (by omega : i₀ ≤ a)] at key
   have hde : deA l b₀ y = a - i₀ + padicValNat l (a.choose i₀) := rfl
   have hdiv : ϖ ^ (E * (κ - deA l b₀ y)) ∣ x := by
@@ -95,8 +109,8 @@ theorem content_div {l : ℕ} [hlp : Fact l.Prime] (hl : (l : O) ∈ IsLocalRing
   linear_combination (-(ϖ ^ (E * (κ - deA l b₀ y)) * x')) * hvv
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (IsLocalRing.maximalIdeal O) O] in
-theorem deA_le {l : ℕ} [hlp : Fact l.Prime] (b₀ y : ℕ) (hy : 1 ≤ y) (hb : 1 ≤ b₀) :
-    (deA l b₀ y : ℝ) ≤ max 0 ((b₀ : ℝ) / l - y + 2 + Real.logb l b₀) + 1 := by
+theorem deA_le {l : ℕ} [hlp : Fact l.Prime] (b₀ y : ℕ) (hy : 1 ≤ y) (hb : 1 ≤ b₀)
+    : (deA l b₀ y : ℝ) ≤ max 0 ((b₀ : ℝ) / l - y + 2 + Real.logb l b₀) + 1 := by
   have hl2 : 2 ≤ l := hlp.out.two_le
   have hfl : ((b₀ / l : ℕ) : ℝ) ≤ (b₀ : ℝ) / l := Nat.cast_div_le
   have hlog0 : 0 ≤ Real.logb l b₀ :=
@@ -107,7 +121,8 @@ theorem deA_le {l : ℕ} [hlp : Fact l.Prime] (b₀ y : ℕ) (hy : 1 ≤ y) (hb 
   set a := b₀ / l + 1 with ha
   have hab : a ≤ b₀ := Nat.div_lt_self (by omega) (by omega)
   rcases le_or_gt a (y - 1) with h | h
-  · simp only [min_eq_left h, Nat.sub_self, Nat.choose_self, Nat.padicValNat_def, multiplicity_one_right, add_zero, Nat.cast_zero]
+  · simp only [min_eq_left h, Nat.sub_self, Nat.choose_self, Nat.padicValNat_def,
+      multiplicity_one_right, add_zero, Nat.cast_zero]
     linarith
   · rw [min_eq_right h.le]
     have hV : padicValNat l (a.choose (y - 1)) ≤ Nat.log l a := by
@@ -130,23 +145,25 @@ end Pure
 
 section Rec
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
-theorem l_mem_max (W : LocWach PD LL O v n) [IsLocalRing O] (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x)) :
-    ((PD.p : ℕ) : O) ∈ IsLocalRing.maximalIdeal O := by
+theorem l_mem_max
+    (W : LocWach PD LL O v n) [IsLocalRing O] (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x))
+    : ((PD.p : ℕ) : O) ∈ IsLocalRing.maximalIdeal O := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   rintro ⟨u, hu⟩
-  have h1 : algebraMap O LL (↑u⁻¹ * ((PD.p : ℕ) : O)) = 1 := by
-    rw [← hu, Units.inv_mul, map_one]
+  have h1 : algebraMap O LL (↑u⁻¹ * ((PD.p : ℕ) : O)) = 1 := by rw [← hu, Units.inv_mul, map_one]
   have h2 := congrArg v h1
   rw [map_mul, AddValuation.map_mul, map_natCast, W.v_l, AddValuation.map_one] at h2
   have h3 := hO ↑u⁻¹
@@ -158,7 +175,8 @@ theorem l_mem_max (W : LocWach PD LL O v n) [IsLocalRing O] (hO : ∀ x : O, 0 �
     have h3' : (0 : ℚ) ≤ q := by exact_mod_cast h3
     linarith
 
-variable [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
+variable
+  [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
   [FiniteDimensional Qp LL]
 
 theorem letE_idem (c : ZMod n) : (letE (O := O) c : LetA O n) * letE c = letE c := by
@@ -167,29 +185,38 @@ theorem letE_idem (c : ZMod n) : (letE (O := O) c : LetA O n) * letE c = letE c 
   | (rw [← Pi.single_mul, mul_one])
   | (ext i; by_cases h : i = c <;> simp [Pi.single_apply, h])
 
-theorem content_step (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
-    (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x)) (c : ZMod n) (b₀ y κ : ℕ) (hy : 1 ≤ y) (f : W.EE) (x : O)
-    (h1 : InFr W c 1 (qA W ^ b₀) f)
+theorem content_step
+    (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (hO : ∀ x : O, 0 ≤ v (algebraMap O LL x))
+    (c : ZMod n)
+    (b₀ y κ : ℕ) (hy : 1 ≤ y)
+    (f : W.EE) (x : O) (h1 : InFr W c 1 (qA W ^ b₀) f)
     (h2 : InFr W c (ps W 1 ^ y) (qA W ^ b₀)
-      (lE W κ * f - algebraMap (LetA O n) W.EE (letE c) * algebraMap O W.EE x)) :
-    ∃ x'' : O, InFr W c (ps W 1 ^ y) (qA W ^ b₀)
-      (lE W (deA PD.p b₀ y) * f - algebraMap (LetA O n) W.EE (letE c) * algebraMap O W.EE x'') := by
+      (lE W κ * f - algebraMap (LetA O n) W.EE (letE c) * algebraMap O W.EE x))
+    : ∃ x'' : O,
+      InFr W c (ps W 1 ^ y) (qA W ^ b₀)
+        (lE W (deA PD.p b₀ y) * f
+          - algebraMap (LetA O n) W.EE (letE c) * algebraMap O W.EE x'') := by
   haveI : Fact PD.p.Prime := Fact.mk PD.hp
   have hR := GS.ringData_of_caseA_of_p9 W hcase hP9
   have hp0 := GS.p_ne_zero W
   have hlm := l_mem_max W hO
   obtain ⟨u₀, hu₀, e1⟩ := h1
   obtain ⟨u₁, hu₁, e2⟩ := h2
-  have hlE : ∀ k : ℕ, algebraMap (LetA O n) W.EE (lA W ^ k) = lE W k := by
-    intro k; simp [lA, lE]
-  have hxE : ∀ z : O, algebraMap (LetA O n) W.EE (algebraMap O (LetA O n) z) = algebraMap O W.EE z :=
+  have hlE : ∀ k : ℕ, algebraMap (LetA O n) W.EE (lA W ^ k) = lE W k := by intro k; simp [lA, lE]
+  have hxE
+      : ∀ z : O, algebraMap (LetA O n) W.EE (algebraMap O (LetA O n) z) = algebraMap O W.EE z :=
     fun z => (IsScalarTower.algebraMap_apply O (LetA O n) W.EE z).symm
-  have hlA : ∀ z : O, ∀ k : ℕ, algebraMap O (LetA O n) (((PD.p : ℕ) : O) ^ k * z) =
-      lA W ^ k * algebraMap O (LetA O n) z := by
+  have hlA
+      : ∀ z : O, ∀ k : ℕ,
+        algebraMap O (LetA O n) (((PD.p : ℕ) : O) ^ k * z)
+          = lA W ^ k * algebraMap O (LetA O n) z := by
     intro z k; simp [lA, map_mul, map_pow, map_natCast]
 
-  have hG : letE c * (lA W ^ κ * u₀ - qA W ^ b₀ * algebraMap O (LetA O n) x) =
-      letE c * ps W 1 ^ y * u₁ := by
+  have hG
+      : letE c * (lA W ^ κ * u₀ - qA W ^ b₀ * algebraMap O (LetA O n) x)
+        = letE c * ps W 1 ^ y * u₁ := by
     apply W.EE_inj
     simp only [map_mul, map_sub, map_one, mul_one, hlE, hxE] at e1 e2 ⊢
     linear_combination e2 - lE W κ * e1
@@ -207,11 +234,14 @@ theorem content_step (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.Li
   have hp1 : 1 ≤ PD.p := PD.hp.one_lt.le
   have hQp : qA W c ^ PD.p = qA W c ^ (PD.p - 1) * qA W c := by
     rw [← pow_succ, Nat.sub_add_cancel hp1]
-  have hP : ps W 1 c = C ((PD.p : ℕ) : O) * (1 - (w : LetA O n) c * qA W c ^ (PD.p - 1)) +
-      (w : LetA O n) c * qA W c ^ PD.p := by
+  have hP
+      : ps W 1 c
+        = C ((PD.p : ℕ) : O) * (1 - (w : LetA O n) c * qA W c ^ (PD.p - 1))
+          + (w : LetA O n) c * qA W c ^ PD.p := by
     rw [hPc, hQp]
     have hπ : W.π₀ c = qA W c - C ((PD.p : ℕ) : O) := by rw [hq]; ring
-    rw [hπ]; ring
+    rw [hπ]
+    ring
   have hcc0 : constantCoeff (W.π₀ c) = 0 := GS.π₀₁_cc (GS.ringData_of_caseA_of_p9 W hcase hP9)
   have hccq : constantCoeff (qA W c) = ((PD.p : ℕ) : O) := by
     rw [hq, map_add (f := _), hcc0, constantCoeff_C, zero_add]
@@ -220,14 +250,17 @@ theorem content_step (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.Li
     apply IsLocalRing.isUnit_one_sub_self_of_mem_nonunits
     rw [← IsLocalRing.mem_maximalIdeal]
     exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_of_mem _ hlm _ (by have := PD.hp.two_le; omega))
-  have hPd : IsDist (ps W 1 c) := GS.dist_ps (GS.ringData_of_caseA_of_p9 W hcase hP9) 1 (GS.dist_φpow (GS.ringData_of_caseA_of_p9 W hcase hP9) 1) c
+  have hPd : IsDist (ps W 1 c) :=
+    GS.dist_ps (GS.ringData_of_caseA_of_p9 W hcase hP9) 1
+      (GS.dist_φpow (GS.ringData_of_caseA_of_p9 W hcase hP9) 1) c
   have hPw : 1 ≤ wdeg (ps W 1 c) := by
     unfold wdeg
     have hne : ((ps W 1 c).map (IsLocalRing.residue O)).order ≠ ⊤ := by
       rw [Ne, order_eq_top]; exact hPd
     have hcc : constantCoeff ((ps W 1 c).map (IsLocalRing.residue O)) = 0 := by
       rw [← coeff_zero_eq_constantCoeff_apply, coeff_map, coeff_zero_eq_constantCoeff_apply,
-        GS.ps_letter 1 c, map_add, GS.cc_φpow (GS.ringData_of_caseA_of_p9 W hcase hP9) 1 c, constantCoeff_C, zero_add]
+        GS.ps_letter 1 c, map_add, GS.cc_φpow (GS.ringData_of_caseA_of_p9 W hcase hP9) 1 c,
+        constantCoeff_C, zero_add]
       exact (IsLocalRing.residue_eq_zero_iff _).2 hlm
     have h1 : 1 ≤ ((ps W 1 c).map (IsLocalRing.residue O)).order :=
       one_le_order_iff_constCoeff_eq_zero.2 hcc
@@ -236,8 +269,12 @@ theorem content_step (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.Li
   obtain ⟨x', hx'⟩ := content_div hlm hp0 hε hP hPd hPw b₀ y κ hy x hGc
 
   by_cases hκ : κ ≤ deA PD.p b₀ y
-  · refine ⟨((PD.p : ℕ) : O) ^ (deA PD.p b₀ y - κ) * x, lA W ^ (deA PD.p b₀ y - κ) * u₁,
-      Subalgebra.mul_mem _ (Subalgebra.pow_mem _ (Subalgebra.natCast_mem _ _) _) hu₁, ?_⟩
+  · refine ⟨
+      ((PD.p : ℕ) : O) ^ (deA PD.p b₀ y - κ) * x,
+      lA W ^ (deA PD.p b₀ y - κ) * u₁,
+      Subalgebra.mul_mem _ (Subalgebra.pow_mem _ (Subalgebra.natCast_mem _ _) _) hu₁,
+      ?_
+    ⟩
     have hsplit : lE W (deA PD.p b₀ y) = lE W (deA PD.p b₀ y - κ) * lE W κ := by
       rw [lE, lE, lE, ← pow_add, Nat.sub_add_cancel hκ]
     rw [← hxE, hlA, hsplit]
@@ -245,18 +282,23 @@ theorem content_step (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.Li
     linear_combination lE W (deA PD.p b₀ y - κ) * e2
   · have hκ' : κ = (κ - deA PD.p b₀ y) + deA PD.p b₀ y := by omega
     have hLmem : (letE (O := O) c : LetA O n) ∈ W.AΔ := fun δ _ => GS.γA_letE W δ c
-    have hsat : lA W ^ (κ - deA PD.p b₀ y) *
-        (letE c * (lA W ^ deA PD.p b₀ y * u₀ - qA W ^ b₀ * algebraMap O (LetA O n) x')) =
-        ps W 1 ^ y * (letE c * u₁) := by
-      have hx'' : algebraMap O (LetA O n) x =
-          lA W ^ (κ - deA PD.p b₀ y) * algebraMap O (LetA O n) x' := by rw [hx', hlA]
+    have hsat
+        : lA W ^ (κ - deA PD.p b₀ y)
+            * (letE c * (lA W ^ deA PD.p b₀ y * u₀ - qA W ^ b₀ * algebraMap O (LetA O n) x'))
+          = ps W 1 ^ y * (letE c * u₁) := by
+      have hx''
+          : algebraMap O (LetA O n) x
+            = lA W ^ (κ - deA PD.p b₀ y) * algebraMap O (LetA O n) x' := by
+        rw [hx', hlA]
       rw [hx'', hκ', pow_add] at hG
       rw [Nat.add_sub_cancel] at hG
       linear_combination hG
     have hpi : ps W 1 ^ y ∈ PiPs W :=
-      Submonoid.pow_mem _ (Submonoid.subset_closure (Set.mem_insert_of_mem _ (Set.mem_range_self 1))) y
-    obtain ⟨y', hy', hz⟩ := GS.sat_A_core (GS.ringData_of_caseA_of_p9 W hcase hP9) hp0 hpi
-      (Subalgebra.mul_mem _ hLmem hu₁) _ hsat
+      Submonoid.pow_mem _
+        (Submonoid.subset_closure (Set.mem_insert_of_mem _ (Set.mem_range_self 1))) y
+    obtain ⟨y', hy', hz⟩ :=
+      GS.sat_A_core (GS.ringData_of_caseA_of_p9 W hcase hP9) hp0 hpi
+        (Subalgebra.mul_mem _ hLmem hu₁) _ hsat
     refine ⟨x', y', hy', ?_⟩
     have hid := congrArg (algebraMap (LetA O n) W.EE) (letE_idem (O := O) c)
     have hzE := congrArg (algebraMap (LetA O n) W.EE) hz

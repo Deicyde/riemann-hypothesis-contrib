@@ -16,20 +16,23 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Primes
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.L2.GlobalTheoryTheory GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
 theorem smallPrimeOne_of_primesRel : GlobalTheory.Lin.PrimesRel → SmallPrimeOne := by
   intro h
   obtain ⟨C₀, Cr, cr, c, h0, h1, h2, h3, H⟩ := GlobalTheory.Lin.primesAPInterval_of_primesRel h
-  obtain ⟨s, hsC, hs21, hsr⟩ : ∃ s : ℝ, C₀ ≤ s ∧ 21 ≤ s ∧ 200 * Cr / cr ≤ s :=
-    ⟨max C₀ (max 21 (200 * Cr / cr)), le_max_left _ _,
-      le_trans (le_max_left _ _) (le_max_right _ _), le_trans (le_max_right _ _) (le_max_right _ _)⟩
+  obtain ⟨s, hsC, hs21, hsr⟩ : ∃ s : ℝ, C₀ ≤ s ∧ 21 ≤ s ∧ 200 * Cr / cr ≤ s := ⟨
+    max C₀ (max 21 (200 * Cr / cr)),
+    le_max_left _ _,
+    le_trans (le_max_left _ _) (le_max_right _ _),
+    le_trans (le_max_right _ _) (le_max_right _ _)
+  ⟩
   have hss : s ≤ s ^ 2 := by nlinarith
   have hexp : Cr * Real.exp (-cr * s) ≤ 1 / 200 := by
-    have e1 : 200 * Cr ≤ cr * s := by
-      rw [div_le_iff₀ h2] at hsr; linarith
+    have e1 : 200 * Cr ≤ cr * s := by rw [div_le_iff₀ h2] at hsr; linarith
     have e2 := Real.add_one_le_exp (cr * s)
     have e3 : 0 < Real.exp (cr * s) := Real.exp_pos _
     rw [neg_mul, Real.exp_neg, ← div_eq_mul_inv, div_le_div_iff₀ e3 (by norm_num)]
@@ -70,8 +73,9 @@ theorem smallPrimeOne_of_primesRel : GlobalTheory.Lin.PrimesRel → SmallPrimeOn
   have h7 : (4 * (M : ℝ)) ^ (7 : ℝ) ≤ 1 * Y ^ ((1 : ℝ) / 3) := by
     rw [one_mul, hY, ← Real.rpow_mul hB0.le]
     exact Real.rpow_le_rpow_of_exponent_le hB1 (by linarith)
-  have hc := H M 1 hM3 (Nat.coprime_one_left M) Y 1
-    (Real.rpow_le_rpow_of_exponent_le hB1 (by linarith)) le_rfl hrho h7
+  have hc :=
+    H M 1 hM3 (Nat.coprime_one_left M) Y 1 (Real.rpow_le_rpow_of_exponent_le hB1 (by linarith))
+      le_rfl hrho h7
   have hpos : 0 < c * 1 * (4 * (M : ℝ)) ^ (-6 : ℝ) * Y / Real.log Y := by
     have := Real.rpow_pos_of_pos hB0 (-6 : ℝ)
     positivity
@@ -82,9 +86,9 @@ theorem smallPrimeOne_of_primesRel : GlobalTheory.Lin.PrimesRel → SmallPrimeOn
   obtain ⟨⟨-, hp2⟩, hpp, hpm⟩ := hp
   refine ⟨p, hpp, ?_, ?_⟩
   · have : p % M = 1 % M := hpm
-    rw [this]; exact Nat.mod_eq_of_lt (by omega)
-  · have e1 : (p : ℝ) ≤ Y * (1 + 1) :=
-      le_trans (Nat.cast_le.2 hp2) (Nat.floor_le (by positivity))
+    rw [this]
+    exact Nat.mod_eq_of_lt (by omega)
+  · have e1 : (p : ℝ) ≤ Y * (1 + 1) := le_trans (Nat.cast_le.2 hp2) (Nat.floor_le (by positivity))
     have hM0 : (0 : ℝ) < M := by linarith
     have e2 : Y ≤ (M : ℝ) ^ (3 * s ^ 2) := by
       rw [Real.rpow_mul hM0.le]

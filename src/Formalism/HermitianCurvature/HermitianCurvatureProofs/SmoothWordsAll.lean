@@ -10,24 +10,34 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationWordBounds
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.B4 Formalism.FourierDecayAlt.P.SandwichRhoAction Formalism.FourierDecayAlt.P.ChartIntegralLocal Formalism.FourierDecayAlt.P.SmoothnessOnGoodSet
-  Formalism.FourierDecayAlt.P.LetterPairRecursion
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.B4
+  Formalism.FourierDecayAlt.P.SandwichRhoAction Formalism.FourierDecayAlt.P.ChartIntegralLocal
+  Formalism.FourierDecayAlt.P.SmoothnessOnGoodSet Formalism.FourierDecayAlt.P.LetterPairRecursion
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp]
 
 section
-variable (D : RealPlaceData k r Wp Wq) {m : ℕ} {F : Mat k r → (Wq →L[ℂ] Wp)} (hFm : CkOn (m : ℕ∞) (GV k r) F)
-    (hDom1 : ∀ u v : List (Mat k r), (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ m →
-      ∀ g ∈ Om k r D.z D.z',
+variable
+  (D : RealPlaceData k r Wp Wq)
+  {m : ℕ} {F : Mat k r → (Wq →L[ℂ] Wp)} (hFm : CkOn (m : ℕ∞) (GV k r) F)
+  (hDom1 : ∀ u v : List (Mat k r),
+    (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ m
+      → ∀ g ∈ Om k r D.z D.z',
         AEStronglyMeasurable (fun p => rho D p (dLR (u.map (AdL p)) (v.map (AdR p)) F) g) D.μSS)
-    (hDom2 : ∀ K : Set (Mat k r), IsCompact K → K ⊆ Om k r D.z D.z' →
-      ∃ b : SS k r → ℝ, Integrable b D.μSS ∧
-        ∀ u v : List (Mat k r), (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) →
-          u.length + v.length ≤ m → ∀ g ∈ K, ∀ᵐ p ∂D.μSS,
-            ‖rho D p (dLR (u.map (AdL p)) (v.map (AdR p)) F) g‖ ≤ b p)
+  (hDom2 : ∀ K : Set (Mat k r),
+    IsCompact K → K ⊆ Om k r D.z D.z'
+      → ∃ b : SS k r → ℝ,
+        Integrable b D.μSS
+          ∧ ∀ u v : List (Mat k r),
+            (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ m
+              → ∀ g ∈ K,
+                ∀ᵐ p ∂D.μSS,
+                  ‖rho D p (dLR (u.map (AdL p)) (v.map (AdR p)) F) g‖ ≤ b p)
 include hFm hDom1 hDom2
 
 lemma words_all :
@@ -149,10 +159,14 @@ theorem _root_.Formalism.FourierDecayAlt.P.bessel_words_of_domain : JWordsOfDom 
   refine ⟨ck_all D hFm hDom1 hDom2, fun u v hu hv hl g hg => ?_⟩
   obtain ⟨bd, hbdI, hbd⟩ := hDom2 {g} isCompact_singleton (Set.singleton_subset_iff.2 hg)
   have hb := hbd u v hu hv hl g (Set.mem_singleton g)
-  refine ⟨hbdI.norm.mono' ((continuous_xiP D).aestronglyMeasurable.smul (hDom1 u v hu hv hl g hg)) ?_, ?_⟩
+  refine ⟨
+    hbdI.norm.mono' ((continuous_xiP D).aestronglyMeasurable.smul (hDom1 u v hu hv hl g hg)) ?_,
+    ?_
+  ⟩
   · filter_upwards [hb] with p hp
     rw [norm_smul]
-    exact (mul_le_of_le_one_left (norm_nonneg _) (norm_xiP D p)).trans (hp.trans (Real.le_norm_self _))
+    exact (mul_le_of_le_one_left (norm_nonneg _) (norm_xiP D p)).trans
+      (hp.trans (Real.le_norm_self _))
   · rw [hW u v hu hv hl g hg]
     refine integral_congr_ae ?_
     filter_upwards [Formalism.FourierDecayAlt.P.B7.ae_inSS D] with p hp

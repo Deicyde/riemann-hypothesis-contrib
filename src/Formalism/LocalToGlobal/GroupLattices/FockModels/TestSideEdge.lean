@@ -9,48 +9,57 @@ noncomputable section
 
 namespace Formalism.L2.G.Model
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.G.LatticeSystems Formalism.MainNotions.Pf14
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.G.LatticeSystems
+  Formalism.MainNotions.Pf14
 
 section
 variable {W Qq : Type} [CommRing W] [Field Qq] [Algebra W Qq] {k : ℕ}
 
-theorem latDual_colSpan (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det) :
-    latDual (colSpan W g) = colSpan W (g⁻¹).transpose := by
+theorem latDual_colSpan (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det)
+    : latDual (colSpan W g) = colSpan W (g⁻¹).transpose := by
   apply le_antisymm
   · intro x hx
-    have h1 : ∀ c, ∃ z : W, algebraMap W Qq z = ∑ i, x i * g i c :=
-      fun c => hx (fun i => g i c) (Submodule.subset_span ⟨c, rfl⟩)
+    have h1 : ∀ c, ∃ z : W, algebraMap W Qq z = ∑ i, x i * g i c := fun c =>
+      hx (fun i => g i c) (Submodule.subset_span ⟨c, rfl⟩)
     choose z hz using h1
     refine (mem_colSpan _ _).2 ⟨z, ?_⟩
     have h2 : (fun c => algebraMap W Qq (z c)) = Matrix.vecMul x g := by
       funext c
       rw [hz c]
       rfl
-    rw [h2, Matrix.mulVec_transpose, Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv g hg, Matrix.vecMul_one]
+    rw [h2, Matrix.mulVec_transpose, Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv g hg,
+      Matrix.vecMul_one]
   · intro x hx y hy
     obtain ⟨a, rfl⟩ := (mem_colSpan _ _).1 hx
     obtain ⟨b, rfl⟩ := (mem_colSpan _ _).1 hy
     refine ⟨∑ c, a c * b c, ?_⟩
-    have h1 : ∑ i, ((g⁻¹).transpose.mulVec fun c => algebraMap W Qq (a c)) i *
-        (g.mulVec fun c => algebraMap W Qq (b c)) i =
-        ((g⁻¹).transpose.mulVec fun c => algebraMap W Qq (a c)) ⬝ᵥ (g.mulVec fun c => algebraMap W Qq (b c)) := rfl
-    rw [h1, Matrix.dotProduct_mulVec, Matrix.mulVec_transpose, Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul g hg,
-      Matrix.vecMul_one]
+    have h1
+        : ∑ i, ((g⁻¹).transpose.mulVec fun c => algebraMap W Qq (a c)) i *
+            (g.mulVec fun c => algebraMap W Qq (b c)) i
+          = ((g⁻¹).transpose.mulVec fun c => algebraMap W Qq (a c))
+            ⬝ᵥ (g.mulVec fun c => algebraMap W Qq (b c)) :=
+      rfl
+    rw [h1, Matrix.dotProduct_mulVec, Matrix.mulVec_transpose, Matrix.vecMul_vecMul,
+      Matrix.nonsing_inv_mul g hg, Matrix.vecMul_one]
     simp [dotProduct]
 
-theorem det_invT (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det) : IsUnit ((g⁻¹).transpose).det := by
+theorem det_invT (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det)
+    : IsUnit ((g⁻¹).transpose).det := by
   rw [Matrix.det_transpose]
   exact (Matrix.isUnit_nonsing_inv_det_iff).2 hg
 
-theorem invT_invT (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det) :
-    (((g⁻¹).transpose)⁻¹).transpose = g := by
-  rw [← Matrix.transpose_nonsing_inv, Matrix.transpose_transpose, Matrix.nonsing_inv_nonsing_inv g hg]
+theorem invT_invT (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det)
+    : (((g⁻¹).transpose)⁻¹).transpose = g := by
+  rw [← Matrix.transpose_nonsing_inv, Matrix.transpose_transpose,
+    Matrix.nonsing_inv_nonsing_inv g hg]
 
-theorem latDual_latDual (L : Submodule W (Fin k → Qq)) (hL : IsLattice W L) : latDual (latDual L) = L := by
+theorem latDual_latDual (L : Submodule W (Fin k → Qq)) (hL : IsLattice W L)
+    : latDual (latDual L) = L := by
   obtain ⟨g, hg, rfl⟩ := hL
   rw [latDual_colSpan g hg, latDual_colSpan _ (det_invT g hg), invT_invT g hg]
 
-def dE (k r : ℕ) (c : Qq) : Matrix (Fin k) (Fin k) Qq := Matrix.diagonal fun a => if a.val < r then c else 1
+def dE (k r : ℕ) (c : Qq) : Matrix (Fin k) (Fin k) Qq :=
+  Matrix.diagonal fun a => if a.val < r then c else 1
 
 theorem lb_D_dE (r : ℕ) (c : Qq) (hc : c ≠ 0) : lb_D k r c * dE k r c = 1 := by
   unfold lb_D dE
@@ -70,8 +79,8 @@ theorem dE_lb_D (r : ℕ) (c : Qq) (hc : c ≠ 0) : dE k r c * lb_D k r c = 1 :=
   · exact mul_inv_cancel₀ hc
   · simp
 
-theorem invT_mul_D (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det) (r : ℕ) (c : Qq) (hc : c ≠ 0) :
-    ((g * lb_D k r c)⁻¹).transpose = (g⁻¹).transpose * dE k r c := by
+theorem invT_mul_D (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det) (r : ℕ) (c : Qq) (hc : c ≠ 0)
+    : ((g * lb_D k r c)⁻¹).transpose = (g⁻¹).transpose * dE k r c := by
   have h1 : (g * lb_D k r c)⁻¹ = dE k r c * g⁻¹ := by
     apply Matrix.inv_eq_right_inv
     rw [Matrix.mul_assoc, ← Matrix.mul_assoc (lb_D k r c), lb_D_dE r c hc, Matrix.one_mul,
@@ -80,8 +89,10 @@ theorem invT_mul_D (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det) (r : ℕ)
   congr 1
   exact Matrix.diagonal_transpose _
 
-theorem dual_edgeBasis (p r : ℕ) (hp : (p : Qq) ≠ 0) (e : Edge W Qq k) (g : Matrix (Fin k) (Fin k) Qq)
-    (h : IsEdgeBasis p r e g) : IsEdgeBasis p r e.dual ((g⁻¹).transpose * dE k r (p : Qq)) := by
+theorem dual_edgeBasis
+    (p r : ℕ) (hp : (p : Qq) ≠ 0)
+    (e : Edge W Qq k) (g : Matrix (Fin k) (Fin k) Qq) (h : IsEdgeBasis p r e g)
+    : IsEdgeBasis p r e.dual ((g⁻¹).transpose * dE k r (p : Qq)) := by
   obtain ⟨hg, hsrc, htgt⟩ := h
   have htgt' : e.tgt = colSpan W (g * lb_D k r (p : Qq)) := htgt
   have hgD : IsUnit (g * lb_D k r (p : Qq)).det := by
@@ -97,12 +108,15 @@ theorem dual_edgeBasis (p r : ℕ) (hp : (p : Qq) ≠ 0) (e : Edge W Qq k) (g : 
 end
 
 section
-variable {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
+variable
+  {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
   [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
   {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O}
 
-theorem edgeBasis (h : HidaSetting p n' W Qq O Kf ι σ j w) (m r : ℕ) (e : Edge W Qq (m + 1))
-    (he : IsEdge p n' r e) : ∃ g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq, IsEdgeBasis p r e g :=
+theorem edgeBasis
+    (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    (m r : ℕ) (e : Edge W Qq (m + 1)) (he : IsEdge p n' r e)
+    : ∃ g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq, IsEdgeBasis p r e g :=
   restEdgeBasis (mkG h m r (fun _ _ => 0) (fun _ _ _ _ => le_rfl)) (0 : Fin 1) e he
 
 theorem pQ_ne (h : HidaSetting p n' W Qq O Kf ι σ j w) : (p : Qq) ≠ 0 := by
@@ -115,8 +129,10 @@ theorem pQ_ne (h : HidaSetting p n' W Qq O Kf ι σ j w) : (p : Qq) ≠ 0 := by
 
 theorem pW_ne (h : HidaSetting p n' W Qq O Kf ι σ j w) : (p : W) ≠ 0 := h.p_unif.ne_zero
 
-theorem edge_r_le (h : HidaSetting p n' W Qq O Kf ι σ j w) (m r : ℕ) (e : Edge W Qq (m + 1))
-    (he : IsEdge p n' r e) : r ≤ m + 1 := by
+theorem edge_r_le
+    (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    (m r : ℕ) (e : Edge W Qq (m + 1)) (he : IsEdge p n' r e)
+    : r ≤ m + 1 := by
   by_contra hr
   have hr' : m + 1 < r := Nat.lt_of_not_le hr
   obtain ⟨g, hg, hsrc, htgt⟩ := edgeBasis h m r e he
@@ -136,12 +152,17 @@ theorem edge_r_le (h : HidaSetting p n' W Qq O Kf ι σ j w) (m r : ℕ) (e : Ed
   have h6 := Nat.eq_of_mul_eq_mul_left h5 h4
   omega
 
-theorem dual_edge (h : HidaSetting p n' W Qq O Kf ι σ j w) (m r : ℕ) (e : Edge W Qq (m + 1))
-    (he : IsEdge p n' r e) : IsEdge p n' r e.dual ∧ e.dual.dual = e := by
+theorem dual_edge
+    (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    (m r : ℕ) (e : Edge W Qq (m + 1)) (he : IsEdge p n' r e)
+    : IsEdge p n' r e.dual ∧ e.dual.dual = e := by
   obtain ⟨g, hg⟩ := edgeBasis h m r e he
   have := h.frac_alt
-  refine ⟨isEdge_of_basis p n' r (pW_ne h) h.res_card (edge_r_le h m r e he) e.dual _
-    (dual_edgeBasis p r (pQ_ne h) e g hg), ?_⟩
+  refine ⟨
+    isEdge_of_basis p n' r (pW_ne h) h.res_card (edge_r_le h m r e he) e.dual _
+      (dual_edgeBasis p r (pQ_ne h) e g hg),
+    ?_
+  ⟩
   cases e with
   | mk src tgt =>
     show Edge.mk (latDual (latDual src)) (latDual (latDual tgt)) = Edge.mk src tgt

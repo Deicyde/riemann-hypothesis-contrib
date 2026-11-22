@@ -8,23 +8,31 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open IsLocalRing
 
-theorem av_no_two_chain {S : Type*} [CommRing S] [IsDomain S] {A B : Ideal S} [A.IsPrime]
-    [B.IsPrime] (h1 : ⊥ < A) (h2 : A < B) (hB : B.height ≤ 1) : False := by
+theorem av_no_two_chain
+    {S : Type*} [CommRing S] [IsDomain S]
+    {A B : Ideal S} [A.IsPrime] [B.IsPrime]
+    (h1 : ⊥ < A) (h2 : A < B) (hB : B.height ≤ 1)
+    : False := by
   have hA : 1 ≤ A.height := le_add_self.trans (Ideal.height_add_one_le_of_lt_of_isPrime h1)
-  have hB₂ : (2 : ℕ∞) ≤ B.height := calc
-    (2 : ℕ∞) = 1 + 1 := by norm_num
-    _ ≤ A.height + 1 := add_le_add hA le_rfl
-    _ ≤ B.height := Ideal.height_add_one_le_of_lt_of_isPrime h2
+  have hB₂ : (2 : ℕ∞) ≤ B.height :=
+    calc
+      (2 : ℕ∞)
+        = 1 + 1 := by norm_num
+      _ ≤ A.height + 1 := add_le_add hA le_rfl
+      _ ≤ B.height := Ideal.height_add_one_le_of_lt_of_isPrime h2
   exact (by norm_num : ¬ (2 : ℕ∞) ≤ 1) (hB₂.trans hB)
 
-theorem av_key {S : Type*} [CommRing S] [IsDomain S] [IsNoetherianRing S] [IsLocalRing S] (g : S)
-    (hg : g ≠ 0) (H : ∀ Q : Ideal S, Q.IsPrime → Q ≠ ⊥ → g ∈ Q) (Q : Ideal S) (hQ : Q.IsPrime)
-    (hQ0 : Q ≠ ⊥) : Q.IsMaximal := by
+theorem av_key
+    {S : Type*} [CommRing S] [IsDomain S] [IsNoetherianRing S] [IsLocalRing S]
+    (g : S) (hg : g ≠ 0) (H : ∀ Q : Ideal S, Q.IsPrime → Q ≠ ⊥ → g ∈ Q)
+    (Q : Ideal S) (hQ : Q.IsPrime) (hQ0 : Q ≠ ⊥)
+    : Q.IsMaximal := by
   classical
   by_contra hQm
   set m := IsLocalRing.maximalIdeal S with hm_def
-  have hQlt : Q < m := lt_of_le_of_ne (IsLocalRing.le_maximalIdeal hQ.ne_top)
-    (fun h => hQm (h ▸ IsLocalRing.maximalIdeal.isMaximal S))
+  have hQlt : Q < m :=
+    lt_of_le_of_ne (IsLocalRing.le_maximalIdeal hQ.ne_top)
+      (fun h => hQm (h ▸ IsLocalRing.maximalIdeal.isMaximal S))
   haveI : (Ideal.span {g}).IsPrincipal := ⟨⟨g, rfl⟩⟩
   have hfin := Ideal.finite_minimalPrimes_of_isNoetherianRing S (Ideal.span {g})
 
@@ -38,8 +46,8 @@ theorem av_key {S : Type*} [CommRing S] [IsDomain S] [IsNoetherianRing S] [IsLoc
       exact (Submodule.mem_bot S).mp this
     · exact Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ P hP
 
-  have hbelow : ∀ P' : Ideal S, P'.IsPrime → P' ≠ ⊥ →
-      ∃ P ∈ (Ideal.span {g}).minimalPrimes, P ≤ P' := by
+  have hbelow
+      : ∀ P' : Ideal S, P'.IsPrime → P' ≠ ⊥ → ∃ P ∈ (Ideal.span {g}).minimalPrimes, P ≤ P' := by
     intro P' hP' h0
     exact Ideal.exists_minimalPrimes_le ((Ideal.span_singleton_le_iff_mem _).mpr (H P' hP' h0))
 
@@ -56,12 +64,14 @@ theorem av_key {S : Type*} [CommRing S] [IsDomain S] [IsNoetherianRing S] [IsLoc
   obtain ⟨x, hxm, hxP⟩ : ∃ x ∈ m, ∀ P ∈ (Ideal.span {g}).minimalPrimes, x ∉ P := by
     by_contra hcon
     push_neg at hcon
-    have hsub : (m : Set S) ⊆ ⋃ P ∈ (hfin.toFinset : Set (Ideal S)), ((id P : Ideal S) : Set S) := by
+    have hsub
+        : (m : Set S) ⊆ ⋃ P ∈ (hfin.toFinset : Set (Ideal S)), ((id P : Ideal S) : Set S) := by
       intro y hy
       obtain ⟨P, hP, hyP⟩ := hcon y hy
       exact Set.mem_iUnion₂.mpr ⟨P, by simpa using hP, hyP⟩
-    obtain ⟨P, hP, hle⟩ := (Ideal.subset_union_prime (f := id) ⊥ ⊥
-      (fun P hP _ _ => (hmin P (by simpa using hP)).1)).mp hsub
+    obtain ⟨P, hP, hle⟩ :=
+      (Ideal.subset_union_prime (f := id) ⊥ ⊥ (fun P hP _ _ => (hmin P (by simpa using hP)).1)).mp
+        hsub
     exact hm_not P (by simpa using hP) hle
   obtain ⟨P0, hP0, -⟩ := hbelow Q hQ hQ0
   have hx0 : x ≠ 0 := by
@@ -87,9 +97,11 @@ theorem av_key {S : Type*} [CommRing S] [IsDomain S] [IsNoetherianRing S] [IsLoc
     rw [heq]
     exact hxP'
 
-theorem av_prime_dim_one {R : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R]
-    (hdim : 1 ≤ ringKrullDim R) (h : R) (hh : h ≠ 0) :
-    ∃ p : Ideal R, p.IsPrime ∧ ringKrullDim (R ⧸ p) = 1 ∧ h ∉ p := by
+theorem av_prime_dim_one
+    {R : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R]
+    (hdim : 1 ≤ ringKrullDim R)
+    (h : R) (hh : h ≠ 0)
+    : ∃ p : Ideal R, p.IsPrime ∧ ringKrullDim (R ⧸ p) = 1 ∧ h ∉ p := by
   classical
   set m := IsLocalRing.maximalIdeal R with hm_def
   have hm0 : m ≠ ⊥ := by
@@ -98,9 +110,10 @@ theorem av_prime_dim_one {R : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing
     rw [ringKrullDim_eq_zero_of_isField hF] at hdim
     exact absurd hdim (by norm_num)
 
-  obtain ⟨p, ⟨hpP, hhp, hpm⟩, hpmax⟩ := set_has_maximal_iff_noetherian.mpr
-    (inferInstance : IsNoetherian R R) {q : Ideal R | q.IsPrime ∧ h ∉ q ∧ q ≠ m}
-    ⟨⊥, Ideal.isPrime_bot, fun h' => hh ((Submodule.mem_bot R).mp h'), fun e => hm0 e.symm⟩
+  obtain ⟨p, ⟨hpP, hhp, hpm⟩, hpmax⟩ :=
+    set_has_maximal_iff_noetherian.mpr (inferInstance : IsNoetherian R R)
+      {q : Ideal R | q.IsPrime ∧ h ∉ q ∧ q ≠ m}
+      ⟨⊥, Ideal.isPrime_bot, fun h' => hh ((Submodule.mem_bot R).mp h'), fun e => hm0 e.symm⟩
   haveI := hpP
   refine ⟨p, hpP, ?_, hhp⟩
   have hplt : p < m := lt_of_le_of_ne (IsLocalRing.le_maximalIdeal hpP.ne_top) hpm
@@ -138,8 +151,8 @@ theorem av_prime_dim_one {R : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing
         exact hpmax _ ⟨hq, hhq, hne⟩ hpq
       rw [hqm]
       exact Ideal.mul_mem_left _ _ hym
-  have hmax : ∀ Q : Ideal (R ⧸ p), Q.IsPrime → Q ≠ ⊥ → Q.IsMaximal :=
-    fun Q hQ hQ0 => av_key (f (h * y)) hg0 hall Q hQ hQ0
+  have hmax : ∀ Q : Ideal (R ⧸ p), Q.IsPrime → Q ≠ ⊥ → Q.IsMaximal := fun Q hQ hQ0 =>
+    av_key (f (h * y)) hg0 hall Q hQ hQ0
   apply le_antisymm
   · unfold ringKrullDim Order.krullDim
     refine iSup_le fun s => ?_
@@ -165,8 +178,10 @@ theorem av_prime_dim_one {R : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing
       rw [e'] at hy
       exact hyp ((hfz y).mp ((Submodule.mem_bot _).mp hy))
     have e1 := Order.height_add_one_le hlt
-    calc (1 : WithBot ℕ∞) ≤ ((Order.height (⟨m.map f, hMp⟩ : PrimeSpectrum (R ⧸ p)) : ℕ∞) :
-          WithBot ℕ∞) := by exact_mod_cast (le_add_self.trans e1)
+    calc
+      (1 : WithBot ℕ∞)
+          ≤ ((Order.height (⟨m.map f, hMp⟩ : PrimeSpectrum (R ⧸ p)) : ℕ∞) : WithBot ℕ∞) := by
+        exact_mod_cast (le_add_self.trans e1)
       _ ≤ ringKrullDim (R ⧸ p) := Order.height_le_krullDim _
 
 end ReciprocityTheory.ChartRestriction.G.T0

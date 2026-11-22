@@ -6,21 +6,22 @@ public import Mathlib
 
 namespace GlobalTheory.LinearIndependentFixed
 
-theorem linearIndepOn_of_fixed {K B W G ι : Type} [Field K] [CommRing B] [IsDomain B]
-    [Algebra K B] [AddCommGroup W] [Module B W] [Module K W] [IsScalarTower K B W]
-    [Module.IsTorsionFree B W] (a : G → B → B) (σ : G → W →+ W)
-    (hσ : ∀ (g : G) (b : B) (w : W), σ g (b • w) = a g b • σ g w)
-    (hK : ∀ (b b' : B), b ≠ 0 → (∀ g : G, b * a g b' = a g b * b') →
-      ∃ c : K, b' = algebraMap K B c * b)
+theorem linearIndepOn_of_fixed
+    {K B W G ι : Type} [Field K] [CommRing B] [IsDomain B] [Algebra K B] [AddCommGroup W]
+    [Module B W] [Module K W] [IsScalarTower K B W] [Module.IsTorsionFree B W]
+    (a : G → B → B) (σ : G → W →+ W) (hσ : ∀ (g : G) (b : B) (w : W), σ g (b • w) = a g b • σ g w)
+    (hK : ∀ (b b' : B),
+      b ≠ 0 → (∀ g : G, b * a g b' = a g b * b') → ∃ c : K, b' = algebraMap K B c * b)
     (v : ι → W) (hv : ∀ (g : G) (i : ι), σ g (v i) = v i)
-    (s : Finset ι) (hs : LinearIndepOn K v (↑s : Set ι)) :
-    LinearIndepOn B v (↑s : Set ι) := by
+    (s : Finset ι) (hs : LinearIndepOn K v (↑s : Set ι))
+    : LinearIndepOn B v (↑s : Set ι) := by
   classical
   have hsli : LinearIndependent K (fun x : (↑s : Set ι) => v x) := hs
   rw [LinearIndepOn, Fintype.linearIndependent_iff] at hs ⊢
 
-  suffices H : ∀ k : ℕ, ∀ b : (↑s : Set ι) → B,
-      (Finset.univ.filter fun j => b j ≠ 0).card ≤ k → ∑ j, b j • v j = 0 → ∀ j, b j = 0 by
+  suffices H
+      : ∀ k : ℕ, ∀ b : (↑s : Set ι) → B,
+        (Finset.univ.filter fun j => b j ≠ 0).card ≤ k → ∑ j, b j • v j = 0 → ∀ j, b j = 0 by
     intro b hb
     exact H _ b le_rfl hb
   intro k
@@ -44,7 +45,8 @@ theorem linearIndepOn_of_fixed {K B W G ι : Type} [Field K] [CommRing B] [IsDom
 
     have hrel : ∀ g, ∀ j, b j0 * a g (b j) = a g (b j0) * b j := by
       intro g
-      obtain ⟨b', hb'⟩ : ∃ b' : (↑s : Set ι) → B, b' = fun j => b j0 * a g (b j) - a g (b j0) * b j :=
+      obtain ⟨b', hb'⟩
+          : ∃ b' : (↑s : Set ι) → B, b' = fun j => b j0 * a g (b j) - a g (b j0) * b j :=
         ⟨_, rfl⟩
       have hbeq : ∀ j, b' j = b j0 * a g (b j) - a g (b j0) * b j := fun j => by rw [hb']
       have hσsum : ∑ j, a g (b j) • v j = 0 := by
@@ -53,10 +55,13 @@ theorem linearIndepOn_of_fixed {K B W G ι : Type} [Field K] [CommRing B] [IsDom
           rw [map_sum, map_zero] at this
         simpa [hσ, hv] using this
       have hsum' : ∑ j, b' j • v j = 0 := by
-        calc ∑ j, b' j • v j = b j0 • ∑ j, a g (b j) • v j - a g (b j0) • ∑ j, b j • v j := by
-              simp only [hbeq, sub_smul, mul_smul, Finset.sum_sub_distrib, Finset.smul_sum]
+        calc
+          ∑ j, b' j • v j = b j0 • ∑ j, a g (b j) • v j - a g (b j0) • ∑ j, b j • v j := by
+            simp only [hbeq, sub_smul, mul_smul, Finset.sum_sub_distrib, Finset.smul_sum]
           _ = 0 := by rw [hσsum, hsum, smul_zero, smul_zero, sub_zero]
-      have hsub : (Finset.univ.filter fun j => b' j ≠ 0) ⊆ (Finset.univ.filter fun j => b j ≠ 0).erase j0 := by
+      have hsub
+          : (Finset.univ.filter fun j => b' j ≠ 0)
+            ⊆ (Finset.univ.filter fun j => b j ≠ 0).erase j0 := by
         intro j hj
         simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase] at hj ⊢
         refine ⟨?_, ?_⟩

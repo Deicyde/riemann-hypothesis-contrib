@@ -5,16 +5,20 @@ public import Formalism.SharpRestriction.GlobalTheoremInputs
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 namespace GlobalTheory.NLink
 
-theorem adm5_tab : ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (X : KillingConditions.HubData D) (C : ℝ) (tf : TwistedPlaces.Tab L),
-    Concl L P X C → TwistedPlaces.adm5 L (tab L X tf C) C := by
+theorem adm5_tab
+    : ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (X : KillingConditions.HubData D)
+        (C : ℝ) (tf : TwistedPlaces.Tab L),
+      Concl L P X C → TwistedPlaces.adm5 L (tab L X tf C) C := by
   classical
   intro D L P X C tf h i hi hl
   obtain ⟨h2, hq, hd, hg⟩ := hl
-  have hqd : ¬ (D.nd.l i = D.host.q ∨ D.nd.l i = D.host.d) := by tauto
+  have hqd : ¬(D.nd.l i = D.host.q ∨ D.nd.l i = D.host.d) := by tauto
   have hR0 : 0 ≤ C * D.R.f * D.R.n * (D.R.t : ℝ) ^ 2 * D.R.nV * (TwistedPlaces.large₂ L) ^ 2 := by
     have := h.pos
     positivity

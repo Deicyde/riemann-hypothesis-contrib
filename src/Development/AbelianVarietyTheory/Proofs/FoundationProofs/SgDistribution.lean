@@ -54,14 +54,19 @@ lemma ee_eq_one (u v : ℚ) (τ : ℍ) (h : ee ((u : ℂ) * τ + v) = 1) : u = 0
   simp at hre
   exact ⟨rfl, k, by exact_mod_cast hre⟩
 
-theorem sg_distribution : ∀ (c m : ℕ) (x : Fin 2 → ℚ) (τ : ℍ), admitted c x → 0 < m → Nat.Coprime c m →
-    ∏ a ∈ Finset.range m, ∏ b ∈ Finset.range m, sg c ![(x 0 + a) / m, (x 1 + b) / m] τ = sg c x τ := by
+theorem sg_distribution
+    : ∀ (c m : ℕ) (x : Fin 2 → ℚ) (τ : ℍ),
+      admitted c x → 0 < m → Nat.Coprime c m
+        → ∏ a ∈ Finset.range m, ∏ b ∈ Finset.range m, sg c ![(x 0 + a) / m, (x 1 + b) / m] τ
+          = sg c x τ := by
   intro c m x τ hA hm hcm
   obtain ⟨hc1, hc6, hnot⟩ := hA
   have hmC : (m : ℂ) ≠ 0 := by exact_mod_cast hm.ne'
   have hq0 : ee (τ : ℂ) ≠ 0 := ee_ne_zero _
-  have hsplit : ∀ a b : ℕ, sg c ![(x 0 + a) / m, (x 1 + b) / m] τ
-      = cth c (ee (τ : ℂ)) (ee ((((x 0 : ℂ) + a) * τ + x 1) / m) * ee ((b : ℂ) / m)) := by
+  have hsplit
+      : ∀ a b : ℕ,
+        sg c ![(x 0 + a) / m, (x 1 + b) / m] τ
+          = cth c (ee (τ : ℂ)) (ee ((((x 0 : ℂ) + a) * τ + x 1) / m) * ee ((b : ℂ) / m)) := by
     intro a b
     unfold sg
     rw [← ee_add]
@@ -80,25 +85,34 @@ theorem sg_distribution : ∀ (c m : ℕ) (x : Fin 2 → ℚ) (τ : ℍ), admitt
     intro n h
     have h' : ee ((((n : ℚ) + c * x 0 : ℚ) : ℂ) * τ + ((c * x 1 : ℚ) : ℂ)) = 1 := by
       rw [← h, ← ee_int_mul, ← ee_nat_mul, ← ee_add]
-      congr 1; simp only [pt]; push_cast; ring
+      congr 1
+      simp only [pt]
+      push_cast
+      ring
     obtain ⟨h0, k, hk⟩ := ee_eq_one _ _ τ h'
     apply hnot
     refine ⟨⟨-n, ?_⟩, ⟨k, hk.symm⟩⟩
-    push_cast; linarith
-  have hD1 : ∀ a : ℕ, ∀ n : ℤ, ee (τ : ℂ) ^ n * ee ((((x 0 : ℂ) + a) * τ + x 1) / m) ^ (c * m) ≠ 1 := by
+    push_cast
+    linarith
+  have hD1
+      : ∀ a : ℕ, ∀ n : ℤ, ee (τ : ℂ) ^ n * ee ((((x 0 : ℂ) + a) * τ + x 1) / m) ^ (c * m) ≠ 1 := by
     intro a n h
     rw [mul_comm c m, pow_mul, hpow a, mul_pow, ← pow_mul] at h
     apply hND (n + ((a * c : ℕ) : ℤ))
     rw [zpow_add₀ hq0, zpow_natCast, ← h]
     ring
-  calc ∏ a ∈ Finset.range m, ∏ b ∈ Finset.range m, sg c ![(x 0 + a) / m, (x 1 + b) / m] τ
-      = ∏ a ∈ Finset.range m, cth c (ee (τ : ℂ) ^ m) (ee (pt x τ) * ee (τ : ℂ) ^ a) := by
-        apply Finset.prod_congr rfl
-        intro a _
-        simp_rw [hsplit a]
-        rw [GlobalTheory.T.smoothedThetaQProduct_distribution_relation c m _ _ hc1 hc6 hm hcm (norm_ee_lt_one τ) hq0 (ee_ne_zero _) (hD1 a), hpow a]
+  calc
+    ∏ a ∈ Finset.range m, ∏ b ∈ Finset.range m, sg c ![(x 0 + a) / m, (x 1 + b) / m] τ
+        = ∏ a ∈ Finset.range m, cth c (ee (τ : ℂ) ^ m) (ee (pt x τ) * ee (τ : ℂ) ^ a) := by
+      apply Finset.prod_congr rfl
+      intro a _
+      simp_rw [hsplit a]
+      rw [GlobalTheory.T.smoothedThetaQProduct_distribution_relation c m _ _ hc1 hc6 hm hcm
+          (norm_ee_lt_one τ) hq0 (ee_ne_zero _) (hD1 a),
+        hpow a]
     _ = cth c (ee (τ : ℂ)) (ee (pt x τ)) :=
-        GlobalTheory.T.prod_smoothedThetaQProduct_distribution c m _ _ hc1 hc6 hm hcm (norm_ee_lt_one τ) hq0 (ee_ne_zero _) hND
+      GlobalTheory.T.prod_smoothedThetaQProduct_distribution c m _ _ hc1 hc6 hm hcm
+        (norm_ee_lt_one τ) hq0 (ee_ne_zero _) hND
     _ = sg c x τ := rfl
 
 end GlobalTheory.SiegDist

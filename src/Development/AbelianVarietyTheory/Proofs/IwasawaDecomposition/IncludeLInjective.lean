@@ -17,7 +17,8 @@ section Rat
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-theorem includeL_injective : Function.Injective (Algebra.TensorProduct.includeLeftRingHom : L →+* AL L) := by
+theorem includeL_injective
+    : Function.Injective (Algebra.TensorProduct.includeLeftRingHom : L →+* AL L) := by
   haveI : Nontrivial (AFplus L) := Formalism.L2.GlobalTheoryTheory.Br.finiteAdeleRing_nontrivial
   exact Algebra.TensorProduct.includeLeft_injective (S := L) (RingHom.injective _)
 
@@ -37,10 +38,11 @@ theorem mem_incGL (γ : GQ L n) : ((γ : GA L n) : GL (Fin n) (AL L)) ∈ (GQ0 L
 
 def ratFun (γ : GQ L n) : GL (Fin n) L := (Subgroup.mem_map.1 (mem_incGL γ)).choose
 
-theorem ratFun_mem (γ : GQ L n) : ratFun γ ∈ GQ0 L n := (Subgroup.mem_map.1 (mem_incGL γ)).choose_spec.1
+theorem ratFun_mem (γ : GQ L n) : ratFun γ ∈ GQ0 L n :=
+  (Subgroup.mem_map.1 (mem_incGL γ)).choose_spec.1
 
-theorem incGL_ratFun (γ : GQ L n) :
-    incGL (L := L) (n := n) (ratFun γ) = ((γ : GA L n) : GL (Fin n) (AL L)) :=
+theorem incGL_ratFun (γ : GQ L n)
+    : incGL (L := L) (n := n) (ratFun γ) = ((γ : GA L n) : GL (Fin n) (AL L)) :=
   (Subgroup.mem_map.1 (mem_incGL γ)).choose_spec.2
 
 def ratHom : GQ L n →* GL (Fin n) L where
@@ -50,10 +52,11 @@ def ratHom : GQ L n →* GL (Fin n) L where
 
 theorem ratHom_mem (γ : GQ L n) : ratHom (L := L) (n := n) γ ∈ GQ0 L n := ratFun_mem γ
 
-theorem ratHom_eq_of_match (γ : GQ L n) (γ₀ : GL (Fin n) L)
-    (h : (((γ : GA L n) : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) =
-      (γ₀ : Matrix (Fin n) (Fin n) L).map (Algebra.TensorProduct.includeLeftRingHom)) :
-    γ₀ = ratHom (L := L) (n := n) γ := by
+theorem ratHom_eq_of_match
+    (γ : GQ L n) (γ₀ : GL (Fin n) L)
+    (h : (((γ : GA L n) : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L))
+      = (γ₀ : Matrix (Fin n) (Fin n) L).map (Algebra.TensorProduct.includeLeftRingHom))
+    : γ₀ = ratHom (L := L) (n := n) γ := by
   apply incGL_injective
   rw [show ratHom (L := L) (n := n) γ = ratFun γ from rfl, incGL_ratFun]
   exact (Units.ext h).symm
@@ -62,22 +65,27 @@ end Rat
 
 section Rep
 
-variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {ι : Type} [Fintype ι] {K : Type} [Field K]
+variable
+  {L : Type} [Field L] [NumberField L] [IsCMField L]
+  {n : ℕ} {ι : Type} [Fintype ι]
+  {K : Type} [Field K]
 
 instance finVV (lam : ι → DomWeight n) : FiniteDimensional K (Formalism.L2.DIV.VV K lam) :=
   Module.Finite.of_basis (Formalism.L2.DIV.bVV K lam)
 
-instance finDualVV (lam : ι → DomWeight n) : FiniteDimensional K (Module.Dual K (Formalism.L2.DIV.VV K lam)) := inferInstance
+instance finDualVV (lam : ι → DomWeight n)
+    : FiniteDimensional K (Module.Dual K (Formalism.L2.DIV.VV K lam)) :=
+  inferInstance
 
 def embGLF (emb : ι → L →+* K) : GL (Fin n) L →* (ι → GL (Fin n) K) :=
   MonoidHom.pi fun τ => Matrix.GeneralLinearGroup.map (emb τ)
 
-def tenRepF (emb : ι → L →+* K) (lam : ι → DomWeight n) :
-    Representation K (GQ L n) (Formalism.L2.DIV.VV K lam) :=
+def tenRepF (emb : ι → L →+* K) (lam : ι → DomWeight n)
+    : Representation K (GQ L n) (Formalism.L2.DIV.VV K lam) :=
   (Formalism.L2.DIV.rhoK lam).comp ((embGLF emb).comp ratHom)
 
-def wtRepF (emb : ι → L →+* K) (lam : ι → DomWeight n) :
-    Representation K (GQ L n) (Module.Dual K (Formalism.L2.DIV.VV K lam)) :=
+def wtRepF (emb : ι → L →+* K) (lam : ι → DomWeight n)
+    : Representation K (GQ L n) (Module.Dual K (Formalism.L2.DIV.VV K lam)) :=
   (tenRepF emb lam).dual
 
 def CMDist (emb : ι → L →+* K) : Prop :=

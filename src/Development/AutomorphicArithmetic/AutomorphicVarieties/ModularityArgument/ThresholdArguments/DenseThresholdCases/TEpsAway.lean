@@ -11,24 +11,36 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 noncomputable section
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 open scoped Matrix
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace UpperTheory.V.Z.Sym.Ga
-private theorem cyc_eq_of_pow {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
-    {l : ℕ} [Fact l.Prime] {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 L)} (hl : ((l : ℕ) : 𝓞 L) ∉ w.asIdeal)
-    (h : IsPlaceOver A w) {σ : G L Ω} {q : ℕ}
-    (hσ : ∀ x, A.valuation x ≤ 1 → A.valuation (σ x - x ^ q) < 1) :
-    (cycBar L Ω l σ : Qbar l) = (q : Qbar l) := by
+private theorem cyc_eq_of_pow
+    {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    {l : ℕ} [Fact l.Prime]
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 L)}
+    (hl : ((l : ℕ) : 𝓞 L) ∉ w.asIdeal) (h : IsPlaceOver A w)
+    {σ : G L Ω} {q : ℕ} (hσ : ∀ x, A.valuation x ≤ 1 → A.valuation (σ x - x ^ q) < 1)
+    : (cycBar L Ω l σ : Qbar l) = (q : Qbar l) := by
   have h1 : ((cycZ L Ω l σ : ℤ_[l]ˣ) : ℤ_[l]) = (q : ℤ_[l]) :=
     PadicInt.ext_of_toZModPow.mp (cycZ_toZModPow_eq hl h hσ)
   simp [cycBar, h1]
 end UpperTheory.V.Z.Sym.Ga
-theorem UpperTheory.V.Z.Sym.Ga.cyc_char_eq_abs_pow_and_norm_pow_deg_away_l :
-    _root_.UpperTheory.V.Af.Hypotheses' → ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (w : Plc L), ((l : ℕ) : 𝓞 L) ∉ w.asIdeal → ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (a : Weil h →* (w.adicCompletion L)ˣ), IsLocalArtin h a → ∀ s : Weil h, ι (Ga.ep l (s : G L Ω)) = (absPow (w.adicCompletion L) 1 (a s) : ℂ) ∧ ι (Ga.ep l (s : G L Ω)) = ((normV w : ℕ) : ℂ) ^ deg s := by
+theorem UpperTheory.V.Z.Sym.Ga.cyc_char_eq_abs_pow_and_norm_pow_deg_away_l
+    : _root_.UpperTheory.V.Af.Hypotheses'
+      → ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)
+          [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (w : Plc L),
+        ((l : ℕ) : 𝓞 L) ∉ w.asIdeal
+          → ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (a : Weil h →* (w.adicCompletion L)ˣ),
+            IsLocalArtin h a
+              → ∀ s : Weil h,
+                ι (Ga.ep l (s : G L Ω)) = (absPow (w.adicCompletion L) 1 (a s) : ℂ)
+                  ∧ ι (Ga.ep l (s : G L Ω)) = ((normV w : ℕ) : ℂ) ^ deg s := by
   intro _ L Ω _ _ _ _ _ l _ ι w hl A h a ha s
   have hfrob : (cycBar L Ω l ((frob h : Weil h) : G L Ω) : Qbar l) = ((normV w : ℕ) : Qbar l) :=
     Ga.cyc_eq_of_pow hl h (isFrob_frob (h := h)).2
@@ -53,7 +65,8 @@ theorem UpperTheory.V.Z.Sym.Ga.cyc_char_eq_abs_pow_and_norm_pow_deg_away_l :
   refine ⟨?_, hq⟩
   have := DFunLike.congr_fun (ha.absPow_comp 1) s
   rw [Complex.ofReal_one] at this
-  rw [hq, ← MonoidHom.comp_apply, this, GlobalTheory.WeilDeligne.unrChar_apply, Units.val_zpow_eq_zpow_val]
+  rw [hq, ← MonoidHom.comp_apply, this, GlobalTheory.WeilDeligne.unrChar_apply,
+    Units.val_zpow_eq_zpow_val]
   simp
 end
 end

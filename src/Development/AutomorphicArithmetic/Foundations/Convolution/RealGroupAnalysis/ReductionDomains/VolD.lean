@@ -15,8 +15,8 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.M.volD :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (M₀ : Meas F), M₀.μ M₀.D < ⊤ := by
+theorem UpperTheory.ConvolutionTheory.R2.M.volD
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (M₀ : Meas F), M₀.μ M₀.D < ⊤ := by
   intro F _ _ _ M₀
   obtain ⟨c, hc, hred⟩ := UpperTheory.ConvolutionTheory.R2.red F
   obtain ⟨C, ρ, hC, hρ, hcov⟩ := M.ideleCover F c hc
@@ -47,17 +47,22 @@ theorem UpperTheory.ConvolutionTheory.R2.M.volD :
     have hp' : mD (IdeleGroup.diagonal F t) * ratS F γ = nU (rt ξ) * ratS F (σ r) := hp
     have hin : nU (rt ξ) * (ratS F (σ r) * g) ∈ S := by
       refine ⟨((IdeleGroup.diagonal F t : (A F)ˣ) : A F) ^ 2 * b, n, x, hx, k, hk, ?_⟩
-      rw [← mul_assoc, ← hp', mul_assoc, heq, ← hta, M.mD_mul, ← mul_assoc, ← mul_assoc, M.mD_mul_nU]
+      rw [← mul_assoc, ← hp', mul_assoc, heq, ← hta, M.mD_mul, ← mul_assoc, ← mul_assoc,
+        M.mD_mul_nU]
       simp only [mul_assoc]
     have hone : u (ratS F (σ r) * g) = 1 := by
       rw [← huinv (rt ξ), hu, Set.indicator_of_mem hin]; rfl
-    calc (1 : ℝ≥0∞) = u (ratS F (σ r) * g) := hone.symm
+    calc
+      (1 : ℝ≥0∞)
+        = u (ratS F (σ r) * g) := hone.symm
       _ ≤ ∑' r, u (ratS F (σ r) * g) := le_tsum (fun r => u (ratS F (σ r) * g)) r
   have hfs : ∀ g, ∫⁻ b in fundamentalSet F, u (nU b * g) ∂(adeleMeasure F) = u g := by
     intro g
     simp only [huinv]
     rw [lintegral_const, Measure.restrict_apply_univ, adeleMeasure_fundamentalSet, mul_one]
-  calc M₀.μ M₀.D = ∫⁻ _ in M₀.D, 1 ∂M₀.μ := by simp
+  calc
+    M₀.μ M₀.D
+      = ∫⁻ _ in M₀.D, 1 ∂M₀.μ := by simp
     _ ≤ ∫⁻ g in M₀.D, ∑' r, u (ratS F (σ r) * g) ∂M₀.μ := lintegral_mono fun g => hcover g
     _ = M.J0 M₀ u := by
       rw [M.unfL F M₀ σ u hσ hum (fun ξ g => huinv _ g)]

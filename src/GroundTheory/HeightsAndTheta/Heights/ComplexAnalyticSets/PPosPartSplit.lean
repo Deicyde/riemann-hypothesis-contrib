@@ -26,10 +26,10 @@ theorem PosPartSplit.proof : PosPartSplit.Statement := by
   set T : ((Fin n → ℂ) → ℝ) → (Fin n → ℂ) → ℝ := fun g x =>
     if h : ∃ s, IsSheetAt J A x s then
       max (g x * ReciprocityTheory.AnForm.maDens (fun k => φ k ∘ h.choose) y) 0 else 0 with hT
-  have hT0 : ∀ g x, 0 ≤ T g x := fun g x => by
-    simp only [hT]; split_ifs <;> simp
-  have hpt : ∀ x ∈ hfin.toFinset,
-      ENNReal.ofReal (T f x) = ∑' k, ENNReal.ofReal (T ((E k).indicator f) x) := by
+  have hT0 : ∀ g x, 0 ≤ T g x := fun g x => by simp only [hT]; split_ifs <;> simp
+  have hpt
+      : ∀ x ∈ hfin.toFinset,
+        ENNReal.ofReal (T f x) = ∑' k, ENNReal.ofReal (T ((E k).indicator f) x) := by
     intro x hx
     have hx' : x ∈ fibre J A y := hfin.mem_toFinset.mp hx
     by_cases hs : ∃ s, IsSheetAt J A x s

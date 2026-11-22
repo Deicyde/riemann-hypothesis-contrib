@@ -9,20 +9,21 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.FrobeniusOrbits GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.FrobeniusOrbits
+  GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
 
 namespace GlobalTheory.SplitPlaces
 
 variable {R : Ranks} (H : Host R)
 
-theorem sqrt_sq : (H.sqd) ^ 2 = -(H.d : H.E) := by
-  exact H.sqd_sq
+theorem sqrt_sq : (H.sqd) ^ 2 = -(H.d : H.E) := by exact H.sqd_sq
 
-theorem conj_sqrt : H.conj (H.sqd) = -H.sqd :=
-  by apply _root_.UpperTheory.Reformulated.B.Rc9.conj_sqrt <;> assumption
+theorem conj_sqrt : H.conj (H.sqd) = -H.sqd := by
+  apply _root_.UpperTheory.Reformulated.B.Rc9.conj_sqrt <;> assumption
 
-theorem exists_conjPl (l : ℕ) (w : HeightOneSpectrum (𝓞 H.E)) (hw : w ∈ placesOver H.E l) :
-    ∃ w' ∈ placesOver H.E l, IsConjPl H w w' := by
+theorem exists_conjPl (l : ℕ) (w : HeightOneSpectrum (𝓞 H.E)) (hw : w ∈ placesOver H.E l)
+    : ∃ w' ∈ placesOver H.E l, IsConjPl H w w' := by
   let c : 𝓞 H.E ≃+* 𝓞 H.E := RingOfIntegers.mapRingEquiv H.conj.toRingEquiv
   refine ⟨HeightOneSpectrum.comap (c.symm : 𝓞 H.E →+* 𝓞 H.E) c.symm.surjective w, ?_, ?_⟩
   · show (c.symm : 𝓞 H.E →+* 𝓞 H.E) (l : 𝓞 H.E) ∈ w.asIdeal
@@ -31,14 +32,16 @@ theorem exists_conjPl (l : ℕ) (w : HeightOneSpectrum (𝓞 H.E)) (hw : w ∈ p
   · intro x y hxy
     have : y = c x := by
       apply RingOfIntegers.ext
-      rw [hxy]; rfl
+      rw [hxy]
+      rfl
     subst this
     show _ ↔ c.symm (c x) ∈ w.asIdeal
     rw [c.symm_apply_apply]
 
-theorem not_isConjPl_self {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (hld : l ≠ H.d)
-    (hj : jacobiSym (-(H.d : ℤ)) l = 1) (w : HeightOneSpectrum (𝓞 H.E)) (hw : w ∈ placesOver H.E l) :
-    ¬ IsConjPl H w w := by
+theorem not_isConjPl_self
+    {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (hld : l ≠ H.d) (hj : jacobiSym (-(H.d : ℤ)) l = 1)
+    (w : HeightOneSpectrum (𝓞 H.E)) (hw : w ∈ placesOver H.E l)
+    : ¬ IsConjPl H w w := by
   intro h
   have : Fact l.Prime := ⟨hl⟩
   obtain ⟨m, hm⟩ := ZMod.isSquare_of_jacobiSym_eq_one hj
@@ -46,7 +49,8 @@ theorem not_isConjPl_self {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (hld : l ≠ 
   have hdvd : (l : ℤ) ∣ n * n + H.d := by
     rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
     push_cast at hm ⊢
-    rw [← hm]; ring
+    rw [← hm]
+    ring
   have hint : IsIntegral ℤ (H.sqd) := by
     apply IsIntegral.of_pow (n := 2) (by norm_num)
     rw [sqrt_sq]
@@ -66,8 +70,7 @@ theorem not_isConjPl_self {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (hld : l ≠ 
     obtain ⟨k, hk⟩ := hdvd
     have hk' : ((n * n + H.d : ℤ) : 𝓞 H.E) = ((l * k : ℤ) : 𝓞 H.E) := by rw [hk]
     push_cast at hk'
-    have : (b - n) * (b + n) = (l : 𝓞 H.E) * (-k) := by
-      linear_combination hb - hk'
+    have : (b - n) * (b + n) = (l : 𝓞 H.E) * (-k) := by linear_combination hb - hk'
     rw [this]
     exact w.asIdeal.mul_mem_right _ hw
   have hboth : b - n ∈ w.asIdeal ∧ b + n ∈ w.asIdeal := by
@@ -76,7 +79,8 @@ theorem not_isConjPl_self {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (hld : l ≠ 
   have h2n : ((2 * n : ℤ) : 𝓞 H.E) ∈ w.asIdeal := by
     have := w.asIdeal.sub_mem hboth.2 hboth.1
     convert this using 1
-    push_cast; ring
+    push_cast
+    ring
   have hlo := GlobalTheory.HubLoc.liesOver_of_mem hl hw
   have hl2n : (l : ℤ) ∣ 2 * n := by
     rw [← Ideal.mem_span_singleton, hlo.over, Ideal.under_def, Ideal.mem_comap]

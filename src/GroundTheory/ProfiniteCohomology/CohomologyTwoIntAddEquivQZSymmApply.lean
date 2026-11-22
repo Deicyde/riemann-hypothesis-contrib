@@ -29,8 +29,10 @@ end Eval
 
 section H2
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-  [TotallyDisconnectedSpace G] {σ : G}
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+  [TotallyDisconnectedSpace G]
+  {σ : G}
 
 end H2
 

@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsU
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,11 +21,17 @@ namespace GlobalTheory
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.point_factor_integral_subalgebra : ∀ (K B E : Type) [Field K] [CommRing B] [CommRing E]
-    [Algebra K B] [Algebra K E] (i : E →ₐ[K] B), Function.Injective i →
-    (∀ b : B, _root_.IsIntegral K b → b ∈ i.range) → ∀ (T : Scheme.{0}) (p : T ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)
-    [IsFinite p] (t : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp B ⟶ T), t ≫ p = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap K B) →
-    ∃ u : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp E ⟶ T, u ≫ p = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap K E) ∧ t = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap i.toRingHom ≫ u := by
+theorem _root_.GlobalTheory.point_factor_integral_subalgebra
+    : ∀ (K B E : Type) [Field K] [CommRing B] [CommRing E] [Algebra K B] [Algebra K E]
+        (i : E →ₐ[K] B),
+      Function.Injective i → (∀ b : B, _root_.IsIntegral K b → b ∈ i.range)
+        → ∀ (T : Scheme.{0}) (p : T ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)
+            [IsFinite p] (t : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp B ⟶ T),
+          t ≫ p = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap K B)
+            → ∃ u : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp E ⟶ T,
+              u ≫ p = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap K E)
+                ∧ t
+                  = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap i.toRingHom ≫ u := by
   intro K B E _ _ _ _ _ i hi hint T p _ t ht
   have : IsAffine T := isAffine_of_isAffineHom p
   set e := T.isoSpec
@@ -32,8 +39,7 @@ theorem _root_.GlobalTheory.point_factor_integral_subalgebra : ∀ (K B E : Type
   let α := Spec.preimage (t ≫ e.hom)
   have hφ : Spec.map φ = e.inv ≫ p := Spec.map_preimage _
   have hα : Spec.map α = t ≫ e.hom := Spec.map_preimage _
-  have hfin : φ.hom.Finite := by
-    rw [← IsFinite.SpecMap_iff, hφ]; infer_instance
+  have hfin : φ.hom.Finite := by rw [← IsFinite.SpecMap_iff, hφ]; infer_instance
   have hcomp : φ ≫ α = CommRingCat.ofHom (algebraMap K B) := by
     apply Spec.map_injective
     rw [Spec.map_comp, hα, hφ]
@@ -68,8 +74,7 @@ theorem _root_.GlobalTheory.point_factor_integral_subalgebra : ∀ (K B E : Type
     exact congrArg (fun f : K →+* E => f x) hβφ
   · change t = Spec.map (CommRingCat.ofHom i.toRingHom) ≫ _
     rw [← Category.assoc, ← Spec.map_comp]
-    have hβα : CommRingCat.ofHom β ≫ CommRingCat.ofHom i.toRingHom = α := by
-      ext x; exact hiβ x
+    have hβα : CommRingCat.ofHom β ≫ CommRingCat.ofHom i.toRingHom = α := by ext x; exact hiβ x
     rw [hβα, hα, Category.assoc, e.hom_inv_id, Category.comp_id]
 
 end GlobalTheory

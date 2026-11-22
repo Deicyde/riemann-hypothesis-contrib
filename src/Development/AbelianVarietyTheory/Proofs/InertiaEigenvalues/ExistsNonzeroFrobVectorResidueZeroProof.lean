@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsN
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 namespace GlobalTheory.PMon

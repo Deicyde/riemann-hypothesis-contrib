@@ -13,20 +13,26 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Cmp.SncRes.Par
 
-open MvPolynomial ReciprocityTheory.AnForm.R ReciprocityTheory.AnForm.R.IrreducibleComponentPreimages GlobalTheory.CompanionTheory.Ar.Cmp
+open MvPolynomial ReciprocityTheory.AnForm.R
+  ReciprocityTheory.AnForm.R.IrreducibleComponentPreimages GlobalTheory.CompanionTheory.Ar.Cmp
 
 variable {m : ℕ}
 
-theorem algebraMap_locRing_eq_zero_of_mem {I : Ideal (MvPolynomial (Fin m) ℂ)} (t : Fin m → ℂ)
-    {h : MvPolynomial (Fin m) ℂ} (hh : h ∈ I) : algebraMap _ (locRing I t) h = 0 := by
-  have halg : algebraMap (MvPolynomial (Fin m) ℂ) (locRing I t) h =
-      Ideal.Quotient.mk _ (algebraMap _ (locPt t) h) := rfl
+theorem algebraMap_locRing_eq_zero_of_mem
+    {I : Ideal (MvPolynomial (Fin m) ℂ)} (t : Fin m → ℂ) {h : MvPolynomial (Fin m) ℂ} (hh : h ∈ I)
+    : algebraMap _ (locRing I t) h = 0 := by
+  have halg
+      : algebraMap (MvPolynomial (Fin m) ℂ) (locRing I t) h
+        = Ideal.Quotient.mk _ (algebraMap _ (locPt t) h) :=
+    rfl
   rw [halg, Ideal.Quotient.eq_zero_iff_mem]
   exact Ideal.mem_map_of_mem _ hh
 
-theorem map_ptIdeal_eq_maximalIdeal {I : Ideal (MvPolynomial (Fin m) ℂ)} {t : Fin m → ℂ}
-    (hI : ∀ h ∈ I, eval t h = 0) [IsLocalRing (locRing I t)] :
-    Ideal.map (algebraMap _ (locRing I t)) (ptIdeal t) = IsLocalRing.maximalIdeal (locRing I t) := by
+theorem map_ptIdeal_eq_maximalIdeal
+    {I : Ideal (MvPolynomial (Fin m) ℂ)} {t : Fin m → ℂ} (hI : ∀ h ∈ I, eval t h = 0)
+    [IsLocalRing (locRing I t)]
+    : Ideal.map (algebraMap _ (locRing I t)) (ptIdeal t)
+      = IsLocalRing.maximalIdeal (locRing I t) := by
   apply le_antisymm
   · rw [Ideal.map_le_iff_le_comap]
     intro g hg
@@ -43,14 +49,14 @@ theorem map_ptIdeal_eq_maximalIdeal {I : Ideal (MvPolynomial (Fin m) ℂ)} {t : 
       rw [← hab] at hau
       exact ((IsLocalRing.mem_maximalIdeal _).mp hx) (isUnit_of_mul_isUnit_left hau)
     obtain ⟨v, hv⟩ := hbu.exists_right_inv
-    have : x = algebraMap _ (locRing I t) a * v := by
-      rw [← hab, mul_assoc, hv, mul_one]
+    have : x = algebraMap _ (locRing I t) a * v := by rw [← hab, mul_assoc, hv, mul_one]
     rw [this]
     exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ ha)
 
-theorem chPrime_le_of_mem {I 𝔮 : Ideal (MvPolynomial (Fin m) ℂ)} {t : Fin m → ℂ}
-    {f : MvPolynomial (Fin m) ℂ} (h𝔮 : 𝔮.IsPrime) (hI𝔮 : I ≤ 𝔮) (h𝔮t : 𝔮 ≤ ptIdeal t)
-    (hf : f ∈ 𝔮) : chPrime I t f ≤ 𝔮 := by
+theorem chPrime_le_of_mem
+    {I 𝔮 : Ideal (MvPolynomial (Fin m) ℂ)} {t : Fin m → ℂ} {f : MvPolynomial (Fin m) ℂ}
+    (h𝔮 : 𝔮.IsPrime) (hI𝔮 : I ≤ 𝔮) (h𝔮t : 𝔮 ≤ ptIdeal t) (hf : f ∈ 𝔮)
+    : chPrime I t f ≤ 𝔮 := by
   intro g hg
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.mp (Ideal.mem_comap.mp hg)
   obtain ⟨a₀, b₀, hb₀, hab⟩ := exists_mk_locRing I t a
@@ -67,23 +73,43 @@ theorem chPrime_le_of_mem {I 𝔮 : Ideal (MvPolynomial (Fin m) ℂ)} {t : Fin m
   rw [map_mul] at this
   exact mul_ne_zero hs hb₀ this
 
-theorem primes_below_params : ∀ (m e : ℕ) (I Dc : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ) (r : Fin e → MvPolynomial (Fin m) ℂ) (Jf : Finset (Fin e)), I ≤ Dc → (∀ h ∈ I, eval t h = 0) → IsRegularLocalRing (locRing I t) → ringKrullDim (locRing I t) = e → Ideal.span (Set.range fun l => algebraMap _ (locRing I t) (r l)) = Ideal.map (algebraMap _ (locRing I t)) (ptIdeal t) → (∀ 𝔮 : Ideal (MvPolynomial (Fin m) ℂ), 𝔮.IsPrime → I ≤ 𝔮 → 𝔮 ≤ ptIdeal t → (Dc ≤ 𝔮 ↔ ∃ i ∈ Jf, r i ∈ 𝔮)) → ∀ i ∈ Jf, (SncRes.Par.chPrime I t (r i)).IsPrime ∧ I ≤ SncRes.Par.chPrime I t (r i) ∧ SncRes.Par.chPrime I t (r i) ≤ ptIdeal t ∧ Dc ≤ SncRes.Par.chPrime I t (r i) ∧ r i ∈ SncRes.Par.chPrime I t (r i) ∧ (∀ j ∈ Jf, j ≠ i → r j ∉ SncRes.Par.chPrime I t (r i)) ∧ ∀ 𝔮 : Ideal (MvPolynomial (Fin m) ℂ), 𝔮.IsPrime → I ≤ 𝔮 → 𝔮 ≤ ptIdeal t → r i ∈ 𝔮 → SncRes.Par.chPrime I t (r i) ≤ 𝔮 := by
+theorem primes_below_params
+    : ∀ (m e : ℕ) (I Dc : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ)
+        (r : Fin e → MvPolynomial (Fin m) ℂ) (Jf : Finset (Fin e)),
+      I ≤ Dc → (∀ h ∈ I, eval t h = 0) → IsRegularLocalRing (locRing I t)
+        → ringKrullDim (locRing I t) = e
+        → Ideal.span (Set.range fun l => algebraMap _ (locRing I t) (r l))
+          = Ideal.map (algebraMap _ (locRing I t)) (ptIdeal t)
+        → (∀ 𝔮 : Ideal (MvPolynomial (Fin m) ℂ),
+          𝔮.IsPrime → I ≤ 𝔮 → 𝔮 ≤ ptIdeal t → (Dc ≤ 𝔮 ↔ ∃ i ∈ Jf, r i ∈ 𝔮))
+        → ∀ i ∈ Jf,
+          (SncRes.Par.chPrime I t (r i)).IsPrime ∧ I ≤ SncRes.Par.chPrime I t (r i)
+            ∧ SncRes.Par.chPrime I t (r i) ≤ ptIdeal t ∧ Dc ≤ SncRes.Par.chPrime I t (r i)
+            ∧ r i ∈ SncRes.Par.chPrime I t (r i)
+            ∧ (∀ j ∈ Jf, j ≠ i → r j ∉ SncRes.Par.chPrime I t (r i))
+            ∧ ∀ 𝔮 : Ideal (MvPolynomial (Fin m) ℂ),
+              𝔮.IsPrime → I ≤ 𝔮 → 𝔮 ≤ ptIdeal t → r i ∈ 𝔮 → SncRes.Par.chPrime I t (r i) ≤ 𝔮 := by
   intro m e I Dc t r Jf hIDc hI hreg hdim hspan hDc i hi
   haveI := hreg
   haveI : IsDomain (locRing I t) := isDomain_of_isRegularLocalRing
   have hmax := map_ptIdeal_eq_maximalIdeal hI
-  have hspan' : Ideal.span (Set.range fun l => algebraMap _ (locRing I t) (r l)) =
-      IsLocalRing.maximalIdeal (locRing I t) := hspan.trans hmax
+  have hspan'
+      : Ideal.span (Set.range fun l => algebraMap _ (locRing I t) (r l))
+        = IsLocalRing.maximalIdeal (locRing I t) :=
+    hspan.trans hmax
   have hprime : ∀ l, Prime (algebraMap _ (locRing I t) (r l)) :=
     prime_of_regular_params (fun l => algebraMap _ (locRing I t) (r l)) hspan' hdim.symm
-  have hnassoc := (regular_params_spec (fun l => algebraMap _ (locRing I t) (r l)) hspan' hdim.symm).2
+  have hnassoc :=
+    (regular_params_spec (fun l => algebraMap _ (locRing I t) (r l)) hspan' hdim.symm).2
   have hIt : I ≤ ptIdeal t := fun h hh => RingHom.mem_ker.mpr (hI h hh)
   have hRi : r i ∈ chPrime I t (r i) := Ideal.mem_comap.mpr (Ideal.mem_span_singleton_self _)
   have hle : chPrime I t (r i) ≤ ptIdeal t := by
     intro g hg
     have hg' : algebraMap _ (locRing I t) g ∈ Ideal.span {algebraMap _ (locRing I t) (r i)} :=
       Ideal.mem_comap.mp hg
-    have hsub : Ideal.span {algebraMap _ (locRing I t) (r i)} ≤ IsLocalRing.maximalIdeal (locRing I t) := by
+    have hsub
+        : Ideal.span {algebraMap _ (locRing I t) (r i)}
+          ≤ IsLocalRing.maximalIdeal (locRing I t) := by
       rw [Ideal.span_singleton_le_iff_mem, ← hspan']
       exact Ideal.subset_span ⟨i, rfl⟩
     have hnu := (IsLocalRing.mem_maximalIdeal _).mp (hsub hg')

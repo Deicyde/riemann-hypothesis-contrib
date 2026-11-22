@@ -12,8 +12,8 @@ namespace PI
 
 open Formalism.QuantumDeterminants
 
-def RStab (k r : ℕ) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
-    Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
+def RStab (k r : ℕ) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
   {a | a ∈ Nset k r ∧ g⁻¹ * a * g ∈ Nset k r}
 
 def StabBig : Prop :=

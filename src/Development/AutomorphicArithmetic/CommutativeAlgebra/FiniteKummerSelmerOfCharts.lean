@@ -11,8 +11,10 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.FiniteKummerS
 open GroundTheory.FunctionField UpperTheory.Et.Sel
 open scoped TensorProduct
 
-theorem UpperTheory.finite_kummerSelmer_of_charts :
-    ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra k K] [IsFunctionField k K] (q : ℕ) [NeZero q], Charts k K q → FinCls q (SelAll k K q) := by
+theorem UpperTheory.finite_kummerSelmer_of_charts
+    : ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra k K] [IsFunctionField k K] (q : ℕ)
+        [NeZero q],
+      Charts k K q → FinCls q (SelAll k K q) := by
   intro k K _ _ _ _ _ q _ hC
   obtain ⟨n, v, hv⟩ := UpperTheory.exists_finite_span_kummerSelmer_representatives k K q
   let P : Set (Fin n → k) → Prop := fun s =>

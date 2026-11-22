@@ -12,10 +12,14 @@ open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar NumberFiel
 
 namespace PositivityTheory.HtPt.Mb
 
-theorem mem_ctrSet_of {o : Type} [CommRing o] {Ω : Type} [Field Ω] [Algebra o Ω] {κ : Type} {x : κ → Ω}
-    {X' : Scheme.{0}} {Ω' : Type} [Field Ω'] {ξ' : Spec (CommRingCat.of Ω') ⟶ X'} {i : Ω →+* Ω'} {p' : Cpt ξ'}
-    (c : κ) (hc : x c ≠ 0) (ho : ∀ r : o, i (algebraMap o Ω r) ∈ regAt ξ' p')
-    (hx : ∀ j, i (x j / x c) ∈ regAt ξ' p') : p' ∈ ctrSet o x i ξ' := by
+theorem mem_ctrSet_of
+    {o : Type} [CommRing o]
+    {Ω : Type} [Field Ω] [Algebra o Ω]
+    {κ : Type} {x : κ → Ω} {X' : Scheme.{0}} {Ω' : Type} [Field Ω']
+    {ξ' : Spec (CommRingCat.of Ω') ⟶ X'} {i : Ω →+* Ω'} {p' : Cpt ξ'}
+    (c : κ) (hc : x c ≠ 0)
+    (ho : ∀ r : o, i (algebraMap o Ω r) ∈ regAt ξ' p') (hx : ∀ j, i (x j / x c) ∈ regAt ξ' p')
+    : p' ∈ ctrSet o x i ξ' := by
   refine ⟨c, hc, fun a ha => ?_⟩
   induction ha using Algebra.adjoin_induction with
   | mem y hy =>
@@ -25,7 +29,12 @@ theorem mem_ctrSet_of {o : Type} [CommRing o] {Ω : Type} [Field Ω] [Algebra o 
   | add y z _ _ hy hz => rw [map_add]; exact add_mem hy hz
   | mul y z _ _ hy hz => rw [map_mul]; exact mul_mem hy hz
 
-theorem join_charts : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ κ' : Type) (x : κ → Ω) (Ω' : Type) [Field Ω'] [Algebra o Ω'] (i : Ω →+* Ω') (w : κ' → Ω') (M' : PModel o (joinCo i x w)), (∀ a : o, i (algebraMap o Ω a) = algebraMap o Ω' a) → ∀ p' : Cpt M'.ξ, p' ∈ ctrSet o x i M'.ξ ∧ ∃ l, InChart M'.ξ w l p' := by
+theorem join_charts
+    : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ κ' : Type) (x : κ → Ω)
+        (Ω' : Type) [Field Ω'] [Algebra o Ω'] (i : Ω →+* Ω') (w : κ' → Ω')
+        (M' : PModel o (joinCo i x w)),
+      (∀ a : o, i (algebraMap o Ω a) = algebraMap o Ω' a)
+        → ∀ p' : Cpt M'.ξ, p' ∈ ctrSet o x i M'.ξ ∧ ∃ l, InChart M'.ξ w l p' := by
   intro o _ Ω _ _ κ κ' x Ω' _ _ i w M' hi p'
   obtain ⟨⟨c, l⟩, hc⟩ := M'.tie.cover p'
   have h0 : i (x c) * w l ≠ 0 := hc.1

@@ -9,12 +9,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem tr_zero {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (hn : 1 ≤ n) : D.tr 0 = 0 := by
-  have h1 : (MonoidAlgebra.single (1 : G) (Polynomial.X : Polynomial A))
-      = (Polynomial.X : Polynomial A) • (1 : MonoidAlgebra (Polynomial A) G) := by
+private theorem tr_zero {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (hn : 1 ≤ n)
+    : D.tr 0 = 0 := by
+  have h1
+      : (MonoidAlgebra.single (1 : G) (Polynomial.X : Polynomial A))
+        = (Polynomial.X : Polynomial A) • (1 : MonoidAlgebra (Polynomial A) G) := by
     rw [MonoidAlgebra.one_def, MonoidAlgebra.smul_single', mul_one]
   have hchi : D.chi 0 = Polynomial.X ^ n := by
     simp only [GDet.chi, map_zero, sub_zero]

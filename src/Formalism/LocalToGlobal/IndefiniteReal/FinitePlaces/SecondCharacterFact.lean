@@ -6,7 +6,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.NormNatCastLtO
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.InjectiveDecompositionAction NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.InjectiveDecompositionAction NumberField IsDedekindDomain
   Topology Filter
 open scoped TensorProduct
 
@@ -18,8 +20,9 @@ section Places
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem exists_finset_norm_one (x : F) (hx : x ≠ 0) :
-    ∃ S : Finset (HeightOneSpectrum (𝓞 F)), ∀ v ∉ S, ‖algebraMap F (v.adicCompletion F) x‖ = 1 := by
+theorem exists_finset_norm_one (x : F) (hx : x ≠ 0)
+    : ∃ S : Finset (HeightOneSpectrum (𝓞 F)), ∀ v ∉ S,
+      ‖algebraMap F (v.adicCompletion F) x‖ = 1 := by
   classical
   have h1 := IsDedekindDomain.HeightOneSpectrum.Support.finite (𝓞 F) x
   have h2 := IsDedekindDomain.HeightOneSpectrum.Support.finite (𝓞 F) x⁻¹
@@ -40,10 +43,9 @@ end Places
 
 section Main
 
-variable {D : D7} (δ : D.host.E) (hδ : D.sp.cm.sig δ = -δ) (hδ0 : δ ≠ 0) (Δ : D.host.F)
+variable
+  {D : D7} (δ : D.host.E) (hδ : D.sp.cm.sig δ = -δ) (hδ0 : δ ≠ 0) (Δ : D.host.F)
   (hΔ : algebraMap D.host.F D.host.E Δ = δ * δ)
-
-
 
 end Main
 

@@ -10,23 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryMa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions Formalism.MainNotions.StandardLattice
+open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.BasicNotions
+  Formalism.MainNotions.StandardLattice
 open scoped TensorProduct
 
 namespace GlobalTheory.SplitIntegers
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
 
-theorem conj_tmul (hc : CMData F E) {R : Type} [CommRing R] [Algebra F R] (a : E) (y : R) :
-    Formalism.UG.sigR hc.sig R (a ⊗ₜ[F] y) = star a ⊗ₜ[F] y := rfl
+theorem conj_tmul (hc : CMData F E) {R : Type} [CommRing R] [Algebra F R] (a : E) (y : R)
+    : Formalism.UG.sigR hc.sig R (a ⊗ₜ[F] y) = star a ⊗ₜ[F] y :=
+  rfl
 
 omit [NumberField F] [NumberField E] [StarRing E] in
-theorem algebraMap_tmul {R : Type} [CommRing R] [Algebra F R] (c : F) (y : R) :
-    (algebraMap F E c) ⊗ₜ[F] y = (1 : E) ⊗ₜ[F] (algebraMap F R c * y) := by
+theorem algebraMap_tmul {R : Type} [CommRing R] [Algebra F R] (c : F) (y : R)
+    : (algebraMap F E c) ⊗ₜ[F] y = (1 : E) ⊗ₜ[F] (algebraMap F R c * y) := by
   rw [Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul, Algebra.smul_def]
 
-theorem exists_add_conj (hc : CMData F E) {R : Type} [CommRing R] [Algebra F R] (z : E ⊗[F] R) :
-    ∃ p : R, z + Formalism.UG.sigR hc.sig R z = (1 : E) ⊗ₜ[F] p := by
+theorem exists_add_conj (hc : CMData F E) {R : Type} [CommRing R] [Algebra F R] (z : E ⊗[F] R)
+    : ∃ p : R, z + Formalism.UG.sigR hc.sig R z = (1 : E) ⊗ₜ[F] p := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨0, by simp⟩
   | tmul a y =>
@@ -36,45 +38,56 @@ theorem exists_add_conj (hc : CMData F E) {R : Type} [CommRing R] [Algebra F R] 
     obtain ⟨p, hp⟩ := hx
     obtain ⟨q, hq⟩ := hy
     refine ⟨p + q, ?_⟩
-    rw [map_add (f := _), TensorProduct.tmul_add, ← hp, ← hq]; ring
+    rw [map_add (f := _), TensorProduct.tmul_add, ← hp, ← hq]
+    ring
 
-theorem exists_of_conj_eq (hc : CMData F E) {R : Type} [CommRing R] [Algebra F R] {z : E ⊗[F] R}
-    (hz : Formalism.UG.sigR hc.sig R z = z) : ∃ p : R, (1 : E) ⊗ₜ[F] p = z := by
+theorem exists_of_conj_eq
+    (hc : CMData F E)
+    {R : Type} [CommRing R] [Algebra F R]
+    {z : E ⊗[F] R} (hz : Formalism.UG.sigR hc.sig R z = z)
+    : ∃ p : R, (1 : E) ⊗ₜ[F] p = z := by
   obtain ⟨p, hp⟩ := exists_add_conj hc z
   rw [hz, ← two_smul F z] at hp
   refine ⟨(2⁻¹ : F) • p, ?_⟩
   rw [TensorProduct.tmul_smul, ← hp, smul_smul, inv_mul_cancel₀ two_ne_zero, one_smul]
 
-theorem exists_diag (hc : CMData F E) {K : Type} [Field K] [Algebra F K]
-    (φ : E ⊗[F] K ≃+* K × K) (hφ : ∀ x, φ (Formalism.UG.sigR hc.sig K x) = swapR _ (φ x)) :
-    ∃ θ : K ≃+* K, ∀ y, φ ((1 : E) ⊗ₜ[F] y) = (θ y, θ y) := by
-  let f : K →+* K := ((RingHom.fst K K).comp φ.toRingHom).comp
-    (Algebra.TensorProduct.includeRight (R := F) (A := E) (B := K)).toRingHom
+theorem exists_diag
+    (hc : CMData F E)
+    {K : Type} [Field K] [Algebra F K]
+    (φ : E ⊗[F] K ≃+* K × K) (hφ : ∀ x, φ (Formalism.UG.sigR hc.sig K x) = swapR _ (φ x))
+    : ∃ θ : K ≃+* K, ∀ y, φ ((1 : E) ⊗ₜ[F] y) = (θ y, θ y) := by
+  let f : K →+* K :=
+    ((RingHom.fst K K).comp φ.toRingHom).comp
+      (Algebra.TensorProduct.includeRight (R := F) (A := E) (B := K)).toRingHom
   have hf : ∀ y, φ ((1 : E) ⊗ₜ[F] y) = (f y, f y) := fun y => by
     have h := hφ ((1 : E) ⊗ₜ[F] y)
     rw [conj_tmul, star_one] at h
     have h2 := congrArg Prod.snd h
     exact Prod.ext rfl h2
   refine ⟨RingEquiv.ofBijective f ⟨f.injective, fun b => ?_⟩, hf⟩
-  obtain ⟨p, hp⟩ := exists_of_conj_eq hc (z := φ.symm (b, b)) (φ.injective (by
-    rw [hφ, φ.apply_symm_apply]; rfl))
+  obtain ⟨p, hp⟩ :=
+    exists_of_conj_eq hc (z := φ.symm (b, b)) (φ.injective (by rw [hφ, φ.apply_symm_apply]; rfl))
   refine ⟨p, ?_⟩
   have := hf p
   rw [hp, φ.apply_symm_apply] at this
   exact (congrArg Prod.fst this).symm
 
-theorem mem_of_isIntegral (v : HeightOneSpectrum (𝓞 F)) {x : v.adicCompletion F}
-    (hx : IsIntegral ℤ x) : x ∈ v.adicCompletionIntegers F := by
+theorem mem_of_isIntegral
+    (v : HeightOneSpectrum (𝓞 F)) {x : v.adicCompletion F} (hx : IsIntegral ℤ x)
+    : x ∈ v.adicCompletionIntegers F := by
   have hi : IsIntegral (v.adicCompletionIntegers F) x := hx.tower_top
   obtain ⟨b, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.1 hi
   exact b.2
 
 omit [NumberField E] [StarRing E] [Algebra F E] in
-theorem map_mem {S : Type} (v : HeightOneSpectrum (𝓞 F)) [FunLike S E (v.adicCompletion F)]
-    [RingHomClass S E (v.adicCompletion F)] (g : S) (a : 𝓞 E) :
-    g (algebraMap (𝓞 E) E a) ∈ v.adicCompletionIntegers F :=
-  mem_of_isIntegral v (a.isIntegral_coe.map_of_comp_eq (RingHom.id ℤ)
-    (g : E →+* v.adicCompletion F) (RingHom.ext_int _ _))
+theorem map_mem
+    {S : Type} (v : HeightOneSpectrum (𝓞 F))
+    [FunLike S E (v.adicCompletion F)] [RingHomClass S E (v.adicCompletion F)]
+    (g : S) (a : 𝓞 E)
+    : g (algebraMap (𝓞 E) E a) ∈ v.adicCompletionIntegers F :=
+  mem_of_isIntegral v
+    (a.isIntegral_coe.map_of_comp_eq (RingHom.id ℤ) (g : E →+* v.adicCompletion F)
+      (RingHom.ext_int _ _))
 
 end GlobalTheory.SplitIntegers
 
@@ -82,16 +95,27 @@ namespace GlobalTheory
 
 open SplitIntegers
 
-theorem mem_intV_iff_of_splitting : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (hc : CMData F E) (v : HeightOneSpectrum (𝓞 F)), (∀ (θ : v.adicCompletion F ≃+* v.adicCompletion F) (x : v.adicCompletion F), θ x ∈ v.adicCompletionIntegers F ↔ x ∈ v.adicCompletionIntegers F) → ∀ (φ : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F), (∀ x, φ (Formalism.UG.sigR hc.sig (v.adicCompletion F) x) = swapR _ (φ x)) → ∀ x, x ∈ intV E v ↔ (φ x).1 ∈ v.adicCompletionIntegers F ∧ (φ x).2 ∈ v.adicCompletionIntegers F := by
+theorem mem_intV_iff_of_splitting
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+        (hc : CMData F E) (v : HeightOneSpectrum (𝓞 F)),
+      (∀ (θ : v.adicCompletion F ≃+* v.adicCompletion F) (x : v.adicCompletion F),
+          θ x ∈ v.adicCompletionIntegers F ↔ x ∈ v.adicCompletionIntegers F)
+        → ∀ (φ : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F),
+          (∀ x, φ (Formalism.UG.sigR hc.sig (v.adicCompletion F) x) = swapR _ (φ x))
+            → ∀ x,
+              x ∈ intV E v
+                ↔ (φ x).1 ∈ v.adicCompletionIntegers F ∧ (φ x).2 ∈ v.adicCompletionIntegers F := by
   intro F E _ _ _ _ _ _ hc v hθ φ hφ
   obtain ⟨θ, hd⟩ := exists_diag hc φ hφ
-  have hθ' : ∀ y ∈ v.adicCompletionIntegers F, θ.symm y ∈ v.adicCompletionIntegers F :=
-    fun y hy => (hθ θ.symm y).2 hy
-  let ι : E →+* v.adicCompletion F × v.adicCompletion F := φ.toRingHom.comp
-    (Algebra.TensorProduct.includeLeftRingHom (R := F) (A := E) (B := v.adicCompletion F))
-  have hι : ∀ a : 𝓞 E,
-      (φ (algebraMap (𝓞 E) E a ⊗ₜ[F] 1)).1 ∈ v.adicCompletionIntegers F ∧
-      (φ (algebraMap (𝓞 E) E a ⊗ₜ[F] 1)).2 ∈ v.adicCompletionIntegers F := fun a =>
+  have hθ' : ∀ y ∈ v.adicCompletionIntegers F, θ.symm y ∈ v.adicCompletionIntegers F := fun y hy =>
+    (hθ θ.symm y).2 hy
+  let ι : E →+* v.adicCompletion F × v.adicCompletion F :=
+    φ.toRingHom.comp (Algebra.TensorProduct.includeLeftRingHom (R := F) (A := E)
+      (B := v.adicCompletion F))
+  have hι
+      : ∀ a : 𝓞 E,
+        (φ (algebraMap (𝓞 E) E a ⊗ₜ[F] 1)).1 ∈ v.adicCompletionIntegers F
+          ∧ (φ (algebraMap (𝓞 E) E a ⊗ₜ[F] 1)).2 ∈ v.adicCompletionIntegers F := fun a =>
     ⟨map_mem v ((RingHom.fst _ _).comp ι) a, map_mem v ((RingHom.snd _ _).comp ι) a⟩
   intro x
   constructor
@@ -111,8 +135,9 @@ theorem mem_intV_iff_of_splitting : ∀ (F E : Type) [Field F] [NumberField F] [
   · rintro ⟨ha, hb⟩
     obtain ⟨P, hP, hPv⟩ := GlobalTheory.Mass.Genus.exists_over (E := E) v
     obtain ⟨w, t, ht, hwt⟩ := hc.cmUnram.2.2 P hP
-    obtain ⟨s, hs⟩ := (hc.fixed (algebraMap (𝓞 E) E ((w - t) * (w - t)))).1 (by
-      rw [map_mul, map_sub, ht, star_mul, star_sub, star_star]; ring)
+    obtain ⟨s, hs⟩ :=
+      (hc.fixed (algebraMap (𝓞 E) E ((w - t) * (w - t)))).1
+        (by rw [map_mul, map_sub, ht, star_mul, star_sub, star_star]; ring)
     have hsi : IsIntegral ℤ s := by
       have := ((w - t) * (w - t)).isIntegral_coe
       rw [← hs] at this
@@ -130,8 +155,9 @@ theorem mem_intV_iff_of_splitting : ∀ (F E : Type) [Field F] [NumberField F] [
     rw [conj_tmul, ← ht] at e1
     have e2 := hd (algebraMap F (v.adicCompletion F) s * 1)
     rw [← algebraMap_tmul, hs, mul_one, ← mul_one (1 : v.adicCompletion F), map_mul,
-      ← Algebra.TensorProduct.tmul_mul_tmul, map_sub, TensorProduct.sub_tmul, map_mul, map_sub,
-      e1] at e2
+        ← Algebra.TensorProduct.tmul_mul_tmul, map_sub, TensorProduct.sub_tmul, map_mul, map_sub,
+        e1]
+      at e2
     generalize hW : φ (algebraMap (𝓞 E) E w ⊗ₜ[F] 1) = W at hα hβ e2
     obtain ⟨α, β⟩ := W
     have e3 : (α - β) * (α - β) = θ (algebraMap F (v.adicCompletion F) s) := congrArg Prod.fst e2
@@ -140,8 +166,10 @@ theorem mem_intV_iff_of_splitting : ∀ (F E : Type) [Field F] [NumberField F] [
     set c := ((φ x).1 - (φ x).2) * (θ u * (α - β)) with hcdef
     have hcm : c ∈ v.adicCompletionIntegers F :=
       mul_mem (sub_mem ha hb) (mul_mem hθu (sub_mem hα hβ))
-    have hx : x = (1 : E) ⊗ₜ[F] θ.symm ((φ x).1 - c * α) +
-        ((1 : E) ⊗ₜ[F] θ.symm c) * (algebraMap (𝓞 E) E w ⊗ₜ[F] 1) := by
+    have hx
+        : x
+          = (1 : E) ⊗ₜ[F] θ.symm ((φ x).1 - c * α)
+            + ((1 : E) ⊗ₜ[F] θ.symm c) * (algebraMap (𝓞 E) E w ⊗ₜ[F] 1) := by
       apply φ.injective
       rw [map_add (f := _), map_mul, hd, hd, hW, θ.apply_symm_apply, θ.apply_symm_apply]
       refine Prod.ext ?_ ?_

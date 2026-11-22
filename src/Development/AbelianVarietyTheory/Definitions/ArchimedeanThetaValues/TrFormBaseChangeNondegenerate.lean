@@ -17,30 +17,36 @@ open scoped TensorProduct ComplexConjugate
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
 def trForm (H : Host E) : LinearMap.BilinForm ℤ (𝓞 E) :=
-  ((LinearMap.mul ℤ (𝓞 E)).compr₂ (Algebra.trace ℤ (𝓞 E))) ∘ₗ H.bar.toAddEquiv.toIntLinearEquiv.toLinearMap
+  ((LinearMap.mul ℤ (𝓞 E)).compr₂ (Algebra.trace ℤ (𝓞 E)))
+    ∘ₗ H.bar.toAddEquiv.toIntLinearEquiv.toLinearMap
 
-theorem trForm_apply (H : Host E) (x y : 𝓞 E) : trForm H x y = Algebra.trace ℤ (𝓞 E) (H.bar x * y) := rfl
+theorem trForm_apply (H : Host E) (x y : 𝓞 E)
+    : trForm H x y = Algebra.trace ℤ (𝓞 E) (H.bar x * y) :=
+  rfl
 
-theorem trace_bar (H : Host E) (a : 𝓞 E) : Algebra.trace ℤ (𝓞 E) (H.bar a) = Algebra.trace ℤ (𝓞 E) a := by
+theorem trace_bar (H : Host E) (a : 𝓞 E)
+    : Algebra.trace ℤ (𝓞 E) (H.bar a) = Algebra.trace ℤ (𝓞 E) a := by
   apply Int.cast_injective (α := ℚ)
   rw [Algebra.coe_trace_int, Algebra.coe_trace_int, H.bar_eq]
   exact Algebra.trace_eq_of_algEquiv ((IsCMField.complexConj E).restrictScalars ℚ) (a : E)
 
-theorem trForm_apply' (H : Host E) (x y : 𝓞 E) : trForm H x y = Algebra.trace ℤ (𝓞 E) (x * H.bar y) := by
+theorem trForm_apply' (H : Host E) (x y : 𝓞 E)
+    : trForm H x y = Algebra.trace ℤ (𝓞 E) (x * H.bar y) := by
   rw [trForm_apply, ← trace_bar H, map_mul, bar_bar]
 
 theorem trForm_symm (H : Host E) (x y : 𝓞 E) : trForm H x y = trForm H y x := by
   rw [trForm_apply', trForm_apply, mul_comm]
 
 theorem trForm_adj (H : Host E) (a y z : 𝓞 E) : trForm H (a • y) z = trForm H y (H.bar a • z) := by
-  rw [trForm_apply, trForm_apply, smul_eq_mul, smul_eq_mul, map_mul H.bar, mul_comm (H.bar a) (H.bar y), mul_assoc]
+  rw [trForm_apply, trForm_apply, smul_eq_mul, smul_eq_mul, map_mul H.bar,
+    mul_comm (H.bar a) (H.bar y), mul_assoc]
 
-theorem trForm_mul_left (H : Host E) (a y z : 𝓞 E) : trForm H (a * y) z = trForm H y (H.bar a * z) :=
+theorem trForm_mul_left (H : Host E) (a y z : 𝓞 E)
+    : trForm H (a * y) z = trForm H y (H.bar a * z) :=
   trForm_adj H a y z
 
 theorem embedding_bar (H : Host E) (τ : E →+* ℂ) (a : 𝓞 E) : τ (H.bar a : 𝓞 E) = conj (τ a) := by
   rw [H.bar_eq, IsCMField.complexEmbedding_complexConj]
-
 
 omit [IsCMField E] in
 theorem coe_trace_eq_sum (a : 𝓞 E) : (Algebra.trace ℤ (𝓞 E) a : ℂ) = ∑ τ : E →+* ℂ, τ a := by
@@ -49,12 +55,15 @@ theorem coe_trace_eq_sum (a : 𝓞 E) : (Algebra.trace ℤ (𝓞 E) a : ℂ) = �
   rw [h, trace_eq_sum_embeddings ℂ]
   exact (Fintype.sum_equiv (RingHom.equivRatAlgHom E ℂ) _ _ fun _ => rfl).symm
 
-theorem trForm_eq_sum (H : Host E) (x y : 𝓞 E) : (trForm H x y : ℂ) = ∑ τ : E →+* ℂ, conj (τ x) * τ y := by
+theorem trForm_eq_sum (H : Host E) (x y : 𝓞 E)
+    : (trForm H x y : ℂ) = ∑ τ : E →+* ℂ, conj (τ x) * τ y := by
   rw [trForm_apply, coe_trace_eq_sum]
   refine Finset.sum_congr rfl fun τ _ => ?_
-  rw [← embedding_bar H, ← map_mul]; rfl
+  rw [← embedding_bar H, ← map_mul]
+  rfl
 
-theorem trForm_self_eq_sum (H : Host E) (y : 𝓞 E) : (trForm H y y : ℝ) = ∑ τ : E →+* ℂ, ‖τ y‖ ^ 2 := by
+theorem trForm_self_eq_sum (H : Host E) (y : 𝓞 E)
+    : (trForm H y y : ℝ) = ∑ τ : E →+* ℂ, ‖τ y‖ ^ 2 := by
   apply Complex.ofReal_injective
   push_cast
   rw [trForm_eq_sum]
@@ -79,22 +88,23 @@ theorem trForm_one_one (H : Host E) : trForm H 1 1 = Module.finrank ℚ E := by
   simp [Embeddings.card]
 
 def realEmb (τ : E →+* ℂ) : ℝ ⊗[ℤ] 𝓞 E →ₐ[ℝ] ℂ :=
-  Algebra.TensorProduct.lift (Algebra.ofId ℝ ℂ) (τ.comp (algebraMap (𝓞 E) E)).toIntAlgHom
-    fun _ _ => Commute.all _ _
-
+  Algebra.TensorProduct.lift (Algebra.ofId ℝ ℂ) (τ.comp (algebraMap (𝓞 E) E)).toIntAlgHom fun _ _ =>
+    Commute.all _ _
 
 omit [NumberField E] [IsCMField E] in
-@[simp] theorem realEmb_tmul (τ : E →+* ℂ) (r : ℝ) (a : 𝓞 E) : realEmb τ (r ⊗ₜ a) = r * τ a := rfl
+@[simp]
+theorem realEmb_tmul (τ : E →+* ℂ) (r : ℝ) (a : 𝓞 E) : realEmb τ (r ⊗ₜ a) = r * τ a := rfl
 
-theorem trForm_baseChange_eq_sum (H : Host E) (v w : ℝ ⊗[ℤ] 𝓞 E) :
-    ((trForm H).baseChange ℝ v w : ℂ) = ∑ τ : E →+* ℂ, conj (realEmb τ v) * realEmb τ w := by
+theorem trForm_baseChange_eq_sum (H : Host E) (v w : ℝ ⊗[ℤ] 𝓞 E)
+    : ((trForm H).baseChange ℝ v w : ℂ) = ∑ τ : E →+* ℂ, conj (realEmb τ v) * realEmb τ w := by
   induction v using TensorProduct.induction_on with
   | zero => simp
   | add v v' h h' => simp [h, h', add_mul, Finset.sum_add_distrib]
   | tmul r x =>
     induction w using TensorProduct.induction_on with
     | zero => simp
-    | add w w' h h' => rw [map_add (f := _), Complex.ofReal_add, h, h']; simp [mul_add, Finset.sum_add_distrib]
+    | add w w' h h' =>
+      rw [map_add (f := _), Complex.ofReal_add, h, h']; simp [mul_add, Finset.sum_add_distrib]
     | tmul s y =>
       rw [LinearMap.BilinForm.baseChange_tmul, zsmul_eq_mul]
       push_cast
@@ -103,8 +113,8 @@ theorem trForm_baseChange_eq_sum (H : Host E) (v w : ℝ ⊗[ℤ] 𝓞 E) :
       simp only [realEmb_tmul, map_mul, Complex.conj_ofReal]
       ring
 
-theorem trForm_baseChange_self_eq_sum (H : Host E) (v : ℝ ⊗[ℤ] 𝓞 E) :
-    (trForm H).baseChange ℝ v v = ∑ τ : E →+* ℂ, ‖realEmb τ v‖ ^ 2 := by
+theorem trForm_baseChange_self_eq_sum (H : Host E) (v : ℝ ⊗[ℤ] 𝓞 E)
+    : (trForm H).baseChange ℝ v v = ∑ τ : E →+* ℂ, ‖realEmb τ v‖ ^ 2 := by
   apply Complex.ofReal_injective
   push_cast
   rw [trForm_baseChange_eq_sum]
@@ -115,19 +125,21 @@ theorem trForm_baseChange_nondegenerate (H : Host E) : ((trForm H).baseChange �
   let b := RingOfIntegers.basis E
   have h := (LinearMap.BilinForm.nondegenerate_iff_det_ne_zero b).1 (trForm_nondegenerate H)
   rw [LinearMap.BilinForm.nondegenerate_iff_det_ne_zero (b.baseChange ℝ)]
-  have e : LinearMap.BilinForm.toMatrix (b.baseChange ℝ) ((trForm H).baseChange ℝ) =
-      (Int.castRingHom ℝ).mapMatrix (LinearMap.BilinForm.toMatrix b (trForm H)) := by
+  have e
+      : LinearMap.BilinForm.toMatrix (b.baseChange ℝ) ((trForm H).baseChange ℝ)
+        = (Int.castRingHom ℝ).mapMatrix (LinearMap.BilinForm.toMatrix b (trForm H)) := by
     ext i j
     simp [LinearMap.BilinForm.toMatrix_apply]
   rw [e, ← RingHom.map_det]
   simpa using h
 
-theorem trForm_baseChange_pos (H : Host E) {v : ℝ ⊗[ℤ] 𝓞 E} (hv : v ≠ 0) :
-    0 < (trForm H).baseChange ℝ v v := by
+theorem trForm_baseChange_pos (H : Host E) {v : ℝ ⊗[ℤ] 𝓞 E} (hv : v ≠ 0)
+    : 0 < (trForm H).baseChange ℝ v v := by
   rw [trForm_baseChange_self_eq_sum]
   refine (Finset.sum_nonneg fun τ _ => sq_nonneg _).lt_of_ne fun h => hv ?_
   have h0 : ∀ τ : E →+* ℂ, realEmb τ v = 0 := fun τ => by
-    simpa using (Finset.sum_eq_zero_iff_of_nonneg fun τ _ => sq_nonneg _).1 h.symm τ (Finset.mem_univ τ)
+    simpa using
+      (Finset.sum_eq_zero_iff_of_nonneg fun τ _ => sq_nonneg _).1 h.symm τ (Finset.mem_univ τ)
   refine (trForm_baseChange_nondegenerate H).1 v fun w => Complex.ofReal_injective ?_
   rw [trForm_baseChange_eq_sum]
   simp [h0]

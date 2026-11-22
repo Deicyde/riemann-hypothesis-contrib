@@ -15,9 +15,12 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CmBase
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField Matrix MvPolynomial
-open GlobalTheory.SignedHC GlobalTheory.ChiGrid Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.FunObj
+open GlobalTheory.SignedHC GlobalTheory.ChiGrid Formalism.L2.DIV Formalism.L2.Ker
+  GlobalTheory.FunObj
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 
@@ -25,8 +28,8 @@ namespace GlobalTheory.RatFinIso
 
 variable {D : D7}
 
-theorem symplOH_ratW_finRat_neg (S T : HSp D) (v : Matrix (Fin T.rank) (Fin S.rank) D.host.E) :
-    symplOH S T (ratW T S v) (GlobalTheory.VacUnique.finRat S T (-v)) = 0 := by
+theorem symplOH_ratW_finRat_neg (S T : HSp D) (v : Matrix (Fin T.rank) (Fin S.rank) D.host.E)
+    : symplOH S T (ratW T S v) (GlobalTheory.VacUnique.finRat S T (-v)) = 0 := by
   set u : WO S T := ratW T S v - GlobalTheory.VacUnique.finRat S T v with hu
   have hfin : u.map (finPart D) = 0 := by
     funext i j
@@ -36,14 +39,16 @@ theorem symplOH_ratW_finRat_neg (S T : HSp D) (v : Matrix (Fin T.rank) (Fin S.ra
     simp only [Matrix.map_apply] at e1
     rw [e1, sub_self]
   have hr : ratW T S v = u + GlobalTheory.VacUnique.finRat S T v := by rw [hu, sub_add_cancel]
-  rw [hr, GlobalTheory.FinTranslate.symplOH_add_left, map_neg, GlobalTheory.FinTranslate.symplOH_neg_right,
-    GlobalTheory.FinTranslate.symplOH_neg_right, GlobalTheory.FinTranslate.symplOH_self,
+  rw [hr, GlobalTheory.FinTranslate.symplOH_add_left, map_neg,
+    GlobalTheory.FinTranslate.symplOH_neg_right, GlobalTheory.FinTranslate.symplOH_neg_right,
+    GlobalTheory.FinTranslate.symplOH_self,
     GlobalTheory.FinTranslate.symplOH_real_fin (GlobalTheory.VacUnique.finRat_inf S T v) hfin]
   simp
 
-theorem isotropic : ∀ {D : D7} (S T : HSp D) (v : Matrix (Fin T.rank) (Fin S.rank) D.host.E),
-    symplOH S T (ratW T S v) (GlobalTheory.VacUnique.finRat S T (-v)) = 0 :=
-  fun S T v => symplOH_ratW_finRat_neg S T v
+theorem isotropic
+    : ∀ {D : D7} (S T : HSp D) (v : Matrix (Fin T.rank) (Fin S.rank) D.host.E),
+      symplOH S T (ratW T S v) (GlobalTheory.VacUnique.finRat S T (-v)) = 0 := fun S T v =>
+  symplOH_ratW_finRat_neg S T v
 
 end GlobalTheory.RatFinIso
 

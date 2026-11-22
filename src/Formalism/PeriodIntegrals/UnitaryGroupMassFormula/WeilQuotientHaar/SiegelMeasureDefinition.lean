@@ -14,7 +14,8 @@ namespace QPK
 
 section SM
 
-variable {G : Type} [TopologicalSpace G] [Group G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type} [TopologicalSpace G] [Group G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
 
 lemma eq_one_of_eq_mul {c x : ℝ≥0∞} (h0 : x ≠ 0) (ht : x ≠ ⊤) (h : x = c * x) : c = 1 := by
@@ -149,8 +150,7 @@ theorem siegel_measure_definition : SMeas := by
   have hHcl : IsClosed H := hHc.isClosed
   have hRH : ∀ s ∈ H, μH.map (fun x => x * s) = μH := fun s hs =>
     map_mul_right_eq_self H hHcl hH μH hμH hHc.measure_lt_top.ne s hs
-  have hRN : ∀ s ∈ N, μN.map (fun x => x * s) = μN :=
-    hU μN hμN.1 hμN.2.1 hμN.2.2.1 hμN.2.2.2
+  have hRN : ∀ s ∈ N, μN.map (fun x => x * s) = μN := hU μN hμN.1 hμN.2.1 hμN.2.2.1 hμN.2.2.2
   have hIH := map_inv_eq_self H hHcl hH μH hμH hRH
   have hIN := map_inv_eq_self N hNc hN μN hμN hRN
   have hm' : Measurable (fun p : G × G => p.2 * p.1) := measurable_snd.mul measurable_fst
@@ -195,7 +195,8 @@ theorem siegel_measure_definition : SMeas := by
         exact Set.mem_mul.2 ⟨p.2 * p.1, hp, p.1⁻¹, Set.inv_mem_inv.2 hp2.1, by group⟩
       · right
         exact hp2
-    calc (μH.prod μN) ((fun p : G × G => p.2 * p.1) ⁻¹' L)
+    calc
+      (μH.prod μN) ((fun p : G × G => p.2 * p.1) ⁻¹' L)
         ≤ (μH.prod μN) ((H ×ˢ (L * H⁻¹)) ∪ (H ×ˢ N)ᶜ) := measure_mono hsub
       _ ≤ (μH.prod μN) (H ×ˢ (L * H⁻¹)) + (μH.prod μN) (H ×ˢ N)ᶜ := measure_union_le _ _
       _ = μH H * μN (L * H⁻¹) := by rw [hnull, add_zero, Measure.prod_prod]
@@ -233,14 +234,18 @@ theorem siegel_measure_definition : SMeas := by
 
   have hleft : ∀ s ∈ prodSet N H, (mulMap μN μH).map (fun x => s * x) = mulMap μN μH := by
     rintro s ⟨a, ha, b, hb, rfl⟩
-    have hg : MeasurePreserving (fun p : G × G => (b * p.1, a * (b * p.2 * b⁻¹)))
+    have hg : MeasurePreserving
+        (fun p : G × G => (b * p.1, a * (b * p.2 * b⁻¹)))
         (μH.prod μN) (μH.prod μN) := by
-      refine MeasurePreserving.skew_product (f := fun x => b * x)
-        (g := fun _ n => a * (b * n * b⁻¹)) ⟨measurable_const_mul b, hμH.2.2.2 b hb⟩
+      refine MeasurePreserving.skew_product
+        (f := fun x => b * x)
+        (g := fun _ n => a * (b * n * b⁻¹))
+        ⟨measurable_const_mul b, hμH.2.2.2 b hb⟩
         (((measurable_snd.const_mul b).mul_const b⁻¹).const_mul a) (ae_of_all _ fun _ => ?_)
       have hcj : Measurable (fun x : G => b * x * b⁻¹) := (measurable_const_mul b).mul_const b⁻¹
-      have e : μN.map (fun n => a * (b * n * b⁻¹)) =
-          (μN.map (fun x => b * x * b⁻¹)).map (fun x => a * x) := by
+      have e
+          : μN.map (fun n => a * (b * n * b⁻¹))
+            = (μN.map (fun x => b * x * b⁻¹)).map (fun x => a * x) := by
         rw [Measure.map_map (measurable_const_mul a) hcj]
         rfl
       show μN.map (fun n => a * (b * n * b⁻¹)) = μN
@@ -250,10 +255,13 @@ theorem siegel_measure_definition : SMeas := by
 
   have hright : ∀ s ∈ prodSet N H, (mulMap μN μH).map (fun x => x * s) = mulMap μN μH := by
     rintro s ⟨a, ha, b, hb, rfl⟩
-    have hg : MeasurePreserving (fun p : G × G => (p.1 * b, p.2 * (p.1 * a * p.1⁻¹)))
+    have hg : MeasurePreserving
+        (fun p : G × G => (p.1 * b, p.2 * (p.1 * a * p.1⁻¹)))
         (μH.prod μN) (μH.prod μN) := by
-      refine MeasurePreserving.skew_product (f := fun x => x * b)
-        (g := fun k n => n * (k * a * k⁻¹)) ⟨measurable_mul_const b, hRH b hb⟩
+      refine MeasurePreserving.skew_product
+        (f := fun x => x * b)
+        (g := fun k n => n * (k * a * k⁻¹))
+        ⟨measurable_mul_const b, hRH b hb⟩
         (measurable_snd.mul ((measurable_fst.mul_const a).mul measurable_fst.inv))
         (hHae.mono fun k hk => ?_)
       exact hRN _ (hnorm k hk a ha)
@@ -261,16 +269,18 @@ theorem siegel_measure_definition : SMeas := by
     exact map_mulSwap_eq _ _ hg _ (measurable_mul_const _) (fun p => by simp only; group)
 
   have hinv : (mulMap μN μH).map (fun x => x⁻¹) = mulMap μN μH := by
-    have hg : MeasurePreserving (fun p : G × G => (p.1⁻¹, p.1⁻¹ * p.2⁻¹ * p.1))
+    have hg : MeasurePreserving
+        (fun p : G × G => (p.1⁻¹, p.1⁻¹ * p.2⁻¹ * p.1))
         (μH.prod μN) (μH.prod μN) := by
-      refine MeasurePreserving.skew_product (f := fun x => x⁻¹)
-        (g := fun k n => k⁻¹ * n⁻¹ * k) ⟨measurable_inv, hIH⟩
-        ((measurable_fst.inv.mul measurable_snd.inv).mul measurable_fst)
+      refine MeasurePreserving.skew_product
+        (f := fun x => x⁻¹)
+        (g := fun k n => k⁻¹ * n⁻¹ * k)
+        ⟨measurable_inv, hIH⟩ ((measurable_fst.inv.mul measurable_snd.inv).mul measurable_fst)
         (hHae.mono fun k hk => ?_)
-      have hcj : Measurable (fun x : G => k⁻¹ * x * k⁻¹⁻¹) :=
-        (measurable_const_mul _).mul_const _
-      have e : μN.map (fun n => k⁻¹ * n⁻¹ * k) =
-          (μN.map (fun x => x⁻¹)).map (fun x => k⁻¹ * x * k⁻¹⁻¹) := by
+      have hcj : Measurable (fun x : G => k⁻¹ * x * k⁻¹⁻¹) := (measurable_const_mul _).mul_const _
+      have e
+          : μN.map (fun n => k⁻¹ * n⁻¹ * k)
+            = (μN.map (fun x => x⁻¹)).map (fun x => k⁻¹ * x * k⁻¹⁻¹) := by
         rw [Measure.map_map hcj measurable_inv]
         simp only [Function.comp_def, inv_inv]
       show μN.map (fun n => k⁻¹ * n⁻¹ * k) = μN

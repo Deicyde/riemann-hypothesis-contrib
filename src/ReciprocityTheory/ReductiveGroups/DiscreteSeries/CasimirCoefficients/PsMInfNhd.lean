@@ -22,16 +22,23 @@ variable {n : ℕ}
 
 variable {ε : Fin n → Bool} {lam : Fin n → ℝ}
 
-theorem psM_inf_nhd (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu lam μ) :
-    ∃ U : Set (Matrix (Fin n) (Fin n) ℂ), IsOpen U ∧ posSet n ⊆ U ∧ DifferentiableOn ℂ (psM T μ) U ∧
-      ∀ z ∈ U, ∀ Y : Matrix (Fin n) (Fin n) ℂ, IsBlock ε Y →
-        fderiv ℂ (psM T μ) z (z * Y) = -(T.dτ Y * psM T μ z) ∧
-          fderiv ℂ (psM T μ) z (Y * z) = -(psM T μ z * T.dτ Y) := by
+theorem psM_inf_nhd (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu lam μ)
+    : ∃ U : Set (Matrix (Fin n) (Fin n) ℂ),
+      IsOpen U ∧ posSet n ⊆ U ∧ DifferentiableOn ℂ (psM T μ) U
+        ∧ ∀ z ∈ U, ∀ Y : Matrix (Fin n) (Fin n) ℂ,
+          IsBlock ε Y
+            → fderiv ℂ (psM T μ) z (z * Y) = -(T.dτ Y * psM T μ z)
+              ∧ fderiv ℂ (psM T μ) z (Y * z) = -(psM T μ z * T.dτ Y) := by
   obtain ⟨U0, hU0o, hpos0, hΩ, hdiff, hfd⟩ := psM_holo (μ := μ) T
-  refine ⟨{z | ∃ x : Matrix (Fin n) (Fin n) ℂ, x.PosDef ∧ ∃ r : ℝ, 0 < r ∧ ‖z - x‖ < r ∧
+  refine ⟨
+    {z | ∃ x : Matrix (Fin n) (Fin n) ℂ, x.PosDef ∧ ∃ r : ℝ, 0 < r ∧ ‖z - x‖ < r ∧
       (∀ w : Matrix (Fin n) (Fin n) ℂ, ‖w - x‖ < 3 * r → w ∈ U0) ∧
       (∀ H : Matrix (Fin n) (Fin n) ℂ, H.IsHermitian → ‖H‖ < 3 * r → (x + H).PosDef)},
-      ?_, ?_, ?_, ?_⟩
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · refine Metric.isOpen_iff.mpr ?_
     rintro z ⟨x, hx, r, hr, hzx, hU, hP⟩
     refine ⟨r - ‖z - x‖, sub_pos.mpr hzx, fun z' hz' => ⟨x, hx, r, hr, ?_, hU, hP⟩⟩
@@ -68,8 +75,8 @@ theorem psM_inf_nhd (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsM
     have hsI : star Complex.I = -Complex.I := Complex.conj_I
     have hn12 : ‖(1 / 2 : ℂ)‖ = 1 / 2 := by simp
     obtain ⟨A, hA⟩ : ∃ A : Matrix (Fin n) (Fin n) ℂ, A = (1 / 2 : ℂ) • (z + zᴴ) := ⟨_, rfl⟩
-    obtain ⟨B, hB⟩ : ∃ B : Matrix (Fin n) (Fin n) ℂ,
-        B = (1 / 2 : ℂ) • (Complex.I • (zᴴ - z)) := ⟨_, rfl⟩
+    obtain ⟨B, hB⟩ : ∃ B : Matrix (Fin n) (Fin n) ℂ, B = (1 / 2 : ℂ) • (Complex.I • (zᴴ - z)) :=
+      ⟨_, rfl⟩
     have hAH : A.IsHermitian := by
       rw [Matrix.IsHermitian, hA]
       ext i j
@@ -123,12 +130,16 @@ theorem psM_inf_nhd (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsM
     have hI : ‖Complex.I‖ < 2 := by rw [Complex.norm_I]; norm_num
     constructor
     · let g : ℂ → (T.V →L[ℂ] T.V) := fun s =>
-        ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ)) •
-          (∫ k, IdA.dPhi2 μ (toMK k⁻¹ * (A + s • B) * toMK k,
-            toMK k⁻¹ * (A * Y + s • (B * Y)) * toMK k) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε))
+        ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))
+            • (∫ k, IdA.dPhi2 μ (toMK k⁻¹ * (A + s • B) * toMK k,
+                toMK k⁻¹ * (A * Y + s • (B * Y)) * toMK k) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε))
           + T.dτ Y * psM T μ (A + s • B)
-      have hgeq : ∀ s : ℂ, A + s • B ∈ U0 →
-          g s = fderiv ℂ (psM T μ) (A + s • B) ((A + s • B) * Y) + T.dτ Y * psM T μ (A + s • B) := by
+      have hgeq
+          : ∀ s : ℂ,
+            A + s • B ∈ U0
+              → g s
+                = fderiv ℂ (psM T μ) (A + s • B) ((A + s • B) * Y)
+                  + T.dτ Y * psM T μ (A + s • B) := by
         intro s hs
         rw [hfd _ hs]
         simp only [g, add_mul, Matrix.smul_mul] <;> rfl
@@ -148,12 +159,16 @@ theorem psM_inf_nhd (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsM
       rw [hgeq _ (key _ hI), hAB] at h0
       exact eq_neg_of_add_eq_zero_left h0
     · let g : ℂ → (T.V →L[ℂ] T.V) := fun s =>
-        ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ)) •
-          (∫ k, IdA.dPhi2 μ (toMK k⁻¹ * (A + s • B) * toMK k,
-            toMK k⁻¹ * (Y * A + s • (Y * B)) * toMK k) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε))
+        ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))
+            • (∫ k, IdA.dPhi2 μ (toMK k⁻¹ * (A + s • B) * toMK k,
+                toMK k⁻¹ * (Y * A + s • (Y * B)) * toMK k) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε))
           + psM T μ (A + s • B) * T.dτ Y
-      have hgeq : ∀ s : ℂ, A + s • B ∈ U0 →
-          g s = fderiv ℂ (psM T μ) (A + s • B) (Y * (A + s • B)) + psM T μ (A + s • B) * T.dτ Y := by
+      have hgeq
+          : ∀ s : ℂ,
+            A + s • B ∈ U0
+              → g s
+                = fderiv ℂ (psM T μ) (A + s • B) (Y * (A + s • B))
+                  + psM T μ (A + s • B) * T.dτ Y := by
         intro s hs
         rw [hfd _ hs]
         simp only [g, mul_add, Matrix.mul_smul] <;> rfl

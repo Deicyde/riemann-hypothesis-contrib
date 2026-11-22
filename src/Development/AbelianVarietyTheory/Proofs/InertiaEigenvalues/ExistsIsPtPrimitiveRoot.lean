@@ -11,10 +11,13 @@ open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.Basi
 
 namespace GlobalTheory
 
-theorem exists_isPt_primitiveRoot {l : ℕ} [Fact l.Prime] {P : LocPrime l} (H : LocHW l P)
-    {K : FinExt l} {s : ℕ} {LL : FinExt l} (h : Good K s LL)
-    (i : ZMod (Module.finrank ℚ_[l] ↥(K0 K))) :
-    ∃ (ζ : ↥LL.1) (τ : ↥(Ks K s) →ₐ[ℚ_[l]] ↥LL.1), H.IsPt h i ζ τ ∧ IsPrimitiveRoot ζ (l ^ s) := by
+theorem exists_isPt_primitiveRoot
+    {l : ℕ} [Fact l.Prime]
+    {P : LocPrime l} (H : LocHW l P)
+    {K : FinExt l} {s : ℕ} {LL : FinExt l}
+    (h : Good K s LL) (i : ZMod (Module.finrank ℚ_[l] ↥(K0 K)))
+    : ∃ (ζ : ↥LL.1) (τ : ↥(Ks K s) →ₐ[ℚ_[l]] ↥LL.1),
+      H.IsPt h i ζ τ ∧ IsPrimitiveRoot ζ (l ^ s) := by
   have hs : 1 ≤ s := h.1
   have hLL := h.2.2.2
   have hprim : IsPrimitiveRoot (P.ζQ s) (l ^ s) := by

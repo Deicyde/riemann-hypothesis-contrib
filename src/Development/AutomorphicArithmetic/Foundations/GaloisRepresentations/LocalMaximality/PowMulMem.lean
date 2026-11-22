@@ -6,12 +6,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteCoverR
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section
-variable {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K]
-  [IsScalarTower ℂ F K] {d : ℕ} {x : Fin (d + 1) → Fˣ}
+variable
+  {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+  {d : ℕ} {x : Fin (d + 1) → Fˣ}
 
 private lemma ratio_mem (i j : Fin (d + 1)) :
     algebraMap F K ((x j : F) / x i) ∈ rB ℂ K (xv x) {i} := by
@@ -63,20 +65,20 @@ private lemma coe_XY (i j : Fin (d + 1)) (N : ℕ) :
 
 end
 
-theorem UpperTheory.Gal.productCup_of_system.zFam_of :
-    ZFam := by
+theorem UpperTheory.Gal.productCup_of_system.zFam_of : ZFam := by
   classical
   intro F K _ _ _ _ _ _ d x h
   choose G hG using fun i => gens (x := x) h i
-  have hGm : ∀ i, ∀ b ∈ G i, b ∈ rB ℂ K (xv x) {i} := fun i b hb =>
-    hG i ▸ Algebra.subset_adjoin hb
-  have hP : ∀ i b, b ∈ G i → ∀ i', ∃ N0 : ℕ, ∀ N, N0 ≤ N →
-      (algebraMap F K ((x i : F) / x i')) ^ N * b ∈ rB ℂ K (xv x) {i'} :=
+  have hGm : ∀ i, ∀ b ∈ G i, b ∈ rB ℂ K (xv x) {i} := fun i b hb => hG i ▸ Algebra.subset_adjoin hb
+  have hP
+      : ∀ i b,
+        b ∈ G i
+          → ∀ i', ∃ N0 : ℕ, ∀ N,
+            N0 ≤ N → (algebraMap F K ((x i : F) / x i')) ^ N * b ∈ rB ℂ K (xv x) {i'} :=
     fun i b hb i' => pow_mul_mem h i i' b (hGm i b hb)
   choose! Nb hNb using hP
   let Nq : Fin (d + 1) × K → ℕ := fun q => Finset.univ.sup (fun i' => Nb q.1 q.2 i')
-  let P : Finset (Fin (d + 1) × K) :=
-    Finset.univ.biUnion (fun i => (G i).image (fun b => (i, b)))
+  let P : Finset (Fin (d + 1) × K) := Finset.univ.biUnion (fun i => (G i).image (fun b => (i, b)))
   have hPm : ∀ q ∈ P, q.2 ∈ G q.1 := by
     intro q hq
     simp only [P, Finset.mem_biUnion, Finset.mem_image] at hq
@@ -84,8 +86,8 @@ theorem UpperTheory.Gal.productCup_of_system.zFam_of :
     exact hb
   let e := P.equivFin.symm
   let zz : Fin (d + 1) × K → K ⊗[ℂ] K := fun q =>
-    (((sysZ K x 0).X q.1 ^ Nq q * (sysZ K x 0).Y q.1 ^ Nq q : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) *
-      (q.2 ⊗ₜ[ℂ] (1 : K) - (1 : K) ⊗ₜ[ℂ] q.2)
+    (((sysZ K x 0).X q.1 ^ Nq q * (sysZ K x 0).Y q.1 ^ Nq q : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K)
+      * (q.2 ⊗ₜ[ℂ] (1 : K) - (1 : K) ⊗ₜ[ℂ] q.2)
   refine ⟨P.card, fun l => (Nq (e l).1, Nq (e l).1), fun l => zz (e l).1, ⟨?_, ?_, ?_⟩⟩
   · intro i' j' l
     show zz (e l).1 * ↑((sysZ K x 0).X i' ^ Nq (e l).1 * (sysZ K x 0).Y j' ^ Nq (e l).1)⁻¹ ∈ _
@@ -101,8 +103,10 @@ theorem UpperTheory.Gal.productCup_of_system.zFam_of :
     have hD := hNb i b hb j' _ hN2
     have hB := Subalgebra.pow_mem _ (ratio_mem (K := K) (x := x) j' i) (Nq (i, b))
     have hC := Subalgebra.pow_mem _ (ratio_mem (K := K) (x := x) i' i) (Nq (i, b))
-    rw [coe_XY, tensor_id (algebraMap F K (x i)) (algebraMap F K (x i')) (algebraMap F K (x j')) b
-      (by simp) (by simp) _, ← coe_XY i' j' _, Units.mul_inv_cancel_right]
+    rw [coe_XY,
+      tensor_id (algebraMap F K (x i)) (algebraMap F K (x i')) (algebraMap F K (x j')) b (by simp)
+        (by simp) _,
+      ← coe_XY i' j' _, Units.mul_inv_cancel_right]
     simp only [map_div₀] at hA hB hC hD
     exact Subalgebra.sub_mem _ ((AlgHom.mem_range _).mpr ⟨⟨_, hA⟩ ⊗ₜ ⟨_, hB⟩, by simp⟩)
       ((AlgHom.mem_range _).mpr ⟨⟨_, hC⟩ ⊗ₜ ⟨_, hD⟩, by simp⟩)

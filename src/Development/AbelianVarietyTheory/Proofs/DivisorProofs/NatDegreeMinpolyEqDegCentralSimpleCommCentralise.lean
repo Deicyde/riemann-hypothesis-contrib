@@ -9,17 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NatDegreeMin
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical ComplexOrder
 
 namespace GlobalTheory.RegDeg
 
 open Polynomial
 
-theorem natDegree_minpoly_eq : ∀ (F C : Type) [Field F] [Ring C] [Algebra F C] [Algebra.IsCentral F C]
-    [IsSimpleRing C] [FiniteDimensional F C] (n : ℕ), Module.finrank F C = n ^ 2 → ∀ c : C,
-    (minpoly F c).Separable → (∀ a b : C, Commute a c → Commute b c → Commute a b) →
-    (minpoly F c).natDegree = n := by
+theorem natDegree_minpoly_eq
+    : ∀ (F C : Type) [Field F] [Ring C] [Algebra F C] [Algebra.IsCentral F C] [IsSimpleRing C]
+        [FiniteDimensional F C] (n : ℕ),
+      Module.finrank F C = n ^ 2
+        → ∀ c : C,
+          (minpoly F c).Separable → (∀ a b : C, Commute a c → Commute b c → Commute a b)
+            → (minpoly F c).natDegree = n := by
   intro F C _ _ _ _ _ _ n hC c hsep hcomm
   obtain ⟨k, hk0, hkC, ⟨e⟩⟩ := GroundTheory.Brauer.exists_algEquiv_matrix_algebraicClosure F C
   have hkn : k = n := Nat.pow_left_injective (by norm_num : (2 : ℕ) ≠ 0) (hkC.symm.trans hC)
@@ -36,8 +40,9 @@ theorem natDegree_minpoly_eq : ∀ (F C : Type) [Field F] [Ring C] [Algebra F C]
     (Polynomial.map_ne_zero_iff (algebraMap F K).injective).mpr
       (minpoly.ne_zero (IsIntegral.of_finite F c))
   have hle : (minpoly K x).natDegree ≤ (minpoly F c).natDegree := by
-    calc (minpoly K x).natDegree ≤ ((minpoly F c).map (algebraMap F K)).natDegree :=
-          natDegree_le_of_dvd hdvd hmap
+    calc
+      (minpoly K x).natDegree
+        ≤ ((minpoly F c).map (algebraMap F K)).natDegree := natDegree_le_of_dvd hdvd hmap
       _ = (minpoly F c).natDegree := natDegree_map _
   have hxsep : (minpoly K x).Separable := (hsep.map).of_dvd hdvd
 
@@ -75,7 +80,9 @@ theorem natDegree_minpoly_eq : ∀ (F C : Type) [Field F] [Ring C] [Algebra F C]
     have h2 := congrArg e h
     rw [map_mul, map_mul, e.apply_symm_apply, e.apply_symm_apply] at h2
     exact h2
-  have hdegN := GlobalTheory.T.natDegree_minpoly_eq_of_separable_commutant_comm K k N (by rw [hmN]; exact hxsep) hNcomm
+  have hdegN :=
+    GlobalTheory.T.natDegree_minpoly_eq_of_separable_commutant_comm K k N (by rw [hmN]; exact hxsep)
+      hNcomm
   have hxk : (minpoly K x).natDegree = k := by rw [← hmN]; exact hdegN
   rw [← hxk]
   exact le_antisymm hge hle

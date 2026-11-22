@@ -9,14 +9,23 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GlobS
 
 @[expose] public section
 
-open NumberField MeasureTheory Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.TermLoc Formalism.L2.SG.RowsConc Formalism.L2.SG.NGCut Formalism.L2.SG.NGAnalytic Formalism.FourierDecayAlt Formalism.L2.SG.NGData Formalism.L2.SG.NGLocModel Formalism.L2.SG.FamDefs GlobalTheory.Unfold GlobalTheory.LocOver GlobalTheory.GenMass
+open NumberField MeasureTheory Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.Full Formalism.L2.SG.TermLoc Formalism.L2.SG.RowsConc Formalism.L2.SG.NGCut
+  Formalism.L2.SG.NGAnalytic Formalism.FourierDecayAlt Formalism.L2.SG.NGData
+  Formalism.L2.SG.NGLocModel Formalism.L2.SG.FamDefs GlobalTheory.Unfold GlobalTheory.LocOver
+  GlobalTheory.GenMass
 open scoped Classical ENNReal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.NormCong
 
-private theorem prime_dvd_int_of_cast_eq_mul {O : Type} [CommRing O] [IsDomain O] {ℓ : ℕ} (hℓ : ℓ.Prime) {q : O}
-    (hq : Irreducible q) (hqℓ : q = (ℓ : O)) {m : ℤ} {c : O} (h : (m : O) = q * c) : (ℓ : ℤ) ∣ m := by
+private theorem prime_dvd_int_of_cast_eq_mul
+    {O : Type} [CommRing O] [IsDomain O]
+    {ℓ : ℕ} (hℓ : ℓ.Prime)
+    {q : O} (hq : Irreducible q) (hqℓ : q = (ℓ : O))
+    {m : ℤ} {c : O} (h : (m : O) = q * c)
+    : (ℓ : ℤ) ∣ m := by
   by_contra hnd
   obtain ⟨a, b, hab⟩ := (Prime.coprime_iff_not_dvd (Nat.prime_iff_prime_int.mp hℓ)).2 hnd
   apply hq.not_isUnit
@@ -25,19 +34,25 @@ private theorem prime_dvd_int_of_cast_eq_mul {O : Type} [CommRing O] [IsDomain O
   rw [h, ← hqℓ] at h1
   exact isUnit_iff_exists_inv.2 ⟨a + b * c, by linear_combination h1⟩
 
-theorem int_sq_dvd_of_eq {O : Type} [CommRing O] [IsDomain O] {ℓ : ℕ} (hℓ : ℓ.Prime) {q : O} (hq : Irreducible q)
-    (hqℓ : q = (ℓ : O)) {n : ℤ} {c : O} (h : (n : O) = q ^ 2 * c) : (ℓ : ℤ) ^ 2 ∣ n := by
+theorem int_sq_dvd_of_eq
+    {O : Type} [CommRing O] [IsDomain O]
+    {ℓ : ℕ} (hℓ : ℓ.Prime)
+    {q : O} (hq : Irreducible q) (hqℓ : q = (ℓ : O))
+    {n : ℤ} {c : O} (h : (n : O) = q ^ 2 * c)
+    : (ℓ : ℤ) ^ 2 ∣ n := by
   obtain ⟨m, rfl⟩ := prime_dvd_int_of_cast_eq_mul hℓ hq hqℓ (c := q * c) (by rw [h]; ring)
   push_cast at h
   rw [← hqℓ] at h
   have h2 : ((m : ℤ) : O) = q * c := by
     apply mul_left_cancel₀ hq.ne_zero
-    rw [h]; ring
+    rw [h]
+    ring
   obtain ⟨k, rfl⟩ := prime_dvd_int_of_cast_eq_mul hℓ hq hqℓ h2
   exact ⟨k, by ring⟩
 
-theorem exists_place_resChar (K : Type) [Field K] [NumberField K] {ℓ : ℕ} (hℓ : ℓ.Prime) :
-    ∃ p : IsDedekindDomain.HeightOneSpectrum (𝓞 K), Formalism.MainNotions.S.Loc.resChar p = ℓ := by
+theorem exists_place_resChar (K : Type) [Field K] [NumberField K] {ℓ : ℕ} (hℓ : ℓ.Prime)
+    : ∃ p : IsDedekindDomain.HeightOneSpectrum (𝓞 K),
+      Formalism.MainNotions.S.Loc.resChar p = ℓ := by
   haveI hmax : (Ideal.span {(ℓ : ℤ)}).IsMaximal :=
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hℓ).irreducible
   have hker : RingHom.ker (algebraMap ℤ (𝓞 K)) ≤ Ideal.span {(ℓ : ℤ)} := by
@@ -64,10 +79,12 @@ theorem exists_place_resChar (K : Type) [Field K] [NumberField K] {ℓ : ℕ} (h
   · exact absurd h1 CharP.ringChar_ne_one
   · exact h1
 
-theorem sq_dvd_at (D : D7) (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS) (Tn T'n : ℕ)
-    (F : LFlag (D.sp.Y 0) D.R.rS (Tn : D.host.E)) (F' : LFlag (D.sp.Y 0) D.R.rS (T'n : D.host.E))
-    (hB : Based Z FP Tn T'n F F') (hN : ∀ p, (FP p).NormsOK) (i : Fin 2) :
-    ((D.host.g i : ℕ) : ℤ) ^ 2 ∣ (Tn : ℤ) - T'n := by
+theorem sq_dvd_at
+    (D : D7) (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS)
+    (Tn T'n : ℕ) (F : LFlag (D.sp.Y 0) D.R.rS (Tn : D.host.E))
+    (F' : LFlag (D.sp.Y 0) D.R.rS (T'n : D.host.E)) (hB : Based Z FP Tn T'n F F')
+    (hN : ∀ p, (FP p).NormsOK) (i : Fin 2)
+    : ((D.host.g i : ℕ) : ℤ) ^ 2 ∣ (Tn : ℤ) - T'n := by
   obtain ⟨p, hp⟩ := exists_place_resChar D.host.F (D.host.g_prime i)
   have hsome : ((D.s.atP p).split).isSome := by
     rw [D.s_split p, hp]
@@ -94,13 +111,19 @@ theorem sq_dvd_at (D : D7) (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH
 end GlobalTheory.NormCong
 
 open GlobalTheory.NormCong in
-theorem GlobalTheory.NormCong.norms_congr : ∀ (D : D7) (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS) (u u' : D.what₂.Word) (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E)) (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)), Based Z FP (Tu D u) (Tu D u') F F' → (∀ p, (FP p).NormsOK) → (D.mem u).A.T ≡ (D.mem u').A.T [MOD (gS D) ^ 2] := by
+theorem GlobalTheory.NormCong.norms_congr
+    : ∀ (D : D7) (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS)
+        (u u' : D.what₂.Word) (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
+        (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)),
+      Based Z FP (Tu D u) (Tu D u') F F' → (∀ p, (FP p).NormsOK)
+        → (D.mem u).A.T ≡ (D.mem u').A.T [MOD (gS D) ^ 2] := by
   intro D Z FP u u' F F' hB hN
   have h0 := sq_dvd_at D Z FP (Tu D u) (Tu D u') F F' hB hN 0
   have h1 := sq_dvd_at D Z FP (Tu D u) (Tu D u') F F' hB hN 1
   have hcop : IsCoprime (((D.host.g 0 : ℕ) : ℤ) ^ 2) (((D.host.g 1 : ℕ) : ℤ) ^ 2) := by
     apply IsCoprime.pow
-    exact Nat.isCoprime_iff_coprime.2 ((Nat.coprime_primes (D.host.g_prime 0) (D.host.g_prime 1)).2 D.host.g_ne)
+    exact Nat.isCoprime_iff_coprime.2 ((Nat.coprime_primes (D.host.g_prime 0) (D.host.g_prime 1)).2
+      D.host.g_ne)
   have h := dvd_sub_comm.1 (hcop.mul_dvd h0 h1)
   rw [Nat.modEq_iff_dvd, show gS D = D.host.g 0 * D.host.g 1 from rfl]
   push_cast

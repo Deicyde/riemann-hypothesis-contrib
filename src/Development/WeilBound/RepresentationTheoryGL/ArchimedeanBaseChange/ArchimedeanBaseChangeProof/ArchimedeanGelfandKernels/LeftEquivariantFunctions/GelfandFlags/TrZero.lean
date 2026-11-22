@@ -13,7 +13,7 @@ theorem trZero : TrZero := by
   let t : (V →L[ℂ] V) → ℂ := fun A => LinearMap.trace ℂ V (A : V →ₗ[ℂ] V)
   have tadd : ∀ A A' : V →L[ℂ] V, t (A + A') = t A + t A' := fun A A' => by
     simp only [t, ContinuousLinearMap.coe_add, map_add (f := _)]
-  have tneg : ∀ A : V →L[ℂ] V, t (-A) = -t A := fun A => by
+  have tneg : ∀ A : V →L[ℂ] V, t (-A) = - t A := fun A => by
     simp only [t, ContinuousLinearMap.coe_neg, map_neg]
   have tsmul : ∀ (a : ℂ) (A : V →L[ℂ] V), t (a • A) = a * t A := fun a A => by
     simp only [t, ContinuousLinearMap.coe_smul, map_smul, smul_eq_mul]
@@ -21,7 +21,9 @@ theorem trZero : TrZero := by
     LinearMap.trace_mul_comm ℂ (A : V →ₗ[ℂ] V) (A' : V →ₗ[ℂ] V)
   set X := B * T with hXdef
   have hX : e * X = -(X * e) := by
-    calc e * X = (e * B) * T := (mul_assoc _ _ _).symm
+    calc
+      e * X
+        = (e * B) * T := (mul_assoc _ _ _).symm
       _ = -(B * e) * T := by rw [heB]
       _ = -(B * (e * T)) := by rw [neg_mul, mul_assoc]
       _ = -(B * (T * e)) := by rw [hTe]

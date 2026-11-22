@@ -27,7 +27,9 @@ theorem first_type_prime_large_of_record (D : D7) : StandardLattice.GBig D := by
   have h4 : D.R.f * D.R.k ≤ D.R.t * D.R.r := Nat.mul_le_mul (by omega) hr
   have hQ : 1 ≤ D.host.QS := D.host.QS_pos
   have h5 : D.host.q ≤ D.host.QS * D.host.q * D.host.d :=
-    calc D.host.q = 1 * D.host.q * 1 := by ring
+    calc
+      D.host.q
+        = 1 * D.host.q * 1 := by ring
       _ ≤ _ := Nat.mul_le_mul (Nat.mul_le_mul_right _ hQ) (by omega)
   rw [mul_assoc] at hq ⊢
   omega

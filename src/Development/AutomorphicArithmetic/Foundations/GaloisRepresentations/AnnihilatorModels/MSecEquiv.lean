@@ -7,17 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.GeomClaus
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-private theorem kerAt_sub {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [CommRing R] {b : Base D R} {N : ℕ} {M : Model b N}
-    {r : ℤ} {w : Ideal (𝓞 D.F)} {j c : ℕ} (T : TjD M r w j c) {X : Scheme.{0}} (z : X ⟶ T.Y) (x : X ⟶ M.X) (hz : z ≫ T.s = x) :
-    ∃ K : Subgroup (Over.mk x ⟶ M.univ.A), (∀ g, g ∈ K ↔ KerAt T z g.left) ∧
-      ∀ g ∈ K, ∀ a : D.O, g ≫ M.univ.act.act a ∈ K := by
+private theorem kerAt_sub
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {R : Type} [CommRing R]
+    {b : Base D R} {N : ℕ} {M : Model b N} {r : ℤ} {w : Ideal (𝓞 D.F)} {j c : ℕ} (T : TjD M r w j c)
+    {X : Scheme.{0}} (z : X ⟶ T.Y) (x : X ⟶ M.X) (hz : z ≫ T.s = x)
+    : ∃ K : Subgroup (Over.mk x ⟶ M.univ.A),
+      (∀ g, g ∈ K ↔ KerAt T z g.left) ∧ ∀ g ∈ K, ∀ a : D.O, g ≫ M.univ.act.act a ∈ K := by
   subst hz
   obtain ⟨-, hmon, hact, -⟩ := T.isog
   haveI := hmon
@@ -37,10 +43,11 @@ private theorem kerAt_sub {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [Com
         exact ha'
       rw [hq]
       exact h
-  let f : (Over.mk z ⟶ T.o.A) →* (Over.mk z ⟶ T.o'.A) :=
-    { toFun := fun a => a ≫ T.ψ
-      map_one' := MonObj.one_comp _
-      map_mul' := fun a b => MonObj.mul_comp a b _ }
+  let f : (Over.mk z ⟶ T.o.A) →* (Over.mk z ⟶ T.o'.A) := {
+    toFun := fun a => a ≫ T.ψ
+    map_one' := MonObj.one_comp _
+    map_mul' := fun a b => MonObj.mul_comp a b _
+  }
   refine ⟨f.ker.comap e.symm.toMonoidHom, fun g => (key g).symm, ?_⟩
   intro g hg a
   have hs : e.symm (g ≫ M.univ.act.act a) = e.symm g ≫ T.o.act.act a := by
@@ -51,8 +58,8 @@ private theorem kerAt_sub {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [Com
   change e.symm g ≫ T.ψ = 1 at hg
   rw [hs, Category.assoc, hact a, ← Category.assoc, hg, MonObj.one_comp]
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.secEquiv_of :
-    WVal → RankN → ValPtsX → SecCard → SecInj → SecSurj → SecEquiv := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.secEquiv_of
+    : WVal → RankN → ValPtsX → SecCard → SecInj → SecSurj → SecEquiv := by
   intro hW hR hV hC hI hS p _ D O _ _ _ _ f b N r w _ hstd M j hj T V _ _ _ _ hp x W
   obtain ⟨ρ, hρl, hρc, hρk, hρT⟩ := hW p D O b N M w V x
   let q : Sp (FractionRing V) ⟶ Sp V := spMap (algebraMap V (FractionRing V))
@@ -82,25 +89,26 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.secEquiv_of :
     have h := W.add 0 0
     rw [add_zero] at h
     exact (mul_eq_left.mp h.symm)
-  have hK := fun z : { z : Sp V ⟶ T.Y // z ≫ T.s = x } => kerAt_sub T z.1 x z.2
+  have hK := fun z : {z : Sp V ⟶ T.Y // z ≫ T.s = x} => kerAt_sub T z.1 x z.2
   choose Kz hKz hKa using hK
-  let U : { z : Sp V ⟶ T.Y // z ≫ T.s = x } → Submodule (𝓞 D.F ⧸ w) W.H := fun z =>
-    { carrier := {h | KerAt T z.1 (W.pt h).left}
-      add_mem' := by
-        intro a c ha hc
-        change KerAt T z.1 (W.pt (a + c)).left
-        rw [← hKz, W.add]
-        exact mul_mem ((hKz z _).2 ha) ((hKz z _).2 hc)
-      zero_mem' := by
-        change KerAt T z.1 (W.pt 0).left
-        rw [← hKz, pt0]
-        exact one_mem _
-      smul_mem' := by
-        intro c h hh
-        obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective c
-        change KerAt T z.1 (W.pt _).left
-        rw [← hKz, W.smul]
-        exact hKa z _ ((hKz z _).2 hh) _ }
+  let U : {z : Sp V ⟶ T.Y // z ≫ T.s = x} → Submodule (𝓞 D.F ⧸ w) W.H := fun z => {
+    carrier := {h | KerAt T z.1 (W.pt h).left}
+    add_mem' := by
+      intro a c ha hc
+      change KerAt T z.1 (W.pt (a + c)).left
+      rw [← hKz, W.add]
+      exact mul_mem ((hKz z _).2 ha) ((hKz z _).2 hc)
+    zero_mem' := by
+      change KerAt T z.1 (W.pt 0).left
+      rw [← hKz, pt0]
+      exact one_mem _
+    smul_mem' := by
+      intro c h hh
+      obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective c
+      change KerAt T z.1 (W.pt _).left
+      rw [← hKz, W.smul]
+      exact hKa z _ ((hKz z _).2 hh) _
+  }
   have hU : ∀ z h, h ∈ U z ↔ KerAt T z.1 (W.pt h).left := fun _ _ => Iff.rfl
   have hpK : ((p : ℕ) : FractionRing V) ≠ 0 := by
     intro h0
@@ -127,8 +135,9 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.secEquiv_of :
     rw [hU, hρT r j _ T z.1 z.2, hρu]
   have hcardU : ∀ z, Nat.card (U z) = Ideal.absNorm w ^ j := by
     intro z
-    have e1 : (U z) ≃ {g' : Over.mk (q ≫ x) ⟶ M.univ.A //
-        KilledBy M.univ w g' ∧ KerAt T (q ≫ z.1) g'.left} :=
+    have e1
+        : (U z)
+          ≃ {g' : Over.mk (q ≫ x) ⟶ M.univ.A // KilledBy M.univ w g' ∧ KerAt T (q ≫ z.1) g'.left} :=
       Equiv.ofBijective (fun h => ⟨Φ h.1, (hΦrange _).1 ⟨_, rfl⟩, (hΦT z h.1).1 h.2⟩) (by
         constructor
         · intro a c h
@@ -171,15 +180,16 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.secEquiv_of :
     obtain ⟨h, rfl⟩ := (hΦrange g').2 hk
     rw [← hΦT, ← hΦT, hUe]
   · rintro ⟨Us, hrank⟩
-    let GK : Subgroup (Over.mk (q ≫ x) ⟶ M.univ.A) :=
-      { carrier := {g' | ∃ h ∈ Us, Φ h = g'}
-        one_mem' := ⟨0, Us.zero_mem, by simp only [Φ, pt0, MonObj.comp_one]⟩
-        mul_mem' := by
-          rintro _ _ ⟨a, ha, rfl⟩ ⟨c, hc, rfl⟩
-          exact ⟨a + c, Us.add_mem ha hc, by simp only [Φ, W.add, MonObj.comp_mul]⟩
-        inv_mem' := by
-          rintro _ ⟨a, ha, rfl⟩
-          exact ⟨-a, Us.neg_mem ha, by simp only [Φ, ptneg, GrpObj.comp_inv]⟩ }
+    let GK : Subgroup (Over.mk (q ≫ x) ⟶ M.univ.A) := {
+      carrier := {g' | ∃ h ∈ Us, Φ h = g'}
+      one_mem' := ⟨0, Us.zero_mem, by simp only [Φ, pt0, MonObj.comp_one]⟩
+      mul_mem' := by
+        rintro _ _ ⟨a, ha, rfl⟩ ⟨c, hc, rfl⟩
+        exact ⟨a + c, Us.add_mem ha hc, by simp only [Φ, W.add, MonObj.comp_mul]⟩
+      inv_mem' := by
+        rintro _ ⟨a, ha, rfl⟩
+        exact ⟨-a, Us.neg_mem ha, by simp only [Φ, ptneg, GrpObj.comp_inv]⟩
+    }
     have hmem : ∀ h, Φ h ∈ GK ↔ h ∈ Us := by
       intro h
       constructor
@@ -189,24 +199,26 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.secEquiv_of :
       · intro hh
         exact ⟨h, hh, rfl⟩
     have hcardG : Nat.card GK = Ideal.absNorm w ^ j := by
-      have e2 : Us ≃ GK := Equiv.ofBijective (fun h => ⟨Φ h.1, (hmem h.1).2 h.2⟩) (by
-        constructor
-        · intro a c h
-          apply Subtype.ext
-          apply hΦinj
-          exact congrArg Subtype.val h
-        · rintro ⟨g', h, hh, rfl⟩
-          exact ⟨⟨h, hh⟩, rfl⟩)
+      have e2 : Us ≃ GK :=
+        Equiv.ofBijective (fun h => ⟨Φ h.1, (hmem h.1).2 h.2⟩) (by
+          constructor
+          · intro a c h
+            apply Subtype.ext
+            apply hΦinj
+            exact congrArg Subtype.val h
+          · rintro ⟨g', h, hh, rfl⟩
+            exact ⟨⟨h, hh⟩, rfl⟩)
       rw [← Nat.card_congr e2, Module.natCard_eq_pow_finrank (K := 𝓞 D.F ⧸ w) (V := Us), hck, hrank]
-    obtain ⟨y, hys, hyG⟩ := hS p D O f b N r w hstd M j hj T (FractionRing V) hpK (q ≫ x) GK
-      (by
-        rintro _ ⟨h, -, rfl⟩
-        exact (hΦrange _).1 ⟨h, rfl⟩)
-      (by
-        rintro _ ⟨h, hh, rfl⟩ a
-        refine ⟨Ideal.Quotient.mk w a • h, Us.smul_mem _ hh, ?_⟩
-        simp only [Φ, W.smul, Category.assoc])
-      hcardG
+    obtain ⟨y, hys, hyG⟩ :=
+      hS p D O f b N r w hstd M j hj T (FractionRing V) hpK (q ≫ x) GK
+        (by
+          rintro _ ⟨h, -, rfl⟩
+          exact (hΦrange _).1 ⟨h, rfl⟩)
+        (by
+          rintro _ ⟨h, hh, rfl⟩ a
+          refine ⟨Ideal.Quotient.mk w a • h, Us.smul_mem _ hh, ?_⟩
+          simp only [Φ, W.smul, Category.assoc])
+        hcardG
     obtain ⟨z, hzs, hzq⟩ := hYe y hys
     refine ⟨⟨z, hzs⟩, ?_⟩
     apply Subtype.ext

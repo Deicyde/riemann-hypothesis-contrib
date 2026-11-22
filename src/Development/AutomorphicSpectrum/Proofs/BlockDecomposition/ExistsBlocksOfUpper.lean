@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsOfValI
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcN.F2
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcN.F2
 open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -16,11 +17,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.IwaBlock
 
-theorem exists_blocks_of_upper {K : Type} [Field K] {n a b : ℕ} (h : a + b = n) (p : GL (Fin n) K)
-    (hp : p.1.BlockTriangular id) :
-    ∃ (m₁ : GL (Fin a) K) (m₂ : GL (Fin b) K) (Y : Matrix (Fin a) (Fin b) K),
+theorem exists_blocks_of_upper
+    {K : Type} [Field K]
+    {n a b : ℕ} (h : a + b = n) (p : GL (Fin n) K) (hp : p.1.BlockTriangular id)
+    : ∃ (m₁ : GL (Fin a) K) (m₂ : GL (Fin b) K) (Y : Matrix (Fin a) (Fin b) K),
       Matrix.reindex (finSumFinEquiv.trans (finCongr h)) (finSumFinEquiv.trans (finCongr h))
-        (Matrix.fromBlocks m₁.val (m₁.val * Y) 0 m₂.val) = p.val := by
+          (Matrix.fromBlocks m₁.val (m₁.val * Y) 0 m₂.val)
+        = p.val := by
   set e : Fin a ⊕ Fin b ≃ Fin n := finSumFinEquiv.trans (finCongr h) with he
   set M : Matrix (Fin a ⊕ Fin b) (Fin a ⊕ Fin b) K := p.val.submatrix e e with hM
   have h21 : M.toBlocks₂₁ = 0 := by
@@ -49,21 +52,28 @@ theorem exists_blocks_of_upper {K : Type} [Field K] {n a b : ℕ} (h : a + b = n
   ext i j
   simp
 
-theorem iwasawa_parabolic : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n a b : ℕ) (h : a + b = n) (w : Pl E)
-    (g : GLw n w), ∃ (m : GLw a w × GLw b w) (Y : Matrix (Fin a) (Fin b) (w.adicCompletion E)),
-      ∃ k ∈ GlobalTheory.LFun.KGL w (n := n), g = blk h w m Y * k := by
+theorem iwasawa_parabolic
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n a b : ℕ) (h : a + b = n) (w : Pl E)
+        (g : GLw n w),
+      ∃ (m : GLw a w × GLw b w) (Y : Matrix (Fin a) (Fin b) (w.adicCompletion E)),
+        ∃ k ∈ GlobalTheory.LFun.KGL w (n := n),
+          g = blk h w m Y * k := by
   intro E _ _ _ n a b h w g
-  obtain ⟨k, c, hc, hg⟩ := GlobalTheory.ValIwasawa.iwasawa (w.adicCompletionIntegers E) (w.adicCompletion E) n g⁻¹
-  have hk : Matrix.GeneralLinearGroup.map (algebraMap (w.adicCompletionIntegers E) (w.adicCompletion E)) k ∈
-      GlobalTheory.LFun.KGL w (n := n) := ⟨k, rfl⟩
+  obtain ⟨k, c, hc, hg⟩ :=
+    GlobalTheory.ValIwasawa.iwasawa (w.adicCompletionIntegers E) (w.adicCompletion E) n g⁻¹
+  have hk
+      : Matrix.GeneralLinearGroup.map (algebraMap (w.adicCompletionIntegers E) (w.adicCompletion E))
+          k
+        ∈ GlobalTheory.LFun.KGL w (n := n) :=
+    ⟨k, rfl⟩
   have hc' : (c⁻¹).1.BlockTriangular id := by
     haveI : Invertible c.1 := Units.invertible c
     rw [Matrix.coe_units_inv]
     exact Matrix.blockTriangular_inv_of_blockTriangular hc
   obtain ⟨m₁, m₂, Y, hY⟩ := exists_blocks_of_upper h c⁻¹ hc'
   have hblk : blk h w (m₁, m₂) Y = c⁻¹ := by
-    have hU : IsUnit (Matrix.reindex (finSumFinEquiv.trans (finCongr h)) (finSumFinEquiv.trans (finCongr h))
-        (Matrix.fromBlocks m₁.val (m₁.val * Y) 0 m₂.val)) := by
+    have hU : IsUnit (Matrix.reindex (finSumFinEquiv.trans (finCongr h))
+        (finSumFinEquiv.trans (finCongr h)) (Matrix.fromBlocks m₁.val (m₁.val * Y) 0 m₂.val)) := by
       rw [hY]; exact (c⁻¹).isUnit
     apply Units.ext
     simp only [blk]

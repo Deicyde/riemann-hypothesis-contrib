@@ -21,21 +21,25 @@ open Submodule Module
 
 variable {Ω : Type} [Field Ω] {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem exists_basis_of_isCompl (R : Type) [CommRing R] [IsLocalRing R] {M : Type} [AddCommGroup M] [Module R M]
-    [Module.Free R M] [Module.Finite R M] (A B : Submodule R M) (h : IsCompl A B) :
-    ∃ k : ℕ, Nonempty (Module.Basis (Fin k) R A) := by
+theorem exists_basis_of_isCompl
+    (R : Type) [CommRing R] [IsLocalRing R]
+    {M : Type} [AddCommGroup M] [Module R M] [Module.Free R M] [Module.Finite R M]
+    (A B : Submodule R M) (h : IsCompl A B)
+    : ∃ k : ℕ, Nonempty (Module.Basis (Fin k) R A) := by
   have h1 : Module.Projective R A :=
     Module.Projective.of_split A.subtype (Submodule.linearProjOfIsCompl A B h)
       (LinearMap.ext fun x => Submodule.linearProjOfIsCompl_apply_left h x)
   have h2 : Module.Finite R A :=
-    Module.Finite.of_surjective (Submodule.linearProjOfIsCompl A B h) (Submodule.linearProjOfIsCompl_surjective h)
+    Module.Finite.of_surjective (Submodule.linearProjOfIsCompl A B h)
+      (Submodule.linearProjOfIsCompl_surjective h)
   have h3 : Module.FinitePresentation R A := Module.finitePresentation_of_projective R A
   have h4 : Module.Free R A := Module.free_of_flat_of_isLocalRing
   exact ⟨_, ⟨Module.finBasis R A⟩⟩
 
-theorem eq_zero_of_mem {V : Submodule Ω E} {s : ℕ} {e : Fin s → E}
-    (hc : LinearIndependent Ω fun i => V.mkQ (e i)) {y : E} (hy : y ∈ span Ω (Set.range e)) (hyV : y ∈ V) :
-    y = 0 := by
+theorem eq_zero_of_mem
+    {V : Submodule Ω E} {s : ℕ} {e : Fin s → E} (hc : LinearIndependent Ω fun i => V.mkQ (e i))
+    {y : E} (hy : y ∈ span Ω (Set.range e)) (hyV : y ∈ V)
+    : y = 0 := by
   obtain ⟨a, rfl⟩ := (mem_span_range_iff_exists_fun Ω).1 hy
   have h0 : ∑ i, a i • V.mkQ (e i) = 0 := by
     have h := (Submodule.Quotient.mk_eq_zero V).2 hyV
@@ -45,41 +49,51 @@ theorem eq_zero_of_mem {V : Submodule Ω E} {s : ℕ} {e : Fin s → E}
   have ha := Fintype.linearIndependent_iff.1 hc a h0
   simp [ha]
 
-theorem sup_inf_eq (R : Subring Ω) {V : Submodule Ω E} {s k : ℕ} {e : Fin s → E} {n : Fin k → E}
-    (hc : LinearIndependent Ω fun i => V.mkQ (e i)) (hn : ∀ j, n j ∈ V) :
-    (span R (Set.range e) ⊔ span R (Set.range n)) ⊓ V.restrictScalars R = span R (Set.range n) := by
-  have hnV : span R (Set.range n) ≤ V.restrictScalars R := span_le.2 (by rintro _ ⟨j, rfl⟩; exact hn j)
+theorem sup_inf_eq
+    (R : Subring Ω)
+    {V : Submodule Ω E} {s k : ℕ} {e : Fin s → E} {n : Fin k → E}
+    (hc : LinearIndependent Ω fun i => V.mkQ (e i)) (hn : ∀ j, n j ∈ V)
+    : (span R (Set.range e) ⊔ span R (Set.range n)) ⊓ V.restrictScalars R
+      = span R (Set.range n) := by
+  have hnV : span R (Set.range n) ≤ V.restrictScalars R :=
+    span_le.2 (by rintro _ ⟨j, rfl⟩; exact hn j)
   apply le_antisymm
   · rintro x ⟨hx, hxV⟩
     obtain ⟨y, hy, z, hz, rfl⟩ := mem_sup.1 hx
-    have hy0 : y = 0 := eq_zero_of_mem hc (span_le_restrictScalars R Ω _ hy) (by
-      have h := V.sub_mem hxV (hnV hz)
-      simpa using h)
+    have hy0 : y = 0 :=
+      eq_zero_of_mem hc (span_le_restrictScalars R Ω _ hy) (by
+        have h := V.sub_mem hxV (hnV hz)
+        simpa using h)
     simpa [hy0] using hz
   · exact le_inf le_sup_right hnV
 
-def cat {s k : ℕ} (e : Fin s → E) (n : Fin k → E) : Fin (s + k) → E := Sum.elim e n ∘ finSumFinEquiv.symm
+def cat {s k : ℕ} (e : Fin s → E) (n : Fin k → E) : Fin (s + k) → E :=
+  Sum.elim e n ∘ finSumFinEquiv.symm
 
-theorem range_cat {s k : ℕ} (e : Fin s → E) (n : Fin k → E) : Set.range (cat e n) = Set.range e ∪ Set.range n := by
+theorem range_cat {s k : ℕ} (e : Fin s → E) (n : Fin k → E)
+    : Set.range (cat e n) = Set.range e ∪ Set.range n := by
   rw [cat, EquivLike.range_comp, Set.Sum.elim_range]
 
-theorem span_cat (R : Subring Ω) {s k : ℕ} (e : Fin s → E) (n : Fin k → E) :
-    span R (Set.range (cat e n)) = span R (Set.range e) ⊔ span R (Set.range n) := by
+theorem span_cat (R : Subring Ω) {s k : ℕ} (e : Fin s → E) (n : Fin k → E)
+    : span R (Set.range (cat e n)) = span R (Set.range e) ⊔ span R (Set.range n) := by
   rw [range_cat, span_union]
 
-theorem exists_frame (R : Subring Ω) [IsLocalRing R] {V W : Submodule Ω E} (hVW : V ≤ W) (P : Submodule R E)
+theorem exists_frame
+    (R : Subring Ω) [IsLocalRing R]
+    {V W : Submodule Ω E} (hVW : V ≤ W)
+    (P : Submodule R E)
     {g s : ℕ} (b : Fin g → E) (hb : LinearIndependent Ω b) (hbW : span Ω (Set.range b) = W)
     (hP : P = span R (Set.range b)) (c : Fin s → E ⧸ V) (hc : LinearIndependent Ω c)
-    (hPc : P.map (V.mkQ.restrictScalars R) = span R (Set.range c)) :
-    ∃ (k : ℕ) (e : Fin s → E) (n : Fin k → E), LinearIndependent Ω (cat e n) ∧
-      P = span R (Set.range e) ⊔ span R (Set.range n) ∧ (LinearIndependent Ω fun i => V.mkQ (e i)) ∧
-      (∀ j, n j ∈ V) ∧ span Ω (Set.range n) = V := by
+    (hPc : P.map (V.mkQ.restrictScalars R) = span R (Set.range c))
+    : ∃ (k : ℕ) (e : Fin s → E) (n : Fin k → E),
+      LinearIndependent Ω (cat e n) ∧ P = span R (Set.range e) ⊔ span R (Set.range n)
+        ∧ (LinearIndependent Ω fun i => V.mkQ (e i)) ∧ (∀ j, n j ∈ V)
+        ∧ span Ω (Set.range n) = V := by
   have hinj : Function.Injective fun r : R => r • (1 : Ω) := fun x y h => by
     simpa [Subring.smul_def] using h
 
   have hlift : ∀ i, ∃ x ∈ P, V.mkQ x = c i := fun i => by
-    have h : c i ∈ P.map (V.mkQ.restrictScalars R) := by
-      rw [hPc]; exact subset_span ⟨i, rfl⟩
+    have h : c i ∈ P.map (V.mkQ.restrictScalars R) := by rw [hPc]; exact subset_span ⟨i, rfl⟩
     obtain ⟨x, hx, e⟩ := h
     exact ⟨x, hx, e⟩
   choose e heP hec using hlift
@@ -88,8 +102,7 @@ theorem exists_frame (R : Subring Ω) [IsLocalRing R] {V W : Submodule Ω E} (hV
   set N := P ⊓ V.restrictScalars R with hN
   have hQP : Q ≤ P := span_le.2 (by rintro _ ⟨i, rfl⟩; exact heP i)
   have hdec : ∀ x ∈ P, ∃ y ∈ Q, ∃ z ∈ N, y + z = x := fun x hx => by
-    have h : V.mkQ x ∈ span R (Set.range c) := by
-      rw [← hPc]; exact ⟨x, hx, rfl⟩
+    have h : V.mkQ x ∈ span R (Set.range c) := by rw [← hPc]; exact ⟨x, hx, rfl⟩
     obtain ⟨a, ha⟩ := (mem_span_range_iff_exists_fun R).1 h
     have hy : ∑ i, a i • e i ∈ Q := sum_mem fun i _ => Q.smul_mem _ (subset_span ⟨i, rfl⟩)
     refine ⟨_, hy, x - ∑ i, a i • e i, ⟨P.sub_mem hx (hQP hy), ?_⟩, by abel⟩
@@ -101,8 +114,7 @@ theorem exists_frame (R : Subring Ω) [IsLocalRing R] {V W : Submodule Ω E} (hV
     eq_zero_of_mem hc' (span_le_restrictScalars R Ω _ hx) hxN.2
 
   have hbR : LinearIndependent R b := hb.restrict_scalars hinj
-  have hfree : Module.Free R P := by
-    subst hP; exact Module.Free.of_basis (Module.Basis.span hbR)
+  have hfree : Module.Free R P := by subst hP; exact Module.Free.of_basis (Module.Basis.span hbR)
   have hfin : Module.Finite R P := by
     subst hP; exact Module.Finite.span_of_finite R (Set.finite_range b)
   have hcompl : IsCompl (N.comap P.subtype) (Q.comap P.subtype) := by
@@ -125,8 +137,7 @@ theorem exists_frame (R : Subring Ω) [IsLocalRing R] {V W : Submodule Ω E} (hV
     · intro h; exact ⟨⟨⟨x, h.1⟩, h⟩, rfl⟩
   let n : Fin k → E := fun j => φ (β j)
   have hnN : span R (Set.range n) = N := by
-    have h : Set.range n = φ '' Set.range β := by
-      rw [← Set.range_comp]; rfl
+    have h : Set.range n = φ '' Set.range β := by rw [← Set.range_comp]; rfl
     rw [h, ← Submodule.map_span, β.span_eq, Submodule.map_top, hφr]
   have hnR : LinearIndependent R n := β.linearIndependent.map' φ (LinearMap.ker_eq_bot.2 hφ)
   have hnV : ∀ j, n j ∈ V := fun j => by
@@ -168,8 +179,7 @@ theorem exists_frame (R : Subring Ω) [IsLocalRing R] {V W : Submodule Ω E} (hV
     · rw [← hbW]
       refine span_le.2 ?_
       rintro _ ⟨i, rfl⟩
-      have h : b i ∈ span R (Set.range (cat e n)) := by
-        rw [hspan, hP]; exact subset_span ⟨i, rfl⟩
+      have h : b i ∈ span R (Set.range (cat e n)) := by rw [hspan, hP]; exact subset_span ⟨i, rfl⟩
       exact span_le_restrictScalars R Ω _ h
   have hcatΩ : LinearIndependent Ω (cat e n) := by
     rw [linearIndependent_iff_card_eq_finrank_span, Set.finrank, hW, ← hbW, finrank_span_eq_card hb]
@@ -182,10 +192,12 @@ theorem exists_frame (R : Subring Ω) [IsLocalRing R] {V W : Submodule Ω E} (hV
   · have hvW := hVW hv
     rw [← hW, range_cat, span_union] at hvW
     obtain ⟨y, hy, z, hz, rfl⟩ := mem_sup.1 hvW
-    have hzV : z ∈ V := (span_le.2 (by rintro _ ⟨j, rfl⟩; exact hnV j) : span Ω (Set.range n) ≤ V) hz
-    have hy0 : y = 0 := eq_zero_of_mem hc' hy (by
-      have h := V.sub_mem hv hzV
-      simpa using h)
+    have hzV : z ∈ V :=
+      (span_le.2 (by rintro _ ⟨j, rfl⟩; exact hnV j) : span Ω (Set.range n) ≤ V) hz
+    have hy0 : y = 0 :=
+      eq_zero_of_mem hc' hy (by
+        have h := V.sub_mem hv hzV
+        simpa using h)
     simpa [hy0] using hz
 
 end GlobalTheory.CompanionTheory.Ar.SatSub
@@ -194,16 +206,22 @@ namespace GlobalTheory.CompanionTheory.Ar
 
 open Submodule Module SatSub
 
-theorem inter_isVBOn_of_map : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type)
-    [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (T : Set (Cpt ξ)) (g s : ℕ) (W V : Submodule Ω E)
-    (W' : Submodule Ω (E ⧸ V)), V ≤ W → L.IsVBOn T g W → (L.map V.mkQ).IsVBOn T s W' →
-    (L.inter V).IsVBOn T (Module.finrank Ω V) V ∧
-      ∀ p ∈ T, ∃ Q : Submodule (regAt ξ p) E, Disjoint Q (L.inter V p) ∧ Q ⊔ L.inter V p = L p := by
+theorem inter_isVBOn_of_map
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type)
+        [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (T : Set (Cpt ξ)) (g s : ℕ)
+        (W V : Submodule Ω E) (W' : Submodule Ω (E ⧸ V)),
+      V ≤ W → L.IsVBOn T g W → (L.map V.mkQ).IsVBOn T s W'
+        → (L.inter V).IsVBOn T (Module.finrank Ω V) V
+          ∧ ∀ p ∈ T, ∃ Q : Submodule (regAt ξ p) E,
+            Disjoint Q (L.inter V p) ∧ Q ⊔ L.inter V p = L p := by
   intro X Ω _ ξ E _ _ L T g s W V W' hVW hL hM
   have hcoh : L.IsCohOn T := (GlobalTheory.T.coherent_lattice_closure X Ω ξ E E L L T).1 g W hL
-  have key : ∀ p ∈ T, ∃ (k : ℕ) (e : Fin s → E) (n : Fin k → E), LinearIndependent Ω (cat e n) ∧
-      L p = span (regAt ξ p) (Set.range e) ⊔ span (regAt ξ p) (Set.range n) ∧
-      (LinearIndependent Ω fun i => V.mkQ (e i)) ∧ (∀ j, n j ∈ V) ∧ span Ω (Set.range n) = V := fun p hp => by
+  have key
+      : ∀ p ∈ T, ∃ (k : ℕ) (e : Fin s → E) (n : Fin k → E),
+        LinearIndependent Ω (cat e n)
+          ∧ L p = span (regAt ξ p) (Set.range e) ⊔ span (regAt ξ p) (Set.range n)
+          ∧ (LinearIndependent Ω fun i => V.mkQ (e i)) ∧ (∀ j, n j ∈ V)
+          ∧ span Ω (Set.range n) = V := fun p hp => by
     have := (GlobalTheory.T.regAt_local_order_fraction X Ω ξ).1 p
     obtain ⟨U, hU, b, hbW, hb⟩ := hL p hp
     obtain ⟨U', hU', c, -, hc⟩ := hM p hp
@@ -215,11 +233,11 @@ theorem inter_isVBOn_of_map : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : 
     have hnI : LinearIndependent Ω n := by
       have h := hf.comp _ ((finSumFinEquiv (m := s) (n := k)).injective.comp Sum.inr_injective)
       simpa [cat, Function.comp_def] using h
-    have hk : k = Module.finrank Ω V := by
-      rw [← hnV, finrank_span_eq_card hnI]; simp
+    have hk : k = Module.finrank Ω V := by rw [← hnV, finrank_span_eq_card hnI]; simp
     subst hk
-    obtain ⟨U, hU, h⟩ := GlobalTheory.T.frame_open_neighbourhood X Ω ξ E L T _ (cat e n) p hcoh hp
-      ⟨hf, by rw [span_cat]; exact hP⟩
+    obtain ⟨U, hU, h⟩ :=
+      GlobalTheory.T.frame_open_neighbourhood X Ω ξ E L T _ (cat e n) p hcoh hp
+        ⟨hf, by rw [span_cat]; exact hP⟩
     refine ⟨U, hU, n, hnV, fun q hq hqU => ⟨hnI, ?_⟩⟩
     obtain ⟨-, h2⟩ := h q hq hqU
     rw [span_cat] at h2

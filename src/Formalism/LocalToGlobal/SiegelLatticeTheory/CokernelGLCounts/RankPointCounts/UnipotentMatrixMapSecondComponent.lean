@@ -16,10 +16,12 @@ section Sandwich
 
 variable {K : Type*} [CommRing K] {r : ℕ}
 
-theorem corner_sandwich (A B : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
+theorem corner_sandwich
+    (A B : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
     (hA : ∀ i, A i (Fin.last r) = if i = Fin.last r then 1 else 0)
-    (hB : ∀ j, B (Fin.last r) j = if j = Fin.last r then 1 else 0) (c : K) :
-    A * cornerM (r := r) c * B = cornerM c := by
+    (hB : ∀ j, B (Fin.last r) j = if j = Fin.last r then 1 else 0)
+    (c : K)
+    : A * cornerM (r := r) c * B = cornerM c := by
   ext i j
   simp only [Matrix.mul_apply, cornerM, Matrix.of_apply]
   rw [Finset.sum_eq_single (Fin.last r)]
@@ -42,7 +44,8 @@ end Sandwich
 
 section Comp
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
   (M : Formalism.MainNotions.S.Loc.Model F E) (g : Formalism.MainNotions.S.Loc.SplitG M.L)
 
@@ -61,22 +64,27 @@ def mmG (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E) : Matrix (Fin (r + 1)) (Fin
 def uuG (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E) : Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
   Matrix.of fun i j => g.e.symm ((g.e (P i j)).1, (g.e (L j i)).2)
 
-theorem middleMatrix_map_firstComponent (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E) : (mmG M g L P).map (π1 M g) = P.map (π2 M g) := by
+theorem middleMatrix_map_firstComponent (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    : (mmG M g L P).map (π1 M g) = P.map (π2 M g) := by
   ext i j
   simp [mmG, π1_apply, π2_apply]
-theorem middleMatrix_map_secondComponent (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E) : (mmG M g L P).map (π2 M g) = (L.map (π1 M g))ᵀ := by
+theorem middleMatrix_map_secondComponent (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    : (mmG M g L P).map (π2 M g) = (L.map (π1 M g))ᵀ := by
   ext i j
   simp [mmG, π1_apply, π2_apply]
-theorem unipotentMatrix_map_firstComponent (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E) : (uuG M g L P).map (π1 M g) = P.map (π1 M g) := by
+theorem unipotentMatrix_map_firstComponent (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    : (uuG M g L P).map (π1 M g) = P.map (π1 M g) := by
   ext i j
   simp [uuG, π1_apply, π2_apply]
-theorem unipotentMatrix_map_secondComponent (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E) : (uuG M g L P).map (π2 M g) = (L.map (π2 M g))ᵀ := by
+theorem unipotentMatrix_map_secondComponent (L P : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    : (uuG M g L P).map (π2 M g) = (L.map (π2 M g))ᵀ := by
   ext i j
   simp [uuG, π1_apply, π2_apply]
 
-theorem zzPlus_map_firstComponent (hs : M.split = some g) (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F) :
-    (Formalism.MainNotions.S.Loc.HermSp.ZZplusOf M Zh T T').map (π1 M g) =
-      ((g.q : F))⁻¹ • Zh.map (π1 M g) + (T / (g.q : F)) • Ec r := by
+theorem zzPlus_map_firstComponent
+    (hs : M.split = some g) (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
+    : (Formalism.MainNotions.S.Loc.HermSp.ZZplusOf M Zh T T').map (π1 M g)
+      = ((g.q : F))⁻¹ • Zh.map (π1 M g) + (T / (g.q : F)) • Ec r := by
   ext a b
   simp only [Formalism.MainNotions.S.Loc.HermSp.ZZplusOf, hs]
   rw [Ec_eq_cornerM]
@@ -86,9 +94,10 @@ theorem zzPlus_map_firstComponent (hs : M.split = some g) (Zh : Matrix (Fin (r +
   · simp [h, cornerM, π1_apply]
     ring
 
-theorem zzPlus_map_secondComponent (hs : M.split = some g) (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F) :
-    (Formalism.MainNotions.S.Loc.HermSp.ZZplusOf M Zh T T').map (π2 M g) =
-      (-((g.q : F))⁻¹) • (Zh.map (π2 M g))ᵀ + (-(T' / (g.q : F))) • Ec r := by
+theorem zzPlus_map_secondComponent
+    (hs : M.split = some g) (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
+    : (Formalism.MainNotions.S.Loc.HermSp.ZZplusOf M Zh T T').map (π2 M g)
+      = (-((g.q : F))⁻¹) • (Zh.map (π2 M g))ᵀ + (-(T' / (g.q : F))) • Ec r := by
   ext a b
   simp only [Formalism.MainNotions.S.Loc.HermSp.ZZplusOf, hs]
   rw [Ec_eq_cornerM]

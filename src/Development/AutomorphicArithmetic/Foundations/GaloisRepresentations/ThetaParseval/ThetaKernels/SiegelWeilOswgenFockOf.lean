@@ -17,22 +17,33 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix SchwartzMap Classical InnerProductSpace
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.Rg.Sw
 namespace PositivityTheory.SiegelWeilFormula.KFP.OswGen
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 variable {d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ}
-theorem crd_inf_eq_k (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d)
-    (L : (Fin d.m × Fin d.n × Fin 2 → mixedEmbedding.mixedSpace F) ≃L[ℝ] (InfinitePlace F → Fin d.m → Fin d.n → ℂ))
+theorem crd_inf_eq_k
+    (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d)
+    (L
+      : (Fin d.m × Fin d.n × Fin 2 → mixedEmbedding.mixedSpace F) ≃L[ℝ] (InfinitePlace F → Fin d.m → Fin d.n → ℂ))
     (hL : ∀ (c : Fin d.m × Fin d.n × Fin 2 → AF F) (w : InfinitePlace F),
-      L (fun k => InfiniteAdeleRing.ringEquiv_mixedSpace F (c k).1) w = R.loc w (d.cmb c)) (X : Mx F E d.m d.n) :
-    (fun k => InfiniteAdeleRing.ringEquiv_mixedSpace F (d.crd X k).1) =
-      L.symm (((EuclideanSpace.equiv (_root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d) ℝ).trans (_root_.PositivityTheory.SiegelWeilFormula.KFP.OswGen.zLE_k d).toContinuousLinearEquiv) (_root_.PositivityTheory.SiegelWeilFormula.KFP.arc_k R X)) := by
+      L (fun k => InfiniteAdeleRing.ringEquiv_mixedSpace F (c k).1) w = R.loc w (d.cmb c))
+    (X : Mx F E d.m d.n)
+    : (fun k => InfiniteAdeleRing.ringEquiv_mixedSpace F (d.crd X k).1)
+      = L.symm
+        (((EuclideanSpace.equiv (_root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d) ℝ).trans
+            (_root_.PositivityTheory.SiegelWeilFormula.KFP.OswGen.zLE_k d).toContinuousLinearEquiv)
+          (_root_.PositivityTheory.SiegelWeilFormula.KFP.arc_k R X)) := by
   apply L.injective
   rw [ContinuousLinearEquiv.apply_symm_apply]
   funext w
   rw [hL, _root_.PositivityTheory.SiegelWeilFormula.KFock.cmb_crd_k]
-  exact (_root_.PositivityTheory.SiegelWeilFormula.KFP.arc_eq_iff_k R X (_root_.PositivityTheory.SiegelWeilFormula.KFP.arc_k R X)).1 rfl w
+  exact (_root_.PositivityTheory.SiegelWeilFormula.KFP.arc_eq_iff_k R X
+    (_root_.PositivityTheory.SiegelWeilFormula.KFP.arc_k R X)).1 rfl w
 theorem mem_fock_of_k (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d) {νf : Measure (_root_.PositivityTheory.SiegelWeilFormula.KFP.Yf_k d)} (hνf : νf.IsAddHaarMeasure) {f : Mx F E d.m d.n → ℂ}
     (hf : f ∈ d.schM) (H : ∀ g ∈ SB (_root_.PositivityTheory.SiegelWeilFormula.KFP.Yf_k d), ∃ P : MvPolynomial (_root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d) ℂ,
       ∀ u, _root_.PositivityTheory.SiegelWeilFormula.KFP.hg_k R νf f g u = MvPolynomial.eval (fun i => ((u i : ℝ) : ℂ)) P * Real.exp (-(2 * Real.pi * ‖u‖ ^ 2))) :

@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryTh
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.RatEqui GlobalTheory.InertParity
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.RatEqui GlobalTheory.InertParity
 open scoped BigOperators Pointwise
 
 noncomputable section
@@ -17,11 +19,21 @@ namespace GlobalTheory.EquivConst
 
 open GlobalTheory.SymConst
 
-def GaussSign (D : D7) : Prop := ∀ (M : Type) [AddCommGroup M] [Module (𝓞 D.host.E) M] [Finite M] (φ : M → ℂ) (β : M → M → ℂ), (∀ x, φ x ≠ 0) → (∀ x y, φ (x + y) = φ x * φ y * β x y) → (∀ x x' y, β (x + x') y = β x y * β x' y) → (∀ (a : 𝓞 D.host.E) x y, β (a • x) y = β x (GlobalTheory.InertSign.sgO D a • y)) → (∀ x, (∀ y, β x y = 1) → x = 0) → (∀ x, ∃ χ : 𝓞 D.host.E → ℂ, (∀ a b, χ (a + b) = χ a * χ b) ∧ ∀ a, φ (a • x) = χ (a * GlobalTheory.InertSign.sgO D a)) → ∃ r : ℝ, 0 < r ∧ ∑ᶠ x, φ x = sgn D (Nat.card M) * (r : ℂ)
+def GaussSign (D : D7) : Prop :=
+  ∀ (M : Type) [AddCommGroup M] [Module (𝓞 D.host.E) M] [Finite M] (φ : M → ℂ) (β : M → M → ℂ),
+    (∀ x, φ x ≠ 0) → (∀ x y, φ (x + y) = φ x * φ y * β x y)
+      → (∀ x x' y, β (x + x') y = β x y * β x' y)
+      → (∀ (a : 𝓞 D.host.E) x y, β (a • x) y = β x (GlobalTheory.InertSign.sgO D a • y))
+      → (∀ x, (∀ y, β x y = 1) → x = 0)
+      → (∀ x, ∃ χ : 𝓞 D.host.E → ℂ,
+        (∀ a b, χ (a + b) = χ a * χ b) ∧ ∀ a, φ (a • x) = χ (a * GlobalTheory.InertSign.sgO D a))
+      → ∃ r : ℝ, 0 < r ∧ ∑ᶠ x, φ x = sgn D (Nat.card M) * (r : ℂ)
 
-theorem finsum_comp_surj {G K : Type} [AddCommGroup G] [AddCommGroup K] [Finite G] (p : G →+ K)
-    (hp : Function.Surjective p) (f : K → ℂ) :
-    ∃ n : ℕ, 0 < n ∧ ∑ᶠ g, f (p g) = n * ∑ᶠ k, f k := by
+theorem finsum_comp_surj
+    {G K : Type} [AddCommGroup G] [AddCommGroup K] [Finite G]
+    (p : G →+ K) (hp : Function.Surjective p)
+    (f : K → ℂ)
+    : ∃ n : ℕ, 0 < n ∧ ∑ᶠ g, f (p g) = n * ∑ᶠ k, f k := by
   haveI : Finite K := Finite.of_surjective p hp
   letI := Fintype.ofFinite G
   letI := Fintype.ofFinite K
@@ -32,15 +44,19 @@ theorem finsum_comp_surj {G K : Type} [AddCommGroup G] [AddCommGroup K] [Finite 
   rw [Finset.sum_congr rfl (g := fun _ => f k) (fun g hg => by rw [(Finset.mem_filter.1 hg).2]),
     Finset.sum_const, nsmul_eq_mul, AddMonoidHom.card_fiber_eq_of_mem_range p (hp k) (hp 0)]
 
-theorem gauss_quot (D : D7) (hG : GaussSign D) (M : Type) [AddCommGroup M] [Module (𝓞 D.host.E) M] (R : Submodule (𝓞 D.host.E) M)
-    (N : AddSubgroup M) [Finite (M ⧸ N)] (hNR : N ≤ R.toAddSubgroup) (φ : M → ℂ) (β : M → M → ℂ)
-    (h0 : ∀ x, φ x ≠ 0) (hadd : ∀ x y, φ (x + y) = φ x * φ y * β x y)
+theorem gauss_quot
+    (D : D7) (hG : GaussSign D)
+    (M : Type) [AddCommGroup M] [Module (𝓞 D.host.E) M]
+    (R : Submodule (𝓞 D.host.E) M)
+    (N : AddSubgroup M) [Finite (M ⧸ N)]
+    (hNR : N ≤ R.toAddSubgroup)
+    (φ : M → ℂ) (β : M → M → ℂ) (h0 : ∀ x, φ x ≠ 0) (hadd : ∀ x y, φ (x + y) = φ x * φ y * β x y)
     (hβ : ∀ x x' y, β (x + x') y = β x y * β x' y)
     (hσ : ∀ (a : 𝓞 D.host.E) x y, β (a • x) y = β x (GlobalTheory.InertSign.sgO D a • y))
     (hrad : ∀ x, (∀ y, β x y = 1) → x ∈ R) (hper : ∀ x, ∀ w ∈ R, φ (x + w) = φ x)
-    (hχ : ∀ x, ∃ χ : 𝓞 D.host.E → ℂ, (∀ a b, χ (a + b) = χ a * χ b) ∧
-      ∀ a, φ (a • x) = χ (a * GlobalTheory.InertSign.sgO D a)) :
-    ∃ r : ℝ, 0 < r ∧ ∑ᶠ q : M ⧸ N, φ q.out = sgn D R.toAddSubgroup.index * (r : ℂ) := by
+    (hχ : ∀ x, ∃ χ : 𝓞 D.host.E → ℂ,
+      (∀ a b, χ (a + b) = χ a * χ b) ∧ ∀ a, φ (a • x) = χ (a * GlobalTheory.InertSign.sgO D a))
+    : ∃ r : ℝ, 0 < r ∧ ∑ᶠ q : M ⧸ N, φ q.out = sgn D R.toAddSubgroup.index * (r : ℂ) := by
   have hcongr : ∀ x y : M, R.mkQ x = R.mkQ y → φ x = φ y := fun x y h => by
     have := hper y (x - y) ((Submodule.Quotient.eq R).1 h)
     rwa [add_sub_cancel] at this
@@ -50,32 +66,37 @@ theorem gauss_quot (D : D7) (hG : GaussSign D) (M : Type) [AddCommGroup M] [Modu
     have h1 := hadd (o (R.mkQ x)) (o (R.mkQ y))
     rw [e1, e1, hcongr _ (x + y) (by rw [map_add (f := _), map_add (f := _), ho, ho]), hadd] at h1
     exact (mul_left_cancel₀ (mul_ne_zero (h0 x) (h0 y)) h1).symm
-  let p : M ⧸ N →+ M ⧸ R := QuotientAddGroup.lift N R.mkQ.toAddMonoidHom fun x hx =>
-    (Submodule.Quotient.mk_eq_zero R).2 (hNR hx)
+  let p : M ⧸ N →+ M ⧸ R :=
+    QuotientAddGroup.lift N R.mkQ.toAddMonoidHom fun x hx =>
+      (Submodule.Quotient.mk_eq_zero R).2 (hNR hx)
   have hp0 : ∀ x : M, p (x : M ⧸ N) = R.mkQ x := fun x => rfl
   have hp : Function.Surjective p := fun k => ⟨(o k : M ⧸ N), (hp0 _).trans (ho k)⟩
   haveI : Finite (M ⧸ R) := Finite.of_surjective p hp
-  obtain ⟨r, hr, hs⟩ := hG (M ⧸ R) (fun k => φ (o k)) (fun k l => β (o k) (o l)) (fun _ => h0 _)
-    (fun k l => by
-      obtain ⟨x, rfl⟩ := R.mkQ_surjective k
-      obtain ⟨y, rfl⟩ := R.mkQ_surjective l
-      rw [← map_add (f := _), e1, e1, e1, e2, hadd])
-    (fun k k' l => by
-      obtain ⟨x, rfl⟩ := R.mkQ_surjective k
-      obtain ⟨x', rfl⟩ := R.mkQ_surjective k'
-      obtain ⟨y, rfl⟩ := R.mkQ_surjective l
-      rw [← map_add (f := _), e2, e2, e2, hβ])
-    (fun a k l => by
-      obtain ⟨x, rfl⟩ := R.mkQ_surjective k
-      obtain ⟨y, rfl⟩ := R.mkQ_surjective l
-      rw [← map_smul, ← map_smul, e2, e2, hσ])
-    (fun k hk => by
-      obtain ⟨x, rfl⟩ := R.mkQ_surjective k
-      exact (Submodule.Quotient.mk_eq_zero R).2 (hrad x fun y => by rw [← e2]; exact hk _))
-    (fun k => by
-      obtain ⟨x, rfl⟩ := R.mkQ_surjective k
-      obtain ⟨χ, h1, h2⟩ := hχ x
-      exact ⟨χ, h1, fun a => by rw [← map_smul, e1, h2]⟩)
+  obtain ⟨r, hr, hs⟩ :=
+    hG (M ⧸ R)
+      (fun k => φ (o k))
+      (fun k l => β (o k) (o l))
+      (fun _ => h0 _)
+      (fun k l => by
+        obtain ⟨x, rfl⟩ := R.mkQ_surjective k
+        obtain ⟨y, rfl⟩ := R.mkQ_surjective l
+        rw [← map_add (f := _), e1, e1, e1, e2, hadd])
+      (fun k k' l => by
+        obtain ⟨x, rfl⟩ := R.mkQ_surjective k
+        obtain ⟨x', rfl⟩ := R.mkQ_surjective k'
+        obtain ⟨y, rfl⟩ := R.mkQ_surjective l
+        rw [← map_add (f := _), e2, e2, e2, hβ])
+      (fun a k l => by
+        obtain ⟨x, rfl⟩ := R.mkQ_surjective k
+        obtain ⟨y, rfl⟩ := R.mkQ_surjective l
+        rw [← map_smul, ← map_smul, e2, e2, hσ])
+      (fun k hk => by
+        obtain ⟨x, rfl⟩ := R.mkQ_surjective k
+        exact (Submodule.Quotient.mk_eq_zero R).2 (hrad x fun y => by rw [← e2]; exact hk _))
+      (fun k => by
+        obtain ⟨x, rfl⟩ := R.mkQ_surjective k
+        obtain ⟨χ, h1, h2⟩ := hχ x
+        exact ⟨χ, h1, fun a => by rw [← map_smul, e1, h2]⟩)
   obtain ⟨n, hn, hsum⟩ := finsum_comp_surj p hp fun k => φ (o k)
   refine ⟨n * r, by positivity, ?_⟩
   have e3 : ∀ q : M ⧸ N, φ q.out = φ (o (p q)) := fun q => by
@@ -87,9 +108,11 @@ theorem gauss_quot (D : D7) (hG : GaussSign D) (M : Type) [AddCommGroup M] [Modu
   push_cast
   ring
 
-theorem gauss_sign (D : D7) (hG : GaussSign D) {V : Type} [AddCommGroup V] [Module ℂ V] (H : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ)
-    (hH : ∀ x y, H y x = (starRingEnd ℂ) (H x y)) (s : ℝ) (A : AddSubgroup V) (hFG : A.FG)
-    (hint : ∀ x ∈ A, ∀ y ∈ A, ∃ n : ℤ, (H x y).im = n)
+theorem gauss_sign
+    (D : D7) (hG : GaussSign D)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (H : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hH : ∀ x y, H y x = (starRingEnd ℂ) (H x y))
+    (s : ℝ) (A : AddSubgroup V) (hFG : A.FG) (hint : ∀ x ∈ A, ∀ y ∈ A, ∃ n : ℤ, (H x y).im = n)
     (hsd : ∀ x, (∀ y ∈ A, ∃ n : ℤ, (H x y).im = n) → x ∈ A)
     (hq : ∀ x ∈ A, ∃ n : ℤ, s * (H x x).re = n)
     (hsemi : ∀ x ∈ A, ∀ y ∈ A, ∃ k : ℤ,
@@ -100,16 +123,18 @@ theorem gauss_sign (D : D7) (hG : GaussSign D) {V : Type} [AddCommGroup V] [Modu
     (T : 𝓞 D.host.E → V →ₗ[ℂ] V) (hT1 : ∀ x, T 1 x = x) (hTm : ∀ b c x, T (b * c) x = T b (T c x))
     (hTa : ∀ b c x, T (b + c) x = T b x + T c x) (hT0 : ∀ x, T 0 x = 0)
     (hTA : ∀ b, ∀ x ∈ A, T b x ∈ A) (hTc : ∀ b x, T b (a x) = a (T b x))
-    (hTH : ∀ b x y, H (T b x) y = H x (T (GlobalTheory.InertSign.sgO D b) y)) :
-    ∃ r : ℝ, 0 < r ∧ ∑ᶠ q : A ⧸ (subLa m A).addSubgroupOf A,
-      (-1 : ℂ) ^ (round (s * (H ((q.out : A) : V) ((q.out : A) : V)).re)) *
-        Complex.exp (-(Real.pi : ℂ) * H (C ((q.out : A) : V)) ((q.out : A) : V)) =
-      sgn D ((A.map (LinearMap.id - a : V →ₗ[ℂ] V).toAddMonoidHom).relIndex A) * (r : ℂ) := by
+    (hTH : ∀ b x y, H (T b x) y = H x (T (GlobalTheory.InertSign.sgO D b) y))
+    : ∃ r : ℝ,
+      0 < r
+        ∧ ∑ᶠ q : A ⧸ (subLa m A).addSubgroupOf A,
+            (-1 : ℂ) ^ (round (s * (H ((q.out : A) : V) ((q.out : A) : V)).re)) *
+              Complex.exp (-(Real.pi : ℂ) * H (C ((q.out : A) : V)) ((q.out : A) : V))
+          = sgn D ((A.map (LinearMap.id - a : V →ₗ[ℂ] V).toAddMonoidHom).relIndex A) * (r : ℂ) := by
   have hcomm : ∀ b x, C (T b x) = T b (C x) := by
     intro b x
     obtain ⟨z, rfl⟩ := hsurj x
     rw [hC, map_sub, hTc, hC, map_smul, map_add (f := _), hTc]
-  have hskew : ∀ x y, H (C x) y = -H x (C y) := by
+  have hskew : ∀ x y, H (C x) y = - H x (C y) := by
     intro x y
     obtain ⟨z, rfl⟩ := hsurj x
     obtain ⟨w, rfl⟩ := hsurj y
@@ -136,8 +161,11 @@ theorem gauss_sign (D : D7) (hG : GaussSign D) {V : Type} [AddCommGroup V] [Modu
       rw [← QuotientAddGroup.mk_nsmul, QuotientAddGroup.eq_zero_iff, hmem]
       exact ⟨x, x.2, rfl⟩
   let ψ : V → ℝ := fun x => s * (H x x).re - (H (C x) x).im
-  have hφ : ∀ x : A, (-1 : ℂ) ^ (round (s * (H (x : V) (x : V)).re)) *
-      Complex.exp (-(Real.pi : ℂ) * H (C (x : V)) (x : V)) = ex (ψ x) := by
+  have hφ
+      : ∀ x : A,
+        (-1 : ℂ) ^ (round (s * (H (x : V) (x : V)).re))
+            * Complex.exp (-(Real.pi : ℂ) * H (C (x : V)) (x : V))
+          = ex (ψ x) := by
     intro x
     obtain ⟨n, hn⟩ := hq x x.2
     simp only [ψ]
@@ -156,19 +184,29 @@ theorem gauss_sign (D : D7) (hG : GaussSign D) {V : Type} [AddCommGroup V] [Modu
       add_smul := fun b c x => Subtype.ext (hTa b c x)
       zero_smul := fun x => Subtype.ext (hT0 x) }
   have hsm : ∀ (b : 𝓞 D.host.E) (x : A), ((b • x : A) : V) = T b x := fun _ _ => rfl
-  have hR0 : ∀ w : A, w ∈ (A.map (LinearMap.id - a : V →ₗ[ℂ] V).toAddMonoidHom).addSubgroupOf A ↔
-      ∃ y ∈ A, y - a y = (w : V) := fun w => by
+  have hR0
+      : ∀ w : A,
+        w ∈ (A.map (LinearMap.id - a : V →ₗ[ℂ] V).toAddMonoidHom).addSubgroupOf A
+          ↔ ∃ y ∈ A, y - a y = (w : V) := fun w => by
     simp [AddSubgroup.mem_addSubgroupOf]
-  let R : Submodule (𝓞 D.host.E) A :=
-    { (A.map (LinearMap.id - a : V →ₗ[ℂ] V).toAddMonoidHom).addSubgroupOf A with
-      smul_mem' := fun b w hw => by
-        obtain ⟨y, hy, hyw⟩ := (hR0 w).1 hw
-        exact (hR0 _).2 ⟨T b y, hTA b y hy, by rw [hsm, ← hyw, map_sub, hTc]⟩ }
-  have e6 : ∀ x w, (H (C (x + w)) (x + w)).im = (H (C x) x).im + (H (C w) w).im + 2 * (H (C x) w).im := fun x w => by
+  let R : Submodule (𝓞 D.host.E) A := {
+    (A.map (LinearMap.id - a : V →ₗ[ℂ] V).toAddMonoidHom).addSubgroupOf A with
+    smul_mem' := fun b w hw => by
+      obtain ⟨y, hy, hyw⟩ := (hR0 w).1 hw
+      exact (hR0 _).2 ⟨T b y, hTA b y hy, by rw [hsm, ← hyw, map_sub, hTc]⟩
+  }
+  have e6
+      : ∀ x w,
+        (H (C (x + w)) (x + w)).im
+          = (H (C x) x).im + (H (C w) w).im + 2 * (H (C x) w).im := fun x w => by
     have := hCim x w
-    simp; linarith
-  refine gauss_quot D hG A R _ ?_ (fun x : A => ex (ψ x)) (fun x y : A => ex (-(H x y).im - 2 * (H (C x) y).im))
-    (fun x => Complex.exp_ne_zero _) ?_ ?_ ?_ ?_ ?_ ?_
+    simp
+    linarith
+  refine gauss_quot D hG A R _ ?_
+    (fun x : A => ex (ψ x))
+    (fun x y : A => ex (-(H x y).im - 2 * (H (C x) y).im))
+    (fun x => Complex.exp_ne_zero _)
+    ?_ ?_ ?_ ?_ ?_ ?_
   · intro w hw
     obtain ⟨v, hv, hvw⟩ := (hmem w).1 hw
     obtain ⟨y, hy, -, hyv⟩ := hm v hv
@@ -213,7 +251,9 @@ theorem gauss_sign (D : D7) (hG : GaussSign D) {V : Type} [AddCommGroup V] [Modu
       rw [hw', hC, him y x, him (a y) x]; simp; ring
     have e3 : (H (C w) w).im = -(H y (a y)).im := by
       have := him y (a y)
-      rw [hw', hC]; simp [ha, him0]; linarith
+      rw [hw', hC]
+      simp [ha, him0]
+      linarith
     have e4 : (H w (a y)).im = (H y (a y)).im := by rw [hw']; simp [him0]
     have e5 : (H x w).im = (H x y).im - (H x (a y)).im := by rw [hw']; simp
     have e7 := e6 x w
@@ -233,12 +273,33 @@ theorem gauss_sign (D : D7) (hG : GaussSign D) {V : Type} [AddCommGroup V] [Modu
     · simp only [ψ, hsm, hcomm, hTH]
       rw [mul_comm b, hTm]
 
-theorem hf_scal {D : D7} {N N' : ℕ} (T : Tor D) (b : D.host.E) (x y : VC D N N') :
-    Hf D T (scal D N N' b x) y = Hf D T x (scal D N N' (D.host.conj b) y) := by
+theorem hf_scal {D : D7} {N N' : ℕ} (T : Tor D) (b : D.host.E) (x y : VC D N N')
+    : Hf D T (scal D N N' b x) y = Hf D T x (scal D N N' (D.host.conj b) y) := by
   simp only [Hf, scal_apply, GlobalTheory.InertSign.embT_conj, map_mul, Complex.conj_conj]
   simp only [mul_assoc, mul_left_comm]
 
-theorem const_of_gaussSign : ∀ (D : D7) (_ : GaussSign D) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ), Crv D cc δ → ∀ (N N' : ℕ) (A A₁ : AddSubgroup (VC D N N')), KLat D (tor0 D cc δ) A → KLat D (tor0 D cc δ) A₁ → ∀ (u : VC D N N' ≃ₗ[ℂ] VC D N N'), (∀ z w, Hf D (tor0 D cc δ) (u z) (u w) = Hf D (tor0 D cc δ) z w) → (∀ x, x ∈ A ↔ u x ∈ A₁) → LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')) ≠ 0 → (∃ m : ℕ, 0 < m ∧ ∀ x ∈ A, ∃ y ∈ A, u.symm y ∈ A ∧ m • x = y - u.symm y) → (∀ (b : 𝓞 D.host.E), ∀ x ∈ A, scal D N N' (b : D.host.E) x ∈ A) → (∀ (b : D.host.E) x, u (scal D N N' b x) = scal D N N' b (u x)) → ∀ th ∈ ThSp D (tor0 D cc δ) A, (fun z => th (u.symm z)) = (sgn D ((A.map (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')).toAddMonoidHom).relIndex A) * ((‖LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N'))‖ : ℂ) / LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')))) • Iop D (tor0 D cc δ) A A₁ th := by
+theorem const_of_gaussSign
+    : ∀ (D : D7) (_ : GaussSign D) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ),
+      Crv D cc δ
+        → ∀ (N N' : ℕ) (A A₁ : AddSubgroup (VC D N N')),
+          KLat D (tor0 D cc δ) A → KLat D (tor0 D cc δ) A₁
+            → ∀ (u : VC D N N' ≃ₗ[ℂ] VC D N N'),
+              (∀ z w, Hf D (tor0 D cc δ) (u z) (u w) = Hf D (tor0 D cc δ) z w)
+                → (∀ x, x ∈ A ↔ u x ∈ A₁)
+                → LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')) ≠ 0
+                → (∃ m : ℕ, 0 < m ∧ ∀ x ∈ A, ∃ y ∈ A, u.symm y ∈ A ∧ m • x = y - u.symm y)
+                → (∀ (b : 𝓞 D.host.E), ∀ x ∈ A, scal D N N' (b : D.host.E) x ∈ A)
+                → (∀ (b : D.host.E) x, u (scal D N N' b x) = scal D N N' b (u x))
+                → ∀ th ∈ ThSp D (tor0 D cc δ) A,
+                  (fun z => th (u.symm z))
+                    = (sgn D
+                          ((A.map
+                            (LinearMap.id
+                              - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')).toAddMonoidHom).relIndex A)
+                        * ((‖LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N'))‖
+                            : ℂ)
+                          / LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N'))))
+                      • Iop D (tor0 D cc δ) A A₁ th := by
   intro D hG cc δ hc N N' A A₁ hA hA₁ u hu huA hdt ⟨m, hm0, hm⟩ hsA hsu th hth
   by_cases h0 : th = 0
   · subst h0
@@ -249,23 +310,33 @@ theorem const_of_gaussSign : ∀ (D : D7) (_ : GaussSign D) (cc : Ideal (𝓞 D.
   set a : VC D N N' →ₗ[ℂ] VC D N N' := (u.symm : VC D N N' →ₗ[ℂ] VC D N N') with ha
   let e := LinearMap.equivOfDetNeZero _ hdt
   have he : ∀ x, e x = x - u.symm x := fun x => rfl
-  let C : VC D N N' →ₗ[ℂ] VC D N N' := ((1 / 2 : ℂ) • (LinearMap.id + a)) ∘ₗ (e.symm : VC D N N' →ₗ[ℂ] VC D N N')
+  let C : VC D N N' →ₗ[ℂ] VC D N N' :=
+    ((1 / 2 : ℂ) • (LinearMap.id + a)) ∘ₗ (e.symm : VC D N N' →ₗ[ℂ] VC D N N')
   have hC : ∀ x, C (x - u.symm x) = (1 / 2 : ℂ) • (x + u.symm x) := fun x => by
     rw [← he]; simp [C, ha]
   have hcom : ∀ (b : D.host.E) x, scal D N N' b (a x) = a (scal D N N' b x) := by
     intro b x
     apply u.injective
-    rw [hsu]; simp [ha]
-  obtain ⟨c, r, hc1, hr, hcr, hfin⟩ := GlobalTheory.UnitaryTheta.Constant.pull_eq_gauss_smul_intertwiner D cc δ hc N N' A A₁ hA hA₁ u hu huA hdt C hC m hm0 hm th hth h0
-  obtain ⟨ρ, hρ, hsum⟩ := gauss_sign D hG (hfL (tor0 D cc δ)) (hfL_swap _) (Real.sqrt D.host.d / 2) A hFG hint hsd hq
-    (semi _ A hq th hth h0) a C (fun x y => by rw [hfL_apply, ← hu]; simp [ha, hfL_apply]) hC
-    (fun x => ⟨e.symm x, (e.apply_symm_apply x).symm.trans (he _)⟩) m hm0 hm
-    (fun b => scal D N N' (b : D.host.E))
-    (fun x => by funext τ i j; simp [scal_apply])
-    (fun b c x => by funext τ i j; simp [scal_apply, mul_assoc])
-    (fun b c x => by funext τ i j; simp [scal_apply, add_mul])
-    (fun x => by funext τ i j; simp [scal_apply]) hsA (fun b x => hcom b x)
-    (fun b x y => hf_scal _ _ x y)
+    rw [hsu]
+    simp [ha]
+  obtain ⟨c, r, hc1, hr, hcr, hfin⟩ :=
+    GlobalTheory.UnitaryTheta.Constant.pull_eq_gauss_smul_intertwiner D cc δ hc N N' A A₁ hA hA₁ u
+      hu huA hdt C hC m hm0 hm th hth h0
+  obtain ⟨ρ, hρ, hsum⟩ :=
+    gauss_sign D hG (hfL (tor0 D cc δ)) (hfL_swap _) (Real.sqrt D.host.d / 2) A hFG hint hsd hq
+      (semi _ A hq th hth h0) a C
+      (fun x y => by rw [hfL_apply, ← hu]; simp [ha, hfL_apply])
+      hC
+      (fun x => ⟨e.symm x, (e.apply_symm_apply x).symm.trans (he _)⟩)
+      m hm0 hm
+      (fun b => scal D N N' (b : D.host.E))
+      (fun x => by funext τ i j; simp [scal_apply])
+      (fun b c x => by funext τ i j; simp [scal_apply, mul_assoc])
+      (fun b c x => by funext τ i j; simp [scal_apply, add_mul])
+      (fun x => by funext τ i j; simp [scal_apply])
+      hsA
+      (fun b x => hcom b x)
+      (fun b x y => hf_scal _ _ x y)
   set ε := sgn D ((A.map (LinearMap.id - a).toAddMonoidHom).relIndex A) with hε
   have hε1 : ‖ε‖ = 1 := by simp [hε, sgn]
   have hcr' : c = r * (LinearMap.det (LinearMap.id - a))⁻¹ * (ε * ρ) := by rw [hcr, ← hsum]; rfl
@@ -273,8 +344,9 @@ theorem const_of_gaussSign : ∀ (D : D7) (_ : GaussSign D) (cc : Ideal (𝓞 D.
   congr 1
   have hn : r * ρ = ‖LinearMap.det (LinearMap.id - a)‖ := by
     rw [hcr'] at hc1
-    simp only [norm_mul, norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hr, abs_of_pos hρ, hε1,
-      one_mul] at hc1
+    simp only [norm_mul, norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hr,
+        abs_of_pos hρ, hε1, one_mul]
+      at hc1
     have := norm_ne_zero_iff.2 hdt
     field_simp at hc1
     exact hc1

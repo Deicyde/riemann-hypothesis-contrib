@@ -13,8 +13,9 @@ open ModularForm EisensteinSeries ModularFormClass UpperHalfPlane Formalism.L2.T
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem fac_eq_zero_of_smul (t : ℕ × ℕ × ℕ) (τ : ℍ) (γ : SL(2, ℤ))
-    (h : γ • pt t.1 t.2.1 t.2.2 τ = τ) : fac t τ = 0 := by
+theorem fac_eq_zero_of_smul
+    (t : ℕ × ℕ × ℕ) (τ : ℍ) (γ : SL(2, ℤ)) (h : γ • pt t.1 t.2.1 t.2.2 τ = τ)
+    : fac t τ = 0 := by
   unfold fac
   have h1 : AA τ = denom γ (pt t.1 t.2.1 t.2.2 τ) ^ 12 * AA (pt t.1 t.2.1 t.2.2 τ) := by
     rw [← AA_smul, h]
@@ -89,8 +90,10 @@ private lemma exists_SL2_mul_eq_Tmat_of_det_eq {m : ℕ} (hm : 0 < m) (A B C D :
     rw [Matrix.mul_fin_two, e1, e2, e3, e4]
     all_goals first | rfl | (unfold Tmat; rfl) | simp [Tmat]
 
-theorem Gm_vanish {m : ℕ} (hm : 0 < m) (τ : ℍ) (A B C D : ℤ) (hdet : A * D - B * C = m)
-    (hfix : (A : ℂ) * τ + B = τ * (C * τ + D)) : Gm m τ = 0 := by
+theorem Gm_vanish
+    {m : ℕ} (hm : 0 < m)
+    (τ : ℍ) (A B C D : ℤ) (hdet : A * D - B * C = m) (hfix : (A : ℂ) * τ + B = τ * (C * τ + D))
+    : Gm m τ = 0 := by
   obtain ⟨g, s, hs, he, hgs⟩ := exists_SL2_mul_eq_Tmat_of_det_eq hm A B C D hdet
   obtain ⟨p, q, r, w, hg⟩ : ∃ p q r w : ℤ, (g : Matrix (Fin 2) (Fin 2) ℤ) = !![p, q; r, w] :=
     ⟨_, _, _, _, Matrix.eta_fin_two _⟩
@@ -137,10 +140,11 @@ theorem Gm_vanish {m : ℕ} (hm : 0 < m) (τ : ℍ) (A B C D : ℤ) (hdet : A * 
     push_cast
     rfl
   have hform : ((g • τ : ℍ) : ℂ) = ((p : ℂ) * τ + q) / ((r : ℂ) * τ + w) := by
-    simp [UpperHalfPlane.coe_smul, UpperHalfPlane.num, UpperHalfPlane.denom,
-      UpperHalfPlane.σ, hp, hq, hr, hw]
+    simp [UpperHalfPlane.coe_smul, UpperHalfPlane.num, UpperHalfPlane.denom, UpperHalfPlane.σ, hp,
+      hq, hr, hw]
     try rw [c1 p, c1 q, c1 r, c1 w]
-  have hX : ((s.1 : ℂ) * τ + (s.2.1 : ℂ)) / (s.2.2 : ℂ) = ((p : ℂ) * τ + q) / ((r : ℂ) * τ + w) := by
+  have hX
+      : ((s.1 : ℂ) * τ + (s.2.1 : ℂ)) / (s.2.2 : ℂ) = ((p : ℂ) * τ + q) / ((r : ℂ) * τ + w) := by
     rw [div_eq_div_iff hE hden]
     linear_combination ((τ : ℂ) * (r * τ + w)) * ea + ((r : ℂ) * τ + w) * eb
       + ((p : ℂ) * (r * τ + w) - (p * τ + q) * r) * hfix + ((p : ℂ) * τ + q) * τ * ez
@@ -148,9 +152,7 @@ theorem Gm_vanish {m : ℕ} (hm : 0 < m) (τ : ℍ) (A B C D : ℤ) (hdet : A * 
   have hpt : pt s.1 s.2.1 s.2.2 τ = g • τ := by
     unfold pt
     rw [hX, ← hform]
-    first
-    | exact UpperHalfPlane.ofComplex_apply (g • τ)
-    | simp
+    first | exact UpperHalfPlane.ofComplex_apply (g • τ) | simp
   unfold Gm
   apply Finset.prod_eq_zero hs
   apply fac_eq_zero_of_smul s τ g⁻¹

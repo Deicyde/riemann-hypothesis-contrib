@@ -16,14 +16,17 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.HermitianLattices.TraceIntegrality
+open Formalism.BasicNotions Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps
+  Formalism.HermitianLattices.TraceIntegrality
 
 section Forms
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-def formAt {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] (b : Basis ι K V) (P : V →ₗ⋆[K] V →ₗ[K] K)
-    (v : InfinitePlace K) (x y : V) : ℂ :=
+def formAt
+    {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι]
+    (b : Basis ι K V) (P : V →ₗ⋆[K] V →ₗ[K] K) (v : InfinitePlace K) (x y : V)
+    : ℂ :=
   ∑ i, ∑ j, starRingEnd ℂ (v.embedding (b.repr x i)) * v.embedding (P (b i) (b j)) * v.embedding (b.repr y j)
 
 end Forms
@@ -44,18 +47,14 @@ theorem kap_succ (R : Ranks) : kap R + 1 = R.N 0 := by
   unfold kap
   omega
 
-def castW {n κ : ℕ} (h : κ + 1 = n) (lam : DomWeight n) : Fin (κ + 1) → ℤ := fun i => lam.w (Fin.cast h i)
+def castW {n κ : ℕ} (h : κ + 1 = n) (lam : DomWeight n) : Fin (κ + 1) → ℤ := fun i =>
+  lam.w (Fin.cast h i)
 
 section Nums
 
 variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R)
 
 def lamZ (u : Pr.Word) (τ : X.Tau) : Fin (kap R + 1) → ℤ := castW (kap_succ R) (W.lamTrue u 0 τ)
-
-
-
-
-
 
 end Nums
 
@@ -80,7 +79,6 @@ end Main
 section PartI
 
 variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m)
-
 
 variable (hX : X.Ok)
 

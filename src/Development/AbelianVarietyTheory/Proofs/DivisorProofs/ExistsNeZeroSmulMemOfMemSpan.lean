@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.NonzeroScalarInSpan
 
-theorem exists_ne_zero_smul_mem_of_mem_span {R K V : Type} [CommRing R] [IsDomain R] [Field K]
-    [Algebra R K] [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V]
-    [IsScalarTower R K V] (N : Submodule R V) {x : V}
-    (hx : x ∈ Submodule.span K (↑N : Set V)) : ∃ a : R, a ≠ 0 ∧ a • x ∈ N := by
+theorem exists_ne_zero_smul_mem_of_mem_span
+    {R K V : Type} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+    (N : Submodule R V)
+    {x : V} (hx : x ∈ Submodule.span K (↑N : Set V))
+    : ∃ a : R, a ≠ 0 ∧ a • x ∈ N := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩

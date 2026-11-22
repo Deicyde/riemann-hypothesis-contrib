@@ -4,23 +4,30 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
 
-theorem UpperTheory.Gal.G3.pWitDeep :
-    KNBasic → GenSm → TransDeep → WitComp → WitForget → WitDeep := by
+theorem UpperTheory.Gal.G3.pWitDeep
+    : KNBasic → GenSm → TransDeep → WitComp → WitForget → WitDeep := by
   intro _ hSm hTD hWC hWF p _ D G L R _ _ gb X N' N h hI
   obtain ⟨k, hk, hAk, hex⟩ := hTD p D G L R gb h hI
   have hk0 : 0 < k := by
     rcases Nat.eq_zero_or_pos k with rfl | hpos
     · exact absurd (Nat.coprime_zero_left _ |>.mp hk) (Fact.out : p.Prime).one_lt.ne'
     · exact hpos
-  let Nk : Lv p := ⟨↑N * k, le_trans N.2.1 (Nat.le_mul_of_pos_right _ hk0), Nat.Coprime.mul_left N.2.2 hk⟩
-  let M : Lv p := ⟨↑N' * (↑N * k), le_trans Nk.2.1 (Nat.le_mul_of_pos_left _ (by have := N'.2.1; omega)),
-    Nat.Coprime.mul_left N'.2.2 Nk.2.2⟩
+  let Nk : Lv p :=
+    ⟨↑N * k, le_trans N.2.1 (Nat.le_mul_of_pos_right _ hk0), Nat.Coprime.mul_left N.2.2 hk⟩
+  let M : Lv p := ⟨
+    ↑N' * (↑N * k),
+    le_trans Nk.2.1 (Nat.le_mul_of_pos_left _ (by have := N'.2.1; omega)),
+    Nat.Coprime.mul_left N'.2.2 Nk.2.2
+  ⟩
   have hNkM : (↑Nk : ℕ) ∣ ↑M := Dvd.intro_left _ rfl
   refine ⟨M, Dvd.intro _ rfl, ?_, ?_⟩
   · intro u hu

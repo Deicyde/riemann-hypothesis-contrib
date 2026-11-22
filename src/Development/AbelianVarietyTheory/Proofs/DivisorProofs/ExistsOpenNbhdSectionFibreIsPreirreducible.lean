@@ -7,48 +7,60 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBasicO
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem affineOpen_fromSpec_mem_basicOpen_iff {Y : Scheme.{0}} {U : Y.Opens} (hU : IsAffineOpen U)
-    (c : Γ(Y, U)) (P : PrimeSpectrum Γ(Y, U)) : hU.fromSpec P ∈ Y.basicOpen c ↔ c ∉ P.asIdeal :=
+theorem affineOpen_fromSpec_mem_basicOpen_iff
+    {Y : Scheme.{0}} {U : Y.Opens} (hU : IsAffineOpen U) (c : Γ(Y, U)) (P : PrimeSpectrum Γ(Y, U))
+    : hU.fromSpec P ∈ Y.basicOpen c ↔ c ∉ P.asIdeal :=
   SetLike.ext_iff.1 (hU.fromSpec_preimage_basicOpen c) P
 
-theorem exists_open_nbhd_section_fibre_isPreirreducible : ∀ (X S : Scheme.{0}) (f : X ⟶ S) (e : S ⟶ X),
-    Smooth f → e ≫ f = 𝟙 _ → ∀ s : S, ∃ (U : X.Opens) (V₀ V : S.Opens) (I : Finset Γ(S, V)),
-      V₀ ≤ V ∧ s ∈ V₀ ∧ e s ∈ U ∧ (∀ c ∈ I, s ∉ S.basicOpen c) ∧
-      ∀ t ∈ V₀, (∀ c ∈ I, t ∉ S.basicOpen c) → IsPreirreducible ((U : Set X) ∩ f ⁻¹' {t}) := by
+theorem exists_open_nbhd_section_fibre_isPreirreducible
+    : ∀ (X S : Scheme.{0}) (f : X ⟶ S) (e : S ⟶ X),
+      Smooth f → e ≫ f = 𝟙 _
+        → ∀ s : S, ∃ (U : X.Opens) (V₀ V : S.Opens) (I : Finset Γ(S, V)),
+          V₀ ≤ V ∧ s ∈ V₀ ∧ e s ∈ U ∧ (∀ c ∈ I, s ∉ S.basicOpen c)
+            ∧ ∀ t ∈ V₀,
+              (∀ c ∈ I, t ∉ S.basicOpen c) → IsPreirreducible ((U : Set X) ∩ f ⁻¹' {t}) := by
   intro X S f e hf hef s
-  obtain ⟨V, W, hWV, hV, hW, hes, hirr⟩ := GlobalTheory.T.exists_affine_chart_preirreducible_fiber' X S f e hf hef s
+  obtain ⟨V, W, hWV, hV, hW, hes, hirr⟩ :=
+    GlobalTheory.T.exists_affine_chart_preirreducible_fiber' X S f e hf hef s
   have hfes : f (e s) = s := by rw [← Scheme.Hom.comp_apply, hef]; rfl
   have hsV : s ∈ V := by have h := hWV hes; rwa [Scheme.Hom.mem_preimage, hfes] at h
   letI : Algebra Γ(S, V) Γ(X, W) := (f.appLE V W hWV).hom.toAlgebra
   have hsm : Algebra.Smooth Γ(S, V) Γ(X, W) :=
     RingHom.smooth_algebraMap.mp (HasRingHomProperty.appLE @Smooth f hf ⟨V, hV⟩ ⟨W, hW⟩ hWV)
 
-  have hcomap : ∀ (x : X) (hxW : x ∈ W) (hxV : f x ∈ V),
-      (hW.primeIdealOf ⟨x, hxW⟩).asIdeal.comap (algebraMap Γ(S, V) Γ(X, W)) =
-        (hV.primeIdealOf ⟨f x, hxV⟩).asIdeal := fun x hxW hxV =>
+  have hcomap
+      : ∀ (x : X) (hxW : x ∈ W) (hxV : f x ∈ V),
+        (hW.primeIdealOf ⟨x, hxW⟩).asIdeal.comap (algebraMap Γ(S, V) Γ(X, W))
+          = (hV.primeIdealOf ⟨f x, hxV⟩).asIdeal := fun x hxW hxV =>
     congrArg PrimeSpectrum.asIdeal (IsAffineOpen.comap_primeIdealOf_appLE V hV W hW hWV hxW)
-  have hfx : ∀ r : Spec Γ(X, W), f (hW.fromSpec r) =
-      hV.fromSpec (Spec.map (f.appLE V W hWV) r) := fun r => by
+  have hfx
+      : ∀ r : Spec Γ(X, W),
+        f (hW.fromSpec r) = hV.fromSpec (Spec.map (f.appLE V W hWV) r) := fun r => by
     show (hW.fromSpec ≫ f) r = (Spec.map (f.appLE V W hWV) ≫ hV.fromSpec) r
     rw [IsAffineOpen.SpecMap_appLE_fromSpec f hV hW hWV]
   set q := hW.primeIdealOf ⟨e s, hes⟩ with hqdef
   set p₀ := hV.primeIdealOf ⟨s, hsV⟩ with hp₀def
   have hq : q.asIdeal.comap (algebraMap Γ(S, V) Γ(X, W)) = p₀.asIdeal := by
     rw [hqdef, hcomap (e s) hes (hWV hes)]
-    congr 2; exact Subtype.ext hfes
+    congr 2
+    exact Subtype.ext hfes
   let Ω := AlgebraicClosure p₀.asIdeal.ResidueField
   have hker : RingHom.ker (algebraMap Γ(S, V) Ω) = p₀.asIdeal := by
     rw [IsScalarTower.algebraMap_eq Γ(S, V) p₀.asIdeal.ResidueField Ω, ← RingHom.comap_ker,
       (RingHom.injective_iff_ker_eq_bot _).mp (algebraMap p₀.asIdeal.ResidueField Ω).injective]
     exact Ideal.ker_algebraMap_residueField _
-  have hpt : (Spec.map (CommRingCat.ofHom (algebraMap Γ(S, V) Ω)) ≫ hV.fromSpec)
-      (IsLocalRing.closedPoint Ω) = s := by
-    have : Spec.map (CommRingCat.ofHom (algebraMap Γ(S, V) Ω)) (IsLocalRing.closedPoint Ω) = p₀ := by
+  have hpt
+      : (Spec.map (CommRingCat.ofHom (algebraMap Γ(S, V) Ω)) ≫ hV.fromSpec) (IsLocalRing.closedPoint
+          Ω)
+        = s := by
+    have : Spec.map (CommRingCat.ofHom (algebraMap Γ(S, V) Ω)) (IsLocalRing.closedPoint Ω)
+        = p₀ := by
       apply PrimeSpectrum.ext
       change Ideal.comap (algebraMap Γ(S, V) Ω) (IsLocalRing.maximalIdeal Ω) = p₀.asIdeal
       rw [IsLocalRing.maximalIdeal_eq_bot, ← RingHom.ker_eq_comap_bot, hker]
@@ -56,15 +68,18 @@ theorem exists_open_nbhd_section_fibre_isPreirreducible : ∀ (X S : Scheme.{0})
     rw [this, hp₀def, hV.fromSpec_primeIdealOf]
   have h1 := hirr Ω _ hpt
   have h2 := GlobalTheory.T.preirreducibleSpace_tensor_of_pullback' X S f V W hWV hV hW Ω rfl h1
-  obtain ⟨b, a, I, hb, ha, hI, hmain⟩ := GlobalTheory.T.exists_basicOpen_fibres_preirreducible_smooth Γ(S, V) Γ(X, W) hsm q Ω (hq.trans hker.symm) h2
+  obtain ⟨b, a, I, hb, ha, hI, hmain⟩ :=
+    GlobalTheory.T.exists_basicOpen_fibres_preirreducible_smooth Γ(S, V) Γ(X, W) hsm q Ω
+      (hq.trans hker.symm) h2
   refine ⟨X.basicOpen b, S.basicOpen a, V, I, S.basicOpen_le a, ?_, ?_, ?_, ?_⟩
   · have h := (affineOpen_fromSpec_mem_basicOpen_iff hV a p₀).mpr (by rw [← hq]; exact ha)
     rwa [hp₀def, hV.fromSpec_primeIdealOf] at h
   · have h := (affineOpen_fromSpec_mem_basicOpen_iff hW b q).mpr hb
     rwa [hqdef, hW.fromSpec_primeIdealOf] at h
   · intro c hc hsc
-    have h := (affineOpen_fromSpec_mem_basicOpen_iff hV c p₀).mp
-      (by rw [hp₀def, hV.fromSpec_primeIdealOf]; exact hsc)
+    have h :=
+      (affineOpen_fromSpec_mem_basicOpen_iff hV c p₀).mp
+        (by rw [hp₀def, hV.fromSpec_primeIdealOf]; exact hsc)
     exact h (by rw [← hq]; exact hI c hc)
   · intro t htV₀ htI
     have htV : t ∈ V := S.basicOpen_le a htV₀
@@ -76,9 +91,11 @@ theorem exists_open_nbhd_section_fibre_isPreirreducible : ∀ (X S : Scheme.{0})
       by_contra hnc
       exact htI c hc (hft' ▸ (affineOpen_fromSpec_mem_basicOpen_iff hV c t').mpr hnc)
     have hZ := hmain t' ha' hc'
-    have heq : ((X.basicOpen b : X.Opens) : Set X) ∩ f ⁻¹' {t} = hW.fromSpec ''
-        {r : PrimeSpectrum Γ(X, W) | r.asIdeal.comap (algebraMap Γ(S, V) Γ(X, W)) = t'.asIdeal ∧
-          b ∉ r.asIdeal} := by
+    have heq
+        : ((X.basicOpen b : X.Opens) : Set X) ∩ f ⁻¹' {t}
+          = hW.fromSpec
+            '' {r : PrimeSpectrum Γ(X, W) | r.asIdeal.comap (algebraMap Γ(S, V) Γ(X, W)) = t'.asIdeal ∧
+                 b ∉ r.asIdeal} := by
       ext x
       constructor
       · rintro ⟨hxU, hxt⟩
@@ -86,7 +103,8 @@ theorem exists_open_nbhd_section_fibre_isPreirreducible : ∀ (X S : Scheme.{0})
         have hxt' : f x = t := hxt
         refine ⟨hW.primeIdealOf ⟨x, hxW⟩, ⟨?_, ?_⟩, hW.fromSpec_primeIdealOf _⟩
         · rw [hcomap x hxW (hWV hxW), ht'def]
-          congr 2; exact Subtype.ext hxt'
+          congr 2
+          exact Subtype.ext hxt'
         · exact (affineOpen_fromSpec_mem_basicOpen_iff hW b _).mp
             (by rw [hW.fromSpec_primeIdealOf]; exact hxU)
       · rintro ⟨r, ⟨hr1, hr2⟩, rfl⟩

@@ -102,16 +102,13 @@ end
 section
 variable {p : Fin n → Mat C N} {E : Fin n → Fin n → Mat C N}
 
-
 variable (E) in
 noncomputable def blk (j : Fin n) : Finset (Fin n) := by
   classical
   exact Finset.univ.filter fun i => E i j ≠ 0
 
-
 variable (E) in
-noncomputable def bb (j : Fin n) : Fin n :=
-  if h : (blk E j).Nonempty then (blk E j).min' h else j
+noncomputable def bb (j : Fin n) : Fin n := if h : (blk E j).Nonempty then (blk E j).min' h else j
 
 lemma mem_blk {i j : Fin n} : i ∈ blk E j ↔ E i j ≠ 0 := by
   classical
@@ -157,18 +154,18 @@ lemma mul_E {R : Subalgebra C (Mat C N)} (hp : Sys p) (hM : MUnits R p E) {a : M
   · simp [hij, coef_zero p E hij]
   rw [(hM.2.2.2.2.1 i j (bb E j) hij (bb_ne hp hM j)).1, bb_congr hp hM hij]
 
-
 variable (E) in
-noncomputable def T (w : Fin N → C) : Matrix (Fin N) (Fin n) C := Matrix.of fun x j => (E j (bb E j) *ᵥ w) x
+noncomputable def T (w : Fin N → C) : Matrix (Fin N) (Fin n) C :=
+  Matrix.of fun x j => (E j (bb E j) *ᵥ w) x
 
 lemma mul_T (M : Mat C N) (w : Fin N → C) (x : Fin N) (j : Fin n) :
     (M * T E w) x j = ((M * E j (bb E j)) *ᵥ w) x := by
   rw [← Matrix.mulVec_mulVec]
   simp [T, Matrix.mul_apply, Matrix.mulVec, dotProduct]
 
-
 variable (p E) in
-noncomputable def rmat (a : Mat C N) : Matrix (Fin n) (Fin n) C := Matrix.of fun i j => coef p E a i j
+noncomputable def rmat (a : Mat C N) : Matrix (Fin n) (Fin n) C :=
+  Matrix.of fun i j => coef p E a i j
 
 lemma T_mul (w : Fin N → C) (a : Mat C N) (x : Fin N) (j : Fin n) :
     (T E w * rmat p E a) x j = ((∑ i, coef p E a i j • E i (bb E i)) *ᵥ w) x := by
@@ -184,18 +181,19 @@ end
 theorem Rep_of : Rep := by
   classical
   intro Γ C _ _ N n ρ R p E hp hM hρ
-  let f : Γ →* Matrix (Fin n) (Fin n) C :=
-    { toFun := fun g => rmat p E (ρ g : Mat C N)
-      map_one' := by
-        ext i j
-        simp only [map_one, Units.val_one]
-        exact coef_one hp hM i j
-      map_mul' := by
-        intro g h
-        ext i k
-        simp only [map_mul, Units.val_mul]
-        rw [Matrix.mul_apply]
-        exact coef_mul hp hM (hρ g) (hρ h) i k }
+  let f : Γ →* Matrix (Fin n) (Fin n) C := {
+    toFun := fun g => rmat p E (ρ g : Mat C N)
+    map_one' := by
+      ext i j
+      simp only [map_one, Units.val_one]
+      exact coef_one hp hM i j
+    map_mul' := by
+      intro g h
+      ext i k
+      simp only [map_mul, Units.val_mul]
+      rw [Matrix.mul_apply]
+      exact coef_mul hp hM (hρ g) (hρ h) i k
+  }
   let r : Γ →* GL (Fin n) C := f.toHomUnits
   have hcol : ∀ k, ∃ v : Fin N → C, p k *ᵥ v = v ∧ v ≠ 0 := by
     intro k
@@ -231,7 +229,8 @@ theorem Rep_of : Rep := by
       · subst h
         rw [(hM.2.2.2.2.1 _ j _ (bb_spec hp hM j).2 (bb_ne hp hM j)).1, hM.2.1]
       · rw [← E_right hp hM (bb E j) j, ← E_left hp hM k (bb E k)]
-        calc E (bb E j) j * p j * (p k * E k (bb E k))
+        calc
+          E (bb E j) j * p j * (p k * E k (bb E k))
             = E (bb E j) j * (p j * p k) * E k (bb E k) := by simp only [mul_assoc]
           _ = 0 := by rw [hp.1.ortho h, mul_zero, zero_mul]
     have hBA : (B * A) j k = (u (bb E j) ᵥ* E (bb E j) j) ⬝ᵥ (E k (bb E k) *ᵥ w0) := rfl
@@ -256,7 +255,8 @@ theorem Rep_of : Rep := by
       have h3 : E j (bb E j) * E (bb E j) j = p j := by
         rw [(hM.2.2.2.2.1 j (bb E j) j (bb_ne hp hM j) (bb_spec hp hM j).2).1, hM.2.1 j]
       rw [← h3, ← mul_assoc, hZE j, zero_mul]
-    calc Z = Z * ∑ j, p j := by rw [hp.1.complete, mul_one]
+    calc
+      Z = Z * ∑ j, p j := by rw [hp.1.complete, mul_one]
       _ = 0 := by
         rw [Finset.mul_sum]
         exact Finset.sum_eq_zero fun j _ => hZp j

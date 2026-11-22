@@ -9,4 +9,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.PositiveDefinite
 @[expose] public section
 
 theorem positive_definite_form : PI.DefPosDef :=
-  PI.DefPosDefWork.defPosDef_of PI.DefPosDefWork.splitting_of_extension PI.DefPosDefWork.positive_definite_second
+  PI.DefPosDefWork.defPosDef_of PI.DefPosDefWork.splitting_of_extension
+    PI.DefPosDefWork.positive_definite_second

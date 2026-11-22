@@ -7,33 +7,44 @@ public import GroundTheory.IdeleRoots.ClassicalIdeles.ExistsPosBoundsOfIsCompact
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff UpperTheory.ConvolutionTheory.RankTwoDescent
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
+  UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 
-private theorem ab_lower {F : Type} [Field F] [NumberField F] {Ω : Set (G1 F)} (hΩ : IsCompact Ω) :
-    ∃ lo : ℝ, 0 < lo ∧ ∀ p ∈ Ω, ∀ x : (A F)ˣ, (x : A F) = p 0 0 → ((x⁻¹ : (A F)ˣ) : A F) = p 1 1 → lo ≤ ab x := by
+private theorem ab_lower {F : Type} [Field F] [NumberField F] {Ω : Set (G1 F)} (hΩ : IsCompact Ω)
+    : ∃ lo : ℝ,
+      0 < lo
+        ∧ ∀ p ∈ Ω, ∀ x : (A F)ˣ,
+          (x : A F) = p 0 0 → ((x⁻¹ : (A F)ˣ) : A F) = p 1 1 → lo ≤ ab x := by
   let f : G1 F → A F × (A F)ᵐᵒᵖ := fun p => (p 0 0, MulOpposite.op (p 1 1))
   have hf : Continuous f :=
     (M.continuous_entry 0 0).prodMk (MulOpposite.continuous_op.comp (M.continuous_entry 1 1))
   have hS : IsCompact ((Units.embedProduct (A F)) ⁻¹' (f '' Ω)) :=
     Units.isClosedEmbedding_embedProduct.isCompact_preimage (hΩ.image hf)
-  obtain ⟨lo, _, hlo, _, hb⟩ := GroundTheory.BlockD.exists_pos_bounds_of_isCompact hS M.continuous_ab M.ab_pos
+  obtain ⟨lo, _, hlo, _, hb⟩ :=
+    GroundTheory.BlockD.exists_pos_bounds_of_isCompact hS M.continuous_ab M.ab_pos
   refine ⟨lo, hlo, fun p hp x h0 h1 => (hb x ?_).1⟩
   refine ⟨p, hp, ?_⟩
   simp [f, Units.embedProduct, h0, h1]
 
-private theorem parts_eq {F : Type} [Field F] [NumberField F] {t : ℝ} (ht : 0 < t) (a : InfiniteAdeleRing F)
-    (h : ∀ w, InfinitePlace.Completion.extensionEmbedding w (a w) = (t : ℂ)) :
-    Formalism.D.adeleOfParts F a 1 = ((GroundTheory.Automorphic.Reduction.posIdele t ht : IdeleGroup F) : AdeleRing (𝓞 F) F) := by
+private theorem parts_eq
+    {F : Type} [Field F] [NumberField F]
+    {t : ℝ} (ht : 0 < t)
+    (a : InfiniteAdeleRing F)
+    (h : ∀ w, InfinitePlace.Completion.extensionEmbedding w (a w) = (t : ℂ))
+    : Formalism.D.adeleOfParts F a 1
+      = ((GroundTheory.Automorphic.Reduction.posIdele t ht : IdeleGroup F)
+        : AdeleRing (𝓞 F) F) := by
   rw [← GroundTheory.BlockD.adeleOfParts_posIdele t ht]
   congr 1
   funext w
   exact (InfinitePlace.Completion.extensionEmbedding w).injective
     ((h w).trans (GroundTheory.BlockD.extensionEmbedding_posIdele t ht w).symm)
 
-theorem UpperTheory.ConvolutionTheory.RankTwoDescent.redE :
-    RedE := by
+theorem UpperTheory.ConvolutionTheory.RankTwoDescent.redE : RedE := by
   intro E _ _
   obtain ⟨Ω, K, t₀, hΩ, h10, hK, ht₀, H⟩ := GroundTheory.BlockD.siegelSetsSL2Adelic_holds E
   obtain ⟨lo, hlo, hb⟩ := ab_lower hΩ

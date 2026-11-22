@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsHig
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
+open Formalism.BasicNotions.TH GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
 open Formalism.MainNotions.SchurIrreducible (IrrU IrrGK IsHCMod)
 open scoped TensorProduct
 
@@ -22,8 +23,7 @@ open GlobalTheory.TensorHW
 
 variable {p q : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 
-noncomputable def zc (p q : ℕ) : Mat p q :=
-  Matrix.diagonal (Sum.elim (fun _ => 1) (fun _ => 0))
+noncomputable def zc (p q : ℕ) : Mat p q := Matrix.diagonal (Sum.elim (fun _ => 1) (fun _ => 0))
 
 lemma zc_eq : zc p q = ∑ i : Fin p, Eab (Sum.inl i) (Sum.inl i) := by
   ext a b
@@ -146,7 +146,18 @@ lemma hw_irr {act : Mat p q →ₗ[ℂ] Module.End ℂ V} (hL : IsLieAct act) {W
   subst hU
   exact ⟨h1, h2⟩
 
-theorem lowest : ∀ (p q : ℕ) (M : GKMod p q) (Λ : Ix p q → ℚ) (W : Submodule ℂ M.V), IrrGK M → FiniteDimensional ℂ W → KStable M.act W → (∀ N : Submodule ℂ M.V, N ≤ W → KStable M.act N → N = ⊥ ∨ N = W) → (∃ e ∈ W, IsHW M.act Λ e) → (∀ e ∈ W, KilledByLower M.act e) → genSub M.act (W : Set M.V) = ⊤ → IsLowestType M Λ W ∧ Module.finrank ℂ ↥(hwSub M.act Λ) = 1 ∧ ∃ N : ℕ → Submodule ℂ M.V, (∀ m, FiniteDimensional ℂ (N m)) ∧ (⨆ m, N m) = ⊤ ∧ ∀ m : ℕ, ∀ x ∈ N m, ∑ i : Fin p, M.act (Eab (Sum.inl i) (Sum.inl i)) x = (((∑ i : Fin p, Λ (Sum.inl i) : ℚ) : ℂ) + m) • x := by
+theorem lowest
+    : ∀ (p q : ℕ) (M : GKMod p q) (Λ : Ix p q → ℚ) (W : Submodule ℂ M.V),
+      IrrGK M → FiniteDimensional ℂ W → KStable M.act W
+        → (∀ N : Submodule ℂ M.V, N ≤ W → KStable M.act N → N = ⊥ ∨ N = W)
+        → (∃ e ∈ W, IsHW M.act Λ e) → (∀ e ∈ W, KilledByLower M.act e)
+        → genSub M.act (W : Set M.V) = ⊤
+        → IsLowestType M Λ W ∧ Module.finrank ℂ ↥(hwSub M.act Λ) = 1
+          ∧ ∃ N : ℕ → Submodule ℂ M.V,
+            (∀ m, FiniteDimensional ℂ (N m)) ∧ (⨆ m, N m) = ⊤
+              ∧ ∀ m : ℕ, ∀ x ∈ N m,
+                ∑ i : Fin p, M.act (Eab (Sum.inl i) (Sum.inl i)) x
+                  = (((∑ i : Fin p, Λ (Sum.inl i) : ℚ) : ℂ) + m) • x := by
   intro p q M Λ W hM hfd hW hirr hex hlow hgen
   obtain ⟨e, heW, he⟩ := hex
   set c : ℂ := ((∑ i : Fin p, Λ (Sum.inl i) : ℚ) : ℂ) with hc
@@ -154,8 +165,9 @@ theorem lowest : ∀ (p q : ℕ) (M : GKMod p q) (Λ : Ix p q → ℚ) (W : Subm
     rcases hirr _ inf_le_left (kstable_inf hW (kstable_eig M.lie c)) with h | h
     · exact absurd ((Submodule.eq_bot_iff _).1 h e ⟨heW, wt_eig he.2.1⟩) he.1
     · exact h.ge.trans inf_le_right
-  obtain ⟨N, hN0, hNfd, hNtop, hN⟩ := GlobalTheory.FockGrade.exists_grading p q M.V M.act M.lie W c hfd hW hlow
-    (fun x hx => by rw [← act_zc]; exact Module.End.mem_eigenspace_iff.1 (hWc hx))
+  obtain ⟨N, hN0, hNfd, hNtop, hN⟩ :=
+    GlobalTheory.FockGrade.exists_grading p q M.V M.act M.lie W c hfd hW hlow
+      (fun x hx => by rw [← act_zc]; exact Module.End.mem_eigenspace_iff.1 (hWc hx))
   rw [hgen] at hNtop
   have hNe : ∀ m : ℕ, N m ≤ Module.End.eigenspace (M.act (zc p q)) (c + m) := fun m x hx => by
     rw [Module.End.mem_eigenspace_iff, act_zc]; exact hN m x hx
@@ -167,8 +179,24 @@ theorem lowest : ∀ (p q : ℕ) (M : GKMod p q) (Λ : Ix p q → ℚ) (W : Subm
     have : m = 0 := by exact_mod_cast left_eq_add.1 hm
     rwa [this, hN0] at hxm
   have hline := hw_irr M.lie hW hirr heW he
-  refine ⟨⟨hM, hfd, hW, hirr, ⟨e, heW, he⟩, fun x => ⟨fun hx => ⟨W, hfd, hx, hW, ?_⟩, ?_⟩, hlow, hgen, ?_⟩, ?_,
-    N, hNfd, hNtop, hN⟩
+  refine ⟨
+    ⟨
+      hM,
+      hfd,
+      hW,
+      hirr,
+      ⟨e, heW, he⟩,
+      fun x => ⟨fun hx => ⟨W, hfd, hx, hW, ?_⟩, ?_⟩,
+      hlow,
+      hgen,
+      ?_
+    ⟩,
+    ?_,
+    N,
+    hNfd,
+    hNtop,
+    hN
+  ⟩
   · intro ν w hw hh
     rcases hline.2 ν w hw hh.1 hh.2.1 with h | h
     · exact h
@@ -176,16 +204,20 @@ theorem lowest : ∀ (p q : ℕ) (M : GKMod p q) (Λ : Ix p q → ℚ) (W : Subm
     · exact h'.symm
     · exact absurd h (not_lt.2 h'.le)
   · rintro ⟨W', hfd', hx, hW', hall⟩
-    have h1 := GlobalTheory.WeightDecomp.mem_iSup_inf_wtSub p q M.V M.act W' (fun a y hy => hW' _ (isKC_Eab (same_refl a)) y hy) x hx (M.wts x)
+    have h1 :=
+      GlobalTheory.WeightDecomp.mem_iSup_inf_wtSub p q M.V M.act W'
+        (fun a y hy => hW' _ (isKC_Eab (same_refl a)) y hy)
+        x hx (M.wts x)
     refine (iSup_le fun μ y hy => ?_ : (⨆ μ : Ix p q → ℚ, W' ⊓ wtSub M.act μ) ≤ W) h1
     by_cases h0 : y = 0
     · rw [h0]; exact W.zero_mem
     have hy2 := wt_eig hy.2
     have := hfd'
-    obtain ⟨ν, v, hv, hh⟩ := GlobalTheory.ExistsHW.exists_highestWeight p q M _
-      (Submodule.finiteDimensional_of_le inf_le_left) (kstable_inf hW' (kstable_eig M.lie
-        ((∑ i : Fin p, μ (Sum.inl i) : ℚ) : ℂ)))
-      (fun h => h0 ((Submodule.eq_bot_iff _).1 h y ⟨hy.1, hy2⟩))
+    obtain ⟨ν, v, hv, hh⟩ :=
+      GlobalTheory.ExistsHW.exists_highestWeight p q M _
+        (Submodule.finiteDimensional_of_le inf_le_left)
+        (kstable_inf hW' (kstable_eig M.lie ((∑ i : Fin p, μ (Sum.inl i) : ℚ) : ℂ)))
+        (fun h => h0 ((Submodule.eq_bot_iff _).1 h y ⟨hy.1, hy2⟩))
     obtain rfl := hall ν v hv.1 hh
     have := eig_unique hv.2 (wt_eig hh.2.1) hh.1
     rw [this] at hy2

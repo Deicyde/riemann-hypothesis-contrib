@@ -10,32 +10,35 @@ noncomputable section
 
 namespace GlobalTheory.GaloisInputCompare
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.MainNotions.SumRepresentations.At
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.MainNotions.SumRepresentations.At
 
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N)
 
-theorem norm_le_one_of_isIntegral {K : Type} [NormedField K] [IsUltrametricDist K] {x : K} (hx : IsIntegral ℤ x) :
-    ‖x‖ ≤ 1 := by
+theorem norm_le_one_of_isIntegral
+    {K : Type} [NormedField K] [IsUltrametricDist K] {x : K} (hx : IsIntegral ℤ x)
+    : ‖x‖ ≤ 1 := by
   have h : x ∈ (NormedField.valuation (K := K)).integer :=
     (Valuation.integer.integers (NormedField.valuation (K := K))).mem_of_integral hx.tower_top
   rw [Valuation.mem_integer_iff] at h
   exact_mod_cast h
 
-theorem exists_inducesW (i : N.Loc) (τ : H.E →+* Qbar (N.l i)) :
-    ∃ w ∈ placesOver H.E (N.l i), InducesW N i τ w := by
+theorem exists_inducesW (i : N.Loc) (τ : H.E →+* Qbar (N.l i))
+    : ∃ w ∈ placesOver H.E (N.l i), InducesW N i τ w := by
   have hle : ∀ x : 𝓞 H.E, ‖τ (x : H.E)‖ ≤ 1 := fun x =>
     norm_le_one_of_isIntegral (map_isIntegral_int τ (RingOfIntegers.isIntegral_coe x))
-  let I : Ideal (𝓞 H.E) :=
-    { carrier := {x | ‖τ (x : H.E)‖ < 1}
-      zero_mem' := by simp
-      add_mem' := fun {x y} hx hy => by
-        change ‖τ ((x + y : 𝓞 H.E) : H.E)‖ < 1
-        rw [show ((x + y : 𝓞 H.E) : H.E) = x + y from rfl, map_add (f := _)]
-        exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt hx hy)
-      smul_mem' := fun c x hx => by
-        change ‖τ ((c * x : 𝓞 H.E) : H.E)‖ < 1
-        rw [show ((c * x : 𝓞 H.E) : H.E) = c * x from rfl, map_mul, norm_mul]
-        exact (mul_le_of_le_one_left (norm_nonneg _) (hle c)).trans_lt hx }
+  let I : Ideal (𝓞 H.E) := {
+    carrier := {x | ‖τ (x : H.E)‖ < 1}
+    zero_mem' := by simp
+    add_mem' := fun {x y} hx hy => by
+      change ‖τ ((x + y : 𝓞 H.E) : H.E)‖ < 1
+      rw [show ((x + y : 𝓞 H.E) : H.E) = x + y from rfl, map_add (f := _)]
+      exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt hx hy)
+    smul_mem' := fun c x hx => by
+      change ‖τ ((c * x : 𝓞 H.E) : H.E)‖ < 1
+      rw [show ((c * x : 𝓞 H.E) : H.E) = c * x from rfl, map_mul, norm_mul]
+      exact (mul_le_of_le_one_left (norm_nonneg _) (hle c)).trans_lt hx
+  }
   have hI : ∀ x : 𝓞 H.E, x ∈ I ↔ ‖τ (x : H.E)‖ < 1 := fun x => Iff.rfl
   have hl : ((N.l i : ℕ) : 𝓞 H.E) ∈ I := by
     rw [hI, show (((N.l i : ℕ) : 𝓞 H.E) : H.E) = (N.l i : ℕ) by simp, map_natCast,
@@ -52,6 +55,5 @@ theorem exists_inducesW (i : N.Loc) (τ : H.E →+* Qbar (N.l i)) :
   refine ⟨⟨I, hP, fun h => ?_⟩, hl, fun x => (hI x).symm⟩
   rw [h, Ideal.mem_bot] at hl
   exact (N.lPrime i).out.ne_zero (by exact_mod_cast hl)
-
 
 end GlobalTheory.GaloisInputCompare

@@ -16,8 +16,8 @@ noncomputable section
 
 namespace TermBoundEq
 
-theorem flagIntegralReal_rootRingToReal (f N j k : ℕ) (h : N = j + k) (P : RootRing f N) :
-    flagIntegralReal f (j + k) (rootRingToReal f N j k h P) = (flagIntegral f N P : ℝ) := by
+theorem flagIntegralReal_rootRingToReal (f N j k : ℕ) (h : N = j + k) (P : RootRing f N)
+    : flagIntegralReal f (j + k) (rootRingToReal f N j k h P) = (flagIntegral f N P : ℝ) := by
   subst h
   have hid : (Prod.map id (finCongr (rfl : j + k = j + k)) : Fin f × Fin (j + k) → _) = id :=
     funext fun _ => rfl
@@ -31,8 +31,8 @@ def coeffMap {σ : Type*} (φ : Module.Dual ℚ ℝ) (P : MvPolynomial σ ℝ) :
 
 variable {σ : Type*} (φ : Module.Dual ℚ ℝ)
 
-theorem coeff_coeffMap (P : MvPolynomial σ ℝ) (d : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (coeffMap φ P) d = φ (AddMonoidAlgebra.coeff P d) := by
+theorem coeff_coeffMap (P : MvPolynomial σ ℝ) (d : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (coeffMap φ P) d = φ (AddMonoidAlgebra.coeff P d) := by
   classical
   rw [coeffMap, coeff_sum]
   simp only [coeff_monomial]
@@ -41,14 +41,14 @@ theorem coeff_coeffMap (P : MvPolynomial σ ℝ) (d : σ →₀ ℕ) :
   · rfl
   · rw [notMem_support_iff.1 hd, map_zero]
 
-theorem coeffMap_sum {ι : Type*} (s : Finset ι) (P : ι → MvPolynomial σ ℝ) :
-    coeffMap φ (∑ i ∈ s, P i) = ∑ i ∈ s, coeffMap φ (P i) := by
+theorem coeffMap_sum {ι : Type*} (s : Finset ι) (P : ι → MvPolynomial σ ℝ)
+    : coeffMap φ (∑ i ∈ s, P i) = ∑ i ∈ s, coeffMap φ (P i) := by
   ext d
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coeff_coeffMap, coeff_sum, map_sum]
+  simp only [coeff_coeffMap, coeff_sum, map_sum]
 
-theorem coeffMap_map_mul (R : MvPolynomial σ ℚ) (P : MvPolynomial σ ℝ) :
-    coeffMap φ (map (algebraMap ℚ ℝ) R * P) = R * coeffMap φ P := by
+theorem coeffMap_map_mul (R : MvPolynomial σ ℚ) (P : MvPolynomial σ ℝ)
+    : coeffMap φ (map (algebraMap ℚ ℝ) R * P) = R * coeffMap φ P := by
   classical
   ext d
   set_option synthInstance.maxHeartbeats 100000 in
@@ -56,18 +56,20 @@ theorem coeffMap_map_mul (R : MvPolynomial σ ℚ) (P : MvPolynomial σ ℝ) :
   refine sum_congr rfl fun x _ => ?_
   rw [coeff_map, coeff_coeffMap, ← Algebra.smul_def, map_smul, smul_eq_mul]
 
-theorem coeffMap_map (R : MvPolynomial σ ℚ) :
-    coeffMap φ (map (algebraMap ℚ ℝ) R) = φ 1 • R := by
+theorem coeffMap_map (R : MvPolynomial σ ℚ) : coeffMap φ (map (algebraMap ℚ ℝ) R) = φ 1 • R := by
   ext d
   rw [coeff_coeffMap, coeff_map, coeff_smul, smul_eq_mul, ← mul_one (algebraMap ℚ ℝ _),
     ← Algebra.smul_def, map_smul, smul_eq_mul, mul_comm]
 
-theorem dual_flagIntegralReal (f N : ℕ) (P : MvPolynomial (Fin f × Fin N) ℝ) :
-    φ (flagIntegralReal f N P) = flagIntegral f N (coeffMap φ P) := by
-  have hterm : ∀ α : Fin f × Fin N →₀ ℕ,
-      AddMonoidAlgebra.coeff P α * ((AddMonoidAlgebra.coeff (blockVandermonde f N) α : ℚ) : ℝ) *
-          α.prod (fun _ e => (e.factorial : ℝ)) =
-        (AddMonoidAlgebra.coeff (blockVandermonde f N) α * α.prod (fun _ e => (e.factorial : ℚ))) • AddMonoidAlgebra.coeff P α := by
+theorem dual_flagIntegralReal (f N : ℕ) (P : MvPolynomial (Fin f × Fin N) ℝ)
+    : φ (flagIntegralReal f N P) = flagIntegral f N (coeffMap φ P) := by
+  have hterm
+      : ∀ α : Fin f × Fin N →₀ ℕ,
+        AddMonoidAlgebra.coeff P α * ((AddMonoidAlgebra.coeff (blockVandermonde f N) α : ℚ) : ℝ)
+            * α.prod (fun _ e => (e.factorial : ℝ))
+          = (AddMonoidAlgebra.coeff (blockVandermonde f N) α
+              * α.prod (fun _ e => (e.factorial : ℚ)))
+            • AddMonoidAlgebra.coeff P α := by
     intro α
     rw [Rat.smul_def]
     simp only [Finsupp.prod, Rat.cast_mul, Rat.cast_prod, Rat.cast_natCast]
@@ -77,8 +79,8 @@ theorem dual_flagIntegralReal (f N : ℕ) (P : MvPolynomial (Fin f × Fin N) ℝ
     simp only [hterm, map_sum, map_smul, smul_eq_mul, flagIntegral, coeff_coeffMap]
   exact sum_congr rfl fun α _ => by ring
 
-theorem flagIntegral_sub_smul (f N : ℕ) (A B : RootRing f N) (s : ℚ) :
-    flagIntegral f N (A - s • B) = flagIntegral f N A - s * flagIntegral f N B := by
+theorem flagIntegral_sub_smul (f N : ℕ) (A B : RootRing f N) (s : ℚ)
+    : flagIntegral f N (A - s • B) = flagIntegral f N A - s * flagIntegral f N B := by
   rw [flagIntegral, flagIntegral, flagIntegral, mul_sum, ← sum_sub_distrib]
   refine sum_congr rfl fun α _ => ?_
   rw [coeff_sub, coeff_smul, smul_eq_mul]

@@ -8,10 +8,13 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactHaarRightInvari
 
 namespace GlobalTheory.CompanionTheory.ExpOneParam
 
-theorem continuous_expG_and_toM_inv :
-    ∀ (n : ℕ) (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ), Formalism.REAL.inG ε Z →
-      Continuous (fun t : ℝ => Formalism.REAL.expG ε Z t) ∧
-        ∀ t : ℝ, Formalism.REAL.toM (Formalism.REAL.expG ε Z t)⁻¹ = NormedSpace.exp (-((t : ℂ) • Z)) := by
+theorem continuous_expG_and_toM_inv
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ),
+      Formalism.REAL.inG ε Z
+        → Continuous (fun t : ℝ => Formalism.REAL.expG ε Z t)
+          ∧ ∀ t : ℝ,
+            Formalism.REAL.toM (Formalism.REAL.expG ε Z t)⁻¹
+              = NormedSpace.exp (-((t : ℂ) • Z)) := by
   intro n ε Z hZ
   obtain ⟨h0, hadd, hcont, -⟩ := Formalism.REAL.group_exponential_facts n ε Z hZ
   refine ⟨hcont, fun t => ?_⟩

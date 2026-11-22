@@ -8,22 +8,26 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem kerCotangentToTensor_injective_of_formallySmooth (k R F : Type*) [CommRing k] [CommRing R]
-    [CommRing F] [Algebra k R] [Algebra k F] [Algebra R F] [IsScalarTower k R F]
-    [Algebra.FormallySmooth k F] (hs : Function.Surjective (algebraMap R F)) :
-    Function.Injective (KaehlerDifferential.kerCotangentToTensor k R F) := by
-  have hsurj : Function.Surjective (IsScalarTower.toAlgHom k R F).kerSquareLift :=
-    fun x ↦ by
-      obtain ⟨y, rfl⟩ := hs x
-      exact ⟨Ideal.Quotient.mk _ y, rfl⟩
+theorem kerCotangentToTensor_injective_of_formallySmooth
+    (k R F : Type*) [CommRing k] [CommRing R] [CommRing F] [Algebra k R] [Algebra k F] [Algebra R F]
+    [IsScalarTower k R F] [Algebra.FormallySmooth k F]
+    (hs : Function.Surjective (algebraMap R F))
+    : Function.Injective (KaehlerDifferential.kerCotangentToTensor k R F) := by
+  have hsurj : Function.Surjective (IsScalarTower.toAlgHom k R F).kerSquareLift := fun x ↦ by
+    obtain ⟨y, rfl⟩ := hs x
+    exact ⟨Ideal.Quotient.mk _ y, rfl⟩
   have hnil : RingHom.ker (IsScalarTower.toAlgHom k R F).kerSquareLift.toRingHom ^ 2 = ⊥ := by
     rw [AlgHom.ker_kerSquareLift, Ideal.cotangentIdeal_square]
-  obtain ⟨l, hl⟩ := (retractionKerCotangentToTensorEquivSection (R := k) hs).symm
-    ⟨_, Algebra.FormallySmooth.comp_liftOfSurjective (AlgHom.id k F) _ hsurj ⟨2, hnil⟩⟩
+  obtain ⟨l, hl⟩ :=
+    (retractionKerCotangentToTensorEquivSection (R := k) hs).symm
+      ⟨_, Algebra.FormallySmooth.comp_liftOfSurjective (AlgHom.id k F) _ hsurj ⟨2, hnil⟩⟩
   exact Function.LeftInverse.injective (g := l) fun x ↦ congr($hl x)
 
-theorem mem_sq_localization_of_pderiv_mem :
-    ∀ (Λ : Type) [CommRing Λ] [IsDomain Λ] [PerfectField (FractionRing Λ)] (σ : Type) [Finite σ] (Q : Ideal (MvPolynomial σ Λ)) [Q.IsPrime], (∀ a : Λ, MvPolynomial.C a ∈ Q → a = 0) → ∀ x ∈ Q, (∀ s, MvPolynomial.pderiv s x ∈ Q) → ∃ g, g ∉ Q ∧ g * x ∈ Q ^ 2 := by
+theorem mem_sq_localization_of_pderiv_mem
+    : ∀ (Λ : Type) [CommRing Λ] [IsDomain Λ] [PerfectField (FractionRing Λ)] (σ : Type) [Finite σ]
+        (Q : Ideal (MvPolynomial σ Λ)) [Q.IsPrime],
+      (∀ a : Λ, MvPolynomial.C a ∈ Q → a = 0)
+        → ∀ x ∈ Q, (∀ s, MvPolynomial.pderiv s x ∈ Q) → ∃ g, g ∉ Q ∧ g * x ∈ Q ^ 2 := by
   intro Λ _ _ _ σ _ Q _ hQ x hx hd
   classical
   haveI : Fintype σ := Fintype.ofFinite σ
@@ -54,14 +58,20 @@ theorem mem_sq_localization_of_pderiv_mem :
   have hker : RingHom.ker (algebraMap R F) = maximalIdeal R := ker_residue
   have hmem : ∀ p ∈ Q, algebraMap (MvPolynomial σ Λ) R p ∈ RingHom.ker (algebraMap R F) := by
     intro p hp
-    rw [hker]; exact (IsLocalization.AtPrime.to_map_mem_maximal_iff R Q p).mpr hp
+    rw [hker]
+    exact (IsLocalization.AtPrime.to_map_mem_maximal_iff R Q p).mpr hp
   have hym := hmem x hx
-  have hD : KaehlerDifferential.D Λ (MvPolynomial σ Λ) x =
-      ∑ s, MvPolynomial.pderiv s x • KaehlerDifferential.D Λ (MvPolynomial σ Λ) (MvPolynomial.X s) := by
-    conv_lhs => rw [← (KaehlerDifferential.mvPolynomialBasis Λ σ).sum_repr (KaehlerDifferential.D Λ _ x)]
-    simp [KaehlerDifferential.mvPolynomialBasis_repr_apply, KaehlerDifferential.mvPolynomialBasis_apply]
-  have h0 : KaehlerDifferential.kerCotangentToTensor Λ R F
-      ((RingHom.ker (algebraMap R F)).toCotangent ⟨_, hym⟩) = 0 := by
+  have hD
+      : KaehlerDifferential.D Λ (MvPolynomial σ Λ) x
+        = ∑ s, MvPolynomial.pderiv s x • KaehlerDifferential.D Λ (MvPolynomial σ Λ) (MvPolynomial.X s) :=
+    by
+      conv_lhs => rw [← (KaehlerDifferential.mvPolynomialBasis Λ σ).sum_repr (KaehlerDifferential.D Λ _ x)]
+      simp [KaehlerDifferential.mvPolynomialBasis_repr_apply,
+        KaehlerDifferential.mvPolynomialBasis_apply]
+  have h0
+      : KaehlerDifferential.kerCotangentToTensor Λ R F
+          ((RingHom.ker (algebraMap R F)).toCotangent ⟨_, hym⟩)
+        = 0 := by
     rw [KaehlerDifferential.kerCotangentToTensor_toCotangent]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← KaehlerDifferential.map_D Λ Λ (MvPolynomial σ Λ) R, hD, map_sum, tmul_sum]
@@ -71,7 +81,8 @@ theorem mem_sq_localization_of_pderiv_mem :
   have h2 : algebraMap (MvPolynomial σ Λ) R x ∈ RingHom.ker (algebraMap R F) ^ 2 :=
     (Ideal.toCotangent_eq_zero _ _).mp (hinj (h0.trans (map_zero _).symm))
   rw [hker, ← Localization.AtPrime.map_eq_maximalIdeal, ← Ideal.map_pow] at h2
-  obtain ⟨m, hm, hmx⟩ := (IsLocalization.algebraMap_mem_map_algebraMap_iff (M := Q.primeCompl) (S := R) _ _).mp h2
+  obtain ⟨m, hm, hmx⟩ :=
+    (IsLocalization.algebraMap_mem_map_algebraMap_iff (M := Q.primeCompl) (S := R) _ _).mp h2
   exact ⟨m, hm, hmx⟩
 
 end GlobalTheory

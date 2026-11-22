@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CompatibleGl
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.AbCoh
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -20,10 +23,13 @@ noncomputable section
 
 namespace GlobalTheory.AbCoh
 
-theorem smooth_of_openImm {R B : Type} [CommRing R] [CommRing B] [Algebra R B] {X : Scheme.{0}} (s : X ⟶ Sp R)
-    (g : ℕ) (hs : SmoothOfRelativeDimension g s) (x : Sp B ⟶ X) (hx : x ≫ s = spMap (algebraMap R B))
-    [IsOpenImmersion x] :
-    RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension g) (algebraMap R B) ∧ Algebra.Smooth R B := by
+theorem smooth_of_openImm
+    {R B : Type} [CommRing R] [CommRing B] [Algebra R B]
+    {X : Scheme.{0}} (s : X ⟶ Sp R)
+    (g : ℕ) (hs : SmoothOfRelativeDimension g s)
+    (x : Sp B ⟶ X) (hx : x ≫ s = spMap (algebraMap R B)) [IsOpenImmersion x]
+    : RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension g) (algebraMap R B)
+      ∧ Algebra.Smooth R B := by
   have h : SmoothOfRelativeDimension g (x ≫ s) := by
     have := smoothOfRelativeDimension_comp 0 g x s
     simpa using this
@@ -33,9 +39,11 @@ theorem smooth_of_openImm {R B : Type} [CommRing R] [CommRing B] [Algebra R B] {
   · have h2 : Smooth (spMap (algebraMap R B)) := SmoothOfRelativeDimension.smooth g _
     exact RingHom.smooth_algebraMap.1 ((HasRingHomProperty.Spec_iff (P := @Smooth)).1 h2)
 
-theorem rankAtStalk_kaehler_of_locally {R B : Type} [CommRing R] [CommRing B] [Algebra R B] [Algebra.Smooth R B]
+theorem rankAtStalk_kaehler_of_locally
+    {R B : Type} [CommRing R] [CommRing B] [Algebra R B] [Algebra.Smooth R B]
     (g : ℕ) (h : RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension g) (algebraMap R B))
-    (p : PrimeSpectrum B) : Module.rankAtStalk Ω[B⁄R] p = g := by
+    (p : PrimeSpectrum B)
+    : Module.rankAtStalk Ω[B⁄R] p = g := by
   obtain ⟨s, hs, H⟩ := h
   obtain ⟨t, ht, htp⟩ : ∃ t ∈ s, t ∉ p.asIdeal := by
     by_contra! hc
@@ -58,12 +66,14 @@ theorem rankAtStalk_kaehler_of_locally {R B : Type} [CommRing R] [CommRing B] [A
   rw [hq] at h1
   rw [← h1, Module.rankAtStalk_eq_of_equiv e, Module.rankAtStalk_eq_finrank_of_free]
   have hf : Module.finrank Bt Ω[Bt⁄R] = g := by
-    rw [Module.finrank, Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := R) (S := Bt) g]
+    rw [Module.finrank,
+      Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := R) (S := Bt) g]
     simp
   simp [hf]
 
-theorem globForm_FP : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (g : ℕ), IsAbelianScheme A →
-    SmoothOfRelativeDimension g A.hom → FP R (GlobForm A.hom) g := by
+theorem globForm_FP
+    : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (g : ℕ),
+      IsAbelianScheme A → SmoothOfRelativeDimension g A.hom → FP R (GlobForm A.hom) g := by
   intro R _ A _ g hA hg
   obtain ⟨hF, h0, -⟩ := GlobalTheory.T.abelianScheme_oneFormFrame_and_square R A g hA hg
   obtain ⟨hfin, hproj⟩ := GlobalTheory.T.glob1_finite_and_projective R _ (OAff A.hom) hF h0
@@ -73,17 +83,17 @@ theorem globForm_FP : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (
   let x : A.left := (η[A]).left.base p
   have hxp : A.hom.base x = p := by
     change ((η[A]).left ≫ A.hom).base p = p
-    rw [hη]; rfl
+    rw [hη]
+    rfl
   obtain ⟨U, hU⟩ : ∃ U : A.left.affineOpens, x ∈ U.1 := by
-    obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ := A.left.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x)
-      isOpen_univ
+    obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ :=
+      A.left.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
     exact ⟨⟨V, hV⟩, hxV⟩
   let T : AffOp A.left := Opposite.op U
   let B := (OAff A.hom).obj T
   have hUa : IsAffineOpen U.1 := U.2
   obtain ⟨q, hq⟩ : ∃ q : Sp (Sec A.hom U.1), (affPt A.hom U).base q = x := by
-    have : x ∈ Set.range hUa.fromSpec.base := by
-      rw [hUa.range_fromSpec]; exact hU
+    have : x ∈ Set.range hUa.fromSpec.base := by rw [hUa.range_fromSpec]; exact hU
     obtain ⟨q, hq⟩ := this
     exact ⟨q, hq⟩
   have hqp : PrimeSpectrum.comap (algebraMap R (Sec A.hom U.1)) q = p := by
@@ -95,7 +105,8 @@ theorem globForm_FP : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (
   obtain ⟨hloc, hsm⟩ := smooth_of_openImm A.hom g hg (affPt A.hom U) (affPt_w A.hom U)
   have hrk := rankAtStalk_kaehler_of_locally g hloc q
   let e : Glob1 (OAff A.hom) →ₗ[R] Ω[B⁄R] := (LinearMap.proj T).comp (Glob1 (OAff A.hom)).subtype
-  have he : IsBaseChange B e := GlobalTheory.T.isBaseChange_compatibleGlobalOneForms R _ (OAff A.hom) hF h0 T e (fun _ ↦ rfl)
+  have he : IsBaseChange B e :=
+    GlobalTheory.T.isBaseChange_compatibleGlobalOneForms R _ (OAff A.hom) hF h0 T e (fun _ ↦ rfl)
   have h1 := Module.rankAtStalk_baseChange (R := R) (M := Glob1 (OAff A.hom)) (S := B) q
   rw [Module.rankAtStalk_eq_of_equiv he.equiv] at h1
   rw [← hqp]

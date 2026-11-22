@@ -4,7 +4,8 @@ public import Development.EtaleCohomology.TateTwists.EtaleSimplicialChainsFreeDe
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations.ChainsBasicPf
 
@@ -37,7 +38,8 @@ lemma chains_le (E : Spc) : ((chains R).obj E).IsStrictlyLE 0 :=
 end LateralTheory.EtaleFoundations.ChainsBasicPf
 
 open LateralTheory.EtaleFoundations.ChainsBasicPf in
-theorem LateralTheory.EtaleFoundations.etale_simplicial_chains_basic_properties_hold : LateralTheory.EtaleFoundations.EtaleSimplicialChainsFreeDescription := by
+theorem LateralTheory.EtaleFoundations.etale_simplicial_chains_basic_properties_hold
+    : LateralTheory.EtaleFoundations.EtaleSimplicialChainsFreeDescription := by
   intro R _
   refine ⟨fun E => chains_le R E, fun {E E'} f p => ?_, fun E p => ?_⟩
   · rw [chains_map_f R f p]

@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing
 
-private theorem UpperTheory.V.CA.homprime_part (R σ : Type) [CommRing R] [Finite σ] :
-    ∃ p : MvPowerSeries σ R → ℕ → MvPolynomial σ R, ∀ F d (m : σ →₀ ℕ),
+private theorem UpperTheory.V.CA.homprime_part (R σ : Type) [CommRing R] [Finite σ]
+    : ∃ p : MvPowerSeries σ R → ℕ → MvPolynomial σ R, ∀ F d (m : σ →₀ ℕ),
       (p F d).coeff m = if m.degree = d then MvPowerSeries.coeff m F else 0 := by
   classical
   have hfin : ∀ d : ℕ, {m : σ →₀ ℕ | m.degree = d}.Finite := fun d =>
@@ -20,11 +20,12 @@ private theorem UpperTheory.V.CA.homprime_part (R σ : Type) [CommRing R] [Finit
   rw [Finset.sum_ite_eq']
   simp
 
-private theorem UpperTheory.V.CA.homprime_mul (R σ : Type) [CommRing R]
-    (p : MvPowerSeries σ R → ℕ → MvPolynomial σ R) (hp : ∀ F d (m : σ →₀ ℕ),
-      (p F d).coeff m = if m.degree = d then MvPowerSeries.coeff m F else 0)
-    (F G : MvPowerSeries σ R) (n : ℕ) :
-    p (F * G) n = ∑ q ∈ Finset.HasAntidiagonal.antidiagonal n, p F q.1 * p G q.2 := by
+private theorem UpperTheory.V.CA.homprime_mul
+    (R σ : Type) [CommRing R]
+    (p : MvPowerSeries σ R → ℕ → MvPolynomial σ R)
+    (hp : ∀ F d (m : σ →₀ ℕ), (p F d).coeff m = if m.degree = d then MvPowerSeries.coeff m F else 0)
+    (F G : MvPowerSeries σ R) (n : ℕ)
+    : p (F * G) n = ∑ q ∈ Finset.HasAntidiagonal.antidiagonal n, p F q.1 * p G q.2 := by
   classical
   ext m
   rw [MvPolynomial.coeff_sum]
@@ -61,17 +62,19 @@ private theorem UpperTheory.V.CA.homprime_mul (R σ : Type) [CommRing R]
       · simp [h2]
     · simp [h1]
 
-theorem UpperTheory.V.CA.g_homprime :
-    ∀ (R σ : Type) [CommRing R] [IsNoetherianRing R] [Finite σ] (P : Ideal (MvPolynomial σ R)), P.IsPrime →
-      (∀ f ∈ P, ∀ d : ℕ, MvPolynomial.homogeneousComponent d f ∈ P) →
-        (P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))).IsPrime ∧
-          (P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))).comap
-            (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R)) = P := by
+theorem UpperTheory.V.CA.g_homprime
+    : ∀ (R σ : Type) [CommRing R] [IsNoetherianRing R] [Finite σ] (P : Ideal (MvPolynomial σ R)),
+      P.IsPrime → (∀ f ∈ P, ∀ d : ℕ, MvPolynomial.homogeneousComponent d f ∈ P)
+        → (P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))).IsPrime
+          ∧ (P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))).comap
+              (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))
+            = P := by
   intro R σ _ _ _ P hP hhom
   classical
   obtain ⟨p, hp⟩ := UpperTheory.V.CA.homprime_part R σ
-  have key : ∀ F : MvPowerSeries σ R,
-      F ∈ P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R)) ↔ ∀ d, p F d ∈ P := by
+  have key
+      : ∀ F : MvPowerSeries σ R,
+        F ∈ P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R)) ↔ ∀ d, p F d ∈ P := by
     intro F
     rw [UpperTheory.V.CA.g_hommem R σ P hhom F]
     constructor
@@ -83,15 +86,18 @@ theorem UpperTheory.V.CA.g_homprime :
         rw [hg, hp]
       rw [hg']
       exact h d
-  have hcomap : (P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))).comap
-      (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R)) = P := by
+  have hcomap
+      : (P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))).comap
+          (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))
+        = P := by
     apply le_antisymm
     · intro f hf
       rw [Ideal.mem_comap, key] at hf
       have hd : ∀ d, MvPolynomial.homogeneousComponent d f ∈ P := by
         intro d
-        have he : MvPolynomial.homogeneousComponent d f =
-            p (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R) f) d := by
+        have he
+            : MvPolynomial.homogeneousComponent d f
+              = p (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R) f) d := by
           ext m
           rw [MvPolynomial.coeff_homogeneousComponent, hp,
             MvPolynomial.coeToMvPowerSeries.ringHom_apply, MvPolynomial.coeff_coe]
@@ -112,18 +118,19 @@ theorem UpperTheory.V.CA.g_homprime :
     push_neg at hF hG
     have ha : p F (Nat.find hF) ∉ P := Nat.find_spec hF
     have hb : p G (Nat.find hG) ∉ P := Nat.find_spec hG
-    have ha' : ∀ i < Nat.find hF, p F i ∈ P := fun i hi => by
-      simpa using Nat.find_min hF hi
-    have hb' : ∀ i < Nat.find hG, p G i ∈ P := fun i hi => by
-      simpa using Nat.find_min hG hi
+    have ha' : ∀ i < Nat.find hF, p F i ∈ P := fun i hi => by simpa using Nat.find_min hF hi
+    have hb' : ∀ i < Nat.find hG, p G i ∈ P := fun i hi => by simpa using Nat.find_min hG hi
     have hsum := hFG (Nat.find hF + Nat.find hG)
     rw [UpperTheory.V.CA.homprime_mul R σ p hp] at hsum
-    have hmem : (Nat.find hF, Nat.find hG) ∈
-        Finset.HasAntidiagonal.antidiagonal (Nat.find hF + Nat.find hG) := by
+    have hmem
+        : (Nat.find hF, Nat.find hG)
+          ∈ Finset.HasAntidiagonal.antidiagonal (Nat.find hF + Nat.find hG) := by
       rw [Finset.HasAntidiagonal.mem_antidiagonal]
     rw [← Finset.add_sum_erase _ _ hmem] at hsum
-    have hrest : ∑ q ∈ (Finset.HasAntidiagonal.antidiagonal (Nat.find hF + Nat.find hG)).erase
-        (Nat.find hF, Nat.find hG), p F q.1 * p G q.2 ∈ P := by
+    have hrest
+        : ∑ q ∈ (Finset.HasAntidiagonal.antidiagonal (Nat.find hF + Nat.find hG)).erase
+            (Nat.find hF, Nat.find hG), p F q.1 * p G q.2
+          ∈ P := by
       refine Ideal.sum_mem _ (fun q hq => ?_)
       rw [Finset.mem_erase, Finset.HasAntidiagonal.mem_antidiagonal] at hq
       obtain ⟨hq2, hq1⟩ := hq

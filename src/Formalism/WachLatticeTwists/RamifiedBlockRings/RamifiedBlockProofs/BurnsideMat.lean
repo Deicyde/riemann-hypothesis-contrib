@@ -36,9 +36,10 @@ theorem burnsideMat : StatBurnsideMat := by
     suffices hso : IsSimpleOrder (Submodule A V) from @IsSimpleModule.mk _ _ _ _ _ hso
     refine ⟨fun W => ?_⟩
     rcases hirr (W.restrictScalars k) (fun g v hv => by
-      have := W.smul_mem (MonoidAlgebra.of k G g) hv
-      rw [hact, hof] at this
-      exact this) with h | h
+        have := W.smul_mem (MonoidAlgebra.of k G g) hv
+        rw [hact, hof] at this
+        exact this)
+      with h | h
     · left; exact (Submodule.restrictScalars_eq_bot_iff k A V).mp h
     · right; exact (Submodule.restrictScalars_eq_top_iff k A V).mp h
   have hsc : ∀ ψ : V →ₗ[A] V, ∃ c : k, ∀ v, ψ v = c • v := by
@@ -47,11 +48,12 @@ theorem burnsideMat : StatBurnsideMat := by
     have hM : ∀ v, M.mulVec v = ψ v := fun v => by
       have := LinearMap.toMatrix'_mulVec (ψ.restrictScalars k) v
       simpa [M] using this
-    obtain ⟨c, hc⟩ := hcom M (fun g => by
-      apply Matrix.toLin'.injective
-      refine LinearMap.ext fun v => ?_
-      simp only [Matrix.toLin'_apply, ← Matrix.mulVec_mulVec]
-      rw [hM, hM, ← hof, ← hact, ← hact, map_smul])
+    obtain ⟨c, hc⟩ :=
+      hcom M (fun g => by
+        apply Matrix.toLin'.injective
+        refine LinearMap.ext fun v => ?_
+        simp only [Matrix.toLin'_apply, ← Matrix.mulVec_mulVec]
+        rw [hM, hM, ← hof, ← hact, ← hact, map_smul])
     refine ⟨c, fun v => ?_⟩
     rw [← hM, hc, Matrix.smul_mulVec, Matrix.one_mulVec]
   have hsurj := burnside k A V hS hsc
@@ -65,20 +67,32 @@ theorem burnsideMat : StatBurnsideMat := by
     rw [← hact]
     exact this.symm
   rw [hB]
-  exact MonoidAlgebra.induction_on (motive := fun a => L a ∈ Submodule.span k (Set.range ρ)) a
+  exact MonoidAlgebra.induction_on
+    (motive := fun a => L a ∈ Submodule.span k (Set.range ρ))
+    a
     (fun g => by rw [hof]; exact Submodule.subset_span ⟨g, rfl⟩)
     (fun f g hf hg => by rw [map_add (f := _)]; exact Submodule.add_mem _ hf hg)
     (fun c f hf => by rw [map_smul]; exact Submodule.smul_mem _ _ hf)
 
 theorem ontoSpan : StatOntoSpan := by
-  first | exact UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan .. | (apply UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> assumption) | (intros; apply UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> assumption) | (apply @UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> assumption) | (apply @UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> first | assumption | infer_instance)
+  first
+  | exact UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan ..
+  | (apply UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> assumption)
+  | (intros; apply UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> assumption)
+  | (apply @UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> assumption)
+  | (intros; apply @UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan <;> assumption)
+  | (
+      apply @UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan
+        <;> first | assumption | infer_instance
+    )
 
 theorem noeth : StatNoeth := by
   intro O _ _ _ X' _ d _ _ R' hint
-  let L : (X' → d → d → O) →ₗ[O] (X' → Matrix d d (FractionRing O)) :=
-    { toFun := fun F x' => Matrix.of fun i j => algebraMap O (FractionRing O) (F x' i j)
-      map_add' := fun F F' => by funext x'; ext i j; simp
-      map_smul' := fun c F => by funext x'; ext i j; simp [Algebra.smul_def] }
+  let L : (X' → d → d → O) →ₗ[O] (X' → Matrix d d (FractionRing O)) := {
+    toFun := fun F x' => Matrix.of fun i j => algebraMap O (FractionRing O) (F x' i j)
+    map_add' := fun F F' => by funext x'; ext i j; simp
+    map_smul' := fun c F => by funext x'; ext i j; simp [Algebra.smul_def]
+  }
   have hle : Subalgebra.toSubmodule R' ≤ LinearMap.range L := by
     intro a ha
     choose F hF using hint a ha

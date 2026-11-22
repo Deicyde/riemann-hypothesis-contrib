@@ -7,16 +7,22 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsCoTyp
 
 noncomputable section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition
+open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.Doubling GlobalTheory.GLDoubling
+  GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition
 
 namespace GlobalTheory.ParHecke.Model
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  {A D D' : Type} [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] [Fintype D'] [DecidableEq D']
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {A D D' : Type}
+  [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] [Fintype D'] [DecidableEq D']
 
-theorem exists_reps {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (J : Subgroup G)
-    (ho : IsOpen (J : Set G)) (hc : IsCompact (J : Set G)) (g : G) :
-    ∃ R : Finset G, (∀ j ∈ R, j ∈ J) ∧ ∀ j ∈ J, ∃! j', j' ∈ R ∧ (j' * g)⁻¹ * (j * g) ∈ J := by
+theorem exists_reps
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (J : Subgroup G) (ho : IsOpen (J : Set G)) (hc : IsCompact (J : Set G))
+    (g : G)
+    : ∃ R : Finset G, (∀ j ∈ R, j ∈ J) ∧ ∀ j ∈ J, ∃! j', j' ∈ R ∧ (j' * g)⁻¹ * (j * g) ∈ J := by
   classical
   haveI : DiscreteTopology (G ⧸ J) := QuotientGroup.discreteTopology ho
   let f : G → G ⧸ J := fun j => QuotientGroup.mk (j * g)
@@ -36,11 +42,13 @@ theorem exists_reps {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGrou
     rw [← this, hs' c (hfin.mem_toFinset.1 hc)]
 
 theorem isOpen_parahoric : IsOpen (parahoric k A D : Set (GL (A ⊕ D) k)) := by
-  have : (parahoric k A D : Set (GL (A ⊕ D) k)) = (KO k (A ⊕ D) : Set _) ∩
-      ⋂ i, ⋂ j, (fun g : GL (A ⊕ D) k => g.1 (.inr i) (.inl j)) ⁻¹' {x : k | valuation k x < 1} := by
-    ext g; simp [mem_parahoric]
+  have : (parahoric k A D : Set (GL (A ⊕ D) k))
+      = (KO k (A ⊕ D) : Set _)
+        ∩ ⋂ i, ⋂ j, (fun g : GL (A ⊕ D) k => g.1 (.inr i) (.inl j)) ⁻¹' {x : k | valuation k x < 1} :=
+    by ext g; simp [mem_parahoric]
   rw [this]
-  refine SplitFlip.isOpen_KO.inter (isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j => ?_)
+  refine SplitFlip.isOpen_KO.inter (isOpen_iInter_of_finite fun i =>
+    isOpen_iInter_of_finite fun j => ?_)
   refine IsOpen.preimage (Units.continuous_val.matrix_elem _ _) ?_
   simpa [Valuation.restrict_lt_one_iff] using (valuation k).isOpen_ball 1
 
@@ -51,8 +59,10 @@ theorem isCompact_parahoric : IsCompact (parahoric k A D : Set (GL (A ⊕ D) k))
 theorem det_lower_ne {j : GL (A ⊕ D) k} (hj : j ∈ parahoric k A D) : j.1.toBlocks₂₂.det ≠ 0 := by
   obtain ⟨h, hh, rfl⟩ := hj
   intro h0
-  have e1 : (GeneralLinearGroup.map (n := A ⊕ D) (algebraMap 𝒪[k] k) h).1.toBlocks₂₂ =
-      (algebraMap 𝒪[k] k).mapMatrix h.1.toBlocks₂₂ := rfl
+  have e1
+      : (GeneralLinearGroup.map (n := A ⊕ D) (algebraMap 𝒪[k] k) h).1.toBlocks₂₂
+        = (algebraMap 𝒪[k] k).mapMatrix h.1.toBlocks₂₂ :=
+    rfl
   rw [e1, ← RingHom.map_det] at h0
   have h1 : h.1.toBlocks₂₂.det = 0 := Subtype.ext h0
   set u := GeneralLinearGroup.map (n := A ⊕ D) (IsLocalRing.residue 𝒪[k]) h with hu
@@ -69,7 +79,12 @@ theorem det_lower_ne {j : GL (A ⊕ D) k} (hj : j ∈ parahoric k A D) : j.1.toB
 theorem exists_isReps (g : GL (A ⊕ D) k) : ∃ R d, IsReps g R d := by
   classical
   obtain ⟨R, h1, h2⟩ := exists_reps _ isOpen_parahoric isCompact_parahoric g
-  refine ⟨R, fun j => if h : j.1.toBlocks₂₂.det ≠ 0 then Units.mk0 _ h else 1, fun j hj => ⟨h1 j hj, ?_⟩, h2⟩
+  refine ⟨
+    R,
+    fun j => if h : j.1.toBlocks₂₂.det ≠ 0 then Units.mk0 _ h else 1,
+    fun j hj => ⟨h1 j hj, ?_⟩,
+    h2
+  ⟩
   simp [det_lower_ne (h1 j hj)]
 
 theorem exists_isRepsK (g : GL D k) : ∃ R, IsRepsK g R := by

@@ -9,12 +9,15 @@ open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut
 
 namespace LateralTheory.E.NormPf.OpenPf
 
-theorem aic_of_equiv {R S : Type} [CommRing R] [CommRing S] (e : R ≃+* S) (h : GlobalTheory.EtC.AIC R) : GlobalTheory.EtC.AIC S := by
+theorem aic_of_equiv
+    {R S : Type} [CommRing R] [CommRing S] (e : R ≃+* S) (h : GlobalTheory.EtC.AIC R)
+    : GlobalTheory.EtC.AIC S := by
   intro p hp hd
-  obtain ⟨a, ha⟩ := h (p.map e.symm.toRingHom) (hp.map _) (by rwa [Polynomial.natDegree_map_eq_of_injective e.symm.injective])
+  obtain ⟨a, ha⟩ :=
+    h (p.map e.symm.toRingHom) (hp.map _)
+      (by rwa [Polynomial.natDegree_map_eq_of_injective e.symm.injective])
   refine ⟨e a, ?_⟩
-  have hq : (p.map e.symm.toRingHom).map e.toRingHom = p := by
-    rw [Polynomial.map_map]; ext n; simp
+  have hq : (p.map e.symm.toRingHom).map e.toRingHom = p := by rw [Polynomial.map_map]; ext n; simp
   rw [← hq, Polynomial.eval_map]
   have h2 := Polynomial.eval₂_at_apply (p := p.map e.symm.toRingHom) e.toRingHom a
   simp only [RingEquiv.toRingHom_eq_coe, RingHom.coe_coe] at h2 ha ⊢

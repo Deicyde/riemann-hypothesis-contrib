@@ -13,10 +13,16 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.LieStable
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 
-theorem lat_stable : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (G : Over X) [GrpObj G] (V : Type) [AddCommGroup V] [Module Ω V] (M : LieModel G ξ V) (O : Type) [CommRing O] (act : OAct O G) (ρ : O →+* Module.End Ω V), M.IsActOf act.act ρ → ∀ (p : Cpt ξ) (a : O), ∀ e ∈ M.lat p, ρ a e ∈ M.lat p := by
+theorem lat_stable
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (G : Over X) [GrpObj G] (V : Type)
+        [AddCommGroup V] [Module Ω V] (M : LieModel G ξ V) (O : Type) [CommRing O] (act : OAct O G)
+        (ρ : O →+* Module.End Ω V),
+      M.IsActOf act.act ρ → ∀ (p : Cpt ξ) (a : O), ∀ e ∈ M.lat p, ρ a e ∈ M.lat p := by
   intro X Ω _ ξ G _ V _ _ M O _ act ρ hact p a e he
   change e ∈ Submodule.span (regAt ξ p) {e | ∃ v, M.Extends p e v} at he
   change ρ a e ∈ Submodule.span (regAt ξ p) {e | ∃ v, M.Extends p e v}
@@ -36,8 +42,10 @@ theorem lat_stable : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶
     · have h := hact a x
       rw [h, Over.comp_left, hv2, Over.comp_left]
       exact Category.assoc _ _ _
-  | zero => rw [map_zero]; exact zero_mem _
-  | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
+  | zero =>
+    rw [map_zero]; exact zero_mem _
+  | add x y _ _ hx hy =>
+    rw [map_add]; exact add_mem hx hy
   | smul r x _ hx =>
     rw [Subring.smul_def, map_smul, ← Subring.smul_def]
     exact Submodule.smul_mem _ r hx

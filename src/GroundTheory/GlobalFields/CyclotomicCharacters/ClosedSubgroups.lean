@@ -24,9 +24,10 @@ section ProfiniteInteger
 
 def factorialPNat (n : ℕ) : ℕ+ := ⟨(n + 1).factorial, Nat.factorial_pos _⟩
 
-theorem tendsto_natCast (a : ℤ̂) :
-    Tendsto (fun n : ℕ => (((ProfiniteInteger.proj (factorialPNat n) a).val : ℕ) : ℤ̂)) atTop
-      (𝓝 a) := by
+theorem tendsto_natCast (a : ℤ̂)
+    : Tendsto
+      (fun n : ℕ => (((ProfiniteInteger.proj (factorialPNat n) a).val : ℕ) : ℤ̂))
+      atTop (𝓝 a) := by
   rw [tendsto_subtype_rng, tendsto_pi_nhds]
   intro m
   refine tendsto_nhds_of_eventually_eq ?_
@@ -41,13 +42,13 @@ theorem tendsto_natCast (a : ℤ̂) :
 theorem denseRange_natCast : DenseRange (Nat.cast : ℕ → ℤ̂) := fun a =>
   mem_closure_of_tendsto (tendsto_natCast a) (Eventually.of_forall fun _ => Set.mem_range_self _)
 
-theorem mul_mem_of_isClosed' (H : AddSubgroup ℤ̂) (hH : IsClosed (H : Set ℤ̂)) {x : ℤ̂}
-    (hx : x ∈ H) (a : ℤ̂) : a * x ∈ H :=
-  denseRange_natCast.induction_on a (hH.preimage (continuous_id.mul continuous_const))
-    fun k => by
-      show (k : ℤ̂) * x ∈ H
-      rw [← nsmul_eq_mul]
-      exact H.nsmul_mem hx k
+theorem mul_mem_of_isClosed'
+    (H : AddSubgroup ℤ̂) (hH : IsClosed (H : Set ℤ̂)) {x : ℤ̂} (hx : x ∈ H) (a : ℤ̂)
+    : a * x ∈ H :=
+  denseRange_natCast.induction_on a (hH.preimage (continuous_id.mul continuous_const)) fun k => by
+    show (k : ℤ̂) * x ∈ H
+    rw [← nsmul_eq_mul]
+    exact H.nsmul_mem hx k
 
 def idealOfIsClosed (H : AddSubgroup ℤ̂) (hH : IsClosed (H : Set ℤ̂)) : Ideal ℤ̂ where
   carrier := H
@@ -55,20 +56,22 @@ def idealOfIsClosed (H : AddSubgroup ℤ̂) (hH : IsClosed (H : Set ℤ̂)) : Id
   zero_mem' := H.zero_mem
   smul_mem' a _ hx := mul_mem_of_isClosed' H hH hx a
 
-noncomputable def primeIdempotent (q : Nat.Primes) : ℤ̂ :=
-  ofPadics (Pi.single q 1)
+noncomputable def primeIdempotent (q : Nat.Primes) : ℤ̂ := ofPadics (Pi.single q 1)
 
-theorem toPadicInt_primeIdempotent (q q' : Nat.Primes) :
-    toPadicInt q' (primeIdempotent q) = Pi.single (M := fun q : Nat.Primes => ℤ_[q]) q 1 q' :=
+theorem toPadicInt_primeIdempotent (q q' : Nat.Primes)
+    : toPadicInt q' (primeIdempotent q) = Pi.single (M := fun q : Nat.Primes => ℤ_[q]) q 1 q' :=
   congrFun (toPadics_ofPadics _) q'
 
-theorem mem_of_forall_toPadicInt (H : AddSubgroup ℤ̂) (hH : IsClosed (H : Set ℤ̂)) {y : ℤ̂}
-    (hy : ∀ q : Nat.Primes, ∃ h ∈ H, toPadicInt q h = toPadicInt q y) : y ∈ H := by
+theorem mem_of_forall_toPadicInt
+    (H : AddSubgroup ℤ̂) (hH : IsClosed (H : Set ℤ̂))
+    {y : ℤ̂} (hy : ∀ q : Nat.Primes, ∃ h ∈ H, toPadicInt q h = toPadicInt q y)
+    : y ∈ H := by
   choose h hh hhy using hy
   let s : Finset Nat.Primes → ℤ̂ := fun F => ∑ q ∈ F, primeIdempotent q * h q
-  have hs : ∀ F, s F ∈ H := fun F =>
-    H.sum_mem fun q _ => mul_mem_of_isClosed' H hH (hh q) _
-  have hcomp : ∀ (F : Finset Nat.Primes) (q' : Nat.Primes), toPadicInt q' (s F) = if q' ∈ F then toPadicInt q' y else 0 := by
+  have hs : ∀ F, s F ∈ H := fun F => H.sum_mem fun q _ => mul_mem_of_isClosed' H hH (hh q) _
+  have hcomp
+      : ∀ (F : Finset Nat.Primes) (q' : Nat.Primes),
+        toPadicInt q' (s F) = if q' ∈ F then toPadicInt q' y else 0 := by
     intro F q'
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [s, map_sum, map_mul, toPadicInt_primeIdempotent]

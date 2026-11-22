@@ -10,12 +10,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemNonzeroLo
 set_option autoImplicit false
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.FiniteNearCodimOne
 
-theorem le_one_of_add_eq {c : ℕ∞} {s t : WithBot ℕ∞} {D : ℕ} (h₁ : (c : WithBot ℕ∞) + s = D)
-    (h₂ : ((1 : ℕ∞) : WithBot ℕ∞) + t = D) (hts : t ≤ s) : c ≤ 1 := by
+theorem le_one_of_add_eq
+    {c : ℕ∞} {s t : WithBot ℕ∞} {D : ℕ}
+    (h₁ : (c : WithBot ℕ∞) + s = D) (h₂ : ((1 : ℕ∞) : WithBot ℕ∞) + t = D) (hts : t ≤ s)
+    : c ≤ 1 := by
   induction t using WithBot.recBotCoe with
   | bot => rw [WithBot.add_bot] at h₂; exact absurd h₂.symm (WithBot.natCast_ne_bot _)
   | coe t =>
@@ -26,8 +29,8 @@ theorem le_one_of_add_eq {c : ℕ∞} {s t : WithBot ℕ∞} {D : ℕ} (h₁ : (
     have h₅ : c + t ≤ 1 + t := by exact_mod_cast h₃
     exact (ENat.add_le_add_iff_right ht).1 h₅
 
-theorem coheight_eq_zero_iff {X : Scheme.{0}} [IsIntegral X] (x : X) :
-    Order.coheight x = 0 ↔ x = genericPoint X := by
+theorem coheight_eq_zero_iff {X : Scheme.{0}} [IsIntegral X] (x : X)
+    : Order.coheight x = 0 ↔ x = genericPoint X := by
   rw [Order.coheight_eq_zero]
   constructor
   · intro h
@@ -36,11 +39,13 @@ theorem coheight_eq_zero_iff {X : Scheme.{0}} [IsIntegral X] (x : X) :
   · rintro rfl b _
     exact genericPoint_specializes b
 
-theorem exists_isFinite_restrict_of_coheight_eq_one : ∀ (F : Type) [Field F] (X Y : Scheme.{0})
-    [IsIntegral X] [IsIntegral Y] (p : X ⟶ Sp F) (q : Y ⟶ Sp F) (D : ℕ), IsProjOver p →
-    topologicalKrullDim X = (D : ℕ) → IsProjOver q → topologicalKrullDim Y = D →
-    ∀ π : Y ⟶ X, π ≫ p = q → π (genericPoint Y) = genericPoint X → ∀ z : X,
-    Order.coheight z = 1 → ∃ U : X.Opens, z ∈ U ∧ IsFinite (π ∣_ U) := by
+theorem exists_isFinite_restrict_of_coheight_eq_one
+    : ∀ (F : Type) [Field F] (X Y : Scheme.{0}) [IsIntegral X] [IsIntegral Y] (p : X ⟶ Sp F)
+        (q : Y ⟶ Sp F) (D : ℕ),
+      IsProjOver p → topologicalKrullDim X = (D : ℕ) → IsProjOver q → topologicalKrullDim Y = D
+        → ∀ π : Y ⟶ X,
+          π ≫ p = q → π (genericPoint Y) = genericPoint X
+            → ∀ z : X, Order.coheight z = 1 → ∃ U : X.Opens, z ∈ U ∧ IsFinite (π ∣_ U) := by
   intro F _ X Y _ _ p q D hp hX hq hY π hπ hη z hz
   have : IsProper p := by
     obtain ⟨N, c, hc, rfl⟩ := hp
@@ -75,7 +80,8 @@ theorem exists_isFinite_restrict_of_coheight_eq_one : ∀ (F : Type) [Field F] (
       rw [hη]
       intro hc
       exact hzne ((specializes_iff_mem_closure.2 hc).antisymm (genericPoint_specializes z)).eq
-    refine (Mix.finite_coheight_one_notMem_open Y U hU).subset fun w hwz => ⟨hw w hwz, fun hwU => ?_⟩
+    refine (Mix.finite_coheight_one_notMem_open Y U hU).subset fun w hwz =>
+      ⟨hw w hwz, fun hwU => ?_⟩
     have hwU' : π w ∈ (closure ({z} : Set X))ᶜ := hwU
     exact hwU' (by rw [show π w = z from hwz]; exact subset_closure rfl)
   exact exists_isFinite_morphismRestrict_of_finite_preimage_singleton π z hfin

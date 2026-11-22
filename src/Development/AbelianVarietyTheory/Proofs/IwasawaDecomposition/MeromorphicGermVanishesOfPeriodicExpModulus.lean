@@ -5,14 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MonoS
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.BdArc Filter Topology
+open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj
+  GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.BdArc Filter
+  Topology
 open ReciprocityTheory.ChartRestriction.G.FD (Data Frame Bor rmul lact mat col dmin Wt)
 
 namespace GlobalTheory.ShFam.BdArc
 
-theorem not_eventually_re_pos_of_periodic {f : ℂ → ℂ} {M : ℝ} (hM : 0 < M) (hper : Function.Periodic f M)
-    (hd : ∀ᶠ z in imTop, DifferentiableAt ℂ f z) (h0 : Tendsto f imTop (𝓝 0)) :
-    ¬ ∀ᶠ z in imTop, 0 < (f z).re := by
+theorem not_eventually_re_pos_of_periodic
+    {f : ℂ → ℂ} {M : ℝ} (hM : 0 < M) (hper : Function.Periodic f M)
+    (hd : ∀ᶠ z in imTop, DifferentiableAt ℂ f z) (h0 : Tendsto f imTop (𝓝 0))
+    : ¬ ∀ᶠ z in imTop, 0 < (f z).re := by
   intro hpos
   set F := Function.Periodic.cuspFunction M f with hF
   have hF0 : F 0 = 0 := Function.Periodic.cuspFunction_zero_of_zero_at_inf hM h0
@@ -29,7 +33,7 @@ theorem not_eventually_re_pos_of_periodic {f : ℂ → ℂ} {M : ℝ} (hM : 0 < 
     by_cases hq0 : q = 0
     · subst hq0; exact hd0.neg.cexp
     · exact (hq hq0).neg.cexp
-  have hmax : IsLocalMax (norm ∘ fun z => Complex.exp (-F z)) 0 := by
+  have hmax : IsLocalMax (norm ∘ fun z => Complex.exp (- F z)) 0 := by
     filter_upwards [eventually_nhdsWithin_iff.mp hp1] with q hq
     by_cases hq0 : q = 0
     · subst hq0; exact le_rfl
@@ -43,11 +47,13 @@ theorem not_eventually_re_pos_of_periodic {f : ℂ → ℂ} {M : ℝ} (hM : 0 < 
   simp at this
   exact hq1.ne' this
 
-theorem not_tendsto_re_atTop_of_periodic {L : ℂ → ℂ} {T M : ℝ} (hM : 0 < M)
-    (hd : DifferentiableOn ℂ L {w | T < w.im}) (hper : ∀ w : ℂ, T < w.im → L (w + M) = L w) :
-    ¬ Tendsto (fun w => (L w).re) imTop atTop := by
+theorem not_tendsto_re_atTop_of_periodic
+    {L : ℂ → ℂ} {T M : ℝ} (hM : 0 < M) (hd : DifferentiableOn ℂ L {w | T < w.im})
+    (hper : ∀ w : ℂ, T < w.im → L (w + M) = L w)
+    : ¬ Tendsto (fun w => (L w).re) imTop atTop := by
   intro ht
-  have hT : ∀ᶠ w in imTop, T < w.im := (tendsto_comap (f := Complex.im) (x := atTop)).eventually (eventually_gt_atTop T)
+  have hT : ∀ᶠ w in imTop, T < w.im :=
+    (tendsto_comap (f := Complex.im) (x := atTop)).eventually (eventually_gt_atTop T)
   have hopen : IsOpen {w : ℂ | T < w.im} := isOpen_lt continuous_const Complex.continuous_im
   have hpos : ∀ᶠ w in imTop, 0 < (L w).re := ht.eventually (eventually_gt_atTop 0)
   classical
@@ -77,8 +83,17 @@ theorem not_tendsto_re_atTop_of_periodic {L : ℂ → ℂ} {T M : ℝ} (hM : 0 <
     rw [hfe w hw, Complex.inv_re]
     exact div_pos hw0 (Complex.normSq_pos.mpr hne)
 
-theorem tendsto_zero_of_norm_eq_mul_exp_periodic :
-    ∀ (p L h a b : ℂ → ℂ) (T r : ℝ) (M n : ℕ) (ζ : ℂ), 0 < M → 0 < n → ζ ^ n = 1 → 0 < r → DifferentiableOn ℂ p {w | T < w.im} → DifferentiableOn ℂ L {w | T < w.im} → (∀ w : ℂ, T < w.im → p (w + M) = ζ * p w ∧ L (w + M) = L w ∧ ‖h (eTwoPi w)‖ = ‖p w‖ * ‖Complex.exp (L w)‖) → Tendsto p imTop (𝓝 0) → DifferentiableOn ℂ a (Metric.ball (0 : ℂ) r) → DifferentiableOn ℂ b (Metric.ball (0 : ℂ) r) → (∀ u ∈ Metric.ball (0 : ℂ) r, u ≠ 0 → b u ≠ 0 ∧ h u * b u = a u) → Tendsto h (𝓝[≠] 0) (𝓝 0) := by
+theorem tendsto_zero_of_norm_eq_mul_exp_periodic
+    : ∀ (p L h a b : ℂ → ℂ) (T r : ℝ) (M n : ℕ) (ζ : ℂ),
+      0 < M → 0 < n → ζ ^ n = 1 → 0 < r → DifferentiableOn ℂ p {w | T < w.im}
+        → DifferentiableOn ℂ L {w | T < w.im}
+        → (∀ w : ℂ,
+          T < w.im
+            → p (w + M) = ζ * p w ∧ L (w + M) = L w ∧ ‖h (eTwoPi w)‖ = ‖p w‖ * ‖Complex.exp (L w)‖)
+        → Tendsto p imTop (𝓝 0) → DifferentiableOn ℂ a (Metric.ball (0 : ℂ) r)
+        → DifferentiableOn ℂ b (Metric.ball (0 : ℂ) r)
+        → (∀ u ∈ Metric.ball (0 : ℂ) r, u ≠ 0 → b u ≠ 0 ∧ h u * b u = a u)
+        → Tendsto h (𝓝[≠] 0) (𝓝 0) := by
   intro p L h a b T r M n ζ hM _ _ hr _ hL hw hp ha hb hab
   have hball : Metric.ball (0 : ℂ) r ∈ 𝓝 (0 : ℂ) := Metric.ball_mem_nhds _ hr
   have hmer : MeromorphicAt h 0 := by
@@ -104,9 +119,11 @@ theorem tendsto_zero_of_norm_eq_mul_exp_periodic :
   have he : Tendsto eTwoPi imTop (𝓝[≠] 0) := by
     refine (Function.Periodic.qParam_tendsto (h := 1) one_pos).congr fun w => ?_
     simp [Function.Periodic.qParam, eTwoPi]
-  have hT : ∀ᶠ w in imTop, T < w.im := (tendsto_comap (f := Complex.im) (x := atTop)).eventually (eventually_gt_atTop T)
+  have hT : ∀ᶠ w in imTop, T < w.im :=
+    (tendsto_comap (f := Complex.im) (x := atTop)).eventually (eventually_gt_atTop T)
   refine not_tendsto_re_atTop_of_periodic (M := (M : ℝ)) (by exact_mod_cast hM) hL
-    (fun w hw' => by simpa using (hw w hw').2.1) ?_
+    (fun w hw' => by simpa using (hw w hw').2.1)
+    ?_
   rw [← tendsto_neg_atBot_iff, ← Real.tendsto_exp_comp_nhds_zero]
   have h1 := hp.norm.mul (hc.comp he).norm
   simp only [norm_zero, zero_mul] at h1

@@ -13,16 +13,17 @@ open MvPolynomial
 
 universe u
 
-theorem HilbFnCut.proof (h1 : GradedPieceQuot.Statement.{u}) (h2 : CutPieces.Statement.{u}) :
-    HilbFnCut.Statement.{u} := by
+theorem HilbFnCut.proof (h1 : GradedPieceQuot.Statement.{u}) (h2 : CutPieces.Statement.{u})
+    : HilbFnCut.Statement.{u} := by
   intro F _ K _ _ ι _ I x e hI hx hnzd m
   by_cases hm : ∀ k, 0 ≤ m k
   · set n : K → ℕ := fun k => (m k).toNat with hn
     have hA := h1 F K ι (I ⊔ Ideal.span {x}) n
     have hB := h1 F K ι I n
     have hC := h2 F K ι I x e n hI hx hnzd
-    have hL : hilbFn (I ⊔ Ideal.span {x}) m =
-        (Module.finrank F (gradedPiece (I ⊔ Ideal.span {x}) n) : ℤ) := by
+    have hL
+        : hilbFn (I ⊔ Ideal.span {x}) m
+          = (Module.finrank F (gradedPiece (I ⊔ Ideal.span {x}) n) : ℤ) := by
       unfold hilbFn; rw [if_pos hm]
     have hM : hilbFn I m = (Module.finrank F (gradedPiece I n) : ℤ) := by
       unfold hilbFn; rw [if_pos hm]
@@ -40,8 +41,8 @@ theorem HilbFnCut.proof (h1 : GradedPieceQuot.Statement.{u}) (h2 : CutPieces.Sta
         have h0 := hm k
         simp only [Pi.sub_apply, hn] at h1k ⊢
         omega
-      have hN : hilbFn I (m - fun k => (e k : ℤ)) =
-          (Module.finrank F (gradedPiece I (n - e)) : ℤ) := by
+      have hN
+          : hilbFn I (m - fun k => (e k : ℤ)) = (Module.finrank F (gradedPiece I (n - e)) : ℤ) := by
         unfold hilbFn; rw [if_pos hme, hq]
       rw [hN, h1 F K ι I (n - e)]
       rw [if_pos he] at hC
@@ -55,8 +56,7 @@ theorem HilbFnCut.proof (h1 : GradedPieceQuot.Statement.{u}) (h2 : CutPieces.Sta
         have h0 := hm k
         simp only [Pi.sub_apply, hn] at h1k ⊢
         omega
-      have hN : hilbFn I (m - fun k => (e k : ℤ)) = 0 := by
-        unfold hilbFn; rw [if_neg hme]
+      have hN : hilbFn I (m - fun k => (e k : ℤ)) = 0 := by unfold hilbFn; rw [if_neg hme]
       rw [hN]
       rw [if_neg he] at hC
       rw [hC]

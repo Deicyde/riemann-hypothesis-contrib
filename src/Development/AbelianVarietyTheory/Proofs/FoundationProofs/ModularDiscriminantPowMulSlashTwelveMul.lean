@@ -16,7 +16,9 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory
 
-theorem disc_pow_mul_slash : ∀ (w : ℕ) (f : ℍ → ℂ) (γ : SL(2, ℤ)), ((fun τ => DD τ ^ w * f τ) ∣[((12 * w : ℕ) : ℤ)] γ) = fun τ => DD τ ^ w * f (γ • τ) := by
+theorem disc_pow_mul_slash
+    : ∀ (w : ℕ) (f : ℍ → ℂ) (γ : SL(2, ℤ)),
+      ((fun τ => DD τ ^ w * f τ) ∣[((12 * w : ℕ) : ℤ)] γ) = fun τ => DD τ ^ w * f (γ • τ) := by
   intro w f γ
   funext τ
   rw [ModularForm.SL_slash_apply]

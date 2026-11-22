@@ -17,8 +17,10 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.OffLeak
 
-theorem ncard_image_eq_of_iff {α β γ : Type*} (B : Set α) (f : α → β) (g : α → γ)
-    (h : ∀ a ∈ B, ∀ b ∈ B, f a = f b ↔ g a = g b) : (f '' B).ncard = (g '' B).ncard := by
+theorem ncard_image_eq_of_iff
+    {α β γ : Type*}
+    (B : Set α) (f : α → β) (g : α → γ) (h : ∀ a ∈ B, ∀ b ∈ B, f a = f b ↔ g a = g b)
+    : (f '' B).ncard = (g '' B).ncard := by
   classical
   refine Set.ncard_congr (fun c hc => g (Classical.choose ((Set.mem_image f B c).1 hc))) ?_ ?_ ?_
   · intro c hc
@@ -33,8 +35,9 @@ theorem ncard_image_eq_of_iff {α β γ : Type*} (B : Set α) (f : α → β) (g
     have e := Classical.choose_spec ((Set.mem_image f B (f a)).1 hfa)
     exact (h _ e.1 _ ha).1 e.2
 
-theorem coset_eq_iff {R V : Type*} [Ring R] [AddCommGroup V] [Module R V] (M : Submodule R V) (a b : V) :
-    ({x | x - a ∈ M} : Set V) = {x | x - b ∈ M} ↔ a - b ∈ M := by
+theorem coset_eq_iff
+    {R V : Type*} [Ring R] [AddCommGroup V] [Module R V] (M : Submodule R V) (a b : V)
+    : ({x | x - a ∈ M} : Set V) = {x | x - b ∈ M} ↔ a - b ∈ M := by
   constructor
   · intro h
     have ha : a ∈ ({x | x - a ∈ M} : Set V) := by simp
@@ -54,16 +57,16 @@ theorem coset_eq_iff {R V : Type*} [Ring R] [AddCommGroup V] [Module R V] (M : S
       rw [e] at hxa
       exact hxa
 
-theorem relIndex_eq_of_reps {R V : Type*} [Ring R] [AddCommGroup V] [Module R V] (M T B : Submodule R V)
-    (hM : M ≤ T) (hB : B ≤ T) (h : ∀ y ∈ T, ∃ y₀ ∈ B, y - y₀ ∈ M) :
-    M.toAddSubgroup.relIndex T.toAddSubgroup =
-      (M.toAddSubgroup ⊓ B.toAddSubgroup).relIndex B.toAddSubgroup := by
+theorem relIndex_eq_of_reps
+    {R V : Type*} [Ring R] [AddCommGroup V] [Module R V]
+    (M T B : Submodule R V) (hM : M ≤ T) (hB : B ≤ T) (h : ∀ y ∈ T, ∃ y₀ ∈ B, y - y₀ ∈ M)
+    : M.toAddSubgroup.relIndex T.toAddSubgroup
+      = (M.toAddSubgroup ⊓ B.toAddSubgroup).relIndex B.toAddSubgroup := by
   have hT : T.toAddSubgroup = B.toAddSubgroup ⊔ M.toAddSubgroup := by
     apply le_antisymm
     · intro y hy
       obtain ⟨y₀, hy₀, hm⟩ := h y hy
-      have hs : y₀ + (y - y₀) ∈ B.toAddSubgroup ⊔ M.toAddSubgroup :=
-        AddSubgroup.add_mem_sup hy₀ hm
+      have hs : y₀ + (y - y₀) ∈ B.toAddSubgroup ⊔ M.toAddSubgroup := AddSubgroup.add_mem_sup hy₀ hm
       have e : y₀ + (y - y₀) = y := by abel
       rw [e] at hs
       exact hs
@@ -73,8 +76,9 @@ theorem relIndex_eq_of_reps {R V : Type*} [Ring R] [AddCommGroup V] [Module R V]
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem spanTo_mono {L : LocE F E} {r k : ℕ} (S : Frames L r k) (g : Fin (r + 1) → S.V) {a b : ℕ}
-    (h : a ≤ b) : S.spanTo g a ≤ S.spanTo g b := by
+theorem spanTo_mono
+    {L : LocE F E} {r k : ℕ} (S : Frames L r k) (g : Fin (r + 1) → S.V) {a b : ℕ} (h : a ≤ b)
+    : S.spanTo g a ≤ S.spanTo g b := by
   unfold Frames.spanTo
   apply Submodule.span_mono
   rintro _ ⟨i, hi, rfl⟩
@@ -89,10 +93,23 @@ theorem th_ne_zero {L : LocE F E} {r k : ℕ} (S : Frames L r k) : S.th ≠ 0 :=
   · exact one_ne_zero
 
 set_option maxHeartbeats 1000000 in
-theorem inFF_moved_of_not_leak : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), ∀ (j : Fin r) (β βJ : ℕ) (d : S.Datum) (Λ : Submodule L.O S.V), S.IsTerm d Λ → S.InFF β (j + 1) βJ d Λ → ∀ x x' u s, S.IsMove (j + 1) d Λ x x' u s → (∃ y ∈ Λ, y ∈ S.W0 ∧ S.h u y = 1) → ∀ Λ₁ : Submodule L.O S.V, (Λ₁ : Set S.V) = S.moved Λ x u s → S.InFF β (j + 1) βJ d Λ₁ := by
+theorem inFF_moved_of_not_leak
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k),
+        ∀ (j : Fin r) (β βJ : ℕ) (d : S.Datum) (Λ : Submodule L.O S.V),
+          S.IsTerm d Λ → S.InFF β (j + 1) βJ d Λ
+            → ∀ x x' u s,
+              S.IsMove (j + 1) d Λ x x' u s → (∃ y ∈ Λ, y ∈ S.W0 ∧ S.h u y = 1)
+                → ∀ Λ₁ : Submodule L.O S.V,
+                  (Λ₁ : Set S.V) = S.moved Λ x u s → S.InFF β (j + 1) βJ d Λ₁ := by
   intro F _ _ _ _ _ E _ _ _ L r k S j β βJ d Λ hT hF x x' u s hMv hleak Λ₁ hΛ₁
-  obtain ⟨hT₁, hY⟩ := GlobalTheory.T.hermitianMove_preserves_frameLattice_levels L r k S j β βJ d Λ hT hF x x' u s hMv Λ₁ hΛ₁
-  have h78 := GlobalTheory.T.hermitianDefectClass_mem_trace_firstFrameSpan L r k S j β βJ d Λ hT hF x x' u s hMv hleak Λ₁ hΛ₁
+  obtain ⟨hT₁, hY⟩ :=
+    GlobalTheory.T.hermitianMove_preserves_frameLattice_levels L r k S j β βJ d Λ hT hF x x' u s hMv
+      Λ₁ hΛ₁
+  have h78 :=
+    GlobalTheory.T.hermitianDefectClass_mem_trace_firstFrameSpan L r k S j β βJ d Λ hT hF x x' u s
+      hMv hleak Λ₁ hΛ₁
   have h64 := GlobalTheory.T.termLevel_zero_and_bounded_representatives L r k S d Λ hT
   have h64₁ := GlobalTheory.T.termLevel_zero_and_bounded_representatives L r k S d Λ₁ hT₁
   have hMs : S.M d Λ ≤ S.sat Λ := (GlobalTheory.HL.TermBasic.term_basic L r k S d Λ hT).2.2.1
@@ -113,9 +130,11 @@ theorem inFF_moved_of_not_leak : ∀ {F : Type} [Field F] [ValuativeRel F] [Topo
   have hYX : Y ≤ S.X ⊔ S.X' := by
     rw [hYdef]
     exact sup_le_sup (spanTo_mono S S.f hjr) (spanTo_mono S S.f' hjr)
-  have hYY : ∀ y ∈ Y, (y ∈ Λ → y ∈ Λ₁) ∧ (y ∈ S.M d Λ₁ ↔ y ∈ S.M d Λ) ∧
-      S.lev (S.fr d Λ₁) (S.fr' d Λ₁) y = S.lev (S.fr d Λ) (S.fr' d Λ) y :=
-    fun y hy => hY y ((hYmem y).1 hy)
+  have hYY
+      : ∀ y ∈ Y,
+        (y ∈ Λ → y ∈ Λ₁) ∧ (y ∈ S.M d Λ₁ ↔ y ∈ S.M d Λ)
+          ∧ S.lev (S.fr d Λ₁) (S.fr' d Λ₁) y = S.lev (S.fr d Λ) (S.fr' d Λ) y := fun y hy =>
+    hY y ((hYmem y).1 hy)
   have memSat : ∀ (Λ' : Submodule L.O S.V) (y : S.V), y ∈ S.sat Λ' ↔ y ∈ Λ' ∧ y ∈ S.ME := by
     intro Λ' y
     unfold Frames.sat
@@ -147,13 +166,17 @@ theorem inFF_moved_of_not_leak : ∀ {F : Type} [Field F] [ValuativeRel F] [Topo
     obtain ⟨y₀, h1, h2, h3⟩ := h78 y hy
     exact ⟨y₀, (hB₀ y₀).2 ⟨h1, (hYmem y₀).2 h2⟩, h3⟩
 
-  have hinv : ∀ (Λ' : Submodule L.O S.V), S.IsTerm d Λ' → ∀ y ∈ S.sat Λ', ∀ y₁,
-      y - y₁ ∈ S.M d Λ' → S.levC d Λ' y₁ = S.levC d Λ' y := by
+  have hinv
+      : ∀ (Λ' : Submodule L.O S.V),
+        S.IsTerm d Λ'
+          → ∀ y ∈ S.sat Λ', ∀ y₁, y - y₁ ∈ S.M d Λ' → S.levC d Λ' y₁ = S.levC d Λ' y := by
     intro Λ' hT' y hy y₁ hm
     have hm' : -(y - y₁) ∈ S.M d Λ' := (S.M d Λ').neg_mem hm
     have e₁ : -(y - y₁) = y₁ - y := by abel
     rw [e₁] at hm'
-    have hc := (GlobalTheory.T.termLevel_zero_and_bounded_representatives L r k S d Λ' hT').2.2.1 y hy (y₁ - y) hm'
+    have hc :=
+      (GlobalTheory.T.termLevel_zero_and_bounded_representatives L r k S d Λ' hT').2.2.1 y hy
+        (y₁ - y) hm'
     have e₂ : y + (y₁ - y) = y₁ := by abel
     rw [e₂] at hc
     exact hc
@@ -187,8 +210,10 @@ theorem inFF_moved_of_not_leak : ∀ {F : Type} [Field F] [ValuativeRel F] [Topo
     rw [e] at h2
     exact h2
   have hTB₁ : S.TypeBe d Λ₁ :=
-    GlobalTheory.T.pairing_second_type_test_on_representatives L r k S d Λ₁ hT₁ hnotBB (B₀ : Set S.V)
-      (fun y hy => ⟨hB₀Λ₁ y hy, hYX (hB₀Y y hy)⟩) rep₁
+    GlobalTheory.T.pairing_second_type_test_on_representatives L r k S d Λ₁ hT₁ hnotBB
+      (B₀ : Set S.V)
+      (fun y hy => ⟨hB₀Λ₁ y hy, hYX (hB₀Y y hy)⟩)
+      rep₁
       (fun x₁ hx₁ x₁' hx₁' x₂ hx₂ x₂' hx₂' h1 h2 =>
         hTB.2.2 x₁ hx₁ x₁' hx₁' x₂ hx₂ x₂' hx₂' (hInTh _ h1) (hInTh _ h2))
 
@@ -205,10 +230,11 @@ theorem inFF_moved_of_not_leak : ∀ {F : Type} [Field F] [ValuativeRel F] [Topo
     refine ⟨y₁, hB₀sat₁ y₁ hy₁, ?_⟩
     rw [hlev y₁ hy₁, hinv Λ hT z hz y₁ hm, hzJ]
 
-  have hset : ∀ (Λ' : Submodule L.O S.V), S.IsTerm d Λ' → (∀ y ∈ B₀, y ∈ S.sat Λ') →
-      (∀ y ∈ S.sat Λ', ∃ y₀ ∈ B₀, y - y₀ ∈ S.M d Λ') →
-      {C : Set S.V | ∃ y ∈ S.sat Λ', S.levC d Λ' y = ↑j + 1 ∧ C = {x | x - y ∈ S.M d Λ'}} =
-        (fun y => {x | x - y ∈ S.M d Λ'}) '' {y | y ∈ B₀ ∧ S.levC d Λ' y = ↑j + 1} := by
+  have hset
+      : ∀ (Λ' : Submodule L.O S.V),
+        S.IsTerm d Λ' → (∀ y ∈ B₀, y ∈ S.sat Λ') → (∀ y ∈ S.sat Λ', ∃ y₀ ∈ B₀, y - y₀ ∈ S.M d Λ')
+          → {C : Set S.V | ∃ y ∈ S.sat Λ', S.levC d Λ' y = ↑j + 1 ∧ C = {x | x - y ∈ S.M d Λ'}}
+            = (fun y => {x | x - y ∈ S.M d Λ'}) '' {y | y ∈ B₀ ∧ S.levC d Λ' y = ↑j + 1} := by
     intro Λ' hT' hBs hrep
     ext C
     constructor
@@ -232,7 +258,8 @@ theorem inFF_moved_of_not_leak : ∀ {F : Type} [Field F] [ValuativeRel F] [Topo
     apply ncard_image_eq_of_iff
     intro a ha b hb
     have hab : a - b ∈ Y := Y.sub_mem (hB₀Y a ha.1) (hB₀Y b hb.1)
-    exact (coset_eq_iff (S.M d Λ₁) a b).trans ((hYY _ hab).2.1.trans (coset_eq_iff (S.M d Λ) a b).symm)
+    exact (coset_eq_iff (S.M d Λ₁) a b).trans
+      ((hYY _ hab).2.1.trans (coset_eq_iff (S.M d Λ) a b).symm)
   exact ⟨hTB₁, hbe₁.trans hbe, hle₁, hex₁, hn₁⟩
 
 end GlobalTheory.HL.OffLeak

@@ -83,9 +83,9 @@ lemma top_of_closedPoint {V : Type} [CommRing V] [IsLocalRing V] (U : (Spec (Com
   refine eq_top_iff.mpr fun y _ => ?_
   exact (IsLocalRing.specializes_closedPoint (R := V) y).mem_open U.isOpen hU
 
-theorem gen_local {V : Type} [CommRing V] [IsLocalRing V]
-    (M : LB (Spec (CommRingCat.of V))) (hM : M.IsLB) : ∃ e : M.Gen, e.IsGen := by
-
+theorem gen_local
+    {V : Type} [CommRing V] [IsLocalRing V] (M : LB (Spec (CommRingCat.of V))) (hM : M.IsLB)
+    : ∃ e : M.Gen, e.IsGen := by
   have hp : (IsLocalRing.closedPoint V : Spec (CommRingCat.of V)) ∈ ⨆ i, M.U i := by
     rw [hM.cover]
     exact TopologicalSpace.Opens.mem_top _
@@ -94,7 +94,9 @@ theorem gen_local {V : Type} [CommRing V] [IsLocalRing V]
   have hle : ∀ W : (Spec (CommRingCat.of V)).Opens, W ≤ M.U i0 := fun W => by
     rw [htop]
     exact le_top
-  have hid : ∀ {W : (Spec (CommRingCat.of V)).Opens} (h0 : W ≤ W) (z : Γ(Spec (CommRingCat.of V), W)ˣ), res h0 z = z := by
+  have hid
+      : ∀ {W : (Spec (CommRingCat.of V)).Opens} (h0 : W ≤ W) (z : Γ(Spec (CommRingCat.of V), W)ˣ),
+        res h0 z = z := by
     intro W h0 z
     have h1 : homOfLE h0 = 𝟙 W := rfl
     ext
@@ -109,18 +111,21 @@ theorem gen_local {V : Type} [CommRing V] [IsLocalRing V]
   simp only [res_res']
   exact hc'.symm
 
-theorem gen_local_linComb {V : Type} [CommRing V] [IsLocalRing V] {X : Scheme.{0}} (L : LB X)
-    (hL : L.IsLB) {K : Type} [Fintype K] (φ : K → (Spec (CommRingCat.of V) ⟶ X)) (ε : K → ℤ) :
-    ∃ e : LB.Gen (LB.LinComb L φ ε), e.IsGen :=
+theorem gen_local_linComb
+    {V : Type} [CommRing V] [IsLocalRing V]
+    {X : Scheme.{0}} (L : LB X) (hL : L.IsLB)
+    {K : Type} [Fintype K]
+    (φ : K → (Spec (CommRingCat.of V) ⟶ X)) (ε : K → ℤ)
+    : ∃ e : LB.Gen (LB.LinComb L φ ε), e.IsGen :=
   gen_local _ (by
     first
-      | exact linComb_isLB
-      | exact linComb_isLB hL
-      | exact linComb_isLB (hL := hL)
-      | exact linComb_isLB hL φ ε
-      | exact linComb_isLB L hL φ ε
-      | exact linComb_isLB (L := L) (φ := φ) (ε := ε) hL
-      | exact linComb_isLB L φ ε hL)
+    | exact linComb_isLB
+    | exact linComb_isLB hL
+    | exact linComb_isLB (hL := hL)
+    | exact linComb_isLB hL φ ε
+    | exact linComb_isLB L hL φ ε
+    | exact linComb_isLB (L := L) (φ := φ) (ε := ε) hL
+    | exact linComb_isLB L φ ε hL)
 
 end Gen
 

@@ -32,8 +32,8 @@ namespace DivisorReduction
 
 theorem orderAtLeastLocus_inter_ker_support_eq_empty_of_comap
     {S X : Scheme.{u}} (ι : S ⟶ X) [AlgebraicGeometry.IsClosedImmersion ι]
-    (J : X.IdealSheafData) (m : ℕ) (h : orderAtLeastLocus (J.comap ι) m = ∅) :
-    orderAtLeastLocus J m ∩ (↑(Scheme.Hom.ker ι).support : Set ↥X) = ∅ := by
+    (J : X.IdealSheafData) (m : ℕ) (h : orderAtLeastLocus (J.comap ι) m = ∅)
+    : orderAtLeastLocus J m ∩ (↑(Scheme.Hom.ker ι).support : Set ↥X) = ∅ := by
   ext x
   simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and]
   intro hx hker
@@ -54,91 +54,115 @@ theorem orderAtLeastLocus_inter_ker_support_eq_empty_of_comap
   exact hy'
 
 theorem orderAtLeastLocus_inter_support_ker_eq_empty
-    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u}) (hno : BlowupPreservesNoetherian.{u})
-    (T : MarkedIdealWithBoundary.{u}) [AlgebraicGeometry.IsNoetherian T.scheme] (j : ℕ)
-    (hj : j < T.boundary.length) (s : (restrictToDivisor T j hj).SequenceOfBlowups)
-    (hpr : (MarkedBlowupSequenceData.ofMarkedSequence s).toBlowupSequenceData.CentersContainNoComponent)
+    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u})
+    (hno : BlowupPreservesNoetherian.{u})
+    (T : MarkedIdealWithBoundary.{u}) [AlgebraicGeometry.IsNoetherian T.scheme]
+    (j : ℕ) (hj : j < T.boundary.length) (s : (restrictToDivisor T j hj).SequenceOfBlowups)
+    (hpr : (MarkedBlowupSequenceData.ofMarkedSequence
+      s).toBlowupSequenceData.CentersContainNoComponent)
     (hdiv : ∀ i < s.length,
-      ∃ B : ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).obj
-          (i + 1)).IdealSheafData,
+      ∃ B : ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T)
+          (lowerBoundaryWithoutBlowup T) s hpr).obj (i + 1)).IdealSheafData,
         Blowup.exceptionalIdeal
-            ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).map i)
-            ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).center i) ^ T.mult *
-            B =
-          (((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).controlledTransform
+                ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T)
+                  (lowerBoundaryWithoutBlowup T) s hpr).map i)
+                ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T)
+                  (lowerBoundaryWithoutBlowup T) s hpr).center i)
+              ^ T.mult
+            * B
+          = (((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T)
+                (lowerBoundaryWithoutBlowup T) s hpr).controlledTransform
               (lowerIdealWithoutBlowup T) T.mult i).comap
-            ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).map i)))
-    (hempty : orderAtLeastLocus (s.ideal s.length) T.mult = ∅) :
-    orderAtLeastLocus
-          ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).controlledTransform
-            T.ideal T.mult s.length)
-          T.mult ∩
-        (↑(Scheme.Hom.ker
-              (embeddingIntoAmbient hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr
-                s.length)).support :
-          Set ↥((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).obj s.length)) =
-      ∅ := by
+            ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T)
+              (lowerBoundaryWithoutBlowup T) s hpr).map i)))
+    (hempty : orderAtLeastLocus (s.ideal s.length) T.mult = ∅)
+    : orderAtLeastLocus
+          ((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T)
+            (lowerBoundaryWithoutBlowup T) s hpr).controlledTransform T.ideal T.mult s.length)
+          T.mult
+        ∩ (↑(Scheme.Hom.ker (embeddingIntoAmbient hres hno T j hj (lowerIdealWithoutBlowup T)
+            (lowerBoundaryWithoutBlowup T) s hpr s.length)).support
+          : Set ↥((ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T)
+            (lowerBoundaryWithoutBlowup T) s hpr).obj s.length))
+      = ∅ := by
   have hid : lowerIdealWithoutBlowup T = T.ideal := by
     show T.ideal.comap (CategoryStruct.id T.scheme) = T.ideal
     simp
-  have hcomap := comap_controlledTransform_embeddingIntoAmbient hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T)
-    s hpr s.length le_rfl hdiv
-  have hctrl :
-      (ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).controlledTransform
-          T.ideal T.mult s.length =
-        (ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).controlledTransform
-          (lowerIdealWithoutBlowup T) T.mult s.length :=
+  have hcomap :=
+    comap_controlledTransform_embeddingIntoAmbient hres hno T j hj (lowerIdealWithoutBlowup T)
+      (lowerBoundaryWithoutBlowup T) s hpr s.length le_rfl hdiv
+  have hctrl
+      : (ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T)
+          s hpr).controlledTransform T.ideal T.mult s.length
+        = (ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T)
+            (lowerBoundaryWithoutBlowup T) s hpr).controlledTransform (lowerIdealWithoutBlowup T)
+          T.mult s.length :=
     congrArg
-      (fun I => (ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr).controlledTransform
-        I T.mult s.length) hid.symm
+      (fun I =>
+        (ambientBlowupSeq hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T)
+          s hpr).controlledTransform I T.mult s.length)
+      hid.symm
   refine orderAtLeastLocus_inter_ker_support_eq_empty_of_comap
-    (embeddingIntoAmbient hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T) s hpr s.length) _ T.mult ?_
+    (embeddingIntoAmbient hres hno T j hj (lowerIdealWithoutBlowup T) (lowerBoundaryWithoutBlowup T)
+      s hpr s.length)
+    _ T.mult ?_
   rw [hctrl, hcomap]
   exact hempty
 
 theorem orderAtLeastLocus_controlledTransform_inter_ker_support_eq_empty
-    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u}) (hno : BlowupPreservesNoetherian.{u})
-    (T : MarkedIdealWithBoundary.{u}) [AlgebraicGeometry.IsNoetherian T.scheme] (j : ℕ)
-    (hj : j < T.boundary.length)
-    (hb : Blowup.IsBlowupAlongIdealSheaf (CategoryStruct.id T.scheme) (containedComponentsIdeal T j hj))
+    (hres : FunctorialResolution.Blowup.StrictTransformIsBlowupOfClosedSubscheme.{u})
+    (hno : BlowupPreservesNoetherian.{u})
+    (T : MarkedIdealWithBoundary.{u}) [AlgebraicGeometry.IsNoetherian T.scheme]
+    (j : ℕ) (hj : j < T.boundary.length)
+    (hb : Blowup.IsBlowupAlongIdealSheaf (CategoryStruct.id T.scheme)
+      (containedComponentsIdeal T j hj))
     (s : (restrictTwistedToDivisor T j hj).SequenceOfBlowups)
-    (hpr : (MarkedBlowupSequenceData.ofMarkedSequence s).toBlowupSequenceData.CentersContainNoComponent)
+    (hpr : (MarkedBlowupSequenceData.ofMarkedSequence
+      s).toBlowupSequenceData.CentersContainNoComponent)
     (hdiv : ∀ i < s.length,
-      ∃ B : ((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr).obj
-          (i + 1)).IdealSheafData,
+      ∃ B : ((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+          (lowerBoundaryAfterBlowup T j hj) s hpr).obj (i + 1)).IdealSheafData,
         Blowup.exceptionalIdeal
-            ((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr).map i)
-            ((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr).center i) ^
-              T.mult * B =
-          (((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr).controlledTransform
+                ((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+                  (lowerBoundaryAfterBlowup T j hj) s hpr).map i)
+                ((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+                  (lowerBoundaryAfterBlowup T j hj) s hpr).center i)
+              ^ T.mult
+            * B
+          = (((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+                (lowerBoundaryAfterBlowup T j hj) s hpr).controlledTransform
               (lowerIdealAfterBlowup T j hj) T.mult i).comap
-            ((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr).map i)))
-    (hone :
-      (BlowupSequenceData.prepend (containedComponentsIdeal T j hj) hb
-            (ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr)).controlledTransform
-          T.ideal T.mult 1 =
-        (lowerIdealAfterBlowup T j hj).comap
-          (ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr).isoZero.hom)
-    (hempty : orderAtLeastLocus (s.ideal s.length) T.mult = ∅) :
-    orderAtLeastLocus
+            ((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+              (lowerBoundaryAfterBlowup T j hj) s hpr).map i)))
+    (hone : (BlowupSequenceData.prepend (containedComponentsIdeal T j hj) hb
+        (ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+          (lowerBoundaryAfterBlowup T j hj) s hpr)).controlledTransform T.ideal T.mult 1
+      = (lowerIdealAfterBlowup T j hj).comap
+        (ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+          (lowerBoundaryAfterBlowup T j hj) s hpr).isoZero.hom)
+    (hempty : orderAtLeastLocus (s.ideal s.length) T.mult = ∅)
+    : orderAtLeastLocus
           ((BlowupSequenceData.prepend (containedComponentsIdeal T j hj) hb
-                (ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s
-                  hpr)).controlledTransform
-            T.ideal T.mult (s.length + 1))
-          T.mult ∩
-        (↑(Scheme.Hom.ker
-              (embeddingIntoAmbient hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr
-                s.length)).support :
-          Set ↥((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr).obj
-            s.length)) =
-      ∅ := by
-  have h1 := BlowupSequenceData.controlledTransform_prepend_succ (containedComponentsIdeal T j hj) hb
-    (ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr)
-    T.ideal (lowerIdealAfterBlowup T j hj) T.mult hone s.length
-  have h2 := comap_controlledTransform_embeddingIntoAmbient hres hno T j hj (lowerIdealAfterBlowup T j hj)
-    (lowerBoundaryAfterBlowup T j hj) s hpr s.length le_rfl hdiv
+              (ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+                (lowerBoundaryAfterBlowup T j hj) s hpr)).controlledTransform T.ideal T.mult
+            (s.length + 1))
+          T.mult
+        ∩ (↑(Scheme.Hom.ker (embeddingIntoAmbient hres hno T j hj (lowerIdealAfterBlowup T j hj)
+            (lowerBoundaryAfterBlowup T j hj) s hpr s.length)).support
+          : Set ↥((ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+            (lowerBoundaryAfterBlowup T j hj) s hpr).obj s.length))
+      = ∅ := by
+  have h1 :=
+    BlowupSequenceData.controlledTransform_prepend_succ (containedComponentsIdeal T j hj) hb
+      (ambientBlowupSeq hres hno T j hj (lowerIdealAfterBlowup T j hj)
+        (lowerBoundaryAfterBlowup T j hj) s hpr)
+      T.ideal (lowerIdealAfterBlowup T j hj) T.mult hone s.length
+  have h2 :=
+    comap_controlledTransform_embeddingIntoAmbient hres hno T j hj (lowerIdealAfterBlowup T j hj)
+      (lowerBoundaryAfterBlowup T j hj) s hpr s.length le_rfl hdiv
   refine orderAtLeastLocus_inter_ker_support_eq_empty_of_comap
-    (embeddingIntoAmbient hres hno T j hj (lowerIdealAfterBlowup T j hj) (lowerBoundaryAfterBlowup T j hj) s hpr s.length)
+    (embeddingIntoAmbient hres hno T j hj (lowerIdealAfterBlowup T j hj)
+      (lowerBoundaryAfterBlowup T j hj) s hpr s.length)
     _ T.mult ?_
   rw [h1, h2]
   exact hempty

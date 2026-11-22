@@ -13,11 +13,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AdeleIdem
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
+open GlobalTheory.FinPl
+  (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 set_option synthInstance.maxHeartbeats 160000
@@ -27,40 +32,51 @@ noncomputable section
 
 namespace GlobalTheory.UniOff
 
-open GlobalTheory.FinPlLoc (idem idem_mem_idAt idem_mem_intAt idem_mul_self cA_idem mem_idAt_iff ePl ePl_int evalV_ePl)
+open GlobalTheory.FinPlLoc
+  (idem idem_mem_idAt idem_mem_intAt idem_mul_self cA_idem mem_idAt_iff ePl ePl_int evalV_ePl)
 
-theorem intAt_neg {D : D7} {v : GlobalTheory.FinPl.Pl D} {z : AE D} (h : z ∈ intAt D (· = v)) : -z ∈ intAt D (· = v) :=
+theorem intAt_neg {D : D7} {v : GlobalTheory.FinPl.Pl D} {z : AE D} (h : z ∈ intAt D (· = v))
+    : -z ∈ intAt D (· = v) :=
   ⟨neg_mem h.1, by rw [map_neg]; exact neg_mem h.2⟩
 
-theorem intAt_add {D : D7} {v : GlobalTheory.FinPl.Pl D} {z w : AE D} (h : z ∈ intAt D (· = v)) (h' : w ∈ intAt D (· = v)) :
-    z + w ∈ intAt D (· = v) :=
+theorem intAt_add
+    {D : D7} {v : GlobalTheory.FinPl.Pl D} {z w : AE D}
+    (h : z ∈ intAt D (· = v)) (h' : w ∈ intAt D (· = v))
+    : z + w ∈ intAt D (· = v) :=
   ⟨add_mem h.1 h'.1, by rw [map_add]; exact add_mem h.2 h'.2⟩
 
-theorem idem_incA_mem {D : D7} (v : GlobalTheory.FinPl.Pl D) (o : 𝓞 D.host.E) :
-    idem D (· = v) * incA D (o : D.host.E) ∈ intAt D (· = v) := by
+theorem idem_incA_mem {D : D7} (v : GlobalTheory.FinPl.Pl D) (o : 𝓞 D.host.E)
+    : idem D (· = v) * incA D (o : D.host.E) ∈ intAt D (· = v) := by
   refine ⟨Ideal.mul_mem_right _ _ (idem_mem_idAt _), ?_⟩
   rw [map_mul, GlobalTheory.IdeleAA.finPart_incA]
   unfold idem
   rw [GlobalTheory.FinPlLoc.finPart_pair, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
   exact AddSubgroup.subset_closure ⟨ePl D (· = v), ePl_int _, o, rfl⟩
 
-theorem idem_incA {D : D7} (P : GlobalTheory.FinPl.Pl D → Prop) (e : D.host.E) :
-    idem D P * incA D e = pairA D.host.F 0 (ePl D P) ⊗ₜ[D.host.F] e := by
+theorem idem_incA {D : D7} (P : GlobalTheory.FinPl.Pl D → Prop) (e : D.host.E)
+    : idem D P * incA D e = pairA D.host.F 0 (ePl D P) ⊗ₜ[D.host.F] e := by
   unfold idem
   show (pairA D.host.F 0 (ePl D P) ⊗ₜ[D.host.F] (1 : D.host.E)) * ((1 : AF D.host.F) ⊗ₜ[D.host.F] e) = _
   rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
 
-theorem gen_mem {D : D7} (S : HSp D) (𝔞 : Set D.host.E) (L : GlobalTheory.FinPl.Lat S) (v : GlobalTheory.FinPl.Pl D)
-    (P : GlobalTheory.FinPl.Pl D → Prop) (hP : ∀ w, ¬ P w → w ≠ v) {a : D.host.E} (ha : a ∈ 𝔞) {x : Fin S.rank → D.host.E}
-    (hx : x ∈ L) : (fun m => idem D (· = v) * incA D (a * x m)) ∈ GlobalTheory.FinPl.latMul S 𝔞 L P := by
+theorem gen_mem
+    {D : D7} (S : HSp D) (𝔞 : Set D.host.E) (L : GlobalTheory.FinPl.Lat S)
+    (v : GlobalTheory.FinPl.Pl D) (P : GlobalTheory.FinPl.Pl D → Prop) (hP : ∀ w, ¬ P w → w ≠ v)
+    {a : D.host.E} (ha : a ∈ 𝔞)
+    {x : Fin S.rank → D.host.E} (hx : x ∈ L)
+    : (fun m => idem D (· = v) * incA D (a * x m)) ∈ GlobalTheory.FinPl.latMul S 𝔞 L P := by
   apply AddSubgroup.subset_closure
-  refine ⟨ePl D (· = v), ePl_int _, fun w hw => by rw [evalV_ePl, if_neg (hP w hw)], a, ha, x, hx, ?_⟩
+  refine
+    ⟨ePl D (· = v), ePl_int _, fun w hw => by rw [evalV_ePl, if_neg (hP w hw)], a, ha, x, hx, ?_⟩
   funext m
   exact idem_incA _ _
 
-theorem col_mem {D : D7} {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B c ε)
-    (Λ : Submodule (𝓞 D.host.E) (Fin A.rank → D.host.E)) (𝔟 : Fin c → FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
-    (p : Fin c) {t : D.host.E} (ht : t ∈ 𝔟 p) : (fun m => t * d.a m p) ∈ d.lat Λ 𝔟 := by
+theorem col_mem
+    {D : D7} {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B c ε)
+    (Λ : Submodule (𝓞 D.host.E) (Fin A.rank → D.host.E))
+    (𝔟 : Fin c → FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) (p : Fin c)
+    {t : D.host.E} (ht : t ∈ 𝔟 p)
+    : (fun m => t * d.a m p) ∈ d.lat Λ 𝔟 := by
   classical
   refine ⟨0, Λ.zero_mem, Pi.single p t, fun q => ?_, ?_⟩
   · by_cases hq : q = p

@@ -12,20 +12,25 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DualOf
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix GlobalTheory.St.G
+open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix
+  GlobalTheory.St.G
 open scoped TensorProduct
 
 namespace GlobalTheory.St.G.LevelConj
 
 section General
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
-  [IsFractionRing O K] {n : ℕ}
+variable
+  {O K : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] [IsFractionRing O K]
+  {n : ℕ}
 
 omit [IsFractionRing O K] in
-theorem covBy_of_cyclic {A B : Submodule O (Fin n → K)} (hle : A ≤ B) (hne : A ≠ B) (d : Fin n → K)
-    (hx : ∀ x ∈ B, ∃ a : O, x - a • d ∈ A) (hd : d ∈ B)
-    (hm : ∀ a ∈ IsLocalRing.maximalIdeal O, a • d ∈ A) : A ⋖ B := by
+theorem covBy_of_cyclic
+    {A B : Submodule O (Fin n → K)} (hle : A ≤ B) (hne : A ≠ B)
+    (d : Fin n → K) (hx : ∀ x ∈ B, ∃ a : O, x - a • d ∈ A) (hd : d ∈ B)
+    (hm : ∀ a ∈ IsLocalRing.maximalIdeal O, a • d ∈ A)
+    : A ⋖ B := by
   refine ⟨lt_of_le_of_ne hle hne, fun C hAC hCB => ?_⟩
   obtain ⟨x, hxC, hxA⟩ := SetLike.exists_of_lt hAC
   obtain ⟨a, ha⟩ := hx x (hCB.le hxC)
@@ -38,10 +43,12 @@ theorem covBy_of_cyclic {A B : Submodule O (Fin n → K)} (hle : A ≤ B) (hne :
   obtain ⟨b, hb⟩ := hx y hy
   simpa using add_mem (hAC.le hb) (C.smul_mem b h2)
 
-theorem bidual (B : LinearMap.BilinForm K (Fin n → K)) (hB : B.Nondegenerate)
+theorem bidual
+    (B : LinearMap.BilinForm K (Fin n → K)) (hB : B.Nondegenerate)
     (N : Submodule O (Fin n → K)) (hfg : N.FG) (hsp : Submodule.span K (N : Set (Fin n → K)) = ⊤)
     (u : Fin n → K)
-    (hu : ∀ w, (∀ u' ∈ N, B u' w ∈ (1 : Submodule O K)) → B u w ∈ (1 : Submodule O K)) : u ∈ N := by
+    (hu : ∀ w, (∀ u' ∈ N, B u' w ∈ (1 : Submodule O K)) → B u w ∈ (1 : Submodule O K))
+    : u ∈ N := by
   classical
   haveI : N.IsFullLattice K := { toIsLattice := Submodule.IsLattice.of_fg K hfg, span_eq_top := hsp }
   have := Submodule.IsLattice.finite K N
@@ -53,8 +60,9 @@ theorem bidual (B : LinearMap.BilinForm K (Fin n → K)) (hB : B.Nondegenerate)
       congr 1
       exact funext fun i => b.extendOfIsFullLattice_apply K i
     rw [h1, ← Submodule.map_span, b.span_eq, Submodule.map_subtype_top]
-  have e := LinearMap.BilinForm.dualSubmodule_dualSubmodule_flip_of_basis (R := O) B hB
-    (b.extendOfIsFullLattice K)
+  have e :=
+    LinearMap.BilinForm.dualSubmodule_dualSubmodule_flip_of_basis (R := O) B hB
+      (b.extendOfIsFullLattice K)
   rw [h] at e
   rw [← e]
   exact fun w hw => hu w hw
@@ -63,26 +71,29 @@ end General
 
 section Comp
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
-  {v : HeightOneSpectrum (𝓞 F)}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {n : ℕ} {v : HeightOneSpectrum (𝓞 F)}
 
-noncomputable def cmp (π : E ⊗[F] v.adicCompletion F →+* v.adicCompletion F) (L : Submodule (𝓞 E) (Fin n → E)) :
-    Submodule (v.adicCompletionIntegers F) (Fin n → v.adicCompletion F) :=
+noncomputable def cmp
+    (π : E ⊗[F] v.adicCompletion F →+* v.adicCompletion F) (L : Submodule (𝓞 E) (Fin n → E))
+    : Submodule (v.adicCompletionIntegers F) (Fin n → v.adicCompletion F) :=
   Submodule.span _ ((fun x i => π (inclE (F := F) _ (x i))) '' (L : Set (Fin n → E)))
 
 variable {π : E ⊗[F] v.adicCompletion F →+* v.adicCompletion F}
 
-theorem mem_cmp (hπ : ∀ a, π ((1 : E) ⊗ₜ[F] a) = a)
-    (hint : ∀ t ∈ intV E v, π t ∈ v.adicCompletionIntegers F) (L : Submodule (𝓞 E) (Fin n → E))
-    (a : Fin n → v.adicCompletion F) :
-    a ∈ cmp π L ↔ ∃ y ∈ loc v L, (fun b => π (y b)) = a := by
+theorem mem_cmp
+    (hπ : ∀ a, π ((1 : E) ⊗ₜ[F] a) = a) (hint : ∀ t ∈ intV E v, π t ∈ v.adicCompletionIntegers F)
+    (L : Submodule (𝓞 E) (Fin n → E)) (a : Fin n → v.adicCompletion F)
+    : a ∈ cmp π L ↔ ∃ y ∈ loc v L, (fun b => π (y b)) = a := by
   constructor
   · intro ha
     induction ha using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨y, hy, rfl⟩ := hx
       exact ⟨_, Submodule.subset_span ⟨y, hy, rfl⟩, rfl⟩
-    | zero => exact ⟨0, zero_mem _, by funext b; simp⟩
+    | zero =>
+      exact ⟨0, zero_mem _, by funext b; simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨x, hx, rfl⟩ := hx
       obtain ⟨y, hy, rfl⟩ := hy
@@ -100,7 +111,8 @@ theorem mem_cmp (hπ : ∀ a, π ((1 : E) ⊗ₜ[F] a) = a)
     | mem x hx =>
       obtain ⟨y, hy, rfl⟩ := hx
       exact Submodule.subset_span ⟨y, hy, rfl⟩
-    | zero => simp only [Pi.zero_apply, map_zero]; exact zero_mem _
+    | zero =>
+      simp only [Pi.zero_apply, map_zero]; exact zero_mem _
     | add x y _ _ hx hy =>
       simp only [Pi.add_apply, map_add (f := _)]; exact add_mem hx hy
     | smul c x _ hx =>
@@ -109,11 +121,16 @@ theorem mem_cmp (hπ : ∀ a, π ((1 : E) ⊗ₜ[F] a) = a)
       funext b
       exact map_mul π (c : E ⊗[F] v.adicCompletion F) (x b)
 
-theorem cmp_fg (hint : ∀ t ∈ intV E v, π t ∈ v.adicCompletionIntegers F)
-    {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L) : (cmp π L).FG := by
+theorem cmp_fg
+    (hint : ∀ t ∈ intV E v, π t ∈ v.adicCompletionIntegers F)
+    {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L)
+    : (cmp π L).FG := by
   obtain ⟨s, hs⟩ := (Module.Finite.iff_fg).1 hL.1
-  refine Submodule.fg_def.2 ⟨(fun x i => π (inclE (F := F) _ (x i))) '' (s : Set (Fin n → E)),
-    s.finite_toSet.image _, le_antisymm (Submodule.span_mono (Set.image_mono ?_)) ?_⟩
+  refine Submodule.fg_def.2 ⟨
+    (fun x i => π (inclE (F := F) _ (x i))) '' (s : Set (Fin n → E)),
+    s.finite_toSet.image _,
+    le_antisymm (Submodule.span_mono (Set.image_mono ?_)) ?_
+  ⟩
   · rw [← hs]; exact Submodule.subset_span
   · rw [cmp, Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
@@ -121,8 +138,7 @@ theorem cmp_fg (hint : ∀ t ∈ intV E v, π t ∈ v.adicCompletionIntegers F)
     induction hx using Submodule.span_induction with
     | mem x hx => exact Submodule.subset_span ⟨x, hx, rfl⟩
     | zero => simp only [Pi.zero_apply, map_zero]; exact zero_mem _
-    | add x y _ _ hx hy =>
-      simp only [Pi.add_apply, map_add (f := _)]; exact add_mem hx hy
+    | add x y _ _ hx hy => simp only [Pi.add_apply, map_add (f := _)]; exact add_mem hx hy
     | smul c x _ hx =>
       have hc : inclE (F := F) (v.adicCompletion F) (c : E) ∈ intV E v :=
         Subring.subset_closure (Or.inl ⟨⟨c, c, rfl⟩, rfl⟩)
@@ -132,17 +148,18 @@ theorem cmp_fg (hint : ∀ t ∈ intV E v, π t ∈ v.adicCompletionIntegers F)
       change π (inclE _ ((c : E) * x b)) = π _ * π _
       rw [map_mul, map_mul]
 
-theorem cmp_span {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L) :
-    Submodule.span (v.adicCompletion F) (cmp π L : Set (Fin n → v.adicCompletion F)) = ⊤ := by
-  have key : ∀ x : Fin n → E, (fun i => π (inclE (F := F) _ (x i))) ∈
-      Submodule.span (v.adicCompletion F) (cmp π L : Set (Fin n → v.adicCompletion F)) := by
+theorem cmp_span {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L)
+    : Submodule.span (v.adicCompletion F) (cmp π L : Set (Fin n → v.adicCompletion F)) = ⊤ := by
+  have key
+      : ∀ x : Fin n → E,
+        (fun i => π (inclE (F := F) _ (x i)))
+          ∈ Submodule.span (v.adicCompletion F) (cmp π L : Set (Fin n → v.adicCompletion F)) := by
     intro x
     have hx : x ∈ Submodule.span E (L : Set (Fin n → E)) := hL.2 ▸ Submodule.mem_top
     induction hx using Submodule.span_induction with
     | mem x hx => exact Submodule.subset_span (Submodule.subset_span ⟨x, hx, rfl⟩)
     | zero => simp only [Pi.zero_apply, map_zero]; exact zero_mem _
-    | add x y _ _ hx hy =>
-      simp only [Pi.add_apply, map_add (f := _)]; exact add_mem hx hy
+    | add x y _ _ hx hy => simp only [Pi.add_apply, map_add (f := _)]; exact add_mem hx hy
     | smul c x _ hx =>
       have := Submodule.smul_mem _ (π (inclE (F := F) _ c)) hx
       convert this using 1
@@ -157,8 +174,8 @@ theorem cmp_span {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L) :
   · subst h; simp
   · simp [h]
 
-theorem cmp_nsmul (T : ℕ) {L M : Submodule (𝓞 E) (Fin n → E)} (h : ∀ y ∈ M, T • y ∈ L) :
-    ∀ y ∈ cmp π M, T • y ∈ cmp π L := by
+theorem cmp_nsmul (T : ℕ) {L M : Submodule (𝓞 E) (Fin n → E)} (h : ∀ y ∈ M, T • y ∈ L)
+    : ∀ y ∈ cmp π M, T • y ∈ cmp π L := by
   intro y hy
   induction hy using Submodule.span_induction with
   | mem x hx =>
@@ -174,7 +191,8 @@ end Comp
 
 section Split
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
   {n : ℕ} {v : HeightOneSpectrum (𝓞 F)}
   (sp : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F)
 
@@ -184,32 +202,32 @@ noncomputable abbrev p₁ : E ⊗[F] v.adicCompletion F →+* v.adicCompletion F
 noncomputable abbrev p₂ : E ⊗[F] v.adicCompletion F →+* v.adicCompletion F :=
   (RingHom.snd _ _).comp sp.toRingHom
 
-noncomputable def pairing (J : Matrix (Fin n) (Fin n) E) :
-    LinearMap.BilinForm (v.adicCompletion F) (Fin n → v.adicCompletion F) :=
+noncomputable def pairing (J : Matrix (Fin n) (Fin n) E)
+    : LinearMap.BilinForm (v.adicCompletion F) (Fin n → v.adicCompletion F) :=
   Matrix.toBilin' (J.map ((p₁ sp).comp (inclE (F := F) (v.adicCompletion F))))
 
 omit [StarRing E] in
-theorem pairing_nondegenerate {J : Matrix (Fin n) (Fin n) E} (hdet : J.det ≠ 0) :
-    (pairing sp J).Nondegenerate := by
+theorem pairing_nondegenerate {J : Matrix (Fin n) (Fin n) E} (hdet : J.det ≠ 0)
+    : (pairing sp J).Nondegenerate := by
   apply LinearMap.BilinForm.nondegenerate_toBilin'_of_det_ne_zero'
   rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
   exact (map_ne_zero _).2 hdet
 
-theorem mem_one_iff (a : v.adicCompletion F) :
-    a ∈ (1 : Submodule (v.adicCompletionIntegers F) (v.adicCompletion F)) ↔
-      a ∈ v.adicCompletionIntegers F := by
+theorem mem_one_iff (a : v.adicCompletion F)
+    : a ∈ (1 : Submodule (v.adicCompletionIntegers F) (v.adicCompletion F))
+      ↔ a ∈ v.adicCompletionIntegers F := by
   rw [Submodule.mem_one]
   exact ⟨fun ⟨y, hy⟩ => hy ▸ y.2, fun h => ⟨⟨a, h⟩, rfl⟩⟩
 
-variable {sp} {cm : CMData F E} {J : Matrix (Fin n) (Fin n) E}
-  (hJ : IsHerm (cm.sig : E →+* E) J) (hdet : J.det ≠ 0)
-  (hsig : ∀ x, sp (sigR cm.sig (v.adicCompletion F) x) = swapR _ (sp x))
+variable
+  {sp} {cm : CMData F E} {J : Matrix (Fin n) (Fin n) E} (hJ : IsHerm (cm.sig : E →+* E) J)
+  (hdet : J.det ≠ 0) (hsig : ∀ x, sp (sigR cm.sig (v.adicCompletion F) x) = swapR _ (sp x))
   (hdiag : ∀ a : v.adicCompletion F, sp ((1 : E) ⊗ₜ[F] a) = (a, a))
 
 include hsig in
-theorem fst_hR (x y : Fin n → E ⊗[F] v.adicCompletion F) :
-    p₁ sp (hR cm.sig J (v.adicCompletion F) x y) =
-      pairing sp J (fun b => p₂ sp (x b)) (fun b => p₁ sp (y b)) := by
+theorem fst_hR (x y : Fin n → E ⊗[F] v.adicCompletion F)
+    : p₁ sp (hR cm.sig J (v.adicCompletion F) x y)
+      = pairing sp J (fun b => p₂ sp (x b)) (fun b => p₁ sp (y b)) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [pairing, Matrix.toBilin'_apply, hR, hform, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -222,9 +240,9 @@ theorem fst_hR (x y : Fin n → E ⊗[F] v.adicCompletion F) :
   rfl
 
 include hsig hJ in
-theorem snd_hR (x y : Fin n → E ⊗[F] v.adicCompletion F) :
-    p₂ sp (hR cm.sig J (v.adicCompletion F) x y) =
-      pairing sp J (fun b => p₂ sp (y b)) (fun b => p₁ sp (x b)) := by
+theorem snd_hR (x y : Fin n → E ⊗[F] v.adicCompletion F)
+    : p₂ sp (hR cm.sig J (v.adicCompletion F) x y)
+      = pairing sp J (fun b => p₂ sp (y b)) (fun b => p₁ sp (x b)) := by
   rw [← fst_hR hsig]
   have hτ : ∀ a, sigR cm.sig (v.adicCompletion F) (sigR cm.sig (v.adicCompletion F) a) = a :=
     fun a => sp.injective (by rw [hsig, hsig]; rfl)
@@ -238,34 +256,35 @@ theorem snd_hR (x y : Fin n → E ⊗[F] v.adicCompletion F) :
 
 omit [StarRing E] in
 include hdiag in
-theorem int_iff (t : E ⊗[F] v.adicCompletion F) : t ∈ intV E v ↔
-    p₁ sp t ∈ v.adicCompletionIntegers F ∧ p₂ sp t ∈ v.adicCompletionIntegers F :=
+theorem int_iff (t : E ⊗[F] v.adicCompletion F)
+    : t ∈ intV E v ↔ p₁ sp t ∈ v.adicCompletionIntegers F ∧ p₂ sp t ∈ v.adicCompletionIntegers F :=
   split_integral_local F E v sp hdiag t
 
 omit [StarRing E] in
 include hdiag in
-theorem mem_cmp₁ (L : Submodule (𝓞 E) (Fin n → E)) (a : Fin n → v.adicCompletion F) :
-    a ∈ cmp (p₁ sp) L ↔ ∃ y ∈ loc v L, (fun b => p₁ sp (y b)) = a :=
+theorem mem_cmp₁ (L : Submodule (𝓞 E) (Fin n → E)) (a : Fin n → v.adicCompletion F)
+    : a ∈ cmp (p₁ sp) L ↔ ∃ y ∈ loc v L, (fun b => p₁ sp (y b)) = a :=
   mem_cmp (fun a => congrArg Prod.fst (hdiag a)) (fun t ht => ((int_iff hdiag t).1 ht).1) L a
 
 omit [StarRing E] in
 include hdiag in
-theorem mem_cmp₂ (L : Submodule (𝓞 E) (Fin n → E)) (a : Fin n → v.adicCompletion F) :
-    a ∈ cmp (p₂ sp) L ↔ ∃ y ∈ loc v L, (fun b => p₂ sp (y b)) = a :=
+theorem mem_cmp₂ (L : Submodule (𝓞 E) (Fin n → E)) (a : Fin n → v.adicCompletion F)
+    : a ∈ cmp (p₂ sp) L ↔ ∃ y ∈ loc v L, (fun b => p₂ sp (y b)) = a :=
   mem_cmp (fun a => congrArg Prod.snd (hdiag a)) (fun t ht => ((int_iff hdiag t).1 ht).2) L a
 
 include hJ hdet hsig hdiag
 
-theorem mem_loc_iff (L : Submodule (𝓞 E) (Fin n → E)) (y : Fin n → E ⊗[F] v.adicCompletion F) :
-    y ∈ loc v L ↔ (fun b => p₁ sp (y b)) ∈ cmp (p₁ sp) L ∧ (fun b => p₂ sp (y b)) ∈ cmp (p₂ sp) L := by
+theorem mem_loc_iff (L : Submodule (𝓞 E) (Fin n → E)) (y : Fin n → E ⊗[F] v.adicCompletion F)
+    : y ∈ loc v L
+      ↔ (fun b => p₁ sp (y b)) ∈ cmp (p₁ sp) L ∧ (fun b => p₂ sp (y b)) ∈ cmp (p₂ sp) L := by
   rw [(split_components F E cm n J hJ hdet v sp hsig hdiag).1 L y, mem_cmp₁ hdiag, mem_cmp₂ hdiag]
   simp only [funext_iff]
   rfl
 
-theorem mem_cmp₂_iff {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L)
-    (u : Fin n → v.adicCompletion F) :
-    u ∈ cmp (p₂ sp) L ↔
-      ∀ w ∈ cmp (p₁ sp) (dualL cm.sig J L), pairing sp J u w ∈ v.adicCompletionIntegers F := by
+theorem mem_cmp₂_iff
+    {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L) (u : Fin n → v.adicCompletion F)
+    : u ∈ cmp (p₂ sp) L
+      ↔ ∀ w ∈ cmp (p₁ sp) (dualL cm.sig J L), pairing sp J u w ∈ v.adicCompletionIntegers F := by
   have hD := (GlobalTheory.T.dual_lattice_local_characterization F E cm n J hJ hdet L hL).2.1 v
   constructor
   · intro hu w hw
@@ -288,11 +307,14 @@ theorem mem_cmp₂_iff {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L)
         exact zero_mem _
     · funext b; simp [p₁]
 
-theorem cmp₁_covBy {T f : ℕ} {L : Submodule (𝓞 E) (Fin n → E)} (hT : T.Prime) (hs : SplitsIn E T)
-    (hf : Module.finrank ℚ E = 2 * f) (hL : TLat cm.sig J T f L) (hv : (T : 𝓞 F) ∈ v.asIdeal) :
-    cmp (p₁ sp) L ⋖ cmp (p₁ sp) (dualL cm.sig J L) := by
+theorem cmp₁_covBy
+    {T f : ℕ} {L : Submodule (𝓞 E) (Fin n → E)} (hT : T.Prime) (hs : SplitsIn E T)
+    (hf : Module.finrank ℚ E = 2 * f) (hL : TLat cm.sig J T f L) (hv : (T : 𝓞 F) ∈ v.asIdeal)
+    : cmp (p₁ sp) L ⋖ cmp (p₁ sp) (dualL cm.sig J L) := by
   have hD := (GlobalTheory.T.dual_lattice_local_characterization F E cm n J hJ hdet L hL.1).2.1 v
-  obtain ⟨-, d, hd, hcyc⟩ := GlobalTheory.T.hermitianLattice_level_local_dual_quotient_length_one F E cm n J hJ hdet T f L hT hs hf hL v hv
+  obtain ⟨-, d, hd, hcyc⟩ :=
+    GlobalTheory.T.hermitianLattice_level_local_dual_quotient_length_one F E cm n J hJ hdet T f L hT
+      hs hf hL v hv
   have hmax := ((SplitPrime.split_place F E cm T hT hs).2 v hv).2.1
   have hd' := (mem_cmp₁ hdiag _ _).2 ⟨d, hd, rfl⟩
   refine covBy_of_cyclic ?_ ?_ _ ?_ hd' ?_
@@ -333,36 +355,57 @@ namespace GlobalTheory.St.G
 
 open LevelConj
 
-theorem exists_unitary_of_TLat :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (cm : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHerm (cm.sig : E →+* E) J → J.det ≠ 0 → ∀ (T f : ℕ) (L M : Submodule (𝓞 E) (Fin n → E)), T.Prime → SplitsIn E T → Module.finrank ℚ E = 2 * f → TLat cm.sig J T f L → TLat cm.sig J T f M → ∀ (v : HeightOneSpectrum (𝓞 F)), (T : 𝓞 F) ∈ v.asIdeal → ∃ h ∈ UPts cm.sig J (v.adicCompletion F), ∀ x, x ∈ loc v L ↔ h.1 *ᵥ x ∈ loc v M := by
+theorem exists_unitary_of_TLat
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+        (cm : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+      IsHerm (cm.sig : E →+* E) J → J.det ≠ 0
+        → ∀ (T f : ℕ) (L M : Submodule (𝓞 E) (Fin n → E)),
+          T.Prime → SplitsIn E T → Module.finrank ℚ E = 2 * f → TLat cm.sig J T f L
+            → TLat cm.sig J T f M
+            → ∀ (v : HeightOneSpectrum (𝓞 F)),
+              (T : 𝓞 F) ∈ v.asIdeal
+                → ∃ h ∈ UPts cm.sig J (v.adicCompletion F), ∀ x,
+                  x ∈ loc v L ↔ h.1 *ᵥ x ∈ loc v M := by
   intro F E _ _ _ _ _ _ cm n J hJ hdet T f L M hT hs hf hL hM v hv
   obtain ⟨sp, hsig, hdiag⟩ := ((SplitPrime.split_place F E cm T hT hs).2 v hv).2.2
-  have hint : ∀ t ∈ intV E v, p₁ sp t ∈ v.adicCompletionIntegers F :=
-    fun t ht => ((int_iff hdiag t).1 ht).1
-  obtain ⟨g, hA, hB⟩ := GlobalTheory.T.exists_GL_conj_lattice_pairs_covBy_dvr (v.adicCompletionIntegers F) (v.adicCompletion F) n _ _ _ _
-    (cmp_fg hint (GlobalTheory.T.dual_lattice_local_characterization F E cm n J hJ hdet L hL.1).1)
-    (cmp_fg hint (GlobalTheory.T.dual_lattice_local_characterization F E cm n J hJ hdet M hM.1).1) (cmp_span hL.1) (cmp_span hM.1)
-    (cmp₁_covBy hJ hdet hsig hdiag hT hs hf hL hv) (cmp₁_covBy hJ hdet hsig hdiag hT hs hf hM hv)
+  have hint : ∀ t ∈ intV E v, p₁ sp t ∈ v.adicCompletionIntegers F := fun t ht =>
+    ((int_iff hdiag t).1 ht).1
+  obtain ⟨g, hA, hB⟩ :=
+    GlobalTheory.T.exists_GL_conj_lattice_pairs_covBy_dvr (v.adicCompletionIntegers F)
+      (v.adicCompletion F) n _ _ _ _
+      (cmp_fg hint (GlobalTheory.T.dual_lattice_local_characterization F E cm n J hJ hdet L hL.1).1)
+      (cmp_fg hint (GlobalTheory.T.dual_lattice_local_characterization F E cm n J hJ hdet M hM.1).1)
+      (cmp_span hL.1) (cmp_span hM.1) (cmp₁_covBy hJ hdet hsig hdiag hT hs hf hL hv)
+      (cmp₁_covBy hJ hdet hsig hdiag hT hs hf hM hv)
   obtain ⟨⟨h, hh⟩, hg, -⟩ := (split_components F E cm n J hJ hdet v sp hsig hdiag).2.1 g
   have hg' : ∀ x, (fun b => p₁ sp ((h.1 *ᵥ x) b)) = g.1 *ᵥ fun b => p₁ sp (x b) := by
     intro x
     funext b
     rw [← hg]
     exact RingHom.map_mulVec (p₁ sp) h.1 x b
-  have hinv : ∀ x y, hR cm.sig J (v.adicCompletion F) (h.1 *ᵥ x) (h.1 *ᵥ y) =
-      hR cm.sig J (v.adicCompletion F) x y := by
+  have hinv
+      : ∀ x y,
+        hR cm.sig J (v.adicCompletion F) (h.1 *ᵥ x) (h.1 *ᵥ y)
+          = hR cm.sig J (v.adicCompletion F) x y := by
     intro x y
-    have h0 : cT (sigR cm.sig (v.adicCompletion F)) h.1 * J.map (inclE (F := F) (v.adicCompletion F)) * h.1 =
-      J.map (inclE (F := F) (v.adicCompletion F)) := hh
-    have h1 : sigR cm.sig (v.adicCompletion F) ∘ (h.1 *ᵥ x) =
-        (h.1.map (sigR cm.sig (v.adicCompletion F))) *ᵥ (sigR cm.sig (v.adicCompletion F) ∘ x) := by
+    have h0
+        : cT (sigR cm.sig (v.adicCompletion F)) h.1 * J.map (inclE (F := F) (v.adicCompletion F))
+            * h.1
+          = J.map (inclE (F := F) (v.adicCompletion F)) :=
+      hh
+    have h1
+        : sigR cm.sig (v.adicCompletion F) ∘ (h.1 *ᵥ x)
+          = (h.1.map (sigR cm.sig (v.adicCompletion F)))
+            *ᵥ (sigR cm.sig (v.adicCompletion F) ∘ x) := by
       funext i
       exact RingHom.map_mulVec _ h.1 x i
-    rw [hR, hR, GlobalTheory.DualFrames.hform_eq_dot, GlobalTheory.DualFrames.hform_eq_dot, h1, ← vecMul_transpose,
-      ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec]
+    rw [hR, hR, GlobalTheory.DualFrames.hform_eq_dot, GlobalTheory.DualFrames.hform_eq_dot, h1,
+      ← vecMul_transpose, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec]
     exact congrArg (fun N => _ ⬝ᵥ N *ᵥ y) h0
-  have hp : ∀ x w, pairing sp J (fun b => p₂ sp ((h.1 *ᵥ x) b)) (g.1 *ᵥ w) =
-      pairing sp J (fun b => p₂ sp (x b)) w := by
+  have hp
+      : ∀ x w,
+        pairing sp J (fun b => p₂ sp ((h.1 *ᵥ x) b)) (g.1 *ᵥ w)
+          = pairing sp J (fun b => p₂ sp (x b)) w := by
     intro x w
     have hw : w = fun b => p₁ sp (sp.symm (w b, 0)) := by funext b; simp [p₁]
     rw [hw, ← hg', ← fst_hR hsig, ← fst_hR hsig, hinv]

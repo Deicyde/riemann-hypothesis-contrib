@@ -7,20 +7,30 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntCZero
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx GlobalTheory.AwayOrb GlobalTheory.FinClsLoc
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx GlobalTheory.AwayOrb GlobalTheory.FinClsLoc
 open scoped TensorProduct Classical
 
 noncomputable section
 namespace GlobalTheory.FinClsLoc
 
-theorem localTransfer : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (K K' : Type) [Field K] [Field K'] [Algebra ℚ K] [Algebra ℚ K'],
-    (K ≃+* K') → ∀ (Y a b b' : G.C),
-    (∃ (u : Kˣ) (z : (K ⊗[ℚ] G.C)ˣ), Commute (z : K ⊗[ℚ] G.C) (inC G K Y) ∧
-      inC G K a = algebraMap K (K ⊗[ℚ] G.C) (u : K) * ((z : K ⊗[ℚ] G.C) * inC G K b *
-        (starT G.star K (z : K ⊗[ℚ] G.C)).unop * inC G K b')) →
-    ∃ (u : K'ˣ) (z : (K' ⊗[ℚ] G.C)ˣ), Commute (z : K' ⊗[ℚ] G.C) (inC G K' Y) ∧
-      inC G K' a = algebraMap K' (K' ⊗[ℚ] G.C) (u : K') * ((z : K' ⊗[ℚ] G.C) * inC G K' b *
-        (starT G.star K' (z : K' ⊗[ℚ] G.C)).unop * inC G K' b') := by
+theorem localTransfer
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (K K' : Type) [Field K] [Field K'] [Algebra ℚ K]
+        [Algebra ℚ K'],
+      (K ≃+* K')
+        → ∀ (Y a b b' : G.C),
+          (∃ (u : Kˣ) (z : (K ⊗[ℚ] G.C)ˣ),
+              Commute (z : K ⊗[ℚ] G.C) (inC G K Y)
+                ∧ inC G K a
+                  = algebraMap K (K ⊗[ℚ] G.C) (u : K)
+                    * ((z : K ⊗[ℚ] G.C) * inC G K b * (starT G.star K (z : K ⊗[ℚ] G.C)).unop
+                      * inC G K b'))
+            → ∃ (u : K'ˣ) (z : (K' ⊗[ℚ] G.C)ˣ),
+              Commute (z : K' ⊗[ℚ] G.C) (inC G K' Y)
+                ∧ inC G K' a
+                  = algebraMap K' (K' ⊗[ℚ] G.C) (u : K')
+                    * ((z : K' ⊗[ℚ] G.C) * inC G K' b * (starT G.star K' (z : K' ⊗[ℚ] G.C)).unop
+                      * inC G K' b') := by
   intro p _ G K K' _ _ _ _ e Y a b b' ⟨u, z, hc, h⟩
   have hq : ∀ q : ℚ, e (algebraMap ℚ K q) = algebraMap ℚ K' q := fun q =>
     RingHom.congr_fun (Subsingleton.elim ((e : K →+* K').comp (algebraMap ℚ K)) (algebraMap ℚ K')) q

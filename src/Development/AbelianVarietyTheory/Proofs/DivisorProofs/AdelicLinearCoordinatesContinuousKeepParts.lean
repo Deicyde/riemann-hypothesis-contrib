@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwoMulInvOf
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 open IsDedekindDomain NumberField
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix Classical
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (incM)
@@ -52,17 +53,21 @@ theorem pairA_mul_eq_zero_iff_fst (a : AF F) : pairA F 1 0 * a = 0 ↔ fstA F a 
 
 def incF : Af F →ₗ[F] AF F where
   toFun y := pairA F 0 y
-  map_add' y y' := af_ext (by rw [map_add (f := _), fstA_pairA, fstA_pairA, fstA_pairA, add_zero])
-    (by rw [map_add (f := _), sndA_pairA, sndA_pairA, sndA_pairA])
-  map_smul' c y := af_ext (by rw [map_smul, fstA_pairA, fstA_pairA, RingHom.id_apply, smul_zero])
-    (by rw [map_smul, sndA_pairA, sndA_pairA, RingHom.id_apply])
+  map_add' y y' :=
+    af_ext (by rw [map_add (f := _), fstA_pairA, fstA_pairA, fstA_pairA, add_zero])
+      (by rw [map_add (f := _), sndA_pairA, sndA_pairA, sndA_pairA])
+  map_smul' c y :=
+    af_ext (by rw [map_smul, fstA_pairA, fstA_pairA, RingHom.id_apply, smul_zero])
+      (by rw [map_smul, sndA_pairA, sndA_pairA, RingHom.id_apply])
 
 def incI : Ainf F →ₗ[F] AF F where
   toFun y := pairA F y 0
-  map_add' y y' := af_ext (by rw [map_add (f := _), fstA_pairA, fstA_pairA, fstA_pairA])
-    (by rw [map_add (f := _), sndA_pairA, sndA_pairA, sndA_pairA, add_zero])
-  map_smul' c y := af_ext (by rw [map_smul, fstA_pairA, fstA_pairA, RingHom.id_apply])
-    (by rw [map_smul, sndA_pairA, sndA_pairA, RingHom.id_apply, smul_zero])
+  map_add' y y' :=
+    af_ext (by rw [map_add (f := _), fstA_pairA, fstA_pairA, fstA_pairA])
+      (by rw [map_add (f := _), sndA_pairA, sndA_pairA, sndA_pairA, add_zero])
+  map_smul' c y :=
+    af_ext (by rw [map_smul, fstA_pairA, fstA_pairA, RingHom.id_apply])
+      (by rw [map_smul, sndA_pairA, sndA_pairA, RingHom.id_apply, smul_zero])
 
 theorem incF_sndA (a : AF F) : incF F (sndA F a) = pairA F 0 1 * a :=
   af_ext (by rw [map_mul, fstA_pairA, zero_mul]; rfl) (by rw [map_mul, sndA_pairA, one_mul]; rfl)
@@ -74,16 +79,19 @@ end Ad
 
 variable (D : D7)
 
-def secF : Af D.host.F ⊗[D.host.F] D.host.E →ₗ[D.host.F] AE D := TensorProduct.map (incF D.host.F) LinearMap.id
+def secF : Af D.host.F ⊗[D.host.F] D.host.E →ₗ[D.host.F] AE D :=
+  TensorProduct.map (incF D.host.F) LinearMap.id
 
-def secI : Ainf D.host.F ⊗[D.host.F] D.host.E →ₗ[D.host.F] AE D := TensorProduct.map (incI D.host.F) LinearMap.id
+def secI : Ainf D.host.F ⊗[D.host.F] D.host.E →ₗ[D.host.F] AE D :=
+  TensorProduct.map (incI D.host.F) LinearMap.id
 
 theorem secF_finPart (z : AE D) : secF D (finPart D z) = pairA D.host.F 0 1 • z := by
   induction z using TensorProduct.induction_on with
   | zero => rw [(finPart D).map_zero, (secF D).map_zero, smul_zero]
   | tmul a b =>
     have h1 : finPart D (a ⊗ₜ b) = sndA D.host.F a ⊗ₜ b := rfl
-    rw [h1, secF, TensorProduct.map_tmul, LinearMap.id_apply, incF_sndA, TensorProduct.smul_tmul', smul_eq_mul]
+    rw [h1, secF, TensorProduct.map_tmul, LinearMap.id_apply, incF_sndA, TensorProduct.smul_tmul',
+      smul_eq_mul]
   | add x y hx hy => rw [map_add (finPart D), map_add (secF D), hx, hy, smul_add]
 
 theorem secI_infPart (z : AE D) : secI D (infPart D z) = pairA D.host.F 1 0 • z := by
@@ -91,7 +99,8 @@ theorem secI_infPart (z : AE D) : secI D (infPart D z) = pairA D.host.F 1 0 • 
   | zero => rw [(infPart D).map_zero, (secI D).map_zero, smul_zero]
   | tmul a b =>
     have h1 : infPart D (a ⊗ₜ b) = fstA D.host.F a ⊗ₜ b := rfl
-    rw [h1, secI, TensorProduct.map_tmul, LinearMap.id_apply, incI_fstA, TensorProduct.smul_tmul', smul_eq_mul]
+    rw [h1, secI, TensorProduct.map_tmul, LinearMap.id_apply, incI_fstA, TensorProduct.smul_tmul',
+      smul_eq_mul]
   | add x y hx hy => rw [map_add (infPart D), map_add (secI D), hx, hy, smul_add]
 
 theorem finPart_smul (z : AE D) : finPart D (pairA D.host.F 0 1 • z) = finPart D z := by
@@ -122,26 +131,36 @@ theorem infPart_eq_zero_iff (z : AE D) : infPart D z = 0 ↔ pairA D.host.F 1 0 
   · intro h; rw [← secI_infPart, h, (secI D).map_zero]
   · intro h; rw [← infPart_smul, h, (infPart D).map_zero]
 
-theorem smul_vec_fin {N : ℕ} (u : Fin N → AF D.host.F) : pairA D.host.F 0 1 • u = 0 ↔ GlobalTheory.SWQ.fin u = 0 := by
+theorem smul_vec_fin {N : ℕ} (u : Fin N → AF D.host.F)
+    : pairA D.host.F 0 1 • u = 0 ↔ GlobalTheory.SWQ.fin u = 0 := by
   rw [funext_iff, funext_iff]
   exact forall_congr' fun l => pairA_mul_eq_zero_iff_snd D.host.F (u l)
 
-theorem smul_vec_inf {N : ℕ} (u : Fin N → AF D.host.F) : pairA D.host.F 1 0 • u = 0 ↔ GlobalTheory.SWQ.inf u = 0 := by
+theorem smul_vec_inf {N : ℕ} (u : Fin N → AF D.host.F)
+    : pairA D.host.F 1 0 • u = 0 ↔ GlobalTheory.SWQ.inf u = 0 := by
   rw [funext_iff, funext_iff]
   exact forall_congr' fun l => pairA_mul_eq_zero_iff_fst D.host.F (u l)
 
-theorem smul_pair_eq_zero {N : ℕ} (c : AF D.host.F) (w : VA D.host.F N) : c • w = 0 ↔ c • w.1 = 0 ∧ c • w.2 = 0 :=
+theorem smul_pair_eq_zero {N : ℕ} (c : AF D.host.F) (w : VA D.host.F N)
+    : c • w = 0 ↔ c • w.1 = 0 ∧ c • w.2 = 0 :=
   Prod.ext_iff
 
-theorem coord (D : D7) (m n N : ℕ) (e : Matrix (Fin m) (Fin n) (AE D) ≃ₗ[AF D.host.F] VA D.host.F N) :
-    Continuous e ∧ Continuous e.symm ∧
-      (∀ x, x.map (finPart D) = 0 ↔ GlobalTheory.SWQ.fin (e x).1 = 0 ∧ GlobalTheory.SWQ.fin (e x).2 = 0) ∧
-      (∀ x, x.map (infPart D) = 0 ↔ GlobalTheory.SWQ.inf (e x).1 = 0 ∧ GlobalTheory.SWQ.inf (e x).2 = 0) := by
+theorem coord (D : D7) (m n N : ℕ) (e : Matrix (Fin m) (Fin n) (AE D) ≃ₗ[AF D.host.F] VA D.host.F N)
+    : Continuous e ∧ Continuous e.symm
+      ∧ (∀ x,
+        x.map (finPart D) = 0 ↔ GlobalTheory.SWQ.fin (e x).1 = 0 ∧ GlobalTheory.SWQ.fin (e x).2 = 0)
+      ∧ (∀ x,
+        x.map (infPart D) = 0
+          ↔ GlobalTheory.SWQ.inf (e x).1 = 0 ∧ GlobalTheory.SWQ.inf (e x).2 = 0) := by
   haveI h0 : IsModuleTopology (AF D.host.F) (AE D) := GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.modTop
   haveI h1 : IsModuleTopology (AF D.host.F) (Fin n → AE D) := IsModuleTopology.instPi
   haveI h2 : IsModuleTopology (AF D.host.F) (Matrix (Fin m) (Fin n) (AE D)) := IsModuleTopology.instPi
-  refine ⟨IsModuleTopology.continuous_of_linearMap e.toLinearMap,
-    IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap, fun x => ?_, fun x => ?_⟩
+  refine ⟨
+    IsModuleTopology.continuous_of_linearMap e.toLinearMap,
+    IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap,
+    fun x => ?_,
+    fun x => ?_
+  ⟩
   · have key : x.map (finPart D) = 0 ↔ pairA D.host.F 0 1 • x = 0 := by
       rw [← Matrix.ext_iff, ← Matrix.ext_iff]
       simp only [Matrix.map_apply, Matrix.zero_apply, Matrix.smul_apply]

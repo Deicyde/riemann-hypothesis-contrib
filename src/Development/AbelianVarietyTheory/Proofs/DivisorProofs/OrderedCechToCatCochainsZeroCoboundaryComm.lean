@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CardNonempty
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.AbCoh
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CechPoset
 
@@ -21,14 +24,19 @@ namespace GlobalTheory.CechPoset
 
 variable {κ : Type} [LinearOrder κ] {R : Type} [CommRing R] (F : (NE κ)ᵒᵖ ⥤ CommAlgCat.{0} R)
 
-theorem mp_cochain_congr {p : ℕ} (c : CC F p) {s s' : {s : Finset κ // s.card = p + 1}} (h : s.1 = s'.1)
-    {b : (NE κ)ᵒᵖ} (φ : ne s.1 (card_nonempty s) ⟶ b) (φ' : ne s'.1 (card_nonempty s') ⟶ b) :
-    mp F φ (c s) = mp F φ' (c s') := by
+theorem mp_cochain_congr
+    {p : ℕ} (c : CC F p)
+    {s s' : {s : Finset κ // s.card = p + 1}} (h : s.1 = s'.1)
+    {b : (NE κ)ᵒᵖ} (φ : ne s.1 (card_nonempty s) ⟶ b) (φ' : ne s'.1 (card_nonempty s') ⟶ b)
+    : mp F φ (c s) = mp F φ' (c s') := by
   obtain rfl : s = s' := Subtype.ext h
   rw [Subsingleton.elim φ φ']
 
-theorem orderedCech_cochainsZero_coboundary_comm {κ : Type} [LinearOrder κ] {R : Type} [CommRing R]
-    (F : (NE κ)ᵒᵖ ⥤ CommAlgCat.{0} R) (c : CC F 0) : d0 F (e0 F c) = e1 F (δ F 0 c) := by
+theorem orderedCech_cochainsZero_coboundary_comm
+    {κ : Type} [LinearOrder κ]
+    {R : Type} [CommRing R]
+    (F : (NE κ)ᵒᵖ ⥤ CommAlgCat.{0} R) (c : CC F 0)
+    : d0 F (e0 F c) = e1 F (δ F 0 c) := by
   funext a b f
   rw [amitsur_d0_apply]
   simp only [e0, e1, LinearMap.pi_apply, LinearMap.comp_apply, LinearMap.proj_apply,

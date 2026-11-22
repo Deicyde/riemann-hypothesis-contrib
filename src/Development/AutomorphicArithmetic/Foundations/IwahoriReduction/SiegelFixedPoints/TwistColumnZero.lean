@@ -26,45 +26,63 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.EisensteinM
 @[expose] public section
 
 open scoped MatrixGroups Matrix
-open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois UpperTheory.Kd.L
+open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois
+  UpperTheory.Kd.L
 
 noncomputable section
 namespace UpperTheory.Kd.L
 
-private def dgU {R : Type} [CommRing R] (u : Rˣ) : GL (Fin 2) R :=
-  ⟨!![1, 0; 0, (u : R)], !![1, 0; 0, ((u⁻¹ : Rˣ) : R)], by
-    ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two], by
-    ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]⟩
+private def dgU {R : Type} [CommRing R] (u : Rˣ) : GL (Fin 2) R := ⟨
+  !![1, 0; 0, (u : R)],
+  !![1, 0; 0, ((u⁻¹ : Rˣ) : R)],
+  by ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two],
+  by ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
+⟩
 
 private def tw {R : Type} [CommRing R] (h : SL(2, R)) (u : Rˣ) : GL (Fin 2) R :=
   Matrix.SpecialLinearGroup.toGL h * dgU u
 
-private theorem twist_column_zero {R : Type} [CommRing R] (h : SL(2, R)) (u : Rˣ) (i : Fin 2) :
-    ((tw h u : GL (Fin 2) R) : Matrix (Fin 2) (Fin 2) R) i 0 = h i 0 := by
+private theorem twist_column_zero {R : Type} [CommRing R] (h : SL(2, R)) (u : Rˣ) (i : Fin 2)
+    : ((tw h u : GL (Fin 2) R) : Matrix (Fin 2) (Fin 2) R) i 0 = h i 0 := by
   fin_cases i <;> simp [tw, dgU, Matrix.mul_apply, Fin.sum_univ_two]
 
-private theorem twist_column_one {R : Type} [CommRing R] (h : SL(2, R)) (u : Rˣ) (i : Fin 2) :
-    ((tw h u : GL (Fin 2) R) : Matrix (Fin 2) (Fin 2) R) i 1 = (u : R) * h i 1 := by
+private theorem twist_column_one {R : Type} [CommRing R] (h : SL(2, R)) (u : Rˣ) (i : Fin 2)
+    : ((tw h u : GL (Fin 2) R) : Matrix (Fin 2) (Fin 2) R) i 1 = (u : R) * h i 1 := by
   fin_cases i <;> simp [tw, dgU, Matrix.mul_apply, Fin.sum_univ_two, mul_comm]
 
-private abbrev kz {K : Type} [Field K] [CharZero K] (ζ : K) (l L N : ℕ) (x : ZMod N) (c d w : ℕ) (g : SL(2, ℤ)) : ℕ → K :=
-  cmul (smF (c : ℤ) (w + 1) (N * l ^ L) ζ (en g 0 0 * ((N : ℤ) + (x.val : ℤ) * (topT l L N : ℤ) * (l : ℤ) ^ L)) ((N : ℤ) ^ 2 * en g 0 1))
-    (smF (d : ℤ) 1 (N * l ^ L) ζ (en g 0 0 * (topT l L N : ℤ) * (l : ℤ) ^ L + en g 1 0) ((N : ℤ) * en g 1 1))
+private abbrev kz
+    {K : Type} [Field K] [CharZero K] (ζ : K) (l L N : ℕ) (x : ZMod N) (c d w : ℕ) (g : SL(2, ℤ))
+    : ℕ → K :=
+  cmul
+    (smF (c : ℤ) (w + 1) (N * l ^ L) ζ
+      (en g 0 0 * ((N : ℤ) + (x.val : ℤ) * (topT l L N : ℤ) * (l : ℤ) ^ L))
+      ((N : ℤ) ^ 2 * en g 0 1))
+    (smF (d : ℤ) 1 (N * l ^ L) ζ (en g 0 0 * (topT l L N : ℤ) * (l : ℤ) ^ L + en g 1 0)
+      ((N : ℤ) * en g 1 1))
 
-private abbrev kg {K : Type} [Field K] [CharZero K] (ζ : K) (l L N : ℕ) (c d : ℤ) (w : ℕ) (v v' : ℤ × ℤ)
-    (γ : GL (Fin 2) (ZMod (l ^ L))) : ℕ → K :=
+private abbrev kg
+    {K : Type} [Field K] [CharZero K]
+    (ζ : K)
+    (l L N : ℕ)
+    (c d : ℤ) (w : ℕ) (v v' : ℤ × ℤ) (γ : GL (Fin 2) (ZMod (l ^ L)))
+    : ℕ → K :=
   cmul (smF c (w + 1) (N * l ^ L) ζ (rowT N l L γ 0 v).1 (rowT N l L γ 0 v).2)
     (smF d 1 (N * l ^ L) ζ (rowT N l L γ 1 v').1 (rowT N l L γ 1 v').2)
 
-private theorem swap4 {V α β γ δ : Type} [AddCommMonoid V] (A : Finset α) (B : Finset β) (C : Finset γ) (D : Finset δ)
-    (f : α → β → γ → δ → V) :
-    ∑ a ∈ A, ∑ b ∈ B, ∑ c ∈ C, ∑ e ∈ D, f a b c e = ∑ e ∈ D, ∑ c ∈ C, ∑ a ∈ A, ∑ b ∈ B, f a b c e := by
-  have h1 : ∀ a, ∑ b ∈ B, ∑ c ∈ C, ∑ e ∈ D, f a b c e = ∑ c ∈ C, ∑ e ∈ D, ∑ b ∈ B, f a b c e := fun a => by
+private theorem swap4
+    {V α β γ δ : Type} [AddCommMonoid V]
+    (A : Finset α) (B : Finset β) (C : Finset γ) (D : Finset δ) (f : α → β → γ → δ → V)
+    : ∑ a ∈ A, ∑ b ∈ B, ∑ c ∈ C, ∑ e ∈ D, f a b c e
+      = ∑ e ∈ D, ∑ c ∈ C, ∑ a ∈ A, ∑ b ∈ B, f a b c e := by
+  have h1
+      : ∀ a,
+        ∑ b ∈ B, ∑ c ∈ C, ∑ e ∈ D, f a b c e = ∑ c ∈ C, ∑ e ∈ D, ∑ b ∈ B, f a b c e := fun a => by
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun c _ => Finset.sum_comm
   simp_rw [h1]
   rw [Finset.sum_comm]
-  have h2 : ∀ c, ∑ a ∈ A, ∑ e ∈ D, ∑ b ∈ B, f a b c e = ∑ e ∈ D, ∑ a ∈ A, ∑ b ∈ B, f a b c e := fun c => Finset.sum_comm
+  have h2 : ∀ c, ∑ a ∈ A, ∑ e ∈ D, ∑ b ∈ B, f a b c e = ∑ e ∈ D, ∑ a ∈ A, ∑ b ∈ B, f a b c e :=
+    fun c => Finset.sum_comm
   simp_rw [h2]
   exact Finset.sum_comm
 

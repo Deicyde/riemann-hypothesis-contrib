@@ -8,7 +8,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 open GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.PairLift GlobalTheory.Chain.RealIt
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -28,7 +31,8 @@ lemma conj_sg (e : Bool) : starRingEnd ℂ (GlobalTheory.IndefiniteRowSideFullHe
 variable {a b : ℕ}
 
 def swSign (ε : Fin a → Bool) (ε' : Fin b → Bool) (n : Fin b × Fin a) : ℂ :=
-  GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.sgn (ε' n.1) * GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.sgn (ε n.2)
+  GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.sgn (ε' n.1)
+    * GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.sgn (ε n.2)
 
 variable (ε : Fin a → Bool) (ε' : Fin b → Bool)
 
@@ -136,31 +140,37 @@ lemma swapHom_termS (i : Fin b) (j k : Fin a) (Q : LPol b a) :
   rw [LinearMap.add_apply, LinearMap.add_apply, map_add (f := _), Module.End.mul_apply, Module.End.mul_apply, swapHom_rai,
     swapHom_low, swapHom_half]
 
-def swapEquiv : LPol b a ≃+ LPol a b :=
-  { toFun := swapHom ε ε'
-    invFun := swapHom ε' ε
-    left_inv := fun P => RingHom.congr_fun (swapHom_comp ε ε') P
-    right_inv := fun P => RingHom.congr_fun (swapHom_comp ε' ε) P
-    map_add' := map_add _ }
+def swapEquiv : LPol b a ≃+ LPol a b := {
+  toFun := swapHom ε ε'
+  invFun := swapHom ε' ε
+  left_inv := fun P => RingHom.congr_fun (swapHom_comp ε ε') P
+  right_inv := fun P => RingHom.congr_fun (swapHom_comp ε' ε) P
+  map_add' := map_add _
+}
 
 lemma swapEquiv_apply (P : LPol b a) : swapEquiv ε ε' P = swapHom ε ε' P := rfl
 
-theorem locS_locT_exchange : ∀ (a b : ℕ) (ε : Fin a → Bool) (ε' : Fin b → Bool), ∃ j : LPol b a ≃+ LPol a b,
-    (∀ (c : ℂ) P, j (c • P) = conj c • j P) ∧ ∀ P : LPol b a,
-      (∀ Y : Matrix (Fin b) (Fin b) ℂ, j (locT ε ε' Y P) = locS ε' ε (Y.map (starRingEnd ℂ)) (j P)) ∧
-        ∀ X : Matrix (Fin a) (Fin a) ℂ, j (locS ε ε' (X.map (starRingEnd ℂ)) P) = locT ε' ε X (j P) := by
+theorem locS_locT_exchange
+    : ∀ (a b : ℕ) (ε : Fin a → Bool) (ε' : Fin b → Bool), ∃ j : LPol b a ≃+ LPol a b,
+      (∀ (c : ℂ) P, j (c • P) = conj c • j P)
+        ∧ ∀ P : LPol b a,
+          (∀ Y : Matrix (Fin b) (Fin b) ℂ,
+              j (locT ε ε' Y P) = locS ε' ε (Y.map (starRingEnd ℂ)) (j P))
+            ∧ ∀ X : Matrix (Fin a) (Fin a) ℂ,
+              j (locS ε ε' (X.map (starRingEnd ℂ)) P) = locT ε' ε X (j P) := by
   intro a b ε ε'
   refine ⟨swapEquiv ε ε', fun c P => ?_, fun P => ⟨fun Y => ?_, fun X => ?_⟩⟩
   · rw [swapEquiv_apply, swapEquiv_apply, swapHom_smul]
   · rw [swapEquiv_apply, swapEquiv_apply]
     unfold locT locS
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, swapHom_smul, swapHom_termT, Matrix.map_apply]
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, swapHom_smul, swapHom_termT,
+      Matrix.map_apply]
   · rw [swapEquiv_apply, swapEquiv_apply]
     unfold locT locS
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, swapHom_smul, swapHom_termS, Matrix.map_apply,
-      starRingEnd_self_apply]
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, swapHom_smul, swapHom_termS,
+      Matrix.map_apply, starRingEnd_self_apply]
 
 end GlobalTheory.Chain.RealIt.SwapFock
 

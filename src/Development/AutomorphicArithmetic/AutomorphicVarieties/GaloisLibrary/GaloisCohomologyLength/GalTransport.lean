@@ -6,27 +6,36 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
-theorem UpperTheory.V.LDataCardLeFinrank.galTransport :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (F' Ω' : Type) [Field F'] [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω'] (f : F →+* F') (σ : Ω ≃+* Ω'), (∀ x, σ (algebraMap F Ω x) = algebraMap F' Ω' (f x)) →
-      ∃ φ : G F' Ω' →* G F Ω, Continuous φ ∧ (∀ g x, σ (φ g x) = g (σ x)) ∧ (∀ (l : ℕ) [Fact l.Prime] (g : G F' Ω'), cycZ F Ω l (φ g) = cycZ F' Ω' l g) ∧ Function.Injective φ ∧ (Function.Surjective f → Function.Surjective φ) := by
+theorem UpperTheory.V.LDataCardLeFinrank.galTransport
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (F' Ω' : Type) [Field F'] [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω']
+        (f : F →+* F') (σ : Ω ≃+* Ω'),
+      (∀ x, σ (algebraMap F Ω x) = algebraMap F' Ω' (f x))
+        → ∃ φ : G F' Ω' →* G F Ω,
+          Continuous φ ∧ (∀ g x, σ (φ g x) = g (σ x))
+            ∧ (∀ (l : ℕ) [Fact l.Prime] (g : G F' Ω'), cycZ F Ω l (φ g) = cycZ F' Ω' l g)
+            ∧ Function.Injective φ ∧ (Function.Surjective f → Function.Surjective φ) := by
   intro F Ω _ _ _ _ _ F' Ω' _ _ _ _ _ f σ hσ
-  have hc : ∀ g : G F' Ω', ∀ x : F,
-      ((σ.trans g.toRingEquiv).trans σ.symm) (algebraMap F Ω x) = algebraMap F Ω x := by
+  have hc
+      : ∀ g : G F' Ω', ∀ x : F,
+        ((σ.trans g.toRingEquiv).trans σ.symm) (algebraMap F Ω x) = algebraMap F Ω x := by
     intro g x
     simp only [RingEquiv.trans_apply, hσ, AlgEquiv.coe_toRingEquiv, AlgEquiv.coe_ringEquiv,
       AlgEquiv.commutes]
     rw [← hσ, RingEquiv.symm_apply_apply]
-  let φ : G F' Ω' →* G F Ω :=
-    { toFun := fun g => AlgEquiv.ofRingEquiv (hc g)
-      map_one' := by
-        ext x
-        simp
-      map_mul' := by
-        intro a b
-        ext x
-        simp }
+  let φ : G F' Ω' →* G F Ω := {
+    toFun := fun g => AlgEquiv.ofRingEquiv (hc g)
+    map_one' := by
+      ext x
+      simp
+    map_mul' := by
+      intro a b
+      ext x
+      simp
+  }
   have hφ : ∀ g x, φ g x = σ.symm (g (σ x)) := fun _ _ => rfl
   haveI : Algebra.IsAlgebraic F' Ω' := IsAlgClosure.isAlgebraic
   refine ⟨φ, ?_, fun g x => by rw [hφ, σ.apply_symm_apply], ?_, ?_, ?_⟩
@@ -67,8 +76,9 @@ theorem UpperTheory.V.LDataCardLeFinrank.galTransport :
     have := congrArg (fun k : G F Ω => k (σ.symm y)) h
     simpa [hφ] using this
   · intro hf h
-    have hc' : ∀ y : F', ((σ.symm.trans h.toRingEquiv).trans σ) (algebraMap F' Ω' y) =
-        algebraMap F' Ω' y := by
+    have hc'
+        : ∀ y : F',
+          ((σ.symm.trans h.toRingEquiv).trans σ) (algebraMap F' Ω' y) = algebraMap F' Ω' y := by
       intro y
       obtain ⟨x, rfl⟩ := hf y
       rw [← hσ]

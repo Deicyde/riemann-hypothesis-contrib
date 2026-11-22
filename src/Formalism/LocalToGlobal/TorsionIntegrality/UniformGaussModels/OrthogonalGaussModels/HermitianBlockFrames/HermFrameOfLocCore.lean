@@ -8,6 +8,7 @@ public import Formalism.LocalToGlobal.TorsionIntegrality.UniformGaussModels.Orth
 
 namespace Formalism.L2.Th1.Top.FrP.UnitaryGroupMassFormula.HermFrame
 
-theorem hermFrame_of_locCore (hL : LocCore) : Formalism.L2.Th1.Top.FrP.HermFrame := hermFrame_of frobStep ratStep hL
+theorem hermFrame_of_locCore (hL : LocCore) : Formalism.L2.Th1.Top.FrP.HermFrame :=
+  hermFrame_of frobStep ratStep hL
 
 end Formalism.L2.Th1.Top.FrP.UnitaryGroupMassFormula.HermFrame

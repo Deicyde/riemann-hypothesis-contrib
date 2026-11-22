@@ -43,37 +43,49 @@ lemma lift_cocycle {A B : Cx R} (φ : Hom A B) (hs : ∀ n, Function.Surjective 
       show φ.f (k+1) ((z : A.X (k+1)) - A.d k c') = w
       rw [map_sub, φ.comm, hc']; abel
 
-theorem surj_part (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m)) (L : Cx R) (π : ∀ m, Hom L (A m))
-    (hT : IsTowerLim A τ L π) (n : ℕ) (y : ∀ m, (A m).H n) (hy : ∀ m, (τ m).H n (y (m + 1)) = y m) :
-    ∃ x, ∀ m, (π m).H n x = y m := by
-  have step : ∀ m (z : (A m).Z n), (Submodule.Quotient.mk z : (A m).H n) = y m →
-      ∃ z' : (A (m+1)).Z n, (Submodule.Quotient.mk z' : (A (m+1)).H n) = y (m+1) ∧ (τ m).Z n z' = z := by
+theorem surj_part
+    (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m))
+    (L : Cx R) (π : ∀ m, Hom L (A m)) (hT : IsTowerLim A τ L π)
+    (n : ℕ) (y : ∀ m, (A m).H n) (hy : ∀ m, (τ m).H n (y (m + 1)) = y m)
+    : ∃ x, ∀ m, (π m).H n x = y m := by
+  have step
+      : ∀ m (z : (A m).Z n),
+        (Submodule.Quotient.mk z : (A m).H n) = y m
+          → ∃ z' : (A (m + 1)).Z n,
+            (Submodule.Quotient.mk z' : (A (m + 1)).H n) = y (m + 1) ∧ (τ m).Z n z' = z := by
     intro m z hz
-    obtain ⟨w, hw⟩ := Submodule.Quotient.mk_surjective _ (y (m+1))
+    obtain ⟨w, hw⟩ := Submodule.Quotient.mk_surjective _ (y (m + 1))
     obtain ⟨z', h1, h2⟩ := lift_cocycle (τ m) (hT.surj m) n w z (by rw [hw, hy, hz])
     exact ⟨z', h1.trans hw, h2⟩
   let seq : ∀ m, {z : (A m).Z n // (Submodule.Quotient.mk z : (A m).H n) = y m} := fun m =>
-    Nat.rec (motive := fun m => {z : (A m).Z n // (Submodule.Quotient.mk z : (A m).H n) = y m})
-      ⟨Classical.choose (Submodule.Quotient.mk_surjective _ (y 0)),
-        Classical.choose_spec (Submodule.Quotient.mk_surjective _ (y 0))⟩
-      (fun m s => ⟨Classical.choose (step m s.1 s.2), (Classical.choose_spec (step m s.1 s.2)).1⟩) m
-  have hseq : ∀ m, (τ m).Z n (seq (m+1)).1 = (seq m).1 := fun m =>
+    Nat.rec
+      (motive := fun m => {z : (A m).Z n // (Submodule.Quotient.mk z : (A m).H n) = y m})
+      ⟨
+        Classical.choose (Submodule.Quotient.mk_surjective _ (y 0)),
+        Classical.choose_spec (Submodule.Quotient.mk_surjective _ (y 0))
+      ⟩
+      (fun m s => ⟨Classical.choose (step m s.1 s.2), (Classical.choose_spec (step m s.1 s.2)).1⟩)
+      m
+  have hseq : ∀ m, (τ m).Z n (seq (m + 1)).1 = (seq m).1 := fun m =>
     (Classical.choose_spec (step m (seq m).1 (seq m).2)).2
-  obtain ⟨x, hx⟩ := hT.lift n (fun m => ((seq m).1 : (A m).X n)) (fun m => congrArg Subtype.val (hseq m))
+  obtain ⟨x, hx⟩ :=
+    hT.lift n (fun m => ((seq m).1 : (A m).X n)) (fun m => congrArg Subtype.val (hseq m))
   have hdx : L.d n x = 0 := by
     apply hT.ext
     intro m
-    rw [(π m).comm, hx]; exact (seq m).1.2
+    rw [(π m).comm, hx]
+    exact (seq m).1.2
   refine ⟨Submodule.Quotient.mk ⟨x, hdx⟩, fun m => ?_⟩
   rw [H_mk, ← (seq m).2]
-  congr 1; exact Subtype.ext (hx m)
+  congr 1
+  exact Subtype.ext (hx m)
 
 def Hs (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m)) (k : ℕ) : ℕ → ∀ m, Submodule R ((A m).H k)
   | 0 => fun _ => ⊤
   | j + 1 => fun m => (Hs A τ k j (m + 1)).map ((τ m).H k)
 
-def Is (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m)) (k : ℕ) (c : ∀ m, (A m).X (k + 1)) :
-    ℕ → ∀ m, Set ((A m).X k)
+def Is (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m)) (k : ℕ) (c : ∀ m, (A m).X (k + 1))
+    : ℕ → ∀ m, Set ((A m).X k)
   | 0 => fun m => {b | (A m).d k b = c m}
   | j + 1 => fun m => (τ m).f k '' Is A τ k c j (m + 1)
 
@@ -173,35 +185,42 @@ lemma Is_stab (hs : ∀ m n, Function.Surjective ((τ m).f n)) (hc : ∀ m, (τ 
   rw [Is_torsor A τ k c hs j m p hp, hJ j hj]
   exact (Is_torsor A τ k c hs J m p hpJ q).1 hq
 
-theorem inj_part (L : Cx R) (π : ∀ m, Hom L (A m)) (hT : IsTowerLim A τ L π)
-    (hA : ∀ m, IsArtinian R ((A m).H k)) (x : L.H (k + 1)) (hx : ∀ m, (π m).H (k + 1) x = 0) :
-    x = 0 := by
+theorem inj_part
+    (L : Cx R) (π : ∀ m, Hom L (A m)) (hT : IsTowerLim A τ L π)
+    (hA : ∀ m, IsArtinian R ((A m).H k))
+    (x : L.H (k + 1)) (hx : ∀ m, (π m).H (k + 1) x = 0)
+    : x = 0 := by
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
-  have hP : ∀ m, ∃ b, (A m).d k b = (π m).f (k+1) z := by
+  have hP : ∀ m, ∃ b, (A m).d k b = (π m).f (k + 1) z := by
     intro m
     have h := hx m
     rw [H_mk, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap] at h
     obtain ⟨b, hb⟩ := h
     exact ⟨b, hb⟩
-  let c : ∀ m, (A m).X (k + 1) := fun m => (π m).f (k+1) z
-  have hc : ∀ m, (τ m).f (k+1) (c (m+1)) = c m := fun m => hT.compat m (k+1) z
+  let c : ∀ m, (A m).X (k + 1) := fun m => (π m).f (k + 1) z
+  have hc : ∀ m, (τ m).f (k + 1) (c (m + 1)) = c m := fun m => hT.compat m (k + 1) z
   have hstab : ∀ m, ∃ J, ∀ j, J ≤ j → Is A τ k c j m = Is A τ k c J m :=
     Is_stab A τ k c hT.surj hc hP hA
   let J : ℕ → ℕ := fun m => Classical.choose (hstab m)
-  have hJ : ∀ m j, J m ≤ j → Is A τ k c j m = Is A τ k c (J m) m := fun m => Classical.choose_spec (hstab m)
+  have hJ : ∀ m j, J m ≤ j → Is A τ k c j m = Is A τ k c (J m) m := fun m =>
+    Classical.choose_spec (hstab m)
   let S : ∀ m, Set ((A m).X k) := fun m => Is A τ k c (J m) m
   have hS : ∀ m j, S m ⊆ Is A τ k c j m := by
     intro m j
     rcases le_total j (J m) with h | h
     · exact Is_anti A τ k c hc m h
     · rw [hJ m j h]
-  have hSsurj : ∀ m, ∀ s ∈ S m, ∃ t ∈ S (m+1), (τ m).f k t = s := fun m s hs =>
-    hS m (J (m+1) + 1) hs
+  have hSsurj : ∀ m, ∀ s ∈ S m, ∃ t ∈ S (m + 1), (τ m).f k t = s := fun m s hs =>
+    hS m (J (m + 1) + 1) hs
   have hS0 : (S 0).Nonempty := Is_nonempty A τ k c hP _ _
   let seq : ∀ m, {b : (A m).X k // b ∈ S m} := fun m =>
-    Nat.rec (motive := fun m => {b : (A m).X k // b ∈ S m}) ⟨hS0.some, hS0.some_mem⟩
-      (fun m s => ⟨Classical.choose (hSsurj m s.1 s.2), (Classical.choose_spec (hSsurj m s.1 s.2)).1⟩) m
-  have hseq : ∀ m, (τ m).f k (seq (m+1)).1 = (seq m).1 := fun m =>
+    Nat.rec
+      (motive := fun m => {b : (A m).X k // b ∈ S m})
+      ⟨hS0.some, hS0.some_mem⟩
+      (fun m s =>
+        ⟨Classical.choose (hSsurj m s.1 s.2), (Classical.choose_spec (hSsurj m s.1 s.2)).1⟩)
+      m
+  have hseq : ∀ m, (τ m).f k (seq (m + 1)).1 = (seq m).1 := fun m =>
     (Classical.choose_spec (hSsurj m (seq m).1 (seq m).2)).2
   obtain ⟨b, hb⟩ := hT.lift k (fun m => (seq m).1) hseq
   have hdb : L.d k b = z := by
@@ -215,8 +234,11 @@ theorem inj_part (L : Cx R) (π : ∀ m, Hom L (A m)) (hT : IsTowerLim A τ L π
 
 end Inj2
 
-theorem inj_zero (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m)) (L : Cx R) (π : ∀ m, Hom L (A m))
-    (hT : IsTowerLim A τ L π) (x : L.H 0) (hx : ∀ m, (π m).H 0 x = 0) : x = 0 := by
+theorem inj_zero
+    (A : ℕ → Cx R) (τ : ∀ m, Hom (A (m + 1)) (A m))
+    (L : Cx R) (π : ∀ m, Hom L (A m)) (hT : IsTowerLim A τ L π) (x : L.H 0)
+    (hx : ∀ m, (π m).H 0 x = 0)
+    : x = 0 := by
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   have hz : (z : L.X 0) = 0 := by
     apply hT.ext

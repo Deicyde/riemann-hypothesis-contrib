@@ -7,15 +7,22 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsRegula
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH GlobalTheory.Poinc
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH
+  GlobalTheory.Poinc
 open GlobalTheory.SiegelTor
 
 noncomputable section
 
 namespace GlobalTheory.Poinc
 
-theorem mem_map_idealSheaf_of_forall_div :
-    ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M₁ M : RatModel o Ω) (π : M.Z ⟶ M₁.Z), M₁.IsHom M (AlgHom.id o Ω) π → IsProper π → ∀ (D : EffCartierData M.Z) (V : M₁.Z.affineOpens) (g : Γ(M₁.Z, V.1)), (∀ x' : M.Z, π x' ∈ V.1 → ∀ f', EqAt M D x' f' → valF M₁.pt V.1 g / f' ∈ M.O x') → g ∈ (D.idealSheaf.map π).ideal V := by
+theorem mem_map_idealSheaf_of_forall_div
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M₁ M : RatModel o Ω) (π : M.Z ⟶ M₁.Z),
+      M₁.IsHom M (AlgHom.id o Ω) π → IsProper π
+        → ∀ (D : EffCartierData M.Z) (V : M₁.Z.affineOpens) (g : Γ(M₁.Z, V.1)),
+          (∀ x' : M.Z, π x' ∈ V.1 → ∀ f', EqAt M D x' f' → valF M₁.pt V.1 g / f' ∈ M.O x')
+            → g ∈ (D.idealSheaf.map π).ideal V := by
   intro o Ω _ _ _ M₁ M π hπ hprop D V g hg
   haveI : QuasiCompact π := inferInstance
   rw [Scheme.IdealSheafData.map, Scheme.Hom.ker_apply, RingHom.mem_ker]
@@ -44,8 +51,9 @@ theorem mem_map_idealSheaf_of_forall_div :
   have e2 := RatModel.stalkEquiv_germ hxV ((π.app V.1).hom g)
   refine ⟨⟨_, hq⟩, ?_⟩
   apply Subtype.ext
-  change (M.stalkEquiv x ((M.Z.presheaf.germ _ x hxV) ((π.app V.1).hom g)) : Ω) =
-    (M.stalkEquiv x ((M.Z.presheaf.germ _ x hi) (D.f i)) : Ω) * (valF M₁.pt V.1 g / valF M.pt (D.U i) (D.f i))
+  change (M.stalkEquiv x ((M.Z.presheaf.germ _ x hxV) ((π.app V.1).hom g)) : Ω)
+    = (M.stalkEquiv x ((M.Z.presheaf.germ _ x hi) (D.f i)) : Ω)
+      * (valF M₁.pt V.1 g / valF M.pt (D.U i) (D.f i))
   rw [e1, e2]
   simp only
   rw [hval, mul_div_cancel₀ _ hne]

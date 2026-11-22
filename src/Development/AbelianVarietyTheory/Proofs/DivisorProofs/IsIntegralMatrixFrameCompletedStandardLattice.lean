@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsApprox
 
 open NumberField IsDedekindDomain
 open scoped Classical Pointwise
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum Formalism.IndefR.Links
 open Formalism.MainNotions.TaylorLogMetric (VC embT tor0 lamOf Th La Iop Qbar lamC)
 open Formalism.MainNotions.StandardLatticesGL3 (TT stdL pt oddE0 Wd La0 Crv inc OhE IntU)
 open GlobalTheory.NormSum (Pair intG)
@@ -26,9 +28,12 @@ section Gen
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-theorem int_of_mem_hatL_pi {z : Fin n → E ⊗[F] Formalism.L2.Herm.Af F}
-    (hz : z ∈ Formalism.L2.Herm.hatL (F := F) (Submodule.pi Set.univ fun _ : Fin n => (1 : Submodule (𝓞 E) E))) (i : Fin n) :
-    z i ∈ Formalism.L2.Herm.intAf F E := by
+theorem int_of_mem_hatL_pi
+    {z : Fin n → E ⊗[F] Formalism.L2.Herm.Af F}
+    (hz : z ∈ Formalism.L2.Herm.hatL (F := F)
+      (Submodule.pi Set.univ fun _ : Fin n => (1 : Submodule (𝓞 E) E)))
+    (i : Fin n)
+    : z i ∈ Formalism.L2.Herm.intAf F E := by
   unfold Formalism.L2.Herm.hatL Formalism.UG.latS at hz
   induction hz using Submodule.span_induction with
   | mem x hx =>
@@ -39,9 +44,9 @@ theorem int_of_mem_hatL_pi {z : Fin n → E ⊗[F] Formalism.L2.Herm.Af F}
   | add x y _ _ hx hy => exact add_mem hx hy
   | smul a x _ hx => exact mul_mem a.2 hx
 
-theorem single_mem_hatL_pi (j : Fin n) :
-    (Pi.single j 1 : Fin n → E ⊗[F] Formalism.L2.Herm.Af F) ∈
-      Formalism.L2.Herm.hatL (F := F) (Submodule.pi Set.univ fun _ : Fin n => (1 : Submodule (𝓞 E) E)) := by
+theorem single_mem_hatL_pi (j : Fin n)
+    : (Pi.single j 1 : Fin n → E ⊗[F] Formalism.L2.Herm.Af F) ∈ Formalism.L2.Herm.hatL (F := F)
+      (Submodule.pi Set.univ fun _ : Fin n => (1 : Submodule (𝓞 E) E)) := by
   unfold Formalism.L2.Herm.hatL Formalism.UG.latS
   refine Submodule.subset_span ⟨Pi.single j 1, fun i _ => ?_, funext fun i => ?_⟩
   · by_cases h : i = j
@@ -55,12 +60,17 @@ theorem single_mem_hatL_pi (j : Fin n) :
       simp only [Pi.single_eq_same, map_one]
     · simp only [Pi.single_eq_of_ne h, map_zero]
 
-theorem entries_int_of_isFrame_pi (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
-    (hβ : Formalism.L2.DIV.IsFrame β (Submodule.pi Set.univ fun _ : Fin n => (1 : Submodule (𝓞 E) E))) :
-    (∀ i j, β.val i j ∈ Formalism.L2.Herm.intAf F E) ∧ ∀ i j, (β⁻¹).val i j ∈ Formalism.L2.Herm.intAf F E := by
+theorem entries_int_of_isFrame_pi
+    (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F))
+    (hβ
+      : Formalism.L2.DIV.IsFrame β (Submodule.pi Set.univ fun _ : Fin n => (1 : Submodule (𝓞 E) E)))
+    : (∀ i j, β.val i j ∈ Formalism.L2.Herm.intAf F E)
+      ∧ ∀ i j, (β⁻¹).val i j ∈ Formalism.L2.Herm.intAf F E := by
   refine ⟨fun i j => ?_, fun i j => ?_⟩
-  · have h1 : Matrix.mulVec β.1 (Pi.single j 1 : Fin n → E ⊗[F] Formalism.L2.Herm.Af F) ∈
-        Formalism.L2.Herm.hatL (F := F) (Submodule.pi Set.univ fun _ : Fin n => (1 : Submodule (𝓞 E) E)) := by
+  · have h1
+        : Matrix.mulVec β.1 (Pi.single j 1 : Fin n → E ⊗[F] Formalism.L2.Herm.Af F)
+          ∈ Formalism.L2.Herm.hatL (F := F)
+            (Submodule.pi Set.univ fun _ : Fin n => (1 : Submodule (𝓞 E) E)) := by
       refine (hβ _).2 fun l => ?_
       rw [Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec]
       exact int_of_mem_hatL_pi (single_mem_hatL_pi j) l
@@ -71,8 +81,9 @@ theorem entries_int_of_isFrame_pi (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.A
 
 end Gen
 
-theorem isIntM_of_isFrame_stdL : ∀ {D : D7} {n : ℕ} (β : GL (Fin n) (EAf D)),
-    Formalism.L2.DIV.IsFrame β (stdL D n) → IsIntM β.val ∧ IsIntM (β⁻¹).val :=
-  fun β hβ => entries_int_of_isFrame_pi β hβ
+theorem isIntM_of_isFrame_stdL
+    : ∀ {D : D7} {n : ℕ} (β : GL (Fin n) (EAf D)),
+      Formalism.L2.DIV.IsFrame β (stdL D n) → IsIntM β.val ∧ IsIntM (β⁻¹).val := fun β hβ =>
+  entries_int_of_isFrame_pi β hβ
 
 end GlobalTheory.StdRead

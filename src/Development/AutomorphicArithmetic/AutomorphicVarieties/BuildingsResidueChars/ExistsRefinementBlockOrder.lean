@@ -12,19 +12,29 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JordanHol
 
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
 
-private theorem exists_equiv_sigma_blk_lt_iff_lt {N : ℕ} {β : Type} [LinearOrder β] (κ : Fin N → β) :
-    ∃ (t : ℕ) (c : Fin t → ℕ) (f : (Σ a, Fin (c a)) ≃ Fin N), ∀ p q, blk f p < blk f q ↔ κ p < κ q := by
+private theorem exists_equiv_sigma_blk_lt_iff_lt {N : ℕ} {β : Type} [LinearOrder β] (κ : Fin N → β)
+    : ∃ (t : ℕ) (c : Fin t → ℕ) (f : (Σ a, Fin (c a)) ≃ Fin N), ∀ p q,
+      blk f p < blk f q ↔ κ p < κ q := by
   classical
   let S : Finset β := Finset.univ.image κ
   let o : Fin S.card ≃o S := S.orderIsoOfFin rfl
   have hS : ∀ p, κ p ∈ S := fun p => Finset.mem_image_of_mem κ (Finset.mem_univ p)
   let g : Fin N → Fin S.card := fun p => o.symm ⟨κ p, hS p⟩
-  refine ⟨S.card, fun a => Fintype.card {p // g p = a},
+  refine ⟨
+    S.card,
+    fun a => Fintype.card {p // g p = a},
     (Equiv.sigmaCongrRight (fun a => (Fintype.equivFin {p // g p = a}).symm)).trans
-      (Equiv.sigmaFiberEquiv g), ?_⟩
+      (Equiv.sigmaFiberEquiv g),
+    ?_
+  ⟩
   intro p q
-  have hb : ∀ x, blk ((Equiv.sigmaCongrRight (fun a => (Fintype.equivFin {p // g p = a}).symm)).trans
-      (Equiv.sigmaFiberEquiv g)) x = g x := by
+  have hb
+      : ∀ x,
+        blk
+            ((Equiv.sigmaCongrRight (fun a => (Fintype.equivFin {p // g p = a}).symm)).trans
+              (Equiv.sigmaFiberEquiv g))
+            x
+          = g x := by
     intro x
     rfl
   rw [hb, hb]
@@ -32,14 +42,20 @@ private theorem exists_equiv_sigma_blk_lt_iff_lt {N : ℕ} {β : Type} [LinearOr
   rw [OrderIso.lt_iff_lt]
   exact Subtype.mk_lt_mk
 
-theorem UpperTheory.exists_refinement_block_order :
-    ∀ (N : ℕ) (r s : ℕ) (d : Fin r → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin N) (j : Fin r) (d' : Fin s → ℕ) (e' : (Σ b, Fin (d' b)) ≃ Fin (d j)),
-    ∃ (t : ℕ) (c : Fin t → ℕ) (f : (Σ a, Fin (c a)) ≃ Fin N), ∀ p q, blk f p < blk f q ↔ (blk e p < blk e q ∨ ∃ p' q', p = e ⟨j, p'⟩ ∧ q = e ⟨j, q'⟩ ∧ blk e' p' < blk e' q') := by
+theorem UpperTheory.exists_refinement_block_order
+    : ∀ (N : ℕ) (r s : ℕ) (d : Fin r → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin N) (j : Fin r)
+        (d' : Fin s → ℕ) (e' : (Σ b, Fin (d' b)) ≃ Fin (d j)),
+      ∃ (t : ℕ) (c : Fin t → ℕ) (f : (Σ a, Fin (c a)) ≃ Fin N), ∀ p q,
+        blk f p < blk f q
+          ↔ (blk e p < blk e q
+            ∨ ∃ p' q', p = e ⟨j, p'⟩ ∧ q = e ⟨j, q'⟩ ∧ blk e' p' < blk e' q') := by
   intro N r s d e j d' e'
   classical
-  obtain ⟨K, hK⟩ : ∃ K : (Σ a, Fin (d a)) → Lex (ℕ × ℕ), ∀ x y, K x < K y ↔
-      (x.1 < y.1 ∨ ∃ p' q', x = ⟨j, p'⟩ ∧ y = ⟨j, q'⟩ ∧ blk e' p' < blk e' q') := by
-    refine ⟨fun x => toLex ((x.1 : ℕ), if h : x.1 = j then ((blk e' (h ▸ x.2) : Fin s) : ℕ) else 0), ?_⟩
+  obtain ⟨K, hK⟩
+      : ∃ K : (Σ a, Fin (d a)) → Lex (ℕ × ℕ), ∀ x y,
+        K x < K y ↔ (x.1 < y.1 ∨ ∃ p' q', x = ⟨j, p'⟩ ∧ y = ⟨j, q'⟩ ∧ blk e' p' < blk e' q') := by
+    refine
+      ⟨fun x => toLex ((x.1 : ℕ), if h : x.1 = j then ((blk e' (h ▸ x.2) : Fin s) : ℕ) else 0), ?_⟩
     rintro ⟨a, u⟩ ⟨b, w⟩
     show toLex ((a : ℕ), if h : a = j then ((blk e' (h ▸ u) : Fin s) : ℕ) else 0) <
         toLex ((b : ℕ), if h : b = j then ((blk e' (h ▸ w) : Fin s) : ℕ) else 0) ↔ _

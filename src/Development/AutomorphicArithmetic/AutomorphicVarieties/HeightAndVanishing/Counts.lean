@@ -6,12 +6,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V.Base UpperTheory.Top
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V.Base UpperTheory.Top
 
 namespace UpperTheory.V.HV
 
-structure GD (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω]
-    (l : ℕ) [Fact l.Prime] (e : ℕ) {O : Type} [CommRing O] {N : ℕ} [NeZero N] (ψ : DirichletCharacter O N) : Prop where
+structure GD
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (K : Type) [Field K] [NumberField K] [Algebra K Ω]
+    (l : ℕ) [Fact l.Prime]
+    (e : ℕ)
+    {O : Type} [CommRing O]
+    {N : ℕ} [NeZero N]
+    (ψ : DirichletCharacter O N)
+    : Prop where
   l_odd : l ≠ 2
   e_pos : 1 ≤ e
   N_even : Even N
@@ -26,31 +34,53 @@ structure GD (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Typ
   gen : ¬ l - 1 ∣ 2 * e
 
 def CorG : Prop :=
-  ∃ c5 : ℝ, ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω]
-    (e N : ℕ) [NeZero N] (H : Subgroup (ZMod N)ˣ) (p p' : ℕ), p.Prime → p'.Prime → p ≠ p' →
-    ¬ p ∣ 30 * N * (discr K).natAbs → ¬ p' ∣ 30 * N * (discr K).natAbs →
-    ∀ (c : ∀ l : Nat.Primes, Coef l) (Ls : Finset Nat.Primes), (∀ l ∈ Ls, ∃ ψ ∈ orb (c l) H, GD Ω K l e ψ) →
-      (∀ l ∈ Ls, ∀ ψ ∈ orb (c l) H, Vlen Ω (c l) e ψ ≠ ⊤) ∧
-      ∑ l ∈ Ls, Real.log (l : ℕ) * ∑ ψ ∈ orb (c l) H, Vn Ω (c l) e ψ ≤
-        4 * c5 * (Nat.totient H.index) * ((discr K).natAbs : ℝ) ^ 5 * (N : ℝ) ^ 18 * (e : ℝ) ^ 7 * (Real.log p + Real.log p')
+  ∃ c5 : ℝ,
+    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K]
+        [Algebra K Ω] (e N : ℕ) [NeZero N] (H : Subgroup (ZMod N)ˣ) (p p' : ℕ),
+      p.Prime → p'.Prime → p ≠ p' → ¬ p ∣ 30 * N * (discr K).natAbs
+        → ¬ p' ∣ 30 * N * (discr K).natAbs
+        → ∀ (c : ∀ l : Nat.Primes, Coef l) (Ls : Finset Nat.Primes),
+          (∀ l ∈ Ls, ∃ ψ ∈ orb (c l) H, GD Ω K l e ψ)
+            → (∀ l ∈ Ls, ∀ ψ ∈ orb (c l) H, Vlen Ω (c l) e ψ ≠ ⊤)
+              ∧ ∑ l ∈ Ls, Real.log (l : ℕ) * ∑ ψ ∈ orb (c l) H, Vn Ω (c l) e ψ
+                ≤ 4 * c5 * (Nat.totient H.index) * ((discr K).natAbs : ℝ) ^ 5 * (N : ℝ) ^ 18
+                  * (e : ℝ) ^ 7 * (Real.log p + Real.log p')
 
 def pZero (m : ℕ) : ℕ := sInf {p : ℕ | p.Prime ∧ 5 ≤ p ∧ ¬ p ∣ m}
 
 def PropZ : Prop :=
-  ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) (e : ℕ),
+  ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l)
+      (e : ℕ),
     5 ≤ l → 2 ≤ e → Even e → l - 1 ∣ 2 * e → Chr.V l e (1 : G ℚ Ω →* c.Oˣ) = 0
 
 def CountI : Prop :=
-  ∀ χ : PChar, ∃ (C r₁ r₂ : ℕ), r₁.Prime ∧ r₂.Prime ∧ ∀ h : Host, h.chi = χ → r₁ < h.q1 → r₁ < h.d → r₂ < h.q1 → r₂ < h.d →
-    ∀ t : ℕ, h.Big t → ∀ e : ℕ, 0 < e → e < t → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
-      (c : ∀ l : Nat.Primes, Coef l) (Ls : Finset Nat.Primes), (∀ l ∈ Ls, (l : ℕ) ≠ 2 ∧ h.CaseI l e) →
-      (∀ l ∈ Ls, ∀ ψ ∈ h.X (c l) e, Vlen Ω (c l) e ψ ≠ ⊤) ∧
-      ∑ l ∈ Ls, Real.log (l : ℕ) * ∑ ψ ∈ h.X (c l) e, Vn Ω (c l) e ψ ≤ ((h.N : ℝ) * t) ^ C
+  ∀ χ : PChar, ∃ (C r₁ r₂ : ℕ),
+    r₁.Prime ∧ r₂.Prime
+      ∧ ∀ h : Host,
+        h.chi = χ → r₁ < h.q1 → r₁ < h.d → r₂ < h.q1 → r₂ < h.d
+          → ∀ t : ℕ,
+            h.Big t
+              → ∀ e : ℕ,
+                0 < e → e < t
+                  → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+                      (c : ∀ l : Nat.Primes, Coef l) (Ls : Finset Nat.Primes),
+                    (∀ l ∈ Ls, (l : ℕ) ≠ 2 ∧ h.CaseI l e)
+                      → (∀ l ∈ Ls, ∀ ψ ∈ h.X (c l) e, Vlen Ω (c l) e ψ ≠ ⊤)
+                        ∧ ∑ l ∈ Ls, Real.log (l : ℕ) * ∑ ψ ∈ h.X (c l) e, Vn Ω (c l) e ψ
+                          ≤ ((h.N : ℝ) * t) ^ C
 
-def CountShape (P : ∀ (h : Host) (l : ℕ) [Fact l.Prime] (c : Coef l) (_ : ℕ), DirichletCharacter c.O h.N → Prop) : Prop :=
-  ∀ χ : PChar, ∃ C : ℕ, ∀ h : Host, h.chi = χ → ∀ t : ℕ, h.Big t →
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) (e : ℕ),
-      l ≠ 2 → 0 < e → e < t → ∀ ψ ∈ h.X c e, P h l c e ψ → VLe Ω c e ψ (((l : ℝ) * h.N * e) ^ C)
+def CountShape
+    (P
+      : ∀ (h : Host) (l : ℕ) [Fact l.Prime] (c : Coef l) (_ : ℕ), DirichletCharacter c.O h.N → Prop)
+    : Prop :=
+  ∀ χ : PChar, ∃ C : ℕ, ∀ h : Host,
+    h.chi = χ
+      → ∀ t : ℕ,
+        h.Big t
+          → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime]
+              (c : Coef l) (e : ℕ),
+            l ≠ 2 → 0 < e → e < t
+              → ∀ ψ ∈ h.X c e, P h l c e ψ → VLe Ω c e ψ (((l : ℝ) * h.N * e) ^ C)
 
 def CountII : Prop := CountShape fun h l _ _ e ψ => h.CaseII l e ψ
 

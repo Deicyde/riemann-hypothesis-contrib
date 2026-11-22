@@ -9,9 +9,12 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.Ar.GR
 
-theorem comap_fg_of_valuationRing (R : Type) [CommRing R] [IsDomain R] [ValuationRing R]
-    (ι κ : Type) [Fintype ι] [Fintype κ] (φ : (ι → R) →ₗ[R] (κ → R)) (W : Submodule R (κ → R))
-    (hW : W.FG) : (W.comap φ).FG := by
+theorem comap_fg_of_valuationRing
+    (R : Type) [CommRing R] [IsDomain R] [ValuationRing R]
+    (ι κ : Type) [Fintype ι] [Fintype κ]
+    (φ : (ι → R) →ₗ[R] (κ → R))
+    (W : Submodule R (κ → R)) (hW : W.FG)
+    : (W.comap φ).FG := by
   obtain ⟨c, w, hw⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hW
   let ψ : ((ι → R) × (Fin c → R)) →ₗ[R] (κ → R) := φ.coprod (Fintype.linearCombination R w)
   have hflat : Module.Flat R (LinearMap.range ψ) := by
@@ -23,9 +26,9 @@ theorem comap_fg_of_valuationRing (R : Type) [CommRing R] [IsDomain R] [Valuatio
   have hsurj : Function.Surjective ψ.rangeRestrict := by
     rintro ⟨y, x, rfl⟩
     exact ⟨x, rfl⟩
-  have hker : (LinearMap.ker ψ.rangeRestrict).FG :=
-    Module.FinitePresentation.fg_ker _ hsurj
-  have heq : W.comap φ = (LinearMap.ker ψ.rangeRestrict).map (LinearMap.fst R (ι → R) (Fin c → R)) := by
+  have hker : (LinearMap.ker ψ.rangeRestrict).FG := Module.FinitePresentation.fg_ker _ hsurj
+  have heq
+      : W.comap φ = (LinearMap.ker ψ.rangeRestrict).map (LinearMap.fst R (ι → R) (Fin c → R)) := by
     ext l
     simp only [Submodule.mem_comap, Submodule.mem_map, LinearMap.mem_ker, LinearMap.fst_apply]
     constructor

@@ -101,20 +101,24 @@ private lemma core {G W V : Type} [Group G] [TopologicalSpace G] [IsTopologicalG
   intro h0
   exact hne' (by rw [h0, map_zero])
 
-theorem UpperTheory.Reformulated.B.HasFixedVector.hasFixed :
-    ∀ {F : Type} [inst : Field F] [inst_1 : NumberField F] {n : ℕ} {V : Type} [inst_2 : AddCommGroup V]
-      [inst_3 : _root_.Module ℂ V] {ρ : Representation ℂ (GL (Fin n) (GlobalTheory.CuspRep.Af F)) V}
-      {w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)}
-      {σ : GlobalTheory.CuspRep.SmIrr (GL (Fin n) (IsDedekindDomain.HeightOneSpectrum.adicCompletion F w))},
-      UpperTheory.V.Af.LocIsotypic ρ w σ →
-        ∀ {U : Subgroup (GL (Fin n) (IsDedekindDomain.HeightOneSpectrum.adicCompletion F w))},
-          IsCompact (↑U : Set (GL (Fin n) (IsDedekindDomain.HeightOneSpectrum.adicCompletion F w))) →
-            UpperTheory.V.Af.HasFixed (MonoidHom.comp ρ (GlobalTheory.CuspRep.locGL F n w)) U → UpperTheory.V.Af.HasFixed σ.ρ U := by
+theorem UpperTheory.Reformulated.B.HasFixedVector.hasFixed
+    : ∀ {F : Type} [inst : Field F] [inst_1 : NumberField F] {n : ℕ} {V : Type}
+        [inst_2 : AddCommGroup V] [inst_3 : _root_.Module ℂ V]
+        {ρ : Representation ℂ (GL (Fin n) (GlobalTheory.CuspRep.Af F)) V}
+        {w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)}
+        {σ : GlobalTheory.CuspRep.SmIrr (GL (Fin n)
+          (IsDedekindDomain.HeightOneSpectrum.adicCompletion F w))},
+      UpperTheory.V.Af.LocIsotypic ρ w σ
+        → ∀ {U : Subgroup (GL (Fin n) (IsDedekindDomain.HeightOneSpectrum.adicCompletion F w))},
+          IsCompact (↑U : Set (GL (Fin n) (IsDedekindDomain.HeightOneSpectrum.adicCompletion F w)))
+            → UpperTheory.V.Af.HasFixed (MonoidHom.comp ρ (GlobalTheory.CuspRep.locGL F n w)) U
+            → UpperTheory.V.Af.HasFixed σ.ρ U := by
   intro F _ _ n V _ _ ρ w σ hiso U hU hfix
   obtain ⟨v, hv, hvfix⟩ := hfix
-  obtain ⟨x, hx, hxfix⟩ := core σ.ρ (MonoidHom.comp ρ (GlobalTheory.CuspRep.locGL F n w))
-    (by
-      cases σ with
-      | mk W ρ' hs hi => exact hs)
-    (by simpa using hiso.2) hU hv hvfix
+  obtain ⟨x, hx, hxfix⟩ :=
+    core σ.ρ (MonoidHom.comp ρ (GlobalTheory.CuspRep.locGL F n w))
+      (by
+        cases σ with
+        | mk W ρ' hs hi => exact hs)
+      (by simpa using hiso.2) hU hv hvfix
   exact ⟨x, hx, hxfix⟩

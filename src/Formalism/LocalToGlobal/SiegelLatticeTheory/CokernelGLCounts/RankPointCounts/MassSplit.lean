@@ -10,34 +10,41 @@ open MeasureTheory
 
 namespace Formalism.L2.SG.NGCut.SplitEmbedding
 
-private theorem isAddFundamentalDomain_of_existsUnique {V : Type} [AddCommGroup V]
-    [MeasurableSpace V] (μ : Measure V) (L : AddSubgroup V) (F : Set V) (hF : MeasurableSet F)
-    (h : ∀ v, ∃! l : L, (l : V) + v ∈ F) : IsAddFundamentalDomain L F μ :=
+private theorem isAddFundamentalDomain_of_existsUnique
+    {V : Type} [AddCommGroup V] [MeasurableSpace V]
+    (μ : Measure V)
+    (L : AddSubgroup V) (F : Set V) (hF : MeasurableSet F) (h : ∀ v, ∃! l : L, (l : V) + v ∈ F)
+    : IsAddFundamentalDomain L F μ :=
   IsAddFundamentalDomain.mk' hF.nullMeasurableSet fun v => h v
 
-private theorem existsUnique_neg_section_add_mem {V : Type} [AddCommGroup V]
+private theorem existsUnique_neg_section_add_mem
+    {V : Type} [AddCommGroup V]
     (L Λ : AddSubgroup V) (σ : L ⧸ Λ.addSubgroupOf L → L)
     (hσ : ∀ q, (QuotientAddGroup.mk (σ q) : L ⧸ Λ.addSubgroupOf L) = q)
-    (m : V) (hm : m ∈ L) : ∃! q : L ⧸ Λ.addSubgroupOf L, -((σ q : L) : V) + m ∈ Λ := by
-  have key : ∀ q : L ⧸ Λ.addSubgroupOf L,
-      (-((σ q : L) : V) + m ∈ Λ ↔ q = QuotientAddGroup.mk ⟨m, hm⟩) := by
+    (m : V) (hm : m ∈ L)
+    : ∃! q : L ⧸ Λ.addSubgroupOf L, -((σ q : L) : V) + m ∈ Λ := by
+  have key
+      : ∀ q : L ⧸ Λ.addSubgroupOf L,
+        (-((σ q : L) : V) + m ∈ Λ ↔ q = QuotientAddGroup.mk ⟨m, hm⟩) := by
     intro q
-    have e : q = QuotientAddGroup.mk ⟨m, hm⟩ ↔
-        (QuotientAddGroup.mk (σ q) : L ⧸ Λ.addSubgroupOf L) = QuotientAddGroup.mk ⟨m, hm⟩ := by
+    have e
+        : q = QuotientAddGroup.mk ⟨m, hm⟩
+          ↔ (QuotientAddGroup.mk (σ q) : L ⧸ Λ.addSubgroupOf L) = QuotientAddGroup.mk ⟨m, hm⟩ := by
       rw [hσ q]
     rw [e]
     first
     | rw [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf]
     | rw [QuotientAddGroup.eq', AddSubgroup.mem_addSubgroupOf]
-    first
-    | exact Iff.rfl
-    | simp
+    first | exact Iff.rfl | simp
   exact ⟨QuotientAddGroup.mk ⟨m, hm⟩, (key _).2 rfl, fun q hq => (key q).1 hq⟩
 
-private theorem existsUnique_mem_iUnion_translate_preimage {V : Type} [AddCommGroup V]
-    (L Λ : AddSubgroup V) (hle : Λ ≤ L) (FL : Set V) (hdL : ∀ v, ∃! l : L, (l : V) + v ∈ FL)
-    {ι : Type*} (ρ : ι → V) (hρL : ∀ i, ρ i ∈ L) (hρ : ∀ m ∈ L, ∃! i, ρ i + m ∈ Λ) (v : V) :
-    ∃! a : Λ, (a : V) + v ∈ ⋃ i, (fun w => ρ i + w) ⁻¹' FL := by
+private theorem existsUnique_mem_iUnion_translate_preimage
+    {V : Type} [AddCommGroup V]
+    (L Λ : AddSubgroup V) (hle : Λ ≤ L)
+    (FL : Set V) (hdL : ∀ v, ∃! l : L, (l : V) + v ∈ FL)
+    {ι : Type*} (ρ : ι → V) (hρL : ∀ i, ρ i ∈ L) (hρ : ∀ m ∈ L, ∃! i, ρ i + m ∈ Λ)
+    (v : V)
+    : ∃! a : Λ, (a : V) + v ∈ ⋃ i, (fun w => ρ i + w) ⁻¹' FL := by
   obtain ⟨l, hl, hlu⟩ := hdL v
   obtain ⟨i, hi, hiu⟩ := hρ (-(l : V)) (L.neg_mem l.2)
   have ha : (l : V) - ρ i ∈ Λ := by
@@ -67,26 +74,31 @@ private theorem existsUnique_mem_iUnion_translate_preimage {V : Type} [AddCommGr
     rw [← hy]
     abel
 
-private theorem pairwise_disjoint_translate_preimage {V : Type} [AddCommGroup V]
+private theorem pairwise_disjoint_translate_preimage
+    {V : Type} [AddCommGroup V]
     (L Λ : AddSubgroup V) (FL : Set V) (hdL : ∀ v, ∃! l : L, (l : V) + v ∈ FL)
-    {ι : Type*} (ρ : ι → V) (hρL : ∀ i, ρ i ∈ L) (hρ : ∀ m ∈ L, ∃! i, ρ i + m ∈ Λ) :
-    Pairwise (Function.onFun Disjoint fun i => (fun w => ρ i + w) ⁻¹' FL) := by
+    {ι : Type*} (ρ : ι → V) (hρL : ∀ i, ρ i ∈ L) (hρ : ∀ m ∈ L, ∃! i, ρ i + m ∈ Λ)
+    : Pairwise (Function.onFun Disjoint fun i => (fun w => ρ i + w) ⁻¹' FL) := by
   intro i j hij
   refine Set.disjoint_left.2 fun w hi hj => hij ?_
   have e : (⟨ρ i, hρL i⟩ : L) = ⟨ρ j, hρL j⟩ :=
     (hdL w).unique (show ((⟨ρ i, hρL i⟩ : L) : V) + w ∈ FL from hi)
       (show ((⟨ρ j, hρL j⟩ : L) : V) + w ∈ FL from hj)
   have e' : ρ i = ρ j := congrArg Subtype.val e
-  obtain ⟨q, -, hq⟩ := hρ (-ρ i) (L.neg_mem (hρL i))
+  obtain ⟨q, -, hq⟩ := hρ (- ρ i) (L.neg_mem (hρL i))
   have h1 : i = q := hq i (by simp)
   have h2 : j = q := hq j (by show ρ j + -ρ i ∈ Λ; rw [← e']; simp)
   rw [h1, h2]
 
-theorem fund_index {V : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V] (μ : Measure V)
-    [μ.IsAddLeftInvariant] (L Λ : AddSubgroup V) [Countable L] (hle : Λ ≤ L) (k : ℕ)
-    (hk : Λ.relIndex L = k) (hk0 : k ≠ 0) (FL FΛ : Set V) (hFL : MeasurableSet FL) (hFΛ : MeasurableSet FΛ)
-    (hdL : ∀ v, ∃! l : L, (l : V) + v ∈ FL) (hdΛ : ∀ v, ∃! a : Λ, (a : V) + v ∈ FΛ) :
-    μ FΛ = k * μ FL := by
+theorem fund_index
+    {V : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V]
+    (μ : Measure V) [μ.IsAddLeftInvariant]
+    (L Λ : AddSubgroup V) [Countable L]
+    (hle : Λ ≤ L)
+    (k : ℕ) (hk : Λ.relIndex L = k) (hk0 : k ≠ 0)
+    (FL FΛ : Set V) (hFL : MeasurableSet FL) (hFΛ : MeasurableSet FΛ)
+    (hdL : ∀ v, ∃! l : L, (l : V) + v ∈ FL) (hdΛ : ∀ v, ∃! a : Λ, (a : V) + v ∈ FΛ)
+    : μ FΛ = k * μ FL := by
   classical
   have hcard : Nat.card (L ⧸ Λ.addSubgroupOf L) = k := hk
   haveI : Finite (L ⧸ Λ.addSubgroupOf L) := Nat.finite_of_card_ne_zero (by rw [hcard]; exact hk0)
@@ -102,18 +114,21 @@ theorem fund_index {V : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAd
     | exact ⟨fun c s _ => measure_preimage_add μ (c : V) s⟩
   have hsurj : Function.Surjective (QuotientAddGroup.mk : L → L ⧸ Λ.addSubgroupOf L) :=
     QuotientAddGroup.mk_surjective
-  obtain ⟨ρ, hρL, hρ⟩ : ∃ ρ : L ⧸ Λ.addSubgroupOf L → V,
-      (∀ q, ρ q ∈ L) ∧ ∀ m ∈ L, ∃! q, ρ q + m ∈ Λ :=
-    ⟨fun q => -((Function.surjInv hsurj q : L) : V), fun q => L.neg_mem (Function.surjInv hsurj q).2,
-      fun m hm => existsUnique_neg_section_add_mem L Λ (Function.surjInv hsurj)
-        (Function.surjInv_eq hsurj) m hm⟩
+  obtain ⟨ρ, hρL, hρ⟩
+      : ∃ ρ : L ⧸ Λ.addSubgroupOf L → V, (∀ q, ρ q ∈ L) ∧ ∀ m ∈ L, ∃! q, ρ q + m ∈ Λ := ⟨
+    fun q => -((Function.surjInv hsurj q : L) : V),
+    fun q => L.neg_mem (Function.surjInv hsurj q).2,
+    fun m hm =>
+      existsUnique_neg_section_add_mem L Λ (Function.surjInv hsurj) (Function.surjInv_eq hsurj) m hm
+  ⟩
   have hmeas : ∀ q, MeasurableSet ((fun w => ρ q + w) ⁻¹' FL) := fun q =>
     measurable_const_add (ρ q) hFL
   have hU : IsAddFundamentalDomain Λ (⋃ q, (fun w => ρ q + w) ⁻¹' FL) μ :=
     isAddFundamentalDomain_of_existsUnique μ Λ _ (MeasurableSet.iUnion hmeas)
       (existsUnique_mem_iUnion_translate_preimage L Λ hle FL hdL ρ hρL hρ)
   have hΛ : IsAddFundamentalDomain Λ FΛ μ := isAddFundamentalDomain_of_existsUnique μ Λ FΛ hFΛ hdΛ
-  rw [hΛ.measure_eq hU, measure_iUnion (pairwise_disjoint_translate_preimage L Λ FL hdL ρ hρL hρ) hmeas]
+  rw [hΛ.measure_eq hU,
+    measure_iUnion (pairwise_disjoint_translate_preimage L Λ FL hdL ρ hρL hρ) hmeas]
   simp only [measure_preimage_add]
   rw [tsum_fintype, Finset.sum_const, Finset.card_univ, nsmul_eq_mul, ← Nat.card_eq_fintype_card,
     hcard]

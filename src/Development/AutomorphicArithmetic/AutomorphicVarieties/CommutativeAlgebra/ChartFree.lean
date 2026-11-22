@@ -8,17 +8,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem exists_intertwiner_decomp_of_kernel_intertwines {σ O : Type} [Fintype σ] [CommRing O] (g : MvPowerSeries σ O)
-    (hg : constantCoeff g = 0) :
-    ∃ h : σ → MvPowerSeries σ O, g = ∑ i, monomial (Finsupp.single i 1) 1 * h i ∧
-      ∀ i, constantCoeff (h i) = coeff (Finsupp.single i 1) g := by
+private theorem exists_intertwiner_decomp_of_kernel_intertwines
+    {σ O : Type} [Fintype σ] [CommRing O] (g : MvPowerSeries σ O) (hg : constantCoeff g = 0)
+    : ∃ h : σ → MvPowerSeries σ O,
+      g = ∑ i, monomial (Finsupp.single i 1) 1 * h i
+        ∧ ∀ i, constantCoeff (h i) = coeff (Finsupp.single i 1) g := by
   classical
-  let sel : (σ →₀ ℕ) → Option σ := fun n =>
-    if hn : n.support.Nonempty then some hn.choose else none
+  let sel : (σ →₀ ℕ) → Option σ := fun n => if hn : n.support.Nonempty then some hn.choose else none
   let H : σ → MvPowerSeries σ O := fun i k =>
     if sel (k + Finsupp.single i 1) = some i then coeff (k + Finsupp.single i 1) g else 0
-  have hc : ∀ i m, coeff m (H i) =
-      if sel (m + Finsupp.single i 1) = some i then coeff (m + Finsupp.single i 1) g else 0 :=
+  have hc
+      : ∀ i m,
+        coeff m (H i)
+          = if sel (m + Finsupp.single i 1) = some i then coeff (m + Finsupp.single i 1) g else 0 :=
     fun _ _ => rfl
   refine ⟨H, ?_, ?_⟩
   · ext n
@@ -86,16 +88,21 @@ private lemma π_mem_sq {O X R : Type} [CommRing O] [AddCommGroup X] [CommRing R
   rw [← mul_assoc, map_mul, map_mul, pow_two]
   exact Ideal.mul_mem_right _ _ (Ideal.mul_mem_mul (hz i) (hz j))
 
-theorem UpperTheory.V.Alg.chart_free :
-    ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R] [Algebra O R] (W : WPres O X R) (h : W.HasOrigin), Function.Injective W.π → ∃ φ : R →ₐ[O] MvPowerSeries W.σ (FractionRing O), IsChart W.part (W.origin h) W.wt φ ∧ ∀ s, φ (W.z s) = MvPowerSeries.X s := by
+theorem UpperTheory.V.Alg.chart_free
+    : ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R]
+        [Algebra O R] (W : WPres O X R) (h : W.HasOrigin),
+      Function.Injective W.π
+        → ∃ φ : R →ₐ[O] MvPowerSeries W.σ (FractionRing O),
+          IsChart W.part (W.origin h) W.wt φ ∧ ∀ s, φ (W.z s) = MvPowerSeries.X s := by
   intro O X R _ _ _ _ _ _ W h hinj
   classical
   let e : MvPowerSeries W.σ O ≃ₐ[O] R := AlgEquiv.ofBijective W.π ⟨hinj, W.surj⟩
-  let μ : MvPowerSeries W.σ O →ₐ[O] MvPowerSeries W.σ (FractionRing O) :=
-    { MvPowerSeries.map (algebraMap O (FractionRing O)) with
-      commutes' := fun r => by
-        ext n
-        simp [MvPowerSeries.algebraMap_apply, MvPowerSeries.coeff_C] }
+  let μ : MvPowerSeries W.σ O →ₐ[O] MvPowerSeries W.σ (FractionRing O) := {
+    MvPowerSeries.map (algebraMap O (FractionRing O)) with
+    commutes' := fun r => by
+      ext n
+      simp [MvPowerSeries.algebraMap_apply, MvPowerSeries.coeff_C]
+  }
   let φ : R →ₐ[O] MvPowerSeries W.σ (FractionRing O) := μ.comp e.symm.toAlgHom
   have hφ : ∀ g, φ (W.π g) = MvPowerSeries.map (algebraMap O (FractionRing O)) g := by
     intro g

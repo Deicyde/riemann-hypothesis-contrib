@@ -6,16 +6,20 @@ public import Mathlib
 
 namespace GlobalTheory.PowSmulMem
 
-theorem exists_pow_smul_mem {E : Type} [CommRing E] {V : Type} [AddCommGroup V] [Module E V]
-    {O : Subring E} {p : E} (hp : p ∈ O) (hO : ∀ e : E, ∃ a : ℕ, p ^ a * e ∈ O)
-    (Λ' : Submodule O V) (hsp : Submodule.span E (Λ' : Set V) = ⊤) (v : V) :
-    ∃ a : ℕ, ∀ b, a ≤ b → p ^ b • v ∈ Λ' := by
+theorem exists_pow_smul_mem
+    {E : Type} [CommRing E]
+    {V : Type} [AddCommGroup V] [Module E V]
+    {O : Subring E} {p : E} (hp : p ∈ O) (hO : ∀ e : E, ∃ a : ℕ, p ^ a * e ∈ O) (Λ' : Submodule O V)
+    (hsp : Submodule.span E (Λ' : Set V) = ⊤)
+    (v : V)
+    : ∃ a : ℕ, ∀ b, a ≤ b → p ^ b • v ∈ Λ' := by
   have hv : v ∈ Submodule.span E (Λ' : Set V) := hsp ▸ Submodule.mem_top
   induction hv using Submodule.span_induction with
   | mem x hx =>
     refine ⟨0, fun b _ => ?_⟩
     exact Λ'.smul_mem (⟨p ^ b, O.pow_mem hp b⟩ : O) hx
-  | zero => exact ⟨0, fun b _ => by rw [smul_zero]; exact Λ'.zero_mem⟩
+  | zero =>
+    exact ⟨0, fun b _ => by rw [smul_zero]; exact Λ'.zero_mem⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, ha⟩ := hx
     obtain ⟨c, hc⟩ := hy
@@ -32,7 +36,13 @@ theorem exists_pow_smul_mem {E : Type} [CommRing E] {V : Type} [AddCommGroup V] 
     rw [h]
     exact Λ'.smul_mem (⟨p ^ c * e, hc⟩ : O) (ha _ (Nat.le_add_right _ _))
 
-theorem main : ∀ {E : Type} [inst : CommRing E] {V : Type} [inst_1 : AddCommGroup V] [inst_2 : Module E V] {O : Subring E} {p : E}, p ∈ O → (∀ (e : E), ∃ (a : ℕ), p ^ a * e ∈ O) → ∀ (Λ Λ' : Submodule (↥O) V), Submodule.FG Λ → Submodule.span E (↑Λ' : Set V) = ⊤ → ∃ (a : ℕ), ∀ v ∈ Λ, p ^ a • v ∈ Λ' := by
+theorem main
+    : ∀ {E : Type} [inst : CommRing E] {V : Type} [inst_1 : AddCommGroup V] [inst_2 : Module E V]
+        {O : Subring E} {p : E},
+      p ∈ O → (∀ (e : E), ∃ (a : ℕ), p ^ a * e ∈ O)
+        → ∀ (Λ Λ' : Submodule (↥O) V),
+          Submodule.FG Λ → Submodule.span E (↑Λ' : Set V) = ⊤
+            → ∃ (a : ℕ), ∀ v ∈ Λ, p ^ a • v ∈ Λ' := by
   intro E _ V _ _ O p hp hO Λ Λ' hfg hsp
   classical
   obtain ⟨s, rfl⟩ := hfg

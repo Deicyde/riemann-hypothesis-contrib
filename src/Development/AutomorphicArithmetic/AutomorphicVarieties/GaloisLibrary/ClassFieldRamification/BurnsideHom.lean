@@ -8,8 +8,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.burnsideHom :
-    ∀ (p : ℕ) [Fact p.Prime] (P : Type) [Group P] [Finite P], IsPGroup p P → ∀ K : Subgroup P, (∀ f : P →* Multiplicative (ZMod p), K ≤ f.ker → f = 1) → K = ⊤ := by
+theorem UpperTheory.V.CF.burnsideHom
+    : ∀ (p : ℕ) [Fact p.Prime] (P : Type) [Group P] [Finite P],
+      IsPGroup p P
+        → ∀ K : Subgroup P, (∀ f : P →* Multiplicative (ZMod p), K ≤ f.ker → f = 1) → K = ⊤ := by
   intro p _ P _ _ hP K hK
   rcases IsCoatomic.eq_top_or_exists_le_coatom K with h | ⟨M, hM, hKM⟩
   · exact h

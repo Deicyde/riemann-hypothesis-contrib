@@ -15,8 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Kerne
 namespace GlobalTheory.CM
 
 theorem cmExists_holds : GlobalTheory.CM.CMExistsSt :=
-  GlobalTheory.CM.ExObj.cmExists GlobalTheory.cmCurve_closed GlobalTheory.cmPoint_closed GlobalTheory.thetaUnifAV_all
-    GlobalTheory.firstFiveLaws.1 GlobalTheory.firstFiveLaws.2.1 GlobalTheory.homExtension_semiAbelian_dvr_unconditional
-    GlobalTheory.kernelFiniteFlat_holds
+  GlobalTheory.CM.ExObj.cmExists GlobalTheory.cmCurve_closed GlobalTheory.cmPoint_closed
+    GlobalTheory.thetaUnifAV_all GlobalTheory.firstFiveLaws.1 GlobalTheory.firstFiveLaws.2.1
+    GlobalTheory.homExtension_semiAbelian_dvr_unconditional GlobalTheory.kernelFiniteFlat_holds
 
 end GlobalTheory.CM

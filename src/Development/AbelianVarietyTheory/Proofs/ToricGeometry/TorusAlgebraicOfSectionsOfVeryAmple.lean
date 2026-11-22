@@ -67,14 +67,26 @@ public import Development.AbelianVarietyTheory.Statements.ThetaLevelCharacters.M
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj Complex Matrix Filter Topology
-open ReciprocityTheory.PTheta ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  Complex Matrix Filter Topology
+open ReciprocityTheory.PTheta ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped BigOperators Real
 
 namespace GlobalTheory
 
-theorem polarisedTorus_algebraic :
-    (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ), τ.IsSymm → (τ.map Complex.im).PosDef → (∀ i, a i = 0 ∨ a i = 1 / 2) → (∀ i, b i = 0 ∨ b i = 1 / 2) → ∃ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L g) (th : P.L.Sec), P.g = g ∧ (∀ z, z ∈ u.Λ ↔ ∃ m n : Fin g → ℤ, z = (fun i => (m i : ℂ)) + τ.mulVec (fun i => (n i : ℂ))) ∧ u.IsFn th (thetaChar τ a b) ∧ ∀ F : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ), (∀ l ∈ u.Λ, F l ∈ u.Λ) → ∃ f : P.A ⟶ P.A, IsMonHom f ∧ ∀ z, u.ex (F z) = u.ex z ≫ f) := by
+theorem polarisedTorus_algebraic
+    : (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ),
+      τ.IsSymm → (τ.map Complex.im).PosDef → (∀ i, a i = 0 ∨ a i = 1 / 2)
+        → (∀ i, b i = 0 ∨ b i = 1 / 2)
+        → ∃ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L g) (th : P.L.Sec),
+          P.g = g
+            ∧ (∀ z,
+              z ∈ u.Λ ↔ ∃ m n : Fin g → ℤ, z = (fun i => (m i : ℂ)) + τ.mulVec (fun i => (n i : ℂ)))
+            ∧ u.IsFn th (thetaChar τ a b)
+            ∧ ∀ F : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ),
+              (∀ l ∈ u.Λ, F l ∈ u.Λ)
+                → ∃ f : P.A ⟶ P.A, IsMonHom f ∧ ∀ z, u.ex (F z) = u.ex z ≫ f) := by
   have f0 := @GlobalTheory.siegelSubDomain_and_domainOpen
   have f1 := @GlobalTheory.thetaMTest_and_thetaSummable
   have f2 := @GlobalTheory.thetaHolo_of_domainOpen_of_mTest f0.2 f1.1
@@ -99,7 +111,8 @@ theorem polarisedTorus_algebraic :
   have f21 := @GlobalTheory.isConnected_basicOpen_complexPoints_of_dense f19 f20
   have f22 := @GlobalTheory.thetaCone_eq_zeroLocus f3 f7 f9 f13 f10 f14 f15 f21 f20
   have f23 := @GlobalTheory.FiniteCoverGrowth.integral_and_rational_of_polynomial_growth f16 f17
-  have f24 := @GlobalTheory.ThetaRational.isIntegral_and_rational_theta f3 f7 f9 f12 f13 f10 f14 f22 f15 f23
+  have f24 :=
+    @GlobalTheory.ThetaRational.isIntegral_and_rational_theta f3 f7 f9 f12 f13 f10 f14 f22 f15 f23
   have f25 := @GlobalTheory.finite_of_isIntegral_of_birational_of_presentation f15
   have f26 := @GlobalTheory.theta_ring_generated_in_degree_one f3 f7 f24 f25
   have f27 := @GlobalTheory.theta_projectiveNormality_even f3 f7 f26
@@ -134,73 +147,207 @@ theorem polarisedTorus_algebraic :
   have f56 := @GlobalTheory.exists_isMonHom_of_map_periodLattice f31 f34 f35 f55 f3
   exact @GlobalTheory.polarisedTorus_algebraic_of_parts f27 f29 f32 f37 f41 f42 f43 f44 f51 f56
 
-theorem torusAlgebraic_of_sections_of_veryAmple :
-    (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ), τ ∈ SiegelH (Fin g) → ∀ N : ℕ, 3 ≤ N → ∀ (X
-        : Over (Sp ℂ)) (ex : (Fin g → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ X)) (D : (Fin g → Fin
-        N) → X.left.Opens), (IsIntegral X.left ∧ IsProper X.hom ∧ Function.Surjective ex ∧
-        (∀ z z', ex z = ex z' ↔ z - z' ∈ periodLattice τ) ∧ (∀ (U : (X).left.Opens) (f : Γ((X).left,
-        U)), IsOpen {w | w ∈ (Set.univ : Set (Fin g → ℂ)) ∧ ⊤ ≤ (ex
-        w).left ⁻¹ᵁ U} ∧ DifferentiableOn ℂ (fun w => valAt' (ex w).left U f) {w | w ∈ (Set.univ
-        : Set (Fin g → ℂ)) ∧ ⊤ ≤ (ex w).left ⁻¹ᵁ U}) ∧ (∀ c, IsAffineOpen (D
-        c) ∧ ringKrullDim Γ(X.left, D c) ≤ g ∧ (∀ z, ⊤ ≤ (ex z).left ⁻¹ᵁ D c ↔ theta (fun i => ((c i
-        : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) • τ) ≠ 0) ∧ ∃ r : (Fin g → Fin N) → Γ(X.left, D
-        c), (∀ c' z, theta (fun i => ((c i : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) •
-        τ) ≠ 0 → valAt' (ex z).left (D c) (r c') = theta (fun i => ((c' i : ℕ) : ℝ) / N) 0 ((N : ℂ)
-        • z) ((N : ℂ) • τ) / theta (fun i => ((c i : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) •
-        τ)) ∧ ∀ f : Γ(X.left, D c), ∃ F : MvPolynomial (Fin g → Fin
-        N) ℂ, f = MvPolynomial.eval₂ (RingHom.comp (X.hom.appLE ⊤ _ le_top).hom (Scheme.ΓSpecIso
-        (CommRingCat.of ℂ)).inv.hom) r F) ∧ (⨆ c, D c = ⊤)) → (∀ (d : ℕ) (p q : (Fin g →
-        ℂ) → ℂ), (Differentiable ℂ p ∧ ∀ (n n' : Fin g → ℤ) z, p (z + τ *ᵥ ofIntVec n + ofIntVec
-        n') = eC (-((N * d : ℕ) : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ
-        z)) * p z) → (Differentiable ℂ q ∧ ∀ (n n' : Fin g → ℤ) z, q (z + τ *ᵥ ofIntVec n + ofIntVec
-        n') = eC (-((N * d : ℕ) : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ
-        z)) * q z) → ∃ (U : X.left.Opens) (φ : Γ(X.left, U)), ∀ z, (⊤ ≤ (ex z).left ⁻¹ᵁ U ↔ q z ≠
-        0) ∧ (q z ≠ 0 → valAt' (ex z).left U φ = p z / q z)) → Even N → ∀ [GrpObj X], (∀ z w, ex (z
-        +
-        w) = ex z * ex w) → ∀ a b : Fin g → ℝ, (∀ i, a i = 0 ∨ a i = 1 / 2) → (∀ i, b i = 0 ∨ b i = 1 / 2) → ∀ (L
-        : LB X.left) (u : HolUnif X L g), L.IsLB → (u.ex = ex ∧ (∀ z, z ∈ u.Λ ↔ z ∈ periodLattice τ)
-        ∧ (∀ (n n' : Fin g → ℤ) i z, ⊤ ≤ (ex
-        z).left ⁻¹ᵁ L.U i → u.fr i z = autFactor a b τ n n' z * u.fr i (z + τ *ᵥ ofIntVec n +
-        ofIntVec n')) ∧ (∀ i, ∃ h F : (Fin g → ℂ) → ℂ, (Differentiable ℂ h ∧ ∀ (n n'
-        : Fin g → ℤ) z, h (z + τ *ᵥ ofIntVec n + ofIntVec n') = eC (-(N : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ
-        ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z)) * h z) ∧ Differentiable ℂ F ∧ (∀ (n n'
-        : Fin g → ℤ) z, F (z + τ *ᵥ ofIntVec n + ofIntVec n') = autFactor a b τ n n' z * eC (-(N
-        : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z)) * F z) ∧ ∀ z, (⊤ ≤ (ex
-        z).left ⁻¹ᵁ L.U i ↔ h z ≠ 0 ∧ F z ≠
-        0) ∧ u.fr i z = h z / F z)) → IsAbelianScheme X → SmoothOfRelativeDimension g X.hom → (∀ n : ℕ, (∀ s, ∃! θ, θ ∈ thetaLevelChar a b n τ ∧ u.IsFnPow n s θ) ∧ ∀ θ ∈ thetaLevelChar a b n τ, ∃! s, u.IsFnPow n s θ)) → (∀ (g
-        : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ), τ ∈ SiegelH (Fin g) → ∀ N : ℕ, 3 ≤ N → ∀ (X : Over (Sp
-        ℂ)) (ex : (Fin g → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ X)) (D : (Fin g → Fin
-        N) → X.left.Opens), (IsIntegral X.left ∧ IsProper X.hom ∧ Function.Surjective ex ∧
-        (∀ z z', ex z = ex z' ↔ z - z' ∈ periodLattice τ) ∧ (∀ (U : (X).left.Opens) (f : Γ((X).left,
-        U)), IsOpen {w | w ∈ (Set.univ : Set (Fin g → ℂ)) ∧ ⊤ ≤ (ex
-        w).left ⁻¹ᵁ U} ∧ DifferentiableOn ℂ (fun w => valAt' (ex w).left U f) {w | w ∈ (Set.univ
-        : Set (Fin g → ℂ)) ∧ ⊤ ≤ (ex w).left ⁻¹ᵁ U}) ∧ (∀ c, IsAffineOpen (D
-        c) ∧ ringKrullDim Γ(X.left, D c) ≤ g ∧ (∀ z, ⊤ ≤ (ex z).left ⁻¹ᵁ D c ↔ theta (fun i => ((c i
-        : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) • τ) ≠ 0) ∧ ∃ r : (Fin g → Fin N) → Γ(X.left, D
-        c), (∀ c' z, theta (fun i => ((c i : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) •
-        τ) ≠ 0 → valAt' (ex z).left (D c) (r c') = theta (fun i => ((c' i : ℕ) : ℝ) / N) 0 ((N : ℂ)
-        • z) ((N : ℂ) • τ) / theta (fun i => ((c i : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) •
-        τ)) ∧ ∀ f : Γ(X.left, D c), ∃ F : MvPolynomial (Fin g → Fin
-        N) ℂ, f = MvPolynomial.eval₂ (RingHom.comp (X.hom.appLE ⊤ _ le_top).hom (Scheme.ΓSpecIso
-        (CommRingCat.of ℂ)).inv.hom) r F) ∧ (⨆ c, D c = ⊤)) → (∀ (d : ℕ) (p q : (Fin g →
-        ℂ) → ℂ), (Differentiable ℂ p ∧ ∀ (n n' : Fin g → ℤ) z, p (z + τ *ᵥ ofIntVec n + ofIntVec
-        n') = eC (-((N * d : ℕ) : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ
-        z)) * p z) → (Differentiable ℂ q ∧ ∀ (n n' : Fin g → ℤ) z, q (z + τ *ᵥ ofIntVec n + ofIntVec
-        n') = eC (-((N * d : ℕ) : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ
-        z)) * q z) → ∃ (U : X.left.Opens) (φ : Γ(X.left, U)), ∀ z, (⊤ ≤ (ex z).left ⁻¹ᵁ U ↔ q z ≠
-        0) ∧ (q z ≠ 0 → valAt' (ex z).left U φ = p z / q z)) → Even N → ∀ [GrpObj X], (∀ z w, ex (z
-        +
-        w) = ex z * ex w) → ∀ a b : Fin g → ℝ, (∀ i, a i = 0 ∨ a i = 1 / 2) → (∀ i, b i = 0 ∨ b i = 1 / 2) → ∀ (L
-        : LB X.left) (u : HolUnif X L g), L.IsLB → (u.ex = ex ∧ (∀ z, z ∈ u.Λ ↔ z ∈ periodLattice τ)
-        ∧ (∀ (n n' : Fin g → ℤ) i z, ⊤ ≤ (ex
-        z).left ⁻¹ᵁ L.U i → u.fr i z = autFactor a b τ n n' z * u.fr i (z + τ *ᵥ ofIntVec n +
-        ofIntVec n')) ∧ (∀ i, ∃ h F : (Fin g → ℂ) → ℂ, (Differentiable ℂ h ∧ ∀ (n n'
-        : Fin g → ℤ) z, h (z + τ *ᵥ ofIntVec n + ofIntVec n') = eC (-(N : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ
-        ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z)) * h z) ∧ Differentiable ℂ F ∧ (∀ (n n'
-        : Fin g → ℤ) z, F (z + τ *ᵥ ofIntVec n + ofIntVec n') = autFactor a b τ n n' z * eC (-(N
-        : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z)) * F z) ∧ ∀ z, (⊤ ≤ (ex
-        z).left ⁻¹ᵁ L.U i ↔ h z ≠ 0 ∧ F z ≠
-        0) ∧ u.fr i z = h z / F z)) → IsAbelianScheme X → SmoothOfRelativeDimension g X.hom → (∀ n : ℕ, (∀ s, ∃! θ, θ ∈ thetaLevelChar a b n τ ∧ u.IsFnPow n s θ) ∧ ∀ θ ∈ thetaLevelChar a b n τ, ∃! s, u.IsFnPow n s θ) → ∀ M : ℕ, 3 ≤ M → Out.VeryAmpleAt X L M) → TorusAlgebraic := by
+theorem torusAlgebraic_of_sections_of_veryAmple
+    : (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ),
+        τ ∈ SiegelH (Fin g)
+          → ∀ N : ℕ,
+            3 ≤ N
+              → ∀ (X : Over (Sp ℂ)) (ex : (Fin g → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ X))
+                  (D : (Fin g → Fin N) → X.left.Opens),
+                (IsIntegral X.left ∧ IsProper X.hom ∧ Function.Surjective ex
+                    ∧ (∀ z z', ex z = ex z' ↔ z - z' ∈ periodLattice τ)
+                    ∧ (∀ (U : (X).left.Opens)
+                        (f
+                          : Γ((X).left,
+                            U)),
+                      IsOpen
+                          {w | w ∈ (Set.univ : Set (Fin g → ℂ)) ∧ ⊤ ≤ (ex
+                            w).left ⁻¹ᵁ U}
+                        ∧ DifferentiableOn ℂ
+                          (fun w => valAt' (ex w).left U f)
+                          {w | w ∈ (Set.univ
+                            : Set (Fin g → ℂ)) ∧ ⊤ ≤ (ex w).left ⁻¹ᵁ U})
+                    ∧ (∀ c,
+                      IsAffineOpen (D c) ∧ ringKrullDim Γ(X.left, D c) ≤ g
+                        ∧ (∀ z,
+                          ⊤ ≤ (ex z).left ⁻¹ᵁ D c
+                            ↔ theta (fun i => ((c i : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) • τ)
+                              ≠ 0)
+                        ∧ ∃ r : (Fin g → Fin N)
+                            → Γ(X.left, D
+                              c),
+                          (∀ c' z,
+                              theta (fun i => ((c i : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) • τ) ≠ 0
+                                → valAt' (ex z).left (D c) (r c')
+                                  = theta
+                                      (fun i => ((c' i : ℕ) : ℝ) / N)
+                                      0 ((N : ℂ) • z) ((N : ℂ) • τ)
+                                    / theta
+                                      (fun i => ((c i : ℕ) : ℝ) / N)
+                                      0 ((N : ℂ) • z) ((N : ℂ) • τ))
+                            ∧ ∀ f : Γ(X.left, D c), ∃ F : MvPolynomial (Fin g → Fin N) ℂ,
+                              f = MvPolynomial.eval₂
+                                (RingHom.comp (X.hom.appLE ⊤ _ le_top).hom
+                                  (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv.hom)
+                                r F)
+                    ∧ (⨆ c, D c = ⊤))
+                  → (∀ (d : ℕ) (p q : (Fin g → ℂ) → ℂ),
+                    (Differentiable ℂ p
+                        ∧ ∀ (n n' : Fin g → ℤ) z,
+                          p (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                            = eC
+                                (-((N * d : ℕ) : ℂ)
+                                  * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z))
+                              * p z)
+                      → (Differentiable ℂ q
+                        ∧ ∀ (n n' : Fin g → ℤ) z,
+                          q (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                            = eC
+                                (-((N * d : ℕ) : ℂ)
+                                  * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z))
+                              * q z)
+                      → ∃ (U : X.left.Opens) (φ : Γ(X.left, U)), ∀ z,
+                        (⊤ ≤ (ex z).left ⁻¹ᵁ U ↔ q z ≠ 0)
+                          ∧ (q z ≠ 0 → valAt' (ex z).left U φ = p z / q z))
+                  → Even N
+                  → ∀ [GrpObj X],
+                    (∀ z w, ex (z + w) = ex z * ex w)
+                      → ∀ a b : Fin g → ℝ,
+                        (∀ i, a i = 0 ∨ a i = 1 / 2) → (∀ i, b i = 0 ∨ b i = 1 / 2)
+                          → ∀ (L : LB X.left) (u : HolUnif X L g),
+                            L.IsLB
+                              → (u.ex = ex ∧ (∀ z, z ∈ u.Λ ↔ z ∈ periodLattice τ)
+                                ∧ (∀ (n n' : Fin g → ℤ) i z,
+                                  ⊤ ≤ (ex z).left ⁻¹ᵁ L.U i
+                                    → u.fr i z
+                                      = autFactor a b τ n n' z
+                                        * u.fr i (z + τ *ᵥ ofIntVec n + ofIntVec n'))
+                                ∧ (∀ i, ∃ h F : (Fin g → ℂ) → ℂ,
+                                  (Differentiable ℂ h
+                                      ∧ ∀ (n n' : Fin g → ℤ) z,
+                                        h (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                                          = eC
+                                              (-(N : ℂ)
+                                                * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2
+                                                  + ofIntVec n ⬝ᵥ z))
+                                            * h z)
+                                    ∧ Differentiable ℂ F
+                                    ∧ (∀ (n n' : Fin g → ℤ) z,
+                                      F (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                                        = autFactor a b τ n n' z
+                                          * eC
+                                            (-(N : ℂ)
+                                              * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2
+                                                + ofIntVec n ⬝ᵥ z))
+                                          * F z)
+                                    ∧ ∀ z,
+                                      (⊤ ≤ (ex z).left ⁻¹ᵁ L.U i ↔ h z ≠ 0 ∧ F z ≠ 0)
+                                        ∧ u.fr i z = h z / F z))
+                              → IsAbelianScheme X → SmoothOfRelativeDimension g X.hom
+                              → (∀ n : ℕ,
+                                (∀ s, ∃! θ, θ ∈ thetaLevelChar a b n τ ∧ u.IsFnPow n s θ)
+                                  ∧ ∀ θ ∈ thetaLevelChar a b n τ, ∃! s, u.IsFnPow n s θ))
+      → (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ),
+        τ ∈ SiegelH (Fin g)
+          → ∀ N : ℕ,
+            3 ≤ N
+              → ∀ (X : Over (Sp ℂ)) (ex : (Fin g → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ X))
+                  (D : (Fin g → Fin N) → X.left.Opens),
+                (IsIntegral X.left ∧ IsProper X.hom ∧ Function.Surjective ex
+                    ∧ (∀ z z', ex z = ex z' ↔ z - z' ∈ periodLattice τ)
+                    ∧ (∀ (U : (X).left.Opens)
+                        (f
+                          : Γ((X).left,
+                            U)),
+                      IsOpen
+                          {w | w ∈ (Set.univ : Set (Fin g → ℂ)) ∧ ⊤ ≤ (ex
+                            w).left ⁻¹ᵁ U}
+                        ∧ DifferentiableOn ℂ
+                          (fun w => valAt' (ex w).left U f)
+                          {w | w ∈ (Set.univ
+                            : Set (Fin g → ℂ)) ∧ ⊤ ≤ (ex w).left ⁻¹ᵁ U})
+                    ∧ (∀ c,
+                      IsAffineOpen (D c) ∧ ringKrullDim Γ(X.left, D c) ≤ g
+                        ∧ (∀ z,
+                          ⊤ ≤ (ex z).left ⁻¹ᵁ D c
+                            ↔ theta (fun i => ((c i : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) • τ)
+                              ≠ 0)
+                        ∧ ∃ r : (Fin g → Fin N)
+                            → Γ(X.left, D
+                              c),
+                          (∀ c' z,
+                              theta (fun i => ((c i : ℕ) : ℝ) / N) 0 ((N : ℂ) • z) ((N : ℂ) • τ) ≠ 0
+                                → valAt' (ex z).left (D c) (r c')
+                                  = theta
+                                      (fun i => ((c' i : ℕ) : ℝ) / N)
+                                      0 ((N : ℂ) • z) ((N : ℂ) • τ)
+                                    / theta
+                                      (fun i => ((c i : ℕ) : ℝ) / N)
+                                      0 ((N : ℂ) • z) ((N : ℂ) • τ))
+                            ∧ ∀ f : Γ(X.left, D c), ∃ F : MvPolynomial (Fin g → Fin N) ℂ,
+                              f = MvPolynomial.eval₂
+                                (RingHom.comp (X.hom.appLE ⊤ _ le_top).hom
+                                  (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv.hom)
+                                r F)
+                    ∧ (⨆ c, D c = ⊤))
+                  → (∀ (d : ℕ) (p q : (Fin g → ℂ) → ℂ),
+                    (Differentiable ℂ p
+                        ∧ ∀ (n n' : Fin g → ℤ) z,
+                          p (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                            = eC
+                                (-((N * d : ℕ) : ℂ)
+                                  * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z))
+                              * p z)
+                      → (Differentiable ℂ q
+                        ∧ ∀ (n n' : Fin g → ℤ) z,
+                          q (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                            = eC
+                                (-((N * d : ℕ) : ℂ)
+                                  * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z))
+                              * q z)
+                      → ∃ (U : X.left.Opens) (φ : Γ(X.left, U)), ∀ z,
+                        (⊤ ≤ (ex z).left ⁻¹ᵁ U ↔ q z ≠ 0)
+                          ∧ (q z ≠ 0 → valAt' (ex z).left U φ = p z / q z))
+                  → Even N
+                  → ∀ [GrpObj X],
+                    (∀ z w, ex (z + w) = ex z * ex w)
+                      → ∀ a b : Fin g → ℝ,
+                        (∀ i, a i = 0 ∨ a i = 1 / 2) → (∀ i, b i = 0 ∨ b i = 1 / 2)
+                          → ∀ (L : LB X.left) (u : HolUnif X L g),
+                            L.IsLB
+                              → (u.ex = ex ∧ (∀ z, z ∈ u.Λ ↔ z ∈ periodLattice τ)
+                                ∧ (∀ (n n' : Fin g → ℤ) i z,
+                                  ⊤ ≤ (ex z).left ⁻¹ᵁ L.U i
+                                    → u.fr i z
+                                      = autFactor a b τ n n' z
+                                        * u.fr i (z + τ *ᵥ ofIntVec n + ofIntVec n'))
+                                ∧ (∀ i, ∃ h F : (Fin g → ℂ) → ℂ,
+                                  (Differentiable ℂ h
+                                      ∧ ∀ (n n' : Fin g → ℤ) z,
+                                        h (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                                          = eC
+                                              (-(N : ℂ)
+                                                * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2
+                                                  + ofIntVec n ⬝ᵥ z))
+                                            * h z)
+                                    ∧ Differentiable ℂ F
+                                    ∧ (∀ (n n' : Fin g → ℤ) z,
+                                      F (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                                        = autFactor a b τ n n' z
+                                          * eC
+                                            (-(N : ℂ)
+                                              * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2
+                                                + ofIntVec n ⬝ᵥ z))
+                                          * F z)
+                                    ∧ ∀ z,
+                                      (⊤ ≤ (ex z).left ⁻¹ᵁ L.U i ↔ h z ≠ 0 ∧ F z ≠ 0)
+                                        ∧ u.fr i z = h z / F z))
+                              → IsAbelianScheme X → SmoothOfRelativeDimension g X.hom
+                              → (∀ n : ℕ,
+                                (∀ s, ∃! θ, θ ∈ thetaLevelChar a b n τ ∧ u.IsFnPow n s θ)
+                                  ∧ ∀ θ ∈ thetaLevelChar a b n τ, ∃! s, u.IsFnPow n s θ)
+                              → ∀ M : ℕ, 3 ≤ M → Out.VeryAmpleAt X L M)
+      → TorusAlgebraic := by
   intro hsec hva g τ a₀ b₀ hs hp ha₀ hb₀
   have f0 := @GlobalTheory.siegelSubDomain_and_domainOpen
   have f1 := @GlobalTheory.thetaMTest_and_thetaSummable
@@ -226,7 +373,8 @@ theorem torusAlgebraic_of_sections_of_veryAmple :
   have f21 := @GlobalTheory.isConnected_basicOpen_complexPoints_of_dense f19 f20
   have f22 := @GlobalTheory.thetaCone_eq_zeroLocus f3 f7 f9 f13 f10 f14 f15 f21 f20
   have f23 := @GlobalTheory.FiniteCoverGrowth.integral_and_rational_of_polynomial_growth f16 f17
-  have f24 := @GlobalTheory.ThetaRational.isIntegral_and_rational_theta f3 f7 f9 f12 f13 f10 f14 f22 f15 f23
+  have f24 :=
+    @GlobalTheory.ThetaRational.isIntegral_and_rational_theta f3 f7 f9 f12 f13 f10 f14 f22 f15 f23
   have f25 := @GlobalTheory.finite_of_isIntegral_of_birational_of_presentation f15
   have f26 := @GlobalTheory.theta_ring_generated_in_degree_one f3 f7 f24 f25
   have f27 := @GlobalTheory.theta_projectiveNormality_even f3 f7 f26
@@ -287,12 +435,37 @@ theorem torusAlgebraic_of_sections_of_veryAmple :
     obtain ⟨c, hc⟩ := TopologicalSpace.Opens.mem_iSup.1 hmem
     have hc' := (top_le_preimage_iff_mem _ _).2 hc
     obtain ⟨-, -, hDc, r, hr, -⟩ := hD c
-    exact f13 g τ hτ N hN 0 w _ fun f hf => fderiv_eq_mul_of_ratio _
-      (fun c => ((f3 g τ hτ N hN1).1 c).1) c 0 w ((hDc 0).1 hc')
-      (fun c' z => valAt' (u.ex z).left (D c) (r c')) hr (fun c' => hw _ _ hc') f (f7 g τ hτ N hN1 f hf)
-  refine ⟨{ A := X, isAb := hab, g := g, smoothDim := hsm, L := L, isLB := hL, rigid := hr, sym := hsy,
-            ample := ham, ktriv := hk }, u, th, rfl, fun z => (hΛ z).trans (TorusAlg.mem_periodLattice_iff z),
-    htan, ?_, hs', hv', fun F hF => ?_⟩
+    exact f13 g τ hτ N hN 0 w _ fun f hf =>
+      fderiv_eq_mul_of_ratio _
+        (fun c => ((f3 g τ hτ N hN1).1 c).1)
+        c 0 w ((hDc 0).1 hc')
+        (fun c' z => valAt' (u.ex z).left (D c) (r c'))
+        hr
+        (fun c' => hw _ _ hc')
+        f (f7 g τ hτ N hN1 f hf)
+  refine ⟨
+    {
+      A := X
+      isAb := hab
+      g := g
+      smoothDim := hsm
+      L := L
+      isLB := hL
+      rigid := hr
+      sym := hsy
+      ample := ham
+      ktriv := hk
+    },
+    u,
+    th,
+    rfl,
+    fun z => (hΛ z).trans (TorusAlg.mem_periodLattice_iff z),
+    htan,
+    ?_,
+    hs',
+    hv',
+    fun F hF => ?_
+  ⟩
   · rw [thetaChar_ofRealVec_eq_theta]
     exact hth
   · exact hend F fun l hl => (hΛ _).1 (hF l ((hΛ _).2 hl))

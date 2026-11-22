@@ -6,8 +6,8 @@ public import Mathlib
 
 open Polynomial
 
-private theorem pow_congr {l : ℕ} [Fact (Nat.Prime l)] {x : PadicAlgCl l} (hx : ‖x‖ = 1) :
-    ∃ n : ℕ, 0 < n ∧ ‖x ^ n - 1‖ < 1 := by
+private theorem pow_congr {l : ℕ} [Fact (Nat.Prime l)] {x : PadicAlgCl l} (hx : ‖x‖ = 1)
+    : ∃ n : ℕ, 0 < n ∧ ‖x ^ n - 1‖ < 1 := by
   have hint : IsIntegral ℚ_[l] x := (Algebra.IsAlgebraic.isAlgebraic x).isIntegral
   let F := IntermediateField.adjoin ℚ_[l] {x}
   have hF : FiniteDimensional ℚ_[l] F := IntermediateField.adjoin.finiteDimensional hint
@@ -33,8 +33,9 @@ private theorem pow_congr {l : ℕ} [Fact (Nat.Prime l)] {x : PadicAlgCl l} (hx 
     rw [mul_sub, ← pow_add, Nat.add_sub_cancel' hlt.le, mul_one]
   rwa [h3, norm_mul, norm_pow, hx, one_pow, one_mul] at h2
 
-private theorem descend {l : ℕ} [hl : Fact (Nat.Prime l)] {y : PadicAlgCl l} (hy : ‖y‖ = 1)
-    (h : ‖y ^ l - 1‖ < 1) : ‖y - 1‖ < 1 := by
+private theorem descend
+    {l : ℕ} [hl : Fact (Nat.Prime l)] {y : PadicAlgCl l} (hy : ‖y‖ = 1) (h : ‖y ^ l - 1‖ < 1)
+    : ‖y - 1‖ < 1 := by
   have hp : ‖(l : PadicAlgCl l)‖ < 1 := by
     rw [← map_natCast (algebraMap ℚ_[l] (PadicAlgCl l)), norm_algebraMap']
     exact Padic.norm_p_lt_one
@@ -53,8 +54,7 @@ private theorem descend {l : ℕ} [hl : Fact (Nat.Prime l)] {y : PadicAlgCl l} (
     rw [one_pow, mul_one, norm_mul, norm_pow]
     exact mul_le_one₀ (pow_le_one₀ (norm_nonneg _) hz1) (norm_nonneg _)
       (IsUltrametricDist.norm_natCast_le_one _ _)
-  have e2 : z ^ l = (y ^ l - 1) + -((l : PadicAlgCl l) * S) := by
-    rw [hyz, e]; ring
+  have e2 : z ^ l = (y ^ l - 1) + -((l : PadicAlgCl l) * S) := by rw [hyz, e]; ring
   have h4 : ‖z ^ l‖ < 1 := by
     rw [e2]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt h ?_)
@@ -63,8 +63,9 @@ private theorem descend {l : ℕ} [hl : Fact (Nat.Prime l)] {y : PadicAlgCl l} (
   rw [norm_pow] at h4
   exact (pow_lt_one_iff_of_nonneg (norm_nonneg _) hl.out.ne_zero).1 h4
 
-private theorem coprime_pow_congr {l : ℕ} [hl : Fact (Nat.Prime l)] {x : PadicAlgCl l}
-    (hx : ‖x‖ = 1) : ∃ m : ℕ, ¬l ∣ m ∧ ‖x ^ m - 1‖ < 1 := by
+private theorem coprime_pow_congr
+    {l : ℕ} [hl : Fact (Nat.Prime l)] {x : PadicAlgCl l} (hx : ‖x‖ = 1)
+    : ∃ m : ℕ, ¬ l ∣ m ∧ ‖x ^ m - 1‖ < 1 := by
   obtain ⟨n, hn, h⟩ := pow_congr hx
   obtain ⟨k, m, hm, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hn.ne' l hl.out.ne_one
   refine ⟨m, hm, ?_⟩
@@ -76,9 +77,11 @@ private theorem coprime_pow_congr {l : ℕ} [hl : Fact (Nat.Prime l)] {x : Padic
     apply descend (by rw [norm_pow, hx, one_pow])
     rwa [← pow_mul, mul_right_comm, ← pow_succ]
 
-theorem UpperTheory.Reformulated.B.ExistsRootCongruence.exists_root_congr :
-    ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] {x : PadicAlgCl l},
-    ‖x‖ = (1 : ℝ) → ∃ (m : ℕ) (ζ : PadicAlgCl l), ¬l ∣ m ∧ ζ ^ m = (1 : PadicAlgCl l) ∧ ‖x - ζ‖ < (1 : ℝ) := by
+theorem UpperTheory.Reformulated.B.ExistsRootCongruence.exists_root_congr
+    : ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] {x : PadicAlgCl l},
+      ‖x‖ = (1 : ℝ)
+        → ∃ (m : ℕ) (ζ : PadicAlgCl l),
+          ¬ l ∣ m ∧ ζ ^ m = (1 : PadicAlgCl l) ∧ ‖x - ζ‖ < (1 : ℝ) := by
   intro l _ x hx
   obtain ⟨m, hm, h⟩ := coprime_pow_congr hx
   have hm0 : 0 < m := Nat.pos_of_ne_zero (by rintro rfl; exact hm (dvd_zero l))
@@ -90,7 +93,9 @@ theorem UpperTheory.Reformulated.B.ExistsRootCongruence.exists_root_congr :
   push Not at hcon
   rw [e, norm_prod] at h
   refine absurd h (not_lt.2 ?_)
-  refine Finset.prod_induction _ (fun r : ℝ => 1 ≤ r)
-    (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb) le_rfl ?_
+  refine Finset.prod_induction _
+    (fun r : ℝ => 1 ≤ r)
+    (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
+    le_rfl ?_
   intro ζ hζ
   exact hcon m ζ hm ((mem_nthRootsFinset hm0 1).1 hζ)

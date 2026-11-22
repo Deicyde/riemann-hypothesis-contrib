@@ -36,8 +36,8 @@ theorem pderiv_linF (lam : τ → K) (w : τ) : pderiv (R := K) w (linF lam) = C
     simp [hb]
   · simp
 
-theorem coeff_linF_pow_step (lam : τ → K) (w : τ) (m : τ →₀ ℕ) (k : ℕ) :
-    coeff (m + Finsupp.single w 1) (linF lam ^ (k + 1)) * ((m w : K) + 1)
+theorem coeff_linF_pow_step (lam : τ → K) (w : τ) (m : τ →₀ ℕ) (k : ℕ)
+    : coeff (m + Finsupp.single w 1) (linF lam ^ (k + 1)) * ((m w : K) + 1)
       = ((k : K) + 1) * lam w * coeff m (linF lam ^ k) := by
   have h := congrArg (coeff m) (Derivation.leibniz_pow (pderiv (R := K) w) (linF lam) (k + 1))
   rw [coeff_pderiv, pderiv_linF] at h
@@ -48,19 +48,23 @@ theorem coeff_linF_pow_step (lam : τ → K) (w : τ) (m : τ →₀ ℕ) (k : �
 
 variable [CharZero K]
 
-private theorem coeff_mvExp_eq_sum_range_degree {K : Type} [Field K] {ρ : Type} (h : MvPowerSeries ρ K) (m : ρ →₀ ℕ) :
-    coeff m (Formalism.IncomingBounds.mvExp h) = ∑ k ∈ Finset.range (m.degree + 1), coeff m (h ^ k) / (k.factorial : K) := rfl
+private theorem coeff_mvExp_eq_sum_range_degree
+    {K : Type} [Field K] {ρ : Type} (h : MvPowerSeries ρ K) (m : ρ →₀ ℕ)
+    : coeff m (Formalism.IncomingBounds.mvExp h)
+      = ∑ k ∈ Finset.range (m.degree + 1), coeff m (h ^ k) / (k.factorial : K) :=
+  rfl
 
-private theorem add_single_one_ne_zero {ρ : Type} (m : ρ →₀ ℕ) (w : ρ) : m + Finsupp.single w 1 ≠ 0 := by
+private theorem add_single_one_ne_zero {ρ : Type} (m : ρ →₀ ℕ) (w : ρ)
+    : m + Finsupp.single w 1 ≠ 0 := by
   intro h
   have := congrArg (fun f : ρ →₀ ℕ => f w) h
   simp at this
 
-theorem coeff_mvExp_linF_step (lam : τ → K) (w : τ) (m : τ →₀ ℕ) :
-    coeff (m + Finsupp.single w 1) (mvExp (linF lam)) * ((m w : K) + 1)
+theorem coeff_mvExp_linF_step (lam : τ → K) (w : τ) (m : τ →₀ ℕ)
+    : coeff (m + Finsupp.single w 1) (mvExp (linF lam)) * ((m w : K) + 1)
       = lam w * coeff m (mvExp (linF lam)) := by
-  rw [coeff_mvExp_eq_sum_range_degree, coeff_mvExp_eq_sum_range_degree, map_add Finsupp.degree, Finsupp.degree_single,
-    Finset.sum_range_succ', Finset.mul_sum, add_mul, Finset.sum_mul]
+  rw [coeff_mvExp_eq_sum_range_degree, coeff_mvExp_eq_sum_range_degree, map_add Finsupp.degree,
+    Finsupp.degree_single, Finset.sum_range_succ', Finset.mul_sum, add_mul, Finset.sum_mul]
   have h0 : coeff (m + Finsupp.single w 1) (linF lam ^ 0) = 0 := by
     classical
     rw [pow_zero, MvPowerSeries.coeff_one, if_neg (add_single_one_ne_zero m w)]

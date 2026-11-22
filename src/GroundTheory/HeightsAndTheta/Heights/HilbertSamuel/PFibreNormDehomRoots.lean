@@ -29,8 +29,8 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 theorem FibreNormDehomRoots.full : FibreNormDehomRoots.Statement :=
   FibreNormDehomRoots.proof
-    (PullFormsGeneric.proof
-      (PullRatiosAlgebraic.proof PullConeNull.proof PullConeDegree.proof PullGradedAlgebraic.proof))
+    (PullFormsGeneric.proof (PullRatiosAlgebraic.proof PullConeNull.proof PullConeDegree.proof
+      PullGradedAlgebraic.proof))
     PullSectionIntegral.proof CharpolyRootLift.proof
 
 end GroundTheory.Heights₂.Heights.HilbertSamuel

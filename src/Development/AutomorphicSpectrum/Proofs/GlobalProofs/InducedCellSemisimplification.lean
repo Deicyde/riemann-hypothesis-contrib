@@ -7,5 +7,7 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.BernsteinZelev
 
 @[expose] public section
 
-theorem GlobalTheory.CompanionTheory.Glob.cellSemisimplification : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], GlobalTheory.SmGL.CellSemisimplification k :=
+theorem GlobalTheory.CompanionTheory.Glob.cellSemisimplification
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      GlobalTheory.SmGL.CellSemisimplification k :=
   GlobalTheory.SmGL.CellSemis.cellSemisimplification GlobalTheory.T.bernstein_zelevinsky_finiteness

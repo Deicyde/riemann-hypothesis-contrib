@@ -11,4 +11,5 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 @[expose] public section
 
 theorem UpperTheory.V.Pa.pFromAut : UpperTheory.V.Pa.PfromAut :=
-  UpperTheory.V.Pa.pFromAut_of UpperTheory.V.Pa.norm UpperTheory.V.Pa.choice UpperTheory.V.Pa.arPl UpperTheory.V.Pa.b1Ar UpperTheory.V.Pa.b2Ar UpperTheory.V.Pa.raw
+  UpperTheory.V.Pa.pFromAut_of UpperTheory.V.Pa.norm UpperTheory.V.Pa.choice UpperTheory.V.Pa.arPl
+    UpperTheory.V.Pa.b1Ar UpperTheory.V.Pa.b2Ar UpperTheory.V.Pa.raw

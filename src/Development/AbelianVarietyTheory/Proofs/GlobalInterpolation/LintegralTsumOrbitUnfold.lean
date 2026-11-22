@@ -9,17 +9,19 @@ open scoped ENNReal
 
 namespace GlobalTheory
 
-theorem lintegral_tsum_orbit_unfold (G G' V X : Type) [Group G] [Group G'] [MeasurableSpace G]
-    [MeasurableSpace G'] [MeasurableMul₂ G] [MeasurableInv G] [MeasurableMul G'] [MulAction G V]
-    (μ : Measure G) [SFinite μ] [μ.IsMulLeftInvariant] (μ' : Measure G') [SFinite μ']
-    [μ'.IsMulLeftInvariant] (Γ : Subgroup G) (Γ' : Subgroup G') [Countable Γ] [Countable Γ']
-    (𝓕 : Set G) (𝓕' : Set G') (h𝓕 : IsFundamentalDomain Γ 𝓕 μ)
-    (h𝓕' : IsFundamentalDomain Γ' 𝓕' μ') (φ : G' →* G) (hφm : Measurable φ)
-    (hφi : Function.Injective φ) (hΓ : ∀ g, φ g ∈ Γ ↔ g ∈ Γ') (x : V)
-    (hst : φ.range = MulAction.stabilizer G x) (c : X → V) (hc : Function.Injective c)
-    (hcr : ∀ y, y ∈ Set.range c ↔ ∃ γ ∈ Γ, γ • x = y) (u : G → ℝ≥0∞) (hu : Measurable u)
-    (Φ : V → ℝ≥0∞) (hΦ : ∀ h : G, Φ (h⁻¹ • x) = ∫⁻ g, u ((φ g)⁻¹ * h) ∂μ') :
-    ∫⁻ h in 𝓕, ∑' i, Φ (h⁻¹ • c i) ∂μ = μ' 𝓕' * ∫⁻ h, u h ∂μ := by
+theorem lintegral_tsum_orbit_unfold
+    (G G' V X : Type) [Group G] [Group G'] [MeasurableSpace G] [MeasurableSpace G']
+    [MeasurableMul₂ G] [MeasurableInv G] [MeasurableMul G'] [MulAction G V]
+    (μ : Measure G) [SFinite μ] [μ.IsMulLeftInvariant]
+    (μ' : Measure G') [SFinite μ'] [μ'.IsMulLeftInvariant]
+    (Γ : Subgroup G) (Γ' : Subgroup G') [Countable Γ] [Countable Γ']
+    (𝓕 : Set G) (𝓕' : Set G') (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (h𝓕' : IsFundamentalDomain Γ' 𝓕' μ')
+    (φ : G' →* G) (hφm : Measurable φ) (hφi : Function.Injective φ) (hΓ : ∀ g, φ g ∈ Γ ↔ g ∈ Γ')
+    (x : V) (hst : φ.range = MulAction.stabilizer G x)
+    (c : X → V) (hc : Function.Injective c) (hcr : ∀ y, y ∈ Set.range c ↔ ∃ γ ∈ Γ, γ • x = y)
+    (u : G → ℝ≥0∞) (hu : Measurable u)
+    (Φ : V → ℝ≥0∞) (hΦ : ∀ h : G, Φ (h⁻¹ • x) = ∫⁻ g, u ((φ g)⁻¹ * h) ∂μ')
+    : ∫⁻ h in 𝓕, ∑' i, Φ (h⁻¹ • c i) ∂μ = μ' 𝓕' * ∫⁻ h, u h ∂μ := by
   haveI : MeasurableConstSMul Γ G := ⟨fun γ => measurable_const_mul (γ : G)⟩
   haveI : MeasurableConstSMul Γ' G' := ⟨fun γ => measurable_const_mul (γ : G')⟩
   haveI : SMulInvariantMeasure Γ G μ :=
@@ -60,8 +62,7 @@ theorem lintegral_tsum_orbit_unfold (G G' V X : Type) [Group G] [Group G'] [Meas
     intro h
     rw [← (Equiv.ofBijective f hf).tsum_eq, ENNReal.tsum_prod']
     refine tsum_congr fun i => ?_
-    have h1 : h⁻¹ • c i = ((γ i)⁻¹ * h)⁻¹ • x := by
-      rw [mul_inv_rev, inv_inv, mul_smul, hγx]
+    have h1 : h⁻¹ • c i = ((γ i)⁻¹ * h)⁻¹ • x := by rw [mul_inv_rev, inv_inv, mul_smul, hγx]
     rw [h1, hΦ, h𝓕'.lintegral_eq_tsum'']
     refine tsum_congr fun a => ?_
     refine lintegral_congr fun g => ?_
@@ -69,7 +70,9 @@ theorem lintegral_tsum_orbit_unfold (G G' V X : Type) [Group G] [Group G'] [Meas
     show (φ ((a : G') * g))⁻¹ * ((γ i)⁻¹ * h) = (φ g)⁻¹ * ((γ i * φ a)⁻¹ * h)
     simp [mul_assoc]
   simp_rw [step]
-  rw [lintegral_tsum (f := fun (δ : Γ) h => F (δ⁻¹ • h)) (fun δ => (hF.comp (measurable_const_smul δ⁻¹)).aemeasurable),
+  rw [lintegral_tsum
+      (f := fun (δ : Γ) h => F (δ⁻¹ • h))
+      (fun δ => (hF.comp (measurable_const_smul δ⁻¹)).aemeasurable),
     ← h𝓕.lintegral_eq_tsum' F]
   show ∫⁻ h, ∫⁻ g in 𝓕', u ((φ g)⁻¹ * h) ∂μ' ∂μ = _
   rw [lintegral_lintegral_swap hK.aemeasurable]

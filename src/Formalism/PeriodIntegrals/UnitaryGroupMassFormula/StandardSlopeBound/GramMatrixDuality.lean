@@ -15,7 +15,8 @@ section Form
 variable {σ : Type}
 
 def fqB (c : ℚ) : MvPolynomial σ ℚ →ₗ[ℚ] MvPolynomial σ ℚ →ₗ[ℚ] ℚ :=
-  LinearMap.mk₂ ℚ (fun P Q => fockQ P Q / c)
+  LinearMap.mk₂ ℚ
+    (fun P Q => fockQ P Q / c)
     (fun P P' Q => by rw [we_fock_add_left, add_div])
     (fun a P Q => by rw [smul_eq_mul, we_fock_smul_left, mul_div_assoc])
     (fun P Q Q' => by rw [we_fock_add_right, add_div])
@@ -26,7 +27,8 @@ theorem fqB_apply (c : ℚ) (P Q : MvPolynomial σ ℚ) : fqB c P Q = fockQ P Q 
 theorem fqB_symm (c : ℚ) (P Q : MvPolynomial σ ℚ) : fqB c P Q = fqB c Q P := by
   rw [fqB_apply, fqB_apply, we_fock_symm]
 
-theorem fqB_self_eq_zero {c : ℚ} (hc : c ≠ 0) (P : MvPolynomial σ ℚ) (h : fqB c P P = 0) : P = 0 := by
+theorem fqB_self_eq_zero {c : ℚ} (hc : c ≠ 0) (P : MvPolynomial σ ℚ) (h : fqB c P P = 0)
+    : P = 0 := by
   rw [fqB_apply, div_eq_zero_iff] at h
   by_contra hP
   exact (ne_of_gt ((fockQPos _ P P).2 hP)) (h.resolve_right hc)
@@ -38,17 +40,21 @@ theorem intQ_injective (N : ℕ) : Function.Injective (intQ N N) := by
   rw [we_intQ_apply, we_intQ_apply] at hpq
   exact map_injective _ (fun a b h => Int.cast_injective h) hpq
 
-theorem linIndep_Q {N r : ℕ} {M : Submodule ℤ (MvPolynomial (Fin N × Fin N) ℤ)} (e : Module.Basis (Fin r) ℤ M) :
-    LinearIndependent ℚ (fun i => intQ N N (e i : MvPolynomial (Fin N × Fin N) ℤ)) := by
+theorem linIndep_Q
+    {N r : ℕ} {M : Submodule ℤ (MvPolynomial (Fin N × Fin N) ℤ)} (e : Module.Basis (Fin r) ℤ M)
+    : LinearIndependent ℚ (fun i => intQ N N (e i : MvPolynomial (Fin N × Fin N) ℤ)) := by
   have h1 : LinearIndependent ℤ (fun i => intQ N N (e i : MvPolynomial (Fin N × Fin N) ℤ)) :=
-    e.linearIndependent.map' ((intQ N N).comp M.subtype) (by
-      rw [LinearMap.ker_eq_bot]; exact (intQ_injective N).comp M.injective_subtype)
+    e.linearIndependent.map' ((intQ N N).comp M.subtype)
+      (by rw [LinearMap.ker_eq_bot]; exact (intQ_injective N).comp M.injective_subtype)
   exact (LinearIndependent.iff_fractionRing ℤ ℚ).mp h1
 
-theorem expand {N r : ℕ} {M : Submodule ℤ (MvPolynomial (Fin N × Fin N) ℤ)} (e : Module.Basis (Fin r) ℤ M)
-    (p : MvPolynomial (Fin N × Fin N) ℤ) (hp : p ∈ M) :
-    intQ N N p = ∑ k, ((e.repr ⟨p, hp⟩ k : ℤ) : ℚ) • intQ N N (e k : MvPolynomial (Fin N × Fin N) ℤ) := by
-  have h := congrArg (fun x : M => intQ N N (x : MvPolynomial (Fin N × Fin N) ℤ)) (e.sum_repr ⟨p, hp⟩)
+theorem expand
+    {N r : ℕ} {M : Submodule ℤ (MvPolynomial (Fin N × Fin N) ℤ)}
+    (e : Module.Basis (Fin r) ℤ M) (p : MvPolynomial (Fin N × Fin N) ℤ) (hp : p ∈ M)
+    : intQ N N p
+      = ∑ k, ((e.repr ⟨p, hp⟩ k : ℤ) : ℚ) • intQ N N (e k : MvPolynomial (Fin N × Fin N) ℤ) := by
+  have h :=
+    congrArg (fun x : M => intQ N N (x : MvPolynomial (Fin N × Fin N) ℤ)) (e.sum_repr ⟨p, hp⟩)
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, map_zsmul] at h
   rw [← h]
@@ -75,8 +81,10 @@ theorem gram_matrix_duality : GramDual := by
     rw [hWE] at hm
     obtain ⟨z, hz⟩ := hm.2 (u k) (hu_mem k)
     exact ⟨z, by rw [hB, fqB_apply, hz, mul_div_assoc, div_self hne, mul_one]⟩
-  obtain ⟨M, hM⟩ : ∃ M : Matrix (Fin r) (Fin r') ℤ, ∀ i k, B (w i) (u k) = M i k :=
-    ⟨Matrix.of fun i k => Classical.choose (hMex0 i k), fun i k => Classical.choose_spec (hMex0 i k)⟩
+  obtain ⟨M, hM⟩ : ∃ M : Matrix (Fin r) (Fin r') ℤ, ∀ i k, B (w i) (u k) = M i k := ⟨
+    Matrix.of fun i k => Classical.choose (hMex0 i k),
+    fun i k => Classical.choose_spec (hMex0 i k)
+  ⟩
   have hu_ind : LinearIndependent ℚ u := linIndep_Q e'
   have hw_ind : LinearIndependent ℚ w := linIndep_Q e
 
@@ -95,10 +103,12 @@ theorem gram_matrix_duality : GramDual := by
       exact Finset.sum_congr rfl fun l _ => by rw [map_smul, smul_eq_mul, mul_comm]
     have e2 : ∀ l, B y (u l) = 0 := fun l => by rw [hB, fqB_symm, ← hB]; exact hx l
     have hxx : B y y = 0 := by
-      calc B y y = B y (∑ l, v l • u l) := by rw [← hy]
+      calc
+        B y y
+          = B y (∑ l, v l • u l) := by rw [← hy]
         _ = ∑ l, v l * B y (u l) := by
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [map_sum]; exact Finset.sum_congr rfl fun l _ => by rw [map_smul, smul_eq_mul]
+          set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sum]; exact Finset.sum_congr rfl fun l _ => by rw [map_smul, smul_eq_mul]
         _ = 0 := by simp [e2]
     have hy0 : ∑ l, v l • u l = 0 := by rw [← hy]; exact fqB_self_eq_zero hne _ hxx
     exact hv0 (funext (Fintype.linearIndependent_iff.mp hu_ind v hy0))
@@ -117,7 +127,8 @@ theorem gram_matrix_duality : GramDual := by
   have hf_mem : ∀ j, f j ∈ (weyl ℤ N N le_rfl ν).map (intQ N N) := by
     intro j
     rw [hWE]
-    refine ⟨Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (we_nabla_le ν (u k) (hu_mem k)), ?_⟩
+    refine
+      ⟨Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (we_nabla_le ν (u k) (hu_mem k)), ?_⟩
     rintro Q ⟨p, hp, rfl⟩
     refine ⟨e'.repr ⟨p, hp⟩ j, ?_⟩
     have hB1 : B (f j) (∑ l, ((e'.repr ⟨p, hp⟩ l : ℤ) : ℚ) • u l) = (e'.repr ⟨p, hp⟩ j : ℚ) := by
@@ -148,10 +159,12 @@ theorem gram_matrix_duality : GramDual := by
     intro y hy hyl
     obtain ⟨d, hd⟩ := (Submodule.mem_span_range_iff_exists_fun ℚ).mp hy
     apply fqB_self_eq_zero hne
-    calc B y y = B y (∑ l, d l • u l) := by rw [hd]
+    calc
+      B y y
+        = B y (∑ l, d l • u l) := by rw [hd]
       _ = ∑ l, d l * B y (u l) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]; exact Finset.sum_congr rfl fun l _ => by rw [map_smul, smul_eq_mul]
+        set_option synthInstance.maxHeartbeats 100000 in
+        rw [map_sum]; exact Finset.sum_congr rfl fun l _ => by rw [map_smul, smul_eq_mul]
       _ = 0 := by simp [hyl]
   have hw_span : ∀ i, w i ∈ Submodule.span ℚ (Set.range u) := by
     intro i
@@ -179,10 +192,13 @@ theorem gram_matrix_duality : GramDual := by
       simp only [hNm, Matrix.mul_apply, Int.cast_sum, Int.cast_mul, Finset.smul_sum, smul_smul,
         Finset.sum_smul]
       rw [Finset.sum_comm]
-    have hsum : ∑ k, ((((M * Nm : Matrix (Fin r) (Fin r) ℤ) i k : ℤ) : ℚ) -
-        (((1 : Matrix (Fin r) (Fin r) ℤ) i k : ℤ) : ℚ)) • w k = 0 := by
+    have hsum
+        : ∑ k, ((((M * Nm : Matrix (Fin r) (Fin r) ℤ) i k : ℤ) : ℚ) -
+            (((1 : Matrix (Fin r) (Fin r) ℤ) i k : ℤ) : ℚ)) • w k
+          = 0 := by
       simp only [sub_smul, Finset.sum_sub_distrib, h2, Matrix.one_apply, Int.cast_ite, Int.cast_one,
-        Int.cast_zero, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
+        Int.cast_zero, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, if_true,
+        sub_self]
     have hk := Fintype.linearIndependent_iff.mp hw_ind _ hsum k
     exact_mod_cast sub_eq_zero.mp hk
 
@@ -203,22 +219,24 @@ theorem gram_matrix_duality : GramDual := by
       rw [hf_def, map_sum]
     exact Finset.sum_congr rfl fun k _ => by rw [map_smul, smul_eq_mul, hM]
   set Mq : Matrix (Fin r) (Fin r) ℚ := M.map (Int.castRingHom ℚ) with hMq
-  have hGw : gramOf ν (fun i => (e i : MvPolynomial (Fin N × Fin N) ℤ)) = Mq * Matrix.transpose Gi * Matrix.transpose Mq := by
+  have hGw
+      : gramOf ν (fun i => (e i : MvPolynomial (Fin N × Fin N) ℤ))
+        = Mq * Matrix.transpose Gi * Matrix.transpose Mq := by
     ext i i'
-    have e1 : gramOf ν (fun i => (e i : MvPolynomial (Fin N × Fin N) ℤ)) i i' = B (w i) (w i') := rfl
+    have e1 : gramOf ν (fun i => (e i : MvPolynomial (Fin N × Fin N) ℤ)) i i' = B (w i) (w i') :=
+      rfl
     rw [e1]
     conv_lhs => rw [hwf i']
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
-    simp only [map_smul, smul_eq_mul, hBwf, Matrix.mul_apply, Matrix.transpose_apply, hMq, Matrix.map_apply,
-      eq_intCast, Finset.sum_mul, Finset.mul_sum]
+    simp only [map_smul, smul_eq_mul, hBwf, Matrix.mul_apply, Matrix.transpose_apply, hMq,
+      Matrix.map_apply, eq_intCast, Finset.sum_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => by ring
   have hGu : gramOf ν (fun i => (e' i : MvPolynomial (Fin N × Fin N) ℤ)) = G' := by
     ext k l
     rfl
   have hdetM : M.det ^ 2 = 1 := by
-    have h1 : M.det * Nm.det = 1 := by
-      rw [← Matrix.det_mul, hMN, Matrix.det_one]
+    have h1 : M.det * Nm.det = 1 := by rw [← Matrix.det_mul, hMN, Matrix.det_one]
     rcases Int.eq_one_or_neg_one_of_mul_eq_one h1 with h2 | h2 <;> simp [h2]
   have hdetMq : Mq.det ^ 2 = 1 := by
     have h3 : (M.map (Int.castRingHom ℚ)).det = ((M.det : ℤ) : ℚ) :=
@@ -226,8 +244,11 @@ theorem gram_matrix_duality : GramDual := by
     rw [hMq, h3]
     exact_mod_cast hdetM
   rw [hGw, hGu, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, Matrix.det_transpose]
-  have hinv : Gi.det * G'.det = 1 := Matrix.det_nonsing_inv_mul_det G' (isUnit_iff_ne_zero.mpr hG'det)
-  calc Mq.det * Gi.det * Mq.det * G'.det = Mq.det ^ 2 * (Gi.det * G'.det) := by ring
+  have hinv : Gi.det * G'.det = 1 :=
+    Matrix.det_nonsing_inv_mul_det G' (isUnit_iff_ne_zero.mpr hG'det)
+  calc
+    Mq.det * Gi.det * Mq.det * G'.det
+      = Mq.det ^ 2 * (Gi.det * G'.det) := by ring
     _ = 1 := by rw [hdetMq, hinv, one_mul]
 
 end PI.SlopeSteps

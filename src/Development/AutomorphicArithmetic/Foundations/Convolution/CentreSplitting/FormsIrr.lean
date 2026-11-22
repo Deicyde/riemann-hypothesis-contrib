@@ -7,13 +7,13 @@ public import GroundTheory.AutomorphicForms.L2LocalComponents.NonEmpty
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
-theorem UpperTheory.ConvolutionTheory.Dp.formsIrr :
-    UpperTheory.ConvolutionTheory.Dp.FormsIrr := by
+theorem UpperTheory.ConvolutionTheory.Dp.formsIrr : UpperTheory.ConvolutionTheory.Dp.FormsIrr := by
   intro K _ _ n μ _ V hV
   obtain ⟨hcs, hI, hirr⟩ := sumT K n μ V hV
   have hc : IsClosed ((V.comap (toLp μ).toLinearMap : Submodule ℂ (CuspL2 μ)) : Set (CuspL2 μ)) :=
@@ -32,7 +32,9 @@ theorem UpperTheory.ConvolutionTheory.Dp.formsIrr :
   · refine le_antisymm (Submodule.topologicalClosure_minimal _ ?_ hV.closed) fun v hv => ?_
     · exact Submodule.map_le_iff_le_comap.2 inf_le_right
     · obtain ⟨u, rfl⟩ : ∃ u : CuspL2 μ, toLp μ u = v := ⟨(⟨v, hV.le hv⟩ : cuspidalL2 μ), rfl⟩
-      have hu : u ∈ closure (((formsIn μ V).map (cuspVecL μ) : Submodule ℂ (CuspL2 μ)) : Set (CuspL2 μ)) := by
+      have hu
+          : u ∈ closure
+            (((formsIn μ V).map (cuspVecL μ) : Submodule ℂ (CuspL2 μ)) : Set (CuspL2 μ)) := by
         rw [← Submodule.topologicalClosure_coe, hcl]
         exact hv
       rw [← SetLike.mem_coe, Submodule.topologicalClosure_coe]

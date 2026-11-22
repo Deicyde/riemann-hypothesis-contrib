@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensorCartan
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open scoped Classical
 
 noncomputable section
@@ -20,25 +22,45 @@ namespace GlobalTheory.GaussFockPair
 
 open GlobalTheory.GaussFockJ
 
-def tensC {n d : ℕ} (JX : Matrix (Fin n) (Fin n) ℂ) (JW : Matrix (Fin d) (Fin d) ℂ) (x y : Matrix (Fin n) (Fin d) ℂ) : ℂ :=
+def tensC
+    {n d : ℕ}
+    (JX : Matrix (Fin n) (Fin n) ℂ) (JW : Matrix (Fin d) (Fin d) ℂ) (x y : Matrix (Fin n) (Fin d) ℂ)
+    : ℂ :=
   ∑ i, ∑ j, ∑ k, ∑ l, x i j * JX i k * JW j l * star (y k l)
 
-theorem tensC_zero_left {n d : ℕ} (JX : Matrix (Fin n) (Fin n) ℂ) (JW : Matrix (Fin d) (Fin d) ℂ) (y : Matrix (Fin n) (Fin d) ℂ) :
-    tensC JX JW 0 y = 0 := by
+theorem tensC_zero_left
+    {n d : ℕ}
+    (JX : Matrix (Fin n) (Fin n) ℂ) (JW : Matrix (Fin d) (Fin d) ℂ) (y : Matrix (Fin n) (Fin d) ℂ)
+    : tensC JX JW 0 y = 0 := by
   simp [tensC]
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem pair_Psi {n d : ℕ} {X : Spc F E n} {W : Spc F E d} (M : Model σ X W) (u v : Matrix (Fin n) (Fin d) (AE F E)) :
-    GlobalTheory.GaussLine.pairInf F (Fin n × Fin d) (Psi M u).1 (Psi M v).2 -
-                 GlobalTheory.GaussLine.pairInf F (Fin n × Fin d) (Psi M v).1 (Psi M u).2 =
-      Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
-        (evI F (symp (R := AF F) (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) X.J) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) W.J) u v)) := by
+theorem pair_Psi
+    {n d : ℕ} {X : Spc F E n} {W : Spc F E d}
+    (M : Model σ X W) (u v : Matrix (Fin n) (Fin d) (AE F E))
+    : GlobalTheory.GaussLine.pairInf F (Fin n × Fin d) (Psi M u).1 (Psi M v).2
+        - GlobalTheory.GaussLine.pairInf F (Fin n × Fin d) (Psi M v).1 (Psi M u).2
+      = Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
+        (evI F
+          (symp (R := AF F) (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ)
+            (-1)
+            ((_root_.Matrix.map ·
+                (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+                  (AF F)))
+              X.J)
+            ((_root_.Matrix.map ·
+                (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+                  (AF F)))
+              W.J)
+            u v)) := by
   have hform := M.co.form u v
   simp only [cA, incM] at hform
   rw [hform, ← evIHom_apply, map_sub, map_sub]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [GlobalTheory.GaussLine.pairInf_apply, Psi, EvAt0.PolD.arc, dotProduct, map_sum, map_mul, evIHom_apply]
+  simp only [GlobalTheory.GaussLine.pairInf_apply, Psi, EvAt0.PolD.arc, dotProduct, map_sum,
+    map_mul, evIHom_apply]
 
 theorem exists_pos_complex_structure : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E) (n d : ℕ)
     (X : Spc F E n) (W : Spc F E d) (M : Model σ X W) (χX χW : Chr F E) (om : Rep σ X W) (r s r' s' : ℕ),

@@ -26,8 +26,8 @@ lemma pow_smul_le_of_smul_le {K : ℕ → Submodule A H} (hK : ∀ n, I • K n 
     rw [pow_succ', Submodule.mul_smul, ← add_assoc]
     exact (Submodule.smul_mono le_rfl ih).trans (hK _)
 
-def reesFiltration {K : ℕ → Submodule A H} (hK : ∀ n, I • K n ≤ K (n + 1)) :
-    Submodule (reesAlgebra I) (PolynomialModule A H) where
+def reesFiltration {K : ℕ → Submodule A H} (hK : ∀ n, I • K n ≤ K (n + 1))
+    : Submodule (reesAlgebra I) (PolynomialModule A H) where
   carrier := {p | ∀ n, p.coeff n ∈ K n}
   add_mem' {p q} hp hq n := by
     have : (p + q).coeff n = p.coeff n + q.coeff n := rfl
@@ -45,16 +45,16 @@ def reesFiltration {K : ℕ → Submodule A H} (hK : ∀ n, I • K n ≤ K (n +
     have := pow_smul_le_of_smul_le I hK x.1 x.2 (Submodule.smul_mem_smul hr (hp x.2))
     rwa [add_comm, hx'] at this
 
-theorem exists_eq_pow_smul_of_fg {K : ℕ → Submodule A H} (hK : ∀ n, I • K n ≤ K (n + 1))
-    (hfg : (reesFiltration I hK).FG) : ∃ c, ∀ n, K (n + c) = I ^ n • K c := by
+theorem exists_eq_pow_smul_of_fg
+    {K : ℕ → Submodule A H} (hK : ∀ n, I • K n ≤ K (n + 1)) (hfg : (reesFiltration I hK).FG)
+    : ∃ c, ∀ n, K (n + c) = I ^ n • K c := by
   classical
   obtain ⟨s, hs⟩ := hfg
   set c := s.sup fun p => p.coeff.support.sup id
   have hdeg : ∀ p ∈ s, ∀ j, c < j → p.coeff j = 0 := by
     intro p hp j hj
     by_contra h
-    have h1 : j ≤ p.coeff.support.sup id :=
-      Finset.le_sup (f := id) (Finsupp.mem_support_iff.2 h)
+    have h1 : j ≤ p.coeff.support.sup id := Finset.le_sup (f := id) (Finsupp.mem_support_iff.2 h)
     have h2 : p.coeff.support.sup id ≤ c := Finset.le_sup (f := fun p => p.coeff.support.sup id) hp
     omega
   refine ⟨c, fun n => le_antisymm ?_ ?_⟩
@@ -89,8 +89,10 @@ theorem exists_eq_pow_smul_of_fg {K : ℕ → Submodule A H} (hK : ∀ n, I • 
         exact this y.2
       have hy1 : y.1 = n + (c - y.2) := by omega
       rw [hy1, pow_add] at hr
-      have h1 : ((f p : reesAlgebra I) : A[X]).coeff y.1 • p.coeff y.2 ∈
-          (I ^ n * I ^ (c - y.2)) • K y.2 := hy1 ▸ Submodule.smul_mem_smul hr hp'
+      have h1
+          : ((f p : reesAlgebra I) : A[X]).coeff y.1 • p.coeff y.2
+            ∈ (I ^ n * I ^ (c - y.2)) • K y.2 :=
+        hy1 ▸ Submodule.smul_mem_smul hr hp'
       rw [Submodule.mul_smul] at h1
       refine Submodule.smul_mono le_rfl ?_ h1
       have := pow_smul_le_of_smul_le I hK (c - y.2) y.2

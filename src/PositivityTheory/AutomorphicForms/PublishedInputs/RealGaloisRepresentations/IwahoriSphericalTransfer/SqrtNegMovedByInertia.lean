@@ -12,17 +12,22 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published UpperTheory.V.Af.Bc GlobalTheory.RealGal
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Published UpperTheory.V.Af.Bc GlobalTheory.RealGal
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.SqrtNegRam
 
 open Polynomial
 
-theorem valuation_natCast_eq {F : Type} [Field F] [NumberField F] {p : ℕ} (hp : p.Prime)
-    (hd : ¬ (p : ℤ) ∣ discr F) (v : HeightOneSpectrum (𝓞 F)) (hv : ((p : ℕ) : 𝓞 F) ∈ v.asIdeal) :
-    v.valuation F (p : F) = WithZero.exp (-1 : ℤ) := by
+theorem valuation_natCast_eq
+    {F : Type} [Field F] [NumberField F]
+    {p : ℕ} (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr F)
+    (v : HeightOneSpectrum (𝓞 F)) (hv : ((p : ℕ) : 𝓞 F) ∈ v.asIdeal)
+    : v.valuation F (p : F) = WithZero.exp (-1 : ℤ) := by
   have h2 := GlobalTheory.LamTie.ExpCond.not_mem_sq_of_not_dvd_discr hp hd v hv
   have e : (p : F) = algebraMap (𝓞 F) F (p : 𝓞 F) := by simp
   rw [e, v.valuation_of_algebraMap]
@@ -36,16 +41,19 @@ theorem valuation_natCast_eq {F : Type} [Field F] [NumberField F] {p : ℕ} (hp 
   push_cast at h1 h2'
   omega
 
-theorem valuation_mul_ne_one {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosure F Ω] {p : ℕ} (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr F) {δ : Ω}
-    (hδ : δ ^ 2 = -(p : Ω)) {v : HeightOneSpectrum (𝓞 F)} {A : ValuationSubring Ω}
-    (hv : ((p : ℕ) : 𝓞 F) ∈ v.asIdeal) (hA : IsPlaceOver A v) (y : F) (hy : y ≠ 0) :
-    A.valuation (algebraMap F Ω y * δ) ≠ 1 := by
+theorem valuation_mul_ne_one
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {p : ℕ} (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr F)
+    {δ : Ω} (hδ : δ ^ 2 = -(p : Ω))
+    {v : HeightOneSpectrum (𝓞 F)} {A : ValuationSubring Ω}
+    (hv : ((p : ℕ) : 𝓞 F) ∈ v.asIdeal) (hA : IsPlaceOver A v)
+    (y : F) (hy : y ≠ 0)
+    : A.valuation (algebraMap F Ω y * δ) ≠ 1 := by
   intro h
   obtain ⟨ι, hι⟩ := GlobalTheory.LocDict.exists_isLocEmb F Ω A v hA
   have hmem : ∀ e : F, algebraMap F Ω e ∈ A ↔ v.valuation F e ≤ 1 := fun e => by
     rw [hι, ι.commutes]; exact GlobalTheory.LocEmbExist.isIntegral_algebraMap_iff v e
-  have he : algebraMap F Ω (y ^ 2 * p) = -(algebraMap F Ω y * δ) ^ 2 := by
+  have he : algebraMap F Ω (y ^ 2 * p) = - (algebraMap F Ω y * δ) ^ 2 := by
     rw [mul_pow, hδ, map_mul, map_pow, map_natCast]; ring
   have hw : A.valuation (algebraMap F Ω (y ^ 2 * p)) = 1 := by
     rw [he, Valuation.map_neg, map_pow, h, one_pow]
@@ -55,7 +63,8 @@ theorem valuation_mul_ne_one {F Ω : Type} [Field F] [NumberField F] [Field Ω] 
   have hy0 : v.valuation F y ≠ 0 := (Valuation.ne_zero_iff _).2 hy
   rw [map_inv₀] at h2
   rw [map_mul, map_pow, valuation_natCast_eq hp hd v hv, ← WithZero.exp_log hy0,
-    ← WithZero.exp_nsmul, ← WithZero.exp_add] at h1 h2
+      ← WithZero.exp_nsmul, ← WithZero.exp_add]
+    at h1 h2
   rw [← WithZero.exp_neg, ← WithZero.exp_zero, WithZero.exp_le_exp] at h2
   rw [← WithZero.exp_zero, WithZero.exp_le_exp] at h1
   rw [nsmul_eq_mul] at h1 h2
@@ -68,7 +77,13 @@ namespace GlobalTheory.SqrtNegRam
 
 open Polynomial
 
-theorem sqrt_neg_moved_by_inertia : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (p : ℕ), p.Prime → p ≠ 2 → ¬ (p : ℤ) ∣ discr F → ∀ (δ : Ω), δ ^ 2 = -(p : Ω) → ∀ (v : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω), ((p : ℕ) : 𝓞 F) ∈ v.asIdeal → IsPlaceOver A v → ∃ s ∈ Ine (F := F) A, s δ ≠ δ := by
+theorem sqrt_neg_moved_by_inertia
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (p : ℕ),
+      p.Prime → p ≠ 2 → ¬ (p : ℤ) ∣ discr F
+        → ∀ (δ : Ω),
+          δ ^ 2 = -(p : Ω)
+            → ∀ (v : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω),
+              ((p : ℕ) : 𝓞 F) ∈ v.asIdeal → IsPlaceOver A v → ∃ s ∈ Ine (F := F) A, s δ ≠ δ := by
   intro F Ω _ _ _ _ _ p hp _ hd δ hδ v A hv hA
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
@@ -118,13 +133,14 @@ theorem sqrt_neg_moved_by_inertia : ∀ (F Ω : Type) [Field F] [NumberField F] 
   haveI : FiniteDimensional F M := Polynomial.IsSplittingField.finiteDimensional M f
   haveI : IsGalois F M := ⟨⟩
   let τ : M ≃ₐ[F] M := σ₀.restrictNormal M
-  have hδM : δ ∈ M := IntermediateField.subset_adjoin _ _
-    (by rw [Polynomial.mem_rootSet]; exact ⟨hmon.ne_zero, (hf_root δ).2 hδ⟩)
+  have hδM : δ ∈ M :=
+    IntermediateField.subset_adjoin _ _
+      (by rw [Polynomial.mem_rootSet]; exact ⟨hmon.ne_zero, (hf_root δ).2 hδ⟩)
   have hform : ∀ z ∈ M, ∃ a b : F, z = algebraMap F Ω a + algebraMap F Ω b * δ := by
     intro z hz
     have hz' : z ∈ Algebra.adjoin F (f.rootSet Ω) := by
-      rw [← IntermediateField.adjoin_toSubalgebra_of_isAlgebraic
-        (fun x _ => Algebra.IsAlgebraic.isAlgebraic x)]
+      rw [← IntermediateField.adjoin_toSubalgebra_of_isAlgebraic (fun x _ =>
+        Algebra.IsAlgebraic.isAlgebraic x)]
       exact hz
     clear hz
     induction hz' using Algebra.adjoin_induction with
@@ -134,7 +150,8 @@ theorem sqrt_neg_moved_by_inertia : ∀ (F Ω : Type) [Field F] [NumberField F] 
       rcases mul_eq_zero.1 hfx with h | h
       · exact ⟨0, 1, by rw [map_zero, map_one]; linear_combination h⟩
       · exact ⟨0, -1, by rw [map_zero, map_neg, map_one]; linear_combination h⟩
-    | algebraMap r => exact ⟨r, 0, by rw [map_zero]; ring⟩
+    | algebraMap r =>
+      exact ⟨r, 0, by rw [map_zero]; ring⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, b, rfl⟩ := hx
       obtain ⟨c, d, rfl⟩ := hy
@@ -145,14 +162,17 @@ theorem sqrt_neg_moved_by_inertia : ∀ (F Ω : Type) [Field F] [NumberField F] 
       refine ⟨a * c - b * d * p, a * d + b * c, ?_⟩
       simp only [map_add (f := _), map_sub, map_mul, map_natCast]
       linear_combination (algebraMap F Ω b * algebraMap F Ω d) * hδ
-  have hcond : ∀ x : M, A.valuation (algebraMap M Ω x) ≤ 1 →
-      A.valuation (algebraMap M Ω (τ x) - algebraMap M Ω x) < 1 := by
+  have hcond
+      : ∀ x : M,
+        A.valuation (algebraMap M Ω x) ≤ 1
+          → A.valuation (algebraMap M Ω (τ x) - algebraMap M Ω x) < 1 := by
     intro x hx
     rw [AlgEquiv.restrictNormal_commutes]
     obtain ⟨a, b, hab⟩ := hform (algebraMap M Ω x) x.2
     rw [hab] at hx ⊢
-    have e : σ₀ (algebraMap F Ω a + algebraMap F Ω b * δ) - (algebraMap F Ω a + algebraMap F Ω b * δ)
-        = (-2 : Ω) * (algebraMap F Ω b * δ) := by
+    have e
+        : σ₀ (algebraMap F Ω a + algebraMap F Ω b * δ) - (algebraMap F Ω a + algebraMap F Ω b * δ)
+          = (-2 : Ω) * (algebraMap F Ω b * δ) := by
       rw [map_add (f := _), map_mul, AlgEquiv.commutes, AlgEquiv.commutes, hσ₀']; ring
     rw [e]
     have hb1 : A.valuation (algebraMap F Ω b * δ) < 1 := by
@@ -177,7 +197,8 @@ theorem sqrt_neg_moved_by_inertia : ∀ (F Ω : Type) [Field F] [NumberField F] 
       rw [Valuation.map_neg]
       have := valuation_natCast_le_one A 2
       simpa using this
-    calc A.valuation (-2 : Ω) * A.valuation (algebraMap F Ω b * δ)
+    calc
+      A.valuation (-2 : Ω) * A.valuation (algebraMap F Ω b * δ)
         ≤ 1 * A.valuation (algebraMap F Ω b * δ) := by gcongr
       _ < 1 := by rw [one_mul]; exact hb1
   obtain ⟨σ, hσ, hστ⟩ := GlobalTheory.InertiaLift.exists_mem_Ine_lift A M τ hcond

@@ -9,14 +9,18 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ConeTilingBySi
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
-theorem series_value_rational : ∀ (ι : Type) [Fintype ι] (r : ℕ) (a : ι → Fin r → ℝ) (b : ι → ℝ) (u : (Fin r → ℕ) → ℚ) (cs : List (Fin r)) (N p : ℕ), Fintype.card ι * p < N →
-  (∀ i, cs.count i = N ∨ ∀ m, m i ≠ 0 → u m = 0) →
-  (∀ m : Fin r → ℕ, ∃ q : ℚ, ∏ j, (b j + ∑ i, a j i * (m i : ℝ)) ^ p = (q : ℝ)) →
-  ∃ q : ℚ, ∑' m, (u m : ℂ) * DL cs (coneTerm a b (-(p : ℂ))) m = (q : ℂ) := by
+theorem series_value_rational
+    : ∀ (ι : Type) [Fintype ι] (r : ℕ) (a : ι → Fin r → ℝ) (b : ι → ℝ) (u : (Fin r → ℕ) → ℚ)
+        (cs : List (Fin r)) (N p : ℕ),
+      Fintype.card ι * p < N → (∀ i, cs.count i = N ∨ ∀ m, m i ≠ 0 → u m = 0)
+        → (∀ m : Fin r → ℕ, ∃ q : ℚ, ∏ j, (b j + ∑ i, a j i * (m i : ℝ)) ^ p = (q : ℝ))
+        → ∃ q : ℚ, ∑' m, (u m : ℂ) * DL cs (coneTerm a b (-(p : ℂ))) m = (q : ℂ) := by
   intro ι _ r a b u cs N p hN hcase hval
   by_cases hex : ∃ i, cs.count i = N
   · obtain ⟨i, hi⟩ := hex

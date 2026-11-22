@@ -45,91 +45,110 @@ private lemma triv_act {Γ G : Type} [Group Γ] [Group G] (ι : Γ →* G) (U : 
   rw [MulAction.Quotient.smul_coe, QuotientGroup.eq, smul_eq_mul, ← Subgroup.mem_center_iff.mp h1 g]
   simpa [mul_assoc] using U.inv_mem h2
 
-private theorem glue (hM : Master) (hTr : TrKer) (hPair : Pair)
-    {Γ G : Type} [Group Γ] [Group G] (ι : Γ →* G) (S U U' : Subgroup G) (Γ₁ Γ₀ : Subgroup Γ) (ι₁ : Γ₁ →* S)
-    (h1 : ∀ γ, (ι₁ γ : G) = ι γ) (h2 : ∀ a b : G, a * b * a⁻¹ * b⁻¹ ∈ S) (h3 : Γ₁.Normal) (h4 : Γ₀ ≤ Subgroup.center Γ)
-    (h5' : ∀ z ∈ Γ₀, ι z ∈ Subgroup.center G ∧ ι z ∈ U') (h6 : U ≤ U') (h7 : U.relIndex (U' ⊓ S) ≠ 0)
+private theorem glue
+    (hM : Master) (hTr : TrKer) (hPair : Pair)
+    {Γ G : Type} [Group Γ] [Group G]
+    (ι : Γ →* G) (S U U' : Subgroup G) (Γ₁ Γ₀ : Subgroup Γ)
+    (ι₁ : Γ₁ →* S) (h1 : ∀ γ, (ι₁ γ : G) = ι γ)
+    (h2 : ∀ a b : G, a * b * a⁻¹ * b⁻¹ ∈ S) (h3 : Γ₁.Normal) (h4 : Γ₀ ≤ Subgroup.center Γ)
+    (h5' : ∀ z ∈ Γ₀, ι z ∈ Subgroup.center G ∧ ι z ∈ U') (h6 : U ≤ U')
+    (h7 : U.relIndex (U' ⊓ S) ≠ 0)
     (h8 : ∀ x : G, ∃ T : Finset S, ∀ s, ∃ h, ∃ t ∈ T, ∃ u : S, x⁻¹ * u * x ∈ U ∧ s = ι₁ h * t * u)
     (h9 : ∀ x : G, {h | x⁻¹ * ι₁ h * x ∈ U}.Finite)
     (h10 : ∃ T : Finset G, ∀ g, ∃ γ, ∃ s ∈ T, ∃ u ∈ U', g = ι γ * s * u)
-    (h11' : ∀ g, Γ₀.relIndex ((U'.map (MulAut.conj g).toMonoidHom).comap ι) ≠ 0) :
-    ∃ c : ℝ, 0 < c ∧ ∀ (n : ℕ) (x : Fin (n + 1) → G),
-      (∀ i j γ, ∀ s ∈ S, ∀ u ∈ U', x j = ι γ * s * x i * u → i = j) → (∀ g, ∃ i γ, ∃ s ∈ S, ∃ u ∈ U', g = ι γ * s * x i * u) →
-      ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (f : G → ℂ) (B : Fin (n + 1) → Base Γ₁ S V)
-        (cl : Γ → ℂ) (I : Type) (δ : I → Γ) (Hi : I → Type) [∀ i, Group (Hi i)] (φ : ∀ i, Hi i →* Γ),
-      (∀ u ∈ U', ∀ g, f (u⁻¹ * g * u) = f g) → (∀ g, {γ : Γ₁ | f (g⁻¹ * ι γ * g) ≠ 0}.Finite) →
-      (∀ i, (B i).ι = ι₁) → (∀ i (s : S), s ∈ (B i).U ↔ (x i)⁻¹ * s * x i ∈ U) → (∀ i, (B i).ω = 1) → (∀ i, (B i).Γ₀ = ⊥) →
-      (∀ i, (B i).Fin) → (∀ i, (Base.Tw.one (B i)).IsTest fun g : S => f ((x i)⁻¹ * g * x i)) →
-      (∀ h γ, cl (h * γ * h⁻¹) = cl γ) → (∀ g, cl g ≠ 0 → g ∈ Γ₁) → (∀ i (γ : Γ₁), LinearMap.trace ℂ V ((B i).W γ) = cl γ) →
-      (∀ i x, x ∈ (φ i).range ↔ x * δ i = δ i * x) → (∀ i i' h, δ i' = h * δ i * h⁻¹ → i = i') →
-      (∀ γ g, cl γ * f (g⁻¹ * ι γ * g) ≠ 0 → ∃ i h, γ = h * δ i * h⁻¹) →
-      ∑ i, LinearMap.trace ℂ (B i).Forms ((Base.Tw.one (B i)).R fun g : S => f ((x i)⁻¹ * g * x i)) =
-        c * ∑ᶠ i, cl (δ i) * gqOn (ι.comp (φ i)) (Γ₀.comap (φ i)) U' fun y => f (y.out⁻¹ * ι (δ i) * y.out) := by
-  classical
-  have hΓ₀n : Γ₀.Normal := normal_of_center h4
-  have htriv : ∀ z ∈ Γ₀, ∀ y : G ⧸ U', ι z • y = y := fun z hz y =>
-    triv_act ι U' z (h5' z hz).1 (h5' z hz).2 y
-  have hstab : ∀ y : G ⧸ U', Γ₀.relIndex ((stabilizer G y).comap ι) ≠ 0 := by
-    intro y
-    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective y
-    rw [stab_mk]
-    exact h11' g
-  obtain ⟨c, hc, hmain⟩ := hM Γ G ι S U U' Γ₁ Γ₀ ι₁ h1 h2 h3 hΓ₀n htriv h6 h7 h8 h9 h10 hstab
-  refine ⟨c, hc, ?_⟩
-  intro n x hdis hcov V _ _ _ f B cl I δ Hi _ φ hf hfin hBι hBU hω hΓ hBF hT hcl hcl1 htr hφ hδ hsupp
-  let Φ : G → ℂ := fun g => ∑ᶠ γ : Γ, cl γ * f (g⁻¹ * ι γ * g)
-  have hsub : ∀ g : G, ∑ᶠ γ : Γ₁, cl γ * f (g⁻¹ * ι γ * g) = Φ g := by
-    intro g
-    have hs : Function.support (fun γ => cl γ * f (g⁻¹ * ι γ * g)) ⊆ (Γ₁ : Set Γ) := by
+    (h11' : ∀ g, Γ₀.relIndex ((U'.map (MulAut.conj g).toMonoidHom).comap ι) ≠ 0)
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ (n : ℕ) (x : Fin (n + 1) → G),
+          (∀ i j γ, ∀ s ∈ S, ∀ u ∈ U', x j = ι γ * s * x i * u → i = j)
+            → (∀ g, ∃ i γ, ∃ s ∈ S, ∃ u ∈ U', g = ι γ * s * x i * u)
+            → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (f : G → ℂ)
+                (B : Fin (n + 1) → Base Γ₁ S V) (cl : Γ → ℂ) (I : Type) (δ : I → Γ) (Hi : I → Type)
+                [∀ i, Group (Hi i)] (φ : ∀ i, Hi i →* Γ),
+              (∀ u ∈ U', ∀ g, f (u⁻¹ * g * u) = f g)
+                → (∀ g, {γ : Γ₁ | f (g⁻¹ * ι γ * g) ≠ 0}.Finite) → (∀ i, (B i).ι = ι₁)
+                → (∀ i (s : S), s ∈ (B i).U ↔ (x i)⁻¹ * s * x i ∈ U) → (∀ i, (B i).ω = 1)
+                → (∀ i, (B i).Γ₀ = ⊥) → (∀ i, (B i).Fin)
+                → (∀ i, (Base.Tw.one (B i)).IsTest fun g : S => f ((x i)⁻¹ * g * x i))
+                → (∀ h γ, cl (h * γ * h⁻¹) = cl γ) → (∀ g, cl g ≠ 0 → g ∈ Γ₁)
+                → (∀ i (γ : Γ₁), LinearMap.trace ℂ V ((B i).W γ) = cl γ)
+                → (∀ i x, x ∈ (φ i).range ↔ x * δ i = δ i * x)
+                → (∀ i i' h, δ i' = h * δ i * h⁻¹ → i = i')
+                → (∀ γ g, cl γ * f (g⁻¹ * ι γ * g) ≠ 0 → ∃ i h, γ = h * δ i * h⁻¹)
+                → ∑ i, LinearMap.trace ℂ (B i).Forms ((Base.Tw.one (B i)).R fun g : S => f ((x i)⁻¹ * g * x i))
+                  = c
+                    * ∑ᶠ i, cl (δ i) * gqOn (ι.comp (φ i)) (Γ₀.comap (φ i)) U' fun y => f (y.out⁻¹ * ι (δ i) * y.out) :=
+  by
+    classical
+    have hΓ₀n : Γ₀.Normal := normal_of_center h4
+    have htriv : ∀ z ∈ Γ₀, ∀ y : G ⧸ U', ι z • y = y := fun z hz y =>
+      triv_act ι U' z (h5' z hz).1 (h5' z hz).2 y
+    have hstab : ∀ y : G ⧸ U', Γ₀.relIndex ((stabilizer G y).comap ι) ≠ 0 := by
+      intro y
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective y
+      rw [stab_mk]
+      exact h11' g
+    obtain ⟨c, hc, hmain⟩ := hM Γ G ι S U U' Γ₁ Γ₀ ι₁ h1 h2 h3 hΓ₀n htriv h6 h7 h8 h9 h10 hstab
+    refine ⟨c, hc, ?_⟩
+    intro n x hdis hcov V _ _ _ f B cl I δ Hi _ φ hf hfin hBι hBU hω hΓ hBF hT hcl hcl1 htr hφ hδ
+      hsupp
+    let Φ : G → ℂ := fun g => ∑ᶠ γ : Γ, cl γ * f (g⁻¹ * ι γ * g)
+    have hsub : ∀ g : G, ∑ᶠ γ : Γ₁, cl γ * f (g⁻¹ * ι γ * g) = Φ g := by
+      intro g
+      have hs : Function.support (fun γ => cl γ * f (g⁻¹ * ι γ * g)) ⊆ (Γ₁ : Set Γ) := by
+        intro γ hγ
+        exact hcl1 γ (left_ne_zero_of_mul hγ)
+      show _ = ∑ᶠ γ : Γ, cl γ * f (g⁻¹ * ι γ * g)
+      refine
+        (finsum_set_coe_eq_finsum_mem (f := fun γ => cl γ * f (g⁻¹ * ι γ * g)) (Γ₁ : Set Γ)).trans
+          ?_
+      rw [finsum_mem_def, Set.indicator_eq_self.2 hs]
+    have hΦl : ∀ (h : Γ) (g : G), Φ (ι h * g) = Φ g := by
+      intro h g
+      show ∑ᶠ γ : Γ, cl γ * f ((ι h * g)⁻¹ * ι γ * (ι h * g)) = ∑ᶠ γ : Γ, cl γ * f (g⁻¹ * ι γ * g)
+      rw [← finsum_comp_equiv (MulAut.conj h).toEquiv]
+      apply finsum_congr
+      intro γ
+      show cl (h * γ * h⁻¹) * f ((ι h * g)⁻¹ * ι (h * γ * h⁻¹) * (ι h * g)) = cl γ * f (g⁻¹ * ι γ * g)
+      rw [hcl]
+      congr 2
+      simp only [map_mul, map_inv]
+      group
+    have hΦr : ∀ u ∈ U', ∀ g : G, Φ (g * u) = Φ g := by
+      intro u hu g
+      show ∑ᶠ γ : Γ, cl γ * f ((g * u)⁻¹ * ι γ * (g * u)) = ∑ᶠ γ : Γ, cl γ * f (g⁻¹ * ι γ * g)
+      apply finsum_congr
+      intro γ
+      rw [← hf u hu (g⁻¹ * ι γ * g)]
+      congr 2
+      group
+    have hM' := hmain (Fin (n + 1)) x (fun i => (B i).U) Φ hdis hcov hBU hΦl hΦr
+    beta_reduce at hM'
+    have hL
+        : ∀ i,
+          LinearMap.trace ℂ (B i).Forms ((Base.Tw.one (B i)).R fun g : S => f ((x i)⁻¹ * g * x i))
+            = gqOn ι₁ ⊥ (B i).U (fun s => Φ (↑(Quotient.out s) * x i)) := by
+      intro i
+      rw [hTr _ _ _ (B i) (hBF i) (hω i) (hΓ i) _ (hT i), hBι i]
+      congr 1
+      funext y
+      rw [← hsub]
+      apply finsum_congr
+      intro γ
+      rw [htr i γ]
+      beta_reduce
+      congr 2
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, h1]
+      group
+    have hfinP : ∀ g : G, {γ | cl γ * f (g⁻¹ * ι γ * g) ≠ 0}.Finite := by
+      intro g
+      refine ((hfin g).image Subtype.val).subset ?_
       intro γ hγ
-      exact hcl1 γ (left_ne_zero_of_mul hγ)
-    show _ = ∑ᶠ γ : Γ, cl γ * f (g⁻¹ * ι γ * g)
-    refine (finsum_set_coe_eq_finsum_mem (f := fun γ => cl γ * f (g⁻¹ * ι γ * g)) (Γ₁ : Set Γ)).trans ?_
-    rw [finsum_mem_def, Set.indicator_eq_self.2 hs]
-  have hΦl : ∀ (h : Γ) (g : G), Φ (ι h * g) = Φ g := by
-    intro h g
-    show ∑ᶠ γ : Γ, cl γ * f ((ι h * g)⁻¹ * ι γ * (ι h * g)) = ∑ᶠ γ : Γ, cl γ * f (g⁻¹ * ι γ * g)
-    rw [← finsum_comp_equiv (MulAut.conj h).toEquiv]
-    apply finsum_congr
-    intro γ
-    show cl (h * γ * h⁻¹) * f ((ι h * g)⁻¹ * ι (h * γ * h⁻¹) * (ι h * g)) = cl γ * f (g⁻¹ * ι γ * g)
-    rw [hcl]
-    congr 2
-    simp only [map_mul, map_inv]
-    group
-  have hΦr : ∀ u ∈ U', ∀ g : G, Φ (g * u) = Φ g := by
-    intro u hu g
-    show ∑ᶠ γ : Γ, cl γ * f ((g * u)⁻¹ * ι γ * (g * u)) = ∑ᶠ γ : Γ, cl γ * f (g⁻¹ * ι γ * g)
-    apply finsum_congr
-    intro γ
-    rw [← hf u hu (g⁻¹ * ι γ * g)]
-    congr 2
-    group
-  have hM' := hmain (Fin (n + 1)) x (fun i => (B i).U) Φ hdis hcov hBU hΦl hΦr
-  beta_reduce at hM'
-  have hL : ∀ i, LinearMap.trace ℂ (B i).Forms ((Base.Tw.one (B i)).R fun g : S => f ((x i)⁻¹ * g * x i)) =
-      gqOn ι₁ ⊥ (B i).U (fun s => Φ (↑(Quotient.out s) * x i)) := by
-    intro i
-    rw [hTr _ _ _ (B i) (hBF i) (hω i) (hΓ i) _ (hT i), hBι i]
-    congr 1
-    funext y
-    rw [← hsub]
-    apply finsum_congr
-    intro γ
-    rw [htr i γ]
-    beta_reduce
-    congr 2
-    simp only [Subgroup.coe_mul, Subgroup.coe_inv, h1]
-    group
-  have hfinP : ∀ g : G, {γ | cl γ * f (g⁻¹ * ι γ * g) ≠ 0}.Finite := by
-    intro g
-    refine ((hfin g).image Subtype.val).subset ?_
-    intro γ hγ
-    have hγ1 := hcl1 γ (left_ne_zero_of_mul hγ)
-    exact ⟨⟨γ, hγ1⟩, right_ne_zero_of_mul hγ, rfl⟩
-  have hP := hPair Γ G I ι Γ₀ U' cl f δ Hi φ h4 htriv hcl hf hfinP h10 hstab hφ hδ hsupp
-  rw [Finset.sum_congr rfl (fun i _ => hL i), hM']
-  exact congrArg (fun z => (c : ℂ) * z) hP
+      have hγ1 := hcl1 γ (left_ne_zero_of_mul hγ)
+      exact ⟨⟨γ, hγ1⟩, right_ne_zero_of_mul hγ, rfl⟩
+    have hP := hPair Γ G I ι Γ₀ U' cl f δ Hi φ h4 htriv hcl hf hfinP h10 hstab hφ hδ hsupp
+    rw [Finset.sum_congr rfl (fun i _ => hL i), hM']
+    exact congrArg (fun z => (c : ℂ) * z) hP
 
 end UpperTheory.V.Z.Sym.Glob
 
@@ -270,19 +289,25 @@ private lemma clEx (hH : HasTrLaw) (ch : F → ℂ) : ∃ cl : DX Δ → ℂ, (�
 end
 
 set_option maxHeartbeats 3000000 in
-private theorem fibre_of (hM : Master) (hTr : TrKer) (hSF : SuppFin) (hPair : Pair) (hReps : Reps) (hLev : LevFin) (hC : FSConj)
-    (hSu : FSSupp) (hH : HasTrLaw) (bS : BaseS) (bK : BaseK) (fS : FinS) (fK : FinK) (cR : ClassRep) (eA : EmbAlg) : Fibre := by
+private theorem fibre_of
+    (hM : Master) (hTr : TrKer) (hSF : SuppFin) (hPair : Pair) (hReps : Reps) (hLev : LevFin)
+    (hC : FSConj) (hSu : FSSupp) (hH : HasTrLaw) (bS : BaseS) (bK : BaseK) (fS : FinS) (fK : FinK)
+    (cR : ClassRep) (eA : EmbAlg)
+    : Fibre := by
   intro F _ _ Δ D ok ι hι x₀ hx₀
   have hΔ := delta_ne D ok
   obtain ⟨hU, hr⟩ := hLev F Δ D ok
   obtain ⟨hZ, hZt, hcls, hstab⟩ := conK D bK fK ok ι hι
   obtain ⟨ι₁, hι₁, hSc, hSf⟩ := conS D bS fS ok ι hι
   have hN1 : (SU Δ).Normal := MonoidHom.normal_ker _
-  obtain ⟨c, hc, hall⟩ := glue hM hTr hPair ι (SA Δ) D.U2 D.UZ (SU Δ) (ZD Δ) ι₁ hι₁ comm_mem hN1 hZ hZt hU hr hSc hSf hcls hstab
+  obtain ⟨c, hc, hall⟩ :=
+    glue hM hTr hPair ι (SA Δ) D.U2 D.UZ (SU Δ) (ZD Δ) ι₁ hι₁ comm_mem hN1 hZ hZt hU hr hSc hSf hcls
+      hstab
   obtain ⟨Y, hY, hYc⟩ := cR F Δ D ok ι hι
-  obtain ⟨n, x, hx0, hxY, hsep, hcov⟩ := hReps (DX Δ) (DA Δ) ι (SA Δ) D.UZ Y x₀ conN (fun g => by
-    obtain ⟨γ, s, hs, y, hy, u, hu, e⟩ := hYc g
-    exact ⟨γ, s, hs, y, hy, u, hU hu, e⟩)
+  obtain ⟨n, x, hx0, hxY, hsep, hcov⟩ :=
+    hReps (DX Δ) (DA Δ) ι (SA Δ) D.UZ Y x₀ conN (fun g => by
+      obtain ⟨γ, s, hs, y, hy, u, hu, e⟩ := hYc g
+      exact ⟨γ, s, hs, y, hy, u, hU hu, e⟩)
   refine ⟨n, x, c, hx0, fun i => ?_, hc, ?_⟩
   · rcases hxY i with h | h
     · rw [h]; exact hx₀
@@ -290,32 +315,43 @@ private theorem fibre_of (hM : Master) (hTr : TrKer) (hSF : SuppFin) (hPair : Pa
   intro V _ _ _ ch B hB t ht I τ γ j hinj hi hcv
   obtain ⟨cl, hcl, hcl0, hclc⟩ := clEx hH ch
   have hE := fun i => eA F Δ (τ i) hΔ (hi i).1 (γ i) (hi i).2.1
-  have key := hall n x hsep hcov V (D.FS t) B cl I γ (fun i => (Etau F (τ i))ˣ) j
-    (fun u hu g => hC F Δ D ok t ht u hu g) (fun g => conF D hSF bS fS ok ι hι t ht g)
-    (fun i => by
-      ext1 γ'
-      exact Subtype.ext ((bι D ι hι ch (x i) (B i) (hB i) γ').trans (hι₁ γ').symm))
-    (fun i => (hB i).U) (fun i => (hB i).ω) (fun i => (hB i).Γ₀) (fun i => (fS F Δ D ok V ch (x i) (B i) (hB i)).1)
-    (fun i => (fS F Δ D ok V ch (x i) (B i) (hB i)).2 t ht) hclc hcl0
-    (fun i γ' => by
-      obtain ⟨s, hs⟩ := (hH F Δ γ').1.1 γ'.2
-      rw [(hB i).tr γ' s hs, hcl _ s hs])
-    (fun i y => ((hE i).2.1 (j i) (hi i).2.2).2.1 y)
-    (fun i i' h e => by
-      have h1 : HasTr (γ i) (τ i') := ((hH F Δ (γ i)).2.2 h _).1 (e ▸ (hi i').2.1)
-      exact hinj ((hH F Δ (γ i)).2.1 _ _ (hi i).2.1 h1))
-    (fun γ' g hne => by
-      obtain ⟨s, hs⟩ := (hH F Δ γ').1.1 (hcl0 γ' (left_ne_zero_of_mul hne))
-      obtain ⟨i, rfl⟩ := hcv γ' s hs (hSu F Δ D ok ι hι t ht γ' s g hs (right_ne_zero_of_mul hne))
-      obtain ⟨y, hy⟩ := (hE i).2.2 γ' hs
-      exact ⟨i, y⁻¹, by rw [hy, inv_inv]⟩)
+  have key :=
+    hall n x hsep hcov V (D.FS t) B cl I γ
+      (fun i => (Etau F (τ i))ˣ)
+      j
+      (fun u hu g => hC F Δ D ok t ht u hu g)
+      (fun g => conF D hSF bS fS ok ι hι t ht g)
+      (fun i => by
+        ext1 γ'
+        exact Subtype.ext ((bι D ι hι ch (x i) (B i) (hB i) γ').trans (hι₁ γ').symm))
+      (fun i => (hB i).U)
+      (fun i => (hB i).ω)
+      (fun i => (hB i).Γ₀)
+      (fun i => (fS F Δ D ok V ch (x i) (B i) (hB i)).1)
+      (fun i => (fS F Δ D ok V ch (x i) (B i) (hB i)).2 t ht)
+      hclc hcl0
+      (fun i γ' => by
+        obtain ⟨s, hs⟩ := (hH F Δ γ').1.1 γ'.2
+        rw [(hB i).tr γ' s hs, hcl _ s hs])
+      (fun i y => ((hE i).2.1 (j i) (hi i).2.2).2.1 y)
+      (fun i i' h e => by
+        have h1 : HasTr (γ i) (τ i') := ((hH F Δ (γ i)).2.2 h _).1 (e ▸ (hi i').2.1)
+        exact hinj ((hH F Δ (γ i)).2.1 _ _ (hi i).2.1 h1))
+      (fun γ' g hne => by
+        obtain ⟨s, hs⟩ := (hH F Δ γ').1.1 (hcl0 γ' (left_ne_zero_of_mul hne))
+        obtain ⟨i, rfl⟩ := hcv γ' s hs (hSu F Δ D ok ι hι t ht γ' s g hs (right_ne_zero_of_mul hne))
+        obtain ⟨y, hy⟩ := (hE i).2.2 γ' hs
+        exact ⟨i, y⁻¹, by rw [hy, inv_inv]⟩)
   refine key.trans (congrArg _ (finsum_congr fun i => ?_))
   rw [hcl _ _ (hi i).2.1, ((hE i).2.1 (j i) (hi i).2.2).2.2]
 
 end UpperTheory.V.Z.Sym.Glob
 
-theorem UpperTheory.V.Z.Sym.Glob.fibre :
-    UpperTheory.V.Z.Sym.Glob.Fibre :=
-  UpperTheory.V.Z.Sym.Glob.fibre_of UpperTheory.symmetric_fiber_master_formula UpperTheory.symmetric_fiber_trace_kernel UpperTheory.orbitalFiber_support_finite UpperTheory.orbitalFiber_pair_correspondence UpperTheory.orbitalFiber_representatives
-    UpperTheory.orbitalFiber_level_finite UpperTheory.orbitalFiber_fixedSet_conj UpperTheory.orbitalFiber_fixedSet_support UpperTheory.orbitalFiber_hasTraceLaw UpperTheory.V.Z.Sym.Glob.baseS UpperTheory.V.Z.Sym.Glob.baseK
-    UpperTheory.V.Z.Sym.Glob.finS UpperTheory.V.Z.Sym.Glob.finK UpperTheory.V.Z.Sym.Glob.classRep UpperTheory.V.Z.Sym.Glob.embAlg
+theorem UpperTheory.V.Z.Sym.Glob.fibre : UpperTheory.V.Z.Sym.Glob.Fibre :=
+  UpperTheory.V.Z.Sym.Glob.fibre_of UpperTheory.symmetric_fiber_master_formula
+    UpperTheory.symmetric_fiber_trace_kernel UpperTheory.orbitalFiber_support_finite
+    UpperTheory.orbitalFiber_pair_correspondence UpperTheory.orbitalFiber_representatives
+    UpperTheory.orbitalFiber_level_finite UpperTheory.orbitalFiber_fixedSet_conj
+    UpperTheory.orbitalFiber_fixedSet_support UpperTheory.orbitalFiber_hasTraceLaw
+    UpperTheory.V.Z.Sym.Glob.baseS UpperTheory.V.Z.Sym.Glob.baseK UpperTheory.V.Z.Sym.Glob.finS
+    UpperTheory.V.Z.Sym.Glob.finK UpperTheory.V.Z.Sym.Glob.classRep UpperTheory.V.Z.Sym.Glob.embAlg

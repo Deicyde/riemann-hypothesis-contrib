@@ -15,8 +15,8 @@ theorem sepIneq_four_mul_add_five_le (k : ℕ) (hk : 5 ≤ k) : 4 * k + 5 ≤ 2 
   | base => norm_num
   | succ k hk ih => rw [pow_succ]; omega
 
-theorem sepIneq_sum_lt (q n : ℕ) (hq : 2 ≤ q) :
-    ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2) < q ^ (n / 2 + 1) := by
+theorem sepIneq_sum_lt (q n : ℕ) (hq : 2 ≤ q)
+    : ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2) < q ^ (n / 2 + 1) := by
   have hinj : Set.InjOn (fun p => n / p) (n.primeFactors : Set ℕ) := by
     intro a ha b hb hab
     have ha' := Nat.mem_primeFactors.1 (Finset.mem_coe.1 ha)
@@ -25,19 +25,20 @@ theorem sepIneq_sum_lt (q n : ℕ) (hq : 2 ≤ q) :
     have h2 := Nat.div_div_self hb'.2.1 hb'.2.2
     simp only at hab
     rw [← h1, ← h2, hab]
-  calc ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2) ≤ ∑ p ∈ n.primeFactors, q ^ (n / p) :=
-        Finset.sum_le_sum fun p _ => Nat.sub_le _ _
+  calc
+    ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2)
+      ≤ ∑ p ∈ n.primeFactors, q ^ (n / p) := Finset.sum_le_sum fun p _ => Nat.sub_le _ _
     _ = ∑ k ∈ n.primeFactors.image (fun p => n / p), q ^ k :=
-        (Finset.sum_image (f := fun k => q ^ k) hinj).symm
+      (Finset.sum_image (f := fun k => q ^ k) hinj).symm
     _ < q ^ (n / 2 + 1) := by
-        apply Nat.geomSum_lt hq
-        intro k hk
-        obtain ⟨p, hp, rfl⟩ := Finset.mem_image.1 hk
-        have hp2 := (Nat.prime_of_mem_primeFactors hp).two_le
-        exact Nat.lt_succ_of_le (Nat.div_le_div_left hp2 (by norm_num))
+      apply Nat.geomSum_lt hq
+      intro k hk
+      obtain ⟨p, hp, rfl⟩ := Finset.mem_image.1 hk
+      have hp2 := (Nat.prime_of_mem_primeFactors hp).two_le
+      exact Nat.lt_succ_of_le (Nat.div_le_div_left hp2 (by norm_num))
 
-theorem sepIneq_large (q n : ℕ) (hq : 2 ≤ q) (hn : 11 ≤ n) :
-    (n - 1) ^ 2 + 4 * n ^ 2 * ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2) < 2 * n * (q ^ n - 1) := by
+theorem sepIneq_large (q n : ℕ) (hq : 2 ≤ q) (hn : 11 ≤ n)
+    : (n - 1) ^ 2 + 4 * n ^ 2 * ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2) < 2 * n * (q ^ n - 1) := by
   have hS := sepIneq_sum_lt q n hq
   set S := ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2)
   obtain ⟨k, hk⟩ : ∃ k, n = (n / 2 + 1) + k := ⟨n - (n / 2 + 1), by omega⟩
@@ -52,25 +53,34 @@ theorem sepIneq_large (q n : ℕ) (hq : 2 ≤ q) (hn : 11 ≤ n) :
   set Q := q ^ (n / 2 + 1)
   set R := q ^ k
   have h4 : Q * (2 * n + 1) ≤ Q * R := Nat.mul_le_mul_left _ h1
-  obtain ⟨T, hT⟩ : ∃ T, Q * R = T + 1 := ⟨Q * R - 1, by
-    have : 0 < Q * R := Nat.mul_pos (by omega) (by omega)
-    omega⟩
+  obtain ⟨T, hT⟩ : ∃ T, Q * R = T + 1 := ⟨
+    Q * R - 1,
+    by
+      have : 0 < Q * R := Nat.mul_pos (by omega) (by omega)
+      omega
+  ⟩
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
   rw [hT] at h4 ⊢
   simp only [Nat.add_sub_cancel]
   have h5 : 2 * (m + 1) + 1 ≤ Q := le_trans h1 h2
-  have h6 : 2 * (m + 1) * (Q * (2 * (m + 1) + 1)) ≤ 2 * (m + 1) * (T + 1) := Nat.mul_le_mul_left _ h4
+  have h6 : 2 * (m + 1) * (Q * (2 * (m + 1) + 1)) ≤ 2 * (m + 1) * (T + 1) :=
+    Nat.mul_le_mul_left _ h4
   have h7 : 4 * (m + 1) ^ 2 * S ≤ 4 * (m + 1) ^ 2 * Q := Nat.mul_le_mul_left _ hS.le
   have h8 : 2 * (m + 1) * (2 * (m + 1) + 1) ≤ 2 * (m + 1) * Q := Nat.mul_le_mul_left _ h5
   nlinarith
 
-theorem sepIneq_sub (t k c : ℕ) (hc : c ≤ 2) (hk : 0 < k) : (((2 + t) ^ k - c : ℕ) : ℤ) = (2 + (t : ℤ)) ^ k - c := by
+theorem sepIneq_sub (t k c : ℕ) (hc : c ≤ 2) (hk : 0 < k)
+    : (((2 + t) ^ k - c : ℕ) : ℤ) = (2 + (t : ℤ)) ^ k - c := by
   have : 2 ≤ (2 + t) ^ k := le_trans (by omega) (Nat.le_self_pow hk.ne' _)
   rw [Nat.cast_sub (by omega)]
   push_cast
   rfl
 
-theorem sep_numerical_ineq : ∀ q n : ℕ, 2 ≤ q → 0 < n → ¬ (q = 2 ∧ (n = 4 ∨ n = 6)) → (n - 1) ^ 2 + 4 * n ^ 2 * ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2) < 2 * n * (q ^ n - 1) := by
+theorem sep_numerical_ineq
+    : ∀ q n : ℕ,
+      2 ≤ q → 0 < n → ¬(q = 2 ∧ (n = 4 ∨ n = 6))
+        → (n - 1) ^ 2 + 4 * n ^ 2 * ∑ p ∈ n.primeFactors, (q ^ (n / p) - 2)
+          < 2 * n * (q ^ n - 1) := by
   intro q n hq hn hex
   rcases le_or_gt 11 n with h | h
   · exact sepIneq_large q n hq h
@@ -89,36 +99,63 @@ theorem sep_numerical_ineq : ∀ q n : ℕ, 2 ≤ q → 0 < n → ¬ (q = 2 ∧ 
   have s1 := fun k hk => sepIneq_sub t k 1 (by omega) hk
   have s2 := fun k hk => sepIneq_sub t k 2 (by omega) hk
   have ht1 : n = 4 ∨ n = 6 → (1 : ℤ) ≤ t := by omega
-  have p2 : (0:ℤ) ≤ t^2 := by positivity
-  have p3 : (0:ℤ) ≤ t^3 := by positivity
-  have p4 : (0:ℤ) ≤ t^4 := by positivity
-  have p5 : (0:ℤ) ≤ t^5 := by positivity
-  have p6 : (0:ℤ) ≤ t^6 := by positivity
-  have p7 : (0:ℤ) ≤ t^7 := by positivity
-  have p8 : (0:ℤ) ≤ t^8 := by positivity
-  have p9 : (0:ℤ) ≤ t^9 := by positivity
-  have p10 : (0:ℤ) ≤ t^10 := by positivity
+  have p2 : (0 : ℤ) ≤ t ^ 2 := by positivity
+  have p3 : (0 : ℤ) ≤ t ^ 3 := by positivity
+  have p4 : (0 : ℤ) ≤ t ^ 4 := by positivity
+  have p5 : (0 : ℤ) ≤ t ^ 5 := by positivity
+  have p6 : (0 : ℤ) ≤ t ^ 6 := by positivity
+  have p7 : (0 : ℤ) ≤ t ^ 7 := by positivity
+  have p8 : (0 : ℤ) ≤ t ^ 8 := by positivity
+  have p9 : (0 : ℤ) ≤ t ^ 9 := by positivity
+  have p10 : (0 : ℤ) ≤ t ^ 10 := by positivity
   interval_cases n
   · rw [e1]; simp
-  · rw [e2, Finset.sum_singleton]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e2, Finset.sum_singleton]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     nlinarith [sq_nonneg ((t:ℤ))]
-  · rw [e3, Finset.sum_singleton]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e3, Finset.sum_singleton]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     nlinarith
-  · rw [e4, Finset.sum_singleton]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e4, Finset.sum_singleton]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     have := ht1 (by norm_num)
     nlinarith
-  · rw [e5, Finset.sum_singleton]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e5, Finset.sum_singleton]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     nlinarith
-  · rw [e6, Finset.sum_pair (by norm_num)]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e6, Finset.sum_pair (by norm_num)]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     have := ht1 (by norm_num)
     nlinarith
-  · rw [e7, Finset.sum_singleton]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e7, Finset.sum_singleton]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     nlinarith
-  · rw [e8, Finset.sum_singleton]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e8, Finset.sum_singleton]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     nlinarith
-  · rw [e9, Finset.sum_singleton]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e9, Finset.sum_singleton]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     nlinarith
-  · rw [e10, Finset.sum_pair (by norm_num)]; zify; rw [s1 _ (by norm_num), s2 _ (by norm_num), s2 _ (by norm_num)]; norm_num
+  · rw [e10, Finset.sum_pair (by norm_num)]
+    zify
+    rw [s1 _ (by norm_num), s2 _ (by norm_num), s2 _ (by norm_num)]
+    norm_num
     nlinarith
 
 end GlobalTheory.CuspGL

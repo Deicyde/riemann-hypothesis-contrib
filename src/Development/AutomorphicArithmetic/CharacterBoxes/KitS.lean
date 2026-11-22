@@ -9,19 +9,24 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.HasWit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Fc NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Fc
+  NumberField IsDedekindDomain
 
 namespace UpperTheory.Top
 
 open GlobalTheory.Fc
 
-theorem kitS : ∀ (Q : Par → PtProp) (la : ℝ) (G : FReq), DC.HostWW la G.req → ObjCP Q →
-    KitCPW la (fun κ => ((withDuty (Q κ)).and DC.WallPt).and G.pt) := by
+theorem kitS
+    : ∀ (Q : Par → PtProp) (la : ℝ) (G : FReq),
+      DC.HostWW la G.req → ObjCP Q
+        → KitCPW la (fun κ => ((withDuty (Q κ)).and DC.WallPt).and G.pt) := by
   intro Q la G hHost hObj
   obtain ⟨εH, hεH, hHost⟩ := hHost
   obtain ⟨εO, hεO, hObj⟩ := hObj
   refine ⟨min εH εO, lt_min hεH hεO, fun eps he he0 he1 => ?_⟩
-  obtain ⟨CT2, C8, C5, c6, Cb, KW, h8, h5, h6, hb, hHost⟩ := hHost eps he (he0.trans (min_le_left _ _)) he1
+  obtain ⟨CT2, C8, C5, c6, Cb, KW, h8, h5, h6, hb, hHost⟩ :=
+    hHost eps he (he0.trans (min_le_left _ _)) he1
   obtain ⟨KO, hObj⟩ := hObj eps C8 C5 c6 Cb he (he0.trans (min_le_right _ _)) he1 h8
   refine ⟨CT2, C8, C5, c6, Cb, KW.sup KO, h8, h5, h6, hb, fun C hC hT hP hL => ?_⟩
   obtain ⟨hLW, hLO⟩ := fc_large_of_sup hL
@@ -53,16 +58,32 @@ theorem kitS : ∀ (Q : Par → PtProp) (la : ℝ) (G : FReq), DC.HostWW la G.re
   choose pt hsc hval har hfrom hcan hhas using
     fun i : Fin R.n => hObj s R H q0 a b _ c i.1 hs hxO hRV hHT' (by show HostGood s C.P.Cpde C5 c6 Cb H q0; rw [hP]; exact hH) hqH hWin rfl hc i.2
   choose eW heW using fun i => (hfrom i).words
-  refine ⟨⟨Fin R.n, ⟨⟨0, hn⟩⟩, pt, hsc, hval, har, fun i i' => ?_, _, eW, fun i i' u u' h => ?_, fun i0 u0 hu => ?_⟩,
-    fun i => ?_⟩
-  · exact GlobalTheory.EX.TieSame.same_of_from C cD ch (pt i) (pt i') R H a b _ c _ _ ((hsc i).trans (hsc i').symm) (hval i) (hval i')
-      (hfrom i) (hfrom i') (hcan i) (hcan i')
+  refine ⟨
+    ⟨
+      Fin R.n,
+      ⟨⟨0, hn⟩⟩,
+      pt,
+      hsc,
+      hval,
+      har,
+      fun i i' => ?_,
+      _,
+      eW,
+      fun i i' u u' h => ?_,
+      fun i0 u0 hu => ?_
+    ⟩,
+    fun i => ?_
+  ⟩
+  · exact GlobalTheory.EX.TieSame.same_of_from C cD ch (pt i) (pt i') R H a b _ c _ _
+      ((hsc i).trans (hsc i').symm) (hval i) (hval i') (hfrom i) (hfrom i') (hcan i) (hcan i')
   · funext l
     rw [heW i u l, heW i' u' l, h]
   · rw [(hfrom i0).1] at hu
     exact ⟨⟨u0, hu⟩, (hfrom ⟨u0, hu⟩).2.2.2.2.2.2.2.2.2.1⟩
-  · have hd := DC.has_withDuty_wall_and_choices (C8 := C8) (c6 := c6) (q0 := q0) (pt i) hC hHT' (by rw [hsc i]; exact hH)
-      (by rw [hsc i]; exact hq0) h0 (by rw [hsc i]; exact hW) (hval i) (hfrom i) (hcan i) (hhas i)
+  · have hd :=
+      DC.has_withDuty_wall_and_choices (C8 := C8) (c6 := c6) (q0 := q0) (pt i) hC hHT'
+        (by rw [hsc i]; exact hH) (by rw [hsc i]; exact hq0) h0 (by rw [hsc i]; exact hW) (hval i)
+        (hfrom i) (hcan i) (hhas i)
     exact ⟨⟨hd.1, G.at_of_from (hfrom i) (by rw [hsc i]; exact hGq)⟩, hd.2⟩
 
 end UpperTheory.Top

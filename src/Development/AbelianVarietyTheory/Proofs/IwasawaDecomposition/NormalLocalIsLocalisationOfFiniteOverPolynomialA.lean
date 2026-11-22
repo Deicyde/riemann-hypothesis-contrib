@@ -9,15 +9,15 @@ open IsLocalRing
 
 namespace GlobalTheory.QFNN
 
-theorem integralClosure_of_fractions (P A : Type) [CommRing P] [IsDomain P] [IsNoetherianRing P]
-    [IsIntegrallyClosed P] [CharZero P] [CommRing A] [IsDomain A] [IsLocalRing A]
-    [IsIntegrallyClosed A] [Algebra P A] [Algebra.EssFiniteType P A]
+theorem integralClosure_of_fractions
+    (P A : Type)
+    [CommRing P] [IsDomain P] [IsNoetherianRing P] [IsIntegrallyClosed P] [CharZero P] [CommRing A]
+    [IsDomain A] [IsLocalRing A] [IsIntegrallyClosed A] [Algebra P A] [Algebra.EssFiniteType P A]
     (hinj : Function.Injective (algebraMap P A))
-    (hloc : ∀ a : A, ∃ b t : A, IsIntegral P b ∧ IsIntegral P t ∧ IsUnit t ∧ a * t = b) :
-    Module.Finite P (integralClosure P A) ∧ IsIntegrallyClosed (integralClosure P A) ∧
-      Function.Injective (algebraMap P (integralClosure P A)) ∧
-      IsLocalization.AtPrime A
-        ((maximalIdeal A).comap (algebraMap (integralClosure P A) A)) := by
+    (hloc : ∀ a : A, ∃ b t : A, IsIntegral P b ∧ IsIntegral P t ∧ IsUnit t ∧ a * t = b)
+    : Module.Finite P (integralClosure P A) ∧ IsIntegrallyClosed (integralClosure P A)
+      ∧ Function.Injective (algebraMap P (integralClosure P A))
+      ∧ IsLocalization.AtPrime A ((maximalIdeal A).comap (algebraMap (integralClosure P A) A)) := by
   let K := FractionRing A
   let F := FractionRing P
   let B := integralClosure P A
@@ -32,8 +32,7 @@ theorem integralClosure_of_fractions (P A : Type) [CommRing P] [IsDomain P] [IsN
   have halgA : ∀ a : A, IsAlgebraic P (algebraMap A K a) := by
     intro a
     obtain ⟨b, t, hb, ht, hu, hab⟩ := hloc a
-    have ht0 : algebraMap A K t ≠ 0 := by
-      simpa using (map_ne_zero_iff _ hιinj).mpr hu.ne_zero
+    have ht0 : algebraMap A K t ≠ 0 := by simpa using (map_ne_zero_iff _ hιinj).mpr hu.ne_zero
     have : algebraMap A K a = algebraMap A K b * (algebraMap A K t)⁻¹ := by
       rw [← hab, map_mul, mul_assoc, mul_inv_cancel₀ ht0, mul_one]
     rw [this]
@@ -68,8 +67,9 @@ theorem integralClosure_of_fractions (P A : Type) [CommRing P] [IsDomain P] [IsN
     exact (IsIntegralClosure.isIntegral_iff (A := B)).mp hxP
   · intro x y h
     exact hinj (congrArg Subtype.val h)
-  · have hne : ∀ b : B, b ∈ ((maximalIdeal A).comap (algebraMap B A)).primeCompl →
-        IsUnit (algebraMap B A b) := by
+  · have hne
+        : ∀ b : B,
+          b ∈ ((maximalIdeal A).comap (algebraMap B A)).primeCompl → IsUnit (algebraMap B A b) := by
       intro b hb
       by_contra hu
       exact hb ((mem_maximalIdeal _).mpr hu)
@@ -83,12 +83,14 @@ theorem integralClosure_of_fractions (P A : Type) [CommRing P] [IsDomain P] [IsN
 
 end GlobalTheory.QFNN
 
-theorem GlobalTheory.normal_local_is_localisation_of_finite_over_polynomial :
-    ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsIntegrallyClosed A] [CharZero A]
-      [Algebra.EssFiniteType ℤ A], ∃ (r : ℕ) (B : Type) (_ : CommRing B) (_ : IsDomain B)
-      (_ : IsIntegrallyClosed B) (_ : Algebra (MvPolynomial (Fin r) ℤ) B)
-      (_ : Module.Finite (MvPolynomial (Fin r) ℤ) B) (_ : Algebra B A) (𝔫 : Ideal B) (_ : 𝔫.IsPrime),
-      Function.Injective (algebraMap (MvPolynomial (Fin r) ℤ) B) ∧ IsLocalization.AtPrime A 𝔫 := by
+theorem GlobalTheory.normal_local_is_localisation_of_finite_over_polynomial
+    : ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsIntegrallyClosed A] [CharZero A]
+        [Algebra.EssFiniteType ℤ A],
+      ∃ (r : ℕ) (B : Type) (_ : CommRing B) (_ : IsDomain B) (_ : IsIntegrallyClosed B)
+          (_ : Algebra (MvPolynomial (Fin r) ℤ) B) (_ : Module.Finite (MvPolynomial (Fin r) ℤ) B)
+          (_ : Algebra B A) (𝔫 : Ideal B) (_ : 𝔫.IsPrime),
+        Function.Injective (algebraMap (MvPolynomial (Fin r) ℤ) B)
+          ∧ IsLocalization.AtPrime A 𝔫 := by
   intro A _ _ _ _ _ hess
   obtain ⟨S₀, M, hft, hlocM⟩ := (Algebra.essFiniteType_iff_exists_subalgebra ℤ A).mp hess
   let 𝔮 : Ideal S₀ := (maximalIdeal A).comap (algebraMap S₀ A)
@@ -136,5 +138,17 @@ theorem GlobalTheory.normal_local_is_localisation_of_finite_over_polynomial :
       rw [← hxs]
       ring
   obtain ⟨h1, h2, h3, h4⟩ := GlobalTheory.QFNN.integralClosure_of_fractions P A hinj hloc
-  exact ⟨r, integralClosure P A, inferInstance, inferInstance, h2, inferInstance, h1, inferInstance,
-    _, Ideal.comap_isPrime _ _, h3, h4⟩
+  exact ⟨
+    r,
+    integralClosure P A,
+    inferInstance,
+    inferInstance,
+    h2,
+    inferInstance,
+    h1,
+    inferInstance,
+    _,
+    Ideal.comap_isPrime _ _,
+    h3,
+    h4
+  ⟩

@@ -9,7 +9,8 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.LocJacTyp.Sd
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField IsDedekindDomain Topology Filter PI.LocJacTyp
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain Topology Filter PI.LocJacTyp
 open PI.VolStabSW.SdUniqW
 open scoped TensorProduct
 
@@ -18,19 +19,22 @@ attribute [local instance] PI.VolStabSW.secondCountable_Fv PI.VolStabSW.locallyC
 section Scale
 
 variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
-variable {V : Type} [AddCommGroup V] [Module (Fv F v) V] [TopologicalSpace V]
-  [IsTopologicalAddGroup V] [ContinuousSMul (Fv F v) V] [LocallyCompactSpace V]
-  [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
+variable
+  {V : Type} [AddCommGroup V] [Module (Fv F v) V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+  [ContinuousSMul (Fv F v) V] [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V]
+  [MeasurableSpace V] [BorelSpace V]
 
-theorem haar_smul_map (μ0 : Measure V) [μ0.IsAddHaarMeasure] (c : Fv F v) (hc : c ≠ 0) :
-    (Measure.map (fun x : V => c • x) μ0).IsAddHaarMeasure := by
+theorem haar_smul_map (μ0 : Measure V) [μ0.IsAddHaarMeasure] (c : Fv F v) (hc : c ≠ 0)
+    : (Measure.map (fun x : V => c • x) μ0).IsAddHaarMeasure := by
   let h := Homeomorph.smulOfNeZero (α := V) c hc
-  exact Measure.isAddHaarMeasure_map μ0 (DistribSMul.toAddMonoidHom V c)
-    (continuous_const_smul c) h.surjective h.isClosedEmbedding.tendsto_cocompact
+  exact Measure.isAddHaarMeasure_map μ0 (DistribSMul.toAddMonoidHom V c) (continuous_const_smul c)
+    h.surjective h.isClosedEmbedding.tendsto_cocompact
 
-theorem scale_prod (μ0 : Measure V) [μ0.IsAddHaarMeasure] (c : Fv F v) (hc : c ≠ 0)
-    (A B : Set V) (hA : MeasurableSet A) (hB : MeasurableSet B) (hA0 : μ0 A ≠ 0) (hAt : μ0 A ≠ ⊤) :
-    μ0 ((fun x : V => c • x) ⁻¹' A) * μ0 ((fun x : V => c⁻¹ • x) ⁻¹' B) = μ0 A * μ0 B := by
+theorem scale_prod
+    (μ0 : Measure V) [μ0.IsAddHaarMeasure]
+    (c : Fv F v) (hc : c ≠ 0)
+    (A B : Set V) (hA : MeasurableSet A) (hB : MeasurableSet B) (hA0 : μ0 A ≠ 0) (hAt : μ0 A ≠ ⊤)
+    : μ0 ((fun x : V => c • x) ⁻¹' A) * μ0 ((fun x : V => c⁻¹ • x) ⁻¹' B) = μ0 A * μ0 B := by
   have := haar_smul_map v μ0 c hc
   have := haar_smul_map v μ0 c⁻¹ (inv_ne_zero hc)
   have hm : Measurable fun x : V => c • x := (continuous_const_smul c).measurable
@@ -53,26 +57,30 @@ theorem scale_prod (μ0 : Measure V) [μ0.IsAddHaarMeasure] (c : Fv F v) (hc : c
   have hs : (s1 : ENNReal) * s2 = 1 := (ENNReal.mul_left_inj hA0 hAt).1 hss
   rw [← Measure.map_apply hm hA, ← Measure.map_apply hm' hB, e1, e2]
   simp only [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
-  calc (s1 : ENNReal) * μ0 A * (s2 * μ0 B) = ((s1 : ENNReal) * s2) * (μ0 A * μ0 B) := by ring
+  calc
+    (s1 : ENNReal) * μ0 A * (s2 * μ0 B)
+      = ((s1 : ENNReal) * s2) * (μ0 A * μ0 B) := by ring
     _ = μ0 A * μ0 B := by rw [hs, one_mul]
 
 end Scale
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F)) (ψ : AddChar (AF F) ℂ)
 
 def Mk (ι : Type) (k : ℕ) : AddSubgroup (ι → Fv F v ⊗[F] E) :=
   (ObS (E := E) v ι).comap (DistribSMul.toAddMonoidHom (ι → Fv F v ⊗[F] E) (piu v ^ k))
 
-theorem coe_Mk (ι : Type) (k : ℕ) : (Mk (E := E) v ι k : Set (ι → Fv F v ⊗[F] E)) =
-    (fun x => piu v ^ k • x) ⁻¹' Obox (E := E) v ι := by
+theorem coe_Mk (ι : Type) (k : ℕ)
+    : (Mk (E := E) v ι k : Set (ι → Fv F v ⊗[F] E))
+      = (fun x => piu v ^ k • x) ⁻¹' Obox (E := E) v ι := by
   ext x
   rw [← coe_ObS]
   rfl
 
-theorem ann_Mk (ι : Type) [Fintype ι] (k : ℕ) :
-    ann (chi (E := E) v ψ ι) (Mk (E := E) v ι k) =
-      (fun y => (piu v ^ k)⁻¹ • y) ⁻¹' Dbox (E := E) v ψ ι := by
+theorem ann_Mk (ι : Type) [Fintype ι] (k : ℕ)
+    : ann (chi (E := E) v ψ ι) (Mk (E := E) v ι k)
+      = (fun y => (piu v ^ k)⁻¹ • y) ⁻¹' Dbox (E := E) v ψ ι := by
   have hpk : piu v ^ k ≠ 0 := pow_ne_zero k (piu_ne v)
   rw [← ann_obox]
   ext y
@@ -95,8 +103,8 @@ omit hnt in
 theorem isOpen_dbox (ι : Type) [Fintype ι] : IsOpen (Dbox (E := E) v ψ ι) :=
   isOpen_set_pi Set.finite_univ fun _ _ => conductor_isOpen v ψ hK
 
-theorem exists_sd (ι : Type) [Fintype ι] :
-    ∃ μ : Measure (ι → Fv F v ⊗[F] E), SelfDual μ (chi (E := E) v ψ ι) := by
+theorem exists_sd (ι : Type) [Fintype ι]
+    : ∃ μ : Measure (ι → Fv F v ⊗[F] E), SelfDual μ (chi (E := E) v ψ ι) := by
   have hpk : ∀ k : ℕ, piu v ^ k ≠ 0 := fun k => pow_ne_zero k (piu_ne v)
   have hψc := continuous_psiV_of v ψ hK
   have hA : MeasurableSet (Obox (E := E) v ι) := (isOpen_obox v ι).measurableSet
@@ -106,18 +114,28 @@ theorem exists_sd (ι : Type) [Fintype ι] :
     (isOpen_obox v ι).measure_ne_zero μ0 ⟨0, zero_mem_obox v ι⟩
   have hAt : μ0 (Obox (E := E) v ι) ≠ ⊤ := (isCompact_obox v ι).measure_lt_top.ne
   refine PI.OmFibreUniq.W.SdCore.selfDual_of_pairs (chi (E := E) v ψ ι) ?_ (chi_add_left v ψ ι)
-    (chi_symm v ψ ι) (fun x y => norm_psiV_of v ψ hK _) (Mk (E := E) v ι) (fun k => ?_)
-    (fun k => ?_) (fun k => ?_) (fun k => ?_) (fun y => ?_) (fun U hU => ?_) μ0 (fun k => ?_)
-  · exact hψc.comp (continuous_finsetSum _ fun i _ => (continuous_tr v).comp
-      (((continuous_apply i).comp continuous_fst).mul ((continuous_apply i).comp continuous_snd)))
+    (chi_symm v ψ ι)
+    (fun x y => norm_psiV_of v ψ hK _)
+    (Mk (E := E) v ι)
+    (fun k => ?_)
+    (fun k => ?_)
+    (fun k => ?_)
+    (fun k => ?_)
+    (fun y => ?_)
+    (fun U hU => ?_)
+    μ0
+    (fun k => ?_)
+  · exact hψc.comp (continuous_finsetSum _ fun i _ =>
+      (continuous_tr v).comp
+        (((continuous_apply i).comp continuous_fst).mul ((continuous_apply i).comp continuous_snd)))
   · rw [coe_Mk]
     exact (Homeomorph.smulOfNeZero (α := ι → Fv F v ⊗[F] E) _ (hpk k)).isCompact_preimage.2
       (isCompact_obox v ι)
   · rw [coe_Mk]
     exact (isOpen_obox v ι).preimage (continuous_const_smul _)
   · rw [ann_Mk]
-    exact (Homeomorph.smulOfNeZero (α := ι → Fv F v ⊗[F] E) _ (inv_ne_zero (hpk k))).isCompact_preimage.2
-      (isCompact_dbox v ψ hK hnt ι)
+    exact (Homeomorph.smulOfNeZero (α := ι → Fv F v ⊗[F] E) _
+      (inv_ne_zero (hpk k))).isCompact_preimage.2 (isCompact_dbox v ψ hK hnt ι)
   · rw [ann_Mk]
     exact (isOpen_dbox v ψ hK ι).preimage (continuous_const_smul _)
   · have ht : Tendsto (fun k : ℕ => piu v ^ k • y) atTop (𝓝 0) := by

@@ -232,18 +232,20 @@ private lemma skew_cay_eq_and_cay_cay_eq {H Y : Matrix (Fin n) (Fin n) ℂ} (h2 
     rw [Matrix.inv_eq_right_inv hinv, hC, smul_mul_smul_comm, mul_assoc, hw2, mul_one]
     norm_num
 
-
 open Matrix in
 open scoped ContDiff in
 variable {n : ℕ} in
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace in
 variable {H : Matrix (Fin n) (Fin n) ℂ} in
-theorem _root_.GlobalTheory.UnitaryRetraction.contDiffOn_iff_local_extension (hH : Hᴴ = H) (h2 : H * H = 1) {E : Type*}
-    [NormedAddCommGroup E] [NormedSpace ℝ E] (f : Matrix (Fin n) (Fin n) ℂ → E) :
-    ContDiffOn ℝ ∞ f {g | gᴴ * H * g = H} ↔
-      ∀ g₀, g₀ᴴ * H * g₀ = H → ∃ (U : Set (Matrix (Fin n) (Fin n) ℂ))
-        (F : Matrix (Fin n) (Fin n) ℂ → E), IsOpen U ∧ g₀ ∈ U ∧ ContDiffOn ℝ ∞ F U ∧
-          ∀ g ∈ U, gᴴ * H * g = H → f g = F g := by
+theorem _root_.GlobalTheory.UnitaryRetraction.contDiffOn_iff_local_extension
+    (hH : Hᴴ = H) (h2 : H * H = 1)
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (f : Matrix (Fin n) (Fin n) ℂ → E)
+    : ContDiffOn ℝ ∞ f {g | gᴴ * H * g = H}
+      ↔ ∀ g₀,
+        g₀ᴴ * H * g₀ = H
+          → ∃ (U : Set (Matrix (Fin n) (Fin n) ℂ)) (F : Matrix (Fin n) (Fin n) ℂ → E),
+            IsOpen U ∧ g₀ ∈ U ∧ ContDiffOn ℝ ∞ F U ∧ ∀ g ∈ U, gᴴ * H * g = H → f g = F g := by
   constructor
   · intro hf g₀ hg₀
     set k := H * g₀ᴴ * H with hk
@@ -276,18 +278,21 @@ theorem _root_.GlobalTheory.UnitaryRetraction.contDiffOn_iff_local_extension (hH
     have hψ0 : ψ g₀ = 0 := by
       show _root_.GlobalTheory.UnitaryRetraction.skewPart H (_root_.GlobalTheory.UnitaryRetraction.cay (k * g₀)) = 0
       rw [hkg]
-      simp [_root_.GlobalTheory.UnitaryRetraction.cay, _root_.GlobalTheory.UnitaryRetraction.skewPart]
+      simp [_root_.GlobalTheory.UnitaryRetraction.cay,
+        _root_.GlobalTheory.UnitaryRetraction.skewPart]
     have hval2 : (1 + ψ g₀).det ≠ 0 := by rw [hψ0]; simp
     have hc1 : ContinuousAt (fun g => (1 + k * g).det) g₀ :=
       (contDiff_det_jet_harmonics.comp_contDiffAt g₀ (contDiffAt_const.add (hlin g₀))).continuousAt
     have hc2 : ContinuousAt (fun g => (1 + ψ g).det) g₀ :=
-      (contDiff_det_jet_harmonics.comp_contDiffAt g₀ (contDiffAt_const.add (hψs g₀ hval1))).continuousAt
+      (contDiff_det_jet_harmonics.comp_contDiffAt g₀
+        (contDiffAt_const.add (hψs g₀ hval1))).continuousAt
     have hT : T ∈ nhds g₀ := (hc1.eventually_ne hval1).and (hc2.eventually_ne hval2)
     refine ⟨interior T, f ∘ r, isOpen_interior, mem_interior_iff_mem_nhds.2 hT, ?_, ?_⟩
     · refine hf.comp (fun g hg => (hrs g (interior_subset hg)).contDiffWithinAt) ?_
       intro g hg
       have hg' := interior_subset hg
-      exact mul_preserves_herm hg₀ (cay_preserves_herm_of_skew (skew_projection_is_skew hH h2 _) hg'.2)
+      exact mul_preserves_herm hg₀
+        (cay_preserves_herm_of_skew (skew_projection_is_skew hH h2 _) hg'.2)
     · intro g hg hgS
       have hY : (k * g)ᴴ * H * (k * g) = H := mul_preserves_herm hkmem hgS
       obtain ⟨h1, h3⟩ := skew_cay_eq_and_cay_cay_eq h2 hY (interior_subset hg).1
@@ -300,7 +305,7 @@ theorem _root_.GlobalTheory.UnitaryRetraction.contDiffOn_iff_local_extension (hH
     have hFg : ContDiffWithinAt ℝ ∞ F {g | gᴴ * H * g = H} g₀ :=
       (hF.contDiffAt (hU.mem_nhds hmem)).contDiffWithinAt
     refine hFg.congr_of_eventuallyEq ?_ (hfF g₀ hmem hg₀)
-    exact Filter.mem_of_superset (inter_mem_nhdsWithin _ (hU.mem_nhds hmem))
-      fun g hg => hfF g hg.2 hg.1
+    exact Filter.mem_of_superset (inter_mem_nhdsWithin _ (hU.mem_nhds hmem)) fun g hg =>
+      hfF g hg.2 hg.1
 
 end GlobalTheory.UnitaryRetraction

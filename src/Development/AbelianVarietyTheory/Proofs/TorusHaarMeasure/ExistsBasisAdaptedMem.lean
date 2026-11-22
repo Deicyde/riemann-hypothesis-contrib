@@ -8,15 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.LatDen
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  MeasureTheory Topology
 open scoped ComplexOrder ENNReal Matrix
 
 namespace GlobalTheory.LatBasisAdapted
 
-theorem span_range_smul_comp {K V ι κ : Type*} [Field K] [AddCommGroup V] [Module K V]
-    (c : ι → K) (hc : ∀ i, c i ≠ 0) (w : ι → V) (f : κ → ι) :
-    Submodule.span K (Set.range ((fun i => c i • w i) ∘ f)) =
-      Submodule.span K (Set.range (w ∘ f)) := by
+theorem span_range_smul_comp
+    {K V ι κ : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (c : ι → K) (hc : ∀ i, c i ≠ 0)
+    (w : ι → V) (f : κ → ι)
+    : Submodule.span K (Set.range ((fun i => c i • w i) ∘ f))
+      = Submodule.span K (Set.range (w ∘ f)) := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨k, rfl⟩
@@ -30,7 +34,14 @@ theorem span_range_smul_comp {K V ι κ : Type*} [Field K] [AddCommGroup V] [Mod
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_basis_adapted_mem : (∀ (r : ℕ) (X : Data E r) (W₁ W₂ : Submodule E (Fin r → E)), ∃ (a b c : ℕ) (w : Fin a ⊕ Fin b ⊕ Fin c → Fin r → E), LinearIndependent E w ∧ (∀ k, w k ∈ X.Λ) ∧ Submodule.span E (Set.range (w ∘ Sum.inl)) = W₁ ⊓ W₂ ∧ Submodule.span E (Set.range (w ∘ Sum.map id Sum.inl)) = W₁ ∧ Submodule.span E (Set.range (w ∘ Sum.map id Sum.inr)) = W₂ ∧ Submodule.span E (Set.range w) = W₁ ⊔ W₂) := by
+theorem exists_basis_adapted_mem
+    : (∀ (r : ℕ) (X : Data E r) (W₁ W₂ : Submodule E (Fin r → E)),
+      ∃ (a b c : ℕ) (w : Fin a ⊕ Fin b ⊕ Fin c → Fin r → E),
+        LinearIndependent E w ∧ (∀ k, w k ∈ X.Λ)
+          ∧ Submodule.span E (Set.range (w ∘ Sum.inl)) = W₁ ⊓ W₂
+          ∧ Submodule.span E (Set.range (w ∘ Sum.map id Sum.inl)) = W₁
+          ∧ Submodule.span E (Set.range (w ∘ Sum.map id Sum.inr)) = W₂
+          ∧ Submodule.span E (Set.range w) = W₁ ⊔ W₂) := by
   intro r X W₁ W₂
   obtain ⟨a, b, c, w, hw, h0, h1, h2, h3⟩ :=
     GlobalTheory.exists_basis_adapted_two_subspaces E (Fin r → E) W₁ W₂

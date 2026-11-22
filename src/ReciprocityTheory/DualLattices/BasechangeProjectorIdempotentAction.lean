@@ -14,8 +14,11 @@ open ReciprocityTheory.PGsh.L2
 
 section W2c
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
 
 private lemma reducedColumnMap_toZMod {r : ℕ} (Bw : Matrix (Ix g) (Fin r) ℤ_[p]) (x : Fin r → ℤ_[p]) :
@@ -29,8 +32,10 @@ private lemma map_algebraMap_mulVec_comp {m n : Type} [Fintype n] (M : Matrix m 
   funext i
   exact (RingHom.map_mulVec (algebraMap ℤ_[p] R) M t i).symm
 
-private def IsHopfApproximable (H : HodgeTateDatum p g v R O σ cp) {r : ℕ} (Bw : Matrix (Ix g) (Fin r) ℤ_[p])
-    (ℓ : (Fin r → ℤ_[p]) → R) : Prop :=
+private def IsHopfApproximable
+    (H : HodgeTateDatum p g v R O σ cp)
+    {r : ℕ} (Bw : Matrix (Ix g) (Fin r) ℤ_[p]) (ℓ : (Fin r → ℤ_[p]) → R)
+    : Prop :=
   ∃ F ∈ H.AA.carrier, ∀ x, ∃ s : R,
     algebraMap R C (ℓ x) - F (red p g (Bw *ᵥ x)) = algebraMap R C ((p : R) * s)
 
@@ -223,8 +228,8 @@ private lemma p_eq_two_of_valuation_le (hS : HodgeTateSetting p v R O σ cp) (dj
 end W2c
 
 theorem restrictedHopfOrderApproximation : RestrictedHopfOrderApproximationStatement := by
-  intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hS H m e π horth hσ hsum hPT hsumL hPTL w hw r Bw hrange hker
-    lam dj hspan hdj
+  intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hS H m e π horth hσ hsum hPT hsumL hPTL w hw r Bw hrange
+    hker lam dj hspan hdj
   have hint := hS.integers
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun R).1 hspan
   have hci : ∀ i, ∑ k, c k * (phiP H e * Bw.map (algebraMap ℤ_[p] R)) k i = dj * lam i := by
@@ -248,39 +253,46 @@ theorem restrictedHopfOrderApproximation : RestrictedHopfOrderApproximationState
     obtain ⟨M, hM⟩ := exists_leftInverse_of_range_eq (H.ρ (e w)) hQ Bw hrange hker
     choose sv hsv using fun i => exists_padicPairing_eq_coord H.E H.isUnit_det_E M Bw hM i
     choose χ hχ hχv using fun i => H.h5 hp2 (sv i)
-    obtain ⟨u, hu⟩ := hint.exists_of_le_one (r := algebraMap R C dj / algebraMap R C (p : R))
-      (le_of_eq (by rw [Valuation.map_div, hvdj, div_self hS.p_ne]))
+    obtain ⟨u, hu⟩ :=
+      hint.exists_of_le_one (r := algebraMap R C dj / algebraMap R C (p : R))
+        (le_of_eq (by rw [Valuation.map_div, hvdj, div_self hS.p_ne]))
     have h2C : algebraMap R C (p : R) = 2 := by
       rw [map_natCast, hp2]
       norm_num
     have hu2 : algebraMap R C u * 2 = algebraMap R C dj := by rw [hu, ← h2C, div_mul_cancel₀ _ hp0]
     let F : Nb p g → C := ∑ i, (u * lam i) • ((1 : Nb p g → C) - χ i)
-    have hF : F ∈ H.AA.carrier := Submodule.sum_mem _ fun i _ =>
-      Submodule.smul_mem _ _ (Submodule.sub_mem _ H.AA.one_mem (hχ i))
+    have hF : F ∈ H.AA.carrier :=
+      Submodule.sum_mem _ fun i _ =>
+        Submodule.smul_mem _ _ (Submodule.sub_mem _ H.AA.one_mem (hχ i))
     refine ⟨LinearMap.funLeft R C (psiW Bw) F, Submodule.mem_map_of_mem hF, fun x => ?_⟩
     show v (F (psiW Bw (fun i => PadicInt.toZMod (x i))) - _) < _
     rw [reducedColumnMap_toZMod]
     choose y hy using fun i => exists_eq_toZMod_val_add_mul (x i)
-    have hFval : F (red p g (Bw *ᵥ x)) =
-        ∑ i, algebraMap R C (dj * lam i * ((PadicInt.toZMod (x i)).val : R)) := by
+    have hFval
+        : F (red p g (Bw *ᵥ x))
+          = ∑ i, algebraMap R C (dj * lam i * ((PadicInt.toZMod (x i)).val : R)) := by
       simp only [F, Finset.sum_apply, Pi.smul_apply, Pi.sub_apply, Pi.one_apply, hχv, hsv]
       refine Finset.sum_congr rfl fun i _ => ?_
       have hlt := ZMod.val_lt (PadicInt.toZMod (x i))
-      rcases (show (PadicInt.toZMod (x i)).val = 0 ∨ (PadicInt.toZMod (x i)).val = 1 by omega) with h | h
+      rcases (show (PadicInt.toZMod (x i)).val = 0 ∨ (PadicInt.toZMod (x i)).val = 1 by omega) with
+        h | h
       · rw [h]
         simp
       · rw [h, Algebra.smul_def]
         simp only [pow_one, Nat.cast_one, mul_one, map_mul]
         rw [← hu2]
         ring
-    have hxR : ∀ i, algebraMap ℤ_[p] R (x i) =
-        ((PadicInt.toZMod (x i)).val : R) + (p : R) * algebraMap ℤ_[p] R (y i) := by
+    have hxR
+        : ∀ i,
+          algebraMap ℤ_[p] R (x i)
+            = ((PadicInt.toZMod (x i)).val : R) + (p : R) * algebraMap ℤ_[p] R (y i) := by
       intro i
       conv_lhs => rw [hy i]
       simp only [map_add (f := _), map_mul, map_natCast]
-    have hR : ∑ i, dj * lam i * ((PadicInt.toZMod (x i)).val : R) -
-        dj * ∑ i, lam i * algebraMap ℤ_[p] R (x i) =
-        -(dj * (p : R) * ∑ i, lam i * algebraMap ℤ_[p] R (y i)) := by
+    have hR
+        : ∑ i, dj * lam i * ((PadicInt.toZMod (x i)).val : R)
+            - dj * ∑ i, lam i * algebraMap ℤ_[p] R (x i)
+          = -(dj * (p : R) * ∑ i, lam i * algebraMap ℤ_[p] R (y i)) := by
       rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hxR i]
@@ -288,34 +300,39 @@ theorem restrictedHopfOrderApproximation : RestrictedHopfOrderApproximationState
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hFval, ← map_sum, ← map_sub, hR, map_neg, Valuation.map_neg]
     simp only [map_mul]
-    calc v (algebraMap R C dj) * v (algebraMap R C (p : R)) *
-          v (algebraMap R C (∑ i, lam i * algebraMap ℤ_[p] R (y i)))
-        ≤ v (algebraMap R C dj) * v (algebraMap R C (p : R)) * 1 :=
-          mul_le_mul_of_nonneg_left (hint.map_le_one _) zero_le
+    calc
+      v (algebraMap R C dj) * v (algebraMap R C (p : R))
+            * v (algebraMap R C (∑ i, lam i * algebraMap ℤ_[p] R (y i)))
+          ≤ v (algebraMap R C dj) * v (algebraMap R C (p : R)) * 1 :=
+        mul_le_mul_of_nonneg_left (hint.map_le_one _) zero_le
       _ = v (algebraMap R C dj) * v (algebraMap R C (p : R)) := mul_one _
       _ < v (algebraMap R C dj) * 1 := mul_lt_mul_of_pos_left hS.p_lt hdj0
       _ = v (algebraMap R C dj) := mul_one _
   · push Not at hcase
-    obtain ⟨F, hF, hFx⟩ := isHopfApproximable_sum H Bw Finset.univ c
-      (fun k x => ((phiP H e * Bw.map (algebraMap ℤ_[p] R)) *ᵥ (algebraMap ℤ_[p] R ∘ x)) k)
-      (fun k _ => isHopfApproximable_row H e horth hPT w Bw hrange k)
+    obtain ⟨F, hF, hFx⟩ :=
+      isHopfApproximable_sum H Bw Finset.univ c
+        (fun k x => ((phiP H e * Bw.map (algebraMap ℤ_[p] R)) *ᵥ (algebraMap ℤ_[p] R ∘ x)) k)
+        (fun k _ => isHopfApproximable_row H e horth hPT w Bw hrange k)
     refine ⟨LinearMap.funLeft R C (psiW Bw) F, Submodule.mem_map_of_mem hF, fun x => ?_⟩
     obtain ⟨s, hs⟩ := hFx x
-    have hlin : ∑ k, c k * ((phiP H e * Bw.map (algebraMap ℤ_[p] R)) *ᵥ (algebraMap ℤ_[p] R ∘ x)) k =
-        dj * ∑ i, lam i * algebraMap ℤ_[p] R (x i) := by
+    have hlin
+        : ∑ k, c k * ((phiP H e * Bw.map (algebraMap ℤ_[p] R)) *ᵥ (algebraMap ℤ_[p] R ∘ x)) k
+          = dj * ∑ i, lam i * algebraMap ℤ_[p] R (x i) := by
       simp only [Matrix.mulVec, dotProduct, Function.comp_apply, Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [← mul_assoc, ← hci i, Finset.sum_mul]
       refine Finset.sum_congr rfl fun k _ => ?_
       ring
-    have hs' : F (red p g (Bw *ᵥ x)) - algebraMap R C (dj * ∑ i, lam i * algebraMap ℤ_[p] R (x i)) =
-        -algebraMap R C ((p : R) * s) := by
+    have hs'
+        : F (red p g (Bw *ᵥ x)) - algebraMap R C (dj * ∑ i, lam i * algebraMap ℤ_[p] R (x i))
+          = - algebraMap R C ((p : R) * s) := by
       rw [← hlin, ← hs]
       ring
     show v (F (psiW Bw (fun i => PadicInt.toZMod (x i))) - _) < _
     rw [reducedColumnMap_toZMod, hs', Valuation.map_neg, map_mul, Valuation.map_mul]
-    calc v (algebraMap R C (p : R)) * v (algebraMap R C s)
+    calc
+      v (algebraMap R C (p : R)) * v (algebraMap R C s)
         ≤ v (algebraMap R C (p : R)) * 1 := mul_le_mul_of_nonneg_left (hint.map_le_one s) zero_le
       _ = v (algebraMap R C (p : R)) := mul_one _
       _ < v (algebraMap R C dj) := hcase

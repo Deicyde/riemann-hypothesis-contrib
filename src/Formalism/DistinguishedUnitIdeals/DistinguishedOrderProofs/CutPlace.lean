@@ -9,8 +9,11 @@ namespace Formalism.ExponentWindows
 
 noncomputable def greedyStep (j : ℕ) (A F : ℕ → Prop) (x : ℕ) : ℕ := by
   classical
-  exact if A (x + j) ∧ ∀ i, j < i → i < 2 * j → ¬ F (x + i) then x + j
-    else sInf {y | x < y ∧ F y}
+  exact
+    if A (x + j) ∧ ∀ i, j < i → i < 2 * j → ¬ F (x + i) then
+      x + j
+    else
+      sInf {y | x < y ∧ F y}
 
 noncomputable def greedySeq (j : ℕ) (A F : ℕ → Prop) : ℕ → ℕ
   | 0 => 0
@@ -100,18 +103,18 @@ variable {n j : ℕ} {A F : ℕ → Prop}
 lemma greedySeq_succ (m : ℕ) :
     greedySeq j A F (m + 1) = greedyStep j A F (greedySeq j A F m) := rfl
 
-theorem greedy_seq_props (hj : 1 ≤ j) (hn : 0 < n) (hFA : ∀ y, F y → A y) (hF0 : F 0)
-    (hFper : ∀ y, F (y + n) ↔ F y) (hAper : ∀ y, A (y + n) ↔ A y)
-    (hsp : ∀ y, F y → ∀ i, 1 ≤ i → i < j → ¬ F (y + i))
-    (hup : ∀ x, A x → (∀ i, 1 ≤ i → i < j → ¬ F (x + i)) →
-      ¬ (A (x + j) ∧ ∀ i, j < i → i < 2 * j → ¬ F (x + i)) →
-      ∃ y, x < y ∧ y ≤ x + 3 * j + 1 ∧ F y) :
-    greedySeq j A F 0 = 0 ∧
-    (∀ m, greedySeq j A F m + j ≤ greedySeq j A F (m + 1) ∧
-      greedySeq j A F (m + 1) ≤ greedySeq j A F m + 3 * j + 1) ∧
-    (∀ m, A (greedySeq j A F m)) ∧
-    (∀ y, F y → ∃ m, greedySeq j A F m = y) ∧
-    ∃ M, ∀ m, greedySeq j A F (m + M) = greedySeq j A F m + n := by
+theorem greedy_seq_props
+    (hj : 1 ≤ j) (hn : 0 < n) (hFA : ∀ y, F y → A y) (hF0 : F 0) (hFper : ∀ y, F (y + n) ↔ F y)
+    (hAper : ∀ y, A (y + n) ↔ A y) (hsp : ∀ y, F y → ∀ i, 1 ≤ i → i < j → ¬ F (y + i))
+    (hup : ∀ x,
+      A x → (∀ i, 1 ≤ i → i < j → ¬ F (x + i)) → ¬(A (x + j) ∧ ∀ i, j < i → i < 2 * j → ¬ F (x + i))
+        → ∃ y, x < y ∧ y ≤ x + 3 * j + 1 ∧ F y)
+    : greedySeq j A F 0 = 0
+      ∧ (∀ m,
+        greedySeq j A F m + j ≤ greedySeq j A F (m + 1)
+          ∧ greedySeq j A F (m + 1) ≤ greedySeq j A F m + 3 * j + 1)
+      ∧ (∀ m, A (greedySeq j A F m)) ∧ (∀ y, F y → ∃ m, greedySeq j A F m = y)
+      ∧ ∃ M, ∀ m, greedySeq j A F (m + M) = greedySeq j A F m + n := by
   classical
   set x := greedySeq j A F with hxdef
   have hinv : ∀ m, A (x m) ∧ ∀ i, 1 ≤ i → i < j → ¬ F (x m + i) := by
@@ -121,10 +124,13 @@ theorem greedy_seq_props (hj : 1 ≤ j) (hn : 0 < n) (hFA : ∀ y, F y → A y) 
     | succ m ih =>
       obtain ⟨-, -, h3, h4, -⟩ := greedyStep_spec hFA hn hF0 hFper hsp hup (x m) ih.1 ih.2
       exact ⟨h3, h4⟩
-  have hstep : ∀ m, x m + j ≤ x (m + 1) ∧ x (m + 1) ≤ x m + 3 * j + 1 ∧
-      (∀ y, F y → x m < y → x (m + 1) ≤ y) := by
+  have hstep
+      : ∀ m,
+        x m + j ≤ x (m + 1) ∧ x (m + 1) ≤ x m + 3 * j + 1
+          ∧ (∀ y, F y → x m < y → x (m + 1) ≤ y) := by
     intro m
-    obtain ⟨h1, h2, -, -, h5⟩ := greedyStep_spec hFA hn hF0 hFper hsp hup (x m) (hinv m).1 (hinv m).2
+    obtain ⟨h1, h2, -, -, h5⟩ :=
+      greedyStep_spec hFA hn hF0 hFper hsp hup (x m) (hinv m).1 (hinv m).2
     exact ⟨h1, h2, h5⟩
   have hx0 : x 0 = 0 := rfl
   have hgrow : ∀ m, m ≤ x m := by
@@ -136,8 +142,7 @@ theorem greedy_seq_props (hj : 1 ≤ j) (hn : 0 < n) (hFA : ∀ y, F y → A y) 
     intro y hy
     have hex : ∃ m, y < x m := ⟨y + 1, by have := hgrow (y + 1); omega⟩
     have hm1 : y < x (Nat.find hex) := Nat.find_spec hex
-    have hm1pos : Nat.find hex ≠ 0 := by
-      intro h; rw [h, hx0] at hm1; omega
+    have hm1pos : Nat.find hex ≠ 0 := by intro h; rw [h, hx0] at hm1; omega
     obtain ⟨p, hp⟩ : ∃ p, Nat.find hex = p + 1 := ⟨Nat.find hex - 1, by omega⟩
     have hle : x p ≤ y := by
       have := Nat.find_min hex (show p < Nat.find hex by omega)
@@ -199,25 +204,29 @@ lemma range_mod (x : ℕ → ℕ) (hmono : StrictMono x) (hx0 : x 0 = 0) (M : �
   have := range_shift x hmono hx0 M hM (y % n) (y / n)
   rwa [Nat.mod_add_div'] at this
 
-theorem pred_of_seq [NeZero n] (hj : 1 ≤ j) (b : ZMod n) (x : ℕ → ℕ) (hx0 : x 0 = 0)
-    (hstep : ∀ m, x m + j ≤ x (m + 1) ∧ x (m + 1) ≤ x m + 3 * j + 1) (M : ℕ)
-    (hM : ∀ m, x (m + M) = x m + n) (S : Finset (ZMod n))
-    (hS : ∀ c, c ∈ S ↔ ∃ m, c = b + (x m : ZMod n)) (c : ZMod n) (hc : c ∈ S) :
-    ∃ d : ℕ, j ≤ d ∧ d ≤ 3 * j + 1 ∧ c - (d : ZMod n) ∈ S ∧
-      ∀ k : ℕ, 1 ≤ k → k < d → c - (k : ZMod n) ∉ S := by
+theorem pred_of_seq
+    [NeZero n]
+    (hj : 1 ≤ j)
+    (b : ZMod n)
+    (x : ℕ → ℕ) (hx0 : x 0 = 0) (hstep : ∀ m, x m + j ≤ x (m + 1) ∧ x (m + 1) ≤ x m + 3 * j + 1)
+    (M : ℕ) (hM : ∀ m, x (m + M) = x m + n)
+    (S : Finset (ZMod n)) (hS : ∀ c, c ∈ S ↔ ∃ m, c = b + (x m : ZMod n))
+    (c : ZMod n) (hc : c ∈ S)
+    : ∃ d : ℕ,
+      j ≤ d ∧ d ≤ 3 * j + 1 ∧ c - (d : ZMod n) ∈ S
+        ∧ ∀ k : ℕ, 1 ≤ k → k < d → c - (k : ZMod n) ∉ S := by
   have hnpos : 0 < n := Nat.pos_of_ne_zero (NeZero.ne n)
   have hmono : StrictMono x := strictMono_nat_of_lt_succ (fun m => by have := (hstep m).1; omega)
   obtain ⟨m, rfl⟩ := (hS c).mp hc
-  have hMpos : M ≠ 0 := by
-    intro h; have := hM 0; simp only [h, add_zero] at this; omega
+  have hMpos : M ≠ 0 := by intro h; have := hM 0; simp only [h, add_zero] at this; omega
   obtain ⟨p, hp⟩ : ∃ p, m + M = p + 1 := ⟨m + M - 1, by omega⟩
-  have hcast : (x m : ZMod n) = (x (p + 1) : ZMod n) := by
-    rw [← hp, hM]; push_cast; simp
+  have hcast : (x m : ZMod n) = (x (p + 1) : ZMod n) := by rw [← hp, hM]; push_cast; simp
   have hle : x p ≤ x (p + 1) := (hstep p).1.trans' (Nat.le_add_right _ _)
   refine ⟨x (p + 1) - x p, by have := (hstep p).1; omega, by have := (hstep p).2; omega, ?_, ?_⟩
   · rw [hS]
     refine ⟨p, ?_⟩
-    rw [hcast, Nat.cast_sub hle]; ring
+    rw [hcast, Nat.cast_sub hle]
+    ring
   · intro k hk1 hk2 hk
     obtain ⟨m'', hm''⟩ := (hS _).mp hk
     have hkle : k ≤ x (p + 1) := by omega
@@ -291,24 +300,30 @@ section Assembly
 
 variable {n j : ℕ} [NeZero n] {thick : ZMod n → Prop} [DecidablePred thick]
 
-theorem cuts_clauses (H : ∀ a : ZMod n, thick a → ∀ k : ℕ, 1 ≤ k → k ≤ j → thick (a - k) →
-      ∀ k' : ℕ, 1 ≤ k' → k' ≤ j → ¬ thick (a - k - k'))
-    (S : Finset (ZMod n)) (hne : S.Nonempty)
-    (hgood : ∀ c ∈ S, ∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (c + k))
+theorem cuts_clauses
+    (H : ∀ a : ZMod n,
+      thick a
+        → ∀ k : ℕ, 1 ≤ k → k ≤ j → thick (a - k) → ∀ k' : ℕ, 1 ≤ k' → k' ≤ j → ¬ thick (a - k - k'))
+    (S : Finset (ZMod n))
+    (hne : S.Nonempty) (hgood : ∀ c ∈ S, ∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (c + k))
     (hend : ∀ e, thick e → (∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (e + k)) → e ∈ S)
-    (hpred : ∀ c ∈ S, ∃ d : ℕ, j ≤ d ∧ d ≤ 3 * j + 1 ∧ c - (d : ZMod n) ∈ S ∧
-      ∀ k : ℕ, 1 ≤ k → k < d → c - (k : ZMod n) ∉ S) :
-    ∃ (cuts : Finset (ZMod n)) (ell : ZMod n → ℕ), cuts.Nonempty ∧
-      ∀ c ∈ cuts,
-        (∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (c + k)) ∧
-        j ≤ ell c ∧ ell c ≤ 3 * j + 1 ∧ ell c ≤ n ∧
-        c - (ell c : ZMod n) ∈ cuts ∧ (∀ k : ℕ, 1 ≤ k → k < ell c → c - k ∉ cuts) ∧
-        (∀ k : ℕ, k < ell c → thick (c - k) → k ≤ j) ∧
-        ((Finset.range (ell c)).filter (fun k : ℕ => thick (c - (k : ZMod n)))).card ≤ 2 ∧
-        (∀ k k' : ℕ, k < ell c → k' < ell c → thick (c - k) → thick (c - k') →
-          k ≤ k' + j ∧ k' ≤ k + j) := by
-  have hch : ∀ c, ∃ d : ℕ, c ∈ S → (j ≤ d ∧ d ≤ 3 * j + 1 ∧ c - (d : ZMod n) ∈ S ∧
-      ∀ k : ℕ, 1 ≤ k → k < d → c - (k : ZMod n) ∉ S) := by
+    (hpred : ∀ c ∈ S, ∃ d : ℕ,
+      j ≤ d ∧ d ≤ 3 * j + 1 ∧ c - (d : ZMod n) ∈ S ∧ ∀ k : ℕ, 1 ≤ k → k < d → c - (k : ZMod n) ∉ S)
+    : ∃ (cuts : Finset (ZMod n)) (ell : ZMod n → ℕ),
+      cuts.Nonempty
+        ∧ ∀ c ∈ cuts,
+          (∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (c + k)) ∧ j ≤ ell c ∧ ell c ≤ 3 * j + 1 ∧ ell c ≤ n
+            ∧ c - (ell c : ZMod n) ∈ cuts ∧ (∀ k : ℕ, 1 ≤ k → k < ell c → c - k ∉ cuts)
+            ∧ (∀ k : ℕ, k < ell c → thick (c - k) → k ≤ j)
+            ∧ ((Finset.range (ell c)).filter (fun k : ℕ => thick (c - (k : ZMod n)))).card ≤ 2
+            ∧ (∀ k k' : ℕ,
+              k < ell c → k' < ell c → thick (c - k) → thick (c - k')
+                → k ≤ k' + j ∧ k' ≤ k + j) := by
+  have hch
+      : ∀ c, ∃ d : ℕ,
+        c ∈ S
+          → (j ≤ d ∧ d ≤ 3 * j + 1 ∧ c - (d : ZMod n) ∈ S
+            ∧ ∀ k : ℕ, 1 ≤ k → k < d → c - (k : ZMod n) ∉ S) := by
     intro c
     by_cases hc : c ∈ S
     · obtain ⟨d, hd⟩ := hpred c hc
@@ -341,14 +356,17 @@ theorem cuts_clauses (H : ∀ a : ZMod n, thick a → ∀ k : ℕ, 1 ≤ k → k
     have := harc k' hk' ht'
     omega
 
-theorem exists_cut_set (hj : 1 ≤ j) (hn : j + 1 ≤ n)
-    (H : ∀ a : ZMod n, thick a → ∀ k : ℕ, 1 ≤ k → k ≤ j → thick (a - k) →
-      ∀ k' : ℕ, 1 ≤ k' → k' ≤ j → ¬ thick (a - k - k')) :
-    ∃ S : Finset (ZMod n), S.Nonempty ∧
-      (∀ c ∈ S, ∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (c + k)) ∧
-      (∀ e, thick e → (∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (e + k)) → e ∈ S) ∧
-      (∀ c ∈ S, ∃ d : ℕ, j ≤ d ∧ d ≤ 3 * j + 1 ∧ c - (d : ZMod n) ∈ S ∧
-        ∀ k : ℕ, 1 ≤ k → k < d → c - (k : ZMod n) ∉ S) := by
+theorem exists_cut_set
+    (hj : 1 ≤ j) (hn : j + 1 ≤ n)
+    (H : ∀ a : ZMod n,
+      thick a
+        → ∀ k : ℕ, 1 ≤ k → k ≤ j → thick (a - k) → ∀ k' : ℕ, 1 ≤ k' → k' ≤ j → ¬ thick (a - k - k'))
+    : ∃ S : Finset (ZMod n),
+      S.Nonempty ∧ (∀ c ∈ S, ∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (c + k))
+        ∧ (∀ e, thick e → (∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ thick (e + k)) → e ∈ S)
+        ∧ (∀ c ∈ S, ∃ d : ℕ,
+          j ≤ d ∧ d ≤ 3 * j + 1 ∧ c - (d : ZMod n) ∈ S
+            ∧ ∀ k : ℕ, 1 ≤ k → k < d → c - (k : ZMod n) ∉ S) := by
   classical
   have hnpos : 0 < n := Nat.pos_of_ne_zero (NeZero.ne n)
   by_cases hex : ∃ t, thick t
@@ -367,9 +385,11 @@ theorem exists_cut_set (hj : 1 ≤ j) (hn : j + 1 ≤ n)
       have := hyi.1
       push_cast at this
       exact hy.2 i h1 h2.le (by rwa [add_assoc])
-    have hup : ∀ x, A x → (∀ i, 1 ≤ i → i < j → ¬ F (x + i)) →
-        ¬ (A (x + j) ∧ ∀ i, j < i → i < 2 * j → ¬ F (x + i)) →
-        ∃ y, x < y ∧ y ≤ x + 3 * j + 1 ∧ F y := by
+    have hup
+        : ∀ x,
+          A x → (∀ i, 1 ≤ i → i < j → ¬ F (x + i))
+            → ¬(A (x + j) ∧ ∀ i, j < i → i < 2 * j → ¬ F (x + i))
+            → ∃ y, x < y ∧ y ≤ x + 3 * j + 1 ∧ F y := by
       intro x _ _ hC
       by_cases hA : A (x + j)
       · have : ¬ ∀ i, j < i → i < 2 * j → ¬ F (x + i) := fun h => hC ⟨hA, h⟩
@@ -379,22 +399,27 @@ theorem exists_cut_set (hj : 1 ≤ j) (hn : j + 1 ≤ n)
       · simp only [A, not_forall, not_not] at hA
         obtain ⟨k, hk1, hk2, hk⟩ := hA
         obtain ⟨k'', hk''1, hk''2, hk''3⟩ := exists_end H _ hk
-        have e : b + ((x + j + k + k'' : ℕ) : ZMod n) =
-            b + ((x + j : ℕ) : ZMod n) + k + k'' := by push_cast; ring
+        have e : b + ((x + j + k + k'' : ℕ) : ZMod n) = b + ((x + j : ℕ) : ZMod n) + k + k'' := by
+          push_cast; ring
         refine ⟨x + j + k + k'', by omega, by omega, ?_, ?_⟩
         · rw [e]; exact hk''2
         · intro k' h1 h2; rw [e]; exact hk''3 k' h1 h2
     obtain ⟨hx0, hstep, hAx, hhit, M, hM⟩ :=
       greedy_seq_props (n := n) hj hnpos hFA hF0 hFper hAper hsp hup
-    refine ⟨Finset.univ.filter (fun c => ∃ m, c = b + (greedySeq j A F m : ZMod n)),
-      ⟨b, Finset.mem_filter.mpr ⟨Finset.mem_univ _, 0, by simp [hx0]⟩⟩, ?_, ?_, ?_⟩
+    refine ⟨
+      Finset.univ.filter (fun c => ∃ m, c = b + (greedySeq j A F m : ZMod n)),
+      ⟨b, Finset.mem_filter.mpr ⟨Finset.mem_univ _, 0, by simp [hx0]⟩⟩,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · intro c hc
       obtain ⟨m, rfl⟩ := (Finset.mem_filter.mp hc).2
       exact hAx m
     · intro e he hg
       have hval : b + ((e - b).val : ZMod n) = e := by rw [ZMod.natCast_zmod_val]; ring
-      obtain ⟨m, hm⟩ := hhit (e - b).val ⟨by rw [hval]; exact he, by
-        intro k h1 h2; rw [hval]; exact hg k h1 h2⟩
+      obtain ⟨m, hm⟩ :=
+        hhit (e - b).val ⟨by rw [hval]; exact he, by intro k h1 h2; rw [hval]; exact hg k h1 h2⟩
       exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, m, by rw [hm, hval]⟩
     · intro c hc
       exact pred_of_seq hj b _ hx0 hstep M hM _ (fun c => by simp) c hc
@@ -409,9 +434,11 @@ theorem exists_cut_set (hj : 1 ≤ j) (hn : j + 1 ≤ n)
       intro y hy i h1 h2 hyi
       have := Nat.le_of_dvd (by omega) ((Nat.dvd_add_right hy).mp hyi)
       omega
-    have hup : ∀ x, A x → (∀ i, 1 ≤ i → i < j → ¬ F (x + i)) →
-        ¬ (A (x + j) ∧ ∀ i, j < i → i < 2 * j → ¬ F (x + i)) →
-        ∃ y, x < y ∧ y ≤ x + 3 * j + 1 ∧ F y := by
+    have hup
+        : ∀ x,
+          A x → (∀ i, 1 ≤ i → i < j → ¬ F (x + i))
+            → ¬(A (x + j) ∧ ∀ i, j < i → i < 2 * j → ¬ F (x + i))
+            → ∃ y, x < y ∧ y ≤ x + 3 * j + 1 ∧ F y := by
       intro x _ _ hC
       have : ¬ ∀ i, j < i → i < 2 * j → ¬ F (x + i) := fun h => hC ⟨trivial, h⟩
       push Not at this
@@ -419,8 +446,13 @@ theorem exists_cut_set (hj : 1 ≤ j) (hn : j + 1 ≤ n)
       exact ⟨x + i, by omega, by omega, h3⟩
     obtain ⟨hx0, hstep, -, -, M, hM⟩ :=
       greedy_seq_props (n := n) hj hnpos hFA hF0 hFper hAper hsp hup
-    refine ⟨Finset.univ.filter (fun c => ∃ m, c = (0 : ZMod n) + (greedySeq j A F m : ZMod n)),
-      ⟨0, Finset.mem_filter.mpr ⟨Finset.mem_univ _, 0, by simp [hx0]⟩⟩, ?_, ?_, ?_⟩
+    refine ⟨
+      Finset.univ.filter (fun c => ∃ m, c = (0 : ZMod n) + (greedySeq j A F m : ZMod n)),
+      ⟨0, Finset.mem_filter.mpr ⟨Finset.mem_univ _, 0, by simp [hx0]⟩⟩,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · intro c _ k _ _; exact hex _
     · intro e he; exact absurd he (hex e)
     · intro c hc

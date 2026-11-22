@@ -5,11 +5,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LiftQMk
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut GlobalTheory.UseLoc Module Classical
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut GlobalTheory.UseLoc
+  Module Classical
 
 namespace GlobalTheory
 
-theorem jTil_shift_block : ∀ (l n t : ℕ) (h w η : ZMod n → ℕ) (typ : ZMod n → Bool) (U : ZMod n → Multiset ℤ), tableLineDegreeTwo.PositionHyps l n t h w η typ U → ∀ (a : ZMod n) (S : Set ℚ), (∀ b : ℤ, ((U a).count (b + w a) = 1 ↔ (b : ℚ) ∈ S) ∧ (U a).count (b + w a) ≤ 1) → ∀ b : ℤ, (if ((b : ℚ) ∈ S ∨ ∃ c : ℕ, c < t ∧ (b : ℚ) = c) then (1 : ℤ) else 0) = tableLineDegreeTwo.jTil U w t a (b + w a) := by
+theorem jTil_shift_block
+    : ∀ (l n t : ℕ) (h w η : ZMod n → ℕ) (typ : ZMod n → Bool) (U : ZMod n → Multiset ℤ),
+      tableLineDegreeTwo.PositionHyps l n t h w η typ U
+        → ∀ (a : ZMod n) (S : Set ℚ),
+          (∀ b : ℤ, ((U a).count (b + w a) = 1 ↔ (b : ℚ) ∈ S) ∧ (U a).count (b + w a) ≤ 1)
+            → ∀ b : ℤ,
+              (if ((b : ℚ) ∈ S ∨ ∃ c : ℕ, c < t ∧ (b : ℚ) = c) then (1 : ℤ) else 0)
+                = tableLineDegreeTwo.jTil U w t a (b + w a) := by
   intro l n t h w η typ U hS a S hU b
   have hsg : 0 ≤ tableLineDegreeTwo.sg n l h a := by
     unfold tableLineDegreeTwo.sg Formalism.WachCohomologyFacts.V2.sgN
@@ -30,7 +40,7 @@ theorem jTil_shift_block : ∀ (l n t : ℕ) (h w η : ZMod n → ℕ) (typ : ZM
   have hcN : (b : ℚ) ∉ S → (U a).count (b + w a) = 0 := fun hn => by
     have := mt (hU b).1.1 hn
     omega
-  have hboth : (b : ℚ) ∈ S → ¬ (0 ≤ b ∧ b ≤ (t : ℤ) - 1) := by
+  have hboth : (b : ℚ) ∈ S → ¬(0 ≤ b ∧ b ≤ (t : ℤ) - 1) := by
     rintro hbS ⟨h0, h1⟩
     have hmem : b + (w a : ℤ) ∈ U a := Multiset.count_pos.mp (by rw [hcS hbS]; omega)
     have hlow : b + (w a : ℤ) ∈ tableLineDegreeTwo.lows (typ a) (h a) (η a) (U a) := by

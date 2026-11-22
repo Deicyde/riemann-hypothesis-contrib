@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-private theorem ee_bd (l : ℕ) : 1 ≤ ee l ∧ ee l ≤ 2 := by
-  unfold ee; split_ifs <;> omega
+private theorem ee_bd (l : ℕ) : 1 ≤ ee l ∧ ee l ≤ 2 := by unfold ee; split_ifs <;> omega
 
 private theorem neg_mem_WW (l : ℕ) [hl : Fact l.Prime] : (-1 : ℤ_[l]ˣ) ∈ WW l := by
   have h2 : 2 < l ^ ee l := by
@@ -17,19 +16,28 @@ private theorem neg_mem_WW (l : ℕ) [hl : Fact l.Prime] : (-1 : ℤ_[l]ˣ) ∈ 
     split_ifs with h
     · subst h; norm_num
     · have := hl.out.two_le
-      rw [pow_one]; omega
+      rw [pow_one]
+      omega
   unfold WW
   rw [mem_rootsOfUnity]
   exact (Nat.totient_even h2).neg_one_pow
 
-private theorem red_red (l : ℕ) [Fact l.Prime] (m n : ℕ) (hmn : m ≤ n) (w : ℤ_[l]ˣ) :
-    ZMod.unitsMap (pow_dvd_pow l hmn) (redU l n w) = redU l m w := by
+private theorem red_red (l : ℕ) [Fact l.Prime] (m n : ℕ) (hmn : m ≤ n) (w : ℤ_[l]ˣ)
+    : ZMod.unitsMap (pow_dvd_pow l hmn) (redU l n w) = redU l m w := by
   ext
   simp only [ZMod.unitsMap_def, redU, Units.coe_map, MonoidHom.coe_coe]
   exact RingHom.congr_fun (PadicInt.zmod_cast_comp_toZModPow m n hmn) (w : ℤ_[l])
 
-theorem UpperTheory.V.FW.struct :
-    ∀ (l : ℕ) [Fact l.Prime] (f n : ℕ), f.Coprime l → 2 ≤ n → ∃ (γ : (ZMod (f * l ^ n))ˣ) (p : (ZMod (f * l ^ n))ˣ →* (ZMod (f * l ^ n))ˣ), (γ : ZMod (f * l ^ n)) = 1 + f * l ^ ee l ∧ γ ^ l ^ n = 1 ∧ (Subgroup.zpowers γ).index = Nat.totient (f * l ^ ee l) ∧ (∀ g, p g ∈ Subgroup.zpowers γ) ∧ (∀ g, (g * (p g)⁻¹) ^ Nat.totient (f * l ^ ee l) = 1) ∧ p (-1) = 1 ∧ ∀ (n₀ : ℕ) (h : l ^ n₀ ∣ f * l ^ n), n₀ ≤ n → (∀ g, piQ l n₀ h (p g) = piQ l n₀ h g) ∧ piQ l n₀ h γ ^ l ^ n₀ = 1 := by
+theorem UpperTheory.V.FW.struct
+    : ∀ (l : ℕ) [Fact l.Prime] (f n : ℕ),
+      f.Coprime l → 2 ≤ n
+        → ∃ (γ : (ZMod (f * l ^ n))ˣ) (p : (ZMod (f * l ^ n))ˣ →* (ZMod (f * l ^ n))ˣ),
+          (γ : ZMod (f * l ^ n)) = 1 + f * l ^ ee l ∧ γ ^ l ^ n = 1
+            ∧ (Subgroup.zpowers γ).index = Nat.totient (f * l ^ ee l)
+            ∧ (∀ g, p g ∈ Subgroup.zpowers γ)
+            ∧ (∀ g, (g * (p g)⁻¹) ^ Nat.totient (f * l ^ ee l) = 1) ∧ p (-1) = 1
+            ∧ ∀ (n₀ : ℕ) (h : l ^ n₀ ∣ f * l ^ n),
+              n₀ ≤ n → (∀ g, piQ l n₀ h (p g) = piQ l n₀ h g) ∧ piQ l n₀ h γ ^ l ^ n₀ = 1 := by
   intro l _ f n hf hn
   have hl : l.Prime := Fact.out
   have hee := ee_bd l
@@ -59,8 +67,8 @@ theorem UpperTheory.V.FW.struct :
       (e.symm.toMonoidHom.comp (ZMod.unitsMap hdiv))
   have hσπ : ∀ g, ZMod.unitsMap hdiv (σ g) = ZMod.unitsMap hdiv g := fun g =>
     e.apply_symm_apply (ZMod.unitsMap hdiv g)
-  have hσH : ∀ x ∈ Subgroup.comap (ZMod.unitsMap hdiv') (Subgroup.map (redU l n) (WW l)),
-      σ x = x := by
+  have hσH
+      : ∀ x ∈ Subgroup.comap (ZMod.unitsMap hdiv') (Subgroup.map (redU l n) (WW l)), σ x = x := by
     intro x hx
     have h1 : ZMod.unitsMap hdiv x = e ⟨x, hx⟩ := rfl
     show ((e.symm (ZMod.unitsMap hdiv x) : _) : (ZMod (f * l ^ n))ˣ) = x
@@ -76,9 +84,11 @@ theorem UpperTheory.V.FW.struct :
     rw [← Subgroup.coe_pow, ← map_pow, h1, map_one, Subgroup.coe_one]
   let p : (ZMod (f * l ^ n))ˣ →* (ZMod (f * l ^ n))ˣ := MonoidHom.id _ / σ
   have hp : ∀ g, p g = g / σ g := fun g => rfl
-  have hQ : ∀ (n₀ : ℕ) (h : l ^ n₀ ∣ f * l ^ n), n₀ ≤ n →
-      ∀ x ∈ Subgroup.comap (ZMod.unitsMap hdiv') (Subgroup.map (redU l n) (WW l)),
-      piQ l n₀ h x = 1 := by
+  have hQ
+      : ∀ (n₀ : ℕ) (h : l ^ n₀ ∣ f * l ^ n),
+        n₀ ≤ n
+          → ∀ x ∈ Subgroup.comap (ZMod.unitsMap hdiv') (Subgroup.map (redU l n) (WW l)),
+            piQ l n₀ h x = 1 := by
     intro n₀ h hn₀ x hx
     obtain ⟨w, hw, hwx⟩ := Subgroup.mem_map.mp (Subgroup.mem_comap.mp hx)
     have hc := DFunLike.congr_fun (ZMod.unitsMap_comp (pow_dvd_pow l hn₀) hdiv') x
@@ -98,8 +108,9 @@ theorem UpperTheory.V.FW.struct :
   · intro g
     rw [hp, inv_div, mul_div_cancel]
     exact hσpow g
-  · have hm : (-1 : (ZMod (f * l ^ n))ˣ) ∈
-        Subgroup.comap (ZMod.unitsMap hdiv') (Subgroup.map (redU l n) (WW l)) := by
+  · have hm
+        : (-1 : (ZMod (f * l ^ n))ˣ)
+          ∈ Subgroup.comap (ZMod.unitsMap hdiv') (Subgroup.map (redU l n) (WW l)) := by
       rw [Subgroup.mem_comap, Subgroup.mem_map]
       refine ⟨-1, neg_mem_WW l, ?_⟩
       ext

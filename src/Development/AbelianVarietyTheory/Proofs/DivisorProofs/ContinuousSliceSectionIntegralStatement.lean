@@ -6,28 +6,38 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OmAOneApply
 
 @[expose] public section
 
-open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
+open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM
+  GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
 
 open scoped Pointwise in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.continuous_slice_section_integral : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (a d : ℕ) (Φ : Matrix (Fin a) (Fin d) k → ℂ), Φ ∈ fullRankSB (k := k) a d →
-    ∀ (s : Matrix (Fin a) (Fin d) k → GL (Fin a) k), ContinuousOn s {Y | Y.rank = a} →
-    (∀ Y : Matrix (Fin a) (Fin d) k, Y.rank = a → ((s Y)⁻¹).val * Y ∈ slice (k := k) a d) →
-    (∀ (Z : Matrix (Fin a) (Fin d) k) (g : GL (Fin a) k), Z ∈ slice (k := k) a d → g.val * Z ∈ slice (k := k) a d → g = 1) →
-    ∃ U ∈ nhds (1 : GL (Fin a) k), ∀ x ∈ U, ∀ (g : GL (Fin a) k), ∀ Z ∈ slice (k := k) a d,
-      Φ (g.val * x.val * Z) = Φ (g.val * Z) := by
+theorem _root_.GlobalTheory.T.continuous_slice_section_integral
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (a d : ℕ) (Φ : Matrix (Fin a) (Fin d) k → ℂ),
+      Φ ∈ fullRankSB (k := k) a d
+        → ∀ (s : Matrix (Fin a) (Fin d) k → GL (Fin a) k),
+          ContinuousOn s {Y | Y.rank = a}
+            → (∀ Y : Matrix (Fin a) (Fin d) k, Y.rank = a → ((s Y)⁻¹).val * Y ∈ slice (k := k) a d)
+            → (∀ (Z : Matrix (Fin a) (Fin d) k) (g : GL (Fin a) k),
+              Z ∈ slice (k := k) a d → g.val * Z ∈ slice (k := k) a d → g = 1)
+            → ∃ U ∈ nhds (1 : GL (Fin a) k), ∀ x ∈ U, ∀ (g : GL (Fin a) k),
+              ∀ Z ∈ slice (k := k) a d,
+                Φ (g.val * x.val * Z) = Φ (g.val * Z) := by
   intro k _ _ _ _ a d Φ hΦ s hs hsl huniq
-  have hInvariant : ∃ U ∈ nhds (1 : GL (Fin a) k), ∀ x ∈ U, ∀ (g : GL (Fin a) k), ∀ Z ∈ slice (k := k) a d,
+  have hInvariant
+      : ∃ U ∈ nhds (1 : GL (Fin a) k), ∀ x ∈ U, ∀ (g : GL (Fin a) k), ∀ Z ∈ slice (k := k) a d,
         Φ (g.val * x.val * Z) = Φ (g.val * Z) := by
     obtain ⟨⟨hlc, hcpt⟩, hrk⟩ := hΦ
 
     have hcl : IsClosed (Function.support Φ) := by
       have : Function.support Φ = (Φ ⁻¹' {0})ᶜ := by ext; simp
-      rw [this, isClosed_compl_iff]; exact hlc.isOpen_fiber 0
+      rw [this, isClosed_compl_iff]
+      exact hlc.isOpen_fiber 0
     have hS : tsupport Φ ⊆ {Y | Y.rank = a} := by
       intro Y hY
       rw [tsupport, hcl.closure_eq] at hY
-      by_contra h; exact hY (hrk Y h)
+      by_contra h
+      exact hY (hrk Y h)
     set f : Matrix (Fin a) (Fin d) k → GL (Fin a) k × Matrix (Fin a) (Fin d) k :=
       fun Y => (s Y, ((s Y)⁻¹).val * Y) with hf
     have hfc : ContinuousOn f (tsupport Φ) := by
@@ -39,11 +49,13 @@ theorem _root_.GlobalTheory.T.continuous_slice_section_integral : ∀ (k : Type)
     set n : Set ((GL (Fin a) k × Matrix (Fin a) (Fin d) k) × GL (Fin a) k) :=
       {p | Φ (p.1.1.val * p.2.val * p.1.2) = Φ (p.1.1.val * p.1.2)} with hn
     have hno : IsOpen n := by
-      have h1 : IsLocallyConstant (fun p : (GL (Fin a) k × Matrix (Fin a) (Fin d) k) × GL (Fin a) k =>
-          Φ (p.1.1.val * p.2.val * p.1.2)) :=
+      have h1
+          : IsLocallyConstant (fun p : (GL (Fin a) k × Matrix (Fin a) (Fin d) k) × GL (Fin a) k =>
+            Φ (p.1.1.val * p.2.val * p.1.2)) :=
         hlc.comp_continuous (by fun_prop)
-      have h2 : IsLocallyConstant (fun p : (GL (Fin a) k × Matrix (Fin a) (Fin d) k) × GL (Fin a) k =>
-          Φ (p.1.1.val * p.1.2)) :=
+      have h2
+          : IsLocallyConstant (fun p : (GL (Fin a) k × Matrix (Fin a) (Fin d) k) × GL (Fin a) k =>
+            Φ (p.1.1.val * p.1.2)) :=
         hlc.comp_continuous (by fun_prop)
       exact (h1.prodMk h2) {q | q.1 = q.2}
     have hsub : (f '' tsupport Φ) ×ˢ ({1} : Set (GL (Fin a) k)) ⊆ n := by
@@ -53,8 +65,9 @@ theorem _root_.GlobalTheory.T.continuous_slice_section_integral : ∀ (k : Type)
       simp [hn]
     obtain ⟨u, v, -, hv, hAu, h1v, huv⟩ := generalized_tube_lemma hA isCompact_singleton hno hsub
 
-    have key : ∀ (h : GL (Fin a) k) (Z : Matrix (Fin a) (Fin d) k), Z ∈ slice (k := k) a d → Φ (h.val * Z) ≠ 0 →
-        (h, Z) ∈ f '' tsupport Φ := by
+    have key
+        : ∀ (h : GL (Fin a) k) (Z : Matrix (Fin a) (Fin d) k),
+          Z ∈ slice (k := k) a d → Φ (h.val * Z) ≠ 0 → (h, Z) ∈ f '' tsupport Φ := by
       intro h Z hZ hne
       have hY : h.val * Z ∈ tsupport Φ := subset_tsupport _ hne
       have hr := hS hY
@@ -74,11 +87,13 @@ theorem _root_.GlobalTheory.T.continuous_slice_section_integral : ∀ (k : Type)
     by_cases h0 : Φ (g.val * Z) ≠ 0
     · exact huv (Set.mk_mem_prod (hAu (key g Z hZ h0)) hxv)
     by_cases h0' : Φ (g.val * x.val * Z) ≠ 0
-    · have hm : (g * x, Z) ∈ f '' tsupport Φ := key (g * x) Z hZ (by simpa [Units.val_mul] using h0')
+    · have hm : (g * x, Z) ∈ f '' tsupport Φ :=
+        key (g * x) Z hZ (by simpa [Units.val_mul] using h0')
       have := huv (Set.mk_mem_prod (hAu hm) (show x⁻¹ ∈ v from hxv'))
       simp only [hn, Set.mem_ofPred_eq] at this
-      rw [Units.val_mul, Matrix.mul_assoc g.val x.val, ← Units.val_mul, mul_inv_cancel, Units.val_one,
-        Matrix.mul_one] at this
+      rw [Units.val_mul, Matrix.mul_assoc g.val x.val, ← Units.val_mul, mul_inv_cancel,
+          Units.val_one, Matrix.mul_one]
+        at this
       rw [this]
     push Not at h0 h0'
     rw [h0, h0']

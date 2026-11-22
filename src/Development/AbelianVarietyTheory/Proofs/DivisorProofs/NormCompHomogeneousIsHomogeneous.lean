@@ -10,14 +10,18 @@ namespace GlobalTheory
 
 open MvPolynomial
 
-theorem norm_comp_homogeneous_isHomogeneous :
-    ∀ (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] (n d : ℕ)
-      (f : MvPolynomial (Fin n) L), f.IsHomogeneous d →
-      ∃ F : MvPolynomial (Fin n × Fin (Module.finrank K L)) K,
-        F.IsHomogeneous (d * Module.finrank K L) ∧
-        ∀ y : Fin n × Fin (Module.finrank K L) → K, MvPolynomial.eval y F =
-          Algebra.norm K (MvPolynomial.eval
-            (fun i => ∑ j, algebraMap K L (y (i, j)) * Module.finBasis K L j) f) := by
+theorem norm_comp_homogeneous_isHomogeneous
+    : ∀ (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] (n d : ℕ)
+        (f : MvPolynomial (Fin n) L),
+      f.IsHomogeneous d
+        → ∃ F : MvPolynomial (Fin n × Fin (Module.finrank K L)) K,
+          F.IsHomogeneous (d * Module.finrank K L)
+            ∧ ∀ y : Fin n × Fin (Module.finrank K L) → K,
+              MvPolynomial.eval y F
+                = Algebra.norm K
+                  (MvPolynomial.eval
+                    (fun i => ∑ j, algebraMap K L (y (i, j)) * Module.finBasis K L j)
+                    f) := by
   intro K L _ _ _ _ n d f hf
   classical
   set m := Module.finrank K L
@@ -29,11 +33,14 @@ theorem norm_comp_homogeneous_isHomogeneous :
     simpa using (isHomogeneous_X L (i, j)).mul (isHomogeneous_C _ (b j))
   let G : MvPolynomial (Fin n × Fin m) L := bind₁ g f
   have hG : G.IsHomogeneous d := by simpa [G, aeval_eq_bind₁] using hf.aeval g hg
-  have hGev : ∀ y : Fin n × Fin m → K, eval (fun p => algebraMap K L (y p)) G =
-      eval (fun i => ∑ j, algebraMap K L (y (i, j)) * b j) f := by
+  have hGev
+      : ∀ y : Fin n × Fin m → K,
+        eval (fun p => algebraMap K L (y p)) G
+          = eval (fun i => ∑ j, algebraMap K L (y (i, j)) * b j) f := by
     intro y
-    have key : ∀ (φ : MvPolynomial (Fin n) L) (x : Fin n × Fin m → L),
-        eval x (bind₁ g φ) = eval (fun i => eval x (g i)) φ := by
+    have key
+        : ∀ (φ : MvPolynomial (Fin n) L) (x : Fin n × Fin m → L),
+          eval x (bind₁ g φ) = eval (fun i => eval x (g i)) φ := by
       intro φ x
       induction φ using MvPolynomial.induction_on <;> simp_all
     rw [show G = bind₁ g f from rfl, key]
@@ -41,8 +48,8 @@ theorem norm_comp_homogeneous_isHomogeneous :
     funext i
     simp [g]
     rfl
-  let M : Matrix (Fin m) (Fin m) (MvPolynomial (Fin n × Fin m) K) :=
-    fun i j => ∑ s ∈ G.support, monomial s (Algebra.leftMulMatrix b (AddMonoidAlgebra.coeff G s) i j)
+  let M : Matrix (Fin m) (Fin m) (MvPolynomial (Fin n × Fin m) K) := fun i j =>
+    ∑ s ∈ G.support, monomial s (Algebra.leftMulMatrix b (AddMonoidAlgebra.coeff G s) i j)
   have hM : ∀ i j, (M i j).IsHomogeneous d := by
     intro i j
     refine IsHomogeneous.sum _ _ _ (fun s hs => isHomogeneous_monomial _ ?_)
@@ -68,7 +75,8 @@ theorem norm_comp_homogeneous_isHomogeneous :
     set_option synthInstance.maxHeartbeats 100000 in
       rw [eval_eq' _ G, map_sum, Matrix.sum_apply]
     refine Finset.sum_congr rfl (fun s _ => ?_)
-    have : AddMonoidAlgebra.coeff G s * ∏ k, (algebraMap K L (y k)) ^ (s k) = (∏ k, y k ^ s k) • AddMonoidAlgebra.coeff G s := by
+    have : AddMonoidAlgebra.coeff G s * ∏ k, (algebraMap K L (y k)) ^ (s k)
+        = (∏ k, y k ^ s k) • AddMonoidAlgebra.coeff G s := by
       rw [Algebra.smul_def, mul_comm]
       simp [map_prod, map_pow]
     rw [this, map_smul, Matrix.smul_apply, smul_eq_mul, mul_comm, Finsupp.prod_fintype]

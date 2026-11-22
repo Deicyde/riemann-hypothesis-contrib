@@ -8,8 +8,8 @@ namespace GlobalTheory.DenominatorExistence
 
 open NumberField
 
-theorem den_exists {E : Type} [Field E] [NumberField E] (c : E) :
-    ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * c) := by
+theorem den_exists {E : Type} [Field E] [NumberField E] (c : E)
+    : ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * c) := by
   have hc : IsAlgebraic ℤ c :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr (Algebra.IsAlgebraic.isAlgebraic c)
   obtain ⟨y, hy, hint⟩ := hc.exists_integral_multiple
@@ -18,17 +18,19 @@ theorem den_exists {E : Type} [Field E] [NumberField E] (c : E) :
   · have h' : (y.natAbs : ℤ) = y := by omega
     have h2 : ((y.natAbs : ℤ) : E) = (y : E) := congrArg _ h'
     rw [Int.cast_natCast] at h2
-    rw [h2, ← zsmul_eq_mul]; exact hint
+    rw [h2, ← zsmul_eq_mul]
+    exact hint
   · have h' : (y.natAbs : ℤ) = -y := by omega
     have h2 : ((y.natAbs : ℤ) : E) = ((-y : ℤ) : E) := congrArg _ h'
     rw [Int.cast_natCast, Int.cast_neg] at h2
-    rw [h2, neg_mul, ← zsmul_eq_mul]; exact hint.neg
+    rw [h2, neg_mul, ← zsmul_eq_mul]
+    exact hint.neg
 
-theorem main {E : Type} [Field E] [NumberField E] {r : ℕ}
-    (Λ Λ' : Submodule (RingOfIntegers E) (Fin r → E)) (hfg : Λ'.FG)
-    (hspan : Submodule.span E (Λ : Set (Fin r → E)) = ⊤) :
-    ∃ n : ℕ, 0 < n ∧ ∀ v ∈ Λ', (n : E) • v ∈ Λ := by
-
+theorem main
+    {E : Type} [Field E] [NumberField E]
+    {r : ℕ} (Λ Λ' : Submodule (RingOfIntegers E) (Fin r → E)) (hfg : Λ'.FG)
+    (hspan : Submodule.span E (Λ : Set (Fin r → E)) = ⊤)
+    : ∃ n : ℕ, 0 < n ∧ ∀ v ∈ Λ', (n : E) • v ∈ Λ := by
   have key : ∀ v : Fin r → E, ∃ n : ℕ, 0 < n ∧ n • v ∈ Λ := by
     intro v
     have hv : v ∈ Submodule.span E (Λ : Set (Fin r → E)) := by rw [hspan]; trivial
@@ -47,14 +49,15 @@ theorem main {E : Type} [Field E] [NumberField E] {r : ℕ}
       obtain ⟨a, ha, hax⟩ := hx
       obtain ⟨d, hd, hdc⟩ := den_exists c
       refine ⟨d * a, Nat.mul_pos hd ha, ?_⟩
-      have e1 : (⟨(d : E) * c, hdc⟩ : RingOfIntegers E) • (a • x)
-          = ((d : E) * c) • (a • x) := by
+      have e1 : (⟨(d : E) * c, hdc⟩ : RingOfIntegers E) • (a • x) = ((d : E) * c) • (a • x) := by
         rw [← algebraMap_smul E]; rfl
       have e : (d * a) • (c • x) = (⟨(d : E) * c, hdc⟩ : RingOfIntegers E) • (a • x) := by
         rw [e1, ← Nat.cast_smul_eq_nsmul E, ← Nat.cast_smul_eq_nsmul E, smul_smul, smul_smul]
         congr 1
-        push_cast; ring
-      rw [e]; exact Λ.smul_mem _ hax
+        push_cast
+        ring
+      rw [e]
+      exact Λ.smul_mem _ hax
   obtain ⟨s, hs⟩ := hfg
   classical
   choose f hfpos hfmem using key

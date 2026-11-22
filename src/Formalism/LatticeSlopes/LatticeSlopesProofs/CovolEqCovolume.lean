@@ -39,8 +39,8 @@ theorem covol_eq_covolume' : CovolEqCovolume := by
     rfl
   have h2 := ZSpan.measure_fundamentalDomain bR MeasureTheory.volume o.toBasis
   have h3 : MeasureTheory.volume (ZSpan.fundamentalDomain o.toBasis) = 1 := by
-    rw [MeasureTheory.measure_congr
-      (ZSpan.fundamentalDomain_ae_parallelepiped o.toBasis MeasureTheory.volume),
+    rw [MeasureTheory.measure_congr (ZSpan.fundamentalDomain_ae_parallelepiped o.toBasis
+        MeasureTheory.volume),
       OrthonormalBasis.coe_toBasis, o.volume_parallelepiped]
   rw [hdet, Real.sqrt_sq_eq_abs, h1, h2, h3, mul_one, ENNReal.toReal_ofReal (abs_nonneg _)]
 

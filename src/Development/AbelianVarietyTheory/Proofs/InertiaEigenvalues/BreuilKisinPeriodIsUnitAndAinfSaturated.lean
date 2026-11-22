@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -15,10 +17,11 @@ namespace GlobalTheory.BSP
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
-theorem ainf_exists_l_mul_of_coeff_zero (a : Ainf l) (h : a.coeff 0 = 0) :
-    ∃ b : Ainf l, a = (l : Ainf l) * b := by
-  have hv := WittVector.eq_iterate_verschiebung (n := 1) (x := a) (fun i hi => by
-    rw [Nat.lt_one_iff.1 hi]; exact h)
+theorem ainf_exists_l_mul_of_coeff_zero (a : Ainf l) (h : a.coeff 0 = 0)
+    : ∃ b : Ainf l, a = (l : Ainf l) * b := by
+  have hv :=
+    WittVector.eq_iterate_verschiebung (n := 1) (x := a)
+      (fun i hi => by rw [Nat.lt_one_iff.1 hi]; exact h)
   have hsurj : Function.Surjective (WittVector.frobenius : Ainf l → Ainf l) := by
     rw [WittVector.frobenius_eq_map_frobenius]
     exact WittVector.map_surjective _ (frobeniusEquiv (OCb l) l).surjective
@@ -26,14 +29,17 @@ theorem ainf_exists_l_mul_of_coeff_zero (a : Ainf l) (h : a.coeff 0 = 0) :
   refine ⟨c, ?_⟩
   rw [hv, Function.iterate_one, ← hc, WittVector.verschiebung_frobenius, mul_comm]
 
-theorem coeff_zero_l_mul {R : Type} [CommRing R] [CharP R l] (x : WittVector l R) :
-    ((l : WittVector l R) * x).coeff 0 = 0 := by
+theorem coeff_zero_l_mul {R : Type} [CommRing R] [CharP R l] (x : WittVector l R)
+    : ((l : WittVector l R) * x).coeff 0 = 0 := by
   change WittVector.constantCoeff ((l : WittVector l R) * x) = 0
   rw [map_mul, map_natCast, CharP.cast_eq_zero, zero_mul]
 
-theorem isUnit_inclW_per_and_saturated : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (τ : Ainf l),
-    bk.IsPer τ → IsUnit (inclW l τ) ∧ (∀ g : GQ l, IsUnit (inclW l (Per.σA g τ))) ∧
-      ∀ (k : ℕ) (a : Ainf l), ((l : ℕ) : WCb l) ^ k ∣ inclW l a → ((l : ℕ) : Ainf l) ^ k ∣ a := by
+theorem isUnit_inclW_per_and_saturated
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (τ : Ainf l),
+      bk.IsPer τ
+        → IsUnit (inclW l τ) ∧ (∀ g : GQ l, IsUnit (inclW l (Per.σA g τ)))
+          ∧ ∀ (k : ℕ) (a : Ainf l),
+            ((l : ℕ) : WCb l) ^ k ∣ inclW l a → ((l : ℕ) : Ainf l) ^ k ∣ a := by
   intro l _ K bk τ hτ
   obtain ⟨-, ε, η, hε, hφ⟩ := hτ
   have hε1 : ε ≠ 1 := by
@@ -44,8 +50,11 @@ theorem isUnit_inclW_per_and_saturated : ∀ (l : ℕ) [Fact l.Prime] (K : FinEx
     intro h0
     have h1 := congrArg (fun x => WittVector.constantCoeff x) hφ
     change (WittVector.frobenius τ).coeff 0 = _ at h1
-    rw [WittVector.coeff_frobenius_charP, h0, zero_pow (Fact.out : l.Prime).ne_zero, map_mul, map_sub, map_one] at h1
-    change 0 = WittVector.constantCoeff (η : Ainf l) * ((WittVector.teichmuller l ε).coeff 0 - 1) at h1
+    rw [WittVector.coeff_frobenius_charP, h0, zero_pow (Fact.out : l.Prime).ne_zero, map_mul,
+        map_sub, map_one]
+      at h1
+    change 0 = WittVector.constantCoeff (η : Ainf l) * ((WittVector.teichmuller l ε).coeff 0 - 1)
+      at h1
     rw [WittVector.teichmuller_coeff_zero] at h1
     have hη : IsUnit (WittVector.constantCoeff (η : Ainf l)) := η.isUnit.map _
     rcases mul_eq_zero.1 h1.symm with h | h

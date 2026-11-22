@@ -10,7 +10,13 @@ open GlobalTheory.QFam GlobalTheory.WpFam
 
 namespace GlobalTheory.WpFam
 
-theorem tsum_residue_class_split : ∀ (N : ℕ) [NeZero N] (r : ZMod N) (R : ℤ → ℂ), Summable (fun n : ℤ => R ((r.val : ℤ) + n * N)) → ∑' n : ℤ, R ((r.val : ℤ) + n * N) = (if r = 0 then R 0 else 0) + ∑' d : ℕ+, (if ((d : ℕ) : ZMod N) = r then R ((d : ℕ) : ℤ) else 0) + ∑' d : ℕ+, (if ((d : ℕ) : ZMod N) = -r then R (-((d : ℕ) : ℤ)) else 0) := by
+theorem tsum_residue_class_split
+    : ∀ (N : ℕ) [NeZero N] (r : ZMod N) (R : ℤ → ℂ),
+      Summable (fun n : ℤ => R ((r.val : ℤ) + n * N))
+        → ∑' n : ℤ, R ((r.val : ℤ) + n * N)
+          = (if r = 0 then R 0 else 0)
+            + ∑' d : ℕ+, (if ((d : ℕ) : ZMod N) = r then R ((d : ℕ) : ℤ) else 0)
+            + ∑' d : ℕ+, (if ((d : ℕ) : ZMod N) = -r then R (-((d : ℕ) : ℤ)) else 0) := by
   intro N _ r R hs
   classical
   let F : ℤ → ℂ := fun t => if (t : ZMod N) = r then R t else 0

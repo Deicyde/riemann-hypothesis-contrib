@@ -7,22 +7,33 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 
 namespace GlobalTheory.CompanionTheory.EtaleLift
 
-theorem lift_hom_existsUnique {O R Λ : Type} [CommRing O] [CommRing R] [CommRing Λ] (a : O →+* R) {d : ℕ}
-    (T : Fin d → R) (I : Ideal Λ) (κ : O →+* Λ ⧸ I) (𝓛 : Lift a T Λ I κ) {B : Type} [CommRing B]
-    (J : Ideal B) : EtLift J → ∀ (h : Λ →+* B) (g : R →+* B ⧸ J) (u : Fin d → B), I ≤ J.comap h →
-    (∀ o x, Ideal.Quotient.mk I x = κ o → g (a o) = Ideal.Quotient.mk J (h x)) →
-    (∀ k, Ideal.Quotient.mk J (u k) = g (T k)) →
-    ∃! f : 𝓛.D →+* B, f.comp 𝓛.i = h ∧ (∀ k, f (𝓛.t k) = u k) ∧
-      ∀ r z, Ideal.Quotient.mk _ z = 𝓛.j r → Ideal.Quotient.mk J (f z) = g r := by
+theorem lift_hom_existsUnique
+    {O R Λ : Type} [CommRing O] [CommRing R] [CommRing Λ]
+    (a : O →+* R)
+    {d : ℕ} (T : Fin d → R)
+    (I : Ideal Λ) (κ : O →+* Λ ⧸ I) (𝓛 : Lift a T Λ I κ)
+    {B : Type} [CommRing B]
+    (J : Ideal B)
+    : EtLift J
+      → ∀ (h : Λ →+* B) (g : R →+* B ⧸ J) (u : Fin d → B),
+        I ≤ J.comap h → (∀ o x, Ideal.Quotient.mk I x = κ o → g (a o) = Ideal.Quotient.mk J (h x))
+          → (∀ k, Ideal.Quotient.mk J (u k) = g (T k))
+          → ∃! f : 𝓛.D →+* B, f.comp 𝓛.i = h ∧ (∀ k, f (𝓛.t k) = u k) ∧
+              ∀ r z, Ideal.Quotient.mk _ z = 𝓛.j r → Ideal.Quotient.mk J (f z) = g r := by
   intro hEt h g u hIJ hg hu
-  obtain ⟨g0, ⟨hg0i, hg0j⟩, hg0u⟩ := 𝓛.univ (B ⧸ J) ((Ideal.Quotient.mk J).comp h) g
-    (fun x hx => Ideal.Quotient.eq_zero_iff_mem.mpr (hIJ hx)) (fun o x hx => hg o x hx)
-  have hcomm : g0.comp (MvPolynomial.eval₂Hom 𝓛.i 𝓛.t) =
-      (Ideal.Quotient.mk J).comp (MvPolynomial.eval₂Hom h u) := by
+  obtain ⟨g0, ⟨hg0i, hg0j⟩, hg0u⟩ :=
+    𝓛.univ (B ⧸ J) ((Ideal.Quotient.mk J).comp h) g
+      (fun x hx => Ideal.Quotient.eq_zero_iff_mem.mpr (hIJ hx))
+      (fun o x hx => hg o x hx)
+  have hcomm
+      : g0.comp (MvPolynomial.eval₂Hom 𝓛.i 𝓛.t)
+        = (Ideal.Quotient.mk J).comp (MvPolynomial.eval₂Hom h u) := by
     apply MvPolynomial.ringHom_ext
     · intro c
       simp only [RingHom.comp_apply, MvPolynomial.eval₂Hom_C]

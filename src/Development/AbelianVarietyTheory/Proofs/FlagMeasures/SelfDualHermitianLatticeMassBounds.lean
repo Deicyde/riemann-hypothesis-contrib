@@ -28,9 +28,10 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 variable {L : LocE F E} {n m : ℕ} {Hm : Matrix (Fin n) (Fin n) E}
 
-theorem smul_inf_eq {Y : Submodule E (Fin n → E)} {h : (Fin n → E) ≃ₗ[E] (Fin n → E)}
-    (hh : h ∈ fixG L Hm Y) (Λ : Submodule L.O (Fin n → E)) :
-    (h • Λ) ⊓ Y.restrictScalars L.O = Λ ⊓ Y.restrictScalars L.O := by
+theorem smul_inf_eq
+    {Y : Submodule E (Fin n → E)} {h : (Fin n → E) ≃ₗ[E] (Fin n → E)} (hh : h ∈ fixG L Hm Y)
+    (Λ : Submodule L.O (Fin n → E))
+    : (h • Λ) ⊓ Y.restrictScalars L.O = Λ ⊓ Y.restrictScalars L.O := by
   have hi := ((fixG L Hm Y).inv_mem hh).2.2
   ext v
   simp only [Submodule.mem_inf, Submodule.restrictScalars_mem, mem_smul_iff]
@@ -39,10 +40,12 @@ theorem smul_inf_eq {Y : Submodule E (Fin n → E)} {h : (Fin n → E) ≃ₗ[E]
   rw [Submodule.mem_bot, sub_eq_zero] at this
   rw [this]
 
-theorem image_thick (ϖ : 𝒪[F]) {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} (hg : g ∈ isomG L Hm)
-    (Λ : Submodule L.O (Fin n → E)) (x : Fin m → Fin n → E) (i : ℕ) :
-    (fun x a => g (x a)) '' thick L ϖ (torb (isomG L Hm ⊓ stabL L Λ) fun a => g⁻¹ (x a)) i =
-      thick L ϖ (torb (isomG L Hm ⊓ stabL L (g • Λ)) x) i := by
+theorem image_thick
+    (ϖ : 𝒪[F])
+    {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} (hg : g ∈ isomG L Hm)
+    (Λ : Submodule L.O (Fin n → E)) (x : Fin m → Fin n → E) (i : ℕ)
+    : (fun x a => g (x a)) '' thick L ϖ (torb (isomG L Hm ⊓ stabL L Λ) fun a => g⁻¹ (x a)) i
+      = thick L ϖ (torb (isomG L Hm ⊓ stabL L (g • Λ)) x) i := by
   ext z
   constructor
   · rintro ⟨_, ⟨_, ⟨k, hk, rfl⟩, A, hA, rfl⟩, rfl⟩
@@ -67,21 +70,26 @@ theorem image_thick (ϖ : 𝒪[F]) {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} (
 
 variable [IsNonarchimedeanLocalField F] [CharZero F]
 
-theorem sigMass_eq_sum (hH : IsHermND L Hm) {Λs : Submodule L.O (Fin n → E)} (hs : IsSD L Hm Λs)
-    (x : Fin m → Fin n → E) (hx : IsUnit (gramT L Hm x).det) {Λ0 : Submodule L.O (Fin n → E)}
-    (h0 : IsLat L Λ0) (Mh : Submodule L.O (Fin n → E))
-    (s : Finset ((Fin n → E) ≃ₗ[E] (Fin n → E)))
-    (h1 : ∀ g ∈ s, g ∈ isomG L Hm ∧
-      (g • Λs) ⊓ (Submodule.span E (Set.range x)).restrictScalars L.O = Mh)
-    (h2 : ∀ Λ, IsSD L Hm Λ → Λ ⊓ (Submodule.span E (Set.range x)).restrictScalars L.O = Mh →
-      ∃! g, g ∈ s ∧ ∃ h ∈ fixG L Hm (Submodule.span E (Set.range x)), Λ = h • g • Λs) :
-    sigMass L Hm (Submodule.span E (Set.range x)) Λ0 Mh =
-      ENNReal.ofReal (∑ g ∈ s, invVol (fixG L Hm (Submodule.span E (Set.range x)) ⊓ stabL L Λ0)
-        (fixG L Hm (Submodule.span E (Set.range x)) ⊓ stabL L (g • Λs))) := by
+theorem sigMass_eq_sum
+    (hH : IsHermND L Hm)
+    {Λs : Submodule L.O (Fin n → E)} (hs : IsSD L Hm Λs)
+    (x : Fin m → Fin n → E) (hx : IsUnit (gramT L Hm x).det)
+    {Λ0 : Submodule L.O (Fin n → E)} (h0 : IsLat L Λ0)
+    (Mh : Submodule L.O (Fin n → E)) (s : Finset ((Fin n → E) ≃ₗ[E] (Fin n → E)))
+    (h1 : ∀ g ∈ s,
+      g ∈ isomG L Hm ∧ (g • Λs) ⊓ (Submodule.span E (Set.range x)).restrictScalars L.O = Mh)
+    (h2 : ∀ Λ,
+      IsSD L Hm Λ → Λ ⊓ (Submodule.span E (Set.range x)).restrictScalars L.O = Mh
+        → ∃! g, g ∈ s ∧ ∃ h ∈ fixG L Hm (Submodule.span E (Set.range x)), Λ = h • g • Λs)
+    : sigMass L Hm (Submodule.span E (Set.range x)) Λ0 Mh
+      = ENNReal.ofReal
+        (∑ g ∈ s, invVol (fixG L Hm (Submodule.span E (Set.range x)) ⊓ stabL L Λ0)
+          (fixG L Hm (Submodule.span E (Set.range x)) ⊓ stabL L (g • Λs))) := by
   set Y := Submodule.span E (Set.range x) with hY
-  let φ : ((Fin n → E) ≃ₗ[E] (Fin n → E)) →
-      MulAction.orbitRel.Quotient (fixG L Hm Y) (Submodule L.O (Fin n → E)) :=
-    fun g => Quotient.mk _ (g • Λs)
+  let φ
+      : ((Fin n → E) ≃ₗ[E] (Fin n → E))
+        → MulAction.orbitRel.Quotient (fixG L Hm Y) (Submodule L.O (Fin n → E)) := fun g =>
+    Quotient.mk _ (g • Λs)
   have hout : ∀ g, ∃ h ∈ fixG L Hm Y, (φ g).out = h • g • Λs := by
     intro g
     have : (MulAction.orbitRel (fixG L Hm Y) (Submodule L.O (Fin n → E))) (φ g).out (g • Λs) :=
@@ -92,10 +100,8 @@ theorem sigMass_eq_sum (hH : IsHermND L Hm) {Λs : Submodule L.O (Fin n → E)} 
     intro g hg g' hg' e
     obtain ⟨h, hh, e1⟩ := hout g
     obtain ⟨h', hh', e2⟩ := hout g'
-    have hsd : IsSD L Hm (φ g).out := by
-      rw [e1]; exact isSD_smul hh.1 (isSD_smul (h1 g hg).1 hs)
-    have htr : (φ g).out ⊓ Y.restrictScalars L.O = Mh := by
-      rw [e1, smul_inf_eq hh, (h1 g hg).2]
+    have hsd : IsSD L Hm (φ g).out := by rw [e1]; exact isSD_smul hh.1 (isSD_smul (h1 g hg).1 hs)
+    have htr : (φ g).out ⊓ Y.restrictScalars L.O = Mh := by rw [e1, smul_inf_eq hh, (h1 g hg).2]
     exact (h2 _ hsd htr).unique ⟨hg, h, hh, e1⟩ ⟨hg', h', hh', e ▸ e2⟩
   rw [ENNReal.ofReal_sum_of_nonneg (fun g _ => by unfold invVol; positivity)]
   unfold sigMass
@@ -114,19 +120,52 @@ theorem sigMass_eq_sum (hH : IsHermND L Hm) {Λs : Submodule L.O (Fin n → E)} 
     refine (Quotient.sound ?_).symm
     exact MulAction.orbitRel_apply.2 ⟨⟨h, hh⟩, e.symm⟩
 
-theorem mass_bounds : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (ϖ : 𝒪[F]), Irreducible ϖ → ∀ {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E), IsHermND L Hm → ∀ Λs, IsSD L Hm Λs → ∀ (m : ℕ) (x : Fin m → Fin n → E), IsUnit (gramT L Hm x).det → 2 * m + 3 ≤ n → ∀ Λ0, IsLat L Λ0 → ∃ κ : ℝ, 0 < κ ∧ ∀ A : Matrix (Fin m) (Fin m) E, IsUnit A.det → IsIntM L (gramT L Hm (rmul x A⁻¹)) → ENNReal.ofReal (κ / 2 * (resQ ϖ : ℝ) ^ (-(vE L ϖ (A.det * L.cj A.det) * ((n : ℤ) - m)))) ≤ sigMass L Hm (Submodule.span E (Set.range x)) Λ0 (Submodule.span L.O (Set.range (rmul x A⁻¹))) ∧ sigMass L Hm (Submodule.span E (Set.range x)) Λ0 (Submodule.span L.O (Set.range (rmul x A⁻¹))) ≤ ENNReal.ofReal (2 * κ * (resQ ϖ : ℝ) ^ (-(vE L ϖ (A.det * L.cj A.det) * ((n : ℤ) - m)))) := by
+theorem mass_bounds
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (ϖ : 𝒪[F]),
+        Irreducible ϖ
+          → ∀ {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E),
+            IsHermND L Hm
+              → ∀ Λs,
+                IsSD L Hm Λs
+                  → ∀ (m : ℕ) (x : Fin m → Fin n → E),
+                    IsUnit (gramT L Hm x).det → 2 * m + 3 ≤ n
+                      → ∀ Λ0,
+                        IsLat L Λ0
+                          → ∃ κ : ℝ,
+                            0 < κ
+                              ∧ ∀ A : Matrix (Fin m) (Fin m) E,
+                                IsUnit A.det → IsIntM L (gramT L Hm (rmul x A⁻¹))
+                                  → ENNReal.ofReal
+                                        (κ / 2
+                                          * (resQ ϖ : ℝ)
+                                            ^ (-(vE L ϖ (A.det * L.cj A.det) * ((n : ℤ) - m))))
+                                      ≤ sigMass L Hm (Submodule.span E (Set.range x)) Λ0
+                                        (Submodule.span L.O (Set.range (rmul x A⁻¹)))
+                                    ∧ sigMass L Hm (Submodule.span E (Set.range x)) Λ0
+                                        (Submodule.span L.O (Set.range (rmul x A⁻¹)))
+                                      ≤ ENNReal.ofReal
+                                        (2 * κ
+                                          * (resQ ϖ : ℝ) ^ (-(vE L ϖ (A.det * L.cj A.det)
+                                            * ((n : ℤ) - m)))) := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ n Hm hH Λs hs m x hx hmn Λ0 h0
-  obtain ⟨κ, hκ, hk⟩ := GlobalTheory.HL.QuotMass.mass_eq_const_mul_content L ϖ hϖ Hm hH Λs hs m x hx Λ0 h0
+  obtain ⟨κ, hκ, hk⟩ :=
+    GlobalTheory.HL.QuotMass.mass_eq_const_mul_content L ϖ hϖ Hm hH Λs hs m x hx Λ0 h0
   refine ⟨κ, hκ, fun A hA hint => ?_⟩
   obtain ⟨s, h1, h2, i1, h3⟩ := trace_partition L ϖ hϖ Hm hH Λs hs m x hx A hA
   obtain ⟨i2, h4⟩ := GlobalTheory.PrimScale.cont_prim_scale L ϖ hϖ Hm hH Λs hs m x hx hmn A hA hint
   rw [sigMass_eq_sum hH hs x hx h0 _ s h1 h2]
-  have hg : ∀ g, ∃ j : ℕ, g ∈ s → ∀ i ≥ j,
-      IsCO (tupLat L Λs m) (thick L ϖ (torb (isomG L Hm ⊓ stabL L Λs) fun a => g⁻¹ (x a)) i) ∧
-      invVol (fixG L Hm (Submodule.span E (Set.range x)) ⊓ stabL L Λ0)
-        (fixG L Hm (Submodule.span E (Set.range x)) ⊓ stabL L (g • Λs)) *
-        cont (hermLat L m) (horb L ϖ (gramT L Hm x) i) = κ * cont (tupLat L Λs m)
-          (thick L ϖ (torb (isomG L Hm ⊓ stabL L Λs) fun a => g⁻¹ (x a)) i) := by
+  have hg
+      : ∀ g, ∃ j : ℕ,
+        g ∈ s
+          → ∀ i ≥ j,
+            IsCO (tupLat L Λs m) (thick L ϖ (torb (isomG L Hm ⊓ stabL L Λs) fun a => g⁻¹ (x a)) i)
+              ∧ invVol (fixG L Hm (Submodule.span E (Set.range x)) ⊓ stabL L Λ0)
+                    (fixG L Hm (Submodule.span E (Set.range x)) ⊓ stabL L (g • Λs))
+                  * cont (hermLat L m) (horb L ϖ (gramT L Hm x) i)
+                = κ * cont (tupLat L Λs m)
+                  (thick L ϖ (torb (isomG L Hm ⊓ stabL L Λs) fun a => g⁻¹ (x a)) i) := by
     intro g
     by_cases hgs : g ∈ s
     swap
@@ -136,9 +175,12 @@ theorem mass_bounds : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpac
     obtain ⟨e, he⟩ := GlobalTheory.HL.QuotMass.exists_pow_smul L ϖ hϖ hs.1 (fun a => g⁻¹ (x a))
     obtain ⟨j2, -, hj2⟩ := GlobalTheory.ThickOrbit.main L ϖ hϖ Hm hH Λs hs Λs hs m _ hx 1 e
     refine ⟨max j1 j2, fun _ i hi => ?_⟩
-    have hco := (hj2 i (le_of_max_le_right hi) (isomG L Hm ⊓ stabL L Λs) le_rfl
-      (fun k hk hk' => ⟨hk, (GlobalTheory.HL.congruence_subgroup_facts L ϖ hϖ Λs hs.1 1).2.1 le_rfl k hk'⟩)
-      (fun a => g⁻¹ (x a)) he (gramT_isom ((isomG L Hm).inv_mem hgi) x)).1
+    have hco :=
+      (hj2 i (le_of_max_le_right hi) (isomG L Hm ⊓ stabL L Λs) le_rfl
+        (fun k hk hk' =>
+          ⟨hk, (GlobalTheory.HL.congruence_subgroup_facts L ϖ hϖ Λs hs.1 1).2.1 le_rfl k hk'⟩)
+        (fun a => g⁻¹ (x a))
+        he (gramT_isom ((isomG L Hm).inv_mem hgi) x)).1
     refine ⟨hco, ?_⟩
     rw [hj1 i (le_of_max_le_left hi), ← image_thick ϖ hgi,
       ((GlobalTheory.HL.TupleJac.tuple_jacobian L ϖ hϖ Hm hH Λs hs m).2 g hgi _ hco).2]
@@ -151,8 +193,8 @@ theorem mass_bounds : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpac
     funext a b
     exact (GlobalTheory.HL.Unimod.hf_swap L hH.1 _ _).symm
   have hpos := ((GlobalTheory.CongGrp.congK_group L ϖ hϖ m i (by omega)).2.2 _ hherm hx).2
-  have hsum := (GlobalTheory.HL.cont_biUnion (tupLat L Λs m) s _
-    (fun g hg => (hj g hg i (hij g hg)).1)).2 hD
+  have hsum :=
+    (GlobalTheory.HL.cont_biUnion (tupLat L Λs m) s _ (fun g hg => (hj g hg i (hij g hg)).1)).2 hD
   rw [hU, hsum] at hl hu
   have key := Finset.sum_congr rfl fun g (hg : g ∈ s) => (hj g hg i (hij g hg)).2
   rw [← Finset.sum_mul, ← Finset.mul_sum] at key

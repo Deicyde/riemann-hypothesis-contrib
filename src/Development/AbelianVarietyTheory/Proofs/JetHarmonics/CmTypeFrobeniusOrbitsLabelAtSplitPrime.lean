@@ -9,37 +9,45 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ExistsFrobAll
 @[expose] public section
 
 open scoped BigOperators TensorProduct
-open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt GlobalTheory.GoodDepth
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds
+  Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt
+  GlobalTheory.GoodDepth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace GlobalTheory.LabSplit
 
-theorem exists_reps {P : Type} [Fintype P] (d : ℕ) [NeZero d] (pos : P → ℕ → P) (h0 : ∀ z, pos z 0 = z)
-    (hadd : ∀ z s t, pos (pos z s) t = pos z (s + t)) (hfree : ∀ z s t, pos z s = pos z t ↔ s ≡ t [MOD d]) :
-    ∃ Z : Finset P, ∀ z', ∃! p : P × ZMod d, p.1 ∈ Z ∧ pos p.1 p.2.val = z' := by
+theorem exists_reps
+    {P : Type} [Fintype P]
+    (d : ℕ) [NeZero d]
+    (pos : P → ℕ → P) (h0 : ∀ z, pos z 0 = z) (hadd : ∀ z s t, pos (pos z s) t = pos z (s + t))
+    (hfree : ∀ z s t, pos z s = pos z t ↔ s ≡ t [MOD d])
+    : ∃ Z : Finset P, ∀ z', ∃! p : P × ZMod d, p.1 ∈ Z ∧ pos p.1 p.2.val = z' := by
   have hd : 1 ≤ d := Nat.one_le_iff_ne_zero.2 (NeZero.ne d)
-  let S : Setoid P :=
-    { r := fun z z' => ∃ s, pos z s = z'
-      iseqv :=
-        { refl := fun z => ⟨0, h0 z⟩
-          symm := by
-            rintro z _ ⟨s, rfl⟩
-            refine ⟨(d - 1) * s, ?_⟩
-            rw [hadd]
-            conv_rhs => rw [← h0 z]
-            rw [hfree]
-            have : s + (d - 1) * s = d * s := by
-              obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_le hd
-              simp only [Nat.add_sub_cancel_left]; ring
-            rw [this]
-            exact (Nat.modEq_zero_iff_dvd).2 (dvd_mul_right _ _)
-          trans := by
-            rintro z _ _ ⟨s, rfl⟩ ⟨t, rfl⟩
-            exact ⟨s + t, (hadd z s t).symm⟩ } }
+  let S : Setoid P := {
+    r := fun z z' => ∃ s, pos z s = z'
+    iseqv := {
+      refl := fun z => ⟨0, h0 z⟩
+      symm := by
+        rintro z _ ⟨s, rfl⟩
+        refine ⟨(d - 1) * s, ?_⟩
+        rw [hadd]
+        conv_rhs => rw [← h0 z]
+        rw [hfree]
+        have : s + (d - 1) * s = d * s := by
+          obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_le hd
+          simp only [Nat.add_sub_cancel_left]
+          ring
+        rw [this]
+        exact (Nat.modEq_zero_iff_dvd).2 (dvd_mul_right _ _)
+      trans := by
+        rintro z _ _ ⟨s, rfl⟩ ⟨t, rfl⟩
+        exact ⟨s + t, (hadd z s t).symm⟩
+    }
+  }
   refine ⟨Finset.univ.filter fun z => (Quotient.mk S z).out = z, fun z' => ?_⟩
   obtain ⟨s, hs⟩ : ∃ s, pos (Quotient.mk S z').out s = z' := Quotient.mk_out (s := S) z'
-  have hmod : ((s : ZMod d)).val ≡ s [MOD d] := by
-    rw [ZMod.val_natCast]; exact Nat.mod_modEq s d
+  have hmod : ((s : ZMod d)).val ≡ s [MOD d] := by rw [ZMod.val_natCast]; exact Nat.mod_modEq s d
   refine ⟨((Quotient.mk S z').out, (s : ZMod d)), ⟨by simp, ?_⟩, ?_⟩
   · exact ((hfree _ _ _).2 hmod).trans hs
   · rintro ⟨z, t⟩ ⟨hz, ht⟩
@@ -53,7 +61,9 @@ theorem exists_reps {P : Type} [Fintype P] (d : ℕ) [NeZero d] (pos : P → ℕ
     have h4 := (ZMod.natCast_eq_natCast_iff _ _ _).2 ((hfree _ _ _).1 h3)
     simpa using h4
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
 
 theorem rt_sq_field : (H.rt : E) ^ 2 = -(H.d : E) := by
   have := congrArg (algebraMap (𝓞 E) E) H.rt_sq
@@ -61,8 +71,7 @@ theorem rt_sq_field : (H.rt : E) ^ 2 = -(H.d : E) := by
 
 theorem inPsi_conj_iff (τ : E →+* ℂ) : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
   have hd : (0 : ℝ) < H.d := by exact_mod_cast H.d_prime.pos
-  have h1 : τ (H.rt : E) ^ 2 = H.rt0 ^ 2 := by
-    rw [H.sqrt_neg_disc_sq, ← map_pow, rt_sq_field]; simp
+  have h1 : τ (H.rt : E) ^ 2 = H.rt0 ^ 2 := by rw [H.sqrt_neg_disc_sq, ← map_pow, rt_sq_field]; simp
   have h2 : starRingEnd ℂ H.rt0 = -H.rt0 := by
     have h := H.sqrt_neg_disc_sq
     have hre := congrArg Complex.re h
@@ -89,8 +98,11 @@ theorem inPsi_conj_iff (τ : E →+* ℂ) : InPsi H (ComplexEmbedding.conjugate 
   · rw [h, h2]; simp [h0]
   · rw [h, map_neg, h2]; simp [h0]
 
-theorem not_MM_neg_sub_pow {C : Type} [Field C] (V : VF C) (d : ℕ) (r : C) (hr : r ^ 2 = -(d : C)) (hi : V.Ge 0 r)
-    (h2 : V.l ≠ 2) (hj : jacobiSym (-(d : ℤ)) V.l = 1) : ¬ V.MM (-r - r ^ V.l) := by
+theorem not_MM_neg_sub_pow
+    {C : Type} [Field C]
+    (V : VF C) (d : ℕ) (r : C) (hr : r ^ 2 = -(d : C)) (hi : V.Ge 0 r)
+    (h2 : V.l ≠ 2) (hj : jacobiSym (-(d : ℤ)) V.l = 1)
+    : ¬ V.MM (-r - r ^ V.l) := by
   haveI : Fact V.l.Prime := ⟨V.l_prime⟩
   rw [← jacobiSym.legendreSym.to_jacobiSym] at hj
   have hp := legendreSym.eq_pow V.l (-(d : ℤ))
@@ -138,14 +150,31 @@ theorem not_MM_neg_sub_pow {C : Type} [Field C] (V : VF C) (d : ℕ) (r : C) (hr
   rw [hvd] at h6
   exact lt_irrefl _ h6
 
-theorem labelling_split : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv) (N : NumDatum) (pl : RPl N.R → (E →+* ℂ)), PlaceTie N c pl → ∀ (la : HeightOneSpectrum (𝓞 c.F)) (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι → V.l = resCharOf la → (∀ x ∈ la.asIdeal, V.MM (ι (io ((x : 𝓞 c.F) : c.F)))) → N.cls V.l = PrimeClass.splitK → ∀ j : ℕ, ∃ (d : ℕ) (_ : NeZero d) (pos : RPl N.R → ℕ → RPl N.R) (Z : Finset (RPl N.R)), RF.IsReps (parAt N j d pos) Z ∧ Z.Nonempty ∧ Function.Bijective (fun x : Z × Fin 2 × ZMod d => tauSp N pl pos x.1.1 x.2.1 x.2.2) ∧ ∀ z g, FrobOrd V io ι (tauSp (d := d) N pl pos z g) := by
+theorem labelling_split
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv)
+        (N : NumDatum) (pl : RPl N.R → (E →+* ℂ)),
+      PlaceTie N c pl
+        → ∀ (la : HeightOneSpectrum (𝓞 c.F)) (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C]
+            [CharZero C] (V : VF C) (ι : T.Fr →+* C),
+          EmbOK T V ι → V.l = resCharOf la → (∀ x ∈ la.asIdeal, V.MM (ι (io ((x : 𝓞 c.F) : c.F))))
+            → N.cls V.l = PrimeClass.splitK
+            → ∀ j : ℕ,
+              ∃ (d : ℕ) (_ : NeZero d) (pos : RPl N.R → ℕ → RPl N.R) (Z : Finset (RPl N.R)),
+                RF.IsReps (parAt N j d pos) Z ∧ Z.Nonempty
+                  ∧ Function.Bijective (fun x : Z × Fin 2 × ZMod d =>
+                    tauSp N pl pos x.1.1 x.2.1 x.2.2)
+                  ∧ ∀ z g, FrobOrd V io ι (tauSp (d := d) N pl pos z g) := by
   intro E _ _ _ H lv c N pl hP la T io C _ _ V ι hE hl _ hcls j
-  obtain ⟨φ, hφ⟩ := GlobalTheory.RowAt.exists_frob_all_embeddings E H lv c T io C V ι hE hP.galois hP.comm
+  obtain ⟨φ, hφ⟩ :=
+    GlobalTheory.RowAt.exists_frob_all_embeddings E H lv c T io C V ι hE hP.galois hP.comm
   haveI : Inhabited (RPl N.R) := ⟨(false, 0)⟩
   have h2 : V.l ≠ 2 := by
     intro h
     unfold NumDatum.cls primeClass at hcls
-    rw [if_pos (show V.l ∈ N.H.small from h ▸ Nat.mem_primeFactors.2 ⟨Nat.prime_two, N.H.two_dvd_QS, N.H.QS_pos.ne'⟩)] at hcls
+    rw [if_pos (show V.l ∈ N.H.small from
+        h ▸ Nat.mem_primeFactors.2 ⟨Nat.prime_two, N.H.two_dvd_QS, N.H.QS_pos.ne'⟩)]
+      at hcls
     exact absurd hcls (by decide)
   have hj : jacobiSym (-(H.d : ℤ)) V.l = 1 := by
     rw [hP.d_eq]
@@ -153,12 +182,11 @@ theorem labelling_split : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
     unfold NumDatum.cls primeClass at hcls
     split_ifs at hcls
   have hfix : φ (H.rt : E) = H.rt := by
-    have h1 : (φ (H.rt : E)) ^ 2 = (H.rt : E) ^ 2 := by
-      rw [← map_pow, rt_sq_field]; simp
+    have h1 : (φ (H.rt : E)) ^ 2 = (H.rt : E) ^ 2 := by rw [← map_pow, rt_sq_field]; simp
     refine (sq_eq_sq_iff_eq_or_eq_neg.1 h1).resolve_right fun h => ?_
     let τ : E →+* ℂ := pl default
-    have h3 : emA3 io ι (τ.comp (φ : E →+* E)) H.rt = -emA3 io ι τ H.rt := by
-      have : embK c (τ.comp (φ : E →+* E)) H.rt = -embK c τ H.rt := by
+    have h3 : emA3 io ι (τ.comp (φ : E →+* E)) H.rt = - emA3 io ι τ H.rt := by
+      have : embK c (τ.comp (φ : E →+* E)) H.rt = - embK c τ H.rt := by
         apply Subtype.ext
         rw [embK_coe]
         push_cast
@@ -169,19 +197,22 @@ theorem labelling_split : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
     rw [h3] at h4
     refine not_MM_neg_sub_pow V H.d _ ?_ ?_ h2 hj h4
     · rw [← map_pow, H.rt_sq]; simp
-    · exact ge_of_isIntegral V (map_isIntegral_int (emA3 io ι τ) (Algebra.IsIntegral.isIntegral H.rt))
+    · exact ge_of_isIntegral V
+        (map_isIntegral_int (emA3 io ι τ) (Algebra.IsIntegral.isIntegral H.rt))
   have hfixs : ∀ s : ℕ, (φ ^ s) (H.rt : E) = H.rt := by
     intro s
     induction s with
     | zero => rfl
     | succ s ih => rw [pow_succ, AlgEquiv.mul_apply, hfix, ih]
-  have hex : ∀ (z : RPl N.R) (s : ℕ), ∃ z', pl z' = (pl z).comp ((φ ^ s : E ≃ₐ[ℚ] E) : E →+* E) := by
+  have hex
+      : ∀ (z : RPl N.R) (s : ℕ), ∃ z', pl z' = (pl z).comp ((φ ^ s : E ≃ₐ[ℚ] E) : E →+* E) := by
     intro z s
     refine (hP.psi _).1 ?_
     have : InPsi H (pl z) := (hP.psi _).2 ⟨z, rfl⟩
     unfold InPsi at this ⊢
     change pl z ((φ ^ s) (H.rt : E)) = H.rt0
-    rw [hfixs]; exact this
+    rw [hfixs]
+    exact this
   choose pos hpos using hex
   haveI : NeZero (orderOf φ) := ⟨(orderOf_pos φ).ne'⟩
   have h0 : ∀ z, pos z 0 = z := fun z => hP.inj (by rw [hpos]; ext x; simp)
@@ -199,9 +230,12 @@ theorem labelling_split : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
   have hin : ∀ z, InPsi H (pl z) := fun z => (hP.psi _).2 ⟨z, rfl⟩
   have hnc : ∀ z z', pl z ≠ ComplexEmbedding.conjugate (pl z') := fun z z' h =>
     (inPsi_conj_iff H _).1 (h ▸ hin z) (hin z')
-  have huniq : ∀ (z z' : Z) (s s' : ZMod (orderOf φ)), pl (pos z s.val) = pl (pos z' s'.val) → z = z' ∧ s = s' := by
+  have huniq
+      : ∀ (z z' : Z) (s s' : ZMod (orderOf φ)),
+        pl (pos z s.val) = pl (pos z' s'.val) → z = z' ∧ s = s' := by
     intro z z' s s' h
-    have := (hZ (pos z' s'.val)).unique (y₁ := (z.1, s)) (y₂ := (z'.1, s')) ⟨z.2, hP.inj h⟩ ⟨z'.2, rfl⟩
+    have :=
+      (hZ (pos z' s'.val)).unique (y₁ := (z.1, s)) (y₂ := (z'.1, s')) ⟨z.2, hP.inj h⟩ ⟨z'.2, rfl⟩
     exact ⟨Subtype.ext (congrArg Prod.fst this), congrArg Prod.snd this⟩
   refine ⟨orderOf φ, inferInstance, pos, Z, hZ, ?_, ⟨?_, ?_⟩, ?_⟩
   · obtain ⟨p, hp, -⟩ := hZ default
@@ -232,7 +266,9 @@ theorem labelling_split : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
       simp
     have h3 : pl (pos z (s + 1).val) = (pl (pos z s.val)).comp (φ : E →+* E) := by
       rw [h1, hpos, hpos]; ext y; simp [pow_succ]
-    have h4 : tauSp (d := orderOf φ) N pl pos z g (s + 1) = (tauSp (d := orderOf φ) N pl pos z g s).comp (φ : E →+* E) := by
+    have h4
+        : tauSp (d := orderOf φ) N pl pos z g (s + 1)
+          = (tauSp (d := orderOf φ) N pl pos z g s).comp (φ : E →+* E) := by
       unfold tauSp
       split_ifs
       · exact h3

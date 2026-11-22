@@ -11,25 +11,35 @@ noncomputable section
 
 namespace GlobalTheory.RelativeSpectrum
 
-structure QCohSub {X Y : Scheme.{0}} (f : X ⟶ Y) (F : ∀ V : Y.Opens, Subring Γ(X, f ⁻¹ᵁ V)) : Prop where
+structure QCohSub {X Y : Scheme.{0}} (f : X ⟶ Y) (F : ∀ V : Y.Opens, Subring Γ(X, f ⁻¹ᵁ V))
+    : Prop where
   app_mem : ∀ V : Y.Opens, IsAffineOpen V → ∀ a : Γ(Y, V), (f.app V).hom a ∈ F V
-  res_mem : ∀ (V V' : Y.Opens) (hle : V' ≤ V), IsAffineOpen V → IsAffineOpen V' → ∀ x ∈ F V,
-    (X.presheaf.map (homOfLE (f.preimage_mono hle)).op).hom x ∈ F V'
-  loc : ∀ V : Y.Opens, IsAffineOpen V → ∀ (r : Γ(Y, V)) (x : Γ(X, f ⁻¹ᵁ Y.basicOpen r)),
-    x ∈ F (Y.basicOpen r) →
-    ∃ (k : ℕ) (y : Γ(X, f ⁻¹ᵁ V)), y ∈ F V ∧
-      (X.presheaf.map (homOfLE (f.preimage_mono (Y.basicOpen_le r))).op).hom y =
-        (X.presheaf.map (homOfLE (f.preimage_mono (Y.basicOpen_le r))).op).hom ((f.app V).hom r) ^ k * x
+  res_mem
+    : ∀ (V V' : Y.Opens) (hle : V' ≤ V),
+      IsAffineOpen V → IsAffineOpen V'
+        → ∀ x ∈ F V, (X.presheaf.map (homOfLE (f.preimage_mono hle)).op).hom x ∈ F V'
+  loc
+    : ∀ V : Y.Opens,
+      IsAffineOpen V
+        → ∀ (r : Γ(Y, V)) (x : Γ(X, f ⁻¹ᵁ Y.basicOpen r)),
+          x ∈ F (Y.basicOpen r)
+            → ∃ (k : ℕ) (y : Γ(X, f ⁻¹ᵁ V)),
+              y ∈ F V
+                ∧ (X.presheaf.map (homOfLE (f.preimage_mono (Y.basicOpen_le r))).op).hom y
+                  = (X.presheaf.map (homOfLE (f.preimage_mono (Y.basicOpen_le r))).op).hom
+                        ((f.app V).hom r)
+                      ^ k
+                    * x
 
 variable {X Y : Scheme.{0}} {f : X ⟶ Y} {F : ∀ V : Y.Opens, Subring Γ(X, f ⁻¹ᵁ V)}
-
 
 set_option backward.isDefEq.respectTransparency false in
 def diagram (H : QCohSub f F) : Y.AffineZariskiSiteᵒᵖ ⥤ CommRingCat where
   obj U := .of (F U.unop.1)
   map {V U} i :=
-    CommRingCat.ofHom ((X.presheaf.map (homOfLE (f.preimage_mono (toOpens_mono i.unop.le))).op).hom.restrict
-      _ _ fun x hx ↦ H.res_mem _ _ (toOpens_mono i.unop.le) V.unop.2 U.unop.2 x hx)
+    CommRingCat.ofHom
+      ((X.presheaf.map (homOfLE (f.preimage_mono (toOpens_mono i.unop.le))).op).hom.restrict _ _
+        fun x hx ↦ H.res_mem _ _ (toOpens_mono i.unop.le) V.unop.2 U.unop.2 x hx)
   map_id U := by
     ext x
     change ((X.presheaf.map (𝟙 _)).hom x.1) = x.1
@@ -37,7 +47,8 @@ def diagram (H : QCohSub f F) : Y.AffineZariskiSiteᵒᵖ ⥤ CommRingCat where
   map_comp i j := by
     simp only [← CommRingCat.ofHom_comp]
     rw [← homOfLE_comp (f.preimage_mono (toOpens_mono j.unop.le))
-      (f.preimage_mono (toOpens_mono i.unop.le)), op_comp]
+        (f.preimage_mono (toOpens_mono i.unop.le)),
+      op_comp]
     simp_rw [X.presheaf.map_comp]
     rfl
 
@@ -88,29 +99,26 @@ def relSpec (H : QCohSub f F) : Scheme := (glueData H).glued
 
 def relCover (H : QCohSub f F) : (relSpec H).OpenCover := (glueData H).cover
 
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 def toRel (H : QCohSub f F) : X ⟶ relSpec H :=
-  Scheme.OpenCover.glueMorphismsOfLocallyDirected
-    ((directedCover Y).pullback₁ f)
+  Scheme.OpenCover.glueMorphismsOfLocallyDirected ((directedCover Y).pullback₁ f)
     (fun U ↦
-      (pullbackRestrictIsoRestrict f _).hom ≫
-      (f ⁻¹ᵁ U.1).toSpecΓ ≫ Spec.map (CommRingCat.ofHom (F U.1).subtype) ≫ (relCover H).f U)
+      (pullbackRestrictIsoRestrict f _).hom ≫ (f ⁻¹ᵁ U.1).toSpecΓ
+        ≫ Spec.map (CommRingCat.ofHom (F U.1).subtype) ≫ (relCover H).f U)
     fun {U V : Y.AffineZariskiSite} i ↦ by
-  have : (pullbackRestrictIsoRestrict f U.1).inv ≫
-      Cover.trans ((directedCover Y).pullback₁ f) i ≫
-      (pullbackRestrictIsoRestrict f V.1).hom = X.homOfLE
-        (f.preimage_mono (toOpens_mono i.1.1)) := by
-    rw [← cancel_mono (Scheme.Opens.ι _)]
-    simp +instances [Cover.trans, Cover.locallyDirectedPullbackCover]
-  rw [← Iso.inv_comp_eq, reassoc_of% this, ← Scheme.Opens.toSpecΓ_SpecMap_presheaf_map_assoc,
-    ← Spec.map_comp_assoc]
-  dsimp [relCover]
-  rw [← colimit.w (glueData H).functor i]
-  dsimp [glueData, relativeGluingData]
-  rw [← Spec.map_comp_assoc]
-  rfl
+      have : (pullbackRestrictIsoRestrict f U.1).inv ≫ Cover.trans ((directedCover Y).pullback₁ f) i
+            ≫ (pullbackRestrictIsoRestrict f V.1).hom
+          = X.homOfLE (f.preimage_mono (toOpens_mono i.1.1)) := by
+        rw [← cancel_mono (Scheme.Opens.ι _)]
+        simp +instances [Cover.trans, Cover.locallyDirectedPullbackCover]
+      rw [← Iso.inv_comp_eq, reassoc_of% this, ← Scheme.Opens.toSpecΓ_SpecMap_presheaf_map_assoc,
+        ← Spec.map_comp_assoc]
+      dsimp [relCover]
+      rw [← colimit.w (glueData H).functor i]
+      dsimp [glueData, relativeGluingData]
+      rw [← Spec.map_comp_assoc]
+      rfl
 
 set_option backward.isDefEq.respectTransparency.types false in
 set_option backward.defeqAttrib.useBackward true in
@@ -160,13 +168,11 @@ lemma isFinite_fromRel (H : QCohSub f F)
   rw [← cancel_mono U.2.fromSpec]
   simp [IsAffineOpen.isoSpec_hom, e, ι_fromRel]
 
-
 set_option backward.isDefEq.respectTransparency.types false in
-def relObjIso (H : QCohSub f F) {U : Y.Opens} (hU : IsAffineOpen U) :
-    Γ(relSpec H, fromRel H ⁻¹ᵁ U) ≅ .of (F U) :=
-  (relSpec H).presheaf.mapIso (eqToIso
-    (by simpa using! (fromRel_preimage H ⟨U, hU⟩).symm)).op ≪≫
-  ((relCover H).f ⟨U, hU⟩).appIso ⊤ ≪≫ Scheme.ΓSpecIso _
+def relObjIso (H : QCohSub f F) {U : Y.Opens} (hU : IsAffineOpen U)
+    : Γ(relSpec H, fromRel H ⁻¹ᵁ U) ≅ .of (F U) :=
+  (relSpec H).presheaf.mapIso (eqToIso (by simpa using! (fromRel_preimage H ⟨U, hU⟩).symm)).op
+    ≪≫ ((relCover H).f ⟨U, hU⟩).appIso ⊤ ≪≫ Scheme.ΓSpecIso _
 
 set_option backward.isDefEq.respectTransparency false in
 lemma toRel_app_preimage (H : QCohSub f F) (U : Y.affineOpens) :
@@ -252,14 +258,19 @@ lemma isIntegral_relSpec (H : QCohSub f F) [AlgebraicGeometry.IsIntegral X] [IsD
     simpa using (toRel H).denseRange.closure_range.symm
   isIntegral_of_irreducibleSpace_of_isReduced _
 
-
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor in
-theorem exists_finite_cover {S : Scheme.{0}} {K : Type} [Field K] (gp : Sp K ⟶ S) [AlgebraicGeometry.IsIntegral S]
-    [IsDominant gp] (F : ∀ V : S.Opens, Subring Γ(Sp K, gp ⁻¹ᵁ V)) (hF : GlobalTheory.Mum.IsFinSub gp F) :
-    ∃ (S' : Scheme) (h : S' ⟶ S) (gp' : Sp K ⟶ S') (hgp : gp' ≫ h = gp),
-      IsFinite h ∧ AlgebraicGeometry.IsIntegral S' ∧ IsDominant gp' ∧
-      ∀ V : S.Opens, IsAffineOpen V → ∀ x ∈ F V, ∃ c : Γ(S', h ⁻¹ᵁ V),
-        (gp'.appLE (h ⁻¹ᵁ V) (gp ⁻¹ᵁ V) (GlobalTheory.Mum.le_preimage_of_comp_eq gp gp' h hgp V)).hom c = x := by
+theorem exists_finite_cover
+    {S : Scheme.{0}} {K : Type} [Field K]
+    (gp : Sp K ⟶ S) [AlgebraicGeometry.IsIntegral S] [IsDominant gp]
+    (F : ∀ V : S.Opens, Subring Γ(Sp K, gp ⁻¹ᵁ V)) (hF : GlobalTheory.Mum.IsFinSub gp F)
+    : ∃ (S' : Scheme) (h : S' ⟶ S) (gp' : Sp K ⟶ S') (hgp : gp' ≫ h = gp),
+      IsFinite h ∧ AlgebraicGeometry.IsIntegral S' ∧ IsDominant gp'
+        ∧ ∀ V : S.Opens,
+          IsAffineOpen V
+            → ∀ x ∈ F V, ∃ c : Γ(S', h ⁻¹ᵁ V),
+              (gp'.appLE (h ⁻¹ᵁ V) (gp ⁻¹ᵁ V)
+                  (GlobalTheory.Mum.le_preimage_of_comp_eq gp gp' h hgp V)).hom c
+                = x := by
   obtain ⟨h1, h2, h3, h4⟩ := hF
   have H : QCohSub gp F := ⟨h1, h2, h3⟩
   haveI : AlgebraicGeometry.IsIntegral (Sp K) := inferInstanceAs (AlgebraicGeometry.IsIntegral (Spec (.of K)))

@@ -6,14 +6,20 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafUnitsPfB
 
 namespace LateralTheory.E.E4
 
-def LeafOrdInfHom : Prop := ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B]
-  [Algebra k B] [Algebra.FiniteType k B] (g : Polynomial k →ₐ[k] B), Function.Injective g → g.Finite →
-  ∃ (n : ℕ) (φ : Bˣ →* Multiplicative (Fin n → ℤ)), ∀ u : Bˣ, φ u = 1 →
-    IsIntegral (Algebra.adjoin k {(algebraMap B (FractionRing B) (g Polynomial.X))⁻¹})
-      (algebraMap B (FractionRing B) (u : B))
+def LeafOrdInfHom : Prop :=
+  ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B] [Algebra k B]
+      [Algebra.FiniteType k B] (g : Polynomial k →ₐ[k] B),
+    Function.Injective g → g.Finite
+      → ∃ (n : ℕ) (φ : Bˣ →* Multiplicative (Fin n → ℤ)), ∀ u : Bˣ,
+        φ u = 1
+          → IsIntegral (Algebra.adjoin k {(algebraMap B (FractionRing B) (g Polynomial.X))⁻¹})
+            (algebraMap B (FractionRing B) (u : B))
 
-def LeafIntBoth : Prop := ∀ (k L : Type) [Field k] [Field L] [Algebra k L] (t : L), Transcendental k t → ∀ x : L,
-  IsIntegral (Algebra.adjoin k {t}) x → IsIntegral (Algebra.adjoin k {t⁻¹}) x → IsIntegral k x
+def LeafIntBoth : Prop :=
+  ∀ (k L : Type) [Field k] [Field L] [Algebra k L] (t : L),
+    Transcendental k t
+      → ∀ x : L,
+        IsIntegral (Algebra.adjoin k {t}) x → IsIntegral (Algebra.adjoin k {t⁻¹}) x → IsIntegral k x
 
 theorem LeafOrdAtInfinity_of (hV : LeafOrdInfHom) (hI : LeafIntBoth) : LeafOrdAtInfinity := by
   intro k B _ _ _ _ _ _ g hg hf
@@ -30,12 +36,17 @@ theorem LeafOrdAtInfinity_of (hV : LeafOrdInfHom) (hI : LeafIntBoth) : LeafOrdAt
     apply hG
     rw [map_zero]
     have : G p = Polynomial.aeval T p := by
-      rw [show G p = G (Polynomial.aeval Polynomial.X p) by simp, ← Polynomial.aeval_algHom_apply]; rfl
-    rw [this]; exact hp
+      rw [show G p = G (Polynomial.aeval Polynomial.X p) by simp, ← Polynomial.aeval_algHom_apply]
+      rfl
+    rw [this]
+    exact hp
   have hint : IsIntegral (Algebra.adjoin k {T}) (algebraMap B L (u : B)) := by
     obtain ⟨p, hpm, hp⟩ := (RingHom.IsIntegral.of_finite hf) (u : B)
-    let f : Polynomial k →ₐ[k] Algebra.adjoin k {T} := Polynomial.aeval ⟨T, Algebra.subset_adjoin rfl⟩
-    have hfG : ((algebraMap (Algebra.adjoin k {T}) L).comp f.toRingHom) = (algebraMap B L).comp g.toRingHom := by
+    let f : Polynomial k →ₐ[k] Algebra.adjoin k {T} :=
+      Polynomial.aeval ⟨T, Algebra.subset_adjoin rfl⟩
+    have hfG
+        : ((algebraMap (Algebra.adjoin k {T}) L).comp f.toRingHom)
+          = (algebraMap B L).comp g.toRingHom := by
       have : (IsScalarTower.toAlgHom k (Algebra.adjoin k {T}) L).comp f = G := by
         apply Polynomial.algHom_ext; simp [f, G, T]
       exact congrArg AlgHom.toRingHom this

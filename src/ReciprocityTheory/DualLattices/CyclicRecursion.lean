@@ -103,34 +103,38 @@ theorem teichSum (p : ℕ) [Fact p.Prime] : TeichSumStatement p := by
   refine ⟨⟨_, (univ_coeff (p := p) s).2⟩, ?_⟩
   intro K _ _ _ X S hS
   refine ⟨?_, ?_⟩
-  · obtain ⟨w, hw⟩ := exists_witt_eq_teich_add_p_teich_frob_symm_add_p_sq_mul (∑ i ∈ s, teichmuller p (X i))
+  · obtain ⟨w, hw⟩ :=
+      exists_witt_eq_teich_add_p_teich_frob_symm_add_p_sq_mul (∑ i ∈ s, teichmuller p (X i))
     have h0 : (∑ i ∈ s, teichmuller p (X i)).coeff 0 = ∑ i ∈ s, X i := by
       rw [coeff_zero_sum]
       simp
-    have hmap : WittVector.map (MvPolynomial.aeval X).toRingHom
-        (∑ i ∈ s, teichmuller p (MvPolynomial.X i : MvPolynomial ι ℤ)) =
-          ∑ i ∈ s, teichmuller p (X i) := by
+    have hmap
+        : WittVector.map (MvPolynomial.aeval X).toRingHom
+            (∑ i ∈ s, teichmuller p (MvPolynomial.X i : MvPolynomial ι ℤ))
+          = ∑ i ∈ s, teichmuller p (X i) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
       refine Finset.sum_congr rfl (fun i _ => ?_)
       rw [WittVector.map_teichmuller]
       simp
     have hSeq : (∑ i ∈ s, teichmuller p (MvPolynomial.X i : MvPolynomial ι ℤ)).coeff 1 = S := by
-      have hp0 : (p : MvPolynomial ι ℤ) ≠ 0 := by
-        exact_mod_cast (Fact.out : p.Prime).ne_zero
+      have hp0 : (p : MvPolynomial ι ℤ) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
       exact mul_left_cancel₀ hp0 ((univ_coeff (p := p) s).2.trans hS.symm)
     have h1 : (∑ i ∈ s, teichmuller p (X i)).coeff 1 = MvPolynomial.aeval X S := by
       rw [← hmap, WittVector.map_coeff, hSeq]
       try rfl
-    have hfr : (frobeniusEquiv K p).symm (MvPolynomial.aeval X S) =
-        MvPolynomial.aeval (fun i => (frobeniusEquiv K p).symm (X i)) S :=
+    have hfr
+        : (frobeniusEquiv K p).symm (MvPolynomial.aeval X S)
+          = MvPolynomial.aeval (fun i => (frobeniusEquiv K p).symm (X i)) S :=
       ringHom_aeval ((frobeniusEquiv K p).symm : K →+* K) X S
     refine ⟨w, ?_⟩
     rw [h0, h1, hfr] at hw
     exact hw
   · intro y t
-    have hd : ((p : ℕ) : WittVector p K) ∣ (teichmuller p y + (p : WittVector p K) * t) -
-        teichmuller p y := ⟨t, by ring⟩
+    have hd
+        : ((p : ℕ) : WittVector p K)
+          ∣ (teichmuller p y + (p : WittVector p K) * t) - teichmuller p y :=
+      ⟨t, by ring⟩
     obtain ⟨w, hw⟩ := dvd_sub_pow_of_dvd_sub hd 1
     refine ⟨w, ?_⟩
     simp only [pow_one] at hw

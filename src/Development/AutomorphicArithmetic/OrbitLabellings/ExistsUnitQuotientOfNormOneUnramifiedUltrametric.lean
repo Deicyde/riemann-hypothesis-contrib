@@ -149,11 +149,13 @@ private lemma norm_onto [CompleteSpace K] [CharZero K] (hU : UnrOK K l σ) (ζ :
 
 private def intFix (hU : UnrOK K l σ) : Subring K where
   carrier := {x | ‖x‖ ≤ 1 ∧ σ (σ x) = x}
-  mul_mem' := fun {a b} ha hb => ⟨by
-    rw [norm_mul]; exact mul_le_one₀ ha.1 (norm_nonneg _) hb.1, by
-    rw [map_mul, map_mul, ha.2, hb.2]⟩
+  mul_mem' := fun {a b} ha hb => ⟨
+    by rw [norm_mul]; exact mul_le_one₀ ha.1 (norm_nonneg _) hb.1,
+    by rw [map_mul, map_mul, ha.2, hb.2]
+  ⟩
   one_mem' := ⟨norm_one.le, by rw [map_one, map_one]⟩
-  add_mem' := fun {a b} ha hb => ⟨nadd ha.1 hb.1, by rw [map_add (f := _), map_add (f := _), ha.2, hb.2]⟩
+  add_mem' := fun {a b} ha hb =>
+    ⟨nadd ha.1 hb.1, by rw [map_add (f := _), map_add (f := _), ha.2, hb.2]⟩
   zero_mem' := ⟨by simp, by rw [map_zero, map_zero]⟩
   neg_mem' := fun {a} ha => ⟨by rw [norm_neg]; exact ha.1, by rw [map_neg, map_neg, ha.2]⟩
 
@@ -360,16 +362,25 @@ private lemma not_dvd {l d : ℕ} (hp : l.Prime) (hd : d ≠ 0) : 0 < l ^ d - 1 
 
 end UpperTheory.NormSurjectiveFixedIntegers
 
-theorem UpperTheory.exists_unit_quotient_of_normOne_unramified_ultrametric :
-    ∀ (l : ℕ) [Fact l.Prime], 5 ≤ l → ∀ σ : MaximalUnramifiedExtension l →+* MaximalUnramifiedExtension l, UnrOK (MaximalUnramifiedExtension l) l σ → ∀ (i : ℕ) [NeZero i], Odd i →
-    ∃ om : Fin i → MaximalUnramifiedExtension l, OwOK (2 * i) σ om (fun r => σ^[i] (om r)) ∧ TrDual (2 * i) σ om (fun r => σ^[i] (om r)) := by
+theorem UpperTheory.exists_unit_quotient_of_normOne_unramified_ultrametric
+    : ∀ (l : ℕ) [Fact l.Prime],
+      5 ≤ l
+        → ∀ σ : MaximalUnramifiedExtension l →+* MaximalUnramifiedExtension l,
+          UnrOK (MaximalUnramifiedExtension l) l σ
+            → ∀ (i : ℕ) [NeZero i],
+              Odd i
+                → ∃ om : Fin i → MaximalUnramifiedExtension l,
+                  OwOK (2 * i) σ om (fun r => σ^[i] (om r))
+                    ∧ TrDual (2 * i) σ om (fun r => σ^[i] (om r)) := by
   intro l _ _ σ hU i _ hi
   haveI : CompleteSpace (MaximalUnramifiedExtension l) := Formalism.L2.Th1.D.kurComplete l
   have a1 := UpperTheory.NormSurjectiveFixedIntegers.not_dvd (d := 2) hU.1 two_ne_zero
   have a2 := UpperTheory.NormSurjectiveFixedIntegers.not_dvd (d := 2 * i) hU.1 (NeZero.ne _)
   obtain ⟨ζ, hζ⟩ := Formalism.L2.Th1.D.kurRoots l _ a1.1 a1.2
   obtain ⟨ξ, hξ⟩ := Formalism.L2.Th1.D.kurRoots l _ a2.1 a2.2
-  have h := Formalism.L2.Th1.D.trDualExists (MaximalUnramifiedExtension l) l (2 * i) σ hU (even_two_mul i) ξ hξ
+  have h :=
+    Formalism.L2.Th1.D.trDualExists (MaximalUnramifiedExtension l) l (2 * i) σ hU (even_two_mul i) ξ
+      hξ
   rw [show 2 * i / 2 = i by omega] at h
   obtain ⟨om, oms, h1, h2⟩ := h
   exact UpperTheory.NormSurjectiveFixedIntegers.main hU ζ hζ i hi om oms h1 h2

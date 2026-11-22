@@ -8,10 +8,10 @@ open Polynomial IsLocalRing
 
 namespace GlobalTheory
 
-theorem monic_dvd_X_pow_card_sub_one_exists_root :
-    ∀ (S : Type) [CommRing S] [HenselianLocalRing S] [Finite (ResidueField S)] (f : S[X]),
-      f.Monic → f.natDegree ≠ 0 → f ∣ X ^ (Nat.card (ResidueField S) - 1) - 1 →
-        ∃ y : S, f.eval y = 0 := by
+theorem monic_dvd_X_pow_card_sub_one_exists_root
+    : ∀ (S : Type) [CommRing S] [HenselianLocalRing S] [Finite (ResidueField S)] (f : S[X]),
+      f.Monic → f.natDegree ≠ 0 → f ∣ X ^ (Nat.card (ResidueField S) - 1) - 1
+        → ∃ y : S, f.eval y = 0 := by
   intro S _ _ _ f hmon hdeg hdvd
   classical
   letI : Fintype (ResidueField S) := Fintype.ofFinite _
@@ -28,16 +28,16 @@ theorem monic_dvd_X_pow_card_sub_one_exists_root :
     have : (X ^ Q - X : (ResidueField S)[X]) = X * (X ^ (Q - 1) - 1) := by
       conv_lhs => rw [show Q = (Q - 1) + 1 by omega]
       ring
-    rw [this]; exact dvd_mul_of_dvd_right h1 _
-  have hne : (X ^ Q - X : (ResidueField S)[X]) ≠ 0 :=
-    Polynomial.X_pow_sub_X_ne_zero hQ1
+    rw [this]
+    exact dvd_mul_of_dvd_right h1 _
+  have hne : (X ^ Q - X : (ResidueField S)[X]) ≠ 0 := Polynomial.X_pow_sub_X_ne_zero hQ1
   have hsplit : Splits (X ^ Q - X : (ResidueField S)[X]) := by
     rw [splits_iff_card_roots, FiniteField.roots_X_pow_card_sub_X,
       Polynomial.natDegree_X_pow_sub_X (R := (ResidueField S)) hQ1]
     simp [Q]
   have hgs : Splits g := hsplit.of_dvd hne hdvd'
-  obtain ⟨abar, habar⟩ := hgs.exists_eval_eq_zero
-    (by rw [degree_eq_natDegree hgm.ne_zero]; exact_mod_cast hgdeg)
+  obtain ⟨abar, habar⟩ :=
+    hgs.exists_eval_eq_zero (by rw [degree_eq_natDegree hgm.ne_zero]; exact_mod_cast hgdeg)
   have hchar : ringChar (ResidueField S) ∣ Q := by
     apply (ringChar.spec (ResidueField S) Q).mp
     exact FiniteField.cast_card_eq_zero (ResidueField S)
@@ -45,15 +45,15 @@ theorem monic_dvd_X_pow_card_sub_one_exists_root :
     galois_poly_separable (ringChar (ResidueField S)) Q hchar
   have hgsep := hsep.of_dvd hdvd'
   have hder : eval abar (derivative g) ≠ 0 := by
-    have := hgsep.aeval_derivative_ne_zero (S := ResidueField S) (x := abar)
-      (by simpa [aeval_def] using habar)
+    have :=
+      hgsep.aeval_derivative_ne_zero (S := ResidueField S) (x := abar)
+        (by simpa [aeval_def] using habar)
     simpa [aeval_def] using this
   obtain ⟨a, rfl⟩ := residue_surjective abar
   have key : ∀ p : S[X], residue S (p.eval a) = (p.map (residue S)).eval (residue S a) := by
     intro p; rw [eval_map, eval₂_hom]
-  obtain ⟨y, hy, -⟩ := HenselianLocalRing.is_henselian f hmon a
-    (by rw [← residue_eq_zero_iff, key]; exact habar)
-    (by
+  obtain ⟨y, hy, -⟩ :=
+    HenselianLocalRing.is_henselian f hmon a (by rw [← residue_eq_zero_iff, key]; exact habar) (by
       rw [← residue_ne_zero_iff_isUnit, key, ← derivative_map]
       exact hder)
   exact ⟨y, hy⟩

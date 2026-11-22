@@ -4,17 +4,21 @@ public import Development.EtaleCohomology.TateTwists.TPairAssocPf
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations
 
-theorem pa_sec_res_map {R : Type} [CommRing R] {F G : Shv R} (φ : F ⟶ G) {V U : Scheme.{0}} (g : V ⟶ U)
-    (x : Sec F U) : Sec.res g (Sec.map φ x) = Sec.map φ (Sec.res g x) := by
+theorem pa_sec_res_map
+    {R : Type} [CommRing R] {F G : Shv R} (φ : F ⟶ G) {V U : Scheme.{0}} (g : V ⟶ U) (x : Sec F U)
+    : Sec.res g (Sec.map φ x) = Sec.map φ (Sec.res g x) := by
   have := congrArg (fun f => (ModuleCat.Hom.hom f) x) (φ.hom.naturality g.op)
   simpa using this.symm
 
-theorem pa_sec_map_comp {R : Type} [CommRing R] {F G H : Shv R} (φ : F ⟶ G) (ψ : G ⟶ H) {U : Scheme.{0}}
-    (x : Sec F U) : Sec.map (φ ≫ ψ) x = Sec.map ψ (Sec.map φ x) := rfl
+theorem pa_sec_map_comp
+    {R : Type} [CommRing R] {F G H : Shv R} (φ : F ⟶ G) (ψ : G ⟶ H) {U : Scheme.{0}} (x : Sec F U)
+    : Sec.map (φ ≫ ψ) x = Sec.map ψ (Sec.map φ x) :=
+  rfl
 
 theorem t_pa_precomp_of : t_pa_precomp := by
   intro R _ I I' J K u μ
@@ -26,7 +30,8 @@ theorem t_pa_precomp_of : t_pa_precomp := by
     simp only [LinearMap.comp_apply]
     rw [μ.leibniz]
     congr 2
-    rw [← pa_sec_map_comp, u.comm]; rfl
+    rw [← pa_sec_map_comp, u.comm]
+    rfl
   · intro U s t w h a b
     rfl
 

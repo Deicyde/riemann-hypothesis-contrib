@@ -13,15 +13,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousGL
 
 @[expose] public section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspQuot GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace MeasureTheory
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspQuot
+  GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace MeasureTheory
 
 namespace GlobalTheory
 
-theorem card_latticeGL_conj_le : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ), ∃ A : ℕ,
-    ∀ W : Set (GA E a), IsCompact W → ∃ C : ℝ, 0 ≤ C ∧ ∀ y : GL (Fin a) (Cinf E),
-      {γ : GlobalTheory.UnitaryBC.latticeGL E a | (infGL E a y)⁻¹ * (γ : GA E a) * infGL E a y ∈ W}.Finite ∧
-      ({γ : GlobalTheory.UnitaryBC.latticeGL E a | (infGL E a y)⁻¹ * (γ : GA E a) * infGL E a y ∈ W}.ncard : ℝ) ≤
-        C * height y ^ (2 * A) := by
+theorem card_latticeGL_conj_le
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
+      ∃ A : ℕ, ∀ W : Set (GA E a),
+        IsCompact W
+          → ∃ C : ℝ,
+            0 ≤ C
+              ∧ ∀ y : GL (Fin a) (Cinf E),
+                {γ : GlobalTheory.UnitaryBC.latticeGL E a | (infGL E a y)⁻¹ * (γ : GA E a) * infGL E a y ∈ W}.Finite
+                  ∧ ({γ : GlobalTheory.UnitaryBC.latticeGL E a | (infGL E a y)⁻¹ * (γ : GA E a) * infGL E a y ∈ W}.ncard
+                      : ℝ)
+                    ≤ C * height y ^ (2 * A) := by
   intro E _ _ _ a
   rcases Nat.eq_zero_or_pos a with rfl | ha
   · refine ⟨0, fun W _ => ⟨1, zero_le_one, fun y => ?_⟩⟩
@@ -36,12 +43,13 @@ theorem card_latticeGL_conj_le : ∀ (E : Type) [Field E] [NumberField E] [_root
   obtain ⟨hInf, hFin, -, -⟩ := GlobalTheory.T.continuous_GL_adelic_projections_inclusions E a
   set e : GA E a := GlobalTheory.UnitaryBC.splitCentre E a 1 with he
   set W' : Set (GA E a) := ⋃ n ∈ Finset.Icc (-(n₀ : ℤ)) n₀, (fun g => g * (e ^ n)⁻¹) '' W with hW'
-  have hW'c : IsCompact W' := (Finset.Icc (-(n₀ : ℤ)) n₀).isCompact_biUnion fun n _ =>
-    hW.image (continuous_mul_const _)
+  have hW'c : IsCompact W' :=
+    (Finset.Icc (-(n₀ : ℤ)) n₀).isCompact_biUnion fun n _ => hW.image (continuous_mul_const _)
   set Kf : Set (GL (Fin a) (Af E)) := (fun g : GA E a => Matrix.GeneralLinearGroup.map (pFin E) g) '' W' with hKf
   have hKfc : IsCompact Kf := hW'c.image hFin
   have hv : Continuous fun g : GA E a =>
-      ((Matrix.GeneralLinearGroup.map (pInf E) g : GL (Fin a) (Cinf E)) : Matrix (Fin a) (Fin a) (Cinf E)) :=
+      ((Matrix.GeneralLinearGroup.map (pInf E) g : GL (Fin a) (Cinf E))
+        : Matrix (Fin a) (Fin a) (Cinf E)) :=
     Units.continuous_val.comp hInf
   have ht : Continuous (toL : Matrix (Fin a) (Fin a) (Cinf E) → Lie E a) := continuous_id
   have hcn : Continuous fun g : GA E a => ‖toL (Matrix.GeneralLinearGroup.map (pInf E) g).val‖ :=
@@ -66,8 +74,9 @@ theorem card_latticeGL_conj_le : ∀ (E : Type) [Field E] [NumberField E] [_root
     Matrix.GeneralLinearGroup.map (pFin E) (ratGL E a δ) ∈ Kf} with hS
   let f : GL (Fin a) E × ℤ → GlobalTheory.UnitaryBC.latticeGL E a := fun p =>
     ⟨ratGL E a p.1 * e ^ p.2, GlobalTheory.CuspRep.CuspidalL2GL.mem_latticeGL_iff.2 ⟨p.1, p.2, rfl⟩⟩
-  have hsub : {γ : GlobalTheory.UnitaryBC.latticeGL E a | (infGL E a y)⁻¹ * (γ : GA E a) * infGL E a y ∈ W} ⊆
-      f '' (S ×ˢ Set.Icc (-(n₀ : ℤ)) n₀) := by
+  have hsub
+      : {γ : GlobalTheory.UnitaryBC.latticeGL E a | (infGL E a y)⁻¹ * (γ : GA E a) * infGL E a y ∈ W}
+        ⊆ f '' (S ×ˢ Set.Icc (-(n₀ : ℤ)) n₀) := by
     rintro ⟨γ, hγ⟩ hγW
     obtain ⟨δ, n, rfl⟩ := GlobalTheory.CuspRep.CuspidalL2GL.mem_latticeGL_iff.1 hγ
     change (infGL E a y)⁻¹ * (ratGL E a δ * e ^ n) * infGL E a y ∈ W at hγW
@@ -84,45 +93,57 @@ theorem card_latticeGL_conj_le : ∀ (E : Type) [Field E] [NumberField E] [_root
       all_goals simp only [hw, mul_assoc]
     have hδ : ratGL E a δ = infGL E a y * w * (infGL E a y)⁻¹ := by rw [hw]; group
     refine ⟨(δ, n), ⟨⟨?_, ?_⟩, hn'⟩, rfl⟩
-    · have e1 : Matrix.GeneralLinearGroup.map (pInf E) (ratGL E a δ) =
-          y * Matrix.GeneralLinearGroup.map (pInf E) w * y⁻¹ := by
+    · have e1
+          : Matrix.GeneralLinearGroup.map (pInf E) (ratGL E a δ)
+            = y * Matrix.GeneralLinearGroup.map (pInf E) w * y⁻¹ := by
         rw [hδ, map_mul, map_mul, map_inv, pInf_infGL]
       rw [e1, Units.val_mul, Units.val_mul]
       have hw' := hBb w hwW
-      have p1 := GlobalTheory.AutGrowth.norm_toL_mul_le (y.val * (Matrix.GeneralLinearGroup.map (pInf E) w).val) (y⁻¹).val
-      have p2 := GlobalTheory.AutGrowth.norm_toL_mul_le y.val (Matrix.GeneralLinearGroup.map (pInf E) w).val
-      have hy1 : ‖toL y.val‖ ≤ height y := by
-        unfold height; linarith [norm_nonneg (toL (y⁻¹).val)]
-      have hy2 : ‖toL (y⁻¹).val‖ ≤ height y := by
-        unfold height; linarith [norm_nonneg (toL y.val)]
+      have p1 :=
+        GlobalTheory.AutGrowth.norm_toL_mul_le
+          (y.val * (Matrix.GeneralLinearGroup.map (pInf E) w).val) (y⁻¹).val
+      have p2 :=
+        GlobalTheory.AutGrowth.norm_toL_mul_le y.val (Matrix.GeneralLinearGroup.map (pInf E) w).val
+      have hy1 : ‖toL y.val‖ ≤ height y := by unfold height; linarith [norm_nonneg (toL (y⁻¹).val)]
+      have hy2 : ‖toL (y⁻¹).val‖ ≤ height y := by unfold height; linarith [norm_nonneg (toL y.val)]
       have n1 := norm_nonneg (toL y.val)
       have n2 := norm_nonneg (toL (y⁻¹).val)
       have n3 := norm_nonneg (toL (Matrix.GeneralLinearGroup.map (pInf E) w).val)
       have ha0 : (0 : ℝ) ≤ a := Nat.cast_nonneg a
-      have q1 : ‖toL (y.val * (Matrix.GeneralLinearGroup.map (pInf E) w).val)‖ ≤ a * (height y * B) :=
+      have q1
+          : ‖toL (y.val * (Matrix.GeneralLinearGroup.map (pInf E) w).val)‖ ≤ a * (height y * B) :=
         p2.trans (mul_le_mul_of_nonneg_left (mul_le_mul hy1 hw' n3 (by linarith)) ha0)
-      have q2 : ‖toL (y.val * (Matrix.GeneralLinearGroup.map (pInf E) w).val * (y⁻¹).val)‖ ≤
-          a * ((a * (height y * B)) * height y) :=
+      have q2
+          : ‖toL (y.val * (Matrix.GeneralLinearGroup.map (pInf E) w).val * (y⁻¹).val)‖
+            ≤ a * ((a * (height y * B)) * height y) :=
         p1.trans (mul_le_mul_of_nonneg_left (mul_le_mul q1 hy2 n2 (by positivity)) ha0)
       refine q2.trans ?_
       rw [hT, hc]
       have : 0 ≤ height y ^ 2 := by positivity
       nlinarith
-    · have e2 : Matrix.GeneralLinearGroup.map (pFin E) (ratGL E a δ) =
-          Matrix.GeneralLinearGroup.map (pFin E) w := by
+    · have e2
+          : Matrix.GeneralLinearGroup.map (pFin E) (ratGL E a δ)
+            = Matrix.GeneralLinearGroup.map (pFin E) w := by
         rw [hδ, map_mul, map_mul, map_inv, pFin_infGL, inv_one, one_mul, mul_one]
       rw [e2]
       exact ⟨w, hwW, rfl⟩
-  have hfin2 : (f '' (S ×ˢ Set.Icc (-(n₀ : ℤ)) n₀)).Finite := (hfin.prod (Set.finite_Icc _ _)).image f
+  have hfin2 : (f '' (S ×ˢ Set.Icc (-(n₀ : ℤ)) n₀)).Finite :=
+    (hfin.prod (Set.finite_Icc _ _)).image f
   refine ⟨hfin2.subset hsub, ?_⟩
   have k1 := Set.ncard_le_ncard hsub hfin2
   have k2 := Set.ncard_image_le (f := f) (hfin.prod (Set.finite_Icc (-(n₀ : ℤ)) n₀))
   rw [Set.ncard_prod] at k2
-  have k3 : (({γ : GlobalTheory.UnitaryBC.latticeGL E a | (infGL E a y)⁻¹ * (γ : GA E a) * infGL E a y ∈ W}.ncard : ℕ) : ℝ) ≤
-      (S.ncard : ℝ) * N := by rw [hN]; exact_mod_cast k1.trans k2
+  have k3
+      : (({γ : GlobalTheory.UnitaryBC.latticeGL E a | (infGL E a y)⁻¹ * (γ : GA E a) * infGL E a y ∈ W}.ncard
+            : ℕ)
+          : ℝ)
+        ≤ (S.ncard : ℝ) * N := by
+    rw [hN]; exact_mod_cast k1.trans k2
   refine k3.trans ?_
   have hN0 : 0 ≤ N := by positivity
-  calc (S.ncard : ℝ) * N ≤ C₁ * T ^ m * N := mul_le_mul_of_nonneg_right hcard hN0
+  calc
+    (S.ncard : ℝ) * N
+      ≤ C₁ * T ^ m * N := mul_le_mul_of_nonneg_right hcard hN0
     _ = C₁ * c ^ m * N * height y ^ (2 * m) := by rw [hT, mul_pow, ← pow_mul, mul_comm 2 m]; ring
 
 end GlobalTheory

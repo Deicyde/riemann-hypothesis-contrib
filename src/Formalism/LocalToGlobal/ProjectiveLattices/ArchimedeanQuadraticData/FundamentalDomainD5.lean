@@ -24,8 +24,13 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
   classical
   rcases Nat.eq_zero_or_pos r with hr0 | hr0
   · subst hr0
-    refine ⟨fun w => ⟨0, L.zero_mem, ?_⟩, fun j => j.elim0, fun j => j.elim0,
-      linearIndependent_empty_type, fun j => j.elim0⟩
+    refine ⟨
+      fun w => ⟨0, L.zero_mem, ?_⟩,
+      fun j => j.elim0,
+      fun j => j.elim0,
+      linearIndependent_empty_type,
+      fun j => j.elim0
+    ⟩
     simp [normSq]
     positivity
   set f := Fintype.card ι with hf
@@ -44,7 +49,8 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
     funext k
     simp only [Matrix.mulVec, dotProduct, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
-  have hAQ : ∀ c : Fin N → ℚ, A *ᵥ (fun j => ((c j : ℚ) : ℝ)) = rho eqv (Phi σ Q (∑ j, c j • e j)) := by
+  have hAQ
+      : ∀ c : Fin N → ℚ, A *ᵥ (fun j => ((c j : ℚ) : ℝ)) = rho eqv (Phi σ Q (∑ j, c j • e j)) := by
     intro c
     rw [hAR, Phi_sum, rho_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -52,8 +58,8 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
 
   let T : Matrix (Fin N) (Fin N) ℚ := Matrix.of fun k j => Algebra.trace ℚ K (S.h (e k) (e j))
   have hfinrank : Module.finrank ℚ (Fin r → K) = N := by
-    rw [Module.finrank_pi_fintype, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul, hN,
-      mul_comm]
+    rw [Module.finrank_pi_fintype, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      smul_eq_mul, hN, mul_comm]
   have : Nonempty (Fin N) := ⟨⟨0, hNpos⟩⟩
   let eB : Module.Basis (Fin N) ℚ (Fin r → K) :=
     basisOfLinearIndependentOfCardEqFinrank heli (by rw [Fintype.card_fin, hfinrank])
@@ -85,8 +91,11 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
       rw [heB, h_qsmul_left, htrq, hTx k, mul_zero]
     exact hx0 (nondeg σ Q hQ p S hform x hall)
 
-  have hid : ∀ y v : Fin r → K, rho eqv (Theta p (Phi σ Q y)) ⬝ᵥ rho eqv (Phi σ Q v) =
-      (1 / 2 : ℝ) * ((Algebra.trace ℚ K (S.h y v) : ℚ) : ℝ) := trace_id σ hinj hcm Q p S hform eqv
+  have hid
+      : ∀ y v : Fin r → K,
+        rho eqv (Theta p (Phi σ Q y)) ⬝ᵥ rho eqv (Phi σ Q v)
+          = (1 / 2 : ℝ) * ((Algebra.trace ℚ K (S.h y v) : ℚ) : ℝ) :=
+    trace_id σ hinj hcm Q p S hform eqv
   have hAdet : A.det ≠ 0 := by
     intro h0
     obtain ⟨c, hc0, hc⟩ := Matrix.exists_mulVec_eq_zero_iff.2 h0
@@ -99,9 +108,11 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
     have h1 : rho eqv (Theta p (Phi σ Q (e k))) ⬝ᵥ (A *ᵥ c) = 0 := by rw [hc, dotProduct_zero]
     rw [hAR, dotProduct_sum] at h1
     simp only [dotProduct_smul, hid, smul_eq_mul] at h1
-    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.of_apply, Pi.zero_apply, Rat.coe_castHom, T]
-    have h2 : ∑ j, ((Algebra.trace ℚ K (S.h (e k) (e j)) : ℚ) : ℝ) * c j =
-        2 * ∑ j, c j * ((1 / 2 : ℝ) * ((Algebra.trace ℚ K (S.h (e k) (e j)) : ℚ) : ℝ)) := by
+    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.of_apply, Pi.zero_apply,
+      Rat.coe_castHom, T]
+    have h2
+        : ∑ j, ((Algebra.trace ℚ K (S.h (e k) (e j)) : ℚ) : ℝ) * c j
+          = 2 * ∑ j, c j * ((1 / 2 : ℝ) * ((Algebra.trace ℚ K (S.h (e k) (e j)) : ℚ) : ℝ)) := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl fun j _ => by ring
     rw [h2, h1, mul_zero]
@@ -113,8 +124,9 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
   have hAu : IsUnit A.det := isUnit_iff_ne_zero.2 hAdet
   have hTTdet : Tᵀ.det ≠ 0 := by rw [Matrix.det_transpose]; exact hTdet
   have hAtdet : Aᵀ.det ≠ 0 := by rw [Matrix.det_transpose]; exact hAdet
-  have hdual : ∀ t : Fin N → ℤ, t ≠ 0 →
-      μ' ^ 2 ≤ ((A⁻¹)ᵀ *ᵥ fun i => (t i : ℝ)) ⬝ᵥ ((A⁻¹)ᵀ *ᵥ fun i => (t i : ℝ)) := by
+  have hdual
+      : ∀ t : Fin N → ℤ,
+        t ≠ 0 → μ' ^ 2 ≤ ((A⁻¹)ᵀ *ᵥ fun i => (t i : ℝ)) ⬝ᵥ ((A⁻¹)ᵀ *ᵥ fun i => (t i : ℝ)) := by
     intro t ht
     set u := (A⁻¹)ᵀ *ᵥ fun i => (t i : ℝ) with hu
     have hAtu : Aᵀ *ᵥ u = fun i => (t i : ℝ) := by
@@ -123,13 +135,15 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
     set tq : Fin N → ℚ := fun i => (t i : ℚ) with htq
     set s : Fin N → ℚ := (Tᵀ)⁻¹ *ᵥ ((2 : ℚ) • tq) with hs
     have hTs : Tᵀ *ᵥ s = (2 : ℚ) • tq := by
-      rw [hs, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.2 hTTdet), Matrix.one_mulVec]
+      rw [hs, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.2 hTTdet),
+        Matrix.one_mulVec]
     set y := ∑ j, s j • e j with hy
     have hyk : ∀ k, Algebra.trace ℚ K (S.h y (e k)) = 2 * (t k : ℚ) := by
       intro k
       have h1 := congrFun hTs k
       simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.of_apply, Pi.smul_apply,
-        smul_eq_mul, htq, T] at h1
+          smul_eq_mul, htq, T]
+        at h1
       set_option synthInstance.maxHeartbeats 100000 in
         rw [hy, h_sum_left, map_sum]
       simp only [h_qsmul_left, htrq]
@@ -140,9 +154,10 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
       have h1 := hid y (e k)
       rw [dotProduct] at h1
       simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply, A, Matrix.of_apply]
-      rw [show (∑ m, rho eqv (Phi σ Q (e k)) m * rho eqv (Theta p (Phi σ Q y)) m) =
-        ∑ m, rho eqv (Theta p (Phi σ Q y)) m * rho eqv (Phi σ Q (e k)) m from
-        Finset.sum_congr rfl fun m _ => mul_comm _ _, h1, hyk k]
+      rw [show (∑ m, rho eqv (Phi σ Q (e k)) m * rho eqv (Theta p (Phi σ Q y)) m)
+            = ∑ m, rho eqv (Theta p (Phi σ Q y)) m * rho eqv (Phi σ Q (e k)) m from
+          Finset.sum_congr rfl fun m _ => mul_comm _ _,
+        h1, hyk k]
       push_cast
       ring
     have hu' : rho eqv (Theta p (Phi σ Q y)) = u := by
@@ -183,17 +198,23 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
     have hdy0 : ((NumberField.discr K : ℤ) : K) • y ≠ 0 :=
       smul_ne_zero (by exact_mod_cast NumberField.discr_ne_zero K) hy0
     obtain ⟨i, hi⟩ := hmin _ hdy hdy0
-    have hscale : normSq (Q i *ᵥ embVec (σ i) (((NumberField.discr K : ℤ) : K) • y)) =
-        dK ^ 2 * normSq (Q i *ᵥ embVec (σ i) y) := by
+    have hscale
+        : normSq (Q i *ᵥ embVec (σ i) (((NumberField.discr K : ℤ) : K) • y))
+          = dK ^ 2 * normSq (Q i *ᵥ embVec (σ i) y) := by
       rw [embVec_smul, Matrix.mulVec_smul, map_intCast]
-      simp only [normSq, Pi.smul_apply, smul_eq_mul, norm_mul, mul_pow, Finset.mul_sum, Complex.norm_intCast]
+      simp only [normSq, Pi.smul_apply, smul_eq_mul, norm_mul, mul_pow, Finset.mul_sum,
+        Complex.norm_intCast]
       rw [hdK, sq_abs]
     have huu : u ⬝ᵥ u = majSq σ Q y := by rw [← hu', theta_dot_self, phi_dot_self]
     rw [huu, hμ', div_pow, div_le_iff₀ (by positivity)]
     have hle : normSq (Q i *ᵥ embVec (σ i) y) ≤ majSq σ Q y :=
-      Finset.single_le_sum (f := fun i => normSq (Q i *ᵥ embVec (σ i) y))
-        (fun j _ => Finset.sum_nonneg fun _ _ => sq_nonneg _) (Finset.mem_univ i)
-    calc laStar ^ 2 ≤ dK ^ 2 * normSq (Q i *ᵥ embVec (σ i) y) := hscale ▸ hi
+      Finset.single_le_sum
+        (f := fun i => normSq (Q i *ᵥ embVec (σ i) y))
+        (fun j _ => Finset.sum_nonneg fun _ _ => sq_nonneg _)
+        (Finset.mem_univ i)
+    calc
+      laStar ^ 2
+        ≤ dK ^ 2 * normSq (Q i *ᵥ embVec (σ i) y) := hscale ▸ hi
       _ ≤ dK ^ 2 * majSq σ Q y := mul_le_mul_of_nonneg_left hle (sq_nonneg _)
       _ = majSq σ Q y * dK ^ 2 := mul_comm _ _
 
@@ -201,16 +222,19 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
     rw [Matrix.det_transpose]
     exact Matrix.isUnit_nonsing_inv_det A hAu
   have hRinv : ((A⁻¹)ᵀ)⁻¹ᵀ = A := by
-    have h1 : ((A⁻¹)ᵀ)⁻¹ = Aᵀ := Matrix.inv_eq_right_inv (by
-      rw [← Matrix.transpose_mul, Matrix.mul_nonsing_inv A hAu, Matrix.transpose_one])
+    have h1 : ((A⁻¹)ᵀ)⁻¹ = Aᵀ :=
+      Matrix.inv_eq_right_inv (by
+        rw [← Matrix.transpose_mul, Matrix.mul_nonsing_inv A hAu, Matrix.transpose_one])
     rw [h1, Matrix.transpose_transpose]
-  have hdual' : ∀ t : Fin N → ℤ, t ≠ 0 → μ' ^ 2 ≤
-      (fun i => (t i : ℝ)) ⬝ᵥ (((A⁻¹)ᵀᵀ * (A⁻¹)ᵀ) *ᵥ fun i => (t i : ℝ)) := by
+  have hdual'
+      : ∀ t : Fin N → ℤ,
+        t ≠ 0 → μ' ^ 2 ≤ (fun i => (t i : ℝ)) ⬝ᵥ (((A⁻¹)ᵀᵀ * (A⁻¹)ᵀ) *ᵥ fun i => (t i : ℝ)) := by
     intro t ht
     rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, Matrix.vecMul_transpose]
     exact hdual t ht
-  obtain ⟨c, hcli, hcb⟩ := Formalism.MainNotions.ModuliIntegralCharts.H1.PhiCMin.shortDual_holds N ((A⁻¹)ᵀᵀ * (A⁻¹)ᵀ) (A⁻¹)ᵀ μ' hNpos rfl
-    hRdet hμ'pos hdual' (N / μ') (by positivity)
+  obtain ⟨c, hcli, hcb⟩ :=
+    Formalism.MainNotions.ModuliIntegralCharts.H1.PhiCMin.shortDual_holds N ((A⁻¹)ᵀᵀ * (A⁻¹)ᵀ)
+      (A⁻¹)ᵀ μ' hNpos rfl hRdet hμ'pos hdual' (N / μ') (by positivity)
   rw [hRinv] at hcb
 
   set v : Fin N → Fin r → K := fun j => ∑ k, ((c j k : ℤ) : ℚ) • e k with hv
@@ -245,10 +269,12 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
     have h1 := congrFun hm k
     simpa [Matrix.vecMul, dotProduct, Cz, Finset.sum_apply] using h1
   have hCR : (Cz.map (Int.castRingHom ℝ)).det ≠ 0 := by
-    rw [show Cz.map (Int.castRingHom ℝ) = (Int.castRingHom ℝ).mapMatrix Cz from rfl, ← RingHom.map_det]
+    rw [show Cz.map (Int.castRingHom ℝ) = (Int.castRingHom ℝ).mapMatrix Cz from rfl,
+      ← RingHom.map_det]
     simpa using hCz
   have hCQ : (Cz.map (Int.castRingHom ℚ)).det ≠ 0 := by
-    rw [show Cz.map (Int.castRingHom ℚ) = (Int.castRingHom ℚ).mapMatrix Cz from rfl, ← RingHom.map_det]
+    rw [show Cz.map (Int.castRingHom ℚ) = (Int.castRingHom ℚ).mapMatrix Cz from rfl,
+      ← RingHom.map_det]
     simpa using hCz
   have hvli : LinearIndependent ℚ v := by
     rw [Fintype.linearIndependent_iff]
@@ -297,35 +323,38 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
     rw [hℓval, hμval, hNX]
     nlinarith
   refine ⟨fun w => ?_, vb, fun j => ?_, hvbli, fun j => ?_⟩
-  ·
-    have hbli : LinearIndependent ℝ (fun j => A *ᵥ (fun k => (c j k : ℝ))) := by
+  · have hbli : LinearIndependent ℝ (fun j => A *ᵥ (fun k => (c j k : ℝ))) := by
       rw [Fintype.linearIndependent_iff]
       intro a ha
       have h1 : A *ᵥ (a ᵥ* Cz.map (Int.castRingHom ℝ)) = 0 := by
-        calc A *ᵥ (a ᵥ* Cz.map (Int.castRingHom ℝ)) = A *ᵥ (∑ i, a i • fun k => (c i k : ℝ)) := by
-              congr 1
-              funext k
-              simp [Matrix.vecMul, dotProduct, Cz, Finset.sum_apply]
+        calc
+          A *ᵥ (a ᵥ* Cz.map (Int.castRingHom ℝ)) = A *ᵥ (∑ i, a i • fun k => (c i k : ℝ)) := by
+            congr 1
+            funext k
+            simp [Matrix.vecMul, dotProduct, Cz, Finset.sum_apply]
           _ = ∑ i, a i • A *ᵥ fun k => (c i k : ℝ) := by
-              rw [Matrix.mulVec_sum]
-              simp [Matrix.mulVec_smul]
+            rw [Matrix.mulVec_sum]
+            simp [Matrix.mulVec_smul]
           _ = 0 := ha
       have h2 := Matrix.eq_zero_of_mulVec_eq_zero hAdet h1
       exact fun j => congrFun (Matrix.eq_zero_of_vecMul_eq_zero hCR h2) j
     have hcr := cover_round (N := N) (fun j => A *ᵥ (fun k => (c j k : ℝ))) hbli ℓ hcb' (rho eqv w)
     obtain ⟨n, hn⟩ := hcr
-    have hlL : (∑ j, ((n j : ℤ) : ℚ) • v j) ∈ L := Submodule.sum_mem L fun j _ => hzsm (n j) (v j) (hvL j)
+    have hlL : (∑ j, ((n j : ℤ) : ℚ) • v j) ∈ L :=
+      Submodule.sum_mem L fun j _ => hzsm (n j) (v j) (hvL j)
     refine ⟨_, hlL, ?_⟩
-    have hsumr : ∑ j, (n j : ℝ) • (A *ᵥ (fun k => (c j k : ℝ))) =
-        rho eqv (Phi σ Q (∑ j, ((n j : ℤ) : ℚ) • v j)) := by
+    have hsumr
+        : ∑ j, (n j : ℝ) • (A *ᵥ (fun k => (c j k : ℝ)))
+          = rho eqv (Phi σ Q (∑ j, ((n j : ℤ) : ℚ) • v j)) := by
       rw [Phi_sum, rho_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [Phi_qsmul, rho_smul, hAv j]
       simp [Rat.cast_intCast]
     rw [hsumr] at hn
-    have heq : ∑ i, normSq (Q i *ᵥ embVec (σ i) (∑ j, ((n j : ℤ) : ℚ) • v j) - w i) =
-        (rho eqv w - rho eqv (Phi σ Q (∑ j, ((n j : ℤ) : ℚ) • v j))) ⬝ᵥ
-          (rho eqv w - rho eqv (Phi σ Q (∑ j, ((n j : ℤ) : ℚ) • v j))) := by
+    have heq
+        : ∑ i, normSq (Q i *ᵥ embVec (σ i) (∑ j, ((n j : ℤ) : ℚ) • v j) - w i)
+          = (rho eqv w - rho eqv (Phi σ Q (∑ j, ((n j : ℤ) : ℚ) • v j)))
+            ⬝ᵥ (rho eqv w - rho eqv (Phi σ Q (∑ j, ((n j : ℤ) : ℚ) • v j))) := by
       rw [← rho_sub, rho_dot_self]
       refine Finset.sum_congr rfl fun i _ => ?_
       simp only [normSq, Phi, Pi.sub_apply]

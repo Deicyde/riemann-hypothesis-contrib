@@ -6,10 +6,11 @@ public import Mathlib
 
 open Filter Topology ValuativeRel
 
-private theorem small_powers {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (V : Set k) (hV : V ∈ nhds (0 : k)) :
-    ∀ᶠ c : ℕ in atTop, ∀ x ∈ IsLocalRing.maximalIdeal ↥(valuation k).integer ^ c,
-      (x : k) ∈ V := by
+private theorem small_powers
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (V : Set k) (hV : V ∈ nhds (0 : k))
+    : ∀ᶠ c : ℕ in atTop, ∀ x ∈ IsLocalRing.maximalIdeal ↥(valuation k).integer ^ c,
+        (x : k) ∈ V := by
   obtain ⟨γ, hγ, hs⟩ := (IsValuativeTopology.hasBasis_nhds_zero' k).mem_iff.mp hV
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible ↥(valuation k).integer
   have hlt : valuation k (π : k) < 1 := by
@@ -26,39 +27,46 @@ private theorem small_powers {k : Type} [Field k] [ValuativeRel k] [TopologicalS
   have ha : valuation k (a : k) ≤ 1 := a.2
   change valuation k ((a : k) * (π : k) ^ N) < γ
   rw [map_mul, map_pow]
-  calc _ ≤ 1 * valuation k (π : k) ^ N := by gcongr
+  calc
+    _ ≤ 1 * valuation k (π : k) ^ N := by gcongr
     _ < γ := by simpa using hN
 
-private theorem entry_mem {k : Type} [Field k] [ValuativeRel k] {n : ℕ}
-    (I : Ideal ↥(valuation k).integer) (g : GL (Fin n) k)
-    (hg : g ∈ Subgroup.map
-      (Matrix.GeneralLinearGroup.map (algebraMap (↥(valuation k).integer) k))
-      (Matrix.GeneralLinearGroup.map (n := Fin n) (Ideal.Quotient.mk I)).ker) (i j : Fin n) :
-    ∃ x ∈ I, (x : k) = (g : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j := by
+private theorem entry_mem
+    {k : Type} [Field k] [ValuativeRel k]
+    {n : ℕ} (I : Ideal ↥(valuation k).integer) (g : GL (Fin n) k)
+    (hg : g ∈ Subgroup.map (Matrix.GeneralLinearGroup.map (algebraMap (↥(valuation k).integer) k))
+      (Matrix.GeneralLinearGroup.map (n := Fin n) (Ideal.Quotient.mk I)).ker)
+    (i j : Fin n)
+    : ∃ x ∈ I,
+      (x : k) = (g : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j := by
   obtain ⟨h, hh, rfl⟩ := hg
   have h1 : Matrix.GeneralLinearGroup.map (n := Fin n) (Ideal.Quotient.mk I) h = 1 := hh
-  have h2 : Ideal.Quotient.mk I ((h : Matrix (Fin n) (Fin n) _) i j)
-      = (1 : Matrix (Fin n) (Fin n) (_ ⧸ I)) i j :=
-    by
-      have h4 := Units.ext_iff.mp h1
-      exact congrFun (congrFun h4 i) j
+  have h2
+      : Ideal.Quotient.mk I ((h : Matrix (Fin n) (Fin n) _) i j)
+        = (1 : Matrix (Fin n) (Fin n) (_ ⧸ I)) i j := by
+    have h4 := Units.ext_iff.mp h1
+    exact congrFun (congrFun h4 i) j
   refine ⟨(h : Matrix (Fin n) (Fin n) _) i j - (1 : Matrix (Fin n) (Fin n) _) i j, ?_, ?_⟩
   · rw [← Ideal.Quotient.eq, h2]
     by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
-  · have h3 : ((Matrix.GeneralLinearGroup.map (algebraMap (↥(valuation k).integer) k) h :
-        GL (Fin n) k) : Matrix (Fin n) (Fin n) k) i j
-        = (((h : Matrix (Fin n) (Fin n) ↥(valuation k).integer) i j : _) : k) := rfl
+  · have h3
+        : ((Matrix.GeneralLinearGroup.map (algebraMap (↥(valuation k).integer) k) h : GL (Fin n) k)
+              : Matrix (Fin n) (Fin n) k)
+            i j
+          = (((h : Matrix (Fin n) (Fin n) ↥(valuation k).integer) i j : _) : k) :=
+      rfl
     rw [h3]
     by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
 
-private theorem tendsto_val {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {n : ℕ} {α : Type} (L : Filter α) (c : α → ℕ)
-    (hc : Tendsto c L atTop) (g : α → GL (Fin n) k)
-    (hg : ∀ᶠ a in L, g a ∈ Subgroup.map
-      (Matrix.GeneralLinearGroup.map (algebraMap (↥(valuation k).integer) k))
-      (Matrix.GeneralLinearGroup.map (n := Fin n)
-        (Ideal.Quotient.mk (IsLocalRing.maximalIdeal ↥(valuation k).integer ^ c a))).ker) :
-    Tendsto (fun a => (g a : Matrix (Fin n) (Fin n) k)) L (nhds 1) := by
+private theorem tendsto_val
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : ℕ} {α : Type} (L : Filter α) (c : α → ℕ) (hc : Tendsto c L atTop) (g : α → GL (Fin n) k)
+    (hg
+      : ∀ᶠ a in L, g a ∈ Subgroup.map
+        (Matrix.GeneralLinearGroup.map (algebraMap (↥(valuation k).integer) k))
+        (Matrix.GeneralLinearGroup.map (n := Fin n)
+          (Ideal.Quotient.mk (IsLocalRing.maximalIdeal ↥(valuation k).integer ^ c a))).ker)
+    : Tendsto (fun a => (g a : Matrix (Fin n) (Fin n) k)) L (nhds 1) := by
   refine tendsto_pi_nhds.mpr fun i => tendsto_pi_nhds.mpr fun j => ?_
   rw [← tendsto_sub_nhds_zero_iff]
   refine tendsto_def.mpr fun V hV => ?_
@@ -67,14 +75,23 @@ private theorem tendsto_val {k : Type} [Field k] [ValuativeRel k] [TopologicalSp
   have := hs x hx
   rwa [e] at this
 
-theorem UpperTheory.congruence_subgroup_eventually :
-    ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ} (U : Set (GL (Fin n) k)), U ∈ nhds (1 : GL (Fin n) k) →
-        ∃ c₀ : ℕ, ∀ c : ℕ, c₀ ≤ c → ∀ g : GL (Fin n) k, g ∈ Subgroup.map (Matrix.GeneralLinearGroup.map (algebraMap (↥(ValuativeRel.valuation k).integer) k))
-          (Matrix.GeneralLinearGroup.map (n := Fin n)
-            (Ideal.Quotient.mk (IsLocalRing.maximalIdeal ↥(ValuativeRel.valuation k).integer ^ c))).ker → g ∈ U := by
+theorem UpperTheory.congruence_subgroup_eventually
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {n : ℕ} (U : Set (GL (Fin n) k)),
+      U ∈ nhds (1 : GL (Fin n) k)
+        → ∃ c₀ : ℕ, ∀ c : ℕ,
+          c₀ ≤ c
+            → ∀ g : GL (Fin n) k,
+              g ∈ Subgroup.map
+                  (Matrix.GeneralLinearGroup.map (algebraMap (↥(ValuativeRel.valuation k).integer)
+                    k))
+                  (Matrix.GeneralLinearGroup.map (n := Fin n)
+                    (Ideal.Quotient.mk
+                      (IsLocalRing.maximalIdeal ↥(ValuativeRel.valuation k).integer ^ c))).ker
+                → g ∈ U := by
   intro k _ _ _ _ n U hU
-  let K : ℕ → Subgroup (GL (Fin n) k) := fun c => Subgroup.map
-      (Matrix.GeneralLinearGroup.map (algebraMap (↥(valuation k).integer) k))
+  let K : ℕ → Subgroup (GL (Fin n) k) := fun c =>
+    Subgroup.map (Matrix.GeneralLinearGroup.map (algebraMap (↥(valuation k).integer) k))
       (Matrix.GeneralLinearGroup.map (n := Fin n)
         (Ideal.Quotient.mk (IsLocalRing.maximalIdeal ↥(valuation k).integer ^ c))).ker
   let L : Filter (ℕ × GL (Fin n) k) := comap Prod.fst atTop ⊓ 𝓟 {p | p.2 ∈ K p.1}

@@ -8,9 +8,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Filter Formalism.MainNotions.V.Pf.V2.Calc UpperTheory.V.Alg UpperTheory.V.Alg.M
 
-private theorem exists_ptDer_eq_degree_smul_of_graded {O A K : Type} [CommRing O] [CommRing A] [Algebra O A] [Field K] [Algebra O K]
-    (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] (ξ : A →ₐ[O] K) :
-    ∃ E ∈ PtDer ξ K, ∀ (j : ℤ) (a : A), a ∈ 𝒜 j → E a = (j : K) * ξ a := by
+private theorem exists_ptDer_eq_degree_smul_of_graded
+    {O A K : Type} [CommRing O] [CommRing A] [Algebra O A] [Field K] [Algebra O K]
+    (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜]
+    (ξ : A →ₐ[O] K)
+    : ∃ E ∈ PtDer ξ K, ∀ (j : ℤ) (a : A), a ∈ 𝒜 j → E a = (j : K) * ξ a := by
   classical
   let L : (DirectSum ℤ fun i => 𝒜 i) →ₗ[O] K :=
     DirectSum.toModule O ℤ K (fun i => ((i : ℤ) : K) • (ξ.toLinearMap ∘ₗ (𝒜 i).subtype))
@@ -39,10 +41,13 @@ private theorem exists_ptDer_eq_degree_smul_of_graded {O A K : Type} [CommRing O
     simp only [add_mul, map_add (f := _), smul_add, add_smul, h₁, h₂, smul_eq_mul]
     ring
 
-private theorem degree_derivation_vanishes_on_homogeneous_ideal {O A K : Type} [CommRing O] [CommRing A] [Algebra O A] [Field K] [Algebra O K]
-    (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] (I : Ideal A) (hI : I.IsHomogeneous 𝒜) (ξ : A →ₐ[O] K)
-    (hξ : OnS I ξ) (E : A →ₗ[O] K) (hE : ∀ (j : ℤ) (a : A), a ∈ 𝒜 j → E a = (j : K) * ξ a) :
-    ∀ a ∈ I, E a = 0 := by
+private theorem degree_derivation_vanishes_on_homogeneous_ideal
+    {O A K : Type} [CommRing O] [CommRing A] [Algebra O A] [Field K] [Algebra O K]
+    (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜]
+    (I : Ideal A) (hI : I.IsHomogeneous 𝒜)
+    (ξ : A →ₐ[O] K) (hξ : OnS I ξ)
+    (E : A →ₗ[O] K) (hE : ∀ (j : ℤ) (a : A), a ∈ 𝒜 j → E a = (j : K) * ξ a)
+    : ∀ a ∈ I, E a = 0 := by
   classical
   intro a ha
   set_option synthInstance.maxHeartbeats 100000 in
@@ -50,14 +55,19 @@ private theorem degree_derivation_vanishes_on_homogeneous_ideal {O A K : Type} [
   refine Finset.sum_eq_zero fun i _ => ?_
   rw [hE i _ (SetLike.coe_mem _), hξ _ (hI i ha), mul_zero]
 
-theorem UpperTheory.V.Alg.M.slice_holds :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (K : Type) [Field K] [Algebra O K] [IsAlgClosed K] [FaithfulSMul O K]
-      (A : Type) [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O), IsWRing 𝒜 x →
-    ∀ I : Ideal A, I.IsHomogeneous 𝒜 → M2 𝒜 I → M4 𝒜 K I → ∀ f ∈ 𝒜 (-2), ∀ g ∈ 𝒜 2,
-      {ξ : A →ₐ[O] K | OnS I ξ ∧ ξ f = 1 ∧ ξ g ≠ 0}.Finite ∧
-      ∀ h : A, (∀ ξ : A →ₐ[O] K, OnS I ξ → ξ f = 1 → ξ g ≠ 0 → ξ h = 0) →
-        ∃ (n : ℕ) (c : O), c ≠ 0 ∧ c • (g ^ n * h) ∈ I ⊔ Ideal.span {f - 1} := by
+theorem UpperTheory.V.Alg.M.slice_holds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (K : Type) [Field K] [Algebra O K]
+        [IsAlgClosed K] [FaithfulSMul O K] (A : Type) [CommRing A] [Algebra O A]
+        (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O),
+      IsWRing 𝒜 x
+        → ∀ I : Ideal A,
+          I.IsHomogeneous 𝒜 → M2 𝒜 I → M4 𝒜 K I
+            → ∀ f ∈ 𝒜 (-2), ∀ g ∈ 𝒜 2,
+              {ξ : A →ₐ[O] K | OnS I ξ ∧ ξ f = 1 ∧ ξ g ≠ 0}.Finite
+                ∧ ∀ h : A,
+                  (∀ ξ : A →ₐ[O] K, OnS I ξ → ξ f = 1 → ξ g ≠ 0 → ξ h = 0)
+                    → ∃ (n : ℕ) (c : O), c ≠ 0 ∧ c • (g ^ n * h) ∈ I ⊔ Ideal.span {f - 1} := by
   intro O _ _ _ _ _ K _ _ _ _ A _ _ 𝒜 _ _ x hx I hI h2 h4 f hf g hg
   classical
   haveI : CharZero K := charZero_of_injective_algebraMap (FaithfulSMul.algebraMap_injective O K)
@@ -140,7 +150,8 @@ theorem UpperTheory.V.Alg.M.slice_holds :
     have hc' : c' = 0 := by
       have h0 := LinearMap.congr_fun hlin f
       rw [LinearMap.add_apply, LinearMap.smul_apply, LinearMap.smul_apply, hD'f, hEf,
-        LinearMap.zero_apply, smul_zero, zero_add, smul_eq_mul] at h0
+          LinearMap.zero_apply, smul_zero, zero_add, smul_eq_mul]
+        at h0
       have h6 : (-2 : K) ≠ 0 := by norm_num
       exact (mul_eq_zero.mp h0).resolve_right h6
     have hc : c ≠ 0 := hcc.resolve_right (fun h => h hc')
@@ -148,7 +159,8 @@ theorem UpperTheory.V.Alg.M.slice_holds :
       intro a
       have h0 := LinearMap.congr_fun hlin a
       rw [LinearMap.add_apply, LinearMap.smul_apply, LinearMap.smul_apply, hc', zero_smul, add_zero,
-        LinearMap.zero_apply, smul_eq_mul] at h0
+          LinearMap.zero_apply, smul_eq_mul]
+        at h0
       exact (mul_eq_zero.mp h0).resolve_left hc
     ext z
     obtain ⟨⟨b, t, ht⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers s) z
@@ -172,8 +184,9 @@ theorem UpperTheory.V.Alg.M.slice_holds :
     exact ((mul_eq_zero.mp h0.symm).resolve_left hne)
   obtain ⟨hfin, hred⟩ := et_holds O K C hunits hder
   refine ⟨?_, ?_⟩
-  · have hsub : {ξ : A →ₐ[O] K | OnS I ξ ∧ ξ f = 1 ∧ ξ g ≠ 0} ⊆
-        Set.range (fun ψ : C →ₐ[O] K => ψ.comp φ) := by
+  · have hsub
+        : {ξ : A →ₐ[O] K | OnS I ξ ∧ ξ f = 1 ∧ ξ g ≠ 0}
+          ⊆ Set.range (fun ψ : C →ₐ[O] K => ψ.comp φ) := by
       rintro ξ ⟨hOn, hξf, hξg⟩
       have hJξ : ∀ a ∈ J, ξ a = 0 := by
         have hle : J ≤ RingHom.ker ξ := by
@@ -199,9 +212,10 @@ theorem UpperTheory.V.Alg.M.slice_holds :
       rfl
     exact (Set.finite_range _).subset hsub
   · intro h hh
-    have hz : φ h = 0 := hred (φ h) (fun ψ => by
-      obtain ⟨h1, h3, h5⟩ := hslice ψ
-      exact hh _ h1 h3 h5)
+    have hz : φ h = 0 :=
+      hred (φ h) (fun ψ => by
+        obtain ⟨h1, h3, h5⟩ := hslice ψ
+        exact hh _ h1 h3 h5)
     rw [hφ] at hz
     obtain ⟨⟨_, n, rfl⟩, hm⟩ := (IsLocalization.map_eq_zero_iff (Submonoid.powers s) C _).mp hz
     refine ⟨n, π ^ n, pow_ne_zero _ hπ0, ?_⟩

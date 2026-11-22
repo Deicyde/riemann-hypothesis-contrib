@@ -22,15 +22,18 @@ def yv (μS ν : Measure G) (σ : G → (HH →L[ℂ] HH)) (w : HH) (W : G → V
 def Yop (μS ν : Measure G) (σ : G → (HH →L[ℂ] HH)) (w : HH) (W : G → V) (Ω : Set G) : V →L[ℂ] HH :=
   ∑ i, (innerSL ℂ (stdOrthonormalBasis ℂ V i)).smulRight (yv μS ν σ w W Ω (stdOrthonormalBasis ℂ V i))
 
-theorem Yop_apply (μS ν : Measure G) (σ : G → (HH →L[ℂ] HH)) (w : HH) (W : G → V) (Ω : Set G) (e : V) :
-    Yop μS ν σ w W Ω e =
-      ∑ i, ⟪stdOrthonormalBasis ℂ V i, e⟫_ℂ • yv μS ν σ w W Ω (stdOrthonormalBasis ℂ V i) := by
-  simp only [Yop, ContinuousLinearMap.sum_apply,
-    ContinuousLinearMap.smulRight_apply, innerSL_apply_apply]
+theorem Yop_apply
+    (μS ν : Measure G) (σ : G → (HH →L[ℂ] HH)) (w : HH) (W : G → V) (Ω : Set G) (e : V)
+    : Yop μS ν σ w W Ω e
+      = ∑ i, ⟪stdOrthonormalBasis ℂ V i, e⟫_ℂ • yv μS ν σ w W Ω (stdOrthonormalBasis ℂ V i) := by
+  simp only [Yop, ContinuousLinearMap.sum_apply, ContinuousLinearMap.smulRight_apply,
+    innerSL_apply_apply]
 
-theorem Yop_apply_basis (μS ν : Measure G) (σ : G → (HH →L[ℂ] HH)) (w : HH) (W : G → V) (Ω : Set G)
-    (j : Fin (Module.finrank ℂ V)) :
-    Yop μS ν σ w W Ω (stdOrthonormalBasis ℂ V j) = yv μS ν σ w W Ω (stdOrthonormalBasis ℂ V j) := by
+theorem Yop_apply_basis
+    (μS ν : Measure G) (σ : G → (HH →L[ℂ] HH)) (w : HH) (W : G → V) (Ω : Set G)
+    (j : Fin (Module.finrank ℂ V))
+    : Yop μS ν σ w W Ω (stdOrthonormalBasis ℂ V j)
+      = yv μS ν σ w W Ω (stdOrthonormalBasis ℂ V j) := by
   rw [Yop_apply, Finset.sum_eq_single j]
   · rw [orthonormal_iff_ite.mp (stdOrthonormalBasis ℂ V).orthonormal]; simp
   · intro i _ hij

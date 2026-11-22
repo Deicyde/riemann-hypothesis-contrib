@@ -10,12 +10,14 @@ namespace LevelStatements.Lv
 
 open PowerSeries IsLocalRing
 
-private theorem constantCoeff_aeval_eq_aeval_constantCoeff {S : Type} [CommRing S] (Q : Polynomial S) (y : PowerSeries S) :
-    constantCoeff (Polynomial.aeval y Q) = Polynomial.aeval (constantCoeff y) Q := by
+private theorem constantCoeff_aeval_eq_aeval_constantCoeff
+    {S : Type} [CommRing S] (Q : Polynomial S) (y : PowerSeries S)
+    : constantCoeff (Polynomial.aeval y Q) = Polynomial.aeval (constantCoeff y) Q := by
   induction Q using Polynomial.induction_on' with
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | monomial n a =>
-    simp only [Polynomial.aeval_monomial, map_mul, map_pow, Algebra.algebraMap_self, RingHom.id_apply]
+    simp only [Polynomial.aeval_monomial, map_mul, map_pow, Algebra.algebraMap_self,
+      RingHom.id_apply]
     congr 1
 
 theorem cycloSimple : CycloSimpleStatement := by
@@ -40,16 +42,17 @@ theorem cycloSimple : CycloSimpleStatement := by
     exact ⟨⟨_, _, (mul_comm _ _).trans h, h⟩, rfl⟩
   set y : PowerSeries S := C ζ * E with hy
   have hy0 : constantCoeff y = ζ := by simp [hy, hE0]
-  have hyd : derivative y = y := by
-    simp [hy, Derivation.leibniz, derivative_C, hE, smul_eq_mul]
+  have hyd : derivative y = y := by simp [hy, Derivation.leibniz, derivative_C, hE, smul_eq_mul]
   have hF : Polynomial.aeval y Φ = Polynomial.aeval y (Φ.map (algebraMap LL S)) :=
     (Polynomial.aeval_map_algebraMap S y Φ).symm
   have h0 : constantCoeff (Polynomial.aeval y Φ) = 0 := by
     rw [hF, constantCoeff_aeval_eq_aeval_constantCoeff, hy0, Polynomial.aeval_map_algebraMap, hζ]
-  have h1 : constantCoeff (derivative (Polynomial.aeval y Φ)) =
-      Polynomial.aeval ζ (Polynomial.derivative Φ) * ζ := by
-    rw [hF, Derivation.map_aeval, hyd, smul_eq_mul, map_mul, constantCoeff_aeval_eq_aeval_constantCoeff, hy0,
-      Polynomial.derivative_map, Polynomial.aeval_map_algebraMap]
+  have h1
+      : constantCoeff (derivative (Polynomial.aeval y Φ))
+        = Polynomial.aeval ζ (Polynomial.derivative Φ) * ζ := by
+    rw [hF, Derivation.map_aeval, hyd, smul_eq_mul, map_mul,
+      constantCoeff_aeval_eq_aeval_constantCoeff, hy0, Polynomial.derivative_map,
+      Polynomial.aeval_map_algebraMap]
   obtain ⟨G, hG⟩ := PowerSeries.X_dvd_iff.2 h0
   have hGc : constantCoeff (derivative (Polynomial.aeval y Φ)) = constantCoeff G := by
     rw [hG]

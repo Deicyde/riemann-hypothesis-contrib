@@ -14,7 +14,7 @@ open GlobalTheory.QFam GlobalTheory.WpFam
 namespace GlobalTheory.WpFam.DerivExpansion
 
 theorem tsum_inv_cube : ∑' m : ℤ, 1 / (m : ℂ) ^ 3 = 0 := by
-  have h : ∑' m : ℤ, 1 / (m : ℂ) ^ 3 = -∑' m : ℤ, 1 / (m : ℂ) ^ 3 := by
+  have h : ∑' m : ℤ, 1 / (m : ℂ) ^ 3 = - ∑' m : ℤ, 1 / (m : ℂ) ^ 3 := by
     conv_lhs => rw [← (Equiv.neg ℤ).tsum_eq]
     rw [← tsum_neg]
     congr 1
@@ -24,9 +24,10 @@ theorem tsum_inv_cube : ∑' m : ℤ, 1 / (m : ℂ) ^ 3 = 0 := by
     rw [show (-(b : ℂ)) ^ 3 = -((b : ℂ) ^ 3) by ring, div_neg]
   linear_combination h / 2
 
-theorem row_eq (N : ℕ) [NeZero N] (j : ZMod N) :
-    ∑' m : ℤ, 1 / (((j.val : ℂ)) / N + m) ^ 3 =
-      -(1 / 2) * (2 * (Real.pi : ℂ) * Complex.I) ^ 3 * (ch N j * (1 + ch N j) / (1 - ch N j) ^ 3) := by
+theorem row_eq (N : ℕ) [NeZero N] (j : ZMod N)
+    : ∑' m : ℤ, 1 / (((j.val : ℂ)) / N + m) ^ 3
+      = -(1 / 2) * (2 * (Real.pi : ℂ) * Complex.I) ^ 3
+        * (ch N j * (1 + ch N j) / (1 - ch N j) ^ 3) := by
   rcases eq_or_ne j 0 with rfl | hj
   · have hc : ch N 0 = 1 := by simp [ch]
     simp only [ZMod.val_zero, Nat.cast_zero, zero_div, zero_add, hc, sub_self]
@@ -58,16 +59,18 @@ theorem main : ∀ (N : ℕ) [NeZero N] (x : Fin 2 → ZMod N), HasQ N (wpd N x)
   intro N _ x
   unfold HasQ
   intro τ
-  have hπ : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by
-    simp [Real.pi_ne_zero, Complex.I_ne_zero]
-  obtain ⟨T, hT, hS⟩ := GlobalTheory.T.torsionPoint_rows_sum_eq_divisor_series N 2 τ x _ (by norm_num) (GlobalTheory.T.hasSum_rows_inv_cube_derivWeierstrassP τ (tors N τ x))
+  have hπ : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by simp [Real.pi_ne_zero, Complex.I_ne_zero]
+  obtain ⟨T, hT, hS⟩ :=
+    GlobalTheory.T.torsionPoint_rows_sum_eq_divisor_series N 2 τ x _ (by norm_num)
+      (GlobalTheory.T.hasSum_rows_inv_cube_derivWeierstrassP τ (tors N τ x))
   set q := Complex.exp ((2 * (Real.pi : ℂ) * Complex.I) * τ / N) with hq
   set c0 : ℂ := if x 0 = 0 then ch N (x 1) * (1 + ch N (x 1)) / (1 - ch N (x 1)) ^ 3 else 0 with hc0
   have h0 : cSum N 2 (-1) x 0 = 0 := by simp [cSum]
   have hT' : HasSum (fun k : ℕ => cSum N 2 (-1) x k * q ^ k) T := by
     have e1 : ((-1 : ℂ)) ^ (2 + 1) = -1 := by norm_num
     simpa only [e1] using hT
-  have hsum : HasSum (fun n : ℕ => cD N x n * Complex.exp (2 * Real.pi * Complex.I * n * τ / N))
+  have hsum : HasSum
+      (fun n : ℕ => cD N x n * Complex.exp (2 * Real.pi * Complex.I * n * τ / N))
       (c0 + T) := by
     have hA : HasSum (fun n : ℕ => if n = 0 then c0 else 0) c0 := hasSum_ite_eq 0 c0
     convert hA.add hT' using 1
@@ -81,8 +84,9 @@ theorem main : ∀ (N : ℕ) [NeZero N] (x : Fin 2 → ZMod N), HasQ N (wpd N x)
     · simp [cD, h0, hc0]
     · simp [cD, hn]
   convert hsum using 1
-  have hrow : (if x 0 = 0 then ∑' m : ℤ, 1 / ((((x 1).val : ℂ)) / N + m) ^ (2 + 1) else 0) =
-      -(1 / 2) * (2 * (Real.pi : ℂ) * Complex.I) ^ 3 * c0 := by
+  have hrow
+      : (if x 0 = 0 then ∑' m : ℤ, 1 / ((((x 1).val : ℂ)) / N + m) ^ (2 + 1) else 0)
+        = -(1 / 2) * (2 * (Real.pi : ℂ) * Complex.I) ^ 3 * c0 := by
     rw [hc0]
     split_ifs
     · exact row_eq N (x 1)

@@ -20,9 +20,12 @@ noncomputable section
 
 namespace FlagBundleSectionDivProof
 
-theorem eq_of_lt_of_le_of_mem_minimalPrimes {A : Type*} [CommRing A] [IsNoetherianRing A]
-    {P Q W : Ideal A} [P.IsPrime] [Q.IsPrime] {x : A}
-    (hW : W ∈ (P ⊔ Ideal.span {x}).minimalPrimes) (hPQ : P < Q) (hQW : Q ≤ W) : Q = W := by
+theorem eq_of_lt_of_le_of_mem_minimalPrimes
+    {A : Type*} [CommRing A] [IsNoetherianRing A]
+    {P Q W : Ideal A} [P.IsPrime] [Q.IsPrime]
+    {x : A} (hW : W ∈ (P ⊔ Ideal.span {x}).minimalPrimes)
+    (hPQ : P < Q) (hQW : Q ≤ W)
+    : Q = W := by
   by_contra hne
   have hQW' : Q < W := lt_of_le_of_ne hQW hne
   have : W.IsPrime := hW.1.1
@@ -37,7 +40,8 @@ theorem eq_of_lt_of_le_of_mem_minimalPrimes {A : Type*} [CommRing A] [IsNoetheri
     refine (Ideal.map_mono hQW).lt_of_not_ge fun e => hQW'.not_ge ?_
     have := Ideal.comap_mono (f := f) e
     rwa [Ideal.comap_map_of_surjective f hf, Ideal.comap_map_of_surjective f hf,
-      ← RingHom.ker_eq_comap_bot, hker, sup_eq_left.mpr hPW, sup_eq_left.mpr hPQ.le] at this
+        ← RingHom.ker_eq_comap_bot, hker, sup_eq_left.mpr hPW, sup_eq_left.mpr hPQ.le]
+      at this
   have : (W.map f).FiniteHeight := ⟨Or.inr (h1.trans_lt (WithTop.coe_lt_top 1)).ne⟩
   have h2 := (Ideal.height_strict_mono_of_isPrime_of_isPrime hlt).trans_le h1
   rw [Order.lt_one_iff, Ideal.height_eq_zero_iff_eq_bot] at h2
@@ -46,26 +50,33 @@ theorem eq_of_lt_of_le_of_mem_minimalPrimes {A : Type*} [CommRing A] [IsNoetheri
   rw [h2, Ideal.mem_bot, Ideal.Quotient.eq_zero_iff_mem] at h3
   exact h3
 
-theorem divCycle_eq_zero_of_not_mem {K : Type*} {ι : K → Type*} {R : Type*} [CommRing R]
-    {P W : Ideal (MRing ι R)} {x : MRing ι R} (hx : x ∉ W) : divCycle P x W = 0 := by
+theorem divCycle_eq_zero_of_not_mem
+    {K : Type*} {ι : K → Type*} {R : Type*} [CommRing R]
+    {P W : Ideal (MRing ι R)} {x : MRing ι R} (hx : x ∉ W)
+    : divCycle P x W = 0 := by
   unfold divCycle
   rw [dite_eq_right]
   rintro ⟨h, -⟩
   exact hx (h.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self x)))
 
-theorem divCycle_congr {K : Type*} {ι : K → Type*} {R : Type*} [CommRing R]
-    {P : Ideal (MRing ι R)} {x x' : MRing ι R} (h : x - x' ∈ P) : divCycle P x = divCycle P x' := by
+theorem divCycle_congr
+    {K : Type*} {ι : K → Type*} {R : Type*} [CommRing R]
+    {P : Ideal (MRing ι R)} {x x' : MRing ι R} (h : x - x' ∈ P)
+    : divCycle P x = divCycle P x' := by
   have hJ : P ⊔ Ideal.span {x} = P ⊔ Ideal.span {x'} := by
     apply le_antisymm
     · refine sup_le le_sup_left ?_
       rw [Ideal.span_le, Set.singleton_subset_iff, SetLike.mem_coe]
-      have := Ideal.add_mem _ (Ideal.mem_sup_left h : x - x' ∈ P ⊔ Ideal.span {x'})
-        (Ideal.mem_sup_right (Ideal.mem_span_singleton_self x') : x' ∈ P ⊔ Ideal.span {x'})
+      have :=
+        Ideal.add_mem _ (Ideal.mem_sup_left h : x - x' ∈ P ⊔ Ideal.span {x'})
+          (Ideal.mem_sup_right (Ideal.mem_span_singleton_self x') : x' ∈ P ⊔ Ideal.span {x'})
       rwa [sub_add_cancel] at this
     · refine sup_le le_sup_left ?_
       rw [Ideal.span_le, Set.singleton_subset_iff, SetLike.mem_coe]
-      have := Ideal.sub_mem _ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self x) : x ∈ P ⊔ Ideal.span {x})
-        (Ideal.mem_sup_left h : x - x' ∈ P ⊔ Ideal.span {x})
+      have :=
+        Ideal.sub_mem _
+          (Ideal.mem_sup_right (Ideal.mem_span_singleton_self x) : x ∈ P ⊔ Ideal.span {x})
+          (Ideal.mem_sup_left h : x - x' ∈ P ⊔ Ideal.span {x})
       rwa [sub_sub_cancel] at this
   funext W
   unfold divCycle
@@ -77,12 +88,12 @@ theorem divCycle_congr {K : Type*} {ι : K → Type*} {R : Type*} [CommRing R]
 
 end FlagBundleSectionDivProof
 
-
 open FlagBundleSectionDivProof in
-theorem FlagBundleSectionDiv.proof (hDim : FlagBundleDim.Statement)
-    (hSat : MultAtOfSaturated.Statement.{0}) (hForm : ProjIdealFormValue.Statement)
-    (hTrunc : TruncSpecialize.Statement) (hChart : FlagBundleChartSection.Statement) :
-    FlagBundleSectionDiv.Statement := by
+theorem FlagBundleSectionDiv.proof
+    (hDim : FlagBundleDim.Statement) (hSat : MultAtOfSaturated.Statement.{0})
+    (hForm : ProjIdealFormValue.Statement) (hTrunc : TruncSpecialize.Statement)
+    (hChart : FlagBundleChartSection.Statement)
+    : FlagBundleSectionDiv.Statement := by
   intro F _ Ω _ _ K _ _ ι _ y e hV hdim N E _ _ B w b hB M a φ hφ Φ _ _ t ht i hi bf bg f g hf hg
     hdeg hgP hval W
   classical
@@ -134,16 +145,18 @@ theorem FlagBundleSectionDiv.proof (hDim : FlagBundleDim.Statement)
       have h2 := hl.mul hg
       rw [← hdeg'] at h2
       have h1 : IsMultiHomog (f * μ - l * g) (bf + dm) :=
-        (mem_weightedHomogeneousSubmodule _ _ _ _).mp (Submodule.sub_mem _
-          ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr (hf.mul hμh))
-          ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr h2))
+        (mem_weightedHomogeneousSubmodule _ _ _ _).mp
+          (Submodule.sub_mem _ ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr (hf.mul hμh))
+            ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr h2))
       rw [hval0 _ _ h1, eval₂_sub, eval₂_mul, eval₂_mul, hval, hlv]
       ring
-    have hrat : ratDiv (projIdeal F y w φ (truncCoord t ((i : ℕ) + 1))) f g W =
-        divCycle (projIdeal F y w φ (truncCoord t ((i : ℕ) + 1))) l W := by
+    have hrat
+        : ratDiv (projIdeal F y w φ (truncCoord t ((i : ℕ) + 1))) f g W
+          = divCycle (projIdeal F y w φ (truncCoord t ((i : ℕ) + 1))) l W := by
       have h1 := congrFun (divCycle_congr hdiff) W
       rw [DivCycleMul.proof.{0} F (Option K) (bundleIdx ι M) _ f μ hP.isPrime hfP hμP,
-        DivCycleMul.proof.{0} F (Option K) (bundleIdx ι M) _ l g hP.isPrime hlP hgP] at h1
+          DivCycleMul.proof.{0} F (Option K) (bundleIdx ι M) _ l g hP.isPrime hlP hgP]
+        at h1
       simp only [Pi.add_apply, divCycle_eq_zero_of_not_mem hμW] at h1
       unfold ratDiv
       omega
@@ -152,16 +165,19 @@ theorem FlagBundleSectionDiv.proof (hDim : FlagBundleDim.Statement)
       (hForm F Ω K ι y N E w M φ Φ (truncCoord t i) dl l hl).mpr (hspec l μ hlv)
     split_ifs with hWQ
     · subst hWQ
-      obtain ⟨hmin, hmult⟩ := hSat F (Option K) (bundleIdx ι M) _ _
-        (sup_le hPQ ((Ideal.span_singleton_le_iff_mem _).mpr hlQ))
-        (fun q hq => by
-          obtain ⟨n, hn⟩ := hsat q hq
-          exact ⟨_, hsW n, hn⟩)
+      obtain ⟨hmin, hmult⟩ :=
+        hSat F (Option K) (bundleIdx ι M) _ _
+          (sup_le hPQ ((Ideal.span_singleton_le_iff_mem _).mpr hlQ))
+          (fun q hq => by
+            obtain ⟨n, hn⟩ := hsat q hq
+            exact ⟨_, hsW n, hn⟩)
       unfold divCycle
       rw [dite_eq_left ⟨hmin, hQ.relevant⟩, hmult]
       rfl
     · by_contra hne
-      have hmin : W ∈ (projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) ⊔ Ideal.span {l}).minimalPrimes := by
+      have hmin
+          : W
+            ∈ (projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) ⊔ Ideal.span {l}).minimalPrimes := by
         unfold divCycle at hne
         split_ifs at hne with h
         · exact h.1
@@ -169,7 +185,8 @@ theorem FlagBundleSectionDiv.proof (hDim : FlagBundleDim.Statement)
       have hQW : projIdeal F y w φ (truncCoord t i) ≤ W := fun q hq => by
         obtain ⟨n, hn⟩ := hsat q hq
         exact (hWp.mem_or_mem (hmin.1.2 hn)).resolve_left (hsW n)
-      have hPQ' : projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) < projIdeal F y w φ (truncCoord t i) :=
+      have hPQ'
+          : projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) < projIdeal F y w φ (truncCoord t i) :=
         lt_of_le_of_ne hPQ (fun h => hlP (by rw [h]; exact hlQ))
       exact hWQ (eq_of_lt_of_le_of_mem_minimalPrimes hmin hPQ' hQW).symm
   · have h0 : ∀ x, divCycle (projIdeal F y w φ (truncCoord t ((i : ℕ) + 1))) x W = 0 := fun x => by

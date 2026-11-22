@@ -6,14 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CoordConj
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 open GlobalTheory.Sl2Ad
 
 namespace GlobalTheory.Sl2Ad
 
-theorem form_ne_zero_of_isIrr : ∀ {K : Type} [Field K] [CharZero K] {Γ : Type} [Group Γ] (ρ : Γ →* GL (Fin 2) K), IsIrr ρ →
-    ∀ y : Fin 3 → K, y ≠ 0 → (∀ g, ∃ c : K, ad (ρ g) *ᵥ y = c • y) → form y y ≠ 0 := by
+theorem form_ne_zero_of_isIrr
+    : ∀ {K : Type} [Field K] [CharZero K] {Γ : Type} [Group Γ] (ρ : Γ →* GL (Fin 2) K),
+      IsIrr ρ → ∀ y : Fin 3 → K, y ≠ 0 → (∀ g, ∃ c : K, ad (ρ g) *ᵥ y = c • y) → form y y ≠ 0 := by
   intro K _ _ Γ _ ρ hirr y hy hstab hform
   have hq : y 0 * y 1 + y 2 * y 2 = 0 := by
     rw [form_apply] at hform
@@ -21,20 +24,28 @@ theorem form_ne_zero_of_isIrr : ∀ {K : Type} [Field K] [CharZero K] {Γ : Type
     rcases mul_eq_zero.mp h2 with h | h
     · exact absurd h two_ne_zero
     · exact h
-  have hconj : ∀ g, ∃ c : K, ofCoord y * (ρ g : Matrix (Fin 2) (Fin 2) K) = (ρ g : Matrix (Fin 2) (Fin 2) K) * (c • ofCoord y) := by
+  have hconj
+      : ∀ g, ∃ c : K,
+        ofCoord y * (ρ g : Matrix (Fin 2) (Fin 2) K)
+          = (ρ g : Matrix (Fin 2) (Fin 2) K) * (c • ofCoord y) := by
     intro g
     obtain ⟨c, hc⟩ := hstab g⁻¹
     refine ⟨c, ?_⟩
     have h1 := coord_conj_ofCoord (ρ g⁻¹) y
     rw [hc] at h1
-    have htr : ((ρ g⁻¹ : Matrix (Fin 2) (Fin 2) K) * ofCoord y * (((ρ g⁻¹)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)).trace = 0 := by
+    have htr
+        : ((ρ g⁻¹ : Matrix (Fin 2) (Fin 2) K) * ofCoord y
+            * (((ρ g⁻¹)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)).trace
+          = 0 := by
       rw [trace_conj, trace_ofCoord]
     have h2 := ofCoord_coord htr
     rw [h1] at h2
     have h3 : ofCoord (c • y) = c • ofCoord y := by
       ext i j; fin_cases i <;> fin_cases j <;> simp [ofCoord]
     rw [h3, map_inv, inv_inv] at h2
-    have hu : (ρ g : Matrix (Fin 2) (Fin 2) K) * (((ρ g)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = 1 := by
+    have hu
+        : (ρ g : Matrix (Fin 2) (Fin 2) K) * (((ρ g)⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
+          = 1 := by
       rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
     rw [h2, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hu, Matrix.one_mul]
   let Wk : Submodule K (Fin 2 → K) := LinearMap.ker (Matrix.mulVecLin (ofCoord y))
@@ -50,15 +61,22 @@ theorem form_ne_zero_of_isIrr : ∀ {K : Type} [Field K] [CharZero K] {Γ : Type
   have hy0 : ∀ a b c : K, a = 0 → b = 0 → c = 0 → y 0 = a → y 1 = b → y 2 = c → False := by
     intro a b c ha hb hc h0 h1 h2
     apply hy
-    ext i; fin_cases i
+    ext i
+    fin_cases i
     · simpa [ha] using h0
     · simpa [hb] using h1
     · simpa [hc] using h2
   rcases hirr.2.2 Wk le_top hinv with h | h
   · have hv1 : (![y 0, -y 2] : Fin 2 → K) ∈ Wk := by
-      rw [hmem]; ext i; fin_cases i <;> simp [ofCoord, Matrix.mulVec, dotProduct, Fin.sum_univ_two] <;> first | linear_combination | linear_combination hq | linear_combination -hq
+      rw [hmem]
+      ext i
+      fin_cases i <;> simp [ofCoord, Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+        <;> first | linear_combination | linear_combination hq | linear_combination -hq
     have hv2 : (![y 2, y 1] : Fin 2 → K) ∈ Wk := by
-      rw [hmem]; ext i; fin_cases i <;> simp [ofCoord, Matrix.mulVec, dotProduct, Fin.sum_univ_two] <;> first | linear_combination | linear_combination hq | linear_combination -hq
+      rw [hmem]
+      ext i
+      fin_cases i <;> simp [ofCoord, Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+        <;> first | linear_combination | linear_combination hq | linear_combination -hq
     rw [h, Submodule.mem_bot] at hv1 hv2
     have a0 := congrFun hv1 0
     have a1 := congrFun hv1 1

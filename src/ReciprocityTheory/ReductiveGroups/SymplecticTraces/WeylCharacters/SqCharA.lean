@@ -11,8 +11,8 @@ noncomputable section
 namespace ReciprocityTheory.ChartRestriction.TR.Weyl
 
 def sq_Intl {k : ℕ} (f : Fin k → Fin k → ℕ) : Prop :=
-  ∀ l j : Fin k, j.val = l.val + 1 → ∀ a : Fin k,
-    (∑ b : Fin k with b ≤ a, f b j) ≤ ∑ b : Fin k with b < a, f b l
+  ∀ l j : Fin k,
+    j.val = l.val + 1 → ∀ a : Fin k, (∑ b : Fin k with b ≤ a, f b j) ≤ ∑ b : Fin k with b < a, f b l
 
 def sq_SSZ (k : ℕ) (κ : Fin k → ℤ) : Type :=
   {g : Fin k → Fin k → ℕ // sq_Intl g ∧ ∀ s, ((∑ a, g a s : ℕ) : ℤ) = κ s}
@@ -22,29 +22,29 @@ def sq_rowSum {k : ℕ} (g : Fin k → Fin k → ℕ) (a : Fin k) : ℕ := ∑ s
 def sq_mono {K : Type*} [Field K] {k : ℕ} (t : Fin k → K) (g : Fin k → Fin k → ℕ) : K :=
   ∏ a, t a ^ sq_rowSum g a
 
-theorem sq_sum_le_castSucc {k : ℕ} (F : Fin (k + 1) → ℕ) (a : Fin k) :
-    (∑ b : Fin (k + 1) with b ≤ a.castSucc, F b) = ∑ b : Fin k with b ≤ a, F b.castSucc := by
+theorem sq_sum_le_castSucc {k : ℕ} (F : Fin (k + 1) → ℕ) (a : Fin k)
+    : (∑ b : Fin (k + 1) with b ≤ a.castSucc, F b) = ∑ b : Fin k with b ≤ a, F b.castSucc := by
   rw [Finset.sum_filter, Finset.sum_filter, Fin.sum_univ_castSucc]
   simp
 
-theorem sq_sum_lt_castSucc {k : ℕ} (F : Fin (k + 1) → ℕ) (a : Fin k) :
-    (∑ b : Fin (k + 1) with b < a.castSucc, F b) = ∑ b : Fin k with b < a, F b.castSucc := by
+theorem sq_sum_lt_castSucc {k : ℕ} (F : Fin (k + 1) → ℕ) (a : Fin k)
+    : (∑ b : Fin (k + 1) with b < a.castSucc, F b) = ∑ b : Fin k with b < a, F b.castSucc := by
   rw [Finset.sum_filter, Finset.sum_filter, Fin.sum_univ_castSucc]
-  have : ¬ (Fin.last k < a.castSucc) := not_lt.2 (Fin.le_last _)
+  have : ¬(Fin.last k < a.castSucc) := not_lt.2 (Fin.le_last _)
   simp [this]
 
-theorem sq_sum_le_last {k : ℕ} (F : Fin (k + 1) → ℕ) :
-    (∑ b : Fin (k + 1) with b ≤ Fin.last k, F b) = ∑ b, F b := by
+theorem sq_sum_le_last {k : ℕ} (F : Fin (k + 1) → ℕ)
+    : (∑ b : Fin (k + 1) with b ≤ Fin.last k, F b) = ∑ b, F b := by
   rw [Finset.sum_filter]
   simp [Fin.le_last]
 
-theorem sq_sum_lt_last {k : ℕ} (F : Fin (k + 1) → ℕ) :
-    (∑ b : Fin (k + 1) with b < Fin.last k, F b) = ∑ b : Fin k, F b.castSucc := by
+theorem sq_sum_lt_last {k : ℕ} (F : Fin (k + 1) → ℕ)
+    : (∑ b : Fin (k + 1) with b < Fin.last k, F b) = ∑ b : Fin k, F b.castSucc := by
   rw [Finset.sum_filter, Fin.sum_univ_castSucc]
   simp [Fin.castSucc_lt_last]
 
-theorem sq_intl_zero {k : ℕ} (f : Fin k → Fin k → ℕ) (hf : sq_Intl f) :
-    ∀ (tv : ℕ) (t : Fin k), t.val = tv → ∀ a : Fin k, a.val < tv → f a t = 0 := by
+theorem sq_intl_zero {k : ℕ} (f : Fin k → Fin k → ℕ) (hf : sq_Intl f)
+    : ∀ (tv : ℕ) (t : Fin k), t.val = tv → ∀ a : Fin k, a.val < tv → f a t = 0 := by
   intro tv
   induction tv with
   | zero => intro t _ a ha; omega
@@ -62,18 +62,18 @@ theorem sq_intl_zero {k : ℕ} (f : Fin k → Fin k → ℕ) (hf : sq_Intl f) :
       Finset.single_le_sum (f := fun b => f b t) (fun _ _ => Nat.zero_le _) (by simp)
     omega
 
-theorem sq_mem_interl {n : ℕ} (μ : Fin (n + 1) → ℤ) (κ : Fin n → ℤ) :
-    κ ∈ interl μ ↔ ∀ i, μ i.succ ≤ κ i ∧ κ i ≤ μ i.castSucc := by
+theorem sq_mem_interl {n : ℕ} (μ : Fin (n + 1) → ℤ) (κ : Fin n → ℤ)
+    : κ ∈ interl μ ↔ ∀ i, μ i.succ ≤ κ i ∧ κ i ≤ μ i.castSucc := by
   simp [interl, Fintype.mem_piFinset, Finset.mem_Icc]
 
-def sq_restr {k : ℕ} (f : Fin (k + 1) → Fin (k + 1) → ℕ) : Fin k → Fin k → ℕ :=
-  fun a t => f a.castSucc t.castSucc
+def sq_restr {k : ℕ} (f : Fin (k + 1) → Fin (k + 1) → ℕ) : Fin k → Fin k → ℕ := fun a t =>
+  f a.castSucc t.castSucc
 
 def sq_UU (k : ℕ) (μ : Fin (k + 1) → ℤ) : Type :=
   {g : Fin k → Fin k → ℕ // sq_Intl g ∧ (fun t => ((∑ a, g a t : ℕ) : ℤ)) ∈ interl μ}
 
-theorem sq_restr_mem {k : ℕ} (μ : Fin (k + 1) → ℤ) (f : sq_SSZ (k + 1) μ) :
-    sq_Intl (sq_restr f.1) ∧ (fun t => ((∑ a, sq_restr f.1 a t : ℕ) : ℤ)) ∈ interl μ := by
+theorem sq_restr_mem {k : ℕ} (μ : Fin (k + 1) → ℤ) (f : sq_SSZ (k + 1) μ)
+    : sq_Intl (sq_restr f.1) ∧ (fun t => ((∑ a, sq_restr f.1 a t : ℕ) : ℤ)) ∈ interl μ := by
   obtain ⟨f, hI, hs⟩ := f
   refine ⟨?_, ?_⟩
   · intro l j hlj a
@@ -102,8 +102,8 @@ theorem sq_rho_inj {k : ℕ} (μ : Fin (k + 1) → ℤ) : Function.Injective (sq
   obtain ⟨f, hI, hs⟩ := f
   obtain ⟨f', hI', hs'⟩ := f'
   simp only at h0
-  have hc : ∀ a t : Fin k, f a.castSucc t.castSucc = f' a.castSucc t.castSucc :=
-    fun a t => congrFun (congrFun h0 a) t
+  have hc : ∀ a t : Fin k, f a.castSucc t.castSucc = f' a.castSucc t.castSucc := fun a t =>
+    congrFun (congrFun h0 a) t
   have hz : ∀ a : Fin k, f a.castSucc (Fin.last k) = f' a.castSucc (Fin.last k) := by
     intro a
     rw [sq_intl_zero f hI k (Fin.last k) rfl a.castSucc (by simp),
@@ -125,32 +125,43 @@ theorem sq_rho_inj {k : ℕ} (μ : Fin (k + 1) → ℤ) : Function.Injective (sq
       Finset.sum_congr rfl fun a _ => hup a t
     rw [h3] at h1
     have h4 := h1.trans h2.symm
-    have h5 : (∑ a : Fin k, f' a.castSucc t) + f (Fin.last k) t =
-        (∑ a : Fin k, f' a.castSucc t) + f' (Fin.last k) t := by
+    have h5
+        : (∑ a : Fin k, f' a.castSucc t) + f (Fin.last k) t
+          = (∑ a : Fin k, f' a.castSucc t) + f' (Fin.last k) t := by
       exact_mod_cast h4
     exact Nat.add_left_cancel h5
 
-def sq_ext {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ) : Fin (k + 1) → Fin (k + 1) → ℕ :=
-  fun a t => Fin.lastCases (motive := fun _ => ℕ)
-    (Fin.lastCases (motive := fun _ => ℕ) (μ (Fin.last k)).toNat
-      (fun t' => (μ t'.castSucc - ((∑ b, g b t' : ℕ) : ℤ)).toNat) t)
-    (fun a' => Fin.lastCases (motive := fun _ => ℕ) 0 (fun t' => g a' t') t) a
+def sq_ext {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ)
+    : Fin (k + 1) → Fin (k + 1) → ℕ := fun a t =>
+  Fin.lastCases
+    (motive := fun _ => ℕ)
+    (Fin.lastCases
+      (motive := fun _ => ℕ)
+      (μ (Fin.last k)).toNat
+      (fun t' => (μ t'.castSucc - ((∑ b, g b t' : ℕ) : ℤ)).toNat)
+      t)
+    (fun a' => Fin.lastCases (motive := fun _ => ℕ) 0 (fun t' => g a' t') t)
+    a
 
-theorem sq_ext_cc {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ) (a t : Fin k) :
-    sq_ext μ g a.castSucc t.castSucc = g a t := by simp [sq_ext]
-
-theorem sq_ext_cl {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ) (a : Fin k) :
-    sq_ext μ g a.castSucc (Fin.last k) = 0 := by simp [sq_ext]
-
-theorem sq_ext_lc {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ) (t : Fin k) :
-    sq_ext μ g (Fin.last k) t.castSucc = (μ t.castSucc - ((∑ b, g b t : ℕ) : ℤ)).toNat := by
+theorem sq_ext_cc {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ) (a t : Fin k)
+    : sq_ext μ g a.castSucc t.castSucc = g a t := by
   simp [sq_ext]
 
-theorem sq_ext_ll {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ) :
-    sq_ext μ g (Fin.last k) (Fin.last k) = (μ (Fin.last k)).toNat := by simp [sq_ext]
+theorem sq_ext_cl {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ) (a : Fin k)
+    : sq_ext μ g a.castSucc (Fin.last k) = 0 := by
+  simp [sq_ext]
 
-theorem sq_ext_sum {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.last k)) (g : sq_UU k μ)
-    (t : Fin (k + 1)) : ((∑ a, sq_ext μ g.1 a t : ℕ) : ℤ) = μ t := by
+theorem sq_ext_lc {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ) (t : Fin k)
+    : sq_ext μ g (Fin.last k) t.castSucc = (μ t.castSucc - ((∑ b, g b t : ℕ) : ℤ)).toNat := by
+  simp [sq_ext]
+
+theorem sq_ext_ll {k : ℕ} (μ : Fin (k + 1) → ℤ) (g : Fin k → Fin k → ℕ)
+    : sq_ext μ g (Fin.last k) (Fin.last k) = (μ (Fin.last k)).toNat := by
+  simp [sq_ext]
+
+theorem sq_ext_sum
+    {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.last k)) (g : sq_UU k μ) (t : Fin (k + 1))
+    : ((∑ a, sq_ext μ g.1 a t : ℕ) : ℤ) = μ t := by
   obtain ⟨g, hI, hb⟩ := g
   rw [sq_mem_interl] at hb
   rw [Fin.sum_univ_castSucc]
@@ -163,8 +174,8 @@ theorem sq_ext_sum {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.las
     have h := (hb t).2
     omega
 
-theorem sq_ext_intl {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.last k)) (g : sq_UU k μ) :
-    sq_Intl (sq_ext μ g.1) := by
+theorem sq_ext_intl {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.last k)) (g : sq_UU k μ)
+    : sq_Intl (sq_ext μ g.1) := by
   have hsum := sq_ext_sum μ hμ g
   obtain ⟨g, hI, hb⟩ := g
   rw [sq_mem_interl] at hb
@@ -191,8 +202,8 @@ theorem sq_ext_intl {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.la
         simp only [sq_ext_cc]
         exact hI l j (by simpa using hlj) a
 
-theorem sq_rho_surj {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.last k)) :
-    Function.Surjective (sq_rho μ) := by
+theorem sq_rho_surj {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.last k))
+    : Function.Surjective (sq_rho μ) := by
   intro g
   refine ⟨⟨sq_ext μ g.1, sq_ext_intl μ hμ g, sq_ext_sum μ hμ g⟩, ?_⟩
   apply Subtype.ext
@@ -202,13 +213,24 @@ theorem sq_rho_surj {k : ℕ} (μ : Fin (k + 1) → ℤ) (hμ : 0 ≤ μ (Fin.la
 theorem sq_SSZ_finite (k : ℕ) (κ : Fin k → ℤ) : Finite (sq_SSZ k κ) := by
   classical
   let B : ℕ := ∑ t, (κ t).toNat
-  have hinj : Function.Injective (fun g : sq_SSZ k κ => fun a t => (⟨g.1 a t, by
-      have h1 : g.1 a t ≤ ∑ a, g.1 a t :=
-        Finset.single_le_sum (f := fun a => g.1 a t) (fun _ _ => Nat.zero_le _) (Finset.mem_univ a)
-      have h2 := g.2.2 t
-      have h3 : (κ t).toNat ≤ B :=
-        Finset.single_le_sum (f := fun t => (κ t).toNat) (fun _ _ => Nat.zero_le _) (Finset.mem_univ t)
-      omega⟩ : Fin (B + 1))) := by
+  have hinj : Function.Injective (fun g : sq_SSZ k κ => fun a t =>
+      (⟨
+         g.1 a t,
+         by
+           have h1 : g.1 a t ≤ ∑ a, g.1 a t :=
+             Finset.single_le_sum
+               (f := fun a => g.1 a t)
+               (fun _ _ => Nat.zero_le _)
+               (Finset.mem_univ a)
+           have h2 := g.2.2 t
+           have h3 : (κ t).toNat ≤ B :=
+             Finset.single_le_sum
+               (f := fun t => (κ t).toNat)
+               (fun _ _ => Nat.zero_le _)
+               (Finset.mem_univ t)
+           omega
+       ⟩
+        : Fin (B + 1))) := by
     intro g g' h
     apply Subtype.ext
     funext a t
@@ -217,9 +239,14 @@ theorem sq_SSZ_finite (k : ℕ) (κ : Fin k → ℤ) : Finite (sq_SSZ k κ) := b
 
 def sq_fibEquiv {k : ℕ} (μ : Fin (k + 1) → ℤ) : sq_UU k μ ≃ Σ κ : ↥(interl μ), sq_SSZ k κ.1 where
   toFun g := ⟨⟨_, g.2.2⟩, ⟨g.1, g.2.1, fun _ => rfl⟩⟩
-  invFun x := ⟨x.2.1, x.2.2.1, by
-    have : (fun t => ((∑ a, x.2.1 a t : ℕ) : ℤ)) = x.1.1 := funext x.2.2.2
-    rw [this]; exact x.1.2⟩
+  invFun x := ⟨
+    x.2.1,
+    x.2.2.1,
+    by
+      have : (fun t => ((∑ a, x.2.1 a t : ℕ) : ℤ)) = x.1.1 := funext x.2.2.2
+      rw [this]
+      exact x.1.2
+  ⟩
   left_inv g := rfl
   right_inv x := by
     obtain ⟨⟨κ, hκ⟩, ⟨g, hI, hs⟩⟩ := x
@@ -227,24 +254,27 @@ def sq_fibEquiv {k : ℕ} (μ : Fin (k + 1) → ℤ) : sq_UU k μ ≃ Σ κ : �
     subst this
     rfl
 
-theorem sq_mono_split {K : Type*} [Field K] {k : ℕ} (μ : Fin (k + 1) → ℤ) (t : Fin (k + 1) → K)
-    (g : sq_SSZ (k + 1) μ) :
-    sq_mono t g.1 = sq_mono (fun i => t i.castSucc) (sq_restr g.1) *
-      t (Fin.last k) ^ (wsum μ - wsum (fun s => ((∑ a, sq_restr g.1 a s : ℕ) : ℤ))) := by
+theorem sq_mono_split
+    {K : Type*} [Field K] {k : ℕ} (μ : Fin (k + 1) → ℤ) (t : Fin (k + 1) → K) (g : sq_SSZ (k + 1) μ)
+    : sq_mono t g.1
+      = sq_mono (fun i => t i.castSucc) (sq_restr g.1)
+        * t (Fin.last k) ^ (wsum μ - wsum (fun s => ((∑ a, sq_restr g.1 a s : ℕ) : ℤ))) := by
   obtain ⟨g, hI, hs⟩ := g
   have hrow : ∀ a : Fin k, sq_rowSum g a.castSucc = sq_rowSum (sq_restr g) a := by
     intro a
-    rw [sq_rowSum, Fin.sum_univ_castSucc,
-      sq_intl_zero g hI k (Fin.last k) rfl a.castSucc (by simp), add_zero]
+    rw [sq_rowSum, Fin.sum_univ_castSucc, sq_intl_zero g hI k (Fin.last k) rfl a.castSucc (by simp),
+      add_zero]
     rfl
-  have hlast : ((sq_rowSum g (Fin.last k) : ℕ) : ℤ) =
-      wsum μ - wsum (fun s => ((∑ a, sq_restr g a s : ℕ) : ℤ)) := by
+  have hlast
+      : ((sq_rowSum g (Fin.last k) : ℕ) : ℤ)
+        = wsum μ - wsum (fun s => ((∑ a, sq_restr g a s : ℕ) : ℤ)) := by
     have h1 : wsum μ = ∑ a, (sq_rowSum g a : ℤ) := by
       simp only [wsum, ← hs, sq_rowSum]
       push_cast
       exact Finset.sum_comm
-    have h2 : wsum (fun s => ((∑ a, sq_restr g a s : ℕ) : ℤ)) =
-        ∑ a : Fin k, (sq_rowSum (sq_restr g) a : ℤ) := by
+    have h2
+        : wsum (fun s => ((∑ a, sq_restr g a s : ℕ) : ℤ))
+          = ∑ a : Fin k, (sq_rowSum (sq_restr g) a : ℤ) := by
       simp only [wsum, sq_rowSum]
       push_cast
       exact Finset.sum_comm
@@ -255,15 +285,19 @@ theorem sq_mono_split {K : Type*} [Field K] {k : ℕ} (μ : Fin (k + 1) → ℤ)
   rw [Fin.prod_univ_castSucc, ← hlast, zpow_natCast]
   simp only [hrow]
 
-theorem sq_gt_sum {K : Type*} [Field K] : ∀ (k : ℕ) (κ : Fin k → ℤ), (∀ s, 0 ≤ κ s) →
-    ∀ [Fintype (sq_SSZ k κ)] (t : Fin k → K), ∑ g : sq_SSZ k κ, sq_mono t g.1 = gtChar k κ t := by
+theorem sq_gt_sum {K : Type*} [Field K]
+    : ∀ (k : ℕ) (κ : Fin k → ℤ),
+      (∀ s, 0 ≤ κ s)
+        → ∀ [Fintype (sq_SSZ k κ)] (t : Fin k → K),
+          ∑ g : sq_SSZ k κ, sq_mono t g.1 = gtChar k κ t := by
   intro k
   induction k with
   | zero =>
     intro κ _ _ t
-    have : Unique (sq_SSZ 0 κ) :=
-      { default := ⟨fun a => a.elim0, fun l => l.elim0, fun s => s.elim0⟩
-        uniq := fun g => Subtype.ext (funext fun a => a.elim0) }
+    have : Unique (sq_SSZ 0 κ) := {
+      default := ⟨fun a => a.elim0, fun l => l.elim0, fun s => s.elim0⟩
+      uniq := fun g => Subtype.ext (funext fun a => a.elim0)
+    }
     rw [Fintype.sum_unique]
     simp [sq_mono, gtChar]
   | succ k ih =>
@@ -271,11 +305,14 @@ theorem sq_gt_sum {K : Type*} [Field K] : ∀ (k : ℕ) (κ : Fin k → ℤ), (�
     have : ∀ κ : Fin k → ℤ, Fintype (sq_SSZ k κ) := fun κ => @Fintype.ofFinite _ (sq_SSZ_finite k κ)
     have : Fintype (sq_UU k μ) := Fintype.ofEquiv _ (sq_fibEquiv μ).symm
     rw [Fintype.sum_bijective (sq_rho μ) ⟨sq_rho_inj μ, sq_rho_surj μ (hμ _)⟩ _
-      (fun u : sq_UU k μ => sq_mono (fun i => t i.castSucc) u.1 *
-        t (Fin.last k) ^ (wsum μ - wsum (fun s => ((∑ a, u.1 a s : ℕ) : ℤ)))) (sq_mono_split μ t)]
+      (fun u : sq_UU k μ =>
+        sq_mono (fun i => t i.castSucc) u.1
+          * t (Fin.last k) ^ (wsum μ - wsum (fun s => ((∑ a, u.1 a s : ℕ) : ℤ))))
+      (sq_mono_split μ t)]
     refine (Fintype.sum_equiv (sq_fibEquiv μ) _
-      (fun x : (Σ κ : ↥(interl μ), sq_SSZ k κ.1) => sq_mono (fun i => t i.castSucc) x.2.1 *
-        t (Fin.last k) ^ (wsum μ - wsum x.1.1)) (fun u => rfl)).trans ?_
+      (fun x : (Σ κ : ↥(interl μ), sq_SSZ k κ.1) =>
+        sq_mono (fun i => t i.castSucc) x.2.1 * t (Fin.last k) ^ (wsum μ - wsum x.1.1))
+      (fun u => rfl)).trans ?_
     rw [Fintype.sum_sigma]
     simp only [← Finset.sum_mul]
     rw [gtChar, ← Finset.sum_coe_sort (interl μ)]

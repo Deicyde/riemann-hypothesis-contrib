@@ -6,16 +6,21 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IndEtOfForal
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC.WExactProd
 
-theorem exactAt_of_prod {ι : Type} {c : ComplexShape ℕ} {K : HomologicalComplex AddCommGrpCat.{1} c}
-    {L : ι → HomologicalComplex AddCommGrpCat.{1} c} (φ : ∀ i, K ⟶ L i)
-    (hφ : ∀ n, Function.Bijective (fun (x : K.X n) (i : ι) => (φ i).f n x)) (p : ℕ)
-    (hL : ∀ i, (L i).ExactAt p) : K.ExactAt p := by
+theorem exactAt_of_prod
+    {ι : Type} {c : ComplexShape ℕ} {K : HomologicalComplex AddCommGrpCat.{1} c}
+    {L : ι → HomologicalComplex AddCommGrpCat.{1} c}
+    (φ : ∀ i, K ⟶ L i) (hφ : ∀ n, Function.Bijective (fun (x : K.X n) (i : ι) => (φ i).f n x))
+    (p : ℕ) (hL : ∀ i, (L i).ExactAt p)
+    : K.ExactAt p := by
   rw [HomologicalComplex.exactAt_iff, ShortComplex.ab_exact_iff]
-  suffices key : ∀ z : K.X p, K.d p (c.next p) z = 0 → ∃ v : K.X (c.prev p), K.d (c.prev p) p v = z from key
+  suffices key
+      : ∀ z : K.X p, K.d p (c.next p) z = 0 → ∃ v : K.X (c.prev p), K.d (c.prev p) p v = z from
+    key
   intro z hz
   have hcomm : ∀ i {q r : ℕ} (x : K.X q), (L i).d q r ((φ i).f q x) = (φ i).f r (K.d q r x) := by
     intro i q r x
@@ -36,12 +41,17 @@ theorem exactAt_of_prod {ι : Type} {c : ComplexShape ℕ} {K : HomologicalCompl
   rw [← hcomm, ← hw i]
   exact congrArg _ (congrFun hv i)
 
-theorem wexact_of_prod (T : Type 1) [Category.{0} T] (U : T) (X : CosimplicialObject T)
-    (a : (CosimplicialObject.const T).obj U ⟶ X) (ι : Type) (M : ι → T ⥤ AddCommGrpCat.{1})
+theorem wexact_of_prod
+    (T : Type 1) [Category.{0} T]
+    (U : T) (X : CosimplicialObject T) (a : (CosimplicialObject.const T).obj U ⟶ X)
+    (ι : Type) (M : ι → T ⥤ AddCommGrpCat.{1})
     (N : T ⥤ AddCommGrpCat.{1}) (π : ∀ i, N ⟶ M i)
     (hπ : ∀ V, Function.Bijective (fun (x : N.obj V) (i : ι) => (π i).app V x))
-    (hM : ∀ i, WExact (M i) a) : WExact N a := by
-  have nat : ∀ i {P Q : T} (f : P ⟶ Q) (x : N.obj P), (π i).app Q (N.map f x) = (M i).map f ((π i).app P x) := by
+    (hM : ∀ i, WExact (M i) a)
+    : WExact N a := by
+  have nat
+      : ∀ i {P Q : T} (f : P ⟶ Q) (x : N.obj P),
+        (π i).app Q (N.map f x) = (M i).map f ((π i).app P x) := by
     intro i P Q f x
     exact ConcreteCategory.congr_hom ((π i).naturality f) x
   refine ⟨?_, ?_, ?_⟩
@@ -53,7 +63,8 @@ theorem wexact_of_prod (T : Type 1) [Category.{0} T] (U : T) (X : CosimplicialOb
     rw [nat, nat] at h
     exact h
   · intro y hy
-    have hx : ∀ i, ∃ x : (M i).obj U, (M i).map (a.app (SimplexCategory.mk 0)) x = (π i).app _ y := by
+    have hx
+        : ∀ i, ∃ x : (M i).obj U, (M i).map (a.app (SimplexCategory.mk 0)) x = (π i).app _ y := by
       intro i
       refine (hM i).2.1 ((π i).app _ y) ?_
       rw [← nat, ← nat, hy]
@@ -66,8 +77,13 @@ theorem wexact_of_prod (T : Type 1) [Category.{0} T] (U : T) (X : CosimplicialOb
     rw [nat, ← hx i]
     exact congrArg _ (congrFun hx' i)
   · intro n
-    refine exactAt_of_prod (fun i => (AlgebraicTopology.alternatingCofaceMapComplex AddCommGrpCat.{1}).map
-      (Functor.whiskerLeft X (π i))) (fun k => ?_) (n + 1) (fun i => (hM i).2.2 n)
+    refine exactAt_of_prod
+      (fun i =>
+        (AlgebraicTopology.alternatingCofaceMapComplex AddCommGrpCat.{1}).map
+          (Functor.whiskerLeft X (π i)))
+      (fun k => ?_)
+      (n + 1)
+      (fun i => (hM i).2.2 n)
     exact hπ (X.obj (SimplexCategory.mk k))
 
 end GlobalTheory.EtC.WExactProd

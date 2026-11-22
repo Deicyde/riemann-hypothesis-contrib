@@ -11,10 +11,12 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.SettingConstruction
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
-theorem haar_smul {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ) (c : ℝ≥0) (hc : 0 < c) :
-    IsHaarOn U (c • μ) := by
+theorem haar_smul
+    {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ) (c : ℝ≥0) (hc : 0 < c)
+    : IsHaarOn U (c • μ) := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rw [smul_apply, h.conc, smul_zero]
   · intro a ha
@@ -80,7 +82,8 @@ lemma unitary_of_form (g : Matrix ι ι ℂ) (h : ∀ x y, herm H (g *ᵥ x) (g 
 lemma form_of_unitary {g : Matrix ι ι ℂ} (h : gᴴ * H * g = H) (x y : ι → ℂ) : herm H (g *ᵥ x) (g *ᵥ y) = herm H x y := by
   rw [herm_mulVec, h]
 
-def rk (d : ι → ℂ) (θ β : ℂ) : Matrix ι ι ℂ := θ • (1 : Matrix ι ι ℂ) + β • (vecMulVec d (star d) * H)
+def rk (d : ι → ℂ) (θ β : ℂ) : Matrix ι ι ℂ :=
+  θ • (1 : Matrix ι ι ℂ) + β • (vecMulVec d (star d) * H)
 
 lemma rk_mulVec (d : ι → ℂ) (θ β : ℂ) (x : ι → ℂ) : rk H d θ β *ᵥ x = θ • x + (β * herm H x d) • d := by
   have key : ∀ v : ι → ℂ, Matrix.vecMulVec d (star d) *ᵥ v = (star d ⬝ᵥ v) • d := by
@@ -159,8 +162,8 @@ lemma herm_Hb_left (y : Fin (k + 1) → ℂ) (i : Fin (k + 1)) :
   simp [mul_comm]
 
 def nu (w s : ℂ) : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ :=
-  1 + vecMulVec ((star w - 1) • Pi.single 0 1 + s • Pi.single (Fin.last k) 1) (Pi.single 0 1) +
-    vecMulVec (s • Pi.single 0 1 + (w - 1) • Pi.single (Fin.last k) 1) (Pi.single (Fin.last k) 1)
+  1 + vecMulVec ((star w - 1) • Pi.single 0 1 + s • Pi.single (Fin.last k) 1) (Pi.single 0 1)
+    + vecMulVec (s • Pi.single 0 1 + (w - 1) • Pi.single (Fin.last k) 1) (Pi.single (Fin.last k) 1)
 
 lemma nu_mulVec (w s : ℂ) (x : Fin (k + 1) → ℂ) :
     nu k w s *ᵥ x = x + x 0 • ((star w - 1) • Pi.single 0 1 + s • Pi.single (Fin.last k) 1) +
@@ -324,15 +327,17 @@ end mid
 
 theorem sectionExists : Formalism.QuantumDeterminants.SectionExists := by
   intro k r z z' hk hz hz' hT hT'
-  obtain ⟨μ, h1, h2⟩ := section_core k hk (wbPart k r z) (wbPart k r z') (Tz k r z) (Tz k r z') hT hT'
-    (herm_self k r z hz) (herm_self k r z' hz')
+  obtain ⟨μ, h1, h2⟩ :=
+    section_core k hk (wbPart k r z) (wbPart k r z') (Tz k r z) (Tz k r z') hT hT'
+      (herm_self k r z hz) (herm_self k r z' hz')
   exact ⟨μ, h1, h2⟩
 
 end Formalism.FourierDecayAlt.P.SettingConstruction
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 theorem base_vector_exists : Formalism.FourierDecayAlt.B2.ZExists := by
   intro k r
@@ -340,7 +345,9 @@ theorem base_vector_exists : Formalism.FourierDecayAlt.B2.ZExists := by
   · intro i hi
     simp only [bvec]
     rw [Pi.single_apply, if_neg]
-    intro h; subst h; simp [wI] at hi
+    intro h
+    subst h
+    simp [wI] at hi
   · simp only [Tz, bvec]
     rw [SettingConstruction.herm_single]
     simp [Hpk, wI]
@@ -365,23 +372,70 @@ theorem setting_exists_of_parts : Formalism.FourierDecayAlt.B2.AssembleExists :=
     obtain ⟨μW', hμW'⟩ := hW k r z' hz' hT'
     obtain ⟨μsec, hsec⟩ := hS k r z z' hk hz hz' hT hT'
     obtain ⟨χ, hχ1, hχ2, hχ3⟩ := hχ
-    have md : IsMeasData k r z z' μsec μG μW μN μW' := ⟨hk, hz, hz', hT, hT', hμG, hμW, hμN, hμW', hsec⟩
+    have md : IsMeasData k r z z' μsec μG μW μN μW' :=
+      ⟨hk, hz, hz', hT, hT', hμG, hμW, hμN, hμW', hsec⟩
     obtain ⟨c, ⟨hc0, hcF⟩, -⟩ := hI k r z z' μsec μG μW μN μW' md
-    exact ⟨⟨z, z', p1, p2, c • μG, μW, μN, μW', μsec, χ, hk, hz, hz', hT, hT', hrep, hrep', hu, hu', hcn, hcn',
-      SettingConstruction.haar_smul hμG c hc0, hμW, hμN, hμW', hsec, hχ1, hχ2, hχ3⟩, rfl, rfl, rfl, rfl, hcF⟩
+    exact ⟨
+      ⟨
+        z,
+        z',
+        p1,
+        p2,
+        c • μG,
+        μW,
+        μN,
+        μW',
+        μsec,
+        χ,
+        hk,
+        hz,
+        hz',
+        hT,
+        hT',
+        hrep,
+        hrep',
+        hu,
+        hu',
+        hcn,
+        hcn',
+        SettingConstruction.haar_smul hμG c hc0,
+        hμW,
+        hμN,
+        hμW',
+        hsec,
+        hχ1,
+        hχ2,
+        hχ3
+      ⟩,
+      rfl,
+      rfl,
+      rfl,
+      rfl,
+      hcF
+    ⟩
   refine ⟨hE, ?_⟩
   intro k r hk
   obtain ⟨hzm, hzT⟩ := hZ k r
-  have hrep : IsCRepOn (UWset k r (bvec (wI k r (Fin.last k)))) (fun _ : Mat k r => (1 : ℂ →L[ℂ] ℂ)) := by
+  have hrep
+      : IsCRepOn (UWset k r (bvec (wI k r (Fin.last k)))) (fun _ : Mat k r => (1 : ℂ →L[ℂ] ℂ)) := by
     refine ⟨rfl, fun a _ b _ => ?_⟩
-    ext; simp
+    ext
+    simp
   have hT : 0 < Tz k r (bvec (wI k r (Fin.last k))) := by rw [hzT]; norm_num
-  obtain ⟨D, -, -, -, -, hD⟩ := hE k r ℂ ℂ _ _ (fun _ => 1) (fun _ => 1) hk hzm hzm hT hT hrep hrep
-    (fun _ _ v => by simp) (fun _ _ v => by simp) continuousOn_const continuousOn_const
+  obtain ⟨D, -, -, -, -, hD⟩ :=
+    hE k r ℂ ℂ _ _
+      (fun _ => 1)
+      (fun _ => 1)
+      hk hzm hzm hT hT hrep hrep
+      (fun _ _ v => by simp)
+      (fun _ _ v => by simp)
+      continuousOn_const continuousOn_const
   exact ⟨D, hD⟩
 
-theorem SettingConstruction.setting_exists_of_haar_normalisation (hG : HaarGExists) (hW : HaarWExists) (hN : HaarNExists) (hI : IntNorm) :
-    RealPlaceDataExists ∧ RealPlaceDataNonempty := by
-  exact setting_exists_of_parts hG hW hN SettingConstruction.sectionExists character_exists_alt hI base_vector_exists
+theorem SettingConstruction.setting_exists_of_haar_normalisation
+    (hG : HaarGExists) (hW : HaarWExists) (hN : HaarNExists) (hI : IntNorm)
+    : RealPlaceDataExists ∧ RealPlaceDataNonempty := by
+  exact setting_exists_of_parts hG hW hN SettingConstruction.sectionExists character_exists_alt hI
+    base_vector_exists
 
 end Formalism.FourierDecayAlt.P

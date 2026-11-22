@@ -14,8 +14,9 @@ namespace GroundTheory.Heights₂.Heights.NineStatements
 open NumberField IsDedekindDomain
 open scoped nonZeroDivisors
 
-theorem extDifferent_ne_bot {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] (ι : E →+* L) :
-    extDifferent ι ≠ ⊥ := by
+theorem extDifferent_ne_bot
+    {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L] (ι : E →+* L)
+    : extDifferent ι ≠ ⊥ := by
   rw [extDifferent, Ne, Ideal.map_eq_bot_iff_of_injective]
   · exact differentIdeal_ne_bot
   · intro x y h

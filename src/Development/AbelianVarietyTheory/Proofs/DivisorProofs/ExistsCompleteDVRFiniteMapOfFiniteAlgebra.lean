@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Exist
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -20,11 +23,16 @@ open Classical
 
 namespace GlobalTheory.CdvrFiniteAlgebra
 
-theorem exists_cdvr_map_of_finite : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], GlobalTheory.LN.CDvr V →
-    ∀ (R₁ : Type) [CommRing R₁] [Algebra (FractionRing V) R₁], Module.Finite (FractionRing V) R₁ → Nontrivial R₁ →
-      ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsLocalRing W) (f : V →+* W) (ψ : R₁ →+* FractionRing W),
-        GlobalTheory.LN.CDvr W ∧ Function.Injective f ∧ IsLocalHom f ∧ f.Finite ∧
-        ∀ a, ψ (algebraMap (FractionRing V) R₁ (algebraMap V _ a)) = algebraMap W _ (f a) := by
+theorem exists_cdvr_map_of_finite
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
+      GlobalTheory.LN.CDvr V
+        → ∀ (R₁ : Type) [CommRing R₁] [Algebra (FractionRing V) R₁],
+          Module.Finite (FractionRing V) R₁ → Nontrivial R₁
+            → ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsLocalRing W) (f : V →+* W)
+                (ψ : R₁ →+* FractionRing W),
+              GlobalTheory.LN.CDvr W ∧ Function.Injective f ∧ IsLocalHom f ∧ f.Finite
+                ∧ ∀ a,
+                  ψ (algebraMap (FractionRing V) R₁ (algebraMap V _ a)) = algebraMap W _ (f a) := by
   intro V _ _ _ hV R₁ _ _ hfin hnt
   obtain ⟨hdvr, hcomp, hchar⟩ := (GlobalTheory.LN.cDvr_iff V).1 hV
   let K := FractionRing V
@@ -49,7 +57,8 @@ theorem exists_cdvr_map_of_finite : ∀ (V : Type) [CommRing V] [IsDomain V] [Is
   let s : Finset F := Finset.univ.image (fun i => t (b i))
   obtain ⟨W, hWd, hWc, -, hWfin, -, hWloc, hfrac, -⟩ :=
     GlobalTheory.exists_complete_dvr_finite_subalgebra V F s
-  have hWch : CharZero W := ⟨fun m n h => Nat.cast_injective (R := F) (by simpa using congrArg Subtype.val h)⟩
+  have hWch : CharZero W :=
+    ⟨fun m n h => Nat.cast_injective (R := F) (by simpa using congrArg Subtype.val h)⟩
   let φ : FractionRing W →+* F := IsFractionRing.lift (g := W.val.toRingHom) Subtype.val_injective
   have hφ : Function.Injective φ := φ.injective
   have hφa : ∀ w : W, φ (algebraMap W (FractionRing W) w) = w := fun w =>
@@ -75,18 +84,31 @@ theorem exists_cdvr_map_of_finite : ∀ (V : Type) [CommRing V] [IsDomain V] [Is
     | mem x hx =>
       obtain ⟨i, rfl⟩ := hx
       exact hs _ (Finset.mem_image.2 ⟨i, Finset.mem_univ _, rfl⟩)
-    | zero => simpa using φ.range.zero_mem
-    | add x y _ _ hx hy => simpa using φ.range.add_mem hx hy
+    | zero =>
+      simpa using φ.range.zero_mem
+    | add x y _ _ hx hy =>
+      simpa using φ.range.add_mem hx hy
     | smul c x _ hx =>
       rw [map_smul, Algebra.smul_def]
       exact φ.range.mul_mem (hK c) hx
-  let e : FractionRing W ≃+* φ.range := RingEquiv.ofBijective φ.rangeRestrict
-    ⟨fun x y h => hφ (congrArg Subtype.val h), φ.rangeRestrict_surjective⟩
+  let e : FractionRing W ≃+* φ.range :=
+    RingEquiv.ofBijective φ.rangeRestrict
+      ⟨fun x y h => hφ (congrArg Subtype.val h), φ.rangeRestrict_surjective⟩
   let ψ : R₁ →+* FractionRing W := e.symm.toRingHom.comp (t.toRingHom.codRestrict φ.range hrange)
-  have hψ : ∀ r, φ (ψ r) = t r := fun r =>
-    congrArg Subtype.val (e.apply_symm_apply ⟨t r, hrange r⟩)
-  refine ⟨W, inferInstance, inferInstance, inferInstance, algebraMap V W, ψ,
-    (GlobalTheory.LN.cDvr_iff W).2 ⟨hWd, hWc, hWch⟩, ?_, hWloc, RingHom.finite_algebraMap.2 hWfin, ?_⟩
+  have hψ : ∀ r, φ (ψ r) = t r := fun r => congrArg Subtype.val (e.apply_symm_apply ⟨t r, hrange r⟩)
+  refine ⟨
+    W,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    algebraMap V W,
+    ψ,
+    (GlobalTheory.LN.cDvr_iff W).2 ⟨hWd, hWc, hWch⟩,
+    ?_,
+    hWloc,
+    RingHom.finite_algebraMap.2 hWfin,
+    ?_
+  ⟩
   · intro x y h
     exact FaithfulSMul.algebraMap_injective V F (congrArg Subtype.val h)
   · intro a

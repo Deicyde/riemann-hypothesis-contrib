@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open scoped TensorProduct NNReal Matrix
 
 noncomputable section
@@ -15,7 +17,6 @@ noncomputable section
 namespace GlobalTheory.ThetaDecay
 
 variable {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-
 
 theorem realAd_mul (a b : ℝ) : realAd F a * realAd F b = realAd F (a * b) := by
   unfold realAd

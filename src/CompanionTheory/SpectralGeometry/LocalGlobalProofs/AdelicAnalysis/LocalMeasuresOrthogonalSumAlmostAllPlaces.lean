@@ -14,18 +14,23 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.StageGood
 
-theorem gram_first {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (t : F) :
-    gramR R σ (blockOne (algebraMap F E t) J)
-        (fun _ : Fin 1 => (Fin.cons 1 (fun _ => 0) : Fin (M + 1) → R ⊗[F] E)) =
-      (hermScal R σ (algebraMap F R t) : HermR R σ 1) := by
+theorem gram_first
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+    (t : F)
+    : gramR R σ (blockOne (algebraMap F E t) J)
+        (fun _ : Fin 1 => (Fin.cons 1 (fun _ => 0) : Fin (M + 1) → R ⊗[F] E))
+      = (hermScal R σ (algebraMap F R t) : HermR R σ 1) := by
   funext a c
   have h1 : (algebraMap F R t) ⊗ₜ[F] (1 : E) = (1 : R) ⊗ₜ[F] (algebraMap F E t) := by
     rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
@@ -35,12 +40,13 @@ theorem gram_first {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [Co
   rw [h1]
   rfl
 
-theorem first_mem {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {d M n : ℕ}
-    (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (σ : E →ₐ[F] E)
-    (J : Matrix (Fin (M + 1)) (Fin (M + 1)) E) (h : HA (Fv F v) σ J)
-    (X : Fin n → Fin M → Fv F v ⊗[F] E)
-    (hX : actW (Fv F v) σ J h (consTup X) ∈ latV b v) :
-    actW (Fv F v) σ J h (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0)) ∈ latV b v := by
+theorem first_mem
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {d M n : ℕ} (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (σ : E →ₐ[F] E) (J : Matrix (Fin (M + 1)) (Fin (M + 1)) E)
+    (h : HA (Fv F v) σ J) (X : Fin n → Fin M → Fv F v ⊗[F] E)
+    (hX : actW (Fv F v) σ J h (consTup X) ∈ latV b v)
+    : actW (Fv F v) σ J h (fun _ : Fin 1 => Fin.cons 1 (fun _ => 0)) ∈ latV b v := by
   intro a i k
   exact hX 0 i k
 

@@ -5,15 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Generali
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
 open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Automorphic.Spherical
 open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.GM
 open scoped ComplexConjugate
 
-private theorem finprod_split_at {α : Type*} (a : α → ℂ) (ha : (Function.mulSupport a).Finite) (q : α)
-    [DecidablePred fun v => v = q] :
-    (∏ᶠ v, a v) = (∏ᶠ v, if v = q then (1 : ℂ) else a v) * a q := by
+private theorem finprod_split_at
+    {α : Type*} (a : α → ℂ) (ha : (Function.mulSupport a).Finite) (q : α)
+    [DecidablePred fun v => v = q]
+    : (∏ᶠ v, a v) = (∏ᶠ v, if v = q then (1 : ℂ) else a v) * a q := by
   have hA : (Function.mulSupport fun v => if v = q then (1 : ℂ) else a v).Finite := by
     refine ha.subset fun v hv => ?_
     by_cases h : v = q
@@ -34,10 +37,18 @@ private theorem finprod_split_at {α : Type*} (a : α → ℂ) (ha : (Function.m
     simp
   · simp [h]
 
-theorem UpperTheory.factorizable_finprod_eq_away_finprod_mul_local_factor :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (f : ∀ v : Pl K, GL (Fin n) (v.adicCompletion K) → ℂ) (S : Finset (Pl K)),
-      (∀ v, v ∉ S → f v = (GLnLocal.integralGL (v.adicCompletion K) n : Set (GL (Fin n) (v.adicCompletion K))).indicator 1) →
-      ∀ (q : Pl K) (x : AdelicGLn.FiniteAdelicGL K n), (∏ᶠ v, f v (cf v x)) = (∏ᶠ v, (open Classical in if v = q then (1 : ℂ) else f v (cf v x))) * f q (cf q x) := by
+theorem UpperTheory.factorizable_finprod_eq_away_finprod_mul_local_factor
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ)
+        (f : ∀ v : Pl K, GL (Fin n) (v.adicCompletion K) → ℂ) (S : Finset (Pl K)),
+      (∀ v,
+          v ∉ S
+            → f v
+              = (GLnLocal.integralGL (v.adicCompletion K) n
+                : Set (GL (Fin n) (v.adicCompletion K))).indicator 1)
+        → ∀ (q : Pl K) (x : AdelicGLn.FiniteAdelicGL K n),
+          (∏ᶠ v, f v (cf v x))
+            = (∏ᶠ v, (open Classical in if v = q then (1 : ℂ) else f v (cf v x)))
+              * f q (cf q x) := by
   intro K _ _ n f S hf q x
   have hfin : (Function.mulSupport fun v => f v (cf v x)).Finite := by
     have h := Filter.eventually_cofinite.1 (AdelicGLn.eventually_mem_integralGL K n (finEmb K n x))

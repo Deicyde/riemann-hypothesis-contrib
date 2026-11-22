@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Polynomial
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Polynomial
 open scoped TensorProduct
 
 namespace Formalism.L2.SG.Pf.NcS.LT
@@ -42,15 +43,16 @@ section Quad
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E] [CharZero E]
 
-theorem exists_alpha (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (hmov : ∃ y, σ y ≠ y) :
-    ∃ α : E, α ≠ 0 ∧ σ α = -α := by
+theorem exists_alpha (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (hmov : ∃ y, σ y ≠ y)
+    : ∃ α : E, α ≠ 0 ∧ σ α = -α := by
   obtain ⟨y, hy⟩ := hmov
   refine ⟨y - σ y, sub_ne_zero.2 (Ne.symm hy), ?_⟩
   rw [map_sub, hσ]
   ring
 
-theorem rep_of (σ : E →ₐ[F] E) (hfin : Module.finrank F E = 2) {α : E} (hα0 : α ≠ 0)
-    (hσα : σ α = -α) : ∀ e : E, ∃ a b : F, e = algebraMap F E a + b • α := by
+theorem rep_of
+    (σ : E →ₐ[F] E) (hfin : Module.finrank F E = 2) {α : E} (hα0 : α ≠ 0) (hσα : σ α = -α)
+    : ∀ e : E, ∃ a b : F, e = algebraMap F E a + b • α := by
   have hli : LinearIndependent F ![(1 : E), α] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
@@ -69,13 +71,16 @@ theorem rep_of (σ : E →ₐ[F] E) (hfin : Module.finrank F E = 2) {α : E} (h�
   have hb := B.sum_repr e
   rw [Fin.sum_univ_two] at hb
   simp only [B, coe_basisOfLinearIndependentOfCardEqFinrank, Matrix.cons_val_zero,
-    Matrix.cons_val_one] at hb
+      Matrix.cons_val_one]
+    at hb
   refine ⟨B.repr e 0, B.repr e 1, ?_⟩
   rw [Algebra.algebraMap_eq_smul_one]
   exact hb.symm
 
-theorem exists_d (σ : E →ₐ[F] E) {α : E} (hrep : ∀ e : E, ∃ a b : F, e = algebraMap F E a + b • α)
-    (hσα : σ α = -α) : ∃ d : F, algebraMap F E d = α * α := by
+theorem exists_d
+    (σ : E →ₐ[F] E)
+    {α : E} (hrep : ∀ e : E, ∃ a b : F, e = algebraMap F E a + b • α) (hσα : σ α = -α)
+    : ∃ d : F, algebraMap F E d = α * α := by
   obtain ⟨a, b, hab⟩ := hrep (α * α)
   rw [Algebra.smul_def] at hab
   have h1 := congrArg σ hab
@@ -93,24 +98,24 @@ variable {F E : Type} [Field F] [Field E] [Algebra F E] {K : Type} [Field K] [Al
 def ev (φ : E →ₐ[F] K) : K ⊗[F] E →+* K :=
   (Algebra.TensorProduct.lift (AlgHom.id K K) φ (fun _ _ => Commute.all _ _)).toRingHom
 
-theorem ev_rep (φ : E →ₐ[F] K) (α : E) (a b : K) :
-    ev φ (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) b * ((1 : K) ⊗ₜ[F] α)) =
-      a + b * φ α := by
+theorem ev_rep (φ : E →ₐ[F] K) (α : E) (a b : K)
+    : ev φ (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) b * ((1 : K) ⊗ₜ[F] α))
+      = a + b * φ α := by
   simp [ev, Algebra.TensorProduct.algebraMap_apply]
 
 theorem ev_alg (φ : E →ₐ[F] K) (c : K) : ev φ (algebraMap K (K ⊗[F] E) c) = c := by
   simp [ev, Algebra.TensorProduct.algebraMap_apply]
 
-theorem tens_rep {α : E} (hrep : ∀ e : E, ∃ a b : F, e = algebraMap F E a + b • α)
-    (s : K ⊗[F] E) : ∃ a b : K,
-      s = algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) b * ((1 : K) ⊗ₜ[F] α) := by
+theorem tens_rep {α : E} (hrep : ∀ e : E, ∃ a b : F, e = algebraMap F E a + b • α) (s : K ⊗[F] E)
+    : ∃ a b : K, s = algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) b * ((1 : K) ⊗ₜ[F] α) := by
   induction s using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, by simp⟩
   | tmul r e =>
     obtain ⟨a, b, rfl⟩ := hrep e
     refine ⟨r * algebraMap F K a, r * algebraMap F K b, ?_⟩
-    have key : r ⊗ₜ[F] (algebraMap F E a + b • α) =
-        (r * algebraMap F K a) ⊗ₜ[F] (1 : E) + (r * algebraMap F K b) ⊗ₜ[F] α := by
+    have key
+        : r ⊗ₜ[F] (algebraMap F E a + b • α)
+          = (r * algebraMap F K a) ⊗ₜ[F] (1 : E) + (r * algebraMap F K b) ⊗ₜ[F] α := by
       rw [TensorProduct.tmul_add, Algebra.algebraMap_eq_smul_one (A := E) a,
         ← TensorProduct.smul_tmul, ← TensorProduct.smul_tmul, Algebra.smul_def, Algebra.smul_def,
         mul_comm (algebraMap F K a), mul_comm (algebraMap F K b)]
@@ -121,26 +126,29 @@ theorem tens_rep {α : E} (hrep : ∀ e : E, ∃ a b : F, e = algebraMap F E a +
     obtain ⟨a', b', rfl⟩ := hy
     exact ⟨a + a', b + b', by simp only [map_add (f := _)]; ring⟩
 
-theorem sigR_rep (σ : E →ₐ[F] E) {α : E} (hσα : σ α = -α) (a b : K) :
-    sigR K σ (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) b * ((1 : K) ⊗ₜ[F] α)) =
-      algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) (-b) * ((1 : K) ⊗ₜ[F] α) := by
-  simp [sigR, Algebra.TensorProduct.algebraMap_apply, hσα, TensorProduct.tmul_neg, TensorProduct.neg_tmul]
+theorem sigR_rep (σ : E →ₐ[F] E) {α : E} (hσα : σ α = -α) (a b : K)
+    : sigR K σ (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) b * ((1 : K) ⊗ₜ[F] α))
+      = algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) (-b) * ((1 : K) ⊗ₜ[F] α) := by
+  simp [sigR, Algebra.TensorProduct.algebraMap_apply, hσα, TensorProduct.tmul_neg,
+    TensorProduct.neg_tmul]
 
-theorem u_mul_u {α : E} {d : F} (hd : algebraMap F E d = α * α) :
-    ((1 : K) ⊗ₜ[F] α) * ((1 : K) ⊗ₜ[F] α) = algebraMap K (K ⊗[F] E) (algebraMap F K d) := by
+theorem u_mul_u {α : E} {d : F} (hd : algebraMap F E d = α * α)
+    : ((1 : K) ⊗ₜ[F] α) * ((1 : K) ⊗ₜ[F] α) = algebraMap K (K ⊗[F] E) (algebraMap F K d) := by
   rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, ← hd, Algebra.TensorProduct.algebraMap_apply,
     Algebra.algebraMap_self, RingHom.id_apply, Algebra.algebraMap_eq_smul_one (A := E) d,
     Algebra.algebraMap_eq_smul_one (A := K) d, ← TensorProduct.smul_tmul]
 
 end Tens
 
-theorem main_gen {F E : Type} [Field F] [Field E] [Algebra F E] [CharZero F] [CharZero E]
-    (K : Type) [Field K] [Algebra F K] (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
-    (hmov : ∃ y, σ y ≠ y) (hfin : Module.finrank F E = 2) (hnf : ¬ IsField (K ⊗[F] E)) :
-    ∃ π₁ π₂ : K ⊗[F] E →+* K,
-      (∀ s, π₁ (sigR K σ s) = π₂ s) ∧ (∀ s, π₂ (sigR K σ s) = π₁ s) ∧
-      (∀ c : K, π₁ (algebraMap K (K ⊗[F] E) c) = c ∧ π₂ (algebraMap K (K ⊗[F] E) c) = c) ∧
-      (∀ s t, π₁ s = π₁ t → π₂ s = π₂ t → s = t) ∧ (∀ p q : K, ∃ s, π₁ s = p ∧ π₂ s = q) := by
+theorem main_gen
+    {F E : Type} [Field F] [Field E] [Algebra F E] [CharZero F] [CharZero E]
+    (K : Type) [Field K] [Algebra F K]
+    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (hmov : ∃ y, σ y ≠ y)
+    (hfin : Module.finrank F E = 2) (hnf : ¬ IsField (K ⊗[F] E))
+    : ∃ π₁ π₂ : K ⊗[F] E →+* K,
+      (∀ s, π₁ (sigR K σ s) = π₂ s) ∧ (∀ s, π₂ (sigR K σ s) = π₁ s)
+        ∧ (∀ c : K, π₁ (algebraMap K (K ⊗[F] E) c) = c ∧ π₂ (algebraMap K (K ⊗[F] E) c) = c)
+        ∧ (∀ s t, π₁ s = π₁ t → π₂ s = π₂ t → s = t) ∧ (∀ p q : K, ∃ s, π₁ s = p ∧ π₂ s = q) := by
   classical
   have : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [hfin]; norm_num)
   have h2K : (2 : K) ≠ 0 := by
@@ -172,11 +180,15 @@ theorem main_gen {F E : Type} [Field F] [Field E] [Algebra F E] [CharZero F] [Ch
       · apply hsq (a / b)
         rw [div_mul_div_comm, div_eq_iff (mul_ne_zero hb hb)]
         linear_combination h0
-    refine ⟨(algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) (-b) * ((1 : K) ⊗ₜ[F] α)) *
-      algebraMap K (K ⊗[F] E) (a * a - b * b * algebraMap F K d)⁻¹, ?_⟩
-    have hprod : (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) b * ((1 : K) ⊗ₜ[F] α)) *
-        (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) (-b) * ((1 : K) ⊗ₜ[F] α)) =
-        algebraMap K (K ⊗[F] E) (a * a - b * b * algebraMap F K d) := by
+    refine ⟨
+      (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) (-b) * ((1 : K) ⊗ₜ[F] α))
+        * algebraMap K (K ⊗[F] E) (a * a - b * b * algebraMap F K d)⁻¹,
+      ?_
+    ⟩
+    have hprod
+        : (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) b * ((1 : K) ⊗ₜ[F] α))
+            * (algebraMap K (K ⊗[F] E) a + algebraMap K (K ⊗[F] E) (-b) * ((1 : K) ⊗ₜ[F] α))
+          = algebraMap K (K ⊗[F] E) (a * a - b * b * algebraMap F K d) := by
       simp only [map_sub, map_mul, map_neg, ← huu]
       ring
     rw [← mul_assoc, hprod, ← map_mul, mul_inv_cancel₀ hN, map_one]
@@ -242,8 +254,12 @@ theorem main_gen {F E : Type} [Field F] [Field E] [Algebra F E] [CharZero F] [Ch
       linear_combination h4
     rw [ha, hb]
   · intro p q
-    refine ⟨algebraMap K (K ⊗[F] E) ((p + q) / 2) +
-      algebraMap K (K ⊗[F] E) ((p - q) / (2 * c)) * ((1 : K) ⊗ₜ[F] α), ?_, ?_⟩
+    refine ⟨
+      algebraMap K (K ⊗[F] E) ((p + q) / 2)
+        + algebraMap K (K ⊗[F] E) ((p - q) / (2 * c)) * ((1 : K) ⊗ₜ[F] α),
+      ?_,
+      ?_
+    ⟩
     · rw [ev_rep, hφ₁]
       field_simp
       ring

@@ -12,17 +12,23 @@ open scoped Pointwise
 
 namespace Formalism.MainNotions.G.ColumnFamilies
 
-open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees Formalism.MainNotions.G.GLWeightTheory Formalism.MainNotions.G.Joints
+open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
+  Formalism.MainNotions.G.GLWeightTheory Formalism.MainNotions.G.Joints
 
-theorem iInf_span_sup_smul_le {R M X κ : Type*} [CommRing R] [AddCommGroup M] [Module R M] {b : X → M}
-    (hb : LinearIndependent R b) (A : κ → Set X) [Nonempty κ] (q : R) :
-    (⨅ i, (Submodule.span R (b '' A i) ⊔ q • Submodule.span R (Set.range b))) ≤
-      (⨅ i, Submodule.span R (b '' A i)) ⊔ q • Submodule.span R (Set.range b) := by
+theorem iInf_span_sup_smul_le
+    {R M X κ : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+    {b : X → M} (hb : LinearIndependent R b)
+    (A : κ → Set X)
+    [Nonempty κ]
+    (q : R)
+    : (⨅ i, (Submodule.span R (b '' A i) ⊔ q • Submodule.span R (Set.range b)))
+      ≤ (⨅ i, Submodule.span R (b '' A i)) ⊔ q • Submodule.span R (Set.range b) := by
   classical
   intro G hG
   rw [Submodule.mem_iInf] at hG
-  have h1 : ∀ i, ∃ z h : X →₀ R, z ∈ Finsupp.supported R R (A i) ∧
-      G = Finsupp.linearCombination R b (z + q • h) := by
+  have h1
+      : ∀ i, ∃ z h : X →₀ R,
+        z ∈ Finsupp.supported R R (A i) ∧ G = Finsupp.linearCombination R b (z + q • h) := by
     intro i
     obtain ⟨Z, hZ, Y, hY, hsum⟩ := Submodule.mem_sup.1 (hG i)
     obtain ⟨z, hz, rfl⟩ := (Finsupp.mem_span_image_iff_linearCombination R).1 hZ
@@ -53,7 +59,8 @@ theorem iInf_span_sup_smul_le {R M X κ : Type*} [CommRing R] [AddCommGroup M] [
   refine Submodule.add_mem_sup ?_ ?_
   · rw [Submodule.mem_iInf]
     intro i
-    refine Submodule.sum_mem _ fun x hx => Submodule.smul_mem _ _ (Submodule.subset_span ⟨x, ?_, rfl⟩)
+    refine Submodule.sum_mem _ fun x hx =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨x, ?_, rfl⟩)
     exact (Finset.mem_filter.1 hx).2 i
   · rw [Submodule.mem_smul_pointwise_iff_exists]
     refine ⟨∑ x ∈ c.support.filter (fun x => ¬ ∀ i, x ∈ A i), d x • b x, ?_, ?_⟩
@@ -66,11 +73,12 @@ section
 
 variable {O : Type} [CommRing O] {N n : ℕ} (LL : Letters (Fin N)) (B : Fin N → ℕ)
 
-def wd (R : Type) [CommRing R] (x : WI n N LL B) : MvPolynomial (Fin N × Fin n) R := Psi R x.1.1.mu x.1.2
+def wd (R : Type) [CommRing R] (x : WI n N LL B) : MvPolynomial (Fin N × Fin n) R :=
+  Psi R x.1.1.mu x.1.2
 
-theorem span_standard_words_eq (R : Type) [CommRing R] (cond : PPath n N LL B → Prop) :
-    Submodule.span R {G | ∃ P : PPath n N LL B, ∃ I, IsSt P.mu I ∧ cond P ∧ G = Psi R P.mu I} =
-      Submodule.span R (wd LL B R '' {x | cond x.1.1}) := by
+theorem span_standard_words_eq (R : Type) [CommRing R] (cond : PPath n N LL B → Prop)
+    : Submodule.span R {G | ∃ P : PPath n N LL B, ∃ I, IsSt P.mu I ∧ cond P ∧ G = Psi R P.mu I}
+      = Submodule.span R (wd LL B R '' {x | cond x.1.1}) := by
   congr 1
   ext G
   constructor
@@ -79,7 +87,8 @@ theorem span_standard_words_eq (R : Type) [CommRing R] (cond : PPath n N LL B �
   · rintro ⟨x, hx, rfl⟩
     exact ⟨x.1.1, x.1.2, x.2, hx, rfl⟩
 
-theorem span_words_eq_polynomials (R : Type) [CommRing R] : Submodule.span R (Set.range (wd LL B R)) = Pol R n B := by
+theorem span_words_eq_polynomials (R : Type) [CommRing R]
+    : Submodule.span R (Set.range (wd LL B R)) = Pol R n B := by
   rw [← (standardPath_basis_any_ring R N n LL B).2]
   congr 1
   ext G
@@ -91,30 +100,44 @@ theorem span_words_eq_polynomials (R : Type) [CommRing R] : Submodule.span R (Se
 
 end
 
-theorem saturatedLowerSetSpan_of_lowerSetTypesSpan (D : Formalism.BasicNotions.D7) (hN2 : LowerSetTypesSpan) : SaturatedLowerSetSpan D := by
+theorem saturatedLowerSetSpan_of_lowerSetTypesSpan
+    (D : Formalism.BasicNotions.D7) (hN2 : LowerSetTypesSpan)
+    : SaturatedLowerSetSpan D := by
   classical
   intro O _ _ _ _ N n LL B pi hpi
   have hinj : Function.Injective (algebraMap O (KK O)) := IsFractionRing.injective O (KK O)
-  have hmapwd : ∀ x : WI n N LL B, MvPolynomial.map (algebraMap O (KK O)) (wd LL B O x) = wd LL B (KK O) x :=
-    fun x => Formalism.MainNotions.LemmaBAlt.map_Psi' (algebraMap O (KK O)) x.1.1.mu x.1.2
-  have hLIK : LinearIndependent (KK O) (wd LL B (KK O)) := (standardPath_basis_any_ring (KK O) N n LL B).1
+  have hmapwd
+      : ∀ x : WI n N LL B,
+        MvPolynomial.map (algebraMap O (KK O)) (wd LL B O x) = wd LL B (KK O) x := fun x =>
+    Formalism.MainNotions.LemmaBAlt.map_Psi' (algebraMap O (KK O)) x.1.1.mu x.1.2
+  have hLIK : LinearIndependent (KK O) (wd LL B (KK O)) :=
+    (standardPath_basis_any_ring (KK O) N n LL B).1
   have hLIO : LinearIndependent O (wd LL B O) := (standardPath_basis_any_ring O N n LL B).1
-  have hT : ∀ i : Fin (N + 1), Pol (KK O) n B ⊓ (⨆ lam ∈ pi i, isoSub (glOps (KK O) n LL {l | l.val < i.val}) lam) =
-      Submodule.span (KK O) (wd LL B (KK O) '' {x | x.1.1.mu i ∈ pi i}) := by
+  have hT
+      : ∀ i : Fin (N + 1),
+        Pol (KK O) n B ⊓ (⨆ lam ∈ pi i, isoSub (glOps (KK O) n LL {l | l.val < i.val}) lam)
+          = Submodule.span (KK O) (wd LL B (KK O) '' {x | x.1.1.mu i ∈ pi i}) := by
     intro i
     rw [hN2 (KK O) N n LL B i (pi i) (hpi i)]
     exact span_standard_words_eq LL B (KK O) (fun P => P.mu i ∈ pi i)
-  have hmaplc : ∀ c : WI n N LL B →₀ O, MvPolynomial.map (algebraMap O (KK O)) (Finsupp.linearCombination O (wd LL B O) c) =
-      Finsupp.linearCombination (KK O) (wd LL B (KK O)) (c.mapRange (algebraMap O (KK O)) (map_zero _)) := by
+  have hmaplc
+      : ∀ c : WI n N LL B →₀ O,
+        MvPolynomial.map (algebraMap O (KK O)) (Finsupp.linearCombination O (wd LL B O) c)
+          = Finsupp.linearCombination (KK O) (wd LL B (KK O))
+            (c.mapRange (algebraMap O (KK O)) (map_zero _)) := by
     intro c
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Finsupp.linearCombination_apply, Finsupp.linearCombination_apply,
-      Finsupp.sum_mapRange_index (by intro i; exact zero_smul _ _), Finsupp.sum, Finsupp.sum, map_sum]
+        Finsupp.sum_mapRange_index (by intro i; exact zero_smul _ _), Finsupp.sum, Finsupp.sum,
+        map_sum]
     refine Finset.sum_congr rfl fun x _ => ?_
-    rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.map_C, hmapwd, ← MvPolynomial.smul_eq_C_mul]
+    rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.map_C, hmapwd,
+      ← MvPolynomial.smul_eq_C_mul]
   constructor
   · intro Ix
-    have hspan : nestSpan O N n LL B pi Ix = Submodule.span O (wd LL B O '' {x | ∀ i ∈ Ix, x.1.1.mu i ∈ pi i}) :=
+    have hspan
+        : nestSpan O N n LL B pi Ix
+          = Submodule.span O (wd LL B O '' {x | ∀ i ∈ Ix, x.1.1.mu i ∈ pi i}) :=
       span_standard_words_eq LL B O (fun P => ∀ i ∈ Ix, P.mu i ∈ pi i)
     ext G
     constructor
@@ -123,10 +146,12 @@ theorem saturatedLowerSetSpan_of_lowerSetTypesSpan (D : Formalism.BasicNotions.D
       obtain ⟨c, rfl⟩ := (Finsupp.mem_span_range_iff_exists_finsupp).1 hG
       change (c.sum fun x a => a • wd LL B O x) ∈ nestSpan O N n LL B pi Ix
       rw [hspan]
-      refine Submodule.sum_mem _ fun x hx => Submodule.smul_mem _ _ (Submodule.subset_span ⟨x, ?_, rfl⟩)
+      refine Submodule.sum_mem _ fun x hx =>
+        Submodule.smul_mem _ _ (Submodule.subset_span ⟨x, ?_, rfl⟩)
       intro i hi
-      have h1 : MvPolynomial.map (algebraMap O (KK O)) (Finsupp.linearCombination O (wd LL B O) c) ∈
-          Submodule.span (KK O) (wd LL B (KK O) '' {x | x.1.1.mu i ∈ pi i}) := by
+      have h1
+          : MvPolynomial.map (algebraMap O (KK O)) (Finsupp.linearCombination O (wd LL B O) c)
+            ∈ Submodule.span (KK O) (wd LL B (KK O) '' {x | x.1.1.mu i ∈ pi i}) := by
         rw [← hT i]
         refine ⟨?_, hGi i hi⟩
         rw [hmaplc, ← span_words_eq_polynomials LL B (KK O)]
@@ -149,29 +174,40 @@ theorem saturatedLowerSetSpan_of_lowerSetTypesSpan (D : Formalism.BasicNotions.D
         · rw [← span_words_eq_polynomials LL B O]
           exact Submodule.subset_span ⟨x, rfl⟩
         · rw [hmapwd]
-          have : wd LL B (KK O) x ∈ Pol (KK O) n B ⊓
-              (⨆ lam ∈ pi i, isoSub (glOps (KK O) n LL {l | l.val < i.val}) lam) := by
+          have : wd LL B (KK O) x
+              ∈ Pol (KK O) n B
+                ⊓ (⨆ lam ∈ pi i, isoSub (glOps (KK O) n LL {l | l.val < i.val}) lam) := by
             rw [hT i]
             exact Submodule.subset_span ⟨x, hx i hi, rfl⟩
           exact this.2
-      | zero => exact ⟨Submodule.zero_mem _, fun i _ => by rw [map_zero]; exact Submodule.zero_mem _⟩
+      | zero =>
+        exact ⟨Submodule.zero_mem _, fun i _ => by rw [map_zero]; exact Submodule.zero_mem _⟩
       | add x y _ _ hx hy =>
-        exact ⟨Submodule.add_mem _ hx.1 hy.1, fun i hi => by
-          rw [map_add (f := _)]; exact Submodule.add_mem _ (hx.2 i hi) (hy.2 i hi)⟩
+        exact ⟨
+          Submodule.add_mem _ hx.1 hy.1,
+          fun i hi => by rw [map_add (f := _)]; exact Submodule.add_mem _ (hx.2 i hi) (hy.2 i hi)
+        ⟩
       | smul a x _ hx =>
-        exact ⟨Submodule.smul_mem _ _ hx.1, fun i hi => by
-          rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.map_C, ← MvPolynomial.smul_eq_C_mul]
-          exact Submodule.smul_mem _ _ (hx.2 i hi)⟩
+        exact ⟨
+          Submodule.smul_mem _ _ hx.1,
+          fun i hi => by
+            rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.map_C,
+              ← MvPolynomial.smul_eq_C_mul]
+            exact Submodule.smul_mem _ _ (hx.2 i hi)
+        ⟩
   · intro p E
-    have hspan : ∀ i : Fin (N + 1), nestSpan O N n LL B pi {i} =
-        Submodule.span O (wd LL B O '' {x | x.1.1.mu i ∈ pi i}) := by
+    have hspan
+        : ∀ i : Fin (N + 1),
+          nestSpan O N n LL B pi {i} = Submodule.span O (wd LL B O '' {x | x.1.1.mu i ∈ pi i}) := by
       intro i
-      have h1 : {x : WI n N LL B | ∀ i' ∈ ({i} : Set (Fin (N + 1))), x.1.1.mu i' ∈ pi i'} =
-          {x | x.1.1.mu i ∈ pi i} := by
+      have h1
+          : {x : WI n N LL B | ∀ i' ∈ ({i} : Set (Fin (N + 1))), x.1.1.mu i' ∈ pi i'}
+            = {x | x.1.1.mu i ∈ pi i} := by
         ext x
         simp only [Set.mem_setOf_eq, Set.mem_singleton_iff, forall_eq]
       rw [← h1]
-      exact span_standard_words_eq LL B O (fun P => ∀ i' ∈ ({i} : Set (Fin (N + 1))), P.mu i' ∈ pi i')
+      exact span_standard_words_eq LL B O
+        (fun P => ∀ i' ∈ ({i} : Set (Fin (N + 1))), P.mu i' ∈ pi i')
     simp only [hspan]
     rw [Submodule.ideal_span_singleton_smul, ← span_words_eq_polynomials LL B O]
     apply le_antisymm

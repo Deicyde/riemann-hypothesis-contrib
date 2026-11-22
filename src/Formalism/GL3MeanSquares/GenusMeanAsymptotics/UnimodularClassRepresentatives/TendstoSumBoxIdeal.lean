@@ -14,13 +14,18 @@ noncomputable section
 namespace Formalism.HermitianLattices.Ext.L3
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem exists_abs_alphaN_le (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (hm : 2 ≤ finrank K V)
-    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : ∃ C : ℝ, ∀ n : 𝓞 F, |alphaN h L 𝔭 n| ≤ C := by
+theorem exists_abs_alphaN_le
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    (hm : 2 ≤ finrank K V)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ C : ℝ, ∀ n : 𝓞 F, |alphaN h L 𝔭 n| ≤ C := by
   obtain ⟨C, hC⟩ := nkCount_le hK hF hs hd hL hLi hm h𝔭
   have hq : (0 : ℝ) < (Ideal.absNorm 𝔭 : ℝ) := zero_lt_one.trans (BoxSum.one_lt_absNorm h𝔭)
   refine ⟨max C |alphaN h L 𝔭 0|, fun n => ?_⟩
@@ -48,28 +53,45 @@ theorem exists_abs_alphaN_le (hK : Formalism.HermitianLatticesTheory.IsCMUnram K
   rw [div_le_iff₀ (by positivity)]
   exact hC _ _
 
-theorem tendsto_sum_box_ideal (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (hm : 2 ≤ finrank K V) (S : Finset {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal})
-    (hS : ∀ 𝔭 : {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal}, vd h L 𝔭.1 ≠ 0 → 𝔭 ∈ S) {b : Ideal (𝓞 F)} (hb : b ≠ ⊥)
-    (hbS : ∀ 𝔭 ∈ S, b ⊔ 𝔭.1 = ⊤) :
-    Tendsto (fun j : ℕ => ((j : ℝ) ^ 2) ^ (-((Formalism.HermitianLatticesTheory.fDeg K * finrank K V : ℕ) : ℤ)) *
-        ∑ᶠ n ∈ {n : 𝓞 F | n ∈ boxSet K F ((j : ℝ) ^ 2) ∧ n ∈ b},
-          (Ideal.absNorm (Ideal.span {n}) : ℝ) ^ (finrank K V - 1) *
-            ∏ 𝔭 ∈ S, alphaN h L 𝔭.1 n / (1 - etaF K F 𝔭.1 ^ finrank K V *
-              (Ideal.absNorm 𝔭.1 : ℝ) ^ (-(finrank K V : ℤ))))
-      atTop (𝓝 ((finrank K V : ℝ) ^ (-(Formalism.HermitianLatticesTheory.fDeg K : ℤ)) /
-        Real.sqrt ((2 * Formalism.HermitianLatticesTheory.vInv K) ^ Formalism.HermitianLatticesTheory.fDeg K) / (Ideal.absNorm b : ℝ) *
-          ∏ 𝔭 ∈ S, (1 - etaF K F 𝔭.1 ^ finrank K V *
-            (Ideal.absNorm 𝔭.1 : ℝ) ^ (-(finrank K V : ℤ)))⁻¹)) := by
+theorem tendsto_sum_box_ideal
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    (hm : 2 ≤ finrank K V)
+    (S : Finset {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal})
+    (hS : ∀ 𝔭 : {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal}, vd h L 𝔭.1 ≠ 0 → 𝔭 ∈ S)
+    {b : Ideal (𝓞 F)} (hb : b ≠ ⊥) (hbS : ∀ 𝔭 ∈ S, b ⊔ 𝔭.1 = ⊤)
+    : Tendsto
+      (fun j : ℕ =>
+        ((j : ℝ) ^ 2) ^ (-((Formalism.HermitianLatticesTheory.fDeg K * finrank K V : ℕ) : ℤ))
+          * ∑ᶠ n ∈ {n : 𝓞 F | n ∈ boxSet K F ((j : ℝ) ^ 2) ∧ n ∈ b},
+              (Ideal.absNorm (Ideal.span {n}) : ℝ) ^ (finrank K V - 1) *
+                ∏ 𝔭 ∈ S, alphaN h L 𝔭.1 n / (1 - etaF K F 𝔭.1 ^ finrank K V *
+                  (Ideal.absNorm 𝔭.1 : ℝ) ^ (-(finrank K V : ℤ))))
+      atTop
+      (𝓝
+        ((finrank K V : ℝ) ^ (-(Formalism.HermitianLatticesTheory.fDeg K : ℤ))
+          / Real.sqrt
+            ((2 * Formalism.HermitianLatticesTheory.vInv K)
+              ^ Formalism.HermitianLatticesTheory.fDeg K)
+          / (Ideal.absNorm b : ℝ)
+          * ∏ 𝔭 ∈ S, (1 - etaF K F 𝔭.1 ^ finrank K V *
+              (Ideal.absNorm 𝔭.1 : ℝ) ^ (-(finrank K V : ℤ)))⁻¹)) := by
   choose C hC using fun 𝔭 : {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal} =>
     exists_abs_alphaN_le hK hF hs hd hL hLi hm 𝔭.2
-  have key := BoxSum.tendsto_sum_of_mean hK hF (m := finrank K V) (by omega) S
-    (fun 𝔭 n => alphaN h L 𝔭.1 n) C (fun 𝔭 => 2 * vd h L 𝔭.1 + 2) (fun 𝔭 _ n => hC 𝔭 n)
-    (fun 𝔭 _ n n' k hn hk hc => alphaN_congr hK hF hs hd hL hLi 𝔭.2 hn (by omega) hc)
-    (fun 𝔭 _ => tendsto_mean_alphaN hK hF hs hd hL hLi hm 𝔭.2) hb hbS
-  refine (key.mul_const (∏ 𝔭 ∈ S, (1 - etaF K F 𝔭.1 ^ finrank K V *
-            (Ideal.absNorm 𝔭.1 : ℝ) ^ (-(finrank K V : ℤ)))⁻¹)).congr fun j => ?_
+  have key :=
+    BoxSum.tendsto_sum_of_mean hK hF (m := finrank K V) (by omega) S
+      (fun 𝔭 n => alphaN h L 𝔭.1 n)
+      C
+      (fun 𝔭 => 2 * vd h L 𝔭.1 + 2)
+      (fun 𝔭 _ n => hC 𝔭 n)
+      (fun 𝔭 _ n n' k hn hk hc => alphaN_congr hK hF hs hd hL hLi 𝔭.2 hn (by omega) hc)
+      (fun 𝔭 _ => tendsto_mean_alphaN hK hF hs hd hL hLi hm 𝔭.2)
+      hb hbS
+  refine (key.mul_const
+    (∏ 𝔭 ∈ S, (1 - etaF K F 𝔭.1 ^ finrank K V *
+      (Ideal.absNorm 𝔭.1 : ℝ) ^ (-(finrank K V : ℤ)))⁻¹)).congr fun j => ?_
   rw [mul_assoc, finsum_mem_mul]
   congr 1
   refine finsum_mem_congr rfl fun n _ => ?_

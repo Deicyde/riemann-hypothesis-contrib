@@ -28,7 +28,9 @@ theorem plusEtale : PlusEtale := by
   refine ⟨etale_of_isReduced _, ?_, hbij⟩
   have hdim := (AlgEquiv.ofBijective _ hbij).toLinearEquiv.finrank_eq
   rw [Module.finrank_tensorProduct, hreg.quad.finrank_eq,
-    ← Module.finrank_mul_finrank F E (genAlg (γ : Matrix n n E)), hreg.quad.finrank_eq, Module.finrank_eq_card_basis b] at hdim
+      ← Module.finrank_mul_finrank F E (genAlg (γ : Matrix n n E)), hreg.quad.finrank_eq,
+      Module.finrank_eq_card_basis b]
+    at hdim
   have hr : Module.finrank F (plusAlg σ J (γ : Matrix n n E)) = Fintype.card n := by omega
   exact ⟨(Module.finBasisOfFinrankEq F _ hr).reindex (Fintype.equivFin n).symm⟩
 

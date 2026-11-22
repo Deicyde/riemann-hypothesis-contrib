@@ -11,14 +11,24 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Unitary
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys Formalism.MainNotions.ArithmeticCylinders
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec
+  GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys Formalism.MainNotions.ArithmeticCylinders
 attribute [local instance] GlobalTheory.TypeRec.factG GlobalTheory.LabPin.instCM
 open GlobalTheory.LabPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory
 
-theorem indep_subfamily_of_disjoint_or_le : ∀ (ι M : Type) [AddCommGroup M] [Module ℂ M] (N : ι → Submodule ℂ M), (∀ i (J : Finset ι), Disjoint (N i) (⨆ j ∈ J, N j) ∨ N i ≤ ⨆ j ∈ J, N j) → ∀ F : Finset ι, ∃ J ⊆ F, (⨆ j ∈ J, N j) = (⨆ j ∈ F, N j) ∧ ∀ f f' : ι → M, (∀ j ∈ J, f j ∈ N j) → (∀ j ∈ J, f' j ∈ N j) → ∑ j ∈ J, f j = ∑ j ∈ J, f' j → ∀ j ∈ J, f j = f' j := by
+theorem indep_subfamily_of_disjoint_or_le
+    : ∀ (ι M : Type) [AddCommGroup M] [Module ℂ M] (N : ι → Submodule ℂ M),
+      (∀ i (J : Finset ι), Disjoint (N i) (⨆ j ∈ J, N j) ∨ N i ≤ ⨆ j ∈ J, N j)
+        → ∀ F : Finset ι, ∃ J ⊆ F,
+          (⨆ j ∈ J, N j) = (⨆ j ∈ F, N j)
+            ∧ ∀ f f' : ι → M,
+              (∀ j ∈ J, f j ∈ N j) → (∀ j ∈ J, f' j ∈ N j) → ∑ j ∈ J, f j = ∑ j ∈ J, f' j
+                → ∀ j ∈ J, f j = f' j := by
   intro ι M _ _ N h F
   classical
   refine Finset.induction_on F ?_ ?_
@@ -34,8 +44,11 @@ theorem indep_subfamily_of_disjoint_or_le : ∀ (ι M : Type) [AddCommGroup M] [
         have hdiff : f i - f' i = ∑ j ∈ J, f' j - ∑ j ∈ J, f j := by
           rw [sub_eq_sub_iff_add_eq_add, hsum, add_comm]
         have hmem : f i - f' i ∈ N i ⊓ ⨆ j ∈ J, N j := by
-          refine ⟨Submodule.sub_mem _ (hf i (Finset.mem_insert_self _ _))
-            (hf' i (Finset.mem_insert_self _ _)), ?_⟩
+          refine ⟨
+            Submodule.sub_mem _ (hf i (Finset.mem_insert_self _ _))
+              (hf' i (Finset.mem_insert_self _ _)),
+            ?_
+          ⟩
           rw [hdiff]
           exact Submodule.sub_mem _
             (Submodule.sum_mem_biSup fun j hj => hf' j (Finset.mem_insert_of_mem hj))
@@ -46,8 +59,10 @@ theorem indep_subfamily_of_disjoint_or_le : ∀ (ι M : Type) [AddCommGroup M] [
         intro j hj
         rcases Finset.mem_insert.mp hj with rfl | hj
         · exact hmem
-        · exact huniq f f' (fun k hk => hf k (Finset.mem_insert_of_mem hk))
-            (fun k hk => hf' k (Finset.mem_insert_of_mem hk)) hJs j hj
+        · exact huniq f f'
+            (fun k hk => hf k (Finset.mem_insert_of_mem hk))
+            (fun k hk => hf' k (Finset.mem_insert_of_mem hk))
+            hJs j hj
     · refine ⟨J, hJF.trans (Finset.subset_insert _ _), ?_, huniq⟩
       rw [Finset.iSup_insert, ← hJsup]
       exact (sup_eq_right.mpr hle).symm

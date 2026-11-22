@@ -11,8 +11,10 @@ noncomputable section
 
 namespace GlobalTheory.UPel.HT
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 variable {p : ℕ} [Fact p.Prime]
 
@@ -34,18 +36,19 @@ section Tate
 
 variable {k : Type} [Field k] {Q : Type} [Group Q] {act : D.O → Q → Q} {e : ℕ → Q → Q → kˣ → Prop}
 
-theorem TateIsoO.ev_nsmul_self (I : TateIsoO D k Q act e) {n : ℕ} (hn : 0 < n) (hc : n.Coprime p) (z : D.La) :
-    I.ev n (n • z) = 1 :=
+theorem TateIsoO.ev_nsmul_self
+    (I : TateIsoO D k Q act e) {n : ℕ} (hn : 0 < n) (hc : n.Coprime p) (z : D.La)
+    : I.ev n (n • z) = 1 :=
   (I.ker n hn hc _).2 ⟨z, rfl⟩
 
-theorem TateIsoO.ev_add_nsmul (I : TateIsoO D k Q act e) {n : ℕ} (hn : 0 < n) (hc : n.Coprime p) (x z : D.La) :
-    I.ev n (x + n • z) = I.ev n x := by
+theorem TateIsoO.ev_add_nsmul
+    (I : TateIsoO D k Q act e) {n : ℕ} (hn : 0 < n) (hc : n.Coprime p) (x z : D.La)
+    : I.ev n (x + n • z) = I.ev n x := by
   rw [I.add, I.ev_nsmul_self hn hc, _root_.mul_one]
 
 end Tate
 
 variable {R : Type} [CommRing R]
-
 
 variable (D K) in
 def multSub : AddSubgroup D.La where
@@ -58,9 +61,7 @@ def multSub : AddSubgroup D.La where
     rintro _ ⟨a, rfl⟩
     exact ⟨-a, (smul_neg _ _).symm⟩
 
-
 variable (D K) in
 abbrev LQ := D.La ⧸ multSub D K
-
 
 end GlobalTheory.UPel.HT

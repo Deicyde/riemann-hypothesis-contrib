@@ -24,8 +24,13 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsSelf
 @[expose] public section
 
 noncomputable section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SeeSaw GlobalTheory.LocMod ValuativeRel Filter
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain
+  NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SeeSaw
+  GlobalTheory.LocMod ValuativeRel Filter
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -37,11 +42,14 @@ open GlobalTheory.SymBridge (IsOrd zPos xPos IsCompl)
 open GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum (IsUnif)
 
 section Place
-variable {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (q : SplitPt D k)
+variable
+  {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  (q : SplitPt D k)
 
-theorem int_dense {PP : Formalism.L2.DIV.Pl D.host.E} (h : IsIdemAt q.e PP) :
-    (∀ a, (ofSplit q).pr a ∈ 𝒪[k] ↔ IntAt PP a) ∧ DenseRange (ofSplit q).pr := by
-  obtain ⟨k₀, _, _, _, _, q₀, he, -, hi, hd⟩ := GlobalTheory.LocMod.SplitCompl.exists_place D PP q.e h
+theorem int_dense {PP : Formalism.L2.DIV.Pl D.host.E} (h : IsIdemAt q.e PP)
+    : (∀ a, (ofSplit q).pr a ∈ 𝒪[k] ↔ IntAt PP a) ∧ DenseRange (ofSplit q).pr := by
+  obtain ⟨k₀, _, _, _, _, q₀, he, -, hi, hd⟩ :=
+    GlobalTheory.LocMod.SplitCompl.exists_place D PP q.e h
   have pe : ∀ x, q.pr (q.e * x) = q.pr x := fun x => by rw [← q.sec_pr, q.pr_sec]
   refine ⟨fun a => ?_, ?_⟩
   · rw [← hi, q.int_iff, q₀.int_iff]
@@ -63,10 +71,11 @@ theorem xi_unit (hu : q.UnitAA) : valuation k (ofSplit q).xi = 1 := by
   rw [map_mul, q.pr_sec, mul_one] at h3 h4
   change valuation k ((q.pr.comp (incA D)) _) ≤ 1 at h4
   rw [map_inv₀, map_inv₀] at h4
-  exact le_antisymm h3 ((inv_le_one₀ (zero_lt_iff.2 ((map_ne_zero _).2 (Witness.xi_ne (ofSplit q))))).1 h4)
+  exact le_antisymm h3
+    ((inv_le_one₀ (zero_lt_iff.2 ((map_ne_zero _).2 (Witness.xi_ne (ofSplit q))))).1 h4)
 
-theorem exists_char (hu : q.UnitAA) {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) :
-    ∃ ψk, (ofSplit q).IsChar ψ ψk ∧ HasConductor ψk 1 := by
+theorem exists_char (hu : q.UnitAA) {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1))
+    : ∃ ψk, (ofSplit q).IsChar ψ ψk ∧ HasConductor ψk 1 := by
   obtain ⟨⟨ψk, hk⟩, -⟩ := GlobalTheory.LocChar.weil_char_split D k (ofSplit q) ψ hψ
   have hx := Witness.xi_ne (ofSplit q)
   have hv := xi_unit q hu
@@ -94,13 +103,18 @@ end Rat
 variable {D : D7}
 
 section Loc
-open GlobalTheory.Fam Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.MainNotions
+open GlobalTheory.Fam Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.MainNotions
 
-variable {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 T : Type} {A : Formalism.L2.DIV.FamIn D.what₂.LL Γ Pl0 T D.R.m} {Ks : Type} [Field Ks]
-  [NumberField Ks] [Algebra Ks D.what₂.LL] (R : Links.RealDat D A Ks) (P : Formalism.L2.DIV.LevelP R.Pg D.R.r ℂ) (u : D.what₂.Word)
-  {a : XGeo D} {y : YRat a} (m : YMeas y) (b : ∀ j, GA D (Yc D j)) (v : VCom (commOf R u (mkGeo m b)))
+variable
+  {Γ : Type} [Group Γ] [Fintype Γ]
+  {Pl0 T : Type} {A : Formalism.L2.DIV.FamIn D.what₂.LL Γ Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+  (R : Links.RealDat D A Ks) (P : Formalism.L2.DIV.LevelP R.Pg D.R.r ℂ)
+  (u : D.what₂.Word)
+  {a : XGeo D} {y : YRat a} (m : YMeas y)
+  (b : ∀ j, GA D (Yc D j)) (v : VCom (commOf R u (mkGeo m b)))
   {PP : Formalism.L2.DIV.Pl D.host.E} (l : LocX a R.βX PP)
-
 
 end Loc
 

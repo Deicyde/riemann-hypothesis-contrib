@@ -26,19 +26,23 @@ abbrev DehomRing (i : (k : K) → ι k) := MvPolynomial (Σ k, ι k) ℂ ⧸ deh
 def dehom (i : (k : K) → ι k) : MvPolynomial (Σ k, ι k) ℂ →ₐ[ℂ] DehomRing i :=
   Ideal.Quotient.mkₐ ℂ (dehomIdeal i)
 
-def coneUnit (i : (k : K) → ι k) : MvPolynomial (Σ k, ι k) ℂ :=
-  ∏ k, X ⟨k, i k⟩
+def coneUnit (i : (k : K) → ι k) : MvPolynomial (Σ k, ι k) ℂ := ∏ k, X ⟨k, i k⟩
 
 abbrev ConeRing (i : (k : K) → ι k) := Localization.Away (coneUnit i)
 
-theorem isUnit_coneX (i : (k : K) → ι k) (k : K) :
-    IsUnit (algebraMap (MvPolynomial (Σ k, ι k) ℂ) (ConeRing i) (X ⟨k, i k⟩)) :=
-  isUnit_of_dvd_unit (map_dvd _ (Finset.dvd_prod_of_mem (fun k => (X ⟨k, i k⟩ : MvPolynomial (Σ k, ι k) ℂ))
-    (Finset.mem_univ k))) (IsLocalization.Away.algebraMap_isUnit (coneUnit i))
+theorem isUnit_coneX (i : (k : K) → ι k) (k : K)
+    : IsUnit (algebraMap (MvPolynomial (Σ k, ι k) ℂ) (ConeRing i) (X ⟨k, i k⟩)) :=
+  isUnit_of_dvd_unit
+    (map_dvd _
+      (Finset.dvd_prod_of_mem
+        (fun k => (X ⟨k, i k⟩ : MvPolynomial (Σ k, ι k) ℂ))
+        (Finset.mem_univ k)))
+    (IsLocalization.Away.algebraMap_isUnit (coneUnit i))
 
 def coneRatio (i : (k : K) → ι k) : MvPolynomial (Σ k, ι k) ℂ →ₐ[ℂ] ConeRing i :=
-  aeval fun p => (((isUnit_coneX i p.1).unit⁻¹ : (ConeRing i)ˣ) : ConeRing i) *
-    algebraMap (MvPolynomial (Σ k, ι k) ℂ) (ConeRing i) (X p)
+  aeval fun p =>
+    (((isUnit_coneX i p.1).unit⁻¹ : (ConeRing i)ˣ) : ConeRing i)
+      * algebraMap (MvPolynomial (Σ k, ι k) ℂ) (ConeRing i) (X p)
 
 theorem coneRatio_X_self (i : (k : K) → ι k) (k : K) : coneRatio i (X ⟨k, i k⟩) = 1 := by
   rw [coneRatio, aeval_X]
@@ -46,14 +50,15 @@ theorem coneRatio_X_self (i : (k : K) → ι k) (k : K) : coneRatio i (X ⟨k, i
 
 def ratioMap (i : (k : K) → ι k) : DehomRing i →+* ConeRing i :=
   Ideal.Quotient.lift (dehomIdeal i) (coneRatio i : MvPolynomial (Σ k, ι k) ℂ →+* ConeRing i) (by
-    have hle : dehomIdeal i ≤ RingHom.ker (coneRatio i : MvPolynomial (Σ k, ι k) ℂ →+* ConeRing i) := by
+    have hle
+        : dehomIdeal i ≤ RingHom.ker (coneRatio i : MvPolynomial (Σ k, ι k) ℂ →+* ConeRing i) := by
       rw [dehomIdeal, Ideal.span_le]
       rintro _ ⟨k, rfl⟩
       simp [coneRatio_X_self]
     exact fun a ha => hle ha)
 
-theorem ratioMap_dehom (i : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ) :
-    ratioMap i (dehom i f) = coneRatio i f :=
+theorem ratioMap_dehom (i : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ)
+    : ratioMap i (dehom i f) = coneRatio i f :=
   Ideal.Quotient.lift_mk _ _ _
 
 omit [Fintype K] in
@@ -73,30 +78,34 @@ def evalOne (i : (k : K) → ι k) : ConeRing i →+* DehomRing i :=
   IsLocalization.Away.lift (coneUnit i) (g := (dehom i : MvPolynomial (Σ k, ι k) ℂ →+* DehomRing i))
     (by rw [AlgHom.coe_toRingHom, dehom_coneUnit]; exact isUnit_one)
 
-theorem evalOne_algebraMap (i : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ) :
-    evalOne i (algebraMap _ (ConeRing i) f) = dehom i f :=
+theorem evalOne_algebraMap (i : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ)
+    : evalOne i (algebraMap _ (ConeRing i) f) = dehom i f :=
   IsLocalization.lift_eq _ _
 
-theorem evalOne_comp_algebraMap (i : (k : K) → ι k) :
-    (evalOne i).comp (algebraMap _ (ConeRing i)) = (dehom i : MvPolynomial (Σ k, ι k) ℂ →+* DehomRing i) :=
+theorem evalOne_comp_algebraMap (i : (k : K) → ι k)
+    : (evalOne i).comp (algebraMap _ (ConeRing i))
+      = (dehom i : MvPolynomial (Σ k, ι k) ℂ →+* DehomRing i) :=
   RingHom.ext (evalOne_algebraMap i)
 
-theorem evalOne_comp_ratioMap (i : (k : K) → ι k) : (evalOne i).comp (ratioMap i) = RingHom.id _ := by
+theorem evalOne_comp_ratioMap (i : (k : K) → ι k)
+    : (evalOne i).comp (ratioMap i) = RingHom.id _ := by
   apply Ideal.Quotient.ringHom_ext
   apply MvPolynomial.ringHom_ext
   · intro c
     simp only [RingHom.comp_apply, RingHom.id_apply]
-    have h1 : ratioMap i (Ideal.Quotient.mk (dehomIdeal i) (C c)) =
-        algebraMap (MvPolynomial (Σ k, ι k) ℂ) (ConeRing i) (C c) := by
-      rw [show Ideal.Quotient.mk (dehomIdeal i) (C c) = dehom i (C c) from rfl, ratioMap_dehom, coneRatio,
-        aeval_C, IsScalarTower.algebraMap_apply ℂ (MvPolynomial (Σ k, ι k) ℂ) (ConeRing i),
+    have h1
+        : ratioMap i (Ideal.Quotient.mk (dehomIdeal i) (C c))
+          = algebraMap (MvPolynomial (Σ k, ι k) ℂ) (ConeRing i) (C c) := by
+      rw [show Ideal.Quotient.mk (dehomIdeal i) (C c) = dehom i (C c) from rfl, ratioMap_dehom,
+        coneRatio, aeval_C,
+        IsScalarTower.algebraMap_apply ℂ (MvPolynomial (Σ k, ι k) ℂ) (ConeRing i),
         MvPolynomial.algebraMap_eq]
     rw [h1, evalOne_algebraMap]
     rfl
   · intro p
     simp only [RingHom.comp_apply, RingHom.id_apply]
-    rw [show Ideal.Quotient.mk (dehomIdeal i) (X p) = dehom i (X p) from rfl, ratioMap_dehom, coneRatio, aeval_X,
-      map_mul, evalOne_algebraMap]
+    rw [show Ideal.Quotient.mk (dehomIdeal i) (X p) = dehom i (X p) from rfl, ratioMap_dehom,
+      coneRatio, aeval_X, map_mul, evalOne_algebraMap]
     have hu : evalOne i (((isUnit_coneX i p.1).unit : (ConeRing i)ˣ) : ConeRing i) = 1 := by
       rw [IsUnit.unit_spec, evalOne_algebraMap, dehom_X_self]
     have hinv : evalOne i (((isUnit_coneX i p.1).unit⁻¹ : (ConeRing i)ˣ) : ConeRing i) = 1 := by
@@ -109,12 +118,13 @@ theorem evalOne_ratioMap (i : (k : K) → ι k) (g : DehomRing i) : evalOne i (r
 
 variable [DecidableEq K]
 
-def segreDehom {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k) :
-    MvPolynomial (Fin m) ℂ →ₐ[ℂ] DehomRing i :=
+def segreDehom {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
+    : MvPolynomial (Fin m) ℂ →ₐ[ℂ] DehomRing i :=
   aeval fun a => dehom i (∏ k, X ⟨k, σ a k⟩)
 
-theorem segreDehom_chartSubst {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
-    (f : MvPolynomial (Σ k, ι k) ℂ) : segreDehom σ i (chartSubst σ i f) = dehom i f := by
+theorem segreDehom_chartSubst
+    {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ)
+    : segreDehom σ i (chartSubst σ i f) = dehom i f := by
   have h : (segreDehom σ i).comp (chartSubst σ i) = dehom i := by
     apply MvPolynomial.algHom_ext
     intro p
@@ -127,8 +137,8 @@ theorem segreDehom_chartSubst {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i :
       exact absurd (Finset.mem_univ _) h
   exact AlgHom.congr_fun h f
 
-theorem segreDehom_surjective {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k) :
-    Function.Surjective (segreDehom σ i) := fun g => by
+theorem segreDehom_surjective {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
+    : Function.Surjective (segreDehom σ i) := fun g => by
   obtain ⟨f, rfl⟩ := dehom_surjective i g
   exact ⟨chartSubst σ i f, segreDehom_chartSubst σ i f⟩
 

@@ -13,8 +13,9 @@ namespace GlobalTheory.NormDivisibility
 
 open NumberField IsDedekindDomain
 
-theorem natCast_eq_zero_of_dvd_card {R : Type*} [CommRing R] [IsDomain R] [Finite R] {l : ℕ}
-    (hl : l.Prime) (h : l ∣ Nat.card R) : (l : R) = 0 := by
+theorem natCast_eq_zero_of_dvd_card
+    {R : Type*} [CommRing R] [IsDomain R] [Finite R] {l : ℕ} (hl : l.Prime) (h : l ∣ Nat.card R)
+    : (l : R) = 0 := by
   classical
   have := Fintype.ofFinite R
   let _ : Field R := Fintype.fieldOfDomain R
@@ -24,11 +25,14 @@ theorem natCast_eq_zero_of_dvd_card {R : Type*} [CommRing R] [IsDomain R] [Finit
   rw [(Nat.prime_dvd_prime_iff_eq hl hp).mp (hl.dvd_of_dvd_pow h)]
   exact ringChar.Nat.cast_ringChar
 
-theorem not_dvd_norm_of_not_mem {E : Type} [Field E] [NumberField E] {l : ℕ} (hl : Nat.Prime l)
-    (w : HeightOneSpectrum (RingOfIntegers E))
-    (hw : (l : RingOfIntegers E) ∉ w.asIdeal) : ¬ l ∣ Formalism.ConjugateSelfDual.normV w := by
+theorem not_dvd_norm_of_not_mem
+    {E : Type} [Field E] [NumberField E]
+    {l : ℕ} (hl : Nat.Prime l)
+    (w : HeightOneSpectrum (RingOfIntegers E)) (hw : (l : RingOfIntegers E) ∉ w.asIdeal)
+    : ¬ l ∣ Formalism.ConjugateSelfDual.normV w := by
   intro h
-  have : Finite (RingOfIntegers E ⧸ w.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot w.asIdeal w.ne_bot
+  have : Finite (RingOfIntegers E ⧸ w.asIdeal) :=
+    Ideal.finiteQuotientOfFreeOfNeBot w.asIdeal w.ne_bot
   unfold Formalism.ConjugateSelfDual.normV at h
   have h0 := natCast_eq_zero_of_dvd_card (R := RingOfIntegers E ⧸ w.asIdeal) hl h
   apply hw

@@ -12,13 +12,15 @@ open scoped ComplexOrder
 namespace GlobalTheory.SgLoc.TriShift
 
 section General
-variable {G : Type} [AddGroup G] [MeasurableSpace G] [MeasurableAdd₂ G]
+variable
+  {G : Type} [AddGroup G] [MeasurableSpace G] [MeasurableAdd₂ G]
   (μ : Measure G) [SigmaFinite μ] [μ.IsAddRightInvariant]
   {ι : Type} [Fintype ι]
 
 open ValuativeRel MeasureTheory ComplexConjugate in
 open scoped ComplexOrder in
-variable {G : Type} [AddGroup G] [MeasurableSpace G] [MeasurableAdd₂ G]
+variable
+  {G : Type} [AddGroup G] [MeasurableSpace G] [MeasurableAdd₂ G]
   (μ : Measure G) [SigmaFinite μ] [μ.IsAddRightInvariant]
   {ι : Type} [Fintype ι] in
 private lemma measurePreserving_update_add_of_indep [DecidableEq ι] (i : ι)
@@ -51,21 +53,22 @@ private lemma measurePreserving_update_add_of_indep [DecidableEq ι] (i : ι)
     exact hgi _ _ fun k hk => by simp [hk]
   · simp [e, c, p, hj]
 
-
 open ValuativeRel MeasureTheory ComplexConjugate in
 open scoped ComplexOrder in
-variable {G : Type} [AddGroup G] [MeasurableSpace G] [MeasurableAdd₂ G]
+variable
+  {G : Type} [AddGroup G] [MeasurableSpace G] [MeasurableAdd₂ G]
   (μ : Measure G) [SigmaFinite μ] [μ.IsAddRightInvariant]
   {ι : Type} [Fintype ι] in
-theorem _root_.GlobalTheory.SgLoc.TriShift.measurePreserving_triangular (rk : ι → ℕ) (f : ι → (ι → G) → G)
-    (hf : ∀ i, Measurable (f i))
-    (hd : ∀ i x y, (∀ j, rk j < rk i → x j = y j) → f i x = f i y) :
-    MeasurePreserving (fun (x : ι → G) i => x i + f i x) (Measure.pi fun _ : ι => μ)
-      (Measure.pi fun _ : ι => μ) := by
+theorem _root_.GlobalTheory.SgLoc.TriShift.measurePreserving_triangular
+    (rk : ι → ℕ) (f : ι → (ι → G) → G)
+    (hf : ∀ i, Measurable (f i)) (hd : ∀ i x y, (∀ j, rk j < rk i → x j = y j) → f i x = f i y)
+    : MeasurePreserving
+      (fun (x : ι → G) i => x i + f i x)
+      (Measure.pi fun _ : ι => μ) (Measure.pi fun _ : ι => μ) := by
   classical
   let Φ : Finset ι → (ι → G) → ι → G := fun s x j => if j ∈ s then x j + f j x else x j
-  have hΦ : ∀ s, MeasurePreserving (Φ s) (Measure.pi fun _ : ι => μ)
-      (Measure.pi fun _ : ι => μ) := by
+  have hΦ
+      : ∀ s, MeasurePreserving (Φ s) (Measure.pi fun _ : ι => μ) (Measure.pi fun _ : ι => μ) := by
     intro s
     induction s using Finset.induction_on_max_value rk with
     | empty =>
@@ -73,8 +76,9 @@ theorem _root_.GlobalTheory.SgLoc.TriShift.measurePreserving_triangular (rk : ι
       funext x j
       simp [Φ]
     | insert a s ha hmax ih =>
-      have hstep := measurePreserving_update_add_of_indep μ a (f a) (hf a)
-        fun x y hxy => hd a x y fun j hj => hxy j (by rintro rfl; exact lt_irrefl _ hj)
+      have hstep :=
+        measurePreserving_update_add_of_indep μ a (f a) (hf a) fun x y hxy =>
+          hd a x y fun j hj => hxy j (by rintro rfl; exact lt_irrefl _ hj)
       convert ih.comp hstep using 1
       funext x j
       by_cases hja : j = a

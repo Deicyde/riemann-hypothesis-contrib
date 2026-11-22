@@ -18,8 +18,10 @@ variable {n : ℕ} {F : Type} [Field F]
 def Pat (S : Finset (Fin n × Fin n)) (A : Matrix (Fin n) (Fin n) F) : Prop :=
   ∀ i j, (i, j) ∉ S → A i j = if i = j then 1 else 0
 
-theorem pat_det (S : Finset (Fin n × Fin n)) (hS : ∀ p ∈ S, p.1 < p.2) (A : Matrix (Fin n) (Fin n) F)
-    (h : Pat S A) : A.det = 1 := by
+theorem pat_det
+    (S : Finset (Fin n × Fin n)) (hS : ∀ p ∈ S, p.1 < p.2)
+    (A : Matrix (Fin n) (Fin n) F) (h : Pat S A)
+    : A.det = 1 := by
   have ht : A.BlockTriangular id := by
     intro i j hij
     have hn : (i, j) ∉ S := fun hm => absurd (hS _ hm) (not_lt.mpr (le_of_lt hij))
@@ -31,16 +33,25 @@ theorem pat_det (S : Finset (Fin n × Fin n)) (hS : ∀ p ∈ S, p.1 < p.2) (A :
   rw [h i i hn, if_pos rfl]
 
 def patMat (S : Finset (Fin n × Fin n)) (φ : S → F) : Matrix (Fin n) (Fin n) F :=
-  Matrix.of fun i j => if h : (i, j) ∈ S then φ ⟨(i, j), h⟩ else if i = j then 1 else 0
+  Matrix.of fun i j =>
+    if h : (i, j) ∈ S then
+      φ ⟨(i, j), h⟩
+    else if i = j then
+      1
+    else
+      0
 
 theorem patMat_pat (S : Finset (Fin n × Fin n)) (φ : S → F) : Pat S (patMat S φ) := fun i j h => by
   simp [patMat, h]
 
-def patEquiv (S : Finset (Fin n × Fin n)) (hS : ∀ p ∈ S, p.1 < p.2) :
-    {A : GL (Fin n) F // Pat S (A : Matrix (Fin n) (Fin n) F)} ≃ (S → F) where
+def patEquiv (S : Finset (Fin n × Fin n)) (hS : ∀ p ∈ S, p.1 < p.2)
+    : {A : GL (Fin n) F // Pat S (A : Matrix (Fin n) (Fin n) F)} ≃ (S → F) where
   toFun A := fun p => (A.1 : Matrix (Fin n) (Fin n) F) p.1.1 p.1.2
-  invFun φ := ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero (patMat S φ)
-    (by rw [pat_det S hS _ (patMat_pat S φ)]; exact one_ne_zero), patMat_pat S φ⟩
+  invFun φ := ⟨
+    Matrix.GeneralLinearGroup.mkOfDetNeZero (patMat S φ)
+      (by rw [pat_det S hS _ (patMat_pat S φ)]; exact one_ne_zero),
+    patMat_pat S φ
+  ⟩
   left_inv A := by
     apply Subtype.ext
     apply Units.ext
@@ -55,9 +66,11 @@ def patEquiv (S : Finset (Fin n × Fin n)) (hS : ∀ p ∈ S, p.1 < p.2) :
     show patMat S φ i j = _
     simp [patMat, h]
 
-theorem card_pat [Finite F] (S : Finset (Fin n × Fin n)) (hS : ∀ p ∈ S, p.1 < p.2) :
-    Nat.card {A : GL (Fin n) F // Pat S (A : Matrix (Fin n) (Fin n) F)} = Nat.card F ^ S.card := by
-  rw [Nat.card_congr (patEquiv S hS), Nat.card_fun, Nat.card_eq_fintype_card (α := S), Fintype.card_coe]
+theorem card_pat [Finite F] (S : Finset (Fin n × Fin n)) (hS : ∀ p ∈ S, p.1 < p.2)
+    : Nat.card {A : GL (Fin n) F // Pat S (A : Matrix (Fin n) (Fin n) F)}
+      = Nat.card F ^ S.card := by
+  rw [Nat.card_congr (patEquiv S hS), Nat.card_fun, Nat.card_eq_fintype_card (α := S),
+    Fintype.card_coe]
 
 end Pattern
 
@@ -75,15 +88,17 @@ theorem card_upS (n : ℕ) : (upS n).card = n * (n - 1) / 2 := by
   rw [Fin.sum_univ_eq_sum_range (fun i => i) n, Finset.sum_range_id]
 
 def rowS (k rS n : ℕ) : Finset (Fin n × Fin n) :=
-  (upS n).filter fun p => ¬ (p.2.val = rS + k ∧ rS ≤ p.1.val)
+  (upS n).filter fun p => ¬(p.2.val = rS + k ∧ rS ≤ p.1.val)
 
 theorem card_rowS (k rS n : ℕ) (hn : rS + k < n) : (rowS k rS n).card + k = n * (n - 1) / 2 := by
-  have h := Finset.card_filter_add_card_filter_not (s := upS n)
-    (fun p : Fin n × Fin n => p.2.val = rS + k ∧ rS ≤ p.1.val)
+  have h :=
+    Finset.card_filter_add_card_filter_not (s := upS n)
+      (fun p : Fin n × Fin n => p.2.val = rS + k ∧ rS ≤ p.1.val)
   rw [card_upS] at h
   have hk : ((upS n).filter fun p : Fin n × Fin n => p.2.val = rS + k ∧ rS ≤ p.1.val).card = k := by
-    have : ((upS n).filter fun p : Fin n × Fin n => p.2.val = rS + k ∧ rS ≤ p.1.val) =
-        (univ : Finset (Fin k)).image fun i => ((⟨rS + i.val, by omega⟩ : Fin n), (⟨rS + k, hn⟩ : Fin n)) := by
+    have : ((upS n).filter fun p : Fin n × Fin n => p.2.val = rS + k ∧ rS ≤ p.1.val)
+        = (univ : Finset (Fin k)).image fun i =>
+          ((⟨rS + i.val, by omega⟩ : Fin n), (⟨rS + k, hn⟩ : Fin n)) := by
       ext ⟨a, b⟩
       simp only [upS, mem_filter, mem_univ, true_and, mem_image, Prod.mk.injEq]
       constructor
@@ -102,8 +117,8 @@ theorem card_rowS (k rS n : ℕ) (hn : rS + k < n) : (rowS k rS n).card + k = n 
   unfold rowS
   omega
 
-theorem isUnitri_iff {n : ℕ} {F : Type} [Field F] (A : Matrix (Fin n) (Fin n) F) :
-    StandardLattice.IsUnitri A ↔ Pat (upS n) A := by
+theorem isUnitri_iff {n : ℕ} {F : Type} [Field F] (A : Matrix (Fin n) (Fin n) F)
+    : StandardLattice.IsUnitri A ↔ Pat (upS n) A := by
   constructor
   · rintro ⟨h1, h2⟩ i j hij
     simp only [upS, mem_filter, mem_univ, true_and, not_lt] at hij
@@ -115,8 +130,8 @@ theorem isUnitri_iff {n : ℕ} {F : Type} [Field F] (A : Matrix (Fin n) (Fin n) 
     · rw [h i j (by simp [upS, le_of_lt hij]), if_neg (ne_of_gt hij)]
     · rw [h i i (by simp [upS]), if_pos rfl]
 
-theorem isRowLev_iff {n : ℕ} {F : Type} [Field F] (k rS : ℕ) (A : Matrix (Fin n) (Fin n) F) :
-    StandardLattice.IsRowLev k rS A ↔ Pat (rowS k rS n) A := by
+theorem isRowLev_iff {n : ℕ} {F : Type} [Field F] (k rS : ℕ) (A : Matrix (Fin n) (Fin n) F)
+    : StandardLattice.IsRowLev k rS A ↔ Pat (rowS k rS n) A := by
   constructor
   · rintro ⟨h1, h2, h3, h4⟩ i j hij
     by_cases e : i = j

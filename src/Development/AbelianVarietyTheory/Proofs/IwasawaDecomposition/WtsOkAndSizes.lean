@@ -11,8 +11,8 @@ open Formalism.L2.Col
 
 namespace GlobalTheory.Mem
 
-theorem wts_ok_and_sizes :
-    ∀ (B : Base) (X : PreX B.toPre), B.wts.Ok ∧ Sizes (B.primes X) B.wts X.a :=
-  fun B X => ⟨B.wts_isOk, B.primes_sizes X⟩
+theorem wts_ok_and_sizes
+    : ∀ (B : Base) (X : PreX B.toPre), B.wts.Ok ∧ Sizes (B.primes X) B.wts X.a := fun B X =>
+  ⟨B.wts_isOk, B.primes_sizes X⟩
 
 end GlobalTheory.Mem

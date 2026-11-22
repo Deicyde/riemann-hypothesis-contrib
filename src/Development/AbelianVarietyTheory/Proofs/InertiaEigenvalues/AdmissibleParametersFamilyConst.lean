@@ -14,18 +14,25 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LogHost
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 namespace GlobalTheory.NLink
 
-theorem mul_rpow_self_le {x c C : ℝ} (hx : 1 ≤ x) (hc : c ≤ C) (hC : 0 ≤ C) :
-    c * x ^ c ≤ C * x ^ C := by
+theorem mul_rpow_self_le {x c C : ℝ} (hx : 1 ≤ x) (hc : c ≤ C) (hC : 0 ≤ C)
+    : c * x ^ c ≤ C * x ^ C := by
   have h0 : 0 ≤ x ^ c := Real.rpow_nonneg (by linarith) _
-  calc c * x ^ c ≤ C * x ^ c := mul_le_mul_of_nonneg_right hc h0
+  calc
+    c * x ^ c
+      ≤ C * x ^ c := mul_le_mul_of_nonneg_right hc h0
     _ ≤ C * x ^ C := mul_le_mul_of_nonneg_left (Real.rpow_le_rpow_of_exponent_le hx hc) hC
 
-theorem admissible_parameters_design_family : ∀ {eps : ℝ} (Fm : FamP eps), ∃ C x0 : ℝ, 1 ≤ C ∧ ∀ x ≥ x0, ∀ (hx : Fm.x1 < x)
-    (i : Fm.Ix x), TwistedPlaces.ParametersPolynomiallyBounded (Fm.L x i) C (Fm.params x hx i) := by
+theorem admissible_parameters_design_family
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ C x0 : ℝ,
+      1 ≤ C
+        ∧ ∀ x ≥ x0, ∀ (hx : Fm.x1 < x) (i : Fm.Ix x),
+          TwistedPlaces.ParametersPolynomiallyBounded (Fm.L x i) C (Fm.params x hx i) := by
   intro eps Fm
   obtain ⟨C1, y1, h1⟩ := GlobalTheory.T.log_hostClassNumber_le_scale_pow_family Fm
   obtain ⟨C2, y2, h2⟩ := GlobalTheory.T.exists_log_card_restRows_le_pow_mul_length Fm
@@ -36,11 +43,14 @@ theorem admissible_parameters_design_family : ∀ {eps : ℝ} (Fm : FamP eps), �
   have hCLw : Fm.PK.getD 7 0 ≤ C := le_trans (le_max_left _ _) (le_max_right _ _)
   have hCYL : Fm.PK.getD 19 0 ≤ C :=
     le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) (le_max_right _ _)
-  have hrest : max (9 / 2 + 10 * eps + eps / 100)
-      (max (2 + 8 * eps + eps / 100) (max (Fm.Ct + eps / 100) (max C1 C2))) ≤ C :=
+  have hrest
+      : max (9 / 2 + 10 * eps + eps / 100)
+          (max (2 + 8 * eps + eps / 100) (max (Fm.Ct + eps / 100) (max C1 C2)))
+        ≤ C :=
     le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) (le_max_right _ _)
   have hK : 9 / 2 + 10 * eps + eps / 100 ≤ C := le_trans (le_max_left _ _) hrest
-  have hN : 2 + 8 * eps + eps / 100 ≤ C := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hrest
+  have hN : 2 + 8 * eps + eps / 100 ≤ C :=
+    le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hrest
   have hT : Fm.Ct + eps / 100 ≤ C :=
     le_trans (le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) (le_max_right _ _)) hrest
   have hc12 : max C1 C2 ≤ C :=
@@ -66,9 +76,11 @@ theorem admissible_parameters_design_family : ∀ {eps : ℝ} (Fm : FamP eps), �
   unfold TwistedPlaces.ParametersPolynomiallyBounded
   refine ⟨?_, ?_, ?_, ?_, ?_, sDe2, ?_, ?_⟩
   · have e : (Fm.params x hx i).CLw = Fm.PK.getD 7 0 := by rw [← hPK]; rfl
-    rw [e]; exact hCLw
+    rw [e]
+    exact hCLw
   · have e : (Fm.params x hx i).CYL = Fm.PK.getD 19 0 := by rw [← hPK]; rfl
-    rw [e]; exact hCYL
+    rw [e]
+    exact hCYL
   · rw [hsx]; exact le_trans sK.2 (hmono _ hK)
   · rw [hsx]; exact le_trans sN.2 (hmono _ hN)
   · rw [hsx]; exact le_trans sT.2 (hmono _ hT)

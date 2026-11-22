@@ -12,8 +12,10 @@ open GlobalTheory.UnitLemma Matrix MeasureTheory
 
 namespace GlobalTheory.JR
 
-theorem Unram.mem_range_of_star_eq : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [GlobalTheory.JR.Unram F E] (y : E), star y = y → ∃ x : F, algebraMap F E x = y := by
+theorem Unram.mem_range_of_star_eq
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [GlobalTheory.JR.Unram F E] (y : E),
+      star y = y → ∃ x : F, algebraMap F E x = y := by
   intro F E _ _ _ _ h y hy
   haveI := h.charZero
   haveI : CharZero E := charZero_of_injective_algebraMap (algebraMap F E).injective

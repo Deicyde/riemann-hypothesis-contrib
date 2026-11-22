@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.HomExtO
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open ReciprocityTheory.ChartRestriction.G GlobalTheory.Points
 open Classical
 
@@ -18,8 +19,8 @@ variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
 def constHom (M : RatModel o Ω) (U : M.Z.Opens) : o →+* Γ(M.Z, U) :=
   (M.s.appLE ⊤ U (fun _ _ => trivial)).hom.comp (Scheme.ΓSpecIso (CommRingCat.of o)).inv.hom
 
-theorem finiteType_constHom (M : RatModel o Ω) {U : M.Z.Opens} (hU : IsAffineOpen U) :
-    (M.constHom U).FiniteType := by
+theorem finiteType_constHom (M : RatModel o Ω) {U : M.Z.Opens} (hU : IsAffineOpen U)
+    : (M.constHom U).FiniteType := by
   have := M.lft
   have h1 : (M.s.appLE ⊤ U (fun _ _ => trivial)).hom.FiniteType :=
     M.s.finiteType_appLE (isAffineOpen_top _) hU _
@@ -30,16 +31,20 @@ theorem finiteType_constHom (M : RatModel o Ω) {U : M.Z.Opens} (hU : IsAffineOp
 
 variable {Ω' : Type} [Field Ω'] [Algebra o Ω']
 
-theorem exists_nbhd_of_map_O (M : RatModel o Ω) (M' : RatModel o Ω') (φ : Ω →ₐ[o] Ω') {z' : M'.Z} {z : M.Z}
-    (hz : ∀ a ∈ M.O z, φ a ∈ M'.O z') :
-    ∃ (V : M'.Z.Opens) (U : M.Z.Opens), z' ∈ V ∧ IsAffineOpen U ∧ (U : Set M.Z).Nonempty ∧
-      ∀ x ∈ M.ringOn U, φ x ∈ M'.ringOn V := by
-  obtain ⟨U, hU, hzU, -⟩ := exists_isAffineOpen_mem_and_subset (U := (⊤ : M.Z.Opens)) (x := z) trivial
+theorem exists_nbhd_of_map_O
+    (M : RatModel o Ω) (M' : RatModel o Ω') (φ : Ω →ₐ[o] Ω')
+    {z' : M'.Z} {z : M.Z} (hz : ∀ a ∈ M.O z, φ a ∈ M'.O z')
+    : ∃ (V : M'.Z.Opens) (U : M.Z.Opens),
+      z' ∈ V ∧ IsAffineOpen U ∧ (U : Set M.Z).Nonempty ∧ ∀ x ∈ M.ringOn U, φ x ∈ M'.ringOn V := by
+  obtain ⟨U, hU, hzU, -⟩ :=
+    exists_isAffineOpen_mem_and_subset (U := (⊤ : M.Z.Opens)) (x := z) trivial
   have hUne : (U : Set M.Z).Nonempty := ⟨z, hzU⟩
   letI := (M.constHom U).toAlgebra
   obtain ⟨s, hs⟩ := (M.finiteType_constHom hU).out
-  let V : M'.Z.Opens := ⟨⋂ f ∈ s, {w | φ (valF M.pt U f) ∈ M'.O w},
-    isOpen_biInter_finset fun f _ => M'.isOpen_setOf_mem_O _⟩
+  let V : M'.Z.Opens := ⟨
+    ⋂ f ∈ s, {w | φ (valF M.pt U f) ∈ M'.O w},
+    isOpen_biInter_finset fun f _ => M'.isOpen_setOf_mem_O _
+  ⟩
   have hzV : z' ∈ V := Set.mem_iInter₂.2 fun f _ => hz _ (valF_mem_O hzU f)
   have hsV : ∀ f ∈ s, φ (valF M.pt U f) ∈ M'.ringOn V := fun f hf =>
     mem_ringOn.2 fun w hw => Set.mem_iInter₂.1 hw f hf
@@ -62,10 +67,10 @@ theorem exists_nbhd_of_map_O (M : RatModel o Ω) (M' : RatModel o Ω') (φ : Ω 
   obtain ⟨f, rfl⟩ := (mem_ringOn_iff_exists hUne).1 hx
   exact key f
 
-theorem exists_isHom_of_map_O :
-    ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (Ω' : Type) [Field Ω'] [Algebra o Ω']
-      (M' : RatModel o Ω') (φ : Ω →ₐ[o] Ω'), (∀ z' : M'.Z, ∃ z : M.Z, ∀ a ∈ M.O z, φ a ∈ M'.O z') →
-        ∃ f : M'.Z ⟶ M.Z, M.IsHom M' φ f := by
+theorem exists_isHom_of_map_O
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (Ω' : Type) [Field Ω']
+        [Algebra o Ω'] (M' : RatModel o Ω') (φ : Ω →ₐ[o] Ω'),
+      (∀ z' : M'.Z, ∃ z : M.Z, ∀ a ∈ M.O z, φ a ∈ M'.O z') → ∃ f : M'.Z ⟶ M.Z, M.IsHom M' φ f := by
   intro o Ω _ _ _ M Ω' _ _ M' φ h
   refine exists_isHom_of_local fun z' => ?_
   obtain ⟨z, hz⟩ := h z'

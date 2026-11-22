@@ -19,36 +19,43 @@ def Pm (φ : K → ℂ) (y : K) : Module.End ℂ (A → ℂ) where
   map_add' Φ Ψ := by funext x; simp [mul_add]
   map_smul' c Φ := by funext x; simp [mul_left_comm]
 
-theorem Pm_apply (φ : K → ℂ) (y : K) (Φ : A → ℂ) (x : A) : Pm ev ι φ y Φ x = φ (ev x) * Φ (put ev ι x y) := rfl
+theorem Pm_apply (φ : K → ℂ) (y : K) (Φ : A → ℂ) (x : A)
+    : Pm ev ι φ y Φ x = φ (ev x) * Φ (put ev ι x y) :=
+  rfl
 
-theorem put_self (x : A) : put ev ι x (ev x) = x := by
-  simp [put]
+theorem put_self (x : A) : put ev ι x (ev x) = x := by simp [put]
 
 variable {ev ι}
 
-theorem ev_put (h : ∀ y, ev (ι y) = y) (x : A) (y : K) : ev (put ev ι x y) = y := by
-  simp [put, h]
+theorem ev_put (h : ∀ y, ev (ι y) = y) (x : A) (y : K) : ev (put ev ι x y) = y := by simp [put, h]
 
-theorem put_put (h : ∀ y, ev (ι y) = y) (x : A) (y z : K) : put ev ι (put ev ι x y) z = put ev ι x z := by
+theorem put_put (h : ∀ y, ev (ι y) = y) (x : A) (y z : K)
+    : put ev ι (put ev ι x y) z = put ev ι x z := by
   simp only [put, map_add (f := _), map_sub, h, sub_self, zero_add]
   abel
 
-theorem Pm_Pm (h : ∀ y, ev (ι y) = y) (φ φ₁ : K → ℂ) (a y : K) (Φ : A → ℂ) :
-    Pm ev ι φ a (Pm ev ι φ₁ y Φ) = φ₁ a • Pm ev ι φ y Φ := by
+theorem Pm_Pm (h : ∀ y, ev (ι y) = y) (φ φ₁ : K → ℂ) (a y : K) (Φ : A → ℂ)
+    : Pm ev ι φ a (Pm ev ι φ₁ y Φ) = φ₁ a • Pm ev ι φ y Φ := by
   funext x
   simp only [Pm_apply, ev_put h, put_put h, Pi.smul_apply, smul_eq_mul]
   ring
 
-variable [TopologicalSpace A] [IsTopologicalAddGroup A] [TopologicalSpace K] [IsTopologicalAddGroup K]
+variable
+  [TopologicalSpace A] [IsTopologicalAddGroup A] [TopologicalSpace K] [IsTopologicalAddGroup K]
 
 omit [IsTopologicalAddGroup K] in
-theorem continuous_put (hev : Continuous ev) (hι : Continuous ι) : Continuous fun p : A × K => put ev ι p.1 p.2 := by
+theorem continuous_put (hev : Continuous ev) (hι : Continuous ι)
+    : Continuous fun p : A × K => put ev ι p.1 p.2 := by
   show Continuous fun p : A × K => p.1 - ι (ev p.1) + ι p.2
   exact (continuous_fst.sub (hι.comp (hev.comp continuous_fst))).add (hι.comp continuous_snd)
 
 omit [IsTopologicalAddGroup K] in
-theorem Pm_mem_SB (h : ∀ y, ev (ι y) = y) (hev : Continuous ev) (hι : Continuous ι) {φ : K → ℂ} (hφ : φ ∈ SB K) (y : K)
-    {g : A → ℂ} (hg : g ∈ SB A) : Pm ev ι φ y g ∈ SB A := by
+theorem Pm_mem_SB
+    (h : ∀ y, ev (ι y) = y) (hev : Continuous ev) (hι : Continuous ι)
+    {φ : K → ℂ} (hφ : φ ∈ SB K)
+    (y : K)
+    {g : A → ℂ} (hg : g ∈ SB A)
+    : Pm ev ι φ y g ∈ SB A := by
   have hφ' : IsLocallyConstant φ ∧ HasCompactSupport φ := hφ
   have hg' : IsLocallyConstant g ∧ HasCompactSupport g := hg
   have hput : Continuous fun x : A => put ev ι x y :=
@@ -62,8 +69,9 @@ theorem Pm_mem_SB (h : ∀ y, ev (ι y) = y) (hev : Continuous ev) (hι : Contin
     (continuous_fst.add (hι.comp continuous_snd)).sub continuous_const
   have hK : IsCompact ((fun p : A × K => p.1 + ι p.2 - ι y) '' (tsupport g ×ˢ tsupport φ)) :=
     (hg'.2.prod hφ'.2).image hc
-  have hsub : Function.support (fun x => φ (ev x) * g (put ev ι x y)) ⊆
-      (fun p : A × K => p.1 + ι p.2 - ι y) '' (tsupport g ×ˢ tsupport φ) := by
+  have hsub
+      : Function.support (fun x => φ (ev x) * g (put ev ι x y))
+        ⊆ (fun p : A × K => p.1 + ι p.2 - ι y) '' (tsupport g ×ˢ tsupport φ) := by
     intro x hx
     have hx' : φ (ev x) * g (put ev ι x y) ≠ 0 := hx
     have h1 : φ (ev x) ≠ 0 := left_ne_zero_of_mul hx'
@@ -73,22 +81,26 @@ theorem Pm_mem_SB (h : ∀ y, ev (ι y) = y) (hev : Continuous ev) (hι : Contin
     abel
   exact IsCompact.of_isClosed_subset hK.closure isClosed_closure (closure_mono hsub)
 
-theorem mem_span_Pm (h : ∀ y, ev (ι y) = y) (hev : Continuous ev) (hι : Continuous ι) {g : A → ℂ} (hg : g ∈ SB A) :
-    g ∈ Submodule.span ℂ {f | ∃ φ ∈ SB K, ∃ y, f = Pm ev ι φ y g} := by
+theorem mem_span_Pm
+    (h : ∀ y, ev (ι y) = y) (hev : Continuous ev) (hι : Continuous ι) {g : A → ℂ} (hg : g ∈ SB A)
+    : g ∈ Submodule.span ℂ {f | ∃ φ ∈ SB K, ∃ y, f = Pm ev ι φ y g} := by
   classical
   have hg' : IsLocallyConstant g ∧ HasCompactSupport g := hg
   have hπc : Continuous fun z : A => z - ι (ev z) := continuous_id.sub (hι.comp hev)
   have hKa : IsCompact ((fun z : A => z - ι (ev z)) '' tsupport g) := hg'.2.image hπc
   have hC : IsCompact (ev '' tsupport g) := hg'.2.image hev
   have hput_eq : ∀ x k, put ev ι x k = (x - ι (ev x)) + ι k := fun x k => rfl
-  have hout : ∀ a k, ev a = 0 → a ∉ (fun z : A => z - ι (ev z)) '' tsupport g → g (a + ι k) = 0 := by
+  have hout
+      : ∀ a k, ev a = 0 → a ∉ (fun z : A => z - ι (ev z)) '' tsupport g → g (a + ι k) = 0 := by
     intro a k ha hnot
     by_contra hne
     apply hnot
     refine ⟨a + ι k, subset_tsupport _ hne, ?_⟩
     simp [ha, h]
-  have htube : ∀ k0 : K, ∀ᶠ k in 𝓝 k0, ∀ a ∈ (fun z : A => z - ι (ev z)) '' tsupport g,
-      g (a + ι k) = g (a + ι k0) := by
+  have htube
+      : ∀ k0 : K,
+        ∀ᶠ k in 𝓝 k0, ∀ a ∈ (fun z : A => z - ι (ev z)) '' tsupport g,
+          g (a + ι k) = g (a + ι k0) := by
     intro k0
     apply hKa.eventually_forall_of_forall_eventually
     intro a _
@@ -174,8 +186,9 @@ theorem mem_span_Pm (h : ∀ y, ev (ι y) = y) (hev : Continuous ev) (hι : Cont
         exact Finset.mem_filter.2 ⟨(Set.Finite.mem_toFinset hfin).2 ⟨ev x, hc, rfl⟩, hne⟩
       rw [hgx, h0]
       rfl
-  have hmem : (∑ v ∈ Vs, Pm ev ι (φv v) (rep v) g) ∈
-      Submodule.span ℂ {f | ∃ φ ∈ SB K, ∃ y, f = Pm ev ι φ y g} :=
+  have hmem
+      : (∑ v ∈ Vs, Pm ev ι (φv v) (rep v) g)
+        ∈ Submodule.span ℂ {f | ∃ φ ∈ SB K, ∃ y, f = Pm ev ι φ y g} :=
     Submodule.sum_mem _ fun v hv => Submodule.subset_span ⟨φv v, hφv v hv, rep v, rfl⟩
   rwa [← hsum] at hmem
 

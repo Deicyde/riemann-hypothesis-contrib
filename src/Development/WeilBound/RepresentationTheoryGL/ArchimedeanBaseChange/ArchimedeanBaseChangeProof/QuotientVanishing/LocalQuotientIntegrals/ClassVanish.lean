@@ -26,9 +26,10 @@ namespace PositivityTheory.Rg.BcB.CV
 open PositivityTheory.Rg.BcB.D1 GlobalTheory.CompanionTheory
 
 theorem classVanish : ClassVanish :=
-  classVanish_of_steps QuotNorm.integral_normaliser_eq (QuotProduct.quotProd_of_normEq QuotNorm.integral_normaliser_eq) chainSum
-    RatDisc.ratDisc locVanish LocP.main LocFlagPf.locFlag degBdd KerTwFin.kerFin mahler SplitInf.splitAt NonEll.nonEllFlag
-    SplitTwo.splitAt2 PairParam.pairParam (TorusCh.torusChar degAdelic)
+  classVanish_of_steps QuotNorm.integral_normaliser_eq
+    (QuotProduct.quotProd_of_normEq QuotNorm.integral_normaliser_eq) chainSum RatDisc.ratDisc
+    locVanish LocP.main LocFlagPf.locFlag degBdd KerTwFin.kerFin mahler SplitInf.splitAt
+    NonEll.nonEllFlag SplitTwo.splitAt2 PairParam.pairParam (TorusCh.torusChar degAdelic)
     (ChiGamGlobal.chiGam_of onlyIsotropic (PosYGlobal.posY_of degSubmod degPairing) chainSum)
     (QuotStageInt.quotStage_of QuotNorm.integral_normaliser_eq) sizeBasic
 

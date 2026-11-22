@@ -33,19 +33,24 @@ theorem val_mem (x : G n) : x.val ∈ GLs n := by
   exact h.ne_zero
 
 def mulL (a : Mat n) : Mat n →L[ℝ] Mat n :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun y => a * y
-      map_add' := fun y z => Matrix.mul_add a y z
-      map_smul' := fun c y => Matrix.mul_smul a c y }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun y => a * y
+    map_add' := fun y z => Matrix.mul_add a y z
+    map_smul' := fun c y => Matrix.mul_smul a c y
+  }
 
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
-theorem contDiffOn_lTr (x : G n) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) :
-    ContDiffOn ℝ ∞ (lTr x f) (GLs n) :=
+theorem contDiffOn_lTr (x : G n) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
+    : ContDiffOn ℝ ∞ (lTr x f) (GLs n) :=
   hf.comp (mulL x.val).contDiff.contDiffOn (fun _ hy => mul_mem (val_mem x) hy)
 
-theorem Rd_lTr (x : G n) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) (X : Mat n)
-    {g : Mat n} (hg : g ∈ GLs n) : Rd X (lTr x f) g = Rd X f (x.val * g) := by
+theorem Rd_lTr
+    (x : G n)
+    {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
+    (X : Mat n)
+    {g : Mat n} (hg : g ∈ GLs n)
+    : Rd X (lTr x f) g = Rd X f (x.val * g) := by
   have hxg : x.val * g ∈ GLs n := mul_mem (val_mem x) hg
   have hd : DifferentiableAt ℝ f (mulL x.val g) :=
     (hf.contDiffAt ((isOpen_GLs n).mem_nhds hxg)).differentiableAt (by simp)
@@ -55,14 +60,18 @@ theorem Rd_lTr (x : G n) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) (
   rw [hc]
   simp [mulL, Matrix.mul_assoc]
 
-theorem contDiffOn_Rw (hR : RCalc) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
-    (w : List (Bool × Fin n × Fin n)) : ContDiffOn ℝ ∞ (Rw w f) (GLs n) := by
+theorem contDiffOn_Rw
+    (hR : RCalc) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n)) (w : List (Bool × Fin n × Fin n))
+    : ContDiffOn ℝ ∞ (Rw w f) (GLs n) := by
   induction w with
   | nil => exact hf
   | cons p w ih => exact ((hR n).1 V (Rw w f) ih).1 (bs p)
 
-theorem Rw_lTr (hR : RCalc) (x : G n) {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
-    (w : List (Bool × Fin n × Fin n)) : ∀ g ∈ GLs n, Rw w (lTr x f) g = Rw w f (x.val * g) := by
+theorem Rw_lTr
+    (hR : RCalc) (x : G n)
+    {f : Mat n → V} (hf : ContDiffOn ℝ ∞ f (GLs n))
+    (w : List (Bool × Fin n × Fin n))
+    : ∀ g ∈ GLs n, Rw w (lTr x f) g = Rw w f (x.val * g) := by
   induction w with
   | nil => intro g _; rfl
   | cons p w ih =>
@@ -76,13 +85,14 @@ theorem Rw_lTr (hR : RCalc) (x : G n) {f : Mat n → V} (hf : ContDiffOn ℝ ∞
 
 end LeftTranslateSobolev
 
-
 open LeftTranslateSobolev in
 theorem ltSob : LtSob := by
   intro n _ _ μ _ V _ _ _ _ hR x f hf
   refine ⟨⟨contDiffOn_lTr x hf.1, fun w => ?_⟩, fun g hg => ?_⟩
   · have h := (hf.2 w).comp_measurePreserving (measurePreserving_mul_left μ x)
-    have he : (fun y : G n => Rw w (lTr x f) y.val) = (fun y : G n => Rw w f y.val) ∘ (fun y => x * y) :=
+    have he
+        : (fun y : G n => Rw w (lTr x f) y.val)
+          = (fun y : G n => Rw w f y.val) ∘ (fun y => x * y) :=
       funext fun y => Rw_lTr hR x hf.1 w y.val (val_mem y)
     rw [he]
     exact h

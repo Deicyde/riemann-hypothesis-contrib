@@ -15,10 +15,13 @@ open MvPolynomial
 
 universe u
 
-theorem divCycle_ne_zero_facts {O : Type u} [CommRing O] {K : Type} [Fintype K] [DecidableEq K]
-    {ι : K → Type} {P : Ideal (MRing ι O)} (hP : IsMultiHomogIdeal P) {f : MRing ι O} {e : K → ℕ}
-    (hf : IsMultiHomog f e) {W : Ideal (MRing ι O)} (h : divCycle P f W ≠ 0) :
-    W.IsPrime ∧ IsRelevant W ∧ P ≤ W ∧ IsMultiHomogIdeal W := by
+theorem divCycle_ne_zero_facts
+    {O : Type u} [CommRing O]
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} {P : Ideal (MRing ι O)} (hP : IsMultiHomogIdeal P)
+    {f : MRing ι O} {e : K → ℕ} (hf : IsMultiHomog f e)
+    {W : Ideal (MRing ι O)} (h : divCycle P f W ≠ 0)
+    : W.IsPrime ∧ IsRelevant W ∧ P ≤ W ∧ IsMultiHomogIdeal W := by
   unfold divCycle at h
   split_ifs at h with hW
   · obtain ⟨hmin, hrel⟩ := hW

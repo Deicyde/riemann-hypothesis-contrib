@@ -7,7 +7,8 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
@@ -78,41 +79,53 @@ theorem mod_qs_of_polyB : ∀ a : ℕ → ℂ, PolyB a → Mod (qs a) := by
   have hr0 : 0 < r := Real.exp_pos _
   have hr1 : r < 1 := by
     have := Real.pi_pos
-    calc r < Real.exp 0 := Real.exp_lt_exp.mpr (by nlinarith)
+    calc
+      r < Real.exp 0 := Real.exp_lt_exp.mpr (by nlinarith)
       _ = 1 := Real.exp_zero
   have hrn : ‖r‖ < 1 := by rwa [Real.norm_of_nonneg hr0.le]
   have hS := hasSum_choose_mul_geometric_of_norm_lt_one (𝕜 := ℝ) A hrn
-  have hbound : ∀ n : ℕ, ‖a n * cexp (2 * π * Complex.I * n * τ)‖ ≤
-      (C * A.factorial) * (((n + A).choose A : ℕ) * r ^ n) := by
+  have hbound
+      : ∀ n : ℕ,
+        ‖a n * cexp (2 * π * Complex.I * n * τ)‖
+          ≤ (C * A.factorial) * (((n + A).choose A : ℕ) * r ^ n) := by
     intro n
     rw [norm_mul, norm_qterm]
     have h1 := hC n
     have h2 := pow_succ_le_factorial_mul_choose n A
-    calc ‖a n‖ * r ^ n ≤ C * ((n : ℝ) + 1) ^ A * r ^ n :=
-          mul_le_mul_of_nonneg_right h1 (by positivity)
-      _ ≤ C * ((A.factorial : ℝ) * ((n + A).choose A : ℕ)) * r ^ n := by
-          gcongr
+    calc
+      ‖a n‖ * r ^ n
+        ≤ C * ((n : ℝ) + 1) ^ A * r ^ n := mul_le_mul_of_nonneg_right h1 (by positivity)
+      _ ≤ C * ((A.factorial : ℝ) * ((n + A).choose A : ℕ)) * r ^ n := by gcongr
       _ = (C * A.factorial) * (((n + A).choose A : ℕ) * r ^ n) := by ring
-  have hsum2 : HasSum (fun n : ℕ => (C * A.factorial) * (((n + A).choose A : ℕ) * r ^ n))
-      ((C * A.factorial) * (1 / (1 - r) ^ (A + 1))) := hS.mul_left _
+  have hsum2 : HasSum
+      (fun n : ℕ => (C * A.factorial) * (((n + A).choose A : ℕ) * r ^ n))
+      ((C * A.factorial) * (1 / (1 - r) ^ (A + 1))) :=
+    hS.mul_left _
   have hsumm : Summable (fun n : ℕ => ‖a n * cexp (2 * π * Complex.I * n * τ)‖) :=
     Summable.of_nonneg_of_le (fun _ => norm_nonneg _) hbound hsum2.summable
   have key : ‖qs a τ‖ ≤ (C * A.factorial) * (1 / (1 - r) ^ (A + 1)) := by
     unfold qs
-    calc ‖∑' n : ℕ, a n * cexp (2 * π * Complex.I * n * τ)‖
+    calc
+      ‖∑' n : ℕ, a n * cexp (2 * π * Complex.I * n * τ)‖
         ≤ ∑' n : ℕ, ‖a n * cexp (2 * π * Complex.I * n * τ)‖ := norm_tsum_le_tsum_norm hsumm
       _ ≤ ∑' n : ℕ, (C * A.factorial) * (((n + A).choose A : ℕ) * r ^ n) :=
-          hsumm.tsum_le_tsum hbound hsum2.summable
+        hsumm.tsum_le_tsum hbound hsum2.summable
       _ = _ := hsum2.tsum_eq
   have hinv : 1 / (1 - r) ^ (A + 1) ≤ 2 ^ (A + 1) * (y ^ (A + 1) + (y ^ (A + 1))⁻¹) := by
     rw [one_div, ← inv_pow]
-    calc ((1 - r)⁻¹) ^ (A + 1) ≤ (1 + y⁻¹) ^ (A + 1) :=
-          pow_le_pow_left₀ (by have : 0 < 1 - r := by linarith
-                               positivity) (one_sub_exp_inv_le y hy) _
+    calc
+      ((1 - r)⁻¹) ^ (A + 1) ≤ (1 + y⁻¹) ^ (A + 1) :=
+        pow_le_pow_left₀
+          (by
+            have : 0 < 1 - r := by linarith
+            positivity)
+          (one_sub_exp_inv_le y hy) _
       _ ≤ _ := one_add_inv_pow_le y hy _
-  calc ‖qs a τ‖ ≤ (C * A.factorial) * (1 / (1 - r) ^ (A + 1)) := key
+  calc
+    ‖qs a τ‖
+      ≤ (C * A.factorial) * (1 / (1 - r) ^ (A + 1)) := key
     _ ≤ (C * A.factorial) * (2 ^ (A + 1) * (y ^ (A + 1) + (y ^ (A + 1))⁻¹)) :=
-        mul_le_mul_of_nonneg_left hinv (by positivity)
+      mul_le_mul_of_nonneg_left hinv (by positivity)
     _ = C * A.factorial * 2 ^ (A + 1) * (y ^ (A + 1) + (y ^ (A + 1))⁻¹) := by ring
 
 end GlobalTheory.EisM

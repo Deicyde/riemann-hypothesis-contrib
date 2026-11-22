@@ -24,9 +24,12 @@ lemma hpart_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) :
       hpart2 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1)) ∈ Glev k r i) :=
   ⟨exp_hpart1_mem i p q, exp_hpart2_mem i p q⟩
 
-theorem eab_smooth (i : Fin (r + 1)) (D : Set (Mx k r)) (p q : Fin (mdim k r i))
-    (f : Mx k r → E) (hf : SmoothLev k r i D f) :
-    SmoothLev k r i D (EH k r (posL k r i p) (posL k r i q) f) := by
+theorem eab_smooth
+    (i : Fin (r + 1))
+    (D : Set (Mx k r))
+    (p q : Fin (mdim k r i))
+    (f : Mx k r → E) (hf : SmoothLev k r i D f)
+    : SmoothLev k r i D (EH k r (posL k r i p) (posL k r i q) f) := by
   intro g₀ hg₀
   obtain ⟨U, F, hU, hg₀U, hF, hfF⟩ := hf g₀ hg₀
   set X₁ := hpart1 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1)
@@ -80,22 +83,30 @@ lemma rdV_left (i : Fin (r + 1)) (z : Fin (2 * r + k + 1) → ℂ) (D : Set (Mx 
   show deriv (fun t : ℝ => f (n * g * NormedSpace.exp ((t : ℂ) • X))) 0 = psi k r z cStd n • RdV X f g
   rw [h2.deriv, rdV_ext i X hX f F1 U1 g hU1 hgU1 hg.1 hF1 hfF1]
 
-theorem eab_left (i : Fin (r + 1)) (z : Fin (2 * r + k + 1) → ℂ) (D : Set (Mx k r))
-    (hD : IsOpen D) (p q : Fin (mdim k r i)) (f : Mx k r → E) (hf : SmoothLev k r i D f)
-    (hL : LeftEq k r z i D f) :
-    LeftEq k r z i D (EH k r (posL k r i p) (posL k r i q) f) := by
+theorem eab_left
+    (i : Fin (r + 1))
+    (z : Fin (2 * r + k + 1) → ℂ)
+    (D : Set (Mx k r)) (hD : IsOpen D)
+    (p q : Fin (mdim k r i))
+    (f : Mx k r → E) (hf : SmoothLev k r i D f) (hL : LeftEq k r z i D f)
+    : LeftEq k r z i D (EH k r (posL k r i p) (posL k r i q) f) := by
   have hX1 := (hpart_mem i p q).1
   have hX2 := (hpart_mem i p q).2
   intro g hg n hn
   simp only [EH, EabH]
-  rw [rdV_left i z D hD _ hX1 f hf hL g hg n hn, rdV_left i z D hD _ hX2 f hf hL g hg n hn, smul_add,
-    smul_comm Complex.I]
+  rw [rdV_left i z D hD _ hX1 f hf hL g hg n hn, rdV_left i z D hD _ hX2 f hf hL g hg n hn,
+    smul_add, smul_comm Complex.I]
 
-theorem eab_lin (i : Fin (r + 1)) (D : Set (Mx k r)) (p q : Fin (mdim k r i))
-    (f f₂ : Mx k r → E) (s : ℂ) (hf : SmoothLev k r i D f) (hf₂ : SmoothLev k r i D f₂)
-    (g : Mx k r) (hg : g ∈ Glev k r i ∩ D) :
-    EH k r (posL k r i p) (posL k r i q) (fun x => f x + s • f₂ x) g =
-      EH k r (posL k r i p) (posL k r i q) f g + s • EH k r (posL k r i p) (posL k r i q) f₂ g := by
+theorem eab_lin
+    (i : Fin (r + 1))
+    (D : Set (Mx k r))
+    (p q : Fin (mdim k r i))
+    (f f₂ : Mx k r → E)
+    (s : ℂ) (hf : SmoothLev k r i D f) (hf₂ : SmoothLev k r i D f₂)
+    (g : Mx k r) (hg : g ∈ Glev k r i ∩ D)
+    : EH k r (posL k r i p) (posL k r i q) (fun x => f x + s • f₂ x) g
+      = EH k r (posL k r i p) (posL k r i q) f g
+        + s • EH k r (posL k r i p) (posL k r i q) f₂ g := by
   have hX1 := (hpart_mem i p q).1
   have hX2 := (hpart_mem i p q).2
   obtain ⟨U1, F1, hU1, hgU1, hF1, hfF1⟩ := hf g hg
@@ -105,19 +116,25 @@ theorem eab_lin (i : Fin (r + 1)) (D : Set (Mx k r)) (p q : Fin (mdim k r i))
   have hF1' : ContDiffOn ℝ ∞ F1 (U1 ∩ U2) := hF1.mono Set.inter_subset_left
   have hF2' : ContDiffOn ℝ ∞ F2 (U1 ∩ U2) := hF2.mono Set.inter_subset_right
   have hFs : ContDiffOn ℝ ∞ (fun x => F1 x + s • F2 x) (U1 ∩ U2) := hF1'.add (hF2'.const_smul s)
-  have hfs : ∀ x ∈ U1 ∩ U2, x ∈ Glev k r i → f x + s • f₂ x = F1 x + s • F2 x :=
-    fun x hx hxG => by rw [hfF1 x hx.1 hxG, hfF2 x hx.2 hxG]
+  have hfs : ∀ x ∈ U1 ∩ U2, x ∈ Glev k r i → f x + s • f₂ x = F1 x + s • F2 x := fun x hx hxG => by
+    rw [hfF1 x hx.1 hxG, hfF2 x hx.2 hxG]
   have hd1 : DifferentiableAt ℝ F1 g :=
     (hF1.differentiableOn (by simp)).differentiableAt (hU1.mem_nhds hgU1)
   have hd2 : DifferentiableAt ℝ F2 g :=
     (hF2.differentiableOn (by simp)).differentiableAt (hU2.mem_nhds hgU2)
-  have key : ∀ X : Mx k r, (∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) ∈ Glev k r i) →
-      RdV X (fun x => f x + s • f₂ x) g = RdV X f g + s • RdV X f₂ g := by
+  have key
+      : ∀ X : Mx k r,
+        (∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) ∈ Glev k r i)
+          → RdV X (fun x => f x + s • f₂ x) g = RdV X f g + s • RdV X f₂ g := by
     intro X hX
     have hfd : fderiv ℝ (fun x => F1 x + s • F2 x) g = fderiv ℝ F1 g + s • fderiv ℝ F2 g :=
       (hd1.hasFDerivAt.add (hd2.hasFDerivAt.const_smul s)).fderiv
-    rw [rdV_ext i X hX (fun x => f x + s • f₂ x) (fun x => F1 x + s • F2 x) (U1 ∩ U2) g hU hgU hg.1 hFs hfs,
-      rdV_ext i X hX f F1 U1 g hU1 hgU1 hg.1 hF1 hfF1, rdV_ext i X hX f₂ F2 U2 g hU2 hgU2 hg.1 hF2 hfF2, hfd]
+    rw [rdV_ext i X hX
+        (fun x => f x + s • f₂ x)
+        (fun x => F1 x + s • F2 x)
+        (U1 ∩ U2) g hU hgU hg.1 hFs hfs,
+      rdV_ext i X hX f F1 U1 g hU1 hgU1 hg.1 hF1 hfF1,
+      rdV_ext i X hX f₂ F2 U2 g hU2 hgU2 hg.1 hF2 hfF2, hfd]
     simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply]
   simp only [EH, EabH]
   rw [key _ hX1, key _ hX2]

@@ -11,9 +11,10 @@ open IsLocalRing
 
 variable {R : Type*} [CommRing R]
 
-theorem exists_le_associated_of_dvd_prod_primes [IsDomain R] {ι : Type*} (f : ι → R) :
-    ∀ (s : Multiset ι), (∀ i ∈ s, Prime (f i)) → ∀ {x : R}, x ∣ (s.map f).prod →
-      ∃ t ≤ s, Associated x (t.map f).prod := by
+theorem exists_le_associated_of_dvd_prod_primes [IsDomain R] {ι : Type*} (f : ι → R)
+    : ∀ (s : Multiset ι),
+      (∀ i ∈ s, Prime (f i))
+        → ∀ {x : R}, x ∣ (s.map f).prod → ∃ t ≤ s, Associated x (t.map f).prod := by
   intro s
   induction s using Multiset.induction_on with
   | empty =>
@@ -44,18 +45,22 @@ theorem exists_le_associated_of_dvd_prod_primes [IsDomain R] {ι : Type*} (f : �
       obtain ⟨t, ht, hxt⟩ := ih hs' ⟨w, h3⟩
       exact ⟨t, ht.trans (Multiset.le_cons_self s a), hxt⟩
 
-theorem prime_of_regular_params [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
-    (hspan : Ideal.span (Set.range f) = maximalIdeal R) (hdim : (n : WithBot ℕ∞) = ringKrullDim R)
-    (i : Fin n) : Prime (f i) := by
+theorem prime_of_regular_params
+    [IsRegularLocalRing R]
+    {n : ℕ} (f : Fin n → R) (hspan : Ideal.span (Set.range f) = maximalIdeal R)
+    (hdim : (n : WithBot ℕ∞) = ringKrullDim R) (i : Fin n)
+    : Prime (f i) := by
   have hm : f i ∈ maximalIdeal R := by
     rw [← hspan]
     exact Ideal.subset_span ⟨i, rfl⟩
   exact prime_of_not_mem_sq hm ((regular_params_spec f hspan hdim).1 i)
 
-theorem eq_unit_mul_monomial [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
-    (hspan : Ideal.span (Set.range f) = maximalIdeal R) (hdim : (n : WithBot ℕ∞) = ringKrullDim R)
-    (J : Finset (Fin n)) {x : R} (hx0 : x ≠ 0) (hrad : (∏ i ∈ J, f i) ∈ (Ideal.span {x}).radical) :
-    ∃ (u : Rˣ) (m : Fin n → ℕ), (∀ i, i ∉ J → m i = 0) ∧ x = u * ∏ i ∈ J, f i ^ m i := by
+theorem eq_unit_mul_monomial
+    [IsRegularLocalRing R]
+    {n : ℕ} (f : Fin n → R) (hspan : Ideal.span (Set.range f) = maximalIdeal R)
+    (hdim : (n : WithBot ℕ∞) = ringKrullDim R) (J : Finset (Fin n))
+    {x : R} (hx0 : x ≠ 0) (hrad : (∏ i ∈ J, f i) ∈ (Ideal.span {x}).radical)
+    : ∃ (u : Rˣ) (m : Fin n → ℕ), (∀ i, i ∉ J → m i = 0) ∧ x = u * ∏ i ∈ J, f i ^ m i := by
   obtain ⟨k, hk⟩ := hrad
   rw [Ideal.mem_span_singleton] at hk
   have hprimes : ∀ i ∈ k • J.val, Prime (f i) := fun i _ => prime_of_regular_params f hspan hdim i
@@ -64,8 +69,8 @@ theorem eq_unit_mul_monomial [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
     rfl
   rw [← hprod] at hk
   obtain ⟨t, ht, hxt⟩ := exists_le_associated_of_dvd_prod_primes f (k • J.val) hprimes hk
-  have htJ : ∀ i, i ∉ J → Multiset.count i t = 0 := fun i hi => Multiset.count_eq_zero.2 fun hit =>
-    hi (Multiset.mem_of_mem_nsmul (Multiset.mem_of_le ht hit))
+  have htJ : ∀ i, i ∉ J → Multiset.count i t = 0 := fun i hi =>
+    Multiset.count_eq_zero.2 fun hit => hi (Multiset.mem_of_mem_nsmul (Multiset.mem_of_le ht hit))
   obtain ⟨u, hu⟩ := hxt.symm
   refine ⟨u, fun i => Multiset.count i t, htJ, ?_⟩
   rw [← hu, Finset.prod_multiset_map_count, mul_comm]
@@ -77,13 +82,15 @@ theorem eq_unit_mul_monomial [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
   · intro i _ hi
     rw [Multiset.count_eq_zero.2 (fun h => hi (Multiset.mem_toFinset.2 h)), pow_zero]
 
-theorem ord_localization_eq_exponent [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
-    (hspan : Ideal.span (Set.range f) = maximalIdeal R) (hdim : (n : WithBot ℕ∞) = ringKrullDim R)
-    (J : Finset (Fin n)) (u : Rˣ) (m : Fin n → ℕ) (i : Fin n) (hi : i ∈ J)
-    [(Ideal.span {f i}).IsPrime] :
-    Ring.ord (Localization.AtPrime (Ideal.span {f i}))
-        (algebraMap R (Localization.AtPrime (Ideal.span {f i})) (u * ∏ j ∈ J, f j ^ m j)) =
-      (m i : ℕ∞) := by
+theorem ord_localization_eq_exponent
+    [IsRegularLocalRing R]
+    {n : ℕ} (f : Fin n → R) (hspan : Ideal.span (Set.range f) = maximalIdeal R)
+    (hdim : (n : WithBot ℕ∞) = ringKrullDim R) (J : Finset (Fin n))
+    (u : Rˣ) (m : Fin n → ℕ)
+    (i : Fin n) (hi : i ∈ J) [(Ideal.span {f i}).IsPrime]
+    : Ring.ord (Localization.AtPrime (Ideal.span {f i}))
+        (algebraMap R (Localization.AtPrime (Ideal.span {f i})) (u * ∏ j ∈ J, f j ^ m j))
+      = (m i : ℕ∞) := by
   have : IsDomain R := isDomain_of_isRegularLocalRing
   set P := Ideal.span {f i} with hP
   set S := Localization.AtPrime P
@@ -95,8 +102,7 @@ theorem ord_localization_eq_exponent [IsRegularLocalRing R] {n : ℕ} (f : Fin n
     obtain ⟨c, hc⟩ := hj
     have hdc : f j ∣ f i * c := ⟨1, by rw [mul_one, hc]⟩
     rcases (hpr j).dvd_or_dvd hdc with h | h
-    · exact (regular_params_spec f hspan hdim).2 j i hji
-        (associated_of_dvd_dvd h ⟨c, hc⟩)
+    · exact (regular_params_spec f hspan hdim).2 j i hji (associated_of_dvd_dvd h ⟨c, hc⟩)
     · obtain ⟨d, rfl⟩ := h
       have : f j * 1 = f j * (f i * d) := by linear_combination hc
       have h1 := mul_left_cancel₀ (hpr j).ne_zero this
@@ -115,8 +121,8 @@ theorem ord_localization_eq_exponent [IsRegularLocalRing R] {n : ℕ} (f : Fin n
   have hord1 : Ring.ord S π = 1 := by
     unfold Ring.ord
     rw [hmax, Module.length_eq_one_iff]
-    exact isSimpleModule_iff_isCoatom.mpr
-      (Ideal.isMaximal_def.mp (IsLocalRing.maximalIdeal.isMaximal S))
+    exact isSimpleModule_iff_isCoatom.mpr (Ideal.isMaximal_def.mp
+      (IsLocalRing.maximalIdeal.isMaximal S))
   rw [← Finset.mul_prod_erase J _ hi, map_mul, map_mul, map_pow,
     Ring.ord_mul_of_isUnit_left ((Units.isUnit u).map _)]
   have hrest : IsUnit (algebraMap R S (∏ j ∈ J.erase i, f j ^ m j)) := by

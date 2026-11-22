@@ -9,10 +9,13 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal GlobalTheory.StringRepresentationDecomposition
+open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions
+  Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal
+  GlobalTheory.StringRepresentationDecomposition
 noncomputable section
 namespace GlobalTheory.MuCharProof
-abbrev _root_.GlobalTheory.MuCharProof.muChar_holds_tyz : Prop :=  _root_.GlobalTheory.StringRepresentationDecomposition.MuCharacterCondition
+abbrev _root_.GlobalTheory.MuCharProof.muChar_holds_tyz : Prop :=
+  _root_.GlobalTheory.StringRepresentationDecomposition.MuCharacterCondition
 end GlobalTheory.MuCharProof
 end
 end

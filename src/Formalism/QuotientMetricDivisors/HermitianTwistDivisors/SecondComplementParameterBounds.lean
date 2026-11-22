@@ -27,8 +27,7 @@ theorem vw_nat_nonneg (g : ℕ) (w : HeightOneSpectrum (𝓞 K)) : 0 ≤ vw w (g
 
 theorem lw_pos (w : HeightOneSpectrum (𝓞 K)) : 0 < lw w := by
   unfold lw
-  have h0 : Ideal.absNorm w.asIdeal ≠ 0 := by
-    rw [Ne, Ideal.absNorm_eq_zero_iff]; exact w.ne_bot
+  have h0 : Ideal.absNorm w.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact w.ne_bot
   have h1 : Ideal.absNorm w.asIdeal ≠ 1 := by
     rw [Ne, Ideal.absNorm_eq_one_iff]; exact w.isPrime.ne_top
   have h2 : (1 : ℝ) < (Ideal.absNorm w.asIdeal : ℝ) := by
@@ -36,8 +35,8 @@ theorem lw_pos (w : HeightOneSpectrum (𝓞 K)) : 0 < lw w := by
   apply div_pos (Real.log_pos h2)
   exact_mod_cast Module.finrank_pos
 
-theorem plOver_mem {g : ℕ} (hg : 0 < g) (w : HeightOneSpectrum (𝓞 K)) (h : PlOver g w) :
-    (g : 𝓞 K) ∈ w.asIdeal := by
+theorem plOver_mem {g : ℕ} (hg : 0 < g) (w : HeightOneSpectrum (𝓞 K)) (h : PlOver g w)
+    : (g : 𝓞 K) ∈ w.asIdeal := by
   classical
   have hc : ((g : 𝓞 K) : K) = (g : K) := by simp
   have hg0 : (g : 𝓞 K) ≠ 0 := by exact_mod_cast hg.ne'
@@ -45,11 +44,13 @@ theorem plOver_mem {g : ℕ} (hg : 0 < g) (w : HeightOneSpectrum (𝓞 K)) (h : 
     rwa [ne_eq, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
   unfold PlOver vw at h
   rw [← hc, ← FractionalIdeal.coeIdeal_span_singleton, FractionalIdeal.count_coe K _ hJ] at h
-  have h1 : 1 ≤ (Associates.mk w.asIdeal).count (Associates.mk (Ideal.span {(g : 𝓞 K)})).factors := by
+  have h1
+      : 1 ≤ (Associates.mk w.asIdeal).count (Associates.mk (Ideal.span {(g : 𝓞 K)})).factors := by
     exact_mod_cast h
   have hm : Associates.mk (Ideal.span {(g : 𝓞 K)}) ≠ 0 := by rwa [ne_eq, Associates.mk_eq_zero]
   rw [← Associates.prime_pow_dvd_iff_le hm w.associates_irreducible, pow_one,
-    Associates.mk_le_mk_iff_dvd, Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem] at h1
+      Associates.mk_le_mk_iff_dvd, Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
+    at h1
   exact h1
 
 end Places
@@ -58,8 +59,8 @@ section Star
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem vw_conj_nat (g : ℕ) (w : HeightOneSpectrum (𝓞 K)) :
-    vw (conjPl w) (g : K) = vw w (g : K) := by
+theorem vw_conj_nat (g : ℕ) (w : HeightOneSpectrum (𝓞 K))
+    : vw (conjPl w) (g : K) = vw w (g : K) := by
   rw [← ValuationRepresentative.vw_star, star_natCast]
 
 end Star
@@ -76,7 +77,9 @@ theorem places_over_coprime : PlOverCoprime := by
     rcases Nat.eq_zero_or_pos n with h0 | h0
     · subst h0
       unfold PlOver vw at hn
-      first | simp [FractionalIdeal.count_zero] at hn | (unfold FractionalIdeal.count at hn; simp at hn)
+      first
+      | simp [FractionalIdeal.count_zero] at hn
+      | (unfold FractionalIdeal.count at hn; simp at hn)
     · exact h0
   have m1 := plOver_mem (hpos g h1) w h1
   have m2 := plOver_mem (hpos g' h2) w h2
@@ -87,7 +90,9 @@ theorem places_over_coprime : PlOverCoprime := by
     linarith
   apply w.isPrime.ne_top
   rw [Ideal.eq_top_iff_one]
-  have e : (1 : 𝓞 K) = ((Nat.gcdA g g' : ℤ) : 𝓞 K) * (g : 𝓞 K) + ((Nat.gcdB g g' : ℤ) : 𝓞 K) * (g' : 𝓞 K) := by
+  have e
+      : (1 : 𝓞 K)
+        = ((Nat.gcdA g g' : ℤ) : 𝓞 K) * (g : 𝓞 K) + ((Nat.gcdB g g' : ℤ) : 𝓞 K) * (g' : 𝓞 K) := by
     exact_mod_cast hab.symm
   rw [e]
   exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ m1) (Ideal.mul_mem_left _ _ m2)

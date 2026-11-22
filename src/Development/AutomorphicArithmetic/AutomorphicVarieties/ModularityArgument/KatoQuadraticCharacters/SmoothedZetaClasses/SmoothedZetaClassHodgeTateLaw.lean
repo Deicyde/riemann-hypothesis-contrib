@@ -5,4 +5,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-theorem UpperTheory.V.Z.Kato.K5.smoothedZetaClass_hodgeTateLaw : UpperTheory.V.Z.Kato.Joint.SmoothedZetaClassHodgeTateLawStatement := UpperTheory.V.Z.Kato.K5.top
+theorem UpperTheory.V.Z.Kato.K5.smoothedZetaClass_hodgeTateLaw
+    : UpperTheory.V.Z.Kato.Joint.SmoothedZetaClassHodgeTateLawStatement :=
+  UpperTheory.V.Z.Kato.K5.top

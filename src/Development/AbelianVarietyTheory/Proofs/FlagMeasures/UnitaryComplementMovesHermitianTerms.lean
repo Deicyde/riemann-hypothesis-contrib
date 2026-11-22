@@ -86,44 +86,59 @@ lemma fwd (hM : M.OK) (P : LocNG.FPair H r) (S : Frames M.L r k) (c : Coord P S)
   rw [k1, k2] at hR
   exact hR
 
-theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), Module.finrank E V = k + 2 * r + 1 → P.RelG (LocNG.theta M) → ∀ (f f' : Fin (r + 1) → V), (∃ n ∈ P.A.N, f = fun b => n (P.A.f b)) → (∃ n' ∈ P.B.N, f' = fun b => n' (P.B.f b)) → ∀ g ∈ P.UW0, ∀ d d' : LocNG.Datum P, LocNG.Datum.Moves g d d' → (∀ b, g (f b) = f b ∧ g (f' b) = f' b) ∧ LocNG.img g '' {Λ | LocNG.IsTermOver P d (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) ∧ ¬ LocNG.BBne (H := H) (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)} = {Λ | LocNG.IsTermOver P d' (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) ∧ ¬ LocNG.BBne (H := H) (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)} := by
-  intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P hk hP f f' ⟨n, hn, hf⟩ ⟨n', hn', hf'⟩ g hg d d' hmv
-  obtain ⟨S, ⟨c⟩⟩ := GlobalTheory.HL.CoordExist.exists_coord M hM H r k P hk hP
-  obtain ⟨hU, -⟩ := GlobalTheory.T.framePairCoordinates_transport_unitary_mass M hM H r k P S c
-  obtain ⟨-, hMv, -⟩ := GlobalTheory.T.hermitianFramePairCoordinates_transport_innerData M hM H r k P S c
-  obtain ⟨-, hNA, hNB, -⟩ := GlobalTheory.HL.CoordUnip.transport M hM H r k P S c
-  have hh := (hU g).1 hg
-  have hmv' := (hMv g hg d d').1 hmv
-  have fixv : ∀ x : V, c.e x ∈ S.ME → g x = x := by
-    intro x hx
-    apply c.e.injective
-    rw [← GlobalTheory.HL.CoordTerm.grp_e c]
-    exact GlobalTheory.HL.ComplAct.hermitianFrames_complementUnitary_fixes_ME S hh _ hx
-  have hfix : ∀ b, g (f b) = f b ∧ g (f' b) = f' b := by
-    intro b
-    subst hf hf'
-    refine ⟨fixv _ ?_, fixv _ ?_⟩
-    · rw [← GlobalTheory.HL.CoordTerm.grp_e c, ← c.f_eq]
-      exact Submodule.mem_sup_left (GlobalTheory.HL.ComplAct.nof_mem S (Or.inl ⟨rfl, rfl⟩) ((hNA n).1 hn)
-        (GlobalTheory.HL.ComplAct.mem_spanTo S S.f b))
-    · rw [← GlobalTheory.HL.CoordTerm.grp_e c, ← c.f'_eq]
-      exact Submodule.mem_sup_right (GlobalTheory.HL.ComplAct.nof_mem S (Or.inr ⟨rfl, rfl⟩) ((hNB n').1 hn')
-        (GlobalTheory.HL.ComplAct.mem_spanTo S S.f' b))
-  have hginv : c.grp g⁻¹ ∈ S.H0 := by rw [map_inv]; exact S.H0.inv_mem hh
-  have hmvinv : c.grp g⁻¹ • c.dat d' = c.dat d := by
-    rw [← hmv', map_inv, inv_smul_smul]
-  have hback : ∀ Λ : Submodule M.L.O V, LocNG.img g (LocNG.img g⁻¹ Λ) = Λ := by
-    intro Λ
-    rw [← GlobalTheory.HL.CoordTerm.lat_inj c, GlobalTheory.HL.CoordTerm.lat_img, GlobalTheory.HL.CoordTerm.lat_img, map_inv,
-      smul_inv_smul]
-  refine ⟨hfix, ?_⟩
-  ext Λ
-  constructor
-  · rintro ⟨Λ0, ⟨hT, hB⟩, rfl⟩
-    exact ⟨fwd hM P S c g hh d d' hmv' f f' Λ0 hT, by rwa [bbne_img g f f' hfix]⟩
-  · rintro ⟨hT, hB⟩
-    refine ⟨LocNG.img g⁻¹ Λ, ⟨fwd hM P S c g⁻¹ hginv d' d hmvinv f f' Λ hT, ?_⟩, hback Λ⟩
-    rw [← bbne_img g f f' hfix, hback Λ]
-    exact hB
+theorem main
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
+            (P : LocNG.FPair H r),
+          Module.finrank E V = k + 2 * r + 1 → P.RelG (LocNG.theta M)
+            → ∀ (f f' : Fin (r + 1) → V),
+              (∃ n ∈ P.A.N, f = fun b => n (P.A.f b)) → (∃ n' ∈ P.B.N, f' = fun b => n' (P.B.f b))
+                → ∀ g ∈ P.UW0, ∀ d d' : LocNG.Datum P,
+                  LocNG.Datum.Moves g d d'
+                    → (∀ b, g (f b) = f b ∧ g (f' b) = f' b)
+                      ∧ LocNG.img g
+                          '' {Λ | LocNG.IsTermOver P d (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) ∧ ¬ LocNG.BBne (H := H) (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)}
+                        = {Λ | LocNG.IsTermOver P d' (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) ∧ ¬ LocNG.BBne (H := H) (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)} :=
+  by
+    intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P hk hP f f' ⟨n, hn, hf⟩ ⟨n', hn', hf'⟩ g hg d d' hmv
+    obtain ⟨S, ⟨c⟩⟩ := GlobalTheory.HL.CoordExist.exists_coord M hM H r k P hk hP
+    obtain ⟨hU, -⟩ := GlobalTheory.T.framePairCoordinates_transport_unitary_mass M hM H r k P S c
+    obtain ⟨-, hMv, -⟩ :=
+      GlobalTheory.T.hermitianFramePairCoordinates_transport_innerData M hM H r k P S c
+    obtain ⟨-, hNA, hNB, -⟩ := GlobalTheory.HL.CoordUnip.transport M hM H r k P S c
+    have hh := (hU g).1 hg
+    have hmv' := (hMv g hg d d').1 hmv
+    have fixv : ∀ x : V, c.e x ∈ S.ME → g x = x := by
+      intro x hx
+      apply c.e.injective
+      rw [← GlobalTheory.HL.CoordTerm.grp_e c]
+      exact GlobalTheory.HL.ComplAct.hermitianFrames_complementUnitary_fixes_ME S hh _ hx
+    have hfix : ∀ b, g (f b) = f b ∧ g (f' b) = f' b := by
+      intro b
+      subst hf hf'
+      refine ⟨fixv _ ?_, fixv _ ?_⟩
+      · rw [← GlobalTheory.HL.CoordTerm.grp_e c, ← c.f_eq]
+        exact Submodule.mem_sup_left (GlobalTheory.HL.ComplAct.nof_mem S (Or.inl ⟨rfl, rfl⟩)
+          ((hNA n).1 hn) (GlobalTheory.HL.ComplAct.mem_spanTo S S.f b))
+      · rw [← GlobalTheory.HL.CoordTerm.grp_e c, ← c.f'_eq]
+        exact Submodule.mem_sup_right (GlobalTheory.HL.ComplAct.nof_mem S (Or.inr ⟨rfl, rfl⟩)
+          ((hNB n').1 hn') (GlobalTheory.HL.ComplAct.mem_spanTo S S.f' b))
+    have hginv : c.grp g⁻¹ ∈ S.H0 := by rw [map_inv]; exact S.H0.inv_mem hh
+    have hmvinv : c.grp g⁻¹ • c.dat d' = c.dat d := by rw [← hmv', map_inv, inv_smul_smul]
+    have hback : ∀ Λ : Submodule M.L.O V, LocNG.img g (LocNG.img g⁻¹ Λ) = Λ := by
+      intro Λ
+      rw [← GlobalTheory.HL.CoordTerm.lat_inj c, GlobalTheory.HL.CoordTerm.lat_img,
+        GlobalTheory.HL.CoordTerm.lat_img, map_inv, smul_inv_smul]
+    refine ⟨hfix, ?_⟩
+    ext Λ
+    constructor
+    · rintro ⟨Λ0, ⟨hT, hB⟩, rfl⟩
+      exact ⟨fwd hM P S c g hh d d' hmv' f f' Λ0 hT, by rwa [bbne_img g f f' hfix]⟩
+    · rintro ⟨hT, hB⟩
+      refine ⟨LocNG.img g⁻¹ Λ, ⟨fwd hM P S c g⁻¹ hginv d' d hmvinv f f' Λ hT, ?_⟩, hback Λ⟩
+      rw [← bbne_img g f f' hfix, hback Λ]
+      exact hB
 
 end GlobalTheory.HL.ComplMove

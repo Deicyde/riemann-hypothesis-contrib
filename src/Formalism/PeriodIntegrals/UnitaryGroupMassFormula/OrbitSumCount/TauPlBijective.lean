@@ -13,13 +13,14 @@ open Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.MainNotions.G
 
 namespace SumOrbCW
 
-theorem plGG_bijective (D : D7) :
-    Function.Bijective (fun z : Bool × HH D => (⟨plGG D z, plGG_mem_Psi D z⟩ : D.R.Psi)) := by
+theorem plGG_bijective (D : D7)
+    : Function.Bijective (fun z : Bool × HH D => (⟨plGG D z, plGG_mem_Psi D z⟩ : D.R.Psi)) := by
   have hi := D.R.toFrame.iota_bijective
   constructor
   · rintro ⟨b, t⟩ ⟨b', t'⟩ h
     have h' := congrArg Subtype.val h
-    cases b <;> cases b' <;> simp [plGG, Formalism.HC.Frame.tau1, Formalism.HC.Frame.tau2] at h' <;> simp [hi.1 h']
+    cases b <;> cases b' <;> simp [plGG, Formalism.HC.Frame.tau1, Formalism.HC.Frame.tau2] at h'
+      <;> simp [hi.1 h']
   · rintro ⟨⟨⟨s, c⟩, h⟩, hg⟩
     have hc : c = 1 := hg
     subst hc

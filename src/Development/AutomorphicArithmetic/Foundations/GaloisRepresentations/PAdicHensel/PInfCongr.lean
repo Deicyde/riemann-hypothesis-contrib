@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+  UpperTheory.Gal.G1
 open scoped TensorProduct
 
 open scoped MatrixOrder ComplexOrder in
@@ -39,8 +41,7 @@ private lemma smul_posDef {n : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (hM : M.IsH
   · simpa [him] using h x hx
   · simp [him]
 
-theorem UpperTheory.Gal.G1.pInfCongr :
-    InfCongr := by
+theorem UpperTheory.Gal.G1.pInfCongr : InfCongr := by
   intro n G G' hG hG' ε h h'
   rcases Nat.eq_zero_or_pos n with hn | hn
   · subst hn
@@ -63,7 +64,9 @@ theorem UpperTheory.Gal.G1.pInfCongr :
   have hBP : B * P = C := by
     rw [hP, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv B hBd, Matrix.one_mul]
   have key : (ε : ℂ) • G' = (ε : ℂ) • (Pᴴ * G * P) := by
-    calc (ε : ℂ) • G' = Cᴴ * C := hCe
+    calc
+      (ε : ℂ) • G'
+        = Cᴴ * C := hCe
       _ = (B * P)ᴴ * (B * P) := by rw [hBP]
       _ = Pᴴ * (Bᴴ * B) * P := by
         rw [Matrix.conjTranspose_mul]

@@ -4,13 +4,16 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NoTo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
-theorem card_le_index_mul_card_map_inf (G H : Type) [Group G] [Group H] [Finite H]
-    (f : G →* H) (N : Subgroup G) (I : Subgroup H) (hf : Function.Surjective f)
-    (hN : N.index ≠ 0) : Nat.card ↥I ≤ N.index * Nat.card ↥(N.map f ⊓ I) := by
+theorem card_le_index_mul_card_map_inf
+    (G H : Type) [Group G] [Group H] [Finite H]
+    (f : G →* H) (N : Subgroup G)
+    (I : Subgroup H) (hf : Function.Surjective f) (hN : N.index ≠ 0)
+    : Nat.card ↥I ≤ N.index * Nat.card ↥(N.map f ⊓ I) := by
   have h1 : (N.map f).relIndex I * Nat.card ↥(N.map f ⊓ I) = Nat.card I := by
     rw [Subgroup.relIndex, mul_comm, ← Subgroup.card_mul_index ((N.map f).subgroupOf I)]
     congr 1

@@ -8,9 +8,11 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem isUnit_aeval_of_forall_isUnit_sub {A : Type*} [Ring A] [Algebra ℂ A] (T : A)
-    (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ A c)) (q : ℂ[X]) (hq : q ≠ 0) :
-    IsUnit (aeval T q) := by
+theorem isUnit_aeval_of_forall_isUnit_sub
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    (T : A) (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ A c))
+    (q : ℂ[X]) (hq : q ≠ 0)
+    : IsUnit (aeval T q) := by
   have hs : spectrum ℂ T = ∅ := by
     ext c
     simp only [Set.mem_empty_iff_false, iff_false, spectrum.notMem_iff]
@@ -25,24 +27,27 @@ theorem isUnit_aeval_of_forall_isUnit_sub {A : Type*} [Ring A] [Algebra ℂ A] (
     rw [h2, aeval_C]
     exact (IsUnit.mk0 _ h3).map _
 
-theorem linearIndependent_of_sub_apply_eq {V : Type*} [AddCommGroup V] [Module ℂ V]
+theorem linearIndependent_of_sub_apply_eq
+    {V : Type*} [AddCommGroup V] [Module ℂ V]
     (T : Module.End ℂ V) (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ (Module.End ℂ V) c))
-    (v : V) (hv : v ≠ 0) (w : ℂ → V)
-    (hw : ∀ c, (T - algebraMap ℂ (Module.End ℂ V) c) (w c) = v) :
-    LinearIndependent ℂ w := by
+    (v : V) (hv : v ≠ 0)
+    (w : ℂ → V) (hw : ∀ c, (T - algebraMap ℂ (Module.End ℂ V) c) (w c) = v)
+    : LinearIndependent ℂ w := by
   classical
   rw [linearIndependent_iff']
   intro s g hg i hi
   set q : ℂ[X] := ∑ k ∈ s, C (g k) * ∏ j ∈ s.erase k, (X - C j) with hqdef
   have hq0 : aeval T q v = 0 := by
-    have h1 : ∀ k ∈ s, aeval T (C (g k) * ∏ j ∈ s.erase k, (X - C j)) v
-        = aeval T (∏ j ∈ s, (X - C j : ℂ[X])) (g k • w k) := by
+    have h1
+        : ∀ k ∈ s,
+          aeval T (C (g k) * ∏ j ∈ s.erase k, (X - C j)) v
+            = aeval T (∏ j ∈ s, (X - C j : ℂ[X])) (g k • w k) := by
       intro k hk
       rw [← Finset.prod_erase_mul s _ hk, ← hw k, map_mul, map_mul, aeval_C, map_sub, aeval_X,
-        aeval_C, Module.End.mul_apply, Module.End.mul_apply, Module.algebraMap_end_apply,
-        map_smul, map_smul]
+        aeval_C, Module.End.mul_apply, Module.End.mul_apply, Module.algebraMap_end_apply, map_smul,
+        map_smul]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [hqdef, map_sum, LinearMap.sum_apply, Finset.sum_congr rfl h1, ← map_sum, hg, map_zero]
+    rw [hqdef, map_sum, LinearMap.sum_apply, Finset.sum_congr rfl h1, ← map_sum, hg, map_zero]
   have hq : q = 0 := by
     by_contra hne
     have hu := isUnit_aeval_of_forall_isUnit_sub T h q hne
@@ -52,18 +57,19 @@ theorem linearIndependent_of_sub_apply_eq {V : Type*} [AddCommGroup V] [Module �
     rw [hqdef, Polynomial.eval_finsetSum, Finset.sum_eq_single i]
     · simp [eval_prod]
     · intro k _ hki
-      rw [eval_mul, eval_prod, Finset.prod_eq_zero (i := i) (Finset.mem_erase.2 ⟨hki.symm, hi⟩)
-        (by simp), mul_zero]
+      rw [eval_mul, eval_prod,
+        Finset.prod_eq_zero (i := i) (Finset.mem_erase.2 ⟨hki.symm, hi⟩) (by simp), mul_zero]
     · intro h; exact absurd hi h
   rw [hq, eval_zero] at h2
   refine (mul_eq_zero.1 h2.symm).resolve_right ?_
   exact Finset.prod_ne_zero_iff.2 fun j hj => sub_ne_zero.2 (Finset.mem_erase.1 hj).1.symm
 
-theorem dixmier_schur_of_rank_le_aleph0 :
-    ∀ (V ι : Type) [AddCommGroup V] [Module ℂ V] (ρ : ι → Module.End ℂ V) (T : Module.End ℂ V),
-      Nontrivial V → Module.rank ℂ V ≤ Cardinal.aleph0 →
-      (∀ N : Submodule ℂ V, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤) →
-      (∀ i, T * ρ i = ρ i * T) → ∃ c : ℂ, T = c • 1 := by
+theorem dixmier_schur_of_rank_le_aleph0
+    : ∀ (V ι : Type) [AddCommGroup V] [Module ℂ V] (ρ : ι → Module.End ℂ V) (T : Module.End ℂ V),
+      Nontrivial V → Module.rank ℂ V ≤ Cardinal.aleph0
+        → (∀ N : Submodule ℂ V, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤)
+        → (∀ i, T * ρ i = ρ i * T)
+        → ∃ c : ℂ, T = c • 1 := by
   intro V ι _ _ ρ T hV hrank hirr hcomm
   by_contra hne
   push_neg at hne

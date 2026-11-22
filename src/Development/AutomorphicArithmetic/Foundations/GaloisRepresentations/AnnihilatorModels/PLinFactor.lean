@@ -7,9 +7,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.crystallineComparison
 
-private theorem exists_min_dvd {B ι : Type} [CommRing B] (w : B) (d : ι → B)
-    (hd : ∀ k k', d k ∣ w → d k ∣ d k' ∨ d k' ∣ d k) (s : Finset ι) (hs : s.Nonempty)
-    (hw : ∀ k ∈ s, d k ∣ w) : ∃ k₀ ∈ s, ∀ k ∈ s, d k₀ ∣ d k := by
+private theorem exists_min_dvd
+    {B ι : Type} [CommRing B]
+    (w : B) (d : ι → B) (hd : ∀ k k', d k ∣ w → d k ∣ d k' ∨ d k' ∣ d k)
+    (s : Finset ι) (hs : s.Nonempty) (hw : ∀ k ∈ s, d k ∣ w)
+    : ∃ k₀ ∈ s, ∀ k ∈ s, d k₀ ∣ d k := by
   classical
   induction s using Finset.induction_on with
   | empty => simp at hs
@@ -37,9 +39,10 @@ private theorem exists_min_dvd {B ι : Type} [CommRing B] (w : B) (d : ι → B)
 theorem linFactor_of : LinFactor := by
   intro B ι _ _ w d hex hd
   classical
-  obtain ⟨k₀, hk₀, hmin⟩ := exists_min_dvd w d hd (Finset.univ.filter fun k => d k ∣ w)
-    (by obtain ⟨k, hk⟩ := hex; exact ⟨k, by simpa using hk⟩)
-    (fun k hk => (Finset.mem_filter.mp hk).2)
+  obtain ⟨k₀, hk₀, hmin⟩ :=
+    exists_min_dvd w d hd (Finset.univ.filter fun k => d k ∣ w)
+      (by obtain ⟨k, hk⟩ := hex; exact ⟨k, by simpa using hk⟩)
+      (fun k hk => (Finset.mem_filter.mp hk).2)
   have hk₀w : d k₀ ∣ w := (Finset.mem_filter.mp hk₀).2
   have hall : ∀ k, d k₀ ∣ d k := by
     intro k

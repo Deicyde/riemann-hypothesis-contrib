@@ -6,15 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open Module
 
-private theorem trTheta_nil {Λ M : Type} [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M]
+private theorem trTheta_nil
+    {Λ M : Type} [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M]
     (n : Λ → Module.End ℂ M) (T : Module.End ℂ M) (σ : Λ → Λ)
     (hc : ∀ a b, Commute (n a) (n b)) (hn : ∀ a, IsNilpotent (n a))
-    (hT : ∀ a, T * n a = n (σ a) * T) (a : Λ) : LinearMap.trace ℂ M (n a * T) = 0 := by
+    (hT : ∀ a, T * n a = n (σ a) * T) (a : Λ)
+    : LinearMap.trace ℂ M (n a * T) = 0 := by
   classical
   have key : ∀ F : Submodule ℂ M, (∀ b, F.map (n b) ≤ F) → F ≤ ⨆ b, F.map (n b) → F = ⊥ := by
     intro F hinv hle
-    obtain ⟨G0, ⟨t, rfl⟩, hmax⟩ := (wellFounded_gt (α := Submodule ℂ M)).has_min
-      {G | ∃ t : Finset Λ, G = t.sup fun b => F.map (n b)} ⟨⊥, ∅, rfl⟩
+    obtain ⟨G0, ⟨t, rfl⟩, hmax⟩ :=
+      (wellFounded_gt (α := Submodule ℂ M)).has_min
+        {G | ∃ t : Finset Λ, G = t.sup fun b => F.map (n b)} ⟨⊥, ∅, rfl⟩
     have hall : ∀ b, F.map (n b) ≤ t.sup fun b => F.map (n b) := by
       intro b
       by_contra hb
@@ -28,8 +31,11 @@ private theorem trTheta_nil {Λ M : Type} [AddCommGroup M] [Module ℂ M] [Finit
     | insert c t hct ih =>
       apply ih
       have Gmap : (t.sup fun b => F.map (n b)).map (n c) ≤ t.sup fun b => F.map (n b) := by
-        refine Finset.sup_induction (p := fun P : Submodule ℂ M => P.map (n c) ≤ t.sup fun b => F.map (n b))
-          (by simp) (fun P1 h1 P2 h2 => ?_) (fun b hb => ?_)
+        refine Finset.sup_induction
+          (p := fun P : Submodule ℂ M => P.map (n c) ≤ t.sup fun b => F.map (n b))
+          (by simp)
+          (fun P1 h1 P2 h2 => ?_)
+          (fun b hb => ?_)
         · rw [Submodule.map_sup]
           exact sup_le h1 h2
         · have e : (F.map (n b)).map (n c) = (F.map (n c)).map (n b) := by
@@ -59,8 +65,9 @@ private theorem trTheta_nil {Λ M : Type} [AddCommGroup M] [Module ℂ M] [Finit
           obtain ⟨y1, hy1, g1, hg1, rfl⟩ := Submodule.mem_sup.mp (hF hy)
           obtain ⟨y2, hy2, rfl⟩ := Submodule.mem_map.mp hy1
           refine ⟨y2, hy2, (n c ^ k) g1 + g, G.add_mem (powinv k g1 hg1) hg, ?_⟩
-          rw [map_add (f := _), show (n c ^ k) (n c y2) = (n c ^ (k + 1)) y2 by
-            rw [pow_succ, Module.End.mul_apply], add_assoc]
+          rw [map_add (f := _),
+            show (n c ^ k) (n c y2) = (n c ^ (k + 1)) y2 by rw [pow_succ, Module.End.mul_apply],
+            add_assoc]
       obtain ⟨m, hm⟩ := hn c
       intro x hx
       obtain ⟨y, _, g, hg, rfl⟩ := step m x hx
@@ -90,7 +97,8 @@ private theorem trTheta_nil {Λ M : Type} [AddCommGroup M] [Module ℂ M] [Finit
       have e : T.comp (n b) = (n (σ b)).comp T := hT b
       rw [e, Submodule.map_comp]
       exact (Submodule.map_mono ih).trans (le_iSup (fun b => (F j).map (n b)) (σ b))
-  obtain ⟨_, ⟨j, rfl⟩, hmin⟩ := (wellFounded_lt (α := Submodule ℂ M)).has_min (Set.range F) ⟨_, 0, rfl⟩
+  obtain ⟨_, ⟨j, rfl⟩, hmin⟩ :=
+    (wellFounded_lt (α := Submodule ℂ M)).has_min (Set.range F) ⟨_, 0, rfl⟩
   have hstab : F j ≤ F (j + 1) := by
     rcases (anti j).lt_or_eq with hlt | heq
     · exact absurd hlt (hmin _ ⟨j + 1, rfl⟩)
@@ -104,23 +112,35 @@ private theorem trTheta_nil {Λ M : Type} [AddCommGroup M] [Module ℂ M] [Finit
       intro x
       rw [pow_succ', Module.End.mul_apply, Module.End.mul_apply]
       exact ninv k a (Submodule.mem_map_of_mem (Tinv k (Submodule.mem_map_of_mem (ih x))))
-  have hnil : IsNilpotent (n a * T) := ⟨j, LinearMap.ext fun x => by
-    have hx := hpow j x
-    rw [hbot, Submodule.mem_bot] at hx
-    exact hx⟩
+  have hnil : IsNilpotent (n a * T) := ⟨
+    j,
+    LinearMap.ext fun x => by
+      have hx := hpow j x
+      rw [hbot, Submodule.mem_bot] at hx
+      exact hx
+  ⟩
   exact (LinearMap.isNilpotent_trace_of_isNilpotent hnil).eq_zero
 
-private theorem trTheta_ext {ι M : Type} [AddCommGroup M] [Module ℂ M] {V : ι → Submodule ℂ M}
-    (htop : ⨆ i, V i = ⊤) {f g : Module.End ℂ M} (h : ∀ i, ∀ x ∈ V i, f x = g x) : f = g := by
+private theorem trTheta_ext
+    {ι M : Type} [AddCommGroup M] [Module ℂ M]
+    {V : ι → Submodule ℂ M} (htop : ⨆ i, V i = ⊤)
+    {f g : Module.End ℂ M} (h : ∀ i, ∀ x ∈ V i, f x = g x)
+    : f = g := by
   ext x
   have hx : x ∈ ⨆ i, V i := by rw [htop]; exact Submodule.mem_top
-  exact Submodule.iSup_induction V (motive := fun x => f x = g x) hx (fun i y hy => h i y hy)
-    (by simp) (fun y z hy hz => by simp only [map_add (f := _), hy, hz])
+  exact Submodule.iSup_induction V
+    (motive := fun x => f x = g x)
+    hx
+    (fun i y hy => h i y hy)
+    (by simp)
+    (fun y z hy hz => by simp only [map_add (f := _), hy, hz])
 
-private theorem trTheta_proj {ι M : Type} [AddCommGroup M] [Module ℂ M] {V : ι → Submodule ℂ M}
-    (hind : iSupIndep V) (htop : ⨆ i, V i = ⊤) (i : ι) :
-    ∃ P : Module.End ℂ M, (∀ x ∈ V i, P x = x) ∧ (∀ j, j ≠ i → ∀ x ∈ V j, P x = 0) ∧
-      ∀ x, P x ∈ V i := by
+private theorem trTheta_proj
+    {ι M : Type} [AddCommGroup M] [Module ℂ M]
+    {V : ι → Submodule ℂ M} (hind : iSupIndep V) (htop : ⨆ i, V i = ⊤)
+    (i : ι)
+    : ∃ P : Module.End ℂ M,
+      (∀ x ∈ V i, P x = x) ∧ (∀ j, j ≠ i → ∀ x ∈ V j, P x = 0) ∧ ∀ x, P x ∈ V i := by
   have hcompl : IsCompl (V i) (⨆ j, ⨆ (_ : j ≠ i), V j) := by
     refine ⟨hind i, codisjoint_iff.mpr (eq_top_iff.mpr ?_)⟩
     rw [← htop]
@@ -134,23 +154,26 @@ private theorem trTheta_proj {ι M : Type} [AddCommGroup M] [Module ℂ M] {V : 
     exact congrArg Subtype.val (Submodule.linearProjOfIsCompl_apply_left hcompl ⟨x, hx⟩)
   · intro j hj x hx
     exact congrArg Subtype.val
-      (Submodule.linearProjOfIsCompl_apply_right hcompl
-        ⟨x, (le_iSup₂_of_le (f := fun j (_ : j ≠ i) => V j) j hj le_rfl : V j ≤ ⨆ j, ⨆ (_ : j ≠ i), V j) hx⟩)
+      (Submodule.linearProjOfIsCompl_apply_right hcompl ⟨
+        x,
+        (le_iSup₂_of_le (f := fun j (_ : j ≠ i) => V j) j hj le_rfl : V j ≤ ⨆ j, ⨆ (_ : j ≠ i), V j)
+          hx
+      ⟩)
   · intro x
     exact ((V i).projectionOnto _ hcompl x).2
 
-theorem UpperTheory.V.Z.Sym.Tf.trTheta :
-    UpperTheory.V.Z.Sym.Tf.TrTheta := by
+theorem UpperTheory.V.Z.Sym.Tf.trTheta : UpperTheory.V.Z.Sym.Tf.TrTheta := by
   intro Λ M _ _ _ u Θ σ hc hΘ
   classical
   let V : (Λ → ℂ) → Submodule ℂ M := fun χ => ⨅ a, (u a).maxGenEigenspace (χ a)
-  have memV : ∀ χ x, x ∈ V χ ↔ ∀ b, ∃ k : ℕ, ((u b - χ b • (1 : End ℂ M)) ^ k) x = 0 :=
-    fun χ x => Module.End.mem_iInf_maxGenEigenspace_iff u χ x
+  have memV : ∀ χ x, x ∈ V χ ↔ ∀ b, ∃ k : ℕ, ((u b - χ b • (1 : End ℂ M)) ^ k) x = 0 := fun χ x =>
+    Module.End.mem_iInf_maxGenEigenspace_iff u χ x
   have hmaps : ∀ a b φ, Set.MapsTo (u a) ((u b).maxGenEigenspace φ) ((u b).maxGenEigenspace φ) :=
     fun a b φ => Module.End.mapsTo_maxGenEigenspace_of_comm (hc b a) φ
   have hind : iSupIndep V := Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo u hmaps
-  have htop : ⨆ χ, V χ = ⊤ := Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_forall_mapsTo u hmaps
-    (fun a => Module.End.iSup_maxGenEigenspace_eq_top (u a))
+  have htop : ⨆ χ, V χ = ⊤ :=
+    Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_forall_mapsTo u hmaps
+      (fun a => Module.End.iSup_maxGenEigenspace_eq_top (u a))
   have hfin : {χ | V χ ≠ ⊥}.Finite := WellFoundedGT.finite_ne_bot_of_iSupIndep hind
   have hint : DirectSum.IsInternal V :=
     (DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top V).mpr ⟨hind, htop⟩
@@ -173,9 +196,9 @@ theorem UpperTheory.V.Z.Sym.Tf.trTheta :
     have h2 := LinearMap.congr_fun (hs.pow_right k) x
     rw [Module.End.mul_apply, Module.End.mul_apply, hk, map_zero] at h2
     exact h2.symm
-  have fixOK : ∀ χ : Λ → ℂ, (∀ b, χ (σ b) = χ b) → ∀ b, χ b = χ (σ.symm b) :=
-    fun χ h b => by rw [← h (σ.symm b), σ.apply_symm_apply]
-  have nfix : ∀ χ : Λ → ℂ, ¬ (∀ b, χ (σ b) = χ b) → (fun b => χ (σ.symm b)) ≠ χ := by
+  have fixOK : ∀ χ : Λ → ℂ, (∀ b, χ (σ b) = χ b) → ∀ b, χ b = χ (σ.symm b) := fun χ h b => by
+    rw [← h (σ.symm b), σ.apply_symm_apply]
+  have nfix : ∀ χ : Λ → ℂ, ¬(∀ b, χ (σ b) = χ b) → (fun b => χ (σ.symm b)) ≠ χ := by
     intro χ h he
     apply h
     intro b
@@ -200,14 +223,17 @@ theorem UpperTheory.V.Z.Sym.Tf.trTheta :
       subst hx0
       simp
   have hPΘ : ∀ χ, Set.MapsTo (P χ * Θ) (V χ) (V χ) := fun χ x _ => hP3 χ (Θ x)
-  refine ⟨F.filter (fun χ => ∀ b, χ (σ b) = χ b),
-    fun χ => LinearMap.trace ℂ (V χ) ((P χ * Θ).restrict (hPΘ χ)), ?_, ?_⟩
+  refine ⟨
+    F.filter (fun χ => ∀ b, χ (σ b) = χ b),
+    fun χ => LinearMap.trace ℂ (V χ) ((P χ * Θ).restrict (hPΘ χ)),
+    ?_,
+    ?_
+  ⟩
   · intro χ hχ
     rw [Finset.mem_filter, hF, Set.Finite.mem_toFinset] at hχ
     exact ⟨hχ.1, hχ.2⟩
   · intro a
-    have decomp : u a * Θ = ∑ χ ∈ F, u a * Θ * P χ := by
-      rw [← Finset.mul_sum, sumP, mul_one]
+    have decomp : u a * Θ = ∑ χ ∈ F, u a * Θ * P χ := by rw [← Finset.mul_sum, sumP, mul_one]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [decomp, map_sum, Finset.sum_filter]
     refine Finset.sum_congr rfl fun χ hχ => ?_
@@ -236,7 +262,8 @@ theorem UpperTheory.V.Z.Sym.Tf.trTheta :
           apply Subtype.ext
           have hΘy : Θ y ∈ V χ := ΘV χ χ (fixOK χ hfix) y y.2
           change u a (Θ (P χ y)) = χ a • P χ (Θ y) + (u a - χ a • (1 : End ℂ M)) (P χ (Θ y))
-          rw [hP1 χ _ y.2, hP1 χ _ hΘy, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply]
+          rw [hP1 χ _ y.2, hP1 χ _ hΘy, LinearMap.sub_apply, LinearMap.smul_apply,
+            Module.End.one_apply]
           abel
         have hcN : ∀ b b', Commute (N b) (N b') := by
           intro b b'
@@ -259,10 +286,10 @@ theorem UpperTheory.V.Z.Sym.Tf.trTheta :
           apply LinearMap.ext
           intro y
           apply Subtype.ext
-          have m1 : Θ ((u b - χ b • (1 : End ℂ M)) y) ∈ V χ :=
-            ΘV χ χ (fixOK χ hfix) _ (hN b y.2)
+          have m1 : Θ ((u b - χ b • (1 : End ℂ M)) y) ∈ V χ := ΘV χ χ (fixOK χ hfix) _ (hN b y.2)
           have m2 : Θ y ∈ V χ := ΘV χ χ (fixOK χ hfix) y y.2
-          change P χ (Θ ((u b - χ b • (1 : End ℂ M)) y)) = (u (σ b) - χ (σ b) • (1 : End ℂ M)) (P χ (Θ y))
+          change P χ (Θ ((u b - χ b • (1 : End ℂ M)) y))
+            = (u (σ b) - χ (σ b) • (1 : End ℂ M)) (P χ (Θ y))
           rw [hP1 χ _ m1, hP1 χ _ m2]
           exact LinearMap.congr_fun hE y
         rw [hEq, add_mul, map_add (f := _), smul_mul_assoc, one_mul, map_smul, smul_eq_mul,

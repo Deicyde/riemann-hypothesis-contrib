@@ -19,9 +19,10 @@ section Core
 
 variable {S : HSpace E} (Λ : Submodule (𝓞 E) S.V) {r : ℕ} {T T' : E}
 
-theorem UUE_eq (F : LFlag S r T) (F' : LFlag S r T') (hz : F.zt = F.fl.z) (hz' : F'.zt = F'.fl.z)
-    (hX : Xsp F ≤ spanE S (XLam Λ F)) (hX' : Xsp F' ≤ spanE S (XLam Λ F')) :
-    UUE Λ F F' = Submodule.span E (Set.range (Sum.elim F.fl.fvec F'.fl.fvec)) := by
+theorem UUE_eq
+    (F : LFlag S r T) (F' : LFlag S r T') (hz : F.zt = F.fl.z) (hz' : F'.zt = F'.fl.z)
+    (hX : Xsp F ≤ spanE S (XLam Λ F)) (hX' : Xsp F' ≤ spanE S (XLam Λ F'))
+    : UUE Λ F F' = Submodule.span E (Set.range (Sum.elim F.fl.fvec F'.fl.fvec)) := by
   have hfv : ∀ i, F.fl.fvec i ∈ Submodule.span E (Set.range (Sum.elim F.fl.fvec F'.fl.fvec)) :=
     fun i => Submodule.subset_span ⟨Sum.inl i, rfl⟩
   have hfv' : ∀ i, F'.fl.fvec i ∈ Submodule.span E (Set.range (Sum.elim F.fl.fvec F'.fl.fvec)) :=
@@ -37,7 +38,8 @@ theorem UUE_eq (F : LFlag S r T) (F' : LFlag S r T') (hz : F.zt = F.fl.z) (hz' :
     unfold Xsp Formalism.MainNotions.S.FlagG.X
     rw [Submodule.span_le]
     rintro _ ⟨a, rfl⟩
-    have he : F'.fl.fvec (Fin.castSucc a) = F'.fl.e a := by simp [Formalism.MainNotions.S.FlagG.fvec]
+    have he : F'.fl.fvec (Fin.castSucc a) = F'.fl.e a := by
+      simp [Formalism.MainNotions.S.FlagG.fvec]
     rw [← he]
     exact hfv' _
   have hzF : F.zt ∈ Submodule.span E (Set.range (Sum.elim F.fl.fvec F'.fl.fvec)) := by
@@ -82,8 +84,8 @@ theorem UUE_eq (F : LFlag S r T) (F' : LFlag S r T') (hz : F.zt = F.fl.z) (hz' :
       apply Submodule.subset_span
       change F.zt ∈ UU Λ F F'
       unfold UU
-      exact Submodule.mem_sup_left (Submodule.mem_sup_left
-        (Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)))
+      exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.mem_sup_right
+        (Submodule.mem_span_singleton_self _)))
     have hzU' : F'.zt ∈ UUE Λ F F' := by
       unfold UUE spanE
       apply Submodule.subset_span
@@ -109,21 +111,21 @@ theorem UUE_eq (F : LFlag S r T) (F' : LFlag S r T') (hz : F.zt = F.fl.z) (hz' :
           unfold Xsp Formalism.MainNotions.S.FlagG.X
           exact Submodule.subset_span ⟨a, rfl⟩))
 
-theorem mem_ThPairs (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V) (p : S.V × S.V) :
-    p ∈ ThPairs Λ F F' F'' β ↔ p.1 ∈ Hp Λ F F' ∧ p.2 ∈ Hp Λ F F'' ∧ p.1 - p.2 ∈ Xsp F ∧
-      β p.1 - p.2 ∈ Xsp F'' := by
+theorem mem_ThPairs (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V) (p : S.V × S.V)
+    : p ∈ ThPairs Λ F F' F'' β
+      ↔ p.1 ∈ Hp Λ F F' ∧ p.2 ∈ Hp Λ F F'' ∧ p.1 - p.2 ∈ Xsp F ∧ β p.1 - p.2 ∈ Xsp F'' := by
   unfold ThPairs
   simp only [Submodule.mem_inf, Submodule.mem_prod, Submodule.mem_comap, LinearMap.sub_apply,
     LinearMap.fst_apply, LinearMap.snd_apply, LinearMap.comp_apply, LinearEquiv.coe_coe, and_assoc]
 
-theorem core (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
+theorem core
+    (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
     (hz : F.zt = F.fl.z) (hz' : F'.zt = F'.fl.z) (hz'' : F''.zt = F''.fl.z)
     (hX : Xsp F ≤ spanE S (XLam Λ F)) (hX' : Xsp F' ≤ spanE S (XLam Λ F'))
-    (hX'' : Xsp F'' ≤ spanE S (XLam Λ F''))
-    (hn : finrank E S.V = k + 2 * r + 1) (hT : T ≠ 0)
-    (hG' : Gval F F' ≠ 0) (hG'' : Gval F F'' ≠ 0)
-    (hs : s0 Λ F F' F'' β k = 1) (hsc : IsScalar Λ F F' F'' β) :
-    Dr F F' = 0 ↔ Dr F F'' = 0 := by
+    (hX'' : Xsp F'' ≤ spanE S (XLam Λ F'')) (hn : finrank E S.V = k + 2 * r + 1) (hT : T ≠ 0)
+    (hG' : Gval F F' ≠ 0) (hG'' : Gval F F'' ≠ 0) (hs : s0 Λ F F' F'' β k = 1)
+    (hsc : IsScalar Λ F F' F'' β)
+    : Dr F F' = 0 ↔ Dr F F'' = 0 := by
   have hU1 := UUE_eq Λ F F' hz hz' hX hX'
   have hU2 := UUE_eq Λ F F'' hz hz'' hX hX''
   have hd1 : finrank E (UUE Λ F F') = 2 * r + 2 := by
@@ -149,8 +151,7 @@ theorem core (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃�
   have hThle : Th Λ F F' F'' β ≤ Hp Λ F F' := by
     rintro x ⟨p, hp, rfl⟩
     exact ((mem_ThPairs Λ F F' F'' β p).1 hp).1
-  have hTheq : Th Λ F F' F'' β = Hp Λ F F' :=
-    Submodule.eq_of_le_of_finrank_eq hThle (by omega)
+  have hTheq : Th Λ F F' F'' β = Hp Λ F F' := Submodule.eq_of_le_of_finrank_eq hThle (by omega)
 
   have hTh''le : Th'' Λ F F' F'' β ≤ Hp Λ F F'' := by
     rintro x ⟨p, hp, rfl⟩
@@ -182,30 +183,38 @@ theorem core (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃�
     have h3 := Submodule.finrank_mono hTh''le
     omega
 
-  have key : ∀ y ∈ Ylift Λ F F', y ∈ Ylift Λ F F'' →
-      (SgRel F F' y 0 1 0 ↔ SgRel F F'' y 0 1 0) := fun y h1 h2 =>
-    hsc y h1 y h2 0 (Submodule.zero_mem _) 0 (Submodule.zero_mem _) (by simp)
-      (by simp) 1 0
+  have key : ∀ y ∈ Ylift Λ F F', y ∈ Ylift Λ F F'' → (SgRel F F' y 0 1 0 ↔ SgRel F F'' y 0 1 0) :=
+    fun y h1 h2 =>
+      hsc y h1 y h2 0 (Submodule.zero_mem _) 0 (Submodule.zero_mem _) (by simp) (by simp) 1 0
   have hzX : ∀ x ∈ Xsp F, S.hT F.fl.z x = 0 := fun x hx =>
-    (mem_orth S).1 (X_le_orth_Xplus F.fl hx) _ (Submodule.mem_sup_right (Submodule.mem_span_singleton_self _))
+    (mem_orth S).1 (X_le_orth_Xplus F.fl hx) _
+      (Submodule.mem_sup_right (Submodule.mem_span_singleton_self _))
   have heX : ∀ x ∈ Xsp F, ∀ a, S.hT (F.fl.e a) x = 0 := fun x hx a =>
-    (mem_orth S).1 (X_le_orth_Xplus F.fl hx) _ (Submodule.mem_sup_left (Submodule.subset_span ⟨a, rfl⟩))
+    (mem_orth S).1 (X_le_orth_Xplus F.fl hx) _
+      (Submodule.mem_sup_left (Submodule.subset_span ⟨a, rfl⟩))
 
-  have hyo : ∀ b : S.V, (∀ a, S.hT (F.fl.e a) b = 0) → S.hT F.fl.z b = T →
-      F.fl.z + b ∈ orth S (Xplus F) := by
+  have hyo
+      : ∀ b : S.V,
+        (∀ a, S.hT (F.fl.e a) b = 0) → S.hT F.fl.z b = T → F.fl.z + b ∈ orth S (Xplus F) := by
     intro b hbe hbz
     rw [Xplus, mem_orth_Xplus]
     refine ⟨fun a => ?_, ?_⟩
     · rw [map_add (f := _), F.fl.z_orth a, hbe a, add_zero]
     · rw [map_add (f := _), F.fl.z_norm, hbz, neg_add_cancel]
 
-  have hconcl : ∀ (F₂ : LFlag S r T'), F₂.zt = F₂.fl.z → ∀ b x x₂ : S.V, (∀ a, S.hT (F.fl.e a) b = 0) →
-      S.hT F.fl.z b = T → x ∈ Xsp F → x₂ ∈ Xsp F₂ →
-      F.fl.z + b - 0 = ((1 : E) • F.zt + x) + ((0 : E) • F₂.zt + x₂) → Dl F.fl F₂.fl r = 0 := by
+  have hconcl
+      : ∀ (F₂ : LFlag S r T'),
+        F₂.zt = F₂.fl.z
+          → ∀ b x x₂ : S.V,
+            (∀ a, S.hT (F.fl.e a) b = 0) → S.hT F.fl.z b = T → x ∈ Xsp F → x₂ ∈ Xsp F₂
+              → F.fl.z + b - 0 = ((1 : E) • F.zt + x) + ((0 : E) • F₂.zt + x₂)
+              → Dl F.fl F₂.fl r = 0 := by
     intro F₂ _ b x x₂ hbe hbz hx hx₂ heq
     rw [hz, one_smul, zero_smul, zero_add, sub_zero] at heq
     have hx₂e : x₂ = b - x := by
-      calc x₂ = (F.fl.z + x + x₂) - F.fl.z - x := by abel
+      calc
+        x₂
+          = (F.fl.z + x + x₂) - F.fl.z - x := by abel
         _ = (F.fl.z + b) - F.fl.z - x := by rw [heq]
         _ = b - x := by abel
     have hx₂z : S.hT F.fl.z x₂ = T := by rw [hx₂e, map_sub, hbz, hzX x hx, sub_zero]
@@ -215,12 +224,12 @@ theorem core (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃�
       exact hT hx₂z.symm
     · rw [hx₂e, map_sub, hbe a, heX x hx a, sub_zero]
   constructor
-  ·
-    intro hD
+  · intro hD
     obtain ⟨b, hbX, hbe, hbz⟩ := exists_b F.fl F'.fl hG' hD
     have hyU1 : F.fl.z + b ∈ UUE Λ F F' := by
       rw [hU1]
-      refine Submodule.add_mem _ (Submodule.subset_span ⟨Sum.inl (Fin.last r), by simp [fvec_last]⟩) ?_
+      refine Submodule.add_mem _ (Submodule.subset_span ⟨Sum.inl (Fin.last r), by simp [fvec_last]⟩)
+        ?_
       have hXs : F'.fl.X ≤ Submodule.span E (Set.range (Sum.elim F.fl.fvec F'.fl.fvec)) := by
         rw [FlagG.X, Submodule.span_le]
         rintro _ ⟨a, rfl⟩
@@ -240,16 +249,15 @@ theorem core (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃�
       have : p.2 = p.1 - (p.1 - p.2) := by abel
       show S.hT p.2 (F.fl.z + b) = 0
       rw [this, hT_sub_left, e1, e2, sub_zero]
-    have hsg : SgRel F F' (F.fl.z + b) 0 1 0 :=
-      ⟨0, Submodule.zero_mem _, b, hbX, by rw [hz]; simp⟩
+    have hsg : SgRel F F' (F.fl.z + b) 0 1 0 := ⟨0, Submodule.zero_mem _, b, hbX, by rw [hz]; simp⟩
     obtain ⟨x, hx, x₂, hx₂, heq⟩ := (key _ ⟨hyU1, hyo b hbe hbz⟩ ⟨hyU2, hyo b hbe hbz⟩).1 hsg
     exact hconcl F'' hz'' b x x₂ hbe hbz hx hx₂ heq
-  ·
-    intro hD
+  · intro hD
     obtain ⟨b, hbX, hbe, hbz⟩ := exists_b F.fl F''.fl hG'' hD
     have hyU2 : F.fl.z + b ∈ UUE Λ F F'' := by
       rw [hU2]
-      refine Submodule.add_mem _ (Submodule.subset_span ⟨Sum.inl (Fin.last r), by simp [fvec_last]⟩) ?_
+      refine Submodule.add_mem _ (Submodule.subset_span ⟨Sum.inl (Fin.last r), by simp [fvec_last]⟩)
+        ?_
       have hXs : F''.fl.X ≤ Submodule.span E (Set.range (Sum.elim F.fl.fvec F''.fl.fvec)) := by
         rw [FlagG.X, Submodule.span_le]
         rintro _ ⟨a, rfl⟩
@@ -269,8 +277,7 @@ theorem core (k : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃�
       have : p.1 = (p.1 - p.2) + p.2 := by abel
       show S.hT p.1 (F.fl.z + b) = 0
       rw [this, hT_add_left, e1, e2, add_zero]
-    have hsg : SgRel F F'' (F.fl.z + b) 0 1 0 :=
-      ⟨0, Submodule.zero_mem _, b, hbX, by rw [hz]; simp⟩
+    have hsg : SgRel F F'' (F.fl.z + b) 0 1 0 := ⟨0, Submodule.zero_mem _, b, hbX, by rw [hz]; simp⟩
     obtain ⟨x, hx, x₂, hx₂, heq⟩ := (key _ ⟨hyU1, hyo b hbe hbz⟩ ⟨hyU2, hyo b hbe hbz⟩).2 hsg
     exact hconcl F' hz' b x x₂ hbe hbz hx hx₂ heq
 

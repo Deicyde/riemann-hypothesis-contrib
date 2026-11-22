@@ -7,7 +7,8 @@ public import Formalism.HarderNarasimhan.ShiftInvariance
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 namespace GlobalTheory.Dec
@@ -19,7 +20,15 @@ private lemma exp_mul_exp_neg_eq_shell (a : ℝ) (r : ℕ) :
   congr 1
   ring
 
-theorem shell_sum_majorant : ∀ (n q : ℕ) (h : ℝ), 1 ≤ n → 1 ≤ q → 32 * (n : ℝ) ^ 2 * Real.sqrt q ≤ h → AntitoneOn (decE q h) (Set.Ici 0) ∧ (∀ r : ℕ, decE q h r ≤ Real.exp (-(4 * (n : ℝ) ^ 2 * r))) ∧ Summable (fun r : ℕ => Real.exp (2 * (n : ℝ) ^ 2 * (r + 1)) * Real.exp (-(4 * (n : ℝ) ^ 2 * r))) ∧ ∑' r : ℕ, Real.exp (2 * (n : ℝ) ^ 2 * (r + 1)) * Real.exp (-(4 * (n : ℝ) ^ 2 * r)) ≤ 2 * Real.exp (2 * (n : ℝ) ^ 2) := by
+theorem shell_sum_majorant
+    : ∀ (n q : ℕ) (h : ℝ),
+      1 ≤ n → 1 ≤ q → 32 * (n : ℝ) ^ 2 * Real.sqrt q ≤ h
+        → AntitoneOn (decE q h) (Set.Ici 0)
+          ∧ (∀ r : ℕ, decE q h r ≤ Real.exp (-(4 * (n : ℝ) ^ 2 * r)))
+          ∧ Summable (fun r : ℕ =>
+            Real.exp (2 * (n : ℝ) ^ 2 * (r + 1)) * Real.exp (-(4 * (n : ℝ) ^ 2 * r)))
+          ∧ ∑' r : ℕ, Real.exp (2 * (n : ℝ) ^ 2 * (r + 1)) * Real.exp (-(4 * (n : ℝ) ^ 2 * r))
+            ≤ 2 * Real.exp (2 * (n : ℝ) ^ 2) := by
   intro n q h hn hq hh
   have hq1 : (1 : ℝ) ≤ (q : ℝ) := by exact_mod_cast hq
   have hsq : 1 ≤ Real.sqrt (q : ℝ) := Real.one_le_sqrt.mpr hq1
@@ -31,15 +40,13 @@ theorem shell_sum_majorant : ∀ (n q : ℕ) (h : ℝ), 1 ≤ n → 1 ≤ q → 
     have : 0 ≤ 32 * (n : ℝ) ^ 2 * Real.sqrt q := by positivity
     linarith
   have hgeo := fun r : ℕ => exp_mul_exp_neg_eq_shell ((n : ℝ) ^ 2) r
-  have h3 : 3 ≤ Real.exp (2 * (n : ℝ) ^ 2) := by
-    linarith [Real.add_one_le_exp (2 * (n : ℝ) ^ 2)]
+  have h3 : 3 ≤ Real.exp (2 * (n : ℝ) ^ 2) := by linarith [Real.add_one_le_exp (2 * (n : ℝ) ^ 2)]
   have he0 : 0 ≤ Real.exp (-(2 * (n : ℝ) ^ 2)) := (Real.exp_pos _).le
   have he : Real.exp (-(2 * (n : ℝ) ^ 2)) ≤ 1 / 2 := by
     rw [Real.exp_neg, inv_eq_one_div, div_le_div_iff₀ (by linarith) (by norm_num)]
     linarith
   refine ⟨?_, ?_, ?_, ?_⟩
-  ·
-    intro x hx y hy hxy
+  · intro x hx y hy hxy
     simp only [Set.mem_Ici] at hx hy
     unfold GlobalTheory.Count.decE
     apply Real.exp_le_exp.mpr
@@ -49,8 +56,7 @@ theorem shell_sum_majorant : ∀ (n q : ℕ) (h : ℝ), 1 ≤ n → 1 ≤ q → 
       · exact div_le_div_of_nonneg_right hxy hsqpos.le
     rw [neg_mul, neg_mul, neg_le_neg_iff]
     exact mul_le_mul_of_nonneg_left hm (by positivity)
-  ·
-    intro r
+  · intro r
     unfold GlobalTheory.Count.decE
     apply Real.exp_le_exp.mpr
     rcases Nat.eq_zero_or_pos r with hr | hr
@@ -72,8 +78,7 @@ theorem shell_sum_majorant : ∀ (n q : ℕ) (h : ℝ), 1 ≤ n → 1 ≤ q → 
       linarith
   · rw [funext hgeo]
     exact (summable_geometric_of_lt_one he0 (by linarith)).mul_left _
-  ·
-    rw [funext hgeo, tsum_mul_left, tsum_geometric_of_lt_one he0 (by linarith)]
+  · rw [funext hgeo, tsum_mul_left, tsum_geometric_of_lt_one he0 (by linarith)]
     have hinv : (1 - Real.exp (-(2 * (n : ℝ) ^ 2)))⁻¹ ≤ 2 := by
       rw [inv_eq_one_div, div_le_iff₀ (by linarith)]
       linarith

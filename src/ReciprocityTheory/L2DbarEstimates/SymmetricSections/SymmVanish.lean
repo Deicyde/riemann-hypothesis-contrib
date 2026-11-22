@@ -22,22 +22,25 @@ theorem symmVanish : symmVanishStatement.{u} := by
     refine h1.congr' (Eventually.of_forall fun v => rfl) ?_
     filter_upwards [hWn] with v hv
     simp only [Function.comp_apply, hzs i v hv, hx]
-  have hprod : ∀ t : Finset (Fin d),
-      (fun v => ∏ i ∈ t, u (s i v)) =O[𝓝 w₀] fun v => ‖v - w₀‖ ^ (t.card * N) := by
+  have hprod
+      : ∀ t : Finset (Fin d),
+        (fun v => ∏ i ∈ t, u (s i v)) =O[𝓝 w₀] fun v => ‖v - w₀‖ ^ (t.card * N) := by
     intro t
     induction t using Finset.induction_on with
     | empty => simpa using (isBigO_const_const (1 : ℂ) (one_ne_zero : (1 : ℝ) ≠ 0) (𝓝 w₀))
     | insert a t ha ih =>
-      have hc : (insert a t).card = t.card + 1 := by
-        exact Finset.card_insert_of_notMem ha
+      have hc : (insert a t).card = t.card + 1 := by exact Finset.card_insert_of_notMem ha
       simp only [Finset.prod_insert ha]
       rw [hc]
       exact ((hi a).mul ih).congr' (Eventually.of_forall fun v => rfl)
         (Eventually.of_forall fun v => by
           show ‖v - w₀‖ ^ N * ‖v - w₀‖ ^ (t.card * N) = ‖v - w₀‖ ^ ((t.card + 1) * N)
-          rw [← pow_add]; congr 1; ring)
-  have heq : (fun v => ∑ t ∈ (Finset.univ : Finset (Fin d)).powersetCard k, ∏ i ∈ t, u (s i v))
-      =ᶠ[𝓝 w₀] fiberSymm n z u k := by
+          rw [← pow_add]
+          congr 1
+          ring)
+  have heq
+      : (fun v => ∑ t ∈ (Finset.univ : Finset (Fin d)).powersetCard k, ∏ i ∈ t, u (s i v))
+        =ᶠ[𝓝 w₀] fiberSymm n z u k := by
     filter_upwards [hWn] with v hv
     rw [fiberSymm, hvals v hv, Finset.esymm_map_val]
   refine IsBigO.congr' ?_ heq (Eventually.of_forall fun _ => rfl)

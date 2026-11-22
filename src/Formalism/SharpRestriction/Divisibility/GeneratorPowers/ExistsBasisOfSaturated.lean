@@ -10,12 +10,13 @@ noncomputable section
 
 namespace Formalism.L2.Pj.SatLin
 
-theorem exists_basis_of_saturated {R : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R] {d r : ℕ}
-    (u : Fin r → (Fin d → R)) (hu : LinearIndependent R u)
-    (hs : ∀ (v : Fin d → R) (a : R), a ≠ 0 → a • v ∈ Submodule.span R (Set.range u) →
-      v ∈ Submodule.span R (Set.range u)) :
-    ∃ (w : Fin d → Fin d → R) (emb : Fin r ↪ Fin d), (∀ i, w (emb i) = u i) ∧
-      ∀ v : Fin d → R, ∃! a : Fin d → R, ∀ j, ∑ k, a k * w k j = v j := by
+theorem exists_basis_of_saturated
+    {R : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R]
+    {d r : ℕ} (u : Fin r → (Fin d → R)) (hu : LinearIndependent R u)
+    (hs : ∀ (v : Fin d → R) (a : R),
+      a ≠ 0 → a • v ∈ Submodule.span R (Set.range u) → v ∈ Submodule.span R (Set.range u))
+    : ∃ (w : Fin d → Fin d → R) (emb : Fin r ↪ Fin d),
+      (∀ i, w (emb i) = u i) ∧ ∀ v : Fin d → R, ∃! a : Fin d → R, ∀ j, ∑ k, a k * w k j = v j := by
   classical
   set S := Submodule.span R (Set.range u) with hS
   haveI : NoZeroSMulDivisors R ((Fin d → R) ⧸ S) := by
@@ -40,8 +41,9 @@ theorem exists_basis_of_saturated {R : Type} [CommRing R] [IsDomain R] [IsPrinci
     have hr : ∀ j, g (Sum.inr j) = 0 := by
       have h1 := congrArg S.mkQ hg
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [w', Sum.elim_inl, Sum.elim_inr, map_add (f := _), map_sum, map_smul, map_zero, Submodule.mkQ_apply,
-        hmk, hs', smul_zero, Finset.sum_const_zero, zero_add] at h1
+        simp only [w', Sum.elim_inl, Sum.elim_inr, map_add (f := _), map_sum, map_smul, map_zero,
+            Submodule.mkQ_apply, hmk, hs', smul_zero, Finset.sum_const_zero, zero_add]
+          at h1
       exact Fintype.linearIndependent_iff.1 bQ.linearIndependent _ h1
     have hl : ∀ i, g (Sum.inl i) = 0 := by
       simp only [hr, zero_smul, Finset.sum_const_zero, add_zero, w', Sum.elim_inl] at hg
@@ -52,7 +54,9 @@ theorem exists_basis_of_saturated {R : Type} [CommRing R] [IsDomain R] [IsPrinci
   have hsp : ⊤ ≤ Submodule.span R (Set.range w') := by
     intro v _
     have hv := bQ.sum_repr (Submodule.Quotient.mk (p := S) v)
-    have ht : (∑ j, bQ.repr (Submodule.Quotient.mk (p := S) v) j • s' j) ∈ Submodule.span R (Set.range w') :=
+    have ht
+        : (∑ j, bQ.repr (Submodule.Quotient.mk (p := S) v) j • s' j)
+          ∈ Submodule.span R (Set.range w') :=
       Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨Sum.inr j, rfl⟩)
     have hvt : v - ∑ j, bQ.repr (Submodule.Quotient.mk (p := S) v) j • s' j ∈ S := by
       set_option synthInstance.maxHeartbeats 100000 in
@@ -68,15 +72,21 @@ theorem exists_basis_of_saturated {R : Type} [CommRing R] [IsDomain R] [IsPrinci
     rw [← Module.finrank_eq_card_basis B, Module.finrank_fin_fun]
   let e := Fintype.equivFinOfCardEq hcard
   let b := B.reindex e
-  refine ⟨fun k => b k, ⟨fun i => e (Sum.inl i), e.injective.comp Sum.inl_injective⟩, fun i => ?_, fun v => ?_⟩
+  refine ⟨
+    fun k => b k,
+    ⟨fun i => e (Sum.inl i), e.injective.comp Sum.inl_injective⟩,
+    fun i => ?_,
+    fun v => ?_
+  ⟩
   · simp [b, B, Module.Basis.reindex_apply, Module.Basis.mk_apply, w']
   · refine ⟨fun k => b.repr v k, fun j => ?_, fun a ha => ?_⟩
     · have h := congrFun (b.sum_repr v) j
       simpa [Finset.sum_apply, smul_eq_mul] using h
-    · have hv : ∑ k, a k • b k = v := funext fun j => by simpa [Finset.sum_apply, smul_eq_mul] using ha j
+    · have hv : ∑ k, a k • b k = v :=
+        funext fun j => by simpa [Finset.sum_apply, smul_eq_mul] using ha j
       funext k
       rw [← hv]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, Module.Basis.repr_self, Finsupp.single_apply]
+      simp [map_sum, Module.Basis.repr_self, Finsupp.single_apply]
 
 end Formalism.L2.Pj.SatLin

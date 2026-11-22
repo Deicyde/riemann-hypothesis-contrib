@@ -14,8 +14,8 @@ open MvPolynomial
 noncomputable section
 
 def PointIdealMultiProj.Statement : Prop :=
-  ∀ (F : Type) [Field F] (L : Type) [Field L] [Algebra F L]
-    (K : Type) [DecidableEq K] (ι : K → Type) (z : (Σ k, ι k) → L),
+  ∀ (F : Type) [Field F] (L : Type) [Field L] [Algebra F L] (K : Type) [DecidableEq K]
+      (ι : K → Type) (z : (Σ k, ι k) → L),
     (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) → IsMultiProjPrime (pointIdeal F z)
 
 end

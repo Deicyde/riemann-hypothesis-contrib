@@ -18,79 +18,83 @@ namespace FunctorialResolution.EmbeddedResolution
 
 variable {X Y : Scheme.{u}}
 
-private theorem comap_finset_prod {ι : Type*} (s : Finset ι) (F : ι → X.IdealSheafData)
-    (h : Y ⟶ X) : (∏ i ∈ s, F i).comap h = ∏ i ∈ s, (F i).comap h := by
+private theorem comap_finset_prod {ι : Type*} (s : Finset ι) (F : ι → X.IdealSheafData) (h : Y ⟶ X)
+    : (∏ i ∈ s, F i).comap h = ∏ i ∈ s, (F i).comap h := by
   induction s using Finset.cons_induction with
   | empty => simp
-  | cons a s ha ih =>
-      rw [Finset.prod_cons, Finset.prod_cons, Scheme.IdealSheafData.comap_mul, ih]
+  | cons a s ha ih => rw [Finset.prod_cons, Finset.prod_cons, Scheme.IdealSheafData.comap_mul, ih]
 
-theorem comap_comap_ι (h : Y ⟶ X) (J : X.IdealSheafData) (U : X.Opens) :
-    (J.comap h).comap (h ⁻¹ᵁ U).ι = (J.comap U.ι).comap (h ∣_ U) := by
+theorem comap_comap_ι (h : Y ⟶ X) (J : X.IdealSheafData) (U : X.Opens)
+    : (J.comap h).comap (h ⁻¹ᵁ U).ι = (J.comap U.ι).comap (h ∣_ U) := by
   rw [← Scheme.IdealSheafData.comap_comp, ← Scheme.IdealSheafData.comap_comp, morphismRestrict_ι]
 
-theorem support_comap_subset_biUnion (h : Y ⟶ X) (E : List X.IdealSheafData)
-    (M : X.IdealSheafData) (hM : (M.support : Set X) ⊆ ⋃ D ∈ E, (D.support : Set X)) :
-    ((M.comap h).support : Set Y) ⊆
-      ⋃ D ∈ E.map (fun D : X.IdealSheafData => D.comap h), (D.support : Set Y) := by
+theorem support_comap_subset_biUnion
+    (h : Y ⟶ X)
+    (E : List X.IdealSheafData) (M : X.IdealSheafData)
+    (hM : (M.support : Set X) ⊆ ⋃ D ∈ E, (D.support : Set X))
+    : ((M.comap h).support : Set Y)
+      ⊆ ⋃ D ∈ E.map (fun D : X.IdealSheafData => D.comap h), (D.support : Set Y) := by
   intro y hy
   have hy' : h.base y ∈ (M.support : Set X) := Scheme.IdealSheafData.mem_support_comap.mp hy
   obtain ⟨D, hD, hyD⟩ := Set.mem_iUnion₂.mp (hM hy')
   refine Set.mem_iUnion₂.mpr ⟨D.comap h, List.mem_map.mpr ⟨D, hD, rfl⟩, ?_⟩
   exact Scheme.IdealSheafData.mem_support_comap.mpr hyD
 
-theorem IsMonomialIn.comap_of_isMonomialIn {E : List X.IdealSheafData} {M : X.IdealSheafData}
-    (hM : IsMonomialIn E M) (h : Y ⟶ X) :
-    IsMonomialIn (E.map (fun D : X.IdealSheafData => D.comap h)) (M.comap h) := by
+theorem IsMonomialIn.comap_of_isMonomialIn
+    {E : List X.IdealSheafData} {M : X.IdealSheafData} (hM : IsMonomialIn E M) (h : Y ⟶ X)
+    : IsMonomialIn (E.map (fun D : X.IdealSheafData => D.comap h)) (M.comap h) := by
   intro y
   obtain ⟨U, hU, a, ha⟩ := hM (h.base y)
   have hlen : (E.map (fun D : X.IdealSheafData => D.comap h)).length = E.length := by simp
   refine ⟨h ⁻¹ᵁ U, hU, fun i => a (Fin.cast hlen i), ?_⟩
-  have hget : ∀ i : Fin (E.map (fun D : X.IdealSheafData => D.comap h)).length,
-      (E.map (fun D : X.IdealSheafData => D.comap h)).get i
-        = (E.get (Fin.cast hlen i)).comap h := by
+  have hget
+      : ∀ i : Fin (E.map (fun D : X.IdealSheafData => D.comap h)).length,
+        (E.map (fun D : X.IdealSheafData => D.comap h)).get i
+          = (E.get (Fin.cast hlen i)).comap h := by
     intro i
     simp [List.get_eq_getElem]
-  have hterm : ∀ i : Fin E.length,
-      (((E.get i).comap U.ι) ^ a i).comap (h ∣_ U)
-        = ((E.get i).comap h).comap (h ⁻¹ᵁ U).ι ^ a i := by
+  have hterm
+      : ∀ i : Fin E.length,
+        (((E.get i).comap U.ι) ^ a i).comap (h ∣_ U)
+          = ((E.get i).comap h).comap (h ⁻¹ᵁ U).ι ^ a i := by
     intro i
     rw [Scheme.IdealSheafData.comap_pow, ← comap_comap_ι h (E.get i) U]
-  have hprod : (∏ i : Fin E.length, (((E.get i).comap U.ι) ^ a i).comap (h ∣_ U))
-      = ∏ i : Fin E.length, ((E.get i).comap h).comap (h ⁻¹ᵁ U).ι ^ a i :=
+  have hprod
+      : (∏ i : Fin E.length, (((E.get i).comap U.ι) ^ a i).comap (h ∣_ U))
+        = ∏ i : Fin E.length, ((E.get i).comap h).comap (h ⁻¹ᵁ U).ι ^ a i :=
     Finset.prod_congr rfl (fun i _ => hterm i)
   rw [comap_comap_ι h M U, ha, comap_finset_prod, hprod,
-    ← Fin.prod_congr'
-      (fun j : Fin E.length => ((E.get j).comap h).comap (h ⁻¹ᵁ U).ι ^ a j) hlen]
+    ← Fin.prod_congr' (fun j : Fin E.length => ((E.get j).comap h).comap (h ⁻¹ᵁ U).ι ^ a j) hlen]
   refine Finset.prod_congr rfl ?_
   intro i _
   rw [hget i]
 
-theorem irreducibleComponents_not_subset_support_comap (h : Y ⟶ X) (hg : GeneralizingMap (fun y : Y => h.base y))
+theorem irreducibleComponents_not_subset_support_comap
+    (h : Y ⟶ X) (hg : GeneralizingMap (fun y : Y => h.base y))
     (E : List X.IdealSheafData) (N : X.IdealSheafData)
-    (hN : ∀ D ∈ E, ∀ C : Set X, IsIrreducible C → C ⊆ (D.support : Set X) →
-      (∀ C' : Set X, IsIrreducible C' → C' ⊆ (D.support : Set X) → C ⊆ C' → C' ⊆ C) →
-      ¬ C ⊆ (N.support : Set X)) :
-    ∀ D ∈ E.map (fun D : X.IdealSheafData => D.comap h), ∀ C : Set Y, IsIrreducible C →
-      C ⊆ (D.support : Set Y) →
-      (∀ C' : Set Y, IsIrreducible C' → C' ⊆ (D.support : Set Y) → C ⊆ C' → C' ⊆ C) →
-      ¬ C ⊆ ((N.comap h).support : Set Y) := by
+    (hN : ∀ D ∈ E, ∀ C : Set X,
+      IsIrreducible C → C ⊆ (D.support : Set X)
+        → (∀ C' : Set X, IsIrreducible C' → C' ⊆ (D.support : Set X) → C ⊆ C' → C' ⊆ C)
+        → ¬ C ⊆ (N.support : Set X))
+    : ∀ D ∈ E.map (fun D : X.IdealSheafData => D.comap h), ∀ C : Set Y,
+      IsIrreducible C → C ⊆ (D.support : Set Y)
+        → (∀ C' : Set Y, IsIrreducible C' → C' ⊆ (D.support : Set Y) → C ⊆ C' → C' ⊆ C)
+        → ¬ C ⊆ ((N.comap h).support : Set Y) := by
   rintro D' hD' C hC hCsub hCmax hCN
   obtain ⟨D, hD, hDD⟩ := List.mem_map.mp hD'
   have hDD' : D' = D.comap h := hDD.symm
   subst hDD'
   have hCclosed : IsClosed C := by
     rw [← closure_subset_iff_isClosed]
-    exact hCmax (closure C) hC.closure
-      (closure_minimal hCsub (D.comap h).support.isClosed) subset_closure
+    exact hCmax (closure C) hC.closure (closure_minimal hCsub (D.comap h).support.isClosed)
+      subset_closure
   obtain ⟨ξ, hξ⟩ := QuasiSober.sober hC hCclosed
   have hξC : ξ ∈ C := by
     rw [← hξ]
     exact subset_closure (Set.mem_singleton ξ)
   have hxD : h.base ξ ∈ (D.support : Set X) :=
     Scheme.IdealSheafData.mem_support_comap.mp (hCsub hξC)
-  have hxN : h.base ξ ∈ (N.support : Set X) :=
-    Scheme.IdealSheafData.mem_support_comap.mp (hCN hξC)
+  have hxN : h.base ξ ∈ (N.support : Set X) := Scheme.IdealSheafData.mem_support_comap.mp (hCN hξC)
   refine hN D hD (closure ({h.base ξ} : Set X)) isIrreducible_singleton.closure
     (closure_minimal (Set.singleton_subset_iff.mpr hxD) D.support.isClosed) ?_
     (closure_minimal (Set.singleton_subset_iff.mpr hxN) N.support.isClosed)
@@ -99,8 +103,7 @@ theorem irreducibleComponents_not_subset_support_comap (h : Y ⟶ X) (hg : Gener
   have hηmem : η ∈ closure C'' := by
     rw [← hη]
     exact subset_closure (Set.mem_singleton η)
-  have hηD : η ∈ (D.support : Set X) :=
-    closure_minimal hC''sub D.support.isClosed hηmem
+  have hηD : η ∈ (D.support : Set X) := closure_minimal hC''sub D.support.isClosed hηmem
   have hηspec : η ⤳ h.base ξ := by
     refine specializes_iff_mem_closure.mpr ?_
     rw [hη]
@@ -115,8 +118,8 @@ theorem irreducibleComponents_not_subset_support_comap (h : Y ⟶ X) (hg : Gener
     closure_minimal (Set.singleton_subset_iff.mpr hξ'D) (D.comap h).support.isClosed
   have hCsubξ' : C ⊆ closure ({ξ'} : Set Y) := by
     rw [← hξ]
-    exact closure_minimal
-      (Set.singleton_subset_iff.mpr (specializes_iff_mem_closure.mp hξ'1)) isClosed_closure
+    exact closure_minimal (Set.singleton_subset_iff.mpr (specializes_iff_mem_closure.mp hξ'1))
+      isClosed_closure
   have hclosure : closure ({ξ'} : Set Y) ⊆ C :=
     hCmax (closure ({ξ'} : Set Y)) isIrreducible_singleton.closure hclos hCsubξ'
   have hξ'C : ξ' ∈ C := hclosure (subset_closure (Set.mem_singleton _))
@@ -133,31 +136,34 @@ theorem irreducibleComponents_not_subset_support_comap (h : Y ⟶ X) (hg : Gener
   rw [← hη] at hzc
   exact closure_minimal (Set.singleton_subset_iff.mpr hηclos) isClosed_closure hzc
 
-theorem isMonomialSplitting_comap_of_generalizingMap (h : Y ⟶ X)
-    (hg : GeneralizingMap (fun y : Y => h.base y)) {E : List X.IdealSheafData}
-    {I M N : X.IdealSheafData} (hs : IsMonomialSplitting E I M N) :
-    IsMonomialSplitting (E.map (fun D : X.IdealSheafData => D.comap h)) (I.comap h) (M.comap h)
+theorem isMonomialSplitting_comap_of_generalizingMap
+    (h : Y ⟶ X) (hg : GeneralizingMap (fun y : Y => h.base y))
+    {E : List X.IdealSheafData} {I M N : X.IdealSheafData} (hs : IsMonomialSplitting E I M N)
+    : IsMonomialSplitting (E.map (fun D : X.IdealSheafData => D.comap h)) (I.comap h) (M.comap h)
       (N.comap h) := by
   refine {
     eq_mul := ?_
     monomial_support := support_comap_subset_biUnion h E M hs.monomial_support
     monomial := hs.monomial.comap_of_isMonomialIn h
-    transversal := irreducibleComponents_not_subset_support_comap h hg E N hs.transversal }
+    transversal := irreducibleComponents_not_subset_support_comap h hg E N hs.transversal
+  }
   rw [hs.eq_mul, Scheme.IdealSheafData.comap_mul]
 
-theorem generalizingMap_base_of_flat (h : Y ⟶ X) [AlgebraicGeometry.Flat h] :
-    GeneralizingMap (fun y : Y => h.base y) :=
+theorem generalizingMap_base_of_flat (h : Y ⟶ X) [AlgebraicGeometry.Flat h]
+    : GeneralizingMap (fun y : Y => h.base y) :=
   AlgebraicGeometry.Flat.generalizingMap h
 
-theorem isMonomialSplitting_comap_of_flat (h : Y ⟶ X) [AlgebraicGeometry.Flat h]
-    {E : List X.IdealSheafData} {I M N : X.IdealSheafData} (hs : IsMonomialSplitting E I M N) :
-    IsMonomialSplitting (E.map (fun D : X.IdealSheafData => D.comap h)) (I.comap h) (M.comap h)
+theorem isMonomialSplitting_comap_of_flat
+    (h : Y ⟶ X) [AlgebraicGeometry.Flat h]
+    {E : List X.IdealSheafData} {I M N : X.IdealSheafData} (hs : IsMonomialSplitting E I M N)
+    : IsMonomialSplitting (E.map (fun D : X.IdealSheafData => D.comap h)) (I.comap h) (M.comap h)
       (N.comap h) :=
   isMonomialSplitting_comap_of_generalizingMap h (generalizingMap_base_of_flat h) hs
 
-theorem isMonomialSplitting_comap_of_smooth (h : Y ⟶ X) [AlgebraicGeometry.Smooth h]
-    {E : List X.IdealSheafData} {I M N : X.IdealSheafData} (hs : IsMonomialSplitting E I M N) :
-    IsMonomialSplitting (E.map (fun D : X.IdealSheafData => D.comap h)) (I.comap h) (M.comap h)
+theorem isMonomialSplitting_comap_of_smooth
+    (h : Y ⟶ X) [AlgebraicGeometry.Smooth h]
+    {E : List X.IdealSheafData} {I M N : X.IdealSheafData} (hs : IsMonomialSplitting E I M N)
+    : IsMonomialSplitting (E.map (fun D : X.IdealSheafData => D.comap h)) (I.comap h) (M.comap h)
       (N.comap h) := by
   have : AlgebraicGeometry.Flat h := inferInstance
   exact isMonomialSplitting_comap_of_flat h hs

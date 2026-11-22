@@ -8,20 +8,26 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemConnec
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
-open GlobalTheory.IndefiniteRowSideFullHecke.RayPrincipalIdeals GlobalTheory.RayFieldCompare GlobalTheory.Mem.Chr GlobalTheory.Mem.LocTriv GlobalTheory.RayFromArtin
+open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
+open GlobalTheory.IndefiniteRowSideFullHecke.RayPrincipalIdeals GlobalTheory.RayFieldCompare
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.LocTriv GlobalTheory.RayFromArtin
 open scoped nonZeroDivisors
 
 namespace GlobalTheory.UnramModulus
 
-theorem inInertia_restrict {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
+theorem inInertia_restrict
+    {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
     (L : Type) [Field L] [Algebra K L] [Algebra L Ω] [IsScalarTower K L Ω] [IsGalois K L]
-    {v : HeightOneSpectrum (𝓞 K)} {A : ValuationSubring Ω} (hA : IsPlaceOver A v) {σ : G K Ω}
-    (hσ : σ ∈ Ine (F := K) A) : GlobalTheory.NT.InInertia L v (AlgEquiv.restrictNormalHom L σ) := by
-  let f : 𝓞 L →+* A := ((algebraMap L Ω).comp (algebraMap (𝓞 L) L)).codRestrict A fun x =>
-    (A.valuation_le_one_iff _).1 (valuation_int_le_one A x)
-  have hf : ∀ x, x ∈ (IsLocalRing.maximalIdeal A).comap f ↔ A.valuation (algebraMap L Ω (x : L)) < 1 := fun x =>
-    A.valuation_lt_one_iff (f x)
+    {v : HeightOneSpectrum (𝓞 K)} {A : ValuationSubring Ω} (hA : IsPlaceOver A v)
+    {σ : G K Ω} (hσ : σ ∈ Ine (F := K) A)
+    : GlobalTheory.NT.InInertia L v (AlgEquiv.restrictNormalHom L σ) := by
+  let f : 𝓞 L →+* A :=
+    ((algebraMap L Ω).comp (algebraMap (𝓞 L) L)).codRestrict A fun x =>
+      (A.valuation_le_one_iff _).1 (valuation_int_le_one A x)
+  have hf
+      : ∀ x, x ∈ (IsLocalRing.maximalIdeal A).comap f ↔ A.valuation (algebraMap L Ω (x : L)) < 1 :=
+    fun x => A.valuation_lt_one_iff (f x)
   refine ⟨(IsLocalRing.maximalIdeal A).comap f, inferInstance, ⟨?_⟩, fun x => ?_⟩
   · ext x
     rw [Ideal.mem_under, hf, ← hA x, IsScalarTower.algebraMap_apply K L Ω]
@@ -31,27 +37,33 @@ theorem inInertia_restrict {K Ω : Type} [Field K] [NumberField K] [Field Ω] [A
     rw [← σ.restrictNormal_commutes L, ← map_sub] at this
     exact this
 
-theorem rayIdl_le {K : Type} [Field K] [NumberField K] (𝔪 : Ideal (𝓞 K)) {U : Subgroup (Ideles K)}
-    (ho : IsOpen (U : Set (Ideles K))) (hi : infConn K ≤ U)
-    (hu : ∀ v x, IsUnitAt v x → localIdele K v x ∈ U) : rayIdl 𝔪 ≤ U := by
+theorem rayIdl_le
+    {K : Type} [Field K] [NumberField K]
+    (𝔪 : Ideal (𝓞 K))
+    {U : Subgroup (Ideles K)} (ho : IsOpen (U : Set (Ideles K))) (hi : infConn K ≤ U)
+    (hu : ∀ v x, IsUnitAt v x → localIdele K v x ∈ U)
+    : rayIdl 𝔪 ≤ U := by
   rintro b ⟨hb, -, hb'⟩
-  let c : Ideles K := Units.map (MonoidHom.inl (InfiniteAdeleRing K) (FiniteAdeleRing (𝓞 K) K)) (infPart b)
+  let c : Ideles K :=
+    Units.map (MonoidHom.inl (InfiniteAdeleRing K) (FiniteAdeleRing (𝓞 K) K)) (infPart b)
   have e : b = c * finPartI K b := Units.ext (Prod.ext (mul_one _).symm (one_mul _).symm)
   rw [e]
   refine mul_mem (hi ⟨_, hb', rfl⟩) ?_
-  refine (U.isClosed_of_isOpen ho).mem_of_tendsto
-    (tendsto_part (a := finPartI K b) hb fun _ => rfl) (Filter.Eventually.of_forall fun S => ?_)
+  refine (U.isClosed_of_isOpen ho).mem_of_tendsto (tendsto_part (a := finPartI K b) hb fun _ => rfl)
+    (Filter.Eventually.of_forall fun S => ?_)
   exact Subgroup.prod_mem _ fun v _ => hu v _ (hb v)
 
-theorem isModulus_top (H : GlobalTheory.Published.GlobalArtinReciprocity) (K M : Type) [Field K] [NumberField K] [Field M]
-    [NumberField M] [Algebra K M] [IsAbelianGalois K M] (hM : ∀ 𝔭 : HeightOneSpectrum (𝓞 K), GlobalTheory.NT.UnramIn M 𝔭)
-    (χ : (M ≃ₐ[K] M) →* ℂˣ) : GlobalTheory.NT.IsModulus M χ ⊤ := by
+theorem isModulus_top
+    (H : GlobalTheory.Published.GlobalArtinReciprocity)
+    (K M : Type)
+    [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M] [IsAbelianGalois K M]
+    (hM : ∀ 𝔭 : HeightOneSpectrum (𝓞 K), GlobalTheory.NT.UnramIn M 𝔭) (χ : (M ≃ₐ[K] M) →* ℂˣ)
+    : GlobalTheory.NT.IsModulus M χ ⊤ := by
   let Ω := AlgebraicClosure K
   obtain ⟨art, ha⟩ := H K Ω
   let j : M →ₐ[K] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let : Algebra M Ω := j.toRingHom.toAlgebra
   have : IsScalarTower K M Ω := IsScalarTower.of_algebraMap_eq fun x => (j.commutes x).symm
@@ -79,7 +91,10 @@ theorem isModulus_top (H : GlobalTheory.Published.GlobalArtinReciprocity) (K M :
     rw [MonoidHom.mem_ker, MonoidHom.comp_apply, ← e, liftAb_toAb]
     exact hM v _ (inInertia_restrict M hA hτ)
   let ψ : idealsPrimeTo (⊤ : Ideal (𝓞 K)) →* (M ≃ₐ[K] M) := (θ.comp (unifIdl ⊤))⁻¹
-  have hψ : ∀ 𝔭 h, GlobalTheory.NT.UnramIn M 𝔭 ∧ GlobalTheory.NT.IsFrob M 𝔭 (ψ (primeElt ⊤ 𝔭 h)) := fun v hv => by
+  have hψ
+      : ∀ 𝔭 h,
+        GlobalTheory.NT.UnramIn M 𝔭
+          ∧ GlobalTheory.NT.IsFrob M 𝔭 (ψ (primeElt ⊤ 𝔭 h)) := fun v hv => by
     refine ⟨hM v, ?_⟩
     obtain ⟨A, hA⟩ := exists_isPlaceOver Ω v
     obtain ⟨σ, hσ, e'⟩ := (ha.frob v A hA _).1 ⟨_, isUnifAt_unif v, rfl⟩
@@ -114,9 +129,12 @@ theorem isModulus_top (H : GlobalTheory.Published.GlobalArtinReciprocity) (K M :
     rw [map_mul, map_inv, inv_mul_eq_one] at h2
     rw [h2]
 
-theorem isModulus_top_of_isTotallyComplex : GlobalTheory.Published.GlobalArtinReciprocity → ∀ (K M : Type) [Field K]
-    [NumberField K] [_root_.NumberField.IsTotallyComplex K] [Field M] [NumberField M] [Algebra K M] [IsAbelianGalois K M],
-    (∀ 𝔭 : HeightOneSpectrum (𝓞 K), GlobalTheory.NT.UnramIn M 𝔭) → ∀ χ : (M ≃ₐ[K] M) →* ℂˣ, GlobalTheory.NT.IsModulus M χ ⊤ :=
+theorem isModulus_top_of_isTotallyComplex
+    : GlobalTheory.Published.GlobalArtinReciprocity
+      → ∀ (K M : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] [Field M]
+          [NumberField M] [Algebra K M] [IsAbelianGalois K M],
+        (∀ 𝔭 : HeightOneSpectrum (𝓞 K), GlobalTheory.NT.UnramIn M 𝔭)
+          → ∀ χ : (M ≃ₐ[K] M) →* ℂˣ, GlobalTheory.NT.IsModulus M χ ⊤ :=
   fun H K M _ _ _ _ _ _ _ hM χ => isModulus_top H K M hM χ
 
 end GlobalTheory.UnramModulus

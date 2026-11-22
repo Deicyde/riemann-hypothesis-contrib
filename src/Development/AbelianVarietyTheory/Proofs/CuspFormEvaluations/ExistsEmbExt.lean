@@ -11,17 +11,21 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FieldBC
+open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory.FieldBC
 
 namespace GlobalTheory.FieldBC
 
-
 set_option autoImplicit false in
 open AlgebraicGeometry CategoryTheory NumberField in
-theorem _root_.GlobalTheory.FieldBC.exists_emb_ext {E : Type} [Field E] [NumberField E]
-    [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H}
-    {c c' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l} (hle : c.F ≤ c'.F) (σ : c.F →+* ℂ) :
-    ∃ σ' : c'.F →+* ℂ, σ'.comp (_root_.Formalism.L2.Pj.incF c c' hle) = σ := by
+theorem _root_.GlobalTheory.FieldBC.exists_emb_ext
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+    {l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H}
+    {c c' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l}
+    (hle : c.F ≤ c'.F) (σ : c.F →+* ℂ)
+    : ∃ σ' : c'.F →+* ℂ, σ'.comp (_root_.Formalism.L2.Pj.incF c c' hle) = σ := by
   letI : Algebra c.F c'.F := (_root_.Formalism.L2.Pj.incF c c' hle).toAlgebra
   letI : Algebra c.F ℂ := σ.toAlgebra
   haveI : IsScalarTower ℚ c.F c'.F := IsScalarTower.of_algebraMap_eq' (Subsingleton.elim _ _)
@@ -29,29 +33,42 @@ theorem _root_.GlobalTheory.FieldBC.exists_emb_ext {E : Type} [Field E] [NumberF
   haveI : Algebra.IsAlgebraic c.F c'.F := Algebra.IsAlgebraic.tower_top (K := ℚ) c.F
   let τ : c'.F →ₐ[c.F] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨τ.toRingHom, ?_⟩
   ext x
   exact τ.commutes x
 
-
 set_option autoImplicit false in
 open AlgebraicGeometry CategoryTheory NumberField in
-theorem _root_.GlobalTheory.FieldBC.rulBC_cusp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H) (Xo : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Moduli Dw l) (c c' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l)
-    (hle : c.F ≤ c'.F) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, _root_.Formalism.L2.Pj.Unf Xo c σ r) (a : (E →+* ℂ) × ℕ → ℕ)
-    (n : ℕ), ∀ f ∈ _root_.Formalism.L2.Pj.sec Xo c a n,
-    (∀ σ' : c'.F →+* ℂ, _root_.Formalism.L2.Pj.rdU (_root_.Formalism.L2.Pj.unfBC hle U σ') (_root_.GlobalTheory.FieldBC.rulBC hle f) =
-      _root_.Formalism.L2.Pj.rdU (U (σ'.comp (_root_.Formalism.L2.Pj.incF c c' hle))) f) ∧
-    (_root_.GlobalTheory.FieldBC.rulBC hle f ∈ _root_.Formalism.L2.Pj.cusp Xo c' (_root_.Formalism.L2.Pj.unfBC hle U) a n ↔ f ∈ _root_.Formalism.L2.Pj.cusp Xo c U a n) := by
+theorem _root_.GlobalTheory.FieldBC.rulBC_cusp
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+        (Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H)
+        (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H)
+        (Xo : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Moduli Dw l)
+        (c c' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l) (hle : c.F ≤ c'.F)
+        (r : ℕ) (U : ∀ σ : c.F →+* ℂ, _root_.Formalism.L2.Pj.Unf Xo c σ r) (a : (E →+* ℂ) × ℕ → ℕ)
+        (n : ℕ),
+      ∀ f ∈ _root_.Formalism.L2.Pj.sec Xo c a n,
+        (∀ σ' : c'.F →+* ℂ,
+            _root_.Formalism.L2.Pj.rdU (_root_.Formalism.L2.Pj.unfBC hle U σ')
+                (_root_.GlobalTheory.FieldBC.rulBC hle f)
+              = _root_.Formalism.L2.Pj.rdU (U (σ'.comp (_root_.Formalism.L2.Pj.incF c c' hle))) f)
+          ∧ (_root_.GlobalTheory.FieldBC.rulBC hle f
+              ∈ _root_.Formalism.L2.Pj.cusp Xo c' (_root_.Formalism.L2.Pj.unfBC hle U) a n
+            ↔ f ∈ _root_.Formalism.L2.Pj.cusp Xo c U a n) := by
   intro E _ _ _ H Dw l Xo c c' hle r U a n f hf
-  obtain ⟨hsec, hval⟩ := (_root_.GlobalTheory.FieldBC.rulBC_sec_val_linear E H Dw l Xo c c' hle).1 a n f hf
-  have hread : ∀ σ' : c'.F →+* ℂ, _root_.Formalism.L2.Pj.rdU (_root_.Formalism.L2.Pj.unfBC hle U σ') (_root_.GlobalTheory.FieldBC.rulBC hle f) =
-      _root_.Formalism.L2.Pj.rdU (U (σ'.comp (_root_.Formalism.L2.Pj.incF c c' hle))) f := by
+  obtain ⟨hsec, hval⟩ :=
+    (_root_.GlobalTheory.FieldBC.rulBC_sec_val_linear E H Dw l Xo c c' hle).1 a n f hf
+  have hread
+      : ∀ σ' : c'.F →+* ℂ,
+        _root_.Formalism.L2.Pj.rdU (_root_.Formalism.L2.Pj.unfBC hle U σ')
+            (_root_.GlobalTheory.FieldBC.rulBC hle f)
+          = _root_.Formalism.L2.Pj.rdU (U (σ'.comp (_root_.Formalism.L2.Pj.incF c c' hle))) f := by
     intro σ'
-    have hbc : _root_.Formalism.L2.Pj.IsBC hle (_root_.GlobalTheory.FieldBC.rulBC hle f) ![1] ![f] := by
+    have hbc
+        : _root_.Formalism.L2.Pj.IsBC hle (_root_.GlobalTheory.FieldBC.rulBC hle f) ![1] ![f] := by
       unfold _root_.Formalism.L2.Pj.IsBC
       intro S _ _ _ h y
       simp [hval S h y]

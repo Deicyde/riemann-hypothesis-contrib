@@ -22,9 +22,10 @@ private noncomputable def FD : FJ O R ⥤ CommRingCat.{0} where
 
 private noncomputable def FC : Cocone (FD O R) where
   pt := CommRingCat.of R
-  ι :=
-    { app := fun S => CommRingCat.ofHom S.1.val.toRingHom
-      naturality := fun _ _ _ => by ext; rfl }
+  ι := {
+    app := fun S => CommRingCat.ofHom S.1.val.toRingHom
+    naturality := fun _ _ _ => by ext; rfl
+  }
 
 variable {O R}
 
@@ -52,8 +53,8 @@ private instance : IsFiltered (FJ O R) := inferInstance
 private noncomputable def descFun (s : Cocone (FD O R)) (x : R) : s.pt :=
   (s.ι.app (gen x)).hom (⟨x, mem_gen x⟩ : (gen (O := O) x).1)
 
-private theorem descFun_eq (s : Cocone (FD O R)) (S : FJ O R) (x : R) (hx : x ∈ S.1) :
-    (s.ι.app S).hom (⟨x, hx⟩ : S.1) = descFun s x := by
+private theorem descFun_eq (s : Cocone (FD O R)) (S : FJ O R) (x : R) (hx : x ∈ S.1)
+    : (s.ι.app S).hom (⟨x, hx⟩ : S.1) = descFun s x := by
   let U : FJ O R := ⟨S.1 ⊔ (gen x).1, finite_sup S (gen x)⟩
   have hS : S ≤ U := le_sup_left (a := S.1)
   have hG : gen x ≤ U := le_sup_right (a := S.1)
@@ -66,10 +67,11 @@ end UpperTheory.IntegralColim
 namespace UpperTheory.IntegralColim
 variable {O R : Type} [CommRing O] [CommRing R] [Algebra O R] [Algebra.IsIntegral O R]
 
-private theorem two (x y : R) : ∃ S : FJ O R, x ∈ S.1 ∧ y ∈ S.1 :=
-  ⟨⟨(gen (O := O) x).1 ⊔ (gen (O := O) y).1, finite_sup _ _⟩,
-    (le_sup_left : (gen (O := O) x).1 ≤ _) (mem_gen x),
-    (le_sup_right : (gen (O := O) y).1 ≤ _) (mem_gen y)⟩
+private theorem two (x y : R) : ∃ S : FJ O R, x ∈ S.1 ∧ y ∈ S.1 := ⟨
+  ⟨(gen (O := O) x).1 ⊔ (gen (O := O) y).1, finite_sup _ _⟩,
+  (le_sup_left : (gen (O := O) x).1 ≤ _) (mem_gen x),
+  (le_sup_right : (gen (O := O) y).1 ≤ _) (mem_gen y)
+⟩
 
 private noncomputable def descHom (s : Cocone (FD O R)) : R →+* s.pt where
   toFun := descFun s
@@ -102,17 +104,20 @@ private noncomputable def isColim : IsColimit (FC O R) where
 
 end UpperTheory.IntegralColim
 
-theorem UpperTheory.acyclic_spec_integral_algebra_strictHenselian :
-    ∀ (q : ℕ) (O R : Type) [CommRing O] [CommRing R] [Algebra O R] [Algebra.IsIntegral O R], SH O → IsUnit (q : O) → Acyc q (sp R) := by
+theorem UpperTheory.acyclic_spec_integral_algebra_strictHenselian
+    : ∀ (q : ℕ) (O R : Type) [CommRing O] [CommRing R] [Algebra O R] [Algebra.IsIntegral O R],
+      SH O → IsUnit (q : O) → Acyc q (sp R) := by
   intro q O R _ _ _ _ hO hq n i hn
-  have hqR : IsUnit (q : R) := by
-    simpa using hq.map (algebraMap O R)
+  have hqR : IsUnit (q : R) := by simpa using hq.map (algebraMap O R)
   have hz : ∀ x : Ht q (sp R) n i, x = 0 := by
     intro x
-    obtain ⟨j, y, hy⟩ := (UpperTheory.twistCohomology_commutes_with_filtered_colimits q (UpperTheory.IntegralColim.FD O R) (UpperTheory.IntegralColim.FC O R)
-      UpperTheory.IntegralColim.isColim n i).1 x hqR
+    obtain ⟨j, y, hy⟩ :=
+      (UpperTheory.twistCohomology_commutes_with_filtered_colimits q
+        (UpperTheory.IntegralColim.FD O R) (UpperTheory.IntegralColim.FC O R)
+        UpperTheory.IntegralColim.isColim n i).1 x hqR
     haveI := j.2
-    have hA : Acyc q (sp j.1) := UpperTheory.acyclic_spec_finite_algebra_strictHenselian q O j.1 hO hq
+    have hA : Acyc q (sp j.1) :=
+      UpperTheory.acyclic_spec_finite_algebra_strictHenselian q O j.1 hO hq
     haveI := hA n i hn
     have hy0 : y = 0 := Subsingleton.elim (α := Ht q (sp j.1) n i) y 0
     rw [← hy, hy0]

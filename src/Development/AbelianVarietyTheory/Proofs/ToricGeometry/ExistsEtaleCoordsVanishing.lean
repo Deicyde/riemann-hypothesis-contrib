@@ -6,24 +6,28 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj Complex Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  Complex Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped BigOperators Real
 
 noncomputable section
 
 namespace GlobalTheory.HolChart
 
-theorem exists_etale_coords_vanishing {g : ℕ} {A : Type} [CommRing A] (c : ℂ →+* A)
-    (hc : c.IsStandardSmoothOfRelativeDimension g) (e : A →+* ℂ) (he : ∀ a, e (c a) = a) :
-    ∃ φ : MvPolynomial (Fin g) ℂ →+* A, φ.comp MvPolynomial.C = c ∧ φ.Etale ∧
-      ∀ i, e (φ (MvPolynomial.X i)) = 0 := by
+theorem exists_etale_coords_vanishing
+    {g : ℕ} {A : Type} [CommRing A]
+    (c : ℂ →+* A) (hc : c.IsStandardSmoothOfRelativeDimension g)
+    (e : A →+* ℂ) (he : ∀ a, e (c a) = a)
+    : ∃ φ : MvPolynomial (Fin g) ℂ →+* A,
+      φ.comp MvPolynomial.C = c ∧ φ.Etale ∧ ∀ i, e (φ (MvPolynomial.X i)) = 0 := by
   obtain ⟨φ, h1, h2⟩ := hc.exists_etale_mvPolynomial
   let a : Fin g → ℂ := fun i => e (φ (MvPolynomial.X i))
   let T : MvPolynomial (Fin g) ℂ ≃ₐ[ℂ] MvPolynomial (Fin g) ℂ :=
     AlgEquiv.ofAlgHom (MvPolynomial.aeval fun i => MvPolynomial.X i - MvPolynomial.C (a i))
-      (MvPolynomial.aeval fun i => MvPolynomial.X i + MvPolynomial.C (a i))
-      (by ext i; simp) (by ext i; simp)
+      (MvPolynomial.aeval fun i => MvPolynomial.X i + MvPolynomial.C (a i)) (by ext i; simp)
+      (by ext i; simp)
   have hC : ∀ x, φ (MvPolynomial.C x) = c x := fun x => by rw [← h1]; rfl
   refine ⟨φ.comp T.toRingEquiv.toRingHom, ?_, ?_, ?_⟩
   · ext x
@@ -32,10 +36,12 @@ theorem exists_etale_coords_vanishing {g : ℕ} {A : Type} [CommRing A] (c : ℂ
   · intro i
     simp [T, hC, he, a]
 
-theorem derivation_eq_zero {g : ℕ} {A : Type} [CommRing A] (φ : MvPolynomial (Fin g) ℂ →+* A)
-    (hφ : φ.Etale) (e : A →+* ℂ) (D : A →+ ℂ) (h0 : ∀ a, D (φ (MvPolynomial.C a)) = 0)
-    (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f)
-    (hX : ∀ i, D (φ (MvPolynomial.X i)) = 0) : D = 0 := by
+theorem derivation_eq_zero
+    {g : ℕ} {A : Type} [CommRing A]
+    (φ : MvPolynomial (Fin g) ℂ →+* A) (hφ : φ.Etale)
+    (e : A →+* ℂ) (D : A →+ ℂ) (h0 : ∀ a, D (φ (MvPolynomial.C a)) = 0)
+    (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f) (hX : ∀ i, D (φ (MvPolynomial.X i)) = 0)
+    : D = 0 := by
   have h1 : D 1 = 0 := by simpa using h0 1
   have hP : ∀ p, D (φ p) = 0 := by
     intro p
@@ -43,20 +49,20 @@ theorem derivation_eq_zero {g : ℕ} {A : Type} [CommRing A] (φ : MvPolynomial 
     | C a => exact h0 a
     | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, add_zero]
     | mul_X p i hp => rw [map_mul, hm, hp, hX]; simp
-  let F : A →+* DualNumber ℂ :=
-    { toFun := fun f => TrivSqZeroExt.inl (e f) + TrivSqZeroExt.inr (D f)
-      map_one' := by ext <;> simp [h1]
-      map_mul' := fun f f' => by ext <;> simp [hm, mul_comm]
-      map_zero' := by ext <;> simp
-      map_add' := fun f f' => by ext <;> simp }
+  let F : A →+* DualNumber ℂ := {
+    toFun := fun f => TrivSqZeroExt.inl (e f) + TrivSqZeroExt.inr (D f)
+    map_one' := by ext <;> simp [h1]
+    map_mul' := fun f f' => by ext <;> simp [hm, mul_comm]
+    map_zero' := by ext <;> simp
+    map_add' := fun f f' => by ext <;> simp
+  }
   let F₀ : A →+* DualNumber ℂ := (algebraMap ℂ (DualNumber ℂ)).comp e
   have hFF : ∀ p, F (φ p) = F₀ (φ p) := fun p => by
     ext <;> simp [F, F₀, hP, TrivSqZeroExt.algebraMap_eq_inl]
   let _ := φ.toAlgebra
   let _ : Algebra (MvPolynomial (Fin g) ℂ) (DualNumber ℂ) := (F₀.comp φ).toAlgebra
   have _ : Algebra.Etale (MvPolynomial (Fin g) ℂ) A := hφ
-  let G : A →ₐ[MvPolynomial (Fin g) ℂ] DualNumber ℂ :=
-    { F with commutes' := hFF }
+  let G : A →ₐ[MvPolynomial (Fin g) ℂ] DualNumber ℂ := { F with commutes' := hFF }
   let G₀ : A →ₐ[MvPolynomial (Fin g) ℂ] DualNumber ℂ := { F₀ with commutes' := fun p => rfl }
   have hnil : IsNilpotent (RingHom.ker (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom) := by
     refine ⟨2, ?_⟩
@@ -67,25 +73,38 @@ theorem derivation_eq_zero {g : ℕ} {A : Type} [CommRing A] (φ : MvPolynomial 
     have hy' : y.fst = 0 := hy
     rw [Ideal.mem_bot]
     ext <;> simp [hx', hy']
-  have hG : G = G₀ := Algebra.FormallyUnramified.ext' (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom hnil G G₀
-    (fun x => by simp [G, G₀, F, F₀])
+  have hG : G = G₀ :=
+    Algebra.FormallyUnramified.ext' (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom hnil G G₀
+      (fun x => by simp [G, G₀, F, F₀])
   ext f
   have := congrArg (fun H : A →ₐ[MvPolynomial (Fin g) ℂ] DualNumber ℂ => (H f).snd) hG
   simpa [G, G₀, F, F₀, TrivSqZeroExt.algebraMap_eq_inl] using this
 
 theorem hol_of_affine
-    (hval : (∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X), (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U ↔ x (default : PrimeSpectrum ℂ) ∈ U) ∧ (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U → ∃ e : Γ(X, U) →+* ℂ, ∀ f, valAt' x U f = e f) ∧ (∀ (U V : X.Opens) (h : V ≤ U) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ V → valAt' x V (resG X h f) = valAt' x U f) ∧ (∀ (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens) (f : Γ(Y, U)), valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f) ∧ (∀ (U : X.Opens) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ X.basicOpen f ↔ valAt' x U f ≠ 0) ∧ (∀ (p : X ⟶ Sp ℂ), x ≫ p = 𝟙 _ → ∀ (U : X.Opens) (a : ℂ), ⊤ ≤ x ⁻¹ᵁ U → valAt' x U (constFn p U a) = a)))
-    {g : ℕ} {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) {W : Set (Fin g → ℂ)} (hW : IsOpen W)
+    (hval : (∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X),
+      (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U ↔ x (default : PrimeSpectrum ℂ) ∈ U)
+        ∧ (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U → ∃ e : Γ(X, U) →+* ℂ, ∀ f, valAt' x U f = e f)
+        ∧ (∀ (U V : X.Opens) (h : V ≤ U) (f : Γ(X, U)),
+          ⊤ ≤ x ⁻¹ᵁ V → valAt' x V (resG X h f) = valAt' x U f)
+        ∧ (∀ (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens) (f : Γ(Y, U)),
+          valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f)
+        ∧ (∀ (U : X.Opens) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ X.basicOpen f ↔ valAt' x U f ≠ 0)
+        ∧ (∀ (p : X ⟶ Sp ℂ),
+          x ≫ p = 𝟙 _ → ∀ (U : X.Opens) (a : ℂ), ⊤ ≤ x ⁻¹ᵁ U → valAt' x U (constFn p U a) = a)))
+    {g : ℕ} {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U)
+    {W : Set (Fin g → ℂ)} (hW : IsOpen W)
     (s : (Fin g → ℂ) → (Sp ℂ ⟶ X)) (hs : ∀ w ∈ W, ⊤ ≤ s w ⁻¹ᵁ U)
     (hd : ∀ a : Γ(X, U), DifferentiableOn ℂ (fun w => valAt' (s w) U a) W)
-    (V : X.Opens) (f : Γ(X, V)) :
-    IsOpen {w | w ∈ W ∧ ⊤ ≤ s w ⁻¹ᵁ V} ∧
-      DifferentiableOn ℂ (fun w => valAt' (s w) V f) {w | w ∈ W ∧ ⊤ ≤ s w ⁻¹ᵁ V} := by
-  have key : ∀ w₀ ∈ {w | w ∈ W ∧ ⊤ ≤ s w ⁻¹ᵁ V}, {w | w ∈ W ∧ ⊤ ≤ s w ⁻¹ᵁ V} ∈ 𝓝 w₀ ∧
-      DifferentiableAt ℂ (fun w => valAt' (s w) V f) w₀ := by
+    (V : X.Opens) (f : Γ(X, V))
+    : IsOpen {w | w ∈ W ∧ ⊤ ≤ s w ⁻¹ᵁ V}
+      ∧ DifferentiableOn ℂ (fun w => valAt' (s w) V f) {w | w ∈ W ∧ ⊤ ≤ s w ⁻¹ᵁ V} := by
+  have key
+      : ∀ w₀ ∈ {w | w ∈ W ∧ ⊤ ≤ s w ⁻¹ᵁ V},
+        {w | w ∈ W ∧ ⊤ ≤ s w ⁻¹ᵁ V} ∈ 𝓝 w₀ ∧ DifferentiableAt ℂ (fun w => valAt' (s w) V f) w₀ := by
     rintro w₀ ⟨hw₀, hV⟩
-    obtain ⟨h, hhV, hh⟩ := hU.exists_basicOpen_le (V := V) ⟨_, ((hval X (s w₀)).1 V).1 hV⟩
-      (((hval X (s w₀)).1 U).1 (hs w₀ hw₀))
+    obtain ⟨h, hhV, hh⟩ :=
+      hU.exists_basicOpen_le (V := V) ⟨_, ((hval X (s w₀)).1 V).1 hV⟩
+        (((hval X (s w₀)).1 U).1 (hs w₀ hw₀))
     have hB₀ : ⊤ ≤ s w₀ ⁻¹ᵁ X.basicOpen h := ((hval X (s w₀)).1 _).2 hh
     have hne₀ : valAt' (s w₀) U h ≠ 0 := ((hval X (s w₀)).2.2.2.2.1 U h).1 hB₀
     have hWn : W ∈ 𝓝 w₀ := hW.mem_nhds hw₀
@@ -111,8 +130,10 @@ theorem hol_of_affine
       rw [map_mul, map_pow, ← hev, ← hev, ← hev, r1, r2, r3] at this
       show valAt' (s w) V f = valAt' (s w) U a * (valAt' (s w) U h ^ n)⁻¹
       rw [← this, mul_inv_cancel_right₀ (pow_ne_zero n hw.2)]
-  exact ⟨isOpen_iff_mem_nhds.2 fun w hw => (key w hw).1,
-    fun w hw => (key w hw).2.differentiableWithinAt⟩
+  exact ⟨
+    isOpen_iff_mem_nhds.2 fun w hw => (key w hw).1,
+    fun w hw => (key w hw).2.differentiableWithinAt
+  ⟩
 
 theorem exists_holomorphic_chart :
     (∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X), (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U ↔ x (default : PrimeSpectrum ℂ) ∈ U) ∧ (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U → ∃ e : Γ(X, U) →+* ℂ, ∀ f, valAt' x U f = e f) ∧ (∀ (U V : X.Opens) (h : V ≤ U) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ V → valAt' x V (resG X h f) = valAt' x U f) ∧ (∀ (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens) (f : Γ(Y, U)), valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f) ∧ (∀ (U : X.Opens) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ X.basicOpen f ↔ valAt' x U f ≠ 0) ∧ (∀ (p : X ⟶ Sp ℂ), x ≫ p = 𝟙 _ → ∀ (U : X.Opens) (a : ℂ), ⊤ ≤ x ⁻¹ᵁ U → valAt' x U (constFn p U a) = a)) → (∀ (X : Over (Sp ℂ)) (U : X.left.Opens), IsAffineOpen U → ∀ e : Γ(X.left, U) →+* ℂ, (∀ a, e (constFn X.hom U a) = a) → ∃! x : (𝟙_ (Over (Sp ℂ)) ⟶ X), ⊤ ≤ (x).left ⁻¹ᵁ U ∧ ∀ f, valAt' x.left U f = e f) → (∀ (g : ℕ) (A : Type) [CommRing A] [Algebra ℂ A] [Algebra (MvPolynomial (Fin g) ℂ) A] [IsScalarTower ℂ (MvPolynomial (Fin g) ℂ) A] [Algebra.Etale (MvPolynomial (Fin g) ℂ) A] (e : A →ₐ[ℂ] ℂ), (∀ i, e (algebraMap (MvPolynomial (Fin g) ℂ) A (MvPolynomial.X i)) = 0) → ∃ (W : Set (Fin g → ℂ)) (σ : (Fin g → ℂ) → (A →ₐ[ℂ] ℂ)) (n : ℕ) (f : Fin n → A) (ε : ℝ), IsOpen W ∧ 0 ∈ W ∧ σ 0 = e ∧ 0 < ε ∧ (∀ a, DifferentiableOn ℂ (fun w => σ w a) W) ∧ (∀ w ∈ W, ∀ i, σ w (algebraMap (MvPolynomial (Fin g) ℂ) A (MvPolynomial.X i)) = w i) ∧ ∀ x : A →ₐ[ℂ] ℂ, (∀ k, ‖x (f k) - e (f k)‖ < ε) → ∃ w ∈ W, x = σ w) → (∀ (X : Over (Sp ℂ)) (g : ℕ), SmoothOfRelativeDimension g X.hom → ∀ e : (𝟙_ (Over (Sp ℂ)) ⟶ X), ∃ (W : Set (Fin g → ℂ)) (σ : (Fin g → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ X)) (U : X.left.Opens) (t : Fin g → Γ(X.left, U)), IsOpen W ∧ 0 ∈ W ∧ σ 0 = e ∧ IsAffineOpen U ∧ (∀ (U : (X).left.Opens) (f : Γ((X).left, U)), IsOpen {w | w ∈ W ∧ ⊤ ≤ (σ w).left ⁻¹ᵁ U} ∧ DifferentiableOn ℂ (fun w => valAt' (σ w).left U f) {w | w ∈ W ∧ ⊤ ≤ (σ w).left ⁻¹ᵁ U}) ∧ (∀ w ∈ W, ⊤ ≤ (σ w).left ⁻¹ᵁ U ∧ ∀ i, valAt' (σ w).left U (t i) = w i) ∧ IsOpen[(TopologicalSpace.generateFrom {S : Set (𝟙_ (Over (Sp ℂ)) ⟶ X) | ∃ (U : X.left.Opens) (f : Γ(X.left, U)) (O : Set ℂ), IsOpen O ∧ S = {x | ⊤ ≤ (x).left ⁻¹ᵁ U ∧ valAt' x.left U f ∈ O}})] (σ '' W) ∧ (∀ D : Γ(X.left, U) →+ ℂ, (∀ a, D (constFn X.hom U a) = 0) → (∀ f f', D (f * f') = valAt' e.left U f * D f' + valAt' e.left U f' * D f) → (∀ i, D (t i) = 0) → D = 0)) := by

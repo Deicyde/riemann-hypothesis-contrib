@@ -8,28 +8,30 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
 
 namespace GlobalTheory.InvDescent
 
-theorem exists_invariant_of_subgroup {G F Ω V : Type} [Group G] [Field F] [Field Ω]
-    [AddCommGroup V] [Module Ω V] (H : Subgroup G) [Finite (G ⧸ H)]
-    (ι : F →* Ω) (σ : G → Ω →* Ω) (hσ : ∀ g h c, σ (g * h) c = σ g (σ h c))
-    (hσ1 : ∀ c, σ 1 c = c)
+theorem exists_invariant_of_subgroup
+    {G F Ω V : Type} [Group G] [Field F] [Field Ω] [AddCommGroup V] [Module Ω V]
+    (H : Subgroup G) [Finite (G ⧸ H)]
+    (ι : F →* Ω) (σ : G → Ω →* Ω) (hσ : ∀ g h c, σ (g * h) c = σ g (σ h c)) (hσ1 : ∀ c, σ 1 c = c)
     (hH : ∀ g, g ∈ H ↔ ∀ c, σ g (ι c) = ι c)
-    (A : G → V →+ V) (hA : ∀ g h v, A (g * h) v = A g (A h v))
-    (hAs : ∀ g (c : Ω) v, A g (c • v) = σ g c • A g v)
+    (A : G → V →+ V)
+    (hA : ∀ g h v, A (g * h) v = A g (A h v)) (hAs : ∀ g (c : Ω) v, A g (c • v) = σ g c • A g v)
     (N₀ N₁ : Submodule Ω V) (hN : ∀ g, ∀ v ∈ N₀, A g v ∈ N₀)
-    (y : V) (hy : ∀ h ∈ H, A h y = y) (h0 : y ∈ N₀) (h1 : y ∉ N₁) :
-    ∃ z, (∀ g, A g z = z) ∧ z ∈ N₀ ∧ z ∉ N₁ := by
+    (y : V) (hy : ∀ h ∈ H, A h y = y) (h0 : y ∈ N₀) (h1 : y ∉ N₁)
+    : ∃ z, (∀ g, A g z = z) ∧ z ∈ N₀ ∧ z ∉ N₁ := by
   classical
   let _ : Fintype (G ⧸ H) := Fintype.ofFinite _
 
-  have key : ∀ (v : V), (∀ h ∈ H, A h v = v) → ∀ g g' : G,
-      (QuotientGroup.mk g : G ⧸ H) = QuotientGroup.mk g' → A g v = A g' v := by
+  have key
+      : ∀ (v : V),
+        (∀ h ∈ H, A h v = v)
+          → ∀ g g' : G, (QuotientGroup.mk g : G ⧸ H) = QuotientGroup.mk g' → A g v = A g' v := by
     intro v hv g g' hgg'
-    obtain ⟨h, hh, rfl⟩ : ∃ h ∈ H, g' = g * h :=
-      ⟨g⁻¹ * g', QuotientGroup.eq.mp hgg', by group⟩
+    obtain ⟨h, hh, rfl⟩ : ∃ h ∈ H, g' = g * h := ⟨g⁻¹ * g', QuotientGroup.eq.mp hgg', by group⟩
     rw [hA, hv h hh]
   have hfix : ∀ c : F, ∀ h ∈ H, A h (ι c • y) = ι c • y := by
     intro c h hh
@@ -100,13 +102,14 @@ theorem exists_invariant_of_subgroup {G F Ω V : Type} [Group G] [Field F] [Fiel
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem smul_mem_Fil (P : LocPrime l) (K : FinExt l) (a : ℤ) (c : Om l) {x : P.R.BdR}
-    (hx : x ∈ (P.PD K).Fil a) : c • x ∈ (P.PD K).Fil a := by
-
+theorem smul_mem_Fil
+    (P : LocPrime l) (K : FinExt l) (a : ℤ) (c : Om l) {x : P.R.BdR} (hx : x ∈ (P.PD K).Fil a)
+    : c • x ∈ (P.PD K).Fil a := by
   have hint : IsIntegral ℚ_[l] c := (Algebra.IsAlgebraic.isAlgebraic c).isIntegral
-  obtain ⟨K', hcK⟩ : ∃ K' : FinExt l, c ∈ K'.1 :=
-    ⟨⟨IntermediateField.adjoin ℚ_[l] {c}, IntermediateField.adjoin.finiteDimensional hint⟩,
-      IntermediateField.mem_adjoin_simple_self ℚ_[l] c⟩
+  obtain ⟨K', hcK⟩ : ∃ K' : FinExt l, c ∈ K'.1 := ⟨
+    ⟨IntermediateField.adjoin ℚ_[l] {c}, IntermediateField.adjoin.finiteDimensional hint⟩,
+    IntermediateField.mem_adjoin_simple_self ℚ_[l] c
+  ⟩
   have hx' : x ∈ (P.PD K').Fil a := by
     rw [← SetLike.mem_coe, ← P.PD_Fil K K' a]
     exact hx
@@ -123,8 +126,8 @@ theorem finite_quot (K E : FinExt l) : Finite (↥(GK K) ⧸ (GK E).subgroupOf (
   classical
   have : FiniteDimensional ℚ_[l] E.1 := E.2
 
-  let f : (↥(GK K) ⧸ (GK E).subgroupOf (GK K)) → (E.1 →ₐ[ℚ_[l]] Om l) :=
-    fun q => ((q.out : GQ l) : Om l →ₐ[ℚ_[l]] Om l).comp E.1.val
+  let f : (↥(GK K) ⧸ (GK E).subgroupOf (GK K)) → (E.1 →ₐ[ℚ_[l]] Om l) := fun q =>
+    ((q.out : GQ l) : Om l →ₐ[ℚ_[l]] Om l).comp E.1.val
   refine Finite.of_injective f (fun q q' hqq' => ?_)
   have hres : ∀ x : E.1, (q.out : GQ l) x = (q'.out : GQ l) x := fun x => DFunLike.congr_fun hqq' x
   rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q']
@@ -138,20 +141,24 @@ theorem finite_quot (K E : FinExt l) : Finite (↥(GK K) ⧸ (GK E).subgroupOf (
   rw [AlgEquiv.mul_apply, ← hx']
   exact AlgEquiv.symm_apply_apply _ _
 
-theorem jump_descends (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K E : FinExt l) (_hKE : K.1 ≤ E.1)
+theorem jump_descends
+    (l : ℕ) [Fact l.Prime]
+    (P : LocPrime l)
+    (K E : FinExt l) (_hKE : K.1 ≤ E.1)
     (d : ℕ) (M : GQ l → Matrix (Fin d) (Fin d) ℚ_[l])
-    (hM : ∀ g ∈ GK K, ∀ h ∈ GK K, M (g * h) = M g * M h) (a : ℤ) (y : Fin d → P.R.BdR)
-    (hy : ∀ g ∈ GK E, ((M g).map (algebraMap ℚ_[l] P.R.BdR)).mulVec
-      (fun i => P.actQdR g (y i)) = y)
-    (h0 : ∀ i, y i ∈ (P.PD K).Fil a) (h1 : ¬ (∀ i, y i ∈ (P.PD K).Fil (a + 1))) :
-    ∃ z : Fin d → P.R.BdR, (∀ g ∈ GK K, ((M g).map (algebraMap ℚ_[l] P.R.BdR)).mulVec
-      (fun i => P.actQdR g (z i)) = z) ∧ (∀ i, z i ∈ (P.PD K).Fil a) ∧
-      ¬ (∀ i, z i ∈ (P.PD K).Fil (a + 1)) := by
+    (hM : ∀ g ∈ GK K, ∀ h ∈ GK K, M (g * h) = M g * M h)
+    (a : ℤ) (y : Fin d → P.R.BdR)
+    (hy : ∀ g ∈ GK E, ((M g).map (algebraMap ℚ_[l] P.R.BdR)).mulVec (fun i => P.actQdR g (y i)) = y)
+    (h0 : ∀ i, y i ∈ (P.PD K).Fil a) (h1 : ¬(∀ i, y i ∈ (P.PD K).Fil (a + 1)))
+    : ∃ z : Fin d → P.R.BdR,
+      (∀ g ∈ GK K, ((M g).map (algebraMap ℚ_[l] P.R.BdR)).mulVec (fun i => P.actQdR g (z i)) = z)
+        ∧ (∀ i, z i ∈ (P.PD K).Fil a) ∧ ¬(∀ i, z i ∈ (P.PD K).Fil (a + 1)) := by
   have := finite_quot K E
   let am := algebraMap ℚ_[l] P.R.BdR
 
   let A : ↥(GK K) → (Fin d → P.R.BdR) →+ (Fin d → P.R.BdR) := fun g =>
-    AddMonoidHom.mk' (fun v => ((M g).map am).mulVec (fun i => P.actQdR g (v i)))
+    AddMonoidHom.mk'
+      (fun v => ((M g).map am).mulVec (fun i => P.actQdR g (v i)))
       (fun v w => by simp only [Pi.add_apply, map_add (f := _)]; exact Matrix.mulVec_add _ _ _)
   have hAapp : ∀ g v, A g v = ((M g).map am).mulVec (fun i => P.actQdR g (v i)) := fun _ _ => rfl
   let σ : ↥(GK K) → Om l →* Om l := fun g => MonoidHom.ofClass (g : GQ l)
@@ -166,16 +173,17 @@ theorem jump_descends (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K E : FinExt l)
     unfold GK
     rw [IntermediateField.mem_fixingSubgroup_iff]
     exact ⟨fun h c => h c c.2, fun h x hx => h ⟨x, hx⟩⟩
-  have hcomm : ∀ (f : P.R.BdR ≃ₐ[ℚ_[l]] P.R.BdR) (N : Matrix (Fin d) (Fin d) ℚ_[l])
-      (w : Fin d → P.R.BdR), (fun i => f ((N.map am).mulVec w i)) = (N.map am).mulVec (fun i => f (w i)) := by
+  have hcomm
+      : ∀ (f : P.R.BdR ≃ₐ[ℚ_[l]] P.R.BdR) (N : Matrix (Fin d) (Fin d) ℚ_[l]) (w : Fin d → P.R.BdR),
+        (fun i => f ((N.map am).mulVec w i)) = (N.map am).mulVec (fun i => f (w i)) := by
     intro f N w
     funext i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul, am, AlgEquiv.commutes]
+    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul, am, AlgEquiv.commutes]
   have hA : ∀ g h v, A (g * h) v = A g (A h v) := by
     intro g h v
-    rw [hAapp, hAapp, hAapp, hcomm, Matrix.mulVec_mulVec, ← Matrix.map_mul,
-      ← hM g g.2 h h.2, Subgroup.coe_mul]
+    rw [hAapp, hAapp, hAapp, hcomm, Matrix.mulVec_mulVec, ← Matrix.map_mul, ← hM g g.2 h h.2,
+      Subgroup.coe_mul]
     congr 1
     funext i
     rw [map_mul, AlgEquiv.mul_apply]
@@ -188,8 +196,9 @@ theorem jump_descends (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K E : FinExt l)
     exact Finset.sum_congr rfl (fun j _ => by ring)
   let N₀ : Submodule (Om l) (Fin d → P.R.BdR) := Submodule.pi Set.univ (fun _ => filOm P K a)
   let N₁ : Submodule (Om l) (Fin d → P.R.BdR) := Submodule.pi Set.univ (fun _ => filOm P K (a + 1))
-  have hmem : ∀ (b : ℤ) (v : Fin d → P.R.BdR),
-      v ∈ Submodule.pi Set.univ (fun _ => filOm P K b) ↔ ∀ i, v i ∈ (P.PD K).Fil b := by
+  have hmem
+      : ∀ (b : ℤ) (v : Fin d → P.R.BdR),
+        v ∈ Submodule.pi Set.univ (fun _ => filOm P K b) ↔ ∀ i, v i ∈ (P.PD K).Fil b := by
     intro b v
     simp only [Submodule.mem_pi, Set.mem_univ, true_imp_iff]
     rfl
@@ -205,9 +214,11 @@ theorem jump_descends (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K E : FinExt l)
       exact (P.PD K).Fil_G g a _ (hv j)
     rw [Matrix.map_apply, ← Algebra.smul_def]
     exact Submodule.smul_of_tower_mem _ _ hj
-  obtain ⟨z, hzA, hz0, hz1⟩ := exists_invariant_of_subgroup ((GK E).subgroupOf (GK K)) ι σ hσ hσ1 hH
-    A hA hAs N₀ N₁ hN y (fun h hh => hy h ((Subgroup.mem_subgroupOf).mp hh)) ((hmem a y).mpr h0)
-    (fun h => h1 ((hmem (a + 1) y).mp h))
+  obtain ⟨z, hzA, hz0, hz1⟩ :=
+    exists_invariant_of_subgroup ((GK E).subgroupOf (GK K)) ι σ hσ hσ1 hH A hA hAs N₀ N₁ hN y
+      (fun h hh => hy h ((Subgroup.mem_subgroupOf).mp hh))
+      ((hmem a y).mpr h0)
+      (fun h => h1 ((hmem (a + 1) y).mp h))
   exact ⟨z, fun g hg => hzA ⟨g, hg⟩, (hmem a z).mp hz0, fun h => hz1 ((hmem (a + 1) z).mpr h)⟩
 
 end GlobalTheory.InvDescent

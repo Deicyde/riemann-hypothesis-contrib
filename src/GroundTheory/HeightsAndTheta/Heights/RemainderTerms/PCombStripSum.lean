@@ -13,9 +13,10 @@ open MvPolynomial Finset Equiv Comb
 
 noncomputable section
 
-theorem CombStripSum.proof (h1 : CombCfAtStair.Statement) (h2 : CombSortShift.Statement)
-    (h3 : CombSortShiftDistinct.Statement) (h4 : CombExtendWord.Statement) :
-    CombStripSum.Statement := by
+theorem CombStripSum.proof
+    (h1 : CombCfAtStair.Statement) (h2 : CombSortShift.Statement)
+    (h3 : CombSortShiftDistinct.Statement) (h4 : CombExtendWord.Statement)
+    : CombStripSum.Statement := by
   classical
   intro m n q lam hlam hq
   set l : Fin m → ℕ := fun j => lam j + stair m j with hl
@@ -34,12 +35,14 @@ theorem CombStripSum.proof (h1 : CombCfAtStair.Statement) (h2 : CombSortShift.St
       have : (b : ℕ) < a := h
       omega
 
-  have key : ∀ i : Fin m, q ≤ l i → Function.Injective (Function.update l i (l i - q)) →
-      ∃ μ : Fin m → ℕ, ∃ s : Fin q → Fin m,
-        (∃ σ : Perm (Fin m), ∀ k, Function.update l i (l i - q) (σ k) = μ k + stair m k) ∧
-        |cf (Function.update l i (l i - q)) (alternantPsum m (List.replicate n 1))| =
-          ((latticeWords n μ).card : ℚ) ∧
-        ∀ w ∈ latticeWords n μ, Fin.append w s ∈ latticeWords (n + q) lam := by
+  have key
+      : ∀ i : Fin m,
+        q ≤ l i → Function.Injective (Function.update l i (l i - q))
+          → ∃ μ : Fin m → ℕ, ∃ s : Fin q → Fin m,
+            (∃ σ : Perm (Fin m), ∀ k, Function.update l i (l i - q) (σ k) = μ k + stair m k)
+              ∧ |cf (Function.update l i (l i - q)) (alternantPsum m (List.replicate n 1))|
+                = ((latticeWords n μ).card : ℚ)
+              ∧ ∀ w ∈ latticeWords n μ, Fin.append w s ∈ latticeWords (n + q) lam := by
     intro i hqi hinj
     obtain ⟨σ, μ, hμ, hμle, hσ0⟩ := h2 m lam hlam q i hqi hinj
     have hσ : ∀ k, Function.update l i (l i - q) (σ k) = μ k + stair m k := hσ0
@@ -65,12 +68,13 @@ theorem CombStripSum.proof (h1 : CombCfAtStair.Statement) (h2 : CombSortShift.St
       rw [Function.comp_apply, ← hσ (σ.symm k), Equiv.apply_symm_apply]
     rw [hu, cf_perm hAlt, abs_mul, h1 m n μ hμ]
     rcases Int.units_eq_one_or (Perm.sign σ) with h | h <;> simp [h]
-  have key' : ∀ i : Fin m, ∃ μ : Fin m → ℕ, ∃ s : Fin q → Fin m,
-      (q ≤ l i ∧ Function.Injective (Function.update l i (l i - q))) →
-        (∃ σ : Perm (Fin m), ∀ k, Function.update l i (l i - q) (σ k) = μ k + stair m k) ∧
-        |cf (Function.update l i (l i - q)) (alternantPsum m (List.replicate n 1))| =
-          ((latticeWords n μ).card : ℚ) ∧
-        ∀ w ∈ latticeWords n μ, Fin.append w s ∈ latticeWords (n + q) lam := by
+  have key'
+      : ∀ i : Fin m, ∃ μ : Fin m → ℕ, ∃ s : Fin q → Fin m,
+        (q ≤ l i ∧ Function.Injective (Function.update l i (l i - q)))
+          → (∃ σ : Perm (Fin m), ∀ k, Function.update l i (l i - q) (σ k) = μ k + stair m k)
+            ∧ |cf (Function.update l i (l i - q)) (alternantPsum m (List.replicate n 1))|
+              = ((latticeWords n μ).card : ℚ)
+            ∧ ∀ w ∈ latticeWords n μ, Fin.append w s ∈ latticeWords (n + q) lam := by
     intro i
     by_cases h : q ≤ l i ∧ Function.Injective (Function.update l i (l i - q))
     · obtain ⟨μ, s, hs⟩ := key i h.1 h.2
@@ -79,11 +83,14 @@ theorem CombStripSum.proof (h1 : CombCfAtStair.Statement) (h2 : CombSortShift.St
   choose μ s hμs using key'
   set S := univ.filter
     (fun i : Fin m => q ≤ l i ∧ Function.Injective (Function.update l i (l i - q))) with hS
-  change ∑ i : Fin m, (if q ≤ l i then
-      |cf (Function.update l i (l i - q)) (alternantPsum m (List.replicate n 1))| else 0) ≤ _
-  have hsum_eq : ∑ i : Fin m, (if q ≤ l i then
-      |cf (Function.update l i (l i - q)) (alternantPsum m (List.replicate n 1))| else 0) =
-      ∑ i ∈ S, ((latticeWords n (μ i)).card : ℚ) := by
+  change
+    ∑ i : Fin m, (if q ≤ l i then
+        |cf (Function.update l i (l i - q)) (alternantPsum m (List.replicate n 1))| else 0)
+      ≤ _
+  have hsum_eq
+      : ∑ i : Fin m, (if q ≤ l i then
+          |cf (Function.update l i (l i - q)) (alternantPsum m (List.replicate n 1))| else 0)
+        = ∑ i ∈ S, ((latticeWords n (μ i)).card : ℚ) := by
     rw [hS, Finset.sum_filter]
     refine Finset.sum_congr rfl fun i _ => ?_
     by_cases hqi : q ≤ l i

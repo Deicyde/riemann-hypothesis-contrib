@@ -14,7 +14,8 @@ namespace GlobalTheory.WpFam
 
 def pv (τ : ℍ) (x : Fin 2 → ℝ) : ℂ := (x 0 : ℂ) * τ + (x 1 : ℂ)
 
-def eta (τ : ℍ) (x : Fin 2 → ℝ) : ℂ := EisensteinSeries.G2 τ * pv τ x - 2 * Real.pi * Complex.I * (x 0 : ℂ)
+def eta (τ : ℍ) (x : Fin 2 → ℝ) : ℂ :=
+  EisensteinSeries.G2 τ * pv τ x - 2 * Real.pi * Complex.I * (x 0 : ℂ)
 
 def G2s (τ : ℍ) : ℂ := EisensteinSeries.G2 τ - (Real.pi : ℂ) / (τ.im : ℂ)
 
@@ -26,7 +27,8 @@ def vmul {N : ℕ} (x : Fin 2 → ZMod N) (α : GL (Fin 2) (ZMod N)) : Fin 2 →
 
 def vact (N : ℕ) (x : Fin 2 → ZMod N) (γ : SL(2, ℤ)) : Fin 2 → ZMod N := vmul x (redGL N γ)
 
-def gact (N : ℕ) (D : GL (Fin 2) (ZMod N)) (α : GL (Fin 2) (ZMod N)) (γ : SL(2, ℤ)) : GL (Fin 2) (ZMod N) :=
+def gact (N : ℕ) (D : GL (Fin 2) (ZMod N)) (α : GL (Fin 2) (ZMod N)) (γ : SL(2, ℤ))
+    : GL (Fin 2) (ZMod N) :=
   α * (D * redGL N γ * D⁻¹)
 
 def dg {N : ℕ} (a : (ZMod N)ˣ) : GL (Fin 2) (ZMod N) where
@@ -51,34 +53,41 @@ def ch (N : ℕ) (j : ZMod N) : ℂ := Complex.exp (2 * Real.pi * Complex.I * (j
 
 def ZetaAct (g : ℂ ≃+* ℂ) (N : ℕ) (a : ZMod N) : Prop := ∀ j : ZMod N, g (ch N j) = ch N (a * j)
 
-
 open Classical in
 def cSum (N e : ℕ) (ε : ℂ) (x : Fin 2 → ZMod N) (k : ℕ) : ℂ :=
   ∑ m ∈ k.divisors, (m : ℂ) ^ e * ((if ((k / m : ℕ) : ZMod N) = x 0 then ch N ((m : ZMod N) * x 1) else 0) +
     ε * (if ((k / m : ℕ) : ZMod N) = -x 0 then ch N (-((m : ZMod N) * x 1)) else 0))
 
-
 open Classical in
 def cB (N : ℕ) (x : Fin 2 → ZMod N) (k : ℕ) : ℂ :=
   if k = 0 then (if x 0 = 0 then ch N (x 1) / (1 - ch N (x 1)) ^ 2 else 0) else cSum N 1 1 x k
 
-
 open Classical in
 def cD (N : ℕ) (x : Fin 2 → ZMod N) (k : ℕ) : ℂ :=
-  if k = 0 then (if x 0 = 0 then ch N (x 1) * (1 + ch N (x 1)) / (1 - ch N (x 1)) ^ 3 else 0) else cSum N 2 (-1) x k
+  if k = 0 then
+    (if x 0 = 0 then ch N (x 1) * (1 + ch N (x 1)) / (1 - ch N (x 1)) ^ 3 else 0)
+  else
+    cSum N 2 (-1) x k
 
 def cG (N : ℕ) (k : ℕ) : ℂ :=
-  if k = 0 then -1 / 12 else if N ∣ k then 2 * (ArithmeticFunction.sigma 1 (k / N) : ℂ) else 0
-
+  if k = 0 then
+    -1 / 12
+  else if N ∣ k then
+    2 * (ArithmeticFunction.sigma 1 (k / N) : ℂ)
+  else
+    0
 
 open Classical in
 def cP (N : ℕ) (x : Fin 2 → ZMod N) (k : ℕ) : ℂ := if x = 0 then 0 else cB N x k - cG N k
 
-theorem wB_eq (N : ℕ) (x : Fin 2 → ZMod N) (τ : ℍ) :
-    wB N x τ = (EisensteinSeries.G2 τ + (tauPair τ).weierstrassP (tors N τ x)) / (2 * Real.pi * Complex.I) ^ 2 := by
+theorem wB_eq (N : ℕ) (x : Fin 2 → ZMod N) (τ : ℍ)
+    : wB N x τ
+      = (EisensteinSeries.G2 τ + (tauPair τ).weierstrassP (tors N τ x))
+        / (2 * Real.pi * Complex.I) ^ 2 := by
   rw [wB, gN, wp, add_div]
 
-theorem gact_one (N : ℕ) (α : GL (Fin 2) (ZMod N)) (γ : SL(2, ℤ)) : gact N 1 α γ = α * redGL N γ := by
+theorem gact_one (N : ℕ) (α : GL (Fin 2) (ZMod N)) (γ : SL(2, ℤ))
+    : gact N 1 α γ = α * redGL N γ := by
   simp [gact]
 
 end GlobalTheory.WpFam

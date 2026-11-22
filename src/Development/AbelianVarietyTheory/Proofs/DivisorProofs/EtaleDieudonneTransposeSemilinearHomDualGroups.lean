@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DieudonneBas
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 namespace GlobalTheory
 

@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
 
 set_option autoImplicit false
@@ -22,8 +23,12 @@ noncomputable section
 
 namespace GlobalTheory.NefOfGen
 
-theorem card_pos_of_isAlgPt {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k} {D : ℕ}
-    (hX : IsArithVar p D) {x : X} (hx : IsAlgPt x) : (0 : ℝ) < Nat.card (X.residueField x →+* ℂ) := by
+theorem card_pos_of_isAlgPt
+    {k : Type} [CommRing k]
+    {X : Scheme.{0}} [IsIntegral X]
+    {p : X ⟶ Sp k} {D : ℕ} (hX : IsArithVar p D)
+    {x : X} (hx : IsAlgPt x)
+    : (0 : ℝ) < Nat.card (X.residueField x →+* ℂ) := by
   obtain ⟨hc, hd⟩ := hx
   obtain ⟨Z, i, _, _, rfl⟩ := exists_isClosedImmersion_genericPoint x
   have hr : Set.range i = closure {i (genericPoint Z)} := by
@@ -43,10 +48,20 @@ theorem card_pos_of_isAlgPt {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral
   rw [GlobalTheory.HtSelfInter.card_ringHom_eq]
   exact_mod_cast Nat.card_pos
 
-theorem nef_of_gen : GlobalTheory.Published.ArCalc → ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ), IsArithVar p D → ∀ (M : HermLB p) (m N : ℕ) (s : Fin N → (M.pow m).B.Sec), 1 ≤ m → (∀ x : X, CharZero (X.residueField x) → ∃ i, x ∈ ReciprocityTheory.ChartRestriction.G.Out.nonzeroLocus (s i)) → M.SemiPos D → NefFib M → ∃ t : ℝ, 0 ≤ t ∧ (M.shift (fun _ => t) fun _ => rfl).IsNef D := by
+theorem nef_of_gen
+    : GlobalTheory.Published.ArCalc
+      → ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+        IsArithVar p D
+          → ∀ (M : HermLB p) (m N : ℕ) (s : Fin N → (M.pow m).B.Sec),
+            1 ≤ m
+              → (∀ x : X,
+                CharZero (X.residueField x)
+                  → ∃ i, x ∈ ReciprocityTheory.ChartRestriction.G.Out.nonzeroLocus (s i))
+              → M.SemiPos D → NefFib M
+              → ∃ t : ℝ, 0 ≤ t ∧ (M.shift (fun _ => t) fun _ => rfl).IsNef D := by
   intro hA k _ X _ p D hX M m N s hm hs hsp hf
-  have hc : ∀ i, ∃ c : ℝ, s i ∈ ((M.shift (fun _ => -c) fun _ => rfl).pow m).smallSec :=
-    fun i => GlobalTheory.AmpleHtLow.small_of_shift k X p D hX M m hm (s i)
+  have hc : ∀ i, ∃ c : ℝ, s i ∈ ((M.shift (fun _ => -c) fun _ => rfl).pow m).smallSec := fun i =>
+    GlobalTheory.AmpleHtLow.small_of_shift k X p D hX M m hm (s i)
   choose c hc using hc
   obtain ⟨h, H⟩ := (hA.arExists k X p D hX).1 M
   refine ⟨-(-(∑ i, |c i|)), ?_, GlobalTheory.HtSelfInter.isNef_shift hX hsp hf fun x hx => ?_⟩
@@ -59,7 +74,8 @@ theorem nef_of_gen : GlobalTheory.Published.ArCalc → ∀ (k : Type) [CommRing 
   refine ⟨_, hb, ?_⟩
   have h1 := GlobalTheory.SmallSecHeight.le_ptHt k X p D hX M m (c i) _ x (s i) hm (hc i) hi hx hb
   have h2 : -(∑ j, |c j|) ≤ c i :=
-    (neg_le_neg (Finset.single_le_sum (fun j _ => abs_nonneg (c j)) (Finset.mem_univ i))).trans (neg_abs_le _)
+    (neg_le_neg (Finset.single_le_sum (fun j _ => abs_nonneg (c j)) (Finset.mem_univ i))).trans
+      (neg_abs_le _)
   exact h2.trans h1
 
 end GlobalTheory.NefOfGen

@@ -6,12 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-
 open Module in
-theorem eq_zero_of_sum_mul_embeddings_eq_zero (F Ω L : Type) [Field F] [CharZero F] [Field Ω]
-    [IsAlgClosed Ω] [Algebra F Ω] [Field L] [Algebra F L] [FiniteDimensional F L] (m : ℕ)
-    (e : Fin m → Ω) (he : LinearIndependent F e) (_halg : ∀ t, IsAlgebraic F (e t))
-    (a : Fin m → L) (h : ∀ σ : L →ₐ[F] Ω, ∑ t, e t * σ (a t) = 0) : a = 0 := by
+theorem eq_zero_of_sum_mul_embeddings_eq_zero
+    (F Ω L : Type) [Field F] [CharZero F] [Field Ω] [IsAlgClosed Ω] [Algebra F Ω] [Field L]
+    [Algebra F L] [FiniteDimensional F L]
+    (m : ℕ) (e : Fin m → Ω) (he : LinearIndependent F e) (_halg : ∀ t, IsAlgebraic F (e t))
+    (a : Fin m → L) (h : ∀ σ : L →ₐ[F] Ω, ∑ t, e t * σ (a t) = 0)
+    : a = 0 := by
   classical
   let b := Module.finBasis F L
   let ε : Fin (Module.finrank F L) ≃ (L →ₐ[F] Ω) :=

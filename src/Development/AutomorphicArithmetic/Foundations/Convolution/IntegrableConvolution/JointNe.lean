@@ -27,15 +27,15 @@ private lemma proj_comm {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ
 
 end UpperTheory.ConvolutionTheory.L1
 
-theorem UpperTheory.ConvolutionTheory.L1.jointNe :
-    UpperTheory.ConvolutionTheory.L1.JointNe := by
+theorem UpperTheory.ConvolutionTheory.L1.jointNe : UpperTheory.ConvolutionTheory.L1.JointNe := by
   intro Γ G H _ _ _ _ _ _ π V m ι E A U h i y hy
   obtain ⟨hcl, hinv, hirr⟩ := UpperTheory.ConvolutionTheory.L1.cutIrr Γ G H π V m ι E A U h
   have hmemVE : ∀ w, w ∈ eigIn V E 1 ↔ w ∈ V ∧ E w = w := by
     intro w
     simp [eigIn, Module.End.mem_eigenspace_iff, Submodule.mem_inf]
-  have hmemZ : ∀ (k : Fin (m + 1)) w, w ∈ eigIn (eigIn V E 1) (A k) y ↔
-      w ∈ eigIn V E 1 ∧ A k w = (y : ℂ) • w := by
+  have hmemZ
+      : ∀ (k : Fin (m + 1)) w,
+        w ∈ eigIn (eigIn V E 1) (A k) y ↔ w ∈ eigIn V E 1 ∧ A k w = (y : ℂ) • w := by
     intro k w
     simp only [eigIn, Submodule.mem_inf, Module.End.mem_eigenspace_iff]
     rfl
@@ -76,7 +76,8 @@ theorem UpperTheory.ConvolutionTheory.L1.jointNe :
     have := ht (j - i)
     rwa [add_sub_cancel] at this
 
-  have hS : ∀ S : Finset (Fin (m + 1)), ∃ w ∈ eigIn V E 1, w ≠ 0 ∧ ∀ j ∈ S, A j w = (y : ℂ) • w := by
+  have hS
+      : ∀ S : Finset (Fin (m + 1)), ∃ w ∈ eigIn V E 1, w ≠ 0 ∧ ∀ j ∈ S, A j w = (y : ℂ) • w := by
     intro S
     induction S using Finset.induction_on with
     | empty =>
@@ -91,13 +92,19 @@ theorem UpperTheory.ConvolutionTheory.L1.jointNe :
     | insert k S hk ih =>
       obtain ⟨w₀, hw₀, hw₀0, hw₀A⟩ := ih
       by_contra hno
-      have hno' : ∀ w ∈ eigIn V E 1, (∀ j ∈ S, A j w = (y : ℂ) • w) → A k w = (y : ℂ) • w → w = 0 := by
+      have hno'
+          : ∀ w ∈ eigIn V E 1, (∀ j ∈ S, A j w = (y : ℂ) • w) → A k w = (y : ℂ) • w → w = 0 := by
         intro w hw hwS hwk
         by_contra hw0
-        exact hno ⟨w, hw, hw0, fun j hj => by
-          rcases Finset.mem_insert.1 hj with rfl | hj
-          · exact hwk
-          · exact hwS j hj⟩
+        exact hno ⟨
+          w,
+          hw,
+          hw0,
+          fun j hj => by
+            rcases Finset.mem_insert.1 hj with rfl | hj
+            · exact hwk
+            · exact hwS j hj
+        ⟩
       set Z := eigIn (eigIn V E 1) (A k) y with hZdef
       have hZcl : IsClosed (Z : Set H) := by
         have h2 : IsClosed {w : H | A k w = (y : ℂ) • w} :=
@@ -126,14 +133,18 @@ theorem UpperTheory.ConvolutionTheory.L1.jointNe :
         obtain ⟨hpVE, hpA⟩ := (hmemZ k _).1 hp
         refine hno' _ hpVE (fun j hj => ?_) hpA
         rw [← proj_comm Z (A j) (hsa j) (hZA j), hwS j hj, map_smul]
-      let M : Submodule ℂ H :=
-        { carrier := {w | w ∈ eigIn V E 1 ∧ ∀ g, π (ι k g) w ∈ Zᗮ}
-          add_mem' := fun {a b} ha hb => ⟨Submodule.add_mem _ ha.1 hb.1, fun g => by
-            rw [map_add (f := _)]; exact Submodule.add_mem _ (ha.2 g) (hb.2 g)⟩
-          zero_mem' := ⟨Submodule.zero_mem _, fun g => by
-            rw [map_zero]; exact Submodule.zero_mem _⟩
-          smul_mem' := fun c a ha => ⟨Submodule.smul_mem _ c ha.1, fun g => by
-            rw [map_smul]; exact Submodule.smul_mem _ c (ha.2 g)⟩ }
+      let M : Submodule ℂ H := {
+        carrier := {w | w ∈ eigIn V E 1 ∧ ∀ g, π (ι k g) w ∈ Zᗮ}
+        add_mem' := fun {a b} ha hb => ⟨
+          Submodule.add_mem _ ha.1 hb.1,
+          fun g => by rw [map_add (f := _)]; exact Submodule.add_mem _ (ha.2 g) (hb.2 g)
+        ⟩
+        zero_mem' := ⟨Submodule.zero_mem _, fun g => by rw [map_zero]; exact Submodule.zero_mem _⟩
+        smul_mem' := fun c a ha => ⟨
+          Submodule.smul_mem _ c ha.1,
+          fun g => by rw [map_smul]; exact Submodule.smul_mem _ c (ha.2 g)
+        ⟩
+      }
       have hMmem : ∀ w, w ∈ M ↔ w ∈ eigIn V E 1 ∧ ∀ g, π (ι k g) w ∈ Zᗮ := fun w => Iff.rfl
       have hMle : M ≤ eigIn V E 1 := fun w hw => hw.1
       have hMcl : IsClosed (M : Set H) := by

@@ -9,11 +9,13 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem slices_test {P V Q : Type} [TopologicalSpace P] [TopologicalSpace V] [TopologicalSpace Q] [T2Space P]
-    [T2Space V] [T2Space Q] (T : (V → ℂ) → V → ℂ) (hT : ∀ φ, IsTest φ → IsTest (T φ)) (hT0 : T 0 = 0)
-    (f : P × V × Q → ℂ) (hf : IsTest f) :
-    (∀ p q, IsTest (fun v => f (p, v, q))) ∧
-      IsTest (fun x : P × V × Q => T (fun v => f (x.1, v, x.2.2)) x.2.1) := by
+theorem slices_test
+    {P V Q : Type} [TopologicalSpace P] [TopologicalSpace V] [TopologicalSpace Q] [T2Space P]
+    [T2Space V] [T2Space Q]
+    (T : (V → ℂ) → V → ℂ) (hT : ∀ φ, IsTest φ → IsTest (T φ)) (hT0 : T 0 = 0)
+    (f : P × V × Q → ℂ) (hf : IsTest f)
+    : (∀ p q, IsTest (fun v => f (p, v, q)))
+      ∧ IsTest (fun x : P × V × Q => T (fun v => f (x.1, v, x.2.2)) x.2.1) := by
   obtain ⟨hlc, hcs⟩ := hf
   have hC : IsCompact (tsupport f) := hcs
   have hz : ∀ x, x ∉ tsupport f → f x = 0 := fun x hx => image_eq_zero_of_notMem_tsupport hx
@@ -23,7 +25,8 @@ theorem slices_test {P V Q : Type} [TopologicalSpace P] [TopologicalSpace V] [To
     have hcl : IsClosed ({x : P × V × Q | x.1 = p} ∩ {x | x.2.2 = q}) :=
       (isClosed_eq continuous_fst continuous_const).inter
         (isClosed_eq (continuous_snd.comp continuous_snd) continuous_const)
-    refine HasCompactSupport.intro ((hC.inter_right hcl).image (continuous_fst.comp continuous_snd)) ?_
+    refine HasCompactSupport.intro ((hC.inter_right hcl).image (continuous_fst.comp continuous_snd))
+      ?_
     intro v hv
     apply hz
     intro hmem
@@ -84,9 +87,10 @@ theorem slices_test {P V Q : Type} [TopologicalSpace P] [TopologicalSpace V] [To
     have hfin : (Set.range (fun a : K => Φ a)).Finite :=
       (hΦ.comp_continuous continuous_subtype_val).range_finite
     set U : Set V := ⋃ h ∈ Set.range (fun a : K => Φ a), tsupport (T h) with hUdef
-    have hU : IsCompact U := hfin.isCompact_biUnion (fun h hh => by
-      obtain ⟨a, rfl⟩ := hh
-      exact (hT _ (h1 _ _)).2.isCompact)
+    have hU : IsCompact U :=
+      hfin.isCompact_biUnion (fun h hh => by
+        obtain ⟨a, rfl⟩ := hh
+        exact (hT _ (h1 _ _)).2.isCompact)
     have hL : IsCompact ((fun z : (P × Q) × V => (z.1.1, z.2, z.1.2)) '' (K ×ˢ U)) :=
       (hK.prod hU).image (by fun_prop)
     refine HasCompactSupport.intro hL ?_
@@ -102,7 +106,14 @@ theorem slices_test {P V Q : Type} [TopologicalSpace P] [TopologicalSpace V] [To
     refine ⟨((x.1, x.2.2), x.2.1), ⟨ha, ?_⟩, rfl⟩
     exact Set.mem_biUnion ⟨⟨(x.1, x.2.2), ha⟩, rfl⟩ (subset_tsupport _ hne)
 
-theorem slices_test' : ∀ {P V Q : Type} [TopologicalSpace P] [TopologicalSpace V] [TopologicalSpace Q] [T2Space P] [T2Space V] [T2Space Q] (T : (V → ℂ) → V → ℂ), (∀ φ, IsTest φ → IsTest (T φ)) → T 0 = 0 → ∀ f : P × V × Q → ℂ, IsTest f → (∀ p q, IsTest (fun v => f (p, v, q))) ∧ IsTest (fun x : P × V × Q => T (fun v => f (x.1, v, x.2.2)) x.2.1) :=
+theorem slices_test'
+    : ∀ {P V Q : Type} [TopologicalSpace P] [TopologicalSpace V] [TopologicalSpace Q] [T2Space P]
+        [T2Space V] [T2Space Q] (T : (V → ℂ) → V → ℂ),
+      (∀ φ, IsTest φ → IsTest (T φ)) → T 0 = 0
+        → ∀ f : P × V × Q → ℂ,
+          IsTest f
+            → (∀ p q, IsTest (fun v => f (p, v, q)))
+              ∧ IsTest (fun x : P × V × Q => T (fun v => f (x.1, v, x.2.2)) x.2.1) :=
   fun T hT hT0 f hf => slices_test T hT hT0 f hf
 
 end GlobalTheory

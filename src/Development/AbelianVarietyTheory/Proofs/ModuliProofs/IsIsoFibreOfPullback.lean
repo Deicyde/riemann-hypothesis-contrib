@@ -10,8 +10,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -25,18 +27,20 @@ def Near (Q : MorphismProperty Scheme.{0}) (x : X) : Prop :=
   ∃ (T T' : Scheme.{0}) (g : T ⟶ X) (g' : T' ⟶ Y) (f' : T' ⟶ T),
     IsPullback f' g' g f ∧ IsOpenImmersion g ∧ x ∈ Set.range g ∧ Q f'
 
-theorem Near.of_pullback {Q : MorphismProperty Scheme.{0}} {T T' : Scheme.{0}} {g : T ⟶ X}
-    {g' : T' ⟶ Y} {f' : T' ⟶ T} (H : IsPullback f' g' g f) [IsOpenImmersion g] {y : T}
-    (h : Near f' Q y) : Near f Q (g y) := by
+theorem Near.of_pullback
+    {Q : MorphismProperty Scheme.{0}} {T T' : Scheme.{0}} {g : T ⟶ X} {g' : T' ⟶ Y} {f' : T' ⟶ T}
+    (H : IsPullback f' g' g f) [IsOpenImmersion g]
+    {y : T} (h : Near f' Q y)
+    : Near f Q (g y) := by
   obtain ⟨T₀, T₀', g₀, g₀', f₀, H₀, hg₀, ⟨z, rfl⟩, hQ⟩ := h
   have := hg₀
   refine ⟨T₀, T₀', g₀ ≫ g, g₀' ≫ g', f₀, H₀.paste_vert H, inferInstance, ⟨z, ?_⟩, hQ⟩
   simp
 
-theorem isIso_fibre_of_pullback {S : Scheme.{0}} (t : S ⟶ Sp R)
-    [IsIso (pullback.snd f (pullback.fst s t))] {T T' : Scheme.{0}} {g : T ⟶ X} {g' : T' ⟶ Y}
-    {f' : T' ⟶ T} (H : IsPullback f' g' g f) :
-    IsIso (pullback.snd f' (pullback.fst (g ≫ s) t)) := by
+theorem isIso_fibre_of_pullback
+    {S : Scheme.{0}} (t : S ⟶ Sp R) [IsIso (pullback.snd f (pullback.fst s t))]
+    {T T' : Scheme.{0}} {g : T ⟶ X} {g' : T' ⟶ Y} {f' : T' ⟶ T} (H : IsPullback f' g' g f)
+    : IsIso (pullback.snd f' (pullback.fst (g ≫ s) t)) := by
   have H' : IsPullback (pullback.snd f' (pullback.fst (g ≫ s) t))
       (pullback.fst f' (pullback.fst (g ≫ s) t) ≫ g') (pullback.fst (g ≫ s) t ≫ g) f :=
     (IsPullback.of_hasPullback _ _).flip.paste_vert H
@@ -45,9 +49,10 @@ theorem isIso_fibre_of_pullback {S : Scheme.{0}} (t : S ⟶ Sp R)
 
 variable (K : Type) [Field K] [Algebra R K]
 
-theorem near_isFinite [IsProper f]
-    [IsIso (pullback.snd f (pullback.fst s (spMap (algebraMap R K))))]
-    (x : X) (hx : RingHom.ker (algebraMap R K) = (s x).asIdeal) : Near f @IsFinite x := by
+theorem near_isFinite
+    [IsProper f] [IsIso (pullback.snd f (pullback.fst s (spMap (algebraMap R K))))]
+    (x : X) (hx : RingHom.ker (algebraMap R K) = (s x).asIdeal)
+    : Near f @IsFinite x := by
   have hsub : (f ⁻¹' {x}).Subsingleton := by
     let k : Sp K := IsLocalRing.closedPoint K
     have hk : s x = spMap (algebraMap R K) k := by
@@ -56,22 +61,26 @@ theorem near_isFinite [IsProper f]
       rfl
     obtain ⟨x', hx', -⟩ := Scheme.Pullback.exists_preimage_pullback x k hk
     intro y₁ hy₁ y₂ hy₂
-    obtain ⟨z₁, hz₁, hz₁'⟩ := Scheme.Pullback.exists_preimage_pullback
-      (f := f) (g := pullback.fst s (spMap (algebraMap R K))) y₁ x' (hy₁.trans hx'.symm)
-    obtain ⟨z₂, hz₂, hz₂'⟩ := Scheme.Pullback.exists_preimage_pullback
-      (f := f) (g := pullback.fst s (spMap (algebraMap R K))) y₂ x' (hy₂.trans hx'.symm)
+    obtain ⟨z₁, hz₁, hz₁'⟩ :=
+      Scheme.Pullback.exists_preimage_pullback (f := f)
+        (g := pullback.fst s (spMap (algebraMap R K))) y₁ x' (hy₁.trans hx'.symm)
+    obtain ⟨z₂, hz₂, hz₂'⟩ :=
+      Scheme.Pullback.exists_preimage_pullback (f := f)
+        (g := pullback.fst s (spMap (algebraMap R K))) y₂ x' (hy₂.trans hx'.symm)
     have hz : z₁ = z₂ :=
       (pullback.snd f (pullback.fst s (spMap (algebraMap R K)))).isOpenEmbedding.injective
         (hz₁'.trans hz₂'.symm)
     rw [← hz₁, ← hz₂, hz]
-  obtain ⟨V, hxV, hV⟩ := exists_isFinite_morphismRestrict_of_finite_preimage_singleton f x hsub.finite
-  refine ⟨V, f ⁻¹ᵁ V, V.ι, (f ⁻¹ᵁ V).ι, f ∣_ V, isPullback_morphismRestrict f V, inferInstance, ?_, hV⟩
+  obtain ⟨V, hxV, hV⟩ :=
+    exists_isFinite_morphismRestrict_of_finite_preimage_singleton f x hsub.finite
+  refine
+    ⟨V, f ⁻¹ᵁ V, V.ι, (f ⁻¹ᵁ V).ι, f ∣_ V, isPullback_morphismRestrict f V, inferInstance, ?_, hV⟩
   simpa using hxV
 
-theorem near_isClosedImmersion [hfin : IsFinite f]
-    [IsIso (pullback.snd f (pullback.fst s (spMap (algebraMap R K))))]
-    (x : X) (hx : RingHom.ker (algebraMap R K) = (s x).asIdeal) :
-    Near f @IsClosedImmersion x := by
+theorem near_isClosedImmersion
+    [hfin : IsFinite f] [IsIso (pullback.snd f (pullback.fst s (spMap (algebraMap R K))))]
+    (x : X) (hx : RingHom.ker (algebraMap R K) = (s x).asIdeal)
+    : Near f @IsClosedImmersion x := by
   refine DenseFibreIso.local_of_ring s f @IsClosedImmersion K ?_ x hx
   intro A B _ _ _ _ _ _ j j' _ H _ hbij m
   have hf : IsFinite (spMap (algebraMap A B)) :=
@@ -81,10 +90,11 @@ theorem near_isClosedImmersion [hfin : IsFinite f]
   exact ⟨a, ha, IsClosedImmersion.spec_of_surjective _ hsurj⟩
 
 set_option backward.isDefEq.respectTransparency.types false in
-theorem near_isIso [hcl : IsClosedImmersion f] [IsLocallyNoetherian X] [Flat (f ≫ s)]
+theorem near_isIso
+    [hcl : IsClosedImmersion f] [IsLocallyNoetherian X] [Flat (f ≫ s)]
     [IsIso (pullback.snd f (pullback.fst s (spMap (algebraMap R K))))]
-    (x : X) (hx : RingHom.ker (algebraMap R K) = (s x).asIdeal) :
-    Near f (MorphismProperty.isomorphisms _) x := by
+    (x : X) (hx : RingHom.ker (algebraMap R K) = (s x).asIdeal)
+    : Near f (MorphismProperty.isomorphisms _) x := by
   refine DenseFibreIso.local_of_ring s f (MorphismProperty.isomorphisms _) K ?_ x hx
   intro A B _ _ _ _ _ _ j j' hj H hjs hbij m
   have : IsOpenImmersion j' :=
@@ -108,8 +118,9 @@ theorem near_isIso [hcl : IsClosedImmersion f] [IsLocallyNoetherian X] [Flat (f 
   have : IsNoetherianRing A := isNoetherian_Spec.mp this
   have hflat : Flat (spMap (algebraMap R B)) := by
     have e : spMap (algebraMap R B) = spMap (algebraMap A B) ≫ spMap (algebraMap R A) := by
-      change Spec.map (CommRingCat.ofHom (algebraMap R B)) =
-        Spec.map (CommRingCat.ofHom (algebraMap A B)) ≫ Spec.map (CommRingCat.ofHom (algebraMap R A))
+      change Spec.map (CommRingCat.ofHom (algebraMap R B))
+        = Spec.map (CommRingCat.ofHom (algebraMap A B))
+          ≫ Spec.map (CommRingCat.ofHom (algebraMap R A))
       rw [← Spec.map_comp, ← CommRingCat.ofHom_comp, ← IsScalarTower.algebraMap_eq]
     rw [e, ← hjs, reassoc_of% H.w]
     infer_instance
@@ -117,10 +128,11 @@ theorem near_isIso [hcl : IsClosedImmersion f] [IsLocallyNoetherian X] [Flat (f 
   obtain ⟨a, ha, hb⟩ := DenseFibreIso.exists_away_bijective R K hs hbij.1 m
   exact ⟨a, ha, isIso_SpecMap_iff.mpr hb⟩
 
-theorem near_isIso_of_isProper [IsProper f] [IsLocallyNoetherian X] [Flat (f ≫ s)]
+theorem near_isIso_of_isProper
+    [IsProper f] [IsLocallyNoetherian X] [Flat (f ≫ s)]
     [IsIso (pullback.snd f (pullback.fst s (spMap (algebraMap R K))))]
-    (x : X) (hx : RingHom.ker (algebraMap R K) = (s x).asIdeal) :
-    Near f (MorphismProperty.isomorphisms _) x := by
+    (x : X) (hx : RingHom.ker (algebraMap R K) = (s x).asIdeal)
+    : Near f (MorphismProperty.isomorphisms _) x := by
   obtain ⟨T, T', g, g', f', H, hg, ⟨y, rfl⟩, hQ⟩ := near_isFinite s f K x hx
   have := hg
   have : IsFinite f' := hQ
@@ -147,10 +159,12 @@ theorem isOpen_near (Q : MorphismProperty Scheme.{0}) : IsOpen {x : X | Near f Q
   rw [isOpen_iff_forall_mem_open]
   rintro x ⟨T, T', g, g', f', H, hg, hx, hQ⟩
   have := hg
-  exact ⟨Set.range g, fun z hz => ⟨T, T', g, g', f', H, hg, hz, hQ⟩, g.isOpenEmbedding.isOpen_range, hx⟩
+  exact
+    ⟨Set.range g, fun z hz => ⟨T, T', g, g', f', H, hg, hz, hQ⟩, g.isOpenEmbedding.isOpen_range, hx⟩
 
-theorem isIso_of_near {S : Scheme.{0}} (t : S ⟶ X)
-    (h : ∀ y : S, Near f (MorphismProperty.isomorphisms _) (t y)) : IsIso (pullback.snd f t) := by
+theorem isIso_of_near
+    {S : Scheme.{0}} (t : S ⟶ X) (h : ∀ y : S, Near f (MorphismProperty.isomorphisms _) (t y))
+    : IsIso (pullback.snd f t) := by
   choose T T' g g' f' H hg hx hQ using h
   rw [← MorphismProperty.isomorphisms.iff]
   refine IsZariskiLocalAtTarget.of_iSup_eq_top (fun y => t ⁻¹ᵁ (g y).opensRange) ?_ fun y => ?_
@@ -162,13 +176,21 @@ theorem isIso_of_near {S : Scheme.{0}} (t : S ⟶ X)
       rintro _ ⟨z, rfl⟩
       exact z.2
     have hu := IsOpenImmersion.lift_fac (g y) _ hle
-    have big := (isPullback_morphismRestrict (pullback.snd f t) (t ⁻¹ᵁ (g y).opensRange)).paste_vert
-      (IsPullback.of_hasPullback f t).flip
+    have big :=
+      (isPullback_morphismRestrict (pullback.snd f t) (t ⁻¹ᵁ (g y).opensRange)).paste_vert
+        (IsPullback.of_hasPullback f t).flip
     rw [← hu] at big
     rw [MorphismProperty.isomorphisms.iff]
     exact (big.of_bot' (H y)).isIso_fst_of_isIso
 
-theorem main : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Y X : Scheme.{0}) (s : X ⟶ Sp R) (φ : Y ⟶ X) (K : Type) [Field K] (x : R →+* K), IsProper s → Flat s → IsProper φ → Flat (φ ≫ s) → IsIso (pullback.snd φ (pullback.fst s (spMap x))) → ∃ f : R, x f ≠ 0 ∧ IsIso (pullback.snd φ (pullback.fst s (spMap (algebraMap R (Localization.Away f))))) := by
+theorem main
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Y X : Scheme.{0}) (s : X ⟶ Sp R) (φ : Y ⟶ X)
+        (K : Type) [Field K] (x : R →+* K),
+      IsProper s → Flat s → IsProper φ → Flat (φ ≫ s)
+        → IsIso (pullback.snd φ (pullback.fst s (spMap x)))
+        → ∃ f : R,
+          x f ≠ 0 ∧ IsIso (pullback.snd φ
+            (pullback.fst s (spMap (algebraMap R (Localization.Away f))))) := by
   intro R _ _ Y X s φ K _ x hs _ hφ hflat hiso
   let : Algebra R K := x.toAlgebra
   have : IsIso (pullback.snd φ (pullback.fst s (spMap (algebraMap R K)))) := hiso
@@ -187,12 +209,15 @@ theorem main : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Y X : Scheme.{0
   refine ⟨f, fun h0 => (PrimeSpectrum.mem_basicOpen _ _).mp hpf (RingHom.mem_ker.mpr h0), ?_⟩
   refine isIso_of_near φ _ fun y => ?_
   by_contra hy
-  have hmem : s (pullback.fst s (spMap (algebraMap R (Localization.Away f))) y) ∈
-      PrimeSpectrum.basicOpen f := by
+  have hmem
+      : s (pullback.fst s (spMap (algebraMap R (Localization.Away f))) y)
+        ∈ PrimeSpectrum.basicOpen f := by
     rw [← Scheme.Hom.comp_apply, pullback.condition, Scheme.Hom.comp_apply]
     refine (PrimeSpectrum.mem_basicOpen _ _).mpr fun hf => ?_
-    have hf' : algebraMap R (Localization.Away f) f ∈
-        (pullback.snd s (spMap (algebraMap R (Localization.Away f))) y).asIdeal := hf
+    have hf'
+        : algebraMap R (Localization.Away f) f
+          ∈ (pullback.snd s (spMap (algebraMap R (Localization.Away f))) y).asIdeal :=
+      hf
     exact (pullback.snd s (spMap (algebraMap R (Localization.Away f))) y).isPrime.ne_top
       (Ideal.eq_top_of_isUnit_mem _ hf' (IsLocalization.Away.algebraMap_isUnit f))
   exact hsub hmem ⟨_, hy, rfl⟩

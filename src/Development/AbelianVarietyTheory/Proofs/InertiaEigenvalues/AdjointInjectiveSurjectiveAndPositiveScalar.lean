@@ -9,15 +9,17 @@ open scoped InnerProductSpace BigOperators
 
 namespace GlobalTheory
 
-theorem adjoint_injective_surjective_and_positive_scalar :
-    ∀ (E F : Type) [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
-      [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F] (A : E →ₗ[ℂ] F),
-      (Function.Injective (LinearMap.adjoint A) → Function.Surjective A) ∧
-      (∀ (U : Submodule ℂ F) (l : ℂ), l ≠ 0 →
-        (∀ x ∈ U, ∀ y, ⟪LinearMap.adjoint A x, LinearMap.adjoint A y⟫_ℂ = l * ⟪x, y⟫_ℂ) →
-        ∃ l' : ℝ, 0 < l' ∧
-          (∀ x ∈ U, ∀ y, ⟪LinearMap.adjoint A x, LinearMap.adjoint A y⟫_ℂ = (l' : ℂ) * ⟪x, y⟫_ℂ) ∧
-          ∀ x ∈ U, A (LinearMap.adjoint A x) = (l' : ℂ) • x) := by
+theorem adjoint_injective_surjective_and_positive_scalar
+    : ∀ (E F : Type) [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+        [NormedAddCommGroup F] [InnerProductSpace ℂ F] [FiniteDimensional ℂ F] (A : E →ₗ[ℂ] F),
+      (Function.Injective (LinearMap.adjoint A) → Function.Surjective A)
+        ∧ (∀ (U : Submodule ℂ F) (l : ℂ),
+          l ≠ 0 → (∀ x ∈ U, ∀ y, ⟪LinearMap.adjoint A x, LinearMap.adjoint A y⟫_ℂ = l * ⟪x, y⟫_ℂ)
+            → ∃ l' : ℝ,
+              0 < l'
+                ∧ (∀ x ∈ U, ∀ y,
+                  ⟪LinearMap.adjoint A x, LinearMap.adjoint A y⟫_ℂ = (l' : ℂ) * ⟪x, y⟫_ℂ)
+                ∧ ∀ x ∈ U, A (LinearMap.adjoint A x) = (l' : ℂ) • x) := by
   intro E F _ _ _ _ _ _ A
   constructor
   · intro hinj
@@ -33,10 +35,14 @@ theorem adjoint_injective_surjective_and_positive_scalar :
     have htop : LinearMap.range A = ⊤ := Submodule.orthogonal_eq_bot_iff.mp hbot
     exact LinearMap.range_eq_top.mp htop
   · intro U l hl h
-    have key : ∀ l' : ℝ, 0 < l' → l = (l' : ℂ) →
-        ∃ l' : ℝ, 0 < l' ∧
-          (∀ x ∈ U, ∀ y, ⟪LinearMap.adjoint A x, LinearMap.adjoint A y⟫_ℂ = (l' : ℂ) * ⟪x, y⟫_ℂ) ∧
-          ∀ x ∈ U, A (LinearMap.adjoint A x) = (l' : ℂ) • x := by
+    have key
+        : ∀ l' : ℝ,
+          0 < l' → l = (l' : ℂ)
+            → ∃ l' : ℝ,
+              0 < l'
+                ∧ (∀ x ∈ U, ∀ y,
+                  ⟪LinearMap.adjoint A x, LinearMap.adjoint A y⟫_ℂ = (l' : ℂ) * ⟪x, y⟫_ℂ)
+                ∧ ∀ x ∈ U, A (LinearMap.adjoint A x) = (l' : ℂ) • x := by
       intro l' hpos hl'
       subst hl'
       refine ⟨l', hpos, h, ?_⟩

@@ -11,9 +11,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoeffTopMonE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -22,12 +26,17 @@ namespace GlobalTheory.MBLow
 theorem archF_of_arch : ∀ κ : Rule, Funct κ → Arch κ → ArchF κ := by
   intro κ hF hA R _ _ _ _ D hP hT F _ _ _ e N ν g r m k hg hm hk β ζ q hq s hs vB bX σ gm hAd k₀ hK
   letI : Algebra (FractionRing R) ℂ := ((e : F →+* ℂ).comp (algebraMap (FractionRing R) F)).toAlgebra
-  have he : ∀ x, e (algebraMap (FractionRing R) F x) = algebraMap (FractionRing R) ℂ x := fun _ => rfl
-  obtain ⟨N', ν', I, hb, hh, hl, heX, hth, hrg, hvE, hfam⟩ := GlobalTheory.T.degenerationValues_transport_fieldIso R D F ℂ e he N ν
-  obtain ⟨hform, hlev⟩ := GlobalTheory.T.degenerationDataValuesIso_transport_formsLevelsFamilies F ℂ e N N' I hb hh hl
+  have he : ∀ x, e (algebraMap (FractionRing R) F x) = algebraMap (FractionRing R) ℂ x := fun _ =>
+    rfl
+  obtain ⟨N', ν', I, hb, hh, hl, heX, hth, hrg, hvE, hfam⟩ :=
+    GlobalTheory.T.degenerationValues_transport_fieldIso R D F ℂ e he N ν
+  obtain ⟨hform, hlev⟩ :=
+    GlobalTheory.T.degenerationDataValuesIso_transport_formsLevelsFamilies F ℂ e N N' I hb hh hl
   obtain ⟨β', hβ⟩ := hform k β
   obtain ⟨q', hq', hev⟩ := hlev m g hm ζ q hq
-  obtain ⟨hBK, hadp⟩ := GlobalTheory.T.abelianKeyValue_adaptedVectors_fieldIso κ hF R D F ℂ e he N ν N' ν' I hh hl heX hth hvE vB
+  obtain ⟨hBK, hadp⟩ :=
+    GlobalTheory.T.abelianKeyValue_adaptedVectors_fieldIso κ hF R D F ℂ e he N ν N' ν' I hh hl heX
+      hth hvE vB
   obtain ⟨gm', hpull, hAd'⟩ := hadp r g bX σ gm hAd
   choose s' hs1 hs2 using fun a => hfam (m ^ 2) (s a)
   have hs' : ∀ a, ∃ f, ν'.FamV (s' a) f ∧ IsEvFam N' m (q' a) f := by
@@ -35,7 +44,8 @@ theorem archF_of_arch : ∀ κ : Rule, Funct κ → Arch κ → ArchF κ := by
     obtain ⟨f, hf, hf2⟩ := hs a
     obtain ⟨f', hf', hff⟩ := hs1 a f hf
     exact ⟨f', hf', hev a f f' hf2 hff⟩
-  obtain ⟨ε, hε, H⟩ := hA R D hP hT N' ν' g r m k hg hm hk β' _ q' hq' s' hs' vB _ σ gm' hAd' _ (hBK k₀ hK)
+  obtain ⟨ε, hε, H⟩ :=
+    hA R D hP hT N' ν' g r m k hg hm hk β' _ q' hq' s' hs' vB _ σ gm' hAd' _ (hBK k₀ hK)
   have h1 : ∀ a j α, (jc ν' (s' a) (gm' j) (I.e α)).fst = e (jc ν (s a) (gm j) α).fst := by
     intro a j α
     rw [hs2 a _ _ (hpull j) α]

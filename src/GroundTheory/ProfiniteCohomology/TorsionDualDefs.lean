@@ -31,10 +31,11 @@ def mk (q : ℚ) : QZ := toAddCircle.symm (q : AddCircle (1 : ℚ))
 theorem mk_surjective : Function.Surjective mk := fun x =>
   QuotientAddGroup.mk_surjective (s := AddSubgroup.zmultiples (1 : ℚ)) (toAddCircle x)
 
-@[simp] theorem mk_add (p q : ℚ) : mk (p + q) = mk p + mk q := by
-  simp [mk]
+@[simp]
+theorem mk_add (p q : ℚ) : mk (p + q) = mk p + mk q := by simp [mk]
 
-@[simp] theorem mk_zero : mk 0 = 0 := by simp [mk]
+@[simp]
+theorem mk_zero : mk 0 = 0 := by simp [mk]
 
 theorem mk_eq_zero_iff (q : ℚ) : mk q = 0 ↔ ∃ n : ℤ, (n : ℚ) = q := by
   simp only [mk, AddEquivClass.map_eq_zero_iff, AddCircle.coe_eq_zero_iff, zsmul_eq_mul, mul_one]
@@ -45,9 +46,9 @@ abbrev QZDual (A : Type*) [AddCommGroup A] [TopologicalSpace A] : Type _ := A �
 
 namespace QZDual
 
-variable {A B C : Type*} [AddCommGroup A] [TopologicalSpace A] [AddCommGroup B]
-  [TopologicalSpace B] [AddCommGroup C] [TopologicalSpace C]
-
+variable
+  {A B C : Type*} [AddCommGroup A] [TopologicalSpace A] [AddCommGroup B] [TopologicalSpace B]
+  [AddCommGroup C] [TopologicalSpace C]
 
 end QZDual
 

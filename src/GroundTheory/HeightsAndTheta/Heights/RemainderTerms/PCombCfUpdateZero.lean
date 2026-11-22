@@ -44,7 +44,8 @@ theorem CombCfUpdateZero.proof : CombCfUpdateZero.Statement := by
       have hm : (i : ℕ) + 1 < m := by have := b.isLt; omega
       refine ⟨hm, fun h => ?_⟩
       have h1 := hlam (show i ≤ (⟨i + 1, h⟩ : Fin m) from Fin.le_iff_val_le_val.mpr (by simp))
-      have h2 := hlam (show (⟨i + 1, h⟩ : Fin m) ≤ b from Fin.le_iff_val_le_val.mpr (by simp; omega))
+      have h2 :=
+        hlam (show (⟨i + 1, h⟩ : Fin m) ≤ b from Fin.le_iff_val_le_val.mpr (by simp; omega))
       omega
   obtain ⟨hm, heq⟩ := key
   have hne : i ≠ (⟨i + 1, hm⟩ : Fin m) := by

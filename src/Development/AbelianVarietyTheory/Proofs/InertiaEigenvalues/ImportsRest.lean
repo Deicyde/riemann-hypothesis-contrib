@@ -8,11 +8,14 @@ universe u_1 u_2
 
 namespace GlobalTheory.PermutationExistence
 
-theorem exists_perm {G : Type u_1} {C : Type u_2} [Group G] [AddCommMonoid C]
-    (H V : Subgroup G) (S : Finset G) (hS : ∀ s ∈ S, s ∈ H)
-    (hT : ∀ h ∈ H, ∃! s : G, s ∈ S ∧ s⁻¹ * h ∈ V) (h : G) (hh : h ∈ H) :
-    ∃ σ : G → G, (∀ s ∈ S, σ s ∈ S ∧ (σ s)⁻¹ * (h * s) ∈ V) ∧
-      ∀ f : G → C, ∑ s ∈ S, f (σ s) = ∑ s ∈ S, f s := by
+theorem exists_perm
+    {G : Type u_1} {C : Type u_2} [Group G] [AddCommMonoid C]
+    (H V : Subgroup G) (S : Finset G)
+    (hS : ∀ s ∈ S, s ∈ H) (hT : ∀ h ∈ H, ∃! s : G, s ∈ S ∧ s⁻¹ * h ∈ V)
+    (h : G) (hh : h ∈ H)
+    : ∃ σ : G → G,
+      (∀ s ∈ S, σ s ∈ S ∧ (σ s)⁻¹ * (h * s) ∈ V)
+        ∧ ∀ f : G → C, ∑ s ∈ S, f (σ s) = ∑ s ∈ S, f s := by
   classical
   have key : ∀ s ∈ S, ∃ s' : G, s' ∈ S ∧ s'⁻¹ * (h * s) ∈ V := fun s hs =>
     (hT (h * s) (H.mul_mem hh (hS s hs))).exists
@@ -37,24 +40,30 @@ theorem exists_perm {G : Type u_1} {C : Type u_2} [Group G] [AddCommMonoid C]
       obtain ⟨s, hs, rfl⟩ := Finset.mem_image.mp hx
       exact hσS s hs
     · rw [Finset.card_image_of_injOn hinj]
-  calc ∑ s ∈ S, f (σ s) = ∑ x ∈ S.image σ, f x := (Finset.sum_image hinj).symm
+  calc
+    ∑ s ∈ S, f (σ s)
+      = ∑ x ∈ S.image σ, f x := (Finset.sum_image hinj).symm
     _ = ∑ s ∈ S, f s := by rw [himg]
 
-theorem main {G : Type u_1} {C : Type u_2} [Group G] [NormedField C] [IsUltrametricDist C]
+theorem main
+    {G : Type u_1} {C : Type u_2} [Group G] [NormedField C] [IsUltrametricDist C]
     (act : G →* C ≃+* C) (hn : ∀ (g : G) (y : C), ‖act g y‖ = ‖y‖)
-    (H V : Subgroup G) (S : Finset G) (hS : ∀ s ∈ S, s ∈ H)
-    (hT : ∀ h ∈ H, ∃! s : G, s ∈ S ∧ s⁻¹ * h ∈ V) (a b : C) (hb : ‖b‖ ≤ (1 : ℝ))
-    (hV : ∀ g ∈ V, act g b = b) (ha : ∑ s ∈ S, act s b = a) (c : G → C)
-    (hc : ∀ g ∈ H, ∀ h ∈ H, c (g * h) = c g + act g (c h)) (t ε : ℝ) (ht : (0 : ℝ) ≤ t)
-    (hε : (0 : ℝ) ≤ ε) (hct : ∀ g ∈ H, ‖c g‖ ≤ t) (hcε : ∀ g ∈ H, g ∈ V → ‖c g‖ ≤ ε) :
-    ∃ x : C, ‖x‖ ≤ t ∧ ∀ h ∈ H, ‖a * c h - (act h x - x)‖ ≤ ε := by
+    (H V : Subgroup G) (S : Finset G)
+    (hS : ∀ s ∈ S, s ∈ H) (hT : ∀ h ∈ H, ∃! s : G, s ∈ S ∧ s⁻¹ * h ∈ V)
+    (a b : C) (hb : ‖b‖ ≤ (1 : ℝ)) (hV : ∀ g ∈ V, act g b = b) (ha : ∑ s ∈ S, act s b = a)
+    (c : G → C) (hc : ∀ g ∈ H, ∀ h ∈ H, c (g * h) = c g + act g (c h))
+    (t ε : ℝ) (ht : (0 : ℝ) ≤ t) (hε : (0 : ℝ) ≤ ε) (hct : ∀ g ∈ H, ‖c g‖ ≤ t)
+    (hcε : ∀ g ∈ H, g ∈ V → ‖c g‖ ≤ ε)
+    : ∃ x : C, ‖x‖ ≤ t ∧ ∀ h ∈ H, ‖a * c h - (act h x - x)‖ ≤ ε := by
   classical
-  refine ⟨-∑ s ∈ S, act s b * c s, ?_, ?_⟩
+  refine ⟨- ∑ s ∈ S, act s b * c s, ?_, ?_⟩
   · rw [norm_neg]
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg ht
     intro s hs
     rw [norm_mul, hn]
-    calc ‖b‖ * ‖c s‖ ≤ 1 * t := mul_le_mul hb (hct s (hS s hs)) (norm_nonneg _) zero_le_one
+    calc
+      ‖b‖ * ‖c s‖
+        ≤ 1 * t := mul_le_mul hb (hct s (hS s hs)) (norm_nonneg _) zero_le_one
       _ = t := one_mul t
   · intro h hh
     obtain ⟨σ, hσ, hsum⟩ := exists_perm (C := C) H V S hS hT h hh
@@ -63,16 +72,18 @@ theorem main {G : Type u_1} {C : Type u_2} [Group G] [NormedField C] [IsUltramet
       rw [map_mul]
       rfl
 
-    have hterm : ∀ s ∈ S, act h (act s b * c s) = act (σ s) b * c (σ s)
-        + act (σ s) (b * c ((σ s)⁻¹ * (h * s))) - act (σ s) b * c h := by
+    have hterm
+        : ∀ s ∈ S,
+          act h (act s b * c s)
+            = act (σ s) b * c (σ s) + act (σ s) (b * c ((σ s)⁻¹ * (h * s)))
+              - act (σ s) b * c h := by
       intro s hs
       have hsH := hS s hs
       have hσH := hS (σ s) (hσ s hs).1
       have hvV := (hσ s hs).2
       have hhs : h * s = σ s * ((σ s)⁻¹ * (h * s)) := (mul_inv_cancel_left _ _).symm
       have hvH : (σ s)⁻¹ * (h * s) ∈ H := H.mul_mem (H.inv_mem hσH) (H.mul_mem hh hsH)
-      have h1 : act h (act s b) = act (σ s) b := by
-        rw [← hmul, hhs, hmul, hV _ hvV]
+      have h1 : act h (act s b) = act (σ s) b := by rw [← hmul, hhs, hmul, hV _ hvV]
       have h2 : act h (c s) = c (σ s) + act (σ s) (c ((σ s)⁻¹ * (h * s))) - c h := by
         have e1 := hc h hh s hsH
         have e2 := hc (σ s) hσH _ hvH
@@ -85,15 +96,19 @@ theorem main {G : Type u_1} {C : Type u_2} [Group G] [NormedField C] [IsUltramet
       exact hsum (fun g => act g b)
     have hsumT : ∑ s ∈ S, act (σ s) b * c (σ s) = ∑ s ∈ S, act s b * c s :=
       hsum (fun g => act g b * c g)
-    have hact : act h (-∑ s ∈ S, act s b * c s) = -(∑ s ∈ S, act s b * c s
-        + ∑ s ∈ S, act (σ s) (b * c ((σ s)⁻¹ * (h * s))) - a * c h) := by
+    have hact
+        : act h (- ∑ s ∈ S, act s b * c s)
+          = -(∑ s ∈ S, act s b * c s + ∑ s ∈ S, act (σ s) (b * c ((σ s)⁻¹ * (h * s)))
+            - a * c h) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_neg, map_sum, Finset.sum_congr rfl hterm, Finset.sum_sub_distrib,
+      rw [map_neg, map_sum, Finset.sum_congr rfl hterm, Finset.sum_sub_distrib,
         Finset.sum_add_distrib, hsumT, ← Finset.sum_mul, hsumA]
     rw [hact]
-    have hE : a * c h - (-(∑ s ∈ S, act s b * c s
-        + ∑ s ∈ S, act (σ s) (b * c ((σ s)⁻¹ * (h * s))) - a * c h)
-        - -∑ s ∈ S, act s b * c s) = ∑ s ∈ S, act (σ s) (b * c ((σ s)⁻¹ * (h * s))) := by
+    have hE
+        : a * c h
+            - (-(∑ s ∈ S, act s b * c s + ∑ s ∈ S, act (σ s) (b * c ((σ s)⁻¹ * (h * s))) - a * c h)
+              - - ∑ s ∈ S, act s b * c s)
+          = ∑ s ∈ S, act (σ s) (b * c ((σ s)⁻¹ * (h * s))) := by
       ring
     rw [hE]
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg hε
@@ -101,8 +116,9 @@ theorem main {G : Type u_1} {C : Type u_2} [Group G] [NormedField C] [IsUltramet
     rw [hn, norm_mul]
     have hvH : (σ s)⁻¹ * (h * s) ∈ H :=
       H.mul_mem (H.inv_mem (hS _ (hσ s hs).1)) (H.mul_mem hh (hS s hs))
-    calc ‖b‖ * ‖c ((σ s)⁻¹ * (h * s))‖ ≤ 1 * ε :=
-          mul_le_mul hb (hcε _ hvH (hσ s hs).2) (norm_nonneg _) zero_le_one
+    calc
+      ‖b‖ * ‖c ((σ s)⁻¹ * (h * s))‖
+        ≤ 1 * ε := mul_le_mul hb (hcε _ hvH (hσ s hs).2) (norm_nonneg _) zero_le_one
       _ = ε := one_mul ε
 
 end GlobalTheory.PermutationExistence

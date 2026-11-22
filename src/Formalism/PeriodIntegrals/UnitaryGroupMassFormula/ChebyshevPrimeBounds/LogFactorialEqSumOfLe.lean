@@ -23,8 +23,8 @@ theorem log_factorial_eq_sum_log (N : ℕ) : log ((N ! : ℕ) : ℝ) = ∑ m ∈
     push_cast
     ring
 
-theorem log_factorial_eq_sum (N : ℕ) :
-    log ((N ! : ℕ) : ℝ) = ∑ d ∈ Ioc 0 N, Λ d * ((N / d : ℕ) : ℝ) := by
+theorem log_factorial_eq_sum (N : ℕ)
+    : log ((N ! : ℕ) : ℝ) = ∑ d ∈ Ioc 0 N, Λ d * ((N / d : ℕ) : ℝ) := by
   rw [log_factorial_eq_sum_log]
   have h1 : ∀ m ∈ Ioc 0 N, log (m : ℝ) = ∑ d ∈ Ioc 0 N, if d ∣ m then Λ d else 0 := by
     intro m hm
@@ -44,8 +44,8 @@ theorem log_factorial_eq_sum (N : ℕ) :
   rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul, Nat.Ioc_filter_dvd_card_eq_div]
   ring
 
-theorem log_factorial_eq_sum_of_le {N M : ℕ} (h : N ≤ M) :
-    log ((N ! : ℕ) : ℝ) = ∑ d ∈ Ioc 0 M, Λ d * ((N / d : ℕ) : ℝ) := by
+theorem log_factorial_eq_sum_of_le {N M : ℕ} (h : N ≤ M)
+    : log ((N ! : ℕ) : ℝ) = ∑ d ∈ Ioc 0 M, Λ d * ((N / d : ℕ) : ℝ) := by
   rw [log_factorial_eq_sum]
   apply Finset.sum_subset (Finset.Ioc_subset_Ioc_right h)
   intro d hdM hd
@@ -61,21 +61,27 @@ def chE (q : ℕ) : ℝ :=
 
 theorem chE_nonneg (q : ℕ) : 0 ≤ chE q := by
   have h : q / 2 + q / 3 + q / 5 ≤ q + q / 30 := by omega
-  have h' : ((q / 2 : ℕ) : ℝ) + ((q / 3 : ℕ) : ℝ) + ((q / 5 : ℕ) : ℝ) ≤ (q : ℝ) + ((q / 30 : ℕ) : ℝ) := by
+  have h'
+      : ((q / 2 : ℕ) : ℝ) + ((q / 3 : ℕ) : ℝ) + ((q / 5 : ℕ) : ℝ)
+        ≤ (q : ℝ) + ((q / 30 : ℕ) : ℝ) := by
     exact_mod_cast h
   unfold chE
   linarith
 
 theorem chE_le_one (q : ℕ) : chE q ≤ 1 := by
   have h : q + q / 30 ≤ q / 2 + q / 3 + q / 5 + 1 := by omega
-  have h' : (q : ℝ) + ((q / 30 : ℕ) : ℝ) ≤ ((q / 2 : ℕ) : ℝ) + ((q / 3 : ℕ) : ℝ) + ((q / 5 : ℕ) : ℝ) + 1 := by
+  have h'
+      : (q : ℝ) + ((q / 30 : ℕ) : ℝ)
+        ≤ ((q / 2 : ℕ) : ℝ) + ((q / 3 : ℕ) : ℝ) + ((q / 5 : ℕ) : ℝ) + 1 := by
     exact_mod_cast h
   unfold chE
   linarith
 
 theorem chE_eq_one {q : ℕ} (h1 : 1 ≤ q) (h6 : q < 6) : chE q = 1 := by
   have h : q / 2 + q / 3 + q / 5 + 1 = q + q / 30 := by omega
-  have h' : ((q / 2 : ℕ) : ℝ) + ((q / 3 : ℕ) : ℝ) + ((q / 5 : ℕ) : ℝ) + 1 = (q : ℝ) + ((q / 30 : ℕ) : ℝ) := by
+  have h'
+      : ((q / 2 : ℕ) : ℝ) + ((q / 3 : ℕ) : ℝ) + ((q / 5 : ℕ) : ℝ) + 1
+        = (q : ℝ) + ((q / 30 : ℕ) : ℝ) := by
     exact_mod_cast h
   unfold chE
   linarith
@@ -84,8 +90,7 @@ private theorem nat_floor_div_natCast (x : ℝ) (k : ℕ) : ⌊x / (k : ℝ)⌋�
   Nat.floor_div_natCast x k
 
 theorem chD_eq_sum (x : ℝ) : chD x = ∑ d ∈ Ioc 0 ⌊x⌋₊, Λ d * chE (⌊x⌋₊ / d) := by
-  have hL : ∀ k : ℕ, lf (x / (k : ℝ)) =
-      ∑ d ∈ Ioc 0 ⌊x⌋₊, Λ d * (((⌊x⌋₊ / d) / k : ℕ) : ℝ) := by
+  have hL : ∀ k : ℕ, lf (x / (k : ℝ)) = ∑ d ∈ Ioc 0 ⌊x⌋₊, Λ d * (((⌊x⌋₊ / d) / k : ℕ) : ℝ) := by
     intro k
     unfold lf
     rw [nat_floor_div_natCast, log_factorial_eq_sum_of_le (Nat.div_le_self ⌊x⌋₊ k)]
@@ -109,8 +114,7 @@ theorem chD_eq_sum (x : ℝ) : chD x = ∑ d ∈ Ioc 0 ⌊x⌋₊, Λ d * chE (�
   unfold chE
   ring
 
-private theorem chebyshev_psi_eq_sum_Ioc_vonMangoldt (x : ℝ) : ψ x = ∑ n ∈ Ioc 0 ⌊x⌋₊, Λ n := by
-  rfl
+private theorem chebyshev_psi_eq_sum_Ioc_vonMangoldt (x : ℝ) : ψ x = ∑ n ∈ Ioc 0 ⌊x⌋₊, Λ n := by rfl
 
 theorem chD_le_psi (x : ℝ) : chD x ≤ ψ x := by
   rw [chD_eq_sum, chebyshev_psi_eq_sum_Ioc_vonMangoldt]
@@ -120,28 +124,24 @@ theorem chD_le_psi (x : ℝ) : chD x ≤ ψ x := by
   have h0 : 0 ≤ Λ d := ArithmeticFunction.vonMangoldt_nonneg
   exact mul_le_of_le_one_right h0 hc
 
-private theorem sum_Ioc_eq_sum_Ioc_div_six_add_sum_Ioc (N : ℕ) (f : ℕ → ℝ) :
-    ∑ d ∈ Ioc 0 N, f d = ∑ d ∈ Ioc 0 (N / 6), f d + ∑ d ∈ Ioc (N / 6) N, f d := by
+private theorem sum_Ioc_eq_sum_Ioc_div_six_add_sum_Ioc (N : ℕ) (f : ℕ → ℝ)
+    : ∑ d ∈ Ioc 0 N, f d = ∑ d ∈ Ioc 0 (N / 6), f d + ∑ d ∈ Ioc (N / 6) N, f d := by
   rw [Finset.sum_Ioc_consecutive f (Nat.zero_le (N / 6)) (Nat.div_le_self N 6)]
 
 theorem psi_sub_psi_le_chD (x : ℝ) : ψ x - ψ (x / 6) ≤ chD x := by
-  have h6 : ⌊x / 6⌋₊ = ⌊x⌋₊ / 6 := by
-    simpa using nat_floor_div_natCast x 6
+  have h6 : ⌊x / 6⌋₊ = ⌊x⌋₊ / 6 := by simpa using nat_floor_div_natCast x 6
   rw [chebyshev_psi_eq_sum_Ioc_vonMangoldt, chebyshev_psi_eq_sum_Ioc_vonMangoldt, h6, chD_eq_sum,
     sum_Ioc_eq_sum_Ioc_div_six_add_sum_Ioc ⌊x⌋₊ (fun d => Λ d),
     sum_Ioc_eq_sum_Ioc_div_six_add_sum_Ioc ⌊x⌋₊ (fun d => Λ d * chE (⌊x⌋₊ / d))]
   have hA : 0 ≤ ∑ d ∈ Ioc 0 (⌊x⌋₊ / 6), Λ d * chE (⌊x⌋₊ / d) :=
-    Finset.sum_nonneg fun d _ =>
-      mul_nonneg ArithmeticFunction.vonMangoldt_nonneg (chE_nonneg _)
-  have hB : ∑ d ∈ Ioc (⌊x⌋₊ / 6) ⌊x⌋₊, Λ d ≤
-      ∑ d ∈ Ioc (⌊x⌋₊ / 6) ⌊x⌋₊, Λ d * chE (⌊x⌋₊ / d) := by
+    Finset.sum_nonneg fun d _ => mul_nonneg ArithmeticFunction.vonMangoldt_nonneg (chE_nonneg _)
+  have hB : ∑ d ∈ Ioc (⌊x⌋₊ / 6) ⌊x⌋₊, Λ d ≤ ∑ d ∈ Ioc (⌊x⌋₊ / 6) ⌊x⌋₊, Λ d * chE (⌊x⌋₊ / d) := by
     apply Finset.sum_le_sum
     intro d hd
     rw [Finset.mem_Ioc] at hd
     have hd0 : 0 < d := by omega
     have hq1 : 1 ≤ ⌊x⌋₊ / d := Nat.div_pos hd.2 hd0
-    have hq6 : ⌊x⌋₊ / d < 6 := by
-      exact Nat.div_lt_of_lt_mul (by omega)
+    have hq6 : ⌊x⌋₊ / d < 6 := by exact Nat.div_lt_of_lt_mul (by omega)
     rw [chE_eq_one hq1 hq6, mul_one]
   linarith
 

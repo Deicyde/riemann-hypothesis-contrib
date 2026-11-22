@@ -21,22 +21,21 @@ theorem gd_qsmul (q : ℚ) (x : Fin m → E) : q • x = ((q : E)) • x := by
   simp [Rat.smul_def]
 
 theorem gd_star_rat (q : ℚ) : star ((q : E)) = (q : E) := by
-  first
-    | exact star_ratCast q
-    | simpa [starRingEnd_apply] using map_ratCast (starRingEnd E) q
+  first | exact star_ratCast q | simpa [starRingEnd_apply] using map_ratCast (starRingEnd E) q
 
 def gdLeft (y : Fin m → E) : (Fin m → E) →ₗ[ℚ] ℚ where
   toFun x := Algebra.trace ℚ E (hform (starRingEnd E) J x y)
   map_add' x x' := by rw [hform_add_left', map_add (f := _)]
   map_smul' q x := by
-    rw [gd_qsmul, hform_smul_left', gd_star_rat, RingHom.id_apply, smul_eq_mul, ← Rat.smul_def, map_smul,
-      smul_eq_mul]
+    rw [gd_qsmul, hform_smul_left', gd_star_rat, RingHom.id_apply, smul_eq_mul, ← Rat.smul_def,
+      map_smul, smul_eq_mul]
 
 def gdRight (x : Fin m → E) : (Fin m → E) →ₗ[ℚ] ℚ where
   toFun y := Algebra.trace ℚ E (hform (starRingEnd E) J x y)
   map_add' y y' := by rw [hform_add_right', map_add (f := _)]
   map_smul' q y := by
-    rw [gd_qsmul, hform_smul_right', RingHom.id_apply, smul_eq_mul, ← Rat.smul_def, map_smul, smul_eq_mul]
+    rw [gd_qsmul, hform_smul_right', RingHom.id_apply, smul_eq_mul, ← Rat.smul_def, map_smul,
+      smul_eq_mul]
 
 theorem gd_int_smul (c : ℤ) (x : Fin m → E) : ((c : E)) • x = ((c : ℚ)) • x := by
   rw [gd_qsmul, Rat.cast_intCast]
@@ -56,11 +55,13 @@ theorem successive_vector_gram_det : SvGramDet := by
     have hint : IsIntegral ℤ (starRingEnd E (algebraMap (𝓞 E) E β)) :=
       IsIntegral.map (starRingEnd E).toIntAlgHom β.isIntegral_coe
     exact RingHom.mem_range.mpr ((IsIntegralClosure.isIntegral_iff (A := 𝓞 E)).mp hint)
-  have F1 : ∀ x y : Fin m → E,
-      hform (starRingEnd E) J x y = (fun i => starRingEnd E (x i)) ⬝ᵥ (J *ᵥ y) := by
+  have F1
+      : ∀ x y : Fin m → E,
+        hform (starRingEnd E) J x y = (fun i => starRingEnd E (x i)) ⬝ᵥ (J *ᵥ y) := by
     intro x y
     simp only [hform, dotProduct, Matrix.mulVec, Finset.mul_sum, mul_assoc]
-  have hsingle : ∀ (i : Fin m) (v : Fin m → E), hform (starRingEnd E) J (Pi.single i 1) v = (J *ᵥ v) i := by
+  have hsingle
+      : ∀ (i : Fin m) (v : Fin m → E), hform (starRingEnd E) J (Pi.single i 1) v = (J *ᵥ v) i := by
     intro i v
     rw [F1]
     have hs : (fun a => starRingEnd E ((Pi.single i (1 : E) : Fin m → E) a)) = Pi.single i 1 := by
@@ -70,9 +71,7 @@ theorem successive_vector_gram_det : SvGramDet := by
         simp
       · simp [Pi.single_apply, h]
     rw [hs]
-    first
-      | rw [single_dotProduct, one_mul]
-      | simp [dotProduct, Pi.single_apply]
+    first | rw [single_dotProduct, one_mul] | simp [dotProduct, Pi.single_apply]
   have hnd : ∀ y : Fin m → E, (∀ x, hform (starRingEnd E) J x y = 0) → y = 0 := by
     intro y hy
     have hJy : J *ᵥ y = 0 := by
@@ -88,21 +87,25 @@ theorem successive_vector_gram_det : SvGramDet := by
     by_contra hne
     have h1 := hz z⁻¹
     rw [inv_mul_cancel₀ hne, ← map_one (algebraMap ℚ E), Algebra.trace_algebraMap, nsmul_eq_mul,
-      mul_one, Nat.cast_eq_zero] at h1
+        mul_one, Nat.cast_eq_zero]
+      at h1
     exact (Module.finrank_pos (R := ℚ) (M := E)).ne' h1
-  have hRt : ∀ x y, gdRight J x y = Algebra.trace ℚ E (hform (starRingEnd E) J x y) := fun x y => rfl
+  have hRt : ∀ x y, gdRight J x y = Algebra.trace ℚ E (hform (starRingEnd E) J x y) := fun x y =>
+    rfl
   have hLt : ∀ x y, gdLeft J y x = Algebra.trace ℚ E (hform (starRingEnd E) J x y) := fun x y => rfl
-  have Br : ∀ (x : Fin m → E) (q : Fin (m * Module.finrank ℚ E) → ℚ),
-      Algebra.trace ℚ E (hform (starRingEnd E) J x (∑ k, q k • e k)) =
-        ∑ k, q k * Algebra.trace ℚ E (hform (starRingEnd E) J x (e k)) := by
+  have Br
+      : ∀ (x : Fin m → E) (q : Fin (m * Module.finrank ℚ E) → ℚ),
+        Algebra.trace ℚ E (hform (starRingEnd E) J x (∑ k, q k • e k))
+          = ∑ k, q k * Algebra.trace ℚ E (hform (starRingEnd E) J x (e k)) := by
     intro x q
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← hRt, map_sum]
     simp only [map_smul, smul_eq_mul]
     simp only [hRt]
-  have Bl : ∀ (y : Fin m → E) (q : Fin (m * Module.finrank ℚ E) → ℚ),
-      Algebra.trace ℚ E (hform (starRingEnd E) J (∑ k, q k • e k) y) =
-        ∑ k, q k * Algebra.trace ℚ E (hform (starRingEnd E) J (e k) y) := by
+  have Bl
+      : ∀ (y : Fin m → E) (q : Fin (m * Module.finrank ℚ E) → ℚ),
+        Algebra.trace ℚ E (hform (starRingEnd E) J (∑ k, q k • e k) y)
+          = ∑ k, q k * Algebra.trace ℚ E (hform (starRingEnd E) J (e k) y) := by
     intro y q
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← hLt, map_sum]
@@ -116,9 +119,7 @@ theorem successive_vector_gram_det : SvGramDet := by
       exact one_ne_zero
     have hcard : Fintype.card (Fin (m * Module.finrank ℚ E)) = Module.finrank ℚ (Fin m → E) := by
       rw [Fintype.card_fin]
-      first
-        | simp [Module.finrank_pi_fintype]
-        | rw [Module.finrank_pi_fintype]; simp
+      first | simp [Module.finrank_pi_fintype] | rw [Module.finrank_pi_fintype]; simp
     let bs := basisOfLinearIndependentOfCardEqFinrank hli hcard
     have hbs : ∀ i, bs i = e i := fun i => by simp [bs]
     rw [Ne, ← Matrix.exists_mulVec_eq_zero_iff]
@@ -128,8 +129,9 @@ theorem successive_vector_gram_det : SvGramDet := by
       intro x
       apply htr
       intro b
-      have e1 : b * hform (starRingEnd E) J x (∑ j, v j • e j) =
-          hform (starRingEnd E) J (star b • x) (∑ j, v j • e j) := by
+      have e1
+          : b * hform (starRingEnd E) J x (∑ j, v j • e j)
+            = hform (starRingEnd E) J (star b • x) (∑ j, v j • e j) := by
         rw [hform_smul_left', star_star]
       rw [e1]
       have hf : gdLeft J (∑ j, v j • e j) = 0 := by
@@ -149,15 +151,18 @@ theorem successive_vector_gram_det : SvGramDet := by
   refine ⟨hdetG, ?_⟩
   set Gi := (gramTr J e)⁻¹ with hGi
   have hGGi : gramTr J e * Gi = 1 := Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hdetG)
-  obtain ⟨w, hw⟩ : ∃ w : Fin (m * Module.finrank ℚ E) → Fin m → E,
-      ∀ j, w j = ∑ k, Gi k j • e k := ⟨_, fun j => rfl⟩
-  have hBw : ∀ i j, Algebra.trace ℚ E (hform (starRingEnd E) J (e i) (w j)) =
-      (1 : Matrix (Fin (m * Module.finrank ℚ E)) (Fin (m * Module.finrank ℚ E)) ℚ) i j := by
+  obtain ⟨w, hw⟩ : ∃ w : Fin (m * Module.finrank ℚ E) → Fin m → E, ∀ j, w j = ∑ k, Gi k j • e k :=
+    ⟨_, fun j => rfl⟩
+  have hBw
+      : ∀ i j,
+        Algebra.trace ℚ E (hform (starRingEnd E) J (e i) (w j))
+          = (1 : Matrix (Fin (m * Module.finrank ℚ E)) (Fin (m * Module.finrank ℚ E)) ℚ) i j := by
     intro i j
     rw [hw, Br, ← hGGi, Matrix.mul_apply]
     exact Finset.sum_congr rfl fun k _ => by rw [hGe, mul_comm]
-  have hint : ∀ x ∈ M, ∀ j, Algebra.trace ℚ E (hform (starRingEnd E) J x (w j)) ∈
-      (algebraMap ℤ ℚ).range := by
+  have hint
+      : ∀ x ∈ M, ∀ j,
+        Algebra.trace ℚ E (hform (starRingEnd E) J x (w j)) ∈ (algebraMap ℤ ℚ).range := by
     intro x hx j
     obtain ⟨c, rfl⟩ := hspan x hx
     have e2 : ∑ i, ((c i : ℤ) : E) • e i = ∑ i, ((c i : ℚ)) • e i :=
@@ -177,15 +182,17 @@ theorem successive_vector_gram_det : SvGramDet := by
       obtain ⟨a', ha'⟩ := RingHom.mem_range.mp (hO _ (RingHom.mem_range.mpr ⟨a, rfl⟩))
       rw [← ha', algebraMap_smul]
       exact M.smul_mem a' hx
-    have e3 : algebraMap (𝓞 E) E a * hform (starRingEnd E) J x (w j) =
-        hform (starRingEnd E) J (star (algebraMap (𝓞 E) E a) • x) (w j) := by
+    have e3
+        : algebraMap (𝓞 E) E a * hform (starRingEnd E) J x (w j)
+          = hform (starRingEnd E) J (star (algebraMap (𝓞 E) E a) • x) (w j) := by
       rw [hform_smul_left', star_star]
     rw [e3]
     exact hint _ hsa j
   have hn : ∀ (n : ℕ) (v : Fin m → E), (n : E) • v = (n : ℚ) • v := fun n v => by
     rw [gd_qsmul, Rat.cast_natCast]
-  have hC : ∀ j, ∃ C : Fin (m * Module.finrank ℚ E) → ℤ,
-      ∀ k, (C k : ℚ) = (d : ℚ) * (δ : ℚ) * Gi k j := by
+  have hC
+      : ∀ j, ∃ C : Fin (m * Module.finrank ℚ E) → ℤ, ∀ k,
+        (C k : ℚ) = (d : ℚ) * (δ : ℚ) * Gi k j := by
     intro j
     obtain ⟨C, hCe⟩ := hspan _ (hdual j)
     refine ⟨C, ?_⟩
@@ -209,10 +216,12 @@ theorem successive_vector_gram_det : SvGramDet := by
   have hCm : C'.map (Int.cast : ℤ → ℚ) = ((d : ℚ) * (δ : ℚ)) • Gi := by
     ext k j
     simp [hC', hCj]
-  have hdetC : ((C'.det : ℤ) : ℚ) =
-      ((d : ℚ) * (δ : ℚ)) ^ (m * Module.finrank ℚ E) * ((gramTr J e).det)⁻¹ := by
+  have hdetC
+      : ((C'.det : ℤ) : ℚ)
+        = ((d : ℚ) * (δ : ℚ)) ^ (m * Module.finrank ℚ E) * ((gramTr J e).det)⁻¹ := by
     have h1 : ((C'.det : ℤ) : ℚ) = (C'.map (Int.cast : ℤ → ℚ)).det := (Int.castRingHom ℚ).map_det C'
-    rw [h1, hCm, Matrix.det_smul, Fintype.card_fin, hGi, Matrix.det_nonsing_inv, Ring.inverse_eq_inv']
+    rw [h1, hCm, Matrix.det_smul, Fintype.card_fin, hGi, Matrix.det_nonsing_inv,
+      Ring.inverse_eq_inv']
   have hCne : C'.det ≠ 0 := by
     intro h0
     rw [h0, Int.cast_zero] at hdetC

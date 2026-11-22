@@ -8,18 +8,28 @@ open MeasureTheory Set
 
 namespace ReciprocityTheory.AnForm.A
 
-theorem locallyIntegrable_comp_eval_fin {D : ℕ} (i : Fin D) {g : ℂ → ℝ}
-    (hg : LocallyIntegrable g volume) :
-    LocallyIntegrable (fun z : Fin D → ℂ => g (z i)) volume := by
+theorem locallyIntegrable_comp_eval_fin
+    {D : ℕ} (i : Fin D) {g : ℂ → ℝ} (hg : LocallyIntegrable g volume)
+    : LocallyIntegrable (fun z : Fin D → ℂ => g (z i)) volume := by
   classical
   intro x
   have hmeas : MeasurableSet (Set.pi Set.univ (fun j => Metric.closedBall (x j) (1 : ℝ))) :=
     MeasurableSet.univ_pi (fun j => measurableSet_closedBall)
-  refine ⟨Set.pi Set.univ (fun j => Metric.closedBall (x j) 1),
-    set_pi_mem_nhds Set.finite_univ (fun j _ => Metric.closedBall_mem_nhds (x j) one_pos), ?_⟩
+  refine ⟨
+    Set.pi Set.univ (fun j => Metric.closedBall (x j) 1),
+    set_pi_mem_nhds Set.finite_univ (fun j _ => Metric.closedBall_mem_nhds (x j) one_pos),
+    ?_
+  ⟩
   rw [← integrable_indicator_iff hmeas]
-  have hf : ∀ j : Fin D, Integrable (fun w : ℂ => if j = i then (Metric.closedBall (x j) 1).indicator g w
-      else (Metric.closedBall (x j) 1).indicator (fun _ => (1 : ℝ)) w) volume := by
+  have hf
+      : ∀ j : Fin D,
+        Integrable
+          (fun w : ℂ =>
+            if j = i then
+              (Metric.closedBall (x j) 1).indicator g w
+            else
+              (Metric.closedBall (x j) 1).indicator (fun _ => (1 : ℝ)) w)
+          volume := by
     intro j
     split_ifs
     · exact (integrable_indicator_iff measurableSet_closedBall).mpr
@@ -44,37 +54,47 @@ theorem locallyIntegrable_comp_eval_fin {D : ℕ} (i : Fin D) {g : ℂ → ℝ}
     obtain ⟨j, hj⟩ := hz
     exact Finset.prod_eq_zero (Finset.mem_univ j) (by split_ifs <;> simp [Set.indicator_apply, hj])
 
-theorem locallyIntegrable_comp_fst_real {g : ℝ → ℝ} (hg : LocallyIntegrable g volume) :
-    LocallyIntegrable (fun p : ℝ × ℝ => g p.1) volume := by
+theorem locallyIntegrable_comp_fst_real {g : ℝ → ℝ} (hg : LocallyIntegrable g volume)
+    : LocallyIntegrable (fun p : ℝ × ℝ => g p.1) volume := by
   intro x
-  refine ⟨Metric.closedBall x.1 1 ×ˢ Metric.closedBall x.2 1,
-    prod_mem_nhds (Metric.closedBall_mem_nhds _ one_pos) (Metric.closedBall_mem_nhds _ one_pos), ?_⟩
+  refine ⟨
+    Metric.closedBall x.1 1 ×ˢ Metric.closedBall x.2 1,
+    prod_mem_nhds (Metric.closedBall_mem_nhds _ one_pos) (Metric.closedBall_mem_nhds _ one_pos),
+    ?_
+  ⟩
   rw [← integrable_indicator_iff (measurableSet_closedBall.prod measurableSet_closedBall),
     Measure.volume_eq_prod]
-  have h1 := (integrable_indicator_iff measurableSet_closedBall).mpr
-    (hg.integrableOn_isCompact (isCompact_closedBall x.1 1))
-  have h2 := (integrable_indicator_iff measurableSet_closedBall).mpr
-    ((locallyIntegrable_const (μ := (volume : Measure ℝ)) (1 : ℝ)).integrableOn_isCompact
-      (isCompact_closedBall x.2 1))
+  have h1 :=
+    (integrable_indicator_iff measurableSet_closedBall).mpr
+      (hg.integrableOn_isCompact (isCompact_closedBall x.1 1))
+  have h2 :=
+    (integrable_indicator_iff measurableSet_closedBall).mpr
+      ((locallyIntegrable_const (μ := (volume : Measure ℝ)) (1 : ℝ)).integrableOn_isCompact
+        (isCompact_closedBall x.2 1))
   refine (h1.mul_prod h2).congr (Filter.Eventually.of_forall fun p => ?_)
-  by_cases ha : p.1 ∈ Metric.closedBall x.1 1 <;> by_cases hb : p.2 ∈ Metric.closedBall x.2 1 <;>
-    simp [Set.indicator_apply, Set.mem_prod, ha, hb]
+  by_cases ha : p.1 ∈ Metric.closedBall x.1 1 <;> by_cases hb : p.2 ∈ Metric.closedBall x.2 1
+    <;> simp [Set.indicator_apply, Set.mem_prod, ha, hb]
 
-theorem locallyIntegrable_comp_snd_real {g : ℝ → ℝ} (hg : LocallyIntegrable g volume) :
-    LocallyIntegrable (fun p : ℝ × ℝ => g p.2) volume := by
+theorem locallyIntegrable_comp_snd_real {g : ℝ → ℝ} (hg : LocallyIntegrable g volume)
+    : LocallyIntegrable (fun p : ℝ × ℝ => g p.2) volume := by
   intro x
-  refine ⟨Metric.closedBall x.1 1 ×ˢ Metric.closedBall x.2 1,
-    prod_mem_nhds (Metric.closedBall_mem_nhds _ one_pos) (Metric.closedBall_mem_nhds _ one_pos), ?_⟩
+  refine ⟨
+    Metric.closedBall x.1 1 ×ˢ Metric.closedBall x.2 1,
+    prod_mem_nhds (Metric.closedBall_mem_nhds _ one_pos) (Metric.closedBall_mem_nhds _ one_pos),
+    ?_
+  ⟩
   rw [← integrable_indicator_iff (measurableSet_closedBall.prod measurableSet_closedBall),
     Measure.volume_eq_prod]
-  have h1 := (integrable_indicator_iff measurableSet_closedBall).mpr
-    ((locallyIntegrable_const (μ := (volume : Measure ℝ)) (1 : ℝ)).integrableOn_isCompact
-      (isCompact_closedBall x.1 1))
-  have h2 := (integrable_indicator_iff measurableSet_closedBall).mpr
-    (hg.integrableOn_isCompact (isCompact_closedBall x.2 1))
+  have h1 :=
+    (integrable_indicator_iff measurableSet_closedBall).mpr
+      ((locallyIntegrable_const (μ := (volume : Measure ℝ)) (1 : ℝ)).integrableOn_isCompact
+        (isCompact_closedBall x.1 1))
+  have h2 :=
+    (integrable_indicator_iff measurableSet_closedBall).mpr
+      (hg.integrableOn_isCompact (isCompact_closedBall x.2 1))
   refine (h1.mul_prod h2).congr (Filter.Eventually.of_forall fun p => ?_)
-  by_cases ha : p.1 ∈ Metric.closedBall x.1 1 <;> by_cases hb : p.2 ∈ Metric.closedBall x.2 1 <;>
-    simp [Set.indicator_apply, Set.mem_prod, ha, hb]
+  by_cases ha : p.1 ∈ Metric.closedBall x.1 1 <;> by_cases hb : p.2 ∈ Metric.closedBall x.2 1
+    <;> simp [Set.indicator_apply, Set.mem_prod, ha, hb]
 
 theorem locallyIntegrable_real_log : LocallyIntegrable Real.log volume := by
   intro x
@@ -87,8 +107,8 @@ theorem locallyIntegrable_norm_real_log : LocallyIntegrable (fun x : ℝ => ‖R
   obtain ⟨s, hs, h⟩ := locallyIntegrable_real_log x
   exact ⟨s, hs, h.norm⟩
 
-theorem norm_log_norm_le (z : ℂ) :
-    ‖Real.log ‖z‖‖ ≤ ‖Real.log z.re‖ + ‖Real.log z.im‖ + ‖z.re‖ + ‖z.im‖ := by
+theorem norm_log_norm_le (z : ℂ)
+    : ‖Real.log ‖z‖‖ ≤ ‖Real.log z.re‖ + ‖Real.log z.im‖ + ‖z.re‖ + ‖z.im‖ := by
   simp only [Real.norm_eq_abs]
   have hre := Complex.abs_re_le_norm z
   have him := Complex.abs_im_le_norm z
@@ -122,13 +142,15 @@ theorem norm_log_norm_le (z : ℂ) :
 
 theorem logNormLocIntC_thm : LogNormLocIntCStatement := by
   have hH : LocallyIntegrable
-      (fun p : ℝ × ℝ => ‖Real.log p.1‖ + ‖Real.log p.2‖ + ‖p.1‖ + ‖p.2‖) volume :=
+      (fun p : ℝ × ℝ => ‖Real.log p.1‖ + ‖Real.log p.2‖ + ‖p.1‖ + ‖p.2‖)
+      volume :=
     (((locallyIntegrable_comp_fst_real locallyIntegrable_norm_real_log).add
-      (locallyIntegrable_comp_snd_real locallyIntegrable_norm_real_log)).add
-      (locallyIntegrable_comp_fst_real (continuous_norm (E := ℝ)).locallyIntegrable)).add
+          (locallyIntegrable_comp_snd_real locallyIntegrable_norm_real_log)).add
+        (locallyIntegrable_comp_fst_real (continuous_norm (E := ℝ)).locallyIntegrable)).add
       (locallyIntegrable_comp_snd_real (continuous_norm (E := ℝ)).locallyIntegrable)
   have hG : LocallyIntegrable
-      (fun z : ℂ => ‖Real.log z.re‖ + ‖Real.log z.im‖ + ‖z.re‖ + ‖z.im‖) volume := by
+      (fun z : ℂ => ‖Real.log z.re‖ + ‖Real.log z.im‖ + ‖z.re‖ + ‖z.im‖)
+      volume := by
     intro x
     obtain ⟨s, hs, hint⟩ := hH (Complex.measurableEquivRealProd x)
     have hcont : Continuous (Complex.measurableEquivRealProd : ℂ → ℝ × ℝ) := by
@@ -141,10 +163,13 @@ theorem logNormLocIntC_thm : LogNormLocIntCStatement := by
     (Filter.Eventually.of_forall fun z => ?_)
   have h1 := norm_log_norm_le z
   have h2 : 0 ≤ ‖Real.log z.re‖ + ‖Real.log z.im‖ + ‖z.re‖ + ‖z.im‖ := by positivity
-  calc ‖Real.log ‖z‖‖ ≤ ‖Real.log z.re‖ + ‖Real.log z.im‖ + ‖z.re‖ + ‖z.im‖ := h1
+  calc
+    ‖Real.log ‖z‖‖
+      ≤ ‖Real.log z.re‖ + ‖Real.log z.im‖ + ‖z.re‖ + ‖z.im‖ := h1
     _ = ‖‖Real.log z.re‖ + ‖Real.log z.im‖ + ‖z.re‖ + ‖z.im‖‖ := (Real.norm_of_nonneg h2).symm
 
-theorem logCoordLocInt_thm : LogCoordLocIntStatement := fun D i => locallyIntegrable_comp_eval_fin i logNormLocIntC_thm
+theorem logCoordLocInt_thm : LogCoordLocIntStatement := fun D i =>
+  locallyIntegrable_comp_eval_fin i logNormLocIntC_thm
 
 theorem logMonoLocInt_thm : LogMonoLocIntStatement := by
   intro D m
@@ -152,8 +177,8 @@ theorem logMonoLocInt_thm : LogMonoLocIntStatement := by
     (f := fun i (z : Fin D → ℂ) => (m i : ℝ) * Real.log ‖z i‖)
     (fun i _ => (logCoordLocInt_thm D i).smul (m i : ℝ))
 
-theorem log_norm_prod_zpow_eq_logMono {D : ℕ} (m : Fin D → ℤ) (z : Fin D → ℂ)
-    (hz : ∀ i, z i ≠ 0) : Real.log ‖∏ i, z i ^ m i‖ = logMono m z := by
+theorem log_norm_prod_zpow_eq_logMono {D : ℕ} (m : Fin D → ℤ) (z : Fin D → ℂ) (hz : ∀ i, z i ≠ 0)
+    : Real.log ‖∏ i, z i ^ m i‖ = logMono m z := by
   rw [norm_prod, Real.log_prod (fun i _ => norm_ne_zero_iff.mpr (zpow_ne_zero _ (hz i)))]
   unfold logMono
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -168,19 +193,23 @@ theorem logUnitMonoLocInt_thm : LogUnitMonoLocIntStatement := by
   have hnull : ∀ᵐ z ∂(volume : Measure (Fin D → ℂ)), ∀ i, z i ≠ 0 := by
     rw [ae_all_iff]
     intro i
-    have hs : (volume : Measure (Fin D → ℂ))
-        ((LinearMap.ker (LinearMap.proj i : (Fin D → ℂ) →ₗ[ℝ] ℂ) : Submodule ℝ (Fin D → ℂ)) :
-          Set (Fin D → ℂ)) = 0 := by
+    have hs
+        : (volume : Measure (Fin D → ℂ))
+            ((LinearMap.ker (LinearMap.proj i : (Fin D → ℂ) →ₗ[ℝ] ℂ) : Submodule ℝ (Fin D → ℂ))
+              : Set (Fin D → ℂ))
+          = 0 := by
       apply Measure.addHaar_submodule
       intro htop
-      have h2 : (Pi.single i (1 : ℂ) : Fin D → ℂ) ∈
-          LinearMap.ker (LinearMap.proj i : (Fin D → ℂ) →ₗ[ℝ] ℂ) := by
+      have h2
+          : (Pi.single i (1 : ℂ) : Fin D → ℂ)
+            ∈ LinearMap.ker (LinearMap.proj i : (Fin D → ℂ) →ₗ[ℝ] ℂ) := by
         rw [htop]
         exact Submodule.mem_top
       simp at h2
-    have hset : {a : Fin D → ℂ | ¬ a i ≠ 0} =
-        ((LinearMap.ker (LinearMap.proj i : (Fin D → ℂ) →ₗ[ℝ] ℂ) : Submodule ℝ (Fin D → ℂ)) :
-          Set (Fin D → ℂ)) := by
+    have hset
+        : {a : Fin D → ℂ | ¬ a i ≠ 0}
+          = ((LinearMap.ker (LinearMap.proj i : (Fin D → ℂ) →ₗ[ℝ] ℂ) : Submodule ℝ (Fin D → ℂ))
+            : Set (Fin D → ℂ)) := by
       ext z
       simp
     rw [ae_iff, hset]
@@ -192,8 +221,9 @@ theorem logUnitMonoLocInt_thm : LogUnitMonoLocIntStatement := by
   filter_upwards [hnull] with z hz hzK
   have hzU := hKU hzK
   show Real.log ‖u z‖ + logMono m z = Real.log ‖u z * ∏ i, z i ^ m i‖
-  rw [norm_mul, Real.log_mul (norm_ne_zero_iff.mpr (hu0 z hzU))
-    (norm_ne_zero_iff.mpr (Finset.prod_ne_zero_iff.mpr fun i _ => zpow_ne_zero _ (hz i))),
+  rw [norm_mul,
+    Real.log_mul (norm_ne_zero_iff.mpr (hu0 z hzU))
+      (norm_ne_zero_iff.mpr (Finset.prod_ne_zero_iff.mpr fun i _ => zpow_ne_zero _ (hz i))),
     log_norm_prod_zpow_eq_logMono m z hz]
 
 end ReciprocityTheory.AnForm.A

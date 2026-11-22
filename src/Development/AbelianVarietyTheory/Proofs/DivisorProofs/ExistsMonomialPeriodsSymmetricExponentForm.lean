@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -23,9 +26,13 @@ noncomputable section
 
 namespace GlobalTheory.MonPeriods
 
-theorem exists_isMonomial_symm : ∀ (W : Type) [CommRing W] [IsDomain W] [IsLocalRing W], GlobalTheory.LN.CDvr W → ∀ ϖ : W, Irreducible ϖ →
-    ∀ D : DegData W (maximalIdeal W), ∃ β : LinearMap.BilinForm ℤ D.toPre.X, (∀ a b, β a b = β b a) ∧
-      IsMonomial D.toPre ![ϖ] ![β] := by
+theorem exists_isMonomial_symm
+    : ∀ (W : Type) [CommRing W] [IsDomain W] [IsLocalRing W],
+      GlobalTheory.LN.CDvr W
+        → ∀ ϖ : W,
+          Irreducible ϖ
+            → ∀ D : DegData W (maximalIdeal W), ∃ β : LinearMap.BilinForm ℤ D.toPre.X,
+              (∀ a b, β a b = β b a) ∧ IsMonomial D.toPre ![ϖ] ![β] := by
   intro W _ _ _ hW ϖ hϖ D
   obtain ⟨hdvr, hcomp, hchar⟩ := hW
   haveI := hdvr
@@ -42,7 +49,8 @@ theorem exists_isMonomial_symm : ∀ (W : Type) [CommRing W] [IsDomain W] [IsLoc
     · rw [ha, QForm.Q_zero (ϖ := ϖ) hϖ D hQ']
     · exact zero_le_one.trans (QForm.Q_pos (ϖ := ϖ) hϖ D hQ' ha)
   let be : LinearMap.BilinForm ℤ D.toPre.X :=
-    LinearMap.mk₂ ℤ (fun a b => QForm.bHom (ϖ := ϖ) hϖ D hQ' a b)
+    LinearMap.mk₂ ℤ
+      (fun a b => QForm.bHom (ϖ := ϖ) hϖ D hQ' a b)
       (fun a a' b => by simp only [map_add (f := _), AddMonoidHom.add_apply])
       (fun c a b => by simp only [map_zsmul, AddMonoidHom.smul_apply, smul_eq_mul])
       (fun a b b' => by simp only [map_add (f := _)])

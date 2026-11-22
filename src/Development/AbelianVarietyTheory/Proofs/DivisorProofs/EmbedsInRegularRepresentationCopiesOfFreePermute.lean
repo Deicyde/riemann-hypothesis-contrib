@@ -4,11 +4,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders GlobalTheory.BadCount Module
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders
+  GlobalTheory.BadCount Module
 
 namespace GlobalTheory.BadCount
 
-theorem embReg_of_free_permuted_summands : ∀ (K Γ V X : Type) [Field K] [Group Γ] [Finite Γ] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Fintype X] [DecidableEq X] (ρ : Representation K Γ V) (H : Subgroup Γ) [MulAction H X], (∀ (h : H) (x : X), h • x = x → h = 1) → ∀ (A : X → Submodule K V), DirectSum.IsInternal A → (∀ (h : H) (x : X), ∀ v ∈ A x, ρ h v ∈ A (h • x)) → ∃ n : ℕ, EmbReg ρ H n ∧ n * Nat.card H = finrank K V := by
+theorem embReg_of_free_permuted_summands
+    : ∀ (K Γ V X : Type) [Field K] [Group Γ] [Finite Γ] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Fintype X] [DecidableEq X] (ρ : Representation K Γ V)
+        (H : Subgroup Γ) [MulAction H X],
+      (∀ (h : H) (x : X), h • x = x → h = 1)
+        → ∀ (A : X → Submodule K V),
+          DirectSum.IsInternal A → (∀ (h : H) (x : X), ∀ v ∈ A x, ρ h v ∈ A (h • x))
+            → ∃ n : ℕ, EmbReg ρ H n ∧ n * Nat.card H = finrank K V := by
   intro K Γ V X _ _ _ _ _ _ _ _ ρ H _ hfree A hA hmap
   classical
   haveI : Fintype H := Fintype.ofFinite H
@@ -31,14 +39,15 @@ theorem embReg_of_free_permuted_summands : ∀ (K Γ V X : Type) [Field K] [Grou
       rw [hE]
       by_cases hxy : y = x
       · subst hxy
-        rw [DirectSum.IsInternal.ofBijective_coeLinearMap_of_mem hA (hmap h y a a.2), DirectSum.of_eq_same]
+        rw [DirectSum.IsInternal.ofBijective_coeLinearMap_of_mem hA (hmap h y a a.2),
+          DirectSum.of_eq_same]
       · have hne : h • y ≠ h • x := fun he => hxy (smul_left_cancel h he)
         rw [DirectSum.IsInternal.ofBijective_coeLinearMap_of_mem_ne hA hne (hmap h y a a.2),
           DirectSum.of_eq_of_ne (β := fun i => A i) y x a (Ne.symm hxy)]
         simp
     | add w₁ w₂ h₁ h₂ =>
-      rw [map_add (f := _), map_add (f := _), map_add (f := _), DirectSum.add_apply, Submodule.coe_add, h₁, h₂,
-        DirectSum.add_apply, Submodule.coe_add, map_add]
+      rw [map_add (f := _), map_add (f := _), map_add (f := _), DirectSum.add_apply,
+        Submodule.coe_add, h₁, h₂, DirectSum.add_apply, Submodule.coe_add, map_add]
   have hzero : ∀ v : V, (∀ x, comp x v = 0) → v = 0 := by
     intro v hv
     have : E.symm v = 0 := DFinsupp.ext fun x => by rw [← comp_apply, hv]; rfl
@@ -91,11 +100,13 @@ theorem embReg_of_free_permuted_summands : ∀ (K Γ V X : Type) [Field K] [Grou
 
   let n : ℕ := ∑ o : O, d o.out
   have hdimV : finrank K V = ∑ x, d x := by
-    rw [Module.finrank_eq_card_basis (hA.collectedBasis fun x => Module.finBasis K (A x)), Fintype.card_sigma]
+    rw [Module.finrank_eq_card_basis (hA.collectedBasis fun x => Module.finBasis K (A x)),
+      Fintype.card_sigma]
     simp [d]
   have hcount : n * Nat.card H = finrank K V := by
     rw [hdimV, ← hβ.sum_comp d, Fintype.sum_prod_type_right]
-    simp only [β, hdeq, Finset.sum_const, Finset.card_univ, smul_eq_mul, Nat.card_eq_fintype_card, n, Finset.sum_mul]
+    simp only [β, hdeq, Finset.sum_const, Finset.card_univ, smul_eq_mul, Nat.card_eq_fintype_card,
+      n, Finset.sum_mul]
     exact Finset.sum_congr rfl fun o _ => by ring
 
   let I := Σ o : O, Fin (d o.out)

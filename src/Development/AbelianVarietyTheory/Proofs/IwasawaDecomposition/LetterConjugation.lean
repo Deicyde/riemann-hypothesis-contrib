@@ -7,7 +7,8 @@ public import Formalism.FrobeniusOrbits.HostCorollaries
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions
+  Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
 open Formalism.MainNotions.DIV.Cons (intO)
 open GlobalTheory.TrueGeo
 
@@ -15,7 +16,9 @@ namespace GlobalTheory.Proof.LetterConjugation
 
 section Free
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (Dw : Datum H)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (Dw : Datum H)
 
 theorem mem_letters (x : Letter Dw) : x ∈ letters Dw := by
   obtain ⟨τ, i⟩ := x
@@ -47,12 +50,11 @@ theorem conj_eq {τ : E →+* ℂ} (h : τ (H.rt : E) ≠ H.rt0) : conjEmb τ (H
   have h0 : ((H.rt : E)) ^ 2 = -(H.d : E) := by
     have := congrArg (algebraMap (𝓞 E) E) H.rt_sq
     simpa using this
-  have h1 : τ (H.rt : E) ^ 2 = H.rt0 ^ 2 := by
-    rw [← map_pow, h0, H.sqrt_neg_disc_sq]; simp
+  have h1 : τ (H.rt : E) ^ 2 = H.rt0 ^ 2 := by rw [← map_pow, h0, H.sqrt_neg_disc_sq]; simp
   have h2 : τ (H.rt : E) = -H.rt0 := (sq_eq_sq_iff_eq_or_eq_neg.1 h1).resolve_left h
-  have h3 : starRingEnd ℂ H.rt0 ^ 2 = H.rt0 ^ 2 := by
-    rw [← map_pow, H.sqrt_neg_disc_sq]; simp
-  have h4 : starRingEnd ℂ H.rt0 = -H.rt0 := (sq_eq_sq_iff_eq_or_eq_neg.1 h3).resolve_left rt0_conj_neg_ne_zero
+  have h3 : starRingEnd ℂ H.rt0 ^ 2 = H.rt0 ^ 2 := by rw [← map_pow, H.sqrt_neg_disc_sq]; simp
+  have h4 : starRingEnd ℂ H.rt0 = -H.rt0 :=
+    (sq_eq_sq_iff_eq_or_eq_neg.1 h3).resolve_left rt0_conj_neg_ne_zero
   simp [conjEmb, h2, h4]
 
 theorem mult_add (τ : E →+* ℂ) : Dw.mult τ + Dw.mult (conjEmb τ) = Dw.p + Dw.q := by
@@ -65,15 +67,16 @@ theorem two_mul_length : 2 * (letters Dw).length = Module.finrank ℚ E * (Dw.p 
   classical
   have h1 : (letters Dw).length = ∑ τ, Dw.mult τ := by
     rw [← List.toFinset_card_of_nodup (nodup_letters Dw),
-      Finset.eq_univ_of_forall fun x => List.mem_toFinset.2 (mem_letters Dw x), Finset.card_univ, Fintype.card_sigma]
+      Finset.eq_univ_of_forall fun x => List.mem_toFinset.2 (mem_letters Dw x), Finset.card_univ,
+      Fintype.card_sigma]
     simp
   have hinv : Function.Involutive (conjEmb : (E →+* ℂ) → (E →+* ℂ)) := fun τ => by
     ext x; simp [conjEmb]
   have h2 : ∑ τ, Dw.mult (conjEmb τ) = ∑ τ, Dw.mult τ := hinv.bijective.sum_comp Dw.mult
   rw [h1, two_mul]
   nth_rewrite 2 [← h2]
-  rw [← Finset.sum_add_distrib, Finset.sum_congr rfl fun τ _ => mult_add Dw τ, Finset.sum_const, Finset.card_univ,
-    Embeddings.card, smul_eq_mul]
+  rw [← Finset.sum_add_distrib, Finset.sum_congr rfl fun τ _ => mult_add Dw τ, Finset.sum_const,
+    Finset.card_univ, Embeddings.card, smul_eq_mul]
 
 end Free
 

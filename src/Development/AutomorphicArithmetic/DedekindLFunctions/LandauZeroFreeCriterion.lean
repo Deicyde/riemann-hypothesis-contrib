@@ -23,14 +23,20 @@ structure PoleData (g : ℝ → ℝ) (Φ : ℂ → ℂ) (Z : Set ℂ) : Prop whe
   pos : ∀ ρ ∈ Z, 0 < ρ.re
   diff : DifferentiableOn ℂ Φ ({s : ℂ | 0 < s.re} \ Z)
   iso : ∀ z : ℂ, 0 < z.re → ∀ᶠ w in 𝓝[≠] z, w ∉ Z
-  pole : ∀ ρ ∈ Z, ∃ c : ℂ, c ≠ 0 ∧ (ρ.im = 0 → 0 < c.re ∧ c.im = 0) ∧
-    ∃ h : ℂ → ℂ, AnalyticAt ℂ h ρ ∧ ∀ᶠ s in 𝓝[≠] ρ, Φ s = c / (s - ρ) + h s
+  pole
+    : ∀ ρ ∈ Z, ∃ c : ℂ,
+      c ≠ 0 ∧ (ρ.im = 0 → 0 < c.re ∧ c.im = 0)
+        ∧ ∃ h : ℂ → ℂ, AnalyticAt ℂ h ρ ∧ ∀ᶠ s in 𝓝[≠] ρ, Φ s = c / (s - ρ) + h s
 
 def WindowHypU (g : ℝ → ℝ) (θ δ : ℝ) : Prop :=
-  ∀ η : ℝ, 0 < η → ∀ U₀ : ℝ, ∃ U : ℝ, U₀ ≤ U ∧ ∃ R : ℝ → ℝ,
-    IntegrableOn (fun u => R u * Real.exp (-θ * u)) (Icc U ((1 + δ) * U)) ∧
-    (∀ u ∈ Icc U ((1 + δ) * U), 0 ≤ R u ∧ g u ≤ R u) ∧
-    ∫ u in Icc U ((1 + δ) * U), R u * Real.exp (-θ * u) ≤ Real.exp (η * U)
+  ∀ η : ℝ,
+    0 < η
+      → ∀ U₀ : ℝ, ∃ U : ℝ,
+        U₀ ≤ U
+          ∧ ∃ R : ℝ → ℝ,
+            IntegrableOn (fun u => R u * Real.exp (-θ * u)) (Icc U ((1 + δ) * U))
+              ∧ (∀ u ∈ Icc U ((1 + δ) * U), 0 ≤ R u ∧ g u ≤ R u)
+              ∧ ∫ u in Icc U ((1 + δ) * U), R u * Real.exp (-θ * u) ≤ Real.exp (η * U)
 
 open Classical
 

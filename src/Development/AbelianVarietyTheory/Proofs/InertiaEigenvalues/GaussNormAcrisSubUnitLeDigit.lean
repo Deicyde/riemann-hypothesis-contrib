@@ -20,8 +20,8 @@ noncomputable section
 
 namespace GlobalTheory.PMon.Gauss
 
-theorem gC_zero_of_radius (l : ℕ) [Fact l.Prime] {ρ : ℝ} (h0 : (l : ℝ)⁻¹ ≤ ρ) (h1 : ρ < 1) :
-    gC l ρ (0 : Formalism.Per.Acris l) = 0 := by
+theorem gC_zero_of_radius (l : ℕ) [Fact l.Prime] {ρ : ℝ} (h0 : (l : ℝ)⁻¹ ≤ ρ) (h1 : ρ < 1)
+    : gC l ρ (0 : Formalism.Per.Acris l) = 0 := by
   have hN := isGauss_gC_of_le l ρ h0 h1
   have hl : gC l ρ (l : Formalism.Per.Acris l) = ρ := (gC_basic_values l ρ h0 h1).2.1
   have hm := hN.2.2.2.1 ((l : Formalism.Per.Acris l)) 0
@@ -31,15 +31,17 @@ theorem gC_zero_of_radius (l : ℕ) [Fact l.Prime] {ρ : ℝ} (h0 : (l : ℝ)⁻
   · linarith
   · exact h'
 
-theorem gC_eq_zpow_mul_of_vr (l : ℕ) [Fact l.Prime] (x y : Formalism.Per.Acris l) (hx : x ≠ 0) (hy : y ≠ 0) (n : ℤ)
-    (hn : ∀ r ∈ Set.Ioc (0 : ℝ) 1, vr l r x - vr l r y = n * r) (ρ : ℝ) (h0 : (l : ℝ)⁻¹ ≤ ρ) (h1 : ρ < 1) :
-    gC l ρ x = ρ ^ n * gC l ρ y := by
+theorem gC_eq_zpow_mul_of_vr
+    (l : ℕ) [Fact l.Prime]
+    (x y : Formalism.Per.Acris l) (hx : x ≠ 0) (hy : y ≠ 0)
+    (n : ℤ) (hn : ∀ r ∈ Set.Ioc (0 : ℝ) 1, vr l r x - vr l r y = n * r)
+    (ρ : ℝ) (h0 : (l : ℝ)⁻¹ ≤ ρ) (h1 : ρ < 1)
+    : gC l ρ x = ρ ^ n * gC l ρ y := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have hl0 : (0 : ℝ) < l := by linarith
   have hρ : 0 < ρ := (inv_pos.2 hl0).trans_le h0
   set r := -Real.logb l ρ with hr
-  have hρr : (l : ℝ) ^ (-r) = ρ := by
-    rw [hr, neg_neg, Real.rpow_logb hl0 hl1.ne' hρ]
+  have hρr : (l : ℝ) ^ (-r) = ρ := by rw [hr, neg_neg, Real.rpow_logb hl0 hl1.ne' hρ]
   have hr0 : 0 < r := by
     have := Real.logb_neg hl1 hρ h1
     linarith
@@ -60,11 +62,22 @@ theorem gC_eq_zpow_mul_of_vr (l : ℕ) [Fact l.Prime] (x y : Formalism.Per.Acris
 
 end GlobalTheory.PMon.Gauss
 
-theorem GlobalTheory.PMon.Gauss.one_digit : ∀ (l : ℕ) [Fact l.Prime] (h s : ℕ), s < h → ∀ w w' : Formalism.Per.Acris l, (φc l)^[h] w' = (l : Formalism.Per.Acris l) ^ s * w' → w' ≠ 0 → φc l w * w' = w * φc l w' → (∀ ρ : ℝ, (l : ℝ)⁻¹ ≤ ρ → ρ < 1 → gC l ρ w = gC l ρ w') → ∃ c : ℤ_[l], IsUnit c ∧ ∀ ρ : ℝ, (l : ℝ)⁻¹ ≤ ρ → ρ < 1 → gC l ρ (w - zc l c * w') ≤ ρ * gC l ρ w' := by
+theorem GlobalTheory.PMon.Gauss.one_digit
+    : ∀ (l : ℕ) [Fact l.Prime] (h s : ℕ),
+      s < h
+        → ∀ w w' : Formalism.Per.Acris l,
+          (φc l)^[h] w' = (l : Formalism.Per.Acris l) ^ s * w' → w' ≠ 0 → φc l w * w' = w * φc l w'
+            → (∀ ρ : ℝ, (l : ℝ)⁻¹ ≤ ρ → ρ < 1 → gC l ρ w = gC l ρ w')
+            → ∃ c : ℤ_[l],
+              IsUnit c
+                ∧ ∀ ρ : ℝ, (l : ℝ)⁻¹ ≤ ρ → ρ < 1 → gC l ρ (w - zc l c * w') ≤ ρ * gC l ρ w' := by
   intro l _ h s hsh w w' hφh hw' hrat hg
   have hl0 : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
-  obtain ⟨ζ, o, ρ₀, ho, hζo, hζ0, hρ₀l, hρ₀1, hlt⟩ := GlobalTheory.T.equal_gaussNorm_teichmuller_cancel l w w' hw' hg
-  have hζl : ζ ^ l = ζ := GlobalTheory.T.rootCancel_pow_eq_self_acris_gaussNorm l h s hsh w w' ζ o ρ₀ hφh hw' hrat hg ho hζo hζ0 hρ₀l.le hρ₀1 hlt
+  obtain ⟨ζ, o, ρ₀, ho, hζo, hζ0, hρ₀l, hρ₀1, hlt⟩ :=
+    GlobalTheory.T.equal_gaussNorm_teichmuller_cancel l w w' hw' hg
+  have hζl : ζ ^ l = ζ :=
+    GlobalTheory.T.rootCancel_pow_eq_self_acris_gaussNorm l h s hsh w w' ζ o ρ₀ hφh hw' hrat hg ho
+      hζo hζ0 hρ₀l.le hρ₀1 hlt
   obtain ⟨c, hcu, hc⟩ := GlobalTheory.PMon.Gauss.teichmuller_root_unity_eq_unit l ζ hζl hζ0
   refine ⟨c, hcu, fun ρ h0 h1 => ?_⟩
   have hρ : 0 < ρ := (inv_pos.2 hl0).trans_le h0
@@ -72,12 +85,13 @@ theorem GlobalTheory.PMon.Gauss.one_digit : ∀ (l : ℕ) [Fact l.Prime] (h s : 
   by_cases hw1 : w - zc l c * w' = 0
   · rw [hw1, gC_zero_of_radius l h0 h1]
     exact mul_nonneg hρ.le (hN.1 w').1
-  have hφz : φc l (zc l c) = zc l c := by
-    rw [hc, frob_teich, hζl]
+  have hφz : φc l (zc l c) = zc l c := by rw [hc, frob_teich, hζl]
   have hrat1 : φc l (w - zc l c * w') * w' = (w - zc l c * w') * φc l w' := by
     rw [map_sub, map_mul, hφz]
     linear_combination hrat
-  obtain ⟨n, hn⟩ := GlobalTheory.T.acrisValuation_sub_eq_int_mul_radius l h s hsh (w - zc l c * w') w' hφh hw1 hw' hrat1
+  obtain ⟨n, hn⟩ :=
+    GlobalTheory.T.acrisValuation_sub_eq_int_mul_radius l h s hsh (w - zc l c * w') w' hφh hw1 hw'
+      hrat1
   have hmono := gC_eq_zpow_mul_of_vr l _ w' hw1 hw' n hn
   have hρ₀ : 0 < ρ₀ := (inv_pos.2 hl0).trans hρ₀l
   have hn1 : 1 ≤ n := by

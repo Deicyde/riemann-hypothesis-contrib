@@ -4,7 +4,8 @@ public import Development.EtaleCohomology.TateTwists.EtaleTateTwistCupPairingOfT
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations
 
@@ -35,7 +36,9 @@ theorem twpair_zc_fun_of : twpair_zc_fun := by
     · rw [zc_push_mk]; congr 1; apply Cocycle.ext; simp [Cochain.comp_id]
   · intro K L M f g I n x
     obtain ⟨b, rfl⟩ := x.mk_surjective
-    rw [zc_pull_mk, zc_pull_mk, zc_pull_mk]; congr 1; apply Cocycle.ext
+    rw [zc_pull_mk, zc_pull_mk, zc_pull_mk]
+    congr 1
+    apply Cocycle.ext
     simp [Cochain.ofHom_comp]
   · intro K I J M f g n x
     obtain ⟨b, rfl⟩ := x.mk_surjective
@@ -43,7 +46,9 @@ theorem twpair_zc_fun_of : twpair_zc_fun := by
     congr 1
   · intro K L I J f g n x
     obtain ⟨b, rfl⟩ := x.mk_surjective
-    rw [zc_push_mk, zc_pull_mk, zc_pull_mk, zc_push_mk]; congr 1; apply Cocycle.ext
+    rw [zc_push_mk, zc_pull_mk, zc_pull_mk, zc_push_mk]
+    congr 1
+    apply Cocycle.ext
     simp
   · intro K L f g ⟨ho⟩ I n
     obtain ⟨z, hz⟩ := Cochain.equivHomotopy f g ho

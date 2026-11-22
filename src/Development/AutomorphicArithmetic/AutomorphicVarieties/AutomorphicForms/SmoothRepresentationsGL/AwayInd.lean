@@ -5,15 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-private theorem fin_bad {E : Type} [Field E] [NumberField E] {n : ℕ} (k : GL (Fin n) (Af E)) :
-    {w | cmp w k ∉ GlobalTheory.LFun.KGL w (n := n)}.Finite := by
+private theorem fin_bad {E : Type} [Field E] [NumberField E] {n : ℕ} (k : GL (Fin n) (Af E))
+    : {w | cmp w k ∉ GlobalTheory.LFun.KGL w (n := n)}.Finite := by
   have h : ∀ x : Af E, ∀ᶠ w in Filter.cofinite, pLoc E w x ∈ Formalism.UG.Ov E w := fun x => x.2
   have h1 : ∀ᶠ w in Filter.cofinite, ∀ i j, pLoc E w (k.val i j) ∈ Formalism.UG.Ov E w := by
     simp only [Filter.eventually_all]; exact fun i j => h _
@@ -25,11 +26,12 @@ private theorem fin_bad {E : Type} [Field E] [NumberField E] {n : ℕ} (k : GL (
     exact ⟨a, b⟩
   exact h3
 
-theorem UpperTheory.V.Af.Smo.awayInd :
-    UpperTheory.V.Af.Smo.AwayInd := by
+theorem UpperTheory.V.Af.Smo.awayInd : UpperTheory.V.Af.Smo.AwayInd := by
   intro E _ _ n S P h0 h1
   classical
-  suffices H : ∀ T : Finset (HeightOneSpectrum (𝓞 E)), ∀ k, Away S k → (∀ w ∉ T, cmp w k ∈ GlobalTheory.LFun.KGL w (n := n)) → P k by
+  suffices H
+      : ∀ T : Finset (HeightOneSpectrum (𝓞 E)), ∀ k,
+        Away S k → (∀ w ∉ T, cmp w k ∈ GlobalTheory.LFun.KGL w (n := n)) → P k by
     intro k hk
     refine H (fin_bad k).toFinset k hk fun w hw => ?_
     by_contra h
@@ -50,9 +52,10 @@ theorem UpperTheory.V.Af.Smo.awayInd :
         rw [map_mul, map_inv, GlobalTheory.CuspRep.pLoc_locGL_of_ne e, inv_one, mul_one]
       have a : Away S (k * (locGL E n w (cmp w k))⁻¹) := fun v hv => by
         rw [e2 v (fun e => hS (e ▸ hv)), hk v hv]
-      have p := ih _ a fun v hv => by
-        by_cases e : v = w
-        · subst e; rw [e1]; exact one_mem _
-        · rw [e2 v e]; exact h v (by simp [e, hv])
+      have p :=
+        ih _ a fun v hv => by
+          by_cases e : v = w
+          · subst e; rw [e1]; exact one_mem _
+          · rw [e2 v e]; exact h v (by simp [e, hv])
       have q := h1 w hS _ a e1 p (cmp w k)
       rwa [inv_mul_cancel_right] at q

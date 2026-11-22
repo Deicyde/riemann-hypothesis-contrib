@@ -15,8 +15,11 @@ open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.
 
 namespace GlobalTheory.GraphClosure
 
-theorem charZero_residueField_of_flat {R : Type} [CommRing R] [IsDomain R] [CharZero R] {W : Scheme.{0}}
-    (s : W ⟶ Sp R) [Flat s] {x : W} (hx : x ∈ genericPoints W) : CharZero (W.residueField x) := by
+theorem charZero_residueField_of_flat
+    {R : Type} [CommRing R] [IsDomain R] [CharZero R]
+    {W : Scheme.{0}} (s : W ⟶ Sp R) [Flat s]
+    {x : W} (hx : x ∈ genericPoints W)
+    : CharZero (W.residueField x) := by
   have hsp : genericPoint (Sp R) ⤳ s x := (genericPoint_spec (Sp R)).specializes trivial
   obtain ⟨x', hx', e⟩ := Flat.generalizingMap s hsp
   obtain rfl := eq_of_specializes_of_mem_genericPoints hx hx'

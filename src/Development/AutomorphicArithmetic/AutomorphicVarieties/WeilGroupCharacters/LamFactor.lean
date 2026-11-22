@@ -6,8 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCh
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W
 
-private theorem a_mu (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (I : Subgroup G) (d : ℕ) (A : LocAb l G I d) (g : G) (hg : g ∈ muG l G) : A.a g = 1 := by
+private theorem a_mu
+    (l : ℕ) [Fact l.Prime]
+    (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (I : Subgroup G) (d : ℕ) (A : LocAb l G I d)
+    (g : G) (hg : g ∈ muG l G)
+    : A.a g = 1 := by
   have hc : (commutator G).topologicalClosure ≤ A.a.ker := by
     apply Subgroup.topologicalClosure_minimal
     · exact Abelianization.commutator_subset_ker A.a
@@ -29,12 +33,17 @@ private theorem a_mu (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalS
     rw [e, h]
     rfl
 
-private theorem factor (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [CompactSpace G] (I : Subgroup G) (d : ℕ) (A : LocAb l G I d) (R : Type) [CommRing R] (m : Ideal R)
-    [IsHausdorff m R] (hl : (l : R) ∈ m) (δ : G →* Rˣ) (hc : AdicCont m fun g => ((δ g : Rˣ) : R))
-    (hr : ∀ g, ((δ g : Rˣ) : R) - 1 ∈ m) (hm : ∀ g ∈ muG l G, δ g = 1) :
-    ∃ χ : Multiplicative ((Fin d → ℤ_[l]) × ℤ_[l]) →* Rˣ, AdicCont m (fun x => ((χ x : Rˣ) : R)) ∧
-      ∀ g, χ (A.a g) = δ g := by
+private theorem factor
+    (l : ℕ) [Fact l.Prime]
+    (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+    (I : Subgroup G) (d : ℕ) (A : LocAb l G I d)
+    (R : Type) [CommRing R]
+    (m : Ideal R) [IsHausdorff m R]
+    (hl : (l : R) ∈ m)
+    (δ : G →* Rˣ) (hc : AdicCont m fun g => ((δ g : Rˣ) : R)) (hr : ∀ g, ((δ g : Rˣ) : R) - 1 ∈ m)
+    (hm : ∀ g ∈ muG l G, δ g = 1)
+    : ∃ χ : Multiplicative ((Fin d → ℤ_[l]) × ℤ_[l]) →* Rˣ,
+      AdicCont m (fun x => ((χ x : Rˣ) : R)) ∧ ∀ g, χ (A.a g) = δ g := by
   classical
   have key : ∀ x : R, x - 1 ∈ m → ∀ k : ℕ, x ^ (l ^ k) - 1 ∈ m ^ (k + 1) := by
     intro x hx k
@@ -43,7 +52,8 @@ private theorem factor (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [Topologica
     | succ k ih =>
       have hy : x ^ (l ^ k) - 1 ∈ m := Ideal.pow_le_self (Nat.succ_ne_zero k) ih
       have h1 : Ideal.Quotient.mk m (x ^ (l ^ k)) = 1 := by
-        rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk m), ← map_sub, Ideal.Quotient.eq_zero_iff_mem]
+        rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk m), ← map_sub,
+          Ideal.Quotient.eq_zero_iff_mem]
         exact hy
       have hS : (∑ i ∈ Finset.range l, (x ^ (l ^ k)) ^ i) ∈ m := by
         set_option synthInstance.maxHeartbeats 100000 in
@@ -51,7 +61,9 @@ private theorem factor (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [Topologica
         simp only [map_pow, h1, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
         rw [← map_natCast (Ideal.Quotient.mk m), Ideal.Quotient.eq_zero_iff_mem]
         exact hl
-      have e : x ^ (l ^ (k + 1)) - 1 = (∑ i ∈ Finset.range l, (x ^ (l ^ k)) ^ i) * (x ^ (l ^ k) - 1) := by
+      have e
+          : x ^ (l ^ (k + 1)) - 1
+            = (∑ i ∈ Finset.range l, (x ^ (l ^ k)) ^ i) * (x ^ (l ^ k) - 1) := by
         rw [geom_sum_mul, ← pow_mul, ← pow_succ]
       rw [e, pow_succ' m (k + 1)]
       exact Ideal.mul_mem_mul hS ih
@@ -95,13 +107,15 @@ private theorem factor (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [Topologica
   have hδ1 : ∀ g, A.a g = 1 → δ g = 1 := by
     intro g hg
     apply Units.ext
-    have h0 := IsHausdorff.haus' (I := m) (((δ g : Rˣ) : R) - 1) (fun N => by
-      rw [SModEq.zero, Ideal.smul_eq_mul, Ideal.mul_top]
-      exact hk g hg N)
+    have h0 :=
+      IsHausdorff.haus' (I := m) (((δ g : Rˣ) : R) - 1) (fun N => by
+        rw [SModEq.zero, Ideal.smul_eq_mul, Ideal.mul_top]
+        exact hk g hg N)
     exact sub_eq_zero.mp h0
   let e := QuotientGroup.quotientKerEquivOfSurjective A.a A.surj
-  let χ0 : G ⧸ A.a.ker →* Rˣ := QuotientGroup.lift A.a.ker δ
-    (fun g hg => MonoidHom.mem_ker.mpr (hδ1 g (MonoidHom.mem_ker.mp hg)))
+  let χ0 : G ⧸ A.a.ker →* Rˣ :=
+    QuotientGroup.lift A.a.ker δ
+      (fun g hg => MonoidHom.mem_ker.mpr (hδ1 g (MonoidHom.mem_ker.mp hg)))
   let χ := χ0.comp e.symm.toMonoidHom
   have hχ : ∀ g, χ (A.a g) = δ g := by
     intro g
@@ -116,8 +130,9 @@ private theorem factor (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [Topologica
   intro N s
   have hcl : IsClosed (A.a '' ((fun g => Ideal.Quotient.mk (m ^ N) ((δ g : Rˣ) : R)) ⁻¹' s)ᶜ) :=
     A.cont.isClosedMap _ (hc N s).isClosed_compl
-  have heq : ((fun x => Ideal.Quotient.mk (m ^ N) ((χ x : Rˣ) : R)) ⁻¹' s)ᶜ =
-      A.a '' ((fun g => Ideal.Quotient.mk (m ^ N) ((δ g : Rˣ) : R)) ⁻¹' s)ᶜ := by
+  have heq
+      : ((fun x => Ideal.Quotient.mk (m ^ N) ((χ x : Rˣ) : R)) ⁻¹' s)ᶜ
+        = A.a '' ((fun g => Ideal.Quotient.mk (m ^ N) ((δ g : Rˣ) : R)) ⁻¹' s)ᶜ := by
     ext x
     constructor
     · intro hx
@@ -128,9 +143,18 @@ private theorem factor (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [Topologica
   rw [← heq] at hcl
   exact isClosed_compl_iff.mp hcl
 
-theorem UpperTheory.V.W.lam_factor :
-    ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] [Algebra ℤ_[l] O] [Finite (ResidueField O)] [CharP (ResidueField O) l] (n : ℕ) (r : Resid F O n) (d : F.Vl → ℕ) (A : ∀ v, LocAb l (F.Gv v) (F.Iv v) (d v)) (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (v : F.Vl) (i : Fin n) (ψ₀ : F.Gv v →* Rˣ), r.IsPsi v i ψ₀ → ∀ ψ : F.Gv v →* Rˣ,
-      r.IsPsi v i ψ ↔ ∃ χ : Multiplicative ((Fin (d v) → ℤ_[l]) × ℤ_[l]) →* Rˣ, AdicCont (maximalIdeal R) (fun x => ((χ x : Rˣ) : R)) ∧ (∀ x, res O R (χ x) = 1) ∧ ψ = ψ₀ * χ.comp (A v).a := by
+theorem UpperTheory.V.W.lam_factor
+    : ∀ (l : ℕ) [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [IsLocalRing O]
+        [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] [Algebra ℤ_[l] O]
+        [Finite (ResidueField O)] [CharP (ResidueField O) l] (n : ℕ) (r : Resid F O n)
+        (d : F.Vl → ℕ) (A : ∀ v, LocAb l (F.Gv v) (F.Iv v) (d v)) (R : Type) [CommRing R]
+        [Algebra O R] [IsCO O R] (v : F.Vl) (i : Fin n) (ψ₀ : F.Gv v →* Rˣ),
+      r.IsPsi v i ψ₀
+        → ∀ ψ : F.Gv v →* Rˣ,
+          r.IsPsi v i ψ
+            ↔ ∃ χ : Multiplicative ((Fin (d v) → ℤ_[l]) × ℤ_[l]) →* Rˣ,
+              AdicCont (maximalIdeal R) (fun x => ((χ x : Rˣ) : R)) ∧ (∀ x, res O R (χ x) = 1)
+                ∧ ψ = ψ₀ * χ.comp (A v).a := by
   intro l _ F O _ _ _ _ _ _ _ n r d A R _ _ _ v i ψ₀ h0 ψ
   haveI hcomp : IsAdicComplete (maximalIdeal R) R := IsCO.complete (O := O)
   have hl : (l : R) ∈ maximalIdeal R := by
@@ -140,17 +164,22 @@ theorem UpperTheory.V.W.lam_factor :
     let δ : F.Gv v →* Rˣ := ψ * ψ₀⁻¹
     have hδc : AdicCont (maximalIdeal R) (fun g => ((δ g : Rˣ) : R)) := by
       intro N
-      have hinv : ∀ u : Rˣ, Ring.inverse (Ideal.Quotient.mk (maximalIdeal R ^ N) (u : R)) =
-          Ideal.Quotient.mk (maximalIdeal R ^ N) ((u⁻¹ : Rˣ) : R) := by
+      have hinv
+          : ∀ u : Rˣ,
+            Ring.inverse (Ideal.Quotient.mk (maximalIdeal R ^ N) (u : R))
+              = Ideal.Quotient.mk (maximalIdeal R ^ N) ((u⁻¹ : Rˣ) : R) := by
         intro u
-        have e : Ideal.Quotient.mk (maximalIdeal R ^ N) (u : R) =
-            ((Units.map (Ideal.Quotient.mk (maximalIdeal R ^ N)).toMonoidHom u : (R ⧸ maximalIdeal R ^ N)ˣ) :
-              R ⧸ maximalIdeal R ^ N) := rfl
+        have e
+            : Ideal.Quotient.mk (maximalIdeal R ^ N) (u : R)
+              = ((Units.map (Ideal.Quotient.mk (maximalIdeal R ^ N)).toMonoidHom u
+                  : (R ⧸ maximalIdeal R ^ N)ˣ)
+                : R ⧸ maximalIdeal R ^ N) :=
+          rfl
         rw [e, Ring.inverse_unit]
         rfl
       have h1 := hψ.cont N
-      have h2 : IsLocallyConstant (fun g => Ring.inverse
-          (Ideal.Quotient.mk (maximalIdeal R ^ N) ((ψ₀ g : Rˣ) : R))) :=
+      have h2 : IsLocallyConstant (fun g =>
+          Ring.inverse (Ideal.Quotient.mk (maximalIdeal R ^ N) ((ψ₀ g : Rˣ) : R))) :=
         (h0.cont N).comp (Ring.inverse : R ⧸ maximalIdeal R ^ N → R ⧸ maximalIdeal R ^ N)
       convert h1.mul h2 using 1
       funext g
@@ -170,7 +199,8 @@ theorem UpperTheory.V.W.lam_factor :
       have e2 := h0.mu ⟨g, hg⟩
       have hh : ψ g = ψ₀ g := Units.ext (e1.trans e2.symm)
       simp only [δ, MonoidHom.mul_apply, MonoidHom.inv_apply, hh, mul_inv_cancel]
-    obtain ⟨χ, hχc, hχ⟩ := factor l (F.Gv v) (F.Iv v) (d v) (A v) R (maximalIdeal R) hl δ hδc hδr hδm
+    obtain ⟨χ, hχc, hχ⟩ :=
+      factor l (F.Gv v) (F.Iv v) (d v) (A v) R (maximalIdeal R) hl δ hδc hδr hδm
     refine ⟨χ, hχc, ?_, ?_⟩
     · intro x
       obtain ⟨g, rfl⟩ := (A v).surj x
@@ -186,8 +216,9 @@ theorem UpperTheory.V.W.lam_factor :
     refine ⟨?_, ?_, ?_⟩
     · intro N
       have h1 := h0.cont N
-      have h2 : IsLocallyConstant (fun g => Ideal.Quotient.mk (maximalIdeal R ^ N)
-          ((χ ((A v).a g) : Rˣ) : R)) := (hχc N).comp_continuous (A v).cont
+      have h2 : IsLocallyConstant (fun g =>
+          Ideal.Quotient.mk (maximalIdeal R ^ N) ((χ ((A v).a g) : Rˣ) : R)) :=
+        (hχc N).comp_continuous (A v).cont
       convert h1.mul h2 using 1
       funext g
       rfl

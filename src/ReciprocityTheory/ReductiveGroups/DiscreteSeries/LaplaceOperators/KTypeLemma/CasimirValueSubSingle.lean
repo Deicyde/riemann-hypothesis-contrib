@@ -21,25 +21,31 @@ namespace ReciprocityTheory.ChartRestriction.DS.Lap.LemK
 
 open ReciprocityTheory.ChartRestriction.DS
 
-theorem casimirValue_sub_single {n : ℕ} (lam : Fin n → ℝ) (s : Fin n) :
-    casVal (lam - Pi.single s 1) = casVal lam + n + 2 * thVd lam s := by
+theorem casimirValue_sub_single {n : ℕ} (lam : Fin n → ℝ) (s : Fin n)
+    : casVal (lam - Pi.single s 1) = casVal lam + n + 2 * thVd lam s := by
   have hd1 : dot lam (Pi.single s 1) = lam s := by simp [dot, Pi.single_apply]
   have hd2 : nsq (Pi.single s (1 : ℝ)) = 1 := by simp [nsq, dot, Pi.single_apply]
   unfold casVal thVd
   rw [nsq_sub', hd1, hd2]
   ring
 
-theorem three_add_le_gapBound_dual {n : ℕ} (ε : Fin n → Bool) : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 3 ≤ hNeed ε := by
+theorem three_add_le_gapBound_dual {n : ℕ} (ε : Fin n → Bool)
+    : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 3 ≤ hNeed ε := by
   unfold hNeed
   have h1 := le_max_right (3 * (n : ℝ) / 2) (1 + (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ))
-  have h2 := le_max_left (2 + max (3 * (n : ℝ) / 2) (1 + (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ)))
-    (max (16 * (n : ℝ) * (min (pOf ε) (qOf ε) : ℝ) + 8 * Real.sqrt (2 * (min (pOf ε) (qOf ε) : ℝ)) + 2)
-      (8 * Real.sqrt (2 * (min (pOf ε) (qOf ε) : ℝ)) *
-        (4 * max (2 * (n : ℝ) * (min (pOf ε) (qOf ε) : ℝ)) (2 * ((qOf ε : ℝ) - 1) * (n : ℝ) ^ 2) + 1)))
+  have h2 :=
+    le_max_left (2 + max (3 * (n : ℝ) / 2) (1 + (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ)))
+      (max
+        (16 * (n : ℝ) * (min (pOf ε) (qOf ε) : ℝ) + 8 * Real.sqrt (2 * (min (pOf ε) (qOf ε) : ℝ))
+          + 2)
+        (8 * Real.sqrt (2 * (min (pOf ε) (qOf ε) : ℝ))
+          * (4 * max (2 * (n : ℝ) * (min (pOf ε) (qOf ε) : ℝ)) (2 * ((qOf ε : ℝ) - 1) * (n : ℝ) ^ 2)
+            + 1)))
   linarith
 
 theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
-  intro ε lam h H _ _ _ σ D E V s N _ _ EN φ x hσ hD hV hc hVK hint hmono hgap hp hq hmono' hEN hUN hφ hx hφx
+  intro ε lam h H _ _ _ σ D E V s N _ _ EN φ x hσ hD hV hc hVK hint hmono hgap hp hq hmono' hEN hUN
+    hφ hx hφx
   classical
   have hE : IsGlRep E := hD.glRep
   have hU : IsInfUnitary ε E := isInfUnitary_of_isDerivedOn hσ hD
@@ -47,9 +53,10 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
   have hKUN := isKUnitary_of_isInfUnitary hUN
   have hVk : IsKStableSub ε E V := hV.2.1
   have hVfd : FiniteDimensional ℂ V := hV.1
-  have hGs : ∀ a b, ∀ v ∈ genSub E V, E a b v ∈ genSub E V := fun a b v hv => generated_submodule_stable_under_action V a b hv
-  have hXg : ∀ f ∈ Xs (eeVd E) (genSub E V) (thVd lam s), ∀ c, f c ∈ genSub E V :=
-    fun f hf => (mem_euler_eigenspace_iff.1 hf).1
+  have hGs : ∀ a b, ∀ v ∈ genSub E V, E a b v ∈ genSub E V := fun a b v hv =>
+    generated_submodule_stable_under_action V a b hv
+  have hXg : ∀ f ∈ Xs (eeVd E) (genSub E V) (thVd lam s), ∀ c, f c ∈ genSub E V := fun f hf =>
+    (mem_euler_eigenspace_iff.1 hf).1
   have hps : ∀ k (u v : Fin n → ℝ), kirrPs k (u - v) = kirrPs k u - kirrPs k v := by
     intro k u v; rw [← k3vdPs_apply, map_sub, k3vdPs_apply, k3vdPs_apply]
   have hpa : ∀ k (u v : Fin n → ℝ), kirrPs k (u + v) = kirrPs k u + kirrPs k v := by
@@ -77,13 +84,17 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
     have h2 := ((tens_statement n) (↥D) E hE).2.2.2 f
     have h3 : (fun c => casimir E (f c)) = (casVal lam : ℂ) • f :=
       funext fun c => casimir_genSub hE hc (f c) (hfg c)
-    have hnum : (casVal (lam - Pi.single s 1) : ℂ) = (casVal lam : ℂ) + n + 2 * ((thVd lam s : ℝ) : ℂ) := by
+    have hnum
+        : (casVal (lam - Pi.single s 1) : ℂ)
+          = (casVal lam : ℂ) + n + 2 * ((thVd lam s : ℝ) : ℂ) := by
       rw [casimirValue_sub_single]; push_cast; ring
-    rw [h1, h2, h3, (mem_euler_eigenspace_iff.1 hf).2, smul_smul, ← add_smul, ← add_smul, ← hnum, map_smul]
+    rw [h1, h2, h3, (mem_euler_eigenspace_iff.1 hf).2, smul_smul, ← add_smul, ← add_smul, ← hnum,
+      map_smul]
 
   have hK2 := (k2Vd n ε lam h H σ D E V s hσ hD hV hc hVK hint hmono hgap hp hq).1
-  have hcone : ∀ (μ : Fin n → ℝ) (y : N), y ∈ Y → y ≠ 0 → IsKHWVec ε EN μ y →
-      InRootCone (μ - lowK ε (lam - Pi.single s 1)) :=
+  have hcone
+      : ∀ (μ : Fin n → ℝ) (y : N),
+        y ∈ Y → y ≠ 0 → IsKHWVec ε EN μ y → InRootCone (μ - lowK ε (lam - Pi.single s 1)) :=
     fun μ y hy hy0 hμ => image_weights_in_root_cone hE hU hVfd hVk hφ hK2 hy hy0 hμ
 
   have hx0 : x ≠ 0 := by rintro rfl; exact hφx (map_zero φ)
@@ -96,16 +107,21 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
   set P : Module.End ℂ (Fin n → D) := aeval (eeVd E) Fs with hP
   have hPg : ∀ f : Fin n → D, (∀ c, f c ∈ genSub E V) → ∀ c, P f c ∈ genSub E V := by
     intro f hf
-    have := aeval_mem_invariant_submodule (eeVd E) (Submodule.pi Set.univ fun _ => genSub E V)
-      (fun g hg => mem_pi_submodule_iff.2 (euler_tensor_dual_mem_of_stable hGs (mem_pi_submodule_iff.1 hg))) Fs f (mem_pi_submodule_iff.2 hf)
+    have :=
+      aeval_mem_invariant_submodule (eeVd E) (Submodule.pi Set.univ fun _ => genSub E V)
+        (fun g hg =>
+          mem_pi_submodule_iff.2 (euler_tensor_dual_mem_of_stable hGs (mem_pi_submodule_iff.1 hg)))
+        Fs f (mem_pi_submodule_iff.2 hf)
     exact mem_pi_submodule_iff.1 this
   have hPc : ∀ a b, Commute P (tensVd E a b) := fun a b =>
     aeval_commute_of_commute (eeVd E) (tensVd E a b) (euler_tensor_dual_commute_gl_action hE a b) Fs
-  have hPX : ∀ f : Fin n → D, (∀ c, f c ∈ genSub E V) → P f ∈ Xs (eeVd E) (genSub E V) (thVd lam s) := by
+  have hPX
+      : ∀ f : Fin n → D, (∀ c, f c ∈ genSub E V) → P f ∈ Xs (eeVd E) (genSub E V) (thVd lam s) := by
     intro f hf
     have hk1 := k1Vd n ε lam h H σ D E V hσ hD hV hc hVK hint hmono hgap hp hq f hf
-    rw [shifted_product_eq_aeval, ← Finset.mul_prod_erase univ _ (mem_univ s), map_mul, Module.End.mul_apply,
-      map_sub, aeval_X, aeval_C, Algebra.algebraMap_eq_smul_one] at hk1
+    rw [shifted_product_eq_aeval, ← Finset.mul_prod_erase univ _ (mem_univ s), map_mul,
+        Module.End.mul_apply, map_sub, aeval_X, aeval_C, Algebra.algebraMap_eq_smul_one]
+      at hk1
     refine mem_euler_eigenspace_iff.2 ⟨hPg f hf, ?_⟩
     rw [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, sub_eq_zero] at hk1
     exact hk1
@@ -117,13 +133,15 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
     intro t ht
     rw [eval_sub, eval_X, eval_C, sub_ne_zero]
     exact_mod_cast (hinj t (Finset.ne_of_mem_erase ht)).symm
-  have hφPx : φ (P x) ≠ 0 := by
-    rw [hPx, map_smul]; exact smul_ne_zero hFs0 hφx
+  have hφPx : φ (P x) ≠ 0 := by rw [hPx, map_smul]; exact smul_ne_zero hFs0 hφx
   have hGen := (gen_statement n ε (↥D) E V hE hVk).2
   obtain ⟨u, huV, hu⟩ := exists_commuting_projection_image V hGen P hPg hPc φ hφ (hXg x hx) hφPx
 
-  have hpiV : ∀ a b, ε a = ε b → ∀ w ∈ Submodule.pi Set.univ (fun _ : Fin n => V),
-      tensVd E a b w ∈ Submodule.pi Set.univ (fun _ : Fin n => V) := by
+  have hpiV
+      : ∀ a b,
+        ε a = ε b
+          → ∀ w ∈ Submodule.pi Set.univ (fun _ : Fin n => V),
+            tensVd E a b w ∈ Submodule.pi Set.univ (fun _ : Fin n => V) := by
     intro a b hab w hw
     refine mem_pi_submodule_iff.2 fun c => ?_
     rw [tensor_dual_action_apply_component]
@@ -133,12 +151,16 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
     · exact zero_mem _
   have hVg : ∀ w ∈ Submodule.pi Set.univ (fun _ : Fin n => V), ∀ c, w c ∈ genSub E V :=
     fun w hw c => le_generatedSubmodule_dual V (mem_pi_submodule_iff.1 hw c)
-  have hfPV : ∀ a b, ε a = ε b → ∀ w ∈ Submodule.pi Set.univ (fun _ : Fin n => V),
-      (φ ∘ₗ P) (tensVd E a b w) = EN a b ((φ ∘ₗ P) w) := by
+  have hfPV
+      : ∀ a b,
+        ε a = ε b
+          → ∀ w ∈ Submodule.pi Set.univ (fun _ : Fin n => V),
+            (φ ∘ₗ P) (tensVd E a b w) = EN a b ((φ ∘ₗ P) w) := by
     intro a b _ w hw
     simp only [LinearMap.comp_apply]
     rw [← Module.End.mul_apply, (hPc a b).eq, Module.End.mul_apply, hφ a b _ (hPg w (hVg w hw))]
-  have hfdpi : FiniteDimensional ℂ (Submodule.pi Set.univ (fun _ : Fin n => V)) := pi_submodule_finiteDimensional V
+  have hfdpi : FiniteDimensional ℂ (Submodule.pi Set.univ (fun _ : Fin n => V)) :=
+    pi_submodule_finiteDimensional V
   set Z := (Submodule.pi Set.univ (fun _ : Fin n => V)).map (φ ∘ₗ P) with hZ
   have hZst : IsKStableSub ε EN Z := by
     intro a b hab z hz
@@ -154,8 +176,10 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
   obtain ⟨w0, hw0, rfl⟩ := Submodule.mem_map.1 hy0Z
   have hy0Y : (φ ∘ₗ P) w0 ∈ Y := Submodule.mem_map_of_mem (hPX w0 (hVg w0 hw0))
   have hν0lo : ∀ k, kirrPs k ν0 ≤ kirrPs k (lowK ε lam) := by
-    obtain ⟨u1, hu1, hkhw, hfu1⟩ := exists_highest_weight_lift_pi hKU (φ ∘ₗ P) hfdpi
-      (fun a b hab w hw => hpiV a b hab w hw) hfPV hw0 hν0
+    obtain ⟨u1, hu1, hkhw, hfu1⟩ :=
+      exists_highest_weight_lift_pi hKU (φ ∘ₗ P) hfdpi
+        (fun a b hab w hw => hpiV a b hab w hw)
+        hfPV hw0 hν0
     have hu10 : u1 ≠ 0 := by rintro rfl; rw [map_zero] at hfu1; exact hy00 hfu1.symm
     obtain ⟨c, hc0⟩ := Function.ne_iff.1 hu10
     have hwt : ∀ a, E a a (u1 c) = (((ν0 + Pi.single c (1 : ℝ) : Fin n → ℝ) a : ℝ) : ℂ) • u1 c := by
@@ -166,17 +190,23 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
       · subst hca
         simp only [if_true] at this
         rw [sub_eq_iff_eq_add] at this
-        rw [this]; simp [add_smul, Pi.add_apply]
+        rw [this]
+        simp [add_smul, Pi.add_apply]
       · simp only [hca, if_false, sub_zero] at this
-        rw [this]; simp [Pi.add_apply, Pi.single_apply, Ne.symm hca]
+        rw [this]
+        simp [Pi.add_apply, Pi.single_apply, Ne.symm hca]
     obtain ⟨w1, hw1V, hw10, hw1⟩ := hV.2.2.2
     intro k
     have := kirrPs_le hE hV hw1V hw10 hw1 (mem_pi_submodule_iff.1 hu1 c) (by simpa using hc0) hwt k
     rw [hpa, partial_sum_of_basis_vector] at this
     split_ifs at this <;> linarith
 
-  have hQ : ∃ m : ℕ, ∃ y ∈ Y, y ≠ 0 ∧ ∃ ν : Fin n → ℝ, IsKHWVec ε EN ν y ∧
-      (∀ k, kirrPs k ν ≤ kirrPs k ν0) ∧ weightHeightFunctional (ν - lowK ε (lam - Pi.single s 1)) = m := by
+  have hQ
+      : ∃ m : ℕ, ∃ y ∈ Y,
+        y ≠ 0
+          ∧ ∃ ν : Fin n → ℝ,
+            IsKHWVec ε EN ν y ∧ (∀ k, kirrPs k ν ≤ kirrPs k ν0)
+              ∧ weightHeightFunctional (ν - lowK ε (lam - Pi.single s 1)) = m := by
     obtain ⟨N0, hN0⟩ := root_cone_height_natural (hcone ν0 _ hy0Y hy00 hν0)
     exact ⟨N0, _, hy0Y, hy00, ν0, hν0, fun k => le_rfl, hN0⟩
   obtain ⟨y, hyY, hy0, ν, hν, hνbd, hνht⟩ := Nat.find_spec hQ
@@ -184,9 +214,11 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
   have hlowK' : lowK ε (lam - Pi.single s 1) = lowK ε lam - Pi.single s 1 := by
     ext a; simp only [lowK, Pi.add_apply, Pi.sub_apply]; ring
   set γ : Fin n → ℝ := ν - lowK ε lam with hγ
-  have hγβ : γ = (ν - lowK ε (lam - Pi.single s 1)) - Pi.single s 1 := by
-    rw [hlowK', hγ]; abel
-  have hγps : ∀ k, kirrPs k γ = kirrPs k (ν - lowK ε (lam - Pi.single s 1)) - (if (s : ℕ) < k then 1 else 0) := by
+  have hγβ : γ = (ν - lowK ε (lam - Pi.single s 1)) - Pi.single s 1 := by rw [hlowK', hγ]; abel
+  have hγps
+      : ∀ k,
+        kirrPs k γ
+          = kirrPs k (ν - lowK ε (lam - Pi.single s 1)) - (if (s : ℕ) < k then 1 else 0) := by
     intro k; rw [hγβ, hps, partial_sum_of_basis_vector]
   have hSγ : ∀ k, -1 ≤ kirrPs k γ ∧ kirrPs k γ ≤ 0 := by
     intro k
@@ -197,7 +229,8 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
     linarith [hνbd k, hν0lo k]
 
   obtain ⟨T, hTY, hTfd, hTk, hyT⟩ := image_eigenspace_K_finite hE hVfd hVk hφ hyY
-  obtain ⟨W, hWT, hWirr⟩ := exists_irreducible_highest_weight_submodule hKUN _ T rfl hTfd hTk y hyT hy0 hν
+  obtain ⟨W, hWT, hWirr⟩ :=
+    exists_irreducible_highest_weight_submodule hKUN _ T rfl hTfd hTk y hyT hy0 hν
   have hWY : W ≤ Y := hWT.trans hTY
 
   set lam'' : Fin n → ℝ := ν + rhoC ε - rhoN ε with hlam''
@@ -234,7 +267,11 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
     obtain ⟨m1, hm1⟩ := hint a
     obtain ⟨N1, hN1⟩ := root_cone_partial_sum_natural hβ ((a : ℕ) + 1)
     obtain ⟨N2, hN2⟩ := root_cone_partial_sum_natural hβ (a : ℕ)
-    refine ⟨m1 + N1 - N2 - (if (s : ℕ) < (a : ℕ) + 1 then 1 else 0) + (if (s : ℕ) < (a : ℕ) then 1 else 0), ?_⟩
+    refine ⟨
+      m1 + N1 - N2 - (if (s : ℕ) < (a : ℕ) + 1 then 1 else 0)
+        + (if (s : ℕ) < (a : ℕ) then 1 else 0),
+      ?_
+    ⟩
     rw [hlam''γ, coordinate_eq_partial_sum_difference γ a, hγps, hγps, hN1, hN2]
     split_ifs <;> push_cast <;> linarith
   have hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h - 2 := by linarith
@@ -259,8 +296,10 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
       exact hne this
     obtain ⟨y', hy'T, hy'0, μ', hy'μ⟩ := exists_khw hEN hKUN inferInstance hT'st hT'ne
     obtain ⟨w0', hw0', rfl⟩ := Submodule.mem_map.1 hy'T
-    obtain ⟨x1, hx1, -, hkhw, hfx⟩ := lift_khw (A := bAct EN 1) (bAct_isKUnitary hUN 1) (phi EN 1)
-      (fun a b hab z => phi_bAct hEN 1 hab z) hfdW hWst hw0' hy'μ
+    obtain ⟨x1, hx1, -, hkhw, hfx⟩ :=
+      lift_khw (A := bAct EN 1) (bAct_isKUnitary hUN 1) (phi EN 1)
+        (fun a b hab z => phi_bAct hEN 1 hab z)
+        hfdW hWst hw0' hy'μ
     have hx10 : x1 ≠ 0 := by rintro rfl; rw [map_zero] at hfx; exact hy'0 hfx.symm
     obtain ⟨a, b, hab, -, hμ'⟩ := Wm_khw hEN hUN hW'' hmono'' hgap'' hbig hx1 hx10 hkhw
     rw [hlowK''] at hμ'
@@ -296,14 +335,17 @@ theorem k3Vd (n : ℕ) : QuotientHighestWeightTensorDual n := by
     have hmin' : ((Nat.find hQ : ℕ) : ℝ) ≤ (N' : ℝ) := by exact_mod_cast hmin
     linarith
 
-  have hcasW : ∀ v ∈ W, casimir EN v = (casVal (lam - Pi.single s 1) : ℂ) • v :=
-    fun v hv => hcasY v (hWY hv)
-  have hSC := schmid_casimir n ε ν (h - 2) (casVal (lam - Pi.single s 1) : ℂ) N EN W hEN hUN hWirr hSch hcasW
-    hint'' hmono'' hgap'' (by linarith) hp hq
+  have hcasW : ∀ v ∈ W, casimir EN v = (casVal (lam - Pi.single s 1) : ℂ) • v := fun v hv =>
+    hcasY v (hWY hv)
+  have hSC :=
+    schmid_casimir n ε ν (h - 2) (casVal (lam - Pi.single s 1) : ℂ) N EN W hEN hUN hWirr hSch hcasW
+      hint'' hmono'' hgap'' (by linarith) hp hq
   have hcv : casVal (lam - Pi.single s 1) = casVal lam'' := by exact_mod_cast hSC
   have hsum : (lam - Pi.single s 1) + (ν - lowK ε (lam - Pi.single s 1)) = lam'' := by
     ext a; simp only [hlam'', lowK, Pi.add_apply, Pi.sub_apply]; ring
-  have hnsq : nsq ((lam - Pi.single s 1) + (ν - lowK ε (lam - Pi.single s 1))) = nsq (lam - Pi.single s 1) := by
+  have hnsq
+      : nsq ((lam - Pi.single s 1) + (ν - lowK ε (lam - Pi.single s 1)))
+        = nsq (lam - Pi.single s 1) := by
     rw [hsum]; unfold casVal at hcv; linarith
   have hβ0 := cone_norm n (lam - Pi.single s 1) _ hmono'.antitone hβ hnsq
   have hνeq : ν = lowK ε (lam - Pi.single s 1) := sub_eq_zero.1 hβ0

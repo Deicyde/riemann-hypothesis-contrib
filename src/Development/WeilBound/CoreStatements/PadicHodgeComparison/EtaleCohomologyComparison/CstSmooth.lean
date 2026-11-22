@@ -21,7 +21,8 @@ namespace CrystallineSemistableComparison.Out
 
 def CstSmooth : Prop := SmoothModelCrystalline ∧ DeRhamComparisonSmooth ∧ CrysPhi
 
-def EtSideS : Prop := ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K],
-  EtSide (Model.Sm (l := l) (K := K))
+def EtSideS : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K],
+    EtSide (Model.Sm (l := l) (K := K))
 
 end CrystallineSemistableComparison.Out

@@ -8,15 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.RealAdele
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Links Formalism.L2.JoinChr Formalism.L2.Host
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Links
+  Formalism.L2.JoinChr Formalism.L2.Host
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.IdeleDiv
 
-theorem exists_infAdele_pow_eq (D : D7) (n : ℕ) (hn : 0 < n)
-    (z : InfiniteAdeleRing D.host.F ⊗[D.host.F] D.host.E) :
-    ∃ w : InfiniteAdeleRing D.host.F ⊗[D.host.F] D.host.E, w ^ n = z := by
+theorem exists_infAdele_pow_eq
+    (D : D7) (n : ℕ) (hn : 0 < n) (z : InfiniteAdeleRing D.host.F ⊗[D.host.F] D.host.E)
+    : ∃ w : InfiniteAdeleRing D.host.F ⊗[D.host.F] D.host.E, w ^ n = z := by
   obtain ⟨⟨θ, hθ⟩, H⟩ := GlobalTheory.Member.infiniteAdele_bijective D
   obtain ⟨-, -, hb⟩ := H θ hθ
   choose r hr using fun τ : {τ : D.host.E →+* ℂ // τ D.host.sqrtMinusD = D.host.φ₀ D.host.sqrtMinusD} =>
@@ -28,7 +31,9 @@ theorem exists_infAdele_pow_eq (D : D7) (n : ℕ) (hn : 0 < n)
   change θ τ.1 (w ^ n) = θ τ.1 z
   rw [map_pow, h1, hr]
 
-theorem exists_pow_eq_of_finPart_eq_one : ∀ (D : D7) (n : ℕ), 0 < n → ∀ x : (AE D)ˣ, finPart D (x : AE D) = 1 → ∃ y : (AE D)ˣ, y ^ n = x := by
+theorem exists_pow_eq_of_finPart_eq_one
+    : ∀ (D : D7) (n : ℕ),
+      0 < n → ∀ x : (AE D)ˣ, finPart D (x : AE D) = 1 → ∃ y : (AE D)ˣ, y ^ n = x := by
   intro D n hn x hx
   obtain ⟨e, he, -, -⟩ := GlobalTheory.AdSplit.exists_adele_equiv D.host.F D.host.E
   obtain ⟨w, hw⟩ := exists_infAdele_pow_eq D n hn (e (x : AE D)).1

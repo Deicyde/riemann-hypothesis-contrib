@@ -9,11 +9,10 @@ open GlobalTheory.DiscSpec
 
 namespace GlobalTheory.CompanionTheory.Rigid
 
-
 open Classical in
-theorem card_spehExp_eq (d m : ℕ) (hm : 1 ≤ m) :
-    ((Finset.univ : Finset (Fin d)).filter (fun k => ((m : ℝ) - 1) / 2 = spehExp d k)).card =
-      if m ≤ d ∧ Even (d - m) then 1 else 0 := by
+theorem card_spehExp_eq (d m : ℕ) (hm : 1 ≤ m)
+    : ((Finset.univ : Finset (Fin d)).filter (fun k => ((m : ℝ) - 1) / 2 = spehExp d k)).card
+      = if m ≤ d ∧ Even (d - m) then 1 else 0 := by
   split_ifs with h
   · obtain ⟨hle, t, ht⟩ := h
     have hd : d = m + 2 * t := by omega
@@ -40,11 +39,10 @@ theorem card_spehExp_eq (d m : ℕ) (hm : 1 ≤ m) :
     have h2 : d = m + 2 * (k : ℕ) := by exact_mod_cast h1
     exact ⟨by omega, (k : ℕ), by omega⟩
 
-
 open Classical in
-theorem count_strings {X ι : Type} [Fintype ι] (p : ι → X) (d : ι → ℕ) (x : X) (m : ℕ) (hm : 1 ≤ m) :
-    (GlobalTheory.Rigid.strings p d).count (x, ((m : ℝ) - 1) / 2) =
-      (Finset.univ.filter fun i => p i = x ∧ m ≤ d i ∧ Even (d i - m)).card := by
+theorem count_strings {X ι : Type} [Fintype ι] (p : ι → X) (d : ι → ℕ) (x : X) (m : ℕ) (hm : 1 ≤ m)
+    : (GlobalTheory.Rigid.strings p d).count (x, ((m : ℝ) - 1) / 2)
+      = (Finset.univ.filter fun i => p i = x ∧ m ≤ d i ∧ Even (d i - m)).card := by
   unfold GlobalTheory.Rigid.strings
   rw [Multiset.count_sum', Finset.card_filter]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -57,12 +55,11 @@ theorem count_strings {X ι : Type} [Fintype ι] (p : ι → X) (d : ι → ℕ)
   · have hx' : ¬ x = p i := fun e => hx e.symm
     simp [hx, hx']
 
-
 open Classical in
-theorem card_fibre_add {ι : Type} {X : Type} [Fintype ι] (p : ι → X) (d : ι → ℕ) (x : X) (m : ℕ) :
-    (Finset.univ.filter fun i => p i = x ∧ d i = m).card +
-        (Finset.univ.filter fun i => p i = x ∧ m + 2 ≤ d i ∧ Even (d i - (m + 2))).card =
-      (Finset.univ.filter fun i => p i = x ∧ m ≤ d i ∧ Even (d i - m)).card := by
+theorem card_fibre_add {ι : Type} {X : Type} [Fintype ι] (p : ι → X) (d : ι → ℕ) (x : X) (m : ℕ)
+    : (Finset.univ.filter fun i => p i = x ∧ d i = m).card
+        + (Finset.univ.filter fun i => p i = x ∧ m + 2 ≤ d i ∧ Even (d i - (m + 2))).card
+      = (Finset.univ.filter fun i => p i = x ∧ m ≤ d i ∧ Even (d i - m)).card := by
   simp only [Finset.card_filter, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => ?_
   by_cases hx : p i = x
@@ -70,13 +67,14 @@ theorem card_fibre_add {ι : Type} {X : Type} [Fintype ι] (p : ι → X) (d : �
     split_ifs <;> omega
   · simp [hx]
 
-
 open Classical in
-theorem card_fibre_eq {X ι κ : Type} [Fintype ι] [Fintype κ] (p : ι → X) (d : ι → ℕ) (p' : κ → X)
-    (d' : κ → ℕ) (hd : ∀ i, 1 ≤ d i) (hd' : ∀ j, 1 ≤ d' j)
-    (h : GlobalTheory.Rigid.strings p d = GlobalTheory.Rigid.strings p' d') (x : X) (m : ℕ) :
-    (Finset.univ.filter fun i => p i = x ∧ d i = m).card =
-      (Finset.univ.filter fun j => p' j = x ∧ d' j = m).card := by
+theorem card_fibre_eq
+    {X ι κ : Type} [Fintype ι] [Fintype κ]
+    (p : ι → X) (d : ι → ℕ) (p' : κ → X) (d' : κ → ℕ)
+    (hd : ∀ i, 1 ≤ d i) (hd' : ∀ j, 1 ≤ d' j)
+    (h : GlobalTheory.Rigid.strings p d = GlobalTheory.Rigid.strings p' d') (x : X) (m : ℕ)
+    : (Finset.univ.filter fun i => p i = x ∧ d i = m).card
+      = (Finset.univ.filter fun j => p' j = x ∧ d' j = m).card := by
   rcases Nat.eq_zero_or_pos m with rfl | hm
   · have h1 : (Finset.univ.filter fun i => p i = x ∧ d i = 0) = ∅ :=
       Finset.filter_eq_empty_iff.2 fun i _ hi => by have := hd i; omega
@@ -92,18 +90,20 @@ theorem card_fibre_eq {X ι κ : Type} [Fintype ι] [Fintype κ] (p : ι → X) 
     rw [h] at c1 e1
     omega
 
-theorem strings_rigid {X ι κ : Type} [Fintype ι] [Fintype κ] (p : ι → X) (d : ι → ℕ) (p' : κ → X)
-    (d' : κ → ℕ) (hd : ∀ i, 1 ≤ d i) (hd' : ∀ j, 1 ≤ d' j)
-    (h : GlobalTheory.Rigid.strings p d = GlobalTheory.Rigid.strings p' d') :
-    ∃ s : ι ≃ κ, ∀ i, p i = p' (s i) ∧ d i = d' (s i) := by
+theorem strings_rigid
+    {X ι κ : Type} [Fintype ι] [Fintype κ]
+    (p : ι → X) (d : ι → ℕ) (p' : κ → X) (d' : κ → ℕ) (hd : ∀ i, 1 ≤ d i) (hd' : ∀ j, 1 ≤ d' j)
+    (h : GlobalTheory.Rigid.strings p d = GlobalTheory.Rigid.strings p' d')
+    : ∃ s : ι ≃ κ, ∀ i, p i = p' (s i) ∧ d i = d' (s i) := by
   classical
-  have hc : ∀ c : X × ℕ, Fintype.card {i // (p i, d i) = c} = Fintype.card {j // (p' j, d' j) = c} := by
+  have hc
+      : ∀ c : X × ℕ, Fintype.card {i // (p i, d i) = c} = Fintype.card {j // (p' j, d' j) = c} := by
     rintro ⟨x, m⟩
     have := card_fibre_eq p d p' d' hd hd' h x m
     simp only [Fintype.card_subtype, Prod.mk.injEq]
     convert this
-  let e : ∀ c : X × ℕ, {i // (p i, d i) = c} ≃ {j // (p' j, d' j) = c} :=
-    fun c => Fintype.equivOfCardEq (hc c)
+  let e : ∀ c : X × ℕ, {i // (p i, d i) = c} ≃ {j // (p' j, d' j) = c} := fun c =>
+    Fintype.equivOfCardEq (hc c)
   refine ⟨Equiv.ofFiberEquiv e, fun i => ?_⟩
   have := Equiv.ofFiberEquiv_map e i
   exact ⟨(congrArg Prod.fst this).symm, (congrArg Prod.snd this).symm⟩

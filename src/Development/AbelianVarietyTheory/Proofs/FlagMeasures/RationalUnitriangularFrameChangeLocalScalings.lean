@@ -9,7 +9,9 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Gaug
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.TermDef GlobalTheory.LocOver
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.TermDef
+  GlobalTheory.LocOver
 open scoped Classical
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -18,8 +20,8 @@ namespace GlobalTheory.LocOver
 
 open Formalism.L2.SG.Pf Formalism.L2.SG.Pf.BBTie
 
-theorem iota_int_cofinite {D : D7} (Z : LocDat D) (x : D.host.E) :
-    {p : PlF D | (D.s.atP p).ιE x ∉ (Z.M p).L.O}.Finite := by
+theorem iota_int_cofinite {D : D7} (Z : LocDat D) (x : D.host.E)
+    : {p : PlF D | (D.s.atP p).ιE x ∉ (Z.M p).L.O}.Finite := by
   have halg : IsAlgebraic ℤ x :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ D.host.E).2 (Algebra.IsAlgebraic.isAlgebraic x)
   obtain ⟨y, hy0, hint⟩ := halg.exists_integral_multiple
@@ -27,9 +29,9 @@ theorem iota_int_cofinite {D : D7} (Z : LocDat D) (x : D.host.E) :
   have hn0 : n ≠ 0 := by rw [hn]; exact Int.natAbs_ne_zero.2 hy0
   have hint' : IsIntegral ℤ ((n : D.host.E) * x) := by
     rcases Int.natAbs_eq y with h | h <;> rw [← hn] at h
-    · have e : y • x = (n : D.host.E) * x := by
-        rw [zsmul_eq_mul, h, Int.cast_natCast]
-      rw [← e]; exact hint
+    · have e : y • x = (n : D.host.E) * x := by rw [zsmul_eq_mul, h, Int.cast_natCast]
+      rw [← e]
+      exact hint
     · have e : y • x = -((n : D.host.E) * x) := by
         rw [zsmul_eq_mul, h, Int.cast_neg, Int.cast_natCast, neg_mul]
       have := hint.neg
@@ -58,13 +60,17 @@ theorem iota_int_cofinite {D : D7} (Z : LocDat D) (x : D.host.E) :
   rw [e]
   exact Subring.mul_mem _ hw'O hwO
 
-theorem tri_scaled : ∀ (D : D7) (Z : LocDat D), ∀ (f g : Fin (D.R.rS + 1) → (VS D).V)
-    (A : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E), Uni A → Chg f A g →
-    ∃ Ap : ∀ p : PlF D, Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (D.s.atP p).Ep,
-      (∀ p, Uni (Ap p) ∧ Chg (scaled Z p f) (Ap p) (scaled Z p g)) ∧
-      {p : PlF D | ¬ ∀ a b, Ap p a b ∈ (Z.M p).L.O}.Finite := by
+theorem tri_scaled
+    : ∀ (D : D7) (Z : LocDat D),
+      ∀ (f g : Fin (D.R.rS + 1) → (VS D).V)
+          (A : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E),
+        Uni A → Chg f A g
+          → ∃ Ap : ∀ p : PlF D, Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (D.s.atP p).Ep,
+            (∀ p, Uni (Ap p) ∧ Chg (scaled Z p f) (Ap p) (scaled Z p g))
+              ∧ {p : PlF D | ¬ ∀ a b, Ap p a b ∈ (Z.M p).L.O}.Finite := by
   intro D Z f g A hA hg
-  refine ⟨fun p a b => Ring.inverse (frFac Z.δ p a) * frFac Z.δ p b * (D.s.atP p).ιE (A a b), ?_, ?_⟩
+  refine
+    ⟨fun p a b => Ring.inverse (frFac Z.δ p a) * frFac Z.δ p b * (D.s.atP p).ιE (A a b), ?_, ?_⟩
   · intro p
     refine ⟨⟨fun a b hab => ?_, fun a => ?_⟩, fun b => ?_⟩
     · simp [hA.1 a b hab]
@@ -91,8 +97,9 @@ theorem tri_scaled : ∀ (D : D7) (Z : LocDat D), ∀ (f g : Fin (D.R.rS + 1) �
     rcases lt_or_ge b a with h | h
     · simp [hA.1 a b h]
     · obtain ⟨k, hk, hkb⟩ := bt_frFac_step Z p hD a b h
-      have e : Ring.inverse (frFac Z.δ p a) * frFac Z.δ p b * (D.s.atP p).ιE (A a b) =
-          k * (D.s.atP p).ιE (A a b) := by
+      have e
+          : Ring.inverse (frFac Z.δ p a) * frFac Z.δ p b * (D.s.atP p).ιE (A a b)
+            = k * (D.s.atP p).ιE (A a b) := by
         rw [hkb, mul_comm k, ← mul_assoc, Ring.inverse_mul_cancel _ (bt_frFac_unit Z p a), one_mul]
       rw [e]
       exact Subring.mul_mem _ hk hι

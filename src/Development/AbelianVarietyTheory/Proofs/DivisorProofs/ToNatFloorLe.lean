@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InnerProduct
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
 open scoped TensorProduct InnerProductSpace
@@ -39,9 +41,9 @@ theorem one_le_b (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) : 1 ≤ b 
   have ht : (0 : ℝ) ≤ (D.R.t : ℝ) := Nat.cast_nonneg _
   linarith [habs.1, habs.2]
 
-theorem lam_bounds (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (τ : D.what₂.Tau) (n : ℕ) :
-    -b ≤ ((Formalism.L2.NTheta.lamAt (D.hc τ) n : ℚ) : ℝ) + (((D.hc τ).e i : ℚ) : ℝ) ∧
-      ((Formalism.L2.NTheta.lamAt (D.hc τ) n : ℚ) : ℝ) + (((D.hc τ).e i : ℚ) : ℝ) ≤ 3 * b := by
+theorem lam_bounds (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (τ : D.what₂.Tau) (n : ℕ)
+    : -b ≤ ((Formalism.L2.NTheta.lamAt (D.hc τ) n : ℚ) : ℝ) + (((D.hc τ).e i : ℚ) : ℝ)
+      ∧ ((Formalism.L2.NTheta.lamAt (D.hc τ) n : ℚ) : ℝ) + (((D.hc τ).e i : ℚ) : ℝ) ≤ 3 * b := by
   unfold GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues.Sizes at h
   obtain ⟨he0, he2, hv, hb⟩ := h.1 τ
   have hb0 : (0 : ℝ) ≤ b := by linarith
@@ -55,7 +57,8 @@ theorem lam_bounds (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (τ : D.
   · push_cast
     constructor <;> linarith
 
-theorem toNat_floor_le (x : ℚ) (c : ℝ) (hc : 0 ≤ c) (hx : (x : ℝ) ≤ c) : ((⌊x⌋.toNat : ℕ) : ℝ) ≤ c := by
+theorem toNat_floor_le (x : ℚ) (c : ℝ) (hc : 0 ≤ c) (hx : (x : ℝ) ≤ c)
+    : ((⌊x⌋.toNat : ℕ) : ℝ) ≤ c := by
   rcases le_or_gt ⌊x⌋ 0 with h0 | h0
   · rw [Int.toNat_of_nonpos h0]
     simpa using hc
@@ -65,8 +68,8 @@ theorem toNat_floor_le (x : ℚ) (c : ℝ) (hc : 0 ≤ c) (hx : (x : ℝ) ≤ c)
     have h3 : ((⌊x⌋ : ℤ) : ℝ) ≤ ((x : ℚ) : ℝ) := by exact_mod_cast Int.floor_le x
     linarith
 
-theorem aPl_le (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (p : ℕ) (τ : D.what₂.Tau) (n : ℕ) :
-    (aPl D i p τ n : ℝ) ≤ 3 * b := by
+theorem aPl_le (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (p : ℕ) (τ : D.what₂.Tau) (n : ℕ)
+    : (aPl D i p τ n : ℝ) ≤ 3 * b := by
   have hlam := (lam_bounds D i b h τ n).2
   have hb1 := one_le_b D i b h
   unfold aPl
@@ -79,8 +82,9 @@ theorem aPl_le (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (p : ℕ) (�
   · simp only [Nat.cast_zero]
     linarith
 
-theorem aMi_le (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (p q : ℕ) (τ : D.what₂.Tau) (n : ℕ) :
-    (aMi D i p q τ n : ℝ) ≤ 3 * b := by
+theorem aMi_le
+    (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (p q : ℕ) (τ : D.what₂.Tau) (n : ℕ)
+    : (aMi D i p q τ n : ℝ) ≤ 3 * b := by
   have hlam := (lam_bounds D i b h τ (p + (q - n) - 1)).1
   have hb1 := one_le_b D i b h
   unfold aMi
@@ -93,8 +97,9 @@ theorem aMi_le (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (p q : ℕ) 
   · simp only [Nat.cast_zero]
     linarith
 
-theorem degAt_le (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (σ : D.what₂.LL →+* ℂ) (ρ : D.what₂.Tau) :
-    (degAt D i σ ρ : ℝ) ≤ 3 * (D.R.r : ℝ) * b := by
+theorem degAt_le
+    (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (σ : D.what₂.LL →+* ℂ) (ρ : D.what₂.Tau)
+    : (degAt D i σ ρ : ℝ) ≤ 3 * (D.R.r : ℝ) * b := by
   have hb1 := one_le_b D i b h
   have hi := i.isLt
   have hs := D.sp.W_sigval ((i : ℕ) + 1) (by omega) (by omega) (tauE D ρ)
@@ -112,10 +117,17 @@ theorem degAt_le (D : D7) (i : Fin D.R.m) (b : ℝ) (h : Sizes D i b) (σ : D.wh
     exact_mod_cast hn
   unfold degAt
   push_cast
-  calc _ ≤ (pW D i ρ : ℝ) * (3 * b) + (qW D i ρ : ℝ) * (3 * b) := add_le_add h1 h2
+  calc
+    _ ≤ (pW D i ρ : ℝ) * (3 * b) + (qW D i ρ : ℝ) * (3 * b) := add_le_add h1 h2
     _ = 3 * (D.R.r : ℝ) * b := by rw [← hr]; ring
 
-theorem sizes : ∀ (D : D7) (i : Fin D.R.m) (b : ℝ), Sizes D i b → (5.5 : ℝ) ≤ Lp D b ∧ Real.log (D.R.nV : ℝ) ≤ Lp D b ∧ 0 ≤ b ∧ Real.log (3 * (D.R.r : ℝ) * b + 2) ≤ 2 * Lp D b ∧ ∀ (σ : D.what₂.LL →+* ℂ) (ρ : D.what₂.Tau), (degAt D i σ ρ : ℝ) ≤ 3 * (D.R.r : ℝ) * b := by
+theorem sizes
+    : ∀ (D : D7) (i : Fin D.R.m) (b : ℝ),
+      Sizes D i b
+        → (5.5 : ℝ) ≤ Lp D b ∧ Real.log (D.R.nV : ℝ) ≤ Lp D b ∧ 0 ≤ b
+          ∧ Real.log (3 * (D.R.r : ℝ) * b + 2) ≤ 2 * Lp D b
+          ∧ ∀ (σ : D.what₂.LL →+* ℂ) (ρ : D.what₂.Tau),
+            (degAt D i σ ρ : ℝ) ≤ 3 * (D.R.r : ℝ) * b := by
   intro D i b h
   have hb1 := one_le_b D i b h
   have hrd := one_le_rdE D
@@ -142,7 +154,8 @@ theorem sizes : ∀ (D : D7) (i : Fin D.R.m) (b : ℝ), Sizes D i b → (5.5 : �
   have hy5 : 5 ≤ y := by nlinarith
   have hy8 : y ^ 3 ≤ y ^ 8 := pow_le_pow_right₀ (by linarith) (by norm_num)
   have hyy : 25 ≤ y * y := by nlinarith
-  have hy3 : 25 * y ≤ y ^ 3 := by nlinarith [mul_le_mul_of_nonneg_right hyy (by linarith : (0 : ℝ) ≤ y)]
+  have hy3 : 25 * y ≤ y ^ 3 := by
+    nlinarith [mul_le_mul_of_nonneg_right hyy (by linarith : (0 : ℝ) ≤ y)]
   have hyP : (390625 : ℝ) ≤ y ^ 8 := by
     have := pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 5) hy5 8
     norm_num at this
@@ -150,18 +163,26 @@ theorem sizes : ∀ (D : D7) (i : Fin D.R.m) (b : ℝ), Sizes D i b → (5.5 : �
   have hg1' : (1 : ℝ) ≤ (D.host.g 1 : ℝ) := by linarith
   have hg0' : (0 : ℝ) ≤ (D.host.g 0 : ℝ) := Nat.cast_nonneg _
   have hbr : (1 : ℝ) ≤ b * D.host.rdE := one_le_mul_of_one_le_of_one_le hb1 hrd
-  have hG : (D.host.g 0 : ℝ) ≤ (D.host.g 0 : ℝ) * (D.host.g 1 : ℝ) := le_mul_of_one_le_right hg0' hg1'
-  have hA : (D.host.g 0 : ℝ) * (D.host.g 1 : ℝ) ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) :=
+  have hG : (D.host.g 0 : ℝ) ≤ (D.host.g 0 : ℝ) * (D.host.g 1 : ℝ) :=
+    le_mul_of_one_le_right hg0' hg1'
+  have hA
+      : (D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)
+        ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) :=
     le_mul_of_one_le_left (by positivity) hbr
-  have hB : b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) ≤
-      b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) :=
+  have hB
+      : b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ))
+        ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) :=
     le_mul_of_one_le_right (by positivity) hnV
   have hC : (1 : ℝ) ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) := by linarith
   have hD : (D.R.nV : ℝ) ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) :=
     le_mul_of_one_le_left (by positivity) hC
-  have hX : y ^ 8 ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) := by linarith
-  have hL : Lp D b = Real.log (b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ)) := rfl
-  have hXpos : 0 < b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) := by linarith
+  have hX : y ^ 8 ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) := by
+    linarith
+  have hL
+      : Lp D b = Real.log (b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ)) :=
+    rfl
+  have hXpos : 0 < b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) := by
+    linarith
   have he6 : Real.exp (5.5 : ℝ) ≤ 729 := by
     have h1 : Real.exp (5.5 : ℝ) ≤ Real.exp 6 := Real.exp_le_exp.mpr (by norm_num)
     have h2 : Real.exp 6 = Real.exp 1 ^ 6 := by
@@ -173,14 +194,18 @@ theorem sizes : ∀ (D : D7) (i : Fin D.R.m) (b : ℝ), Sizes D i b → (5.5 : �
     linarith
   have h55 : (5.5 : ℝ) ≤ Lp D b := by
     rw [hL]
-    calc (5.5 : ℝ) = Real.log (Real.exp 5.5) := (Real.log_exp _).symm
+    calc
+      (5.5 : ℝ)
+        = Real.log (Real.exp 5.5) := (Real.log_exp _).symm
       _ ≤ _ := Real.log_le_log (Real.exp_pos _) (by linarith)
   refine ⟨h55, ?_, by linarith, ?_, fun σ ρ => degAt_le D i b h σ ρ⟩
   · rw [hL]
     exact Real.log_le_log (by linarith) hD
   · have hb0 : (0 : ℝ) ≤ b := by linarith
     have hrb : (D.R.r : ℝ) * b ≤ (2 * (D.R.k : ℝ)) * b := mul_le_mul_of_nonneg_right hr2 hb0
-    have h32 : 3 * (D.R.r : ℝ) * b + 2 ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) := by
+    have h32
+        : 3 * (D.R.r : ℝ) * b + 2
+          ≤ b * D.host.rdE * ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ)) * (D.R.nV : ℝ) := by
       nlinarith
     have hpos : 0 < 3 * (D.R.r : ℝ) * b + 2 := by positivity
     have hlog := Real.log_le_log hpos h32

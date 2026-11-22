@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ToricSumEqHe
 
 noncomputable section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.MainNotions GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.ToricDistribution
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.BasicNotions Formalism.MainNotions GlobalTheory.CMVal GlobalTheory.ToricDenom
+  GlobalTheory.ToricDistribution
 
 namespace GlobalTheory.ToricDistributionObj
 

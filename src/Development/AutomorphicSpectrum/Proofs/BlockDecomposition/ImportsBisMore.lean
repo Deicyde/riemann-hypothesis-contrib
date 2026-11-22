@@ -17,7 +17,8 @@ open PositivityTheory.RgBcC
 
 theorem main : PositivityTheory.RgBcC.KerZero := by
   intro n _ _ μ _ E κ hκ hr hf y hy
-  refine GlobalTheory.CompanionTheory.KerUniq.main n μ E κ (GLs n) GlobalTheory.CompanionTheory.KerUniq.isOpen_GLs subset_rfl ?_ hκ hr ?_ y hy
+  refine GlobalTheory.CompanionTheory.KerUniq.main n μ E κ (GLs n)
+    GlobalTheory.CompanionTheory.KerUniq.isOpen_GLs subset_rfl ?_ hκ hr ?_ y hy
   · intro y hy k₂
     have hk : (k₂.1).det ≠ 0 := by
       have h : k₂.1 * star k₂.1 = 1 := (Matrix.mem_unitaryGroup_iff).1 k₂.2

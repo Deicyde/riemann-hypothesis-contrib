@@ -14,15 +14,32 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.Auxili
 
 namespace GlobalTheory.EX.DC
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.L2.GlobalTheoryTheory GlobalTheory.EX NumberField
 
-theorem fix_and_win_of_numAt (eps : ℝ) (C : FC) (Fm : FamP eps) (hS : Std C) (hO : Fm.cOut = C.cOut)
-    (hN : ∀ x (i : Fm.Ix x), Nonempty (NumAt C (Fm.L x i))) : DC.PageFix Fm ∧ DC.PageWin Fm := by
-  obtain ⟨⟨-, -, -, -, -, -, -, -, -, sCt⟩, sCc, -, -, scw, sCYL, -, sCp, seP, scTO, -, sCe, -⟩ := hS
+theorem fix_and_win_of_numAt
+    (eps : ℝ)
+    (C : FC) (Fm : FamP eps)
+    (hS : Std C) (hO : Fm.cOut = C.cOut) (hN : ∀ x (i : Fm.Ix x), Nonempty (NumAt C (Fm.L x i)))
+    : DC.PageFix Fm ∧ DC.PageWin Fm := by
+  obtain ⟨⟨-, -, -, -, -, -, -, -, -, sCt⟩, sCc, -, -, scw, sCYL, -, sCp, seP, scTO, -, sCe, -⟩ :=
+    hS
   simp only [FamP.cOut, FC.cOut, List.cons.injEq] at hO
   obtain ⟨oCt, oCc, -, -, -, ocw, oCYL, -, -, -, oCp, oeP, ocTO, -, oCe, -⟩ := hO
-  refine ⟨⟨oCp.trans sCp, oeP.trans seP, ?_, ?_, oCe.trans sCe, oCc.trans sCc, ocw.trans scw, oCYL.trans sCYL,
-    fun x hx i => ?_⟩, fun x hx i => ?_⟩
+  refine ⟨
+    ⟨
+      oCp.trans sCp,
+      oeP.trans seP,
+      ?_,
+      ?_,
+      oCe.trans sCe,
+      oCc.trans sCc,
+      ocw.trans scw,
+      oCYL.trans sCYL,
+      fun x hx i => ?_
+    ⟩,
+    fun x hx i => ?_
+  ⟩
   · rw [ocTO, oeP, scTO, seP]; norm_num
   · rw [ocTO, oCt, scTO, sCt]; norm_num
   · obtain ⟨N⟩ := hN x i

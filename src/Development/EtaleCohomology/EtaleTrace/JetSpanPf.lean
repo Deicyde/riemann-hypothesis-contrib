@@ -31,7 +31,8 @@ lemma essFT {n : ℕ} (v : Fin n → K)
     rw [div_mul_cancel₀ _ h]; exact aeval_mem_adj v g
 
 def T {n : ℕ} (v : Fin n → K) : Submodule K Ω[K⁄k] :=
-  (Submodule.span K (Set.range (LateralTheory.EtaleTrace.Cov.jet k v))).comap (LinearMap.inr K K Ω[K⁄k])
+  (Submodule.span K (Set.range (LateralTheory.EtaleTrace.Cov.jet k v))).comap
+    (LinearMap.inr K K Ω[K⁄k])
 
 lemma fst_mem {n : ℕ} (v : Fin n → K) (i : Fin n) (hi : v i = 1) (x : K) :
     ((x, 0) : K × Ω[K⁄k]) ∈ Submodule.span K (Set.range (LateralTheory.EtaleTrace.Cov.jet k v)) := by
@@ -86,7 +87,8 @@ theorem LateralTheory.EtaleTrace.Cov.JetSpan_of : LateralTheory.EtaleTrace.Cov.J
   have hω : ω ∈ T (k := k) v := by
     have : (⊤ : Submodule K Ω[K⁄k]) ≤ T v := by
       rw [← KaehlerDifferential.span_range_derivation, Submodule.span_le]
-      rintro _ ⟨z, rfl⟩; exact dall_mem v i hi hz z
+      rintro _ ⟨z, rfl⟩
+      exact dall_mem v i hi hz z
     exact this Submodule.mem_top
   have : ((x, ω) : K × Ω[K⁄k]) = (x, 0) + LinearMap.inr K K Ω[K⁄k] ω := by simp
   rw [this]

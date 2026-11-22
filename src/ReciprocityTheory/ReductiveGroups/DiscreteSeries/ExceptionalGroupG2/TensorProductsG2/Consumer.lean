@@ -20,16 +20,22 @@ namespace ReciprocityTheory.ChartRestriction.DS.G2
 open MeasureTheory
 
 def ZuckG : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (μ : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
-    PI.UpqRep.IsHCParam μ → PI.UpqRep.IsDS ε μ σ → ∀ h : ℝ, PI.ZuckTensor.GapAtLeast ε μ h → thrS ε + 1 < h →
-      ∃ X : PI.ZuckTensor.TensorDS n ε μ H σ, ∀ s, s ∈ X.Sm ↔ PI.UpqRep.IsHCParam (μ + Pi.single s 1)
+  ∀ (n : ℕ) (ε : Fin n → Bool) (μ : Fin n → ℝ) (H : Type) [NormedAddCommGroup H]
+      [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+    PI.UpqRep.IsHCParam μ → PI.UpqRep.IsDS ε μ σ
+      → ∀ h : ℝ,
+        PI.ZuckTensor.GapAtLeast ε μ h → thrS ε + 1 < h
+          → ∃ X : PI.ZuckTensor.TensorDS n ε μ H σ, ∀ s,
+            s ∈ X.Sm ↔ PI.UpqRep.IsHCParam (μ + Pi.single s 1)
 
 def ZuckDualG : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (μ : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
-    PI.UpqRep.IsHCParam μ → PI.UpqRep.IsDS ε μ σ → ∀ h : ℝ, PI.ZuckTensor.GapAtLeast ε μ h → thrS ε + 1 < h →
-      ∃ X : PI.ZuckTensor.TensorDSd n ε μ H σ, ∀ s, s ∈ X.Sm ↔ PI.UpqRep.IsHCParam (μ - Pi.single s 1)
+  ∀ (n : ℕ) (ε : Fin n → Bool) (μ : Fin n → ℝ) (H : Type) [NormedAddCommGroup H]
+      [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+    PI.UpqRep.IsHCParam μ → PI.UpqRep.IsDS ε μ σ
+      → ∀ h : ℝ,
+        PI.ZuckTensor.GapAtLeast ε μ h → thrS ε + 1 < h
+          → ∃ X : PI.ZuckTensor.TensorDSd n ε μ H σ, ∀ s,
+            s ∈ X.Sm ↔ PI.UpqRep.IsHCParam (μ - Pi.single s 1)
 
 theorem zuckG : ZuckG := by
   intro n ε μ H _ _ _ σ hμ hd h hG hth

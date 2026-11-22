@@ -17,8 +17,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsSmu
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
 open Formalism.DivisionValues (vw lw)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -27,9 +30,9 @@ namespace GlobalTheory
 
 open Formalism.L2.Col
 
-theorem mem_dualFr_span_iff_dualsum {K : Type} [Field K] [NumberField K] {n : ℕ} (S : Set (Fin n → K))
-    (φ : Fin n → K) :
-    φ ∈ dualFr (Submodule.span (𝓞 K) S) ↔ ∀ x ∈ S, φ ⬝ᵥ x ∈ (1 : Submodule (𝓞 K) K) := by
+theorem mem_dualFr_span_iff_dualsum
+    {K : Type} [Field K] [NumberField K] {n : ℕ} (S : Set (Fin n → K)) (φ : Fin n → K)
+    : φ ∈ dualFr (Submodule.span (𝓞 K) S) ↔ ∀ x ∈ S, φ ⬝ᵥ x ∈ (1 : Submodule (𝓞 K) K) := by
   constructor
   · intro h x hx
     exact h x (Submodule.subset_span hx)
@@ -40,17 +43,26 @@ theorem mem_dualFr_span_iff_dualsum {K : Type} [Field K] [NumberField K] {n : �
     | add x y _ _ hx hy => rw [dotProduct_add]; exact add_mem hx hy
     | smul a x _ hx => rw [dotProduct_smul]; exact Submodule.smul_mem _ a hx
 
-theorem dualFr_tauLat_sumLat : ∀ {E K ι : Type} [Field E] [NumberField E] [Field K] [NumberField K] [Fintype ι]
-    (emb : ι → E →+* K) {n N : ℕ} (hN : N = n + 1) (M : Submodule (𝓞 E) (Fin n → E))
-    (L : Submodule (𝓞 E) (Fin N → E)),
-    (∀ v, v ∈ L ↔ (fun k => v (Formalism.L2.Col.Br.iC hN k)) ∈ M ∧ ∃ c : 𝓞 E, (c : E) = v (Formalism.L2.Col.Br.iL hN)) →
-    ∀ τ : ι, dualFr (tauLat emb τ L) = Formalism.L2.Col.Br.sumLat hN (dualFr (tauLat emb τ M)) 1 := by
+theorem dualFr_tauLat_sumLat
+    : ∀ {E K ι : Type} [Field E] [NumberField E] [Field K] [NumberField K] [Fintype ι]
+        (emb : ι → E →+* K) {n N : ℕ} (hN : N = n + 1) (M : Submodule (𝓞 E) (Fin n → E))
+        (L : Submodule (𝓞 E) (Fin N → E)),
+      (∀ v,
+          v ∈ L
+            ↔ (fun k => v (Formalism.L2.Col.Br.iC hN k)) ∈ M
+              ∧ ∃ c : 𝓞 E, (c : E) = v (Formalism.L2.Col.Br.iL hN))
+        → ∀ τ : ι,
+          dualFr (tauLat emb τ L) = Formalism.L2.Col.Br.sumLat hN (dualFr (tauLat emb τ M)) 1 := by
   intro E K ι _ _ _ _ _ emb n N hN M L hL τ
   subst hN
-  have hC : ∀ k : Fin n, Formalism.L2.Col.Br.iC (rfl : n + 1 = n + 1) k = Fin.castSucc k := fun k => rfl
+  have hC : ∀ k : Fin n, Formalism.L2.Col.Br.iC (rfl : n + 1 = n + 1) k = Fin.castSucc k := fun k =>
+    rfl
   have hLst : Formalism.L2.Col.Br.iL (rfl : n + 1 = n + 1) = Fin.last n := rfl
-  have split : ∀ φ x : Fin (n + 1) → K, φ ⬝ᵥ x = (fun k => φ (Fin.castSucc k)) ⬝ᵥ (fun k => x (Fin.castSucc k))
-      + φ (Fin.last n) * x (Fin.last n) := by
+  have split
+      : ∀ φ x : Fin (n + 1) → K,
+        φ ⬝ᵥ x
+          = (fun k => φ (Fin.castSucc k)) ⬝ᵥ (fun k => x (Fin.castSucc k))
+            + φ (Fin.last n) * x (Fin.last n) := by
     intro φ x
     simp only [dotProduct, Fin.sum_univ_castSucc]
   ext φ
@@ -75,7 +87,8 @@ theorem dualFr_tauLat_sumLat : ∀ {E K ι : Type} [Field E] [NumberField E] [Fi
         refine ⟨?_, 1, ?_⟩
         · have : (fun k : Fin n => v (Formalism.L2.Col.Br.iC rfl k)) = 0 := by
             funext k; simp [hC, v, Fin.castSucc_ne_last]
-          rw [this]; exact M.zero_mem
+          rw [this]
+          exact M.zero_mem
         · simp [hLst, v]
       have := h _ ⟨v, hv, rfl⟩
       rw [split] at this

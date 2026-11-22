@@ -13,11 +13,13 @@ namespace RelDim
 variable {K : Type} [Field K] {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of K))
 
 def Chart (n : ℕ) (x : X) : Prop :=
-  ∃ (U : (Spec (CommRingCat.of K)).Opens) (_ : IsAffineOpen U) (V : X.Opens) (_ : IsAffineOpen V) (_ : x ∈ V)
-    (e : V ≤ f ⁻¹ᵁ U), RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U V e).hom
+  ∃ (U : (Spec (CommRingCat.of K)).Opens) (_ : IsAffineOpen U) (V : X.Opens) (_ : IsAffineOpen V)
+      (_ : x ∈ V) (e : V ≤ f ⁻¹ᵁ U),
+    RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U V e).hom
 
-theorem eq_top {U : (Spec (CommRingCat.of K)).Opens} {V : X.Opens} (e : V ≤ f ⁻¹ᵁ U) {x : X} (hx : x ∈ V) :
-    U = ⊤ := by
+theorem eq_top
+    {U : (Spec (CommRingCat.of K)).Opens} {V : X.Opens} (e : V ≤ f ⁻¹ᵁ U) {x : X} (hx : x ∈ V)
+    : U = ⊤ := by
   have : Subsingleton (Spec (CommRingCat.of K)) := by
     refine ⟨fun a b => PrimeSpectrum.ext ?_⟩
     have := a.isPrime
@@ -27,21 +29,27 @@ theorem eq_top {U : (Spec (CommRingCat.of K)).Opens} {V : X.Opens} (e : V ≤ f 
   refine eq_top_iff.mpr fun z _ => ?_
   rwa [Subsingleton.elim z (f x)]
 
-theorem basicOpen {n : ℕ} {U : (Spec (CommRingCat.of K)).Opens} {V : X.Opens} (hV : IsAffineOpen V)
-    (e : V ≤ f ⁻¹ᵁ U) (h : RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U V e).hom) (a : Γ(X, V))
-    (W : X.Opens) (hW : X.basicOpen a = W) (e' : W ≤ f ⁻¹ᵁ U) :
-    RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U W e').hom := by
+theorem basicOpen
+    {n : ℕ} {U : (Spec (CommRingCat.of K)).Opens} {V : X.Opens}
+    (hV : IsAffineOpen V) (e : V ≤ f ⁻¹ᵁ U)
+    (h : RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U V e).hom) (a : Γ(X, V))
+    (W : X.Opens) (hW : X.basicOpen a = W) (e' : W ≤ f ⁻¹ᵁ U)
+    : RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U W e').hom := by
   subst hW
   have := hV.isLocalization_basicOpen a
-  have h2 := (RingHom.isStandardSmoothOfRelativeDimension_stableUnderCompositionWithLocalizationAway n).2
-    Γ(X, X.basicOpen a) a (f.appLE U V e).hom h
+  have h2 :=
+    (RingHom.isStandardSmoothOfRelativeDimension_stableUnderCompositionWithLocalizationAway n).2
+      Γ(X, X.basicOpen a) a (f.appLE U V e).hom h
   convert h2 using 1
   rw [← Scheme.Hom.appLE_map f e (homOfLE (X.basicOpen_le a)).op]
   rfl
 
-theorem uniq {n m : ℕ} {U : (Spec (CommRingCat.of K)).Opens} (W : X.Opens) [Nonempty W] (e : W ≤ f ⁻¹ᵁ U)
-    (hn : RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U W e).hom)
-    (hm : RingHom.IsStandardSmoothOfRelativeDimension m (f.appLE U W e).hom) : n = m := by
+theorem uniq
+    {n m : ℕ} {U : (Spec (CommRingCat.of K)).Opens}
+    (W : X.Opens) [Nonempty W]
+    (e : W ≤ f ⁻¹ᵁ U) (hn : RingHom.IsStandardSmoothOfRelativeDimension n (f.appLE U W e).hom)
+    (hm : RingHom.IsStandardSmoothOfRelativeDimension m (f.appLE U W e).hom)
+    : n = m := by
   let := (f.appLE U W e).hom.toAlgebra
   have h1 := @Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential _ _ _ _ _ _ n hn
   have h2 := @Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential _ _ _ _ _ _ m hm
@@ -73,10 +81,11 @@ theorem isOpen_chart (n : ℕ) : IsOpen {x | Chart f n x} := by
 
 end RelDim
 
-
 open RelDim in
-theorem exists_smoothOfRelativeDimension {K : Type} [Field K] {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of K))
-    [Smooth f] [ConnectedSpace X] : ∃ d, SmoothOfRelativeDimension d f := by
+theorem exists_smoothOfRelativeDimension
+    {K : Type} [Field K]
+    {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of K)) [Smooth f] [ConnectedSpace X]
+    : ∃ d, SmoothOfRelativeDimension d f := by
   obtain ⟨x0⟩ := (inferInstance : Nonempty X)
   obtain ⟨n, hn⟩ := exists_chart f x0
   have hclopen : IsClopen {x | Chart f n x} := by

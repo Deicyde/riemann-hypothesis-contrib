@@ -4,7 +4,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Hecke
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 
 noncomputable section
 
@@ -14,11 +17,12 @@ open ValuativeRel Filter Topology
 
 section Val
 
-variable {K K' : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K K' : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   [Field K'] [ValuativeRel K'] [TopologicalSpace K'] [IsNonarchimedeanLocalField K']
 
-theorem tendsto_pow_zero_of_lt_one {x : K} (h : valuation K x < 1) :
-    Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0) := by
+theorem tendsto_pow_zero_of_lt_one {x : K} (h : valuation K x < 1)
+    : Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0) := by
   rw [(IsValuativeTopology.hasBasis_nhds_zero' K).tendsto_right_iff]
   intro γ hγ
   have : MulArchimedean (ValueGroupWithZero K) :=
@@ -28,8 +32,8 @@ theorem tendsto_pow_zero_of_lt_one {x : K} (h : valuation K x < 1) :
   rw [map_pow]
   exact lt_of_le_of_lt (pow_le_pow_right_of_le_one' h.le hm) hn
 
-theorem lt_one_of_continuous (i : K →+* K') (hi : Continuous i) {x : K} (h : valuation K x < 1) :
-    valuation K' (i x) < 1 := by
+theorem lt_one_of_continuous (i : K →+* K') (hi : Continuous i) {x : K} (h : valuation K x < 1)
+    : valuation K' (i x) < 1 := by
   have h1 : Tendsto (fun n : ℕ => i x ^ n) atTop (𝓝 0) := by
     have := (hi.tendsto 0).comp (tendsto_pow_zero_of_lt_one h)
     simpa [Function.comp_def, map_pow] using this
@@ -41,8 +45,8 @@ theorem lt_one_of_continuous (i : K →+* K') (hi : Continuous i) {x : K} (h : v
   have : 1 ≤ valuation K' (i x ^ N) := by rw [map_pow]; exact one_le_pow₀ hc
   exact absurd hN (not_lt.2 this)
 
-theorem le_one_of_map_le_one (i : K →+* K') (hi : Continuous i) {y : K} (h : valuation K' (i y) ≤ 1) :
-    valuation K y ≤ 1 := by
+theorem le_one_of_map_le_one (i : K →+* K') (hi : Continuous i) {y : K} (h : valuation K' (i y) ≤ 1)
+    : valuation K y ≤ 1 := by
   by_contra hc
   push_neg at hc
   have hy : y ≠ 0 := fun h0 => by simp [h0] at hc
@@ -54,15 +58,14 @@ theorem le_one_of_map_le_one (i : K →+* K') (hi : Continuous i) {y : K} (h : v
     exact (map_ne_zero i).2 hy
   exact absurd h (not_le.2 ((inv_lt_one₀ h0).1 h2))
 
-theorem map_le_one (i : K →+* K') (hi : Continuous i) {y : K} (h : valuation K y ≤ 1) :
-    valuation K' (i y) ≤ 1 := by
+theorem map_le_one (i : K →+* K') (hi : Continuous i) {y : K} (h : valuation K y ≤ 1)
+    : valuation K' (i y) ≤ 1 := by
   by_contra hc
   push_neg at hc
   have hy : y ≠ 0 := fun h0 => by simp [h0] at hc
   obtain ⟨x, hx0, hx1⟩ := Valuation.IsNontrivial.exists_lt_one (v := valuation K)
   have hx : x ≠ 0 := fun h0 => hx0 (by simp [h0])
-  have hγ : valuation K' (i x) ≠ 0 := by
-    rw [Valuation.ne_zero_iff]; exact (map_ne_zero i).2 hx
+  have hγ : valuation K' (i x) ≠ 0 := by rw [Valuation.ne_zero_iff]; exact (map_ne_zero i).2 hx
   have hpos : (0 : ValueGroupWithZero K') < valuation K' (i y) := zero_lt_one.trans hc
   have hinv : valuation K' (i y)⁻¹ < 1 := by rw [map_inv₀]; exact inv_lt_one_of_one_lt₀ hc
   have ht := tendsto_pow_zero_of_lt_one hinv
@@ -83,11 +86,14 @@ end Val
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem valued_le_one_iff_of_continuous : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E)) (i : v.adicCompletion F ≃+* w.adicCompletion E),
-    Continuous i → ∀ a : v.adicCompletion F, Valued.v (i a) ≤ 1 ↔ Valued.v a ≤ 1 := by
+theorem valued_le_one_iff_of_continuous
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
+        (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E))
+        (i : v.adicCompletion F ≃+* w.adicCompletion E),
+      Continuous i → ∀ a : v.adicCompletion F, Valued.v (i a) ≤ 1 ↔ Valued.v a ≤ 1 := by
   intro F E _ _ _ _ v w i hi a
-  rw [← GlobalTheory.CuspRep.ParLaws.valuation_le_one_iff w, ← GlobalTheory.CuspRep.ParLaws.valuation_le_one_iff v]
+  rw [← GlobalTheory.CuspRep.ParLaws.valuation_le_one_iff w,
+    ← GlobalTheory.CuspRep.ParLaws.valuation_le_one_iff v]
   exact ⟨le_one_of_map_le_one i.toRingHom hi, map_le_one i.toRingHom hi⟩
 
 end GlobalTheory.IsoInteg

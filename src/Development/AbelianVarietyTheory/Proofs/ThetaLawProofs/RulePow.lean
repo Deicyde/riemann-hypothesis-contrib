@@ -16,14 +16,19 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.ThetaKeyRul
 
 set_option autoImplicit false
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.KeyCl
 
 namespace GlobalTheory.KeyCl
 
-theorem rule_pow : ∀ κ : Rule, Homog (fun _ => 1) κ → Funct κ → ThetaOne κ → ∀ (K : Type) [Field K] [CharZero K]
-    (x y : KeyIn K) (j : ℕ), GlobalTheory.KeyPow.IsKeyPow y x j → κ K y = κ K x ^ j := by
+theorem rule_pow
+    : ∀ κ : Rule,
+      Homog (fun _ => 1) κ → Funct κ → ThetaOne κ
+        → ∀ (K : Type) [Field K] [CharZero K] (x y : KeyIn K) (j : ℕ),
+          GlobalTheory.KeyPow.IsKeyPow y x j → κ K y = κ K x ^ j := by
   intro κ hH hF hT K _ _ x y j hp
   have hj : 1 ≤ j := by
     obtain ⟨_, hg, -⟩ := hp
@@ -31,7 +36,8 @@ theorem rule_pow : ∀ κ : Rule, Homog (fun _ => 1) κ → Funct κ → ThetaOn
     rcases Nat.eq_zero_or_pos j with rfl | h
     · omega
     · exact h
-  obtain ⟨K₀, x₀, hK₀, hx₀⟩ := (GlobalTheory.T.keyData_descend_countable_subrings GlobalTheory.firstFiveLaws.1).2 K x
+  obtain ⟨K₀, x₀, hK₀, hx₀⟩ :=
+    (GlobalTheory.T.keyData_descend_countable_subrings GlobalTheory.firstFiveLaws.1).2 K x
   obtain ⟨σ⟩ := GlobalTheory.KeyHouse.nonempty_ringHom_complex K₀
   obtain ⟨y₀, hy₀⟩ := GlobalTheory.KeyPow.exists_isKeyPow _ x₀ j hj
   obtain ⟨x₁, hx₁⟩ := GlobalTheory.KeyPow.exists_keyPB_ring x₀ σ

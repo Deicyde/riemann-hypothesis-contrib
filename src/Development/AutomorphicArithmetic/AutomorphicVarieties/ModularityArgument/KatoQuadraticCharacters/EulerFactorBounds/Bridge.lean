@@ -17,8 +17,9 @@ open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4
 
 namespace UpperTheory.V.Z.Kato.Nb
 
-private theorem cgr_solve {K : Type} [Field K] {m : ℕ} {f a b c d : Kˣ} (h : Cgr m f (a * b)) (h' : Cgr m f (c * d)) :
-    Cgr m b (c * d / a) := by
+private theorem cgr_solve
+    {K : Type} [Field K] {m : ℕ} {f a b c d : Kˣ} (h : Cgr m f (a * b)) (h' : Cgr m f (c * d))
+    : Cgr m b (c * d / a) := by
   obtain ⟨k, hk⟩ := h
   obtain ⟨k', hk'⟩ := h'
   refine ⟨k' / k, ?_⟩
@@ -40,8 +41,11 @@ theorem sBridge : SBridge := by
     Xi X l n N M₀ M w g x y (fun z => z = t) (u (repM M t)) + X.galB l (repM M t) β
   have hB : ∀ t, InvM X l N w n (B t) := fun t =>
     (iadd _ _ (hI _ _ (hu.eqv _)) (sGalAct Ω ε X l N w n hN _ β hβ).1).1
-  have key : ∀ (s : Ω ≃ₐ[ℚ] Ω) (t : (ZMod M)ˣ), CgF X l n (shB X l M z s t)
-      (Xi X l n N M₀ M w g x y (fun z => z = t) (u s) + (X.galB l s (B (t * (cycM M s)⁻¹)) - B t)) := by
+  have key
+      : ∀ (s : Ω ≃ₐ[ℚ] Ω) (t : (ZMod M)ˣ),
+        CgF X l n (shB X l M z s t)
+          (Xi X l n N M₀ M w g x y (fun z => z = t) (u s)
+            + (X.galB l s (B (t * (cycM M s)⁻¹)) - B t)) := by
     intro s t
     unfold shB
     simp only [B]
@@ -63,28 +67,37 @@ theorem sBridge : SBridge := by
       funext z
       rw [c1, mul_eq_right]
     rw [p2] at h2
-    have h3 := (hM (fun z => z = t)).1 (tw X (l ^ n) M₀ τ (u σ)) (u s) (tw X (l ^ n) M₀ s (u τ')) (u τ)
-      fun x y h => cgr_solve (hu.coc τ σ x y h) (e ▸ hu.coc s τ' x y h)
+    have h3 :=
+      (hM (fun z => z = t)).1 (tw X (l ^ n) M₀ τ (u σ)) (u s) (tw X (l ^ n) M₀ s (u τ')) (u τ)
+        fun x y h => cgr_solve (hu.coc τ σ x y h) (e ▸ hu.coc s τ' x y h)
     have h4 := hT (fun z => z = t) (u τ') s
     have p4 : (fun z : (ZMod M)ˣ => z * cycM M s = t) = fun z => z = t * (cycM M s)⁻¹ := by
       funext z
       rw [eq_mul_inv_iff_mul_eq]
     rw [p4] at h4
-    have h5 := eqv.trans (eqv.symm h2) (eqv.trans h3 (hadd _ _ _ _ (eqv.refl _) (hadd _ _ _ _ h4 (eqv.refl _)).2).1)
+    have h5 :=
+      eqv.trans (eqv.symm h2)
+        (eqv.trans h3 (hadd _ _ _ _ (eqv.refl _) (hadd _ _ _ _ h4 (eqv.refl _)).2).1)
     have h6 := eqv.trans h1 (hadd _ _ _ _ h5 (eqv.refl _)).1
     convert h6 using 1
     rw [map_add (f := _)]
     abel
-  refine ⟨fun t => ∑ v ∈ Finset.univ.filter (fun v => π v = t), B v, fun t => isum _ _ _ fun v _ => hB v, fun s t => ?_⟩
+  refine ⟨
+    fun t => ∑ v ∈ Finset.univ.filter (fun v => π v = t), B v,
+    fun t => isum _ _ _ fun v _ => hB v,
+    fun s t => ?_
+  ⟩
   have h := hsum _ (Finset.univ.filter (fun v => π v = t)) _ _ fun v _ => key s v
-  have r : ∑ v ∈ Finset.univ.filter (fun v => π v = t * (π (cycM M s))⁻¹), B v =
-      ∑ v ∈ Finset.univ.filter (fun v => π v = t), B (v * (cycM M s)⁻¹) := by
+  have r
+      : ∑ v ∈ Finset.univ.filter (fun v => π v = t * (π (cycM M s))⁻¹), B v
+        = ∑ v ∈ Finset.univ.filter (fun v => π v = t), B (v * (cycM M s)⁻¹) := by
     symm
     refine Finset.sum_equiv (Equiv.mulRight (cycM M s)⁻¹) (fun v => ?_) fun v _ => rfl
     simp
   beta_reduce
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [r, (hM (fun _ => True)).2.2.2 (u s) A π t, map_sum, ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
+    rw [r, (hM (fun _ => True)).2.2.2 (u s) A π t, map_sum, ← Finset.sum_sub_distrib,
+      ← Finset.sum_add_distrib]
   exact h
 
 end UpperTheory.V.Z.Kato.Nb

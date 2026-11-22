@@ -12,8 +12,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-private theorem kwRam_split (M N : ℕ) (hN : 0 < N) :
-    ∃ a b n : ℕ, N = a * b ∧ a ∣ M ^ n ∧ b.Coprime M := by
+private theorem kwRam_split (M N : ℕ) (hN : 0 < N)
+    : ∃ a b n : ℕ, N = a * b ∧ a ∣ M ^ n ∧ b.Coprime M := by
   induction N using Nat.strong_induction_on with
   | _ N ih =>
     by_cases hc : N.Coprime M
@@ -27,8 +27,10 @@ private theorem kwRam_split (M N : ℕ) (hN : 0 < N) :
       rw [pow_succ']
       exact mul_dvd_mul hpM ha
 
-theorem UpperTheory.V.CF.kwRam :
-    ∀ (L : Type) [Field L] [NumberField L] [IsAbelianGalois ℚ L] (M : ℕ), 0 < M → (∀ p : ℕ, p.Prime → ¬ p ∣ M → UnramAt L p) → ∃ n : ℕ, Nonempty (L →ₐ[ℚ] CyclotomicField (M ^ n) ℚ) := by
+theorem UpperTheory.V.CF.kwRam
+    : ∀ (L : Type) [Field L] [NumberField L] [IsAbelianGalois ℚ L] (M : ℕ),
+      0 < M → (∀ p : ℕ, p.Prime → ¬ p ∣ M → UnramAt L p)
+        → ∃ n : ℕ, Nonempty (L →ₐ[ℚ] CyclotomicField (M ^ n) ℚ) := by
   intro L _ _ _ M hM hram
   obtain ⟨N, hN, ⟨f⟩⟩ := kwHom L
   obtain ⟨a, b, n, rfl, ha, hb⟩ := kwRam_split M N hN
@@ -62,8 +64,7 @@ theorem UpperTheory.V.CF.kwRam :
     · rfl
   obtain ⟨ω, hω⟩ : ∃ z : CyclotomicField (M ^ n) ℚ, IsPrimitiveRoot z (M ^ n) :=
     ⟨_, IsCyclotomicExtension.zeta_spec _ ℚ _⟩
-  have hq0 : M ^ n / a ≠ 0 :=
-    (Nat.div_pos (Nat.le_of_dvd (pow_pos hM n) ha) hapos).ne'
+  have hq0 : M ^ n / a ≠ 0 := (Nat.div_pos (Nat.le_of_dvd (pow_pos hM n) ha) hapos).ne'
   have hη := hω.pow_of_dvd hq0 (Nat.div_dvd_of_dvd ha)
   rw [Nat.div_div_self ha (pow_ne_zero _ hM.ne')] at hη
   have hmem : ω ^ (M ^ n / a) ∈ (minpoly ℚ (ζ ^ b)).aroots (CyclotomicField (M ^ n) ℚ) := by

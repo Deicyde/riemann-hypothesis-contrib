@@ -10,8 +10,8 @@ noncomputable section
 
 namespace GlobalTheory.RegSS
 
-def monomialChar (F Ω : Type) [Field F] [Field Ω] [Algebra F Ω] (s : ℕ) (a : Fin s → ℤ) :
-    (Fin s → Fˣ) →* Ω where
+def monomialChar (F Ω : Type) [Field F] [Field Ω] [Algebra F Ω] (s : ℕ) (a : Fin s → ℤ)
+    : (Fin s → Fˣ) →* Ω where
   toFun t := algebraMap F Ω ((∏ j, t j ^ a j : Fˣ) : F)
   map_one' := by simp
   map_mul' x y := by
@@ -30,12 +30,13 @@ theorem characterMonomial : CharacterMonomial := by
 
   let l : ((Fin s → Fˣ) →* Ω) →₀ Ω :=
     Finsupp.single f 1 - ∑ a ∈ S, Finsupp.single (monomialChar F Ω s a) (c a)
-  have hvanish : Finsupp.linearCombination Ω
-      (fun φ : (Fin s → Fˣ) →* Ω => (φ : (Fin s → Fˣ) → Ω)) l = 0 := by
+  have hvanish
+      : Finsupp.linearCombination Ω (fun φ : (Fin s → Fˣ) →* Ω => (φ : (Fin s → Fˣ) → Ω)) l
+        = 0 := by
     funext t
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [l, map_sub, map_sum, Finsupp.linearCombination_single, one_smul,
-      Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, hf t]
+      simp only [l, map_sub, map_sum, Finsupp.linearCombination_single, one_smul, Pi.sub_apply,
+        Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, hf t]
     rw [sub_eq_zero]
     refine Finset.sum_congr rfl fun a _ => ?_
     show _ = c a * algebraMap F Ω ((∏ j, t j ^ a j : Fˣ) : F)

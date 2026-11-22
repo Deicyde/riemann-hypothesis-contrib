@@ -14,8 +14,10 @@ namespace GlobalTheory.Mem
 
 open Formalism.BasicNotions NumberField IsDedekindDomain
 
-def assemble (B : Base) (C : Cols B) (W : RowsRest B C) (V : DivStage B C W) (S : SStage B C W) (N : NStage B C W)
-    (G : GJStage B C) : D7 where
+def assemble
+    (B : Base) (C : Cols B) (W : RowsRest B C)
+    (V : DivStage B C W) (S : SStage B C W) (N : NStage B C W) (G : GJStage B C)
+    : D7 where
   R := B.R
   host := B.host
   sp := B.sp
@@ -67,8 +69,7 @@ def assemble (B : Base) (C : Cols B) (W : RowsRest B C) (V : DivStage B C W) (S 
   T_ne_pde := fun u => by rw [C.A_T]; exact B.T_ne_pde u
   Dstar_eq := C.A_Dstar
   clsLat := C.clsLat
-  clsLat_lat u i c :=
-    show Submodule.IsFullLattice B.host.E (C.clsLat u i c) from C.clsLat_lat u i c
+  clsLat_lat u i c := show Submodule.IsFullLattice B.host.E (C.clsLat u i c) from C.clsLat_lat u i c
   eMu := W.eMu
   eMt := W.eMt0
   perCol_base_eq_PtilCol := W.perCol_base_eq_PtilCol
@@ -162,8 +163,9 @@ def assemble (B : Base) (C : Cols B) (W : RowsRest B C) (V : DivStage B C W) (S 
   Y_sigval := B.Y_sigval
 
 section
-variable (B : Base) (C : Cols B) (W : RowsRest B C) (V : DivStage B C W) (S : SStage B C W) (N : NStage B C W)
-    (G : GJStage B C)
+variable
+  (B : Base) (C : Cols B) (W : RowsRest B C)
+  (V : DivStage B C W) (S : SStage B C W) (N : NStage B C W) (G : GJStage B C)
 
 end
 

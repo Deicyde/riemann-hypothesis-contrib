@@ -15,8 +15,8 @@ open MvPolynomial
 
 noncomputable section
 
-def blockPermuteEquiv (f N : ℕ) (w : Fin f → Equiv.Perm (Fin N)) :
-    Fin f × Fin N ≃ Fin f × Fin N where
+def blockPermuteEquiv (f N : ℕ) (w : Fin f → Equiv.Perm (Fin N))
+    : Fin f × Fin N ≃ Fin f × Fin N where
   toFun p := (p.1, w p.1 p.2)
   invFun p := (p.1, (w p.1).symm p.2)
   left_inv p := by simp

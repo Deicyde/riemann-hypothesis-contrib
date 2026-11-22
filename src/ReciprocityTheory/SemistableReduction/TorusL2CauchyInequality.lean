@@ -22,9 +22,11 @@ theorem sj : SJStatement := sj_holds sphereLinLog
 
 theorem sphereLogIntegrable : SphereLogIntegrableStatement := sphereLogIntegrable_holds sj
 
-theorem gauss_height_additivity : HeightAdditiveStatement := gauss_height_add_of_sphere sphereLogIntegrable
+theorem gauss_height_additivity : HeightAdditiveStatement :=
+  gauss_height_add_of_sphere sphereLogIntegrable
 
-theorem sphere_height_lower_bound : HeightLowerBoundStatement := heightLowerBound_of_sj_of_sphereLogIntegrable sj sphereLogIntegrable
+theorem sphere_height_lower_bound : HeightLowerBoundStatement :=
+  heightLowerBound_of_sj_of_sphereLogIntegrable sj sphereLogIntegrable
 
 theorem torusMeanBasic : TorusMeanBasicStatement := torusMean_holds.1
 
@@ -36,6 +38,7 @@ theorem torus_l2_cauchy_inequality : TorusL2Cauchy := (torusLex_holds torusMeanB
 
 theorem gram : GramStatement := gram_holds torusMeanBasic torusLex torus_l2_cauchy_inequality
 
-theorem sphereLeTorus : SphereLeTorusStatement := sphereTorus_holds sphereLogIntegrable torusMeanBasic
+theorem sphereLeTorus : SphereLeTorusStatement :=
+  sphereTorus_holds sphereLogIntegrable torusMeanBasic
 
 end ReciprocityTheory.MultiplicativeHeights.Closed

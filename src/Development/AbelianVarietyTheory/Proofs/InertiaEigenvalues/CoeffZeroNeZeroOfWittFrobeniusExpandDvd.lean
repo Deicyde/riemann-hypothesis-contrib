@@ -8,15 +8,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvdSubO
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
 namespace GlobalTheory
 
-theorem coeff_zero_ne_zero_of_expand_map_dvd {R : Type*} [CommRing R] [IsDomain R] (l : ℕ) (hl : 2 ≤ l)
-    (σ : R →+* R) (P E : Polynomial R) (M : ℕ) (hP : P ≠ 0) (hE : E.coeff 0 ≠ 0)
-    (h : Polynomial.expand R l (P.map σ) ∣ E ^ M * P) : P.coeff 0 ≠ 0 := by
+theorem coeff_zero_ne_zero_of_expand_map_dvd
+    {R : Type*} [CommRing R] [IsDomain R]
+    (l : ℕ) (hl : 2 ≤ l)
+    (σ : R →+* R) (P E : Polynomial R) (M : ℕ)
+    (hP : P ≠ 0) (hE : E.coeff 0 ≠ 0) (h : Polynomial.expand R l (P.map σ) ∣ E ^ M * P)
+    : P.coeff 0 ≠ 0 := by
   obtain ⟨P0, hP0, hnd⟩ := Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd P hP 0
   generalize Polynomial.rootMultiplicity 0 P = k at hP0
   simp only [map_zero, sub_zero] at hP0 hnd
@@ -39,9 +44,11 @@ theorem coeff_zero_ne_zero_of_expand_map_dvd {R : Type*} [CommRing R] [IsDomain 
   · exact hE (Polynomial.X_dvd_iff.mp (Polynomial.prime_X.dvd_of_dvd_pow h4))
   · exact hnd h4
 
-theorem coeff_zero_ne_zero_of_frobenius_dvd_pow_mul :
-    ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (P E : Polynomial (Wq l a)) (M : ℕ), P.Monic → E.coeff 0 ≠ 0 →
-    Polynomial.expand (Wq l a) l (P.map (sigma l a : Wq l a →+* Wq l a)) ∣ E ^ M * P → P.coeff 0 ≠ 0 := by
+theorem coeff_zero_ne_zero_of_frobenius_dvd_pow_mul
+    : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (P E : Polynomial (Wq l a)) (M : ℕ),
+      P.Monic → E.coeff 0 ≠ 0
+        → Polynomial.expand (Wq l a) l (P.map (sigma l a : Wq l a →+* Wq l a)) ∣ E ^ M * P
+        → P.coeff 0 ≠ 0 := by
   intro l hl a _ P E M hP hE h
   exact coeff_zero_ne_zero_of_expand_map_dvd l hl.out.two_le _ P E M hP.ne_zero hE h
 

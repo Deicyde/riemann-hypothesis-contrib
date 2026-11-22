@@ -8,9 +8,11 @@ namespace GlobalTheory.NormResidue
 
 open Polynomial
 
-theorem exists_mul_involution_eq_neg_one {k : Type*} [Field k] [Finite k] (σ : k →+* k)
-    (hσ : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x) (h2 : (2 : k) ≠ 0) :
-    ∃ z : k, z * σ z + 1 = 0 := by
+theorem exists_mul_involution_eq_neg_one
+    {k : Type*} [Field k] [Finite k]
+    (σ : k →+* k) (hσ : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x)
+    (h2 : (2 : k) ≠ 0)
+    : ∃ z : k, z * σ z + 1 = 0 := by
   classical
   obtain ⟨x, hx⟩ := hne
   let F : Subfield k := σ.eqLocusField (RingHom.id k)
@@ -29,11 +31,11 @@ theorem exists_mul_involution_eq_neg_one {k : Type*} [Field k] [Finite k] (σ : 
     have h0 : ((2 : ℕ) : F) = 0 := by rw [← hc]; exact ringChar.Nat.cast_ringChar
     have h0' := congrArg F.subtype h0
     rwa [map_natCast, map_zero, Nat.cast_ofNat] at h0'
-  obtain ⟨a, b, hab⟩ := FiniteField.exists_root_sum_quadratic (R := F)
-    (f := Polynomial.X ^ 2 + Polynomial.C 1) (g := Polynomial.C (-d) * Polynomial.X ^ 2)
-    (Polynomial.degree_X_pow_add_C (by norm_num) _)
-    (Polynomial.degree_C_mul_X_pow 2 (neg_ne_zero.mpr hd0))
-    (FiniteField.odd_card_of_char_ne_two hchar)
+  obtain ⟨a, b, hab⟩ :=
+    FiniteField.exists_root_sum_quadratic (R := F) (f := Polynomial.X ^ 2 + Polynomial.C 1)
+      (g := Polynomial.C (-d) * Polynomial.X ^ 2) (Polynomial.degree_X_pow_add_C (by norm_num) _)
+      (Polynomial.degree_C_mul_X_pow 2 (neg_ne_zero.mpr hd0))
+      (FiniteField.odd_card_of_char_ne_two hchar)
   have hab' := congrArg Subtype.val hab
   simp [d] at hab'
   have ha : σ a = a := (memF _).1 a.2
@@ -42,11 +44,13 @@ theorem exists_mul_involution_eq_neg_one {k : Type*} [Field k] [Finite k] (σ : 
   rw [map_add (f := _), map_mul, ha, hb, hθ]
   linear_combination hab'
 
-theorem exists_mul_involution_add_one_mem_pow (O : Type) [CommRing O] (s : O →+* O)
-    (hs : ∀ x, s (s x) = x) (P : Ideal O) [hP : P.IsMaximal] [Finite (O ⧸ P)]
-    (hsP : ∀ x ∈ P, s x ∈ P) (hne : ∃ x, s x - x ∉ P) (h2 : (2 : O) ∉ P) (N : ℕ) (z0 : O)
-    (hz : N = 0 ∨ z0 * s z0 + 1 ∈ P ^ N) :
-    ∃ z : O, z * s z + 1 ∈ P ^ (N + 1) ∧ (N ≠ 0 → z - z0 ∈ P ^ N) := by
+theorem exists_mul_involution_add_one_mem_pow
+    (O : Type) [CommRing O]
+    (s : O →+* O) (hs : ∀ x, s (s x) = x)
+    (P : Ideal O) [hP : P.IsMaximal] [Finite (O ⧸ P)]
+    (hsP : ∀ x ∈ P, s x ∈ P) (hne : ∃ x, s x - x ∉ P) (h2 : (2 : O) ∉ P)
+    (N : ℕ) (z0 : O) (hz : N = 0 ∨ z0 * s z0 + 1 ∈ P ^ N)
+    : ∃ z : O, z * s z + 1 ∈ P ^ (N + 1) ∧ (N ≠ 0 → z - z0 ∈ P ^ N) := by
   classical
   have hPP : P ≤ P.comap s := fun x hx => hsP x hx
   rcases Nat.eq_zero_or_pos N with hN | hN
@@ -94,8 +98,9 @@ theorem exists_mul_involution_add_one_mem_pow (O : Type) [CommRing O] (s : O →
       · exact h
     refine ⟨z0 + y * z0 * e, ?_, fun _ => ?_⟩
     · have hse : s e = e := by rw [he_def, map_add (f := _), map_mul, hs, map_one]; ring
-      have key : (z0 + y * z0 * e) * s (z0 + y * z0 * e) + 1
-          = e * (1 - (y + s y) + (y + s y) * e) + e * (e * (y * z0 * s y * s z0)) := by
+      have key
+          : (z0 + y * z0 * e) * s (z0 + y * z0 * e) + 1
+            = e * (1 - (y + s y) + (y + s y) * e) + e * (e * (y * z0 * s y * s z0)) := by
         rw [map_add (f := _), map_mul, map_mul, hse]
         rw [he_def]
         ring

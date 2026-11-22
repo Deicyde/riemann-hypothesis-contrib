@@ -6,14 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N ValuativeRel
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N ValuativeRel
 open GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem norm_lt_one_of_valuation_lt {F : Type} [Field F] [NumberField F] {w : HeightOneSpectrum (𝓞 F)} {p : ℕ} [Fact p.Prime]
-    (j : w.adicCompletion F →+* Qbar p) (hj : Continuous j) (y : w.adicCompletion F) (hy : Valued.v y < 1) :
-    ‖j y‖ < 1 := by
+private theorem norm_lt_one_of_valuation_lt
+    {F : Type} [Field F] [NumberField F]
+    {w : HeightOneSpectrum (𝓞 F)} {p : ℕ} [Fact p.Prime]
+    (j : w.adicCompletion F →+* Qbar p) (hj : Continuous j)
+    (y : w.adicCompletion F) (hy : Valued.v y < 1)
+    : ‖j y‖ < 1 := by
   have h2 := Valued.tendsto_zero_pow_of_v_lt_one hy
   have h3 := (hj.tendsto 0).comp h2
   rw [map_zero] at h3
@@ -21,9 +25,12 @@ private theorem norm_lt_one_of_valuation_lt {F : Type} [Field F] [NumberField F]
   refine h3.congr (fun n => ?_)
   simp
 
-private theorem norm_le_one_of_valuation_le {F : Type} [Field F] [NumberField F] {w : HeightOneSpectrum (𝓞 F)} {p : ℕ} [Fact p.Prime]
-    (j : w.adicCompletion F →+* Qbar p) (hj : Continuous j) (y : w.adicCompletion F) (hy : Valued.v y ≤ 1) :
-    ‖j y‖ ≤ 1 := by
+private theorem norm_le_one_of_valuation_le
+    {F : Type} [Field F] [NumberField F]
+    {w : HeightOneSpectrum (𝓞 F)} {p : ℕ} [Fact p.Prime]
+    (j : w.adicCompletion F →+* Qbar p) (hj : Continuous j)
+    (y : w.adicCompletion F) (hy : Valued.v y ≤ 1)
+    : ‖j y‖ ≤ 1 := by
   obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot w.ne_bot
   set t := algebraMap F (w.adicCompletion F) (algebraMap (𝓞 F) F a) with ht
   have h1 : Valued.v t < 1 := by
@@ -40,19 +47,22 @@ private theorem norm_le_one_of_valuation_le {F : Type} [Field F] [NumberField F]
   obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt (‖j t‖⁻¹) hlt
   have h4 : Valued.v (t * y ^ n) < 1 := by
     rw [map_mul, map_pow]
-    calc Valued.v t * Valued.v y ^ n ≤ Valued.v t * 1 := by
-          gcongr
-          exact pow_le_one' hy n
+    calc
+      Valued.v t * Valued.v y ^ n ≤ Valued.v t * 1 := by
+        gcongr
+        exact pow_le_one' hy n
       _ < 1 := by rwa [mul_one]
   have h5 := norm_lt_one_of_valuation_lt j hj _ h4
   rw [map_mul, map_pow, norm_mul, norm_pow] at h5
   rw [inv_lt_iff_one_lt_mul₀' hpos] at hn
   exact absurd (hn.trans h5) (lt_irrefl _)
 
-theorem UpperTheory.norm_locPow_sub_one_le_of_valuation_sub_one_le :
-    ∀ (F : Type) [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F)) (p : ℕ) [Fact p.Prime] (ι : Qbar p ≃+* ℂ) (M : ℕ)
-    (u : w.adicCompletion F), valuation (w.adicCompletion F) (u - 1) ≤ valuation (w.adicCompletion F) (M : w.adicCompletion F) →
-    ‖GlobalTheory.HeckeGal.locPow ι (fun _ => 1) w u - 1‖ ≤ ‖(M : Qbar p)‖ := by
+theorem UpperTheory.norm_locPow_sub_one_le_of_valuation_sub_one_le
+    : ∀ (F : Type) [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F)) (p : ℕ) [Fact p.Prime]
+        (ι : Qbar p ≃+* ℂ) (M : ℕ) (u : w.adicCompletion F),
+      valuation (w.adicCompletion F) (u - 1)
+          ≤ valuation (w.adicCompletion F) (M : w.adicCompletion F)
+        → ‖GlobalTheory.HeckeGal.locPow ι (fun _ => 1) w u - 1‖ ≤ ‖(M : Qbar p)‖ := by
   intro F _ _ w p _ ι M u h
   have hv : Valued.v (u - 1) ≤ Valued.v (M : w.adicCompletion F) :=
     ((Valuation.Compatible.vle_iff_le (v := valuation (w.adicCompletion F)) _ _).mpr h :)
@@ -69,7 +79,8 @@ theorem UpperTheory.norm_locPow_sub_one_le_of_valuation_sub_one_le :
       have hM' : (M : Qbar p) ≠ 0 := by
         rw [← map_natCast j]
         exact (map_ne_zero j).mpr hM
-      rw [map_div₀, map_sub, map_one, map_natCast, norm_div, div_le_one (norm_pos_iff.mpr hM')] at h1
+      rw [map_div₀, map_sub, map_one, map_natCast, norm_div, div_le_one (norm_pos_iff.mpr hM')]
+        at h1
       exact h1
   unfold GlobalTheory.HeckeGal.locPow
   refine finprod_induction (fun z : Qbar p => ‖z - 1‖ ≤ ‖(M : Qbar p)‖) (by simp) ?_ ?_

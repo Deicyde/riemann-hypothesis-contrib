@@ -82,35 +82,39 @@ private lemma exists_emb {F : Type} [Field F] (Δ : F) (σ : F →+* ℝ) (h : �
 
 end UpperTheory.Reformulated.B.CubicCharpolyDiscriminant
 
-theorem UpperTheory.Reformulated.B.CubicCharpolyDiscriminant.tauEx :
-    UpperTheory.V.Z.Sym.Glob.TauEx := by
+theorem UpperTheory.Reformulated.B.CubicCharpolyDiscriminant.tauEx
+    : UpperTheory.V.Z.Sym.Glob.TauEx := by
   intro F _ _ Δ D hD δ
   set M : U3 Δ := δ * theta Δ δ with hMdef
-  obtain ⟨h1, h2⟩ := charpoly_tw (δ : Matrix (Fin 3) (Fin 3) (Lsq F Δ)) (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ))
-    δ.2.2 M.2.2 rfl
+  obtain ⟨h1, h2⟩ :=
+    charpoly_tw (δ : Matrix (Fin 3) (Fin 3) (Lsq F Δ)) (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)) δ.2.2
+      M.2.2 rfl
   have him : (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).trace.im = 0 := by
     have := congrArg QuadraticAlgebra.im h1
     rw [QuadraticAlgebra.im_star] at this
     linear_combination (-1 / 2 : F) * this
-  have hτ : algebraMap F (Lsq F Δ) ((M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).trace.re - 1) =
-      (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).trace - 1 := by
+  have hτ
+      : algebraMap F (Lsq F Δ) ((M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).trace.re - 1)
+        = (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).trace - 1 := by
     ext <;> simp [QuadraticAlgebra.re_one, QuadraticAlgebra.im_one, him]
   rw [← hτ] at h2
   generalize (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).trace.re - 1 = τ at h2
   refine ⟨τ, h2, fun hne σ => ?_⟩
   obtain ⟨φ, hφ, hφa⟩ := exists_emb Δ σ (hD.neg σ)
-  have hs : star ((M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).map φ) = (star (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ))).map φ := by
+  have hs
+      : star ((M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).map φ)
+        = (star (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ))).map φ := by
     ext i j
     simp only [Matrix.star_apply, Matrix.map_apply, hφ]
   have hu : (M : Matrix (Fin 3) (Fin 3) (Lsq F Δ)).map φ ∈ unitary (Matrix (Fin 3) (Fin 3) ℂ) := by
     constructor
     · rw [hs, ← Matrix.map_mul, M.2.1, Matrix.map_one _ (map_zero φ) (map_one φ)]
     · rw [hs, ← Matrix.map_mul, M.2.2, Matrix.map_one _ (map_zero φ) (map_one φ)]
-  have hle := disc_nonpos _ hu (σ τ) (by
-    rw [Matrix.charpoly_map, h2]
-    simp only [Polynomial.map_mul, Polynomial.map_sub, Polynomial.map_add (f := _), Polynomial.map_pow,
-      Polynomial.map_X, Polynomial.map_one, Polynomial.map_C, hφa])
+  have hle :=
+    disc_nonpos _ hu (σ τ) (by
+      rw [Matrix.charpoly_map, h2]
+      simp only [Polynomial.map_mul, Polynomial.map_sub, Polynomial.map_add (f := _),
+        Polynomial.map_pow, Polynomial.map_X, Polynomial.map_one, Polynomial.map_C, hφa])
   have hne' : σ (τ ^ 2 - 4) ≠ 0 := (map_ne_zero σ).2 hne
-  have e : σ (τ ^ 2 - 4) = σ τ ^ 2 - 4 := by
-    rw [map_sub, map_pow, map_ofNat]
+  have e : σ (τ ^ 2 - 4) = σ τ ^ 2 - 4 := by rw [map_sub, map_pow, map_ofNat]
   exact lt_of_le_of_ne (e ▸ hle) hne'

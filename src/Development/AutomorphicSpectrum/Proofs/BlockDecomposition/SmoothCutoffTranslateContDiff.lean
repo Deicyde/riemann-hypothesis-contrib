@@ -4,7 +4,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LastRowM
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter GlobalTheory.CuspGeneric GlobalTheory.CuspRep PositivityTheory.jumpWindows PositivityTheory.AdelicQuotientData GroundTheory.Automorphic.FourierWhittaker GlobalTheory.CompanionTheory.CutOff
+open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter GlobalTheory.CuspGeneric
+  GlobalTheory.CuspRep PositivityTheory.jumpWindows PositivityTheory.AdelicQuotientData
+  GroundTheory.Automorphic.FourierWhittaker GlobalTheory.CompanionTheory.CutOff
 open scoped ContDiff
 
 noncomputable section
@@ -27,8 +29,9 @@ theorem contDiff_lastEnt : ContDiff ℝ ∞ (lastEnt : (Fin k → Cinf E) → Ci
 theorem isOpen_lastEnt_unit : IsOpen {x : Fin k → Cinf E | IsUnit (lastEnt x)} :=
   (Units.isOpen (R := Cinf E)).preimage (contDiff_lastEnt (E := E)).continuous
 
-theorem contDiffOn_inverse_lastEnt :
-    ContDiffOn ℝ ∞ (fun x : Fin k → Cinf E => Ring.inverse (lastEnt x))
+theorem contDiffOn_inverse_lastEnt
+    : ContDiffOn ℝ ∞
+      (fun x : Fin k → Cinf E => Ring.inverse (lastEnt x))
       {x | IsUnit (lastEnt x)} := by
   intro x hx
   obtain ⟨u, hu⟩ := hx
@@ -38,8 +41,8 @@ theorem contDiffOn_inverse_lastEnt :
 
 def tauM (x : Fin k → Cinf E) : LieI (InfinitePlace E) k := Matrix.of.symm (rowM (rowI x))
 
-theorem contDiffOn_tauM :
-    ContDiffOn ℝ ∞ (tauM : (Fin k → Cinf E) → LieI (InfinitePlace E) k)
+theorem contDiffOn_tauM
+    : ContDiffOn ℝ ∞ (tauM : (Fin k → Cinf E) → LieI (InfinitePlace E) k)
       {x | IsUnit (lastEnt x)} := by
   refine contDiffOn_pi.2 fun i => contDiffOn_pi.2 fun c => ?_
   have hinv := contDiffOn_inverse_lastEnt (E := E) (k := k)
@@ -56,30 +59,36 @@ theorem contDiffOn_tauM :
     simp only [e]
     exact contDiffOn_const
 
-theorem tauM_isUnit {x : Fin k → Cinf E} (h : IsUnit (lastEnt x)) :
-    IsUnit (Matrix.of (tauM x)) := by
-  have e : Matrix.of (tauM x) = (((rowGL x)⁻¹ : GL (Fin k) (Cinf E)) : Matrix (Fin k) (Fin k) (Cinf E)) :=
+theorem tauM_isUnit {x : Fin k → Cinf E} (h : IsUnit (lastEnt x))
+    : IsUnit (Matrix.of (tauM x)) := by
+  have e
+      : Matrix.of (tauM x)
+        = (((rowGL x)⁻¹ : GL (Fin k) (Cinf E)) : Matrix (Fin k) (Fin k) (Cinf E)) :=
     (rowGL_inv_val h).symm
   rw [e]
   exact Units.isUnit _
 
-theorem rt_inv_eq_orb (φ : XB E k) {x : Fin k → Cinf E} (h : IsUnit (lastEnt x)) :
-    Rt E k (infGL E k (rowGL x))⁻¹ φ = orb (repI E k) φ (tauM x) := by
+theorem rt_inv_eq_orb (φ : XB E k) {x : Fin k → Cinf E} (h : IsUnit (lastEnt x))
+    : Rt E k (infGL E k (rowGL x))⁻¹ φ = orb (repI E k) φ (tauM x) := by
   have hu := tauM_isUnit h
-  have e : hu.unit = (rowGL x)⁻¹ := Units.ext (by
-    rw [IsUnit.unit_spec]; exact (rowGL_inv_val h).symm)
+  have e : hu.unit = (rowGL x)⁻¹ :=
+    Units.ext (by rw [IsUnit.unit_spec]; exact (rowGL_inv_val h).symm)
   rw [orb, dite_eq_left hu, e]
   change _ = Rt E k (infGL E k (rowGL x)⁻¹) φ
   rw [map_inv (infGL E k)]
 
-theorem contDiff_cut_orbit {φ : XB E k} (hφ : SmV (repI E k) φ) {b : (Fin k → Cinf E) → ℝ}
-    (hb : ContDiff ℝ ∞ b) (hs : ∀ x ∈ tsupport b, IsUnit (lastEnt x)) :
-    ContDiff ℝ ∞ fun x => (b x : ℂ) • Rt E k (infGL E k (rowGL x))⁻¹ φ := by
+theorem contDiff_cut_orbit
+    {φ : XB E k} (hφ : SmV (repI E k) φ)
+    {b : (Fin k → Cinf E) → ℝ} (hb : ContDiff ℝ ∞ b) (hs : ∀ x ∈ tsupport b, IsUnit (lastEnt x))
+    : ContDiff ℝ ∞ fun x => (b x : ℂ) • Rt E k (infGL E k (rowGL x))⁻¹ φ := by
   have hO := isOpen_lastEnt_unit (E := E) (k := k)
   have hbc : ContDiff ℝ ∞ fun x => (b x : ℂ) := Complex.ofRealCLM.contDiff.comp hb
-  have horb : ContDiffOn ℝ ∞ (fun x => orb (repI E k) φ (tauM x)) {x : Fin k → Cinf E | IsUnit (lastEnt x)} :=
+  have horb : ContDiffOn ℝ ∞
+      (fun x => orb (repI E k) φ (tauM x))
+      {x : Fin k → Cinf E | IsUnit (lastEnt x)} :=
     ContDiffOn.comp hφ contDiffOn_tauM fun x hx => tauM_isUnit hx
-  have hF : ContDiffOn ℝ ∞ (fun x => (b x : ℂ) • Rt E k (infGL E k (rowGL x))⁻¹ φ)
+  have hF : ContDiffOn ℝ ∞
+      (fun x => (b x : ℂ) • Rt E k (infGL E k (rowGL x))⁻¹ φ)
       {x : Fin k → Cinf E | IsUnit (lastEnt x)} :=
     (hbc.contDiffOn.smul horb).congr fun x hx => by
       rw [rt_inv_eq_orb φ hx]

@@ -6,43 +6,65 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafTwPairExistsPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.E.LeafPairExtPf
 open LateralTheory.E.CupProductRingLaws LateralTheory.E.LeafUnitPairGPf
 
-def LeafActSgl : Prop := ∀ (q : ℕ) [NeZero q] (i : ℤ) L, IsAct q i L →
-  ∃ lam : Pair (sgl (tw q 0)) (res _ (tw q i)) (res _ (tw q i)),
-    ∀ (U : Scheme.{0}) (t : ℤ) (a : Sec (tw q 0) U) (b : Sec ((res _ (tw q i)).X t) U),
-      lam.mul U 0 t t (zero_add t) (Sec.map (sglι (tw q 0)) a) b = L U t a b
+def LeafActSgl : Prop :=
+  ∀ (q : ℕ) [NeZero q] (i : ℤ) L,
+    IsAct q i L
+      → ∃ lam : Pair (sgl (tw q 0)) (res _ (tw q i)) (res _ (tw q i)),
+        ∀ (U : Scheme.{0}) (t : ℤ) (a : Sec (tw q 0) U) (b : Sec ((res _ (tw q i)).X t) U),
+          lam.mul U 0 t t (zero_add t) (Sec.map (sglι (tw q 0)) a) b = L U t a b
 
-def LeafExtAlongAug : Prop := ∀ (q : ℕ) [NeZero q] (i : ℤ) (lam : Pair (sgl (tw q 0)) (res _ (tw q i)) (res _ (tw q i))),
-  ∃ ν : Pair (res _ (tw q 0)) (res _ (tw q i)) (res _ (tw q i)),
-    ∀ (U : Scheme.{0}) (t : ℤ) (x : Sec ((sgl (tw q 0)).X 0) U) (b : Sec ((res _ (tw q i)).X t) U),
-      ν.mul U 0 t t (zero_add t) (Sec.map ((resAug (tw q 0)).f 0) x) b = lam.mul U 0 t t (zero_add t) x b
+def LeafExtAlongAug : Prop :=
+  ∀ (q : ℕ) [NeZero q] (i : ℤ) (lam : Pair (sgl (tw q 0)) (res _ (tw q i)) (res _ (tw q i))),
+    ∃ ν : Pair (res _ (tw q 0)) (res _ (tw q i)) (res _ (tw q i)),
+      ∀ (U : Scheme.{0}) (t : ℤ) (x : Sec ((sgl (tw q 0)).X 0) U)
+          (b : Sec ((res _ (tw q i)).X t) U),
+        ν.mul U 0 t t (zero_add t) (Sec.map ((resAug (tw q 0)).f 0) x) b
+          = lam.mul U 0 t t (zero_add t) x b
 
 section Act
 variable {q : ℕ} {i : ℤ}
 
-def actPair (L : ∀ (U : Scheme.{0}) (t : ℤ), Sec (tw q 0) U →ₗ[ULift.{1} (ZMod q)]
-    Sec ((res _ (tw q i)).X t) U →ₗ[ULift.{1} (ZMod q)] Sec ((res _ (tw q i)).X t) U) (U : Scheme.{0}) (s t w : ℤ)
-    (h : s + t = w) : Sec ((sgl (tw q 0)).X s) U →ₗ[ULift.{1} (ZMod q)] Sec ((res _ (tw q i)).X t) U →ₗ[ULift.{1} (ZMod q)]
+def actPair
+    (L : ∀ (U : Scheme.{0}) (t : ℤ),
+      Sec (tw q 0) U →ₗ[ULift.{1} (ZMod q)]
+        Sec ((res _ (tw q i)).X t) U →ₗ[ULift.{1} (ZMod q)] Sec ((res _ (tw q i)).X t) U)
+    (U : Scheme.{0})
+    (s t w : ℤ) (h : s + t = w)
+    : Sec ((sgl (tw q 0)).X s) U →ₗ[ULift.{1} (ZMod q)] Sec ((res _ (tw q i)).X t) U →ₗ[ULift.{1} (ZMod q)]
       Sec ((res _ (tw q i)).X w) U :=
   if hs : s = 0 then
-    ((L U t).compl₁₂ (((HomologicalComplex.singleObjXIsoOfEq (ComplexShape.up ℤ) 0 (tw q 0) s hs).hom.hom.app (op U)).hom)
-      LinearMap.id).compr₂ ((((res _ (tw q i)).XIsoOfEq (show t = w by omega)).hom.hom.app (op U)).hom)
-  else 0
+    ((L U t).compl₁₂
+        (((HomologicalComplex.singleObjXIsoOfEq (ComplexShape.up ℤ) 0 (tw q 0) s hs).hom.hom.app
+          (op U)).hom)
+        LinearMap.id).compr₂
+      ((((res _ (tw q i)).XIsoOfEq (show t = w by omega)).hom.hom.app (op U)).hom)
+  else
+    0
 
-theorem actPair_pos (L : ∀ (U : Scheme.{0}) (t : ℤ), Sec (tw q 0) U →ₗ[ULift.{1} (ZMod q)]
-    Sec ((res _ (tw q i)).X t) U →ₗ[ULift.{1} (ZMod q)] Sec ((res _ (tw q i)).X t) U) (U : Scheme.{0}) (t : ℤ)
-    (a : Sec ((sgl (tw q 0)).X 0) U) (b : Sec ((res _ (tw q i)).X t) U) :
-    actPair L U 0 t t (zero_add t) a b =
-      L U t (Sec.map (HomologicalComplex.singleObjXIsoOfEq (ComplexShape.up ℤ) 0 (tw q 0) 0 rfl).hom a) b := by
+theorem actPair_pos
+    (L : ∀ (U : Scheme.{0}) (t : ℤ),
+      Sec (tw q 0) U →ₗ[ULift.{1} (ZMod q)]
+        Sec ((res _ (tw q i)).X t) U →ₗ[ULift.{1} (ZMod q)] Sec ((res _ (tw q i)).X t) U)
+    (U : Scheme.{0}) (t : ℤ) (a : Sec ((sgl (tw q 0)).X 0) U) (b : Sec ((res _ (tw q i)).X t) U)
+    : actPair L U 0 t t (zero_add t) a b
+      = L U t
+        (Sec.map (HomologicalComplex.singleObjXIsoOfEq (ComplexShape.up ℤ) 0 (tw q 0) 0 rfl).hom a)
+        b := by
   simp [actPair, HomologicalComplex.XIsoOfEq_rfl]
 
-theorem actPair_neg (L : ∀ (U : Scheme.{0}) (t : ℤ), Sec (tw q 0) U →ₗ[ULift.{1} (ZMod q)]
-    Sec ((res _ (tw q i)).X t) U →ₗ[ULift.{1} (ZMod q)] Sec ((res _ (tw q i)).X t) U) (U : Scheme.{0}) (s t w : ℤ)
-    (h : s + t = w) (hs : s ≠ 0) : actPair L U s t w h = 0 := by
+theorem actPair_neg
+    (L : ∀ (U : Scheme.{0}) (t : ℤ),
+      Sec (tw q 0) U →ₗ[ULift.{1} (ZMod q)]
+        Sec ((res _ (tw q i)).X t) U →ₗ[ULift.{1} (ZMod q)] Sec ((res _ (tw q i)).X t) U)
+    (U : Scheme.{0})
+    (s t w : ℤ) (h : s + t = w) (hs : s ≠ 0)
+    : actPair L U s t w h = 0 := by
   simp [actPair, hs]
 
 end Act
@@ -52,7 +74,9 @@ theorem LeafPairExt_of (h1 : LeafActSgl) (h2 : LeafExtAlongAug) : LeafPairExt :=
   obtain ⟨lam, hlam⟩ := h1 q i L hL
   obtain ⟨ν, hν⟩ := h2 q i lam
   refine ⟨ν, fun U t a b => ?_⟩
-  have e : Sec.map (resι _ (tw q 0)) a = Sec.map ((resAug (tw q 0)).f 0) (Sec.map (sglι (tw q 0)) a) := rfl
+  have e
+      : Sec.map (resι _ (tw q 0)) a = Sec.map ((resAug (tw q 0)).f 0) (Sec.map (sglι (tw q 0)) a) :=
+    rfl
   rw [e, hν, hlam]
 
 theorem etale_twist_action_induces_single_complex_pairing_holds : LeafActSgl := by
@@ -83,6 +107,7 @@ theorem etale_twist_action_induces_single_complex_pairing_holds : LeafActSgl := 
     rw [actPair_pos]
     congr 1
 
-theorem LeafPairExt_of' (h2 : LeafExtAlongAug) : LeafPairExt := LeafPairExt_of etale_twist_action_induces_single_complex_pairing_holds h2
+theorem LeafPairExt_of' (h2 : LeafExtAlongAug) : LeafPairExt :=
+  LeafPairExt_of etale_twist_action_induces_single_complex_pairing_holds h2
 
 end LateralTheory.E.LeafPairExtPf

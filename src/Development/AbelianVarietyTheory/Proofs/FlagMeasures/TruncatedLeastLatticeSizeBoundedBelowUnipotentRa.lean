@@ -9,23 +9,27 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TruncatedLeas
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 namespace GlobalTheory.Dec
 
-theorem one_le_rank_of_isIsot (I : AutInst) (W : Submodule I.E (Fin I.n → I.E)) (hW : I.IsIsot W) :
-    1 ≤ I.n := by
+theorem one_le_rank_of_isIsot (I : AutInst) (W : Submodule I.E (Fin I.n → I.E)) (hW : I.IsIsot W)
+    : 1 ≤ I.n := by
   by_contra h
   have h0 : I.n = 0 := by omega
   haveI : IsEmpty (Fin I.n) := by rw [h0]; infer_instance
   exact hW.1 (Subsingleton.elim _ _)
 
-theorem exists_pos_le_tau1_mul_of_mem_NA_of_isIsot (I : AutInst) (W : Submodule I.E (Fin I.n → I.E)) (x : I.GA)
-    (hW : I.IsIsot W) : ∃ c : ℝ, 0 < c ∧ ∀ m ∈ I.NA W, c ≤ tau1 I (m * x) := by
-  obtain ⟨hpos, hcont, hinv, -⟩ := GlobalTheory.T.truncatedLeastLatticeSize_lipschitz_properties I (one_le_rank_of_isIsot I W hW)
+theorem exists_pos_le_tau1_mul_of_mem_NA_of_isIsot
+    (I : AutInst) (W : Submodule I.E (Fin I.n → I.E)) (x : I.GA) (hW : I.IsIsot W)
+    : ∃ c : ℝ, 0 < c ∧ ∀ m ∈ I.NA W, c ≤ tau1 I (m * x) := by
+  obtain ⟨hpos, hcont, hinv, -⟩ :=
+    GlobalTheory.T.truncatedLeastLatticeSize_lipschitz_properties I (one_le_rank_of_isIsot I W hW)
   obtain ⟨-, -, -, -, Cp, hCp, -, hcov⟩ := GlobalTheory.UnipApprox.strong_approximation I W hW
-  have hc : Continuous fun y : I.GA => tau1 I (y * x) := hcont.comp (continuous_id.mul continuous_const)
+  have hc : Continuous fun y : I.GA => tau1 I (y * x) :=
+    hcont.comp (continuous_id.mul continuous_const)
   have key : ∀ m ∈ I.NA W, ∃ y ∈ Cp, tau1 I (m * x) = tau1 I (y * x) := by
     intro m hm
     obtain ⟨γ, hγ, hy⟩ := hcov m hm

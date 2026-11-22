@@ -125,10 +125,10 @@ lemma eta_rel (hP : IsogenyP) (hd : ZetaHasDeriv) (hq : ZetaQuasi) (L : PeriodPa
 
 end S2IsogenyPsi
 
-
 open S2IsogenyPsi in
-theorem quasiPeriodConstIsogeny_of (hP : IsogenyP) (hd : ZetaHasDeriv) (hq : ZetaQuasi) (he : EtaSplit)
-    (hc : KerRepsCard) : QuasiPeriodConstIsogeny := by
+theorem quasiPeriodConstIsogeny_of
+    (hP : IsogenyP) (hd : ZetaHasDeriv) (hq : ZetaQuasi) (he : EtaSplit) (hc : KerRepsCard)
+    : QuasiPeriodConstIsogeny := by
   intro L α S hα hst hS
   have hω₁ : L.ω₁ ∈ L.lattice := PeriodPair.mem_lattice.mpr ⟨1, 0, by simp⟩
   have hne : L.ω₁ ≠ 0 := by
@@ -148,7 +148,8 @@ theorem quasiPeriodConstIsogeny_of (hP : IsogenyP) (hd : ZetaHasDeriv) (hq : Zet
   rw [map_mul] at hrel
   linear_combination hrel
 
-theorem quasiPeriodConstIsogeny_thm : QuasiPeriodConstIsogeny := quasiPeriodConstIsogeny_of isogenyP zetaHasDeriv zetaQuasi etaSplit kerRepsCard
+theorem quasiPeriodConstIsogeny_thm : QuasiPeriodConstIsogeny :=
+  quasiPeriodConstIsogeny_of isogenyP zetaHasDeriv zetaQuasi etaSplit kerRepsCard
 
 theorem cmQuasiPeriodConst_of (h : QuasiPeriodConstIsogeny) : CMQuasiPeriodConst := by
   intro L α S hst him hS

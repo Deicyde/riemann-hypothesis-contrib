@@ -8,34 +8,43 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FinStabl
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
-open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation GlobalTheory.CompanionTheory.LimV
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
+open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  GlobalTheory.CompanionTheory.LimV
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.LimV
 
-theorem typed_tw_finite {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {N : ℕ}
-    (U : Submodule ℂ (Sm E N)) (z : ℂ)
+theorem typed_tw_finite
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {N : ℕ} (U : Submodule ℂ (Sm E N))
+    (z : ℂ)
     (H : ∀ (K : Subgroup (GL (Fin N) (Af E))) (W : Submodule ℂ (Kinf E N → ℂ)),
-      IsOpen (K : Set (GL (Fin N) (Af E))) → FiniteDimensional ℂ W → FiniteDimensional ℂ (typed U K W))
+      IsOpen (K : Set (GL (Fin N) (Af E))) → FiniteDimensional ℂ W
+        → FiniteDimensional ℂ (typed U K W))
     (K : Subgroup (GL (Fin N) (Af E))) (W : Submodule ℂ (Kinf E N → ℂ))
-    (hK : IsOpen (K : Set (GL (Fin N) (Af E)))) (hW : FiniteDimensional ℂ W) :
-    FiniteDimensional ℂ (typed (tw U z) K W) := by
+    (hK : IsOpen (K : Set (GL (Fin N) (Af E)))) (hW : FiniteDimensional ℂ W)
+    : FiniteDimensional ℂ (typed (tw U z) K W) := by
   have hK₀ : IsOpen ((K ⊓ KO E N : Subgroup (GL (Fin N) (Af E))) : Set (GL (Fin N) (Af E))) := by
     rw [Subgroup.coe_inf]
     exact hK.inter (GroundTheory.Automorphic.AdelicGLn.isOpen_integralFiniteGL E N)
   have hfin := H (K ⊓ KO E N) W hK₀ hW
   have hflat : FlatFn (absFn (E := E) N (-z)) := GlobalTheory.T.flat_absolute_character N (-z)
-  have hval : ∀ (φ : Sm E N) x, (mulChi N (GlobalTheory.CuspRep.Model.absC E (-z)) φ).1 x =
-      absFn N (-z) x * φ.1 x := fun φ x => by
+  have hval
+      : ∀ (φ : Sm E N) x,
+        (mulChi N (GlobalTheory.CuspRep.Model.absC E (-z)) φ).1 x
+          = absFn N (-z) x * φ.1 x := fun φ x => by
     simp only [mulChi_apply, absFn]
     exact mul_comm _ _
-  have hfinv : ∀ (g : GA E N), ∀ u ∈ KO E N, absFn (E := E) N (-z) (g * finGL E N u) = absFn N (-z) g := by
+  have hfinv
+      : ∀ (g : GA E N), ∀ u ∈ KO E N, absFn (E := E) N (-z) (g * finGL E N u) = absFn N (-z) g := by
     intro g u hu
     have := hflat.rinv g 1 u hu
     simpa [cf] using this
-  have hkinv : ∀ (g : GA E N) (k : Kinf E N),
-      absFn (E := E) N (-z) (g * infGL E N (Unitary.toUnits k)) = absFn N (-z) g := by
+  have hkinv
+      : ∀ (g : GA E N) (k : Kinf E N),
+        absFn (E := E) N (-z) (g * infGL E N (Unitary.toUnits k)) = absFn N (-z) g := by
     intro g k
     have := hflat.rinv g k 1 (one_mem _)
     simpa [cf] using this
@@ -47,8 +56,12 @@ theorem typed_tw_finite {E : Type} [Field E] [NumberField E] [_root_.NumberField
     refine ⟨?_, ?_, ?_⟩
     · have hback : L φ = ψ := by
         refine Subtype.ext (funext fun x => ?_)
-        have e : ∀ s : ℂ, ((chiDet N (GlobalTheory.CuspRep.Model.absC E s) x : ℂˣ) : ℂ) =
-            Complex.exp (s * GlobalTheory.Mem.Chr.CharModel.logNorm E (GeneralLinearGroup.det x)) := fun _ => rfl
+        have e
+            : ∀ s : ℂ,
+              ((chiDet N (GlobalTheory.CuspRep.Model.absC E s) x : ℂˣ) : ℂ)
+                = Complex.exp
+                  (s * GlobalTheory.Mem.Chr.CharModel.logNorm E (GeneralLinearGroup.det x)) :=
+          fun _ => rfl
         rw [hL, hφ, mulChi_apply, absFn, e, e, mul_left_comm, ← Complex.exp_add]
         simp
       show L φ ∈ U
@@ -60,8 +73,9 @@ theorem typed_tw_finite {E : Type} [Field E] [NumberField E] [_root_.NumberField
       rw [hL, hL, hfinv g u hu.2, h2]
     · intro g
       have h3 : (fun k : Kinf E N => φ.1 (g * infGL E N (Unitary.toUnits k))) ∈ W := htype g
-      have h4 : (fun k : Kinf E N => (L φ).1 (g * infGL E N (Unitary.toUnits k))) =
-          absFn N (-z) g • (fun k : Kinf E N => φ.1 (g * infGL E N (Unitary.toUnits k))) := by
+      have h4
+          : (fun k : Kinf E N => (L φ).1 (g * infGL E N (Unitary.toUnits k)))
+            = absFn N (-z) g • (fun k : Kinf E N => φ.1 (g * infGL E N (Unitary.toUnits k))) := by
         funext k
         rw [hL, hkinv g k]
         rfl

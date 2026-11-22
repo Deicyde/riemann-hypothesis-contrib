@@ -8,12 +8,12 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem selfAdjoint_eq_algebraMap_of_commute_irreducible {G H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] (π : G → (H →L[ℂ] H))
-    (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ u ∈ S, π g u ∈ S) →
-      S = ⊥ ∨ S = ⊤)
-    (A : H →L[ℂ] H) (hA : IsSelfAdjoint A) (hc : ∀ g, Commute A (π g)) :
-    ∃ r : ℝ, A = algebraMap ℝ (H →L[ℂ] H) r := by
+theorem selfAdjoint_eq_algebraMap_of_commute_irreducible
+    {G H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (π : G → (H →L[ℂ] H))
+    (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ u ∈ S, π g u ∈ S) → S = ⊥ ∨ S = ⊤)
+    (A : H →L[ℂ] H) (hA : IsSelfAdjoint A) (hc : ∀ g, Commute A (π g))
+    : ∃ r : ℝ, A = algebraMap ℝ (H →L[ℂ] H) r := by
   classical
   rcases subsingleton_or_nontrivial H with hH | hH
   · refine ⟨0, ?_⟩
@@ -36,21 +36,18 @@ theorem selfAdjoint_eq_algebraMap_of_commute_irreducible {G H : Type} [NormedAdd
       rcases le_total x c with h | h
       · rw [max_eq_right (by linarith : x - c ≤ 0), zero_mul]
       · rw [max_eq_right (by linarith : c - x ≤ 0), mul_zero]
-    have hprod : cfc k A * cfc f A = 0 := by
-      rw [← cfc_mul k f A, hfk, cfc_zero]
+    have hprod : cfc k A * cfc f A = 0 := by rw [← cfc_mul k f A, hfk, cfc_zero]
     have hF : cfc f A ≠ 0 := by
       intro h0
       have := (eqOn_of_cfc_eq_cfc (f := f) (g := 0) (a := A) (h0.trans (cfc_zero ℝ A).symm)) ha
       simp only [Pi.zero_apply, hf_def] at this
-      have : c - a ≤ 0 := by
-        rw [← this]; exact le_max_left _ _
+      have : c - a ≤ 0 := by rw [← this]; exact le_max_left _ _
       linarith
     have hK : cfc k A ≠ 0 := by
       intro h0
       have := (eqOn_of_cfc_eq_cfc (f := k) (g := 0) (a := A) (h0.trans (cfc_zero ℝ A).symm)) hb
       simp only [Pi.zero_apply, hk_def] at this
-      have : b - c ≤ 0 := by
-        rw [← this]; exact le_max_left _ _
+      have : b - c ≤ 0 := by rw [← this]; exact le_max_left _ _
       linarith
     have hcomm : ∀ g, Commute (cfc k A) (π g) := fun g => (hc g).cfc_real k
     let S : Submodule ℂ H := LinearMap.ker (cfc k A).toLinearMap
@@ -78,16 +75,17 @@ theorem selfAdjoint_eq_algebraMap_of_commute_irreducible {G H : Type} [NormedAdd
       rw [ContinuousLinearMap.zero_apply]
       exact hv'
   refine ⟨r, ?_⟩
-  calc A = cfc (fun x : ℝ => x) A := (cfc_id' ℝ A).symm
+  calc
+    A = cfc (fun x : ℝ => x) A := (cfc_id' ℝ A).symm
     _ = cfc (fun _ : ℝ => r) A := cfc_congr (fun s hs => hsub s hs)
     _ = algebraMap ℝ (H →L[ℂ] H) r := cfc_const r A
 
-theorem schur_unitary_irreducible (G H : Type) [Group G] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] (π : G →* (H →L[ℂ] H))
-    (hπ : ∀ g u, ‖π g u‖ = ‖u‖)
-    (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ u ∈ S, π g u ∈ S) →
-      S = ⊥ ∨ S = ⊤)
-    (T : H →L[ℂ] H) (hT : ∀ g, T * π g = π g * T) : ∃ c : ℂ, T = c • 1 := by
+theorem schur_unitary_irreducible
+    (G H : Type) [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (π : G →* (H →L[ℂ] H)) (hπ : ∀ g u, ‖π g u‖ = ‖u‖)
+    (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ u ∈ S, π g u ∈ S) → S = ⊥ ∨ S = ⊤)
+    (T : H →L[ℂ] H) (hT : ∀ g, T * π g = π g * T)
+    : ∃ c : ℂ, T = c • 1 := by
   classical
   have hinner : ∀ g (u v : H), ⟪π g u, π g v⟫_ℂ = ⟪u, v⟫_ℂ := by
     intro g u v
@@ -119,7 +117,8 @@ theorem schur_unitary_irreducible (G H : Type) [Group G] [NormedAddCommGroup H]
     rw [imaginaryPart_apply_coe]
     exact (((hcT g).sub_left (hcS g)).smul_left _).smul_left _
   obtain ⟨a, ha⟩ := selfAdjoint_eq_algebraMap_of_commute_irreducible (⇑π) hirr _ (realPart T).2 hre
-  obtain ⟨b, hb⟩ := selfAdjoint_eq_algebraMap_of_commute_irreducible (⇑π) hirr _ (imaginaryPart T).2 him
+  obtain ⟨b, hb⟩ :=
+    selfAdjoint_eq_algebraMap_of_commute_irreducible (⇑π) hirr _ (imaginaryPart T).2 him
   refine ⟨(a : ℂ) + Complex.I * (b : ℂ), ?_⟩
   rw [← realPart_add_I_smul_imaginaryPart T, ha, hb, Algebra.algebraMap_eq_smul_one,
     Algebra.algebraMap_eq_smul_one, add_smul, mul_smul, ← Complex.coe_smul, ← Complex.coe_smul]

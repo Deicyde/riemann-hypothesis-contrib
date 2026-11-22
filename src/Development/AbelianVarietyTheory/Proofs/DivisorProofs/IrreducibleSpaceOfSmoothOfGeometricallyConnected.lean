@@ -11,9 +11,9 @@ open ReciprocityTheory.ChartRestriction.G.Out
 
 namespace GlobalTheory
 
-theorem irreducibleSpace_of_smooth_of_geometricallyConnected_domain :
-    ∀ (R : Type) [CommRing R] [IsDomain R] (G : Over (Spec (CommRingCat.of R))), Smooth G.hom →
-      GeometricallyConnected G.hom → Nonempty G.left → IrreducibleSpace G.left := by
+theorem irreducibleSpace_of_smooth_of_geometricallyConnected_domain
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (G : Over (Spec (CommRingCat.of R))),
+      Smooth G.hom → GeometricallyConnected G.hom → Nonempty G.left → IrreducibleSpace G.left := by
   intro R _ _ G hs hc _
   let K := FractionRing R
   let g : Spec (CommRingCat.of K) ⟶ Spec (CommRingCat.of R) :=

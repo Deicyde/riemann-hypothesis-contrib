@@ -9,8 +9,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open MeasureTheory PositivityTheory.Rg.Tf.Loc UpperTheory.V.Z.Tf.Orb
 open scoped ENNReal
 
-theorem UpperTheory.Gal.InertialTypesAlt.L.oneCoset :
-    UpperTheory.Gal.InertialTypesAlt.L.OneCoset := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.oneCoset
+    : UpperTheory.Gal.InertialTypesAlt.L.OneCoset := by
   classical
   intro G _ _ _ _ _ _ _ _ μ hμ K hKo hKc hK1 T hTc hTcomm ν hν F hF hFT q
   haveI := hμ
@@ -40,8 +40,7 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.oneCoset :
   have hHo : IsOpen Hs :=
     hKo.preimage (((continuous_const.mul continuous_subtype_val).mul continuous_const))
   have hHc : IsCompact Hs := by
-    have hS : IsCompact ((fun x : G => q * x * q⁻¹) '' (K : Set G)) :=
-      hKc.image (by fun_prop)
+    have hS : IsCompact ((fun x : G => q * x * q⁻¹) '' (K : Set G)) := hKc.image (by fun_prop)
     have hpc := hTc.isClosedEmbedding_subtypeVal.isCompact_preimage hS
     have e : Hs = Subtype.val ⁻¹' ((fun x : G => q * x * q⁻¹) '' (K : Set G)) := by
       ext t
@@ -54,8 +53,7 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.oneCoset :
         rwa [this]
     rw [e]
     exact hpc
-  have h1H : (1 : T) ∈ Hs := by
-    simpa [hHs] using K.one_mem
+  have h1H : (1 : T) ∈ Hs := by simpa [hHs] using K.one_mem
   set v : ℝ≥0∞ := ν Hs with hv
   have hv0 : v ≠ 0 := hHo.measure_ne_zero ν ⟨1, h1H⟩
   have hvt : v ≠ ∞ := hHc.measure_lt_top.ne
@@ -65,22 +63,24 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.oneCoset :
     constructor
     · rintro ⟨t, ht, y, hy, e⟩
       refine ⟨h⁻¹ * t, T.mul_mem (T.inv_mem hh) ht, y, hy, ?_⟩
-      calc g = h⁻¹ * (h * g) := by group
+      calc
+        g = h⁻¹ * (h * g) := by group
         _ = _ := by rw [e]; group
     · rintro ⟨t, ht, y, hy, rfl⟩
       exact ⟨h * t, T.mul_mem hh ht, y, hy, by group⟩
   set ρ' : G → ℝ≥0∞ := D.piecewise (qK.indicator fun _ => v⁻¹) ρ with hρ'def
   have hρ' : IsQuotNormaliser T ν ρ' := by
-    refine ⟨Measurable.piecewise hDo.measurableSet
-      (measurable_const.indicator hqKo.measurableSet) hρ.1, fun g => ?_⟩
+    refine ⟨
+      Measurable.piecewise hDo.measurableSet (measurable_const.indicator hqKo.measurableSet) hρ.1,
+      fun g => ?_
+    ⟩
     by_cases hg : g ∈ D
     · obtain ⟨t₀, ht₀, y, hy, rfl⟩ := hg
       set A : Set T := (fun h : T => h * (⟨t₀, ht₀⟩ : T)) ⁻¹' Hs with hA
       have hAm : MeasurableSet A := (hHo.preimage (continuous_mul_const _)).measurableSet
       have hpt : ∀ h : T, ρ' ((h : G) * (t₀ * q * y)) = A.indicator (fun _ => v⁻¹) h := by
         intro h
-        have hmem : (h : G) * (t₀ * q * y) ∈ D :=
-          (hDT _ h.2 _).2 ⟨t₀, ht₀, y, hy, rfl⟩
+        have hmem : (h : G) * (t₀ * q * y) ∈ D := (hDT _ h.2 _).2 ⟨t₀, ht₀, y, hy, rfl⟩
         rw [hρ'def, Set.piecewise_eq_of_mem _ _ _ hmem]
         have hiff : (h : G) * (t₀ * q * y) ∈ qK ↔ h ∈ A := by
           have e : q⁻¹ * ((h : G) * (t₀ * q * y)) = (q⁻¹ * ((h : G) * t₀) * q) * y := by group
@@ -104,8 +104,10 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.oneCoset :
     · rw [Set.indicator_of_mem hg, Set.indicator_of_mem ((hDT h hh g).2 hg), hFT h hh]
     · rw [Set.indicator_of_notMem hg, Set.indicator_of_notMem (fun c => hg ((hDT h hh g).1 c))]
   rw [quotIndep_holds G μ hμ T ν hsf hinv _ hFm hFinv ρ' hρ']
-  have hpt : ∀ g, D.indicator F g * ((ρ' g).toReal : ℂ) =
-      qK.indicator (fun g => ((v.toReal : ℝ) : ℂ)⁻¹ * F g) g := by
+  have hpt
+      : ∀ g,
+        D.indicator F g * ((ρ' g).toReal : ℂ)
+          = qK.indicator (fun g => ((v.toReal : ℝ) : ℂ)⁻¹ * F g) g := by
     intro g
     by_cases hg : g ∈ D
     · rw [Set.indicator_of_mem hg, hρ'def, Set.piecewise_eq_of_mem _ _ _ hg]
@@ -121,8 +123,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.oneCoset :
   have hpre : (fun y : G => q * y) ⁻¹' qK = (K : Set G) := by
     ext y
     simp [hqK]
-  have := (measurePreserving_mul_left μ q).setIntegral_preimage_emb
-    (measurableEmbedding_mulLeft q) F qK
+  have :=
+    (measurePreserving_mul_left μ q).setIntegral_preimage_emb (measurableEmbedding_mulLeft q) F qK
   rw [hpre] at this
   rw [this]
   rfl

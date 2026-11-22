@@ -21,8 +21,7 @@ theorem FlagQuotientHomogeneous.proof : FlagQuotientHomogeneous.Statement := by
     have h1 := HomogeneousComponentMul.proof σ ℚ A R m (m + j) hA
     rw [if_pos (Nat.le_add_right m j), Nat.add_sub_cancel_left] at h1
     have h2 : homogeneousComponent (m + j) (A * R) = 0 := by
-      rw [homogeneousComponent_of_mem ((mem_homogeneousSubmodule _ _).mpr hAR),
-        if_neg (by omega)]
+      rw [homogeneousComponent_of_mem ((mem_homogeneousSubmodule _ _).mpr hAR), if_neg (by omega)]
     rw [h2] at h1
     exact (mul_eq_zero.mp h1.symm).resolve_left hA0
   have hR : R = homogeneousComponent k R := by

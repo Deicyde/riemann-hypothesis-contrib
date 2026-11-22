@@ -15,7 +15,8 @@ namespace Formalism.InvariantFactorPaths.G7
 
 namespace ETerm
 
-open Formalism.DworkPowerSeriesWeights (Integral jetPair mfact jetPair_eq_sum jetPair_C_mul_right jetPair_sum_right)
+open Formalism.DworkPowerSeriesWeights
+  (Integral jetPair mfact jetPair_eq_sum jetPair_C_mul_right jetPair_sum_right)
 
 section Mono
 
@@ -320,13 +321,18 @@ lemma fact_dvd {Φ κ : Type} [Fintype Φ] [Fintype κ] (k : Φ ⊕ κ ⊕ Fin 2
 
 section Main
 
-variable {K Tp Lw Φ κ : Type} [NormedField K] [IsUltrametricDist K] [Fintype Tp] [Fintype Lw]
-  [Fintype Φ] [Fintype κ]
+variable
+  {K Tp Lw Φ κ : Type}
+  [NormedField K] [IsUltrametricDist K] [Fintype Tp] [Fintype Lw] [Fintype Φ] [Fintype κ]
 
-def piece (p : ℕ) (Z Y : MvPowerSeries (Tp ⊕ Lw) K) (aA : Φ → K) (dA : Φ → Tp →₀ ℕ) (aB : κ → K)
-    (dB : κ → Tp →₀ ℕ) (b : κ → Lw → K) : Φ ⊕ κ ⊕ Fin 2 → MvPowerSeries (Tp ⊕ Lw) K :=
-  Sum.elim (fun φ => MvPowerSeries.C (aA φ) * topMonoS (dA φ))
-    (Sum.elim (fun k => MvPowerSeries.C (aB k) * topMonoS (dB k) * lowLin (b k))
+def piece
+    (p : ℕ) (Z Y : MvPowerSeries (Tp ⊕ Lw) K) (aA : Φ → K) (dA : Φ → Tp →₀ ℕ) (aB : κ → K)
+    (dB : κ → Tp →₀ ℕ) (b : κ → Lw → K)
+    : Φ ⊕ κ ⊕ Fin 2 → MvPowerSeries (Tp ⊕ Lw) K :=
+  Sum.elim
+    (fun φ => MvPowerSeries.C (aA φ) * topMonoS (dA φ))
+    (Sum.elim
+      (fun k => MvPowerSeries.C (aB k) * topMonoS (dB k) * lowLin (b k))
       (fun t => if t = 0 then Z else MvPowerSeries.C (p : K) * Y))
 
 lemma sum_piece (p : ℕ) (Z Y : MvPowerSeries (Tp ⊕ Lw) K) (aA : Φ → K) (dA : Φ → Tp →₀ ℕ)
@@ -340,12 +346,12 @@ lemma sum_piece (p : ℕ) (Z Y : MvPowerSeries (Tp ⊕ Lw) K) (aA : Φ → K) (d
   ring
 
 def dTot (dA : Φ → Tp →₀ ℕ) (dB : κ → Tp →₀ ℕ) (k : Φ ⊕ κ ⊕ Fin 2 → ℕ) : Tp ⊕ Lw →₀ ℕ :=
-  ∑ φ, k (Sum.inl φ) • (dA φ).mapDomain Sum.inl +
-    ∑ x, k (Sum.inr (Sum.inl x)) • (dB x).mapDomain Sum.inl
+  ∑ φ, k (Sum.inl φ) • (dA φ).mapDomain Sum.inl
+    + ∑ x, k (Sum.inr (Sum.inl x)) • (dB x).mapDomain Sum.inl
 
 def cTot (p : ℕ) (aA : Φ → K) (aB : κ → K) (k : Φ ⊕ κ ⊕ Fin 2 → ℕ) : K :=
-  (∏ φ, aA φ ^ k (Sum.inl φ)) * (∏ x, aB x ^ k (Sum.inr (Sum.inl x))) *
-    (p : K) ^ k (Sum.inr (Sum.inr 1))
+  (∏ φ, aA φ ^ k (Sum.inl φ)) * (∏ x, aB x ^ k (Sum.inr (Sum.inl x)))
+    * (p : K) ^ k (Sum.inr (Sum.inr 1))
 
 lemma dTot_inl (dA : Φ → Tp →₀ ℕ) (dB : κ → Tp →₀ ℕ) (k : Φ ⊕ κ ⊕ Fin 2 → ℕ) (τ : Tp) :
     dTot (Lw := Lw) dA dB k (Sum.inl τ) =
@@ -388,16 +394,18 @@ lemma prod_piece (p : ℕ) (Z Y : MvPowerSeries (Tp ⊕ Lw) K) (aA : Φ → K) (
   rw [hA, hB, hC, mul_pow]
   ring
 
-def valid (p : ℕ) (aA : Φ → K) (dA : Φ → Tp →₀ ℕ) (aB : κ → K) (dB : κ → Tp →₀ ℕ) (b : κ → Lw → K)
-    (e : Tp →₀ ℕ) (Q : MvPolynomial Lw K) (w : (Φ → ℕ) × (κ →₀ ℕ) × ℕ × (Lw →₀ ℕ)) : Prop :=
-  w.2.2.2 ∈ (hasseDir b w.2.1 Q).support ∧ (∀ φ, w.1 φ ≠ 0 → aA φ ≠ 0) ∧
-    (∀ k, w.2.1 k ≠ 0 → aB k ≠ 0) ∧
-    (∀ τ, ∑ φ, w.1 φ * dA φ τ + ∑ k, w.2.1 k * dB k τ ≤ e τ) ∧ p * w.2.2.1 ≤ w.2.2.2.degree
+def valid
+    (p : ℕ) (aA : Φ → K) (dA : Φ → Tp →₀ ℕ) (aB : κ → K) (dB : κ → Tp →₀ ℕ) (b : κ → Lw → K)
+    (e : Tp →₀ ℕ) (Q : MvPolynomial Lw K) (w : (Φ → ℕ) × (κ →₀ ℕ) × ℕ × (Lw →₀ ℕ))
+    : Prop :=
+  w.2.2.2 ∈ (hasseDir b w.2.1 Q).support ∧ (∀ φ, w.1 φ ≠ 0 → aA φ ≠ 0)
+    ∧ (∀ k, w.2.1 k ≠ 0 → aB k ≠ 0) ∧ (∀ τ, ∑ φ, w.1 φ * dA φ τ + ∑ k, w.2.1 k * dB k τ ≤ e τ)
+    ∧ p * w.2.2.1 ≤ w.2.2.2.degree
 
-def bnd (K : Type) [NormedField K] (p : ℕ) (e : Tp →₀ ℕ)
-    (w : (Φ → ℕ) × (κ →₀ ℕ) × ℕ × (Lw →₀ ℕ)) : ℝ :=
-  (p : ℝ) ^ (∑ φ, w.1 φ + ∑ k, w.2.1 k + w.2.2.1) * ‖((mfact e : ℕ) : K)‖ *
-    ‖(((∑ k, w.2.1 k).factorial : ℕ) : K)‖ * ‖((mfact w.2.2.2 : ℕ) : K)‖
+def bnd (K : Type) [NormedField K] (p : ℕ) (e : Tp →₀ ℕ) (w : (Φ → ℕ) × (κ →₀ ℕ) × ℕ × (Lw →₀ ℕ))
+    : ℝ :=
+  (p : ℝ) ^ (∑ φ, w.1 φ + ∑ k, w.2.1 k + w.2.2.1) * ‖((mfact e : ℕ) : K)‖
+    * ‖(((∑ k, w.2.1 k).factorial : ℕ) : K)‖ * ‖((mfact w.2.2.2 : ℕ) : K)‖
 
 lemma term_bound (h1 : JetPairingHasseIdentity) (h2 : HasseDerivIntegralHomogeneous) (p : ℕ) (Z Y : MvPowerSeries (Tp ⊕ Lw) K)
     (aA : Φ → K) (dA : Φ → Tp →₀ ℕ) (aB : κ → K) (dB : κ → Tp →₀ ℕ) (b : κ → Lw → K)
@@ -497,7 +505,8 @@ end ETerm
 
 open Formalism.DworkPowerSeriesWeights (Integral jetPair mfact)
 
-theorem TermBound_of (h1 : JetPairingHasseIdentity) (h2 : HasseDerivIntegralHomogeneous) : TermBound := by
+theorem TermBound_of (h1 : JetPairingHasseIdentity) (h2 : HasseDerivIntegralHomogeneous)
+    : TermBound := by
   intro K Tp Lw Φ κ _ _ _ _ _ _ _ _ p D dQ h g Z Y aA dA aB dB b e Q hp hpn _ hg haA haB hb hZ hY
     hZlow hdec hQ hQh hD
   classical
@@ -513,14 +522,17 @@ theorem TermBound_of (h1 : JetPairingHasseIdentity) (h2 : HasseDerivIntegralHomo
       rw [← this, Finsupp.degree_eq_weight_one]
       rfl
     rw [ETerm.degree_jn, hnd, hD]
-  have key : jetPair (topMonoP e * lowPoly Q) g =
-      ∑ i ∈ range (D + 1), ∑ k ∈ Finset.piAntidiag (univ : Finset (Φ ⊕ κ ⊕ Fin 2)) i,
-        ((p : K) ^ i)⁻¹ * (((Nat.multinomial univ k : ℕ) : K) *
-          jetPair (topMonoP e * lowPoly Q)
-            ((∏ j, ETerm.piece p Z Y aA dA aB dB b j ^ k j) * U i)) := by
-    have h0 : jetPair (topMonoP e * lowPoly Q) g = jetPair (topMonoP e * lowPoly Q)
-        (∑ i ∈ range (D + 1), MvPowerSeries.C (((p : K) ^ i)⁻¹) *
-          ((∑ j, ETerm.piece p Z Y aA dA aB dB b j) ^ i * U i)) := by
+  have key
+      : jetPair (topMonoP e * lowPoly Q) g
+        = ∑ i ∈ range (D + 1), ∑ k ∈ Finset.piAntidiag (univ : Finset (Φ ⊕ κ ⊕ Fin 2)) i,
+            ((p : K) ^ i)⁻¹ * (((Nat.multinomial univ k : ℕ) : K) *
+              jetPair (topMonoP e * lowPoly Q)
+                ((∏ j, ETerm.piece p Z Y aA dA aB dB b j ^ k j) * U i)) := by
+    have h0
+        : jetPair (topMonoP e * lowPoly Q) g
+          = jetPair (topMonoP e * lowPoly Q)
+            (∑ i ∈ range (D + 1), MvPowerSeries.C (((p : K) ^ i)⁻¹) *
+              ((∑ j, ETerm.piece p Z Y aA dA aB dB b j) ^ i * U i)) := by
       refine ETerm.jetPair_congr _ _ _ fun m hm => ?_
       set_option synthInstance.maxHeartbeats 100000 in
         rw [hgU m, hsupp m hm, map_sum]
@@ -529,21 +541,26 @@ theorem TermBound_of (h1 : JetPairingHasseIdentity) (h2 : HasseDerivIntegralHomo
         ETerm.agree_mul (ETerm.agree_pow hag i) (ETerm.agree_refl D (U i)) m (hsupp m hm).le]
     rw [h0, Formalism.DworkPowerSeriesWeights.jetPair_sum_right]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [Formalism.DworkPowerSeriesWeights.jetPair_C_mul_right, Finset.sum_pow_eq_sum_piAntidiag, Finset.sum_mul,
-      Formalism.DworkPowerSeriesWeights.jetPair_sum_right, Finset.mul_sum]
+    rw [Formalism.DworkPowerSeriesWeights.jetPair_C_mul_right, Finset.sum_pow_eq_sum_piAntidiag,
+      Finset.sum_mul, Formalism.DworkPowerSeriesWeights.jetPair_sum_right, Finset.mul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
-    have hc : ((Nat.multinomial univ k : ℕ) : MvPowerSeries (Tp ⊕ Lw) K) =
-        MvPowerSeries.C ((Nat.multinomial univ k : ℕ) : K) := (map_natCast _ _).symm
+    have hc
+        : ((Nat.multinomial univ k : ℕ) : MvPowerSeries (Tp ⊕ Lw) K)
+          = MvPowerSeries.C ((Nat.multinomial univ k : ℕ) : K) :=
+      (map_natCast _ _).symm
     rw [mul_assoc, hc, Formalism.DworkPowerSeriesWeights.jetPair_C_mul_right]
   rw [key]
-  have hmain := ETerm.closure_sum (ETerm.valid p aA dA aB dB b e Q) (ETerm.bnd K p e)
-    (range (D + 1)) (fun i => ∑ k ∈ Finset.piAntidiag (univ : Finset (Φ ⊕ κ ⊕ Fin 2)) i,
-        ((p : K) ^ i)⁻¹ * (((Nat.multinomial univ k : ℕ) : K) *
-          jetPair (topMonoP e * lowPoly Q)
-            ((∏ j, ETerm.piece p Z Y aA dA aB dB b j ^ k j) * U i)))
-    (fun i _ => ETerm.closure_sum _ _ _ _ fun k hk =>
-      ETerm.term_bound h1 h2 p Z Y aA dA aB dB b e Q hp hpn haA haB hb hZ hY hZlow hQ i k
-        (Finset.mem_piAntidiag.1 hk).1 (U i) (hU i))
+  have hmain :=
+    ETerm.closure_sum (ETerm.valid p aA dA aB dB b e Q) (ETerm.bnd K p e) (range (D + 1))
+      (fun i =>
+        ∑ k ∈ Finset.piAntidiag (univ : Finset (Φ ⊕ κ ⊕ Fin 2)) i,
+          ((p : K) ^ i)⁻¹ * (((Nat.multinomial univ k : ℕ) : K) *
+            jetPair (topMonoP e * lowPoly Q)
+              ((∏ j, ETerm.piece p Z Y aA dA aB dB b j ^ k j) * U i)))
+      (fun i _ =>
+        ETerm.closure_sum _ _ _ _ fun k hk =>
+          ETerm.term_bound h1 h2 p Z Y aA dA aB dB b e Q hp hpn haA haB hb hZ hY hZlow hQ i k
+            (Finset.mem_piAntidiag.1 hk).1 (U i) (hU i))
   rcases hmain with h0 | ⟨⟨α, β, i2, n⟩, hv, hbd⟩
   · exact Or.inl h0
   · exact Or.inr ⟨α, β, i2, n, hv.1, hv.2.1, hv.2.2.1, hv.2.2.2.1, hv.2.2.2.2, hbd⟩

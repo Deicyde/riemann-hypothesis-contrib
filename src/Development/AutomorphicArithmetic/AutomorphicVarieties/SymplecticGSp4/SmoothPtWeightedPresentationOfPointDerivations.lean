@@ -5,31 +5,45 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem origin_part {O X B : Type} [CommRing O] [AddCommGroup X] [CommRing B] [Algebra O B]
-    (W : WPres O X B) (h : W.HasOrigin) {j : X} (hj : j ≠ 0) {x : B} (hx : x ∈ W.part j) :
-    W.origin h x = 0 := by
+private theorem origin_part
+    {O X B : Type} [CommRing O] [AddCommGroup X] [CommRing B] [Algebra O B]
+    (W : WPres O X B) (h : W.HasOrigin)
+    {j : X} (hj : j ≠ 0)
+    {x : B} (hx : x ∈ W.part j)
+    : W.origin h x = 0 := by
   obtain ⟨F, hF, rfl⟩ := hx
   refine (W.origin_π h F).trans ?_
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply]
   exact hF 0 (by rw [map_zero]; exact hj.symm)
 
-private theorem sep_char {O : Type} [CommRing O] (u : Oˣ) (hu : ¬ IsOfFinOrder u) {i j : ℤ × ℤ} (h : i ≠ j) :
-    ∃ t : Multiplicative (ℤ × ℤ) →* Oˣ, t (Multiplicative.ofAdd i) ≠ t (Multiplicative.ofAdd j) := by
+private theorem sep_char
+    {O : Type} [CommRing O] (u : Oˣ) (hu : ¬ IsOfFinOrder u) {i j : ℤ × ℤ} (h : i ≠ j)
+    : ∃ t : Multiplicative (ℤ × ℤ) →* Oˣ,
+      t (Multiplicative.ofAdd i) ≠ t (Multiplicative.ofAdd j) := by
   have hinj := injective_zpow_iff_not_isOfFinOrder.2 hu
   by_cases h1 : i.1 = j.1
-  · refine ⟨(zpowersHom Oˣ u).comp (AddMonoidHom.toMultiplicative (AddMonoidHom.snd ℤ ℤ)), fun e => h ?_⟩
+  · refine
+      ⟨(zpowersHom Oˣ u).comp (AddMonoidHom.toMultiplicative (AddMonoidHom.snd ℤ ℤ)), fun e => h ?_⟩
     exact Prod.ext h1 (hinj e)
-  · exact ⟨(zpowersHom Oˣ u).comp (AddMonoidHom.toMultiplicative (AddMonoidHom.fst ℤ ℤ)), fun e => h1 (hinj e)⟩
+  · exact ⟨
+      (zpowersHom Oˣ u).comp (AddMonoidHom.toMultiplicative (AddMonoidHom.fst ℤ ℤ)),
+      fun e => h1 (hinj e)
+    ⟩
 
-private theorem core {O B ι : Type} [CommRing O] [IsDomain O] [IsLocalRing O] [CommRing B] [Algebra O B] [IsCO O B]
-    [IsCO O (DualNumber O)] (u : Oˣ) (hu : ¬ IsOfFinOrder u)
-    (W : WPres O (ℤ × ℤ) B) (h : W.HasOrigin) (e : ι → B) (w : ι → ℤ × ℤ) (he : ∀ a, e a ∈ W.part (w a))
+private theorem core
+    {O B ι : Type} [CommRing O] [IsDomain O] [IsLocalRing O] [CommRing B] [Algebra O B] [IsCO O B]
+    [IsCO O (DualNumber O)]
+    (u : Oˣ) (hu : ¬ IsOfFinOrder u)
+    (W : WPres O (ℤ × ℤ) B) (h : W.HasOrigin)
+    (e : ι → B) (w : ι → ℤ × ℤ) (he : ∀ a, e a ∈ W.part (w a))
     (huniq : ∀ f f' : B →ₐ[O] DualNumber O, (∀ a, f (e a) = f' (e a)) → f = f')
     (y : B →ₐ[O] DualNumber O) (j : ℤ × ℤ)
-    (h1 : ∀ a, (y (e a)).fst = W.origin h (e a)) (h2 : ∀ a, w a ≠ j → (y (e a)).snd = 0) :
-    (∀ x, (y x).fst = W.origin h x) ∧ ∀ i, i ≠ j → ∀ x ∈ W.part i, (y x).snd = 0 := by
+    (h1 : ∀ a, (y (e a)).fst = W.origin h (e a)) (h2 : ∀ a, w a ≠ j → (y (e a)).snd = 0)
+    : (∀ x, (y x).fst = W.origin h x) ∧ ∀ i, i ≠ j → ∀ x ∈ W.part i, (y x).snd = 0 := by
   classical
   have hz : ∀ s, W.z s ∈ maximalIdeal B := by
     intro s
@@ -42,26 +56,33 @@ private theorem core {O B ι : Type} [CommRing O] [IsDomain O] [IsLocalRing O] [
     have h3 := hu'.map (W.origin h)
     rw [h0] at h3
     exact not_isUnit_zero h3
-  have hmul : ∀ (c : O) (d : DualNumber O), (algebraMap O (DualNumber O) c * d).fst = c * d.fst ∧
-      (algebraMap O (DualNumber O) c * d).snd = c * d.snd := by
+  have hmul
+      : ∀ (c : O) (d : DualNumber O),
+        (algebraMap O (DualNumber O) c * d).fst = c * d.fst
+          ∧ (algebraMap O (DualNumber O) c * d).snd = c * d.snd := by
     intro c d
     rw [Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul]
     exact ⟨rfl, rfl⟩
   have hfst : ∀ x, (y x).fst = W.origin h x := by
-    have key := huniq ((Algebra.ofId O (DualNumber O)).comp ((TrivSqZeroExt.fstHom O O O).comp y))
-      ((Algebra.ofId O (DualNumber O)).comp (W.origin h)) (by
-        intro a
-        simp only [AlgHom.comp_apply, TrivSqZeroExt.fstHom_apply, h1 a])
+    have key :=
+      huniq ((Algebra.ofId O (DualNumber O)).comp ((TrivSqZeroExt.fstHom O O O).comp y))
+        ((Algebra.ofId O (DualNumber O)).comp (W.origin h))
+        (by
+          intro a
+          simp only [AlgHom.comp_apply, TrivSqZeroExt.fstHom_apply, h1 a])
     intro x
     have h4 := congrArg TrivSqZeroExt.fst (AlgHom.congr_fun key x)
     simpa [Algebra.ofId_apply, TrivSqZeroExt.algebraMap_eq_inl] using h4
   refine ⟨hfst, ?_⟩
   intro i hij x hx
   obtain ⟨s, hs⟩ := sep_char u hu hij
-  obtain ⟨y1, hy1, -⟩ := tact O (ℤ × ℤ) B W hz (DualNumber O) y
-    ((Units.map (algebraMap O (DualNumber O)).toMonoidHom).comp s)
-  have hy1' : ∀ k, ∀ z ∈ W.part k, (y1 z).fst = ↑(s (Multiplicative.ofAdd k)) * (y z).fst ∧
-      (y1 z).snd = ↑(s (Multiplicative.ofAdd k)) * (y z).snd := by
+  obtain ⟨y1, hy1, -⟩ :=
+    tact O (ℤ × ℤ) B W hz (DualNumber O) y
+      ((Units.map (algebraMap O (DualNumber O)).toMonoidHom).comp s)
+  have hy1'
+      : ∀ k, ∀ z ∈ W.part k,
+        (y1 z).fst = ↑(s (Multiplicative.ofAdd k)) * (y z).fst
+          ∧ (y1 z).snd = ↑(s (Multiplicative.ofAdd k)) * (y z).snd := by
     intro k z hz'
     rw [hy1 k z hz']
     exact hmul _ _
@@ -100,8 +121,11 @@ private theorem core {O B ι : Type} [CommRing O] [IsDomain O] [IsLocalRing O] [
     rw [sub_mul, one_mul, hx1, sub_self]
   exact (mul_eq_zero.mp h6).resolve_left hne
 
-private theorem ex_unit (l : ℕ) [hl : Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] : ∃ u : Oˣ, ¬ IsOfFinOrder u := by
+private theorem ex_unit
+    (l : ℕ) [hl : Fact l.Prime]
+    (O : Type)
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+    : ∃ u : Oˣ, ¬ IsOfFinOrder u := by
   obtain ⟨hinj, -, -, -, -, -, -, -, hunit⟩ := dvrFacts l O
   have hnd : ¬ l ∣ (l + 1) := by
     intro h
@@ -121,14 +145,26 @@ private theorem ex_unit (l : ℕ) [hl : Fact l.Prime] (O : Type) [CommRing O] [I
   · exact hl.out.ne_zero (by omega)
   · exact hn.ne' h3
 
-theorem UpperTheory.smoothPt_weightedPresentation_of_pointDerivations :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ (L : LocBase D) (y : L.B →ₐ[c.O] DualNumber c.O) (j : ℤ × ℤ), (∀ (v : D.T) (g : D.Gp v) (a b : Fin 4), (y ((L.ρ v).hom g a b)).fst = D.r0 g a b ∧ (wt a b ≠ j → (y ((L.ρ v).hom g a b)).snd = 0)) → (∀ x, (y x).fst = L.W.origin L.org x) ∧ ∀ i, i ≠ j → ∀ x ∈ L.W.part i, (y x).snd = 0 := by
+theorem UpperTheory.smoothPt_weightedPresentation_of_pointDerivations
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ (L : LocBase D) (y : L.B →ₐ[c.O] DualNumber c.O) (j : ℤ × ℤ),
+          (∀ (v : D.T) (g : D.Gp v) (a b : Fin 4),
+              (y ((L.ρ v).hom g a b)).fst = D.r0 g a b
+                ∧ (wt a b ≠ j → (y ((L.ρ v).hom g a b)).snd = 0))
+            → (∀ x, (y x).fst = L.W.origin L.org x)
+              ∧ ∀ i, i ≠ j → ∀ x ∈ L.W.part i, (y x).snd = 0 := by
   intro Ω _ _ _ l _ c D _ L y j H
   haveI := c.dvr
   obtain ⟨u, hu⟩ := ex_unit l c.O
   refine core u hu L.W L.org (ι := (v : D.T) × D.Gp v × Fin 4 × Fin 4)
-    (fun a => (L.ρ a.1).hom a.2.1 a.2.2.1 a.2.2.2) (fun a => wt a.2.2.1 a.2.2.2) (fun a => L.hom _ _ _ _) ?_ y j
-    (fun a => (H _ _ _ _).1.trans (L.at0 _ _ _ _).symm) (fun a => (H _ _ _ _).2)
+    (fun a => (L.ρ a.1).hom a.2.1 a.2.2.1 a.2.2.2)
+    (fun a => wt a.2.2.1 a.2.2.2)
+    (fun a => L.hom _ _ _ _)
+    ?_ y j
+    (fun a => (H _ _ _ _).1.trans (L.at0 _ _ _ _).symm)
+    (fun a => (H _ _ _ _).2)
   intro f f' hff
   obtain ⟨f0, -, hf0⟩ := L.univ (DualNumber c.O) (fun v => (L.ρ v).map f) (L.eqs.map f)
   refine (hf0 f fun _ => rfl).trans (hf0 f' fun v => ?_).symm

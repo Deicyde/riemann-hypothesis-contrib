@@ -14,15 +14,20 @@ open NumberField Module
 
 namespace GlobalTheory
 
-theorem exists_isShortGen_of_short_span : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V] (N : (K →+* ℂ) → V → ℝ)
-    (L : Submodule (𝓞 K) V) (s : Set V) (A : ℝ), L.FG → (∀ σ x, 0 ≤ N σ x) →
-    (∀ σ (a : K) x, N σ (a • x) = ‖σ a‖ * N σ x) → (∀ σ x y, N σ (x + y) ≤ N σ x + N σ y) → s ⊆ L →
-    Submodule.span K s = ⊤ → (∀ y ∈ s, ∀ σ, N σ y ≤ A) →
-    ∃ (n : ℕ) (w : Fin n → V) (abelian₂ : ℝ), GlobalTheory.CompHt.IsShortGen N L w abelian₂ ∧
-      abelian₂ ≤ max 1 ((Module.finrank ℚ K : ℝ) ^ 4 * (Formalism.HN.rkK L : ℝ) *
-        |((NumberField.discr K : ℤ) : ℝ)| ^ (1 / (Module.finrank ℚ K : ℝ)) * A) ∧
-      n ≤ 2 * Module.finrank ℚ K * Formalism.HN.rkK L := by
+theorem exists_isShortGen_of_short_span
+    : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+        [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V] (N : (K →+* ℂ) → V → ℝ)
+        (L : Submodule (𝓞 K) V) (s : Set V) (A : ℝ),
+      L.FG → (∀ σ x, 0 ≤ N σ x) → (∀ σ (a : K) x, N σ (a • x) = ‖σ a‖ * N σ x)
+        → (∀ σ x y, N σ (x + y) ≤ N σ x + N σ y) → s ⊆ L → Submodule.span K s = ⊤
+        → (∀ y ∈ s, ∀ σ, N σ y ≤ A)
+        → ∃ (n : ℕ) (w : Fin n → V) (abelian₂ : ℝ),
+          GlobalTheory.CompHt.IsShortGen N L w abelian₂
+            ∧ abelian₂
+              ≤ max 1
+                ((Module.finrank ℚ K : ℝ) ^ 4 * (Formalism.HN.rkK L : ℝ)
+                  * |((NumberField.discr K : ℤ) : ℝ)| ^ (1 / (Module.finrank ℚ K : ℝ)) * A)
+            ∧ n ≤ 2 * Module.finrank ℚ K * Formalism.HN.rkK L := by
   intro K V _ _ _ _ _ _ _ N L s A hLfg h0 hsm hadd hsL hsp hA
   classical
   letI : Module ℚ V := Module.compHom V (algebraMap ℚ K)
@@ -30,8 +35,7 @@ theorem exists_isShortGen_of_short_span : ∀ (K V : Type) [Field K] [NumberFiel
     show (q • a) • x = (algebraMap ℚ K q) • (a • x)
     rw [Algebra.smul_def, mul_smul]⟩
   have hspL : Submodule.span K (L : Set V) = ⊤ := eq_top_iff.2 (hsp ▸ Submodule.span_mono hsL)
-  have hrk : Formalism.HN.rkK L = Module.finrank K V := by
-    rw [Formalism.HN.rkK, hspL, finrank_top]
+  have hrk : Formalism.HN.rkK L = Module.finrank K V := by rw [Formalism.HN.rkK, hspL, finrank_top]
 
   obtain ⟨t, hts, htsp, hti⟩ := exists_linearIndependent K s
   let vb : Basis t K V := Basis.mk hti (by rw [Subtype.range_coe, htsp, hsp])
@@ -50,7 +54,8 @@ theorem exists_isShortGen_of_short_span : ∀ (K V : Type) [Field K] [NumberFiel
     exact algebraMap_smul K (ω p.1) (p.2 : V)
 
   have hN0 : ∀ σ, N σ 0 = 0 := fun σ => by simpa using hsm σ 0 0
-  have hsum : ∀ σ {ι : Type} (S : Finset ι) (f : ι → V), N σ (∑ i ∈ S, f i) ≤ ∑ i ∈ S, N σ (f i) := by
+  have hsum
+      : ∀ σ {ι : Type} (S : Finset ι) (f : ι → V), N σ (∑ i ∈ S, f i) ≤ ∑ i ∈ S, N σ (f i) := by
     intro σ ι S f
     induction S using Finset.induction_on with
     | empty => simp [hN0]
@@ -79,8 +84,9 @@ theorem exists_isShortGen_of_short_span : ∀ (K V : Type) [Field K] [NumberFiel
     exact Submodule.sum_mem _ fun p _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨p, rfl⟩)
   have hred_le : ∀ σ x, N σ (red x) ≤ ((finrank ℚ K : ℝ) * Formalism.HN.rkK L) * C := fun σ x => by
     refine (hsum σ _ _).trans ?_
-    have hle : ∀ p ∈ (Finset.univ : Finset (Fin (finrank ℚ K) × t)),
-        N σ (Int.fract (E.repr x p) • E p) ≤ C := fun p _ => by
+    have hle
+        : ∀ p ∈ (Finset.univ : Finset (Fin (finrank ℚ K) × t)),
+          N σ (Int.fract (E.repr x p) • E p) ≤ C := fun p _ => by
       rw [hq]
       have h1 : |((Int.fract (E.repr x p) : ℚ) : ℝ)| ≤ 1 := by
         rw [abs_of_nonneg (Rat.cast_nonneg.2 (Int.fract_nonneg _))]
@@ -88,7 +94,8 @@ theorem exists_isShortGen_of_short_span : ∀ (K V : Type) [Field K] [NumberFiel
       exact (mul_le_of_le_one_left (h0 _ _) h1).trans (hEle σ p)
     refine (Finset.sum_le_card_nsmul _ _ _ hle).trans (le_of_eq ?_)
     rw [nsmul_eq_mul, Finset.card_univ, Fintype.card_prod, Fintype.card_fin, hm]
-    push_cast; ring
+    push_cast
+    ring
 
   haveI : NoZeroSMulDivisors ℤ V := ⟨fun {c x} h => by
     rw [← Int.cast_smul_eq_zsmul K] at h
@@ -98,27 +105,41 @@ theorem exists_isShortGen_of_short_span : ∀ (K V : Type) [Field K] [NumberFiel
   haveI : Module.Free ℤ Lz := Module.free_of_finite_type_torsion_free'
   let ZB := Module.Free.chooseBasis ℤ Lz
   let bZ : Module.Free.ChooseBasisIndex ℤ Lz → V := fun j => (ZB j : V)
-  have hZq : LinearIndependent ℚ bZ := (LinearIndependent.iff_fractionRing ℤ ℚ).1
-    (ZB.linearIndependent.map' Lz.subtype (Submodule.ker_subtype _))
+  have hZq : LinearIndependent ℚ bZ :=
+    (LinearIndependent.iff_fractionRing ℤ ℚ).1
+      (ZB.linearIndependent.map' Lz.subtype (Submodule.ker_subtype _))
   haveI : Module.Finite ℚ V := Module.Finite.of_basis E
-  have hcardZ : Fintype.card (Module.Free.ChooseBasisIndex ℤ Lz) ≤ Fintype.card (Fin (finrank ℚ K) × t) := by
+  have hcardZ
+      : Fintype.card (Module.Free.ChooseBasisIndex ℤ Lz)
+        ≤ Fintype.card (Fin (finrank ℚ K) × t) := by
     rw [← finrank_eq_card_basis E]; exact hZq.fintype_card_le_finrank
   have hLz : Lz = Submodule.span ℤ (Set.range bZ) := by
-    rw [show Set.range bZ = Lz.subtype '' Set.range ZB from Set.range_comp _ _, ← Submodule.map_span,
-      ZB.span_eq, Submodule.map_top, Submodule.range_subtype]
+    rw [show Set.range bZ = Lz.subtype '' Set.range ZB from Set.range_comp _ _,
+      ← Submodule.map_span, ZB.span_eq, Submodule.map_top, Submodule.range_subtype]
 
-  let F : (Fin (finrank ℚ K) × t) ⊕ Module.Free.ChooseBasisIndex ℤ Lz → V := Sum.elim E (fun j => red (bZ j))
+  let F : (Fin (finrank ℚ K) × t) ⊕ Module.Free.ChooseBasisIndex ℤ Lz → V :=
+    Sum.elim E (fun j => red (bZ j))
   let e := Fintype.equivFin ((Fin (finrank ℚ K) × t) ⊕ Module.Free.ChooseBasisIndex ℤ Lz)
   have hEL : ∀ p, E p ∈ L := fun p => by rw [hE]; exact L.smul_mem _ (hsL (hts p.2.2))
   have hspanE : Submodule.span ℤ (Set.range E) ≤ Lz :=
     Submodule.span_le.2 (by rintro _ ⟨p, rfl⟩; exact hEL p)
   have hrng : Set.range (F ∘ e.symm) = Set.range F := e.symm.surjective.range_comp F
-  have hbig : ((finrank ℚ K : ℝ) * Formalism.HN.rkK L) * C ≤ max 1 ((finrank ℚ K : ℝ) ^ 4 * (Formalism.HN.rkK L : ℝ) *
-      |((NumberField.discr K : ℤ) : ℝ)| ^ (1 / (finrank ℚ K : ℝ)) * A) := by
+  have hbig
+      : ((finrank ℚ K : ℝ) * Formalism.HN.rkK L) * C
+        ≤ max 1
+          ((finrank ℚ K : ℝ) ^ 4 * (Formalism.HN.rkK L : ℝ)
+            * |((NumberField.discr K : ℤ) : ℝ)| ^ (1 / (finrank ℚ K : ℝ)) * A) := by
     refine le_trans (le_of_eq ?_) (le_max_right _ _); rw [hC]; ring
-  refine ⟨Fintype.card _, F ∘ e.symm, max 1 ((finrank ℚ K : ℝ) ^ 4 * (Formalism.HN.rkK L : ℝ) *
-      |((NumberField.discr K : ℤ) : ℝ)| ^ (1 / (finrank ℚ K : ℝ)) * A),
-    ⟨fun x => ?_, fun i σ => ?_, le_max_left _ _⟩, le_rfl, ?_⟩
+  refine ⟨
+    Fintype.card _,
+    F ∘ e.symm,
+    max 1
+      ((finrank ℚ K : ℝ) ^ 4 * (Formalism.HN.rkK L : ℝ)
+        * |((NumberField.discr K : ℤ) : ℝ)| ^ (1 / (finrank ℚ K : ℝ)) * A),
+    ⟨fun x => ?_, fun i σ => ?_, le_max_left _ _⟩,
+    le_rfl,
+    ?_
+  ⟩
   · rw [hrng]
     constructor
     · intro hx
@@ -126,19 +147,24 @@ theorem exists_isShortGen_of_short_span : ∀ (K V : Type) [Field K] [NumberFiel
       rw [hLz] at hx'
       refine (Submodule.span_le.2 ?_) hx'
       rintro _ ⟨j, rfl⟩
-      have h1 : red (bZ j) ∈ Submodule.span ℤ (Set.range F) := Submodule.subset_span ⟨Sum.inr j, rfl⟩
+      have h1 : red (bZ j) ∈ Submodule.span ℤ (Set.range F) :=
+        Submodule.subset_span ⟨Sum.inr j, rfl⟩
       have h2 : bZ j - red (bZ j) ∈ Submodule.span ℤ (Set.range F) :=
         Submodule.span_mono (by rintro _ ⟨p, rfl⟩; exact ⟨Sum.inl p, rfl⟩) (hred_sub _)
       simpa using add_mem h2 h1
     · intro hx
-      have : x ∈ Lz := (Submodule.span_le (p := Lz)).2 (by
-        rintro _ ⟨q | j, rfl⟩
-        · exact hEL q
-        · have h1 : bZ j ∈ Lz := (ZB j).2
-          have h2 := hspanE (hred_sub (bZ j))
-          have e1 : red (bZ j) = bZ j - (bZ j - red (bZ j)) := by abel
-          show red (bZ j) ∈ Lz
-          rw [e1]; exact sub_mem h1 h2) hx
+      have : x ∈ Lz :=
+        (Submodule.span_le (p := Lz)).2
+          (by
+            rintro _ ⟨q | j, rfl⟩
+            · exact hEL q
+            · have h1 : bZ j ∈ Lz := (ZB j).2
+              have h2 := hspanE (hred_sub (bZ j))
+              have e1 : red (bZ j) = bZ j - (bZ j - red (bZ j)) := by abel
+              show red (bZ j) ∈ Lz
+              rw [e1]
+              exact sub_mem h1 h2)
+          hx
       exact this
   · refine le_trans ?_ hbig
     rw [Function.comp_apply]

@@ -16,7 +16,8 @@ open Formalism.BasicNotions Formalism.L2.DIV
 
 variable {ι : Type} [Fintype ι] {n n' : ℕ}
 
-theorem fockF_eq_fockS {σ : Type} (f : MvPolynomial σ ℂ) : Formalism.REAL.fockF f f = fockS f f := by
+theorem fockF_eq_fockS {σ : Type} (f : MvPolynomial σ ℂ)
+    : Formalism.REAL.fockF f f = fockS f f := by
   unfold Formalism.REAL.fockF fockS mfact
   refine Finset.sum_congr rfl fun m _ => ?_
   ring

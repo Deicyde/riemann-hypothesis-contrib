@@ -6,14 +6,18 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.GzEq
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
 open Classical in
 private noncomputable def UpperTheory.Comparison₂.level_family_wt (Λ : Level) (ψ : PChar) : ℝ :=
   if ψ = PChar.one then 1 else Λ.wt ψ
 
-private theorem UpperTheory.Comparison₂.level_family_wt_pos (Λ : Level) (ψ : PChar) : 0 < UpperTheory.Comparison₂.level_family_wt Λ ψ := by
+private theorem UpperTheory.Comparison₂.level_family_wt_pos (Λ : Level) (ψ : PChar)
+    : 0 < UpperTheory.Comparison₂.level_family_wt Λ ψ := by
   unfold UpperTheory.Comparison₂.level_family_wt Level.wt
   split_ifs
   · exact one_pos
@@ -28,8 +32,9 @@ private theorem UpperTheory.Comparison₂.level_family_adm (ψ : PChar) : ψ.N =
     exact hp.symm
   · exact Or.inr h
 
-private theorem UpperTheory.Comparison₂.level_family_sum (Λ : Level) (y : ℝ) :
-    ∑ ψ ∈ Λ.KEPT, UpperTheory.Comparison₂.level_family_wt Λ ψ * (Deduction.Gchi ψ.χ y).re = Λ.Gm y := by
+private theorem UpperTheory.Comparison₂.level_family_sum (Λ : Level) (y : ℝ)
+    : ∑ ψ ∈ Λ.KEPT, UpperTheory.Comparison₂.level_family_wt Λ ψ * (Deduction.Gchi ψ.χ y).re
+      = Λ.Gm y := by
   classical
   rw [← Finset.add_sum_erase _ _ Λ.one_mem, Level.Gm, Level.Nt]
   congr 1
@@ -37,8 +42,9 @@ private theorem UpperTheory.Comparison₂.level_family_sum (Λ : Level) (y : ℝ
       simp [UpperTheory.Comparison₂.level_family_wt]
     have hG : Formalism.Gz y = An.G y := by
       unfold Formalism.Gz Formalism.Sz An.G
-      have hsum : (∑ n ∈ Finset.Icc 1 ⌊y⌋₊, ArithmeticFunction.vonMangoldt n * (y / n - 1)) =
-          ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, An.abelian₂ n * max (y / n - 1) 0 := by
+      have hsum
+          : (∑ n ∈ Finset.Icc 1 ⌊y⌋₊, ArithmeticFunction.vonMangoldt n * (y / n - 1))
+            = ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, An.abelian₂ n * max (y / n - 1) 0 := by
         apply Finset.sum_congr rfl
         intro n hn
         obtain ⟨hn₁, hn₂⟩ := Finset.mem_Icc.mp hn
@@ -57,12 +63,24 @@ private theorem UpperTheory.Comparison₂.level_family_sum (Λ : Level) (y : ℝ
     have hne : ψ ≠ PChar.one := Finset.ne_of_mem_erase hψ
     simp only [UpperTheory.Comparison₂.level_family_wt, ite_eq_right hne, gChi_eq]
 
-theorem UpperTheory.Comparison₂.level_family :
-    ∀ Λ : Level, ∃ F : Deduction.CharFamily, (∀ y, Deduction.Gm F y = Λ.Gm y) ∧ ∀ θ, Deduction.ZeroFree F θ ↔ Λ.ZeroFreeAbove θ := by
+theorem UpperTheory.Comparison₂.level_family
+    : ∀ Λ : Level, ∃ F : Deduction.CharFamily,
+      (∀ y, Deduction.Gm F y = Λ.Gm y) ∧ ∀ θ, Deduction.ZeroFree F θ ↔ Λ.ZeroFreeAbove θ := by
   intro Λ
-  refine ⟨@Deduction.CharFamily.mk Λ.KEPT _ (fun i => i.1.N) (fun i => i.1.ne) (fun i => i.1.χ) (fun i => UpperTheory.Comparison₂.level_family_wt Λ i.1) (fun i => UpperTheory.Comparison₂.level_family_wt_pos Λ i.1) (fun i => UpperTheory.Comparison₂.level_family_adm i.1), fun y => ?_, fun θ => ?_⟩
+  refine ⟨
+    @Deduction.CharFamily.mk Λ.KEPT _
+      (fun i => i.1.N)
+      (fun i => i.1.ne)
+      (fun i => i.1.χ)
+      (fun i => UpperTheory.Comparison₂.level_family_wt Λ i.1)
+      (fun i => UpperTheory.Comparison₂.level_family_wt_pos Λ i.1)
+      (fun i => UpperTheory.Comparison₂.level_family_adm i.1),
+    fun y => ?_,
+    fun θ => ?_
+  ⟩
   · rw [← UpperTheory.Comparison₂.level_family_sum Λ y, Deduction.Gm]
-    exact Finset.sum_coe_sort Λ.KEPT (fun ψ => UpperTheory.Comparison₂.level_family_wt Λ ψ * (Deduction.Gchi ψ.χ y).re)
+    exact Finset.sum_coe_sort Λ.KEPT
+      (fun ψ => UpperTheory.Comparison₂.level_family_wt Λ ψ * (Deduction.Gchi ψ.χ y).re)
   · simp only [Deduction.ZeroFree, Level.ZeroFreeAbove, PChar.ZeroFreeAbove]
     constructor
     · intro h ψ hψ s hs

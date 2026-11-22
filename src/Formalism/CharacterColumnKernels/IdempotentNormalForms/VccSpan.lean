@@ -16,9 +16,12 @@ theorem descent : StatDescent := by
     rw [ccIdeal, RingHom.mem_ker]
     funext x
     have hx : x.1 ∉ Z := x.2
-    have h0 := hind x.1 hx (fun k => a k x.1) (fun x' hx' => by
-      have e := hvan x' (by rw [hx']; exact hx)
-      simpa [hx', Finset.sum_apply, Pi.mul_apply, Function.comp] using e)
+    have h0 :=
+      hind x.1 hx
+        (fun k => a k x.1)
+        (fun x' hx' => by
+          have e := hvan x' (by rw [hx']; exact hx)
+          simpa [hx', Finset.sum_apply, Pi.mul_apply, Function.comp] using e)
     have e2 := congrFun h0 k
     simpa [resOff] using e2
   rw [Finset.sum_apply]
@@ -32,7 +35,8 @@ theorem vccSpan : StatVccSpan := by
   | mem s hs =>
     obtain ⟨c, hc, rfl⟩ := hs
     exact iInf₂_le c hc
-  | zero => simp
+  | zero =>
+    simp
   | add a b _ _ ha hb =>
     exact le_trans (le_min ha hb) IsDiscreteValuationRing.addVal_add
   | smul r a _ ha =>

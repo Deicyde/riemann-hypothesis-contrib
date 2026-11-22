@@ -11,10 +11,12 @@ open GlobalTheory.PRep GlobalTheory.SmGL ValuativeRel PositivityTheory.Lbc
 
 namespace GlobalTheory.CompanionTheory.Lbc
 
-theorem hecke_dominant_mul : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k], PositivityTheory.Lbc.C1 k := by
+theorem hecke_dominant_mul
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      PositivityTheory.Lbc.C1 k := by
   intro k _ _ _ _ N h d hd J hJo hJc hIw hpos V _ _ π hπ t t' ht ht' T T' hT hT' v l hl
-  obtain ⟨r, hr, x, hxN, hx⟩ := GlobalTheory.T.dominant_iwahori_coset_reps k N h d hd J hJo hJc hIw hpos t' ht'
+  obtain ⟨r, hr, x, hxN, hx⟩ :=
+    GlobalTheory.T.dominant_iwahori_coset_reps k N h d hd J hJo hJc hIw hpos t' ht'
   have hxJ : ∀ i, x i ∈ J := fun i => (hxN i).1
   have hform := GlobalTheory.T.hecke_operator_coset_sum k N J hJc V π hπ _ T' hT' r x hr hxJ hx v
   have hr0 : (r : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hr.ne'

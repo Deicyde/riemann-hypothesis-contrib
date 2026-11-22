@@ -19,9 +19,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL Formalism.BasicNotions UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL Formalism.BasicNotions UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 open UpperTheory.V.W (Plc Lp)
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -31,24 +34,36 @@ section SlopeTestRemainingChoices
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
-theorem exFin (n : ℕ) : ∃ p : UA L n →* finU (E := L) (n := n),
-    (∀ f : finU (E := L) (n := n), ∀ k ∈ infU L n, p ((f : UA L n) * k) = f) ∧ ∀ x : UA L n, ∃ k ∈ infU L n, x = (p x : UA L n) * k := by
+theorem exFin (n : ℕ)
+    : ∃ p : UA L n →* finU (E := L) (n := n),
+      (∀ f : finU (E := L) (n := n), ∀ k ∈ infU L n, p ((f : UA L n) * k) = f)
+        ∧ ∀ x : UA L n, ∃ k ∈ infU L n, x = (p x : UA L n) * k := by
   obtain ⟨-, -, hs, hc, he, hm, -, -⟩ := uaFacts L n
   have hone : ∀ x : UA L n, x ∈ finU (E := L) (n := n) → x ∈ infU L n → x = 1 := fun x h₁ h₂ =>
     he x 1 (fun w => by rw [(hm x).2.1 h₂ w, map_one]) (fun τ => by rw [(hm x).1.1 h₁ τ, map_one])
-  have hu : ∀ f ∈ finU (E := L) (n := n), ∀ k ∈ infU L n, ∀ f' ∈ finU (E := L) (n := n), ∀ k' ∈ infU L n, f * k = f' * k' → f = f' := by
+  have hu
+      : ∀ f ∈ finU (E := L) (n := n), ∀ k ∈ infU L n, ∀ f' ∈ finU (E := L) (n := n),
+        ∀ k' ∈ infU L n,
+          f * k = f' * k' → f = f' := by
     intro f hf k hk f' hf' k' hk' h
     have h₀ : f'⁻¹ * f = k' * k⁻¹ := by
       rw [inv_mul_eq_iff_eq_mul, ← mul_assoc, ← h, mul_inv_cancel_right]
     have h₁ := hone _ (mul_mem (inv_mem hf') hf) (h₀ ▸ mul_mem hk' (inv_mem hk))
     exact (inv_mul_eq_one.1 h₁).symm
   choose f hf k hk hx using hs
-  refine ⟨{ toFun := fun x => ⟨f x, hf x⟩, map_one' := ?_, map_mul' := ?_ }, ?_, fun x => ⟨k x, hk x, hx x⟩⟩
+  refine ⟨
+    { toFun := fun x => ⟨f x, hf x⟩, map_one' := ?_, map_mul' := ?_ },
+    ?_,
+    fun x => ⟨k x, hk x, hx x⟩
+  ⟩
   · exact Subtype.ext (hu _ (hf 1) _ (hk 1) 1 (one_mem _) 1 (one_mem _) (by rw [← hx, one_mul]))
   · intro x y
-    refine Subtype.ext (hu _ (hf (x * y)) _ (hk (x * y)) (f x * f y) (mul_mem (hf x) (hf y)) (k x * k y) (mul_mem (hk x) (hk y)) ?_)
+    refine Subtype.ext (hu _ (hf (x * y)) _ (hk (x * y)) (f x * f y) (mul_mem (hf x) (hf y))
+      (k x * k y) (mul_mem (hk x) (hk y)) ?_)
     have hxy := (hc _ (hf y) _ (hk x)).eq
-    calc f (x * y) * k (x * y) = (f x * k x) * (f y * k y) := by rw [← hx, ← hx, ← hx]
+    calc
+      f (x * y) * k (x * y)
+        = (f x * k x) * (f y * k y) := by rw [← hx, ← hx, ← hx]
       _ = f x * (k x * f y) * k y := by simp only [mul_assoc]
       _ = f x * (f y * k x) * k y := by rw [hxy]
       _ = _ := by simp only [mul_assoc]
@@ -60,8 +75,9 @@ theorem infC_fin {n : ℕ} {x : UA L n} (h : x ∈ finU (E := L) (n := n)) : inf
   funext v
   exact (hm x).1.1 h v.embedding
 
-theorem cD_rS (B : Bridge L) (n : ℕ) (e : ℤ) (γ : SU B.Δ) :
-    Wt.cD (em B) n e (γ : DX B.Δ) = repE n (0 : InfinitePlace L → ℤ) (infC L 2 (B.rS γ : UA L 2)) := by
+theorem cD_rS (B : Bridge L) (n : ℕ) (e : ℤ) (γ : SU B.Δ)
+    : Wt.cD (em B) n e (γ : DX B.Δ)
+      = repE n (0 : InfinitePlace L → ℤ) (infC L 2 (B.rS γ : UA L 2)) := by
   have h₁ : Wt.infG (em B) 2 ((γ : DX B.Δ) : GL (Fin 2) _) = infC L 2 (B.rS γ : UA L 2) := by
     funext v
     apply Units.ext
@@ -69,12 +85,17 @@ theorem cD_rS (B : Bridge L) (n : ℕ) (e : ℤ) (γ : SU B.Δ) :
     rw [B.rS_inf]
     rfl
   have hdet : Matrix.GeneralLinearGroup.det ((γ : DX B.Δ) : GL (Fin 2) (Lsq (Lp L) B.Δ)) = 1 :=
-    MonoidHom.mem_ker.1 (show (γ : DX B.Δ) ∈ ((Matrix.GeneralLinearGroup.det (n := Fin 2) (R := Lsq (Lp L) B.Δ)).comp (DX B.Δ).subtype).ker from γ.2)
+    MonoidHom.mem_ker.1 (show (γ : DX B.Δ)
+        ∈ ((Matrix.GeneralLinearGroup.det (n := Fin 2) (R := Lsq (Lp L) B.Δ)).comp
+          (DX B.Δ).subtype).ker from
+      γ.2)
   have h₂ : Wt.detE 2 e (Wt.infG (em B) 2 ((γ : DX B.Δ) : GL (Fin 2) _)) = 1 := by
     show ∏ v, Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.map (em B v) ((γ : DX B.Δ) : GL (Fin 2) _)) ^ e = 1
     simp [Matrix.GeneralLinearGroup.map_det, hdet]
   show Wt.repD _ n e (Wt.infG (em B) 2 ((γ : DX B.Δ) : GL (Fin 2) _)) = _
-  have h₃ : ∀ g : InfinitePlace L → GL (Fin 2) ℂ, repE n (0 : InfinitePlace L → ℤ) g = Wt.mRep 2 _ g := fun g => by
+  have h₃
+      : ∀ g : InfinitePlace L → GL (Fin 2) ℂ,
+        repE n (0 : InfinitePlace L → ℤ) g = Wt.mRep 2 _ g := fun g => by
     show ((∏ v, Matrix.GeneralLinearGroup.det (g v) ^ (0 : InfinitePlace L → ℤ) v : ℂˣ) : ℂ) • Wt.mRep 2 _ g = _
     simp
   rw [Wt.repD_apply, h₂, h₁, h₃]
@@ -100,17 +121,29 @@ section Aux2
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
-theorem comm_mem (x y : finU (E := L) (n := 2)) : x * y * x⁻¹ * y⁻¹ ∈ (SUA L).subgroupOf (finU (E := L) (n := 2)) := by
+theorem comm_mem (x y : finU (E := L) (n := 2))
+    : x * y * x⁻¹ * y⁻¹ ∈ (SUA L).subgroupOf (finU (E := L) (n := 2)) := by
   rw [Subgroup.mem_subgroupOf]
   refine MonoidHom.mem_ker.2 ?_
-  rw [Subgroup.coe_mul, Subgroup.coe_mul, Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_inv, map_mul, map_mul, map_mul, map_inv, map_inv]
+  rw [Subgroup.coe_mul, Subgroup.coe_mul, Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_inv,
+    map_mul, map_mul, map_mul, map_inv, map_inv]
   exact comm_one _ _
 
-theorem rat_iota (B : Bridge L) (hB : B.Ok) (p : UA L 2 →* finU (E := L) (n := 2))
-    (hp1 : ∀ f : finU (E := L) (n := 2), ∀ k ∈ infU L 2, p ((f : UA L 2) * k) = f) (ι : DX B.Δ →* DA B.Δ) (hι : IsIotaD ι) (γ₀ : SU B.Δ) :
-    ∃ h : ι γ₀ ∈ SA B.Δ, ((B.bS ⟨ι γ₀, h⟩ : ↥(finU (E := L) (n := 2) ⊓ SUA L)) : UA L 2) = (p (B.rS γ₀ : UA L 2) : UA L 2) := by
+theorem rat_iota
+    (B : Bridge L) (hB : B.Ok)
+    (p : UA L 2 →* finU (E := L) (n := 2))
+    (hp1 : ∀ f : finU (E := L) (n := 2), ∀ k ∈ infU L 2, p ((f : UA L 2) * k) = f)
+    (ι : DX B.Δ →* DA B.Δ) (hι : IsIotaD ι)
+    (γ₀ : SU B.Δ)
+    : ∃ h : ι γ₀ ∈ SA B.Δ,
+      ((B.bS ⟨ι γ₀, h⟩ : ↥(finU (E := L) (n := 2) ⊓ SUA L)) : UA L 2)
+        = (p (B.rS γ₀ : UA L 2) : UA L 2) := by
   have hdet : (mt (γ₀ : DX B.Δ)).det = 1 :=
-    congrArg Units.val (MonoidHom.mem_ker.1 (show (γ₀ : DX B.Δ) ∈ ((Matrix.GeneralLinearGroup.det (n := Fin 2) (R := Lsq (Lp L) B.Δ)).comp (DX B.Δ).subtype).ker from γ₀.2))
+    congrArg Units.val
+      (MonoidHom.mem_ker.1 (show (γ₀ : DX B.Δ)
+          ∈ ((Matrix.GeneralLinearGroup.det (n := Fin 2) (R := Lsq (Lp L) B.Δ)).comp
+            (DX B.Δ).subtype).ker from
+        γ₀.2))
   have hmem : ι γ₀ ∈ SA B.Δ := by
     refine Subgroup.mem_iInf.2 fun v => ?_
     show (ι γ₀).1 v ∈ SU (cv v B.Δ)
@@ -136,21 +169,28 @@ variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 def eS (B : Bridge L) : SA B.Δ ≃* ↥((SUA L).subgroupOf (finU (E := L) (n := 2))) := B.bS.trans eT
 
 set_option maxHeartbeats 2000000 in
-theorem left_eq (B : Bridge L) (hB : B.Ok) (p : UA L 2 →* finU (E := L) (n := 2))
+theorem left_eq
+    (B : Bridge L) (hB : B.Ok)
+    (p : UA L 2 →* finU (E := L) (n := 2))
     (hp1 : ∀ f : finU (E := L) (n := 2), ∀ k ∈ infU L 2, p ((f : UA L 2) * k) = f)
     (hp2 : ∀ x : UA L 2, ∃ k ∈ infU L 2, x = (p x : UA L 2) * k)
-    {m : ℕ} (hm : 3 ≤ m) {U : Subgroup (UA L 2)} (hU : IsCong m U) (ι : DX B.Δ →* DA B.Δ) (hι : IsIotaD ι)
+    {m : ℕ} (hm : 3 ≤ m)
+    {U : Subgroup (UA L 2)} (hU : IsCong m U)
+    (ι : DX B.Δ →* DA B.Δ) (hι : IsIotaD ι)
     {n : ℕ} {e : ℤ} (ψ : SA B.Δ → Wt.VD (InfinitePlace L) n)
-    (h0 : ∀ (γ : SU B.Δ) (g g' : SA B.Δ), (g' : DA B.Δ) = ι γ * g → ψ g' = Wt.cD (em B) n e (γ : DX B.Δ) (ψ g))
-    (γ : ratU L 2) (g g' : ↥((SUA L).subgroupOf (finU (E := L) (n := 2)))) (hg : (g' : finU (E := L) (n := 2)) = p γ.1 * g) :
-    ψ ((eS B).symm g') = repE n (0 : InfinitePlace L → ℤ) (infC L 2 γ.1) (ψ ((eS B).symm g)) := by
+    (h0 : ∀ (γ : SU B.Δ) (g g' : SA B.Δ),
+      (g' : DA B.Δ) = ι γ * g → ψ g' = Wt.cD (em B) n e (γ : DX B.Δ) (ψ g))
+    (γ : ratU L 2) (g g' : ↥((SUA L).subgroupOf (finU (E := L) (n := 2))))
+    (hg : (g' : finU (E := L) (n := 2)) = p γ.1 * g)
+    : ψ ((eS B).symm g') = repE n (0 : InfinitePlace L → ℤ) (infC L 2 γ.1) (ψ ((eS B).symm g)) := by
   obtain ⟨k, hk, hγ⟩ := hp2 γ.1
   have hfS : p γ.1 ∈ (SUA L).subgroupOf (finU (E := L) (n := 2)) := by
     have h₁ := mul_mem g'.2 (inv_mem g.2)
     rwa [hg, mul_inv_cancel_right] at h₁
   have hr : (p γ.1 : UA L 2) * k ∈ ratU L 2 := by rw [← hγ]; exact γ.2
-  have hdr := detRoot L m hm U hU _ (p γ.1).2 k hk hr 1 (one_mem _)
-    (by rw [mul_one]; exact Subgroup.mem_subgroupOf.1 hfS)
+  have hdr :=
+    detRoot L m hm U hU _ (p γ.1).2 k hk hr 1 (one_mem _)
+      (by rw [mul_one]; exact Subgroup.mem_subgroupOf.1 hfS)
   have hγS : γ.1 ∈ ratU L 2 ⊓ SUA L := ⟨γ.2, by rw [hγ]; exact mul_mem hdr.1 hdr.2⟩
   obtain ⟨γ₀, hγ₀⟩ : ∃ γ₀ : SU B.Δ, (B.rS γ₀ : UA L 2) = γ.1 :=
     ⟨B.rS.symm ⟨γ.1, hγS⟩, congrArg Subtype.val (B.rS.apply_symm_apply ⟨γ.1, hγS⟩)⟩
@@ -191,8 +231,10 @@ section Aux5
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
-theorem dom_two {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (t : kˣ)
-    (h : valuation k (t : k) ≤ valuation k ((t⁻¹ : kˣ) : k)) : AlgebraTools.Dom ![t, t⁻¹] := by
+theorem dom_two
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (t : kˣ) (h : valuation k (t : k) ≤ valuation k ((t⁻¹ : kˣ) : k))
+    : AlgebraTools.Dom ![t, t⁻¹] := by
   intro i j hij
   fin_cases i <;> fin_cases j
   · exact le_rfl
@@ -200,8 +242,10 @@ theorem dom_two {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNo
   · simp at hij
   · exact le_rfl
 
-theorem val_inv_ge {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (t : kˣ)
-    (h : valuation k (t : k) < 1) : valuation k (t : k) ≤ valuation k ((t⁻¹ : kˣ) : k) := by
+theorem val_inv_ge
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (t : kˣ) (h : valuation k (t : k) < 1)
+    : valuation k (t : k) ≤ valuation k ((t⁻¹ : kˣ) : k) := by
   have h₀ : valuation k (t : k) ≠ 0 := (Valuation.ne_zero_iff _).2 t.ne_zero
   rw [Units.val_inv_eq_inv_val, map_inv₀]
   exact h.le.trans ((one_le_inv₀ (zero_lt_iff.2 h₀)).2 h.le)
@@ -209,12 +253,18 @@ theorem val_inv_ge {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [I
 variable {B : Bridge L}
 
 set_option maxHeartbeats 4000000 in
-theorem place_el (hB : B.Ok) (T : Spl B) {S : Finset (Plc L)} {VL : ∀ w : Plc L, Lev (Kw w)} {A : SD B.Δ} (hA : A.Ok) (hF : Fit T S VL A)
-    {a : ∀ w : Plc L, (Kw w)ˣ →* ℂˣ} {b : Chs (Lp L)} (hab : FitCh T S a b) {w : Plc L} (hw : w ∈ S) (h : IsSplitAt w) (t : (Kw w)ˣ)
-    (ht : valuation (Kw w) (t : Kw w) < 1) :
-    ∃ (t' : Dat.Par (Lp L)) (g : SA B.Δ), A.IsElD g (SD.dS t') ∧ A.DomS (SD.dS t') ∧ A.exS b t' = Dict.expo ![a w, 1] ![t, t⁻¹] ∧
-      (B.bS g : UA L 2) = secW 2 w (Sig.dg ![t, t⁻¹]) ∧ (∀ u, un u ≠ un w → cLoc u (B.bS g : UA L 2) = 1) ∧
-      ∀ w' ∈ S, ∀ h', cLoc w' (B.bS g : UA L 2) = Sig.dg fun i => iu T w' h' (SD.dS t' (un w') i) := by
+theorem place_el
+    (hB : B.Ok)
+    (T : Spl B)
+    {S : Finset (Plc L)} {VL : ∀ w : Plc L, Lev (Kw w)} {A : SD B.Δ} (hA : A.Ok) (hF : Fit T S VL A)
+    {a : ∀ w : Plc L, (Kw w)ˣ →* ℂˣ} {b : Chs (Lp L)} (hab : FitCh T S a b)
+    {w : Plc L} (hw : w ∈ S) (h : IsSplitAt w) (t : (Kw w)ˣ) (ht : valuation (Kw w) (t : Kw w) < 1)
+    : ∃ (t' : Dat.Par (Lp L)) (g : SA B.Δ),
+      A.IsElD g (SD.dS t') ∧ A.DomS (SD.dS t') ∧ A.exS b t' = Dict.expo ![a w, 1] ![t, t⁻¹]
+        ∧ (B.bS g : UA L 2) = secW 2 w (Sig.dg ![t, t⁻¹])
+        ∧ (∀ u, un u ≠ un w → cLoc u (B.bS g : UA L 2) = 1)
+        ∧ ∀ w' ∈ S, ∀ h',
+          cLoc w' (B.bS g : UA L 2) = Sig.dg fun i => iu T w' h' (SD.dS t' (un w') i) := by
   classical
   obtain ⟨t₀, ht₀⟩ : ∃ t₀ : (Kv (un w))ˣ, iu T w h t₀ = t :=
     ⟨Units.map ((T w h).i.symm : Kw w →* Kv (un w)) t, Units.ext ((T w h).i.apply_symm_apply _)⟩
@@ -231,8 +281,10 @@ theorem place_el (hB : B.Ok) (T : Spl B) {S : Finset (Plc L)} {VL : ∀ w : Plc 
     funext i
     fin_cases i <;> simp
   have hEl := elEx _ _ A hA
-  obtain ⟨g, hg₀⟩ : ∃ g : SA B.Δ, A.IsElD (g : DA B.Δ) (SD.dS t') :=
-    ⟨⟨(hEl.2.1 (SD.dS t')).choose, hEl.2.2.2.2 _ t' (hEl.2.1 (SD.dS t')).choose_spec.1⟩, (hEl.2.1 (SD.dS t')).choose_spec.1⟩
+  obtain ⟨g, hg₀⟩ : ∃ g : SA B.Δ, A.IsElD (g : DA B.Δ) (SD.dS t') := ⟨
+    ⟨(hEl.2.1 (SD.dS t')).choose, hEl.2.2.2.2 _ t' (hEl.2.1 (SD.dS t')).choose_spec.1⟩,
+    (hEl.2.1 (SD.dS t')).choose_spec.1
+  ⟩
   have hLG := levG L B hB T S VL A hA hF
   have hL4 := hLG.2.2.2.1
   have hL5 := hLG.2.2.2.2
@@ -248,7 +300,10 @@ theorem place_el (hB : B.Ok) (T : Spl B) {S : Finset (Plc L)} {VL : ∀ w : Plc 
   have hoff : ∀ u, un u ≠ un w → cLoc u (B.bS g : UA L 2) = 1 := fun u hu =>
     (hB.oneS g (un u)).1 (hone _ hu) u rfl
   have hloc : (B.bS g : UA L 2) ∈ locU 2 w :=
-    Subgroup.mem_inf.2 ⟨(B.bS g).2.1, Subgroup.mem_iInf.2 fun u => Subgroup.mem_iInf.2 fun hu => MonoidHom.mem_ker.2 (hoff u hu)⟩
+    Subgroup.mem_inf.2 ⟨
+      (B.bS g).2.1,
+      Subgroup.mem_iInf.2 fun u => Subgroup.mem_iInf.2 fun hu => MonoidHom.mem_ker.2 (hoff u hu)
+    ⟩
   have hcw : cLoc w (B.bS g : UA L 2) = Sig.dg ![t, t⁻¹] := by
     rw [hcl w hw h, hdS]
     congr 1

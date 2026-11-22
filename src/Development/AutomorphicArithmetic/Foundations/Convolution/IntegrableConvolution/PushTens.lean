@@ -12,8 +12,9 @@ namespace UpperTheory.ConvolutionTheory.L1
 
 section
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
 private lemma fib_cons {m : ℕ} (a : G) (y : Fin m → G) (x : G) :
     fib (Fin.cons (α := fun _ => G) a y) x = Fin.cons (α := fun _ => G) a (fib y (a⁻¹ * x)) := by
@@ -90,7 +91,6 @@ end
 
 end UpperTheory.ConvolutionTheory.L1
 
-theorem UpperTheory.ConvolutionTheory.L1.pushTens :
-    UpperTheory.ConvolutionTheory.L1.PushTens := by
+theorem UpperTheory.ConvolutionTheory.L1.pushTens : UpperTheory.ConvolutionTheory.L1.PushTens := by
   intro G _ _ _ _ _ _ _ _ μ _ m φ hc hs
   exact UpperTheory.ConvolutionTheory.L1.push_tens μ m φ hc hs

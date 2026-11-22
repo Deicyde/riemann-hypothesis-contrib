@@ -12,8 +12,8 @@ open scoped nonZeroDivisors
 
 namespace PI.VolStabS
 
-private theorem exists_trace_mul_eq_linearMap (F : Type) [Field F] [NumberField F] (f : F →ₗ[ℚ] ℚ) :
-    ∃ β : F, ∀ y : F, f y = Algebra.trace ℚ F (β * y) := by
+private theorem exists_trace_mul_eq_linearMap (F : Type) [Field F] [NumberField F] (f : F →ₗ[ℚ] ℚ)
+    : ∃ β : F, ∀ y : F, f y = Algebra.trace ℚ F (β * y) := by
   have hnd := traceForm_nondegenerate ℚ F
   obtain ⟨β, hβ⟩ : ∃ β, (LinearMap.BilinForm.toDual (Algebra.traceForm ℚ F) hnd) β = f :=
     ⟨_, LinearEquiv.apply_symm_apply _ f⟩
@@ -62,8 +62,7 @@ theorem addIntF_holds : AddIntF := by
       exact ⟨1, map_one _⟩
     rw [h, FractionalIdeal.mem_zero_iff] at h1
     exact one_ne_zero h1
-  have hdual : ∀ x ∈ Λ,
-      β * c0⁻¹ * x ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 F)⁰ F) := by
+  have hdual : ∀ x ∈ Λ, β * c0⁻¹ * x ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 F)⁰ F) := by
     intro x hx
     rw [FractionalIdeal.mem_dual h10]
     intro b hb
@@ -74,28 +73,26 @@ theorem addIntF_holds : AddIntF := by
     refine ⟨m, ?_⟩
     rw [Algebra.traceForm_apply, eq_intCast]
     have h1 := hgx (algebraMap (𝓞 F) F r * x)
-    have h2 : ((Algebra.trace ℚ F (β * c0⁻¹ * (algebraMap (𝓞 F) F r * x)) : ℚ) : ℂ)
-        = ((m : ℚ) : ℂ) := by
+    have h2
+        : ((Algebra.trace ℚ F (β * c0⁻¹ * (algebraMap (𝓞 F) F r * x)) : ℚ) : ℂ)
+          = ((m : ℚ) : ℂ) := by
       rw [← h1, hm, Rat.cast_intCast]
     rw [Rat.cast_inj] at h2
     rw [← h2]
     congr 1
     ring
-  obtain ⟨d, hd, hdint⟩ :=
-    (FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 F)⁰ F)).isFractional
-  have hd0 : algebraMap (𝓞 F) F d ≠ 0 :=
-    IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hd
+  obtain ⟨d, hd, hdint⟩ := (FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 F)⁰ F)).isFractional
+  have hd0 : algebraMap (𝓞 F) F d ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hd
   apply hnot ((algebraMap (𝓞 F) F d * (β * c0⁻¹))⁻¹) (inv_ne_zero (mul_ne_zero hd0 hβ0))
   intro x hx
   obtain ⟨r, hr⟩ := hdint _ (hdual x hx)
   refine ⟨r, ?_⟩
   rw [Algebra.smul_def] at hr
   have hr' : (r : F) = algebraMap (𝓞 F) F r := rfl
-  rw [hr', hr, show algebraMap (𝓞 F) F d * (β * c0⁻¹ * x)
-      = algebraMap (𝓞 F) F d * (β * c0⁻¹) * x by ring,
+  rw [hr', hr,
+    show algebraMap (𝓞 F) F d * (β * c0⁻¹ * x) = algebraMap (𝓞 F) F d * (β * c0⁻¹) * x by ring,
     inv_mul_cancel_left₀ (mul_ne_zero hd0 hβ0)]
 
-theorem chInf_of_lift (hL : ChLift) : ChInf :=
-  chInf_of hL addIntF_holds
+theorem chInf_of_lift (hL : ChLift) : ChInf := chInf_of hL addIntF_holds
 
 end PI.VolStabS

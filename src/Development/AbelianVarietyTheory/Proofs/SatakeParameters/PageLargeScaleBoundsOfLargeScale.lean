@@ -14,11 +14,16 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW
 
-theorem roomy_of_large : ∀ eps C A : ℝ, 0 < eps → 100 ≤ C → ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L), L.sc.eps = eps → P.CLw ≤ A → x0 ≤ L.sc.x → Roomy L C := by
+theorem roomy_of_large
+    : ∀ eps C A : ℝ,
+      0 < eps → 100 ≤ C
+        → ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L),
+          L.sc.eps = eps → P.CLw ≤ A → x0 ≤ L.sc.x → Roomy L C := by
   intro eps C A he hC
   have hC0 : (0 : ℝ) ≤ C := by linarith
   obtain ⟨x1, h1⟩ := GlobalTheory.T.thinSize_dominates_at_large_scale eps he
-  obtain ⟨x2, h2⟩ := GlobalTheory.T.scale_log_mul_le_size_ratio eps C (max A 0) he hC0 (le_max_right _ _)
+  obtain ⟨x2, h2⟩ :=
+    GlobalTheory.T.scale_log_mul_le_size_ratio eps C (max A 0) he hC0 (le_max_right _ _)
   refine ⟨max (max x1 x2) 4, fun D L P hL hA hx => ?_⟩
   have hx1 : x1 ≤ L.sc.x := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hx
   have hx2 : x2 ≤ L.sc.x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx

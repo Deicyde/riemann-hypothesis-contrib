@@ -23,8 +23,8 @@ section Lat
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-abbrev IntAf (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] :
-    Subring (E ⊗[F] Af F) :=
+abbrev IntAf (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    : Subring (E ⊗[F] Af F) :=
   Formalism.UG.tensInt (F := F) (Af F) (Formalism.UG.intOE E) (Formalism.UG.intAd F)
 
 def lamAf (L : Submodule (𝓞 E) (Fin n → E)) : Submodule (IntAf F E) (Fin n → E ⊗[F] Af F) :=
@@ -44,39 +44,42 @@ structure AutInst : Type 1 where
   [aFE : Algebra F E]
   cm : Formalism.BasicNotions.CMData F E
   n : ℕ
-
   J : Matrix (Fin n) (Fin n) E
   J_herm : Formalism.UG.IsHerm (starRingEnd E) J
   J_det : J.det ≠ 0
-
   L : Submodule (𝓞 E) (Fin n → E)
   L_span : Submodule.span E (L : Set (Fin n → E)) = ⊤
   L_fg : L.FG
-  L_dual : ∀ x : Fin n → E, x ∈ L ↔
-    ∀ y ∈ L, Formalism.UG.hform (starRingEnd E) J y x ∈ (algebraMap (𝓞 E) E).range
-
+  L_dual
+    : ∀ x : Fin n → E,
+      x ∈ L ↔ ∀ y ∈ L, Formalism.UG.hform (starRingEnd E) J y x ∈ (algebraMap (𝓞 E) E).range
   ε : InfinitePlace F → Fin n → Bool
   φ : InfinitePlace F → (E →+* ℂ)
   φ_over : ∀ v (a : F), φ v (algebraMap F E a) = v.embedding a
   P : InfinitePlace F → Matrix (Fin n) (Fin n) ℂ
   P_unit : ∀ v, IsUnit (P v)
   P_spec : ∀ v, (P v)ᴴ * J.map (φ v) * P v = Formalism.REAL.Jm (ε v)
-
   [topf : TopologicalSpace (Formalism.UG.UPts cm.sig J (Af F))]
   [topf_group : IsTopologicalGroup (Formalism.UG.UPts cm.sig J (Af F))]
+  topf_open
+    : ∀ g : ℕ,
+      1 ≤ g
+        → IsOpen
+          {x : Formalism.UG.UPts cm.sig J (Af F) |
+            (x : GL (Fin n) (E ⊗[F] Af F)) ∈ Formalism.UG.stabGL (lamAf (F := F) L) ∧
+              ∀ y ∈ lamAf (F := F) L, ∃ z ∈ lamAf (F := F) L,
+                ((x : GL (Fin n) (E ⊗[F] Af F)) - 1 : Matrix (Fin n) (Fin n) (E ⊗[F] Af F)) *ᵥ y = (g : E ⊗[F] Af F) • z}
+  topf_basis
+    : ∀ U ∈ nhds (1 : Formalism.UG.UPts cm.sig J (Af F)), ∃ g : ℕ,
+      1 ≤ g
+        ∧ {x : Formalism.UG.UPts cm.sig J (Af F) |
+            (x : GL (Fin n) (E ⊗[F] Af F)) ∈ Formalism.UG.stabGL (lamAf (F := F) L) ∧
+            ∀ y ∈ lamAf (F := F) L, ∃ z ∈ lamAf (F := F) L,
+              ((x : GL (Fin n) (E ⊗[F] Af F)) - 1 : Matrix (Fin n) (Fin n) (E ⊗[F] Af F)) *ᵥ y = (g : E ⊗[F] Af F) • z}
+          ⊆ U
 
-  topf_open : ∀ g : ℕ, 1 ≤ g → IsOpen {x : Formalism.UG.UPts cm.sig J (Af F) |
-    (x : GL (Fin n) (E ⊗[F] Af F)) ∈ Formalism.UG.stabGL (lamAf (F := F) L) ∧
-      ∀ y ∈ lamAf (F := F) L, ∃ z ∈ lamAf (F := F) L,
-        ((x : GL (Fin n) (E ⊗[F] Af F)) - 1 : Matrix (Fin n) (Fin n) (E ⊗[F] Af F)) *ᵥ y = (g : E ⊗[F] Af F) • z}
-  topf_basis : ∀ U ∈ nhds (1 : Formalism.UG.UPts cm.sig J (Af F)), ∃ g : ℕ, 1 ≤ g ∧
-    {x : Formalism.UG.UPts cm.sig J (Af F) |
-      (x : GL (Fin n) (E ⊗[F] Af F)) ∈ Formalism.UG.stabGL (lamAf (F := F) L) ∧
-      ∀ y ∈ lamAf (F := F) L, ∃ z ∈ lamAf (F := F) L,
-        ((x : GL (Fin n) (E ⊗[F] Af F)) - 1 : Matrix (Fin n) (Fin n) (E ⊗[F] Af F)) *ᵥ y = (g : E ⊗[F] Af F) • z} ⊆ U
-
-attribute [instance] AutInst.fF AutInst.nF AutInst.fE AutInst.nE AutInst.sE AutInst.aFE AutInst.topf
-  AutInst.topf_group
+attribute [instance]
+  AutInst.fF AutInst.nF AutInst.fE AutInst.nE AutInst.sE AutInst.aFE AutInst.topf AutInst.topf_group
 
 namespace AutInst
 
@@ -113,8 +116,8 @@ def muA (μf : Measure I.Gf) [SigmaFinite μf] : Measure I.GA :=
   (Measure.pi fun v => Formalism.REAL.muG (I.ε v)).prod μf
 
 def IsFundDom (μ : Measure I.GA) (fund : Set I.GA) : Prop :=
-  MeasurableSet fund ∧ (∀ y : I.GA, ∃ γ ∈ I.GFset, γ * y ∈ fund) ∧
-    ∀ γ ∈ I.GFset, γ ≠ 1 → μ ((fun y => γ * y) '' fund ∩ fund) = 0
+  MeasurableSet fund ∧ (∀ y : I.GA, ∃ γ ∈ I.GFset, γ * y ∈ fund)
+    ∧ ∀ γ ∈ I.GFset, γ ≠ 1 → μ ((fun y => γ * y) '' fund ∩ fund) = 0
 
 def rep (fund : Set I.GA) (y : I.GA) : I.GA := by
   classical
@@ -126,25 +129,35 @@ abbrev L2 (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA) : Type :=
 def ext {μf : Measure I.Gf} [SigmaFinite μf] {fund : Set I.GA} (Fv : I.L2 μf fund) : I.GA → ℂ :=
   fun y => (Fv : I.GA → ℂ) (I.rep fund y)
 
-def IsRightReg (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
-    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) : Prop :=
-  ∀ g Fv, ((R g Fv : I.L2 μf fund) : I.GA → ℂ) =ᵐ[(I.muA μf).restrict fund] fun x => I.ext Fv (x * g)
+def IsRightReg
+    (μf : Measure I.Gf) [SigmaFinite μf]
+    (fund : Set I.GA) (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund))
+    : Prop :=
+  ∀ g Fv,
+    ((R g Fv : I.L2 μf fund) : I.GA → ℂ) =ᵐ[(I.muA μf).restrict fund] fun x => I.ext Fv (x * g)
 
-def IsRConv (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
-    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (φ : I.GA → ℂ)
-    (T : I.L2 μf fund →L[ℂ] I.L2 μf fund) : Prop :=
+def IsRConv
+    (μf : Measure I.Gf) [SigmaFinite μf]
+    (fund : Set I.GA) (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund))
+    (φ : I.GA → ℂ) (T : I.L2 μf fund →L[ℂ] I.L2 μf fund)
+    : Prop :=
   Integrable φ (I.muA μf) ∧ ∀ x y : I.L2 μf fund, ⟪x, T y⟫_ℂ = ∫ g, φ g * ⟪x, R g y⟫_ℂ ∂(I.muA μf)
 
-def IsRConvF (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
-    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (e : I.Gf → ℂ)
-    (T : I.L2 μf fund →L[ℂ] I.L2 μf fund) : Prop :=
+def IsRConvF
+    (μf : Measure I.Gf) [SigmaFinite μf]
+    (fund : Set I.GA) (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund))
+    (e : I.Gf → ℂ) (T : I.L2 μf fund →L[ℂ] I.L2 μf fund)
+    : Prop :=
   Integrable e μf ∧ ∀ x y : I.L2 μf fund, ⟪x, T y⟫_ℂ = ∫ g, e g * ⟪x, R (1, g) y⟫_ℂ ∂μf
 
 def IsIsot (W : Submodule I.E (Fin I.n → I.E)) : Prop :=
   W ≠ ⊥ ∧ ∀ x ∈ W, ∀ y ∈ W, Formalism.UG.hform (starRingEnd I.E) I.J x y = 0
 
-def InUnipRad {A : Type} [CommRing A] (s : A →+* A) (JA : Matrix (Fin I.n) (Fin I.n) A)
-    (WA : Submodule A (Fin I.n → A)) (g : Matrix (Fin I.n) (Fin I.n) A) : Prop :=
+def InUnipRad
+    {A : Type} [CommRing A]
+    (s : A →+* A) (JA : Matrix (Fin I.n) (Fin I.n) A) (WA : Submodule A (Fin I.n → A))
+    (g : Matrix (Fin I.n) (Fin I.n) A)
+    : Prop :=
   let perp : Set (Fin I.n → A) := {y | ∀ x ∈ WA, Formalism.UG.hform s JA x y = 0}
   (∀ x ∈ WA, (g - 1) *ᵥ x = 0) ∧ (∀ y ∈ perp, (g - 1) *ᵥ y ∈ WA) ∧ ∀ y, (g - 1) *ᵥ y ∈ perp
 
@@ -158,26 +171,33 @@ def NA (W : Submodule I.E (Fin I.n → I.E)) : Set I.GA :=
       (I.fmat x.2)}
 
 def IsNQuotMeas (W : Submodule I.E (Fin I.n → I.E)) (ν : Measure I.GA) : Prop :=
-  IsFiniteMeasure ν ∧ ν ≠ 0 ∧ ν (I.NA W)ᶜ = 0 ∧
-    ∀ f : I.GA → ℂ, (∀ γ ∈ I.GFset ∩ I.NA W, ∀ y, f (γ * y) = f y) →
-      ∀ n₀ ∈ I.NA W, ∫ m, f (m * n₀) ∂ν = ∫ m, f m ∂ν
+  IsFiniteMeasure ν ∧ ν ≠ 0 ∧ ν (I.NA W)ᶜ = 0
+    ∧ ∀ f : I.GA → ℂ,
+      (∀ γ ∈ I.GFset ∩ I.NA W, ∀ y, f (γ * y) = f y)
+        → ∀ n₀ ∈ I.NA W, ∫ m, f (m * n₀) ∂ν = ∫ m, f m ∂ν
 
 def IsCuspFn (μ : Measure I.GA) (f : I.GA → ℂ) : Prop :=
-  ∀ W : Submodule I.E (Fin I.n → I.E), I.IsIsot W → ∀ ν : Measure I.GA, I.IsNQuotMeas W ν →
-    ∀ᵐ x ∂μ, ∫ m, f (m * x) ∂ν = 0
+  ∀ W : Submodule I.E (Fin I.n → I.E),
+    I.IsIsot W → ∀ ν : Measure I.GA, I.IsNQuotMeas W ν → ∀ᵐ x ∂μ, ∫ m, f (m * x) ∂ν = 0
 
-variable {H : InfinitePlace I.F → Type} [∀ v, NormedAddCommGroup (H v)] [∀ v, InnerProductSpace ℂ (H v)]
+variable
+  {H : InfinitePlace I.F → Type} [∀ v, NormedAddCommGroup (H v)] [∀ v, InnerProductSpace ℂ (H v)]
 
-def IsHilbTensor (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v))
+def IsHilbTensor
+    (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v))
     {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
-    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (tens : (∀ v, H v) → Hs) : Prop :=
-  (∀ x y, ⟪tens x, tens y⟫_ℂ = ∏ v, ⟪x v, y v⟫_ℂ) ∧
-    (∀ g x, σs g (tens x) = tens fun v => σ v (uMat (g v)) (x v)) ∧
-    Dense (Submodule.span ℂ (Set.range tens) : Set Hs)
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (tens : (∀ v, H v) → Hs)
+    : Prop :=
+  (∀ x y, ⟪tens x, tens y⟫_ℂ = ∏ v, ⟪x v, y v⟫_ℂ)
+    ∧ (∀ g x, σs g (tens x) = tens fun v => σ v (uMat (g v)) (x v))
+    ∧ Dense (Submodule.span ℂ (Set.range tens) : Set Hs)
 
-def HomS {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
-    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
-    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) : Submodule ℂ (Hs →L[ℂ] I.L2 μf fund) where
+def HomS
+    {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+    (σs : I.Ginf → (Hs →L[ℂ] Hs))
+    (μf : Measure I.Gf) [SigmaFinite μf]
+    (fund : Set I.GA) (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund))
+    : Submodule ℂ (Hs →L[ℂ] I.L2 μf fund) where
   carrier := {T | ∀ g : I.Ginf, T.comp (σs g) = (R (g, 1)).comp T}
   add_mem' := by
     intro a b ha hb g
@@ -191,17 +211,24 @@ def HomS {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
     simp only [Set.mem_ofPred_eq] at *
     rw [ContinuousLinearMap.smul_comp, ContinuousLinearMap.comp_smul, ha g]
 
-def eHom {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
-    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
-    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund) :
-    Submodule ℂ (Hs →L[ℂ] I.L2 μf fund) :=
+def eHom
+    {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+    (σs : I.Ginf → (Hs →L[ℂ] Hs))
+    (μf : Measure I.Gf) [SigmaFinite μf]
+    (fund : Set I.GA)
+    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund)
+    : Submodule ℂ (Hs →L[ℂ] I.L2 μf fund) :=
   (I.HomS σs μf fund R).map
-    ((ContinuousLinearMap.compL ℂ Hs (I.L2 μf fund) (I.L2 μf fund) Re) :
-      (Hs →L[ℂ] I.L2 μf fund) →ₗ[ℂ] (Hs →L[ℂ] I.L2 μf fund))
+    ((ContinuousLinearMap.compL ℂ Hs (I.L2 μf fund) (I.L2 μf fund) Re)
+      : (Hs →L[ℂ] I.L2 μf fund) →ₗ[ℂ] (Hs →L[ℂ] I.L2 μf fund))
 
-def Dcount {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
-    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
-    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund) : ℕ :=
+def Dcount
+    {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+    (σs : I.Ginf → (Hs →L[ℂ] Hs))
+    (μf : Measure I.Gf) [SigmaFinite μf]
+    (fund : Set I.GA)
+    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund)
+    : ℕ :=
   Module.finrank ℂ (I.eHom σs μf fund R Re)
 
 def vol (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA) : ℝ := ((I.muA μf) fund).toReal
@@ -215,9 +242,9 @@ def IsPosType (e : I.Gf → ℂ) : Prop :=
   ∀ (m : ℕ) (x : Fin m → I.Gf) (c : Fin m → ℂ), 0 ≤ ∑ i, ∑ j, star (c i) * c j * e ((x i)⁻¹ * x j)
 
 def IsAdmIdem (μf : Measure I.Gf) (g g₀ : ℕ) (e : I.Gf → ℂ) : Prop :=
-  IsLocallyConstant e ∧ I.convF μf e e = e ∧ (∀ x, e x⁻¹ = star (e x)) ∧ I.IsPosType e ∧
-    (∀ x, e x ≠ 0 → x ∈ I.Kset) ∧ (∀ x, ∀ k ∈ I.Kg g, ∀ k' ∈ I.Kg g, e (k * x * k') = e x) ∧
-    ∀ x, e x ≠ 0 → I.UnipMod g₀ x
+  IsLocallyConstant e ∧ I.convF μf e e = e ∧ (∀ x, e x⁻¹ = star (e x)) ∧ I.IsPosType e
+    ∧ (∀ x, e x ≠ 0 → x ∈ I.Kset) ∧ (∀ x, ∀ k ∈ I.Kg g, ∀ k' ∈ I.Kg g, e (k * x * k') = e x)
+    ∧ ∀ x, e x ≠ 0 → I.UnipMod g₀ x
 
 def f : ℕ := Module.finrank ℚ I.F
 
@@ -258,7 +285,8 @@ structure RowsAut : Type 1 where
   Re : I.L2 μf fund →L[ℂ] I.L2 μf fund
   Re_spec : I.IsRConvF μf fund R e Re
 
-attribute [instance] RowsAut.haar RowsAut.sf RowsAut.hN RowsAut.hI RowsAut.hC RowsAut.sN RowsAut.sI RowsAut.sC
+attribute [instance]
+  RowsAut.haar RowsAut.sf RowsAut.hN RowsAut.hI RowsAut.hC RowsAut.sN RowsAut.sI RowsAut.sC
 
 def RowsAut.D (B : RowsAut) : ℕ := B.I.Dcount B.σs B.μf B.fund B.R B.Re
 

@@ -27,7 +27,8 @@ lemma _root_.GlobalTheory.MomOne.OrthFrame.beta_smul_left (d : ℕ) (H : Matrix 
   simp only [_root_.Formalism.L2.Ker.JMB.beta, _root_.Formalism.L2.Ker.JMB.hf, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-noncomputable def betaL (d : ℕ) (H : Matrix (Fin g) (Fin g) ℂ) (z : Fin g → ℂ) : (Fin g → ℂ) →ₗ[ℂ] ℂ where
+noncomputable def betaL (d : ℕ) (H : Matrix (Fin g) (Fin g) ℂ) (z : Fin g → ℂ)
+    : (Fin g → ℂ) →ₗ[ℂ] ℂ where
   toFun x := beta d H x z
   map_add' x y := beta_add_left d H x y z
   map_smul' c x := beta_smul_left d H c x z
@@ -387,18 +388,26 @@ private lemma exists_orthogonal_vector_norm_coprime {q : ℕ} (hq : q.Prime) (S 
     lt_of_lt_of_le (Nat.lt_pow_self hq.one_lt) (Nat.pow_le_pow_right hq.pos (by omega))
   omega
 
-
 open scoped ComplexConjugate BigOperators ComplexOrder in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.MomOne.exists_orthFrame : ∀ (q g : ℕ) (S : _root_.Formalism.L2.Ker.JMB.Setup g),
-    q.Prime → S.Ok → ¬ q ∣ S.d → ∃ (x : Fin g → Fin g → ℂ) (a : Fin g → ℕ), (∀ i, x i ∈ S.La) ∧
-      (∀ i j, _root_.Formalism.L2.Ker.JMB.beta S.d S.Hm (x i) (x j) = if i = j then (a i : ℂ) else 0) ∧
-      ∀ i, 0 < a i ∧ Nat.Coprime (a i) q := by
+theorem _root_.GlobalTheory.MomOne.exists_orthFrame
+    : ∀ (q g : ℕ) (S : _root_.Formalism.L2.Ker.JMB.Setup g),
+      q.Prime → S.Ok → ¬ q ∣ S.d
+        → ∃ (x : Fin g → Fin g → ℂ) (a : Fin g → ℕ),
+          (∀ i, x i ∈ S.La)
+            ∧ (∀ i j,
+              _root_.Formalism.L2.Ker.JMB.beta S.d S.Hm (x i) (x j)
+                = if i = j then (a i : ℂ) else 0)
+            ∧ ∀ i, 0 < a i ∧ Nat.Coprime (a i) q := by
   intro q g S hq hS hqd
   have hH : S.Hm.IsHermitian := hS.2.2.1.1
-  suffices h : ∀ r ≤ g, ∃ (x : Fin r → Fin g → ℂ) (a : Fin r → ℕ), (∀ i, x i ∈ S.La) ∧
-      (∀ i j, _root_.Formalism.L2.Ker.JMB.beta S.d S.Hm (x i) (x j) = if i = j then (a i : ℂ) else 0) ∧
-      ∀ i, 0 < a i ∧ Nat.Coprime (a i) q from h g le_rfl
+  suffices h
+      : ∀ r ≤ g, ∃ (x : Fin r → Fin g → ℂ) (a : Fin r → ℕ),
+        (∀ i, x i ∈ S.La)
+          ∧ (∀ i j,
+            _root_.Formalism.L2.Ker.JMB.beta S.d S.Hm (x i) (x j) = if i = j then (a i : ℂ) else 0)
+          ∧ ∀ i, 0 < a i ∧ Nat.Coprime (a i) q from
+    h g le_rfl
   intro r hr
   induction r with
   | zero => exact ⟨Fin.elim0, Fin.elim0, fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩

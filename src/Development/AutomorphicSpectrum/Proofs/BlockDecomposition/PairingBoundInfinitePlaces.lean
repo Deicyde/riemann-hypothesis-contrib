@@ -9,7 +9,6 @@ open Matrix PositivityTheory.Rg.BcB.D1
 
 namespace GlobalTheory.CompanionTheory.Wedge
 
-
 open ComplexOrder in
 theorem pairI_of_detMono : DetMono → PairI := by
   open scoped ComplexOrder in
@@ -21,8 +20,7 @@ theorem pairI_of_detMono : DetMono → PairI := by
   have hGim : ((Uᴴ * U).det).im = 0 := ((Complex.le_def.1 hG.det_nonneg).2).symm
   unfold nI
   by_cases hdet : (Uᴴ * U).det = 0
-  ·
-    obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hdet
+  · obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hdet
     have hUv : U *ᵥ v = 0 := by
       have := (Matrix.conjTranspose_mul_self_mulVec_eq_zero U v).1 hv
       exact this
@@ -43,25 +41,22 @@ theorem pairI_of_detMono : DetMono → PairI := by
     have hiG : G⁻¹ * G = 1 := nonsing_inv_mul _ hu
     have hGh : Gᴴ = G := hG.isHermitian
     have hih : (G⁻¹)ᴴ = G⁻¹ := by rw [conjTranspose_nonsing_inv, hGh]
-    have hMh : Mᴴ = Wᴴ * U := by
-      rw [hMdef, conjTranspose_mul, conjTranspose_conjTranspose]
+    have hMh : Mᴴ = Wᴴ * U := by rw [hMdef, conjTranspose_mul, conjTranspose_conjTranspose]
     set T := G⁻¹ * M with hT
     have hTh : Tᴴ = Mᴴ * G⁻¹ := by rw [hT, conjTranspose_mul, hih]
     have hGT : G * T = M := by rw [hT, ← Matrix.mul_assoc, hGi, Matrix.one_mul]
     have hX : (Tᴴ * G * T).PosSemidef := hG.conjTranspose_mul_mul_same T
-    have hXe : Tᴴ * G * T = Mᴴ * T := by
-      rw [Matrix.mul_assoc, hGT, hTh, Matrix.mul_assoc, ← hT]
+    have hXe : Tᴴ * G * T = Mᴴ * T := by rw [Matrix.mul_assoc, hGT, hTh, Matrix.mul_assoc, ← hT]
     have hXp : (Mᴴ * T).PosSemidef := hXe ▸ hX
     have e1 : Wᴴ * (U * T) = Mᴴ * T := by rw [hMh, Matrix.mul_assoc]
-    have e2 : Tᴴ * Uᴴ * W = Mᴴ * T := by
-      rw [Matrix.mul_assoc, ← hMdef, hTh, Matrix.mul_assoc, ← hT]
+    have e2 : Tᴴ * Uᴴ * W = Mᴴ * T := by rw [Matrix.mul_assoc, ← hMdef, hTh, Matrix.mul_assoc, ← hT]
     have e3 : Tᴴ * Uᴴ * (U * T) = Mᴴ * T := by
       rw [← hXe, hGdef]
       simp only [Matrix.mul_assoc]
 
     have hZ : (W - U * T)ᴴ * (W - U * T) = Wᴴ * W - Mᴴ * T := by
-      rw [conjTranspose_sub, conjTranspose_mul, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub,
-        e1, e2, e3]
+      rw [conjTranspose_sub, conjTranspose_mul, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub, e1,
+        e2, e3]
       abel
     have hmono : ((Mᴴ * T).det).re ≤ ((Wᴴ * W).det).re :=
       hD κ _ _ hXp (hZ ▸ posSemidef_conjTranspose_mul_self (W - U * T))

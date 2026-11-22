@@ -14,7 +14,8 @@ open scoped MatrixOrder NNReal ENNReal ComplexOrder Pointwise
 
 section Abstract
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [MeasurableSpace G] [BorelSpace G]
 
 lemma modChar_eq_one_of_compact (μ : Measure G) [μ.IsHaarMeasure] [μ.InnerRegular]
@@ -79,8 +80,10 @@ section Matrices
 
 variable {n : ℕ} (ε : Fin n → Bool)
 
-def mkU (g : Matrix (Fin n) (Fin n) ℂ) (hg : inUJ ε g) : UJ ε :=
-  ⟨⟨g, Jm ε * gᴴ * Jm ε, mul_eq_one_comm.mp (coeMatrix_left_inv ε g hg), coeMatrix_left_inv ε g hg⟩, hg⟩
+def mkU (g : Matrix (Fin n) (Fin n) ℂ) (hg : inUJ ε g) : UJ ε := ⟨
+  ⟨g, Jm ε * gᴴ * Jm ε, mul_eq_one_comm.mp (coeMatrix_left_inv ε g hg), coeMatrix_left_inv ε g hg⟩,
+  hg
+⟩
 
 lemma toM_mkU (g : Matrix (Fin n) (Fin n) ℂ) (hg : inUJ ε g) : toM (mkU ε g hg) = g := rfl
 

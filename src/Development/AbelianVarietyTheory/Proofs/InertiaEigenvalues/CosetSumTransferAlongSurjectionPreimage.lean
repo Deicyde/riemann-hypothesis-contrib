@@ -11,24 +11,28 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Inert
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain
+  GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open scoped TensorProduct
 open Classical
 
 namespace GlobalTheory
 
-theorem cosetSum_transfer_surj {G H V : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
+theorem cosetSum_transfer_surj
+    {G H V : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
     (U0 : Subgroup G) (K : Subgroup H) (T : Subgroup G) (ψ : T →* H)
     (hψ : Function.Surjective ψ) (hTU : ∀ t : T, ψ t ∈ K ↔ (t : G) ∈ U0)
     (a φ' : H → ℂ) (β : G → V) (lam : V →ₗ[ℂ] ℂ)
-    (ha : ∀ x, ∀ k ∈ K, a (x * k) = a x)
-    (hfin : (Function.support fun d : H ⧸ K => a d.out).Finite)
-    (hβ : ∀ x, ∀ u ∈ U0, β (x * u) = β x)
-    (hφ : ∀ t : T, φ' (ψ t) = lam (β t)) :
-    ∑ᶠ d : H ⧸ K, a d.out * φ' d.out = lam (∑ᶠ c : G ⧸ U0,
-      if hc : ∃ x : G, (x : G ⧸ U0) = c ∧ x ∈ T then
-        a (ψ ⟨hc.choose, hc.choose_spec.2⟩) • β hc.choose else 0) := by
+    (ha : ∀ x, ∀ k ∈ K, a (x * k) = a x) (hfin : (Function.support fun d : H ⧸ K => a d.out).Finite)
+    (hβ : ∀ x, ∀ u ∈ U0, β (x * u) = β x) (hφ : ∀ t : T, φ' (ψ t) = lam (β t))
+    : ∑ᶠ d : H ⧸ K, a d.out * φ' d.out
+      = lam
+        (∑ᶠ c : G ⧸ U0,
+          if hc : ∃ x : G, (x : G ⧸ U0) = c ∧ x ∈ T then
+            a (ψ ⟨hc.choose, hc.choose_spec.2⟩) • β hc.choose else 0) := by
   classical
   set F : G ⧸ U0 → V := fun c => if hc : ∃ x : G, (x : G ⧸ U0) = c ∧ x ∈ T then
         a (ψ ⟨hc.choose, hc.choose_spec.2⟩) • β hc.choose else 0 with hF
@@ -36,8 +40,10 @@ theorem cosetSum_transfer_surj {G H V : Type} [Group G] [Group H] [AddCommGroup 
   have ht : ∀ d, ψ (t d) = d.out := fun d => (hψ d.out).choose_spec
   let f : H ⧸ K → G ⧸ U0 := fun d => ((t d : G) : G ⧸ U0)
 
-  have key : ∀ x y : T, ((x : G) : G ⧸ U0) = ((y : G) : G ⧸ U0) →
-      ((x : G)⁻¹ * y ∈ U0) ∧ ∃ k ∈ K, ψ y = ψ x * k := by
+  have key
+      : ∀ x y : T,
+        ((x : G) : G ⧸ U0) = ((y : G) : G ⧸ U0)
+          → ((x : G)⁻¹ * y ∈ U0) ∧ ∃ k ∈ K, ψ y = ψ x * k := by
     intro x y hxy
     rw [QuotientGroup.eq] at hxy
     refine ⟨hxy, ψ (x⁻¹ * y), (hTU _).2 (by simpa using hxy), ?_⟩
@@ -50,12 +56,12 @@ theorem cosetSum_transfer_surj {G H V : Type} [Group G] [Group H] [AddCommGroup 
     rw [← QuotientGroup.out_eq' d, ← QuotientGroup.out_eq' d', QuotientGroup.eq, hkk]
     simpa using hk
 
-  have hcover : ∀ x : T, f ((ψ x : H) : H ⧸ K) = ((x : G) : G ⧸ U0) ∧
-      a (((ψ x : H) : H ⧸ K).out) = a (ψ x) := by
+  have hcover
+      : ∀ x : T,
+        f ((ψ x : H) : H ⧸ K) = ((x : G) : G ⧸ U0) ∧ a (((ψ x : H) : H ⧸ K).out) = a (ψ x) := by
     intro x
     set d : H ⧸ K := ((ψ x : H) : H ⧸ K) with hd
-    have h1 : d.out⁻¹ * ψ x ∈ K := by
-      rw [← QuotientGroup.eq, QuotientGroup.out_eq']
+    have h1 : d.out⁻¹ * ψ x ∈ K := by rw [← QuotientGroup.eq, QuotientGroup.out_eq']
     refine ⟨?_, ?_⟩
     · show (((t d : T) : G) : G ⧸ U0) = ((x : G) : G ⧸ U0)
       rw [QuotientGroup.eq]
@@ -96,7 +102,7 @@ theorem cosetSum_transfer_surj {G H V : Type} [Group G] [Group H] [AddCommGroup 
     exact fun h0 => hd (by simp only [h0, zero_mul])
   set_option synthInstance.maxHeartbeats 100000 in
     rw [finsum_eq_sum_of_support_subset _ hL, finsum_eq_sum_of_support_subset _ hsupp,
-    Finset.sum_image (fun d _ d' _ h => hinj h), map_sum]
+      Finset.sum_image (fun d _ d' _ h => hinj h), map_sum]
   refine Finset.sum_congr rfl fun d _ => ?_
   rw [hval, map_smul, smul_eq_mul, ← hφ, ht]
 

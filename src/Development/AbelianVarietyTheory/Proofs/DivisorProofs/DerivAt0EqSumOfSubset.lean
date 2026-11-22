@@ -10,25 +10,29 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSatFram
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh GlobalTheory.FGDepth
+open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh
+  GlobalTheory.FGDepth
 
 namespace GlobalTheory.FGDepth
 
-theorem derivAt0_eq_sum_of_subset {C : Type} [Field C] {σ : Type} (P : MvPolynomial σ C)
-    (g : MvPowerSeries σ C) {s : Finset (σ →₀ ℕ)} (hs : P.support ⊆ s) :
-    derivAt0 P g = ∑ α ∈ s, P.coeff α * mfact α * coeff α g := by
+theorem derivAt0_eq_sum_of_subset
+    {C : Type} [Field C]
+    {σ : Type} (P : MvPolynomial σ C) (g : MvPowerSeries σ C)
+    {s : Finset (σ →₀ ℕ)} (hs : P.support ⊆ s)
+    : derivAt0 P g = ∑ α ∈ s, P.coeff α * mfact α * coeff α g := by
   unfold derivAt0
   refine Finset.sum_subset hs fun α _ hα => ?_
   rw [MvPolynomial.notMem_support_iff.mp hα]
   simp
 
-theorem derivAt0_linear (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ))
-    (σ : Type) (P Q : MvPolynomial σ C) (g g' : MvPowerSeries σ C) (a : C) :
-    derivAt0 P (g + g') = derivAt0 P g + derivAt0 P g' ∧
-      derivAt0 P (a • g) = a * derivAt0 P g ∧
-      derivAt0 (P + Q) g = derivAt0 P g + derivAt0 Q g ∧
-      derivAt0 (a • P) g = a * derivAt0 P g ∧
-      ((∀ α ∈ P.support, coeff α g = coeff α g') → derivAt0 P g = derivAt0 P g') := by
+theorem derivAt0_linear
+    (C : Type) [Field C] [CharZero C]
+    (v : AddValuation C (WithTop ℝ))
+    (σ : Type) (P Q : MvPolynomial σ C) (g g' : MvPowerSeries σ C)
+    (a : C)
+    : derivAt0 P (g + g') = derivAt0 P g + derivAt0 P g' ∧ derivAt0 P (a • g) = a * derivAt0 P g
+      ∧ derivAt0 (P + Q) g = derivAt0 P g + derivAt0 Q g ∧ derivAt0 (a • P) g = a * derivAt0 P g
+      ∧ ((∀ α ∈ P.support, coeff α g = coeff α g') → derivAt0 P g = derivAt0 P g') := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · unfold derivAt0
     rw [← Finset.sum_add_distrib]
@@ -47,8 +51,8 @@ theorem derivAt0_linear (C : Type) [Field C] [CharZero C] (v : AddValuation C (W
     refine Finset.sum_congr rfl fun α _ => ?_
     rw [MvPolynomial.coeff_add]
     ring
-  · rw [derivAt0_eq_sum_of_subset (a • P) g (MvPolynomial.support_smul (a := a) (f := P)),
-      derivAt0, Finset.mul_sum]
+  · rw [derivAt0_eq_sum_of_subset (a • P) g (MvPolynomial.support_smul (a := a) (f := P)), derivAt0,
+      Finset.mul_sum]
     refine Finset.sum_congr rfl fun α _ => ?_
     rw [MvPolynomial.coeff_smul, smul_eq_mul]
     ring

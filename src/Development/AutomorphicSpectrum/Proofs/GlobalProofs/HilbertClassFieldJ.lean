@@ -9,6 +9,7 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ComplexMultipl
 namespace GlobalTheory.CompanionTheory.Hypotheses₂
 
 theorem hilbertClassFieldJ : GlobalTheory.Published.HilbertClassFieldJ :=
-  GlobalTheory.Published.ComplexMultiplicationJSt.hilbertClassFieldJ GlobalTheory.CompanionTheory.Published.complexMultiplicationJ
+  GlobalTheory.Published.ComplexMultiplicationJSt.hilbertClassFieldJ
+    GlobalTheory.CompanionTheory.Published.complexMultiplicationJ
 
 end GlobalTheory.CompanionTheory.Hypotheses₂

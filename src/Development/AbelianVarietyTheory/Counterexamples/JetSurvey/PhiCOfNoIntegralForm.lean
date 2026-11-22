@@ -17,7 +17,8 @@ namespace GlobalTheory.LeastExponentProbe
 variable {E : Type} [Field E] [NumberField E] {cj : E → E}
 variable {Y : Type} [AddCommGroup Y] [Module (𝓞 E) Y]
 
-def vals (b : SymB cj Y) : Set ℝ := {x | ∃ l : SymB cj Y →ₗ[ℝ] ℝ,
+def vals (b : SymB cj Y) : Set ℝ :=
+  {x | ∃ l : SymB cj Y →ₗ[ℝ] ℝ,
     (∀ β : SymB cj Y, (∀ a c, ∃ z : ℤ, (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a c = z) → ∃ z : ℤ, l β = z) ∧
     (∀ β : SymB cj Y, (∀ a, 0 ≤ (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a a) → β ≠ 0 → 0 < l β) ∧ x = l b}
 
@@ -35,9 +36,11 @@ section CM
 
 variable [IsCMField E] [Module.Finite (𝓞 E) Y] [Module.Projective (𝓞 E) Y]
 
-theorem one_le_phiC (h : IsConj cj) (b : SymB cj Y)
-    (hint : ∀ a c, ∃ z : ℤ, (b : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a c = z)
-    (hpos : ∀ a, 0 ≤ (b : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a a) (h0 : b ≠ 0) : 1 ≤ phiC cj b := by
+theorem one_le_phiC
+    (h : IsConj cj)
+    (b : SymB cj Y) (hint : ∀ a c, ∃ z : ℤ, (b : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a c = z)
+    (hpos : ∀ a, 0 ≤ (b : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a a) (h0 : b ≠ 0)
+    : 1 ≤ phiC cj b := by
   rw [phiC_def]
   refine le_csInf (by rw [vals_eq_functionalValues]; exact functionalValues_nonempty h b) ?_
   rintro x ⟨l, h1, h2, rfl⟩

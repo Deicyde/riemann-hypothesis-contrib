@@ -143,12 +143,14 @@ private lemma exists_polynomial_weierstrass (n : ℕ) : ∀ (g h : ℂ → ℂ),
     rw [eval_add, eval_mul, eval_C, eval_pow, eval_X, ← this]
     ring
 
-theorem exists_eq_polynomial_weierstrassP {g : ℂ → ℂ} (h0 : MeromorphicAt g 0)
-    (hd : ∀ z ∉ L.lattice, DifferentiableAt ℂ g z) (hp : ∀ z, ∀ l ∈ L.lattice, g (z + l) = g z)
-    (hev : ∀ z, g (-z) = g z) : ∃ A : ℂ[X], ∀ z ∉ L.lattice, g z = A.eval (℘[L] z) := by
+theorem exists_eq_polynomial_weierstrassP
+    {g : ℂ → ℂ} (h0 : MeromorphicAt g 0) (hd : ∀ z ∉ L.lattice, DifferentiableAt ℂ g z)
+    (hp : ∀ z, ∀ l ∈ L.lattice, g (z + l) = g z) (hev : ∀ z, g (-z) = g z)
+    : ∃ A : ℂ[X], ∀ z ∉ L.lattice, g z = A.eval (℘[L] z) := by
   obtain ⟨N, hN⟩ := h0
-  refine exists_polynomial_weierstrass L N g (fun z => z ^ (2 * N) * g z) hd hp hev ?_
-    (Eventually.of_forall fun z => rfl)
+  refine exists_polynomial_weierstrass L N g
+    (fun z => z ^ (2 * N) * g z)
+    hd hp hev ?_ (Eventually.of_forall fun z => rfl)
   have : (fun z => z ^ (2 * N) * g z) = fun z => z ^ N * ((z - 0) ^ N • g z) := by
     funext z
     simp only [sub_zero, smul_eq_mul]
@@ -156,9 +158,10 @@ theorem exists_eq_polynomial_weierstrassP {g : ℂ → ℂ} (h0 : MeromorphicAt 
   rw [this]
   exact (analyticAt_id.pow N).mul hN
 
-theorem exists_mul_eq_polynomial_weierstrassP {f : ℂ → ℂ} (hf : Meromorphic f)
-    (hp : ∀ z, ∀ l ∈ L.lattice, f (z + l) = f z) (hev : ∀ z, f (-z) = f z) :
-    ∃ A D : ℂ[X], D.Monic ∧ ∀ z ∉ L.lattice, f z * D.eval (℘[L] z) = A.eval (℘[L] z) := by
+theorem exists_mul_eq_polynomial_weierstrassP
+    {f : ℂ → ℂ}
+    (hf : Meromorphic f) (hp : ∀ z, ∀ l ∈ L.lattice, f (z + l) = f z) (hev : ∀ z, f (-z) = f z)
+    : ∃ A D : ℂ[X], D.Monic ∧ ∀ z ∉ L.lattice, f z * D.eval (℘[L] z) = A.eval (℘[L] z) := by
   classical
   have hK : IsCompact (closure (ZSpan.fundamentalDomain L.basis)) :=
     (ZSpan.fundamentalDomain_isBounded L.basis).isCompact_closure
@@ -170,21 +173,24 @@ theorem exists_mul_eq_polynomial_weierstrassP {f : ℂ → ℂ} (hf : Meromorphi
     rw [Filter.inf_principal_eq_bot]
     filter_upwards [(hf x).eventually_analyticAt] with y hy
     exact fun hyS => hyS.2 hy
-  obtain ⟨S, hS⟩ : ∃ S : Finset ℂ, ∀ a, a ∈ S ↔
-      a ∈ closure (ZSpan.fundamentalDomain L.basis) ∩ {z | ¬ AnalyticAt ℂ f z} :=
+  obtain ⟨S, hS⟩
+      : ∃ S : Finset ℂ, ∀ a,
+        a ∈ S ↔ a ∈ closure (ZSpan.fundamentalDomain L.basis) ∩ {z | ¬ AnalyticAt ℂ f z} :=
     ⟨hfin.toFinset, fun a => hfin.mem_toFinset⟩
   choose n hn using hf
   let D : ℂ[X] := ∏ a ∈ S, (X - C (℘[L] a)) ^ (n a + 1)
   have hD : D.Monic := monic_prod_of_monic _ _ fun a _ => (monic_X_sub_C _).pow _
   let g : ℂ → ℂ := fun z => f z * D.eval (℘[L] z)
-  have h℘d : ∀ z ∉ L.lattice, DifferentiableAt ℂ ℘[L] z :=
-    fun z hz => (hasDerivAt_weierstrassP L hz).differentiableAt
-  have hPd : ∀ (p : ℂ[X]) (z : ℂ), z ∉ L.lattice → DifferentiableAt ℂ (fun w => p.eval (℘[L] w)) z :=
+  have h℘d : ∀ z ∉ L.lattice, DifferentiableAt ℂ ℘[L] z := fun z hz =>
+    (hasDerivAt_weierstrassP L hz).differentiableAt
+  have hPd
+      : ∀ (p : ℂ[X]) (z : ℂ), z ∉ L.lattice → DifferentiableAt ℂ (fun w => p.eval (℘[L] w)) z :=
     fun p z hz => (p.differentiableAt (x := ℘[L] z)).comp z (h℘d z hz)
   have hPm : ∀ p : ℂ[X], MeromorphicAt (fun w => p.eval (℘[L] w)) 0 := by
     intro p
     have h℘m := L.meromorphic_weierstrassP 0
-    refine Polynomial.induction_on (motive := fun p => MeromorphicAt (fun w => p.eval (℘[L] w)) 0)
+    refine Polynomial.induction_on
+      (motive := fun p => MeromorphicAt (fun w => p.eval (℘[L] w)) 0)
       p ?_ ?_ ?_
     · intro a
       simp
@@ -203,11 +209,16 @@ theorem exists_mul_eq_polynomial_weierstrassP {f : ℂ → ℂ} (hf : Meromorphi
     intro a ha hal
     have hψ : DifferentiableAt ℂ (dslope ℘[L] a) a := by
       have hs : (L.lattice : Set ℂ)ᶜ ∈ 𝓝 a := L.isClosed_lattice.isOpen_compl.mem_nhds hal
-      exact ((Complex.differentiableOn_dslope hs).mpr L.differentiableOn_weierstrassP).differentiableAt hs
+      exact
+        ((Complex.differentiableOn_dslope hs).mpr L.differentiableOn_weierstrassP).differentiableAt
+          hs
     have hDR : D = (X - C (℘[L] a)) ^ (n a + 1) * ∏ b ∈ S.erase a, (X - C (℘[L] b)) ^ (n b + 1) :=
       (Finset.mul_prod_erase S (fun b => (X - C (℘[L] b)) ^ (n b + 1)) ha).symm
-    have hfun : g = fun w => (w - a) * ((w - a) ^ (n a) • f w) * (dslope ℘[L] a w) ^ (n a + 1) *
-        (∏ b ∈ S.erase a, (X - C (℘[L] b)) ^ (n b + 1)).eval (℘[L] w) := by
+    have hfun
+        : g
+          = fun w =>
+            (w - a) * ((w - a) ^ (n a) • f w) * (dslope ℘[L] a w) ^ (n a + 1)
+              * (∏ b ∈ S.erase a, (X - C (℘[L] b)) ^ (n b + 1)).eval (℘[L] w) := by
       funext w
       have e := sub_smul_dslope ℘[L] a w
       rw [smul_eq_mul] at e
@@ -223,29 +234,33 @@ theorem exists_mul_eq_polynomial_weierstrassP {f : ℂ → ℂ} (hf : Meromorphi
     intro z hz
     by_cases hfa : AnalyticAt ℂ f z
     · exact hfa.differentiableAt.mul (hPd D z hz)
-    obtain ⟨a, l, hlL, rfl, haK⟩ : ∃ a l, l ∈ L.lattice ∧ z = a + l ∧
-        a ∈ closure (ZSpan.fundamentalDomain L.basis) :=
-      ⟨ZSpan.fract L.basis z, ZSpan.floor L.basis z,
-        by rw [L.lattice_eq_span_range_basis]; exact (ZSpan.floor L.basis z).2,
-        by rw [ZSpan.fract_apply]; ring,
-        subset_closure (ZSpan.fract_mem_fundamentalDomain L.basis z)⟩
+    obtain ⟨a, l, hlL, rfl, haK⟩
+        : ∃ a l, l ∈ L.lattice ∧ z = a + l ∧ a ∈ closure (ZSpan.fundamentalDomain L.basis) := ⟨
+      ZSpan.fract L.basis z,
+      ZSpan.floor L.basis z,
+      by rw [L.lattice_eq_span_range_basis]; exact (ZSpan.floor L.basis z).2,
+      by rw [ZSpan.fract_apply]; ring,
+      subset_closure (ZSpan.fract_mem_fundamentalDomain L.basis z)
+    ⟩
     have hal : a ∉ L.lattice := fun h => hz (L.lattice.add_mem h hlL)
     have haB : ¬ AnalyticAt ℂ f a := by
       intro hfa'
       apply hfa
-      have htf : (fun w => f (w - l)) = f := funext fun w => by
-        have := hp (w - l) l hlL
-        rw [sub_add_cancel] at this
-        exact this.symm
+      have htf : (fun w => f (w - l)) = f :=
+        funext fun w => by
+          have := hp (w - l) l hlL
+          rw [sub_add_cancel] at this
+          exact this.symm
       rw [← htf]
       have h2 : AnalyticAt ℂ (fun w : ℂ => w - l) (a + l) := by fun_prop
       exact hfa'.comp_of_eq h2 (by simp)
     have haS : a ∈ S := (hS a).mpr ⟨haK, haB⟩
     have hga := hgS a haS hal
-    have htr : g = fun w => g (w - l) := funext fun w => by
-      have := hgp (w - l) l hlL
-      rw [sub_add_cancel] at this
-      exact this
+    have htr : g = fun w => g (w - l) :=
+      funext fun w => by
+        have := hgp (w - l) l hlL
+        rw [sub_add_cancel] at this
+        exact this
     rw [htr]
     have h2 : DifferentiableAt ℂ (fun w : ℂ => w - l) (a + l) := differentiableAt_id.sub_const l
     have h3 : DifferentiableAt ℂ g ((fun w : ℂ => w - l) (a + l)) := by simpa using hga

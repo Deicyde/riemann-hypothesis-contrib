@@ -21,19 +21,19 @@ def qZ (σ : ℂ) (a : ℤ) (b m : ℕ) (y t : ℝ) : ℂ :=
 def intZ (σ : ℂ) (ν : ℝ) (a : ℤ) (b m : ℕ) (y : ℝ) : ℂ :=
   ∫ t : ℝ, qZ σ a b m y t * Complex.exp (-(2 * (Real.pi : ℂ) * I * (ν : ℂ) * (t : ℂ)))
 
-theorem term_eq_qZ (σ : ℂ) (ν : ℝ) (a b m : ℕ) (y t : ℝ) :
-    GlobalTheory.HeckeTwo.TermSmooth.term σ ν a b m y t =
-      qZ σ (a : ℤ) b m y t * Complex.exp (-(2 * (Real.pi : ℂ) * I * (ν : ℂ) * (t : ℂ))) := by
+theorem term_eq_qZ (σ : ℂ) (ν : ℝ) (a b m : ℕ) (y t : ℝ)
+    : GlobalTheory.HeckeTwo.TermSmooth.term σ ν a b m y t
+      = qZ σ (a : ℤ) b m y t * Complex.exp (-(2 * (Real.pi : ℂ) * I * (ν : ℂ) * (t : ℂ))) := by
   unfold GlobalTheory.HeckeTwo.TermSmooth.term qZ
   rw [zpow_neg, zpow_natCast, inv_pow]
 
-theorem intT_eq_intZ (σ : ℂ) (ν : ℝ) (a b m : ℕ) (y : ℝ) :
-    GlobalTheory.HeckeTwo.TermSmooth.intT σ ν a b m y = intZ σ ν (a : ℤ) b m y := by
+theorem intT_eq_intZ (σ : ℂ) (ν : ℝ) (a b m : ℕ) (y : ℝ)
+    : GlobalTheory.HeckeTwo.TermSmooth.intT σ ν a b m y = intZ σ ν (a : ℤ) b m y := by
   unfold GlobalTheory.HeckeTwo.TermSmooth.intT intZ
   simp_rw [term_eq_qZ]
 
-theorem intZ_eq_fourier (σ : ℂ) (ν : ℝ) (a : ℤ) (b m : ℕ) (y : ℝ) :
-    intZ σ ν a b m y = FourierTransform.fourier (qZ σ a b m y) ν := by
+theorem intZ_eq_fourier (σ : ℂ) (ν : ℝ) (a : ℤ) (b m : ℕ) (y : ℝ)
+    : intZ σ ν a b m y = FourierTransform.fourier (qZ σ a b m y) ν := by
   rw [Real.fourier_real_eq_integral_exp_smul]
   unfold intZ
   congr 1

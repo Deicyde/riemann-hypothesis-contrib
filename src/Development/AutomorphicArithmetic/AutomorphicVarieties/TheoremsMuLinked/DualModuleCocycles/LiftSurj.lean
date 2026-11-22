@@ -13,11 +13,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa UpperTheory.V.Th UpperTheory.V.Th.Coc
+open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa
+  UpperTheory.V.Th UpperTheory.V.Th.Coc
 
-private theorem lift_surj {B E E' P : Type} [CommRing B] [Ring E] [Ring E'] [Ring P] [Algebra B E] [Algebra B E']
-    [Algebra B P] (q : E →ₐ[B] E') (hq : Function.Surjective q) (ρ : E →ₐ[B] P) (h : ∀ x, q x = 0 → ρ x = 0) :
-    ∃ π : E' →ₐ[B] P, ∀ x, π (q x) = ρ x := by
+private theorem lift_surj
+    {B E E' P : Type}
+    [CommRing B] [Ring E] [Ring E'] [Ring P] [Algebra B E] [Algebra B E'] [Algebra B P]
+    (q : E →ₐ[B] E') (hq : Function.Surjective q)
+    (ρ : E →ₐ[B] P) (h : ∀ x, q x = 0 → ρ x = 0)
+    : ∃ π : E' →ₐ[B] P, ∀ x, π (q x) = ρ x := by
   have key : ∀ x y, q x = q y → ρ x = ρ y := fun x y hxy =>
     sub_eq_zero.1 (by rw [← map_sub]; exact h _ (by rw [map_sub, hxy, sub_self]))
   choose s hs using hq
@@ -35,8 +39,13 @@ private theorem lift_surj {B E E' P : Type} [CommRing B] [Ring E] [Ring E'] [Rin
   · change ρ (s (algebraMap B E' r)) = _
     rw [← q.commutes, hq', ρ.commutes]
 
-theorem UpperTheory.V.Th.Coc.gma :
-    ∀ {n : ℕ} {O R G : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R] [Group G] (D : GDet n R G) (χ : Fin n → G →* (ResidueField O)ˣ), 1 ≤ n → Function.Injective χ → D.map (res O R : R →+* ResidueField O) = GDet.ofRep (diagRep χ) → ∃ (E : Type) (_ : Ring E) (_ : Algebra R E) (π : MonoidAlgebra R G →ₐ[R] E) (τ : E →ₗ[R] R) (e : Fin n → E), Function.Surjective π ∧ (∀ y, τ (π y) = D.tr y) ∧ IsTrGMA τ e := by
+theorem UpperTheory.V.Th.Coc.gma
+    : ∀ {n : ℕ} {O R G : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
+        [Group G] (D : GDet n R G) (χ : Fin n → G →* (ResidueField O)ˣ),
+      1 ≤ n → Function.Injective χ → D.map (res O R : R →+* ResidueField O) = GDet.ofRep (diagRep χ)
+        → ∃ (E : Type) (_ : Ring E) (_ : Algebra R E) (π : MonoidAlgebra R G →ₐ[R] E)
+            (τ : E →ₗ[R] R) (e : Fin n → E),
+          Function.Surjective π ∧ (∀ y, τ (π y) = D.tr y) ∧ IsTrGMA τ e := by
   intro n O R G _ _ _ _ _ _ D χ hn hχ hred
   obtain ⟨E, _, _, q, DE, hsurj, hDE, hCH, -⟩ := chQuot D.toDet
   obtain ⟨π0, hs0, -, -, hchi0⟩ := CA.f_chars χ hχ
@@ -44,9 +53,14 @@ theorem UpperTheory.V.Th.Coc.gma :
   have hal : algebraMap R (ResidueField O) = (res O R : R →+* ResidueField O) := rfl
   let ρ : MonoidAlgebra R G →ₐ[R] (Fin n → ResidueField O) :=
     (π0.restrictScalars R).comp (MonoidAlgebra.mapAlgHom G (Algebra.ofId R (ResidueField O)))
-  have hρ : ∀ x, ρ x = π0 (MonoidAlgebra.mapRingHom G (res O R : R →+* ResidueField O) x) := fun x => rfl
-  have hchi : ∀ x, (DE.chi (q x)).map (res O R : R →+* ResidueField O) = ∏ i, (Polynomial.X - Polynomial.C (ρ x i)) := fun x => by
-    rw [← (CA.d_pull DE q).1, hDE, (CA.d_toDet D x).1, ← ((CA.d_gmap D).2.2.1 (res O R : R →+* ResidueField O) x).1, hred, hρ]
+  have hρ : ∀ x, ρ x = π0 (MonoidAlgebra.mapRingHom G (res O R : R →+* ResidueField O) x) :=
+    fun x => rfl
+  have hchi
+      : ∀ x,
+        (DE.chi (q x)).map (res O R : R →+* ResidueField O)
+          = ∏ i, (Polynomial.X - Polynomial.C (ρ x i)) := fun x => by
+    rw [← (CA.d_pull DE q).1, hDE, (CA.d_toDet D x).1,
+      ← ((CA.d_gmap D).2.2.1 (res O R : R →+* ResidueField O) x).1, hred, hρ]
     exact hchi0 _
   have hker : ∀ x, q x = 0 → ρ x = 0 := fun x hx => by
     have h1 := hchi x
@@ -54,12 +68,16 @@ theorem UpperTheory.V.Th.Coc.gma :
     funext i
     have h2 := congrArg (Polynomial.eval (ρ x i)) h1
     rw [Polynomial.eval_prod, Polynomial.eval_prod,
-      Finset.prod_eq_zero (f := fun j => Polynomial.eval (ρ x i) (Polynomial.X - Polynomial.C (ρ x j)))
-      (Finset.mem_univ i) (by simp)] at h2
+        Finset.prod_eq_zero
+          (f := fun j => Polynomial.eval (ρ x i) (Polynomial.X - Polynomial.C (ρ x j)))
+          (Finset.mem_univ i) (by simp)]
+      at h2
     obtain ⟨j, -, hj⟩ := Finset.prod_eq_zero_iff.1 h2
     simpa using hj
   obtain ⟨π, hπ⟩ := lift_surj q hsurj ρ hker
-  have hmap : ∀ y : MonoidAlgebra (ResidueField O) G, ∃ x, MonoidAlgebra.mapRingHom G (res O R : R →+* ResidueField O) x = y := by
+  have hmap
+      : ∀ y : MonoidAlgebra (ResidueField O) G, ∃ x,
+        MonoidAlgebra.mapRingHom G (res O R : R →+* ResidueField O) x = y := by
     intro y
     induction y using MonoidAlgebra.induction_linear with
     | zero => exact ⟨0, map_zero _⟩
@@ -69,13 +87,18 @@ theorem UpperTheory.V.Th.Coc.gma :
       exact ⟨a' + b', map_add _ _ _⟩
     | single g r =>
       obtain ⟨c, rfl⟩ := residue_surjective r
-      exact ⟨MonoidAlgebra.single g (algebraMap O R c), (MonoidAlgebra.mapRingHom_single _ _ _).trans
-        (congrArg _ ((res O R).commutes c))⟩
+      exact ⟨
+        MonoidAlgebra.single g (algebraMap O R c),
+        (MonoidAlgebra.mapRingHom_single _ _ _).trans (congrArg _ ((res O R).commutes c))
+      ⟩
   have hπs : Function.Surjective π := fun v => by
     obtain ⟨y, rfl⟩ := hs0 v
     obtain ⟨x, rfl⟩ := hmap y
     exact ⟨q x, by rw [hπ, hρ]⟩
-  have hchiE : ∀ x, (DE.chi x).map (algebraMap R (ResidueField O)) = ∏ i, (Polynomial.X - Polynomial.C (π x i)) := fun x => by
+  have hchiE
+      : ∀ x,
+        (DE.chi x).map (algebraMap R (ResidueField O))
+          = ∏ i, (Polynomial.X - Polynomial.C (π x i)) := fun x => by
     obtain ⟨y, rfl⟩ := hsurj x
     rw [hπ, hal, hchi]
   haveI : IsLocalHom (algebraMap R (ResidueField O)) := ⟨fun a ha => by

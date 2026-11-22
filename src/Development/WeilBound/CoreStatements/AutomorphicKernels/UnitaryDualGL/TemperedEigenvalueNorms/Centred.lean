@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Lang
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace PositivityTheory.UdReth2
 
@@ -22,8 +23,9 @@ section Local
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 def IsCentred (Δ : Segment k) : Prop :=
-  ∀ ω : kˣ →* ℂˣ, HasCentralChar Δ.first.rep ω → ∀ z : kˣ,
-    Real.log ‖(ω z : ℂ)‖ = -((Δ.d : ℝ) * ((Δ.len : ℝ) - 1) / 2) * Real.log (nabs k z)
+  ∀ ω : kˣ →* ℂˣ,
+    HasCentralChar Δ.first.rep ω
+      → ∀ z : kˣ, Real.log ‖(ω z : ℂ)‖ = -((Δ.d : ℝ) * ((Δ.len : ℝ) - 1) / 2) * Real.log (nabs k z)
 
 end Local
 

@@ -121,8 +121,9 @@ lemma E_eq (ε : Fin n → Bool) (a b : Fin n) :
 end Alg
 
 section Rep
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
 lemma inner_map_map' (hσ : IsURepOn (UJset ε) σ) {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε)
     (x y : H) : inner ℂ (σ g x) (σ g y) = inner ℂ x y :=

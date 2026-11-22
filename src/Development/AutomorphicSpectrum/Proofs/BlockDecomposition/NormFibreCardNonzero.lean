@@ -26,8 +26,8 @@ theorem nontrivial_of_resAlg (h : ResAlg E τ q ε) : Nontrivial E := by
 theorem card_fixed (h : ResAlg E τ q ε) : Nat.card {x : E // τ x = x} = q := by
   have := finite_of_resAlg h
   obtain ⟨u, hu, hb⟩ := h.basis
-  have hbij : Function.Bijective
-      (fun p : {x : E // τ x = x} × {x : E // τ x = x} => (p.1 : E) + p.2 * u) := by
+  have hbij : Function.Bijective (fun p : {x : E // τ x = x} × {x : E // τ x = x} =>
+      (p.1 : E) + p.2 * u) := by
     constructor
     · rintro ⟨⟨x, hx⟩, ⟨y, hy⟩⟩ ⟨⟨x', hx'⟩, ⟨y', hy'⟩⟩ hxy
       simp only at hxy
@@ -52,12 +52,15 @@ theorem card_fixed (h : ResAlg E τ q ε) : Nat.card {x : E // τ x = x} = q := 
 theorem card_fixed_ne (h : ResAlg E τ q ε) : Nat.card {x : E // τ x = x ∧ x ≠ 0} = q - 1 := by
   classical
   have := finite_of_resAlg h
-  have e1 : Nat.card {x : E // τ x = x ∧ x ≠ 0} =
-      Nat.card {y : {x : E // τ x = x} // y ≠ ⟨0, map_zero τ⟩} := Nat.card_congr
-    { toFun := fun x => ⟨⟨x.1, x.2.1⟩, fun h0 => x.2.2 (congrArg Subtype.val h0)⟩
+  have e1
+      : Nat.card {x : E // τ x = x ∧ x ≠ 0}
+        = Nat.card {y : {x : E // τ x = x} // y ≠ ⟨0, map_zero τ⟩} :=
+    Nat.card_congr {
+      toFun := fun x => ⟨⟨x.1, x.2.1⟩, fun h0 => x.2.2 (congrArg Subtype.val h0)⟩
       invFun := fun y => ⟨y.1.1, y.1.2, fun h0 => y.2 (Subtype.ext h0)⟩
       left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+      right_inv := fun _ => rfl
+    }
   have e2 := Nat.card_congr (Equiv.optionSubtypeNe (⟨0, map_zero τ⟩ : {x : E // τ x = x}))
   rw [Finite.card_option, card_fixed h] at e2
   rw [e1, ← e2, Nat.add_sub_cancel]
@@ -66,19 +69,25 @@ theorem fixed_inv {s v : E} (hs : τ s = s) (hv : s * v = 1) : τ v = v := by
   have h2 : s * τ v = 1 := by
     have h3 := congrArg τ hv
     rwa [map_mul, map_one, hs] at h3
-  calc τ v = (v * s) * τ v := by rw [mul_comm v s, hv, one_mul]
+  calc
+    τ v
+      = (v * s) * τ v := by rw [mul_comm v s, hv, one_mul]
     _ = v := by rw [mul_assoc, h2, mul_one]
 
-theorem exists_idem (h : ResAlg E τ q ε) (hnf : ¬ IsField E) :
-    ∃ e : E, e + τ e = 1 ∧ e * τ e = 0 := by
+theorem exists_idem (h : ResAlg E τ q ε) (hnf : ¬ IsField E)
+    : ∃ e : E, e + τ e = 1 ∧ e * τ e = 0 := by
   have := nontrivial_of_resAlg h
   obtain ⟨u, hu, -⟩ := h.basis
   obtain ⟨a, ha0, hau⟩ : ∃ a : E, a ≠ 0 ∧ ¬ IsUnit a := by
     by_contra hc
     push Not at hc
-    exact hnf ⟨exists_pair_ne E, mul_comm, fun {a} ha => by
-      obtain ⟨b, hb⟩ := (hc a ha).exists_right_inv
-      exact ⟨b, hb⟩⟩
+    exact hnf ⟨
+      exists_pair_ne E,
+      mul_comm,
+      fun {a} ha => by
+        obtain ⟨b, hb⟩ := (hc a ha).exists_right_inv
+        exact ⟨b, hb⟩
+    ⟩
   have haτ : a * τ a = 0 := by
     by_contra hne
     apply hau
@@ -96,7 +105,8 @@ theorem exists_idem (h : ResAlg E τ q ε) (hnf : ¬ IsField E) :
       linear_combination h2 - τ u * h1
     exact hu.mul_left_eq_zero.1 h3
   obtain ⟨w, hw⟩ := hw
-  have hTfix : τ (a * w + τ (a * w)) = a * w + τ (a * w) := by rw [map_add (f := _), h.inv, add_comm]
+  have hTfix : τ (a * w + τ (a * w)) = a * w + τ (a * w) := by
+    rw [map_add (f := _), h.inv, add_comm]
   obtain ⟨s, hs⟩ := (h.fixedUnit _ hTfix hw).exists_right_inv
   have hsf : τ s = s := fixed_inv hTfix hs
   refine ⟨a * w * s, ?_, ?_⟩
@@ -105,8 +115,9 @@ theorem exists_idem (h : ResAlg E τ q ε) (hnf : ¬ IsField E) :
   · rw [map_mul, hsf, map_mul]
     linear_combination (w * τ w * s * s) * haτ
 
-theorem card_fibre_split (h : ResAlg E τ q ε) (hnf : ¬ IsField E) {t : E} (ht : τ t = t)
-    (t0 : t ≠ 0) : Nat.card {a : E // a * τ a = t} = q - 1 := by
+theorem card_fibre_split
+    (h : ResAlg E τ q ε) (hnf : ¬ IsField E) {t : E} (ht : τ t = t) (t0 : t ≠ 0)
+    : Nat.card {a : E // a * τ a = t} = q - 1 := by
   obtain ⟨e, he1, he0⟩ := exists_idem h hnf
   have hτe : τ (τ e) = e := h.inv e
   have hee : e * e = e := by linear_combination e * he1 - he0
@@ -129,27 +140,31 @@ theorem card_fibre_split (h : ResAlg E τ q ε) (hnf : ¬ IsField E) {t : E} (ht
     have h2 : τ a * τ e = 0 := by linear_combination τ e * hα - τ a * hff - a * he0
     linear_combination -ha + τ a * h1 + a * h2 - a * τ a * he1
   rw [← card_fixed_ne h]
-  exact Nat.card_congr
-    { toFun := fun a => ⟨a.1 * e + τ a.1 * τ e, hfixA a.1, hneA a.1 a.2⟩
-      invFun := fun x => ⟨x.1 * e + t * s x.1 * τ e, by
+  exact Nat.card_congr {
+    toFun := fun a => ⟨a.1 * e + τ a.1 * τ e, hfixA a.1, hneA a.1 a.2⟩
+    invFun := fun x => ⟨
+      x.1 * e + t * s x.1 * τ e,
+      by
         obtain ⟨hs1, hs2⟩ := hs x.1 x.2.1 x.2.2
         simp only [map_add (f := _), map_mul, x.2.1, ht, hs2, hτe]
         linear_combination (x.1 ^ 2 + t ^ 2 * s x.1 ^ 2) * he0 + x.1 * t * s x.1 * hee +
-          x.1 * t * s x.1 * hff + x.1 * t * s x.1 * he1 + t * hs1⟩
-      left_inv := fun a => by
-        obtain ⟨hs1, -⟩ := hs _ (hfixA a.1) (hneA a.1 a.2)
-        have ha := a.2
-        apply Subtype.ext
-        dsimp only
-        linear_combination a.1 * hee + (τ a.1 - a.1 ^ 2 * s (a.1 * e + τ a.1 * τ e)) * he0 + a.1 * he1 -
-          s (a.1 * e + τ a.1 * τ e) * τ e * ha + a.1 * τ e * hs1 -
-          a.1 * τ a.1 * s (a.1 * e + τ a.1 * τ e) * hff
-      right_inv := fun x => by
-        obtain ⟨-, hs2⟩ := hs x.1 x.2.1 x.2.2
-        apply Subtype.ext
-        dsimp only
-        simp only [map_add (f := _), map_mul, x.2.1, ht, hs2, hτe]
-        linear_combination x.1 * hee + 2 * t * s x.1 * he0 + x.1 * hff + x.1 * he1 }
+          x.1 * t * s x.1 * hff + x.1 * t * s x.1 * he1 + t * hs1
+    ⟩
+    left_inv := fun a => by
+      obtain ⟨hs1, -⟩ := hs _ (hfixA a.1) (hneA a.1 a.2)
+      have ha := a.2
+      apply Subtype.ext
+      dsimp only
+      linear_combination a.1 * hee + (τ a.1 - a.1 ^ 2 * s (a.1 * e + τ a.1 * τ e)) * he0 + a.1 * he1 -
+        s (a.1 * e + τ a.1 * τ e) * τ e * ha + a.1 * τ e * hs1 -
+        a.1 * τ a.1 * s (a.1 * e + τ a.1 * τ e) * hff
+    right_inv := fun x => by
+      obtain ⟨-, hs2⟩ := hs x.1 x.2.1 x.2.2
+      apply Subtype.ext
+      dsimp only
+      simp only [map_add (f := _), map_mul, x.2.1, ht, hs2, hτe]
+      linear_combination x.1 * hee + 2 * t * s x.1 * he0 + x.1 * hff + x.1 * he1
+  }
 
 theorem isUnit_of_ne (hf : IsField E) {a : E} (ha : a ≠ 0) : IsUnit a := by
   obtain ⟨b, hb⟩ := hf.mul_inv_cancel ha
@@ -159,11 +174,13 @@ theorem card_units (h : ResAlg E τ q ε) (hf : IsField E) : Nat.card Eˣ = q ^ 
   classical
   have := finite_of_resAlg h
   have := nontrivial_of_resAlg h
-  have e1 : Nat.card Eˣ = Nat.card {a : E // a ≠ 0} := Nat.card_congr
-    { toFun := fun u => ⟨u, u.ne_zero⟩
+  have e1 : Nat.card Eˣ = Nat.card {a : E // a ≠ 0} :=
+    Nat.card_congr {
+      toFun := fun u => ⟨u, u.ne_zero⟩
       invFun := fun a => (isUnit_of_ne hf a.2).unit
       left_inv := fun u => Units.ext rfl
-      right_inv := fun a => rfl }
+      right_inv := fun a => rfl
+    }
   have e2 := Nat.card_congr (Equiv.optionSubtypeNe (0 : E))
   rw [Finite.card_option, h.card] at e2
   rw [e1, ← e2, Nat.add_sub_cancel]
@@ -196,14 +213,14 @@ theorem mem_ker_ratioU {k : Eˣ} : k ∈ (ratioU τ).ker ↔ (k : E) = τ k := b
 theorem card_ker_ratioU (h : ResAlg E τ q ε) : Nat.card (ratioU τ).ker = q - 1 := by
   have := nontrivial_of_resAlg h
   rw [← card_fixed_ne h]
-  exact Nat.card_congr
-    { toFun := fun k => ⟨((k : Eˣ) : E), (mem_ker_ratioU.1 k.2).symm, (k : Eˣ).ne_zero⟩
-      invFun := fun x => ⟨(h.fixedUnit x.1 x.2.1 x.2.2).unit, mem_ker_ratioU.2 x.2.1.symm⟩
-      left_inv := fun k => Subtype.ext (Units.ext rfl)
-      right_inv := fun x => rfl }
+  exact Nat.card_congr {
+    toFun := fun k => ⟨((k : Eˣ) : E), (mem_ker_ratioU.1 k.2).symm, (k : Eˣ).ne_zero⟩
+    invFun := fun x => ⟨(h.fixedUnit x.1 x.2.1 x.2.2).unit, mem_ker_ratioU.2 x.2.1.symm⟩
+    left_inv := fun k => Subtype.ext (Units.ext rfl)
+    right_inv := fun x => rfl
+  }
 
-theorem range_ratioU (h : ResAlg E τ q ε) (hf : IsField E) :
-    (ratioU τ).range = (normU τ).ker := by
+theorem range_ratioU (h : ResAlg E τ q ε) (hf : IsField E) : (ratioU τ).range = (normU τ).ker := by
   have := nontrivial_of_resAlg h
   ext k
   constructor
@@ -234,8 +251,8 @@ theorem sq_sub_one (hq : 1 < q) : q ^ 2 - 1 = (q - 1) * (q + 1) := by
   have h2 : (r + 1) ^ 2 = r * (r + 1 + 1) + 1 := by ring
   rw [h2, Nat.add_sub_cancel, Nat.add_sub_cancel]
 
-theorem card_fibre_field (h : ResAlg E τ q ε) (hf : IsField E) {t : E} (ht : τ t = t)
-    (t0 : t ≠ 0) : Nat.card {a : E // a * τ a = t} = q + 1 := by
+theorem card_fibre_field (h : ResAlg E τ q ε) (hf : IsField E) {t : E} (ht : τ t = t) (t0 : t ≠ 0)
+    : Nat.card {a : E // a * τ a = t} = q + 1 := by
   have := finite_of_resAlg h
   have := nontrivial_of_resAlg h
   have hq := h.one_lt
@@ -258,11 +275,12 @@ theorem card_fibre_field (h : ResAlg E τ q ε) (hf : IsField E) {t : E} (ht : �
   let S : Set Eˣ := {k | τ (k : E) = k}
   have hS : Nat.card S = q - 1 := by
     rw [← card_fixed_ne h]
-    exact Nat.card_congr
-      { toFun := fun k => ⟨((k.1 : Eˣ) : E), k.2, k.1.ne_zero⟩
-        invFun := fun x => ⟨(h.fixedUnit x.1 x.2.1 x.2.2).unit, x.2.1⟩
-        left_inv := fun k => Subtype.ext (Units.ext rfl)
-        right_inv := fun x => rfl }
+    exact Nat.card_congr {
+      toFun := fun k => ⟨((k.1 : Eˣ) : E), k.2, k.1.ne_zero⟩
+      invFun := fun x => ⟨(h.fixedUnit x.1 x.2.1 x.2.2).unit, x.2.1⟩
+      left_inv := fun k => Subtype.ext (Units.ext rfl)
+      right_inv := fun x => rfl
+    }
   have hsub : ((normU τ).range : Set Eˣ) ⊆ S := by
     intro k hk
     obtain ⟨b, rfl⟩ := MonoidHom.mem_range.1 hk
@@ -288,18 +306,26 @@ theorem card_fibre_field (h : ResAlg E τ q ε) (hf : IsField E) {t : E} (ht : �
     hn _ (by rw [IsUnit.unit_spec]; exact a.2)
   rw [← hK]
   symm
-  exact Nat.card_congr
-    { toFun := fun k => ⟨(((k : Eˣ) * a₀ : Eˣ) : E), by
+  exact Nat.card_congr {
+    toFun := fun k => ⟨
+      (((k : Eˣ) * a₀ : Eˣ) : E),
+      by
         have hk := mem_ker_normU.1 k.2
         rw [Units.val_mul, map_mul]
-        linear_combination ((a₀ : E) * τ (a₀ : E)) * hk + hna⟩
-      invFun := fun a => ⟨(hau a).unit * a₀⁻¹, by
-        rw [MonoidHom.mem_ker, map_mul, map_inv, ha₀, hna' a, mul_inv_cancel]⟩
-      left_inv := fun k => Subtype.ext (Units.ext (by simp [mul_assoc]))
-      right_inv := fun a => Subtype.ext (by simp [mul_assoc]) }
+        linear_combination ((a₀ : E) * τ (a₀ : E)) * hk + hna
+    ⟩
+    invFun := fun a => ⟨
+      (hau a).unit * a₀⁻¹,
+      by rw [MonoidHom.mem_ker, map_mul, map_inv, ha₀, hna' a, mul_inv_cancel]
+    ⟩
+    left_inv := fun k => Subtype.ext (Units.ext (by simp [mul_assoc]))
+    right_inv := fun a => Subtype.ext (by simp [mul_assoc])
+  }
 
-theorem card_fibre : ∀ (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ), ResAlg E τ q ε →
-    ∀ t : E, τ t = t → t ≠ 0 → (Nat.card {a : E // a * τ a = t} : ℤ) = q - ε := by
+theorem card_fibre
+    : ∀ (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ),
+      ResAlg E τ q ε
+        → ∀ t : E, τ t = t → t ≠ 0 → (Nat.card {a : E // a * τ a = t} : ℤ) = q - ε := by
   intro E _ τ q ε h t ht t0
   have hq := h.one_lt
   rcases h.eps with ⟨rfl, hf⟩ | ⟨rfl, hnf⟩

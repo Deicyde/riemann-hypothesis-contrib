@@ -11,14 +11,16 @@ noncomputable section
 
 namespace GlobalTheory.FlagBundle
 
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier
 open scoped TensorProduct
 
 variable {F Ω Ω' : Type} [Field F] [Field Ω] [Algebra F Ω] [Field Ω'] [Algebra F Ω']
 
-theorem exists_openImmersion_ringOn (M : RatModel F Ω) {U : M.Z.Opens} (hU : IsAffineOpen U)
-    (hne : (U : Set M.Z).Nonempty) : ∃ ι : Sp (M.ringOn U) ⟶ M.Z, IsOpenImmersion ι ∧ Set.range ι = U ∧
-      ι ≫ M.s = spMap (algebraMap F (M.ringOn U)) := by
+theorem exists_openImmersion_ringOn
+    (M : RatModel F Ω) {U : M.Z.Opens} (hU : IsAffineOpen U) (hne : (U : Set M.Z).Nonempty)
+    : ∃ ι : Sp (M.ringOn U) ⟶ M.Z,
+      IsOpenImmersion ι ∧ Set.range ι = U ∧ ι ≫ M.s = spMap (algebraMap F (M.ringOn U)) := by
   let e : Γ(M.Z, U) ≅ CommRingCat.of (M.ringOn U) := (M.sectionsEquiv U hne).toCommRingCatIso
   have hx := GlobalTheory.Points.le_preimage_specMap_fromSpec hU e.hom
   have hv : ∀ f, valR (Spec.map e.hom ≫ hU.fromSpec) U f = M.sectionsEquiv U hne f := fun f => by
@@ -32,12 +34,15 @@ theorem exists_openImmersion_ringOn (M : RatModel F Ω) {U : M.Z.Opens} (hU : Is
     rw [← GlobalTheory.Points.valR_constFn M.s _ U hx, hv]
     exact Subtype.ext ((RatModel.coe_sectionsEquiv U hne _).trans (M.valF_constFn hne b))
 
-theorem exists_openImmersion_tensor (M : RatModel F Ω) {U : M.Z.Opens} (hU : IsAffineOpen U)
-    (hne : (U : Set M.Z).Nonempty) {K : Type} [Field K] [Algebra F K] {Z : Scheme.{0}} {p : Z ⟶ M.Z} {q : Z ⟶ Sp K}
-    (h : IsPullback p q M.s (spMap (algebraMap F K))) :
-    ∃ j : Sp (M.ringOn U ⊗[F] K) ⟶ Z, IsOpenImmersion j ∧ Set.range j = p ⁻¹' U := by
+theorem exists_openImmersion_tensor
+    (M : RatModel F Ω)
+    {U : M.Z.Opens} (hU : IsAffineOpen U) (hne : (U : Set M.Z).Nonempty)
+    {K : Type} [Field K] [Algebra F K]
+    {Z : Scheme.{0}} {p : Z ⟶ M.Z} {q : Z ⟶ Sp K} (h : IsPullback p q M.s (spMap (algebraMap F K)))
+    : ∃ j : Sp (M.ringOn U ⊗[F] K) ⟶ Z, IsOpenImmersion j ∧ Set.range j = p ⁻¹' U := by
   obtain ⟨ι, hι, hr, hs⟩ := exists_openImmersion_ringOn M hU hne
-  have h1 := isPullback_SpecMap_of_isPushout _ _ _ _ (CommRingCat.isPushout_tensorProduct F (M.ringOn U) K)
+  have h1 :=
+    isPullback_SpecMap_of_isPushout _ _ _ _ (CommRingCat.isPushout_tensorProduct F (M.ringOn U) K)
   rw [show Spec.map (CommRingCat.ofHom (algebraMap F (M.ringOn U))) = ι ≫ M.s from hs.symm] at h1
   let j := h.lift (_ ≫ ι) _ ((Category.assoc _ _ _).trans h1.w)
   have h2 : IsPullback j _ p ι :=
@@ -52,12 +57,16 @@ theorem exists_openImmersion_tensor (M : RatModel F Ω) {U : M.Z.Opens} (hU : Is
     obtain ⟨v, hv, -⟩ := Scheme.exists_preimage_of_isPullback h2 z w hw.symm
     exact ⟨v, hv⟩
 
-theorem nonempty_algEquiv_adjoin (φ : Ω →ₐ[F] Ω') (A : Subalgebra F Ω) {σ : Type} (t : σ → Ω')
-    (ht : ∀ P : MvPolynomial σ Ω, MvPolynomial.eval₂ (φ : Ω →+* Ω') t P = 0 → P = 0) :
-    Nonempty (MvPolynomial σ A ≃ₐ[F] Algebra.adjoin F (φ '' (A : Set Ω) ∪ Set.range t)) := by
+theorem nonempty_algEquiv_adjoin
+    (φ : Ω →ₐ[F] Ω')
+    (A : Subalgebra F Ω)
+    {σ : Type}
+    (t : σ → Ω') (ht : ∀ P : MvPolynomial σ Ω, MvPolynomial.eval₂ (φ : Ω →+* Ω') t P = 0 → P = 0)
+    : Nonempty (MvPolynomial σ A ≃ₐ[F] Algebra.adjoin F (φ '' (A : Set Ω) ∪ Set.range t)) := by
   let ψ : MvPolynomial σ A →ₐ[F] Ω' := MvPolynomial.aevalTower (φ.comp A.val) t
   have hinj : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro P hP
     refine MvPolynomial.map_injective (A.val : A →+* Ω) Subtype.val_injective ?_
     rw [map_zero]
@@ -79,10 +88,12 @@ theorem nonempty_algEquiv_adjoin (φ : Ω →ₐ[F] Ω') (A : Subalgebra F Ω) {
       · exact ⟨MvPolynomial.X i, by simp [ψ]⟩
   exact ⟨(AlgEquiv.ofInjective ψ hinj).trans (Subalgebra.equivOfEq _ _ hr)⟩
 
-theorem isDomain_mvPolynomial_tensor (A K σ : Type) [CommRing A] [Algebra F A] [CommRing K] [Algebra F K]
-    [IsDomain (A ⊗[F] K)] : IsDomain (MvPolynomial σ A ⊗[F] K) := by
+theorem isDomain_mvPolynomial_tensor
+    (A K σ : Type) [CommRing A] [Algebra F A] [CommRing K] [Algebra F K] [IsDomain (A ⊗[F] K)]
+    : IsDomain (MvPolynomial σ A ⊗[F] K) := by
   let e1 : MvPolynomial σ A ⊗[F] K ≃ₐ[F] (A ⊗[F] MvPolynomial σ F) ⊗[F] K :=
-    Algebra.TensorProduct.congr ((MvPolynomial.algebraTensorAlgEquiv F A).symm.restrictScalars F) AlgEquiv.refl
+    Algebra.TensorProduct.congr ((MvPolynomial.algebraTensorAlgEquiv F A).symm.restrictScalars F)
+      AlgEquiv.refl
   let e2 : (A ⊗[F] MvPolynomial σ F) ⊗[F] K ≃ₐ[F] (A ⊗[F] K) ⊗[F] MvPolynomial σ F :=
     (Algebra.TensorProduct.assoc F F F A (MvPolynomial σ F) K).trans
       ((Algebra.TensorProduct.congr AlgEquiv.refl (Algebra.TensorProduct.comm F _ _)).trans
@@ -90,19 +101,22 @@ theorem isDomain_mvPolynomial_tensor (A K σ : Type) [CommRing A] [Algebra F A] 
   let e3 := MvPolynomial.algebraTensorAlgEquiv (σ := σ) F (A ⊗[F] K)
   exact (((e1.trans e2).toRingEquiv).trans e3.toRingEquiv).toMulEquiv.isDomain _
 
-theorem AffCover.geometricallyIntegral : ∀ (F Ω Ω' : Type) [Field F] [Field Ω] [Algebra F Ω] [Field Ω'] [Algebra F Ω']
-    (M : RatModel F Ω) (M' : RatModel F Ω') (φ : Ω →ₐ[F] Ω') (f : M'.Z ⟶ M.Z) (r : ℕ), AffCover M M' φ f r →
-    GeometricallyIntegral M.s → GeometricallyIntegral M'.s := by
+theorem AffCover.geometricallyIntegral
+    : ∀ (F Ω Ω' : Type) [Field F] [Field Ω] [Algebra F Ω] [Field Ω'] [Algebra F Ω']
+        (M : RatModel F Ω) (M' : RatModel F Ω') (φ : Ω →ₐ[F] Ω') (f : M'.Z ⟶ M.Z) (r : ℕ),
+      AffCover M M' φ f r → GeometricallyIntegral M.s → GeometricallyIntegral M'.s := by
   intro F Ω Ω' _ _ _ _ _ M M' φ f r h hM
   refine ⟨geometrically_iff_of_commRing.2 fun K _ _ Z p q hZ => ?_⟩
   have hI : IsIntegral (pullback M.s (spMap (algebraMap F K))) :=
     pullback_of_geometrically hM.geometrically_isIntegral K _
-  have key : ∀ z' : M'.Z, ∃ (U : M'.Z.Opens) (Y : Scheme.{0}) (j : Y ⟶ Z), z' ∈ U ∧ IsIntegral Y ∧
-      IsOpenImmersion j ∧ Set.range j = p ⁻¹' U := by
+  have key
+      : ∀ z' : M'.Z, ∃ (U : M'.Z.Opens) (Y : Scheme.{0}) (j : Y ⟶ Z),
+        z' ∈ U ∧ IsIntegral Y ∧ IsOpenImmersion j ∧ Set.range j = p ⁻¹' U := by
     intro z'
     obtain ⟨U, W, t, hU, hW, hz, hUW, ht, hR⟩ := h.2 z'
     have hWne : (W : Set M.Z).Nonempty := ⟨_, hUW z' hz⟩
-    obtain ⟨i, hi, -⟩ := exists_openImmersion_tensor M hW hWne (IsPullback.of_hasPullback M.s (spMap (algebraMap F K)))
+    obtain ⟨i, hi, -⟩ :=
+      exists_openImmersion_tensor M hW hWne (IsPullback.of_hasPullback M.s (spMap (algebraMap F K)))
     have : Nontrivial (M.ringOn W ⊗[F] K) := inferInstance
     have : IsIntegral (Sp (M.ringOn W ⊗[F] K)) := isIntegral_of_isOpenImmersion i
     have : IsDomain (M.ringOn W ⊗[F] K) := (affine_isIntegral_iff (CommRingCat.of _)).1 this
@@ -117,7 +131,8 @@ theorem AffCover.geometricallyIntegral : ∀ (F Ω Ω' : Type) [Field F] [Field 
     have : ∀ z : Z, _root_.IsReduced (Z.presheaf.stalk z) := fun z => by
       obtain ⟨U, Y, j, hz, hY, hj, hr⟩ := key (p z)
       obtain ⟨y, rfl⟩ : z ∈ Set.range j := hr ▸ hz
-      exact isReduced_of_injective (j.stalkMap y).hom (asIso (j.stalkMap y)).commRingCatIsoToRingEquiv.injective
+      exact isReduced_of_injective (j.stalkMap y).hom
+        (asIso (j.stalkMap y)).commRingCatIsoToRingEquiv.injective
     exact isReduced_of_isReduced_stalk Z
   have hopen : UniversallyOpen p := MorphismProperty.of_isPullback hZ.flip inferInstance
   have hirr : IrreducibleSpace Z := by

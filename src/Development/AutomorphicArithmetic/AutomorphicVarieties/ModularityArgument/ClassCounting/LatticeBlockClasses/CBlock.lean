@@ -5,87 +5,95 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
 section
 
 variable {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] {J X : Type}
 
 omit [NumberField L] [NumberField F] in
-private theorem blk_apply {g : GG L F J} {s : J → F ≃ₐ[L] F} {β : J → X}
-    {g' : ∀ x : X, ({j // β j = x} → F) ≃ₗ[F] ({j // β j = x} → F)} (h : BlockForm g s β g') (w : J → F) (x : X)
-    (i : {j // β j = x}) : s i.1 (g w i.1) = g' x (fun i => s i.1 (w i.1)) i := by
+private theorem blk_apply
+    {g : GG L F J} {s : J → F ≃ₐ[L] F} {β : J → X}
+    {g' : ∀ x : X, ({j // β j = x} → F) ≃ₗ[F] ({j // β j = x} → F)} (h : BlockForm g s β g')
+    (w : J → F)
+    (x : X) (i : {j // β j = x})
+    : s i.1 (g w i.1) = g' x (fun i => s i.1 (w i.1)) i := by
   obtain ⟨j, rfl⟩ := i
   exact h w j
 
 omit [NumberField L] [NumberField F] in
-private theorem blk_glue {β : J → X} (f : ∀ x : X, ({j // β j = x} → F)) (x : X) :
-    (fun i : {j // β j = x} => f (β i.1) ⟨i.1, rfl⟩) = f x := by
+private theorem blk_glue {β : J → X} (f : ∀ x : X, ({j // β j = x} → F)) (x : X)
+    : (fun i : {j // β j = x} => f (β i.1) ⟨i.1, rfl⟩) = f x := by
   funext i
   obtain ⟨j, hj⟩ := i
   subst hj
   rfl
 
 omit [NumberField L] [NumberField F] in
-private theorem blk_exists (s : J → F ≃ₐ[L] F) (β : J → X)
-    (g' : ∀ x : X, ({j // β j = x} → F) ≃ₗ[F] ({j // β j = x} → F)) : ∃ g : GG L F J, BlockForm g s β g' := by
-  let G : (J → F) ≃ₗ[F] (J → F) :=
-    { toFun := fun v j => g' (β j) (fun i => v i.1) ⟨j, rfl⟩
-      invFun := fun v j => (g' (β j)).symm (fun i => v i.1) ⟨j, rfl⟩
-      map_add' := by
-        intro v w
-        funext j
-        exact congrFun (map_add (g' (β j)) (fun i => v i.1) (fun i => w i.1)) _
-      map_smul' := by
-        intro c v
-        funext j
-        exact congrFun (map_smul (g' (β j)) c (fun i => v i.1)) _
-      left_inv := by
-        intro v
-        funext j
-        have e := blk_glue (β := β) (fun x => g' x (fun i' => v i'.1)) (β j)
-        show (g' (β j)).symm (fun i : {k // β k = β j} => g' (β i.1) (fun i' => v i'.1) ⟨i.1, rfl⟩) ⟨j, rfl⟩ = v j
-        rw [e, LinearEquiv.symm_apply_apply]
-      right_inv := by
-        intro v
-        funext j
-        have e := blk_glue (β := β) (fun x => (g' x).symm (fun i' => v i'.1)) (β j)
-        show (g' (β j)) (fun i : {k // β k = β j} => (g' (β i.1)).symm (fun i' => v i'.1) ⟨i.1, rfl⟩) ⟨j, rfl⟩ = v j
-        rw [e, LinearEquiv.apply_symm_apply] }
+private theorem blk_exists
+    (s : J → F ≃ₐ[L] F) (β : J → X) (g' : ∀ x : X, ({j // β j = x} → F) ≃ₗ[F] ({j // β j = x} → F))
+    : ∃ g : GG L F J, BlockForm g s β g' := by
+  let G : (J → F) ≃ₗ[F] (J → F) := {
+    toFun := fun v j => g' (β j) (fun i => v i.1) ⟨j, rfl⟩
+    invFun := fun v j => (g' (β j)).symm (fun i => v i.1) ⟨j, rfl⟩
+    map_add' := by
+      intro v w
+      funext j
+      exact congrFun (map_add (g' (β j)) (fun i => v i.1) (fun i => w i.1)) _
+    map_smul' := by
+      intro c v
+      funext j
+      exact congrFun (map_smul (g' (β j)) c (fun i => v i.1)) _
+    left_inv := by
+      intro v
+      funext j
+      have e := blk_glue (β := β) (fun x => g' x (fun i' => v i'.1)) (β j)
+      show (g' (β j)).symm (fun i : {k // β k = β j} => g' (β i.1) (fun i' => v i'.1) ⟨i.1, rfl⟩) ⟨j, rfl⟩ = v j
+      rw [e, LinearEquiv.symm_apply_apply]
+    right_inv := by
+      intro v
+      funext j
+      have e := blk_glue (β := β) (fun x => (g' x).symm (fun i' => v i'.1)) (β j)
+      show (g' (β j)) (fun i : {k // β k = β j} => (g' (β i.1)).symm (fun i' => v i'.1) ⟨i.1, rfl⟩) ⟨j, rfl⟩ = v j
+      rw [e, LinearEquiv.apply_symm_apply]
+  }
   let S : (J → F) ≃ₗ[L] (J → F) := LinearEquiv.piCongrRight fun j => (s j).toLinearEquiv
   refine ⟨S.trans ((G.restrictScalars L).trans S.symm), ?_⟩
   intro w j
   simp [S, G]
 
-private theorem act_forall (σ : F ≃ₐ[L] F) (p : HeightOneSpectrum (𝓞 F) → Prop) :
-    (∀ P, p (actP σ P)) ↔ ∀ P, p P := by
+private theorem act_forall (σ : F ≃ₐ[L] F) (p : HeightOneSpectrum (𝓞 F) → Prop)
+    : (∀ P, p (actP σ P)) ↔ ∀ P, p P := by
   constructor
   · intro h P
-    obtain ⟨Q, rfl⟩ := (HeightOneSpectrum.equivOfRingEquiv
-      (RingOfIntegers.mapRingEquiv σ.toRingEquiv)).surjective P
+    obtain ⟨Q, rfl⟩ :=
+      (HeightOneSpectrum.equivOfRingEquiv (RingOfIntegers.mapRingEquiv σ.toRingEquiv)).surjective P
     exact h Q
   · intro h P
     exact h _
 
-private theorem loc_iff (σ : F ≃ₐ[L] F) (b : 𝓞 L) (a : F) :
-    (∀ P : HeightOneSpectrum (𝓞 F), algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → P.valuation F (σ a) ≤ 1) ↔
-      ∀ P : HeightOneSpectrum (𝓞 F), algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → P.valuation F a ≤ 1 := by
+private theorem loc_iff (σ : F ≃ₐ[L] F) (b : 𝓞 L) (a : F)
+    : (∀ P : HeightOneSpectrum (𝓞 F),
+        algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → P.valuation F (σ a) ≤ 1)
+      ↔ ∀ P : HeightOneSpectrum (𝓞 F),
+        algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → P.valuation F a ≤ 1 := by
   obtain ⟨hv, -, -, hm, -⟩ := cAct L F
-  refine Iff.trans (act_forall σ (fun P => algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal →
-    P.valuation F (σ a) ≤ 1)).symm ?_
+  refine Iff.trans
+    (act_forall σ (fun P => algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → P.valuation F (σ a) ≤ 1)).symm ?_
   simp only [hm, hv]
 
-private theorem lat_iff (σ : F ≃ₐ[L] F) (𝔟 𝔠 : HeightOneSpectrum (𝓞 F) →₀ ℤ) (h : ∀ P, 𝔠 (actP σ P) = 𝔟 P) (a : F) :
-    (∀ P : HeightOneSpectrum (𝓞 F), P.valuation F (σ a) ≤ WithZero.exp (-𝔠 P)) ↔
-      ∀ P : HeightOneSpectrum (𝓞 F), P.valuation F a ≤ WithZero.exp (-𝔟 P) := by
+private theorem lat_iff
+    (σ : F ≃ₐ[L] F) (𝔟 𝔠 : HeightOneSpectrum (𝓞 F) →₀ ℤ) (h : ∀ P, 𝔠 (actP σ P) = 𝔟 P) (a : F)
+    : (∀ P : HeightOneSpectrum (𝓞 F), P.valuation F (σ a) ≤ WithZero.exp (- 𝔠 P))
+      ↔ ∀ P : HeightOneSpectrum (𝓞 F), P.valuation F a ≤ WithZero.exp (- 𝔟 P) := by
   obtain ⟨hv, -⟩ := cAct L F
-  refine Iff.trans (act_forall σ (fun P => P.valuation F (σ a) ≤ WithZero.exp (-𝔠 P))).symm ?_
+  refine Iff.trans (act_forall σ (fun P => P.valuation F (σ a) ≤ WithZero.exp (- 𝔠 P))).symm ?_
   simp only [hv, h]
 
 end
 
-theorem UpperTheory.V.ZK.Cl.cBlock :
-    UpperTheory.V.ZK.Cl.CBlock := by
+theorem UpperTheory.V.ZK.Cl.cBlock : UpperTheory.V.ZK.Cl.CBlock := by
   intro L F _ _ _ _ _ J X s β g'
   refine ⟨blk_exists s β g', fun g hg => ⟨?_, ?_, ?_⟩⟩
   · have hg' : ∀ (w : J → F) (j : J), s j (g w j) = g' (β j) (fun i => s i.1 (w i.1)) ⟨j, rfl⟩ := hg
@@ -100,8 +108,9 @@ theorem UpperTheory.V.ZK.Cl.cBlock :
     rw [hw, diag_apply]
     apply (s j).injective
     rw [hg', map_mul, hg', hu']
-    have e : (fun i : {k // β k = β j} => s i.1 ((u i.1 : F) * w i.1)) =
-        (u' (β j) : F) • (fun i => s i.1 (w i.1)) := by
+    have e
+        : (fun i : {k // β k = β j} => s i.1 ((u i.1 : F) * w i.1))
+          = (u' (β j) : F) • (fun i => s i.1 (w i.1)) := by
       funext i
       obtain ⟨k, hk⟩ := i
       simp only [map_mul, hu', Pi.smul_apply, smul_eq_mul, hk]
@@ -130,8 +139,10 @@ theorem UpperTheory.V.ZK.Cl.cBlock :
         simp [hW0 k hk']
       rw [hz, map_zero]
       rfl
-    have key : ∀ V : J → F, (∀ j, β j ≠ x → V j = 0) →
-        (InLoc b V ↔ InLoc b (fun i : {k // β k = x} => s i.1 (V i.1))) := by
+    have key
+        : ∀ V : J → F,
+          (∀ j, β j ≠ x → V j = 0)
+            → (InLoc b V ↔ InLoc b (fun i : {k // β k = x} => s i.1 (V i.1))) := by
       intro V hV
       constructor
       · intro h i P hP

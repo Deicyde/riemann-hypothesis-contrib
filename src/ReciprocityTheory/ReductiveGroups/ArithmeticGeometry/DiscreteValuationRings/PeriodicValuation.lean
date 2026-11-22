@@ -17,22 +17,35 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace ReciprocityTheory.ChartRestriction.G.DVR
 
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi IsLocalRing QForm
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi IsLocalRing
+  QForm
 
 def TWStatement : Prop :=
-  ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (ϖ : V), Irreducible ϖ →
-    ∀ (D : DegData V (maximalIdeal V)) (Q : D.toPre.X → ℤ), IsQ D.toPre ϖ Q →
-    ∀ (F : Type) [Field F] [Algebra (FractionRing V) F] (v : AddValuation F (WithTop ℚ)), ValOver ϖ F v →
-    ∀ k : ℕ, 1 ≤ k → ∀ (p : QkPt D.toPre F k)
-      (w : LB.Gen (LB.LinComb D.toPre.P.L (DegPre.lineφ D.toPre F p.g.b) (DegPre.lineε k))),
-      w.IsGen → ∀ ζ : F, ζ ≠ 0 →
-      ∃ c : ℚ, ∀ s t s' : Fam D.toPre F k, PhiRel D.toPre F k p w s t → Fam.IsSmul D.toPre F ζ t s' →
-        ∀ r : ℚ, NuGe D Q F v k s r ↔ NuGe D Q F v k s' (r + c)
+  ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (ϖ : V),
+    Irreducible ϖ
+      → ∀ (D : DegData V (maximalIdeal V)) (Q : D.toPre.X → ℤ),
+        IsQ D.toPre ϖ Q
+          → ∀ (F : Type) [Field F] [Algebra (FractionRing V) F] (v : AddValuation F (WithTop ℚ)),
+            ValOver ϖ F v
+              → ∀ k : ℕ,
+                1 ≤ k
+                  → ∀ (p : QkPt D.toPre F k)
+                      (w : LB.Gen (LB.LinComb D.toPre.P.L (DegPre.lineφ D.toPre F p.g.b)
+                        (DegPre.lineε k))),
+                    w.IsGen
+                      → ∀ ζ : F,
+                        ζ ≠ 0
+                          → ∃ c : ℚ, ∀ s t s' : Fam D.toPre F k,
+                            PhiRel D.toPre F k p w s t → Fam.IsSmul D.toPre F ζ t s'
+                              → ∀ r : ℚ, NuGe D Q F v k s r ↔ NuGe D Q F v k s' (r + c)
 
 namespace PeriodicValuation
 
-theorem all_of_periodic {P : ℚ → Prop} (hmono : ∀ r r' : ℚ, r' ≤ r → P r → P r') {d : ℚ} (hd : d ≠ 0)
-    (hper : ∀ r, P r ↔ P (r + d)) (r₁ r₂ : ℚ) (h : P r₁) : P r₂ := by
+theorem all_of_periodic
+    {P : ℚ → Prop} (hmono : ∀ r r' : ℚ, r' ≤ r → P r → P r')
+    {d : ℚ} (hd : d ≠ 0) (hper : ∀ r, P r ↔ P (r + d))
+    (r₁ r₂ : ℚ) (h : P r₁)
+    : P r₂ := by
   have he : ∀ r, P r → P (r + |d|) := by
     intro r hr
     rcases lt_or_gt_of_ne hd with hneg | hpos
@@ -59,7 +72,8 @@ end PeriodicValuation
 
 open PeriodicValuation
 
-theorem galois_fixed_adelic_matrices_descend (hL : Laws) (hTW : TWStatement) : FiniteOrderValuationInvariance := by
+theorem galois_fixed_adelic_matrices_descend (hL : Laws) (hTW : TWStatement)
+    : FiniteOrderValuationInvariance := by
   intro V _ _ _ ϖ hϖ D Q hQ F _ _ v hv k hk p w hw ζ hζ hfin s t s' hst hts' r
   obtain ⟨c, hc⟩ := hTW V ϖ hϖ D Q hQ F v hv k hk p w hw ζ hζ
   obtain ⟨Φ, hΦ⟩ := phiFun_of_globalFns hL.globalFns V (maximalIdeal V) D F k hk p w hw
@@ -68,8 +82,9 @@ theorem galois_fixed_adelic_matrices_descend (hL : Laws) (hTW : TWStatement) : F
   have hsm : ∀ x : Fam D.toPre F k, Fam.IsSmul D.toPre F ζ (Φ x) (step x) := fun x α j => rfl
   have hstep : ∀ x r, NuGe D Q F v k x r ↔ NuGe D Q F v k (step x) (r + c) := fun x r =>
     hc x (Φ x) (step x) ((hΦ x (Φ x)).2 rfl) (hsm x) r
-  have hsame : ∀ x y : Fam D.toPre F k, (∀ α j, (x.s α).f j = (y.s α).f j) →
-      ∀ r, NuGe D Q F v k x r ↔ NuGe D Q F v k y r := by
+  have hsame
+      : ∀ x y : Fam D.toPre F k,
+        (∀ α j, (x.s α).f j = (y.s α).f j) → ∀ r, NuGe D Q F v k x r ↔ NuGe D Q F v k y r := by
     intro x y hxy r
     simp only [NuGe, VGe, hxy]
   have hiter : ∀ n : ℕ, ∀ r, NuGe D Q F v k s r ↔ NuGe D Q F v k (step^[n] s) (r + n * c) := by
@@ -94,16 +109,15 @@ theorem galois_fixed_adelic_matrices_descend (hL : Laws) (hTW : TWStatement) : F
   · have h := hc s t s' hst hts' r
     rwa [hc0, add_zero] at h
   · have hd : (M : ℚ) * c ≠ 0 := mul_ne_zero (by exact_mod_cast (by omega : M ≠ 0)) hc0
-    have hmono : ∀ r r' : ℚ, r' ≤ r → NuGe D Q F v k s r → NuGe D Q F v k s r' :=
-      fun r r' h hp => NuGe.mono (h := hp) (hr := h)
+    have hmono : ∀ r r' : ℚ, r' ≤ r → NuGe D Q F v k s r → NuGe D Q F v k s r' := fun r r' h hp =>
+      NuGe.mono (h := hp) (hr := h)
     constructor
     · intro h
       have h1 : NuGe D Q F v k s (r - c) := all_of_periodic hmono hd hper r (r - c) h
       have h2 := (hc s t s' hst hts' (r - c)).1 h1
       rwa [sub_add_cancel] at h2
     · intro h
-      have h1 : NuGe D Q F v k s (r - c) :=
-        (hc s t s' hst hts' (r - c)).2 (by rwa [sub_add_cancel])
+      have h1 : NuGe D Q F v k s (r - c) := (hc s t s' hst hts' (r - c)).2 (by rwa [sub_add_cancel])
       exact all_of_periodic hmono hd hper (r - c) r h1
 
 end ReciprocityTheory.ChartRestriction.G.DVR

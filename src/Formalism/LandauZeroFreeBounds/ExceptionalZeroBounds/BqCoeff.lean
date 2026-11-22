@@ -41,8 +41,8 @@ theorem dirichlet_product_coefficients : BqCoeff := by
     (toArithmeticFunction (fun m : ℕ => χ₂ (m : ZMod q₂)) *
       toArithmeticFunction (fun m : ℕ => ψ (m : ZMod (q₁ * q₂)))) with hf
 
-  have hvals : ∀ {N : ℕ} (χ : DirichletCharacter ℂ N), χ ^ 2 = 1 →
-      ∀ x, χ x = 0 ∨ χ x = 1 ∨ χ x = -1 := by
+  have hvals
+      : ∀ {N : ℕ} (χ : DirichletCharacter ℂ N), χ ^ 2 = 1 → ∀ x, χ x = 0 ∨ χ x = 1 ∨ χ x = -1 := by
     intro N χ hχ x
     by_cases hx : IsUnit x
     · have h := congrArg (fun φ : DirichletCharacter ℂ N => φ x) hχ
@@ -56,9 +56,11 @@ theorem dirichlet_product_coefficients : BqCoeff := by
     (DirichletCharacter.isMultiplicative_zetaMul χ₁).mul
       ((DirichletCharacter.isMultiplicative_toArithmeticFunction χ₂).mul
         (DirichletCharacter.isMultiplicative_toArithmeticFunction ψ))
-  have hswap : f = DirichletCharacter.zetaMul χ₂ *
-      (toArithmeticFunction (fun m : ℕ => χ₁ (m : ZMod q₁)) *
-        toArithmeticFunction (fun m : ℕ => ψ (m : ZMod (q₁ * q₂)))) := by
+  have hswap
+      : f
+        = DirichletCharacter.zetaMul χ₂
+          * (toArithmeticFunction (fun m : ℕ => χ₁ (m : ZMod q₁))
+            * toArithmeticFunction (fun m : ℕ => ψ (m : ZMod (q₁ * q₂)))) := by
     simp only [hf, DirichletCharacter.zetaMul]
     ring
   have hψ' : ∀ n : ℕ, ψ (n : ZMod (q₁ * q₂)) = χ₂ (n : ZMod q₂) * χ₁ (n : ZMod q₁) := by
@@ -85,15 +87,19 @@ theorem dirichlet_product_coefficients : BqCoeff := by
       (ArithmeticFunction.LSeriesSummable_mul (dirichlet_character_lseries_summable χ₂ hs)
         (dirichlet_character_lseries_summable ψ hs))
   refine ⟨⇑f, hnn, hmul.map_one, ?_, ?_⟩
-  · have := LSeries.abscissaOfAbsConv_le_of_forall_lt_LSeriesSummable (f := ⇑f) (x := 1)
-      (fun y hy => hsum y (by simpa using hy))
+  · have :=
+      LSeries.abscissaOfAbsConv_le_of_forall_lt_LSeriesSummable (f := ⇑f) (x := 1)
+        (fun y hy => hsum y (by simpa using hy))
     simpa using this
   · intro s hs
-    rw [Fbq, ArithmeticFunction.LSeries_mul' (DirichletCharacter.LSeriesSummable_zetaMul χ₁ hs)
-      (ArithmeticFunction.LSeriesSummable_mul (dirichlet_character_lseries_summable χ₂ hs)
-        (dirichlet_character_lseries_summable ψ hs)),
-      ArithmeticFunction.LSeries_mul' (dirichlet_character_lseries_summable χ₂ hs) (dirichlet_character_lseries_summable ψ hs),
-      lseries_zetaMul_eq χ₁ hs, dirichlet_character_lseries_eq χ₂ hs, dirichlet_character_lseries_eq ψ hs]
+    rw [Fbq,
+      ArithmeticFunction.LSeries_mul' (DirichletCharacter.LSeriesSummable_zetaMul χ₁ hs)
+        (ArithmeticFunction.LSeriesSummable_mul (dirichlet_character_lseries_summable χ₂ hs)
+          (dirichlet_character_lseries_summable ψ hs)),
+      ArithmeticFunction.LSeries_mul' (dirichlet_character_lseries_summable χ₂ hs)
+        (dirichlet_character_lseries_summable ψ hs),
+      lseries_zetaMul_eq χ₁ hs, dirichlet_character_lseries_eq χ₂ hs,
+      dirichlet_character_lseries_eq ψ hs]
     ring
 
 end Formalism.ZeroFreeDirichlet

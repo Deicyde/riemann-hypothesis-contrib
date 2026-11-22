@@ -10,23 +10,26 @@ open Module Submodule
 
 variable {K V : Type} [Field K] [AddCommGroup V] [Module K V]
 
-def chainVec (f : V →ₗ[K] V) {ι : Type} (e : ι → ℕ) (v : ι → V) : (Σ a, Fin (e a)) → V :=
-  fun p => (f ^ (p.2 : ℕ)) (v p.1)
+def chainVec (f : V →ₗ[K] V) {ι : Type} (e : ι → ℕ) (v : ι → V) : (Σ a, Fin (e a)) → V := fun p =>
+  (f ^ (p.2 : ℕ)) (v p.1)
 
-theorem pow_coe_of_restrict {W : Submodule K V} (f : V →ₗ[K] V) (g : W →ₗ[K] W)
-    (hg : ∀ x, (g x : V) = f x) (k : ℕ) (x : W) : (((g ^ k) x : W) : V) = (f ^ k) x := by
+theorem pow_coe_of_restrict
+    {W : Submodule K V} (f : V →ₗ[K] V) (g : W →ₗ[K] W) (hg : ∀ x, (g x : V) = f x) (k : ℕ) (x : W)
+    : (((g ^ k) x : W) : V) = (f ^ k) x := by
   induction k generalizing x with
   | zero => simp
   | succ k ih => rw [pow_succ, pow_succ, Module.End.mul_apply, Module.End.mul_apply, ih, hg]
 
-theorem exists_chains_of_range [FiniteDimensional K V] (f : V →ₗ[K] V)
-    (g : LinearMap.range f →ₗ[K] LinearMap.range f) (hg : ∀ x, (g x : V) = f x)
-    {ι' : Type} [Fintype ι'] (e' : ι' → ℕ) (he' : ∀ b, 0 < e' b) (w : ι' → LinearMap.range f)
-    (h0 : ∀ b, (g ^ e' b) (w b) = 0) (hli : LinearIndependent K (chainVec g e' w))
-    (hsp : span K (Set.range (chainVec g e' w)) = ⊤) :
-    ∃ (ι : Type) (_ : Fintype ι) (e : ι → ℕ) (v : ι → V), (∀ a, 0 < e a) ∧
-      (∀ a, (f ^ e a) (v a) = 0) ∧ LinearIndependent K (chainVec f e v) ∧
-      span K (Set.range (chainVec f e v)) = ⊤ := by
+theorem exists_chains_of_range
+    [FiniteDimensional K V]
+    (f : V →ₗ[K] V) (g : LinearMap.range f →ₗ[K] LinearMap.range f) (hg : ∀ x, (g x : V) = f x)
+    {ι' : Type} [Fintype ι']
+    (e' : ι' → ℕ) (he' : ∀ b, 0 < e' b)
+    (w : ι' → LinearMap.range f) (h0 : ∀ b, (g ^ e' b) (w b) = 0)
+    (hli : LinearIndependent K (chainVec g e' w)) (hsp : span K (Set.range (chainVec g e' w)) = ⊤)
+    : ∃ (ι : Type) (_ : Fintype ι) (e : ι → ℕ) (v : ι → V),
+      (∀ a, 0 < e a) ∧ (∀ a, (f ^ e a) (v a) = 0) ∧ LinearIndependent K (chainVec f e v)
+        ∧ span K (Set.range (chainVec f e v)) = ⊤ := by
   classical
   have hu : ∀ b, ∃ u, f u = (w b : V) := fun b => (w b).2
   choose u hu using hu
@@ -136,18 +139,27 @@ theorem exists_chains_of_range [FiniteDimensional K V] (f : V →ₗ[K] V)
       simpa using hz c
   · exact linearIndependent_of_top_le_span_of_card_eq_finrank hTtop.ge hcard
 
-theorem exists_chains : ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (f : V →ₗ[K] V), finrank K V = n → IsNilpotent f →
-    ∃ (ι : Type) (_ : Fintype ι) (e : ι → ℕ) (v : ι → V), (∀ a, 0 < e a) ∧
-      (∀ a, (f ^ e a) (v a) = 0) ∧ LinearIndependent K (chainVec f e v) ∧
-      span K (Set.range (chainVec f e v)) = ⊤ := by
+theorem exists_chains
+    : ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module K V] [FiniteDimensional K V] (f : V →ₗ[K] V),
+      finrank K V = n → IsNilpotent f
+        → ∃ (ι : Type) (_ : Fintype ι) (e : ι → ℕ) (v : ι → V),
+          (∀ a, 0 < e a) ∧ (∀ a, (f ^ e a) (v a) = 0) ∧ LinearIndependent K (chainVec f e v)
+            ∧ span K (Set.range (chainVec f e v)) = ⊤ := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     intro V _ _ _ f hn hf
     by_cases hV : Subsingleton V
-    · refine ⟨Empty, inferInstance, fun _ => 0, fun _ => 0, fun a => a.elim, fun a => a.elim,
-        ?_, Subsingleton.elim _ _⟩
+    · refine ⟨
+        Empty,
+        inferInstance,
+        fun _ => 0,
+        fun _ => 0,
+        fun a => a.elim,
+        fun a => a.elim,
+        ?_,
+        Subsingleton.elim _ _
+      ⟩
       exact linearIndependent_empty_type
     · have hnt : Nontrivial V := not_subsingleton_iff_nontrivial.1 hV
       obtain ⟨m, hm⟩ := hf
@@ -173,12 +185,13 @@ theorem exists_chains : ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module K V] [
       obtain ⟨ι', _, e', w, he', h0, hli, hsp⟩ := ih _ hlt (LinearMap.range f) g rfl hgn
       exact exists_chains_of_range f g hg e' he' w h0 hli hsp
 
-theorem exists_chain_basis {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] (f : V →ₗ[K] V) (hf : IsNilpotent f) :
-    ∃ (ι : Type) (_ : Fintype ι) (e : ι → ℕ) (v : ι → V), (∀ a, 0 < e a) ∧
-      (∀ a, (f ^ e a) (v a) = 0) ∧
-      LinearIndependent K (fun p : Σ a, Fin (e a) => (f ^ (p.2 : ℕ)) (v p.1)) ∧
-      span K (Set.range (fun p : Σ a, Fin (e a) => (f ^ (p.2 : ℕ)) (v p.1))) = ⊤ :=
+theorem exists_chain_basis
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (f : V →ₗ[K] V) (hf : IsNilpotent f)
+    : ∃ (ι : Type) (_ : Fintype ι) (e : ι → ℕ) (v : ι → V),
+      (∀ a, 0 < e a) ∧ (∀ a, (f ^ e a) (v a) = 0)
+        ∧ LinearIndependent K (fun p : Σ a, Fin (e a) => (f ^ (p.2 : ℕ)) (v p.1))
+        ∧ span K (Set.range (fun p : Σ a, Fin (e a) => (f ^ (p.2 : ℕ)) (v p.1))) = ⊤ :=
   exists_chains _ V f rfl hf
 
 end GlobalTheory.CompanionTheory.JordanChain

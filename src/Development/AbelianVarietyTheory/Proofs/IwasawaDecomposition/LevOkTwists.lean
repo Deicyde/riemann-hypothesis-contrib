@@ -7,13 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Hecke
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 ReciprocityTheory.Neutral.Bridge.HCFR Neutral.B1
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV
+  GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 ReciprocityTheory.Neutral.Bridge.HCFR
+  Neutral.B1
 open Formalism.L2.Host (HChar atFin)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.LevTwist
 
-theorem conjP_ne {R : Ranks} (H : Formalism.BasicNotions.Host R) {P : HeightOneSpectrum (𝓞 H.E)} (h : IsSplitPl H P) : conjPrime₂ P ≠ P := by
+theorem conjP_ne
+    {R : Ranks} (H : Formalism.BasicNotions.Host R)
+    {P : HeightOneSpectrum (𝓞 H.E)} (h : IsSplitPl H P)
+    : conjPrime₂ P ≠ P := by
   intro e
   obtain ⟨x, hx, hy⟩ := h
   have hc : IsConjPl H P P := (isConjPl_iff H P P).2 e.symm
@@ -22,18 +27,19 @@ theorem conjP_ne {R : Ranks} (H : Formalism.BasicNotions.Host R) {P : HeightOneS
 
 variable {B : Base} {X : PreX B.toPre} {I : ColIn B X}
 
-theorem under_sel (h : I.Ok) (v : HeightOneSpectrum (𝓞 B.host.F)) : (I.sel v).under (𝓞 B.host.F) = v :=
+theorem under_sel (h : I.Ok) (v : HeightOneSpectrum (𝓞 B.host.F))
+    : (I.sel v).under (𝓞 B.host.F) = v :=
   HeightOneSpectrum.ext (h.sel_ok v)
 
-theorem good_of_mem (h : I.Ok) {P : HeightOneSpectrum (𝓞 B.host.E)} (hP : P ∈ I.SQ) :
-    I.sel (P.under (𝓞 B.host.F)) = P ∧ GoodPl B.host.E I.S (P.under (𝓞 B.host.F)) := by
+theorem good_of_mem (h : I.Ok) {P : HeightOneSpectrum (𝓞 B.host.E)} (hP : P ∈ I.SQ)
+    : I.sel (P.under (𝓞 B.host.F)) = P ∧ GoodPl B.host.E I.S (P.under (𝓞 B.host.F)) := by
   obtain ⟨a, ha⟩ := I.mem_SQ.1 hP
   obtain ⟨v, -, rfl, hg⟩ := I.exists_of_mem_Q ha
   rw [under_sel h]
   exact ⟨rfl, hg⟩
 
-theorem plc_mem (h : I.Ok) {P : HeightOneSpectrum (𝓞 B.host.E)} (hP : P ∈ (B.primes X).vGs) :
-    Formalism.EigenvalueLevelCeiling.plc (P.under (𝓞 B.host.F)) ∈ I.S := by
+theorem plc_mem (h : I.Ok) {P : HeightOneSpectrum (𝓞 B.host.E)} (hP : P ∈ (B.primes X).vGs)
+    : Formalism.EigenvalueLevelCeiling.plc (P.under (𝓞 B.host.F)) ∈ I.S := by
   classical
   have hPr := (GlobalTheory.BasePrimes.primes_ok B X).1
   have h0 : ∀ i, B.fields.conjO ((B.primes X).piG i) ≠ 0 := fun i h => by
@@ -49,14 +55,25 @@ theorem plc_mem (h : I.Ok) {P : HeightOneSpectrum (𝓞 B.host.E)} (hP : P ∈ (
   rw [(ReadTwist.plc_under_eq_iff (F := B.host.F) P (hPr.g_prime i)).2 h1]
   exact h.g_mem i
 
-theorem levOk_twists : ∀ (B : Base) (X : PreX B.toPre) (I : ColIn B X), I.Ok → LevOk B.host (B.primes X).vGs I.SQ ∧ Disjoint (B.primes X).vGs I.SQ ∧ ∀ a, KDq B.host (I.Q a) ≤ ((I.xi a).1.comp (finPartI B.host.E)).ker ∧ (I.xi a).IsUnitary := by
+theorem levOk_twists
+    : ∀ (B : Base) (X : PreX B.toPre) (I : ColIn B X),
+      I.Ok
+        → LevOk B.host (B.primes X).vGs I.SQ ∧ Disjoint (B.primes X).vGs I.SQ
+          ∧ ∀ a,
+            KDq B.host (I.Q a) ≤ ((I.xi a).1.comp (finPartI B.host.E)).ker
+              ∧ (I.xi a).IsUnitary := by
   classical
   intro B X I h
   have hb := levOk_base B X
-  have hu : ∀ P : HeightOneSpectrum (𝓞 B.host.E), (conjPrime₂ P).under (𝓞 B.host.F) = P.under (𝓞 B.host.F) := fun P =>
+  have hu
+      : ∀ P : HeightOneSpectrum (𝓞 B.host.E),
+        (conjPrime₂ P).under (𝓞 B.host.F) = P.under (𝓞 B.host.F) := fun P =>
     (under_eq_iff B.host P _).2 (Or.inr rfl)
-  refine ⟨⟨hb.cover, fun P hP hP' => ?_⟩, Finset.disjoint_left.2 fun P h1 h2 => (good_of_mem h h2).2.2.2 (plc_mem h h1),
-    fun a => ?_⟩
+  refine ⟨
+    ⟨hb.cover, fun P hP hP' => ?_⟩,
+    Finset.disjoint_left.2 fun P h1 h2 => (good_of_mem h h2).2.2.2 (plc_mem h h1),
+    fun a => ?_
+  ⟩
   · simp only [Finset.mem_union] at hP hP'
     rcases hP with hP | hP <;> rcases hP' with hP' | hP'
     · exact hb.split P (by simpa using hP) (by simpa using hP')
@@ -68,7 +85,8 @@ theorem levOk_twists : ∀ (B : Base) (X : PreX B.toPre) (I : ColIn B X), I.Ok �
       exact plc_mem h hP'
     · have e := (good_of_mem h hP').1
       rw [hu, (good_of_mem h hP).1] at e
-      exact conjP_ne B.host ((GoodPlace.goodPl_under_iff _ B.host _ P).1 (good_of_mem h hP).2).1 e.symm
+      exact conjP_ne B.host ((GoodPlace.goodPl_under_iff _ B.host _ P).1 (good_of_mem h hP).2).1
+        e.symm
   · obtain ⟨⟨⟨n, hn, ho⟩, hT, hta, -⟩, hq, -⟩ :=
       ReadTwist.isTwist_of_reads B.R B.host B.LL B.embLL I.S (I.tup a) (I.xi a) (h.xi_reads a)
     refine ⟨KDq_le_ker_of_tame _ hT hta fun w hw => by_contra fun hr => hw (Or.inr ?_), fun x => ?_⟩

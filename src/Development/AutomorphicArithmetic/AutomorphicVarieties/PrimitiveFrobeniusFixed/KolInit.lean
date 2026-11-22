@@ -5,14 +5,36 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-theorem UpperTheory.V.ML.kolInit :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (M F r a : ℕ) [NeZero M] [NeZero F] (hM : M ∣ F), r.Prime → r.Coprime F → ∀ (ζ : Ω), IsPrimitiveRoot ζ M → ∀ δ : G ℚ Ω, Pows M a δ → ∀ y : Ω, y ≠ 0 → (∀ h ∈ fixMu ℚ Ω F, h y = y) →
-    ∀ κ : G ℚ Ω → ZMod M, IsKol M F 1 ζ δ a y κ → ∀ A₀ : ValuationSubring Ω, Over A₀ r → ∀ k : (ZMod F)ˣ → ℤ, HasOrd F r A₀ (opP δ a y) k →
-    ∀ ρ : Ω, ρ ^ M = (r : Ω) → ∀ t ∈ Ine (F := ℚ) A₀, t ρ = ζ * ρ → ∀ (c : (ZMod F)ˣ) (σ : G ℚ Ω), Lifts F c σ →
-    κ (σ⁻¹ * t * σ) * ZMod.castHom hM (ZMod M) (c : ZMod F) = (k c : ZMod M) := by
+theorem UpperTheory.V.ML.kolInit
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (M F r a : ℕ) [NeZero M] [NeZero F]
+        (hM : M ∣ F),
+      r.Prime → r.Coprime F
+        → ∀ (ζ : Ω),
+          IsPrimitiveRoot ζ M
+            → ∀ δ : G ℚ Ω,
+              Pows M a δ
+                → ∀ y : Ω,
+                  y ≠ 0 → (∀ h ∈ fixMu ℚ Ω F, h y = y)
+                    → ∀ κ : G ℚ Ω → ZMod M,
+                      IsKol M F 1 ζ δ a y κ
+                        → ∀ A₀ : ValuationSubring Ω,
+                          Over A₀ r
+                            → ∀ k : (ZMod F)ˣ → ℤ,
+                              HasOrd F r A₀ (opP δ a y) k
+                                → ∀ ρ : Ω,
+                                  ρ ^ M = (r : Ω)
+                                    → ∀ t ∈ Ine (F := ℚ) A₀,
+                                      t ρ = ζ * ρ
+                                        → ∀ (c : (ZMod F)ˣ) (σ : G ℚ Ω),
+                                          Lifts F c σ
+                                            → κ (σ⁻¹ * t * σ)
+                                                * ZMod.castHom hM (ZMod M) (c : ZMod F)
+                                              = (k c : ZMod M) := by
   intro Ω _ _ _ M F r a _ _ hM hr hrF ζ hζ δ hδ y hy0 hyfix κ hκ A₀ hA₀ k hk ρ hρ t ht htρ c σ hσ
   have pb := placeBasic Ω
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
@@ -77,7 +99,8 @@ theorem UpperTheory.V.ML.kolInit :
     simpa [AlgEquiv.mul_apply] using h2
   set e := W / ρ ^ (k c) with he
   have heM : e ^ M = σ (opP δ a y) / (r : Ω) ^ (k c) := by
-    rw [he, div_pow, hWM, ← zpow_natCast (ρ ^ k c) M, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hρ]
+    rw [he, div_pow, hWM, ← zpow_natCast (ρ ^ k c) M, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast,
+      hρ]
   have hvr0 : A₀.valuation (r : Ω) ≠ 0 := (Valuation.ne_zero_iff _).mpr hr0
   have hveM : A₀.valuation e ^ M = 1 := by
     rw [← map_pow, heM, map_div₀, map_zpow₀, hk c σ hσ, div_self (zpow_ne_zero _ hvr0)]
@@ -103,8 +126,7 @@ theorem UpperTheory.V.ML.kolInit :
   have hte : t e = e := by
     have h3 := pb.2.2.2.2.2.1 A₀ M (t e / e) hnotM hteM hte1
     rwa [div_eq_one_iff_eq he0] at h3
-  have hWe : W = e * ρ ^ (k c) := by
-    rw [he, div_mul_cancel₀ _ (zpow_ne_zero _ hρ0)]
+  have hWe : W = e * ρ ^ (k c) := by rw [he, div_mul_cancel₀ _ (zpow_ne_zero _ hρ0)]
   have htW : t W / W = ζ ^ (k c) := by
     rw [div_eq_iff hW0]
     conv_lhs => rw [hWe]
@@ -112,7 +134,8 @@ theorem UpperTheory.V.ML.kolInit :
     ring
   rw [htW, ← zpow_natCast] at h1
   have hdvd : (M : ℤ) ∣ (k c) - (((c : ZMod F).val * (κ (σ⁻¹ * t * σ)).val : ℕ) : ℤ) := by
-    rw [← hζ.zpow_eq_one_iff_dvd, zpow_sub₀ (hζ.ne_zero hM0), ← h1, div_self (zpow_ne_zero _ (hζ.ne_zero hM0))]
+    rw [← hζ.zpow_eq_one_iff_dvd, zpow_sub₀ (hζ.ne_zero hM0), ← h1,
+      div_self (zpow_ne_zero _ (hζ.ne_zero hM0))]
   have h4 := (ZMod.intCast_eq_intCast_iff_dvd_sub _ _ M).mpr hdvd
   push_cast at h4
   rw [ZMod.castHom_apply, ZMod.cast_eq_val, ← h4, ZMod.natCast_zmod_val, mul_comm]

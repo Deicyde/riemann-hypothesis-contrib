@@ -20,14 +20,21 @@ variable {L : Type} [Field L] [NumberField L] {N : ℕ}
 
 theorem emb_eq (γ : Gm L N) : emb L N γ = toP L N (toK L N γ) := rfl
 
-theorem hecke_eq (π : 𝓞 L) (hπ : π ≠ 0) (f : Gp L N → ℝ) (y : Gp L N) :
-    hecke (toK L N) (toP L N) (qel L N π hπ) f y =
-      ((Hq L N π hπ).index : ℝ)⁻¹ * ∑ᶠ c : Quotient (QuotientGroup.rightRel (Hq L N π hπ)),
-        f (toP L N (qel L N π hπ * toK L N c.out) * y) := rfl
+theorem hecke_eq (π : 𝓞 L) (hπ : π ≠ 0) (f : Gp L N → ℝ) (y : Gp L N)
+    : hecke (toK L N) (toP L N) (qel L N π hπ) f y
+      = ((Hq L N π hπ).index : ℝ)⁻¹
+        * ∑ᶠ c : Quotient (QuotientGroup.rightRel (Hq L N π hπ)),
+          f (toP L N (qel L N π hπ * toK L N c.out) * y) :=
+  rfl
 
-theorem coset_inv (π : 𝓞 L) (hπ : π ≠ 0) (f : Gp L N → ℝ) (hf : ∀ γ x, f (emb L N γ * x) = f x)
-    (y : Gp L N) (h : Gm L N) (hh : h ∈ Hq L N π hπ) (γ : Gm L N) :
-    f (toP L N (qel L N π hπ * toK L N (h * γ)) * y) = f (toP L N (qel L N π hπ * toK L N γ) * y) := by
+theorem coset_inv
+    (π : 𝓞 L) (hπ : π ≠ 0)
+    (f : Gp L N → ℝ) (hf : ∀ γ x, f (emb L N γ * x) = f x)
+    (y : Gp L N)
+    (h : Gm L N) (hh : h ∈ Hq L N π hπ)
+    (γ : Gm L N)
+    : f (toP L N (qel L N π hπ * toK L N (h * γ)) * y)
+      = f (toP L N (qel L N π hπ * toK L N γ) * y) := by
   obtain ⟨k, ⟨γ', rfl⟩, hk⟩ := Subgroup.mem_map.mp (Subgroup.mem_comap.mp hh)
   have e : qel L N π hπ * toK L N h = toK L N γ' * qel L N π hπ := by
     rw [← hk]
@@ -70,9 +77,10 @@ theorem _root_.PositivityTheory.KB.sGap_of_parts : GapAbs → Unfold → Arith �
   have hw2 : ∫ x in (fun x => q * x) ⁻¹' d.D, w x ^ 2 ∂d.μ = ∫ x in d.D, f (ofS L N x) ^ 2 ∂d.μ :=
     (hint1 (fun y => f (ofS L N y) ^ 2)).2
   have htri := hAr L π hπp h25 N hN
-  obtain ⟨hAint, hA0, hAle⟩ := hGap (Matrix.SpecialLinearGroup (Fin N) L) (Sp L N) d.μ (jS L N)
-    (jS_injective L N) (Kg L N π 0) (Kg L N π 1) (Kg L N π 2) htri (hDe L hTC π hπp N hN)
-    d.D _ _ hfund0 hD1 hD2 d.fin hμ1 w hwc.measurable hwinv hwint hw0
+  obtain ⟨hAint, hA0, hAle⟩ :=
+    hGap (Matrix.SpecialLinearGroup (Fin N) L) (Sp L N) d.μ (jS L N) (jS_injective L N) (Kg L N π 0)
+      (Kg L N π 1) (Kg L N π 2) htri (hDe L hTC π hπp N hN) d.D _ _ hfund0 hD1 hD2 d.fin hμ1 w
+      hwc.measurable hwinv hwint hw0
   let C : Subgroup (Matrix.SpecialLinearGroup (Fin N) (𝓞 L)) :=
     (Hq L N π hπ).comap (Matrix.SpecialLinearGroup.toGL)
   let ψ : Matrix.SpecialLinearGroup (Fin N) (𝓞 L) →* Kg L N π 0 :=
@@ -90,19 +98,24 @@ theorem _root_.PositivityTheory.KB.sGap_of_parts : GapAbs → Unfold → Arith �
     have : ψ a = γ := Subtype.ext ha
     rw [this, mul_inv_cancel]
     exact H'.one_mem
-  have hkey : ∀ x : Sp L N, hecke (toK L N) (toP L N) (qel L N π hπ) f (ofS L N x) =
-      avg (jS L N) (Kg L N π 0 ⊓ Kg L N π 1) (Kg L N π 0) w x := by
+  have hkey
+      : ∀ x : Sp L N,
+        hecke (toK L N) (toP L N) (qel L N π hπ) f (ofS L N x)
+          = avg (jS L N) (Kg L N π 0 ⊓ Kg L N π 1) (Kg L N π 0) w x := by
     intro x
-    obtain ⟨e1, i1⟩ := finsum_transfer (Matrix.SpecialLinearGroup.toGL) (Hq L N π hπ) C
-      (fun a => Iff.rfl) (fun γ => Hq_surj L N π hπ hN0 γ)
-      (fun γ => f (toP L N (qel L N π hπ * toK L N γ) * ofS L N x))
-      (fun h hh γ => coset_inv π hπ f hfe (ofS L N x) h hh γ)
-    obtain ⟨e2, i2⟩ := finsum_transfer ψ H' C hψ hψs
-      (fun k : Kg L N π 0 => w (jS L N k * x))
-      (fun h hh k => by
-        show w (jS L N ((h : _) * k) * x) = w (jS L N k * x)
-        rw [map_mul, mul_assoc]
-        exact hwinv _ (Subgroup.mem_subgroupOf.1 hh).2 _)
+    obtain ⟨e1, i1⟩ :=
+      finsum_transfer (Matrix.SpecialLinearGroup.toGL) (Hq L N π hπ) C
+        (fun a => Iff.rfl)
+        (fun γ => Hq_surj L N π hπ hN0 γ)
+        (fun γ => f (toP L N (qel L N π hπ * toK L N γ) * ofS L N x))
+        (fun h hh γ => coset_inv π hπ f hfe (ofS L N x) h hh γ)
+    obtain ⟨e2, i2⟩ :=
+      finsum_transfer ψ H' C hψ hψs
+        (fun k : Kg L N π 0 => w (jS L N k * x))
+        (fun h hh k => by
+          show w (jS L N ((h : _) * k) * x) = w (jS L N k * x)
+          rw [map_mul, mul_assoc]
+          exact hwinv _ (Subgroup.mem_subgroupOf.1 hh).2 _)
     beta_reduce at e1 e2
     rw [hecke_eq]
     unfold avg
@@ -112,8 +125,11 @@ theorem _root_.PositivityTheory.KB.sGap_of_parts : GapAbs → Unfold → Arith �
     intro c
     show f (toP L N (qel L N π hπ * toK L N (Matrix.SpecialLinearGroup.toGL c.out)) * ofS L N x) =
       f (ofS L N (q * (jS L N (iO L N c.out) * x)))
-    have e : ofS L N (q * (jS L N (iO L N c.out) * x)) =
-        scal L N s * (toP L N (qel L N π hπ * toK L N (Matrix.SpecialLinearGroup.toGL c.out)) * ofS L N x) := by
+    have e
+        : ofS L N (q * (jS L N (iO L N c.out) * x))
+          = scal L N s
+            * (toP L N (qel L N π hπ * toK L N (Matrix.SpecialLinearGroup.toGL c.out))
+              * ofS L N x) := by
       rw [map_mul, map_mul, ofS_q L N π hπ q s hq, ← toP_toGL, map_mul]
       simp only [mul_assoc]
     rw [e, hfs]
@@ -127,17 +143,26 @@ theorem _root_.PositivityTheory.KB.sGap_of_parts : GapAbs → Unfold → Arith �
     rw [h0] at hd
     exact htri.fin₀ (Nat.eq_zero_of_zero_dvd hd)
   have hHq0 : (Hq L N π hπ).index ≠ 0 := by
-    obtain ⟨-, i1⟩ := finsum_transfer (Matrix.SpecialLinearGroup.toGL) (Hq L N π hπ) C
-      (fun a => Iff.rfl) (fun γ => Hq_surj L N π hπ hN0 γ) (E := ℝ) (fun _ => 0) (fun _ _ _ => rfl)
+    obtain ⟨-, i1⟩ :=
+      finsum_transfer (Matrix.SpecialLinearGroup.toGL) (Hq L N π hπ) C
+        (fun a => Iff.rfl)
+        (fun γ => Hq_surj L N π hπ hN0 γ)
+        (E := ℝ)
+        (fun _ => 0)
+        (fun _ _ _ => rfl)
     obtain ⟨-, i2⟩ := finsum_transfer ψ H' C hψ hψs (E := ℝ) (fun _ => 0) (fun _ _ _ => rfl)
     rw [← i1, i2]
     exact hH'0
   refine ⟨?_, ?_⟩
   · unfold Lz
     refine ⟨?_, ?_, ?_, ?_, ?_⟩
-    · have e : hecke (toK L N) (toP L N) (qel L N π hπ) f = fun y =>
-          ((Hq L N π hπ).index : ℝ)⁻¹ * ∑ᶠ c : Quotient (QuotientGroup.rightRel (Hq L N π hπ)),
-            f (toP L N (qel L N π hπ * toK L N c.out) * y) := funext (hecke_eq π hπ f)
+    · have e
+          : hecke (toK L N) (toP L N) (qel L N π hπ) f
+            = fun y =>
+              ((Hq L N π hπ).index : ℝ)⁻¹
+                * ∑ᶠ c : Quotient (QuotientGroup.rightRel (Hq L N π hπ)),
+                  f (toP L N (qel L N π hπ * toK L N c.out) * y) :=
+        funext (hecke_eq π hπ f)
       rw [e]
       exact continuous_const.mul (continuous_finsum_quot (Hq L N π hπ) hHq0
         (fun γ y => f (toP L N (qel L N π hπ * toK L N γ) * y))
@@ -145,9 +170,11 @@ theorem _root_.PositivityTheory.KB.sGap_of_parts : GapAbs → Unfold → Arith �
     · intro γ x
       rw [hecke_eq, hecke_eq]
       congr 1
-      have h := finsum_mul_right (Hq L N π hπ)
-        (fun δ => f (toP L N (qel L N π hπ * toK L N δ) * x))
-        (fun h hh δ => coset_inv π hπ f hfe x h hh δ) γ
+      have h :=
+        finsum_mul_right (Hq L N π hπ)
+          (fun δ => f (toP L N (qel L N π hπ * toK L N δ) * x))
+          (fun h hh δ => coset_inv π hπ f hfe x h hh δ)
+          γ
       beta_reduce at h
       rw [← h]
       apply finsum_congr
@@ -163,14 +190,15 @@ theorem _root_.PositivityTheory.KB.sGap_of_parts : GapAbs → Unfold → Arith �
       exact hAint
     · simp only [hkey]
       exact hA0
-  · calc ∫ x in d.D, hecke (toK L N) (toP L N) (qel L N π hπ) f (ofS L N x) ^ 2 ∂d.μ
-        = ∫ x in d.D, avg (jS L N) (Kg L N π 0 ⊓ Kg L N π 1) (Kg L N π 0) w x ^ 2 ∂d.μ := by
-          simp only [hkey]
+  · calc
+      ∫ x in d.D, hecke (toK L N) (toP L N) (qel L N π hπ) f (ofS L N x) ^ 2 ∂d.μ
+          = ∫ x in d.D, avg (jS L N) (Kg L N π 0 ⊓ Kg L N π 1) (Kg L N π 0) w x ^ 2 ∂d.μ := by
+        simp only [hkey]
       _ ≤ (2 / 5) ^ 2 * ∫ x in (fun x => q * x) ⁻¹' d.D, w x ^ 2 ∂d.μ := hAle
       _ = (2 / 5) ^ 2 * ∫ x in d.D, f (ofS L N x) ^ 2 ∂d.μ := by rw [hw2]
       _ ≤ (3 / 5) ^ 2 * ∫ x in d.D, f (ofS L N x) ^ 2 ∂d.μ := by
-          apply mul_le_mul_of_nonneg_right (by norm_num)
-          exact integral_nonneg (fun x => sq_nonneg _)
+        apply mul_le_mul_of_nonneg_right (by norm_num)
+        exact integral_nonneg (fun x => sq_nonneg _)
 
 end PositivityTheory.KB.SpectralGap
 

@@ -11,7 +11,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison UpperTheory.Ru.crystallineComparison UpperTheory.Gal.crystallineComparison
+open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison
+  UpperTheory.Ru.crystallineComparison UpperTheory.Gal.crystallineComparison
 
 private lemma spec_chart {B : Type} [CommRing B] {X : Scheme.{0}} (w : Spec (CommRingCat.of B) ⟶ X) {V : X.Opens}
     (hV : IsAffineOpen V) (hw : ⊤ ≤ w ⁻¹ᵁ V) :
@@ -72,26 +73,31 @@ private lemma chart_norm {l Q n : ℕ} {Y : Scheme.{0}} (T : Fin (n + 1) → Cor
     exact (Category.assoc _ _ _).trans e3
   · exact hn B hl (fun j => Fin (T j).d) ζ hζ B' ψ hres ι x
 
-theorem UpperTheory.correspondence_norm_bound_of_affine_opens :
-    ∀ (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O] {Y : Scheme.{0}} (q : Y ⟶ Spec (CommRingCat.of O)) (ϖ : O) (Q n : ℕ)
-        (T : Fin (n + 1) → Corr l Y) (κ : O →+* OC l) (D : WDat l T)
-        (A : Test l) (y : (PX (D.π ≫ q) κ).obj A.obj) {U V : Y.Opens} (hU : IsAffineOpen U) (hV : IsAffineOpen V)
-        (h : ∀ j, (T j).p ⁻¹ᵁ U ≤ (T j).r ⁻¹ᵁ V), ⊤ ≤ (y.1 ≫ D.π) ⁻¹ᵁ U →
-        NormOn l Q n (fn q ϖ) T U V h → ∀ (ψ : A.obj.U →+* Qb A.obj), ψ (A.obj.oC (κ ϖ)) = 0 →
-        ∃ α : ∀ j, Fin (T j).d → (Γ(Y, V) →+* A.obj.U),
-          (∀ j i, y.1 ≫ D.s j i ≫ (T j).r = ptOf hV A.obj.U (α j i)) ∧
-          ∀ (ι : Type) [Fintype ι] (x : ι → Γ(Y, V)),
-            SameNorm (pts (wEv Q) fun j i k => ψ (α j i (x k)) ^ Q ^ (n - j))
-              (pts (wOd Q) fun j i k => ψ (α j i (x k)) ^ Q ^ (n - j)) := by
+theorem UpperTheory.correspondence_norm_bound_of_affine_opens
+    : ∀ (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O] {Y : Scheme.{0}}
+        (q : Y ⟶ Spec (CommRingCat.of O)) (ϖ : O) (Q n : ℕ) (T : Fin (n + 1) → Corr l Y)
+        (κ : O →+* OC l) (D : WDat l T) (A : Test l) (y : (PX (D.π ≫ q) κ).obj A.obj)
+        {U V : Y.Opens} (hU : IsAffineOpen U) (hV : IsAffineOpen V)
+        (h : ∀ j, (T j).p ⁻¹ᵁ U ≤ (T j).r ⁻¹ᵁ V),
+      ⊤ ≤ (y.1 ≫ D.π) ⁻¹ᵁ U → NormOn l Q n (fn q ϖ) T U V h
+        → ∀ (ψ : A.obj.U →+* Qb A.obj),
+          ψ (A.obj.oC (κ ϖ)) = 0
+            → ∃ α : ∀ j, Fin (T j).d → (Γ(Y, V) →+* A.obj.U),
+              (∀ j i, y.1 ≫ D.s j i ≫ (T j).r = ptOf hV A.obj.U (α j i))
+                ∧ ∀ (ι : Type) [Fintype ι] (x : ι → Γ(Y, V)),
+                  SameNorm (pts (wEv Q) fun j i k => ψ (α j i (x k)) ^ Q ^ (n - j))
+                    (pts (wOd Q) fun j i k => ψ (α j i (x k)) ^ Q ^ (n - j)) := by
   intro l _ O _ Y q ϖ Q n T κ D A y U V hU hV h hy hn ψ hψ
   have hl : (l : A.obj.U) ∈ nonZeroDivisors A.obj.U := (testFacts l A.obj A.property).1
   have hyq : (y.1 ≫ D.π) ≫ q = Spec.map (CommRingCat.ofHom (A.obj.oC.comp κ)) := by
     rw [Category.assoc]
     exact y.2
-  have hval : (Scheme.ΓSpecIso (CommRingCat.of A.obj.U)).hom.hom ((y.1 ≫ D.π).appTop.hom (fn q ϖ)) =
-      A.obj.oC (κ ϖ) := by
-    have e : (y.1 ≫ D.π).appTop.hom (fn q ϖ) =
-        ((y.1 ≫ D.π) ≫ q).appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom ϖ) := by
+  have hval
+      : (Scheme.ΓSpecIso (CommRingCat.of A.obj.U)).hom.hom ((y.1 ≫ D.π).appTop.hom (fn q ϖ))
+        = A.obj.oC (κ ϖ) := by
+    have e
+        : (y.1 ≫ D.π).appTop.hom (fn q ϖ)
+          = ((y.1 ≫ D.π) ≫ q).appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom ϖ) := by
       rw [Scheme.Hom.comp_appTop]
       rfl
     rw [e, hyq]
@@ -99,10 +105,12 @@ theorem UpperTheory.correspondence_norm_bound_of_affine_opens :
     have e3 := congr($(e2).hom ((Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom ϖ))
     refine e3.trans ?_
     simp
-  obtain ⟨α, h1, h2⟩ := chart_norm T hU hV h (fn q ϖ) hn A.obj.U hl (y.1 ≫ D.π) hy
-    (fun j i => y.1 ≫ D.s j i) (fun j i => by rw [Category.assoc, D.hs])
-    (fun j => by
-      have := D.gen _ (awayPt l A.obj.U ≫ y.1) (unit_away l A.obj.U) j
-      simpa only [Category.assoc] using this)
-    (Qb A.obj) ψ (by rw [hval]; exact hψ)
+  obtain ⟨α, h1, h2⟩ :=
+    chart_norm T hU hV h (fn q ϖ) hn A.obj.U hl (y.1 ≫ D.π) hy
+      (fun j i => y.1 ≫ D.s j i)
+      (fun j i => by rw [Category.assoc, D.hs])
+      (fun j => by
+        have := D.gen _ (awayPt l A.obj.U ≫ y.1) (unit_away l A.obj.U) j
+        simpa only [Category.assoc] using this)
+      (Qb A.obj) ψ (by rw [hval]; exact hψ)
   exact ⟨α, h1, h2⟩

@@ -17,11 +17,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ModEq
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
 
 namespace GlobalTheory.EX.OB
 
-theorem exists_levCh_of_levelPrime : LevelPrime → ∀ (eps cs : ℝ) (C : FC), 0 < eps → eps < 1 / 52 → 0 < cs → Std C → ∃ x0 : ℝ, ∀ (cD ch : ℝ) (s : Scale) (P : PreCh) (q1 : ℕ) (a b : P.R.A → ℤ) (c : P.Word → Fin (P.R.k - 2) → Bool) (du : P.Word → ℕ) (Ds : ℝ), s.eps = eps → x0 ≤ s.x → ChOK s C cD ch P q1 a b c → (∀ u, 0 < du u) → 0 < Ds → (∀ u, cs * P.R.m * s.L ≤ Real.log ((Ds / du u) ^ ((1 : ℝ) / (P.R.f * P.R.k)) * GamS C s P.R ^ (-(2 : ℝ) / (P.R.f * P.R.k)))) → ∃ Lv : LevCh P, Lv.duStar = du ∧ Lv.Dstar = Ds ∧ Lv.GamP = GamS C s P.R := by
+theorem exists_levCh_of_levelPrime
+    : LevelPrime
+      → ∀ (eps cs : ℝ) (C : FC),
+        0 < eps → eps < 1 / 52 → 0 < cs → Std C
+          → ∃ x0 : ℝ,
+            ∀ (cD ch : ℝ) (s : Scale) (P : PreCh) (q1 : ℕ) (a b : P.R.A → ℤ)
+                (c : P.Word → Fin (P.R.k - 2) → Bool) (du : P.Word → ℕ) (Ds : ℝ),
+              s.eps = eps → x0 ≤ s.x → ChOK s C cD ch P q1 a b c → (∀ u, 0 < du u) → 0 < Ds
+                → (∀ u,
+                  cs * P.R.m * s.L
+                    ≤ Real.log
+                      ((Ds / du u) ^ ((1 : ℝ) / (P.R.f * P.R.k))
+                        * GamS C s P.R ^ (-(2 : ℝ) / (P.R.f * P.R.k))))
+                → ∃ Lv : LevCh P, Lv.duStar = du ∧ Lv.Dstar = Ds ∧ Lv.GamP = GamS C s P.R := by
   intro hLP eps cs C he he' hcs hC
   obtain ⟨x1, h1⟩ := hLP eps cs he he' hcs
   obtain ⟨x2, h2⟩ := GlobalTheory.scale_poly_comparison eps 41 1 he one_pos
@@ -58,11 +72,15 @@ theorem exists_levCh_of_levelPrime : LevelPrime → ∀ (eps cs : ℝ) (C : FC),
     exact (le_mul_of_one_le_right (by positivity) hX1).trans hb
   have hk8 : 2 * (P.R.k : ℝ) ^ 8 ≤ s.b := by
     have h8 : (P.R.k : ℝ) ^ 8 ≤ (s.x ^ 5) ^ 8 := pow_le_pow_left₀ (by positivity) hk 8
-    calc 2 * (P.R.k : ℝ) ^ 8 ≤ s.x * (s.x ^ 5) ^ 8 := mul_le_mul hx4 h8 (by positivity) hx0.le
+    calc
+      2 * (P.R.k : ℝ) ^ 8
+        ≤ s.x * (s.x ^ 5) ^ 8 := mul_le_mul hx4 h8 (by positivity) hx0.le
       _ = s.x ^ 41 := by ring
       _ ≤ s.b := hb41
   have hg : ∀ i, (P.H.g i : ℝ) ≤ s.b ^ 9 := fun i => by
-    calc (P.H.g i : ℝ) ≤ 2 * ((P.R.k : ℝ) * s.b) ^ 8 := (hOK.val.2.2.2.2.1 i).2
+    calc
+      (P.H.g i : ℝ)
+        ≤ 2 * ((P.R.k : ℝ) * s.b) ^ 8 := (hOK.val.2.2.2.2.1 i).2
       _ = (2 * (P.R.k : ℝ) ^ 8) * s.b ^ 8 := by ring
       _ ≤ s.b * s.b ^ 8 := mul_le_mul_of_nonneg_right hk8 (by positivity)
       _ = s.b ^ 9 := by ring
@@ -95,14 +113,17 @@ theorem exists_levCh_of_levelPrime : LevelPrime → ∀ (eps cs : ℝ) (C : FC),
     · exact absurd hi (P.H.pde_ne_g i).2
     · exact h
   refine GlobalTheory.Mem.LevelChoice.exists_levCh P du Ds _ hdu hDs hGam fun u => ?_
-  have hT0 : 0 < (Ds / du u) ^ ((1 : ℝ) / (P.R.f * P.R.k)) * GamS C s P.R ^ (-(2 : ℝ) / (P.R.f * P.R.k)) := by
+  have hT0
+      : 0
+        < (Ds / du u) ^ ((1 : ℝ) / (P.R.f * P.R.k))
+          * GamS C s P.R ^ (-(2 : ℝ) / (P.R.f * P.R.k)) := by
     have : (0 : ℝ) < du u := by exact_mod_cast hdu u
     have : 0 < GamS C s P.R := by linarith
     positivity
-  obtain ⟨T, hT, hlo, hhi, hN⟩ := h1 s P.R P.H.condN P.H.d (P.H.g 0) (P.H.g 1) _ hs hx1 hOK.rank hOK.val.modRow
-    (P.H.g_prime 0).one_le (P.H.g_prime 1).one_le (hg 0) (hg 1) hT0 (hwin u)
-  have hXT : s.X' ≤ T :=
-    hXL.trans (((Real.le_log_iff_exp_le hT0).1 (hwin u)).trans hlo)
+  obtain ⟨T, hT, hlo, hhi, hN⟩ :=
+    h1 s P.R P.H.condN P.H.d (P.H.g 0) (P.H.g 1) _ hs hx1 hOK.rank hOK.val.modRow
+      (P.H.g_prime 0).one_le (P.H.g_prime 1).one_le (hg 0) (hg 1) hT0 (hwin u)
+  have hXT : s.X' ≤ T := hXL.trans (((Real.le_log_iff_exp_le hT0).1 (hwin u)).trans hlo)
   have hM : 1 ≤ P.H.QS * P.H.q * P.H.d * (P.H.g 0 * P.H.g 1) ^ 2 := by
     have hn : 0 < P.H.QS := P.H.QS_pos
     have hq : 0 < P.H.q := P.H.hyp.1.pos

@@ -77,15 +77,18 @@ private lemma height_add_ringKrullDim_quotient_le' (A : Type) [CommRing A] (I : 
   norm_cast
   exact le_iSup (fun a : PrimeSpectrum A => Order.height a + Order.coheight a) P
 
-
 open IsLocalRing TensorProduct in
-theorem _root_.GlobalTheory.RegularAscent.exists_regular_near_of_regular_quotient (B : Type) [CommRing B]
-    [IsNoetherianRing B] (p : Ideal B) [p.IsPrime]
-    (hp : IsRegularLocalRing (Localization.AtPrime p)) :
-    ∃ g, g ∉ p ∧ ∀ (q : Ideal B) [q.IsPrime], p ≤ q → g ∉ q →
-      IsRegularLocalRing
-        (Localization.AtPrime q ⧸ p.map (algebraMap B (Localization.AtPrime q))) →
-      IsRegularLocalRing (Localization.AtPrime q) := by
+theorem _root_.GlobalTheory.RegularAscent.exists_regular_near_of_regular_quotient
+    (B : Type) [CommRing B] [IsNoetherianRing B]
+    (p : Ideal B) [p.IsPrime]
+    (hp : IsRegularLocalRing (Localization.AtPrime p))
+    : ∃ g,
+      g ∉ p
+        ∧ ∀ (q : Ideal B) [q.IsPrime],
+          p ≤ q → g ∉ q
+            → IsRegularLocalRing
+              (Localization.AtPrime q ⧸ p.map (algebraMap B (Localization.AtPrime q)))
+            → IsRegularLocalRing (Localization.AtPrime q) := by
   classical
   have hmfg : (maximalIdeal (Localization.AtPrime p)).FG := IsNoetherian.noetherian _
   obtain ⟨U, hUc, hU⟩ := Submodule.FG.exists_span_finset_card_eq_spanFinrank hmfg
@@ -96,8 +99,9 @@ theorem _root_.GlobalTheory.RegularAscent.exists_regular_near_of_regular_quotien
     obtain ⟨u, hu, rfl⟩ := Finset.mem_image.mp ht
     rw [← IsLocalization.AtPrime.to_map_mem_maximal_iff (Localization.AtPrime p) p, ← hf u]
     exact Ideal.mul_mem_right _ _ (hU ▸ Ideal.subset_span hu)
-  have hTspan : p.map (algebraMap B (Localization.AtPrime p)) =
-      Ideal.span (algebraMap B (Localization.AtPrime p) '' T) := by
+  have hTspan
+      : p.map (algebraMap B (Localization.AtPrime p))
+        = Ideal.span (algebraMap B (Localization.AtPrime p) '' T) := by
     rw [Localization.AtPrime.map_eq_maximalIdeal]
     apply le_antisymm
     · rw [← hU]
@@ -133,15 +137,17 @@ theorem _root_.GlobalTheory.RegularAscent.exists_regular_near_of_regular_quotien
   intro q _ hpq hgq hreg
   have hdisj : Disjoint (q.primeCompl : Set B) p :=
     Set.disjoint_left.mpr fun x hxq hxp => hxq (hpq hxp)
-  have hI : p.map (algebraMap B (Localization.AtPrime q)) =
-      Ideal.span (algebraMap B (Localization.AtPrime q) '' T) := by
+  have hI
+      : p.map (algebraMap B (Localization.AtPrime q))
+        = Ideal.span (algebraMap B (Localization.AtPrime q) '' T) := by
     apply le_antisymm
     · rw [Ideal.map_le_iff_le_comap]
       intro x hx
       have hu : IsUnit (algebraMap B (Localization.AtPrime q) (∏ v ∈ V, c v)) :=
         IsLocalization.map_units (Localization.AtPrime q) (⟨_, hgq⟩ : q.primeCompl)
-      have h2 : algebraMap B (Localization.AtPrime q) ((∏ v ∈ V, c v) * x) ∈
-          Ideal.span (algebraMap B (Localization.AtPrime q) '' T) := by
+      have h2
+          : algebraMap B (Localization.AtPrime q) ((∏ v ∈ V, c v) * x)
+            ∈ Ideal.span (algebraMap B (Localization.AtPrime q) '' T) := by
         rw [← Ideal.map_span]; exact Ideal.mem_map_of_mem _ (hg x hx)
       rw [map_mul] at h2
       exact (Ideal.unit_mul_mem_iff_mem _ hu).mp h2
@@ -151,7 +157,9 @@ theorem _root_.GlobalTheory.RegularAscent.exists_regular_near_of_regular_quotien
     IsLocalization.isPrime_of_isPrime_disjoint q.primeCompl _ p ‹_› hdisj
   have hIcard : (p.map (algebraMap B (Localization.AtPrime q))).spanFinrank ≤ T.card := by
     rw [hI, ← Finset.coe_image]
-    exact (_root_.ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.spanFinrank_span_finset_le _).trans Finset.card_image_le
+    exact
+      (_root_.ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.spanFinrank_span_finset_le _).trans
+        Finset.card_image_le
   have hTcard : (T.card : WithBot ℕ∞) ≤ (p.map (algebraMap B (Localization.AtPrime q))).height := by
     have h1 : (p.map (algebraMap B (Localization.AtPrime q))).height = p.height := by
       rw [← IsLocalization.height_under q.primeCompl,
@@ -162,23 +170,30 @@ theorem _root_.GlobalTheory.RegularAscent.exists_regular_near_of_regular_quotien
     rw [h1, h2]
     exact_mod_cast (Finset.card_image_le.trans hUc.le)
   have := hreg.toIsLocalRing
-  have hA := spanFinrank_maximalIdeal_le_add (Localization.AtPrime q)
-    (p.map (algebraMap B (Localization.AtPrime q))) (IsNoetherian.noetherian _)
-    (IsNoetherian.noetherian _)
+  have hA :=
+    spanFinrank_maximalIdeal_le_add (Localization.AtPrime q)
+      (p.map (algebraMap B (Localization.AtPrime q))) (IsNoetherian.noetherian _)
+      (IsNoetherian.noetherian _)
   have hd := hreg.spanFinrank_maximalIdeal
-  have hdim := height_add_ringKrullDim_quotient_le' (Localization.AtPrime q)
-    (p.map (algebraMap B (Localization.AtPrime q)))
+  have hdim :=
+    height_add_ringKrullDim_quotient_le' (Localization.AtPrime q)
+      (p.map (algebraMap B (Localization.AtPrime q)))
   apply IsRegularLocalRing.of_spanFinrank_maximalIdeal_le
-  calc ((maximalIdeal (Localization.AtPrime q)).spanFinrank : WithBot ℕ∞)
-      ≤ ((T.card + (maximalIdeal (Localization.AtPrime q ⧸
-          p.map (algebraMap B (Localization.AtPrime q)))).spanFinrank : ℕ) : WithBot ℕ∞) := by
-        exact_mod_cast hA.trans (by omega)
-    _ = (T.card : WithBot ℕ∞) + ringKrullDim (Localization.AtPrime q ⧸
+  calc
+    ((maximalIdeal (Localization.AtPrime q)).spanFinrank : WithBot ℕ∞)
+        ≤ ((T.card + (maximalIdeal
+              (Localization.AtPrime q ⧸
+                p.map (algebraMap B (Localization.AtPrime q)))).spanFinrank
+            : ℕ)
+          : WithBot ℕ∞) := by
+      exact_mod_cast hA.trans (by omega)
+    _ = (T.card : WithBot ℕ∞) + ringKrullDim
+        (Localization.AtPrime q ⧸
           p.map (algebraMap B (Localization.AtPrime q))) := by
-        push_cast; rw [hd]
+      push_cast; rw [hd]
     _ ≤ (p.map (algebraMap B (Localization.AtPrime q))).height + ringKrullDim
-          (Localization.AtPrime q ⧸ p.map (algebraMap B (Localization.AtPrime q))) := by
-        gcongr
+        (Localization.AtPrime q ⧸ p.map (algebraMap B (Localization.AtPrime q))) := by
+      gcongr
     _ ≤ ringKrullDim (Localization.AtPrime q) := hdim
 
 end GlobalTheory.RegularAscent

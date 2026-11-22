@@ -7,20 +7,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsRatIffExis
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.VB GlobalTheory.LieVB GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.NeronCurve GlobalTheory.Nef
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.VB GlobalTheory.LieVB GlobalTheory.QCoh GlobalTheory.CechPic
+  GlobalTheory.NeronCurve GlobalTheory.Nef
 open GlobalTheory.Twist (resM)
 open scoped CategoryTheory.Obj RatFunc
 
 namespace GlobalTheory.Nef
 
-theorem isRatPath_of_isRat : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (ξ : Sp (PowerSeries F) ⟶ Y),
-    (∀ (U : Y.Opens), IsAffineOpen U → ∀ (h : ⊤ ≤ ξ ⁻¹ᵁ U) (f : Γ(Y, U)), IsRat (evAt ξ h f)) → IsRatPath ξ := by
+theorem isRatPath_of_isRat
+    : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (ξ : Sp (PowerSeries F) ⟶ Y),
+      (∀ (U : Y.Opens), IsAffineOpen U → ∀ (h : ⊤ ≤ ξ ⁻¹ᵁ U) (f : Γ(Y, U)), IsRat (evAt ξ h f))
+        → IsRatPath ξ := by
   intro F _ Y ξ hrat
-  obtain ⟨h1, -, -, h4, h5, h6, -⟩ := GlobalTheory.T.evalSectionAtRingPoint_spMap_comp_restrict_stalk
-  obtain ⟨U, hUa, hy, -⟩ := (Opens.isBasis_iff_nbhd.mp Y.isBasis_affineOpens)
-    (show ξ (IsLocalRing.closedPoint (PowerSeries F)) ∈ (⊤ : Y.Opens) from trivial)
+  obtain ⟨h1, -, -, h4, h5, h6, -⟩ :=
+    GlobalTheory.T.evalSectionAtRingPoint_spMap_comp_restrict_stalk
+  obtain ⟨U, hUa, hy, -⟩ :=
+    (Opens.isBasis_iff_nbhd.mp Y.isBasis_affineOpens)
+      (show ξ (IsLocalRing.closedPoint (PowerSeries F)) ∈ (⊤ : Y.Opens) from trivial)
   have hξ : ⊤ ≤ ξ ⁻¹ᵁ U := (h4 _ Y ξ U).2 hy
   set ψ := evAt ξ hξ
   set ιR := algebraMap (RatFunc F) (LaurentSeries F)
@@ -29,7 +36,9 @@ theorem isRatPath_of_isRat : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (ξ : Sp 
   have hmem : ∀ f, (ιP.comp ψ) f ∈ ιR.range := fun f => by
     obtain ⟨ρ, hρ⟩ := (isRat_iff_exists_ratFunc F (ψ f)).1 (hrat U hUa hξ f)
     exact ⟨ρ, hρ⟩
-  let e := RingEquiv.ofBijective ιR.rangeRestrict ⟨fun a b hab => hR (congrArg Subtype.val hab), ιR.rangeRestrict_surjective⟩
+  let e :=
+    RingEquiv.ofBijective ιR.rangeRestrict
+      ⟨fun a b hab => hR (congrArg Subtype.val hab), ιR.rangeRestrict_surjective⟩
   let φ : Γ(Y, U) →+* RatFunc F := e.symm.toRingHom.comp ((ιP.comp ψ).codRestrict ιR.range hmem)
   have hφ : ∀ f, ιR (φ f) = ιP (ψ f) := fun f => by
     have := congrArg Subtype.val (e.apply_symm_apply ((ιP.comp ψ).codRestrict ιR.range hmem f))

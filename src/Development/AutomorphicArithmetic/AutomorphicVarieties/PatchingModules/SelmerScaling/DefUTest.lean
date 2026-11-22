@@ -10,22 +10,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem UpperTheory.V.Pa.defUTest_smul {F : Type} [CommRing F] {e : ℕ} (c : F) (x : DD F e) :
-    c • x = DD.C c * x := rfl
+private theorem UpperTheory.V.Pa.defUTest_smul {F : Type} [CommRing F] {e : ℕ} (c : F) (x : DD F e)
+    : c • x = DD.C c * x :=
+  rfl
 
 private def UpperTheory.V.Pa.defUTest_a (F : Type) [CommRing F] (e : ℕ) : DD F e →ₗ[F] F where
   toFun x := x.a
   map_add' _ _ := rfl
   map_smul' c x := by simp [defUTest_smul]
 
-private def UpperTheory.V.Pa.defUTest_ep (F : Type) [CommRing F] {e : ℕ} (k : Fin e) : DD F e →ₗ[F] F where
+private def UpperTheory.V.Pa.defUTest_ep (F : Type) [CommRing F] {e : ℕ} (k : Fin e)
+    : DD F e →ₗ[F] F where
   toFun x := x.ep k
   map_add' _ _ := rfl
   map_smul' c x := by simp [defUTest_smul]
 
-private def UpperTheory.V.Pa.defUTest_ep' (F : Type) [CommRing F] {e : ℕ} (k : Fin e) : DD F e →ₗ[F] F where
+private def UpperTheory.V.Pa.defUTest_ep' (F : Type) [CommRing F] {e : ℕ} (k : Fin e)
+    : DD F e →ₗ[F] F where
   toFun x := x.ep' k
   map_add' _ _ := rfl
   map_smul' c x := by simp [defUTest_smul]
@@ -35,8 +39,15 @@ private def UpperTheory.V.Pa.defUTest_eta (F : Type) [CommRing F] (e : ℕ) : DD
   map_add' _ _ := rfl
   map_smul' c x := by simp [defUTest_smul]
 
-theorem UpperTheory.V.Pa.defUTest :
-    ∀ (l : ℕ) [Fact l.Prime] (S : Ctx l), ∀ (e : ℕ) (α : Fin e → S.Bh →+ S.F) (μ : Fin e → S.U.N →+ S.F) (Φ : S.U.N →+ S.F), (∀ k, α k ∈ S.Tp) → (∀ k, μ k ∈ S.La) → (∀ (b : S.Bh) y, Φ (b • y) = S.rF b * Φ y + ∑ k, α k b * μ k y) → ∃ (u : S.G.G₀ → Matrix (Fin S.n) (Fin S.n) (DD S.F e)) (ψ : ∀ v, Fin S.n → S.L.Gv v →* (DD S.F e)ˣ), DefU S.h S.x u ψ ∧ (∀ k, epC S.h S.x u k = S.laC (μ k)) ∧ ∀ k, epC' S.h S.x u k = S.alC (α k) := by
+theorem UpperTheory.V.Pa.defUTest
+    : ∀ (l : ℕ) [Fact l.Prime] (S : Ctx l),
+      ∀ (e : ℕ) (α : Fin e → S.Bh →+ S.F) (μ : Fin e → S.U.N →+ S.F) (Φ : S.U.N →+ S.F),
+        (∀ k, α k ∈ S.Tp) → (∀ k, μ k ∈ S.La)
+          → (∀ (b : S.Bh) y, Φ (b • y) = S.rF b * Φ y + ∑ k, α k b * μ k y)
+          → ∃ (u : S.G.G₀ → Matrix (Fin S.n) (Fin S.n) (DD S.F e))
+              (ψ : ∀ v, Fin S.n → S.L.Gv v →* (DD S.F e)ˣ),
+            DefU S.h S.x u ψ ∧ (∀ k, epC S.h S.x u k = S.laC (μ k))
+              ∧ ∀ k, epC' S.h S.x u k = S.alC (α k) := by
   intro l _ S e α μ Φ hα hμ hΦ
   obtain ⟨θ, hT, hθ⟩ := testEx l S e α μ Φ hα hμ hΦ
   obtain ⟨_, hE, _, hψ, hm⟩ := testVal l S (DD S.F e) (DD.aug S.F e) θ hT
@@ -50,18 +61,19 @@ theorem UpperTheory.V.Pa.defUTest :
   let ψ : ∀ v, Fin S.n → S.L.Gv v →* (DD S.F e)ˣ := fun v i =>
     (Units.map (θ.comp (algebraMap S.B S.U.AA)).toMonoidHom).comp (S.u.ψ v i)
   refine ⟨u, ψ, ?_, ?_, ?_⟩
-  · refine
-      { one := by simp [u]
-        mul := by intro g g'; simp [u, Matrix.map_mul]
-        red := ?_
-        even := ?_
-        form := ?_
-        ine := ?_
-        ψ_red := ?_
-        ψ_even := ?_
-        ψ_mu := ?_
-        ord := ?_
-        bnd := ?_ }
+  · refine {
+      one := by simp [u]
+      mul := by intro g g'; simp [u, Matrix.map_mul]
+      red := ?_
+      even := ?_
+      form := ?_
+      ine := ?_
+      ψ_red := ?_
+      ψ_even := ?_
+      ψ_mu := ?_
+      ord := ?_
+      bnd := ?_
+    }
     · intro g
       ext i j
       simp only [u, Matrix.map_apply, hθ]
@@ -71,15 +83,13 @@ theorem UpperTheory.V.Pa.defUTest :
       constructor
       · intro hij
         simp only [u, Matrix.map_apply, hθ]
-        refine ⟨?_, ?_, ?_, ?_⟩ <;>
-          first
+        refine ⟨?_, ?_, ?_, ?_⟩ <;> first
           | (intro h; exact absurd h (by decide))
           | (intro _; funext k; simp [h1 hij])
           | (intro _; simp [h1 hij])
       · intro hij
         simp only [u, Matrix.map_apply, hθ]
-        refine ⟨?_, ?_, ?_, ?_⟩ <;>
-          first
+        refine ⟨?_, ?_, ?_, ?_⟩ <;> first
           | (intro h; exact absurd h (by decide))
           | (intro _; funext k; simp [h2 hij])
           | (intro _; simp [h2 hij])
@@ -99,10 +109,9 @@ theorem UpperTheory.V.Pa.defUTest :
     · intro v i g
       exact hψ v i g
     · intro v i g
-      simp only [ψ, MonoidHom.comp_apply, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
-        RingHom.coe_comp, Function.comp_apply, hθ, hB]
-      refine ⟨?_, ?_, ?_, ?_⟩ <;>
-        first
+      simp only [ψ, MonoidHom.comp_apply, Units.coe_map, RingHom.toMonoidHom_eq_coe,
+        MonoidHom.coe_coe, RingHom.coe_comp, Function.comp_apply, hθ, hB]
+      refine ⟨?_, ?_, ?_, ?_⟩ <;> first
         | (intro h; exact absurd h (by decide))
         | (intro _; funext k; simp)
         | (intro _; simp)
@@ -118,10 +127,12 @@ theorem UpperTheory.V.Pa.defUTest :
         simp [u, ψ, Matrix.algebraMap_matrix_apply, Matrix.sub_apply]
       · simp [u, ψ, Matrix.algebraMap_matrix_apply, Matrix.sub_apply, hab]
     · intro i j
-      exact ⟨trBnd l S _ _ θ hT (defUTest_a S.F e) i j,
+      exact ⟨
+        trBnd l S _ _ θ hT (defUTest_a S.F e) i j,
         fun k => trBnd l S _ _ θ hT (defUTest_ep S.F k) i j,
         fun k => trBnd l S _ _ θ hT (defUTest_ep' S.F k) i j,
-        trBnd l S _ _ θ hT (defUTest_eta S.F e) i j⟩
+        trBnd l S _ _ θ hT (defUTest_eta S.F e) i j
+      ⟩
   · intro k
     funext γ
     simp only [epC, Ctx.laC, u, Matrix.map_map]

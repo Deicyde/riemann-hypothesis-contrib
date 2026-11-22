@@ -16,7 +16,8 @@ def dI (τ : ι) (b : Fin r) : UpI ι r := ⟨(τ, b, b), lt_irrefl b⟩
 
 def jacU (y : UpI ι r → ℂ) : ℂ := ∏ i : Ix ι r, if i.2.2 < i.2.1 then y (dI i.1 i.2.2) else 1
 
-def jacβ (β : ι → Matrix (Fin r) (Fin r) ℂ) : ℂ := ∏ i : Ix ι r, if i.2.2 < i.2.1 then β i.1 i.2.2 i.2.2 else 1
+def jacβ (β : ι → Matrix (Fin r) (Fin r) ℂ) : ℂ :=
+  ∏ i : Ix ι r, if i.2.2 < i.2.1 then β i.1 i.2.2 i.2.2 else 1
 
 def Cy (ι : Type*) [Fintype ι] (r : ℕ) : Set (UpI ι r → ℂ) :=
   {y | ∀ i : UpI ι r, (i.1.2.1 = i.1.2.2 → 1 ≤ ‖y i‖ ∧ ‖y i‖ ≤ 2) ∧ (i.1.2.1 ≠ i.1.2.2 → ‖y i‖ ≤ 1)}
@@ -156,10 +157,12 @@ lemma jacβ_ne (β : ι → Matrix (Fin r) (Fin r) ℂ) (hd : ∀ τ b, β τ b 
   · exact hd _ _
   · exact one_ne_zero
 
-theorem lintegral_upper (β : ι → Matrix (Fin r) (Fin r) ℂ) (hβ : ∀ τ, (β τ).BlockTriangular id)
-    (hd : ∀ τ b, β τ b b ≠ 0) :
-    ∫⁻ y, ENNReal.ofReal (Complex.normSq (jacU y)) * (Cy ι r).indicator 1 (Lβ β y) =
-      ENNReal.ofReal ((Complex.normSq (LinearMap.det (Lβ β)) * Complex.normSq (jacβ β))⁻¹) * K0 ι r := by
+theorem lintegral_upper
+    (β : ι → Matrix (Fin r) (Fin r) ℂ)
+    (hβ : ∀ τ, (β τ).BlockTriangular id) (hd : ∀ τ b, β τ b b ≠ 0)
+    : ∫⁻ y, ENNReal.ofReal (Complex.normSq (jacU y)) * (Cy ι r).indicator 1 (Lβ β y)
+      = ENNReal.ofReal ((Complex.normSq (LinearMap.det (Lβ β)) * Complex.normSq (jacβ β))⁻¹)
+        * K0 ι r := by
   set LR : (UpI ι r → ℂ) →ₗ[ℝ] (UpI ι r → ℂ) := (Lβ β).restrictScalars ℝ with hLR_def
   have hdet : LinearMap.det LR = Complex.normSq (LinearMap.det (Lβ β)) := by
     rw [hLR_def, LinearMap.det_restrictScalars, Algebra.norm_complex_apply]
@@ -172,18 +175,23 @@ theorem lintegral_upper (β : ι → Matrix (Fin r) (Fin r) ℂ) (hβ : ∀ τ, 
     ENNReal.ofReal (Complex.normSq (jacU z) / Complex.normSq (jacβ β)) * (Cy ι r).indicator 1 z with hG_def
   have hG : Measurable G :=
     (ENNReal.measurable_ofReal.comp
-      ((Complex.continuous_normSq.comp continuous_jacU).measurable.div_const _)).mul
+        ((Complex.continuous_normSq.comp continuous_jacU).measurable.div_const _)).mul
       (measurable_one.indicator measurableSet_Cy)
   have hLRm : Measurable LR := LR.continuous_of_finiteDimensional.measurable
-  have hpt : ∀ y, ENNReal.ofReal (Complex.normSq (jacU y)) * (Cy ι r).indicator 1 (Lβ β y) = G (LR y) := by
+  have hpt
+      : ∀ y,
+        ENNReal.ofReal (Complex.normSq (jacU y)) * (Cy ι r).indicator 1 (Lβ β y) = G (LR y) := by
     intro y
     have e : LR y = Lβ β y := rfl
     rw [hG_def]
     dsimp only
     rw [e, jacU_Lβ β hβ, map_mul, mul_div_cancel_left₀ _ hjbp.ne']
   have hint : ∫⁻ z, G z = ENNReal.ofReal ((Complex.normSq (jacβ β))⁻¹) * K0 ι r := by
-    have e : ∀ z, G z = ENNReal.ofReal ((Complex.normSq (jacβ β))⁻¹) *
-        (Cy ι r).indicator (fun z => ENNReal.ofReal (Complex.normSq (jacU z))) z := by
+    have e
+        : ∀ z,
+          G z
+            = ENNReal.ofReal ((Complex.normSq (jacβ β))⁻¹)
+              * (Cy ι r).indicator (fun z => ENNReal.ofReal (Complex.normSq (jacU z))) z := by
       intro z
       rw [hG_def]
       dsimp only
@@ -191,11 +199,13 @@ theorem lintegral_upper (β : ι → Matrix (Fin r) (Fin r) ℂ) (hβ : ∀ τ, 
       · rw [Set.indicator_of_mem hz, Set.indicator_of_mem hz, Pi.one_apply, mul_one, div_eq_mul_inv,
           ENNReal.ofReal_mul (Complex.normSq_nonneg _), mul_comm]
       · rw [Set.indicator_of_notMem hz, Set.indicator_of_notMem hz, mul_zero, mul_zero]
-    rw [lintegral_congr e, lintegral_const_mul _ (measurable_normSq_jacU.indicator measurableSet_Cy),
+    rw [lintegral_congr e,
+      lintegral_const_mul _ (measurable_normSq_jacU.indicator measurableSet_Cy),
       lintegral_indicator measurableSet_Cy]
     rfl
-  rw [lintegral_congr hpt, ← lintegral_map hG hLRm, Measure.map_linearMap_addHaar_eq_smul_addHaar _ hdR,
-    lintegral_smul_measure, hint, smul_eq_mul, ← mul_assoc, ← ENNReal.ofReal_mul (abs_nonneg _), hdet,
+  rw [lintegral_congr hpt, ← lintegral_map hG hLRm,
+    Measure.map_linearMap_addHaar_eq_smul_addHaar _ hdR, lintegral_smul_measure, hint, smul_eq_mul,
+    ← mul_assoc, ← ENNReal.ofReal_mul (abs_nonneg _), hdet,
     abs_of_nonneg (inv_nonneg.2 (Complex.normSq_nonneg _)), ← mul_inv]
 
 end

@@ -9,12 +9,13 @@ open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.Adelic
 
-theorem geom_sum_int_le (D M : ℕ) (hD : 0 < D) (hM : 1 ≤ M) (x₀ C : ℝ) :
-    ∃ C' : ℝ, ∀ r : ℝ, 0 < r →
-      ∑' j : ℤ, (if (j : ℝ) + Real.log r < x₀ then 0
-        else ENNReal.ofReal (C * Real.exp (2 * D * ((j : ℝ) + Real.log r)))) *
-          ENNReal.ofReal (Real.exp (-(2 * D * (M + 1) * (j : ℝ)))) ≤
-        ENNReal.ofReal (C' * r ^ (2 * D * (M + 1))) := by
+theorem geom_sum_int_le (D M : ℕ) (hD : 0 < D) (hM : 1 ≤ M) (x₀ C : ℝ)
+    : ∃ C' : ℝ, ∀ r : ℝ,
+      0 < r
+        → ∑' j : ℤ, (if (j : ℝ) + Real.log r < x₀ then 0
+            else ENNReal.ofReal (C * Real.exp (2 * D * ((j : ℝ) + Real.log r)))) *
+              ENNReal.ofReal (Real.exp (-(2 * D * (M + 1) * (j : ℝ))))
+          ≤ ENNReal.ofReal (C' * r ^ (2 * D * (M + 1))) := by
   have hDr : (0 : ℝ) < D := by exact_mod_cast hD
   have hMr : (0 : ℝ) < M := by exact_mod_cast hM
   obtain ⟨a, ha⟩ : ∃ a : ℝ, a = 2 * D * M := ⟨_, rfl⟩
@@ -33,13 +34,16 @@ theorem geom_sum_int_le (D M : ℕ) (hD : 0 < D) (hM : 1 ≤ M) (x₀ C : ℝ) :
   obtain ⟨A, hA⟩ : ∃ A : ℝ, A = K * r ^ (2 * D) * Real.exp (-a * n₀) := ⟨_, rfl⟩
   have hA0 : 0 ≤ A := by rw [hA]; have := Real.exp_pos (-a * n₀); positivity
 
-  have hsupp : Function.support (fun j : ℤ =>
-      (if (j : ℝ) + Real.log r < x₀ then 0
-        else ENNReal.ofReal (C * Real.exp (2 * D * ((j : ℝ) + Real.log r)))) *
-          ENNReal.ofReal (Real.exp (-(2 * D * (M + 1) * (j : ℝ))))) ⊆
-      Set.range (fun n : ℕ => n₀ + (n : ℤ)) := by
+  have hsupp
+      : Function.support (fun j : ℤ =>
+          (if (j : ℝ) + Real.log r < x₀ then
+             0
+           else
+             ENNReal.ofReal (C * Real.exp (2 * D * ((j : ℝ) + Real.log r))))
+            * ENNReal.ofReal (Real.exp (-(2 * D * (M + 1) * (j : ℝ)))))
+        ⊆ Set.range (fun n : ℕ => n₀ + (n : ℤ)) := by
     intro j hj
-    have hnot : ¬ ((j : ℝ) + Real.log r < x₀) := by
+    have hnot : ¬((j : ℝ) + Real.log r < x₀) := by
       intro h
       apply hj
       simp [h]
@@ -56,11 +60,14 @@ theorem geom_sum_int_le (D M : ℕ) (hD : 0 < D) (hM : 1 ≤ M) (x₀ C : ℝ) :
     simpa using h
   rw [← hinj.tsum_eq hsupp]
 
-  have hterm : ∀ n : ℕ,
-      (if (((n₀ + (n : ℤ) : ℤ)) : ℝ) + Real.log r < x₀ then 0
-        else ENNReal.ofReal (C * Real.exp (2 * D * ((((n₀ + (n : ℤ) : ℤ)) : ℝ) + Real.log r)))) *
-          ENNReal.ofReal (Real.exp (-(2 * D * (M + 1) * (((n₀ + (n : ℤ) : ℤ)) : ℝ)))) ≤
-        ENNReal.ofReal (A * q ^ n) := by
+  have hterm
+      : ∀ n : ℕ,
+        (if (((n₀ + (n : ℤ) : ℤ)) : ℝ) + Real.log r < x₀ then
+           0
+         else
+           ENNReal.ofReal (C * Real.exp (2 * D * ((((n₀ + (n : ℤ) : ℤ)) : ℝ) + Real.log r))))
+            * ENNReal.ofReal (Real.exp (-(2 * D * (M + 1) * (((n₀ + (n : ℤ) : ℤ)) : ℝ))))
+          ≤ ENNReal.ofReal (A * q ^ n) := by
     intro n
     split_ifs with h
     · simp
@@ -68,11 +75,11 @@ theorem geom_sum_int_le (D M : ℕ) (hD : 0 < D) (hM : 1 ≤ M) (x₀ C : ℝ) :
       apply ENNReal.ofReal_le_ofReal
       have hr' : r ^ (2 * D) = Real.exp (((2 * D : ℕ) : ℝ) * Real.log r) := by
         rw [Real.exp_nat_mul, Real.exp_log hr]
-      have hq' : q ^ n = Real.exp ((n : ℝ) * (-a)) := by
-        rw [hq, Real.exp_nat_mul]
-      have key : Real.exp (2 * D * ((((n₀ + (n : ℤ) : ℤ)) : ℝ) + Real.log r)) *
-          Real.exp (-(2 * D * (M + 1) * (((n₀ + (n : ℤ) : ℤ)) : ℝ))) =
-          r ^ (2 * D) * Real.exp (-a * n₀) * q ^ n := by
+      have hq' : q ^ n = Real.exp ((n : ℝ) * (-a)) := by rw [hq, Real.exp_nat_mul]
+      have key
+          : Real.exp (2 * D * ((((n₀ + (n : ℤ) : ℤ)) : ℝ) + Real.log r))
+              * Real.exp (-(2 * D * (M + 1) * (((n₀ + (n : ℤ) : ℤ)) : ℝ)))
+            = r ^ (2 * D) * Real.exp (-a * n₀) * q ^ n := by
         rw [hr', hq', ← Real.exp_add, ← Real.exp_add, ← Real.exp_add, ha]
         congr 1
         push_cast
@@ -80,15 +87,14 @@ theorem geom_sum_int_le (D M : ℕ) (hD : 0 < D) (hM : 1 ≤ M) (x₀ C : ℝ) :
       have hpos : 0 ≤ r ^ (2 * D) * Real.exp (-a * n₀) * q ^ n := by
         have := Real.exp_pos (-a * n₀)
         positivity
-      calc C * Real.exp (2 * D * ((((n₀ + (n : ℤ) : ℤ)) : ℝ) + Real.log r)) *
-            Real.exp (-(2 * D * (M + 1) * (((n₀ + (n : ℤ) : ℤ)) : ℝ)))
+      calc
+        C * Real.exp (2 * D * ((((n₀ + (n : ℤ) : ℤ)) : ℝ) + Real.log r))
+            * Real.exp (-(2 * D * (M + 1) * (((n₀ + (n : ℤ) : ℤ)) : ℝ)))
           = C * (r ^ (2 * D) * Real.exp (-a * n₀) * q ^ n) := by rw [mul_assoc, key]
-        _ ≤ K * (r ^ (2 * D) * Real.exp (-a * n₀) * q ^ n) :=
-            mul_le_mul_of_nonneg_right hCK hpos
+        _ ≤ K * (r ^ (2 * D) * Real.exp (-a * n₀) * q ^ n) := mul_le_mul_of_nonneg_right hCK hpos
         _ = A * q ^ n := by rw [hA]; ring
   refine (ENNReal.tsum_le_tsum hterm).trans ?_
-  have hsum : Summable (fun n : ℕ => A * q ^ n) :=
-    (summable_geometric_of_lt_one hq0 hq1).mul_left A
+  have hsum : Summable (fun n : ℕ => A * q ^ n) := (summable_geometric_of_lt_one hq0 hq1).mul_left A
   rw [← ENNReal.ofReal_tsum_of_nonneg (fun n => by positivity) hsum]
   apply ENNReal.ofReal_le_ofReal
   rw [tsum_mul_left, tsum_geometric_of_lt_one hq0 hq1]
@@ -107,22 +113,25 @@ theorem geom_sum_int_le (D M : ℕ) (hD : 0 < D) (hM : 1 ≤ M) (x₀ C : ℝ) :
     ring
   have hAle : A ≤ K * Real.exp (-a * x₀) * r ^ (2 * D * (M + 1)) := by
     rw [hA, hpow]
-    calc K * r ^ (2 * D) * Real.exp (-a * n₀)
-        ≤ K * r ^ (2 * D) * (Real.exp (-a * x₀) * r ^ (2 * D * M)) :=
-          mul_le_mul_of_nonneg_left hexp (by positivity)
+    calc
+      K * r ^ (2 * D) * Real.exp (-a * n₀)
+          ≤ K * r ^ (2 * D) * (Real.exp (-a * x₀) * r ^ (2 * D * M)) :=
+        mul_le_mul_of_nonneg_left hexp (by positivity)
       _ = K * Real.exp (-a * x₀) * (r ^ (2 * D) * r ^ (2 * D * M)) := by ring
-  calc A * (1 - q)⁻¹
-      ≤ (K * Real.exp (-a * x₀) * r ^ (2 * D * (M + 1))) * (1 - q)⁻¹ :=
-        mul_le_mul_of_nonneg_right hAle (inv_nonneg.mpr h1q.le)
-    _ = K * Real.exp (-a * x₀) / (1 - q) * r ^ (2 * D * (M + 1)) := by
-        rw [div_eq_mul_inv]; ring
+  calc
+    A * (1 - q)⁻¹ ≤ (K * Real.exp (-a * x₀) * r ^ (2 * D * (M + 1))) * (1 - q)⁻¹ :=
+      mul_le_mul_of_nonneg_right hAle (inv_nonneg.mpr h1q.le)
+    _ = K * Real.exp (-a * x₀) / (1 - q) * r ^ (2 * D * (M + 1)) := by rw [div_eq_mul_inv]; ring
 
-theorem geom_sum_int :
-    ∀ (D M : ℕ), 0 < D → 1 ≤ M → ∀ (x₀ C : ℝ), ∃ C' : ℝ, ∀ r : ℝ, 0 < r →
-      ∑' j : ℤ, (if (j : ℝ) + Real.log r < x₀ then 0
-        else ENNReal.ofReal (C * Real.exp (2 * D * ((j : ℝ) + Real.log r)))) *
-          ENNReal.ofReal (Real.exp (-(2 * D * (M + 1) * (j : ℝ)))) ≤
-        ENNReal.ofReal (C' * r ^ (2 * D * (M + 1))) :=
-  fun D M hD hM x₀ C => geom_sum_int_le D M hD hM x₀ C
+theorem geom_sum_int
+    : ∀ (D M : ℕ),
+      0 < D → 1 ≤ M
+        → ∀ (x₀ C : ℝ), ∃ C' : ℝ, ∀ r : ℝ,
+          0 < r
+            → ∑' j : ℤ, (if (j : ℝ) + Real.log r < x₀ then 0
+                else ENNReal.ofReal (C * Real.exp (2 * D * ((j : ℝ) + Real.log r)))) *
+                  ENNReal.ofReal (Real.exp (-(2 * D * (M + 1) * (j : ℝ))))
+              ≤ ENNReal.ofReal (C' * r ^ (2 * D * (M + 1))) := fun D M hD hM x₀ C =>
+  geom_sum_int_le D M hD hM x₀ C
 
 end GlobalTheory.CompanionTheory.Adelic

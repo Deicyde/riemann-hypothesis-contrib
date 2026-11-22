@@ -28,6 +28,8 @@ theorem bernAt : BernAt k :=
   Prod.Final.bern_of k (Form.U.Final.derivTop k (thmB k)) (Form.U.Final.derivPos k (thmB k))
     (GlobalTheory.RgGu.Leib.Hand.leibnizOrd k)
 
-theorem bernsteinUnitaryProductIrreducible : GlobalTheory.Published.BernsteinUnitaryProductIrreducible := fun k _ _ _ _ => bernAt k
+theorem bernsteinUnitaryProductIrreducible
+    : GlobalTheory.Published.BernsteinUnitaryProductIrreducible := fun k _ _ _ _ =>
+  bernAt k
 
 end PositivityTheory.RgUd.All

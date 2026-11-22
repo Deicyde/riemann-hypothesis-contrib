@@ -19,13 +19,14 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
 set_option maxHeartbeats 800000 in
-theorem glueFwd_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) (hE : GlueEta M r) :
-    GlueFwd M r n := by
+theorem glueFwd_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) (hE : GlueEta M r)
+    : GlueFwd M r n := by
   intro V _ _ H hn t₁ f₂ f₂' φ φ' hT Λ₂ hG₂ hTh
   set t₂ : Term V M r := { abelian₂ := Λ₂, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } with ht₂
-  have memS : ∀ (t : Term V M r) (N : Submodule M.L.O V) (w : V),
-      w ∈ ThSharp H t N ↔ (w ∈ H.W0 t.f t.f' ∧ ∀ n ∈ N, H.h w n ∈ M.L.O) :=
-    fun _ _ _ => Iff.rfl
+  have memS
+      : ∀ (t : Term V M r) (N : Submodule M.L.O V) (w : V),
+        w ∈ ThSharp H t N ↔ (w ∈ H.W0 t.f t.f' ∧ ∀ n ∈ N, H.h w n ∈ M.L.O) := fun _ _ _ =>
+    Iff.rfl
   have memL : ∀ (t : Term V M r) (w : V), w ∈ ThL H t ↔ (w ∈ t.abelian₂ ∧ w ∈ H.W0 t.f t.f') :=
     fun _ _ => Iff.rfl
   have hDl : IsUnit (H.Dl f₂ f₂' (r + 1)) := by
@@ -39,8 +40,9 @@ theorem glueFwd_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) 
     fun x hx => hTh x _ ((hψC x _).2 ⟨hx, rfl⟩)
   obtain ⟨η₁, hη₁a, hη₁b⟩ := hE hM V H t₁ hG₁
   obtain ⟨η₂, hη₂a, hη₂b⟩ := hE hM V H t₂ hG₂
-  have fwd : ∀ (w : V) (hw : w ∈ ThSharp H t₁ (ThL H t₁)),
-      (ψ ⟨w, ((memS _ _ _).1 hw).1⟩ : V) ∈ ThSharp H t₂ (ThL H t₂) := by
+  have fwd
+      : ∀ (w : V) (hw : w ∈ ThSharp H t₁ (ThL H t₁)),
+        (ψ ⟨w, ((memS _ _ _).1 hw).1⟩ : V) ∈ ThSharp H t₂ (ThL H t₂) := by
     intro w hw
     refine (memS _ _ _).2 ⟨(ψ _).2, ?_⟩
     intro n hn'
@@ -49,8 +51,9 @@ theorem glueFwd_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) 
     rw [← h1, hψh]
     refine ((memS _ _ _).1 hw).2 _ ((memL _ _).2 ⟨?_, (ψ.symm ⟨n, hnW⟩).2⟩)
     exact (key _ (ψ.symm ⟨n, hnW⟩).2).2 (by simpa [ht₂] using hnΛ)
-  have bwd : ∀ (w : V) (hw : w ∈ ThSharp H t₂ (ThL H t₂)),
-      (ψ.symm ⟨w, ((memS _ _ _).1 hw).1⟩ : V) ∈ ThSharp H t₁ (ThL H t₁) := by
+  have bwd
+      : ∀ (w : V) (hw : w ∈ ThSharp H t₂ (ThL H t₂)),
+        (ψ.symm ⟨w, ((memS _ _ _).1 hw).1⟩ : V) ∈ ThSharp H t₁ (ThL H t₁) := by
     intro w hw
     refine (memS _ _ _).2 ⟨(ψ.symm _).2, ?_⟩
     intro n hn'
@@ -59,31 +62,34 @@ theorem glueFwd_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) 
     simp only [LinearEquiv.apply_symm_apply] at h2
     rw [← h2]
     exact ((memS _ _ _).1 hw).2 _ ((memL _ _).2 ⟨(key n hnW).1 hnΛ, (ψ ⟨n, hnW⟩).2⟩)
-  let e : ThSharp H t₁ (ThL H t₁) ≃ₗ[M.L.O] ThSharp H t₂ (ThL H t₂) :=
-    { toFun := fun w => ⟨_, fwd w.1 w.2⟩
-      invFun := fun w => ⟨_, bwd w.1 w.2⟩
-      map_add' := by
-        intro a b
-        apply Subtype.ext
-        have h := congrArg Subtype.val
+  let e : ThSharp H t₁ (ThL H t₁) ≃ₗ[M.L.O] ThSharp H t₂ (ThL H t₂) := {
+    toFun := fun w => ⟨_, fwd w.1 w.2⟩
+    invFun := fun w => ⟨_, bwd w.1 w.2⟩
+    map_add' := by
+      intro a b
+      apply Subtype.ext
+      have h :=
+        congrArg Subtype.val
           (map_add ψ ⟨(a : V), ((memS _ _ _).1 a.2).1⟩ ⟨(b : V), ((memS _ _ _).1 b.2).1⟩)
-        exact h
-      map_smul' := by
-        intro c a
-        apply Subtype.ext
-        have h := congrArg Subtype.val (map_smul ψ (c : E) ⟨(a : V), ((memS _ _ _).1 a.2).1⟩)
-        exact h
-      left_inv := by
-        intro a
-        apply Subtype.ext
-        simp
-      right_inv := by
-        intro a
-        apply Subtype.ext
-        simp }
-  have hPQ : Submodule.map (e : ThSharp H t₁ (ThL H t₁) →ₗ[M.L.O] ThSharp H t₂ (ThL H t₂))
-      (Submodule.comap (ThSharp H t₁ (ThL H t₁)).subtype (ThL H t₁)) =
-      Submodule.comap (ThSharp H t₂ (ThL H t₂)).subtype (ThL H t₂) := by
+      exact h
+    map_smul' := by
+      intro c a
+      apply Subtype.ext
+      have h := congrArg Subtype.val (map_smul ψ (c : E) ⟨(a : V), ((memS _ _ _).1 a.2).1⟩)
+      exact h
+    left_inv := by
+      intro a
+      apply Subtype.ext
+      simp
+    right_inv := by
+      intro a
+      apply Subtype.ext
+      simp
+  }
+  have hPQ
+      : Submodule.map (e : ThSharp H t₁ (ThL H t₁) →ₗ[M.L.O] ThSharp H t₂ (ThL H t₂))
+          (Submodule.comap (ThSharp H t₁ (ThL H t₁)).subtype (ThL H t₁))
+        = Submodule.comap (ThSharp H t₂ (ThL H t₂)).subtype (ThL H t₂) := by
     ext x
     simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.subtype_apply]
     constructor
@@ -101,8 +107,8 @@ theorem glueFwd_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) 
     intro m
     obtain ⟨w, hw⟩ := Submodule.Quotient.mk_surjective _ (η₁ (ddMk H t₁ m))
     exact ⟨w, hw.symm⟩
-  have hh : ∀ a b : ThSharp H t₁ (ThL H t₁), H.h (e a : V) (e b : V) = H.h a b :=
-    fun a b => hψh ⟨a, ((memS _ _ _).1 a.2).1⟩ ⟨b, ((memS _ _ _).1 b.2).1⟩
+  have hh : ∀ a b : ThSharp H t₁ (ThL H t₁), H.h (e a : V) (e b : V) = H.h a b := fun a b =>
+    hψh ⟨a, ((memS _ _ _).1 a.2).1⟩ ⟨b, ((memS _ _ _).1 b.2).1⟩
   refine ⟨(η₁.trans κ).trans η₂.symm, ?_, ?_⟩
   · intro x y x₂ y₂ hx hy
     obtain ⟨w, hw⟩ := surj x

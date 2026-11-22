@@ -11,9 +11,10 @@ open MeasureTheory Module
 
 namespace Formalism.L2.Th1.H
 
-private theorem exists_real_basis_span_int_eq_of_isLat {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
-    (Λ : AddSubgroup V) (hΛ : IsLat Λ) :
-    ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι ℝ V),
+private theorem exists_real_basis_span_int_eq_of_isLat
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
+    (Λ : AddSubgroup V) (hΛ : IsLat Λ)
+    : ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι ℝ V),
       (Submodule.span ℤ (Set.range b)).toAddSubgroup = Λ := by
   obtain ⟨hdisc, hspan⟩ := hΛ
   let L : Submodule ℤ V := AddSubgroup.toIntSubmodule Λ
@@ -57,13 +58,13 @@ theorem fundamentalDomainExists : FundDomain := by
     have e1 := (hmem _ (L.neg_mem (hrepL p)) y).mp hyp
     have e2 := (hmem _ (L.neg_mem (hrepL q)) y).mp hyq
     apply hpq
-    have hpq' : rep p = rep q := by
-      rw [← neg_neg (rep p), e1, ← e2, neg_neg]
+    have hpq' : rep p = rep q := by rw [← neg_neg (rep p), e1, ← e2, neg_neg]
     rw [← hrep p, ← hrep q]
     congr 1
     exact Subtype.ext hpq'
   refine ⟨⋃ q : L ⧸ H, rep q +ᵥ D, ?_, ?_, ?_⟩
-  · refine IsAddFundamentalDomain.mk' (MeasurableSet.iUnion fun q => hmeas.const_vadd _).nullMeasurableSet ?_
+  · refine IsAddFundamentalDomain.mk'
+      (MeasurableSet.iUnion fun q => hmeas.const_vadd _).nullMeasurableSet ?_
     intro x
     set l0 : V := -(ZSpan.floor b x : V) with hl0def
     have hl0 : l0 ∈ L := L.neg_mem (hfl x)
@@ -77,19 +78,19 @@ theorem fundamentalDomainExists : FundDomain := by
     · show rep q0 + l0 + x ∈ ⋃ q : L ⧸ H, rep q +ᵥ D
       refine Set.mem_iUnion.mpr ⟨q0, ?_⟩
       rw [Set.mem_vadd_set_iff_neg_vadd_mem, vadd_eq_add,
-        show -rep q0 + (rep q0 + l0 + x) = l0 + x by abel]
+        show - rep q0 + (rep q0 + l0 + x) = l0 + x by abel]
       exact (hmem l0 hl0 x).mpr rfl
     · intro g hg
       obtain ⟨q, hq⟩ := Set.mem_iUnion.mp hg
       rw [Set.mem_vadd_set_iff_neg_vadd_mem, vadd_eq_add] at hq
-      have hgx : -rep q + (g : V) + x ∈ D := by
+      have hgx : - rep q + (g : V) + x ∈ D := by
         rw [add_assoc]
         exact hq
-      have hv : -rep q + (g : V) ∈ L := L.add_mem (L.neg_mem (hrepL q)) (hle g.2)
-      have e1 : -rep q + (g : V) = l0 := (hmem _ hv x).mp hgx
+      have hv : - rep q + (g : V) ∈ L := L.add_mem (L.neg_mem (hrepL q)) (hle g.2)
+      have e1 : - rep q + (g : V) = l0 := (hmem _ hv x).mp hgx
       have hqq : q = q0 := by
         rw [← hrep q, hq0def, QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf]
-        have h3 : -rep q + -l0 = -(g : V) := by
+        have h3 : - rep q + -l0 = -(g : V) := by
           rw [← e1]
           abel
         have h4 : -(g : V) ∈ Λ' := Λ'.neg_mem g.2
@@ -148,8 +149,11 @@ theorem characterIntegral : CharIntegral := by
     have e1 : ∫ z in w +ᵥ D', f z ∂μ = ∫ z in D', f z ∂μ := hD2.setIntegral_eq hD hper
     have e2 : ∫ z in w +ᵥ D', f z ∂μ = ∫ z in D', f (w + z) ∂μ := by
       rw [← Set.image_vadd]
-      exact (measurePreserving_add_left μ w).setIntegral_image_emb (measurableEmbedding_addLeft w) f D'
-    calc ∫ z in D', f z ∂μ = ∫ z in w +ᵥ D', f z ∂μ := e1.symm
+      exact (measurePreserving_add_left μ w).setIntegral_image_emb (measurableEmbedding_addLeft w) f
+        D'
+    calc
+      ∫ z in D', f z ∂μ
+        = ∫ z in w +ᵥ D', f z ∂μ := e1.symm
       _ = ∫ z in D', f (w + z) ∂μ := e2
       _ = f w * ∫ z in D', f z ∂μ := by
         simp only [hmul]
@@ -157,9 +161,9 @@ theorem characterIntegral : CharIntegral := by
   have ha : 0 < (H v v).re := hH v hv0
   set c : ℂ := ((1 / (2 * (H v v).re) : ℝ) : ℂ) * Complex.I with hc
   have hw : altE H v (c • v) = -(1 / 2) := by
-    simp only [altE, LinearMap.map_smulₛₗ, hc, smul_eq_mul, Complex.mul_im, map_mul, Complex.conj_ofReal,
-      Complex.conj_I, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, Complex.I_re, Complex.I_im,
-      Complex.neg_re, Complex.neg_im]
+    simp only [altE, LinearMap.map_smulₛₗ, hc, smul_eq_mul, Complex.mul_im, map_mul,
+      Complex.conj_ofReal, Complex.conj_I, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.I_re, Complex.I_im, Complex.neg_re, Complex.neg_im]
     field_simp
     ring
   have hfw : f (c • v) = -1 := by

@@ -10,11 +10,12 @@ open ValuativeRel PositivityTheory.Rg.Tf.Loc
 
 namespace GlobalTheory.CompanionTheory.Unram
 
-theorem sub_mem_span_pow {O : Type*} [CommRing O] (τ : O →+* O) (π : O) (q : ℕ)
-    (hτπ : τ π = π) (hq : (q : O) ∈ Ideal.span {π})
-    (hpow : ∀ x : O, x ^ q - x ∈ Ideal.span {π})
-    (h1 : ∀ x : O, τ x - x ∈ Ideal.span {π}) (m : ℕ) (hm : 1 ≤ m) :
-    ∀ x : O, τ x - x ∈ (Ideal.span {π}) ^ m := by
+theorem sub_mem_span_pow
+    {O : Type*} [CommRing O]
+    (τ : O →+* O) (π : O) (q : ℕ) (hτπ : τ π = π) (hq : (q : O) ∈ Ideal.span {π})
+    (hpow : ∀ x : O, x ^ q - x ∈ Ideal.span {π}) (h1 : ∀ x : O, τ x - x ∈ Ideal.span {π})
+    (m : ℕ) (hm : 1 ≤ m)
+    : ∀ x : O, τ x - x ∈ (Ideal.span {π}) ^ m := by
   induction m, hm using Nat.le_induction with
   | base => simpa using h1
   | succ m hm ih =>
@@ -29,7 +30,7 @@ theorem sub_mem_span_pow {O : Type*} [CommRing O] (τ : O →+* O) (π : O) (q :
         Ideal.Quotient.eq.mpr (h1 x)
       simp only [map_mul, map_pow, hab]
       rw [Finset.sum_congr rfl (fun i hi => by
-        rw [← pow_add, show i + (q - 1 - i) = q - 1 by have := Finset.mem_range.mp hi; omega]),
+          rw [← pow_add, show i + (q - 1 - i) = q - 1 by have := Finset.mem_range.mp hi; omega]),
         Finset.sum_const, Finset.card_range, nsmul_eq_mul]
       rw [show ((q : ℕ) : O ⧸ Ideal.span {π}) = Ideal.Quotient.mk (Ideal.span {π}) (q : O) by simp,
         Ideal.Quotient.eq_zero_iff_mem.mpr hq, zero_mul]
@@ -48,20 +49,24 @@ section Local
 
 variable (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
 
-theorem lt_one_of_mem_maximal (x : 𝒪[E]) (hx : x ∈ IsLocalRing.maximalIdeal 𝒪[E]) :
-    valuation E (x : E) < 1 := by
+theorem lt_one_of_mem_maximal (x : 𝒪[E]) (hx : x ∈ IsLocalRing.maximalIdeal 𝒪[E])
+    : valuation E (x : E) < 1 := by
   have hle : valuation E (x : E) ≤ 1 := x.2
   refine lt_of_le_of_ne hle ?_
   intro heq
-  have hunit : IsUnit x := (Valuation.integer.integers (valuation E)).isUnit_iff_valuation_eq_one.mpr heq
+  have hunit : IsUnit x :=
+    (Valuation.integer.integers (valuation E)).isUnit_iff_valuation_eq_one.mpr heq
   exact ((IsLocalRing.mem_maximalIdeal _).mp hx) hunit
 
-theorem residue_card_facts : ∃ q : ℕ, valuation E (q : E) < 1 ∧
-    ∀ x : 𝒪[E], valuation E (((x ^ q - x : 𝒪[E])) : E) < 1 := by
+theorem residue_card_facts
+    : ∃ q : ℕ,
+      valuation E (q : E) < 1 ∧ ∀ x : 𝒪[E], valuation E (((x ^ q - x : 𝒪[E])) : E) < 1 := by
   classical
   haveI : Fintype (IsLocalRing.ResidueField 𝒪[E]) := Fintype.ofFinite _
   refine ⟨Fintype.card (IsLocalRing.ResidueField 𝒪[E]), ?_, ?_⟩
-  · have hmem : ((Fintype.card (IsLocalRing.ResidueField 𝒪[E]) : ℕ) : 𝒪[E]) ∈ IsLocalRing.maximalIdeal 𝒪[E] := by
+  · have hmem
+        : ((Fintype.card (IsLocalRing.ResidueField 𝒪[E]) : ℕ) : 𝒪[E])
+          ∈ IsLocalRing.maximalIdeal 𝒪[E] := by
       rw [← IsLocalRing.residue_eq_zero_iff, map_natCast]
       exact FiniteField.cast_card_eq_zero _
     have := lt_one_of_mem_maximal E _ hmem
@@ -74,14 +79,14 @@ end Local
 
 section Ext
 
-variable (k E : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
-  [Algebra k E] [ValuativeExtension k E] [FiniteDimensional k E]
+variable
+  (k E : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] [Algebra k E]
+  [ValuativeExtension k E] [FiniteDimensional k E]
 
-theorem integral_basis
-    (hint : ∀ a : k, algebraMap k E a ∈ intO E ↔ a ∈ intO k) :
-    ∃ b : Module.Basis (Fin (Module.finrank k E)) k E, (∀ i, b i ∈ intO E) ∧
-      ∀ x : E, x ∈ intO E ↔ ∀ i, b.repr x i ∈ intO k := by
+theorem integral_basis (hint : ∀ a : k, algebraMap k E a ∈ intO E ↔ a ∈ intO k)
+    : ∃ b : Module.Basis (Fin (Module.finrank k E)) k E,
+      (∀ i, b i ∈ intO E) ∧ ∀ x : E, x ∈ intO E ↔ ∀ i, b.repr x i ∈ intO k := by
   haveI := GroundTheory.LocalField.free_integer k E
   haveI := GroundTheory.LocalField.finite_integer k E
   haveI := GroundTheory.LocalField.isIntegralClosure k E
@@ -89,7 +94,8 @@ theorem integral_basis
     IsIntegralClosure.isLocalization 𝒪[k] k E 𝒪[E]
   let bO := Module.finBasisOfFinrankEq 𝒪[k] 𝒪[E] (GroundTheory.LocalField.finrank_integer k E)
   let b := bO.localizationLocalization k (nonZeroDivisors 𝒪[k]) E
-  have hb : ∀ i, b i = ((bO i : 𝒪[E]) : E) := fun i => Module.Basis.localizationLocalization_apply _ _ _ _ _
+  have hb : ∀ i, b i = ((bO i : 𝒪[E]) : E) := fun i =>
+    Module.Basis.localizationLocalization_apply _ _ _ _ _
   refine ⟨b, fun i => by rw [hb]; exact (bO i).2, fun x => ⟨fun hx i => ?_, fun h => ?_⟩⟩
   · have hx' : x = algebraMap 𝒪[E] E ⟨x, hx⟩ := rfl
     rw [hx', Module.Basis.localizationLocalization_repr_algebraMap]
@@ -101,13 +107,14 @@ theorem integral_basis
 
 variable {k E}
 
-theorem val_le_iff (a b : k) :
-    valuation k a ≤ valuation k b ↔
-      valuation E (algebraMap k E a) ≤ valuation E (algebraMap k E b) := by
-  rw [← Valuation.Compatible.vle_iff_le, ← Valuation.Compatible.vle_iff_le, ValuativeExtension.vle_iff_vle]
+theorem val_le_iff (a b : k)
+    : valuation k a ≤ valuation k b
+      ↔ valuation E (algebraMap k E a) ≤ valuation E (algebraMap k E b) := by
+  rw [← Valuation.Compatible.vle_iff_le, ← Valuation.Compatible.vle_iff_le,
+    ValuativeExtension.vle_iff_vle]
 
-theorem uniformiser_of_unramified (hU : IsUnramifiedLoc k E) :
-    ∃ π : k, IsUniformiser π ∧ IsUniformiser (algebraMap k E π) := by
+theorem uniformiser_of_unramified (hU : IsUnramifiedLoc k E)
+    : ∃ π : k, IsUniformiser π ∧ IsUniformiser (algebraMap k E π) := by
   obtain ⟨π, hπ1, hπ2⟩ := hU
   have hk1 : ∀ x : k, valuation k x < 1 ↔ valuation E (algebraMap k E x) < 1 := by
     intro x
@@ -116,7 +123,8 @@ theorem uniformiser_of_unramified (hU : IsUnramifiedLoc k E) :
     rw [← not_le, ← not_le, h]
   have hne : π ≠ 0 := by
     rintro rfl
-    obtain ⟨y, hy, hy0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot (GroundTheory.LocalField.maximalIdeal_ne_bot E)
+    obtain ⟨y, hy, hy0⟩ :=
+      Submodule.exists_mem_ne_zero_of_ne_bot (GroundTheory.LocalField.maximalIdeal_ne_bot E)
     have hlt := lt_one_of_mem_maximal E y hy
     have h0 := hπ2 _ hlt
     rw [map_zero, map_zero] at h0
@@ -125,9 +133,10 @@ theorem uniformiser_of_unramified (hU : IsUnramifiedLoc k E) :
   intro x hx
   exact (val_le_iff x π).mpr (hπ2 _ ((hk1 x).mp hx))
 
-theorem exists_moved (hU : IsUnramifiedLoc k E) (τ : E ≃ₐ[k] E) (hτ : τ ≠ 1)
-    (hval : ∀ x : E, valuation E (τ x) = valuation E x) :
-    ∃ x : E, x ∈ intO E ∧ valuation E (τ x - x) = 1 := by
+theorem exists_moved
+    (hU : IsUnramifiedLoc k E)
+    (τ : E ≃ₐ[k] E) (hτ : τ ≠ 1) (hval : ∀ x : E, valuation E (τ x) = valuation E x)
+    : ∃ x : E, x ∈ intO E ∧ valuation E (τ x - x) = 1 := by
   classical
   by_contra hcon
   push_neg at hcon
@@ -150,7 +159,8 @@ theorem exists_moved (hU : IsUnramifiedLoc k E) (τ : E ≃ₐ[k] E) (hτ : τ �
     refine ⟨⟨(y : E) / algebraMap k E π, ?_⟩, ?_⟩
     · show valuation E ((y : E) / algebraMap k E π) ≤ 1
       rw [div_eq_mul_inv, map_mul, map_inv₀]
-      calc valuation E (y : E) * (valuation E (algebraMap k E π))⁻¹
+      calc
+        valuation E (y : E) * (valuation E (algebraMap k E π))⁻¹
           ≤ valuation E (algebraMap k E π) * (valuation E (algebraMap k E π))⁻¹ := by gcongr
         _ = 1 := mul_inv_cancel₀ ((Valuation.ne_zero_iff _).mpr hπ0)
     · exact Subtype.ext (div_mul_cancel₀ (y : E) hπ0)

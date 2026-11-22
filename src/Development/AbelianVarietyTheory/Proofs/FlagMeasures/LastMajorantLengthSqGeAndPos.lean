@@ -16,7 +16,9 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SettingConst
 
 @[expose] public section
 
-open BranchingSupport GlobalTheory.CellAmp GlobalTheory.Amp GlobalTheory.TypeAsm Formalism.BasicNotions Formalism.MainNotions.S Formalism.QuantumDeterminants Matrix MeasureTheory Finset
+open BranchingSupport GlobalTheory.CellAmp GlobalTheory.Amp GlobalTheory.TypeAsm
+  Formalism.BasicNotions Formalism.MainNotions.S Formalism.QuantumDeterminants Matrix MeasureTheory
+  Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.LastLen
@@ -89,14 +91,25 @@ private lemma neg_re_herm_splitForm_le_sum_normSq (k r : ℕ) (u : Fin (2 * r + 
         rw [← Finset.sum_div, Finset.sum_add_distrib, hperm]
         ring
 
-
 open Matrix MeasureTheory Finset in
 open scoped InnerProductSpace ENNReal in
-theorem _root_.GlobalTheory.LastLen.last_len : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), _root_.Formalism.QuantumDeterminants.inWb k r z → 0 < _root_.Formalism.QuantumDeterminants.Tz k r z → ∀ g ∈ _root_.BranchingSupport.GG k r, _root_.Formalism.QuantumDeterminants.Tz k r z ≤ _root_.BranchingSupport.lenA k r z g (Fin.last r) ^ 2 ∧ ∀ a, 0 < _root_.BranchingSupport.lenA k r z g a ∧ _root_.BranchingSupport.lenA k r z g a = _root_.Formalism.MainNotions.S.lA k r z g a := by
+theorem _root_.GlobalTheory.LastLen.last_len
+    : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ),
+      _root_.Formalism.QuantumDeterminants.inWb k r z
+        → 0 < _root_.Formalism.QuantumDeterminants.Tz k r z
+        → ∀ g ∈ _root_.BranchingSupport.GG k r,
+          _root_.Formalism.QuantumDeterminants.Tz k r z
+              ≤ _root_.BranchingSupport.lenA k r z g (Fin.last r) ^ 2
+            ∧ ∀ a,
+              0 < _root_.BranchingSupport.lenA k r z g a
+                ∧ _root_.BranchingSupport.lenA k r z g a
+                  = _root_.Formalism.MainNotions.S.lA k r z g a := by
   intro k r z hz hT g hg
   have hpos := (_root_.GlobalTheory.TensLen.lengths k r z hz hT g hg).2.2.1
   refine ⟨?_, fun a => ⟨hpos a, _root_.BranchingSupport.TensInh.lenA_eq_lA z g a⟩⟩
-  have hbound : √(_root_.Formalism.QuantumDeterminants.Tz k r z) ≤ _root_.BranchingSupport.lenA k r z g (Fin.last r) := by
+  have hbound
+      : √(_root_.Formalism.QuantumDeterminants.Tz k r z)
+        ≤ _root_.BranchingSupport.lenA k r z g (Fin.last r) := by
     rw [_root_.BranchingSupport.TensInh.lenA_eq_lA]
     unfold _root_.Formalism.MainNotions.S.lA _root_.Formalism.MainNotions.S.eucl
     refine le_csInf ⟨_, 0, Submodule.zero_mem _, rfl⟩ ?_
@@ -121,12 +134,18 @@ theorem _root_.GlobalTheory.LastLen.last_len : ∀ (k r : ℕ) (z : Fin (2 * r +
       unfold _root_.Formalism.QuantumDeterminants.fvec
       simp
     rw [hf]
-    calc _root_.Formalism.QuantumDeterminants.Tz k r z = -(_root_.Formalism.QuantumDeterminants.herm (_root_.Formalism.QuantumDeterminants.Hpk k r) (g⁻¹ *ᵥ (z - y)) (g⁻¹ *ᵥ (z - y))).re := by
-          rw [herm_splitForm_inv_mulVec_eq_of_mem hg, herm_splitForm_sub_eq_of_isotropic z y hz hy0,
-            _root_.Formalism.FourierDecayAlt.P.TwoByOneBlock.herm_self_eq]
-          simp
+    calc
+      _root_.Formalism.QuantumDeterminants.Tz k r z
+          = -(_root_.Formalism.QuantumDeterminants.herm
+            (_root_.Formalism.QuantumDeterminants.Hpk k r) (g⁻¹ *ᵥ (z - y))
+            (g⁻¹ *ᵥ (z - y))).re := by
+        rw [herm_splitForm_inv_mulVec_eq_of_mem hg, herm_splitForm_sub_eq_of_isotropic z y hz hy0,
+          _root_.Formalism.FourierDecayAlt.P.TwoByOneBlock.herm_self_eq]
+        simp
       _ ≤ _ := neg_re_herm_splitForm_le_sum_normSq k r _
-  calc _root_.Formalism.QuantumDeterminants.Tz k r z = √(_root_.Formalism.QuantumDeterminants.Tz k r z) ^ 2 := (Real.sq_sqrt hT.le).symm
+  calc
+    _root_.Formalism.QuantumDeterminants.Tz k r z
+      = √(_root_.Formalism.QuantumDeterminants.Tz k r z) ^ 2 := (Real.sq_sqrt hT.le).symm
     _ ≤ _ := pow_le_pow_left₀ (Real.sqrt_nonneg _) hbound 2
 
 end GlobalTheory.LastLen

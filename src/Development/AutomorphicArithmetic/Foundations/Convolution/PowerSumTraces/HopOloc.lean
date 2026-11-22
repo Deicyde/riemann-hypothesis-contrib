@@ -5,31 +5,45 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C
 
 open scoped InnerProductSpace
 
 namespace UpperTheory.ConvolutionTheory.C.HopfExpansion
 
 section
-variable {G : Type*} [Group G] [TopologicalSpace G] [MeasurableSpace G] [BorelSpace G] [IsTopologicalGroup G]
+variable
+  {G : Type*}
+  [Group G] [TopologicalSpace G] [MeasurableSpace G] [BorelSpace G] [IsTopologicalGroup G]
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
-private theorem setInt_shift {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (m : Measure G) [m.IsMulLeftInvariant]
-    (f : G → E) (y : G) {S T : Set G} (hS : MeasurableSet S) (hT : MeasurableSet T) (h : ∀ x, x ∈ S ↔ y * x ∈ T) :
-    ∫ x in S, f (y * x) ∂m = ∫ x in T, f x ∂m := by
-  rw [← integral_indicator hS, ← integral_indicator hT, ← integral_mul_left_eq_self (T.indicator f) y]
+private theorem setInt_shift
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (m : Measure G) [m.IsMulLeftInvariant]
+    (f : G → E)
+    (y : G)
+    {S T : Set G} (hS : MeasurableSet S) (hT : MeasurableSet T) (h : ∀ x, x ∈ S ↔ y * x ∈ T)
+    : ∫ x in S, f (y * x) ∂m = ∫ x in T, f x ∂m := by
+  rw [← integral_indicator hS, ← integral_indicator hT,
+    ← integral_mul_left_eq_self (T.indicator f) y]
   congr 1
   ext x
   by_cases hx : x ∈ S
   · rw [Set.indicator_of_mem hx, Set.indicator_of_mem ((h x).1 hx)]
   · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem (fun h' => hx ((h x).2 h'))]
 
-private theorem avg (π : UnitaryRep G H) (m : Measure G) [m.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts m]
+private theorem avg
+    (π : UnitaryRep G H)
+    (m : Measure G) [m.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts m]
     (J : Subgroup G) (hJ : IsCompact (J : Set G)) (hJo : IsOpen (J : Set G)) (hm : m J = 1)
-    (W : Submodule ℂ H) (hW : ∀ v, v ∈ W ↔ ∀ j ∈ J, π j v = v) (u v : H) :
-    ∫ j in (J : Set G), ⟪u, π j v⟫_ℂ ∂m = ⟪u, prj W v⟫_ℂ := by
+    (W : Submodule ℂ H) (hW : ∀ v, v ∈ W ↔ ∀ j ∈ J, π j v = v)
+    (u v : H)
+    : ∫ j in (J : Set G), ⟪u, π j v⟫_ℂ ∂m = ⟪u, prj W v⟫_ℂ := by
   have hmeas : MeasurableSet (J : Set G) := hJo.measurableSet
   have hint : IntegrableOn (fun j => π j v) (J : Set G) m :=
     (π.continuous_orbit v).continuousOn.integrableOn_compact' hJ hmeas
@@ -43,8 +57,11 @@ private theorem avg (π : UnitaryRep G H) (m : Measure G) [m.IsMulLeftInvariant]
     rw [hW]
     intro j₀ hj₀
     rw [← ContinuousLinearMap.integral_comp_comm _ hint]
-    have := setInt_shift m (fun j => π j v) j₀ hmeas hmeas (fun x => by
-      simp [Subgroup.mul_mem_cancel_left J hj₀])
+    have :=
+      setInt_shift m
+        (fun j => π j v)
+        j₀ hmeas hmeas
+        (fun x => by simp [Subgroup.mul_mem_cancel_left J hj₀])
     simpa [UnitaryRep.map_mul_apply] using this
   have hin : ∀ w ∈ W, ⟪w, ∫ j in (J : Set G), π j v ∂m⟫_ℂ = ⟪w, v⟫_ℂ := by
     intro w hw
@@ -56,18 +73,22 @@ private theorem avg (π : UnitaryRep G H) (m : Measure G) [m.IsMulLeftInvariant]
     simp [Measure.real, hm]
   have hP : prj W v = ∫ j in (J : Set G), π j v ∂m := by
     change W.topologicalClosure.starProjection v = _
-    refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero (Submodule.le_topologicalClosure _ hA) ?_
+    refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero
+      (Submodule.le_topologicalClosure _ hA) ?_
     intro w hw
     rw [hcl.submodule_topologicalClosure_eq] at hw
     rw [inner_sub_left, ← inner_conj_symm, ← inner_conj_symm _ w, hin w hw]
     simp
   rw [hP, integral_inner hint u]
 
-private theorem main (π : UnitaryRep G H) (m : Measure G) [m.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts m]
+private theorem main
+    (π : UnitaryRep G H)
+    (m : Measure G) [m.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts m]
     (J : Subgroup G) (hJ : IsCompact (J : Set G)) (hJo : IsOpen (J : Set G)) (hm : m J = 1)
-    (W : Submodule ℂ H) (hW : ∀ v, v ∈ W ↔ ∀ j ∈ J, π j v = v) (x : G) (u v : H) :
-    ⟪u, (∑ᶠ c ∈ {c : G ⧸ J | ∃ k ∈ J, c = QuotientGroup.mk (k * x)}, π c.out) (prj W v)⟫_ℂ =
-      ∫ g, Set.indicator {g | ∃ a ∈ J, ∃ b ∈ J, g = a * x * b} 1 g * ⟪u, π g v⟫_ℂ ∂m := by
+    (W : Submodule ℂ H) (hW : ∀ v, v ∈ W ↔ ∀ j ∈ J, π j v = v)
+    (x : G) (u v : H)
+    : ⟪u, (∑ᶠ c ∈ {c : G ⧸ J | ∃ k ∈ J, c = QuotientGroup.mk (k * x)}, π c.out) (prj W v)⟫_ℂ
+      = ∫ g, Set.indicator {g | ∃ a ∈ J, ∃ b ∈ J, g = a * x * b} 1 g * ⟪u, π g v⟫_ℂ ∂m := by
   haveI : DiscreteTopology (G ⧸ J) := QuotientGroup.discreteTopology hJo
   set S : Set (G ⧸ J) := {c | ∃ k ∈ J, c = QuotientGroup.mk (k * x)} with hSdef
   have hSfin : S.Finite := by
@@ -79,10 +100,12 @@ private theorem main (π : UnitaryRep G H) (m : Measure G) [m.IsMulLeftInvariant
       · rintro ⟨k, hk, rfl⟩
         exact ⟨k, hk, rfl⟩
     rw [e]
-    exact (hJ.image (QuotientGroup.continuous_mk.comp (continuous_id.mul continuous_const))).finite_of_discrete
+    exact (hJ.image (QuotientGroup.continuous_mk.comp (continuous_id.mul
+      continuous_const))).finite_of_discrete
   set D : Set G := {g | ∃ a ∈ J, ∃ b ∈ J, g = a * x * b} with hDdef
   let P : G ⧸ J → Set G := fun c => QuotientGroup.mk ⁻¹' {c}
-  have hPo : ∀ c, IsOpen (P c) := fun c => (isOpen_discrete {c}).preimage QuotientGroup.continuous_mk
+  have hPo : ∀ c, IsOpen (P c) := fun c =>
+    (isOpen_discrete {c}).preimage QuotientGroup.continuous_mk
   have hPmem : ∀ (c : G ⧸ J) (h : G), h ∈ (J : Set G) ↔ c.out * h ∈ P c := by
     intro c h
     have : (QuotientGroup.mk (c.out * h) : G ⧸ J) = c ↔ h ∈ J := by
@@ -120,13 +143,18 @@ private theorem main (π : UnitaryRep G H) (m : Measure G) [m.IsMulLeftInvariant
       rw [e]
       exact hJ.image (continuous_const.mul continuous_id)
     exact hcont.continuousOn.integrableOn_compact' hc (hPo c).measurableSet
-  have hind : (fun g => D.indicator (1 : G → ℂ) g * ⟪u, π g v⟫_ℂ) = D.indicator fun g => ⟪u, π g v⟫_ℂ := by
+  have hind
+      : (fun g => D.indicator (1 : G → ℂ) g * ⟪u, π g v⟫_ℂ)
+        = D.indicator fun g => ⟪u, π g v⟫_ℂ := by
     ext g
     by_cases hg : g ∈ D <;> simp [hg]
-  rw [hind, integral_indicator hDm, hD, integral_biUnion_finset _ (fun c _ => (hPo c).measurableSet) ?_
-    (fun c _ => hPint c), finsum_mem_eq_finite_toFinset_sum _ hSfin, ContinuousLinearMap.sum_apply, inner_sum]
+  rw [hind, integral_indicator hDm, hD,
+    integral_biUnion_finset _ (fun c _ => (hPo c).measurableSet) ?_ (fun c _ => hPint c),
+    finsum_mem_eq_finite_toFinset_sum _ hSfin, ContinuousLinearMap.sum_apply, inner_sum]
   · refine Finset.sum_congr rfl fun c _ => ?_
-    rw [← setInt_shift m (fun g => ⟪u, π g v⟫_ℂ) c.out hJo.measurableSet (hPo c).measurableSet (hPmem c)]
+    rw [← setInt_shift m
+      (fun g => ⟪u, π g v⟫_ℂ)
+      c.out hJo.measurableSet (hPo c).measurableSet (hPmem c)]
     rw [UnitaryRep.inner_map_right, ← avg π m J hJ hJo hm W hW]
     refine integral_congr_ae (Eventually.of_forall fun h => ?_)
     simp only [UnitaryRep.map_mul_apply]
@@ -138,12 +166,14 @@ private theorem main (π : UnitaryRep G H) (m : Measure G) [m.IsMulLeftInvariant
 end
 end UpperTheory.ConvolutionTheory.C.HopfExpansion
 
-theorem UpperTheory.ConvolutionTheory.C.hopOloc :
-    UpperTheory.ConvolutionTheory.C.HopOloc := by
+theorem UpperTheory.ConvolutionTheory.C.hopOloc : UpperTheory.ConvolutionTheory.C.HopOloc := by
   intro K _ _ n μ _ w _ _ m _ J x hJ hm u v
-  let φ : Gw n w →* normOneGL (K := K) (n := n) := (MultiplicityOne.finProj K n).comp (AdelicGLn.localEmbedding w)
-  have hφ : Continuous φ := MultiplicityOne.continuous_finProj.comp (UpperTheory.ConvolutionTheory.Tf.locEmb K n w).1
-  let π : UnitaryRep (Gw n w) (LL μ) := (rightRegularRep (rationalGLOne (K := K) (n := n)) μ).compHom φ hφ
+  let φ : Gw n w →* normOneGL (K := K) (n := n) :=
+    (MultiplicityOne.finProj K n).comp (AdelicGLn.localEmbedding w)
+  have hφ : Continuous φ :=
+    MultiplicityOne.continuous_finProj.comp (UpperTheory.ConvolutionTheory.Tf.locEmb K n w).1
+  let π : UnitaryRep (Gw n w) (LL μ) :=
+    (rightRegularRep (rationalGLOne (K := K) (n := n)) μ).compHom φ hφ
   have hπ : ∀ x, π x = rhoL μ w x := fun _ => rfl
   have hW : ∀ v, v ∈ fixL μ w J ↔ ∀ j ∈ J, π j v = v := by
     intro v

@@ -20,15 +20,19 @@ theorem wdim_shift {r : ℕ} (lam : Fin r → ℤ) (c : ℤ) : wdim (fun i => la
     ring
   · rfl
 
-theorem wdim_nat {r : ℕ} (nu : Fin r → ℕ) :
-    wdim (fun i => (nu i : ℤ)) = ∏ i : Fin r, ∏ j : Fin r,
-      if i < j then ((nu i : ℚ) - (nu j : ℚ) + (j : ℚ) - (i : ℚ)) / ((j : ℚ) - (i : ℚ)) else 1 := by
-  unfold wdim
-  refine Finset.prod_congr rfl fun i _ => Finset.prod_congr rfl fun j _ => ?_
-  simp only [Int.cast_natCast]
+theorem wdim_nat {r : ℕ} (nu : Fin r → ℕ)
+    : wdim (fun i => (nu i : ℤ))
+      = ∏ i : Fin r, ∏ j : Fin r,
+        if i < j then ((nu i : ℚ) - (nu j : ℚ) + (j : ℚ) - (i : ℚ)) / ((j : ℚ) - (i : ℚ)) else 1 :=
+  by
+    unfold wdim
+    refine Finset.prod_congr rfl fun i _ => Finset.prod_congr rfl fun j _ => ?_
+    simp only [Int.cast_natCast]
 
-theorem antitone_of_interlace {r : ℕ} {lamN : Fin (r + 1) → ℕ} (hl : Antitone lamN) (nu : Fin r → ℕ)
-    (h : ∀ i : Fin r, lamN i.succ ≤ nu i ∧ nu i ≤ lamN i.castSucc) : Antitone nu := by
+theorem antitone_of_interlace
+    {r : ℕ} {lamN : Fin (r + 1) → ℕ} (hl : Antitone lamN) (nu : Fin r → ℕ)
+    (h : ∀ i : Fin r, lamN i.succ ≤ nu i ∧ nu i ≤ lamN i.castSucc)
+    : Antitone nu := by
   intro i j hij
   rcases eq_or_lt_of_le hij with rfl | hlt
   · exact le_rfl
@@ -50,9 +54,14 @@ theorem numBranch_of {D : Formalism.BasicNotions.D7} (h2 : adm2 D) (h3 : adm3 D)
     have h1 := hmu hij
     have : (lamN j : ℤ) ≤ (lamN i : ℤ) := by rw [hcast, hcast]; linarith
     exact_mod_cast this
-  have e1 : wdim mu = (Module.finrank ℚ (Formalism.GradedWeylDivisibility.dualWeyl ℚ (r + 1) (r + 1) lamN) : ℚ) := by
+  have e1
+      : wdim mu
+        = (Module.finrank ℚ (Formalism.GradedWeylDivisibility.dualWeyl ℚ (r + 1) (r + 1) lamN)
+          : ℚ) := by
     have hmu' : mu = fun i => (lamN i : ℤ) + c := funext fun i => by rw [hcast]; ring
-    calc wdim mu = wdim (fun i => (lamN i : ℤ) + c) := congrArg wdim hmu'
+    calc
+      wdim mu
+        = wdim (fun i => (lamN i : ℤ) + c) := congrArg wdim hmu'
       _ = wdim (fun i => (lamN i : ℤ)) := wdim_shift _ c
       _ = _ := by rw [wdim_nat, h3 ℚ (r + 1) lamN hanti]
   rw [e1, h2 ℚ r lamN hanti]
@@ -65,7 +74,8 @@ theorem numBranch_of {D : Formalism.BasicNotions.D7} (h2 : adm2 D) (h3 : adm3 D)
     have := congrFun hab i
     simp only at this
     omega
-  rw [finsum_eq_sum_of_support_subset (s := F.image (fun (nu : Fin r → ℕ) (i : Fin r) => (nu i : ℤ) + c))]
+  rw [finsum_eq_sum_of_support_subset
+    (s := F.image (fun (nu : Fin r → ℕ) (i : Fin r) => (nu i : ℤ) + c))]
   · rw [Finset.sum_image hinj]
     refine Finset.sum_congr rfl fun nu hnu => ?_
     rw [hF, Finset.mem_filter] at hnu
@@ -110,7 +120,9 @@ theorem numBranch_of {D : Formalism.BasicNotions.D7} (h2 : adm2 D) (h3 : adm3 D)
 
 theorem stWeylAt (D : Formalism.BasicNotions.D7) : StWeylAt := by
   intro n N LL B P
-  have h := Formalism.MainNotions.G.Joints.Lit.weyl_dimension_formula_index_sets D n N P.mu (P.dom (Fin.last N))
+  have h :=
+    Formalism.MainNotions.G.Joints.Lit.weyl_dimension_formula_index_sets D n N P.mu
+      (P.dom (Fin.last N))
   rw [h]
   rfl
 

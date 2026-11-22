@@ -14,8 +14,10 @@ noncomputable section
 namespace GlobalTheory.Mem.SRe
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PackageTie2
-  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict Formalism.L2.SG.RowDict Formalism.L2.Forms
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.PackageTie2
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict Formalism.L2.SG.RowDict
+  Formalism.L2.Forms
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -37,19 +39,20 @@ structure SPack (D : D7) (F : ∀ u, Forms0 D u) where
   isom : ∀ u, ColDictIsom X (tr u) Y.hK (Y.cs u) (fin.shInj u)
   inst : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D
   G : GoodOp X
-
   pin : ∀ x : X.B.I.E, HEq (X.ιE x) x
 
 structure SRest {D : D7} {F : ∀ u, Forms0 D u} (P : SPack D F) where
   hI : SIso D.s (sOf P.fin)
   autTie : Formalism.MainNotions.S.AutTie D P.X.B P.X.pl
-  colPin : ∀ (u : D.what₂.Word) (x : D.s.Cu u),
-    colDict P.X (P.tr u) P.Y.hK (P.into u) (P.bij u) (hI.eCu u x) = D.s_Cu u x
+  colPin
+    : ∀ (u : D.what₂.Word) (x : D.s.Cu u),
+      colDict P.X (P.tr u) P.Y.hK (P.into u) (P.bij u) (hI.eCu u x) = D.s_Cu u x
   j : D.what₂.EE ≃ₗᵢ[ℂ] EEC P.X P.G
   rowPin : ∀ x : D.what₂.EE, hI.eHH (D.sEE x) = conjHH P.X P.G (j x)
   locTied : Formalism.L2.SG.Pf.LocCP.LocTied D
 
-def SRest.toSTies {D : D7} {F : ∀ u, Forms0 D u} {P : SPack D F} (S : SRest P) : Formalism.L2.SG.SpectralTiesReal.STies D where
+def SRest.toSTies {D : D7} {F : ∀ u, Forms0 D u} {P : SPack D F} (S : SRest P)
+    : Formalism.L2.SG.SpectralTiesReal.STies D where
   X := P.X
   hb := P.hb
   Y := P.Y
@@ -62,11 +65,14 @@ def SRest.toSTies {D : D7} {F : ∀ u, Forms0 D u} {P : SPack D F} (S : SRest P)
   measCompat := P.measCompat
   locCompat := P.locCompat
 
-theorem SRest.rowTie {D : D7} {F : ∀ u, Forms0 D u} {P : SPack D F} (S : SRest P) : RowDictTie P.X P.G S.hI.eHH :=
+theorem SRest.rowTie {D : D7} {F : ∀ u, Forms0 D u} {P : SPack D F} (S : SRest P)
+    : RowDictTie P.X P.G S.hI.eHH :=
   ⟨S.j, S.rowPin⟩
 
-def SPack.toNew {D : D7} {F : ∀ u, Forms0 D u} (P : SPack D F) (hD : Module.finrank ℂ (HHX P.X) = D.what₂.Dall)
-    (j : D.what₂.EE ≃ₗᵢ[ℂ] EEC P.X P.G) : SNew D where
+def SPack.toNew
+    {D : D7} {F : ∀ u, Forms0 D u} (P : SPack D F) (hD : Module.finrank ℂ (HHX P.X) = D.what₂.Dall)
+    (j : D.what₂.EE ≃ₗᵢ[ℂ] EEC P.X P.G)
+    : SNew D where
   s := sOf P.fin
   s_HH := hD
   s_Cu := fun u => colDictT P.X (P.tr u) P.Y.hK (P.fin.shInj u) (P.into u) (P.bij u)

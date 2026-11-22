@@ -9,25 +9,29 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Frames
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Frames
 
 namespace GlobalTheory
 
-theorem exists_testRing_universal_partially_invertible (K : Type) [Field K] (σ : Type) [Finite σ]
-    (D : σ → Prop) (p : TRing K) :
-    ∃ (A : TRing K) (π : p.R →ₐ[K] A.R) (x : σ → A.R), (∀ i, D i → IsUnit (x i)) ∧
-      ∀ (T : Type) [CommRing T] [Algebra K T] (ψ : p.R →ₐ[K] T) (t : σ → T), (∀ i, D i → IsUnit (t i)) →
-        ∃! k : A.R →ₐ[K] T, k.comp π = ψ ∧ ∀ i, k (x i) = t i := by
+theorem exists_testRing_universal_partially_invertible
+    (K : Type) [Field K] (σ : Type) [Finite σ] (D : σ → Prop) (p : TRing K)
+    : ∃ (A : TRing K) (π : p.R →ₐ[K] A.R) (x : σ → A.R),
+      (∀ i, D i → IsUnit (x i))
+        ∧ ∀ (T : Type) [CommRing T] [Algebra K T] (ψ : p.R →ₐ[K] T) (t : σ → T),
+          (∀ i, D i → IsUnit (t i)) → ∃! k : A.R →ₐ[K] T, k.comp π = ψ ∧ ∀ i, k (x i) = t i := by
   classical
   have := Fintype.ofFinite σ
   obtain ⟨hft, hred⟩ := (reduced_finiteType_iff_testRing K).2 p
   let P := MvPolynomial σ p.R
   let f : P := ∏ i ∈ Finset.univ.filter D, MvPolynomial.X i
   let B := Localization.Away f
-  have hPred : _root_.IsReduced P := ⟨fun q hq => by
-    ext i
-    exact IsReduced.eq_zero _ (MvPolynomial.isNilpotent_iff.1 hq i)⟩
+  have hPred : _root_.IsReduced P :=
+    ⟨fun q hq => by
+      ext i
+      exact IsReduced.eq_zero _ (MvPolynomial.isNilpotent_iff.1 hq i)⟩
   have hBred : _root_.IsReduced B := isReduced_localizationPreserves (Submonoid.powers f) B hPred
   have hPft : Algebra.FiniteType K P := Algebra.FiniteType.trans hft inferInstance
   have hBft : Algebra.FiniteType K B :=
@@ -35,7 +39,8 @@ theorem exists_testRing_universal_partially_invertible (K : Type) [Field K] (σ 
   obtain ⟨A, ⟨e⟩⟩ := (reduced_finiteType_iff_testRing K).1 B hBft hBred
   let emb : P →ₐ[K] B := IsScalarTower.toAlgHom K P B
   let c : p.R →ₐ[K] P := IsScalarTower.toAlgHom K p.R P
-  refine ⟨A, (e.symm : B →ₐ[K] A.R).comp (emb.comp c), fun i => e.symm (emb (MvPolynomial.X i)), ?_, ?_⟩
+  refine
+    ⟨A, (e.symm : B →ₐ[K] A.R).comp (emb.comp c), fun i => e.symm (emb (MvPolynomial.X i)), ?_, ?_⟩
   · intro i hi
     refine IsUnit.map e.symm ?_
     have hf : IsUnit (emb f) := IsLocalization.Away.algebraMap_isUnit f
@@ -69,36 +74,51 @@ theorem exists_testRing_universal_partially_invertible (K : Type) [Field K] (σ 
         | C r =>
           have := AlgHom.congr_fun h1 r
           exact this.trans (MvPolynomial.aevalTower_algebraMap ψ t r).symm
-        | add a b ha hb => simp only [map_add (f := _), ha, hb]
+        | add a b ha hb =>
+          simp only [map_add (f := _), ha, hb]
         | mul_X a i ha =>
           simp only [map_mul, ha, h2]
           rw [show φ (MvPolynomial.X i) = t i from MvPolynomial.aevalTower_X ψ t i]
       have h4 : (k.comp (e.symm : B →ₐ[K] A.R)).toRingHom = k₀.toRingHom :=
-        IsLocalization.ringHom_ext (Submonoid.powers f) (RingHom.ext fun q => (h3 q).trans (hk₀ q).symm)
+        IsLocalization.ringHom_ext (Submonoid.powers f)
+          (RingHom.ext fun q => (h3 q).trans (hk₀ q).symm)
       refine AlgHom.ext fun a => ?_
       have := RingHom.congr_fun h4 (e a)
       simpa using this
 
-theorem exists_testRing_triRing :
-    ∀ (K : Type) [Field K] (J : Type) [Fintype J] (m : J → ℕ) (p : TRing K), ∃ (A : TRing K) (π : p.R →ₐ[K] A.R) (X : ∀ τ, Matrix (Fin (m τ)) (Fin (m τ)) A.R) (s : (A.R)ˣ), TriRing m π X s := by
+theorem exists_testRing_triRing
+    : ∀ (K : Type) [Field K] (J : Type) [Fintype J] (m : J → ℕ) (p : TRing K),
+      ∃ (A : TRing K) (π : p.R →ₐ[K] A.R) (X : ∀ τ, Matrix (Fin (m τ)) (Fin (m τ)) A.R)
+          (s : (A.R)ˣ),
+        TriRing m π X s := by
   intro K _ J _ m p
   classical
-  obtain ⟨A, π, x, hx, hu⟩ := exists_testRing_universal_partially_invertible K
-    (Option (Σ τ : J, {q : Fin (m τ) × Fin (m τ) // q.2 ≤ q.1}))
-    (fun o => o.elim True fun z => z.2.1.1 = z.2.1.2) p
-  refine ⟨A, π, fun τ => Matrix.of fun i j => if h : j ≤ i then x (some ⟨τ, ⟨(i, j), h⟩⟩) else 0,
-    (hx none trivial).unit, ?_, ?_, ?_⟩
+  obtain ⟨A, π, x, hx, hu⟩ :=
+    exists_testRing_universal_partially_invertible K
+      (Option (Σ τ : J, {q : Fin (m τ) × Fin (m τ) // q.2 ≤ q.1}))
+      (fun o => o.elim True fun z => z.2.1.1 = z.2.1.2)
+      p
+  refine ⟨
+    A,
+    π,
+    fun τ => Matrix.of fun i j => if h : j ≤ i then x (some ⟨τ, ⟨(i, j), h⟩⟩) else 0,
+    (hx none trivial).unit,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro τ i
     simp only [Matrix.of_apply, le_refl, dif_pos]
     exact hx _ rfl
   · intro τ i j hij
     exact dif_neg (not_le.2 hij)
   · intro T _ _ ψ g a hg1 hg2
-    obtain ⟨k, ⟨hk1, hk2⟩, hk3⟩ := hu T ψ (fun o => o.elim (a : T) fun z => g z.1 z.2.1.1 z.2.1.2) (by
-      rintro (_ | ⟨τ, ⟨i, j⟩, h⟩) hD
-      · exact a.isUnit
-      · obtain rfl : i = j := hD
-        exact hg1 τ i)
+    obtain ⟨k, ⟨hk1, hk2⟩, hk3⟩ :=
+      hu T ψ (fun o => o.elim (a : T) fun z => g z.1 z.2.1.1 z.2.1.2) (by
+        rintro (_ | ⟨τ, ⟨i, j⟩, h⟩) hD
+        · exact a.isUnit
+        · obtain rfl : i = j := hD
+          exact hg1 τ i)
     refine ⟨k, ⟨hk1, fun τ => ?_, hk2 none⟩, ?_⟩
     · ext i j
       simp only [Matrix.map_apply, Matrix.of_apply]

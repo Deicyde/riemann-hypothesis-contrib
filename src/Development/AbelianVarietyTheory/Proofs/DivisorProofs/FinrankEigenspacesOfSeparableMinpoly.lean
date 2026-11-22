@@ -10,19 +10,20 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.WittOnFalse
 
 open CategoryTheory Polynomial NumberField IsDedekindDomain AlgebraicGeometry
 open scoped TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] CategoryTheory.Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.EigSum
 
 theorem finrank_eigenspaces_of_separable_minpoly
-    (Ω V : Type) [Field Ω] [IsAlgClosed Ω] [DecidableEq Ω] [AddCommGroup V] [Module Ω V]
-    [FiniteDimensional Ω V] (T : Module.End Ω V) (f : Polynomial Ω) (hm : f.Monic)
-    (hs : f.Separable) (h0 : Polynomial.aeval T f = 0)
-    (hmin : ∀ g : Polynomial Ω, Polynomial.aeval T g = 0 → f ∣ g) :
-    ∑ z ∈ f.roots.toFinset, Module.finrank Ω (T.eigenspace z) = Module.finrank Ω V ∧
-      ∀ z ∈ f.roots, T.eigenspace z ≠ ⊥ := by
+    (Ω V : Type)
+    [Field Ω] [IsAlgClosed Ω] [DecidableEq Ω] [AddCommGroup V] [Module Ω V] [FiniteDimensional Ω V]
+    (T : Module.End Ω V) (f : Polynomial Ω) (hm : f.Monic) (hs : f.Separable)
+    (h0 : Polynomial.aeval T f = 0) (hmin : ∀ g : Polynomial Ω, Polynomial.aeval T g = 0 → f ∣ g)
+    : ∑ z ∈ f.roots.toFinset, Module.finrank Ω (T.eigenspace z) = Module.finrank Ω V
+      ∧ ∀ z ∈ f.roots, T.eigenspace z ≠ ⊥ := by
   have hf : f = minpoly Ω T := by
     apply Polynomial.eq_of_monic_of_associated hm (minpoly.monic (Algebra.IsIntegral.isIntegral T))
     exact associated_of_dvd_dvd (hmin _ (minpoly.aeval Ω T)) (minpoly.dvd Ω T h0)
@@ -42,8 +43,7 @@ theorem finrank_eigenspaces_of_separable_minpoly
     refine iSup_le fun μ => ?_
     by_cases hμ : μ ∈ s
     · exact le_iSup N ⟨μ, hμ⟩
-    · have : ¬ T.HasEigenvalue μ := by
-        rw [hroot]; simpa [s] using hμ
+    · have : ¬ T.HasEigenvalue μ := by rw [hroot]; simpa [s] using hμ
       rw [Module.End.hasEigenvalue_iff, not_not] at this
       simp [this]
   have hint := DirectSum.isInternal_submodule_of_iSupIndep_of_iSup_eq_top hind htop

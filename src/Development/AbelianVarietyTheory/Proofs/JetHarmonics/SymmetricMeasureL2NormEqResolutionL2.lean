@@ -24,16 +24,19 @@ open GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient (Mat leviW
 
 variable {k r : ℕ}
 
-theorem exists_pos_lt_top {X : Type*} [MeasurableSpace X] (μ : Measure X) [SigmaFinite μ]
-    (h : μ ≠ 0) : ∃ t : Set X, μ t ≠ 0 ∧ μ t ≠ ⊤ := by
+theorem exists_pos_lt_top
+    {X : Type*} [MeasurableSpace X] (μ : Measure X) [SigmaFinite μ] (h : μ ≠ 0)
+    : ∃ t : Set X, μ t ≠ 0 ∧ μ t ≠ ⊤ := by
   have h0 : (0 : ℝ≥0∞) < μ Set.univ := by
     rw [pos_iff_ne_zero]; exact fun h' => h (Measure.measure_univ_eq_zero.mp h')
   obtain ⟨t, -, -, h1, h2⟩ := Measure.exists_subset_measure_lt_top MeasurableSet.univ h0
   exact ⟨t, h1.ne', h2.ne⟩
 
-theorem haar_unique {U : Set (Mat k r)} (hU : IsClosedSubgroup U) {μ ν : Measure (Mt k r)}
-    (hμ : PI.BesselPeriodGGP.IsHaarOn U μ) (hν : PI.BesselPeriodGGP.IsHaarOn U ν) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • ν := by
+theorem haar_unique
+    {U : Set (Mat k r)} (hU : IsClosedSubgroup U)
+    {μ ν : Measure (Mt k r)}
+    (hμ : PI.BesselPeriodGGP.IsHaarOn U μ) (hν : PI.BesselPeriodGGP.IsHaarOn U ν)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • ν := by
   obtain ⟨m1, m2, m3, m4⟩ := hμ
   obtain ⟨n1, n2, n3, n4⟩ := hν
   have em : (pull hU μ).map inc = μ := map_pull μ m3
@@ -44,8 +47,8 @@ theorem haar_unique {U : Set (Mat k r)} (hU : IsClosedSubgroup U) {μ ν : Measu
     SigmaFinite.of_map _ inc_memb.measurable.aemeasurable (by rw [em]; exact m1)
   have : SigmaFinite (pull hU ν) :=
     SigmaFinite.of_map _ inc_memb.measurable.aemeasurable (by rw [en]; exact n1)
-  obtain ⟨s, s0, s1⟩ := exists_pos_lt_top (pull hU ν) (by
-    intro h; apply n2; rw [← en, h, Measure.map_zero])
+  obtain ⟨s, s0, s1⟩ :=
+    exists_pos_lt_top (pull hU ν) (by intro h; apply n2; rw [← en, h, Measure.map_zero])
   have e := measure_eq_div_smul (pull hU μ) (pull hU ν) s0 s1
   generalize pull hU μ s / pull hU ν s = c at e
   have e' : μ = c • ν := by
@@ -61,8 +64,11 @@ theorem haar_unique {U : Set (Mat k r)} (hU : IsClosedSubgroup U) {μ ν : Measu
     · exact t0 (by rw [h, mul_zero])
     · exact t1 (ENNReal.top_mul h)
 
-theorem haar_of_compact {U : Set (Mat k r)} (hU : IsClosed U) {μ : Measure (Mt k r)}
-    (hμ : GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient.IsHaarOn U μ) : PI.BesselPeriodGGP.IsHaarOn U μ := by
+theorem haar_of_compact
+    {U : Set (Mat k r)} (hU : IsClosed U)
+    {μ : Measure (Mt k r)}
+    (hμ : GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient.IsHaarOn U μ)
+    : PI.BesselPeriodGGP.IsHaarOn U μ := by
   obtain ⟨m1, m2, m3, m4⟩ := hμ
   have : IsFiniteMeasureOnCompacts μ := by
     refine ⟨fun K hK => ?_⟩
@@ -73,14 +79,13 @@ theorem haar_of_compact {U : Set (Mat k r)} (hU : IsClosed U) {μ : Measure (Mt 
     exact lt_of_le_of_lt hle (m3 _ (hK.inter_right hU) fun x hx => hx.2)
   exact ⟨inferInstance, m4, m1, m2⟩
 
-theorem exists_haar {U : Set (Mat k r)} (hU : IsClosedSubgroup U) :
-    ∃ μ, GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient.IsHaarOn U μ := by
+theorem exists_haar {U : Set (Mat k r)} (hU : IsClosedSubgroup U)
+    : ∃ μ, GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient.IsHaarOn U μ := by
   let m : Measure (Gp U hU) := Measure.haar
   have hm : Measurable (inc : Gp U hU → Mt k r) := inc_memb.measurable
   refine ⟨m.map inc, ?_, ?_, ?_, ?_⟩
   · rw [inc_memb.map_apply]
-    have : (inc : Gp U hU → Mt k r) ⁻¹' {x | Matrix.of x ∉ U} = ∅ := by
-      ext x; simpa using inc_mem x
+    have : (inc : Gp U hU → Mt k r) ⁻¹' {x | Matrix.of x ∉ U} = ∅ := by ext x; simpa using inc_mem x
     rw [this, measure_empty]
   · intro a ha
     let g : Gp U hU := ⟨Matrix.of.symm a, ha⟩
@@ -94,8 +99,9 @@ theorem exists_haar {U : Set (Mat k r)} (hU : IsClosedSubgroup U) :
     rw [Measure.map_eq_zero_iff hm.aemeasurable] at h
     exact NeZero.ne m h
 
-theorem isHaarOn_iff {U : Set (Mat k r)} (hU : IsClosedSubgroup U) (μ : Measure (Mt k r)) :
-    PI.BesselPeriodGGP.IsHaarOn U μ ↔ GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient.IsHaarOn U μ := by
+theorem isHaarOn_iff {U : Set (Mat k r)} (hU : IsClosedSubgroup U) (μ : Measure (Mt k r))
+    : PI.BesselPeriodGGP.IsHaarOn U μ
+      ↔ GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient.IsHaarOn U μ := by
   refine ⟨fun h => ?_, haar_of_compact hU.closed⟩
   obtain ⟨ν, hν⟩ := exists_haar hU
   obtain ⟨c, -, c1, e⟩ := haar_unique hU h (haar_of_compact hU.closed hν)
@@ -108,7 +114,9 @@ def uinv (k r : ℕ) (h : Mat k r) : Mat k r := Hpk k r * hᴴ * Hpk k r
 theorem uinv_eq {h : Mat k r} (hh : h ∈ UH (Hpk k r)) : uinv k r h = h⁻¹ := by
   have hU : hᴴ * Hpk k r * h = Hpk k r := hh
   refine (Matrix.inv_eq_left_inv ?_).symm
-  calc uinv k r h * h = Hpk k r * (hᴴ * Hpk k r * h) := by simp only [uinv, Matrix.mul_assoc]
+  calc
+    uinv k r h * h
+      = Hpk k r * (hᴴ * Hpk k r * h) := by simp only [uinv, Matrix.mul_assoc]
     _ = 1 := by rw [hU, (Formalism.QuantumDeterminants.hpkFacts k r).2.1]
 
 theorem continuous_uinv : Continuous (uinv k r) :=
@@ -129,15 +137,19 @@ theorem continuous_split : Continuous (split k r) :=
   (continuous_leviW (k := k) (r := r)).prodMk
     (((continuous_uinv (k := k) (r := r)).comp continuous_leviW).matrix_mul continuous_id)
 
-theorem split_mul {z : Fin (2 * r + k + 1) → ℂ} {h n : Mat k r} (hh : h ∈ UWset k r z)
-    (hn : n ∈ Nset k r) : split k r (h * n) = (h, n) := by
-  have e : leviW k r (h * n) = h := GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient.leviW_mul hh hn
+theorem split_mul
+    {z : Fin (2 * r + k + 1) → ℂ} {h n : Mat k r} (hh : h ∈ UWset k r z) (hn : n ∈ Nset k r)
+    : split k r (h * n) = (h, n) := by
+  have e : leviW k r (h * n) = h :=
+    GlobalTheory.IndefiniteRowSideFullHecke.FormalDegreeHaarQuotient.leviW_mul hh hn
   refine Prod.ext e ?_
   show uinv k r (leviW k r (h * n)) * (h * n) = n
-  rw [e, uinv_eq hh.1, Matrix.nonsing_inv_mul_cancel_left _ _
-    ((Formalism.FourierDecayAlt.P.B2x3.closedW k r z).unit h hh)]
+  rw [e, uinv_eq hh.1,
+    Matrix.nonsing_inv_mul_cancel_left _ _
+      ((Formalism.FourierDecayAlt.P.B2x3.closedW k r z).unit h hh)]
 
-theorem closedS {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) : IsClosedSubgroup (Sset k r z) := by
+theorem closedS {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    : IsClosedSubgroup (Sset k r z) := by
   obtain ⟨h1, h2, h3⟩ := Formalism.QuantumDeterminants.sGroup k r z hz
   have hW := Formalism.FourierDecayAlt.P.B2x3.closedW k r z
   have hN := Formalism.FourierDecayAlt.P.B2x2.closedN k r

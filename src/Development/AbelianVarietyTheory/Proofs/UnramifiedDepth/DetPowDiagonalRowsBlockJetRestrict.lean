@@ -170,17 +170,24 @@ theorem detPowDiag : DetPowDiag := by
   have hS : ∀ x : Fin n × Fin n, (n0 ≤ x.1.val ∧ x.2 ≠ x.1) → e x = 0 := by
     rintro ⟨ρ, c⟩ ⟨h1, h2⟩
     rw [he ρ c h1, if_neg h2]
-  have hk := coeff_kill (R := R) (fun x : Fin n × Fin n => n0 ≤ x.1.val ∧ x.2 ≠ x.1)
-    ((Matrix.of fun b c : Fin n => (MvPolynomial.X (b, c) : MvPolynomial (Fin n × Fin n) R)).det ^ Y) e
+  have hk :=
+    coeff_kill (R := R)
+      (fun x : Fin n × Fin n => n0 ≤ x.1.val ∧ x.2 ≠ x.1)
+      ((Matrix.of fun b c : Fin n => (MvPolynomial.X (b, c) : MvPolynomial (Fin n × Fin n) R)).det
+        ^ Y)
+      e
   rw [if_pos hS] at hk
   rw [← hk, kill_det_pow _ hn (fun b c => (b, c)) (fun ρ c => Iff.rfl) Y]
-  have hsplit : e = e.filter (fun x => x.1.val < n0) +
-      ∑ ρ ∈ (Finset.univ : Finset (Fin n)).filter (fun ρ => n0 ≤ ρ.val), Finsupp.single (ρ, ρ) Y := by
-    ext ⟨ρ, c⟩
-    rw [Finsupp.add_apply, Finsupp.filter_apply, diag_single_sum_apply]
-    by_cases hρ : n0 ≤ ρ.val
-    · simp [hρ, he ρ c hρ, not_lt.2 hρ]
-    · simp [hρ, not_le.1 hρ]
+  have hsplit
+      : e
+        = e.filter (fun x => x.1.val < n0)
+          + ∑ ρ ∈ (Finset.univ : Finset (Fin n)).filter (fun ρ => n0 ≤ ρ.val), Finsupp.single (ρ, ρ) Y :=
+    by
+      ext ⟨ρ, c⟩
+      rw [Finsupp.add_apply, Finsupp.filter_apply, diag_single_sum_apply]
+      by_cases hρ : n0 ≤ ρ.val
+      · simp [hρ, he ρ c hρ, not_lt.2 hρ]
+      · simp [hρ, not_le.1 hρ]
   conv_lhs => rw [hsplit]
   rw [MvPolynomial.coeff_mul_monomial, mul_one]
 
@@ -423,12 +430,16 @@ private lemma filter_nondiag_eq_diagMon_of_coeff_ne_zero {C : Type} [Field C] {n
 theorem blockJet : BlockJet := by
   intro C _ _ n0 n hn L y G1 H hG1 hH hHd
   classical
-  have hkill := kill_detL_pow_mul_detR_pow (C := C) hn L y
-    (fun x : PVar n => n0 ≤ (rowOf x).val ∧ Sum.elim Prod.snd Prod.snd x ≠ rowOf x)
-    (fun ρ c => Iff.rfl) (fun ρ c => Iff.rfl)
-  have havoid : ∀ m : PVar n →₀ ℕ, AddMonoidAlgebra.coeff (detL C n ^ (L * y) * detR C n ^ y) m ≠ 0 →
-      MvPowerSeries.coeff m (G1 * H) ≠ 0 →
-      ∀ x, (n0 ≤ (rowOf x).val ∧ Sum.elim Prod.snd Prod.snd x ≠ rowOf x) → m x = 0 := by
+  have hkill :=
+    kill_detL_pow_mul_detR_pow (C := C) hn L y
+      (fun x : PVar n => n0 ≤ (rowOf x).val ∧ Sum.elim Prod.snd Prod.snd x ≠ rowOf x)
+      (fun ρ c => Iff.rfl)
+      (fun ρ c => Iff.rfl)
+  have havoid
+      : ∀ m : PVar n →₀ ℕ,
+        AddMonoidAlgebra.coeff (detL C n ^ (L * y) * detR C n ^ y) m ≠ 0
+          → MvPowerSeries.coeff m (G1 * H) ≠ 0
+          → ∀ x, (n0 ≤ (rowOf x).val ∧ Sum.elim Prod.snd Prod.snd x ≠ rowOf x) → m x = 0 := by
     intro m hm hmG x hx
     have hb := filter_nondiag_eq_diagMon_of_coeff_ne_zero L y G1 H hG1 hH hHd m hm hmG
     have hmx : m x = (m.filter fun x => ¬ (rowOf x).val < n0) x := by
@@ -441,12 +452,19 @@ theorem blockJet : BlockJet := by
     · rw [diagMon_inr, if_neg]
       rintro ⟨-, rfl⟩
       exact hx.2 rfl
-  have h3 : jetAt0 (detL C n ^ (L * y) * detR C n ^ y) (G1 * H) =
-      jetAt0 (kill (fun x : PVar n => n0 ≤ (rowOf x).val ∧ Sum.elim Prod.snd Prod.snd x ≠ rowOf x)
-        (detL C n ^ (L * y) * detR C n ^ y)) (G1 * H) := by
-    rw [GlobalTheory.UnitCase.jetAt0_eq_sum (kill (fun x : PVar n => n0 ≤ (rowOf x).val ∧
-      Sum.elim Prod.snd Prod.snd x ≠ rowOf x) (detL C n ^ (L * y) * detR C n ^ y)) (G1 * H)
-      (detL C n ^ (L * y) * detR C n ^ y).support ?_, jetAt0]
+  have h3
+      : jetAt0 (detL C n ^ (L * y) * detR C n ^ y) (G1 * H)
+        = jetAt0
+          (kill
+            (fun x : PVar n => n0 ≤ (rowOf x).val ∧ Sum.elim Prod.snd Prod.snd x ≠ rowOf x)
+            (detL C n ^ (L * y) * detR C n ^ y))
+          (G1 * H) := by
+    rw [GlobalTheory.UnitCase.jetAt0_eq_sum
+        (kill
+          (fun x : PVar n => n0 ≤ (rowOf x).val ∧ Sum.elim Prod.snd Prod.snd x ≠ rowOf x)
+          (detL C n ^ (L * y) * detR C n ^ y))
+        (G1 * H) (detL C n ^ (L * y) * detR C n ^ y).support ?_,
+      jetAt0]
     · refine Finset.sum_congr rfl fun m _ => ?_
       rw [coeff_kill]
       split_ifs with h
@@ -463,23 +481,26 @@ theorem blockJet : BlockJet := by
       · exact hm
       · exact absurd rfl hm
   rw [h3, hkill]
-  have hsupp : (MvPolynomial.rename (embV hn) (detL C n0 ^ (L * y) * detR C n0 ^ y) *
-      MvPolynomial.monomial (diagMon n0 n L y) (1 : C)).support ⊆
-      (detL C n0 ^ (L * y) * detR C n0 ^ y).support.image
-        (fun u => u.mapDomain (embV hn) + diagMon n0 n L y) := by
+  have hsupp
+      : (MvPolynomial.rename (embV hn) (detL C n0 ^ (L * y) * detR C n0 ^ y)
+          * MvPolynomial.monomial (diagMon n0 n L y) (1 : C)).support
+        ⊆ (detL C n0 ^ (L * y) * detR C n0 ^ y).support.image
+          (fun u => u.mapDomain (embV hn) + diagMon n0 n L y) := by
     intro m hm
     rw [MvPolynomial.mem_support_iff, MvPolynomial.coeff_mul_monomial'] at hm
     split_ifs at hm with hle
     · rw [mul_one] at hm
-      have hm' : m - diagMon n0 n L y ∈
-          (MvPolynomial.rename (embV hn) (detL C n0 ^ (L * y) * detR C n0 ^ y)).support :=
+      have hm'
+          : m - diagMon n0 n L y
+            ∈ (MvPolynomial.rename (embV hn) (detL C n0 ^ (L * y) * detR C n0 ^ y)).support :=
         MvPolynomial.mem_support_iff.2 hm
       rw [MvPolynomial.support_rename_of_injective (embV_inj hn), Finset.mem_image] at hm'
       obtain ⟨u, hu, hue⟩ := hm'
       exact Finset.mem_image.2 ⟨u, hu, by rw [hue, tsub_add_cancel_of_le hle]⟩
     · exact absurd rfl hm
   rw [GlobalTheory.UnitCase.jetAt0_eq_sum _ _ _ hsupp,
-    Finset.sum_image (fun u _ v _ h => Finsupp.mapDomain_injective (embV_inj hn) (add_right_cancel h)),
+    Finset.sum_image (fun u _ v _ h =>
+      Finsupp.mapDomain_injective (embV_inj hn) (add_right_cancel h)),
     jetAt0, Finset.mul_sum]
   refine Finset.sum_congr rfl fun u _ => ?_
   rw [MvPolynomial.coeff_mul_monomial, mul_one, MvPolynomial.coeff_rename_mapDomain _ (embV_inj hn)]
@@ -489,24 +510,32 @@ theorem blockJet : BlockJet := by
     rcases v with ⟨b, c⟩ | ⟨b, c⟩
     · exact b.isLt
     · exact b.isLt
-  have hDrow : ∀ x ∈ (diagMon n0 n L y).support, ¬ (rowOf x).val < n0 :=
-    fun x hx => not_lt.2 (diagMon_row x hx)
-  rw [coeff_mul_split (fun x => (rowOf x).val < n0) G1 H hG1
-    (fun m hm x hx => not_lt.2 (hH m hm x hx)) _ _ hU hDrow]
+  have hDrow : ∀ x ∈ (diagMon n0 n L y).support, ¬ (rowOf x).val < n0 := fun x hx =>
+    not_lt.2 (diagMon_row x hx)
+  rw [coeff_mul_split
+    (fun x => (rowOf x).val < n0)
+    G1 H hG1
+    (fun m hm x hx => not_lt.2 (hH m hm x hx))
+    _ _ hU hDrow]
   have hHD : MvPowerSeries.coeff (diagMon n0 n L y) H = 1 := by
-    rw [hHd _ (fun x hx => diagMon_row x hx) (fun ρ hρ => ⟨by simp [rowDegZ, diagMon_inl, hρ],
-      by simp [rowDegZ', diagMon_inr, hρ]⟩), if_pos rfl]
+    rw [hHd _
+        (fun x hx => diagMon_row x hx)
+        (fun ρ hρ => ⟨by simp [rowDegZ, diagMon_inl, hρ], by simp [rowDegZ', diagMon_inr, hρ]⟩),
+      if_pos rfl]
   have hdisj : Disjoint (u.mapDomain (embV hn)).support (diagMon n0 n L y).support :=
     Finset.disjoint_left.2 fun x hx1 hx2 => hDrow x hx2 (hU x hx1)
-  have hmf : mfact (u.mapDomain (embV hn) + diagMon n0 n L y) =
-      mfact u * ((L * y).factorial * y.factorial) ^ (n - n0) := by
+  have hmf
+      : mfact (u.mapDomain (embV hn) + diagMon n0 n L y)
+        = mfact u * ((L * y).factorial * y.factorial) ^ (n - n0) := by
     rw [← mfact_diagMon, mfact, mfact, mfact, Finsupp.prod_add_index_of_disjoint hdisj,
       Finsupp.prod_mapDomain_index_inj (embV_inj hn)]
-  have hr : MvPowerSeries.coeff u (restr hn G1) = MvPowerSeries.coeff (u.mapDomain (embV hn)) G1 := rfl
+  have hr : MvPowerSeries.coeff u (restr hn G1) = MvPowerSeries.coeff (u.mapDomain (embV hn)) G1 :=
+    rfl
   rw [hHD, mul_one, hmf, hr]
   push_cast
   ring
 
-theorem main : DetPowDiag ∧ BlockJet ∧ RestrictMul ∧ RestrictExp := ⟨detPowDiag, blockJet, restrictMul, restrictExp⟩
+theorem main : DetPowDiag ∧ BlockJet ∧ RestrictMul ∧ RestrictExp :=
+  ⟨detPowDiag, blockJet, restrictMul, restrictExp⟩
 
 end GlobalTheory.DiagBlock

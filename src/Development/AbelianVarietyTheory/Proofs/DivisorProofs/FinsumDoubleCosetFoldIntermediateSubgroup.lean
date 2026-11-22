@@ -18,16 +18,25 @@ namespace GlobalTheory.ConjugateFold
 
 variable {G : Type} [Group G]
 
-noncomputable def foldMap (Γ' T K : Subgroup G) (hΓT : Γ' ≤ T) (y : G)
+noncomputable def foldMap
+    (Γ' T K : Subgroup G) (hΓT : Γ' ≤ T)
+    (y : G)
     (p : DoubleCoset.Quotient ((Γ'.subgroupOf T : Subgroup T) : Set T)
-      (((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T : Subgroup T) : Set T)) :
-    {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) //
-      DoubleCoset.mk T K (Quotient.out q) = DoubleCoset.mk T K y} :=
-  ⟨DoubleCoset.mk Γ' K (((Quotient.out p : T) : G) * y), by
+      (((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T : Subgroup T) : Set T))
+    : {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G)
+      // DoubleCoset.mk T K (Quotient.out q) = DoubleCoset.mk T K y} := ⟨
+  DoubleCoset.mk Γ' K (((Quotient.out p : T) : G) * y),
+  by
     obtain ⟨g, hg, k, hk, he⟩ := DoubleCoset.mk_out_eq_mul Γ' K (((Quotient.out p : T) : G) * y)
     rw [he, DoubleCoset.eq]
-    refine ⟨(g * ((Quotient.out p : T) : G))⁻¹, T.inv_mem (T.mul_mem (hΓT hg) (Quotient.out p).2),
-      k⁻¹, K.inv_mem hk, by group⟩⟩
+    refine ⟨
+      (g * ((Quotient.out p : T) : G))⁻¹,
+      T.inv_mem (T.mul_mem (hΓT hg) (Quotient.out p).2),
+      k⁻¹,
+      K.inv_mem hk,
+      by group
+    ⟩
+⟩
 
 end GlobalTheory.ConjugateFold
 
@@ -131,68 +140,93 @@ private lemma card_inf_map_conj_mul_mul_eq (Γ' K : Subgroup G) {γ k : G} (hγ 
   rw [e]
   exact Nat.card_congr (Subgroup.equivMapOfInjective _ _ (MulAut.conj γ).injective).toEquiv.symm
 
-theorem _root_.GlobalTheory.finsum_fold_intermediate : ∀ {G : Type} [Group G] (Γ' T K : Subgroup G) (F : G → ℂ), Γ' ≤ T → (∀ t ∈ T, ∀ x, ∀ k ∈ K, F (t * x * k) = F x) → (∀ x : G, ((Γ' ⊓ K.map (MulAut.conj x).toMonoidHom : Subgroup G) : Set G).Finite) → {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) | F (Quotient.out q) ≠ 0}.Finite → ∑ᶠ q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G), ((Nat.card (Γ' ⊓ K.map (MulAut.conj (Quotient.out q)).toMonoidHom : Subgroup G) : ℕ) : ℂ)⁻¹ * F (Quotient.out q) = ∑ᶠ y : DoubleCoset.Quotient (T : Set G) (K : Set G), ((_root_.GlobalTheory.LKCount.massC Γ' T (T ⊓ K.map (MulAut.conj (Quotient.out y)).toMonoidHom) : ℚ) : ℂ) * F (Quotient.out y) := by
-  intro G _ Γ' T K F hΓT hF _ hfin
-  have hsupp : (Function.support fun q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) =>
-      ((Nat.card (Γ' ⊓ K.map (MulAut.conj (Quotient.out q)).toMonoidHom : Subgroup G) : ℕ) : ℂ)⁻¹ *
-        F (Quotient.out q)).Finite :=
-    hfin.subset fun q hq => right_ne_zero_of_mul hq
-  refine (_root_.GlobalTheory.finsum_fiberwise_of_finite_support (A := DoubleCoset.Quotient (Γ' : Set G) (K : Set G))
-    (B := DoubleCoset.Quotient (T : Set G) (K : Set G))
-    (fun q => DoubleCoset.mk T K (Quotient.out q)) _ hsupp).trans (finsum_congr fun y' => ?_)
-  set y := Quotient.out y'
-  have hy' : DoubleCoset.mk T K y = y' := DoubleCoset.out_eq' y'
-  have hfib : ∀ q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G),
-      DoubleCoset.mk T K (Quotient.out q) = DoubleCoset.mk T K y → F (Quotient.out q) = F y := by
-    intro q hq
-    obtain ⟨t, ht, k, hk, hqe⟩ := DoubleCoset.eq.mp hq.symm
-    rw [hqe, hF t ht y k hk]
-  let e : DoubleCoset.Quotient ((Γ'.subgroupOf T : Subgroup T) : Set T)
-      (((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T : Subgroup T) : Set T) →
-      {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) // DoubleCoset.mk T K (Quotient.out q) = y'} :=
-    fun p => ⟨(_root_.GlobalTheory.ConjugateFold.foldMap Γ' T K hΓT y p).1,
-      (_root_.GlobalTheory.ConjugateFold.foldMap Γ' T K hΓT y p).2.trans hy'⟩
-  have hb := foldMap_bijective' Γ' T K hΓT y
-  have he : Function.Bijective e := by
-    constructor
-    · intro p p' h
-      have h' := congrArg Subtype.val h
-      exact hb.1 (Subtype.ext h')
-    · rintro ⟨q, hq⟩
-      obtain ⟨p, hp⟩ := hb.2 ⟨q, hq.trans hy'.symm⟩
-      have hp' := congrArg Subtype.val hp
-      exact ⟨p, Subtype.ext hp'⟩
-  rw [← finsum_eq_of_bijective e he (fun _ => rfl)]
-  have hterm : ∀ p, ((Nat.card (Γ' ⊓ K.map (MulAut.conj (Quotient.out (e p).1)).toMonoidHom :
-      Subgroup G) : ℕ) : ℂ)⁻¹ * F (Quotient.out (e p).1) =
-      ((Nat.card ((Γ'.subgroupOf T) ⊓ ((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T).map
-        (MulAut.conj (Quotient.out p)).toMonoidHom : Subgroup T) : ℕ) : ℂ)⁻¹ * F y := by
-    intro p
-    obtain ⟨γ, hγ, k, hk, hg⟩ := DoubleCoset.mk_out_eq_mul Γ' K (((Quotient.out p : T) : G) * y)
-    have hval : (e p).1 = DoubleCoset.mk Γ' K (((Quotient.out p : T) : G) * y) := rfl
-    rw [card_subgroupOf_inf_map_conj_eq Γ' T K hΓT, hval, hg, card_inf_map_conj_mul_mul_eq Γ' K hγ hk,
-      show γ * (((Quotient.out p : T) : G) * y) * k = (γ * ((Quotient.out p : T) : G)) * y * k by group,
-      hF _ (T.mul_mem (hΓT hγ) (Quotient.out p).2) y k hk]
-  rw [finsum_congr hterm]
-  by_cases hFy : F y = 0
-  · simp [hFy]
-  haveI : Finite {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) | F (Quotient.out q) ≠ 0} :=
-    hfin.to_subtype
-  haveI : Finite (DoubleCoset.Quotient ((Γ'.subgroupOf T : Subgroup T) : Set T)
-      (((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T : Subgroup T) : Set T)) :=
-    Finite.of_injective
-      (β := {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) | F (Quotient.out q) ≠ 0})
-      (fun p => ⟨(e p).1, by
-        show F (Quotient.out (e p).1) ≠ 0
-        rw [hfib _ ((e p).2.trans hy'.symm)]
-        exact hFy⟩)
-      (fun p p' h => by
+theorem _root_.GlobalTheory.finsum_fold_intermediate
+    : ∀ {G : Type} [Group G] (Γ' T K : Subgroup G) (F : G → ℂ),
+      Γ' ≤ T → (∀ t ∈ T, ∀ x, ∀ k ∈ K, F (t * x * k) = F x)
+        → (∀ x : G, ((Γ' ⊓ K.map (MulAut.conj x).toMonoidHom : Subgroup G) : Set G).Finite)
+        → {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) | F (Quotient.out q) ≠ 0}.Finite
+        → ∑ᶠ q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G), ((Nat.card (Γ' ⊓ K.map (MulAut.conj (Quotient.out q)).toMonoidHom : Subgroup G) : ℕ) : ℂ)⁻¹ * F (Quotient.out q)
+          = ∑ᶠ y : DoubleCoset.Quotient (T : Set G) (K : Set G), ((_root_.GlobalTheory.LKCount.massC Γ' T (T ⊓ K.map (MulAut.conj (Quotient.out y)).toMonoidHom) : ℚ) : ℂ) * F (Quotient.out y) :=
+  by
+    intro G _ Γ' T K F hΓT hF _ hfin
+    have hsupp : (Function.support fun q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) =>
+        ((Nat.card (Γ' ⊓ K.map (MulAut.conj (Quotient.out q)).toMonoidHom : Subgroup G) : ℕ) : ℂ)⁻¹
+          * F (Quotient.out q)).Finite :=
+      hfin.subset fun q hq => right_ne_zero_of_mul hq
+    refine (_root_.GlobalTheory.finsum_fiberwise_of_finite_support
+      (A := DoubleCoset.Quotient (Γ' : Set G) (K : Set G))
+      (B := DoubleCoset.Quotient (T : Set G) (K : Set G))
+      (fun q => DoubleCoset.mk T K (Quotient.out q))
+      _ hsupp).trans (finsum_congr fun y' => ?_)
+    set y := Quotient.out y'
+    have hy' : DoubleCoset.mk T K y = y' := DoubleCoset.out_eq' y'
+    have hfib
+        : ∀ q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G),
+          DoubleCoset.mk T K (Quotient.out q) = DoubleCoset.mk T K y
+            → F (Quotient.out q) = F y := by
+      intro q hq
+      obtain ⟨t, ht, k, hk, hqe⟩ := DoubleCoset.eq.mp hq.symm
+      rw [hqe, hF t ht y k hk]
+    let e
+        : DoubleCoset.Quotient ((Γ'.subgroupOf T : Subgroup T) : Set T)
+            (((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T : Subgroup T) : Set T)
+          → {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G)
+            // DoubleCoset.mk T K (Quotient.out q) = y'} := fun p => ⟨
+      (_root_.GlobalTheory.ConjugateFold.foldMap Γ' T K hΓT y p).1,
+      (_root_.GlobalTheory.ConjugateFold.foldMap Γ' T K hΓT y p).2.trans hy'
+    ⟩
+    have hb := foldMap_bijective' Γ' T K hΓT y
+    have he : Function.Bijective e := by
+      constructor
+      · intro p p' h
         have h' := congrArg Subtype.val h
-        exact he.1 (Subtype.ext h'))
-  letI := Fintype.ofFinite (DoubleCoset.Quotient ((Γ'.subgroupOf T : Subgroup T) : Set T)
-      (((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T : Subgroup T) : Set T))
-  unfold _root_.GlobalTheory.LKCount.massC
-  rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype, ← Finset.sum_mul, Rat.cast_sum]
-  simp
+        exact hb.1 (Subtype.ext h')
+      · rintro ⟨q, hq⟩
+        obtain ⟨p, hp⟩ := hb.2 ⟨q, hq.trans hy'.symm⟩
+        have hp' := congrArg Subtype.val hp
+        exact ⟨p, Subtype.ext hp'⟩
+    rw [← finsum_eq_of_bijective e he (fun _ => rfl)]
+    have hterm
+        : ∀ p,
+          ((Nat.card (Γ' ⊓ K.map (MulAut.conj (Quotient.out (e p).1)).toMonoidHom : Subgroup G) : ℕ)
+                : ℂ)⁻¹
+              * F (Quotient.out (e p).1)
+            = ((Nat.card
+                    ((Γ'.subgroupOf T)
+                        ⊓ ((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T).map
+                          (MulAut.conj (Quotient.out p)).toMonoidHom
+                      : Subgroup T)
+                  : ℕ)
+                : ℂ)⁻¹
+              * F y := by
+      intro p
+      obtain ⟨γ, hγ, k, hk, hg⟩ := DoubleCoset.mk_out_eq_mul Γ' K (((Quotient.out p : T) : G) * y)
+      have hval : (e p).1 = DoubleCoset.mk Γ' K (((Quotient.out p : T) : G) * y) := rfl
+      rw [card_subgroupOf_inf_map_conj_eq Γ' T K hΓT, hval, hg,
+        card_inf_map_conj_mul_mul_eq Γ' K hγ hk,
+        show γ * (((Quotient.out p : T) : G) * y) * k = (γ * ((Quotient.out p : T) : G)) * y * k by
+          group,
+        hF _ (T.mul_mem (hΓT hγ) (Quotient.out p).2) y k hk]
+    rw [finsum_congr hterm]
+    by_cases hFy : F y = 0
+    · simp [hFy]
+    haveI : Finite {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) | F (Quotient.out q) ≠ 0} :=
+      hfin.to_subtype
+    haveI : Finite (DoubleCoset.Quotient ((Γ'.subgroupOf T : Subgroup T) : Set T)
+        (((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T : Subgroup T) : Set T)) :=
+      Finite.of_injective
+        (β := {q : DoubleCoset.Quotient (Γ' : Set G) (K : Set G) | F (Quotient.out q) ≠ 0})
+        (fun p => ⟨(e p).1, by
+          show F (Quotient.out (e p).1) ≠ 0
+          rw [hfib _ ((e p).2.trans hy'.symm)]
+          exact hFy⟩)
+        (fun p p' h => by
+          have h' := congrArg Subtype.val h
+          exact he.1 (Subtype.ext h'))
+    letI := Fintype.ofFinite (DoubleCoset.Quotient ((Γ'.subgroupOf T : Subgroup T) : Set T)
+        (((T ⊓ K.map (MulAut.conj y).toMonoidHom).subgroupOf T : Subgroup T) : Set T))
+    unfold _root_.GlobalTheory.LKCount.massC
+    rw [finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype, ← Finset.sum_mul, Rat.cast_sum]
+    simp
 
 end GlobalTheory

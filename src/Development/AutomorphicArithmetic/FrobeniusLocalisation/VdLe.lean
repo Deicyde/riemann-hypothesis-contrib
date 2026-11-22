@@ -11,9 +11,9 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-private theorem arith {l : ℕ} (hl : l.Prime) (k : ℕ) :
-    ∑ j ∈ Finset.range (k + 1), (1 - ((l ^ j).totient : ℝ) / ((l ^ (k + 1)).totient : ℝ)) =
-      ((k + 1 : ℕ) : ℝ) - 1 / ((l : ℝ) - 1) := by
+private theorem arith {l : ℕ} (hl : l.Prime) (k : ℕ)
+    : ∑ j ∈ Finset.range (k + 1), (1 - ((l ^ j).totient : ℝ) / ((l ^ (k + 1)).totient : ℝ))
+      = ((k + 1 : ℕ) : ℝ) - 1 / ((l : ℝ) - 1) := by
   rw [Finset.sum_sub_distrib, ← Finset.sum_div]
   simp only [Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
   have hs : (∑ j ∈ Finset.range (k + 1), ((l ^ j).totient : ℝ)) = (l : ℝ) ^ k := by
@@ -26,33 +26,40 @@ private theorem arith {l : ℕ} (hl : l.Prime) (k : ℕ) :
   congr 1
   rw [div_mul_eq_div_div, div_self hp]
 
-private theorem intCast_mul_mul_mul_eq_of_mul_eq {l : ℕ} (hl : l.Prime) {j e c : ℕ} (hje : j ≤ e)
-    (hd : c ∣ (l ^ e).totient / (l ^ j).totient) :
-    1 - 1 / (c : ℝ) ≤ 1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ) := by
+private theorem intCast_mul_mul_mul_eq_of_mul_eq
+    {l : ℕ} (hl : l.Prime) {j e c : ℕ} (hje : j ≤ e) (hd : c ∣ (l ^ e).totient / (l ^ j).totient)
+    : 1 - 1 / (c : ℝ) ≤ 1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ) := by
   have hjd : (l ^ j).totient ∣ (l ^ e).totient := Nat.totient_dvd_of_dvd (pow_dvd_pow l hje)
   have hj0 : 0 < (l ^ j).totient := Nat.totient_pos.2 (pow_pos hl.pos j)
   have he0 : 0 < (l ^ e).totient := Nat.totient_pos.2 (pow_pos hl.pos e)
   have hq0 : 0 < (l ^ e).totient / (l ^ j).totient := Nat.div_pos (Nat.le_of_dvd he0 hjd) hj0
   have hc0 : 0 < c := Nat.pos_of_dvd_of_pos hd hq0
   have hcle : c ≤ (l ^ e).totient / (l ^ j).totient := Nat.le_of_dvd hq0 hd
-  have hq : (((l ^ e).totient / (l ^ j).totient : ℕ) : ℝ) =
-      ((l ^ e).totient : ℝ) / ((l ^ j).totient : ℝ) :=
+  have hq
+      : (((l ^ e).totient / (l ^ j).totient : ℕ) : ℝ)
+        = ((l ^ e).totient : ℝ) / ((l ^ j).totient : ℝ) :=
     Nat.cast_div hjd (by exact_mod_cast hj0.ne')
   have h1 : (1 : ℝ) / (((l ^ e).totient / (l ^ j).totient : ℕ) : ℝ) ≤ 1 / (c : ℝ) :=
     one_div_le_one_div_of_le (by exact_mod_cast hc0) (by exact_mod_cast hcle)
   rw [hq, one_div_div] at h1
   linarith
 
-theorem UpperTheory.HF.vd_le :
-    ∀ {φ : Frame} (H : HostAx φ) {l : ℕ}, l.Prime → H.vdH l ≤ (H.sl l : ℝ) - 1 / ((l : ℝ) - 1) ∧ H.vdH l ≤ (H.condE.factorization l : ℝ) := by
+theorem UpperTheory.HF.vd_le
+    : ∀ {φ : Frame} (H : HostAx φ) {l : ℕ},
+      l.Prime
+        → H.vdH l ≤ (H.sl l : ℝ) - 1 / ((l : ℝ) - 1) ∧ H.vdH l ≤ (H.condE.factorization l : ℝ) := by
   intro φ H l hl
   have heN := (layer_bot H.toHostRaw hl (Nat.zero_le (H.condN.factorization l))).2.2
   simp only [UpperTheory.HF.Formalism.HC.HostRaw.sl]
-  generalize hE : (UpperTheory.HF.Formalism.HC.HostRaw.condE H.toHostRaw).factorization l = e at heN ⊢
-  have hcard : ∀ j ∈ Finset.range (H.condN.factorization l),
-      (1 - 1 / (Nat.card (UpperTheory.HF.Formalism.HC.HostRaw.imgOne H.toHostRaw
-        (H.condN / l ^ H.condN.factorization l * l ^ j)) : ℝ)) ≤
-      if j < e then 1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ) else 0 := by
+  generalize hE : (UpperTheory.HF.Formalism.HC.HostRaw.condE H.toHostRaw).factorization l = e
+    at heN ⊢
+  have hcard
+      : ∀ j ∈ Finset.range (H.condN.factorization l),
+        (1 - 1
+            / (Nat.card (UpperTheory.HF.Formalism.HC.HostRaw.imgOne H.toHostRaw
+                (H.condN / l ^ H.condN.factorization l * l ^ j))
+              : ℝ))
+          ≤ if j < e then 1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ) else 0 := by
     intro j hj
     have hjN : j ≤ H.condN.factorization l := (Finset.mem_range.1 hj).le
     obtain ⟨hbot, hdvd, -⟩ := layer_bot H.toHostRaw hl hjN
@@ -64,20 +71,25 @@ theorem UpperTheory.HF.vd_le :
       simp
   have hsum := Finset.sum_le_sum hcard
   rw [← vd_formula H hl] at hsum
-  have hS : ∑ j ∈ Finset.range (H.condN.factorization l),
-      (if j < e then 1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ) else 0) =
-      ∑ j ∈ Finset.range e, (1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ)) := by
+  have hS
+      : ∑ j ∈ Finset.range (H.condN.factorization l),
+          (if j < e then 1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ) else 0)
+        = ∑ j ∈ Finset.range e, (1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ)) := by
     obtain ⟨m, hm⟩ := Nat.exists_eq_add_of_le heN
     rw [hm, Finset.sum_range_add]
-    have h2 : ∑ x ∈ Finset.range m,
-        (if e + x < e then 1 - ((l ^ (e + x)).totient : ℝ) / ((l ^ e).totient : ℝ) else 0) = 0 :=
+    have h2
+        : ∑ x ∈ Finset.range m,
+            (if e + x < e then 1 - ((l ^ (e + x)).totient : ℝ) / ((l ^ e).totient : ℝ) else 0)
+          = 0 :=
       Finset.sum_eq_zero (fun x _ => if_neg (by omega))
     rw [h2, add_zero]
     exact Finset.sum_congr rfl (fun j hj => if_pos (Finset.mem_range.1 hj))
   rw [hS] at hsum
-  have hle : ∑ j ∈ Finset.range e, (1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ)) ≤ (e : ℝ) := by
-    calc _ ≤ ∑ j ∈ Finset.range e, (1 : ℝ) :=
-          Finset.sum_le_sum (fun j _ => sub_le_self 1 (by positivity))
+  have hle
+      : ∑ j ∈ Finset.range e, (1 - ((l ^ j).totient : ℝ) / ((l ^ e).totient : ℝ)) ≤ (e : ℝ) := by
+    calc
+      _ ≤ ∑ j ∈ Finset.range e, (1 : ℝ) :=
+        Finset.sum_le_sum (fun j _ => sub_le_self 1 (by positivity))
       _ = e := by simp
   refine ⟨?_, hsum.trans hle⟩
   rcases e with _ | k

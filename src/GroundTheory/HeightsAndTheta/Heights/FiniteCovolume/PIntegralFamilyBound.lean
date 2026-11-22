@@ -9,8 +9,8 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open NumberField Module
 
-theorem IntegralFamilyBound.proof (E : Type*) [Field E] [NumberField E] :
-    IntegralFamilyBound.Statement E := by
+theorem IntegralFamilyBound.proof (E : Type*) [Field E] [NumberField E]
+    : IntegralFamilyBound.Statement E := by
   have hcard : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 E)) = finrank ℚ E := by
     rw [← Module.finrank_eq_card_chooseBasisIndex, RingOfIntegers.rank]
   let e : Fin (finrank ℚ E) ≃ Module.Free.ChooseBasisIndex ℤ (𝓞 E) :=
@@ -22,11 +22,16 @@ theorem IntegralFamilyBound.proof (E : Type*) [Field E] [NumberField E] :
     funext i
     simp [a, integralBasis_apply]
   · intro i σ
-    calc ‖σ (a i)‖ ≤ ∑ σ' : E →+* ℂ, ‖σ' (a i)‖ :=
-          Finset.single_le_sum (f := fun σ' : E →+* ℂ => ‖σ' (a i)‖)
-            (fun _ _ => norm_nonneg _) (Finset.mem_univ σ)
+    calc
+      ‖σ (a i)‖ ≤ ∑ σ' : E →+* ℂ, ‖σ' (a i)‖ :=
+        Finset.single_le_sum
+          (f := fun σ' : E →+* ℂ => ‖σ' (a i)‖)
+          (fun _ _ => norm_nonneg _)
+          (Finset.mem_univ σ)
       _ ≤ ∑ j, ∑ σ' : E →+* ℂ, ‖σ' (a j)‖ :=
-          Finset.single_le_sum (f := fun j => ∑ σ' : E →+* ℂ, ‖σ' (a j)‖)
-            (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ i)
+        Finset.single_le_sum
+          (f := fun j => ∑ σ' : E →+* ℂ, ‖σ' (a j)‖)
+          (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+          (Finset.mem_univ i)
 
 end GroundTheory.Heights₂.Heights.FiniteCovolume

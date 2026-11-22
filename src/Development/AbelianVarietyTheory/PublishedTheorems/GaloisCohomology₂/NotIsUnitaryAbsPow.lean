@@ -8,22 +8,24 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.LFun GlobalTheory.CuspRep GlobalTheory.HeckeGal.Model
+open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.LFun GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal.Model
 
 namespace GlobalTheory.Published.JacquetShalikaModel
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
 
-
 open NumberField IsDedekindDomain in
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] in
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem _root_.GlobalTheory.Published.JacquetShalikaModel.infinite_places : Infinite (HeightOneSpectrum (𝓞 E)) := by
+theorem _root_.GlobalTheory.Published.JacquetShalikaModel.infinite_places
+    : Infinite (HeightOneSpectrum (𝓞 E)) := by
   classical
   by_contra h
   rw [not_infinite_iff_finite] at h
   have hfin : (Set.range fun P : HeightOneSpectrum (𝓞 E) =>
-      Ideal.comap (algebraMap ℤ (𝓞 E)) P.asIdeal).Finite := Set.finite_range _
+      Ideal.comap (algebraMap ℤ (𝓞 E)) P.asIdeal).Finite :=
+    Set.finite_range _
   apply Nat.infinite_setOf_prime
   have hinj : Set.InjOn (fun p : ℕ => Ideal.span {(p : ℤ)}) {p | p.Prime} := by
     intro p _ q _ hpq
@@ -36,8 +38,7 @@ theorem _root_.GlobalTheory.Published.JacquetShalikaModel.infinite_places : Infi
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hp).irreducible
   obtain ⟨Q, hQ, hlies⟩ :=
     Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) (Ideal.span {(p : ℤ)})
-  have hcomap : Ideal.comap (algebraMap ℤ (𝓞 E)) Q = Ideal.span {(p : ℤ)} :=
-    (hlies.over).symm
+  have hcomap : Ideal.comap (algebraMap ℤ (𝓞 E)) Q = Ideal.span {(p : ℤ)} := (hlies.over).symm
   have hne : Q ≠ ⊥ := by
     rintro rfl
     have hmem : (p : ℤ) ∈ Ideal.comap (algebraMap ℤ (𝓞 E)) (⊥ : Ideal (𝓞 E)) :=

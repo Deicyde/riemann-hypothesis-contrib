@@ -12,8 +12,8 @@ open scoped TensorProduct
 
 namespace GlobalTheory.UPel.HT.MatRed
 
-theorem approx {p : ℕ} [Fact p.Prime] {M : Type} [AddCommGroup M] (r : ℕ) (x : M ⊗[ℤ] ℤ_[p]) :
-    ∃ (b : M) (y : M ⊗[ℤ] ℤ_[p]), x = b ⊗ₜ (1 : ℤ_[p]) + (p ^ r) • y := by
+theorem approx {p : ℕ} [Fact p.Prime] {M : Type} [AddCommGroup M] (r : ℕ) (x : M ⊗[ℤ] ℤ_[p])
+    : ∃ (b : M) (y : M ⊗[ℤ] ℤ_[p]), x = b ⊗ₜ (1 : ℤ_[p]) + (p ^ r) • y := by
   induction x using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, by simp⟩
   | tmul o z =>
@@ -30,9 +30,11 @@ theorem approx {p : ℕ} [Fact p.Prime] {M : Type} [AddCommGroup M] (r : ℕ) (x
     obtain ⟨b, v, hb⟩ := hy
     exact ⟨a + b, u + v, by rw [ha, hb, TensorProduct.add_tmul, smul_add]; abel⟩
 
-theorem dvd_of_tmul {p : ℕ} [Fact p.Prime] {M : Type} [AddCommGroup M] [Module.Free ℤ M]
-    [Module.Finite ℤ M] (r : ℕ) (u : M) (z : M ⊗[ℤ] ℤ_[p]) (h : u ⊗ₜ (1 : ℤ_[p]) = (p ^ r) • z) :
-    ∃ v : M, u = (p ^ r) • v := by
+theorem dvd_of_tmul
+    {p : ℕ} [Fact p.Prime]
+    {M : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M]
+    (r : ℕ) (u : M) (z : M ⊗[ℤ] ℤ_[p]) (h : u ⊗ₜ (1 : ℤ_[p]) = (p ^ r) • z)
+    : ∃ v : M, u = (p ^ r) • v := by
   let bs := Module.Free.chooseBasis ℤ M
   have hd : ∀ i, ((p ^ r : ℕ) : ℤ) ∣ bs.repr u i := by
     intro i
@@ -54,17 +56,21 @@ theorem dvd_of_tmul {p : ℕ} [Fact p.Prime] {M : Type} [AddCommGroup M] [Module
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hk i, mul_smul, natCast_zsmul]
 
-theorem mem_smul_top_map {R X Y : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup Y] [Module R Y]
-    (I : Ideal R) (f : X →ₗ[R] Y) {x : X} (hx : x ∈ I • (⊤ : Submodule R X)) :
-    f x ∈ I • (⊤ : Submodule R Y) := by
+theorem mem_smul_top_map
+    {R X Y : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup Y] [Module R Y]
+    (I : Ideal R)
+    (f : X →ₗ[R] Y)
+    {x : X} (hx : x ∈ I • (⊤ : Submodule R X))
+    : f x ∈ I • (⊤ : Submodule R Y) := by
   have h := Submodule.mem_map_of_mem (f := f) hx
   rw [Submodule.map_smul''] at h
   exact Submodule.smul_mono le_rfl le_top h
 
-theorem exists_matRed : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (w0 : Ideal (𝓞 D.F)) (r : ℕ), w0.IsMaximal →
-    (p : 𝓞 D.F) ∈ w0 →
-    ∃ φ : D.O →ₐ[𝓞 D.F] Matrix (Fin D.m) (Fin D.m) (𝓞 D.F ⧸ w0 ^ r), Function.Surjective φ ∧
-      ∀ b, φ b = 0 → b ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) D.O) := by
+theorem exists_matRed
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (w0 : Ideal (𝓞 D.F)) (r : ℕ),
+      w0.IsMaximal → (p : 𝓞 D.F) ∈ w0
+        → ∃ φ : D.O →ₐ[𝓞 D.F] Matrix (Fin D.m) (Fin D.m) (𝓞 D.F ⧸ w0 ^ r),
+          Function.Surjective φ ∧ ∀ b, φ b = 0 → b ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) D.O) := by
   intro p _ D w0 r _ hp
   haveI := D.freeO
   haveI := D.finO
@@ -87,10 +93,10 @@ theorem exists_matRed : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.D
     have hc : c ∈ w0 ^ r := Ideal.Quotient.eq_zero_iff_mem.1 hy
     have h1 : c ⊗ₜ[ℤ] (1 : ℤ_[p]) = c • (1 : 𝓞 D.F ⊗[ℤ] ℤ_[p]) := by
       rw [Algebra.TensorProduct.one_def, TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
-    have h2 : (p ^ r) • z = ((p : 𝓞 D.F) ^ r) • z := by
-      rw [← Nat.cast_pow, Nat.cast_smul_eq_nsmul]
+    have h2 : (p ^ r) • z = ((p : 𝓞 D.F) ^ r) • z := by rw [← Nat.cast_pow, Nat.cast_smul_eq_nsmul]
     rw [h1, h2]
-    exact Submodule.add_mem _ (Submodule.smul_mem_smul hc trivial) (Submodule.smul_mem_smul hpr trivial)
+    exact Submodule.add_mem _ (Submodule.smul_mem_smul hc trivial)
+      (Submodule.smul_mem_smul hpr trivial)
   let incl : D.O →ₐ[𝓞 D.F] D.O ⊗[ℤ] ℤ_[p] := Algebra.TensorProduct.includeLeft
   have hincl : ∀ b, incl b = b ⊗ₜ (1 : ℤ_[p]) := fun b => rfl
   refine ⟨ψ.mapMatrix.comp (e.toAlgHom.comp incl), ?_, ?_⟩
@@ -109,16 +115,19 @@ theorem exists_matRed : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.D
     have hb' : ∀ i j, ψ (e (incl b) i j) = 0 := fun i j => by
       have h := congrFun (congrFun hb i) j
       simpa [AlgHom.mapMatrix_apply] using h
-    have hM : e (incl b) ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) (Matrix (Fin D.m) (Fin D.m) (𝓞 D.F ⊗[ℤ] ℤ_[p]))) := by
+    have hM
+        : e (incl b)
+          ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) (Matrix (Fin D.m) (Fin D.m) (𝓞 D.F ⊗[ℤ] ℤ_[p]))) := by
       rw [Matrix.matrix_eq_sum_single (e (incl b))]
       refine Submodule.sum_mem _ fun i _ => Submodule.sum_mem _ fun j _ => ?_
       exact mem_smul_top_map _ (Matrix.singleLinearMap (𝓞 D.F) i j) (hψk _ (hb' i j))
     have hO : incl b ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) (D.O ⊗[ℤ] ℤ_[p])) := by
       have h := mem_smul_top_map _ e.symm.toLinearEquiv.toLinearMap hM
       simpa using h
-    have claim : ∀ x ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) (D.O ⊗[ℤ] ℤ_[p])),
-        ∃ b' ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) D.O), ∃ z : D.O ⊗[ℤ] ℤ_[p],
-          x = b' ⊗ₜ (1 : ℤ_[p]) + (p ^ r) • z := by
+    have claim
+        : ∀ x ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) (D.O ⊗[ℤ] ℤ_[p])),
+          ∃ b' ∈ (w0 ^ r) • (⊤ : Submodule (𝓞 D.F) D.O), ∃ z : D.O ⊗[ℤ] ℤ_[p],
+            x = b' ⊗ₜ (1 : ℤ_[p]) + (p ^ r) • z := by
       intro x hx
       refine Submodule.smul_induction_on hx ?_ ?_
       · intro c hc x _
@@ -129,8 +138,7 @@ theorem exists_matRed : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.D
         exact ⟨a + a', add_mem ha ha', u + v, by rw [TensorProduct.add_tmul, smul_add]; abel⟩
     obtain ⟨b', hb'', z, hz⟩ := claim _ hO
     rw [hincl] at hz
-    have h3 : (b - b') ⊗ₜ[ℤ] (1 : ℤ_[p]) = (p ^ r) • z := by
-      rw [TensorProduct.sub_tmul, hz]; abel
+    have h3 : (b - b') ⊗ₜ[ℤ] (1 : ℤ_[p]) = (p ^ r) • z := by rw [TensorProduct.sub_tmul, hz]; abel
     obtain ⟨v, hv⟩ := dvd_of_tmul r (b - b') z h3
     have h4 : b = b' + ((p : 𝓞 D.F) ^ r) • v := by
       rw [← Nat.cast_pow, Nat.cast_smul_eq_nsmul, ← hv]; abel

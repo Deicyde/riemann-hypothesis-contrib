@@ -23,30 +23,44 @@ theorem norm_cc_of_unitAt {f : K⟦X⟧} (h : UnitAt 0 f) : ‖constantCoeff f�
   obtain ⟨a, V, ha, hV, rfl⟩ := h
   simp [hV.1, ha]
 
-theorem tele [IsUltrametricDist K] (g ψ : ℕ → K⟦X⟧) (c : K) (n : ℕ) (hn : ‖((n + 1 : ℕ) : K)‖ = 1)
+theorem tele
+    [IsUltrametricDist K]
+    (g ψ : ℕ → K⟦X⟧) (c : K)
+    (n : ℕ) (hn : ‖((n + 1 : ℕ) : K)‖ = 1)
     (h0 : OneUnit (g 0)) (hper : g (n + 1) = g 0) (hne : ∀ j, constantCoeff (g j) ≠ 0)
     (hψ : ∀ j, UnitAt 0 (ψ j))
-    (hrec : ∀ j, g (j + 2) * g j = (C (c ^ 2) * ψ (j + 1)) * g (j + 1) ^ 2) :
-    OneUnit (C (constantCoeff (g 1))⁻¹ * g 1) := by
+    (hrec : ∀ j, g (j + 2) * g j = (C (c ^ 2) * ψ (j + 1)) * g (j + 1) ^ 2)
+    : OneUnit (C (constantCoeff (g 1))⁻¹ * g 1) := by
   obtain ⟨-, -, -, -, -, -, oMul, oPow, oInv, -⟩ := intRules K
   obtain ⟨uMul, uPow, -, -, -⟩ := unitAtRules K
-  have key := Power.closed g (fun j => C (c ^ 2) * ψ j) 1 (g 0) n (by simp)
-    (fun j _ h => hne j (by rw [h, map_zero])) (fun j _ => hrec j) n le_rfl
-  have hprod : ∃ (r : ℕ) (f : K⟦X⟧), UnitAt 0 f ∧
-      ∏ j ∈ Finset.range n, (C (c ^ 2) * ψ (j + 1)) ^ (n - j) = C (c ^ r) * f := by
+  have key :=
+    Power.closed g
+      (fun j => C (c ^ 2) * ψ j)
+      1 (g 0) n (by simp)
+      (fun j _ h => hne j (by rw [h, map_zero]))
+      (fun j _ => hrec j)
+      n le_rfl
+  have hprod
+      : ∃ (r : ℕ) (f : K⟦X⟧),
+        UnitAt 0 f ∧ ∏ j ∈ Finset.range n, (C (c ^ 2) * ψ (j + 1)) ^ (n - j) = C (c ^ r) * f := by
     apply Finset.prod_induction _ (fun f => ∃ (r : ℕ) (f' : K⟦X⟧), UnitAt 0 f' ∧ f = C (c ^ r) * f')
     · rintro _ _ ⟨r1, g1, h1, rfl⟩ ⟨r2, g2, h2, rfl⟩
       exact ⟨r1 + r2, g1 * g2, uMul 0 0 _ _ h1 h2, by rw [pow_add, map_mul]; ring⟩
     · exact ⟨0, 1, Main.unitAt_one, by simp⟩
     · intro j _
-      exact ⟨2 * (n - j), _, by simpa using uPow 0 (n - j) _ (hψ (j + 1)),
-        by rw [mul_pow, ← map_pow, ← pow_mul]⟩
+      exact ⟨
+        2 * (n - j),
+        _,
+        by simpa using uPow 0 (n - j) _ (hψ (j + 1)),
+        by rw [mul_pow, ← map_pow, ← pow_mul]
+      ⟩
   obtain ⟨r, _, ⟨a, V, ha, hV, rfl⟩, hpr⟩ := hprod
   rw [hpr, hper, one_pow, one_mul, pow_zero, mul_one, ← pow_succ'] at key
   have hh := hne 1
   have hcc := congrArg constantCoeff key
   rw [map_pow, h0.1, one_pow, map_mul, map_pow, map_mul, map_mul, constantCoeff_C, constantCoeff_C,
-    hV.1, mul_one] at hcc
+      hV.1, mul_one]
+    at hcc
   generalize hh' : constantCoeff (g 1) = h at hh hcc ⊢
   have hV0 : constantCoeff V ≠ 0 := by rw [hV.1]; exact one_ne_zero
   have hVi : V * V⁻¹ = 1 := PowerSeries.mul_inv_cancel V hV0
@@ -54,10 +68,10 @@ theorem tele [IsUltrametricDist K] (g ψ : ℕ → K⟦X⟧) (c : K) (n : ℕ) (
     rw [inv_pow]
     exact inv_eq_of_mul_eq_one_right hcc.symm
   have hY : (C h⁻¹ * g 1) ^ (n + 1) = V⁻¹ * g 0 ^ (n + 1) := by
-    calc (C h⁻¹ * g 1) ^ (n + 1) = (V * V⁻¹) * (C (h⁻¹ ^ (n + 1)) * g 1 ^ (n + 1)) := by
-          rw [hVi, one_mul, mul_pow, map_pow]
-      _ = V⁻¹ * (g 1 ^ (n + 1) * (C (c ^ r) * (C a * V))) := by
-          rw [hinv, map_mul]; ring
+    calc
+      (C h⁻¹ * g 1) ^ (n + 1)
+        = (V * V⁻¹) * (C (h⁻¹ ^ (n + 1)) * g 1 ^ (n + 1)) := by rw [hVi, one_mul, mul_pow, map_pow]
+      _ = V⁻¹ * (g 1 ^ (n + 1) * (C (c ^ r) * (C a * V))) := by rw [hinv, map_mul]; ring
       _ = _ := by rw [← key]
   have hone : constantCoeff (C h⁻¹ * g 1) = 1 := by
     rw [map_mul, constantCoeff_C, hh', inv_mul_cancel₀ hh]
@@ -71,21 +85,25 @@ section Pts
 
 variable {K : Type} [NormedField K] (W : WeierstrassCurve K)
 
-theorem in_kernel_of_one_lt_norm_x (R : W.toAffine.Point) (h : 1 < ‖px W R‖) : Formalism.ELL.InFormalGroupPoints R := by
+theorem in_kernel_of_one_lt_norm_x (R : W.toAffine.Point) (h : 1 < ‖px W R‖)
+    : Formalism.ELL.InFormalGroupPoints R := by
   cases R with
   | zero => trivial
   | some x y hxy => exact h
 
-theorem py_int [IsUltrametricDist K] (hW : Formalism.ELL.IntegralModel W) (R : W.toAffine.Point)
-    (h : ‖px W R‖ ≤ 1) : ‖py W R‖ ≤ 1 := by
+theorem py_int
+    [IsUltrametricDist K]
+    (hW : Formalism.ELL.IntegralModel W)
+    (R : W.toAffine.Point) (h : ‖px W R‖ ≤ 1)
+    : ‖py W R‖ ≤ 1 := by
   cases R with
   | zero => simp [py]
   | some x y hxy => exact Formalism.ELL.TorsionIntegralEllipticTorsion.y_int W hW hxy.1 h
 
 end Pts
 
-theorem card_kill {G : Type} [AddCommGroup G] (A : AddSubgroup G) [Finite A] (P : G) (hP : P ∈ A) :
-    Nat.card A • P = 0 := by
+theorem card_kill {G : Type} [AddCommGroup G] (A : AddSubgroup G) [Finite A] (P : G) (hP : P ∈ A)
+    : Nat.card A • P = 0 := by
   have h := card_nsmul_eq_zero' (G := A) (x := ⟨P, hP⟩)
   simpa only [AddSubgroup.coe_nsmul, AddSubgroup.coe_zero] using congrArg Subtype.val h
 
@@ -98,13 +116,17 @@ theorem shifted_points_integral : ShiftPtsInt := by
   have hTor := torsion_integral K W hW
   obtain ⟨h1, h2, h3, h4, h6, hΔ⟩ := hW
   have hM : Formalism.ELL.IntegralModel W := ⟨h1, h2, h3, h4, h6⟩
-  have hSub : ∀ P Q : W.toAffine.Point, Formalism.ELL.InFormalGroupPoints P → Formalism.ELL.InFormalGroupPoints Q →
-      Formalism.ELL.InFormalGroupPoints (P + Q) ∧ Formalism.ELL.InFormalGroupPoints (-P) := by
+  have hSub
+      : ∀ P Q : W.toAffine.Point,
+        Formalism.ELL.InFormalGroupPoints P → Formalism.ELL.InFormalGroupPoints Q
+          → Formalism.ELL.InFormalGroupPoints (P + Q) ∧ Formalism.ELL.InFormalGroupPoints (-P) := by
     have e : inst = (fun a b => Classical.propDecidable (a = b)) := Subsingleton.elim _ _
     subst e
     exact Formalism.ELL.formal_group_points_subgroup.{0} K W hM hΔ
-  have hNoT : ∀ (n : ℕ), ‖(n : K)‖ = 1 → ∀ P : W.toAffine.Point, Formalism.ELL.InFormalGroupPoints P → n • P = 0 →
-      P = 0 := by
+  have hNoT
+      : ∀ (n : ℕ),
+        ‖(n : K)‖ = 1
+          → ∀ P : W.toAffine.Point, Formalism.ELL.InFormalGroupPoints P → n • P = 0 → P = 0 := by
     have e : inst = (fun a b => Classical.propDecidable (a = b)) := Subsingleton.elim _ _
     subst e
     exact Formalism.ELL.formal_group_points_no_torsion.{0} K W hM hΔ
@@ -163,16 +185,21 @@ theorem shift_unit' : ShiftUnit := by
     · rw [e1]; exact hS0 _ (A.add_mem hP hQ)
     · rw [e2]; exact hS0 _ (A.sub_mem hP hQ)
 
-  have hcc : ∀ P ∈ A, ∀ Q ∈ A, Q ≠ 0 → ∃ b : K, ‖b‖ = 1 ∧
-      constantCoeff (H (P + Q)) * constantCoeff (H (P - Q)) =
-        b * c Q ^ 2 * constantCoeff (H P) ^ 2 := by
+  have hcc
+      : ∀ P ∈ A, ∀ Q ∈ A,
+        Q ≠ 0
+          → ∃ b : K,
+            ‖b‖ = 1
+              ∧ constantCoeff (H (P + Q)) * constantCoeff (H (P - Q))
+                = b * c Q ^ 2 * constantCoeff (H P) ^ 2 := by
     intro P hP Q hQ hQ0
     obtain ⟨ρ, hρ, h⟩ := hid P hP Q hQ hQ0
     refine ⟨ρ * constantCoeff (C (px W Q) - xT W (P + S)), ?_, ?_⟩
     · rw [norm_mul, hρ, norm_cc_of_unitAt (hfac P hP Q hQ hQ0), one_mul]
     · have := congrArg constantCoeff h
       rw [map_mul, map_mul, map_mul, map_pow, constantCoeff_C] at this
-      rw [this]; ring
+      rw [this]
+      ring
   have hne : ∀ P ∈ A, constantCoeff (H P) ≠ 0 := by
     intro P hP
     by_cases hP0 : P = 0
@@ -196,35 +223,42 @@ theorem shift_unit' : ShiftUnit := by
       obtain ⟨n, hn⟩ : ∃ n, addOrderOf t = n + 1 := Nat.exists_eq_succ_of_ne_zero hn0
       have hnn : ‖((n + 1 : ℕ) : K)‖ = 1 := hn ▸ Main.norm_natCast_of_dvd hdvd hcard
       choose ρ hρ hρid using fun j : ℕ => hid (j • t) (A.nsmul_mem ht j) t ht ht0
-      have h := tele (fun j => H (j • t))
-        (fun j => C (ρ j) * (C (px W t) - xT W (j • t + S))) (c t) n hnn
-        (by simpa using hH0)
-        (by rw [← hn, addOrderOf_nsmul_eq_zero, zero_nsmul])
-        (fun j => hne _ (A.nsmul_mem ht j))
-        (fun j => uC 0 _ _ (hρ j) (hfac _ (A.nsmul_mem ht j) t ht ht0))
-        (by
-          intro j
-          have h := hρid (j + 1)
-          have e1 : (j + 1) • t + t = (j + 2) • t := by rw [← succ_nsmul]
-          have e2 : (j + 1) • t - t = j • t := by rw [succ_nsmul]; abel
-          rw [e1, e2] at h
-          rw [h, map_mul]; ring)
+      have h :=
+        tele
+          (fun j => H (j • t))
+          (fun j => C (ρ j) * (C (px W t) - xT W (j • t + S)))
+          (c t) n hnn (by simpa using hH0) (by rw [← hn, addOrderOf_nsmul_eq_zero, zero_nsmul])
+          (fun j => hne _ (A.nsmul_mem ht j))
+          (fun j => uC 0 _ _ (hρ j) (hfac _ (A.nsmul_mem ht j) t ht ht0))
+          (by
+            intro j
+            have h := hρid (j + 1)
+            have e1 : (j + 1) • t + t = (j + 2) • t := by rw [← succ_nsmul]
+            have e2 : (j + 1) • t - t = j • t := by rw [succ_nsmul]; abel
+            rw [e1, e2] at h
+            rw [h, map_mul]
+            ring)
       simpa using h
 
-  have hpar := parSumTwo A (fun P => Real.log ‖constantCoeff (H (P : W.toAffine.Point))‖)
-    (fun Q => Real.log ‖c (Q : W.toAffine.Point)‖) (by
-      rintro ⟨P, hP⟩ ⟨Q, hQ⟩ hQ0
-      have hQ0' : Q ≠ 0 := fun h => hQ0 (Subtype.ext h)
-      obtain ⟨b, hb, h⟩ := hcc P hP Q hQ hQ0'
-      have hl := congrArg (fun z => Real.log ‖z‖) h
-      simp only [norm_mul, norm_pow, hb, one_mul] at hl
-      rw [Real.log_mul (norm_ne_zero_iff.mpr (hne _ (A.add_mem hP hQ)))
-          (norm_ne_zero_iff.mpr (hne _ (A.sub_mem hP hQ))),
-        Real.log_mul (pow_ne_zero _ (norm_ne_zero_iff.mpr (hc0 Q hQ hQ0')))
-          (pow_ne_zero _ (norm_ne_zero_iff.mpr (hne P hP))), Real.log_pow, Real.log_pow] at hl
-      push_cast at hl
-      simp only [AddSubgroup.coe_add, AddSubgroup.coe_sub]
-      linarith)
+  have hpar :=
+    parSumTwo A
+      (fun P => Real.log ‖constantCoeff (H (P : W.toAffine.Point))‖)
+      (fun Q => Real.log ‖c (Q : W.toAffine.Point)‖)
+      (by
+        rintro ⟨P, hP⟩ ⟨Q, hQ⟩ hQ0
+        have hQ0' : Q ≠ 0 := fun h => hQ0 (Subtype.ext h)
+        obtain ⟨b, hb, h⟩ := hcc P hP Q hQ hQ0'
+        have hl := congrArg (fun z => Real.log ‖z‖) h
+        simp only [norm_mul, norm_pow, hb, one_mul] at hl
+        rw [Real.log_mul (norm_ne_zero_iff.mpr (hne _ (A.add_mem hP hQ)))
+              (norm_ne_zero_iff.mpr (hne _ (A.sub_mem hP hQ))),
+            Real.log_mul (pow_ne_zero _ (norm_ne_zero_iff.mpr (hc0 Q hQ hQ0')))
+              (pow_ne_zero _ (norm_ne_zero_iff.mpr (hne P hP))),
+            Real.log_pow, Real.log_pow]
+          at hl
+        push_cast at hl
+        simp only [AddSubgroup.coe_add, AddSubgroup.coe_sub]
+        linarith)
   obtain ⟨hm, hM⟩ := hpar
   refine ⟨fun Q hQ hQ0 => ?_, fun P hP => ⟨?_, hone P hP⟩⟩
   · have := hm ⟨Q, hQ⟩ (fun h => hQ0 (congrArg Subtype.val h))

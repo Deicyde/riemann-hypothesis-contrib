@@ -30,17 +30,18 @@ def monos (I : Finset (Fin (N + 1))) : Submonoid (Poly S N) :=
 theorem monos_mono {I J : Finset (Fin (N + 1))} (h : I ⊆ J) : monos (S := S) I ≤ monos J :=
   Submonoid.closure_mono (Set.image_mono (by exact_mod_cast h))
 
-theorem X_mem_monos {I : Finset (Fin (N + 1))} {i : Fin (N + 1)} (hi : i ∈ I) :
-    (X i : Poly S N) ∈ monos I :=
+theorem X_mem_monos {I : Finset (Fin (N + 1))} {i : Fin (N + 1)} (hi : i ∈ I)
+    : (X i : Poly S N) ∈ monos I :=
   Submonoid.subset_closure ⟨i, by exact_mod_cast hi, rfl⟩
 
-theorem monos_isHomogeneous {I : Finset (Fin (N + 1))} {s : Poly S N} (hs : s ∈ monos I) :
-    ∃ e : ℕ, s.IsHomogeneous e := by
+theorem monos_isHomogeneous {I : Finset (Fin (N + 1))} {s : Poly S N} (hs : s ∈ monos I)
+    : ∃ e : ℕ, s.IsHomogeneous e := by
   induction hs using Submonoid.closure_induction with
   | mem x hx =>
     obtain ⟨i, -, rfl⟩ := hx
     exact ⟨1, isHomogeneous_X S i⟩
-  | one => exact ⟨0, isHomogeneous_one _ _⟩
+  | one =>
+    exact ⟨0, isHomogeneous_one _ _⟩
   | mul x y _ _ hx hy =>
     obtain ⟨a, ha⟩ := hx
     obtain ⟨b, hb⟩ := hy
@@ -51,17 +52,15 @@ end Poly
 section Graded
 
 variable (S : Type u) [CommRing S] (N : ℕ)
-variable (M : Type v) [AddCommGroup M] [Module (Poly S N) M] [Module S M]
-  [IsScalarTower S (Poly S N) M]
+variable
+  (M : Type v) [AddCommGroup M] [Module (Poly S N) M] [Module S M] [IsScalarTower S (Poly S N) M]
 
 structure GradedPMod where
-
   piece : ℤ → Submodule S M
-
   isInternal : DirectSum.IsInternal piece
-
-  smul_mem : ∀ (d : ℕ) (c : ℤ) (p : Poly S N) (m : M), p.IsHomogeneous d → m ∈ piece c →
-    p • m ∈ piece (c + d)
+  smul_mem
+    : ∀ (d : ℕ) (c : ℤ) (p : Poly S N) (m : M),
+      p.IsHomogeneous d → m ∈ piece c → p • m ∈ piece (c + d)
 
 def LocMod (I : Finset (Fin (N + 1))) : Type (max u v) := LocalizedModule (monos (S := S) I) M
 
@@ -84,9 +83,10 @@ instance (I : Finset (Fin (N + 1))) : IsScalarTower S (Poly S N) (LocMod S N M I
 def locRes {I J : Finset (Fin (N + 1))} (h : I ⊆ J) : LocMod S N M I →ₗ[Poly S N] LocMod S N M J :=
   LocalizedModule.liftOfLE (monos I) (monos J) (monos_mono h)
 
-theorem locRes_mk {I J : Finset (Fin (N + 1))} (h : I ⊆ J) (m : M) (s : monos (S := S) I) :
-    locRes (M := M) h (LocalizedModule.mk m s : LocalizedModule (monos (S := S) I) M) =
-      (LocalizedModule.mk m ⟨(s : Poly S N), monos_mono h s.2⟩ : LocalizedModule (monos J) M) := by
+theorem locRes_mk {I J : Finset (Fin (N + 1))} (h : I ⊆ J) (m : M) (s : monos (S := S) I)
+    : locRes (M := M) h (LocalizedModule.mk m s : LocalizedModule (monos (S := S) I) M)
+      = (LocalizedModule.mk m ⟨(s : Poly S N), monos_mono h s.2⟩
+        : LocalizedModule (monos J) M) := by
   rw [IsLocalizedModule.mk_eq_mk', IsLocalizedModule.mk_eq_mk']
   exact IsLocalizedModule.liftOfLE_mk' (monos (S := S) I) (monos J) (monos_mono h)
     (LocalizedModule.mkLinearMap (monos (S := S) I) M) (LocalizedModule.mkLinearMap (monos J) M) m s
@@ -101,30 +101,39 @@ variable {n : ℕ} {U : Finset (Fin n)}
 
 abbrev Idx (U : Finset (Fin n)) (i : ℕ) : Type := {I : Cell U // I.1.card = i + 1}
 
-def face {i : ℕ} (J : Idx U (i + 1)) (j : J.1.1) : Idx U i :=
-  ⟨⟨J.1.1.erase j, by
-      rw [← Finset.card_pos, Finset.card_erase_of_mem j.2, J.2]; omega,
-    (Finset.erase_subset _ _).trans J.1.2.2⟩, by
+def face {i : ℕ} (J : Idx U (i + 1)) (j : J.1.1) : Idx U i := ⟨
+  ⟨
+    J.1.1.erase j,
+    by rw [← Finset.card_pos, Finset.card_erase_of_mem j.2, J.2]; omega,
+    (Finset.erase_subset _ _).trans J.1.2.2
+  ⟩,
+  by
     change (J.1.1.erase j).card = i + 1
-    rw [Finset.card_erase_of_mem j.2, J.2]; rfl⟩
+    rw [Finset.card_erase_of_mem j.2, J.2]
+    rfl
+⟩
 
 theorem face_subset {i : ℕ} (J : Idx U (i + 1)) (j : J.1.1) : (face J j).1.1 ⊆ J.1.1 :=
   Finset.erase_subset _ _
 
 def sgn (J : Finset (Fin n)) (j : Fin n) : ℤ := (-1) ^ (J.filter (· < j)).card
 
-variable {R : Type u} [CommRing R] (G : Cell U → Type v) [∀ I, AddCommGroup (G I)]
-  [∀ I, Module R (G I)] (ρ : ∀ I J : Cell U, I.1 ⊆ J.1 → G I →ₗ[R] G J)
+variable
+  {R : Type u} [CommRing R]
+  (G : Cell U → Type v) [∀ I, AddCommGroup (G I)] [∀ I, Module R (G I)]
+  (ρ : ∀ I J : Cell U, I.1 ⊆ J.1 → G I →ₗ[R] G J)
 
 abbrev Cochain (i : ℕ) : Type v := ∀ I : Idx U i, G I.1
 
-instance (i : ℕ) : AddCommGroup (Cochain G i) := inferInstanceAs (AddCommGroup (∀ I : Idx U i, G I.1))
+instance (i : ℕ) : AddCommGroup (Cochain G i) :=
+  inferInstanceAs (AddCommGroup (∀ I : Idx U i, G I.1))
 instance (i : ℕ) : Module R (Cochain G i) := inferInstanceAs (Module R (∀ I : Idx U i, G I.1))
 
 def d (i : ℕ) : Cochain G i →ₗ[R] Cochain G (i + 1) :=
-  LinearMap.pi fun J : Idx U (i + 1) => ∑ j : J.1.1, sgn J.1.1 j •
-    ((ρ (face J j).1 J.1 (face_subset J j)).comp
-      (LinearMap.proj (R := R) (φ := fun I : Idx U i => G I.1) (face J j)))
+  LinearMap.pi fun J : Idx U (i + 1) =>
+    ∑ j : J.1.1, sgn J.1.1 j •
+      ((ρ (face J j).1 J.1 (face_subset J j)).comp
+        (LinearMap.proj (R := R) (φ := fun I : Idx U i => G I.1) (face J j)))
 
 def bdry : (i : ℕ) → Submodule R (Cochain G i)
   | 0 => ⊥
@@ -138,8 +147,9 @@ instance (i : ℕ) : Module R (H G ρ i) := Submodule.Quotient.module _
 
 section Deg
 
-variable {R' : Type*} [CommRing R'] [∀ I, Module R' (G I)] (deg : ∀ I, Submodule R' (G I))
-  (ρ' : ∀ I J : Cell U, I.1 ⊆ J.1 → G I →ₗ[R'] G J)
+variable
+  {R' : Type*} [CommRing R'] [∀ I, Module R' (G I)]
+  (deg : ∀ I, Submodule R' (G I)) (ρ' : ∀ I J : Cell U, I.1 ⊆ J.1 → G I →ₗ[R'] G J)
 
 def Cdeg (i : ℕ) : Submodule R' (Cochain G i) := Submodule.pi Set.univ fun I : Idx U i => deg I.1
 
@@ -168,41 +178,50 @@ theorem sum_sgn_of_card_two {J : Finset (Fin n)} (hJ : J.card = 2) : ∑ j ∈ J
   rw [Finset.sum_pair hab]
   rcases hab.lt_or_gt with h | h
   · have h1 : ({a, b} : Finset (Fin n)).filter (· < a) = ∅ := by
-      ext z; simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton,
-        Finset.notMem_empty, iff_false, not_and]
+      ext z
+      simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton, Finset.notMem_empty,
+        iff_false, not_and]
       rintro (rfl | rfl) <;> omega
     have h2 : ({a, b} : Finset (Fin n)).filter (· < b) = {a} := by
-      ext z; simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton]
+      ext z
+      simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton]
       constructor
       · rintro ⟨rfl | rfl, hz⟩ <;> [rfl; omega]
       · rintro rfl; exact ⟨Or.inl rfl, h⟩
     simp [sgn, h1, h2]
   · have h1 : ({a, b} : Finset (Fin n)).filter (· < b) = ∅ := by
-      ext z; simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton,
-        Finset.notMem_empty, iff_false, not_and]
+      ext z
+      simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton, Finset.notMem_empty,
+        iff_false, not_and]
       rintro (rfl | rfl) <;> omega
     have h2 : ({a, b} : Finset (Fin n)).filter (· < a) = {b} := by
-      ext z; simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton]
+      ext z
+      simp only [Finset.mem_filter, Finset.mem_insert, Finset.mem_singleton]
       constructor
       · rintro ⟨rfl | rfl, hz⟩ <;> [omega; rfl]
       · rintro rfl; exact ⟨Or.inr rfl, h⟩
     simp [sgn, h1, h2]
 
-variable {R : Type u} [CommRing R] {G : Cell U → Type v} [∀ I, AddCommGroup (G I)]
-  [∀ I, Module R (G I)] {ρ : ∀ I J : Cell U, I.1 ⊆ J.1 → G I →ₗ[R] G J}
+variable
+  {R : Type u} [CommRing R]
+  {G : Cell U → Type v} [∀ I, AddCommGroup (G I)] [∀ I, Module R (G I)]
+  {ρ : ∀ I J : Cell U, I.1 ⊆ J.1 → G I →ₗ[R] G J}
 
-theorem d_apply (i : ℕ) (s : Cochain G i) (J : Idx U (i + 1)) :
-    d G ρ i s J = ∑ j : J.1.1, sgn J.1.1 j • ρ (face J j).1 J.1 (face_subset J j) (s (face J j)) := by
+theorem d_apply (i : ℕ) (s : Cochain G i) (J : Idx U (i + 1))
+    : d G ρ i s J
+      = ∑ j : J.1.1, sgn J.1.1 j • ρ (face J j).1 J.1 (face_subset J j) (s (face J j)) := by
   change (∑ j : J.1.1, sgn J.1.1 j • ((ρ (face J j).1 J.1 (face_subset J j)).comp
-      (LinearMap.proj (R := R) (φ := fun I : Idx U i => G I.1) (face J j)))) s = _
+           (LinearMap.proj (R := R) (φ := fun I : Idx U i => G I.1) (face J j))))
+      s
+    = _
   rw [LinearMap.sum_apply]
   rfl
 
-theorem d_zero_of_compat (v : ∀ I, G I) (hv : ∀ I J h, ρ I J h (v I) = v J) :
-    d G ρ 0 (fun I => v I.1) = 0 := by
+theorem d_zero_of_compat (v : ∀ I, G I) (hv : ∀ I J h, ρ I J h (v I) = v J)
+    : d G ρ 0 (fun I => v I.1) = 0 := by
   funext J
-  have key : ∀ j : J.1.1, ρ (face J j).1 J.1 (face_subset J j) (v (face J j).1) = v J.1 :=
-    fun j => hv _ _ _
+  have key : ∀ j : J.1.1, ρ (face J j).1 J.1 (face_subset J j) (v (face J j).1) = v J.1 := fun j =>
+    hv _ _ _
   rw [d_apply]
   simp only [key]
   rw [← Finset.sum_smul, Finset.sum_coe_sort J.1.1 (fun j => sgn J.1.1 j), sum_sgn_of_card_two J.2,
@@ -211,14 +230,18 @@ theorem d_zero_of_compat (v : ∀ I, G I) (hv : ∀ I J h, ρ I J h (v I) = v J)
 
 section Map
 
-variable {G' : Cell U → Type w} [∀ I, AddCommGroup (G' I)] [∀ I, Module R (G' I)]
+variable
+  {G' : Cell U → Type w} [∀ I, AddCommGroup (G' I)] [∀ I, Module R (G' I)]
   {ρ' : ∀ I J : Cell U, I.1 ⊆ J.1 → G' I →ₗ[R] G' J}
 
 def mapC (φ : ∀ I, G I →ₗ[R] G' I) (i : ℕ) : Cochain G i →ₗ[R] Cochain G' i :=
-  LinearMap.pi fun I : Idx U i => (φ I.1).comp (LinearMap.proj (R := R) (φ := fun I : Idx U i => G I.1) I)
+  LinearMap.pi fun I : Idx U i =>
+    (φ I.1).comp (LinearMap.proj (R := R) (φ := fun I : Idx U i => G I.1) I)
 
-theorem mapC_d (φ : ∀ I, G I →ₗ[R] G' I) (hφ : ∀ I J h m, φ J (ρ I J h m) = ρ' I J h (φ I m))
-    (i : ℕ) (s : Cochain G i) : mapC φ (i + 1) (d G ρ i s) = d G' ρ' i (mapC φ i s) := by
+theorem mapC_d
+    (φ : ∀ I, G I →ₗ[R] G' I) (hφ : ∀ I J h m, φ J (ρ I J h m) = ρ' I J h (φ I m))
+    (i : ℕ) (s : Cochain G i)
+    : mapC φ (i + 1) (d G ρ i s) = d G' ρ' i (mapC φ i s) := by
   funext J
   rw [d_apply]
   change φ J.1 (d G ρ i s J) = _
@@ -230,14 +253,16 @@ theorem mapC_d (φ : ∀ I, G I →ₗ[R] G' I) (hφ : ∀ I J h m, φ J (ρ I J
 
 variable (deg : ∀ I, Submodule R (G I)) (deg' : ∀ I, Submodule R (G' I))
 
-def mapHdeg (φ : ∀ I, G I →ₗ[R] G' I) (hφ : ∀ I J h m, φ J (ρ I J h m) = ρ' I J h (φ I m))
-    (hdeg : ∀ I m, m ∈ deg I → φ I m ∈ deg' I) (i : ℕ) :
-    Hdeg G deg ρ i →ₗ[R] Hdeg G' deg' ρ' i :=
-  Submodule.mapQ _ _ ((mapC φ i).restrict (p := cocyDeg G deg ρ i) (q := cocyDeg G' deg' ρ' i)
-      (fun s hs => by
-        refine ⟨?_, fun I _ => hdeg I.1 _ (hs.2 I (Set.mem_univ _))⟩
-        change d G' ρ' i (mapC φ i s) = 0
-        rw [← mapC_d φ hφ, show d G ρ i s = 0 from hs.1, map_zero]))
+def mapHdeg
+    (φ : ∀ I, G I →ₗ[R] G' I)
+    (hφ : ∀ I J h m, φ J (ρ I J h m) = ρ' I J h (φ I m)) (hdeg : ∀ I m, m ∈ deg I → φ I m ∈ deg' I)
+    (i : ℕ)
+    : Hdeg G deg ρ i →ₗ[R] Hdeg G' deg' ρ' i :=
+  Submodule.mapQ _ _
+    ((mapC φ i).restrict (p := cocyDeg G deg ρ i) (q := cocyDeg G' deg' ρ' i) (fun s hs => by
+      refine ⟨?_, fun I _ => hdeg I.1 _ (hs.2 I (Set.mem_univ _))⟩
+      change d G' ρ' i (mapC φ i s) = 0
+      rw [← mapC_d φ hφ, show d G ρ i s = 0 from hs.1, map_zero]))
     (by
       intro s hs
       cases i with
@@ -245,7 +270,8 @@ def mapHdeg (φ : ∀ I, G I →ₗ[R] G' I) (hφ : ∀ I J h m, φ J (ρ I J h 
         change (s : Cochain G 0) ∈ (⊥ : Submodule R _) at hs
         rw [Submodule.mem_bot] at hs
         change (mapC φ 0 s : Cochain G' 0) ∈ (⊥ : Submodule R _)
-        rw [hs, map_zero]; exact Submodule.zero_mem _
+        rw [hs, map_zero]
+        exact Submodule.zero_mem _
       | succ i =>
         obtain ⟨t, ht, hts⟩ := hs
         refine ⟨mapC φ i t, fun I _ => hdeg I.1 _ (ht I (Set.mem_univ _)), ?_⟩
@@ -260,8 +286,8 @@ end Cech
 section GradedCech
 
 variable {S : Type u} [CommRing S] {N : ℕ}
-variable {M : Type v} [AddCommGroup M] [Module (Poly S N) M] [Module S M]
-  [IsScalarTower S (Poly S N) M]
+variable
+  {M : Type v} [AddCommGroup M] [Module (Poly S N) M] [Module S M] [IsScalarTower S (Poly S N) M]
 
 abbrev StdCell (N : ℕ) : Type := Cell (Finset.univ : Finset (Fin (N + 1)))
 
@@ -272,9 +298,10 @@ def locResS (I J : StdCell N) (h : I.1 ⊆ J.1) : LocMod S N M I.1 →ₗ[S] Loc
   (locRes (M := M) h).restrictScalars S
 
 def degLoc (𝓜 : GradedPMod S N M) (c : ℤ) (I : StdCell N) : Submodule S (LocMod S N M I.1) :=
-  Submodule.span S {z | ∃ (m : M) (s : monos (S := S) I.1) (a : ℤ) (e : ℕ), m ∈ 𝓜.piece a ∧
-    (s : Poly S N).IsHomogeneous e ∧ a - e = c ∧
-    z = (LocalizedModule.mk m s : LocalizedModule (monos (S := S) I.1) M)}
+  Submodule.span S
+    {z | ∃ (m : M) (s : monos (S := S) I.1) (a : ℤ) (e : ℕ), m ∈ 𝓜.piece a ∧
+      (s : Poly S N).IsHomogeneous e ∧ a - e = c ∧
+      z = (LocalizedModule.mk m s : LocalizedModule (monos (S := S) I.1) M)}
 
 def cohom (𝓜 : GradedPMod S N M) (i : ℕ) (c : ℤ) : Type (max u v) :=
   Cech.Hdeg (locSys S N M) (degLoc 𝓜 c) locResS i
@@ -291,57 +318,61 @@ def locMk (I : Finset (Fin (N + 1))) : M →ₗ[Poly S N] LocMod S N M I :=
 def constCochain : M →ₗ[S] Cech.Cochain (locSys S N M) 0 :=
   LinearMap.pi fun I => (locMk M I.1.1).restrictScalars S
 
-theorem constCochain_mem (𝓜 : GradedPMod S N M) (c : ℤ) (m : M) (hm : m ∈ 𝓜.piece c) :
-    constCochain m ∈ Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0 := by
-  refine ⟨?_, fun I _ => Submodule.subset_span ⟨m, 1, c, 0, hm, isHomogeneous_one _ _, by simp, by rfl⟩⟩
+theorem constCochain_mem (𝓜 : GradedPMod S N M) (c : ℤ) (m : M) (hm : m ∈ 𝓜.piece c)
+    : constCochain m ∈ Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0 := by
+  refine
+    ⟨?_, fun I _ => Submodule.subset_span ⟨m, 1, c, 0, hm, isHomogeneous_one _ _, by simp, by rfl⟩⟩
   change Cech.d _ locResS 0 (fun I => (LocalizedModule.mk m 1 : LocalizedModule _ M)) = 0
   refine Cech.d_zero_of_compat (G := locSys S N M)
-    (v := fun I => (LocalizedModule.mk m 1 : LocalizedModule (monos (S := S) I.1) M)) ?_
+    (v := fun I => (LocalizedModule.mk m 1 : LocalizedModule (monos (S := S) I.1) M))
+    ?_
   intro I J h
   change locRes h _ = _
-  rw [locRes_mk]; rfl
+  rw [locRes_mk]
+  rfl
 
 def toH0 (𝓜 : GradedPMod S N M) (c : ℤ) : 𝓜.piece c →ₗ[S] cohom 𝓜 0 c :=
   (Submodule.mkQ _).comp
     ((constCochain.comp (𝓜.piece c).subtype).codRestrict _ fun m => constCochain_mem 𝓜 c m m.2)
 
-variable {M' : Type w} [AddCommGroup M'] [Module (Poly S N) M'] [Module S M']
-  [IsScalarTower S (Poly S N) M']
+variable
+  {M' : Type w}
+  [AddCommGroup M'] [Module (Poly S N) M'] [Module S M'] [IsScalarTower S (Poly S N) M']
 
 structure GradedHom (𝓜 : GradedPMod S N M) (𝓜' : GradedPMod S N M') where
-
   toLin : M →ₗ[Poly S N] M'
-
   map_piece : ∀ (c : ℤ) (m : M), m ∈ 𝓜.piece c → toLin m ∈ 𝓜'.piece c
 
-def locMap (f : M →ₗ[Poly S N] M') (I : Finset (Fin (N + 1))) :
-    LocMod S N M I →ₗ[Poly S N] LocMod S N M' I :=
+def locMap (f : M →ₗ[Poly S N] M') (I : Finset (Fin (N + 1)))
+    : LocMod S N M I →ₗ[Poly S N] LocMod S N M' I :=
   IsLocalizedModule.map (monos I) (LocalizedModule.mkLinearMap (monos (S := S) I) M)
     (LocalizedModule.mkLinearMap (monos (S := S) I) M') f
 
-theorem locMap_mk (f : M →ₗ[Poly S N] M') (I : Finset (Fin (N + 1))) (m : M) (s : monos (S := S) I) :
-    locMap f I (LocalizedModule.mk m s : LocalizedModule (monos (S := S) I) M) =
-      (LocalizedModule.mk (f m) s : LocalizedModule (monos (S := S) I) M') :=
+theorem locMap_mk (f : M →ₗ[Poly S N] M') (I : Finset (Fin (N + 1))) (m : M) (s : monos (S := S) I)
+    : locMap f I (LocalizedModule.mk m s : LocalizedModule (monos (S := S) I) M)
+      = (LocalizedModule.mk (f m) s : LocalizedModule (monos (S := S) I) M') :=
   IsLocalizedModule.map_LocalizedModules _ _ _ _
 
-def cohomMap {𝓜 : GradedPMod S N M} {𝓜' : GradedPMod S N M'} (f : GradedHom 𝓜 𝓜') (i : ℕ)
-    (c : ℤ) : cohom 𝓜 i c →ₗ[S] cohom 𝓜' i c :=
-  Cech.mapHdeg (ρ := locResS) (ρ' := locResS)
-    (degLoc 𝓜 c) (degLoc 𝓜' c) (fun I => (locMap f.toLin I.1).restrictScalars S)
+def cohomMap {𝓜 : GradedPMod S N M} {𝓜' : GradedPMod S N M'} (f : GradedHom 𝓜 𝓜') (i : ℕ) (c : ℤ)
+    : cohom 𝓜 i c →ₗ[S] cohom 𝓜' i c :=
+  Cech.mapHdeg (ρ := locResS) (ρ' := locResS) (degLoc 𝓜 c) (degLoc 𝓜' c)
+    (fun I => (locMap f.toLin I.1).restrictScalars S)
     (fun I J h x => by
       induction x using LocalizedModule.induction_on with
       | h m s =>
         change locMap f.toLin J.1 (locRes h _) = locRes h (locMap f.toLin I.1 _)
         rw [locRes_mk, locMap_mk, locMap_mk, locRes_mk])
     (fun I x hx => by
-      refine Submodule.span_induction (p := fun x _ => (locMap f.toLin I.1).restrictScalars S x ∈
-        degLoc 𝓜' c I) ?_ ?_ ?_ ?_ hx
+      refine Submodule.span_induction
+        (p := fun x _ => (locMap f.toLin I.1).restrictScalars S x ∈ degLoc 𝓜' c I)
+        ?_ ?_ ?_ ?_ hx
       · rintro _ ⟨m, s, a, e, hm, hs, hae, rfl⟩
         refine Submodule.subset_span ⟨f.toLin m, s, a, e, f.map_piece a m hm, hs, hae, ?_⟩
         exact locMap_mk f.toLin I.1 m s
       · simp
       · intro x y _ _ hx hy; simpa using add_mem hx hy
-      · intro r x _ hx; simpa using Submodule.smul_mem _ r hx) i
+      · intro r x _ hx; simpa using Submodule.smul_mem _ r hx)
+    i
 
 end GradedCech
 
@@ -352,8 +383,9 @@ variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω]
 def coneGen {σ : Type*} (y : σ → Ω) : MvPolynomial σ S →ₐ[S] Polynomial Ω :=
   aeval fun v => Polynomial.C (y v) * Polynomial.X
 
-theorem coneGen_of_isHomogeneous {σ : Type*} (y : σ → Ω) {g : MvPolynomial σ S} {d : ℕ}
-    (hg : g.IsHomogeneous d) : coneGen y g = Polynomial.C (aeval y g) * Polynomial.X ^ d := by
+theorem coneGen_of_isHomogeneous
+    {σ : Type*} (y : σ → Ω) {g : MvPolynomial σ S} {d : ℕ} (hg : g.IsHomogeneous d)
+    : coneGen y g = Polynomial.C (aeval y g) * Polynomial.X ^ d := by
   classical
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
@@ -364,17 +396,20 @@ theorem coneGen_of_isHomogeneous {σ : Type*} (y : σ → Ω) {g : MvPolynomial 
     have := hg (mem_support_iff.mp hs)
     simpa [Finsupp.weight_apply, Finsupp.sum] using this
   rw [coneGen, aeval_monomial, aeval_monomial, Polynomial.algebraMap_apply, map_mul]
-  simp only [Finsupp.prod, mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum,
-    map_prod, map_pow]
+  simp only [Finsupp.prod, mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, map_prod,
+    map_pow]
   rw [hdeg, mul_assoc]
 
-theorem coneGen_homogeneousComponent {σ : Type*} (y : σ → Ω) {g : MvPolynomial σ S}
-    (hg : coneGen y g = 0) (d : ℕ) : coneGen y (homogeneousComponent d g) = 0 := by
+theorem coneGen_homogeneousComponent
+    {σ : Type*} (y : σ → Ω) {g : MvPolynomial σ S} (hg : coneGen y g = 0) (d : ℕ)
+    : coneGen y (homogeneousComponent d g) = 0 := by
   classical
   rw [coneGen_of_isHomogeneous y (homogeneousComponent_isHomogeneous d g)]
   by_cases hd : d < g.totalDegree + 1
-  · have hsum : coneGen y g = ∑ i ∈ Finset.range (g.totalDegree + 1),
-        Polynomial.C (aeval y (homogeneousComponent i g)) * Polynomial.X ^ i := by
+  · have hsum
+        : coneGen y g
+          = ∑ i ∈ Finset.range (g.totalDegree + 1),
+            Polynomial.C (aeval y (homogeneousComponent i g)) * Polynomial.X ^ i := by
       conv_lhs => rw [← sum_homogeneousComponent g]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
@@ -382,7 +417,8 @@ theorem coneGen_homogeneousComponent {σ : Type*} (y : σ → Ω) {g : MvPolynom
         coneGen_of_isHomogeneous y (homogeneousComponent_isHomogeneous i g)
     have hc := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p d) hsum
     simp only [hg, Polynomial.coeff_zero, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow,
-      Finset.sum_ite_eq, Finset.mem_range, hd, if_true] at hc
+        Finset.sum_ite_eq, Finset.mem_range, hd, if_true]
+      at hc
     rw [← hc, map_zero, zero_mul]
   · rw [homogeneousComponent_eq_zero d g (by omega), map_zero, map_zero, zero_mul]
 
@@ -398,12 +434,12 @@ theorem primeOf_eq : primeOf (S := S) x = RingHom.ker (cone (S := S) x) := rfl
 
 instance : (primeOf (S := S) x).IsPrime := by rw [primeOf_eq]; exact RingHom.ker_isPrime _
 
-theorem cone_of_isHomogeneous {f : Poly S N} {d : ℕ} (hf : f.IsHomogeneous d) :
-    cone x f = Polynomial.C (aeval x f) * Polynomial.X ^ d :=
+theorem cone_of_isHomogeneous {f : Poly S N} {d : ℕ} (hf : f.IsHomogeneous d)
+    : cone x f = Polynomial.C (aeval x f) * Polynomial.X ^ d :=
   coneGen_of_isHomogeneous x hf
 
-theorem mem_primeOf_of_isHomogeneous {f : Poly S N} {d : ℕ} (hf : f.IsHomogeneous d) :
-    f ∈ primeOf x ↔ aeval x f = 0 := by
+theorem mem_primeOf_of_isHomogeneous {f : Poly S N} {d : ℕ} (hf : f.IsHomogeneous d)
+    : f ∈ primeOf x ↔ aeval x f = 0 := by
   rw [primeOf_eq, RingHom.mem_ker, cone_of_isHomogeneous x hf]
   constructor
   · intro h
@@ -411,10 +447,9 @@ theorem mem_primeOf_of_isHomogeneous {f : Poly S N} {d : ℕ} (hf : f.IsHomogene
     simpa only [Polynomial.coeff_C_mul_X_pow, if_true, Polynomial.coeff_zero] using this
   · intro h; rw [h, map_zero, zero_mul]
 
-theorem homogeneousComponent_mem_primeOf {f : Poly S N} (hf : f ∈ primeOf x) (d : ℕ) :
-    homogeneousComponent d f ∈ primeOf x :=
+theorem homogeneousComponent_mem_primeOf {f : Poly S N} (hf : f ∈ primeOf x) (d : ℕ)
+    : homogeneousComponent d f ∈ primeOf x :=
   coneGen_homogeneousComponent x hf d
-
 
 open NumbersDVR in
 def oneBlock : NumbersDVR.MRing (fun _ : Unit => Fin (N + 1)) S →ₐ[S] Poly S N :=
@@ -423,22 +458,22 @@ def oneBlock : NumbersDVR.MRing (fun _ : Unit => Fin (N + 1)) S →ₐ[S] Poly S
 def primeOfOne : Ideal (NumbersDVR.MRing (fun _ : Unit => Fin (N + 1)) S) :=
   (primeOf (S := S) x).comap (oneBlock (S := S) (N := N))
 
-
 open NumbersDVR in
-theorem isMultiProjPrime_primeOfOne (hx : x ≠ 0) :
-    IsMultiProjPrime (primeOfOne (S := S) x) := by
+theorem isMultiProjPrime_primeOfOne (hx : x ≠ 0) : IsMultiProjPrime (primeOfOne (S := S) x) := by
   refine ⟨Ideal.comap_isPrime _ _, ?_, ?_⟩
   · classical
     intro f hf b
-    have hw : ∀ d : (Σ _ : Unit, Fin (N + 1)) →₀ ℕ,
-        Finsupp.weight (blockWeight (fun _ : Unit => Fin (N + 1))) d = fun _ => d.degree := by
+    have hw
+        : ∀ d : (Σ _ : Unit, Fin (N + 1)) →₀ ℕ,
+          Finsupp.weight (blockWeight (fun _ : Unit => Fin (N + 1))) d = fun _ => d.degree := by
       intro d
       funext u
       rw [Finsupp.weight_apply, Finsupp.degree, Finsupp.sum, Finset.sum_apply]
       refine Finset.sum_congr rfl fun v _ => ?_
       simp [blockWeight]
-    have heq : weightedHomogeneousComponent (blockWeight (fun _ : Unit => Fin (N + 1))) b f =
-        homogeneousComponent (b ()) f := by
+    have heq
+        : weightedHomogeneousComponent (blockWeight (fun _ : Unit => Fin (N + 1))) b f
+          = homogeneousComponent (b ()) f := by
       ext d
       rw [coeff_weightedHomogeneousComponent, coeff_homogeneousComponent, hw d]
       congr 1
@@ -463,11 +498,12 @@ end Cone
 
 section Charts
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  (x : Fin (N + 1) → Ω)
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} (x : Fin (N + 1) → Ω)
 
 def support : Finset (Fin (N + 1)) := by
-  classical exact Finset.univ.filter fun i => x i ≠ 0
+  classical
+  exact Finset.univ.filter fun i => x i ≠ 0
 
 theorem mem_support {i : Fin (N + 1)} : i ∈ support x ↔ x i ≠ 0 := by
   classical
@@ -477,8 +513,8 @@ abbrev Chart : Type := Cell (support x)
 
 variable {x}
 
-theorem eval_ne_zero_of_mem_monos (I : Chart x) {s : Poly S N} (hs : s ∈ monos I.1) :
-    aeval x s ≠ 0 := by
+theorem eval_ne_zero_of_mem_monos (I : Chart x) {s : Poly S N} (hs : s ∈ monos I.1)
+    : aeval x s ≠ 0 := by
   induction hs using Submonoid.closure_induction with
   | mem a ha =>
     obtain ⟨i, hi, rfl⟩ := ha
@@ -489,27 +525,43 @@ theorem eval_ne_zero_of_mem_monos (I : Chart x) {s : Poly S N} (hs : s ∈ monos
 
 variable (S x) in
 def chartRing (I : Chart x) : Subalgebra S Ω where
-  carrier := {a | ∃ (f s : Poly S N) (e : ℕ), s ∈ monos I.1 ∧ f.IsHomogeneous e ∧
-    s.IsHomogeneous e ∧ a = aeval x f / aeval x s}
+  carrier :=
+    {a | ∃ (f s : Poly S N) (e : ℕ), s ∈ monos I.1 ∧ f.IsHomogeneous e ∧
+      s.IsHomogeneous e ∧ a = aeval x f / aeval x s}
   mul_mem' := by
     rintro a b ⟨f, s, e, hs, hf, hse, rfl⟩ ⟨f', s', e', hs', hf', hse', rfl⟩
-    exact ⟨f * f', s * s', e + e', mul_mem hs hs', hf.mul hf', hse.mul hse', by
-      rw [map_mul, map_mul, div_mul_div_comm]⟩
+    exact ⟨
+      f * f',
+      s * s',
+      e + e',
+      mul_mem hs hs',
+      hf.mul hf',
+      hse.mul hse',
+      by rw [map_mul, map_mul, div_mul_div_comm]
+    ⟩
   one_mem' := ⟨1, 1, 0, one_mem _, isHomogeneous_one _ _, isHomogeneous_one _ _, by simp⟩
   add_mem' := by
     rintro a b ⟨f, s, e, hs, hf, hse, rfl⟩ ⟨f', s', e', hs', hf', hse', rfl⟩
-    refine ⟨f * s' + s * f', s * s', e + e', mul_mem hs hs', (hf.mul hse').add (hse.mul hf'),
-      hse.mul hse', ?_⟩
+    refine ⟨
+      f * s' + s * f',
+      s * s',
+      e + e',
+      mul_mem hs hs',
+      (hf.mul hse').add (hse.mul hf'),
+      hse.mul hse',
+      ?_
+    ⟩
     rw [div_add_div _ _ (eval_ne_zero_of_mem_monos I hs) (eval_ne_zero_of_mem_monos I hs')]
     simp only [map_add (f := _), map_mul]
   zero_mem' := ⟨0, 1, 0, one_mem _, isHomogeneous_zero _ _ _, isHomogeneous_one _ _, by simp⟩
-  algebraMap_mem' r := ⟨C r, 1, 0, one_mem _, isHomogeneous_C _ _, isHomogeneous_one _ _, by
-    simp [aeval_C]⟩
+  algebraMap_mem' r :=
+    ⟨C r, 1, 0, one_mem _, isHomogeneous_C _ _, isHomogeneous_one _ _, by simp [aeval_C]⟩
 
 variable (S x) in
 def twistMod (c : ℤ) (I : Chart x) : Submodule (chartRing S x I) Ω :=
-  Submodule.span _ {a | ∃ (f s : Poly S N) (e e' : ℕ), s ∈ monos I.1 ∧ f.IsHomogeneous e' ∧
-    s.IsHomogeneous e ∧ (e' : ℤ) = e + c ∧ a = aeval x f / aeval x s}
+  Submodule.span _
+    {a | ∃ (f s : Poly S N) (e e' : ℕ), s ∈ monos I.1 ∧ f.IsHomogeneous e' ∧
+      s.IsHomogeneous e ∧ (e' : ℤ) = e + c ∧ a = aeval x f / aeval x s}
 
 end Charts
 
@@ -527,8 +579,8 @@ end Dim
 
 section Families
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω}
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
 theorem chartRing_mono {I J : Chart x} (h : I.1 ⊆ J.1) : chartRing S x I ≤ chartRing S x J :=
   fun _ ⟨f, s, e, hs, hf, hse, ha⟩ => ⟨f, s, e, monos_mono h hs, hf, hse, ha⟩
@@ -538,25 +590,25 @@ def chartIncl {I J : Chart x} (h : I.1 ⊆ J.1) : chartRing S x I →ₐ[S] char
 
 variable (S x) in
 structure Family where
-
   F : Chart x → Type v
   [grp : ∀ I, AddCommGroup (F I)]
   [modA : ∀ I, Module (chartRing S x I) (F I)]
   [modS : ∀ I, Module S (F I)]
   [tower : ∀ I, IsScalarTower S (chartRing S x I) (F I)]
-
   res : ∀ I J : Chart x, I.1 ⊆ J.1 → F I →ₗ[S] F J
-  res_smul : ∀ (I J : Chart x) (h : I.1 ⊆ J.1) (a : chartRing S x I) (m : F I),
-    res I J h (a • m) = chartIncl h a • res I J h m
+  res_smul
+    : ∀ (I J : Chart x) (h : I.1 ⊆ J.1) (a : chartRing S x I) (m : F I),
+      res I J h (a • m) = chartIncl h a • res I J h m
   res_self : ∀ (I : Chart x) (m : F I), res I I subset_rfl m = m
-  res_comp : ∀ (I J K : Chart x) (h : I.1 ⊆ J.1) (h' : J.1 ⊆ K.1) (m : F I),
-    res J K h' (res I J h m) = res I K (h.trans h') m
-
-  exists_smul_eq_res : ∀ (I J : Chart x) (h : I.1 ⊆ J.1) (y : F J), ∃ (a : chartRing S x I)
-    (m : F I), IsUnit (chartIncl h a) ∧ chartIncl h a • y = res I J h m
-
-  exists_smul_eq_zero : ∀ (I J : Chart x) (h : I.1 ⊆ J.1) (m : F I), res I J h m = 0 →
-    ∃ a : chartRing S x I, IsUnit (chartIncl h a) ∧ a • m = 0
+  res_comp
+    : ∀ (I J K : Chart x) (h : I.1 ⊆ J.1) (h' : J.1 ⊆ K.1) (m : F I),
+      res J K h' (res I J h m) = res I K (h.trans h') m
+  exists_smul_eq_res
+    : ∀ (I J : Chart x) (h : I.1 ⊆ J.1) (y : F J), ∃ (a : chartRing S x I) (m : F I),
+      IsUnit (chartIncl h a) ∧ chartIncl h a • y = res I J h m
+  exists_smul_eq_zero
+    : ∀ (I J : Chart x) (h : I.1 ⊆ J.1) (m : F I),
+      res I J h m = 0 → ∃ a : chartRing S x I, IsUnit (chartIncl h a) ∧ a • m = 0
 
 attribute [instance] Family.grp Family.modA Family.modS Family.tower
 
@@ -566,7 +618,6 @@ variable (E : Type v) [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower
 
 variable (S x) in
 structure SubSystem where
-
   sub : ∀ I : Chart x, Submodule (chartRing S x I) E
   mono : ∀ (I J : Chart x), I.1 ⊆ J.1 → ∀ y, y ∈ sub I → y ∈ sub J
 
@@ -594,8 +645,10 @@ def Generated (F : SubSystem S x E) : Prop :=
 def twist (F : SubSystem S x E) (Q : SubSystem S x Ω) : SubSystem S x E where
   sub I := Submodule.span _ {z | ∃ q ∈ Q.sub I, ∃ y ∈ F.sub I, z = q • y}
   mono I J h z hz := by
-    refine Submodule.span_induction (p := fun z _ => z ∈ Submodule.span (chartRing S x J)
-      {z | ∃ q ∈ Q.sub J, ∃ y ∈ F.sub J, z = q • y}) ?_ ?_ ?_ ?_ hz
+    refine Submodule.span_induction
+      (p := fun z _ =>
+        z ∈ Submodule.span (chartRing S x J) {z | ∃ q ∈ Q.sub J, ∃ y ∈ F.sub J, z = q • y})
+      ?_ ?_ ?_ ?_ hz
     · rintro _ ⟨q, hq, y, hy, rfl⟩
       exact Submodule.subset_span ⟨q, Q.mono I J h q hq, y, F.mono I J h y hy, rfl⟩
     · exact Submodule.zero_mem _
@@ -623,8 +676,9 @@ def SubSystem.pow (Q : SubSystem S x Ω) : ℕ → SubSystem S x Ω
 
 variable (S x) in
 structure SubFamily extends SubSystem S x E where
-  mem_iff : ∀ (I J : Chart x) (h : I.1 ⊆ J.1) (y : E), y ∈ sub J ↔
-    ∃ a : chartRing S x I, IsUnit (chartIncl h a) ∧ (a : Ω) • y ∈ sub I
+  mem_iff
+    : ∀ (I J : Chart x) (h : I.1 ⊆ J.1) (y : E),
+      y ∈ sub J ↔ ∃ a : chartRing S x I, IsUnit (chartIncl h a) ∧ (a : Ω) • y ∈ sub I
 
 variable (S x) in
 structure LineBundle extends SubFamily S x Ω where
@@ -632,20 +686,25 @@ structure LineBundle extends SubFamily S x Ω where
   invertible : ∀ I, ∃ Q' : Submodule (chartRing S x I) Ω, sub I * Q' = 1
 
 structure FinGradedSub where
-
   piece : ℤ → Submodule S E
-  smul_mem : ∀ (d : ℕ) (c : ℤ) (f : Poly S N) (m : E), f.IsHomogeneous d → m ∈ piece c →
-    aeval x f • m ∈ piece (c + d)
-
-  fg : ∃ (n : ℕ) (deg : Fin n → ℤ) (gen : Fin n → E), (∀ j, gen j ∈ piece (deg j)) ∧
-    ∀ c, piece c ≤ Submodule.span S {z | ∃ (j : Fin n) (f : Poly S N) (e : ℕ),
-      f.IsHomogeneous e ∧ (e : ℤ) + deg j = c ∧ z = aeval x f • gen j}
+  smul_mem
+    : ∀ (d : ℕ) (c : ℤ) (f : Poly S N) (m : E),
+      f.IsHomogeneous d → m ∈ piece c → aeval x f • m ∈ piece (c + d)
+  fg
+    : ∃ (n : ℕ) (deg : Fin n → ℤ) (gen : Fin n → E),
+      (∀ j, gen j ∈ piece (deg j))
+        ∧ ∀ c,
+          piece c
+            ≤ Submodule.span S
+              {z | ∃ (j : Fin n) (f : Poly S N) (e : ℕ),
+                f.IsHomogeneous e ∧ (e : ℤ) + deg j = c ∧ z = aeval x f • gen j}
 
 variable {E} in
-def FinGradedSub.tilde (M : FinGradedSub (S := S) (x := x) E) (c : ℤ) (I : Chart x) :
-    Submodule (chartRing S x I) E :=
-  Submodule.span _ {y | ∃ (m : E) (s : Poly S N) (a : ℤ) (e : ℕ), s ∈ monos I.1 ∧
-    s.IsHomogeneous e ∧ m ∈ M.piece a ∧ a - e = c ∧ y = (aeval x s)⁻¹ • m}
+def FinGradedSub.tilde (M : FinGradedSub (S := S) (x := x) E) (c : ℤ) (I : Chart x)
+    : Submodule (chartRing S x I) E :=
+  Submodule.span _
+    {y | ∃ (m : E) (s : Poly S N) (a : ℤ) (e : ℕ), s ∈ monos I.1 ∧
+      s.IsHomogeneous e ∧ m ∈ M.piece a ∧ a - e = c ∧ y = (aeval x s)⁻¹ • m}
 
 variable {E} in
 def SubSystem.gam (F : SubSystem S x E) (c : ℤ) : Submodule S E := (F.twist (twistSys S x c)).secs
@@ -656,8 +715,8 @@ section Examples
 
 variable {S : Type u} [CommRing S] {N : ℕ}
 
-theorem isWeightedHomogeneous_int_of_isHomogeneous {p : Poly S N} {d : ℕ} (hp : p.IsHomogeneous d) :
-    IsWeightedHomogeneous (fun _ => (1 : ℤ)) p (d : ℤ) := by
+theorem isWeightedHomogeneous_int_of_isHomogeneous {p : Poly S N} {d : ℕ} (hp : p.IsHomogeneous d)
+    : IsWeightedHomogeneous (fun _ => (1 : ℤ)) p (d : ℤ) := by
   intro s hs
   have := hp hs
   simp only [Finsupp.weight_apply, Finsupp.sum, Pi.one_apply, smul_eq_mul, mul_one] at this ⊢
@@ -680,13 +739,13 @@ end Examples
 
 section ChartFacts
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω}
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
 theorem chartRing_smul_def {I : Chart x} (a : chartRing S x I) (z : Ω) : a • z = (a : Ω) * z := rfl
 
-theorem twistMod_eq_span (c : ℤ) (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1) :
-    twistMod S x c I = Submodule.span _ {x i ^ c} := by
+theorem twistMod_eq_span (c : ℤ) (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1)
+    : twistMod S x c I = Submodule.span _ {x i ^ c} := by
   have hxi : x i ≠ 0 := (mem_support x).mp (I.2.2 hi)
   apply le_antisymm
   · rw [twistMod, Submodule.span_le]
@@ -695,36 +754,88 @@ theorem twistMod_eq_span (c : ℤ) (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I
     rw [SetLike.mem_coe, Submodule.mem_span_singleton]
     obtain ⟨n, rfl | rfl⟩ := Int.eq_nat_or_neg c
     · have he : e' = e + n := by omega
-      refine ⟨⟨aeval x f / aeval x (s * X i ^ n), f, s * X i ^ n, e',
-        mul_mem hs (pow_mem (X_mem_monos hi) n), hf, he ▸ hse.mul (isHomogeneous_X_pow i n), rfl⟩, ?_⟩
+      refine ⟨
+        ⟨
+          aeval x f / aeval x (s * X i ^ n),
+          f,
+          s * X i ^ n,
+          e',
+          mul_mem hs (pow_mem (X_mem_monos hi) n),
+          hf,
+          he ▸ hse.mul (isHomogeneous_X_pow i n),
+          rfl
+        ⟩,
+        ?_
+      ⟩
       rw [chartRing_smul_def]
       simp only [map_mul, map_pow, aeval_X, zpow_natCast]
       field_simp
     · have he : e = e' + n := by omega
-      refine ⟨⟨aeval x (f * X i ^ n) / aeval x s, f * X i ^ n, s, e, hs,
-        he ▸ hf.mul (isHomogeneous_X_pow i n), hse, rfl⟩, ?_⟩
+      refine ⟨
+        ⟨
+          aeval x (f * X i ^ n) / aeval x s,
+          f * X i ^ n,
+          s,
+          e,
+          hs,
+          he ▸ hf.mul (isHomogeneous_X_pow i n),
+          hse,
+          rfl
+        ⟩,
+        ?_
+      ⟩
       rw [chartRing_smul_def]
       simp only [map_mul, map_pow, aeval_X, zpow_neg, zpow_natCast]
       field_simp
   · rw [Submodule.span_le, Set.singleton_subset_iff]
     obtain ⟨n, rfl | rfl⟩ := Int.eq_nat_or_neg c
-    · exact Submodule.subset_span ⟨X i ^ n, 1, 0, n, one_mem _, isHomogeneous_X_pow i n,
-        isHomogeneous_one _ _, by simp, by simp⟩
-    · exact Submodule.subset_span ⟨1, X i ^ n, n, 0, pow_mem (X_mem_monos hi) n,
-        isHomogeneous_one _ _, isHomogeneous_X_pow i n, by simp, by simp [zpow_neg]⟩
+    · exact Submodule.subset_span ⟨
+        X i ^ n,
+        1,
+        0,
+        n,
+        one_mem _,
+        isHomogeneous_X_pow i n,
+        isHomogeneous_one _ _,
+        by simp,
+        by simp
+      ⟩
+    · exact Submodule.subset_span ⟨
+        1,
+        X i ^ n,
+        n,
+        0,
+        pow_mem (X_mem_monos hi) n,
+        isHomogeneous_one _ _,
+        isHomogeneous_X_pow i n,
+        by simp,
+        by simp [zpow_neg]
+      ⟩
 
-theorem exists_isUnit_mul_mem {I J : Chart x} (h : I.1 ⊆ J.1) (b : chartRing S x J) :
-    ∃ a : chartRing S x I, IsUnit (chartIncl h a) ∧ (a : Ω) * b ∈ chartRing S x I := by
+theorem exists_isUnit_mul_mem {I J : Chart x} (h : I.1 ⊆ J.1) (b : chartRing S x J)
+    : ∃ a : chartRing S x I, IsUnit (chartIncl h a) ∧ (a : Ω) * b ∈ chartRing S x I := by
   obtain ⟨f, s, e, hs, hf, hse, hb⟩ := b.2
   obtain ⟨i, hi⟩ := I.2.1
   have hxi : x i ≠ 0 := (mem_support x).mp (I.2.2 hi)
   have hs0 := eval_ne_zero_of_mem_monos J hs
-  have hX0 : aeval x (X i ^ e : Poly S N) ≠ 0 := by
-    rw [map_pow, aeval_X]; exact pow_ne_zero _ hxi
-  refine ⟨⟨aeval x s / aeval x (X i ^ e), s, X i ^ e, e, pow_mem (X_mem_monos hi) e, hse,
-    isHomogeneous_X_pow i e, rfl⟩, ?_, ?_⟩
+  have hX0 : aeval x (X i ^ e : Poly S N) ≠ 0 := by rw [map_pow, aeval_X]; exact pow_ne_zero _ hxi
+  refine ⟨
+    ⟨
+      aeval x s / aeval x (X i ^ e),
+      s,
+      X i ^ e,
+      e,
+      pow_mem (X_mem_monos hi) e,
+      hse,
+      isHomogeneous_X_pow i e,
+      rfl
+    ⟩,
+    ?_,
+    ?_
+  ⟩
   · rw [isUnit_iff_exists_inv]
-    refine ⟨⟨aeval x (X i ^ e) / aeval x s, X i ^ e, s, e, hs, isHomogeneous_X_pow i e, hse, rfl⟩, ?_⟩
+    refine
+      ⟨⟨aeval x (X i ^ e) / aeval x s, X i ^ e, s, e, hs, isHomogeneous_X_pow i e, hse, rfl⟩, ?_⟩
     apply Subtype.ext
     change aeval x s / aeval x (X i ^ e) * (aeval x (X i ^ e) / aeval x s) = 1
     field_simp
@@ -734,44 +845,45 @@ theorem exists_isUnit_mul_mem {I J : Chart x} (h : I.1 ⊆ J.1) (b : chartRing S
     field_simp
 
 variable (S x) in
-def twistBundle (c : ℤ) : LineBundle S x :=
-  { twistSys S x c with
-    mem_iff := fun I J h y => by
-      obtain ⟨i, hi⟩ := I.2.1
-      constructor
-      · intro hy
-        change y ∈ twistMod S x c J at hy
-        rw [twistMod_eq_span c J (h hi), Submodule.mem_span_singleton] at hy
-        obtain ⟨b, rfl⟩ := hy
-        obtain ⟨a, ha, hab⟩ := exists_isUnit_mul_mem h b
-        refine ⟨a, ha, ?_⟩
-        change _ ∈ twistMod S x c I
-        rw [twistMod_eq_span c I hi, Submodule.mem_span_singleton]
-        refine ⟨⟨_, hab⟩, ?_⟩
-        rw [chartRing_smul_def, chartRing_smul_def, smul_eq_mul, mul_assoc]
-      · rintro ⟨a, ⟨u, hu⟩, hay⟩
-        have hJ := (twistSys S x c).mono I J h _ hay
-        have hinv : ((↑u⁻¹ : chartRing S x J) : Ω) * (a : Ω) = 1 := by
-          have := congrArg Subtype.val (Units.inv_mul u)
-          rw [hu] at this
-          exact this
-        have hy : y = (↑u⁻¹ : chartRing S x J) • ((a : Ω) • y) := by
-          rw [chartRing_smul_def, smul_eq_mul, ← mul_assoc, hinv, one_mul]
-        rw [hy]
-        exact Submodule.smul_mem _ _ hJ
-    fg := fun I => by
-      obtain ⟨i, hi⟩ := I.2.1
-      change (twistMod S x c I).FG
-      rw [twistMod_eq_span c I hi]
-      exact Submodule.fg_span_singleton _
-    invertible := fun I => by
-      obtain ⟨i, hi⟩ := I.2.1
-      have hxi : x i ≠ 0 := (mem_support x).mp (I.2.2 hi)
-      refine ⟨twistMod S x (-c) I, ?_⟩
-      change twistMod S x c I * twistMod S x (-c) I = 1
-      rw [twistMod_eq_span c I hi, twistMod_eq_span (-c) I hi, Submodule.span_mul_span,
-        Set.singleton_mul_singleton, ← zpow_add₀ hxi, add_neg_cancel, zpow_zero,
-        Submodule.one_eq_span] }
+def twistBundle (c : ℤ) : LineBundle S x := {
+  twistSys S x c with
+  mem_iff := fun I J h y => by
+    obtain ⟨i, hi⟩ := I.2.1
+    constructor
+    · intro hy
+      change y ∈ twistMod S x c J at hy
+      rw [twistMod_eq_span c J (h hi), Submodule.mem_span_singleton] at hy
+      obtain ⟨b, rfl⟩ := hy
+      obtain ⟨a, ha, hab⟩ := exists_isUnit_mul_mem h b
+      refine ⟨a, ha, ?_⟩
+      change _ ∈ twistMod S x c I
+      rw [twistMod_eq_span c I hi, Submodule.mem_span_singleton]
+      refine ⟨⟨_, hab⟩, ?_⟩
+      rw [chartRing_smul_def, chartRing_smul_def, smul_eq_mul, mul_assoc]
+    · rintro ⟨a, ⟨u, hu⟩, hay⟩
+      have hJ := (twistSys S x c).mono I J h _ hay
+      have hinv : ((↑u⁻¹ : chartRing S x J) : Ω) * (a : Ω) = 1 := by
+        have := congrArg Subtype.val (Units.inv_mul u)
+        rw [hu] at this
+        exact this
+      have hy : y = (↑u⁻¹ : chartRing S x J) • ((a : Ω) • y) := by
+        rw [chartRing_smul_def, smul_eq_mul, ← mul_assoc, hinv, one_mul]
+      rw [hy]
+      exact Submodule.smul_mem _ _ hJ
+  fg := fun I => by
+    obtain ⟨i, hi⟩ := I.2.1
+    change (twistMod S x c I).FG
+    rw [twistMod_eq_span c I hi]
+    exact Submodule.fg_span_singleton _
+  invertible := fun I => by
+    obtain ⟨i, hi⟩ := I.2.1
+    have hxi : x i ≠ 0 := (mem_support x).mp (I.2.2 hi)
+    refine ⟨twistMod S x (-c) I, ?_⟩
+    change twistMod S x c I * twistMod S x (-c) I = 1
+    rw [twistMod_eq_span c I hi, twistMod_eq_span (-c) I hi, Submodule.span_mul_span,
+      Set.singleton_mul_singleton, ← zpow_add₀ hxi, add_neg_cancel, zpow_zero,
+      Submodule.one_eq_span]
+}
 
 end ChartFacts
 
@@ -779,22 +891,17 @@ section MoreObjects
 
 variable {S : Type u} [CommRing S] {N : ℕ}
 
-variable {M : Type v} [AddCommGroup M] [Module (Poly S N) M] [Module S M]
-  [IsScalarTower S (Poly S N) M]
+variable
+  {M : Type v} [AddCommGroup M] [Module (Poly S N) M] [Module S M] [IsScalarTower S (Poly S N) M]
 
 def H0tail (𝓜 : GradedPMod S N M) (c₁ : ℤ) : Submodule S (Cech.Cochain (locSys S N M) 0) :=
   ⨆ (c : ℤ) (_ : c₁ ≤ c), Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0
 
 structure PrimeFilt (𝓜 : GradedPMod S N M) where
-
   n : ℕ
-
   step : Fin (n + 1) → Submodule (Poly S N) M
-
   gen : Fin n → M
-
   deg : Fin n → ℤ
-
   prime : Fin n → Ideal (Poly S N)
   step_zero : step 0 = ⊥
   step_last : step (Fin.last n) = ⊤
@@ -810,17 +917,26 @@ variable {Ω : Type w} [Field Ω] [Algebra S Ω] {x : Fin (N + 1) → Ω}
 def singleChart {j : Fin (N + 1)} (hj : x j ≠ 0) : Chart x :=
   ⟨{j}, Finset.singleton_nonempty j, Finset.singleton_subset_iff.mpr ((mem_support x).mpr hj)⟩
 
-def ratio {j : Fin (N + 1)} (hj : x j ≠ 0) (i : Fin (N + 1)) : chartRing S x (singleChart hj) :=
-  ⟨x i / x j, X i, X j, 1, X_mem_monos (Finset.mem_singleton_self j), isHomogeneous_X S i,
-    isHomogeneous_X S j, by simp⟩
+def ratio {j : Fin (N + 1)} (hj : x j ≠ 0) (i : Fin (N + 1)) : chartRing S x (singleChart hj) := ⟨
+  x i / x j,
+  X i,
+  X j,
+  1,
+  X_mem_monos (Finset.mem_singleton_self j),
+  isHomogeneous_X S i,
+  isHomogeneous_X S j,
+  by simp
+⟩
 
-def chartPrime (pp : Ideal (Poly S N)) {j : Fin (N + 1)} (hj : x j ≠ 0) :
-    Ideal (chartRing S x (singleChart hj)) :=
-  Ideal.span {a | ∃ (f s : Poly S N) (e : ℕ), f ∈ pp ∧ s ∈ monos {j} ∧ f.IsHomogeneous e ∧
-    s.IsHomogeneous e ∧ (a : Ω) = aeval x f / aeval x s}
+def chartPrime (pp : Ideal (Poly S N)) {j : Fin (N + 1)} (hj : x j ≠ 0)
+    : Ideal (chartRing S x (singleChart hj)) :=
+  Ideal.span
+    {a | ∃ (f s : Poly S N) (e : ℕ), f ∈ pp ∧ s ∈ monos {j} ∧ f.IsHomogeneous e ∧
+      s.IsHomogeneous e ∧ (a : Ω) = aeval x f / aeval x s}
 
-def liftChart {K' : Type w} [Field K'] {y : Fin (N + 1) → K'} (hxy : ∀ i, y i ≠ 0 → x i ≠ 0)
-    (I : Chart y) : Chart x :=
+def liftChart
+    {K' : Type w} [Field K'] {y : Fin (N + 1) → K'} (hxy : ∀ i, y i ≠ 0 → x i ≠ 0) (I : Chart y)
+    : Chart x :=
   ⟨I.1, I.2.1, fun i hi => (mem_support x).mpr (hxy i ((mem_support y).mp (I.2.2 hi)))⟩
 
 def xProd (I : Chart x) : Ω := ∏ i ∈ I.1, x i
@@ -835,35 +951,40 @@ def ampleBase {r : ℕ} (h : Fin (r + 1) → Ω) (j : Fin (r + 1)) : Subalgebra 
 
 variable (S x) in
 structure AmpleData (H : LineBundle S x) where
-
   m : ℕ
   m_pos : 0 < m
-
   r : ℕ
-
   h : Fin (r + 1) → Ω
   mem_secs : ∀ j, h j ∈ (H.pow m).secs
   generates : ∀ I, Submodule.span (chartRing S x I) (Set.range h) = (H.pow m).sub I
-  finite : ∀ j, h j ≠ 0 → ∃ t : Finset Ω,
-    ampleRing H.toSubSystem m (h j) ⊆ Submodule.span (ampleBase (S := S) h j) (t : Set Ω)
-  affine : ∀ j, h j ≠ 0 → ∃ (n : ℕ) (a b : Fin n → Ω) (J : Fin n → Chart x),
-    (∀ k, a k ∈ ampleRing H.toSubSystem m (h j)) ∧ (∀ k, b k ∈ ampleRing H.toSubSystem m (h j)) ∧
-    ∑ k, a k * b k = 1 ∧ ∀ (k : Fin n) (I : Chart x), ∃ e : ℕ,
-      b k ^ e * (xProd I ^ (J k).1.card / xProd (J k) ^ I.1.card) ∈ ampleChart H.toSubSystem m (h j) I
+  finite
+    : ∀ j,
+      h j ≠ 0
+        → ∃ t : Finset Ω,
+          ampleRing H.toSubSystem m (h j) ⊆ Submodule.span (ampleBase (S := S) h j) (t : Set Ω)
+  affine
+    : ∀ j,
+      h j ≠ 0
+        → ∃ (n : ℕ) (a b : Fin n → Ω) (J : Fin n → Chart x),
+          (∀ k, a k ∈ ampleRing H.toSubSystem m (h j))
+            ∧ (∀ k, b k ∈ ampleRing H.toSubSystem m (h j)) ∧ ∑ k, a k * b k = 1
+            ∧ ∀ (k : Fin n) (I : Chart x), ∃ e : ℕ,
+              b k ^ e * (xProd I ^ (J k).1.card / xProd (J k) ^ I.1.card)
+                ∈ ampleChart H.toSubSystem m (h j) I
 
 end MoreObjects
 
 section Inhabitants
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω}
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
 theorem mem_twistMod_one (I : Chart x) (j : Fin (N + 1)) : x j ∈ twistMod S x 1 I :=
-  Submodule.subset_span ⟨X j, 1, 0, 1, one_mem _, isHomogeneous_X S j, isHomogeneous_one _ _,
-    by simp, by simp⟩
+  Submodule.subset_span
+    ⟨X j, 1, 0, 1, one_mem _, isHomogeneous_X S j, isHomogeneous_one _ _, by simp, by simp⟩
 
-theorem span_range_eq_twistMod_one (I : Chart x) :
-    Submodule.span (chartRing S x I) (Set.range x) = twistMod S x 1 I := by
+theorem span_range_eq_twistMod_one (I : Chart x)
+    : Submodule.span (chartRing S x I) (Set.range x) = twistMod S x 1 I := by
   obtain ⟨i, hi⟩ := I.2.1
   apply le_antisymm
   · rw [Submodule.span_le]
@@ -895,15 +1016,15 @@ end Generic
 
 section AmpleExample
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω}
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
 theorem one_mem_twistMod_zero (I : Chart x) : (1 : Ω) ∈ twistMod S x 0 I :=
-  Submodule.subset_span ⟨1, 1, 0, 0, one_mem _, isHomogeneous_one _ _, isHomogeneous_one _ _,
-    by simp, by simp⟩
+  Submodule.subset_span
+    ⟨1, 1, 0, 0, one_mem _, isHomogeneous_one _ _, isHomogeneous_one _ _, by simp, by simp⟩
 
-theorem pow_twistSys_one_le (n : ℕ) (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1) :
-    ((twistSys S x 1).pow n).sub I ≤ Submodule.span _ {x i ^ n} := by
+theorem pow_twistSys_one_le (n : ℕ) (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1)
+    : ((twistSys S x 1).pow n).sub I ≤ Submodule.span _ {x i ^ n} := by
   induction n with
   | zero =>
     change twistMod S x 0 I ≤ _
@@ -921,8 +1042,8 @@ theorem pow_twistSys_one_le (n : ℕ) (I : Chart x) {i : Fin (N + 1)} (hi : i �
     simp only [chartRing_smul_def, smul_eq_mul, Subalgebra.coe_mul, pow_succ]
     ring
 
-theorem prod_mem_pow_twistSys_one (I : Chart x) (T : Finset (Fin (N + 1))) :
-    ∏ i ∈ T, x i ∈ ((twistSys S x 1).pow T.card).sub I := by
+theorem prod_mem_pow_twistSys_one (I : Chart x) (T : Finset (Fin (N + 1)))
+    : ∏ i ∈ T, x i ∈ ((twistSys S x 1).pow T.card).sub I := by
   classical
   induction T using Finset.induction_on with
   | empty => exact one_mem_twistMod_zero I
@@ -930,13 +1051,13 @@ theorem prod_mem_pow_twistSys_one (I : Chart x) (T : Finset (Fin (N + 1))) :
     rw [Finset.prod_insert ha, Finset.card_insert_of_notMem ha]
     exact Submodule.subset_span ⟨x a, mem_twistMod_one I a, _, ih, rfl⟩
 
-theorem mem_pow_one_twistSys_one (I : Chart x) (j : Fin (N + 1)) :
-    x j ∈ ((twistSys S x 1).pow 1).sub I :=
-  Submodule.subset_span ⟨x j, mem_twistMod_one I j, 1, one_mem_twistMod_zero I, by
-    rw [smul_eq_mul, mul_one]⟩
+theorem mem_pow_one_twistSys_one (I : Chart x) (j : Fin (N + 1))
+    : x j ∈ ((twistSys S x 1).pow 1).sub I :=
+  Submodule.subset_span
+    ⟨x j, mem_twistMod_one I j, 1, one_mem_twistMod_zero I, by rw [smul_eq_mul, mul_one]⟩
 
-theorem aeval_div_of_isHomogeneous {f : Poly S N} {e : ℕ} (hf : f.IsHomogeneous e) (j : Fin (N + 1)) :
-    aeval (fun l => x l / x j) f = aeval x f / x j ^ e := by
+theorem aeval_div_of_isHomogeneous {f : Poly S N} {e : ℕ} (hf : f.IsHomogeneous e) (j : Fin (N + 1))
+    : aeval (fun l => x l / x j) f = aeval x f / x j ^ e := by
   classical
   conv_lhs => rw [f.as_sum]
   conv_rhs => rw [f.as_sum]
@@ -950,17 +1071,21 @@ theorem aeval_div_of_isHomogeneous {f : Poly S N} {e : ℕ} (hf : f.IsHomogeneou
   simp only [Finsupp.prod, div_pow, Finset.prod_div_distrib, Finset.prod_pow_eq_pow_sum, hdeg]
   ring
 
-theorem mem_ampleBase_of_mem_chartRing {j : Fin (N + 1)} (hj : x j ≠ 0) {a : Ω}
-    (ha : a ∈ chartRing S x (singleChart hj)) : a ∈ ampleBase (S := S) x j := by
+theorem mem_ampleBase_of_mem_chartRing
+    {j : Fin (N + 1)} (hj : x j ≠ 0) {a : Ω} (ha : a ∈ chartRing S x (singleChart hj))
+    : a ∈ ampleBase (S := S) x j := by
   have := (algebraMap S Ω).domain_nontrivial
   obtain ⟨f, s, e, hs, hf, hse, rfl⟩ := ha
   have hs' : s ∈ Submonoid.closure {(X j : Poly S N)} := by
-    have : ((fun i => (X i : Poly S N)) '' ((({j} : Finset (Fin (N + 1))) : Set (Fin (N + 1))))) =
-        {X j} := by simp
-    rw [← this]; exact hs
+    have : ((fun i => (X i : Poly S N)) '' ((({j} : Finset (Fin (N + 1))) : Set (Fin (N + 1)))))
+        = {X j} := by
+      simp
+    rw [← this]
+    exact hs
   obtain ⟨m, rfl⟩ := Submonoid.mem_closure_singleton.mp hs'
-  have hme : e = m := hse.inj_right (isHomogeneous_X_pow j m) (by
-    rw [X_pow_eq_monomial, Ne, monomial_eq_zero]; exact one_ne_zero)
+  have hme : e = m :=
+    hse.inj_right (isHomogeneous_X_pow j m)
+      (by rw [X_pow_eq_monomial, Ne, monomial_eq_zero]; exact one_ne_zero)
   subst hme
   rw [map_pow, aeval_X, ← aeval_div_of_isHomogeneous hf j, ampleBase,
     Algebra.adjoin_range_eq_range_aeval]
@@ -990,8 +1115,9 @@ def twistAmple : AmpleData S x (twistBundle S x 1) where
     have ha' := Set.mem_iInter.mp ha (singleChart hj)
     obtain ⟨n, hn⟩ := ha'
     rw [one_mul] at hn
-    obtain ⟨b, hb⟩ := Submodule.mem_span_singleton.mp
-      (pow_twistSys_one_le n (singleChart hj) (Finset.mem_singleton_self j) hn)
+    obtain ⟨b, hb⟩ :=
+      Submodule.mem_span_singleton.mp (pow_twistSys_one_le n (singleChart hj)
+        (Finset.mem_singleton_self j) hn)
     rw [chartRing_smul_def] at hb
     have hab : a = b := by
       have hxn : x j ^ n ≠ 0 := pow_ne_zero _ hj
@@ -1004,8 +1130,16 @@ def twistAmple : AmpleData S x (twistBundle S x 1) where
       refine Set.mem_iInter.mpr fun I => ⟨0, ?_⟩
       rw [pow_zero, mul_one, mul_zero]
       exact one_mem_twistMod_zero I
-    refine ⟨1, fun _ => 1, fun _ => 1, fun _ => singleChart hj, fun _ => h1, fun _ => h1,
-      by simp, fun _ I => ⟨0, I.1.card, ?_⟩⟩
+    refine ⟨
+      1,
+      fun _ => 1,
+      fun _ => 1,
+      fun _ => singleChart hj,
+      fun _ => h1,
+      fun _ => h1,
+      by simp,
+      fun _ I => ⟨0, I.1.card, ?_⟩
+    ⟩
     have hxp : xProd (singleChart hj) = x j := by simp [xProd, singleChart]
     have hc : (singleChart hj).1.card = 1 := by simp [singleChart]
     rw [hxp, hc, pow_zero, one_mul, pow_one, one_mul, div_mul_cancel₀ _ (pow_ne_zero _ hj)]
@@ -1017,28 +1151,37 @@ section MoreInhabitants
 
 variable {S : Type u} [CommRing S] {N : ℕ}
 
-
-
-
 variable {Ω : Type w} [Field Ω] [Algebra S Ω] (x : Fin (N + 1) → Ω)
 
 variable (S) in
 def coordGraded : FinGradedSub (S := S) (x := x) Ω where
-  piece c := Submodule.span S {z | ∃ (f : Poly S N) (e : ℕ), f.IsHomogeneous e ∧ (e : ℤ) = c ∧
-    z = aeval x f}
+  piece c :=
+    Submodule.span S
+      {z | ∃ (f : Poly S N) (e : ℕ), f.IsHomogeneous e ∧ (e : ℤ) = c ∧
+        z = aeval x f}
   smul_mem d c f m hf hm := by
-    refine Submodule.span_induction (p := fun m _ => aeval x f • m ∈ Submodule.span S
-      {z | ∃ (f : Poly S N) (e : ℕ), f.IsHomogeneous e ∧ (e : ℤ) = c + d ∧ z = aeval x f}) ?_ ?_ ?_ ?_ hm
+    refine Submodule.span_induction
+      (p := fun m _ =>
+        aeval x f • m ∈ Submodule.span S
+          {z | ∃ (f : Poly S N) (e : ℕ), f.IsHomogeneous e ∧ (e : ℤ) = c + d ∧ z = aeval x f})
+      ?_ ?_ ?_ ?_ hm
     · rintro _ ⟨g, e, hg, he, rfl⟩
-      exact Submodule.subset_span ⟨f * g, d + e, hf.mul hg, by push_cast; omega, by
-        rw [map_mul, smul_eq_mul]⟩
+      exact Submodule.subset_span
+        ⟨f * g, d + e, hf.mul hg, by push_cast; omega, by rw [map_mul, smul_eq_mul]⟩
     · rw [smul_zero]; exact Submodule.zero_mem _
     · intro a b _ _ ha hb; rw [smul_add]; exact Submodule.add_mem _ ha hb
     · intro r a _ ha
-      rw [smul_comm]; exact Submodule.smul_mem _ r ha
-  fg := ⟨1, fun _ => 0, fun _ => 1, fun _ => Submodule.subset_span ⟨1, 0, isHomogeneous_one _ _,
-      by simp, by simp⟩, fun c => Submodule.span_mono fun z ⟨f, e, hf, he, hz⟩ =>
-      ⟨0, f, e, hf, by simp [he], by rw [hz, smul_eq_mul, mul_one]⟩⟩
+      rw [smul_comm]
+      exact Submodule.smul_mem _ r ha
+  fg := ⟨
+    1,
+    fun _ => 0,
+    fun _ => 1,
+    fun _ => Submodule.subset_span ⟨1, 0, isHomogeneous_one _ _, by simp, by simp⟩,
+    fun c =>
+      Submodule.span_mono fun z ⟨f, e, hf, he, hz⟩ =>
+        ⟨0, f, e, hf, by simp [he], by rw [hz, smul_eq_mul, mul_one]⟩
+  ⟩
 
 end MoreInhabitants
 

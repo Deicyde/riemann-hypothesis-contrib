@@ -12,8 +12,7 @@ section Defs
 
 variable {K : Type*} [Field K] {V : Type*} [AddCommGroup V] [Module K V]
 
-def baseSpan (F : Type*) [Field F] [Algebra K F] (U : Submodule K V) :
-    Submodule F (F ⊗[K] V) :=
+def baseSpan (F : Type*) [Field F] [Algebra K F] (U : Submodule K V) : Submodule F (F ⊗[K] V) :=
   Submodule.span F ((fun u => (1 : F) ⊗ₜ[K] u) '' (U : Set V))
 
 variable {Ω : Type*} [Field Ω] [Algebra K Ω]

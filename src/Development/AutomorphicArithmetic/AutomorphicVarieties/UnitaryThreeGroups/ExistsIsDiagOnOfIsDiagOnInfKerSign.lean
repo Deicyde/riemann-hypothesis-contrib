@@ -6,23 +6,29 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 open Matrix UpperTheory.V
 
-private theorem exists_char {Γ k : Type} [Group Γ] [Field k] (η : Γ →* ℤˣ) (Φ : Γ →* kˣ) (s : Γ) (hs : η s = -1)
-    (x : k) (hx : x * x = (Φ s : k) * Φ s) :
-    ∃ χ : Γ →* kˣ, (∀ g, η g = 1 → χ g = Φ g) ∧ (χ s : k) = x := by
+private theorem exists_char
+    {Γ k : Type} [Group Γ] [Field k]
+    (η : Γ →* ℤˣ)
+    (Φ : Γ →* kˣ)
+    (s : Γ) (hs : η s = -1)
+    (x : k) (hx : x * x = (Φ s : k) * Φ s)
+    : ∃ χ : Γ →* kˣ, (∀ g, η g = 1 → χ g = Φ g) ∧ (χ s : k) = x := by
   have hΦ : (Φ s : k) ≠ 0 := (Φ s).ne_zero
-  have hsq : (x / Φ s) * (x / Φ s) = 1 := by
-    rw [div_mul_div_comm, hx, div_self (mul_ne_zero hΦ hΦ)]
+  have hsq : (x / Φ s) * (x / Φ s) = 1 := by rw [div_mul_div_comm, hx, div_self (mul_ne_zero hΦ hΦ)]
   rcases mul_self_eq_one_iff.mp hsq with h | h
   · exact ⟨Φ, fun g _ => rfl, ((div_eq_one_iff_eq hΦ).mp h).symm⟩
   · refine ⟨Φ * (Units.map (Int.castRingHom k).toMonoidHom).comp η, fun g hg => by simp [hg], ?_⟩
     rw [div_eq_iff hΦ] at h
     simp [hs, h]
 
-private theorem diag_sq {k : Type} [Field k] [CharZero k] (S : Matrix (Fin 2) (Fin 2) k) (a : k) (ha : a ≠ 0)
-    (hS : S * S = Matrix.diagonal fun _ => a * a) :
-    ∃ (P : GL (Fin 2) k) (x : Fin 2 → k), (∀ i, x i * x i = a * a) ∧
-      (P : Matrix (Fin 2) (Fin 2) k) * S = Matrix.diagonal x * P := by
-  have e : ∀ i j, (S * S) i j = (Matrix.diagonal fun _ : Fin 2 => a * a) i j := fun i j => by rw [hS]
+private theorem diag_sq
+    {k : Type} [Field k] [CharZero k]
+    (S : Matrix (Fin 2) (Fin 2) k) (a : k)
+    (ha : a ≠ 0) (hS : S * S = Matrix.diagonal fun _ => a * a)
+    : ∃ (P : GL (Fin 2) k) (x : Fin 2 → k),
+      (∀ i, x i * x i = a * a) ∧ (P : Matrix (Fin 2) (Fin 2) k) * S = Matrix.diagonal x * P := by
+  have e : ∀ i j, (S * S) i j = (Matrix.diagonal fun _ : Fin 2 => a * a) i j := fun i j => by
+    rw [hS]
   have e00 := e 0 0
   have e01 := e 0 1
   have e10 := e 1 0
@@ -40,7 +46,7 @@ private theorem diag_sq {k : Type} [Field k] [CharZero k] (S : Matrix (Fin 2) (F
           linear_combination e11 - S 0 1 * hr
       · ext i j
         fin_cases i <;> fin_cases j <;> simp [hq, hr]
-    · have ht : S 1 1 = -S 0 0 := by
+    · have ht : S 1 1 = - S 0 0 := by
         have : S 0 1 * (S 0 0 + S 1 1) = 0 := by linear_combination e01
         rcases mul_eq_zero.mp this with h | h
         · exact absurd h hq
@@ -67,7 +73,7 @@ private theorem diag_sq {k : Type} [Field k] [CharZero k] (S : Matrix (Fin 2) (F
           linear_combination hr
         · simp [Matrix.mul_apply, Fin.sum_univ_two]
           linear_combination ht
-  · have ht : S 1 1 = -S 0 0 := by
+  · have ht : S 1 1 = - S 0 0 := by
       have : S 1 0 * (S 0 0 + S 1 1) = 0 := by linear_combination e10
       rcases mul_eq_zero.mp this with h | h
       · exact absurd h hr
@@ -92,12 +98,18 @@ private theorem diag_sq {k : Type} [Field k] [CharZero k] (S : Matrix (Fin 2) (F
       · simp [Matrix.mul_apply, Fin.sum_univ_two]
         linear_combination e00 + (-a - S 0 0) * ht
 
-private theorem diag_ext {Γ k : Type} [Group Γ] [Field k] (H : Subgroup Γ) (η : Γ →* ℤˣ) (W : Γ →* GL (Fin 2) k)
-    (χ : Fin 2 → Γ →* kˣ) (g : GL (Fin 2) k) (s : Γ) (hsH : s ∈ H) (hs : η s = -1)
-    (h0 : ∀ t ∈ H, η t = 1 → ((g * W t * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) =
-      Matrix.diagonal fun i => (χ i t : k))
-    (h1 : ((g * W s * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) = Matrix.diagonal fun i => (χ i s : k)) :
-    Af.IsDiagOn W H χ := by
+private theorem diag_ext
+    {Γ k : Type} [Group Γ] [Field k]
+    (H : Subgroup Γ) (η : Γ →* ℤˣ)
+    (W : Γ →* GL (Fin 2) k) (χ : Fin 2 → Γ →* kˣ) (g : GL (Fin 2) k)
+    (s : Γ) (hsH : s ∈ H) (hs : η s = -1)
+    (h0 : ∀ t ∈ H,
+      η t = 1
+        → ((g * W t * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+          = Matrix.diagonal fun i => (χ i t : k))
+    (h1 : ((g * W s * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+      = Matrix.diagonal fun i => (χ i s : k))
+    : Af.IsDiagOn W H χ := by
   refine ⟨g, fun t ht => ?_⟩
   rcases Int.units_eq_one_or (η t) with h | h
   · exact h0 t ht h
@@ -110,8 +122,11 @@ private theorem diag_ext {Γ k : Type} [Group Γ] [Field k] (H : Subgroup Γ) (�
     funext i
     rw [← Units.val_mul, ← map_mul, mul_inv_cancel_left]
 
-theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign :
-    ∀ {Γ k : Type} [Group Γ] [Field k] [CharZero k] (H : Subgroup Γ) (η : Γ →* ℤˣ) (W : Γ →* GL (Fin 2) k) (Ψ : Γ →* kˣ), Af.IsDiagOn W (H ⊓ η.ker) ![Ψ, Ψ⁻¹] → ∃ χ : Fin 2 → Γ →* kˣ, (∀ i g, Ψ g = 1 → η g = 1 → χ i g = 1) ∧ Af.IsDiagOn W H χ := by
+theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign
+    : ∀ {Γ k : Type} [Group Γ] [Field k] [CharZero k] (H : Subgroup Γ) (η : Γ →* ℤˣ)
+        (W : Γ →* GL (Fin 2) k) (Ψ : Γ →* kˣ),
+      Af.IsDiagOn W (H ⊓ η.ker) ![Ψ, Ψ⁻¹]
+        → ∃ χ : Fin 2 → Γ →* kˣ, (∀ i g, Ψ g = 1 → η g = 1 → χ i g = 1) ∧ Af.IsDiagOn W H χ := by
   intro Γ k _ _ _ H η W Ψ hD
   obtain ⟨g, hg⟩ := hD
   by_cases hex : ∃ s ∈ H, η s = -1
@@ -124,9 +139,11 @@ theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign :
       · exact h
       · exact absurd h (hex t ht)
   obtain ⟨s, hsH, hs⟩ := hex
-  have hmul : ∀ a b : Γ, ((g * W (a * b) * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) =
-      ((g * W a * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) *
-        ((g * W b * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) := by
+  have hmul
+      : ∀ a b : Γ,
+        ((g * W (a * b) * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+          = ((g * W a * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+            * ((g * W b * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) := by
     intro a b
     rw [← Units.val_mul, map_mul]
     congr 1
@@ -137,10 +154,12 @@ theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign :
   have hmemk : ∀ t, t ∈ H ⊓ η.ker ↔ t ∈ H ∧ η t = 1 := fun t => by
     simp [Subgroup.mem_inf, MonoidHom.mem_ker]
   have hss : s * s ∈ H ⊓ η.ker := (hmemk _).mpr ⟨H.mul_mem hsH hsH, by rw [map_mul, hs]; decide⟩
-  have hcomm : ∀ t ∈ H ⊓ η.ker, ((g * W s * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) *
-      Matrix.diagonal (fun i => ((![Ψ, Ψ⁻¹] i t : kˣ) : k)) =
-      Matrix.diagonal (fun i => ((![Ψ, Ψ⁻¹] i t : kˣ) : k)) *
-        ((g * W s * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) := by
+  have hcomm
+      : ∀ t ∈ H ⊓ η.ker,
+        ((g * W s * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+            * Matrix.diagonal (fun i => ((![Ψ, Ψ⁻¹] i t : kˣ) : k))
+          = Matrix.diagonal (fun i => ((![Ψ, Ψ⁻¹] i t : kˣ) : k))
+            * ((g * W s * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) := by
     intro t ht
     obtain ⟨htH, htk⟩ := (hmemk t).mp ht
     have hm : s * t * s⁻¹ ∈ H ⊓ η.ker :=
@@ -149,8 +168,10 @@ theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign :
     simp only [hconj] at e2
     conv_rhs => rw [← e2]
     rw [← hg t ht, ← hmul, ← hmul, inv_mul_cancel_right]
-  obtain ⟨S, hS⟩ : ∃ S : Matrix (Fin 2) (Fin 2) k,
-      ((g * W s * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) = S := ⟨_, rfl⟩
+  obtain ⟨S, hS⟩
+      : ∃ S : Matrix (Fin 2) (Fin 2) k,
+        ((g * W s * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) = S :=
+    ⟨_, rfl⟩
   have hSS : S * S = Matrix.diagonal (fun i => ((![Ψ, Ψ⁻¹] i (s * s) : kˣ) : k)) := by
     rw [← hS, ← hmul, hg _ hss]
   by_cases hdist : ∃ t ∈ H ⊓ η.ker, ((Ψ t : kˣ) : k) ≠ (((Ψ⁻¹) t : kˣ) : k)
@@ -160,7 +181,8 @@ theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign :
     have c01 := congrFun (congrFun hc 0) 1
     have c10 := congrFun (congrFun hc 1) 0
     simp only [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.cons_val_zero, Matrix.cons_val_one,
-      Matrix.head_cons] at c01 c10
+        Matrix.head_cons]
+      at c01 c10
     have h01 : S 0 1 = 0 := by
       have : S 0 1 * (((Ψ t0 : kˣ) : k) - (((Ψ⁻¹) t0 : kˣ) : k)) = 0 := by linear_combination -c01
       exact (mul_eq_zero.mp this).resolve_right (sub_ne_zero.mpr hne)
@@ -170,7 +192,8 @@ theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign :
     have d0 := congrFun (congrFun hSS 0) 0
     have d1 := congrFun (congrFun hSS 1) 1
     simp only [Matrix.mul_apply, Fin.sum_univ_two, Matrix.diagonal_apply_eq, h01, h10, mul_zero,
-      add_zero, zero_mul, zero_add, map_mul, Units.val_mul] at d0 d1
+        add_zero, zero_mul, zero_add, map_mul, Units.val_mul]
+      at d0 d1
     have hxi : ∀ i, S i i * S i i = ((![Ψ, Ψ⁻¹] i s : kˣ) : k) * ((![Ψ, Ψ⁻¹] i s : kˣ) : k) := by
       intro i
       fin_cases i
@@ -190,8 +213,10 @@ theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign :
       ext i j
       fin_cases i <;> fin_cases j <;> simp [Matrix.diagonal, hχ2, h01, h10]
   · push_neg at hdist
-    have hDt : ∀ t ∈ H ⊓ η.ker, Matrix.diagonal (fun i => ((![Ψ, Ψ⁻¹] i t : kˣ) : k)) =
-        Matrix.diagonal (fun _ => ((Ψ t : kˣ) : k)) := by
+    have hDt
+        : ∀ t ∈ H ⊓ η.ker,
+          Matrix.diagonal (fun i => ((![Ψ, Ψ⁻¹] i t : kˣ) : k))
+            = Matrix.diagonal (fun _ => ((Ψ t : kˣ) : k)) := by
       intro t ht
       congr 1
       funext i
@@ -202,22 +227,28 @@ theorem UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign :
       rw [hSS, hDt _ hss, map_mul, Units.val_mul]
     obtain ⟨P, x, hx, hP⟩ := diag_sq S _ (Ψ s).ne_zero hSS'
     choose χ hχ1 hχ2 using fun i => exists_char η Ψ s hs (x i) (hx i)
-    have hconjP : ∀ t, (((P * g) * W t * (P * g)⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) =
-        (P : Matrix (Fin 2) (Fin 2) k) * ((g * W t * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) *
-          ((P⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) := by
+    have hconjP
+        : ∀ t,
+          (((P * g) * W t * (P * g)⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+            = (P : Matrix (Fin 2) (Fin 2) k)
+              * ((g * W t * g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+              * ((P⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) := by
       intro t
       rw [← Units.val_mul, ← Units.val_mul]
       congr 1
       group
-    have hPinv : (P : Matrix (Fin 2) (Fin 2) k) * ((P⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) = 1 := by
+    have hPinv
+        : (P : Matrix (Fin 2) (Fin 2) k) * ((P⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+          = 1 := by
       rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
     refine ⟨χ, ?_, diag_ext H η W χ (P * g) s hsH hs ?_ ?_⟩
     · intro i y hΨ hη
       rw [hχ1 i y hη, hΨ]
     · intro t htH htη
       have ht : t ∈ H ⊓ η.ker := (hmemk t).mpr ⟨htH, htη⟩
-      have hsc : (P : Matrix (Fin 2) (Fin 2) k) * Matrix.diagonal (fun _ => ((Ψ t : kˣ) : k)) =
-          Matrix.diagonal (fun _ => ((Ψ t : kˣ) : k)) * (P : Matrix (Fin 2) (Fin 2) k) := by
+      have hsc
+          : (P : Matrix (Fin 2) (Fin 2) k) * Matrix.diagonal (fun _ => ((Ψ t : kˣ) : k))
+            = Matrix.diagonal (fun _ => ((Ψ t : kˣ) : k)) * (P : Matrix (Fin 2) (Fin 2) k) := by
         ext i j
         simp [Matrix.mul_diagonal, Matrix.diagonal_mul, mul_comm]
       rw [hconjP, hg t ht, hDt t ht, hsc, mul_assoc, hPinv, mul_one]

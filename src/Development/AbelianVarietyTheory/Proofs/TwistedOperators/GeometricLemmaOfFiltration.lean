@@ -9,9 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Geometric
 
 namespace GlobalTheory
 
-theorem geometricLemma_of_filtration :
-    GlobalTheory.Published.BernsteinZelevinskyFiniteness → GlobalTheory.Published.GeometricLemmaFiltration →
-      GlobalTheory.Published.GeometricLemma := by
+theorem geometricLemma_of_filtration
+    : GlobalTheory.Published.BernsteinZelevinskyFiniteness
+      → GlobalTheory.Published.GeometricLemmaFiltration
+      → GlobalTheory.Published.GeometricLemma := by
   intro hB hF k _ _ _ _
   exact ⟨hF k, GlobalTheory.T.geometricLemma_cell_semisimplification_GL hB k⟩
 

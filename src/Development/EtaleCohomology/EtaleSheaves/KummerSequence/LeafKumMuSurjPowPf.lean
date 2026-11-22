@@ -5,30 +5,40 @@ public import Development.EtaleCohomology.EtaleSheaves.KummerSequence.LeafKumMuS
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.E4 LateralTheory.E.H2CurveOrder.LeafKumMuSurjPf
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.E4
+  LateralTheory.E.H2CurveOrder.LeafKumMuSurjPf
 
 namespace LateralTheory.E.H2CurveOrder.LeafKumMuSurjPowPf
 
-def powCof {A : Type*} [CommRing A] (u v : A) (q : ℕ) : A := ∑ i ∈ Finset.range q, u ^ i * v ^ (q - 1 - i)
+def powCof {A : Type*} [CommRing A] (u v : A) (q : ℕ) : A :=
+  ∑ i ∈ Finset.range q, u ^ i * v ^ (q - 1 - i)
 
-theorem powCof_mul {A : Type*} [CommRing A] (u v : A) (q : ℕ) : powCof u v q * (u - v) = u ^ q - v ^ q :=
+theorem powCof_mul {A : Type*} [CommRing A] (u v : A) (q : ℕ)
+    : powCof u v q * (u - v) = u ^ q - v ^ q :=
   geom_sum₂_mul u v q
 
-theorem powCof_map {A B : Type*} [CommRing A] [CommRing B] (φ : A →+* B) (u v : A) (q : ℕ) :
-    φ (powCof u v q) = powCof (φ u) (φ v) q := by
+theorem powCof_map {A B : Type*} [CommRing A] [CommRing B] (φ : A →+* B) (u v : A) (q : ℕ)
+    : φ (powCof u v q) = powCof (φ u) (φ v) q := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [powCof, map_sum, map_mul, map_pow]
+  simp [powCof, map_sum, map_mul, map_pow]
 
-theorem powCof_self {A : Type*} [CommRing A] (v : A) (q : ℕ) : powCof v v q = (q : A) * v ^ (q - 1) := by
+theorem powCof_self {A : Type*} [CommRing A] (v : A) (q : ℕ)
+    : powCof v v q = (q : A) * v ^ (q - 1) := by
   unfold powCof
   rw [Finset.sum_congr rfl (g := fun _ => v ^ (q - 1))]
   · simp
   · intro i hi
-    rw [← pow_add]; congr 1; have := Finset.mem_range.1 hi; omega
+    rw [← pow_add]
+    congr 1
+    have := Finset.mem_range.1 hi
+    omega
 
-theorem field_step {K : Type} [Field K] (q : ℕ) [NeZero q] (hq : (q : K) ≠ 0) (z w : K)
-    (hz : Polynomial.aeval z (Polynomial.cyclotomic q ℤ) = 0) (hw : w ^ q = 1) :
-    ∃ a : Fin q, powCof w (z ^ (a : ℕ)) q ≠ 0 := by
+theorem field_step
+    {K : Type} [Field K]
+    (q : ℕ) [NeZero q]
+    (hq : (q : K) ≠ 0)
+    (z w : K) (hz : Polynomial.aeval z (Polynomial.cyclotomic q ℤ) = 0) (hw : w ^ q = 1)
+    : ∃ a : Fin q, powCof w (z ^ (a : ℕ)) q ≠ 0 := by
   have : NeZero (q : K) := ⟨hq⟩
   have hroot : Polynomial.IsRoot (Polynomial.cyclotomic q K) z := by
     rw [← Polynomial.map_cyclotomic_int, Polynomial.IsRoot, Polynomial.eval_map]
@@ -42,7 +52,8 @@ theorem field_step {K : Type} [Field K] (q : ℕ) [NeZero q] (hq : (q : K) ≠ 0
     have := hp.pow_eq_one; rw [h, zero_pow (NeZero.ne q)] at this; exact zero_ne_one this
   exact mul_ne_zero hq (pow_ne_zero _ (pow_ne_zero _ hz0))
 
-theorem isUnit_of_basicOpen_top {V : Scheme.{0}} (t : Γ(V, ⊤)) (h : V.basicOpen t = ⊤) : IsUnit t := by
+theorem isUnit_of_basicOpen_top {V : Scheme.{0}} (t : Γ(V, ⊤)) (h : V.basicOpen t = ⊤)
+    : IsUnit t := by
   apply V.toRingedSpace.isUnit_of_isUnit_germ
   intro x hx
   have hx' : x ∈ V.basicOpen t := by rw [h]; trivial
@@ -73,8 +84,11 @@ theorem pow_pf : LeafKumMuSurjPow := by
     rw [powCof_map, map_pow]
     exact ha
   let 𝒰 := U.openCoverOfIsOpenCover _ hcov
-  refine ⟨Sieve.ofArrows 𝒰.X 𝒰.f,
-    Scheme.zariskiTopology_le_etaleTopology _ (Scheme.Cover.mem_grothendieckTopology 𝒰), ?_⟩
+  refine ⟨
+    Sieve.ofArrows 𝒰.X 𝒰.f,
+    Scheme.zariskiTopology_le_etaleTopology _ (Scheme.Cover.mem_grothendieckTopology 𝒰),
+    ?_
+  ⟩
   intro V f hf
   obtain ⟨a', g, rfl⟩ := (Sieve.mem_ofArrows_iff _ _ _).1 hf
   let a : Fin q := a'

@@ -20,20 +20,24 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
-private theorem trOn_top_one {V : Type} [AddCommGroup V] [Module ℂ V] [Module.Free ℂ V] (S : Submodule ℂ V)
-    [FiniteDimensional ℂ S] : trOn S (1 : Module.End ℂ V) = (Module.finrank ℂ S : ℂ) := by
+private theorem trOn_top_one
+    {V : Type} [AddCommGroup V] [Module ℂ V] [Module.Free ℂ V]
+    (S : Submodule ℂ V) [FiniteDimensional ℂ S]
+    : trOn S (1 : Module.End ℂ V) = (Module.finrank ℂ S : ℂ) := by
   unfold trOn
   rw [dite_eq_left (fun x hx => by simpa using hx)]
-  have : (LinearMap.restrict (1 : Module.End ℂ V) (fun x hx => by simpa using hx) : Module.End ℂ S) = 1 := by
+  have : (LinearMap.restrict (1 : Module.End ℂ V) (fun x hx => by simpa using hx) : Module.End ℂ S)
+      = 1 := by
     ext x
     rfl
   rw [this, LinearMap.trace_one]
 
-private theorem prod_swap {n : ℕ} (z : Fin n → ℂ) (hz : ∀ a, z a * conj (z a) = 1) :
-    (∏ a, ∏ b, (1 + conj (z a) / conj (z b))) = ∏ a, ∏ b, (1 + z a / z b) := by
+private theorem prod_swap {n : ℕ} (z : Fin n → ℂ) (hz : ∀ a, z a * conj (z a) = 1)
+    : (∏ a, ∏ b, (1 + conj (z a) / conj (z b))) = ∏ a, ∏ b, (1 + z a / z b) := by
   have hne : ∀ a, z a ≠ 0 := fun a h => by simpa [h] using hz a
   have hc : ∀ a, conj (z a) = (z a)⁻¹ := fun a => (eq_inv_of_mul_eq_one_right (hz a))
   have key : ∀ a b, conj (z a) / conj (z b) = z b / z a := by
@@ -43,13 +47,22 @@ private theorem prod_swap {n : ℕ} (z : Fin n → ℂ) (hz : ∀ a, z a * conj 
   simp_rw [key]
   exact Finset.prod_comm
 
-theorem UpperTheory.RealTr.lefData :
-    ∀ (n : ℕ) (lam : Fin n → ℤ), Antitone lam → ∀ (E : KMod n) (T : E.V →L[ℂ] E.V), IsLefK lam E T →
-      ∃ (E' : KMod n) (e : (E.V →L[ℂ] ℂ) ≃ₗ[ℂ] E'.V) (T' : Module.End ℂ E'.V) (σ' : UK n →* (E'.V →ₗ[ℂ] E'.V)) (F : Fin n → Fin n → Module.End ℂ E'.V)
-        (χ : FR n) (s : Finset (Wt n)), (∀ k ξ, e (ξ ∘L E.ρ k⁻¹) = σ' k (e ξ)) ∧ (∀ ξ, e (dualT E T ξ) = T' (e ξ)) ∧ UF F ∧ IsDerivK σ' F ∧
-        (∀ a b, T' * F a b = F a b * T') ∧ (∀ ν ∉ s, hw F ν = ⊥) ∧ alt (rhoV n) * χ = alt ((fun a => (lam a : ℝ)) + rhoV n) ∧
-        ∀ ν : Wt n, StrictAnti (ν + rhoV n) → trOn (hw F ν) T' = 2 ^ n * cf (chR n * alt (twoL lam)) (ν + rhoV n) ∧
-          (Module.finrank ℂ (hw F ν) : ℂ) = 2 ^ n * cf (chR n * (alt ((2 : ℝ) • rhoV n) * (χ * χ))) (ν + rhoV n) := by
+theorem UpperTheory.RealTr.lefData
+    : ∀ (n : ℕ) (lam : Fin n → ℤ),
+      Antitone lam
+        → ∀ (E : KMod n) (T : E.V →L[ℂ] E.V),
+          IsLefK lam E T
+            → ∃ (E' : KMod n) (e : (E.V →L[ℂ] ℂ) ≃ₗ[ℂ] E'.V) (T' : Module.End ℂ E'.V)
+                (σ' : UK n →* (E'.V →ₗ[ℂ] E'.V)) (F : Fin n → Fin n → Module.End ℂ E'.V) (χ : FR n)
+                (s : Finset (Wt n)),
+              (∀ k ξ, e (ξ ∘L E.ρ k⁻¹) = σ' k (e ξ)) ∧ (∀ ξ, e (dualT E T ξ) = T' (e ξ)) ∧ UF F
+                ∧ IsDerivK σ' F ∧ (∀ a b, T' * F a b = F a b * T') ∧ (∀ ν ∉ s, hw F ν = ⊥)
+                ∧ alt (rhoV n) * χ = alt ((fun a => (lam a : ℝ)) + rhoV n)
+                ∧ ∀ ν : Wt n,
+                  StrictAnti (ν + rhoV n)
+                    → trOn (hw F ν) T' = 2 ^ n * cf (chR n * alt (twoL lam)) (ν + rhoV n)
+                      ∧ (Module.finrank ℂ (hw F ν) : ℂ)
+                        = 2 ^ n * cf (chR n * (alt ((2 : ℝ) • rhoV n) * (χ * χ))) (ν + rhoV n) := by
   intro n lam hlam E T hL
   obtain ⟨hcomm, hTT, htrace⟩ := hL
   obtain ⟨E', e, T', he1, he2, he3⟩ := dualEx n E T hcomm
@@ -90,23 +103,28 @@ theorem UpperTheory.RealTr.lefData :
   have hCmT : Cm F ⊤ T' := ⟨hTF, fun x _ => trivial⟩
   obtain ⟨c₁, hc₁⟩ := chEx n E'.V F hUF ⊤ inferInstance hStop 1
   obtain ⟨cT, hcT⟩ := chEx n E'.V F hUF ⊤ inferInstance hStop T'
-  have hkey : ∀ (θ : Wt n) (z : Fin n → ℂ), (∀ a, z a = Complex.exp (Complex.I * (θ a : ℂ))) →
-      (Function.Injective fun a => z a ^ 2) →
-      evT θ c₁ = (∏ a, ∏ b, (1 + z a / z b)) * weylChar lam z ^ 2 ∧
-      evT θ cT = (∏ a, ∏ b, (1 + z a / z b)) * weylChar lam (fun a => z a ^ 2) := by
+  have hkey
+      : ∀ (θ : Wt n) (z : Fin n → ℂ),
+        (∀ a, z a = Complex.exp (Complex.I * (θ a : ℂ))) → (Function.Injective fun a => z a ^ 2)
+          → evT θ c₁ = (∏ a, ∏ b, (1 + z a / z b)) * weylChar lam z ^ 2
+            ∧ evT θ cT = (∏ a, ∏ b, (1 + z a / z b)) * weylChar lam (fun a => z a ^ 2) := by
     intro θ z hz hinj
     have hzn : ∀ a, z a * conj (z a) = 1 := by
       intro a
-      rw [Complex.mul_conj, hz a, Complex.normSq_eq_norm_sq, mul_comm, Complex.norm_exp_ofReal_mul_I]
+      rw [Complex.mul_conj, hz a, Complex.normSq_eq_norm_sq, mul_comm,
+        Complex.norm_exp_ofReal_mul_I]
       simp
     have hmemU : diagonal z ∈ unitaryGroup (Fin n) ℂ := by
-      rw [mem_unitaryGroup_iff, star_eq_conjTranspose, diagonal_conjTranspose, diagonal_mul_diagonal]
+      rw [mem_unitaryGroup_iff, star_eq_conjTranspose, diagonal_conjTranspose,
+        diagonal_mul_diagonal]
       rw [← diagonal_one]
       congr 1
       funext a
       exact hzn a
     set k : UK n := ⟨diagonal z, hmemU⟩ with hkdef
-    have hk : (k : Matrix (Fin n) (Fin n) ℂ) = diagonal fun a => Complex.exp (Complex.I * (θ a : ℂ)) := by
+    have hk
+        : (k : Matrix (Fin n) (Fin n) ℂ)
+          = diagonal fun a => Complex.exp (Complex.I * (θ a : ℂ)) := by
       show diagonal z = _
       congr 1
       funext a
@@ -129,8 +147,7 @@ theorem UpperTheory.RealTr.lefData :
     constructor
     · rw [← chEv n E'.V σ' F hUF hder 1 c₁ hCm1 hc₁ θ k hk, mul_one, hσk, (he3 k).1, t1,
         prod_swap z hzn, hw z]
-    · rw [← chEv n E'.V σ' F hUF hder T' cT hCmT hcT θ k hk, hσk, (he3 k).2, t2,
-        prod_swap z hzn]
+    · rw [← chEv n E'.V σ' F hUF hder T' cT hCmT hcT θ k hk, hσk, (he3 k).2, t2, prod_swap z hzn]
       have : (fun a => conj (z a) ^ 2) = fun a => conj (z a ^ 2) := by
         funext a
         rw [map_pow]

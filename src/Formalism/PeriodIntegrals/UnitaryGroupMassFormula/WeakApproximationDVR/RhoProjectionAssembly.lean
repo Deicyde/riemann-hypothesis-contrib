@@ -44,10 +44,14 @@ theorem rho_projection_assembly : Assembly := by
   have hkB : ∀ i j, -(k i j) ≤ (B : ℤ) := by
     intro i j
     have h1 : (-(k i j)).toNat ≤ ∑ j', (-(k i j')).toNat :=
-      Finset.single_le_sum (f := fun j' => (-(k i j')).toNat) (fun _ _ => Nat.zero_le _)
+      Finset.single_le_sum
+        (f := fun j' => (-(k i j')).toNat)
+        (fun _ _ => Nat.zero_le _)
         (Finset.mem_univ j)
     have h2 : ∑ j', (-(k i j')).toNat ≤ B :=
-      Finset.single_le_sum (f := fun i' => ∑ j', (-(k i' j')).toNat) (fun _ _ => Nat.zero_le _)
+      Finset.single_le_sum
+        (f := fun i' => ∑ j', (-(k i' j')).toNat)
+        (fun _ _ => Nat.zero_le _)
         (Finset.mem_univ i)
     have h3 := Int.self_le_toNat (-(k i j))
     have h4 : ((-(k i j)).toNat : ℤ) ≤ B := by exact_mod_cast h1.trans h2
@@ -64,25 +68,27 @@ theorem rho_projection_assembly : Assembly := by
   have he : ∀ i, iw j (e i) = iw j (z i) ^ r * (1 + iw j (z i) ^ r)⁻¹ := by
     intro i; simp [e, map_mul, map_pow, map_inv₀, map_add (f := _), map_one]
 
-  have hT : ∀ i, PI.WADVR.Sm (Q j) (ϖ j) K
-      ((iw j (e i) - if i = j then 1 else 0) * iw j (y i)) := by
+  have hT
+      : ∀ i, PI.WADVR.Sm (Q j) (ϖ j) K ((iw j (e i) - if i = j then 1 else 0) * iw j (y i)) := by
     intro i
     by_cases hij : i = j
     · subst hij
       obtain ⟨hne, hsm⟩ := big_one_add_pow (hϖ i) ((map_ne_zero (iw i)).mpr (hz0 i)) (hzi i) hr1
       have hid : iw i (e i) - (if i = i then 1 else 0) = -(1 + iw i (z i) ^ r)⁻¹ := by
         rw [if_pos rfl, he]
-        calc iw i (z i) ^ r * (1 + iw i (z i) ^ r)⁻¹ - 1
-            = (iw i (z i) ^ r - (1 + iw i (z i) ^ r)) * (1 + iw i (z i) ^ r)⁻¹ := by
-              rw [sub_mul, mul_inv_cancel₀ hne]
+        calc
+          iw i (z i) ^ r * (1 + iw i (z i) ^ r)⁻¹ - 1
+              = (iw i (z i) ^ r - (1 + iw i (z i) ^ r)) * (1 + iw i (z i) ^ r)⁻¹ := by
+            rw [sub_mul, mul_inv_cancel₀ hne]
           _ = -(1 + iw i (z i) ^ r)⁻¹ := by ring
       rw [hid]
       exact (hsm.neg.mul (hϖ i) (hk i i)).mono (hϖ i) (hrk i i)
     · rw [if_neg hij, sub_zero, he]
       obtain ⟨_, hsm⟩ := small_one_add_pow (hϖ j) (hzj i j (Ne.symm hij)) hr1
       exact (hsm.mul (hϖ j) (hk i j)).mono (hϖ j) (hrk i j)
-  have hsum : iw j (∑ i, e i * y i) - x j =
-      (∑ i, (iw j (e i) - if i = j then 1 else 0) * iw j (y i)) + (iw j (y j) - x j) := by
+  have hsum
+      : iw j (∑ i, e i * y i) - x j
+        = (∑ i, (iw j (e i) - if i = j then 1 else 0) * iw j (y i)) + (iw j (y j) - x j) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp only [map_mul, sub_mul, Finset.sum_sub_distrib, ite_mul, one_mul, zero_mul,

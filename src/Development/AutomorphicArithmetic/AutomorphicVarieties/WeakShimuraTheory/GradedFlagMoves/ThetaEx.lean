@@ -5,16 +5,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CyclotomicI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem thetaEx_val {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {m : ℕ} (hm : m ≠ 0) {ζ : Ω}
-    (h : ζ ^ m = 1) : A.valuation ζ = 1 := by
+private theorem thetaEx_val
+    {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {m : ℕ} (hm : m ≠ 0) {ζ : Ω} (h : ζ ^ m = 1)
+    : A.valuation ζ = 1 := by
   have h2 := congrArg A.valuation h
   rw [map_pow, map_one] at h2
   exact (pow_eq_one_iff_of_nonneg zero_le' hm).mp h2
 
-private theorem thetaEx_pow {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {η : Ω} (h1 : A.valuation η = 1)
-    (h : A.valuation (η - 1) < 1) (i : ℕ) : A.valuation (1 - η ^ i) < 1 := by
+private theorem thetaEx_pow
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {η : Ω} (h1 : A.valuation η = 1) (h : A.valuation (η - 1) < 1)
+    (i : ℕ)
+    : A.valuation (1 - η ^ i) < 1 := by
   induction i with
   | zero => simp
   | succ n ih =>
@@ -24,8 +31,12 @@ private theorem thetaEx_pow {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {η
     rw [map_mul, map_pow, h1, one_pow, one_mul, ← Valuation.map_neg, neg_sub]
     exact h
 
-private theorem thetaEx_eta {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {m : ℕ} (hm : m ≠ 0)
-    (hv : ¬ A.valuation (m : Ω) < 1) {η : Ω} (hη : η ^ m = 1) (h : A.valuation (η - 1) < 1) : η = 1 := by
+private theorem thetaEx_eta
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {m : ℕ} (hm : m ≠ 0) (hv : ¬ A.valuation (m : Ω) < 1)
+    {η : Ω} (hη : η ^ m = 1) (h : A.valuation (η - 1) < 1)
+    : η = 1 := by
   by_contra hne
   have hsub : η - 1 ≠ 0 := sub_ne_zero.mpr hne
   have hg : (∑ i ∈ Finset.range m, η ^ i) = 0 := by
@@ -33,14 +44,19 @@ private theorem thetaEx_eta {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {m 
     rw [hη, sub_self] at this
     exact (mul_eq_zero.mp this).resolve_right hsub
   have hm' : (m : Ω) = ∑ i ∈ Finset.range m, (1 - η ^ i) := by
-    rw [Finset.sum_sub_distrib, hg, sub_zero, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
+    rw [Finset.sum_sub_distrib, hg, sub_zero, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
+      mul_one]
   apply hv
   rw [hm']
   exact Valuation.map_sum_lt _ one_ne_zero (fun i _ => thetaEx_pow A (thetaEx_val A hm hη) h i)
 
-private theorem thetaEx_fix {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω) {m : ℕ}
-    (hm : m ≠ 0) (hw : ¬ A.valuation (m : Ω) < 1) {ζ : Ω} (hζ : ζ ^ m = 1) (g : G ℚ Ω) (hg : g ∈ Ine (F := ℚ) A) :
-    g ζ = ζ := by
+private theorem thetaEx_fix
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (A : ValuationSubring Ω)
+    {m : ℕ} (hm : m ≠ 0) (hw : ¬ A.valuation (m : Ω) < 1)
+    {ζ : Ω} (hζ : ζ ^ m = 1)
+    (g : G ℚ Ω) (hg : g ∈ Ine (F := ℚ) A)
+    : g ζ = ζ := by
   have hv1 : A.valuation ζ = 1 := thetaEx_val A hm hζ
   have hz : ζ ≠ 0 := by
     intro h0
@@ -61,10 +77,9 @@ private theorem thetaEx_fix {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure �
     simpa [hz] using this
   exact this
 
-private theorem thetaEx_hom (l w : ℕ) [hl : Fact l.Prime] [hw : Fact w.Prime] (h : l ∣ w - 1) :
-    ∃ φ : (ZMod w)ˣ →* Multiplicative (ZMod l), ∃ b, φ b ≠ 1 := by
-  have hc : Nat.card (ZMod w)ˣ = w - 1 := by
-    rw [Nat.card_eq_fintype_card, ZMod.card_units]
+private theorem thetaEx_hom (l w : ℕ) [hl : Fact l.Prime] [hw : Fact w.Prime] (h : l ∣ w - 1)
+    : ∃ φ : (ZMod w)ˣ →* Multiplicative (ZMod l), ∃ b, φ b ≠ 1 := by
+  have hc : Nat.card (ZMod w)ˣ = w - 1 := by rw [Nat.card_eq_fintype_card, ZMod.card_units]
   have hd : l ∣ Nat.card (ZMod w)ˣ := hc ▸ h
   let e := (zmodCyclicMulEquiv (inferInstance : IsCyclic (ZMod w)ˣ)).symm
   let ψ : Multiplicative (ZMod (Nat.card (ZMod w)ˣ)) →* Multiplicative (ZMod l) :=
@@ -75,10 +90,13 @@ private theorem thetaEx_hom (l w : ℕ) [hl : Fact l.Prime] [hw : Fact w.Prime] 
   rw [map_one, ne_eq, ofAdd_eq_one]
   exact (one_ne_zero : (1 : ZMod l) ≠ 0)
 
-theorem UpperTheory.V.Ws.Rt.thetaEx :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (w : ℕ), w.Prime → l ∣ w - 1 →
-      ∃ θ : G ℚ Ω →* Multiplicative (ZMod l), IsOpen (θ.ker : Set (G ℚ Ω)) ∧ (∀ A, Raw.Away {w} A → Ine (F := ℚ) A ≤ θ.ker) ∧
-        ∀ A : ValuationSubring Ω, A.valuation (w : Ω) < 1 → ∃ g ∈ Ine (F := ℚ) A, θ g ≠ 1 := by
+theorem UpperTheory.V.Ws.Rt.thetaEx
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (w : ℕ),
+      w.Prime → l ∣ w - 1
+        → ∃ θ : G ℚ Ω →* Multiplicative (ZMod l),
+          IsOpen (θ.ker : Set (G ℚ Ω)) ∧ (∀ A, Raw.Away {w} A → Ine (F := ℚ) A ≤ θ.ker)
+            ∧ ∀ A : ValuationSubring Ω,
+              A.valuation (w : Ω) < 1 → ∃ g ∈ Ine (F := ℚ) A, θ g ≠ 1 := by
   intro Ω _ _ _ l _ w hw h
   haveI : Fact w.Prime := ⟨hw⟩
   haveI : NeZero w := ⟨hw.ne_zero⟩
@@ -105,8 +123,7 @@ theorem UpperTheory.V.Ws.Rt.thetaEx :
     have hb' : b ∈ UpperTheory.V.B3.pPart w w := by
       unfold UpperTheory.V.B3.pPart
       rw [MonoidHom.mem_ker]
-      have hk : ordCompl[w] w = 1 := by
-        rw [hw.factorization_self, pow_one, Nat.div_self hw.pos]
+      have hk : ordCompl[w] w = 1 := by rw [hw.factorization_self, pow_one, Nat.div_self hw.pos]
       haveI : Subsingleton (ZMod (ordCompl[w] w)) := by
         rw [ZMod.subsingleton_iff]
         exact hk

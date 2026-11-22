@@ -9,11 +9,14 @@ open scoped FourierTransform ContDiff Manifold
 
 namespace GlobalTheory
 
-theorem exists_smooth_compact_partition_on_compact :
-    ∀ (Z : Type) [NormedAddCommGroup Z] [NormedSpace ℝ Z] [FiniteDimensional ℝ Z] (K : Set Z),
-    IsCompact K → ∀ (ι : Type) [Fintype ι] (U : ι → Set Z), (∀ i, IsOpen (U i)) →
-    K ⊆ ⋃ i, U i → ∃ φ : ι → Z → ℂ, (∀ i, ContDiff ℝ ∞ (φ i) ∧ HasCompactSupport (φ i) ∧
-      tsupport (φ i) ⊆ U i) ∧ ∀ z ∈ K, ∑ i, φ i z = 1 := by
+theorem exists_smooth_compact_partition_on_compact
+    : ∀ (Z : Type) [NormedAddCommGroup Z] [NormedSpace ℝ Z] [FiniteDimensional ℝ Z] (K : Set Z),
+      IsCompact K
+        → ∀ (ι : Type) [Fintype ι] (U : ι → Set Z),
+          (∀ i, IsOpen (U i)) → K ⊆ ⋃ i, U i
+            → ∃ φ : ι → Z → ℂ,
+              (∀ i, ContDiff ℝ ∞ (φ i) ∧ HasCompactSupport (φ i) ∧ tsupport (φ i) ⊆ U i)
+                ∧ ∀ z ∈ K, ∑ i, φ i z = 1 := by
   intro Z _ _ _ K hK ι _ U hU hKU
   classical
   haveI : ProperSpace Z := FiniteDimensional.proper ℝ Z
@@ -22,9 +25,11 @@ theorem exists_smooth_compact_partition_on_compact :
     intro z hz
     obtain ⟨i, hi⟩ := Set.mem_iUnion.1 (hKU hz)
     exact Set.mem_iUnion.2 ⟨i, hi, hR hz⟩
-  obtain ⟨ρ, hρ⟩ := SmoothPartitionOfUnity.exists_isSubordinate (modelWithCornersSelf ℝ Z)
-    hK.isClosed (fun i => U i ∩ Metric.ball (0 : Z) R)
-    (fun i => (hU i).inter Metric.isOpen_ball) hcov
+  obtain ⟨ρ, hρ⟩ :=
+    SmoothPartitionOfUnity.exists_isSubordinate (modelWithCornersSelf ℝ Z) hK.isClosed
+      (fun i => U i ∩ Metric.ball (0 : Z) R)
+      (fun i => (hU i).inter Metric.isOpen_ball)
+      hcov
   have hρs : ∀ i, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (ρ i) := fun i =>
     contMDiff_iff_contDiff.1 (ρ i).contMDiff
   refine ⟨fun i z => ((ρ i z : ℝ) : ℂ), fun i => ⟨?_, ?_, ?_⟩, ?_⟩

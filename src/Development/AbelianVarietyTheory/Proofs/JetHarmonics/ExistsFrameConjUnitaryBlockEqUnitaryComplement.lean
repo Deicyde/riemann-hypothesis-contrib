@@ -8,7 +8,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SettingConst
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 noncomputable section
@@ -158,7 +159,16 @@ lemma conj_mem_UW {z : Fin (2 * r + k + 1) → ℂ} {g : Matrix (Fin (2 * r + k 
   · rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, frame_inv_mulVec_negativeVector hg, Matrix.mulVec_smul,
       blockW_fix x (by unfold InB wI; simp), hg.2.2]
 
-theorem frame_exists : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), Formalism.QuantumDeterminants.inWb k r z → 0 < Formalism.QuantumDeterminants.Tz k r z → ∃ g, PI.UpqRep.IsFrameW k r z g ∧ (∀ x ∈ PI.UpqRep.UJset (PI.UpqRep.allPos k), g * PI.UpqRep.blockW k r x * g⁻¹ ∈ Formalism.QuantumDeterminants.UWset k r z) ∧ ∀ y ∈ Formalism.QuantumDeterminants.UWset k r z, ∃ x ∈ PI.UpqRep.UJset (PI.UpqRep.allPos k), y = g * PI.UpqRep.blockW k r x * g⁻¹ := by
+theorem frame_exists
+    : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ),
+      Formalism.QuantumDeterminants.inWb k r z → 0 < Formalism.QuantumDeterminants.Tz k r z
+        → ∃ g,
+          PI.UpqRep.IsFrameW k r z g
+            ∧ (∀ x ∈ PI.UpqRep.UJset (PI.UpqRep.allPos k),
+              g * PI.UpqRep.blockW k r x * g⁻¹ ∈ Formalism.QuantumDeterminants.UWset k r z)
+            ∧ ∀ y ∈ Formalism.QuantumDeterminants.UWset k r z,
+              ∃ x ∈ PI.UpqRep.UJset (PI.UpqRep.allPos k),
+                y = g * PI.UpqRep.blockW k r x * g⁻¹ := by
   intro k r z hz hT
   have hT' : 0 < PI.UpqRep.Tz k r z := hT
   obtain ⟨g, hg⟩ := exists_isFrameW z hz hT'

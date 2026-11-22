@@ -11,21 +11,26 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct
 
-theorem gramR_add_sub {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R]
-    [Algebra F R] (σ : E →ₐ[F] E) {M n : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    (x W : Fin n → Fin M → R ⊗[F] E) :
-    gramR R σ J (x + W) - gramR R σ J x - gramR R σ J W = gramB R σ J x W := by
+theorem gramR_add_sub
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E)
+    {M n : ℕ} (J : Matrix (Fin M) (Fin M) E) (x W : Fin n → Fin M → R ⊗[F] E)
+    : gramR R σ J (x + W) - gramR R σ J x - gramR R σ J W = gramB R σ J x W := by
   funext i j
   simp only [Matrix.sub_apply, gramR, gramB, Pi.add_apply, hR_add_left, hR_add_right]
   ring
 
-theorem gramB_add_right {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R]
-    [Algebra F R] (σ : E →ₐ[F] E) {M n : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    (x W W' : Fin n → Fin M → R ⊗[F] E) :
-    gramB R σ J x (W + W') = gramB R σ J x W + gramB R σ J x W' := by
+theorem gramB_add_right
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E)
+    {M n : ℕ} (J : Matrix (Fin M) (Fin M) E) (x W W' : Fin n → Fin M → R ⊗[F] E)
+    : gramB R σ J x (W + W') = gramB R σ J x W + gramB R σ J x W' := by
   funext i j
   simp only [Matrix.add_apply, gramB, Pi.add_apply, hR_add_left, hR_add_right]
   ring
@@ -69,16 +74,20 @@ theorem dxOpen_of (h : SecGram) : DxOpen := by
   show IsOpen (Dx '' (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)))
   rw [isOpen_iff_mem_nhds]
   rintro _ ⟨l, hl, rfl⟩
-  have hU : IsOpen {S : HermR (Fv F v) σ a | T ((S - Dx l : HermR (Fv F v) σ a) :
-      Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L} :=
+  have hU : IsOpen
+      {S : HermR (Fv F v) σ a | T ((S - Dx l : HermR (Fv F v) σ a) :
+        Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L} :=
     hLo.preimage (hTc.comp (continuous_subtype_val.comp (continuous_id.sub continuous_const)))
   refine Filter.mem_of_superset (hU.mem_nhds ?_) ?_
   · show T ((Dx l - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L
     rw [sub_self, AddSubgroup.coe_zero, hT0]
     exact L.zero_mem
   · intro S hS
-    refine ⟨l + T ((S - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)),
-      L.add_mem hl hS, ?_⟩
+    refine ⟨
+      l + T ((S - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)),
+      L.add_mem hl hS,
+      ?_
+    ⟩
     rw [hDadd, hDT]
     abel
 

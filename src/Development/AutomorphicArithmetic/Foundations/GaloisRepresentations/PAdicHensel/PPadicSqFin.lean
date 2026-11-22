@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+  UpperTheory.Gal.G1
 open scoped TensorProduct
 
 private lemma pow_neg_three_lt_two_norm_sq (q : ℕ) [hq : Fact q.Prime] :
@@ -39,18 +41,24 @@ private lemma sq_of_close (q : ℕ) [hq : Fact q.Prime] (z : ℤ_[q])
   refine ⟨x, ?_⟩
   simpa [sub_eq_zero] using hx
 
-theorem UpperTheory.Gal.G1.pPadicSqFin :
-    PadicSqFin := by
+theorem UpperTheory.Gal.G1.pPadicSqFin : PadicSqFin := by
   intro q hq
   haveI : NeZero (q ^ 3) := ⟨pow_ne_zero 3 hq.out.ne_zero⟩
-  refine ⟨Fintype.card (ZMod (q ^ 3)), fun u => Fintype.equivFin (ZMod (q ^ 3))
-    (if h : ‖u‖ ≤ 1 then PadicInt.toZModPow 3 ⟨u, h⟩ else 0), ?_⟩
+  refine ⟨
+    Fintype.card (ZMod (q ^ 3)),
+    fun u =>
+      Fintype.equivFin (ZMod (q ^ 3)) (if h : ‖u‖ ≤ 1 then PadicInt.toZModPow 3 ⟨u, h⟩ else 0),
+    ?_
+  ⟩
   intro u u' hu hu' hk
   simp only [dif_pos hu.le, dif_pos hu'.le, (Fintype.equivFin _).injective.eq_iff] at hk
-  obtain ⟨a, ha⟩ : ∃ a : ℤ_[q], (a : ℚ_[q]) = u ∧ PadicInt.toZModPow 3 a =
-      PadicInt.toZModPow 3 ⟨u, hu.le⟩ := ⟨⟨u, hu.le⟩, rfl, rfl⟩
-  obtain ⟨b, hb⟩ : ∃ b : ℤ_[q], (b : ℚ_[q]) = u' ∧ PadicInt.toZModPow 3 b =
-      PadicInt.toZModPow 3 ⟨u', hu'.le⟩ := ⟨⟨u', hu'.le⟩, rfl, rfl⟩
+  obtain ⟨a, ha⟩
+      : ∃ a : ℤ_[q], (a : ℚ_[q]) = u ∧ PadicInt.toZModPow 3 a = PadicInt.toZModPow 3 ⟨u, hu.le⟩ :=
+    ⟨⟨u, hu.le⟩, rfl, rfl⟩
+  obtain ⟨b, hb⟩
+      : ∃ b : ℤ_[q],
+        (b : ℚ_[q]) = u' ∧ PadicInt.toZModPow 3 b = PadicInt.toZModPow 3 ⟨u', hu'.le⟩ :=
+    ⟨⟨u', hu'.le⟩, rfl, rfl⟩
   have hmem : b - a ∈ RingHom.ker (PadicInt.toZModPow (p := q) 3) := by
     rw [RingHom.sub_mem_ker_iff, ha.2, hb.2]
     exact hk.symm
@@ -61,7 +69,8 @@ theorem UpperTheory.Gal.G1.pPadicSqFin :
       rw [hc, norm_mul, PadicInt.norm_p_pow]
       have hc1 := PadicInt.norm_le_one c
       have hpos : (0 : ℝ) ≤ (q : ℝ) ^ (-((3 : ℕ) : ℤ)) := by positivity
-      calc _ ≤ (q : ℝ) ^ (-((3 : ℕ) : ℤ)) * 1 := mul_le_mul_of_nonneg_left hc1 hpos
+      calc
+        _ ≤ (q : ℝ) ^ (-((3 : ℕ) : ℤ)) * 1 := mul_le_mul_of_nonneg_left hc1 hpos
         _ = _ := mul_one _
     rw [PadicInt.norm_def, PadicInt.coe_sub, ha.1, hb.1] at h1
     simpa using h1
@@ -72,13 +81,14 @@ theorem UpperTheory.Gal.G1.pPadicSqFin :
     rw [norm_div, hu, hu']
     simp
   obtain ⟨w, hw⟩ : ∃ w : ℤ_[q], (w : ℚ_[q]) = u' / u := ⟨⟨u' / u, hz⟩, rfl⟩
-  obtain ⟨x, hx⟩ := sq_of_close q w (by
-    have e : ‖(1 : ℤ_[q]) - w‖ = ‖u' - u‖ := by
-      rw [PadicInt.norm_def, PadicInt.coe_sub, PadicInt.coe_one, hw,
-        show (1 : ℚ_[q]) - u' / u = (u - u') / u by field_simp, norm_div, hu, div_one,
-        norm_sub_rev]
-    rw [e]
-    exact lt_of_le_of_lt hd (pow_neg_three_lt_two_norm_sq q))
+  obtain ⟨x, hx⟩ :=
+    sq_of_close q w (by
+      have e : ‖(1 : ℤ_[q]) - w‖ = ‖u' - u‖ := by
+        rw [PadicInt.norm_def, PadicInt.coe_sub, PadicInt.coe_one, hw,
+          show (1 : ℚ_[q]) - u' / u = (u - u') / u by field_simp, norm_div, hu, div_one,
+          norm_sub_rev]
+      rw [e]
+      exact lt_of_le_of_lt hd (pow_neg_three_lt_two_norm_sq q))
   refine ⟨x, ?_⟩
   have hx' : (x : ℚ_[q]) ^ 2 = u' / u := by
     rw [← hw, ← hx]

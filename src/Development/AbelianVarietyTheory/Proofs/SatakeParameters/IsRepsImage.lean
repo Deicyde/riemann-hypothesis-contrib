@@ -7,10 +7,13 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.UnderT
 
 namespace GlobalTheory.RepresentativesImage
 
-theorem isReps_image {V W : Type} [AddCommGroup V] [AddCommGroup W] [DecidableEq W] (T : V ≃+ W)
+theorem isReps_image
+    {V W : Type} [AddCommGroup V] [AddCommGroup W] [DecidableEq W]
+    (T : V ≃+ W)
     {Λ₁ Λ₂ : AddSubgroup V} {M₁ M₂ : AddSubgroup W} {S : Finset V}
-    (hS : Formalism.L2.Th1.H.IsReps Λ₁ Λ₂ S) (h₁ : ∀ x : V, T x ∈ M₁ ↔ x ∈ Λ₁) (h₂ : ∀ x : V, T x ∈ M₂ ↔ x ∈ Λ₂) :
-    Formalism.L2.Th1.H.IsReps M₁ M₂ (Finset.image (⇑T : V → W) S) := by
+    (hS : Formalism.L2.Th1.H.IsReps Λ₁ Λ₂ S) (h₁ : ∀ x : V, T x ∈ M₁ ↔ x ∈ Λ₁)
+    (h₂ : ∀ x : V, T x ∈ M₂ ↔ x ∈ Λ₂)
+    : Formalism.L2.Th1.H.IsReps M₁ M₂ (Finset.image (⇑T : V → W) S) := by
   unfold Formalism.L2.Th1.H.IsReps at hS ⊢
   obtain ⟨hmem, hdist, hcov⟩ := hS
   refine ⟨?_, ?_, ?_⟩

@@ -15,17 +15,19 @@ section Helpers
 
 variable {O : Type} [CommRing O] [IsDomain O]
 
-theorem C_dvd_of_forall_dvd_coeff (a : O) (w : PowerSeries O) (h : ∀ n, a ∣ coeff n w) :
-    C a ∣ w := by
+theorem C_dvd_of_forall_dvd_coeff (a : O) (w : PowerSeries O) (h : ∀ n, a ∣ coeff n w)
+    : C a ∣ w := by
   choose q hq using h
   refine ⟨PowerSeries.mk q, ?_⟩
   ext n
   rw [PowerSeries.coeff_C_mul, PowerSeries.coeff_mk]
   exact hq n
 
-theorem C_dvd_of_C_dvd_mul (ϖ : O) [(Ideal.span {ϖ}).IsMaximal] (f w : PowerSeries O)
-    (hf : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) f ≠ 0)
-    (h : C ϖ ∣ f * w) : C ϖ ∣ w := by
+theorem C_dvd_of_C_dvd_mul
+    (ϖ : O) [(Ideal.span {ϖ}).IsMaximal]
+    (f w : PowerSeries O)
+    (hf : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) f ≠ 0) (h : C ϖ ∣ f * w)
+    : C ϖ ∣ w := by
   obtain ⟨q, hq⟩ := h
   have hk : Ideal.Quotient.mk (Ideal.span {ϖ}) ϖ = 0 :=
     Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self ϖ)
@@ -37,23 +39,26 @@ theorem C_dvd_of_C_dvd_mul (ϖ : O) [(Ideal.span {ϖ}).IsMaximal] (f w : PowerSe
   apply C_dvd_of_forall_dvd_coeff
   intro n
   have hn := congrArg (PowerSeries.coeff n) hw
-  rw [PowerSeries.coeff_map, map_zero, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton] at hn
+  rw [PowerSeries.coeff_map, map_zero, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton]
+    at hn
   exact hn
 
-theorem map_ne_zero_of_unitDist (ϖ : O) [(Ideal.span {ϖ}).IsMaximal] (d : ℕ)
-    (p : PowerSeries O) (hp : UnitDist ϖ d p) :
-    PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) p ≠ 0 := by
+theorem map_ne_zero_of_unitDist
+    (ϖ : O) [(Ideal.span {ϖ}).IsMaximal] (d : ℕ) (p : PowerSeries O) (hp : UnitDist ϖ d p)
+    : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) p ≠ 0 := by
   obtain ⟨u, E, hu, hE, hdeg, rfl⟩ := hp
   subst hdeg
   rw [map_mul]
   refine mul_ne_zero (hu.map _).ne_zero ?_
   intro h0
   have hc := congrArg (PowerSeries.coeff E.natDegree) h0
-  rw [PowerSeries.coeff_map, Polynomial.coeff_coe, hE.monic.coeff_natDegree, map_one, map_zero] at hc
+  rw [PowerSeries.coeff_map, Polynomial.coeff_coe, hE.monic.coeff_natDegree, map_one, map_zero]
+    at hc
   exact one_ne_zero hc
 
-theorem constantCoeff_mem_of_unitDist (ϖ : O) (d : ℕ) (p : PowerSeries O) (hp : UnitDist ϖ d p)
-    (hd : 1 ≤ d) : coeff 0 p ∈ Ideal.span {ϖ} := by
+theorem constantCoeff_mem_of_unitDist
+    (ϖ : O) (d : ℕ) (p : PowerSeries O) (hp : UnitDist ϖ d p) (hd : 1 ≤ d)
+    : coeff 0 p ∈ Ideal.span {ϖ} := by
   obtain ⟨u, E, hu, hE, hdeg, rfl⟩ := hp
   rw [PowerSeries.coeff_zero_eq_constantCoeff_apply, map_mul]
   refine Ideal.mul_mem_left _ _ ?_
@@ -62,10 +67,12 @@ theorem constantCoeff_mem_of_unitDist (ϖ : O) (d : ℕ) (p : PowerSeries O) (hp
 
 end Helpers
 
-private theorem mem_span_of_C_pow_mul_mem_span {O : Type} [CommRing O] [IsDomain O] (ϖ : O)
-    [(Ideal.span {ϖ}).IsMaximal] (hϖ0 : ϖ ≠ 0) (q : PowerSeries O)
-    (hq : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) q ≠ 0) :
-    ∀ (N : ℕ) (z : PowerSeries O), C (ϖ ^ N) * z ∈ Ideal.span {q} → z ∈ Ideal.span {q} := by
+private theorem mem_span_of_C_pow_mul_mem_span
+    {O : Type} [CommRing O] [IsDomain O]
+    (ϖ : O) [(Ideal.span {ϖ}).IsMaximal]
+    (hϖ0 : ϖ ≠ 0)
+    (q : PowerSeries O) (hq : PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) q ≠ 0)
+    : ∀ (N : ℕ) (z : PowerSeries O), C (ϖ ^ N) * z ∈ Ideal.span {q} → z ∈ Ideal.span {q} := by
   have hC : (C ϖ : PowerSeries O) ≠ 0 := fun h =>
     hϖ0 (by simpa using congrArg PowerSeries.constantCoeff h)
   intro N
@@ -95,8 +102,10 @@ theorem mem_span_pow_of_uniformizer_mul : SatDist := by
 
 theorem pow_dvd_of_const_mem_span : ConstDist := by
   intro O _ _ _ ϖ hϖ d p hp hd c y N a h
-  have key : ∀ (N : ℕ) (z : PowerSeries O), C (ϖ ^ N) * z ∈ Ideal.span {p} → z ∈ Ideal.span {p} :=
-    fun N z hz => by simpa using mem_span_pow_of_uniformizer_mul O ϖ hϖ d p hp 1 N z (by simpa using hz)
+  have key
+      : ∀ (N : ℕ) (z : PowerSeries O),
+        C (ϖ ^ N) * z ∈ Ideal.span {p} → z ∈ Ideal.span {p} := fun N z hz => by
+    simpa using mem_span_pow_of_uniformizer_mul O ϖ hϖ d p hp 1 N z (by simpa using hz)
   have hp0 := constantCoeff_mem_of_unitDist ϖ d p hp hd
   rw [PowerSeries.coeff_zero_eq_constantCoeff_apply, Ideal.mem_span_singleton] at hp0
   have h1 := key N _ h
@@ -120,8 +129,10 @@ theorem pow_dvd_of_const_mem_span : ConstDist := by
     have h4 := congrArg PowerSeries.constantCoeff hg
     simp only [map_mul, map_sub, PowerSeries.constantCoeff_C] at h4
     have hc' : ϖ ∣ c' := by
-      have e : c' = PowerSeries.constantCoeff g * PowerSeries.constantCoeff p +
-          ϖ * PowerSeries.constantCoeff a := by
+      have e
+          : c'
+            = PowerSeries.constantCoeff g * PowerSeries.constantCoeff p
+              + ϖ * PowerSeries.constantCoeff a := by
         linear_combination (-1 : O) * h4
       rw [e]
       exact dvd_add (dvd_mul_of_dvd_right hp0 _) (dvd_mul_right _ _)

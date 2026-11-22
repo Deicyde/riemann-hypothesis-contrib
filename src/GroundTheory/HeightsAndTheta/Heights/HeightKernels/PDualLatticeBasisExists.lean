@@ -17,13 +17,16 @@ namespace DualLatticeBasisExistsAlt
 
 variable {K : Type} [Field K] [NumberField K] {i : ℕ}
 
-theorem eq_zero_of_dotProduct_gens (F : HermLattice K i) (s : Finset (Fin i → K))
-    (hs : Submodule.span (𝓞 K) (s : Set (Fin i → K)) = F.lattice) (φ : Fin i → K)
-    (h : ∀ g ∈ s, φ ⬝ᵥ g = 0) : φ = 0 := by
-  let L : (Fin i → K) →ₗ[K] K :=
-    { toFun := fun x => φ ⬝ᵥ x
-      map_add' := dotProduct_add φ
-      map_smul' := fun c x => by simp [dotProduct_smul] }
+theorem eq_zero_of_dotProduct_gens
+    (F : HermLattice K i) (s : Finset (Fin i → K))
+    (hs : Submodule.span (𝓞 K) (s : Set (Fin i → K)) = F.lattice)
+    (φ : Fin i → K) (h : ∀ g ∈ s, φ ⬝ᵥ g = 0)
+    : φ = 0 := by
+  let L : (Fin i → K) →ₗ[K] K := {
+    toFun := fun x => φ ⬝ᵥ x
+    map_add' := dotProduct_add φ
+    map_smul' := fun c x => by simp [dotProduct_smul]
+  }
   have h1 : F.lattice ≤ (LinearMap.ker L).restrictScalars (𝓞 K) := by
     rw [← hs, Submodule.span_le]
     intro g hg
@@ -42,13 +45,14 @@ theorem dualLattice_fg (F : HermLattice K i) : (dualLattice F).FG := by
   classical
   obtain ⟨s, hs⟩ := F.fg
 
-  let G : (Fin i → K) →ₗ[ℤ] (s → K) :=
-    { toFun := fun φ g => φ ⬝ᵥ (g : Fin i → K)
-      map_add' := fun φ ψ => by funext g; simp [add_dotProduct]
-      map_smul' := fun c φ => by
-        funext g
-        show (c • φ) ⬝ᵥ (g : Fin i → K) = c • (φ ⬝ᵥ (g : Fin i → K))
-        exact smul_dotProduct c φ _ }
+  let G : (Fin i → K) →ₗ[ℤ] (s → K) := {
+    toFun := fun φ g => φ ⬝ᵥ (g : Fin i → K)
+    map_add' := fun φ ψ => by funext g; simp [add_dotProduct]
+    map_smul' := fun c φ => by
+      funext g
+      show (c • φ) ⬝ᵥ (g : Fin i → K) = c • (φ ⬝ᵥ (g : Fin i → K))
+      exact smul_dotProduct c φ _
+  }
   have hG : Function.Injective G := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro φ hφ
@@ -72,14 +76,17 @@ theorem dualLattice_fg (F : HermLattice K i) : (dualLattice F).FG := by
 
 end DualLatticeBasisExistsAlt
 
-
 open DualLatticeBasisExistsAlt in
 theorem DualLatticeBasisExists.proof : DualLatticeBasisExists.Statement := by
   intro K _ _ i F
   classical
   have : Module.Finite ℤ (dualLattice F) := Module.Finite.iff_fg.mpr (dualLattice_fg F)
-  exact ⟨Module.Free.ChooseBasisIndex ℤ (dualLattice F), inferInstance, inferInstance,
-    ⟨Module.Free.chooseBasis ℤ (dualLattice F)⟩⟩
+  exact ⟨
+    Module.Free.ChooseBasisIndex ℤ (dualLattice F),
+    inferInstance,
+    inferInstance,
+    ⟨Module.Free.chooseBasis ℤ (dualLattice F)⟩
+  ⟩
 
 end
 

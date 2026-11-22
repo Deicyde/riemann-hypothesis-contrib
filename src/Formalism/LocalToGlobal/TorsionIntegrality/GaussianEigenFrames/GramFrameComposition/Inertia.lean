@@ -74,8 +74,7 @@ theorem InertiaRam_proof : InertiaRam := by
   have hq1 : q < 1 := norm_p_lt_one
   set d : ℝ := ‖φ δ‖ with hd
   have hd0 : 0 ≤ d := norm_nonneg _
-  have hdq : d ^ 2 = q := by
-    rw [hd, ← norm_pow, ← map_pow, hδ, map_neg, map_natCast, norm_neg]
+  have hdq : d ^ 2 = q := by rw [hd, ← norm_pow, ← map_pow, hδ, map_neg, map_natCast, norm_neg]
   have hdpos : 0 < d := by
     rcases hd0.lt_or_eq with h | h
     · exact h
@@ -94,14 +93,15 @@ theorem InertiaRam_proof : InertiaRam := by
     intro h
     rw [hd, h, map_zero, norm_zero] at hdpos
     exact lt_irrefl _ hdpos
-  have hdr : d = q ^ (1 / 2 : ℝ) := by
-    rw [← Real.sqrt_eq_rpow, ← hdq, Real.sqrt_sq hd0]
+  have hdr : d = q ^ (1 / 2 : ℝ) := by rw [← Real.sqrt_eq_rpow, ← hdq, Real.sqrt_sq hd0]
 
   have key : ∀ b : ℂ_[p], b ∈ MaximalUnramifiedExtension p → ‖b‖ * d ≤ 1 → ‖b‖ ≤ 1 := by
     intro b hb h
     have h1 : ‖b‖ < q ^ (-1 : ℤ) := by
       rw [zpow_neg_one, ← hdq, ← one_div, lt_div_iff₀ (by positivity)]
-      calc ‖b‖ * d ^ 2 = (‖b‖ * d) * d := by ring
+      calc
+        ‖b‖ * d ^ 2
+          = (‖b‖ * d) * d := by ring
         _ ≤ 1 * d := mul_le_mul_of_nonneg_right h hd0
         _ < 1 := by rw [one_mul]; exact hd1
     have := kur_step hb (-1) h1
@@ -119,16 +119,14 @@ theorem InertiaRam_proof : InertiaRam := by
       refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hint y) ?_)
       rw [norm_neg]
       exact hints y
-    have hmul : ‖φ (w / δ)‖ * d = ‖φ w‖ := by
-      rw [hd, ← norm_mul, ← map_mul, div_mul_cancel₀ _ hδ0]
+    have hmul : ‖φ (w / δ)‖ * d = ‖φ w‖ := by rw [hd, ← norm_mul, ← map_mul, div_mul_cancel₀ _ hδ0]
     have h1 := key _ (hK _ hsw) (by rw [hmul]; exact hw1)
     rw [← map_sub, ← hw, ← hmul]
     exact mul_le_of_le_one_left hd0 h1
   · intro y hy
     set a : E := ((y : E) + s (y : E)) / 2 with ha
     set b : E := ((y : E) - s (y : E)) / (2 * δ) with hb
-    have hsa : s a = a := by
-      rw [ha, map_div₀, map_add (f := _), hss, map_ofNat, add_comm]
+    have hsa : s a = a := by rw [ha, map_div₀, map_add (f := _), hss, map_ofNat, add_comm]
     have hsb : s b = b := by
       rw [hb, map_div₀, map_mul, hsδ, map_sub, hss, map_ofNat, mul_neg, div_neg, ← neg_div, neg_sub]
     have hy' : (y : E) = a + b * δ := by
@@ -137,8 +135,7 @@ theorem InertiaRam_proof : InertiaRam := by
       ring
     have hnb : ‖φ (b * δ)‖ = ‖φ b‖ * d := by rw [map_mul, norm_mul]
     by_cases hne : ‖φ a‖ = ‖φ (b * δ)‖
-    ·
-      by_cases hb0 : φ b = 0
+    · by_cases hb0 : φ b = 0
       · have ha0 : φ a = 0 := by
           rw [hnb, hb0, norm_zero, zero_mul] at hne
           exact norm_eq_zero.1 hne
@@ -152,8 +149,7 @@ theorem InertiaRam_proof : InertiaRam := by
           linarith
         obtain ⟨k, hk⟩ := Formalism.L2.Th1.D.kurUnram p _ (hK _ hsa) ha0
         obtain ⟨m, hm⟩ := Formalism.L2.Th1.D.kurUnram p _ (hK _ hsb) hb0
-        have h2 : (‖φ a‖) ^ 2 = (‖φ b‖) ^ 2 * q := by
-          rw [hne, hnb, mul_pow, hdq]
+        have h2 : (‖φ a‖) ^ 2 = (‖φ b‖) ^ 2 * q := by rw [hne, hnb, mul_pow, hdq]
         rw [hk, hm, ← hq] at h2
         have h3 : q ^ (2 * k) = q ^ (2 * m + 1) := by
           rw [zpow_add₀ hq0.ne', zpow_one, mul_comm 2 k, mul_comm 2 m, zpow_mul, zpow_mul]

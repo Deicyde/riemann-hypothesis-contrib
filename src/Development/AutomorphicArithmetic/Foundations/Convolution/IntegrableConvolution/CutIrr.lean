@@ -23,8 +23,7 @@ private lemma UpperTheory.ConvolutionTheory.L1.cutIrr_prod {Γ G H : Type} [Grou
     · rw [List.prod_cons, UnitaryRep.map_mul_apply]
       exact hP _ _ _ (h2 v hv)
 
-theorem UpperTheory.ConvolutionTheory.L1.cutIrr :
-    UpperTheory.ConvolutionTheory.L1.CutIrr := by
+theorem UpperTheory.ConvolutionTheory.L1.cutIrr : UpperTheory.ConvolutionTheory.L1.CutIrr := by
   intro Γ G H _ _ _ _ _ _ π V m ι E A U h
   have hfix : ∀ v, v ∈ eigIn V E 1 ↔ v ∈ V ∧ E v = v := by
     intro v
@@ -51,20 +50,23 @@ theorem UpperTheory.ConvolutionTheory.L1.cutIrr :
       | mem x hx =>
         obtain ⟨γ, rfl⟩ := hx
         exact Submodule.subset_span ⟨g * γ, by simp [UnitaryRep.map_mul_apply]⟩
-      | zero => simp
+      | zero =>
+        simp
       | add x y _ _ hx hy =>
         rw [map_add (f := _)]
         exact S.add_mem hx hy
       | smul a x _ hx =>
         rw [map_smul]
         exact S.smul_mem a hx
-    have hSV : S ≤ V := Submodule.span_le.2 (by
-      rintro _ ⟨γ, rfl⟩
-      exact h.summand.inv _ _ hwV)
+    have hSV : S ≤ V :=
+      Submodule.span_le.2 (by
+        rintro _ ⟨γ, rfl⟩
+        exact h.summand.inv _ _ hwV)
     have hQle : S.topologicalClosure ≤ V :=
       Submodule.topologicalClosure_minimal _ hSV h.summand.closed
     have hQ : S.topologicalClosure = V := by
-      rcases h.summand.irred _ hQle S.isClosed_topologicalClosure hSinv.topologicalClosure with h0 | h1
+      rcases h.summand.irred _ hQle S.isClosed_topologicalClosure hSinv.topologicalClosure with
+        h0 | h1
       · exfalso
         have hmem : w ∈ S.topologicalClosure :=
           S.le_topologicalClosure (Submodule.subset_span ⟨1, by simp⟩)
@@ -87,7 +89,8 @@ theorem UpperTheory.ConvolutionTheory.L1.cutIrr :
         show E (π γ w) ∈ P
         rw [hγ, UnitaryRep.map_mul_apply, h1, hc']
         exact h2 _ (P.smul_mem c hwP)
-      | zero => simp
+      | zero =>
+        simp
       | add x y _ _ hx hy =>
         rw [map_add (f := _)]
         exact P.add_mem hx hy

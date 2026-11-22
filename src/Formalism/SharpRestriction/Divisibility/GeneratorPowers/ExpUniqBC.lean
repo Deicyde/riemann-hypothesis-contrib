@@ -13,7 +13,9 @@ noncomputable section
 namespace Formalism.MainNotions.ModuliIntegralCharts.H1.ExpUniqBC
 
 open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open MvPolynomial Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1.ExpUniqJet Formalism.MainNotions.ModuliIntegralCharts.H1.ExpUniqLoc Formalism.MainNotions.ModuliIntegralCharts.H1.ExpUniqTan
+open MvPolynomial Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1.ExpUniqJet
+  Formalism.MainNotions.ModuliIntegralCharts.H1.ExpUniqLoc
+  Formalism.MainNotions.ModuliIntegralCharts.H1.ExpUniqTan
 open ReciprocityTheory.ChartRestriction.G.Chart (JetR zR IsUnivChart sp spMap spMap_comp comp_one')
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp)
 open scoped CategoryTheory.Obj
@@ -33,12 +35,13 @@ def br {A : Type} [CommRing A] [Algebra S A] (f : overAt x0 A ⟶ G) : sp (R₀ 
 
 variable {G x0}
 
-theorem br_injective {A : Type} [CommRing A] [Algebra S A] : Function.Injective (br G x0 (A := A)) := by
+theorem br_injective {A : Type} [CommRing A] [Algebra S A]
+    : Function.Injective (br G x0 (A := A)) := by
   intro f g h
   exact ((Over.mapPullbackAdj x0).homEquiv _ _).injective h
 
-theorem br_mul {A : Type} [CommRing A] [Algebra S A] (f g : overAt x0 A ⟶ G) :
-    br G x0 (f * g) = br G x0 f * br G x0 g := by
+theorem br_mul {A : Type} [CommRing A] [Algebra S A] (f g : overAt x0 A ⟶ G)
+    : br G x0 (f * g) = br G x0 f * br G x0 g := by
   simp only [br, Adjunction.homEquiv_unit]
   first
   | rw [Functor.map_mul, comp_mul]
@@ -49,14 +52,14 @@ theorem br_mul {A : Type} [CommRing A] [Algebra S A] (f g : overAt x0 A ⟶ G) :
 theorem br_one {A : Type} [CommRing A] [Algebra S A] : br G x0 (1 : overAt x0 A ⟶ G) = 1 := by
   simp [br, Adjunction.homEquiv_unit]
 
-theorem homAt_eq {A B : Type} [CommRing A] [Algebra S A] [CommRing B] [Algebra S B] (ψ : A →ₐ[S] B) :
-    homAt x0 ψ = (Over.map x0).map (spMap ψ) := by
-  first
-  | rfl
-  | exact Over.OverMorphism.ext rfl
+theorem homAt_eq {A B : Type} [CommRing A] [Algebra S A] [CommRing B] [Algebra S B] (ψ : A →ₐ[S] B)
+    : homAt x0 ψ = (Over.map x0).map (spMap ψ) := by
+  first | rfl | exact Over.OverMorphism.ext rfl
 
-theorem br_comp {A B : Type} [CommRing A] [Algebra S A] [CommRing B] [Algebra S B] (ψ : A →ₐ[S] B)
-    (f : overAt x0 A ⟶ G) : br G x0 (homAt x0 ψ ≫ f) = spMap ψ ≫ br G x0 f := by
+theorem br_comp
+    {A B : Type} [CommRing A] [Algebra S A] [CommRing B] [Algebra S B]
+    (ψ : A →ₐ[S] B) (f : overAt x0 A ⟶ G)
+    : br G x0 (homAt x0 ψ ≫ f) = spMap ψ ≫ br G x0 f := by
   unfold br
   rw [homAt_eq, Adjunction.homEquiv_naturality_left]
 

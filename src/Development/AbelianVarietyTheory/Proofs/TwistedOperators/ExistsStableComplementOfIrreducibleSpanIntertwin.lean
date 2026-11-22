@@ -5,10 +5,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HasInfExp
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -20,25 +23,30 @@ namespace GlobalTheory.RealQuot.SemisimpleSpan
 
 open GlobalTheory.RealQuot
 
-theorem isStab_iSup {ι κ M : Type} [AddCommGroup M] [Module ℂ M] {σ : ι → Module.End ℂ M}
-    (W : κ → Submodule ℂ M) (h : ∀ k, IsStab σ (W k)) : IsStab σ (⨆ k, W k) := by
+theorem isStab_iSup
+    {ι κ M : Type} [AddCommGroup M] [Module ℂ M]
+    {σ : ι → Module.End ℂ M} (W : κ → Submodule ℂ M) (h : ∀ k, IsStab σ (W k))
+    : IsStab σ (⨆ k, W k) := by
   intro i
   have hle : (⨆ k, W k) ≤ (⨆ k, W k).comap (σ i) :=
     iSup_le fun k x hx => Submodule.mem_iSup_of_mem k (h k i x hx)
   exact fun x hx => hle hx
 
-theorem exists_stab_compl_of_iSup {ι κ M : Type} [AddCommGroup M] [Module ℂ M] (σ : ι → Module.End ℂ M)
-    (W : κ → Submodule ℂ M) (hW : ∀ k, IsStab σ (W k))
-    (hs : ∀ k (V : Submodule ℂ M), IsStab σ V → V ≤ W k → V = ⊥ ∨ V = W k) (htop : ⨆ k, W k = ⊤) :
-    ∀ N : Submodule ℂ M, IsStab σ N → ∃ N' : Submodule ℂ M, IsStab σ N' ∧ IsCompl N N' := by
+theorem exists_stab_compl_of_iSup
+    {ι κ M : Type} [AddCommGroup M] [Module ℂ M]
+    (σ : ι → Module.End ℂ M) (W : κ → Submodule ℂ M) (hW : ∀ k, IsStab σ (W k))
+    (hs : ∀ k (V : Submodule ℂ M), IsStab σ V → V ≤ W k → V = ⊥ ∨ V = W k) (htop : ⨆ k, W k = ⊤)
+    : ∀ N : Submodule ℂ M, IsStab σ N → ∃ N' : Submodule ℂ M, IsStab σ N' ∧ IsCompl N N' := by
   letI : Module (FreeAlgebra ℂ ι) M :=
     Module.compHom M (FreeAlgebra.lift ℂ σ : FreeAlgebra ℂ ι →ₐ[ℂ] Module.End ℂ M).toRingHom
-  have smul_def : ∀ (a : FreeAlgebra ℂ ι) (x : M), a • x = FreeAlgebra.lift ℂ σ a x := fun _ _ => rfl
+  have smul_def : ∀ (a : FreeAlgebra ℂ ι) (x : M), a • x = FreeAlgebra.lift ℂ σ a x := fun _ _ =>
+    rfl
   haveI : IsScalarTower ℂ (FreeAlgebra ℂ ι) M := ⟨fun c a x => by
     rw [smul_def, smul_def, map_smul]
     rfl⟩
-  have key : ∀ N : Submodule ℂ M, IsStab σ N →
-      ∃ W' : Submodule (FreeAlgebra ℂ ι) M, W'.restrictScalars ℂ = N := by
+  have key
+      : ∀ N : Submodule ℂ M,
+        IsStab σ N → ∃ W' : Submodule (FreeAlgebra ℂ ι) M, W'.restrictScalars ℂ = N := by
     intro N hN
     have hst : ∀ a : FreeAlgebra ℂ ι, ∀ x ∈ N, FreeAlgebra.lift ℂ σ a x ∈ N := by
       intro a
@@ -59,10 +67,15 @@ theorem exists_stab_compl_of_iSup {ι κ M : Type} [AddCommGroup M] [Module ℂ 
         intro x hx
         rw [map_add (f := _), LinearMap.add_apply]
         exact N.add_mem (ha x hx) (hb x hx)
-    refine ⟨{ carrier := N
-              add_mem' := N.add_mem
-              zero_mem' := N.zero_mem
-              smul_mem' := fun a x hx => hst a x hx }, ?_⟩
+    refine ⟨
+      {
+        carrier := N
+        add_mem' := N.add_mem
+        zero_mem' := N.zero_mem
+        smul_mem' := fun a x hx => hst a x hx
+      },
+      ?_
+    ⟩
     ext x
     rfl
   have stabR : ∀ W' : Submodule (FreeAlgebra ℂ ι) M, IsStab σ (W'.restrictScalars ℂ) := by
@@ -81,7 +94,8 @@ theorem exists_stab_compl_of_iSup {ι κ M : Type} [AddCommGroup M] [Module ℂ 
     · rw [h0]
       exact bot_le
     · refine le_sSup (isSimpleModule_iff_isAtom.2 ⟨h0, fun V hV => ?_⟩)
-      rcases hs k (V.restrictScalars ℂ) (stabR V) (hWk ▸ Submodule.restrictScalars_mono ℂ hV.le) with h | h
+      rcases hs k (V.restrictScalars ℂ) (stabR V) (hWk ▸ Submodule.restrictScalars_mono ℂ hV.le)
+        with h | h
       · exact (Submodule.restrictScalars_eq_bot_iff ℂ _ _).1 h
       · exact absurd ((Submodule.restrictScalars_injective ℂ _ _) (h.trans hWk.symm)) hV.ne
   intro N hN
@@ -93,12 +107,18 @@ theorem exists_stab_compl_of_iSup {ι κ M : Type} [AddCommGroup M] [Module ℂ 
   · rw [codisjoint_iff, ← hWN, ← Submodule.restrictScalars_sup, hc.sup_eq_top]
     rfl
 
-theorem exists_stab_compl : ∀ (ι J Fm Q Pi : Type) [AddCommGroup Q] [Module ℂ Q] [AddCommGroup Pi] [Module ℂ Pi] (ρ : ι → Module.End ℂ Q)
-  (C : Submodule ℂ Q) (σ : ι → Module.End ℂ Pi) (τ : J → Module.End ℂ Pi) (β : Fm → Q →ₗ[ℂ] Pi),
-  GlobalTheory.RealQuot.HoweCond ρ C → (∀ f i, β f ∘ₗ ρ i = σ i ∘ₗ β f) → (∀ f, C ≤ LinearMap.ker (β f)) →
-  (∀ j f, ∃ f', τ j ∘ₗ β f = β f') → (⨆ f, LinearMap.range (β f)) = ⊤ →
-  (∀ N : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N → GlobalTheory.RealQuot.IsStab τ N → N = ⊥ ∨ N = ⊤) →
-  ∀ N : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N → ∃ N' : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N' ∧ IsCompl N N' := by
+theorem exists_stab_compl
+    : ∀ (ι J Fm Q Pi : Type) [AddCommGroup Q] [Module ℂ Q] [AddCommGroup Pi] [Module ℂ Pi]
+        (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) (σ : ι → Module.End ℂ Pi)
+        (τ : J → Module.End ℂ Pi) (β : Fm → Q →ₗ[ℂ] Pi),
+      GlobalTheory.RealQuot.HoweCond ρ C → (∀ f i, β f ∘ₗ ρ i = σ i ∘ₗ β f)
+        → (∀ f, C ≤ LinearMap.ker (β f)) → (∀ j f, ∃ f', τ j ∘ₗ β f = β f')
+        → (⨆ f, LinearMap.range (β f)) = ⊤
+        → (∀ N : Submodule ℂ Pi,
+          GlobalTheory.RealQuot.IsStab σ N → GlobalTheory.RealQuot.IsStab τ N → N = ⊥ ∨ N = ⊤)
+        → ∀ N : Submodule ℂ Pi,
+          GlobalTheory.RealQuot.IsStab σ N
+            → ∃ N' : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N' ∧ IsCompl N N' := by
   intro ι J Fm Q Pi _ _ _ _ ρ C σ τ β hH hint hker hτ hspan hirr
   obtain ⟨⟨L, hL⟩, -⟩ := hH
   have hcomm : ∀ f i x, β f (ρ i x) = σ i (β f x) := fun f i x => by
@@ -127,10 +147,17 @@ theorem exists_stab_compl : ∀ (ι J Fm Q Pi : Type) [AddCommGroup Q] [Module �
       exact Submodule.mem_iSup_of_mem f' ⟨x, hx, rfl⟩
     exact fun x hx => hle hx
 
-  obtain ⟨S, hSst, hStop, hsimp⟩ : ∃ S : Submodule ℂ Q, IsStab ρ S ∧ (⨆ f, S.map (β f)) = ⊤ ∧
-      ∀ f (V : Submodule ℂ Pi), IsStab σ V → V ≤ S.map (β f) → V = ⊥ ∨ V = S.map (β f) := by
+  obtain ⟨S, hSst, hStop, hsimp⟩
+      : ∃ S : Submodule ℂ Q,
+        IsStab ρ S ∧ (⨆ f, S.map (β f)) = ⊤
+          ∧ ∀ f (V : Submodule ℂ Pi), IsStab σ V → V ≤ S.map (β f) → V = ⊥ ∨ V = S.map (β f) := by
     by_cases hK : K = ⊤
-    · refine ⟨⊤, fun i x _ => Submodule.mem_top, by simpa [Submodule.map_top] using hspan, fun f V _ hV => Or.inl ?_⟩
+    · refine ⟨
+        ⊤,
+        fun i x _ => Submodule.mem_top,
+        by simpa [Submodule.map_top] using hspan,
+        fun f V _ hV => Or.inl ?_
+      ⟩
       have h0 : (⊤ : Submodule ℂ Q).map (β f) = ⊥ := by
         rw [Submodule.map_top, LinearMap.range_eq_bot]
         exact LinearMap.ker_eq_top.1 (top_le_iff.1 (hK ▸ hKf f))
@@ -146,8 +173,9 @@ theorem exists_stab_compl : ∀ (ι J Fm Q Pi : Type) [AddCommGroup Q] [Module �
           exact anti (by have := a.2; have := b.2; simp only [Fin.lt_def] at hab; omega)
         have := hL (L + 1) _ mono fun k => (g (L - k.1)).2
         omega
-      obtain ⟨M, hMK0, hMmin⟩ := wf.has_min {x : T | K < x.1}
-        ⟨⟨⊤, fun i x _ => Submodule.mem_top, le_top⟩, lt_top_iff_ne_top.2 hK⟩
+      obtain ⟨M, hMK0, hMmin⟩ :=
+        wf.has_min {x : T | K < x.1}
+          ⟨⟨⊤, fun i x _ => Submodule.mem_top, le_top⟩, lt_top_iff_ne_top.2 hK⟩
       have hMK : K < M.1 := hMK0
       refine ⟨M.1, M.2.1, ?_, ?_⟩
       · rcases hNS M.1 M.2.1 with h | h
@@ -166,10 +194,13 @@ theorem exists_stab_compl : ∀ (ι J Fm Q Pi : Type) [AddCommGroup Q] [Module �
           show β f (ρ i x) ∈ V
           rw [hcomm]
           exact hVs i _ hx2
-        have hKU : K ≤ U := fun x hx => ⟨hMK.le hx, by
-          show β f x ∈ V
-          rw [LinearMap.mem_ker.1 (hKf f hx)]
-          exact V.zero_mem⟩
+        have hKU : K ≤ U := fun x hx => ⟨
+          hMK.le hx,
+          by
+            show β f x ∈ V
+            rw [LinearMap.mem_ker.1 (hKf f hx)]
+            exact V.zero_mem
+        ⟩
         by_cases hlt : K < U
         · right
           have hUM : U = M.1 := by

@@ -11,15 +11,19 @@ namespace ReciprocityTheory.Neutral.Cmp
 
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain Pointwise
 
-variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {p : ℕ} [Fact p.Prime]
+variable
+  {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+  {p : ℕ} [Fact p.Prime]
 
-theorem exists_res (ι : Ω →+* PadicAlgCl p) (σ : GK F ι) : ∃ τ : Ω ≃ₐ[F] Ω, ∀ x, ι (τ x) = σ (ι x) := by
+theorem exists_res (ι : Ω →+* PadicAlgCl p) (σ : GK F ι)
+    : ∃ τ : Ω ≃ₐ[F] Ω, ∀ x, ι (τ x) = σ (ι x) := by
   letI : Algebra Ω (PadicAlgCl p) := ι.toAlgebra
   letI : Algebra F (PadicAlgCl p) := (ι.comp (algebraMap F Ω)).toAlgebra
   haveI : IsScalarTower F Ω (PadicAlgCl p) := IsScalarTower.of_algebraMap_eq fun _ => rfl
   haveI : Normal F Ω := IsAlgClosure.normal F Ω
-  let χ : PadicAlgCl p ≃ₐ[F] PadicAlgCl p := AlgEquiv.ofRingEquiv (f := σ.toRingEquiv) fun c =>
-    σ.commutes ⟨ι (algebraMap F Ω c), IntermediateField.subset_adjoin _ _ ⟨c, rfl⟩⟩
+  let χ : PadicAlgCl p ≃ₐ[F] PadicAlgCl p :=
+    AlgEquiv.ofRingEquiv (f := σ.toRingEquiv) fun c =>
+      σ.commutes ⟨ι (algebraMap F Ω c), IntermediateField.subset_adjoin _ _ ⟨c, rfl⟩⟩
   exact ⟨χ.restrictNormal Ω, fun x => χ.restrictNormal_commutes Ω x⟩
 
 def res (ι : Ω →+* PadicAlgCl p) : GK F ι →* (Ω ≃ₐ[F] Ω) where
@@ -38,7 +42,8 @@ def res (ι : Ω →+* PadicAlgCl p) : GK F ι →* (Ω ≃ₐ[F] Ω) where
 theorem res_spec (ι : Ω →+* PadicAlgCl p) (σ : GK F ι) (x : Ω) : ι (res ι σ x) = σ (ι x) :=
   Classical.choose_spec (exists_res ι σ) x
 
-private theorem norm_GK_lemma (ι : Ω →+* PadicAlgCl p) (σ : GK F ι) (y : PadicAlgCl p) : ‖σ y‖ = ‖y‖ := by
+private theorem norm_GK_lemma (ι : Ω →+* PadicAlgCl p) (σ : GK F ι) (y : PadicAlgCl p)
+    : ‖σ y‖ = ‖y‖ := by
   rw [← PadicAlgCl.spectralNorm_eq, ← PadicAlgCl.spectralNorm_eq]
   unfold spectralNorm
   exact congrArg _ (minpoly.algEquiv_eq (σ.restrictScalars ℚ_[p]) y)
@@ -52,15 +57,16 @@ theorem res_injective (ι : Ω →+* PadicAlgCl p) : Function.Injective (res (F 
     funext x
     simp only [Function.comp_apply]
     rw [← res_spec ι σ x, ← res_spec ι τ x, h]
-  exact AlgEquiv.ext (congrFun
-    ((denseRange F ι).equalizer (continuous_GK ι σ) (continuous_GK ι τ) h2))
+  exact AlgEquiv.ext (congrFun ((denseRange F ι).equalizer (continuous_GK ι σ) (continuous_GK ι τ)
+    h2))
 
 theorem continuous_res (ι : Ω →+* PadicAlgCl p) : Continuous (res (F := F) ι) := by
   letI : Algebra Ω (PadicAlgCl p) := ι.toAlgebra
   letI : Algebra F (PadicAlgCl p) := (ι.comp (algebraMap F Ω)).toAlgebra
   haveI : IsScalarTower F Ω (PadicAlgCl p) := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  let φ : F →+* Kloc F ι := (ι.comp (algebraMap F Ω)).codRestrict (Kloc F ι)
-    fun c => IntermediateField.subset_adjoin _ _ ⟨c, rfl⟩
+  let φ : F →+* Kloc F ι :=
+    (ι.comp (algebraMap F Ω)).codRestrict (Kloc F ι) fun c =>
+      IntermediateField.subset_adjoin _ _ ⟨c, rfl⟩
   letI : Algebra F (Kloc F ι) := φ.toAlgebra
   haveI : IsScalarTower F (Kloc F ι) (PadicAlgCl p) := IsScalarTower.of_algebraMap_eq fun _ => rfl
   have hint : ∀ x : Ω, IsIntegral (Kloc F ι) (ι x) := fun x =>
@@ -87,12 +93,13 @@ theorem continuous_res (ι : Ω →+* PadicAlgCl p) : Continuous (res (F := F) �
       (IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩)
   rw [SetLike.mem_coe, IntermediateField.mem_fixingSubgroup_iff]
   intro x hx
-  have hL := b.ext (f₁ := (res ι σ).toLinearMap ∘ₗ E.val.toLinearMap)
-    (f₂ := E.val.toLinearMap) fun i => hb i
+  have hL :=
+    b.ext (f₁ := (res ι σ).toLinearMap ∘ₗ E.val.toLinearMap) (f₂ := E.val.toLinearMap) fun i => hb i
   exact LinearMap.congr_fun hL ⟨x, hx⟩
 
-theorem res_mem_dec {A : ValuationSubring Ω} {ι : Ω →+* PadicAlgCl p} (h : Compat p A ι) (σ : GK F ι) :
-    res ι σ ∈ Dec (F := F) A := by
+theorem res_mem_dec
+    {A : ValuationSubring Ω} {ι : Ω →+* PadicAlgCl p} (h : Compat p A ι) (σ : GK F ι)
+    : res ι σ ∈ Dec (F := F) A := by
   have hτ : ∀ x, res ι σ x ∈ A ↔ x ∈ A := fun x => by rw [h, h, res_spec, norm_GK_lemma]
   rw [Dec, ValuationSubring.decompositionSubgroup, MulAction.mem_stabilizer_iff]
   ext x

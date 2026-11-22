@@ -22,21 +22,22 @@ namespace IsExpLieAlgebra
 variable (h : IsExpLieAlgebra G 𝔤)
 variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F]
 
-def IsSmoothFun (f : G → F) : Prop :=
-  letI := h.chartedSpace; ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, F) ∞ f
+def IsSmoothFun (f : G → F) : Prop := letI := h.chartedSpace; ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, F) ∞ f
 
-theorem isSmoothFun_iff {f : G → F} :
-    h.IsSmoothFun f ↔ ∀ g : G, ContDiff ℝ ∞ (fun Y : 𝔤 => f (g * h.expG Y)) :=
+theorem isSmoothFun_iff {f : G → F}
+    : h.IsSmoothFun f ↔ ∀ g : G, ContDiff ℝ ∞ (fun Y : 𝔤 => f (g * h.expG Y)) :=
   h.contMDiff_iff_expG f
 
-theorem IsSmoothFun.contDiff_comp {f : G → F} (hf : h.IsSmoothFun f) (g₀ : G) {V : Type*}
-    [NormedAddCommGroup V] [NormedSpace ℝ V] {φ₁ φ₂ φ₃ : V → 𝔤} (h₁ : ContDiff ℝ ∞ φ₁)
-    (h₂ : ContDiff ℝ ∞ φ₂) (h₃ : ContDiff ℝ ∞ φ₃) :
-    ContDiff ℝ ∞ (fun p => f (g₀ * h.expG (φ₁ p) * h.expG (φ₂ p) * h.expG (φ₃ p))) := by
+theorem IsSmoothFun.contDiff_comp
+    {f : G → F} (hf : h.IsSmoothFun f)
+    (g₀ : G)
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {φ₁ φ₂ φ₃ : V → 𝔤} (h₁ : ContDiff ℝ ∞ φ₁) (h₂ : ContDiff ℝ ∞ φ₂) (h₃ : ContDiff ℝ ∞ φ₃)
+    : ContDiff ℝ ∞ (fun p => f (g₀ * h.expG (φ₁ p) * h.expG (φ₂ p) * h.expG (φ₃ p))) := by
   letI := h.chartedSpace
   haveI := h.lieGroup ∞
-  have hm : ContMDiff 𝓘(ℝ, V) 𝓘(ℝ, 𝔤) ∞
-      (fun p => g₀ * h.expG (φ₁ p) * h.expG (φ₂ p) * h.expG (φ₃ p)) :=
+  have hm
+      : ContMDiff 𝓘(ℝ, V) 𝓘(ℝ, 𝔤) ∞ (fun p => g₀ * h.expG (φ₁ p) * h.expG (φ₂ p) * h.expG (φ₃ p)) :=
     ((contMDiff_const.mul (h.contMDiff_expG_comp h₁)).mul (h.contMDiff_expG_comp h₂)).mul
       (h.contMDiff_expG_comp h₃)
   exact (ContMDiff.comp (I' := 𝓘(ℝ, 𝔤)) hf hm).contDiff
@@ -44,86 +45,92 @@ theorem IsSmoothFun.contDiff_comp {f : G → F} (hf : h.IsSmoothFun f) (g₀ : G
 noncomputable def rightDeriv (X : 𝔤) (f : G → F) (g : G) : F :=
   fderiv ℝ (fun Y : 𝔤 => f (g * h.expG Y)) 0 X
 
-theorem differentiable_comp_expG {f : G → F} (hf : h.IsSmoothFun f) (g : G) :
-    Differentiable ℝ (fun Y : 𝔤 => f (g * h.expG Y)) :=
+theorem differentiable_comp_expG {f : G → F} (hf : h.IsSmoothFun f) (g : G)
+    : Differentiable ℝ (fun Y : 𝔤 => f (g * h.expG Y)) :=
   ((h.isSmoothFun_iff).1 hf g).differentiable (by simp)
 
-theorem hasDerivAt_rightDeriv {f : G → F} (hf : h.IsSmoothFun f) (X : 𝔤) (g : G) :
-    HasDerivAt (fun t : ℝ => f (g * h.expG (t • X))) (h.rightDeriv X f g) 0 := by
+theorem hasDerivAt_rightDeriv {f : G → F} (hf : h.IsSmoothFun f) (X : 𝔤) (g : G)
+    : HasDerivAt (fun t : ℝ => f (g * h.expG (t • X))) (h.rightDeriv X f g) 0 := by
   have h1 := hasDerivAt_comp_line (h.differentiable_comp_expG hf g 0) X
   simp only [zero_add] at h1
   exact h1
 
-theorem isSmoothFun_rightTranslate {f : G → F} (hf : h.IsSmoothFun f) (a : G) :
-    h.IsSmoothFun (rightTranslate a f) := by
+theorem isSmoothFun_rightTranslate {f : G → F} (hf : h.IsSmoothFun f) (a : G)
+    : h.IsSmoothFun (rightTranslate a f) := by
   letI := h.chartedSpace
   haveI := h.lieGroup ∞
   exact ContMDiff.comp (I' := 𝓘(ℝ, 𝔤)) hf (contMDiff_id.mul contMDiff_const)
 
-theorem isSmoothFun_rightDeriv {f : G → F} (hf : h.IsSmoothFun f) (X : 𝔤) :
-    h.IsSmoothFun (h.rightDeriv X f) := by
+theorem isSmoothFun_rightDeriv {f : G → F} (hf : h.IsSmoothFun f) (X : 𝔤)
+    : h.IsSmoothFun (h.rightDeriv X f) := by
   rw [isSmoothFun_iff]
   intro g₀
   have hΨ : ContDiff ℝ ∞ (Function.uncurry fun Z Y : 𝔤 => f (g₀ * h.expG Z * h.expG Y)) := by
-    have := hf.contDiff_comp h g₀ (φ₁ := fun p : 𝔤 × 𝔤 => p.1) (φ₂ := fun p => p.2)
-      (φ₃ := fun _ => 0) contDiff_fst contDiff_snd contDiff_const
+    have :=
+      hf.contDiff_comp h g₀
+        (φ₁ := fun p : 𝔤 × 𝔤 => p.1)
+        (φ₂ := fun p => p.2)
+        (φ₃ := fun _ => 0)
+        contDiff_fst contDiff_snd contDiff_const
     convert this using 2 with p
     simp [Function.uncurry]
   have hd : ContDiff ℝ ∞ (fun Z : 𝔤 => fderiv ℝ (fun Y : 𝔤 => f (g₀ * h.expG Z * h.expG Y)) 0) :=
     ContDiff.fderiv hΨ contDiff_const (by simp)
   exact hd.clm_apply contDiff_const
 
-theorem rightDeriv_add_left (X Y : 𝔤) (f : G → F) :
-    h.rightDeriv (X + Y) f = h.rightDeriv X f + h.rightDeriv Y f := by
+theorem rightDeriv_add_left (X Y : 𝔤) (f : G → F)
+    : h.rightDeriv (X + Y) f = h.rightDeriv X f + h.rightDeriv Y f := by
   funext g; simp [rightDeriv]
 
-theorem rightDeriv_smul_left (r : ℝ) (X : 𝔤) (f : G → F) :
-    h.rightDeriv (r • X) f = r • h.rightDeriv X f := by
+theorem rightDeriv_smul_left (r : ℝ) (X : 𝔤) (f : G → F)
+    : h.rightDeriv (r • X) f = r • h.rightDeriv X f := by
   funext g; simp [rightDeriv]
 
-theorem rightDeriv_neg_left (X : 𝔤) (f : G → F) : h.rightDeriv (-X) f = -h.rightDeriv X f := by
+theorem rightDeriv_neg_left (X : 𝔤) (f : G → F) : h.rightDeriv (-X) f = - h.rightDeriv X f := by
   funext g; simp [rightDeriv]
 
-theorem rightDeriv_add {f₁ f₂ : G → F} (hf₁ : h.IsSmoothFun f₁) (hf₂ : h.IsSmoothFun f₂)
-    (X : 𝔤) : h.rightDeriv X (f₁ + f₂) = h.rightDeriv X f₁ + h.rightDeriv X f₂ := by
+theorem rightDeriv_add {f₁ f₂ : G → F} (hf₁ : h.IsSmoothFun f₁) (hf₂ : h.IsSmoothFun f₂) (X : 𝔤)
+    : h.rightDeriv X (f₁ + f₂) = h.rightDeriv X f₁ + h.rightDeriv X f₂ := by
   funext g
   simp only [rightDeriv, Pi.add_apply]
   rw [fderiv_fun_add (h.differentiable_comp_expG hf₁ g 0) (h.differentiable_comp_expG hf₂ g 0)]
   rfl
 
-theorem rightDeriv_smul {f : G → F} (hf : h.IsSmoothFun f) (c : ℂ) (X : 𝔤) :
-    h.rightDeriv X (c • f) = c • h.rightDeriv X f := by
+theorem rightDeriv_smul {f : G → F} (hf : h.IsSmoothFun f) (c : ℂ) (X : 𝔤)
+    : h.rightDeriv X (c • f) = c • h.rightDeriv X f := by
   funext g
   simp only [rightDeriv, Pi.smul_apply]
   rw [fderiv_fun_const_smul (h.differentiable_comp_expG hf g 0) c]
   rfl
 
-theorem rightDeriv_rightTranslate {f : G → F} (hf : h.IsSmoothFun f) (a : G) (X : 𝔤) :
-    h.rightDeriv X (rightTranslate a f) = rightTranslate a (h.rightDeriv (h.Ad a⁻¹ X) f) := by
+theorem rightDeriv_rightTranslate {f : G → F} (hf : h.IsSmoothFun f) (a : G) (X : 𝔤)
+    : h.rightDeriv X (rightTranslate a f) = rightTranslate a (h.rightDeriv (h.Ad a⁻¹ X) f) := by
   funext g
   simp only [rightDeriv, rightTranslate]
-  have e : (fun Y : 𝔤 => f (g * h.expG Y * a)) =
-      (fun Y : 𝔤 => f (g * a * h.expG Y)) ∘ h.AdL a⁻¹ := by
+  have e
+      : (fun Y : 𝔤 => f (g * h.expG Y * a)) = (fun Y : 𝔤 => f (g * a * h.expG Y)) ∘ h.AdL a⁻¹ := by
     funext Y
     simp only [Function.comp_apply, AdL_apply, expG_Ad, inv_inv]
     congr 1
     group
   rw [e]
-  have hF : HasFDerivAt (fun Y : 𝔤 => f (g * a * h.expG Y))
+  have hF : HasFDerivAt
+      (fun Y : 𝔤 => f (g * a * h.expG Y))
       (fderiv ℝ (fun Y : 𝔤 => f (g * a * h.expG Y)) 0) (h.AdL a⁻¹ 0) := by
     simpa using (h.differentiable_comp_expG hf (g * a) 0).hasFDerivAt
   rw [(hF.comp (0 : 𝔤) (h.AdL a⁻¹).hasFDerivAt).fderiv]
   rfl
 
-theorem rightDeriv_bracket {f : G → F} (hf : h.IsSmoothFun f) (X Y : 𝔤) :
-    h.rightDeriv (h.bracket X Y) f =
-      h.rightDeriv X (h.rightDeriv Y f) - h.rightDeriv Y (h.rightDeriv X f) := by
+theorem rightDeriv_bracket {f : G → F} (hf : h.IsSmoothFun f) (X Y : 𝔤)
+    : h.rightDeriv (h.bracket X Y) f
+      = h.rightDeriv X (h.rightDeriv Y f) - h.rightDeriv Y (h.rightDeriv X f) := by
   funext g
   set A : ℝ × ℝ × ℝ → F :=
     fun p => f (g * h.expG (p.1 • X) * h.expG (p.2.1 • Y) * h.expG (p.2.2 • (-X))) with hAdef
-  have hA : ContDiff ℝ ∞ A := hf.contDiff_comp h g
-    (contDiff_fst.smul contDiff_const) ((contDiff_fst.comp contDiff_snd).smul contDiff_const)
-    ((contDiff_snd.comp contDiff_snd).smul contDiff_const)
+  have hA : ContDiff ℝ ∞ A :=
+    hf.contDiff_comp h g (contDiff_fst.smul contDiff_const)
+      ((contDiff_fst.comp contDiff_snd).smul contDiff_const)
+      ((contDiff_snd.comp contDiff_snd).smul contDiff_const)
   have hAd : Differentiable ℝ A := hA.differentiable (by simp)
   set D2 := fderiv ℝ (fderiv ℝ A) 0
   set er : ℝ × ℝ × ℝ := (1, 0, 0)
@@ -137,7 +144,7 @@ theorem rightDeriv_bracket {f : G → F} (hf : h.IsSmoothFun f) (X Y : 𝔤) :
     have h2 := h.hasDerivAt_rightDeriv hf Y (g * h.expG (r • X))
     refine h1.unique (h2.congr_of_eventuallyEq (Eventually.of_forall fun s => ?_))
     simp [A, er, et]
-  have dc : ∀ t : ℝ, fderiv ℝ A (t • et) eu = -h.rightDeriv X f (g * h.expG (t • Y)) := by
+  have dc : ∀ t : ℝ, fderiv ℝ A (t • et) eu = - h.rightDeriv X f (g * h.expG (t • Y)) := by
     intro t
     have h1 := hasDerivAt_comp_line (hAd (t • et)) eu
     have h2 := h.hasDerivAt_rightDeriv hf (-X) (g * h.expG (t • Y))
@@ -150,7 +157,7 @@ theorem rightDeriv_bracket {f : G → F} (hf : h.IsSmoothFun f) (X Y : 𝔤) :
     refine h1.unique (h2.congr_of_eventuallyEq (Eventually.of_forall fun s => ?_))
     simp only [zero_add]
     rw [da]
-  have dd : D2 et eu = -h.rightDeriv Y (h.rightDeriv X f) g := by
+  have dd : D2 et eu = - h.rightDeriv Y (h.rightDeriv X f) g := by
     have h1 := hasDerivAt_fderiv_line hA 0 et eu
     have h2 := (h.hasDerivAt_rightDeriv hX Y g).neg
     refine h1.unique (h2.congr_of_eventuallyEq (Eventually.of_forall fun s => ?_))
@@ -159,9 +166,12 @@ theorem rightDeriv_bracket {f : G → F} (hf : h.IsSmoothFun f) (X Y : 𝔤) :
     rfl
   have hsymm : D2 eu et = D2 et eu :=
     (hA.contDiffAt.isSymmSndFDerivAt (by
-      simp only [minSmoothness_of_isRCLikeNormedField]; exact WithTop.coe_le_coe.2 le_top)) eu et
-  have diag : ∀ s : ℝ, fderiv ℝ A (s • (er + eu)) et =
-      fderiv ℝ (fun Z : 𝔤 => f (g * h.expG Z)) 0 (h.Ad (h.expG (s • X)) Y) := by
+        simp only [minSmoothness_of_isRCLikeNormedField]; exact WithTop.coe_le_coe.2 le_top))
+      eu et
+  have diag
+      : ∀ s : ℝ,
+        fderiv ℝ A (s • (er + eu)) et
+          = fderiv ℝ (fun Z : 𝔤 => f (g * h.expG Z)) 0 (h.Ad (h.expG (s • X)) Y) := by
     intro s
     have h1 := hasDerivAt_comp_line (hAd (s • (er + eu))) et
     have h2 := h.hasDerivAt_rightDeriv hf (h.Ad (h.expG (s • X)) Y) g
@@ -171,11 +181,13 @@ theorem rightDeriv_bracket {f : G → F} (hf : h.IsSmoothFun f) (X Y : 𝔤) :
     rw [← map_smul, expG_Ad, smul_neg, expG_neg]
     simp only [mul_assoc]
   have hg := hasDerivAt_fderiv_line hA 0 (er + eu) et
-  have hg' := (fderiv ℝ (fun Z : 𝔤 => f (g * h.expG Z)) 0).hasFDerivAt.comp_hasDerivAt (0 : ℝ)
-    (h.hasDerivAt_Ad_expG X Y)
+  have hg' :=
+    (fderiv ℝ (fun Z : 𝔤 => f (g * h.expG Z)) 0).hasFDerivAt.comp_hasDerivAt (0 : ℝ)
+      (h.hasDerivAt_Ad_expG X Y)
   have e := hg.unique (hg'.congr_of_eventuallyEq (Eventually.of_forall fun s => ?_))
   · change D2 (er + eu) et = h.rightDeriv (h.bracket X Y) f g at e
-    rw [Pi.sub_apply, ← e, map_add (f := _), ContinuousLinearMap.add_apply, db, hsymm, dd, sub_eq_add_neg]
+    rw [Pi.sub_apply, ← e, map_add (f := _), ContinuousLinearMap.add_apply, db, hsymm, dd,
+      sub_eq_add_neg]
   · simp only [zero_add, Function.comp_apply]
     rw [diag]
 
@@ -195,8 +207,7 @@ def smoothFuns : Submodule ℂ (G → F) where
     change h.IsSmoothFun f at hf
     show h.IsSmoothFun (c • f)
     letI := h.chartedSpace
-    have e : c • f = ((c • ContinuousLinearMap.id ℂ F).restrictScalars ℝ) ∘ f := by
-      funext g; simp
+    have e : c • f = ((c • ContinuousLinearMap.id ℂ F).restrictScalars ℝ) ∘ f := by funext g; simp
     rw [e]
     exact ((c • ContinuousLinearMap.id ℂ F).restrictScalars ℝ).contDiff.comp_contMDiff hf
 
@@ -207,16 +218,20 @@ noncomputable def rightDerivEnd (X : 𝔤) : Module.End ℂ (h.smoothFuns (F := 
   map_add' f₁ f₂ := by ext1; exact h.rightDeriv_add f₁.2 f₂.2 X
   map_smul' c f := by ext1; exact h.rightDeriv_smul f.2 c X
 
-@[simp] theorem coe_rightDerivEnd (X : 𝔤) (f : h.smoothFuns (F := F)) :
-    ((h.rightDerivEnd X f : h.smoothFuns (F := F)) : G → F) = h.rightDeriv X f := rfl
+@[simp]
+theorem coe_rightDerivEnd (X : 𝔤) (f : h.smoothFuns (F := F))
+    : ((h.rightDerivEnd X f : h.smoothFuns (F := F)) : G → F) = h.rightDeriv X f :=
+  rfl
 
 def rightTranslateEnd (a : G) : Module.End ℂ (h.smoothFuns (F := F)) where
   toFun f := ⟨rightTranslate a f, h.isSmoothFun_rightTranslate f.2 a⟩
   map_add' f₁ f₂ := rfl
   map_smul' c f := rfl
 
-@[simp] theorem coe_rightTranslateEnd (a : G) (f : h.smoothFuns (F := F)) :
-    ((h.rightTranslateEnd a f : h.smoothFuns (F := F)) : G → F) = rightTranslate a f := rfl
+@[simp]
+theorem coe_rightTranslateEnd (a : G) (f : h.smoothFuns (F := F))
+    : ((h.rightTranslateEnd a f : h.smoothFuns (F := F)) : G → F) = rightTranslate a f :=
+  rfl
 
 attribute [local instance 100] LieRing.ofAssociativeRing
 
@@ -225,20 +240,21 @@ noncomputable def rightDerivLie : h.lieSubalgebra →ₗ⁅ℝ⁆ Module.End ℂ
   map_add' X Y := by ext1 f; ext1; exact h.rightDeriv_add_left _ _ _
   map_smul' r X := by ext1 f; ext1; exact h.rightDeriv_smul_left r _ _
   map_lie' {X Y} := by
-    ext1 f; ext1
+    ext1 f
+    ext1
     rw [h.ofLie_lie, Ring.lie_def]
     exact h.rightDeriv_bracket f.2 _ _
 
-noncomputable def rightUAction :
-    UniversalEnvelopingAlgebra ℝ h.lieSubalgebra →ₐ[ℝ] Module.End ℂ (h.smoothFuns (F := F)) :=
+noncomputable def rightUAction
+    : UniversalEnvelopingAlgebra ℝ h.lieSubalgebra →ₐ[ℝ] Module.End ℂ (h.smoothFuns (F := F)) :=
   UniversalEnvelopingAlgebra.lift ℝ h.rightDerivLie
 
-@[simp] theorem rightUAction_ι (X : h.lieSubalgebra) :
-    h.rightUAction (F := F) (UniversalEnvelopingAlgebra.ι ℝ X) = h.rightDerivEnd (h.ofLie X) :=
+@[simp]
+theorem rightUAction_ι (X : h.lieSubalgebra)
+    : h.rightUAction (F := F) (UniversalEnvelopingAlgebra.ι ℝ X) = h.rightDerivEnd (h.ofLie X) :=
   UniversalEnvelopingAlgebra.lift_ι_apply ℝ h.rightDerivLie X
 
-def centerU : Subalgebra ℝ (UniversalEnvelopingAlgebra ℝ h.lieSubalgebra) :=
-  Subalgebra.center ℝ _
+def centerU : Subalgebra ℝ (UniversalEnvelopingAlgebra ℝ h.lieSubalgebra) := Subalgebra.center ℝ _
 
 def IsZFinite (f : h.smoothFuns (F := F)) : Prop :=
   FiniteDimensional ℂ (Submodule.span ℂ ((fun z => h.rightUAction z f) '' (h.centerU : Set _)))

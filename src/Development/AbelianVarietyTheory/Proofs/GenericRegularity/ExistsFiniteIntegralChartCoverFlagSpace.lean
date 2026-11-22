@@ -20,14 +20,19 @@ noncomputable section
 
 namespace GlobalTheory.Reg
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg
 
-theorem MChart.Lift.exists_coordinates (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
-    (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
-    (M : MChart Y) (L : Type) [Field L] [Algebra c.F L] (f : Γ(Y.X, M.U) →+* L) (y : FrPt Xo c L)
-    (Λ : M.Lift f y.x) :
-    ∃ g : ∀ τ : E →+* ℂ, Matrix (Fin M.n) (Fin (Dw.mult τ)) L,
+theorem MChart.Lift.exists_coordinates
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l)
+    (O : Type) [CommRing O]
+    (β : O →+* c.F) (Y : Model Xo c β) (M : MChart Y)
+    (L : Type) [Field L] [Algebra c.F L]
+    (f : Γ(Y.X, M.U) →+* L) (y : FrPt Xo c L) (Λ : M.Lift f y.x)
+    : ∃ g : ∀ τ : E →+* ℂ, Matrix (Fin M.n) (Fin (Dw.mult τ)) L,
       Λ.LieTie g y.u ∧ ∀ τ, LinearIndependent L (g τ).transpose := by
   classical
   have hb := vec_bijective E H Dw l Xo c O β Y M L f y.x Λ
@@ -47,51 +52,78 @@ theorem MChart.Lift.exists_coordinates (E : Type) [Field E] [NumberField E] [IsC
   have h := (y.6 τ (y.u τ k) (y.4 τ k) (y.5 τ k)).unique e1 e2
   simpa using congrFun h k
 
-private theorem spMap_comp_moduli_spaces {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B)
-    (g : B →+* C) : spMap (g.comp f) = spMap g ≫ spMap f := by
+private theorem spMap_comp_moduli_spaces
+    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap (g.comp f) = spMap g ≫ spMap f := by
   unfold spMap
   rw [CommRingCat.ofHom_comp, Spec.map_comp]
 
-theorem exists_integral_lift (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
-    (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
-    {J : Type} (M : J → MChart Y) (hM : ∀ x : Y.X, ∃ j, x ∈ (M j).U) (L : Type) [Field L] [Algebra c.F L]
-    (W : ValuationSubring L) (hW : ∀ a : O, algebraMap c.F L (β a) ∈ W) (y : FrPt Xo c L) :
-    ∃ (j : J) (f : Γ(Y.X, (M j).U) →+* L), (∀ a, f a ∈ W) ∧ Nonempty ((M j).Lift f y.x) := by
+theorem exists_integral_lift
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l)
+    (O : Type) [CommRing O]
+    (β : O →+* c.F) (Y : Model Xo c β)
+    {J : Type} (M : J → MChart Y) (hM : ∀ x : Y.X, ∃ j, x ∈ (M j).U)
+    (L : Type) [Field L] [Algebra c.F L]
+    (W : ValuationSubring L) (hW : ∀ a : O, algebraMap c.F L (β a) ∈ W)
+    (y : FrPt Xo c L)
+    : ∃ (j : J) (f : Γ(Y.X, (M j).U) →+* L), (∀ a, f a ∈ W) ∧ Nonempty ((M j).Lift f y.x) := by
   classical
-  have hx : y.x ≫ Xo.s = spMap (algebraMap c.F L) ≫ spMap (IntermediateField.inclusion c.le).toRingHom := by
+  have hx
+      : y.x ≫ Xo.s
+        = spMap (algebraMap c.F L) ≫ spMap (IntermediateField.inclusion c.le).toRingHom := by
     rw [y.2]
     unfold sOf
     exact spMap_comp_moduli_spaces _ _
-  obtain ⟨yt, ⟨-, hyt⟩, -⟩ := (GlobalTheory.ModelPoints.model_points_charts E H Dw l Xo c O β Y).1 W L
-    (((algebraMap c.F L).comp β).codRestrict W hW) (algebraMap c.F L)
-    (pullback.lift y.x (spMap (algebraMap c.F L)) hx) (RingHom.ext fun _ => rfl) (pullback.lift_snd _ _ _)
+  obtain ⟨yt, ⟨-, hyt⟩, -⟩ :=
+    (GlobalTheory.ModelPoints.model_points_charts E H Dw l Xo c O β Y).1 W L
+      (((algebraMap c.F L).comp β).codRestrict W hW) (algebraMap c.F L)
+      (pullback.lift y.x (spMap (algebraMap c.F L)) hx) (RingHom.ext fun _ => rfl)
+      (pullback.lift_snd _ _ _)
   obtain ⟨j, hj⟩ := hM (yt (IsLocalRing.closedPoint W))
   obtain ⟨ψ, hψ, -⟩ := GlobalTheory.ModelPoints.existsUnique_chartHom (M j).hU W yt hj
   refine ⟨j, (algebraMap W L).comp ψ, fun a => (ψ a).2, ?_⟩
-  have key : pullback.lift y.x (spMap (algebraMap c.F L)) hx ≫ Y.j =
-      spMap ((algebraMap W L).comp ψ) ≫ (M j).hU.fromSpec := by
+  have key
+      : pullback.lift y.x (spMap (algebraMap c.F L)) hx ≫ Y.j
+        = spMap ((algebraMap W L).comp ψ) ≫ (M j).hU.fromSpec := by
     rw [spMap_comp_moduli_spaces, Category.assoc, hψ, hyt]
-  have hn := MChart.nonempty_lift E H Dw l Xo c O β Y (M j) L ((algebraMap W L).comp ψ)
-    (pullback.lift y.x (spMap (algebraMap c.F L)) hx) (pullback.lift_snd _ _ _) key
+  have hn :=
+    MChart.nonempty_lift E H Dw l Xo c O β Y (M j) L ((algebraMap W L).comp ψ)
+      (pullback.lift y.x (spMap (algebraMap c.F L)) hx) (pullback.lift_snd _ _ _) key
   rwa [pullback.lift_fst] at hn
 
-theorem exists_finite_pchart_cover : ReciprocityTheory.ChartRestriction.G.Out.SecTwistSt → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), FrBC Xo c → ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O c.F] [IsFractionRing O c.F] (Y : Model Xo c (algebraMap O c.F)), PushInvertible Y.t.G Y.t.PP.L → ∃ (J : Type) (_ : Finite J) (P : J → PChart Xo c (algebraMap O c.F)), Covers P := by
+theorem exists_finite_pchart_cover
+    : ReciprocityTheory.ChartRestriction.G.Out.SecTwistSt
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+          (l : Level H) (Xo : Moduli Dw l) (c : Coeff l),
+        FrBC Xo c
+          → ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O c.F]
+              [IsFractionRing O c.F] (Y : Model Xo c (algebraMap O c.F)),
+            PushInvertible Y.t.G Y.t.PP.L
+              → ∃ (J : Type) (_ : Finite J) (P : J → PChart Xo c (algebraMap O c.F)), Covers P := by
   intro hS E _ _ _ H Dw l Xo c hBC O _ _ _ _ _ Y hP
   classical
   obtain ⟨J₀, hJ₀, M, hM⟩ := exists_finite_mchart_cover E H Dw l Xo c O (algebraMap O c.F) Y hP
   have hT := fun (j : J₀) (ix : ∀ τ : E →+* ℂ, Fin (Dw.mult τ) ↪ Fin (M j).n) =>
     GlobalTheory.T.exists_flagCellChart_over_modelChart hS E H Dw l Xo c hBC O Y hP (M j) ix
   choose K hK P hPc using hT
-  refine ⟨(j : J₀) × (ix : ∀ τ : E →+* ℂ, Fin (Dw.mult τ) ↪ Fin (M j).n) × K j ix, ?_,
-    fun q => P q.1 q.2.1 q.2.2, ?_⟩
+  refine ⟨
+    (j : J₀) × (ix : ∀ τ : E →+* ℂ, Fin (Dw.mult τ) ↪ Fin (M j).n) × K j ix,
+    ?_,
+    fun q => P q.1 q.2.1 q.2.2,
+    ?_
+  ⟩
   · infer_instance
   · intro L _ _ W hW y
-    obtain ⟨j, f, hf, ⟨Λ⟩⟩ := exists_integral_lift E H Dw l Xo c O (algebraMap O c.F) Y M hM L W hW y
-    obtain ⟨g, hg, hind⟩ := MChart.Lift.exists_coordinates E H Dw l Xo c O (algebraMap O c.F) Y (M j) L f y Λ
+    obtain ⟨j, f, hf, ⟨Λ⟩⟩ :=
+      exists_integral_lift E H Dw l Xo c O (algebraMap O c.F) Y M hM L W hW y
+    obtain ⟨g, hg, hind⟩ :=
+      MChart.Lift.exists_coordinates E H Dw l Xo c O (algebraMap O c.F) Y (M j) L f y Λ
     choose ixs u b hu hlow hone hbt hdiag hgu using
       fun τ => GlobalTheory.exists_integral_pivot_decomposition L W (M j).n (Dw.mult τ) (g τ) (hind τ)
-    obtain ⟨k, hk⟩ := hPc j ixs L W f y Λ u b hf hu (fun τ => ⟨hlow τ, hone τ⟩) (fun τ => ⟨hbt τ, hdiag τ⟩)
-      (by rw [← funext hgu]; exact hg)
+    obtain ⟨k, hk⟩ :=
+      hPc j ixs L W f y Λ u b hf hu (fun τ => ⟨hlow τ, hone τ⟩) (fun τ => ⟨hbt τ, hdiag τ⟩) (by
+        rw [← funext hgu]; exact hg)
     exact ⟨⟨j, ixs, k⟩, hk⟩
 
 end GlobalTheory.Reg

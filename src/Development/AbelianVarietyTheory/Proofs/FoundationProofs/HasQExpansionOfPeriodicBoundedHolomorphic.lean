@@ -17,9 +17,8 @@ open Function
 
 namespace GlobalTheory.FN
 
-theorem periodic_comp_ofComplex_of_vadd_real {f : ℍ → ℂ} {h : ℝ}
-    (hf : ∀ τ : ℍ, f (h +ᵥ τ) = f τ) :
-    Periodic (f ∘ UpperHalfPlane.ofComplex) (h : ℂ) := by
+theorem periodic_comp_ofComplex_of_vadd_real {f : ℍ → ℂ} {h : ℝ} (hf : ∀ τ : ℍ, f (h +ᵥ τ) = f τ)
+    : Periodic (f ∘ UpperHalfPlane.ofComplex) (h : ℂ) := by
   intro w
   by_cases! hw : 0 < Complex.im w
   · have : 0 < Complex.im (w + h) := by simp [hw]
@@ -32,7 +31,11 @@ theorem periodic_comp_ofComplex_of_vadd_real {f : ℍ → ℂ} {h : ℝ}
     simp [UpperHalfPlane.ofComplex_apply_of_im_nonpos this,
       UpperHalfPlane.ofComplex_apply_of_im_nonpos hw]
 
-theorem hasQ_of_periodic_bounded : ∀ (N : ℕ) (f : ℍ → ℂ), 0 < N → MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f → (∀ τ : ℍ, f ((N : ℝ) +ᵥ τ) = f τ) → UpperHalfPlane.IsBoundedAtImInfty f → ∃ a, HasQ N f a := by
+theorem hasQ_of_periodic_bounded
+    : ∀ (N : ℕ) (f : ℍ → ℂ),
+      0 < N → MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f → (∀ τ : ℍ, f ((N : ℝ) +ᵥ τ) = f τ)
+        → UpperHalfPlane.IsBoundedAtImInfty f
+        → ∃ a, HasQ N f a := by
   intro N f hN hf hper hbdd
   refine ⟨fun n => PowerSeries.coeff n (UpperHalfPlane.qExpansion (N : ℝ) f), ?_⟩
   rw [GlobalTheory.QFam.hasQ_coeff_iff_hasQExpansion]

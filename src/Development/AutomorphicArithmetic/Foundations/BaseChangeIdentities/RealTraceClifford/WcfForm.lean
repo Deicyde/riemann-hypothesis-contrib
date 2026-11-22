@@ -13,12 +13,15 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
-theorem UpperTheory.RealTr.wcfForm :
-    ∀ (n : ℕ) (c : FR n) (ν : Wt n), Antitone ν → Sym c → (∀ μ, cf c μ ≠ 0 → Maj μ ν) →
-      (∀ x, cf (alt (rhoV n) * c) x ≠ 0 → nsq x = nsq (ν + rhoV n)) → alt (rhoV n) * c = cf c ν • alt (ν + rhoV n) := by
+theorem UpperTheory.RealTr.wcfForm
+    : ∀ (n : ℕ) (c : FR n) (ν : Wt n),
+      Antitone ν → Sym c → (∀ μ, cf c μ ≠ 0 → Maj μ ν)
+        → (∀ x, cf (alt (rhoV n) * c) x ≠ 0 → nsq x = nsq (ν + rhoV n))
+        → alt (rhoV n) * c = cf c ν • alt (ν + rhoV n) := by
   intro n c ν hν hc hmaj hnsq
   obtain ⟨_, _, _, hlin, _, _, halt, hperm, hasym, hsym, _, hstrict, _⟩ := cfBasic n
   obtain ⟨hR1, -, hρ, -, -, hR6⟩ := rearr n
@@ -37,8 +40,10 @@ theorem UpperTheory.RealTr.wcfForm :
     have e2 : cf (alt ρ) ρ = cf (sg (1 : Equiv.Perm (Fin n)) • alt ρ) ρ := by rw [← e]
     rw [(hlin (alt ρ) (alt ρ) (sg (1 : Equiv.Perm (Fin n))) ρ).2, (hstrict ρ hρ).1] at e2
     simpa using e2.symm
-  have hterm : ∀ (x : Wt n) (w : Equiv.Perm (Fin n)), Antitone x → cf c (x - ρ ∘ ⇑w) ≠ 0 →
-      ∑ a, x a * x a ≤ ∑ a, x a * ν a + ∑ a, x a * ρ (w a) := by
+  have hterm
+      : ∀ (x : Wt n) (w : Equiv.Perm (Fin n)),
+        Antitone x → cf c (x - ρ ∘ ⇑w) ≠ 0
+          → ∑ a, x a * x a ≤ ∑ a, x a * ν a + ∑ a, x a * ρ (w a) := by
     intro x w hx hne
     have h1 : ∑ a, x a * (x - ρ ∘ ⇑w) a ≤ ∑ a, x a * ν a := hmaj _ hne x hx
     have h2 : ∑ a, x a * (x - ρ ∘ ⇑w) a = ∑ a, x a * x a - ∑ a, x a * ρ (w a) := by

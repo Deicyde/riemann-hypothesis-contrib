@@ -6,8 +6,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 open UpperTheory.V.Cj.A
 
-theorem UpperTheory.V.Cj.A.satFacts :
-    SatFacts := by
+theorem UpperTheory.V.Cj.A.satFacts : SatFacts := by
   intro Γ V S _ _ _ d G T K
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro γ s p
@@ -28,8 +27,7 @@ theorem UpperTheory.V.Cj.A.satFacts :
   · intro hK s
     rw [isOpen_iff_mem_nhds]
     rintro p ⟨γ, t, ht, hT, hp⟩
-    have hc : Continuous fun q : V => t • (G.ρ γ) q :=
-      continuous_const.smul (G.ρ γ).continuous
+    have hc : Continuous fun q : V => t • (G.ρ γ) q := continuous_const.smul (G.ρ γ).continuous
     filter_upwards [(hK.preimage hc).mem_nhds hp] with q hq
     exact ⟨γ, t, ht, hT, hq⟩
   · rintro K' hKK' s p ⟨γ, t, ht, hT, hp⟩

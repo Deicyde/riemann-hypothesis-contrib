@@ -48,7 +48,11 @@ theorem rDens_pf : RFormula → DensSymm → RDens := by
   rw [← hS n (t : ℂ) z σ]
   unfold dens
   simp only [Function.comp_apply] at hc
-  calc _ = monomialChar l (z ∘ σ) * half (t : ℂ) (z ∘ σ) * ((∏ p ∈ prs n, ((z (σ p.1) : ℂ) - (t : ℂ) * (z (σ p.2) : ℂ)) / ((z (σ p.1) : ℂ) - (z (σ p.2) : ℂ))) * half (t : ℂ) (z ∘ σ)⁻¹) := by ring
+  calc
+    _ = monomialChar l (z ∘ σ) * half (t : ℂ) (z ∘ σ)
+        * ((∏ p ∈ prs n, ((z (σ p.1) : ℂ) - (t : ℂ) * (z (σ p.2) : ℂ)) / ((z (σ p.1) : ℂ) - (z (σ p.2) : ℂ)))
+          * half (t : ℂ) (z ∘ σ)⁻¹) := by
+      ring
     _ = _ := by rw [hc, mul_one]
 
 end UpperTheory.Gal.Gen

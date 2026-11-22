@@ -24,16 +24,20 @@ def perm' (σ : Equiv.Perm (Fin q)) (w : Fin q → W) : Matrix (Fin q → Ix W m
   Matrix.of fun I J => if (∀ i, (I i).1 = w i) ∧ J = I ∘ σ then 1 else 0
 
 def PlacePermOperatorBicommutantSpan : Prop :=
-  ∀ (W : Type) [Fintype W] [DecidableEq W] (m q : ℕ) (T : Matrix (Fin q → Ix W m) (Fin q → Ix W m) ℂ),
+  ∀ (W : Type) [Fintype W] [DecidableEq W] (m q : ℕ)
+      (T : Matrix (Fin q → Ix W m) (Fin q → Ix W m) ℂ),
     (∀ Z : Matrix (Fin q → Ix W m) (Fin q → Ix W m) ℂ,
-      (∀ (σ : Equiv.Perm (Fin q)) (w : Fin q → W), Z * perm' σ w = perm' σ w * Z) → T * Z = Z * T) →
-    T ∈ Submodule.span ℂ (Set.range fun p : Equiv.Perm (Fin q) × (Fin q → W) => (perm' (m := m) p.1 p.2))
+        (∀ (σ : Equiv.Perm (Fin q)) (w : Fin q → W), Z * perm' σ w = perm' σ w * Z) → T * Z = Z * T)
+      → T ∈ Submodule.span ℂ
+        (Set.range fun p : Equiv.Perm (Fin q) × (Fin q → W) => (perm' (m := m) p.1 p.2))
 
 def PlacePermOperatorCommutantSpan : Prop :=
-  ∀ (W : Type) [Fintype W] [DecidableEq W] (m q : ℕ) (Z : Matrix (Fin q → Ix W m) (Fin q → Ix W m) ℂ),
-    (∀ (σ : Equiv.Perm (Fin q)) (w : Fin q → W), Z * perm' σ w = perm' σ w * Z) →
-    Z ∈ Submodule.span ℂ {M | ∃ d : W → Matrix (Fin m) (Fin m) ℂ,
-      (∀ w, d w ∈ Matrix.unitaryGroup (Fin m) ℂ) ∧ M = tp q (blk d)}
+  ∀ (W : Type) [Fintype W] [DecidableEq W] (m q : ℕ)
+      (Z : Matrix (Fin q → Ix W m) (Fin q → Ix W m) ℂ),
+    (∀ (σ : Equiv.Perm (Fin q)) (w : Fin q → W), Z * perm' σ w = perm' σ w * Z)
+      → Z ∈ Submodule.span ℂ
+        {M | ∃ d : W → Matrix (Fin m) (Fin m) ℂ,
+          (∀ w, d w ∈ Matrix.unitaryGroup (Fin m) ℂ) ∧ M = tp q (blk d)}
 
 end PositivityTheory.KB.BlockInvariants
 

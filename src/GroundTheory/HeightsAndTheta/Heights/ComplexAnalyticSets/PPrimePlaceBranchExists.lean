@@ -16,9 +16,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets Filter Topology
 
-theorem PrimePlaceBranchExists.proof (hA : NormalModelPointOfPlace.Statement) (hB : NormalModelDisc.Statement)
-    (hC : NormalModelProjectionLocallyInjective.Statement) (hO : NormalCurveBranchOrder.Statement) :
-    PrimePlaceBranchExists.Statement := by
+theorem PrimePlaceBranchExists.proof
+    (hA : NormalModelPointOfPlace.Statement) (hB : NormalModelDisc.Statement)
+    (hC : NormalModelProjectionLocallyInjective.Statement) (hO : NormalCurveBranchOrder.Statement)
+    : PrimePlaceBranchExists.Statement := by
   intro n J q hJ hdim P
 
   have hq : q ∈ zeroSet J := by
@@ -41,7 +42,8 @@ theorem PrimePlaceBranchExists.proof (hA : NormalModelPointOfPlace.Statement) (h
       | top =>
         exfalso
         simp only [not_le.2 (show ((n : ℕ) : WithBot ℕ∞) < ((⊤ : ℕ∞) : WithBot ℕ∞) from
-          WithBot.coe_lt_coe.2 (ENat.natCast_lt_top n))] at hle
+            WithBot.coe_lt_coe.2 (ENat.natCast_lt_top n))]
+          at hle
       | coe e => exact ⟨e, rfl⟩
   have hloc : ringKrullDim (curveLocalRing J q) = (e : ℕ) := LocalDimDomain.proof n e J hJ he q hq
   have hdim1 : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (1 : ℕ) := by
@@ -60,22 +62,29 @@ theorem PrimePlaceBranchExists.proof (hA : NormalModelPointOfPlace.Statement) (h
     Metric.ball_subset_ball (min_le_left _ _)
   have hsubU : ∀ t ∈ Metric.ball (0 : Fin 1 → ℂ) (min r ε), φ t ∈ U := fun t ht ↦
     hεU (Metric.ball_subset_ball (min_le_right _ _) ht)
-  let ν : VarBranch J 1 q :=
-    { radius := min r ε, radius_pos := hρ, toFun := fun t i ↦ φ t (Sum.inl i),
-      differentiableOn := differentiableOn_pi.2 fun i ↦ differentiableOn_pi.1 (hφd.mono hsub) (Sum.inl i),
-      injOn := fun a ha b hb hab ↦ hφi (hsub ha) (hsub hb)
-        (hUi ⟨hφm (hsub ha), hsubU a ha⟩ ⟨hφm (hsub hb), hsubU b hb⟩ hab),
-      map_zero := by
-        funext i
-        rw [hφ0]
-        exact congrFun hwq i,
-      mapsTo := fun t ht g hg ↦ by
-        have hg' : rename Sum.inl g ∈ M.ideal := Ideal.mem_comap.1 (M.comap_eq.symm ▸ hg)
-        have h := hφm (hsub ht) _ hg'
-        rw [eval_rename] at h
-        exact h }
+  let ν : VarBranch J 1 q := {
+    radius := min r ε
+    radius_pos := hρ
+    toFun := fun t i ↦ φ t (Sum.inl i)
+    differentiableOn :=
+      differentiableOn_pi.2 fun i ↦ differentiableOn_pi.1 (hφd.mono hsub) (Sum.inl i)
+    injOn := fun a ha b hb hab ↦
+      hφi (hsub ha) (hsub hb) (hUi ⟨hφm (hsub ha), hsubU a ha⟩ ⟨hφm (hsub hb), hsubU b hb⟩ hab)
+    map_zero := by
+      funext i
+      rw [hφ0]
+      exact congrFun hwq i
+    mapsTo := fun t ht g hg ↦ by
+      have hg' : rename Sum.inl g ∈ M.ideal := Ideal.mem_comap.1 (M.comap_eq.symm ▸ hg)
+      have h := hφm (hsub ht) _ hg'
+      rw [eval_rename] at h
+      exact h
+  }
   refine ⟨ν, fun f ↦ ?_⟩
-  rw [hord f, hO n J M w (min r ε) φ hJ hdim1 hρ (hφd.mono hsub) (hφi.mono hsub) (fun t ht ↦ hφm (hsub ht)) hφ0]
+  rw [hord f,
+    hO n J M w (min r ε) φ hJ hdim1 hρ (hφd.mono hsub) (hφi.mono hsub)
+      (fun t ht ↦ hφm (hsub ht))
+      hφ0]
   unfold branchOrder
   simp only [eval_rename]
   rfl

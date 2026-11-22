@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIsogenyAnd
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.EtLev
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.EtLev
 open scoped TensorProduct
 open GlobalTheory.AV GlobalTheory.AV.AbVar
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
@@ -24,7 +27,10 @@ namespace GlobalTheory.AV.AbVar.DegNorm
 
 open Polynomial IntermediateField
 
-theorem deg_pow_finrank_eq_natAbs_norm_pow : ∀ (K : Type) [Field K] (B : AbVar K) (F : Type) [Field F] [NumberField F] (ψ : 𝓞 F →+* End B) (c : 𝓞 F), c ≠ 0 → deg (ψ c).asHom ^ Module.finrank ℚ F = (Algebra.norm ℤ c).natAbs ^ (2 * B.dim) := by
+theorem deg_pow_finrank_eq_natAbs_norm_pow
+    : ∀ (K : Type) [Field K] (B : AbVar K) (F : Type) [Field F] [NumberField F] (ψ : 𝓞 F →+* End B)
+        (c : 𝓞 F),
+      c ≠ 0 → deg (ψ c).asHom ^ Module.finrank ℚ F = (Algebra.norm ℤ c).natAbs ^ (2 * B.dim) := by
   intro K _ B F _ _ ψ c hc
   have hN : Algebra.norm ℤ c ≠ 0 := by
     intro h
@@ -50,15 +56,18 @@ theorem deg_pow_finrank_eq_natAbs_norm_pow : ∀ (K : Type) [Field K] (B : AbVar
     have hdeg : k * Module.finrank ℚ ℚ⟮(c : F)⟯ = 2 * B.dim := by
       have e := congrArg Polynomial.natDegree hPQ
       rw [Polynomial.natDegree_map_eq_of_injective (RingHom.injective_int _), hd,
-        Polynomial.natDegree_pow, ← IntermediateField.adjoin.finrank hxint] at e
+          Polynomial.natDegree_pow, ← IntermediateField.adjoin.finrank hxint]
+        at e
       omega
     have hD := deg_aeval_eq_prod_aroots K B (ψ c) (AlgebraicClosure ℚ) Polynomial.X
     simp only [aeval_X, Multiset.map_id'] at hD
     rw [hPQ, Polynomial.aroots_pow, Multiset.prod_nsmul] at hD
-    have hNr := Algebra.norm_eq_prod_roots (K := ℚ) (L := F) (AlgebraicClosure ℚ) (x := (c : F))
-      (IsAlgClosed.splits _)
-    have e : algebraMap ℚ (AlgebraicClosure ℚ) ((deg (ψ c).asHom : ℚ) ^ Module.finrank ℚ⟮(c : F)⟯ F) =
-        algebraMap ℚ (AlgebraicClosure ℚ) (Algebra.norm ℚ (c : F) ^ k) := by
+    have hNr :=
+      Algebra.norm_eq_prod_roots (K := ℚ) (L := F) (AlgebraicClosure ℚ) (x := (c : F))
+        (IsAlgClosed.splits _)
+    have e
+        : algebraMap ℚ (AlgebraicClosure ℚ) ((deg (ψ c).asHom : ℚ) ^ Module.finrank ℚ⟮(c : F)⟯ F)
+          = algebraMap ℚ (AlgebraicClosure ℚ) (Algebra.norm ℚ (c : F) ^ k) := by
       rw [map_pow, map_pow, hD, hNr, ← pow_mul, ← pow_mul, mul_comm]
     have e2 := (algebraMap ℚ (AlgebraicClosure ℚ)).injective e
     rw [← Algebra.coe_norm_int] at e2

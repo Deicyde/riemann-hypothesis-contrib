@@ -19,8 +19,10 @@ open scoped ENNReal NNReal
 
 namespace ProperHolomorphicSurjective
 
-theorem analyticOnNhd_of_differentiableOn {k m : ℕ} {U : Set (Fin k → ℂ)} {f : (Fin k → ℂ) → Fin m → ℂ}
-    (hU : IsOpen U) (hf : DifferentiableOn ℂ f U) : AnalyticOnNhd ℂ f U := by
+theorem analyticOnNhd_of_differentiableOn
+    {k m : ℕ} {U : Set (Fin k → ℂ)} {f : (Fin k → ℂ) → Fin m → ℂ}
+    (hU : IsOpen U) (hf : DifferentiableOn ℂ f U)
+    : AnalyticOnNhd ℂ f U := by
   refine analyticOnNhd_pi_iff.2 fun j => ?_
   have hj : DifferentiableOn ℂ (fun t => f t j) U := differentiableOn_pi.1 hf j
   refine analyticOnNhd_of_continuousOn_of_separately hU hj.continuousOn fun w hw i => ?_
@@ -32,23 +34,27 @@ theorem analyticOnNhd_of_differentiableOn {k m : ℕ} {U : Set (Fin k → ℂ)} 
 noncomputable def jac {k : ℕ} (g : (Fin k → ℂ) → Fin k → ℂ) (v : Fin k → ℂ) : ℂ :=
   LinearMap.det (fderiv ℂ g v : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ)
 
-theorem jac_ne_zero_iff {k : ℕ} (g : (Fin k → ℂ) → Fin k → ℂ) (v : Fin k → ℂ) :
-    jac g v ≠ 0 ↔ Function.Injective (fderiv ℂ g v) := by
+theorem jac_ne_zero_iff {k : ℕ} (g : (Fin k → ℂ) → Fin k → ℂ) (v : Fin k → ℂ)
+    : jac g v ≠ 0 ↔ Function.Injective (fderiv ℂ g v) := by
   rw [jac, ← isUnit_iff_ne_zero, ← LinearMap.isUnit_iff_isUnit_det, Module.End.isUnit_iff]
   constructor
   · exact fun h => h.1
   · intro h
     exact ⟨h, LinearMap.injective_iff_surjective.1 h⟩
 
-theorem differentiableOn_jac {k : ℕ} {Ω : Set (Fin k → ℂ)} {g : (Fin k → ℂ) → Fin k → ℂ} (hΩ : IsOpen Ω)
-    (hg : DifferentiableOn ℂ g Ω) : DifferentiableOn ℂ (jac g) Ω := by
+theorem differentiableOn_jac
+    {k : ℕ} {Ω : Set (Fin k → ℂ)} {g : (Fin k → ℂ) → Fin k → ℂ}
+    (hΩ : IsOpen Ω) (hg : DifferentiableOn ℂ g Ω)
+    : DifferentiableOn ℂ (jac g) Ω := by
   have hfd : DifferentiableOn ℂ (fderiv ℂ g) Ω :=
     (analyticOnNhd_of_differentiableOn hΩ hg).fderiv.differentiableOn
-  have hentry : ∀ i j : Fin k,
-      DifferentiableOn ℂ (fun v => fderiv ℂ g v (Pi.single j 1) i) Ω := fun i j =>
-    differentiableOn_pi.1 (hfd.clm_apply (differentiableOn_const _)) i
-  have hjac : jac g = fun v => ∑ σ : Equiv.Perm (Fin k),
-      ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, fderiv ℂ g v (Pi.single i 1) (σ i) := by
+  have hentry : ∀ i j : Fin k, DifferentiableOn ℂ (fun v => fderiv ℂ g v (Pi.single j 1) i) Ω :=
+    fun i j => differentiableOn_pi.1 (hfd.clm_apply (differentiableOn_const _)) i
+  have hjac
+      : jac g
+        = fun v =>
+          ∑ σ : Equiv.Perm (Fin k),
+            ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, fderiv ℂ g v (Pi.single i 1) (σ i) := by
     funext v
     rw [jac, ← LinearMap.det_toMatrix', Matrix.det_apply']
     simp [LinearMap.toMatrix'_apply]
@@ -59,9 +65,10 @@ theorem differentiableOn_jac {k : ℕ} {Ω : Set (Fin k → ℂ)} {g : (Fin k �
     (g := fun i v => fderiv ℂ g v (Pi.single i 1) (σ i))
     fun i _ => ((hentry (σ i) i) x hx).hasFDerivWithinAt).differentiableWithinAt
 
-theorem proof (hFin : CompactHolomorphicFibreFinite.Statement) (hInf : RankDeficientFibreInfinite.Statement)
-    (hDim : HolomorphicZeroSetDimH.Statement) (hConn : HausdorffNullComplementConnected.Statement) :
-    ProperHolomorphicSurjective.Statement := by
+theorem proof
+    (hFin : CompactHolomorphicFibreFinite.Statement) (hInf : RankDeficientFibreInfinite.Statement)
+    (hDim : HolomorphicZeroSetDimH.Statement) (hConn : HausdorffNullComplementConnected.Statement)
+    : ProperHolomorphicSurjective.Statement := by
   intro k Ω D g hΩ hΩne hD hDc hg hmaps hprop
   refine Set.Subset.antisymm (Set.image_subset_iff.2 hmaps) ?_
   rcases Nat.eq_zero_or_pos k with rfl | hk
@@ -74,13 +81,18 @@ theorem proof (hFin : CompactHolomorphicFibreFinite.Statement) (hInf : RankDefic
 
   have hopen : ∀ v ∈ Ω, jac g v ≠ 0 → g '' Ω ∈ 𝓝 (g v) := by
     intro v hv hdet
-    have he : ((LinearMap.equivOfDetNeZero (fderiv ℂ g v : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ)
-        hdet).toContinuousLinearEquiv : (Fin k → ℂ) →L[ℂ] Fin k → ℂ) = fderiv ℂ g v := by
+    have he
+        : ((LinearMap.equivOfDetNeZero (fderiv ℂ g v : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ)
+              hdet).toContinuousLinearEquiv
+            : (Fin k → ℂ) →L[ℂ] Fin k → ℂ)
+          = fderiv ℂ g v := by
       ext1 u
       rfl
-    have hs : HasStrictFDerivAt g ((LinearMap.equivOfDetNeZero
-        (fderiv ℂ g v : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ) hdet).toContinuousLinearEquiv :
-          (Fin k → ℂ) →L[ℂ] Fin k → ℂ) v := by
+    have hs : HasStrictFDerivAt g
+        ((LinearMap.equivOfDetNeZero (fderiv ℂ g v : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ)
+            hdet).toContinuousLinearEquiv
+          : (Fin k → ℂ) →L[ℂ] Fin k → ℂ)
+        v := by
       rw [he]
       exact (han v hv).hasStrictFDerivAt
     rw [← hs.map_nhds_eq_of_equiv]
@@ -90,8 +102,8 @@ theorem proof (hFin : CompactHolomorphicFibreFinite.Statement) (hInf : RankDefic
     intro W hW hWo hWne
     by_contra hcon
     simp only [not_exists, not_and, not_not] at hcon
-    obtain ⟨y, hy⟩ := hInf k k W g hWo hWne (hg.mono hW)
-      fun v hv hinj => (jac_ne_zero_iff g v).2 hinj (hcon v hv)
+    obtain ⟨y, hy⟩ :=
+      hInf k k W g hWo hWne (hg.mono hW) fun v hv hinj => (jac_ne_zero_iff g v).2 hinj (hcon v hv)
     obtain ⟨t, htW, hty⟩ := hy.nonempty
     have hyD : y ∈ D := hty ▸ hmaps (hW htW)
     have hcpt : IsCompact {v | v ∈ Ω ∧ g v = y} :=
@@ -107,7 +119,9 @@ theorem proof (hFin : CompactHolomorphicFibreFinite.Statement) (hInf : RankDefic
   have hnull : μH[(Module.finrank ℝ (Fin k → ℂ) : ℝ) - 1] C = 0 := by
     have hlt : dimH C < (((2 * k - 1 : ℕ) : ℝ≥0) : ℝ≥0∞) := by
       rw [ENNReal.coe_natCast]
-      calc dimH C ≤ 2 * ((k - 1 : ℕ) : ℝ≥0∞) := hdimC
+      calc
+        dimH C
+          ≤ 2 * ((k - 1 : ℕ) : ℝ≥0∞) := hdimC
         _ = ((2 * (k - 1) : ℕ) : ℝ≥0∞) := by push_cast; ring
         _ < ((2 * k - 1 : ℕ) : ℝ≥0∞) := by exact_mod_cast (by omega : 2 * (k - 1) < 2 * k - 1)
     have h0 := hausdorffMeasure_of_dimH_lt hlt
@@ -141,9 +155,11 @@ theorem proof (hFin : CompactHolomorphicFibreFinite.Statement) (hInf : RankDefic
       by_contra hzC
       exact hcon ⟨z, ⟨Set.image_subset_iff.2 hmaps (interior_subset hz), hzC⟩, hz⟩
     have h1 : dimH (interior (g '' Ω)) = Module.finrank ℝ (Fin k → ℂ) :=
-      Real.dimH_of_nonempty_interior (by rw [interior_interior]; exact ⟨g w, mem_interior_iff_mem_nhds.2 hN⟩)
+      Real.dimH_of_nonempty_interior (by
+        rw [interior_interior]; exact ⟨g w, mem_interior_iff_mem_nhds.2 hN⟩)
     have h2 := (dimH_mono hsubC).trans hdimC
-    rw [h1, hfr, show (2 : ℝ≥0∞) * ((k - 1 : ℕ) : ℝ≥0∞) = ((2 * (k - 1) : ℕ) : ℝ≥0∞) by push_cast; ring]
+    rw [h1, hfr,
+        show (2 : ℝ≥0∞) * ((k - 1 : ℕ) : ℝ≥0∞) = ((2 * (k - 1) : ℕ) : ℝ≥0∞) by push_cast; ring]
       at h2
     have h3 : 2 * k ≤ 2 * (k - 1) := by exact_mod_cast h2
     omega
@@ -159,7 +175,8 @@ theorem proof (hFin : CompactHolomorphicFibreFinite.Statement) (hInf : RankDefic
       exact fun hcl => hyE (hclosed y hyD hcl)
   have hdisj : Disjoint (interior (g '' Ω)) (closure (g '' Ω))ᶜ :=
     Set.disjoint_compl_right_iff_subset.2 (interior_subset.trans subset_closure)
-  have hRE := hR.subset_left_of_subset_union isOpen_interior isClosed_closure.isOpen_compl hdisj hRsub hne
+  have hRE :=
+    hR.subset_left_of_subset_union isOpen_interior isClosed_closure.isOpen_compl hdisj hRsub hne
   intro y hyD
   by_cases hyC : y ∈ C
   · obtain ⟨v, ⟨hv, _⟩, rfl⟩ := hyC

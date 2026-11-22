@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.FrobeniusLocalisation.locRoots
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
 
-private theorem UpperTheory.V.Loc.ci_closed (l : ℕ) [Fact l.Prime] (x y : PadicAlgCl l) :
-    IsClosed {σ : PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l | σ x = y} := by
+private theorem UpperTheory.V.Loc.ci_closed (l : ℕ) [Fact l.Prime] (x y : PadicAlgCl l)
+    : IsClosed {σ : PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l | σ x = y} := by
   have hx : IsIntegral ℚ_[l] x := Algebra.IsIntegral.isIntegral x
   haveI := IntermediateField.adjoin.finiteDimensional hx
   have hU := IntermediateField.fixingSubgroup_isOpen (IntermediateField.adjoin ℚ_[l] {x})
@@ -18,24 +19,26 @@ private theorem UpperTheory.V.Loc.ci_closed (l : ℕ) [Fact l.Prime] (x y : Padi
   have h1 := (hU.preimage hc).mem_nhds (x := σ) (by simp)
   refine Filter.mem_of_superset h1 fun τ hτ h => hσ ?_
   have h2 : (σ⁻¹ * τ) x = x :=
-    (IntermediateField.mem_fixingSubgroup_iff _ _).1 hτ x (IntermediateField.mem_adjoin_simple_self _ _)
+    (IntermediateField.mem_fixingSubgroup_iff _ _).1 hτ x
+      (IntermediateField.mem_adjoin_simple_self _ _)
   have h3 : τ x = y := h
-  have h4 : σ ((σ⁻¹ * τ) x) = τ x := by
-    rw [← AlgEquiv.mul_apply, mul_inv_cancel_left]
+  have h4 : σ ((σ⁻¹ * τ) x) = τ x := by rw [← AlgEquiv.mul_apply, mul_inv_cancel_left]
   show σ x = y
   rw [← h3, ← h4, h2]
 
-private theorem UpperTheory.V.Loc.ci_dvd_sub_iff (l : ℕ) [Fact l.Prime] (r : ℕ) (x y : ℤ_[l]) :
-    (l : ℤ_[l]) ^ r ∣ x - y ↔ PadicInt.toZModPow r x = PadicInt.toZModPow r y := by
+private theorem UpperTheory.V.Loc.ci_dvd_sub_iff (l : ℕ) [Fact l.Prime] (r : ℕ) (x y : ℤ_[l])
+    : (l : ℤ_[l]) ^ r ∣ x - y ↔ PadicInt.toZModPow r x = PadicInt.toZModPow r y := by
   rw [← Ideal.mem_span_singleton, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, sub_eq_zero]
 
-private theorem UpperTheory.V.Loc.ci_pow_congr {K : Type*} [Monoid K] {x : K} {M a b : ℕ} (hx : x ^ M = 1)
-    (h : a ≡ b [MOD M]) : x ^ a = x ^ b := by
+private theorem UpperTheory.V.Loc.ci_pow_congr
+    {K : Type*} [Monoid K] {x : K} {M a b : ℕ} (hx : x ^ M = 1) (h : a ≡ b [MOD M])
+    : x ^ a = x ^ b := by
   rw [pow_eq_pow_mod a hx, pow_eq_pow_mod b hx, h]
 
-private theorem UpperTheory.V.Loc.ci_crt (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ) (M : ℕ) (hM : M ≠ 0) :
-    ∃ c : ℕ, c.Coprime M ∧ c ≡ 1 [MOD ordCompl[l] M] ∧
-      ∀ k ≤ M.factorization l, (c : ZMod (l ^ k)) = PadicInt.toZModPow k (a : ℤ_[l]) := by
+private theorem UpperTheory.V.Loc.ci_crt (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ) (M : ℕ) (hM : M ≠ 0)
+    : ∃ c : ℕ,
+      c.Coprime M ∧ c ≡ 1 [MOD ordCompl[l] M]
+        ∧ ∀ k ≤ M.factorization l, (c : ZMod (l ^ k)) = PadicInt.toZModPow k (a : ℤ_[l]) := by
   have hp : l.Prime := Fact.out
   set v := M.factorization l with hv
   have hcop : Nat.Coprime (ordCompl[l] M) (l ^ v) := (Nat.coprime_ordCompl hp hM).symm.pow_right _
@@ -57,10 +60,11 @@ private theorem UpperTheory.V.Loc.ci_crt (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ
     have := (pow_dvd_pow _ hk).trans hd
     rwa [UpperTheory.V.Loc.ci_dvd_sub_iff, map_natCast] at this
 
-private theorem UpperTheory.V.Loc.ci_fin (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ) (n : ℕ) :
-    ∃ σ : (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l),
-      (∀ m ≤ n, 0 < m → ¬ l ∣ m → ∀ x : PadicAlgCl l, x ^ m = 1 → σ x = x) ∧
-      ∀ k ≤ n, ∀ x : PadicAlgCl l, x ^ l ^ k = 1 → σ x = x ^ (PadicInt.toZModPow k (a : ℤ_[l])).val := by
+private theorem UpperTheory.V.Loc.ci_fin (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ) (n : ℕ)
+    : ∃ σ : (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l),
+      (∀ m ≤ n, 0 < m → ¬ l ∣ m → ∀ x : PadicAlgCl l, x ^ m = 1 → σ x = x)
+        ∧ ∀ k ≤ n, ∀ x : PadicAlgCl l,
+          x ^ l ^ k = 1 → σ x = x ^ (PadicInt.toZModPow k (a : ℤ_[l])).val := by
   have hp : l.Prime := Fact.out
   obtain ⟨M, hM⟩ : ∃ M, M = n.factorial * l ^ n := ⟨_, rfl⟩
   have hM0 : M ≠ 0 := by
@@ -69,12 +73,15 @@ private theorem UpperTheory.V.Loc.ci_fin (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ
   have hv : n ≤ M.factorization l :=
     (hp.pow_dvd_iff_le_factorization hM0).1 (by rw [hM]; exact Dvd.intro_left _ rfl)
   obtain ⟨c, hcM, hc1, hc2⟩ := UpperTheory.V.Loc.ci_crt l a M hM0
-  have hval : ∀ (N : ℕ) (h : c.Coprime N), ((ZMod.unitOfCoprime c h : (ZMod N)ˣ) : ZMod N).val ≡ c [MOD N] := by
+  have hval
+      : ∀ (N : ℕ) (h : c.Coprime N),
+        ((ZMod.unitOfCoprime c h : (ZMod N)ˣ) : ZMod N).val ≡ c [MOD N] := by
     intro N h
     rw [ZMod.coe_unitOfCoprime, ZMod.val_natCast]
     exact Nat.mod_modEq _ _
-  obtain ⟨σ, hσ⟩ := (UpperTheory.HF.loc_roots l M (Nat.pos_of_ne_zero hM0)).2 (ZMod.unitOfCoprime c hcM) 0
-    (by rw [pow_zero]; exact ((hval M hcM).of_dvd (Nat.ordCompl_dvd _ _)).trans hc1)
+  obtain ⟨σ, hσ⟩ :=
+    (UpperTheory.HF.loc_roots l M (Nat.pos_of_ne_zero hM0)).2 (ZMod.unitOfCoprime c hcM) 0
+      (by rw [pow_zero]; exact ((hval M hcM).of_dvd (Nat.ordCompl_dvd _ _)).trans hc1)
   have hσc : ∀ d, d ∣ M → ∀ x : PadicAlgCl l, x ^ d = 1 → σ x = x ^ c := by
     intro d ⟨e, he⟩ x hx
     have hxM : x ^ M = 1 := by rw [he, pow_mul, hx, one_pow]
@@ -95,7 +102,8 @@ private theorem UpperTheory.V.Loc.ci_fin (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ
     rw [← ZMod.natCast_eq_natCast_iff, ZMod.natCast_zmod_val]
     exact hc2 k (le_trans hk hv)
 
-private theorem UpperTheory.V.Loc.ci_surj (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ) : ∃ g ∈ Iq l, cyc l l g = a := by
+private theorem UpperTheory.V.Loc.ci_surj (l : ℕ) [Fact l.Prime] (a : ℤ_[l]ˣ)
+    : ∃ g ∈ Iq l, cyc l l g = a := by
   have hp : l.Prime := Fact.out
   let S : ℕ → Set (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l) := fun n =>
     {σ | (∀ m ≤ n, 0 < m → ¬ l ∣ m → ∀ x : PadicAlgCl l, x ^ m = 1 → σ x = x) ∧
@@ -104,14 +112,21 @@ private theorem UpperTheory.V.Loc.ci_surj (l : ℕ) [Fact l.Prime] (a : ℤ_[l]�
     intro n
     simp only [S, Set.setOf_and, Set.setOf_forall]
     refine IsClosed.inter ?_ ?_
-    · exact isClosed_iInter fun _ => isClosed_iInter fun _ => isClosed_iInter fun _ => isClosed_iInter fun _ =>
-        isClosed_iInter fun _ => isClosed_iInter fun _ => UpperTheory.V.Loc.ci_closed l _ _
-    · exact isClosed_iInter fun _ => isClosed_iInter fun _ => isClosed_iInter fun _ => isClosed_iInter fun _ =>
-        UpperTheory.V.Loc.ci_closed l _ _
+    · exact isClosed_iInter fun _ =>
+        isClosed_iInter fun _ =>
+          isClosed_iInter fun _ =>
+            isClosed_iInter fun _ =>
+              isClosed_iInter fun _ => isClosed_iInter fun _ => UpperTheory.V.Loc.ci_closed l _ _
+    · exact isClosed_iInter fun _ =>
+        isClosed_iInter fun _ =>
+          isClosed_iInter fun _ => isClosed_iInter fun _ => UpperTheory.V.Loc.ci_closed l _ _
   haveI : IsGalois ℚ_[l] (PadicAlgCl l) := {}
-  obtain ⟨σ, hσ⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed S
-    (fun n σ hσ => ⟨fun m hm => hσ.1 m (hm.trans n.le_succ), fun k hk => hσ.2 k (hk.trans n.le_succ)⟩)
-    (fun n => UpperTheory.V.Loc.ci_fin l a n) (hcl 0).isCompact hcl
+  obtain ⟨σ, hσ⟩ :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed S
+      (fun n σ hσ =>
+        ⟨fun m hm => hσ.1 m (hm.trans n.le_succ), fun k hk => hσ.2 k (hk.trans n.le_succ)⟩)
+      (fun n => UpperTheory.V.Loc.ci_fin l a n)
+      (hcl 0).isCompact hcl
   rw [Set.mem_iInter] at hσ
   refine ⟨σ, (IntermediateField.mem_fixingSubgroup_iff _ _).2 fun x hx => ?_, ?_⟩
   · unfold MaximalUnramifiedExtension at hx
@@ -129,13 +144,16 @@ private theorem UpperTheory.V.Loc.ci_surj (l : ℕ) [Fact l.Prime] (a : ℤ_[l]�
     refine Units.ext (PadicInt.ext_of_toZModPow.1 fun k => ?_)
     haveI : NeZero (l ^ k) := ⟨pow_ne_zero _ hp.ne_zero⟩
     obtain ⟨η, hη⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (PadicAlgCl l) (l ^ k)
-    have h1 := cyclotomicCharacter.spec l (n := k)
-      (MulSemiringAction.toRingAut (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l) (PadicAlgCl l) σ) η hη.pow_eq_one
+    have h1 :=
+      cyclotomicCharacter.spec l (n := k)
+        (MulSemiringAction.toRingAut (PadicAlgCl l ≃ₐ[ℚ_[l]] PadicAlgCl l) (PadicAlgCl l) σ) η
+        hη.pow_eq_one
     have h2 := (hσ k).2 k le_rfl η hη.pow_eq_one
     have h3 := h1.symm.trans h2
     exact ZMod.val_injective _ (hη.pow_inj (ZMod.val_lt _) (ZMod.val_lt _) h3)
 
-private theorem UpperTheory.V.Loc.ci_inf (l : ℕ) [Fact l.Prime] : ∃ u : ℤ_[l]ˣ, ¬ IsOfFinOrder u := by
+private theorem UpperTheory.V.Loc.ci_inf (l : ℕ) [Fact l.Prime]
+    : ∃ u : ℤ_[l]ˣ, ¬ IsOfFinOrder u := by
   have hp : l.Prime := Fact.out
   have hu : IsUnit (((l + 1 : ℕ)) : ℤ_[l]) := by
     rw [PadicInt.isUnit_iff]
@@ -144,12 +162,18 @@ private theorem UpperTheory.V.Loc.ci_inf (l : ℕ) [Fact l.Prime] : ∃ u : ℤ_
   obtain ⟨n, hn, h⟩ := isOfFinOrder_iff_pow_eq_one.1 h
   have h2 := congrArg Units.val h
   rw [Units.val_pow_eq_pow_val, hu.unit_spec, Units.val_one, ← Nat.cast_pow, Nat.cast_eq_one,
-    Nat.pow_eq_one] at h2
+      Nat.pow_eq_one]
+    at h2
   have := hp.one_lt
   omega
 
-theorem UpperTheory.V.Loc.cycInertia :
-    ∀ (l : ℕ) [Fact l.Prime], (∀ u : ℤ_[l]ˣ, ∃ g ∈ Iq l, cyc l l g = u) ∧ ∀ U : Subgroup (GQ l), IsOpen (U : Set (GQ l)) → IsOpen (((U ⊓ Iq l).map (cyc l l) : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ) ∧ ∃ s ∈ U ⊓ Iq l, ¬ IsOfFinOrder (cyc l l s) := by
+theorem UpperTheory.V.Loc.cycInertia
+    : ∀ (l : ℕ) [Fact l.Prime],
+      (∀ u : ℤ_[l]ˣ, ∃ g ∈ Iq l, cyc l l g = u)
+        ∧ ∀ U : Subgroup (GQ l),
+          IsOpen (U : Set (GQ l))
+            → IsOpen (((U ⊓ Iq l).map (cyc l l) : Subgroup ℤ_[l]ˣ) : Set ℤ_[l]ˣ)
+              ∧ ∃ s ∈ U ⊓ Iq l, ¬ IsOfFinOrder (cyc l l s) := by
   intro l _
   refine ⟨UpperTheory.V.Loc.ci_surj l, fun U hU => ?_⟩
   haveI : IsGalois ℚ_[l] (Om l) := {}
@@ -160,7 +184,8 @@ theorem UpperTheory.V.Loc.cycInertia :
   · have hs : Function.Surjective ((cyc l l).comp (Iq l).subtype) := fun u => by
       obtain ⟨g, hg, h⟩ := UpperTheory.V.Loc.ci_surj l u
       exact ⟨⟨g, hg⟩, h⟩
-    have he : (U ⊓ Iq l).map (cyc l l) = (U.subgroupOf (Iq l)).map ((cyc l l).comp (Iq l).subtype) := by
+    have he
+        : (U ⊓ Iq l).map (cyc l l) = (U.subgroupOf (Iq l)).map ((cyc l l).comp (Iq l).subtype) := by
       rw [← Subgroup.map_map, Subgroup.subgroupOf_map_subtype]
     haveI : ((U ⊓ Iq l).map (cyc l l)).FiniteIndex := ⟨by
       rw [he]
@@ -168,11 +193,12 @@ theorem UpperTheory.V.Loc.cycInertia :
     refine Subgroup.isOpen_of_isClosed_of_finiteIndex _ ?_
     rw [Subgroup.coe_map, Subgroup.coe_inf]
     exact (((U.isClosed_of_isOpen hU).inter
-      (InfiniteGalois.fixingSubgroup_isClosed (MaximalUnramifiedExtension l))).isCompact.image hc).isClosed
+        (InfiniteGalois.fixingSubgroup_isClosed (MaximalUnramifiedExtension l))).isCompact.image
+      hc).isClosed
   · obtain ⟨u, hu⟩ := UpperTheory.V.Loc.ci_inf l
     obtain ⟨g, hg, h⟩ := UpperTheory.V.Loc.ci_surj l u
-    obtain ⟨n, hn, -, hgn⟩ := Subgroup.exists_pow_mem_of_index_ne_zero
-      (Subgroup.FiniteIndex.index_ne_zero (H := U)) g
+    obtain ⟨n, hn, -, hgn⟩ :=
+      Subgroup.exists_pow_mem_of_index_ne_zero (Subgroup.FiniteIndex.index_ne_zero (H := U)) g
     refine ⟨g ^ n, ⟨hgn, pow_mem hg n⟩, fun hf => hu ?_⟩
     rw [map_pow, h] at hf
     exact hf.of_pow hn.ne'

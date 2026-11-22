@@ -6,11 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.FormalGrou
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
 
 namespace GlobalTheory.CompanionTheory.Ar.Conj
 
-theorem rho_hom : ∀ (R : Type) [CommRing R] (d : ℕ) (O : Type) [CommRing O] [StarRing O] (B : FB R d O), ∃ ρ : O →+* Matrix (Fin d) (Fin d) R, ∀ a, ρ a = rho B a := by
+theorem rho_hom
+    : ∀ (R : Type) [CommRing R] (d : ℕ) (O : Type) [CommRing O] [StarRing O] (B : FB R d O),
+      ∃ ρ : O →+* Matrix (Fin d) (Fin d) R, ∀ a,
+        ρ a = rho B a := by
   intro R _ d O _ _ B
   obtain ⟨ρ, h⟩ := GlobalTheory.ChF.linPart_act_ringHom R d B.G O B.A R (RingHom.id R)
   refine ⟨ρ, fun a => ?_⟩

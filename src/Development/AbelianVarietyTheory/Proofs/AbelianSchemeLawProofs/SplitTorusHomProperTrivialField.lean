@@ -6,8 +6,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -16,12 +18,13 @@ namespace TorusToProper
 
 variable {K : Type} [Field K]
 
-noncomputable abbrev sp (K : Type) [Field K] (R : Type) [CommRing R] [Algebra K R] :
-    Over (Spec (CommRingCat.of K)) :=
+noncomputable abbrev sp (K : Type) [Field K] (R : Type) [CommRing R] [Algebra K R]
+    : Over (Spec (CommRingCat.of K)) :=
   Over.mk (Spec.map (CommRingCat.ofHom (algebraMap K R)))
 
-noncomputable def spm {R R' : Type} [CommRing R] [Algebra K R] [CommRing R'] [Algebra K R']
-    (g : R →ₐ[K] R') : sp K R' ⟶ sp K R :=
+noncomputable def spm
+    {R R' : Type} [CommRing R] [Algebra K R] [CommRing R'] [Algebra K R'] (g : R →ₐ[K] R')
+    : sp K R' ⟶ sp K R :=
   Over.homMk (Spec.map (CommRingCat.ofHom g.toRingHom)) (by
     change Spec.map _ ≫ Spec.map _ = Spec.map _
     rw [← Spec.map_comp, ← CommRingCat.ofHom_comp]
@@ -67,7 +70,6 @@ lemma point_extend {V F : Type} [CommRing V] [IsDomain V] [ValuationRing V] [Alg
       commSq := ⟨(Over.w p).trans (Over.w (spm (IsScalarTower.toAlgHom K V F))).symm⟩ }
   obtain ⟨⟨l, h1, h2⟩⟩ := hE S
   exact ⟨Over.homMk l h2, by ext1; exact h1⟩
-
 
 open PowerSeries in
 lemma units_family_trivial {B : Over (Spec (CommRingCat.of K))} [GrpObj B] [IsProper B.hom]
@@ -140,14 +142,14 @@ lemma mul_left_fst {S S' A : Scheme.{0}} (f : S' ⟶ S) (G : Over S) [GrpObj G] 
 
 variable (K) (X : Type) [AddCommGroup X]
 
-noncomputable def charAlg (R : Type) [CommRing R] (φ : Multiplicative X →* Rˣ) :
-    letI : Algebra (ULift.{0} ℤ) R := ULift.algebra' ℤ R
-    AddMonoidAlgebra (ULift.{0} ℤ) X →ₐ[ULift.{0} ℤ] R :=
+noncomputable def charAlg (R : Type) [CommRing R] (φ : Multiplicative X →* Rˣ)
+    : letI : Algebra (ULift.{0} ℤ) R := ULift.algebra' ℤ R
+      AddMonoidAlgebra (ULift.{0} ℤ) X →ₐ[ULift.{0} ℤ] R :=
   letI : Algebra (ULift.{0} ℤ) R := ULift.algebra' ℤ R
   AddMonoidAlgebra.lift (ULift.{0} ℤ) R X ((Units.coeHom R).comp φ)
 
-noncomputable def charRing (R : Type) [CommRing R] (φ : Multiplicative X →* Rˣ) :
-    AddMonoidAlgebra (ULift.{0} ℤ) X →+* R :=
+noncomputable def charRing (R : Type) [CommRing R] (φ : Multiplicative X →* Rˣ)
+    : AddMonoidAlgebra (ULift.{0} ℤ) X →+* R :=
   letI : Algebra (ULift.{0} ℤ) R := ULift.algebra' ℤ R
   (charAlg X R φ).toRingHom
 
@@ -155,10 +157,11 @@ lemma charRing_single (R : Type) [CommRing R] (φ : Multiplicative X →* Rˣ) (
     charRing X R φ (AddMonoidAlgebra.single a 1) = φ (Multiplicative.ofAdd a) := by
   simp [charRing, charAlg]
 
-noncomputable def ptFun (R : Type) [CommRing R] [Algebra K R] (φ : Multiplicative X →* Rˣ) :
-    sp K R ⟶ splitTorus (Spec (CommRingCat.of K)) X :=
-  Over.homMk (pullback.lift (Spec.map (CommRingCat.ofHom (charRing X R φ)) :
-    _ ⟶ (splitTorusAff ZU X).left) (sp K R).hom (specULiftZIsTerminal.hom_ext _ _))
+noncomputable def ptFun (R : Type) [CommRing R] [Algebra K R] (φ : Multiplicative X →* Rˣ)
+    : sp K R ⟶ splitTorus (Spec (CommRingCat.of K)) X :=
+  Over.homMk
+    (pullback.lift (Spec.map (CommRingCat.ofHom (charRing X R φ)) : _ ⟶ (splitTorusAff ZU X).left)
+      (sp K R).hom (specULiftZIsTerminal.hom_ext _ _))
     (pullback.lift_snd _ _ _)
 
 lemma ptFun_fst (R : Type) [CommRing R] [Algebra K R] (φ : Multiplicative X →* Rˣ) :
@@ -195,8 +198,8 @@ lemma ptFun_mul (R : Type) [CommRing R] [Algebra K R] (φ ψ : Multiplicative X 
   rw [ptFun_fst]
   exact (congrArg CommaMorphism.left h3).trans h.symm
 
-noncomputable def pt (R : Type) [CommRing R] [Algebra K R] :
-    (Multiplicative X →* Rˣ) →* (sp K R ⟶ splitTorus (Spec (CommRingCat.of K)) X) :=
+noncomputable def pt (R : Type) [CommRing R] [Algebra K R]
+    : (Multiplicative X →* Rˣ) →* (sp K R ⟶ splitTorus (Spec (CommRingCat.of K)) X) :=
   MonoidHom.mk' (ptFun K X R) (ptFun_mul K X R)
 
 lemma pt_nat {R R' : Type} [CommRing R] [Algebra K R] [CommRing R'] [Algebra K R'] (g : R →ₐ[K] R')
@@ -223,13 +226,13 @@ lemma pt_univ : (pt K X _ (univ K X)).left = (Rosenlicht.torusIso K X).hom := by
     simp [univ]
   · exact (Over.w (pt K X _ (univ K X))).trans (Rosenlicht.torusIso_hom_hom K X).symm
 
-
 variable {X} in
 def coch (l : X →+ ℤ) (G : Type) [CommGroup G] : G →* (Multiplicative X →* G) where
-  toFun x :=
-    { toFun := fun a => x ^ l a.toAdd
-      map_one' := by simp
-      map_mul' := fun a b => by simp [zpow_add] }
+  toFun x := {
+    toFun := fun a => x ^ l a.toAdd
+    map_one' := by simp
+    map_mul' := fun a b => by simp [zpow_add]
+  }
   map_one' := by ext; simp
   map_mul' x y := by ext; simp [mul_zpow]
 
@@ -245,12 +248,13 @@ lemma char_eq_prod {I : Type} [Fintype I] (e : Module.Basis I ℤ X) (G : Type) 
 
 end TorusToProper
 
-
 open TorusToProper in
-theorem splitTorus_hom_proper_trivial_field (K : Type) [Field K] (X : Type) [AddCommGroup X]
-    [Module.Free ℤ X] [Module.Finite ℤ X] (B : Over (Spec (CommRingCat.of K))) [GrpObj B]
-    [IsProper B.hom] (f : splitTorus (Spec (CommRingCat.of K)) X ⟶ B) (hf : IsMonHom f) :
-    f = toUnit _ ≫ η[B] := by
+theorem splitTorus_hom_proper_trivial_field
+    (K : Type) [Field K]
+    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (B : Over (Spec (CommRingCat.of K))) [GrpObj B] [IsProper B.hom]
+    (f : splitTorus (Spec (CommRingCat.of K)) X ⟶ B) (hf : IsMonHom f)
+    : f = toUnit _ ≫ η[B] := by
   let Ψ : ∀ (R : Type) [CommRing R] [Algebra K R], (Multiplicative X →* Rˣ) →* (sp K R ⟶ B) :=
     fun R _ _ => (MonoidHom.mk' (fun t => t ≫ f) (fun s t => MonObj.mul_comp s t f)).comp (pt K X R)
   have hΨ : ∀ (R : Type) [CommRing R] [Algebra K R] φ, Ψ R φ = pt K X R φ ≫ f := fun _ _ _ _ => rfl
@@ -275,8 +279,9 @@ theorem splitTorus_hom_proper_trivial_field (K : Type) [Field K] (X : Type) [Add
     rw [← Category.assoc, ← pt_nat, ← hΨ, h2, ← Category.assoc, ← Category.assoc, Hom.one_def]
     congr 1
     exact toUnit_unique _ _
-  have h4 : (pt K X R (univ K X)).left ≫ f.left =
-      (pt K X R (univ K X)).left ≫ (toUnit _ ≫ η[B]).left := congrArg CommaMorphism.left h3
+  have h4
+      : (pt K X R (univ K X)).left ≫ f.left = (pt K X R (univ K X)).left ≫ (toUnit _ ≫ η[B]).left :=
+    congrArg CommaMorphism.left h3
   rw [pt_univ] at h4
   ext1
   exact (cancel_epi _).1 h4

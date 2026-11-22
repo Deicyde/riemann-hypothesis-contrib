@@ -13,33 +13,45 @@ theorem cT_conj_eq {m p : Type} (M : Matrix m p ℂ) : Formalism.UG.cT (starRing
   ext i j
   simp [Formalism.UG.cT]
 
-theorem form_Jpq (p q : ℕ) (y : Fin p ⊕ Fin q → ℂ) :
-    star y ⬝ᵥ (Formalism.UG.Jpq p q *ᵥ y) =
-      (∑ i, star (y (Sum.inl i)) * y (Sum.inl i)) - ∑ j, star (y (Sum.inr j)) * y (Sum.inr j) := by
+theorem form_Jpq (p q : ℕ) (y : Fin p ⊕ Fin q → ℂ)
+    : star y ⬝ᵥ (Formalism.UG.Jpq p q *ᵥ y)
+      = (∑ i, star (y (Sum.inl i)) * y (Sum.inl i))
+        - ∑ j, star (y (Sum.inr j)) * y (Sum.inr j) := by
   unfold Formalism.UG.Jpq
   simp [dotProduct, Fintype.sum_sum_type, Matrix.fromBlocks_mulVec, Matrix.neg_mulVec,
-    Function.comp_def, sub_eq_add_neg] <;> ring
+      Function.comp_def, sub_eq_add_neg]
+    <;> ring
 
-theorem sylvester_le {n k : Type} [Fintype n] [DecidableEq n] [Fintype k] [DecidableEq k]
-    (J : Matrix n n ℂ) {p q : ℕ} (hJ : Formalism.UG.HasSignature J p q) (B : Matrix n k ℂ)
-    (hB : Function.Injective B.mulVec)
-    (hneg : ∀ v : k → ℂ, (star (B *ᵥ v) ⬝ᵥ (J *ᵥ (B *ᵥ v))).re ≤ 0) : Fintype.card k ≤ q := by
+theorem sylvester_le
+    {n k : Type} [Fintype n] [DecidableEq n] [Fintype k] [DecidableEq k]
+    (J : Matrix n n ℂ)
+    {p q : ℕ} (hJ : Formalism.UG.HasSignature J p q)
+    (B : Matrix n k ℂ) (hB : Function.Injective B.mulVec)
+    (hneg : ∀ v : k → ℂ, (star (B *ᵥ v) ⬝ᵥ (J *ᵥ (B *ᵥ v))).re ≤ 0)
+    : Fintype.card k ≤ q := by
   classical
   obtain ⟨e, P, hP⟩ := hJ
   rw [cT_conj_eq] at hP
   by_contra hcon
   push_neg at hcon
-  let T : (k → ℂ) →ₗ[ℂ] (Fin q → ℂ) := (LinearMap.funLeft ℂ ℂ Sum.inr) ∘ₗ
-    (Matrix.mulVecLin ((P⁻¹ : GL (Fin p ⊕ Fin q) ℂ) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ)) ∘ₗ
-    (LinearMap.funLeft ℂ ℂ e.symm) ∘ₗ (Matrix.mulVecLin B)
+  let T : (k → ℂ) →ₗ[ℂ] (Fin q → ℂ) :=
+    (LinearMap.funLeft ℂ ℂ Sum.inr)
+      ∘ₗ (Matrix.mulVecLin
+        ((P⁻¹ : GL (Fin p ⊕ Fin q) ℂ) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ))
+      ∘ₗ (LinearMap.funLeft ℂ ℂ e.symm) ∘ₗ (Matrix.mulVecLin B)
   have hker : LinearMap.ker T ≠ ⊥ := by
     apply LinearMap.ker_ne_bot_of_finrank_lt
     rw [Module.finrank_fin_fun, Module.finrank_fintype_fun_eq_card]
     exact hcon
   obtain ⟨v, hvK, hv0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hker
   have hTv : T v = 0 := LinearMap.mem_ker.1 hvK
-  have hyr : ∀ j, (((P⁻¹ : GL (Fin p ⊕ Fin q) ℂ) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ) *ᵥ
-      ((B *ᵥ v) ∘ e.symm)) (Sum.inr j) = 0 := fun j => congrFun hTv j
+  have hyr
+      : ∀ j,
+        (((P⁻¹ : GL (Fin p ⊕ Fin q) ℂ) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ)
+              *ᵥ ((B *ᵥ v) ∘ e.symm))
+            (Sum.inr j)
+          = 0 := fun j =>
+    congrFun hTv j
   set w : n → ℂ := B *ᵥ v with hwdef
   set y : Fin p ⊕ Fin q → ℂ :=
     ((P⁻¹ : GL (Fin p ⊕ Fin q) ℂ) : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ) *ᵥ (w ∘ e.symm) with hydef
@@ -68,8 +80,8 @@ theorem sylvester_le {n k : Type} [Fintype n] [DecidableEq n] [Fintype k] [Decid
     | inl i => exact hall i
     | inr j => exact hyr j
   have h1 : star w ⬝ᵥ (J *ᵥ w) = star (w ∘ e.symm) ⬝ᵥ (J.reindex e e *ᵥ (w ∘ e.symm)) := by
-    simp only [dotProduct, mulVec, Matrix.reindex_apply, Matrix.submatrix_apply, Function.comp_apply,
-      Pi.star_apply]
+    simp only [dotProduct, mulVec, Matrix.reindex_apply, Matrix.submatrix_apply,
+      Function.comp_apply, Pi.star_apply]
     refine Fintype.sum_equiv e _ _ (fun a => ?_)
     simp only [Equiv.symm_apply_apply]
     congr 1
@@ -83,7 +95,8 @@ theorem sylvester_le {n k : Type} [Fintype n] [DecidableEq n] [Fintype k] [Decid
   have hpos : 0 < (star w ⬝ᵥ (J *ᵥ w)).re := by
     rw [hform, form_Jpq]
     simp only [hyr, mul_zero, Finset.sum_const_zero, sub_zero, Complex.re_sum, hre]
-    exact Finset.sum_pos' (fun j _ => Complex.normSq_nonneg _)
+    exact Finset.sum_pos'
+      (fun j _ => Complex.normSq_nonneg _)
       ⟨i, Finset.mem_univ _, Complex.normSq_pos.2 hi⟩
   have := hneg v
   linarith

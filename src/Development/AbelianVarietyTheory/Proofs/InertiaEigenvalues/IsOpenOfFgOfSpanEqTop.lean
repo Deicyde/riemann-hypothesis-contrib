@@ -8,15 +8,18 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
 
 namespace GlobalTheory.Cyc
 
-theorem isOpen_of_fg_of_span_eq_top {LL O V : Type} [Field LL] [TopologicalSpace LL]
-    [IsTopologicalRing LL] [CommRing O] [Algebra O LL] [AddCommGroup V] [Module LL V] [Module O V]
-    [IsScalarTower O LL V] [TopologicalSpace V] [IsModuleTopology LL V]
-    (hO : IsOpen (Set.range (algebraMap O LL))) (M : Submodule O V) (hfg : M.FG)
-    (hspan : Submodule.span LL (M : Set V) = ⊤) : IsOpen (M : Set V) := by
+theorem isOpen_of_fg_of_span_eq_top
+    {LL O V : Type} [Field LL] [TopologicalSpace LL] [IsTopologicalRing LL] [CommRing O]
+    [Algebra O LL] [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
+    [TopologicalSpace V] [IsModuleTopology LL V]
+    (hO : IsOpen (Set.range (algebraMap O LL)))
+    (M : Submodule O V) (hfg : M.FG) (hspan : Submodule.span LL (M : Set V) = ⊤)
+    : IsOpen (M : Set V) := by
   obtain ⟨n, b, hb⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hfg
   have hbM : ∀ i, b i ∈ M := fun i => hb ▸ Submodule.subset_span ⟨i, rfl⟩
   have hsurj : Function.Surjective (Fintype.linearCombination LL b) := by
@@ -36,7 +39,11 @@ theorem isOpen_of_fg_of_span_eq_top {LL O V : Type} [Field LL] [TopologicalSpace
   rw [← ha, algebraMap_smul]
   exact M.smul_mem a (hbM i)
 
-theorem locLat_isOpen : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp : Type} [Field Qp] [TopologicalSpace Qp] {LL : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] {O : Type} [CommRing O] [Algebra O LL], GoodO (Qp := Qp) LL O → ∀ T : LocLat G Qp LL O, IsOpen (T.L.T : Set T.V) := by
+theorem locLat_isOpen
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp : Type} [Field Qp] [TopologicalSpace Qp]
+        {LL : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] {O : Type} [CommRing O]
+        [Algebra O LL],
+      GoodO (Qp := Qp) LL O → ∀ T : LocLat G Qp LL O, IsOpen (T.L.T : Set T.V) := by
   intro G _ _ Qp _ _ LL _ _ _ O _ _ h T
   haveI := h.2.2.2.1
   exact isOpen_of_fg_of_span_eq_top h.2.2.2.2 T.L.T T.L.fg T.L.span

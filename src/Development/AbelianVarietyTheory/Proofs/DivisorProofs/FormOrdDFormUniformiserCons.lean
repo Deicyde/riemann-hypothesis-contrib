@@ -9,23 +9,34 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FreeGenerato
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem formOrd_dForm_uniformiser_cons : ∀ {k K : Type} [Field k] [CharZero k] [Field K] (c : k →+* K) (n : ℕ) (E : Place c) (t : E.ring)
-  (w : Fin n → E.ring), Irreducible t →
-  (∀ P : MvPolynomial (Fin n) k, P ≠ 0 → IsUnit (MvPolynomial.eval₂ E.const w P)) →
-  (∃ x : Fin (n + 1) → K, TrBasis c x) →
-  (fun ω => @dite ℤ (∃ a, E.IsFormOrd ω a) (Classical.propDecidable _) (fun h => h.choose) (fun _ => 0)) (dForm c (Fin.cons (t : K) (fun i => (w i : K)) : Fin (n + 1) → K)) = 0 := by
+theorem formOrd_dForm_uniformiser_cons
+    : ∀ {k K : Type} [Field k] [CharZero k] [Field K] (c : k →+* K) (n : ℕ) (E : Place c)
+        (t : E.ring) (w : Fin n → E.ring),
+      Irreducible t
+        → (∀ P : MvPolynomial (Fin n) k, P ≠ 0 → IsUnit (MvPolynomial.eval₂ E.const w P))
+        → (∃ x : Fin (n + 1) → K, TrBasis c x)
+        → (fun ω =>
+              @dite ℤ (∃ a, E.IsFormOrd ω a) (Classical.propDecidable _)
+                (fun h => h.choose)
+                (fun _ => 0))
+            (dForm c (Fin.cons (t : K) (fun i => (w i : K)) : Fin (n + 1) → K))
+          = 0 := by
   intro k K _ _ _ c n E t w ht hw hx
   obtain ⟨x, hx⟩ := hx
-  have e : dForm c (Fin.cons (t : K) (fun i => (w i : K)) : Fin (n + 1) → K) =
-      E.toRat (n + 1) (dForm E.const (Fin.cons t w : Fin (n + 1) → E.ring)) := by
-    have h := TopForm.formMap_dForm (D := n + 1) (α := E.const) (β := c) E.ring.subtype rfl
-      (Fin.cons t w : Fin (n + 1) → E.ring)
+  have e
+      : dForm c (Fin.cons (t : K) (fun i => (w i : K)) : Fin (n + 1) → K)
+        = E.toRat (n + 1) (dForm E.const (Fin.cons t w : Fin (n + 1) → E.ring)) := by
+    have h :=
+      TopForm.formMap_dForm (D := n + 1) (α := E.const) (β := c) E.ring.subtype rfl
+        (Fin.cons t w : Fin (n + 1) → E.ring)
     refine Eq.trans ?_ h.symm
     congr 1
     funext i

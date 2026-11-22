@@ -15,7 +15,20 @@ open scoped ContDiff
 
 open scoped Pointwise
 
-theorem GlobalTheory.setIntegral_norm_prodExp_mul_le_haar : ∀ (𝔸 : Type) [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸] (G : Subgroup 𝔸ˣ) (𝔤 : Submodule ℝ 𝔸) (h : IsExpLieAlgebra G 𝔤) (d : ℕ) (b : Module.Basis (Fin d) ℝ 𝔤) [MeasurableSpace G] [BorelSpace G] (μ : Measure G), μ.IsHaarMeasure → ∃ ρ > 0, ∀ K₁ : Set G, IsCompact K₁ → ∃ (C : ℝ) (K₂ : Set G), 0 ≤ C ∧ IsCompact K₂ ∧ ∀ φ : G → ℂ, Continuous φ → ∀ y ∈ K₁, ∫ t in Metric.closedBall (0 : Fin d → ℝ) ρ, ‖φ (h.prodExp b t * y)‖ ≤ C * ∫ x in K₂, ‖φ x‖ ∂μ := by
+theorem GlobalTheory.setIntegral_norm_prodExp_mul_le_haar
+    : ∀ (𝔸 : Type) [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸]
+        (G : Subgroup 𝔸ˣ) (𝔤 : Submodule ℝ 𝔸) (h : IsExpLieAlgebra G 𝔤) (d : ℕ)
+        (b : Module.Basis (Fin d) ℝ 𝔤) [MeasurableSpace G] [BorelSpace G] (μ : Measure G),
+      μ.IsHaarMeasure
+        → ∃ ρ > 0, ∀ K₁ : Set G,
+          IsCompact K₁
+            → ∃ (C : ℝ) (K₂ : Set G),
+              0 ≤ C ∧ IsCompact K₂
+                ∧ ∀ φ : G → ℂ,
+                  Continuous φ
+                    → ∀ y ∈ K₁,
+                      ∫ t in Metric.closedBall (0 : Fin d → ℝ) ρ, ‖φ (h.prodExp b t * y)‖
+                        ≤ C * ∫ x in K₂, ‖φ x‖ ∂μ := by
   intro 𝔸 _ _ _ _ G 𝔤 h d b _ _ μ hμ
   haveI := hμ
   haveI : LocallyCompactSpace G := IsExpLieAlgebra.locallyCompactSpace h
@@ -44,15 +57,18 @@ theorem GlobalTheory.setIntegral_norm_prodExp_mul_le_haar : ∀ (𝔸 : Type) [N
   set f : (Fin d → ℝ) → ℝ := fun t => ‖φ (P t * y)‖ with hfdef
   have hfc : Continuous f := (hφ.comp (hPc.mul continuous_const)).norm
   set ψ : G → ℂ := fun x => ((‖φ (x * y)‖ : ℝ) : ℂ) with hψdef
-  have hψc : Continuous ψ := Complex.continuous_ofReal.comp (hφ.comp (continuous_id.mul continuous_const)).norm
+  have hψc : Continuous ψ :=
+    Complex.continuous_ofReal.comp (hφ.comp (continuous_id.mul continuous_const)).norm
 
   have h1 : ∫ t in Metric.closedBall (0 : Fin d → ℝ) (ε / 2), f t ≤ ∫ t, β t * f t := by
-    have e : ∫ t in Metric.closedBall (0 : Fin d → ℝ) (ε / 2), f t
-        = ∫ t in Metric.closedBall (0 : Fin d → ℝ) (ε / 2), β t * f t := by
+    have e
+        : ∫ t in Metric.closedBall (0 : Fin d → ℝ) (ε / 2), f t
+          = ∫ t in Metric.closedBall (0 : Fin d → ℝ) (ε / 2), β t * f t := by
       refine setIntegral_congr_fun measurableSet_closedBall fun t ht => ?_
       rw [β.one_of_mem_closedBall ht, one_mul]
     rw [e]
-    refine setIntegral_le_integral ?_ (Filter.Eventually.of_forall fun t => mul_nonneg β.nonneg (norm_nonneg _))
+    refine setIntegral_le_integral ?_
+      (Filter.Eventually.of_forall fun t => mul_nonneg β.nonneg (norm_nonneg _))
     exact (β.continuous.mul hfc).integrable_of_hasCompactSupport β.hasCompactSupport.mul_right
 
   have h2 : ∫ t, β t * f t = (∫ x, κ x * ψ x ∂μ).re := by
@@ -84,22 +100,27 @@ theorem GlobalTheory.setIntegral_norm_prodExp_mul_le_haar : ∀ (𝔸 : Type) [N
     · have : κ x = 0 := image_eq_zero_of_notMem_tsupport hx
       simp [this]
   have h4l : ∫⁻ x, ‖κ x * ψ x‖ₑ ∂μ ≤ ENNReal.ofReal (max M 0) * ((B : ENNReal) * L) := by
-    calc ∫⁻ x, ‖κ x * ψ x‖ₑ ∂μ ≤ ∫⁻ x, ENNReal.ofReal (max M 0) * g (x * y) ∂μ := lintegral_mono hpt
+    calc
+      ∫⁻ x, ‖κ x * ψ x‖ₑ ∂μ
+        ≤ ∫⁻ x, ENNReal.ofReal (max M 0) * g (x * y) ∂μ := lintegral_mono hpt
       _ = ENNReal.ofReal (max M 0) * ∫⁻ x, g (x * y) ∂μ :=
-          lintegral_const_mul _ (hg.comp (measurable_id.mul_const y))
+        lintegral_const_mul _ (hg.comp (measurable_id.mul_const y))
       _ ≤ ENNReal.ofReal (max M 0) * ((B : ENNReal) * L) := by
-          gcongr
-          rw [← hgL]
-          exact hB y hy g hg
+        gcongr
+        rw [← hgL]
+        exact hB y hy g hg
   have h4 : ∫ x, ‖κ x * ψ x‖ ∂μ ≤ max M 0 * B * ∫ x in K₂, ‖φ x‖ ∂μ := by
-    rw [integral_norm_eq_lintegral_enorm (f := fun x => κ x * ψ x) (hκcont.mul hψc).aestronglyMeasurable,
+    rw [integral_norm_eq_lintegral_enorm
+        (f := fun x => κ x * ψ x)
+        (hκcont.mul hψc).aestronglyMeasurable,
       integral_norm_eq_lintegral_enorm hφ.aestronglyMeasurable]
     have hfin : ENNReal.ofReal (max M 0) * ((B : ENNReal) * L) ≠ ⊤ :=
       ENNReal.mul_ne_top ENNReal.ofReal_ne_top (ENNReal.mul_ne_top ENNReal.coe_ne_top hL.ne)
     refine (ENNReal.toReal_mono hfin h4l).trans (le_of_eq ?_)
     rw [ENNReal.toReal_mul, ENNReal.toReal_mul, ENNReal.toReal_ofReal (le_max_right _ _),
       ENNReal.coe_toReal, mul_assoc]
-  calc _ ≤ _ := h1
+  calc
+    _ ≤ _ := h1
     _ = _ := h2
     _ ≤ _ := h3
     _ ≤ _ := h4

@@ -15,22 +15,28 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.LatDet
 
-theorem card_quot_pow {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] {p : R}
-    (hp : Irreducible p) (k : ℕ) :
-    Nat.card (R ⧸ Ideal.span {p ^ k}) = Nat.card (R ⧸ Ideal.span {p}) ^ k := by
+theorem card_quot_pow
+    {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    {p : R} (hp : Irreducible p)
+    (k : ℕ)
+    : Nat.card (R ⧸ Ideal.span {p ^ k}) = Nat.card (R ⧸ Ideal.span {p}) ^ k := by
   haveI : (Ideal.span {p}).IsPrime := (Ideal.span_singleton_prime hp.ne_zero).2 hp.prime
-  have hq := cardQuot_pow_of_prime (P := Ideal.span {p})
-    (by rw [Ne, Ideal.span_singleton_eq_bot]; exact hp.ne_zero) (i := k)
+  have hq :=
+    cardQuot_pow_of_prime (P := Ideal.span {p})
+      (by rw [Ne, Ideal.span_singleton_eq_bot]; exact hp.ne_zero) (i := k)
   rw [Submodule.cardQuot_apply, Submodule.cardQuot_apply, Ideal.span_singleton_pow] at hq
   exact hq
 
-
 open Module Submodule in
-theorem card_coker {R M ι : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [AddCommGroup M] [Module R M] [Fintype ι] (b : Basis ι R M) {p : R} (hp : Irreducible p)
-    (φ : M →ₗ[R] M) (hφ : Function.Injective φ) :
-    ∃ m : ℕ, Associated (LinearMap.det φ) (p ^ m) ∧
-      Nat.card (M ⧸ LinearMap.range φ) = Nat.card (R ⧸ Ideal.span {p}) ^ m :=
+theorem card_coker
+    {R M ι : Type}
+    [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup M] [Module R M] [Fintype ι]
+    (b : Basis ι R M)
+    {p : R} (hp : Irreducible p)
+    (φ : M →ₗ[R] M) (hφ : Function.Injective φ)
+    : ∃ m : ℕ,
+      Associated (LinearMap.det φ) (p ^ m)
+        ∧ Nat.card (M ⧸ LinearMap.range φ) = Nat.card (R ⧸ Ideal.span {p}) ^ m :=
   _root_.GlobalTheory.CardQuotientPow.main b hp φ hφ
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
@@ -41,23 +47,39 @@ theorem resQ_ne_zero {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) : resQ ϖ ≠ 0 := by
   haveI : Finite (𝒪[F] ⧸ IsLocalRing.maximalIdeal 𝒪[F]) := inferInstanceAs (Finite 𝓀[F])
   exact Nat.card_pos.ne'
 
-theorem relIndex_map {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ) {W : Type} [AddCommGroup W] [Module F W]
-    {ι : Type} [Fintype ι] (b : Module.Basis ι F W) (ψ : W →ₗ[F] W) (a : ℤ) (u : (𝒪[F])ˣ)
-    (hd : LinearMap.det ψ = (ϖ : F) ^ a * ((u : 𝒪[F]) : F)) (W0 : AddSubgroup W)
-    (hW : ∀ x, x ∈ W0 ↔ ∀ i, b.repr x i ∈ 𝒪[F]) (hψ : ∀ i j, b.repr (ψ (b j)) i ∈ 𝒪[F]) :
-    ∃ m : ℕ, a = m ∧ (W0.map ψ.toAddMonoidHom).relIndex W0 = resQ ϖ ^ m :=
+theorem relIndex_map
+    {ϖ : 𝒪[F]} (hϖ : Irreducible ϖ)
+    {W : Type} [AddCommGroup W] [Module F W]
+    {ι : Type} [Fintype ι]
+    (b : Module.Basis ι F W)
+    (ψ : W →ₗ[F] W) (a : ℤ) (u : (𝒪[F])ˣ) (hd : LinearMap.det ψ = (ϖ : F) ^ a * ((u : 𝒪[F]) : F))
+    (W0 : AddSubgroup W) (hW : ∀ x, x ∈ W0 ↔ ∀ i, b.repr x i ∈ 𝒪[F])
+    (hψ : ∀ i j, b.repr (ψ (b j)) i ∈ 𝒪[F])
+    : ∃ m : ℕ, a = m ∧ (W0.map ψ.toAddMonoidHom).relIndex W0 = resQ ϖ ^ m :=
   _root_.UpperTheory.Reformulated.B.Yzb5.relIndex_map hϖ b ψ a u hd W0 hW hψ
 
-theorem relVol_map : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (ϖ : 𝒪[F]), Irreducible ϖ → ∀ {W : Type} [AddCommGroup W] [Module F W] {ι : Type} [Fintype ι] (b : Module.Basis ι F W) (φ : W ≃ₗ[F] W) (a : ℤ) (u : (𝒪[F])ˣ), LinearMap.det (φ : W →ₗ[F] W) = (ϖ : F) ^ a * ((u : 𝒪[F]) : F) → ∀ W0 : AddSubgroup W, (∀ x, x ∈ W0 ↔ ∀ i, b.repr x i ∈ 𝒪[F]) → (W0.map φ.toAddEquiv.toAddMonoidHom).relIndex W0 ≠ 0 ∧ W0.relIndex (W0.map φ.toAddEquiv.toAddMonoidHom) ≠ 0 ∧ relVol W0 (W0.map φ.toAddEquiv.toAddMonoidHom) = (resQ ϖ : ℝ) ^ (-a) := by
+theorem relVol_map
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        (ϖ : 𝒪[F]),
+      Irreducible ϖ
+        → ∀ {W : Type} [AddCommGroup W] [Module F W] {ι : Type} [Fintype ι] (b : Module.Basis ι F W)
+            (φ : W ≃ₗ[F] W) (a : ℤ) (u : (𝒪[F])ˣ),
+          LinearMap.det (φ : W →ₗ[F] W) = (ϖ : F) ^ a * ((u : 𝒪[F]) : F)
+            → ∀ W0 : AddSubgroup W,
+              (∀ x, x ∈ W0 ↔ ∀ i, b.repr x i ∈ 𝒪[F])
+                → (W0.map φ.toAddEquiv.toAddMonoidHom).relIndex W0 ≠ 0
+                  ∧ W0.relIndex (W0.map φ.toAddEquiv.toAddMonoidHom) ≠ 0
+                  ∧ relVol W0 (W0.map φ.toAddEquiv.toAddMonoidHom) = (resQ ϖ : ℝ) ^ (-a) := by
   intro F _ _ _ _ ϖ hϖ W _ _ ι _ b φ a u hd W0 hW
   have h0 : (ϖ : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   have hq := resQ_ne_zero hϖ
   haveI := Module.Finite.of_basis b
   haveI := Module.Free.of_basis b
-  obtain ⟨c, hc⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors 𝒪[F])
-    (fun ij : ι × ι => b.repr (φ (b ij.2)) ij.1)
-  obtain ⟨n, v, hv⟩ := IsDiscreteValuationRing.associated_pow_irreducible
-    (nonZeroDivisors.ne_zero c.2) hϖ
+  obtain ⟨c, hc⟩ :=
+    IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors 𝒪[F])
+      (fun ij : ι × ι => b.repr (φ (b ij.2)) ij.1)
+  obtain ⟨n, v, hv⟩ :=
+    IsDiscreteValuationRing.associated_pow_irreducible (nonZeroDivisors.ne_zero c.2) hϖ
   set d := Module.finrank F W
   set t : F := (ϖ : F) ^ n with ht
   have htO : t ∈ 𝒪[F] := pow_mem ϖ.2 n
@@ -79,24 +101,34 @@ theorem relVol_map : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
     split_ifs
     · simpa using htO
     · simp
-  obtain ⟨m1, hm1, i1⟩ := relIndex_map hϖ b _ (n * d + a) u (by
-    rw [LinearMap.det_smul, hd, zpow_add₀ h0, ht, ← pow_mul, ← zpow_natCast, mul_assoc]
-    push_cast; rfl) W0 hW h1
-  obtain ⟨m2, hm2, i2⟩ := relIndex_map hϖ b _ (n * d) 1 (by
-    rw [LinearMap.det_smul, LinearMap.det_id, ht, ← pow_mul, ← zpow_natCast]
-    push_cast; rfl) W0 hW h2
+  obtain ⟨m1, hm1, i1⟩ :=
+    relIndex_map hϖ b _ (n * d + a) u
+      (by
+        rw [LinearMap.det_smul, hd, zpow_add₀ h0, ht, ← pow_mul, ← zpow_natCast, mul_assoc]
+        push_cast
+        rfl)
+      W0 hW h1
+  obtain ⟨m2, hm2, i2⟩ :=
+    relIndex_map hϖ b _ (n * d) 1
+      (by
+        rw [LinearMap.det_smul, LinearMap.det_id, ht, ← pow_mul, ← zpow_natCast]
+        push_cast
+        rfl)
+      W0 hW h2
   set A := W0.map φ.toAddEquiv.toAddMonoidHom with hA
   set B := W0.map (t • (φ : W →ₗ[F] W)).toAddMonoidHom with hB
-  have hBe : B = (W0.map (t • (LinearMap.id : W →ₗ[F] W)).toAddMonoidHom).map
-      φ.toAddEquiv.toAddMonoidHom := by
+  have hBe
+      : B
+        = (W0.map (t • (LinearMap.id : W →ₗ[F] W)).toAddMonoidHom).map
+          φ.toAddEquiv.toAddMonoidHom := by
     rw [hB, AddSubgroup.map_map]
     congr 1
     ext x
     simp
   have i3 : B.relIndex A = resQ ϖ ^ m2 := by
     rw [hBe, hA, AddSubgroup.relIndex_map_map_of_injective _ _ φ.injective, i2]
-  have hle : ∀ ψ : W →ₗ[F] W, (∀ i j, b.repr (ψ (b j)) i ∈ 𝒪[F]) →
-      W0.map ψ.toAddMonoidHom ≤ W0 := by
+  have hle
+      : ∀ ψ : W →ₗ[F] W, (∀ i j, b.repr (ψ (b j)) i ∈ 𝒪[F]) → W0.map ψ.toAddMonoidHom ≤ W0 := by
     rintro ψ hψ _ ⟨x, hx, rfl⟩
     rw [hW]
     intro i
@@ -108,8 +140,7 @@ theorem relVol_map : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
     rw [this]
     exact sum_mem fun j _ => mul_mem ((hW x).1 hx j) (hψ i j)
   have hBW : B ≤ W0 := hle _ h1
-  have hBA : B ≤ A := by
-    rw [hBe, hA]; exact AddSubgroup.map_mono (hle _ h2)
+  have hBA : B ≤ A := by rw [hBe, hA]; exact AddSubgroup.map_mono (hle _ h2)
   have t1 := AddSubgroup.relIndex_mul_relIndex B (A ⊓ W0) W0 (le_inf hBA hBW) inf_le_right
   have t2 := AddSubgroup.relIndex_mul_relIndex B (A ⊓ W0) A (le_inf hBA hBW) inf_le_left
   rw [AddSubgroup.inf_relIndex_right, i1] at t1

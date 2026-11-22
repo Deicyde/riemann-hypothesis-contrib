@@ -9,7 +9,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
-open IndefiniteRowSideFullHecke.NumbersDVR.Bundles IndefiniteRowSideFullHecke.NumbersDVR.Bundles.FlagRestrict
+open IndefiniteRowSideFullHecke.NumbersDVR.Bundles
+  IndefiniteRowSideFullHecke.NumbersDVR.Bundles.FlagRestrict
 
 theorem FullFlagRestriction.proof : FullFlagRestriction.Statement := by
   intro O _ _ _ Ω _ _ K _ ι _ x d N V _ _ B _ Q _ hQ hPQ

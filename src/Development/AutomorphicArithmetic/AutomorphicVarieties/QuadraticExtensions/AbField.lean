@@ -6,11 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.QuadraticEx
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-theorem UpperTheory.V.Two.abField :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : AbF) (L : Type) [Field L] [NumberField L] [Algebra L Ω], IsAbField A L → galOf ℚ L Ω = abU Ω A := by
+theorem UpperTheory.V.Two.abField
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : AbF) (L : Type) [Field L]
+        [NumberField L] [Algebra L Ω],
+      IsAbField A L → galOf ℚ L Ω = abU Ω A := by
   intro Ω _ _ _ A L _ _ _ hL
   obtain ⟨N, hN, j, ζ, hm, hζ, hj⟩ := hL
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
@@ -24,8 +28,7 @@ theorem UpperTheory.V.Two.abField :
     exact Subsingleton.elim _ _
   let k : CyclotomicField N ℚ →ₐ[ℚ] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   letI : Algebra (CyclotomicField N ℚ) Ω := k.toRingHom.toAlgebra
   haveI : IsScalarTower ℚ (CyclotomicField N ℚ) Ω :=
@@ -36,8 +39,7 @@ theorem UpperTheory.V.Two.abField :
     let τ := σ.restrictNormal (CyclotomicField N ℚ)
     have hτ : ∀ y, k (τ y) = σ (k y) := fun y => σ.restrictNormal_commutes (CyclotomicField N ℚ) y
     have hkζ : IsPrimitiveRoot (k ζ) N := hζ.map_of_injective k.injective
-    have hσζ : σ (k ζ) = k ζ ^ (galChar Ω N σ : ZMod N).val :=
-      galChar_spec N σ (k ζ) hkζ.pow_eq_one
+    have hσζ : σ (k ζ) = k ζ ^ (galChar Ω N σ : ZMod N).val := galChar_spec N σ (k ζ) hkζ.pow_eq_one
     have hτζ : τ ζ = ζ ^ (galChar Ω N σ : ZMod N).val := by
       apply k.injective
       show k (τ ζ) = k (ζ ^ _)
@@ -51,11 +53,13 @@ theorem UpperTheory.V.Two.abField :
       hkζ.pow (Nat.pos_of_ne_zero (NeZero.ne N)) (hd.trans (mul_comm _ _))
     have e1 := galChar_spec A.m σ (k ζ ^ d) hprim.pow_eq_one
     rw [map_pow, hσζ, ← pow_mul, mul_comm _ d, pow_mul] at e1
-    have hfin : IsOfFinOrder (k ζ ^ d) := isOfFinOrder_iff_pow_eq_one.2 ⟨A.m, A.pos, hprim.pow_eq_one⟩
+    have hfin : IsOfFinOrder (k ζ ^ d) :=
+      isOfFinOrder_iff_pow_eq_one.2 ⟨A.m, A.pos, hprim.pow_eq_one⟩
     have hmod : (galChar Ω N σ : ZMod N).val ≡ (galChar Ω A.m σ : ZMod A.m).val [MOD A.m] := by
       have h2 := hfin.pow_eq_pow_iff_modEq.1 e1
       rwa [← hprim.eq_orderOf] at h2
-    have hcast : (((galChar Ω N σ : ZMod N).val : ℕ) : ZMod A.m) = (galChar Ω A.m σ : ZMod A.m) := by
+    have hcast
+        : (((galChar Ω N σ : ZMod N).val : ℕ) : ZMod A.m) = (galChar Ω A.m σ : ZMod A.m) := by
       rw [(ZMod.natCast_eq_natCast_iff _ _ _).2 hmod, ZMod.natCast_zmod_val]
     constructor
     · rintro ⟨u, hu, hua⟩

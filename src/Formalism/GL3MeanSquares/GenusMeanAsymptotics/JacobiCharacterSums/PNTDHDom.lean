@@ -43,8 +43,8 @@ lemma dhDom_hasSum {q : ℕ} [NeZero q] (ψ : DirichletCharacter ℂ q) (k : ℕ
   exact (LSeriesSummable_of_abscissaOfAbsConv_lt_re
     (by simpa using habs)).LSeriesHasSum
 
-private theorem logMul_iterate_apply_eq_log_pow_mul (f : ℕ → ℂ) (k n : ℕ) :
-    logMul^[k] f n = Complex.log n ^ k * f n := by
+private theorem logMul_iterate_apply_eq_log_pow_mul (f : ℕ → ℂ) (k n : ℕ)
+    : logMul^[k] f n = Complex.log n ^ k * f n := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -117,14 +117,15 @@ theorem deuring_heilbronn_dominant : DHDom := by
   have hB := dhDom_hasSum (χ * χ₁) k hs
   have hC := dhDom_hasSum (1 : DirichletCharacter ℂ M) k hs0
   have hD := dhDom_hasSum χ₁ k hs0
-  have hbound := HasSum.norm_le_of_bounded (hA.add hB) (Complex.hasSum_re (hC.add hD))
-    (fun n ↦ by
+  have hbound :=
+    HasSum.norm_le_of_bounded (hA.add hB) (Complex.hasSum_re (hC.add hD)) (fun n ↦ by
       rw [Complex.add_re]
       exact dhDom_term_le χ₁ χ h1 k σ γ n)
-  have e1 : ‖iteratedDeriv k (negLD χ) ((σ : ℂ) + γ * I)
-      + iteratedDeriv k (negLD (χ * χ₁)) ((σ : ℂ) + γ * I)‖ =
-      ‖(-1 : ℂ) ^ k * iteratedDeriv k (negLD χ) ((σ : ℂ) + γ * I)
-        + (-1 : ℂ) ^ k * iteratedDeriv k (negLD (χ * χ₁)) ((σ : ℂ) + γ * I)‖ := by
+  have e1
+      : ‖iteratedDeriv k (negLD χ) ((σ : ℂ) + γ * I)
+          + iteratedDeriv k (negLD (χ * χ₁)) ((σ : ℂ) + γ * I)‖
+        = ‖(-1 : ℂ) ^ k * iteratedDeriv k (negLD χ) ((σ : ℂ) + γ * I)
+            + (-1 : ℂ) ^ k * iteratedDeriv k (negLD (χ * χ₁)) ((σ : ℂ) + γ * I)‖ := by
     rw [← mul_add, norm_mul, norm_pow, norm_neg, norm_one, one_pow, one_mul]
   rw [e1, mul_add]
   exact hbound

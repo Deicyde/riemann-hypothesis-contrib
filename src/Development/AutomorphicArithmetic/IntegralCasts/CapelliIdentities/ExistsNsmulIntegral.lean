@@ -5,8 +5,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.Uc15.exists_nsmul_integral {E : Type} [Field E] [NumberField E]
-    (a : E) : ∃ M : ℕ, M ≠ 0 ∧ ∃ b : NumberField.RingOfIntegers E, (b : E) = (M : E) * a := by
+private theorem UpperTheory.Reformulated.B.Uc15.exists_nsmul_integral
+    {E : Type} [Field E] [NumberField E] (a : E)
+    : ∃ M : ℕ, M ≠ 0 ∧ ∃ b : NumberField.RingOfIntegers E, (b : E) = (M : E) * a := by
   have halg : IsAlgebraic ℤ a :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr (Algebra.IsAlgebraic.isAlgebraic a)
   obtain ⟨y, hy, hint⟩ := halg.exists_integral_multiple
@@ -18,9 +19,11 @@ private theorem UpperTheory.Reformulated.B.Uc15.exists_nsmul_integral {E : Type}
   change y • (y • a) = _
   rw [smul_smul, zsmul_eq_mul]
 
-theorem UpperTheory.Reformulated.B.Uc15.exists_nsmul_mem :
-    ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [inst_2 : NumberField.IsCMField E] {r : ℕ}
-      (X : ReciprocityTheory.ChartRestriction.G.FD.Data E r) (u : Fin r → E), ∃ (N : ℕ), N ≠ (0 : ℕ) ∧ N • u ∈ X.Λ := by
+theorem UpperTheory.Reformulated.B.Uc15.exists_nsmul_mem
+    : ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [inst_2 : NumberField.IsCMField E]
+        {r : ℕ} (X : ReciprocityTheory.ChartRestriction.G.FD.Data E r) (u : Fin r → E),
+      ∃ (N : ℕ),
+        N ≠ (0 : ℕ) ∧ N • u ∈ X.Λ := by
   intro E _ _ _ r X u
   have hu : u ∈ Submodule.span E (X.Λ : Set (Fin r → E)) := by
     rw [X.Λ_span]; exact Submodule.mem_top

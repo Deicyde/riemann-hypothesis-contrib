@@ -224,8 +224,9 @@ lemma comb {ε : Fin n → Bool} (g : UJ ε) (r : Fin n × Fin n) :
 
 section Ops
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
 
 lemma dS_add (hC : Calc ε σ D) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X) {u v : H} (hu : u ∈ D)
     (hv : v ∈ D) : dS σ X (u + v) = dS σ X u + dS σ X v := by
@@ -366,7 +367,11 @@ end TorusPowerExponential
 
 theorem c2 : CasimirProperties := by
   intro n ε H _ _ _ σ D hC hst
-  exact ⟨fun u hu v hv => TorusPowerExponential.cas_add hC hu hv, fun c v hv => TorusPowerExponential.cas_smul hC c hv,
-    fun u hu v hv => TorusPowerExponential.cas_symm hC hu hv, fun g v hv => TorusPowerExponential.cas_inv hC hst g hv⟩
+  exact ⟨
+    fun u hu v hv => TorusPowerExponential.cas_add hC hu hv,
+    fun c v hv => TorusPowerExponential.cas_smul hC c hv,
+    fun u hu v hv => TorusPowerExponential.cas_symm hC hu hv,
+    fun g v hv => TorusPowerExponential.cas_inv hC hst g hv
+  ⟩
 
 end Formalism.L2.SG.Pf.admitted

@@ -8,13 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPri
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Polynomial GlobalTheory.Pst GlobalTheory.MemLoc GlobalTheory.Pst.StLat GlobalTheory.Pst.NoLog
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Polynomial GlobalTheory.Pst GlobalTheory.MemLoc
+  GlobalTheory.Pst.StLat GlobalTheory.Pst.NoLog
 open scoped Formalism.Per
 
 namespace GlobalTheory.Pst.StLat
 
-theorem filtration_eq_span_pow : ∀ (l : ℕ) [Fact l.Prime] (Co : Core l) (ϖ : Per.Fl l), Per.kerP l = Ideal.span {beta ϖ} →
-  ∀ n : ℕ, Per.FilP l n = Ideal.span {betaD ϖ ^ n} := by
+theorem filtration_eq_span_pow
+    : ∀ (l : ℕ) [Fact l.Prime] (Co : Core l) (ϖ : Per.Fl l),
+      Per.kerP l = Ideal.span {beta ϖ} → ∀ n : ℕ, Per.FilP l n = Ideal.span {betaD ϖ ^ n} := by
   intro l _ Co ϖ hb n
   have he := core_isEps l Co
   obtain ⟨hfil, -, -, -⟩ := filtration_eq_xi_pow l Co.ε he

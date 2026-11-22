@@ -9,10 +9,12 @@ open Matrix PositivityTheory.Rg.BcB.D1
 
 namespace GlobalTheory.CompanionTheory.WedgeNorm
 
-theorem wedge_fromCols_le {K ι : Type} [Field K] [Fintype ι] [DecidableEq ι] {N : Fam K ι}
-    (h : IsWedge N) (κ κ' : Type) [Fintype κ] [DecidableEq κ] [Fintype κ'] [DecidableEq κ']
-    (X : Matrix ι κ K) (Z : Matrix ι κ' K) :
-    N (κ ⊕ κ') (fromCols X Z) ≤ N κ X * N κ' Z := by
+theorem wedge_fromCols_le
+    {K ι : Type} [Field K] [Fintype ι] [DecidableEq ι]
+    {N : Fam K ι} (h : IsWedge N)
+    (κ κ' : Type) [Fintype κ] [DecidableEq κ] [Fintype κ'] [DecidableEq κ']
+    (X : Matrix ι κ K) (Z : Matrix ι κ' K)
+    : N (κ ⊕ κ') (fromCols X Z) ≤ N κ X * N κ' Z := by
   by_cases hX : LinearIndependent K Xᵀ
   · obtain ⟨Y, hY⟩ := h.quot κ X hX
     obtain ⟨h1, h2, -⟩ := hY κ' Z
@@ -40,9 +42,10 @@ theorem wedgeSub : WedgeSub := by
     rw [h1, h2, h3, Matrix.mul_fromCols]
     have hle := wedge_fromCols_le h κ₁ κ₂ ((1 - B * Y) * A) ((1 - B * Y) * C)
     have hn := h.nonneg κ₀ B
-    calc N κ₀ B * N (κ₁ ⊕ κ₂) (fromCols ((1 - B * Y) * A) ((1 - B * Y) * C)) * N κ₀ B
-        ≤ N κ₀ B * (N κ₁ ((1 - B * Y) * A) * N κ₂ ((1 - B * Y) * C)) * N κ₀ B :=
-          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hle hn) hn
+    calc
+      N κ₀ B * N (κ₁ ⊕ κ₂) (fromCols ((1 - B * Y) * A) ((1 - B * Y) * C)) * N κ₀ B
+          ≤ N κ₀ B * (N κ₁ ((1 - B * Y) * A) * N κ₂ ((1 - B * Y) * C)) * N κ₀ B :=
+        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hle hn) hn
       _ = N κ₀ B * N κ₁ ((1 - B * Y) * A) * (N κ₀ B * N κ₂ ((1 - B * Y) * C)) := by ring
   · have h0 : N κ₀ B = 0 := by
       by_contra hne

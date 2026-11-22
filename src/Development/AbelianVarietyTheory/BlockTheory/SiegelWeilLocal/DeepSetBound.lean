@@ -17,9 +17,11 @@ def deepSet (B : RowsAut) (q : ℕ) (b : ℝ) : Set B.I.GA :=
   {x | x ∈ B.fund ∧ least B.I x < tauStar B q b}
 
 def DeepBound : Prop :=
-  ∀ Cg : ℝ, 0 ≤ Cg → ∃ n₀ : ℕ, ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (p q : ℕ) (b : ℝ),
-    1 ≤ q → CountHyp B Cg n₀ d p q b →
-      ∫⁻ x in deepSet B q b, ENNReal.ofReal (kern B.I (phe B d) x x).re ∂(B.I.muA B.μf) ≤
-        ENNReal.ofReal ((B.D : ℝ) * Real.exp (-((B.I.n : ℝ) ^ 2 * (B.I.f : ℝ))))
+  ∀ Cg : ℝ,
+    0 ≤ Cg
+      → ∃ n₀ : ℕ, ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (p q : ℕ) (b : ℝ),
+        1 ≤ q → CountHyp B Cg n₀ d p q b
+          → ∫⁻ x in deepSet B q b, ENNReal.ofReal (kern B.I (phe B d) x x).re ∂(B.I.muA B.μf)
+            ≤ ENNReal.ofReal ((B.D : ℝ) * Real.exp (-((B.I.n : ℝ) ^ 2 * (B.I.f : ℝ))))
 
 end GlobalTheory.IndefiniteRowSideFullHecke.DeepSet

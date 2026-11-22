@@ -7,73 +7,84 @@ public import GroundTheory.ProfiniteCohomology.ContinuousCochains
 
 @[expose] public section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal
+  Formalism.ConjugateSelfDual
 open scoped Pointwise IntermediateField
 
 namespace GlobalTheory.CompanionTheory.Glob.InertiaLift
 
 section
 
-variable {F K Ω : Type*} [Field F] [NumberField F] [Field K] [NumberField K] [Algebra F K]
-  [Field Ω] [Algebra F Ω] [Algebra K Ω] [IsScalarTower F K Ω]
-
+variable
+  {F K Ω : Type*} [Field F] [NumberField F] [Field K] [NumberField K] [Algebra F K] [Field Ω]
+  [Algebra F Ω] [Algebra K Ω] [IsScalarTower F K Ω]
 
 omit [NumberField F] [NumberField K] in
-theorem restrictScalars_smul (h : Ω ≃ₐ[K] Ω) (A : ValuationSubring Ω) :
-    (h.restrictScalars F) • A = h • A := by
+theorem restrictScalars_smul (h : Ω ≃ₐ[K] Ω) (A : ValuationSubring Ω)
+    : (h.restrictScalars F) • A = h • A := by
   ext x
   rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem,
     ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem]
   rfl
 
-
 omit [NumberField K] [Field K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω] in
-theorem mem_inertia_of_integers [IsAlgClosure F Ω] {A : ValuationSubring Ω} {σ : Ω ≃ₐ[F] Ω}
-    (hd : σ • A = A) (hb : ∀ b : Ω, IsIntegral ℤ b → A.valuation (σ b - b) < 1) :
-    σ ∈ Inertia (F := F) A := by
+theorem mem_inertia_of_integers
+    [IsAlgClosure F Ω]
+    {A : ValuationSubring Ω} {σ : Ω ≃ₐ[F] Ω}
+    (hd : σ • A = A) (hb : ∀ b : Ω, IsIntegral ℤ b → A.valuation (σ b - b) < 1)
+    : σ ∈ Inertia (F := F) A := by
   refine ⟨hd, fun x hx => ?_⟩
   have hD : σ ∈ Dec (F := F) A := hd
   obtain ⟨s, t, hs, ht, hs1, e⟩ := exists_den F A hx
   have hvt : A.valuation t ≤ 1 := (A.valuation_le_one_iff _).mpr (mem_of_isIntegral_int A ht)
   have hσs : A.valuation (σ s) = 1 := by
-    refine le_antisymm ((A.valuation_le_one_iff _).mpr (mem_of_isIntegral_int A
-      (hs.map ((σ : Ω ≃ₐ[F] Ω).toAlgHom.restrictScalars ℤ)))) ?_
+    refine le_antisymm
+      ((A.valuation_le_one_iff _).mpr
+        (mem_of_isIntegral_int A (hs.map ((σ : Ω ≃ₐ[F] Ω).toAlgHom.restrictScalars ℤ))))
+      ?_
     refine not_lt.mp fun h => ?_
     have := (valuation_apply_lt_one_iff hD s).1 h
     rw [hs1] at this
     exact lt_irrefl _ this
   have he' : σ s * σ x = σ t := by rw [← map_mul, e]
-  have key : s * σ s * (σ x - x) = s * (σ t - t) + t * (s - σ s) := by
-    rw [← he', ← e]; ring
+  have key : s * σ s * (σ x - x) = s * (σ t - t) + t * (s - σ s) := by rw [← he', ← e]; ring
   have hv : A.valuation (s * σ s * (σ x - x)) < 1 := by
     rw [key]
     apply Valuation.map_add_lt
     · rw [Valuation.map_mul, hs1, one_mul]
       exact hb t ht
     · rw [Valuation.map_mul, Valuation.map_sub_swap]
-      calc A.valuation t * A.valuation (σ s - s) ≤ 1 * A.valuation (σ s - s) :=
-            mul_le_mul_left hvt _
+      calc
+        A.valuation t * A.valuation (σ s - s)
+          ≤ 1 * A.valuation (σ s - s) := mul_le_mul_left hvt _
         _ < 1 := by rw [one_mul]; exact hb s hs
   rwa [Valuation.map_mul, Valuation.map_mul, hs1, hσs, one_mul, one_mul] at hv
 
 noncomputable def actInt (g : Ω ≃ₐ[F] Ω) : IntCl K Ω ≃+* IntCl K Ω where
-  toFun b := ⟨g b, ((isIntegral_int_of_isIntegral (F := K) b.2).map
-    (g.toAlgHom.restrictScalars ℤ)).tower_top⟩
-  invFun b := ⟨(g⁻¹ : Ω ≃ₐ[F] Ω) b, ((isIntegral_int_of_isIntegral (F := K) b.2).map
-    ((g⁻¹ : Ω ≃ₐ[F] Ω).toAlgHom.restrictScalars ℤ)).tower_top⟩
-  left_inv b := Subtype.ext (by
-    show (g⁻¹ * g) (b : Ω) = b
-    simp)
+  toFun b := ⟨
+    g b,
+    ((isIntegral_int_of_isIntegral (F := K) b.2).map (g.toAlgHom.restrictScalars ℤ)).tower_top
+  ⟩
+  invFun b := ⟨
+    (g⁻¹ : Ω ≃ₐ[F] Ω) b,
+    ((isIntegral_int_of_isIntegral (F := K) b.2).map
+      ((g⁻¹ : Ω ≃ₐ[F] Ω).toAlgHom.restrictScalars ℤ)).tower_top
+  ⟩
+  left_inv b :=
+    Subtype.ext (by
+      show (g⁻¹ * g) (b : Ω) = b
+      simp)
   right_inv b := Subtype.ext (mul_inv_apply (σ := g) (b : Ω))
   map_mul' a b := Subtype.ext (map_mul g (a : Ω) b)
   map_add' a b := Subtype.ext (map_add g (a : Ω) b)
 
-theorem exists_residue_correction [IsAlgClosure K Ω] {A : ValuationSubring Ω}
-    (w : HeightOneSpectrum (𝓞 K))
+theorem exists_residue_correction
+    [IsAlgClosure K Ω]
+    {A : ValuationSubring Ω} (w : HeightOneSpectrum (𝓞 K))
     (hA : ∀ x : 𝓞 K, A.valuation (algebraMap K Ω (x : K)) < 1 ↔ x ∈ w.asIdeal)
     {σ₁ : Ω ≃ₐ[F] Ω} (hd : σ₁ ∈ Dec (F := F) A)
-    (hz : ∀ z : 𝓞 K, A.valuation (σ₁ (algebraMap K Ω (z : K)) - algebraMap K Ω (z : K)) < 1) :
-    ∃ h : Ω ≃ₐ[K] Ω, h • A = A ∧ ∀ b : IntCl K Ω, A.valuation (h (b : Ω) - σ₁ b) < 1 := by
+    (hz : ∀ z : 𝓞 K, A.valuation (σ₁ (algebraMap K Ω (z : K)) - algebraMap K Ω (z : K)) < 1)
+    : ∃ h : Ω ≃ₐ[K] Ω, h • A = A ∧ ∀ b : IntCl K Ω, A.valuation (h (b : Ω) - σ₁ b) < 1 := by
   have : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ K).injective
   have : IsGalois K Ω := {}
   letI : TopologicalSpace (IntCl K Ω) := ⊥
@@ -93,16 +104,17 @@ theorem exists_residue_correction [IsAlgClosure K Ω] {A : ValuationSubring Ω}
     rw [Ideal.mem_comap, mem_primeBelow, mem_primeBelow]
     exact (valuation_apply_lt_one_iff ((Dec (F := F) A).inv_mem hd) _).symm
   let φr : (IntCl K Ω ⧸ P) ≃+* (IntCl K Ω ⧸ P) := Ideal.quotientEquiv P P e hP
-  let φ : (IntCl K Ω ⧸ P) ≃ₐ[𝓞 K ⧸ w.asIdeal] (IntCl K Ω ⧸ P) := AlgEquiv.ofRingEquiv (f := φr) (by
-    intro r
-    obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective r
-    show φr (Ideal.Quotient.mk P (algebraMap (𝓞 K) (IntCl K Ω) z)) =
-      Ideal.Quotient.mk P (algebraMap (𝓞 K) (IntCl K Ω) z)
-    rw [Ideal.quotientEquiv_mk]
-    refine Ideal.Quotient.eq.2 ?_
-    exact hz z)
-  obtain ⟨⟨h, hhP⟩, hh⟩ := Ideal.Quotient.stabilizerHom_surjective_of_profinite
-    (G := Ω ≃ₐ[K] Ω) w.asIdeal P φ
+  let φ : (IntCl K Ω ⧸ P) ≃ₐ[𝓞 K ⧸ w.asIdeal] (IntCl K Ω ⧸ P) :=
+    AlgEquiv.ofRingEquiv (f := φr) (by
+      intro r
+      obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective r
+      show φr (Ideal.Quotient.mk P (algebraMap (𝓞 K) (IntCl K Ω) z)) =
+        Ideal.Quotient.mk P (algebraMap (𝓞 K) (IntCl K Ω) z)
+      rw [Ideal.quotientEquiv_mk]
+      refine Ideal.Quotient.eq.2 ?_
+      exact hz z)
+  obtain ⟨⟨h, hhP⟩, hh⟩ :=
+    Ideal.Quotient.stabilizerHom_surjective_of_profinite (G := Ω ≃ₐ[K] Ω) w.asIdeal P φ
   have hhP' : h • P = P := hhP
   refine ⟨h, ?_, fun b => ?_⟩
   · refine eq_of_valuation_lt_one_iff K fun b hb => ?_
@@ -113,11 +125,13 @@ theorem exists_residue_correction [IsAlgClosure K Ω] {A : ValuationSubring Ω}
       DFunLike.congr_fun hh (Ideal.Quotient.mk P b)
     exact Ideal.Quotient.eq.1 h1
 
-theorem exists_inertia_lift [IsAlgClosure F Ω] [IsAlgClosure K Ω] [Normal F K]
-    (w : HeightOneSpectrum (𝓞 K)) {τ : K ≃ₐ[F] K} (hτ : τ ∈ w.asIdeal.inertia (K ≃ₐ[F] K)) :
-    ∃ (A : ValuationSubring Ω) (σ : Ω ≃ₐ[F] Ω),
-      (∀ x : 𝓞 K, A.valuation (algebraMap K Ω (x : K)) < 1 ↔ x ∈ w.asIdeal) ∧
-      σ ∈ Inertia (F := F) A ∧ ∀ x : K, σ (algebraMap K Ω x) = algebraMap K Ω (τ x) := by
+theorem exists_inertia_lift
+    [IsAlgClosure F Ω] [IsAlgClosure K Ω] [Normal F K]
+    (w : HeightOneSpectrum (𝓞 K))
+    {τ : K ≃ₐ[F] K} (hτ : τ ∈ w.asIdeal.inertia (K ≃ₐ[F] K))
+    : ∃ (A : ValuationSubring Ω) (σ : Ω ≃ₐ[F] Ω),
+      (∀ x : 𝓞 K, A.valuation (algebraMap K Ω (x : K)) < 1 ↔ x ∈ w.asIdeal) ∧ σ ∈ Inertia (F := F) A
+        ∧ ∀ x : K, σ (algebraMap K Ω x) = algebraMap K Ω (τ x) := by
   have : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ K).injective
   have : CharZero F := charZero_of_injective_algebraMap (algebraMap ℚ F).injective
   have : IsGalois K Ω := {}
@@ -129,7 +143,8 @@ theorem exists_inertia_lift [IsAlgClosure F Ω] [IsAlgClosure K Ω] [Normal F K]
   have hτ' : ∀ z : 𝓞 K, τ • z - z ∈ w.asIdeal := fun z => AddSubgroup.mem_inertia.1 hτ z
   have hτi : ∀ z : 𝓞 K, τ⁻¹ • z - z ∈ w.asIdeal := fun z =>
     AddSubgroup.mem_inertia.1 (Subgroup.inv_mem _ hτ) z
-  have hσ₀i : ∀ x : K, (σ₀⁻¹ : Ω ≃ₐ[F] Ω) (algebraMap K Ω x) = algebraMap K Ω ((τ⁻¹ : K ≃ₐ[F] K) x) := by
+  have hσ₀i
+      : ∀ x : K, (σ₀⁻¹ : Ω ≃ₐ[F] Ω) (algebraMap K Ω x) = algebraMap K Ω ((τ⁻¹ : K ≃ₐ[F] K) x) := by
     intro x
     have h1 : algebraMap K Ω x = σ₀ (algebraMap K Ω ((τ⁻¹ : K ≃ₐ[F] K) x)) := by
       rw [hσ₀]
@@ -191,9 +206,10 @@ theorem exists_inertia_lift [IsAlgClosure F Ω] [IsAlgClosure K Ω] [Normal F K]
 
 end
 
-theorem fixingSubgroup_le_NS : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosure F Ω] (S : Set (HeightOneSpectrum (𝓞 F))),
-    (maxUnramifiedOutside F Ω S).fixingSubgroup ≤ NS Ω S := by
+theorem fixingSubgroup_le_NS
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (S : Set (HeightOneSpectrum (𝓞 F))),
+      (maxUnramifiedOutside F Ω S).fixingSubgroup ≤ NS Ω S := by
   intro F Ω _ _ _ _ _ S
   have : CharZero F := charZero_of_injective_algebraMap (algebraMap ℚ F).injective
   have : IsGalois F Ω := {}
@@ -204,7 +220,8 @@ theorem fixingSubgroup_le_NS : ∀ (F Ω : Type) [Field F] [NumberField F] [Fiel
     have : FiniteDimensional F F⟮x⟯ := finiteDimensional_of_le hE
     have hEK : F⟮x⟯ ≤ IntermediateField.fixedField (NS Ω S) :=
       IntermediateField.adjoin_simple_le_iff.2 hx
-    refine le_maxUnramifiedOutside S (E := F⟮x⟯) (fun v hv => ?_)
+    refine le_maxUnramifiedOutside S (E := F⟮x⟯)
+      (fun v hv => ?_)
       (IntermediateField.mem_adjoin_simple_self F x)
     rw [isUnramifiedIn_iff_inertia hE v]
     intro Q hQ hQv τ hτ y hy
@@ -224,12 +241,13 @@ theorem fixingSubgroup_le_NS : ∀ (F Ω : Type) [Field F] [NumberField F] [Fiel
       apply Subgroup.subset_normalClosure
       simp only [Set.mem_iUnion]
       exact ⟨v, hv, A, hAv, hσ⟩
-    have hfix : σ y = y :=
-      (IntermediateField.mem_fixedField_iff (NS Ω S) y).1 (hEK hy) σ hNS
+    have hfix : σ y = y := (IntermediateField.mem_fixedField_iff (NS Ω S) y).1 (hEK hy) σ hNS
     apply Subtype.ext
     have := hres ⟨y, hE hy⟩
     exact (this.symm.trans hfix)
-  have hc := InfiniteGalois.fixingSubgroup_fixedField (⟨NS Ω S, isClosed_NS Ω S⟩ : ClosedSubgroup (Ω ≃ₐ[F] Ω))
+  have hc :=
+    InfiniteGalois.fixingSubgroup_fixedField
+      (⟨NS Ω S, isClosed_NS Ω S⟩ : ClosedSubgroup (Ω ≃ₐ[F] Ω))
   have := IntermediateField.fixingSubgroup_antitone key
   rw [show (IntermediateField.fixedField (NS Ω S)).fixingSubgroup = NS Ω S from hc] at this
   exact this

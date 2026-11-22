@@ -9,8 +9,17 @@ open scoped ComplexOrder ENNReal Pointwise
 
 namespace GlobalTheory
 
-theorem fundamentalSet_lintegral_mul_right_and_measure_le :
-    (∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (ν : Measure G) [ν.IsHaarMeasure] (Γ : Subgroup G) [Countable Γ] (F : Set G), MeasurableSet F → (∀ g : G, ∃! γ : Γ, (γ : G) * g ∈ F) → (∀ h : G, ν.map (fun g => g * h) = ν → ∀ φ : G → ℝ≥0∞, Measurable φ → (∀ γ ∈ Γ, ∀ g, φ (γ * g) = φ g) → ∫⁻ g in F, φ (g * h) ∂ν = ∫⁻ g in F, φ g ∂ν) ∧ ∀ K : Set G, MeasurableSet K → ν (F ∩ {g | ∃ γ ∈ Γ, ∃ k ∈ K, g = γ * k}) ≤ ν K) := by
+theorem fundamentalSet_lintegral_mul_right_and_measure_le
+    : (∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+        (ν : Measure G) [ν.IsHaarMeasure] (Γ : Subgroup G) [Countable Γ] (F : Set G),
+      MeasurableSet F → (∀ g : G, ∃! γ : Γ, (γ : G) * g ∈ F)
+        → (∀ h : G,
+            ν.map (fun g => g * h) = ν
+              → ∀ φ : G → ℝ≥0∞,
+                Measurable φ → (∀ γ ∈ Γ, ∀ g, φ (γ * g) = φ g)
+                  → ∫⁻ g in F, φ (g * h) ∂ν = ∫⁻ g in F, φ g ∂ν)
+          ∧ ∀ K : Set G, MeasurableSet K → ν (F ∩ {g | ∃ γ ∈ Γ, ∃ k ∈ K, g = γ * k}) ≤ ν K) := by
   intro G _ _ _ _ _ _ _ _ ν _ Γ _ F hF hex
   have hFD : IsFundamentalDomain Γ F ν :=
     IsFundamentalDomain.mk' hF.nullMeasurableSet (fun g => hex g)

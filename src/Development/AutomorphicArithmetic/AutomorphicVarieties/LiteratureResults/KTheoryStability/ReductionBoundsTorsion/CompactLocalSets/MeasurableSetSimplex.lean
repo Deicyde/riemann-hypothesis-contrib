@@ -15,17 +15,19 @@ namespace PositivityTheory.KB.LocalOverlapAverage
 variable {L : Type} [Field L] [NumberField L] {N : ℕ}
 
 def actEq (x : Gp L N) : HS L N ≃L[ℝ] HS L N where
-  toLinearEquiv :=
-    { toFun := actL x
-      invFun := actL x⁻¹
-      map_add' := (actL x).map_add
-      map_smul' := (actL x).map_smul
-      left_inv := fun h => by rw [← actL_mul, inv_mul_cancel, actL_one]
-      right_inv := fun h => by rw [← actL_mul, mul_inv_cancel, actL_one] }
+  toLinearEquiv := {
+    toFun := actL x
+    invFun := actL x⁻¹
+    map_add' := (actL x).map_add
+    map_smul' := (actL x).map_smul
+    left_inv := fun h => by rw [← actL_mul, inv_mul_cancel, actL_one]
+    right_inv := fun h => by rw [← actL_mul, mul_inv_cancel, actL_one]
+  }
   continuous_toFun := (actL x).continuous
   continuous_invFun := (actL x⁻¹).continuous
 
-@[simp] theorem actEq_apply (x : Gp L N) (h : HS L N) : actEq x h = actL x h := rfl
+@[simp]
+theorem actEq_apply (x : Gp L N) (h : HS L N) : actEq x h = actL x h := rfl
 
 theorem pos_convex : Convex ℝ (Pos L N) := by
   intro h hh k hk a b ha hb hab w
@@ -36,19 +38,25 @@ theorem pos_convex : Convex ℝ (Pos L N) := by
     simpa using hk w
   · exact ((hh w).smul ha').add_posSemidef ((hk w).posSemidef.smul hb)
 
-theorem kset_sub {q : ℕ} (x : Fin (q + 1) → Gp L N) {B : Set (HS L N)} (hB : B ⊆ Pos L N) :
-    Kset (fun j => actL (x j)) B ⊆ Pos L N := by
+theorem kset_sub {q : ℕ} (x : Fin (q + 1) → Gp L N) {B : Set (HS L N)} (hB : B ⊆ Pos L N)
+    : Kset (fun j => actL (x j)) B ⊆ Pos L N := by
   rintro p ⟨τ, hτ0, hτ1, y, hy, rfl⟩
   exact pos_convex.sum_mem (fun j _ => hτ0 j) hτ1 fun j _ => actL_pos (x j) (hB (hy j))
 
-theorem isCompact_kset {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {q : ℕ}
-    (A : Fin (q + 1) → V →L[ℝ] V) {B : Set V} (hB : IsCompact B) : IsCompact (Kset A B) := by
+theorem isCompact_kset
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {q : ℕ} (A : Fin (q + 1) → V →L[ℝ] V)
+    {B : Set V} (hB : IsCompact B)
+    : IsCompact (Kset A B) := by
   have hc : IsCompact ((stdSimplex ℝ (Fin (q + 1))) ×ˢ (Set.univ.pi fun _ : Fin (q + 1) => B)) :=
     IsCompact.prod (isCompact_stdSimplex ℝ (Fin (q + 1))) (isCompact_univ_pi fun _ => hB)
-  have hcont : Continuous fun p : (Fin (q + 1) → ℝ) × (Fin (q + 1) → V) =>
-      ∑ j, p.1 j • A j (p.2 j) := by fun_prop
-  have e : Kset A B = (fun p : (Fin (q + 1) → ℝ) × (Fin (q + 1) → V) =>
-      ∑ j, p.1 j • A j (p.2 j)) '' ((stdSimplex ℝ (Fin (q + 1))) ×ˢ (Set.univ.pi fun _ : Fin (q + 1) => B)) := by
+  have hcont
+      : Continuous fun p : (Fin (q + 1) → ℝ) × (Fin (q + 1) → V) => ∑ j, p.1 j • A j (p.2 j) := by
+    fun_prop
+  have e
+      : Kset A B
+        = (fun p : (Fin (q + 1) → ℝ) × (Fin (q + 1) → V) => ∑ j, p.1 j • A j (p.2 j))
+          '' ((stdSimplex ℝ (Fin (q + 1))) ×ˢ (Set.univ.pi fun _ : Fin (q + 1) => B)) := by
     ext p
     constructor
     · rintro ⟨τ, hτ0, hτ1, y, hy, rfl⟩
@@ -58,10 +66,13 @@ theorem isCompact_kset {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {q 
   rw [e]
   exact hc.image hcont
 
-theorem simplex_pos {q : ℕ} (y : Fin (q + 1) → HS L N) (hy : ∀ j, y j ∈ Pos L N) (t : Fin q → ℝ)
-    (ht : (∀ j, 0 ≤ t j) ∧ ∑ j, t j ≤ 1) : y 0 + ∑ j, t j • (y j.succ - y 0) ∈ Pos L N := by
-  have e : y 0 + ∑ j, t j • (y j.succ - y 0) =
-      ∑ i, (Fin.cons (1 - ∑ j, t j) t : Fin (q + 1) → ℝ) i • y i := by
+theorem simplex_pos
+    {q : ℕ} (y : Fin (q + 1) → HS L N) (hy : ∀ j, y j ∈ Pos L N) (t : Fin q → ℝ)
+    (ht : (∀ j, 0 ≤ t j) ∧ ∑ j, t j ≤ 1)
+    : y 0 + ∑ j, t j • (y j.succ - y 0) ∈ Pos L N := by
+  have e
+      : y 0 + ∑ j, t j • (y j.succ - y 0)
+        = ∑ i, (Fin.cons (1 - ∑ j, t j) t : Fin (q + 1) → ℝ) i • y i := by
     rw [Fin.sum_univ_succ]
     simp only [Fin.cons_zero, Fin.cons_succ, smul_sub, Finset.sum_sub_distrib, sub_smul, one_smul,
       ← Finset.sum_smul]
@@ -75,18 +86,21 @@ theorem simplex_pos {q : ℕ} (y : Fin (q + 1) → HS L N) (hy : ∀ j, y j ∈ 
   · rw [Fin.sum_univ_succ]
     simp
 
-theorem measurableSet_simplex (q : ℕ) :
-    MeasurableSet {t : Fin q → ℝ | (∀ j, 0 ≤ t j) ∧ ∑ j, t j ≤ 1} := by
-  have : {t : Fin q → ℝ | (∀ j, 0 ≤ t j) ∧ ∑ j, t j ≤ 1} =
-      (⋂ j, {t : Fin q → ℝ | 0 ≤ t j}) ∩ {t | ∑ j, t j ≤ 1} := by
+theorem measurableSet_simplex (q : ℕ)
+    : MeasurableSet {t : Fin q → ℝ | (∀ j, 0 ≤ t j) ∧ ∑ j, t j ≤ 1} := by
+  have : {t : Fin q → ℝ | (∀ j, 0 ≤ t j) ∧ ∑ j, t j ≤ 1}
+      = (⋂ j, {t : Fin q → ℝ | 0 ≤ t j}) ∩ {t | ∑ j, t j ≤ 1} := by
     ext t
     simp
   rw [this]
-  refine (IsClosed.inter (isClosed_iInter fun j => isClosed_le continuous_const (continuous_apply j))
-    (isClosed_le (continuous_finsetSum _ fun j _ => continuous_apply j) continuous_const)).measurableSet
+  refine (IsClosed.inter
+    (isClosed_iInter fun j => isClosed_le continuous_const (continuous_apply j))
+    (isClosed_le (continuous_finsetSum _ fun j _ => continuous_apply j)
+      continuous_const)).measurableSet
 
-theorem intP_inv {q : ℕ} (ω : Form (HS L N) q) (g : Gp L N) (hg : FInv ω g)
-    (y : Fin (q + 1) → Pos L N) : intP ω (fun j => g • y j) = intP ω y := by
+theorem intP_inv
+    {q : ℕ} (ω : Form (HS L N) q) (g : Gp L N) (hg : FInv ω g) (y : Fin (q + 1) → Pos L N)
+    : intP ω (fun j => g • y j) = intP ω y := by
   simp only [intP, intS]
   refine setIntegral_congr_fun (measurableSet_simplex q) fun t ht => ?_
   have hv : ∀ j, ((g • y j : Pos L N) : HS L N) = actL g (y j).1 := fun j => rfl
@@ -99,8 +113,8 @@ theorem intP_inv {q : ℕ} (ω : Form (HS L N) q) (g : Gp L N) (hg : FInv ω g)
 theorem cont_actL_apply (v : HS L N) : Continuous fun x : Gp L N => actL x v := by
   refine continuous_induced_rng.2 ?_
   change Continuous fun x : Gp L N => fun w i j =>
-    ((((x w)⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ)ᴴ * mat v w *
-      ((x w)⁻¹ : GL (Fin N) ℂ)) i j
+    ((((x w)⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ)ᴴ * mat v w * ((x w)⁻¹ : GL (Fin N) ℂ)) i
+      j
   refine continuous_pi fun w => continuous_pi fun i => continuous_pi fun j => ?_
   have hi : Continuous fun x : Gp L N => (((x w)⁻¹ : GL (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ) :=
     Units.continuous_coe_inv.comp (continuous_apply w)
@@ -109,8 +123,8 @@ theorem cont_actL_apply (v : HS L N) : Continuous fun x : Gp L N => actL x v := 
 theorem cont_actL : Continuous fun x : Gp L N => actL x :=
   continuous_clm_apply.2 fun v => cont_actL_apply v
 
-theorem cont_fr {q : ℕ} (ω : Form (HS L N) q) (hω : ContinuousOn ω (Pos L N)) :
-    Continuous (fr ω) := by
+theorem cont_fr {q : ℕ} (ω : Form (HS L N) q) (hω : ContinuousOn ω (Pos L N))
+    : Continuous (fr ω) := by
   have h1 : Continuous fun x : Gp L N => ω (actL x (one L N).1) :=
     hω.comp_continuous (cont_actL_apply _) fun x => actL_pos x (one L N).2
   exact (ContinuousAlternatingMap.continuous_compContinuousLinearMapCLM.comp cont_actL).clm_apply h1
@@ -118,8 +132,8 @@ theorem cont_fr {q : ℕ} (ω : Form (HS L N) q) (hω : ContinuousOn ω (Pos L N
 theorem cont_ofS : Continuous (ofS L N) :=
   continuous_pi fun w => Matrix.SpecialLinearGroup.continuous_toGL.comp (continuous_apply w)
 
-theorem fr_mul {q : ℕ} (ω : Form (HS L N) q) (g x : Gp L N) (hg : FInv ω g) :
-    fr ω (g * x) = fr ω x := by
+theorem fr_mul {q : ℕ} (ω : Form (HS L N) q) (g x : Gp L N) (hg : FInv ω g)
+    : fr ω (g * x) = fr ω x := by
   ext v
   have h := congrArg (fun f => f (fun i => actL x (v i))) (hg _ (actL_pos x (one L N).2))
   simpa [fr, actL_mul, Function.comp_def] using h

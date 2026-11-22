@@ -13,7 +13,8 @@ open scoped Classical
 
 namespace Formalism.L2.SG.Pf.ThSomePf
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
+open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
 open Formalism.L2.SG.LsDatumB
 open scoped Matrix
 
@@ -37,7 +38,8 @@ theorem MonoU.det_unit {W : Matrix (Fin m) (Fin m) K} (H : MonoU W) : IsUnit W.d
     · rw [H.hW, if_pos rfl]
       simp only [inv]
       by_cases hb : b = a
-      · subst hb; rw [if_pos (H.σσ b).symm, H.cσ, Matrix.one_apply_eq, Ring.mul_inverse_cancel _ (H.hcu b)]
+      · subst hb
+        rw [if_pos (H.σσ b).symm, H.cσ, Matrix.one_apply_eq, Ring.mul_inverse_cancel _ (H.hcu b)]
       · rw [if_neg (fun h => hb (by rw [h, H.σσ])), mul_zero, Matrix.one_apply_ne (Ne.symm hb)]
     · intro k _ hk; rw [H.hW, if_neg hk, zero_mul]
     · simp
@@ -49,11 +51,13 @@ section Corner
 
 variable {K : Type} [Field K] {r : ℕ}
 
-theorem det_add_corner (A : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (c : K) :
-    (A + Matrix.of fun a b => if a = Fin.last r ∧ b = Fin.last r then c else 0).det =
-      A.det + c * (A.submatrix Fin.castSucc Fin.castSucc).det := by
-  have e : (A + Matrix.of fun a b => if a = Fin.last r ∧ b = Fin.last r then c else 0) =
-      A.updateCol (Fin.last r) ((fun a => A a (Fin.last r)) + (Pi.single (Fin.last r) c : Fin (r + 1) → K)) := by
+theorem det_add_corner (A : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (c : K)
+    : (A + Matrix.of fun a b => if a = Fin.last r ∧ b = Fin.last r then c else 0).det
+      = A.det + c * (A.submatrix Fin.castSucc Fin.castSucc).det := by
+  have e
+      : (A + Matrix.of fun a b => if a = Fin.last r ∧ b = Fin.last r then c else 0)
+        = A.updateCol (Fin.last r)
+          ((fun a => A a (Fin.last r)) + (Pi.single (Fin.last r) c : Fin (r + 1) → K)) := by
     ext a b
     by_cases hb : b = Fin.last r
     · subst hb
@@ -73,7 +77,8 @@ end Formalism.L2.SG.Pf.ThSomePf
 
 namespace Formalism.L2.SG.Pf.ThSomePf
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
+open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
 open Formalism.L2.SG.LsDatumB
 open scoped Matrix
 
@@ -81,12 +86,17 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section ModeL
 
-variable {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
-  {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+variable
+  {D : Formalism.BasicNotions.D7}
+  {δ : ∀ p : PlF D, (D.s.atP p).Fp} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
 
-theorem blkMod_unitL (T T' : ℕ) (p : PlF D) (hA : Agree δ M p) (hsM : (M p).split = none) {t : D.host.E}
-    (ht0 : t ≠ 0) (a s : ℕ) :
-    IsUnit (blkMod δ T T' p a s t) ∧ (nu D.R.rS a (a + s - 1) = 0 → blkMod δ T T' p a s t = (D.s.atP p).ιE t) := by
+theorem blkMod_unitL
+    (T T' : ℕ)
+    (p : PlF D) (hA : Agree δ M p) (hsM : (M p).split = none)
+    {t : D.host.E} (ht0 : t ≠ 0)
+    (a s : ℕ)
+    : IsUnit (blkMod δ T T' p a s t)
+      ∧ (nu D.R.rS a (a + s - 1) = 0 → blkMod δ T T' p a s t = (D.s.atP p).ιE t) := by
   have hsD : (D.s.atP p).split = none := LocModel.split_none_of_agree hA hsM
   obtain ⟨-, hδ0, -, -, -, -⟩ := hA
   set w0 : (D.s.atP p).Ep := algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (δ p) * (D.s.atP p).ιE (uP p : D.host.E)
@@ -105,18 +115,22 @@ theorem blkMod_unitL (T T' : ℕ) (p : PlF D) (hA : Agree δ M p) (hsM : (M p).s
   rw [hb]
   exact ⟨(hw1u.pow _).mul htu, fun h0 => by rw [h0, pow_zero, one_mul]⟩
 
-theorem monoShiftL (T T' : ℕ) (w : Point D.host.E (D.R.rS + 1)) (p : PlF D) (hA : Agree δ M p)
-    (hsM : (M p).split = none) :
-    IsUnit (modMat δ T T' p w + cornerM p (cornerSh δ T T' p w)).det := by
-  have hcu : ∀ a : Fin (D.R.rS + 1), IsUnit (blkMod δ T T' p (1 + pSt w.1 a.val) (pSz w.1 a.val) (pTau w.1 a.val)) :=
-    fun a => (blkMod_unitL T T' p hA hsM (pTau_ne' w a) _ _).1
-  let H : MonoU (modMat δ T T' p w) :=
-    { σ := sgF w
-      c := fun a => blkMod δ T T' p (1 + pSt w.1 a.val) (pSz w.1 a.val) (pTau w.1 a.val)
-      σσ := sgF_sgF w
-      cσ := fun a => by simp only [sgF]; rw [pSt_pSig, pSz_pSig, pTau_pSig]
-      hcu := hcu
-      hW := modMat_apply' δ T T' p w }
+theorem monoShiftL
+    (T T' : ℕ) (w : Point D.host.E (D.R.rS + 1))
+    (p : PlF D) (hA : Agree δ M p) (hsM : (M p).split = none)
+    : IsUnit (modMat δ T T' p w + cornerM p (cornerSh δ T T' p w)).det := by
+  have hcu
+      : ∀ a : Fin (D.R.rS + 1),
+        IsUnit (blkMod δ T T' p (1 + pSt w.1 a.val) (pSz w.1 a.val) (pTau w.1 a.val)) := fun a =>
+    (blkMod_unitL T T' p hA hsM (pTau_ne' w a) _ _).1
+  let H : MonoU (modMat δ T T' p w) := {
+    σ := sgF w
+    c := fun a => blkMod δ T T' p (1 + pSt w.1 a.val) (pSz w.1 a.val) (pTau w.1 a.val)
+    σσ := sgF_sgF w
+    cσ := fun a => by simp only [sgF]; rw [pSt_pSig, pSz_pSig, pTau_pSig]
+    hcu := hcu
+    hW := modMat_apply' δ T T' p w
+  }
   by_cases hD : Dmin w D.R.rS = 0
   · have : cornerSh δ T T' p w = 0 := by unfold cornerSh; rw [if_pos hD]
     rw [this]
@@ -134,54 +148,61 @@ theorem monoShiftL (T T' : ℕ) (w : Point D.host.E (D.R.rS + 1)) (p : PlF D) (h
     exact ht0 hpm.symm
   rw [if_pos hσl.symm] at hpm
   obtain ⟨c1, c2⟩ := (cond_iff w (Fin.last _)).2 ⟨rfl, hσl⟩
-  have hst : pSt w.1 (Fin.last D.R.rS).val = D.R.rS := by
-    simp only [Fin.val_last] at c1 c2 ⊢; omega
+  have hst : pSt w.1 (Fin.last D.R.rS).val = D.R.rS := by simp only [Fin.val_last] at c1 c2 ⊢; omega
   have hcl : H.c (Fin.last _) = blkMod δ T T' p (D.R.rS + 1) 1 t := by
     show blkMod δ T T' p (1 + pSt w.1 (Fin.last D.R.rS).val) (pSz w.1 (Fin.last D.R.rS).val)
       (pTau w.1 (Fin.last D.R.rS).val) = _
     rw [c2, hpm, hst, add_comm]
   have hcu_l := H.hcu (Fin.last _)
   rw [hcl] at hcu_l
-  have hcs : cornerSh δ T T' p w = ((nSh (blkMod δ T T' p (D.R.rS + 1) 1 t) : ℕ) : (D.s.atP p).Ep) := by
+  have hcs
+      : cornerSh δ T T' p w = ((nSh (blkMod δ T T' p (D.R.rS + 1) 1 t) : ℕ) : (D.s.atP p).Ep) := by
     unfold cornerSh; rw [if_neg hD, hz]
-  have hc : ∃ k : Fin 3, IsUnit (blkMod δ T T' p (D.R.rS + 1) 1 t + (((k : Fin 3) : ℕ) : (D.s.atP p).Ep)) :=
+  have hc
+      : ∃ k : Fin 3,
+        IsUnit (blkMod δ T T' p (D.R.rS + 1) 1 t + (((k : Fin 3) : ℕ) : (D.s.atP p).Ep)) :=
     ⟨0, by simpa using hcu_l⟩
   have hnsh : nSh (blkMod δ T T' p (D.R.rS + 1) 1 t) = ((hc.choose : Fin 3) : ℕ) := by
     unfold nSh; rw [dif_pos hc]
   have hku := hc.choose_spec
   let c' : Fin (D.R.rS + 1) → (D.s.atP p).Ep := fun a =>
-    if a = Fin.last _ then blkMod δ T T' p (D.R.rS + 1) 1 t + (((hc.choose : Fin 3) : ℕ) : (D.s.atP p).Ep)
-    else H.c a
+    if a = Fin.last _ then
+      blkMod δ T T' p (D.R.rS + 1) 1 t + (((hc.choose : Fin 3) : ℕ) : (D.s.atP p).Ep)
+    else
+      H.c a
   have hσne : ∀ a, a ≠ Fin.last _ → H.σ a ≠ Fin.last _ := fun a ha h =>
     ha (by rw [← H.σσ a, h]; exact hσl)
-  let H' : MonoU (modMat δ T T' p w + cornerM p (cornerSh δ T T' p w)) :=
-    { σ := H.σ
-      c := c'
-      σσ := H.σσ
-      cσ := fun a => by
-        by_cases ha : a = Fin.last _
-        · have hs' : H.σ a = Fin.last _ := by rw [ha]; exact hσl
-          simp only [c', if_pos hs', if_pos ha]
-        · simp only [c', if_neg ha, if_neg (hσne a ha)]; exact H.cσ a
-      hcu := fun a => by
-        by_cases ha : a = Fin.last _
-        · simp only [c', if_pos ha]; exact hku
-        · simp only [c', if_neg ha]; exact H.hcu a
-      hW := fun a b => by
-        rw [Matrix.add_apply, H.hW]
-        simp only [cornerM, Matrix.of_apply, c']
-        by_cases ha : a = Fin.last _
-        · have hs' : H.σ a = Fin.last _ := by rw [ha]; exact hσl
-          by_cases hbl : b = Fin.last _
-          · have hb' : b = H.σ a := by rw [hs', hbl]
-            rw [if_pos hb', if_pos ⟨ha, hbl⟩, if_pos hb', if_pos ha, ha, hcl, hcs, hnsh]
-          · have hb' : ¬ b = H.σ a := by rw [hs']; exact hbl
-            rw [if_neg hb', if_neg (show ¬ (a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS) from fun h => hbl h.2),
-              if_neg hb', add_zero]
-        · rw [if_neg (show ¬ (a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS) from fun h => ha h.1), add_zero]
-          by_cases hb' : b = H.σ a
-          · rw [if_pos hb', if_pos hb', if_neg ha]
-          · rw [if_neg hb', if_neg hb'] }
+  let H' : MonoU (modMat δ T T' p w + cornerM p (cornerSh δ T T' p w)) := {
+    σ := H.σ
+    c := c'
+    σσ := H.σσ
+    cσ := fun a => by
+      by_cases ha : a = Fin.last _
+      · have hs' : H.σ a = Fin.last _ := by rw [ha]; exact hσl
+        simp only [c', if_pos hs', if_pos ha]
+      · simp only [c', if_neg ha, if_neg (hσne a ha)]; exact H.cσ a
+    hcu := fun a => by
+      by_cases ha : a = Fin.last _
+      · simp only [c', if_pos ha]; exact hku
+      · simp only [c', if_neg ha]; exact H.hcu a
+    hW := fun a b => by
+      rw [Matrix.add_apply, H.hW]
+      simp only [cornerM, Matrix.of_apply, c']
+      by_cases ha : a = Fin.last _
+      · have hs' : H.σ a = Fin.last _ := by rw [ha]; exact hσl
+        by_cases hbl : b = Fin.last _
+        · have hb' : b = H.σ a := by rw [hs', hbl]
+          rw [if_pos hb', if_pos ⟨ha, hbl⟩, if_pos hb', if_pos ha, ha, hcl, hcs, hnsh]
+        · have hb' : ¬ b = H.σ a := by rw [hs']; exact hbl
+          rw [if_neg hb',
+            if_neg (show ¬(a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS) from fun h => hbl h.2),
+            if_neg hb', add_zero]
+      · rw [if_neg (show ¬(a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS) from fun h => ha h.1),
+          add_zero]
+        by_cases hb' : b = H.σ a
+        · rw [if_pos hb', if_pos hb', if_neg ha]
+        · rw [if_neg hb', if_neg hb']
+  }
   exact H'.det_unit
 
 end ModeL
@@ -190,7 +211,8 @@ end Formalism.L2.SG.Pf.ThSomePf
 
 namespace Formalism.L2.SG.Pf.ThSomePf
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
+open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
 open Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc
 open scoped Matrix
 
@@ -198,12 +220,16 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section DetL
 
-variable {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
-  {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+variable
+  {D : Formalism.BasicNotions.D7}
+  {δ : ∀ p : PlF D, (D.s.atP p).Fp} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
 
-theorem zhatLoc_eq (hA : ∀ p, Agree δ M p) (p : PlF D) (Z : Formalism.L2.SG.PairVal.MatR D) (a b : Fin (D.R.rS + 1)) :
-    Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z a b =
-      algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf ⟨δ, M, hA⟩ p b * cf ⟨δ, M, hA⟩ p a) * (D.s.atP p).ιE (Z a b) := by
+theorem zhatLoc_eq
+    (hA : ∀ p, Agree δ M p) (p : PlF D) (Z : Formalism.L2.SG.PairVal.MatR D)
+    (a b : Fin (D.R.rS + 1))
+    : Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z a b
+      = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf ⟨δ, M, hA⟩ p b * cf ⟨δ, M, hA⟩ p a)
+        * (D.s.atP p).ιE (Z a b) := by
   have e1 : frFac δ p a = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf ⟨δ, M, hA⟩ p a) :=
     frFac_eq (⟨δ, M, hA⟩ : LocDat D) p a
   have e2 : frFac δ p b = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf ⟨δ, M, hA⟩ p b) :=
@@ -214,16 +240,25 @@ theorem zhatLoc_eq (hA : ∀ p, Agree δ M p) (p : PlF D) (Z : Formalism.L2.SG.P
 theorem isUnit_det_signMatrix (p : PlF D) : IsUnit (LsDatumB.sgnP p).det :=
   Matrix.isUnit_det_of_right_inverse (permSign_mul_self₂ p)
 
-theorem detL (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (hM : (M p).split = none)
-    (w : Point D.host.E (D.R.rS + 1)) (Z : Formalism.L2.SG.PairVal.MatR D) (L U : Formalism.L2.SG.PairVal.MatR D)
-    (hL : IsLo L) (hU : IsUp U) (hZ : Z * Sg D.host.E D.R.rS = L * ptMat w * U) :
-    IsUnit (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z +
-      cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p w)).det := by
-  have hY : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z * LsDatumB.sgnP p =
-      Matrix.diagonal (fun a => algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf (⟨δ, M, hA⟩ : LocDat D) p a)) *
-        (Z * Sg D.host.E D.R.rS).map (D.s.atP p).ιE *
-        Matrix.diagonal (fun a => algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf (⟨δ, M, hA⟩ : LocDat D) p a)) := by
-    have e0 : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z = Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z := by
+theorem detL
+    (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word)
+    (p : PlF D) (hM : (M p).split = none)
+    (w : Point D.host.E (D.R.rS + 1)) (Z : Formalism.L2.SG.PairVal.MatR D)
+    (L U : Formalism.L2.SG.PairVal.MatR D)
+    (hL : IsLo L) (hU : IsUp U) (hZ : Z * Sg D.host.E D.R.rS = L * ptMat w * U)
+    : IsUnit
+      (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z
+        + cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p w)).det := by
+  have hY
+      : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z * LsDatumB.sgnP p
+        = Matrix.diagonal (fun a =>
+            algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf (⟨δ, M, hA⟩ : LocDat D) p a))
+          * (Z * Sg D.host.E D.R.rS).map (D.s.atP p).ιE
+          * Matrix.diagonal (fun a =>
+            algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cf (⟨δ, M, hA⟩ : LocDat D) p a)) := by
+    have e0
+        : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z
+          = Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z := by
       simp only [Formalism.L2.SG.CntLocal.ZZP, Loc.HermSp.ZZplusOf, hM]
     rw [e0]
     ext a b
@@ -239,8 +274,9 @@ theorem detL (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (hM 
   set fri : Fin (D.R.rS + 1) → (D.s.atP p).Ep := fun a => al (cfi Zd p a)
   have hfr : ∀ a, fri a * fr a = 1 := fun a => by simp only [fr, fri, ← map_mul, cfi_cf, map_one]
   have hfr' : ∀ a, fr a * fri a = 1 := fun a => by simp only [fr, fri, ← map_mul, cf_cfi, map_one]
-  have hmod : Matrix.diagonal fr * (ptMat w).map ι * Matrix.diagonal fr =
-      modMat δ (D.mem u).A.T (D.mem u').A.T p w := by
+  have hmod
+      : Matrix.diagonal fr * (ptMat w).map ι * Matrix.diagonal fr
+        = modMat δ (D.mem u).A.T (D.mem u').A.T p w := by
     ext a b
     rw [modMat_apply', Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.map_apply, ptMat_apply']
     by_cases hb : b = sgF w a
@@ -253,17 +289,23 @@ theorem detL (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (hM 
   set U' := Matrix.diagonal fri * U.map ι * Matrix.diagonal fr
   have hL' : IsLo L' := isLo_conj (isLo_map ι hL) fr fri hfr'
   have hU' : IsUp U' := isUp_conj (isUp_map ι hU) fri fr hfr
-  have e1 : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z * LsDatumB.sgnP p =
-      L' * modMat δ (D.mem u).A.T (D.mem u').A.T p w * U' := by
+  have e1
+      : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z * LsDatumB.sgnP p
+        = L' * modMat δ (D.mem u).A.T (D.mem u').A.T p w * U' := by
     rw [hY, hZ, Matrix.map_mul, Matrix.map_mul, regroup fr fri hfr, hmod]
-  have e2 : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z =
-      L' * modMat δ (D.mem u).A.T (D.mem u').A.T p w * U' * LsDatumB.sgnP p := by
+  have e2
+      : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z
+        = L' * modMat δ (D.mem u).A.T (D.mem u').A.T p w * U' * LsDatumB.sgnP p := by
     rw [← e1, Matrix.mul_assoc, permSign_mul_self₂, Matrix.mul_one]
-  have e3 : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p w) =
-      L' * (modMat δ (D.mem u).A.T (D.mem u').A.T p w + cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p w)) *
-        U' * LsDatumB.sgnP p := by
-    rw [e2, Matrix.mul_add, Matrix.add_mul, Matrix.add_mul, loU_corner p _ ⟨hL'.1, hL'.2⟩ ⟨hU'.1, fun a b h => hU'.2 b a h⟩,
-      corner_sgn]
+  have e3
+      : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z
+          + cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p w)
+        = L'
+          * (modMat δ (D.mem u).A.T (D.mem u').A.T p w
+            + cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p w))
+          * U' * LsDatumB.sgnP p := by
+    rw [e2, Matrix.mul_add, Matrix.add_mul, Matrix.add_mul,
+      loU_corner p _ ⟨hL'.1, hL'.2⟩ ⟨hU'.1, fun a b h => hU'.2 b a h⟩, corner_sgn]
   rw [e3, Matrix.det_mul, Matrix.det_mul, Matrix.det_mul, det_lo hL', det_up hU', one_mul, mul_one]
   exact (monoShiftL _ _ w p (hA p) hM).mul (isUnit_det_signMatrix p)
 
@@ -273,7 +315,8 @@ end Formalism.L2.SG.Pf.ThSomePf
 
 namespace Formalism.L2.SG.Pf.ThSomePf
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
+open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
 open Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc
 open scoped Matrix
 
@@ -281,25 +324,33 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section DetG
 
-variable {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
-  {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+variable
+  {D : Formalism.BasicNotions.D7}
+  {δ : ∀ p : PlF D, (D.s.atP p).Fp} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
 
 def cornerF {K : Type} [Field K] (r : ℕ) (c : K) : Matrix (Fin (r + 1)) (Fin (r + 1)) K :=
   Matrix.of fun a b => if a = Fin.last r ∧ b = Fin.last r then c else 0
 
-theorem det_diag_mul {K : Type} [Field K] {r : ℕ} (f : Fin (r + 1) → K) (A : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
-    (c : K) :
-    (Matrix.of (fun a b => f a * A a b * f b) + cornerF r c).det =
-      (∏ a : Fin r, f (Fin.castSucc a)) ^ 2 * f (Fin.last r) ^ 2 * A.det +
-        c * ((∏ a : Fin r, f (Fin.castSucc a)) ^ 2 * (A.submatrix Fin.castSucc Fin.castSucc).det) := by
+theorem det_diag_mul
+    {K : Type} [Field K]
+    {r : ℕ} (f : Fin (r + 1) → K) (A : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
+    (c : K)
+    : (Matrix.of (fun a b => f a * A a b * f b) + cornerF r c).det
+      = (∏ a : Fin r, f (Fin.castSucc a)) ^ 2 * f (Fin.last r) ^ 2 * A.det
+        + c
+          * ((∏ a : Fin r, f (Fin.castSucc a)) ^ 2
+            * (A.submatrix Fin.castSucc Fin.castSucc).det) := by
   have e1 := det_add_corner (Matrix.of (fun a b => f a * A a b * f b)) c
   unfold cornerF
   rw [e1]
-  have h1 : (Matrix.of (fun a b => f a * A a b * f b)) = Matrix.diagonal f * A * Matrix.diagonal f := by
+  have h1
+      : (Matrix.of (fun a b => f a * A a b * f b)) = Matrix.diagonal f * A * Matrix.diagonal f := by
     ext a b; simp [Matrix.mul_diagonal, Matrix.diagonal_mul]
-  have h2 : (Matrix.of (fun a b => f a * A a b * f b)).submatrix Fin.castSucc Fin.castSucc =
-      Matrix.diagonal (fun a : Fin r => f (Fin.castSucc a)) * A.submatrix Fin.castSucc Fin.castSucc *
-        Matrix.diagonal (fun a : Fin r => f (Fin.castSucc a)) := by
+  have h2
+      : (Matrix.of (fun a b => f a * A a b * f b)).submatrix Fin.castSucc Fin.castSucc
+        = Matrix.diagonal (fun a : Fin r => f (Fin.castSucc a))
+          * A.submatrix Fin.castSucc Fin.castSucc
+          * Matrix.diagonal (fun a : Fin r => f (Fin.castSucc a)) := by
     ext a b; simp [Matrix.mul_diagonal, Matrix.diagonal_mul]
   rw [h2, h1, Matrix.det_mul, Matrix.det_mul, Matrix.det_mul, Matrix.det_mul, Matrix.det_diagonal,
     Matrix.det_diagonal, Fin.prod_univ_castSucc]
@@ -311,7 +362,8 @@ end Formalism.L2.SG.Pf.ThSomePf
 
 namespace Formalism.L2.SG.Pf.ThSomePf
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
+open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
 open Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc
 open scoped Matrix
 
@@ -319,49 +371,78 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section DetG2
 
-variable {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
-  {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+variable
+  {D : Formalism.BasicNotions.D7}
+  {δ : ∀ p : PlF D, (D.s.atP p).Fp} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
 
-theorem proj_inverse_algebraMap {Fp K : Type} [Field Fp] [CommRing K] [Algebra Fp K] [Nontrivial K] (e : K ≃ₐ[Fp] Fp × Fp)
-    (q : Fp) (hq : q ≠ 0) : p1 e (Ring.inverse (algebraMap Fp K q)) = q⁻¹ ∧ p2 e (Ring.inverse (algebraMap Fp K q)) = q⁻¹ := by
-  have h1 : algebraMap Fp K q * algebraMap Fp K q⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel₀ hq, map_one]
+theorem proj_inverse_algebraMap
+    {Fp K : Type} [Field Fp] [CommRing K] [Algebra Fp K] [Nontrivial K]
+    (e : K ≃ₐ[Fp] Fp × Fp)
+    (q : Fp) (hq : q ≠ 0)
+    : p1 e (Ring.inverse (algebraMap Fp K q)) = q⁻¹
+      ∧ p2 e (Ring.inverse (algebraMap Fp K q)) = q⁻¹ := by
+  have h1 : algebraMap Fp K q * algebraMap Fp K q⁻¹ = 1 := by
+    rw [← map_mul, mul_inv_cancel₀ hq, map_one]
   have h := LocModel.ring_inverse_pow_eq h1 1
   rw [pow_one, pow_one] at h
   rw [h, fst_proj_algebraMap, snd_proj_algebraMap]
   exact ⟨rfl, rfl⟩
 
-theorem firstProj_det_corner (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (g : Loc.SplitG (M p).L)
-    (hsM : (M p).split = some g) (sg : Loc.SplitAt (D.s.atP p).Fp (D.s.atP p).Ep (D.s.atP p).cj (Loc.resChar p))
-    (hge : g.e = sg.e) (hgq : g.q = sg.q) (Z : Formalism.L2.SG.PairVal.MatR D) (c : (D.s.atP p).Ep) :
-    p1 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c).det =
-      ((sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1) *
-        (Matrix.of (fun a b => cf ⟨δ, M, hA⟩ p a * ((p1 sg.e).comp (D.s.atP p).ιE) (Z a b) * cf ⟨δ, M, hA⟩ p b) +
-          cornerF D.R.rS ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) + (sg.q : (D.s.atP p).Fp) * p1 sg.e c)).det := by
+theorem firstProj_det_corner
+    (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word)
+    (p : PlF D) (g : Loc.SplitG (M p).L) (hsM : (M p).split = some g)
+    (sg : Loc.SplitAt (D.s.atP p).Fp (D.s.atP p).Ep (D.s.atP p).cj (Loc.resChar p))
+    (hge : g.e = sg.e) (hgq : g.q = sg.q)
+    (Z : Formalism.L2.SG.PairVal.MatR D) (c : (D.s.atP p).Ep)
+    : p1 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c).det
+      = ((sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1)
+        * (Matrix.of (fun a b =>
+            cf ⟨δ, M, hA⟩ p a * ((p1 sg.e).comp (D.s.atP p).ιE) (Z a b) * cf ⟨δ, M, hA⟩ p b)
+          + cornerF D.R.rS
+            ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)
+              + (sg.q : (D.s.atP p).Fp) * p1 sg.e c)).det := by
   have hq : (sg.q : (D.s.atP p).Fp) ≠ 0 := fun h => sg.q_irr.ne_zero (Subtype.ext h)
   rw [RingHom.map_det]
-  have hX : (p1 sg.e).mapMatrix (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c) =
-      ((sg.q : (D.s.atP p).Fp)⁻¹) •
-        (Matrix.of (fun a b => cf ⟨δ, M, hA⟩ p a * ((p1 sg.e).comp (D.s.atP p).ιE) (Z a b) * cf ⟨δ, M, hA⟩ p b) +
-          cornerF D.R.rS ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) + (sg.q : (D.s.atP p).Fp) * p1 sg.e c)) := by
+  have hX
+      : (p1 sg.e).mapMatrix (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c)
+        = ((sg.q : (D.s.atP p).Fp)⁻¹)
+          • (Matrix.of (fun a b =>
+              cf ⟨δ, M, hA⟩ p a * ((p1 sg.e).comp (D.s.atP p).ιE) (Z a b) * cf ⟨δ, M, hA⟩ p b)
+            + cornerF D.R.rS
+              ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) + (sg.q : (D.s.atP p).Fp) * p1 sg.e c)) := by
     ext a b
-    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.of_apply,
-      cornerF, smul_eq_mul]
-    have hZZ : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z a b =
-        g.e.symm ((g.e (Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z a b)).1 / (g.q : (D.s.atP p).Fp),
-          -((g.e (Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z b a)).2 / (g.q : (D.s.atP p).Fp))) -
-        (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
-          g.e.symm (-(((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) / (g.q : (D.s.atP p).Fp),
-            (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) / (g.q : (D.s.atP p).Fp)) else 0) := by
+    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.add_apply, Matrix.smul_apply,
+      Matrix.of_apply, cornerF, smul_eq_mul]
+    have hZZ
+        : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z a b
+          = g.e.symm (
+              (g.e (Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z a b)).1 / (g.q : (D.s.atP p).Fp),
+              -((g.e (Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z b a)).2 / (g.q : (D.s.atP p).Fp))
+            )
+            - (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
+                 g.e.symm (
+                   -(((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) / (g.q : (D.s.atP p).Fp),
+                   (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) / (g.q : (D.s.atP p).Fp)
+                 )
+               else
+                 0) := by
       simp only [Formalism.L2.SG.CntLocal.ZZP, Loc.HermSp.ZZplusOf, hsM, Matrix.of_apply]
-    have hp1Z : p1 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z a b) =
-        cf ⟨δ, M, hA⟩ p b * cf ⟨δ, M, hA⟩ p a * ((p1 sg.e).comp (D.s.atP p).ιE) (Z a b) / (sg.q : (D.s.atP p).Fp) -
-          (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
-            -(((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) / (sg.q : (D.s.atP p).Fp) else 0) := by
-      rw [hZZ, map_sub, hge, hgq, fst_proj_symm, zhatLoc_eq hA p Z a b, ← adeleInfiniteComponent_apply, map_mul, fst_proj_algebraMap]
+    have hp1Z
+        : p1 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z a b)
+          = cf ⟨δ, M, hA⟩ p b * cf ⟨δ, M, hA⟩ p a * ((p1 sg.e).comp (D.s.atP p).ιE) (Z a b)
+              / (sg.q : (D.s.atP p).Fp)
+            - (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
+                 -(((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) / (sg.q : (D.s.atP p).Fp)
+               else
+                 0) := by
+      rw [hZZ, map_sub, hge, hgq, fst_proj_symm, zhatLoc_eq hA p Z a b,
+        ← adeleInfiniteComponent_apply, map_mul, fst_proj_algebraMap]
       split_ifs with h
       · rw [fst_proj_symm]; rfl
       · rw [map_zero]; rfl
-    have hp1c : p1 sg.e (cornerM p c a b) = if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then p1 sg.e c else 0 := by
+    have hp1c
+        : p1 sg.e (cornerM p c a b)
+          = if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then p1 sg.e c else 0 := by
       simp only [cornerM, Matrix.of_apply]
       split_ifs
       · rfl
@@ -380,7 +461,8 @@ end Formalism.L2.SG.Pf.ThSomePf
 
 namespace Formalism.L2.SG.Pf.ThSomePf
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
+open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
 open Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc
 open scoped Matrix
 
@@ -388,42 +470,65 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section DetG3
 
-variable {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
-  {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+variable
+  {D : Formalism.BasicNotions.D7}
+  {δ : ∀ p : PlF D, (D.s.atP p).Fp} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
 
-theorem secondProj_det_corner (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (g : Loc.SplitG (M p).L)
-    (hsM : (M p).split = some g) (sg : Loc.SplitAt (D.s.atP p).Fp (D.s.atP p).Ep (D.s.atP p).cj (Loc.resChar p))
-    (hge : g.e = sg.e) (hgq : g.q = sg.q) (Z : Formalism.L2.SG.PairVal.MatR D) (c : (D.s.atP p).Ep) :
-    p2 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c).det =
-      (-(sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1) *
-        (Matrix.of (fun a b => cf ⟨δ, M, hA⟩ p a * ((p2 sg.e).comp (D.s.atP p).ιE) (Z b a) * cf ⟨δ, M, hA⟩ p b) +
-          cornerF D.R.rS ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) - (sg.q : (D.s.atP p).Fp) * p2 sg.e c)).det := by
+theorem secondProj_det_corner
+    (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word)
+    (p : PlF D) (g : Loc.SplitG (M p).L) (hsM : (M p).split = some g)
+    (sg : Loc.SplitAt (D.s.atP p).Fp (D.s.atP p).Ep (D.s.atP p).cj (Loc.resChar p))
+    (hge : g.e = sg.e) (hgq : g.q = sg.q)
+    (Z : Formalism.L2.SG.PairVal.MatR D) (c : (D.s.atP p).Ep)
+    : p2 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c).det
+      = (-(sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1)
+        * (Matrix.of (fun a b =>
+            cf ⟨δ, M, hA⟩ p a * ((p2 sg.e).comp (D.s.atP p).ιE) (Z b a) * cf ⟨δ, M, hA⟩ p b)
+          + cornerF D.R.rS
+            ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp)
+              - (sg.q : (D.s.atP p).Fp) * p2 sg.e c)).det := by
   have hq : (sg.q : (D.s.atP p).Fp) ≠ 0 := fun h => sg.q_irr.ne_zero (Subtype.ext h)
   rw [RingHom.map_det]
-  have hX : (p2 sg.e).mapMatrix (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c) =
-      (-(sg.q : (D.s.atP p).Fp)⁻¹) •
-        (Matrix.of (fun a b => cf ⟨δ, M, hA⟩ p a * ((p2 sg.e).comp (D.s.atP p).ιE) (Z b a) * cf ⟨δ, M, hA⟩ p b) +
-          cornerF D.R.rS ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) - (sg.q : (D.s.atP p).Fp) * p2 sg.e c)) := by
+  have hX
+      : (p2 sg.e).mapMatrix (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c)
+        = (-(sg.q : (D.s.atP p).Fp)⁻¹)
+          • (Matrix.of (fun a b =>
+              cf ⟨δ, M, hA⟩ p a * ((p2 sg.e).comp (D.s.atP p).ιE) (Z b a) * cf ⟨δ, M, hA⟩ p b)
+            + cornerF D.R.rS
+              ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) - (sg.q : (D.s.atP p).Fp) * p2 sg.e c)) := by
     ext a b
-    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.of_apply,
-      cornerF, smul_eq_mul]
-    have hZZ : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z a b =
-        g.e.symm ((g.e (Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z a b)).1 / (g.q : (D.s.atP p).Fp),
-          -((g.e (Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z b a)).2 / (g.q : (D.s.atP p).Fp))) -
-        (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
-          g.e.symm (-(((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) / (g.q : (D.s.atP p).Fp),
-            (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) / (g.q : (D.s.atP p).Fp)) else 0) := by
+    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.add_apply, Matrix.smul_apply,
+      Matrix.of_apply, cornerF, smul_eq_mul]
+    have hZZ
+        : Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z a b
+          = g.e.symm (
+              (g.e (Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z a b)).1 / (g.q : (D.s.atP p).Fp),
+              -((g.e (Formalism.L2.SG.CntLocal.ZhatLoc M δ p Z b a)).2 / (g.q : (D.s.atP p).Fp))
+            )
+            - (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
+                 g.e.symm (
+                   -(((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) / (g.q : (D.s.atP p).Fp),
+                   (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) / (g.q : (D.s.atP p).Fp)
+                 )
+               else
+                 0) := by
       simp only [Formalism.L2.SG.CntLocal.ZZP, Loc.HermSp.ZZplusOf, hsM, Matrix.of_apply]
-    have hp2Z : p2 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z a b) =
-        -(cf ⟨δ, M, hA⟩ p a * cf ⟨δ, M, hA⟩ p b * ((p2 sg.e).comp (D.s.atP p).ιE) (Z b a) /
-          (sg.q : (D.s.atP p).Fp)) -
-          (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
-            (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) / (sg.q : (D.s.atP p).Fp) else 0) := by
-      rw [hZZ, map_sub, hge, hgq, snd_proj_symm, zhatLoc_eq hA p Z b a, ← adele_ext_components, map_mul, snd_proj_algebraMap]
+    have hp2Z
+        : p2 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z a b)
+          = -(cf ⟨δ, M, hA⟩ p a * cf ⟨δ, M, hA⟩ p b * ((p2 sg.e).comp (D.s.atP p).ιE) (Z b a)
+              / (sg.q : (D.s.atP p).Fp))
+            - (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
+                 (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) / (sg.q : (D.s.atP p).Fp)
+               else
+                 0) := by
+      rw [hZZ, map_sub, hge, hgq, snd_proj_symm, zhatLoc_eq hA p Z b a, ← adele_ext_components,
+        map_mul, snd_proj_algebraMap]
       split_ifs with h
       · rw [snd_proj_symm]; rfl
       · rw [map_zero]; rfl
-    have hp2c : p2 sg.e (cornerM p c a b) = if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then p2 sg.e c else 0 := by
+    have hp2c
+        : p2 sg.e (cornerM p c a b)
+          = if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then p2 sg.e c else 0 := by
       simp only [cornerM, Matrix.of_apply]
       split_ifs
       · rfl
@@ -436,28 +541,33 @@ theorem secondProj_det_corner (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word)
       ring
   rw [hX, Matrix.det_smul, Fintype.card_fin]
 
-theorem blkMod_comps (p : PlF D) (sg : Loc.SplitAt (D.s.atP p).Fp (D.s.atP p).Ep (D.s.atP p).cj (Loc.resChar p))
-    (hsD : (D.s.atP p).split = some sg) (T T' : ℕ) (ζ : D.host.E) :
-    p1 sg.e (blkMod δ T T' p (D.R.rS + 1) 1 ζ) =
-        (p1 sg.e ((D.s.atP p).ιE ζ) + (T : (D.s.atP p).Fp)) * (sg.q : (D.s.atP p).Fp)⁻¹ ∧
-      p2 sg.e (blkMod δ T T' p (D.R.rS + 1) 1 ζ) =
-        -(p2 sg.e ((D.s.atP p).ιE ζ) + (T' : (D.s.atP p).Fp)) * (sg.q : (D.s.atP p).Fp)⁻¹ := by
+theorem blkMod_comps
+    (p : PlF D) (sg : Loc.SplitAt (D.s.atP p).Fp (D.s.atP p).Ep (D.s.atP p).cj (Loc.resChar p))
+    (hsD : (D.s.atP p).split = some sg)
+    (T T' : ℕ) (ζ : D.host.E)
+    : p1 sg.e (blkMod δ T T' p (D.R.rS + 1) 1 ζ)
+        = (p1 sg.e ((D.s.atP p).ιE ζ) + (T : (D.s.atP p).Fp)) * (sg.q : (D.s.atP p).Fp)⁻¹
+      ∧ p2 sg.e (blkMod δ T T' p (D.R.rS + 1) 1 ζ)
+        = -(p2 sg.e ((D.s.atP p).ιE ζ) + (T' : (D.s.atP p).Fp)) * (sg.q : (D.s.atP p).Fp)⁻¹ := by
   have hq : (sg.q : (D.s.atP p).Fp) ≠ 0 := fun h => sg.q_irr.ne_zero (Subtype.ext h)
   haveI : Nontrivial (D.s.atP p).Ep := PI.ProdFormulaE.Base.nontrivial (D.s.atP p)
   obtain ⟨hi1, hi2⟩ := proj_inverse_algebraMap sg.e (sg.q : (D.s.atP p).Fp) hq
   have hnu : nu D.R.rS (D.R.rS + 1) (D.R.rS + 1 + 1 - 1) = 0 := by unfold nu; omega
   have hc : (D.R.rS + 1 + 1 - 1 = D.R.rS + 1 ∧ (1 : ℕ) = 1) := ⟨by omega, rfl⟩
-  simp only [blkMod, tMod, if_pos hc, hnu, pow_zero, Ring.inverse_one, one_mul, twist, qE, tau0, hsD]
+  simp only [blkMod, tMod, if_pos hc, hnu, pow_zero, Ring.inverse_one, one_mul, twist, qE, tau0,
+    hsD]
   refine ⟨?_, ?_⟩
-  · rw [map_sub, map_mul, if_pos (show D.R.rS + 1 + 1 - 1 = D.R.rS + 1 ∧ True from ⟨by omega, trivial⟩), map_mul,
+  · rw [map_sub, map_mul,
+      if_pos (show D.R.rS + 1 + 1 - 1 = D.R.rS + 1 ∧ True from ⟨by omega, trivial⟩), map_mul,
       fst_proj_symm, fst_proj_symm, hi1, adeleInfiniteComponent_apply]
     ring
-  · rw [map_sub, map_mul, if_pos (show D.R.rS + 1 + 1 - 1 = D.R.rS + 1 ∧ True from ⟨by omega, trivial⟩), map_mul,
+  · rw [map_sub, map_mul,
+      if_pos (show D.R.rS + 1 + 1 - 1 = D.R.rS + 1 ∧ True from ⟨by omega, trivial⟩), map_mul,
       snd_proj_symm, snd_proj_symm, hi2, adele_ext_components]
     ring
 
-theorem exists_k {K : Type} [Field K] [CharZero K] (a b : K) :
-    ∃ k : Fin 3, a + ((k : ℕ) : K) ≠ 0 ∧ b + ((k : ℕ) : K) ≠ 0 := by
+theorem exists_k {K : Type} [Field K] [CharZero K] (a b : K)
+    : ∃ k : Fin 3, a + ((k : ℕ) : K) ≠ 0 ∧ b + ((k : ℕ) : K) ≠ 0 := by
   by_cases h0 : a ≠ 0 ∧ b ≠ 0
   · exact ⟨0, by simpa using h0⟩
   by_cases h1 : a + 1 ≠ 0 ∧ b + 1 ≠ 0
@@ -490,33 +600,39 @@ end Formalism.L2.SG.Pf.ThSomePf
 
 namespace Formalism.L2.SG.Pf.ThSomePf
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
-open Formalism.L2.SG.LsDatumB Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB Formalism.L2.SG.TermLoc
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+open Formalism.L2.SG.LsDatumB Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
+  Formalism.L2.SG.TermLoc
 open scoped Matrix
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section DetG4
 
-variable {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
-  {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+variable
+  {D : Formalism.BasicNotions.D7}
+  {δ : ∀ p : PlF D, (D.s.atP p).Fp} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
 
-theorem leadMinor_top (Z : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E) :
-    leadMinorE Z (D.R.rS + 1) = Z.det := by
+theorem leadMinor_top (Z : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)
+    : leadMinorE Z (D.R.rS + 1) = Z.det := by
   unfold leadMinorE; rw [dif_pos le_rfl]; rfl
 
-theorem leadMinor_r (Z : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E) :
-    leadMinorE Z D.R.rS = (Z.submatrix Fin.castSucc Fin.castSucc).det := by
+theorem leadMinor_r (Z : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)
+    : leadMinorE Z D.R.rS = (Z.submatrix Fin.castSucc Fin.castSucc).det := by
   unfold leadMinorE; rw [dif_pos (Nat.le_succ _)]; rfl
 
-
 set_option maxHeartbeats 1600000 in
-theorem detG (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (g : Loc.SplitG (M p).L)
-    (hsM : (M p).split = some g) {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
-    {F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)} (w : Point D.host.E (D.R.rS + 1))
-    (hc : IsInCell (ZhatOM (ZhatL (lf D F0) F')) w) :
-    IsUnit (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (ZhatL (lf D F0) F') +
-      cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p w)).det := by
+theorem detG
+    (hA : ∀ p, Agree δ M p)
+    (u u' : D.what₂.Word)
+    (p : PlF D) (g : Loc.SplitG (M p).L) (hsM : (M p).split = some g)
+    {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
+    {F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)}
+    (w : Point D.host.E (D.R.rS + 1)) (hc : IsInCell (ZhatOM (ZhatL (lf D F0) F')) w)
+    : IsUnit
+      (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (ZhatL (lf D F0) F')
+        + cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p w)).det := by
   have hsp := (hA p).2.2.2.2.2
   rw [hsM] at hsp
   rcases hsD : (D.s.atP p).split with _ | sg
@@ -527,7 +643,8 @@ theorem detG (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (g :
   haveI := (D.s.atP p).char0
   haveI : Nontrivial (D.s.atP p).Ep := PI.ProdFormulaE.Base.nontrivial (D.s.atP p)
   have key : ∀ y : (D.s.atP p).Ep, p1 sg.e y ≠ 0 → p2 sg.e y ≠ 0 → IsUnit y := fun y h1 h2 => by
-    have hu : IsUnit (sg.e y) := Prod.isUnit_iff.2 ⟨isUnit_iff_ne_zero.2 h1, isUnit_iff_ne_zero.2 h2⟩
+    have hu : IsUnit (sg.e y) :=
+      Prod.isUnit_iff.2 ⟨isUnit_iff_ne_zero.2 h1, isUnit_iff_ne_zero.2 h2⟩
     have := hu.map sg.e.symm
     rwa [AlgEquiv.symm_apply_apply] at this
 
@@ -544,43 +661,64 @@ theorem detG (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (g :
 
   have hcfl : cf (⟨δ, M, hA⟩ : LocDat D) p (Fin.last D.R.rS) = 1 := by simp [cf]
   set P := ∏ a : Fin D.R.rS, cf (⟨δ, M, hA⟩ : LocDat D) p (Fin.castSucc a) with hPdef
-  have hP : P ≠ 0 := Finset.prod_ne_zero_iff.2 fun a _ => by
-    simp only [cf]; exact pow_ne_zero _ (inv_ne_zero (yP_ne _ p))
+  have hP : P ≠ 0 :=
+    Finset.prod_ne_zero_iff.2 fun a _ => by
+      simp only [cf]; exact pow_ne_zero _ (inv_ne_zero (yP_ne _ p))
 
-  have v1 : ∀ c : (D.s.atP p).Ep,
-      p1 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c).det =
-        ((sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1) * (P ^ 2 * (((p1 sg.e).comp (D.s.atP p).ιE) Z.det +
-          ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) + (sg.q : (D.s.atP p).Fp) * p1 sg.e c) *
-            ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det)) := by
+  have v1
+      : ∀ c : (D.s.atP p).Ep,
+        p1 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c).det
+          = ((sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1)
+            * (P ^ 2
+              * (((p1 sg.e).comp (D.s.atP p).ιE) Z.det
+                + ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) + (sg.q : (D.s.atP p).Fp) * p1 sg.e c)
+                  * ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc
+                    Fin.castSucc).det)) := by
     intro c
     rw [firstProj_det_corner hA u u' p g hsM sg hge hgq Z c]
-    have h := det_diag_mul (cf (⟨δ, M, hA⟩ : LocDat D) p) (Z.map ((p1 sg.e).comp (D.s.atP p).ιE))
-      ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) + (sg.q : (D.s.atP p).Fp) * p1 sg.e c)
+    have h :=
+      det_diag_mul (cf (⟨δ, M, hA⟩ : LocDat D) p) (Z.map ((p1 sg.e).comp (D.s.atP p).ιE))
+        ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) + (sg.q : (D.s.atP p).Fp) * p1 sg.e c)
     simp only [Matrix.map_apply] at h
-    have hd1 : (Z.map ((p1 sg.e).comp (D.s.atP p).ιE)).det = ((p1 sg.e).comp (D.s.atP p).ιE) Z.det := (RingHom.map_det ((p1 sg.e).comp (D.s.atP p).ιE) Z).symm
-    have hd1s : ((Z.map ((p1 sg.e).comp (D.s.atP p).ιE)).submatrix Fin.castSucc Fin.castSucc).det = ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det :=
+    have hd1
+        : (Z.map ((p1 sg.e).comp (D.s.atP p).ιE)).det = ((p1 sg.e).comp (D.s.atP p).ιE) Z.det :=
+      (RingHom.map_det ((p1 sg.e).comp (D.s.atP p).ιE) Z).symm
+    have hd1s
+        : ((Z.map ((p1 sg.e).comp (D.s.atP p).ιE)).submatrix Fin.castSucc Fin.castSucc).det
+          = ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det :=
       (RingHom.map_det ((p1 sg.e).comp (D.s.atP p).ιE) _).symm
     rw [h, hcfl, hd1, hd1s, ← hPdef]
     ring
-  have v2 : ∀ c : (D.s.atP p).Ep,
-      p2 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c).det =
-        (-(sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1) * (P ^ 2 * (((p2 sg.e).comp (D.s.atP p).ιE) Z.det +
-          ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) - (sg.q : (D.s.atP p).Fp) * p2 sg.e c) *
-            ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det)) := by
+  have v2
+      : ∀ c : (D.s.atP p).Ep,
+        p2 sg.e (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p Z + cornerM p c).det
+          = (-(sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1)
+            * (P ^ 2
+              * (((p2 sg.e).comp (D.s.atP p).ιE) Z.det
+                + ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) - (sg.q : (D.s.atP p).Fp) * p2 sg.e c)
+                  * ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc
+                    Fin.castSucc).det)) := by
     intro c
     rw [secondProj_det_corner hA u u' p g hsM sg hge hgq Z c]
-    have h := det_diag_mul (cf (⟨δ, M, hA⟩ : LocDat D) p) (Z.map ((p2 sg.e).comp (D.s.atP p).ιE)).transpose
-      ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) - (sg.q : (D.s.atP p).Fp) * p2 sg.e c)
+    have h :=
+      det_diag_mul (cf (⟨δ, M, hA⟩ : LocDat D) p) (Z.map ((p2 sg.e).comp (D.s.atP p).ιE)).transpose
+        ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) - (sg.q : (D.s.atP p).Fp) * p2 sg.e c)
     simp only [Matrix.transpose_apply, Matrix.map_apply] at h
-    have hd2 : (Z.map ((p2 sg.e).comp (D.s.atP p).ιE)).transpose.det = ((p2 sg.e).comp (D.s.atP p).ιE) Z.det := by
+    have hd2
+        : (Z.map ((p2 sg.e).comp (D.s.atP p).ιE)).transpose.det
+          = ((p2 sg.e).comp (D.s.atP p).ιE) Z.det := by
       rw [Matrix.det_transpose]; exact (RingHom.map_det ((p2 sg.e).comp (D.s.atP p).ιE) Z).symm
-    have hd2s : ((Z.map ((p2 sg.e).comp (D.s.atP p).ιE)).transpose.submatrix Fin.castSucc Fin.castSucc).det =
-        ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
-      rw [← Matrix.transpose_submatrix, Matrix.det_transpose]; exact (RingHom.map_det ((p2 sg.e).comp (D.s.atP p).ιE) _).symm
+    have hd2s
+        : ((Z.map ((p2 sg.e).comp (D.s.atP p).ιE)).transpose.submatrix Fin.castSucc
+            Fin.castSucc).det
+          = ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
+      rw [← Matrix.transpose_submatrix, Matrix.det_transpose]
+      exact (RingHom.map_det ((p2 sg.e).comp (D.s.atP p).ιE) _).symm
     rw [h, hcfl, hd2, hd2s, ← hPdef]
     ring
   have hqi : ((sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1) ≠ 0 := pow_ne_zero _ (inv_ne_zero hq)
-  have hqi' : (-(sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1) ≠ 0 := pow_ne_zero _ (neg_ne_zero.2 (inv_ne_zero hq))
+  have hqi' : (-(sg.q : (D.s.atP p).Fp)⁻¹) ^ (D.R.rS + 1) ≠ 0 :=
+    pow_ne_zero _ (neg_ne_zero.2 (inv_ne_zero hq))
   have hP2 : P ^ 2 ≠ 0 := pow_ne_zero _ hP
   by_cases hD : Dmin w D.R.rS = 0
   · have hcs : cornerSh δ (D.mem u).A.T (D.mem u').A.T p w = 0 := by unfold cornerSh; rw [if_pos hD]
@@ -590,41 +728,62 @@ theorem detG (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (g :
     refine key _ ?_ ?_
     · rw [v1, hDr]
       simp only [map_zero, mul_zero, add_zero]
-      exact mul_ne_zero hqi (mul_ne_zero hP2 ((map_ne_zero ((p1 sg.e).comp (D.s.atP p).ιE)).2 hdetZ))
+      exact mul_ne_zero hqi
+        (mul_ne_zero hP2 ((map_ne_zero ((p1 sg.e).comp (D.s.atP p).ιE)).2 hdetZ))
     · rw [v2, hDr]
       simp only [map_zero, mul_zero, add_zero]
-      exact mul_ne_zero hqi' (mul_ne_zero hP2 ((map_ne_zero ((p2 sg.e).comp (D.s.atP p).ιE)).2 hdetZ))
-  · have hDr : (Z.submatrix Fin.castSucc Fin.castSucc).det ≠ 0 := fun h => hD (by rw [hr, h, mul_zero])
+      exact mul_ne_zero hqi'
+        (mul_ne_zero hP2 ((map_ne_zero ((p2 sg.e).comp (D.s.atP p).ιE)).2 hdetZ))
+  · have hDr : (Z.submatrix Fin.castSucc Fin.castSucc).det ≠ 0 := fun h =>
+      hD (by rw [hr, h, mul_zero])
     have hζZ : Z.det = zetaOf w * (Z.submatrix Fin.castSucc Fin.castSucc).det := by
       unfold zetaOf
       rw [hr1, hr, mul_div_mul_left _ _ hs, div_mul_cancel₀ _ hDr]
     obtain ⟨b1, b2⟩ := blkMod_comps (δ := δ) p sg hsD (D.mem u).A.T (D.mem u').A.T (zetaOf w)
-    obtain ⟨k, hk1, hk2⟩ := exists_k (p1 sg.e (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w)))
-      (p2 sg.e (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w)))
-    have hex : ∃ k : Fin 3, IsUnit (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w) +
-        (((k : Fin 3) : ℕ) : (D.s.atP p).Ep)) := by
+    obtain ⟨k, hk1, hk2⟩ :=
+      exists_k (p1 sg.e (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w)))
+        (p2 sg.e (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w)))
+    have hex
+        : ∃ k : Fin 3,
+          IsUnit
+            (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w)
+              + (((k : Fin 3) : ℕ) : (D.s.atP p).Ep)) := by
       refine ⟨k, key _ ?_ ?_⟩
       · rw [map_add (p1 sg.e), map_natCast (p1 sg.e)]; exact hk1
       · rw [map_add (p2 sg.e), map_natCast (p2 sg.e)]; exact hk2
-    have hcs : cornerSh δ (D.mem u).A.T (D.mem u').A.T p w = (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Ep) := by
+    have hcs
+        : cornerSh δ (D.mem u).A.T (D.mem u').A.T p w
+          = (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Ep) := by
       unfold cornerSh nSh; rw [if_neg hD, dif_pos hex]
     have hu := hex.choose_spec
-    have hu1 : p1 sg.e (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w) +
-        (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Ep)) ≠ 0 := fun h => by
+    have hu1
+        : p1 sg.e
+            (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w)
+              + (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Ep))
+          ≠ 0 := fun h => by
       have := hu.map (p1 sg.e); rw [h] at this; exact not_isUnit_zero this
-    have hu2 : p2 sg.e (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w) +
-        (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Ep)) ≠ 0 := fun h => by
+    have hu2
+        : p2 sg.e
+            (blkMod δ (D.mem u).A.T (D.mem u').A.T p (D.R.rS + 1) 1 (zetaOf w)
+              + (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Ep))
+          ≠ 0 := fun h => by
       have := hu.map (p2 sg.e); rw [h] at this; exact not_isUnit_zero this
     rw [map_add (p1 sg.e), map_natCast (p1 sg.e) ((hex.choose : Fin 3) : ℕ)] at hu1
     rw [map_add (p2 sg.e), map_natCast (p2 sg.e) ((hex.choose : Fin 3) : ℕ)] at hu2
     simp only [b1] at hu1
     simp only [b2] at hu2
     have hqq : (sg.q : (D.s.atP p).Fp) * (sg.q : (D.s.atP p).Fp)⁻¹ = 1 := mul_inv_cancel₀ hq
-    have h1' : ((p1 sg.e).comp (D.s.atP p).ιE) Z.det = p1 sg.e ((D.s.atP p).ιE (zetaOf w)) * ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
+    have h1'
+        : ((p1 sg.e).comp (D.s.atP p).ιE) Z.det
+          = p1 sg.e ((D.s.atP p).ιE (zetaOf w))
+            * ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
       have := congrArg ((p1 sg.e).comp (D.s.atP p).ιE) hζZ
       rw [map_mul] at this
       exact this
-    have h2' : ((p2 sg.e).comp (D.s.atP p).ιE) Z.det = p2 sg.e ((D.s.atP p).ιE (zetaOf w)) * ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
+    have h2'
+        : ((p2 sg.e).comp (D.s.atP p).ιE) Z.det
+          = p2 sg.e ((D.s.atP p).ιE (zetaOf w))
+            * ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
       have := congrArg ((p2 sg.e).comp (D.s.atP p).ιE) hζZ
       rw [map_mul] at this
       exact this
@@ -632,28 +791,37 @@ theorem detG (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word) (p : PlF D) (g :
     refine key _ ?_ ?_
     · rw [v1, map_natCast (p1 sg.e) ((hex.choose : Fin 3) : ℕ)]
       refine mul_ne_zero hqi (mul_ne_zero hP2 ?_)
-      have e : ((p1 sg.e).comp (D.s.atP p).ιE) Z.det + ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) +
-          (sg.q : (D.s.atP p).Fp) * (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Fp)) *
-            ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det =
-          (sg.q : (D.s.atP p).Fp) * ((p1 sg.e ((D.s.atP p).ιE (zetaOf w)) + (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)) *
-            (sg.q : (D.s.atP p).Fp)⁻¹ + (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Fp)) *
-            ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
+      have e
+          : ((p1 sg.e).comp (D.s.atP p).ιE) Z.det
+              + ((((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)
+                  + (sg.q : (D.s.atP p).Fp) * (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Fp))
+                * ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det
+            = (sg.q : (D.s.atP p).Fp)
+              * ((p1 sg.e ((D.s.atP p).ιE (zetaOf w)) + (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp))
+                  * (sg.q : (D.s.atP p).Fp)⁻¹
+                + (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Fp))
+              * ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
         linear_combination h1' - ((p1 sg.e ((D.s.atP p).ιE (zetaOf w)) + (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)) *
           ((p1 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det) * hqq
       rw [e]
       exact mul_ne_zero (mul_ne_zero hq hu1) ((map_ne_zero ((p1 sg.e).comp (D.s.atP p).ιE)).2 hDr)
     · rw [v2, map_natCast (p2 sg.e) ((hex.choose : Fin 3) : ℕ)]
       refine mul_ne_zero hqi' (mul_ne_zero hP2 ?_)
-      have e : ((p2 sg.e).comp (D.s.atP p).ιE) Z.det + ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) -
-          (sg.q : (D.s.atP p).Fp) * (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Fp)) *
-            ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det =
-          -(sg.q : (D.s.atP p).Fp) * (-(p2 sg.e ((D.s.atP p).ιE (zetaOf w)) + (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp)) *
-            (sg.q : (D.s.atP p).Fp)⁻¹ + (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Fp)) *
-            ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
+      have e
+          : ((p2 sg.e).comp (D.s.atP p).ιE) Z.det
+              + ((((D.mem u').A.T : ℕ) : (D.s.atP p).Fp)
+                  - (sg.q : (D.s.atP p).Fp) * (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Fp))
+                * ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det
+            = -(sg.q : (D.s.atP p).Fp)
+              * (-(p2 sg.e ((D.s.atP p).ιE (zetaOf w)) + (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp))
+                  * (sg.q : (D.s.atP p).Fp)⁻¹
+                + (((hex.choose : Fin 3) : ℕ) : (D.s.atP p).Fp))
+              * ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det := by
         linear_combination h2' - ((p2 sg.e ((D.s.atP p).ιE (zetaOf w)) + (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp)) *
           ((p2 sg.e).comp (D.s.atP p).ιE) (Z.submatrix Fin.castSucc Fin.castSucc).det) * hqq
       rw [e]
-      exact mul_ne_zero (mul_ne_zero (neg_ne_zero.2 hq) hu2) ((map_ne_zero ((p2 sg.e).comp (D.s.atP p).ιE)).2 hDr)
+      exact mul_ne_zero (mul_ne_zero (neg_ne_zero.2 hq) hu2)
+        ((map_ne_zero ((p2 sg.e).comp (D.s.atP p).ιE)).2 hDr)
 
 end DetG4
 
@@ -661,35 +829,42 @@ end Formalism.L2.SG.Pf.ThSomePf
 
 namespace Formalism.L2.SG.Pf.ThSomePf
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
-open Formalism.L2.SG.LsDatumB Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB Formalism.L2.SG.TermLoc
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+open Formalism.L2.SG.LsDatumB Formalism.L2.SG.Pf.AtPt Formalism.L2.SG.Pf.LocUnramB
+  Formalism.L2.SG.TermLoc
 open scoped Matrix
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Assembly
 
-variable {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
-  {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+variable
+  {D : Formalism.BasicNotions.D7}
+  {δ : ∀ p : PlF D, (D.s.atP p).Fp} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
 
-theorem isLo_of_uni' {K : Type} [CommRing K] {n : ℕ} {L : Matrix (Fin n) (Fin n) K} (h : IsLoUni L) : IsLo L :=
+theorem isLo_of_uni' {K : Type} [CommRing K] {n : ℕ} {L : Matrix (Fin n) (Fin n) K} (h : IsLoUni L)
+    : IsLo L :=
   ⟨fun a => (h a a).2 rfl, fun a b hab => (h a b).1 hab⟩
 
-theorem isUp_of_uni' {K : Type} [CommRing K] {n : ℕ} {U : Matrix (Fin n) (Fin n) K} (h : IsUpUni U) : IsUp U :=
+theorem isUp_of_uni' {K : Type} [CommRing K] {n : ℕ} {U : Matrix (Fin n) (Fin n) K} (h : IsUpUni U)
+    : IsUp U :=
   ⟨fun a => (h a a).2 rfl, fun a b hab => (h b a).1 hab⟩
 
-theorem cornerSh_mem (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1)) :
-    cornerSh δ T T' p w ∈ (M p).R := by
+theorem cornerSh_mem (T T' : ℕ) (p : PlF D) (w : Point D.host.E (D.R.rS + 1))
+    : cornerSh δ T T' p w ∈ (M p).R := by
   unfold cornerSh
   split_ifs
   · exact (M p).R.zero_mem
   · exact natCast_mem (M p).R _
 
-theorem thSome_of (hA : ∀ p, Agree δ M p) {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (Formalism.L2.SG.CntLocal.Tn u)}
+theorem thSome_of
+    (hA : ∀ p, Agree δ M p)
+    {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (Formalism.L2.SG.CntLocal.Tn u)}
     {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)} (hNR : NormRepElig u u' F0 what₂)
-    (hInt : ∀ (γ : TermDef.Term D u u' F0 what₂) (w : Point D.host.E (D.R.rS + 1)), EligAt γ w →
-      ∀ p a b, Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (zT γ) a b ∈ (M p).R) :
-    ThSome M δ u u' F0 what₂ := by
+    (hInt : ∀ (γ : TermDef.Term D u u' F0 what₂) (w : Point D.host.E (D.R.rS + 1)),
+      EligAt γ w → ∀ p a b, Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (zT γ) a b ∈ (M p).R)
+    : ThSome M δ u u' F0 what₂ := by
   intro γ w hγ p
   have hex := hNR γ w hγ
   have hn : nrep γ = some hex.choose := dif_pos hex
@@ -697,16 +872,21 @@ theorem thSome_of (hA : ∀ p, Agree δ M p) {u u' : D.what₂.Word} {F0 : FlagG
   have hz : zT γ = ZhatL (lf D F0) hex.choose.2.1 := by unfold zT; rw [hn]
   have hpt : ptT γ = hex.choose.1 := by unfold ptT; rw [hn]
   have hc : IsInCell (ZhatOM (ZhatL (lf D F0) hex.choose.2.1)) hex.choose.1 := ⟨_, _, hL, hU, e⟩
-  have hint : ∀ a b, (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (zT γ) +
-      cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p hex.choose.1)) a b ∈ (M p).R := fun a b => by
+  have hint
+      : ∀ a b,
+        (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (zT γ)
+              + cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p hex.choose.1))
+            a b
+          ∈ (M p).R := fun a b => by
     rw [Matrix.add_apply]
     refine (M p).R.add_mem (hInt γ w hγ p a b) ?_
     simp only [cornerM, Matrix.of_apply]
     split_ifs
     · exact cornerSh_mem _ _ p _
     · exact (M p).R.zero_mem
-  have hdet : IsUnit (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (zT γ) +
-      cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p hex.choose.1)).det := by
+  have hdet : IsUnit
+      (Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (zT γ)
+        + cornerM p (cornerSh δ (D.mem u).A.T (D.mem u').A.T p hex.choose.1)).det := by
     rw [hz]
     rcases hsM : (M p).split with _ | g
     · exact detL hA u u' p hsM hex.choose.1 _ _ _ (isLo_of_uni' hL) (isUp_of_uni' hU)
@@ -724,17 +904,20 @@ end Formalism.L2.SG.Pf.ThSomePf
 
 namespace Formalism.L2.SG.Pf
 
-open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut Formalism.L2.SG.LsDatumB
+open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+  Formalism.L2.SG.LsDatumB
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem thSome_holds_of {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
-    {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep} (hA : ∀ p, Agree δ M p) {u u' : D.what₂.Word}
-    {F0 : FlagG (VS D) D.R.rS (Formalism.L2.SG.CntLocal.Tn u)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
-    (hNR : NormRepElig u u' F0 what₂)
-    (hInt : ∀ (γ : TermDef.Term D u u' F0 what₂) (w : Point D.host.E (D.R.rS + 1)), EligAt γ w →
-      ∀ p a b, Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (zT γ) a b ∈ (M p).R) :
-    ThSome M δ u u' F0 what₂ :=
+theorem thSome_holds_of
+    {D : Formalism.BasicNotions.D7} {δ : ∀ p : PlF D, (D.s.atP p).Fp}
+    {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep} (hA : ∀ p, Agree δ M p)
+    {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (Formalism.L2.SG.CntLocal.Tn u)}
+    {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)} (hNR : NormRepElig u u' F0 what₂)
+    (hInt : ∀ (γ : TermDef.Term D u u' F0 what₂) (w : Point D.host.E (D.R.rS + 1)),
+      EligAt γ w → ∀ p a b, Formalism.L2.SG.CntLocal.ZZP (M := M) δ u u' p (zT γ) a b ∈ (M p).R)
+    : ThSome M δ u u' F0 what₂ :=
   ThSomePf.thSome_of hA hNR hInt
 
 end Formalism.L2.SG.Pf

@@ -14,9 +14,10 @@ open MvPolynomial NumberField IsDedekindDomain
 
 noncomputable section
 
-theorem SpecResidue.proof (hCSD : ChowSecDegree.Statement) (hCNF : ChowNormForm.Statement)
-    (hDim : SpecCompDim.Statement) (hExist : ChowFormExists.Statement)
-    (hInd : ResidueAlgIndep.Statement) : SpecResidue.Statement := by
+theorem SpecResidue.proof
+    (hCSD : ChowSecDegree.Statement) (hCNF : ChowNormForm.Statement) (hDim : SpecCompDim.Statement)
+    (hExist : ChowFormExists.Statement) (hInd : ResidueAlgIndep.Statement)
+    : SpecResidue.Statement := by
   intro K _ _ n e I f v hI hf W hW
   have : v.asIdeal.IsMaximal := v.isMaximal
   let R := ParDVR e n v
@@ -37,9 +38,10 @@ theorem SpecResidue.proof (hCSD : ChowSecDegree.Statement) (hCNF : ChowNormForm.
   have hcomp : ρ.comp ι = (algebraMap k E).comp (algebraMap (𝓞 K) k) := by
     ext a
     exact (Ideal.ResidueField.map_algebraMap _ _ _ _ a).symm
-  have hmm : ∀ {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (φ₁ : A →+* B) (φ₂ : B →+* C),
-      (MvPolynomial.map φ₂).comp (MvPolynomial.map φ₁) =
-        (MvPolynomial.map (φ₂.comp φ₁) : MvPolynomial (Fin n) A →+* MvPolynomial (Fin n) C) :=
+  have hmm
+      : ∀ {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (φ₁ : A →+* B) (φ₂ : B →+* C),
+        (MvPolynomial.map φ₂).comp (MvPolynomial.map φ₁)
+          = (MvPolynomial.map (φ₂.comp φ₁) : MvPolynomial (Fin n) A →+* MvPolynomial (Fin n) C) :=
     fun φ₁ φ₂ ↦ RingHom.ext fun p ↦ MvPolynomial.map_map _ _ p
 
   have hJW : integralModel I ⊔ Ideal.map C v.asIdeal ≤ W := hW.1.1.2
@@ -53,15 +55,17 @@ theorem SpecResidue.proof (hCSD : ChowSecDegree.Statement) (hCNF : ChowNormForm.
   have hM : (modelR e I v).map Ψ ≤ QE := by
     rw [← hWR]
     exact Ideal.map_mono (Ideal.map_mono (le_sup_left.trans hJW))
-  have hA : (Ideal.span (Set.range (secForm (parY e n v)))).map Ψ =
-      Ideal.span (Set.range (secForm (parYκ e n v))) := by
+  have hA
+      : (Ideal.span (Set.range (secForm (parY e n v)))).map Ψ
+        = Ideal.span (Set.range (secForm (parYκ e n v))) := by
     rw [Ideal.map_span, ← Set.range_comp]
     congr 2
     funext i
     simp [Ψ, secForm, linForm, parYκ, ρ]
     rfl
-  have hB : (Ideal.span {chartForm (parY e n v) - 1}).map Ψ =
-      Ideal.span {chartForm (parYκ e n v) - 1} := by
+  have hB
+      : (Ideal.span {chartForm (parY e n v) - 1}).map Ψ
+        = Ideal.span {chartForm (parYκ e n v) - 1} := by
     rw [Ideal.map_span, Set.image_singleton]
     congr 2
     simp [Ψ, chartForm, linForm, parYκ, ρ]
@@ -69,8 +73,10 @@ theorem SpecResidue.proof (hCSD : ChowSecDegree.Statement) (hCNF : ChowNormForm.
   have hT : (S ⊔ WR).map Ψ = T := by
     simp only [S, T, secIdeal, Ideal.map_sup, hA, hB, hWR]
     apply le_antisymm
-    · exact sup_le (sup_le (sup_le (hM.trans (le_sup_left.trans le_sup_left))
-        (le_sup_right.trans le_sup_left)) le_sup_right) (le_sup_left.trans le_sup_left)
+    · exact sup_le
+        (sup_le (sup_le (hM.trans (le_sup_left.trans le_sup_left)) (le_sup_right.trans le_sup_left))
+          le_sup_right)
+        (le_sup_left.trans le_sup_left)
     · exact sup_le (sup_le le_sup_right (le_sup_right.trans (le_sup_left.trans le_sup_left)))
         (le_sup_right.trans le_sup_left)
   have hkerΨ : RingHom.ker Ψ ≤ WR := by
@@ -83,11 +89,12 @@ theorem SpecResidue.proof (hCSD : ChowSecDegree.Statement) (hCNF : ChowNormForm.
       ← MvPolynomial.map_comp_C, ← Ideal.map_map]
     exact Ideal.map_mono (le_sup_right.trans hJW)
 
-  let Φ : MvPolynomial (Fin n) R →ₐ[R] SecAlg QE (parYκ e n v) :=
-    { toRingHom := (Ideal.Quotient.mk T).comp Ψ
-      commutes' := fun r ↦ by
-        simp [Ψ, ρ]
-        rfl }
+  let Φ : MvPolynomial (Fin n) R →ₐ[R] SecAlg QE (parYκ e n v) := {
+    toRingHom := (Ideal.Quotient.mk T).comp Ψ
+    commutes' := fun r ↦ by
+      simp [Ψ, ρ]
+      rfl
+  }
   have hΦ : Function.Surjective Φ := Ideal.Quotient.mk_surjective.comp hΨ
   have hker : RingHom.ker Φ = S ⊔ WR := by
     have : RingHom.ker Φ = T.comap Ψ := by
@@ -99,8 +106,7 @@ theorem SpecResidue.proof (hCSD : ChowSecDegree.Statement) (hCNF : ChowNormForm.
   let eq : (SecB e I v ⧸ secIdealOf e I v W) ≃ₐ[R] SecAlg QE (parYκ e n v) :=
     ((Ideal.quotientEquivAlgOfEq R hsec).trans (DoubleQuot.quotQuotEquivQuotSupₐ R S WR)).trans
       ((Ideal.quotientEquivAlgOfEq R hker.symm).trans (Ideal.quotientKerAlgEquivOfSurjective hΦ))
-  rw [eq.toLinearEquiv.length_eq, Module.length_eq_of_surjective hρ, Module.length_eq_finrank,
-    hdeg]
+  rw [eq.toLinearEquiv.length_eq, Module.length_eq_of_surjective hρ, Module.length_eq_finrank, hdeg]
 
 end
 

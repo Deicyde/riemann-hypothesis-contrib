@@ -8,11 +8,12 @@ namespace CrystallineSemistableComparison.Inj
 
 open Submodule
 
-theorem exists_weight_basis_filtration {K H : Type*} [Field K] [AddCommGroup H] [Module K H]
-    (F : ℕ → Set H) (N : ℕ) (hN : ∀ j, N ≤ j → ∀ x ∈ F j, x = 0) :
-    ∀ i, ∃ (s : Set H) (w : H → ℕ), LinearIndepOn K id s ∧
-      (∀ v ∈ s, v ∈ F (w v) ∧ N - i ≤ w v) ∧
-      ∀ j, N - i ≤ j → F j ⊆ span K {v | v ∈ s ∧ j ≤ w v} := by
+theorem exists_weight_basis_filtration
+    {K H : Type*} [Field K] [AddCommGroup H] [Module K H]
+    (F : ℕ → Set H) (N : ℕ) (hN : ∀ j, N ≤ j → ∀ x ∈ F j, x = 0)
+    : ∀ i, ∃ (s : Set H) (w : H → ℕ),
+      LinearIndepOn K id s ∧ (∀ v ∈ s, v ∈ F (w v) ∧ N - i ≤ w v)
+        ∧ ∀ j, N - i ≤ j → F j ⊆ span K {v | v ∈ s ∧ j ≤ w v} := by
   intro i
   induction i with
   | zero =>
@@ -56,11 +57,14 @@ theorem exists_weight_basis_filtration {K H : Type*} [Field K] [AddCommGroup H] 
         rintro v ⟨hv, hw⟩
         exact ⟨hsb hv, by simp [hv, hw]⟩
 
-theorem wt_basis {K H : Type*} [Field K] [AddCommGroup H] [Module K H] [FiniteDimensional K H]
-    (F : ℕ → Set H) (hF : Antitone F) (h0 : F 0 = Set.univ) (N : ℕ) (hN : ∀ x ∈ F N, x = 0) :
-    ∃ (m : ℕ) (b : Module.Basis (Fin m) K H) (w : Fin m → ℕ),
-      ∀ s, b s ∈ F (w s) ∧ ∀ x ∈ F (w s + 1), b.coord s x = 0 := by
-  obtain ⟨s, w, hli, hs, hspan⟩ := exists_weight_basis_filtration (K := K) F N (fun j hj x hx => hN x (hF hj hx)) N
+theorem wt_basis
+    {K H : Type*} [Field K] [AddCommGroup H] [Module K H] [FiniteDimensional K H]
+    (F : ℕ → Set H) (hF : Antitone F) (h0 : F 0 = Set.univ)
+    (N : ℕ) (hN : ∀ x ∈ F N, x = 0)
+    : ∃ (m : ℕ) (b : Module.Basis (Fin m) K H) (w : Fin m → ℕ), ∀ s,
+      b s ∈ F (w s) ∧ ∀ x ∈ F (w s + 1), b.coord s x = 0 := by
+  obtain ⟨s, w, hli, hs, hspan⟩ :=
+    exists_weight_basis_filtration (K := K) F N (fun j hj x hx => hN x (hF hj hx)) N
   have hli' : LinearIndependent K ((↑) : s → H) := hli
   have htop : ⊤ ≤ span K (Set.range ((↑) : s → H)) := by
     rw [Subtype.range_coe]

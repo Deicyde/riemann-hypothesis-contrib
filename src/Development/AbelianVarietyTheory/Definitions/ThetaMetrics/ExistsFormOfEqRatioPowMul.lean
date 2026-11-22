@@ -19,11 +19,12 @@ namespace GlobalTheory.ProjSpace.Model
 
 variable {R : Type} [CommRing R] {N : ℕ}
 
-theorem exists_formOn (i : Fin (N + 1)) (u : Γ(PSpace R N, chart R N i)) :
-    ∃ n f, ∃ hf : (f : MvPolynomial (Fin (N + 1)) R).IsHomogeneous n,
+theorem exists_formOn (i : Fin (N + 1)) (u : Γ(PSpace R N, chart R N i))
+    : ∃ n f, ∃ hf : (f : MvPolynomial (Fin (N + 1)) R).IsHomogeneous n,
       u = formOn (chart R N i) i le_rfl n f hf := by
   obtain ⟨p, rfl⟩ := (chartAlgEquiv R N i).surjective u
-  obtain ⟨n, f, hf, h⟩ := HomogeneousLocalization.Away.mk_surjective _ (X_mem R N i) (polyToAway R N i p)
+  obtain ⟨n, f, hf, h⟩ :=
+    HomogeneousLocalization.Away.mk_surjective _ (X_mem R N i) (polyToAway R N i p)
   refine ⟨n, f, by simpa using hf, ?_⟩
   rw [chartAlgEquiv_apply, ← h, awayToSection_mk]
   exact frac_eq rfl

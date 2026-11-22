@@ -12,9 +12,9 @@ open Finset
 
 namespace Formalism.InvariantFactorPaths.G7
 
-private theorem exists_two_le_or_two_pos_of_one_lt_sum {κ : Type} (S : Finset κ) (β : κ →₀ ℕ)
-    (h : 1 < ∑ k ∈ S, β k) :
-    (∃ k ∈ S, 2 ≤ β k) ∨ ∃ k ∈ S, ∃ k' ∈ S, k ≠ k' ∧ 1 ≤ β k ∧ 1 ≤ β k' := by
+private theorem exists_two_le_or_two_pos_of_one_lt_sum
+    {κ : Type} (S : Finset κ) (β : κ →₀ ℕ) (h : 1 < ∑ k ∈ S, β k)
+    : (∃ k ∈ S, 2 ≤ β k) ∨ ∃ k ∈ S, ∃ k' ∈ S, k ≠ k' ∧ 1 ≤ β k ∧ 1 ≤ β k' := by
   by_cases hA : ∃ k ∈ S, 2 ≤ β k
   · exact Or.inl hA
   right
@@ -27,43 +27,52 @@ private theorem exists_two_le_or_two_pos_of_one_lt_sum {κ : Type} (S : Finset �
     intro a ha b hb
     rw [Finset.mem_filter] at ha hb
     by_contra hab
-    exact hB ⟨a, ha.1, b, hb.1, hab, Nat.one_le_iff_ne_zero.mpr ha.2,
-      Nat.one_le_iff_ne_zero.mpr hb.2⟩
+    exact hB
+      ⟨a, ha.1, b, hb.1, hab, Nat.one_le_iff_ne_zero.mpr ha.2, Nat.one_le_iff_ne_zero.mpr hb.2⟩
   have hsum : ∑ k ∈ S, β k ≤ (S.filter (fun k => β k ≠ 0)).card := by
-    calc ∑ k ∈ S, β k = ∑ k ∈ S.filter (fun k => β k ≠ 0), β k := by
-          rw [Finset.sum_filter_ne_zero]
+    calc
+      ∑ k ∈ S, β k
+        = ∑ k ∈ S.filter (fun k => β k ≠ 0), β k := by rw [Finset.sum_filter_ne_zero]
       _ ≤ ∑ k ∈ S.filter (fun k => β k ≠ 0), 1 :=
-          Finset.sum_le_sum (fun k hk => hle k (Finset.mem_filter.mp hk).1)
+        Finset.sum_le_sum (fun k hk => hle k (Finset.mem_filter.mp hk).1)
       _ = (S.filter (fun k => β k ≠ 0)).card := by simp
   omega
 
 theorem HitsCapPos_of (h1 : HasseDerivProdVanish) (h2 : MinorHits) : HitsCapPos := by
   intro K σ κ _ _ _ r0 r1 C l sf T I pos ξ col S s₀ hpos hξ β hβ
-  refine h1 K (σ × Fin r0 × Fin r1) κ (fun k => colDir (pos k) (ξ k) (col k)) C
-    (fun c => minorAt (sf c) (T c) (I c)) (fun c => if sf c = s₀ then 1 else 0) S ?hf β ?hsum
+  refine h1 K (σ × Fin r0 × Fin r1) κ
+    (fun k => colDir (pos k) (ξ k) (col k))
+    C
+    (fun c => minorAt (sf c) (T c) (I c))
+    (fun c => if sf c = s₀ then 1 else 0)
+    S ?hf β ?hsum
   case hf =>
     intro c β' hc
     try dsimp only at hc
     apply h2 K σ κ r0 r1 (l c) (sf c) (T c) (I c) pos ξ col β'
     by_cases hs : sf c = s₀
     · rw [if_pos hs] at hc
-      rcases exists_two_le_or_two_pos_of_one_lt_sum S β' hc with ⟨k, _, h2k⟩ | ⟨k, hk, k', hk', hne, h1k, h1k'⟩
+      rcases exists_two_le_or_two_pos_of_one_lt_sum S β' hc with
+        ⟨k, _, h2k⟩ | ⟨k, hk, k', hk', hne, h1k, h1k'⟩
       · exact Or.inl ⟨k, h2k⟩
-      · exact Or.inr (Or.inl ⟨k, k', hne, h1k, h1k', (hpos k hk).trans (hpos k' hk').symm,
-          Or.inl (hξ k hk k' hk')⟩)
+      · exact Or.inr (Or.inl
+          ⟨k, k', hne, h1k, h1k', (hpos k hk).trans (hpos k' hk').symm, Or.inl (hξ k hk k' hk')⟩)
     · rw [if_neg hs] at hc
       obtain ⟨k, hk, hk0⟩ := Finset.exists_ne_zero_of_sum_ne_zero hc.ne'
-      exact Or.inr (Or.inr ⟨k, Nat.one_le_iff_ne_zero.mpr hk0,
-        Or.inl (fun h => hs (h.symm.trans (hpos k hk)))⟩)
+      exact Or.inr (Or.inr
+        ⟨k, Nat.one_le_iff_ne_zero.mpr hk0, Or.inl (fun h => hs (h.symm.trans (hpos k hk)))⟩)
   case hsum =>
     rw [Finset.card_filter] at hβ
     exact hβ
 
 theorem HitsColumnsPos_of (h1 : HasseDerivProdVanish) (h2 : MinorHits) : HitsColumnsPos := by
   intro K σ κ _ _ _ r0 r1 C l sf T I pos ξ col S s₀ J hpos hJ β hβ
-  refine h1 K (σ × Fin r0 × Fin r1) κ (fun k => colDir (pos k) (ξ k) (col k)) C
+  refine h1 K (σ × Fin r0 × Fin r1) κ
+    (fun k => colDir (pos k) (ξ k) (col k))
+    C
     (fun c => minorAt (sf c) (T c) (I c))
-    (fun c => if sf c = s₀ then ((univ.image (I c)) ∩ J).card else 0) S ?hf β ?hsum
+    (fun c => if sf c = s₀ then ((univ.image (I c)) ∩ J).card else 0)
+    S ?hf β ?hsum
   case hf =>
     intro c β' hc
     try dsimp only at hc
@@ -76,35 +85,48 @@ theorem HitsColumnsPos_of (h1 : HasseDerivProdVanish) (h2 : MinorHits) : HitsCol
       have hle : ∀ k ∈ S, β' k ≤ 1 := fun k _ => by
         by_contra h'
         exact hno (Or.inl ⟨k, by omega⟩)
-      have hinj : ∀ k ∈ S.filter (fun k => β' k ≠ 0), ∀ k' ∈ S.filter (fun k => β' k ≠ 0),
-          col k = col k' → k = k' := by
+      have hinj
+          : ∀ k ∈ S.filter (fun k => β' k ≠ 0), ∀ k' ∈ S.filter (fun k => β' k ≠ 0),
+            col k = col k' → k = k' := by
         intro k hk k' hk' hcol
         rw [Finset.mem_filter] at hk hk'
         by_contra hne
-        exact hno (Or.inr (Or.inl ⟨k, k', hne, Nat.one_le_iff_ne_zero.mpr hk.2,
-          Nat.one_le_iff_ne_zero.mpr hk'.2, (hpos k hk.1).trans (hpos k' hk'.1).symm, Or.inr hcol⟩))
+        exact hno (Or.inr (Or.inl ⟨
+          k,
+          k',
+          hne,
+          Nat.one_le_iff_ne_zero.mpr hk.2,
+          Nat.one_le_iff_ne_zero.mpr hk'.2,
+          (hpos k hk.1).trans (hpos k' hk'.1).symm,
+          Or.inr hcol
+        ⟩))
       have hmaps : ∀ k ∈ S.filter (fun k => β' k ≠ 0), col k ∈ (univ.image (I c)) ∩ J := by
         intro k hk
         rw [Finset.mem_filter] at hk
         rw [Finset.mem_inter]
         refine ⟨?_, hJ k hk.1⟩
         by_contra hnot
-        exact hno (Or.inr (Or.inr ⟨k, Nat.one_le_iff_ne_zero.mpr hk.2, Or.inr (fun hr => by
-          obtain ⟨i, hi⟩ := Set.mem_range.mp hr
-          exact hnot (Finset.mem_image.mpr ⟨i, Finset.mem_univ _, hi⟩))⟩))
-      calc ∑ k ∈ S, β' k = ∑ k ∈ S.filter (fun k => β' k ≠ 0), β' k := by
-            rw [Finset.sum_filter_ne_zero]
+        exact hno (Or.inr (Or.inr ⟨
+          k,
+          Nat.one_le_iff_ne_zero.mpr hk.2,
+          Or.inr (fun hr => by
+            obtain ⟨i, hi⟩ := Set.mem_range.mp hr
+            exact hnot (Finset.mem_image.mpr ⟨i, Finset.mem_univ _, hi⟩))
+        ⟩))
+      calc
+        ∑ k ∈ S, β' k
+          = ∑ k ∈ S.filter (fun k => β' k ≠ 0), β' k := by rw [Finset.sum_filter_ne_zero]
         _ ≤ ∑ k ∈ S.filter (fun k => β' k ≠ 0), 1 :=
-            Finset.sum_le_sum (fun k hk => hle k (Finset.mem_filter.mp hk).1)
+          Finset.sum_le_sum (fun k hk => hle k (Finset.mem_filter.mp hk).1)
         _ = (S.filter (fun k => β' k ≠ 0)).card := by simp
         _ ≤ ((univ.image (I c)) ∩ J).card :=
-            Finset.card_le_card_of_injOn col
-              (fun k hk => Finset.mem_coe.mpr (hmaps k (Finset.mem_coe.mp hk)))
-              (fun k hk k' hk' h => hinj k (Finset.mem_coe.mp hk) k' (Finset.mem_coe.mp hk') h)
+          Finset.card_le_card_of_injOn col
+            (fun k hk => Finset.mem_coe.mpr (hmaps k (Finset.mem_coe.mp hk)))
+            (fun k hk k' hk' h => hinj k (Finset.mem_coe.mp hk) k' (Finset.mem_coe.mp hk') h)
     · rw [if_neg hs] at hc
       obtain ⟨k, hk, hk0⟩ := Finset.exists_ne_zero_of_sum_ne_zero hc.ne'
-      exact Or.inr (Or.inr ⟨k, Nat.one_le_iff_ne_zero.mpr hk0,
-        Or.inl (fun h => hs (h.symm.trans (hpos k hk)))⟩)
+      exact Or.inr (Or.inr
+        ⟨k, Nat.one_le_iff_ne_zero.mpr hk0, Or.inl (fun h => hs (h.symm.trans (hpos k hk)))⟩)
   case hsum =>
     rw [Finset.sum_filter] at hβ
     exact hβ
@@ -162,17 +184,20 @@ lemma biLe_mul {n0 n0' : ι →₀ ℕ} {W W' : MvPolynomial κ (MvPolynomial ι
     simp only [map_add (f := _)]
     omega
 
-private theorem eq_zero_of_mem_support_one {R σ : Type*} [CommSemiring R] {n : σ →₀ ℕ}
-    (hn : n ∈ (1 : MvPolynomial σ R).support) : n = 0 := by
+private theorem eq_zero_of_mem_support_one
+    {R σ : Type*} [CommSemiring R] {n : σ →₀ ℕ} (hn : n ∈ (1 : MvPolynomial σ R).support)
+    : n = 0 := by
   classical
   rw [MvPolynomial.mem_support_iff, MvPolynomial.coeff_one] at hn
   by_contra h
   exact hn (if_neg (Ne.symm h))
 
-private theorem eq_zero_and_mem_support_of_mem_support_coeff_C {R σ κ' : Type*} [CommSemiring R] {P : MvPolynomial σ R}
-    {β : κ' →₀ ℕ} {n : σ →₀ ℕ}
-    (hn : n ∈ (AddMonoidAlgebra.coeff (MvPolynomial.C P : MvPolynomial κ' (MvPolynomial σ R)) β).support) :
-    β = 0 ∧ n ∈ P.support := by
+private theorem eq_zero_and_mem_support_of_mem_support_coeff_C
+    {R σ κ' : Type*} [CommSemiring R]
+    {P : MvPolynomial σ R} {β : κ' →₀ ℕ} {n : σ →₀ ℕ}
+    (hn : n
+      ∈ (AddMonoidAlgebra.coeff (MvPolynomial.C P : MvPolynomial κ' (MvPolynomial σ R)) β).support)
+    : β = 0 ∧ n ∈ P.support := by
   classical
   rw [MvPolynomial.coeff_C] at hn
   by_cases hβ : (0 : κ' →₀ ℕ) = β
@@ -189,8 +214,10 @@ lemma biLe_one : BiLe 0 (1 : MvPolynomial κ (MvPolynomial ι K)) := by
   subst hβ
   exact ⟨le_rfl, by simp⟩
 
-private theorem eq_zero_of_mem_support_C {R σ : Type*} [CommSemiring R] {a : R} {n : σ →₀ ℕ}
-    (hn : n ∈ (MvPolynomial.C a : MvPolynomial σ R).support) : n = 0 := by
+private theorem eq_zero_of_mem_support_C
+    {R σ : Type*} [CommSemiring R]
+    {a : R} {n : σ →₀ ℕ} (hn : n ∈ (MvPolynomial.C a : MvPolynomial σ R).support)
+    : n = 0 := by
   classical
   rw [MvPolynomial.mem_support_iff, MvPolynomial.coeff_C] at hn
   by_contra h
@@ -204,8 +231,10 @@ lemma biLe_CC (a : K) :
   subst hβ
   exact ⟨le_rfl, by simp⟩
 
-private theorem eq_single_of_mem_support_X {R σ : Type*} [CommSemiring R] {x : σ} {n : σ →₀ ℕ}
-    (hn : n ∈ (MvPolynomial.X x : MvPolynomial σ R).support) : n = Finsupp.single x 1 := by
+private theorem eq_single_of_mem_support_X
+    {R σ : Type*} [CommSemiring R]
+    {x : σ} {n : σ →₀ ℕ} (hn : n ∈ (MvPolynomial.X x : MvPolynomial σ R).support)
+    : n = Finsupp.single x 1 := by
   classical
   rw [MvPolynomial.mem_support_iff, MvPolynomial.coeff_X] at hn
   by_contra h
@@ -219,8 +248,8 @@ lemma biLe_CX (x : ι) : BiLe (Finsupp.single x 1)
   subst hβ
   exact ⟨le_rfl, by simp⟩
 
-private theorem biLe_single_one_X (x : ι) (k : κ) :
-    BiLe (Finsupp.single x 1) (MvPolynomial.X k : MvPolynomial κ (MvPolynomial ι K)) := by
+private theorem biLe_single_one_X (x : ι) (k : κ)
+    : BiLe (Finsupp.single x 1) (MvPolynomial.X k : MvPolynomial κ (MvPolynomial ι K)) := by
   classical
   intro β n hn
   rw [MvPolynomial.coeff_X] at hn
@@ -229,10 +258,7 @@ private theorem biLe_single_one_X (x : ι) (k : κ) :
     obtain rfl := eq_zero_of_mem_support_one hn
     subst hβ
     refine ⟨?_, by simp [Finsupp.degree_single]⟩
-    first
-      | exact zero_le _
-      | exact fun i => Nat.zero_le _
-      | simp
+    first | exact zero_le _ | exact fun i => Nat.zero_le _ | simp
   · rw [if_neg hβ] at hn
     simp at hn
 
@@ -281,12 +307,16 @@ theorem hasseDerivSupport : HasseDegree := by
   classical
   change n ∈ (AddMonoidAlgebra.coeff (shiftPoly b Q) β).support at hn
   rw [shiftPoly_eq_sum, MvPolynomial.coeff_sum, MvPolynomial.mem_support_iff,
-    MvPolynomial.coeff_sum] at hn
+      MvPolynomial.coeff_sum]
+    at hn
   obtain ⟨n0, hn0, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero hn
   have hs : ∑ x ∈ n0.support, Finsupp.single x (n0 x) = n0 := Finsupp.sum_single n0
-  have h := biLe_mul (biLe_CC (ι := ι) (κ := κ) (AddMonoidAlgebra.coeff Q n0))
-    (biLe_prod n0.support (fun x => Finsupp.single x (n0 x)) _
-      (fun x _ => biLe_pow_single (biLe_gen b x) (n0 x)))
+  have h :=
+    biLe_mul (biLe_CC (ι := ι) (κ := κ) (AddMonoidAlgebra.coeff Q n0))
+      (biLe_prod n0.support
+        (fun x => Finsupp.single x (n0 x))
+        _
+        (fun x _ => biLe_pow_single (biLe_gen b x) (n0 x)))
   simp only [zero_add, hs] at h
   obtain ⟨h1, h2⟩ := h β n (MvPolynomial.mem_support_iff.mpr hne)
   refine ⟨n0, hn0, h1, ?_⟩
@@ -354,9 +384,12 @@ end PosDeg
 
 theorem minorProdBlockDegree : MinorProdDegree := by
   intro K σ _ _ r0 r1 C l sf T I n hn s
-  have hH := MvPolynomial.IsWeightedHomogeneous.prod Finset.univ
-    (fun c => minorAt (sf c) (T c) (I c)) (fun c => if sf c = s then l c else 0)
-    (w := posWt r0 r1 s) (fun c _ => minorAt_posWt s (sf c) (T c) (I c))
+  have hH :=
+    MvPolynomial.IsWeightedHomogeneous.prod Finset.univ
+      (fun c => minorAt (sf c) (T c) (I c))
+      (fun c => if sf c = s then l c else 0)
+      (w := posWt r0 r1 s)
+      (fun c _ => minorAt_posWt s (sf c) (T c) (I c))
   have h := hH (MvPolynomial.mem_support_iff.mp hn)
   rw [weight_posWt] at h
   rw [h, Finset.sum_filter]

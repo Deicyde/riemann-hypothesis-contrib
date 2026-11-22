@@ -7,7 +7,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagonalM
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WMan
 
@@ -19,17 +23,22 @@ open GlobalTheory.CompanionTheory.Ar.PB.MinorCalc
 
 variable {N : ℕ}
 
-theorem minorIJ_self_of_isLowerUni {X : Matrix (Fin N) (Fin N) ℂ} (hX : IsLowerUni X) (C : Finset (Fin N)) :
-    minorIJ X C C = 1 := by
+theorem minorIJ_self_of_isLowerUni
+    {X : Matrix (Fin N) (Fin N) ℂ} (hX : IsLowerUni X) (C : Finset (Fin N))
+    : minorIJ X C C = 1 := by
   have key : minorIJ X C C = minorIJ Xᵀ C C := by
     rw [minorIJ_eq_det X C C C.card rfl rfl, minorIJ_eq_det Xᵀ C C C.card rfl rfl,
       ← Matrix.transpose_submatrix, Matrix.det_transpose]
-  rw [key, minorIJ_self_of_triangular Xᵀ (fun i j hij => by simpa [Matrix.transpose_apply] using hX.2 j i hij) C]
+  rw [key,
+    minorIJ_self_of_triangular Xᵀ
+      (fun i j hij => by simpa [Matrix.transpose_apply] using hX.2 j i hij)
+      C]
   exact Finset.prod_eq_one (fun c _ => hX.1 c)
 
-theorem minorIJ_insert_erase_of_isLowerUni {X : Matrix (Fin N) (Fin N) ℂ} (hX : IsLowerUni X) {C : Finset (Fin N)}
-    {a' b' : Fin N} (hb : b' ∈ C) (hmax : ∀ c ∈ C, c ≤ b') (hlt : b' < a') :
-    minorIJ X (insert a' (C.erase b')) C = X a' b' := by
+theorem minorIJ_insert_erase_of_isLowerUni
+    {X : Matrix (Fin N) (Fin N) ℂ} (hX : IsLowerUni X)
+    {C : Finset (Fin N)} {a' b' : Fin N} (hb : b' ∈ C) (hmax : ∀ c ∈ C, c ≤ b') (hlt : b' < a')
+    : minorIJ X (insert a' (C.erase b')) C = X a' b' := by
   have ha : a' ∉ C := fun h => absurd (hmax a' h) (not_le.mpr hlt)
   obtain ⟨n, hn⟩ : ∃ n, C.card = n + 1 :=
     ⟨C.card - 1, by have := Finset.card_pos.mpr ⟨b', hb⟩; omega⟩
@@ -61,8 +70,8 @@ theorem minorIJ_insert_erase_of_isLowerUni {X : Matrix (Fin N) (Fin N) ℂ} (hX 
     simp only [f]
     split_ifs with hk
     · exact Finset.mem_insert_self _ _
-    · exact Finset.mem_insert_of_mem
-        (Finset.mem_erase.mpr ⟨(hlt' k hk).ne, Finset.orderEmbOfFin_mem C hn k⟩)
+    · exact Finset.mem_insert_of_mem (Finset.mem_erase.mpr
+        ⟨(hlt' k hk).ne, Finset.orderEmbOfFin_mem C hn k⟩)
   have hR' : ⇑((insert a' (C.erase b')).orderEmbOfFin hR) = f :=
     (Finset.orderEmbOfFin_unique hR hfmem hfmono).symm
   rw [minorIJ_eq_det X _ C (n + 1) hR hn, hR', Matrix.det_of_lowerTriangular]
@@ -80,8 +89,8 @@ theorem minorIJ_insert_erase_of_isLowerUni {X : Matrix (Fin N) (Fin N) ℂ} (hX 
     simp only [Matrix.submatrix_apply, f, if_neg hi]
     exact hX.2 _ _ (eC.strictMono hij')
 
-theorem mem_stepCols_stepOf (N j : ℕ) (c : Fin N) :
-    c ∈ stepCols N j (stepOf N j c) ∧ ∀ x ∈ stepCols N j (stepOf N j c), x ≤ c := by
+theorem mem_stepCols_stepOf (N j : ℕ) (c : Fin N)
+    : c ∈ stepCols N j (stepOf N j c) ∧ ∀ x ∈ stepCols N j (stepOf N j c), x ≤ c := by
   have hc := c.isLt
   refine ⟨?_, fun x hx => ?_⟩
   · simp only [stepCols, stepOf]
@@ -95,10 +104,13 @@ theorem mem_stepCols_stepOf (N j : ℕ) (c : Fin N) :
     all_goals (try simp at hx)
     all_goals omega
 
-theorem minorIJ_stepCols_of_isLowerUni (N j : ℕ) (X : Matrix (Fin N) (Fin N) ℂ) (a' b' : Fin N) (_hj : j ≤ N)
-    (_hd : IsBlockDiag j X) (hX : IsLowerUni X) (hlt : b' < a') (_hs : (a' : ℕ) < N - j ↔ (b' : ℕ) < N - j) :
-    minorIJ X (stepCols N j (stepOf N j b')) (stepCols N j (stepOf N j b')) = 1 ∧
-      minorIJ X (insert a' ((stepCols N j (stepOf N j b')).erase b')) (stepCols N j (stepOf N j b')) = X a' b' := by
+theorem minorIJ_stepCols_of_isLowerUni
+    (N j : ℕ) (X : Matrix (Fin N) (Fin N) ℂ) (a' b' : Fin N) (_hj : j ≤ N) (_hd : IsBlockDiag j X)
+    (hX : IsLowerUni X) (hlt : b' < a') (_hs : (a' : ℕ) < N - j ↔ (b' : ℕ) < N - j)
+    : minorIJ X (stepCols N j (stepOf N j b')) (stepCols N j (stepOf N j b')) = 1
+      ∧ minorIJ X (insert a' ((stepCols N j (stepOf N j b')).erase b'))
+          (stepCols N j (stepOf N j b'))
+        = X a' b' := by
   obtain ⟨hb, hmax⟩ := mem_stepCols_stepOf N j b'
   exact ⟨minorIJ_self_of_isLowerUni hX _, minorIJ_insert_erase_of_isLowerUni hX hb hmax hlt⟩
 

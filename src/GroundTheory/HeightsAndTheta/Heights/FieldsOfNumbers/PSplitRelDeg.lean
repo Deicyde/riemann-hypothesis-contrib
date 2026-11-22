@@ -21,15 +21,16 @@ universe u
 
 section SplitRelDeg
 
-variable {F : Type u} [Field F] {K K' : Type} (j : K ↪ K') {ι' : K' → Type}
-  (P' : Ideal (MRing ι' F)) [P'.IsPrime]
+variable
+  {F : Type u} [Field F]
+  {K K' : Type} (j : K ↪ K')
+  {ι' : K' → Type} (P' : Ideal (MRing ι' F)) [P'.IsPrime]
 
-theorem contractFracMap_mk (f : MRing (fun k => ι' (j k)) F) :
-    contractFracMap j P' (algebraMap _ _ (Ideal.Quotient.mk (contractPrime j P') f)) =
-      algebraMap _ _ (Ideal.Quotient.mk P' (rename (blockIncl j ι') f)) := by
+theorem contractFracMap_mk (f : MRing (fun k => ι' (j k)) F)
+    : contractFracMap j P' (algebraMap _ _ (Ideal.Quotient.mk (contractPrime j P') f))
+      = algebraMap _ _ (Ideal.Quotient.mk P' (rename (blockIncl j ι') f)) := by
   simp [contractFracMap, contractQuot]
   rfl
-
 
 end SplitRelDeg
 

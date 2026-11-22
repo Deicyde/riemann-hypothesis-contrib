@@ -8,8 +8,9 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2
-  Formalism.L2.SG.NGCut.SplitEmbedding
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
+  Formalism.L2.SG.PackageTie2 Formalism.L2.SG.NGCut.SplitEmbedding
 
 namespace Formalism.L2.SG.NGCut.StabilizerCovolume
 
@@ -36,8 +37,8 @@ theorem uni_injective {A : (P → ℂ) →ₗ[ℂ] (P → ℂ)} (hA : IsUni ht A
   funext q
   exact key (ht q + 1) q (Nat.lt_succ_self _)
 
-theorem uni_inv {A : (P → ℂ) →ₗ[ℂ] (P → ℂ)} (hA : IsUni ht A) :
-    ∃ B : (P → ℂ) →ₗ[ℂ] (P → ℂ), (∀ x, A (B x) = x) ∧ (∀ x, B (A x) = x) ∧ IsUni ht B := by
+theorem uni_inv {A : (P → ℂ) →ₗ[ℂ] (P → ℂ)} (hA : IsUni ht A)
+    : ∃ B : (P → ℂ) →ₗ[ℂ] (P → ℂ), (∀ x, A (B x) = x) ∧ (∀ x, B (A x) = x) ∧ IsUni ht B := by
   have hinj := uni_injective ht hA
   let e := LinearEquiv.ofInjectiveEndo A hinj
   refine ⟨e.symm.toLinearMap, fun x => e.apply_symm_apply x, fun x => e.symm_apply_apply x, ?_⟩

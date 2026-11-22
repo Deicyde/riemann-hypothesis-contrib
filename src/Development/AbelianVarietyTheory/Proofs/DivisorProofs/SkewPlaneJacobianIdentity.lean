@@ -29,13 +29,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLeviEl
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix ComplexConjugate
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.DescB
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.DescB
 
 noncomputable section
 
 namespace GlobalTheory.ThK.CuspTransfer.Smooth
-
 
 end GlobalTheory.ThK.CuspTransfer.Smooth
 
@@ -44,21 +45,18 @@ open GlobalTheory.Orb (archMat IsSmoothRealFam)
 
 namespace GlobalTheory.ThK.CuspTransfer.Smooth
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
-  {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
 
-theorem line_fam (h : IsCMExt F E σ) {γ : ℝ → GAd σ J} (hγ : IsRealLine σ J γ) : IsSmoothRealFam γ ∧ Continuous γ := by
+theorem line_fam (h : IsCMExt F E σ) {γ : ℝ → GAd σ J} (hγ : IsRealLine σ J γ)
+    : IsSmoothRealFam γ ∧ Continuous γ := by
   obtain ⟨w, τ, Z, -, hγ⟩ := hγ
   choose y e1 e2 using hγ
   obtain rfl : γ = fun t => embArch σ J w (y t) := funext e1
   exact GlobalTheory.Orb.isSmoothRealFam_embArch h τ fun i j => by
     simp only [e2]; exact GlobalTheory.Orb.contDiff_exp_smul_entry Z i j
 
-
-
-
-
 end GlobalTheory.ThK.CuspTransfer.Smooth
-
 
 end

@@ -10,13 +10,15 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrthogonalCan
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.Deep Formalism.HN
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.Deep Formalism.HN
 open scoped InnerProductSpace ContDiff
 
 namespace GlobalTheory.FlagPieces
 
-theorem sizesLe_stepLe (I : AutInst) (x : I.GA) {t : ℝ} (ht : 0 < t)
-    (A' : Submodule (𝓞 I.E) (Fin I.n → I.E)) : SizesLe I x (stepLe I x t) A' t := by
+theorem sizesLe_stepLe
+    (I : AutInst) (x : I.GA) {t : ℝ} (ht : 0 < t) (A' : Submodule (𝓞 I.E) (Fin I.n → I.E))
+    : SizesLe I x (stepLe I x t) A' t := by
   intro N _ hN hne
   have hle : stepLe I x t ≤ lamX I x := GlobalTheory.PointFlag.stepLe_le I x t
   have hne0 : stepLe I x t ≠ ⊥ := by
@@ -24,7 +26,8 @@ theorem sizesLe_stepLe (I : AutInst) (x : I.GA) {t : ℝ} (ht : 0 < t)
     apply hne
     rw [h0] at hN ⊢
     exact le_bot_iff.mp hN.1
-  exact (GlobalTheory.PointFlag.sizeQ_le I x hle hN hne).trans ((GlobalTheory.T.canonicalLatticeFiltration_size_properties I x t ht).2.2.2.2.1 hne0)
+  exact (GlobalTheory.PointFlag.sizeQ_le I x hle hN hne).trans
+    ((GlobalTheory.T.canonicalLatticeFiltration_size_properties I x t ht).2.2.2.2.1 hne0)
 
 theorem perpIn_bot (I : AutInst) (x : I.GA) : perpIn I x ⊥ = lamX I x := by
   apply le_antisymm
@@ -35,7 +38,23 @@ theorem perpIn_bot (I : AutInst) (x : I.GA) : perpIn I x ⊥ = lamX I x := by
     rw [(Submodule.mem_bot _).mp hs]
     simp [Formalism.UG.hform]
 
-theorem flag_pieces : ∀ (I : AutInst) (x : I.GA) (a : ℕ) (S : Fin (a + 1) → Submodule (𝓞 I.E) (Fin I.n → I.E)) (τ : Fin a → ℝ), HasFlag I x S τ → (∀ i, SatX I x (S i) ∧ SatX I x (perpIn I x (S i)) ∧ S i ≤ perpIn I x (S (Fin.last a)) ∧ perpIn I x (S (Fin.last a)) ≤ perpIn I x (S i) ∧ rkK (perpIn I x (S i)) + rkK (S i) = I.n) ∧ perpIn I x (S 0) = lamX I x ∧ SizesLe I x (perpIn I x (S (Fin.last a))) (S (Fin.last a)) 2 ∧ ∀ i : Fin a, SizesGe I x (S i.succ) (S i.castSucc) (τ i) ∧ SizesLe I x (S i.succ) (S i.castSucc) (τ i) ∧ SizesLe I x (perpIn I x (S i.castSucc)) (perpIn I x (S i.succ)) (τ i)⁻¹ ∧ S i.succ ≠ ⊥ ∧ largestSize (bas I) (frm I x) (S i.succ) ≤ τ i ∧ SizesGe I x (lamX I x) (S i.succ) (if h : (i : ℕ) + 1 < a then τ ⟨i + 1, h⟩ else 1 / 2) := by
+theorem flag_pieces
+    : ∀ (I : AutInst) (x : I.GA) (a : ℕ) (S : Fin (a + 1) → Submodule (𝓞 I.E) (Fin I.n → I.E))
+        (τ : Fin a → ℝ),
+      HasFlag I x S τ
+        → (∀ i,
+            SatX I x (S i) ∧ SatX I x (perpIn I x (S i)) ∧ S i ≤ perpIn I x (S (Fin.last a))
+              ∧ perpIn I x (S (Fin.last a)) ≤ perpIn I x (S i)
+              ∧ rkK (perpIn I x (S i)) + rkK (S i) = I.n)
+          ∧ perpIn I x (S 0) = lamX I x
+          ∧ SizesLe I x (perpIn I x (S (Fin.last a))) (S (Fin.last a)) 2
+          ∧ ∀ i : Fin a,
+            SizesGe I x (S i.succ) (S i.castSucc) (τ i)
+              ∧ SizesLe I x (S i.succ) (S i.castSucc) (τ i)
+              ∧ SizesLe I x (perpIn I x (S i.castSucc)) (perpIn I x (S i.succ)) (τ i)⁻¹
+              ∧ S i.succ ≠ ⊥ ∧ largestSize (bas I) (frm I x) (S i.succ) ≤ τ i
+              ∧ SizesGe I x (lamX I x) (S i.succ)
+                (if h : (i : ℕ) + 1 < a then τ ⟨i + 1, h⟩ else 1 / 2) := by
   intro I x a S τ hF
   have h35 := GlobalTheory.T.orthogonal_canonicalFiltration_steps_autPoint I x
   have h34 := (GlobalTheory.T.canonicalFlag_exists_unique_semistable I x).2.2 a S τ hF
@@ -46,7 +65,8 @@ theorem flag_pieces : ∀ (I : AutInst) (x : I.GA) (a : ℕ) (S : Fin (a + 1) �
   have hle_last : ∀ i, S i ≤ S (Fin.last a) := fun i => hF.2.1.monotone (Fin.le_last i)
   have hlast_le : S (Fin.last a) ≤ stepLe I x 2 := by
     rw [hF.2.2.1]
-    exact (GlobalTheory.PointFlag.stepLt_le_stepLe I x _).trans (GlobalTheory.PointFlag.stepLe_mono I x (by norm_num))
+    exact (GlobalTheory.PointFlag.stepLt_le_stepLe I x _).trans
+      (GlobalTheory.PointFlag.stepLe_mono I x (by norm_num))
   refine ⟨fun i => ?_, ?_, ?_, fun i => ?_⟩
   · have hp := h35.2.2.2 (S i) (S i) (hsat i) (hsat i) le_rfl
     have hp' := h35.2.2.2 (S i) (S (Fin.last a)) (hsat i) (hsat _) (hle_last i)
@@ -81,6 +101,7 @@ theorem flag_pieces : ∀ (I : AutInst) (x : I.GA) (a : ℕ) (S : Fin (a + 1) �
         have e : i.succ = Fin.last a := Fin.ext (by simp; omega)
         rw [e, hF.2.2.1]
         intro N hlt hle
-        exact (GlobalTheory.T.canonicalLatticeFiltration_size_properties I x (1 / 2) (by norm_num)).2.2.2.2.2.2.2.1 N hlt hle
+        exact (GlobalTheory.T.canonicalLatticeFiltration_size_properties I x (1 / 2)
+          (by norm_num)).2.2.2.2.2.2.2.1 N hlt hle
 
 end GlobalTheory.FlagPieces

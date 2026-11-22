@@ -15,16 +15,16 @@ variable (K : UQ)
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-theorem _root_.GlobalTheory.UnitLemma.UnramNorm.alg_inj :
-    Function.Injective (algebraMap K.O K.E) :=
+theorem _root_.GlobalTheory.UnitLemma.UnramNorm.alg_inj : Function.Injective (algebraMap K.O K.E) :=
   IsFractionRing.injective K.O K.E
 
 def cOf (x : K.O) : K.O := Classical.choose (K.c_int x)
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-theorem _root_.GlobalTheory.UnitLemma.UnramNorm.cOf_spec (x : K.O) :
-    algebraMap K.O K.E (_root_.GlobalTheory.UnitLemma.UnramNorm.cOf K x) = K.c (algebraMap K.O K.E x) :=
+theorem _root_.GlobalTheory.UnitLemma.UnramNorm.cOf_spec (x : K.O)
+    : algebraMap K.O K.E (_root_.GlobalTheory.UnitLemma.UnramNorm.cOf K x)
+      = K.c (algebraMap K.O K.E x) :=
   (Classical.choose_spec (K.c_int x)).symm
 
 def cO : K.O ≃+* K.O where
@@ -33,23 +33,28 @@ def cO : K.O ≃+* K.O where
   left_inv x := alg_inj K (by rw [cOf_spec, cOf_spec, K.c_c])
   right_inv x := alg_inj K (by rw [cOf_spec, cOf_spec, K.c_c])
   map_mul' x y := alg_inj K (by rw [cOf_spec, map_mul, map_mul, map_mul, cOf_spec, cOf_spec])
-  map_add' x y := alg_inj K (by rw [cOf_spec, map_add (f := _), map_add (f := _), map_add (f := _), cOf_spec, cOf_spec])
+  map_add' x y :=
+    alg_inj K
+      (by rw [cOf_spec, map_add (f := _), map_add (f := _), map_add (f := _), cOf_spec, cOf_spec])
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-theorem _root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec (x : K.O) :
-    algebraMap K.O K.E (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K x) = K.c (algebraMap K.O K.E x) :=
+theorem _root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec (x : K.O)
+    : algebraMap K.O K.E (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K x)
+      = K.c (algebraMap K.O K.E x) :=
   _root_.GlobalTheory.UnitLemma.UnramNorm.cOf_spec K x
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-private theorem valuation_algebraMap_isUnit_eq_one (u : K.O) (hu : IsUnit u) :
-    IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
-      (algebraMap K.O K.E u) = 1 := by
+private theorem valuation_algebraMap_isUnit_eq_one (u : K.O) (hu : IsUnit u)
+    : IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
+        (algebraMap K.O K.E u)
+      = 1 := by
   obtain ⟨w, rfl⟩ := hu
   set v := IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
   have h1 := (IsDiscreteValuationRing.maximalIdeal K.O).valuation_le_one (K := K.E) (w : K.O)
-  have h2 := (IsDiscreteValuationRing.maximalIdeal K.O).valuation_le_one (K := K.E) ((w⁻¹ : K.Oˣ) : K.O)
+  have h2 :=
+    (IsDiscreteValuationRing.maximalIdeal K.O).valuation_le_one (K := K.E) ((w⁻¹ : K.Oˣ) : K.O)
   have h3 : v (algebraMap K.O K.E w) * v (algebraMap K.O K.E ((w⁻¹ : K.Oˣ) : K.O)) = 1 := by
     rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
   exact le_antisymm h1 (by
@@ -61,22 +66,22 @@ private theorem valuation_algebraMap_isUnit_eq_one (u : K.O) (hu : IsUnit u) :
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-private theorem valuation_algebraMap_irreducible_eq {p p' : K.O} (hp : Irreducible p)
-    (hp' : Irreducible p') :
-    IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
-      (algebraMap K.O K.E p') =
-    IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
-      (algebraMap K.O K.E p) := by
+private theorem valuation_algebraMap_irreducible_eq
+    {p p' : K.O} (hp : Irreducible p) (hp' : Irreducible p')
+    : IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
+        (algebraMap K.O K.E p')
+      = IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
+        (algebraMap K.O K.E p) := by
   obtain ⟨w, hw⟩ := IsDiscreteValuationRing.associated_of_irreducible K.O hp hp'
   rw [← hw, map_mul, map_mul, valuation_algebraMap_isUnit_eq_one K _ w.isUnit, mul_one]
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-private theorem valuation_algebraMap_cO (a : K.O) :
-    IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
-      (algebraMap K.O K.E (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K a)) =
-    IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
-      (algebraMap K.O K.E a) := by
+private theorem valuation_algebraMap_cO (a : K.O)
+    : IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
+        (algebraMap K.O K.E (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K a))
+      = IsDedekindDomain.HeightOneSpectrum.valuation K.E (IsDiscreteValuationRing.maximalIdeal K.O)
+        (algebraMap K.O K.E a) := by
   by_cases ha : a = 0
   · simp [ha]
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible K.O
@@ -84,26 +89,29 @@ private theorem valuation_algebraMap_cO (a : K.O) :
   have hcϖ : Irreducible (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K ϖ) :=
     (MulEquiv.irreducible_iff (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K).toMulEquiv).mpr hϖ
   simp only [map_mul, map_pow]
-  rw [valuation_algebraMap_isUnit_eq_one K _ (u.isUnit.map (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K)),
+  rw [valuation_algebraMap_isUnit_eq_one K _
+      (u.isUnit.map (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K)),
     valuation_algebraMap_isUnit_eq_one K _ u.isUnit, valuation_algebraMap_irreducible_eq K hϖ hcϖ]
-
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-theorem _root_.GlobalTheory.UnitLemma.UnramNorm.val_c (x : K.E) :
-    _root_.GlobalTheory.UnitLemma.val K.O (K.c x) = _root_.GlobalTheory.UnitLemma.val K.O x := by
+theorem _root_.GlobalTheory.UnitLemma.UnramNorm.val_c (x : K.E)
+    : _root_.GlobalTheory.UnitLemma.val K.O (K.c x) = _root_.GlobalTheory.UnitLemma.val K.O x := by
   unfold _root_.GlobalTheory.UnitLemma.val
   congr 2
   obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := K.O) x
-  rw [map_div₀, ← _root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec, ← _root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec,
-    map_div₀, map_div₀, valuation_algebraMap_cO, valuation_algebraMap_cO]
+  rw [map_div₀, ← _root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec,
+    ← _root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec, map_div₀, map_div₀, valuation_algebraMap_cO,
+    valuation_algebraMap_cO]
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-private theorem cO_cO' (x : K.O) :
-    _root_.GlobalTheory.UnitLemma.UnramNorm.cO K (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K x) = x :=
+private theorem cO_cO' (x : K.O)
+    : _root_.GlobalTheory.UnitLemma.UnramNorm.cO K (_root_.GlobalTheory.UnitLemma.UnramNorm.cO K x)
+      = x :=
   _root_.GlobalTheory.UnitLemma.UnramNorm.alg_inj K (by
-    rw [_root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec, _root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec, K.c_c])
+    rw [_root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec,
+      _root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec, K.c_c])
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
@@ -112,14 +120,17 @@ private theorem isUnit_iff_notMem_maximalIdeal {x : K.O} : IsUnit x ↔ x ∉ ma
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-private theorem exists_mul_apply_eq_of_fixed_involution {F : Type} [Field F] [Finite F] (σ : F ≃+* F)
-    (hσ : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x) (u : F) (hu : u ≠ 0) (hfix : σ u = u) :
-    ∃ z, z * σ z = u := by
+private theorem exists_mul_apply_eq_of_fixed_involution
+    {F : Type} [Field F] [Finite F]
+    (σ : F ≃+* F) (hσ : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x)
+    (u : F) (hu : u ≠ 0) (hfix : σ u = u)
+    : ∃ z, z * σ z = u := by
   classical
   haveI : Fact (ringChar F).Prime := ⟨CharP.char_is_prime F (ringChar F)⟩
   letI : Algebra (ZMod (ringChar F)) F := ZMod.algebra F (ringChar F)
-  have hcomm : ∀ r : ZMod (ringChar F), σ (algebraMap (ZMod (ringChar F)) F r) =
-      algebraMap (ZMod (ringChar F)) F r := fun r =>
+  have hcomm
+      : ∀ r : ZMod (ringChar F),
+        σ (algebraMap (ZMod (ringChar F)) F r) = algebraMap (ZMod (ringChar F)) F r := fun r =>
     congrArg (· r) (RingHom.ext_zmod ((σ : F →+* F).comp (algebraMap _ _)) (algebraMap _ _))
   let τ : F ≃ₐ[ZMod (ringChar F)] F := AlgEquiv.ofRingEquiv (f := σ) hcomm
   have hτ : τ ≠ 1 := by
@@ -141,9 +152,10 @@ private theorem exists_mul_apply_eq_of_fixed_involution {F : Type} [Field F] [Fi
     have : Subgroup.zpowers τ ≤ MulAction.stabilizer (F ≃ₐ[ZMod (ringChar F)] F) x :=
       Subgroup.zpowers_le.mpr (by simpa [MulAction.mem_stabilizer_iff, τ] using hx)
     exact this hg
-  let τ0 : F ≃ₐ[k0] F := AlgEquiv.ofRingEquiv (f := σ) (fun x => by
-    have := (IntermediateField.mem_fixedField_iff _ _).mp x.2 τ (Subgroup.mem_zpowers τ)
-    simpa [τ] using this)
+  let τ0 : F ≃ₐ[k0] F :=
+    AlgEquiv.ofRingEquiv (f := σ) (fun x => by
+      have := (IntermediateField.mem_fixedField_iff _ _).mp x.2 τ (Subgroup.mem_zpowers τ)
+      simpa [τ] using this)
   have hτ0 : (1 : F ≃ₐ[k0] F) ≠ τ0 := by
     obtain ⟨x, hx⟩ := hne
     intro h
@@ -161,13 +173,14 @@ private theorem exists_mul_apply_eq_of_fixed_involution {F : Type} [Field F] [Fi
 
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-private theorem exists_add_mul_cO_notMem_maximalIdeal (e : K.O) :
-    ∃ t : K.O, t + e * _root_.GlobalTheory.UnitLemma.UnramNorm.cO K t ∉ maximalIdeal K.O := by
+private theorem exists_add_mul_cO_notMem_maximalIdeal (e : K.O)
+    : ∃ t : K.O, t + e * _root_.GlobalTheory.UnitLemma.UnramNorm.cO K t ∉ maximalIdeal K.O := by
   by_contra h
   push_neg at h
   obtain ⟨x, y, hxy, hm⟩ := K.c_res
-  have hy : _root_.GlobalTheory.UnitLemma.UnramNorm.cO K x = y := _root_.GlobalTheory.UnitLemma.UnramNorm.alg_inj K
-    (by rw [_root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec, hxy])
+  have hy : _root_.GlobalTheory.UnitLemma.UnramNorm.cO K x = y :=
+    _root_.GlobalTheory.UnitLemma.UnramNorm.alg_inj K
+      (by rw [_root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec, hxy])
   have h1 := h 1
   have hx := h x
   rw [map_one, mul_one] at h1
@@ -177,15 +190,18 @@ private theorem exists_add_mul_cO_notMem_maximalIdeal (e : K.O) :
   rw [this]
   exact Ideal.sub_mem _ hx (Ideal.mul_mem_right _ _ h1)
 
-
 open IsLocalRing Polynomial in
 variable (K : _root_.GlobalTheory.UnitLemma.UQ) in
-theorem _root_.GlobalTheory.UnitLemma.UnramNorm.unram_quadratic_facts :
-    ∀ (K : _root_.GlobalTheory.UnitLemma.UQ), (∀ u : K.Oˣ, K.c (algebraMap K.O K.E u) = algebraMap K.O K.E u →
-    ∃ z : K.Oˣ, algebraMap K.O K.E u = algebraMap K.O K.E z * K.c (algebraMap K.O K.E z)) ∧
-    (∃ z : K.O, algebraMap K.O K.E z + K.c (algebraMap K.O K.E z) = 1) ∧
-    (∃ ϖ : K.O, Irreducible ϖ ∧ K.c (algebraMap K.O K.E ϖ) = algebraMap K.O K.E ϖ) ∧
-    ∀ x : K.E, _root_.GlobalTheory.UnitLemma.val K.O (K.c x) = _root_.GlobalTheory.UnitLemma.val K.O x := by
+theorem _root_.GlobalTheory.UnitLemma.UnramNorm.unram_quadratic_facts
+    : ∀ (K : _root_.GlobalTheory.UnitLemma.UQ),
+      (∀ u : K.Oˣ,
+          K.c (algebraMap K.O K.E u) = algebraMap K.O K.E u
+            → ∃ z : K.Oˣ, algebraMap K.O K.E u = algebraMap K.O K.E z * K.c (algebraMap K.O K.E z))
+        ∧ (∃ z : K.O, algebraMap K.O K.E z + K.c (algebraMap K.O K.E z) = 1)
+        ∧ (∃ ϖ : K.O, Irreducible ϖ ∧ K.c (algebraMap K.O K.E ϖ) = algebraMap K.O K.E ϖ)
+        ∧ ∀ x : K.E,
+          _root_.GlobalTheory.UnitLemma.val K.O (K.c x)
+            = _root_.GlobalTheory.UnitLemma.val K.O x := by
   intro K
   set σ := _root_.GlobalTheory.UnitLemma.UnramNorm.cO K
   have hσσ : ∀ x, σ (σ x) = x := cO_cO' K
@@ -193,7 +209,8 @@ theorem _root_.GlobalTheory.UnitLemma.UnramNorm.unram_quadratic_facts :
     (_root_.GlobalTheory.UnitLemma.UnramNorm.cO_spec K x).symm
   have hσm : ∀ x, x ∈ maximalIdeal K.O → σ x ∈ maximalIdeal K.O := by
     intro x hx
-    rw [← not_not (a := σ x ∈ _), ← isUnit_iff_notMem_maximalIdeal, isUnit_map_iff σ, isUnit_iff_notMem_maximalIdeal, not_not]
+    rw [← not_not (a := σ x ∈ _), ← isUnit_iff_notMem_maximalIdeal, isUnit_map_iff σ,
+      isUnit_iff_notMem_maximalIdeal, not_not]
     exact hx
   refine ⟨?_, ?_, ?_, _root_.GlobalTheory.UnitLemma.UnramNorm.val_c K⟩
   · intro u hu
@@ -214,8 +231,9 @@ theorem _root_.GlobalTheory.UnitLemma.UnramNorm.unram_quadratic_facts :
     have hu0 : residue K.O (u : K.O) ≠ 0 := by
       rw [ne_eq, residue_eq_zero_iff, ← isUnit_iff_notMem_maximalIdeal K] at *
       simp [u.isUnit]
-    obtain ⟨zb, hzb⟩ := exists_mul_apply_eq_of_fixed_involution (ResidueField.mapEquiv σ) hσb hne _ hu0
-      (by rw [hres, hσu])
+    obtain ⟨zb, hzb⟩ :=
+      exists_mul_apply_eq_of_fixed_involution (ResidueField.mapEquiv σ) hσb hne _ hu0
+        (by rw [hres, hσu])
     obtain ⟨z0, rfl⟩ := residue_surjective zb
     rw [hres, ← map_mul] at hzb
     have hN : z0 * σ z0 - u ∈ maximalIdeal K.O := by
@@ -234,24 +252,26 @@ theorem _root_.GlobalTheory.UnitLemma.UnramNorm.unram_quadratic_facts :
       exact ht (Ideal.add_mem _ h (hσm t h))
     obtain ⟨w0, hw0⟩ : ∃ w, z0 * w = 1 := ⟨↑hz0.unit⁻¹, hz0.mul_val_inv⟩
     set e0 := σ t * σ w0 with he0
-    have hz0e0 : z0 * σ e0 = t := by
-      rw [he0, map_mul, hσσ, hσσ, mul_left_comm, hw0, mul_one]
+    have hz0e0 : z0 * σ e0 = t := by rw [he0, map_mul, hσσ, hσσ, mul_left_comm, hw0, mul_one]
     have he0z0 : e0 * σ z0 = σ t := by
       rw [he0, mul_assoc, ← map_mul, mul_comm w0, hw0, map_one, mul_one]
     have he0u : IsUnit e0 := by
       rw [he0]
-      refine (htu.map σ).mul (IsUnit.map σ (⟨⟨w0, z0, by rw [mul_comm]; exact hw0, hw0⟩, rfl⟩ : IsUnit w0))
+      refine (htu.map σ).mul
+        (IsUnit.map σ (⟨⟨w0, z0, by rw [mul_comm]; exact hw0, hw0⟩, rfl⟩ : IsUnit w0))
     have ha2 : IsUnit (e0 * σ e0) := he0u.mul (he0u.map σ)
     obtain ⟨i2, hi2⟩ : ∃ i, e0 * σ e0 * i = 1 := ⟨↑ha2.unit⁻¹, ha2.mul_val_inv⟩
     have hi2u : IsUnit i2 := ⟨⟨i2, e0 * σ e0, by rw [mul_comm]; exact hi2, hi2⟩, rfl⟩
     set f : K.O[X] := X ^ 2 + C ((t + σ t) * i2) * X + C ((z0 * σ z0 - u) * i2) with hf
     have hfm : f.Monic := by rw [hf]; monicity!
-    obtain ⟨X0, hroot, hX0⟩ := HenselianRing.is_henselian (I := maximalIdeal K.O) f hfm 0
-      (by simpa [hf] using Ideal.mul_mem_right _ _ hN)
-      (by
-        have hd : (derivative f).eval 0 = (t + σ t) * i2 := by
-          rw [hf]; simp; first | done | rfl | ring
-        rw [hd]; exact (ha1.mul hi2u).map _)
+    obtain ⟨X0, hroot, hX0⟩ :=
+      HenselianRing.is_henselian (I := maximalIdeal K.O) f hfm 0
+        (by simpa [hf] using Ideal.mul_mem_right _ _ hN)
+        (by
+          have hd : (derivative f).eval 0 = (t + σ t) * i2 := by
+            rw [hf]; simp; first | done | rfl | ring
+          rw [hd]
+          exact (ha1.mul hi2u).map _)
     rw [sub_zero] at hX0
     have hE : e0 * σ e0 * X0 ^ 2 + (t + σ t) * X0 + (z0 * σ z0 - u) = 0 := by
       have h := hroot
@@ -289,10 +309,8 @@ theorem _root_.GlobalTheory.UnitLemma.UnramNorm.unram_quadratic_facts :
     rw [hspec, ← map_add (f := _), ← map_one (algebraMap K.O K.E)]
     congr 1
     have hz : t * w * s = t := by rw [mul_assoc, hws, mul_one]
-    have hz' : σ (t * w) * s = σ t := by
-      rw [← hσs, ← map_mul, hz]
-    have : (t * w + σ (t * w)) * s = 1 * s := by
-      rw [add_mul, hz, hz', one_mul]
+    have hz' : σ (t * w) * s = σ t := by rw [← hσs, ← map_mul, hz]
+    have : (t * w + σ (t * w)) * s = 1 * s := by rw [add_mul, hz, hz', one_mul]
     exact hs.mul_left_injective this
   · obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible K.O
     have hcϖ : Irreducible (σ ϖ) := (MulEquiv.irreducible_iff σ.toMulEquiv).mpr hϖ
@@ -300,8 +318,7 @@ theorem _root_.GlobalTheory.UnitLemma.UnramNorm.unram_quadratic_facts :
     obtain ⟨t, ht⟩ := exists_add_mul_cO_notMem_maximalIdeal K (e : K.O)
     have hw := (isUnit_iff_notMem_maximalIdeal K).mpr ht
     refine ⟨ϖ * t + σ (ϖ * t), ?_, ?_⟩
-    · have : ϖ * t + σ (ϖ * t) = ϖ * (t + ↑e * σ t) := by
-        rw [map_mul, ← he]; ring
+    · have : ϖ * t + σ (ϖ * t) = ϖ * (t + ↑e * σ t) := by rw [map_mul, ← he]; ring
       rw [this]
       exact (irreducible_mul_isUnit hw).mpr hϖ
     · rw [hspec]

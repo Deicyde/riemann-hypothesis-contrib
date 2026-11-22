@@ -10,9 +10,11 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem inner_casK_eq_sum {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {n : ℕ}
-    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (h : KUnit ε E) (x y : M) :
-    ⟪x, CasK ε E y⟫_ℂ = ∑ a, ∑ b, if ε a = ε b then ⟪E a b x, E a b y⟫_ℂ else 0 := by
+theorem inner_casK_eq_sum
+    {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+    {n : ℕ} {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (h : KUnit ε E)
+    (x y : M)
+    : ⟪x, CasK ε E y⟫_ℂ = ∑ a, ∑ b, if ε a = ε b then ⟪E a b x, E a b y⟫_ℂ else 0 := by
   unfold CasK
   rw [Finset.sum_comm]
   simp only [LinearMap.sum_apply, inner_sum]
@@ -22,11 +24,12 @@ theorem inner_casK_eq_sum {M : Type} [NormedAddCommGroup M] [InnerProductSpace �
   · rw [if_neg (fun e => hab e.symm), if_neg hab]
     simp
 
-theorem casK_isSymmetric_and_form :
-    ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (n : ℕ) (ε : Fin n → Bool)
-      (E : Fin n → Fin n → Module.End ℂ M), KUnit ε E →
-      LinearMap.IsSymmetric (CasK ε E) ∧
-        ∀ x, (⟪x, CasK ε E x⟫_ℂ).re = ∑ a, ∑ b, if ε a = ε b then ‖E a b x‖ ^ 2 else 0 := by
+theorem casK_isSymmetric_and_form
+    : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ M),
+      KUnit ε E
+        → LinearMap.IsSymmetric (CasK ε E)
+          ∧ ∀ x, (⟪x, CasK ε E x⟫_ℂ).re = ∑ a, ∑ b, if ε a = ε b then ‖E a b x‖ ^ 2 else 0 := by
   intro M _ _ n ε E h
   refine ⟨fun x y => ?_, fun x => ?_⟩
   · rw [← inner_conj_symm, inner_casK_eq_sum h, inner_casK_eq_sum h]

@@ -6,12 +6,13 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology
 
 namespace GlobalTheory.CycDec
 
-theorem exists_unit_infinite_order (l : ℕ) [Fact l.Prime] :
-    ∃ u : ℤ_[l]ˣ, ∀ n : ℤ, n ≠ 0 → u ^ n ≠ 1 := by
+theorem exists_unit_infinite_order (l : ℕ) [Fact l.Prime]
+    : ∃ u : ℤ_[l]ˣ, ∀ n : ℤ, n ≠ 0 → u ^ n ≠ 1 := by
   have hl : l.Prime := Fact.out
   have hu : IsUnit (1 + (l : ℤ_[l])) := by
     rw [← sub_neg_eq_add]
@@ -33,18 +34,18 @@ theorem exists_unit_infinite_order (l : ℕ) [Fact l.Prime] :
   · exact hl.ne_zero (by omega)
   · exact hn (Int.natAbs_eq_zero.1 h3)
 
-theorem exists_mem_Dec_cycZ_zpow_ne_one : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω]
-    [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (v : HeightOneSpectrum (𝓞 F))
-    (A : ValuationSubring Ω), ((l : ℕ) : 𝓞 F) ∈ v.asIdeal → IsPlaceOver A v → ∀ n : ℤ, n ≠ 0 →
-    ∃ g : G F Ω, g ∈ Dec (F := F) A ∧ cycZ F Ω l g ^ n ≠ 1 := by
+theorem exists_mem_Dec_cycZ_zpow_ne_one
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (v : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω),
+      ((l : ℕ) : 𝓞 F) ∈ v.asIdeal → IsPlaceOver A v
+        → ∀ n : ℤ, n ≠ 0 → ∃ g : G F Ω, g ∈ Dec (F := F) A ∧ cycZ F Ω l g ^ n ≠ 1 := by
   intro F Ω _ _ _ _ _ l _ v A hl hA n hn
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   have : Algebra.IsAlgebraic ℚ Ω := Algebra.IsAlgebraic.trans ℚ F Ω
   have : IsAlgClosure ℚ Ω := ⟨inferInstance, inferInstance⟩
   have : IsGalois ℚ Ω := IsAlgClosure.isGalois ℚ Ω
-  have hv : A.valuation (l : Ω) < 1 := by
-    simpa using (hA _).2 hl
+  have hv : A.valuation (l : Ω) < 1 := by simpa using (hA _).2 hl
   obtain ⟨u, hu⟩ := exists_unit_infinite_order l
   obtain ⟨σ, hσ, hσu⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l A hv u
   let K : IntermediateField ℚ Ω := (IsScalarTower.toAlgHom ℚ F Ω).fieldRange
@@ -53,10 +54,13 @@ theorem exists_mem_Dec_cycZ_zpow_ne_one : ∀ (F Ω : Type) [Field F] [NumberFie
   have : Finite ((Ω ≃ₐ[ℚ] Ω) ⧸ K.fixingSubgroup) :=
     Subgroup.quotient_finite_of_isOpen _ K.fixingSubgroup_isOpen
   have : K.fixingSubgroup.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
-  obtain ⟨N, hN, -, hmem⟩ := Subgroup.exists_pow_mem_of_index_ne_zero
-    (Subgroup.FiniteIndex.index_ne_zero (H := K.fixingSubgroup)) σ
-  let g : G F Ω := { (σ ^ N).toRingEquiv with
-    commutes' := fun x => (IntermediateField.mem_fixingSubgroup_iff _ _).1 hmem _ ⟨x, rfl⟩ }
+  obtain ⟨N, hN, -, hmem⟩ :=
+    Subgroup.exists_pow_mem_of_index_ne_zero
+      (Subgroup.FiniteIndex.index_ne_zero (H := K.fixingSubgroup)) σ
+  let g : G F Ω := {
+    (σ ^ N).toRingEquiv with
+    commutes' := fun x => (IntermediateField.mem_fixingSubgroup_iff _ _).1 hmem _ ⟨x, rfl⟩
+  }
   have hD : σ ^ N ∈ Dec (F := ℚ) A := (Dec (F := ℚ) A).pow_mem (Ine_le_Dec A hσ) N
   have hc : cycZ F Ω l g = cycZ ℚ Ω l (σ ^ N) := rfl
   refine ⟨g, hD, ?_⟩

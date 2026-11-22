@@ -11,8 +11,8 @@ noncomputable section
 
 namespace Deduction
 
-theorem landau_pole_asym_deriv (c ρ z : ℂ) (k : ℕ) :
-    iteratedDeriv k (fun s : ℂ => c * (s - ρ)⁻¹) z
+theorem landau_pole_asym_deriv (c ρ z : ℂ) (k : ℕ)
+    : iteratedDeriv k (fun s : ℂ => c * (s - ρ)⁻¹) z
       = c * ((-1) ^ k * (k.factorial : ℂ) * ((z - ρ) ^ (k + 1))⁻¹) := by
   rw [iteratedDeriv_const_mul_field]
   congr 1
@@ -20,12 +20,14 @@ theorem landau_pole_asym_deriv (c ρ z : ℂ) (k : ℕ) :
   rw [e, iteratedDeriv_eq_iterate, show (fun t : ℂ => t⁻¹) = Inv.inv from rfl, iter_deriv_inv,
     show (-1 - k : ℤ) = -((k + 1 : ℕ) : ℤ) by push_cast; ring, zpow_neg, zpow_natCast]
 
-theorem landau_pole_asym {Φ : ℂ → ℂ} {z ρ c : ℂ} {r r' : ℝ} (hρ : ρ ∈ Metric.ball z r) (hne : ρ ≠ z)
-    (hd : DifferentiableOn ℂ Φ (Metric.ball z r \ {ρ}))
-    (hp : ∃ h : ℂ → ℂ, AnalyticAt ℂ h ρ ∧ ∀ᶠ s in 𝓝[≠] ρ, Φ s = c / (s - ρ) + h s)
-    (h0 : 0 < r') (h1 : r' < r) :
-    ∃ M : ℝ, ∀ k : ℕ,
-      ‖(-1) ^ k * iteratedDeriv k Φ z / (k.factorial : ℂ) - c / (z - ρ) ^ (k + 1)‖ ≤ M / r' ^ k := by
+theorem landau_pole_asym
+    {Φ : ℂ → ℂ} {z ρ c : ℂ} {r r' : ℝ}
+    (hρ : ρ ∈ Metric.ball z r) (hne : ρ ≠ z) (hd : DifferentiableOn ℂ Φ (Metric.ball z r \ {ρ}))
+    (hp : ∃ h : ℂ → ℂ, AnalyticAt ℂ h ρ ∧ ∀ᶠ s in 𝓝[≠] ρ, Φ s = c / (s - ρ) + h s) (h0 : 0 < r')
+    (h1 : r' < r)
+    : ∃ M : ℝ, ∀ k : ℕ,
+      ‖(-1) ^ k * iteratedDeriv k Φ z / (k.factorial : ℂ) - c / (z - ρ) ^ (k + 1)‖
+        ≤ M / r' ^ k := by
   obtain ⟨hfun, han, hev⟩ := hp
   have hopen : IsOpen (Metric.ball z r \ {ρ}) := Metric.isOpen_ball.sdiff isClosed_singleton
   set G : ℂ → ℂ := fun s => if s = ρ then hfun ρ else Φ s - c / (s - ρ) with hG
@@ -50,8 +52,8 @@ theorem landau_pole_asym {Φ : ℂ → ℂ} {z ρ c : ℂ} {r r' : ℝ} (hρ : �
         have htρ : t ≠ ρ := ht.2
         simp only [G, if_neg htρ]
       have hd' : DifferentiableAt ℂ (fun t => Φ t - c / (t - ρ)) s :=
-        hΦ.sub ((differentiableAt_const c).div
-          (differentiableAt_id.sub (differentiableAt_const ρ)) (sub_ne_zero.mpr hsρ))
+        hΦ.sub ((differentiableAt_const c).div (differentiableAt_id.sub (differentiableAt_const ρ))
+          (sub_ne_zero.mpr hsρ))
       exact ((hloc.differentiableAt_iff).mpr hd').differentiableWithinAt
   obtain ⟨M, hM⟩ := landau_cauchy hGd h0 h1
   refine ⟨M, fun k => ?_⟩
@@ -74,10 +76,13 @@ theorem landau_pole_asym {Φ : ℂ → ℂ} {z ρ c : ℂ} {r r' : ℝ} (hρ : �
   have hpow : ((-1 : ℂ)) ^ k * (-1) ^ k = 1 := by rw [← mul_pow]; norm_num
   set iG := iteratedDeriv k G z
   set X := (z - ρ) ^ (k + 1)
-  have e : (-1) ^ k * (iG + c * ((-1) ^ k * (k.factorial : ℂ) * X⁻¹)) / (k.factorial : ℂ) - c / X
-      = (-1) ^ k * (iG / k.factorial) := by
-    calc _ = (-1) ^ k * (iG / k.factorial) + ((-1) ^ k * (-1) ^ k) * c *
-          ((k.factorial : ℂ) / k.factorial) * X⁻¹ - c / X := by ring
+  have e
+      : (-1) ^ k * (iG + c * ((-1) ^ k * (k.factorial : ℂ) * X⁻¹)) / (k.factorial : ℂ) - c / X
+        = (-1) ^ k * (iG / k.factorial) := by
+    calc
+      _ = (-1) ^ k * (iG / k.factorial)
+          + ((-1) ^ k * (-1) ^ k) * c * ((k.factorial : ℂ) / k.factorial) * X⁻¹ - c / X := by
+        ring
       _ = _ := by rw [hpow, div_self hfac, div_eq_mul_inv c]; ring
   rw [e, norm_mul, norm_pow, norm_neg, norm_one, one_pow, one_mul]
   exact hM k

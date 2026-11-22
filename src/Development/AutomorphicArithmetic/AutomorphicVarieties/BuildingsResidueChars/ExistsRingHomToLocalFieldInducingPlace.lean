@@ -35,10 +35,12 @@ private def embeddingPrimeIdeal (σ : K →+* k) : Ideal (𝓞 K) where
     intro c x hx
     change ‖σ (algebraMap (𝓞 K) K (c * x))‖ < 1
     rw [map_mul, map_mul, norm_mul]
-    exact lt_of_le_of_lt (mul_le_of_le_one_left (norm_nonneg _) (norm_ringHom_integer_le_one σ c)) hx
+    exact lt_of_le_of_lt (mul_le_of_le_one_left (norm_nonneg _) (norm_ringHom_integer_le_one σ c))
+      hx
 
-private theorem norm_embedding_eq_one_of_not_mem (σ : K →+* k) (x : 𝓞 K) (hx : x ∉ embeddingPrimeIdeal σ) :
-    ‖σ (algebraMap (𝓞 K) K x)‖ = 1 :=
+private theorem norm_embedding_eq_one_of_not_mem
+    (σ : K →+* k) (x : 𝓞 K) (hx : x ∉ embeddingPrimeIdeal σ)
+    : ‖σ (algebraMap (𝓞 K) K x)‖ = 1 :=
   le_antisymm (norm_ringHom_integer_le_one σ x) (not_lt.1 hx)
 
 private theorem embedding_ideal_prime (σ : K →+* k) : (embeddingPrimeIdeal σ).IsPrime := by
@@ -50,25 +52,30 @@ private theorem embedding_ideal_prime (σ : K →+* k) : (embeddingPrimeIdeal σ
     by_contra hc
     push Not at hc
     change ‖σ (algebraMap (𝓞 K) K (x * y))‖ < 1 at hxy
-    rw [map_mul, map_mul, norm_mul, norm_embedding_eq_one_of_not_mem σ x hc.1, norm_embedding_eq_one_of_not_mem σ y hc.2, one_mul] at hxy
+    rw [map_mul, map_mul, norm_mul, norm_embedding_eq_one_of_not_mem σ x hc.1,
+        norm_embedding_eq_one_of_not_mem σ y hc.2, one_mul]
+      at hxy
     exact lt_irrefl _ hxy
 
-private theorem exists_embedding_prime_above [NumberField K] [CharZero k] [IsAlgClosed k] {l : ℕ} (hp : l.Prime) (hk : ‖(l : k)‖ < 1)
-    (w : HeightOneSpectrum (𝓞 K)) (hl : (l : 𝓞 K) ∈ w.asIdeal) :
-    ∃ σ : K →+* k, embeddingPrimeIdeal σ = w.asIdeal := by
+private theorem exists_embedding_prime_above
+    [NumberField K] [CharZero k] [IsAlgClosed k]
+    {l : ℕ} (hp : l.Prime) (hk : ‖(l : k)‖ < 1)
+    (w : HeightOneSpectrum (𝓞 K)) (hl : (l : 𝓞 K) ∈ w.asIdeal)
+    : ∃ σ : K →+* k, embeddingPrimeIdeal σ = w.asIdeal := by
   classical
   by_contra hne
   push Not at hne
   have σ0 : K →ₐ[ℚ] k := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
-  have hnot : ¬ ((w.asIdeal : Set (𝓞 K)) ⊆ ⋃ σ ∈ ((Finset.univ : Finset (K →ₐ[ℚ] k)) : Set (K →ₐ[ℚ] k)),
-      (embeddingPrimeIdeal (σ : K →+* k) : Set (𝓞 K))) := by
+  have hnot : ¬((w.asIdeal : Set (𝓞 K))
+      ⊆ ⋃ σ ∈ ((Finset.univ : Finset (K →ₐ[ℚ] k)) : Set (K →ₐ[ℚ] k)),
+        (embeddingPrimeIdeal (σ : K →+* k) : Set (𝓞 K))) := by
     rw [Ideal.subset_union_prime σ0 σ0 (fun σ _ _ _ => embedding_ideal_prime _)]
     rintro ⟨σ, -, hle⟩
-    exact hne σ (((w.isPrime.isMaximal w.ne_bot).eq_of_le (embedding_ideal_prime _).ne_top hle).symm)
+    exact hne σ
+      (((w.isPrime.isMaximal w.ne_bot).eq_of_le (embedding_ideal_prime _).ne_top hle).symm)
   obtain ⟨a, haw, ha⟩ := Set.not_subset.1 hnot
   have h1 : ∀ σ : K →ₐ[ℚ] k, ‖σ (a : K)‖ = 1 := by
     intro σ

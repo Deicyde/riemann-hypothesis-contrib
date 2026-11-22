@@ -10,7 +10,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnitaryI
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -19,22 +20,28 @@ namespace PositivityTheory.Rg.BcB.F.Inert
 
 theorem satEx : SatEx := by
   intro E _ _ _ n w hw b ϖ q hb hϖ hU σ ha hfix
-  have hUL : UL n w = UJ (cj w) 1 := GlobalTheory.CompanionTheory.UnitaryWitt.UL_eq_of_not_split hw n
+  have hUL : UL n w = UJ (cj w) 1 :=
+    GlobalTheory.CompanionTheory.UnitaryWitt.UL_eq_of_not_split hw n
   let a := GlobalTheory.UnitaryBC.SatEx.toAnti b hb.2
   have hac := GlobalTheory.UnitaryBC.SatEx.continuous_toAnti b hb.2
   let p : UL n w ≃* GU (cj w) n := (MulEquiv.subgroupCongr hUL).trans a
   have hp : ∀ x, (p x).1 = b⁻¹ * x.1 * b := fun x => rfl
   have hpc : Continuous p := hac.1.comp (continuous_subtype_val.subtype_mk _)
   have hpsc : Continuous p.symm := (continuous_subtype_val.comp hac.2).subtype_mk _
-  let hh : UL n w ≃ₜ GU (cj w) n :=
-    { toEquiv := p.toEquiv, continuous_toFun := hpc, continuous_invFun := hpsc }
-  let σ' : SmIrr (GU (cj w) n) :=
-    { V := σ.V
-      ρ := σ.ρ.comp p.symm.toMonoidHom
-      smooth := fun v => (σ.smooth v).preimage hpsc
-      irred := GlobalTheory.ConjPairLoc.irred_comp _ _ p.symm.surjective σ.irred }
-  have hfx : ∀ (K : Subgroup (GU (cj w) n)) (v : σ.V),
-      v ∈ fixed σ'.ρ K ↔ v ∈ fixed σ.ρ (K.comap p.toMonoidHom) := by
+  let hh : UL n w ≃ₜ GU (cj w) n := {
+    toEquiv := p.toEquiv
+    continuous_toFun := hpc
+    continuous_invFun := hpsc
+  }
+  let σ' : SmIrr (GU (cj w) n) := {
+    V := σ.V
+    ρ := σ.ρ.comp p.symm.toMonoidHom
+    smooth := fun v => (σ.smooth v).preimage hpsc
+    irred := GlobalTheory.ConjPairLoc.irred_comp _ _ p.symm.surjective σ.irred
+  }
+  have hfx
+      : ∀ (K : Subgroup (GU (cj w) n)) (v : σ.V),
+        v ∈ fixed σ'.ρ K ↔ v ∈ fixed σ.ρ (K.comap p.toMonoidHom) := by
     intro K v
     constructor
     · intro h
@@ -54,15 +61,18 @@ theorem satEx : SatEx := by
     exact ha.2 _ (ho.preimage hpc) (hh.isCompact_preimage.2 hc)
   have hs' : GlobalTheory.LGrp.IsSpherical σ'.ρ (KU (cj w) n) := by
     obtain ⟨v, hv, h0⟩ := (Submodule.ne_bot_iff _).1 hfix
-    refine (Submodule.ne_bot_iff _).2 ⟨v, (hfx _ v).2 (GlobalTheory.LGrp.mem_fixed.2 fun k hk => ?_), h0⟩
-    have hk1 : (p k).1 ∈ GlobalTheory.LFun.KGL w (n := n) := (Subgroup.mem_subgroupOf.1 (Subgroup.mem_comap.1 hk)).2
+    refine (Submodule.ne_bot_iff _).2
+      ⟨v, (hfx _ v).2 (GlobalTheory.LGrp.mem_fixed.2 fun k hk => ?_), h0⟩
+    have hk1 : (p k).1 ∈ GlobalTheory.LFun.KGL w (n := n) :=
+      (Subgroup.mem_subgroupOf.1 (Subgroup.mem_comap.1 hk)).2
     have e : k.1 = b * (p k).1 * b⁻¹ := by rw [hp]; group
     have hk2 : k.1 ∈ GlobalTheory.LFun.KGL w (n := n) := by
       rw [e]
       exact mul_mem (mul_mem hb.1 hk1) (inv_mem hb.1)
     exact GlobalTheory.LGrp.mem_fixed.1 hv k (Subgroup.mem_subgroupOf.2 hk2)
-  obtain ⟨α, hα⟩ := GlobalTheory.LFun.ExSatU.exists_hasSatU E w (ϖ : w.adicCompletion E) (cj w) q n hU σ'.V σ'.ρ
-    σ'.irred ha' hs'
+  obtain ⟨α, hα⟩ :=
+    GlobalTheory.LFun.ExSatU.exists_hasSatU E w (ϖ : w.adicCompletion E) (cj w) q n hU σ'.V σ'.ρ
+      σ'.irred ha' hs'
   have hcomp : σ'.ρ.comp p.toMonoidHom = σ.ρ := by
     ext g v
     show σ.ρ (p.symm (p g)) v = σ.ρ g v

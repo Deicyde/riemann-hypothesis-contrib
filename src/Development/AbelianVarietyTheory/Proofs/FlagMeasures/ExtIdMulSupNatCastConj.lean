@@ -12,7 +12,8 @@ open scoped InnerProductSpace ComplexOrder TensorProduct Pointwise Classical
 
 namespace GlobalTheory.RowLev
 
-theorem extId_eq_map_psi (I : AutInst) (𝔞 : Ideal (𝓞 I.E)) : extId I 𝔞 = 𝔞.map (Inhab.psi I.F I.E) := by
+theorem extId_eq_map_psi (I : AutInst) (𝔞 : Ideal (𝓞 I.E))
+    : extId I 𝔞 = 𝔞.map (Inhab.psi I.F I.E) := by
   unfold extId Ideal.map
   congr 1
   ext z
@@ -22,7 +23,18 @@ theorem extId_eq_map_psi (I : AutInst) (𝔞 : Ideal (𝓞 I.E)) : extId I 𝔞 
   · rintro ⟨a, ha, rfl⟩
     exact ⟨a, ha, rfl⟩
 
-theorem extId_mul_sup_natCast_conj : ∀ (I : AutInst), (∀ 𝔞 𝔟 : Ideal (𝓞 I.E), extId I (𝔞 * 𝔟) = extId I 𝔞 * extId I 𝔟) ∧ (∀ 𝔞 𝔟 : Ideal (𝓞 I.E), 𝔞 ⊔ 𝔟 = ⊤ → extId I 𝔞 ⊔ extId I 𝔟 = ⊤) ∧ (∀ m : ℕ, extId I (Ideal.span {(m : 𝓞 I.E)}) = Ideal.span {(m : IntAf I.F I.E)}) ∧ (∀ w : HeightOneSpectrum (𝓞 I.E), ∃ w', IsConj I w w') ∧ (∀ w w' : HeightOneSpectrum (𝓞 I.E), IsConj I w w' → IsConj I w' w) ∧ (∀ w w' w'' : HeightOneSpectrum (𝓞 I.E), IsConj I w w' → IsConj I w w'' → w' = w'') ∧ ∀ w w' : HeightOneSpectrum (𝓞 I.E), IsConj I w w' → ∀ z ∈ extId I w.asIdeal, ∃ z' ∈ extId I w'.asIdeal, (z' : (I.E ⊗[I.F] Af I.F)) = Formalism.UG.sigR I.cm.sig (Af I.F) z := by
+theorem extId_mul_sup_natCast_conj
+    : ∀ (I : AutInst),
+      (∀ 𝔞 𝔟 : Ideal (𝓞 I.E), extId I (𝔞 * 𝔟) = extId I 𝔞 * extId I 𝔟)
+        ∧ (∀ 𝔞 𝔟 : Ideal (𝓞 I.E), 𝔞 ⊔ 𝔟 = ⊤ → extId I 𝔞 ⊔ extId I 𝔟 = ⊤)
+        ∧ (∀ m : ℕ, extId I (Ideal.span {(m : 𝓞 I.E)}) = Ideal.span {(m : IntAf I.F I.E)})
+        ∧ (∀ w : HeightOneSpectrum (𝓞 I.E), ∃ w', IsConj I w w')
+        ∧ (∀ w w' : HeightOneSpectrum (𝓞 I.E), IsConj I w w' → IsConj I w' w)
+        ∧ (∀ w w' w'' : HeightOneSpectrum (𝓞 I.E), IsConj I w w' → IsConj I w w'' → w' = w'')
+        ∧ ∀ w w' : HeightOneSpectrum (𝓞 I.E),
+          IsConj I w w'
+            → ∀ z ∈ extId I w.asIdeal, ∃ z' ∈ extId I w'.asIdeal,
+              (z' : (I.E ⊗[I.F] Af I.F)) = Formalism.UG.sigR I.cm.sig (Af I.F) z := by
   intro I
   let st : 𝓞 I.E →+* 𝓞 I.E := RingOfIntegers.mapRingHom (starRingEnd I.E)
   have hst : ∀ a : 𝓞 I.E, (st a : I.E) = star (a : I.E) := fun a => rfl
@@ -30,8 +42,15 @@ theorem extId_mul_sup_natCast_conj : ∀ (I : AutInst), (∀ 𝔞 𝔟 : Ideal (
   have hsurj : Function.Surjective st := fun a => ⟨st a, hst2 a⟩
   have hsig : ∀ z ∈ IntAf I.F I.E, Formalism.UG.sigR I.cm.sig (Af I.F) z ∈ IntAf I.F I.E :=
     (intAf_approx_inter_unit_conj I 1 le_rfl).2.2.2
-  refine ⟨fun a b => ?_, fun a b h => ?_, fun m => ?_, fun w => ?_, fun w w' h => ?_,
-    fun w w' w'' h h' => ?_, fun w w' h z hz => ?_⟩
+  refine ⟨
+    fun a b => ?_,
+    fun a b h => ?_,
+    fun m => ?_,
+    fun w => ?_,
+    fun w w' h => ?_,
+    fun w w' w'' h h' => ?_,
+    fun w w' h z hz => ?_
+  ⟩
   · simp only [extId_eq_map_psi, Ideal.map_mul]
   · simp only [extId_eq_map_psi, ← Ideal.map_sup, h, Ideal.map_top]
   · rw [extId_eq_map_psi, Ideal.map_span, Set.image_singleton, map_natCast]

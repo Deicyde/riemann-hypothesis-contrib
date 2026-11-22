@@ -8,9 +8,11 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Delt
 
 namespace GlobalTheory.BSP
 
-theorem exists_ringHom_comp_of_isCompl : ∀ (L : Type) [CommRing L] (Q : Type) [CommRing Q] (C : Type) [CommRing C]
-    (i : L →+* Q) (J : Ideal L) (JC : Ideal C), IsCompl i J → IsAdicComplete JC C →
-    ∀ g : L →+* C, J.map g ≤ JC → ∃ h : Q →+* C, h.comp i = g := by
+theorem exists_ringHom_comp_of_isCompl
+    : ∀ (L : Type) [CommRing L] (Q : Type) [CommRing Q] (C : Type) [CommRing C] (i : L →+* Q)
+        (J : Ideal L) (JC : Ideal C),
+      IsCompl i J → IsAdicComplete JC C
+        → ∀ g : L →+* C, J.map g ≤ JC → ∃ h : Q →+* C, h.comp i = g := by
   intro L _ Q _ C _ i J JC hi hC g hg
   haveI := hC
 

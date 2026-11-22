@@ -21,24 +21,26 @@ def ordH {n : ℕ} (h : ZMod n) : ℕ := addOrderOf h
 
 def rho (D : D7) (τ g : D.R.GG) : D.R.GG := D.R.cc * g * τ
 
-
 open Classical in
 def frob (D : D7) (p : ℕ) : D.R.GG :=
-  if h : ∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, ∃ P : Ideal (𝓞 D.host.E),
-      P.IsPrime ∧ P.LiesOver (Ideal.span {(p : ℤ)}) ∧ IsArithFrobAt ℤ σ P
-  then D.host.galE h.choose else 1
+  if h
+      : ∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, ∃ P : Ideal (𝓞 D.host.E),
+        P.IsPrime ∧ P.LiesOver (Ideal.span {(p : ℤ)}) ∧ IsArithFrobAt ℤ σ P then
+    D.host.galE h.choose
+  else
+    1
 
 def hOf (e l : ℕ) : ZMod (2 ^ e) :=
   if h : Nat.Coprime l 2 then
     iotaHInv e (hcl e (ZMod.unitOfCoprime l (Nat.Coprime.pow_right (e + 2) h)))
-  else 0
+  else
+    0
 
 def sgc0 : G0 := ((-1 : ℤˣ), (1 : ℤˣ)) * c0
 
 def PhiEmb (D : D7) : Set (D.host.E →+* ℂ) := D.host.emb '' (D.R.Psi : Set (D.R.GG))
 
-def rdF (D : D7) : ℝ :=
-  |(discr D.host.F : ℝ)| ^ ((1 : ℝ) / (Module.finrank ℚ D.host.F : ℝ))
+def rdF (D : D7) : ℝ := |(discr D.host.F : ℝ)| ^ ((1 : ℝ) / (Module.finrank ℚ D.host.F : ℝ))
 
 abbrev thick (D : D7) : Finset (D.R.GG) := D.host.thickPlaces
 

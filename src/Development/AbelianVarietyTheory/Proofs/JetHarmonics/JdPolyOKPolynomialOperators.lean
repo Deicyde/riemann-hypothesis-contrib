@@ -12,7 +12,8 @@ noncomputable section
 
 namespace GlobalTheory.HatNF
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -54,39 +55,54 @@ private lemma Dw_smul_const (w : List (Bool × B.Mat k r)) (f : B.Mat k r → �
     rw [ih]
     exact Dx_smul_const x _ v
 
-theorem polyOK_star {N a : ℕ} {P : Matrix (Fin N) (Fin N) ℂ → ℂ} (h : IsPolyDeg a P) :
-    IsPolyDeg a (fun g => star (P g)) := by
+theorem polyOK_star {N a : ℕ} {P : Matrix (Fin N) (Fin N) ℂ → ℂ} (h : IsPolyDeg a P)
+    : IsPolyDeg a (fun g => star (P g)) := by
   obtain ⟨q, hq, hPq⟩ := h
 
   refine ⟨MvPolynomial.rename Sum.swap (MvPolynomial.map (starRingEnd ℂ) q), ?_, ?_⟩
   · refine (MvPolynomial.totalDegree_rename_le _ _).trans (le_trans ?_ hq)
-    exact MvPolynomial.totalDegree_le_of_support_subset (MvPolynomial.support_map_subset (f := starRingEnd ℂ) q)
+    exact MvPolynomial.totalDegree_le_of_support_subset (MvPolynomial.support_map_subset
+      (f := starRingEnd ℂ) q)
   · intro g
 
-    have key : ∀ (p : MvPolynomial ((Fin N × Fin N) ⊕ (Fin N × Fin N)) ℂ) (y : (Fin N × Fin N) ⊕ (Fin N × Fin N) → ℂ),
-        star (MvPolynomial.eval y p) = MvPolynomial.eval₂ (starRingEnd ℂ) (fun i => star (y i)) p := by
+    have key
+        : ∀ (p : MvPolynomial ((Fin N × Fin N) ⊕ (Fin N × Fin N)) ℂ)
+            (y : (Fin N × Fin N) ⊕ (Fin N × Fin N) → ℂ),
+          star (MvPolynomial.eval y p)
+            = MvPolynomial.eval₂ (starRingEnd ℂ) (fun i => star (y i)) p := by
       intro p y
       induction p using MvPolynomial.induction_on with
       | C c => rw [MvPolynomial.eval_C, MvPolynomial.eval₂_C, Complex.star_def]
       | add p p' hp hp' => rw [map_add (f := _), star_add, hp, hp', MvPolynomial.eval₂_add]
       | mul_X p i hp =>
-        rw [map_mul, star_mul', hp, MvPolynomial.eval_X, MvPolynomial.eval₂_mul, MvPolynomial.eval₂_X]
+        rw [map_mul, star_mul', hp, MvPolynomial.eval_X, MvPolynomial.eval₂_mul,
+          MvPolynomial.eval₂_X]
     show star (P g) = _
     rw [MvPolynomial.eval_rename, MvPolynomial.eval_map, hPq g, key]
     congr 1
     funext i
     rcases i with ⟨a, b⟩ | ⟨a, b⟩ <;> simp
 
-theorem polyOK_ck {κ : ℕ} {P : B.Mat k r → ℂ} (hP : IsPolyDeg κ P) (v : E) (UU : Set (B.Mat k r)) :
-    B.CkOn ⊤ UU (fun g => P g • v) := by
+theorem polyOK_ck {κ : ℕ} {P : B.Mat k r → ℂ} (hP : IsPolyDeg κ P) (v : E) (UU : Set (B.Mat k r))
+    : B.CkOn ⊤ UU (fun g => P g • v) := by
   obtain ⟨hs, -⟩ := polynomial_bound k r κ P hP
   intro g₀ _
-  exact ⟨Set.univ, fun g => P g • v, isOpen_univ, Set.mem_univ _,
-    (hs.smul contDiff_const).contDiffOn, fun _ _ _ => rfl⟩
+  exact ⟨
+    Set.univ,
+    fun g => P g • v,
+    isOpen_univ,
+    Set.mem_univ _,
+    (hs.smul contDiff_const).contDiffOn,
+    fun _ _ _ => rfl
+  ⟩
 
-theorem polyOK_bound {κ : ℕ} {P : B.Mat k r → ℂ} (hP : IsPolyDeg κ P) (v : E) {d : ℝ} (hd : (κ : ℝ) ≤ d) (m : ℕ) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ u w : List (B.Mat k r), (∀ X ∈ u, B.unitLie k r X) → (∀ X ∈ w, B.unitLie k r X) →
-      u.length + w.length ≤ m → ∀ g ∈ B.GV k r, ‖B.dLR u w (fun g => P g • v) g‖ ≤ C * B.gN g ^ d := by
+theorem polyOK_bound
+    {κ : ℕ} {P : B.Mat k r → ℂ} (hP : IsPolyDeg κ P) (v : E) {d : ℝ} (hd : (κ : ℝ) ≤ d) (m : ℕ)
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ u w : List (B.Mat k r),
+          (∀ X ∈ u, B.unitLie k r X) → (∀ X ∈ w, B.unitLie k r X) → u.length + w.length ≤ m
+            → ∀ g ∈ B.GV k r, ‖B.dLR u w (fun g => P g • v) g‖ ≤ C * B.gN g ^ d := by
   obtain ⟨-, hB⟩ := polynomial_bound k r κ P hP
   obtain ⟨C₀, hC₀⟩ := hB m
   refine ⟨max C₀ 0 * ‖v‖, mul_nonneg (le_max_right _ _) (norm_nonneg _), ?_⟩
@@ -102,8 +118,9 @@ theorem polyOK_bound {κ : ℕ} {P : B.Mat k r → ℂ} (hP : IsPolyDeg κ P) (v
     h1.trans ((mul_le_mul_of_nonneg_right (le_max_left _ _) e0).trans
       (mul_le_mul_of_nonneg_left hpow (le_max_right _ _)))
   rw [dLR_eq, Dw_smul_const, norm_smul]
-  calc ‖Dw (wL u ++ wR w) P g‖ * ‖v‖ ≤ max C₀ 0 * B.gN g ^ d * ‖v‖ :=
-        mul_le_mul_of_nonneg_right hC (norm_nonneg _)
+  calc
+    ‖Dw (wL u ++ wR w) P g‖ * ‖v‖
+      ≤ max C₀ 0 * B.gN g ^ d * ‖v‖ := mul_le_mul_of_nonneg_right hC (norm_nonneg _)
     _ = max C₀ 0 * ‖v‖ * B.gN g ^ d := by ring
 
 end aux
@@ -126,11 +143,14 @@ theorem polyOp_ok : Formalism.FourierDecayAlt.P.CutMP.JDPolyOK := by
       show T.coefAdj = fun g => star (P g) • ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp) from funext hca]
     refine ⟨polyOK_ck hP _ _, polyOK_ck (polyOK_star hP) _ _, fun m => ?_⟩
     obtain ⟨C₁, -, h₁⟩ := polyOK_bound hP (ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp)) hd m
-    obtain ⟨C₂, -, h₂⟩ := polyOK_bound (polyOK_star hP) (ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp)) hd m
+    obtain ⟨C₂, -, h₂⟩ :=
+      polyOK_bound (polyOK_star hP) (ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp)) hd m
     refine ⟨max C₁ C₂, fun u w hu hw hl g hg => ?_⟩
     have hx : 0 ≤ B.gN g ^ d := Real.rpow_nonneg (zero_le_one.trans (gN_ge_one hg)) d
-    exact ⟨(h₁ u w hu hw hl g hg).trans (mul_le_mul_of_nonneg_right (le_max_left _ _) hx),
-      (h₂ u w hu hw hl g hg).trans (mul_le_mul_of_nonneg_right (le_max_right _ _) hx)⟩
+    exact ⟨
+      (h₁ u w hu hw hl g hg).trans (mul_le_mul_of_nonneg_right (le_max_left _ _) hx),
+      (h₂ u w hu hw hl g hg).trans (mul_le_mul_of_nonneg_right (le_max_right _ _) hx)
+    ⟩
   · show (Θ.map fun T => T.word.length).foldr max 0 ≤ o
     refine foldr_max_zero_le_of_forall_le _ fun a ha => ?_
     obtain ⟨T, hT, rfl⟩ := List.mem_map.mp ha

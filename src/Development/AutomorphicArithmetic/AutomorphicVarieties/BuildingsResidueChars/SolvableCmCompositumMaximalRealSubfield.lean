@@ -4,31 +4,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published UpperTheory.V.Af.Sol
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published UpperTheory.V.Af.Sol
 
-private theorem rcsup_mem_real {L M' : Type} [Field L] [Field M'] (f : L →+* M') (hL : IsTotallyReal L) (x : L) :
-    f x ∈ maximalRealSubfield M' := by
+private theorem rcsup_mem_real
+    {L M' : Type} [Field L] [Field M'] (f : L →+* M') (hL : IsTotallyReal L) (x : L)
+    : f x ∈ maximalRealSubfield M' := by
   intro φ
-  have h : x ∈ maximalRealSubfield L := by
-    rw [IsTotallyReal.maximalRealSubfield_eq_top]; trivial
+  have h : x ∈ maximalRealSubfield L := by rw [IsTotallyReal.maximalRealSubfield_eq_top]; trivial
   exact h (φ.comp f)
 
-private theorem rcsup_map_real {M M' : Type} [Field M] [Field M'] (g : M →+* M') {x : M}
-    (hx : x ∈ maximalRealSubfield M) : g x ∈ maximalRealSubfield M' :=
-  fun φ => hx (φ.comp g)
+private theorem rcsup_map_real
+    {M M' : Type} [Field M] [Field M'] (g : M →+* M') {x : M} (hx : x ∈ maximalRealSubfield M)
+    : g x ∈ maximalRealSubfield M' := fun φ =>
+  hx (φ.comp g)
 
-private theorem rcsup_cm_of_pair {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (d : K) (hd0 : d ≠ 0)
-    (hd : ∀ φ : K →+* ℂ, star (φ d) = - φ d)
-    (hspan : ∀ y : K, ∃ a ∈ maximalRealSubfield K, ∃ b ∈ maximalRealSubfield K, y = a + b * d) :
-    IsCMField K := by
+private theorem rcsup_cm_of_pair
+    {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    (d : K) (hd0 : d ≠ 0) (hd : ∀ φ : K →+* ℂ, star (φ d) = - φ d)
+    (hspan : ∀ y : K, ∃ a ∈ maximalRealSubfield K, ∃ b ∈ maximalRealSubfield K, y = a + b * d)
+    : IsCMField K := by
   have hli : LinearIndependent (maximalRealSubfield K) ![(1 : K), d] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
     let φ : K →+* ℂ := Classical.choice (inferInstance : Nonempty _)
-    have h0 : (s : K) + (t : K) * d = 0 := by
-      simpa [Subfield.smul_def] using hst
-    have h1 : φ s + φ t * φ d = 0 := by
-      rw [← map_mul, ← map_add (f := _), h0, map_zero]
+    have h0 : (s : K) + (t : K) * d = 0 := by simpa [Subfield.smul_def] using hst
+    have h1 : φ s + φ t * φ d = 0 := by rw [← map_mul, ← map_add (f := _), h0, map_zero]
     have h2 : φ s - φ t * φ d = 0 := by
       have := congrArg star h1
       rw [star_add, star_mul', s.2 φ, t.2 φ, hd φ, star_zero] at this
@@ -42,7 +45,10 @@ private theorem rcsup_cm_of_pair {K : Type} [Field K] [NumberField K] [_root_.Nu
   have hsp : ⊤ ≤ Submodule.span (maximalRealSubfield K) (Set.range ![(1 : K), d]) := by
     intro y _
     obtain ⟨a, ha, b, hb, rfl⟩ := hspan y
-    have e : a + b * d = (⟨a, ha⟩ : maximalRealSubfield K) • (1 : K) + (⟨b, hb⟩ : maximalRealSubfield K) • d := by
+    have e
+        : a + b * d
+          = (⟨a, ha⟩ : maximalRealSubfield K) • (1 : K)
+            + (⟨b, hb⟩ : maximalRealSubfield K) • d := by
       simp [Subfield.smul_def]
     rw [e]
     exact Submodule.add_mem _ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, rfl⟩))
@@ -53,8 +59,7 @@ private theorem rcsup_cm_of_pair {K : Type} [Field K] [NumberField K] [_root_.Nu
   haveI : Algebra.IsQuadraticExtension (maximalRealSubfield K) K := { finrank_eq_two' := hrk }
   exact {}
 
-theorem UpperTheory.solvable_cm_compositum_maximalRealSubfield :
-    UpperTheory.V.Af.Sol.RCSup := by
+theorem UpperTheory.solvable_cm_compositum_maximalRealSubfield : UpperTheory.V.Af.Sol.RCSup := by
   intro L M M' _ _ _ _ _ _ _ f hL htop hM
   rcases hM with hM | hM
   · left
@@ -85,7 +90,8 @@ theorem UpperTheory.solvable_cm_compositum_maximalRealSubfield :
       exact this.symm
     have hsq : algebraMap M M' δ * algebraMap M M' δ ∈ maximalRealSubfield M' := by
       intro φ
-      rw [map_mul, star_mul', hd φ]; ring
+      rw [map_mul, star_mul', hd φ]
+      ring
     refine rcsup_cm_of_pair (algebraMap M M' δ) ((_root_.map_ne_zero _).mpr hδ0) hd ?_
     intro y
     have hy : y ∈ Algebra.adjoin M (Set.range f) := htop ▸ Algebra.mem_top
@@ -94,10 +100,17 @@ theorem UpperTheory.solvable_cm_compositum_maximalRealSubfield :
       obtain ⟨z, rfl⟩ := hx
       exact ⟨f z, rcsup_mem_real f hL z, 0, zero_mem _, by simp⟩
     | algebraMap r =>
-      refine ⟨algebraMap M M' ((r + IsCMField.complexConj M r) / 2), rcsup_map_real _ ?_,
-        algebraMap M M' ((r - IsCMField.complexConj M r) / (2 * δ)), rcsup_map_real _ ?_, ?_⟩
-      · rw [← IsCMField.complexConj_eq_self_iff, map_div₀, map_add (f := _), IsCMField.complexConj_apply_apply, map_ofNat, add_comm]
-      · rw [← IsCMField.complexConj_eq_self_iff, map_div₀, map_sub, map_mul, IsCMField.complexConj_apply_apply, map_ofNat, hcδ]
+      refine ⟨
+        algebraMap M M' ((r + IsCMField.complexConj M r) / 2),
+        rcsup_map_real _ ?_,
+        algebraMap M M' ((r - IsCMField.complexConj M r) / (2 * δ)),
+        rcsup_map_real _ ?_,
+        ?_
+      ⟩
+      · rw [← IsCMField.complexConj_eq_self_iff, map_div₀, map_add (f := _),
+          IsCMField.complexConj_apply_apply, map_ofNat, add_comm]
+      · rw [← IsCMField.complexConj_eq_self_iff, map_div₀, map_sub, map_mul,
+          IsCMField.complexConj_apply_apply, map_ofNat, hcδ]
         field_simp
         ring
       · rw [← map_mul, ← map_add (f := _)]
@@ -111,6 +124,10 @@ theorem UpperTheory.solvable_cm_compositum_maximalRealSubfield :
     | mul x y _ _ hx hy =>
       obtain ⟨a, ha, b, hb, rfl⟩ := hx
       obtain ⟨a', ha', b', hb', rfl⟩ := hy
-      exact ⟨a * a' + b * b' * (algebraMap M M' δ * algebraMap M M' δ),
+      exact ⟨
+        a * a' + b * b' * (algebraMap M M' δ * algebraMap M M' δ),
         add_mem (mul_mem ha ha') (mul_mem (mul_mem hb hb') hsq),
-        a * b' + b * a', add_mem (mul_mem ha hb') (mul_mem hb ha'), by ring⟩
+        a * b' + b * a',
+        add_mem (mul_mem ha hb') (mul_mem hb ha'),
+        by ring
+      ⟩

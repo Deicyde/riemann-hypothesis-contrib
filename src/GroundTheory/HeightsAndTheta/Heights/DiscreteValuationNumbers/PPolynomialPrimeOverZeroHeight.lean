@@ -11,7 +11,6 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 open Polynomial
 
-
 attribute [local instance] Polynomial.algebra Polynomial.isLocalization in
 theorem PolynomialPrimeOverZeroHeight.proof : PolynomialPrimeOverZeroHeight.Statement := by
   intro D _ _ Q _ hQ
@@ -26,11 +25,12 @@ theorem PolynomialPrimeOverZeroHeight.proof : PolynomialPrimeOverZeroHeight.Stat
     rwa [hQ, Ideal.mem_bot] at this
   have hK : ringKrullDim K[X] = 1 :=
     IsPrincipalIdealRing.ringKrullDim_eq_one K[X] (Polynomial.not_isField K)
-  have h := IsLocalization.height_map_of_disjoint ((nonZeroDivisors D).map (C : D →+* D[X]))
-    (S := K[X]) Q disj
+  have h :=
+    IsLocalization.height_map_of_disjoint ((nonZeroDivisors D).map (C : D →+* D[X])) (S := K[X]) Q
+      disj
   have hP : (Q.map (algebraMap D[X] K[X])).IsPrime :=
-    IsLocalization.isPrime_of_isPrime_disjoint ((nonZeroDivisors D).map (C : D →+* D[X])) K[X] Q
-      ‹_› disj
+    IsLocalization.isPrime_of_isPrime_disjoint ((nonZeroDivisors D).map (C : D →+* D[X])) K[X] Q ‹_›
+      disj
   have hle : ((Q.map (algebraMap D[X] K[X])).height : WithBot ℕ∞) ≤ 1 :=
     hK ▸ Ideal.height_le_ringKrullDim_of_isPrime
   rw [h] at hle

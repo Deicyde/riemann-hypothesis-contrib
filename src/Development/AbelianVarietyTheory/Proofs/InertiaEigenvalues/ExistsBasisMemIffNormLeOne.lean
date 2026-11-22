@@ -6,17 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory.UnitBallBasis
 
-theorem exists_basis_mem_iff_norm_le_one {l : ℕ} [inst : Fact (Nat.Prime l)] {L O V : Type}
-    [inst_1 : Field L] [inst_2 : Algebra ℚ_[l] L] [inst_3 : CommRing O] [inst_4 : Algebra O L]
-    [inst_5 : Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O]
+theorem exists_basis_mem_iff_norm_le_one
+    {l : ℕ} [inst : Fact (Nat.Prime l)]
+    {L O V : Type} [inst_1 : Field L] [inst_2 : Algebra ℚ_[l] L] [inst_3 : CommRing O]
+    [inst_4 : Algebra O L] [inst_5 : Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O]
     (hc : ∀ (a : ℤ_[l]), algebraMap O L (algebraMap ℤ_[l] O a) = algebraMap ℚ_[l] L (a : ℚ_[l]))
-    (hd : ∀ (a : L), ∃ (y : ℤ_[l]), y ≠ 0 ∧ ∃ (o : O),
-      algebraMap O L o = algebraMap ℚ_[l] L (y : ℚ_[l]) * a)
+    (hd : ∀ (a : L), ∃ (y : ℤ_[l]),
+      y ≠ 0 ∧ ∃ (o : O), algebraMap O L o = algebraMap ℚ_[l] L (y : ℚ_[l]) * a)
     [inst_8 : AddCommGroup V] [inst_9 : Module L V] [inst_10 : Module ℚ_[l] V]
     [IsScalarTower ℚ_[l] L V] [inst_12 : Module O V] [IsScalarTower O L V]
-    (S : Submodule O V) (hfg : S.FG) (hfree : Module.Free O S)
-    (hspan : Submodule.span L (S : Set V) = ⊤) :
-    ∃ (n : ℕ) (w : Module.Basis (Fin n) ℚ_[l] V), ∀ (x : V),
+    (S : Submodule O V)
+    (hfg : S.FG) (hfree : Module.Free O S) (hspan : Submodule.span L (S : Set V) = ⊤)
+    : ∃ (n : ℕ) (w : Module.Basis (Fin n) ℚ_[l] V), ∀ (x : V),
       x ∈ S ↔ ∀ (i : Fin n), ‖w.repr x i‖ ≤ (1 : ℝ) := by
   classical
   have := hfree
@@ -71,13 +72,15 @@ theorem exists_basis_mem_iff_norm_le_one {l : ℕ} [inst : Fact (Nat.Prime l)] {
       intro j
       rw [norm_mul, norm_pow, Padic.norm_p, inv_pow, inv_mul_le_iff₀ (by positivity), mul_one]
       exact (Finset.single_le_sum (fun j _ => norm_nonneg (g j)) (Finset.mem_univ j)).trans hN.le
-    have h0 := hind (fun j => ⟨(l : ℚ_[l]) ^ N * g j, hsmall j⟩) (by
-      change ∑ j, ((l : ℚ_[l]) ^ N * g j) • e j = 0
-      simp_rw [mul_smul]
-      rw [← Finset.smul_sum, hg, smul_zero])
+    have h0 :=
+      hind (fun j => ⟨(l : ℚ_[l]) ^ N * g j, hsmall j⟩) (by
+        change ∑ j, ((l : ℚ_[l]) ^ N * g j) • e j = 0
+        simp_rw [mul_smul]
+        rw [← Finset.smul_sum, hg, smul_zero])
     intro j
     have hj : (l : ℚ_[l]) ^ N * g j = 0 := congrArg Subtype.val (congrFun h0 j)
-    exact (mul_eq_zero.mp hj).resolve_left (pow_ne_zero _ (by exact_mod_cast (Fact.out : l.Prime).ne_zero))
+    exact (mul_eq_zero.mp hj).resolve_left
+      (pow_ne_zero _ (by exact_mod_cast (Fact.out : l.Prime).ne_zero))
 
   let P := Submodule.span ℚ_[l] (Set.range e)
   have hSP : ∀ s : S, (s : V) ∈ P := by
@@ -91,8 +94,7 @@ theorem exists_basis_mem_iff_norm_le_one {l : ℕ} [inst : Fact (Nat.Prime l)] {
     have hy' : (y : ℚ_[l]) ≠ 0 := fun h => hy (Subtype.ext h)
     have ho' : o • s = (y : ℚ_[l]) • (x • s) := by
       rw [← algebraMap_smul L o s, ho, mul_smul, algebraMap_smul]
-    have hx : x • s = ((y : ℚ_[l]))⁻¹ • (o • s) := by
-      rw [ho', inv_smul_smul₀ hy']
+    have hx : x • s = ((y : ℚ_[l]))⁻¹ • (o • s) := by rw [ho', inv_smul_smul₀ hy']
     rw [hx]
     exact P.smul_mem _ (hSP ⟨_, S.smul_mem o hs⟩)
   have hLP : ∀ (x : L) (v : V), v ∈ P → x • v ∈ P := by

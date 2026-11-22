@@ -5,12 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LayeredIsom
 
 @[expose] public section
 
-open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
+open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V
+  UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
 
-theorem UpperTheory.V.Win.near1 :
-    ∀ (l : ℕ) [Fact l.Prime] (K : Type) [NormedField K] [NormedAlgebra ℚ_[l] K] [IsUltrametricDist K] (s : K) (Z a b : ℕ),
-      1 ≤ a → a ≤ Z → 1 ≤ b → b ≤ Z → ‖s - (a : K)‖ < (l : ℝ) ^ (-(Nat.log l Z : ℤ)) →
-        ‖s - (b : K)‖ < (l : ℝ) ^ (-(Nat.log l Z : ℤ)) → a = b := by
+theorem UpperTheory.V.Win.near1
+    : ∀ (l : ℕ) [Fact l.Prime] (K : Type) [NormedField K] [NormedAlgebra ℚ_[l] K]
+        [IsUltrametricDist K] (s : K) (Z a b : ℕ),
+      1 ≤ a → a ≤ Z → 1 ≤ b → b ≤ Z → ‖s - (a : K)‖ < (l : ℝ) ^ (-(Nat.log l Z : ℤ))
+        → ‖s - (b : K)‖ < (l : ℝ) ^ (-(Nat.log l Z : ℤ))
+        → a = b := by
   intro l _ K _ _ _ s Z a b ha1 haZ hb1 hbZ hsa hsb
   by_contra hab
   have hlp : l.Prime := Fact.out
@@ -24,7 +27,9 @@ theorem UpperTheory.V.Win.near1 :
       push_cast
       ring
     rw [← norm_algebraMap' K, h1]
-    calc ‖(s - b) + -(s - a)‖ ≤ max ‖s - b‖ ‖-(s - a)‖ := IsUltrametricDist.norm_add_le_max _ _
+    calc
+      ‖(s - b) + -(s - a)‖
+        ≤ max ‖s - b‖ ‖-(s - a)‖ := IsUltrametricDist.norm_add_le_max _ _
       _ < _ := by
         rw [norm_neg]
         exact max_lt hsb hsa
@@ -41,7 +46,8 @@ theorem UpperTheory.V.Win.near1 :
   have habs : d.natAbs ≤ Z := by
     rw [hd]
     omega
-  have h0 := Int.eq_zero_of_dvd_of_natAbs_lt_natAbs hdvd (by
-    simp only [Int.natAbs_pow, Int.natAbs_natCast]
-    exact lt_of_le_of_lt habs hZ)
+  have h0 :=
+    Int.eq_zero_of_dvd_of_natAbs_lt_natAbs hdvd (by
+      simp only [Int.natAbs_pow, Int.natAbs_natCast]
+      exact lt_of_le_of_lt habs hZ)
   exact hd0 h0

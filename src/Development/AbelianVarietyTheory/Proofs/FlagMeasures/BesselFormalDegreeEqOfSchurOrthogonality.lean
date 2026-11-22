@@ -9,13 +9,18 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.SgInf
 
-theorem fdegH_eq_of_schurH (k r : ℕ) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+theorem fdegH_eq_of_schurH
+    (k r : ℕ)
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
     (σ : Mat k r → (H →L[ℂ] H)) (μG : Measure (Mt k r)) (d : ℝ) (w : H)
-    (hS : SchurH μG σ d) (hw : w ≠ 0) : fdegH μG σ w = d := by
+    (hS : SchurH μG σ d) (hw : w ≠ 0)
+    : fdegH μG σ w = d := by
   obtain ⟨hd, hrel⟩ := hS
   obtain ⟨-, hint⟩ := hrel w w w w
-  have hpt : ∀ g : Mt k r, coef σ w w (Matrix.of g) * star (coef σ w w (Matrix.of g))
-      = ((‖⟪w, σ (Matrix.of g) w⟫_ℂ‖ ^ 2 : ℝ) : ℂ) := by
+  have hpt
+      : ∀ g : Mt k r,
+        coef σ w w (Matrix.of g) * star (coef σ w w (Matrix.of g))
+          = ((‖⟪w, σ (Matrix.of g) w⟫_ℂ‖ ^ 2 : ℝ) : ℂ) := by
     intro g
     simp only [coef]
     rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]

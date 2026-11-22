@@ -19,8 +19,9 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 variable {L : LocE F E} {r k : ℕ}
 
-theorem mem_smul_iff {n : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (A : Submodule L.O (Fin n → E))
-    (x : Fin n → E) : x ∈ g • A ↔ g.symm x ∈ A := by
+theorem mem_smul_iff
+    {n : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (A : Submodule L.O (Fin n → E)) (x : Fin n → E)
+    : x ∈ g • A ↔ g.symm x ∈ A := by
   rw [Submodule.mem_smul_pointwise_iff_exists]
   constructor
   · rintro ⟨y, hy, rfl⟩
@@ -28,8 +29,8 @@ theorem mem_smul_iff {n : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (A : 
   · intro h
     exact ⟨_, h, by simp [LinearEquiv.smul_def]⟩
 
-theorem smul_eq_iff {n : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (A : Submodule L.O (Fin n → E)) :
-    g • A = A ↔ ∀ x, g x ∈ A ↔ x ∈ A := by
+theorem smul_eq_iff {n : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (A : Submodule L.O (Fin n → E))
+    : g • A = A ↔ ∀ x, g x ∈ A ↔ x ∈ A := by
   constructor
   · intro h x
     conv_lhs => rw [← h]
@@ -39,16 +40,21 @@ theorem smul_eq_iff {n : ℕ} (g : (Fin n → E) ≃ₗ[E] (Fin n → E)) (A : S
     rw [mem_smul_iff, ← h]
     simp
 
-theorem perp_iff {n : ℕ} {Hm : Matrix (Fin n) (Fin n) E} {g : (Fin n → E) ≃ₗ[E] (Fin n → E)}
-    (hg : g ∈ isomG L Hm) {Y : Submodule E (Fin n → E)} (hY : ∀ y ∈ Y, g y = y) (x : Fin n → E) :
-    g x ∈ perp L Hm Y ↔ x ∈ perp L Hm Y := by
+theorem perp_iff
+    {n : ℕ} {Hm : Matrix (Fin n) (Fin n) E} {g : (Fin n → E) ≃ₗ[E] (Fin n → E)}
+    (hg : g ∈ isomG L Hm)
+    {Y : Submodule E (Fin n → E)} (hY : ∀ y ∈ Y, g y = y)
+    (x : Fin n → E)
+    : g x ∈ perp L Hm Y ↔ x ∈ perp L Hm Y := by
   have h : ∀ y ∈ Y, hf L Hm (g x) y = hf L Hm x y := fun y hy => by
     conv_lhs => rw [← hY y hy]
     exact hg x y
   exact ⟨fun H y hy => (h y hy).symm.trans (H y hy), fun H y hy => (h y hy).trans (H y hy)⟩
 
-theorem sub_iff {n : ℕ} {g : (Fin n → E) ≃ₗ[E] (Fin n → E)}
-    {Y : Submodule E (Fin n → E)} (hY : ∀ y ∈ Y, g y = y) (x : Fin n → E) : g x ∈ Y ↔ x ∈ Y := by
+theorem sub_iff
+    {n : ℕ} {g : (Fin n → E) ≃ₗ[E] (Fin n → E)} {Y : Submodule E (Fin n → E)}
+    (hY : ∀ y ∈ Y, g y = y) (x : Fin n → E)
+    : g x ∈ Y ↔ x ∈ Y := by
   constructor
   · intro h
     have := g.injective (hY _ h)
@@ -56,21 +62,25 @@ theorem sub_iff {n : ℕ} {g : (Fin n → E) ≃ₗ[E] (Fin n → E)}
   · intro h
     rwa [hY x h]
 
-theorem complementGroup_fixes_frameSpan (S : Frames L r k) {h : S.GLV} (hh : h ∈ S.H0) : ∀ y ∈ S.ME, h y = y := fun y hy => by
+theorem complementGroup_fixes_frameSpan (S : Frames L r k) {h : S.GLV} (hh : h ∈ S.H0)
+    : ∀ y ∈ S.ME, h y = y := fun y hy => by
   have := hh.2.2 y hy
   rwa [Submodule.mem_bot, sub_eq_zero] at this
 
-theorem spanTo_mono (S : Frames L r k) (g : Fin (r + 1) → S.V) : S.spanTo g r ≤ S.spanTo g (r + 1) :=
+theorem spanTo_mono (S : Frames L r k) (g : Fin (r + 1) → S.V)
+    : S.spanTo g r ≤ S.spanTo g (r + 1) :=
   Submodule.span_mono (Set.image_mono fun i (hi : (i : ℕ) < r) => Nat.lt_succ_of_lt hi)
 
 theorem X_le (S : Frames L r k) : S.spanTo S.f r ≤ S.ME := (spanTo_mono S _).trans le_sup_left
 
 theorem X'_le (S : Frames L r k) : S.spanTo S.f' r ≤ S.ME := (spanTo_mono S _).trans le_sup_right
 
-theorem inner_iff (S : Frames L r k) {g : Fin (r + 1) → S.V} {A Λ₀ : Submodule L.O S.V} {n : S.GLV}
-    (hn : n ∈ S.Nof g)
-    (hA : ∀ x, x ∈ A ↔ ∃ y ∈ Λ₀, y ∈ perp L S.Hm (S.spanTo g r) ∧ y - x ∈ S.spanTo g r) (x : S.V) :
-    x ∈ A ↔ ∃ y ∈ n • Λ₀, y ∈ perp L S.Hm (S.spanTo g r) ∧ y - x ∈ S.spanTo g r := by
+theorem inner_iff
+    (S : Frames L r k)
+    {g : Fin (r + 1) → S.V} {A Λ₀ : Submodule L.O S.V} {n : S.GLV} (hn : n ∈ S.Nof g)
+    (hA : ∀ x, x ∈ A ↔ ∃ y ∈ Λ₀, y ∈ perp L S.Hm (S.spanTo g r) ∧ y - x ∈ S.spanTo g r)
+    (x : S.V)
+    : x ∈ A ↔ ∃ y ∈ n • Λ₀, y ∈ perp L S.Hm (S.spanTo g r) ∧ y - x ∈ S.spanTo g r := by
   obtain ⟨h1, h2⟩ := hn.2
   rw [hA]
   constructor
@@ -85,9 +95,12 @@ theorem inner_iff (S : Frames L r k) {g : Fin (r + 1) → S.V} {A Λ₀ : Submod
     have := Submodule.sub_mem _ hx (h2 _ hp')
     simpa using this
 
-theorem stab_inner (S : Frames L r k) {A Λ : Submodule L.O S.V} {X : Submodule E S.V} (hX : X ≤ S.ME)
-    (hA : ∀ x, x ∈ A ↔ ∃ y ∈ Λ, y ∈ perp L S.Hm X ∧ y - x ∈ X)
-    {h : S.GLV} (hh : h ∈ S.H0) (hΛ : h • Λ = Λ) : h • A = A := by
+theorem stab_inner
+    (S : Frames L r k)
+    {A Λ : Submodule L.O S.V} {X : Submodule E S.V}
+    (hX : X ≤ S.ME) (hA : ∀ x, x ∈ A ↔ ∃ y ∈ Λ, y ∈ perp L S.Hm X ∧ y - x ∈ X)
+    {h : S.GLV} (hh : h ∈ S.H0) (hΛ : h • Λ = Λ)
+    : h • A = A := by
   have hfix : ∀ y ∈ X, h y = y := fun y hy => complementGroup_fixes_frameSpan S hh y (hX hy)
   rw [smul_eq_iff] at hΛ ⊢
   intro x
@@ -101,10 +114,12 @@ theorem stab_inner (S : Frames L r k) {A Λ : Submodule L.O S.V} {X : Submodule 
     refine ⟨h y, (hΛ y).2 hy, (perp_iff hh.1 hfix y).2 hp, ?_⟩
     rwa [← map_sub, sub_iff hfix]
 
-theorem stab_graph (S : Frames L r k) {Λ : Submodule L.O S.V}
-    {h : S.GLV} (hh : h ∈ S.H0) (hΛ : h • Λ = Λ) : h • S.graphOf Λ = S.graphOf Λ := by
+theorem stab_graph
+    (S : Frames L r k) {Λ : Submodule L.O S.V} {h : S.GLV} (hh : h ∈ S.H0) (hΛ : h • Λ = Λ)
+    : h • S.graphOf Λ = S.graphOf Λ := by
   have hfix : ∀ y ∈ S.X, h y = y := fun y hy => complementGroup_fixes_frameSpan S hh y (X_le S hy)
-  have hfix' : ∀ y ∈ S.X', h y = y := fun y hy => complementGroup_fixes_frameSpan S hh y (X'_le S hy)
+  have hfix' : ∀ y ∈ S.X', h y = y := fun y hy =>
+    complementGroup_fixes_frameSpan S hh y (X'_le S hy)
   rw [smul_eq_iff] at hΛ
   have hth : ∀ x, S.InTh Λ (h x) ↔ S.InTh Λ x := fun x => by
     constructor
@@ -122,19 +137,37 @@ theorem stab_graph (S : Frames L r k) {Λ : Submodule L.O S.V}
       obtain ⟨y, rfl⟩ := h.surjective y
       obtain ⟨y', rfl⟩ := h.surjective y'
       simp only [← map_sub, sub_iff hfix, sub_iff hfix', hth] at h3 h4 h5
-      exact ⟨y', (hΛ _).1 hy', y, (hΛ _).1 hy, (perp_iff hh.1 hfix' _).1 h1,
-        (perp_iff hh.1 hfix _).1 h2, h3, h4, h5⟩
+      exact ⟨
+        y',
+        (hΛ _).1 hy',
+        y,
+        (hΛ _).1 hy,
+        (perp_iff hh.1 hfix' _).1 h1,
+        (perp_iff hh.1 hfix _).1 h2,
+        h3,
+        h4,
+        h5
+      ⟩
     · rintro ⟨y', hy', y, hy, h1, h2, h3, h4, h5⟩
-      refine ⟨h y', (hΛ _).2 hy', h y, (hΛ _).2 hy, (perp_iff hh.1 hfix' _).2 h1,
-        (perp_iff hh.1 hfix _).2 h2, ?_, ?_, ?_⟩
+      refine ⟨
+        h y',
+        (hΛ _).2 hy',
+        h y,
+        (hΛ _).2 hy,
+        (perp_iff hh.1 hfix' _).2 h1,
+        (perp_iff hh.1 hfix _).2 h2,
+        ?_,
+        ?_,
+        ?_
+      ⟩
       · simpa only [← map_sub, sub_iff hfix'] using h3
       · simpa only [← map_sub, sub_iff hfix] using h4
       · simpa only [← map_sub, hth] using h5
   ext p
   rw [Set.mem_smul_set_iff_inv_smul_mem, ← key, smul_inv_smul]
 
-theorem exists_smul_mem {n : ℕ} {Λ : Submodule L.O (Fin n → E)} (hΛ : IsLat L Λ) (w : Fin n → E) :
-    ∃ c : F, c ≠ 0 ∧ c ∈ 𝒪[F] ∧ algebraMap F E c • w ∈ Λ := by
+theorem exists_smul_mem {n : ℕ} {Λ : Submodule L.O (Fin n → E)} (hΛ : IsLat L Λ) (w : Fin n → E)
+    : ∃ c : F, c ≠ 0 ∧ c ∈ 𝒪[F] ∧ algebraMap F E c • w ∈ Λ := by
   have hw : w ∈ Submodule.span E (Λ : Set (Fin n → E)) := by rw [hΛ.2]; trivial
   have hO : ∀ c : F, c ∈ 𝒪[F] → ∀ v ∈ Λ, algebraMap F E c • v ∈ Λ := fun c hc v hv =>
     Λ.smul_mem (⟨_, (UnramOrder.algebraMap_mem_iff L c).2 hc⟩ : L.O) hv
@@ -154,9 +187,17 @@ theorem exists_smul_mem {n : ℕ} {Λ : Submodule L.O (Fin n → E)} (hΛ : IsLa
     have := Λ.smul_mem (⟨_, h' e (by simp)⟩ : L.O) h
     have e1 : algebraMap F E (c * d) • e • a = (algebraMap F E d * e) • algebraMap F E c • a := by
       rw [smul_smul, smul_smul, map_mul]; congr 1; ring
-    rw [e1]; exact this
+    rw [e1]
+    exact this
 
-theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), ∀ (d : S.Datum) (Λ : Submodule L.O S.V), S.IsTerm d Λ → S.H0 ⊓ stabL L Λ ≤ S.H0 ⊓ MulAction.stabilizer S.GLV d ∧ ∃ Λ₂ : Submodule L.O S.V, IsLat L Λ₂ ∧ S.H0 ⊓ MulAction.stabilizer S.GLV d ≤ S.H0 ⊓ stabL L Λ₂ := by
+theorem main
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k), ∀ (d : S.Datum) (Λ : Submodule L.O S.V),
+        S.IsTerm d Λ
+          → S.H0 ⊓ stabL L Λ ≤ S.H0 ⊓ MulAction.stabilizer S.GLV d
+            ∧ ∃ Λ₂ : Submodule L.O S.V,
+              IsLat L Λ₂ ∧ S.H0 ⊓ MulAction.stabilizer S.GLV d ≤ S.H0 ⊓ stabL L Λ₂ := by
   intro F _ _ _ _ _ E _ _ _ L r k S d Λ ⟨⟨n, n'⟩, hI, hI', hn, hn', hΛ, hΛ', _, hg⟩
   obtain ⟨hsd, -, hA⟩ := StdLat.stdLat_spec L r k S S.f S.es (Or.inl ⟨rfl, rfl⟩) _ hI
   obtain ⟨-, -, hA'⟩ := StdLat.stdLat_spec L r k S S.f' S.es' (Or.inr ⟨rfl, rfl⟩) _ hI'
@@ -172,7 +213,8 @@ theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [I
     rw [← hΛ] at h1
     rw [← hΛ'] at h2
     change h • d = d
-    refine Prod.ext (stab_inner S (X_le S) h1 hh hs') (Prod.ext (stab_inner S (X'_le S) h2 hh hs') ?_)
+    refine Prod.ext (stab_inner S (X_le S) h1 hh hs')
+      (Prod.ext (stab_inner S (X'_le S) h2 hh hs') ?_)
     change h • d.2.2 = d.2.2
     rw [hg]
     exact stab_graph S hh hs'
@@ -188,8 +230,14 @@ theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [I
       rintro _ (⟨i, rfl⟩ | ⟨i, rfl⟩)
       · exact Submodule.mem_sup_left (Submodule.subset_span ⟨i, i.2, rfl⟩)
       · exact Submodule.mem_sup_right (Submodule.subset_span ⟨i, i.2, rfl⟩)
-    refine ⟨(d.1 ⊓ S.W0.restrictScalars L.O) ⊔ Submodule.span L.O (Set.range S.f ∪ Set.range S.f'),
-      ⟨Submodule.FG.sup ?_ (Submodule.fg_span ((Set.finite_range _).union (Set.finite_range _))), ?_⟩, ?_⟩
+    refine ⟨
+      (d.1 ⊓ S.W0.restrictScalars L.O) ⊔ Submodule.span L.O (Set.range S.f ∪ Set.range S.f'),
+      ⟨
+        Submodule.FG.sup ?_ (Submodule.fg_span ((Set.finite_range _).union (Set.finite_range _))),
+        ?_
+      ⟩,
+      ?_
+    ⟩
     · have hfg : (Λ₀.map (P.restrictScalars L.O)).FG := hsd.1.1.map _
       refine hfg.of_le ?_
       rintro x ⟨hx, hw⟩
@@ -226,8 +274,10 @@ theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [I
         exact and_congr (h1 x) (perp_iff hh.1 (complementGroup_fixes_frameSpan S hh) x)
       · rw [smul_eq_iff]
         intro x
-        have hsub : ∀ z ∈ Submodule.span L.O (Set.range S.f ∪ Set.range S.f'), h z = z := fun z hz =>
-          complementGroup_fixes_frameSpan S hh z ((Submodule.span_le.2 hME : _ ≤ S.ME.restrictScalars L.O) hz)
+        have hsub
+            : ∀ z ∈ Submodule.span L.O (Set.range S.f ∪ Set.range S.f'), h z = z := fun z hz =>
+          complementGroup_fixes_frameSpan S hh z
+            ((Submodule.span_le.2 hME : _ ≤ S.ME.restrictScalars L.O) hz)
         constructor
         · intro hx
           have := h.injective (hsub _ hx)

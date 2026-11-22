@@ -25,7 +25,8 @@ def prp (K : Type) [CommRing K] (j : ZMod 2) : Matrix (Fin 3) (Fin 3) K →ₗ[K
   map_add' X Y := Subtype.ext (by ext a b; by_cases e : pw a b = j <;> simp [e])
   map_smul' c X := Subtype.ext (by ext a b; by_cases e : pw a b = j <;> simp [e])
 
-def evp {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ : R →ₐ[O] R) (j : ZMod 2) : Submodule O R where
+def evp {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ : R →ₐ[O] R) (j : ZMod 2)
+    : Submodule O R where
   carrier := {x | σ x = sg R j * x}
   add_mem' {x y} (h : _ = _) (h' : _ = _) := show _ = _ by rw [map_add (f := _), h, h', mul_add]
   zero_mem' := show _ = _ by simp
@@ -33,14 +34,18 @@ def evp {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (σ : R →ₐ[O] R
 
 section Pres
 
-variable (O : Type) [CommRing O] [IsLocalRing O] {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R)
+variable
+  (O : Type) [CommRing O] [IsLocalRing O]
+  {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
+  (σ : R →ₐ[O] R)
 
 def derp (j : ZMod 2) : Submodule (ResidueField O) (R →ₗ[O] ResidueField O) :=
-  PtDer (res O R) (ResidueField O) ⊓
-    { carrier := {D | ∀ x, D (σ x) = sg (ResidueField O) j * D x}
-      add_mem' := fun h h' x => by simp only [LinearMap.add_apply, h x, h' x, mul_add]
-      zero_mem' := fun x => by simp
-      smul_mem' := fun c D h x => by simp only [LinearMap.smul_apply, h x, smul_eq_mul, mul_left_comm] }
+  PtDer (res O R) (ResidueField O) ⊓ {
+    carrier := {D | ∀ x, D (σ x) = sg (ResidueField O) j * D x}
+    add_mem' := fun h h' x => by simp only [LinearMap.add_apply, h x, h' x, mul_add]
+    zero_mem' := fun x => by simp
+    smul_mem' := fun c D h x => by simp only [LinearMap.smul_apply, h x, smul_eq_mul, mul_left_comm]
+  }
 
 structure GPres where
   a : ℕ
@@ -57,15 +62,21 @@ structure GPres where
   min : ∀ h ∈ RingHom.ker p, ∀ s, MvPowerSeries.coeff (Finsupp.single s 1) h ∈ maximalIdeal O
   hf : ∀ u, f u ∈ wtPart O (Space.Loc.par a g) (wf u)
   ker : RingHom.ker p = Ideal.span (Set.range f)
-  indep : ∀ c : κ → O, ∑ u, c u • f u ∈ maximalIdeal (MvPowerSeries (Fin a ⊕ Fin g) O) * RingHom.ker p →
-    ∀ u, c u ∈ maximalIdeal O
+  indep
+    : ∀ c : κ → O,
+      ∑ u, c u • f u ∈ maximalIdeal (MvPowerSeries (Fin a ⊕ Fin g) O) * RingHom.ker p
+        → ∀ u, c u ∈ maximalIdeal O
 
 attribute [instance] GPres.fin
 
 end Pres
 
-structure Space.Loc.IsInv {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O]
-    {F : Frame l (ResidueField O)} {S : Space O F 3} {x : Ideal S.A} (L : S.Loc x) (σ : L.R →ₐ[L.O'] L.R) : Prop where
+structure Space.Loc.IsInv
+    {l : ℕ} [Fact l.Prime]
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {F : Frame l (ResidueField O)} {S : Space O F 3} {x : Ideal S.A}
+    (L : S.Loc x) (σ : L.R →ₐ[L.O'] L.R)
+    : Prop where
   sq : ∀ y, σ (σ y) = y
   ent : ∀ g a b, L.ρ.r g a b ∈ evp σ (pw a b)
   base : ∀ y : S.B, L.b y ∈ evp σ 0

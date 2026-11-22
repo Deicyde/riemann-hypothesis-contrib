@@ -79,25 +79,29 @@ lemma hasFDerivAt_coordDiv (k : Fin N) (z : Fin N → ℂ) :
 namespace CP
 
 def kahlerPotential (i : Fin (N + 1)) (z : Fin N → ℂ) : ℝ :=
-  -Real.log (fsNorm (chartInv i z) (restrictForm (coordForm i) _) ^ 2)
+  - Real.log (fsNorm (chartInv i z) (restrictForm (coordForm i) _) ^ 2)
 
 lemma kahlerPotential_eq (i : Fin (N + 1)) (z : Fin N → ℂ) :
     kahlerPotential i z = Real.log (1 + normSqSum z) := by
   rw [kahlerPotential, fsNorm_sq_frame, one_div, Real.log_inv, neg_neg]; rfl
 
 def chernCoeff (i : Fin (N + 1)) (z : Fin N → ℂ) : Matrix (Fin N) (Fin N) ℂ :=
-  Matrix.of fun j k => ((1 / (2 * Real.pi) : ℝ) : ℂ) *
-    wirtinger (fun w => wirtingerBar (fun u => ((kahlerPotential i u : ℝ) : ℂ)) k w) j z
+  Matrix.of fun j k =>
+    ((1 / (2 * Real.pi) : ℝ) : ℂ)
+      * wirtinger (fun w => wirtingerBar (fun u => ((kahlerPotential i u : ℝ) : ℂ)) k w) j z
 
-theorem chernCoeff_apply (i : Fin (N + 1)) (z : Fin N → ℂ) (j k : Fin N) :
-    chernCoeff i z j k = ((1 / (2 * Real.pi * (1 + normSqSum z)) : ℝ) : ℂ) *
-      ((1 : Matrix (Fin N) (Fin N) ℂ) j k -
-        (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) * (conj (z j) * z k)) := by
-  have hpot : (fun u => ((kahlerPotential i u : ℝ) : ℂ)) =
-      fun u => ((Real.log (1 + normSqSum u) : ℝ) : ℂ) := by
+theorem chernCoeff_apply (i : Fin (N + 1)) (z : Fin N → ℂ) (j k : Fin N)
+    : chernCoeff i z j k
+      = ((1 / (2 * Real.pi * (1 + normSqSum z)) : ℝ) : ℂ)
+        * ((1 : Matrix (Fin N) (Fin N) ℂ) j k
+          - (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) * (conj (z j) * z k)) := by
+  have hpot
+      : (fun u => ((kahlerPotential i u : ℝ) : ℂ))
+        = fun u => ((Real.log (1 + normSqSum u) : ℝ) : ℂ) := by
     funext u; rw [kahlerPotential_eq]
-  have hfun : (fun w => wirtingerBar (fun u => ((kahlerPotential i u : ℝ) : ℂ)) k w) =
-      fun u : Fin N → ℂ => (1 + normSqSum u)⁻¹ • u k := by
+  have hfun
+      : (fun w => wirtingerBar (fun u => ((kahlerPotential i u : ℝ) : ℂ)) k w)
+        = fun u : Fin N → ℂ => (1 + normSqSum u)⁻¹ • u k := by
     funext w; rw [hpot, wirtingerBar_logPot, Complex.real_smul]
   rw [chernCoeff, Matrix.of_apply, hfun, wirtinger, (hasFDerivAt_coordDiv k z).fderiv]
   simp only [FunLike.coe_add, Pi.add_apply, FunLike.coe_smul, Pi.smul_apply,
@@ -125,9 +129,10 @@ theorem chernCoeff_apply (i : Fin (N + 1)) (z : Fin N → ℂ) (j k : Fin N) :
     field_simp
     ring_nf
 
-theorem chernCoeff_eq_matrix (i : Fin (N + 1)) (z : Fin N → ℂ) :
-    chernCoeff i z = ((1 / (2 * Real.pi * (1 + normSqSum z)) : ℝ) : ℂ) •
-      (1 - (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) • Matrix.vecMulVec (star z) z) := by
+theorem chernCoeff_eq_matrix (i : Fin (N + 1)) (z : Fin N → ℂ)
+    : chernCoeff i z
+      = ((1 / (2 * Real.pi * (1 + normSqSum z)) : ℝ) : ℂ)
+        • (1 - (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) • Matrix.vecMulVec (star z) z) := by
   ext j k
   rw [chernCoeff_apply]
   simp [Matrix.vecMulVec_apply]
@@ -136,9 +141,12 @@ lemma star_dotProduct_self (x : Fin N → ℂ) : star x ⬝ᵥ x = ((∑ j, ‖x
   simp only [dotProduct, Pi.star_apply, Complex.star_def, Complex.conj_mul']
   push_cast; rfl
 
-theorem chernCoeff_quadForm (i : Fin (N + 1)) (z x : Fin N → ℂ) :
-    star x ⬝ᵥ (chernCoeff i z *ᵥ x) = ((1 / (2 * Real.pi * (1 + normSqSum z)) *
-      (∑ j, ‖x j‖ ^ 2 - (1 + normSqSum z)⁻¹ * ‖z ⬝ᵥ x‖ ^ 2) : ℝ) : ℂ) := by
+theorem chernCoeff_quadForm (i : Fin (N + 1)) (z x : Fin N → ℂ)
+    : star x ⬝ᵥ (chernCoeff i z *ᵥ x)
+      = ((1 / (2 * Real.pi * (1 + normSqSum z))
+            * (∑ j, ‖x j‖ ^ 2 - (1 + normSqSum z)⁻¹ * ‖z ⬝ᵥ x‖ ^ 2)
+          : ℝ)
+        : ℂ) := by
   rw [chernCoeff_eq_matrix, Matrix.smul_mulVec, Matrix.sub_mulVec, Matrix.one_mulVec,
     Matrix.smul_mulVec, Matrix.vecMulVec_mulVec, op_smul_eq_smul, dotProduct_smul, dotProduct_sub,
     dotProduct_smul, dotProduct_smul, Matrix.star_dotProduct_star, star_dotProduct_self]
@@ -155,12 +163,15 @@ lemma norm_dotProduct_sq_le (z x : Fin N → ℂ) :
     Finset.sum_mul_sq_le_sq_mul_sq _ _ _
   exact (pow_le_pow_left₀ (norm_nonneg _) h1 2).trans h2
 
-theorem det_chernCoeff (i : Fin (N + 1)) (z : Fin N → ℂ) :
-    (chernCoeff i z).det = (((1 / (2 * Real.pi)) ^ N / (1 + normSqSum z) ^ (N + 1) : ℝ) : ℂ) := by
+theorem det_chernCoeff (i : Fin (N + 1)) (z : Fin N → ℂ)
+    : (chernCoeff i z).det = (((1 / (2 * Real.pi)) ^ N / (1 + normSqSum z) ^ (N + 1) : ℝ) : ℂ) := by
   rw [chernCoeff_eq_matrix, Matrix.det_smul, Fintype.card_fin]
-  have hmat : (1 : Matrix (Fin N) (Fin N) ℂ) - (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) •
-      Matrix.vecMulVec (star z) z = 1 + Matrix.replicateCol Unit
-        (-((((1 + normSqSum z)⁻¹ : ℝ) : ℂ)) • star z) * Matrix.replicateRow Unit z := by
+  have hmat
+      : (1 : Matrix (Fin N) (Fin N) ℂ)
+          - (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) • Matrix.vecMulVec (star z) z
+        = 1
+          + Matrix.replicateCol Unit (-((((1 + normSqSum z)⁻¹ : ℝ) : ℂ)) • star z)
+            * Matrix.replicateRow Unit z := by
     ext j k
     simp [Matrix.vecMulVec_apply, Matrix.mul_apply, sub_eq_add_neg]
     ring
@@ -169,8 +180,9 @@ theorem det_chernCoeff (i : Fin (N + 1)) (z : Fin N → ℂ) :
   rw [hmat, Matrix.det_one_add_replicateCol_mul_replicateRow, dotProduct_smul, hzz, smul_eq_mul]
   have hS := one_add_normSqSum_pos z
   have hpi := Real.pi_pos
-  have key : (1 / (2 * Real.pi * (1 + normSqSum z))) ^ N * (1 + -(1 + normSqSum z)⁻¹ * normSqSum z) =
-      (1 / (2 * Real.pi)) ^ N / (1 + normSqSum z) ^ (N + 1) := by
+  have key
+      : (1 / (2 * Real.pi * (1 + normSqSum z))) ^ N * (1 + -(1 + normSqSum z)⁻¹ * normSqSum z)
+        = (1 / (2 * Real.pi)) ^ N / (1 + normSqSum z) ^ (N + 1) := by
     simp only [div_pow, mul_pow, one_pow, pow_succ]
     field_simp
     ring
@@ -181,8 +193,8 @@ theorem det_chernCoeff (i : Fin (N + 1)) (z : Fin N → ℂ) :
 def fsVolumeDensity (i : Fin (N + 1)) (z : Fin N → ℂ) : ℝ :=
   (N.factorial : ℝ) * 2 ^ N * ((chernCoeff i z).det).re
 
-theorem fsVolumeDensity_eq (i : Fin (N + 1)) (z : Fin N → ℂ) :
-    fsVolumeDensity i z = N.factorial / (Real.pi ^ N * (1 + normSqSum z) ^ (N + 1)) := by
+theorem fsVolumeDensity_eq (i : Fin (N + 1)) (z : Fin N → ℂ)
+    : fsVolumeDensity i z = N.factorial / (Real.pi ^ N * (1 + normSqSum z) ^ (N + 1)) := by
   rw [fsVolumeDensity, det_chernCoeff, Complex.ofReal_re, div_pow, one_pow, mul_pow]
   have hS := one_add_normSqSum_pos z
   have hpi := Real.pi_pos

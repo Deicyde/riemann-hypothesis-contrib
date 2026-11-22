@@ -11,23 +11,31 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.QmRowForm
 
-def pF {A : Type*} [Ring A] [Algebra ℂ A] {n t : ℕ} (E : Fin n → Fin n → A) (a b : Fin t → Fin n)
-    (x : Fin t → ℂ) (σ τ : Equiv.Perm (Fin t)) (k : Fin t) : A :=
+def pF
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    {n t : ℕ} (E : Fin n → Fin n → A) (a b : Fin t → Fin n) (x : Fin t → ℂ)
+    (σ τ : Equiv.Perm (Fin t)) (k : Fin t)
+    : A :=
   Tm E (x k) (a (σ k)) (b (τ k))
 
 def pε {A : Type*} [Ring A] {t : ℕ} (σ τ : Equiv.Perm (Fin t)) : A :=
   (((Equiv.Perm.sign σ : ℤ) * (Equiv.Perm.sign τ : ℤ) : ℤ) : A)
 
-theorem dblAlt_eq {A : Type*} [Ring A] [Algebra ℂ A] {n t : ℕ} (E : Fin n → Fin n → A)
-    (a b : Fin t → Fin n) (x : Fin t → ℂ) :
-    doubleRowFormSum E a b x = ∑ σ : Equiv.Perm (Fin t), ∑ τ : Equiv.Perm (Fin t),
-      pε σ τ * (List.ofFn (pF E a b x σ τ)).prod := rfl
+theorem dblAlt_eq
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    {n t : ℕ} (E : Fin n → Fin n → A) (a b : Fin t → Fin n) (x : Fin t → ℂ)
+    : doubleRowFormSum E a b x
+      = ∑ σ : Equiv.Perm (Fin t), ∑ τ : Equiv.Perm (Fin t),
+        pε σ τ * (List.ofFn (pF E a b x σ τ)).prod :=
+  rfl
 
-theorem perm_Tm_comm {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A) (x y : ℂ)
-    (a b c d : Fin n) :
-    Tm E x a b * Tm E y c d - Tm E y c d * Tm E x a b = E a b * E c d - E c d * E a b := by
-  have cen : ∀ (u : ℂ) (p q : Fin n) (z : A),
-      (if p = q then algebraMap ℂ A u else 0) * z = z * (if p = q then algebraMap ℂ A u else 0) := by
+theorem perm_Tm_comm
+    {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A) (x y : ℂ) (a b c d : Fin n)
+    : Tm E x a b * Tm E y c d - Tm E y c d * Tm E x a b = E a b * E c d - E c d * E a b := by
+  have cen
+      : ∀ (u : ℂ) (p q : Fin n) (z : A),
+        (if p = q then algebraMap ℂ A u else 0) * z
+          = z * (if p = q then algebraMap ℂ A u else 0) := by
     intro u p q z
     split_ifs
     · exact Algebra.commutes u z
@@ -42,8 +50,9 @@ theorem perm_Tm_comm {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n �
   rw [h1, h2, h3]
   abel
 
-theorem perm_fix {m : ℕ} (i : Fin m) (k : Fin (m + 1)) (h1 : (k : ℕ) ≠ i) (h2 : (k : ℕ) ≠ (i : ℕ) + 1) :
-    Equiv.swap i.castSucc i.succ k = k := by
+theorem perm_fix
+    {m : ℕ} (i : Fin m) (k : Fin (m + 1)) (h1 : (k : ℕ) ≠ i) (h2 : (k : ℕ) ≠ (i : ℕ) + 1)
+    : Equiv.swap i.castSucc i.succ k = k := by
   apply Equiv.swap_apply_of_ne_of_ne
   · intro h
     apply h1
@@ -78,36 +87,52 @@ private lemma ofFn_take_drop_eq_of_eq_off_pair {A : Type*} {m : ℕ} (F G : Fin 
     simp only [List.getElem_drop, List.getElem_ofFn]
     apply h <;> simp <;> omega
 
-theorem perm_split_swap {A : Type*} [Ring A] {m : ℕ} (F : Fin (m + 1) → A) (i : Fin m) :
-    (List.ofFn F).prod - (List.ofFn (F ∘ Equiv.swap i.castSucc i.succ)).prod =
-      ((List.ofFn F).take (i : ℕ)).prod * (F i.castSucc * F i.succ - F i.succ * F i.castSucc) *
-        ((List.ofFn F).drop ((i : ℕ) + 2)).prod := by
-  rw [sum_cf_mul_sum_cf_mul_eq_sum_sum_toReal_mul F i, sum_cf_mul_sum_cf_mul_eq_sum_sum_toReal_mul (F ∘ Equiv.swap i.castSucc i.succ) i]
-  obtain ⟨ht, hd⟩ := ofFn_take_drop_eq_of_eq_off_pair (F ∘ Equiv.swap i.castSucc i.succ) F i
-    (fun k h1 h2 => by simp [perm_fix i k h1 h2])
+theorem perm_split_swap {A : Type*} [Ring A] {m : ℕ} (F : Fin (m + 1) → A) (i : Fin m)
+    : (List.ofFn F).prod - (List.ofFn (F ∘ Equiv.swap i.castSucc i.succ)).prod
+      = ((List.ofFn F).take (i : ℕ)).prod * (F i.castSucc * F i.succ - F i.succ * F i.castSucc)
+        * ((List.ofFn F).drop ((i : ℕ) + 2)).prod := by
+  rw [sum_cf_mul_sum_cf_mul_eq_sum_sum_toReal_mul F i,
+    sum_cf_mul_sum_cf_mul_eq_sum_sum_toReal_mul (F ∘ Equiv.swap i.castSucc i.succ) i]
+  obtain ⟨ht, hd⟩ :=
+    ofFn_take_drop_eq_of_eq_off_pair (F ∘ Equiv.swap i.castSucc i.succ) F i
+      (fun k h1 h2 => by simp [perm_fix i k h1 h2])
   rw [ht, hd]
   simp only [Function.comp, Equiv.swap_apply_left, Equiv.swap_apply_right]
   noncomm_ring
 
-def pL {A : Type*} [Ring A] [Algebra ℂ A] {n m : ℕ} (E : Fin n → Fin n → A) (a b : Fin (m + 1) → Fin n)
-    (x : Fin (m + 1) → ℂ) (i : Fin m) (σ τ : Equiv.Perm (Fin (m + 1))) : A :=
+def pL
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    {n m : ℕ} (E : Fin n → Fin n → A) (a b : Fin (m + 1) → Fin n) (x : Fin (m + 1) → ℂ) (i : Fin m)
+    (σ τ : Equiv.Perm (Fin (m + 1)))
+    : A :=
   ((List.ofFn (pF E a b x σ τ)).take (i : ℕ)).prod
 
-def pR {A : Type*} [Ring A] [Algebra ℂ A] {n m : ℕ} (E : Fin n → Fin n → A) (a b : Fin (m + 1) → Fin n)
-    (x : Fin (m + 1) → ℂ) (i : Fin m) (σ τ : Equiv.Perm (Fin (m + 1))) : A :=
+def pR
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    {n m : ℕ} (E : Fin n → Fin n → A) (a b : Fin (m + 1) → Fin n) (x : Fin (m + 1) → ℂ) (i : Fin m)
+    (σ τ : Equiv.Perm (Fin (m + 1)))
+    : A :=
   ((List.ofFn (pF E a b x σ τ)).drop ((i : ℕ) + 2)).prod
 
-def permutedRowProductSplitSum {A : Type*} [Ring A] {n m : ℕ} (E : Fin n → Fin n → A) (a b : Fin (m + 1) → Fin n) (i : Fin m)
-    (σ τ : Equiv.Perm (Fin (m + 1))) : A :=
+def permutedRowProductSplitSum
+    {A : Type*} [Ring A]
+    {n m : ℕ}
+    (E : Fin n → Fin n → A) (a b : Fin (m + 1) → Fin n) (i : Fin m) (σ τ : Equiv.Perm (Fin (m + 1)))
+    : A :=
   if b (τ i.castSucc) = a (σ i.succ) then E (a (σ i.castSucc)) (b (τ i.succ)) else 0
 
-def permutedRowProductSplit {A : Type*} [Ring A] {n m : ℕ} (E : Fin n → Fin n → A) (a b : Fin (m + 1) → Fin n) (i : Fin m)
-    (σ τ : Equiv.Perm (Fin (m + 1))) : A :=
+def permutedRowProductSplit
+    {A : Type*} [Ring A]
+    {n m : ℕ}
+    (E : Fin n → Fin n → A) (a b : Fin (m + 1) → Fin n) (i : Fin m) (σ τ : Equiv.Perm (Fin (m + 1)))
+    : A :=
   if b (τ i.succ) = a (σ i.castSucc) then E (a (σ i.succ)) (b (τ i.castSucc)) else 0
 
-theorem perm_swap {A : Type*} [Ring A] [Algebra ℂ A] {n m : ℕ} (E : Fin n → Fin n → A) (hE : GlRel E)
-    (a b : Fin (m + 1) → Fin n) (x : Fin (m + 1) → ℂ) (i : Fin m) :
-    doubleRowFormSum E a b (x ∘ Equiv.swap i.castSucc i.succ) = doubleRowFormSum E a b x := by
+theorem perm_swap
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    {n m : ℕ} (E : Fin n → Fin n → A) (hE : GlRel E) (a b : Fin (m + 1) → Fin n)
+    (x : Fin (m + 1) → ℂ) (i : Fin m)
+    : doubleRowFormSum E a b (x ∘ Equiv.swap i.castSucc i.succ) = doubleRowFormSum E a b x := by
   set s := Equiv.swap i.castSucc i.succ with hs
   have hu : ((Equiv.Perm.sign s : ℤ) * (Equiv.Perm.sign s : ℤ)) = 1 := by
     rw [← Units.val_mul, Int.units_mul_self, Units.val_one]
@@ -117,8 +142,9 @@ theorem perm_swap {A : Type*} [Ring A] [Algebra ℂ A] {n m : ℕ} (E : Fin n �
     congr 1
     rw [Equiv.Perm.sign_mul, Equiv.Perm.sign_mul, Units.val_mul, Units.val_mul]
     linear_combination ((Equiv.Perm.sign σ : ℤ) * (Equiv.Perm.sign τ : ℤ)) * hu
-  have hagree : ∀ σ τ : Equiv.Perm (Fin (m + 1)), ∀ k : Fin (m + 1), (k : ℕ) ≠ i →
-      (k : ℕ) ≠ (i : ℕ) + 1 → pF E a b x (σ * s) (τ * s) k = pF E a b x σ τ k := by
+  have hagree
+      : ∀ σ τ : Equiv.Perm (Fin (m + 1)), ∀ k : Fin (m + 1),
+        (k : ℕ) ≠ i → (k : ℕ) ≠ (i : ℕ) + 1 → pF E a b x (σ * s) (τ * s) k = pF E a b x σ τ k := by
     intro σ τ k h1 h2
     simp only [pF, Equiv.Perm.mul_apply, hs, perm_fix i k h1 h2]
   have hL : ∀ σ τ, pL E a b x i (σ * s) (τ * s) = pL E a b x i σ τ := by
@@ -129,11 +155,16 @@ theorem perm_swap {A : Type*} [Ring A] [Algebra ℂ A] {n m : ℕ} (E : Fin n �
     intro σ τ
     unfold pR
     rw [(ofFn_take_drop_eq_of_eq_off_pair _ _ i (hagree σ τ)).2]
-  have hX : ∀ σ τ, permutedRowProductSplitSum E a b i (σ * s) (τ * s) = permutedRowProductSplit E a b i σ τ := by
+  have hX
+      : ∀ σ τ,
+        permutedRowProductSplitSum E a b i (σ * s) (τ * s)
+          = permutedRowProductSplit E a b i σ τ := by
     intro σ τ
-    simp only [permutedRowProductSplitSum, permutedRowProductSplit, Equiv.Perm.mul_apply, hs, Equiv.swap_apply_left, Equiv.swap_apply_right]
-  have h1 : doubleRowFormSum E a b (x ∘ s) =
-      ∑ σ, ∑ τ, pε σ τ * (List.ofFn (pF E a b x σ τ ∘ s)).prod := by
+    simp only [permutedRowProductSplitSum, permutedRowProductSplit, Equiv.Perm.mul_apply, hs,
+      Equiv.swap_apply_left, Equiv.swap_apply_right]
+  have h1
+      : doubleRowFormSum E a b (x ∘ s)
+        = ∑ σ, ∑ τ, pε σ τ * (List.ofFn (pF E a b x σ τ ∘ s)).prod := by
     rw [dblAlt_eq, ← Equiv.sum_comp (Equiv.mulRight s)]
     refine Finset.sum_congr rfl fun σ _ => ?_
     rw [← Equiv.sum_comp (Equiv.mulRight s)]
@@ -141,8 +172,12 @@ theorem perm_swap {A : Type*} [Ring A] [Algebra ℂ A] {n m : ℕ} (E : Fin n �
     simp only [Equiv.coe_mulRight]
     rw [hε]
     rfl
-  have h2 : ∀ σ τ, (List.ofFn (pF E a b x σ τ)).prod - (List.ofFn (pF E a b x σ τ ∘ s)).prod =
-      pL E a b x i σ τ * (permutedRowProductSplitSum E a b i σ τ - permutedRowProductSplit E a b i σ τ) * pR E a b x i σ τ := by
+  have h2
+      : ∀ σ τ,
+        (List.ofFn (pF E a b x σ τ)).prod - (List.ofFn (pF E a b x σ τ ∘ s)).prod
+          = pL E a b x i σ τ
+            * (permutedRowProductSplitSum E a b i σ τ - permutedRowProductSplit E a b i σ τ)
+            * pR E a b x i σ τ := by
     intro σ τ
     rw [hs, perm_split_swap]
     unfold pL pR
@@ -150,21 +185,25 @@ theorem perm_swap {A : Type*} [Ring A] [Algebra ℂ A] {n m : ℕ} (E : Fin n �
     simp only [pF]
     rw [perm_Tm_comm, hE]
     rfl
-  have h3 : ∑ σ, ∑ τ, pε σ τ * (pL E a b x i σ τ * permutedRowProductSplitSum E a b i σ τ * pR E a b x i σ τ) =
-      ∑ σ, ∑ τ, pε σ τ * (pL E a b x i σ τ * permutedRowProductSplit E a b i σ τ * pR E a b x i σ τ) := by
-    rw [← Equiv.sum_comp (Equiv.mulRight s)]
-    refine Finset.sum_congr rfl fun σ _ => ?_
-    rw [← Equiv.sum_comp (Equiv.mulRight s)]
-    refine Finset.sum_congr rfl fun τ _ => ?_
-    simp only [Equiv.coe_mulRight]
-    rw [hε, hL, hR, hX]
+  have h3
+      : ∑ σ, ∑ τ, pε σ τ * (pL E a b x i σ τ * permutedRowProductSplitSum E a b i σ τ * pR E a b x i σ τ)
+        = ∑ σ, ∑ τ, pε σ τ * (pL E a b x i σ τ * permutedRowProductSplit E a b i σ τ * pR E a b x i σ τ) :=
+    by
+      rw [← Equiv.sum_comp (Equiv.mulRight s)]
+      refine Finset.sum_congr rfl fun σ _ => ?_
+      rw [← Equiv.sum_comp (Equiv.mulRight s)]
+      refine Finset.sum_congr rfl fun τ _ => ?_
+      simp only [Equiv.coe_mulRight]
+      rw [hε, hL, hR, hX]
   rw [h1, dblAlt_eq]
   symm
   rw [← sub_eq_zero]
-  calc (∑ σ, ∑ τ, pε σ τ * (List.ofFn (pF E a b x σ τ)).prod) -
-        ∑ σ, ∑ τ, pε σ τ * (List.ofFn (pF E a b x σ τ ∘ s)).prod
-      = ∑ σ, ∑ τ, (pε σ τ * (pL E a b x i σ τ * permutedRowProductSplitSum E a b i σ τ * pR E a b x i σ τ) -
-          pε σ τ * (pL E a b x i σ τ * permutedRowProductSplit E a b i σ τ * pR E a b x i σ τ)) := by
+  calc
+    (∑ σ, ∑ τ, pε σ τ * (List.ofFn (pF E a b x σ τ)).prod)
+          - ∑ σ, ∑ τ, pε σ τ * (List.ofFn (pF E a b x σ τ ∘ s)).prod
+        = ∑ σ, ∑ τ, (pε σ τ * (pL E a b x i σ τ * permutedRowProductSplitSum E a b i σ τ * pR E a b x i σ τ) -
+            pε σ τ * (pL E a b x i σ τ * permutedRowProductSplit E a b i σ τ * pR E a b x i σ τ)) :=
+      by
         rw [← Finset.sum_sub_distrib]
         refine Finset.sum_congr rfl fun σ _ => ?_
         rw [← Finset.sum_sub_distrib]
@@ -172,8 +211,8 @@ theorem perm_swap {A : Type*} [Ring A] [Algebra ℂ A] {n m : ℕ} (E : Fin n �
         rw [← mul_sub, h2]
         noncomm_ring
     _ = 0 := by
-        simp only [Finset.sum_sub_distrib]
-        rw [h3, sub_self]
+      simp only [Finset.sum_sub_distrib]
+      rw [h3, sub_self]
 
 theorem double_row_permutation : DblPerm := by
   intro A _ _ n t E hE a b x π

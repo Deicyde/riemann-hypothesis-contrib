@@ -24,13 +24,17 @@ public import Formalism.LocalToGlobal.TorsionIntegrality.ComplexLatticeClosure.L
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators ComplexConjugate
 
 namespace GlobalTheory.JetsGenusOne
 
-theorem sgStar_eq (L : PeriodPair) : TaylorLogMetric.sgStar L.lattice.toAddSubgroup = Formalism.L2.Th1.F.sgStar L := by
-  rw [GlobalTheory.OddTheta.sgStar_eq L _ (fun _ => Iff.rfl), GlobalTheory.Mem.Col2.ThetaVec.sgStar_eq]
+theorem sgStar_eq (L : PeriodPair)
+    : TaylorLogMetric.sgStar L.lattice.toAddSubgroup = Formalism.L2.Th1.F.sgStar L := by
+  rw [GlobalTheory.OddTheta.sgStar_eq L _ (fun _ => Iff.rfl),
+    GlobalTheory.Mem.Col2.ThetaVec.sgStar_eq]
 
 end GlobalTheory.JetsGenusOne
 

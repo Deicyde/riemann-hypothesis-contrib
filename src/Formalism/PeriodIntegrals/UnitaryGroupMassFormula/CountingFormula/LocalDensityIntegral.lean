@@ -12,8 +12,11 @@ namespace PI.UnitaryGroupMassFormula.CntFormula
 open Formalism.MainNotions.S
 open ValuativeRel
 
-theorem fl_inj {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Loc.LocE F E) : Function.Injective (algebraMap F E) := by
+theorem fl_inj
+    {F E : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : Loc.LocE F E)
+    : Function.Injective (algebraMap F E) := by
   haveI : Nontrivial E := by
     by_contra hn
     rw [not_nontrivial_iff_subsingleton] at hn
@@ -22,9 +25,14 @@ theorem fl_inj {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [Com
     omega
   exact (algebraMap F E).injective
 
-theorem fl_norm_ne {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Loc.LocE F E) (hE : ∀ x : E, x ≠ 0 → IsUnit x)
-    {x : E} (hx0 : x ≠ 0) (n : 𝒪[F]) (hn : algebraMap F E n = x * L.cj x) : n ≠ 0 := by
+theorem fl_norm_ne
+    {F E : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : Loc.LocE F E)
+    (hE : ∀ x : E, x ≠ 0 → IsUnit x)
+    {x : E} (hx0 : x ≠ 0)
+    (n : 𝒪[F]) (hn : algebraMap F E n = x * L.cj x)
+    : n ≠ 0 := by
   haveI : Nontrivial E := by
     by_contra hn
     rw [not_nontrivial_iff_subsingleton] at hn
@@ -39,18 +47,26 @@ theorem fl_norm_ne {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] 
   rw [← hn]
   simp
 
-theorem fl_fact {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F)
-    (hE : ∀ x : E, x ≠ 0 → IsUnit x) (hinj : Function.Injective (algebraMap F E))
-    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) :
-    ∀ x ∈ L.O, x ≠ 0 → ∃ k : ℕ, ∃ u ∈ L.O, (∃ w ∈ L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ k * u := by
+theorem fl_fact
+    {F E : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F) (hE : ∀ x : E, x ≠ 0 → IsUnit x)
+    (hinj : Function.Injective (algebraMap F E))
+    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ)
+    : ∀ x ∈ L.O,
+      x ≠ 0 → ∃ k : ℕ, ∃ u ∈ L.O, (∃ w ∈ L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ k * u := by
   haveI := hl
-  have key : ∀ n : 𝒪[F], ∀ x ∈ L.O, x ≠ 0 → algebraMap F E n = x * L.cj x →
-      ∃ k : ℕ, ∃ u ∈ L.O, (∃ w ∈ L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ k * u := by
+  have key
+      : ∀ n : 𝒪[F], ∀ x ∈ L.O,
+        x ≠ 0 → algebraMap F E n = x * L.cj x
+          → ∃ k : ℕ, ∃ u ∈ L.O, (∃ w ∈ L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ k * u := by
     intro n
     refine WellFounded.induction (wellFounded_dvdNotUnit (α := 𝒪[F]))
-      (C := fun n : 𝒪[F] => ∀ x ∈ L.O, x ≠ 0 → algebraMap F E n = x * L.cj x →
-        ∃ k : ℕ, ∃ u ∈ L.O, (∃ w ∈ L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ k * u) n ?_
+      (C := fun n : 𝒪[F] =>
+        ∀ x ∈ L.O,
+          x ≠ 0 → algebraMap F E n = x * L.cj x
+            → ∃ k : ℕ, ∃ u ∈ L.O, (∃ w ∈ L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ k * u)
+      n ?_
     intro n ih x hx hx0 hn
     by_cases hdiv : ∃ z ∈ L.O, x = algebraMap F E ϖ * z
     · obtain ⟨z, hz, rfl⟩ := hdiv
@@ -62,11 +78,14 @@ theorem fl_fact {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [Co
       have heq : n = n' * (ϖ * ϖ) := by
         apply Subtype.ext
         apply hinj
-        calc algebraMap F E (n : F) = algebraMap F E ϖ * z * L.cj (algebraMap F E ϖ * z) := hn
+        calc
+          algebraMap F E (n : F)
+            = algebraMap F E ϖ * z * L.cj (algebraMap F E ϖ * z) := hn
           _ = (z * L.cj z) * (algebraMap F E ϖ * algebraMap F E ϖ) := by rw [map_mul, hcj]; ring
           _ = algebraMap F E n' * (algebraMap F E ϖ * algebraMap F E ϖ) := by rw [hn']
           _ = algebraMap F E ((n' * (ϖ * ϖ) : 𝒪[F]) : F) := by
-            rw [show ((n' * (ϖ * ϖ) : 𝒪[F]) : F) = (n' : F) * ((ϖ : F) * (ϖ : F)) from rfl, map_mul, map_mul]
+            rw [show ((n' * (ϖ * ϖ) : 𝒪[F]) : F) = (n' : F) * ((ϖ : F) * (ϖ : F)) from rfl, map_mul,
+              map_mul]
       have hdvd : DvdNotUnit n' n := by
         refine ⟨fl_norm_ne L hE hz0 n' hn', ϖ * ϖ, ?_, heq⟩
         rw [IsUnit.mul_iff]

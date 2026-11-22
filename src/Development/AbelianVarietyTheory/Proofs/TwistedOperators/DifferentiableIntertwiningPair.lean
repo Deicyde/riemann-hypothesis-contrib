@@ -14,8 +14,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SrcLat
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -30,16 +33,19 @@ open GlobalTheory.MovedDict Formalism.L2.Ker GlobalTheory.SignedHC
 
 namespace GlobalTheory.MovedDict.Entire
 
-theorem differentiable_U' {D : D7} {T : Tor D} {N N' : ℕ} (x : VC D N N') {G : VC D N N' → ℂ}
-    (hG : Differentiable ℂ G) : Differentiable ℂ (U D T x G) := by
+theorem differentiable_U'
+    {D : D7} {T : Tor D} {N N' : ℕ} (x : VC D N N') {G : VC D N N' → ℂ} (hG : Differentiable ℂ G)
+    : Differentiable ℂ (U D T x G) := by
   have h : Differentiable ℂ (fun z : VC D N N' => Hf D T z x) := by
     unfold Hf
     fun_prop
   unfold U
   fun_prop
 
-theorem differentiable_Iop' {D : D7} {T : Tor D} {N N' : ℕ} (A B : AddSubgroup (VC D N N'))
-    {G : VC D N N' → ℂ} (hG : Differentiable ℂ G) : Differentiable ℂ (Iop D T A B G) := by
+theorem differentiable_Iop'
+    {D : D7} {T : Tor D} {N N' : ℕ} (A B : AddSubgroup (VC D N N'))
+    {G : VC D N N' → ℂ} (hG : Differentiable ℂ G)
+    : Differentiable ℂ (Iop D T A B G) := by
   unfold Iop
   by_cases h : (A.addSubgroupOf B).index = 0
   · simp [h]

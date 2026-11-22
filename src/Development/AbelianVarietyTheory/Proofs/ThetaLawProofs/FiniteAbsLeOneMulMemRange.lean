@@ -10,19 +10,22 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.SndFDerivAd
 
 noncomputable section
 
-open Complex Matrix ReciprocityTheory.PTheta ReciprocityTheory.ChartRestriction.G.Key ReciprocityTheory.ChartRestriction.G.Key.Chi
+open Complex Matrix ReciprocityTheory.PTheta ReciprocityTheory.ChartRestriction.G.Key
+  ReciprocityTheory.ChartRestriction.G.Key.Chi
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold Topology
 
 namespace GlobalTheory
 
-theorem eq_of_finite_modular_family {F : Set (ℍ → ℂ)} (hF : F.Finite)
-    (hol : ∀ f ∈ F, MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f)
+theorem eq_of_finite_modular_family
+    {F : Set (ℍ → ℂ)} (hF : F.Finite) (hol : ∀ f ∈ F, MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f)
     (bdd : ∀ f ∈ F, UpperHalfPlane.IsBoundedAtImInfty f)
     (hS : ∀ f ∈ F, (fun z => f (ModularGroup.S • z)) ∈ F)
     (hT : ∀ f ∈ F, (fun z => f (ModularGroup.T • z)) ∈ F)
-    {f : ℍ → ℂ} (hf : f ∈ F) (z w : ℍ) : f z = f w := by
-  have key : ∀ X : ℂ, ∃ c, (∏ f ∈ hF.toFinset, (fun z => X - f z) : ℍ → ℂ) =
-      Function.const _ c := by
+    {f : ℍ → ℂ} (hf : f ∈ F)
+    (z w : ℍ)
+    : f z = f w := by
+  have key
+      : ∀ X : ℂ, ∃ c, (∏ f ∈ hF.toFinset, (fun z => X - f z) : ℍ → ℂ) = Function.const _ c := by
     intro X
     set P : ℍ → ℂ := ∏ f ∈ hF.toFinset, (fun z => X - f z) with hP
     have hγ : ∀ γ : SL(2, ℤ), (∀ f ∈ F, (fun z => f (γ • z)) ∈ F) → P ∣[(0 : ℤ)] γ = P := by
@@ -36,30 +39,37 @@ theorem eq_of_finite_modular_family {F : Set (ℍ → ℂ)} (hF : F.Finite)
       ext z
       rw [ModularForm.SL_slash_apply]
       simp only [neg_zero, zpow_zero, mul_one, hP, Finset.prod_apply]
-      exact Finset.prod_nbij (fun (f : ℍ → ℂ) (z : ℍ) => f (γ • z))
-        (fun f hf => by simpa using hγ f (by simpa using hf)) hinj.injOn
-        (by simpa using hb.surjOn) (fun f _ => rfl)
+      exact Finset.prod_nbij
+        (fun (f : ℍ → ℂ) (z : ℍ) => f (γ • z))
+        (fun f hf => by simpa using hγ f (by simpa using hf))
+        hinj.injOn (by simpa using hb.surjOn)
+        (fun f _ => rfl)
     have hs := SlashInvariantForm.slash_action_generators_SL2Z (hγ _ hS) (hγ _ hT)
     have hb : UpperHalfPlane.IsBoundedAtImInfty P := by
       refine Filter.BoundedAtFilter.prod _ fun f hf => ?_
       exact Asymptotics.IsBigO.sub (Filter.const_boundedAtFilter _ X) (bdd f (by simpa using hf))
-    let M : ModularForm 𝒮ℒ 0 :=
-      { toFun := P
-        slash_action_eq' := fun _ ⟨γ, hγ⟩ ↦ hγ ▸ hs γ
-        holo' := by
-          refine Finset.prod_induction _ (fun f : ℍ → ℂ => MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f)
-            (fun a b ha hb => ha.mul hb) mdifferentiable_const fun f hf => ?_
-          exact mdifferentiable_const.sub (hol f (by simpa using hf))
-        bdd_at_cusps' := fun {c} hc ↦ by
-          rw [Subgroup.IsArithmetic.isCusp_iff_isCusp_SL2Z] at hc
-          rw [OnePoint.isBoundedAt_iff_forall_SL2Z hc]
-          intro γ _
-          rw [hs γ]
-          exact hb }
+    let M : ModularForm 𝒮ℒ 0 := {
+      toFun := P
+      slash_action_eq' := fun _ ⟨γ, hγ⟩ ↦ hγ ▸ hs γ
+      holo' := by
+        refine Finset.prod_induction _
+          (fun f : ℍ → ℂ => MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f)
+          (fun a b ha hb => ha.mul hb)
+          mdifferentiable_const
+          fun f hf => ?_
+        exact mdifferentiable_const.sub (hol f (by simpa using hf))
+      bdd_at_cusps' := fun {c} hc ↦ by
+        rw [Subgroup.IsArithmetic.isCusp_iff_isCusp_SL2Z] at hc
+        rw [OnePoint.isBoundedAt_iff_forall_SL2Z hc]
+        intro γ _
+        rw [hs γ]
+        exact hb
+    }
     exact ModularFormClass.levelOne_weight_zero_const M
   have hfin : ((fun f : ℍ → ℂ => f UpperHalfPlane.I) '' F).Finite := hF.image _
-  refine isPreconnected_univ.constant_of_mapsTo hfin.isDiscrete
-    (hol f hf).continuous.continuousOn (fun t _ => ?_) (Set.mem_univ z) (Set.mem_univ w)
+  refine isPreconnected_univ.constant_of_mapsTo hfin.isDiscrete (hol f hf).continuous.continuousOn
+    (fun t _ => ?_)
+    (Set.mem_univ z) (Set.mem_univ w)
   obtain ⟨c, hc⟩ := key (f t)
   have h1 := congrFun hc t
   have h2 := congrFun hc UpperHalfPlane.I
@@ -71,29 +81,39 @@ theorem eq_of_finite_modular_family {F : Set (ℍ → ℂ)} (hF : F.Finite)
 
 variable {g : ℕ} {H : Matrix (Fin g) (Fin g) ℂ → ℂ}
 
-theorem spInvariant_transl (hH : IsSpInvariant g H) {B : Matrix (Fin g) (Fin g) ℤ} (hB : B.IsSymm)
-    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g)) :
-    H (τ + B.map (Int.cast : ℤ → ℂ)) = H τ := by
+theorem spInvariant_transl
+    (hH : IsSpInvariant g H)
+    {B : Matrix (Fin g) (Fin g) ℤ} (hB : B.IsSymm)
+    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g))
+    : H (τ + B.map (Int.cast : ℤ → ℂ)) = H τ := by
   rw [← spAct_spTransl]
   exact hH _ (spTransl_mem_sp hB) τ hτ
 
-theorem spAct_spDiag_eq (U : (Matrix (Fin g) (Fin g) ℤ)ˣ) (τ : Matrix (Fin g) (Fin g) ℂ) :
-    spAct (spDiag U) τ = (U : Matrix (Fin g) (Fin g) ℤ).map (Int.cast : ℤ → ℂ) * τ *
-      ((U : Matrix (Fin g) (Fin g) ℤ).map (Int.cast : ℤ → ℂ))ᵀ := by
+theorem spAct_spDiag_eq (U : (Matrix (Fin g) (Fin g) ℤ)ˣ) (τ : Matrix (Fin g) (Fin g) ℂ)
+    : spAct (spDiag U) τ
+      = (U : Matrix (Fin g) (Fin g) ℤ).map (Int.cast : ℤ → ℂ) * τ
+        * ((U : Matrix (Fin g) (Fin g) ℤ).map (Int.cast : ℤ → ℂ))ᵀ := by
   rw [spAct_eq, jAut_spDiag_inv, nAut_eq, cMat_spDiag]
   simp
 
-theorem spInvariant_conj (hH : IsSpInvariant g H) (U : (Matrix (Fin g) (Fin g) ℤ)ˣ)
-    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g)) :
-    H ((U : Matrix (Fin g) (Fin g) ℤ).map (Int.cast : ℤ → ℂ) * τ *
-      ((U : Matrix (Fin g) (Fin g) ℤ).map (Int.cast : ℤ → ℂ))ᵀ) = H τ := by
+theorem spInvariant_conj
+    (hH : IsSpInvariant g H) (U : (Matrix (Fin g) (Fin g) ℤ)ˣ)
+    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g))
+    : H
+        ((U : Matrix (Fin g) (Fin g) ℤ).map (Int.cast : ℤ → ℂ) * τ
+          * ((U : Matrix (Fin g) (Fin g) ℤ).map (Int.cast : ℤ → ℂ))ᵀ)
+      = H τ := by
   rw [← spAct_spDiag_eq]
   exact hH _ (spDiag_mem_sp U) τ hτ
 
-theorem spInvariant_partialInv (hH : IsSpInvariant g H) (e : Fin g)
+theorem spInvariant_partialInv
+    (hH : IsSpInvariant g H)
+    (e : Fin g)
     {τ σ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g))
-    (h : ∀ i k, σ i k - σ i e * (τ e k + if e = k then 1 else 0) =
-      τ i k + if i = e then (if e = k then 1 else 0) - τ e k else 0) : H σ = H τ := by
+    (h : ∀ i k,
+      σ i k - σ i e * (τ e k + if e = k then 1 else 0)
+        = τ i k + if i = e then (if e = k then 1 else 0) - τ e k else 0)
+    : H σ = H τ := by
   have hm := spH_le g (spPJ_mem e)
   have hj := jAut_isUnit hm hτ
   have : σ * jAut (spPJ e) τ = nAut (spPJ e) τ := by
@@ -117,25 +137,29 @@ theorem spInvariant_partialInv (hH : IsSpInvariant g H) (e : Fin g)
   rw [e2]
   exact hH _ hm τ hτ
 
-def rankOneCurve (Z : Matrix (Fin g) (Fin g) ℂ) (R : Matrix (Fin g) (Fin g) ℝ) (u : Fin g → ℝ)
-    (s : ℂ) : Matrix (Fin g) (Fin g) ℂ :=
+def rankOneCurve
+    (Z : Matrix (Fin g) (Fin g) ℂ) (R : Matrix (Fin g) (Fin g) ℝ) (u : Fin g → ℝ) (s : ℂ)
+    : Matrix (Fin g) (Fin g) ℂ :=
   of fun i j => Z i j + R i j + s * u i * u j
 
-theorem rankOneCurve_map_im (Z : Matrix (Fin g) (Fin g) ℂ) (R : Matrix (Fin g) (Fin g) ℝ)
-    (u : Fin g → ℝ) (s : ℂ) :
-    (rankOneCurve Z R u s).map Complex.im = Z.map Complex.im + s.im • vecMulVec u u := by
+theorem rankOneCurve_map_im
+    (Z : Matrix (Fin g) (Fin g) ℂ) (R : Matrix (Fin g) (Fin g) ℝ) (u : Fin g → ℝ) (s : ℂ)
+    : (rankOneCurve Z R u s).map Complex.im = Z.map Complex.im + s.im • vecMulVec u u := by
   ext i j
   simp [rankOneCurve, vecMulVec_apply, mul_assoc]
 
 section Curve
 
-variable {e : Fin g} {Z : Matrix (Fin g) (Fin g) ℂ} (hZs : Z.IsSymm) (hZe : ∀ i, Z i e = 0)
-  (hZ : ∀ u : Fin g → ℝ, u e = 1 → ∀ y : ℝ, 0 < y →
-    (Z.map Complex.im + y • vecMulVec u u).PosDef)
+variable
+  {e : Fin g} {Z : Matrix (Fin g) (Fin g) ℂ} (hZs : Z.IsSymm) (hZe : ∀ i, Z i e = 0)
+  (hZ : ∀ u : Fin g → ℝ, u e = 1 → ∀ y : ℝ, 0 < y → (Z.map Complex.im + y • vecMulVec u u).PosDef)
 
 include hZs hZ in
-theorem rankOneCurve_mem {R : Matrix (Fin g) (Fin g) ℝ} (hR : R.IsSymm) {u : Fin g → ℝ}
-    (hu : u e = 1) {s : ℂ} (hs : 0 < s.im) : rankOneCurve Z R u s ∈ SiegelH (Fin g) := by
+theorem rankOneCurve_mem
+    {R : Matrix (Fin g) (Fin g) ℝ} (hR : R.IsSymm)
+    {u : Fin g → ℝ} (hu : u e = 1)
+    {s : ℂ} (hs : 0 < s.im)
+    : rankOneCurve Z R u s ∈ SiegelH (Fin g) := by
   refine ⟨?_, ?_⟩
   · ext i j
     simp only [rankOneCurve, transpose_apply, of_apply, hZs.apply i j, hR.apply i j]
@@ -143,9 +167,9 @@ theorem rankOneCurve_mem {R : Matrix (Fin g) (Fin g) ℝ} (hR : R.IsSymm) {u : F
   · rw [rankOneCurve_map_im]
     exact hZ u hu _ hs
 
-theorem finite_abs_le_one_mul_mem_range {c : ℝ} (hc : c ≠ 0) :
-    {x : ℝ | |x| ≤ 1 ∧ c * x ∈ (Int.castRingHom ℝ).range}.Finite := by
-  refine ((Set.finite_Icc (-⌈|c|⌉) ⌈|c|⌉).image fun k : ℤ => (k : ℝ) / c).subset ?_
+theorem finite_abs_le_one_mul_mem_range {c : ℝ} (hc : c ≠ 0)
+    : {x : ℝ | |x| ≤ 1 ∧ c * x ∈ (Int.castRingHom ℝ).range}.Finite := by
+  refine ((Set.finite_Icc (- ⌈|c|⌉) ⌈|c|⌉).image fun k : ℤ => (k : ℝ) / c).subset ?_
   rintro x ⟨hx, k, hk⟩
   have hk' : (k : ℝ) = c * x := hk
   refine ⟨k, ?_, by simp only [hk']; field_simp⟩
@@ -154,31 +178,35 @@ theorem finite_abs_le_one_mul_mem_range {c : ℝ} (hc : c ≠ 0) :
     exact (mul_le_of_le_one_right (abs_nonneg c) hx).trans (Int.le_ceil _)
   exact abs_le.1 (by exact_mod_cast h1)
 
-
 include hZs hZe hZ in
-theorem eq_on_rankOneCurve_of_integral (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
-    (hb : ∀ c : ℝ, 0 < c → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
-      (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
-    {N : ℕ} (hN : N ≠ 0) {R : Matrix (Fin g) (Fin g) ℝ} {u : Fin g → ℝ} (hu : u e = 1)
-    (hR : R.IsSymm) (hRe : R e e = 0) (huN : ∀ i, N * u i ∈ (Int.castRingHom ℝ).range)
+theorem eq_on_rankOneCurve_of_integral
+    (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
+    (hb : ∀ c : ℝ,
+      0 < c
+        → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
+          (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
+    {N : ℕ} (hN : N ≠ 0)
+    {R : Matrix (Fin g) (Fin g) ℝ} {u : Fin g → ℝ} (hu : u e = 1) (hR : R.IsSymm) (hRe : R e e = 0)
+    (huN : ∀ i, N * u i ∈ (Int.castRingHom ℝ).range)
     (hRN : ∀ i, N * R i e ∈ (Int.castRingHom ℝ).range)
-    (hRN2 : ∀ i j, N * N * R i j ∈ (Int.castRingHom ℝ).range) (z w : ℍ) :
-    H (rankOneCurve Z R u z) = H (rankOneCurve Z R u w) := by
+    (hRN2 : ∀ i j, N * N * R i j ∈ (Int.castRingHom ℝ).range)
+    (z w : ℍ)
+    : H (rankOneCurve Z R u z) = H (rankOneCurve Z R u w) := by
   set A := (Int.castRingHom ℝ).range with hA
   let ε : Fin g → ℝ := fun i => if i = e then 1 else 0
   have hεe : ε e = 1 := if_pos rfl
-  have hε : ∀ i, ε i ∈ A := fun i => by
-    by_cases h : i = e <;> simp [ε, h]
+  have hε : ∀ i, ε i ∈ A := fun i => by by_cases h : i = e <;> simp [ε, h]
   have hNA : (N : ℝ) ∈ A := natCast_mem A N
-  let F : Set (ℍ → ℂ) := {f | ∃ (R : Matrix (Fin g) (Fin g) ℝ) (u : Fin g → ℝ), u e = 1 ∧
-    R.IsSymm ∧ R e e = 0 ∧ (∀ i, N * u i ∈ A) ∧ (∀ i, N * R i e ∈ A) ∧
-    (∀ i j, N * N * R i j ∈ A) ∧ f = fun z : ℍ => H (rankOneCurve Z R u z)}
+  let F : Set (ℍ → ℂ) :=
+    {f | ∃ (R : Matrix (Fin g) (Fin g) ℝ) (u : Fin g → ℝ), u e = 1 ∧
+      R.IsSymm ∧ R e e = 0 ∧ (∀ i, N * u i ∈ A) ∧ (∀ i, N * R i e ∈ A) ∧
+      (∀ i j, N * N * R i j ∈ A) ∧ f = fun z : ℍ => H (rankOneCurve Z R u z)}
   refine eq_of_finite_modular_family (F := F) ?_ ?_ ?_ ?_ ?_
     ⟨R, u, hu, hR, hRe, huN, hRN, hRN2, rfl⟩ z w
   · have hfin := finite_abs_le_one_mul_mem_range (c := (N * N : ℝ)) (by positivity)
     refine (((Set.Finite.pi' fun _ : Fin g => Set.Finite.pi' fun _ : Fin g => hfin).prod
-      (Set.Finite.pi' fun _ : Fin g => hfin)).image
-        fun p (z : ℍ) => H (rankOneCurve Z (of p.1) p.2 z)).subset ?_
+        (Set.Finite.pi' fun _ : Fin g => hfin)).image fun p (z : ℍ) =>
+      H (rankOneCurve Z (of p.1) p.2 z)).subset ?_
     rintro _ ⟨R, u, hu, hR, hRe, huN, hRN, hRN2, rfl⟩
     let k : Fin g → ℤ := fun i => if i = e then 0 else ⌊u i⌋
     have hke : k e = 0 := if_pos rfl
@@ -188,29 +216,36 @@ theorem eq_on_rankOneCurve_of_integral (hol : IsHoloSiegel g H) (hH : IsSpInvari
       ext i j
       simp only [R₁, transpose_apply, of_apply, hR.apply i j]
       ring
-    refine ⟨(fun i j => Int.fract (R₁ i j), fun i => u i - k i), ⟨fun i j => ⟨?_, ?_⟩,
-      fun i => ⟨?_, ?_⟩⟩, funext fun z => ?_⟩
+    refine ⟨
+      (fun i j => Int.fract (R₁ i j), fun i => u i - k i),
+      ⟨fun i j => ⟨?_, ?_⟩, fun i => ⟨?_, ?_⟩⟩,
+      funext fun z => ?_
+    ⟩
     · exact abs_le.2 ⟨by linarith [Int.fract_nonneg (R₁ i j)], (Int.fract_lt_one _).le⟩
-    · have : N * N * Int.fract (R₁ i j) = N * N * R i j - (N * k i * (N * R j e) +
-          N * R i e * (N * k j)) - N * N * ⌊R₁ i j⌋ := by
+    · have : N * N * Int.fract (R₁ i j)
+          = N * N * R i j - (N * k i * (N * R j e) + N * R i e * (N * k j)) - N * N * ⌊R₁ i j⌋ := by
         simp only [Int.fract, R₁, of_apply]
         ring
       simp only [this]
-      exact sub_mem (sub_mem (hRN2 i j) (add_mem (mul_mem (mul_mem hNA (hk i)) (hRN j))
-        (mul_mem (hRN i) (mul_mem hNA (hk j))))) (mul_mem (mul_mem hNA hNA) (intCast_mem A _))
+      exact sub_mem
+        (sub_mem (hRN2 i j)
+          (add_mem (mul_mem (mul_mem hNA (hk i)) (hRN j)) (mul_mem (hRN i) (mul_mem hNA (hk j)))))
+        (mul_mem (mul_mem hNA hNA) (intCast_mem A _))
     · by_cases h : i = e
       · simp [h, hu, hke]
       · simp only [k, if_neg h]
         exact abs_le.2 ⟨by linarith [Int.floor_le (u i)], by linarith [Int.lt_floor_add_one (u i)]⟩
     · simp only [mul_sub, mul_assoc]
       exact sub_mem (mul_mem hNA (huN i)) (mul_mem hNA (mul_mem hNA (hk i)))
-    · have h1 := spInvariant_conj hH (rkU (-k) (Pi.single e 1) (by simp [hke]))
-        (rankOneCurve_mem hZs hZ hR hu z.im_pos)
+    · have h1 :=
+        spInvariant_conj hH (rkU (-k) (Pi.single e 1) (by simp [hke]))
+          (rankOneCurve_mem hZs hZ hR hu z.im_pos)
       have hfs : (of fun i j => Int.fract (R₁ i j)).IsSymm := by
         ext i j
         simp only [transpose_apply, of_apply, hR₁.apply i j]
-      have h2 := spInvariant_transl hH (B := R₁.map Int.floor) (hR₁.map _)
-        (rankOneCurve_mem hZs hZ hfs (u := fun i => u i - k i) (by simp [hu, hke]) z.im_pos)
+      have h2 :=
+        spInvariant_transl hH (B := R₁.map Int.floor) (hR₁.map _)
+          (rankOneCurve_mem hZs hZ hfs (u := fun i => u i - k i) (by simp [hu, hke]) z.im_pos)
       simp only
       rw [← h1, ← h2]
       congr 1
@@ -220,14 +255,15 @@ theorem eq_on_rankOneCurve_of_integral (hol : IsHoloSiegel g H) (hH : IsSpInvari
         push_cast
         rfl
       have hZe' : ∀ i, Z e i = 0 := fun i => (hZs.apply i e).trans (hZe i)
-      simp only [rkU_val, Matrix.mul_apply, map_apply, Matrix.add_apply, transpose_apply, rankOneCurve,
-        of_apply, h3]
-      simp [Matrix.one_apply, vecMulVec_apply, Pi.single_apply, add_mul, mul_add, Finset.sum_add_distrib,
-        hZe, hZe', hu, hRe, R₁, hR.apply j e]
+      simp only [rkU_val, Matrix.mul_apply, map_apply, Matrix.add_apply, transpose_apply,
+        rankOneCurve, of_apply, h3]
+      simp [Matrix.one_apply, vecMulVec_apply, Pi.single_apply, add_mul, mul_add,
+        Finset.sum_add_distrib, hZe, hZe', hu, hRe, R₁, hR.apply j e]
       ring
   · rintro _ ⟨R, u, hu, hR, -, -, -, -, rfl⟩
     rw [UpperHalfPlane.mdifferentiable_iff]
-    have hd : Differentiable ℂ fun s : ℂ => (of.symm (rankOneCurve Z R u s) : Fin g → Fin g → ℂ) := by
+    have hd
+        : Differentiable ℂ fun s : ℂ => (of.symm (rankOneCurve Z R u s) : Fin g → Fin g → ℂ) := by
       refine differentiable_pi.2 fun i => differentiable_pi.2 fun j => ?_
       simp only [rankOneCurve, of_symm_apply, of_apply]
       fun_prop
@@ -238,10 +274,11 @@ theorem eq_on_rankOneCurve_of_integral (hol : IsHoloSiegel g H) (hH : IsSpInvari
   · rintro _ ⟨R, u, hu, hR, -, -, -, -, rfl⟩
     obtain ⟨c, hc, hle⟩ := posDef_exists_mul_dotProduct_le (hZ u hu 1 one_pos)
     obtain ⟨K, hK⟩ := hb c hc
-    refine UpperHalfPlane.isBoundedAtImInfty_iff.2 ⟨K, 1, fun z hz =>
-      hK _ (rankOneCurve_mem hZs hZ hR hu z.im_pos) ?_⟩
-    have h1 : (Z.map Complex.im + (1 : ℝ) • vecMulVec u u -
-        c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef := by
+    refine UpperHalfPlane.isBoundedAtImInfty_iff.2
+      ⟨K, 1, fun z hz => hK _ (rankOneCurve_mem hZs hZ hR hu z.im_pos) ?_⟩
+    have h1
+        : (Z.map Complex.im + (1 : ℝ) • vecMulVec u u
+          - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef := by
       refine posSemidef_iff_dotProduct_mulVec.2 ⟨(hZ u hu 1 one_pos).1.sub ?_, fun x => ?_⟩
       · simp [IsHermitian]
       · rw [sub_mulVec, dotProduct_sub, smul_mulVec, one_mulVec, dotProduct_smul]
@@ -252,13 +289,22 @@ theorem eq_on_rankOneCurve_of_integral (hol : IsHoloSiegel g H) (hH : IsSpInvari
     simp only [star_trivial, UpperHalfPlane.coe_im]
     module
   · rintro _ ⟨R, u, hu, hR, hRe, huN, hRN, hRN2, rfl⟩
-    have hR' : (of fun i j => R i j - u i * (ε j + R j e) - (ε i + R i e) * u j +
-        2 * (ε i * ε j)).IsSymm := by
+    have hR' : (of fun i j =>
+        R i j - u i * (ε j + R j e) - (ε i + R i e) * u j + 2 * (ε i * ε j)).IsSymm := by
       ext i j
       simp only [transpose_apply, of_apply, hR.apply i j]
       ring
-    refine ⟨_, fun i => ε i + R i e, by simp [hεe, hRe], hR', by simp [hεe, hRe, hu]; ring,
-      fun i => ?_, fun i => ?_, fun i j => ?_, funext fun z => ?_⟩
+    refine ⟨
+      _,
+      fun i => ε i + R i e,
+      by simp [hεe, hRe],
+      hR',
+      by simp [hεe, hRe, hu]; ring,
+      fun i => ?_,
+      fun i => ?_,
+      fun i j => ?_,
+      funext fun z => ?_
+    ⟩
     · rw [mul_add]
       exact add_mem (mul_mem hNA (hε i)) (hRN i)
     · convert sub_mem (mul_mem hNA (hε i)) (huN i) using 1
@@ -272,22 +318,22 @@ theorem eq_on_rankOneCurve_of_integral (hol : IsHoloSiegel g H) (hH : IsSpInvari
       push_cast
       ring
     · symm
-      refine spInvariant_partialInv hH e
-        (rankOneCurve_mem hZs hZ hR hu (ModularGroup.S • z).im_pos) fun i k => ?_
+      refine spInvariant_partialInv hH e (rankOneCurve_mem hZs hZ hR hu (ModularGroup.S • z).im_pos)
+        fun i k => ?_
       have hZe' : ∀ i, Z e i = 0 := fun i => (hZs.apply i e).trans (hZe i)
       have hz := z.ne_zero
-      simp only [rankOneCurve, of_apply, UpperHalfPlane.modular_S_smul, UpperHalfPlane.coe_mk,
-        hZe, hZe', hεe, hu, hRe, hR.apply k e]
-      by_cases hi : i = e <;> by_cases hk : k = e <;>
-        simp [ε, hi, hk, eq_comm (a := e), hZe, hZe', hu, hRe, hR.apply k e] <;>
-        field_simp <;> ring
+      simp only [rankOneCurve, of_apply, UpperHalfPlane.modular_S_smul, UpperHalfPlane.coe_mk, hZe,
+        hZe', hεe, hu, hRe, hR.apply k e]
+      by_cases hi : i = e <;> by_cases hk : k = e
+        <;> simp [ε, hi, hk, eq_comm (a := e), hZe, hZe', hu, hRe, hR.apply k e] <;> field_simp
+        <;> ring
   · rintro _ ⟨R, u, hu, hR, hRe, huN, hRN, hRN2, rfl⟩
     have hR' : (of fun i j => R i j + u i * u j - ε i * ε j).IsSymm := by
       ext i j
       simp only [transpose_apply, of_apply, hR.apply i j]
       ring
-    refine ⟨_, u, hu, hR', by simp [hεe, hRe, hu], huN, fun i => ?_, fun i j => ?_,
-      funext fun z => ?_⟩
+    refine
+      ⟨_, u, hu, hR', by simp [hεe, hRe, hu], huN, fun i => ?_, fun i j => ?_, funext fun z => ?_⟩
     · convert sub_mem (add_mem (hRN i) (huN i)) (mul_mem hNA (hε i)) using 1
       simp only [of_apply, hεe, hu]
       ring
@@ -302,8 +348,8 @@ theorem eq_on_rankOneCurve_of_integral (hol : IsHoloSiegel g H) (hH : IsSpInvari
         Matrix.add_apply, map_apply, eJ_apply]
       by_cases hi : i = e <;> by_cases hj : j = e <;> simp [ε, hi, hj, eq_comm (a := e)] <;> ring
 
-theorem tendsto_floor_nat_mul_div (x : ℝ) :
-    Filter.Tendsto (fun n : ℕ => (⌊(n + 1 : ℝ) * x⌋ : ℝ) / (n + 1)) Filter.atTop (𝓝 x) := by
+theorem tendsto_floor_nat_mul_div (x : ℝ)
+    : Filter.Tendsto (fun n : ℕ => (⌊(n + 1 : ℝ) * x⌋ : ℝ) / (n + 1)) Filter.atTop (𝓝 x) := by
   have h := (tendsto_const_nhds (x := x)).sub tendsto_one_div_add_atTop_nhds_zero_nat
   rw [sub_zero] at h
   refine tendsto_of_tendsto_of_tendsto_of_le_of_le h tendsto_const_nhds (fun n => ?_) fun n => ?_
@@ -316,14 +362,17 @@ theorem tendsto_floor_nat_mul_div (x : ℝ) :
     rw [div_le_iff₀ hn]
     linarith [Int.floor_le ((n + 1 : ℝ) * x)]
 
-
 include hZs hZe hZ in
-theorem eq_on_rankOneCurve (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
-    (hb : ∀ c : ℝ, 0 < c → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
-      (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
-    {u v : Fin g → ℝ} (hu : u e = 1) (hv : v e = 0) (z w : ℍ) :
-    H (rankOneCurve Z (vecMulVec (Pi.single e 1) v + vecMulVec v (Pi.single e 1)) u z) =
-      H (rankOneCurve Z (vecMulVec (Pi.single e 1) v + vecMulVec v (Pi.single e 1)) u w) := by
+theorem eq_on_rankOneCurve
+    (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
+    (hb : ∀ c : ℝ,
+      0 < c
+        → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
+          (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
+    {u v : Fin g → ℝ} (hu : u e = 1) (hv : v e = 0)
+    (z w : ℍ)
+    : H (rankOneCurve Z (vecMulVec (Pi.single e 1) v + vecMulVec v (Pi.single e 1)) u z)
+      = H (rankOneCurve Z (vecMulVec (Pi.single e 1) v + vecMulVec v (Pi.single e 1)) u w) := by
   let R : (Fin g → ℝ) → Matrix (Fin g) (Fin g) ℝ := fun v =>
     vecMulVec (Pi.single e 1) v + vecMulVec v (Pi.single e 1)
   have hR : ∀ v, (R v).IsSymm := fun v => by
@@ -345,8 +394,11 @@ theorem eq_on_rankOneCurve (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
     field_simp
   have hε : ∀ i, (Pi.single e 1 : Fin g → ℝ) i ∈ (Int.castRingHom ℝ).range := fun i => by
     by_cases h : i = e <;> simp [h]
-  have hlim : ∀ z : ℍ, Filter.Tendsto (fun n => H (rankOneCurve Z (R (a v n)) (a u n) z))
-      Filter.atTop (𝓝 (H (rankOneCurve Z (R v) u z))) := by
+  have hlim
+      : ∀ z : ℍ,
+        Filter.Tendsto
+          (fun n => H (rankOneCurve Z (R (a v n)) (a u n) z))
+          Filter.atTop (𝓝 (H (rankOneCurve Z (R v) u z))) := by
     intro z
     have hm := rankOneCurve_mem hZs hZ (hR v) hu z.im_pos
     have hc : Continuous fun p : (Fin g → ℝ) × (Fin g → ℝ) =>
@@ -357,16 +409,19 @@ theorem eq_on_rankOneCurve (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
     have h1 : Filter.Tendsto (fun n => (a v n, a u n)) Filter.atTop (𝓝 (v, u)) :=
       (tendsto_pi_nhds.2 fun i => tendsto_floor_nat_mul_div _).prodMk_nhds
         (tendsto_pi_nhds.2 fun i => tendsto_floor_nat_mul_div _)
-    have h2 := (hol.continuousOn.continuousAt
-      ((isOpen_phDom g).mem_nhds (of_symm_mem_phDom hm))).tendsto.comp
-      ((hc.tendsto (v, u)).comp h1)
+    have h2 :=
+      (hol.continuousOn.continuousAt ((isOpen_phDom g).mem_nhds
+        (of_symm_mem_phDom hm))).tendsto.comp ((hc.tendsto (v, u)).comp h1)
     simp only [Equiv.apply_symm_apply, phSym_eq_self_of_isSymm hm.1] at h2
     refine h2.congr fun n => ?_
     simp only [Function.comp_apply, Equiv.apply_symm_apply,
       phSym_eq_self_of_isSymm (rankOneCurve_mem hZs hZ (hR _) (hau n) z.im_pos).1]
   refine tendsto_nhds_unique (hlim z) ((hlim w).congr fun n => ?_)
   refine eq_on_rankOneCurve_of_integral hZs hZe hZ hol hH hb (Nat.succ_ne_zero n) (hau n) (hR _)
-    (by simp [R, vecMulVec_apply, hav]) (ha u n) (fun i => ?_) (fun i j => ?_) w z
+    (by simp [R, vecMulVec_apply, hav]) (ha u n)
+    (fun i => ?_)
+    (fun i j => ?_)
+    w z
   · simpa [R, vecMulVec_apply, hav] using ha v n i
   · convert mul_mem (natCast_mem _ (n + 1))
       (add_mem (mul_mem (hε i) (ha v n j)) (mul_mem (ha v n i) (hε j))) using 1
@@ -375,9 +430,12 @@ theorem eq_on_rankOneCurve (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
 
 end Curve
 
-theorem posDef_sub_vecMulVec_add {Y : Matrix (Fin g) (Fin g) ℝ} (hY : Y.PosDef) (e : Fin g)
-    {u : Fin g → ℝ} (hu : u e = 1) {y : ℝ} (hy : 0 < y) :
-    (Y - (Y e e)⁻¹ • vecMulVec (fun i => Y i e) (fun i => Y i e) + y • vecMulVec u u).PosDef := by
+theorem posDef_sub_vecMulVec_add
+    {Y : Matrix (Fin g) (Fin g) ℝ} (hY : Y.PosDef)
+    (e : Fin g)
+    {u : Fin g → ℝ} (hu : u e = 1)
+    {y : ℝ} (hy : 0 < y)
+    : (Y - (Y e e)⁻¹ • vecMulVec (fun i => Y i e) (fun i => Y i e) + y • vecMulVec u u).PosDef := by
   have hs : ∀ i j, Y j i = Y i j := fun i j => by simpa using hY.1.apply i j
   have he : 0 < Y e e := hY.diag_pos
   refine posDef_iff_dotProduct_mulVec.2 ⟨?_, fun x hx => ?_⟩
@@ -391,8 +449,11 @@ theorem posDef_sub_vecMulVec_add {Y : Matrix (Fin g) (Fin g) ℝ} (hY : Y.PosDef
       rw [single_dotProduct]
       simp [ha, mulVec, dotProduct, hs e, mul_comm]
     set x' := x - (a / Y e e) • (Pi.single e 1 : Fin g → ℝ) with hx'
-    have h3 : star x ⬝ᵥ (Y - (Y e e)⁻¹ • vecMulVec (fun i => Y i e) (fun i => Y i e) +
-        y • vecMulVec u u) *ᵥ x = x' ⬝ᵥ Y *ᵥ x' + y * (x ⬝ᵥ u) ^ 2 := by
+    have h3
+        : star x
+            ⬝ᵥ (Y - (Y e e)⁻¹ • vecMulVec (fun i => Y i e) (fun i => Y i e) + y • vecMulVec u u)
+              *ᵥ x
+          = x' ⬝ᵥ Y *ᵥ x' + y * (x ⬝ᵥ u) ^ 2 := by
       simp only [star_trivial, add_mulVec, sub_mulVec, smul_mulVec, vecMulVec_mulVec, hx',
         mulVec_sub, mulVec_smul, dotProduct_add, dotProduct_sub, sub_dotProduct, dotProduct_smul,
         smul_dotProduct, h1, h2, single_dotProduct, op_smul_eq_smul, smul_eq_mul,
@@ -412,12 +473,16 @@ theorem posDef_sub_vecMulVec_add {Y : Matrix (Fin g) (Fin g) ℝ} (hY : Y.PosDef
       rw [star_trivial] at this
       positivity
 
-theorem eventually_eq_column (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
-    (hb : ∀ c : ℝ, 0 < c → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
-      (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
-    (e : Fin g) {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g)) :
-    ∀ᶠ s in 𝓝 (0 : ℂ), H (τ + s • vecMulVec (fun i => ((τ i e).im : ℂ))
-      (fun i => ((τ i e).im : ℂ))) = H τ := by
+theorem eventually_eq_column
+    (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
+    (hb : ∀ c : ℝ,
+      0 < c
+        → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
+          (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
+    (e : Fin g)
+    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g))
+    : ∀ᶠ s in 𝓝 (0 : ℂ), H (τ + s • vecMulVec (fun i => ((τ i e).im : ℂ))
+        (fun i => ((τ i e).im : ℂ))) = H τ := by
   have he : 0 < (τ e e).im := hτ.2.diag_pos (i := e)
   let u : Fin g → ℝ := fun i => (τ i e).im / (τ e e).im
   let v : Fin g → ℝ := fun i => (τ i e).re - (τ e e).re * u i
@@ -437,8 +502,10 @@ theorem eventually_eq_column (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
       simp only [u]
       field_simp
       ring
-  have hZ : ∀ u : Fin g → ℝ, u e = 1 → ∀ y : ℝ, 0 < y →
-      (Z.map Complex.im + y • vecMulVec u u).PosDef := fun u' hu' y hy => by
+  have hZ
+      : ∀ u : Fin g → ℝ,
+        u e = 1
+          → ∀ y : ℝ, 0 < y → (Z.map Complex.im + y • vecMulVec u u).PosDef := fun u' hu' y hy => by
     convert posDef_sub_vecMulVec_add hτ.2 e hu' hy using 2
     ext i j
     simp [Z, vecMulVec_apply]
@@ -459,27 +526,37 @@ theorem eventually_eq_column (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
     simp [rankOneCurve, Z, R]
     ring
 
-theorem fderiv_vecMulVec_eq_zero (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
-    (hb : ∀ c : ℝ, 0 < c → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
-      (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
-    (U : (Matrix (Fin g) (Fin g) ℤ)ˣ) (e : Fin g) {τ : Matrix (Fin g) (Fin g) ℂ}
-    (hτ : τ ∈ SiegelH (Fin g)) :
-    fderiv ℂ (fun x : Fin g → Fin g → ℂ => H (phSym (of x))) (of.symm τ)
-      (of.symm (vecMulVec (imC τ *ᵥ fun l => (U.val e l : ℂ))
-        (imC τ *ᵥ fun l => (U.val e l : ℂ)))) = 0 := by
+theorem fderiv_vecMulVec_eq_zero
+    (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
+    (hb : ∀ c : ℝ,
+      0 < c
+        → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
+          (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
+    (U : (Matrix (Fin g) (Fin g) ℤ)ˣ) (e : Fin g)
+    {τ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g))
+    : fderiv ℂ
+        (fun x : Fin g → Fin g → ℂ => H (phSym (of x)))
+        (of.symm τ)
+        (of.symm (vecMulVec (imC τ *ᵥ fun l => (U.val e l : ℂ))
+          (imC τ *ᵥ fun l => (U.val e l : ℂ))))
+      = 0 := by
   set w := imC τ *ᵥ fun l => (U.val e l : ℂ) with hw
   have hτ' := spAct_mem (spDiag_mem_sp U) hτ
   have h1 := eventually_eq_column hol hH hb e hτ'
   rw [spAct_spDiag_eq] at h1
-  have h2 : (fun i => (((U.val.map (Int.cast : ℤ → ℂ) * τ *
-      (U.val.map (Int.cast : ℤ → ℂ))ᵀ) i e).im : ℂ)) = U.val.map (Int.cast : ℤ → ℂ) *ᵥ w := by
+  have h2
+      : (fun i =>
+          (((U.val.map (Int.cast : ℤ → ℂ) * τ * (U.val.map (Int.cast : ℤ → ℂ))ᵀ) i e).im : ℂ))
+        = U.val.map (Int.cast : ℤ → ℂ) *ᵥ w := by
     ext i
     rw [Matrix.mul_assoc]
     simp [hw, Matrix.mul_apply, mulVec, dotProduct, imC]
-  have hd : HasDerivAt (fun s : ℂ => (of.symm τ + s • of.symm (vecMulVec w w) : Fin g → Fin g → ℂ))
+  have hd : HasDerivAt
+      (fun s : ℂ => (of.symm τ + s • of.symm (vecMulVec w w) : Fin g → Fin g → ℂ))
       (of.symm (vecMulVec w w)) 0 := by
-    simpa using ((hasDerivAt_id (0 : ℂ)).smul_const
-      (of.symm (vecMulVec w w) : Fin g → Fin g → ℂ)).const_add (of.symm τ)
+    simpa using
+      ((hasDerivAt_id (0 : ℂ)).smul_const (of.symm (vecMulVec w w) : Fin g → Fin g → ℂ)).const_add
+        (of.symm τ)
   have hn := (isOpen_phDom g).mem_nhds (of_symm_mem_phDom hτ)
   have h3 := (hol.differentiableAt hn).hasFDerivAt.comp_hasDerivAt_of_eq 0 hd (by simp)
   refine h3.unique ((hasDerivAt_const 0 (H τ)).congr_of_eventuallyEq ?_)
@@ -493,25 +570,33 @@ theorem fderiv_vecMulVec_eq_zero (hol : IsHoloSiegel g H) (hH : IsSpInvariant g 
     Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, mul_vecMulVec, vecMulVec_mul,
     vecMul_transpose]
 
-theorem siegel_eq_of_bounded (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
-    (hb : ∀ c : ℝ, 0 < c → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
-      (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
-    {τ σ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g)) (hσ : σ ∈ SiegelH (Fin g)) :
-    H τ = H σ := by
-  have key : ∀ τ ∈ SiegelH (Fin g), ∀ V : Matrix (Fin g) (Fin g) ℂ, V.IsSymm →
-      fderiv ℂ (fun x : Fin g → Fin g → ℂ => H (phSym (of x))) (of.symm τ) (of.symm V) = 0 := by
+theorem siegel_eq_of_bounded
+    (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
+    (hb : ∀ c : ℝ,
+      0 < c
+        → ∃ K : ℝ, ∀ τ ∈ SiegelH (Fin g),
+          (τ.map Complex.im - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef → ‖H τ‖ ≤ K)
+    {τ σ : Matrix (Fin g) (Fin g) ℂ} (hτ : τ ∈ SiegelH (Fin g)) (hσ : σ ∈ SiegelH (Fin g))
+    : H τ = H σ := by
+  have key
+      : ∀ τ ∈ SiegelH (Fin g), ∀ V : Matrix (Fin g) (Fin g) ℂ,
+        V.IsSymm
+          → fderiv ℂ (fun x : Fin g → Fin g → ℂ => H (phSym (of x))) (of.symm τ) (of.symm V)
+            = 0 := by
     intro τ hτ V hV
     set L := fderiv ℂ (fun x : Fin g → Fin g → ℂ => H (phSym (of x))) (of.symm τ) with hL
-    let M : Matrix (Fin g) (Fin g) ℂ →ₗ[ℂ] ℂ :=
-      { toFun := fun S => L (of.symm (imC τ * S * (imC τ)ᵀ))
-        map_add' := fun S T => by
-          rw [Matrix.mul_add, Matrix.add_mul]
-          exact L.map_add _ _
-        map_smul' := fun c S => by
-          rw [Matrix.mul_smul, Matrix.smul_mul]
-          exact L.map_smul _ _ }
-    have hM : ∀ (U : (Matrix (Fin g) (Fin g) ℤ)ˣ) (e : Fin g),
-        M (vecMulVec (fun l => (U.val e l : ℂ)) fun l => (U.val e l : ℂ)) = 0 := by
+    let M : Matrix (Fin g) (Fin g) ℂ →ₗ[ℂ] ℂ := {
+      toFun := fun S => L (of.symm (imC τ * S * (imC τ)ᵀ))
+      map_add' := fun S T => by
+        rw [Matrix.mul_add, Matrix.add_mul]
+        exact L.map_add _ _
+      map_smul' := fun c S => by
+        rw [Matrix.mul_smul, Matrix.smul_mul]
+        exact L.map_smul _ _
+    }
+    have hM
+        : ∀ (U : (Matrix (Fin g) (Fin g) ℤ)ˣ) (e : Fin g),
+          M (vecMulVec (fun l => (U.val e l : ℂ)) fun l => (U.val e l : ℂ)) = 0 := by
       intro U e
       rw [← fderiv_vecMulVec_eq_zero hol hH hb U e hτ]
       change L _ = L _
@@ -526,13 +611,14 @@ theorem siegel_eq_of_bounded (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
       by_cases hij : i = j
       · simp [hij, h1]
       have h := hM (rkU (Pi.single i 1) (Pi.single j 1) (by simp [hij])) i
-      have e : (vecMulVec (fun l => ((rkU (Pi.single i 1) (Pi.single j 1)
-          (by simp [hij])).val i l : ℂ)) fun l => ((rkU (Pi.single i 1) (Pi.single j 1)
-          (by simp [hij])).val i l : ℂ)) =
-          single i i 1 + single j j 1 + (single i j 1 + single j i 1) := by
+      have e
+          : (vecMulVec
+              (fun l => ((rkU (Pi.single i 1) (Pi.single j 1) (by simp [hij])).val i l : ℂ))
+              fun l => ((rkU (Pi.single i 1) (Pi.single j 1) (by simp [hij])).val i l : ℂ))
+            = single i i 1 + single j j 1 + (single i j 1 + single j i 1) := by
         ext a b
-        simp only [rkU_val, vecMulVec_apply, single_apply, Matrix.one_apply, ite_and, Matrix.add_apply,
-          Pi.single_apply, eq_comm (b := j)]
+        simp only [rkU_val, vecMulVec_apply, single_apply, Matrix.one_apply, ite_and,
+          Matrix.add_apply, Pi.single_apply, eq_comm (b := j)]
         split_ifs <;> norm_num
       rwa [e, map_add, map_add, map_add, h1, h1, zero_add, zero_add] at h
     have h3 : ∀ S : Matrix (Fin g) (Fin g) ℂ, S.IsSymm → M S = 0 := fun S hS => by
@@ -552,41 +638,52 @@ theorem siegel_eq_of_bounded (hol : IsHoloSiegel g H) (hH : IsSpInvariant g H)
       have : imC τ = Complex.ofRealHom.mapMatrix (τ.map Complex.im) := rfl
       rw [this, ← RingHom.map_det]
       exact hτ.2.det_pos.ne'.isUnit.map _
-    have h4 := h3 ((imC τ)⁻¹ * V * ((imC τ)⁻¹)ᵀ) (by
-      simp only [IsSymm, transpose_mul, transpose_transpose, hV.eq, Matrix.mul_assoc])
+    have h4 :=
+      h3 ((imC τ)⁻¹ * V * ((imC τ)⁻¹)ᵀ)
+        (by simp only [IsSymm, transpose_mul, transpose_transpose, hV.eq, Matrix.mul_assoc])
     rw [← h4]
     change L _ = L _
     rw [Matrix.mul_assoc, Matrix.mul_assoc, ← transpose_mul, mul_nonsing_inv _ hu, transpose_one,
       Matrix.mul_one, mul_nonsing_inv_cancel_left _ _ hu]
   have hmem : ∀ t ∈ Set.Icc (0 : ℝ) 1, τ + (t : ℂ) • (σ - τ) ∈ SiegelH (Fin g) := fun t ht => by
-    have h : phSym _ ∈ SiegelH (Fin g) := (convex_phDom g).add_smul_sub_mem
-      (of_symm_mem_phDom hτ) (of_symm_mem_phDom hσ) ht
+    have h : phSym _ ∈ SiegelH (Fin g) :=
+      (convex_phDom g).add_smul_sub_mem (of_symm_mem_phDom hτ) (of_symm_mem_phDom hσ) ht
     rwa [← phSym_eq_self_of_isSymm (hτ.1.add ((hσ.1.sub hτ.1).smul (t : ℂ)))]
-  have hd : ∀ t ∈ Set.Icc (0 : ℝ) 1, HasDerivAt (fun t : ℝ =>
-      H (phSym (of (of.symm τ + (t : ℂ) • of.symm (σ - τ))))) 0 t := fun t ht => by
-    have h1 : HasDerivAt (fun s : ℂ => (of.symm τ + s • of.symm (σ - τ) : Fin g → Fin g → ℂ))
+  have hd
+      : ∀ t ∈ Set.Icc (0 : ℝ) 1,
+        HasDerivAt
+          (fun t : ℝ => H (phSym (of (of.symm τ + (t : ℂ) • of.symm (σ - τ)))))
+          0 t := fun t ht => by
+    have h1 : HasDerivAt
+        (fun s : ℂ => (of.symm τ + s • of.symm (σ - τ) : Fin g → Fin g → ℂ))
         (of.symm (σ - τ)) t := by
-      simpa using ((hasDerivAt_id (t : ℂ)).smul_const
-        (of.symm (σ - τ) : Fin g → Fin g → ℂ)).const_add (of.symm τ)
-    have h2 := (hol.differentiableAt ((isOpen_phDom g).mem_nhds
-      (of_symm_mem_phDom (hmem t ht)))).hasFDerivAt.comp_hasDerivAt_of_eq (t : ℂ) h1 rfl
+      simpa using
+        ((hasDerivAt_id (t : ℂ)).smul_const (of.symm (σ - τ) : Fin g → Fin g → ℂ)).const_add
+          (of.symm τ)
+    have h2 :=
+      (hol.differentiableAt ((isOpen_phDom g).mem_nhds
+        (of_symm_mem_phDom (hmem t ht)))).hasFDerivAt.comp_hasDerivAt_of_eq (t : ℂ) h1 rfl
     rw [key _ (hmem t ht) _ (hσ.1.sub hτ.1)] at h2
     exact h2.comp_ofReal
-  have h := constant_of_has_deriv_right_zero
-    (fun t ht => (hd t ht).continuousAt.continuousWithinAt)
-    (fun t ht => (hd t (Set.Ico_subset_Icc_self ht)).hasDerivWithinAt) 1 (by simp)
+  have h :=
+    constant_of_has_deriv_right_zero
+      (fun t ht => (hd t ht).continuousAt.continuousWithinAt)
+      (fun t ht => (hd t (Set.Ico_subset_Icc_self ht)).hasDerivWithinAt)
+      1 (by simp)
   simp only [ofReal_one, ofReal_zero, one_smul, zero_smul, add_zero, Equiv.apply_symm_apply,
-    phSym_eq_self_of_isSymm hτ.1] at h
+      phSym_eq_self_of_isSymm hτ.1]
+    at h
   have e : of (of.symm τ + of.symm (σ - τ)) = σ := add_sub_cancel τ σ
   rw [← h, e, phSym_eq_self_of_isSymm hσ.1]
 
 theorem phHolo_of_phKoecher : PhKoecherStatement → PhHoloStatement := by
   intro hK g hg H hol hH
-  have hb := hK g hg 1 le_rfl H hol
-    (fun B hB τ hτ => by simpa using spInvariant_transl hH hB hτ)
-    (fun U hU _ τ hτ => by
-      obtain ⟨U, rfl⟩ := (isUnit_iff_isUnit_det U).2 (hU ▸ isUnit_one)
-      exact spInvariant_conj hH U hτ)
+  have hb :=
+    hK g hg 1 le_rfl H hol
+      (fun B hB τ hτ => by simpa using spInvariant_transl hH hB hτ)
+      (fun U hU _ τ hτ => by
+        obtain ⟨U, rfl⟩ := (isUnit_iff_isUnit_det U).2 (hU ▸ isUnit_one)
+        exact spInvariant_conj hH U hτ)
   by_cases h : (SiegelH (Fin g)).Nonempty
   · obtain ⟨σ, hσ⟩ := h
     exact ⟨H σ, fun τ hτ => siegel_eq_of_bounded hol hH hb hτ hσ⟩

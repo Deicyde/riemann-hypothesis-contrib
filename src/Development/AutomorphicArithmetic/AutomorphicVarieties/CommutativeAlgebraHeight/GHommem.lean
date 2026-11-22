@@ -6,55 +6,66 @@ public import Mathlib
 
 open IsLocalRing
 
-private theorem UpperTheory.V.CA.exists_part {R σ : Type} [CommRing R] [Finite σ]
-    (F : MvPowerSeries σ R) (d : ℕ) :
-    ∃ g : MvPolynomial σ R, ∀ m : σ →₀ ℕ,
+private theorem UpperTheory.V.CA.exists_part
+    {R σ : Type} [CommRing R] [Finite σ] (F : MvPowerSeries σ R) (d : ℕ)
+    : ∃ g : MvPolynomial σ R, ∀ m : σ →₀ ℕ,
       g.coeff m = if m.degree ≤ d then MvPowerSeries.coeff m F else 0 := by
   classical
   haveI : Fintype σ := Fintype.ofFinite σ
   set D : σ →₀ ℕ := Finsupp.equivFunOnFinite.symm (fun _ => d) with hD
-  refine ⟨∑ m ∈ Finset.Iic D, MvPolynomial.monomial m
-    (if m.degree ≤ d then MvPowerSeries.coeff m F else 0), fun m => ?_⟩
+  refine ⟨
+    ∑ m ∈ Finset.Iic D, MvPolynomial.monomial m
+      (if m.degree ≤ d then MvPowerSeries.coeff m F else 0),
+    fun m => ?_
+  ⟩
   rw [MvPolynomial.coeff_sum]
   simp only [MvPolynomial.coeff_monomial]
   rw [Finset.sum_ite_eq']
   by_cases h : m.degree ≤ d
   · have hm : m ∈ Finset.Iic D := by
-      refine Finset.mem_Iic.mpr (Finsupp.le_def.mpr fun i => (Finsupp.le_degree i m).trans (h.trans ?_))
+      refine Finset.mem_Iic.mpr (Finsupp.le_def.mpr fun i =>
+        (Finsupp.le_degree i m).trans (h.trans ?_))
       simp [hD]
     rw [if_pos hm]
   · simp [h]
 
-theorem UpperTheory.V.CA.g_hommem :
-    ∀ (R σ : Type) [CommRing R] [IsNoetherianRing R] [Finite σ] (P : Ideal (MvPolynomial σ R)),
-      (∀ f ∈ P, ∀ d : ℕ, MvPolynomial.homogeneousComponent d f ∈ P) → ∀ F : MvPowerSeries σ R,
-        F ∈ P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R)) ↔
-          ∀ (d : ℕ) (g : MvPolynomial σ R),
-            (∀ m : σ →₀ ℕ, g.coeff m = if m.degree = d then MvPowerSeries.coeff m F else 0) → g ∈ P := by
+theorem UpperTheory.V.CA.g_hommem
+    : ∀ (R σ : Type) [CommRing R] [IsNoetherianRing R] [Finite σ] (P : Ideal (MvPolynomial σ R)),
+      (∀ f ∈ P, ∀ d : ℕ, MvPolynomial.homogeneousComponent d f ∈ P)
+        → ∀ F : MvPowerSeries σ R,
+          F ∈ P.map (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R))
+            ↔ ∀ (d : ℕ) (g : MvPolynomial σ R),
+              (∀ m : σ →₀ ℕ, g.coeff m = if m.degree = d then MvPowerSeries.coeff m F else 0)
+                → g ∈ P := by
   intro R σ _ _ _ P hP F
   classical
-  have hsumco : ∀ (f : MvPolynomial σ R) (d : ℕ) (m : σ →₀ ℕ),
-      AddMonoidAlgebra.coeff (∑ k ∈ Finset.range (d + 1), MvPolynomial.homogeneousComponent k f) m =
-        if m.degree ≤ d then AddMonoidAlgebra.coeff f m else 0 := by
+  have hsumco
+      : ∀ (f : MvPolynomial σ R) (d : ℕ) (m : σ →₀ ℕ),
+        AddMonoidAlgebra.coeff (∑ k ∈ Finset.range (d + 1), MvPolynomial.homogeneousComponent k f) m
+          = if m.degree ≤ d then AddMonoidAlgebra.coeff f m else 0 := by
     intro f d m
     rw [MvPolynomial.coeff_sum]
     simp only [MvPolynomial.coeff_homogeneousComponent]
     rw [Finset.sum_ite_eq]
     simp only [Finset.mem_range, Nat.lt_succ_iff]
   have htr := UpperTheory.V.CA.exists_part (R := R) (σ := σ)
-  have hpolyQ : ∀ f ∈ P, ∀ (d : ℕ) (g : MvPolynomial σ R),
-      (∀ m : σ →₀ ℕ, g.coeff m = if m.degree ≤ d then AddMonoidAlgebra.coeff f m else 0) → g ∈ P := by
+  have hpolyQ
+      : ∀ f ∈ P, ∀ (d : ℕ) (g : MvPolynomial σ R),
+        (∀ m : σ →₀ ℕ, g.coeff m = if m.degree ≤ d then AddMonoidAlgebra.coeff f m else 0)
+          → g ∈ P := by
     intro f hf d g hg
     have hgeq : g = ∑ k ∈ Finset.range (d + 1), MvPolynomial.homogeneousComponent k f := by
       ext m
       rw [hg, hsumco]
     rw [hgeq]
     exact Ideal.sum_mem _ fun k _ => hP f hf k
-  have hRQ : ∀ G : MvPowerSeries σ R,
-      ((∀ (d : ℕ) (g : MvPolynomial σ R),
-        (∀ m : σ →₀ ℕ, g.coeff m = if m.degree = d then MvPowerSeries.coeff m G else 0) → g ∈ P) ↔
-      (∀ (d : ℕ) (g : MvPolynomial σ R),
-        (∀ m : σ →₀ ℕ, g.coeff m = if m.degree ≤ d then MvPowerSeries.coeff m G else 0) → g ∈ P)) := by
+  have hRQ
+      : ∀ G : MvPowerSeries σ R,
+        ((∀ (d : ℕ) (g : MvPolynomial σ R),
+            (∀ m : σ →₀ ℕ, g.coeff m = if m.degree = d then MvPowerSeries.coeff m G else 0) → g ∈ P)
+          ↔ (∀ (d : ℕ) (g : MvPolynomial σ R),
+            (∀ m : σ →₀ ℕ, g.coeff m = if m.degree ≤ d then MvPowerSeries.coeff m G else 0)
+              → g ∈ P)) := by
     intro G
     constructor
     · intro h d g hg
@@ -81,10 +92,15 @@ theorem UpperTheory.V.CA.g_hommem :
   refine Iff.trans ?_ (hRQ F).symm
   constructor
   · intro hF
-    have hF' : F ∈ Submodule.span (MvPowerSeries σ R)
-        (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R) '' (P : Set (MvPolynomial σ R))) := hF
-    refine Submodule.span_induction (p := fun x _ => ∀ (d : ℕ) (g : MvPolynomial σ R),
-        (∀ m : σ →₀ ℕ, g.coeff m = if m.degree ≤ d then MvPowerSeries.coeff m x else 0) → g ∈ P)
+    have hF'
+        : F ∈ Submodule.span (MvPowerSeries σ R)
+          (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := R)
+            '' (P : Set (MvPolynomial σ R))) :=
+      hF
+    refine Submodule.span_induction
+      (p := fun x _ =>
+        ∀ (d : ℕ) (g : MvPolynomial σ R),
+          (∀ m : σ →₀ ℕ, g.coeff m = if m.degree ≤ d then MvPowerSeries.coeff m x else 0) → g ∈ P)
       ?_ ?_ ?_ ?_ hF'
     · rintro x ⟨f, hf, rfl⟩ d g hg
       refine hpolyQ f hf d g fun m => ?_
@@ -108,7 +124,8 @@ theorem UpperTheory.V.CA.g_hommem :
       obtain ⟨Ta, hTa⟩ := htr a d
       obtain ⟨Tx, hTx⟩ := htr x d
       have hTxP := hx d Tx hTx
-      have hgeq : g = ∑ k ∈ Finset.range (d + 1), MvPolynomial.homogeneousComponent k (Ta * Tx) := by
+      have hgeq
+          : g = ∑ k ∈ Finset.range (d + 1), MvPolynomial.homogeneousComponent k (Ta * Tx) := by
         ext m
         rw [hsumco, hg, smul_eq_mul]
         by_cases hm : m.degree ≤ d
@@ -136,7 +153,10 @@ theorem UpperTheory.V.CA.g_hommem :
       intro f hf
       have hf' : f ∈ s := Finset.mem_coe.mp hf
       have hfsum : f = ∑ k ∈ Finset.range (D + 1), MvPolynomial.homogeneousComponent k f := by
-        rw [← Finset.sum_subset (Finset.range_subset_range.mpr (Nat.succ_le_succ (Finset.le_sup (f := MvPolynomial.totalDegree) hf'))) ?_,
+        rw [← Finset.sum_subset
+            (Finset.range_subset_range.mpr (Nat.succ_le_succ (Finset.le_sup
+              (f := MvPolynomial.totalDegree) hf')))
+            ?_,
           MvPolynomial.sum_homogeneousComponent]
         intro k _ hk
         simp only [Finset.mem_range] at hk
@@ -144,15 +164,17 @@ theorem UpperTheory.V.CA.g_hommem :
       rw [SetLike.mem_coe, hfsum]
       exact Ideal.sum_mem _ fun k hk =>
         Ideal.subset_span ⟨(⟨f, hf'⟩, ⟨k, Finset.mem_range.mp hk⟩), rfl⟩
-    have hcomp : ∀ d : ℕ, ∃ c : ↥s × Fin (D + 1) → MvPolynomial σ R,
-        ∑ i, c i • h i = MvPolynomial.homogeneousComponent d (Classical.choose (htr F d)) := by
+    have hcomp
+        : ∀ d : ℕ, ∃ c : ↥s × Fin (D + 1) → MvPolynomial σ R,
+          ∑ i, c i • h i = MvPolynomial.homogeneousComponent d (Classical.choose (htr F d)) := by
       intro d
       have hmem : MvPolynomial.homogeneousComponent d (Classical.choose (htr F d)) ∈ P :=
         hP _ (hQ d _ (Classical.choose_spec (htr F d))) d
       exact (Submodule.mem_span_range_iff_exists_fun _).mp (hPspan hmem)
     choose c hc using hcomp
-    have hcoefF : ∀ m : σ →₀ ℕ,
-        AddMonoidAlgebra.coeff (∑ i, c m.degree i • h i) m = MvPowerSeries.coeff m F := by
+    have hcoefF
+        : ∀ m : σ →₀ ℕ,
+          AddMonoidAlgebra.coeff (∑ i, c m.degree i • h i) m = MvPowerSeries.coeff m F := by
       intro m
       rw [hc, MvPolynomial.coeff_homogeneousComponent, if_pos rfl,
         Classical.choose_spec (htr F m.degree) m, if_pos le_rfl]

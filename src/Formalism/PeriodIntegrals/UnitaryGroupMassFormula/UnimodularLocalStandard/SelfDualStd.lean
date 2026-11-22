@@ -25,8 +25,8 @@ lemma stdH_apply (L : PeriodPair) (m : Type*) [Fintype m] [DecidableEq m] (x y :
 
 def detD (L : PeriodPair) : ℝ := (conj L.ω₁ * L.ω₂).im
 
-private theorem detD_eq_re_mul_im_sub (L : PeriodPair) :
-    detD L = L.ω₁.re * L.ω₂.im - L.ω₁.im * L.ω₂.re := by
+private theorem detD_eq_re_mul_im_sub (L : PeriodPair)
+    : detD L = L.ω₁.re * L.ω₂.im - L.ω₁.im * L.ω₂.re := by
   simp only [detD, Complex.mul_im, Complex.conj_re, Complex.conj_im]
   ring
 

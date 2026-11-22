@@ -29,20 +29,21 @@ theorem dL_algebraMap (r : ℤ_[p]) : Formalism.L2.Th1.A.dL (algebraMap ℤ_[p] 
 
 def thetaO :=
   letI : Module ℤ_[p] (Lau p) := Algebra.toModule
-  GlobalTheory.BK.complDer (k := ℤ_[p]) (pI p)
-    { toFun := thetaFun p
-      map_add' := fun a b => by simp only [thetaFun, map_add (f := _), mul_add]
-      map_smul' := fun r f => by
-        simp only [thetaFun, Algebra.smul_def, RingHom.id_apply]
-        rw [Formalism.L2.Th1.A.dL_mul, dL_algebraMap p r]
-        ring
-      map_one_eq_zero' := by
-        show thetaFun p 1 = 0
-        simp [thetaFun, Formalism.L2.Th1.A.dL_one]
-      leibniz' := fun a b => by
-        show thetaFun p (a * b) = a • thetaFun p b + b • thetaFun p a
-        simp only [thetaFun, smul_eq_mul, Formalism.L2.Th1.A.dL_mul]
-        ring }
+  GlobalTheory.BK.complDer (k := ℤ_[p]) (pI p) {
+    toFun := thetaFun p
+    map_add' := fun a b => by simp only [thetaFun, map_add (f := _), mul_add]
+    map_smul' := fun r f => by
+      simp only [thetaFun, Algebra.smul_def, RingHom.id_apply]
+      rw [Formalism.L2.Th1.A.dL_mul, dL_algebraMap p r]
+      ring
+    map_one_eq_zero' := by
+      show thetaFun p 1 = 0
+      simp [thetaFun, Formalism.L2.Th1.A.dL_one]
+    leibniz' := fun a b => by
+      show thetaFun p (a * b) = a • thetaFun p b + b • thetaFun p a
+      simp only [thetaFun, smul_eq_mul, Formalism.L2.Th1.A.dL_mul]
+      ring
+  }
 
 theorem thetaO_qO : thetaO p (qO p) = qO p := by
   rw [thetaO, qO, GlobalTheory.BK.complDer_algebraMap]
@@ -54,13 +55,13 @@ theorem thetaO_algebraMap (r : ℤ_[p]) : thetaO p (algebraMap ℤ_[p] (O0 p) r)
 def thetaZ : Derivation ℤ (O0 p) (O0 p) where
   toFun := thetaO p
   map_add' := map_add _
-  map_smul' := fun r x => by
-    simp [Algebra.smul_def, Derivation.leibniz]
+  map_smul' := fun r x => by simp [Algebra.smul_def, Derivation.leibniz]
   map_one_eq_zero' := (thetaO p).map_one_eq_zero
   leibniz' := (thetaO p).leibniz
 
-theorem exists_qDer : ∀ (p : ℕ) [Fact p.Prime], ∃ D : Derivation ℤ (O0 p) (O0 p), D (qO p) = qO p ∧
-    ∀ r : ℤ_[p], D (algebraMap ℤ_[p] (O0 p) r) = 0 := fun p _ =>
+theorem exists_qDer
+    : ∀ (p : ℕ) [Fact p.Prime], ∃ D : Derivation ℤ (O0 p) (O0 p),
+      D (qO p) = qO p ∧ ∀ r : ℤ_[p], D (algebraMap ℤ_[p] (O0 p) r) = 0 := fun p _ =>
   ⟨thetaZ p, thetaO_qO p, thetaO_algebraMap p⟩
 
 end GlobalTheory.K5.QDer

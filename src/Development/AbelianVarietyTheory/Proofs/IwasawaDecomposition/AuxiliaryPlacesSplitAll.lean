@@ -11,15 +11,24 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.RankOn
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 
 namespace GlobalTheory.SplitPrimeAuxiliary
 
 open scoped Pointwise
 
-theorem eq_one_of_smul_eq (E : Type) [Field E] [NumberField E] [IsGalois ℚ E] {p : ℕ} (hp : p.Prime)
-    (h : ((Ideal.span {(p : ℤ)}).primesOver (𝓞 E)).ncard = Module.finrank ℚ E)
-    (P : Ideal (𝓞 E)) [P.IsPrime] (hP : (p : 𝓞 E) ∈ P) (σ : Gal(E/ℚ)) (hσ : σ • P = P) : σ = 1 := by
+theorem eq_one_of_smul_eq
+    (E : Type) [Field E] [NumberField E] [IsGalois ℚ E]
+    {p : ℕ}
+    (hp : p.Prime) (h : ((Ideal.span {(p : ℤ)}).primesOver (𝓞 E)).ncard = Module.finrank ℚ E)
+    (P : Ideal (𝓞 E)) [P.IsPrime]
+    (hP : (p : 𝓞 E) ∈ P)
+    (σ : Gal(E/ℚ)) (hσ : σ • P = P)
+    : σ = 1 := by
   have hpz : Prime (p : ℤ) := Nat.prime_iff_prime_int.1 hp
   have hmax : (Ideal.span {(p : ℤ)}).IsMaximal :=
     ((Ideal.span_singleton_prime hpz.ne_zero).2 hpz).isMaximal (by simpa using hp.ne_zero)
@@ -49,9 +58,12 @@ theorem conj_ne_one {R : Ranks} (H : Host R) : H.conj ≠ 1 := by
   rw [this, h]
   rfl
 
-theorem isSplitPl_of_split {R : Ranks} (H : Host R) {p : ℕ} (hp : p.Prime)
-    (h : ((Ideal.span {(p : ℤ)}).primesOver (𝓞 H.E)).ncard = Module.finrank ℚ H.E)
-    (v : HeightOneSpectrum (𝓞 H.E)) (hv : v ∈ placesOver H.E p) : IsSplitPl H v := by
+theorem isSplitPl_of_split
+    {R : Ranks} (H : Host R)
+    {p : ℕ}
+    (hp : p.Prime) (h : ((Ideal.span {(p : ℤ)}).primesOver (𝓞 H.E)).ncard = Module.finrank ℚ H.E)
+    (v : HeightOneSpectrum (𝓞 H.E)) (hv : v ∈ placesOver H.E p)
+    : IsSplitPl H v := by
   have : IsGalois ℚ H.E := H.hostE_isGalois
   have := v.isPrime
   by_contra hs

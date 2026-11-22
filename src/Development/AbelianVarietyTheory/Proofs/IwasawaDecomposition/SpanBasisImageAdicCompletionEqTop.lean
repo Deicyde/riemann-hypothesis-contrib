@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocDict
+open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocDict
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory
@@ -15,11 +18,13 @@ namespace GlobalTheory
 theorem span_basis_image_adicCompletion_eq_top
     (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
     (v : HeightOneSpectrum (𝓞 K)) (v' : HeightOneSpectrum (𝓞 L))
-    (f : v.adicCompletion K →+* v'.adicCompletion L) (hfc : Continuous f)
-    (hf : ∀ x : K, f (algebraMap K _ x) = algebraMap L _ (algebraMap K L x)) :
-    letI := f.toAlgebra; ∀ (n : ℕ) (b : Module.Basis (Fin n) K L),
-      Submodule.span (v.adicCompletion K)
-        (Set.range fun i => algebraMap L (v'.adicCompletion L) (b i)) = ⊤ := by
+    (f : v.adicCompletion K →+* v'.adicCompletion L)
+    (hfc : Continuous f) (hf : ∀ x : K, f (algebraMap K _ x) = algebraMap L _ (algebraMap K L x))
+    : letI := f.toAlgebra
+      ∀ (n : ℕ) (b : Module.Basis (Fin n) K L),
+        Submodule.span (v.adicCompletion K)
+            (Set.range fun i => algebraMap L (v'.adicCompletion L) (b i))
+          = ⊤ := by
   letI := f.toAlgebra
   intro n b
   letI : NontriviallyNormedField (v.adicCompletion K) := Valued.toNontriviallyNormedField _ _
@@ -41,8 +46,8 @@ theorem span_basis_image_adicCompletion_eq_top
       rw [← b.sum_repr z, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     have : algebraMap L (v'.adicCompletion L) (b.repr z i • b i)
-        = (algebraMap K (v.adicCompletion K) (b.repr z i)) •
-            algebraMap L (v'.adicCompletion L) (b i) := by
+        = (algebraMap K (v.adicCompletion K) (b.repr z i))
+          • algebraMap L (v'.adicCompletion L) (b i) := by
       rw [Algebra.smul_def, Algebra.smul_def, map_mul, RingHom.algebraMap_toAlgebra, hf]
     rw [this]
     exact S.smul_mem _ (Submodule.subset_span ⟨i, rfl⟩)

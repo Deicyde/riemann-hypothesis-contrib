@@ -5,9 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GapGeSubKapB
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+  GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
 open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW secZ ptF LiesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.CompHt (hodgeWt)
@@ -17,11 +19,12 @@ open GlobalTheory.OrbitSep
 
 namespace GlobalTheory
 
-theorem exists_unit_of_cocycle_rightAction_charZero :
-    ∀ (K : Type) [Field K] [CharZero K] (Γ : Type) [Group Γ] [Finite Γ] (σ : Γ → K →+* K),
-    (∀ γ δ a, σ (γ * δ) a = σ δ (σ γ a)) → ∀ (c : Γ → Kˣ),
-    (∀ γ δ, (c (γ * δ) : K) = σ δ (c γ) * c δ) → (∀ γ, (∀ a, σ γ a = a) → c γ = 1) →
-    ∃ f : Kˣ, ∀ γ, σ γ f = c γ * f := by
+theorem exists_unit_of_cocycle_rightAction_charZero
+    : ∀ (K : Type) [Field K] [CharZero K] (Γ : Type) [Group Γ] [Finite Γ] (σ : Γ → K →+* K),
+      (∀ γ δ a, σ (γ * δ) a = σ δ (σ γ a))
+        → ∀ (c : Γ → Kˣ),
+          (∀ γ δ, (c (γ * δ) : K) = σ δ (c γ) * c δ) → (∀ γ, (∀ a, σ γ a = a) → c γ = 1)
+            → ∃ f : Kˣ, ∀ γ, σ γ f = c γ * f := by
   intro K _ _ Γ _ _ σ hσ c hc htriv
   classical
   haveI := Fintype.ofFinite Γ
@@ -54,13 +57,15 @@ theorem exists_unit_of_cocycle_rightAction_charZero :
       funext b
       rw [Finset.sum_apply, Pi.zero_apply, ← hno b]
       simp only [Pi.smul_apply, smul_eq_mul, g, Finset.sum_mul]
-      have hterm : ∀ ψ ∈ s, ∑ i ∈ Finset.univ.filter (fun γ => φ γ = ψ), ((c i : K))⁻¹ * ψ b
-          = ∑ i ∈ Finset.univ.filter (fun γ => φ γ = ψ), ((c i : K))⁻¹ * σ i b := fun ψ _ =>
+      have hterm
+          : ∀ ψ ∈ s,
+            ∑ i ∈ Finset.univ.filter (fun γ => φ γ = ψ), ((c i : K))⁻¹ * ψ b
+              = ∑ i ∈ Finset.univ.filter (fun γ => φ γ = ψ), ((c i : K))⁻¹ * σ i b := fun ψ _ =>
         Finset.sum_congr rfl fun γ hγ => by rw [← (Finset.mem_filter.mp hγ).2]; rfl
-      rw [Finset.sum_congr rfl hterm, Finset.sum_fiberwise_of_maps_to
-        (fun γ _ => Finset.mem_image_of_mem φ (Finset.mem_univ γ))]
-    have hz := linearIndependent_iff'.mp hli s g hsum (φ 1)
-      (Finset.mem_image_of_mem φ (Finset.mem_univ 1))
+      rw [Finset.sum_congr rfl hterm,
+        Finset.sum_fiberwise_of_maps_to (fun γ _ => Finset.mem_image_of_mem φ (Finset.mem_univ γ))]
+    have hz :=
+      linearIndependent_iff'.mp hli s g hsum (φ 1) (Finset.mem_image_of_mem φ (Finset.mem_univ 1))
     have hterm : ∀ γ ∈ Finset.univ.filter (fun γ => φ γ = φ 1), ((c γ : K))⁻¹ = 1 := by
       intro γ hγ
       rw [Finset.mem_filter] at hγ

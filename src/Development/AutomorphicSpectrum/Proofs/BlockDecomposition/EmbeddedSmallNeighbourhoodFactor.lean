@@ -8,7 +8,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RowQMulO
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.LeibPhi Topology
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.LeibPhi Topology
 open scoped TensorProduct
 
 noncomputable section
@@ -20,11 +21,15 @@ open GlobalTheory.CompanionTheory.BZPhiPhi
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem mirProj_iotaM (n : ℕ) (y : Mir k n) :
-    mirabolicProjection k (n + 1) (embedding₂ k n y) = (y : GL (Fin (n + 1)) k) := by
+theorem mirProj_iotaM (n : ℕ) (y : Mir k n)
+    : mirabolicProjection k (n + 1) (embedding₂ k n y) = (y : GL (Fin (n + 1)) k) := by
   apply Units.ext
   ext i j
-  change GlobalTheory.BZMir.blockMat k (n + 1) (GlobalTheory.BZMir.glEmbMat k (n + 1) ((y : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k)) i j = _
+  change GlobalTheory.BZMir.blockMat k (n + 1)
+      (GlobalTheory.BZMir.glEmbMat k (n + 1)
+        ((y : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k))
+      i j
+    = _
   simp [GlobalTheory.BZMir.blockMat, GlobalTheory.BZMir.glEmbMat]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
@@ -33,21 +38,29 @@ theorem iotaM_mem_Q (n : ℕ) (y : Mir k n) : embedding₂ k n y ∈ Q k n := by
   rw [mirProj_iotaM]
   exact y.2
 
-theorem mem_mirabolicParabolic_of_iotaM_mem (m j : ℕ) (p : Mir k (m + j))
-    (h : embedding₂ k (m + j) p ∈ MirabolicParabolic k m (j + 1)) : p ∈ MirabolicParabolic k m j := by
-  have h1 := (GlobalTheory.CompanionTheory.GPMem.mem_mirabolicParabolic_iff_mirabolicProj_mem_parabolic k m (j + 1) (embedding₂ k (m + j) p)).1 h
-  have e : mirabolicProjection k (m + (j + 1)) (embedding₂ k (m + j) p) = (p : GL (Fin (m + j + 1)) k) :=
+theorem mem_mirabolicParabolic_of_iotaM_mem
+    (m j : ℕ) (p : Mir k (m + j)) (h : embedding₂ k (m + j) p ∈ MirabolicParabolic k m (j + 1))
+    : p ∈ MirabolicParabolic k m j := by
+  have h1 :=
+    (GlobalTheory.CompanionTheory.GPMem.mem_mirabolicParabolic_iff_mirabolicProj_mem_parabolic k m
+      (j + 1) (embedding₂ k (m + j) p)).1 h
+  have e
+      : mirabolicProjection k (m + (j + 1)) (embedding₂ k (m + j) p)
+        = (p : GL (Fin (m + j + 1)) k) :=
     mirProj_iotaM (m + j) p
   rw [e] at h1
   exact h1
 
-theorem mem_mirabolicParabolic_of_mirabolicProj_eq_one (m j : ℕ) (w : Mir k (m + j)) (h : mirabolicProjection k (m + j) w = 1) :
-    w ∈ MirabolicParabolic k m j := by
+theorem mem_mirabolicParabolic_of_mirabolicProj_eq_one
+    (m j : ℕ) (w : Mir k (m + j)) (h : mirabolicProjection k (m + j) w = 1)
+    : w ∈ MirabolicParabolic k m j := by
   rw [GlobalTheory.CompanionTheory.GPMem.mem_mirabolicParabolic_iff_mirabolicProj_mem_parabolic, h]
   exact one_mem _
 
-theorem rowQ_eq_zero_of_mem_HGP (m j : ℕ) (h : Mir k (m + (j + 1))) (hh : h ∈ MirabolicParabolic k m (j + 1))
-    (i : Fin (m + j + 1)) (hi : (i : ℕ) < m) : rowQ k (m + j) h i = 0 := by
+theorem rowQ_eq_zero_of_mem_HGP
+    (m j : ℕ) (h : Mir k (m + (j + 1))) (hh : h ∈ MirabolicParabolic k m (j + 1))
+    (i : Fin (m + j + 1)) (hi : (i : ℕ) < m)
+    : rowQ k (m + j) h i = 0 := by
   have h1 := (mem_mirabolicParabolic_iff k m (j + 1) h).1 hh ⟨j, by omega⟩ ⟨i, hi⟩
   have e1 : eGP m (j + 1) ⟨true, ⟨j, by omega⟩⟩ = Fin.castSucc (Fin.last (m + j)) :=
     Fin.ext (by rw [blockIndex_true_val]; simp)
@@ -56,15 +69,19 @@ theorem rowQ_eq_zero_of_mem_HGP (m j : ℕ) (h : Mir k (m + (j + 1))) (hh : h �
   rw [e1, e2] at h1
   exact h1
 
-theorem rowEl_mem_HGP (m j : ℕ) (r : Fin (m + j + 1) → k) (hr : (rowMat (m + j) r).det ≠ 0)
-    (h0 : ∀ i : Fin (m + j + 1), (i : ℕ) < m → r i = 0) :
-    (rowEl (m + j) r hr : Mir k (m + (j + 1))) ∈ MirabolicParabolic k m (j + 1) := by
+theorem rowEl_mem_HGP
+    (m j : ℕ) (r : Fin (m + j + 1) → k)
+    (hr : (rowMat (m + j) r).det ≠ 0) (h0 : ∀ i : Fin (m + j + 1), (i : ℕ) < m → r i = 0)
+    : (rowEl (m + j) r hr : Mir k (m + (j + 1))) ∈ MirabolicParabolic k m (j + 1) := by
   rw [mem_mirabolicParabolic_iff]
   intro b a
   have hb := blockIndex_true_val m (j + 1) b
   have ha := blockIndex_false_val m (j + 1) a
-  have hval : (((rowEl (m + j) r hr : Mir k (m + j + 1)) : GL (Fin (m + j + 2)) k) :
-      Matrix (Fin (m + j + 2)) (Fin (m + j + 2)) k) = rowMat (m + j) r := rfl
+  have hval
+      : (((rowEl (m + j) r hr : Mir k (m + j + 1)) : GL (Fin (m + j + 2)) k)
+          : Matrix (Fin (m + j + 2)) (Fin (m + j + 2)) k)
+        = rowMat (m + j) r :=
+    rfl
   generalize eGP m (j + 1) ⟨true, b⟩ = p at hb ⊢
   generalize eGP m (j + 1) ⟨false, a⟩ = q at ha ⊢
   show (((rowEl (m + j) r hr : Mir k (m + j + 1)) : GL (Fin (m + j + 2)) k) :
@@ -83,27 +100,34 @@ theorem rowEl_mem_HGP (m j : ℕ) (r : Fin (m + j + 1) → k) (hr : (rowMat (m +
     have ham := a.2
     omega
 
-theorem mul_inv_qProj_mem (m j : ℕ) (x : Mir k (m + j)) (h d κ : Mir k (m + (j + 1)))
-    (hh : h ∈ MirabolicParabolic k m (j + 1)) (hd : d ∈ MirabolicParabolic k m (j + 1)) (hq : d * κ ∈ Q k (m + j))
-    (e : embedding₂ k (m + j) x = h * κ) :
-    x * (qProj k (m + j) ⟨d * κ, hq⟩)⁻¹ ∈ MirabolicParabolic k m j := by
+theorem mul_inv_qProj_mem
+    (m j : ℕ) (x : Mir k (m + j)) (h d κ : Mir k (m + (j + 1)))
+    (hh : h ∈ MirabolicParabolic k m (j + 1)) (hd : d ∈ MirabolicParabolic k m (j + 1))
+    (hq : d * κ ∈ Q k (m + j)) (e : embedding₂ k (m + j) x = h * κ)
+    : x * (qProj k (m + j) ⟨d * κ, hq⟩)⁻¹ ∈ MirabolicParabolic k m j := by
   apply mem_mirabolicParabolic_of_iotaM_mem
   set y := qProj k (m + j) ⟨d * κ, hq⟩ with hy
-  have e1 : embedding₂ k (m + j) (x * y⁻¹) = (h * d⁻¹) * ((d * κ) * (embedding₂ k (m + j) y)⁻¹) := by
+  have e1
+      : embedding₂ k (m + j) (x * y⁻¹) = (h * d⁻¹) * ((d * κ) * (embedding₂ k (m + j) y)⁻¹) := by
     rw [map_mul, map_inv, e]
     group
   rw [e1]
-  refine mul_mem (mul_mem hh (inv_mem hd)) (mem_mirabolicParabolic_of_mirabolicProj_eq_one m (j + 1) _ ?_)
-  have e2 : mirabolicProjection k (m + (j + 1)) (embedding₂ k (m + j) y) = (y : GL (Fin (m + j + 1)) k) :=
+  refine mul_mem (mul_mem hh (inv_mem hd))
+    (mem_mirabolicParabolic_of_mirabolicProj_eq_one m (j + 1) _ ?_)
+  have e2
+      : mirabolicProjection k (m + (j + 1)) (embedding₂ k (m + j) y)
+        = (y : GL (Fin (m + j + 1)) k) :=
     mirProj_iotaM (m + j) y
   have e3 : (y : GL (Fin (m + j + 1)) k) = mirabolicProjection k (m + (j + 1)) (d * κ) := rfl
   rw [map_mul, map_inv, e2, e3, mul_inv_cancel]
 
-theorem iotaM_descent (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (m j : ℕ) :
-    ∀ K' ∈ 𝓝 (1 : Mir k (m + j)), ∃ K ∈ 𝓝 (1 : Mir k (m + (j + 1))),
-      ∀ x : Mir k (m + j), ∀ h ∈ MirabolicParabolic k m (j + 1), ∀ κ ∈ K, embedding₂ k (m + j) x = h * κ →
-        ∃ h' ∈ MirabolicParabolic k m j, ∃ κ' ∈ K', x = h' * κ' := by
+theorem iotaM_descent
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (m j : ℕ)
+    : ∀ K' ∈ 𝓝 (1 : Mir k (m + j)), ∃ K ∈ 𝓝 (1 : Mir k (m + (j + 1))), ∀ x : Mir k (m + j),
+      ∀ h ∈ MirabolicParabolic k m (j + 1), ∀ κ ∈ K,
+        embedding₂ k (m + j) x = h * κ
+          → ∃ h' ∈ MirabolicParabolic k m j, ∃ κ' ∈ K', x = h' * κ' := by
   have : T2Space k := by
     let := IsTopologicalAddGroup.rightUniformSpace k
     have := isUniformAddGroup_of_addCommGroup (G := k)
@@ -132,12 +156,14 @@ theorem iotaM_descent (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
   let φ : O → Q k (m + j) := fun κ => ⟨d κ * κ.1, hQ κ⟩
   have hφc : Continuous φ := Continuous.subtype_mk (hdc.mul continuous_subtype_val) _
   let ψ : O → Mir k (m + j) := fun κ => qProj k (m + j) (φ κ)
-  have hψc : Continuous ψ := (GlobalTheory.CompanionTheory.BZMirOnto.continuous_qProj k (m + j)).comp hφc
+  have hψc : Continuous ψ :=
+    (GlobalTheory.CompanionTheory.BZMirOnto.continuous_qProj k (m + j)).comp hφc
   have hd1 : d ⟨1, h1O⟩ = 1 := Subtype.ext (Units.ext hm1)
   have hψ1 : ψ ⟨1, h1O⟩ = 1 := by
-    have : φ ⟨1, h1O⟩ = 1 := Subtype.ext (by
-      show d ⟨1, h1O⟩ * 1 = 1
-      rw [hd1, one_mul])
+    have : φ ⟨1, h1O⟩ = 1 :=
+      Subtype.ext (by
+        show d ⟨1, h1O⟩ * 1 = 1
+        rw [hd1, one_mul])
     show qProj k (m + j) (φ ⟨1, h1O⟩) = 1
     rw [this, map_one]
   have hpre : ψ ⁻¹' K' ∈ 𝓝 (⟨1, h1O⟩ : O) :=

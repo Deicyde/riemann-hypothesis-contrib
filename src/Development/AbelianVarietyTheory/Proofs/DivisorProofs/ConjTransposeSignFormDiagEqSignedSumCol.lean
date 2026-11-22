@@ -168,8 +168,10 @@ lemma mat_core (Y Yi : Matrix (Fin n) (Fin n) ℂ) (d : Fin n → ℂ) (hd : Fun
   · conv_lhs => rw [hY2]
     simp only [Matrix.mul_assoc, J2, Matrix.mul_one]
 
-theorem mem_K_of_conj (s y : UJ ε) (d : Fin n → ℂ) (hs : toM s = Matrix.diagonal d)
-    (hd : Function.Injective d) (h : y⁻¹ * s * y ∈ KG ε) : y ∈ KG ε := by
+theorem mem_K_of_conj
+    (s y : UJ ε) (d : Fin n → ℂ) (hs : toM s = Matrix.diagonal d) (hd : Function.Injective d)
+    (h : y⁻¹ * s * y ∈ KG ε)
+    : y ∈ KG ε := by
   rw [Formalism.REAL.mem_KG] at h ⊢
   have e : toM (y⁻¹ * s * y) = toM y⁻¹ * Matrix.diagonal d * toM y := by rw [← hs]; rfl
   rw [e] at h
@@ -193,26 +195,29 @@ namespace GlobalTheory.PsCo.PcdConjLow
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
-theorem offDiagonalBlockSqNorm_eq_sum_ite (g : Matrix (Fin n) (Fin n) ℂ) :
-    rM ε g = ∑ i, ∑ j, if ε i = true ∧ ε j = false then ‖g i j‖ ^ 2 else 0 := by
-  rw [GlobalTheory.PsCo.Pc1.rM, ← Finset.sum_subtype (Finset.univ.filter fun x : Fin n × Fin n => ε x.1 = true ∧ ε x.2 = false)
-    (by simp) (fun x => ‖g x.1 x.2‖ ^ 2), Finset.sum_filter, Fintype.sum_prod_type]
+theorem offDiagonalBlockSqNorm_eq_sum_ite (g : Matrix (Fin n) (Fin n) ℂ)
+    : rM ε g = ∑ i, ∑ j, if ε i = true ∧ ε j = false then ‖g i j‖ ^ 2 else 0 := by
+  rw [GlobalTheory.PsCo.Pc1.rM,
+    ← Finset.sum_subtype (Finset.univ.filter fun x : Fin n × Fin n => ε x.1 = true ∧ ε x.2 = false)
+      (by simp) (fun x => ‖g x.1 x.2‖ ^ 2),
+    Finset.sum_filter, Fintype.sum_prod_type]
 
 theorem continuous_rM : Continuous fun g : UJ ε => rM ε (toM g) := by
   have h : Continuous fun g : UJ ε => toM g := Units.continuous_val.comp continuous_subtype_val
   unfold GlobalTheory.PsCo.Pc1.rM
   exact continuous_finsetSum _ fun x _ => (h.matrix_elem x.1.1 x.1.2).norm.pow 2
 
-theorem mul_signMatrix_apply (g : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n) :
-    (g * Jm ε) a b = g a b * (if ε b then 1 else -1) := by
+theorem mul_signMatrix_apply (g : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n)
+    : (g * Jm ε) a b = g a b * (if ε b then 1 else -1) := by
   rw [jm_diag, Matrix.mul_diagonal]
 
-theorem signMatrix_mul_apply (g : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n) :
-    (Jm ε * g) a b = (if ε a then 1 else -1) * g a b := by
+theorem signMatrix_mul_apply (g : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n)
+    : (Jm ε * g) a b = (if ε a then 1 else -1) * g a b := by
   rw [jm_diag, Matrix.diagonal_mul]
 
-theorem entry_eq_zero_of_commute_signMatrix_diffSign {g : Matrix (Fin n) (Fin n) ℂ} (h : g * Jm ε = Jm ε * g) (a b : Fin n) (hab : ε a ≠ ε b) :
-    g a b = 0 := by
+theorem entry_eq_zero_of_commute_signMatrix_diffSign
+    {g : Matrix (Fin n) (Fin n) ℂ} (h : g * Jm ε = Jm ε * g) (a b : Fin n) (hab : ε a ≠ ε b)
+    : g a b = 0 := by
   have h1 := congrFun (congrFun h a) b
   rw [mul_signMatrix_apply, signMatrix_mul_apply] at h1
   have h2 : g a b * ((if ε b then (1 : ℂ) else -1) - (if ε a then 1 else -1)) = 0 := by
@@ -220,9 +225,8 @@ theorem entry_eq_zero_of_commute_signMatrix_diffSign {g : Matrix (Fin n) (Fin n)
   rcases mul_eq_zero.1 h2 with h3 | h3
   · exact h3
   · exfalso
-    cases ha : ε a <;> cases hb : ε b <;> first
-      | exact absurd (ha.trans hb.symm) hab
-      | (rw [ha, hb] at h3; norm_num at h3)
+    cases ha : ε a <;> cases hb : ε b
+      <;> first | exact absurd (ha.trans hb.symm) hab | (rw [ha, hb] at h3; norm_num at h3)
 
 theorem rM_of_mem_K (g : UJ ε) (h : g ∈ KG ε) : rM ε (toM g) = 0 := by
   rw [Formalism.REAL.mem_KG] at h
@@ -239,22 +243,26 @@ private lemma sum_sq_norm_column_eq_conjTranspose_mul_diag (A : Matrix (Fin n) (
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Matrix.conjTranspose_apply, Complex.star_def, Complex.conj_mul']
 
-theorem sum_sqNorm_column_unitary_mul (u M : Matrix (Fin n) (Fin n) ℂ) (hu : star u * u = 1) (j : Fin n) :
-    ∑ i, ‖(u * M) i j‖ ^ 2 = ∑ i, ‖M i j‖ ^ 2 := by
+theorem sum_sqNorm_column_unitary_mul
+    (u M : Matrix (Fin n) (Fin n) ℂ) (hu : star u * u = 1) (j : Fin n)
+    : ∑ i, ‖(u * M) i j‖ ^ 2 = ∑ i, ‖M i j‖ ^ 2 := by
   apply Complex.ofReal_injective
-  rw [sum_sq_norm_column_eq_conjTranspose_mul_diag, sum_sq_norm_column_eq_conjTranspose_mul_diag, Matrix.conjTranspose_mul, Matrix.mul_assoc, ← Matrix.mul_assoc uᴴ,
+  rw [sum_sq_norm_column_eq_conjTranspose_mul_diag, sum_sq_norm_column_eq_conjTranspose_mul_diag,
+    Matrix.conjTranspose_mul, Matrix.mul_assoc, ← Matrix.mul_assoc uᴴ,
     ← Matrix.star_eq_conjTranspose u, hu, Matrix.one_mul]
 
-theorem offDiagonalBlockSqNorm_eq_sum_columns (g : Matrix (Fin n) (Fin n) ℂ) :
-    rM ε g = ∑ j, if ε j = false then ∑ i, ‖(Matrix.of fun a b => if ε a = true then g a b else 0) i j‖ ^ 2 else 0 := by
-  rw [offDiagonalBlockSqNorm_eq_sum_ite, Finset.sum_comm]
-  refine Finset.sum_congr rfl fun j _ => ?_
-  by_cases hj : ε j = false
-  · rw [if_pos hj]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    by_cases hi : ε i = true <;> simp [hi, hj]
-  · rw [if_neg hj]
-    exact Finset.sum_eq_zero fun i _ => by simp [hj]
+theorem offDiagonalBlockSqNorm_eq_sum_columns (g : Matrix (Fin n) (Fin n) ℂ)
+    : rM ε g
+      = ∑ j, if ε j = false then ∑ i, ‖(Matrix.of fun a b => if ε a = true then g a b else 0) i j‖ ^ 2 else 0 :=
+  by
+    rw [offDiagonalBlockSqNorm_eq_sum_ite, Finset.sum_comm]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    by_cases hj : ε j = false
+    · rw [if_pos hj]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      by_cases hi : ε i = true <;> simp [hi, hj]
+    · rw [if_neg hj]
+      exact Finset.sum_eq_zero fun i _ => by simp [hj]
 
 theorem rM_mul_left (t x : UJ ε) (ht : t ∈ KG ε) : rM ε (toM (t * x)) = rM ε (toM x) := by
   have hK : toM t ∈ Kset ε := (Formalism.REAL.mem_KG ε t).1 ht
@@ -262,15 +270,18 @@ theorem rM_mul_left (t x : UJ ε) (ht : t ∈ KG ε) : rM ε (toM (t * x)) = rM 
   rw [offDiagonalBlockSqNorm_eq_sum_columns, offDiagonalBlockSqNorm_eq_sum_columns, hm]
   refine Finset.sum_congr rfl fun j _ => ?_
   split_ifs
-  · have key : (Matrix.of fun a b => if ε a = true then (toM t * toM x) a b else 0)
-        = toM t * Matrix.of fun a b => if ε a = true then toM x a b else 0 := by
+  · have key
+        : (Matrix.of fun a b => if ε a = true then (toM t * toM x) a b else 0)
+          = toM t * Matrix.of fun a b => if ε a = true then toM x a b else 0 := by
       ext a b
       simp only [Matrix.of_apply, Matrix.mul_apply]
       split_ifs with ha
       · refine Finset.sum_congr rfl fun c _ => ?_
         by_cases hc : ε c = true
         · simp [hc]
-        · rw [entry_eq_zero_of_commute_signMatrix_diffSign hK.2 a c (by rw [ha]; exact fun h => hc h.symm)]; simp [hc]
+        · rw [entry_eq_zero_of_commute_signMatrix_diffSign hK.2 a c
+            (by rw [ha]; exact fun h => hc h.symm)]
+          simp [hc]
       · symm
         refine Finset.sum_eq_zero fun c _ => ?_
         by_cases hc : ε c = true
@@ -279,8 +290,9 @@ theorem rM_mul_left (t x : UJ ε) (ht : t ∈ KG ε) : rM ε (toM (t * x)) = rM 
     rw [key, sum_sqNorm_column_unitary_mul _ _ (Matrix.mem_unitaryGroup_iff'.1 hK.1)]
   · rfl
 
-theorem signForm_conjTranspose_diag_eq_signed_sum_row (N : Matrix (Fin n) (Fin n) ℂ) (a : Fin n) :
-    (N * Jm ε * Nᴴ) a a = ((∑ c, (if ε c = true then (1 : ℝ) else -1) * ‖N a c‖ ^ 2 : ℝ) : ℂ) := by
+theorem signForm_conjTranspose_diag_eq_signed_sum_row (N : Matrix (Fin n) (Fin n) ℂ) (a : Fin n)
+    : (N * Jm ε * Nᴴ) a a
+      = ((∑ c, (if ε c = true then (1 : ℝ) else -1) * ‖N a c‖ ^ 2 : ℝ) : ℂ) := by
   rw [Matrix.mul_apply]
   push_cast
   refine Finset.sum_congr rfl fun c _ => ?_
@@ -290,8 +302,9 @@ theorem signForm_conjTranspose_diag_eq_signed_sum_row (N : Matrix (Fin n) (Fin n
   · push_cast; linear_combination h
   · push_cast; linear_combination -h
 
-theorem conjTranspose_signForm_diag_eq_signed_sum_col (N : Matrix (Fin n) (Fin n) ℂ) (c : Fin n) :
-    (Nᴴ * Jm ε * N) c c = ((∑ i, (if ε i = true then (1 : ℝ) else -1) * ‖N i c‖ ^ 2 : ℝ) : ℂ) := by
+theorem conjTranspose_signForm_diag_eq_signed_sum_col (N : Matrix (Fin n) (Fin n) ℂ) (c : Fin n)
+    : (Nᴴ * Jm ε * N) c c
+      = ((∑ i, (if ε i = true then (1 : ℝ) else -1) * ‖N i c‖ ^ 2 : ℝ) : ℂ) := by
   rw [Matrix.mul_apply]
   push_cast
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -301,7 +314,8 @@ theorem conjTranspose_signForm_diag_eq_signed_sum_col (N : Matrix (Fin n) (Fin n
   · push_cast; linear_combination h
   · push_cast; linear_combination -h
 
-theorem signMatrix_diag_apply (a : Fin n) : Jm ε a a = (((if ε a = true then (1 : ℝ) else -1) : ℝ) : ℂ) := by
+theorem signMatrix_diag_apply (a : Fin n)
+    : Jm ε a a = (((if ε a = true then (1 : ℝ) else -1) : ℝ) : ℂ) := by
   rw [jm_diag, Matrix.diagonal_apply_eq]
   split_ifs <;> simp
 
@@ -312,22 +326,30 @@ theorem mem_K_of_rM (g : UJ ε) (h : rM ε (toM g) = 0) : g ∈ KG ε := by
   have hup : ∀ a b, ε a = true → ε b = false → toM g a b = 0 := by
     intro a b ha hb
     rw [offDiagonalBlockSqNorm_eq_sum_ite] at h
-    have h1 := (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => by positivity)).1 h a (Finset.mem_univ _)
-    have h2 := (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => by positivity)).1 h1 b (Finset.mem_univ _)
+    have h1 :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => by positivity)).1 h a (Finset.mem_univ _)
+    have h2 :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => by positivity)).1 h1 b (Finset.mem_univ _)
     rw [if_pos ⟨ha, hb⟩] at h2
     simpa using h2
-  have hcol : ∀ c, ∑ i, (if ε i = true then (1 : ℝ) else -1) * ‖toM g i c‖ ^ 2
-      = if ε c = true then 1 else -1 := by
+  have hcol
+      : ∀ c,
+        ∑ i, (if ε i = true then (1 : ℝ) else -1) * ‖toM g i c‖ ^ 2
+          = if ε c = true then 1 else -1 := by
     intro c
     apply Complex.ofReal_injective
     rw [← conjTranspose_signForm_diag_eq_signed_sum_col (toM g) c, hG, signMatrix_diag_apply]
-  have hrow : ∀ a, ∑ c, (if ε c = true then (1 : ℝ) else -1) * ‖toM g a c‖ ^ 2
-      = if ε a = true then 1 else -1 := by
+  have hrow
+      : ∀ a,
+        ∑ c, (if ε c = true then (1 : ℝ) else -1) * ‖toM g a c‖ ^ 2
+          = if ε a = true then 1 else -1 := by
     intro a
     apply Complex.ofReal_injective
     rw [← signForm_conjTranspose_diag_eq_signed_sum_row (toM g) a, hG', signMatrix_diag_apply]
-  have hsplit : ∀ x : Fin n → ℝ, ∑ i, (if ε i = true then (1 : ℝ) else -1) * x i
-      = ∑ i, (if ε i = true then x i else 0) - ∑ i, (if ε i = false then x i else 0) := by
+  have hsplit
+      : ∀ x : Fin n → ℝ,
+        ∑ i, (if ε i = true then (1 : ℝ) else -1) * x i
+          = ∑ i, (if ε i = true then x i else 0) - ∑ i, (if ε i = false then x i else 0) := by
     intro x
     rw [← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -342,17 +364,23 @@ theorem mem_K_of_rM (g : UJ ε) (h : rM ε (toM g) = 0) : g ∈ KG ε := by
         · simp [hi, hup i c hi hc]
         · simp [hi]
     linarith
-  have hr1 : ∀ a, ε a = false → ∑ c, (if ε c = true then ‖toM g a c‖ ^ 2 else 0)
-      - ∑ c, (if ε c = false then ‖toM g a c‖ ^ 2 else 0) = -1 := by
+  have hr1
+      : ∀ a,
+        ε a = false
+          → ∑ c, (if ε c = true then ‖toM g a c‖ ^ 2 else 0)
+              - ∑ c, (if ε c = false then ‖toM g a c‖ ^ 2 else 0)
+            = -1 := by
     intro a ha
     have e := hrow a
     rw [hsplit (fun c => ‖toM g a c‖ ^ 2), if_neg (by simp [ha])] at e
     exact e
-  have e1 : ∑ a, (if ε a = false then ∑ c, (if ε c = false then ‖toM g a c‖ ^ 2 else 0) else 0)
-      = ∑ a, (if ε a = false then (1 : ℝ) else 0) := by
+  have e1
+      : ∑ a, (if ε a = false then ∑ c, (if ε c = false then ‖toM g a c‖ ^ 2 else 0) else 0)
+        = ∑ a, (if ε a = false then (1 : ℝ) else 0) := by
     rw [show (∑ a, (if ε a = false then ∑ c, (if ε c = false then ‖toM g a c‖ ^ 2 else 0) else 0))
-        = ∑ a, ∑ c, (if ε a = false then (if ε c = false then ‖toM g a c‖ ^ 2 else 0) else 0) from
-      Finset.sum_congr rfl fun a _ => by by_cases ha : ε a = false <;> simp [ha], Finset.sum_comm]
+          = ∑ a, ∑ c, (if ε a = false then (if ε c = false then ‖toM g a c‖ ^ 2 else 0) else 0) from
+        Finset.sum_congr rfl fun a _ => by by_cases ha : ε a = false <;> simp [ha],
+      Finset.sum_comm]
     refine Finset.sum_congr rfl fun c _ => ?_
     by_cases hc : ε c = false
     · rw [if_pos hc, ← hc1 c hc]
@@ -360,25 +388,31 @@ theorem mem_K_of_rM (g : UJ ε) (h : rM ε (toM g) = 0) : g ∈ KG ε := by
       by_cases ha : ε a = false <;> simp [ha, hc]
     · rw [if_neg hc]
       exact Finset.sum_eq_zero fun a _ => by by_cases ha : ε a = false <;> simp [ha, hc]
-  have e2 : ∑ a, (if ε a = false then ∑ c, (if ε c = true then ‖toM g a c‖ ^ 2 else 0) else 0)
-      - ∑ a, (if ε a = false then ∑ c, (if ε c = false then ‖toM g a c‖ ^ 2 else 0) else 0)
-      = ∑ a, (if ε a = false then (-1 : ℝ) else 0) := by
+  have e2
+      : ∑ a, (if ε a = false then ∑ c, (if ε c = true then ‖toM g a c‖ ^ 2 else 0) else 0)
+          - ∑ a, (if ε a = false then ∑ c, (if ε c = false then ‖toM g a c‖ ^ 2 else 0) else 0)
+        = ∑ a, (if ε a = false then (-1 : ℝ) else 0) := by
     rw [← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun a _ => ?_
     by_cases ha : ε a = false
     · simp only [if_pos ha]; exact hr1 a ha
     · simp [ha]
-  have e3 : ∑ a, (if ε a = false then (-1 : ℝ) else 0) = -∑ a, (if ε a = false then (1 : ℝ) else 0) := by
+  have e3
+      : ∑ a, (if ε a = false then (-1 : ℝ) else 0)
+        = - ∑ a, (if ε a = false then (1 : ℝ) else 0) := by
     rw [← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun a _ => ?_
     by_cases ha : ε a = false <;> simp [ha]
-  have hsum : ∑ a, (if ε a = false then ∑ c, (if ε c = true then ‖toM g a c‖ ^ 2 else 0) else 0) = 0 := by
+  have hsum
+      : ∑ a, (if ε a = false then ∑ c, (if ε c = true then ‖toM g a c‖ ^ 2 else 0) else 0) = 0 := by
     linarith
   have hlow : ∀ a c, ε a = false → ε c = true → toM g a c = 0 := by
     intro a c ha hc
-    have h1 := (Finset.sum_eq_zero_iff_of_nonneg (fun a _ => by positivity)).1 hsum a (Finset.mem_univ _)
+    have h1 :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun a _ => by positivity)).1 hsum a (Finset.mem_univ _)
     rw [if_pos ha] at h1
-    have h2 := (Finset.sum_eq_zero_iff_of_nonneg (fun c _ => by positivity)).1 h1 c (Finset.mem_univ _)
+    have h2 :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun c _ => by positivity)).1 h1 c (Finset.mem_univ _)
     rw [if_pos hc] at h2
     simpa using h2
   have hcomm : toM g * Jm ε = Jm ε * toM g := by
@@ -386,7 +420,9 @@ theorem mem_K_of_rM (g : UJ ε) (h : rM ε (toM g) = 0) : g ∈ KG ε := by
     rw [mul_signMatrix_apply, signMatrix_mul_apply]
     cases ha : ε a <;> cases hb : ε b <;> simp [hup a b, hlow a b, ha, hb]
   have hu : (toM g)ᴴ * toM g = 1 := by
-    calc (toM g)ᴴ * toM g = (toM g)ᴴ * toM g * (Jm ε * Jm ε) := by rw [J2, Matrix.mul_one]
+    calc
+      (toM g)ᴴ * toM g
+        = (toM g)ᴴ * toM g * (Jm ε * Jm ε) := by rw [J2, Matrix.mul_one]
       _ = (toM g)ᴴ * (toM g * Jm ε) * Jm ε := by simp only [Matrix.mul_assoc]
       _ = Jm ε * Jm ε := by rw [hcomm, ← Matrix.mul_assoc, hG]
       _ = 1 := J2
@@ -505,31 +541,43 @@ theorem isCompact_rM_le (c : ℝ) : IsCompact {g : UJ ε | rM ε (toM g) ≤ c} 
   have J2 := Formalism.REAL.Jm_mul_self ε
   let S : Set (Matrix (Fin n) (Fin n) ℂ) := {G | Formalism.REAL.inUJ ε G ∧ rM ε G ≤ c}
   have hScl : IsClosed S := by
-    refine IsClosed.inter (isClosed_eq ?_ continuous_const) (isClosed_le continuous_rM_mat continuous_const)
+    refine IsClosed.inter (isClosed_eq ?_ continuous_const)
+      (isClosed_le continuous_rM_mat continuous_const)
     exact (continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul continuous_id
   have hSc : IsCompact S := by
-    refine IsCompact.of_isClosed_subset (isCompact_univ_pi fun _ => isCompact_univ_pi fun _ =>
-      isCompact_closedBall (0 : ℂ) (Real.sqrt (n + 4 * c))) hScl ?_
+    refine IsCompact.of_isClosed_subset
+      (isCompact_univ_pi fun _ =>
+        isCompact_univ_pi fun _ => isCompact_closedBall (0 : ℂ) (Real.sqrt (n + 4 * c)))
+      hScl ?_
     intro G hG
     refine Set.mem_univ_pi.2 fun i => Set.mem_univ_pi.2 fun j => ?_
     rw [Metric.mem_closedBall, dist_zero_right]
     have h : ‖G i j‖ ^ 2 ≤ n + 4 * c := (entry_le G hG.1 i j).trans (by linarith [hG.2])
     exact le_trans (le_abs_self _) (Real.abs_le_sqrt h)
-  have hinv : ∀ G ∈ S, G * (Formalism.REAL.Jm ε * Gᴴ * Formalism.REAL.Jm ε) = 1 ∧
-      Formalism.REAL.Jm ε * Gᴴ * Formalism.REAL.Jm ε * G = 1 := by
+  have hinv
+      : ∀ G ∈ S,
+        G * (Formalism.REAL.Jm ε * Gᴴ * Formalism.REAL.Jm ε) = 1
+          ∧ Formalism.REAL.Jm ε * Gᴴ * Formalism.REAL.Jm ε * G = 1 := by
     intro G hG
     have h1 : Gᴴ * Formalism.REAL.Jm ε * G = Formalism.REAL.Jm ε := hG.1
     have h2 : Formalism.REAL.Jm ε * Gᴴ * Formalism.REAL.Jm ε * G = 1 := by
-      rw [show Formalism.REAL.Jm ε * Gᴴ * Formalism.REAL.Jm ε * G = Formalism.REAL.Jm ε * (Gᴴ * Formalism.REAL.Jm ε * G) by
-        simp only [Matrix.mul_assoc], h1, J2]
+      rw [show Formalism.REAL.Jm ε * Gᴴ * Formalism.REAL.Jm ε * G
+            = Formalism.REAL.Jm ε * (Gᴴ * Formalism.REAL.Jm ε * G) by
+          simp only [Matrix.mul_assoc],
+        h1, J2]
     exact ⟨mul_eq_one_comm.mp h2, h2⟩
-  let F : S → UJ ε := fun G =>
-    ⟨⟨G.1, Formalism.REAL.Jm ε * G.1ᴴ * Formalism.REAL.Jm ε, (hinv G.1 G.2).1, (hinv G.1 G.2).2⟩, G.2.1⟩
+  let F : S → UJ ε := fun G => ⟨
+    ⟨G.1, Formalism.REAL.Jm ε * G.1ᴴ * Formalism.REAL.Jm ε, (hinv G.1 G.2).1, (hinv G.1 G.2).2⟩,
+    G.2.1
+  ⟩
   have hF : Continuous F := by
     apply Continuous.subtype_mk
     rw [Units.continuous_iff]
-    exact ⟨continuous_subtype_val,
-      (continuous_const.matrix_mul continuous_subtype_val.matrix_conjTranspose).matrix_mul continuous_const⟩
+    exact ⟨
+      continuous_subtype_val,
+      (continuous_const.matrix_mul continuous_subtype_val.matrix_conjTranspose).matrix_mul
+        continuous_const
+    ⟩
   have e : {g : UJ ε | rM ε (toM g) ≤ c} = F '' Set.univ := by
     ext g
     constructor
@@ -553,8 +601,10 @@ open Formalism.REAL (UJ KG toM)
 
 namespace GlobalTheory.PsCo.PcdConjLow
 
-theorem isRegSS_of_diag {n : ℕ} {ε : Fin n → Bool} (s : UJ ε) (d : Fin n → ℂ)
-    (hs : toM s = Matrix.diagonal d) (hd : Function.Injective d) : GlobalTheory.Orb.IsRegSS (GlobalTheory.Orb.ujMat ε s) := by
+theorem isRegSS_of_diag
+    {n : ℕ} {ε : Fin n → Bool}
+    (s : UJ ε) (d : Fin n → ℂ) (hs : toM s = Matrix.diagonal d) (hd : Function.Injective d)
+    : GlobalTheory.Orb.IsRegSS (GlobalTheory.Orb.ujMat ε s) := by
   have e : GlobalTheory.Orb.ujMat ε s = toM s := rfl
   rw [e, hs, GlobalTheory.Orb.IsRegSS, Matrix.charpoly_diagonal]
   exact (Polynomial.separable_prod_X_sub_C_iff').2 fun i _ j _ h => hd h
@@ -576,7 +626,9 @@ namespace GlobalTheory.PsCo.Pcd
 theorem stConjLow : GlobalTheory.PsCo.Pc3.StConjLow := by
   intro n ε s d hs hd δ hδ
   have hreg := GlobalTheory.PsCo.PcdConjLow.isRegSS_of_diag s d hs hd
-  obtain ⟨C, hC, hCp⟩ := GlobalTheory.Orb.isProperOrbit_realUJ hreg _ (GlobalTheory.PsCo.PcdConjLow.isCompact_rM_le (ε := ε) 1)
+  obtain ⟨C, hC, hCp⟩ :=
+    GlobalTheory.Orb.isProperOrbit_realUJ hreg _
+      (GlobalTheory.PsCo.PcdConjLow.isCompact_rM_le (ε := ε) 1)
   have hconj : ∀ t ∈ GlobalTheory.Orb.cent s, t⁻¹ * s * t = s := by
     intro t ht
     have h1 : t * s = s * t := GlobalTheory.Orb.mem_cent.1 ht
@@ -587,13 +639,17 @@ theorem stConjLow : GlobalTheory.PsCo.Pc3.StConjLow := by
     rw [hconj t ht]
     exact GlobalTheory.PsCo.PcdConjLow.diag_mem_K s d hs
   have hφc : Continuous fun x : UJ ε => rM ε (toM (x⁻¹ * s * x)) :=
-    GlobalTheory.PsCo.PcdConjLow.continuous_rM.comp ((continuous_inv.mul continuous_const).mul continuous_id)
+    GlobalTheory.PsCo.PcdConjLow.continuous_rM.comp ((continuous_inv.mul continuous_const).mul
+      continuous_id)
   have hφ0 : ∀ x : UJ ε, 0 ≤ rM ε (toM (x⁻¹ * s * x)) := fun x => by
     unfold GlobalTheory.PsCo.Pc1.rM; positivity
   have hD : IsCompact (C ∩ {x : UJ ε | δ ≤ rM ε (toM x)}) :=
     hC.inter_right (isClosed_le continuous_const GlobalTheory.PsCo.PcdConjLow.continuous_rM)
-  have key : ∀ x : UJ ε, rM ε (toM (x⁻¹ * s * x)) ≤ 1 → δ < rM ε (toM x) →
-      ∃ y ∈ C ∩ {x : UJ ε | δ ≤ rM ε (toM x)}, rM ε (toM (y⁻¹ * s * y)) = rM ε (toM (x⁻¹ * s * x)) := by
+  have key
+      : ∀ x : UJ ε,
+        rM ε (toM (x⁻¹ * s * x)) ≤ 1 → δ < rM ε (toM x)
+          → ∃ y ∈ C ∩ {x : UJ ε | δ ≤ rM ε (toM x)},
+            rM ε (toM (y⁻¹ * s * y)) = rM ε (toM (x⁻¹ * s * x)) := by
     intro x hx1 hx2
     obtain ⟨t, ht, htC⟩ := hCp x hx1
     refine ⟨t * x, ⟨htC, ?_⟩, ?_⟩

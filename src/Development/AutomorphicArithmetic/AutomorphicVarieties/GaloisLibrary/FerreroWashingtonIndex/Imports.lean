@@ -4,6 +4,5 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-theorem UpperTheory.V.FW.main :
-    UpperTheory.V.Published.FerreroWashington :=
+theorem UpperTheory.V.FW.main : UpperTheory.V.Published.FerreroWashington :=
   UpperTheory.V.FW.ferreroWashington

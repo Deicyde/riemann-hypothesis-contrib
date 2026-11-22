@@ -67,13 +67,14 @@ theorem weyl_dim_eq_gelfand_tsetlin : WeylGT := by
     simp [weylDim, Formalism.InvariantFactorPaths.GelfandTsetlinBases.dGT]
   | succ n ih =>
     intro μ hμ
-    rw [← hB n μ ((dom_iff μ).mpr hμ), finsum_prop_eq_sum _ (Formalism.InvariantFactorPaths.GelfandTsetlinBases.gtBox μ) _ (fun la => interl_iff la μ),
+    rw [← hB n μ ((dom_iff μ).mpr hμ),
+      finsum_prop_eq_sum _ (Formalism.InvariantFactorPaths.GelfandTsetlinBases.gtBox μ) _
+        (fun la => interl_iff la μ),
       Formalism.InvariantFactorPaths.GelfandTsetlinBases.Pieri.dGT_succ, Nat.cast_sum]
     refine Finset.sum_congr rfl (fun la hla => ih la ?_)
     have hI := (interl_iff la μ).mpr hla
     apply (dom_iff la).mp
     intro m hm
     exact le_trans (hI (m + 1) hm).1 (hI m (by omega)).2
-
 
 end Formalism.InvariantFactorPaths.BranchingDimensions

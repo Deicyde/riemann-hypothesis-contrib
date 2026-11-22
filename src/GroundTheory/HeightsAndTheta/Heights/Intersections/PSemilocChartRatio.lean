@@ -13,7 +13,9 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4 IndefiniteRowSideFullHecke.Inter
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+  IndefiniteRowSideFullHecke.Inter
 
 theorem SemilocChartRatio.proof (hF : FibreOverFinite.Statement) : SemilocChartRatio.Statement := by
   classical
@@ -34,9 +36,11 @@ theorem SemilocChartRatio.proof (hF : FibreOverFinite.Statement) : SemilocChartR
   have hNd : IsMultiHomog N d₀ := AvoidRing.isMultiHomog_coordProd i' d₀
   have hNP : N ∉ P' := AvoidRing.coordProd_not_mem hPp i' hi' d₀
   have hwW : ∀ W' ∈ fibreOver v P' W, w ∉ W' := fun W' hW' => hwS W' (Set.mem_insert_of_mem _ hW')
-  have gen : ∀ u : MRing ι', IsMultiHomog u (Pi.single q.1 1 + d₀) →
-      IsLocalization.mk' (FractionRing (MRing ι' ⧸ P')) (Ideal.Quotient.mk P' u) ⟨_, hwnz⟩ ∈
-        semiLocRing P' (fibreOver v P' W) := fun u hu =>
+  have gen
+      : ∀ u : MRing ι',
+        IsMultiHomog u (Pi.single q.1 1 + d₀)
+          → IsLocalization.mk' (FractionRing (MRing ι' ⧸ P')) (Ideal.Quotient.mk P' u) ⟨_, hwnz⟩
+            ∈ semiLocRing P' (fibreOver v P' W) := fun u hu =>
     Subring.subset_closure ⟨u, w, _, hwnz, hwW, hu, hwd, rfl⟩
   have hq : IsMultiHomog (X q * N) (Pi.single q.1 1 + d₀) :=
     AvoidRing.isMultiHomog_mul (AvoidRing.isMultiHomog_X q.1 q.2) hNd

@@ -10,7 +10,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.EmbeddedGrou
 
 noncomputable section
 
-open Matrix MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open Matrix MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q
 open scoped ContDiff
 
 namespace Formalism.FourierDecayAlt.P.CutEX
@@ -33,7 +34,8 @@ theorem radial_extension_holds : RadExt := by
 theorem radial_of_function_holds : RadOfFun := by
   classical
   intro Wp Wq _ _ _ _ k ρ z z' π π' f hloc hequiv
-  have hUW : ∀ {w : Fin (2 * ρ + k + 1) → ℂ} {h : Mx k ρ}, h ∈ UWset k ρ w → h ∈ Glev k ρ (Fin.last ρ) :=
+  have hUW
+      : ∀ {w : Fin (2 * ρ + k + 1) → ℂ} {h : Mx k ρ}, h ∈ UWset k ρ w → h ∈ Glev k ρ (Fin.last ρ) :=
     fun hh => ⟨hh.1, fun a _ => hh.2.1 a⟩
   refine ⟨⟨fun c g => if (c, g) ∈ DomR k ρ z z' then f g else 0, ?_, ?_, ?_⟩, ?_⟩
   · intro x hx
@@ -44,7 +46,8 @@ theorem radial_of_function_holds : RadOfFun := by
     obtain ⟨U, F, hU, hgU, hF, hFe⟩ := hloc x₀.2 hG hpos
     refine ⟨OmX ρ ×ˢ (U ∩ {g | 0 < GGl k ρ z z' g}), fun x => F x.2, ?_, ?_, ?_, ?_⟩
     · exact (Formalism.FourierDecayAlt.P.Qx5.isOpen_OmX ρ).prod
-        (hU.inter (isOpen_lt continuous_const (Formalism.FourierDecayAlt.P.Qx5.GGl_continuous k ρ z z')))
+        (hU.inter (isOpen_lt continuous_const
+          (Formalism.FourierDecayAlt.P.Qx5.GGl_continuous k ρ z z')))
     · exact ⟨hΩ, hgU, hpos⟩
     · exact hF.comp contDiff_snd.contDiffOn (fun x hx => hx.2.1)
     · intro x hx hxG
@@ -54,9 +57,12 @@ theorem radial_of_function_holds : RadOfFun := by
       exact hFe x.2 hx.2.1 hxG
   · intro x hx h hh h' hh'
     obtain ⟨hΩ, hG, hpos⟩ := hx
-    have hD : (x.1, h * x.2 * h') ∈ DomR k ρ z z' :=
-      ⟨hΩ, Formalism.FourierDecayAlt.P.Qx5.Glev_mul (Formalism.FourierDecayAlt.P.Qx5.Glev_mul (hUW hh) hG) (hUW hh'),
-        by rw [Formalism.FourierDecayAlt.P5.Rad.GGl_uw hh hh']; exact hpos⟩
+    have hD : (x.1, h * x.2 * h') ∈ DomR k ρ z z' := ⟨
+      hΩ,
+      Formalism.FourierDecayAlt.P.Qx5.Glev_mul
+        (Formalism.FourierDecayAlt.P.Qx5.Glev_mul (hUW hh) hG) (hUW hh'),
+      by rw [Formalism.FourierDecayAlt.P5.Rad.GGl_uw hh hh']; exact hpos
+    ⟩
     have hD0 : (x.1, x.2) ∈ DomR k ρ z z' := ⟨hΩ, hG, hpos⟩
     show (if (x.1, h * x.2 * h') ∈ DomR k ρ z z' then f (h * x.2 * h') else 0) =
       π h ∘SL (if (x.1, x.2) ∈ DomR k ρ z z' then f x.2 else 0) ∘SL π' h'
@@ -71,7 +77,8 @@ theorem determinant_vanishing_holds : ZxDet := by
   unfold PBQ.zxH
   rw [Matrix.det_reindex_self, Matrix.det_mul]
   exact mul_ne_zero (LeftFubiniLemmas.lh_unit _ v).ne_zero
-    (Formalism.FourierDecayAlt.P.PBM.hMat_det_ne _ _ (fun a => Formalism.FourierDecayAlt.P.PBJ.Asm.ptScal_ne h hh.1 a a.isLt))
+    (Formalism.FourierDecayAlt.P.PBM.hMat_det_ne _ _
+      (fun a => Formalism.FourierDecayAlt.P.PBJ.Asm.ptScal_ne h hh.1 a a.isLt))
 
 end Formalism.FourierDecayAlt.P.CutEX
 

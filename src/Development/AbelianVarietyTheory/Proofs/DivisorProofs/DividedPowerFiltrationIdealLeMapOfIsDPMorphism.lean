@@ -11,13 +11,15 @@ open DividedPowers GlobalTheory.Cris GlobalTheory.PDA
 
 namespace GlobalTheory.PDA
 
-theorem fil_le_map_fil : ∀ (B : Type) [CommRing B] (J : Ideal B) (δ : DividedPowers J) (C : Type) [CommRing C]
-    (J' : Ideal C) (δ' : DividedPowers J') (f : B →+* C), IsDPMorphism δ δ' f → J' = J.map f →
-    ∀ N, fil δ' N ≤ (fil δ N).map f := by
+theorem fil_le_map_fil
+    : ∀ (B : Type) [CommRing B] (J : Ideal B) (δ : DividedPowers J) (C : Type) [CommRing C]
+        (J' : Ideal C) (δ' : DividedPowers J') (f : B →+* C),
+      IsDPMorphism δ δ' f → J' = J.map f → ∀ N, fil δ' N ≤ (fil δ N).map f := by
   intro B _ J δ C _ J' δ' f hf hJ N
   subst hJ
-  have hmul : ∀ {m n : ℕ} {a b : C}, a ∈ (fil δ m).map f → b ∈ (fil δ n).map f →
-      a * b ∈ (fil δ (m + n)).map f := by
+  have hmul
+      : ∀ {m n : ℕ} {a b : C},
+        a ∈ (fil δ m).map f → b ∈ (fil δ n).map f → a * b ∈ (fil δ (m + n)).map f := by
     intro m n a b ha hb
     have : (fil δ m).map f * (fil δ n).map f ≤ (fil δ (m + n)).map f := by
       rw [← Ideal.map_mul]
@@ -53,8 +55,10 @@ theorem fil_le_map_fil : ∀ (B : Type) [CommRing B] (J : Ideal B) (δ : Divided
       intro n
       rw [smul_eq_mul, δ'.dpow_mul hx]
       exact Ideal.mul_mem_left _ _ (ih n)
-  have hprod : ∀ l : List (ℕ × C), (∀ p ∈ l, p.2 ∈ J.map f) →
-      (l.map fun p ↦ δ'.dpow p.1 p.2).prod ∈ (fil δ (l.map Prod.fst).sum).map f := by
+  have hprod
+      : ∀ l : List (ℕ × C),
+        (∀ p ∈ l, p.2 ∈ J.map f)
+          → (l.map fun p ↦ δ'.dpow p.1 p.2).prod ∈ (fil δ (l.map Prod.fst).sum).map f := by
     intro l hl
     induction l with
     | nil => exact hzero _

@@ -7,10 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 @[expose] public section
 
 open UpperTheory.V.Lit.Geo
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.Lit.Dr
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.Lit.Dr
 
-theorem UpperTheory.unitarySimilitudeGroup_isSmooth_cmDatum :
-    RootEx := by
+theorem UpperTheory.unitarySimilitudeGroup_isSmooth_cmDatum : RootEx := by
   intro E _ _ a
   obtain ⟨τ, -, hτ⟩ := locSec E a (hOne E a) hOne_mem_cone
   obtain ⟨ε, hε, hball⟩ := Metric.nhds_basis_closedBall.eventually_iff.1 hτ
@@ -29,4 +29,5 @@ theorem UpperTheory.unitarySimilitudeGroup_isSmooth_cmDatum :
   · have h3 : sand (τ (hOne E a + hv Y))⁻¹ (sand (τ (hOne E a + hv Y)) (hOne E a)) = hOne E a := by
       rw [← ContinuousLinearMap.mul_apply, ← map_mul, inv_mul_cancel, map_one]; rfl
     rw [hs] at h3
-    rw [h3]; exact h1
+    rw [h3]
+    exact h1

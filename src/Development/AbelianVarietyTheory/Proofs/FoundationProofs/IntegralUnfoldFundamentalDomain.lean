@@ -11,10 +11,17 @@ open scoped BigOperators ComplexConjugate Real Classical
 
 namespace GlobalTheory
 
-theorem integral_unfold_fundamentalDomain : ∀ (V : Type) [NormedAddCommGroup V] [MeasurableSpace V] [BorelSpace V] [SecondCountableTopology V] (μ : Measure V) [μ.IsAddLeftInvariant] (Λ : AddSubgroup V) [Countable Λ] (Fd : Set V), IsAddFundamentalDomain Λ Fd μ → ∀ g : V → ℂ, Integrable g μ → IntegrableOn (fun z => ∑' y : Λ, g (z + y)) Fd μ ∧ ∫ z in Fd, ∑' y : Λ, g (z + y) ∂μ = ∫ z, g z ∂μ := by
+theorem integral_unfold_fundamentalDomain
+    : ∀ (V : Type) [NormedAddCommGroup V] [MeasurableSpace V] [BorelSpace V]
+        [SecondCountableTopology V] (μ : Measure V) [μ.IsAddLeftInvariant] (Λ : AddSubgroup V)
+        [Countable Λ] (Fd : Set V),
+      IsAddFundamentalDomain Λ Fd μ
+        → ∀ g : V → ℂ,
+          Integrable g μ
+            → IntegrableOn (fun z => ∑' y : Λ, g (z + y)) Fd μ
+              ∧ ∫ z in Fd, ∑' y : Λ, g (z + y) ∂μ = ∫ z, g z ∂μ := by
   intro V _ _ _ _ μ _ Λ _ Fd hFd g hg
-  have hv : ∀ (y : Λ) (z : V), y +ᵥ z = z + y := fun y z => by
-    rw [add_comm]; rfl
+  have hv : ∀ (y : Λ) (z : V), y +ᵥ z = z + y := fun y z => by rw [add_comm]; rfl
   have hm : ∀ y : Λ, AEStronglyMeasurable (fun z => g (z + y)) (μ.restrict Fd) := fun y => by
     have h := (hg.comp_add_left (y : V)).aestronglyMeasurable
     simp only [add_comm (y : V)] at h

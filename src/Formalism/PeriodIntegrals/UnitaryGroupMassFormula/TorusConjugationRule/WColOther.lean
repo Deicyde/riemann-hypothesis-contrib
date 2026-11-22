@@ -244,7 +244,13 @@ lemma w_mul_mem (l : Fin r) (a : ℂ) (ha : a ≠ 0) (g₁ : Mx k r) (hg : g₁ 
   · rw [← Matrix.mulVec_mulVec, hfb.2, w_fix l a _ h3 h4]
 
 def dg (l : Fin r) (u v : ℂ) : Mx k r :=
-  diagonal (fun p => if p = eI k r l then u else if p = esI k r l then v else 1)
+  diagonal (fun p =>
+    if p = eI k r l then
+      u
+    else if p = esI k r l then
+      v
+    else
+      1)
 
 lemma w_mul_dg (l : Fin r) (a u : ℂ) :
     w1 k r l a * dg l u (star u)⁻¹ = w1 k r l (a * u) := by

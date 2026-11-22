@@ -53,15 +53,19 @@ lemma rho_mul_le_Fnum (hl : 2 ≤ l) {D : ZMod d → ℝ} (hD : ∀ a, 0 ≤ D a
   unfold Fnum
   linarith
 
-theorem main : ∀ (l d : ℕ) [NeZero d] (D : ZMod d → ℝ), 2 ≤ l → (∀ a, 0 ≤ D a) →
-    Formalism.IncomingBounds.rho l * ∑ a, D a ≤ Fnum l d D ∧
-    (∀ t : ℝ, 0 ≤ t → Fnum l d (fun a => t * D a) = t * Fnum l d D) ∧
-    Formalism.BasicNotions.lpF l d D = Fnum l d D ∧
-    ∀ i₀ : ℕ, ∃ x : ZMod d → ℕ → ℝ, IsFlow l d D x ∧ (∀ a i, i₀ ≤ i → x a i = 0) ∧
-      Formalism.IncomingBounds.gam l * ∑ a, D a - flowVal d x ≤
-        Fnum l d D + ((l : ℝ) ^ i₀)⁻¹ * ∑ a, D a := by
+theorem main
+    : ∀ (l d : ℕ) [NeZero d] (D : ZMod d → ℝ),
+      2 ≤ l → (∀ a, 0 ≤ D a)
+        → Formalism.IncomingBounds.rho l * ∑ a, D a ≤ Fnum l d D
+          ∧ (∀ t : ℝ, 0 ≤ t → Fnum l d (fun a => t * D a) = t * Fnum l d D)
+          ∧ Formalism.BasicNotions.lpF l d D = Fnum l d D
+          ∧ ∀ i₀ : ℕ, ∃ x : ZMod d → ℕ → ℝ,
+            IsFlow l d D x ∧ (∀ a i, i₀ ≤ i → x a i = 0)
+              ∧ Formalism.IncomingBounds.gam l * ∑ a, D a - flowVal d x
+                ≤ Fnum l d D + ((l : ℝ) ^ i₀)⁻¹ * ∑ a, D a := by
   intro l d _ D hl hD
-  refine ⟨rho_mul_le_Fnum hl hD, fun t ht => ?_, GlobalTheory.LevelsOrbits.lpF_eq l d D, fun i₀ => ?_⟩
+  refine
+    ⟨rho_mul_le_Fnum hl hD, fun t ht => ?_, GlobalTheory.LevelsOrbits.lpF_eq l d D, fun i₀ => ?_⟩
   · unfold Fnum
     rw [GlobalTheory.FlowScaling.maxFlow_mul (by omega) ht hD, ← Finset.mul_sum]
     ring

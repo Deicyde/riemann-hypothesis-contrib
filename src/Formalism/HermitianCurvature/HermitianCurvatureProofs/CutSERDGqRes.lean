@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSE
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
 
 theorem radial_group_residue : RDGqRes := by
   intro k r Wp Wq _ _ _ _ _ _ D q hq
@@ -28,7 +29,13 @@ theorem radial_group_residue : RDGqRes := by
       simpa using hv.2.2
     rw [hz]
     linarith
-  · refine ⟨((∏ a : Fin r, if (a : ℕ) < ((Fin.last r : Fin (r + 1)) : ℕ) then ‖q.1 a‖ ^ (Mdim k r a - 1) else 1 : ℝ) : ℂ), ?_, ?_⟩
+  · refine ⟨
+      ((∏ a : Fin r, if (a : ℕ) < ((Fin.last r : Fin (r + 1)) : ℕ) then ‖q.1 a‖ ^ (Mdim k r a - 1) else 1
+          : ℝ)
+        : ℂ),
+      ?_,
+      ?_
+    ⟩
     · rw [Complex.ofReal_ne_zero]
       refine Finset.prod_ne_zero_iff.mpr fun a _ => ?_
       split_ifs

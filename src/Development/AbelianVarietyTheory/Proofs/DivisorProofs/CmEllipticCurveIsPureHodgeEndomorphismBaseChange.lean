@@ -13,8 +13,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.PureLift GlobalTheory.DeRham GlobalTheory.Cris GlobalTheory.CatCoh GlobalTheory.GrpTangent
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.PureLift GlobalTheory.DeRham GlobalTheory.Cris GlobalTheory.CatCoh
+  GlobalTheory.GrpTangent
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding epsScale
 open scoped CategoryTheory.Obj
 
@@ -22,8 +25,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PureLift
 
-theorem eq_epsScale_of_isLieComb {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A] {c : Fin 1 → R}
-    {v : Fin 1 → (epsR R ⟶ A)} {w : epsR R ⟶ A} (h : IsLieComb c v w) : w = epsScale (c 0) ≫ v 0 := by
+theorem eq_epsScale_of_isLieComb
+    {R : Type} [CommRing R]
+    {A : Over (Sp R)} [GrpObj A]
+    {c : Fin 1 → R} {v : Fin 1 → (epsR R ⟶ A)} {w : epsR R ⟶ A} (h : IsLieComb c v w)
+    : w = epsScale (c 0) ≫ v 0 := by
   obtain ⟨u, hu, rfl⟩ := h
   have h1 : (List.ofFn u).prod = u 0 := by simp
   rw [h1]
@@ -31,9 +37,15 @@ theorem eq_epsScale_of_isLieComb {R : Type} [CommRing R] {A : Over (Sp R)} [GrpO
   rw [Over.comp_left]
   exact hu 0
 
-theorem push_sub_smul_mem_Fil {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A] (hA : LieExact A)
-    {v : Fin 1 → (epsR R ⟶ A)} (hv : IsLieBasis v) (W : A ⟶ A) [IsMonHom W] {s : Fin 1 → R}
-    (e : IsLieComb s v (v 0 ≫ W)) (y : HdR A) : push (dp0 R) (𝟙 _) W y - s 0 • y ∈ Fil A := by
+theorem push_sub_smul_mem_Fil
+    {R : Type} [CommRing R]
+    {A : Over (Sp R)} [GrpObj A]
+    (hA : LieExact A)
+    {v : Fin 1 → (epsR R ⟶ A)} (hv : IsLieBasis v)
+    (W : A ⟶ A) [IsMonHom W]
+    {s : Fin 1 → R} (e : IsLieComb s v (v 0 ≫ W))
+    (y : HdR A)
+    : push (dp0 R) (𝟙 _) W y - s 0 • y ∈ Fil A := by
   obtain ⟨u, hu⟩ := (hA.1 y).exists
   obtain ⟨c, hc, -⟩ := hv.2 u hu.1
   have hu' : u = epsScale (c 0) ≫ v 0 := eq_epsScale_of_isLieComb hc
@@ -44,9 +56,14 @@ theorem push_sub_smul_mem_Fil {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj 
   rw [key] at h1
   exact h1.sub_mem (hu.smul (s 0))
 
-theorem exists_isPolForm (P : GlobalTheory.Published.AbelianDeRham.Free) {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A]
-    {g : ℕ} (hA : IsAbelianScheme A) (hg : SmoothOfRelativeDimension g A.hom) {L : LB A.left} (hL : L.IsLB) :
-    ∃ ψ, IsPolForm (dp0 R) (𝟙 _) A L ψ := by
+theorem exists_isPolForm
+    (P : GlobalTheory.Published.AbelianDeRham.Free)
+    {R : Type} [CommRing R]
+    {A : Over (Sp R)} [GrpObj A]
+    {g : ℕ}
+    (hA : IsAbelianScheme A) (hg : SmoothOfRelativeDimension g A.hom)
+    {L : LB A.left} (hL : L.IsLB)
+    : ∃ ψ, IsPolForm (dp0 R) (𝟙 _) A L ψ := by
   obtain ⟨hall, -, -, -, e, he⟩ := P R A g hA hg
   obtain ⟨z, hz⟩ : ∃ z, IsChern (dp0 R) (A.hom ≫ 𝟙 (Sp R)) L z :=
     GlobalTheory.Cris.ChernExists.exists_isChern L hL
@@ -62,8 +79,8 @@ theorem exists_isPolForm (P : GlobalTheory.Published.AbelianDeRham.Free) {R : Ty
   rw [hz'] at hz
   exact hz
 
-private theorem pGen_pull_refl {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) (F : Y ⟶ X) :
-    PGen (⟨fun p => (L.pull F).g p.1 p.2⟩ : LB.Iso (L.pull F) (L.pull F)) := by
+private theorem pGen_pull_refl {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) (F : Y ⟶ X)
+    : PGen (⟨fun p => (L.pull F).g p.1 p.2⟩ : LB.Iso (L.pull F) (L.pull F)) := by
   intro Z f y j j' k k' h1 h2 h3 h4
   unfold gw
   dsimp only
@@ -79,25 +96,35 @@ private theorem pGen_pull_refl {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) (F : 
   have c2 := gm_cocycle hL (f ≫ F) y e1 e4 e3
   have c3 := gm_cocycle hL (f ≫ F) y e3 e4 e3
   have c4 := gm_cocycle hL (f ≫ F) y e3 e3 e3
-  have hkk : (gm (f ≫ F) y (L.U (k PUnit.unit) ⊓ L.U (k PUnit.unit))) (L.g (k PUnit.unit) (k PUnit.unit)) = 1 := by
-    have h := congrArg (· * ((gm (f ≫ F) y (L.U (k PUnit.unit) ⊓ L.U (k PUnit.unit)))
-      (L.g (k PUnit.unit) (k PUnit.unit)))⁻¹) c4
+  have hkk
+      : (gm (f ≫ F) y (L.U (k PUnit.unit) ⊓ L.U (k PUnit.unit))) (L.g (k PUnit.unit) (k PUnit.unit))
+        = 1 := by
+    have h :=
+      congrArg
+        (· * ((gm (f ≫ F) y (L.U (k PUnit.unit) ⊓ L.U (k PUnit.unit))) (L.g (k PUnit.unit)
+          (k PUnit.unit)))⁻¹)
+        c4
     simpa using h
   have hinv := eq_inv_of_mul_eq_one_right (c3.trans hkk)
   rw [← c2, ← c1, hinv, mul_right_comm]
 
-theorem isPureBC_ell : GlobalTheory.Published.AbelianDeRham → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E)
-    (S : Type) [CommRing S] (ω : S) (C : GlobalTheory.CM.Ell H S ω),
-    IsPureBC C.P.A (C.act.act (GlobalTheory.CM.wK H)) (1 - ω) ω := by
+theorem isPureBC_ell
+    : GlobalTheory.Published.AbelianDeRham
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (S : Type) [CommRing S]
+          (ω : S) (C : GlobalTheory.CM.Ell H S ω),
+        IsPureBC C.P.A (C.act.act (GlobalTheory.CM.wK H)) (1 - ω) ω := by
   intro hP E _ _ _ H S _ ω C
   unfold IsPureBC
   intro R _ f A _ φ hpb W' _ hW'
 
   haveI : IsCommMonObj A := GlobalTheory.PolPull.isCommMonObj_of_isGrpPullback hpb
   have hA : IsAbelianScheme A := by
-    exact ⟨inferInstance, MorphismProperty.of_isPullback (P := @Smooth) hpb.1 C.P.isAb.smooth,
+    exact ⟨
+      inferInstance,
+      MorphismProperty.of_isPullback (P := @Smooth) hpb.1 C.P.isAb.smooth,
       MorphismProperty.of_isPullback (P := @IsProper) hpb.1 C.P.isAb.proper,
-      MorphismProperty.of_isPullback (P := @GeometricallyConnected) hpb.1 C.P.isAb.geomConnected⟩
+      MorphismProperty.of_isPullback (P := @GeometricallyConnected) hpb.1 C.P.isAb.geomConnected
+    ⟩
   have hgG : SmoothOfRelativeDimension 1 C.P.A.hom := by
     have h := C.P.smoothDim
     rw [C.dim] at h
@@ -107,16 +134,20 @@ theorem isPureBC_ell : GlobalTheory.Published.AbelianDeRham → ∀ (E : Type) [
   have hLie : LieExact A := (hP.2.1 R A 1 hA hgA).1
 
   haveI := hgG
-  obtain ⟨v', hv', hv'φ⟩ := GlobalTheory.exists_isLieBasis_baseChange S R f C.P.A A φ hpb
-    (SmoothOfRelativeDimension.smooth 1 C.P.A.hom) 1 ![C.v] C.basis
+  obtain ⟨v', hv', hv'φ⟩ :=
+    GlobalTheory.exists_isLieBasis_baseChange S R f C.P.A A φ hpb
+      (SmoothOfRelativeDimension.smooth 1 C.P.A.hom) 1 ![C.v] C.basis
   have hu : ∀ i, (v' i).left ≫ φ = spMap (Chart.dualMapR f) ≫ (![C.v] i).left := hv'φ
-  have hw : (v' 0 ≫ W').left ≫ φ = spMap (Chart.dualMapR f) ≫ (C.v ≫ C.act.act (GlobalTheory.CM.wK H)).left := by
+  have hw
+      : (v' 0 ≫ W').left ≫ φ
+        = spMap (Chart.dualMapR f) ≫ (C.v ≫ C.act.act (GlobalTheory.CM.wK H)).left := by
     rw [Over.comp_left, Category.assoc, hW', ← Category.assoc, hu 0, Over.comp_left, Category.assoc]
     rfl
   have e : IsLieComb (fun i => f (![ω] i)) v' (v' 0 ≫ W') := by
     have he := eq_epsScale_of_isLieComb C.eig
-    have hs : spMap (epsScaleR (f ω)) ≫ spMap (Chart.dualMapR f) =
-        spMap (Chart.dualMapR f) ≫ spMap (epsScaleR ω) := by
+    have hs
+        : spMap (epsScaleR (f ω)) ≫ spMap (Chart.dualMapR f)
+          = spMap (Chart.dualMapR f) ≫ spMap (epsScaleR ω) := by
       rw [← Geo.Tor.spMap_comp, ← Geo.Tor.spMap_comp]
       congr 1
       ext r <;> simp [Chart.dualMapR, epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]
@@ -124,8 +155,8 @@ theorem isPureBC_ell : GlobalTheory.Published.AbelianDeRham → ∀ (E : Type) [
       apply Over.OverMorphism.ext
       apply hpb.1.hom_ext
       · rw [hw, he, Over.comp_left, Over.comp_left, Category.assoc, hu 0]
-        change (spMap (Chart.dualMapR f) ≫ spMap (epsScaleR ω)) ≫ C.v.left =
-          spMap (epsScaleR (f ω)) ≫ (spMap (Chart.dualMapR f) ≫ C.v.left)
+        change (spMap (Chart.dualMapR f) ≫ spMap (epsScaleR ω)) ≫ C.v.left
+          = spMap (epsScaleR (f ω)) ≫ (spMap (Chart.dualMapR f) ≫ C.v.left)
         rw [← hs, Category.assoc]
       · rw [Over.w, Over.w]
     refine ⟨fun _ => epsScale (f ω) ≫ v' 0, ?_, ?_⟩
@@ -133,8 +164,8 @@ theorem isPureBC_ell : GlobalTheory.Published.AbelianDeRham → ∀ (E : Type) [
       fin_cases i
       rfl
     · simpa using heq
-  have hquot : ∀ y : HdR A, push (dp0 R) (𝟙 _) W' y - f ω • y ∈ Fil A :=
-    fun y => push_sub_smul_mem_Fil hLie hv' W' e y
+  have hquot : ∀ y : HdR A, push (dp0 R) (𝟙 _) W' y - f ω • y ∈ Fil A := fun y =>
+    push_sub_smul_mem_Fil hLie hv' W' e y
 
   have hL' : (C.P.L.pull φ).IsLB := pull_isLB C.P.isLB φ
   obtain ⟨ψ, hψ⟩ := exists_isPolForm hP.1 hA hgA hL'
@@ -152,24 +183,36 @@ theorem isPureBC_ell : GlobalTheory.Published.AbelianDeRham → ∀ (E : Type) [
     · rw [ho', hW']
     · rw [Over.w, Over.w]
 
-  have hb : ((1 - GlobalTheory.CM.wK H : GlobalTheory.CM.OK H) : 𝓞 E) = H.bar ((GlobalTheory.CM.wK H : GlobalTheory.CM.OK H) : 𝓞 E) := by
-    rw [show ((GlobalTheory.CM.wK H : GlobalTheory.CM.OK H) : 𝓞 E) = H.w0 from rfl, GlobalTheory.CM.kform_bar_w0]
+  have hb
+      : ((1 - GlobalTheory.CM.wK H : GlobalTheory.CM.OK H) : 𝓞 E)
+        = H.bar ((GlobalTheory.CM.wK H : GlobalTheory.CM.OK H) : 𝓞 E) := by
+    rw [show ((GlobalTheory.CM.wK H : GlobalTheory.CM.OK H) : 𝓞 E) = H.w0 from rfl,
+      GlobalTheory.CM.kform_bar_w0]
     push_cast
     rfl
-  have HG : LBIso (cubeLB C.P.A ![fst C.P.A C.P.A ≫ C.act.act (GlobalTheory.CM.wK H), snd C.P.A C.P.A] C.P.L)
-      (cubeLB C.P.A ![fst C.P.A C.P.A, snd C.P.A C.P.A ≫ C.act.act (1 - GlobalTheory.CM.wK H)] C.P.L) := by
+  have HG : LBIso
+      (cubeLB C.P.A ![fst C.P.A C.P.A ≫ C.act.act (GlobalTheory.CM.wK H), snd C.P.A C.P.A] C.P.L)
+      (cubeLB C.P.A ![fst C.P.A C.P.A, snd C.P.A C.P.A ≫ C.act.act (1 - GlobalTheory.CM.wK H)]
+        C.P.L) := by
     have h := C.adj (GlobalTheory.CM.wK H) (1 - GlobalTheory.CM.wK H) hb
     unfold GlobalTheory.CM.LamEq at h
     simpa only [Category.comp_id] using h
   have HA := GlobalTheory.PolAdjoint.lbIso_cube hpb C.P.L hW' (ho' (1 - GlobalTheory.CM.wK H)) HG
-  have hadj : ∀ x y : HdR A, ψ (push (dp0 R) (𝟙 _) W' x) y =
-      ψ x (push (dp0 R) (𝟙 _) (o'.act (1 - GlobalTheory.CM.wK H)) y) :=
-    GlobalTheory.PolAdjoint.adjoint_of_lbIso hP.1 hA hgA hL' hψ W' (o'.act (1 - GlobalTheory.CM.wK H)) HA
-  have hpushb : ∀ y : HdR A, push (dp0 R) (𝟙 _) (o'.act (1 - GlobalTheory.CM.wK H)) y = y - push (dp0 R) (𝟙 _) W' y := by
+  have hadj
+      : ∀ x y : HdR A,
+        ψ (push (dp0 R) (𝟙 _) W' x) y
+          = ψ x (push (dp0 R) (𝟙 _) (o'.act (1 - GlobalTheory.CM.wK H)) y) :=
+    GlobalTheory.PolAdjoint.adjoint_of_lbIso hP.1 hA hgA hL' hψ W'
+      (o'.act (1 - GlobalTheory.CM.wK H)) HA
+  have hpushb
+      : ∀ y : HdR A,
+        push (dp0 R) (𝟙 _) (o'.act (1 - GlobalTheory.CM.wK H)) y = y - push (dp0 R) (𝟙 _) W' y := by
     intro y
-    have h1 : GlobalTheory.DeRham.act (dp0 R) (𝟙 _) o' (1 - GlobalTheory.CM.wK H) = 1 - push (dp0 R) (𝟙 _) W' := by
+    have h1
+        : GlobalTheory.DeRham.act (dp0 R) (𝟙 _) o' (1 - GlobalTheory.CM.wK H)
+          = 1 - push (dp0 R) (𝟙 _) W' := by
       set_option synthInstance.maxHeartbeats 200000 in
-       rw [map_sub, map_one, GlobalTheory.DeRham.act_apply (dp0 R) (𝟙 _) o' (GlobalTheory.CM.wK H),
+      rw [map_sub, map_one, GlobalTheory.DeRham.act_apply (dp0 R) (𝟙 _) o' (GlobalTheory.CM.wK H),
         push_congr (dp0 R) (𝟙 _) hWo]
     rw [← GlobalTheory.DeRham.act_apply (dp0 R) (𝟙 _) o' (1 - GlobalTheory.CM.wK H), h1]
     rfl

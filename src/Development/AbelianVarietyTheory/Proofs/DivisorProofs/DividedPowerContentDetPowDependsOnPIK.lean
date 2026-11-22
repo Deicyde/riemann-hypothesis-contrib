@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AddValuation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Pj ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.FGDepth GlobalTheory.CharDepth GlobalTheory.FactorDepth GlobalTheory.RefSum
-open GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes (IsIntHom IsOrbit FrobOnType embX primeBelow SplitInK InertInK)
+open NumberField IsDedekindDomain Formalism.L2.Pj ReciprocityTheory.PGsh
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  GlobalTheory.FGDepth GlobalTheory.CharDepth GlobalTheory.FactorDepth GlobalTheory.RefSum
+open GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes
+  (IsIntHom IsOrbit FrobOnType embX primeBelow SplitInK InertInK)
 open GlobalTheory.IndefiniteRowSideFullHecke.BigBlockCharacters (HasChars)
 open GlobalTheory.IndefiniteRowSideFullHecke.FactorDepthInertBounds (boundAll boundInert boundFine)
 
@@ -19,13 +22,13 @@ open GlobalTheory.DetPowShape
 noncomputable def intCoeff (i k : ℕ) (α : (Σ _ : Fin i, Fin i) →₀ ℕ) : ℤ :=
   (detZ i ^ k).coeff α * α.prod fun _ n => ((n.factorial : ℕ) : ℤ)
 
-theorem cast_intCoeff (C : Type) [Field C] (i k : ℕ) (α : (Σ _ : Fin i, Fin i) →₀ ℕ) :
-    ((intCoeff i k α : ℤ) : C) = (detPow C i k).coeff α * GlobalTheory.FGDepth.mfact α := by
+theorem cast_intCoeff (C : Type) [Field C] (i k : ℕ) (α : (Σ _ : Fin i, Fin i) →₀ ℕ)
+    : ((intCoeff i k α : ℤ) : C) = (detPow C i k).coeff α * GlobalTheory.FGDepth.mfact α := by
   rw [intCoeff, detPow_eq_map, MvPolynomial.coeff_map, Int.cast_mul, GlobalTheory.FGDepth.mfact]
   congr 1 <;> simp [Finsupp.prod]
 
-theorem mem_support_iff' (C : Type) [Field C] [CharZero C] (i k : ℕ) (α) :
-    α ∈ (detPow C i k).support ↔ α ∈ (detZ i ^ k).support := by
+theorem mem_support_iff' (C : Type) [Field C] [CharZero C] (i k : ℕ) (α)
+    : α ∈ (detPow C i k).support ↔ α ∈ (detZ i ^ k).support := by
   rw [MvPolynomial.mem_support_iff, MvPolynomial.mem_support_iff, detPow_eq_map,
     MvPolynomial.coeff_map]
   simp
@@ -37,10 +40,13 @@ theorem intCoeff_ne_zero (i k : ℕ) (α) (h : α ∈ (detZ i ^ k).support) : in
   refine Finset.prod_ne_zero_iff.2 fun a _ => ?_
   exact_mod_cast Nat.factorial_ne_zero _
 
-theorem v_intCast (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (p : ℕ)
-    (hp : p.Prime) (hv : v (p : C) = 1) (m : ℤ) (hm : m ≠ 0) :
-    v (m : C) = (((padicValNat p m.natAbs : ℕ) : ℝ) : WithTop ℝ) := by
-  have h := GlobalTheory.addValuation_natCast_eq_padicValNat C v p hp hv m.natAbs (Int.natAbs_ne_zero.2 hm)
+theorem v_intCast
+    (C : Type) [Field C] [CharZero C]
+    (v : AddValuation C (WithTop ℝ)) (p : ℕ) (hp : p.Prime) (hv : v (p : C) = 1)
+    (m : ℤ) (hm : m ≠ 0)
+    : v (m : C) = (((padicValNat p m.natAbs : ℕ) : ℝ) : WithTop ℝ) := by
+  have h :=
+    GlobalTheory.addValuation_natCast_eq_padicValNat C v p hp hv m.natAbs (Int.natAbs_ne_zero.2 hm)
   rcases Int.natAbs_eq m with h1 | h1
   · conv_lhs => rw [h1]
     simpa using h
@@ -51,11 +57,12 @@ end GlobalTheory.DetPowContent
 
 namespace GlobalTheory
 
-
 open GlobalTheory.DetPowShape GlobalTheory.DetPowContent in
-theorem detPow_content_const : ∀ (p : ℕ), p.Prime → ∀ i k : ℕ, ∃ κ : ℝ, ∀ (C : Type) [Field C]
-    [CharZero C] (v : AddValuation C (WithTop ℝ)), v (p : C) = 1 →
-      content v (detPow C i k) = (κ : EReal) := by
+theorem detPow_content_const
+    : ∀ (p : ℕ),
+      p.Prime
+        → ∀ i k : ℕ, ∃ κ : ℝ, ∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)),
+          v (p : C) = 1 → content v (detPow C i k) = (κ : EReal) := by
   intro p hp i k
   set S := (detZ i ^ k).support with hS
   have hne : S.Nonempty := by
@@ -66,8 +73,10 @@ theorem detPow_content_const : ∀ (p : ℕ), p.Prime → ∀ i k : ℕ, ∃ κ 
   let f : ((Σ _ : Fin i, Fin i) →₀ ℕ) → ℕ := fun α => padicValNat p (intCoeff i k α).natAbs
   obtain ⟨α0, hα0, hmin⟩ := S.exists_min_image f hne
   refine ⟨(f α0 : ℝ), fun C _ _ v hv => ?_⟩
-  have hval : ∀ α ∈ S, GlobalTheory.FGDepth.toE (v ((detPow C i k).coeff α * GlobalTheory.FGDepth.mfact α)) =
-      ((f α : ℝ) : EReal) := by
+  have hval
+      : ∀ α ∈ S,
+        GlobalTheory.FGDepth.toE (v ((detPow C i k).coeff α * GlobalTheory.FGDepth.mfact α))
+          = ((f α : ℝ) : EReal) := by
     intro α hα
     rw [← cast_intCoeff, v_intCast C v p hp hv _ (intCoeff_ne_zero i k α hα)]
     rfl

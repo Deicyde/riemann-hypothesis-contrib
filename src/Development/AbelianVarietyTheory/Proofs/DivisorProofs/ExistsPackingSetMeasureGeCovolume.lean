@@ -10,8 +10,12 @@ public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.MuCardLeTwo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.CovTop.VolUp
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.StandardLattice Formalism.IndefR.Lev Formalism.IndefR.Datum GlobalTheory.AdelicScalar
+open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls
+  GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.CovTop.VolUp
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.StandardLattice Formalism.IndefR.Lev Formalism.IndefR.Datum
+  GlobalTheory.AdelicScalar
 open scoped ENNReal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -20,8 +24,11 @@ namespace GlobalTheory
 open MeasureTheory
 open scoped Pointwise
 
-theorem packing_set_covolume_le :
-    ∀ (H : Type) [Group H] [MeasurableSpace H] [MeasurableMul H] (ν : Measure H) (Γ : Subgroup H), Countable Γ → ∃ F : Set H, MeasurableSet F ∧ covolume Γ H ν ≤ ν F ∧ ∀ γ ∈ Γ, ∀ y ∈ F, γ * y ∈ F → γ = 1 := by
+theorem packing_set_covolume_le
+    : ∀ (H : Type) [Group H] [MeasurableSpace H] [MeasurableMul H] (ν : Measure H) (Γ : Subgroup H),
+      Countable Γ
+        → ∃ F : Set H,
+          MeasurableSet F ∧ covolume Γ H ν ≤ ν F ∧ ∀ γ ∈ Γ, ∀ y ∈ F, γ * y ∈ F → γ = 1 := by
   intro H _ _ _ ν Γ _
   classical
   by_cases hF : HasFundamentalDomain Γ H ν
@@ -34,7 +41,8 @@ theorem packing_set_covolume_le :
     have hcov : covolume Γ H ν = ν s := by simp [covolume, hF, hs_def]
     obtain ⟨t, hts, htm, hte⟩ := hs.nullMeasurableSet.exists_measurable_subset_ae_eq
     have hsmul : ∀ g : Γ, (g • t : Set H) = (fun y => (g : H)⁻¹ * y) ⁻¹' t := by
-      intro g; ext y
+      intro g
+      ext y
       simp [Set.mem_smul_set_iff_inv_smul_mem, Subgroup.smul_def]
     have hmeas : ∀ g : Γ, MeasurableSet (g • t : Set H) := by
       intro g; rw [hsmul g]; exact (measurable_const_mul _) htm

@@ -22,15 +22,20 @@ namespace CompanionTheory.RgExh.Hk
 theorem unitarity : Unit := UnitB.unit_of_dualFacts dual_module_facts
 
 theorem reflection_symmetry : Reflect :=
-  reflect_of' GlobalTheory.T.QuantumDeterminantTensor GlobalTheory.T.OmegaScalar GlobalTheory.T.HeckeBackwardStable dual_module_facts unitarity
+  reflect_of' GlobalTheory.T.QuantumDeterminantTensor GlobalTheory.T.OmegaScalar
+    GlobalTheory.T.HeckeBackwardStable dual_module_facts unitarity
 
 theorem forward_simple_module : FwdSimple :=
-  forward_simple_of_tensor_facts GlobalTheory.T.QuantumDeterminantTensor GlobalTheory.T.HeckeBackwardStable dual_module_facts unitarity
+  forward_simple_of_tensor_facts GlobalTheory.T.QuantumDeterminantTensor
+    GlobalTheory.T.HeckeBackwardStable dual_module_facts unitarity
 
-theorem infinitesimal_character_shift : CompanionTheory.RgExh.StepChar := GlobalTheory.T.InfinitesimalCharacterStatement
+theorem infinitesimal_character_shift : CompanionTheory.RgExh.StepChar :=
+  GlobalTheory.T.InfinitesimalCharacterStatement
 
 theorem hecke_algebra_exhaustion : CompanionTheory.RgExh.Hecke :=
-  hecke_of' GlobalTheory.T.QuantumDeterminantEquality GlobalTheory.T.InfinitesimalCharacterStatement GlobalTheory.T.CayleyHamiltonHk GlobalTheory.T.HeckeNonVanishing GlobalTheory.T.HeckeNonScalar GlobalTheory.T.HeckeBackward GlobalTheory.T.OmegaScalar
-    forward_simple_module reflection_symmetry
+  hecke_of' GlobalTheory.T.QuantumDeterminantEquality GlobalTheory.T.InfinitesimalCharacterStatement
+    GlobalTheory.T.CayleyHamiltonHk GlobalTheory.T.HeckeNonVanishing GlobalTheory.T.HeckeNonScalar
+    GlobalTheory.T.HeckeBackward GlobalTheory.T.OmegaScalar forward_simple_module
+    reflection_symmetry
 
 end CompanionTheory.RgExh.Hk

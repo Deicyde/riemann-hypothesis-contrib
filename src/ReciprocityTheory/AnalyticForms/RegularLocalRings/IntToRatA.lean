@@ -11,9 +11,11 @@ open MvPolynomial
 
 variable {σ : Type} [Fintype σ]
 
-noncomputable def ChZero (q : Ideal (MvPolynomial σ ℤ)) : Prop := ∀ m : ℤ, (C m : MvPolynomial σ ℤ) ∈ q → m = 0
+noncomputable def ChZero (q : Ideal (MvPolynomial σ ℤ)) : Prop :=
+  ∀ m : ℤ, (C m : MvPolynomial σ ℤ) ∈ q → m = 0
 
-noncomputable abbrev intS (σ : Type) : Submonoid (MvPolynomial σ ℤ) := (nonZeroDivisors ℤ).map (C (σ := σ))
+noncomputable abbrev intS (σ : Type) : Submonoid (MvPolynomial σ ℤ) :=
+  (nonZeroDivisors ℤ).map (C (σ := σ))
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 

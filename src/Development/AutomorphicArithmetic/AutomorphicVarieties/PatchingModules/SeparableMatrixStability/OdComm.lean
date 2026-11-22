@@ -4,11 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem comm_of_sep {K V : Type} [Field K] [IsAlgClosed K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] (f g h : Module.End K V) (hs : f.charpoly.Separable)
-    (hg : Commute f g) (hh : Commute f h) : g * h = h * g := by
+private theorem comm_of_sep
+    {K V : Type} [Field K] [IsAlgClosed K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (f g h : Module.End K V) (hs : f.charpoly.Separable) (hg : Commute f g) (hh : Commute f h)
+    : g * h = h * g := by
   classical
   have key : ∀ μ : K, ∀ x ∈ f.maxGenEigenspace μ, (g * h) x = (h * g) x := by
     intro μ x hx
@@ -37,20 +39,27 @@ private theorem comm_of_sep {K V : Type} [Field K] [IsAlgClosed K] [AddCommGroup
     exact iSup_le hker
   exact sub_eq_zero.mp (LinearMap.ker_eq_top.mp htop)
 
-private theorem mat_comm_of_sep {K : Type} [Field K] [IsAlgClosed K] {n : ℕ}
-    (P Z E : Matrix (Fin n) (Fin n) K) (hs : P.charpoly.Separable)
-    (hg : P * Z = Z * P) (hh : P * E = E * P) : Z * E = E * Z := by
+private theorem mat_comm_of_sep
+    {K : Type} [Field K] [IsAlgClosed K]
+    {n : ℕ} (P Z E : Matrix (Fin n) (Fin n) K) (hs : P.charpoly.Separable) (hg : P * Z = Z * P)
+    (hh : P * E = E * P)
+    : Z * E = E * Z := by
   let φ := (Matrix.toLinAlgEquiv' : Matrix (Fin n) (Fin n) K ≃ₐ[K] Module.End K (Fin n → K))
   have hc : (φ P).charpoly = P.charpoly := Matrix.charpoly_toLin' P
-  have e := comm_of_sep (φ P) (φ Z) (φ E) (by rw [hc]; exact hs)
-    (by rw [Commute, SemiconjBy, ← map_mul, ← map_mul, hg])
-    (by rw [Commute, SemiconjBy, ← map_mul, ← map_mul, hh])
+  have e :=
+    comm_of_sep (φ P) (φ Z) (φ E) (by rw [hc]; exact hs)
+      (by rw [Commute, SemiconjBy, ← map_mul, ← map_mul, hg])
+      (by rw [Commute, SemiconjBy, ← map_mul, ← map_mul, hh])
   apply φ.injective
   rw [map_mul, map_mul]
   exact e
 
-theorem UpperTheory.V.Pa.od_comm :
-    ∀ (A : Type) [CommRing A] [IsDomain A] (n a : ℕ) (P Z : Matrix (Fin n) (Fin n) A) (al : Fin n → A), P ∈ Ev A A n a → Z ∈ Od A A n a → Function.Injective al → P.charpoly = ∏ i, (Polynomial.X - Polynomial.C (al i)) → P * Z = Z * P → Z = 0 := by
+theorem UpperTheory.V.Pa.od_comm
+    : ∀ (A : Type) [CommRing A] [IsDomain A] (n a : ℕ) (P Z : Matrix (Fin n) (Fin n) A)
+        (al : Fin n → A),
+      P ∈ Ev A A n a → Z ∈ Od A A n a → Function.Injective al
+        → P.charpoly = ∏ i, (Polynomial.X - Polynomial.C (al i)) → P * Z = Z * P
+        → Z = 0 := by
   intro A _ _ n a P Z al hP hZ hal hchar hPZ
   classical
   have hP' : ∀ i j : Fin n, ¬((i : ℕ) < a ↔ (j : ℕ) < a) → P i j = 0 := by
@@ -78,8 +87,7 @@ theorem UpperTheory.V.Pa.od_comm :
     rw [Matrix.charpoly_map, hchar, Polynomial.map_prod]
     simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C]
     exact Polynomial.separable_prod_X_sub_C_iff.mpr (hι.comp hal)
-  have h1 : P.map ι * Z.map ι = Z.map ι * P.map ι := by
-    rw [← Matrix.map_mul, ← Matrix.map_mul, hPZ]
+  have h1 : P.map ι * Z.map ι = Z.map ι * P.map ι := by rw [← Matrix.map_mul, ← Matrix.map_mul, hPZ]
   have h2 : P.map ι * (Matrix.diagonal e).map ι = (Matrix.diagonal e).map ι * P.map ι := by
     rw [← Matrix.map_mul, ← Matrix.map_mul, hPE]
   have h3 := mat_comm_of_sep (P.map ι) (Z.map ι) ((Matrix.diagonal e).map ι) hs h1 h2
@@ -91,8 +99,8 @@ theorem UpperTheory.V.Pa.od_comm :
   rw [Matrix.zero_apply]
   by_cases hi : (i : ℕ) < a <;> by_cases hj : (j : ℕ) < a
   · exact hZ' i j (by simp [hi, hj])
-  · simp only [e, hi, hj, ↓reduceIte, mul_one, mul_zero, one_mul, zero_mul] at h5
+  · simp only [e, hi, hj, ↓ reduceIte, mul_one, mul_zero, one_mul, zero_mul] at h5
     exact h5.symm
-  · simp only [e, hi, hj, ↓reduceIte, mul_one, mul_zero, one_mul, zero_mul] at h5
+  · simp only [e, hi, hj, ↓ reduceIte, mul_one, mul_zero, one_mul, zero_mul] at h5
     exact h5
   · exact hZ' i j (by simp [hi, hj])

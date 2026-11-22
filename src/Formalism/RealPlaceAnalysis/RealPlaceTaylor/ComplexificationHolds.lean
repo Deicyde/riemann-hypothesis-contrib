@@ -45,7 +45,8 @@ lemma f1auxiliary_hs_one (n : ℕ) : hs (1 : Matrix (Fin n) (Fin n) ℂ) = n := 
 
 theorem ball_open_holds : BallOpen := by
   intro n R hR
-  refine ⟨{g | hs g < R}, isOpen_lt continuous_hs_real_place_taylor continuous_const, ?_, fun g hg => hg⟩
+  refine
+    ⟨{g | hs g < R}, isOpen_lt continuous_hs_real_place_taylor continuous_const, ?_, fun g hg => hg⟩
   show hs (1 : Matrix (Fin n) (Fin n) ℂ) < R
   rw [f1auxiliary_hs_one]
   exact hR
@@ -68,7 +69,9 @@ theorem hermitian_small_ball : HSBall := by
   · have hcpt : IsCompact (Set.pi Set.univ fun _ : Fin n =>
         Set.pi Set.univ fun _ : Fin n => Metric.closedBall (0 : ℂ) (Real.sqrt R)) :=
       isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
-    refine hcpt.of_isClosed_subset ((f1auxiliary_closed ε).inter (isClosed_le continuous_hs_real_place_taylor continuous_const)) ?_
+    refine hcpt.of_isClosed_subset
+      ((f1auxiliary_closed ε).inter (isClosed_le continuous_hs_real_place_taylor continuous_const))
+      ?_
     rintro g ⟨_, hg⟩ i _ j _
     have h1 := (f1auxiliary_entry_le g i j).trans hg
     simpa using Real.abs_le_sqrt h1
@@ -84,6 +87,7 @@ theorem hermitian_small_ball : HSBall := by
       exact Matrix.mem_unitaryGroup_iff'.1 hk.1
     rw [f1auxiliary_hs_eq, f1auxiliary_hs_eq, conjTranspose_mul]
     congr 1
-    rw [show gᴴ * kᴴ * (k * g) = gᴴ * (kᴴ * k) * g by simp only [Matrix.mul_assoc], hk2, Matrix.mul_one]
+    rw [show gᴴ * kᴴ * (k * g) = gᴴ * (kᴴ * k) * g by simp only [Matrix.mul_assoc], hk2,
+      Matrix.mul_one]
 
 end Formalism.REAL

@@ -18,7 +18,8 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarR
 open NumberField Module Matrix in
 open scoped ENNReal in
 open Polynomial in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] in
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] in
 private lemma sub_mem_differentIdeal_of_eq_star (h : _root_.Formalism.BasicNotions.CMData F E) (θ t : 𝓞 E)
     (ht : algebraMap (𝓞 E) E t = star (algebraMap (𝓞 E) E θ)) :
     θ - t ∈ differentIdeal (𝓞 F) (𝓞 E) := by
@@ -81,12 +82,14 @@ private lemma sub_mem_differentIdeal_of_eq_star (h : _root_.Formalism.BasicNotio
   simp [hp_def, hs]
   ring
 
-
 open NumberField Module Matrix in
 open scoped ENNReal in
 open Polynomial in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] in
-theorem _root_.GlobalTheory.CMDiscrSq.differentIdeal_eq_top (h : _root_.Formalism.BasicNotions.CMData F E) : differentIdeal (𝓞 F) (𝓞 E) = ⊤ := by
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] in
+theorem _root_.GlobalTheory.CMDiscrSq.differentIdeal_eq_top
+    (h : _root_.Formalism.BasicNotions.CMData F E)
+    : differentIdeal (𝓞 F) (𝓞 E) = ⊤ := by
   by_contra hne
   obtain ⟨P, hP, hle⟩ := Ideal.exists_le_maximal _ hne
   obtain ⟨θ, t, ht, hθt⟩ := h.cmUnram.2.2 P hP
@@ -94,13 +97,14 @@ theorem _root_.GlobalTheory.CMDiscrSq.differentIdeal_eq_top (h : _root_.Formalis
 
 end GlobalTheory.CMDiscrSq
 
-
 open NumberField Module Matrix in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.cm_discr_sq : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
-    [NumberField E] [StarRing E] [Algebra F E], _root_.Formalism.BasicNotions.CMData F E → |discr E| = discr F ^ 2 ∧
-      Ideal.absNorm (Ideal.map (algebraMap (𝓞 F) (𝓞 E)) (differentIdeal ℤ (𝓞 F))) =
-        (discr F).natAbs ^ 2 := by
+theorem _root_.GlobalTheory.cm_discr_sq
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E],
+      _root_.Formalism.BasicNotions.CMData F E
+        → |discr E| = discr F ^ 2
+          ∧ Ideal.absNorm (Ideal.map (algebraMap (𝓞 F) (𝓞 E)) (differentIdeal ℤ (𝓞 F)))
+            = (discr F).natAbs ^ 2 := by
   intro F E _ _ _ _ _ _ h
   have hd := _root_.GlobalTheory.CMDiscrSq.differentIdeal_eq_top h
   have hE := natAbs_discr_eq_absNorm_differentIdeal_mul_natAbs_discr_pow F (𝓞 F) E (𝓞 E)

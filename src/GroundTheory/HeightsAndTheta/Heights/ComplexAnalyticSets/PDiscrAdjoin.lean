@@ -29,33 +29,41 @@ theorem DiscrAdjoin.proof : DiscrAdjoin.Statement := by
     natDegree_derivative_le _
   have hres := resultant_deriv (f := minpoly R ℓ) (natDegree_pos_iff_degree_pos.mp hpos)
   rw [hFm.leadingCoeff, mul_one] at hres
-  have hdisc : (minpoly R ℓ).discr = (-1) ^ ((minpoly R ℓ).natDegree *
-      ((minpoly R ℓ).natDegree - 1) / 2) * resultant (minpoly R ℓ) (derivative (minpoly R ℓ))
-        (minpoly R ℓ).natDegree ((minpoly R ℓ).natDegree - 1) := by
+  have hdisc
+      : (minpoly R ℓ).discr
+        = (-1) ^ ((minpoly R ℓ).natDegree * ((minpoly R ℓ).natDegree - 1) / 2)
+          * resultant (minpoly R ℓ) (derivative (minpoly R ℓ)) (minpoly R ℓ).natDegree
+            ((minpoly R ℓ).natDegree - 1) := by
     rw [hres, ← mul_assoc, ← mul_pow, neg_one_mul, neg_neg, one_pow, one_mul]
   refine ⟨hdeg, ?_, ?_⟩
   · intro h0
-    have hR : resultant (minpoly R ℓ) (derivative (minpoly R ℓ)) (minpoly R ℓ).natDegree
-        ((minpoly R ℓ).natDegree - 1) = 0 := by rw [hres, h0, mul_zero]
+    have hR
+        : resultant (minpoly R ℓ) (derivative (minpoly R ℓ)) (minpoly R ℓ).natDegree
+            ((minpoly R ℓ).natDegree - 1)
+          = 0 := by
+      rw [hres, h0, mul_zero]
     have hRK := congrArg (algebraMap R K) hR
     rw [← resultant_map_map, map_zero, ← derivative_map, ← hFK, ← hdegK] at hRK
     have hsep : (minpoly K ℓ).Separable := Algebra.IsSeparable.isSeparable K ℓ
     have hle : (derivative (minpoly K ℓ)).natDegree ≤ (minpoly K ℓ).natDegree - 1 :=
       natDegree_derivative_le _
     obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le hle
-    rw [hk, resultant_add_right_deg _ _ _ _ k le_rfl, coeff_natDegree, (minpoly.monic hK).leadingCoeff,
-      one_pow, one_mul] at hRK
+    rw [hk, resultant_add_right_deg _ _ _ _ k le_rfl, coeff_natDegree,
+        (minpoly.monic hK).leadingCoeff, one_pow, one_mul]
+      at hRK
     exact resultant_ne_zero _ _ hsep hRK
   · intro z hz
-    obtain ⟨p, q, -, -, hpq⟩ := exists_mul_add_mul_eq_C_resultant (minpoly R ℓ)
-      (derivative (minpoly R ℓ)) le_rfl hF'deg (Or.inl hpos.ne')
+    obtain ⟨p, q, -, -, hpq⟩ :=
+      exists_mul_add_mul_eq_C_resultant (minpoly R ℓ) (derivative (minpoly R ℓ)) le_rfl hF'deg
+        (Or.inl hpos.ne')
     have hev := congrArg (aeval ℓ) hpq
     simp only [map_add (f := _), map_mul, minpoly.aeval, zero_mul, zero_add, aeval_C] at hev
     have hadjK : Algebra.adjoin K {ℓ} = ⊤ := by
       rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hK.isAlgebraic, hadj,
         IntermediateField.top_toSubalgebra]
-    have hzmem : z ∈ (Algebra.traceForm K L).dualSubmodule
-        (Subalgebra.toSubmodule (Algebra.adjoin R {ℓ})) := by
+    have hzmem
+        : z ∈ (Algebra.traceForm K L).dualSubmodule
+          (Subalgebra.toSubmodule (Algebra.adjoin R {ℓ})) := by
       rw [LinearMap.BilinForm.mem_dualSubmodule]
       intro y hy
       rw [Submodule.mem_one]
@@ -70,9 +78,11 @@ theorem DiscrAdjoin.proof : DiscrAdjoin.Statement := by
     rw [hd]
     have hq : aeval ℓ q ∈ Algebra.adjoin R {ℓ} := aeval_mem_adjoin_singleton R ℓ
     have hw' : w ∈ Algebra.adjoin R {ℓ} := hw
-    have key : (minpoly R ℓ).discr • ((aeval ℓ (derivative (minpoly R ℓ)))⁻¹ • w) =
-        ((-1 : L) ^ ((minpoly R ℓ).natDegree * ((minpoly R ℓ).natDegree - 1) / 2) * aeval ℓ q * w) *
-          (aeval ℓ (derivative (minpoly R ℓ)) * (aeval ℓ (derivative (minpoly R ℓ)))⁻¹) := by
+    have key
+        : (minpoly R ℓ).discr • ((aeval ℓ (derivative (minpoly R ℓ)))⁻¹ • w)
+          = ((-1 : L) ^ ((minpoly R ℓ).natDegree * ((minpoly R ℓ).natDegree - 1) / 2) * aeval ℓ q
+              * w)
+            * (aeval ℓ (derivative (minpoly R ℓ)) * (aeval ℓ (derivative (minpoly R ℓ)))⁻¹) := by
       rw [hdisc, Algebra.smul_def, smul_eq_mul, map_mul, ← hev, map_pow, map_neg, map_one]
       ring
     rw [key]

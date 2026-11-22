@@ -80,8 +80,8 @@ lemma de_cons {p m : ℕ} (a : Fin (p + 1) → ℂ) (w : ℂ) (b : Fin p → ℂ
   simp only [de, rhoSq_cons, bco_cons]
   rfl
 
-def sclPt {p m : ℕ} (a0 : ℂ) (r : ℝ) (x : Xp p m) :
-    (Fin (p + 1) → ℂ) × (Fin p → ℂ) × (Fin m → ℂ) × ℝ :=
+def sclPt {p m : ℕ} (a0 : ℂ) (r : ℝ) (x : Xp p m)
+    : (Fin (p + 1) → ℂ) × (Fin p → ℂ) × (Fin m → ℂ) × ℝ :=
   (Fin.cons a0 (r • x.1), r • x.2.1, r • x.2.2.1, r ^ 2 * x.2.2.2)
 
 lemma lsq_scl_one {p m : ℕ} (a0 : ℂ) (r : ℝ) (x : Xp p m) :

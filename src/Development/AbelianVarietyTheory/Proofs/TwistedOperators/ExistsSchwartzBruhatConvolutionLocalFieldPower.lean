@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNo
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 
 noncomputable section
 namespace GlobalTheory.SBConv
@@ -15,8 +16,8 @@ namespace GlobalTheory.SBConv
 section Abstract
 variable {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
 
-theorem eventually_translate {F : G → ℂ} (hF : F ∈ SB G) :
-    ∀ᶠ x in nhds (0 : G), ∀ g, F (g - x) = F g := by
+theorem eventually_translate {F : G → ℂ} (hF : F ∈ SB G)
+    : ∀ᶠ x in nhds (0 : G), ∀ g, F (g - x) = F g := by
   have hlc : IsLocallyConstant F := hF.1
   have hK : IsCompact (tsupport F) := hF.2
   have hz : ∀ z, z ∉ tsupport F → F z = 0 := fun z hz => by
@@ -43,9 +44,11 @@ theorem eventually_translate {F : G → ℂ} (hF : F ∈ SB G) :
       exact h.symm
     · exact hz _ hg'
 
-def translate (Ψ : SB G) (y : G) : SB G :=
-  ⟨fun x => Ψ.1 (x - y), Ψ.2.1.comp_continuous (continuous_sub_right y),
-    Ψ.2.2.comp_homeomorph (Homeomorph.subRight y)⟩
+def translate (Ψ : SB G) (y : G) : SB G := ⟨
+  fun x => Ψ.1 (x - y),
+  Ψ.2.1.comp_continuous (continuous_sub_right y),
+  Ψ.2.2.comp_homeomorph (Homeomorph.subRight y)
+⟩
 
 theorem isLocallyConstant_translate (Ψ : SB G) : IsLocallyConstant (translate Ψ) := by
   rw [IsLocallyConstant.iff_eventually_eq]
@@ -59,10 +62,13 @@ theorem isLocallyConstant_translate (Ψ : SB G) : IsLocallyConstant (translate �
   have h := hy' (x - y)
   rwa [sub_sub_sub_cancel_right] at h
 
-theorem exists_conv [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G)
-    [IsFiniteMeasureOnCompacts μ] (Φ Ψ : SB G) :
-    ∃ w : SB G, (∀ x, w.1 x = ∫ y, Φ.1 y * Ψ.1 (x - y) ∂μ) ∧
-      ∀ l : SB G →ₗ[ℂ] ℂ, l w = ∫ y, Φ.1 y * l (translate Ψ y) ∂μ := by
+theorem exists_conv
+    [T2Space G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [IsFiniteMeasureOnCompacts μ]
+    (Φ Ψ : SB G)
+    : ∃ w : SB G,
+      (∀ x, w.1 x = ∫ y, Φ.1 y * Ψ.1 (x - y) ∂μ)
+        ∧ ∀ l : SB G →ₗ[ℂ] ℂ, l w = ∫ y, Φ.1 y * l (translate Ψ y) ∂μ := by
   have hT : IsLocallyConstant (fun y => Φ.1 y • translate Ψ y) :=
     IsLocallyConstant.comp₂ Φ.2.1 (isLocallyConstant_translate Ψ) (fun c f => c • f)
   have hz : ∀ y, y ∉ tsupport Φ.1 → Φ.1 y • translate Ψ y = 0 := by
@@ -71,8 +77,10 @@ theorem exists_conv [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure
       by_contra h
       exact hy (subset_tsupport _ h)
     rw [h0, zero_smul]
-  obtain ⟨w, hw⟩ := GlobalTheory.exists_weakIntegral_of_isLocallyConstant_of_isCompact G μ (SB G)
-    (fun y => Φ.1 y • translate Ψ y) hT (tsupport Φ.1) Φ.2.2.isCompact hz
+  obtain ⟨w, hw⟩ :=
+    GlobalTheory.exists_weakIntegral_of_isLocallyConstant_of_isCompact G μ (SB G)
+      (fun y => Φ.1 y • translate Ψ y)
+      hT (tsupport Φ.1) Φ.2.2.isCompact hz
   refine ⟨w, fun x => ?_, fun l => ?_⟩
   · exact hw ((LinearMap.proj x).comp (SB G).subtype)
   · rw [hw l]
@@ -80,7 +88,15 @@ theorem exists_conv [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure
 
 end Abstract
 
-theorem exists_convolution : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (n : Type) [Fintype n] [DecidableEq n] (ν : Measure k) [ν.IsAddHaarMeasure] (Φ Ψ : SB (n → k)), ∃ (T : (n → k) → SB (n → k)) (w : SB (n → k)), (∀ y x, (T y).1 x = Ψ.1 (x - y)) ∧ (∀ x, w.1 x = ∫ y, Φ.1 y * Ψ.1 (x - y) ∂(Measure.pi fun _ => ν)) ∧ (∀ x, w.1 x = ∫ y, Ψ.1 y * Φ.1 (x - y) ∂(Measure.pi fun _ => ν)) ∧ ∀ l : SB (n → k) →ₗ[ℂ] ℂ, l w = ∫ y, Φ.1 y * l (T y) ∂(Measure.pi fun _ => ν) := by
+theorem exists_convolution
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (n : Type) [Fintype n] [DecidableEq n] (ν : Measure k)
+        [ν.IsAddHaarMeasure] (Φ Ψ : SB (n → k)),
+      ∃ (T : (n → k) → SB (n → k)) (w : SB (n → k)),
+        (∀ y x, (T y).1 x = Ψ.1 (x - y))
+          ∧ (∀ x, w.1 x = ∫ y, Φ.1 y * Ψ.1 (x - y) ∂(Measure.pi fun _ => ν))
+          ∧ (∀ x, w.1 x = ∫ y, Ψ.1 y * Φ.1 (x - y) ∂(Measure.pi fun _ => ν))
+          ∧ ∀ l : SB (n → k) →ₗ[ℂ] ℂ, l w = ∫ y, Φ.1 y * l (T y) ∂(Measure.pi fun _ => ν) := by
   intro k _ _ _ _ _ _ n _ _ ν _ Φ Ψ
   have : SecondCountableTopology k := GlobalTheory.SplitWeil.secondCountable k
   have : T2Space k := GlobalTheory.SplitWeil.t2Space k

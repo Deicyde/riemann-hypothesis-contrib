@@ -18,7 +18,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GlBlockFinit
 
 noncomputable section
 
-open Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta Matrix Filter GlobalTheory.SmoothGlob GlobalTheory.TypeSum GlobalTheory.LowTypeDetermined
+open Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta Matrix Filter GlobalTheory.SmoothGlob
+  GlobalTheory.TypeSum GlobalTheory.LowTypeDetermined
 open scoped Topology
 
 namespace GlobalTheory.CWGeneral
@@ -29,15 +30,16 @@ section Sub
 
 variable {E : Type} [AddCommGroup E] [Module ℂ E] [TopologicalSpace E] [IsTopologicalAddGroup E]
 
-
 end Sub
 
 section KFin
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {σ : Mx n → (H →L[ℂ] H)}
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  {σ : Mx n → (H →L[ℂ] H)}
 
-theorem dense_smoothAll_of_irred (hσ : IsURepOn (UJset ε) σ) (hi : IsIrredOn (UJset ε) σ) :
-    Dense (smoothAll (Jm ε) σ : Set H) := by
+theorem dense_smoothAll_of_irred (hσ : IsURepOn (UJset ε) σ) (hi : IsIrredOn (UJset ε) σ)
+    : Dense (smoothAll (Jm ε) σ : Set H) := by
   rcases subsingleton_or_nontrivial H with hs | hn
   · intro x
     rw [Subsingleton.elim x 0]
@@ -51,14 +53,20 @@ theorem dense_smoothAll_of_irred (hσ : IsURepOn (UJset ε) σ) (hi : IsIrredOn 
     · obtain ⟨v, hv, hs⟩ := GlobalTheory.GardingVec.exists_garding hσ
       exact (Submodule.ne_bot_iff _).2 ⟨v, hs, hv⟩
 
-theorem sm_of_isKFin (hHC : GlobalTheory.Published.HarishChandraModules) (hσ : IsURepOn (UJset ε) σ)
-    (hi : IsIrredOn (UJset ε) σ) {v : H} (hv : IsKFin ε σ v) : Sm ε σ v := by
+theorem sm_of_isKFin
+    (hHC : GlobalTheory.Published.HarishChandraModules) (hσ : IsURepOn (UJset ε) σ)
+    (hi : IsIrredOn (UJset ε) σ)
+    {v : H} (hv : IsKFin ε σ v)
+    : Sm ε σ v := by
   have := hHC.smoothVec hσ hi hv (P := 1) (G := Jm ε) isUnit_one (by simp)
   rwa [conj_one_eq] at this
 
-theorem isKFin_dRep_of_irred (hHC : GlobalTheory.Published.HarishChandraModules) (hσ : IsURepOn (UJset ε) σ)
-    (hi : IsIrredOn (UJset ε) σ) {v : H} (hv : IsKFin ε σ v) {X : Mx n} (hX : X ∈ lieSet ε) :
-    IsKFin ε σ (dRep σ X v) := by
+theorem isKFin_dRep_of_irred
+    (hHC : GlobalTheory.Published.HarishChandraModules) (hσ : IsURepOn (UJset ε) σ)
+    (hi : IsIrredOn (UJset ε) σ)
+    {v : H} (hv : IsKFin ε σ v)
+    {X : Mx n} (hX : X ∈ lieSet ε)
+    : IsKFin ε σ (dRep σ X v) := by
   obtain ⟨S, h1, h2, h3⟩ := hv
   have hS : S ≤ smooth (Jm ε) σ := fun s hs => sm_of_isKFin hHC hσ hi ⟨S, h1, hs, h3⟩
   let b := Module.finBasis ℝ (lie (Jm ε))
@@ -70,8 +78,10 @@ theorem isKFin_dRep_of_irred (hHC : GlobalTheory.Published.HarishChandraModules)
     have e : Y = ∑ i, b.repr ⟨Y, hY⟩ i • (b i : Mx n) := by
       have := congrArg Subtype.val (b.sum_repr ⟨Y, hY⟩)
       simpa only [AddSubmonoidClass.coe_finsetSum, SetLike.val_smul] using this.symm
-    rw [e, GlobalTheory.LowTypeDetermined.dRep_sum (isUnit_Jm ε) hσ (dense_smoothAll_of_irred hσ hi) (fun i => (b i).2)
-      (hS hs)]
+    rw [e,
+      GlobalTheory.LowTypeDetermined.dRep_sum (isUnit_Jm ε) hσ (dense_smoothAll_of_irred hσ hi)
+        (fun i => (b i).2)
+        (hS hs)]
     refine T.sum_mem fun i _ => T.smul_mem _ ?_
     exact Submodule.mem_iSup_of_mem i ⟨⟨s, hs⟩, rfl⟩
   refine ⟨T, inferInstance, hT X hX v h2, fun k hk w hw => ?_⟩

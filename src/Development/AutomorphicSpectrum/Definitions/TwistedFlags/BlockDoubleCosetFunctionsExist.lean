@@ -8,8 +8,11 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.InstBor
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.Indef Formalism.DivisionValues Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.Indef Formalism.DivisionValues Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open GlobalTheory.CompanionTheory.QL (bAA bAD bDA bDD chi0 pEl)
 open GlobalTheory.LFun (KGL IsSatVecGL heckeVec eulerFac seg)
 open Formalism.UG (qV IsUnifV dosetInd)
@@ -29,7 +32,8 @@ section Adelic
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open GlobalTheory.FinZeta (projV embV Kv Gv)
-open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (SplitProj IsIdemOf IsProjAt rdA grpCo frCo)
+open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting
+  (SplitProj IsIdemOf IsProjAt rdA grpCo frCo)
 open GlobalTheory.CompanionTheory.Ipf.Loc (FPl)
 
 variable {D : D7}

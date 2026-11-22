@@ -14,18 +14,24 @@ namespace PositivityTheory.ThKCT
 
 open scoped TensorProduct Matrix NNReal
 open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK Fr
+open GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK Fr
 
-theorem sig_val {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} {A : Matrix (Fin n) (Fin r ⊕ Fin s) ℂ}
-    (hA : Aᵀ * M * A.map star = Matrix.fromBlocks 1 0 0 (-1)) (u : Fin r ⊕ Fin s → ℂ) :
-    (A *ᵥ u) ⬝ᵥ M *ᵥ star (A *ᵥ u) =
-      ((∑ i, Complex.normSq (u (Sum.inl i)) - ∑ i, Complex.normSq (u (Sum.inr i)) : ℝ) : ℂ) := by
-  have e : star (A *ᵥ u) = A.map star *ᵥ star u := funext fun i => RingHom.map_mulVec (starRingEnd ℂ) A u i
-  rw [e, ← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hA]
+theorem sig_val
+    {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} {A : Matrix (Fin n) (Fin r ⊕ Fin s) ℂ}
+    (hA : Aᵀ * M * A.map star = Matrix.fromBlocks 1 0 0 (-1)) (u : Fin r ⊕ Fin s → ℂ)
+    : (A *ᵥ u) ⬝ᵥ M *ᵥ star (A *ᵥ u)
+      = ((∑ i, Complex.normSq (u (Sum.inl i)) - ∑ i, Complex.normSq (u (Sum.inr i)) : ℝ) : ℂ) := by
+  have e : star (A *ᵥ u) = A.map star *ᵥ star u :=
+    funext fun i => RingHom.map_mulVec (starRingEnd ℂ) A u i
+  rw [e, ← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
+    Matrix.mulVec_mulVec, hA]
   simp [Matrix.fromBlocks_mulVec, dotProduct, Matrix.neg_mulVec, Complex.mul_conj, sub_eq_add_neg]
 
-theorem aniso {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : HasSig M r s) (h0 : min r s = 0) {x : Fin n → ℂ}
-    (hx : x ⬝ᵥ M *ᵥ star x = 0) : x = 0 := by
+theorem aniso
+    {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : HasSig M r s) (h0 : min r s = 0)
+    {x : Fin n → ℂ} (hx : x ⬝ᵥ M *ᵥ star x = 0)
+    : x = 0 := by
   obtain ⟨hn, A, hA⟩ := h
   obtain ⟨A', -, h1⟩ := PositivityTheory.ThKG.Tow.Pln.frame_inv hn hA
   have e : x = A *ᵥ (A' *ᵥ x) := by rw [Matrix.mulVec_mulVec, h1, Matrix.one_mulVec]
@@ -36,10 +42,14 @@ theorem aniso {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : HasSig M r s) 
     · simp only [Finset.univ_eq_empty, Finset.sum_empty, zero_sub, neg_eq_zero] at hx
       ext (i | i)
       · exact i.elim0
-      · exact Complex.normSq_eq_zero.1 ((Finset.sum_eq_zero_iff_of_nonneg fun i _ => Complex.normSq_nonneg _).1 hx i (Finset.mem_univ _))
+      · exact Complex.normSq_eq_zero.1
+          ((Finset.sum_eq_zero_iff_of_nonneg fun i _ => Complex.normSq_nonneg _).1 hx i
+            (Finset.mem_univ _))
     · simp only [Finset.univ_eq_empty, Finset.sum_empty, sub_zero] at hx
       ext (i | i)
-      · exact Complex.normSq_eq_zero.1 ((Finset.sum_eq_zero_iff_of_nonneg fun i _ => Complex.normSq_nonneg _).1 hx i (Finset.mem_univ _))
+      · exact Complex.normSq_eq_zero.1
+          ((Finset.sum_eq_zero_iff_of_nonneg fun i _ => Complex.normSq_nonneg _).1 hx i
+            (Finset.mem_univ _))
       · exact i.elim0
   rw [e, this, Matrix.mulVec_zero]
 
@@ -56,22 +66,29 @@ theorem witt_of : Witt := by
     have f : ∀ x, form σ X.J x x = 0 → form σ (c • X.J) x x = 0 := fun x hx => by
       rw [form, Matrix.smul_mulVec, dotProduct_smul]
       exact smul_eq_zero_of_right _ hx
-    have key := fun x : IsoV σ X => PositivityTheory.ThKEnd.Grp.wittVec F E σ hB.cm n (c • X.J)
-      (fun i j => by simp [hσ, hX.herm])
-      (by rw [Matrix.det_smul]; exact mul_ne_zero (pow_ne_zero _ hc) (det_ne (Or.inl hX))) x.1 H.x x.2.1 h1 (f _ x.2.2) (f _ h2)
+    have key := fun x : IsoV σ X =>
+      PositivityTheory.ThKEnd.Grp.wittVec F E σ hB.cm n (c • X.J)
+        (fun i j => by simp [hσ, hX.herm])
+        (by rw [Matrix.det_smul]; exact mul_ne_zero (pow_ne_zero _ hc) (det_ne (Or.inl hX))) x.1 H.x
+        x.2.1 h1 (f _ x.2.2) (f _ h2)
     choose g g1 g2 using key
-    have g3 : ∀ x, (g x).1ᵀ * X.J * (g x).1.map σ = X.J := fun x => smul_right_injective _ hc (by
-      have := g1 x
-      rwa [Matrix.mul_smul, Matrix.smul_mul] at this)
+    have g3 : ∀ x, (g x).1ᵀ * X.J * (g x).1.map σ = X.J := fun x =>
+      smul_right_injective _ hc (by
+        have := g1 x
+        rwa [Matrix.mul_smul, Matrix.smul_mul] at this)
     have key : ∀ x, ∃ p : UA σ X.J, mat p = incM F (g x).1 := fun x =>
       PositivityTheory.ThKG.Tow.Levi.exists_UA (g' := incM F (g x)⁻¹.1)
-        (by rw [← PositivityTheory.ThKEnd.Grp.incM_mul, Units.mul_inv, PositivityTheory.ThKEnd.Grp.incM_one])
+        (by
+          rw [← PositivityTheory.ThKEnd.Grp.incM_mul, Units.mul_inv,
+            PositivityTheory.ThKEnd.Grp.incM_one])
         (by
           conv_rhs => rw [← g3 x]
-          rw [PositivityTheory.ThKEnd.Grp.incM_mul, PositivityTheory.ThKEnd.Grp.incM_mul, PositivityTheory.ThKEnd.Grp.incM_conj]
+          rw [PositivityTheory.ThKEnd.Grp.incM_mul, PositivityTheory.ThKEnd.Grp.incM_mul,
+            PositivityTheory.ThKEnd.Grp.incM_conj]
           rfl)
     choose γ hγ using key
-    exact ⟨γ, fun x => ⟨mem_ratU.2 ⟨_, hγ x⟩, by rw [hγ, PositivityTheory.ThKEnd.Grp.incM_mulVec, g2]⟩⟩
+    exact
+      ⟨γ, fun x => ⟨mem_ratU.2 ⟨_, hγ x⟩, by rw [hγ, PositivityTheory.ThKEnd.Grp.incM_mulVec, g2]⟩⟩
 
 end PositivityTheory.ThKCT
 

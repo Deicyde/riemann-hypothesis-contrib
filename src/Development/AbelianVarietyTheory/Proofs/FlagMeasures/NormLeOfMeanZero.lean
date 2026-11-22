@@ -10,16 +10,19 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicUnitary
 
 @[expose] public section
 
-open GlobalTheory.Count Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField MeasureTheory Finset
+open GlobalTheory.Count Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField
+  MeasureTheory Finset
 open scoped InnerProductSpace
 
 namespace GlobalTheory.MeanZero
 
-theorem continuous_mean {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+theorem continuous_mean
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
     [SecondCountableTopology G] [LocallyCompactSpace G] [MeasurableSpace G] [OpensMeasurableSpace G]
-    (ν : Measure G) [IsFiniteMeasure ν] {C : Set G} (hC : IsCompact C) (hν : ν Cᶜ = 0)
-    {f : G → ℂ} (hf : Continuous f) : Continuous fun y => ∫ m, f (m * y) ∂ν := by
-
+    (ν : Measure G) [IsFiniteMeasure ν]
+    {C : Set G} (hC : IsCompact C) (hν : ν Cᶜ = 0)
+    {f : G → ℂ} (hf : Continuous f)
+    : Continuous fun y => ∫ m, f (m * y) ∂ν := by
   have hae : ∀ᵐ m ∂ν, m ∈ C := by
     rw [ae_iff]
     exact hν
@@ -30,18 +33,22 @@ theorem continuous_mean {G : Type} [Group G] [TopologicalSpace G] [IsTopological
   rw [hres] at h
   exact h
 
-theorem norm_le_of_mean_zero {X : Type} [MeasurableSpace X] (ν : Measure X) [IsProbabilityMeasure ν] {D : ℕ}
-    (f : Fin D → X → ℂ) (c : Fin D → ℂ) (r : ℝ) (hi : ∀ i, Integrable (f i) ν)
-    (h0 : ∀ i, ∫ m, f i m ∂ν = 0) (hb : ∀ᵐ m ∂ν, Real.sqrt (∑ i, ‖f i m - c i‖ ^ 2) ≤ r) :
-    Real.sqrt (∑ i, ‖c i‖ ^ 2) ≤ r := by
+theorem norm_le_of_mean_zero
+    {X : Type} [MeasurableSpace X]
+    (ν : Measure X) [IsProbabilityMeasure ν]
+    {D : ℕ} (f : Fin D → X → ℂ) (c : Fin D → ℂ)
+    (r : ℝ)
+    (hi : ∀ i, Integrable (f i) ν) (h0 : ∀ i, ∫ m, f i m ∂ν = 0)
+    (hb : ∀ᵐ m ∂ν, Real.sqrt (∑ i, ‖f i m - c i‖ ^ 2) ≤ r)
+    : Real.sqrt (∑ i, ‖c i‖ ^ 2) ≤ r := by
   set S : ℝ := ∑ i, ‖c i‖ ^ 2 with hS
   have hS0 : 0 ≤ S := Finset.sum_nonneg fun i _ => by positivity
   have hr0 : 0 ≤ r := by
     obtain ⟨m, hm⟩ := hb.exists
     exact (Real.sqrt_nonneg _).trans hm
 
-  have hint : ∀ i ∈ (Finset.univ : Finset (Fin D)),
-      Integrable (fun m => star (c i) * (c i - f i m)) ν :=
+  have hint
+      : ∀ i ∈ (Finset.univ : Finset (Fin D)), Integrable (fun m => star (c i) * (c i - f i m)) ν :=
     fun i _ => ((integrable_const (c i)).sub (hi i)).const_mul (star (c i))
   have hval : ∫ m, (∑ i, star (c i) * (c i - f i m)) ∂ν = (S : ℂ) := by
     rw [integral_finsetSum _ hint, hS, Complex.ofReal_sum]
@@ -51,12 +58,14 @@ theorem norm_le_of_mean_zero {X : Type} [MeasurableSpace X] (ν : Measure X) [Is
 
   have hbound : ∀ᵐ m ∂ν, ‖∑ i, star (c i) * (c i - f i m)‖ ≤ Real.sqrt S * r := by
     filter_upwards [hb] with m hm
-    calc ‖∑ i, star (c i) * (c i - f i m)‖ ≤ ∑ i, ‖star (c i) * (c i - f i m)‖ := norm_sum_le _ _
+    calc
+      ‖∑ i, star (c i) * (c i - f i m)‖
+        ≤ ∑ i, ‖star (c i) * (c i - f i m)‖ := norm_sum_le _ _
       _ = ∑ i, ‖c i‖ * ‖f i m - c i‖ := by
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [norm_mul, norm_star, norm_sub_rev]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [norm_mul, norm_star, norm_sub_rev]
       _ ≤ Real.sqrt (∑ i, ‖c i‖ ^ 2) * Real.sqrt (∑ i, ‖f i m - c i‖ ^ 2) :=
-          Real.sum_mul_le_sqrt_mul_sqrt _ _ _
+        Real.sum_mul_le_sqrt_mul_sqrt _ _ _
       _ ≤ Real.sqrt S * r := mul_le_mul_of_nonneg_left hm (Real.sqrt_nonneg _)
   have key : S ≤ Real.sqrt S * r := by
     have h := norm_integral_le_of_norm_le (integrable_const (Real.sqrt S * r)) hbound
@@ -66,17 +75,23 @@ theorem norm_le_of_mean_zero {X : Type} [MeasurableSpace X] (ν : Measure X) [Is
   have hs0 := Real.sqrt_nonneg S
   nlinarith
 
-theorem norm_le_of_cusp (I : AutInst) (μf : Measure I.Gf) [μf.IsHaarMeasure] [SigmaFinite μf] (g : ℕ)
-    (W : Submodule I.E (Fin I.n → I.E)) (D : ℕ) (Fn : Fin D → I.GA → ℂ) (x : I.GA) (c : Fin D → ℂ) (r : ℝ)
+theorem norm_le_of_cusp
+    (I : AutInst) (μf : Measure I.Gf) [μf.IsHaarMeasure] [SigmaFinite μf]
+    (g : ℕ) (W : Submodule I.E (Fin I.n → I.E))
+    (D : ℕ) (Fn : Fin D → I.GA → ℂ)
+    (x : I.GA) (c : Fin D → ℂ) (r : ℝ)
     (hg : 1 ≤ g) (hW : I.IsIsot W)
-    (hF : ∀ i, Continuous (Fn i) ∧ (∀ γ ∈ I.GFset, ∀ y, Fn i (γ * y) = Fn i y) ∧
-      (∀ k ∈ I.Kg g, ∀ y, Fn i (y * (1, k)) = Fn i y) ∧ I.IsCuspFn (I.muA μf) (Fn i))
-    (hr : ∀ ν : I.Ginf, ((ν, 1) : I.GA) ∈ I.NA W →
-      Real.sqrt (∑ i, ‖Fn i ((ν, 1) * x) - c i‖ ^ 2) ≤ r) :
-    Real.sqrt (∑ i, ‖c i‖ ^ 2) ≤ r := by
+    (hF : ∀ i,
+      Continuous (Fn i) ∧ (∀ γ ∈ I.GFset, ∀ y, Fn i (γ * y) = Fn i y)
+        ∧ (∀ k ∈ I.Kg g, ∀ y, Fn i (y * (1, k)) = Fn i y) ∧ I.IsCuspFn (I.muA μf) (Fn i))
+    (hr
+      : ∀ ν : I.Ginf, ((ν, 1) : I.GA) ∈ I.NA W → Real.sqrt (∑ i, ‖Fn i ((ν, 1) * x) - c i‖ ^ 2) ≤ r)
+    : Real.sqrt (∑ i, ‖c i‖ ^ 2) ≤ r := by
   classical
-  obtain ⟨ν, hνP, hνQ, Cp, hCp, -, hνCp⟩ := GlobalTheory.T.exists_unipotentQuotient_invariant_probability I W hW
-  obtain ⟨⟨N, hN⟩, -, hsplit, hdense, -⟩ := GlobalTheory.T.strong_approximation_unitaryUnipotentRadical I W hW
+  obtain ⟨ν, hνP, hνQ, Cp, hCp, -, hνCp⟩ :=
+    GlobalTheory.T.exists_unipotentQuotient_invariant_probability I W hW
+  obtain ⟨⟨N, hN⟩, -, hsplit, hdense, -⟩ :=
+    GlobalTheory.T.strong_approximation_unitaryUnipotentRadical I W hW
   obtain ⟨-, -, -, -, hpos⟩ := GlobalTheory.T.adelicUnitaryHaar_bi_invariant I μf
   obtain ⟨hT2, hLC, hSC, -, -, -, hKg⟩ := GlobalTheory.CongTop.adelic_topology I
   obtain ⟨hKo, ⟨K, hK⟩, -⟩ := hKg g hg
@@ -118,7 +133,8 @@ theorem norm_le_of_cusp (I : AutInst) (μf : Measure I.Gf) [μf.IsHaarMeasure] [
 
   have hint : ∀ i, Integrable (fun m => Fn i (m * x)) ν := by
     intro i
-    have hci : Continuous fun m => Fn i (m * x) := (hF i).1.comp (continuous_id.mul continuous_const)
+    have hci : Continuous fun m => Fn i (m * x) :=
+      (hF i).1.comp (continuous_id.mul continuous_const)
     obtain ⟨B, hB⟩ := hCp.exists_bound_of_continuousOn hci.continuousOn
     have hae : ∀ᵐ m ∂ν, m ∈ Cp := by
       rw [ae_iff]

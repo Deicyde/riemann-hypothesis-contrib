@@ -7,7 +7,9 @@ public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
 open scoped Classical
 
@@ -15,9 +17,10 @@ namespace GlobalTheory.CompanionTheory.EmbUniq
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem norm_coe_algHom {K L : FinExt l} (τ : ↥K.1 →ₐ[ℚ_[l]] ↥L.1) (x : ↥K.1) :
-    ‖((τ x : ↥L.1) : Om l)‖ = ‖(x : Om l)‖ := by
-  have a := minpoly.algHom_eq (L.1.val.comp τ) (RingHom.injective (L.1.val.comp τ : ↥K.1 →+* Om l)) x
+theorem norm_coe_algHom {K L : FinExt l} (τ : ↥K.1 →ₐ[ℚ_[l]] ↥L.1) (x : ↥K.1)
+    : ‖((τ x : ↥L.1) : Om l)‖ = ‖(x : Om l)‖ := by
+  have a :=
+    minpoly.algHom_eq (L.1.val.comp τ) (RingHom.injective (L.1.val.comp τ : ↥K.1 →+* Om l)) x
   have b := minpoly.algHom_eq K.1.val (RingHom.injective (K.1.val : ↥K.1 →+* Om l)) x
   have c : minpoly ℚ_[l] ((τ x : ↥L.1) : Om l) = minpoly ℚ_[l] (x : Om l) := a.trans b.symm
   rw [← PadicAlgCl.spectralNorm_eq, ← PadicAlgCl.spectralNorm_eq, spectralNorm, spectralNorm, c]
@@ -30,9 +33,10 @@ theorem norm_le_one_of_isIntegral {x : Om l} (hx : IsIntegral ℤ x) : ‖x‖ �
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem continuous_withVal (w : HeightOneSpectrum (𝓞 E)) (f : E →+* Om l)
-    (h1 : ∀ x, w.valuation E x ≤ 1 → ‖f x‖ ≤ 1) (y : E) (hy0 : y ≠ 0) (hy : ‖f y‖ < 1) :
-    Continuous (f.comp (WithVal.equiv (w.valuation E)).toRingHom) := by
+theorem continuous_withVal
+    (w : HeightOneSpectrum (𝓞 E)) (f : E →+* Om l) (h1 : ∀ x, w.valuation E x ≤ 1 → ‖f x‖ ≤ 1)
+    (y : E) (hy0 : y ≠ 0) (hy : ‖f y‖ < 1)
+    : Continuous (f.comp (WithVal.equiv (w.valuation E)).toRingHom) := by
   refine continuous_of_continuousAt_zero _ ?_
   rw [ContinuousAt, map_zero, Metric.tendsto_nhds]
   intro ε hε
@@ -45,7 +49,8 @@ theorem continuous_withVal (w : HeightOneSpectrum (𝓞 E)) (f : E →+* Om l)
   filter_upwards [Valued.mem_nhds_zero.2 ⟨Units.mk0 _ h0, subset_rfl⟩] with z hz
   simp only [Set.mem_setOf_eq, Units.val_mk0, Valuation.restrict_lt_iff] at hz
   have hz' : w.valuation E (WithVal.equiv (w.valuation E) z) < w.valuation E (y ^ n) := hz
-  have hv : 0 < w.valuation E (y ^ n) := zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 (pow_ne_zero n hy0))
+  have hv : 0 < w.valuation E (y ^ n) :=
+    zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 (pow_ne_zero n hy0))
   have hu : w.valuation E (WithVal.equiv (w.valuation E) z / y ^ n) ≤ 1 := by
     rw [map_div₀]
     exact (div_le_one₀ hv).2 hz'.le
@@ -55,15 +60,23 @@ theorem continuous_withVal (w : HeightOneSpectrum (𝓞 E)) (f : E →+* Om l)
   rw [dist_zero_right]
   exact lt_of_le_of_lt h2 hn
 
-def toKw {Ω : Type} [Field Ω] [Algebra E Ω] {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [Algebra ℤ_[l] O]
-    [TopologicalSpace O] (Bw : LocBridge l E Ω Gw O) : E →+* ↥Bw.Kw.1 :=
+def toKw
+    {Ω : Type} [Field Ω] [Algebra E Ω]
+    {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+    (Bw : LocBridge l E Ω Gw O)
+    : E →+* ↥Bw.Kw.1 :=
   (Bw.j.comp (algebraMap E Ω)).codRestrict Bw.Kw.1 Bw.j_E
 
-theorem existsUnique_continuous_induced : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] {l : ℕ} [Fact l.Prime] (w : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω), IsPlaceOver A w →
-    ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l E Ω (Dec (F := E) A) O),
-      GlobalTheory.Pst.Induces Bw → ∀ (LL' : FinExt l) (τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥LL'.1),
-      ∃! j : {j : w.adicCompletion E →+* Qbar l // Continuous j},
-        IsInduced Bw (j.1.comp (algebraMap E (w.adicCompletion E))) τ' := by
+theorem existsUnique_continuous_induced
+    : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] {l : ℕ}
+        [Fact l.Prime] (w : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω),
+      IsPlaceOver A w
+        → ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+            (Bw : LocBridge l E Ω (Dec (F := E) A) O),
+          GlobalTheory.Pst.Induces Bw
+            → ∀ (LL' : FinExt l) (τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥LL'.1),
+              ∃! j : {j : w.adicCompletion E →+* Qbar l // Continuous j},
+                IsInduced Bw (j.1.comp (algebraMap E (w.adicCompletion E))) τ' := by
   intro E Ω _ _ _ _ _ l _ w A hA O _ _ _ Bw hj LL' τ'
   let g : E →+* ↥LL'.1 := (τ' : ↥Bw.Kw.1 →+* ↥LL'.1).comp (toKw Bw)
   let f : E →+* Om l := (algebraMap ↥LL'.1 (Om l)).comp g
@@ -90,17 +103,24 @@ theorem existsUnique_continuous_induced : ∀ {E Ω : Type} [Field E] [NumberFie
   haveI : FiniteDimensional ℚ_[l] ↥LL'.1 := LL'.2
   haveI : CompleteSpace ↥LL'.1 := FiniteDimensional.complete ℚ_[l] ↥LL'.1
   let ext : w.adicCompletion E →+* ↥LL'.1 :=
-    (UniformSpace.Completion.extensionHom _ hcg).comp (HeightOneSpectrum.adicCompletion.equiv E w).toRingHom
-  have hextc : Continuous ext := UniformSpace.Completion.continuous_extension.comp
-    (HeightOneSpectrum.adicCompletion.continuous_toCompletion E w)
+    (UniformSpace.Completion.extensionHom _ hcg).comp
+      (HeightOneSpectrum.adicCompletion.equiv E w).toRingHom
+  have hextc : Continuous ext :=
+    UniformSpace.Completion.continuous_extension.comp
+      (HeightOneSpectrum.adicCompletion.continuous_toCompletion E w)
   have hext : ∀ x : E, ext (algebraMap E _ x) = g x := fun k =>
     UniformSpace.Completion.extensionHom_coe _ hcg (WithVal.toVal _ k)
   have hval : ∀ x : E, ((ext (algebraMap E _ x) : ↥LL'.1) : Om l) = f x := fun x =>
     congrArg (Subtype.val) (hext x)
-  refine ⟨⟨(algebraMap ↥LL'.1 (Om l)).comp ext, continuous_subtype_val.comp hextc⟩, fun x => (hval x), ?_⟩
+  refine ⟨
+    ⟨(algebraMap ↥LL'.1 (Om l)).comp ext, continuous_subtype_val.comp hextc⟩,
+    fun x => (hval x),
+    ?_
+  ⟩
   rintro ⟨j', hj'c⟩ hj'
-  refine Subtype.ext (DFunLike.coe_injective ((HeightOneSpectrum.denseRange_algebraMap E w).equalizer hj'c
-    (continuous_subtype_val.comp hextc) (funext fun x => ?_)))
+  refine Subtype.ext (DFunLike.coe_injective
+    ((HeightOneSpectrum.denseRange_algebraMap E w).equalizer hj'c
+      (continuous_subtype_val.comp hextc) (funext fun x => ?_)))
   exact (hj' x).trans (hval x).symm
 
 end GlobalTheory.CompanionTheory.EmbUniq

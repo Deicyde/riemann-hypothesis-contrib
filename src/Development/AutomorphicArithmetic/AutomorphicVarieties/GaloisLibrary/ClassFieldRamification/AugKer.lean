@@ -7,11 +7,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.augKer :
-    ∀ (R G : Type) [CommRing R] [CommGroup G], RingHom.ker (aug R G) = augIdeal R G ∧ Function.Surjective (aug R G) := by
+theorem UpperTheory.V.CF.augKer
+    : ∀ (R G : Type) [CommRing R] [CommGroup G],
+      RingHom.ker (aug R G) = augIdeal R G ∧ Function.Surjective (aug R G) := by
   intro R G _ _
-  have key : ∀ x : MonoidAlgebra R G,
-      x - algebraMap R (MonoidAlgebra R G) (aug R G x) ∈ augIdeal R G := by
+  have key
+      : ∀ x : MonoidAlgebra R G,
+        x - algebraMap R (MonoidAlgebra R G) (aug R G x) ∈ augIdeal R G := by
     intro x
     induction x using MonoidAlgebra.induction_linear with
     | zero => simp
@@ -20,8 +22,9 @@ theorem UpperTheory.V.CF.augKer :
       exact add_mem hx hy
     | single g r =>
       rw [aug_single]
-      have h1 : MonoidAlgebra.single g r - algebraMap R (MonoidAlgebra R G) r =
-          MonoidAlgebra.single 1 r * (MonoidAlgebra.of R G g - 1) := by
+      have h1
+          : MonoidAlgebra.single g r - algebraMap R (MonoidAlgebra R G) r
+            = MonoidAlgebra.single 1 r * (MonoidAlgebra.of R G g - 1) := by
         rw [mul_sub, mul_one, MonoidAlgebra.of_apply, MonoidAlgebra.single_mul_single, one_mul,
           mul_one, MonoidAlgebra.coe_algebraMap]
         rfl

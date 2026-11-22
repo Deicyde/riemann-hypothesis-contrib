@@ -13,8 +13,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-def antisymEvalOn {T : Type*} {N : ℕ} (Ω : Set (T × Fin N → ℝ)) :
-    MvPolynomial (T × Fin N) ℝ →ₗ[ℝ] C(Ω, ℝ) where
+def antisymEvalOn {T : Type*} {N : ℕ} (Ω : Set (T × Fin N → ℝ))
+    : MvPolynomial (T × Fin N) ℝ →ₗ[ℝ] C(Ω, ℝ) where
   toFun p := ⟨fun x => eval (x : T × Fin N → ℝ) p, (continuous_eval p).comp continuous_subtype_val⟩
   map_add' p q := by ext x; simp
   map_smul' c p := by ext x; simp
@@ -56,16 +56,19 @@ theorem AntisymStability.proof (hB1 : AntisymDivisible.Statement) : AntisymStabi
   set Ω : Set (T × Fin N → ℝ) :=
     ⋃ (τ : T) (a : Fin N) (b : Fin N) (_ : a.val < j ∧ j ≤ b.val), Om τ a b with hΩdef
   have hΩc : IsCompact Ω :=
-    isCompact_iUnion fun τ => isCompact_iUnion fun a => isCompact_iUnion fun b =>
-      isCompact_iUnion fun h => (hOm τ a b h.1 h.2).1
+    isCompact_iUnion fun τ =>
+      isCompact_iUnion fun a =>
+        isCompact_iUnion fun b => isCompact_iUnion fun h => (hOm τ a b h.1 h.2).1
   have : CompactSpace Ω := isCompact_iff_compactSpace.mp hΩc
   have : FiniteDimensional ℝ (homogeneousSubmodule (T × Fin N) ℝ (antisymDegree T N + 1)) :=
     Module.Finite.iff_fg.mpr (homogeneousSubmodule_fg _ _ _)
   have : FiniteDimensional ℝ (antisymSpace T N j) :=
     Submodule.finiteDimensional_of_le (fun P hP => hP.1)
   let Φ : antisymSpace T N j →ₗ[ℝ] C(Ω, ℝ) := (antisymEvalOn Ω).comp (antisymSpace T N j).subtype
-  obtain ⟨g, hg⟩ := Φ.rangeRestrict.exists_rightInverse_of_surjective (LinearMap.range_rangeRestrict Φ)
-  obtain ⟨C, hC0, hC⟩ := exists_uniform_coeff_bound (E := LinearMap.range Φ) ((antisymSpace T N j).subtype.comp g)
+  obtain ⟨g, hg⟩ :=
+    Φ.rangeRestrict.exists_rightInverse_of_surjective (LinearMap.range_rangeRestrict Φ)
+  obtain ⟨C, hC0, hC⟩ :=
+    exists_uniform_coeff_bound (E := LinearMap.range Φ) ((antisymSpace T N j).subtype.comp g)
   refine ⟨C, fun P hP => ?_⟩
   let P' : antisymSpace T N j := ⟨P, hP⟩
   let y := Φ.rangeRestrict P'
@@ -78,11 +81,12 @@ theorem AntisymStability.proof (hB1 : AntisymDivisible.Statement) : AntisymStabi
     intro x hx
     have := congrArg (fun f : C(Ω, ℝ) => f ⟨x, hx⟩) hker
     simpa [Φ, antisymEvalOn] using this
-  obtain ⟨l, hl, hPl⟩ := hB1 T N j _ (P' - Q).2 (fun τ a b ha hb => by
-    obtain ⟨_, _, O, hO, hne, hOsub⟩ := hOm τ a b ha hb
-    refine ⟨O, hO, hne, fun x hx => hvan x ?_⟩
-    exact Set.mem_iUnion.2 ⟨τ, Set.mem_iUnion.2 ⟨a, Set.mem_iUnion.2 ⟨b,
-      Set.mem_iUnion.2 ⟨⟨ha, hb⟩, hOsub hx⟩⟩⟩⟩)
+  obtain ⟨l, hl, hPl⟩ :=
+    hB1 T N j _ (P' - Q).2 (fun τ a b ha hb => by
+      obtain ⟨_, _, O, hO, hne, hOsub⟩ := hOm τ a b ha hb
+      refine ⟨O, hO, hne, fun x hx => hvan x ?_⟩
+      exact Set.mem_iUnion.2
+        ⟨τ, Set.mem_iUnion.2 ⟨a, Set.mem_iUnion.2 ⟨b, Set.mem_iUnion.2 ⟨⟨ha, hb⟩, hOsub hx⟩⟩⟩⟩)
   refine ⟨l, hl, fun M hM hbd m => ?_⟩
   have hPQ : P - antisymDelta T N * l = (Q : MvPolynomial (T × Fin N) ℝ) := by
     rw [← hPl, Submodule.coe_sub]
@@ -96,7 +100,9 @@ theorem AntisymStability.proof (hB1 : AntisymDivisible.Statement) : AntisymStabi
     simp only [hΩdef, Set.mem_iUnion] at hx'
     obtain ⟨τ, a, b, ⟨ha, hb⟩, hxO⟩ := hx'
     simpa [Φ, P', antisymEvalOn, Real.norm_eq_abs] using hbd τ a b ha hb x hxO
-  calc |(Q : MvPolynomial (T × Fin N) ℝ).coeff m| ≤ C * ‖y‖ := hC y m
+  calc
+    |(Q : MvPolynomial (T × Fin N) ℝ).coeff m|
+      ≤ C * ‖y‖ := hC y m
     _ ≤ C * M := mul_le_mul_of_nonneg_left hy hC0
 
 end GroundTheory.Heights₂.Heights

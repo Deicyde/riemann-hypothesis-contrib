@@ -6,11 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem mem_of_sum_mul_pow_mem_of_valuation_zpow (Ω : Type) [Field Ω] (A : ValuationSubring Ω)
-    (N : ℕ) (π ℓ : Ω) (c : ℕ → Ω) (hN : 0 < N) (hℓ : ℓ ≠ 0)
-    (hℓ1 : A.valuation ℓ < 1) (hπ : A.valuation π ^ N = A.valuation ℓ)
+theorem mem_of_sum_mul_pow_mem_of_valuation_zpow
+    (Ω : Type) [Field Ω]
+    (A : ValuationSubring Ω) (N : ℕ) (π ℓ : Ω) (c : ℕ → Ω)
+    (hN : 0 < N) (hℓ : ℓ ≠ 0) (hℓ1 : A.valuation ℓ < 1) (hπ : A.valuation π ^ N = A.valuation ℓ)
     (hc : ∀ i < N, c i ≠ 0 → ∃ k : ℤ, A.valuation (c i) = A.valuation ℓ ^ k)
-    (hsum : (∑ i ∈ Finset.range N, c i * π ^ i) ∈ A) : ∀ i < N, c i ∈ A := by
+    (hsum : (∑ i ∈ Finset.range N, c i * π ^ i) ∈ A)
+    : ∀ i < N, c i ∈ A := by
   classical
   set v := A.valuation with hv
   set b := v ℓ with hb
@@ -42,8 +44,7 @@ theorem mem_of_sum_mul_pow_mem_of_valuation_zpow (Ω : Type) [Field Ω] (A : Val
     suffices t j ≤ 1 from fun i hi => (hmax i hi).trans this
     by_cases htj : t j = 0
     · rw [htj]; exact zero_le'
-    have hcj : c j ≠ 0 := by
-      intro h; apply htj; simp [ht, h]
+    have hcj : c j ≠ 0 := by intro h; apply htj; simp [ht, h]
     have hlt : ∀ i ∈ Finset.range N \ {j}, v (c i * π ^ i) < v (c j * π ^ j) := by
       intro i hi
       rw [Finset.mem_sdiff, Finset.mem_singleton] at hi
@@ -55,7 +56,8 @@ theorem mem_of_sum_mul_pow_mem_of_valuation_zpow (Ω : Type) [Field Ω] (A : Val
     have := Valuation.map_sum_eq_of_lt v hj hlt
     rw [← (A.valuation_le_one_iff _)] at hsum
     show v (c j * π ^ j) ≤ 1
-    rw [← this]; exact hsum
+    rw [← this]
+    exact hsum
   intro i hi
   by_cases hci : c i = 0
   · rw [hci]; exact A.zero_mem

@@ -22,20 +22,20 @@ theorem hQ_symm {T' : E} (F' : LFlag S r T') (c : E) (hc : star c = c) : (hQ F' 
     intro x y
     induction x using Submodule.Quotient.induction_on with
     | H a =>
-    induction y using Submodule.Quotient.induction_on with
-    | H b =>
-    rw [hQ_mk, hQ_mk, hV_apply, hV_apply, map_add (f := _), map_mul, map_mul, S.herm.eq, S.herm.eq, S.herm.eq,
-      starRingEnd_apply c, hc]
-    ring
-  first
-    | exact key
-    | exact ⟨key⟩
+      induction y using Submodule.Quotient.induction_on with
+      | H b =>
+        rw [hQ_mk, hQ_mk, hV_apply, hV_apply, map_add (f := _), map_mul, map_mul, S.herm.eq,
+          S.herm.eq, S.herm.eq, starRingEnd_apply c, hc]
+        ring
+  first | exact key | exact ⟨key⟩
 
-theorem hV_pos {T' : ℕ} (F' : LFlag S r ((T' : ℕ) : E)) (hT : 0 < T')
+theorem hV_pos
+    {T' : ℕ} (F' : LFlag S r ((T' : ℕ) : E)) (hT : 0 < T')
     (hτ : ∀ (τ : E →+* ℂ) (a : E), τ (star a) = starRingEnd ℂ (τ a))
     (hpos : ∀ τ : E →+* ℂ, ∀ w ∈ orth S (Xplus F'), w ∉ Xsp F' → 0 < (τ (S.hT w w)).re)
-    (a : S.V) (ha : a ∈ orth S (Xsp F')) (haX : a ∉ Xsp F') (τ : E →+* ℂ) :
-    0 < (τ (hV F' (2 / ((T' : ℕ) : E)) a a)).re := by
+    (a : S.V) (ha : a ∈ orth S (Xsp F')) (haX : a ∉ Xsp F')
+    (τ : E →+* ℂ)
+    : 0 < (τ (hV F' (2 / ((T' : ℕ) : E)) a a)).re := by
   have ht : (T' : E) ≠ 0 := by exact_mod_cast hT.ne'
   have hst : star (T' : E) = T' := star_natCast T'
   have hzz : S.hT F'.fl.z F'.fl.z = -(T' : E) := F'.fl.z_norm
@@ -47,8 +47,8 @@ theorem hV_pos {T' : ℕ} (F' : LFlag S r ((T' : ℕ) : E)) (hT : 0 < T')
     ring
   have hww : S.hT w w = S.hT a a + h * star h / T' := by
     rw [hw]
-    simp only [map_add (f := _), LinearMap.map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply, map_smul,
-      smul_eq_mul, starRingEnd_apply, hzz]
+    simp only [map_add (f := _), LinearMap.map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply,
+      map_smul, smul_eq_mul, starRingEnd_apply, hzz]
     rw [herm' F'.fl.z a, ← hh, star_div₀, hst]
     field_simp
     ring
@@ -57,8 +57,8 @@ theorem hV_pos {T' : ℕ} (F' : LFlag S r ((T' : ℕ) : E)) (hT : 0 < T')
     field_simp
     ring
   have hterm : (τ (star (h / T') * (h / T') * T')).re = Complex.normSq (τ (h / T')) * T' := by
-    rw [map_mul, map_mul, hτ, ← Complex.normSq_eq_conj_mul_self, map_natCast, ← Complex.ofReal_natCast,
-      ← Complex.ofReal_mul, Complex.ofReal_re]
+    rw [map_mul, map_mul, hτ, ← Complex.normSq_eq_conj_mul_self, map_natCast,
+      ← Complex.ofReal_natCast, ← Complex.ofReal_mul, Complex.ofReal_re]
   have hXo : F'.fl.z ∈ orth S (Xsp F') := mem_orth'.mpr (hXz F')
   have hwo : w ∈ orth S (Xsp F') := by
     rw [hw]
@@ -80,18 +80,20 @@ theorem hV_pos {T' : ℕ} (F' : LFlag S r ((T' : ℕ) : E)) (hT : 0 < T')
       intro x hx
       obtain ⟨x1, hx1, x2, hx2, rfl⟩ := Submodule.mem_sup.mp hx
       obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp hx2
-      rw [map_add (f := _), LinearMap.add_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, hzw, smul_zero,
-        add_zero]
+      rw [map_add (f := _), LinearMap.add_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, hzw,
+        smul_zero, add_zero]
       exact mem_orth'.mp hwo x1 hx1
     have h1 := hpos τ w hwp hwX
     have h2 : 0 ≤ Complex.normSq (τ (h / T')) * T' :=
       mul_nonneg (Complex.normSq_nonneg _) (Nat.cast_nonneg _)
     linarith
 
-theorem hQ_trace_pos {T' : ℕ} (F' : LFlag S r ((T' : ℕ) : E)) (hT : 0 < T')
+theorem hQ_trace_pos
+    {T' : ℕ} (F' : LFlag S r ((T' : ℕ) : E)) (hT : 0 < T')
     (hτ : ∀ (τ : E →+* ℂ) (a : E), τ (star a) = starRingEnd ℂ (τ a))
     (hpos : ∀ τ : E →+* ℂ, ∀ w ∈ orth S (Xplus F'), w ∉ Xsp F' → 0 < (τ (S.hT w w)).re)
-    (q : Qt F') (hq : q ≠ 0) : 0 < Algebra.trace ℚ E (hQ F' (2 / ((T' : ℕ) : E)) q q) := by
+    (q : Qt F') (hq : q ≠ 0)
+    : 0 < Algebra.trace ℚ E (hQ F' (2 / ((T' : ℕ) : E)) q q) := by
   obtain ⟨b, rfl⟩ := Submodule.Quotient.mk_surjective _ q
   have hb : (b : S.V) ∉ Xsp F' := by
     intro hbX
@@ -102,8 +104,9 @@ theorem hQ_trace_pos {T' : ℕ} (F' : LFlag S r ((T' : ℕ) : E)) (hT : 0 < T')
   have hp : ∀ σ : E →ₐ[ℚ] ℂ, 0 < (σ (hV F' (2 / ((T' : ℕ) : E)) b b)).re := fun σ =>
     hV_pos F' hT hτ hpos b b.2 hb σ.toRingHom
   have _ : Nonempty (E →ₐ[ℚ] ℂ) := ⟨IsAlgClosed.lift⟩
-  have hre := congrArg Complex.re
-    (trace_eq_sum_embeddings (K := ℚ) (L := E) (E := ℂ) (x := hV F' (2 / ((T' : ℕ) : E)) b b))
+  have hre :=
+    congrArg Complex.re
+      (trace_eq_sum_embeddings (K := ℚ) (L := E) (E := ℂ) (x := hV F' (2 / ((T' : ℕ) : E)) b b))
   rw [Complex.re_sum] at hre
   have hsum := Finset.sum_pos (fun σ _ => hp σ) (Finset.univ_nonempty (α := E →ₐ[ℚ] ℂ))
   rw [← hre, eq_ratCast, Complex.ratCast_re, Rat.cast_pos] at hsum

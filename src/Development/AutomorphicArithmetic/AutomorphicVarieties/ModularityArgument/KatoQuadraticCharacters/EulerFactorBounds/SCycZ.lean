@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open scoped MatrixGroups Matrix Classical
-open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4 UpperTheory.V.Z.Kato.Nb
+open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4
+  UpperTheory.V.Z.Kato.Nb
 
-theorem UpperTheory.V.Z.Kato.Nb.sCycZ :
-    UpperTheory.V.Z.Kato.Nb.SCycZ := by
+theorem UpperTheory.V.Z.Kato.Nb.sCycZ : UpperTheory.V.Z.Kato.Nb.SCycZ := by
   intro Ω _ _ _ l _ r s
   have hl : l.Prime := Fact.out
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
@@ -17,10 +17,17 @@ theorem UpperTheory.V.Z.Kato.Nb.sCycZ :
   haveI : ∀ i, HasEnoughRootsOfUnity Ω (l ^ i) := fun i => by
     haveI : NeZero (l ^ i) := ⟨pow_ne_zero _ hl.ne_zero⟩
     infer_instance
-  have hval : ((ReciprocityTheory.Gal.cycMod ℚ Ω l r s : (ZMod (l ^ r))ˣ) : ZMod (l ^ r)) =
-      PadicInt.toZModPow r (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) := rfl
-  have hspec : ∀ z : Ω, z ^ (l ^ r) = 1 →
-      s z = z ^ ((ReciprocityTheory.Gal.cycMod ℚ Ω l r s : (ZMod (l ^ r))ˣ) : ZMod (l ^ r)).val := by
+  have hval
+      : ((ReciprocityTheory.Gal.cycMod ℚ Ω l r s : (ZMod (l ^ r))ˣ) : ZMod (l ^ r))
+        = PadicInt.toZModPow r (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) :=
+    rfl
+  have hspec
+      : ∀ z : Ω,
+        z ^ (l ^ r) = 1
+          → s z
+            = z
+              ^ ((ReciprocityTheory.Gal.cycMod ℚ Ω l r s : (ZMod (l ^ r))ˣ)
+                : ZMod (l ^ r)).val := by
     intro z hz
     rw [hval]
     exact cyclotomicCharacter.spec l s.toRingEquiv z hz

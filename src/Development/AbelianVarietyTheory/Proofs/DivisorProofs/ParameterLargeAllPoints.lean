@@ -10,16 +10,21 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links GlobalTheory.BigTop GlobalTheory.BigOn
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links GlobalTheory.BigTop GlobalTheory.BigOn
   GlobalTheory.ExpTie
 
 namespace GlobalTheory.ExpTie
 
-theorem rows_big_of_largeParameter {D : D7} (L : SizeData₂ D) (P5 : ParameterChoice' D L) (j : Fin D.R.m) (eps C x : ℝ)
+theorem rows_big_of_largeParameter
+    {D : D7} (L : SizeData₂ D) (P5 : ParameterChoice' D L) (j : Fin D.R.m)
+    (eps C x : ℝ)
     (hx : L.sc.x = x) (heps : L.sc.eps = eps) (hC : 2 * L.Ct + 1 ≤ C) (hC0 : L.Ct ≤ C) (hx2 : 2 ≤ x)
-    (hB : Formalism.CohomologicalDescent.LargeParameterEstimates.Big (x ^ eps) x (Real.exp (x ^ (eps / 3))) (x ^ C)) :
-    Formalism.CohomologicalDescent.LargeParameterEstimates.Rows (parOf L j) L.sc.X' (x ^ C) ∧
-      Formalism.CohomologicalDescent.LargeParameterEstimates.Big (parOf L j).L (parOf L j).x L.sc.X' (x ^ C) := by
+    (hB : Formalism.CohomologicalDescent.LargeParameterEstimates.Big (x ^ eps) x
+      (Real.exp (x ^ (eps / 3))) (x ^ C))
+    : Formalism.CohomologicalDescent.LargeParameterEstimates.Rows (parOf L j) L.sc.X' (x ^ C)
+      ∧ Formalism.CohomologicalDescent.LargeParameterEstimates.Big (parOf L j).L (parOf L j).x
+        L.sc.X' (x ^ C) := by
   have hx0 : 0 < x := by linarith
   have hx1 : 1 ≤ x := by linarith
   have hX : 0 < L.sc.X' := Real.exp_pos _
@@ -52,7 +57,8 @@ theorem rows_big_of_largeParameter {D : D7} (L : SizeData₂ D) (P5 : ParameterC
     linarith
   have heta_le : L.etaSz ≤ L.sc.w'' D.R.n / 2 := by
     have h1 : (2 : ℝ) ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) := by nlinarith
-    have : 2 * L.etaSz ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) * L.etaSz := mul_le_mul_of_nonneg_right h1 heta.le
+    have : 2 * L.etaSz ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) * L.etaSz :=
+      mul_le_mul_of_nonneg_right h1 heta.le
     linarith
 
   have htw := L.t_win
@@ -61,8 +67,7 @@ theorem rows_big_of_largeParameter {D : D7} (L : SizeData₂ D) (P5 : ParameterC
   have hkt' : (D.R.k : ℝ) + D.R.m + 4 ≤ D.R.t := by exact_mod_cast hkt
   have hCt : x ^ L.Ct ≤ x ^ C := Real.rpow_le_rpow_of_exponent_le hx1 hC0
   refine ⟨⟨?_, ?_, ?_, ?_, ?_, rfl, D.R.f_le_k, ?_, ?_⟩, ?_⟩
-  ·
-    show L.sc.a / L.sc.X' = L.sc.x * Real.exp L.sc.L / L.sc.X'
+  · show L.sc.a / L.sc.X' = L.sc.x * Real.exp L.sc.L / L.sc.X'
     rfl
   · show L.sc.X' * (L.Sc + L.etaSz) ≤ Real.exp L.sc.L
     have : L.sc.X' * (L.Sc + L.etaSz) ≤ L.sc.X' * L.sc.w'' D.R.n :=
@@ -82,8 +87,7 @@ theorem rows_big_of_largeParameter {D : D7} (L : SizeData₂ D) (P5 : ParameterC
     nlinarith
   · exact D.R.two_le_m
   · exact htw.2.trans hCt
-  ·
-    show (D.R.k : ℝ) + (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) ≤ x ^ C * L.sc.x
+  · show (D.R.k : ℝ) + (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) ≤ x ^ C * L.sc.x
     rw [hx]
     have hT := htw.2
     have ht1 := htw.1
@@ -93,7 +97,9 @@ theorem rows_big_of_largeParameter {D : D7} (L : SizeData₂ D) (P5 : ParameterC
       linarith
     have hsq : (x ^ L.Ct) ^ 2 * x ≤ x ^ C := by
       rw [sq, ← Real.rpow_add hx0]
-      calc x ^ (L.Ct + L.Ct) * x = x ^ (L.Ct + L.Ct + 1) := by rw [Real.rpow_add hx0 (L.Ct + L.Ct) 1, Real.rpow_one]
+      calc
+        x ^ (L.Ct + L.Ct) * x
+          = x ^ (L.Ct + L.Ct + 1) := by rw [Real.rpow_add hx0 (L.Ct + L.Ct) 1, Real.rpow_one]
         _ ≤ x ^ C := Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
     have hpos : 0 ≤ (x ^ L.Ct) ^ 2 := sq_nonneg _
     nlinarith

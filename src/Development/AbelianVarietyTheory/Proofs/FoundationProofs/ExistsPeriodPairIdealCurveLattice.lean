@@ -8,19 +8,27 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.Lattice
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.CurveLattice
 
-theorem exists_periodPair_of_im_ne_zero {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
-    (σ : K →+* ℂ) (a : 𝓞 K) (ha : (σ (a : K)).im ≠ 0) {I : Ideal (𝓞 K)} (hI : I ≠ ⊥) :
-    ∃ L : PeriodPair, ∀ z, z ∈ L.lattice ↔ ∃ a ∈ I, z = σ (a : K) := by
+theorem exists_periodPair_of_im_ne_zero
+    {K : Type} [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    (σ : K →+* ℂ) (a : 𝓞 K) (ha : (σ (a : K)).im ≠ 0)
+    {I : Ideal (𝓞 K)} (hI : I ≠ ⊥)
+    : ∃ L : PeriodPair, ∀ z, z ∈ L.lattice ↔ ∃ a ∈ I, z = σ (a : K) := by
   have hr : Module.finrank ℤ I = 2 :=
-    (Ideal.finrank_eq_finrank (RingOfIntegers.basis K) I hI).trans ((RingOfIntegers.rank K).trans hK)
+    (Ideal.finrank_eq_finrank (RingOfIntegers.basis K) I hI).trans
+      ((RingOfIntegers.rank K).trans hK)
   let b : Module.Basis (Fin 2) ℤ I := Module.finBasisOfFinrankEq ℤ _ hr
-  have hs : ∀ x : I, σ ((x : 𝓞 K) : K) =
-      b.repr x 0 * σ ((b 0 : 𝓞 K) : K) + b.repr x 1 * σ ((b 1 : 𝓞 K) : K) := by
+  have hs
+      : ∀ x : I,
+        σ ((x : 𝓞 K) : K)
+          = b.repr x 0 * σ ((b 0 : 𝓞 K) : K) + b.repr x 1 * σ ((b 1 : 𝓞 K) : K) := by
     intro x
     have := congrArg (fun x : I => σ ((x : 𝓞 K) : K)) (b.sum_repr x)
     rw [Fin.sum_univ_two] at this
@@ -34,8 +42,9 @@ theorem exists_periodPair_of_im_ne_zero {K : Type} [Field K] [NumberField K] (hK
     have e := hs ⟨a * b 0, I.mul_mem_left a (b 0).2⟩
     have e' := congrArg (fun z => (z * starRingEnd ℂ (σ ((b 0 : 𝓞 K) : K))).im) e
     simp only [RingOfIntegers.coe_eq_algebraMap, map_mul] at e' h0 ha hb0
-    rw [add_mul, _root_.mul_assoc, _root_.mul_assoc, _root_.mul_assoc, Complex.mul_conj, Complex.add_im,
-      Complex.mul_im, Complex.mul_im, Complex.mul_im, h0] at e'
+    rw [add_mul, _root_.mul_assoc, _root_.mul_assoc, _root_.mul_assoc, Complex.mul_conj,
+        Complex.add_im, Complex.mul_im, Complex.mul_im, Complex.mul_im, h0]
+      at e'
     simp [ha, hb0] at e'
   refine ⟨⟨σ ((b 0 : 𝓞 K) : K), σ ((b 1 : 𝓞 K) : K), ?_⟩, fun z => ?_⟩
   · rw [LinearIndependent.pair_iff]
@@ -55,8 +64,9 @@ theorem exists_periodPair_of_im_ne_zero {K : Type} [Field K] [NumberField K] (hK
     · rintro ⟨x, hx, rfl⟩
       exact ⟨_, _, (hs ⟨x, hx⟩).symm⟩
 
-theorem eisG_eq_periodPair_G (Λ : AddSubgroup ℂ) (L : PeriodPair) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) {k : ℕ} (hk : k ≠ 0) :
-    eisG Λ k = L.G (2 * k) := by
+theorem eisG_eq_periodPair_G
+    (Λ : AddSubgroup ℂ) (L : PeriodPair) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) {k : ℕ} (hk : k ≠ 0)
+    : eisG Λ k = L.G (2 * k) := by
   have e1 := tsum_subtype {w : ℂ | w ∈ Λ ∧ w ≠ 0} (fun w : ℂ => 1 / w ^ (2 * k))
   have e2 := tsum_subtype (L.lattice : Set ℂ) (fun w : ℂ => (w ^ (2 * k))⁻¹)
   refine e1.trans (Eq.trans (tsum_congr fun w => ?_) e2.symm)
@@ -65,13 +75,15 @@ theorem eisG_eq_periodPair_G (Λ : AddSubgroup ℂ) (L : PeriodPair) (h : ∀ z,
     simp [Set.indicator, hk]
   · simp [Set.indicator, hw, h]
 
-theorem discr_ne_zero (Λ : AddSubgroup ℂ) (L : PeriodPair) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) : TaylorLogMetric.discr Λ ≠ 0 := by
+theorem discr_ne_zero (Λ : AddSubgroup ℂ) (L : PeriodPair) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
+    : TaylorLogMetric.discr Λ ≠ 0 := by
   have := g₂_cube_sub_g₃_sq_ne_zero L
-  rw [TaylorLogMetric.discr, g2, g3, eisG_eq_periodPair_G Λ L h two_ne_zero, eisG_eq_periodPair_G Λ L h three_ne_zero]
+  rw [TaylorLogMetric.discr, g2, g3, eisG_eq_periodPair_G Λ L h two_ne_zero,
+    eisG_eq_periodPair_G Λ L h three_ne_zero]
   exact this
 
-theorem mem_lamOf_iff (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ z : ℂ) :
-    z ∈ lamOf D cc δ ↔ ∃ c ∈ cc, z = δ * D.host.φ₀ (((c : D.host.K) : D.host.E)) := by
+theorem mem_lamOf_iff (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ z : ℂ)
+    : z ∈ lamOf D cc δ ↔ ∃ c ∈ cc, z = δ * D.host.φ₀ (((c : D.host.K) : D.host.E)) := by
   constructor
   · intro hz
     induction hz using AddSubgroup.closure_induction with
@@ -87,8 +99,8 @@ theorem mem_lamOf_iff (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ z : ℂ) :
   · intro hz
     exact AddSubgroup.subset_closure hz
 
-theorem exists_periodPair_one (D : D7) {cc : Ideal (𝓞 D.host.K)} (hc : cc ≠ ⊥) :
-    ∃ L : PeriodPair, ∀ z : ℂ, z ∈ lamOf D cc 1 ↔ z ∈ L.lattice := by
+theorem exists_periodPair_one (D : D7) {cc : Ideal (𝓞 D.host.K)} (hc : cc ≠ ⊥)
+    : ∃ L : PeriodPair, ∀ z : ℂ, z ∈ lamOf D cc 1 ↔ z ∈ L.lattice := by
   have hb : D.host.sqrtMinusD ^ 2 = -(D.host.d : D.host.E) := D.host.sqd_sq
   have hd : 0 < D.host.d := D.host.hyp.2.1.pos
   have hK : Module.finrank ℚ D.host.K = 2 := Formalism.FrobeniusOrbits.SplitK.finrank_K hd hb
@@ -113,8 +125,9 @@ theorem exists_periodPair_one (D : D7) {cc : Ideal (𝓞 D.host.K)} (hc : cc ≠
   simp only [one_mul]
   rfl
 
-theorem exists_periodPair_lamOf : ∀ (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ), Crv D cc δ →
-    ∃ L : PeriodPair, ∀ z : ℂ, z ∈ lamOf D cc δ ↔ z ∈ L.lattice := by
+theorem exists_periodPair_lamOf
+    : ∀ (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ),
+      Crv D cc δ → ∃ L : PeriodPair, ∀ z : ℂ, z ∈ lamOf D cc δ ↔ z ∈ L.lattice := by
   intro D cc δ h
   obtain ⟨L, hL⟩ := exists_periodPair_one D h.1.1
   have hδ : δ ≠ 0 := by
@@ -132,10 +145,12 @@ theorem exists_periodPair_lamOf : ∀ (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ 
   rw [mem_lamOf_iff, PeriodPair.mem_lattice]
   constructor
   · rintro ⟨c, hc, rfl⟩
-    obtain ⟨m, n, e⟩ := PeriodPair.mem_lattice.1 ((hL _).1 ((mem_lamOf_iff D cc 1 _).2 ⟨c, hc, rfl⟩))
+    obtain ⟨m, n, e⟩ :=
+      PeriodPair.mem_lattice.1 ((hL _).1 ((mem_lamOf_iff D cc 1 _).2 ⟨c, hc, rfl⟩))
     exact ⟨m, n, by linear_combination δ * e⟩
   · rintro ⟨m, n, rfl⟩
-    obtain ⟨c, hc, e⟩ := (mem_lamOf_iff D cc 1 _).1 ((hL _).2 (PeriodPair.mem_lattice.2 ⟨m, n, rfl⟩))
+    obtain ⟨c, hc, e⟩ :=
+      (mem_lamOf_iff D cc 1 _).1 ((hL _).2 (PeriodPair.mem_lattice.2 ⟨m, n, rfl⟩))
     exact ⟨c, hc, by linear_combination δ * e⟩
 
 end GlobalTheory.CurveLattice

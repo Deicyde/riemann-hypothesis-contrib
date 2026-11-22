@@ -10,8 +10,10 @@ set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 1000000
 
 open scoped Matrix NNReal TensorProduct
-open IsDedekindDomain NumberField Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum GlobalTheory.AdelicU
-  GlobalTheory.MixModel GlobalTheory.StdUnn GlobalTheory.Doubling Filter MeasureTheory
+open IsDedekindDomain NumberField Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum GlobalTheory.AdelicU GlobalTheory.MixModel GlobalTheory.StdUnn
+  GlobalTheory.Doubling Filter MeasureTheory
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -45,19 +47,28 @@ theorem npow_ne (r : ℝ≥0) (hr : r ≠ 0) (t : ℂ) : npow r t ≠ 0 := by
   have := (Complex.cpow_eq_zero_iff _ _).1 h
   exact hr (by exact_mod_cast this.1)
 
-theorem fixWc (V : HSp D) {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) :
-    ∃ S₀ : Finset (Pl D), ∀ S, S₀ ⊆ S → ∀ e, IsIdem S e → ∀ (n : ℕ) (θ : InfFam D) (μ : Measure (Mx D V.rank n))
-      (ω : G D n →* Module.End ℂ (schwartzA θ V.rank n)) (χ : (AE D)ˣ →* Circle), IsWeilSch ψ χ θ V μ ω →
-      μ.IsAddHaarMeasure → ∀ w u : G D n, IsW w → IsN u → u ∈ KOff D n S → ∀ Φ : schwartzA θ V.rank n,
-        Good S e Φ.1 → ω (w * u * w⁻¹) Φ = Φ := by
+theorem fixWc (V : HSp D) {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    : ∃ S₀ : Finset (Pl D), ∀ S,
+      S₀ ⊆ S
+        → ∀ e,
+          IsIdem S e
+            → ∀ (n : ℕ) (θ : InfFam D) (μ : Measure (Mx D V.rank n))
+                (ω : G D n →* Module.End ℂ (schwartzA θ V.rank n)) (χ : (AE D)ˣ →* Circle),
+              IsWeilSch ψ χ θ V μ ω → μ.IsAddHaarMeasure
+                → ∀ w u : G D n,
+                  IsW w → IsN u → u ∈ KOff D n S
+                    → ∀ Φ : schwartzA θ V.rank n, Good S e Φ.1 → ω (w * u * w⁻¹) Φ = Φ := by
   classical
   obtain ⟨S₁, hS₁⟩ := fixN V hψ
   obtain ⟨S₂, hS₂⟩ := ft_supp V.gram (gram_det_ne V) hψ
   refine ⟨S₁ ∪ S₂, fun S hS e he n θ μ ω χ hω hμ w u hw hNu hu Φ hΦ => ?_⟩
   set Φ' := ω (w⁻¹ * w⁻¹) Φ with hΦ'
-  have hmw : mat (w * w) = blk4 ((-1 : GL (Fin n) (AE D)) : Mx D n n) 0 0
-      (adj (((-1 : GL (Fin n) (AE D))⁻¹ : GL (Fin n) (AE D)) : Mx D n n)) := by
-    rw [LFixTh.mat_mul, hw, block_matrix_mul_comm_ring, inv_neg, inv_one, Units.val_neg, Units.val_one, adj_neg_one]
+  have hmw
+      : mat (w * w)
+        = blk4 ((-1 : GL (Fin n) (AE D)) : Mx D n n) 0 0
+          (adj (((-1 : GL (Fin n) (AE D))⁻¹ : GL (Fin n) (AE D)) : Mx D n n)) := by
+    rw [LFixTh.mat_mul, hw, block_matrix_mul_comm_ring, inv_neg, inv_one, Units.val_neg,
+      Units.val_one, adj_neg_one]
     simp
   set c : ℂ := (χ (Matrix.GeneralLinearGroup.det (-1 : GL (Fin n) (AE D))) : ℂ) *
     npow (absA D (Matrix.GeneralLinearGroup.det (-1 : GL (Fin n) (AE D)))) ((V.rank : ℂ) / 2) with hcdef
@@ -86,9 +97,10 @@ theorem fixWc (V : HSp D) {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.hos
       group
     rw [e1, hω.weyl w hw Φ' x]
     exact hS₂ S (fun v h => hS (Finset.mem_union_right _ h)) e he n μ hμ Φ'.1 hgood x hx
-  have hfix := hS₁ S (fun v h => hS (Finset.mem_union_left _ h)) n θ μ ω χ hω u hu hNu (ω w⁻¹ Φ) hsupp
-  rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, hfix, ← Module.End.mul_apply, ← map_mul,
-    mul_inv_cancel, map_one, Module.End.one_apply]
+  have hfix :=
+    hS₁ S (fun v h => hS (Finset.mem_union_left _ h)) n θ μ ω χ hω u hu hNu (ω w⁻¹ Φ) hsupp
+  rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, hfix, ← Module.End.mul_apply,
+    ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
 
 end PositivityTheory.Rg.Rsw.L.LFixW
 

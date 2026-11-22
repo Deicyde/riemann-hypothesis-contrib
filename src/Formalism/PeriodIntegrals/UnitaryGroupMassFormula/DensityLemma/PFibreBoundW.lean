@@ -4,7 +4,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.DensityLemma.PFi
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 
 noncomputable section
 
@@ -27,17 +28,20 @@ lemma nbm_cm (Ba B : Matrix (Fin r) (Fin (k + 1)) ℂ) (Sa S : Matrix (Fin r) (F
     Matrix.smul_apply, smul_eq_mul]
   ring
 
-theorem nbm_mul (Ba B : Matrix (Fin r) (Fin (k + 1)) ℂ) (Sa S : Matrix (Fin r) (Fin r) ℂ) :
-    unipotentBlockMatrix k r Ba Sa * unipotentBlockMatrix k r B S =
-      unipotentBlockMatrix k r (Ba + B) (Sa + S + (1 / 2 : ℂ) •
-        (B * Matrix.diagonal (hW k) * Baᴴ - Ba * Matrix.diagonal (hW k) * Bᴴ)) := by
+theorem nbm_mul (Ba B : Matrix (Fin r) (Fin (k + 1)) ℂ) (Sa S : Matrix (Fin r) (Fin r) ℂ)
+    : unipotentBlockMatrix k r Ba Sa * unipotentBlockMatrix k r B S
+      = unipotentBlockMatrix k r (Ba + B)
+        (Sa + S
+          + (1 / 2 : ℂ)
+            • (B * Matrix.diagonal (hW k) * Baᴴ - Ba * Matrix.diagonal (hW k) * Bᴴ)) := by
   ext p q
   rw [Matrix.mul_apply, sum_split]
-  induction p using cases3 <;> induction q using cases3 <;>
-    simp only [nb_ee, nb_we, nb_se, nb_ew, nb_ww, nb_sw, nb_es, nb_ws, nb_ss, zero_mul, mul_zero,
-      Finset.sum_const_zero, add_zero, zero_add, ite_mul, mul_ite, one_mul, mul_one, Finset.sum_ite_eq,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true, Matrix.add_apply, star_add]
-  all_goals first
+  induction p using cases3 <;> induction q using cases3
+    <;> simp only [nb_ee, nb_we, nb_se, nb_ew, nb_ww, nb_sw, nb_es, nb_ws, nb_ss, zero_mul,
+      mul_zero, Finset.sum_const_zero, add_zero, zero_add, ite_mul, mul_ite, one_mul, mul_one,
+      Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true, Matrix.add_apply, star_add]
+  all_goals
+    first
     | done
     | (rw [nbm_cm, mul_diagonal_conjTranspose_apply, ← Finset.sum_neg_distrib]; ring)
     | ring

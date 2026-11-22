@@ -9,13 +9,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
+open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
 open UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Lit.Dr
 open scoped TensorProduct GlobalTheory.CuspRep.CuspidalL2GL
 open UpperTheory.V.Cj UpperTheory.V.Cj.H
 
-theorem UpperTheory.V.Cj.H.opComm :
-    UpperTheory.V.Cj.H.OpComm := by
+theorem UpperTheory.V.Cj.H.opComm : UpperTheory.V.Cj.H.OpComm := by
   intro E _ _ _ a ha μ _ _ T hT T' hL
   obtain ⟨c1, c2, c3, -⟩ := clFacts E a μ
   have gf := gardFacts E a ha μ
@@ -38,7 +38,8 @@ theorem UpperTheory.V.Cj.H.opComm :
       add_mem (Submodule.smul_mem _ _ m1) (Submodule.smul_mem _ _ m2)
     have e := (c1 _ _ 1 (-1) (gf _ m1).2.1 (gf _ m2).2.1).2
     rw [c3 _ g (gf _ (hL φ hφ).1).2.1, (hL φ hφ).2, (hL _ m0).2, c3 _ g (gf _ hφ).2.1, hT,
-      ← add_smul, add_neg_cancel, zero_smul] at e
+        ← add_smul, add_neg_cancel, zero_smul]
+      at e
     have z := c2 _ (gf _ m3).1 (gf _ m3).2.1 e
     rw [one_smul, neg_one_smul, ← sub_eq_add_neg, sub_eq_zero] at z
     exact z

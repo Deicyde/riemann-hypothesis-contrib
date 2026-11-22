@@ -14,7 +14,8 @@ theorem embMem : EmbMem := by
   intro L _ _ σ n r e β γ ι hσ hD hι g
   obtain ⟨he, -, -, -, -, hβγ⟩ := hD
   obtain ⟨h1, h2⟩ := hι g
-  have hcases : ∀ a b : Fin n, (∃ i j, a = e i ∧ b = e j) ∨ (a ∉ Set.range e ∨ b ∉ Set.range e) := by
+  have hcases
+      : ∀ a b : Fin n, (∃ i j, a = e i ∧ b = e j) ∨ (a ∉ Set.range e ∨ b ∉ Set.range e) := by
     intro a b
     by_cases ha : a ∈ Set.range e
     · by_cases hb : b ∈ Set.range e

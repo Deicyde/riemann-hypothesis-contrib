@@ -8,19 +8,24 @@ open MulAction
 
 namespace UpperTheory.V.Z.Sym.Sig
 
-private theorem relIndex_smul {T Y : Type} [Group T] [MulAction T Y] (C : Subgroup T) (hC : C.Normal)
-    (t : T) (y : Y) : (stabilizer T (t • y)).relIndex C = (stabilizer T y).relIndex C := by
+private theorem relIndex_smul
+    {T Y : Type} [Group T] [MulAction T Y] (C : Subgroup T) (hC : C.Normal) (t : T) (y : Y)
+    : (stabilizer T (t • y)).relIndex C = (stabilizer T y).relIndex C := by
   have hc : C.map (MulAut.conj t).toMonoidHom = C := by
-    rw [MulEquiv.toMonoidHom_eq_coe, ← Subgroup.mem_normalizer_iff_map_conj_eq, Subgroup.normalizer_eq_top_iff.mpr hC]
+    rw [MulEquiv.toMonoidHom_eq_coe, ← Subgroup.mem_normalizer_iff_map_conj_eq,
+      Subgroup.normalizer_eq_top_iff.mpr hC]
     exact Subgroup.mem_top t
   rw [stabilizer_smul_eq_stabilizer_map_conj]
   conv_lhs => rw [← hc]
   exact Subgroup.relIndex_map_map_of_injective _ _ (MulAut.conj t).injective
 
-private theorem wcount_congr {T Y Y' : Type} [Group T] [MulAction T Y] [MulAction T Y']
-    (C : Subgroup T) (hC : C.Normal) (φ : Y ≃ Y') (hφ : ∀ (t : T) (y : Y), φ (t • y) = t • φ y)
-    (k : Y → ℂ) (k' : Y' → ℂ) (hk : ∀ y, k y = k' (φ y)) (hinv : ∀ (t : T) (y : Y'), k' (t • y) = k' y) :
-    wcount C k = wcount C k' := by
+private theorem wcount_congr
+    {T Y Y' : Type} [Group T] [MulAction T Y] [MulAction T Y']
+    (C : Subgroup T) (hC : C.Normal)
+    (φ : Y ≃ Y') (hφ : ∀ (t : T) (y : Y), φ (t • y) = t • φ y)
+    (k : Y → ℂ) (k' : Y' → ℂ)
+    (hk : ∀ y, k y = k' (φ y)) (hinv : ∀ (t : T) (y : Y'), k' (t • y) = k' y)
+    : wcount C k = wcount C k' := by
   have hkT : ∀ (t : T) (y : Y), k (t • y) = k y := by
     intro t y
     rw [hk, hk, hφ, hinv]
@@ -29,8 +34,11 @@ private theorem wcount_congr {T Y Y' : Type} [Group T] [MulAction T Y] [MulActio
     ext t
     rw [mem_stabilizer_iff, mem_stabilizer_iff, ← hφ]
     exact φ.injective.eq_iff
-  have cls' : ∀ (y z : Y'), z ∈ orbit T y →
-      ((stabilizer T z).relIndex C : ℂ) * k' z = ((stabilizer T y).relIndex C : ℂ) * k' y := by
+  have cls'
+      : ∀ (y z : Y'),
+        z ∈ orbit T y
+          → ((stabilizer T z).relIndex C : ℂ) * k' z
+            = ((stabilizer T y).relIndex C : ℂ) * k' y := by
     intro y z h
     obtain ⟨t, rfl⟩ := mem_orbit_iff.mp h
     rw [relIndex_smul C hC, hinv]
@@ -54,18 +62,20 @@ private theorem wcount_congr {T Y Y' : Type} [Group T] [MulAction T Y] [MulActio
     exact Quotient.exact (by rw [Quotient.out_eq]; exact hq)
   rw [cls' _ _ ho, hst, ← hk]
 
-private def qmap {G G' : Type} [Group G] [Group G'] (e : G →* G') (U' : Subgroup G') :
-    G ⧸ U'.comap e → G' ⧸ U' :=
+private def qmap {G G' : Type} [Group G] [Group G'] (e : G →* G') (U' : Subgroup G')
+    : G ⧸ U'.comap e → G' ⧸ U' :=
   Quotient.map' e (by
     intro a b h
     rw [QuotientGroup.leftRel_apply] at h ⊢
     simpa using h)
 
-private theorem qmap_mk {G G' : Type} [Group G] [Group G'] (e : G →* G') (U' : Subgroup G') (g : G) :
-    qmap e U' (g : G ⧸ U'.comap e) = (e g : G' ⧸ U') := rfl
+private theorem qmap_mk {G G' : Type} [Group G] [Group G'] (e : G →* G') (U' : Subgroup G') (g : G)
+    : qmap e U' (g : G ⧸ U'.comap e) = (e g : G' ⧸ U') :=
+  rfl
 
-private theorem qmap_bij {G G' : Type} [Group G] [Group G'] (e : G →* G') (he : Function.Bijective e)
-    (U' : Subgroup G') : Function.Bijective (qmap e U') := by
+private theorem qmap_bij
+    {G G' : Type} [Group G] [Group G'] (e : G →* G') (he : Function.Bijective e) (U' : Subgroup G')
+    : Function.Bijective (qmap e U') := by
   constructor
   · intro x y h
     obtain ⟨a, rfl⟩ := QuotientGroup.mk_surjective x
@@ -78,9 +88,11 @@ private theorem qmap_bij {G G' : Type} [Group G] [Group G'] (e : G →* G') (he 
     obtain ⟨a, rfl⟩ := he.2 c
     exact ⟨a, qmap_mk e U' a⟩
 
-private theorem f_out {G' : Type} [Group G'] (θ' : G' →* G') (U' : Subgroup G') (f : G' → ℂ)
-    (hf : ∀ u ∈ U', ∀ x, f (u⁻¹ * x * θ' u) = f x) (x z : G') :
-    f ((z : G' ⧸ U').out⁻¹ * x * θ' (z : G' ⧸ U').out) = f (z⁻¹ * x * θ' z) := by
+private theorem f_out
+    {G' : Type} [Group G']
+    (θ' : G' →* G') (U' : Subgroup G') (f : G' → ℂ) (hf : ∀ u ∈ U', ∀ x, f (u⁻¹ * x * θ' u) = f x)
+    (x z : G')
+    : f ((z : G' ⧸ U').out⁻¹ * x * θ' (z : G' ⧸ U').out) = f (z⁻¹ * x * θ' z) := by
   have hu : z⁻¹ * (z : G' ⧸ U').out ∈ U' :=
     QuotientGroup.eq.mp (QuotientGroup.out_eq' (z : G' ⧸ U')).symm
   obtain ⟨u, hu, hw⟩ : ∃ u ∈ U', (z : G' ⧸ U').out = z * u :=
@@ -92,8 +104,7 @@ private theorem f_out {G' : Type} [Group G'] (θ' : G' →* G') (U' : Subgroup G
 
 end UpperTheory.V.Z.Sym.Sig
 
-theorem UpperTheory.V.Z.Sym.Sig.orbMap :
-    UpperTheory.V.Z.Sym.Sig.OrbMap := by
+theorem UpperTheory.V.Z.Sym.Sig.orbMap : UpperTheory.V.Z.Sym.Sig.OrbMap := by
   classical
   intro T G G' _ _ _ e he ι C θ θ' hθ U' f δ hf hδ hC
   let E : G ≃* G' := MulEquiv.ofBijective e he
@@ -118,12 +129,14 @@ theorem UpperTheory.V.Z.Sym.Sig.orbMap :
     · intro t y
       obtain ⟨z, rfl⟩ := QuotientGroup.mk_surjective y
       rw [MulAction.compHom_smul_def, MulAction.Quotient.smul_coe, smul_eq_mul,
-        UpperTheory.V.Z.Sym.Sig.f_out θ' U' f hf, UpperTheory.V.Z.Sym.Sig.f_out θ' U' f hf, MonoidHom.comp_apply]
+        UpperTheory.V.Z.Sym.Sig.f_out θ' U' f hf, UpperTheory.V.Z.Sym.Sig.f_out θ' U' f hf,
+        MonoidHom.comp_apply]
       congr 1
       have h1 : e ((ι t)⁻¹ * δ * θ (ι t)) = e δ := by rw [hδ]
       rw [hc] at h1
-      have key : (e (ι t) * z)⁻¹ * e δ * θ' (e (ι t) * z)
-          = z⁻¹ * ((e (ι t))⁻¹ * e δ * θ' (e (ι t))) * θ' z := by
+      have key
+          : (e (ι t) * z)⁻¹ * e δ * θ' (e (ι t) * z)
+            = z⁻¹ * ((e (ι t))⁻¹ * e δ * θ' (e (ι t))) * θ' z := by
         rw [map_mul]
         group
       rw [key, h1]

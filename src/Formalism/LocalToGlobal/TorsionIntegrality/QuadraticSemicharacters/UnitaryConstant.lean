@@ -39,25 +39,29 @@ structure UnitaryData (H : Sesq V) (Λ : AddSubgroup V) (α : V → ℂ) (δ Ae 
 def gaussC (H : Sesq V) (α : V → ℂ) (Ae : V ≃ₗ[ℂ] V) (S : Finset V) : ℂ :=
   ((Real.sqrt S.card : ℝ) : ℂ)⁻¹ * ∑ x ∈ S, phiC H α Ae x
 
-def AtMostLine {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] (H : Sesq V) (α : V → ℂ)
-    (Λ : AddSubgroup V) : Prop :=
+def AtMostLine
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    (H : Sesq V) (α : V → ℂ) (Λ : AddSubgroup V)
+    : Prop :=
   ∀ θ ∈ Th H α Λ, θ ≠ 0 → ∀ F ∈ Th H α Λ, ∃ c : ℂ, F = c • θ
 
 end Objects
 
 def UnitaryIndex : Prop :=
   ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] (H : Sesq V)
-    (Λ : AddSubgroup V) (α : V → ℂ) (δ Ae : V ≃ₗ[ℂ] V), IsLat Λ → UnitaryData H Λ α δ Ae →
-    latA Λ δ Ae ≤ Λ ∧
-    (relIdx (latA Λ δ Ae) Λ : ℝ)
-      = (relIdx (imgLat (δ : V →ₗ[ℂ] V) Λ) Λ : ℝ) * ‖LinearMap.det (Ae : V →ₗ[ℂ] V)‖ ^ 2
+      (Λ : AddSubgroup V) (α : V → ℂ) (δ Ae : V ≃ₗ[ℂ] V),
+    IsLat Λ → UnitaryData H Λ α δ Ae
+      → latA Λ δ Ae ≤ Λ
+        ∧ (relIdx (latA Λ δ Ae) Λ : ℝ)
+          = (relIdx (imgLat (δ : V →ₗ[ℂ] V) Λ) Λ : ℝ) * ‖LinearMap.det (Ae : V →ₗ[ℂ] V)‖ ^ 2
 
 def PhiBasic : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Sesq V) (Λ : AddSubgroup V) (α : V → ℂ)
-    (δ Ae : V ≃ₗ[ℂ] V), UnitaryData H Λ α δ Ae →
-    (∀ x y, H (cayC Ae x) y = -H x (cayC Ae y)) ∧ (∀ x, (H (cayC Ae x) x).re = 0) ∧
-    (∀ x ∈ Λ, ‖phiC H α Ae x‖ = 1) ∧
-    ∀ x ∈ Λ, ∀ y ∈ latA Λ δ Ae, phiC H α Ae (x + y) = phiC H α Ae x
+      (δ Ae : V ≃ₗ[ℂ] V),
+    UnitaryData H Λ α δ Ae
+      → (∀ x y, H (cayC Ae x) y = - H x (cayC Ae y)) ∧ (∀ x, (H (cayC Ae x) x).re = 0)
+        ∧ (∀ x ∈ Λ, ‖phiC H α Ae x‖ = 1)
+        ∧ ∀ x ∈ Λ, ∀ y ∈ latA Λ δ Ae, phiC H α Ae (x + y) = phiC H α Ae x
 
 structure IsQuadFn {M : Type*} [AddCommGroup M] (φ : M → ℂ) (b : M → M → ℂ) : Prop where
   add : ∀ x y, φ (x + y) = φ x * φ y * b x y
@@ -67,32 +71,43 @@ structure IsQuadFn {M : Type*} [AddCommGroup M] (φ : M → ℂ) (b : M → M �
   nondeg : ∀ x, (∀ y, b x y = 1) → x = 0
 
 def GaussEighth : Prop :=
-  ∀ (M : Type) [AddCommGroup M] [Fintype M] (φ : M → ℂ) (b : M → M → ℂ), IsQuadFn φ b →
-    (∑ x, φ x) ^ 8 = (Fintype.card M : ℂ) ^ 4
+  ∀ (M : Type) [AddCommGroup M] [Fintype M] (φ : M → ℂ) (b : M → M → ℂ),
+    IsQuadFn φ b → (∑ x, φ x) ^ 8 = (Fintype.card M : ℂ) ^ 4
 
 def UnitaryGauss : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Sesq V) (Λ : AddSubgroup V) (α : V → ℂ)
-    (δ Ae : V ≃ₗ[ℂ] V), UnitaryData H Λ α δ Ae → ∀ S : Finset V, IsReps (latA Λ δ Ae) Λ S →
-    gaussC H α Ae S ^ 8 = 1
+      (δ Ae : V ≃ₗ[ℂ] V),
+    UnitaryData H Λ α δ Ae → ∀ S : Finset V, IsReps (latA Λ δ Ae) Λ S → gaussC H α Ae S ^ 8 = 1
 
 def DetCayley : Prop :=
-  ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (H : Sesq V), IsHerm H → IsPosDef H →
-    ∀ δ Ae : V ≃ₗ[ℂ] V, IsIsom H H (δ : V →ₗ[ℂ] V) → (∀ x, Ae x = x - δ.symm x) →
-    conj (LinearMap.det (Ae : V →ₗ[ℂ] V))
-      = (-1) ^ Module.finrank ℂ V * LinearMap.det (δ : V →ₗ[ℂ] V) * LinearMap.det (Ae : V →ₗ[ℂ] V)
+  ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (H : Sesq V),
+    IsHerm H → IsPosDef H
+      → ∀ δ Ae : V ≃ₗ[ℂ] V,
+        IsIsom H H (δ : V →ₗ[ℂ] V) → (∀ x, Ae x = x - δ.symm x)
+          → conj (LinearMap.det (Ae : V →ₗ[ℂ] V))
+            = (-1) ^ Module.finrank ℂ V * LinearMap.det (δ : V →ₗ[ℂ] V)
+              * LinearMap.det (Ae : V →ₗ[ℂ] V)
 
 def UnitaryConstant : Prop :=
   ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] (H : Sesq V)
-    (Λ : AddSubgroup V) (α : V → ℂ) (δ Ae : V ≃ₗ[ℂ] V), IsLat Λ → UnitaryData H Λ α δ Ae →
-    AtMostLine H α Λ → ∀ S : Finset V, IsReps (latA Λ δ Ae) Λ S → ∀ θ ∈ Th H α Λ,
-      pullInv δ θ = ((‖LinearMap.det (Ae : V →ₗ[ℂ] V)‖ : ℂ) / LinearMap.det (Ae : V →ₗ[ℂ] V)
-        * gaussC H α Ae S) • inter H α Λ (imgLat (δ : V →ₗ[ℂ] V) Λ) θ
+      (Λ : AddSubgroup V) (α : V → ℂ) (δ Ae : V ≃ₗ[ℂ] V),
+    IsLat Λ → UnitaryData H Λ α δ Ae → AtMostLine H α Λ
+      → ∀ S : Finset V,
+        IsReps (latA Λ δ Ae) Λ S
+          → ∀ θ ∈ Th H α Λ,
+            pullInv δ θ
+              = ((‖LinearMap.det (Ae : V →ₗ[ℂ] V)‖ : ℂ) / LinearMap.det (Ae : V →ₗ[ℂ] V)
+                  * gaussC H α Ae S)
+                • inter H α Λ (imgLat (δ : V →ₗ[ℂ] V) Λ) θ
 
 def UnitaryEighth : Prop :=
   ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] (H : Sesq V)
-    (Λ : AddSubgroup V) (α : V → ℂ) (δ Ae : V ≃ₗ[ℂ] V), IsLat Λ → UnitaryData H Λ α δ Ae →
-    AtMostLine H α Λ → ∀ θ ∈ Th H α Λ, θ ≠ 0 → ∀ c : ℂ,
-      pullInv δ θ = c • inter H α Λ (imgLat (δ : V →ₗ[ℂ] V) Λ) θ →
-      c ^ 8 = LinearMap.det (δ : V →ₗ[ℂ] V) ^ 4
+      (Λ : AddSubgroup V) (α : V → ℂ) (δ Ae : V ≃ₗ[ℂ] V),
+    IsLat Λ → UnitaryData H Λ α δ Ae → AtMostLine H α Λ
+      → ∀ θ ∈ Th H α Λ,
+        θ ≠ 0
+          → ∀ c : ℂ,
+            pullInv δ θ = c • inter H α Λ (imgLat (δ : V →ₗ[ℂ] V) Λ) θ
+              → c ^ 8 = LinearMap.det (δ : V →ₗ[ℂ] V) ^ 4
 
 end Formalism.L2.Th1.H

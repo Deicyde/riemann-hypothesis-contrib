@@ -17,18 +17,20 @@ section
 
 variable {R : Type*} [CommRing R] {r n : ℕ}
 
-def lrfc_iota : MvPolynomial (Fin r × Fin n) R →+*
-    MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) :=
+def lrfc_iota
+    : MvPolynomial (Fin r × Fin n) R
+      →+* MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) :=
   MvPolynomial.map (C : R →+* MvPolynomial (Fin r × Fin n) R)
 
-def lrfc_coeffT (d : Fin r × Fin n →₀ ℕ)
-    (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    MvPolynomial (Fin r × Fin n) R :=
+def lrfc_coeffT
+    (d : Fin r × Fin n →₀ ℕ) (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : MvPolynomial (Fin r × Fin n) R :=
   ∑ m ∈ G.support, monomial m (AddMonoidAlgebra.coeff (AddMonoidAlgebra.coeff G m) d)
 
-theorem lrfc_coeff_coeffT (d m : Fin r × Fin n →₀ ℕ)
-    (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    AddMonoidAlgebra.coeff (lrfc_coeffT d G) m = AddMonoidAlgebra.coeff (AddMonoidAlgebra.coeff G m) d := by
+theorem lrfc_coeff_coeffT
+    (d m : Fin r × Fin n →₀ ℕ) (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : AddMonoidAlgebra.coeff (lrfc_coeffT d G) m
+      = AddMonoidAlgebra.coeff (AddMonoidAlgebra.coeff G m) d := by
   classical
   unfold lrfc_coeffT
   rw [coeff_sum]
@@ -38,28 +40,29 @@ theorem lrfc_coeff_coeffT (d m : Fin r × Fin n →₀ ℕ)
   · rfl
   · simp [notMem_support_iff.mp h]
 
-theorem lrfc_coeffT_add (d : Fin r × Fin n →₀ ℕ)
-    (G H : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    lrfc_coeffT d (G + H) = lrfc_coeffT d G + lrfc_coeffT d H := by
+theorem lrfc_coeffT_add
+    (d : Fin r × Fin n →₀ ℕ) (G H : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : lrfc_coeffT d (G + H) = lrfc_coeffT d G + lrfc_coeffT d H := by
   ext m
   simp [lrfc_coeff_coeffT]
 
-theorem lrfc_coeffT_sum {ι : Type*} (s : Finset ι) (d : Fin r × Fin n →₀ ℕ)
-    (G : ι → MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    lrfc_coeffT d (∑ i ∈ s, G i) = ∑ i ∈ s, lrfc_coeffT d (G i) := by
+theorem lrfc_coeffT_sum
+    {ι : Type*} (s : Finset ι)
+    (d : Fin r × Fin n →₀ ℕ) (G : ι → MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : lrfc_coeffT d (∑ i ∈ s, G i) = ∑ i ∈ s, lrfc_coeffT d (G i) := by
   ext m
   simp [lrfc_coeff_coeffT, coeff_sum]
 
-theorem lrfc_coeffT_monomial (d u : Fin r × Fin n →₀ ℕ) (c : MvPolynomial (Fin r × Fin n) R) :
-    lrfc_coeffT d (monomial u c) = monomial u (AddMonoidAlgebra.coeff c d) := by
+theorem lrfc_coeffT_monomial (d u : Fin r × Fin n →₀ ℕ) (c : MvPolynomial (Fin r × Fin n) R)
+    : lrfc_coeffT d (monomial u c) = monomial u (AddMonoidAlgebra.coeff c d) := by
   classical
   ext m
   rw [lrfc_coeff_coeffT, coeff_monomial, coeff_monomial]
   split_ifs <;> simp
 
-theorem lrfc_coeffT_C_monomial_mul (d s : Fin r × Fin n →₀ ℕ)
-    (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    lrfc_coeffT d (C (monomial s 1) * G) = if s ≤ d then lrfc_coeffT (d - s) G else 0 := by
+theorem lrfc_coeffT_C_monomial_mul
+    (d s : Fin r × Fin n →₀ ℕ) (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : lrfc_coeffT d (C (monomial s 1) * G) = if s ≤ d then lrfc_coeffT (d - s) G else 0 := by
   classical
   ext m
   rw [lrfc_coeff_coeffT, coeff_C_mul, coeff_monomial_mul', one_mul]
@@ -67,8 +70,8 @@ theorem lrfc_coeffT_C_monomial_mul (d s : Fin r × Fin n →₀ ℕ)
   · rw [lrfc_coeff_coeffT]
   · simp
 
-theorem lrfc_coeffT_iota (d : Fin r × Fin n →₀ ℕ) (F : MvPolynomial (Fin r × Fin n) R) :
-    lrfc_coeffT d (lrfc_iota F) = if d = 0 then F else 0 := by
+theorem lrfc_coeffT_iota (d : Fin r × Fin n →₀ ℕ) (F : MvPolynomial (Fin r × Fin n) R)
+    : lrfc_coeffT d (lrfc_iota F) = if d = 0 then F else 0 := by
   classical
   ext m
   rw [lrfc_coeff_coeffT, lrfc_iota, coeff_map, coeff_C]
@@ -80,21 +83,24 @@ section
 
 variable {R : Type*} [CommRing R] {r n : ℕ}
 
-def lrfc_tau (l : Fin r × Fin r × (Fin r × Fin n)) :
-    MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) →ₐ[MvPolynomial (Fin r × Fin n) R]
-      MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) :=
+def lrfc_tau (l : Fin r × Fin r × (Fin r × Fin n))
+    : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) →ₐ[MvPolynomial (Fin r × Fin n) R]
+        MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) :=
   aeval fun v => X v + if v.1 = l.2.1 then C (X l.2.2) * X (l.1, v.2) else 0
 
-theorem lrfc_tau_iota (l : Fin r × Fin r × (Fin r × Fin n)) (F : MvPolynomial (Fin r × Fin n) R) :
-    lrfc_tau l (lrfc_iota F) =
-      Polynomial.eval₂ lrfc_iota (C (X l.2.2)) (rowGen R l.1 l.2.1 F) := by
-  have h : ((lrfc_tau (R := R) l).toRingHom.comp lrfc_iota) =
-      (Polynomial.eval₂RingHom lrfc_iota (C (X l.2.2))).comp (rowGen R l.1 l.2.1).toRingHom := by
+theorem lrfc_tau_iota (l : Fin r × Fin r × (Fin r × Fin n)) (F : MvPolynomial (Fin r × Fin n) R)
+    : lrfc_tau l (lrfc_iota F)
+      = Polynomial.eval₂ lrfc_iota (C (X l.2.2)) (rowGen R l.1 l.2.1 F) := by
+  have h
+      : ((lrfc_tau (R := R) l).toRingHom.comp lrfc_iota)
+        = (Polynomial.eval₂RingHom lrfc_iota (C (X l.2.2))).comp
+          (rowGen R l.1 l.2.1).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro c
       simp [lrfc_tau, lrfc_iota, rowGen]
     · intro i
-      simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom]
+      simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe,
+        AlgHom.coe_toRingHom]
       simp only [lrfc_tau, lrfc_iota, rowGen, aeval_X, map_X, Polynomial.coe_eval₂RingHom]
       split_ifs
       · simp
@@ -102,33 +108,36 @@ theorem lrfc_tau_iota (l : Fin r × Fin r × (Fin r × Fin n)) (F : MvPolynomial
       · simp
   exact congrArg (fun φ => φ F) h
 
-def lrfc_Phi (L : List (Fin r × Fin r × (Fin r × Fin n))) :
-    MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) →ₐ[MvPolynomial (Fin r × Fin n) R]
-      MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) :=
+def lrfc_Phi (L : List (Fin r × Fin r × (Fin r × Fin n)))
+    : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) →ₐ[MvPolynomial (Fin r × Fin n) R]
+        MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R) :=
   L.foldr (fun l φ => (lrfc_tau l).comp φ) (AlgHom.id _ _)
 
-theorem lrfc_Phi_nil (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    lrfc_Phi [] G = G := rfl
+theorem lrfc_Phi_nil (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : lrfc_Phi [] G = G :=
+  rfl
 
-theorem lrfc_Phi_cons (l : Fin r × Fin r × (Fin r × Fin n)) (w : List (Fin r × Fin r × (Fin r × Fin n)))
-    (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    lrfc_Phi (l :: w) G = lrfc_tau l (lrfc_Phi w G) := rfl
+theorem lrfc_Phi_cons
+    (l : Fin r × Fin r × (Fin r × Fin n)) (w : List (Fin r × Fin r × (Fin r × Fin n)))
+    (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : lrfc_Phi (l :: w) G = lrfc_tau l (lrfc_Phi w G) :=
+  rfl
 
-theorem lrfc_Phi_append_single (w : List (Fin r × Fin r × (Fin r × Fin n)))
-    (l : Fin r × Fin r × (Fin r × Fin n))
-    (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    lrfc_Phi (w ++ [l]) G = lrfc_Phi w (lrfc_tau l G) := by
+theorem lrfc_Phi_append_single
+    (w : List (Fin r × Fin r × (Fin r × Fin n))) (l : Fin r × Fin r × (Fin r × Fin n))
+    (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : lrfc_Phi (w ++ [l]) G = lrfc_Phi w (lrfc_tau l G) := by
   induction w with
   | nil => rfl
   | cons x w ih => rw [List.cons_append, lrfc_Phi_cons, ih, lrfc_Phi_cons]
 
-theorem lrfc_applyWord_append_single (w : List (Fin r × Fin r × ℕ)) (x : Fin r × Fin r × ℕ)
-    (F : MvPolynomial (Fin r × Fin n) R) :
-    applyWord R (w ++ [x]) F = applyWord R w (rowDiv R x.1 x.2.1 x.2.2 F) := by
+theorem lrfc_applyWord_append_single
+    (w : List (Fin r × Fin r × ℕ)) (x : Fin r × Fin r × ℕ) (F : MvPolynomial (Fin r × Fin n) R)
+    : applyWord R (w ++ [x]) F = applyWord R w (rowDiv R x.1 x.2.1 x.2.2 F) := by
   simp [applyWord, List.foldr_append]
 
-theorem lrfc_applyWord_zero (w : List (Fin r × Fin r × ℕ)) :
-    applyWord R w (0 : MvPolynomial (Fin r × Fin n) R) = 0 := by
+theorem lrfc_applyWord_zero (w : List (Fin r × Fin r × ℕ))
+    : applyWord R w (0 : MvPolynomial (Fin r × Fin n) R) = 0 := by
   induction w with
   | nil => rfl
   | cons x w ih =>
@@ -136,16 +145,20 @@ theorem lrfc_applyWord_zero (w : List (Fin r × Fin r × ℕ)) :
     rw [ih]
     simp [rowDiv]
 
-theorem lrfc_coeffT_Phi (L : List (Fin r × Fin r × (Fin r × Fin n)))
-    (hL : (L.map (·.2.2)).Nodup) (F : MvPolynomial (Fin r × Fin n) R) (d : Fin r × Fin n →₀ ℕ) :
-    lrfc_coeffT d (lrfc_Phi L (lrfc_iota F)) =
-      if (∀ u, u ∉ L.map (·.2.2) → d u = 0) then
-        applyWord R (L.map fun l => (l.1, l.2.1, d l.2.2)) F else 0 := by
+theorem lrfc_coeffT_Phi
+    (L : List (Fin r × Fin r × (Fin r × Fin n))) (hL : (L.map (·.2.2)).Nodup)
+    (F : MvPolynomial (Fin r × Fin n) R) (d : Fin r × Fin n →₀ ℕ)
+    : lrfc_coeffT d (lrfc_Phi L (lrfc_iota F))
+      = if (∀ u, u ∉ L.map (·.2.2) → d u = 0) then
+          applyWord R (L.map fun l => (l.1, l.2.1, d l.2.2)) F
+        else
+          0 := by
   classical
   induction L using List.reverseRecOn generalizing F d with
   | nil =>
     rw [lrfc_Phi_nil, lrfc_coeffT_iota]
-    have : (∀ u, u ∉ ([] : List (Fin r × Fin r × (Fin r × Fin n))).map (·.2.2) → d u = 0) ↔ d = 0 := by
+    have : (∀ u, u ∉ ([] : List (Fin r × Fin r × (Fin r × Fin n))).map (·.2.2) → d u = 0)
+        ↔ d = 0 := by
       simp [Finsupp.ext_iff]
     simp only [this]
     rfl
@@ -159,13 +172,20 @@ theorem lrfc_coeffT_Phi (L : List (Fin r × Fin r × (Fin r × Fin n)))
       exact hL'.2.2 v h v (by simp) rfl
     set_option synthInstance.maxHeartbeats 100000 in
       rw [lrfc_Phi_append_single, lrfc_tau_iota, Polynomial.eval₂_eq_sum, Polynomial.sum_def,
-      map_sum, lrfc_coeffT_sum]
-    have key : ∀ (j : ℕ) (c : MvPolynomial (Fin r × Fin n) R),
-        lrfc_coeffT d (lrfc_Phi w (lrfc_iota c * C (X (s, a, v).2.2) ^ j)) =
-          if j ≤ d v then lrfc_coeffT (d - Finsupp.single v j) (lrfc_Phi w (lrfc_iota c)) else 0 := by
+        map_sum, lrfc_coeffT_sum]
+    have key
+        : ∀ (j : ℕ) (c : MvPolynomial (Fin r × Fin n) R),
+          lrfc_coeffT d (lrfc_Phi w (lrfc_iota c * C (X (s, a, v).2.2) ^ j))
+            = if j ≤ d v then
+                lrfc_coeffT (d - Finsupp.single v j) (lrfc_Phi w (lrfc_iota c))
+              else
+                0 := by
       intro j c
-      have e0 : (C (X (s, a, v).2.2) : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) ^ j =
-          C (X v ^ j) := (map_pow C (X v) j).symm
+      have e0
+          : (C (X (s, a, v).2.2) : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+              ^ j
+            = C (X v ^ j) :=
+        (map_pow C (X v) j).symm
       rw [e0, map_mul]
       have hC : lrfc_Phi w (C (X v ^ j)) = C (X v ^ j : MvPolynomial (Fin r × Fin n) R) :=
         (lrfc_Phi w).commutes (X v ^ j)
@@ -174,19 +194,21 @@ theorem lrfc_coeffT_Phi (L : List (Fin r × Fin r × (Fin r × Fin n)))
     simp only [key, ih hw]
     rw [Finset.sum_eq_single (d v)]
     · simp only [le_refl, ite_true]
-      have hfill : w.map (fun l => (l.1, l.2.1, (d - Finsupp.single v (d v)) l.2.2)) =
-          w.map (fun l => (l.1, l.2.1, d l.2.2)) := by
+      have hfill
+          : w.map (fun l => (l.1, l.2.1, (d - Finsupp.single v (d v)) l.2.2))
+            = w.map (fun l => (l.1, l.2.1, d l.2.2)) := by
         apply List.map_congr_left
         intro l hl
-        have hne : l.2.2 ≠ v := by
-          intro h; exact hv (List.mem_map.mpr ⟨l, hl, h⟩)
+        have hne : l.2.2 ≠ v := by intro h; exact hv (List.mem_map.mpr ⟨l, hl, h⟩)
         simp [Finsupp.single_apply, Ne.symm hne]
-      have hcond : (∀ u, u ∉ w.map (·.2.2) → (d - Finsupp.single v (d v)) u = 0) ↔
-          (∀ u, u ∉ (w ++ [(s, a, v)]).map (·.2.2) → d u = 0) := by
+      have hcond
+          : (∀ u, u ∉ w.map (·.2.2) → (d - Finsupp.single v (d v)) u = 0)
+            ↔ (∀ u, u ∉ (w ++ [(s, a, v)]).map (·.2.2) → d u = 0) := by
         constructor
         · intro h u hu
-          simp only [List.map_append, List.mem_append, List.map_cons, List.map_nil, List.mem_singleton,
-            not_or] at hu
+          simp only [List.map_append, List.mem_append, List.map_cons, List.map_nil,
+              List.mem_singleton, not_or]
+            at hu
           have := h u hu.1
           simpa [Finsupp.single_apply, Ne.symm hu.2] using this
         · intro h u hu
@@ -223,10 +245,10 @@ def lrf_L (r n : ℕ) : List (Fin r × Fin r × (Fin r × Fin n)) :=
     (List.finRange r).filterMap fun a =>
       if h : s.val < a.val ∧ s.val < r then some ((⟨s.val, h.2⟩ : Fin r), a, (a, s)) else none
 
-theorem lrf_mem_col (s : Fin n) (l : Fin r × Fin r × (Fin r × Fin n)) :
-    (l ∈ (List.finRange r).filterMap fun a =>
-      if h : s.val < a.val ∧ s.val < r then some ((⟨s.val, h.2⟩ : Fin r), a, (a, s)) else none) ↔
-      l.1.val = s.val ∧ s.val < l.2.1.val ∧ l.2.2 = (l.2.1, s) := by
+theorem lrf_mem_col (s : Fin n) (l : Fin r × Fin r × (Fin r × Fin n))
+    : (l ∈ (List.finRange r).filterMap fun a =>
+        if h : s.val < a.val ∧ s.val < r then some ((⟨s.val, h.2⟩ : Fin r), a, (a, s)) else none)
+      ↔ l.1.val = s.val ∧ s.val < l.2.1.val ∧ l.2.2 = (l.2.1, s) := by
   rw [List.mem_filterMap]
   constructor
   · rintro ⟨a, -, ha⟩
@@ -243,8 +265,8 @@ theorem lrf_mem_col (s : Fin n) (l : Fin r × Fin r × (Fin r × Fin n)) :
     congr 2
     exact Fin.ext h1.symm
 
-theorem lrf_mem_L (l : Fin r × Fin r × (Fin r × Fin n)) :
-    l ∈ lrf_L r n ↔ l.1.val = l.2.2.2.val ∧ l.2.2.2.val < l.2.1.val ∧ l.2.2.1 = l.2.1 := by
+theorem lrf_mem_L (l : Fin r × Fin r × (Fin r × Fin n))
+    : l ∈ lrf_L r n ↔ l.1.val = l.2.2.2.val ∧ l.2.2.2.val < l.2.1.val ∧ l.2.2.1 = l.2.1 := by
   unfold lrf_L
   rw [List.mem_flatMap]
   constructor
@@ -258,8 +280,7 @@ theorem lrf_mem_L (l : Fin r × Fin r × (Fin r × Fin n)) :
     rw [lrf_mem_col]
     exact ⟨h1, h2, Prod.ext h3 rfl⟩
 
-theorem lrf_mem_vars (v : Fin r × Fin n) :
-    v ∈ (lrf_L r n).map (·.2.2) ↔ v.2.val < v.1.val := by
+theorem lrf_mem_vars (v : Fin r × Fin n) : v ∈ (lrf_L r n).map (·.2.2) ↔ v.2.val < v.1.val := by
   rw [List.mem_map]
   constructor
   · rintro ⟨l, hl, rfl⟩
@@ -271,8 +292,7 @@ theorem lrf_mem_vars (v : Fin r × Fin n) :
     rw [lrf_mem_L]
     exact ⟨rfl, h, rfl⟩
 
-theorem lrf_pairwise :
-    (lrf_L r n).Pairwise fun l l' => l.2.2 ≠ l'.2.2 ∧ l.2.1 ≠ l'.1 := by
+theorem lrf_pairwise : (lrf_L r n).Pairwise fun l l' => l.2.2 ≠ l'.2.2 ∧ l.2.1 ≠ l'.1 := by
   unfold lrf_L
   rw [List.pairwise_flatMap]
   constructor
@@ -305,8 +325,9 @@ theorem lrf_nodup : ((lrf_L r n).map (·.2.2)).Nodup := by
   rw [List.Nodup, List.pairwise_map]
   exact (lrf_pairwise (r := r) (n := n)).imp fun h => h.1
 
-theorem lrf_wordOf (e d : Fin r × Fin n →₀ ℕ) (h : ∀ (a : Fin r) (s : Fin n), s.val < a.val → d (a, s) = e (a, s)) :
-    (lrf_L r n).map (fun l => (l.1, l.2.1, d l.2.2)) = wordOf e := by
+theorem lrf_wordOf
+    (e d : Fin r × Fin n →₀ ℕ) (h : ∀ (a : Fin r) (s : Fin n), s.val < a.val → d (a, s) = e (a, s))
+    : (lrf_L r n).map (fun l => (l.1, l.2.1, d l.2.2)) = wordOf e := by
   unfold lrf_L wordOf
   rw [List.map_flatMap]
   congr 1
@@ -324,11 +345,13 @@ def lrf_idS (R : Type*) [CommRing R] (r n : ℕ) : Fin r × Fin n → MvPolynomi
 def lrf_ell (R : Type*) [CommRing R] (r n : ℕ) : Fin r × Fin n → MvPolynomial (Fin r × Fin n) R :=
   fun v => C (idFrame R r n v) + if v.2.val < v.1.val then X v else 0
 
-theorem lrf_pt (L : List (Fin r × Fin r × (Fin r × Fin n)))
+theorem lrf_pt
+    (L : List (Fin r × Fin r × (Fin r × Fin n)))
     (hP : L.Pairwise fun l l' => l.2.2 ≠ l'.2.2 ∧ l.2.1 ≠ l'.1)
-    (hM : ∀ l ∈ L, l.1.val = l.2.2.2.val ∧ l.2.2.1 = l.2.1) (v : Fin r × Fin n) :
-    eval (lrf_idS R r n) (lrfc_Phi L (X v)) =
-      C (idFrame R r n v) + if v ∈ L.map (·.2.2) then X v else 0 := by
+    (hM : ∀ l ∈ L, l.1.val = l.2.2.2.val ∧ l.2.2.1 = l.2.1)
+    (v : Fin r × Fin n)
+    : eval (lrf_idS R r n) (lrfc_Phi L (X v))
+      = C (idFrame R r n v) + if v ∈ L.map (·.2.2) then X v else 0 := by
   classical
   induction L using List.reverseRecOn generalizing v with
   | nil => simp [lrfc_Phi_nil, lrf_idS]
@@ -342,12 +365,14 @@ theorem lrf_pt (L : List (Fin r × Fin r × (Fin r × Fin n)))
       intro h
       obtain ⟨x, hx, hxe⟩ := List.mem_map.mp h
       exact (hPl x hx l (by simp)).1 hxe
-    have hmem : ∀ u : Fin r × Fin n, u ∈ (w ++ [l]).map (·.2.2) ↔ (u ∈ w.map (·.2.2) ∨ u = l.2.2) := by
+    have hmem
+        : ∀ u : Fin r × Fin n, u ∈ (w ++ [l]).map (·.2.2) ↔ (u ∈ w.map (·.2.2) ∨ u = l.2.2) := by
       intro u
       simp
     rw [lrfc_Phi_append_single, lrfc_tau, aeval_X]
     by_cases hv : v.1 = l.2.1
-    · rw [ite_eq_left hv, map_add (f := _), map_mul, map_add (f := _), map_mul, ihw v, ihw (l.1, v.2)]
+    · rw [ite_eq_left hv, map_add (f := _), map_mul, map_add (f := _), map_mul, ihw v,
+        ihw (l.1, v.2)]
       have hC : lrfc_Phi w (C (X l.2.2)) = C (X l.2.2 : MvPolynomial (Fin r × Fin n) R) :=
         (lrfc_Phi w).commutes (X l.2.2)
       rw [hC, eval_C]
@@ -385,46 +410,56 @@ theorem lrf_pt (L : List (Fin r × Fin r × (Fin r × Fin n)))
       rw [ite_eq_right hv, add_zero, ihw v]
       simp only [e]
 
-theorem lrf_pt_L (v : Fin r × Fin n) :
-    eval (lrf_idS R r n) (lrfc_Phi (lrf_L r n) (X v)) = lrf_ell R r n v := by
-  rw [lrf_pt (lrf_L r n) lrf_pairwise (fun l hl => ⟨((lrf_mem_L l).1 hl).1, ((lrf_mem_L l).1 hl).2.2⟩) v]
+theorem lrf_pt_L (v : Fin r × Fin n)
+    : eval (lrf_idS R r n) (lrfc_Phi (lrf_L r n) (X v)) = lrf_ell R r n v := by
+  rw [lrf_pt (lrf_L r n) lrf_pairwise
+    (fun l hl => ⟨((lrf_mem_L l).1 hl).1, ((lrf_mem_L l).1 hl).2.2⟩)
+    v]
   simp only [lrf_mem_vars, lrf_ell]
 
-theorem lrf_eval_Phi (F : MvPolynomial (Fin r × Fin n) R) :
-    eval (lrf_idS R r n) (lrfc_Phi (lrf_L r n) (lrfc_iota F)) = eval₂ C (lrf_ell R r n) F := by
-  have h : ((eval (lrf_idS R r n)).comp ((lrfc_Phi (R := R) (lrf_L r n)).toRingHom.comp lrfc_iota)) =
-      eval₂Hom C (lrf_ell R r n) := by
+theorem lrf_eval_Phi (F : MvPolynomial (Fin r × Fin n) R)
+    : eval (lrf_idS R r n) (lrfc_Phi (lrf_L r n) (lrfc_iota F)) = eval₂ C (lrf_ell R r n) F := by
+  have h
+      : ((eval (lrf_idS R r n)).comp ((lrfc_Phi (R := R) (lrf_L r n)).toRingHom.comp lrfc_iota))
+        = eval₂Hom C (lrf_ell R r n) := by
     apply MvPolynomial.ringHom_ext
     · intro c
-      simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, lrfc_iota,
-        map_C, coe_eval₂Hom, eval₂_C]
+      simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe,
+        AlgHom.coe_toRingHom, lrfc_iota, map_C, coe_eval₂Hom, eval₂_C]
       have hC : lrfc_Phi (lrf_L r n) (C (C c)) = C (C c : MvPolynomial (Fin r × Fin n) R) :=
         (lrfc_Phi (lrf_L r n)).commutes (C c)
       rw [hC, eval_C]
     · intro v
-      simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, lrfc_iota,
-        map_X, coe_eval₂Hom, eval₂_X]
+      simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe,
+        AlgHom.coe_toRingHom, lrfc_iota, map_X, coe_eval₂Hom, eval₂_X]
       exact lrf_pt_L v
   exact congrArg (fun φ => φ F) h
 
-theorem lrf_eval_coeffT (d : Fin r × Fin n →₀ ℕ)
-    (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R)) :
-    eval (idFrame R r n) (lrfc_coeffT d G) = AddMonoidAlgebra.coeff (eval (lrf_idS R r n) G) d := by
+theorem lrf_eval_coeffT
+    (d : Fin r × Fin n →₀ ℕ) (G : MvPolynomial (Fin r × Fin n) (MvPolynomial (Fin r × Fin n) R))
+    : eval (idFrame R r n) (lrfc_coeffT d G)
+      = AddMonoidAlgebra.coeff (eval (lrf_idS R r n) G) d := by
   induction G using MvPolynomial.induction_on' with
   | monomial u c =>
     rw [lrfc_coeffT_monomial, eval_monomial, eval_monomial]
-    have h : (u.prod fun i k => lrf_idS R r n i ^ k) = C (u.prod fun i k => idFrame R r n i ^ k) := by
+    have h
+        : (u.prod fun i k => lrf_idS R r n i ^ k) = C (u.prod fun i k => idFrame R r n i ^ k) := by
       simp only [lrf_idS, Finsupp.prod, map_prod, map_pow]
     rw [h, mul_comm c, coeff_C_mul, mul_comm]
-  | add p q hp hq => rw [lrfc_coeffT_add, map_add (f := _), map_add (f := _), AddMonoidAlgebra.coeff_add, hp, hq, Finsupp.add_apply]
+  | add p q hp hq =>
+    rw [lrfc_coeffT_add, map_add (f := _), map_add (f := _), AddMonoidAlgebra.coeff_add, hp, hq,
+      Finsupp.add_apply]
 
 def lrf_off (m : Fin r × Fin n →₀ ℕ) : Fin r × Fin n →₀ ℕ := m.filter fun v => v.2.val < v.1.val
 
-theorem lrf_prod_lower (m : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) :
-    (m.prod fun v k => lrf_ell R r n v ^ k) = monomial (lrf_off m) 1 := by
+theorem lrf_prod_lower (m : Fin r × Fin n →₀ ℕ) (hm : LowerTri m)
+    : (m.prod fun v k => lrf_ell R r n v ^ k) = monomial (lrf_off m) 1 := by
   classical
   rw [← Finsupp.prod_filter_mul_prod_filter_not (fun v : Fin r × Fin n => v.2.val < v.1.val)]
-  have h2 : ((m.filter fun v : Fin r × Fin n => ¬ v.2.val < v.1.val).prod fun v k => lrf_ell R r n v ^ k) = 1 := by
+  have h2
+      : ((m.filter fun v : Fin r × Fin n => ¬ v.2.val < v.1.val).prod fun v k =>
+          lrf_ell R r n v ^ k)
+        = 1 := by
     refine Finset.prod_eq_one fun v hv => ?_
     rw [Finsupp.support_filter, Finset.mem_filter, Finsupp.mem_support_iff] at hv
     have h3 : ¬ v.1.val < v.2.val := fun h => hv.1 (hm v.1 v.2 h)
@@ -432,8 +467,10 @@ theorem lrf_prod_lower (m : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) :
     have h5 : lrf_ell R r n v = 1 := by simp [lrf_ell, idFrame, h4]
     beta_reduce
     rw [h5, one_pow]
-  have h1 : ((m.filter fun v : Fin r × Fin n => v.2.val < v.1.val).prod fun v k => lrf_ell R r n v ^ k) =
-      (m.filter fun v : Fin r × Fin n => v.2.val < v.1.val).prod fun v k => (X v : MvPolynomial (Fin r × Fin n) R) ^ k := by
+  have h1
+      : ((m.filter fun v : Fin r × Fin n => v.2.val < v.1.val).prod fun v k => lrf_ell R r n v ^ k)
+        = (m.filter fun v : Fin r × Fin n => v.2.val < v.1.val).prod fun v k =>
+          (X v : MvPolynomial (Fin r × Fin n) R) ^ k := by
     refine Finset.prod_congr rfl fun v hv => ?_
     rw [Finsupp.support_filter, Finset.mem_filter] at hv
     have h4 : ¬ v.1.val = v.2.val := by omega
@@ -442,8 +479,8 @@ theorem lrf_prod_lower (m : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) :
     rw [h5]
   rw [h1, h2, mul_one, lrf_off, monomial_eq, C_1, one_mul]
 
-theorem lrf_prod_upper (m : Fin r × Fin n →₀ ℕ) (hm : ¬ LowerTri m) :
-    (m.prod fun v k => lrf_ell R r n v ^ k) = 0 := by
+theorem lrf_prod_upper (m : Fin r × Fin n →₀ ℕ) (hm : ¬ LowerTri m)
+    : (m.prod fun v k => lrf_ell R r n v ^ k) = 0 := by
   classical
   unfold LowerTri at hm
   push Not at hm
@@ -455,8 +492,10 @@ theorem lrf_prod_upper (m : Fin r × Fin n →₀ ℕ) (hm : ¬ LowerTri m) :
   beta_reduce
   rw [h5, zero_pow hne]
 
-theorem lrf_unique (m e : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (he : LowerTri e) (hoff : lrf_off m = lrf_off e)
-    (hcol : ∀ s : Fin n, ∑ a : Fin r, m (a, s) = ∑ a : Fin r, e (a, s)) : m = e := by
+theorem lrf_unique
+    (m e : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (he : LowerTri e) (hoff : lrf_off m = lrf_off e)
+    (hcol : ∀ s : Fin n, ∑ a : Fin r, m (a, s) = ∑ a : Fin r, e (a, s))
+    : m = e := by
   classical
   have hlow : ∀ (a : Fin r) (s : Fin n), s.val < a.val → m (a, s) = e (a, s) := by
     intro a s h
@@ -470,7 +509,9 @@ theorem lrf_unique (m e : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (he : Low
   ext ⟨a, s⟩
   by_cases h : a.val = s.val
   · have h1 := hcol s
-    rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a), ← Finset.add_sum_erase _ (fun a => e (a, s)) (Finset.mem_univ a)] at h1
+    rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a),
+        ← Finset.add_sum_erase _ (fun a => e (a, s)) (Finset.mem_univ a)]
+      at h1
     have h2 : ∑ x ∈ Finset.univ.erase a, m (x, s) = ∑ x ∈ Finset.univ.erase a, e (x, s) := by
       refine Finset.sum_congr rfl fun x hx => hne x s ?_
       intro hxs
@@ -478,13 +519,19 @@ theorem lrf_unique (m e : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (he : Low
     omega
   · exact hne a s h
 
-theorem lrf_coeff_ell (ν : Fin n → ℕ) (F : MvPolynomial (Fin r × Fin n) R) (e : Fin r × Fin n →₀ ℕ)
-    (hF : IsWeightedHomogeneous (colW r n) F ν) (he : LowerTri e) (hcol : ∀ s : Fin n, ∑ a : Fin r, e (a, s) = ν s) :
-    AddMonoidAlgebra.coeff (eval₂ C (lrf_ell R r n) F) (lrf_off e) = AddMonoidAlgebra.coeff F e := by
+theorem lrf_coeff_ell
+    (ν : Fin n → ℕ) (F : MvPolynomial (Fin r × Fin n) R) (e : Fin r × Fin n →₀ ℕ)
+    (hF : IsWeightedHomogeneous (colW r n) F ν) (he : LowerTri e)
+    (hcol : ∀ s : Fin n, ∑ a : Fin r, e (a, s) = ν s)
+    : AddMonoidAlgebra.coeff (eval₂ C (lrf_ell R r n) F) (lrf_off e)
+      = AddMonoidAlgebra.coeff F e := by
   classical
   rw [eval₂_eq', coeff_sum]
-  have key : ∀ m ∈ F.support, AddMonoidAlgebra.coeff (C (AddMonoidAlgebra.coeff F m) * ∏ i, lrf_ell R r n i ^ m i) (lrf_off e) =
-      if m = e then AddMonoidAlgebra.coeff F m else 0 := by
+  have key
+      : ∀ m ∈ F.support,
+        AddMonoidAlgebra.coeff (C (AddMonoidAlgebra.coeff F m) * ∏ i, lrf_ell R r n i ^ m i)
+            (lrf_off e)
+          = if m = e then AddMonoidAlgebra.coeff F m else 0 := by
     intro m hm
     have hp : (∏ i, lrf_ell R r n i ^ m i) = m.prod fun v k => lrf_ell R r n v ^ k := by
       rw [Finsupp.prod_fintype _ _ (fun i => pow_zero _)]
@@ -499,7 +546,8 @@ theorem lrf_coeff_ell (ν : Fin n → ℕ) (F : MvPolynomial (Fin r × Fin n) R)
         apply hme
         refine lrf_unique m e hl he hoff fun s => ?_
         rw [hcol s, ← lccomp_weight_colW_apply, hF (mem_support_iff.mp hm)]
-    · rw [lrf_prod_upper m hl, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply, mul_zero, ite_eq_right]
+    · rw [lrf_prod_upper m hl, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply, mul_zero,
+        ite_eq_right]
       rintro rfl
       exact hl he
   rw [Finset.sum_congr rfl key, Finset.sum_ite_eq']

@@ -20,20 +20,29 @@ namespace GoodPlacesAlt
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G]
 
-theorem sum_chars_eq {S : Type} [Fintype S] {Ws : S → Type} [∀ s, AddCommGroup (Ws s)] [∀ s, Module K (Ws s)]
+theorem sum_chars_eq
+    {S : Type} [Fintype S]
+    {Ws : S → Type} [∀ s, AddCommGroup (Ws s)] [∀ s, Module K (Ws s)]
     (τ : ∀ s, Representation K G (Ws s)) (Xc : Finset (G → K))
-    (hinj : ∀ s t, Formalism.IndefR.TransferLatticeStatement.charOf (τ s) = Formalism.IndefR.TransferLatticeStatement.charOf (τ t) → s = t) (hX : CharsX τ Xc)
-    {M : Type} [AddCommMonoid M] (F : (G → K) → M) :
-    ∑ t, F (Formalism.IndefR.TransferLatticeStatement.charOf (τ t)) = ∑ χ ∈ Xc, F χ := by
+    (hinj : ∀ s t,
+      Formalism.IndefR.TransferLatticeStatement.charOf (τ s)
+          = Formalism.IndefR.TransferLatticeStatement.charOf (τ t)
+        → s = t)
+    (hX : CharsX τ Xc)
+    {M : Type} [AddCommMonoid M]
+    (F : (G → K) → M)
+    : ∑ t, F (Formalism.IndefR.TransferLatticeStatement.charOf (τ t)) = ∑ χ ∈ Xc, F χ := by
   classical
-  have himg : Finset.univ.image (fun t => Formalism.IndefR.TransferLatticeStatement.charOf (τ t)) = Xc := by
+  have himg
+      : Finset.univ.image (fun t => Formalism.IndefR.TransferLatticeStatement.charOf (τ t))
+        = Xc := by
     ext χ
     rw [hX χ]
     simp
   rw [← himg, Finset.sum_image (fun s _ t _ h => hinj s t h)]
 
-theorem mulVec_sum_smul {n : ℕ} (c : G → K) (M : G → Matrix (Fin n) (Fin n) K) (x : Fin n → K) :
-    (∑ g, c g • M g) *ᵥ x = ∑ g, c g • (M g *ᵥ x) := by
+theorem mulVec_sum_smul {n : ℕ} (c : G → K) (M : G → Matrix (Fin n) (Fin n) K) (x : Fin n → K)
+    : (∑ g, c g • M g) *ᵥ x = ∑ g, c g • (M g *ᵥ x) := by
   classical
   have key : ∀ s : Finset G, (∑ g ∈ s, c g • M g) *ᵥ x = ∑ g ∈ s, c g • (M g *ᵥ x) := by
     intro s
@@ -42,22 +51,24 @@ theorem mulVec_sum_smul {n : ℕ} (c : G → K) (M : G → Matrix (Fin n) (Fin n
     · intro a s ha ih
       rw [Finset.sum_insert ha, Finset.sum_insert ha, Matrix.add_mulVec, ← ih]
       first
-        | rw [Matrix.smul_mulVec]
-        | rw [Matrix.smul_mulVec_assoc]
-        | simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc]
+      | rw [Matrix.smul_mulVec]
+      | rw [Matrix.smul_mulVec_assoc]
+      | simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc]
   exact key Finset.univ
 
-theorem cpt_sum_smul (σ : K →+* ℂ) {n : ℕ} (c : G → K) (y : G → Fin n → K) :
-    cpt σ (∑ g, c g • y g) = ∑ g, σ (c g) • cpt σ (y g) := by
+theorem cpt_sum_smul (σ : K →+* ℂ) {n : ℕ} (c : G → K) (y : G → Fin n → K)
+    : cpt σ (∑ g, c g • y g) = ∑ g, σ (c g) • cpt σ (y g) := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [cpt, Finset.sum_apply, map_sum]
+  simp [cpt, Finset.sum_apply, map_sum]
 
-theorem sum_eq_one_of {E : Type} [AddCommGroup E] [Module ℂ E] (σ : K →+* ℂ) {n : ℕ}
-    (f : (Fin n → ℂ) →ₗ[ℂ] E) (hf : Function.Injective f) (ρ : G → Matrix (Fin n) (Fin n) K)
+theorem sum_eq_one_of
+    {E : Type} [AddCommGroup E] [Module ℂ E]
+    (σ : K →+* ℂ)
+    {n : ℕ} (f : (Fin n → ℂ) →ₗ[ℂ] E) (hf : Function.Injective f) (ρ : G → Matrix (Fin n) (Fin n) K)
     (act : G → E →ₗ[ℂ] E) (hρ : ∀ g x, f (cpt σ (ρ g *ᵥ x)) = act g (f (cpt σ x)))
-    (c : G → K) (hfix : ∀ x, ∑ g, σ (c g) • act g (f (cpt σ x)) = f (cpt σ x)) :
-    ∑ g, c g • ρ g = 1 := by
+    (c : G → K) (hfix : ∀ x, ∑ g, σ (c g) • act g (f (cpt σ x)) = f (cpt σ x))
+    : ∑ g, c g • ρ g = 1 := by
   apply Matrix.toLin'.injective
   apply LinearMap.ext
   intro x
@@ -75,8 +86,10 @@ end GoodPlacesAlt
 
 namespace In
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ}
-  (I : In K G Pl0 T m)
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {m : ℕ} (I : In K G Pl0 T m)
 
 end In
 

@@ -11,7 +11,8 @@ public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.Projecti
 namespace ReciprocityTheory.AnForm.M.PLAux
 
 open MeasureTheory FinHolAtlas Filter Topology
-open ReciprocityTheory.AnForm.A (hypInclAt densHypAt densV PoincareLelongData log_norm_integral_formula_snc)
+open ReciprocityTheory.AnForm.A
+  (hypInclAt densHypAt densV PoincareLelongData log_norm_integral_formula_snc)
 open scoped ContDiff
 
 noncomputable section
@@ -21,26 +22,30 @@ variable {e : ℕ} {X : Type} [TopologicalSpace X] [T2Space X] [CompactSpace X]
 theorem isCompatChart_chart (A : FinHolAtlas e X) (j : Fin A.n) : IsCompatChart A (A.chart j) :=
   fun k => ⟨A.holo k j, A.holo j k⟩
 
-theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ)
+theorem pl_chart
+    (A : FinHolAtlas (e + 1) X)
+    (L : LocPot X)
+    (s : X → X → ℂ)
     (hL : IsPotential A L) (hs : IsSection A L s)
-    (hℓ : ∀ Φ' : Fin (e + 1) → LocPot X, (∀ i, IsPotential A (Φ' i)) →
-      MIntegrable A Φ' (logNormSec L s))
-    (Φ : Fin e → LocPot X) (hΦ : ∀ k, IsPotential A (Φ k)) (x : X)
-    (ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ)) (hψ : IsCompatChart A ψ)
-    (hψL : ψ.source ⊆ L.U x) (u : X → ℂ) (hu : A.HoloOn ψ.source u)
-    (hu0 : ∀ p ∈ ψ.source, u p ≠ 0) (M : Fin (e + 1) → ℤ)
-    (hsu : ∀ p ∈ ψ.source, s x p = u p * ∏ i, ψ p i ^ M i) {V : Set X} (hV : IsOpen V)
-    (hVψ : V ⊆ ψ.source) (hVΦ : ∀ k, V ⊆ (Φ k).U x) {v : X → ℝ} (hv : A.Smooth v)
-    (hvV : tsupport v ⊆ V) :
-    mInt A (Fin.cons (LocPot.ofFun v) Φ) (logNormSec L s) =
-      ∑ i, (M i : ℝ) * (∫ w, chartExt ψ v (hypInclAt i w) *
-        densHypAt i (fun k => (Φ k).φ x ∘ ψ.symm) w) - mInt A (Fin.cons L Φ) v := by
+    (hℓ : ∀ Φ' : Fin (e + 1) → LocPot X,
+      (∀ i, IsPotential A (Φ' i)) → MIntegrable A Φ' (logNormSec L s))
+    (Φ : Fin e → LocPot X) (hΦ : ∀ k, IsPotential A (Φ k))
+    (x : X) (ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ))
+    (hψ : IsCompatChart A ψ) (hψL : ψ.source ⊆ L.U x)
+    (u : X → ℂ) (hu : A.HoloOn ψ.source u) (hu0 : ∀ p ∈ ψ.source, u p ≠ 0)
+    (M : Fin (e + 1) → ℤ) (hsu : ∀ p ∈ ψ.source, s x p = u p * ∏ i, ψ p i ^ M i)
+    {V : Set X} (hV : IsOpen V) (hVψ : V ⊆ ψ.source) (hVΦ : ∀ k, V ⊆ (Φ k).U x)
+    {v : X → ℝ} (hv : A.Smooth v) (hvV : tsupport v ⊆ V)
+    : mInt A (Fin.cons (LocPot.ofFun v) Φ) (logNormSec L s)
+      = ∑ i, (M i : ℝ) * (∫ w, chartExt ψ v (hypInclAt i w) *
+          densHypAt i (fun k => (Φ k).φ x ∘ ψ.symm) w)
+        - mInt A (Fin.cons L Φ) v := by
   classical
-  have mInt_congr {B : FinHolAtlas (e + 1) X} {P Q : Fin (e + 1) → LocPot X}
-      {g g' : X → ℝ}
+  have mInt_congr
+      {B : FinHolAtlas (e + 1) X} {P Q : Fin (e + 1) → LocPot X} {g g' : X → ℝ}
       (h : ∀ j, ∀ y ∈ (B.chart j).target,
-        g ((B.chart j).symm y) * locDens B P j y =
-          g' ((B.chart j).symm y) * locDens B Q j y) : mInt B P g = mInt B Q g' := by
+        g ((B.chart j).symm y) * locDens B P j y = g' ((B.chart j).symm y) * locDens B Q j y)
+      : mInt B P g = mInt B Q g' := by
     unfold mInt
     split_ifs
     · unfold integralWith
@@ -50,17 +55,21 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
       rw [h j y hy]
     · rfl
 
-  have hcomp : ∀ i, IsCompatChart A
-      ((Fin.cons ψ A.chart : Fin (A.n + 1) → OpenPartialHomeomorph X (Fin (e + 1) → ℂ)) i) := by
+  have hcomp
+      : ∀ i,
+        IsCompatChart A
+          ((Fin.cons ψ A.chart : Fin (A.n + 1) → OpenPartialHomeomorph X (Fin (e + 1) → ℂ)) i) := by
     intro i
     refine Fin.cases ?_ (fun j => ?_) i
     · simpa using hψ
     · simpa using isCompatChart_chart A j
-  obtain ⟨A', hAA', hin, -⟩ := atlasOfCompat A _ hcomp
-    (fun p => ⟨(A.cover p).choose.succ, by simpa using (A.cover p).choose_spec⟩)
-  have mIntAtlasIndep (P : Fin (e + 1) → LocPot X) (hP : ∀ i, IsPotential A (P i))
-      (g : X → ℝ) (hg : MIntegrable A P g) :
-      MIntegrable A' P g ∧ mInt A P g = mInt A' P g := by
+  obtain ⟨A', hAA', hin, -⟩ :=
+    atlasOfCompat A _ hcomp
+      (fun p => ⟨(A.cover p).choose.succ, by simpa using (A.cover p).choose_spec⟩)
+  have mIntAtlasIndep
+      (P : Fin (e + 1) → LocPot X) (hP : ∀ i, IsPotential A (P i))
+      (g : X → ℝ) (hg : MIntegrable A P g)
+      : MIntegrable A' P g ∧ mInt A P g = mInt A' P g := by
     have hg' := mIntegrable_of_compatible hAA' P hP hg
     refine ⟨hg', ?_⟩
     have hU := compatible_unionAtlas_left A A' hAA'
@@ -69,8 +78,8 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
     have hP' := fun i => isPotential_of_compatible hAA' (hP i)
     obtain ⟨R⟩ := existsPartition A
     obtain ⟨R'⟩ := existsPartition A'
-    rw [mIntEq A R P hP g hg, mIntEq A' R' P hP' g hg',
-      ← integralWith_extendLeft hAA' R P g, ← integralWith_extendRight hAA' R' P g]
+    rw [mIntEq A R P hP g hg, mIntEq A' R' P hP' g hg', ← integralWith_extendLeft hAA' R P g,
+      ← integralWith_extendRight hAA' R' P g]
     exact integralWithIndep _ _ _ P hPU g hgU
   obtain ⟨j0, hj0⟩ := hin 0
   simp only [Fin.cons_zero] at hj0
@@ -116,7 +125,8 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
 
   have hD0 : ∀ y ∈ ψ.target, ψ.symm y ∉ tsupport v → locDens A' Φv j0 y = 0 := by
     intro y hy hp
-    exact locDens_cons_ofFun_eq_zero (A := A') v Φ j0 (by rw [hj0]; exact hy) (by rw [hj0]; exact hp)
+    exact locDens_cons_ofFun_eq_zero (A := A') v Φ j0 (by rw [hj0]; exact hy)
+      (by rw [hj0]; exact hp)
   have hDK : ∀ y ∈ ψ.target, y ∉ ψ '' tsupport v → locDens A' Φv j0 y = 0 := by
     intro y hy hyK
     exact hD0 y hy fun hp => hyK ⟨_, hp, ψ.right_inv hy⟩
@@ -130,11 +140,15 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
       rw [h0, mul_zero, mul_zero]
   have hmiρ : MIntegrable A' Φv (fun p => ρ p * ℓ p) :=
     mIntegrableMul A' Φv ℓ ρ hℓ' (smooth_continuous hρs)
-  have hc : mInt A' Φv (fun p => ρ p * ℓ p) =
-      ∫ y in ψ.target, ρ (ψ.symm y) * ℓ (ψ.symm y) * locDens A' Φv j0 y := by
+  have hc
+      : mInt A' Φv (fun p => ρ p * ℓ p)
+        = ∫ y in ψ.target, ρ (ψ.symm y) * ℓ (ψ.symm y) * locDens A' Φv j0 y := by
     unfold mInt
-    rw [dite_eq_left hne, mIntLocalize A' hne.some Φv hΦv' j0 (fun p => ρ p * ℓ p)
-      (by rw [hj0]; exact tsupport_mul_subset_left.trans hρsupp) hmiρ, hj0]
+    rw [dite_eq_left hne,
+      mIntLocalize A' hne.some Φv hΦv' j0
+        (fun p => ρ p * ℓ p)
+        (by rw [hj0]; exact tsupport_mul_subset_left.trans hρsupp) hmiρ,
+      hj0]
 
   have hG1 : IntegrableOn (fun y => ρ (ψ.symm y) * ℓ (ψ.symm y) * locDens A' Φv j0 y) ψ.target := by
     have h := hmiρ j0 _ (by rw [hj0]; exact hKT) hKc
@@ -152,29 +166,29 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
     show w (ψ.symm y) * locDens A' Φv j0 y = 0
     rw [hDK y hy hyK, mul_zero]
 
-  have hae : ∀ᵐ y ∂(volume.restrict ψ.target),
-      Real.log ‖u (ψ.symm y) * ∏ i, y i ^ M i‖ * locDens A' Φv j0 y =
-        ρ (ψ.symm y) * ℓ (ψ.symm y) * locDens A' Φv j0 y + w (ψ.symm y) * locDens A' Φv j0 y := by
+  have hae
+      : ∀ᵐ y ∂(volume.restrict ψ.target),
+        Real.log ‖u (ψ.symm y) * ∏ i, y i ^ M i‖ * locDens A' Φv j0 y =
+          ρ (ψ.symm y) * ℓ (ψ.symm y) * locDens A' Φv j0 y + w (ψ.symm y) * locDens A' Φv j0 y := by
     filter_upwards [ae_restrict_mem ψ.open_target.measurableSet,
       ae_restrict_of_ae ae_coord_ne_zero] with y hy hy0
     by_cases hp : ψ.symm y ∈ tsupport v
     · have hps : ψ.symm y ∈ ψ.source := hvs hp
       have hψp : ψ (ψ.symm y) = y := ψ.right_inv hy
-      have hprod : ∏ i, y i ^ M i ≠ 0 :=
-        Finset.prod_ne_zero_iff.2 fun i _ => zpow_ne_zero _ (hy0 i)
+      have hprod : ∏ i, y i ^ M i ≠ 0 := Finset.prod_ne_zero_iff.2 fun i _ => zpow_ne_zero _ (hy0 i)
       have hsx : s x (ψ.symm y) = u (ψ.symm y) * ∏ i, y i ^ M i := by rw [hsu _ hps, hψp]
       have hsx0 : s x (ψ.symm y) ≠ 0 := by rw [hsx]; exact mul_ne_zero (hu0 _ hps) hprod
       have hℓp : ℓ (ψ.symm y) = Real.log ‖s x (ψ.symm y)‖ - L.φ x (ψ.symm y) :=
         logNormSecLocal A L s x _ hs (hψL hps) hsx0
-      have hwp : w (ψ.symm y) = L.φ x (ψ.symm y) :=
-        hwL _ hps (by rw [hψp]; exact hKO ⟨_, hp, hψp⟩)
+      have hwp : w (ψ.symm y) = L.φ x (ψ.symm y) := hwL _ hps (by rw [hψp]; exact hKO ⟨_, hp, hψp⟩)
       rw [hρ1 _ hp, hℓp, hwp, hsx]
       ring
     · rw [hD0 y hy hp]
       ring
-  have hsplit : ∫ y in ψ.target, ρ (ψ.symm y) * ℓ (ψ.symm y) * locDens A' Φv j0 y =
-      (∫ y in ψ.target, Real.log ‖u (ψ.symm y) * ∏ i, y i ^ M i‖ * locDens A' Φv j0 y) -
-        ∫ y in ψ.target, w (ψ.symm y) * locDens A' Φv j0 y := by
+  have hsplit
+      : ∫ y in ψ.target, ρ (ψ.symm y) * ℓ (ψ.symm y) * locDens A' Φv j0 y
+        = (∫ y in ψ.target, Real.log ‖u (ψ.symm y) * ∏ i, y i ^ M i‖ * locDens A' Φv j0 y)
+          - ∫ y in ψ.target, w (ψ.symm y) * locDens A' Φv j0 y := by
     have h := integral_congr_ae hae
     rw [integral_add hG1 hG2] at h
     rw [h]
@@ -186,27 +200,33 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
     rintro _ ⟨p, hp, rfl⟩
     exact ⟨ψ.map_source (hVψ hp), by simpa [ψ.left_inv (hVψ hp)] using hVΦ k hp⟩
   have hu' : DifferentiableOn ℂ (u ∘ ψ.symm) (ψ '' V) := fun y hy =>
-    (analyticAt_compat_fun hψ hu (hU'T hy) (ψ.map_target (hU'T hy))).differentiableAt.differentiableWithinAt
+    (analyticAt_compat_fun hψ hu (hU'T hy)
+      (ψ.map_target (hU'T hy))).differentiableAt.differentiableWithinAt
   have hu'0 : ∀ y ∈ ψ '' V, (u ∘ ψ.symm) y ≠ 0 := fun y hy => hu0 _ (ψ.map_target (hU'T hy))
-  have hyp : PoincareLelongData (ψ '' V) (chartExt ψ v) (fun k => (Φ k).φ x ∘ ψ.symm) :=
-    ⟨hU', hv'C.of_le (WithTop.coe_le_coe.2 le_top),
-      hKc.of_isClosed_subset (isClosed_tsupport _) hv'K, hv'K.trans hKU, hφ'⟩
-  obtain ⟨-, hPL⟩ := log_norm_integral_formula_snc e M (ψ '' V) (chartExt ψ v) _ (u ∘ ψ.symm) hyp hu' hu'0
-  have hdens0 : ∀ y, y ∉ ψ '' tsupport v →
-      densV (chartExt ψ v) (fun k => (Φ k).φ x ∘ ψ.symm) y = 0 := by
+  have hyp : PoincareLelongData (ψ '' V) (chartExt ψ v) (fun k => (Φ k).φ x ∘ ψ.symm) := ⟨
+    hU',
+    hv'C.of_le (WithTop.coe_le_coe.2 le_top),
+    hKc.of_isClosed_subset (isClosed_tsupport _) hv'K,
+    hv'K.trans hKU,
+    hφ'
+  ⟩
+  obtain ⟨-, hPL⟩ :=
+    log_norm_integral_formula_snc e M (ψ '' V) (chartExt ψ v) _ (u ∘ ψ.symm) hyp hu' hu'0
+  have hdens0
+      : ∀ y, y ∉ ψ '' tsupport v → densV (chartExt ψ v) (fun k => (Φ k).φ x ∘ ψ.symm) y = 0 := by
     intro y hy
     apply maDens_cons_eq_zero
     filter_upwards [hKc.isClosed.isOpen_compl.mem_nhds hy] with y' hy'
     exact image_eq_zero_of_notMem_tsupport fun h => hy' (hv'K h)
-  have hDeq : ∀ y ∈ ψ.target,
-      locDens A' Φv j0 y = densV (chartExt ψ v) (fun k => (Φ k).φ x ∘ ψ.symm) y := by
+  have hDeq
+      : ∀ y ∈ ψ.target,
+        locDens A' Φv j0 y = densV (chartExt ψ v) (fun k => (Φ k).φ x ∘ ψ.symm) y := by
     intro y hy
     by_cases hyK : y ∈ ψ '' tsupport v
     · obtain ⟨p, hp, hpy⟩ := hyK
       have hps : p ∈ ψ.source := hvs hp
       have hsy : ψ.symm y = p := by rw [← hpy, ψ.left_inv hps]
-      rw [locDensBase A' Φv hΦv' j0 y (by rw [hj0]; exact hy)
-        (Fin.cons p (fun _ => x)) ?_]
+      rw [locDensBase A' Φv hΦv' j0 y (by rw [hj0]; exact hy) (Fin.cons p (fun _ => x)) ?_]
       · unfold densV
         apply maDens_congr_germ
         intro i
@@ -220,14 +240,16 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
         · simp [hΦvd, LocPot.ofFun]
         · simpa [hΦvd, hj0, hsy] using hVΦ k (hvV hp)
     · rw [hDK y hy hyK, hdens0 y hyK]
-  have he : ∫ y in ψ.target, Real.log ‖u (ψ.symm y) * ∏ i, y i ^ M i‖ * locDens A' Φv j0 y =
-      ∑ i, (M i : ℝ) * ∫ w, chartExt ψ v (hypInclAt i w) *
-        densHypAt i (fun k => (Φ k).φ x ∘ ψ.symm) w := by
+  have he
+      : ∫ y in ψ.target, Real.log ‖u (ψ.symm y) * ∏ i, y i ^ M i‖ * locDens A' Φv j0 y
+        = ∑ i, (M i : ℝ) * ∫ w, chartExt ψ v (hypInclAt i w) *
+            densHypAt i (fun k => (Φ k).φ x ∘ ψ.symm) w := by
     rw [← hPL]
-    calc _ = ∫ y in ψ.target, Real.log ‖(u ∘ ψ.symm) y * ∏ i, y i ^ M i‖ *
+    calc
+      _ = ∫ y in ψ.target, Real.log ‖(u ∘ ψ.symm) y * ∏ i, y i ^ M i‖ *
           densV (chartExt ψ v) (fun k => (Φ k).φ x ∘ ψ.symm) y :=
-          setIntegral_congr_fun ψ.open_target.measurableSet (fun y hy => by
-            simp only [Function.comp_apply]; rw [hDeq y hy])
+        setIntegral_congr_fun ψ.open_target.measurableSet
+          (fun y hy => by simp only [Function.comp_apply]; rw [hDeq y hy])
       _ = _ := by
         refine setIntegral_eq_integral_of_forall_compl_eq_zero fun y hy => ?_
         have hyK : y ∉ ψ '' tsupport v := fun h => hy (hKT h)
@@ -245,24 +267,28 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
     · exact hΦ k
   have hf1 : ∫ y in ψ.target, w (ψ.symm y) * locDens A' Φv j0 y = mInt A' Φv w := by
     unfold mInt
-    rw [dite_eq_left hne, mIntLocalize A' hne.some Φv hΦv' j0 w (by rw [hj0]; exact hwsupp) hmiw, hj0]
+    rw [dite_eq_left hne, mIntLocalize A' hne.some Φv hΦv' j0 w (by rw [hj0]; exact hwsupp) hmiw,
+      hj0]
   have hf2 : mInt A' Φv w = mInt A' (Fin.cons (LocPot.ofFun w) Φ) v := by
     let Φw : Fin (e + 1) → LocPot X := Fin.cons (LocPot.ofFun w) Φ
     let φ : Fin e → (Fin (e + 1) → ℂ) → ℝ := fun k => (Φ k).φ x ∘ ψ.symm
     have hv' := smoothOn_of_compatible hAA' isOpen_univ hv
-    have hΦw' : ∀ i, IsPotential A' (Φw i) :=
-      fun i => isPotential_of_compatible hAA' (hΦw i)
+    have hΦw' : ∀ i, IsPotential A' (Φw i) := fun i => isPotential_of_compatible hAA' (hΦw i)
     have hmi := mIntegrableCont A' Φw hΦw' v (smooth_continuous hv')
     have hloc : mInt A' Φw v = ∫ y in ψ.target, v (ψ.symm y) * locDens A' Φw j0 y := by
       rw [mIntEq A' hne.some Φw hΦw' v hmi,
         mIntLocalize A' hne.some Φw hΦw' j0 v (by rw [hj0]; exact hvs) hmi, hj0]
-    have hparts : ReciprocityTheory.AnForm.A.PartsHyp φ (chartExt ψ v) (w ∘ ψ.symm) (ψ '' V) :=
-      ⟨hU', hyp.2.1.contDiffOn, hyp.2.2.1, hyp.2.2.2.1,
-        ((contDiffOn_compat hψ isOpen_univ hws).mono fun y hy => ⟨hU'T hy, Set.mem_univ _⟩).of_le
-          (WithTop.coe_le_coe.2 le_top),
-        fun k => (hφ' k).of_le (WithTop.coe_le_coe.2 le_top)⟩
-    have hsymm := (ReciprocityTheory.AnForm.A.parts_thm e φ (chartExt ψ v) (w ∘ ψ.symm)
-      (ψ '' V) hparts).2.2.2.2
+    have hparts : ReciprocityTheory.AnForm.A.PartsHyp φ (chartExt ψ v) (w ∘ ψ.symm) (ψ '' V) := ⟨
+      hU',
+      hyp.2.1.contDiffOn,
+      hyp.2.2.1,
+      hyp.2.2.2.1,
+      ((contDiffOn_compat hψ isOpen_univ hws).mono fun y hy => ⟨hU'T hy, Set.mem_univ _⟩).of_le
+        (WithTop.coe_le_coe.2 le_top),
+      fun k => (hφ' k).of_le (WithTop.coe_le_coe.2 le_top)
+    ⟩
+    have hsymm :=
+      (ReciprocityTheory.AnForm.A.parts_thm e φ (chartExt ψ v) (w ∘ ψ.symm) (ψ '' V) hparts).2.2.2.2
     rw [← hf1, show Fin.cons (LocPot.ofFun w) Φ = Φw from rfl, hloc]
     calc
       _ = ∫ y in ψ '' V, w (ψ.symm y) * locDens A' Φv j0 y := by
@@ -292,14 +318,14 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
           funext i z
           refine Fin.cases ?_ (fun k => ?_) i <;> rfl
         simp only [chartExt, Set.indicator_of_mem (hU'T hy), Function.comp_apply]
-        exact congrArg (fun d => v (ψ.symm y) * d)
-          (hd.trans (congrArg (fun f => maDens f y) hφw)).symm
+        exact
+          congrArg (fun d => v (ψ.symm y) * d) (hd.trans (congrArg (fun f => maDens f y) hφw)).symm
       _ = _ := by
         symm
         refine setIntegral_eq_of_subset_of_forall_sdiff_eq_zero ψ.open_target.measurableSet hU'T ?_
         rintro y ⟨hy, hyV⟩
-        have h0 : v (ψ.symm y) = 0 := image_eq_zero_of_notMem_tsupport fun hp =>
-          hyV ⟨_, hvV hp, ψ.right_inv hy⟩
+        have h0 : v (ψ.symm y) = 0 :=
+          image_eq_zero_of_notMem_tsupport fun hp => hyV ⟨_, hvV hp, ψ.right_inv hy⟩
         rw [h0, zero_mul]
   have hf3 : mInt A' (Fin.cons (LocPot.ofFun w) Φ) v = mInt A (Fin.cons (LocPot.ofFun w) Φ) v :=
     ((mIntAtlasIndep _ hΦw v (mIntegrableCont A _ hΦw v (smooth_continuous hv))).2).symm
@@ -312,8 +338,8 @@ theorem pl_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ
       have hpt : (A.chart j).symm y ∈ tsupport v := subset_tsupport _ hp
       have hps := hvs hpt
       let base : Fin (e + 1) → X := Fin.cons x (fun _ => (A.chart j).symm y)
-      have hbase : ∀ i, (A.chart j).symm y ∈
-          ((Fin.cons L Φ : Fin (e + 1) → LocPot X) i).U (base i) := by
+      have hbase
+          : ∀ i, (A.chart j).symm y ∈ ((Fin.cons L Φ : Fin (e + 1) → LocPot X) i).U (base i) := by
         intro i
         refine Fin.cases ?_ (fun k => ?_) i
         · exact hψL hps

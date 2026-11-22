@@ -9,11 +9,12 @@ open scoped InnerProductSpace
 
 namespace PositivityTheory.CW.CasimirNonnegative
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {E : Fin n → Fin n → Module.End ℂ V}
 
-theorem casK_symm (hU : IsInfUnitary ε E) (x y : V) :
-    ⟪casimirK ε E x, y⟫_ℂ = ⟪x, casimirK ε E y⟫_ℂ := by
+theorem casK_symm (hU : IsInfUnitary ε E) (x y : V)
+    : ⟪casimirK ε E x, y⟫_ℂ = ⟪x, casimirK ε E y⟫_ℂ := by
   unfold casimirK
   simp only [LinearMap.sum_apply, Module.End.mul_apply, sum_inner, inner_sum]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b hb => ?_
@@ -44,11 +45,15 @@ theorem c2b : CardSubmodulesAndLinearEquivBounds := by
     exact casK_symm hU x y
   have hn : Module.finrank ℂ S = Module.finrank ℂ S := rfl
   have hsum := (hT.eigenvectorBasis hn).sum_repr ⟨v, hvS⟩
-  have hv : v = ∑ i, ((hT.eigenvectorBasis hn).repr ⟨v, hvS⟩ i) • ((hT.eigenvectorBasis hn i : S) : V) := by
-    have h0 := congrArg Subtype.val hsum
-    simpa using h0.symm
+  have hv
+      : v
+        = ∑ i, ((hT.eigenvectorBasis hn).repr ⟨v, hvS⟩ i) • ((hT.eigenvectorBasis hn i : S) : V) :=
+    by
+      have h0 := congrArg Subtype.val hsum
+      simpa using h0.symm
   rw [hv]
-  refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨hT.eigenvalues hn i, ?_⟩)
+  refine Submodule.sum_mem _ fun i _ =>
+    Submodule.smul_mem _ _ (Submodule.subset_span ⟨hT.eigenvalues hn i, ?_⟩)
   show casimirK ε E (hT.eigenvectorBasis hn i : V) = ((hT.eigenvalues hn i : ℝ) : ℂ) • (hT.eigenvectorBasis hn i : V)
   exact congrArg Subtype.val (hT.apply_eigenvectorBasis hn i)
 

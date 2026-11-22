@@ -28,11 +28,9 @@ namespace PositivityTheory.SphericalProduct
 theorem jacquet_hecke (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] : A2 G :=
   GlobalTheory.T.jacquet_projection_hecke_holds G
 
-theorem iwahori_u : IwahoriU :=
-  GlobalTheory.T.iwahori_unipotent_datum
+theorem iwahori_u : IwahoriU := GlobalTheory.T.iwahori_unipotent_datum
 
-theorem dom_u : DomU :=
-  GlobalTheory.T.dominant_unipotent_contraction
+theorem dom_u : DomU := GlobalTheory.T.dominant_unipotent_contraction
 
 end PositivityTheory.SphericalProduct
 

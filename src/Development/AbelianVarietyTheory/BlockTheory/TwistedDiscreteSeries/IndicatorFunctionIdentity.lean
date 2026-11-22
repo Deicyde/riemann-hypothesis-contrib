@@ -25,15 +25,16 @@ private lemma isOpen_stdLat : IsOpen (stdLat k n : Set (n → k)) := by
 
 theorem isOpen_lat (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice k] : IsOpen (L : Set (n → k)) := by
   obtain ⟨g, rfl⟩ := exists_smul_lat (stdLat k n) L
-  have e : ((g • stdLat k n : Submodule 𝒪[k] (n → k)) : Set (n → k)) =
-      (fun x => (g⁻¹ : GL n k).val *ᵥ x) ⁻¹' (stdLat k n : Set (n → k)) := by
+  have e
+      : ((g • stdLat k n : Submodule 𝒪[k] (n → k)) : Set (n → k))
+        = (fun x => (g⁻¹ : GL n k).val *ᵥ x) ⁻¹' (stdLat k n : Set (n → k)) := by
     ext x
     exact mem_smul_iff
   rw [e]
   exact isOpen_stdLat.preimage (Continuous.matrix_mulVec continuous_const continuous_id)
 
-theorem maps_std_iff (x : Matrix n n' k) :
-    (∀ y ∈ stdLat k n', x *ᵥ y ∈ stdLat k n) ↔ ∀ i j, x i j ∈ 𝒪[k] := by
+theorem maps_std_iff (x : Matrix n n' k)
+    : (∀ y ∈ stdLat k n', x *ᵥ y ∈ stdLat k n) ↔ ∀ i j, x i j ∈ 𝒪[k] := by
   constructor
   · intro H i j
     have h1 : (Pi.single j 1 : n' → k) ∈ stdLat k n' := by
@@ -51,10 +52,12 @@ theorem maps_std_iff (x : Matrix n n' k) :
     simp only [Matrix.mulVec, dotProduct]
     exact sum_mem fun j _ => mul_mem (H i j) (hy j)
 
-theorem maps_smul_iff (g : GL n' k) (h : GL n k) (S : Submodule 𝒪[k] (n' → k)) (L : Submodule 𝒪[k] (n → k))
-    (x : Matrix n n' k) :
-    (∀ y ∈ g • S, x *ᵥ y ∈ h • L) ↔ ∀ y ∈ S, ((h⁻¹ : GL n k).val * x * g.val) *ᵥ y ∈ L := by
-  have key : ∀ y : n' → k, ((h⁻¹ : GL n k).val * x * g.val) *ᵥ y = (h⁻¹ : GL n k) • (x *ᵥ (g • y)) := by
+theorem maps_smul_iff
+    (g : GL n' k) (h : GL n k) (S : Submodule 𝒪[k] (n' → k)) (L : Submodule 𝒪[k] (n → k))
+    (x : Matrix n n' k)
+    : (∀ y ∈ g • S, x *ᵥ y ∈ h • L) ↔ ∀ y ∈ S, ((h⁻¹ : GL n k).val * x * g.val) *ᵥ y ∈ L := by
+  have key
+      : ∀ y : n' → k, ((h⁻¹ : GL n k).val * x * g.val) *ᵥ y = (h⁻¹ : GL n k) • (x *ᵥ (g • y)) := by
     intro y
     simp only [Units.smul_def, Matrix.smul_eq_mulVec, Matrix.mulVec_mulVec, Matrix.mul_assoc]
   constructor
@@ -90,11 +93,17 @@ private lemma exists_sideMul_preimage_integral (S : Submodule 𝒪[k] (n' → k)
     ∀ i j, ((h⁻¹ : GL n k).val * x * g.val) i j ∈ 𝒪[k]
   rw [maps_smul_iff, maps_std_iff]
 
-theorem hom_lat (S : Submodule 𝒪[k] (n' → k)) (L : Submodule 𝒪[k] (n → k)) [S.IsFullLattice k] [L.IsFullLattice k] :
-    IsCompact {x : Matrix n n' k | ∀ y ∈ S, x *ᵥ y ∈ L} ∧ IsOpen {x : Matrix n n' k | ∀ y ∈ S, x *ᵥ y ∈ L} := by
+theorem hom_lat
+    (S : Submodule 𝒪[k] (n' → k)) (L : Submodule 𝒪[k] (n → k))
+    [S.IsFullLattice k] [L.IsFullLattice k]
+    : IsCompact {x : Matrix n n' k | ∀ y ∈ S, x *ᵥ y ∈ L}
+      ∧ IsOpen {x : Matrix n n' k | ∀ y ∈ S, x *ᵥ y ∈ L} := by
   obtain ⟨g, h, e⟩ := exists_sideMul_preimage_integral S L
   rw [e]
-  exact ⟨(sideMul g h).isCompact_preimage.2 isCompact_isOpen_isClosed_integral_matrices.1, isCompact_isOpen_isClosed_integral_matrices.2.1.preimage (sideMul g h).continuous⟩
+  exact ⟨
+    (sideMul g h).isCompact_preimage.2 isCompact_isOpen_isClosed_integral_matrices.1,
+    isCompact_isOpen_isClosed_integral_matrices.2.1.preimage (sideMul g h).continuous
+  ⟩
 
 private lemma phiOne_congr_of_sub_mulVec_mem_ker {P : Pair k n'} {Q : Pair k n} {x z : Matrix n n' k}
     (hz : ∀ y ∈ P.lat, (z - x) *ᵥ y ∈ Q.ker) : phiOne P Q z = phiOne P Q x := by
@@ -133,7 +142,8 @@ theorem phiOne_mem (P : Pair k n') (Q : Pair k n) : phiOne P Q ∈ SB (Matrix n 
       simpa using (continuous_sub_right x).tendsto x
     filter_upwards [ht hH0] with z hz
     exact phiOne_congr_of_sub_mulVec_mem_ker hz
-  · refine HasCompactSupport.intro' (hom_lat P.lat Q.lat).1 (isClosed_setOf_mulVec_mem P.lat Q.lat) fun x hx => ?_
+  · refine HasCompactSupport.intro' (hom_lat P.lat Q.lat).1 (isClosed_setOf_mulVec_mem P.lat Q.lat)
+      fun x hx => ?_
     unfold phiOne
     rw [if_neg]
     rintro ⟨hm, -⟩
@@ -149,12 +159,12 @@ private lemma det_mem_of_integral_entries {u : GL n k} (hu : ∀ i j, u.val i j 
   rw [e, ← RingHom.map_det]
   exact (M.det).2
 
-theorem valuation_det_of_fix (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice k] {h : GL n k} (hh : h • L = L) :
-    valuation k ((Matrix.GeneralLinearGroup.det h : kˣ) : k) = 1 := by
+theorem valuation_det_of_fix
+    (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice k] {h : GL n k} (hh : h • L = L)
+    : valuation k ((Matrix.GeneralLinearGroup.det h : kˣ) : k) = 1 := by
   obtain ⟨g, rfl⟩ := exists_smul_lat (stdLat k n) L
   obtain ⟨u, hu⟩ : ∃ u : GL n k, u = g⁻¹ * h * g := ⟨_, rfl⟩
-  have hfix : u • stdLat k n = stdLat k n := by
-    rw [hu, mul_smul, mul_smul, hh, inv_smul_smul]
+  have hfix : u • stdLat k n = stdLat k n := by rw [hu, mul_smul, mul_smul, hh, inv_smul_smul]
   have hint : ∀ w : GL n k, w • stdLat k n = stdLat k n → ∀ i j, w.val i j ∈ 𝒪[k] := by
     intro w hw
     refine (maps_std_iff w.val).1 ?_
@@ -165,7 +175,8 @@ theorem valuation_det_of_fix (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice 
   have h1 := det_mem_of_integral_entries (hint u hfix)
   have h2 := det_mem_of_integral_entries (hint u⁻¹ (by rw [inv_smul_eq_iff, hfix]))
   have hdet : Matrix.GeneralLinearGroup.det u = Matrix.GeneralLinearGroup.det h := by
-    rw [hu, map_mul, map_mul, map_inv, mul_comm _ (Matrix.GeneralLinearGroup.det g), mul_inv_cancel_left]
+    rw [hu, map_mul, map_mul, map_inv, mul_comm _ (Matrix.GeneralLinearGroup.det g),
+      mul_inv_cancel_left]
   rw [← hdet, Matrix.GeneralLinearGroup.val_det_apply]
   have hp : u.val.det * (u⁻¹ : GL n k).val.det = 1 := by
     rw [← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.det_one]
@@ -174,22 +185,28 @@ theorem valuation_det_of_fix (L : Submodule 𝒪[k] (n → k)) [L.IsFullLattice 
   have v3 : valuation k u.val.det * valuation k (u⁻¹ : GL n k).val.det = 1 := by
     rw [← map_mul, hp, map_one]
   refine le_antisymm v1 ?_
-  calc (1 : ValueGroupWithZero k) = valuation k u.val.det * valuation k (u⁻¹ : GL n k).val.det := v3.symm
+  calc
+    (1 : ValueGroupWithZero k)
+      = valuation k u.val.det * valuation k (u⁻¹ : GL n k).val.det := v3.symm
     _ ≤ valuation k u.val.det * 1 := by gcongr
     _ = valuation k u.val.det := mul_one _
 
 variable {V' V : Type} [AddCommGroup V'] [Module ℂ V'] [AddCommGroup V] [Module ℂ V]
 
-def IsEquivTheta (μ : kˣ →* ℂˣ) (π' : Representation ℂ (GL n' k) V') (π : Representation ℂ (GL n k) V)
-    (θ : V' →ₗ[ℂ] SB (Matrix n n' k) →ₗ[ℂ] V) : Prop :=
+def IsEquivTheta
+    (μ : kˣ →* ℂˣ) (π' : Representation ℂ (GL n' k) V') (π : Representation ℂ (GL n k) V)
+    (θ : V' →ₗ[ℂ] SB (Matrix n n' k) →ₗ[ℂ] V)
+    : Prop :=
   ∀ (g : GL n' k) (h : GL n k) (v : V') (Ψ Ψ' : SB (Matrix n n' k)),
     Ψ'.1 = om μ g h Ψ.1 → θ (π' g v) Ψ' = π h (θ v Ψ)
 
-variable {μ : kˣ →* ℂˣ} {π' : Representation ℂ (GL n' k) V'} {π : Representation ℂ (GL n k) V}
+variable
+  {μ : kˣ →* ℂˣ} {π' : Representation ℂ (GL n' k) V'} {π : Representation ℂ (GL n k) V}
   {θ : V' →ₗ[ℂ] SB (Matrix n n' k) →ₗ[ℂ] V}
 
-theorem theta_mem (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : Pair k n') (Q₀ : Pair k n) (v : V') :
-    θ v (phiOneSB P₀ Q₀) ∈ levelVec π Q₀ := by
+theorem theta_mem
+    (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : Pair k n') (Q₀ : Pair k n) (v : V')
+    : θ v (phiOneSB P₀ Q₀) ∈ levelVec π Q₀ := by
   change ∀ h : GL n k, h • Q₀ = Q₀ → π h (θ v (phiOneSB P₀ Q₀)) = θ v (phiOneSB P₀ Q₀)
   intro h hh
   have hv : valuation k ((Matrix.GeneralLinearGroup.det h : kˣ) : k) = 1 :=
@@ -200,33 +217,38 @@ theorem theta_mem (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : P
       rw [← phiOne_smul (1 : GL n' k) h, one_smul, hh]
     change phiOne P₀ Q₀ x = om μ 1 h (phiOne P₀ Q₀) x
     rw [e1]
-    simp only [om, map_one, Units.val_one, hμ _ hv, inv_one, nabs_one, nabs_eq_one_of_valuation_eq_one hv,
-      Real.one_rpow, Complex.ofReal_one, one_mul]
+    simp only [om, map_one, Units.val_one, hμ _ hv, inv_one, nabs_one,
+      nabs_eq_one_of_valuation_eq_one hv, Real.one_rpow, Complex.ofReal_one, one_mul]
   have h1 := hθ 1 h v _ _ hfun
   simpa using h1.symm
 
-def kerVec (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : Pair k n') (Q₀ : Pair k n) :
-    levelVec π' P₀ →ₗ[ℂ] levelVec π Q₀ :=
-  LinearMap.codRestrict _ (θ.flip (phiOneSB P₀ Q₀) ∘ₗ (levelVec π' P₀).subtype)
-    fun v => theta_mem hμ hθ P₀ Q₀ v.1
+def kerVec (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : Pair k n') (Q₀ : Pair k n)
+    : levelVec π' P₀ →ₗ[ℂ] levelVec π Q₀ :=
+  LinearMap.codRestrict _ (θ.flip (phiOneSB P₀ Q₀) ∘ₗ (levelVec π' P₀).subtype) fun v =>
+    theta_mem hμ hθ P₀ Q₀ v.1
 
-def K (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : Pair k n') (Q₀ : Pair k n) :
-    EqForm π' →ₗ[ℂ] EqForm π :=
+def K (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : Pair k n') (Q₀ : Pair k n)
+    : EqForm π' →ₗ[ℂ] EqForm π :=
   (evalEquiv π Q₀).symm.toLinearMap ∘ₗ kerVec hμ hθ P₀ Q₀ ∘ₗ (evalEquiv π' P₀).toLinearMap
 
-theorem K_apply (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : Pair k n') (Q₀ : Pair k n) (φ : EqForm π')
-    (h : GL n k) : (K hμ hθ P₀ Q₀ φ).1 (h • Q₀) = π h (θ (φ.1 P₀) (phiOneSB P₀ Q₀)) := by
+theorem K_apply
+    (hμ : IsUnram μ) (hθ : IsEquivTheta μ π' π θ) (P₀ : Pair k n') (Q₀ : Pair k n) (φ : EqForm π')
+    (h : GL n k)
+    : (K hμ hθ P₀ Q₀ φ).1 (h • Q₀) = π h (θ (φ.1 P₀) (phiOneSB P₀ Q₀)) := by
   change formOf π Q₀ (kerVec hμ hθ P₀ Q₀ (evalEquiv π' P₀ φ)) (h • Q₀) = _
   rw [formOf_smul]
   rfl
 
-
 open Classical in
-def midInd (q : Unif k) (L : Submodule 𝒪[k] (n' → k)) (e₁ : n' → k) (Q : Pair k n) (x : Matrix n n' k) : ℂ :=
+def midInd
+    (q : Unif k) (L : Submodule 𝒪[k] (n' → k)) (e₁ : n' → k) (Q : Pair k n) (x : Matrix n n' k)
+    : ℂ :=
   if (∀ y ∈ L, x *ᵥ y ∈ Q.lat) ∧ Q.HasVal (x *ᵥ (q.1 • e₁)) 1 then 1 else 0
 
-
-def scal (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (t : ℕ) : ℂ :=
+def scal
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (t : ℕ)
+    : ℂ :=
   (((resCard k : ℝ) ^ (((t : ℝ) + 1) / 2) : ℝ) : ℂ)
 
 end GlobalTheory.IndefiniteRowSideFullHecke.IndicatorFunctionIdentity

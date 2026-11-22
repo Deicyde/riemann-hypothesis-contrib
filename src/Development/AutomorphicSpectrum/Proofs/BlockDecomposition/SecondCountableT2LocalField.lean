@@ -13,8 +13,9 @@ namespace GlobalTheory.CompanionTheory.GLMeasure
 
 open ValuativeRel
 
-theorem secondCountable_t2_local_field (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] : SecondCountableTopology k ∧ T2Space k := by
+theorem secondCountable_t2_local_field
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : SecondCountableTopology k ∧ T2Space k := by
   letI := IsTopologicalAddGroup.rightUniformSpace k
   haveI := isUniformAddGroup_of_addCommGroup (G := k)
   letI : (Valued.v (R := k)).RankOne :=
@@ -25,8 +26,10 @@ theorem secondCountable_t2_local_field (k : Type) [Field k] [ValuativeRel k] [To
   haveI : ProperSpace k := .of_nontriviallyNormedField_of_weaklyLocallyCompactSpace k
   exact ⟨secondCountable_of_proper, inferInstance⟩
 
-theorem secondCountable_GL (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : ℕ) : SecondCountableTopology (GL (Fin n) k) := by
+theorem secondCountable_GL
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : ℕ)
+    : SecondCountableTopology (GL (Fin n) k) := by
   obtain ⟨_, _⟩ := secondCountable_t2_local_field k
   haveI : SecondCountableTopology (Matrix (Fin n) (Fin n) k) :=
     inferInstanceAs (SecondCountableTopology (Fin n → Fin n → k))

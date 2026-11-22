@@ -4,8 +4,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-private theorem UpperTheory.cardinal_sum_eq_finite_sum_range (N : ℕ) : ∀ f : ℕ → Cardinal.{0}, (∀ q, N ≤ q → f q = 0) →
-    Cardinal.sum f = ∑ q ∈ Finset.range N, f q := by
+private theorem UpperTheory.cardinal_sum_eq_finite_sum_range (N : ℕ)
+    : ∀ f : ℕ → Cardinal.{0},
+      (∀ q, N ≤ q → f q = 0) → Cardinal.sum f = ∑ q ∈ Finset.range N, f q := by
   induction N with
   | zero =>
     intro f hf
@@ -14,11 +15,10 @@ private theorem UpperTheory.cardinal_sum_eq_finite_sum_range (N : ℕ) : ∀ f :
     rw [Cardinal.sum_const', mul_zero, Finset.sum_range_zero]
   | succ N ih =>
     intro f hf
-    rw [Cardinal.sum_nat_eq_add_sum_succ, ih (fun i => f (i+1)) (fun q hq => hf (q+1) (by omega)),
-      Finset.sum_range_succ', add_comm]
+    rw [Cardinal.sum_nat_eq_add_sum_succ,
+      ih (fun i => f (i + 1)) (fun q hq => hf (q + 1) (by omega)), Finset.sum_range_succ', add_comm]
 
-theorem UpperTheory.adelic_rep_bounded_of_degree_bounded :
-    UpperTheory.V.Af.BA.BddOfDeg := by
+theorem UpperTheory.adelic_rep_bounded_of_degree_bounded : UpperTheory.V.Af.BA.BddOfDeg := by
   unfold UpperTheory.V.Af.BA.BddOfDeg
   intro Γ _ hc hD
   choose c hc using hc
@@ -26,5 +26,6 @@ theorem UpperTheory.adelic_rep_bounded_of_degree_bounded :
   unfold UpperTheory.V.Af.CohB.Bdd
   refine ⟨∑ q ∈ Finset.range D, c q, fun A => ?_⟩
   unfold UpperTheory.V.Af.CohB.totCoh
-  rw [UpperTheory.cardinal_sum_eq_finite_sum_range D _ (fun q hq => hD q hq A), Nat.cast_sum, Finset.sum_mul]
+  rw [UpperTheory.cardinal_sum_eq_finite_sum_range D _ (fun q hq => hD q hq A), Nat.cast_sum,
+    Finset.sum_mul]
   exact Finset.sum_le_sum fun q _ => hc q A

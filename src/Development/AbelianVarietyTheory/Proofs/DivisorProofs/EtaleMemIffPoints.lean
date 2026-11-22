@@ -5,12 +5,15 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory
 
-theorem etale_mem_iff_points : ∀ (U : Scheme.{0}) (S : Sieve U), S ∈ Scheme.etaleTopology.{0} U ↔
-    ∀ u : U, ∃ (V : Scheme.{0}) (j : V ⟶ U) (v : V), Etale j ∧ j v = u ∧ S.arrows j := by
+theorem etale_mem_iff_points
+    : ∀ (U : Scheme.{0}) (S : Sieve U),
+      S ∈ Scheme.etaleTopology.{0} U
+        ↔ ∀ u : U, ∃ (V : Scheme.{0}) (j : V ⟶ U) (v : V), Etale j ∧ j v = u ∧ S.arrows j := by
   intro U S
   constructor
   · intro hS u

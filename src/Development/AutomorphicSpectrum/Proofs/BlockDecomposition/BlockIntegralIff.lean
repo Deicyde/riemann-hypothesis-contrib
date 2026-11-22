@@ -7,8 +7,10 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT GlobalTheory.LFun Formalism.L2.Host
-open PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F.RS GlobalTheory.CompanionTheory.CtS
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT GlobalTheory.LFun Formalism.L2.Host
+open PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F.RS GlobalTheory.CompanionTheory.CtS
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -17,12 +19,15 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.CtS
 
-theorem blk_val_eq {E : Type} [Field E] [NumberField E] [IsCMField E] {n a b : ℕ} (h : a + b = n) (w : Pl E)
-    (m : GLw a w × GLw b w) (X : Matrix (Fin a) (Fin b) (w.adicCompletion E)) :
-    (blk h w m X).val = Matrix.reindex (finSumFinEquiv.trans (finCongr h)) (finSumFinEquiv.trans (finCongr h))
-      (Matrix.fromBlocks m.1.val (m.1.val * X) 0 m.2.val) := by
-  have hU : IsUnit (Matrix.reindex (finSumFinEquiv.trans (finCongr h)) (finSumFinEquiv.trans (finCongr h))
-      (Matrix.fromBlocks m.1.val (m.1.val * X) 0 m.2.val)) := by
+theorem blk_val_eq
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n a b : ℕ} (h : a + b = n)
+    (w : Pl E) (m : GLw a w × GLw b w) (X : Matrix (Fin a) (Fin b) (w.adicCompletion E))
+    : (blk h w m X).val
+      = Matrix.reindex (finSumFinEquiv.trans (finCongr h)) (finSumFinEquiv.trans (finCongr h))
+        (Matrix.fromBlocks m.1.val (m.1.val * X) 0 m.2.val) := by
+  have hU : IsUnit (Matrix.reindex (finSumFinEquiv.trans (finCongr h))
+      (finSumFinEquiv.trans (finCongr h)) (Matrix.fromBlocks m.1.val (m.1.val * X) 0 m.2.val)) := by
     rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_reindex_self, Matrix.det_fromBlocks_zero₂₁]
     exact ((Matrix.isUnit_iff_isUnit_det _).1 m.1.isUnit).mul
       ((Matrix.isUnit_iff_isUnit_det _).1 m.2.isUnit)
@@ -31,7 +36,10 @@ theorem blk_val_eq {E : Type} [Field E] [NumberField E] [IsCMField E] {n a b : �
   rw [dite_eq_left hU]
   rfl
 
-theorem isInt_blk_iff : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n a b : ℕ) (h : a + b = n) (w : Pl E) (m : GLw a w × GLw b w) (X : Matrix (Fin a) (Fin b) (w.adicCompletion E)), IsInt w (blk h w m X).val ↔ IsInt w m.1.val ∧ IsInt w m.2.val ∧ IsInt w (m.1.val * X) := by
+theorem isInt_blk_iff
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n a b : ℕ) (h : a + b = n) (w : Pl E)
+        (m : GLw a w × GLw b w) (X : Matrix (Fin a) (Fin b) (w.adicCompletion E)),
+      IsInt w (blk h w m X).val ↔ IsInt w m.1.val ∧ IsInt w m.2.val ∧ IsInt w (m.1.val * X) := by
   intro E _ _ _ n a b h w m X
   rw [blk_val_eq]
   set e : Fin a ⊕ Fin b ≃ Fin n := finSumFinEquiv.trans (finCongr h) with he

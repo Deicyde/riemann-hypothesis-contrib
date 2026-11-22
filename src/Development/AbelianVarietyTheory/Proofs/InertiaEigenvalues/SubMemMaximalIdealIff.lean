@@ -13,9 +13,10 @@ open scoped Classical
 
 namespace GlobalTheory.TameRed
 
-theorem part_spec {G : Type} [Monoid G] {l : ℕ} (hl : l.Prime) {x : G} (hx : IsOfFinOrder x) :
-    ∃ a M : ℕ, M ≠ 0 ∧ M.Coprime l ∧ Formalism.CyclotomicNorms.primeToPart l x ^ M = 1 ∧
-      Formalism.CyclotomicNorms.primeToPart l x ^ (l ^ a) = x ^ (l ^ a) := by
+theorem part_spec {G : Type} [Monoid G] {l : ℕ} (hl : l.Prime) {x : G} (hx : IsOfFinOrder x)
+    : ∃ a M : ℕ,
+      M ≠ 0 ∧ M.Coprime l ∧ Formalism.CyclotomicNorms.primeToPart l x ^ M = 1
+        ∧ Formalism.CyclotomicNorms.primeToPart l x ^ (l ^ a) = x ^ (l ^ a) := by
   have hn : orderOf x ≠ 0 := hx.orderOf_pos.ne'
   set a := (orderOf x).factorization l with ha
   set M := orderOf x / l ^ a with hM
@@ -35,15 +36,27 @@ theorem part_spec {G : Type} [Monoid G] {l : ℕ} (hl : l.Prime) {x : G} (hx : I
     have := pow_eq_pow_of_modEq hmod hone
     rwa [pow_one] at this
 
-theorem eq_of_map_eq {O k : Type} [CommRing O] [IsDomain O] [Field k] (f : O →+* k) {M : ℕ} (hM : (M : k) ≠ 0)
-    {x y : O} (hx : x ^ M = 1) (hy : y ^ M = 1) (h : f x = f y) : x = y := by
+theorem eq_of_map_eq
+    {O k : Type} [CommRing O] [IsDomain O] [Field k]
+    (f : O →+* k)
+    {M : ℕ} (hM : (M : k) ≠ 0)
+    {x y : O} (hx : x ^ M = 1) (hy : y ^ M = 1) (h : f x = f y)
+    : x = y := by
   first
-  | (rename_i h_2 h_3 h_4; revert O k h_2 h_3 h_4 f M hM x y hx hy h; exact @_root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main)
+  | (
+      rename_i h_2 h_3 h_4
+      revert O k h_2 h_3 h_4 f M hM x y hx hy h
+      exact @_root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main
+    )
   | exact @_root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main
   | exact _root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main
   | (apply _root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.RootsOfUnityInjectiveInertiaEigenvalues.main ..)
 
 end GlobalTheory.TameRed

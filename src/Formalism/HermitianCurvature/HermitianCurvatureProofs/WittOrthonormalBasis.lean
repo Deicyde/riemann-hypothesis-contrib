@@ -177,7 +177,8 @@ lemma witt_nd {z z' : Fin (2 * r + k + 1) → ℂ} (hstd : C2.Std k r z z') {g�
 
 end WittOrthonormalBasis
 
-open C2x5 C2x6 C2x7 HermitianProjections FixedPointsGramVector FlagGramRestriction WittOrthonormalBasis
+open C2x5 C2x6 C2x7 HermitianProjections FixedPointsGramVector FlagGramRestriction
+  WittOrthonormalBasis
 
 theorem fibre_orbit_description : C2.FibreOrbit := by
   intro k r z z' hstd g₁ hg₁ g₂ hg₂ hG hZ
@@ -187,30 +188,36 @@ theorem fibre_orbit_description : C2.FibreOrbit := by
     intro g hg
     have hg' : g ᴴ * Hpk k r * g = Hpk k r := hg
     have : (Hpk k r * gᴴ * Hpk k r) * g = 1 := by
-      calc Hpk k r * gᴴ * Hpk k r * g = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
+      calc
+        Hpk k r * gᴴ * Hpk k r * g
+          = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
         _ = 1 := by rw [hg', hH2]
     exact Matrix.isUnit_det_of_left_inverse this
   have hinv : ∀ g ∈ B.GV k r, g⁻¹ ∈ B.GV k r := by
     intro g hg
     have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
     show (g⁻¹)ᴴ * Hpk k r * g⁻¹ = Hpk k r
-    calc (g⁻¹)ᴴ * Hpk k r * g⁻¹ = (g⁻¹)ᴴ * (gᴴ * Hpk k r * g) * g⁻¹ := by rw [hg']
-      _ = (g * g⁻¹)ᴴ * Hpk k r * (g * g⁻¹) := by simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      (g⁻¹)ᴴ * Hpk k r * g⁻¹
+        = (g⁻¹)ᴴ * (gᴴ * Hpk k r * g) * g⁻¹ := by rw [hg']
+      _ = (g * g⁻¹)ᴴ * Hpk k r * (g * g⁻¹) := by
+        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = Hpk k r := by rw [Matrix.mul_nonsing_inv _ (hunit g hg)]; simp
   have hmul : ∀ g ∈ B.GV k r, ∀ h ∈ B.GV k r, g * h ∈ B.GV k r := by
     intro g hg h hh
     have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
     have hh' : hᴴ * Hpk k r * h = Hpk k r := hh
     show (g * h)ᴴ * Hpk k r * (g * h) = Hpk k r
-    calc (g * h)ᴴ * Hpk k r * (g * h) = hᴴ * (gᴴ * Hpk k r * g) * h := by
-          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      (g * h)ᴴ * Hpk k r * (g * h)
+        = hᴴ * (gᴴ * Hpk k r * g) * h := by simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = Hpk k r := by rw [hg', hh']
   have hGf : Gf k r z z' g₂ = Gf k r z z' g₁ := by simp only [Gf, Dmin, hZ]
   have hp1 : C2.PosPt k r z z' g₁ := ⟨hg₁, hG⟩
   have hp2 : C2.PosPt k r z z' g₂ := ⟨hg₂, by rw [hGf]; exact hG⟩
   have hgram : gramM k r z z' g₁ = gramM k r z z' g₂ := by
-    rw [gram_block_form k r z z' hstd.2.1 hstd.2.2 g₁ hg₁, gram_block_form k r z z' hstd.2.1 hstd.2.2 g₂ hg₂,
-      hZ]
+    rw [gram_block_form k r z z' hstd.2.1 hstd.2.2 g₁ hg₁,
+      gram_block_form k r z z' hstd.2.1 hstd.2.2 g₂ hg₂, hZ]
   rw [gn_gramM_eq, gn_gramM_eq] at hgram
   obtain ⟨s0, hs0, hs0V⟩ := witt_nd hstd hp1 hp2 hgram
   have hcol : ∀ j, s0 *ᵥ gramVec k r z z' g₁ j = gramVec k r z z' g₂ j := by
@@ -225,20 +232,24 @@ theorem fibre_orbit_description : C2.FibreOrbit := by
   refine ⟨s0⁻¹, ?_, g₁⁻¹ * s0⁻¹ * g₂, ?_, ?_⟩
   · rw [← fixed_frame_property k r z hstd.2.1]
     refine ⟨hinv s0 hs0, fun a => ?_⟩
-    calc s0⁻¹ *ᵥ fvec k r z a = s0⁻¹ *ᵥ (s0 *ᵥ fvec k r z a) := by rw [hfa]
-      _ = fvec k r z a := by rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu0, Matrix.one_mulVec]
+    calc
+      s0⁻¹ *ᵥ fvec k r z a
+        = s0⁻¹ *ᵥ (s0 *ᵥ fvec k r z a) := by rw [hfa]
+      _ = fvec k r z a := by
+        rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu0, Matrix.one_mulVec]
   · rw [← fixed_frame_property k r z' hstd.2.2]
     refine ⟨hmul _ (hmul _ (hinv g₁ hg₁) _ (hinv s0 hs0)) _ hg₂, fun b => ?_⟩
-    calc (g₁⁻¹ * s0⁻¹ * g₂) *ᵥ fvec k r z' b = g₁⁻¹ *ᵥ (s0⁻¹ *ᵥ (g₂ *ᵥ fvec k r z' b)) := by
-          simp only [Matrix.mulVec_mulVec, Matrix.mul_assoc]
+    calc
+      (g₁⁻¹ * s0⁻¹ * g₂) *ᵥ fvec k r z' b = g₁⁻¹ *ᵥ (s0⁻¹ *ᵥ (g₂ *ᵥ fvec k r z' b)) := by
+        simp only [Matrix.mulVec_mulVec, Matrix.mul_assoc]
       _ = g₁⁻¹ *ᵥ (s0⁻¹ *ᵥ (s0 *ᵥ (g₁ *ᵥ fvec k r z' b))) := by rw [hfb]
       _ = fvec k r z' b := by
-          have e0 : s0⁻¹ *ᵥ (s0 *ᵥ (g₁ *ᵥ fvec k r z' b)) = g₁ *ᵥ fvec k r z' b := by
-            rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu0, Matrix.one_mulVec]
-          rw [e0, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu1, Matrix.one_mulVec]
+        have e0 : s0⁻¹ *ᵥ (s0 *ᵥ (g₁ *ᵥ fvec k r z' b)) = g₁ *ᵥ fvec k r z' b := by
+          rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu0, Matrix.one_mulVec]
+        rw [e0, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hu1, Matrix.one_mulVec]
   · rw [Matrix.nonsing_inv_nonsing_inv _ hu0]
     simp only [← Matrix.mul_assoc]
-    rw [Matrix.mul_assoc s0 g₁ g₁⁻¹, Matrix.mul_nonsing_inv _ hu1, Matrix.mul_one, Matrix.mul_nonsing_inv _ hu0,
-      Matrix.one_mul]
+    rw [Matrix.mul_assoc s0 g₁ g₁⁻¹, Matrix.mul_nonsing_inv _ hu1, Matrix.mul_one,
+      Matrix.mul_nonsing_inv _ hu0, Matrix.one_mul]
 
 end Formalism.FourierDecayAlt.P

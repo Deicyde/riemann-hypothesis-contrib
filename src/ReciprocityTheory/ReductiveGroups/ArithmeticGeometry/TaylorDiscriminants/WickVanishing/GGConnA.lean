@@ -10,14 +10,15 @@ section Line
 
 open Polynomial
 
-theorem isPreconnected_det_ne {ι : Type*} [Fintype ι] {n : ℕ} (V : Set (ι → Matrix (Fin n) (Fin n) ℂ))
-    (hV : ∀ a ∈ V, ∀ b ∈ V, ∀ z : ℂ, (1 - z) • a + z • b ∈ V) :
-    IsPreconnected {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0} := by
+theorem isPreconnected_det_ne
+    {ι : Type*} [Fintype ι]
+    {n : ℕ} (V : Set (ι → Matrix (Fin n) (Fin n) ℂ))
+    (hV : ∀ a ∈ V, ∀ b ∈ V, ∀ z : ℂ, (1 - z) • a + z • b ∈ V)
+    : IsPreconnected {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0} := by
   refine isPreconnected_of_forall_pair ?_
   rintro a ⟨haV, ha⟩ b ⟨hbV, hb⟩
   let L : ℂ → ι → Matrix (Fin n) (Fin n) ℂ := fun z => (1 - z) • a + z • b
-  let p : ι → ℂ[X] := fun i =>
-    (Matrix.of fun k l => C (a i k l) + X * C (b i k l - a i k l)).det
+  let p : ι → ℂ[X] := fun i => (Matrix.of fun k l => C (a i k l) + X * C (b i k l - a i k l)).det
   have hev : ∀ i z, (p i).eval z = (L z i).det := by
     intro i z
     simp only [p, L]
@@ -32,9 +33,11 @@ theorem isPreconnected_det_ne {ι : Type*} [Fintype ι] {n : ℕ} (V : Set (ι �
     rw [h0, eval_zero] at this
     exact ha i (by simpa [L] using this.symm)
   let Z : Set ℂ := ⋃ i, {z | (p i).IsRoot z}
-  have hZ : Z.Countable := (Set.finite_iUnion fun i => Polynomial.finite_setOfPred_isRoot (hp i)).countable
+  have hZ : Z.Countable :=
+    (Set.finite_iUnion fun i => Polynomial.finite_setOfPred_isRoot (hp i)).countable
   have hc : IsPreconnected Zᶜ :=
-    (hZ.isConnected_compl_of_one_lt_rank (by rw [Complex.rank_real_complex]; norm_num)).isPreconnected
+    (hZ.isConnected_compl_of_one_lt_rank (by
+      rw [Complex.rank_real_complex]; norm_num)).isPreconnected
   have hLc : Continuous L := by
     simp only [L]
     fun_prop
@@ -48,8 +51,13 @@ theorem isPreconnected_det_ne {ι : Type*} [Fintype ι] {n : ℕ} (V : Set (ι �
     exact hz i (by rw [← hev]; exact hi)
   have hL0 : L 0 = a := by simp [L]
   have hL1 : L 1 = b := by simp [L]
-  refine ⟨L '' Zᶜ, ?_, ⟨0, hnot 0 (by rw [hL0]; exact ha), hL0⟩,
-    ⟨1, hnot 1 (by rw [hL1]; exact hb), hL1⟩, hc.image L hLc.continuousOn⟩
+  refine ⟨
+    L '' Zᶜ,
+    ?_,
+    ⟨0, hnot 0 (by rw [hL0]; exact ha), hL0⟩,
+    ⟨1, hnot 1 (by rw [hL1]; exact hb), hL1⟩,
+    hc.image L hLc.continuousOn
+  ⟩
   rintro _ ⟨z, hz, rfl⟩
   exact hmem z hz
 
@@ -220,15 +228,16 @@ lemma continuous_mask (y : Matrix (Fin r) (Fin r) ℂ) : Continuous fun t : ℝ 
   simp only [mask, Matrix.of_apply]
   split_ifs <;> fun_prop
 
-theorem isPreconnected_ok {ι : Type*} [Fintype ι] :
-    IsPreconnected {y : ι → Matrix (Fin r) (Fin r) ℂ | ∀ i, Ok p0 (y i)} := by
+theorem isPreconnected_ok {ι : Type*} [Fintype ι]
+    : IsPreconnected {y : ι → Matrix (Fin r) (Fin r) ℂ | ∀ i, Ok p0 (y i)} := by
   let V : Set (ι → Matrix (Fin r) (Fin r) ℂ) :=
     {x | ∀ i (k a : Fin r), ¬((k : ℕ) < p0 ↔ (a : ℕ) < p0) → x i k a = 0}
   have hV : ∀ a ∈ V, ∀ b ∈ V, ∀ z : ℂ, (1 - z) • a + z • b ∈ V := by
     intro a ha b hb z i k l hkl
     simp [ha i k l hkl, hb i k l hkl]
   have hBD := isPreconnected_det_ne V hV
-  have hsub : {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0} ⊆ {y : ι → Matrix (Fin r) (Fin r) ℂ | ∀ i, Ok p0 (y i)} :=
+  have hsub
+      : {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0} ⊆ {y : ι → Matrix (Fin r) (Fin r) ℂ | ∀ i, Ok p0 (y i)} :=
     fun x hx i => ok_of_blk (hx.1 i) (hx.2 i)
   have h1 : (1 : ι → Matrix (Fin r) (Fin r) ℂ) ∈ {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0} := by
     refine ⟨fun i k a hka => ?_, fun i => by simp⟩
@@ -239,23 +248,33 @@ theorem isPreconnected_ok {ι : Type*} [Fintype ι] :
   refine isPreconnected_of_forall 1 fun y hy => ?_
   let γ : ℝ → ι → Matrix (Fin r) (Fin r) ℂ := fun t i => mask p0 t (y i)
   have hγc : Continuous γ := continuous_pi fun i => continuous_mask (y i)
-  have hγ0 : γ 0 ∈ {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0} :=
-    ⟨fun i k a hka => mask_zero_blk (y i) hka, fun i => det_ne_of_ok (ok_mask (hy i) le_rfl zero_le_one)⟩
-  refine ⟨γ '' Set.Icc 0 1 ∪ {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0}, ?_, Or.inr (hsub h1 |> fun _ => h1),
-    Or.inl ⟨1, ⟨zero_le_one, le_rfl⟩, funext fun i => mask_one (y i)⟩, ?_⟩
+  have hγ0 : γ 0 ∈ {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0} := ⟨
+    fun i k a hka => mask_zero_blk (y i) hka,
+    fun i => det_ne_of_ok (ok_mask (hy i) le_rfl zero_le_one)
+  ⟩
+  refine ⟨
+    γ '' Set.Icc 0 1 ∪ {x | x ∈ V ∧ ∀ i, (x i).det ≠ 0},
+    ?_,
+    Or.inr (hsub h1 |> fun _ => h1),
+    Or.inl ⟨1, ⟨zero_le_one, le_rfl⟩, funext fun i => mask_one (y i)⟩,
+    ?_
+  ⟩
   · rintro x (⟨t, ⟨ht0, ht1⟩, rfl⟩ | hx)
     · exact fun i => ok_mask (hy i) ht0 ht1
     · exact hsub hx
   · exact IsPreconnected.union (γ 0) ⟨0, ⟨le_rfl, zero_le_one⟩, rfl⟩ hγ0
       (isPreconnected_Icc.image γ hγc.continuousOn) hBD
 
-theorem isPreconnected_upper {ι : Type*} [Fintype ι] :
-    IsPreconnected {b : ι → Matrix (Fin r) (Fin r) ℂ |
-      ∀ i, (b i).det ≠ 0 ∧ ∀ a c : Fin r, c < a → b i a c = 0} := by
-  have h := isPreconnected_det_ne {x : ι → Matrix (Fin r) (Fin r) ℂ | ∀ i (a c : Fin r), c < a → x i a c = 0}
-    (by
-      intro a ha b hb z i k l hkl
-      simp [ha i k l hkl, hb i k l hkl])
+theorem isPreconnected_upper {ι : Type*} [Fintype ι]
+    : IsPreconnected
+      {b : ι → Matrix (Fin r) (Fin r) ℂ |
+        ∀ i, (b i).det ≠ 0 ∧ ∀ a c : Fin r, c < a → b i a c = 0} := by
+  have h :=
+    isPreconnected_det_ne
+      {x : ι → Matrix (Fin r) (Fin r) ℂ | ∀ i (a c : Fin r), c < a → x i a c = 0}
+      (by
+        intro a ha b hb z i k l hkl
+        simp [ha i k l hkl, hb i k l hkl])
   convert h using 1
   ext b
   simp only [Set.mem_ofPred_eq]

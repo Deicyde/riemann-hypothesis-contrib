@@ -11,7 +11,9 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel.DerivDLR
 
@@ -84,13 +86,17 @@ lemma hasDerivAt_Fr (a : ι → Fin r → ℝ) (b : ι → ℝ) (ha : ∀ j i, 0
   rw [hF, smul_eq_mul]
   ring
 
-theorem hasDerivAt_DLR_Fr (ι : Type) [Fintype ι] [DecidableEq ι] (r : ℕ) (a : ι → Fin r → ℝ)
-    (b : ι → ℝ) (ha : ∀ j i, 0 < a j i) (hb : ∀ j, 0 < b j)
-    (s : ℂ) (β : ι → ℕ) (cs : List (Fin r)) (i : Fin r) (x : Fin r → ℝ) (τ : ℝ)
-    (hx : ∀ k, 0 ≤ x k) (hτ : 0 ≤ τ) :
-    HasDerivAt (fun t : ℝ => DLR cs (Fr a b s β) (x + t • (Pi.single i 1 : Fin r → ℝ)))
+theorem hasDerivAt_DLR_Fr
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (r : ℕ) (a : ι → Fin r → ℝ)
+    (b : ι → ℝ)
+    (ha : ∀ j i, 0 < a j i) (hb : ∀ j, 0 < b j) (s : ℂ) (β : ι → ℕ) (cs : List (Fin r)) (i : Fin r)
+    (x : Fin r → ℝ) (τ : ℝ) (hx : ∀ k, 0 ≤ x k) (hτ : 0 ≤ τ)
+    : HasDerivAt
+      (fun t : ℝ => DLR cs (Fr a b s β) (x + t • (Pi.single i 1 : Fin r → ℝ)))
       (∑ j, (-s - (β j : ℂ)) * (a j i : ℂ) *
-        DLR cs (Fr a b s (β + Pi.single j 1)) (x + τ • (Pi.single i 1 : Fin r → ℝ))) τ := by
+        DLR cs (Fr a b s (β + Pi.single j 1)) (x + τ • (Pi.single i 1 : Fin r → ℝ)))
+      τ := by
   induction cs generalizing x with
   | nil =>
     have hy : ∀ k, 0 ≤ (x + τ • (Pi.single i 1 : Fin r → ℝ)) k := by
@@ -110,13 +116,15 @@ theorem hasDerivAt_DLR_Fr (ι : Type) [Fintype ι] [DecidableEq ι] (r : ℕ) (a
         · subst hk; simp
         · simp [Pi.single_apply, hk]
       simpa using add_nonneg (hx k) this
-    have hsw : ∀ (G : (Fin r → ℝ) → ℂ) (t : ℝ),
-        DLR (c :: cs) G (x + t • (Pi.single i 1 : Fin r → ℝ))
-          = DLR cs G ((x + (Pi.single c 1 : Fin r → ℝ)) + t • (Pi.single i 1 : Fin r → ℝ))
-            - DLR cs G (x + t • (Pi.single i 1 : Fin r → ℝ)) := by
+    have hsw
+        : ∀ (G : (Fin r → ℝ) → ℂ) (t : ℝ),
+          DLR (c :: cs) G (x + t • (Pi.single i 1 : Fin r → ℝ))
+            = DLR cs G ((x + (Pi.single c 1 : Fin r → ℝ)) + t • (Pi.single i 1 : Fin r → ℝ))
+              - DLR cs G (x + t • (Pi.single i 1 : Fin r → ℝ)) := by
       intro G t
       have : x + t • (Pi.single i 1 : Fin r → ℝ) + (Pi.single c 1 : Fin r → ℝ)
-          = (x + (Pi.single c 1 : Fin r → ℝ)) + t • (Pi.single i 1 : Fin r → ℝ) := by abel
+          = (x + (Pi.single c 1 : Fin r → ℝ)) + t • (Pi.single i 1 : Fin r → ℝ) := by
+        abel
       change fdR c (DLR cs G) _ = _
       simp only [fdR, this]
     have h := (ih (x + Pi.single c 1) hxc).sub (ih x hx)

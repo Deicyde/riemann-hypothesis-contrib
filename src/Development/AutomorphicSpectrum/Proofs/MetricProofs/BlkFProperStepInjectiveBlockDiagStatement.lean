@@ -7,15 +7,19 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ColFlags
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory NumberField Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.FMX GlobalTheory.CompanionTheory.Ar.FlagBun
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.PB
+  GlobalTheory.CompanionTheory.Ar.PB.FMX GlobalTheory.CompanionTheory.Ar.FlagBun
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.blkF_properStep_injective_blockDiag :
-    ∀ (Ψ : Type) [Fintype Ψ] (p q : ℕ) (Ω : Type) [Field Ω] (K₀ : Type),
-      (∀ r, blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = none ↔ ¬ IsProperStep (p + q) p r.2) ∧
-      (∀ r r' k, blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = some k →
-        blkF (Ψ := Ψ) (p := p) (q := q) K₀ r' = some k → r = r') ∧
-      ∀ τ : Ψ, IsBlockDiag p (gMat p q Ω τ) := by
+theorem _root_.GlobalTheory.T.blkF_properStep_injective_blockDiag
+    : ∀ (Ψ : Type) [Fintype Ψ] (p q : ℕ) (Ω : Type) [Field Ω] (K₀ : Type),
+      (∀ r, blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = none ↔ ¬ IsProperStep (p + q) p r.2)
+        ∧ (∀ r r' k,
+          blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = some k
+            → blkF (Ψ := Ψ) (p := p) (q := q) K₀ r' = some k
+            → r = r')
+        ∧ ∀ τ : Ψ, IsBlockDiag p (gMat p q Ω τ) := by
   intro Ψ _ p q Ω _ K₀
   have stepOf_injective : Function.Injective (stepOf (Ψ := Ψ) (p := p) (q := q)) := by
     rintro ⟨τ, i⟩ ⟨τ', i'⟩ h
@@ -32,13 +36,12 @@ theorem _root_.GlobalTheory.T.blkF_properStep_injective_blockDiag :
       exact absurd (congrArg Sigma.fst h) (by simp)
     · simp only [stepOf, dite_eq_right h₁, dite_eq_right h₂] at h
       have e₁ : τ = τ' := Sum.inr.inj (congrArg Sigma.fst h)
-      have e₂ : (i : ℕ) - p = (i' : ℕ) - p :=
-        congrArg (fun t : StepIx Ψ p q => (t.2 : ℕ)) h
+      have e₂ : (i : ℕ) - p = (i' : ℕ) - p := congrArg (fun t : StepIx Ψ p q => (t.2 : ℕ)) h
       exact Prod.ext e₁ (Fin.ext (by show (i : ℕ) = (i' : ℕ); omega))
-  have fromBlocks_isBlockDiag {R : Type} [CommRing R] (A : Matrix (Fin q) (Fin q) R)
-      (B : Matrix (Fin p) (Fin p) R) :
-      IsBlockDiag p ((Matrix.fromBlocks A 0 0 B).submatrix
-        (blockEquiv p q).symm (blockEquiv p q).symm) := by
+  have fromBlocks_isBlockDiag
+      {R : Type} [CommRing R] (A : Matrix (Fin q) (Fin q) R) (B : Matrix (Fin p) (Fin p) R)
+      : IsBlockDiag p
+        ((Matrix.fromBlocks A 0 0 B).submatrix (blockEquiv p q).symm (blockEquiv p q).symm) := by
     intro a b hab
     obtain ⟨x, rfl⟩ := (blockEquiv p q).surjective a
     obtain ⟨y, rfl⟩ := (blockEquiv p q).surjective b
@@ -67,5 +70,4 @@ theorem _root_.GlobalTheory.T.blkF_properStep_injective_blockDiag :
     have e := (Option.some.inj h).trans (Option.some.inj h').symm
     exact Sum.inr.inj e
   · intro τ
-    exact fromBlocks_isBlockDiag
-      (genU Ω (rk Ψ p q) (.inr τ)) (genU Ω (rk Ψ p q) (.inl τ))
+    exact fromBlocks_isBlockDiag (genU Ω (rk Ψ p q) (.inr τ)) (genU Ω (rk Ψ p q) (.inl τ))

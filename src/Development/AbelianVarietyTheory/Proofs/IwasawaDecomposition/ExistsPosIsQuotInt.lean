@@ -9,26 +9,41 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.Mem Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open GlobalTheory.Mem Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped InnerProductSpace
 
 noncomputable section
 
 namespace GlobalTheory.Mem.QuotHaar
 
-theorem exists_pos_isQuotInt : ∀ (D : D7) (V : HSp D), V.SigOK → ∀ ν : Measure (GA D V), ν.IsHaarMeasure → ∃ r : ℝ, 0 < r ∧
-    ∀ 𝓕, IsFundamentalDomain (GQ V) 𝓕 ν → ∀ φ : GA D V → ℂ, (∀ γ ∈ GQ V, ∀ g, φ (γ * g) = φ g) → IntegrableOn φ 𝓕 ν →
-      GlobalTheory.IndefiniteRowSideFullHecke.SplittingKernelQuotients.IsQuotInt V r φ (∫ g in 𝓕, φ g ∂ν) := by
+theorem exists_pos_isQuotInt
+    : ∀ (D : D7) (V : HSp D),
+      V.SigOK
+        → ∀ ν : Measure (GA D V),
+          ν.IsHaarMeasure
+            → ∃ r : ℝ,
+              0 < r
+                ∧ ∀ 𝓕,
+                  IsFundamentalDomain (GQ V) 𝓕 ν
+                    → ∀ φ : GA D V → ℂ,
+                      (∀ γ ∈ GQ V, ∀ g, φ (γ * g) = φ g) → IntegrableOn φ 𝓕 ν
+                        → GlobalTheory.IndefiniteRowSideFullHecke.SplittingKernelQuotients.IsQuotInt
+                          V r φ (∫ g in 𝓕, φ g ∂ν) := by
   intro D V hV ν hν
   obtain ⟨i1, i2, i3, i4, i5, i6, i7⟩ := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D V
   obtain ⟨μ₀, hμ₀, huniq⟩ := GlobalTheory.Mem.VolMeasure.existsUnique_isVolMeasG D V hV
   haveI := hμ₀.1
-  obtain ⟨-, 𝓕₀, h𝓕₀⟩ := GlobalTheory.Mem.AdelicGroupFund.rightInvariant_and_exists_fundamentalDomain D V μ₀ hμ₀.1
+  obtain ⟨-, 𝓕₀, h𝓕₀⟩ :=
+    GlobalTheory.Mem.AdelicGroupFund.rightInvariant_and_exists_fundamentalDomain D V μ₀ hμ₀.1
   have e : ν = Measure.haarScalarFactor ν μ₀ • μ₀ := Measure.isMulLeftInvariant_eq_smul ν μ₀
-  have cpos : 0 < Measure.haarScalarFactor ν μ₀ := Measure.haarScalarFactor_pos_of_isHaarMeasure ν μ₀
+  have cpos : 0 < Measure.haarScalarFactor ν μ₀ :=
+    Measure.haarScalarFactor_pos_of_isHaarMeasure ν μ₀
   set c := Measure.haarScalarFactor ν μ₀
   refine ⟨c, by exact_mod_cast cpos, ?_⟩
   intro 𝓕 h𝓕 φ hφ hint

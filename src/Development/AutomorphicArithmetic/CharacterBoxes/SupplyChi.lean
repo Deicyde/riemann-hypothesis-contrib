@@ -9,8 +9,7 @@ public import Development.AutomorphicArithmetic.CoprimeRanks.AdmChi
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.HC GlobalTheory.EX UpperTheory.Top
 
-theorem UpperTheory.Top.supplyChi :
-    ∀ ψ : PChar, VWinAt ψ 401 → HostExW (3 / 2) (GChi ψ).req := by
+theorem UpperTheory.Top.supplyChi : ∀ ψ : PChar, VWinAt ψ 401 → HostExW (3 / 2) (GChi ψ).req := by
   intro ψ hψ
   refine supplyOfAdm ψ hψ ?_
   intro eps he0 he1

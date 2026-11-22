@@ -17,8 +17,8 @@ structure NormFam (K : Type) [Field K] (V : Type) [AddCommGroup V] [Module K V] 
 
 section Defs
 
-variable {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V]
+variable
+  {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
 
 def ProdLower (Nf : NormFam K V) (M : Submodule (𝓞 K) V) (A : ℝ) : Prop :=
   ∀ f ∈ M, f ≠ 0 → -A ≤ ∑ σ : K →+* ℂ, Real.log (Nf.N σ f)
@@ -29,20 +29,18 @@ def UnifDiscrete (Nf : NormFam K V) (M : Submodule (𝓞 K) V) : Prop :=
 end Defs
 
 def DiscOfProdLowerSt : Prop :=
-  ∀ (K : Type) [Field K] [NumberField K] (V : Type) [AddCommGroup V] [Module K V]
-    [Module (𝓞 K) V] (Nf : NormFam K V) (M : Submodule (𝓞 K) V) (A : ℝ),
+  ∀ (K : Type) [Field K] [NumberField K] (V : Type) [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+      (Nf : NormFam K V) (M : Submodule (𝓞 K) V) (A : ℝ),
     ProdLower Nf M A → UnifDiscrete Nf M
 
 def FGOfDiscSt : Prop :=
-  ∀ (K : Type) [Field K] [NumberField K] (V : Type) [AddCommGroup V] [Module K V]
-    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V]
-    (Nf : NormFam K V) (M : Submodule (𝓞 K) V),
+  ∀ (K : Type) [Field K] [NumberField K] (V : Type) [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+      [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V] (Nf : NormFam K V) (M : Submodule (𝓞 K) V),
     UnifDiscrete Nf M → M.FG
 
 def IsLatticeOfDiscSt : Prop :=
-  ∀ (K : Type) [Field K] [NumberField K] (V : Type) [AddCommGroup V] [Module K V]
-    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V]
-    (Nf : NormFam K V) (M : Submodule (𝓞 K) V),
+  ∀ (K : Type) [Field K] [NumberField K] (V : Type) [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+      [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V] (Nf : NormFam K V) (M : Submodule (𝓞 K) V),
     UnifDiscrete Nf M → Submodule.span K (M : Set V) = ⊤ → Submodule.IsLattice K M
 
 theorem rat_emb_apply (σ : ℚ →+* ℂ) (q : ℚ) : σ q = (q : ℂ) := eq_ratCast σ q

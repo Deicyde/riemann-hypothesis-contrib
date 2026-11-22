@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TraceTranspos
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 noncomputable section
@@ -159,10 +160,9 @@ lemma smooth_right {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : 
   exact ⟨(fun x => x * k) ⁻¹' U, fun x => F (x * k), hU.preimage hc.continuous, hmem,
     hF.comp hc.contDiffOn (fun _ hx => hx), fun g hg hgJ => hfF (g * k) hg (inUJ_mul_flag_measures' hgJ hk)⟩
 
-
 open GlobalTheory.CapelliCentral in
-def rightEnd {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : inUJ ε k) :
-    Module.End ℂ (smoothSpace ε ℂ) where
+def rightEnd {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : inUJ ε k)
+    : Module.End ℂ (smoothSpace ε ℂ) where
   toFun F := mk (fun x => F.1 (x * k)) (smooth_right hk F.2.1)
   map_add' F F' := by
     apply ext_on
@@ -207,9 +207,11 @@ lemma eabEnd_rightEnd {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk
     Submodule.coe_smul, Pi.smul_apply, eabEnd_apply (f := F.1) _ _ F (fun _ _ => rfl) hgk,
     mul_single_mul_apply', Matrix.transpose_apply]
 
-theorem gelf_right : ∀ (n : ℕ) (ε : Fin n → Bool) (m : ℕ) (f : Matrix (Fin n) (Fin n) ℂ → ℂ)
-    (k g : Matrix (Fin n) (Fin n) ℂ), SmoothOnG ε f → k ∈ UJset ε → g ∈ UJset ε →
-    gelf ε m (fun x => f (x * k)) g = gelf ε m f (g * k) := by
+theorem gelf_right
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (m : ℕ) (f : Matrix (Fin n) (Fin n) ℂ → ℂ)
+        (k g : Matrix (Fin n) (Fin n) ℂ),
+      SmoothOnG ε f → k ∈ UJset ε → g ∈ UJset ε
+        → gelf ε m (fun x => f (x * k)) g = gelf ε m f (g * k) := by
   intro n ε m f k g hf hk hg
   have hkU : inUJ ε k := hk
   have hgU : inUJ ε g := hg
@@ -218,15 +220,22 @@ theorem gelf_right : ∀ (n : ℕ) (ε : Fin n → Bool) (m : ℕ) (f : Matrix (
     rw [← Matrix.transpose_mul, Matrix.nonsing_inv_mul k hd, Matrix.transpose_one]
   have hfV : SmoothOnGV ε f := (smoothOnGV_iff ε f).mpr hf
   let F : GlobalTheory.CapelliCentral.smoothSpace ε ℂ := GlobalTheory.CapelliCentral.mk f hfV
-  have hFf : ∀ x, inUJ ε x → F.1 x = f x := fun x hx => GlobalTheory.CapelliCentral.mk_apply f hfV hx
-  have hcomm := trace_pow_comm (GlobalTheory.CapelliCentral.eabEnd ε ℂ) (rightEnd hkU) (k⁻¹)ᵀ kᵀ hQP
-    (eabEnd_rightEnd hkU) (m + 1)
-  have h1 := congrArg (fun T : Module.End ℂ (GlobalTheory.CapelliCentral.smoothSpace ε ℂ) => (T F).1 g) hcomm
+  have hFf : ∀ x, inUJ ε x → F.1 x = f x := fun x hx =>
+    GlobalTheory.CapelliCentral.mk_apply f hfV hx
+  have hcomm :=
+    trace_pow_comm (GlobalTheory.CapelliCentral.eabEnd ε ℂ) (rightEnd hkU) (k⁻¹)ᵀ kᵀ hQP
+      (eabEnd_rightEnd hkU) (m + 1)
+  have h1 :=
+    congrArg (fun T : Module.End ℂ (GlobalTheory.CapelliCentral.smoothSpace ε ℂ) => (T F).1 g) hcomm
   simp only [Module.End.mul_apply] at h1
-  rw [GlobalTheory.Dec.FormF.gelf_apply (f := fun x => f (x * k)) m (rightEnd hkU F)
-      (fun x hx => (rightEnd_apply hkU F hx).trans (hFf _ (inUJ_mul_flag_measures' hx hkU))) hgU,
-    rightEnd_apply hkU _ hgU,
-    GlobalTheory.Dec.FormF.gelf_apply m F hFf (inUJ_mul_flag_measures' hgU hkU)] at h1
+  rw [GlobalTheory.Dec.FormF.gelf_apply
+        (f := fun x => f (x * k))
+        m (rightEnd hkU F)
+        (fun x hx => (rightEnd_apply hkU F hx).trans (hFf _ (inUJ_mul_flag_measures' hx hkU)))
+        hgU,
+      rightEnd_apply hkU _ hgU,
+      GlobalTheory.Dec.FormF.gelf_apply m F hFf (inUJ_mul_flag_measures' hgU hkU)]
+    at h1
   exact h1
 
 end GlobalTheory.Dec.GelfAd

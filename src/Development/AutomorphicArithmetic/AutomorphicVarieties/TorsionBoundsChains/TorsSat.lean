@@ -7,10 +7,13 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open CategoryTheory UpperTheory.V.KH
 
-private theorem torsSat_coeff {M ι : Type} [AddCommGroup M] (L : Set M) (v : ι → M)
-    (hv : LinearIndependent ℤ v) (x : M) (hx : x ∈ Submodule.span ℤ (Set.range v))
-    (n : ℤ) (hn : n ≠ 0) (hnx : n • x ∈ Submodule.span ℤ (Set.range v ∩ L)) :
-    x ∈ Submodule.span ℤ (Set.range v ∩ L) := by
+private theorem torsSat_coeff
+    {M ι : Type} [AddCommGroup M]
+    (L : Set M)
+    (v : ι → M) (hv : LinearIndependent ℤ v)
+    (x : M) (hx : x ∈ Submodule.span ℤ (Set.range v))
+    (n : ℤ) (hn : n ≠ 0) (hnx : n • x ∈ Submodule.span ℤ (Set.range v ∩ L))
+    : x ∈ Submodule.span ℤ (Set.range v ∩ L) := by
   have hS : Set.range v ∩ L = v '' (v ⁻¹' L) := by
     rw [Set.image_preimage_eq_inter_range, Set.inter_comm]
   rw [hS] at hnx ⊢
@@ -28,25 +31,29 @@ private theorem torsSat_coeff {M ι : Type} [AddCommGroup M] (L : Set M) (v : ι
   rw [hcd, Finsupp.smul_apply, smul_eq_mul, mul_eq_zero] at this
   exact this.resolve_left hn
 
-private theorem torsSat_mult {M : Type} [AddCommGroup M] (L : Set M) (N : Submodule ℤ M)
-    (h : ∀ x ∈ L, ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ N) (x : M) (hx : x ∈ Submodule.span ℤ L) :
-    ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ N :=
+private theorem torsSat_mult
+    {M : Type} [AddCommGroup M]
+    (L : Set M) (N : Submodule ℤ M) (h : ∀ x ∈ L, ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ N)
+    (x : M) (hx : x ∈ Submodule.span ℤ L)
+    : ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ N :=
   _root_.UpperTheory.Reformulated.B.Qi35.torsSat_mult L N h x hx
 
-private theorem torsSat_tors {M : Type} [AddCommGroup M] (N : Submodule ℤ M) (x : M)
-    (hx : (Submodule.Quotient.mk x : M ⧸ N) ∈ AddCommGroup.torsion (M ⧸ N)) :
-    ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ N := by
+private theorem torsSat_tors
+    {M : Type} [AddCommGroup M]
+    (N : Submodule ℤ M) (x : M)
+    (hx : (Submodule.Quotient.mk x : M ⧸ N) ∈ AddCommGroup.torsion (M ⧸ N))
+    : ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ N := by
   have hx' : IsOfFinAddOrder (Submodule.Quotient.mk x : M ⧸ N) := hx
   obtain ⟨n, hn, h⟩ := isOfFinAddOrder_iff_nsmul_eq_zero.1 hx'
   refine ⟨n, by exact_mod_cast hn.ne', ?_⟩
   rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_smul, natCast_zsmul]
   exact h
 
-theorem UpperTheory.V.KH.torsSat :
-    ∀ (M ι : Type) [AddCommGroup M] [IsAddTorsionFree M] (L : Set M) (v : ι → M) (B : ℕ),
-      LinearIndependent ℤ v →
-      (∀ x ∈ L, ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ Submodule.span ℤ (Set.range v ∩ L)) →
-      CardLe (M ⧸ Submodule.span ℤ (Set.range v)) B → TorsLe (M ⧸ Submodule.span ℤ L) B := by
+theorem UpperTheory.V.KH.torsSat
+    : ∀ (M ι : Type) [AddCommGroup M] [IsAddTorsionFree M] (L : Set M) (v : ι → M) (B : ℕ),
+      LinearIndependent ℤ v → (∀ x ∈ L, ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ Submodule.span ℤ (Set.range v ∩ L))
+        → CardLe (M ⧸ Submodule.span ℤ (Set.range v)) B
+        → TorsLe (M ⧸ Submodule.span ℤ L) B := by
   intro M ι _ _ L v B hv hL hc
   obtain ⟨hfin, hB⟩ := hc
   choose lift hlift using Submodule.Quotient.mk_surjective (Submodule.span ℤ L)
@@ -56,8 +63,9 @@ theorem UpperTheory.V.KH.torsSat :
     intro t s hts
     have h1 : lift t.1 - lift s.1 ∈ Submodule.span ℤ (Set.range v) :=
       (Submodule.Quotient.eq _).1 hts
-    have h2 : (Submodule.Quotient.mk (lift t.1 - lift s.1) : M ⧸ Submodule.span ℤ L) ∈
-        AddCommGroup.torsion (M ⧸ Submodule.span ℤ L) := by
+    have h2
+        : (Submodule.Quotient.mk (lift t.1 - lift s.1) : M ⧸ Submodule.span ℤ L)
+          ∈ AddCommGroup.torsion (M ⧸ Submodule.span ℤ L) := by
       rw [Submodule.Quotient.mk_sub, hlift, hlift]
       exact sub_mem t.2 s.2
     obtain ⟨n, hn, hnx⟩ := torsSat_tors _ _ h2

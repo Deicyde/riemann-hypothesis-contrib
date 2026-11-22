@@ -8,16 +8,20 @@ universe u_1 u_2
 
 namespace Bl.general_b_fact_rest
 
-theorem goal1 :
-  ∀ {R : Type u_1} [inst : CommRing.{u_1} R] [inst_1 : IsLocalRing.{u_1} R] [IsNoetherianRing.{u_1} R] {M : Type u_2}
-  [inst_3 : AddCommGroup.{u_2} M] [inst_4 : Module.{u_1, u_2} R M] [Module.Finite.{u_1, u_2} R M] {p : Ideal.{u_1} R},
-  Membership.mem.{u_1, u_1} (associatedPrimes.{u_1, u_2} R M) p →
-    ∀ {x : R},
-      Membership.mem.{u_1, u_1} (IsLocalRing.maximalIdeal.{u_1} R) x →
-        IsSMulRegular.{u_1, u_2} M x →
-          Exists.{u_1 + 1} fun (q : Ideal.{u_1} R) ↦
-            And (Membership.mem.{u_1, u_1} (associatedPrimes.{u_1, u_2} R (QuotSMulTop.{u_2, u_1} x M)) q)
-              (And (LT.lt.{u_1} p q) (And (Membership.mem.{u_1, u_1} q x) (Not (Membership.mem.{u_1, u_1} p x)))) := by
+theorem goal1
+    : ∀ {R : Type u_1} [inst : CommRing.{u_1} R] [inst_1 : IsLocalRing.{u_1} R]
+        [IsNoetherianRing.{u_1} R] {M : Type u_2} [inst_3 : AddCommGroup.{u_2} M]
+        [inst_4 : Module.{u_1, u_2} R M] [Module.Finite.{u_1, u_2} R M] {p : Ideal.{u_1} R},
+      Membership.mem.{u_1, u_1} (associatedPrimes.{u_1, u_2} R M) p
+        → ∀ {x : R},
+          Membership.mem.{u_1, u_1} (IsLocalRing.maximalIdeal.{u_1} R) x
+            → IsSMulRegular.{u_1, u_2} M x
+            → Exists.{u_1 + 1} fun (q : Ideal.{u_1} R) ↦
+              And
+                (Membership.mem.{u_1, u_1}
+                  (associatedPrimes.{u_1, u_2} R (QuotSMulTop.{u_2, u_1} x M)) q)
+                (And (LT.lt.{u_1} p q)
+                  (And (Membership.mem.{u_1, u_1} q x) (Not (Membership.mem.{u_1, u_1} p x)))) := by
   intro R _ _ _ M _ _ _ p hp x hx hreg
   open Pointwise in
   · rw [AssociatedPrimes.mem_iff, isAssociatedPrime_iff] at hp
@@ -55,9 +59,11 @@ theorem goal1 :
           rw [smul_comm, hm', hn r hr, smul_zero]
         rw [← hm']
         exact Submodule.smul_mem_smul (Ideal.mem_span_singleton_self x) hm'N
-      have hbot := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (Ideal.span {x}) N
-        (IsNoetherian.noetherian N) hle
-        (((Ideal.span_singleton_le_iff_mem _).2 hx).trans (IsLocalRing.maximalIdeal_le_jacobson _))
+      have hbot :=
+        Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (Ideal.span {x}) N
+          (IsNoetherian.noetherian N) hle
+          (((Ideal.span_singleton_le_iff_mem _).2 hx).trans
+            (IsLocalRing.maximalIdeal_le_jacobson _))
       apply hm0
       rw [hbot] at hm0N
       exact (Submodule.mem_bot R).1 hm0N

@@ -80,8 +80,8 @@ private lemma sum_eq_sum_succ_of_zero_at_edges (f : Fin (2 * (1 + r') + k + 1) �
   · intro a
     rfl
 
-theorem herm_lift_lift (u v : Fin (2 * r' + k + 1) → ℂ) :
-    herm (Hpk k (1 + r')) (liftVec k 1 r' u) (liftVec k 1 r' v) = herm (Hpk k r') u v := by
+theorem herm_lift_lift (u v : Fin (2 * r' + k + 1) → ℂ)
+    : herm (Hpk k (1 + r')) (liftVec k 1 r' u) (liftVec k 1 r' v) = herm (Hpk k r') u v := by
   unfold herm
   simp only [dotProduct, Matrix.mulVec]
   rw [sum_eq_sum_succ_of_zero_at_edges]
@@ -94,7 +94,8 @@ theorem herm_lift_lift (u v : Fin (2 * r' + k + 1) → ℂ) :
   · intro i hi
     rw [Pi.star_apply, liftVec_apply_of_edge k r' v i hi, star_zero, zero_mul]
 
-theorem herm_first_lift_eq_zero (v : Fin (2 * r' + k + 1) → ℂ) : herm (Hpk k (1 + r')) (e0 k r') (liftVec k 1 r' v) = 0 := by
+theorem herm_first_lift_eq_zero (v : Fin (2 * r' + k + 1) → ℂ)
+    : herm (Hpk k (1 + r')) (e0 k r') (liftVec k 1 r' v) = 0 := by
   simp only [e0]
   rw [herm_bvec_left']
   apply Finset.sum_eq_zero
@@ -102,10 +103,16 @@ theorem herm_first_lift_eq_zero (v : Fin (2 * r' + k + 1) → ℂ) : herm (Hpk k
   by_cases hi : i.val = 2 * (1 + r') + k
   · rw [liftVec_apply_of_edge k r' v i (Or.inr hi), star_zero, zero_mul]
   · have h0 : Hpk k (1 + r') i (eI k (1 + r') (a0 r')) = 0 := by
-      first | (simp only [Hpk, eI, esI, a0, Fin.val_mk, Fin.ext_iff]; (try split_ifs) <;> (first | rfl | omega)) | (simp [Hpk, eI, esI, a0])
+      first
+      | (
+          simp only [Hpk, eI, esI, a0, Fin.val_mk, Fin.ext_iff]
+          (try split_ifs) <;> (first | rfl | omega)
+        )
+      | (simp [Hpk, eI, esI, a0])
     rw [h0, mul_zero]
 
-theorem herm_last_lift_eq_zero (v : Fin (2 * r' + k + 1) → ℂ) : herm (Hpk k (1 + r')) (es0 k r') (liftVec k 1 r' v) = 0 := by
+theorem herm_last_lift_eq_zero (v : Fin (2 * r' + k + 1) → ℂ)
+    : herm (Hpk k (1 + r')) (es0 k r') (liftVec k 1 r' v) = 0 := by
   simp only [es0]
   rw [herm_bvec_left']
   apply Finset.sum_eq_zero
@@ -113,13 +120,23 @@ theorem herm_last_lift_eq_zero (v : Fin (2 * r' + k + 1) → ℂ) : herm (Hpk k 
   by_cases hi : i.val = 0
   · rw [liftVec_apply_of_edge k r' v i (Or.inl hi), star_zero, zero_mul]
   · have h0 : Hpk k (1 + r') i (esI k (1 + r') (a0 r')) = 0 := by
-      first | (simp only [Hpk, eI, esI, a0, Fin.val_mk, Fin.ext_iff]; (try split_ifs) <;> (first | rfl | omega)) | (simp [Hpk, eI, esI, a0])
+      first
+      | (
+          simp only [Hpk, eI, esI, a0, Fin.val_mk, Fin.ext_iff]
+          (try split_ifs) <;> (first | rfl | omega)
+        )
+      | (simp [Hpk, eI, esI, a0])
     rw [h0, mul_zero]
 
 theorem herm_last_first_eq_one : herm (Hpk k (1 + r')) (es0 k r') (e0 k r') = 1 := by
   simp only [e0, es0]
   rw [herm_bvec_bvec']
-  first | (simp only [Hpk, eI, esI, a0, Fin.val_mk, Fin.ext_iff]; (try split_ifs) <;> (first | rfl | omega)) | (simp [Hpk, eI, esI, a0])
+  first
+  | (
+      simp only [Hpk, eI, esI, a0, Fin.val_mk, Fin.ext_iff]
+      (try split_ifs) <;> (first | rfl | omega)
+    )
+  | (simp [Hpk, eI, esI, a0])
 
 private lemma sum_Hpk_eI_a0_mul_eq_esI (w : Fin (2 * (1 + r') + k + 1) → ℂ) :
     ∑ j, Hpk k (1 + r') (eI k (1 + r') (a0 r')) j * w j = w (esI k (1 + r') (a0 r')) := by
@@ -162,7 +179,8 @@ private lemma phiV'_one_add_zero_eq_first_basis_e0_vec : phiV' k (1 + r') 0 = e0
   simp only [e0, bvec, Pi.single_apply, Hpk, esI, eI, a0, Fin.val_mk, Fin.ext_iff, Fin.val_zero]
   (try split_ifs) <;> (first | rfl | omega)
 
-theorem herm_phi_first_eq_zero (b : Fin (1 + r' + 1)) : herm (Hpk k (1 + r')) (phiV' k (1 + r') b) (e0 k r') = 0 := by
+theorem herm_phi_first_eq_zero (b : Fin (1 + r' + 1))
+    : herm (Hpk k (1 + r')) (phiV' k (1 + r') b) (e0 k r') = 0 := by
   simp only [e0]
   rw [herm_bvec_right', sum_Hpk_eI_a0_mul_eq_esI]
   simp only [phiV', Matrix.mulVec, dotProduct]
@@ -175,9 +193,10 @@ theorem herm_phi_first_eq_zero (b : Fin (1 + r' + 1)) : herm (Hpk k (1 + r')) (p
       Fin.ext_iff, Fin.val_zero, Fin.val_last]
     (try split_ifs) <;> (first | omega | simp)
 
-theorem heis_phi' (hHA : HeisAct) (x : HPar k r') (b : Fin (1 + r' + 1)) :
-    heis0 k r' x *ᵥ phiV' k (1 + r') b = phiV' k (1 + r') b -
-      herm (Hpk k (1 + r')) (phiV' k (1 + r') b) (liftVec k 1 r' x.1) • phiV' k (1 + r') 0 := by
+theorem heis_phi' (hHA : HeisAct) (x : HPar k r') (b : Fin (1 + r' + 1))
+    : heis0 k r' x *ᵥ phiV' k (1 + r') b
+      = phiV' k (1 + r') b
+        - herm (Hpk k (1 + r')) (phiV' k (1 + r') b) (liftVec k 1 r' x.1) • phiV' k (1 + r') 0 := by
   simp only [heis0]
   rw [hHA k r', herm_phi_first_eq_zero k r' b, phiV'_one_add_zero_eq_first_basis_e0_vec k r']
   simp
@@ -218,30 +237,36 @@ private lemma herm_sub_smul_right' {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ) (u
     herm H u (v - c • w) = herm H u v - star c * herm H u w := by
   simp [herm, star_sub, star_smul, sub_dotProduct, smul_dotProduct]
 
-theorem Dl_conj (l : Fin (r + 1)) (Y n n' : Mat k r) (hn : n ∈ GV k r) (α β : Fin (r + 1) → ℂ)
-    (hα : α 0 = 0) (hβ : β 0 = 0)
-    (hn' : ∀ b, n' *ᵥ phiV' k r b = phiV' k r b - α b • phiV' k r 0)
-    (hnn : ∀ a, n *ᵥ phiV' k r a = phiV' k r a - β a • phiV' k r 0) :
-    Dl k r l (n⁻¹ * Y * n') = Dl k r l Y := by
+theorem Dl_conj
+    (l : Fin (r + 1))
+    (Y n n' : Mat k r) (hn : n ∈ GV k r)
+    (α β : Fin (r + 1) → ℂ)
+    (hα : α 0 = 0) (hβ : β 0 = 0) (hn' : ∀ b, n' *ᵥ phiV' k r b = phiV' k r b - α b • phiV' k r 0)
+    (hnn : ∀ a, n *ᵥ phiV' k r a = phiV' k r a - β a • phiV' k r 0)
+    : Dl k r l (n⁻¹ * Y * n') = Dl k r l Y := by
   have HH : Hpk k r * Hpk k r = 1 := Hpk_mul_Hpk_eq_one k r
   have hinv : n⁻¹ = Hpk k r * nᴴ * Hpk k r := by
     apply Matrix.inv_eq_left_inv
     have h1 : nᴴ * Hpk k r * n = Hpk k r := hn
-    calc Hpk k r * nᴴ * Hpk k r * n = Hpk k r * (nᴴ * Hpk k r * n) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      Hpk k r * nᴴ * Hpk k r * n
+        = Hpk k r * (nᴴ * Hpk k r * n) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [h1, HH]
-  have hherm : ∀ z w : Fin (2 * r + k + 1) → ℂ,
-      herm (Hpk k r) (n⁻¹ *ᵥ z) w = herm (Hpk k r) z (n *ᵥ w) := by
+  have hherm
+      : ∀ z w : Fin (2 * r + k + 1) → ℂ,
+        herm (Hpk k r) (n⁻¹ *ᵥ z) w = herm (Hpk k r) z (n *ᵥ w) := by
     intro z w
     have e1 : Hpk k r * (Hpk k r * nᴴ * Hpk k r) = nᴴ * Hpk k r := by
       simp only [← Matrix.mul_assoc, HH, Matrix.one_mul]
     unfold herm
     rw [hinv, Matrix.mulVec_mulVec, e1, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec,
       Matrix.mulVec_mulVec]
-  have hc0 : ∀ h : l.val + 1 ≤ r + 1, Fin.castLE h (0 : Fin (l.val + 1)) = 0 :=
-    fun h => Fin.ext (by simp)
-  have detP : (1 - Matrix.of fun a c : Fin (l.val + 1) =>
-      if c = 0 then star (β (Fin.castLE (by omega) a)) else 0).det = 1 := by
+  have hc0 : ∀ h : l.val + 1 ≤ r + 1, Fin.castLE h (0 : Fin (l.val + 1)) = 0 := fun h =>
+    Fin.ext (by simp)
+  have detP
+      : (1 - Matrix.of fun a c : Fin (l.val + 1) =>
+          if c = 0 then star (β (Fin.castLE (by omega) a)) else 0).det
+        = 1 := by
     rw [Matrix.det_of_lowerTriangular]
     · apply Finset.prod_eq_one
       intro i _
@@ -253,8 +278,10 @@ theorem Dl_conj (l : Fin (r + 1)) (Y n n' : Mat k r) (hn : n ∈ GV k r) (α β 
       have hij' : i < j := hij
       have hj : j ≠ 0 := fun h => absurd (h ▸ hij') (Fin.not_lt_zero i)
       simp [hj, Matrix.one_apply, ne_of_lt hij']
-  have detQ : (1 - Matrix.of fun d b : Fin (l.val + 1) =>
-      if d = 0 then α (Fin.castLE (by omega) b) else 0).det = 1 := by
+  have detQ
+      : (1 - Matrix.of fun d b : Fin (l.val + 1) =>
+          if d = 0 then α (Fin.castLE (by omega) b) else 0).det
+        = 1 := by
     rw [Matrix.det_of_upperTriangular]
     · apply Finset.prod_eq_one
       intro i _
@@ -267,16 +294,17 @@ theorem Dl_conj (l : Fin (r + 1)) (Y n n' : Mat k r) (hn : n ∈ GV k r) (α β 
       have hi : i ≠ 0 := fun h => absurd (h ▸ hij') (Fin.not_lt_zero j)
       simp [hi, Matrix.one_apply, ne_of_gt hij']
   unfold Dl
-  have hM : (Matrix.of fun a b : Fin (l.val + 1) =>
-      herm (Hpk k r) ((n⁻¹ * Y * n') *ᵥ phiV' k r (Fin.castLE (by omega) b))
-        (phiV' k r (Fin.castLE (by omega) a))) =
-      (1 - Matrix.of fun a c : Fin (l.val + 1) =>
-          if c = 0 then star (β (Fin.castLE (by omega) a)) else 0) *
-        (Matrix.of fun a b : Fin (l.val + 1) =>
-          herm (Hpk k r) (Y *ᵥ phiV' k r (Fin.castLE (by omega) b))
-            (phiV' k r (Fin.castLE (by omega) a))) *
-        (1 - Matrix.of fun d b : Fin (l.val + 1) =>
-          if d = 0 then α (Fin.castLE (by omega) b) else 0) := by
+  have hM
+      : (Matrix.of fun a b : Fin (l.val + 1) =>
+          herm (Hpk k r) ((n⁻¹ * Y * n') *ᵥ phiV' k r (Fin.castLE (by omega) b))
+            (phiV' k r (Fin.castLE (by omega) a)))
+        = (1 - Matrix.of fun a c : Fin (l.val + 1) =>
+            if c = 0 then star (β (Fin.castLE (by omega) a)) else 0)
+          * (Matrix.of fun a b : Fin (l.val + 1) =>
+            herm (Hpk k r) (Y *ᵥ phiV' k r (Fin.castLE (by omega) b))
+              (phiV' k r (Fin.castLE (by omega) a)))
+          * (1 - Matrix.of fun d b : Fin (l.val + 1) =>
+            if d = 0 then α (Fin.castLE (by omega) b) else 0) := by
     ext a b
     simp only [Matrix.of_apply, ← Matrix.mulVec_mulVec, hherm, hn', hnn, Matrix.mulVec_sub,
       Matrix.mulVec_smul, herm_sub_smul_left', herm_sub_smul_right']
@@ -285,8 +313,9 @@ theorem Dl_conj (l : Fin (r + 1)) (Y n n' : Mat k r) (hn : n ∈ GV k r) (α β 
     ring
   rw [hM, Matrix.det_mul, Matrix.det_mul, detP, detQ, one_mul, mul_one]
 
-theorem det_eq_mul_minor_of_col_zero_alt {m : ℕ} (A : Matrix (Fin (m + 1)) (Fin (m + 1)) ℂ) (h : ∀ i : Fin m, A i.succ 0 = 0) :
-    A.det = A 0 0 * (A.submatrix Fin.succ Fin.succ).det := by
+theorem det_eq_mul_minor_of_col_zero_alt
+    {m : ℕ} (A : Matrix (Fin (m + 1)) (Fin (m + 1)) ℂ) (h : ∀ i : Fin m, A i.succ 0 = 0)
+    : A.det = A 0 0 * (A.submatrix Fin.succ Fin.succ).det := by
   rw [Matrix.det_succ_column_zero, Fin.sum_univ_succ]
   simp [h]
 
@@ -295,8 +324,9 @@ end dl
 section a1
 variable (k r' : ℕ)
 
-theorem castLE_succ_eq {m : ℕ} (h : m + 1 ≤ 1 + r' + 1) (b : Fin m) :
-    Fin.castLE h b.succ = sc r' ⟨b.val, by omega⟩ := by first | rfl | (ext; simp [sc])
+theorem castLE_succ_eq {m : ℕ} (h : m + 1 ≤ 1 + r' + 1) (b : Fin m)
+    : Fin.castLE h b.succ = sc r' ⟨b.val, by omega⟩ := by
+  first | rfl | (ext; simp [sc])
 
 private lemma phiV_one_add_sc_eq_liftVec (b : Fin (r' + 1)) :
     phiV k (1 + r') (sc r' b) = liftVec k 1 r' (phiV k r' b) := by
@@ -428,36 +458,45 @@ private lemma herm_smul_left_tail_integrals {m : ℕ} (H : Matrix (Fin m) (Fin m
     herm H (c • v) w = c * herm H v w := by
   simp [herm, Matrix.mulVec_smul, dotProduct_smul]
 
-theorem Dl_Y (c : ℂ) (g : Mat k r') (l : Fin (1 + r' + 1)) :
-    Dl k (1 + r') l (w0 k r' c * ιLev k 1 r' g) =
-      c * (Matrix.of fun a b : Fin l.val =>
-        herm (Hpk k r') (g *ᵥ phiV' k r' ⟨b.val, by omega⟩) (phiV' k r' ⟨a.val, by omega⟩)).det := by
-  have hc0 : ∀ h : l.val + 1 ≤ 1 + r' + 1, Fin.castLE h (0 : Fin (l.val + 1)) = 0 :=
-    fun h => Fin.ext (by simp)
+theorem Dl_Y (c : ℂ) (g : Mat k r') (l : Fin (1 + r' + 1))
+    : Dl k (1 + r') l (w0 k r' c * ιLev k 1 r' g)
+      = c * (Matrix.of fun a b : Fin l.val =>
+        herm (Hpk k r') (g *ᵥ phiV' k r' ⟨b.val, by omega⟩)
+          (phiV' k r' ⟨a.val, by omega⟩)).det := by
+  have hc0 : ∀ h : l.val + 1 ≤ 1 + r' + 1, Fin.castLE h (0 : Fin (l.val + 1)) = 0 := fun h =>
+    Fin.ext (by simp)
   unfold Dl
   rw [det_eq_mul_minor_of_col_zero_alt]
   · congr 1
-    · simp only [Matrix.of_apply, hc0, phiV'_one_add_zero_eq_first_basis_e0_vec, w0_mul_lev_mulVec_e0_eq_smul_es0, herm_smul_left_tail_integrals, herm_last_first_eq_one, mul_one]
+    · simp only [Matrix.of_apply, hc0, phiV'_one_add_zero_eq_first_basis_e0_vec,
+        w0_mul_lev_mulVec_e0_eq_smul_es0, herm_smul_left_tail_integrals, herm_last_first_eq_one,
+        mul_one]
     · congr 1
       ext a b
-      simp only [Matrix.submatrix_apply, Matrix.of_apply, castLE_succ_eq, phiV'_one_add_sc_eq_liftVec, w0_mul_lev_mulVec_liftVec,
-        herm_lift_lift]
+      simp only [Matrix.submatrix_apply, Matrix.of_apply, castLE_succ_eq,
+        phiV'_one_add_sc_eq_liftVec, w0_mul_lev_mulVec_liftVec, herm_lift_lift]
   · intro i
-    simp only [Matrix.of_apply, hc0, phiV'_one_add_zero_eq_first_basis_e0_vec, w0_mul_lev_mulVec_e0_eq_smul_es0, herm_smul_left_tail_integrals, castLE_succ_eq, phiV'_one_add_sc_eq_liftVec,
-      herm_last_lift_eq_zero, mul_zero]
+    simp only [Matrix.of_apply, hc0, phiV'_one_add_zero_eq_first_basis_e0_vec,
+      w0_mul_lev_mulVec_e0_eq_smul_es0, herm_smul_left_tail_integrals, castLE_succ_eq,
+      phiV'_one_add_sc_eq_liftVec, herm_last_lift_eq_zero, mul_zero]
 
-theorem Dl_Y_sc (c : ℂ) (g : Mat k r') (l : Fin (r' + 1)) :
-    Dl k (1 + r') (sc r' l) (w0 k r' c * ιLev k 1 r' g) = c * Dl k r' l g := by
+theorem Dl_Y_sc (c : ℂ) (g : Mat k r') (l : Fin (r' + 1))
+    : Dl k (1 + r') (sc r' l) (w0 k r' c * ιLev k 1 r' g) = c * Dl k r' l g := by
   rw [Dl_Y]
   first | rfl | (unfold Dl; rfl)
 
 theorem Dl_Y_zero (c : ℂ) (g : Mat k r') : Dl k (1 + r') 0 (w0 k r' c * ιLev k 1 r' g) = c := by
   rw [Dl_Y, Matrix.det_eq_one_of_card_eq_zero]
-  all_goals first | (simp; done) | (simp; exact Fintype.card_eq_zero) | exact Fintype.card_eq_zero | (simp; rfl)
+  all_goals
+    first
+    | (simp; done)
+    | (simp; exact Fintype.card_eq_zero)
+    | exact Fintype.card_eq_zero
+    | (simp; rfl)
 
-theorem Dl_oneStep (hHA : HeisAct) (hHM : HeisMem) (x x' : HPar k r') (c : ℂ) (g : Mat k r')
-    (l : Fin (1 + r' + 1)) :
-    Dl k (1 + r') l (oneStep k r' x c g x') = Dl k (1 + r') l (w0 k r' c * ιLev k 1 r' g) := by
+theorem Dl_oneStep
+    (hHA : HeisAct) (hHM : HeisMem) (x x' : HPar k r') (c : ℂ) (g : Mat k r') (l : Fin (1 + r' + 1))
+    : Dl k (1 + r') l (oneStep k r' x c g x') = Dl k (1 + r') l (w0 k r' c * ιLev k 1 r' g) := by
   have hn : heis0 k r' x ∈ GV k (1 + r') := by
     first
     | exact (hHM k r' x).1
@@ -485,10 +524,11 @@ private lemma prod_fin_eq_zero_mul_prod_sc (F : Fin (1 + r' + 1) → ℝ≥0∞)
   congr 1
   exact Fintype.prod_equiv (finCongr (by omega)) _ _ (fun l => congrArg F (Fin.ext (by simp [sc])))
 
-theorem FsE_oneStep (hHA : HeisAct) (hHM : HeisMem) (x x' : HPar k r') (c : ℂ) (g : Mat k r')
-    (s : Fin (1 + r' + 1) → ℝ) :
-    FsE k (1 + r') s (oneStep k r' x c g x') =
-      (∏ l, (‖c‖₊ : ℝ≥0∞) ^ (-s l)) * FsE k r' (fun l => s (sc r' l)) g := by
+theorem FsE_oneStep
+    (hHA : HeisAct) (hHM : HeisMem) (x x' : HPar k r') (c : ℂ) (g : Mat k r')
+    (s : Fin (1 + r' + 1) → ℝ)
+    : FsE k (1 + r') s (oneStep k r' x c g x')
+      = (∏ l, (‖c‖₊ : ℝ≥0∞) ^ (-s l)) * FsE k r' (fun l => s (sc r' l)) g := by
   simp only [FsE, Dl_oneStep k r' hHA hHM x x' c g]
   rw [prod_fin_eq_zero_mul_prod_sc, prod_fin_eq_zero_mul_prod_sc]
   simp only [Dl_Y_zero, Dl_Y_sc, nnnorm_mul, ENNReal.coe_mul]

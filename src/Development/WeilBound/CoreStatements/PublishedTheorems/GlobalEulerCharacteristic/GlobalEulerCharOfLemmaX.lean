@@ -10,7 +10,8 @@ open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfD
 
 namespace PositivityTheory.Lit1.GEN
 
-theorem globalEulerChar_of_lemmaX (hX : GlobalEulerCharCoprime) : ReciprocityTheory.Gal.GlobalEulerChar := by
+theorem globalEulerChar_of_lemmaX (hX : GlobalEulerCharCoprime)
+    : ReciprocityTheory.Gal.GlobalEulerChar := by
   intro F Ω _ _ _ _ _ l _ r M _ _ _ _ _ S rhoS
   exact globalEulerCharAt_of_ratioOne S rhoS (ratioOne_of_lemmaX l hX)
 

@@ -21,8 +21,8 @@ theorem pieriSt_kRel_stdM {n : ℕ} (ε : Fin n → Bool) : Formalism.REAL.KRel 
   · subst h2; simp [Matrix.single_mul_single_same, Matrix.single_mul_single_of_ne, h1]
   · simp [Matrix.single_mul_single_of_ne, h1, h2]
 
-theorem pieriSt_stdM_diag {n : ℕ} (a : Fin n) :
-    stdM n a a = Matrix.diagonal fun i => ((stdWt n i a : ℝ) : ℂ) := by
+theorem pieriSt_stdM_diag {n : ℕ} (a : Fin n)
+    : stdM n a a = Matrix.diagonal fun i => ((stdWt n i a : ℝ) : ℂ) := by
   ext i j
   by_cases hij : i = j
   · subst hij
@@ -30,6 +30,7 @@ theorem pieriSt_stdM_diag {n : ℕ} (a : Fin n) :
     · subst hai; simp [stdM, stdWt]
     · simp [stdM, stdWt, hai, Pi.single_apply]
   · simp [stdM, Matrix.single_apply, hij]
-    intro h1 h2; exact hij (h1.symm.trans h2)
+    intro h1 h2
+    exact hij (h1.symm.trans h2)
 
 end ReciprocityTheory.ChartRestriction.DS.HW

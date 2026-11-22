@@ -13,9 +13,10 @@ open MvPolynomial MeasureTheory ReciprocityTheory.AnForm.M
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem exists_divSupp_of_eval {P : Ideal (MRing ι)} {s : MRing ι} {z : (Σ k, ι k) → ℂ}
-    (hz : z ∈ mcPts P) (h0 : eval z (map (Int.castRingHom ℂ) s) = 0) :
-    ∃ W' ∈ divSupp P s, IsHorizontal W' ∧ z ∈ mcPts W' := by
+theorem exists_divSupp_of_eval
+    {P : Ideal (MRing ι)} {s : MRing ι} {z : (Σ k, ι k) → ℂ}
+    (hz : z ∈ mcPts P) (h0 : eval z (map (Int.castRingHom ℂ) s) = 0)
+    : ∃ W' ∈ divSupp P s, IsHorizontal W' ∧ z ∈ mcPts W' := by
   classical
   let φ : MRing ι →+* ℂ := (eval z).comp (map (Int.castRingHom ℂ))
   have hφ : ∀ f, φ f = eval z (map (Int.castRingHom ℂ) f) := fun f => rfl

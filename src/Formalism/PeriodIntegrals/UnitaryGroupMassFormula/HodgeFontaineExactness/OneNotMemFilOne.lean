@@ -10,12 +10,14 @@ namespace PI.HodgeOfFon.W.Triv
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Module TensorProduct
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
 
 theorem fil_antitone : Antitone PD.Fil := antitone_int_of_succ_le PD.Fil_anti
 
@@ -29,25 +31,25 @@ theorem actdR_smul (g : G) (c : Qp) (β : BdR) : PD.actdR g (c • β) = c • P
   rw [Algebra.smul_def, map_mul, Algebra.smul_def, IsScalarTower.algebraMap_apply Qp K BdR c,
     AlgEquiv.commutes]
 
-variable {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+variable
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
 
 section Coord
 
 variable [DecidableEq (Basis.ofVectorSpaceIndex Qp V)]
 
-noncomputable abbrev coordE (V : Type) [AddCommGroup V] [Module Qp V]
-    [DecidableEq (Basis.ofVectorSpaceIndex Qp V)] :
-    V ⊗[Qp] BdR ≃ₗ[Qp] (Basis.ofVectorSpaceIndex Qp V →₀ BdR) :=
+noncomputable abbrev coordE
+    (V : Type) [AddCommGroup V] [Module Qp V] [DecidableEq (Basis.ofVectorSpaceIndex Qp V)]
+    : V ⊗[Qp] BdR ≃ₗ[Qp] (Basis.ofVectorSpaceIndex Qp V →₀ BdR) :=
   equivFinsuppOfBasisLeft (N := BdR) (Basis.ofVectorSpace Qp V)
 
-theorem coordE_tmul (v : V) (β : BdR) (i) :
-    coordE (BdR := BdR) V (v ⊗ₜ β) i = (Basis.ofVectorSpace Qp V).repr v i • β := by
+theorem coordE_tmul (v : V) (β : BdR) (i)
+    : coordE (BdR := BdR) V (v ⊗ₜ β) i = (Basis.ofVectorSpace Qp V).repr v i • β := by
   exact TensorProduct.equivFinsuppOfBasisLeft_apply_tmul_apply _ _ _ _
 
-theorem coordE_act (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) (g : G)
-    (x : V ⊗[Qp] BdR) (i) :
-    coordE V (actVdR PD ρ g x) i = PD.actdR g (coordE V x i) := by
+theorem coordE_act (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) (g : G) (x : V ⊗[Qp] BdR) (i)
+    : coordE V (actVdR PD ρ g x) i = PD.actdR g (coordE V x i) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v β =>
@@ -55,8 +57,8 @@ theorem coordE_act (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) (g :
     exact (actdR_smul PD g _ β).symm
   | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
 
-theorem coordE_mem_fil {a : ℤ} {x : V ⊗[Qp] BdR} (hx : x ∈ FilV PD (LL := LL) (V := V) a) (i) :
-    coordE V x i ∈ PD.Fil a := by
+theorem coordE_mem_fil {a : ℤ} {x : V ⊗[Qp] BdR} (hx : x ∈ FilV PD (LL := LL) (V := V) a) (i)
+    : coordE V x i ∈ PD.Fil a := by
   obtain ⟨y, rfl⟩ := hx
   induction y using TensorProduct.induction_on with
   | zero => simp
@@ -67,19 +69,24 @@ theorem coordE_mem_fil {a : ℤ} {x : V ⊗[Qp] BdR} (hx : x ∈ FilV PD (LL := 
     simp only [map_add (f := _), Finsupp.add_apply]
     exact add_mem hy hz
 
-theorem mem_DdR_iff (ρ : Representation LL G V) {x : V ⊗[Qp] BdR} :
-    x ∈ DdR PD ρ ↔ ∀ g, actVdR PD ρ g x = x := by
+theorem mem_DdR_iff (ρ : Representation LL G V) {x : V ⊗[Qp] BdR}
+    : x ∈ DdR PD ρ ↔ ∀ g, actVdR PD ρ g x = x := by
   simp only [DdR, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply,
     sub_eq_zero]
 
-theorem coordE_fixed (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) {x : V ⊗[Qp] BdR}
-    (hx : x ∈ DdR PD ρ) (i) : ∃ c : K, algebraMap K BdR c = coordE V x i := by
+theorem coordE_fixed
+    (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) {x : V ⊗[Qp] BdR} (hx : x ∈ DdR PD ρ) (i)
+    : ∃ c : K, algebraMap K BdR c = coordE V x i := by
   refine PD.invdR _ fun g => ?_
   rw [← coordE_act PD ρ hρ g x i, (mem_DdR_iff PD ρ).1 hx g]
 
-theorem DdR_le_filV (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) {a : ℤ} (ha : a ≤ 0)
-    {x : V ⊗[Qp] BdR} (hx : x ∈ DdR PD ρ) : x ∈ FilV PD (LL := LL) (V := V) a := by
-  have hx' : x = (coordE (BdR := BdR) V).symm (coordE V x) := (LinearEquiv.symm_apply_apply _ x).symm
+theorem DdR_le_filV
+    (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x)
+    {a : ℤ} (ha : a ≤ 0)
+    {x : V ⊗[Qp] BdR} (hx : x ∈ DdR PD ρ)
+    : x ∈ FilV PD (LL := LL) (V := V) a := by
+  have hx' : x = (coordE (BdR := BdR) V).symm (coordE V x) :=
+    (LinearEquiv.symm_apply_apply _ x).symm
   rw [hx', TensorProduct.equivFinsuppOfBasisLeft_symm_apply]
   rw [Finsupp.sum]
   refine Submodule.sum_mem _ fun i _ => ?_
@@ -89,8 +96,11 @@ theorem DdR_le_filV (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) {a 
     exact (fil_antitone PD ha) ((PD.Fil 0).smul_mem c PD.one_mem)
   exact ⟨_ ⊗ₜ ⟨_, hmem⟩, by rw [TensorProduct.AlgebraTensorModule.map_tmul]; rfl⟩
 
-theorem DdR_filV_eq_zero (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) {a : ℤ} (ha : 1 ≤ a)
-    {x : V ⊗[Qp] BdR} (hx : x ∈ DdR PD ρ) (hxF : x ∈ FilV PD (LL := LL) (V := V) a) : x = 0 := by
+theorem DdR_filV_eq_zero
+    (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x)
+    {a : ℤ} (ha : 1 ≤ a)
+    {x : V ⊗[Qp] BdR} (hx : x ∈ DdR PD ρ) (hxF : x ∈ FilV PD (LL := LL) (V := V) a)
+    : x = 0 := by
   have hc : ∀ i, coordE V x i = 0 := by
     intro i
     obtain ⟨c, hc⟩ := coordE_fixed PD ρ hρ hx i
@@ -108,8 +118,10 @@ theorem DdR_filV_eq_zero (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x
 
 end Coord
 
-theorem no_jump (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x) (τ : K →ₐ[Qp] LL) (a : ℤ)
-    (h : IsJumpV PD ρ τ a) : a = 0 := by
+theorem no_jump
+    (ρ : Representation LL G V) (hρ : ∀ g x, ρ g x = x)
+    (τ : K →ₐ[Qp] LL) (a : ℤ) (h : IsJumpV PD ρ τ a)
+    : a = 0 := by
   classical
   by_contra ha0
   apply h

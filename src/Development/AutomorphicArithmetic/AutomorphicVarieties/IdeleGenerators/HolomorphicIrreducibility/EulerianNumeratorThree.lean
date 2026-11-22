@@ -104,16 +104,14 @@ private lemma norm_nat_lt {l : ℕ} [Fact l.Prime] {N : ℕ} (h : l ∣ N) : ‖
 end UpperTheory.V.Sd
 
 open UpperTheory.V.Sd in
-theorem UpperTheory.V.Sd.lkSep :
-    UpperTheory.V.Sd.LkSep := by
+theorem UpperTheory.V.Sd.lkSep : UpperTheory.V.Sd.LkSep := by
   intro l _ hl2 N hN hlN
   have hn : ‖(N : Qbar l)‖ = 1 := norm_nat hlN
   have h1 : ∀ (k : ℕ) (x : Qbar l), x ^ N = 1 → x ≠ 1 → ‖Lk k x‖ ≤ 1 := by
     intro k x hx h
     rw [Lk, norm_div, norm_pow, norm_one_sub hN hn hx h, one_pow, div_one]
     exact norm_aeval_le (norm_root hN hx).le _
-  have hne : ∀ x : Qbar l, x ^ 2 ≠ 1 → x ≠ 1 := by
-    rintro x h rfl; exact h (one_pow 2)
+  have hne : ∀ x : Qbar l, x ^ 2 ≠ 1 → x ≠ 1 := by rintro x h rfl; exact h (one_pow 2)
   have h3 : ∀ x : Qbar l, x ^ N = 1 → x ^ 2 ≠ 1 → ‖Lk 3 x‖ = 1 := by
     intro x hx h
     have ha := norm_one_sub hN hn hx (hne x h)
@@ -122,7 +120,8 @@ theorem UpperTheory.V.Sd.lkSep :
     have hc : ‖1 + x‖ = 1 := by
       have : 1 - x ^ 2 = (1 - x) * (1 + x) := by ring
       rwa [this, norm_mul, ha, one_mul] at hb
-    rw [eulerian_three_eq, norm_div, norm_mul, norm_pow, ha, hc, norm_root hN hx]; norm_num
+    rw [eulerian_three_eq, norm_div, norm_mul, norm_pow, ha, hc, norm_root hN hx]
+    norm_num
   refine ⟨h1, h3, ?_⟩
   intro x y hx hy hx2 hy2 hyx hyx'
   have hax := norm_one_sub hN hn hx (hne x hx2)

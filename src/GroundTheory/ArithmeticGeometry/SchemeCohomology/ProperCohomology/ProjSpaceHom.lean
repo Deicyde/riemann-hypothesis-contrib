@@ -16,8 +16,10 @@ noncomputable section
 
 namespace ProjHom
 
-variable {σ : Type*} {A : Type u} [CommRing A] [SetLike σ A] [AddSubgroupClass σ A]
-  (𝒜 : ℕ → σ) [GradedRing 𝒜] {X : Scheme.{u}}
+variable
+  {σ : Type*} {A : Type u} [CommRing A] [SetLike σ A] [AddSubgroupClass σ A]
+  (𝒜 : ℕ → σ) [GradedRing 𝒜]
+  {X : Scheme.{u}}
 
 lemma corr_apply (g : X ⟶ Proj 𝒜) (r : A) (V : X.Opens) (h : V ≤ g ⁻¹ᵁ Proj.basicOpen 𝒜 r)
     (y : Away 𝒜 r) :
@@ -30,7 +32,6 @@ lemma corr_apply (g : X ⟶ Proj 𝒜) (r : A) (V : X.Opens) (h : V ≤ g ⁻¹�
   simp only [ConcreteCategory.comp_apply, Iso.inv_hom_id_apply] at hR
   erw [hB]
   exact hR
-
 
 set_option backward.isDefEq.respectTransparency false in
 lemma ι_appTop_eq (V : X.Opens) (z : Γ(X, ⊤)) :
@@ -68,8 +69,8 @@ open MvPolynomial
 
 variable {A : Type u} [CommRing A] {n : ℕ}
 
-def chartHom (i : Fin (n + 1)) :
-    MvPolynomial (Fin (n + 1)) A →+* Γ(projectiveSpace A n, Proj.basicOpen (grading A n) (X i)) :=
+def chartHom (i : Fin (n + 1))
+    : MvPolynomial (Fin (n + 1)) A →+* Γ(projectiveSpace A n, Proj.basicOpen (grading A n) (X i)) :=
   (Proj.awayToSection (grading A n) (X i)).hom.comp ((polyToChart A i).comp (dehom A i))
 
 lemma polyToChart_dehom_of_mem (i : Fin (n + 1)) {m : ℕ} {a : MvPolynomial (Fin (n + 1)) A}
@@ -170,32 +171,47 @@ lemma iSup_basicOpen_X : ⨆ j : Fin (n + 1), Proj.basicOpen (grading A n)
     (X j : MvPolynomial (Fin (n + 1)) A) = ⊤ :=
   iSup_stdOpen
 
-theorem eq_fromOfGlobalSections_of_preimage_eq_top {O : Scheme.{u}} (q : O ⟶ projectiveSpace A n)
-    (k : Fin (n + 1)) (hq : q ⁻¹ᵁ Proj.basicOpen (grading A n) (X k) = ⊤) :
-    q = Proj.fromOfGlobalSections (grading A n) ((q.appLE _ ⊤ hq.ge).hom.comp (chartHom k))
-      (map_irrelevant_eq_top _ k (by
-        rw [RingHom.comp_apply, chartHom_X_self, map_one]
-        exact isUnit_one)) := by
+theorem eq_fromOfGlobalSections_of_preimage_eq_top
+    {O : Scheme.{u}} (q : O ⟶ projectiveSpace A n)
+    (k : Fin (n + 1)) (hq : q ⁻¹ᵁ Proj.basicOpen (grading A n) (X k) = ⊤)
+    : q
+      = Proj.fromOfGlobalSections (grading A n) ((q.appLE _ ⊤ hq.ge).hom.comp (chartHom k))
+        (map_irrelevant_eq_top _ k (by
+          rw [RingHom.comp_apply, chartHom_X_self, map_one]
+          exact isUnit_one)) := by
   set f := (q.appLE _ ⊤ hq.ge).hom.comp (chartHom k)
   have hpre : ∀ j, q ⁻¹ᵁ Proj.basicOpen (grading A n) (X j) = O.basicOpen (f (X j)) := fun j => by
     rw [RingHom.comp_apply, Scheme.basicOpen_appLE, basicOpen_chartHom_X, Scheme.Hom.preimage_inf,
       hq, top_inf_eq, top_inf_eq]
-  refine ProjHom.eq_fromOfGlobalSections (𝒜 := grading A n) (ι := Fin (n + 1)) f _ (fun j => X j) (fun _ => 1)
-    (fun _ => one_pos) (fun j => X_mem j) iSup_basicOpen_X q hpre fun j t a ha => ?_
+  refine ProjHom.eq_fromOfGlobalSections (𝒜 := grading A n) (ι := Fin (n + 1)) f _
+    (fun j => X j)
+    (fun _ => 1)
+    (fun _ => one_pos)
+    (fun j => X_mem j)
+    iSup_basicOpen_X q hpre
+    fun j t a ha => ?_
   have hW : O.basicOpen (f (X j)) ≤ q ⁻¹ᵁ Proj.basicOpen (grading A n) (X k * X j) := by
     rw [Proj.basicOpen_mul, Scheme.Hom.preimage_inf, hq, top_inf_eq, hpre]
-  have hk : ∀ z, O.presheaf.map (homOfLE le_top).op (f z) =
-      q.appLE _ (O.basicOpen (f (X j))) (hW.trans (q.preimage_mono (basicOpen_mul_le_left j k)))
-        (chartHom k z) := fun z => by
+  have hk
+      : ∀ z,
+        O.presheaf.map (homOfLE le_top).op (f z)
+          = q.appLE _ (O.basicOpen (f (X j)))
+            (hW.trans (q.preimage_mono (basicOpen_mul_le_left j k))) (chartHom k z) := fun z => by
     change O.presheaf.map _ (q.appLE _ ⊤ hq.ge (chartHom k z)) = _
     rw [← ConcreteCategory.comp_apply, Scheme.Hom.appLE_map]
-  have hk' : ∀ z, q.appLE _ (O.basicOpen (f (X j))) (hW.trans (q.preimage_mono (basicOpen_mul_le_left j k))) z =
-      q.appLE _ (O.basicOpen (f (X j))) hW ((projectiveSpace A n).presheaf.map
-        (homOfLE (basicOpen_mul_le_left j k)).op z) := fun z => by
+  have hk'
+      : ∀ z,
+        q.appLE _ (O.basicOpen (f (X j))) (hW.trans (q.preimage_mono (basicOpen_mul_le_left j k))) z
+          = q.appLE _ (O.basicOpen (f (X j))) hW
+            ((projectiveSpace A n).presheaf.map (homOfLE (basicOpen_mul_le_left j k)).op
+              z) := fun z => by
     rw [← ConcreteCategory.comp_apply, Scheme.Hom.map_appLE]
-  have hj' : ∀ (h : O.basicOpen (f (X j)) ≤ q ⁻¹ᵁ Proj.basicOpen (grading A n) (X j)) z, q.appLE _ (O.basicOpen (f (X j))) h z =
-      q.appLE _ (O.basicOpen (f (X j))) hW ((projectiveSpace A n).presheaf.map
-        (homOfLE (basicOpen_mul_le_right j k)).op z) := fun h z => by
+  have hj'
+      : ∀ (h : O.basicOpen (f (X j)) ≤ q ⁻¹ᵁ Proj.basicOpen (grading A n) (X j)) z,
+        q.appLE _ (O.basicOpen (f (X j))) h z
+          = q.appLE _ (O.basicOpen (f (X j))) hW
+            ((projectiveSpace A n).presheaf.map (homOfLE (basicOpen_mul_le_right j k)).op
+              z) := fun h z => by
     rw [← ConcreteCategory.comp_apply, Scheme.Hom.map_appLE]
   rw [ProjHom.corr_apply, ProjHom.ι_appTop_eq, ProjHom.ι_appTop_eq, hk, hk, hk', hk', hj']
   exact map_mul_pow_eq _ t (map_mul_pow_eq _ t (chart_identity j k ha))

@@ -5,13 +5,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
+open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
 open UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Lit.Dr
 open scoped TensorProduct GlobalTheory.CuspRep.CuspidalL2GL
 open UpperTheory.V.Cj UpperTheory.V.Cj.H
 
-theorem UpperTheory.V.Cj.H.clFacts :
-    UpperTheory.V.Cj.H.ClFacts := by
+theorem UpperTheory.V.Cj.H.clFacts : UpperTheory.V.Cj.H.ClFacts := by
   intro E _ _ _ a μ _ _
   refine ⟨fun φ ψ s t hφ hψ => ?_, fun φ hl hφ h0 => ?_, fun φ g hφ => ?_, fun ψ φ F hψ e => ?_⟩
   · have hm : InL μ (s • φ + t • ψ) := by
@@ -25,13 +25,16 @@ theorem UpperTheory.V.Cj.H.clFacts :
       (congrArg₂ (· + ·) (MemLp.toLp_const_smul s hφ.2) (MemLp.toLp_const_smul t hψ.2))
   · by_contra hne
     rw [cl_eq hφ] at h0
-    exact GlobalTheory.CuspRep.CuspidalL2GL.toL2_ne_zero hφ (ContAut.continuous_of_isOpen_stab E a φ hl)
-      (fun h => hne (Subtype.ext h)) h0
+    exact GlobalTheory.CuspRep.CuspidalL2GL.toL2_ne_zero hφ
+      (ContAut.continuous_of_isOpen_stab E a φ hl)
+      (fun h => hne (Subtype.ext h))
+      h0
   · have hm : InL μ (rt E a g φ) := hφ.mul_right g
     rw [cl_eq hm, cl_eq hφ]
     exact (GlobalTheory.AutomorphicL2Unitary.right_translate_toL2 hφ g).symm
-  · obtain ⟨h, hh⟩ := UpperTheory.V.Cj.H.convolution_L2_class (GA E a) (latticeGL E a) μ ψ.1
-      (ContAut.continuous_of_isOpen_stab E a ψ hψ.2) hψ.1 F
+  · obtain ⟨h, hh⟩ :=
+      UpperTheory.V.Cj.H.convolution_L2_class (GA E a) (latticeGL E a) μ ψ.1
+        (ContAut.continuous_of_isOpen_stab E a ψ hψ.2) hψ.1 F
     have hm : InL μ φ := by
       unfold InL
       rw [e]

@@ -17,7 +17,8 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 
 variable {n : ℕ}
 
-theorem exp_pmat_inUJ {ε : Fin n → Bool} (z : PCoord ε → ℂ) : inUJ ε (NormedSpace.exp (pmat z)) := by
+theorem exp_pmat_inUJ {ε : Fin n → Bool} (z : PCoord ε → ℂ)
+    : inUJ ε (NormedSpace.exp (pmat z)) := by
   have h := inUJ_kexp (1 : KG ε) (pmat_inP z)
   have e : toMK (1 : KG ε) = 1 := rfl
   rwa [e, Matrix.one_mul] at h
@@ -33,20 +34,21 @@ theorem pmat_injective (ε : Fin n → Bool) : Function.Injective (pmat (ε := �
 
 theorem polarM_injective (ε : Fin n → Bool) : Function.Injective (polarM (ε := ε)) := by
   rintro ⟨k, z⟩ ⟨k', z'⟩ h
-  obtain ⟨hk, hX⟩ := polar_unique (pmat_inP z) (pmat_inP z')
-    (show toMK k * NormedSpace.exp (pmat z) = toMK k' * NormedSpace.exp (pmat z') from h)
+  obtain ⟨hk, hX⟩ :=
+    polar_unique (pmat_inP z) (pmat_inP z')
+      (show toMK k * NormedSpace.exp (pmat z) = toMK k' * NormedSpace.exp (pmat z') from h)
   rw [hk, pmat_injective ε hX]
 
-theorem polarM_surj {ε : Fin n → Bool} (g : Matrix (Fin n) (Fin n) ℂ) (hg : inUJ ε g) :
-    ∃ kz : KG ε × (PCoord ε → ℂ), polarM kz = g := by
+theorem polarM_surj {ε : Fin n → Bool} (g : Matrix (Fin n) (Fin n) ℂ) (hg : inUJ ε g)
+    : ∃ kz : KG ε × (PCoord ε → ℂ), polarM kz = g := by
   obtain ⟨k, X, hX, rfl⟩ := polar_exists hg
   refine ⟨(k, fun ab => X ab.1.1 ab.1.2), ?_⟩
   show toMK k * NormedSpace.exp (pmat fun ab : PCoord ε => X ab.1.1 ab.1.2) = _
   rw [pmat_coords X hX]
 
 open scoped Matrix.Norms.L2Operator in
-theorem polarL_continuousOn (ε : Fin n → Bool) :
-    ContinuousOn (PolarDecomposition.polar_L (n := n)) {g | inUJ ε g} := by
+theorem polarL_continuousOn (ε : Fin n → Bool)
+    : ContinuousOn (PolarDecomposition.polar_L (n := n)) {g | inUJ ε g} := by
   have h : ContinuousOn (fun g : Matrix (Fin n) (Fin n) ℂ => CFC.log (gᴴ * g)) {g | inUJ ε g} := by
     refine CFC.continuousOn_log.comp (by fun_prop) ?_
     intro g hg
@@ -66,8 +68,8 @@ theorem polarM_continuous (ε : Fin n → Bool) : Continuous (polarM (ε := ε))
 def polarInvK (ε : Fin n → Bool) (g : UJset ε) : KG ε :=
   Classical.choose (exists_toMK (PolarDecomposition.polar_k_mem (ε := ε) (g := g.1) g.2))
 
-theorem toMK_polarInvK (ε : Fin n → Bool) (g : UJset ε) :
-    toMK (polarInvK ε g) = g.1 * NormedSpace.exp (-PolarDecomposition.polar_L g.1) :=
+theorem toMK_polarInvK (ε : Fin n → Bool) (g : UJset ε)
+    : toMK (polarInvK ε g) = g.1 * NormedSpace.exp (- PolarDecomposition.polar_L g.1) :=
   Classical.choose_spec (exists_toMK (PolarDecomposition.polar_k_mem (ε := ε) (g := g.1) g.2))
 
 def polarInv (ε : Fin n → Bool) (g : UJset ε) : KG ε × (PCoord ε → ℂ) :=
@@ -85,8 +87,8 @@ theorem polarInv_continuous (ε : Fin n → Bool) : Continuous (polarInv ε) := 
     (isClosedEmbedding_toM ε).isInducing.comp Topology.IsInducing.subtypeVal
   have hK : Continuous (polarInvK ε) := by
     rw [hind.continuous_iff]
-    have : (fun k : KG ε => toMK k) ∘ polarInvK ε =
-        fun g : UJset ε => g.1 * NormedSpace.exp (-PolarDecomposition.polar_L g.1) := by
+    have : (fun k : KG ε => toMK k) ∘ polarInvK ε
+        = fun g : UJset ε => g.1 * NormedSpace.exp (- PolarDecomposition.polar_L g.1) := by
       funext g; exact toMK_polarInvK ε g
     rw [this]
     exact continuous_subtype_val.mul (NormedSpace.exp_continuous.comp hL.neg)
@@ -100,8 +102,10 @@ def polarHomeo (ε : Fin n → Bool) : KG ε × (PCoord ε → ℂ) ≃ₜ UJset
   continuous_toFun := (polarM_continuous ε).subtype_mk _
   continuous_invFun := polarInv_continuous ε
 
-theorem polarM_isClosedEmbedding (ε : Fin n → Bool) : Topology.IsClosedEmbedding (polarM (ε := ε)) := by
-  have h : Topology.IsClosedEmbedding ((Subtype.val : UJset ε → Matrix (Fin n) (Fin n) ℂ) ∘ polarHomeo ε) :=
+theorem polarM_isClosedEmbedding (ε : Fin n → Bool)
+    : Topology.IsClosedEmbedding (polarM (ε := ε)) := by
+  have h : Topology.IsClosedEmbedding
+      ((Subtype.val : UJset ε → Matrix (Fin n) (Fin n) ℂ) ∘ polarHomeo ε) :=
     (isClosed_inUJ ε).isClosedEmbedding_subtypeVal.comp (polarHomeo ε).isClosedEmbedding
   exact h
 

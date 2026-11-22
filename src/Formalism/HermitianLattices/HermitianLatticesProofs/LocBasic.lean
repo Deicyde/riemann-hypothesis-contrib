@@ -13,35 +13,36 @@ section LocS
 
 variable {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
 
-theorem locBasic_mem_locS {S : Submonoid R} {L : Submodule R W} {x : W} :
-    x ∈ locS S L ↔ ∃ s ∈ S, s • x ∈ L := Iff.rfl
+theorem locBasic_mem_locS {S : Submonoid R} {L : Submodule R W} {x : W}
+    : x ∈ locS S L ↔ ∃ s ∈ S, s • x ∈ L :=
+  Iff.rfl
 
 theorem locBasic_le_locS (S : Submonoid R) (L : Submodule R W) : L ≤ locS S L := by
   intro x hx
   exact locBasic_mem_locS.mpr ⟨1, S.one_mem, by rwa [one_smul]⟩
 
-theorem locBasic_locS_mono (S : Submonoid R) {L M : Submodule R W} (h : L ≤ M) :
-    locS S L ≤ locS S M := by
+theorem locBasic_locS_mono (S : Submonoid R) {L M : Submodule R W} (h : L ≤ M)
+    : locS S L ≤ locS S M := by
   intro x hx
   obtain ⟨s, hs, hsx⟩ := locBasic_mem_locS.mp hx
   exact locBasic_mem_locS.mpr ⟨s, hs, h hsx⟩
 
-theorem locBasic_locS_le_of_le {S T : Submonoid R} (hST : S ≤ T) (L : Submodule R W) :
-    locS S L ≤ locS T L := by
+theorem locBasic_locS_le_of_le {S T : Submonoid R} (hST : S ≤ T) (L : Submodule R W)
+    : locS S L ≤ locS T L := by
   intro x hx
   obtain ⟨s, hs, hsx⟩ := locBasic_mem_locS.mp hx
   exact locBasic_mem_locS.mpr ⟨s, hST hs, hsx⟩
 
-theorem locBasic_locS_idem (S : Submonoid R) (L : Submodule R W) :
-    locS S (locS S L) = locS S L := by
+theorem locBasic_locS_idem (S : Submonoid R) (L : Submodule R W)
+    : locS S (locS S L) = locS S L := by
   refine le_antisymm ?_ (locBasic_le_locS S _)
   intro x hx
   obtain ⟨s, hs, hsx⟩ := locBasic_mem_locS.mp hx
   obtain ⟨t, ht, htx⟩ := locBasic_mem_locS.mp hsx
   exact locBasic_mem_locS.mpr ⟨t * s, S.mul_mem ht hs, by rwa [mul_smul]⟩
 
-theorem locBasic_locS_inf (S : Submonoid R) (L M : Submodule R W) :
-    locS S (L ⊓ M) = locS S L ⊓ locS S M := by
+theorem locBasic_locS_inf (S : Submonoid R) (L M : Submodule R W)
+    : locS S (L ⊓ M) = locS S L ⊓ locS S M := by
   apply le_antisymm
   · exact le_inf (locBasic_locS_mono S inf_le_left) (locBasic_locS_mono S inf_le_right)
   · intro x hx
@@ -53,9 +54,10 @@ theorem locBasic_locS_inf (S : Submonoid R) (L M : Submodule R W) :
     · rw [mul_smul]
       exact M.smul_mem s htx
 
-theorem locBasic_lg (S : Ideal R → Submonoid R)
-    (hS : ∀ p : Ideal R, p.IsMaximal → ∀ s ∈ S p, s ∉ p) (L : Submodule R W) (x : W)
-    (hx : ∀ p : Ideal R, p.IsMaximal → x ∈ locS (S p) L) : x ∈ L := by
+theorem locBasic_lg
+    (S : Ideal R → Submonoid R) (hS : ∀ p : Ideal R, p.IsMaximal → ∀ s ∈ S p, s ∉ p)
+    (L : Submodule R W) (x : W) (hx : ∀ p : Ideal R, p.IsMaximal → x ∈ locS (S p) L)
+    : x ∈ L := by
   let I : Ideal R := L.comap (LinearMap.toSpanSingleton R W x)
   have hI : ∀ r, r ∈ I ↔ r • x ∈ L := fun r => by simp [I]
   by_contra hxL
@@ -74,19 +76,20 @@ end LocS
 
 section LocK
 
-variable {R K V : Type*} [CommRing R] [Field K] [Algebra R K]
-  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [Field K] [Algebra R K] [AddCommGroup V] [Module K V] [Module R V]
+  [IsScalarTower R K V]
 
-theorem locBasic_locS_sup (S : Submonoid R) (hS : ∀ s ∈ S, algebraMap R K s ≠ 0)
-    (L M : Submodule R V) : locS S (L ⊔ M) = locS S L ⊔ locS S M := by
+theorem locBasic_locS_sup
+    (S : Submonoid R) (hS : ∀ s ∈ S, algebraMap R K s ≠ 0) (L M : Submodule R V)
+    : locS S (L ⊔ M) = locS S L ⊔ locS S M := by
   apply le_antisymm
   · intro x hx
     obtain ⟨s, hs, hsx⟩ := locBasic_mem_locS.mp hx
     obtain ⟨l, hl, m, hm, hlm⟩ := Submodule.mem_sup.mp hsx
     have ha := hS s hs
     have key : ∀ v : V, s • ((algebraMap R K s)⁻¹ • v) = v := fun v => by
-      rw [← algebraMap_smul K s ((algebraMap R K s)⁻¹ • v), smul_smul, mul_inv_cancel₀ ha,
-        one_smul]
+      rw [← algebraMap_smul K s ((algebraMap R K s)⁻¹ • v), smul_smul, mul_inv_cancel₀ ha, one_smul]
     have hx' : x = (algebraMap R K s)⁻¹ • l + (algebraMap R K s)⁻¹ • m := by
       rw [← smul_add, hlm, ← algebraMap_smul K s x, smul_smul, inv_mul_cancel₀ ha, one_smul]
     rw [hx']
@@ -101,18 +104,18 @@ section Herm
 
 variable {R K : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
 
-theorem locBasic_hcompl_le (p : Ideal R) [p.IsPrime] :
-    hcompl (K := K) p ≤ p.primeCompl := by
+theorem locBasic_hcompl_le (p : Ideal R) [p.IsPrime] : hcompl (K := K) p ≤ p.primeCompl := by
   unfold hcompl
   rw [Submonoid.closure_le]
   intro s hs
   exact hs.1
 
-theorem locBasic_hcompl_not_mem (p : Ideal R) [p.IsPrime] (s : R) (hs : s ∈ hcompl (K := K) p) :
-    s ∉ p := Ideal.mem_primeCompl_iff.mp (locBasic_hcompl_le (K := K) p hs)
+theorem locBasic_hcompl_not_mem (p : Ideal R) [p.IsPrime] (s : R) (hs : s ∈ hcompl (K := K) p)
+    : s ∉ p :=
+  Ideal.mem_primeCompl_iff.mp (locBasic_hcompl_le (K := K) p hs)
 
-theorem locBasic_mem_hcompl (p : Ideal R) (u : R) (hu : u ∉ p) (hu' : u ∉ conjIdeal (K := K) p) :
-    u ∈ hcompl (K := K) p := by
+theorem locBasic_mem_hcompl (p : Ideal R) (u : R) (hu : u ∉ p) (hu' : u ∉ conjIdeal (K := K) p)
+    : u ∈ hcompl (K := K) p := by
   unfold hcompl
   apply Submonoid.subset_closure
   refine ⟨hu, fun t ht htp => hu' ?_⟩
@@ -120,25 +123,32 @@ theorem locBasic_mem_hcompl (p : Ideal R) (u : R) (hu : u ∉ p) (hu' : u ∉ co
   apply Ideal.subset_span
   exact ⟨t, htp, by rw [ht, star_star]⟩
 
-def locBasic_sigma (hinj : Function.Injective (algebraMap R K))
-    (hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K)) : R →+* R where
+def locBasic_sigma
+    (hinj : Function.Injective (algebraMap R K))
+    (hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K))
+    : R →+* R where
   toFun r := (hstar r).choose
   map_one' := hinj (by rw [(hstar 1).choose_spec, map_one, star_one])
-  map_mul' a b := hinj (by
-    rw [(hstar (a * b)).choose_spec, map_mul, map_mul, (hstar a).choose_spec,
-      (hstar b).choose_spec, star_mul'])
+  map_mul' a b :=
+    hinj (by
+      rw [(hstar (a * b)).choose_spec, map_mul, map_mul, (hstar a).choose_spec,
+        (hstar b).choose_spec, star_mul'])
   map_zero' := hinj (by rw [(hstar 0).choose_spec, map_zero, star_zero])
-  map_add' a b := hinj (by
-    rw [(hstar (a + b)).choose_spec, map_add (f := _), map_add (f := _), (hstar a).choose_spec,
-      (hstar b).choose_spec, star_add])
+  map_add' a b :=
+    hinj (by
+      rw [(hstar (a + b)).choose_spec, map_add (f := _), map_add (f := _), (hstar a).choose_spec,
+        (hstar b).choose_spec, star_add])
 
-theorem locBasic_sigma_spec (hinj : Function.Injective (algebraMap R K))
-    (hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K)) (r : R) :
-    algebraMap R K (locBasic_sigma hinj hstar r) = star (algebraMap R K r) := (hstar r).choose_spec
+theorem locBasic_sigma_spec
+    (hinj : Function.Injective (algebraMap R K))
+    (hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K)) (r : R)
+    : algebraMap R K (locBasic_sigma hinj hstar r) = star (algebraMap R K r) :=
+  (hstar r).choose_spec
 
-theorem locBasic_conj_eq (hinj : Function.Injective (algebraMap R K))
-    (hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K)) (p : Ideal R) :
-    conjIdeal (K := K) p = p.comap (locBasic_sigma hinj hstar) := by
+theorem locBasic_conj_eq
+    (hinj : Function.Injective (algebraMap R K))
+    (hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K)) (p : Ideal R)
+    : conjIdeal (K := K) p = p.comap (locBasic_sigma hinj hstar) := by
   have hσ := locBasic_sigma_spec hinj hstar
   have hσσ : ∀ r, locBasic_sigma hinj hstar (locBasic_sigma hinj hstar r) = r := fun r =>
     hinj (by rw [hσ, hσ, star_star])
@@ -154,10 +164,11 @@ theorem locBasic_conj_eq (hinj : Function.Injective (algebraMap R K))
     apply Ideal.subset_span
     exact ⟨locBasic_sigma hinj hstar r, Ideal.mem_comap.mp hr, by rw [hσ, star_star]⟩
 
-theorem locBasic_hcompl_le_conj (hinj : Function.Injective (algebraMap R K))
-    (hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K)) (p : Ideal R)
-    [(conjIdeal (K := K) p).IsPrime] :
-    hcompl (K := K) p ≤ (conjIdeal (K := K) p).primeCompl := by
+theorem locBasic_hcompl_le_conj
+    (hinj : Function.Injective (algebraMap R K))
+    (hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K))
+    (p : Ideal R) [(conjIdeal (K := K) p).IsPrime]
+    : hcompl (K := K) p ≤ (conjIdeal (K := K) p).primeCompl := by
   unfold hcompl
   rw [Submonoid.closure_le]
   rintro s ⟨_, hs2⟩
@@ -183,8 +194,13 @@ theorem locBasic : LocBasic := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro p hp L M
     haveI := hp
-    exact ⟨locBasic_le_locS _ L, fun h => locBasic_locS_mono _ h, locBasic_locS_idem _ L,
-      locBasic_locS_inf _ L M, locBasic_locS_sup (K := K) _ (hne p hp) L M⟩
+    exact ⟨
+      locBasic_le_locS _ L,
+      fun h => locBasic_locS_mono _ h,
+      locBasic_locS_idem _ L,
+      locBasic_locS_inf _ L M,
+      locBasic_locS_sup (K := K) _ (hne p hp) L M
+    ⟩
   · intro L
     apply le_antisymm
     · intro x hx
@@ -192,7 +208,9 @@ theorem locBasic : LocBasic := by
       exact locBasic_lg (fun p => hcompl (K := K) p) hnm L x hx
     · exact le_iInf₂ fun p _ => locBasic_le_locS _ L
   · intro L M h x hx
-    exact locBasic_lg (fun p => hcompl (K := K) p) hnm M x
+    exact locBasic_lg
+      (fun p => hcompl (K := K) p)
+      hnm M x
       (fun p hp => h p hp (locBasic_le_locS _ L hx))
   · intro p _ L
     exact locBasic_locS_le_of_le (locBasic_hcompl_le (K := K) p) L
@@ -212,8 +230,10 @@ theorem locBasic : LocBasic := by
       have ht' : locBasic_sigma hinj hstar t ∉ p := by
         have h1 := Ideal.mem_primeCompl_iff.mp ht
         rwa [hc, Ideal.mem_comap] at h1
-      have key : ∀ u, u • x ∈ L → u ∉ p → locBasic_sigma hinj hstar u ∉ p →
-          x ∈ locS (hcompl (K := K) p) L := by
+      have key
+          : ∀ u,
+            u • x ∈ L → u ∉ p → locBasic_sigma hinj hstar u ∉ p
+              → x ∈ locS (hcompl (K := K) p) L := by
         intro u hux hu1 hu2
         refine locBasic_mem_locS.mpr ⟨u, locBasic_mem_hcompl (K := K) p u hu1 ?_, hux⟩
         rw [hc, Ideal.mem_comap]

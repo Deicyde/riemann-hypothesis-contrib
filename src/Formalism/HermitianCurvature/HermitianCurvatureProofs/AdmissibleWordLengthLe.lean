@@ -11,7 +11,9 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryCorollaryDerivatives.CRH
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -31,8 +33,8 @@ section defs
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
 def LSS (f : Mat k r → E) (S : Set (Mat k r)) : Prop :=
-  ∀ g ∈ S, ∃ f' : Mat k r → E, ContDiff ℝ ∞ f' ∧ ∃ V : Set (Mat k r), IsOpen V ∧ g ∈ V ∧
-    ∀ g' ∈ GV k r, g' ∈ V → f g' = f' g'
+  ∀ g ∈ S, ∃ f' : Mat k r → E,
+    ContDiff ℝ ∞ f' ∧ ∃ V : Set (Mat k r), IsOpen V ∧ g ∈ V ∧ ∀ g' ∈ GV k r, g' ∈ V → f g' = f' g'
 
 def UB (f : Mat k r → E) (S : Set (Mat k r)) (n : ℕ) (C : ℝ) (e γ : ℕ) : Prop :=
   ∀ w, admitted n w → ∀ g ∈ S, ‖Dw w f g‖ ≤ C * gN g ^ (e + γ * w.length)
@@ -142,7 +144,8 @@ end defs
 
 section app
 
-variable {E F : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup F] [NormedSpace ℂ F]
+variable
+  {E F : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup F] [NormedSpace ℂ F]
 
 lemma leibC (g : Mat k r) (M : ℝ) (w : List (Bool × Mat k r)) (a : Mat k r → (F →L[ℂ] E)) (b : Mat k r → F)
     (ha : ContDiff ℝ ∞ a) (hb : ContDiff ℝ ∞ b)

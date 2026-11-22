@@ -10,9 +10,13 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Assoc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc GlobalTheory.Poinc.Eq8 Formalism.L2.Pj
 open scoped TensorProduct
@@ -34,8 +38,10 @@ abbrev QR (R : Type) [CommRing R] [IsDomain R] := (FractionRing R)ˣ ⧸ unitsR 
 
 abbrev cls : (FractionRing R)ˣ →* QR R := QuotientGroup.mk' (unitsR R)
 
-theorem cls_eq_iff (x y : (FractionRing R)ˣ) :
-    cls x = cls y ↔ ∃ u : Rˣ, (x : FractionRing R) = (y : FractionRing R) * algebraMap R (FractionRing R) u := by
+theorem cls_eq_iff (x y : (FractionRing R)ˣ)
+    : cls x = cls y
+      ↔ ∃ u : Rˣ,
+        (x : FractionRing R) = (y : FractionRing R) * algebraMap R (FractionRing R) u := by
   rw [eq_comm, QuotientGroup.mk'_eq_mk']
   constructor
   · rintro ⟨z, ⟨u, rfl⟩, hz⟩
@@ -51,31 +57,63 @@ variable [IsLocalRing R]
 def tq (D : DegPre R) (a b : D.X) : QR R :=
   cls (psiCoord D (a + b)) * (cls (psiCoord D a))⁻¹ * (cls (psiCoord D b))⁻¹
 
-theorem cls_tauCoord {D : DegPre R} {a b : D.X} {x : (FractionRing R)ˣ} (hx : IsTauCoord D a b x) :
-    cls x = tq D a b := by
-  obtain ⟨u, hu⟩ := GlobalTheory.TauCoordQuot.main R D a b x _ _ _ hx (psiCoord_spec D (a + b)) (psiCoord_spec D a)
-    (psiCoord_spec D b)
-  have : x = Units.map (algebraMap R (FractionRing R)).toMonoidHom u *
-      (psiCoord D (a + b) * (psiCoord D a)⁻¹ * (psiCoord D b)⁻¹) := by
+theorem cls_tauCoord {D : DegPre R} {a b : D.X} {x : (FractionRing R)ˣ} (hx : IsTauCoord D a b x)
+    : cls x = tq D a b := by
+  obtain ⟨u, hu⟩ :=
+    GlobalTheory.TauCoordQuot.main R D a b x _ _ _ hx (psiCoord_spec D (a + b)) (psiCoord_spec D a)
+      (psiCoord_spec D b)
+  have : x
+      = Units.map (algebraMap R (FractionRing R)).toMonoidHom u
+        * (psiCoord D (a + b) * (psiCoord D a)⁻¹ * (psiCoord D b)⁻¹) := by
     ext; rw [hu]; simp <;> ring
   rw [this, map_mul, cls_unit, _root_.one_mul, tq, map_mul, map_mul, map_inv, map_inv]
 
 theorem tq_symm (D : DegPre R) (a b : D.X) : tq D a b = tq D b a := by
   simp only [tq, add_comm a b]; exact mul_right_comm _ _ _
 
-theorem tq_add_left (D : DegPre R) (hB : D.TauBimult) (a z b : D.X) : tq D (a + z) b = tq D a b * tq D z b := by
+theorem tq_add_left (D : DegPre R) (hB : D.TauBimult) (a z b : D.X)
+    : tq D (a + z) b = tq D a b * tq D z b := by
   obtain ⟨x, hx⟩ := GlobalTheory.PsiFromTau.exists_isTauCoord R D a b
   obtain ⟨x', hx'⟩ := GlobalTheory.PsiFromTau.exists_isTauCoord R D z b
   obtain ⟨x'', hx''⟩ := GlobalTheory.PsiFromTau.exists_isTauCoord R D (a + (1 : ℕ) • z) b
   obtain ⟨u, hu⟩ := GlobalTheory.TauShift.main R D hB a z b 1 x x' x'' hx hx' hx''
   rw [one_smul] at hx''
-  rw [← cls_tauCoord hx'', ← cls_tauCoord hx, ← cls_tauCoord hx', hu, map_mul, cls_unit, _root_.one_mul, pow_one, map_mul]
+  rw [← cls_tauCoord hx'', ← cls_tauCoord hx, ← cls_tauCoord hx', hu, map_mul, cls_unit,
+    _root_.one_mul, pow_one, map_mul]
 
 def tqHom (D : DegPre R) (hB : D.TauBimult) (a : D.X) : D.X →+ Additive (QR R) :=
-  AddMonoidHom.mk' (fun b => Additive.ofMul (tq D a b)) fun b b' => by
-    rw [tq_symm D a (b + b'), tq_add_left D hB, tq_symm D b a, tq_symm D b' a]; rfl
+  AddMonoidHom.mk'
+    (fun b => Additive.ofMul (tq D a b))
+    fun b b' => by rw [tq_symm D a (b + b'), tq_add_left D hB, tq_symm D b a, tq_symm D b' a]; rfl
 
-theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], IsDiscreteValuationRing R → ∀ (D D' : DegPre R), D'.TauBimult → D'.PsiEven → D.TauBimult → ∀ (W : Matrix (Fin 8) (Fin 8) ℤ), IsE8 W → ∀ (ϖ : R) (β : LinearMap.BilinForm ℤ D.X), (∀ a b, β a b = β b a) → (∀ a, 0 ≤ β a a) → (∀ a b' (x : (FractionRing R)ˣ), GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D a b' x → ∃ u : Rˣ, (x : FractionRing R) = algebraMap R (FractionRing R) (u : R) * algebraMap R (FractionRing R) ϖ ^ (β a b')) → ∀ (c : Fin 8 → (D.X →+ D'.X)) (e : D'.X ≃+ (Fin 8 → D.X)), (∀ y, ∑ v, c v (∑ u, (W + W.transpose) v u • e y u) = y) → (∀ v a' b (x x' : (FractionRing R)ˣ), GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D (e a' v) b x → GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D' a' (c v b) x' → ∃ u : Rˣ, (x : FractionRing R) = algebraMap R (FractionRing R) (u : R) * (x' : FractionRing R)) → ∀ y r, PsiCoord D' y r → 0 ≤ qW W β (e y) ∧ Associated r (ϖ ^ (qW W β (e y)).toNat) := by
+theorem main
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      IsDiscreteValuationRing R
+        → ∀ (D D' : DegPre R),
+          D'.TauBimult → D'.PsiEven → D.TauBimult
+            → ∀ (W : Matrix (Fin 8) (Fin 8) ℤ),
+              IsE8 W
+                → ∀ (ϖ : R) (β : LinearMap.BilinForm ℤ D.X),
+                  (∀ a b, β a b = β b a) → (∀ a, 0 ≤ β a a)
+                    → (∀ a b' (x : (FractionRing R)ˣ),
+                      GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D a b' x
+                        → ∃ u : Rˣ,
+                          (x : FractionRing R)
+                            = algebraMap R (FractionRing R) (u : R)
+                              * algebraMap R (FractionRing R) ϖ ^ (β a b'))
+                    → ∀ (c : Fin 8 → (D.X →+ D'.X)) (e : D'.X ≃+ (Fin 8 → D.X)),
+                      (∀ y, ∑ v, c v (∑ u, (W + W.transpose) v u • e y u) = y)
+                        → (∀ v a' b (x x' : (FractionRing R)ˣ),
+                          GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D
+                              (e a' v) b x
+                            → GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D'
+                              a' (c v b) x'
+                            → ∃ u : Rˣ,
+                              (x : FractionRing R)
+                                = algebraMap R (FractionRing R) (u : R) * (x' : FractionRing R))
+                        → ∀ y r,
+                          PsiCoord D' y r
+                            → 0 ≤ qW W β (e y) ∧ Associated r (ϖ ^ (qW W β (e y)).toNat) := by
   intro R _ _ _ hR D D' hB' hE' hB W hW ϖ β hs hp hτ c e hsum hcomp y r hr
   haveI := hR
   have hq : 0 ≤ qW W β (e y) := GlobalTheory.Poinc.qW_nonneg_of_posW W hW.1 β hs hp (e y)
@@ -87,13 +125,13 @@ theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], IsDiscr
     subst ht
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_neg, map_sum, map_zsmul, smul_eq_mul, Finset.sum_neg_distrib, neg_inj]
-    simp only [Matrix.add_apply, Matrix.transpose_apply, add_mul, Finset.sum_add_distrib, qW, two_mul]
+    simp only [Matrix.add_apply, Matrix.transpose_apply, add_mul, Finset.sum_add_distrib, qW,
+      two_mul]
     congr 1
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun u _ => Finset.sum_congr rfl fun v _ => by rw [hs]
   have h1 : ∑ v, c v (t v) = y := by rw [ht, hsd]; exact hsum y
-  have hy : -y = ∑ v, c v (-(t v)) := by
-    rw [← h1]; simp only [map_neg, Finset.sum_neg_distrib]
+  have hy : -y = ∑ v, c v (-(t v)) := by rw [← h1]; simp only [map_neg, Finset.sum_neg_distrib]
   obtain ⟨x', hx'⟩ := GlobalTheory.PsiFromTau.exists_isTauCoord R D' y (-y)
   have hcl : cls x' = tq D' y (-y) := cls_tauCoord hx'
   have hterm : ∀ v, tq D' y (c v (-(t v))) = tq D (s v) (-(t v)) := by
@@ -122,13 +160,16 @@ theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], IsDiscr
     exact eq_inv_of_mul_eq_one_right this
   obtain ⟨n, hn⟩ := Int.eq_ofNat_of_zero_le hq
   rw [hn, Int.toNat_natCast]
-  have final : ∀ ρ : (FractionRing R)ˣ, (ρ : FractionRing R) = algebraMap R (FractionRing R) (ϖ ^ n) →
-      cls ru ^ 2 = cls ρ ^ 2 → Associated r (ϖ ^ n) := by
+  have final
+      : ∀ ρ : (FractionRing R)ˣ,
+        (ρ : FractionRing R) = algebraMap R (FractionRing R) (ϖ ^ n) → cls ru ^ 2 = cls ρ ^ 2
+          → Associated r (ϖ ^ n) := by
     intro ρ hρ h
     rw [← map_pow, ← map_pow] at h
     obtain ⟨u, hu⟩ := (cls_eq_iff _ _).1 h
     simp only [Units.val_pow_eq_pow_val, hρ, ru, toUnitK, Units.val_mk0, ← map_pow, ← map_mul] at hu
-    have hsq : Associated ((ϖ ^ n) ^ 2) (r ^ 2) := ⟨u, (IsFractionRing.injective R (FractionRing R) hu).symm⟩
+    have hsq : Associated ((ϖ ^ n) ^ 2) (r ^ 2) :=
+      ⟨u, (IsFractionRing.injective R (FractionRing R) hu).symm⟩
     exact (associated_of_dvd_dvd ((IsIntegrallyClosed.pow_dvd_pow_iff two_ne_zero).1 hsq.dvd)
       ((IsIntegrallyClosed.pow_dvd_pow_iff two_ne_zero).1 hsq.symm.dvd)).symm
   by_cases hϖ : ϖ = 0
@@ -150,24 +191,29 @@ theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], IsDiscr
       rw [this, cls_unit]
     have h1' : tq D' y (-y) = 1 := by
       apply Additive.ofMul.injective
-      rw [hprod]; simp [htq]
+      rw [hprod]
+      simp [htq]
     have hn0 : n = 0 := by omega
     subst hn0
     refine final 1 (by simp) ?_
-    rw [hcr, hcl, h1']; simp
+    rw [hcr, hcl, h1']
+    simp
   · let ϖu : (FractionRing R)ˣ := toUnitK ϖ hϖ
     have htq : ∀ a b, tq D a b = cls ϖu ^ β a b := by
       intro a b
       obtain ⟨x, hx⟩ := GlobalTheory.PsiFromTau.exists_isTauCoord R D a b
       obtain ⟨u, hu⟩ := hτ a b x hx
       rw [← cls_tauCoord hx, ← map_zpow]
-      exact (cls_eq_iff _ _).2 ⟨u, by rw [hu, Units.val_zpow_eq_zpow_val]; simp [ϖu, toUnitK, mul_comm]⟩
+      exact (cls_eq_iff _ _).2
+        ⟨u, by rw [hu, Units.val_zpow_eq_zpow_val]; simp [ϖu, toUnitK, mul_comm]⟩
     have hx'cl : cls x' = cls ϖu ^ (-(2 * qW W β s)) := by
-      rw [hcl]; apply Additive.ofMul.injective; rw [hprod]
+      rw [hcl]
+      apply Additive.ofMul.injective
+      rw [hprod]
       simp only [htq, ofMul_zpow]
       rw [← Finset.sum_smul, hsum2]
     refine final (ϖu ^ n) (by simp [ϖu, toUnitK]) ?_
-    rw [hcr, hx'cl, hn, map_pow, ← zpow_neg, neg_neg, show (2 * (n : ℤ)) = ((n * 2 : ℕ) : ℤ) by push_cast; ring,
-      zpow_natCast, pow_mul]
+    rw [hcr, hx'cl, hn, map_pow, ← zpow_neg, neg_neg,
+      show (2 * (n : ℤ)) = ((n * 2 : ℕ) : ℤ) by push_cast; ring, zpow_natCast, pow_mul]
 
 end GlobalTheory.Poinc.E8Order

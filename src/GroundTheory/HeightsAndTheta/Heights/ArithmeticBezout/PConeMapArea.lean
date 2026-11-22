@@ -20,8 +20,10 @@ theorem ConeMapArea.proof (h : ConeMapAreaOne.Statement) : ConeMapArea.Statement
   intro n e ι _ U D v F hUD hinj hF
   let g : ι → (Fin e → ℂ) × ℂ → EuclideanSpace ℂ (Fin n) := fun i q => q.2 • WithLp.toLp 2 (v i q.1)
   let S : ι → Set ((Fin e → ℂ) × ℂ) := fun i => {q | q.1 ∈ D i ∧ q.2 ≠ 0}
-  have himg : (fun q : ι × (Fin e → ℂ) × ℂ => q.2.2 • WithLp.toLp 2 (v q.1 q.2.1)) ''
-      {q | q.2.1 ∈ D q.1 ∧ q.2.2 ≠ 0} = ⋃ i, g i '' S i := by
+  have himg
+      : (fun q : ι × (Fin e → ℂ) × ℂ => q.2.2 • WithLp.toLp 2 (v q.1 q.2.1))
+          '' {q | q.2.1 ∈ D q.1 ∧ q.2.2 ≠ 0}
+        = ⋃ i, g i '' S i := by
     ext y
     simp only [Set.mem_image, Set.mem_iUnion]
     constructor

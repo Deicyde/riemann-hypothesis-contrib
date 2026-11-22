@@ -7,6 +7,7 @@ public import Development.WeilBound.CoreStatements.OrbitDecayEstimates.CurveDeri
 
 namespace PositivityTheory.UnitaryDecomposition.Com
 
-theorem comatrix_word_bound : Comat := comat_of CompanionTheory.Lime.T3.kFiniteWordBound_indefUnitary
+theorem comatrix_word_bound : Comat :=
+  comat_of CompanionTheory.Lime.T3.kFiniteWordBound_indefUnitary
 
 end PositivityTheory.UnitaryDecomposition.Com

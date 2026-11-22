@@ -13,32 +13,43 @@ open Formalism.BasicNotions NumberField IsDedekindDomain
 
 section S
 
-variable {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (sig : E →ₐ[F] E)
 
-def locAdj (G : Finset ℕ) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p)
-    (spl : ∀ p, Formalism.MainNotions.S.Loc.resChar p ∈ G →
-      Formalism.MainNotions.S.Loc.SplitAt (loc p).Fp (loc p).Ep (loc p).cj (Formalism.MainNotions.S.Loc.resChar p))
-    (p : HeightOneSpectrum (𝓞 F)) : Formalism.MainNotions.S.Loc.LocAt F E sig p :=
-  { loc p with split := if h : Formalism.MainNotions.S.Loc.resChar p ∈ G then some (spl p h) else none }
+def locAdj
+    (G : Finset ℕ) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p)
+    (spl : ∀ p,
+      Formalism.MainNotions.S.Loc.resChar p ∈ G
+        → Formalism.MainNotions.S.Loc.SplitAt (loc p).Fp (loc p).Ep (loc p).cj
+          (Formalism.MainNotions.S.Loc.resChar p))
+    (p : HeightOneSpectrum (𝓞 F))
+    : Formalism.MainNotions.S.Loc.LocAt F E sig p := {
+  loc p with
+  split := if h : Formalism.MainNotions.S.Loc.resChar p ∈ G then some (spl p h) else none
+}
 
-theorem locAdj_split (G : Finset ℕ) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p)
-    (spl : ∀ p, Formalism.MainNotions.S.Loc.resChar p ∈ G →
-      Formalism.MainNotions.S.Loc.SplitAt (loc p).Fp (loc p).Ep (loc p).cj (Formalism.MainNotions.S.Loc.resChar p))
-    (p : HeightOneSpectrum (𝓞 F)) :
-    (locAdj sig G loc spl p).split.isSome ↔ Formalism.MainNotions.S.Loc.resChar p ∈ G := by
+theorem locAdj_split
+    (G : Finset ℕ) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p)
+    (spl : ∀ p,
+      Formalism.MainNotions.S.Loc.resChar p ∈ G
+        → Formalism.MainNotions.S.Loc.SplitAt (loc p).Fp (loc p).Ep (loc p).cj
+          (Formalism.MainNotions.S.Loc.resChar p))
+    (p : HeightOneSpectrum (𝓞 F))
+    : (locAdj sig G loc spl p).split.isSome ↔ Formalism.MainNotions.S.Loc.resChar p ∈ G := by
   unfold locAdj
   by_cases h : Formalism.MainNotions.S.Loc.resChar p ∈ G <;> simp [h]
 
 variable {Word Tau : Type} [Subsingleton Word] (hc : Word → Tau → HCParam R)
 
-def toySData (Del : ℚ) (hDel : 0 < Del)
+def toySData
+    (Del : ℚ) (hDel : 0 < Del)
     (hgap : ∀ (w : Word) (τ : Tau) (l : ℕ) (h : l + 1 < R.k - 1),
       (hc w τ).v ⟨l, by omega⟩ - (hc w τ).v ⟨l + 1, h⟩ = 4 * Del)
     (hlet : ∀ (w : Word) (τ : Tau) (l : ℕ) (h : l < R.k - 2),
       (hc w τ).u ⟨l + 1, by omega⟩ = (hc w τ).v ⟨l, by omega⟩ - 1 / 2)
-    (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p) :
-    Formalism.MainNotions.S.Draft.SData R F E sig Word Tau hc where
+    (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p)
+    : Formalism.MainNotions.S.Draft.SData R F E sig Word Tau hc where
   cdScale := fun _ _ => 1
   cdScale_pos := fun _ _ => one_pos
   Del := Del
@@ -80,20 +91,24 @@ def toySData (Del : ℚ) (hDel : 0 < Del)
 
 variable {sig hc}
 
-theorem toySData_HH (Del : ℚ) (hDel hgap hlet) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p) :
-    Module.finrank ℂ (toySData sig hc Del hDel hgap hlet loc).HH = 0 := by
+theorem toySData_HH
+    (Del : ℚ) (hDel hgap hlet) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p)
+    : Module.finrank ℂ (toySData sig hc Del hDel hgap hlet loc).HH = 0 := by
   show Module.finrank ℂ (EuclideanSpace ℂ (Fin 0)) = 0
   simp
 
-def toySData_Cu (Del : ℚ) (hDel hgap hlet) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p) (u : Word)
-    {V : Type} [AddCommGroup V] [Module ℂ V] (M : Submodule ℂ V) (hM : M = ⊥) :
-    (toySData sig hc Del hDel hgap hlet loc).Cu u ≃ₗ[ℂ] M := by
+def toySData_Cu
+    (Del : ℚ) (hDel hgap hlet) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p) (u : Word)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (M : Submodule ℂ V) (hM : M = ⊥)
+    : (toySData sig hc Del hDel hgap hlet loc).Cu u ≃ₗ[ℂ] M := by
   subst hM
   haveI : Subsingleton (EuclideanSpace ℂ (Fin 0)) := ⟨fun a b => by ext i; exact i.elim0⟩
   exact LinearEquiv.ofSubsingleton (EuclideanSpace ℂ (Fin 0)) (⊥ : Submodule ℂ V)
 
-def toySData_PlF (Del : ℚ) (hDel hgap hlet) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p) :
-    (toySData sig hc Del hDel hgap hlet loc).PlF ≃ HeightOneSpectrum (𝓞 F) := Equiv.refl _
+def toySData_PlF (Del : ℚ) (hDel hgap hlet) (loc : ∀ p, Formalism.MainNotions.S.Loc.LocAt F E sig p)
+    : (toySData sig hc Del hDel hgap hlet loc).PlF ≃ HeightOneSpectrum (𝓞 F) :=
+  Equiv.refl _
 
 end S
 
@@ -121,16 +136,16 @@ def emptyPlaces (p : ℕ) : Places p ℤ_[3] ℚ_[3] where
   lam0 := fun v => v.elim0
   dom := fun v => v.elim0
 
-instance (p : ℕ) : Unique (emptyPlaces p).Tup :=
-  inferInstanceAs (Unique (∀ _ : Fin 0, _))
+instance (p : ℕ) : Unique (emptyPlaces p).Tup := inferInstanceAs (Unique (∀ _ : Fin 0, _))
 
 def toySignLevel (p : ℕ) : Level (emptyPlaces p) where
   Γ := ℤˣ
   act := fun v => v.elim0
   χ := Units.map (Int.castRingHom ℤ_[3]).toMonoidHom
 
-theorem emptyPlaces_natAct (p : ℕ) (A : ∀ v, GL (Fin ((emptyPlaces p).m + 1)) ((emptyPlaces p).Qq v)) :
-    (emptyPlaces p).natAct A = LinearMap.id := by
+theorem emptyPlaces_natAct
+    (p : ℕ) (A : ∀ v, GL (Fin ((emptyPlaces p).m + 1)) ((emptyPlaces p).Qq v))
+    : (emptyPlaces p).natAct A = LinearMap.id := by
   have hs : ∀ G, (emptyPlaces p).subst G = AlgHom.id _ _ := by
     intro G
     apply MvPolynomial.algHom_ext
@@ -156,15 +171,19 @@ theorem toySignLevel_M (p : ℕ) : (toySignLevel p).M = ⊥ := by
   have h := hF
   simp only [Level.M, Level.funMod, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker] at h
   have h1 := h.2 (show (toySignLevel p).Γ from (-1 : ℤˣ)) L
-  have hs : (toySignLevel p).smul (show (toySignLevel p).Γ from (-1 : ℤˣ)) L = L := Subsingleton.elim _ _
+  have hs : (toySignLevel p).smul (show (toySignLevel p).Γ from (-1 : ℤˣ)) L = L :=
+    Subsingleton.elim _ _
   simp only [LinearMap.sub_apply, LinearMap.proj_apply, LinearMap.comp_apply, LinearMap.smul_apply,
-    hs] at h1
+      hs]
+    at h1
   have hc : ((toySignLevel p).χ (show (toySignLevel p).Γ from (-1 : ℤˣ)) : ℤ_[3]) = -1 := by
     show ((Units.map (Int.castRingHom ℤ_[3]).toMonoidHom (-1 : ℤˣ) : ℤ_[3]ˣ) : ℤ_[3]) = -1
     simp
   rw [hc] at h1
-  have e : (((toySignLevel p).actX (show (toySignLevel p).Γ from (-1 : ℤˣ))).restrictScalars
-      ℤ_[3]) (F L) = F L := by
+  have e
+      : (((toySignLevel p).actX (show (toySignLevel p).Γ from (-1 : ℤˣ))).restrictScalars ℤ_[3]) (F
+          L)
+        = F L := by
     show (emptyPlaces p).natAct _ (F L) = F L
     rw [emptyPlaces_natAct]
     rfl

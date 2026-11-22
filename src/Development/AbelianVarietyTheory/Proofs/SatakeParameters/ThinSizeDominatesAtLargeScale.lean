@@ -11,7 +11,13 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW
 
-theorem thinSize_dominates : ∀ eps : ℝ, 0 < eps → ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D) (_ : ParameterChoice' D L), L.sc.eps = eps → x0 ≤ L.sc.x → (100 : ℝ) ≤ L.sc.w'' D.R.n ∧ 100 * (L.etaSz + L.Sc + D.R.t + 2) ≤ L.sc.w'' D.R.n ∧ L.sc.w'' D.R.n ≤ L.sc.b' := by
+theorem thinSize_dominates
+    : ∀ eps : ℝ,
+      0 < eps
+        → ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D) (_ : ParameterChoice' D L),
+          L.sc.eps = eps → x0 ≤ L.sc.x
+            → (100 : ℝ) ≤ L.sc.w'' D.R.n ∧ 100 * (L.etaSz + L.Sc + D.R.t + 2) ≤ L.sc.w'' D.R.n
+              ∧ L.sc.w'' D.R.n ≤ L.sc.b' := by
   intro eps _
   refine ⟨10000, fun D L P _ hx => ?_⟩
   have hm : (2 : ℝ) ≤ D.R.m := by exact_mod_cast D.R.two_le_m
@@ -38,8 +44,7 @@ theorem thinSize_dominates : ∀ eps : ℝ, 0 < eps → ∃ x0 : ℝ, ∀ (D : D
     refine le_trans ?_ P.k_ge_mx
     have a : (200 : ℝ) ≤ (D.R.m : ℝ) * L.sc.x ^ ((1 : ℝ) / 2) := by nlinarith
     nlinarith
-  have h2 : 200 * L.Sc ≤ L.sc.w'' D.R.n :=
-    le_trans (mul_le_mul_of_nonneg_right hk hS.le) P.kS_le
+  have h2 : 200 * L.Sc ≤ L.sc.w'' D.R.n := le_trans (mul_le_mul_of_nonneg_right hk hS.le) P.kS_le
   have h3 : 7 * L.etaSz ≤ (D.R.t : ℝ) * L.etaSz := mul_le_mul_of_nonneg_right ht (by linarith)
   have h4 : 7 * L.etaSz * 10000 ≤ L.sc.w'' D.R.n :=
     le_trans (mul_le_mul h3 hx (by norm_num) (by linarith)) h1

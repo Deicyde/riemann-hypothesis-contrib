@@ -8,29 +8,31 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.RelIndexS
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  MeasureTheory Topology
 open scoped ComplexOrder ENNReal Matrix
 
 namespace GlobalTheory.HeightEnds
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-
 omit [NumberField E] [IsCMField E] in
-theorem gram_eq_mul {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
-    (x : Matrix (Fin r) (Fin r) ℂ) :
-    gram τ G x = xᵀ * G.map τ * (xᴴ)ᵀ := by
+theorem gram_eq_mul
+    {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (x : Matrix (Fin r) (Fin r) ℂ)
+    : gram τ G x = xᵀ * G.map τ * (xᴴ)ᵀ := by
   ext a b
   simp only [gram, hermC, col, Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply,
     Matrix.map_apply, Matrix.conjTranspose_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
   rfl
 
-theorem norm_det_orth {r : ℕ} (X : Data E r) (x : Frame X.Ψ r) (hx : IsOrth X x) (τ : X.Ψ) :
-    ‖(mat x τ).det‖ ^ 2 * ‖τ.1 X.Gm.det‖ = 1 := by
+theorem norm_det_orth {r : ℕ} (X : Data E r) (x : Frame X.Ψ r) (hx : IsOrth X x) (τ : X.Ψ)
+    : ‖(mat x τ).det‖ ^ 2 * ‖τ.1 X.Gm.det‖ = 1 := by
   have h := congrArg (fun M => ‖Matrix.det M‖) (hx τ)
   simp only [gram_eq_mul, Matrix.det_mul, Matrix.det_transpose, Matrix.det_conjTranspose,
-    Matrix.det_diagonal, norm_mul, norm_star, norm_prod] at h
+      Matrix.det_diagonal, norm_mul, norm_star, norm_prod]
+    at h
   have h1 : ∀ a : Fin r, ‖((sgn X.p0 (a : ℕ) : ℝ) : ℂ)‖ = 1 := by
     intro a
     unfold sgn
@@ -39,12 +41,22 @@ theorem norm_det_orth {r : ℕ} (X : Data E r) (x : Frame X.Ψ r) (hx : IsOrth X
   rw [RingHom.map_det, RingHom.mapMatrix_apply, ← h]
   ring
 
-theorem gramDet_square {r : ℕ} (N : Matrix (Fin r) (Fin r) ℂ) :
-    (Nᴴ * N).det.re = ‖N.det‖ ^ 2 := by
+theorem gramDet_square {r : ℕ} (N : Matrix (Fin r) (Fin r) ℂ) : (Nᴴ * N).det.re = ‖N.det‖ ^ 2 := by
   rw [Matrix.det_mul, Matrix.det_conjTranspose, Complex.star_def, Complex.conj_mul']
   norm_cast
 
-theorem exists_pos_le_bot_top : (∀ (r : ℕ) (X : Data E r) (d : Frame X.Ψ r → Submodule E (Fin r → E) → ℝ), (∀ x : Frame X.Ψ r, (∀ τ : X.Ψ, (mat x τ).det ≠ 0) → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (w : ι → Fin r → E), LinearIndependent E w → (∀ a, w a ∈ X.Λ) → d x (Submodule.span E (Set.range w)) = ((∏ τ : X.Ψ, ((((mat x τ)⁻¹ * (Matrix.of fun k a => τ.1 (w a k)))ᴴ * ((mat x τ)⁻¹ * (Matrix.of fun k a => τ.1 (w a k)))).det.re)) / (((Submodule.span (𝓞 E) (Set.range w)).toAddSubgroup.relIndex (X.Λ.toAddSubgroup ⊓ (Submodule.span E (Set.range w)).toAddSubgroup)) : ℝ))) → ∃ m : ℝ, 0 < m ∧ ∀ x, IsOrth X x → m ≤ d x ⊥ ∧ m ≤ d x ⊤) := by
+theorem exists_pos_le_bot_top
+    : (∀ (r : ℕ) (X : Data E r) (d : Frame X.Ψ r → Submodule E (Fin r → E) → ℝ),
+      (∀ x : Frame X.Ψ r,
+          (∀ τ : X.Ψ, (mat x τ).det ≠ 0)
+            → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (w : ι → Fin r → E),
+              LinearIndependent E w → (∀ a, w a ∈ X.Λ)
+                → d x (Submodule.span E (Set.range w))
+                  = ((∏ τ : X.Ψ, ((((mat x τ)⁻¹ * (Matrix.of fun k a => τ.1 (w a k)))ᴴ * ((mat x τ)⁻¹ * (Matrix.of fun k a => τ.1 (w a k)))).det.re))
+                    / (((Submodule.span (𝓞 E) (Set.range w)).toAddSubgroup.relIndex
+                        (X.Λ.toAddSubgroup ⊓ (Submodule.span E (Set.range w)).toAddSubgroup))
+                      : ℝ)))
+        → ∃ m : ℝ, 0 < m ∧ ∀ x, IsOrth X x → m ≤ d x ⊥ ∧ m ≤ d x ⊤) := by
   intro r X d hd
   obtain ⟨w0, hw0, hΛ0, hsp0⟩ := GlobalTheory.LatBasis.exists_basis_mem r X ⊤
   have hr : r = Module.finrank E (⊤ : Submodule E (Fin r → E)) := by simp
@@ -74,8 +86,8 @@ theorem exists_pos_le_bot_top : (∀ (r : ℕ) (X : Data E r) (d : Frame X.Ψ r 
     have hre : Set.range (fun a : Empty => (a.elim : Fin r → E)) = ∅ := Set.range_eq_empty _
     rw [hre] at h
     simp only [Submodule.span_empty, Matrix.det_isEmpty, Complex.one_re, Finset.prod_const_one,
-      Submodule.bot_toAddSubgroup, inf_bot_eq, AddSubgroup.relIndex_self, Nat.cast_one,
-      div_one] at h
+        Submodule.bot_toAddSubgroup, inf_bot_eq, AddSubgroup.relIndex_self, Nat.cast_one, div_one]
+      at h
     rw [h]
     exact min_le_left _ _
   · have h := hd x hxd (Fin r) w hw hΛ

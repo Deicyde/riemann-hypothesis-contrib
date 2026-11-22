@@ -15,8 +15,8 @@ theorem LocalizationPrimeDVR.proof : LocalizationPrimeDVR.Statement := by
   intro R _ _ _ _ q p _ hq hp
   set O := Localization.AtPrime p
   have hmax : maximalIdeal O = Ideal.span {algebraMap R O q} := by
-    rw [← IsLocalization.AtPrime.map_eq_maximalIdeal p O,
-      congrArg (Ideal.map (algebraMap R O)) hp, Ideal.map_span, Set.image_singleton]
+    rw [← IsLocalization.AtPrime.map_eq_maximalIdeal p O, congrArg (Ideal.map (algebraMap R O)) hp,
+      Ideal.map_span, Set.image_singleton]
   have hprin : (maximalIdeal O).IsPrincipal := ⟨⟨algebraMap R O q, hmax⟩⟩
   have hPID : IsPrincipalIdealRing O :=
     ((tfae_of_isNoetherianRing_of_isLocalRing_of_isDomain O).out 5 1).mp hprin

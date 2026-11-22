@@ -12,8 +12,8 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Filter Topology
 
-theorem BranchProperAtPoint.proof (hrim : BranchAwayFromRim.Statement) :
-    BranchProperAtPoint.Statement := by
+theorem BranchProperAtPoint.proof (hrim : BranchAwayFromRim.Statement)
+    : BranchProperAtPoint.Statement := by
   intro n k J u p x m γ hJ hdim hu hcov hdisj b s hs hsx P hP
   obtain ⟨ε₀, hε₀, ρ, hρ, hrimb⟩ := hrim n k J u p x m γ hJ hdim hu hcov hdisj b
   obtain ⟨P', hP'P, hP'o, hsP'⟩ := mem_nhds_iff.mp hP

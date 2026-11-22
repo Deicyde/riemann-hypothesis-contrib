@@ -8,18 +8,32 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.smoothCharacter_extends_to_open_subgroup :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ (S : Space O F n) (Q : Type) [CommRing Q] [Algebra (ResidueField O) Q] (ξ : S.A →+* Q), S.FPt ξ → (S.u.map ξ).IsBar (algebraMap (ResidueField O) Q) ∧ (∀ i j, IsLocallyConstant fun g => (S.u.map ξ).r g i j) ∧ ∀ ξ' : S.A →+* Q, S.FPt ξ' → (∀ g i j, ξ' (S.u.r g i j) = ξ (S.u.r g i j)) → ξ' = ξ := by
+theorem UpperTheory.smoothCharacter_extends_to_open_subgroup
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ (S : Space O F n) (Q : Type) [CommRing Q] [Algebra (ResidueField O) Q] (ξ : S.A →+* Q),
+          S.FPt ξ
+            → (S.u.map ξ).IsBar (algebraMap (ResidueField O) Q)
+              ∧ (∀ i j, IsLocallyConstant fun g => (S.u.map ξ).r g i j)
+              ∧ ∀ ξ' : S.A →+* Q,
+                S.FPt ξ' → (∀ g i j, ξ' (S.u.r g i j) = ξ (S.u.r g i j)) → ξ' = ξ := by
   intro l _ O _ _ _ _ F C₀ n hF hn S Q _ _ ξ hξ
-  have hkey : ∀ ζ : S.A →+* Q, S.FPt ζ → ∀ (b : S.B) (c : O), b - algebraMap O S.B c ∈ S.mB →
-      ζ (S.inc b) = algebraMap (ResidueField O) Q (residue O c) := by
+  have hkey
+      : ∀ ζ : S.A →+* Q,
+        S.FPt ζ
+          → ∀ (b : S.B) (c : O),
+            b - algebraMap O S.B c ∈ S.mB
+              → ζ (S.inc b) = algebraMap (ResidueField O) Q (residue O c) := by
     intro ζ hζ b c hbc
     have h1 : S.inc (b - algebraMap O S.B c) ∈ S.x0 := Ideal.mem_map_of_mem _ hbc
     have h2 := hζ.x0 h1
     rw [RingHom.mem_ker, map_sub, AlgHom.commutes, map_sub, sub_eq_zero] at h2
     rw [h2, hζ.alg]
-  have hres : ∀ (b : S.B) (y : ResidueField O), res O S.R b.val = y →
-      ∀ ζ : S.A →+* Q, S.FPt ζ → ζ (S.inc b) = algebraMap (ResidueField O) Q y := by
+  have hres
+      : ∀ (b : S.B) (y : ResidueField O),
+        res O S.R b.val = y
+          → ∀ ζ : S.A →+* Q, S.FPt ζ → ζ (S.inc b) = algebraMap (ResidueField O) Q y := by
     intro b y hb ζ hζ
     obtain ⟨c, rfl⟩ := IsLocalRing.residue_surjective y
     apply hkey ζ hζ b c

@@ -13,9 +13,10 @@ namespace GlobalTheory.CompanionTheory.InertZeta
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem traceZero_eq_map {σ : L →+* L} {c : L} (hc : c ≠ 0) (hσ : σ c = c) :
-    traceZero σ c =
-      ((intL L).toAddSubgroup ⊓ (σ.toAddMonoidHom + AddMonoidHom.id L).ker).map (AddMonoidHom.mulLeft c⁻¹) := by
+theorem traceZero_eq_map {σ : L →+* L} {c : L} (hc : c ≠ 0) (hσ : σ c = c)
+    : traceZero σ c
+      = ((intL L).toAddSubgroup ⊓ (σ.toAddMonoidHom + AddMonoidHom.id L).ker).map
+        (AddMonoidHom.mulLeft c⁻¹) := by
   ext x
   rw [mem_traceZero, AddSubgroup.mem_map]
   constructor
@@ -38,7 +39,8 @@ theorem traceZero_eq_map {σ : L →+* L} {c : L} (hc : c ≠ 0) (hσ : σ c = c
 
 theorem traceIndex : TraceIndex := by
   intro L _ _ ϖ σ q f hU
-  have hbase := GlobalTheory.SatakeWeyl.traceZeroIndex_of_intIndex GlobalTheory.SatakeWeyl.intIndex L ϖ σ q hU
+  have hbase :=
+    GlobalTheory.SatakeWeyl.traceZeroIndex_of_intIndex GlobalTheory.SatakeWeyl.intIndex L ϖ σ q hU
   obtain ⟨-, -, hϖ, hv, -, -, -⟩ := hU
   have hv' : Valued.v ϖ = WithZero.exp (-1 : ℤ) := hv
   have h0 : ϖ ≠ 0 := by
@@ -62,8 +64,9 @@ theorem traceIndex : TraceIndex := by
     intro f
     have hinj : Function.Injective (AddMonoidHom.mulLeft (ϖ ^ (f + 1))⁻¹) :=
       mul_right_injective₀ (inv_ne_zero (pow_ne_zero _ h0))
-    have e : T.map (AddMonoidHom.mulLeft (ϖ ^ f)⁻¹) =
-        (T.map (AddMonoidHom.mulLeft ϖ)).map (AddMonoidHom.mulLeft (ϖ ^ (f + 1))⁻¹) := by
+    have e
+        : T.map (AddMonoidHom.mulLeft (ϖ ^ f)⁻¹)
+          = (T.map (AddMonoidHom.mulLeft ϖ)).map (AddMonoidHom.mulLeft (ϖ ^ (f + 1))⁻¹) := by
       ext x
       simp only [AddSubgroup.mem_map, AddMonoidHom.coe_mulLeft]
       constructor
@@ -78,8 +81,7 @@ theorem traceIndex : TraceIndex := by
     rw [hS f, hS (f + 1), e, AddSubgroup.relIndex_map_map_of_injective _ _ hinj]
     exact hbase
   induction f with
-  | zero =>
-    rw [pow_zero, pow_zero, AddSubgroup.relIndex_self]
+  | zero => rw [pow_zero, pow_zero, AddSubgroup.relIndex_self]
   | succ f ih =>
     have hle : traceZero σ 1 ≤ traceZero σ (ϖ ^ f) := by
       clear ih

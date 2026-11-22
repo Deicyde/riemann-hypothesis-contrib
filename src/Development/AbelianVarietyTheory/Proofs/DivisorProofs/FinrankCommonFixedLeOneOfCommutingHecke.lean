@@ -9,17 +9,20 @@ open Module
 
 namespace GlobalTheory.CommutingHecke
 
-theorem fixed_mem_of_stable {ι : Type} [Finite ι] {H : ι → Type} [∀ c, Monoid (H c)] {V : Type}
-    [AddCommGroup V] [Module ℂ V] (a : ∀ c, H c →* Module.End ℂ V) (e : ι → Module.End ℂ V)
+theorem fixed_mem_of_stable
+    {ι : Type} [Finite ι]
+    {H : ι → Type} [∀ c, Monoid (H c)]
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (a : ∀ c, H c →* Module.End ℂ V) (e : ι → Module.End ℂ V)
     (hea : ∀ c c', c ≠ c' → ∀ g, Commute (e c) (a c' g))
     (haa : ∀ c c', c ≠ c' → ∀ g h, Commute (a c g) (a c' h))
     (hirr : ∀ Y : Submodule ℂ V, (∀ c g, ∀ v ∈ Y, a c g v ∈ Y) → Y = ⊥ ∨ Y = ⊤)
     (E : Submodule ℂ V) (hE : E ≠ ⊥) (hst : ∀ c g, ∀ v ∈ E, e c (a c g v) ∈ E)
-    (v : V) (hv : ∀ c, e c v = v) : v ∈ E := by
+    (v : V) (hv : ∀ c, e c v = v)
+    : v ∈ E := by
   classical
   haveI := Fintype.ofFinite ι
-  let Y : Finset ι → Submodule ℂ V := fun s =>
-    sInf {Y | E ≤ Y ∧ ∀ c ∈ s, ∀ g, ∀ v ∈ Y, a c g v ∈ Y}
+  let Y : Finset ι → Submodule ℂ V := fun s => sInf {Y | E ≤ Y ∧ ∀ c ∈ s, ∀ g, ∀ v ∈ Y, a c g v ∈ Y}
   have hEY : ∀ s, E ≤ Y s := fun s => le_sInf fun _ h => h.1
   have hYst : ∀ s, ∀ c ∈ s, ∀ g, ∀ v ∈ Y s, a c g v ∈ Y s := by
     intro s c hc g v hv
@@ -61,16 +64,18 @@ theorem fixed_mem_of_stable {ι : Type} [Finite ι] {H : ι → Type} [∀ c, Mo
   · exact absurd (le_bot_iff.1 (h ▸ hEY _)) hE
   · rw [h]; trivial
 
-theorem finrank_fixed_le_one (ι : Type) [Finite ι] (H : ι → Type) [∀ c, Monoid (H c)] (V : Type)
-    [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+theorem finrank_fixed_le_one
+    (ι : Type) [Finite ι]
+    (H : ι → Type) [∀ c, Monoid (H c)]
+    (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
     (a : ∀ c, H c →* Module.End ℂ V) (e : ι → Module.End ℂ V)
-    (hee : ∀ c, e c * e c = e c)
-    (hea : ∀ c c', c ≠ c' → ∀ g, Commute (e c) (a c' g))
+    (hee : ∀ c, e c * e c = e c) (hea : ∀ c c', c ≠ c' → ∀ g, Commute (e c) (a c' g))
     (hec : ∀ c c', c ≠ c' → Commute (e c) (e c'))
     (haa : ∀ c c', c ≠ c' → ∀ g h, Commute (a c g) (a c' h))
     (hhk : ∀ c g h, e c * a c g * e c * a c h * e c = e c * a c h * e c * a c g * e c)
     (hirr : ∀ Y : Submodule ℂ V, (∀ c g, ∀ v ∈ Y, a c g v ∈ Y) → Y = ⊥ ∨ Y = ⊤)
-    (W : Submodule ℂ V) (hW : ∀ v ∈ W, ∀ c, e c v = v) : finrank ℂ W ≤ 1 := by
+    (W : Submodule ℂ V) (hW : ∀ v ∈ W, ∀ c, e c v = v)
+    : finrank ℂ W ≤ 1 := by
   classical
   let W0 : Submodule ℂ V := ⨅ c, LinearMap.eqLocus (e c) LinearMap.id
   have hW0 : ∀ v, v ∈ W0 ↔ ∀ c, e c v = v := by
@@ -83,12 +88,11 @@ theorem finrank_fixed_le_one (ι : Type) [Finite ι] (H : ι → Type) [∀ c, M
     by_cases h : c' = c
     · subst h
       exact LinearMap.congr_fun (hee c') _
-    · have h1 : e c' (e c (a c g v)) = e c (e c' (a c g v)) :=
-        LinearMap.congr_fun (hec c' c h).eq _
+    · have h1 : e c' (e c (a c g v)) = e c (e c' (a c g v)) := LinearMap.congr_fun (hec c' c h).eq _
       have h2 : e c' (a c g v) = a c g (e c' v) := LinearMap.congr_fun (hea c' c h g).eq _
       rw [h1, h2, hv]
-  have hcomm : ∀ c g c' h, ∀ v ∈ W0,
-      e c (a c g (e c' (a c' h v))) = e c' (a c' h (e c (a c g v))) := by
+  have hcomm
+      : ∀ c g c' h, ∀ v ∈ W0, e c (a c g (e c' (a c' h v))) = e c' (a c' h (e c (a c g v))) := by
     intro c g c' h v hv
     rw [hW0] at hv
     by_cases hc : c = c'
@@ -106,13 +110,14 @@ theorem finrank_fixed_le_one (ι : Type) [Finite ι] (H : ι → Type) [∀ c, M
   haveI : Nontrivial W0 := Submodule.nontrivial_iff_ne_bot.2 hbot
   have hscal : ∀ c g, ∃ μ : ℂ, ∀ v ∈ W0, e c (a c g v) = μ • v := by
     intro c g
-    obtain ⟨μ, hμ⟩ := Module.End.exists_eigenvalue
-      ((e c * a c g).restrict (p := W0) (q := W0) (hpres c g))
+    obtain ⟨μ, hμ⟩ :=
+      Module.End.exists_eigenvalue ((e c * a c g).restrict (p := W0) (q := W0) (hpres c g))
     obtain ⟨w, hw⟩ := hμ.exists_hasEigenvector
     have hw1 : e c (a c g w) = μ • (w : V) := congrArg Subtype.val hw.apply_eq_smul
     refine ⟨μ, fun v hv => ?_⟩
-    have := fixed_mem_of_stable a e hea haa hirr (W0 ⊓ Module.End.eigenspace (e c * a c g) μ)
-      ?_ ?_ v ((hW0 v).1 hv)
+    have :=
+      fixed_mem_of_stable a e hea haa hirr (W0 ⊓ Module.End.eigenspace (e c * a c g) μ) ?_ ?_ v
+        ((hW0 v).1 hv)
     · exact Module.End.mem_eigenspace_iff.1 this.2
     · rw [Submodule.ne_bot_iff]
       exact ⟨w, ⟨w.2, Module.End.mem_eigenspace_iff.2 hw1⟩, fun h => hw.2 (Subtype.ext h)⟩

@@ -12,14 +12,36 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.For
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.EndOnTorsion
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.EndOnTorsion
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem pull_two_nsmul_eq_zero_of_triples : ∀ (S : Scheme.{0}) [IsIntegral S] [IsLocallyNoetherian S], ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme S → ∀ (A : Over S) [GrpObj A], IsAbelianScheme A → ∀ (U : S.Opens) (V W : A.left.Opens) (hV : V ≤ W), (U : Set S).Nonempty → (∀ s : S, ∃ x ∈ V, A.hom x = s) → A.hom ⁻¹ᵁ U ≤ W → W ≤ A.hom ⁻¹ᵁ U ⊔ V → ∀ c : Pic W.toScheme, GlobalTheory.CechPic.pull (A.left.homOfLE hV) c = 0 → ∀ (Y : Over S) (x a v : Y ⟶ A) (p : Y.left ⟶ V.toScheme) (e : V.toScheme ⟶ (x.left ⁻¹ᵁ V).toScheme), p ≫ V.ι = v.left → (∀ y, (x * a).left y ∈ V ∧ (x * a⁻¹).left y ∈ V ∧ (v * a).left y ∈ V ∧ (v * a⁻¹).left y ∈ V) → Smooth ((x.left ⁻¹ᵁ V).ι ≫ p) → GeometricallyIntegral ((x.left ⁻¹ᵁ V).ι ≫ p) → e ≫ (x.left ⁻¹ᵁ V).ι ≫ p = 𝟙 _ → GlobalTheory.CechPic.pull (x.left ∣_ W) (2 • c) = 0 := by
+theorem pull_two_nsmul_eq_zero_of_triples
+    : ∀ (S : Scheme.{0}) [IsIntegral S] [IsLocallyNoetherian S],
+      ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme S
+        → ∀ (A : Over S) [GrpObj A],
+          IsAbelianScheme A
+            → ∀ (U : S.Opens) (V W : A.left.Opens) (hV : V ≤ W),
+              (U : Set S).Nonempty → (∀ s : S, ∃ x ∈ V, A.hom x = s) → A.hom ⁻¹ᵁ U ≤ W
+                → W ≤ A.hom ⁻¹ᵁ U ⊔ V
+                → ∀ c : Pic W.toScheme,
+                  GlobalTheory.CechPic.pull (A.left.homOfLE hV) c = 0
+                    → ∀ (Y : Over S) (x a v : Y ⟶ A) (p : Y.left ⟶ V.toScheme)
+                        (e : V.toScheme ⟶ (x.left ⁻¹ᵁ V).toScheme),
+                      p ≫ V.ι = v.left
+                        → (∀ y,
+                          (x * a).left y ∈ V ∧ (x * a⁻¹).left y ∈ V ∧ (v * a).left y ∈ V
+                            ∧ (v * a⁻¹).left y ∈ V)
+                        → Smooth ((x.left ⁻¹ᵁ V).ι ≫ p)
+                        → GeometricallyIntegral ((x.left ⁻¹ᵁ V).ι ≫ p)
+                        → e ≫ (x.left ⁻¹ᵁ V).ι ≫ p = 𝟙 _
+                        → GlobalTheory.CechPic.pull (x.left ∣_ W) (2 • c) = 0 := by
   intro S _ _ hS A _ hA U V W hV hU hsurj hUW hWUV c hc Y x a v p e hpv hmem hsm hgi he
   have := hA.smooth
   have : GeometricallyIntegral A.hom :=
@@ -32,7 +54,8 @@ theorem pull_two_nsmul_eq_zero_of_triples : ∀ (S : Scheme.{0}) [IsIntegral S] 
   obtain ⟨a0, ha0V, ha0⟩ := hsurj s0
   have : Nonempty V := ⟨⟨a0, ha0V⟩⟩
   have : IsIntegral V.toScheme := inferInstance
-  have hVn : GlobalTheory.IsNormalScheme V.toScheme := GlobalTheory.isNormalScheme_of_smooth (V.ι ≫ A.hom)
+  have hVn : GlobalTheory.IsNormalScheme V.toScheme :=
+    GlobalTheory.isNormalScheme_of_smooth (V.ι ≫ A.hom)
   let i0 := (x.left ⁻¹ᵁ W).ι
   let O : (x.left ⁻¹ᵁ W).toScheme.Opens := i0 ⁻¹ᵁ (x.left ⁻¹ᵁ V)
   have hrange : Set.range (x.left ⁻¹ᵁ V).ι = Set.range (O.ι ≫ i0) := by
@@ -45,17 +68,20 @@ theorem pull_two_nsmul_eq_zero_of_triples : ∀ (S : Scheme.{0}) [IsIntegral S] 
   let φ := IsOpenImmersion.isoOfRangeEq (x.left ⁻¹ᵁ V).ι (O.ι ≫ i0) hrange
   have hφ : φ.hom ≫ O.ι ≫ i0 = (x.left ⁻¹ᵁ V).ι := IsOpenImmersion.isoOfRangeEq_hom_fac _ _ _
   let UT : V.toScheme.Opens := (V.ι ≫ A.hom) ⁻¹ᵁ U
-  have hUT : (UT : Set V.toScheme).Nonempty := ⟨⟨a0, ha0V⟩, by
-    show A.hom (V.ι ⟨a0, ha0V⟩) ∈ U
-    simpa [ha0] using hs0⟩
+  have hUT : (UT : Set V.toScheme).Nonempty := ⟨
+    ⟨a0, ha0V⟩,
+    by
+      show A.hom (V.ι ⟨a0, ha0V⟩) ∈ U
+      simpa [ha0] using hs0
+  ⟩
   let p' := i0 ≫ p
-  have hOp : O.ι ≫ p' = φ.inv ≫ (x.left ⁻¹ᵁ V).ι ≫ p := by
-    rw [← hφ]; simp [p']
+  have hOp : O.ι ≫ p' = φ.inv ≫ (x.left ⁻¹ᵁ V).ι ≫ p := by rw [← hφ]; simp [p']
   have hsm' : Smooth (O.ι ≫ p') := by rw [hOp]; infer_instance
   have hgi' : GeometricallyIntegral (O.ι ≫ p') := by
     have : MorphismProperty.RespectsIso @GeometricallyIntegral :=
       MorphismProperty.IsStableUnderBaseChange.respectsIso
-    rw [hOp]; exact (MorphismProperty.cancel_left_of_respectsIso @GeometricallyIntegral φ.inv _).mpr hgi
+    rw [hOp]
+    exact (MorphismProperty.cancel_left_of_respectsIso @GeometricallyIntegral φ.inv _).mpr hgi
   have he' : (e ≫ φ.hom) ≫ O.ι ≫ p' = 𝟙 _ := by
     simp only [p', Category.assoc]; rw [reassoc_of% hφ]; exact he
   have hpY : p' ≫ V.ι ≫ A.hom = i0 ≫ Y.hom := by
@@ -73,10 +99,12 @@ theorem pull_two_nsmul_eq_zero_of_triples : ∀ (S : Scheme.{0}) [IsIntegral S] 
       exact h
     · left
       exact h
-  have key : ∀ c' : Pic (x.left ⁻¹ᵁ W).toScheme, pull O.ι c' = 0 → pull (p' ⁻¹ᵁ UT).ι c' = 0 →
-      c' = 0 := fun c' h1 h2 =>
-    GlobalTheory.T.picardClass_eq_zero_of_zero_dense_open_and_section_open V.toScheme (x.left ⁻¹ᵁ W).toScheme ((GlobalTheory.isNormalScheme_iff _).mp hVn) UT hUT p'
-      O (e ≫ φ.hom) hsm' hgi' he' hcover c' h1 h2
+  have key
+      : ∀ c' : Pic (x.left ⁻¹ᵁ W).toScheme,
+        pull O.ι c' = 0 → pull (p' ⁻¹ᵁ UT).ι c' = 0 → c' = 0 := fun c' h1 h2 =>
+    GlobalTheory.T.picardClass_eq_zero_of_zero_dense_open_and_section_open V.toScheme
+      (x.left ⁻¹ᵁ W).toScheme ((GlobalTheory.isNormalScheme_iff _).mp hVn) UT hUT p' O (e ≫ φ.hom)
+      hsm' hgi' he' hcover c' h1 h2
   apply key
   · rw [← pull_comp]
     have hfac : O.ι ≫ (x.left ∣_ W) = φ.inv ≫ (x.left ∣_ V) ≫ A.left.homOfLE hV := by
@@ -89,8 +117,8 @@ theorem pull_two_nsmul_eq_zero_of_triples : ∀ (S : Scheme.{0}) [IsIntegral S] 
     let j := (p' ⁻¹ᵁ UT).ι
     let Y' : Over S := Over.mk (j ≫ i0 ≫ Y.hom)
     let q : Y' ⟶ Y := Over.homMk (j ≫ i0) (by simp [Y'])
-    refine GlobalTheory.T.twice_picardClass_eq_zero_of_translates_mem_open S A hA U V W hV hUW c hc Y' (q ≫ x) (q ≫ a) (q ≫ v) ?_ ?_ ?_
-      (j ≫ (x.left ∣_ W)) ?_
+    refine GlobalTheory.T.twice_picardClass_eq_zero_of_translates_mem_open S A hA U V W hV hUW c hc
+      Y' (q ≫ x) (q ≫ a) (q ≫ v) ?_ ?_ ?_ (j ≫ (x.left ∣_ W)) ?_
     · intro y
       show (j ≫ i0 ≫ Y.hom) y ∈ U
       rw [← hpY]

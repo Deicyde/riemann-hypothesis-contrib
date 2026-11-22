@@ -32,18 +32,18 @@ theorem half_two : ((2 : ℂ)⁻¹) • ((1 : Matrix n n ℂ) + 1) = 1 := by
 theorem half_double (A : Matrix n n ℂ) : ((2 : ℂ)⁻¹) • (A + A) = A := by
   rw [← two_smul ℂ A, smul_smul]; norm_num
 
-theorem fwd {H X : Matrix n n ℂ} (hX : Xᴴ * H + H * X = 0) (hu : IsUnit (1 - X)) :
-    ((1 + X) * (1 - X)⁻¹)ᴴ * H * ((1 + X) * (1 - X)⁻¹) = H ∧ IsUnit ((1 + X) * (1 - X)⁻¹ + 1) ∧
-      ((1 + X) * (1 - X)⁻¹ - 1) * ((1 + X) * (1 - X)⁻¹ + 1)⁻¹ = X := by
+theorem fwd {H X : Matrix n n ℂ} (hX : Xᴴ * H + H * X = 0) (hu : IsUnit (1 - X))
+    : ((1 + X) * (1 - X)⁻¹)ᴴ * H * ((1 + X) * (1 - X)⁻¹) = H ∧ IsUnit ((1 + X) * (1 - X)⁻¹ + 1)
+      ∧ ((1 + X) * (1 - X)⁻¹ - 1) * ((1 + X) * (1 - X)⁻¹ + 1)⁻¹ = X := by
   set V := (1 - X)⁻¹ with hV
   have h1 : (1 - X) * V = 1 := mul_inv_of_isUnit hu
   have h2 : V * (1 - X) = 1 := inv_mul_of_isUnit hu
   have hXV : X * V = V - 1 := by
     have e := h1
     rw [Matrix.sub_mul, Matrix.one_mul] at e
-    rw [← e]; abel
-  have hg1 : (1 + X) * V + 1 = V + V := by
-    rw [Matrix.add_mul, Matrix.one_mul, hXV]; abel
+    rw [← e]
+    abel
+  have hg1 : (1 + X) * V + 1 = V + V := by rw [Matrix.add_mul, Matrix.one_mul, hXV]; abel
   have hq : (V + V) * ((2⁻¹ : ℂ) • (1 - X)) = 1 := by
     rw [Matrix.mul_smul, Matrix.add_mul, h2, half_two]
   refine ⟨?_, ?_, ?_⟩
@@ -57,14 +57,13 @@ theorem fwd {H X : Matrix n n ℂ} (hX : Xᴴ * H + H * X = 0) (hu : IsUnit (1 -
     have hW : Vᴴ * (1 - Xᴴ) = 1 := by
       have e := congrArg Matrix.conjTranspose h1
       rwa [Matrix.conjTranspose_mul, Matrix.conjTranspose_sub, Matrix.conjTranspose_one] at e
-    calc ((1 + X) * V)ᴴ * H * ((1 + X) * V)
-        = Vᴴ * (((1 + Xᴴ) * H) * ((1 + X) * V)) := by
-          rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_add, Matrix.conjTranspose_one]
-          simp only [Matrix.mul_assoc]
+    calc
+      ((1 + X) * V)ᴴ * H * ((1 + X) * V) = Vᴴ * (((1 + Xᴴ) * H) * ((1 + X) * V)) := by
+        rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_add, Matrix.conjTranspose_one]
+        simp only [Matrix.mul_assoc]
       _ = Vᴴ * (H * (((1 - X) * (1 + X)) * V)) := by rw [ha]; simp only [Matrix.mul_assoc]
       _ = Vᴴ * (H * ((1 + X) * ((1 - X) * V))) := by rw [hc]; simp only [Matrix.mul_assoc]
-      _ = (Vᴴ * (1 - Xᴴ)) * H := by
-          rw [h1, Matrix.mul_one, hb]; simp only [Matrix.mul_assoc]
+      _ = (Vᴴ * (1 - Xᴴ)) * H := by rw [h1, Matrix.mul_one, hb]; simp only [Matrix.mul_assoc]
       _ = H := by rw [hW, Matrix.one_mul]
   · rw [hg1]; exact isUnit_of_mul_one hq
   · rw [hg1, Matrix.inv_eq_right_inv hq, Matrix.mul_smul]
@@ -72,16 +71,17 @@ theorem fwd {H X : Matrix n n ℂ} (hX : Xᴴ * H + H * X = 0) (hu : IsUnit (1 -
       rw [Matrix.sub_mul, Matrix.mul_assoc, h2, Matrix.mul_one, Matrix.one_mul]; abel
     rw [e, half_double]
 
-theorem bwd {H g : Matrix n n ℂ} (hg : gᴴ * H * g = H) (hu : IsUnit (g + 1)) :
-    ((g - 1) * (g + 1)⁻¹)ᴴ * H + H * ((g - 1) * (g + 1)⁻¹) = 0 ∧ IsUnit (1 - (g - 1) * (g + 1)⁻¹) ∧
-      (1 + (g - 1) * (g + 1)⁻¹) * (1 - (g - 1) * (g + 1)⁻¹)⁻¹ = g := by
+theorem bwd {H g : Matrix n n ℂ} (hg : gᴴ * H * g = H) (hu : IsUnit (g + 1))
+    : ((g - 1) * (g + 1)⁻¹)ᴴ * H + H * ((g - 1) * (g + 1)⁻¹) = 0 ∧ IsUnit (1 - (g - 1) * (g + 1)⁻¹)
+      ∧ (1 + (g - 1) * (g + 1)⁻¹) * (1 - (g - 1) * (g + 1)⁻¹)⁻¹ = g := by
   set P := (g + 1)⁻¹ with hP
   have h1 : (g + 1) * P = 1 := mul_inv_of_isUnit hu
   have h2 : P * (g + 1) = 1 := inv_mul_of_isUnit hu
   have hgP : g * P = 1 - P := by
     have e := h1
     rw [Matrix.add_mul, Matrix.one_mul] at e
-    rw [← e]; abel
+    rw [← e]
+    abel
   have hX : (g - 1) * P = 1 - P - P := by rw [Matrix.sub_mul, Matrix.one_mul, hgP]
   have hOne : (1 : Matrix n n ℂ) - (1 - P - P) = P + P := by abel
   have hq : (P + P) * ((2⁻¹ : ℂ) • (g + 1)) = 1 := by
@@ -94,10 +94,11 @@ theorem bwd {H g : Matrix n n ℂ} (hg : gᴴ * H * g = H) (hu : IsUnit (g + 1))
     have hm : H * (g + 1) + (gᴴ + 1) * H = (gᴴ + 1) * H * (g + 1) := by
       simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_one, Matrix.one_mul, hg]; abel
     have key : Pᴴ * H + H * P = H := by
-      calc Pᴴ * H + H * P = Pᴴ * (H * ((g + 1) * P)) + (Pᴴ * (gᴴ + 1)) * (H * P) := by
-            rw [h1, hQ, Matrix.mul_one, Matrix.one_mul]
+      calc
+        Pᴴ * H + H * P = Pᴴ * (H * ((g + 1) * P)) + (Pᴴ * (gᴴ + 1)) * (H * P) := by
+          rw [h1, hQ, Matrix.mul_one, Matrix.one_mul]
         _ = Pᴴ * ((H * (g + 1) + (gᴴ + 1) * H) * P) := by
-            simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
+          simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
         _ = (Pᴴ * (gᴴ + 1)) * H * ((g + 1) * P) := by rw [hm]; simp only [Matrix.mul_assoc]
         _ = H := by rw [hQ, h1, Matrix.one_mul, Matrix.mul_one]
     have key' : Pᴴ * H = H - H * P := eq_sub_of_add_eq key

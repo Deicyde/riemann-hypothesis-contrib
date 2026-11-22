@@ -20,8 +20,9 @@ theorem latSB_holds : LatSB := by
   have : Module.Finite F E := Module.Finite.of_basis b
   exact PositiveNearLattice.isSB_latV b v n M
 
-theorem exOmT_of_steps' (hI : FibInfEx) (hV : FibVEx) (hU : SdUniq) (hDI : DensFibInf)
-    (hDV : DensFibV) (hR : RestrProd) : ExOmT :=
+theorem exOmT_of_steps'
+    (hI : FibInfEx) (hV : FibVEx) (hU : SdUniq) (hDI : DensFibInf) (hDV : DensFibV) (hR : RestrProd)
+    : ExOmT :=
   exOmT_of_steps hI hV latSB_holds hU hDI hDV hR
 
 theorem exOmT_of_open (hI : FibInfEx) (hV : FibVEx) (hU : SdUniq) (hR : RestrProd) : ExOmT :=

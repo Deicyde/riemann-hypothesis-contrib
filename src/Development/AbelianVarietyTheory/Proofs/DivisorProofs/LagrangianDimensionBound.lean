@@ -5,19 +5,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulTranspose
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.MixedLagr
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.MixedLagr
 open GlobalTheory.Doubling (absE)
 
 namespace GlobalTheory
 
-theorem finrank_le_card_of_isotropic_prod_pi (F : Type) [Field F] (κ : Type) [Fintype κ]
-    (L : Submodule F ((κ → F) × (κ → F)))
-    (hL : ∀ a ∈ L, ∀ b ∈ L, a.1 ⬝ᵥ b.2 = b.1 ⬝ᵥ a.2) :
-    Module.finrank F L ≤ Fintype.card κ := by
+theorem finrank_le_card_of_isotropic_prod_pi
+    (F : Type) [Field F]
+    (κ : Type) [Fintype κ]
+    (L : Submodule F ((κ → F) × (κ → F))) (hL : ∀ a ∈ L, ∀ b ∈ L, a.1 ⬝ᵥ b.2 = b.1 ⬝ᵥ a.2)
+    : Module.finrank F L ≤ Fintype.card κ := by
   classical
   let ω : ((κ → F) × (κ → F)) →ₗ[F] Module.Dual F ((κ → F) × (κ → F)) :=
-    LinearMap.mk₂ F (fun b a => a.1 ⬝ᵥ b.2 - b.1 ⬝ᵥ a.2)
+    LinearMap.mk₂ F
+      (fun b a => a.1 ⬝ᵥ b.2 - b.1 ⬝ᵥ a.2)
       (by intro b b' a; simp [dotProduct_add, add_dotProduct]; ring)
       (by intro c b a; simp [dotProduct_smul, smul_dotProduct]; ring)
       (by intro b a a'; simp [dotProduct_add, add_dotProduct]; ring)

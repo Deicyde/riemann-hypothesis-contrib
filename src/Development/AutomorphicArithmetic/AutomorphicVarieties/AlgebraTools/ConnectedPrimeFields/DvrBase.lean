@@ -9,8 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-theorem UpperTheory.V.AlgebraTools.Conn.dvrBase :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O], IsBase O := by
+theorem UpperTheory.V.AlgebraTools.Conn.dvrBase
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O],
+      IsBase O := by
   intro O _ _ _ _
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   haveI : Nontrivial (QuotSMulTop ϖ O) := by

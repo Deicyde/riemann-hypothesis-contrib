@@ -20,7 +20,8 @@ theorem pB_conjTranspose (ε : Fin n → Bool) (B : Mode ε → ℂ) : (pB ε B)
   simp only [Matrix.conjTranspose_apply]
   cases ha : ε a <;> cases hb : ε b <;> simp [pB, ha, hb]
 
-theorem pB_ne (ε : Fin n → Bool) (B : Mode ε → ℂ) (a b : Fin n) (h : ε a = ε b) : pB ε B a b = 0 := by
+theorem pB_ne (ε : Fin n → Bool) (B : Mode ε → ℂ) (a b : Fin n) (h : ε a = ε b)
+    : pB ε B a b = 0 := by
   simp only [pB]
   rw [dite_eq_right (by rintro ⟨h1, h2⟩; rw [h, h2] at h1; simp at h1),
     dite_eq_right (by rintro ⟨h1, h2⟩; rw [← h, h2] at h1; simp at h1)]
@@ -42,8 +43,7 @@ theorem continuous_pB (ε : Fin n → Bool) : Continuous (pB ε) := by
   · exact (continuous_apply _).star
   · exact continuous_const
 
-theorem pB_zero (ε : Fin n → Bool) : pB ε 0 = 0 := by
-  ext a b; simp only [pB]; split_ifs <;> simp
+theorem pB_zero (ε : Fin n → Bool) : pB ε 0 = 0 := by ext a b; simp only [pB]; split_ifs <;> simp
 
 theorem toM_eB (ε : Fin n → Bool) (B : Mode ε → ℂ) : toM (eB ε B) = NormedSpace.exp (pB ε B) := by
   rw [eB, Formalism.REAL.toM_expG ε _ 1 (pB_inG ε B)]; simp
@@ -64,7 +64,8 @@ theorem stEB : StEB := by
       exact @NormedSpace.exp_continuous (Matrix (Fin n) (Fin n) ℂ) _ _
         (inferInstanceAs (CompleteSpace (Fin n → Fin n → ℂ)))
     exact hc.comp (continuous_pB ε)
-  · apply Subtype.ext; apply Units.ext
+  · apply Subtype.ext
+    apply Units.ext
     change toM (eB ε 0) = 1
     rw [toM_eB, pB_zero, NormedSpace.exp_zero]
   · rw [toM_inv, toM_eB]

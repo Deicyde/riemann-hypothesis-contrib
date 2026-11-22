@@ -8,7 +8,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
 open ReciprocityTheory.ChartRestriction.G.Semi
 open scoped CategoryTheory.Obj
 
@@ -24,7 +25,8 @@ def torusExtOfIso (e : G₁ ≅ G₂) [IsMonHom e.hom] (T : TorusExtension G₁)
   letI := T.grpB
   haveI := T.q_hom
   haveI := T.i_hom
-  { X := T.X
+  {
+    X := T.X
     addCommGroup := T.addCommGroup
     free := T.free
     finite := T.finite
@@ -34,12 +36,16 @@ def torusExtOfIso (e : G₁ ≅ G₂) [IsMonHom e.hom] (T : TorusExtension G₁)
     q := e.inv ≫ T.q
     q_hom := inferInstance
     q_flat := by rw [Over.comp_left]; have := T.q_flat; have := isIso_inv_left e; infer_instance
-    q_surjective := by rw [Over.comp_left]; have := T.q_surjective; have := isIso_inv_left e; infer_instance
-    q_quasiCompact := by rw [Over.comp_left]; have := T.q_quasiCompact; have := isIso_inv_left e; infer_instance
+    q_surjective := by
+      rw [Over.comp_left]; have := T.q_surjective; have := isIso_inv_left e; infer_instance
+    q_quasiCompact := by
+      rw [Over.comp_left]; have := T.q_quasiCompact; have := isIso_inv_left e; infer_instance
     i := T.i ≫ e.hom
     i_hom := inferInstance
     isKernel := by
-      refine IsPullback.of_iso T.isKernel (Iso.refl _) e (Iso.refl _) (Iso.refl _) ?_ ?_ ?_ ?_ <;> simp }
+      refine IsPullback.of_iso T.isKernel (Iso.refl _) e (Iso.refl _) (Iso.refl _) ?_ ?_ ?_ ?_
+        <;> simp
+  }
 
 end Transport
 
@@ -47,8 +53,9 @@ section Pull
 
 variable {T S S' : Scheme.{0}} (p : T ⟶ S') (f : S' ⟶ S) (G : Over S) [GrpObj G]
 
-def pullCompMon : (Over.pullback (p ≫ f)).mapMon.obj (Mon.mk G) ≅
-    (Over.pullback p).mapMon.obj ((Over.pullback f).mapMon.obj (Mon.mk G)) :=
+def pullCompMon
+    : (Over.pullback (p ≫ f)).mapMon.obj (Mon.mk G)
+      ≅ (Over.pullback p).mapMon.obj ((Over.pullback f).mapMon.obj (Mon.mk G)) :=
   (Functor.mapMonNatIso (Over.pullbackComp p f) ≪≫ Functor.mapMonCompIso).app (Mon.mk G)
 
 def pullCompIso : (Over.pullback (p ≫ f)).obj G ≅ (Over.pullback p).obj ((Over.pullback f).obj G) :=
@@ -59,13 +66,14 @@ instance : IsMonHom (pullCompIso p f G).hom := by
   infer_instance
 
 theorem IsSemiAbelian.pullback (h : IsSemiAbelian G) : IsSemiAbelian ((Over.pullback f).obj G) := by
-  refine
-    { comm := ?_
-      smooth := ?_
-      separated := ?_
-      quasiCompact := ?_
-      geomConnected := ?_
-      fibres := ?_ }
+  refine {
+    comm := ?_
+    smooth := ?_
+    separated := ?_
+    quasiCompact := ?_
+    geomConnected := ?_
+    fibres := ?_
+  }
   · have := h.comm
     infer_instance
   · have := h.smooth
@@ -84,7 +92,8 @@ theorem IsSemiAbelian.pullback (h : IsSemiAbelian G) : IsSemiAbelian ((Over.pull
     obtain ⟨E⟩ := h.fibres Ω (q ≫ f)
     exact ⟨torusExtOfIso (pullCompIso q f G) E⟩
 
-def OAct.pullback [IsCommMonObj G] {O : Type} [CommRing O] (a : OAct O G) : OAct O ((Over.pullback f).obj G) where
+def OAct.pullback [IsCommMonObj G] {O : Type} [CommRing O] (a : OAct O G)
+    : OAct O ((Over.pullback f).obj G) where
   act x := (Over.pullback f).map (a.act x)
   hom x := by have := a.hom x; infer_instance
   one := by rw [a.one, CategoryTheory.Functor.map_id]

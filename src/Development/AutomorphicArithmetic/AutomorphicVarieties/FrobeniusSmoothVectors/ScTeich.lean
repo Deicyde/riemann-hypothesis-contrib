@@ -8,23 +8,35 @@ public import Mathlib.RingTheory.Teichmuller
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV
+  UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
 
-private theorem teich_ex (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O]
-    [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField O)] [CharP (ResidueField O) l] :
-    ∃ τ : ResidueField O →* O, ∀ x, residue O (τ x) = x := by
+private theorem teich_ex
+    (l : ℕ) [Fact l.Prime]
+    (O : Type) [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O]
+    [Finite (ResidueField O)] [CharP (ResidueField O) l]
+    : ∃ τ : ResidueField O →* O, ∀ x, residue O (τ x) = x := by
   haveI : CharP (O ⧸ maximalIdeal O) l := ‹CharP (ResidueField O) l›
   haveI hp : PerfectRing (ResidueField O) l := inferInstance
   haveI : PerfectRing (O ⧸ maximalIdeal O) l := hp
-  let f : (O ⧸ maximalIdeal O) →* O := (Perfection.teichmuller l (maximalIdeal O)).comp
-    (Perfection.liftMonoidHom l (O ⧸ maximalIdeal O) (O ⧸ maximalIdeal O) (MonoidHom.id _))
+  let f : (O ⧸ maximalIdeal O) →* O :=
+    (Perfection.teichmuller l (maximalIdeal O)).comp
+      (Perfection.liftMonoidHom l (O ⧸ maximalIdeal O) (O ⧸ maximalIdeal O) (MonoidHom.id _))
   refine ⟨f, fun x => ?_⟩
-  have h := Perfection.mk_teichmuller (p := l) (I := maximalIdeal O)
-    (Perfection.liftMonoidHom l (O ⧸ maximalIdeal O) (O ⧸ maximalIdeal O) (MonoidHom.id _) x)
+  have h :=
+    Perfection.mk_teichmuller (p := l) (I := maximalIdeal O)
+      (Perfection.liftMonoidHom l (O ⧸ maximalIdeal O) (O ⧸ maximalIdeal O) (MonoidHom.id _) x)
   exact h.trans (Perfection.coeffMonoidHom_zero_liftMonoidHom l (MonoidHom.id _) x)
 
-theorem UpperTheory.V.Fr.sc_teich :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) [CharP (ResidueField c.O) l], Finite (ResidueField c.O) → ∃ T : (ResidueField c.O)ˣ →* (Qbar l)ˣ, Function.Injective T ∧ ∀ (u : c.Oˣ) (j : ℕ) (s : G ℚ Ω), ‖(GlobalTheory.GalOfCusp.cycBar ℚ Ω l s ^ j * T (Units.map (residue c.O).toMonoidHom u * (omO Ω l c.O s ^ j)⁻¹)).val - u.val.1‖ < 1 := by
+theorem UpperTheory.V.Fr.sc_teich
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l)
+        [CharP (ResidueField c.O) l],
+      Finite (ResidueField c.O)
+        → ∃ T : (ResidueField c.O)ˣ →* (Qbar l)ˣ,
+          Function.Injective T
+            ∧ ∀ (u : c.Oˣ) (j : ℕ) (s : G ℚ Ω),
+              ‖(GlobalTheory.GalOfCusp.cycBar ℚ Ω l s ^ j * T (Units.map (residue c.O).toMonoidHom u * (omO Ω l c.O s ^ j)⁻¹)).val - u.val.1‖
+                < 1 := by
   intro Ω _ _ _ l _ c _ hfin
   haveI : IsAdicComplete (maximalIdeal c.O) c.O := (dvrFacts l c.O).2.2.2.1
   obtain ⟨τ, hτ⟩ := teich_ex l c.O
@@ -38,7 +50,9 @@ theorem UpperTheory.V.Fr.sc_teich :
   · intro u j s
     have hω : ((omO Ω l c.O s).val : ResidueField c.O) = residue c.O (chiO ℚ Ω l c.O s).val :=
       (UpperTheory.V.X.cycKFacts Ω l (ResidueField c.O)).2 c (residue c.O) s
-    have hc : (GlobalTheory.GalOfCusp.cycBar ℚ Ω l s).val = ((chiO ℚ Ω l c.O s).val : PadicAlgCl l) := rfl
+    have hc
+        : (GlobalTheory.GalOfCusp.cycBar ℚ Ω l s).val = ((chiO ℚ Ω l c.O s).val : PadicAlgCl l) :=
+      rfl
     set w : (ResidueField c.O)ˣ := Units.map (residue c.O).toMonoidHom u * (omO Ω l c.O s ^ j)⁻¹
     have key : (chiO ℚ Ω l c.O s).val ^ j * τ w.val - u.val ∈ maximalIdeal c.O := by
       rw [← Ideal.Quotient.eq_zero_iff_mem]

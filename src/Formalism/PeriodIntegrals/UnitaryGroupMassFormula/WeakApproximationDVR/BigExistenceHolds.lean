@@ -13,8 +13,10 @@ open PI.WADVR
 
 section Field
 
-variable {W Q : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Q]
-  [Algebra W Q] [IsFractionRing W Q] {ϖ : W}
+variable
+  {W Q : Type}
+  [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Q] [Algebra W Q] [IsFractionRing W Q]
+  {ϖ : W}
 
 lemma g_big_pow_mul (hϖ : Irreducible ϖ) {q Y : Q} (hqs : Sm Q ϖ 1 q⁻¹) (hY : Sm Q ϖ 1 Y⁻¹)
     (r : ℕ) : Sm Q ϖ 1 (q ^ r * Y)⁻¹ := by
@@ -80,9 +82,8 @@ end Field
 theorem big_existence_holds : BigExists := by
   intro E _ ι _ W Q _ _ _ _ _ _ iw p hp0 hpu hden hdist ϖ hϖ i
   classical
-
-  have pair : ∀ j, j ≠ i → ∃ y : E, y ≠ 0 ∧ Sm (Q i) (ϖ i) 1 (iw i y)⁻¹ ∧
-      Sm (Q j) (ϖ j) 1 (iw j y) := by
+  have pair
+      : ∀ j, j ≠ i → ∃ y : E, y ≠ 0 ∧ Sm (Q i) (ϖ i) 1 (iw i y)⁻¹ ∧ Sm (Q j) (ϖ j) 1 (iw j y) := by
     intro j hji
     obtain ⟨a, haj, hai⟩ := hdist j i hji
     obtain ⟨b, hbi, hbj⟩ := hdist i j (Ne.symm hji)
@@ -105,8 +106,9 @@ theorem big_existence_holds : BigExists := by
     obtain ⟨a, c, hac⟩ := hden i ((p : Q i)⁻¹) 1
     have hpi := hp0 i
     have hts : Sm (Q i) (ϖ i) 1 ((p : Q i) ^ 2 * algebraMap (W i) (Q i) c) := by
-      have h1 := ((sm_natCast (Q := Q i) (hϖ i) (hpu i)).pow (hϖ i) 2).mul (hϖ i)
-        (Sm.alg (ϖ := ϖ i) (Q := Q i) c)
+      have h1 :=
+        ((sm_natCast (Q := Q i) (hϖ i) (hpu i)).pow (hϖ i) 2).mul (hϖ i)
+          (Sm.alg (ϖ := ϖ i) (Q := Q i) c)
       exact h1.mono (hϖ i) (by norm_num)
     obtain ⟨h1t, h2t⟩ := one_add_of_sm (hϖ i) hts
     have e : iw i a = (p : Q i)⁻¹ * (1 + (p : Q i) ^ 2 * algebraMap (W i) (Q i) c) := by
@@ -119,8 +121,9 @@ theorem big_existence_holds : BigExists := by
       have := (sm_natCast (Q := Q i) (hϖ i) (hpu i)).mul (hϖ i) h2t
       rwa [add_zero] at this
 
-  have main : ∀ S : Finset ι, ∃ z : E, z ≠ 0 ∧ Sm (Q i) (ϖ i) 1 (iw i z)⁻¹ ∧
-      ∀ k ∈ S, k ≠ i → Sm (Q k) (ϖ k) 1 (iw k z) := by
+  have main
+      : ∀ S : Finset ι, ∃ z : E,
+        z ≠ 0 ∧ Sm (Q i) (ϖ i) 1 (iw i z)⁻¹ ∧ ∀ k ∈ S, k ≠ i → Sm (Q k) (ϖ k) 1 (iw k z) := by
     intro S
     induction S using Finset.induction_on with
     | empty =>
@@ -136,7 +139,9 @@ theorem big_existence_holds : BigExists := by
         obtain ⟨r, hr1, hrm⟩ : ∃ r : ℕ, 1 ≤ r ∧ ∀ k, 1 ≤ (r : ℤ) + m k := by
           refine ⟨1 + ∑ k, (-(m k)).toNat, by omega, fun k => ?_⟩
           have h1 : (-(m k)).toNat ≤ ∑ k, (-(m k)).toNat :=
-            Finset.single_le_sum (f := fun k => (-(m k)).toNat) (fun _ _ => Nat.zero_le _)
+            Finset.single_le_sum
+              (f := fun k => (-(m k)).toNat)
+              (fun _ _ => Nat.zero_le _)
               (Finset.mem_univ k)
           have h2 := Int.self_le_toNat (-(m k))
           have h3 : ((1 + ∑ k, (-(m k)).toNat : ℕ) : ℤ) ≥ 1 + ((-(m k)).toNat : ℤ) := by
@@ -155,15 +160,22 @@ theorem big_existence_holds : BigExists := by
             · exact g_small_pow_mul (hϖ k) (hzS k hkS hki) (hm k) r (hrm k)
         · obtain ⟨hzj0, hzj1⟩ := big_of_not_mem (hϖ j) hzj
           obtain ⟨hd, hbig⟩ := g_B_big (hϖ i) hzi0 hzi ((map_ne_zero _).mpr hy0) hyi hr1
-          have hmap : ∀ k, iw k (z ^ r * (1 + z ^ r)⁻¹ * y) =
-              (iw k z) ^ r * (1 + (iw k z) ^ r)⁻¹ * iw k y := fun k => by
+          have hmap
+              : ∀ k,
+                iw k (z ^ r * (1 + z ^ r)⁻¹ * y)
+                  = (iw k z) ^ r * (1 + (iw k z) ^ r)⁻¹ * iw k y := fun k => by
             simp only [map_mul, map_pow, map_inv₀, map_add (f := _), map_one]
-          have hd' : (1 + z ^ r : E) ≠ 0 := fun h => hd (by
-            have : iw i (1 + z ^ r) = 1 + (iw i z) ^ r := by
-              simp only [map_add (f := _), map_one, map_pow]
-            rw [← this, h, map_zero])
-          refine ⟨z ^ r * (1 + z ^ r)⁻¹ * y,
-            mul_ne_zero (mul_ne_zero (pow_ne_zero _ hz0) (inv_ne_zero hd')) hy0, ?_, ?_⟩
+          have hd' : (1 + z ^ r : E) ≠ 0 := fun h =>
+            hd (by
+              have : iw i (1 + z ^ r) = 1 + (iw i z) ^ r := by
+                simp only [map_add (f := _), map_one, map_pow]
+              rw [← this, h, map_zero])
+          refine ⟨
+            z ^ r * (1 + z ^ r)⁻¹ * y,
+            mul_ne_zero (mul_ne_zero (pow_ne_zero _ hz0) (inv_ne_zero hd')) hy0,
+            ?_,
+            ?_
+          ⟩
           · rw [hmap]
             exact hbig
           · intro k hk hki

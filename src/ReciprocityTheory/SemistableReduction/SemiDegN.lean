@@ -11,24 +11,30 @@ namespace ReciprocityTheory.MultiplicativeHeights.SemiPt
 open Matrix NumberField ComplexConjugate
 open scoped ComplexOrder
 
-theorem mid_le_zero (hN : IntegralIndexStatement) (hA : AbsDetStatement) {K : Type} [Field K]
-    [NumberField K] {r : ℕ} (S : HermForm K r) (m : ℕ) (g : Fin r → K)
-    (hfix : ∀ a : Fin r, m ≤ (a : ℕ) → (a : ℕ) + m < r → S.c (g a) = g a)
-    (Gm : Submodule (𝓞 K) (Fin r → K)) (hGm : Gm.FG)
-    (hsupp : ∀ x ∈ Gm, ∀ a : Fin r, ((a : ℕ) < m ∨ r ≤ (a : ℕ) + m) → x a = 0)
+theorem mid_le_zero
+    (hN : IntegralIndexStatement) (hA : AbsDetStatement)
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ} (S : HermForm K r)
+    (m : ℕ) (g : Fin r → K) (hfix : ∀ a : Fin r, m ≤ (a : ℕ) → (a : ℕ) + m < r → S.c (g a) = g a)
+    (Gm : Submodule (𝓞 K) (Fin r → K))
+    (hGm : Gm.FG) (hsupp : ∀ x ∈ Gm, ∀ a : Fin r, ((a : ℕ) < m ∨ r ≤ (a : ℕ) + m) → x a = 0)
     (hint : IsIntegralOn (midForm S m g hfix) Gm)
-    (haniso : ∀ t : Fin r → K, (∀ i : Fin r, (i : ℕ) < m ∨ r ≤ (i : ℕ) + m → t i = 0) →
-      ∑ i, S.c (t i) * g i * t i = 0 → t = 0)
+    (haniso : ∀ t : Fin r → K,
+      (∀ i : Fin r, (i : ℕ) < m ∨ r ≤ (i : ℕ) + m → t i = 0) → ∑ i, S.c (t i) * g i * t i = 0
+        → t = 0)
     (δ : (K →+* ℂ) → Fin r → ℝ) (hδ : ∀ σ a, 0 < δ σ a)
     (hδmid : ∀ σ (a : Fin r), m ≤ (a : ℕ) → (a : ℕ) + m < r → δ σ a = ‖σ (g a)‖)
-    (C : Submodule (𝓞 K) (Fin r → K)) (hC : C ≤ Gm) (k : ℕ) (c : Fin k → Fin r → K)
-    (hc : IsKBasisIn C c) : latDeg (diagMet δ) C c ≤ 0 := by
+    (C : Submodule (𝓞 K) (Fin r → K)) (hC : C ≤ Gm)
+    (k : ℕ) (c : Fin k → Fin r → K) (hc : IsKBasisIn C c)
+    : latDeg (diagMet δ) C c ≤ 0 := by
   set Sm := midForm S m g hfix with hSm
   have hCfg : C.FG := Submodule.FG.of_le hGm hC
   have hCint : IsIntegralOn Sm C := fun x hx y hy => hint x (hC hx) y (hC hy)
 
-  have hSmh : ∀ z : Fin r → K, (∀ a : Fin r, ((a : ℕ) < m ∨ r ≤ (a : ℕ) + m) → z a = 0) →
-      Sm.h z z = ∑ a, S.c (z a) * g a * z a := by
+  have hSmh
+      : ∀ z : Fin r → K,
+        (∀ a : Fin r, ((a : ℕ) < m ∨ r ≤ (a : ℕ) + m) → z a = 0)
+          → Sm.h z z = ∑ a, S.c (z a) * g a * z a := by
     intro z hz
     simp only [HermForm.h, hSm, midForm, midG, Matrix.diagonal_apply, mul_ite, mul_zero, ite_mul,
       zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
@@ -68,8 +74,9 @@ theorem mid_le_zero (hN : IntegralIndexStatement) (hA : AbsDetStatement) {K : Ty
       simp only [hSm, midForm]
       rw [hEc]
       rfl
-    have hGσ : (midG r m g).map σ =
-        diagonal fun a : Fin r => σ (if m ≤ (a : ℕ) ∧ (a : ℕ) + m < r then g a else 0) := by
+    have hGσ
+        : (midG r m g).map σ
+          = diagonal fun a : Fin r => σ (if m ≤ (a : ℕ) ∧ (a : ℕ) + m < r then g a else 0) := by
       simp only [midG]
       rw [Matrix.diagonal_map (map_zero σ)]
     have hherm : ((hGram Sm c).map σ).IsHermitian := by
@@ -77,36 +84,42 @@ theorem mid_le_zero (hN : IntegralIndexStatement) (hA : AbsDetStatement) {K : Ty
       simp only [Matrix.conjTranspose_apply, Matrix.map_apply, hGram, Matrix.of_apply]
       rw [← hermForm_swap Sm (c j) (c i), Sm.c_emb]
       rfl
-    have hineq : ∀ v : Fin k → ℂ, ‖star v ⬝ᵥ (((hGram Sm c).map σ) *ᵥ v)‖ ≤
-        (star v ⬝ᵥ ((gramC (diagMet δ σ) σ c) *ᵥ v)).re := by
+    have hineq
+        : ∀ v : Fin k → ℂ,
+          ‖star v ⬝ᵥ (((hGram Sm c).map σ) *ᵥ v)‖
+            ≤ (star v ⬝ᵥ ((gramC (diagMet δ σ) σ c) *ᵥ v)).re := by
       intro v
       rw [hC', gramC_eq, quad_eq, quad_eq, hGσ]
       simp only [diagMet]
       rw [quad_diag, quad_diag]
-      calc ‖∑ a : Fin r, σ (if m ≤ (a : ℕ) ∧ (a : ℕ) + m < r then g a else 0) *
-              ((‖(E *ᵥ v) a‖ ^ 2 : ℝ) : ℂ)‖
-          ≤ ∑ a : Fin r, ‖σ (if m ≤ (a : ℕ) ∧ (a : ℕ) + m < r then g a else 0) *
-              ((‖(E *ᵥ v) a‖ ^ 2 : ℝ) : ℂ)‖ := norm_sum_le _ _
+      calc
+        ‖∑ a : Fin r, σ (if m ≤ (a : ℕ) ∧ (a : ℕ) + m < r then g a else 0) *
+           ((‖(E *ᵥ v) a‖ ^ 2 : ℝ) : ℂ)‖
+            ≤ ∑ a : Fin r, ‖σ (if m ≤ (a : ℕ) ∧ (a : ℕ) + m < r then g a else 0) *
+                ((‖(E *ᵥ v) a‖ ^ 2 : ℝ) : ℂ)‖ :=
+          norm_sum_le _ _
         _ ≤ ∑ a : Fin r, δ σ a * ‖(E *ᵥ v) a‖ ^ 2 := by
-            refine Finset.sum_le_sum fun a _ => ?_
-            rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (by positivity)]
-            gcongr
-            split_ifs with h
-            · rw [hδmid σ a h.1 h.2]
-            · simp only [map_zero, norm_zero]
-              exact (hδ σ a).le
+          refine Finset.sum_le_sum fun a _ => ?_
+          rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (by positivity)]
+          gcongr
+          split_ifs with h
+          · rw [hδmid σ a h.1 h.2]
+          · simp only [map_zero, norm_zero]
+            exact (hδ σ a).le
         _ = (∑ a : Fin r, ((δ σ a : ℝ) : ℂ) * ((‖(E *ᵥ v) a‖ ^ 2 : ℝ) : ℂ)).re := by
-            rw [Complex.re_sum]
-            refine Finset.sum_congr rfl fun a _ => ?_
-            rw [← Complex.ofReal_mul, Complex.ofReal_re]
-    have h5 := hA k (gramC (diagMet δ σ) σ c) ((hGram Sm c).map σ)
-      (gramC_posDef S _ (hDpd σ) σ c hc.2.1) hherm hineq
+          rw [Complex.re_sum]
+          refine Finset.sum_congr rfl fun a _ => ?_
+          rw [← Complex.ofReal_mul, Complex.ofReal_re]
+    have h5 :=
+      hA k (gramC (diagMet δ σ) σ c) ((hGram Sm c).map σ) (gramC_posDef S _ (hDpd σ) σ c hc.2.1)
+        hherm hineq
     rwa [show ((hGram Sm c).map σ).det = σ (hGram Sm c).det from (RingHom.map_det σ _).symm] at h5
   have hN0 : 0 < |((Algebra.norm ℚ (hGram Sm c).det : ℚ) : ℝ)| := by
     apply abs_pos.2
     exact_mod_cast (Algebra.norm_ne_zero_iff).2 hdet
-  have hsum : Real.log |((Algebra.norm ℚ (hGram Sm c).det : ℚ) : ℝ)| ≤
-      ∑ σ : K →+* ℂ, Real.log (gramC (diagMet δ σ) σ c).det.re := by
+  have hsum
+      : Real.log |((Algebra.norm ℚ (hGram Sm c).det : ℚ) : ℝ)|
+        ≤ ∑ σ : K →+* ℂ, Real.log (gramC (diagMet δ σ) σ c).det.re := by
     rw [← sum_log_norm_emb]
     refine Finset.sum_le_sum fun σ _ => Real.log_le_log ?_ (hσ σ)
     apply norm_pos_iff.2
@@ -114,7 +127,9 @@ theorem mid_le_zero (hN : IntegralIndexStatement) (hA : AbsDetStatement) {K : Ty
     exact hdet (σ.injective (by rw [h0, map_zero]))
   have hone : 1 ≤ (spanIdx C c : ℝ) :=
     Nat.one_le_cast.2 (Nat.one_le_iff_ne_zero.2 (spanIdx_ne_zero C c hCfg hc))
-  have hidx' : 2 * Real.log (spanIdx C c : ℝ) ≤ Real.log |((Algebra.norm ℚ (hGram Sm c).det : ℚ) : ℝ)| := by
+  have hidx'
+      : 2 * Real.log (spanIdx C c : ℝ)
+        ≤ Real.log |((Algebra.norm ℚ (hGram Sm c).det : ℚ) : ℝ)| := by
     have := Real.log_le_log (by positivity) hidx
     rwa [Real.log_pow] at this
   unfold latDeg

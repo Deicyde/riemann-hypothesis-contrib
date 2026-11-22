@@ -14,27 +14,33 @@ namespace GlobalTheory.RSJ
 
 open IsDedekindDomain.HeightOneSpectrum WithZero
 
-theorem valued_natCast_apply (E : Type) [Field E] [NumberField E] (N : ℕ)
-    (v : HeightOneSpectrum (𝓞 E)) :
-    Valued.v ((N : FiniteAdeleRing (𝓞 E) E) v) = v.valuation E (N : E) := by
+theorem valued_natCast_apply
+    (E : Type) [Field E] [NumberField E] (N : ℕ) (v : HeightOneSpectrum (𝓞 E))
+    : Valued.v ((N : FiniteAdeleRing (𝓞 E) E) v) = v.valuation E (N : E) := by
   rw [← map_natCast (algebraMap E (FiniteAdeleRing (𝓞 E) E)) N]
   exact valuedAdicCompletion_eq_valuation' v (N : E)
 
-theorem natLat_iff_mem_idealFiniteAdeles : ∀ (E : Type) [Field E] [NumberField E] (N : ℕ), 0 < N →
-    ∀ (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ),
-      (J : FractionalIdeal (𝓞 E)⁰ E) = FractionalIdeal.spanSingleton (𝓞 E)⁰ (N : E) →
-      ∀ z : FiniteAdeleRing (𝓞 E) E, z ∈ GlobalTheory.RSJ.natLat E N ↔ z ∈ GroundTheory.Global.idealFiniteAdeles J := by
+theorem natLat_iff_mem_idealFiniteAdeles
+    : ∀ (E : Type) [Field E] [NumberField E] (N : ℕ),
+      0 < N
+        → ∀ (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ),
+          (J : FractionalIdeal (𝓞 E)⁰ E) = FractionalIdeal.spanSingleton (𝓞 E)⁰ (N : E)
+            → ∀ z : FiniteAdeleRing (𝓞 E) E,
+              z ∈ GlobalTheory.RSJ.natLat E N ↔ z ∈ GroundTheory.Global.idealFiniteAdeles J := by
   intro E _ _ N hN J hJ x
   have hN0 : (N : E) ≠ 0 := Nat.cast_ne_zero.2 hN.ne'
-  have hc0 : ∀ v : HeightOneSpectrum (𝓞 E), v.valuation E (N : E) ≠ 0 :=
-    fun v => (Valuation.ne_zero_iff _).2 hN0
-  have hc : ∀ v : HeightOneSpectrum (𝓞 E),
-      exp (-FractionalIdeal.count E v (J : FractionalIdeal (𝓞 E)⁰ E)) = v.valuation E (N : E) := by
+  have hc0 : ∀ v : HeightOneSpectrum (𝓞 E), v.valuation E (N : E) ≠ 0 := fun v =>
+    (Valuation.ne_zero_iff _).2 hN0
+  have hc
+      : ∀ v : HeightOneSpectrum (𝓞 E),
+        exp (- FractionalIdeal.count E v (J : FractionalIdeal (𝓞 E)⁰ E))
+          = v.valuation E (N : E) := by
     intro v
     rw [hJ, GroundTheory.Global.count_spanSingleton v hN0, neg_neg, exp_log (hc0 v)]
   rw [GroundTheory.Global.mem_idealFiniteAdeles]
   simp only [hc]
-  have hunit : (N : FiniteAdeleRing (𝓞 E) E) * algebraMap E (FiniteAdeleRing (𝓞 E) E) (N : E)⁻¹ = 1 := by
+  have hunit
+      : (N : FiniteAdeleRing (𝓞 E) E) * algebraMap E (FiniteAdeleRing (𝓞 E) E) (N : E)⁻¹ = 1 := by
     rw [← map_natCast (algebraMap E (FiniteAdeleRing (𝓞 E) E)) N, ← map_mul, mul_inv_cancel₀ hN0,
       map_one]
   constructor
@@ -44,7 +50,9 @@ theorem natLat_iff_mem_idealFiniteAdeles : ∀ (E : Type) [Field E] [NumberField
     have : Valued.v (z v) ≤ 1 := by
       have h := hz v
       rwa [mem_adicCompletionIntegers] at h
-    calc v.valuation E (N : E) * Valued.v (z v) ≤ v.valuation E (N : E) * 1 := by gcongr
+    calc
+      v.valuation E (N : E) * Valued.v (z v)
+        ≤ v.valuation E (N : E) * 1 := by gcongr
       _ = _ := mul_one _
   · intro hx
     refine ⟨algebraMap E (FiniteAdeleRing (𝓞 E) E) (N : E)⁻¹ * x, fun v => ?_, ?_⟩

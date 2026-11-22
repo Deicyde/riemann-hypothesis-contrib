@@ -16,27 +16,36 @@ namespace ReciprocityTheory.ChartRestriction.DS.DecInf
 
 variable {n : ℕ}
 
-theorem poles_injective {lam : Fin n → ℝ} (hlam : StrictAnti lam) : Function.Injective (poleF false lam) := by
+theorem poles_injective {lam : Fin n → ℝ} (hlam : StrictAnti lam)
+    : Function.Injective (poleF false lam) := by
   simpa only [poleF, Bool.cond_false] using poleV_injective hlam.injective
 
-theorem projection_square_integrable {ε : Fin n → Bool} {lam : Fin n → ℝ} (hlam : S7.IsHCParam lam) {T : S7.KType ε (lowK ε lam)}
-    {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} {v₀ : T.V}
+theorem projection_square_integrable
+    {ε : Fin n → Bool} {lam : Fin n → ℝ} (hlam : S7.IsHCParam lam)
+    {T : S7.KType ε (lowK ε lam)} {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} {v₀ : T.V}
     (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀ : v₀ ≠ 0)
-    (hW : ∀ v ∈ genSub (smE ε (rreg ε)) (datumV ε Ψ v₀), ∀ w ∈ genSub (smE ε (rreg ε)) (datumV ε Ψ v₀),
-      MemLp (fun g : Formalism.REAL.UJ ε => ((Real.sqrt (S7.hs (Formalism.MainNotions.S.umat g)) : ℝ) : ℂ) *
-        inner ℂ ((w : smD ε (rreg ε)) : L2 ε) (rreg ε (Formalism.MainNotions.S.umat g) ((v : smD ε (rreg ε)) : L2 ε))) 2 (Formalism.REAL.muG ε))
-    (hG : HasGelfandChar (smE ε (rreg ε)) lam (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀))) :
-    ∃ P : Fin n → Module.End ℂ (Fin n → smD ε (rreg ε)),
-      (∀ s, IsGKEndo false ε (rreg ε) (smE ε (rreg ε)) (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)) (P s)) ∧
-      (∀ s, ∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)),
-        eeF false (smE ε (rreg ε)) (P s f) = poleF false lam s • P s f) ∧
-      (∀ s, ∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)),
-        eeF false (smE ε (rreg ε)) f = poleF false lam s • f → P s f = f) ∧
-      (∀ s, ∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)), ∀ z' : ℂ, z' ≠ poleF false lam s →
-        eeF false (smE ε (rreg ε)) f = z' • f → P s f = 0) ∧
-      (∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)), f = ∑ s, P s f) ∧
-      ∀ s (j : ℕ), ∃ C : ℝ, ∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)),
-        NT (smE ε (rreg ε)) j (P s f) ≤ C * NT (smE ε (rreg ε)) (j + (n - 1)) f := by
+    (hW : ∀ v ∈ genSub (smE ε (rreg ε)) (datumV ε Ψ v₀),
+      ∀ w ∈ genSub (smE ε (rreg ε)) (datumV ε Ψ v₀),
+        MemLp
+          (fun g : Formalism.REAL.UJ ε =>
+            ((Real.sqrt (S7.hs (Formalism.MainNotions.S.umat g)) : ℝ) : ℂ)
+              * inner ℂ ((w : smD ε (rreg ε)) : L2 ε)
+                (rreg ε (Formalism.MainNotions.S.umat g) ((v : smD ε (rreg ε)) : L2 ε)))
+          2 (Formalism.REAL.muG ε))
+    (hG : HasGelfandChar (smE ε (rreg ε)) lam (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)))
+    : ∃ P : Fin n → Module.End ℂ (Fin n → smD ε (rreg ε)),
+      (∀ s,
+          IsGKEndo false ε (rreg ε) (smE ε (rreg ε)) (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀))
+            (P s))
+        ∧ (∀ s, ∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)),
+          eeF false (smE ε (rreg ε)) (P s f) = poleF false lam s • P s f)
+        ∧ (∀ s, ∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)),
+          eeF false (smE ε (rreg ε)) f = poleF false lam s • f → P s f = f)
+        ∧ (∀ s, ∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)), ∀ z' : ℂ,
+          z' ≠ poleF false lam s → eeF false (smE ε (rreg ε)) f = z' • f → P s f = 0)
+        ∧ (∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)), f = ∑ s, P s f)
+        ∧ ∀ s (j : ℕ), ∃ C : ℝ, ∀ f ∈ tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)),
+          NT (smE ε (rreg ε)) j (P s f) ≤ C * NT (smE ε (rreg ε)) (j + (n - 1)) f := by
   classical
   have hσ := rreg_isURepOn ε
   have hD := isDerivedOn_smE hσ
@@ -54,8 +63,10 @@ theorem projection_square_integrable {ε : Fin n → Bool} {lam : Fin n → ℝ}
   set S := tensSub (genSub (smE ε (rreg ε)) (datumV ε Ψ v₀)) with hS
   let P : Fin n → Module.End ℂ (Fin n → smD ε (rreg ε)) := fun s =>
     Polynomial.aeval EE (Lagrange.basis Finset.univ a s)
-  have hPe : ∀ s (e : Fin n → smD ε (rreg ε)) (z : ℂ), EE e = z • e →
-      P s e = (Lagrange.basis Finset.univ a s).eval z • e := fun s e z he => dc_aeval_eigen he _
+  have hPe
+      : ∀ s (e : Fin n → smD ε (rreg ε)) (z : ℂ),
+        EE e = z • e → P s e = (Lagrange.basis Finset.univ a s).eval z • e := fun s e z he =>
+    dc_aeval_eigen he _
   have hLval : ∀ s t, (Lagrange.basis Finset.univ a s).eval (a t) = if s = t then 1 else 0 := by
     intro s t
     split_ifs with hst
@@ -79,8 +90,9 @@ theorem projection_square_integrable {ε : Fin n → Bool} {lam : Fin n → ℝ}
     have hne : (Finset.univ : Finset (Fin n)).Nonempty := ⟨t, Finset.mem_univ _⟩
     have h1 : ∑ s, (Lagrange.basis Finset.univ a s).eval (a t) = 1 := by
       rw [← Polynomial.eval_finsetSum, Lagrange.sum_basis hinj hne, Polynomial.eval_one]
-    calc ∑ s, P s e = ∑ s, (Lagrange.basis Finset.univ a s).eval (a t) • e :=
-          Finset.sum_congr rfl fun s _ => hPe s e _ hz
+    calc
+      ∑ s, P s e = ∑ s, (Lagrange.basis Finset.univ a s).eval (a t) • e :=
+        Finset.sum_congr rfl fun s _ => hPe s e _ hz
       _ = e := by rw [← Finset.sum_smul, h1, one_smul]
   refine ⟨P, fun s => dc_isGKEndo_aeval (isGKEndo_eeF hσ hD _ false) _, ?_, ?_, ?_, ?_, ?_⟩
   · intro s f hf

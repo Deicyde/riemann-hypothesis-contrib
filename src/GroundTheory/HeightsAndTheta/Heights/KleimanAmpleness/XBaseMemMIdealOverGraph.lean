@@ -19,21 +19,21 @@ section Zero
 
 variable {S : Type} [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] {N m : ℕ} {x : Fin (N + 1) → Ω}
 
-theorem X_mem_primeOf_of_eq_zero {i : Fin (N + 1)} (hi : x i = 0) :
-    (X i : Kleiman.Poly S N) ∈ Kleiman.primeOf (S := S) x := by
+theorem X_mem_primeOf_of_eq_zero {i : Fin (N + 1)} (hi : x i = 0)
+    : (X i : Kleiman.Poly S N) ∈ Kleiman.primeOf (S := S) x := by
   rw [Kleiman.primeOf_eq, RingHom.mem_ker]
   simp [Kleiman.cone, ReciprocityTheory.ChartRestriction.G.Geo.coneMap, hi]
 
-theorem X_base_mem_mIdealOver_graph (s : Fin m → Ω) {i : Fin (N + 1)} (hi : x i = 0) :
-    (X ⟨baseBlock, i⟩ : NumbersDVR.MRing (graphIdx N m) S) ∈ mIdealOver S (graphVec x s) := by
+theorem X_base_mem_mIdealOver_graph (s : Fin m → Ω) {i : Fin (N + 1)} (hi : x i = 0)
+    : (X ⟨baseBlock, i⟩ : NumbersDVR.MRing (graphIdx N m) S) ∈ mIdealOver S (graphVec x s) := by
   change mConeMapOver S (graphVec x s) (X _) = 0
   simp [mConeMapOver, hi]
   exact hi
 
 end Zero
 
-theorem NefEq.proof (hC : CurveComap.Statement) (hL : CurveLift.Statement) (hD : DegEq.Statement) :
-    NefEq.Statement := by
+theorem NefEq.proof (hC : CurveComap.Statement) (hL : CurveLift.Statement) (hD : DegEq.Statement)
+    : NefEq.Statement := by
   intro k _ N Ω _ _ x Q n m s hgen
   by_cases hx : ∃ i, x i ≠ 0
   · constructor

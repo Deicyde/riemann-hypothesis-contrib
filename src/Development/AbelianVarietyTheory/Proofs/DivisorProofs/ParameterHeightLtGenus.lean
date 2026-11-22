@@ -9,19 +9,23 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.ExpTie
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links GlobalTheory.BigTop GlobalTheory.BigOn
+  GlobalTheory.ExpTie
 
 namespace GlobalTheory.ExpTie
 
-theorem parOf_h_lt_g {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (j : Fin D.R.m) (a : Fin 2) :
-    (parOf L j).h < (D.host.g a : ℝ) := by
+theorem parOf_h_lt_g
+    {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (j : Fin D.R.m) (a : Fin 2)
+    : (parOf L j).h < (D.host.g a : ℝ) := by
   have hx : 1 < L.sc.x := L.sc.one_lt_alt
   have hx0 : 0 < L.sc.x := by linarith
   have hL0 : 0 < L.sc.L := by unfold Scale.L; exact Real.rpow_pos_of_pos hx0 _
   have hb : L.sc.b = Real.exp L.sc.L := rfl
   have hb1 : 1 < L.sc.b := by
     have := Real.add_one_lt_exp (ne_of_gt hL0)
-    rw [hb]; linarith
+    rw [hb]
+    linarith
   have hb0 : 0 < L.sc.b := by linarith
   have hb'0 : 0 < L.sc.b' := by
     unfold Scale.b' Scale.a Scale.X' Scale.b
@@ -39,7 +43,8 @@ theorem parOf_h_lt_g {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (j 
 
   set den : ℝ := (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2 +
     (D.R.k : ℝ) * (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + L.sc.L) with hden
-  have hd1 : 0 ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2 := by positivity
+  have hd1 : 0 ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2 := by
+    positivity
   have hn2 : (1 : ℝ) ≤ (D.R.n : ℝ) ^ 2 := by nlinarith
   have hd2 : (D.R.m : ℝ) ≤ (D.R.k : ℝ) * (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + L.sc.L) := by
     have h1 : (1 : ℝ) ≤ (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + L.sc.L) := by nlinarith

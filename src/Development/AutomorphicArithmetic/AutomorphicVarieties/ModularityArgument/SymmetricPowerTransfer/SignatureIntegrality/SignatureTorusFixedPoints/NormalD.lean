@@ -6,8 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open Matrix Polynomial GlobalTheory.SplitWeil GlobalTheory.SmGL
 
-private theorem exists_eigvec {k : Type} [Field k] (M : Matrix (Fin 2) (Fin 2) k) (c : k)
-    (h : M.charpoly.eval c = 0) : ∃ v : Fin 2 → k, v ≠ 0 ∧ M *ᵥ v = c • v := by
+private theorem exists_eigvec
+    {k : Type} [Field k] (M : Matrix (Fin 2) (Fin 2) k) (c : k) (h : M.charpoly.eval c = 0)
+    : ∃ v : Fin 2 → k, v ≠ 0 ∧ M *ᵥ v = c • v := by
   rw [Matrix.eval_charpoly] at h
   obtain ⟨v, hv, hMv⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr h
   refine ⟨v, hv, ?_⟩
@@ -18,13 +19,10 @@ private theorem exists_eigvec {k : Type} [Field k] (M : Matrix (Fin 2) (Fin 2) k
   rw [hs] at hMv
   exact (sub_eq_zero.mp hMv).symm
 
-theorem UpperTheory.V.Z.Sym.Sig.normalD :
-    UpperTheory.V.Z.Sym.Sig.NormalD := by
+theorem UpperTheory.V.Z.Sym.Sig.normalD : UpperTheory.V.Z.Sym.Sig.NormalD := by
   intro k _ _ _ _ γ a b hab hchar
-  have ha : (γ : Matrix (Fin 2) (Fin 2) k).charpoly.eval (a : k) = 0 := by
-    simp [hchar]
-  have hb : (γ : Matrix (Fin 2) (Fin 2) k).charpoly.eval (b : k) = 0 := by
-    simp [hchar]
+  have ha : (γ : Matrix (Fin 2) (Fin 2) k).charpoly.eval (a : k) = 0 := by simp [hchar]
+  have hb : (γ : Matrix (Fin 2) (Fin 2) k).charpoly.eval (b : k) = 0 := by simp [hchar]
   obtain ⟨v, hv0, hv⟩ := exists_eigvec _ _ ha
   obtain ⟨w, hw0, hw⟩ := exists_eigvec _ _ hb
   have hab' : (a : k) ≠ (b : k) := fun h => hab (Units.ext h)
@@ -41,8 +39,9 @@ theorem UpperTheory.V.Z.Sym.Sig.normalD :
       rw [hu, Matrix.mulVec_zero]
     rw [Matrix.mulVec_add, Matrix.mulVec_smul, Matrix.mulVec_smul, hv, hw] at h2
     have h3 : (u 1 * ((b : k) - a)) • w = 0 := by
-      have e : (u 1 * ((b : k) - a)) • w
-          = (u 0 • (a : k) • v + u 1 • (b : k) • w) - (a : k) • (u 0 • v + u 1 • w) := by
+      have e
+          : (u 1 * ((b : k) - a)) • w
+            = (u 0 • (a : k) • v + u 1 • (b : k) • w) - (a : k) • (u 0 • v + u 1 • w) := by
         module
       rw [e, h2, hu, smul_zero, sub_zero]
     rcases smul_eq_zero.mp h3 with h4 | h4
@@ -60,7 +59,10 @@ theorem UpperTheory.V.Z.Sym.Sig.normalD :
       · exact hv0 h6
     · exact hw0 h4
   refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero P hdet, ?_⟩
-  have hg : ((Matrix.GeneralLinearGroup.mkOfDetNeZero P hdet : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) = P := rfl
+  have hg
+      : ((Matrix.GeneralLinearGroup.mkOfDetNeZero P hdet : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k)
+        = P :=
+    rfl
   rw [eq_mul_inv_iff_mul_eq]
   apply Units.ext
   simp only [Units.val_mul, hg, UpperTheory.V.Z.Sym.Sig.dg, val_diagT]

@@ -33,7 +33,8 @@ theorem rtAlg' : RtAlg := rtAlg sizeBasic
 
 theorem adelRep' : AdelRep := adelRep fmAlg' fmTr' rtAlg'
 
-theorem blkOp' (h : MultAlg) : BlockOperatorsProductAdjoint := blkOp E1.opEx_holds h tensTest tensMul
+theorem blkOp' (h : MultAlg) : BlockOperatorsProductAdjoint :=
+  blkOp E1.opEx_holds h tensTest tensMul
 
 theorem blkComm' (h : MultAlg) : BlockPureTensorsCommute := blkComm E1.opEx_holds h tensTest tensMul
 

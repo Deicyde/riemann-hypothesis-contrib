@@ -32,8 +32,9 @@ theorem sum_single_one : ∑ a : Fin n, (Matrix.single a a (1 : ℂ) : Mat n) = 
 theorem sqrt_two_inv_sq : ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ = 1 / 2 :=
   GlobalTheory.CompanionTheory.TopClass.sqrt_two_inv_sq
 
-theorem hb_mul_self (a b : Fin n) :
-    (hb (a, b) : Mat n) * hb (a, b) = (1 / 2 : ℂ) • (Matrix.single a a 1 + Matrix.single b b 1) := by
+theorem hb_mul_self (a b : Fin n)
+    : (hb (a, b) : Mat n) * hb (a, b)
+      = (1 / 2 : ℂ) • (Matrix.single a a 1 + Matrix.single b b 1) := by
   have hs := sqrt_two_inv_sq
   by_cases h : a = b
   · subst h
@@ -42,17 +43,24 @@ theorem hb_mul_self (a b : Fin n) :
     norm_num
   · have hne : b ≠ a := fun e => h e.symm
     by_cases h' : a < b
-    · have : (hb (a, b) : Mat n) = (((Real.sqrt 2 : ℝ) : ℂ)⁻¹) • (Matrix.single a b 1 + Matrix.single b a 1) := by
+    · have : (hb (a, b) : Mat n)
+          = (((Real.sqrt 2 : ℝ) : ℂ)⁻¹) • (Matrix.single a b 1 + Matrix.single b a 1) := by
         simp [hb, h, h']
       rw [this, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hs]
       simp only [Matrix.add_mul, Matrix.mul_add, Matrix.single_mul_single_same,
         Matrix.single_mul_single_of_ne _ _ _ _ hne, Matrix.single_mul_single_of_ne _ _ _ _ h]
       simp [add_comm]
-    · have : (hb (a, b) : Mat n) =
-          (((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * Complex.I) • (Matrix.single a b 1 - Matrix.single b a 1) := by
+    · have : (hb (a, b) : Mat n)
+          = (((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * Complex.I)
+            • (Matrix.single a b 1 - Matrix.single b a 1) := by
         simp [hb, h, h']
-      have hc : (((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * Complex.I) * (((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * Complex.I) = -(1 / 2) := by
-        calc _ = (((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * ((Real.sqrt 2 : ℝ) : ℂ)⁻¹) * (Complex.I * Complex.I) := by ring
+      have hc
+          : (((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * Complex.I) * (((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * Complex.I)
+            = -(1 / 2) := by
+        calc
+          _ = (((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * ((Real.sqrt 2 : ℝ) : ℂ)⁻¹)
+              * (Complex.I * Complex.I) := by
+            ring
           _ = _ := by rw [hs, Complex.I_mul_I]; ring
       rw [this, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hc]
       simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.single_mul_single_same,
@@ -62,12 +70,13 @@ theorem hb_mul_self (a b : Fin n) :
 
 theorem sum_hb_mul_self : ∑ p, (hb p : Mat n) * hb p = (n : ℂ) • 1 := by
   rw [Fintype.sum_prod_type]
-  simp only [hb_mul_self, ← Finset.smul_sum, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
-    Fintype.card_fin, sum_single_one]
+  simp only [hb_mul_self, ← Finset.smul_sum, Finset.sum_add_distrib, Finset.sum_const,
+    Finset.card_univ, Fintype.card_fin, sum_single_one]
   rw [← Nat.cast_smul_eq_nsmul ℂ n (1 : Mat n), ← two_smul ℂ, smul_smul, smul_smul]
   norm_num
 
-theorem coords_one (p : Fin n × Fin n) : ((coords (1 : Mat n) p : ℝ) : ℂ) = (hb p : Mat n).trace := by
+theorem coords_one (p : Fin n × Fin n)
+    : ((coords (1 : Mat n) p : ℝ) : ℂ) = (hb p : Mat n).trace := by
   have := GlobalTheory.CompanionTheory.ConeLin.re_trace (1 : Mat n) (by simp) p
   simpa [coords] using this
 
@@ -94,8 +103,15 @@ theorem oPt_mem_cone : oPt n ∈ cone n := by
   rw [hOf_coords Matrix.isHermitian_one]
   exact Matrix.PosDef.one
 
-theorem hbFacts : HbFacts := fun _ =>
-  ⟨GlobalTheory.CompanionTheory.TwistHomotopy.hb_conjTranspose, GlobalTheory.CompanionTheory.TopClass.trace_hb_mul_hb, fun _ hH => hOf_coords hH,
-    coords_hOf, hOf_isHermitian, sum_hb_mul_self, sum_trace_smul_hb, oPt_mem_cone⟩
+theorem hbFacts : HbFacts := fun _ => ⟨
+  GlobalTheory.CompanionTheory.TwistHomotopy.hb_conjTranspose,
+  GlobalTheory.CompanionTheory.TopClass.trace_hb_mul_hb,
+  fun _ hH => hOf_coords hH,
+  coords_hOf,
+  hOf_isHermitian,
+  sum_hb_mul_self,
+  sum_trace_smul_hb,
+  oPt_mem_cone
+⟩
 
 end GlobalTheory.CompanionTheory.HbBasis

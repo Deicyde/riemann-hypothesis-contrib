@@ -9,9 +9,12 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem flat_of_algHom_atPrime (R A B : Type) [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
-    [Algebra.Etale R A] [Algebra.Etale R B] (p : Ideal B) [p.IsPrime] (φ : A →ₐ[R] Localization.AtPrime p) :
-    φ.toRingHom.Flat := by
+theorem flat_of_algHom_atPrime
+    (R A B : Type) [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
+    [Algebra.Etale R A] [Algebra.Etale R B]
+    (p : Ideal B) [p.IsPrime]
+    (φ : A →ₐ[R] Localization.AtPrime p)
+    : φ.toRingHom.Flat := by
   obtain ⟨g, hg, ψ, hψ⟩ := GlobalTheory.T.algHom_localizationAtPrime_factors_through_away R A B p φ
   set h := Localization.awayLift (algebraMap B (Localization.AtPrime p)) g
     (IsLocalization.map_units (Localization.AtPrime p) (⟨g, hg⟩ : p.primeCompl)) with hh
@@ -33,7 +36,16 @@ theorem flat_of_algHom_atPrime (R A B : Type) [CommRing R] [CommRing A] [CommRin
         (Localization.AtPrime p)).mpr inferInstance
     exact RingHom.flat_algebraMap_iff.mpr this
 
-theorem flat_of_essEtale : ∀ (R L₁ L₂ : Type) [CommRing R] [CommRing L₁] [CommRing L₂] [Algebra R L₁] [Algebra R L₂] [Algebra L₁ L₂] [IsScalarTower R L₁ L₂], (∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A) (_ : q.IsPrime), Nonempty (Localization.AtPrime q ≃ₐ[R] L₁)) → (∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A) (_ : q.IsPrime), Nonempty (Localization.AtPrime q ≃ₐ[R] L₂)) → Module.Flat L₁ L₂ := by
+theorem flat_of_essEtale
+    : ∀ (R L₁ L₂ : Type) [CommRing R] [CommRing L₁] [CommRing L₂] [Algebra R L₁] [Algebra R L₂]
+        [Algebra L₁ L₂] [IsScalarTower R L₁ L₂],
+      (∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A)
+            (_ : q.IsPrime),
+          Nonempty (Localization.AtPrime q ≃ₐ[R] L₁))
+        → (∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A)
+            (_ : q.IsPrime),
+          Nonempty (Localization.AtPrime q ≃ₐ[R] L₂))
+        → Module.Flat L₁ L₂ := by
   intro R L₁ L₂ _ _ _ _ _ _ _ ⟨A, _, _, _, q, _, ⟨e₁⟩⟩ ⟨A', _, _, _, q', _, ⟨e₂⟩⟩
   let φ : A →ₐ[R] Localization.AtPrime q' :=
     (e₂.symm.toAlgHom.comp (IsScalarTower.toAlgHom R L₁ L₂)).comp

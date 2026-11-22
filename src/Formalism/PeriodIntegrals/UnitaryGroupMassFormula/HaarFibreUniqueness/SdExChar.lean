@@ -10,7 +10,8 @@ noncomputable section
 
 namespace PI.OmFibreUniq.W.SdChar
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory Topology Filter NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory Topology Filter
+  NumberField IsDedekindDomain
 
 theorem eq_one_of_pow_near (w : ℂ) (hw : ‖w‖ = 1) (h : ∀ m : ℕ, ‖w ^ m - 1‖ < 1) : w = 1 := by
   have key : ∀ y : ℝ, Real.cos y ≤ 1 / 2 → 1 ≤ ‖Complex.exp (y * Complex.I) - 1‖ := by
@@ -63,9 +64,10 @@ theorem eq_one_of_pow_near (w : ℂ) (hw : ‖w‖ = 1) (h : ∀ m : ℕ, ‖w ^
   rw [hpow m] at this
   linarith [key _ hcos]
 
-variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
-  (ψ0 : Fv F v → ℂ) (hψc : Continuous ψ0) (hψa : ∀ r s, ψ0 (r + s) = ψ0 r * ψ0 s)
-  (hψn : ∀ r, ‖ψ0 r‖ = 1)
+variable
+  {F : Type} [Field F] [NumberField F]
+  (v : HeightOneSpectrum (𝓞 F)) (ψ0 : Fv F v → ℂ)
+  (hψc : Continuous ψ0) (hψa : ∀ r s, ψ0 (r + s) = ψ0 r * ψ0 s) (hψn : ∀ r, ‖ψ0 r‖ = 1)
 
 include hψa hψn in
 theorem psi_zero : ψ0 0 = 1 := by
@@ -79,13 +81,11 @@ theorem psi_zero : ψ0 0 = 1 := by
   have h2 : ψ0 0 * (ψ0 0 - 1) = 0 := by rw [mul_sub, mul_one, ← h, sub_self]
   exact sub_eq_zero.mp ((mul_eq_zero.mp h2).resolve_left hne)
 
-
 include hψa hψn in
 theorem psi_natCast_mul (m : ℕ) (t : Fv F v) : ψ0 ((m : Fv F v) * t) = ψ0 t ^ m := by
   induction m with
   | zero => simp [psi_zero v ψ0 hψa hψn]
-  | succ m ih =>
-    rw [Nat.cast_succ, add_mul, one_mul, hψa, ih, pow_succ]
+  | succ m ih => rw [Nat.cast_succ, add_mul, one_mul, hψa, ih, pow_succ]
 
 def Aset : Set (Fv F v) := {t | ∀ c ∈ v.adicCompletionIntegers F, ψ0 (c * t) = 1}
 
@@ -102,9 +102,12 @@ theorem Aset_mem_nhds : Aset v ψ0 ∈ 𝓝 (0 : Fv F v) := by
     intro c' hc'
     apply hγ
     rw [IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers,
-      ← Valuation.restrict_le_one_iff] at hc'
+        ← Valuation.restrict_le_one_iff]
+      at hc'
     simp only [Set.mem_setOf_eq, map_mul]
-    calc Valued.v.restrict c' * Valued.v.restrict t ≤ 1 * Valued.v.restrict t := by gcongr
+    calc
+      Valued.v.restrict c' * Valued.v.restrict t
+        ≤ 1 * Valued.v.restrict t := by gcongr
       _ = Valued.v.restrict t := one_mul _
       _ < _ := ht
   apply eq_one_of_pow_near _ (hψn _)
@@ -113,8 +116,8 @@ theorem Aset_mem_nhds : Aset v ψ0 ∈ 𝓝 (0 : Fv F v) := by
   exact hin _ (mul_mem (natCast_mem _ m) hc)
 
 include hψa hψn in
-theorem Aset_bdd (hnt : ∃ y, ψ0 y ≠ 1) :
-    ∃ y0 : Fv F v, y0 ≠ 0 ∧ ∀ t ∈ Aset v ψ0, ∃ s ∈ v.adicCompletionIntegers F, t = y0 * s := by
+theorem Aset_bdd (hnt : ∃ y, ψ0 y ≠ 1)
+    : ∃ y0 : Fv F v, y0 ≠ 0 ∧ ∀ t ∈ Aset v ψ0, ∃ s ∈ v.adicCompletionIntegers F, t = y0 * s := by
   obtain ⟨y, hy⟩ := hnt
   have hy0 : y ≠ 0 := by
     rintro rfl
@@ -130,7 +133,9 @@ theorem Aset_bdd (hnt : ∃ y, ψ0 y ≠ 1) :
     have hne : Valued.v (t / y) ≠ 0 := (Valuation.ne_zero_iff _).2 (div_ne_zero ht0 hy0)
     have hc : y / t ∈ v.adicCompletionIntegers F := by
       rw [IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers, ← inv_div, map_inv₀]
-      calc (Valued.v (t / y))⁻¹ = (Valued.v (t / y))⁻¹ * 1 := (mul_one _).symm
+      calc
+        (Valued.v (t / y))⁻¹
+          = (Valued.v (t / y))⁻¹ * 1 := (mul_one _).symm
         _ ≤ (Valued.v (t / y))⁻¹ * Valued.v (t / y) := by gcongr
         _ = 1 := inv_mul_cancel₀ hne
     have := (show ∀ c ∈ v.adicCompletionIntegers F, ψ0 (c * t) = 1 from ht) _ hc

@@ -6,9 +6,10 @@ public import Mathlib
 
 open Polynomial Matrix
 
-theorem UpperTheory.V.AlgebraTools.charpolyPowInt :
-    ∀ (R ι : Type) [CommRing R] [Fintype ι] [DecidableEq ι] (S : Subring R) (M : Matrix ι ι R) (N : ℕ), 0 < N →
-      (∀ i, (M ^ N).charpoly.coeff i ∈ S) → ∀ i, IsIntegral S (M.charpoly.coeff i) := by
+theorem UpperTheory.V.AlgebraTools.charpolyPowInt
+    : ∀ (R ι : Type) [CommRing R] [Fintype ι] [DecidableEq ι] (S : Subring R) (M : Matrix ι ι R)
+        (N : ℕ),
+      0 < N → (∀ i, (M ^ N).charpoly.coeff i ∈ S) → ∀ i, IsIntegral S (M.charpoly.coeff i) := by
   intro R ι _ _ _ S M N hN h i
   rcases subsingleton_or_nontrivial R with hR | hR
   · exact ⟨1, Polynomial.monic_one, Subsingleton.elim _ _⟩

@@ -7,15 +7,17 @@ public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProof
 
 namespace Formalism.InvariantFactorPaths.L4
 
-open Formalism.GM Formalism.GM.M Formalism.GM.TM Formalism.GM.MeanGammaLemmas Formalism.CountingSumsFrames MvPolynomial Finset
+open Formalism.GM Formalism.GM.M Formalism.GM.TM Formalism.GM.MeanGammaLemmas
+  Formalism.CountingSumsFrames MvPolynomial Finset
 
 section Abs
 variable {k V : Type*} [Field k] [AddCommGroup V] [Module k V]
 
-theorem proj_comm_abs' (PE A : V →ₗ[k] V) (R W L : Submodule k V) (h1 : PE ∘ₗ PE = PE)
-    (h2 : LinearMap.range PE = R ⊓ W) (h3 : LinearMap.ker PE ⊓ W = L ⊓ W)
-    (hR : ∀ x ∈ R, A x ∈ R) (hW : ∀ x ∈ W, A x ∈ W) (hL : ∀ x ∈ L, A x ∈ L) :
-    ∀ x ∈ W, PE (A x) = A (PE x) := by
+theorem proj_comm_abs'
+    (PE A : V →ₗ[k] V) (R W L : Submodule k V)
+    (h1 : PE ∘ₗ PE = PE) (h2 : LinearMap.range PE = R ⊓ W) (h3 : LinearMap.ker PE ⊓ W = L ⊓ W)
+    (hR : ∀ x ∈ R, A x ∈ R) (hW : ∀ x ∈ W, A x ∈ W) (hL : ∀ x ∈ L, A x ∈ L)
+    : ∀ x ∈ W, PE (A x) = A (PE x) := by
   intro x hx
   have hfix : ∀ y ∈ LinearMap.range PE, PE y = y := by
     rintro y ⟨z, rfl⟩
@@ -41,46 +43,56 @@ end Abs
 section EC
 variable {p : ℕ} [Fact p.Prime] {N r : ℕ}
 
-noncomputable def lowIm' (p : ℕ) [Fact p.Prime] {N r : ℕ} (LL : Letters N) (j : ℕ) (ρ : Fin r) :
-    Submodule ℚ_[p] (MvPolynomial (Fin N × Fin r) ℚ_[p]) :=
+noncomputable def lowIm' (p : ℕ) [Fact p.Prime] {N r : ℕ} (LL : Letters N) (j : ℕ) (ρ : Fin r)
+    : Submodule ℚ_[p] (MvPolynomial (Fin N × Fin r) ℚ_[p]) :=
   ⨆ (c : Fin r) (d : Fin r) (_ : c ∈ univ.erase ρ ∧ d ∈ univ.erase ρ ∧ d < c),
     Submodule.map (glAct p LL j c d) ⊤
 
-theorem lowIm_keep' (LL : Letters N) (j : ℕ) (ρ : Fin r)
+theorem lowIm_keep'
+    (LL : Letters N) (j : ℕ) (ρ : Fin r)
     (A : MvPolynomial (Fin N × Fin r) ℚ_[p] →ₗ[ℚ_[p]] MvPolynomial (Fin N × Fin r) ℚ_[p])
-    (hA : ∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ x, A (glAct p LL j c d x) = glAct p LL j c d (A x)) :
-    ∀ x ∈ lowIm' p LL j ρ, A x ∈ lowIm' p LL j ρ := by
+    (hA : ∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ x,
+      A (glAct p LL j c d x) = glAct p LL j c d (A x))
+    : ∀ x ∈ lowIm' p LL j ρ, A x ∈ lowIm' p LL j ρ := by
   have key : lowIm' p LL j ρ ≤ (lowIm' p LL j ρ).comap A := by
     unfold lowIm'
     refine iSup_le fun c => iSup_le fun d => iSup_le fun hcd => ?_
     rintro y ⟨z, -, rfl⟩
     rw [Submodule.mem_comap, hA c hcd.1 d hcd.2.1 z]
-    exact Submodule.mem_iSup_of_mem c (Submodule.mem_iSup_of_mem d
-      (Submodule.mem_iSup_of_mem hcd ⟨A z, Submodule.mem_top, rfl⟩))
+    exact Submodule.mem_iSup_of_mem c
+      (Submodule.mem_iSup_of_mem d (Submodule.mem_iSup_of_mem hcd ⟨A z, Submodule.mem_top, rfl⟩))
   intro x hx
   exact key hx
 
-theorem hwProj_comm' (LL : Letters N) (j : ℕ) (ρ : Fin r) (la : Fin r → ℤ)
+theorem hwProj_comm'
+    (LL : Letters N) (j : ℕ) (ρ : Fin r) (la : Fin r → ℤ)
     (PE A : MvPolynomial (Fin N × Fin r) ℚ_[p] →ₗ[ℚ_[p]] MvPolynomial (Fin N × Fin r) ℚ_[p])
     (h1 : PE ∘ₗ PE = PE)
     (h2 : LinearMap.range PE = HWC p LL j (univ.erase ρ) la ⊓ WtSpC p LL j univ la)
     (h3 : LinearMap.ker PE ⊓ WtSpC p LL j univ la = lowIm' p LL j ρ ⊓ WtSpC p LL j univ la)
-    (hA : ∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ x, A (glAct p LL j c d x) = glAct p LL j c d (A x))
-    (hW : ∀ x ∈ WtSpC p LL j univ la, A x ∈ WtSpC p LL j univ la) :
-    ∀ x ∈ WtSpC p LL j univ la, PE (A x) = A (PE x) := by
+    (hA : ∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ x,
+      A (glAct p LL j c d x) = glAct p LL j c d (A x))
+    (hW : ∀ x ∈ WtSpC p LL j univ la, A x ∈ WtSpC p LL j univ la)
+    : ∀ x ∈ WtSpC p LL j univ la, PE (A x) = A (PE x) := by
   have hsub : WtSpC p LL j univ la ≤ WtSpC p LL j (univ.erase ρ) la := by
     intro x hx
-    simp only [WtSpC, MvPolynomial.restrictSupport, AddMonoidAlgebra.supported, Finsupp.mem_supported, Submodule.mem_comap,
-      LinearEquiv.coe_coe, AddMonoidAlgebra.coeffLinearEquiv_apply] at hx ⊢
+    simp only [WtSpC, MvPolynomial.restrictSupport, AddMonoidAlgebra.supported,
+        Finsupp.mem_supported, Submodule.mem_comap, LinearEquiv.coe_coe,
+        AddMonoidAlgebra.coeffLinearEquiv_apply]
+      at hx ⊢
     intro m hm c _
     exact hx (show m ∈ (↑x.support : Set _) from hm) c (Finset.mem_univ c)
-  have hR : ∀ x ∈ HWC p LL j (univ.erase ρ) la ⊓ WtSpC p LL j univ la,
-      A x ∈ HWC p LL j (univ.erase ρ) la ⊓ WtSpC p LL j univ la := by
+  have hR
+      : ∀ x ∈ HWC p LL j (univ.erase ρ) la ⊓ WtSpC p LL j univ la,
+        A x ∈ HWC p LL j (univ.erase ρ) la ⊓ WtSpC p LL j univ la := by
     intro x hx
     have hAx := hW x hx.2
     refine ⟨?_, hAx⟩
-    have hx1 : x ∈ WtSpC p LL j (univ.erase ρ) la ⊓
-        ⨅ (c : Fin r) (d : Fin r) (_ : c ∈ univ.erase ρ ∧ d ∈ univ.erase ρ ∧ c < d), LinearMap.ker (glAct p LL j c d) := hx.1
+    have hx1
+        : x
+          ∈ WtSpC p LL j (univ.erase ρ) la
+            ⊓ ⨅ (c : Fin r) (d : Fin r) (_ : c ∈ univ.erase ρ ∧ d ∈ univ.erase ρ ∧ c < d), LinearMap.ker (glAct p LL j c d) :=
+      hx.1
     show A x ∈ WtSpC p LL j (univ.erase ρ) la ⊓
         ⨅ (c : Fin r) (d : Fin r) (_ : c ∈ univ.erase ρ ∧ d ∈ univ.erase ρ ∧ c < d), LinearMap.ker (glAct p LL j c d)
     rw [Submodule.mem_inf] at hx1 ⊢
@@ -89,16 +101,20 @@ theorem hwProj_comm' (LL : Letters N) (j : ℕ) (ρ : Fin r) (la : Fin r → ℤ
     simp only [Submodule.mem_iInf, LinearMap.mem_ker] at hx2 ⊢
     intro c d hcd
     rw [← hA c hcd.1 d hcd.2.1, hx2 c d hcd, map_zero]
-  have h2' : LinearMap.range PE
-      = (HWC p LL j (univ.erase ρ) la ⊓ WtSpC p LL j univ la) ⊓ WtSpC p LL j univ la := by
+  have h2'
+      : LinearMap.range PE
+        = (HWC p LL j (univ.erase ρ) la ⊓ WtSpC p LL j univ la) ⊓ WtSpC p LL j univ la := by
     rw [h2, inf_assoc, inf_idem]
   exact proj_comm_abs' PE A _ _ _ h1 h2' h3 hR hW (lowIm_keep' LL j ρ A hA)
 
-theorem resL_fix' {σ : Type} (v : σ) (x : MvPolynomial σ ℚ_[p]) (hx : x ∈ FreeOf p v) : resL p v 0 x = x := by
+theorem resL_fix' {σ : Type} (v : σ) (x : MvPolynomial σ ℚ_[p]) (hx : x ∈ FreeOf p v)
+    : resL p v 0 x = x := by
   have hx' : ↑x.support ⊆ {m : σ →₀ ℕ | m v = 0} := by
     have h' := hx
-    simp only [FreeOf, MvPolynomial.restrictSupport, AddMonoidAlgebra.supported, Finsupp.mem_supported, Submodule.mem_comap,
-      LinearEquiv.coe_coe, AddMonoidAlgebra.coeffLinearEquiv_apply] at h'
+    simp only [FreeOf, MvPolynomial.restrictSupport, AddMonoidAlgebra.supported,
+        Finsupp.mem_supported, Submodule.mem_comap, LinearEquiv.coe_coe,
+        AddMonoidAlgebra.coeffLinearEquiv_apply]
+      at h'
     exact h'
   change initPart v 0 x = x
   unfold initPart
@@ -106,8 +122,8 @@ theorem resL_fix' {σ : Type} (v : σ) (x : MvPolynomial σ ℚ_[p]) (hx : x ∈
   refine Finset.sum_congr rfl (fun m hm => ?_)
   rw [if_pos (show m v = 0 from hx' (Finset.mem_coe.mpr hm))]
 
-theorem fock_monomial_zero' {σ : Type} (g : MvPolynomial σ ℚ_[p]) (m : σ →₀ ℕ) (hm : m ∉ g.support) :
-    fock p g (monomial m 1) = 0 := by
+theorem fock_monomial_zero' {σ : Type} (g : MvPolynomial σ ℚ_[p]) (m : σ →₀ ℕ) (hm : m ∉ g.support)
+    : fock p g (monomial m 1) = 0 := by
   classical
   unfold fock
   refine Finset.sum_eq_zero (fun n hn => ?_)
@@ -118,20 +134,24 @@ theorem fock_right_zero' {σ : Type} (g : MvPolynomial σ ℚ_[p]) : fock p g 0 
   unfold fock
   simp
 
-theorem monomial_mem_supp' {σ : Type} (Q : Set (σ →₀ ℕ)) (m : σ →₀ ℕ) (hm : m ∈ Q) :
-    monomial m (1 : ℚ_[p]) ∈ restrictSupport ℚ_[p] Q := by
-  simp only [MvPolynomial.restrictSupport, AddMonoidAlgebra.supported, Finsupp.mem_supported, Submodule.mem_comap,
-      LinearEquiv.coe_coe, AddMonoidAlgebra.coeffLinearEquiv_apply]
+theorem monomial_mem_supp' {σ : Type} (Q : Set (σ →₀ ℕ)) (m : σ →₀ ℕ) (hm : m ∈ Q)
+    : monomial m (1 : ℚ_[p]) ∈ restrictSupport ℚ_[p] Q := by
+  simp only [MvPolynomial.restrictSupport, AddMonoidAlgebra.supported, Finsupp.mem_supported,
+    Submodule.mem_comap, LinearEquiv.coe_coe, AddMonoidAlgebra.coeffLinearEquiv_apply]
   intro n hn
-  rw [Finset.mem_singleton.mp (MvPolynomial.support_monomial_subset (show n ∈ (monomial m (1 : ℚ_[p])).support from hn))]
+  rw [Finset.mem_singleton.mp (MvPolynomial.support_monomial_subset
+    (show n ∈ (monomial m (1 : ℚ_[p])).support from hn))]
   exact hm
 
-theorem cartan_comm_erase' (LL : Letters N) (j : ℕ) (ρ : Fin r) (a : Fin r) (ha : a ∈ univ.erase ρ) (b : Fin r)
-    (hb : b ∈ univ.erase ρ) (x : MvPolynomial (Fin N × Fin r) ℚ_[p]) :
-    glAct p LL j ρ ρ (glAct p LL j a b x) = glAct p LL j a b (glAct p LL j ρ ρ x) := by
+theorem cartan_comm_erase'
+    (LL : Letters N) (j : ℕ)
+    (ρ : Fin r) (a : Fin r) (ha : a ∈ univ.erase ρ)
+    (b : Fin r) (hb : b ∈ univ.erase ρ)
+    (x : MvPolynomial (Fin N × Fin r) ℚ_[p])
+    : glAct p LL j ρ ρ (glAct p LL j a b x) = glAct p LL j a b (glAct p LL j ρ ρ x) := by
   have h := glAct_comm (p := p) LL j ρ ρ a b x
-  have hda : ¬ (ρ = a) := fun h => (Finset.mem_erase.mp ha).1 h.symm
-  have hbc : ¬ (b = ρ) := (Finset.mem_erase.mp hb).1
+  have hda : ¬(ρ = a) := fun h => (Finset.mem_erase.mp ha).1 h.symm
+  have hbc : ¬(b = ρ) := (Finset.mem_erase.mp hb).1
   rw [if_neg hda, if_neg hbc, sub_zero, sub_eq_zero] at h
   exact h
 
@@ -167,10 +187,13 @@ theorem highest_vector_projection : ProjX := by
     rw [Fin.val_zero] at h'
     omega
   have h0e : (0 : Fin r) ∈ univ.erase ρ := Finset.mem_erase.mpr ⟨h0ρ, Finset.mem_univ _⟩
-  obtain ⟨Tu, hTu⟩ : ∃ Tu : ℕ → Set (Fin r → ℤ),
-      Tu = fun j => {la | ∀ k, min (J k) K = j → ((la 0 : ℤ) : WithTop ℤ) ≤ M k} := ⟨_, rfl⟩
-  obtain ⟨Te, hTe⟩ : ∃ Te : Set (Fin r → ℤ),
-      Te = {la | ∀ k, K + 1 ≤ J k → ((la 0 : ℤ) : WithTop ℤ) ≤ M k} := ⟨_, rfl⟩
+  obtain ⟨Tu, hTu⟩
+      : ∃ Tu : ℕ → Set (Fin r → ℤ),
+        Tu = fun j => {la | ∀ k, min (J k) K = j → ((la 0 : ℤ) : WithTop ℤ) ≤ M k} :=
+    ⟨_, rfl⟩
+  obtain ⟨Te, hTe⟩
+      : ∃ Te : Set (Fin r → ℤ), Te = {la | ∀ k, K + 1 ≤ J k → ((la 0 : ℤ) : WithTop ℤ) ≤ M k} :=
+    ⟨_, rfl⟩
   have hTu' : ∀ j la, la ∈ Tu j ↔ ∀ k, min (J k) K = j → ((la 0 : ℤ) : WithTop ℤ) ≤ M k := by
     intro j la; rw [hTu]; rfl
   have hTe' : ∀ la, la ∈ Te ↔ ∀ k, K + 1 ≤ J k → ((la 0 : ℤ) : WithTop ℤ) ≤ M k := by
@@ -186,8 +209,12 @@ theorem highest_vector_projection : ProjX := by
   obtain ⟨hPex, hPcomm⟩ := hP
   choose Pu hPu using fun (j : ℕ) (hj : j ≤ K) => hPex j (by omega) univ (Or.inl rfl) (Tu j) (hsatU _)
   obtain ⟨Pe, hPe1, hPe2, hPe3⟩ := hPex (K + 1) le_rfl (univ.erase ρ) (Or.inr rfl) Te hsatE
-  obtain ⟨P, hPdef⟩ : ∃ P : ℕ → (MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p] →ₗ[ℚ_[p]]
-      MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]), P = fun j => if h : j ≤ K then Pu j h else Pe := ⟨_, rfl⟩
+  obtain ⟨P, hPdef⟩
+      : ∃ P : ℕ
+          → (MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p] →ₗ[ℚ_[p]]
+              MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]),
+        P = fun j => if h : j ≤ K then Pu j h else Pe :=
+    ⟨_, rfl⟩
   have hPu_eq : ∀ j (hj : j ≤ K), P j = Pu j hj := by intro j hj; rw [hPdef]; simp [hj]
   have hPe_eq : ∀ j, ¬ j ≤ K → P j = Pe := by intro j hj; rw [hPdef]; simp [hj]
   have hTPu : ∀ j (hj : j ≤ K), IsTypeProj p LL j univ (Tu j) (P j) := by
@@ -203,21 +230,30 @@ theorem highest_vector_projection : ProjX := by
     intro j j' x
     by_cases hj : j ≤ K <;> by_cases hj' : j' ≤ K
     · rcases le_total j j' with h | h
-      · exact LinearMap.congr_fun (hPcomm j j' univ univ (Tu j) (Tu j') (P j) (P j') h subset_rfl
-          (Or.inl rfl) (Or.inl rfl) (hTPu j hj) (hTPu j' hj')) x
-      · exact (LinearMap.congr_fun (hPcomm j' j univ univ (Tu j') (Tu j) (P j') (P j) h subset_rfl
-          (Or.inl rfl) (Or.inl rfl) (hTPu j' hj') (hTPu j hj)) x).symm
-    · exact LinearMap.congr_fun (hPcomm j (K + 1) univ (univ.erase ρ) (Tu j) Te (P j) (P j') (by omega)
-          (Finset.erase_subset _ _) (Or.inl rfl) (Or.inr rfl) (hTPu j hj) (hTPe j' hj')) x
-    · exact (LinearMap.congr_fun (hPcomm j' (K + 1) univ (univ.erase ρ) (Tu j') Te (P j') (P j) (by omega)
-          (Finset.erase_subset _ _) (Or.inl rfl) (Or.inr rfl) (hTPu j' hj') (hTPe j hj)) x).symm
+      · exact LinearMap.congr_fun
+          (hPcomm j j' univ univ (Tu j) (Tu j') (P j) (P j') h subset_rfl (Or.inl rfl) (Or.inl rfl)
+            (hTPu j hj) (hTPu j' hj'))
+          x
+      · exact (LinearMap.congr_fun
+          (hPcomm j' j univ univ (Tu j') (Tu j) (P j') (P j) h subset_rfl (Or.inl rfl) (Or.inl rfl)
+            (hTPu j' hj') (hTPu j hj))
+          x).symm
+    · exact LinearMap.congr_fun
+        (hPcomm j (K + 1) univ (univ.erase ρ) (Tu j) Te (P j) (P j') (by omega)
+          (Finset.erase_subset _ _) (Or.inl rfl) (Or.inr rfl) (hTPu j hj) (hTPe j' hj'))
+        x
+    · exact (LinearMap.congr_fun
+        (hPcomm j' (K + 1) univ (univ.erase ρ) (Tu j') Te (P j') (P j) (by omega)
+          (Finset.erase_subset _ _) (Or.inl rfl) (Or.inr rfl) (hTPu j' hj') (hTPe j hj))
+        x).symm
     · rw [hPe_eq j hj, hPe_eq j' hj']
   have hPsa : ∀ j F G, fock p (P j F) G = fock p F (P j G) := by
     intro j F G
     by_cases hj : j ≤ K
     · rw [hPu_eq j hj]; exact (hPu j hj).2.1 F G
     · rw [hPe_eq j hj]; exact hPe2 F G
-  have hPint : ∀ j, ∀ F ∈ PolZ p r LL, ((p : ℚ_[p]) ^ e1) • P j F ∈ IntPol p (Fin (K + 1) × Fin r) := by
+  have hPint
+      : ∀ j, ∀ F ∈ PolZ p r LL, ((p : ℚ_[p]) ^ e1) • P j F ∈ IntPol p (Fin (K + 1) × Fin r) := by
     intro j F hF
     by_cases hj : j ≤ K
     · rw [hPu_eq j hj]; exact (hPu j hj).2.2 F hF
@@ -227,8 +263,9 @@ theorem highest_vector_projection : ProjX := by
     by_cases hj : j ≤ K
     · exact typeProj_polC LL j univ (Tu j) (P j) (hTPu j hj) x hx
     · exact typeProj_polC LL (K + 1) (univ.erase ρ) Te (P j) (hTPe j hj) x hx
-  have hPgl : ∀ j, ∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ x,
-      P j (glAct p LL (K + 1) c d x) = glAct p LL (K + 1) c d (P j x) := by
+  have hPgl
+      : ∀ j, ∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ x,
+        P j (glAct p LL (K + 1) c d x) = glAct p LL (K + 1) c d (P j x) := by
     intro j c hc d hd x
     by_cases hj : j ≤ K
     · exact typeProj_comm_later LL j (K + 1) (by omega) (Tu j) (P j) (hTPu j hj) c d x
@@ -240,34 +277,42 @@ theorem highest_vector_projection : ProjX := by
     · by_cases hc : c = ρ
       · rw [hc]
         exact typeProj_commC LL (K + 1) (univ.erase ρ) Te (P j) (hTPe j hj) (glAct p LL (K + 1) ρ ρ)
-          (fun a ha b hb y => cartan_comm_erase' LL (K + 1) ρ a ha b hb y) x
+          (fun a ha b hb y => cartan_comm_erase' LL (K + 1) ρ a ha b hb y)
+          x
       · have hc' : c ∈ univ.erase ρ := Finset.mem_erase.mpr ⟨hc, Finset.mem_univ _⟩
         exact typeProj_glActC LL (K + 1) (univ.erase ρ) Te (P j) (hTPe j hj) c hc' c hc' x
-  have hPws : ∀ j, ∀ x ∈ WtSpC p LL (K + 1) univ w, P j x ∈ WtSpC p LL (K + 1) univ w :=
-    fun j => comm_wtsp LL (K + 1) (P j) (hPdiag j) w
+  have hPws : ∀ j, ∀ x ∈ WtSpC p LL (K + 1) univ w, P j x ∈ WtSpC p LL (K + 1) univ w := fun j =>
+    comm_wtsp LL (K + 1) (P j) (hPdiag j) w
   have hPres : ∀ j x, P j (resL p (Fin.last K, ρ) 0 x) = resL p (Fin.last K, ρ) 0 (P j x) := by
     intro j x
     by_cases hj : j ≤ K
     · refine typeProj_commC LL j univ (Tu j) (P j) (hTPu j hj) (resL p (Fin.last K, ρ) 0)
-        (fun c _ d _ y => resL_glAct LL j c d (Fin.last K, ρ) 0 ?_ y) x
+        (fun c _ d _ y => resL_glAct LL j c d (Fin.last K, ρ) 0 ?_ y)
+        x
       intro i hi
       have hne : i ≠ Fin.last K := by
         intro h
         rw [h, Fin.val_last] at hi
         omega
       exact ⟨fun h => hne (Prod.ext_iff.mp h).1, fun h => hne (Prod.ext_iff.mp h).1⟩
-    · refine typeProj_commC LL (K + 1) (univ.erase ρ) Te (P j) (hTPe j hj) (resL p (Fin.last K, ρ) 0)
-        (fun c hc d hd y => resL_glAct LL (K + 1) c d (Fin.last K, ρ) 0 ?_ y) x
+    · refine typeProj_commC LL (K + 1) (univ.erase ρ) Te (P j) (hTPe j hj)
+        (resL p (Fin.last K, ρ) 0)
+        (fun c hc d hd y => resL_glAct LL (K + 1) c d (Fin.last K, ρ) 0 ?_ y)
+        x
       intro i _
-      exact ⟨fun h => (Finset.mem_erase.mp hc).1 (Prod.ext_iff.mp h).2,
-        fun h => (Finset.mem_erase.mp hd).1 (Prod.ext_iff.mp h).2⟩
+      exact ⟨
+        fun h => (Finset.mem_erase.mp hc).1 (Prod.ext_iff.mp h).2,
+        fun h => (Finset.mem_erase.mp hd).1 (Prod.ext_iff.mp h).2
+      ⟩
   obtain ⟨PE, hE1, hE2, hE3, hE4, hE5⟩ := hE (K + 1) le_rfl w
-  have hPEc : ∀ A : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p] →ₗ[ℚ_[p]] MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p],
-      (∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ x,
-        A (glAct p LL (K + 1) c d x) = glAct p LL (K + 1) c d (A x)) →
-      (∀ x ∈ WtSpC p LL (K + 1) univ w, A x ∈ WtSpC p LL (K + 1) univ w) →
-      ∀ x ∈ WtSpC p LL (K + 1) univ w, PE (A x) = A (PE x) :=
-    fun A hA hW => hwProj_comm' LL (K + 1) ρ w PE A hE1 hE2 hE3 hA hW
+  have hPEc
+      : ∀ A
+          : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p] →ₗ[ℚ_[p]] MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p],
+        (∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ x,
+            A (glAct p LL (K + 1) c d x) = glAct p LL (K + 1) c d (A x))
+          → (∀ x ∈ WtSpC p LL (K + 1) univ w, A x ∈ WtSpC p LL (K + 1) univ w)
+          → ∀ x ∈ WtSpC p LL (K + 1) univ w, PE (A x) = A (PE x) := fun A hA hW =>
+    hwProj_comm' LL (K + 1) ρ w PE A hE1 hE2 hE3 hA hW
   have hPEfix : ∀ g ∈ HWC p LL (K + 1) (univ.erase ρ) w ⊓ WtSpC p LL (K + 1) univ w, PE g = g := by
     intro g hg
     exact idempotent_apply_eq_self_of_mem_range PE hE1 g (by rw [hE2]; exact hg)
@@ -276,19 +321,28 @@ theorem highest_vector_projection : ProjX := by
     obtain ⟨hy1, hy2⟩ := Submodule.mem_inf.mp hy
     rw [pol_iff_eul] at hy1 ⊢
     intro i
-    have hc := hPEc (ProjS.eulL (fun c : Fin r => (i, c)))
-      (fun c _ d _ x => eul_glAct LL (K + 1) i c d x)
-      (comm_wtsp LL (K + 1) _ (fun c x => eul_glAct LL (K + 1) i c c x) w) y hy2
+    have hc :=
+      hPEc (ProjS.eulL (fun c : Fin r => (i, c)))
+        (fun c _ d _ x => eul_glAct LL (K + 1) i c d x)
+        (comm_wtsp LL (K + 1) _ (fun c x => eul_glAct LL (K + 1) i c c x) w) y hy2
     rw [← hc, hy1 i, map_smul]
 
-  have hXH : ∀ g ∈ XH p LL J M ρ w, g ∈ Pol p r LL ∧ g ∈ FreeOf p (Fin.last K, ρ) ∧
-      (∀ k, K + 1 ≤ J k → g ∈ YCond p LL K (M k) ∧ g ∈ TypesLE p LL (K + 1) (univ.erase ρ) (M k)) ∧
-      (∀ k, ¬ K + 1 ≤ J k → g ∈ YCond p LL (J k) (M k)) ∧
-      g ∈ HWC p LL (K + 1) (univ.erase ρ) w ∧ g ∈ WtSpC p LL (K + 1) univ w := by
+  have hXH
+      : ∀ g ∈ XH p LL J M ρ w,
+        g ∈ Pol p r LL ∧ g ∈ FreeOf p (Fin.last K, ρ)
+          ∧ (∀ k,
+            K + 1 ≤ J k → g ∈ YCond p LL K (M k) ∧ g ∈ TypesLE p LL (K + 1) (univ.erase ρ) (M k))
+          ∧ (∀ k, ¬ K + 1 ≤ J k → g ∈ YCond p LL (J k) (M k))
+          ∧ g ∈ HWC p LL (K + 1) (univ.erase ρ) w ∧ g ∈ WtSpC p LL (K + 1) univ w := by
     intro g hg
-    have hg' : g ∈ ((Pol p r LL ⊓ FreeOf p (Fin.last K, ρ) ⊓
-        ⨅ k, (if K + 1 ≤ J k then YCond p LL K (M k) ⊓ TypesLE p LL (K + 1) (univ.erase ρ) (M k)
-          else YCond p LL (J k) (M k))) ⊓ HWC p LL (K + 1) (univ.erase ρ) w) ⊓ WtSpC p LL (K + 1) univ w := hg
+    have hg'
+        : g
+          ∈ ((Pol p r LL ⊓ FreeOf p (Fin.last K, ρ)
+                ⊓ ⨅ k, (if K + 1 ≤ J k then YCond p LL K (M k) ⊓ TypesLE p LL (K + 1) (univ.erase ρ) (M k)
+                    else YCond p LL (J k) (M k)))
+              ⊓ HWC p LL (K + 1) (univ.erase ρ) w)
+            ⊓ WtSpC p LL (K + 1) univ w :=
+      hg
     simp only [Submodule.mem_inf, Submodule.mem_iInf] at hg'
     obtain ⟨⟨⟨⟨h1, h2⟩, h3⟩, h4⟩, h5⟩ := hg'
     refine ⟨h1, h2, fun k hk => ?_, fun k hk => ?_, h4, h5⟩
@@ -311,8 +365,9 @@ theorem highest_vector_projection : ProjX := by
     by_cases hj : j ≤ K
     · by_cases hex : ∃ k, min (J k) K = j
       · obtain ⟨k, hk⟩ := hex
-        obtain ⟨k0, hk0, hmin⟩ := Finset.exists_min_image (univ.filter fun k => min (J k) K = j) M
-          ⟨k, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hk⟩⟩
+        obtain ⟨k0, hk0, hmin⟩ :=
+          Finset.exists_min_image (univ.filter fun k => min (J k) K = j) M
+            ⟨k, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hk⟩⟩
         have hk0' : min (J k0) K = j := (Finset.mem_filter.mp hk0).2
         refine ycond_fix LL j (Tu j) (M k0) (P j) (hTPu j hj) (fun la hla => ?_) g ⟨?_, hgP⟩
         · rw [hTu']
@@ -328,15 +383,18 @@ theorem highest_vector_projection : ProjX := by
         exact absurd ⟨k, hk⟩ hex
     · by_cases hex : ∃ k, K + 1 ≤ J k
       · obtain ⟨k, hk⟩ := hex
-        obtain ⟨k0, hk0, hmin⟩ := Finset.exists_min_image (univ.filter fun k => K + 1 ≤ J k) M
-          ⟨k, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hk⟩⟩
+        obtain ⟨k0, hk0, hmin⟩ :=
+          Finset.exists_min_image (univ.filter fun k => K + 1 ≤ J k) M
+            ⟨k, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hk⟩⟩
         have hk0' : K + 1 ≤ J k0 := (Finset.mem_filter.mp hk0).2
         refine idempotent_apply_eq_self_of_mem_range (P j) (hTPe j hj).1 g ?_
         rw [(hTPe j hj).2.1]
         have hgt := (hgT k0 hk0').2
         unfold TypesLE at hgt
         refine SetLike.le_def.mp (iSup_le fun la => iSup_le fun hla => ?_) hgt
-        refine le_iSup₂_of_le (f := fun la (_ : la ∈ Te) => IsoC p LL (K + 1) (univ.erase ρ) la) la ?_ le_rfl
+        refine le_iSup₂_of_le
+          (f := fun la (_ : la ∈ Te) => IsoC p LL (K + 1) (univ.erase ρ) la)
+          la ?_ le_rfl
         rw [hTe']
         intro k' hk'
         exact hla.trans (hmin k' (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hk'⟩))
@@ -347,14 +405,23 @@ theorem highest_vector_projection : ProjX := by
         intro k hk
         exact absurd ⟨k, hk⟩ hex
 
-  obtain ⟨G, hG⟩ : ∃ G : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p] → MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p],
-      G = fun u => resL p (Fin.last K, ρ) 0 (PE (lcomp P (List.range (K + 2)) u)) := ⟨_, rfl⟩
-  obtain ⟨f, hf⟩ : ∃ f : (Fin (K + 1) × Fin r →₀ ℕ) → MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p],
-      f = fun m => if (∀ c ∈ (univ : Finset (Fin r)), wt LL (K + 1) c m = w c) then G (monomial m 1) else 0 :=
+  obtain ⟨G, hG⟩
+      : ∃ G : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p] → MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p],
+        G = fun u => resL p (Fin.last K, ρ) 0 (PE (lcomp P (List.range (K + 2)) u)) :=
+    ⟨_, rfl⟩
+  obtain ⟨f, hf⟩
+      : ∃ f : (Fin (K + 1) × Fin r →₀ ℕ) → MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p],
+        f = fun m =>
+          if (∀ c ∈ (univ : Finset (Fin r)), wt LL (K + 1) c m = w c) then
+            G (monomial m 1)
+          else
+            0 :=
     ⟨_, rfl⟩
   refine ⟨(MvPolynomial.basisMonomials (Fin (K + 1) × Fin r) ℚ_[p]).constr ℚ_[p] f, ?_⟩
   intro m hm hm0
-  have hPr : (MvPolynomial.basisMonomials (Fin (K + 1) × Fin r) ℚ_[p]).constr ℚ_[p] f (monomial m 1) = f m := by
+  have hPr
+      : (MvPolynomial.basisMonomials (Fin (K + 1) × Fin r) ℚ_[p]).constr ℚ_[p] f (monomial m 1)
+        = f m := by
     have h := (MvPolynomial.basisMonomials (Fin (K + 1) × Fin r) ℚ_[p]).constr_basis ℚ_[p] f m
     rwa [MvPolynomial.coe_basisMonomials] at h
   rw [hPr]
@@ -373,9 +440,12 @@ theorem highest_vector_projection : ProjX := by
 
   have hu_pol : (monomial m 1 : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) ∈ Pol p r LL :=
     monomial_mem_supp' {m | MultiDeg LL m} m hm
-  have hu_ws : (monomial m 1 : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) ∈ WtSpC p LL (K + 1) univ w :=
+  have hu_ws
+      : (monomial m 1 : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) ∈ WtSpC p LL (K + 1) univ w :=
     monomial_mem_supp' _ m hw
-  have hu_int : (monomial m 1 : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) ∈ IntPol p (Fin (K + 1) × Fin r) := by
+  have hu_int
+      : (monomial m 1 : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p])
+        ∈ IntPol p (Fin (K + 1) × Fin r) := by
     rw [intPol_iff_norm]
     intro n
     rw [MvPolynomial.coeff_monomial]
@@ -402,16 +472,23 @@ theorem highest_vector_projection : ProjX := by
   have hx_pol : x ∈ Pol p r LL := resL_keep_supp (Fin.last K, ρ) 0 {m | MultiDeg LL m} z hz_pol
   have hx_free : x ∈ FreeOf p (Fin.last K, ρ) := resL_free _ z
   have hx_ws : x ∈ WtSpC p LL (K + 1) univ w := resL_keep_supp _ 0 _ z hz_rng.2
-  have hres : ∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ u,
-      resL p (Fin.last K, ρ) 0 (glAct p LL (K + 1) c d u) = glAct p LL (K + 1) c d (resL p (Fin.last K, ρ) 0 u) := by
+  have hres
+      : ∀ c ∈ univ.erase ρ, ∀ d ∈ univ.erase ρ, ∀ u,
+        resL p (Fin.last K, ρ) 0 (glAct p LL (K + 1) c d u)
+          = glAct p LL (K + 1) c d (resL p (Fin.last K, ρ) 0 u) := by
     intro c hc d hd u
     refine resL_glAct LL (K + 1) c d (Fin.last K, ρ) 0 (fun i _ => ?_) u
-    exact ⟨fun h => (Finset.mem_erase.mp hc).1 (Prod.ext_iff.mp h).2,
-      fun h => (Finset.mem_erase.mp hd).1 (Prod.ext_iff.mp h).2⟩
+    exact ⟨
+      fun h => (Finset.mem_erase.mp hc).1 (Prod.ext_iff.mp h).2,
+      fun h => (Finset.mem_erase.mp hd).1 (Prod.ext_iff.mp h).2
+    ⟩
   have hx_hwc : x ∈ HWC p LL (K + 1) (univ.erase ρ) w := by
-    have hzh : z ∈ WtSpC p LL (K + 1) (univ.erase ρ) w ⊓
-        ⨅ (c : Fin r) (d : Fin r) (_ : c ∈ univ.erase ρ ∧ d ∈ univ.erase ρ ∧ c < d),
-          LinearMap.ker (glAct p LL (K + 1) c d) := hz_rng.1
+    have hzh
+        : z
+          ∈ WtSpC p LL (K + 1) (univ.erase ρ) w
+            ⊓ ⨅ (c : Fin r) (d : Fin r) (_ : c ∈ univ.erase ρ ∧ d ∈ univ.erase ρ ∧ c < d),
+                LinearMap.ker (glAct p LL (K + 1) c d) :=
+      hz_rng.1
     show x ∈ WtSpC p LL (K + 1) (univ.erase ρ) w ⊓
         ⨅ (c : Fin r) (d : Fin r) (_ : c ∈ univ.erase ρ ∧ d ∈ univ.erase ρ ∧ c < d),
           LinearMap.ker (glAct p LL (K + 1) c d)
@@ -425,14 +502,16 @@ theorem highest_vector_projection : ProjX := by
     intro k
     rw [← hx_fix (min (J k) K) (by omega)]
     exact typeProj_range_le_ycond LL _ (Tu _) (M k) (P _) (hTPu _ (by omega))
-      (fun la hla => (hTu' _ la).mp hla k rfl) x
+      (fun la hla => (hTu' _ la).mp hla k rfl)
+      x
   have hxT : ∀ k, K + 1 ≤ J k → x ∈ TypesLE p LL (K + 1) (univ.erase ρ) (M k) := by
     intro k hk
     have h1 : x ∈ ⨆ (la : Fin r → ℤ) (_ : la ∈ Te), IsoC p LL (K + 1) (univ.erase ρ) la := by
       rw [← (hTPe (K + 1) (by omega)).2.1, ← hx_fix (K + 1) le_rfl]
       exact LinearMap.mem_range_self _ x
-    have hle : (⨆ (la : Fin r → ℤ) (_ : la ∈ Te), IsoC p LL (K + 1) (univ.erase ρ) la)
-        ≤ TypesLE p LL (K + 1) (univ.erase ρ) (M k) := by
+    have hle
+        : (⨆ (la : Fin r → ℤ) (_ : la ∈ Te), IsoC p LL (K + 1) (univ.erase ρ) la)
+          ≤ TypesLE p LL (K + 1) (univ.erase ρ) (M k) := by
       unfold TypesLE
       exact iSup₂_le fun la hla => le_iSup₂_of_le la ((hTe' la).mp hla k hk) le_rfl
     exact hle h1
@@ -454,8 +533,9 @@ theorem highest_vector_projection : ProjX := by
     have hzI := hE5 _ hyZ (Submodule.smul_mem _ _ hy_ws)
     rw [map_smul, smul_smul, ← pow_add] at hzI
     have hxI := initPart_int (Fin.last K, ρ) 0 _ hzI
-    have he : ((p : ℚ_[p]) ^ ((K + 3) * e1)) • x
-        = resL p (Fin.last K, ρ) 0 (((p : ℚ_[p]) ^ (e1 + e1 * (K + 2))) • z) := by
+    have he
+        : ((p : ℚ_[p]) ^ ((K + 3) * e1)) • x
+          = resL p (Fin.last K, ρ) 0 (((p : ℚ_[p]) ^ (e1 + e1 * (K + 2))) • z) := by
       rw [map_smul, hx, show (K + 3) * e1 = e1 + e1 * (K + 2) by ring]
     rw [he]
     exact hxI
@@ -467,10 +547,10 @@ theorem highest_vector_projection : ProjX := by
       refine Finset.sum_congr rfl (fun n hn => ?_)
       have h1 : (resL p (Fin.last K, ρ) 0 z).coeff n = z.coeff n := by
         show (initPart (Fin.last K, ρ) 0 z).coeff n = _
-        rw [coeff_initPart, if_pos (show n (Fin.last K, ρ) = 0 from mem_of_mem_support_restrictSupport hgF hn)]
+        rw [coeff_initPart,
+          if_pos (show n (Fin.last K, ρ) = 0 from mem_of_mem_support_restrictSupport hgF hn)]
       rw [h1]
-    have f2 : fock p g z = fock p g y := by
-      rw [hz, ← hE4 g y hgW hy_ws, hPEfix g ⟨hgH, hgW⟩]
+    have f2 : fock p g z = fock p g y := by rw [hz, ← hE4 g y hgW hy_ws, hPEfix g ⟨hgH, hgW⟩]
     have f3 : fock p g y = fock p g (monomial m 1) := lcomp_fock P hPsa g (hPg g hg) _ _
     rw [f1, f2, f3]
 

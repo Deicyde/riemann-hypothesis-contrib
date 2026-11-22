@@ -27,31 +27,33 @@ theorem mem_normInteger {x : K} : x ∈ normInteger K ↔ ‖x‖ ≤ 1 := by
 theorem normInteger_integers : (NormedField.valuation (K := K)).Integers (normInteger K) :=
   Valuation.integer.integers _
 
-
-theorem mem_span_singleton_pow_iff {a x : normInteger K} (n : ℕ) :
-    x ∈ Ideal.span {a} ^ n ↔ ‖(x : K)‖ ≤ ‖(a : K)‖ ^ n := by
+theorem mem_span_singleton_pow_iff {a x : normInteger K} (n : ℕ)
+    : x ∈ Ideal.span {a} ^ n ↔ ‖(x : K)‖ ≤ ‖(a : K)‖ ^ n := by
   rw [Ideal.span_singleton_pow, Ideal.mem_span_singleton']
   constructor
   · rintro ⟨y, rfl⟩
     rw [Subring.coe_mul, SubmonoidClass.coe_pow, norm_mul, norm_pow]
-    calc ‖(y : K)‖ * ‖(a : K)‖ ^ n ≤ 1 * ‖(a : K)‖ ^ n := by
-          gcongr; exact mem_normInteger.1 y.2
+    calc
+      ‖(y : K)‖ * ‖(a : K)‖ ^ n
+        ≤ 1 * ‖(a : K)‖ ^ n := by gcongr; exact mem_normInteger.1 y.2
       _ = _ := one_mul _
   · intro hx
     by_cases ha : (a : K) ^ n = 0
     · refine ⟨0, ?_⟩
       have : ‖(x : K)‖ = 0 := le_antisymm (by simpa [← norm_pow, ha] using hx) (norm_nonneg _)
-      ext; simp [norm_eq_zero.1 this]
+      ext
+      simp [norm_eq_zero.1 this]
     · refine ⟨⟨(x : K) / (a : K) ^ n, mem_normInteger.2 ?_⟩, ?_⟩
       · rw [norm_div, norm_pow]
         exact div_le_one_of_le₀ hx (by positivity)
       · ext; simp [div_mul_cancel₀ _ ha]
 
-theorem isAdicComplete_span_singleton [CompleteSpace K] {a : normInteger K}
-    (ha : ‖(a : K)‖ < 1) : IsAdicComplete (Ideal.span {a}) (normInteger K) := by
-  have hmem : ∀ (n : ℕ) (x y : normInteger K),
-      x ≡ y [SMOD (Ideal.span {a} ^ n • ⊤ : Submodule (normInteger K) (normInteger K))] ↔
-        ‖(x : K) - y‖ ≤ ‖(a : K)‖ ^ n := by
+theorem isAdicComplete_span_singleton [CompleteSpace K] {a : normInteger K} (ha : ‖(a : K)‖ < 1)
+    : IsAdicComplete (Ideal.span {a}) (normInteger K) := by
+  have hmem
+      : ∀ (n : ℕ) (x y : normInteger K),
+        x ≡ y [SMOD (Ideal.span {a} ^ n • ⊤ : Submodule (normInteger K) (normInteger K))]
+          ↔ ‖(x : K) - y‖ ≤ ‖(a : K)‖ ^ n := by
     intro n x y
     rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, mem_span_singleton_pow_iff]
     simp
@@ -61,7 +63,8 @@ theorem isAdicComplete_span_singleton [CompleteSpace K] {a : normInteger K}
     have ht : Filter.Tendsto (fun n : ℕ => ‖(a : K)‖ ^ n) Filter.atTop (nhds 0) :=
       tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) ha
     have : ‖(x : K)‖ ≤ 0 := ge_of_tendsto' ht hx
-    ext; simpa using this
+    ext
+    simpa using this
   · intro f hf
     simp only [hmem] at hf
     have ht : Filter.Tendsto (fun n : ℕ => ‖(a : K)‖ ^ n) Filter.atTop (nhds 0) :=
@@ -73,16 +76,15 @@ theorem isAdicComplete_span_singleton [CompleteSpace K] {a : normInteger K}
       rw [dist_eq_norm, norm_sub_rev]
       exact (hf hn).trans_lt (hN N le_rfl)
     obtain ⟨L, hL⟩ := cauchySeq_tendsto_of_complete hc
-    have hL1 : ‖L‖ ≤ 1 :=
-      le_of_tendsto' hL.norm fun n => mem_normInteger.1 (f n).2
+    have hL1 : ‖L‖ ≤ 1 := le_of_tendsto' hL.norm fun n => mem_normInteger.1 (f n).2
     refine ⟨⟨L, mem_normInteger.2 hL1⟩, fun n => (hmem n _ _).2 ?_⟩
     have h2 : Filter.Tendsto (fun m => (f n : K) - f m) Filter.atTop (nhds ((f n : K) - L)) :=
       tendsto_const_nhds.sub hL
     exact le_of_tendsto h2.norm (Filter.eventually_atTop.2 ⟨n, fun m hm => hf hm⟩)
 
-theorem surjective_pow_modP_of_exists_pow_eq {p : ℕ} (hp : p ≠ 0)
-    (h : ∀ x : K, ‖x‖ ≤ 1 → ∃ y : K, y ^ p = x) :
-    Function.Surjective (fun x : ModP (normInteger K) p => x ^ p) := by
+theorem surjective_pow_modP_of_exists_pow_eq
+    {p : ℕ} (hp : p ≠ 0) (h : ∀ x : K, ‖x‖ ≤ 1 → ∃ y : K, y ^ p = x)
+    : Function.Surjective (fun x : ModP (normInteger K) p => x ^ p) := by
   intro z
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective z
   obtain ⟨y, hy⟩ := h x (mem_normInteger.1 x.2)
@@ -92,19 +94,17 @@ theorem surjective_pow_modP_of_exists_pow_eq {p : ℕ} (hp : p ≠ 0)
   refine ⟨Ideal.Quotient.mk _ ⟨y, mem_normInteger.2 hy1⟩, ?_⟩
   simp only [← map_pow]
   congr 1
-  ext; simp [hy]
+  ext
+  simp [hy]
 
 end Integers
 
-class IsPerfectoidField (K : Type*) [NontriviallyNormedField K] [IsUltrametricDist K]
-    (p : ℕ) [Fact p.Prime] : Prop where
-
+class IsPerfectoidField
+    (K : Type*) [NontriviallyNormedField K] [IsUltrametricDist K] (p : ℕ) [Fact p.Prime]
+    : Prop where
   complete : CompleteSpace K
-
   norm_natCast_lt_one : ‖(p : K)‖ < 1
-
   exists_norm_mem_Ioo : ∀ r : ℝ, r < 1 → ∃ x : K, r < ‖x‖ ∧ ‖x‖ < 1
-
   surjective_pow : Function.Surjective (fun x : ModP (normInteger K) p => x ^ p)
 
 namespace IsPerfectoidField
@@ -121,7 +121,8 @@ theorem norm_natCast_integer_lt_one : ‖((p : normInteger K) : K)‖ < 1 := by
 instance fact_not_isUnit : Fact (¬ IsUnit (p : normInteger K)) := by
   refine ⟨fun hu => ?_⟩
   obtain ⟨u, hu⟩ := hu
-  have h1 : ‖((u : normInteger K) : K)‖ * ‖(((u⁻¹ : (normInteger K)ˣ) : normInteger K) : K)‖ = 1 := by
+  have h1
+      : ‖((u : normInteger K) : K)‖ * ‖(((u⁻¹ : (normInteger K)ˣ) : normInteger K) : K)‖ = 1 := by
     rw [← norm_mul, ← Subring.coe_mul, Units.mul_inv]; simp
   have ha : ‖((u : normInteger K) : K)‖ < 1 := hu ▸ norm_natCast_integer_lt_one p
   have hb := mem_normInteger.1 ((u⁻¹ : (normInteger K)ˣ) : normInteger K).2
@@ -141,7 +142,8 @@ instance isAdicComplete : IsAdicComplete (Ideal.span {(p : normInteger K)}) (nor
 theorem surjective_frobenius : Function.Surjective (frobenius (ModP (normInteger K) p) p) :=
   IsPerfectoidField.surjective_pow
 
-theorem surjective_fontaineTheta : Function.Surjective (WittVector.fontaineTheta (normInteger K) p) :=
+theorem surjective_fontaineTheta
+    : Function.Surjective (WittVector.fontaineTheta (normInteger K) p) :=
   _root_.surjective_fontaineTheta (surjective_frobenius p)
 
 theorem isDomain_preTilt : IsDomain (PreTilt (normInteger K) p) :=
@@ -153,11 +155,9 @@ namespace IsPerfectoidField
 
 variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K]
 
-
 omit [IsUltrametricDist K] in
-theorem exists_norm_mem_Ioo_of_exists_pow_eq
-    (h : ∀ (x : K) (n : ℕ), 0 < n → ∃ y : K, y ^ n = x) :
-    ∀ r : ℝ, r < 1 → ∃ x : K, r < ‖x‖ ∧ ‖x‖ < 1 := by
+theorem exists_norm_mem_Ioo_of_exists_pow_eq (h : ∀ (x : K) (n : ℕ), 0 < n → ∃ y : K, y ^ n = x)
+    : ∀ r : ℝ, r < 1 → ∃ x : K, r < ‖x‖ ∧ ‖x‖ < 1 := by
   intro r hr
   obtain ⟨c, hc0, hc1⟩ := NormedField.exists_norm_lt_one K
   set r' := max r 0 with hr'
@@ -176,12 +176,12 @@ theorem exists_norm_mem_Ioo_of_exists_pow_eq
   · rw [← pow_lt_one_iff_of_nonneg (norm_nonneg y) hN0, hyN]
     exact hc1
 
-theorem of_isAlgClosed (p : ℕ) [Fact p.Prime] [CompleteSpace K] [IsAlgClosed K]
-    (hp : ‖(p : K)‖ < 1) : IsPerfectoidField K p := by
+theorem of_isAlgClosed (p : ℕ) [Fact p.Prime] [CompleteSpace K] [IsAlgClosed K] (hp : ‖(p : K)‖ < 1)
+    : IsPerfectoidField K p := by
   refine ⟨inferInstance, hp, ?_, ?_⟩
   · exact exists_norm_mem_Ioo_of_exists_pow_eq fun x _ hn => IsAlgClosed.exists_pow_nat_eq x hn
-  · exact surjective_pow_modP_of_exists_pow_eq (Fact.out : p.Prime).ne_zero
-      fun x _ => IsAlgClosed.exists_pow_nat_eq x (Fact.out : p.Prime).pos
+  · exact surjective_pow_modP_of_exists_pow_eq (Fact.out : p.Prime).ne_zero fun x _ =>
+      IsAlgClosed.exists_pow_nat_eq x (Fact.out : p.Prime).pos
 
 instance padicComplex (p : ℕ) [Fact p.Prime] : IsPerfectoidField ℂ_[p] p :=
   of_isAlgClosed p (by

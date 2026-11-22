@@ -6,21 +6,36 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RangeSubsetOf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 
 noncomputable section
 namespace GlobalTheory.LevCover
 
-theorem implocus_open_closed : ∀ (Y : Scheme.{0}) (Z : Over Y) (P Q : ∀ T : Over Y, (T ⟶ Z) → Prop), IsFinite Z.hom → Etale Z.hom → GlobalTheory.LevCover.ClopenCond Z P → GlobalTheory.LevCover.ClopenCond Z Q → ∃ W : Set Y, IsOpen W ∧ IsClosed W ∧ (∀ (Tb : Scheme.{0}) (t : Tb ⟶ Y), Set.range t.base ⊆ W ↔ ∀ (T : Over Y) (σ : T.left ⟶ Tb), σ ≫ t = T.hom → ∀ z : T ⟶ Z, P T z → Q T z) ∧ ∀ (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ Y), Set.range x.base ⊆ W ↔ ∀ z : Over.mk x ⟶ Z, P _ z → Q _ z := by
+theorem implocus_open_closed
+    : ∀ (Y : Scheme.{0}) (Z : Over Y) (P Q : ∀ T : Over Y, (T ⟶ Z) → Prop),
+      IsFinite Z.hom → Etale Z.hom → GlobalTheory.LevCover.ClopenCond Z P
+        → GlobalTheory.LevCover.ClopenCond Z Q
+        → ∃ W : Set Y,
+          IsOpen W ∧ IsClosed W
+            ∧ (∀ (Tb : Scheme.{0}) (t : Tb ⟶ Y),
+              Set.range t.base ⊆ W
+                ↔ ∀ (T : Over Y) (σ : T.left ⟶ Tb), σ ≫ t = T.hom → ∀ z : T ⟶ Z, P T z → Q T z)
+            ∧ ∀ (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ Y),
+              Set.range x.base ⊆ W ↔ ∀ z : Over.mk x ⟶ Z, P _ z → Q _ z := by
   intro Y Z P Q hfin het hP hQ
   obtain ⟨U, hUc, HU⟩ := hP
   obtain ⟨V, hVc, HV⟩ := hQ
   let B : Set Z.left := (U : Set Z.left) \ V
   have hBo : IsOpen B := U.isOpen.sdiff hVc
   have hBc : IsClosed B := hUc.sdiff V.isOpen
-  have c1 : ∀ (Tb : Scheme.{0}) (t : Tb ⟶ Y), Set.range t.base ⊆ (Z.hom.base '' B)ᶜ ↔
-      ∀ (T : Over Y) (σ : T.left ⟶ Tb), σ ≫ t = T.hom → ∀ z : T ⟶ Z, P T z → Q T z := by
+  have c1
+      : ∀ (Tb : Scheme.{0}) (t : Tb ⟶ Y),
+        Set.range t.base ⊆ (Z.hom.base '' B)ᶜ
+          ↔ ∀ (T : Over Y) (σ : T.left ⟶ Tb), σ ≫ t = T.hom → ∀ z : T ⟶ Z, P T z → Q T z := by
     intro Tb t
     constructor
     · intro hW T σ hσ z hPz
@@ -49,13 +64,19 @@ theorem implocus_open_closed : ∀ (Y : Scheme.{0}) (Z : Over Y) (P Q : ∀ T : 
       have hpO : p ∈ Set.range O.ι.base := by
         rw [Scheme.Opens.range_ι O]
         show (pullback.snd t Z.hom).base p ∈ B
-        rw [hp2]; exact hu
+        rw [hp2]
+        exact hu
       obtain ⟨w, hw⟩ := hpO
       apply hu.2
       have := hQz ⟨w, rfl⟩
       simpa [z, Scheme.Hom.comp_apply, hw, hp2] using this
-  refine ⟨(Z.hom.base '' B)ᶜ, (Z.hom.isClosedMap _ hBc).isOpen_compl,
-    (Z.hom.isOpenMap _ hBo).isClosed_compl, c1, ?_⟩
+  refine ⟨
+    (Z.hom.base '' B)ᶜ,
+    (Z.hom.isClosedMap _ hBc).isOpen_compl,
+    (Z.hom.isOpenMap _ hBo).isClosed_compl,
+    c1,
+    ?_
+  ⟩
   intro k _ _ x
   constructor
   · intro hW z hPz
@@ -66,10 +87,11 @@ theorem implocus_open_closed : ∀ (Y : Scheme.{0}) (Z : Over Y) (P Q : ∀ T : 
     haveI : IsClosedImmersion Bo.ι := .of_isPreimmersion _ (by rw [Scheme.Opens.range_ι]; exact hBc)
     have huB : u ∈ Set.range Bo.ι.base := by rw [Scheme.Opens.range_ι]; exact hu
     obtain ⟨v, hv⟩ := huB
-    obtain ⟨w, hw⟩ := GlobalTheory.LevCover.exists_lift_geom (Bo.ι ≫ Z.hom) x (by
-      rintro _ ⟨s', rfl⟩
-      refine ⟨v, ?_⟩
-      rw [Subsingleton.elim s' s, Scheme.Hom.comp_apply, hv, hs])
+    obtain ⟨w, hw⟩ :=
+      GlobalTheory.LevCover.exists_lift_geom (Bo.ι ≫ Z.hom) x (by
+        rintro _ ⟨s', rfl⟩
+        refine ⟨v, ?_⟩
+        rw [Subsingleton.elim s' s, Scheme.Hom.comp_apply, hv, hs])
     let z : Over.mk x ⟶ Z := Over.homMk (w ≫ Bo.ι) (by simpa using hw)
     have hPz : P _ z := by
       rw [HU]

@@ -11,8 +11,12 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem linearIndependent_tmul_D_of_regular_system :
-    ∀ (k A : Type) [Field k] [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [Algebra k A] [Algebra.FormallySmooth k (IsLocalRing.ResidueField A)] (n : ℕ) (t : Fin n → A), Ideal.span (Set.range t) = IsLocalRing.maximalIdeal A → (n : WithBot ℕ∞) = ringKrullDim A → LinearIndependent (IsLocalRing.ResidueField A) (fun a => (1 : IsLocalRing.ResidueField A) ⊗ₜ[A] KaehlerDifferential.D k A (t a)) := by
+theorem linearIndependent_tmul_D_of_regular_system
+    : ∀ (k A : Type) [Field k] [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [Algebra k A]
+        [Algebra.FormallySmooth k (IsLocalRing.ResidueField A)] (n : ℕ) (t : Fin n → A),
+      Ideal.span (Set.range t) = IsLocalRing.maximalIdeal A → (n : WithBot ℕ∞) = ringKrullDim A
+        → LinearIndependent (IsLocalRing.ResidueField A)
+          (fun a => (1 : IsLocalRing.ResidueField A) ⊗ₜ[A] KaehlerDifferential.D k A (t a)) := by
   intro k A _ _ _ _ _ _ n t hspan hdim
   classical
   have htm : ∀ i, t i ∈ maximalIdeal A := fun i => hspan ▸ Ideal.subset_span ⟨i, rfl⟩
@@ -35,16 +39,19 @@ theorem linearIndependent_tmul_D_of_regular_system :
     exact Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (htm j)
   have htk : ∀ j, algebraMap A (ResidueField A) (t j) = 0 := fun j => by
     rw [← RingHom.mem_ker, hker]; exact htm j
-  have h0 : KaehlerDifferential.kerCotangentToTensor k A (ResidueField A)
-      ((RingHom.ker (algebraMap A (ResidueField A))).toCotangent ⟨_, hx⟩) = 0 := by
+  have h0
+      : KaehlerDifferential.kerCotangentToTensor k A (ResidueField A)
+          ((RingHom.ker (algebraMap A (ResidueField A))).toCotangent ⟨_, hx⟩)
+        = 0 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [KaehlerDifferential.kerCotangentToTensor_toCotangent, map_sum, tmul_sum, ← hg]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Derivation.leibniz, tmul_add, ← smul_tmul, ← smul_tmul, Algebra.smul_def, mul_one,
       Algebra.smul_def, mul_one, htk, zero_tmul, add_zero, smul_tmul', smul_eq_mul, mul_one]
-    rw [← hb j]; rfl
-  have hinj := kerCotangentToTensor_injective_of_formallySmooth k A (ResidueField A)
-    residue_surjective
+    rw [← hb j]
+    rfl
+  have hinj :=
+    kerCotangentToTensor_injective_of_formallySmooth k A (ResidueField A) residue_surjective
   have h2 : ∑ j, b j * t j ∈ RingHom.ker (algebraMap A (ResidueField A)) ^ 2 :=
     (Ideal.toCotangent_eq_zero _ _).mp (hinj (h0.trans (map_zero _).symm))
   rw [hker] at h2

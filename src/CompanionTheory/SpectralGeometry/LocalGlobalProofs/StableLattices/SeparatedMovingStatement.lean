@@ -13,7 +13,8 @@ variable {G G' : Type} [Group G] [Group G']
 
 def cosetEquiv (e : G ≃* G') (K : Subgroup G) : G ⧸ K ≃ G' ⧸ K.map e.toMonoidHom :=
   Quotient.congr (ra := QuotientGroup.leftRel K) (rb := QuotientGroup.leftRel (K.map e.toMonoidHom))
-    e.toEquiv (by
+    e.toEquiv
+    (by
       intro a b
       have h : (e.toEquiv a)⁻¹ * e.toEquiv b = e.toMonoidHom (a⁻¹ * b) := by simp
       rw [QuotientGroup.leftRel_apply, QuotientGroup.leftRel_apply, h]
@@ -39,8 +40,9 @@ theorem stSepMove : StSepMove := by
   have hact : ∀ (γ : Γ) (x : G ⧸ K), φ (γ • x) = (⟨e (γ : G), hmem γ⟩ : Γ') • φ x := fun γ x =>
     cosetEquiv_smul e K (γ : G) x
   refine ⟨Γ, ?_, ?_, ?_⟩
-  · let f : MulAction.orbitRel.Quotient Γ' (G' ⧸ K.map e.toMonoidHom) →
-        MulAction.orbitRel.Quotient Γ (G ⧸ K) :=
+  · let f
+        : MulAction.orbitRel.Quotient Γ' (G' ⧸ K.map e.toMonoidHom)
+          → MulAction.orbitRel.Quotient Γ (G ⧸ K) :=
       Quotient.map' φ.symm (by
         rintro a b ⟨γ', rfl⟩
         refine ⟨⟨e.symm (γ' : G'), hsymm γ'⟩, ?_⟩
@@ -54,12 +56,15 @@ theorem stSepMove : StSepMove := by
     intro q
     induction q using Quotient.inductionOn' with
     | h x =>
-      exact ⟨Quotient.mk'' (φ x),
-        congrArg (Quotient.mk'' (s₁ := MulAction.orbitRel Γ (G ⧸ K))) (φ.symm_apply_apply x)⟩
+      exact ⟨
+        Quotient.mk'' (φ x),
+        congrArg (Quotient.mk'' (s₁ := MulAction.orbitRel Γ (G ⧸ K))) (φ.symm_apply_apply x)
+      ⟩
   · intro x
-    let f : MulAction.stabilizer Γ x → MulAction.stabilizer Γ' (φ x) := fun γ =>
-      ⟨⟨e ((γ : Γ) : G), hmem γ⟩, by
-        rw [MulAction.mem_stabilizer_iff, ← hact, MulAction.mem_stabilizer_iff.mp γ.2]⟩
+    let f : MulAction.stabilizer Γ x → MulAction.stabilizer Γ' (φ x) := fun γ => ⟨
+      ⟨e ((γ : Γ) : G), hmem γ⟩,
+      by rw [MulAction.mem_stabilizer_iff, ← hact, MulAction.mem_stabilizer_iff.mp γ.2]
+    ⟩
     refine Finite.of_injective f ?_
     intro a b hab
     have h := congrArg (fun c : MulAction.stabilizer Γ' (φ x) => ((c : Γ') : G')) hab

@@ -11,10 +11,10 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.SurjectionOntoH4
 open CrystallineSemistableComparison.Onto
 
-theorem sub_oneE_mem_cone {n d : ℕ} {S : Finset (Fin d)} {g : Gam n d}
-    (hg : g ∈ (cone S : AddSubmonoid (Gam n d))) (ht : 1 ≤ tdeg g) (k : Fin d)
-    (hk : k ∈ S ∨ 1 ≤ g (Sum.inr k)) :
-    g - oneE (Sum.inr k) ∈ (cone S : AddSubmonoid (Gam n d)) := by
+theorem sub_oneE_mem_cone
+    {n d : ℕ} {S : Finset (Fin d)} {g : Gam n d} (hg : g ∈ (cone S : AddSubmonoid (Gam n d)))
+    (ht : 1 ≤ tdeg g) (k : Fin d) (hk : k ∈ S ∨ 1 ≤ g (Sum.inr k))
+    : g - oneE (Sum.inr k) ∈ (cone S : AddSubmonoid (Gam n d)) := by
   have hg' : (∀ l, 0 ≤ g (Sum.inl l)) ∧ (∀ j, j ∉ S → 0 ≤ g (Sum.inr j)) ∧ 0 ≤ tdeg g := hg
   obtain ⟨h1, h2, _⟩ := hg'
   show (∀ l, 0 ≤ (g - oneE (Sum.inr k) : Gam n d) (Sum.inl l)) ∧
@@ -45,23 +45,27 @@ theorem sub_oneE_mem_cone {n d : ℕ} {S : Finset (Fin d)} {g : Gam n d}
     have ht' : 1 ≤ ∑ j, g (Sum.inr j) := ht
     omega
 
-theorem monomial_mem_exceptional_ideal {K : Type} [Field K] {n d : ℕ} (S : Finset (Fin d)) (g : Gam n d)
-    (hg : g ∈ (cone S : AddSubmonoid (Gam n d))) (ht : 1 ≤ tdeg g) : mon K g hg ∈ I0 n K S := by
+theorem monomial_mem_exceptional_ideal
+    {K : Type} [Field K]
+    {n d : ℕ} (S : Finset (Fin d)) (g : Gam n d) (hg : g ∈ (cone S : AddSubmonoid (Gam n d)))
+    (ht : 1 ≤ tdeg g)
+    : mon K g hg ∈ I0 n K S := by
   have hex : ∃ k, (S = ∅ ∨ k ∈ S) ∧ (k ∈ S ∨ 1 ≤ g (Sum.inr k)) := by
     by_cases hS : S = ∅
     · by_contra hno
       push_neg at hno
-      have hsum : ∑ j, g (Sum.inr j) ≤ 0 := Finset.sum_nonpos fun j _ => by
-        have := (hno j (Or.inl hS)).2
-        omega
+      have hsum : ∑ j, g (Sum.inr j) ≤ 0 :=
+        Finset.sum_nonpos fun j _ => by
+          have := (hno j (Or.inl hS)).2
+          omega
       have ht' : 1 ≤ ∑ j, g (Sum.inr j) := ht
       omega
     · obtain ⟨k, hk⟩ := Finset.nonempty_iff_ne_empty.2 hS
       exact ⟨k, Or.inr hk, Or.inl hk⟩
   obtain ⟨k, hkS, hk⟩ := hex
   have h' := sub_oneE_mem_cone hg ht k hk
-  have hmul : mon K g hg =
-      mon K (oneE (Sum.inr k)) (oneE_mem S _) * mon K (g - oneE (Sum.inr k)) h' := by
+  have hmul
+      : mon K g hg = mon K (oneE (Sum.inr k)) (oneE_mem S _) * mon K (g - oneE (Sum.inr k)) h' := by
     simp only [mon, AddMonoidAlgebra.single_mul_single, mul_one]
     congr 1
     ext1

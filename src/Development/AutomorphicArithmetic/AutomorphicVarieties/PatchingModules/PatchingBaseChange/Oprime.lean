@@ -7,12 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 open scoped TensorProduct
 
-private theorem op_mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} (x : Fin r → R) :
-    x ∈ J • (⊤ : Submodule R (Fin r → R)) ↔ ∀ i, x i ∈ J := by
+private theorem op_mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} (x : Fin r → R)
+    : x ∈ J • (⊤ : Submodule R (Fin r → R)) ↔ ∀ i, x i ∈ J := by
   constructor
   · intro hx
-    refine Submodule.smul_induction_on (p := fun y : Fin r → R => ∀ i, y i ∈ J) hx
-      (fun a ha y _ i => ?_) (fun a b ha hb i => ?_)
+    refine Submodule.smul_induction_on
+      (p := fun y : Fin r → R => ∀ i, y i ∈ J)
+      hx
+      (fun a ha y _ i => ?_)
+      (fun a b ha hb i => ?_)
     · simpa using J.mul_mem_right (y i) ha
     · simpa using J.add_mem (ha i) (hb i)
   · intro hx
@@ -26,8 +29,9 @@ private theorem op_mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : �
     rw [hs]
     exact Submodule.smul_mem_smul (hx i) trivial
 
-private theorem op_isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (r : ℕ) :
-    IsPrecomplete I (Fin r → R) := by
+private theorem op_isPrecomplete_pi
+    {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (r : ℕ)
+    : IsPrecomplete I (Fin r → R) := by
   refine ⟨fun f hf => ?_⟩
   have hc : ∀ i, ∃ L : R, ∀ n, f n i ≡ L [SMOD (I ^ n • ⊤ : Submodule R R)] := by
     intro i
@@ -44,8 +48,10 @@ private theorem op_isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPre
   rw [SModEq.sub_mem] at h
   simpa [smul_eq_mul, Ideal.mul_top] using h
 
-private theorem op_isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
-    [Module.Finite R M] (I : Ideal R) [IsPrecomplete I R] : IsPrecomplete I M := by
+private theorem op_isPrecomplete_finite
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (I : Ideal R) [IsPrecomplete I R]
+    : IsPrecomplete I M := by
   obtain ⟨r, φ, hφ⟩ := Module.Finite.exists_fin' R M
   haveI := op_isPrecomplete_pi I r
   have hmap : ∀ n, (I ^ n • ⊤ : Submodule R M) = (I ^ n • ⊤ : Submodule R (Fin r → R)).map φ := by
@@ -72,7 +78,7 @@ private theorem op_isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup 
   have hFc : ∀ {m n}, m ≤ n → F m ≡ F n [SMOD (I ^ m • ⊤ : Submodule R (Fin r → R))] := by
     intro m n hmn
     rw [SModEq.sub_mem]
-    have he : F m - F n = -∑ k ∈ Finset.Ico m n, d k := by
+    have he : F m - F n = - ∑ k ∈ Finset.Ico m n, d k := by
       simp only [F]
       rw [← Finset.sum_range_add_sum_Ico _ hmn]
       abel
@@ -86,8 +92,10 @@ private theorem op_isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup 
   rw [hmap, ← hF n, ← map_sub]
   exact Submodule.mem_map_of_mem h
 
-private theorem op_localHom (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    (K : Type) [Field K] [Finite K] [Algebra O K] : IsLocalHom (algebraMap O K) := by
+private theorem op_localHom
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (K : Type) [Field K] [Finite K] [Algebra O K]
+    : IsLocalHom (algebraMap O K) := by
   have hne : RingHom.ker (algebraMap O K) ≠ ⊥ := by
     intro h
     have hinj : Function.Injective (algebraMap O K) := (RingHom.injective_iff_ker_eq_bot _).mpr h
@@ -105,8 +113,16 @@ private theorem op_localHom (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValu
   exact not_isUnit_zero hx
 
 open Polynomial in
-theorem UpperTheory.V.Pa.BC.oprime :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] (K : Type) [Field K] [Finite K] [Algebra O K], ∃ (O' : Type) (_ : CommRing O') (_ : IsDomain O') (_ : IsDiscreteValuationRing O') (_ : Algebra O O') (α : O') (P : Polynomial O), IsCoef l O' ∧ Module.Finite O O' ∧ Module.Free O O' ∧ IsLocalHom (algebraMap O O') ∧ Nat.card (ResidueField O') = Nat.card K ∧ Algebra.adjoin O {α} = ⊤ ∧ P.Monic ∧ Polynomial.aeval α P = 0 ∧ ∀ (K' : Type) [Field K'] [Finite K'] [Algebra O K'], Nat.card K' = Nat.card K → (P.map (algebraMap O K')).Splits := by
+theorem UpperTheory.V.Pa.BC.oprime
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] (K : Type) [Field K] [Finite K] [Algebra O K],
+      ∃ (O' : Type) (_ : CommRing O') (_ : IsDomain O') (_ : IsDiscreteValuationRing O')
+          (_ : Algebra O O') (α : O') (P : Polynomial O),
+        IsCoef l O' ∧ Module.Finite O O' ∧ Module.Free O O' ∧ IsLocalHom (algebraMap O O')
+          ∧ Nat.card (ResidueField O') = Nat.card K ∧ Algebra.adjoin O {α} = ⊤ ∧ P.Monic
+          ∧ Polynomial.aeval α P = 0
+          ∧ ∀ (K' : Type) [Field K'] [Finite K'] [Algebra O K'],
+            Nat.card K' = Nat.card K → (P.map (algebraMap O K')).Splits := by
   intro l _ O _ _ _ _ K _ _ _
   classical
   haveI := op_localHom O K
@@ -118,16 +134,19 @@ theorem UpperTheory.V.Pa.BC.oprime :
   have hαi : IsIntegral (ResidueField O) α := .of_finite _ α
   have hgi : Irreducible (minpoly (ResidueField O) α) := minpoly.irreducible hαi
   have hgm : (minpoly (ResidueField O) α).Monic := minpoly.monic hαi
-  obtain ⟨P, hPmap, -, hPmon⟩ := Polynomial.lifts_and_natDegree_eq_and_monic
-    (f := IsLocalRing.residue O) (p := minpoly (ResidueField O) α)
-    (by
-      rw [Polynomial.lifts_iff_set_range,
-        (Polynomial.map_surjective _ IsLocalRing.residue_surjective).range_eq]
-      trivial) hgm
+  obtain ⟨P, hPmap, -, hPmon⟩ :=
+    Polynomial.lifts_and_natDegree_eq_and_monic (f := IsLocalRing.residue O)
+      (p := minpoly (ResidueField O) α)
+      (by
+        rw [Polynomial.lifts_iff_set_range,
+          (Polynomial.map_surjective _ IsLocalRing.residue_surjective).range_eq]
+        trivial)
+      hgm
   haveI : Module.Finite O (AdjoinRoot P) := (AdjoinRoot.powerBasis' hPmon).finite
   haveI : Module.Free O (AdjoinRoot P) := Module.Free.of_basis (AdjoinRoot.powerBasis' hPmon).basis
   set M : Ideal (AdjoinRoot P) := (maximalIdeal O).map (algebraMap O (AdjoinRoot P)) with hM
-  let e0 : AdjoinRoot (P.map (IsLocalRing.residue O)) ≃+* AdjoinRoot (minpoly (ResidueField O) α) := by
+  let e0
+      : AdjoinRoot (P.map (IsLocalRing.residue O)) ≃+* AdjoinRoot (minpoly (ResidueField O) α) := by
     rw [hPmap]
   let e1 : AdjoinRoot P ⧸ M ≃+* AdjoinRoot (minpoly (ResidueField O) α) :=
     (AdjoinRoot.quotAdjoinRootEquivQuotPolynomialQuot (maximalIdeal O) P).trans e0
@@ -155,7 +174,8 @@ theorem UpperTheory.V.Pa.BC.oprime :
     rw [hπ, ← map_pow] at h
     exact pow_ne_zero n hϖ.ne_zero (hinj (h.trans (map_zero _).symm))
   have hKrull : ⨅ i : ℕ, M ^ i = ⊥ := Ideal.iInf_pow_eq_bot_of_isLocalRing M hMmax.ne_top
-  have hfac : ∀ x : AdjoinRoot P, x ≠ 0 → ∃ n : ℕ, ∃ u : AdjoinRoot P, IsUnit u ∧ x = π ^ n * u := by
+  have hfac
+      : ∀ x : AdjoinRoot P, x ≠ 0 → ∃ n : ℕ, ∃ u : AdjoinRoot P, IsUnit u ∧ x = π ^ n * u := by
     intro x hx
     have hex : ∃ i : ℕ, x ∉ M ^ i := by
       by_contra h
@@ -195,53 +215,78 @@ theorem UpperTheory.V.Pa.BC.oprime :
   have hprin : (maximalIdeal (AdjoinRoot P)).IsPrincipal := ⟨⟨π, by rw [← hMeq, hMspan]⟩⟩
   haveI : IsDiscreteValuationRing (AdjoinRoot P) :=
     ((IsDiscreteValuationRing.TFAE (AdjoinRoot P) hnf).out 1 5).mpr hprin
-  have hsub : ∀ n : ℕ, ((maximalIdeal O ^ n • ⊤ : Submodule O (AdjoinRoot P)) : Set (AdjoinRoot P))
-      = ((maximalIdeal (AdjoinRoot P) ^ n • ⊤ : Submodule (AdjoinRoot P) (AdjoinRoot P)) : Set (AdjoinRoot P)) := by
+  have hsub
+      : ∀ n : ℕ,
+        ((maximalIdeal O ^ n • ⊤ : Submodule O (AdjoinRoot P)) : Set (AdjoinRoot P))
+          = ((maximalIdeal (AdjoinRoot P) ^ n • ⊤ : Submodule (AdjoinRoot P) (AdjoinRoot P))
+            : Set (AdjoinRoot P)) := by
     intro n
     rw [Ideal.smul_top_eq_map, smul_eq_mul, Ideal.mul_top, ← hMeq, hM, Ideal.map_pow]
     rfl
   haveI : IsPrecomplete (maximalIdeal O) O := (IsCoef.complete (l := l) (O := O)).toIsPrecomplete
-  have hpre : IsPrecomplete (maximalIdeal O) (AdjoinRoot P) := op_isPrecomplete_finite (maximalIdeal O)
+  have hpre : IsPrecomplete (maximalIdeal O) (AdjoinRoot P) :=
+    op_isPrecomplete_finite (maximalIdeal O)
   have hcomp : IsAdicComplete (maximalIdeal (AdjoinRoot P)) (AdjoinRoot P) := by
     refine { haus' := ?_, prec' := ?_ }
     · intro x hx
-      have hmem : x ∈ ⨅ i : ℕ, M ^ i := (Submodule.mem_iInf _).mpr fun n => by
-        have h := hx n
-        rw [SModEq.sub_mem, sub_zero] at h
-        rw [hMeq]
-        simpa [smul_eq_mul, Ideal.mul_top] using h
+      have hmem : x ∈ ⨅ i : ℕ, M ^ i :=
+        (Submodule.mem_iInf _).mpr fun n => by
+          have h := hx n
+          rw [SModEq.sub_mem, sub_zero] at h
+          rw [hMeq]
+          simpa [smul_eq_mul, Ideal.mul_top] using h
       rw [hKrull] at hmem
       exact hmem
     · intro f hf
-      obtain ⟨L, hL⟩ := hpre.prec' f (fun {m n} hmn => by
-        have h := hf hmn
-        rw [SModEq.sub_mem] at h ⊢
-        rw [← SetLike.mem_coe, hsub]
-        exact h)
+      obtain ⟨L, hL⟩ :=
+        hpre.prec' f (fun {m n} hmn => by
+          have h := hf hmn
+          rw [SModEq.sub_mem] at h ⊢
+          rw [← SetLike.mem_coe, hsub]
+          exact h)
       refine ⟨L, fun n => ?_⟩
       have h := hL n
       rw [SModEq.sub_mem] at h ⊢
       rw [← SetLike.mem_coe, ← hsub]
       exact h
-  have hlh : IsLocalHom (algebraMap O (AdjoinRoot P)) := ⟨fun x hx => by
-    by_contra hnu
-    have hxm : x ∈ maximalIdeal O := (IsLocalRing.mem_maximalIdeal _).mpr hnu
-    have hm : algebraMap O (AdjoinRoot P) x ∈ maximalIdeal (AdjoinRoot P) := by
-      rw [← hMeq]
-      exact Ideal.mem_map_of_mem _ hxm
-    exact (IsLocalRing.mem_maximalIdeal _).mp hm hx⟩
+  have hlh : IsLocalHom (algebraMap O (AdjoinRoot P)) :=
+    ⟨fun x hx => by
+      by_contra hnu
+      have hxm : x ∈ maximalIdeal O := (IsLocalRing.mem_maximalIdeal _).mpr hnu
+      have hm : algebraMap O (AdjoinRoot P) x ∈ maximalIdeal (AdjoinRoot P) := by
+        rw [← hMeq]
+        exact Ideal.mem_map_of_mem _ hxm
+      exact (IsLocalRing.mem_maximalIdeal _).mp hm hx⟩
   let eR : ResidueField (AdjoinRoot P) ≃+* K := (Ideal.quotEquivOfEq hMeq.symm).trans eK
   haveI hfin : Finite (ResidueField (AdjoinRoot P)) := Finite.of_equiv K eR.symm.toEquiv
   haveI : CharP (ResidueField O) l := IsCoef.char
   have hchar : CharP (ResidueField (AdjoinRoot P)) l :=
-    charP_of_injective_ringHom (IsLocalRing.ResidueField.map (algebraMap O (AdjoinRoot P))).injective l
-  refine ⟨AdjoinRoot P, inferInstance, inferInstance, inferInstance, inferInstance, AdjoinRoot.root P, P,
-    ⟨hcomp, hfin, hchar⟩, inferInstance, inferInstance, hlh, Nat.card_congr eR.toEquiv,
-    AdjoinRoot.adjoinRoot_eq_top, hPmon, by rw [AdjoinRoot.aeval_eq, AdjoinRoot.mk_self], ?_⟩
+    charP_of_injective_ringHom
+      (IsLocalRing.ResidueField.map (algebraMap O (AdjoinRoot P))).injective l
+  refine ⟨
+    AdjoinRoot P,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    AdjoinRoot.root P,
+    P,
+    ⟨hcomp, hfin, hchar⟩,
+    inferInstance,
+    inferInstance,
+    hlh,
+    Nat.card_congr eR.toEquiv,
+    AdjoinRoot.adjoinRoot_eq_top,
+    hPmon,
+    by rw [AdjoinRoot.aeval_eq, AdjoinRoot.mk_self],
+    ?_
+  ⟩
   intro K' _ _ _ hK'
   haveI := op_localHom O K'
   haveI : Fintype K' := Fintype.ofFinite K'
-  have hφ : algebraMap O K' = (IsLocalRing.ResidueField.lift (algebraMap O K')).comp (IsLocalRing.residue O) :=
+  have hφ
+      : algebraMap O K'
+        = (IsLocalRing.ResidueField.lift (algebraMap O K')).comp (IsLocalRing.residue O) :=
     (IsLocalRing.ResidueField.lift_comp_residue _).symm
   rw [hφ, ← Polynomial.map_map, hPmap]
   have hcard : Fintype.card K' = Fintype.card K := by

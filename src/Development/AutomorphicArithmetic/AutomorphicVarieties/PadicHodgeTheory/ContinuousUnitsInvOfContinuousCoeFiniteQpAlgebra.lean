@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module Topology UpperTheory.V.Loc UpperTheory.V.U3
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module Topology
+  UpperTheory.V.Loc UpperTheory.V.U3
 
-theorem UpperTheory.continuous_units_inv_of_continuous_coe_finite_Qp_algebra :
-    ∀ {l : ℕ} [Fact l.Prime] {B : Type} [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [TopologicalSpace B] [IsModuleTopology ℚ_[l] B] [IsTopologicalRing B] {X : Type} [TopologicalSpace X] (f : X → Bˣ), Continuous (fun x => (f x : B)) → Continuous fun x => (((f x)⁻¹ : Bˣ) : B) := by
+theorem UpperTheory.continuous_units_inv_of_continuous_coe_finite_Qp_algebra
+    : ∀ {l : ℕ} [Fact l.Prime] {B : Type} [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B]
+        [TopologicalSpace B] [IsModuleTopology ℚ_[l] B] [IsTopologicalRing B] {X : Type}
+        [TopologicalSpace X] (f : X → Bˣ),
+      Continuous (fun x => (f x : B)) → Continuous fun x => (((f x)⁻¹ : Bˣ) : B) := by
   intro l _ B _ _ _ _ _ _ X _ f hf
   classical
   let b := Module.finBasis ℚ_[l] B
@@ -20,8 +24,7 @@ theorem UpperTheory.continuous_units_inv_of_continuous_coe_finite_Qp_algebra :
       rw [← map_mul, Units.inv_mul, map_one]
     rw [hinv, Algebra.leftMulMatrix_mulVec_repr, mul_one]
     simp [E]
-  have hM : Continuous fun y : B => M y :=
-    IsModuleTopology.continuous_of_linearMap M.toLinearMap
+  have hM : Continuous fun y : B => M y := IsModuleTopology.continuous_of_linearMap M.toLinearMap
   have hE : Continuous E := LinearMap.continuous_on_pi E
   have hcomp : Continuous fun x => E (Matrix.mulVec (M (f x : B))⁻¹ (b.repr 1)) := by
     refine hE.comp ?_

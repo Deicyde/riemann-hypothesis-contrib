@@ -7,22 +7,30 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsTransl
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
 open IsDedekindDomain NumberField MeasureTheory Matrix
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames GlobalTheory.BigNZ GlobalTheory.AdelicU
-open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation (spV spW spW₁ spV₁ Num IsTripleOf IsDatumA skewGram blkU conjU UB)
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chars Rep IsTriple UAt ratU mat Acts SInf)
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StdFrames GlobalTheory.BigNZ GlobalTheory.AdelicU
+open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation
+  (spV spW spW₁ spV₁ Num IsTripleOf IsDatumA skewGram blkU conjU UB)
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  (Base Spc Model Chars Rep IsTriple UAt ratU mat Acts SInf)
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 open ValuativeRel
 
 namespace GlobalTheory.PrimFrameExist
 
-theorem exists_gl_mul_isPrimFrame : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (a : ℕ) (C : Type) [Fintype C] [DecidableEq C] (d : C → kˣ) (X : Matrix (Fin a) C k), X.rank = a →
-    ∃ g₀ : GL (Fin a) k, IsPrimFrame (diagLat d) (g₀.val * X) := by
+theorem exists_gl_mul_isPrimFrame
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (a : ℕ) (C : Type) [Fintype C] [DecidableEq C] (d : C → kˣ) (X : Matrix (Fin a) C k),
+      X.rank = a → ∃ g₀ : GL (Fin a) k, IsPrimFrame (diagLat d) (g₀.val * X) := by
   intro k _ _ _ _ a C _ _ d X hX
   classical
   set Λ : Submodule 𝒪[k] (C → k) := diagLat d with hΛdef
@@ -50,8 +58,9 @@ theorem exists_gl_mul_isPrimFrame : ∀ (k : Type) [Field k] [ValuativeRel k] [T
     exact b.linearIndependent.map' M.subtype M.ker_subtype
   have hclear : ∀ x : C → k, ∃ r : 𝒪[k], r ≠ 0 ∧ (r : k) • x ∈ Λ := by
     intro x
-    obtain ⟨r, hr⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors 𝒪[k])
-      (fun j => x j / (d j : k))
+    obtain ⟨r, hr⟩ :=
+      IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors 𝒪[k])
+        (fun j => x j / (d j : k))
     refine ⟨r, nonZeroDivisors.coe_ne_zero r, ?_⟩
     rw [hΛdef, mem_diagLat]
     intro j
@@ -60,7 +69,10 @@ theorem exists_gl_mul_isPrimFrame : ∀ (k : Type) [Field k] [ValuativeRel k] [T
     have h1 : valuation k (algebraMap 𝒪[k] k r * (x j / d j)) ≤ 1 := by
       rw [← hs]; exact (Valuation.mem_integer_iff _ _).1 s.2
     have e : ((r : 𝒪[k]) : k) • x = fun l => (algebraMap 𝒪[k] k r * (x l / d l)) * d l := by
-      funext l; simp only [Pi.smul_apply, smul_eq_mul]; rw [mul_assoc, div_mul_cancel₀ _ (d l).ne_zero]; rfl
+      funext l
+      simp only [Pi.smul_apply, smul_eq_mul]
+      rw [mul_assoc, div_mul_cancel₀ _ (d l).ne_zero]
+      rfl
     rw [e, map_mul]
     exact mul_le_of_le_one_left' h1
   have hli' : X.rank = Fintype.card (Fin a) ↔ LinearIndependent k X.row := by
@@ -74,8 +86,8 @@ theorem exists_gl_mul_isPrimFrame : ∀ (k : Type) [Field k] [ValuativeRel k] [T
     have hr0' : ((r : 𝒪[k]) : k) ≠ 0 := fun h => hr0 (Subtype.ext h)
     have hx' : x = ((r : 𝒪[k]) : k)⁻¹ • (((r : 𝒪[k]) : k) • x) := (inv_smul_smul₀ hr0' x).symm
     rw [hx', e]
-    exact Submodule.smul_mem _ _ (Submodule.sum_mem _ fun i _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
+    exact Submodule.smul_mem _ _
+      (Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
   have hspan : Submodule.span k (Set.range v) = V :=
     le_antisymm (Submodule.span_le.2 (by rintro _ ⟨i, rfl⟩; exact hvV i)) hVle
   have hcard : Fintype.card ι = a := by
@@ -101,15 +113,17 @@ theorem exists_gl_mul_isPrimFrame : ∀ (k : Type) [Field k] [ValuativeRel k] [T
   refine ⟨hu.unit, ?_⟩
   rw [IsUnit.unit_spec, hYg, isPrimFrame_iff]
   refine ⟨fun i => hvΛ (e i), fun c hc i => ?_⟩
-  have hcV : c ᵥ* Y ∈ V := by
-    rw [vecMul_eq_sum]; exact V.sum_mem fun i _ => V.smul_mem _ (hYV i)
+  have hcV : c ᵥ* Y ∈ V := by rw [vecMul_eq_sum]; exact V.sum_mem fun i _ => V.smul_mem _ (hYV i)
   have hcM : c ᵥ* Y ∈ M := ⟨hcV, hc⟩
   have e1 := hrepr _ hcM
   have e2 : c ᵥ* Y = ∑ t, c (e.symm t) • v t := by
     rw [vecMul_eq_sum, ← e.sum_comp]
     exact Finset.sum_congr rfl fun i _ => by rw [e.symm_apply_apply]; rfl
-  have h := Fintype.linearIndependent_iffₛ.1 hli (fun t => c (e.symm t))
-    (fun t => ((b.repr ⟨_, hcM⟩ t : 𝒪[k]) : k)) (by rw [← e2, ← e1]) (e i)
+  have h :=
+    Fintype.linearIndependent_iffₛ.1 hli
+      (fun t => c (e.symm t))
+      (fun t => ((b.repr ⟨_, hcM⟩ t : 𝒪[k]) : k))
+      (by rw [← e2, ← e1]) (e i)
   simp only [Equiv.symm_apply_apply] at h
   rw [h]
   exact (b.repr _ _).2

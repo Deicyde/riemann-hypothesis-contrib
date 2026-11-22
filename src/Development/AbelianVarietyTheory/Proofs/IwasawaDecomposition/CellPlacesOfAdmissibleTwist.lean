@@ -5,7 +5,12 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.EqOrIsCon
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem
+  GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
@@ -17,15 +22,20 @@ open GlobalTheory.TwistChoice (Reading ReadsAt)
 
 namespace GlobalTheory.SepPlaces
 
-theorem mem_of_conj {R : Ranks} (H : Host R) (p : ℕ) {w w' : HeightOneSpectrum (𝓞 H.E)}
-    (h : IsConjPl H w w') : w ∈ placesOver H.E p ↔ w' ∈ placesOver H.E p := by
+theorem mem_of_conj
+    {R : Ranks} (H : Host R) (p : ℕ) {w w' : HeightOneSpectrum (𝓞 H.E)} (h : IsConjPl H w w')
+    : w ∈ placesOver H.E p ↔ w' ∈ placesOver H.E p := by
   have hc : ((p : 𝓞 H.E) : H.E) = H.conj ((p : 𝓞 H.E) : H.E) := by
     push_cast; exact (map_natCast _ p).symm
   exact h _ _ hc
 
-theorem not_mem_two {E : Type} [Field E] [NumberField E] {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q)
-    {w : HeightOneSpectrum (𝓞 E)} (h1 : w ∈ placesOver E p) (h2 : w ∈ placesOver E q) : False := by
-  have hc : IsCoprime (p : ℤ) (q : ℤ) := Nat.isCoprime_iff_coprime.mpr ((Nat.coprime_primes hp hq).mpr hpq)
+theorem not_mem_two
+    {E : Type} [Field E] [NumberField E]
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q)
+    {w : HeightOneSpectrum (𝓞 E)} (h1 : w ∈ placesOver E p) (h2 : w ∈ placesOver E q)
+    : False := by
+  have hc : IsCoprime (p : ℤ) (q : ℤ) :=
+    Nat.isCoprime_iff_coprime.mpr ((Nat.coprime_primes hp hq).mpr hpq)
   obtain ⟨a, b, hab⟩ := hc
   have h1' : ((p : ℕ) : 𝓞 E) ∈ w.asIdeal := h1
   have h2' : ((q : ℕ) : 𝓞 E) ∈ w.asIdeal := h2
@@ -38,8 +48,8 @@ theorem not_mem_two {E : Type} [Field E] [NumberField E] {p q : ℕ} (hp : p.Pri
     exact w.asIdeal.add_mem (w.asIdeal.mul_mem_left _ h1') (w.asIdeal.mul_mem_left _ h2')
   exact w.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr this)
 
-theorem same_v (D : D7) (s s' : SplitPlace D.host.E) (h : s.v = s'.v) :
-    s.w = s'.w ∨ IsConjPl D.host s'.w s.w := by
+theorem same_v (D : D7) (s s' : SplitPlace D.host.E) (h : s.v = s'.v)
+    : s.w = s'.w ∨ IsConjPl D.host s'.w s.w := by
   apply GlobalTheory.SplitPlaceOver.eq_or_isConjPl D s s'.w
   show Ideal.comap _ _ = _
   rw [s'.w_under, h]
@@ -48,25 +58,30 @@ end GlobalTheory.SepPlaces
 
 namespace GlobalTheory.SepPlaces
 
-theorem sep_gen (D : D7) {i : D.ntw.Tw} {j : ℕ} {b : Bool} {k : ℕ} {Q : Finset (PlE D.host)}
-    {ψ : G D.host.E D.nd.Om →* (D.ntw.Ok i k)ˣ} {e : ℤ} {W₀ : Type} [AddCommGroup W₀]
-    [Module (FractionRing (D.ntw.O i)) W₀] {ρ₀ : Representation (FractionRing (D.ntw.O i)) (GQ D.host.E D.R.nV) W₀}
+theorem sep_gen
+    (D : D7)
+    {i : D.ntw.Tw} {j : ℕ} {b : Bool} {k : ℕ} {Q : Finset (PlE D.host)}
+    {ψ : G D.host.E D.nd.Om →* (D.ntw.Ok i k)ˣ} {e : ℤ} {W₀ : Type}
+    [AddCommGroup W₀] [Module (FractionRing (D.ntw.O i)) W₀]
+    {ρ₀ : Representation (FractionRing (D.ntw.O i)) (GQ D.host.E D.R.nV) W₀}
     {τ : ∀ kv : (Σ kk : Fin 2, D.nd.PlG kk), (ZMod (D.host.g kv.1))ˣ →* (FractionRing (D.ntw.O i))ˣ}
     (M : NX.MtVReal D i j b k Q ψ e W₀ ρ₀ τ)
     (hQ : ∀ P ∈ Q, P ∉ D.ntw.pD i ∧ ∀ k' : Fin 2, P ∉ placesOver D.host.E (D.host.g k'))
-    (P' : PlE D.host) (hP' : P' ∈ M.QP ∨ P' ∈ M.DP) :
-    ¬ (P' ∈ M.QP ∧ P' ∈ M.DP) ∧ (∀ kv, (M.sp (NX.pG D kv)).v ≠ (M.sp P').v) ∧
-      (∀ P'' ∈ M.QP, (M.sp P'').v = (M.sp P').v → P'' = P') ∧
-      (∀ P'' ∈ M.DP, (M.sp P'').v = (M.sp P').v → P'' = P') := by
+    (P' : PlE D.host) (hP' : P' ∈ M.QP ∨ P' ∈ M.DP)
+    : ¬(P' ∈ M.QP ∧ P' ∈ M.DP) ∧ (∀ kv, (M.sp (NX.pG D kv)).v ≠ (M.sp P').v)
+      ∧ (∀ P'' ∈ M.QP, (M.sp P'').v = (M.sp P').v → P'' = P')
+      ∧ (∀ P'' ∈ M.DP, (M.sp P'').v = (M.sp P').v → P'' = P') := by
   set pX := if D.ntw.l i = D.host.pde then D.host.pde' else D.host.pde with hpX
   have hpD : ∀ P, P ∈ D.ntw.pD i ↔ P ∈ placesOver D.host.E pX := fun P => by
     rw [← Finset.mem_coe, D.ntw.pD_eq i]
   have hpXp : pX.Prime := by
-    rw [hpX]; split_ifs
+    rw [hpX]
+    split_ifs
     · exact D.host.pde'_prime
     · exact D.host.pde_prime
   have hpXg : ∀ kk, pX ≠ D.host.g kk := fun kk => by
-    rw [hpX]; split_ifs
+    rw [hpX]
+    split_ifs
     · exact (D.host.pde_ne_g kk).2
     · exact (D.host.pde_ne_g kk).1
 
@@ -74,7 +89,8 @@ theorem sep_gen (D : D7) {i : D.ntw.Tw} {j : ℕ} {b : Bool} {k : ℕ} {Q : Fins
     rintro P (hP | hP) kk hg
     · exact (hQ P (M.QP_sub hP)).2 kk hg
     · exact not_mem_two hpXp (D.host.g_prime kk) (hpXg kk) ((hpD P).1 (M.DP_sub hP)) hg
-  have hwP' : (M.sp P').w = P' := M.sp_w P' (by rcases hP' with h | h; exacts [Or.inl h, Or.inr (Or.inl h)])
+  have hwP' : (M.sp P').w = P' :=
+    M.sp_w P' (by rcases hP' with h | h; exacts [Or.inl h, Or.inr (Or.inl h)])
   refine ⟨?_, ?_, ?_, ?_⟩
   · rintro ⟨h1, h2⟩
     exact (hQ P' (M.QP_sub h1)).1 (M.DP_sub h2)

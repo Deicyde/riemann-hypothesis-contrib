@@ -14,7 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitExEv
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.LocLanglands GlobalTheory.LocGL
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie
+  GlobalTheory.SplitRead GlobalTheory.LocLanglands GlobalTheory.LocGL
 open GlobalTheory.WeilDeligne GlobalTheory.ThetaExh GlobalTheory.SplitPairLift
 
 namespace UpperTheory.One.M

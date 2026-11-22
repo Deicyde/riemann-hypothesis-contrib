@@ -12,10 +12,11 @@ open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets Topo
 
 namespace GlobalTheory.CompanionTheory.AnalyticGermSlice
 
-theorem isAnalyticNear_zeros_inter {σ : Type} [Fintype σ] {X : Set (σ → ℂ)} {w : σ → ℂ}
-    (hX : IsAnalyticNear X w) {m : ℕ} (g : Fin m → (σ → ℂ) → ℂ)
-    (hg : ∀ i, AnalyticOnNhd ℂ (g i) Set.univ) :
-    IsAnalyticNear {z | z ∈ X ∧ ∀ i, g i z = 0} w := by
+theorem isAnalyticNear_zeros_inter
+    {σ : Type} [Fintype σ]
+    {X : Set (σ → ℂ)} {w : σ → ℂ} (hX : IsAnalyticNear X w)
+    {m : ℕ} (g : Fin m → (σ → ℂ) → ℂ) (hg : ∀ i, AnalyticOnNhd ℂ (g i) Set.univ)
+    : IsAnalyticNear {z | z ∈ X ∧ ∀ i, g i z = 0} w := by
   obtain ⟨N, k, f, hN, hwN, hf, hXN⟩ := hX
   refine ⟨N, k + m, Fin.append f g, hN, hwN, ?_, ?_⟩
   · intro i
@@ -37,9 +38,10 @@ theorem isAnalyticNear_zeros_inter {σ : Type} [Fintype σ] {X : Set (σ → ℂ
       · have := h2.2 j
         rwa [Fin.append_right] at this
 
-private theorem exists_eventually_eq_zero_of_prod_analyticAt {n : ℕ} (a : ℂ) (f : Fin n → ℂ → ℂ)
-    (hf : ∀ i, AnalyticAt ℂ (f i) a) (hP : ∀ᶠ t in 𝓝 a, ∏ i, f i t = 0) :
-    ∃ i, ∀ᶠ t in 𝓝 a, f i t = 0 := by
+private theorem exists_eventually_eq_zero_of_prod_analyticAt
+    {n : ℕ}
+    (a : ℂ) (f : Fin n → ℂ → ℂ) (hf : ∀ i, AnalyticAt ℂ (f i) a) (hP : ∀ᶠ t in 𝓝 a, ∏ i, f i t = 0)
+    : ∃ i, ∀ᶠ t in 𝓝 a, f i t = 0 := by
   by_contra hcon
   have hcon' : ∀ i, ¬ ∀ᶠ t in 𝓝 a, f i t = 0 := fun i hi => hcon ⟨i, hi⟩
   have hne : ∀ i, ∀ᶠ t in 𝓝[≠] a, f i t ≠ 0 := fun i =>
@@ -49,8 +51,17 @@ private theorem exists_eventually_eq_zero_of_prod_analyticAt {n : ℕ} (a : ℂ)
   obtain ⟨t, ht1, ht2⟩ := (hall.and hP').exists
   exact (Finset.prod_ne_zero_iff.2 fun i _ => ht1 i) ht2
 
-theorem exists_irreducible_slice :
-    FiniteGermProjectionOpenAt.Statement → GermFiniteProjection.Statement → AnalyticGermComponents.Statement → ∀ (σ : Type) [Fintype σ] (X : Set (σ → ℂ)) (w : σ → ℂ), IsAnalyticNear X w → GermIrreducibleAt X w → AccPt w (𝓟 X) → ∃ (Y W : Set (σ → ℂ)) (A : (σ → ℂ) →L[ℂ] (Fin 1 → ℂ)), W ∈ 𝓝 w ∧ Y ∩ W ⊆ X ∧ IsAnalyticNear Y w ∧ GermIrreducibleAt Y w ∧ (∃ W' ∈ 𝓝 w, ∀ x ∈ Y ∩ W', A x = A w → x = w) ∧ ∀ h : (Fin 1 → ℂ) → ℂ, AnalyticAt ℂ h (A w) → (∀ᶠ z in 𝓝 w, z ∈ Y → h (A z) = 0) → ∀ᶠ y in 𝓝 (A w), h y = 0 := by
+theorem exists_irreducible_slice
+    : FiniteGermProjectionOpenAt.Statement → GermFiniteProjection.Statement
+      → AnalyticGermComponents.Statement
+      → ∀ (σ : Type) [Fintype σ] (X : Set (σ → ℂ)) (w : σ → ℂ),
+        IsAnalyticNear X w → GermIrreducibleAt X w → AccPt w (𝓟 X)
+          → ∃ (Y W : Set (σ → ℂ)) (A : (σ → ℂ) →L[ℂ] (Fin 1 → ℂ)),
+            W ∈ 𝓝 w ∧ Y ∩ W ⊆ X ∧ IsAnalyticNear Y w ∧ GermIrreducibleAt Y w
+              ∧ (∃ W' ∈ 𝓝 w, ∀ x ∈ Y ∩ W', A x = A w → x = w)
+              ∧ ∀ h : (Fin 1 → ℂ) → ℂ,
+                AnalyticAt ℂ h (A w) → (∀ᶠ z in 𝓝 w, z ∈ Y → h (A z) = 0)
+                  → ∀ᶠ y in 𝓝 (A w), h y = 0 := by
   intro hFG hGF hAC σ _ X w hX hirr hacc
   obtain ⟨d, A, ⟨W0, hW0, hfib⟩, hdom⟩ := hGF σ X w hX hirr
   have hd : 0 < d := by
@@ -118,16 +129,23 @@ theorem exists_irreducible_slice :
       have := congrFun hxy i0
       simp only [ψ, if_true] at this
       rw [hA1, this, Subsingleton.elim k 0]
-  have hdomi : ∃ i, ∀ h : (Fin 1 → ℂ) → ℂ, AnalyticAt ℂ h (A1 w) →
-      (∀ᶠ z in 𝓝 w, z ∈ Y i → h (A1 z) = 0) → ∀ᶠ y in 𝓝 (A1 w), h y = 0 := by
+  have hdomi
+      : ∃ i, ∀ h : (Fin 1 → ℂ) → ℂ,
+        AnalyticAt ℂ h (A1 w) → (∀ᶠ z in 𝓝 w, z ∈ Y i → h (A1 z) = 0)
+          → ∀ᶠ y in 𝓝 (A1 w), h y = 0 := by
     by_contra hcon
-    have hcon' : ∀ i, ∃ h : (Fin 1 → ℂ) → ℂ, AnalyticAt ℂ h (A1 w) ∧
-        (∀ᶠ z in 𝓝 w, z ∈ Y i → h (A1 z) = 0) ∧ ¬ ∀ᶠ y in 𝓝 (A1 w), h y = 0 := by
+    have hcon'
+        : ∀ i, ∃ h : (Fin 1 → ℂ) → ℂ,
+          AnalyticAt ℂ h (A1 w) ∧ (∀ᶠ z in 𝓝 w, z ∈ Y i → h (A1 z) = 0)
+            ∧ ¬ ∀ᶠ y in 𝓝 (A1 w), h y = 0 := by
       intro i
       by_contra hi
-      exact hcon ⟨i, fun h ha hz => by
-        by_contra hy
-        exact hi ⟨h, ha, hz, hy⟩⟩
+      exact hcon ⟨
+        i,
+        fun h ha hz => by
+          by_contra hy
+          exact hi ⟨h, ha, hz, hy⟩
+      ⟩
     choose h hha hhz hhnz using hcon'
     let c : ℂ →L[ℂ] (Fin 1 → ℂ) := ContinuousLinearMap.pi fun _ => ContinuousLinearMap.id ℂ ℂ
     let a : ℂ := A w i0

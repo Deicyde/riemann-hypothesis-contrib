@@ -7,8 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.BC.nonSS_mono :
-    ∀ (R R' S G G' : Type) [CommRing R] [CommRing R'] [CommRing S] [Group G] [Group G'] (p : G' →* G) (I : Set (MonoidAlgebra R G)) (I' : Set (MonoidAlgebra R' G')) (φ : R →+* S) (φ' : R' →+* S) (Q : Ideal S), Function.Surjective p → (∀ z ∈ I', MonoidAlgebra.mapDomainRingHom S p (MonoidAlgebra.mapRingHom G' φ' z) ∈ TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G φ '' I)) → NonSS I φ Q → NonSS I' φ' Q := by
+theorem UpperTheory.V.Pa.BC.nonSS_mono
+    : ∀ (R R' S G G' : Type) [CommRing R] [CommRing R'] [CommRing S] [Group G] [Group G']
+        (p : G' →* G) (I : Set (MonoidAlgebra R G)) (I' : Set (MonoidAlgebra R' G')) (φ : R →+* S)
+        (φ' : R' →+* S) (Q : Ideal S),
+      Function.Surjective p
+        → (∀ z ∈ I',
+          MonoidAlgebra.mapDomainRingHom S p (MonoidAlgebra.mapRingHom G' φ' z)
+            ∈ TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G φ '' I))
+        → NonSS I φ Q
+        → NonSS I' φ' Q := by
   intro R R' S G G' _ _ _ _ _ p I I' φ φ' Q hp hI ⟨κ, hκ, f, hf, hn⟩
   refine ⟨κ, hκ, f, hf, fun hs => hn ?_⟩
   set J := TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G (f.comp φ) '' I) with hJ
@@ -28,24 +36,27 @@ theorem UpperTheory.V.Pa.BC.nonSS_mono :
         obtain ⟨g', rfl⟩ := hp g
         exact ⟨MonoidAlgebra.single g' c, by simp⟩
     exact (RingCon.mk'_surjective _).comp h1
-  have hcomm : ∀ w : MonoidAlgebra S G',
-      MonoidAlgebra.mapDomainRingHom κ p (MonoidAlgebra.mapRingHom G' f w) =
-        MonoidAlgebra.mapRingHom G f (MonoidAlgebra.mapDomainRingHom S p w) := by
+  have hcomm
+      : ∀ w : MonoidAlgebra S G',
+        MonoidAlgebra.mapDomainRingHom κ p (MonoidAlgebra.mapRingHom G' f w)
+          = MonoidAlgebra.mapRingHom G f (MonoidAlgebra.mapDomainRingHom S p w) := by
     intro w
     induction w using MonoidAlgebra.induction_linear with
     | zero => simp
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
     | single g c => simp
-  have hcomp : ∀ (T H : Type) [CommRing T] [Group H] (θ : T →+* S) (z : MonoidAlgebra T H),
-      MonoidAlgebra.mapRingHom H (f.comp θ) z =
-        MonoidAlgebra.mapRingHom H f (MonoidAlgebra.mapRingHom H θ z) := by
+  have hcomp
+      : ∀ (T H : Type) [CommRing T] [Group H] (θ : T →+* S) (z : MonoidAlgebra T H),
+        MonoidAlgebra.mapRingHom H (f.comp θ) z
+          = MonoidAlgebra.mapRingHom H f (MonoidAlgebra.mapRingHom H θ z) := by
     intro T H _ _ θ z
     induction z using MonoidAlgebra.induction_linear with
     | zero => simp
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
     | single g c => simp
-  have hle : TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G φ '' I) ≤
-      J.comap (MonoidAlgebra.mapRingHom G f) := by
+  have hle
+      : TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G φ '' I)
+        ≤ J.comap (MonoidAlgebra.mapRingHom G f) := by
     rw [TwoSidedIdeal.span_le]
     rintro _ ⟨y, hy, rfl⟩
     rw [SetLike.mem_coe, TwoSidedIdeal.mem_comap, ← hcomp]

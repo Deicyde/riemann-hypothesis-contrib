@@ -5,10 +5,22 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV UpperTheory.Gal.Int.Geo TensorProduct
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  UpperTheory.Gal.Int.Geo TensorProduct
 
-theorem UpperTheory.exists_basis_simultaneousEigenspace_of_equivariant_bijective :
-    ∀ (l : ℕ) [Fact l.Prime] (V V' : Type 1) [AddCommGroup V] [Module ℚ_[l] V] [AddCommGroup V'] [Module ℚ_[l] V'] (Φ : V →ₗ[ℚ_[l]] V'), Function.Bijective Φ → ∀ (I : Type) (T : I → V →ₗ[ℚ_[l]] V) (T' : I → V' →ₗ[ℚ_[l]] V'), (∀ g, Φ ∘ₗ T g = T' g ∘ₗ Φ) → ∀ (L : Type) [Field L] [Algebra ℚ_[l] L] (θ : I → L) (d : ℕ) (b : Module.Basis (Fin d) L ↥(⨅ g, Module.End.eigenspace ((T g).baseChange L) (θ g))), ∃ b' : Module.Basis (Fin d) L ↥(⨅ g, Module.End.eigenspace ((T' g).baseChange L) (θ g)), ∀ i, (b' i).1 = Φ.baseChange L (b i).1 := by
+theorem UpperTheory.exists_basis_simultaneousEigenspace_of_equivariant_bijective
+    : ∀ (l : ℕ) [Fact l.Prime] (V V' : Type 1) [AddCommGroup V] [Module ℚ_[l] V] [AddCommGroup V']
+        [Module ℚ_[l] V'] (Φ : V →ₗ[ℚ_[l]] V'),
+      Function.Bijective Φ
+        → ∀ (I : Type) (T : I → V →ₗ[ℚ_[l]] V) (T' : I → V' →ₗ[ℚ_[l]] V'),
+          (∀ g, Φ ∘ₗ T g = T' g ∘ₗ Φ)
+            → ∀ (L : Type) [Field L] [Algebra ℚ_[l] L] (θ : I → L) (d : ℕ)
+                (b : Module.Basis (Fin d) L
+                  ↥(⨅ g, Module.End.eigenspace ((T g).baseChange L) (θ g))),
+              ∃ b' : Module.Basis (Fin d) L
+                  ↥(⨅ g, Module.End.eigenspace ((T' g).baseChange L) (θ g)),
+                ∀ i,
+                  (b' i).1 = Φ.baseChange L (b i).1 := by
   intro l _ V V' _ _ _ _ Φ hΦ I T T' hT L _ _ θ d b
   let e : V ≃ₗ[ℚ_[l]] V' := LinearEquiv.ofBijective Φ hΦ
   let eL : L ⊗[ℚ_[l]] V ≃ₗ[L] L ⊗[ℚ_[l]] V' := LinearEquiv.baseChange ℚ_[l] L V V' e
@@ -18,10 +30,15 @@ theorem UpperTheory.exists_basis_simultaneousEigenspace_of_equivariant_bijective
     | zero => simp
     | tmul a v => rfl
     | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
-  have hcomm : ∀ g x, (T' g).baseChange L (Φ.baseChange L x) = Φ.baseChange L ((T g).baseChange L x) := by
+  have hcomm
+      : ∀ g x, (T' g).baseChange L (Φ.baseChange L x) = Φ.baseChange L ((T g).baseChange L x) := by
     intro g x
-    rw [← LinearMap.comp_apply, ← LinearMap.comp_apply, ← LinearMap.baseChange_comp, ← LinearMap.baseChange_comp, hT g]
-  have hmap : (⨅ g, Module.End.eigenspace ((T g).baseChange L) (θ g)).map (eL : L ⊗[ℚ_[l]] V →ₗ[L] L ⊗[ℚ_[l]] V') = ⨅ g, Module.End.eigenspace ((T' g).baseChange L) (θ g) := by
+    rw [← LinearMap.comp_apply, ← LinearMap.comp_apply, ← LinearMap.baseChange_comp,
+      ← LinearMap.baseChange_comp, hT g]
+  have hmap
+      : (⨅ g, Module.End.eigenspace ((T g).baseChange L) (θ g)).map
+          (eL : L ⊗[ℚ_[l]] V →ₗ[L] L ⊗[ℚ_[l]] V')
+        = ⨅ g, Module.End.eigenspace ((T' g).baseChange L) (θ g) := by
     apply le_antisymm
     · intro z hz
       obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.1 hz

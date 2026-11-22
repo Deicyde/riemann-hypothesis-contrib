@@ -22,9 +22,12 @@ instance (p c : ℕ) : TopologicalSpace (Fr k p c) := inferInstanceAs (Topologic
 def frMod (p c : ℕ) [Fact p.Prime] [CharP k p] : Module k (Fr k p c) :=
   Module.compHom k (iterateFrobenius k p c)
 
-structure PhiData {n N : ℕ} (q : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
-    (Z' : Subalgebra k (Matrix (Fin N) (Fin N) k)) (φ : Matrix (Fin n) (Fin n) k →+* Matrix (Fin N) (Fin N) k)
-    (e : (Fin n → k) ≃+ (Fin N → k)) : Prop where
+structure PhiData
+    {n N : ℕ}
+    (q : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+    (Z' : Subalgebra k (Matrix (Fin N) (Fin N) k))
+    (φ : Matrix (Fin n) (Fin n) k →+* Matrix (Fin N) (Fin N) k) (e : (Fin n → k) ≃+ (Fin N → k))
+    : Prop where
   inj : Function.Injective φ
   emb : Topology.IsClosedEmbedding φ
   econt : Continuous e
@@ -41,26 +44,39 @@ structure PhiData {n N : ℕ} (q : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n
 
 variable (k)
 
-def FinDim : Prop := ∀ (p c : ℕ) [Fact p.Prime] [CharP k p],
-  letI := frMod (k := k) p c
-  FiniteDimensional k (Fr k p c) ∧ 0 < Module.finrank k (Fr k p c)
+def FinDim : Prop :=
+  ∀ (p c : ℕ) [Fact p.Prime] [CharP k p],
+    letI := frMod (k := k) p c
+    FiniteDimensional k (Fr k p c) ∧ 0 < Module.finrank k (Fr k p c)
 
-def PhiEx : Prop := ∀ (p c : ℕ) [Fact p.Prime] [CharP k p] (n : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)), CR Z →
-  n ≤ p ^ c → ∃ (N : ℕ) (Z' : Subalgebra k (Matrix (Fin N) (Fin N) k)) (φ : Matrix (Fin n) (Fin n) k →+* Matrix (Fin N) (Fin N) k)
-    (e : (Fin n → k) ≃+ (Fin N → k)), PhiData (p ^ c) Z Z' φ e
+def PhiEx : Prop :=
+  ∀ (p c : ℕ) [Fact p.Prime] [CharP k p] (n : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)),
+    CR Z → n ≤ p ^ c
+      → ∃ (N : ℕ) (Z' : Subalgebra k (Matrix (Fin N) (Fin N) k))
+          (φ : Matrix (Fin n) (Fin n) k →+* Matrix (Fin N) (Fin N) k)
+          (e : (Fin n → k) ≃+ (Fin N → k)),
+        PhiData (p ^ c) Z Z' φ e
 
 def RestrL : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] [CharP k p] (n : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)), CR Z →
-    ∃ (N q : ℕ) (Z' : Subalgebra k (Matrix (Fin N) (Fin N) k)), CR Z' ∧ mu Z' = mu Z ∧ (∃ c : ℕ, q = p ^ c) ∧
-      HasRoots Z' q ∧ NilBound Z' q ∧ ∀ χ : k[X], ∃ l : List k[X],
-        (∀ χ' ∈ l, ∃ (m : ℕ) (F' : Fin m → Set (Matrix (Fin N) (Fin N) k)), IsPieces Z' χ' F' ∧ ∀ i, Good Z' (F' i)) →
-        ∃ (m : ℕ) (F : Fin m → Set (Matrix (Fin n) (Fin n) k)), IsPieces Z χ F ∧ ∀ i, Good Z (F i)
+  ∀ (p : ℕ) [Fact p.Prime] [CharP k p] (n : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)),
+    CR Z
+      → ∃ (N q : ℕ) (Z' : Subalgebra k (Matrix (Fin N) (Fin N) k)),
+        CR Z' ∧ mu Z' = mu Z ∧ (∃ c : ℕ, q = p ^ c) ∧ HasRoots Z' q ∧ NilBound Z' q
+          ∧ ∀ χ : k[X], ∃ l : List k[X],
+            (∀ χ' ∈ l, ∃ (m : ℕ) (F' : Fin m → Set (Matrix (Fin N) (Fin N) k)),
+                IsPieces Z' χ' F' ∧ ∀ i, Good Z' (F' i))
+              → ∃ (m : ℕ) (F : Fin m → Set (Matrix (Fin n) (Fin n) k)),
+                IsPieces Z χ F ∧ ∀ i, Good Z (F i)
 
 def PullPieces : Prop :=
-  ∀ {n N q : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (Z' : Subalgebra k (Matrix (Fin N) (Fin N) k))
-    (φ : Matrix (Fin n) (Fin n) k →+* Matrix (Fin N) (Fin N) k) (e : (Fin n → k) ≃+ (Fin N → k)), CR Z →
-    PhiData q Z Z' φ e → ∀ χ : k[X], ∃ l : List k[X],
-        (∀ χ' ∈ l, ∃ (m : ℕ) (F' : Fin m → Set (Matrix (Fin N) (Fin N) k)), IsPieces Z' χ' F' ∧ ∀ i, Good Z' (F' i)) →
-        ∃ (m : ℕ) (F : Fin m → Set (Matrix (Fin n) (Fin n) k)), IsPieces Z χ F ∧ ∀ i, Good Z (F i)
+  ∀ {n N q : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+      (Z' : Subalgebra k (Matrix (Fin N) (Fin N) k))
+      (φ : Matrix (Fin n) (Fin n) k →+* Matrix (Fin N) (Fin N) k) (e : (Fin n → k) ≃+ (Fin N → k)),
+    CR Z → PhiData q Z Z' φ e
+      → ∀ χ : k[X], ∃ l : List k[X],
+        (∀ χ' ∈ l, ∃ (m : ℕ) (F' : Fin m → Set (Matrix (Fin N) (Fin N) k)),
+            IsPieces Z' χ' F' ∧ ∀ i, Good Z' (F' i))
+          → ∃ (m : ℕ) (F : Fin m → Set (Matrix (Fin n) (Fin n) k)),
+            IsPieces Z χ F ∧ ∀ i, Good Z (F i)
 
 end PositivityTheory.RgUd.TP.Desc.Restr

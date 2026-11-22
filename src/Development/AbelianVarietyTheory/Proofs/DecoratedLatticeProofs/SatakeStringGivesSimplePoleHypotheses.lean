@@ -15,9 +15,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift GlobalTheory.Core.Rk.Exh
@@ -26,13 +29,19 @@ noncomputable section
 
 namespace GlobalTheory.Core.Rk.StringPole
 
-theorem good_of_not_mem_above {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
-    {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+theorem good_of_not_mem_above
+    {D : D7} {G : Type} [Group G] [Fintype G]
+    {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+    [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
     (R : RealDat D A Ks) (t : T) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hw : w ∉ GlobalTheory.LFun.above D.host.E (GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t : Set (HeightOneSpectrum (𝓞 D.host.F)))) :
-    GlobalTheory.Hk3.Good R t w := by
+    (hw : w ∉ GlobalTheory.LFun.above D.host.E
+      (GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t
+        : Set (HeightOneSpectrum (𝓞 D.host.F))))
+    : GlobalTheory.Hk3.Good R t w := by
   intro PP hPP
-  have hmem : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ∈ GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t := by
+  have hmem
+      : (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)
+        ∈ GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t := by
     unfold GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl
     exact Finset.mem_image.2 ⟨PP, Finset.mem_union.2 hPP, rfl⟩
   refine ⟨?_, ?_⟩
@@ -47,26 +56,49 @@ theorem good_of_not_mem_above {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T :
 
 end GlobalTheory.Core.Rk.StringPole
 
-
 open GlobalTheory.Core.Rk.StringPole in
-theorem GlobalTheory.Core.Rk.StringPole.string_pole_hyp : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T : Type) (A : FamIn D.what₂.LL G Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A), GlobalTheory.LiftRows.Given R F → R.FullP → ∀ i t s, HasString R i t s → ∃ B c : GlobalTheory.LFun.Fam D.host.E, GlobalTheory.LFun.IsSysParamD D (GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t) (Vc D i).rank s B ∧ GlobalTheory.IndefiniteRowSideFullHecke.SimplePoleTwistedLift.Hyp (GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t : Set (HeightOneSpectrum (𝓞 D.host.F))) D.R.r D.R.t c B (GlobalTheory.LFun.val (F := D.host.F) (chiV R i t)) (GlobalTheory.LFun.val (F := D.host.F) (chiV R i t)) := by
+theorem GlobalTheory.Core.Rk.StringPole.string_pole_hyp
+    : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T : Type)
+        (A : FamIn D.what₂.LL G Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A),
+      GlobalTheory.LiftRows.Given R F → R.FullP
+        → ∀ i t s,
+          HasString R i t s
+            → ∃ B c : GlobalTheory.LFun.Fam D.host.E,
+              GlobalTheory.LFun.IsSysParamD D
+                  (GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t)
+                  (Vc D i).rank s B
+                ∧ GlobalTheory.IndefiniteRowSideFullHecke.SimplePoleTwistedLift.Hyp
+                  (GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t
+                    : Set (HeightOneSpectrum (𝓞 D.host.F)))
+                  D.R.r D.R.t c B (GlobalTheory.LFun.val (F := D.host.F) (chiV R i t))
+                  (GlobalTheory.LFun.val (F := D.host.F) (chiV R i t)) := by
   intro D G _ _ Pl0 T A Ks _ _ _ R F _ _ i t s hs
   classical
   obtain ⟨B, hB, hstr⟩ := hs
   set x := GlobalTheory.LFun.val (F := D.host.F) (chiV R i t) with hx
   let c : GlobalTheory.LFun.Fam D.host.E := fun w => B w - GlobalTheory.LFun.segFam x D.R.t w
-  refine ⟨B, c, hB, (GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t).finite_toSet, D.R.rank_add_five_le, fun w hw => ?_⟩
+  refine ⟨
+    B,
+    c,
+    hB,
+    (GlobalTheory.IndefiniteRowSideFullHecke.LabelSettingScalars.badPl R t).finite_toSet,
+    D.R.rank_add_five_le,
+    fun w hw => ?_
+  ⟩
   have hg := good_of_not_mem_above R t w hw
   obtain ⟨B', hB', hbd⟩ := hstr w hg
   have hcard : (B w).card = (Vc D i).rank := by
-    rcases hB (w.under (𝓞 D.host.F)) (fun h => hw h) w rfl with ⟨_, h2, _⟩ | ⟨_, τ, ϖ, α, _, _, h3, _⟩
+    rcases hB (w.under (𝓞 D.host.F)) (fun h => hw h) w rfl with
+      ⟨_, h2, _⟩ | ⟨_, τ, ϖ, α, _, _, h3, _⟩
     · exact h2
     · rw [h3]
       simp [GlobalTheory.LGrp.bcParam]
       omega
   have hrank : (Vc D i).rank = D.R.r + D.R.t := D.sp.V_rank _ (Nat.le_add_left _ _) i.2
-  have hseg : (GlobalTheory.LFun.segFam x D.R.t w).map (fun a : ℂˣ => (a : ℂ)) =
-      str (Ideal.absNorm w.asIdeal) (valV R i t w : ℂ) D.R.t := by
+  have hseg
+      : (GlobalTheory.LFun.segFam x D.R.t w).map (fun a : ℂˣ => (a : ℂ))
+        = str (Ideal.absNorm w.asIdeal) (valV R i t w : ℂ) D.R.t := by
     unfold GlobalTheory.LFun.segFam GlobalTheory.LFun.seg str
     rw [Multiset.map_map]
     rfl

@@ -12,18 +12,15 @@ open scoped Classical
 
 variable {K : Type*} [Field K] {R : Subring K} {p : ℕ}
 
-
 variable (R p) in
-def nm_N (x : K) : ℝ := if x = 0 then 0 else (p : ℝ) ^ (-nm_v R p x)
+def nm_N (x : K) : ℝ := if x = 0 then 0 else (p : ℝ) ^ (- nm_v R p x)
 
-theorem nm_N_zero : nm_N R p (0 : K) = 0 := by
-  simp [nm_N]
+theorem nm_N_zero : nm_N R p (0 : K) = 0 := by simp [nm_N]
 
-theorem nm_N_of_ne {x : K} (hx : x ≠ 0) : nm_N R p x = (p : ℝ) ^ (-nm_v R p x) := by
+theorem nm_N_of_ne {x : K} (hx : x ≠ 0) : nm_N R p x = (p : ℝ) ^ (- nm_v R p x) := by
   simp [nm_N, hx]
 
-theorem nm_pR (h : nm_Hyp R p) : (1 : ℝ) < p := by
-  exact_mod_cast h.one_lt
+theorem nm_pR (h : nm_Hyp R p) : (1 : ℝ) < p := by exact_mod_cast h.one_lt
 
 theorem nm_N_nonneg (h : nm_Hyp R p) (x : K) : 0 ≤ nm_N R p x := by
   unfold nm_N
@@ -82,12 +79,15 @@ def nm_abs (h : nm_Hyp R p) : AbsoluteValue K ℝ where
   map_mul' := nm_N_mul h
   nonneg' := nm_N_nonneg h
   eq_zero' := nm_N_eq_zero h
-  add_le' x y := le_trans (nm_N_add h x y) (max_le_add_of_nonneg (nm_N_nonneg h x) (nm_N_nonneg h y))
+  add_le' x y :=
+    le_trans (nm_N_add h x y) (max_le_add_of_nonneg (nm_N_nonneg h x) (nm_N_nonneg h y))
 
-theorem nm_extG {K : Type} [Field K] (N : AbsoluteValue K ℝ) (hna : ∀ x y, N (x + y) ≤ max (N x) (N y)) (c : K)
-    (hc : 1 < N c) :
-    ∃ (K' : Type) (_ : NormedField K') (_ : Algebra K K'), IsUltrametricDist K' ∧ IsAlgClosed K' ∧
-      ∀ x, ‖algebraMap K K' x‖ = N x := by
+theorem nm_extG
+    {K : Type} [Field K]
+    (N : AbsoluteValue K ℝ) (hna : ∀ x y, N (x + y) ≤ max (N x) (N y))
+    (c : K) (hc : 1 < N c)
+    : ∃ (K' : Type) (_ : NormedField K') (_ : Algebra K K'),
+      IsUltrametricDist K' ∧ IsAlgClosed K' ∧ ∀ x, ‖algebraMap K K' x‖ = N x := by
   let nK : NormedField K := N.toNormedField
   have hnorm : ∀ x : K, ‖x‖ = N x := fun _ => rfl
   have hnatK : ∀ n : ℕ, N (n : K) ≤ 1 := by
@@ -97,22 +97,27 @@ theorem nm_extG {K : Type} [Field K] (N : AbsoluteValue K ℝ) (hna : ∀ x y, N
     | succ n ih =>
       rw [Nat.cast_succ]
       exact le_trans (hna _ _) (max_le ih (by simp))
-  have hcast : ∀ n : ℕ, ((n : K) : UniformSpace.Completion K) = (n : UniformSpace.Completion K) := fun n =>
-    map_natCast (UniformSpace.Completion.coeRingHom (α := K)) n
+  have hcast : ∀ n : ℕ, ((n : K) : UniformSpace.Completion K) = (n : UniformSpace.Completion K) :=
+    fun n => map_natCast (UniformSpace.Completion.coeRingHom (α := K)) n
   have hnatC : ∀ n : ℕ, ‖(n : UniformSpace.Completion K)‖ ≤ 1 := by
     intro n
     rw [← hcast, UniformSpace.Completion.norm_coe]
     exact hnatK n
   have uC : IsUltrametricDist (UniformSpace.Completion K) :=
     IsUltrametricDist.isUltrametricDist_of_forall_norm_natCast_le_one hnatC
-  let nnC : NontriviallyNormedField (UniformSpace.Completion K) :=
-    { (inferInstance : NormedField (UniformSpace.Completion K)) with
-      non_trivial := ⟨(c : UniformSpace.Completion K), by rw [UniformSpace.Completion.norm_coe]; exact hc⟩ }
+  let nnC : NontriviallyNormedField (UniformSpace.Completion K) := {
+    (inferInstance : NormedField (UniformSpace.Completion K)) with
+    non_trivial :=
+      ⟨(c : UniformSpace.Completion K), by rw [UniformSpace.Completion.norm_coe]; exact hc⟩
+  }
   let nL : NormedField (AlgebraicClosure (UniformSpace.Completion K)) :=
-    spectralNorm.normedField (UniformSpace.Completion K) (AlgebraicClosure (UniformSpace.Completion K))
-  have hext : ∀ z : UniformSpace.Completion K,
-      ‖algebraMap (UniformSpace.Completion K) (AlgebraicClosure (UniformSpace.Completion K)) z‖ = ‖z‖ :=
-    fun z => spectralNorm_extends z
+    spectralNorm.normedField (UniformSpace.Completion K)
+      (AlgebraicClosure (UniformSpace.Completion K))
+  have hext
+      : ∀ z : UniformSpace.Completion K,
+        ‖algebraMap (UniformSpace.Completion K) (AlgebraicClosure (UniformSpace.Completion K)) z‖
+          = ‖z‖ := fun z =>
+    spectralNorm_extends z
   let aL : Algebra K (AlgebraicClosure (UniformSpace.Completion K)) :=
     ((algebraMap (UniformSpace.Completion K) (AlgebraicClosure (UniformSpace.Completion K))).comp
       (UniformSpace.Completion.coeRingHom (α := K))).toAlgebra

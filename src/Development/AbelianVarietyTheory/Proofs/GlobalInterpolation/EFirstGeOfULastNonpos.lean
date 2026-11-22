@@ -32,8 +32,8 @@ def eFirst {R : Ranks} (P : HCParam R) : ℚ := P.e ⟨0, m_pos R⟩
 def SignLaw {R : Ranks} {ι : Type} (hc : ι → HCParam R) (top : ι → Prop) : Prop :=
   (∀ τ, top τ → uLast (hc τ) ≤ -(((R.k : ℚ) - 1) / 2)) ∧ ∀ τ, (R.k : ℚ) / 2 ≤ eFirst (hc τ)
 
-theorem e_ge {R : Ranks} (P : HCParam R) (i : ℕ) (hi : i < R.m) :
-    eFirst P + (i : ℚ) * ((R.t : ℚ) + 3) ≤ P.e ⟨i, hi⟩ := by
+theorem e_ge {R : Ranks} (P : HCParam R) (i : ℕ) (hi : i < R.m)
+    : eFirst P + (i : ℚ) * ((R.t : ℚ) + 3) ≤ P.e ⟨i, hi⟩ := by
   induction i with
   | zero => simp [eFirst]
   | succ i ih =>
@@ -44,8 +44,9 @@ theorem e_ge {R : Ranks} (P : HCParam R) (i : ℕ) (hi : i < R.m) :
     simp only at h2
     linarith
 
-theorem sExp_nonneg {R : Ranks} (P : HCParam R) (h : (R.k : ℚ) / 2 ≤ eFirst P) (i : ℕ) (hi : i < R.m) :
-    0 ≤ sExp R (P.e ⟨i, hi⟩) (i + 1) := by
+theorem sExp_nonneg
+    {R : Ranks} (P : HCParam R) (h : (R.k : ℚ) / 2 ≤ eFirst P) (i : ℕ) (hi : i < R.m)
+    : 0 ≤ sExp R (P.e ⟨i, hi⟩) (i + 1) := by
   have h1 := e_ge P i hi
   have h2 : (0 : ℚ) ≤ (i : ℚ) * (R.t : ℚ) := by positivity
   have h3 : (0 : ℚ) ≤ (i : ℚ) := by positivity
@@ -53,8 +54,8 @@ theorem sExp_nonneg {R : Ranks} (P : HCParam R) (h : (R.k : ℚ) / 2 ≤ eFirst 
   push_cast
   nlinarith
 
-theorem eFirst_ge_of_uLast_le {R : Ranks} (P : HCParam R) (h : uLast P ≤ -(((R.k : ℚ) - 1) / 2)) :
-    (R.k : ℚ) / 2 ≤ eFirst P := by
+theorem eFirst_ge_of_uLast_le {R : Ranks} (P : HCParam R) (h : uLast P ≤ -(((R.k : ℚ) - 1) / 2))
+    : (R.k : ℚ) / 2 ≤ eFirst P := by
   have h1 := P.u_last_gt (by have := k_pred_lt R; omega) (m_pos R)
   have h2 := P.gap_be ⟨0, m_pos R⟩
   have h3 : (0 : ℚ) ≤ R.t := by positivity
@@ -62,7 +63,8 @@ theorem eFirst_ge_of_uLast_le {R : Ranks} (P : HCParam R) (h : uLast P ≤ -(((R
   unfold eFirst
   linarith
 
-theorem eFirst_ge_of_uLast_nonpos {R : Ranks} (P : HCParam R) (h : uLast P ≤ 0) : (R.k : ℚ) / 2 ≤ eFirst P := by
+theorem eFirst_ge_of_uLast_nonpos {R : Ranks} (P : HCParam R) (h : uLast P ≤ 0)
+    : (R.k : ℚ) / 2 ≤ eFirst P := by
   have h1 := P.u_last_gt (by have := k_pred_lt R; omega) (m_pos R)
   have h2 := P.gap_be ⟨0, m_pos R⟩
   have h5 : (R.k : ℚ) ≤ R.t := by
@@ -74,8 +76,8 @@ theorem eFirst_ge_of_uLast_nonpos {R : Ranks} (P : HCParam R) (h : uLast P ≤ 0
 
 variable {D : D7} {u : D.what₂.Word}
 
-theorem bTop_cast (X : Ch D u) (τ : D.what₂.Tau) :
-    (X.fm.bTop τ : ℚ) = -uLast (D.hc τ) - ((D.R.k : ℚ) - 1) / 2 := by
+theorem bTop_cast (X : Ch D u) (τ : D.what₂.Tau)
+    : (X.fm.bTop τ : ℚ) = - uLast (D.hc τ) - ((D.R.k : ℚ) - 1) / 2 := by
   have hk := k_pred_lt D.R
   have hN : D.R.N 0 = D.R.k := by simp [Ranks.N]
   have h := X.fm.lam_eq 0 (Nat.zero_le _) τ ⟨D.R.N 0 - 1, by omega⟩
@@ -89,8 +91,8 @@ theorem bTop_cast (X : Ch D u) (τ : D.what₂.Tau) :
   rw [h, show (D.R.N 0 : ℚ) = D.R.k by exact_mod_cast hN]
   ring
 
-theorem sDiv_cast (X : Ch D u) (i : ℕ) (hi : i < D.R.m) (τ : D.what₂.Tau) :
-    (X.C.sDiv i τ : ℚ) = sExp D.R ((D.hc τ).e ⟨i, hi⟩) (i + 1) := by
+theorem sDiv_cast (X : Ch D u) (i : ℕ) (hi : i < D.R.m) (τ : D.what₂.Tau)
+    : (X.C.sDiv i τ : ℚ) = sExp D.R ((D.hc τ).e ⟨i, hi⟩) (i + 1) := by
   rw [X.C.sDiv_eq i hi τ, D.hcW_e]
 
 theorem wtSigns_iff (X : Ch D u) : TwColumn.WtSigns X ↔ SignLaw D.hc (· ∈ tops D) := by
@@ -124,8 +126,8 @@ theorem b'_pos (s : Scale) : 0 < s.b' := by
   unfold Scale.b' Scale.a Scale.b Scale.X'
   positivity
 
-theorem uLast_le (L : SizeData₂ D) (τ : D.what₂.Tau) (hτ : τ ∈ tops D) :
-    uLast (D.hc τ) ≤ -(((D.R.k : ℚ) - 1) / 2) := by
+theorem uLast_le (L : SizeData₂ D) (τ : D.what₂.Tau) (hτ : τ ∈ tops D)
+    : uLast (D.hc τ) ≤ -(((D.R.k : ℚ) - 1) / 2) := by
   have h1 := (mem_tops τ).1 hτ
   unfold Host.topPlaces at h1
   obtain ⟨t, ht, e⟩ := Finset.mem_image.1 h1
@@ -143,13 +145,13 @@ open GlobalTheory.Mem
 
 def BaseSigns (B : Base) : Prop := SignLaw B.hc (· ∈ B.wts.tops)
 
-theorem wtSigns_assemble_iff (B : Base) (C : Cols B) (W : RowsRest B C) (V : DivStage B C W) (S : SStage B C W)
-    (N : NStage B C W) (G : GJStage B C) (u : B.Word) (X : Ch (assemble B C W V S N G) u) :
-    TwColumn.WtSigns X ↔ BaseSigns B := by
+theorem wtSigns_assemble_iff
+    (B : Base) (C : Cols B) (W : RowsRest B C) (V : DivStage B C W) (S : SStage B C W)
+    (N : NStage B C W) (G : GJStage B C) (u : B.Word) (X : Ch (assemble B C W V S N G) u)
+    : TwColumn.WtSigns X ↔ BaseSigns B := by
   have e : ∀ τ, τ ∈ tops (assemble B C W V S N G) ↔ τ ∈ B.wts.tops := fun τ =>
     (mem_tops (D := assemble B C W V S N G) τ).trans (B.mem_wts_tops τ).symm
   exact (wtSigns_iff (D := assemble B C W V S N G) X).trans
     (and_congr (forall_congr' fun τ => imp_congr (e τ) Iff.rfl) Iff.rfl)
-
 
 end GlobalTheory.LvT.WtSign

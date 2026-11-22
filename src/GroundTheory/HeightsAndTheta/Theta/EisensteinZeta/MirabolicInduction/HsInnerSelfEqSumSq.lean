@@ -56,10 +56,11 @@ theorem opNorm_le_hs (X : Matrix ι ι ℂ) : ‖X‖ ≤ hs X := by
   rw [EuclideanSpace.norm_sq_eq, mul_pow, hs_sq, EuclideanSpace.norm_sq_eq, Finset.sum_mul]
   refine Finset.sum_le_sum fun i _ => ?_
   rw [ofLp_toEuclideanCLM, mulVec, dotProduct]
-  calc ‖∑ j, X i j * (WithLp.ofLp v) j‖ ^ 2 ≤ (∑ j, ‖X i j‖ * ‖(WithLp.ofLp v) j‖) ^ 2 := by
-        gcongr
-        refine (norm_sum_le _ _).trans (le_of_eq ?_)
-        simp
+  calc
+    ‖∑ j, X i j * (WithLp.ofLp v) j‖ ^ 2 ≤ (∑ j, ‖X i j‖ * ‖(WithLp.ofLp v) j‖) ^ 2 := by
+      gcongr
+      refine (norm_sum_le _ _).trans (le_of_eq ?_)
+      simp
     _ ≤ (∑ j, ‖X i j‖ ^ 2) * ∑ j, ‖(WithLp.ofLp v) j‖ ^ 2 := Finset.sum_mul_sq_le_sq_mul_sq _ _ _
 
 theorem hs_mul_left_le (A X : Matrix ι ι ℂ) : hs (A * X) ≤ ‖A‖ * hs X := by

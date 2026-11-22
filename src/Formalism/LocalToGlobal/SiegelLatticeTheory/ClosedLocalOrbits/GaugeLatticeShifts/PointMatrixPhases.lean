@@ -15,9 +15,11 @@ open Formalism.MainNotions.S Formalism.L2.SG.Pf
 
 variable {K : Type} [Field K] {N : ℕ}
 
-def sgLoF (L : Matrix (Fin N) (Fin N) K) : K := ∑ a : Fin N, if h : a.val + 1 < N then L ⟨a.val + 1, h⟩ a else 0
+def sgLoF (L : Matrix (Fin N) (Fin N) K) : K :=
+  ∑ a : Fin N, if h : a.val + 1 < N then L ⟨a.val + 1, h⟩ a else 0
 
-def sgUpF (U : Matrix (Fin N) (Fin N) K) : K := ∑ a : Fin N, if h : a.val + 1 < N then U a ⟨a.val + 1, h⟩ else 0
+def sgUpF (U : Matrix (Fin N) (Fin N) K) : K :=
+  ∑ a : Fin N, if h : a.val + 1 < N then U a ⟨a.val + 1, h⟩ else 0
 
 private lemma mul_apply_subdiag_of_isLoUni {A B : Matrix (Fin N) (Fin N) K} (hA : IsLoUni A) (hB : IsLoUni B) (a : Fin N)
     (h : a.val + 1 < N) : (A * B) ⟨a.val + 1, h⟩ a = A ⟨a.val + 1, h⟩ a + B ⟨a.val + 1, h⟩ a := by
@@ -35,8 +37,8 @@ private lemma mul_apply_subdiag_of_isLoUni {A B : Matrix (Fin N) (Fin N) K} (hA 
         simp only [b]; omega
       rw [(hA b x).1 hbx, zero_mul]
 
-theorem sgLoF_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsLoUni A) (hB : IsLoUni B) :
-    sgLoF (A * B) = sgLoF A + sgLoF B := by
+theorem sgLoF_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsLoUni A) (hB : IsLoUni B)
+    : sgLoF (A * B) = sgLoF A + sgLoF B := by
   unfold sgLoF
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -60,8 +62,8 @@ private lemma mul_apply_superdiag_of_isUpUni {A B : Matrix (Fin N) (Fin N) K} (h
         simp only [b]; omega
       rw [(hB x b).1 hbx, mul_zero]
 
-theorem sgUpF_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUpUni A) (hB : IsUpUni B) :
-    sgUpF (A * B) = sgUpF A + sgUpF B := by
+theorem sgUpF_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUpUni A) (hB : IsUpUni B)
+    : sgUpF (A * B) = sgUpF A + sgUpF B := by
   unfold sgUpF
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -72,8 +74,8 @@ theorem sgUpF_mul {A B : Matrix (Fin N) (Fin N) K} (hA : IsUpUni A) (hB : IsUpUn
 def sameBF (bs : List (K × ℕ)) (N a : ℕ) : Prop :=
   a + 1 < N ∧ pσ bs (a + 1) + 1 = pσ bs a ∧ pv bs (a + 1) = pv bs a
 
-private theorem pv_psigma_eq_pv : ∀ (bs : List (K × ℕ)) (i : ℕ), i < (bs.map Prod.snd).sum →
-    pv bs (pσ bs i) = pv bs i := by
+private theorem pv_psigma_eq_pv
+    : ∀ (bs : List (K × ℕ)) (i : ℕ), i < (bs.map Prod.snd).sum → pv bs (pσ bs i) = pv bs i := by
   intro bs
   induction bs with
   | nil => intro i h; simp at h
@@ -88,14 +90,14 @@ private theorem pv_psigma_eq_pv : ∀ (bs : List (K × ℕ)) (i : ℕ), i < (bs.
       simp only [pσ, pv, hi, h1, if_false, Nat.add_sub_cancel_left]
       exact ih (i - s) (by omega)
 
-theorem same_phiF (p : Point K N) {a : ℕ} (hs : sameBF p.1 N a) :
-    sameBF p.1 N (pσ p.1 (a + 1)) ∧ pσ p.1 (pσ p.1 (a + 1) + 1) = a := by
+theorem same_phiF (p : Point K N) {a : ℕ} (hs : sameBF p.1 N a)
+    : sameBF p.1 N (pσ p.1 (a + 1)) ∧ pσ p.1 (pσ p.1 (a + 1) + 1) = a := by
   have hsum : (p.1.map Prod.snd).sum = N := p.2.2
   unfold sameBF at hs ⊢
   obtain ⟨h1, h2, h3⟩ := hs
   have ha : a < N := by omega
-  have hσlt (bs : List (K × ℕ)) (i : ℕ) (hi : i < (bs.map Prod.snd).sum) :
-      pσ bs i < (bs.map Prod.snd).sum := by
+  have hσlt (bs : List (K × ℕ)) (i : ℕ) (hi : i < (bs.map Prod.snd).sum)
+      : pσ bs i < (bs.map Prod.snd).sum := by
     induction bs generalizing i with
     | nil => simp at hi
     | cons b bs ih =>
@@ -117,8 +119,9 @@ theorem same_phiF (p : Point K N) {a : ℕ} (hs : sameBF p.1 N a) :
   · rw [h2, hv0, hv1, h3]
   · rw [h2, hinv0]
 
-private theorem pv_ne_zero_of_blocks_ne_zero : ∀ (bs : List (K × ℕ)), (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) →
-    ∀ i, i < (bs.map Prod.snd).sum → pv bs i ≠ 0 := by
+private theorem pv_ne_zero_of_blocks_ne_zero
+    : ∀ (bs : List (K × ℕ)),
+      (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) → ∀ i, i < (bs.map Prod.snd).sum → pv bs i ≠ 0 := by
   intro bs
   induction bs with
   | nil => intro _ i h; simp at h
@@ -162,12 +165,15 @@ private lemma ptMat_mul_apply_eq (p : Point K N) (A : Matrix (Fin N) (Fin N) K) 
     rw [e, zero_mul]
   · intro h; exact absurd (Finset.mem_univ k) h
 
-theorem simple_eqF (p : Point K N) {n m : Matrix (Fin N) (Fin N) K} (hn : IsLoUni n) (hm : IsUpUni m)
-    (h : n * ptMat p = ptMat p * m) : sgLoF n = sgUpF m := by
+theorem simple_eqF
+    (p : Point K N)
+    {n m : Matrix (Fin N) (Fin N) K}
+    (hn : IsLoUni n) (hm : IsUpUni m) (h : n * ptMat p = ptMat p * m)
+    : sgLoF n = sgUpF m := by
   have hs : (p.1.map Prod.snd).sum = N := p.2.2
   have hbs := p.2.1
-  have hσlt (bs : List (K × ℕ)) (i : ℕ) (hi : i < (bs.map Prod.snd).sum) :
-      pσ bs i < (bs.map Prod.snd).sum := by
+  have hσlt (bs : List (K × ℕ)) (i : ℕ) (hi : i < (bs.map Prod.snd).sum)
+      : pσ bs i < (bs.map Prod.snd).sum := by
     induction bs generalizing i with
     | nil => simp at hi
     | cons b bs ih =>
@@ -181,10 +187,10 @@ theorem simple_eqF (p : Point K N) {n m : Matrix (Fin N) (Fin N) K} (hn : IsLoUn
   have hlt : ∀ i, i < N → pσ p.1 i < N := fun i hi => by
     simpa only [hs] using hσlt p.1 i (hs.symm ▸ hi)
   have hinv : ∀ i, i < N → pσ p.1 (pσ p.1 i) = i := fun i hi => pσ_inv p.1 i (by rw [hs]; exact hi)
-  have hv : ∀ i, i < N → pv p.1 i ≠ 0 := fun i hi => pv_ne_zero_of_blocks_ne_zero p.1 hbs i (by rw [hs]; exact hi)
-  have hadj (bs : List (K × ℕ)) (i : ℕ) :
-      (pσ bs (i + 1) + 1 = pσ bs i ∧ pv bs (i + 1) = pv bs i) ∨
-        pσ bs i < pσ bs (i + 1) := by
+  have hv : ∀ i, i < N → pv p.1 i ≠ 0 := fun i hi =>
+    pv_ne_zero_of_blocks_ne_zero p.1 hbs i (by rw [hs]; exact hi)
+  have hadj (bs : List (K × ℕ)) (i : ℕ)
+      : (pσ bs (i + 1) + 1 = pσ bs i ∧ pv bs (i + 1) = pv bs i) ∨ pσ bs i < pσ bs (i + 1) := by
     induction bs generalizing i with
     | nil => simp [pσ]
     | cons b bs ih =>
@@ -202,24 +208,33 @@ theorem simple_eqF (p : Point K N) {n m : Matrix (Fin N) (Fin N) K} (hn : IsLoUn
           rcases ih (i - s) with ⟨hσ, hv⟩ | hσ
           · exact Or.inl ⟨by omega, hv⟩
           · exact Or.inr (by omega)
-  have key : ∀ (i j k l : Fin N), k.val = pσ p.1 j.val → l.val = pσ p.1 i.val →
-      n i k * pv p.1 k.val = pv p.1 i.val * m l j := by
+  have key
+      : ∀ (i j k l : Fin N),
+        k.val = pσ p.1 j.val → l.val = pσ p.1 i.val
+          → n i k * pv p.1 k.val = pv p.1 i.val * m l j := by
     intro i j k l hk hl
     have := congrFun (congrFun h i) j
     rwa [mul_ptMat_apply_eq p n i j k hk, ptMat_mul_apply_eq p m i j l hl] at this
-  have hlo : ∀ a : Fin N, (if h : a.val + 1 < N then n ⟨a.val + 1, h⟩ a else 0) =
-      if hS : sameBF p.1 N a.val then
-        m ⟨pσ p.1 (a.val + 1), hlt _ hS.1⟩ ⟨pσ p.1 (a.val + 1) + 1, by rw [hS.2.1]; exact hlt _ a.isLt⟩
-      else 0 := by
+  have hlo
+      : ∀ a : Fin N,
+        (if h : a.val + 1 < N then n ⟨a.val + 1, h⟩ a else 0)
+          = if hS : sameBF p.1 N a.val then
+              m ⟨pσ p.1 (a.val + 1), hlt _ hS.1⟩
+                ⟨pσ p.1 (a.val + 1) + 1, by rw [hS.2.1]; exact hlt _ a.isLt⟩
+            else
+              0 := by
     intro a
     by_cases ha : a.val + 1 < N
     · rw [dite_eq_left ha]
-      have K1 := key ⟨a.val + 1, ha⟩ ⟨pσ p.1 a.val, hlt _ a.isLt⟩ a ⟨pσ p.1 (a.val + 1), hlt _ ha⟩
-        (hinv _ a.isLt).symm rfl
+      have K1 :=
+        key ⟨a.val + 1, ha⟩ ⟨pσ p.1 a.val, hlt _ a.isLt⟩ a ⟨pσ p.1 (a.val + 1), hlt _ ha⟩
+          (hinv _ a.isLt).symm rfl
       split_ifs with hS
       · obtain ⟨_, h2, h3⟩ := hS
-        have e : (⟨pσ p.1 a.val, hlt _ a.isLt⟩ : Fin N) =
-            ⟨pσ p.1 (a.val + 1) + 1, by rw [h2]; exact hlt _ a.isLt⟩ := Fin.ext h2.symm
+        have e
+            : (⟨pσ p.1 a.val, hlt _ a.isLt⟩ : Fin N)
+              = ⟨pσ p.1 (a.val + 1) + 1, by rw [h2]; exact hlt _ a.isLt⟩ :=
+          Fin.ext h2.symm
         have h3' : pv p.1 (Fin.val (⟨a.val + 1, ha⟩ : Fin N)) = pv p.1 a.val := h3
         rw [e, h3'] at K1
         exact mul_right_cancel₀ (hv _ a.isLt) (K1.trans (mul_comm _ _))
@@ -230,8 +245,10 @@ theorem simple_eqF (p : Point K N) {n m : Matrix (Fin N) (Fin N) K} (hn : IsLoUn
           rw [e, mul_zero] at K1
           exact (mul_eq_zero.1 K1).resolve_right (hv _ a.isLt)
     · rw [dite_eq_right ha, dite_eq_right (fun hS => ha hS.1)]
-  have hup : ∀ b : Fin N, (if h : b.val + 1 < N then m b ⟨b.val + 1, h⟩ else 0) =
-      if hS : sameBF p.1 N b.val then m b ⟨b.val + 1, hS.1⟩ else 0 := by
+  have hup
+      : ∀ b : Fin N,
+        (if h : b.val + 1 < N then m b ⟨b.val + 1, h⟩ else 0)
+          = if hS : sameBF p.1 N b.val then m b ⟨b.val + 1, hS.1⟩ else 0 := by
     intro b
     by_cases hb : b.val + 1 < N
     · rw [dite_eq_left hb]
@@ -239,8 +256,9 @@ theorem simple_eqF (p : Point K N) {n m : Matrix (Fin N) (Fin N) K} (hn : IsLoUn
       · rfl
       · rcases hadj p.1 b.val with hsame | hgt
         · exact absurd ⟨hb, hsame.1, hsame.2⟩ hS
-        · have K1 := key ⟨pσ p.1 b.val, hlt _ b.isLt⟩ ⟨b.val + 1, hb⟩ ⟨pσ p.1 (b.val + 1), hlt _ hb⟩ b
-            rfl (hinv _ b.isLt).symm
+        · have K1 :=
+            key ⟨pσ p.1 b.val, hlt _ b.isLt⟩ ⟨b.val + 1, hb⟩ ⟨pσ p.1 (b.val + 1), hlt _ hb⟩ b rfl
+              (hinv _ b.isLt).symm
           have e : n ⟨pσ p.1 b.val, hlt _ b.isLt⟩ ⟨pσ p.1 (b.val + 1), hlt _ hb⟩ = 0 :=
             (hn _ _).1 (by rw [Fin.lt_iff_val_lt_val]; exact hgt)
           rw [e, zero_mul] at K1
@@ -263,30 +281,37 @@ theorem simple_eqF (p : Point K N) {n m : Matrix (Fin N) (Fin N) K} (hn : IsLoUn
     simp [hfe, hS, h2.1]
   · simp [hfe, hS]
 
-theorem decompSimpleF (p : Point K N) {L U L' U' : Matrix (Fin N) (Fin N) K} (hL : IsLoUni L) (hU : IsUpUni U)
-    (hL' : IsLoUni L') (hU' : IsUpUni U') (e : L * ptMat p * U = L' * ptMat p * U') :
-    sgLoF L + sgUpF U = sgLoF L' + sgUpF U' := by
+theorem decompSimpleF
+    (p : Point K N)
+    {L U L' U' : Matrix (Fin N) (Fin N) K} (hL : IsLoUni L) (hU : IsUpUni U) (hL' : IsLoUni L')
+    (hU' : IsUpUni U') (e : L * ptMat p * U = L' * ptMat p * U')
+    : sgLoF L + sgUpF U = sgLoF L' + sgUpF U' := by
   obtain ⟨hn, hm, hnm, hL1, hU1⟩ := cell_move hL hU hL' hU' e
   have hs := simple_eqF p hn hm hnm
   have h1 : sgLoF L = sgLoF L' + sgLoF (L'⁻¹ * L) := by rw [← sgLoF_mul hL' hn, hL1]
   have h2 : sgUpF U' = sgUpF (U' * U⁻¹) + sgUpF U := by rw [← sgUpF_mul hm hU, hU1]
-  rw [h1, h2, hs]; ring
+  rw [h1, h2, hs]
+  ring
 
-def mapPt {K' : Type} [Field K'] (f : K →+* K') (p : Point K N) : Point K' N :=
-  ⟨p.1.map (fun b => (f b.1, b.2)), by
+def mapPt {K' : Type} [Field K'] (f : K →+* K') (p : Point K N) : Point K' N := ⟨
+  p.1.map (fun b => (f b.1, b.2)),
+  by
     refine ⟨fun b hb => ?_, ?_⟩
     · obtain ⟨c, hc, rfl⟩ := List.mem_map.1 hb
       exact ⟨(map_ne_zero f).2 (p.2.1 c hc).1, (p.2.1 c hc).2⟩
-    · rw [List.map_map]; exact p.2.2⟩
+    · rw [List.map_map]; exact p.2.2
+⟩
 
-theorem ptEntry_map {K' : Type} [Field K'] (f : K →+* K') :
-    ∀ (bs : List (K × ℕ)) (i j : ℕ), ptEntry (bs.map (fun b => (f b.1, b.2))) i j = f (ptEntry bs i j)
+theorem ptEntry_map {K' : Type} [Field K'] (f : K →+* K')
+    : ∀ (bs : List (K × ℕ)) (i j : ℕ),
+      ptEntry (bs.map (fun b => (f b.1, b.2))) i j = f (ptEntry bs i j)
   | [], _, _ => by simp [ptEntry]
   | (t, s) :: bs, i, j => by
     simp only [List.map_cons, ptEntry]
     split_ifs <;> simp [ptEntry_map f bs]
 
-theorem ptMat_mapPt {K' : Type} [Field K'] (f : K →+* K') (p : Point K N) : ptMat (mapPt f p) = (ptMat p).map f := by
+theorem ptMat_mapPt {K' : Type} [Field K'] (f : K →+* K') (p : Point K N)
+    : ptMat (mapPt f p) = (ptMat p).map f := by
   ext a b
   exact ptEntry_map f p.1 a.val b.val
 

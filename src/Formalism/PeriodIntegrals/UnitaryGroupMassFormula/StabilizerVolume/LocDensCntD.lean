@@ -34,9 +34,13 @@ theorem exists_anti (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) : ∃ δ : E, δ
   rw [map_sub, hinv]
   abel
 
-theorem anti_coeff (σ : E →ₐ[F] E) {δ : E} (hδ0 : δ ≠ 0) (hσδ : σ δ = -δ) (s t : F)
-    (h : σ (s • (1 : E) + t • δ) = s • 1 + t • δ) : t = 0 := by
-  simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgHom.commutes, map_one, hσδ, mul_one] at h
+theorem anti_coeff
+    (σ : E →ₐ[F] E)
+    {δ : E} (hδ0 : δ ≠ 0) (hσδ : σ δ = -δ)
+    (s t : F) (h : σ (s • (1 : E) + t • δ) = s • 1 + t • δ)
+    : t = 0 := by
+  simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgHom.commutes, map_one, hσδ, mul_one]
+    at h
   have h2 : (2 : E) * (algebraMap F E t * δ) = 0 := by linear_combination -h
   rcases mul_eq_zero.1 h2 with h3 | h3
   · exact absurd h3 two_ne_zero
@@ -44,9 +48,9 @@ theorem anti_coeff (σ : E →ₐ[F] E) {δ : E} (hδ0 : δ ≠ 0) (hσδ : σ �
     · exact (algebraMap F E).injective (by rw [h4, map_zero])
     · exact absurd h4 hδ0
 
-theorem exists_basis_anti (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) :
-    ∃ (δ : E) (D0 : F) (c : Module.Basis (Fin 2) F E), δ ≠ 0 ∧ σ δ = -δ ∧
-      δ * δ = algebraMap F E D0 ∧ D0 ≠ 0 ∧ c 0 = 1 ∧ c 1 = δ := by
+theorem exists_basis_anti (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ)
+    : ∃ (δ : E) (D0 : F) (c : Module.Basis (Fin 2) F E),
+      δ ≠ 0 ∧ σ δ = -δ ∧ δ * δ = algebraMap F E D0 ∧ D0 ≠ 0 ∧ c 0 = 1 ∧ c 1 = δ := by
   obtain ⟨δ, hδ0, hσδ⟩ := exists_anti σ hCM
   have h2 : Module.finrank F E = 2 := hCM.2.2.1
   have hli : LinearIndependent F ![(1 : E), δ] := by

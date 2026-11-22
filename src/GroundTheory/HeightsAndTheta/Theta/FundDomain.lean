@@ -12,8 +12,8 @@ namespace GroundTheory.Heights₂.Theta
 
 variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem exists_isOpen_inter_subgroup_eq_one (Γ : Subgroup G) [DiscreteTopology Γ] :
-    ∃ W : Set G, IsOpen W ∧ (1 : G) ∈ W ∧ ∀ γ ∈ Γ, γ ∈ W → γ = 1 := by
+theorem exists_isOpen_inter_subgroup_eq_one (Γ : Subgroup G) [DiscreteTopology Γ]
+    : ∃ W : Set G, IsOpen W ∧ (1 : G) ∈ W ∧ ∀ γ ∈ Γ, γ ∈ W → γ = 1 := by
   have h1 : IsOpen ({1} : Set Γ) := isOpen_discrete _
   obtain ⟨W, hW, hWeq⟩ := isOpen_induced_iff.mp h1
   refine ⟨W, hW, ?_, ?_⟩
@@ -26,17 +26,21 @@ theorem exists_isOpen_inter_subgroup_eq_one (Γ : Subgroup G) [DiscreteTopology 
 
 variable [LocallyCompactSpace G]
 
-theorem exists_isOpen_small (Γ : Subgroup G) [DiscreteTopology Γ] (c : G) :
-    ∃ V : Set G, IsOpen V ∧ c ∈ V ∧ (∃ L, IsCompact L ∧ V ⊆ L) ∧
-      ∀ γ ∈ Γ, ∀ x ∈ V, γ * x ∈ V → γ = 1 := by
+theorem exists_isOpen_small (Γ : Subgroup G) [DiscreteTopology Γ] (c : G)
+    : ∃ V : Set G,
+      IsOpen V ∧ c ∈ V ∧ (∃ L, IsCompact L ∧ V ⊆ L) ∧ ∀ γ ∈ Γ, ∀ x ∈ V, γ * x ∈ V → γ = 1 := by
   obtain ⟨W, hWo, hW1, hWΓ⟩ := exists_isOpen_inter_subgroup_eq_one Γ
   have hcont : Continuous fun p : G × G => p.1 * p.2⁻¹ := by fun_prop
   have hmem : (c, c) ∈ (fun p : G × G => p.1 * p.2⁻¹) ⁻¹' W := by simpa using hW1
-  obtain ⟨U₁, U₂, hU₁, hU₂, hc₁, hc₂, hsub⟩ :=
-    isOpen_prod_iff.mp (hWo.preimage hcont) c c hmem
+  obtain ⟨U₁, U₂, hU₁, hU₂, hc₁, hc₂, hsub⟩ := isOpen_prod_iff.mp (hWo.preimage hcont) c c hmem
   obtain ⟨L, hL, hLn⟩ := exists_compact_mem_nhds c
-  refine ⟨U₁ ∩ U₂ ∩ interior L, (hU₁.inter hU₂).inter isOpen_interior,
-    ⟨⟨hc₁, hc₂⟩, mem_interior_iff_mem_nhds.mpr hLn⟩, ⟨L, hL, fun x hx => interior_subset hx.2⟩, ?_⟩
+  refine ⟨
+    U₁ ∩ U₂ ∩ interior L,
+    (hU₁.inter hU₂).inter isOpen_interior,
+    ⟨⟨hc₁, hc₂⟩, mem_interior_iff_mem_nhds.mpr hLn⟩,
+    ⟨L, hL, fun x hx => interior_subset hx.2⟩,
+    ?_
+  ⟩
   intro γ hγ x hx hγx
   apply hWΓ γ hγ
   have : (γ * x, x) ∈ U₁ ×ˢ U₂ := ⟨hγx.1.1, hx.1.2⟩
@@ -45,23 +49,24 @@ theorem exists_isOpen_small (Γ : Subgroup G) [DiscreteTopology Γ] (c : G) :
 def saturate (Γ : Subgroup G) (A : Set G) : Set G := {y | ∃ γ ∈ Γ, γ⁻¹ * y ∈ A}
 
 theorem isOpen_saturate (Γ : Subgroup G) {A : Set G} (hA : IsOpen A) : IsOpen (saturate Γ A) := by
-  have : saturate Γ A = ⋃ γ : Γ, (fun y => (γ : G)⁻¹ * y) ⁻¹' A := by
-    ext y; simp [saturate]
+  have : saturate Γ A = ⋃ γ : Γ, (fun y => (γ : G)⁻¹ * y) ⁻¹' A := by ext y; simp [saturate]
   rw [this]
   exact isOpen_iUnion fun γ => hA.preimage (by fun_prop)
 
-def firstHit (Γ : Subgroup G) (A : ℕ → Set G) : Set G :=
-  ⋃ i, (A i \ saturate Γ (⋃ j < i, A j))
+def firstHit (Γ : Subgroup G) (A : ℕ → Set G) : Set G := ⋃ i, (A i \ saturate Γ (⋃ j < i, A j))
 
-theorem measurableSet_firstHit [MeasurableSpace G] [BorelSpace G] (Γ : Subgroup G)
-    {A : ℕ → Set G} (hA : ∀ i, IsOpen (A i)) : MeasurableSet (firstHit Γ A) := by
+theorem measurableSet_firstHit
+    [MeasurableSpace G] [BorelSpace G] (Γ : Subgroup G) {A : ℕ → Set G} (hA : ∀ i, IsOpen (A i))
+    : MeasurableSet (firstHit Γ A) := by
   refine MeasurableSet.iUnion fun i => (hA i).measurableSet.diff ?_
-  exact (isOpen_saturate Γ (isOpen_iUnion fun j => isOpen_iUnion fun _ : j < i => hA j)).measurableSet
+  exact (isOpen_saturate Γ
+    (isOpen_iUnion fun j => isOpen_iUnion fun _ : j < i => hA j)).measurableSet
 
-theorem existsUnique_mem_firstHit (Γ : Subgroup G) (A : ℕ → Set G)
-    (hinj : ∀ i, ∀ γ ∈ Γ, ∀ x ∈ A i, γ * x ∈ A i → γ = 1)
-    (hcov : ∀ x : G, ∃ i, ∃ γ ∈ Γ, γ * x ∈ A i) (x : G) :
-    ∃! γ : Γ, γ • x ∈ firstHit Γ A := by
+theorem existsUnique_mem_firstHit
+    (Γ : Subgroup G) (A : ℕ → Set G) (hinj : ∀ i, ∀ γ ∈ Γ, ∀ x ∈ A i, γ * x ∈ A i → γ = 1)
+    (hcov : ∀ x : G, ∃ i, ∃ γ ∈ Γ, γ * x ∈ A i)
+    (x : G)
+    : ∃! γ : Γ, γ • x ∈ firstHit Γ A := by
   classical
   have hex : ∃ i, ∃ γ ∈ Γ, γ * x ∈ A i := hcov x
   let i₀ := Nat.find hex
@@ -79,10 +84,13 @@ theorem existsUnique_mem_firstHit (Γ : Subgroup G) (A : ℕ → Set G)
   · show ((⟨γ, hγ⟩ : Γ) • x ∈ firstHit Γ A)
     rw [Subgroup.smul_def, smul_eq_mul]
     exact hγF
-  ·
-    have key : ∀ (α β : Γ), (α : G) * x ∈ firstHit Γ A → (β : G) * x ∈ firstHit Γ A →
-        ∀ i i', (α : G) * x ∈ A i \ saturate Γ (⋃ j < i, A j) →
-          (β : G) * x ∈ A i' \ saturate Γ (⋃ j < i', A j) → i ≤ i' := by
+  · have key
+        : ∀ (α β : Γ),
+          (α : G) * x ∈ firstHit Γ A → (β : G) * x ∈ firstHit Γ A
+            → ∀ i i',
+              (α : G) * x ∈ A i \ saturate Γ (⋃ j < i, A j)
+                → (β : G) * x ∈ A i' \ saturate Γ (⋃ j < i', A j)
+                → i ≤ i' := by
       intro α β _ _ i i' hα hβ
       by_contra hlt'
       have hlt := not_le.mp hlt'
@@ -98,25 +106,28 @@ theorem existsUnique_mem_firstHit (Γ : Subgroup G) (A : ℕ → Set G)
     have h2 := key ⟨γ, hγ⟩ β hγF hβ i' i hi' hi
     have hii : i = i' := le_antisymm h1 h2
     subst hii
-    have hmul := hinj i ((γ : G) * (β : G)⁻¹) (Γ.mul_mem hγ (Γ.inv_mem β.2)) _ hi.1
-      (by simpa [mul_assoc] using hi'.1)
+    have hmul :=
+      hinj i ((γ : G) * (β : G)⁻¹) (Γ.mul_mem hγ (Γ.inv_mem β.2)) _ hi.1
+        (by simpa [mul_assoc] using hi'.1)
     apply Subtype.ext
     have : (γ : G) = β := by
       have := congrArg (· * (β : G)) hmul
       simpa using this
     exact this.symm
 
-theorem exists_isFundamentalDomain_of_isCompact [MeasurableSpace G] [BorelSpace G]
-    (Γ : Subgroup G) [DiscreteTopology Γ] {C : Set G} (hC : IsCompact C)
-    (hcov : ∀ x : G, ∃ γ ∈ Γ, γ * x ∈ C) :
-    ∃ 𝓕 L : Set G, MeasurableSet 𝓕 ∧ IsCompact L ∧ 𝓕 ⊆ L ∧ ∀ x, ∃! γ : Γ, γ • x ∈ 𝓕 := by
+theorem exists_isFundamentalDomain_of_isCompact
+    [MeasurableSpace G] [BorelSpace G]
+    (Γ : Subgroup G) [DiscreteTopology Γ]
+    {C : Set G} (hC : IsCompact C) (hcov : ∀ x : G, ∃ γ ∈ Γ, γ * x ∈ C)
+    : ∃ 𝓕 L : Set G, MeasurableSet 𝓕 ∧ IsCompact L ∧ 𝓕 ⊆ L ∧ ∀ x, ∃! γ : Γ, γ • x ∈ 𝓕 := by
   classical
   choose V hVo hcV hVL hVinj using exists_isOpen_small Γ
   obtain ⟨t, ht⟩ := hC.elim_finite_subcover V hVo (fun c _ => mem_iUnion.mpr ⟨c, hcV c⟩)
   let l := t.toList
   let A : ℕ → Set G := fun i => if h : i < l.length then V (l.get ⟨i, h⟩) else ∅
   have hAo : ∀ i, IsOpen (A i) := fun i => by
-    simp only [A]; split_ifs
+    simp only [A]
+    split_ifs
     · exact hVo _
     · exact isOpen_empty
   have hinj : ∀ i, ∀ γ ∈ Γ, ∀ x ∈ A i, γ * x ∈ A i → γ = 1 := by
@@ -138,8 +149,14 @@ theorem exists_isFundamentalDomain_of_isCompact [MeasurableSpace G] [BorelSpace 
     rw [hget]
     exact hcV'
   choose L hL hVL' using hVL
-  refine ⟨firstHit Γ A, ⋃ c ∈ t, L c, measurableSet_firstHit Γ hAo,
-    t.isCompact_biUnion fun c _ => hL c, ?_, existsUnique_mem_firstHit Γ A hinj hcovA⟩
+  refine ⟨
+    firstHit Γ A,
+    ⋃ c ∈ t, L c,
+    measurableSet_firstHit Γ hAo,
+    t.isCompact_biUnion fun c _ => hL c,
+    ?_,
+    existsUnique_mem_firstHit Γ A hinj hcovA
+  ⟩
   intro y hy
   obtain ⟨i, hi, -⟩ := mem_iUnion.mp hy
   simp only [A] at hi

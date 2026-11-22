@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Conne
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 open scoped TensorProduct
 
@@ -68,9 +70,23 @@ end GlobalTheory.HTSummand.LieMod
 
 namespace GlobalTheory.HTSummand
 
-
 open LieMod in
-theorem lie_mod_fil : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R] (b : GlobalTheory.UPel.HT.Base D R) (N : ℕ) (C₀ : Type) [CommRing C₀] [IsLocalRing C₀] (β : R →+* C₀) (s : Sp C₀ ⟶ Sp R), s = spMap β → ∀ (o₀ : GlobalTheory.UPel.HT.Obj b N s) (y : HdR o₀.A), GlobalTheory.HTSummand.crysAct (dp0 C₀) (𝟙 _) o₀.act (algebraMap (𝓞 D.F) D.O D.ω) y - β b.ρ • y ∈ Fil o₀.A → ∃ w : Fin D.a → HdR o₀.A, (∀ i (c : 𝓞 D.F), GlobalTheory.HTSummand.crysAct (dp0 C₀) (𝟙 _) o₀.act (algebraMap (𝓞 D.F) D.O c) (w i) - β (b.t i c) • w i ∈ Fil o₀.A) ∧ y - ∑ i, w i ∈ Fil o₀.A := by
+theorem lie_mod_fil
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R]
+        (b : GlobalTheory.UPel.HT.Base D R) (N : ℕ) (C₀ : Type) [CommRing C₀] [IsLocalRing C₀]
+        (β : R →+* C₀) (s : Sp C₀ ⟶ Sp R),
+      s = spMap β
+        → ∀ (o₀ : GlobalTheory.UPel.HT.Obj b N s) (y : HdR o₀.A),
+          GlobalTheory.HTSummand.crysAct (dp0 C₀) (𝟙 _) o₀.act (algebraMap (𝓞 D.F) D.O D.ω) y
+                - β b.ρ • y
+              ∈ Fil o₀.A
+            → ∃ w : Fin D.a → HdR o₀.A,
+              (∀ i (c : 𝓞 D.F),
+                  GlobalTheory.HTSummand.crysAct (dp0 C₀) (𝟙 _) o₀.act (algebraMap (𝓞 D.F) D.O c)
+                        (w i)
+                      - β (b.t i c) • w i
+                    ∈ Fil o₀.A)
+                ∧ y - ∑ i, w i ∈ Fil o₀.A := by
   intro p _ D R _ b N C₀ _ _ β s hs o₀ y hy
   obtain ⟨g, hg⟩ := GlobalTheory.AbelianDim.exists_relDim C₀ o₀.A o₀.ab
   have H : LieExact o₀.A := (GlobalTheory.abelianDeRham.2.1 C₀ o₀.A g o₀.ab hg).1
@@ -82,17 +98,19 @@ theorem lie_mod_fil : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Dat
   have hx : 𝟙 (Sp C₀) ≫ s = spMap β := by rw [Category.id_comp, hs]
   have hvT : GlobalTheory.UPel.HT.IsTanScal o₀.act (𝟙 (Sp C₀)) ωO (β b.ρ) (epsIso.inv ≫ v) := by
     refine ⟨tan_of hv.1, ?_⟩
-    rw [Category.assoc, Over.comp_left, hω, Over.comp_left, Over.comp_left, epsIso_inv_left, Category.id_comp,
-      Category.id_comp, GlobalTheory.GrpTangent.epsScale_left]
+    rw [Category.assoc, Over.comp_left, hω, Over.comp_left, Over.comp_left, epsIso_inv_left,
+      Category.id_comp, Category.id_comp, GlobalTheory.GrpTangent.epsScale_left]
   obtain ⟨w, hw, hprod⟩ := o₀.lie C₀ β (𝟙 (Sp C₀)) hx (epsIso.inv ≫ v) hvT
   have hwT : ∀ i, IsTangent (epsIso.hom ≫ w i) := fun i => tan_to (hw i 0).1
   choose u hu using fun i => H.2 _ (hwT i)
   refine ⟨u, fun i c => ?_, ?_⟩
   · haveI := o₀.act.hom (algebraMap (𝓞 D.F) D.O c)
-    have e : (epsIso.hom ≫ w i) ≫ o₀.act.act (algebraMap (𝓞 D.F) D.O c) =
-        GlobalTheory.GrpTangent.epsScale (β (b.t i c)) ≫ epsIso.hom ≫ w i := by
+    have e
+        : (epsIso.hom ≫ w i) ≫ o₀.act.act (algebraMap (𝓞 D.F) D.O c)
+          = GlobalTheory.GrpTangent.epsScale (β (b.t i c)) ≫ epsIso.hom ≫ w i := by
       ext1
-      simp only [Over.comp_left, epsIso_hom_left, Category.id_comp, GlobalTheory.GrpTangent.epsScale_left]
+      simp only [Over.comp_left, epsIso_hom_left, Category.id_comp,
+        GlobalTheory.GrpTangent.epsScale_left]
       rw [← Over.comp_left]
       exact (hw i c).2
     have k₁ := (hu i).push (o₀.act.act (algebraMap (𝓞 D.F) D.O c))
@@ -101,7 +119,8 @@ theorem lie_mod_fil : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Dat
   · have k := isLieImage_sum D.a u _ hu
     have e : (List.ofFn fun i => epsIso.hom ≫ w i).prod = v := by
       rw [show (List.ofFn fun i => epsIso.hom ≫ w i) = (List.ofFn w).map (epsIso.hom ≫ ·) from
-        List.map_ofFn.symm, ← comp_prod, ← hprod, Iso.hom_inv_id_assoc]
+          List.map_ofFn.symm,
+        ← comp_prod, ← hprod, Iso.hom_inv_id_assoc]
     rw [e] at k
     exact hv.sub_mem k
 

@@ -77,11 +77,19 @@ private lemma good_all (k : ℕ) (hk : Even k) (h2 : k ≠ 2) : GoodWt k := by
 
 end UpperTheory.V.Sd
 
-theorem UpperTheory.V.Sd.levelOne :
-    UpperTheory.V.Sd.LevelOne := by
+theorem UpperTheory.V.Sd.levelOne : UpperTheory.V.Sd.LevelOne := by
   intro N k _ hk h2
   obtain ⟨f, hf0, hf⟩ := UpperTheory.V.Sd.good_all k hk h2
-  have hle : (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 N)) ≤ 𝒮ℒ := Subgroup.map_le_range _ _
-  refine ⟨⟨⟨f, fun γ hγ => SlashInvariantFormClass.slash_action_eq f γ (hle hγ)⟩, ModularFormClass.holo f,
-    fun hc => f.bdd_at_cusps' (hc.mono hle)⟩, fun γ => ?_, hf0, hf⟩
+  have hle : (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (Gamma1 N)) ≤ 𝒮ℒ :=
+    Subgroup.map_le_range _ _
+  refine ⟨
+    ⟨
+      ⟨f, fun γ hγ => SlashInvariantFormClass.slash_action_eq f γ (hle hγ)⟩,
+      ModularFormClass.holo f,
+      fun hc => f.bdd_at_cusps' (hc.mono hle)
+    ⟩,
+    fun γ => ?_,
+    hf0,
+    hf
+  ⟩
   exact SlashInvariantFormClass.slash_action_eq f (Matrix.SpecialLinearGroup.mapGL ℝ γ) ⟨γ, rfl⟩

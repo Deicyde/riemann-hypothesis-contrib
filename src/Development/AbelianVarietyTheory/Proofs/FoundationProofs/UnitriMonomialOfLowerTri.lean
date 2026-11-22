@@ -13,18 +13,25 @@ namespace GlobalTheory.CoeffWord
 
 variable {R : Type} [CommRing R] {r n : ℕ}
 
-def unitri (R : Type) [CommRing R] (L : List (Fin r × Fin n)) :
-    MvPolynomial (Fin r × Fin n) R →ₐ[R] MvPolynomial (Fin r × Fin n) R :=
-  aeval fun v => if v.1.val = v.2.val then 1 else if v ∈ L then X v else 0
+def unitri (R : Type) [CommRing R] (L : List (Fin r × Fin n))
+    : MvPolynomial (Fin r × Fin n) R →ₐ[R] MvPolynomial (Fin r × Fin n) R :=
+  aeval fun v =>
+    if v.1.val = v.2.val then
+      1
+    else if v ∈ L then
+      X v
+    else
+      0
 
-def single (R : Type) [CommRing R] (p : Fin r × Fin n) :
-    MvPolynomial (Fin r × Fin n) R →ₐ[R] Polynomial (MvPolynomial (Fin r × Fin n) R) :=
+def single (R : Type) [CommRing R] (p : Fin r × Fin n)
+    : MvPolynomial (Fin r × Fin n) R →ₐ[R] Polynomial (MvPolynomial (Fin r × Fin n) R) :=
   aeval fun v => if v = p then Polynomial.X else Polynomial.C (X v)
 
-theorem single_monomial (p : Fin r × Fin n) (m : Fin r × Fin n →₀ ℕ) (c : R) :
-    single R p (monomial m c) = Polynomial.monomial (m p) (monomial (m.erase p) c) := by
+theorem single_monomial (p : Fin r × Fin n) (m : Fin r × Fin n →₀ ℕ) (c : R)
+    : single R p (monomial m c) = Polynomial.monomial (m p) (monomial (m.erase p) c) := by
   classical
-  have h1 : (monomial m c : MvPolynomial (Fin r × Fin n) R) = monomial (m.erase p) c * X p ^ (m p) := by
+  have h1
+      : (monomial m c : MvPolynomial (Fin r × Fin n) R) = monomial (m.erase p) c * X p ^ (m p) := by
     rw [X_pow_eq_monomial, monomial_mul, mul_one, Finsupp.erase_add_single]
   have h2 : single R p (monomial (m.erase p) c) = Polynomial.C (monomial (m.erase p) c) := by
     rw [single, aeval_monomial, monomial_eq, map_mul, map_finsuppProd]
@@ -37,9 +44,11 @@ theorem single_monomial (p : Fin r × Fin n) (m : Fin r × Fin n →₀ ℕ) (c 
   have h3 : single R p (X p) = Polynomial.X := by simp [single]
   rw [h1, map_mul, map_pow, h2, h3, Polynomial.C_mul_X_pow_eq_monomial]
 
-theorem coeff_single (p : Fin r × Fin n) (e : Fin r × Fin n →₀ ℕ) (he : e p = 0) (k : ℕ)
-    (G : MvPolynomial (Fin r × Fin n) R) :
-    AddMonoidAlgebra.coeff ((single R p G).coeff k) e = AddMonoidAlgebra.coeff G (e + Finsupp.single p k) := by
+theorem coeff_single
+    (p : Fin r × Fin n) (e : Fin r × Fin n →₀ ℕ) (he : e p = 0)
+    (k : ℕ) (G : MvPolynomial (Fin r × Fin n) R)
+    : AddMonoidAlgebra.coeff ((single R p G).coeff k) e
+      = AddMonoidAlgebra.coeff G (e + Finsupp.single p k) := by
   classical
   induction G using MvPolynomial.induction_on' with
   | add G H hG hH => simp [hG, hH]
@@ -61,12 +70,14 @@ theorem coeff_single (p : Fin r × Fin n) (e : Fin r × Fin n →₀ ℕ) (he : 
         rw [← h2, ← h1, Finsupp.erase_add_single]
       · simp
 
-theorem map_rowGen (L : List (Fin r × Fin n)) (p : Fin r × Fin n) (s : Fin r) (hs : s.val = p.2.val)
+theorem map_rowGen
+    (L : List (Fin r × Fin n))
+    (p : Fin r × Fin n) (s : Fin r) (hs : s.val = p.2.val)
     (hp : p.2.val < p.1.val) (hpL : p ∉ L) (hL : ∀ q ∈ L, q.2.val < q.1.val ∧ p.2.val ≤ q.2.val)
-    (F : MvPolynomial (Fin r × Fin n) R) :
-    (rowGen R s p.1 F).map (unitri R L).toRingHom = single R p (unitri R (L ++ [p]) F) := by
-  have : (Polynomial.mapRingHom (unitri R L).toRingHom).comp (rowGen R s p.1).toRingHom =
-      (single R p).toRingHom.comp (unitri R (L ++ [p])).toRingHom := by
+    (F : MvPolynomial (Fin r × Fin n) R)
+    : (rowGen R s p.1 F).map (unitri R L).toRingHom = single R p (unitri R (L ++ [p]) F) := by
+  have : (Polynomial.mapRingHom (unitri R L).toRingHom).comp (rowGen R s p.1).toRingHom
+      = (single R p).toRingHom.comp (unitri R (L ++ [p])).toRingHom := by
     refine MvPolynomial.ringHom_ext (fun c => ?_) (fun v => ?_)
     · simp [rowGen, single, unitri]
     · by_cases hv : v = p
@@ -84,8 +95,8 @@ theorem map_rowGen (L : List (Fin r × Fin n)) (p : Fin r × Fin n) (s : Fin r) 
         have h5 : single R p (unitri R (L ++ [p]) (X v)) = Polynomial.C (unitri R L (X v)) := by
           simp only [unitri, aeval_X, List.mem_append, List.mem_singleton, hv, or_false]
           split_ifs <;> simp [single, hv]
-        simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, h5, rowGen, aeval_X,
-          Polynomial.coe_mapRingHom, Polynomial.map_add, Polynomial.map_C]
+        simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, h5, rowGen,
+          aeval_X, Polynomial.coe_mapRingHom, Polynomial.map_add, Polynomial.map_C]
         split_ifs with h1
         · simp [h0 h1]
         · simp
@@ -94,20 +105,24 @@ theorem map_rowGen (L : List (Fin r × Fin n)) (p : Fin r × Fin n) (s : Fin r) 
 def letter (e : Fin r × Fin n →₀ ℕ) (p : Fin r × Fin n) : Fin r × Fin r × ℕ :=
   (if h : p.2.val < r then ⟨p.2.val, h⟩ else p.1, p.1, e p)
 
-theorem eval_applyWord (e : Fin r × Fin n →₀ ℕ) (L : List (Fin r × Fin n))
+theorem eval_applyWord
+    (e : Fin r × Fin n →₀ ℕ)
+    (L : List (Fin r × Fin n))
     (h1 : ∀ q ∈ L, q.2.val < q.1.val) (h2 : L.Pairwise fun q p => q ≠ p ∧ p.2.val ≤ q.2.val)
-    (F : MvPolynomial (Fin r × Fin n) R) :
-    eval (idFrame R r n) (applyWord R (L.map (letter e)) F) =
-      (unitri R L F).coeff (e.filter (· ∈ L)) := by
+    (F : MvPolynomial (Fin r × Fin n) R)
+    : eval (idFrame R r n) (applyWord R (L.map (letter e)) F)
+      = (unitri R L F).coeff (e.filter (· ∈ L)) := by
   induction L using List.reverseRecOn generalizing F with
   | nil =>
-    have h : (eval (idFrame R r n)) = constantCoeff.comp (unitri R ([] : List (Fin r × Fin n))).toRingHom := by
+    have h
+        : (eval (idFrame R r n))
+          = constantCoeff.comp (unitri R ([] : List (Fin r × Fin n))).toRingHom := by
       refine MvPolynomial.ringHom_ext (fun c => ?_) (fun v => ?_)
       · simp [unitri]
-      · simp only [unitri, idFrame, eval_X, RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, aeval_X]
+      · simp only [unitri, idFrame, eval_X, RingHom.comp_apply, AlgHom.toRingHom_eq_coe,
+          RingHom.coe_coe, aeval_X]
         split_ifs <;> simp_all
-    have h' : e.filter (· ∈ ([] : List (Fin r × Fin n))) = 0 := by
-      ext v; simp
+    have h' : e.filter (· ∈ ([] : List (Fin r × Fin n))) = 0 := by ext v; simp
     rw [h', h]
     rfl
   | append_singleton L p ih =>
@@ -117,16 +132,21 @@ theorem eval_applyWord (e : Fin r × Fin n →₀ ℕ) (L : List (Fin r × Fin n
     have hpr : p.2.val < r := lt_trans hp p.1.2
     have hL1 : ∀ q ∈ L, q.2.val < q.1.val := fun q hq => h1 q (by simp [hq])
     have hpL : p ∉ L := fun h => (h3 p h p (by simp)).1 rfl
-    have hw : applyWord R ((L ++ [p]).map (letter e)) F =
-        applyWord R (L.map (letter e)) (rowDiv R ⟨p.2.val, hpr⟩ p.1 (e p) F) := by
+    have hw
+        : applyWord R ((L ++ [p]).map (letter e)) F
+          = applyWord R (L.map (letter e)) (rowDiv R ⟨p.2.val, hpr⟩ p.1 (e p) F) := by
       simp [applyWord, letter, hpr]
     rw [hw, ih hL1 h2]
-    have hm := map_rowGen (R := R) L p ⟨p.2.val, hpr⟩ rfl hp hpL
-      (fun q hq => ⟨hL1 q hq, (h3 q hq p (by simp)).2⟩) F
+    have hm :=
+      map_rowGen (R := R) L p ⟨p.2.val, hpr⟩ rfl hp hpL
+        (fun q hq => ⟨hL1 q hq, (h3 q hq p (by simp)).2⟩)
+        F
     have hc := congrArg (fun P => _root_.AddMonoidAlgebra.coeff (M := ℕ) P (e p)) hm
     simp only [Polynomial.coeff_map] at hc
-    have hc' : unitri R L (rowDiv R ⟨p.2.val, hpr⟩ p.1 (e p) F) =
-        (single R p (unitri R (L ++ [p]) F)).coeff (e p) := hc
+    have hc'
+        : unitri R L (rowDiv R ⟨p.2.val, hpr⟩ p.1 (e p) F)
+          = (single R p (unitri R (L ++ [p]) F)).coeff (e p) :=
+      hc
     rw [hc', coeff_single _ _ (by simp [Finsupp.filter_apply, hpL])]
     congr 1
     ext v
@@ -156,11 +176,11 @@ theorem wordOf_eq (e : Fin r × Fin n →₀ ℕ) : wordOf e = (positions r n).m
       rw [List.filterMap_cons, dite_eq_left ⟨h, hr⟩, List.filter_cons_of_pos (by simpa using h)]
       simp only [List.map_cons, ih]
       simp [letter, hr]
-    · rw [List.filterMap_cons, dite_eq_right (fun h' => h h'.1), List.filter_cons_of_neg (by simpa using h)]
+    · rw [List.filterMap_cons, dite_eq_right (fun h' => h h'.1),
+        List.filter_cons_of_neg (by simpa using h)]
       exact ih
 
-theorem pairwise_positions :
-    (positions r n).Pairwise fun q p => q ≠ p ∧ p.2.val ≤ q.2.val := by
+theorem pairwise_positions : (positions r n).Pairwise fun q p => q ≠ p ∧ p.2.val ≤ q.2.val := by
   rw [positions, List.pairwise_flatMap]
   constructor
   · intro s _
@@ -176,9 +196,11 @@ theorem pairwise_positions :
     obtain ⟨b, -, rfl⟩ := hy
     exact ⟨fun h => hst.ne' (congrArg Prod.snd h), hst.le⟩
 
-theorem eq_of_filter_eq (m e : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (he : LowerTri e)
+theorem eq_of_filter_eq
+    (m e : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (he : LowerTri e)
     (hs : ∀ s : Fin n, ∑ a : Fin r, m (a, s) = ∑ a : Fin r, e (a, s))
-    (h : ∀ v : Fin r × Fin n, v.2.val < v.1.val → m v = e v) : m = e := by
+    (h : ∀ v : Fin r × Fin n, v.2.val < v.1.val → m v = e v)
+    : m = e := by
   have key : ∀ (a : Fin r) (s : Fin n), a.val ≠ s.val → m (a, s) = e (a, s) := by
     intro a s hne
     rcases lt_or_gt_of_ne hne with h1 | h1
@@ -187,14 +209,16 @@ theorem eq_of_filter_eq (m e : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (he 
   ext ⟨a, s⟩
   by_cases ha : a.val = s.val
   · have h1 := hs s
-    rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a), ← Finset.add_sum_erase _ _ (Finset.mem_univ a),
-      Finset.sum_congr rfl (fun b hb => key b s (fun hb' =>
-        (Finset.ne_of_mem_erase hb) (Fin.ext (hb'.trans ha.symm))))] at h1
+    rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a),
+        ← Finset.add_sum_erase _ _ (Finset.mem_univ a),
+        Finset.sum_congr rfl (fun b hb =>
+          key b s (fun hb' => (Finset.ne_of_mem_erase hb) (Fin.ext (hb'.trans ha.symm))))]
+      at h1
     exact Nat.add_right_cancel h1
   · exact key a s ha
 
-theorem unitri_monomial_of_lowerTri (m : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (c : R) :
-    unitri R (positions r n) (monomial m c) = monomial (m.filter (· ∈ positions r n)) c := by
+theorem unitri_monomial_of_lowerTri (m : Fin r × Fin n →₀ ℕ) (hm : LowerTri m) (c : R)
+    : unitri R (positions r n) (monomial m c) = monomial (m.filter (· ∈ positions r n)) c := by
   classical
   rw [unitri, aeval_monomial, monomial_eq, Finsupp.prod_filter_index, Finsupp.support_filter,
     Finset.prod_filter]
@@ -207,8 +231,8 @@ theorem unitri_monomial_of_lowerTri (m : Fin r × Fin n →₀ ℕ) (hm : LowerT
   · have h3 : v.2.val < v.1.val := by omega
     simp [mem_positions, h2, h3]
 
-theorem unitri_monomial_of_not (m : Fin r × Fin n →₀ ℕ) (hm : ¬ LowerTri m) (c : R) :
-    unitri R (positions r n) (monomial m c) = 0 := by
+theorem unitri_monomial_of_not (m : Fin r × Fin n →₀ ℕ) (hm : ¬ LowerTri m) (c : R)
+    : unitri R (positions r n) (monomial m c) = 0 := by
   simp only [LowerTri, not_forall] at hm
   obtain ⟨a, s, h, h0⟩ := hm
   rw [unitri, aeval_monomial, Finsupp.prod,
@@ -216,9 +240,10 @@ theorem unitri_monomial_of_not (m : Fin r × Fin n →₀ ℕ) (hm : ¬ LowerTri
   have h1 : ¬ s.val < a.val := by omega
   simp [mem_positions, h.ne, h1, h0]
 
-theorem weight_colW (m : Fin r × Fin n →₀ ℕ) (s : Fin n) :
-    Finsupp.weight (colW r n) m s = ∑ a : Fin r, m (a, s) := by
-  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply, Fintype.sum_prod_type]
+theorem weight_colW (m : Fin r × Fin n →₀ ℕ) (s : Fin n)
+    : Finsupp.weight (colW r n) m s = ∑ a : Fin r, m (a, s) := by
+  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply,
+    Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun a _ => ?_
   simp [colW, Pi.single_apply]
 

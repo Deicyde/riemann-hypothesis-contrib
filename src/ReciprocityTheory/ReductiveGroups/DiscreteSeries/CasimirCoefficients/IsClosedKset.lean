@@ -45,12 +45,13 @@ lemma isClosed_KG (ε : Fin n → Bool) : IsClosed ((KG ε : Set (UJ ε))) := by
 instance (ε : Fin n → Bool) : LocallyCompactSpace (KG ε) := (isClosed_KG ε).locallyCompactSpace
 
 -- Keep the instance name stable across builds of the downstream Haar modules.
-instance instMeasurableSpaceSubtypeUnitsMatrixFinComplexMemSubgroupUJKG
-    (ε : Fin n → Bool) : MeasurableSpace (KG ε) := borel _
+instance instMeasurableSpaceSubtypeUnitsMatrixFinComplexMemSubgroupUJKG (ε : Fin n → Bool)
+    : MeasurableSpace (KG ε) :=
+  borel _
 
 -- Older stub interfaces refer to the name generated from their source path.
-abbrev «instMeasurableSpaceSubtypeUnitsMatrixFinComplexMemSubgroupUJKG_.leanwrap»
-    (ε : Fin n → Bool) : MeasurableSpace (KG ε) :=
+abbrev «instMeasurableSpaceSubtypeUnitsMatrixFinComplexMemSubgroupUJKG_.leanwrap» (ε : Fin n → Bool)
+    : MeasurableSpace (KG ε) :=
   instMeasurableSpaceSubtypeUnitsMatrixFinComplexMemSubgroupUJKG ε
 
 instance (ε : Fin n → Bool) : BorelSpace (KG ε) := ⟨rfl⟩
@@ -60,18 +61,22 @@ def muK (ε : Fin n → Bool) : Measure (KG ε) := Measure.haar
 def projW {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) : T.V →L[ℂ] T.V :=
   (innerSL ℂ T.w).smulRight T.w
 
-def psM {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ)
-    (x : Matrix (Fin n) (Fin n) ℂ) : T.V →L[ℂ] T.V :=
-  ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ)) •
-    ∫ k, PhiM μ (toMK k⁻¹ * x * toMK k) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε)
-
+def psM
+    {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
+    (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ)
+    : T.V →L[ℂ] T.V :=
+  ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))
+    • ∫ k, PhiM μ (toMK k⁻¹ * x * toMK k) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε)
 
 open Classical in
-def PsiM {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ)
-    (g : Matrix (Fin n) (Fin n) ℂ) : T.V →L[ℂ] T.V :=
+def PsiM
+    {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
+    (μ : Fin n → ℤ) (g : Matrix (Fin n) (Fin n) ℂ)
+    : T.V →L[ℂ] T.V :=
   if h : ∃ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ), inP ε X ∧ g = toMK k * NormedSpace.exp X then
     T.op h.choose * psM T μ (NormedSpace.exp h.choose_spec.choose)
-  else 0
+  else
+    0
 
 section Calc
 
@@ -81,30 +86,39 @@ def IsLowerTri (c : Matrix (Fin n) (Fin n) ℂ) : Prop := ∀ a b : Fin n, a < b
 
 def IsUpperTri (c : Matrix (Fin n) (Fin n) ℂ) : Prop := ∀ a b : Fin n, b < a → c a b = 0
 
-def IsBlock (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) : Prop := ∀ a b : Fin n, ε a ≠ ε b → X a b = 0
+def IsBlock (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) : Prop :=
+  ∀ a b : Fin n, ε a ≠ ε b → X a b = 0
 
 def lowMinusUp (B : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
-  Matrix.of fun a b => if b < a then B a b else if a < b then -B a b else 0
+  Matrix.of fun a b =>
+    if b < a then
+      B a b
+    else if a < b then
+      - B a b
+    else
+      0
 
 def posSet (n : ℕ) : Set (Matrix (Fin n) (Fin n) ℂ) := {x | x.PosDef}
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-def Lhol (X : Matrix (Fin n) (Fin n) ℂ) (F : Matrix (Fin n) (Fin n) ℂ → E) :
-    Matrix (Fin n) (Fin n) ℂ → E :=
-  fun z => fderiv ℂ F z (X * z)
+def Lhol (X : Matrix (Fin n) (Fin n) ℂ) (F : Matrix (Fin n) (Fin n) ℂ → E)
+    : Matrix (Fin n) (Fin n) ℂ → E := fun z =>
+  fderiv ℂ F z (X * z)
 
-def Rhol (X : Matrix (Fin n) (Fin n) ℂ) (F : Matrix (Fin n) (Fin n) ℂ → E) :
-    Matrix (Fin n) (Fin n) ℂ → E :=
-  fun z => fderiv ℂ F z (z * X)
+def Rhol (X : Matrix (Fin n) (Fin n) ℂ) (F : Matrix (Fin n) (Fin n) ℂ → E)
+    : Matrix (Fin n) (Fin n) ℂ → E := fun z =>
+  fderiv ℂ F z (z * X)
 
-def casL (F : Matrix (Fin n) (Fin n) ℂ → E) : Matrix (Fin n) (Fin n) ℂ → E :=
-  fun z => ∑ a, ∑ b, Lhol (Matrix.single a b 1) (Lhol (Matrix.single b a 1) F) z
+def casL (F : Matrix (Fin n) (Fin n) ℂ → E) : Matrix (Fin n) (Fin n) ℂ → E := fun z =>
+  ∑ a, ∑ b, Lhol (Matrix.single a b 1) (Lhol (Matrix.single b a 1) F) z
 
 end Calc
 
-def Gint {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ)
-    (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε) : T.V →L[ℂ] T.V :=
+def Gint
+    {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
+    (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε)
+    : T.V →L[ℂ] T.V :=
   PhiM μ (toMK k⁻¹ * x * toMK k) • (T.op k * projW T * T.op k⁻¹)
 
 end ReciprocityTheory.ChartRestriction.DS.S7

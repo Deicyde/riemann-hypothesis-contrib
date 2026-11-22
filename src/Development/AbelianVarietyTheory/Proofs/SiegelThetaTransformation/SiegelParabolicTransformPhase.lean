@@ -33,13 +33,16 @@ theorem ph_rat_mul_exp (r q : ℚ) : Ph ((r : ℂ) * cexp (-(Real.pi * I * (q : 
   push_cast
   rfl
 
-theorem trans_explicit (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
+theorem trans_explicit
+    (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
     (σ : Matrix (ι ⊕ ι) (ι ⊕ ι) ℚ) (hσ : σ ∈ Matrix.symplecticGroup ι ℚ) (hC : σ.toBlocks₂₁ = 0)
-    (φ : Matrix κ ι ℚ → ℂ) (hφ : IsSB φ) :
-    IsSB (((σ.toBlocks₂₂.det : ℂ) ^ (Fintype.card κ / 2)) •
-      fun x => parChar (σ.toBlocks₁₂ * σ.toBlocks₁₁ᵀ) x * φ (x * σ.toBlocks₁₁)) ∧
-    TransS σ φ (((σ.toBlocks₂₂.det : ℂ) ^ (Fintype.card κ / 2)) •
-      fun x => parChar (σ.toBlocks₁₂ * σ.toBlocks₁₁ᵀ) x * φ (x * σ.toBlocks₁₁)) := by
+    (φ : Matrix κ ι ℚ → ℂ) (hφ : IsSB φ)
+    : IsSB
+        (((σ.toBlocks₂₂.det : ℂ) ^ (Fintype.card κ / 2))
+          • fun x => parChar (σ.toBlocks₁₂ * σ.toBlocks₁₁ᵀ) x * φ (x * σ.toBlocks₁₁))
+      ∧ TransS σ φ
+        (((σ.toBlocks₂₂.det : ℂ) ^ (Fintype.card κ / 2))
+          • fun x => parChar (σ.toBlocks₁₂ * σ.toBlocks₁₁ᵀ) x * φ (x * σ.toBlocks₁₁)) := by
   classical
   set A := σ.toBlocks₁₁ with hA
   set B := σ.toBlocks₁₂ with hB
@@ -47,7 +50,8 @@ theorem trans_explicit (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
   have hDA : D * Aᵀ = 1 := by
     have h := SymplecticGroup.mem_iff.mp hσ
     rw [← Matrix.fromBlocks_toBlocks σ, hC, Matrix.J, Matrix.fromBlocks_transpose,
-      Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply] at h
+        Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
+      at h
     have := congrArg Matrix.toBlocks₂₁ h
     simpa using this
   have hdet : D.det * A.det = 1 := by
@@ -56,8 +60,8 @@ theorem trans_explicit (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
   have hA0 : A.det ≠ 0 := right_ne_zero_of_mul_eq_one hdet
   have hAu : IsUnit A.det := isUnit_iff_ne_zero.mpr hA0
   refine ⟨?_, ?_⟩
-  · have h1 := isSB_parChar_mul (B * Aᵀ) _
-      ((GlobalTheory.SW.LinChange.haar_mul ℚ κ ι φ hφ).1 A hA0).1
+  · have h1 :=
+      isSB_parChar_mul (B * Aᵀ) _ ((GlobalTheory.SW.LinChange.haar_mul ℚ κ ι φ hφ).1 A hA0).1
     exact (GlobalTheory.SW.isSB_algebra_haar_linear ℚ κ ι _ _ h1 h1).2.1 _
   · intro τ _ ζ
     have hden : spDen σ τ = qm D := by
@@ -69,18 +73,20 @@ theorem trans_explicit (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
       apply Matrix.inv_eq_right_inv
       have e : (qm A)ᵀ = qm Aᵀ := rfl
       rw [e, ← qm_mul', hDA]
-      ext i j; by_cases h : i = j <;> simp [qm, Matrix.one_apply, h]
+      ext i j
+      by_cases h : i = j <;> simp [qm, Matrix.one_apply, h]
     have hdetD : (qm D).det = (D.det : ℂ) := ((Rat.castHom ℂ).map_det D).symm
     have hC' : qm σ.toBlocks₂₁ = 0 := by rw [hC]; ext i j; simp [qm]
     unfold spAct
     rw [hden, hinv, hC', hdetD]
     simp only [Matrix.mul_zero, Matrix.zero_mulVec, dotProduct_zero, Finset.sum_const_zero,
       mul_zero, Complex.exp_zero, mul_one]
-    let e : Matrix κ ι ℚ ≃ Matrix κ ι ℚ :=
-      { toFun := fun x => x * A
-        invFun := fun x => x * A⁻¹
-        left_inv := fun x => Matrix.mul_nonsing_inv_cancel_right A x hAu
-        right_inv := fun x => Matrix.nonsing_inv_mul_cancel_right A x hAu }
+    let e : Matrix κ ι ℚ ≃ Matrix κ ι ℚ := {
+      toFun := fun x => x * A
+      invFun := fun x => x * A⁻¹
+      left_inv := fun x => Matrix.mul_nonsing_inv_cancel_right A x hAu
+      right_inv := fun x => Matrix.nonsing_inv_mul_cancel_right A x hAu
+    }
     unfold thS
     rw [← tsum_mul_left, ← e.tsum_eq (fun x => _ * (φ x * _))]
     refine tsum_congr fun x => ?_
@@ -104,25 +110,40 @@ theorem trans_explicit (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
       Matrix.dotProduct_mulVec (qv (x k)) (qm A)]
     ring
 
-theorem trans_unique (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
+theorem trans_unique
+    (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
     (σ : Matrix (ι ⊕ ι) (ι ⊕ ι) ℚ) (hσ : σ ∈ Matrix.symplecticGroup ι ℚ)
-    (φ ψ ψ' : Matrix κ ι ℚ → ℂ) (hψ : IsSB ψ) (hψ' : IsSB ψ') (h : TransS σ φ ψ)
-    (h' : TransS σ φ ψ') : ψ = ψ' := by
+    (φ ψ ψ' : Matrix κ ι ℚ → ℂ)
+    (hψ : IsSB ψ) (hψ' : IsSB ψ') (h : TransS σ φ ψ) (h' : TransS σ φ ψ')
+    : ψ = ψ' := by
   obtain ⟨hd, hs, -⟩ := GlobalTheory.SiegelAction.symplectic_action ι σ hσ _ (I_mem_siegel (ι := ι))
   refine GlobalTheory.SW.eq_of_thS_eq κ ι ψ ψ' hψ hψ' _ hs fun ζ => ?_
-  have e : ζ = fun k => (ζ k ᵥ* spDen σ (I • (1 : Matrix ι ι ℂ))) ᵥ*
-      (spDen σ (I • (1 : Matrix ι ι ℂ)))⁻¹ := by
+  have e
+      : ζ
+        = fun k =>
+          (ζ k ᵥ* spDen σ (I • (1 : Matrix ι ι ℂ))) ᵥ* (spDen σ (I • (1 : Matrix ι ι ℂ)))⁻¹ := by
     funext k
     rw [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hd),
       Matrix.vecMul_one]
   rw [e, h _ I_mem_siegel, h' _ I_mem_siegel]
 
-theorem values_parabolic : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι], Even (Fintype.card κ) → ∀ σ ∈ Matrix.symplecticGroup ι ℚ, σ.toBlocks₂₁ = 0 → ∀ φ ψ : Matrix κ ι ℚ → ℂ, IsSB φ → IsSB ψ → TransS σ φ ψ → ∀ y, ∃ (u : ℂ) (y' : Matrix κ ι ℚ), Ph u ∧ ψ y = u * φ y' := by
+theorem values_parabolic
+    : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι],
+      Even (Fintype.card κ)
+        → ∀ σ ∈ Matrix.symplecticGroup ι ℚ,
+          σ.toBlocks₂₁ = 0
+            → ∀ φ ψ : Matrix κ ι ℚ → ℂ,
+              IsSB φ → IsSB ψ → TransS σ φ ψ
+                → ∀ y, ∃ (u : ℂ) (y' : Matrix κ ι ℚ), Ph u ∧ ψ y = u * φ y' := by
   intro κ ι _ _ _ _ σ hσ hC φ ψ hφ hψ h y
   obtain ⟨h1, h2⟩ := trans_explicit κ ι σ hσ hC φ hφ
   have e := trans_unique κ ι σ hσ φ _ _ hψ h1 h h2
-  refine ⟨((σ.toBlocks₂₂.det ^ (Fintype.card κ / 2) : ℚ) : ℂ) *
-    parChar (σ.toBlocks₁₂ * σ.toBlocks₁₁ᵀ) y, y * σ.toBlocks₁₁, ph_rat_mul_exp _ _, ?_⟩
+  refine ⟨
+    ((σ.toBlocks₂₂.det ^ (Fintype.card κ / 2) : ℚ) : ℂ) * parChar (σ.toBlocks₁₂ * σ.toBlocks₁₁ᵀ) y,
+    y * σ.toBlocks₁₁,
+    ph_rat_mul_exp _ _,
+    ?_
+  ⟩
   rw [e]
   simp only [Pi.smul_apply, smul_eq_mul]
   push_cast

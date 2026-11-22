@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LevelFamO
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -20,7 +23,11 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.TrIdem
 
 namespace GlobalTheory.TrIdem
 
-theorem levelFam_open_le : ∀ (D : D7) (V : HSp D) (T : TypeDataG V) (U : AuxiliaryPlaceHermitianSpace V), U.u ∉ T.S → ∀ v, IsOpen (levelFam T U v : Set (GLoc D.sp.cm.sig V.gram v)) ∧ levelFam T U v ≤ Kv V v := by
+theorem levelFam_open_le
+    : ∀ (D : D7) (V : HSp D) (T : TypeDataG V) (U : AuxiliaryPlaceHermitianSpace V),
+      U.u ∉ T.S
+        → ∀ v,
+          IsOpen (levelFam T U v : Set (GLoc D.sp.cm.sig V.gram v)) ∧ levelFam T U v ≤ Kv V v := by
   intro D V T U hu v
   by_cases hvu : v = U.u
   · subst hvu

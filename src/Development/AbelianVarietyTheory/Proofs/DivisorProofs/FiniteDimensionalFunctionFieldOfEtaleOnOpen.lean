@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NadelVanishi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
 open scoped TensorProduct
 
@@ -15,11 +16,12 @@ set_option autoImplicit false
 
 namespace GlobalTheory.FunctionFieldEtale
 
-theorem finiteDimensional_fractionRing_of_etale {R S K L : Type} [CommRing R] [IsDomain R]
-    [CommRing S] [IsDomain S] [Field K] [Field L] [Algebra R K] [IsFractionRing R K]
-    [Algebra S L] [IsFractionRing S L] (φ : R →+* S) (hφ : φ.Etale) (ψ : K →+* L)
-    (h : ∀ r, ψ (algebraMap R K r) = algebraMap S L (φ r)) :
-    letI := ψ.toAlgebra; FiniteDimensional K L := by
+theorem finiteDimensional_fractionRing_of_etale
+    {R S K L : Type} [CommRing R] [IsDomain R] [CommRing S] [IsDomain S] [Field K] [Field L]
+    [Algebra R K] [IsFractionRing R K] [Algebra S L] [IsFractionRing S L]
+    (φ : R →+* S) (hφ : φ.Etale)
+    (ψ : K →+* L) (h : ∀ r, ψ (algebraMap R K r) = algebraMap S L (φ r))
+    : letI := ψ.toAlgebra; FiniteDimensional K L := by
   letI : Algebra K L := ψ.toAlgebra
   letI : Algebra R S := φ.toAlgebra
   haveI : Algebra.Etale R S := hφ
@@ -27,8 +29,9 @@ theorem finiteDimensional_fractionRing_of_etale {R S K L : Type} [CommRing R] [I
   haveI : IsScalarTower R K L := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   haveI : IsScalarTower R S L := IsScalarTower.of_algebraMap_eq (fun r => h r)
   haveI : Module.Finite K (K ⊗[R] S) := Algebra.FormallyUnramified.finite_of_free K (K ⊗[R] S)
-  let g : K ⊗[R] S →ₐ[K] L := Algebra.TensorProduct.lift (Algebra.ofId K L)
-    (IsScalarTower.toAlgHom R S L) (fun _ _ => Commute.all _ _)
+  let g : K ⊗[R] S →ₐ[K] L :=
+    Algebra.TensorProduct.lift (Algebra.ofId K L) (IsScalarTower.toAlgHom R S L)
+      (fun _ _ => Commute.all _ _)
   haveI : Module.Finite K g.range :=
     Module.Finite.of_surjective g.rangeRestrict.toLinearMap g.rangeRestrict_surjective
   have hS : ∀ s : S, algebraMap S L s ∈ g.range := fun s => ⟨1 ⊗ₜ s, by simp [g]⟩
@@ -42,14 +45,16 @@ theorem finiteDimensional_fractionRing_of_etale {R S K L : Type} [CommRing R] [I
     exact Subalgebra.mul_mem _ (hS a) (hinv _ (hS b))
   exact Module.Finite.of_surjective g.toLinearMap hsurj
 
-theorem finiteDimensional_functionField_of_etale_on_open : ∀ (M W : Scheme.{0}) [IsIntegral M] [IsIntegral W]
-    (f : M ⟶ W) [IsDominant f] (U : M.Opens), Etale (U.ι ≫ f) → (U : Set M).Nonempty →
-    letI := (functionFieldMap f).toAlgebra; FiniteDimensional W.functionField M.functionField := by
+theorem finiteDimensional_functionField_of_etale_on_open
+    : ∀ (M W : Scheme.{0}) [IsIntegral M] [IsIntegral W] (f : M ⟶ W) [IsDominant f] (U : M.Opens),
+      Etale (U.ι ≫ f) → (U : Set M).Nonempty
+        → letI := (functionFieldMap f).toAlgebra
+          FiniteDimensional W.functionField M.functionField := by
   intro M W _ _ f _ U hf hU
   have hξU : genericPoint M ∈ U :=
     ((genericPoint_spec M).mem_open_set_iff U.isOpen).mpr (by simpa using hU)
-  obtain ⟨V, hV, hfξV, -⟩ := exists_isAffineOpen_mem_and_subset (x := f (genericPoint M))
-    (U := ⊤) trivial
+  obtain ⟨V, hV, hfξV, -⟩ :=
+    exists_isAffineOpen_mem_and_subset (x := f (genericPoint M)) (U := ⊤) trivial
   let x : U := ⟨genericPoint M, hξU⟩
   have hx : x ∈ (U.ι ≫ f) ⁻¹ᵁ V := hfξV
   obtain ⟨V', hV', hxV', hV'sub⟩ := exists_isAffineOpen_mem_and_subset hx
@@ -67,8 +72,7 @@ theorem finiteDimensional_functionField_of_etale_on_open : ∀ (M W : Scheme.{0}
     rw [Scheme.Hom.comp_appLE]
     erw [Scheme.Opens.ι_appLE]
     rfl
-  have het : (f.appLE V U' e').hom.Etale := by
-    rw [← key]; exact het0
+  have het : (f.appLE V U' e').hom.Etale := by rw [← key]; exact het0
   haveI := functionField_isFractionRing_of_isAffineOpen W V hV
   haveI := functionField_isFractionRing_of_isAffineOpen M U' hU'
   refine finiteDimensional_fractionRing_of_etale (f.appLE V U' e').hom het (functionFieldMap f) ?_

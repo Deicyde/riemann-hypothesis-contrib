@@ -11,8 +11,11 @@ noncomputable section
 
 namespace GlobalTheory.TorsorColim
 
-def bcAct (S : Type) {R A G : Type} [CommRing R] [CommRing S] [CommRing A] [Algebra R S]
-    [Algebra R A] [Monoid G] (act : G →* (A ≃ₐ[R] A)) : G →* (S ⊗[R] A ≃ₐ[S] S ⊗[R] A) where
+def bcAct
+    (S : Type)
+    {R A G : Type} [CommRing R] [CommRing S] [CommRing A] [Algebra R S] [Algebra R A] [Monoid G]
+    (act : G →* (A ≃ₐ[R] A))
+    : G →* (S ⊗[R] A ≃ₐ[S] S ⊗[R] A) where
   toFun g := Algebra.TensorProduct.congr AlgEquiv.refl (act g)
   map_one' := by
     ext x
@@ -28,28 +31,35 @@ def bcAct (S : Type) {R A G : Type} [CommRing R] [CommRing S] [CommRing A] [Alge
     | add x y hx hy => rw [map_add (f := _), hx, hy, map_add (f := _)]
 
 @[simp]
-theorem bcAct_tmul (S : Type) {R A G : Type} [CommRing R] [CommRing S] [CommRing A] [Algebra R S]
-    [Algebra R A] [Monoid G] (act : G →* (A ≃ₐ[R] A)) (g : G) (s : S) (a : A) :
-    bcAct S act g (s ⊗ₜ[R] a) = s ⊗ₜ[R] act g a := rfl
+theorem bcAct_tmul
+    (S : Type)
+    {R A G : Type} [CommRing R] [CommRing S] [CommRing A] [Algebra R S] [Algebra R A] [Monoid G]
+    (act : G →* (A ≃ₐ[R] A)) (g : G) (s : S) (a : A)
+    : bcAct S act g (s ⊗ₜ[R] a) = s ⊗ₜ[R] act g a :=
+  rfl
 
-def prodMapOf (B D : Type) [CommRing B] [CommRing D] [Algebra B D] (q : ℕ)
-    (act : Multiplicative (ZMod q) →* (D ≃ₐ[B] D)) :
-    D ⊗[B] D →ₐ[B] (Multiplicative (ZMod q) → D) :=
+def prodMapOf
+    (B D : Type) [CommRing B] [CommRing D] [Algebra B D]
+    (q : ℕ) (act : Multiplicative (ZMod q) →* (D ≃ₐ[B] D))
+    : D ⊗[B] D →ₐ[B] (Multiplicative (ZMod q) → D) :=
   Algebra.TensorProduct.productMap
     (Pi.algHom B (fun _ : Multiplicative (ZMod q) => D) (fun _ => AlgHom.id B D))
     (Pi.algHom B (fun _ : Multiplicative (ZMod q) => D) (fun g => (act g).toAlgHom))
 
 @[simp]
-theorem prodMapOf_tmul (B D : Type) [CommRing B] [CommRing D] [Algebra B D] (q : ℕ)
-    (act : Multiplicative (ZMod q) →* (D ≃ₐ[B] D)) (x y : D) (g : Multiplicative (ZMod q)) :
-    prodMapOf B D q act (x ⊗ₜ[B] y) g = x * act g y := by
+theorem prodMapOf_tmul
+    (B D : Type) [CommRing B] [CommRing D] [Algebra B D]
+    (q : ℕ) (act : Multiplicative (ZMod q) →* (D ≃ₐ[B] D))
+    (x y : D) (g : Multiplicative (ZMod q))
+    : prodMapOf B D q act (x ⊗ₜ[B] y) g = x * act g y := by
   simp [prodMapOf]
 
-theorem eventually_and {J : Type} [Category J] [IsFiltered J] {j : J}
-    (P Q : ∀ k : J, (j ⟶ k) → Prop)
+theorem eventually_and
+    {J : Type} [Category J] [IsFiltered J]
+    {j : J} (P Q : ∀ k : J, (j ⟶ k) → Prop)
     (hP : ∃ (k₀ : J) (f₀ : j ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k), P k (f₀ ≫ f))
-    (hQ : ∃ (k₀ : J) (f₀ : j ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k), Q k (f₀ ≫ f)) :
-    ∃ (k₀ : J) (f₀ : j ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k), P k (f₀ ≫ f) ∧ Q k (f₀ ≫ f) := by
+    (hQ : ∃ (k₀ : J) (f₀ : j ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k), Q k (f₀ ≫ f))
+    : ∃ (k₀ : J) (f₀ : j ⟶ k₀), ∀ (k : J) (f : k₀ ⟶ k), P k (f₀ ≫ f) ∧ Q k (f₀ ≫ f) := by
   obtain ⟨k₁, f₁, h₁⟩ := hP
   obtain ⟨k₂, f₂, h₂⟩ := hQ
   let a := IsFiltered.leftToMax k₁ k₂

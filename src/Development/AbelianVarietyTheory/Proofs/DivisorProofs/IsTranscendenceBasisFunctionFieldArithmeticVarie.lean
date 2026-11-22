@@ -9,23 +9,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoheightAddP
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 
 set_option autoImplicit false
 noncomputable section
 
 namespace GlobalTheory.ArithTrdeg
 
-theorem trdeg_functionField_eq {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral X]
-    {p : X ⟶ Sp k} {D : ℕ} (h : IsArithVar p D) :
-    Algebra.trdeg ℤ X.functionField = D := by
+theorem trdeg_functionField_eq
+    {k : Type} [CommRing k]
+    {X : Scheme.{0}} [IsIntegral X]
+    {p : X ⟶ Sp k} {D : ℕ} (h : IsArithVar p D)
+    : Algebra.trdeg ℤ X.functionField = D := by
   have hft := DimCoheight.finiteType_of_isAmb (MixHt.isAmb_of_isArithVar h)
   have hc0 : CharZero Γ(X, ⊤) := (flat_int_iff_charZero _).1 h.flat
 
-  have key : ∀ U : X.Opens, IsAffineOpen U → Nonempty U →
-      ringKrullDim Γ(X, U) =
-        ((Cardinal.toENat (Algebra.trdeg ℤ X.functionField) + 1 : ℕ∞) : WithBot ℕ∞) := by
+  have key
+      : ∀ U : X.Opens,
+        IsAffineOpen U → Nonempty U
+          → ringKrullDim Γ(X, U)
+            = ((Cardinal.toENat (Algebra.trdeg ℤ X.functionField) + 1 : ℕ∞) : WithBot ℕ∞) := by
     intro U hU hne
     have := hft U hU
     have := functionField_isFractionRing_of_isAffineOpen X U hU
@@ -35,8 +41,9 @@ theorem trdeg_functionField_eq {k : Type} [CommRing k] {X : Scheme.{0}} [IsInteg
     have : FaithfulSMul ℤ Γ(X, U) := (faithfulSMul_iff_algebraMap_injective _ _).2 hinj
     rw [IntFiniteTypeDim.ringKrullDim_eq_trdeg_add_one _ hinj,
       ← DimCoheight.trdeg_eq_of_isFractionRing ℤ Γ(X, U) X.functionField]
-  have hdim : ((Cardinal.toENat (Algebra.trdeg ℤ X.functionField) + 1 : ℕ∞) : WithBot ℕ∞) =
-      ((D + 1 : ℕ) : WithBot ℕ∞) := by
+  have hdim
+      : ((Cardinal.toENat (Algebra.trdeg ℤ X.functionField) + 1 : ℕ∞) : WithBot ℕ∞)
+        = ((D + 1 : ℕ) : WithBot ℕ∞) := by
     rw [← h.dim_eq]
     apply le_antisymm
     · obtain ⟨_, ⟨U, hU, rfl⟩, hxU, -⟩ :=
@@ -56,10 +63,11 @@ theorem trdeg_functionField_eq {k : Type} [CommRing k] {X : Scheme.{0}} [IsInteg
     exact (WithTop.add_right_cancel (ENat.one_ne_top) h3)
   exact Cardinal.toENat_eq_natCast.1 h2
 
-theorem isTranscendenceBasis_functionField : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X]
-    (p : X ⟶ Sp k) (D : ℕ), IsArithVar p D →
-    (∃ x : Fin D → X.functionField, IsTranscendenceBasis ℤ x) ∧
-      ∀ x : Fin D → X.functionField, AlgebraicIndependent ℤ x → IsTranscendenceBasis ℤ x := by
+theorem isTranscendenceBasis_functionField
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D
+        → (∃ x : Fin D → X.functionField, IsTranscendenceBasis ℤ x)
+          ∧ ∀ x : Fin D → X.functionField, AlgebraicIndependent ℤ x → IsTranscendenceBasis ℤ x := by
   intro k _ X _ p D h
   have htr := trdeg_functionField_eq h
   refine ⟨?_, fun x hx => hx.isTranscendenceBasis_of_trdeg_le_of_finite (by rw [htr]; simp)⟩
@@ -71,10 +79,11 @@ theorem isTranscendenceBasis_functionField : ∀ (k : Type) [CommRing k] (X : Sc
   obtain ⟨s, hs⟩ := exists_isTranscendenceBasis ℤ X.functionField
   have hcard := hs.cardinalMk_eq_trdeg
   rw [htr] at hcard
-  have : Finite s := Cardinal.lt_aleph0_iff_finite.1 (by rw [hcard]; exact Cardinal.natCast_lt_aleph0)
+  have : Finite s :=
+    Cardinal.lt_aleph0_iff_finite.1 (by rw [hcard]; exact Cardinal.natCast_lt_aleph0)
   have : Fintype s := Fintype.ofFinite s
-  have e : s ≃ Fin D := Fintype.equivFinOfCardEq (by
-    rw [Cardinal.mk_fintype] at hcard; exact_mod_cast hcard)
+  have e : s ≃ Fin D :=
+    Fintype.equivFinOfCardEq (by rw [Cardinal.mk_fintype] at hcard; exact_mod_cast hcard)
   exact ⟨_, hs.comp_equiv e.symm⟩
 
 end GlobalTheory.ArithTrdeg

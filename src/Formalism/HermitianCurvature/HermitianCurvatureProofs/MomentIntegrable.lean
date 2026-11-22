@@ -13,12 +13,15 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5.HerC.Fou
 
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V]
-  [BorelSpace V]
+variable
+  {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V]
 
-theorem moment_integrable {u : V → ℂ} (hu : Continuous u) (m : ℕ) (C : ℝ)
-    (hdec : ∀ w, ‖u w‖ ≤ C * (1 + ‖w‖) ^ (-((m : ℝ) + finrank ℝ V + 1))) (n : ℕ) (hn : n ≤ m) :
-    Integrable (fun v => ‖v‖ ^ n * ‖u v‖) := by
+theorem moment_integrable
+    {u : V → ℂ} (hu : Continuous u)
+    (m : ℕ) (C : ℝ) (hdec : ∀ w, ‖u w‖ ≤ C * (1 + ‖w‖) ^ (-((m : ℝ) + finrank ℝ V + 1)))
+    (n : ℕ) (hn : n ≤ m)
+    : Integrable (fun v => ‖v‖ ^ n * ‖u v‖) := by
   have hC : 0 ≤ C := by
     have h := (norm_nonneg _).trans (hdec 0)
     have hp : 0 < (1 + ‖(0 : V)‖) ^ (-((m : ℝ) + finrank ℝ V + 1)) := by positivity
@@ -30,23 +33,25 @@ theorem moment_integrable {u : V → ℂ} (hu : Continuous u) (m : ℕ) (C : ℝ
   have h1 : (1 : ℝ) ≤ 1 + ‖v‖ := by linarith [norm_nonneg v]
   have h0 : (0 : ℝ) < 1 + ‖v‖ := by linarith
   rw [Real.norm_eq_abs, abs_of_nonneg (by positivity)]
-  calc ‖v‖ ^ n * ‖u v‖ ≤ (1 + ‖v‖) ^ n * (C * (1 + ‖v‖) ^ (-((m : ℝ) + finrank ℝ V + 1))) := by
-        gcongr
-        · linarith [norm_nonneg v]
-        · exact hdec v
+  calc
+    ‖v‖ ^ n * ‖u v‖ ≤ (1 + ‖v‖) ^ n * (C * (1 + ‖v‖) ^ (-((m : ℝ) + finrank ℝ V + 1))) := by
+      gcongr
+      · linarith [norm_nonneg v]
+      · exact hdec v
     _ = C * ((1 + ‖v‖) ^ (n : ℝ) * (1 + ‖v‖) ^ (-((m : ℝ) + finrank ℝ V + 1))) := by
-        rw [Real.rpow_natCast]; ring
-    _ = C * (1 + ‖v‖) ^ ((n : ℝ) + -((m : ℝ) + finrank ℝ V + 1)) := by
-        rw [← Real.rpow_add h0]
+      rw [Real.rpow_natCast]; ring
+    _ = C * (1 + ‖v‖) ^ ((n : ℝ) + -((m : ℝ) + finrank ℝ V + 1)) := by rw [← Real.rpow_add h0]
     _ ≤ C * (1 + ‖v‖) ^ (-((finrank ℝ V : ℝ) + 1)) := by
-        gcongr
-        have : (n : ℝ) ≤ m := by exact_mod_cast hn
-        linarith
+      gcongr
+      have : (n : ℝ) ≤ m := by exact_mod_cast hn
+      linarith
 
-theorem fourier_smooth (D : V → ℂ) (m : ℕ) (C : ℝ) (hD : Integrable D)
-    (hdec : ∀ w, ‖𝓕 D w‖ ≤ C * (1 + ‖w‖) ^ (-((m : ℝ) + finrank ℝ V + 1))) :
-    ∃ D' : V → ℂ, ContDiff ℝ m D' ∧ (∀ j ≤ m, ∃ B, ∀ t, ‖iteratedFDeriv ℝ j D' t‖ ≤ B) ∧
-      ∀ t, ContinuousAt D t → D' t = D t := by
+theorem fourier_smooth
+    (D : V → ℂ) (m : ℕ) (C : ℝ)
+    (hD : Integrable D) (hdec : ∀ w, ‖𝓕 D w‖ ≤ C * (1 + ‖w‖) ^ (-((m : ℝ) + finrank ℝ V + 1)))
+    : ∃ D' : V → ℂ,
+      ContDiff ℝ m D' ∧ (∀ j ≤ m, ∃ B, ∀ t, ‖iteratedFDeriv ℝ j D' t‖ ≤ B)
+        ∧ ∀ t, ContinuousAt D t → D' t = D t := by
   set g : V → ℂ := 𝓕 D with hg
   have hgc : Continuous g :=
     VectorFourier.fourierIntegral_continuous Real.continuous_fourierChar (innerSL ℝ).continuous₂ hD
@@ -58,8 +63,8 @@ theorem fourier_smooth (D : V → ℂ) (m : ℕ) (C : ℝ) (hD : Integrable D)
     rwa [norm_neg] at this
   have hmom : ∀ n : ℕ, n ≤ m → Integrable (fun v => ‖v‖ ^ n * ‖h v‖) :=
     moment_integrable hhc m C hhd
-  have hmomN : ∀ n : ℕ, (n : ℕ∞) ≤ (m : ℕ∞) → Integrable (fun v => ‖v‖ ^ n * ‖h v‖) :=
-    fun n hn => hmom n (by exact_mod_cast hn)
+  have hmomN : ∀ n : ℕ, (n : ℕ∞) ≤ (m : ℕ∞) → Integrable (fun v => ‖v‖ ^ n * ‖h v‖) := fun n hn =>
+    hmom n (by exact_mod_cast hn)
   have hgi : Integrable g := by
     have := moment_integrable hgc m C hdec 0 (Nat.zero_le _)
     simp only [pow_zero, one_mul] at this

@@ -47,8 +47,11 @@ theorem rootsInt : StatRootsInt := by
   have hPm : P.Monic := by
     first
     | exact Polynomial.monic_of_injective hinj hmon
-    | (rw [Polynomial.Monic, ← hinj.eq_iff, map_one, ← Polynomial.leadingCoeff_map_of_injective hinj]
-       exact hmon)
+    | (
+        rw [Polynomial.Monic, ← hinj.eq_iff, map_one,
+          ← Polynomial.leadingCoeff_map_of_injective hinj]
+        exact hmon
+      )
   have hint : ∀ i, ∃ b : O, algebraMap O (FractionRing O) b = α i := by
     intro i
     have hroot : Polynomial.eval₂ (algebraMap O (FractionRing O)) (α i) P = 0 := by
@@ -70,12 +73,15 @@ theorem lemma_five_three_holds : BlockRingDecompositionLemma := by
   have hsum : ∑ k : Fin (t + 1), Fintype.card {a // bl a = k} = Fintype.card d := by
     rw [← Fintype.card_sigma]
     exact Fintype.card_congr (Equiv.sigmaFiberEquiv bl)
-  have hcard' : ((g₀ * ∑ k : Fin (t + 1), Fintype.card {a // bl a = k} : ℕ) : Cardinal) <
-      Cardinal.mk (IsLocalRing.ResidueField O) := by
+  have hcard'
+      : ((g₀ * ∑ k : Fin (t + 1), Fintype.card {a // bl a = k} : ℕ) : Cardinal)
+        < Cardinal.mk (IsLocalRing.ResidueField O) := by
     rw [hsum]; exact hcard
 
-  have hmain := Formalism.NG.globalModule O X D.X' T D.T' Z D.p D.q D.b h1 (fun x _ => h2 x) d D.R' h3
-    NN g₀ n hspan hZ D.π' D.ρπ h7 (Fin (t + 1)) bl h8 D.ρk h9 h10 hcard'
+  have hmain :=
+    Formalism.NG.globalModule O X D.X' T D.T' Z D.p D.q D.b h1
+      (fun x _ => h2 x)
+      d D.R' h3 NN g₀ n hspan hZ D.π' D.ρπ h7 (Fin (t + 1)) bl h8 D.ρk h9 h10 hcard'
   exact hmain.trans (Finset.sum_le_sum_of_subset (Finset.subset_univ _))
 
 end Formalism.RepresentationBoundsCohomology.ringDataObjects

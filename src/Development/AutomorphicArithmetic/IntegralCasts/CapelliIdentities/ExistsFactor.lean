@@ -4,11 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.ExistsFactor.exists_factor :
-    ∀ {K : Type} [inst : Field K] {n : ℕ} (e : Matrix (Fin n) (Fin n) K),
-    e * e = e →
-      ∃ (r : ℕ) (M : Matrix (Fin n) (Fin r) K) (N : Matrix (Fin r) (Fin n) K),
-        N * M = (1 : Matrix (Fin r) (Fin r) K) ∧ M * N = e := by
+theorem UpperTheory.Reformulated.B.ExistsFactor.exists_factor
+    : ∀ {K : Type} [inst : Field K] {n : ℕ} (e : Matrix (Fin n) (Fin n) K),
+      e * e = e
+        → ∃ (r : ℕ) (M : Matrix (Fin n) (Fin r) K) (N : Matrix (Fin r) (Fin n) K),
+          N * M = (1 : Matrix (Fin r) (Fin r) K) ∧ M * N = e := by
   intro K _ n e he
   let f : (Fin n → K) →ₗ[K] (Fin n → K) := Matrix.toLin' e
   have hf : ∀ v, f (f v) = f v := by
@@ -19,9 +19,13 @@ theorem UpperTheory.Reformulated.B.ExistsFactor.exists_factor :
     exact LinearMap.congr_fun h v
   let b := Module.finBasis K (LinearMap.range f)
   let c := Pi.basisFun K (Fin n)
-  refine ⟨Module.finrank K (LinearMap.range f),
+  refine ⟨
+    Module.finrank K (LinearMap.range f),
     LinearMap.toMatrix b c (LinearMap.range f).subtype,
-    LinearMap.toMatrix c b f.rangeRestrict, ?_, ?_⟩
+    LinearMap.toMatrix c b f.rangeRestrict,
+    ?_,
+    ?_
+  ⟩
   · rw [← LinearMap.toMatrix_comp]
     have h : f.rangeRestrict.comp (LinearMap.range f).subtype = LinearMap.id := by
       apply LinearMap.ext

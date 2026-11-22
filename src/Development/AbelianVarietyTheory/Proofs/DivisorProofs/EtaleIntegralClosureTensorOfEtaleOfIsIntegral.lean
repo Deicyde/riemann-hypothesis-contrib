@@ -12,15 +12,17 @@ namespace GlobalTheory
 theorem exists_one_tmul_eq_of_isIntegral_smooth_fractionField
     (R K B : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [Field K] [Algebra R K]
     [IsFractionRing R K] [CommRing B] [Algebra R B] [Algebra.Smooth R B]
-    (x : K ⊗[R] B) (hx : IsIntegral R x) : ∃ b : B, x = (1 : K) ⊗ₜ[R] b := by
+    (x : K ⊗[R] B) (hx : IsIntegral R x)
+    : ∃ b : B, x = (1 : K) ⊗ₜ[R] b := by
   let e := Algebra.TensorProduct.comm R K B
   have h1 : IsIntegral R (e x) := hx.map e.toAlgHom
   have h2 : IsIntegral B (e x) := h1.tower_top
-  obtain ⟨y, hy⟩ := (TensorProduct.toIntegralClosure_bijective_of_smooth
-    (R := R) (S := B) (B := K)).2 ⟨e x, h2⟩
+  obtain ⟨y, hy⟩ :=
+    (TensorProduct.toIntegralClosure_bijective_of_smooth (R := R) (S := B) (B := K)).2 ⟨e x, h2⟩
   have hy' : (TensorProduct.toIntegralClosure R B K y : B ⊗[R] K) = e x := congrArg Subtype.val hy
-  have key : ∀ y : B ⊗[R] integralClosure R K, ∃ b : B,
-      (TensorProduct.toIntegralClosure R B K y : B ⊗[R] K) = b ⊗ₜ[R] (1 : K) := by
+  have key
+      : ∀ y : B ⊗[R] integralClosure R K, ∃ b : B,
+        (TensorProduct.toIntegralClosure R B K y : B ⊗[R] K) = b ⊗ₜ[R] (1 : K) := by
     intro y
     induction y with
     | tmul b c =>
@@ -37,11 +39,11 @@ theorem exists_one_tmul_eq_of_isIntegral_smooth_fractionField
   rw [← hy', hb]
   simp [e]
 
-theorem etale_integralClosure_tensor_of_etale_of_isIntegral :
-    ∀ (S₁ K₁ T : Type) [CommRing S₁] [IsDomain S₁] [IsIntegrallyClosed S₁] [Field K₁]
-    [Algebra S₁ K₁] [IsFractionRing S₁ K₁] [CommRing T] [Algebra S₁ T],
-    Algebra.Etale S₁ T → Algebra.IsIntegral S₁ T →
-    Algebra.Etale S₁ (integralClosure S₁ (K₁ ⊗[S₁] T)) := by
+theorem etale_integralClosure_tensor_of_etale_of_isIntegral
+    : ∀ (S₁ K₁ T : Type) [CommRing S₁] [IsDomain S₁] [IsIntegrallyClosed S₁] [Field K₁]
+        [Algebra S₁ K₁] [IsFractionRing S₁ K₁] [CommRing T] [Algebra S₁ T],
+      Algebra.Etale S₁ T → Algebra.IsIntegral S₁ T
+        → Algebra.Etale S₁ (integralClosure S₁ (K₁ ⊗[S₁] T)) := by
   intro S₁ K₁ T _ _ _ _ _ _ _ _ hE hI
   let i : T →ₐ[S₁] K₁ ⊗[S₁] T := Algebra.TensorProduct.includeRight
   have hi : Function.Injective i :=

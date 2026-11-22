@@ -19,8 +19,9 @@ section Parts
 variable (D : D7) (u : D.what₂.Word)
 
 def RamifiedSlopeFormula : Prop :=
-  (D.fm u).ramLat.mu = ((D.fm u).lat 0).mu -
-    (D.R.f : ℝ) * Real.log (((D.mem u).A.T : ℝ) - 1) / (((D.mem u).A.T : ℝ) - 2)
+  (D.fm u).ramLat.mu
+    = ((D.fm u).lat 0).mu
+      - (D.R.f : ℝ) * Real.log (((D.mem u).A.T : ℝ) - 1) / (((D.mem u).A.T : ℝ) - 2)
 
 end Parts
 

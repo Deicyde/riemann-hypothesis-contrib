@@ -6,17 +6,27 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Contin
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Host Formalism.ConjugateSelfDual Neutral.B1 ReciprocityTheory.Gal
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.Gal.TP.Chr
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.L2.Host Formalism.ConjugateSelfDual Neutral.B1 ReciprocityTheory.Gal
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.HeckeGal
+  GlobalTheory.CuspRep UpperTheory.Gal.TP.Chr
 
 set_option maxHeartbeats 400000 in
-theorem UpperTheory.Gal.TP.Chr.readEx :
-    UpperTheory.Gal.TP.Chr.ReadEx := by
+theorem UpperTheory.Gal.TP.Chr.readEx : UpperTheory.Gal.TP.Chr.ReadEx := by
   intro E _ _ _ μ hU
   let e := GlobalTheory.UnitaryHeckeBaseChange.adeleEquiv (GlobalTheory.GalOfCusp.isCMExt_real E)
   let f : (AE (↥(maximalRealSubfield E)) E)ˣ →* (AdeleRing (𝓞 E) E)ˣ := Units.map (e : _ →* _)
-  refine ⟨{ toFun := fun z => ⟨((μ.1 (f z) : ℂˣ) : ℂ), mem_sphere_zero_iff_norm.2 (hU (f z))⟩,
-            map_one' := ?_, map_mul' := ?_ }, ?_, ?_, ?_⟩
+  refine ⟨
+    {
+      toFun := fun z => ⟨((μ.1 (f z) : ℂˣ) : ℂ), mem_sphere_zero_iff_norm.2 (hU (f z))⟩
+      map_one' := ?_
+      map_mul' := ?_
+    },
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · apply Subtype.ext
     simp
   · intro x y

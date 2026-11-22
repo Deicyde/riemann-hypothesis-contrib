@@ -6,45 +6,63 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RepresentsKi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PtClosed
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.PtClosed
 
 namespace GlobalTheory.PtClosed
 
-theorem exists_pow_mul_eq_zero_of_represents_away {A : Type} [CommRing A]
+theorem exists_pow_mul_eq_zero_of_represents_away
+    {A : Type} [CommRing A]
     {Q : ∀ (R' : Type) [CommRing R'], (A →+* R') → Prop}
     (hbc : ∀ (R' : Type) [CommRing R'] (R'' : Type) [CommRing R''] (g : R' →+* R'') (f : A →+* R'),
       Q R' f → Q R'' (g.comp f))
-    (a : A) {Ja : Ideal (Localization.Away a)}
-    (hJa : Represents (fun (R' : Type) [CommRing R'] (h : Localization.Away a →+* R') ↦
-      Q R' (h.comp (algebraMap A (Localization.Away a)))) Ja)
-    {R' : Type} [CommRing R'] (f : A →+* R') (hf : Q R' f) (x : A)
-    (hx : algebraMap A (Localization.Away a) x ∈ Ja) : ∃ m : ℕ, f a ^ m * f x = 0 := by
-  have e : (Localization.awayMap f a).comp (algebraMap A (Localization.Away a)) =
-      (algebraMap R' (Localization.Away (f a))).comp f := IsLocalization.map_comp _
+    (a : A)
+    {Ja : Ideal (Localization.Away a)}
+    (hJa : Represents
+      (fun (R' : Type) [CommRing R'] (h : Localization.Away a →+* R') ↦
+        Q R' (h.comp (algebraMap A (Localization.Away a))))
+      Ja)
+    {R' : Type} [CommRing R']
+    (f : A →+* R') (hf : Q R' f)
+    (x : A) (hx : algebraMap A (Localization.Away a) x ∈ Ja)
+    : ∃ m : ℕ, f a ^ m * f x = 0 := by
+  have e
+      : (Localization.awayMap f a).comp (algebraMap A (Localization.Away a))
+        = (algebraMap R' (Localization.Away (f a))).comp f :=
+    IsLocalization.map_comp _
   have h1 : Q _ ((algebraMap R' (Localization.Away (f a))).comp f) :=
     hbc _ _ (algebraMap R' (Localization.Away (f a))) f hf
   rw [← e] at h1
   have h2 := (hJa _ (Localization.awayMap f a)).1 h1 hx
   rw [RingHom.mem_ker, ← RingHom.comp_apply, e, RingHom.comp_apply,
-    IsLocalization.map_eq_zero_iff (Submonoid.powers (f a))] at h2
+      IsLocalization.map_eq_zero_iff (Submonoid.powers (f a))]
+    at h2
   obtain ⟨⟨_, m, rfl⟩, hm⟩ := h2
   exact ⟨m, hm⟩
 
-theorem represents_of_away_cover : ∀ (A : Type) [CommRing A] (Q : ∀ (R' : Type) [CommRing R'], (A →+* R') → Prop),
-  (∀ (R' : Type) [CommRing R'] (R'' : Type) [CommRing R''] (g : R' →+* R'') (f : A →+* R'),
-    Q R' f → Q R'' (g.comp f)) →
-  (∀ (R' : Type) [CommRing R'] (f : A →+* R') (t : Finset R'), Ideal.span (t : Set R') = ⊤ →
-    (∀ r ∈ t, Q (Localization.Away r) ((algebraMap R' (Localization.Away r)).comp f)) → Q R' f) →
-  ∀ (s : Finset A), Ideal.span (s : Set A) = ⊤ →
-  (∀ a ∈ s, ∃ J : Ideal (Localization.Away a),
-    Represents (fun (R' : Type) [CommRing R'] (h : Localization.Away a →+* R') ↦
-      Q R' (h.comp (algebraMap A (Localization.Away a)))) J) →
-  ∃ J : Ideal A, Represents Q J := by
+theorem represents_of_away_cover
+    : ∀ (A : Type) [CommRing A] (Q : ∀ (R' : Type) [CommRing R'], (A →+* R') → Prop),
+      (∀ (R' : Type) [CommRing R'] (R'' : Type) [CommRing R''] (g : R' →+* R'') (f : A →+* R'),
+          Q R' f → Q R'' (g.comp f))
+        → (∀ (R' : Type) [CommRing R'] (f : A →+* R') (t : Finset R'),
+          Ideal.span (t : Set R') = ⊤
+            → (∀ r ∈ t, Q (Localization.Away r) ((algebraMap R' (Localization.Away r)).comp f))
+            → Q R' f)
+        → ∀ (s : Finset A),
+          Ideal.span (s : Set A) = ⊤
+            → (∀ a ∈ s, ∃ J : Ideal (Localization.Away a),
+              Represents
+                (fun (R' : Type) [CommRing R'] (h : Localization.Away a →+* R') ↦
+                  Q R' (h.comp (algebraMap A (Localization.Away a))))
+                J)
+            → ∃ J : Ideal A, Represents Q J := by
   classical
   intro A _ Q hbc hloc s hs hJ
   choose! J' hJ' using hJ
-  refine ⟨⨅ a ∈ s, (J' a).comap (algebraMap A (Localization.Away a)),
-    fun R' _ f ↦ ⟨fun hf ↦ ?_, fun hf ↦ ?_⟩⟩
+  refine ⟨
+    ⨅ a ∈ s, (J' a).comap (algebraMap A (Localization.Away a)),
+    fun R' _ f ↦ ⟨fun hf ↦ ?_, fun hf ↦ ?_⟩
+  ⟩
   · intro x hx
     simp only [Submodule.mem_iInf, Ideal.mem_comap] at hx
     rw [RingHom.mem_ker]
@@ -59,8 +77,10 @@ theorem represents_of_away_cover : ∀ (A : Type) [CommRing A] (Q : ∀ (R' : Ty
     · rw [Finset.coe_image, ← Ideal.map_span, hs, Ideal.map_top]
     intro r hr
     obtain ⟨a, ha, rfl⟩ := Finset.mem_image.1 hr
-    have e : (Localization.awayMap f a).comp (algebraMap A (Localization.Away a)) =
-        (algebraMap R' (Localization.Away (f a))).comp f := IsLocalization.map_comp _
+    have e
+        : (Localization.awayMap f a).comp (algebraMap A (Localization.Away a))
+          = (algebraMap R' (Localization.Away (f a))).comp f :=
+      IsLocalization.map_comp _
     rw [← e]
     refine ((hJ' a ha) _ (Localization.awayMap f a)).2 ?_
     intro j hj
@@ -91,7 +111,8 @@ theorem represents_of_away_cover : ∀ (A : Type) [CommRing A] (Q : ∀ (R' : Ty
       rw [← RingHom.comp_apply, e, RingHom.comp_apply, map_pow]
       rw [map_pow]
       exact (IsLocalization.Away.algebraMap_isUnit (S := Localization.Away (f a)) (f a)).pow n
-    have h3 : Localization.awayMap f a j * Localization.awayMap f a (algebraMap A _ (a ^ n)) = 0 := by
+    have h3
+        : Localization.awayMap f a j * Localization.awayMap f a (algebraMap A _ (a ^ n)) = 0 := by
       rw [← map_mul, hy, ← RingHom.comp_apply, e, RingHom.comp_apply,
         IsLocalization.map_eq_zero_iff (Submonoid.powers (f a))]
       exact ⟨⟨_, s.sup m, rfl⟩, h0⟩

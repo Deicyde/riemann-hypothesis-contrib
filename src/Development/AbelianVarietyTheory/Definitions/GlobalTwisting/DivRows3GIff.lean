@@ -14,14 +14,17 @@ noncomputable section
 
 namespace GlobalTheory.Cp
 
-open Formalism Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Rows
+open Formalism Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.BasicNotions
+  Formalism.MainNotions Formalism.L2.Rows
 
 section Col
 
-variable {X : Formalism.L2.Col.Fields} {G : Type} [Group G] [Fintype G] {Pl0 I0 Ty T : Type} {m : ℕ}
-  {A3 : FamIn3 X.K G Pl0 I0 Ty T m} {P1 : Subgroup G} {ψ1 : P1 →* X.Kˣ}
+variable
+  {X : Formalism.L2.Col.Fields} {G : Type} [Group G] [Fintype G]
+  {Pl0 I0 Ty T : Type} {m : ℕ} {A3 : FamIn3 X.K G Pl0 I0 Ty T m} {P1 : Subgroup G} {ψ1 : P1 →* X.Kˣ}
 
-@[reducible] def ColRec3.toS (c : GlobalTheory.Cp.ColRec3 X A3 P1 ψ1) : Formalism.L2.DIV.ColRec3 X A3 P1 ψ1 where
+@[reducible]
+def ColRec3.toS (c : GlobalTheory.Cp.ColRec3 X A3 P1 ψ1) : Formalism.L2.DIV.ColRec3 X A3 P1 ψ1 where
   Pr := c.Pr
   Rk := c.Rk
   W := c.W
@@ -48,7 +51,8 @@ variable {X : Formalism.L2.Col.Fields} {G : Type} [Group G] [Fintype G] {Pl0 I0 
   hE := c.hE
   ev := c.ev
 
-@[reducible] def ColRec3.ofS (c : Formalism.L2.DIV.ColRec3 X A3 P1 ψ1) : GlobalTheory.Cp.ColRec3 X A3 P1 ψ1 where
+@[reducible]
+def ColRec3.ofS (c : Formalism.L2.DIV.ColRec3 X A3 P1 ψ1) : GlobalTheory.Cp.ColRec3 X A3 P1 ψ1 where
   Pr := c.Pr
   Rk := c.Rk
   W := c.W
@@ -77,12 +81,30 @@ variable {X : Formalism.L2.Col.Fields} {G : Type} [Group G] [Fintype G] {Pl0 I0 
 
 end Col
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L} {Gl : MainNotions.G.LatInst D} {Kc : MainNotions.G.Consts} {Y : DivX D}
-  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L}
+  {Gl : MainNotions.G.LatInst D} {Kc : MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
+  {ex : Extra D L hT Gi Gl Kc Y cX}
 
-theorem divRows3G_iff (P : RowSideFamily ex) : GlobalTheory.Cp.DivRows3G P ↔ Formalism.L2.DIV.DivRows3G P :=
-  ⟨fun h => ⟨h.sharpRR, h.baseRR, h.divisionRows_rationalLift, h.thTheta, ⟨h.num.Ij, h.num.jw, h.num.etaJ⟩, h.colsBk⟩,
-    fun h => ⟨h.sharpRR, h.baseRR, h.divisionRows_rationalLift, h.thTheta, ⟨h.num.Ij, h.num.jw, h.num.etaJ⟩, h.colsBk⟩⟩
+theorem divRows3G_iff (P : RowSideFamily ex)
+    : GlobalTheory.Cp.DivRows3G P ↔ Formalism.L2.DIV.DivRows3G P := ⟨
+  fun h => ⟨
+    h.sharpRR,
+    h.baseRR,
+    h.divisionRows_rationalLift,
+    h.thTheta,
+    ⟨h.num.Ij, h.num.jw, h.num.etaJ⟩,
+    h.colsBk
+  ⟩,
+  fun h => ⟨
+    h.sharpRR,
+    h.baseRR,
+    h.divisionRows_rationalLift,
+    h.thTheta,
+    ⟨h.num.Ij, h.num.jw, h.num.etaJ⟩,
+    h.colsBk
+  ⟩
+⟩
 
 end GlobalTheory.Cp
 

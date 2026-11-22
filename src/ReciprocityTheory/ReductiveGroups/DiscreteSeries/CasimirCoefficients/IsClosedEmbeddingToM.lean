@@ -36,10 +36,11 @@ def UJ (ε : Fin n → Bool) : Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ where
   mul_mem' := by
     intro g h hg hh
     simp only [Set.mem_ofPred_eq, inUJ, Units.val_mul, Matrix.conjTranspose_mul] at *
-    calc (h : Matrix (Fin n) (Fin n) ℂ)ᴴ * (g : Matrix (Fin n) (Fin n) ℂ)ᴴ * Jm ε *
-          ((g : Matrix (Fin n) (Fin n) ℂ) * h)
-        = (h : Matrix (Fin n) (Fin n) ℂ)ᴴ * ((g : Matrix (Fin n) (Fin n) ℂ)ᴴ * Jm ε * g) * h := by
-          simp only [Matrix.mul_assoc]
+    calc
+      (h : Matrix (Fin n) (Fin n) ℂ)ᴴ * (g : Matrix (Fin n) (Fin n) ℂ)ᴴ * Jm ε
+            * ((g : Matrix (Fin n) (Fin n) ℂ) * h)
+          = (h : Matrix (Fin n) (Fin n) ℂ)ᴴ * ((g : Matrix (Fin n) (Fin n) ℂ)ᴴ * Jm ε * g) * h := by
+        simp only [Matrix.mul_assoc]
       _ = Jm ε := by rw [hg, hh]
   one_mem' := by
     simp only [Set.mem_ofPred_eq, inUJ, Units.val_one, Matrix.conjTranspose_one, Matrix.one_mul,
@@ -47,19 +48,28 @@ def UJ (ε : Fin n → Bool) : Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ where
   inv_mem' := by
     intro g hg
     simp only [Set.mem_ofPred_eq, inUJ] at *
-    have h1 : ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)ᴴ *
-        (g : Matrix (Fin n) (Fin n) ℂ)ᴴ = 1 := by
+    have h1
+        : ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)ᴴ
+            * (g : Matrix (Fin n) (Fin n) ℂ)ᴴ
+          = 1 := by
       rw [← Matrix.conjTranspose_mul, Units.mul_inv, Matrix.conjTranspose_one]
-    have h2 : (g : Matrix (Fin n) (Fin n) ℂ) * ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) :
-        Matrix (Fin n) (Fin n) ℂ) = 1 := Units.mul_inv g
-    calc ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)ᴴ * Jm ε *
-          ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)
-        = ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)ᴴ *
-          ((g : Matrix (Fin n) (Fin n) ℂ)ᴴ * Jm ε * g) *
-          ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ) := by rw [hg]
+    have h2
+        : (g : Matrix (Fin n) (Fin n) ℂ)
+            * ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)
+          = 1 :=
+      Units.mul_inv g
+    calc
+      ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)ᴴ * Jm ε
+            * ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)
+          = ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)ᴴ
+            * ((g : Matrix (Fin n) (Fin n) ℂ)ᴴ * Jm ε * g)
+            * ((g⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ) := by
+        rw [hg]
       _ = Jm ε := by
-          rw [show ∀ A B C D E : Matrix (Fin n) (Fin n) ℂ, A * (B * C * D) * E = (A * B) * C * (D * E)
-            from fun A B C D E => by simp only [Matrix.mul_assoc], h1, h2, Matrix.one_mul, Matrix.mul_one]
+        rw [show ∀ A B C D E : Matrix (Fin n) (Fin n) ℂ,
+              A * (B * C * D) * E = (A * B) * C * (D * E) from fun A B C D E => by
+            simp only [Matrix.mul_assoc],
+          h1, h2, Matrix.one_mul, Matrix.mul_one]
 
 abbrev toM {ε : Fin n → Bool} (g : UJ ε) : Matrix (Fin n) (Fin n) ℂ :=
   ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)

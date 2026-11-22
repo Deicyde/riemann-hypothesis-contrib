@@ -17,8 +17,11 @@ noncomputable section
 
 attribute [local instance] algebraOfOver reesCechModule
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{u}}
-  [X.Over (Spec (.of A))] (F : X.Modules)
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
+  (F : X.Modules)
 
 def transMap (n : ℕ) : (c : ℕ) → idealPow I F (n + c + 1) ⟶ idealPow I F (n + 1)
   | 0 => 𝟙 _
@@ -61,16 +64,17 @@ lemma transMap_reesDeg_smul {V : X.Opens} (hV : IsAffineOpen V) (n d : ℕ) (r :
     simp only [Finset.mem_range] at hk hk'
     rw [hs k (by omega), map_zero]
 
-variable {ι : Type u} (𝔘 : ι → X.Opens)
-  (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a))) [Finite ι] (p : ℕ)
-
+variable
+  {ι : Type u} (𝔘 : ι → X.Opens) (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a)))
+  [Finite ι]
+  (p : ℕ)
 
 set_option maxHeartbeats 4000000 in
 include hF hU in
-theorem exists_transMap_eq_zero [IsProper (X ↘ Spec (.of A))] (hUtop : iSup 𝔘 = ⊤) :
-    ∃ c, ∀ n (y : cechH (modulesAb (idealPow I F (n + c + 1))).obj 𝔘 p),
-      cechHMap 𝔘 (modulesAbMap (idealPowι I F (n + c + 1))).hom p y = 0 →
-        cechHMap 𝔘 (modulesAbMap (transMap I F n c)).hom p y = 0 := by
+theorem exists_transMap_eq_zero [IsProper (X ↘ Spec (.of A))] (hUtop : iSup 𝔘 = ⊤)
+    : ∃ c, ∀ n (y : cechH (modulesAb (idealPow I F (n + c + 1))).obj 𝔘 p),
+      cechHMap 𝔘 (modulesAbMap (idealPowι I F (n + c + 1))).hom p y = 0
+        → cechHMap 𝔘 (modulesAbMap (transMap I F n c)).hom p y = 0 := by
   classical
   have := finite_reesCech I 𝔘 p hF hUtop hU
   have hnoeth : IsNoetherian (reesAlgebra I) (cechH (reesPre I F) 𝔘 p) :=
@@ -79,8 +83,8 @@ theorem exists_transMap_eq_zero [IsProper (X ↘ Spec (.of A))] (hUtop : iSup �
   choose σ hσ Nb hcls hNb using fun g => exists_cls_coef_eq_zero I hF 𝔘 hU p g
   obtain ⟨d, hd⟩ : ∃ d, d = S.sup Nb := ⟨_, rfl⟩
   refine ⟨d + 1, fun n y hy => ?_⟩
-  have hκ : (reesIncFam I hF 𝔘 hU (n + (d + 1) + 1)).cechH p y ∈
-      LinearMap.ker (reesΦ I hF 𝔘 hU p) := by
+  have hκ
+      : (reesIncFam I hF 𝔘 hU (n + (d + 1) + 1)).cechH p y ∈ LinearMap.ker (reesΦ I hF 𝔘 hU p) := by
     rw [LinearMap.mem_ker]
     apply PolynomialModule.ext
     ext k
@@ -96,20 +100,28 @@ theorem exists_transMap_eq_zero [IsProper (X ↘ Spec (.of A))] (hUtop : iSup �
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hy', map_sum, map_sum]
   refine Finset.sum_eq_zero fun g hg => ?_
-  have hgker : reesΦ I hF 𝔘 hU p g = 0 :=
-    LinearMap.mem_ker.1 (hS ▸ Submodule.subset_span hg)
+  have hgker : reesΦ I hF 𝔘 hU p g = 0 := LinearMap.mem_ker.1 (hS ▸ Submodule.subset_span hg)
   have hgd : Nb g ≤ d := hd ▸ Finset.le_sup (f := Nb) hg
-  have key : ∀ r : reesAlgebra I, cechHMap 𝔘 (modulesAbMap (transMap I F n (d + 1))).hom p
-      ((reesDegFam I hF 𝔘 hU (n + (d + 1) + 1)).cechH p (r • g)) = 0 := by
+  have key
+      : ∀ r : reesAlgebra I,
+        cechHMap 𝔘 (modulesAbMap (transMap I F n (d + 1))).hom p
+            ((reesDegFam I hF 𝔘 hU (n + (d + 1) + 1)).cechH p (r • g))
+          = 0 := by
     intro r
     rw [← hcls g]
     change cechHMap 𝔘 (modulesAbMap (transMap I F n (d + 1))).hom p
-      ((reesDegFam I hF 𝔘 hU (n + (d + 1) + 1)).cechH p
-        (cechHMap 𝔘 (modulesAbMap (reesMul I F r)).hom p (cls (σ g) (hσ g)))) = 0
+        ((reesDegFam I hF 𝔘 hU (n + (d + 1) + 1)).cechH p
+          (cechHMap 𝔘 (modulesAbMap (reesMul I F r)).hom p (cls (σ g) (hσ g))))
+      = 0
     rw [cechHMap_cls, CechFamily.cechH_cls, cechHMap_cls]
-    have hterm : ∀ j : Fin (d + 1), cechHMap 𝔘 (modulesAbMap (idealPowOfMem I F (k := n + 1)
-        ((r : Polynomial A).coeff (n + (d + 1) + 1 - j)) (coeff_mem_pow_of_le I r (by omega)))).hom p
-        ((reesCoefFam I hF 𝔘 hU j).cechH p (cls (σ g) (hσ g))) = 0 := by
+    have hterm
+        : ∀ j : Fin (d + 1),
+          cechHMap 𝔘
+              (modulesAbMap (idealPowOfMem I F (k := n + 1)
+                ((r : Polynomial A).coeff (n + (d + 1) + 1 - j))
+                (coeff_mem_pow_of_le I r (by omega)))).hom
+              p ((reesCoefFam I hF 𝔘 hU j).cechH p (cls (σ g) (hσ g)))
+            = 0 := by
       intro j
       rw [hcls g, ← reesΦ_coeff, hgker, PolynomialModule.coeff_zero, Finsupp.zero_apply, map_zero]
     refine Eq.trans ?_ (Finset.sum_eq_zero (s := Finset.univ) fun j _ => hterm j)
@@ -120,9 +132,9 @@ theorem exists_transMap_eq_zero [IsProper (X ↘ Spec (.of A))] (hUtop : iSup �
       exact transMap_reesDeg_smul I hF (isAffineOpen_inter 𝔘 hU t) n d r (σ g t)
         (fun j hj => hNb g j (by omega) t)
     set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sum]
-        exact Finset.sum_eq_zero fun j _ => by
-          rw [← push_d, ← CechFamily.cochain_d, hσ g, map_zero, map_zero]
+    · rw [map_sum]
+      exact Finset.sum_eq_zero fun j _ => by
+        rw [← push_d, ← CechFamily.cochain_d, hσ g, map_zero, map_zero]
   exact key (f g)
 
 end

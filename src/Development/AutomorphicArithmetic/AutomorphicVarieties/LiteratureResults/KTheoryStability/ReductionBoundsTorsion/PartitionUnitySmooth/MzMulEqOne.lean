@@ -15,8 +15,9 @@ abbrev cz {ι : Type*} (c : ι → ℤ) : ι → ℝ := fun i => (c i : ℝ)
 abbrev mz {ι : Type*} [Fintype ι] [DecidableEq ι] (U : Matrix ι ι ℤ) : Matrix ι ι ℝ :=
   (Int.castRingHom ℝ).mapMatrix U
 
-theorem mz_apply {ι : Type*} [Fintype ι] [DecidableEq ι] (U : Matrix ι ι ℤ) (i j : ι) :
-    mz U i j = (U i j : ℝ) := rfl
+theorem mz_apply {ι : Type*} [Fintype ι] [DecidableEq ι] (U : Matrix ι ι ℤ) (i j : ι)
+    : mz U i j = (U i j : ℝ) :=
+  rfl
 
 def Dual {ι : Type*} [Fintype ι] [DecidableEq ι] (G : Matrix ι ι ℝ) (δ : ℝ) : Prop :=
   ∀ c : ι → ℤ, c ≠ 0 → δ ≤ cz c ⬝ᵥ (G⁻¹ *ᵥ cz c)
@@ -36,12 +37,12 @@ theorem mz_mul_eq_one {U V : Matrix ι ι ℤ} (h : U * V = 1) : mz U * mz V = 1
   have h' := congrArg (Int.castRingHom ℝ).mapMatrix h
   rwa [map_mul, map_one] at h'
 
-theorem quad_mz (U : Matrix ι ι ℤ) (G : Matrix ι ι ℝ) (y : ι → ℝ) :
-    (mz U *ᵥ y) ⬝ᵥ (G *ᵥ (mz U *ᵥ y)) = y ⬝ᵥ (((mz U)ᵀ * G * mz U) *ᵥ y) := by
+theorem quad_mz (U : Matrix ι ι ℤ) (G : Matrix ι ι ℝ) (y : ι → ℝ)
+    : (mz U *ᵥ y) ⬝ᵥ (G *ᵥ (mz U *ᵥ y)) = y ⬝ᵥ (((mz U)ᵀ * G * mz U) *ᵥ y) := by
   rw [← mulVec_mulVec, ← mulVec_mulVec, dotProduct_mulVec y (mz U)ᵀ, vecMul_transpose]
 
-theorem uni_pd (U V : Matrix ι ι ℤ) (hVU : V * U = 1) (G : Matrix ι ι ℝ) (hG : G.PosDef) :
-    ((mz U)ᵀ * G * mz U).PosDef := by
+theorem uni_pd (U V : Matrix ι ι ℤ) (hVU : V * U = 1) (G : Matrix ι ι ℝ) (hG : G.PosDef)
+    : ((mz U)ᵀ * G * mz U).PosDef := by
   have hVUr := mz_mul_eq_one hVU
   have hinj : Function.Injective (mz U).mulVec := by
     intro x y hxy
@@ -50,15 +51,19 @@ theorem uni_pd (U V : Matrix ι ι ℤ) (hVU : V * U = 1) (G : Matrix ι ι ℝ)
   have := hG.conjTranspose_mul_mul_same hinj
   rwa [conjTranspose_eq_transpose_of_trivial] at this
 
-theorem uni_dual (U V : Matrix ι ι ℤ) (hUV : U * V = 1) (hVU : V * U = 1) (G : Matrix ι ι ℝ)
-    (hG : G.PosDef) (δ : ℝ) (hD : Dual G δ) : Dual ((mz U)ᵀ * G * mz U) δ := by
+theorem uni_dual
+    (U V : Matrix ι ι ℤ) (hUV : U * V = 1) (hVU : V * U = 1)
+    (G : Matrix ι ι ℝ) (hG : G.PosDef)
+    (δ : ℝ) (hD : Dual G δ)
+    : Dual ((mz U)ᵀ * G * mz U) δ := by
   have hUVr := mz_mul_eq_one hUV
   have hVUr := mz_mul_eq_one hVU
   have hu : IsUnit G.det := isUnit_iff_ne_zero.mpr hG.det_pos.ne'
   have hinv : ((mz U)ᵀ * G * mz U)⁻¹ = mz V * G⁻¹ * (mz V)ᵀ := by
     apply Matrix.inv_eq_left_inv
     have hT : (mz V)ᵀ * (mz U)ᵀ = 1 := by rw [← transpose_mul, hUVr, transpose_one]
-    calc mz V * G⁻¹ * (mz V)ᵀ * ((mz U)ᵀ * G * mz U)
+    calc
+      mz V * G⁻¹ * (mz V)ᵀ * ((mz U)ᵀ * G * mz U)
         = mz V * (G⁻¹ * (((mz V)ᵀ * (mz U)ᵀ) * G)) * mz U := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hT, Matrix.one_mul, nonsing_inv_mul G hu, Matrix.mul_one, hVUr]
   intro c hc
@@ -73,8 +78,10 @@ theorem uni_dual (U V : Matrix ι ι ℤ) (hUV : U * V = 1) (hVU : V * U = 1) (G
   have h1 : Uᵀ *ᵥ (Vᵀ *ᵥ c) = Uᵀ *ᵥ 0 := by rw [h0]
   rwa [mulVec_mulVec, ← transpose_mul, hVU, transpose_one, one_mulVec, mulVec_zero] at h1
 
-theorem uni_cov (U V : Matrix ι ι ℤ) (hUV : U * V = 1) (G : Matrix ι ι ℝ) (R : ℝ)
-    (hC : Cov ((mz U)ᵀ * G * mz U) R) : Cov G R := by
+theorem uni_cov
+    (U V : Matrix ι ι ℤ) (hUV : U * V = 1)
+    (G : Matrix ι ι ℝ) (R : ℝ) (hC : Cov ((mz U)ᵀ * G * mz U) R)
+    : Cov G R := by
   have hUVr := mz_mul_eq_one hUV
   intro p
   obtain ⟨c, hc⟩ := hC (mz V *ᵥ p)
@@ -86,9 +93,9 @@ theorem uni_cov (U V : Matrix ι ι ℤ) (hUV : U * V = 1) (G : Matrix ι ι ℝ
 
 end Uni
 
-theorem complete {n : ℕ} (v : Fin n → ℤ) (hv : v ≠ 0) (i0 : Fin n) :
-    ∃ (U V : Matrix (Fin n) (Fin n) ℤ) (m : ℤ), U * V = 1 ∧ V * U = 1 ∧ m ≠ 0 ∧
-      v = m • fun i => U i i0 := by
+theorem complete {n : ℕ} (v : Fin n → ℤ) (hv : v ≠ 0) (i0 : Fin n)
+    : ∃ (U V : Matrix (Fin n) (Fin n) ℤ) (m : ℤ),
+      U * V = 1 ∧ V * U = 1 ∧ m ≠ 0 ∧ v = m • fun i => U i i0 := by
   classical
   obtain ⟨k, snf⟩ := (Submodule.span ℤ {v}).smithNormalForm (Pi.basisFun ℤ (Fin n))
   have hvN : v ∈ Submodule.span ℤ {v} := Submodule.mem_span_singleton_self v
@@ -111,9 +118,15 @@ theorem complete {n : ℕ} (v : Fin n → ℤ) (hv : v ≠ 0) (i0 : Fin n) :
     rw [← hs, smul_smul, hsu, one_smul]
   let e := Equiv.swap (snf.f ⟨0, hk⟩) i0
   let bM' := snf.bM.reindex e
-  refine ⟨(Pi.basisFun ℤ (Fin n)).toMatrix bM', bM'.toMatrix (Pi.basisFun ℤ (Fin n)),
-    s * snf.a ⟨0, hk⟩, Basis.toMatrix_mul_toMatrix_flip _ _, Basis.toMatrix_mul_toMatrix_flip _ _,
-    ?_, ?_⟩
+  refine ⟨
+    (Pi.basisFun ℤ (Fin n)).toMatrix bM',
+    bM'.toMatrix (Pi.basisFun ℤ (Fin n)),
+    s * snf.a ⟨0, hk⟩,
+    Basis.toMatrix_mul_toMatrix_flip _ _,
+    Basis.toMatrix_mul_toMatrix_flip _ _,
+    ?_,
+    ?_
+  ⟩
   · intro h0
     apply hv
     rw [hv', snf.snf, smul_smul, h0, zero_smul]
@@ -133,37 +146,43 @@ def sch : Matrix (Fin d) (Fin d) ℝ :=
 theorem sym_of_herm (hs : G.IsHermitian) (i j : Fin (d + 1)) : G j i = G i j := by
   simpa using hs.apply i j
 
-theorem sch_id (hs : G.IsHermitian) (ha : G 0 0 ≠ 0) (y0 : ℝ) (y : Fin d → ℝ) :
-    (Fin.cons y0 y : Fin (d + 1) → ℝ) ⬝ᵥ (G *ᵥ Fin.cons y0 y) =
-      G 0 0 * (y0 + (∑ j, G 0 j.succ * y j) / G 0 0) ^ 2 + y ⬝ᵥ (sch G *ᵥ y) := by
-  have hL : (Fin.cons y0 y : Fin (d + 1) → ℝ) ⬝ᵥ (G *ᵥ Fin.cons y0 y) =
-      y0 * (G 0 0 * y0) + y0 * (∑ j, G 0 j.succ * y j) + (∑ i, y i * G i.succ 0) * y0 +
-        ∑ i, y i * ∑ j, G i.succ j.succ * y j := by
+theorem sch_id (hs : G.IsHermitian) (ha : G 0 0 ≠ 0) (y0 : ℝ) (y : Fin d → ℝ)
+    : (Fin.cons y0 y : Fin (d + 1) → ℝ) ⬝ᵥ (G *ᵥ Fin.cons y0 y)
+      = G 0 0 * (y0 + (∑ j, G 0 j.succ * y j) / G 0 0) ^ 2 + y ⬝ᵥ (sch G *ᵥ y) := by
+  have hL
+      : (Fin.cons y0 y : Fin (d + 1) → ℝ) ⬝ᵥ (G *ᵥ Fin.cons y0 y)
+        = y0 * (G 0 0 * y0) + y0 * (∑ j, G 0 j.succ * y j) + (∑ i, y i * G i.succ 0) * y0
+          + ∑ i, y i * ∑ j, G i.succ j.succ * y j := by
     simp only [dotProduct, mulVec, Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, mul_add,
       Finset.sum_add_distrib, Finset.sum_mul, Finset.mul_sum, mul_assoc]
     ring
   have e1 : ∑ i, y i * G i.succ 0 = ∑ j, G 0 j.succ * y j :=
     Finset.sum_congr rfl fun i _ => by rw [sym_of_herm G hs 0 i.succ, mul_comm]
-  have h3 : ∀ i : Fin d, ∑ j, (G i.succ j.succ - G i.succ 0 * G 0 j.succ / G 0 0) * y j =
-      ∑ j, G i.succ j.succ * y j - G i.succ 0 / G 0 0 * ∑ j, G 0 j.succ * y j := by
+  have h3
+      : ∀ i : Fin d,
+        ∑ j, (G i.succ j.succ - G i.succ 0 * G 0 j.succ / G 0 0) * y j
+          = ∑ j, G i.succ j.succ * y j - G i.succ 0 / G 0 0 * ∑ j, G 0 j.succ * y j := by
     intro i
     rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
     exact Finset.sum_congr rfl fun j _ => by ring
-  have e2 : y ⬝ᵥ (sch G *ᵥ y) = ∑ i, y i * ∑ j, G i.succ j.succ * y j -
-      (∑ j, G 0 j.succ * y j) ^ 2 / G 0 0 := by
-    calc y ⬝ᵥ (sch G *ᵥ y)
-        = ∑ i, y i * (∑ j, G i.succ j.succ * y j - G i.succ 0 / G 0 0 * ∑ j, G 0 j.succ * y j) := by
-          simp only [dotProduct, mulVec, sch, of_apply, h3]
-      _ = ∑ i, y i * ∑ j, G i.succ j.succ * y j -
-            (∑ i, y i * G i.succ 0) * ((∑ j, G 0 j.succ * y j) / G 0 0) := by
-          rw [Finset.sum_mul, ← Finset.sum_sub_distrib]
-          exact Finset.sum_congr rfl fun i _ => by ring
+  have e2
+      : y ⬝ᵥ (sch G *ᵥ y)
+        = ∑ i, y i * ∑ j, G i.succ j.succ * y j - (∑ j, G 0 j.succ * y j) ^ 2 / G 0 0 := by
+    calc
+      y ⬝ᵥ (sch G *ᵥ y)
+          = ∑ i, y i * (∑ j, G i.succ j.succ * y j - G i.succ 0 / G 0 0 * ∑ j, G 0 j.succ * y j) :=
+        by simp only [dotProduct, mulVec, sch, of_apply, h3]
+      _ = ∑ i, y i * ∑ j, G i.succ j.succ * y j
+          - (∑ i, y i * G i.succ 0) * ((∑ j, G 0 j.succ * y j) / G 0 0) := by
+        rw [Finset.sum_mul, ← Finset.sum_sub_distrib]
+        exact Finset.sum_congr rfl fun i _ => by ring
       _ = _ := by rw [e1]; ring
   rw [hL, e1, e2]
   field_simp
   ring
 
-theorem fin_cons_ne {y0 : ℝ} {y : Fin d → ℝ} (hy : y ≠ 0) : (Fin.cons y0 y : Fin (d + 1) → ℝ) ≠ 0 := by
+theorem fin_cons_ne {y0 : ℝ} {y : Fin d → ℝ} (hy : y ≠ 0)
+    : (Fin.cons y0 y : Fin (d + 1) → ℝ) ≠ 0 := by
   intro h
   apply hy
   funext j
@@ -192,8 +211,9 @@ theorem sch_dual (hG : G.PosDef) (δ : ℝ) (hD : Dual G δ) : Dual (sch G) δ :
   intro c hc
   obtain ⟨x', hx'⟩ : ∃ x', x' = (sch G)⁻¹ *ᵥ cz c := ⟨_, rfl⟩
   have hS : sch G *ᵥ x' = cz c := by rw [hx', mulVec_mulVec, mul_nonsing_inv _ hSu, one_mulVec]
-  have hGx : G *ᵥ (Fin.cons (-(∑ k, G 0 k.succ * x' k) / G 0 0) x' : Fin (d + 1) → ℝ) =
-      Fin.cons 0 (cz c) := by
+  have hGx
+      : G *ᵥ (Fin.cons (-(∑ k, G 0 k.succ * x' k) / G 0 0) x' : Fin (d + 1) → ℝ)
+        = Fin.cons 0 (cz c) := by
     funext i
     refine Fin.cases ?_ (fun j => ?_) i
     · simp only [mulVec, dotProduct, Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ]
@@ -201,17 +221,21 @@ theorem sch_dual (hG : G.PosDef) (δ : ℝ) (hD : Dual G δ) : Dual (sch G) δ :
       ring
     · have hSj := congrFun hS j
       simp only [mulVec, dotProduct, sch, of_apply, sub_mul, Finset.sum_sub_distrib] at hSj
-      have e : ∑ k, G j.succ 0 * G 0 k.succ / G 0 0 * x' k =
-          G j.succ 0 * ((∑ k, G 0 k.succ * x' k) / G 0 0) := by
+      have e
+          : ∑ k, G j.succ 0 * G 0 k.succ / G 0 0 * x' k
+            = G j.succ 0 * ((∑ k, G 0 k.succ * x' k) / G 0 0) := by
         rw [Finset.sum_div, Finset.mul_sum]
         exact Finset.sum_congr rfl fun k _ => by ring
       simp only [mulVec, dotProduct, Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ]
-      have e2 : G j.succ 0 * (-(∑ k, G 0 k.succ * x' k) / G 0 0) =
-          -(G j.succ 0 * ((∑ k, G 0 k.succ * x' k) / G 0 0)) := by ring
+      have e2
+          : G j.succ 0 * (-(∑ k, G 0 k.succ * x' k) / G 0 0)
+            = -(G j.succ 0 * ((∑ k, G 0 k.succ * x' k) / G 0 0)) := by
+        ring
       rw [e2]
       linarith
-  have hinv : G⁻¹ *ᵥ (Fin.cons 0 (cz c) : Fin (d + 1) → ℝ) =
-      Fin.cons (-(∑ k, G 0 k.succ * x' k) / G 0 0) x' := by
+  have hinv
+      : G⁻¹ *ᵥ (Fin.cons 0 (cz c) : Fin (d + 1) → ℝ)
+        = Fin.cons (-(∑ k, G 0 k.succ * x' k) / G 0 0) x' := by
     rw [← hGx, mulVec_mulVec, nonsing_inv_mul _ hu, one_mulVec]
   have hc0 : cz (Fin.cons 0 c : Fin (d + 1) → ℤ) = Fin.cons 0 (cz c) := by
     funext i
@@ -223,8 +247,10 @@ theorem sch_dual (hG : G.PosDef) (δ : ℝ) (hD : Dual G δ) : Dual (sch G) δ :
     simpa using congrFun h j.succ
   have h := hD _ hne
   rw [hc0, hinv] at h
-  have e : (Fin.cons 0 (cz c) : Fin (d + 1) → ℝ) ⬝ᵥ
-      (Fin.cons (-(∑ k, G 0 k.succ * x' k) / G 0 0) x' : Fin (d + 1) → ℝ) = cz c ⬝ᵥ x' := by
+  have e
+      : (Fin.cons 0 (cz c) : Fin (d + 1) → ℝ)
+          ⬝ᵥ (Fin.cons (-(∑ k, G 0 k.succ * x' k) / G 0 0) x' : Fin (d + 1) → ℝ)
+        = cz c ⬝ᵥ x' := by
     simp [dotProduct, Fin.sum_univ_succ]
   rw [e, hx'] at h
   exact h
@@ -237,8 +263,9 @@ theorem sch_cov (hG : G.PosDef) (R : ℝ) (hC : Cov (sch G) R) : Cov G (G 0 0 / 
   rw [← hy] at hc'
   obtain ⟨t, ht⟩ : ∃ t : ℝ, t = p 0 + (∑ j, G 0 j.succ * y j) / G 0 0 := ⟨_, rfl⟩
   refine ⟨Fin.cons (round t) c', ?_⟩
-  have hp : p - cz (Fin.cons (round t) c' : Fin (d + 1) → ℤ) =
-      Fin.cons (p 0 - ((round t : ℤ) : ℝ)) y := by
+  have hp
+      : p - cz (Fin.cons (round t) c' : Fin (d + 1) → ℤ)
+        = Fin.cons (p 0 - ((round t : ℤ) : ℝ)) y := by
     funext i
     refine Fin.cases ?_ (fun j => ?_) i
     · simp [cz]
@@ -258,18 +285,23 @@ theorem sch_cov (hG : G.PosDef) (R : ℝ) (hC : Cov (sch G) R) : Cov G (G 0 0 / 
 
 end Schur
 
-theorem quad_reindex {ι κ : Type*} [Fintype ι] [Fintype κ] (e : ι ≃ κ) (G : Matrix ι ι ℝ)
-    (y : κ → ℝ) : y ⬝ᵥ (G.submatrix e.symm e.symm *ᵥ y) = (y ∘ e) ⬝ᵥ (G *ᵥ (y ∘ e)) := by
+theorem quad_reindex
+    {ι κ : Type*} [Fintype ι] [Fintype κ] (e : ι ≃ κ) (G : Matrix ι ι ℝ) (y : κ → ℝ)
+    : y ⬝ᵥ (G.submatrix e.symm e.symm *ᵥ y) = (y ∘ e) ⬝ᵥ (G *ᵥ (y ∘ e)) := by
   simp only [dotProduct, mulVec, submatrix_apply, Function.comp_apply]
   rw [← e.symm.sum_comp]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [← e.symm.sum_comp]
   simp only [Equiv.apply_symm_apply]
 
-theorem reidx {d : ℕ} {C : ℝ} (core : ∀ G : Matrix (Fin d) (Fin d) ℝ, G.PosDef → ∀ δ : ℝ, 0 < δ →
-      Dual G δ → Cov G (C / δ))
-    (ι : Type) [Fintype ι] [DecidableEq ι] (h : Fintype.card ι = d) (G : Matrix ι ι ℝ)
-    (hG : G.PosDef) (δ : ℝ) (hδ : 0 < δ) (hD : Dual G δ) : Cov G (C / δ) := by
+theorem reidx
+    {d : ℕ} {C : ℝ}
+    (core : ∀ G : Matrix (Fin d) (Fin d) ℝ, G.PosDef → ∀ δ : ℝ, 0 < δ → Dual G δ → Cov G (C / δ))
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (h : Fintype.card ι = d)
+    (G : Matrix ι ι ℝ) (hG : G.PosDef)
+    (δ : ℝ) (hδ : 0 < δ) (hD : Dual G δ)
+    : Cov G (C / δ) := by
   let e : ι ≃ Fin d := Fintype.equivFinOfCardEq h
   have hG' : (G.submatrix e.symm e.symm).PosDef := hG.submatrix e.symm.injective
   have hD' : Dual (G.submatrix e.symm e.symm) δ := by
@@ -290,11 +322,14 @@ theorem reidx {d : ℕ} {C : ℝ} (core : ∀ G : Matrix (Fin d) (Fin d) ℝ, G.
   rw [e1, ← quad_reindex e G]
   exact hc
 
-theorem core (T : ℕ → ℝ) (hT : ∀ n, 0 ≤ T n)
-    (SV : ∀ (n : ℕ) (G : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ), G.PosDef → ∀ δ : ℝ, 0 < δ →
-      Dual G δ → ∃ v : Fin (n + 1) → ℤ, v ≠ 0 ∧ cz v ⬝ᵥ (G *ᵥ cz v) ≤ T n / δ) :
-    ∀ d : ℕ, ∃ C : ℝ, 0 < C ∧ ∀ G : Matrix (Fin d) (Fin d) ℝ, G.PosDef → ∀ δ : ℝ, 0 < δ →
-      Dual G δ → Cov G (C / δ) := by
+theorem core
+    (T : ℕ → ℝ) (hT : ∀ n, 0 ≤ T n)
+    (SV : ∀ (n : ℕ) (G : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ),
+      G.PosDef
+        → ∀ δ : ℝ, 0 < δ → Dual G δ → ∃ v : Fin (n + 1) → ℤ, v ≠ 0 ∧ cz v ⬝ᵥ (G *ᵥ cz v) ≤ T n / δ)
+    : ∀ d : ℕ, ∃ C : ℝ,
+      0 < C
+        ∧ ∀ G : Matrix (Fin d) (Fin d) ℝ, G.PosDef → ∀ δ : ℝ, 0 < δ → Dual G δ → Cov G (C / δ) := by
   intro d
   induction d with
   | zero =>
@@ -310,8 +345,7 @@ theorem core (T : ℕ → ℝ) (hT : ∀ n, 0 ≤ T n)
     obtain ⟨U, V, m, hUV, hVU, hm, hvU⟩ := complete v hv0 0
     have hG' := uni_pd U V hVU G hG
     have hD' := uni_dual U V hUV hVU G hG δ hD
-    have hq0 : ((mz U)ᵀ * G * mz U) 0 0 =
-        cz (fun i => U i 0) ⬝ᵥ (G *ᵥ cz (fun i => U i 0)) := by
+    have hq0 : ((mz U)ᵀ * G * mz U) 0 0 = cz (fun i => U i 0) ⬝ᵥ (G *ᵥ cz (fun i => U i 0)) := by
       simp only [Matrix.mul_apply, transpose_apply, mz_apply, dotProduct, mulVec, cz,
         Finset.sum_mul, Finset.mul_sum]
       conv_lhs => rw [Finset.sum_comm]
@@ -320,8 +354,9 @@ theorem core (T : ℕ → ℝ) (hT : ∀ n, 0 ≤ T n)
       subst hvU
       funext i
       simp [cz]
-    have hQ : cz v ⬝ᵥ (G *ᵥ cz v) =
-        (m : ℝ) ^ 2 * (cz (fun i => U i 0) ⬝ᵥ (G *ᵥ cz (fun i => U i 0))) := by
+    have hQ
+        : cz v ⬝ᵥ (G *ᵥ cz v)
+          = (m : ℝ) ^ 2 * (cz (fun i => U i 0) ⬝ᵥ (G *ᵥ cz (fun i => U i 0))) := by
       rw [hcv, mulVec_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul]
       ring
     have hm1 : (1 : ℝ) ≤ (m : ℝ) ^ 2 := by
@@ -334,8 +369,9 @@ theorem core (T : ℕ → ℝ) (hT : ∀ n, 0 ≤ T n)
       simpa using hG.posSemidef.dotProduct_mulVec_nonneg (cz (fun i => U i 0))
     have h00 : ((mz U)ᵀ * G * mz U) 0 0 ≤ T d / δ := by
       rw [hq0]
-      calc _ ≤ (m : ℝ) ^ 2 * (cz (fun i => U i 0) ⬝ᵥ (G *ᵥ cz (fun i => U i 0))) :=
-            le_mul_of_one_le_left hQ0 hm1
+      calc
+        _ ≤ (m : ℝ) ^ 2 * (cz (fun i => U i 0) ⬝ᵥ (G *ᵥ cz (fun i => U i 0))) :=
+          le_mul_of_one_le_left hQ0 hm1
         _ = _ := hQ.symm
         _ ≤ T d / δ := hv
     have hcov := sch_cov _ hG' _ (hC _ (sch_pd _ hG') δ hδ (sch_dual _ hG' δ hD'))

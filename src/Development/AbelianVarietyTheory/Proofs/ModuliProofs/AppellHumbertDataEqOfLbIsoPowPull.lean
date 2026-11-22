@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.HermFor
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 noncomputable section
@@ -34,25 +36,30 @@ private lemma mul_pow_mul_inv_pow_eq_of_factor {s a b a' b' x x' E E' : ℂ} (m 
   rw [mul_pow, mul_pow, mul_pow, mul_pow, hE]
   field_simp
 
-
 open PullHermitian in
-theorem semicharacter_pull_eq_of_lbIso_pow :
-    ∀ (A A' : Over (Sp ℂ)) [GrpObj A] [GrpObj A'] (L : LB A.left) (L' : LB A'.left), L.IsLB → L'.IsLB →
-  ∀ (g g' : ℕ) (u : HolUnif A L g) (u' : HolUnif A' L' g') (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ)
-    (Hm' : Matrix (Fin g') (Fin g') ℂ) (χ' : u'.Λ → ℂ), u.IsAH Hm χ → u'.IsAH Hm' χ' →
-  ∀ (f : A ⟶ A') (F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)) (hΛ₀ : ∀ l ∈ u.Λ, F l ∈ u'.Λ), (∀ z, u'.ex (F z) = u.ex z ≫ f) →
-  ∀ m n : ℕ, LBIso (lbPow (L'.pull f.left) m) (lbPow L n) →
-  ∀ l : u.Λ, χ l ^ n = χ' ⟨F l, hΛ₀ l l.2⟩ ^ m := by
+theorem semicharacter_pull_eq_of_lbIso_pow
+    : ∀ (A A' : Over (Sp ℂ)) [GrpObj A] [GrpObj A'] (L : LB A.left) (L' : LB A'.left),
+      L.IsLB → L'.IsLB
+        → ∀ (g g' : ℕ) (u : HolUnif A L g) (u' : HolUnif A' L' g') (Hm : Matrix (Fin g) (Fin g) ℂ)
+            (χ : u.Λ → ℂ) (Hm' : Matrix (Fin g') (Fin g') ℂ) (χ' : u'.Λ → ℂ),
+          u.IsAH Hm χ → u'.IsAH Hm' χ'
+            → ∀ (f : A ⟶ A') (F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)) (hΛ₀ : ∀ l ∈ u.Λ, F l ∈ u'.Λ),
+              (∀ z, u'.ex (F z) = u.ex z ≫ f)
+                → ∀ m n : ℕ,
+                  LBIso (lbPow (L'.pull f.left) m) (lbPow L n)
+                    → ∀ l : u.Λ, χ l ^ n = χ' ⟨F l, hΛ₀ l l.2⟩ ^ m := by
   intro A A' _ _ L L' hL hL' g g' u u' Hm χ Hm' χ' hu hu' f F hΛ₀ hex m n hiso
 
-  have hH := hermForm_pull_eq_of_lbIso_pow A A' L L' hL hL' g g' u u' Hm χ Hm' χ' hu hu' f F hex m n hiso
+  have hH :=
+    hermForm_pull_eq_of_lbIso_pow A A' L L' hL hL' g g' u u' Hm χ Hm' χ' hu hu' f F hex m n hiso
   obtain ⟨w, hw⟩ := hiso
   unfold HolUnif.IsAH at hu hu'
   have := u.discrete
   have hxf : ∀ z, (u'.ex (F z)).left = (u.ex z).left ≫ f.left := fun z => by rw [hex z]; rfl
 
   let φ : L.ι × L'.ι → (Fin g → ℂ) → ℂ := fun p z =>
-    valAt' (u.ex z).left _ (w.s (idx f.left m n p.1 p.2)).val * u'.fr p.2 (F z) ^ m * (u.fr p.1 z ^ n)⁻¹
+    valAt' (u.ex z).left _ (w.s (idx f.left m n p.1 p.2)).val * u'.fr p.2 (F z) ^ m
+      * (u.fr p.1 z ^ n)⁻¹
   let V : L.ι × L'.ι → Set (Fin g → ℂ) := fun p =>
     {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U p.1 ∧ ⊤ ≤ (u'.ex (F z)).left ⁻¹ᵁ L'.U p.2}
   have hFc : Continuous F := LinearMap.continuous_of_finiteDimensional F
@@ -62,16 +69,22 @@ theorem semicharacter_pull_eq_of_lbIso_pow :
     obtain ⟨i, hi⟩ := exists_chart (u.ex z).left hL
     obtain ⟨j, hj⟩ := exists_chart (u'.ex (F z)).left hL'
     exact ⟨(i, j), hi, hj⟩
-  have hdiv : ∀ i j z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → ⊤ ≤ (u'.ex (F z)).left ⁻¹ᵁ L'.U j →
-      ⊤ ≤ (u.ex z).left ⁻¹ᵁ (LB.div (lbPow L n) (lbPow (L'.pull f.left) m)).U (idx f.left m n i j) :=
+  have hdiv
+      : ∀ i j z,
+        ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → ⊤ ≤ (u'.ex (F z)).left ⁻¹ᵁ L'.U j
+          → ⊤
+            ≤ (u.ex z).left
+              ⁻¹ᵁ (LB.div (lbPow L n) (lbPow (L'.pull f.left) m)).U (idx f.left m n i j) :=
     fun i j z hi hj => idx_chart _ f.left m n i j hi (by rw [← hxf]; exact hj)
   have hφd : ∀ p, DifferentiableOn ℂ (φ p) (V p) := fun p => by
-    have h1 := ((u.hol _ (w.s (idx f.left m n p.1 p.2)).val).2).mono
-      (fun z (hz : z ∈ V p) => hdiv p.1 p.2 z hz.1 hz.2)
+    have h1 :=
+      ((u.hol _ (w.s (idx f.left m n p.1 p.2)).val).2).mono
+        (fun z (hz : z ∈ V p) => hdiv p.1 p.2 z hz.1 hz.2)
     have h2 : DifferentiableOn ℂ (fun z => u'.fr p.2 (F z)) (V p) :=
       (u'.fr_hol p.2).comp (LinearMap.toContinuousLinearMap F).differentiable.differentiableOn
         (fun z hz => hz.2)
-    have h3 : DifferentiableOn ℂ (fun z => u.fr p.1 z) (V p) := (u.fr_hol p.1).mono (fun z hz => hz.1)
+    have h3 : DifferentiableOn ℂ (fun z => u.fr p.1 z) (V p) :=
+      (u.fr_hol p.1).mono (fun z hz => hz.1)
     exact (h1.mul (h2.pow m)).mul ((h3.pow n).inv fun z hz => pow_ne_zero _ (u.fr_ne _ z hz.1))
   have hagree : ∀ p q z, z ∈ V p → z ∈ V q → φ p z = φ q z := by
     rintro ⟨i, j⟩ ⟨i', j'⟩ z ⟨hi, hj⟩ ⟨hi', hj'⟩
@@ -107,9 +120,15 @@ theorem semicharacter_pull_eq_of_lbIso_pow :
   let c : u.Λ → ℂ := fun l => χ l ^ n * (χ' ⟨F l, hΛ₀ l l.2⟩ ^ m)⁻¹
   have h0 : ∀ a b : Fin g → ℂ, hermForm (0 : Matrix (Fin g) (Fin g) ℂ) a b = 0 := fun a b => by
     simp [hermForm]
-  have hper : ∀ (l : u.Λ) z, r (z + l) =
-      c l * Complex.exp (Real.pi * hermForm (0 : Matrix (Fin g) (Fin g) ℂ) z (l : Fin g → ℂ) +
-        Real.pi / 2 * hermForm (0 : Matrix (Fin g) (Fin g) ℂ) (l : Fin g → ℂ) (l : Fin g → ℂ)) * r z := by
+  have hper
+      : ∀ (l : u.Λ) z,
+        r (z + l)
+          = c l
+            * Complex.exp
+              (Real.pi * hermForm (0 : Matrix (Fin g) (Fin g) ℂ) z (l : Fin g → ℂ)
+                + Real.pi / 2
+                  * hermForm (0 : Matrix (Fin g) (Fin g) ℂ) (l : Fin g → ℂ) (l : Fin g → ℂ))
+            * r z := by
     intro l z
     simp only [h0, mul_zero, add_zero, Complex.exp_zero, _root_.mul_one]
     obtain ⟨⟨i, j⟩, hp⟩ := hcov z
@@ -122,7 +141,8 @@ theorem semicharacter_pull_eq_of_lbIso_pow :
     have hb' : u'.fr j (F z + F l) ≠ 0 := u'.fr_ne j _ (by rw [← map_add (f := _)]; exact hzl.2)
     simp only [φ, c]
     rw [hexl l z, map_add (f := _)]
-    refine mul_pow_mul_inv_pow_eq_of_factor m n ha ha' ?_ (hχne l) (hχne' _) (Complex.exp_ne_zero _) hb hb'
+    refine mul_pow_mul_inv_pow_eq_of_factor m n ha ha' ?_ (hχne l) (hχne' _) (Complex.exp_ne_zero _)
+      hb hb'
     rw [← Complex.exp_nat_mul, ← Complex.exp_nat_mul]
     congr 1
     have e1 := hH z l
@@ -130,21 +150,35 @@ theorem semicharacter_pull_eq_of_lbIso_pow :
     simp only [hermForm] at e1 e2
     linear_combination (Real.pi : ℂ) * e1 + ((Real.pi : ℂ) / 2) * e2
   have hcn : ∀ l, ‖c l‖ = 1 := fun l => by
-    simp only [c, norm_mul, norm_inv, norm_pow, hu.2.2.1 l, hu'.2.2.1, one_pow, inv_one, _root_.mul_one]
-  have key := (appellHumbert_trivial_of_nowhere_vanishing g u.Λ u.full 0 c r
-    Matrix.isHermitian_zero hcn hr hr_ne hper).2.1
+    simp only [c, norm_mul, norm_inv, norm_pow, hu.2.2.1 l, hu'.2.2.1, one_pow, inv_one,
+      _root_.mul_one]
+  have key :=
+    (appellHumbert_trivial_of_nowhere_vanishing g u.Λ u.full 0 c r Matrix.isHermitian_zero hcn hr
+      hr_ne hper).2.1
   intro l
   have hl := key l
   simp only [c] at hl
   exact (mul_inv_eq_one₀ (pow_ne_zero _ (hχne' _))).1 hl
 
-theorem appellHumbert_data_eq_of_lbIso_pow_pull :
-    ∀ (A A' : Over (Sp ℂ)) [GrpObj A] [GrpObj A'] (L : LB A.left) (L' : LB A'.left) (g g' : ℕ) (u : HolUnif A L g) (u' : HolUnif A' L' g') (Hm : Matrix (Fin g) (Fin g) ℂ) (Hm' : Matrix (Fin g') (Fin g') ℂ) (χ : u.Λ → ℂ) (χ' : u'.Λ → ℂ) (f : A ⟶ A') (F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)) (hF : ∀ l ∈ u.Λ, F l ∈ u'.Λ) (n : ℕ), 0 < n → L.IsLB → L'.IsLB → u.IsAH Hm χ → u'.IsAH Hm' χ' → (∀ z, u'.ex (F z) = u.ex z ≫ f) → LBIso (lbPow L n) (lbPow (L'.pull f.left) n) → (∀ z w, hermForm Hm z w = hermForm Hm' (F z) (F w)) ∧ ∀ l : u.Λ, χ l ^ n = χ' ⟨F l, hF l l.2⟩ ^ n := by
+theorem appellHumbert_data_eq_of_lbIso_pow_pull
+    : ∀ (A A' : Over (Sp ℂ)) [GrpObj A] [GrpObj A'] (L : LB A.left) (L' : LB A'.left) (g g' : ℕ)
+        (u : HolUnif A L g) (u' : HolUnif A' L' g') (Hm : Matrix (Fin g) (Fin g) ℂ)
+        (Hm' : Matrix (Fin g') (Fin g') ℂ) (χ : u.Λ → ℂ) (χ' : u'.Λ → ℂ) (f : A ⟶ A')
+        (F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)) (hF : ∀ l ∈ u.Λ, F l ∈ u'.Λ) (n : ℕ),
+      0 < n → L.IsLB → L'.IsLB → u.IsAH Hm χ → u'.IsAH Hm' χ' → (∀ z, u'.ex (F z) = u.ex z ≫ f)
+        → LBIso (lbPow L n) (lbPow (L'.pull f.left) n)
+        → (∀ z w, hermForm Hm z w = hermForm Hm' (F z) (F w))
+          ∧ ∀ l : u.Λ, χ l ^ n = χ' ⟨F l, hF l l.2⟩ ^ n := by
   intro A A' _ _ L L' g g' u u' Hm Hm' χ χ' f F hF n hn hL hL' hu hu' hex hiso
   have hiso' := hiso.symm
-  refine ⟨fun z w => ?_,
-    semicharacter_pull_eq_of_lbIso_pow A A' L L' hL hL' g g' u u' Hm χ Hm' χ' hu hu' f F hF hex n n hiso'⟩
-  have h := hermForm_pull_eq_of_lbIso_pow A A' L L' hL hL' g g' u u' Hm χ Hm' χ' hu hu' f F hex n n hiso' z w
+  refine ⟨
+    fun z w => ?_,
+    semicharacter_pull_eq_of_lbIso_pow A A' L L' hL hL' g g' u u' Hm χ Hm' χ' hu hu' f F hF hex n n
+      hiso'
+  ⟩
+  have h :=
+    hermForm_pull_eq_of_lbIso_pow A A' L L' hL hL' g g' u u' Hm χ Hm' χ' hu hu' f F hex n n hiso' z
+      w
   have hn' : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
   exact (mul_left_cancel₀ hn' h).symm
 

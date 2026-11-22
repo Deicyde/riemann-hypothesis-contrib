@@ -16,7 +16,11 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ToUn
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.ExportSeries GlobalTheory.SeriesTie
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain
+  NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.ExportSeries
+  GlobalTheory.SeriesTie
 open Formalism.IndefR.Links
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab toAb IsGlobalArtin)
@@ -26,5 +30,10 @@ set_option maxHeartbeats 800000
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.tame_residue_char_trivial_split_place_off_unramified : ∀ (D : D7) (M : Type) [CommGroup M] (χ : (AE D)ˣ →* M) (Q P : Finset (Pl D.host.E)), UnramOutside χ Q → SplitSet P → Q ⊆ P → ∀ PP ∈ P, PP ∉ Q → IsResAt χ PP 1 := by
-  first | exact @GlobalTheory.ConjTwist.isResAt_one_of_unram | exact GlobalTheory.ConjTwist.isResAt_one_of_unram | (intros; apply GlobalTheory.ConjTwist.isResAt_one_of_unram <;> assumption)
+theorem _root_.GlobalTheory.T.tame_residue_char_trivial_split_place_off_unramified
+    : ∀ (D : D7) (M : Type) [CommGroup M] (χ : (AE D)ˣ →* M) (Q P : Finset (Pl D.host.E)),
+      UnramOutside χ Q → SplitSet P → Q ⊆ P → ∀ PP ∈ P, PP ∉ Q → IsResAt χ PP 1 := by
+  first
+  | exact @GlobalTheory.ConjTwist.isResAt_one_of_unram
+  | exact GlobalTheory.ConjTwist.isResAt_one_of_unram
+  | (intros; apply GlobalTheory.ConjTwist.isResAt_one_of_unram <;> assumption)

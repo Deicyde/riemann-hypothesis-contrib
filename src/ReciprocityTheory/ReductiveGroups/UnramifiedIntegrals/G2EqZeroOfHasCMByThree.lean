@@ -32,8 +32,7 @@ def mulOmegaEquiv (L : PeriodPair) (hCM : HasCMBy 3 L) : L.lattice ≃ L.lattice
 
 theorem g2_eq_zero_of_hasCMBy_three (L : PeriodPair) (hCM : HasCMBy 3 L) : L.g₂ = 0 := by
   have hsq := omegaK_three_sq
-  have h4 : omegaK 3 ^ 4 = -omegaK 3 := by
-    linear_combination (omegaK 3 ^ 2 + omegaK 3) * hsq
+  have h4 : omegaK 3 ^ 4 = - omegaK 3 := by linear_combination (omegaK 3 ^ 2 + omegaK 3) * hsq
   have h0 : omegaK 3 ≠ 0 := by
     intro h
     rw [h] at hsq

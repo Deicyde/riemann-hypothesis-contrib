@@ -9,17 +9,33 @@ open scoped ComplexOrder ENNReal Pointwise
 
 namespace GlobalTheory
 
-theorem subspace_sup_alternative :
-    (∀ (K V Y σ : Type) [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Fintype σ] (r : ℕ) (t : σ → Y → Y) (D : Y → Submodule K V → ℝ) (α : ℕ → Y → ℝ) (c Ω : ℝ), Module.finrank K V = r → 1 ≤ Ω → (∀ y W, 0 < D y W) → (∀ i ≤ r, ∀ y, IsLUB (D y '' {W | Module.finrank K W = i}) (α i y)) → (∀ y W₁ W₂, D y W₁ * D y W₂ ≤ D y (W₁ ⊓ W₂) * D y (W₁ ⊔ W₂)) → (∀ s y W, D (t s y) W ≤ Ω * D y W ∧ D y W ≤ Ω * D (t s y) W) → (∀ y W, W ≠ ⊥ → W ≠ ⊤ → ∑ s, D (t s y) W ≤ Fintype.card σ * (c * D y W)) → ∃ C : ℝ, 0 ≤ C ∧ (∀ (y : Y) (i : ℕ), 0 < i → i < r → (∑ s, α i (t s y) ≤ Fintype.card σ * (c * α i y)) ∨ ∃ j : ℕ, 0 < j ∧ j ≤ i ∧ i + j ≤ r ∧ ∀ s, α i (t s y) ≤ C * Real.sqrt (α (i - j) y * α (i + j) y))) := by
+theorem subspace_sup_alternative
+    : (∀ (K V Y σ : Type) [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+        [Fintype σ] (r : ℕ) (t : σ → Y → Y) (D : Y → Submodule K V → ℝ) (α : ℕ → Y → ℝ) (c Ω : ℝ),
+      Module.finrank K V = r → 1 ≤ Ω → (∀ y W, 0 < D y W)
+        → (∀ i ≤ r, ∀ y, IsLUB (D y '' {W | Module.finrank K W = i}) (α i y))
+        → (∀ y W₁ W₂, D y W₁ * D y W₂ ≤ D y (W₁ ⊓ W₂) * D y (W₁ ⊔ W₂))
+        → (∀ s y W, D (t s y) W ≤ Ω * D y W ∧ D y W ≤ Ω * D (t s y) W)
+        → (∀ y W, W ≠ ⊥ → W ≠ ⊤ → ∑ s, D (t s y) W ≤ Fintype.card σ * (c * D y W))
+        → ∃ C : ℝ,
+          0 ≤ C
+            ∧ (∀ (y : Y) (i : ℕ),
+              0 < i → i < r
+                → (∑ s, α i (t s y) ≤ Fintype.card σ * (c * α i y))
+                  ∨ ∃ j : ℕ,
+                    0 < j ∧ j ≤ i ∧ i + j ≤ r
+                      ∧ ∀ s, α i (t s y) ≤ C * Real.sqrt (α (i - j) y * α (i + j) y))) := by
   intro K V Y σ _ _ _ _ _ r t D α c Ω hr hΩ hpos hlub hsub hmove hcon
   have hΩ0 : 0 < Ω := by linarith
   refine ⟨2 * Ω ^ 3, by positivity, fun y i hi0 hir => ?_⟩
   have hle : ∀ k ≤ r, ∀ z (W : Submodule K V), Module.finrank K W = k → D z W ≤ α k z :=
     fun k hk z W hW => (hlub k hk z).1 ⟨W, hW, rfl⟩
-  have hub : ∀ k ≤ r, ∀ z (b : ℝ), (∀ W : Submodule K V, Module.finrank K W = k → D z W ≤ b) →
-      α k z ≤ b := fun k hk z b hb => (hlub k hk z).2 (by
-        rintro _ ⟨W, hW, rfl⟩
-        exact hb W hW)
+  have hub
+      : ∀ k ≤ r, ∀ z (b : ℝ),
+        (∀ W : Submodule K V, Module.finrank K W = k → D z W ≤ b) → α k z ≤ b := fun k hk z b hb =>
+    (hlub k hk z).2 (by
+      rintro _ ⟨W, hW, rfl⟩
+      exact hb W hW)
   have hex : ∀ b < α i y, ∃ W : Submodule K V, Module.finrank K W = i ∧ b < D y W := by
     intro b hb
     by_contra h
@@ -80,14 +96,19 @@ theorem subspace_sup_alternative :
     have e1 : D y (W₁ ⊓ W₀) ≤ α (i - j) y := hle _ (by omega) y _ (by omega)
     have e2 : D y (W₁ ⊔ W₀) ≤ α (i + j) y := hle _ (by omega) y _ (by omega)
     have e3 : B ^ 2 ≤ α (i - j) y * α (i + j) y := by
-      calc B ^ 2 = B * B := sq B
+      calc
+        B ^ 2
+          = B * B := sq B
         _ ≤ D y W₁ * D y W₀ := mul_le_mul hBW₁.le hBW₀.le hB0.le (hpos _ _).le
         _ ≤ _ := hsub y W₁ W₀
         _ ≤ _ := mul_le_mul e1 e2 (hpos _ _).le ((hpos _ _).le.trans e1)
     have e4 : B ≤ Real.sqrt (α (i - j) y * α (i + j) y) := Real.le_sqrt_of_sq_le e3
-    have e5 : α i (t s y) ≤ Ω * A := hub i hir.le _ _ fun W hW =>
-      (hmove s y W).1.trans (mul_le_mul_of_nonneg_left (hle i hir.le y W hW) hΩ0.le)
-    calc α i (t s y) ≤ Ω * A := e5
+    have e5 : α i (t s y) ≤ Ω * A :=
+      hub i hir.le _ _ fun W hW =>
+        (hmove s y W).1.trans (mul_le_mul_of_nonneg_left (hle i hir.le y W hW) hΩ0.le)
+    calc
+      α i (t s y)
+        ≤ Ω * A := e5
       _ = 2 * Ω ^ 3 * B := by rw [hAB]; ring
       _ ≤ _ := mul_le_mul_of_nonneg_left e4 (by positivity)
 

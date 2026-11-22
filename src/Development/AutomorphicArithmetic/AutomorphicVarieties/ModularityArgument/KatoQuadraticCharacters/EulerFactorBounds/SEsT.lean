@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GaloisCom
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.KZ.ES
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.KZ.ES
 open scoped Matrix MatrixGroups Pointwise
 
 theorem UpperTheory.V.Z.Kato.Nb.sEsT : UpperTheory.V.Z.Kato.Nb.SEsT := by
@@ -58,10 +59,9 @@ theorem UpperTheory.V.Z.Kato.Nb.sEsT : UpperTheory.V.Z.Kato.Nb.SEsT := by
   have hAct : X.act l ↑γ b = X.act l ↑(sgD N l q) b := by
     conv_lhs => rw [← hb' _ hδ]
     rw [Tower.act_act Ω ε X l _ _ (by rw [Matrix.SpecialLinearGroup.det_coe]; norm_num)
-      (by rw [Matrix.SpecialLinearGroup.det_coe]; norm_num), ← Matrix.SpecialLinearGroup.coe_mul,
-      inv_mul_cancel_right]
-  have hdq : (0 : ℤ) < Matrix.det !![(q : ℤ), 0; 0, 1] := by
-    simpa [Matrix.det_fin_two] using hq.pos
+        (by rw [Matrix.SpecialLinearGroup.det_coe]; norm_num),
+      ← Matrix.SpecialLinearGroup.coe_mul, inv_mul_cancel_right]
+  have hdq : (0 : ℤ) < Matrix.det !![(q : ℤ), 0; 0, 1] := by simpa [Matrix.det_fin_two] using hq.pos
   refine ⟨?_, fun s => ?_⟩
   · unfold Tower.heckeT
     simp only [LinearMap.add_apply, LinearMap.sum_apply]
@@ -73,12 +73,18 @@ theorem UpperTheory.V.Z.Kato.Nb.sEsT : UpperTheory.V.Z.Kato.Nb.SEsT := by
         have h' : a ≡ a' [MOD q] := Nat.ModEq.cancel_right_of_coprime hqM h
         unfold Nat.ModEq at h'
         rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt ha'] at h'
-      refine Finset.sum_nbij (fun j => j * M % q) (fun a _ => Finset.mem_range.mpr (Nat.mod_lt _ hq.pos))
-        (fun a ha a' ha' h => hinj a (Finset.mem_coe.mp ha) a' (Finset.mem_coe.mp ha') h) ?_ ?_
+      refine Finset.sum_nbij
+        (fun j => j * M % q)
+        (fun a _ => Finset.mem_range.mpr (Nat.mod_lt _ hq.pos))
+        (fun a ha a' ha' h => hinj a (Finset.mem_coe.mp ha) a' (Finset.mem_coe.mp ha') h)
+        ?_ ?_
       · intro k hk
-        obtain ⟨a, ha, h⟩ := Finset.surj_on_of_inj_on_of_card_le (fun a _ => a * M % q)
-          (fun a _ => Finset.mem_range.mpr (Nat.mod_lt _ hq.pos)) (fun a a' ha ha' h => hinj a ha a' ha' h)
-          le_rfl k (Finset.mem_coe.mp hk)
+        obtain ⟨a, ha, h⟩ :=
+          Finset.surj_on_of_inj_on_of_card_le
+            (fun a _ => a * M % q)
+            (fun a _ => Finset.mem_range.mpr (Nat.mod_lt _ hq.pos))
+            (fun a a' ha ha' h => hinj a ha a' ha' h)
+            le_rfl k (Finset.mem_coe.mp hk)
         exact ⟨a, Finset.mem_coe.mpr ha, h.symm⟩
       · intro a _
         have hdm := Nat.mod_add_div (a * M) q
@@ -90,11 +96,16 @@ theorem UpperTheory.V.Z.Kato.Nb.sEsT : UpperTheory.V.Z.Kato.Nb.SEsT := by
           rw [Subgroup.mem_inf, CongruenceSubgroup.Gamma1_mem, CongruenceSubgroup.Gamma0_mem]
           simp [T]
         have hz : (a : ℤ) * M = r + q * t := by exact_mod_cast hdm.symm
-        have hm : !![1, (a : ℤ) * M; 0, (q : ℤ)] = (T : Matrix (Fin 2) (Fin 2) ℤ) * !![1, (r : ℤ); 0, (q : ℤ)] := by
+        have hm
+            : !![1, (a : ℤ) * M; 0, (q : ℤ)]
+              = (T : Matrix (Fin 2) (Fin 2) ℤ) * !![1, (r : ℤ); 0, (q : ℤ)] := by
           ext i j
-          fin_cases i <;> fin_cases j <;> simp [T, Matrix.mul_apply, Fin.sum_univ_two] <;> linear_combination hz
-        rw [hm, ← Tower.act_act Ω ε X l _ _ (by rw [Matrix.SpecialLinearGroup.det_coe]; norm_num)
-          (by simpa [Matrix.det_fin_two] using hq.pos), hb' T hT]
+          fin_cases i <;> fin_cases j <;> simp [T, Matrix.mul_apply, Fin.sum_univ_two]
+            <;> linear_combination hz
+        rw [hm,
+          ← Tower.act_act Ω ε X l _ _ (by rw [Matrix.SpecialLinearGroup.det_coe]; norm_num)
+            (by simpa [Matrix.det_fin_two] using hq.pos),
+          hb' T hT]
     · rw [← Tower.act_act Ω ε X l _ _ (by rw [Matrix.SpecialLinearGroup.det_coe]; norm_num) hdq,
         ← Tower.act_act Ω ε X l _ _ (by rw [Matrix.SpecialLinearGroup.det_coe]; norm_num) hdq, hAct]
   · unfold Tower.diam

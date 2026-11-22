@@ -14,13 +14,16 @@ private lemma fe_LFunction_const_mul {N : ℕ} [NeZero N] (c : ℂ) (Φ : ZMod N
   refine Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem UpperTheory.V.Bern.b_fe :
-    ∀ {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (k : ℕ), χ.IsPrimitive → 1 ≤ k → χ (-1) = (-1) ^ k → ‖χ.LFunction (1 - k)‖ = 2 * ((k - 1).factorial : ℝ) * (N : ℝ) ^ ((k : ℝ) - 1 / 2) / (2 * Real.pi) ^ k * ‖χ⁻¹.LFunction k‖ := by
+theorem UpperTheory.V.Bern.b_fe
+    : ∀ {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (k : ℕ),
+      χ.IsPrimitive → 1 ≤ k → χ (-1) = (-1) ^ k
+        → ‖χ.LFunction (1 - k)‖
+          = 2 * ((k - 1).factorial : ℝ) * (N : ℝ) ^ ((k : ℝ) - 1 / 2) / (2 * Real.pi) ^ k
+            * ‖χ⁻¹.LFunction k‖ := by
   intro N _ χ k hχ hk hpar
   obtain ⟨m, rfl⟩ : ∃ m, k = m + 1 := ⟨k - 1, by omega⟩
   set g := gaussSum χ ZMod.stdAddChar with hg
-  have hinv1 : χ⁻¹ (-1) = χ (-1) := by
-    rw [MulChar.inv_apply_eq_inv', hpar, ← inv_pow, inv_neg_one]
+  have hinv1 : χ⁻¹ (-1) = χ (-1) := by rw [MulChar.inv_apply_eq_inv', hpar, ← inv_pow, inv_neg_one]
   have hF : ZMod.dft (χ : ZMod N → ℂ) = fun j => (χ (-1) * g) * χ⁻¹ j := by
     funext j
     rw [hχ.fourierTransform_eq_inv_mul_gaussSum, show -j = -1 * j by ring, map_mul, hinv1]
@@ -47,21 +50,27 @@ theorem UpperTheory.V.Bern.b_fe :
       exact_mod_cast (by omega : m + 1 ≠ 1)
   have hfe := ZMod.LFunction_one_sub (χ : ZMod N → ℂ) hs hs'
   rw [hF, hF', fe_LFunction_const_mul, fe_LFunction_const_mul] at hfe
-  have he1 : Complex.exp ((Real.pi : ℂ) * Complex.I * ((m + 1 : ℕ) : ℂ) / 2) = Complex.I ^ (m + 1) := by
+  have he1
+      : Complex.exp ((Real.pi : ℂ) * Complex.I * ((m + 1 : ℕ) : ℂ) / 2) = Complex.I ^ (m + 1) := by
     rw [show (Real.pi : ℂ) * Complex.I * ((m + 1 : ℕ) : ℂ) / 2
-        = ((m + 1 : ℕ) : ℂ) * ((Real.pi : ℂ) / 2 * Complex.I) by ring,
+          = ((m + 1 : ℕ) : ℂ) * ((Real.pi : ℂ) / 2 * Complex.I) by
+        ring,
       Complex.exp_nat_mul, Complex.exp_pi_div_two_mul_I]
-  have he2 : Complex.exp (-(Real.pi : ℂ) * Complex.I * ((m + 1 : ℕ) : ℂ) / 2) = (-Complex.I) ^ (m + 1) := by
+  have he2
+      : Complex.exp (-(Real.pi : ℂ) * Complex.I * ((m + 1 : ℕ) : ℂ) / 2)
+        = (-Complex.I) ^ (m + 1) := by
     rw [show -(Real.pi : ℂ) * Complex.I * ((m + 1 : ℕ) : ℂ) / 2
-        = ((m + 1 : ℕ) : ℂ) * (-(Real.pi : ℂ) / 2 * Complex.I) by ring,
+          = ((m + 1 : ℕ) : ℂ) * (-(Real.pi : ℂ) / 2 * Complex.I) by
+        ring,
       Complex.exp_nat_mul, Complex.exp_neg_pi_div_two_mul_I]
   have hGam : Complex.Gamma ((m + 1 : ℕ) : ℂ) = (m.factorial : ℂ) := by
     rw [Nat.cast_succ, Complex.Gamma_nat_eq_factorial]
   have h2pi : (2 * (Real.pi : ℂ)) = ((2 * Real.pi : ℝ) : ℂ) := by push_cast; ring
-  have key : ZMod.LFunction (χ : ZMod N → ℂ) (1 - ((m + 1 : ℕ) : ℂ)) =
-      (N : ℂ) ^ (((m + 1 : ℕ) : ℂ) - 1) * ((2 * Real.pi : ℝ) : ℂ) ^ (-((m + 1 : ℕ) : ℂ)) *
-        (m.factorial : ℂ) * g * ZMod.LFunction ⇑(χ⁻¹) ((m + 1 : ℕ) : ℂ) *
-        (2 * (-Complex.I) ^ (m + 1)) := by
+  have key
+      : ZMod.LFunction (χ : ZMod N → ℂ) (1 - ((m + 1 : ℕ) : ℂ))
+        = (N : ℂ) ^ (((m + 1 : ℕ) : ℂ) - 1) * ((2 * Real.pi : ℝ) : ℂ) ^ (-((m + 1 : ℕ) : ℂ))
+          * (m.factorial : ℂ) * g * ZMod.LFunction ⇑(χ⁻¹) ((m + 1 : ℕ) : ℂ)
+          * (2 * (-Complex.I) ^ (m + 1)) := by
     rw [hfe, he1, he2, hGam, hpar, ← h2pi, neg_pow Complex.I]
     ring
   show ‖ZMod.LFunction (χ : ZMod N → ℂ) (1 - ((m + 1 : ℕ) : ℂ))‖ = _
@@ -73,7 +82,10 @@ theorem UpperTheory.V.Bern.b_fe :
   simp only [norm_mul, norm_pow, norm_neg, Complex.norm_I, one_pow, mul_one, Complex.norm_natCast]
   have hre1 : (((m + 1 : ℕ) : ℂ) - 1).re = ((m : ℕ) : ℝ) := by simp
   have hre2 : (-((m + 1 : ℕ) : ℂ)).re = -((m + 1 : ℕ) : ℝ) := by simp
-  have hL : DirichletCharacter.LFunction χ⁻¹ ((m + 1 : ℕ) : ℂ) = ZMod.LFunction ⇑(χ⁻¹) ((m + 1 : ℕ) : ℂ) := rfl
+  have hL
+      : DirichletCharacter.LFunction χ⁻¹ ((m + 1 : ℕ) : ℂ)
+        = ZMod.LFunction ⇑(χ⁻¹) ((m + 1 : ℕ) : ℂ) :=
+    rfl
   have hNr : (N : ℝ) ^ (((m + 1 : ℕ) : ℝ) - 1 / 2) = (N : ℝ) ^ m * √(N : ℝ) := by
     rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast, ← Real.rpow_add hNpos]
     congr 1

@@ -11,8 +11,9 @@ set_option maxSynthPendingDepth 1
 namespace GroundTheory.Arith.SchemeCoh
 
 open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits MonoidalCategory
-open GroundTheory.Arith.Etale (pullbackUnitApp pullbackUnitApp_res pullbackUnitApp_comp
-  pullbackUnitApp_comp_hom pullbackUnitApp_bijective)
+open GroundTheory.Arith.Etale
+  (pullbackUnitApp pullbackUnitApp_res pullbackUnitApp_comp pullbackUnitApp_comp_hom
+    pullbackUnitApp_bijective)
 
 universe u
 
@@ -25,18 +26,19 @@ lemma pullbackUnitApp_smul (f : Y ⟶ Z) (N : Z.Modules) (O : Z.Opens) (r : Γ(Z
   Scheme.Modules.Hom.app_smul _ r n
 
 instance final_opensMap (f : Y ⟶ Z) : (Opens.map f.base).Final :=
-  Functor.final_of_exists_of_isFiltered _ (fun _ => ⟨⊤, ⟨homOfLE le_top⟩⟩)
+  Functor.final_of_exists_of_isFiltered _
+    (fun _ => ⟨⊤, ⟨homOfLE le_top⟩⟩)
     (fun _ _ => ⟨_, 𝟙 _, rfl⟩)
 
-
 set_option backward.isDefEq.respectTransparency.types false in
-def pullbackUnitIso (f : Y ⟶ Z) :
-    (Scheme.Modules.pullback f).obj (SheafOfModules.unit Z.ringCatSheaf) ≅
-      SheafOfModules.unit Y.ringCatSheaf :=
+def pullbackUnitIso (f : Y ⟶ Z)
+    : (Scheme.Modules.pullback f).obj (SheafOfModules.unit Z.ringCatSheaf)
+      ≅ SheafOfModules.unit Y.ringCatSheaf :=
   letI : (SheafOfModules.pushforward.{u} f.toRingCatSheafHom).IsRightAdjoint :=
     (inferInstance : (Scheme.Modules.pushforward f).IsRightAdjoint)
-  let e := asIso (C := SheafOfModules Y.ringCatSheaf)
-    (SheafOfModules.pullbackObjUnitToUnit f.toRingCatSheafHom)
+  let e :=
+    asIso (C := SheafOfModules Y.ringCatSheaf)
+      (SheafOfModules.pullbackObjUnitToUnit f.toRingCatSheafHom)
   ⟨e.hom, e.inv, e.hom_inv_id, e.inv_hom_id⟩
 
 def unitOne (Z : Scheme.{u}) (O : Z.Opens) : Γ(SheafOfModules.unit Z.ringCatSheaf, O) :=
@@ -51,7 +53,6 @@ lemma pullbackUnitApp_naturality (f : Y ⟶ Z) {N N' : Z.Modules} (φ : N ⟶ N'
   simp only [Functor.id_map, Functor.comp_map, Scheme.Modules.Hom.comp_app,
     AddCommGrpCat.hom_comp, AddMonoidHom.coe_comp, Function.comp_apply] at h
   exact h.symm
-
 
 set_option backward.isDefEq.respectTransparency.types false in
 lemma pullbackUnitIso_hom_one (f : Y ⟶ Z) :
@@ -192,11 +193,10 @@ lemma isBasisOn_of_pullbackUnitApp_comp {T : Scheme.{u}} (c : T ⟶ Y) (d : Y �
   rw [e] at h2
   exact h2
 
-theorem isBasisOn_pullbackUnitApp (f : Y ⟶ Z) {N : Z.Modules} {W : Z.Opens} {t : Γ(N, W)}
-    (ht : IsBasisOn ((preMod Z).obj N) W t) :
-    IsBasisOn ((preMod Y).obj ((Scheme.Modules.pullback f).obj N)) (f ⁻¹ᵁ W)
+theorem isBasisOn_pullbackUnitApp
+    (f : Y ⟶ Z) {N : Z.Modules} {W : Z.Opens} {t : Γ(N, W)} (ht : IsBasisOn ((preMod Z).obj N) W t)
+    : IsBasisOn ((preMod Y).obj ((Scheme.Modules.pullback f).obj N)) (f ⁻¹ᵁ W)
       (pullbackUnitApp f N W t) := by
-
   have h1 : IsBasisOn ((preMod W.toScheme).obj ((Scheme.Modules.pullback W.ι).obj N)) (W.ι ⁻¹ᵁ W)
       (pullbackUnitApp W.ι N W t) :=
     (isBasisOn_pullbackUnitApp_iff W.ι N (by rw [Scheme.Opens.opensRange_ι]) t).2 ht

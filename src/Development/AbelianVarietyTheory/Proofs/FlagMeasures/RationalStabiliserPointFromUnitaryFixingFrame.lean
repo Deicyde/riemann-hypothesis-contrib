@@ -9,13 +9,26 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HermitianFrameEx
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict GlobalTheory.St
+open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions
+  Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting
+  Formalism.L2.SG.ColDict GlobalTheory.St
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.GamRat
 
-theorem gam_rat : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (γ : Gam X u), ∃ γ₀ : GL (Fin X.B.I.n) X.B.I.E, γ₀ ∈ Formalism.UG.UJ (starRingEnd X.B.I.E) X.B.I.J ∧ (∀ v, uMat ((γ : X.B.I.GA).1 v) = (X.B.I.P v)⁻¹ * (γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E).map (X.B.I.φ v) * X.B.I.P v) ∧ X.B.I.fmat (γ : X.B.I.GA).2 = (γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E).map (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F)) ∧ ∀ x ∈ fixSet X u, (γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ x = x := by
+theorem gam_rat
+    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (γ : Gam X u),
+      ∃ γ₀ : GL (Fin X.B.I.n) X.B.I.E,
+        γ₀ ∈ Formalism.UG.UJ (starRingEnd X.B.I.E) X.B.I.J
+          ∧ (∀ v,
+            uMat ((γ : X.B.I.GA).1 v)
+              = (X.B.I.P v)⁻¹ * (γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E).map (X.B.I.φ v)
+                * X.B.I.P v)
+          ∧ X.B.I.fmat (γ : X.B.I.GA).2
+            = (γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E).map
+              (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F))
+          ∧ ∀ x ∈ fixSet X u, (γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ x = x := by
   intro D X u γ
   obtain ⟨hGF, hH⟩ := Subgroup.mem_inf.1 γ.2
   obtain ⟨γ₀, hU, h1, h2⟩ := (Formalism.MainNotions.LeviCoordinates.rr_mem_GF _ _).1 hGF
@@ -32,9 +45,14 @@ theorem gam_rat : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (γ : Ga
     exact zero_ne_one h0
   funext i
   apply Formalism.UG.P.inclE_injective X.B.I.F X.B.I.E (Af X.B.I.F)
-  calc Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F) (((γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ x) i)
-      = ((γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E).map (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F)) *ᵥ
-          (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F) ∘ x)) i := RingHom.map_mulVec _ _ _ _
+  calc
+    Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F)
+          (((γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) *ᵥ x) i)
+        = ((γ₀ : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E).map
+              (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F))
+            *ᵥ (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F) ∘ x))
+          i :=
+      RingHom.map_mulVec _ _ _ _
     _ = _ := congrFun hf i
 
 end GlobalTheory.GamRat

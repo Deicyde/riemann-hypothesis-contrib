@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
 private lemma exists_close {E : Type} [Field E] [NumberField E] (c : InfinitePlace E → E) :
@@ -18,13 +19,13 @@ private lemma exists_close {E : Type} [Field E] [NumberField E] (c : InfinitePla
   rw [dist_comm, dist_eq_norm] at h1
   exact h1
 
-theorem UpperTheory.Gal.W2.Seed.pCEx :
-    CEx := by
+theorem UpperTheory.Gal.W2.Seed.pCEx : CEx := by
   intro E _ _ _ τ₀ M hM
   classical
   obtain ⟨x, hx⟩ := exists_close (E := E) (fun v => if v = InfinitePlace.mk τ₀ then -1 else 1)
-  have hbound : ∀ τ : E →+* ℂ,
-      |(τ x).re - (if InfinitePlace.mk τ = InfinitePlace.mk τ₀ then -1 else 1)| < 1 / 2 := by
+  have hbound
+      : ∀ τ : E →+* ℂ,
+        |(τ x).re - (if InfinitePlace.mk τ = InfinitePlace.mk τ₀ then -1 else 1)| < 1 / 2 := by
     intro τ
     have h : ‖τ (x - (if InfinitePlace.mk τ = InfinitePlace.mk τ₀ then -1 else 1))‖ < 1 / 2 :=
       hx (InfinitePlace.mk τ)
@@ -71,7 +72,8 @@ theorem UpperTheory.Gal.W2.Seed.pCEx :
     rw [div_lt_iff₀ hd] at hK
     nlinarith
   let wO : 𝓞 E := ⟨w, (mem_integralClosure_iff ℤ E).mpr hw⟩
-  have hcoe : (((1 : 𝓞 E) + (M : 𝓞 E) * ((K : 𝓞 E) * wO) : 𝓞 E) : E) = 1 + (M : E) * ((K : E) * w) := by
+  have hcoe
+      : (((1 : 𝓞 E) + (M : 𝓞 E) * ((K : 𝓞 E) * wO) : 𝓞 E) : E) = 1 + (M : E) * ((K : E) * w) := by
     push_cast
     rfl
   have hre : ∀ τ : E →+* ℂ, (τ (1 + (M : E) * ((K : E) * w))).re = 1 + (M : ℝ) * K * (τ w).re := by

@@ -14,7 +14,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.PresSobA
 
-theorem l2_limit_eq_pointwise_limit : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V] (a : ℕ → Mat n → V) (b : Mat n → V) (x : Lp V 2 μ), (∀ k, MemLp (fun y : G n => a k y.val) 2 μ) → Tendsto (fun k => cls μ (a k)) atTop (𝓝 x) → (∀ z ∈ GLs n, Tendsto (fun k => a k z) atTop (𝓝 (b z))) → MemLp (fun y : G n => b y.val) 2 μ ∧ cls μ b = x := by
+theorem l2_limit_eq_pointwise_limit
+    : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
+        (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V]
+        (a : ℕ → Mat n → V) (b : Mat n → V) (x : Lp V 2 μ),
+      (∀ k, MemLp (fun y : G n => a k y.val) 2 μ) → Tendsto (fun k => cls μ (a k)) atTop (𝓝 x)
+        → (∀ z ∈ GLs n, Tendsto (fun k => a k z) atTop (𝓝 (b z)))
+        → MemLp (fun y : G n => b y.val) 2 μ ∧ cls μ b = x := by
   intro n _ _ μ _ V _ _ _ a b x hm hc hp
   have hin : TendstoInMeasure μ (fun k => (cls μ (a k) : G n → V)) atTop (x : G n → V) :=
     tendstoInMeasure_of_tendsto_Lp hc
@@ -28,8 +34,7 @@ theorem l2_limit_eq_pointwise_limit : ∀ (n : ℕ) [MeasurableSpace (G n)] [Bor
       exact hu.ne_zero
     have h3 : Tendsto (fun k => a (ns k) y.val) atTop (𝓝 (b y.val)) :=
       (hp y.val hy).comp hns.tendsto_atTop
-    have h4 : Tendsto (fun k => a (ns k) y.val) atTop (𝓝 (x y)) := by
-      simpa only [h2] using h1
+    have h4 : Tendsto (fun k => a (ns k) y.val) atTop (𝓝 (x y)) := by simpa only [h2] using h1
     exact tendsto_nhds_unique h3 h4
   exact cls_of_ae μ hbx
 

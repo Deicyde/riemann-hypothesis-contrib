@@ -11,8 +11,9 @@ open NumberField IsDedekindDomain Formalism.L2.Host
 
 namespace GlobalTheory.Corev.UnrPow
 
-theorem exists_pow_unrAt : ∀ (L : Type) [Field L] [NumberField L] (χ : Formalism.L2.Host.HChar L),
-    ∃ N : ℕ, 0 < N ∧ ∀ v : HeightOneSpectrum (𝓞 L), (χ ^ N).UnrAt v := by
+theorem exists_pow_unrAt
+    : ∀ (L : Type) [Field L] [NumberField L] (χ : Formalism.L2.Host.HChar L), ∃ N : ℕ,
+      0 < N ∧ ∀ v : HeightOneSpectrum (𝓞 L), (χ ^ N).UnrAt v := by
   intro L _ _ χ
   obtain ⟨hfin, hlev⟩ := GlobalTheory.Mem.UnrAe.unr_ae_and_level L χ
   have hm : ∀ v, ∃ m : ℕ, 0 < m ∧ ∀ x, IsUnitAt v x → χ.loc v x ^ m = 1 := by
@@ -27,7 +28,8 @@ theorem exists_pow_unrAt : ∀ (L : Type) [Field L] [NumberField L] (χ : Formal
   show χ.loc v x ^ (∏ v ∈ hfin.toFinset, m v) = 1
   by_cases hv : χ.UnrAt v
   · rw [hv x hx, one_pow]
-  · obtain ⟨d, hd⟩ : m v ∣ ∏ v ∈ hfin.toFinset, m v := Finset.dvd_prod_of_mem _ (hfin.mem_toFinset.2 hv)
+  · obtain ⟨d, hd⟩ : m v ∣ ∏ v ∈ hfin.toFinset, m v :=
+      Finset.dvd_prod_of_mem _ (hfin.mem_toFinset.2 hv)
     rw [hd, pow_mul, hm v x hx, one_pow]
 
 end GlobalTheory.Corev.UnrPow

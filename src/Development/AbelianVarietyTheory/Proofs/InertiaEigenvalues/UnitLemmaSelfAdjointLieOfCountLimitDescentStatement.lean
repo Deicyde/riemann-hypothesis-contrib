@@ -9,5 +9,9 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Line
 
 open GlobalTheory.UnitLemma Polynomial
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.unitLemmaSelfAdjointLie_of_count_limit_descent : CountIdentity → UnitaryLimit → LinearDescent → UnitLemmaLie := by
-  first | exact @GlobalTheory.UnitLemma.LieEnd.unitLemmaLie_of | exact GlobalTheory.UnitLemma.LieEnd.unitLemmaLie_of | (intros; apply GlobalTheory.UnitLemma.LieEnd.unitLemmaLie_of <;> assumption)
+theorem _root_.GlobalTheory.T.unitLemmaSelfAdjointLie_of_count_limit_descent
+    : CountIdentity → UnitaryLimit → LinearDescent → UnitLemmaLie := by
+  first
+  | exact @GlobalTheory.UnitLemma.LieEnd.unitLemmaLie_of
+  | exact GlobalTheory.UnitLemma.LieEnd.unitLemmaLie_of
+  | (intros; apply GlobalTheory.UnitLemma.LieEnd.unitLemmaLie_of <;> assumption)

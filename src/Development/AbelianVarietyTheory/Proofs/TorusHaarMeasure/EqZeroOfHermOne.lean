@@ -6,15 +6,14 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ComplexConjugate Matrix
 
 namespace GlobalTheory.TwoLines
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
-
-
-
 
 theorem two_mul_card_cmType {r : ℕ} (X : Data E r) : 2 * X.Ψ.card = Module.finrank ℚ E := by
   classical
@@ -35,7 +34,8 @@ theorem two_mul_card_cmType {r : ℕ} (X : Data E r) : 2 * X.Ψ.card = Module.fi
       exact hτ
   have hcard := congrArg Finset.card hunion
   rw [Finset.card_union_of_disjoint hdisj, Finset.card_image_of_injective _ hinv.injective,
-    Finset.card_univ, NumberField.Embeddings.card] at hcard
+      Finset.card_univ, NumberField.Embeddings.card]
+    at hcard
   omega
 
 end GlobalTheory.TwoLines

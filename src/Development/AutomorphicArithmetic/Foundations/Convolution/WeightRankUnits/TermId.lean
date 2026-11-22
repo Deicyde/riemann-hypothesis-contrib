@@ -7,13 +7,17 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.WeightRa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem finprod_termIdentity {ι : Type} (S : Set ι) (s d k : ι → ℂ) (c : ℂ) (hs : (Function.mulSupport s).Finite)
-    (hd : (Function.mulSupport d).Finite) (h : ∀ w ∈ S, s w = d w * k w) (hc : (∏ᶠ w ∈ S, d w) * c = 1) :
-    (S ∩ Function.mulSupport s).Finite ∧ ∏ᶠ w ∈ S, k w = c * ∏ᶠ w ∈ S, s w := by
+private theorem finprod_termIdentity
+    {ι : Type} (S : Set ι) (s d k : ι → ℂ)
+    (c : ℂ)
+    (hs : (Function.mulSupport s).Finite) (hd : (Function.mulSupport d).Finite)
+    (h : ∀ w ∈ S, s w = d w * k w) (hc : (∏ᶠ w ∈ S, d w) * c = 1)
+    : (S ∩ Function.mulSupport s).Finite ∧ ∏ᶠ w ∈ S, k w = c * ∏ᶠ w ∈ S, s w := by
   refine ⟨hs.inter_of_right _, ?_⟩
   have hk : (S ∩ Function.mulSupport k).Finite := by
     refine (hs.union hd).subset ?_
@@ -23,10 +27,10 @@ private theorem finprod_termIdentity {ι : Type} (S : Set ι) (s d k : ι → �
     have := h w hw
     rw [hn.1, hn.2, one_mul] at this
     exact hkw this.symm
-  rw [finprod_mem_congr rfl h, finprod_mem_mul_distrib' (hd.inter_of_right _) hk, ← mul_assoc, mul_comm c, hc, one_mul]
+  rw [finprod_mem_congr rfl h, finprod_mem_mul_distrib' (hd.inter_of_right _) hk, ← mul_assoc,
+    mul_comm c, hc, one_mul]
 
-theorem UpperTheory.ConvolutionTheory.G2.termId :
-    UpperTheory.ConvolutionTheory.G2.TermId := by
+theorem UpperTheory.ConvolutionTheory.G2.termId : UpperTheory.ConvolutionTheory.G2.TermId := by
   intro E _ _ _ hE μ e hμ S hS n a b f φ hφ hM P₁ P₂ h₁ h₂ hco
   obtain ⟨hd, hc⟩ := UpperTheory.ConvolutionTheory.G2.deltaProd E hE μ e hμ S hS a b P₁ P₂ h₁ h₂ hco
   have hst := UpperTheory.ConvolutionTheory.G2.stAA E hE a b P₁ P₂ h₁ h₂

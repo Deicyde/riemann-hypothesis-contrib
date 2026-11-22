@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSelfDualTr
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 
@@ -39,12 +40,15 @@ lemma oe_smul {r : ℕ} (c : 𝓞 E) (y : Fin r → E) : c • y = (c : E) • y
 
 end GlobalTheory.EqCovol.FullLevel
 
-
 open GlobalTheory.EqCovol.FullLevel in
-theorem GlobalTheory.EqCovol.mem_iff_congr_lcm : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E)
-    (l : Level H) (r : ℕ) (Y : Data E r), GlobalTheory.EqCovol.IsLevGrp l Y → GlobalTheory.EqCovol.IsSelfDualTr Y →
-    ∀ γ : GL (Fin r) E, γ ∈ Y.Γ ↔ IsUStab Y.Gm Y.Λ γ ∧ ∀ x ∈ Y.Λ, ∃ y ∈ Y.Λ,
-      (γ : Matrix (Fin r) (Fin r) E).mulVec x - x = l.M' • y := by
+theorem GlobalTheory.EqCovol.mem_iff_congr_lcm
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (r : ℕ)
+        (Y : Data E r),
+      GlobalTheory.EqCovol.IsLevGrp l Y → GlobalTheory.EqCovol.IsSelfDualTr Y
+        → ∀ γ : GL (Fin r) E,
+          γ ∈ Y.Γ
+            ↔ IsUStab Y.Gm Y.Λ γ
+              ∧ ∀ x ∈ Y.Λ, ∃ y ∈ Y.Λ, (γ : Matrix (Fin r) (Fin r) E).mulVec x - x = l.M' • y := by
   intro E _ _ _ H l r Y hL hS γ
   have hM0 : (l.M : E) ≠ 0 := by
     have : l.M ≠ 0 := by have := l.three_le; omega
@@ -58,7 +62,8 @@ theorem GlobalTheory.EqCovol.mem_iff_congr_lcm : ∀ (E : Type) [Field E] [Numbe
     set gi : Matrix (Fin r) (Fin r) E := ((γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) with hgi
     have hggi : ∀ v, g.mulVec (gi.mulVec v) = v := by
       intro v
-      rw [Matrix.mulVec_mulVec, hg, hgi, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
+      rw [Matrix.mulVec_mulVec, hg, hgi, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.one_mulVec]
     have hunit : ∀ u v, herm Y.Gm (g.mulVec u) v = herm Y.Gm u (gi.mulVec v) := by
       intro u v
       have := hU.1 u (gi.mulVec v)
@@ -81,7 +86,8 @@ theorem GlobalTheory.EqCovol.mem_iff_congr_lcm : ∀ (E : Type) [Field E] [Numbe
         have h1 : herm Y.Gm z y = herm Y.Gm x w := by
           have h2 := congrArg (herm Y.Gm x) ew
           rw [herm_sub_right', ← hunit, herm_smul_right'', herm_smul_right'', herm_smul_right'',
-            cc_cc', cc, map_natCast] at h2
+              cc_cc', cc, map_natCast]
+            at h2
           rw [hz, herm_smul_left'', herm_smul_left'', herm_sub_left']
           field_simp
           linear_combination h2
@@ -89,26 +95,31 @@ theorem GlobalTheory.EqCovol.mem_iff_congr_lcm : ∀ (E : Type) [Field E] [Numbe
         exact ⟨n, by rw [h1, hn]⟩
       refine ⟨z + y1, Y.Λ.add_mem hzmem hy1, ?_⟩
       rw [oe_smul, Matrix.mulVec_smul] at e1
-      rw [smul_add, ← e1, ← Nat.cast_smul_eq_nsmul E, hz, smul_smul,
-        mul_inv_cancel₀ hM0, one_smul, ← smul_sub, ← add_smul, hsumE, one_smul]
+      rw [smul_add, ← e1, ← Nat.cast_smul_eq_nsmul E, hz, smul_smul, mul_inv_cancel₀ hM0, one_smul,
+        ← smul_sub, ← add_smul, hsumE, one_smul]
     refine ⟨hU, fun x hx => ?_⟩
     obtain ⟨y, hy, ey⟩ := key x hx
     obtain ⟨y', hy', ey'⟩ := hA x hx
-    refine ⟨Nat.gcdA l.M l.A • y' + Nat.gcdB l.M l.A • y,
-      Y.Λ.add_mem (Y.Λ.toAddSubgroup.zsmul_mem hy' _) (Y.Λ.toAddSubgroup.zsmul_mem hy _), ?_⟩
+    refine ⟨
+      Nat.gcdA l.M l.A • y' + Nat.gcdB l.M l.A • y,
+      Y.Λ.add_mem (Y.Λ.toAddSubgroup.zsmul_mem hy' _) (Y.Λ.toAddSubgroup.zsmul_mem hy _),
+      ?_
+    ⟩
     set t := g.mulVec x - x with ht
     rw [← Nat.cast_smul_eq_nsmul E] at ey ey'
     have hy1 : y = (l.M : E)⁻¹ • t := by rw [ey, smul_smul, inv_mul_cancel₀ hM0, one_smul]
     have hy2 : y' = (l.A : E)⁻¹ • t := by rw [ey', smul_smul, inv_mul_cancel₀ hA0, one_smul]
-    have hG : ((Nat.gcd l.M l.A : ℕ) : E) = (l.M : E) * (Nat.gcdA l.M l.A : E) + (l.A : E) * (Nat.gcdB l.M l.A : E) := by
+    have hG
+        : ((Nat.gcd l.M l.A : ℕ) : E)
+          = (l.M : E) * (Nat.gcdA l.M l.A : E) + (l.A : E) * (Nat.gcdB l.M l.A : E) := by
       have := congrArg (Int.cast : ℤ → E) (Nat.gcd_eq_gcd_ab l.M l.A)
       push_cast at this
       exact this
     have hGL : ((Nat.gcd l.M l.A : ℕ) : E) * (l.M' : E) = (l.M : E) * (l.A : E) := by
       unfold Level.M'
       exact_mod_cast Nat.gcd_mul_lcm l.M l.A
-    rw [← Nat.cast_smul_eq_nsmul E, ← Int.cast_smul_eq_zsmul E, ← Int.cast_smul_eq_zsmul E, hy1, hy2,
-      smul_smul, smul_smul, ← add_smul, smul_smul]
+    rw [← Nat.cast_smul_eq_nsmul E, ← Int.cast_smul_eq_zsmul E, ← Int.cast_smul_eq_zsmul E, hy1,
+      hy2, smul_smul, smul_smul, ← add_smul, smul_smul]
     conv_lhs => rw [← one_smul E t]
     congr 1
     field_simp

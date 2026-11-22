@@ -92,8 +92,17 @@ private lemma absNorm_span_sq_eq_prod_embeddings_sq (E : Type) [Field E] [Number
   rw [h2, Algebra.norm_eq_prod_embeddings ℚ ℂ]
   exact Fintype.prod_equiv (RingHom.equivRatAlgHom (R := E) (S := ℂ)).symm _ _ (fun σ => rfl)
 
-theorem UpperTheory.isIntegral_cmType_unitaryPart_mul_absNorm_pow :
-    ∀ (E : Type) [Field E] [NumberField E] (I : Type) [Fintype I] (φ : I → E →+* ℂ), Function.Injective (Sum.elim φ fun i => ComplexEmbedding.conjugate (φ i)) → ∀ (n : I → ℤ) (M : ℕ), (∀ i, (n i).natAbs ≤ M) → ∀ (P : HeightOneSpectrum (𝓞 E)) (h : ℕ) (z : Eˣ), P.valuation E (z : E) = WithZero.exp (-(h : ℤ)) → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → Q.valuation E (z : E) = 1) → IsIntegral ℤ ((∏ i, (φ i (z : E) / ((‖φ i (z : E)‖ : ℝ) : ℂ)) ^ n i) * ((Ideal.absNorm P.asIdeal : ℕ) : ℂ) ^ (h * M)) := by
+theorem UpperTheory.isIntegral_cmType_unitaryPart_mul_absNorm_pow
+    : ∀ (E : Type) [Field E] [NumberField E] (I : Type) [Fintype I] (φ : I → E →+* ℂ),
+      Function.Injective (Sum.elim φ fun i => ComplexEmbedding.conjugate (φ i))
+        → ∀ (n : I → ℤ) (M : ℕ),
+          (∀ i, (n i).natAbs ≤ M)
+            → ∀ (P : HeightOneSpectrum (𝓞 E)) (h : ℕ) (z : Eˣ),
+              P.valuation E (z : E) = WithZero.exp (-(h : ℤ))
+                → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → Q.valuation E (z : E) = 1)
+                → IsIntegral ℤ
+                  ((∏ i, (φ i (z : E) / ((‖φ i (z : E)‖ : ℝ) : ℂ)) ^ n i)
+                    * ((Ideal.absNorm P.asIdeal : ℕ) : ℂ) ^ (h * M)) := by
   intro E _ _ I _ φ hinj n M hn P h z hP hQ
   classical
   have hle : ∀ v : HeightOneSpectrum (𝓞 E), v.valuation E (z : E) ≤ 1 := by
@@ -109,7 +118,9 @@ theorem UpperTheory.isIntegral_cmType_unitaryPart_mul_absNorm_pow :
     rintro rfl
     rw [map_zero] at ha
     exact z.ne_zero ha.symm
-  have hspan := span_eq_pow_of_valuation_supported_at E P h a ha0 (by rw [← hza]; exact hP) (fun Q hQP => by rw [← hza]; exact hQ Q hQP)
+  have hspan :=
+    span_eq_pow_of_valuation_supported_at E P h a ha0 (by rw [← hza]; exact hP)
+      (fun Q hQP => by rw [← hza]; exact hQ Q hQP)
   have hnorm : ((Ideal.absNorm P.asIdeal : ℕ) : ℂ) ^ (2 * h) = (∏ σ : E →+* ℂ, σ (a : E)) ^ 2 := by
     rw [← absNorm_span_sq_eq_prod_embeddings_sq E a, hspan, map_pow]
     push_cast
@@ -123,8 +134,12 @@ theorem UpperTheory.isIntegral_cmType_unitaryPart_mul_absNorm_pow :
     rw [← zpow_natCast, ← zpow_natCast x, ← zpow_mul, ← zpow_mul, mul_comm]
   rw [hza]
   apply IsIntegral.of_pow (n := 2) two_pos
-  have e1 : ((∏ i, (φ i (a : E) / ((‖φ i (a : E)‖ : ℝ) : ℂ)) ^ n i) * ((Ideal.absNorm P.asIdeal : ℕ) : ℂ) ^ (h * M)) ^ 2
-      = (∏ i, (φ i (a : E) / (starRingEnd ℂ) (φ i (a : E))) ^ n i) * ((∏ σ : E →+* ℂ, σ (a : E)) ^ 2) ^ M := by
+  have e1
+      : ((∏ i, (φ i (a : E) / ((‖φ i (a : E)‖ : ℝ) : ℂ)) ^ n i)
+            * ((Ideal.absNorm P.asIdeal : ℕ) : ℂ) ^ (h * M))
+          ^ 2
+        = (∏ i, (φ i (a : E) / (starRingEnd ℂ) (φ i (a : E))) ^ n i)
+          * ((∏ σ : E →+* ℂ, σ (a : E)) ^ 2) ^ M := by
     rw [mul_pow, ← Finset.prod_pow, ← hnorm]
     congr 1
     · apply Finset.prod_congr rfl
@@ -132,24 +147,30 @@ theorem UpperTheory.isIntegral_cmType_unitaryPart_mul_absNorm_pow :
       rw [hzp, div_abs_sq_eq_div_conj _ (hw0 i)]
     · ring
   let e : I ⊕ I ↪ (E →+* ℂ) := ⟨Sum.elim φ (fun i => ComplexEmbedding.conjugate (φ i)), hinj⟩
-  have hsplit : ∏ σ : E →+* ℂ, σ (a : E)
-      = (∏ i, φ i (a : E) * (starRingEnd ℂ) (φ i (a : E))) * ∏ σ ∈ Finset.univ \ Finset.univ.map e, σ (a : E) := by
-    rw [← Finset.prod_sdiff (Finset.subset_univ (Finset.univ.map e)), Finset.prod_map, Fintype.prod_sum_type,
-      ← Finset.prod_mul_distrib, mul_comm]
+  have hsplit
+      : ∏ σ : E →+* ℂ, σ (a : E)
+        = (∏ i, φ i (a : E) * (starRingEnd ℂ) (φ i (a : E)))
+          * ∏ σ ∈ Finset.univ \ Finset.univ.map e, σ (a : E) := by
+    rw [← Finset.prod_sdiff (Finset.subset_univ (Finset.univ.map e)), Finset.prod_map,
+      Fintype.prod_sum_type, ← Finset.prod_mul_distrib, mul_comm]
     rfl
   rw [e1, hsplit]
-  have e2 : (∏ i, (φ i (a : E) / (starRingEnd ℂ) (φ i (a : E))) ^ n i) *
-      (((∏ i, φ i (a : E) * (starRingEnd ℂ) (φ i (a : E))) * ∏ σ ∈ Finset.univ \ Finset.univ.map e, σ (a : E)) ^ 2) ^ M
-      = (∏ i, (φ i (a : E) / (starRingEnd ℂ) (φ i (a : E))) ^ n i * (φ i (a : E) * (starRingEnd ℂ) (φ i (a : E))) ^ (2 * M))
-        * (∏ σ ∈ Finset.univ \ Finset.univ.map e, σ (a : E)) ^ (2 * M) := by
+  have e2
+      : (∏ i, (φ i (a : E) / (starRingEnd ℂ) (φ i (a : E))) ^ n i)
+          * (((∏ i, φ i (a : E) * (starRingEnd ℂ) (φ i (a : E)))
+                * ∏ σ ∈ Finset.univ \ Finset.univ.map e, σ (a : E))
+              ^ 2)
+            ^ M
+        = (∏ i, (φ i (a : E) / (starRingEnd ℂ) (φ i (a : E))) ^ n i * (φ i (a : E) * (starRingEnd ℂ) (φ i (a : E))) ^ (2 * M))
+          * (∏ σ ∈ Finset.univ \ Finset.univ.map e, σ (a : E)) ^ (2 * M) := by
     simp only [Finset.prod_mul_distrib, Finset.prod_pow]
     ring
   rw [e2]
   apply IsIntegral.mul
   · apply IsIntegral.prod
     intro i _
-    exact isIntegral_pow_div_mul_pow _ _ (hint (φ i)) (hint (ComplexEmbedding.conjugate (φ i))) (hw0 i) (hwc0 i) (n i) (2 * M)
-      (by have := hn i; omega)
+    exact isIntegral_pow_div_mul_pow _ _ (hint (φ i)) (hint (ComplexEmbedding.conjugate (φ i)))
+      (hw0 i) (hwc0 i) (n i) (2 * M) (by have := hn i; omega)
   · apply IsIntegral.pow
     apply IsIntegral.prod
     intro σ _

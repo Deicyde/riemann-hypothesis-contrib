@@ -22,7 +22,8 @@ section Perp
 
 variable {K : Type} [Field K] [StarRing K] {n : ℕ}
 
-def perpOf (H : Matrix (Fin n) (Fin n) K) (Z : Submodule K (Fin n → K)) : Submodule K (Fin n → K) where
+def perpOf (H : Matrix (Fin n) (Fin n) K) (Z : Submodule K (Fin n → K))
+    : Submodule K (Fin n → K) where
   carrier := {x | ∀ z ∈ Z, hform H z x = 0}
   add_mem' := by
     intro x y hx hy z hz
@@ -41,48 +42,47 @@ section Exp
 variable {K : Type} [Field K] [NumberField K] {d : ℕ}
 
 def expW (w : HeightOneSpectrum (𝓞 K)) (A B : Submodule (𝓞 K) (Fin d → K)) : ℕ :=
-  sInf {J : ℕ | ∀ a ∈ w.asIdeal ^ J, ∀ z ∈ A, a • z ∈ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B}
+  sInf
+    {J : ℕ | ∀ a ∈ w.asIdeal ^ J, ∀ z ∈ A, a • z ∈ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B}
 
 end Exp
 
 structure Lvl (K G : Type) [Field K] [Group G] where
-
   X : Finset (G → K)
-
   P : Subgroup G
-
   ψ : P →* Kˣ
 
 def Lvl.full {K G : Type} [Field K] [Group G] (X : Finset (G → K)) : Lvl K G := ⟨X, ⊥, 1⟩
 
-def CSD.gaOp {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K) {G : Type} [Group G] [Fintype G]
-    (r : Representation K G S.Forms) (a : MonoidAlgebra K G) : Module.End K S.Forms := ∑ t : G, a.coeff t • r t
+def CSD.gaOp
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    (S : CSD K)
+    {G : Type} [Group G] [Fintype G]
+    (r : Representation K G S.Forms) (a : MonoidAlgebra K G)
+    : Module.End K S.Forms :=
+  ∑ t : G, a.coeff t • r t
 
-structure BlockDat (K : Type) [Field K] [NumberField K] [StarRing K] (G : Type) [Group G] [Fintype G]
+structure BlockDat
+    (K : Type) [Field K] [NumberField K] [StarRing K]
+    (G : Type) [Group G] [Fintype G]
     (Pl0 : Type) where
-
   S : CSD K
-
   r : Representation K G S.Forms
-
   Pl : Type
-
   pl : Pl → Pl0
-
   q : Pl → ℕ
-
   n : ℕ
-
   t : ℕ
-
   op : Pl × ℕ → Module.End K S.Forms
-
   bl : List (Pl → K)
 
 namespace BlockDat
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 : Type}
-  (B : BlockDat K G Pl0) (ℓ : Lvl K G)
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 : Type} (B : BlockDat K G Pl0)
+  (ℓ : Lvl K G)
 
 def blockProd (P : B.Pl) : K[X] := (B.bl.map fun ν => Col.blockPoly (ν P) (B.q P) B.t).prod
 
@@ -122,7 +122,6 @@ def invariantGoodPart : Submodule K (Fin (B.nV ℓ) → K) := B.inV0 ℓ B.ZH
 def resSet (X : Finset (G → K)) : Set (Pl0 → K[X]) :=
   {Sg | (∀ P0, P0 ∉ Set.range B.pl → Sg P0 = 1) ∧ B.inV0 (Lvl.full X) (B.partF Sg) ≠ ⊥}
 
-
 open Classical in
 def ixFin (X : Finset (G → K)) : Finset (Pl0 → K[X]) :=
   if h : (B.resSet X).Finite then h.toFinset else ∅
@@ -145,7 +144,8 @@ def Pq : Matrix (Fin (B.dZ ℓ Z)) (Fin (B.nV ℓ)) K := orthPr (B.HV ℓ) (B.zE
 
 def HZ : Matrix (Fin (B.dZ ℓ Z)) (Fin (B.dZ ℓ Z)) K := (B.zE ℓ Z)ᴴ * B.HV ℓ * B.zE ℓ Z
 
-def XQ : InfinitePlace K → Matrix (Fin (B.dZ ℓ Z)) (Fin (B.dZ ℓ Z)) ℂ := quotFrame (B.Pq ℓ Z) (B.HV ℓ)
+def XQ : InfinitePlace K → Matrix (Fin (B.dZ ℓ Z)) (Fin (B.dZ ℓ Z)) ℂ :=
+  quotFrame (B.Pq ℓ Z) (B.HV ℓ)
 
 def fE : Matrix (Fin B.S.dim) (Fin (B.dZ ℓ Z)) K := B.vE ℓ * B.zE ℓ Z
 
@@ -168,58 +168,47 @@ def part (Sg : Pl0 → K[X]) : Submodule K (Fin (B.dZ ℓ Z) → K) :=
   (B.inV0 ℓ (B.partF Sg)).comap (B.zE ℓ Z).mulVecLin
 
 def toF : (Fin (B.dZ ℓ Z) → K) →ₗ[K] B.S.Forms :=
-  (B.S.basis.equivFun.symm : (Fin B.S.dim → K) →ₗ[K] B.S.Forms) ∘ₗ (B.vE ℓ).mulVecLin ∘ₗ
-    (B.zE ℓ Z).mulVecLin
+  (B.S.basis.equivFun.symm : (Fin B.S.dim → K) →ₗ[K] B.S.Forms) ∘ₗ (B.vE ℓ).mulVecLin
+    ∘ₗ (B.zE ℓ Z).mulVecLin
 
 end Sub
 
 structure Ok (s : ℕ) : Prop where
-
   good : B.S.Good s
-
   hrat : ∀ i j, B.S.H i j ∈ cmMax K
-
   hpos : ∀ v : InfinitePlace K, (B.S.H.map v.embedding).PosDef
-
   act : B.S.ActGood B.r
-
   actRat : B.S.ActRat B.r
-
   comm : Col.PairComm B.op
-
   split : Col.SplitOver B.op
-
   opG : ∀ i g, Commute (B.op i) (B.r g)
-
   blocks : Col.BlockOk B.t B.bl
-
   q_pos : ∀ P, 0 < B.q P
-
   pl_inj : Function.Injective B.pl
 
 end BlockDat
 
-structure DefFam (K : Type) [Field K] [NumberField K] [StarRing K] (G : Type) [Group G] [Fintype G]
+structure DefFam
+    (K : Type) [Field K] [NumberField K] [StarRing K]
+    (G : Type) [Group G] [Fintype G]
     (Pl0 T J : Type) where
-
   v0 : InfinitePlace K
-
   μ0 : T
-
   X : Finset (G → K)
-
   R : T → BlockDat K G Pl0
-
   L : J → T → BlockDat K G Pl0
-
   tr : J → (Pl0 → K[X]) → Pl0 → K[X]
 
 namespace DefFam
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G]
-  {Pl0 T J : Type} [Fintype J] (F : DefFam K G Pl0 T J)
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T J : Type} [Fintype J]
+  (F : DefFam K G Pl0 T J)
 
-@[reducible] def base : DefBase K where
+@[reducible]
+def base : DefBase K where
   K0 := cmMax K
   v0 := F.v0
   Tup := T
@@ -229,7 +218,8 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] 
   J := J
   fJ := inferInstance
 
-@[reducible] def amb : DefAmb F.base where
+@[reducible]
+def amb : DefAmb F.base where
   FR t := (F.R t).S.Forms
   aR _ := inferInstance
   mR _ := inferInstance
@@ -262,23 +252,19 @@ def side (P : Subgroup G) (ψ : P →* Kˣ) (Zs : DefSub F.amb) : DefSide F.base
   Zp j t p := (F.L j t).part (F.lvlA P ψ) (Zs.Zl j t) (F.tr j p.1)
 
 structure Ok (s : ℕ) : Prop where
-
   conj : IsConjAt F.v0
-
   tup_fin : Finite T
-
   irr : ∀ χ ∈ F.X, IsAbsIrrChar χ
-
   what₂ : ∀ t, (F.R t).Ok s
-
   lifts : ∀ j t, (F.L j t).Ok s
 
 def IsType (B : BlockDat K G Pl0) (f : (Pl0 → K[X]) → Pl0 → K[X]) (x : B.Pl × ℕ → K) : Prop :=
   ∃ Sg ∈ (F.R F.μ0).ixFin F.X, B.HasRes (f Sg) x
 
 def TypesSep : Prop :=
-  ∀ Sg ∈ (F.R F.μ0).ixFin F.X, ∀ Sg' ∈ (F.R F.μ0).ixFin F.X, Sg ≠ Sg' →
-    ∀ j, ∃ P : (F.L j F.μ0).Pl, F.tr j Sg ((F.L j F.μ0).pl P) ≠ F.tr j Sg' ((F.L j F.μ0).pl P)
+  ∀ Sg ∈ (F.R F.μ0).ixFin F.X, ∀ Sg' ∈ (F.R F.μ0).ixFin F.X,
+    Sg ≠ Sg'
+      → ∀ j, ∃ P : (F.L j F.μ0).Pl, F.tr j Sg ((F.L j F.μ0).pl P) ≠ F.tr j Sg' ((F.L j F.μ0).pl P)
 
 end DefFam
 
@@ -286,10 +272,9 @@ section Side
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} (Df : DefSide Bs)
 
-
 open Classical in
-def locBasisOf {D : ℕ} (L : Submodule (𝓞 K) (Fin D → K)) (w : HeightOneSpectrum (𝓞 K)) :
-    Fin D → Fin D → K :=
+def locBasisOf {D : ℕ} (L : Submodule (𝓞 K) (Fin D → K)) (w : HeightOneSpectrum (𝓞 K))
+    : Fin D → Fin D → K :=
   if h : ∃ e, IsLocBasis L w e then h.choose else 0
 
 def ebOf (t : Bs.Tup) (w : HeightOneSpectrum (𝓞 K)) : Fin (Df.dQ t) → Fin (Df.dQ t) → K :=
@@ -297,16 +282,17 @@ def ebOf (t : Bs.Tup) (w : HeightOneSpectrum (𝓞 K)) : Fin (Df.dQ t) → Fin (
 
 def GmOf (t : Bs.Tup) (w : HeightOneSpectrum (𝓞 K)) : K := Df.Gm (ebOf Df) t w
 
-
 open Classical in
 def partPr (t : Bs.Tup) (p : Bs.Ix) : Matrix (Fin (Df.dQ t)) (Fin (Df.dQ t)) K :=
   if h : IsCompl (Df.Qp t p) (⨆ (p' : Bs.Ix) (_ : p' ≠ p), Df.Qp t p') then
     LinearMap.toMatrix' ((Df.Qp t p).subtype ∘ₗ Submodule.projectionOnto _ _ h)
-  else 0
+  else
+    0
 
-def rowXE (Y : Matrix (Fin (Df.dQ Bs.μ0)) (Fin (Df.dQ Bs.μ0)) ℂ) (κ : InfinitePlace K → ℝ)
-    (lam : Bs.J → Bs.Ix → InfinitePlace K → ℝ) :
-    InfinitePlace K → Matrix (Fin (Df.dQ Bs.μ0)) (Fin (Df.dQ Bs.μ0)) ℂ :=
+def rowXE
+    (Y : Matrix (Fin (Df.dQ Bs.μ0)) (Fin (Df.dQ Bs.μ0)) ℂ) (κ : InfinitePlace K → ℝ)
+    (lam : Bs.J → Bs.Ix → InfinitePlace K → ℝ)
+    : InfinitePlace K → Matrix (Fin (Df.dQ Bs.μ0)) (Fin (Df.dQ Bs.μ0)) ℂ :=
   rowFrame Bs.v0 Y 1 (partPr Df Bs.μ0) (fun p v => κ v * ∏ j, lam j p v) (Df.XQ Bs.μ0)
 
 variable {Df}

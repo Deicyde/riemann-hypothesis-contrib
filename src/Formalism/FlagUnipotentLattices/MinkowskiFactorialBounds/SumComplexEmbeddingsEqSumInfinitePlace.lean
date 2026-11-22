@@ -175,26 +175,31 @@ lemma inner_complexPlaceSpace (x y : s5bV E) : inner ℝ x y = ∑ w, (conj (x w
        Complex.conj_re, Complex.conj_im]
      ring1)
 
-noncomputable def complexSpaceMixedLinearEquiv (hc : ∀ w : InfinitePlace E, w.IsComplex) :
-    s5bV E ≃ₗ[ℝ] mixedEmbedding.mixedSpace E :=
+noncomputable def complexSpaceMixedLinearEquiv (hc : ∀ w : InfinitePlace E, w.IsComplex)
+    : s5bV E ≃ₗ[ℝ] mixedEmbedding.mixedSpace E :=
   haveI : IsEmpty {w : InfinitePlace E // w.IsReal} :=
     ⟨fun w => (InfinitePlace.not_isReal_iff_isComplex.mpr (hc w.1)) w.2⟩
-  { toFun := fun x => (0, fun w => x w.1)
+  {
+    toFun := fun x => (0, fun w => x w.1)
     map_add' := by intro x y; exact Prod.ext (by simp) (by funext w; rfl)
     map_smul' := by intro c x; exact Prod.ext (by simp) (by funext w; rfl)
     invFun := fun p => WithLp.toLp 2 (fun w => p.2 ⟨w, hc w⟩)
     left_inv := fun x => by ext w; rfl
-    right_inv := fun p => Prod.ext (Subsingleton.elim _ _) (by funext w; rfl) }
+    right_inv := fun p => Prod.ext (Subsingleton.elim _ _) (by funext w; rfl)
+  }
 
 open scoped Classical in
-noncomputable def complexSpaceMixedEquivCLM (hc : ∀ w : InfinitePlace E, w.IsComplex) :
-    s5bV E ≃L[ℝ] mixedEmbedding.mixedSpace E := (complexSpaceMixedLinearEquiv hc).toContinuousLinearEquiv
+noncomputable def complexSpaceMixedEquivCLM (hc : ∀ w : InfinitePlace E, w.IsComplex)
+    : s5bV E ≃L[ℝ] mixedEmbedding.mixedSpace E :=
+  (complexSpaceMixedLinearEquiv hc).toContinuousLinearEquiv
 
 open scoped Classical in
-noncomputable def integerEmbeddingLattice (hc : ∀ w : InfinitePlace E, w.IsComplex) : Submodule ℤ (s5bV E) :=
+noncomputable def integerEmbeddingLattice (hc : ∀ w : InfinitePlace E, w.IsComplex)
+    : Submodule ℤ (s5bV E) :=
   ZLattice.comap ℝ (mixedEmbedding.integerLattice E) (complexSpaceMixedEquivCLM hc).toLinearMap
 
-instance (hc : ∀ w : InfinitePlace E, w.IsComplex) : DiscreteTopology (integerEmbeddingLattice hc) := by
+instance (hc : ∀ w : InfinitePlace E, w.IsComplex)
+    : DiscreteTopology (integerEmbeddingLattice hc) := by
   rw [integerEmbeddingLattice]; infer_instance
 
 open scoped Classical in
@@ -377,21 +382,22 @@ lemma four_mul_card_le_norm_sq_mul_discr (hc : ∀ w : InfinitePlace E, w.IsComp
 
 end Cov2
 
-private theorem finrank_eq_two_mul_card_infinitePlace_of_isComplex {E : Type} [Field E] [NumberField E]
-    (hc : ∀ w : InfinitePlace E, w.IsComplex) :
-    (Module.finrank ℚ E : ℝ) = 2 * (Fintype.card (InfinitePlace E) : ℝ) := by
+private theorem finrank_eq_two_mul_card_infinitePlace_of_isComplex
+    {E : Type} [Field E] [NumberField E] (hc : ∀ w : InfinitePlace E, w.IsComplex)
+    : (Module.finrank ℚ E : ℝ) = 2 * (Fintype.card (InfinitePlace E) : ℝ) := by
   have h := sum_complexEmbeddings_eq_sum_infinitePlace hc (fun _ => (1 : ℂ))
-  simp only [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, mul_one,
-    NumberField.Embeddings.card] at h
-  have h' : (((Module.finrank ℚ E : ℝ)) : ℂ) =
-      ((2 * (Fintype.card (InfinitePlace E) : ℝ) : ℝ) : ℂ) := by
+  simp only [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, mul_one, NumberField.Embeddings.card]
+    at h
+  have h'
+      : (((Module.finrank ℚ E : ℝ)) : ℂ)
+        = ((2 * (Fintype.card (InfinitePlace E) : ℝ) : ℝ) : ℂ) := by
     push_cast
     rw [h]
     ring
   exact Complex.ofReal_injective h'
 
-private theorem two_mul_div_two_le_sqrt_mul_sqrt_mul_rpow (r D : ℝ) (hr : 0 < r) (hD : 0 < D) :
-    2 * r / 2 ≤ Real.sqrt (4 * r / D ^ (1 / r)) * (Real.sqrt (2 * r) * D ^ (1 / (2 * r))) := by
+private theorem two_mul_div_two_le_sqrt_mul_sqrt_mul_rpow (r D : ℝ) (hr : 0 < r) (hD : 0 < D)
+    : 2 * r / 2 ≤ Real.sqrt (4 * r / D ^ (1 / r)) * (Real.sqrt (2 * r) * D ^ (1 / (2 * r))) := by
   have hT : 0 < D ^ (1 / r) := Real.rpow_pos_of_pos hD _
   have hT' : D ^ (1 / r) ≠ 0 := hT.ne'
   have hr' : r ≠ 0 := hr.ne'
@@ -404,13 +410,13 @@ private theorem two_mul_div_two_le_sqrt_mul_sqrt_mul_rpow (r D : ℝ) (hr : 0 < 
   have h2r : 0 ≤ 2 * r := by linarith
   have hs0 : 0 ≤ Real.sqrt (4 * r / D ^ (1 / r)) * (Real.sqrt (2 * r) * D ^ (1 / (2 * r))) :=
     mul_nonneg (Real.sqrt_nonneg _) (mul_nonneg (Real.sqrt_nonneg _) (Real.rpow_nonneg hD.le _))
-  have hs2 : (Real.sqrt (4 * r / D ^ (1 / r)) * (Real.sqrt (2 * r) * D ^ (1 / (2 * r)))) ^ 2 =
-      8 * r ^ 2 := by
+  have hs2
+      : (Real.sqrt (4 * r / D ^ (1 / r)) * (Real.sqrt (2 * r) * D ^ (1 / (2 * r)))) ^ 2
+        = 8 * r ^ 2 := by
     rw [mul_pow, mul_pow, ht2, Real.sq_sqrt h4, Real.sq_sqrt h2r]
     field_simp
     ring
   nlinarith [hs0, hs2, hr]
-
 
 set_option maxHeartbeats 800000 in
 theorem coveringO_of_transference (hT : Transference) : CoveringO := by
@@ -422,34 +428,44 @@ theorem coveringO_of_transference (hT : Transference) : CoveringO := by
   have hcard := finrank_eq_two_mul_card_infinitePlace_of_isComplex hc
   have hfin : (finrank ℝ (s5bV E) : ℝ) = finrank ℚ E := by
     exact_mod_cast ((complexSpaceMixedLinearEquiv hc).finrank_eq.trans (mixedEmbedding.finrank E))
-  have hd : (discr E : ℝ) ≠ 0 := by
-    exact_mod_cast NumberField.discr_ne_zero E
+  have hd : (discr E : ℝ) ≠ 0 := by exact_mod_cast NumberField.discr_ne_zero E
   have hD : (0 : ℝ) < |(discr E : ℝ)| := abs_pos.mpr hd
   have hDr : 0 < |(discr E : ℝ)| ^ (1 / (Fintype.card (InfinitePlace E) : ℝ)) :=
     Real.rpow_pos_of_pos hD _
-  obtain ⟨lam, hlam_def⟩ : ∃ lam : ℝ, lam = Real.sqrt (4 * (Fintype.card (InfinitePlace E) : ℝ) /
-      |(discr E : ℝ)| ^ (1 / (Fintype.card (InfinitePlace E) : ℝ))) := ⟨_, rfl⟩
+  obtain ⟨lam, hlam_def⟩
+      : ∃ lam : ℝ,
+        lam
+          = Real.sqrt
+            (4 * (Fintype.card (InfinitePlace E) : ℝ)
+              / |(discr E : ℝ)| ^ (1 / (Fintype.card (InfinitePlace E) : ℝ))) :=
+    ⟨_, rfl⟩
   have hlampos : 0 < lam := by
     rw [hlam_def]
     exact Real.sqrt_pos.mpr (div_pos (by linarith) hDr)
-  have hdual : ∀ y : s5bV E, y ≠ 0 →
-      (∀ v ∈ integerEmbeddingLattice hc, ∃ m : ℤ, inner ℝ v y = (m : ℝ)) → lam ≤ ‖y‖ := by
+  have hdual
+      : ∀ y : s5bV E,
+        y ≠ 0 → (∀ v ∈ integerEmbeddingLattice hc, ∃ m : ℤ, inner ℝ v y = (m : ℝ)) → lam ≤ ‖y‖ := by
     intro y hy hint_r
     have h := four_mul_card_le_norm_sq_mul_discr hc y hy hint_r
     rw [hlam_def, ← Real.sqrt_sq (norm_nonneg y)]
     exact Real.sqrt_le_sqrt ((div_le_iff₀ hDr).mpr h)
-  obtain ⟨l, hl, hlx⟩ := hT (s5bV E) (integerEmbeddingLattice hc) lam hlampos
-    hdual (WithLp.toLp 2 x)
+  obtain ⟨l, hl, hlx⟩ :=
+    hT (s5bV E) (integerEmbeddingLattice hc) lam hlampos hdual (WithLp.toLp 2 x)
   obtain ⟨a, rfl⟩ := (s5bLat_mem hc l).mp hl
   refine ⟨a, fun w => ?_⟩
-  have hcomp : ‖x w - w.embedding (a : E)‖ ≤
-      ‖(WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E)‖ := by
-    have hsq : ‖x w - w.embedding (a : E)‖ ^ 2 ≤
-        ‖(WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E)‖ ^ 2 := by
+  have hcomp
+      : ‖x w - w.embedding (a : E)‖
+        ≤ ‖(WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E)‖ := by
+    have hsq
+        : ‖x w - w.embedding (a : E)‖ ^ 2
+          ≤ ‖(WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E)‖ ^ 2 := by
       rw [EuclideanSpace.norm_eq, Real.sq_sqrt (Finset.sum_nonneg fun _ _ => sq_nonneg _)]
-      have h := Finset.single_le_sum (f := fun v : InfinitePlace E =>
-        ‖((WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E)) v‖ ^ 2)
-        (fun _ _ => sq_nonneg _) (Finset.mem_univ w)
+      have h :=
+        Finset.single_le_sum
+          (f := fun v : InfinitePlace E =>
+            ‖((WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E)) v‖ ^ 2)
+          (fun _ _ => sq_nonneg _)
+          (Finset.mem_univ w)
       simpa [s5bSig_apply] using h
     nlinarith [norm_nonneg (x w - w.embedding (a : E)),
       norm_nonneg ((WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E))]
@@ -457,10 +473,13 @@ theorem coveringO_of_transference (hT : Transference) : CoveringO := by
   rw [← hlam_def] at hconst
   rw [hfin, hcard] at hlx
   rw [hcard]
-  have key : ‖(WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E)‖ * lam ≤
-      (Real.sqrt (2 * (Fintype.card (InfinitePlace E) : ℝ)) *
-        |(discr E : ℝ)| ^ (1 / (2 * (Fintype.card (InfinitePlace E) : ℝ)))) * lam := by
-    calc _ ≤ _ := hlx
+  have key
+      : ‖(WithLp.toLp 2 x : s5bV E) - complexEmbeddingVector (a : E)‖ * lam
+        ≤ (Real.sqrt (2 * (Fintype.card (InfinitePlace E) : ℝ))
+            * |(discr E : ℝ)| ^ (1 / (2 * (Fintype.card (InfinitePlace E) : ℝ))))
+          * lam := by
+    calc
+      _ ≤ _ := hlx
       _ ≤ _ := hconst
       _ = _ := mul_comm _ _
   exact hcomp.trans (le_of_mul_le_mul_right key hlampos)

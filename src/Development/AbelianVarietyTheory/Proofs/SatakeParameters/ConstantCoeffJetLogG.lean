@@ -11,13 +11,15 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.NormPowDi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.FrobeniusOrbits GlobalTheory.TwU Classical
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.FrobeniusOrbits GlobalTheory.TwU Classical
 
 noncomputable section
 
 namespace GlobalTheory.BeProps
 
-open MvPowerSeries GlobalTheory.ThStr Formalism.MainNotions.GL3Theta Formalism.MainNotions.TaylorLogMetric
+open MvPowerSeries GlobalTheory.ThStr Formalism.MainNotions.GL3Theta
+  Formalism.MainNotions.TaylorLogMetric
 
 variable {l : ℕ} [hl : Fact l.Prime] {d : ℕ}
 
@@ -42,16 +44,19 @@ variable [NeZero d]
 theorem constantCoeff_laS (s : ZMod d) : constantCoeff (laS l d s) = 0 :=
   (GlobalTheory.BiextInhab.laK_idMod2 (K := ℂ_[l]) (d := d) hl.out).1 s
 
-theorem constantCoeff_laAt {κ : Type} [Finite κ] (ι : ZMod d → κ) (s : ZMod d) :
-    constantCoeff (laAt (l := l) ι s) = 0 :=
+theorem constantCoeff_laAt {κ : Type} [Finite κ] (ι : ZMod d → κ) (s : ZMod d)
+    : constantCoeff (laAt (l := l) ι s) = 0 :=
   constantCoeff_subst_eq_zero (hasSubst_of_constantCoeff_zero fun _ => constantCoeff_X _)
-    (fun _ => constantCoeff_X _) (constantCoeff_laS s)
+    (fun _ => constantCoeff_X _)
+    (constantCoeff_laS s)
 
-theorem coeff_subst_range {K σ : Type*} [CommRing K] {G : MvPowerSeries σ K}
-    (hG : MvPowerSeries.constantCoeff G = 0) (f : PowerSeries K) (α : σ →₀ ℕ) :
-    MvPowerSeries.coeff α (f.subst G) =
-      ∑ n ∈ Finset.range ((α.sum fun _ k => k) + 1),
-        PowerSeries.coeff n f * MvPowerSeries.coeff α (G ^ n) := by
+theorem coeff_subst_range
+    {K σ : Type*} [CommRing K]
+    {G : MvPowerSeries σ K} (hG : MvPowerSeries.constantCoeff G = 0)
+    (f : PowerSeries K) (α : σ →₀ ℕ)
+    : MvPowerSeries.coeff α (f.subst G)
+      = ∑ n ∈ Finset.range ((α.sum fun _ k => k) + 1),
+          PowerSeries.coeff n f * MvPowerSeries.coeff α (G ^ n) := by
   rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero hG),
     finsum_eq_sum_of_support_subset (s := Finset.range ((α.sum fun _ k => k) + 1))]
   · rfl
@@ -65,8 +70,9 @@ theorem coeff_subst_range {K σ : Type*} [CommRing K] {G : MvPowerSeries σ K}
       exact_mod_cast hlt
     simp [h0]
 
-theorem expMv_eq_subst {σ : Type*} {G : MvPowerSeries σ ℂ_[l]} (hG : MvPowerSeries.constantCoeff G = 0) :
-    expMv G = (PowerSeries.exp ℂ_[l]).subst G := by
+theorem expMv_eq_subst
+    {σ : Type*} {G : MvPowerSeries σ ℂ_[l]} (hG : MvPowerSeries.constantCoeff G = 0)
+    : expMv G = (PowerSeries.exp ℂ_[l]).subst G := by
   ext α
   rw [coeff_subst_range hG]
   show expMv G α = _
@@ -74,9 +80,12 @@ theorem expMv_eq_subst {σ : Type*} {G : MvPowerSeries σ ℂ_[l]} (hG : MvPower
   refine Finset.sum_congr rfl fun k _ => ?_
   simp [div_eq_inv_mul]
 
-theorem subst_psubst {σ τ : Type} [Finite σ] {b : σ → MvPowerSeries τ ℂ_[l]} (hb : HasSubst b)
-    {f : MvPowerSeries σ ℂ_[l]} (hf : constantCoeff f = 0) (g : PowerSeries ℂ_[l]) :
-    subst b (PowerSeries.subst f g) = PowerSeries.subst (subst b f) g := by
+theorem subst_psubst
+    {σ τ : Type} [Finite σ]
+    {b : σ → MvPowerSeries τ ℂ_[l]} (hb : HasSubst b)
+    {f : MvPowerSeries σ ℂ_[l]} (hf : constantCoeff f = 0)
+    (g : PowerSeries ℂ_[l])
+    : subst b (PowerSeries.subst f g) = PowerSeries.subst (subst b f) g := by
   have ha : HasSubst (fun _ : Unit => f) := hasSubst_of_constantCoeff_zero fun _ => hf
   unfold PowerSeries.subst
   rw [subst_comp_subst_apply ha hb]

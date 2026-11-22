@@ -13,11 +13,13 @@ def FP : MorphismProperty CommRingCat.{0} := fun _ _ f => f.hom.FinitePresentati
 
 def FPSpreads : Prop := MorphismProperty.PreIndSpreads.{0} FP
 
-def EtStage : Prop := ∀ {J : Type} [SmallCategory J] [IsFiltered J] {D : J ⥤ CommRingCat.{0}} {c : Cocone D}
-  (_ : IsColimit c) (j : J) {T' T : CommRingCat.{0}} (f' : D.obj j ⟶ T') (f : c.pt ⟶ T) (g : T' ⟶ T),
-  FP f' → IsPushout (c.ι.app j) f' f g → Et f →
-  ∃ (k : J) (T'' : CommRingCat.{0}) (f'' : D.obj k ⟶ T'') (g'' : T'' ⟶ T),
-    IsPushout (c.ι.app k) f'' f g'' ∧ Et f''
+def EtStage : Prop :=
+  ∀ {J : Type} [SmallCategory J] [IsFiltered J] {D : J ⥤ CommRingCat.{0}} {c : Cocone D}
+      (_ : IsColimit c) (j : J) {T' T : CommRingCat.{0}} (f' : D.obj j ⟶ T') (f : c.pt ⟶ T)
+      (g : T' ⟶ T),
+    FP f' → IsPushout (c.ι.app j) f' f g → Et f
+      → ∃ (k : J) (T'' : CommRingCat.{0}) (f'' : D.obj k ⟶ T'') (g'' : T'' ⟶ T),
+        IsPushout (c.ι.app k) f'' f g'' ∧ Et f''
 
 theorem EtSpreads_of (hF : FPSpreads) (hS : EtStage) : LateralTheory.E.SpreadPf.EtSpreads where
   exists_isPushout {J} _ _ {D} {c} hc {T} f hf := by

@@ -14,7 +14,9 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.SmoothnessOnGoodSet
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.B4 Formalism.FourierDecayAlt.P.SandwichRhoAction Formalism.FourierDecayAlt.P.ChartIntegralLocal
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.B4
+  Formalism.FourierDecayAlt.P.SandwichRhoAction Formalism.FourierDecayAlt.P.ChartIntegralLocal
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -70,8 +72,9 @@ lemma cv_continuous (b : Bool) (X g : Mat k r) : Continuous fun t : ℝ => cv b 
     refine h2.congr fun t => ?_
     simp [cv, smul_neg]
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 lemma norm_xiP (D : RealPlaceData k r Wp Wq) (p : SS k r) : ‖xiP D p‖ ≤ 1 := by
   unfold xiP

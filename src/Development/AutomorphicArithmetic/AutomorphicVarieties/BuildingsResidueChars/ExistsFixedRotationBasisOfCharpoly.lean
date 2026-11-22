@@ -35,10 +35,14 @@ private lemma trace_inverseGram_conj_smul_eq {K : Type} [Field K] [CharZero K] (
     simp only [Matrix.mul_apply, Fin.sum_univ_three]
     linear_combination (M 0 0 + M 1 1 + M 2 2 + 1 + τ) * (e0 - e1 / 2 - em / 2) - (e1 - em)
 
-theorem UpperTheory.exists_fixed_rotation_basis_of_charpoly :
-    ∀ (K : Type) [Field K] [CharZero K] (τ : K), τ ^ 2 - 4 ≠ 0 → ∀ M : Matrix (Fin 3) (Fin 3) K,
-        M.charpoly = (Polynomial.X - 1) * (Polynomial.X ^ 2 - Polynomial.C τ * Polynomial.X + 1) →
-        ∃ e v : Fin 3 → K, M *ᵥ e = e ∧ M *ᵥ (M *ᵥ v) = τ • (M *ᵥ v) - v ∧ (Matrix.of ![e, v, M *ᵥ v]).det ≠ 0 := by
+theorem UpperTheory.exists_fixed_rotation_basis_of_charpoly
+    : ∀ (K : Type) [Field K] [CharZero K] (τ : K),
+      τ ^ 2 - 4 ≠ 0
+        → ∀ M : Matrix (Fin 3) (Fin 3) K,
+          M.charpoly = (Polynomial.X - 1) * (Polynomial.X ^ 2 - Polynomial.C τ * Polynomial.X + 1)
+            → ∃ e v : Fin 3 → K,
+              M *ᵥ e = e ∧ M *ᵥ (M *ᵥ v) = τ • (M *ᵥ v) - v
+                ∧ (Matrix.of ![e, v, M *ᵥ v]).det ≠ 0 := by
   intro K _ _ τ hτ M hM
   have hPQ := cayley_hamilton_rank_three_factored τ M hM
   obtain ⟨htr1, htr2⟩ := trace_inverseGram_conj_smul_eq τ M hM
@@ -60,7 +64,9 @@ theorem UpperTheory.exists_fixed_rotation_basis_of_charpoly :
         mul_smul_comm, mul_assoc]
     rw [hc', hMQ]
   have hQQ : Q * Q = (2 - τ) • Q := by
-    calc Q * Q = Q * (M * M - τ • M + 1) := by rw [← hQdef]
+    calc
+      Q * Q
+        = Q * (M * M - τ • M + 1) := by rw [← hQdef]
       _ = Q * M * M - τ • (Q * M) + Q := by
         simp only [mul_add, mul_sub, mul_one, mul_smul_comm, mul_assoc]
       _ = (2 - τ) • Q := by

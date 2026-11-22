@@ -19,23 +19,25 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Char
 @[expose] public section
 
 open NumberField IsDedekindDomain
-open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DefiniteBC
+open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions GlobalTheory.UnitaryBC
+  GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory
 
-theorem unitary_string_forces_long_part : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (c : ℕ) (d : Fin c → ℕ)
-    (S : Fin c → Multiset ℂˣ) (T : Multiset ℂˣ) (t : ℕ) (ν : ℂ),
-  1 ≤ t → (∀ i, ∀ s ∈ S i, ‖(s : ℂ)‖ = 1) → ‖ν‖ = 1 →
-  ∑ i, ∑ k : Fin (d i), (S i).map (fun z => (z : ℂ) * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (((d i : ℂ) - 1) / 2 - (k : ℕ))) =
-    T.map (fun z => (z : ℂ)) →
-  (Multiset.range t).map (fun c : ℕ => ν * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (((t : ℂ) - 1) / 2 - c)) ≤
-    T.map (fun z => (z : ℂ)) →
-  ∃ i, t ≤ d i := by
+theorem unitary_string_forces_long_part
+    : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (c : ℕ) (d : Fin c → ℕ)
+        (S : Fin c → Multiset ℂˣ) (T : Multiset ℂˣ) (t : ℕ) (ν : ℂ),
+      1 ≤ t → (∀ i, ∀ s ∈ S i, ‖(s : ℂ)‖ = 1) → ‖ν‖ = 1
+        → ∑ i, ∑ k : Fin (d i), (S i).map (fun z => (z : ℂ) * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (((d i : ℂ) - 1) / 2 - (k : ℕ)))
+          = T.map (fun z => (z : ℂ))
+        → (Multiset.range t).map
+            (fun c : ℕ => ν * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (((t : ℂ) - 1) / 2 - c))
+          ≤ T.map (fun z => (z : ℂ))
+        → ∃ i, t ≤ d i := by
   intro E _ _ w c d S T t ν ht hS hν hsum hle
   have hN1 : 1 < Ideal.absNorm w.asIdeal := by
-    have h0 : Ideal.absNorm w.asIdeal ≠ 0 := by
-      rw [Ne, Ideal.absNorm_eq_zero_iff]; exact w.ne_bot
+    have h0 : Ideal.absNorm w.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact w.ne_bot
     have h1 : Ideal.absNorm w.asIdeal ≠ 1 := by
       rw [Ne, Ideal.absNorm_eq_one_iff]; exact w.isPrime.ne_top
     omega
@@ -47,7 +49,8 @@ theorem unitary_string_forces_long_part : ∀ (E : Type) [Field E] [NumberField 
   obtain ⟨k, -, hk⟩ := Multiset.mem_sum.1 hi
   obtain ⟨s, hs, hsk⟩ := Multiset.mem_map.1 hk
   have hs1 : ‖s‖ = 1 := by
-    simp only [Multiset.bind_def, Multiset.pure_def, Multiset.mem_bind, Multiset.mem_singleton] at hs
+    simp only [Multiset.bind_def, Multiset.pure_def, Multiset.mem_bind, Multiset.mem_singleton]
+      at hs
     obtain ⟨u, hu, rfl⟩ := hs
     exact hS i u hu
   have hNpos : 0 < N := by omega

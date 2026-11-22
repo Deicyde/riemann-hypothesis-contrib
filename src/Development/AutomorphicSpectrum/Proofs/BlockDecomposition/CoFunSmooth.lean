@@ -13,26 +13,35 @@ namespace GlobalTheory.CompanionTheory.CIndCoinv
 
 section Abstract
 
-variable {G M W W' : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group M]
-  [TopologicalSpace M] [IsTopologicalGroup M] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
+variable
+  {G M W W' : Type}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group M] [TopologicalSpace M]
+  [IsTopologicalGroup M] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
 
 def coFun (s : M →* G) (χ : M →* ℂˣ) (c : W →ₗ[ℂ] W') (f : G → W) (x : M) : W' :=
   (χ x : ℂ) • c (f (s x))
 
-theorem coFun_mem {H : Subgroup G} {Q : Subgroup M} (s : M →* G) (hQH : ∀ p ∈ Q, s p ∈ H) (χ : M →* ℂˣ)
-    (σ : Representation ℂ H W) (σ' : Representation ℂ Q W') (c : W →ₗ[ℂ] W')
-    (hcomp : ∀ (p : Q) (w : W), (χ p : ℂ) • c (σ ⟨s p, hQH p p.2⟩ w) = σ' p (c w)) (f : indSpace H σ) :
-    coFun s χ c f.1 ∈ indSpace Q σ' := by
+theorem coFun_mem
+    {H : Subgroup G} {Q : Subgroup M}
+    (s : M →* G) (hQH : ∀ p ∈ Q, s p ∈ H)
+    (χ : M →* ℂˣ) (σ : Representation ℂ H W) (σ' : Representation ℂ Q W') (c : W →ₗ[ℂ] W')
+    (hcomp : ∀ (p : Q) (w : W), (χ p : ℂ) • c (σ ⟨s p, hQH p p.2⟩ w) = σ' p (c w))
+    (f : indSpace H σ)
+    : coFun s χ c f.1 ∈ indSpace Q σ' := by
   intro p x
   have h1 : f.1 (s p * s x) = σ ⟨s p, hQH p p.2⟩ (f.1 (s x)) := f.2 ⟨s p, hQH p p.2⟩ (s x)
   show ((χ ((p : M) * x) : ℂˣ) : ℂ) • c (f.1 (s ((p : M) * x))) = σ' p (((χ x : ℂˣ) : ℂ) • c (f.1 (s x)))
   rw [map_mul, map_mul, h1, map_smul, ← hcomp, Units.val_mul, mul_comm, mul_smul]
 
-theorem coFun_smooth {H : Subgroup G} {Q : Subgroup M} (s : M →* G) (hs : Continuous s) (hQH : ∀ p ∈ Q, s p ∈ H)
+theorem coFun_smooth
+    {H : Subgroup G} {Q : Subgroup M}
+    (s : M →* G) (hs : Continuous s) (hQH : ∀ p ∈ Q, s p ∈ H)
     (χ : M →* ℂˣ) (hχ : IsOpen (χ.ker : Set M))
     (σ : Representation ℂ H W) (σ' : Representation ℂ Q W') (c : W →ₗ[ℂ] W')
-    (hcomp : ∀ (p : Q) (w : W), (χ p : ℂ) • c (σ ⟨s p, hQH p p.2⟩ w) = σ' p (c w)) (f : smoothPart (ind H σ)) :
-    (⟨coFun s χ c f.1.1, coFun_mem s hQH χ σ σ' c hcomp f.1⟩ : indSpace Q σ') ∈ smoothPart (ind Q σ') := by
+    (hcomp : ∀ (p : Q) (w : W), (χ p : ℂ) • c (σ ⟨s p, hQH p p.2⟩ w) = σ' p (c w))
+    (f : smoothPart (ind H σ))
+    : (⟨coFun s χ c f.1.1, coFun_mem s hQH χ σ σ' c hcomp f.1⟩ : indSpace Q σ')
+      ∈ smoothPart (ind Q σ') := by
   refine mem_smoothPart_of_nhds (Filter.mem_of_superset
     (((IsOpen.preimage hs f.2).inter hχ).mem_nhds ?_) ?_)
   · refine ⟨?_, one_mem _⟩
@@ -50,15 +59,22 @@ end Abstract
 
 section Abstract2
 
-variable {G M W W' : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group M]
-  [TopologicalSpace M] [IsTopologicalGroup M] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
+variable
+  {G M W W' : Type}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group M] [TopologicalSpace M]
+  [IsTopologicalGroup M] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
 
-def coMap {H : Subgroup G} {Q : Subgroup M} (s : M →* G) (hs : Continuous s) (hQH : ∀ p ∈ Q, s p ∈ H)
+def coMap
+    {H : Subgroup G} {Q : Subgroup M}
+    (s : M →* G) (hs : Continuous s) (hQH : ∀ p ∈ Q, s p ∈ H)
     (χ : M →* ℂˣ) (hχ : IsOpen (χ.ker : Set M))
     (σ : Representation ℂ H W) (σ' : Representation ℂ Q W') (c : W →ₗ[ℂ] W')
-    (hcomp : ∀ (p : Q) (w : W), (χ p : ℂ) • c (σ ⟨s p, hQH p p.2⟩ w) = σ' p (c w)) :
-    cIndSpace H σ →ₗ[ℂ] smoothPart (ind Q σ') where
-  toFun f := ⟨⟨coFun s χ c f.1.1.1, coFun_mem s hQH χ σ σ' c hcomp f.1.1⟩, coFun_smooth s hs hQH χ hχ σ σ' c hcomp f.1⟩
+    (hcomp : ∀ (p : Q) (w : W), (χ p : ℂ) • c (σ ⟨s p, hQH p p.2⟩ w) = σ' p (c w))
+    : cIndSpace H σ →ₗ[ℂ] smoothPart (ind Q σ') where
+  toFun f := ⟨
+    ⟨coFun s χ c f.1.1.1, coFun_mem s hQH χ σ σ' c hcomp f.1.1⟩,
+    coFun_smooth s hs hQH χ hχ σ σ' c hcomp f.1
+  ⟩
   map_add' a b := by
     apply Subtype.ext
     apply Subtype.ext
@@ -73,19 +89,29 @@ def coMap {H : Subgroup G} {Q : Subgroup M} (s : M →* G) (hs : Continuous s) (
     show ((χ x : ℂˣ) : ℂ) • c (r • a.1.1.1 (s x)) = r • (((χ x : ℂˣ) : ℂ) • c (a.1.1.1 (s x)))
     rw [map_smul, smul_comm]
 
-theorem coinv_equiv (H U : Subgroup G) (Q : Subgroup M) (s : M →* G) (q : G →* M)
+theorem coinv_equiv
+    (H U : Subgroup G)
+    (Q : Subgroup M)
+    (s : M →* G)
+    (q : G →* M)
     (hH : IsClosed (H : Set G))
-    (hbasis : ∀ O : Set G, O ∈ nhds (1 : G) → ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
+    (hbasis : ∀ O : Set G,
+      O ∈ nhds (1 : G)
+        → ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
     (hs : Continuous s) (hq : Continuous q) (hqs : ∀ x, q (s x) = x) (hker : ∀ g, q g = 1 ↔ g ∈ U)
-    (hUH : U ≤ H) (hHQ : ∀ g ∈ H, q g ∈ Q) (hQH : ∀ p ∈ Q, s p ∈ H)
+    (hUH : U ≤ H) (hHQ : ∀ g ∈ H, q g ∈ Q)
+    (hQH : ∀ p ∈ Q, s p ∈ H)
     (C : Set M) (hC : IsCompact C) (hMC : ∀ x : M, ∃ p ∈ Q, ∃ y ∈ C, x = p * y)
     (χ : M →* ℂˣ) (hχ : IsOpen (χ.ker : Set M))
-    (σ : Representation ℂ H W) (hσ : IsSmooth σ) (σ' : Representation ℂ Q W')
-    (c : W →ₗ[ℂ] W') (hc : Function.Surjective c) (hck : ∀ w, c w = 0 ↔ w ∈ twKer σ (U.subgroupOf H) 1)
+    (σ : Representation ℂ H W) (hσ : IsSmooth σ)
+    (σ' : Representation ℂ Q W') (c : W →ₗ[ℂ] W')
+    (hc : Function.Surjective c) (hck : ∀ w, c w = 0 ↔ w ∈ twKer σ (U.subgroupOf H) 1)
     (hcomp : ∀ (p : Q) (w : W), (χ p : ℂ) • c (σ ⟨s p, hQH p p.2⟩ w) = σ' p (c w))
-    (hK : ∀ f : cIndSpace H σ, (∀ g, f.1.1.1 g ∈ twKer σ (U.subgroupOf H) 1) → f ∈ twKer (cInd H σ) U 1) :
-    ∃ E : (cIndSpace H σ ⧸ twKer (cInd H σ) U 1) ≃ₗ[ℂ] smoothPart (ind Q σ'),
-      ∀ (f : cIndSpace H σ) (x : M), (E (Submodule.Quotient.mk f)).1.1 x = (χ x : ℂ) • c (f.1.1.1 (s x)) := by
+    (hK : ∀ f : cIndSpace H σ,
+      (∀ g, f.1.1.1 g ∈ twKer σ (U.subgroupOf H) 1) → f ∈ twKer (cInd H σ) U 1)
+    : ∃ E : (cIndSpace H σ ⧸ twKer (cInd H σ) U 1) ≃ₗ[ℂ] smoothPart (ind Q σ'),
+      ∀ (f : cIndSpace H σ) (x : M),
+        (E (Submodule.Quotient.mk f)).1.1 x = (χ x : ℂ) • c (f.1.1.1 (s x)) := by
   classical
   haveI hUn : U.Normal := by
     have : U = q.ker := by
@@ -118,8 +144,9 @@ theorem coinv_equiv (H U : Subgroup G) (Q : Subgroup M) (s : M →* G) (q : G �
       congr 1
       group
     show ((χ x : ℂˣ) : ℂ) • c ((cInd H σ (u : G) f - ((1 : U →* ℂˣ) u : ℂ) • f).1.1.1 (s x)) = 0
-    have e2 : (cInd H σ (u : G) f - ((1 : U →* ℂˣ) u : ℂ) • f).1.1.1 (s x)
-        = (cInd H σ (u : G) f).1.1.1 (s x) - f.1.1.1 (s x) := by
+    have e2
+        : (cInd H σ (u : G) f - ((1 : U →* ℂˣ) u : ℂ) • f).1.1.1 (s x)
+          = (cInd H σ (u : G) f).1.1.1 (s x) - f.1.1.1 (s x) := by
       simp
     rw [e2, e, map_sub, hcu _ hn, sub_self, smul_zero]
   have hinj : ∀ f : cIndSpace H σ, Φ f = 0 → f ∈ twKer (cInd H σ) U 1 := by
@@ -187,18 +214,22 @@ theorem coinv_equiv (H U : Subgroup G) (Q : Subgroup M) (s : M →* G) (q : G �
       refine ⟨g * (s y)⁻¹, hmemH _ ?_, s y, ⟨y, hy, rfl⟩, by group⟩
       rw [map_mul, map_inv, hqs, e]
       simpa using hp
-    obtain ⟨F, hF⟩ := GlobalTheory.CompanionTheory.BZMirOnto.cInd_lift H hH hbasis σ σb c hc hcb (fun w _ => by
-      let S : Subgroup H :=
-        { carrier := {h | σ h w = w}
-          one_mem' := by simp
-          mul_mem' := fun {a b} ha hb => by
-            simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
-            rw [hb, ha]
-          inv_mem' := fun {a} ha => by
-            simp only [Set.mem_setOf_eq] at *
-            conv_lhs => rw [← ha]
-            rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
-      exact ⟨S, hσ w, fun t ht _ => ht⟩) ⟨⟨⟨b, hb⟩, hbs⟩, hbc⟩
+    obtain ⟨F, hF⟩ :=
+      GlobalTheory.CompanionTheory.BZMirOnto.cInd_lift H hH hbasis σ σb c hc hcb
+        (fun w _ => by
+          let S : Subgroup H := {
+            carrier := {h | σ h w = w}
+            one_mem' := by simp
+            mul_mem' := fun {a b} ha hb => by
+              simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
+              rw [hb, ha]
+            inv_mem' := fun {a} ha => by
+              simp only [Set.mem_setOf_eq] at *
+              conv_lhs => rw [← ha]
+              rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+          }
+          exact ⟨S, hσ w, fun t ht _ => ht⟩)
+        ⟨⟨⟨b, hb⟩, hbs⟩, hbc⟩
     refine ⟨F, Subtype.ext (Subtype.ext (funext fun x => ?_))⟩
     show ((χ x : ℂˣ) : ℂ) • c (F.1.1.1 (s x)) = φ.1.1 x
     rw [hF]

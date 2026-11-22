@@ -15,10 +15,25 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cokerne
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
-theorem GlobalTheory.BK.Hom.finiteLength_coker_of_generic : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (κ : Type) [Fintype κ] [DecidableEq κ] (P : PhiMod O K l e a ι) (Q : PhiMod O K l e a κ) (F : GlobalTheory.BK.Hom P Q), ((∀ τ, ∃ (Y : Matrix ι κ K⟦X⟧) (g : K⟦X⟧), (∀ i j, Y i j ∈ A O K) ∧ (∃ n, ‖coeff n g‖ = 1) ∧ F.mat τ * Y = g • (1 : Matrix κ κ K⟦X⟧)) → IsFiniteLength (A O K) F.coker) ∧ ((∀ τ, ∃ (Y : Matrix ι κ K⟦X⟧) (g : K⟦X⟧), (∀ i j, Y i j ∈ A O K) ∧ (∃ n, ‖coeff n g‖ = 1) ∧ Y * F.mat τ = g • (1 : Matrix ι ι K⟦X⟧)) → ∀ v ∈ Q.M, ∀ f ∈ A O K, f ≠ 0 → f • v ∈ F.imM → v ∈ F.imM) := by
+theorem GlobalTheory.BK.Hom.finiteLength_coker_of_generic
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+        [TameDescentExponentData K l e a] (κ : Type) [Fintype κ] [DecidableEq κ]
+        (P : PhiMod O K l e a ι) (Q : PhiMod O K l e a κ) (F : GlobalTheory.BK.Hom P Q),
+      ((∀ τ, ∃ (Y : Matrix ι κ K⟦X⟧) (g : K⟦X⟧),
+            (∀ i j, Y i j ∈ A O K) ∧ (∃ n, ‖coeff n g‖ = 1)
+              ∧ F.mat τ * Y = g • (1 : Matrix κ κ K⟦X⟧))
+          → IsFiniteLength (A O K) F.coker)
+        ∧ ((∀ τ, ∃ (Y : Matrix ι κ K⟦X⟧) (g : K⟦X⟧),
+            (∀ i j, Y i j ∈ A O K) ∧ (∃ n, ‖coeff n g‖ = 1)
+              ∧ Y * F.mat τ = g • (1 : Matrix ι ι K⟦X⟧))
+          → ∀ v ∈ Q.M, ∀ f ∈ A O K, f ≠ 0 → f • v ∈ F.imM → v ∈ F.imM) := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ κ _ _ P Q F
   have hl2 : 2 ≤ l := (Fact.out : l.Prime).two_le
   have h1 : (l : K) = algebraMap ℚ_[l] K (l : ℚ_[l]) := (map_natCast _ _).symm
@@ -31,14 +46,23 @@ theorem GlobalTheory.BK.Hom.finiteLength_coker_of_generic : ∀ (O K : Type) [Co
   have he : 0 < e := Nat.pos_of_ne_zero (NeZero.ne e)
   have hone : ∃ c : ℝ, ∀ n, ‖coeff n (1 : K⟦X⟧)‖ ≤ c :=
     ⟨1, fun n => by rw [coeff_one]; split_ifs <;> simp⟩
-  refine ⟨fun hyp => GlobalTheory.T.coker_finite_length_of_primitive_divisor O K l e a ι κ P Q F hyp ?_, fun hyp => GlobalTheory.T.cokernel_torsionFree_of_bounded_leftInverse O K l e a ι κ P Q F hyp ?_⟩
+  refine ⟨
+    fun hyp => GlobalTheory.T.coker_finite_length_of_primitive_divisor O K l e a ι κ P Q F hyp ?_,
+    fun hyp => GlobalTheory.T.cokernel_torsionFree_of_bounded_leftInverse O K l e a ι κ P Q F hyp ?_
+  ⟩
   · rcases isEmpty_or_nonempty κ with hκ | ⟨⟨i0⟩⟩
     · intro τ
       exact ⟨hone, 0, ⟨0, fun _ j => isEmptyElim j⟩, Subsingleton.elim _ _⟩
-    · obtain ⟨M₁, h₁⟩ := GlobalTheory.T.exists_E_pow_mul_frob_mem_rightDivisorSet O K l e a ι κ P Q F
-      obtain ⟨M₂, h₂⟩ := GlobalTheory.T.exists_frobeniusSlice_mem_rightDivisorSet O K l e a ι κ P Q F
-      refine GlobalTheory.T.one_mem_of_frobenius_linked_boundedSeries_ideals K l e a M₁ M₂ he hl0 hlK F.rdivSet (fun τ x hx y hy => Hom.rdivSet_add F τ hx hy)
-        (fun τ x hx b hb => Hom.rdivSet_mul F τ hx b hb) (fun τ x hx => hx.1) ?_ h₁ h₂
+    · obtain ⟨M₁, h₁⟩ :=
+        GlobalTheory.T.exists_E_pow_mul_frob_mem_rightDivisorSet O K l e a ι κ P Q F
+      obtain ⟨M₂, h₂⟩ :=
+        GlobalTheory.T.exists_frobeniusSlice_mem_rightDivisorSet O K l e a ι κ P Q F
+      refine GlobalTheory.T.one_mem_of_frobenius_linked_boundedSeries_ideals K l e a M₁ M₂ he hl0
+        hlK F.rdivSet
+        (fun τ x hx y hy => Hom.rdivSet_add F τ hx hy)
+        (fun τ x hx b hb => Hom.rdivSet_mul F τ hx b hb)
+        (fun τ x hx => hx.1)
+        ?_ h₁ h₂
       intro τ
       obtain ⟨Y, g, hY, hg, hFY⟩ := hyp τ
       have hgA : g ∈ A O K := by
@@ -50,9 +74,14 @@ theorem GlobalTheory.BK.Hom.finiteLength_coker_of_generic : ∀ (O K : Type) [Co
     · intro τ
       exact ⟨hone, 0, ⟨0, fun i _ => isEmptyElim i⟩, Subsingleton.elim _ _⟩
     · obtain ⟨M₁, h₁⟩ := GlobalTheory.T.frob_mem_leftDivisorSet_phiModuleHom O K l e a ι κ P Q F
-      obtain ⟨M₂, h₂⟩ := GlobalTheory.T.frobeniusResidueSlice_mem_boundedLeftDivisorSet O K l e a ι κ P Q F
-      refine GlobalTheory.T.one_mem_of_frobenius_linked_boundedSeries_ideals K l e a M₁ M₂ he hl0 hlK F.ldivSet (fun τ x hx y hy => Hom.ldivSet_add F τ hx hy)
-        (fun τ x hx b hb => Hom.ldivSet_mul F τ hx b hb) (fun τ x hx => hx.1) ?_ h₁ h₂
+      obtain ⟨M₂, h₂⟩ :=
+        GlobalTheory.T.frobeniusResidueSlice_mem_boundedLeftDivisorSet O K l e a ι κ P Q F
+      refine GlobalTheory.T.one_mem_of_frobenius_linked_boundedSeries_ideals K l e a M₁ M₂ he hl0
+        hlK F.ldivSet
+        (fun τ x hx y hy => Hom.ldivSet_add F τ hx hy)
+        (fun τ x hx b hb => Hom.ldivSet_mul F τ hx b hb)
+        (fun τ x hx => hx.1)
+        ?_ h₁ h₂
       intro τ
       obtain ⟨Y, g, hY, hg, hFY⟩ := hyp τ
       have hgA : g ∈ A O K := by

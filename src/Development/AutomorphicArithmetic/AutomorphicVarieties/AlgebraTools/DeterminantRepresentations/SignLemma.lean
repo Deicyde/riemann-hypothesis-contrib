@@ -6,10 +6,12 @@ public import Mathlib
 
 open Polynomial Matrix
 
-theorem UpperTheory.V.AlgebraTools.Det.signLemma :
-    ∀ {K G ι : Type} [Field K] [Group G] [Fintype ι] [DecidableEq ι] (ρ : G →* Matrix ι ι K) (σ : G →* G) (μ : G → K)
-    (B : Matrix ι ι K), Submodule.span K (Set.range ρ) = ⊤ → (∀ s, σ (σ s) = s) → (∀ s, μ (σ s) = μ s) → IsUnit B →
-    (∀ s, (ρ s)ᵀ * B * ρ (σ s) = μ s • B) → Bᵀ = B ∨ Bᵀ = -B := by
+theorem UpperTheory.V.AlgebraTools.Det.signLemma
+    : ∀ {K G ι : Type} [Field K] [Group G] [Fintype ι] [DecidableEq ι] (ρ : G →* Matrix ι ι K)
+        (σ : G →* G) (μ : G → K) (B : Matrix ι ι K),
+      Submodule.span K (Set.range ρ) = ⊤ → (∀ s, σ (σ s) = s) → (∀ s, μ (σ s) = μ s) → IsUnit B
+        → (∀ s, (ρ s)ᵀ * B * ρ (σ s) = μ s • B)
+        → Bᵀ = B ∨ Bᵀ = -B := by
   intro K G ι _ _ _ _ ρ σ μ B hspan hσ hμ hB hlaw
   have hlaw' : ∀ s, (ρ s)ᵀ * Bᵀ * ρ (σ s) = μ s • Bᵀ := by
     intro s
@@ -19,7 +21,10 @@ theorem UpperTheory.V.AlgebraTools.Det.signLemma :
     exact h
   obtain ⟨C, hC⟩ : ∃ C : Matrix ι ι K, Bᵀ = B * C := by
     obtain ⟨u, rfl⟩ := hB
-    exact ⟨((u⁻¹ : (Matrix ι ι K)ˣ) : Matrix ι ι K) * (↑u : Matrix ι ι K)ᵀ, by rw [← Matrix.mul_assoc, Units.mul_inv, Matrix.one_mul]⟩
+    exact ⟨
+      ((u⁻¹ : (Matrix ι ι K)ˣ) : Matrix ι ι K) * (↑u : Matrix ι ι K)ᵀ,
+      by rw [← Matrix.mul_assoc, Units.mul_inv, Matrix.one_mul]
+    ⟩
   have hcomm : ∀ t, C * ρ t = ρ t * C := by
     intro t
     have h1 := hlaw (σ t)
@@ -59,4 +64,5 @@ theorem UpperTheory.V.AlgebraTools.Det.signLemma :
       rcases smul_eq_zero.mp h3 with h | h
       · exact absurd (sub_eq_zero.mp h).symm hcc
       · exact h
-    left; rw [h0, transpose_zero]
+    left
+    rw [h0, transpose_zero]

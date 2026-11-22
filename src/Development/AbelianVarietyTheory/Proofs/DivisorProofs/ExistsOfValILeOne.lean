@@ -10,9 +10,9 @@ namespace GlobalTheory.ValIwasawa
 
 open Matrix
 
-variable {V F : Type} [CommRing V] [IsDomain V] [ValuationRing V] [Field F] [Algebra V F]
-  [IsFractionRing V F]
-
+variable
+  {V F : Type}
+  [CommRing V] [IsDomain V] [ValuationRing V] [Field F] [Algebra V F] [IsFractionRing V F]
 
 variable (V) in
 abbrev valI : Valuation F (ValuationRing.ValueGroup V F) := ValuationRing.valuation V F
@@ -20,10 +20,11 @@ abbrev valI : Valuation F (ValuationRing.ValueGroup V F) := ValuationRing.valuat
 theorem exists_of_valI_le_one {x : F} (h : valI (V := V) x ≤ 1) : ∃ a : V, algebraMap V F a = x :=
   (ValuationRing.mem_integer_iff V F x).1 h
 
-theorem exists_clear_col {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (hA : A.det ≠ 0) :
-    ∃ Q : Matrix (Fin (n + 1)) (Fin (n + 1)) V, IsUnit Q.det ∧
-      ∀ i : Fin n, (Q.map (algebraMap V F) * A) i.succ 0 = 0 := by
-  obtain ⟨p, -, hp⟩ := Finset.exists_max_image Finset.univ (fun r => valI (V := V) (A r 0)) Finset.univ_nonempty
+theorem exists_clear_col {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (hA : A.det ≠ 0)
+    : ∃ Q : Matrix (Fin (n + 1)) (Fin (n + 1)) V,
+      IsUnit Q.det ∧ ∀ i : Fin n, (Q.map (algebraMap V F) * A) i.succ 0 = 0 := by
+  obtain ⟨p, -, hp⟩ :=
+    Finset.exists_max_image Finset.univ (fun r => valI (V := V) (A r 0)) Finset.univ_nonempty
   have hcol : ∃ r, A r 0 ≠ 0 := by
     by_contra h
     push Not at h
@@ -44,8 +45,14 @@ theorem exists_clear_col {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (h
     rw [div_le_one₀ (zero_lt_iff.2 hpos)]
     exact hp _ (Finset.mem_univ _)
   choose c hc using hc
-  let E : Matrix (Fin (n + 1)) (Fin (n + 1)) V := Matrix.of fun i j =>
-    if i = j then 1 else if j = 0 then -c i else 0
+  let E : Matrix (Fin (n + 1)) (Fin (n + 1)) V :=
+    Matrix.of fun i j =>
+      if i = j then
+        1
+      else if j = 0 then
+        - c i
+      else
+        0
   refine ⟨E * P, ?_, ?_⟩
   · rw [Matrix.det_mul]
     refine IsUnit.mul ?_ ?_
@@ -56,7 +63,8 @@ theorem exists_clear_col {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (h
           have hij' : i < j := hij
           have hj : j ≠ 0 := fun h => by subst h; exact Fin.not_lt_zero _ hij'
           simp only [E, Matrix.of_apply, if_neg (ne_of_lt hij'), if_neg hj]
-      rw [hE]; exact isUnit_one
+      rw [hE]
+      exact isUnit_one
     · simp only [P, Matrix.det_permutation]
       rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h <;> simp [h]
   · intro i
@@ -79,9 +87,12 @@ theorem exists_clear_col {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (h
       simp
     · intro h; exact absurd (Finset.mem_univ i) h
 
-theorem iwasawa_matrix : ∀ {n : ℕ} (A : Matrix (Fin n) (Fin n) F), A.det ≠ 0 →
-    ∃ (k : Matrix (Fin n) (Fin n) V) (U : Matrix (Fin n) (Fin n) F), IsUnit k.det ∧ U.BlockTriangular id ∧
-      (∀ i, U i i ≠ 0) ∧ A = k.map (algebraMap V F) * U := by
+theorem iwasawa_matrix
+    : ∀ {n : ℕ} (A : Matrix (Fin n) (Fin n) F),
+      A.det ≠ 0
+        → ∃ (k : Matrix (Fin n) (Fin n) V) (U : Matrix (Fin n) (Fin n) F),
+          IsUnit k.det ∧ U.BlockTriangular id ∧ (∀ i, U i i ≠ 0)
+            ∧ A = k.map (algebraMap V F) * U := by
   intro n
   induction n with
   | zero =>
@@ -94,18 +105,18 @@ theorem iwasawa_matrix : ∀ {n : ℕ} (A : Matrix (Fin n) (Fin n) F), A.det ≠
     have hdetB : B.det = B 0 0 * (B.submatrix Fin.succ Fin.succ).det := by
       rw [Matrix.det_succ_column_zero, Fin.sum_univ_succ]
       simp [hQA, B]
-    have hQF : (Q.map (algebraMap V F)).det = algebraMap V F Q.det := by
-      rw [RingHom.map_det]; rfl
+    have hQF : (Q.map (algebraMap V F)).det = algebraMap V F Q.det := by rw [RingHom.map_det]; rfl
     have hBne : B.det ≠ 0 := by
       rw [hB, Matrix.det_mul, hQF]
       exact mul_ne_zero (hQ.map (algebraMap V F)).ne_zero hA
     have hB00 : B 0 0 ≠ 0 := by intro h; apply hBne; rw [hdetB, h, zero_mul]
-    obtain ⟨k', U', hk', hU', hd', hA'⟩ := ih (B.submatrix Fin.succ Fin.succ) (by
-      intro h; apply hBne; rw [hdetB, h, mul_zero])
-    let K : Matrix (Fin (n + 1)) (Fin (n + 1)) V := Matrix.of fun i j =>
-      Fin.cases (Fin.cases 1 (fun _ => 0) j) (fun i' => Fin.cases 0 (fun j' => k' i' j') j) i
-    let U : Matrix (Fin (n + 1)) (Fin (n + 1)) F := Matrix.of fun i j =>
-      Fin.cases (B 0 j) (fun i' => Fin.cases 0 (fun j' => U' i' j') j) i
+    obtain ⟨k', U', hk', hU', hd', hA'⟩ :=
+      ih (B.submatrix Fin.succ Fin.succ) (by intro h; apply hBne; rw [hdetB, h, mul_zero])
+    let K : Matrix (Fin (n + 1)) (Fin (n + 1)) V :=
+      Matrix.of fun i j =>
+        Fin.cases (Fin.cases 1 (fun _ => 0) j) (fun i' => Fin.cases 0 (fun j' => k' i' j') j) i
+    let U : Matrix (Fin (n + 1)) (Fin (n + 1)) F :=
+      Matrix.of fun i j => Fin.cases (B 0 j) (fun i' => Fin.cases 0 (fun j' => U' i' j') j) i
     have hKU : K.map (algebraMap V F) * U = B := by
       ext i j
       refine Fin.cases ?_ (fun i' => ?_) i
@@ -139,16 +150,20 @@ theorem iwasawa_matrix : ∀ {n : ℕ} (A : Matrix (Fin n) (Fin n) F), A.det ≠
     · rw [Matrix.map_mul, Matrix.mul_assoc, hKU, hB, ← Matrix.mul_assoc, ← Matrix.map_mul,
         Matrix.nonsing_inv_mul Q hQ, Matrix.map_one _ (map_zero _) (map_one _), Matrix.one_mul]
 
-theorem iwasawa : ∀ (V K : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K]
-    [IsFractionRing V K] (N : ℕ) (g : GL (Fin N) K), ∃ (k : GL (Fin N) V) (b : GL (Fin N) K),
-    b.1.BlockTriangular id ∧ g = GeneralLinearGroup.map (algebraMap V K) k * b := by
+theorem iwasawa
+    : ∀ (V K : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K]
+        [IsFractionRing V K] (N : ℕ) (g : GL (Fin N) K),
+      ∃ (k : GL (Fin N) V) (b : GL (Fin N) K),
+        b.1.BlockTriangular id ∧ g = GeneralLinearGroup.map (algebraMap V K) k * b := by
   intro V K _ _ _ _ _ _ N g
-  obtain ⟨k, U, hk, hU, -, hg⟩ := iwasawa_matrix (V := V) g.1 (Matrix.GeneralLinearGroup.det_ne_zero g)
+  obtain ⟨k, U, hk, hU, -, hg⟩ :=
+    iwasawa_matrix (V := V) g.1 (Matrix.GeneralLinearGroup.det_ne_zero g)
   obtain ⟨u, rfl⟩ := (Matrix.isUnit_iff_isUnit_det k).2 hk
   refine ⟨u, (GeneralLinearGroup.map (n := Fin N) (algebraMap V K) u)⁻¹ * g, ?_, by simp⟩
   have : ((GeneralLinearGroup.map (n := Fin N) (algebraMap V K) u)⁻¹ * g).1 = U := by
     have h1 : g.1 = (GeneralLinearGroup.map (n := Fin N) (algebraMap V K) u).1 * U := hg
-    rw [Units.val_mul, h1, ← Matrix.mul_assoc, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mul]
+    rw [Units.val_mul, h1, ← Matrix.mul_assoc, ← Units.val_mul, inv_mul_cancel, Units.val_one,
+      Matrix.one_mul]
   rw [this]
   exact hU
 

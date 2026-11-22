@@ -46,8 +46,8 @@ private lemma multiHomog_weighted_lemma_2 [DecidableEq K] {f : MRingOver ℂ ι}
   intro d hd
   exact weight_blkW_lemma d a (ha d (MvPolynomial.mem_support_iff.mpr hd))
 
-theorem ideal_homog [DecidableEq K] {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q) :
-    Q.IsHomogeneous (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) := by
+theorem ideal_homog [DecidableEq K] {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
+    : Q.IsHomogeneous (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) := by
   obtain ⟨S, hS, rfl⟩ := hQ
   apply Ideal.homogeneous_span
   intro f hf
@@ -176,16 +176,20 @@ private lemma exists_segre_poly_lemma_6 [DecidableEq K] [∀ k, DecidableEq (ι 
     refine Finset.sum_congr rfl (fun m hm => ?_)
     rw [(hμ m hm).2 z]
 
-theorem segre_rel [DecidableEq K] [∀ k, DecidableEq (ι k)] {Q : Ideal (MRingOver ℂ ι)}
-    (hQ : IsMultiHomogIdeal Q)
+theorem segre_rel
+    [DecidableEq K] [∀ k, DecidableEq (ι k)]
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
     (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : IsSetGoodProj (conePts Q) Ψ)
-    (i : (k : K) → ι k) :
-    ∃ r : ℕ, 0 < r ∧ ∃ G : Fin (e + 1) → MvPolynomial ((k : K) → ι k) ℂ,
-      (∀ j, (G j).totalDegree ≤ r - 1) ∧
-      ∀ z ∈ conePts Q, segre z i ^ r = ∑ j, Ψ (segre z) j * eval (segre z) (G j) := by
+    (i : (k : K) → ι k)
+    : ∃ r : ℕ,
+      0 < r
+        ∧ ∃ G : Fin (e + 1) → MvPolynomial ((k : K) → ι k) ℂ,
+          (∀ j, (G j).totalDegree ≤ r - 1)
+            ∧ ∀ z ∈ conePts Q, segre z i ^ r = ∑ j, Ψ (segre z) j * eval (segre z) (G j) := by
   have hQh := ideal_homog hQ
-  have hvan : segMono ι i ∈ MvPolynomial.vanishingIdeal ℂ
-      (MvPolynomial.zeroLocus ℂ (Q ⊔ Ideal.span (Set.range (psiPoly Ψ)))) := by
+  have hvan
+      : segMono ι i ∈ MvPolynomial.vanishingIdeal ℂ
+        (MvPolynomial.zeroLocus ℂ (Q ⊔ Ideal.span (Set.range (psiPoly Ψ)))) := by
     rw [MvPolynomial.mem_vanishingIdeal_iff]
     intro x hx
     rw [MvPolynomial.mem_zeroLocus_iff] at hx
@@ -214,7 +218,9 @@ theorem segre_rel [DecidableEq K] [∀ k, DecidableEq (ι k)] {Q : Ideal (MRingO
   obtain ⟨q, hq, t, ht, hqt⟩ := Submodule.mem_sup.1 hn1
   obtain ⟨a, rfl⟩ := Ideal.mem_span_range_iff_exists_fun.1 ht
   have hle1 : (fun _ : K => (1 : ℕ)) ≤ fun _ => n + 1 := Pi.le_def.2 (fun k => by simp)
-  have hsN : segMono ι i ^ (n + 1) ∈ weightedHomogeneousSubmodule ℂ (blkW (ι := ι)) (fun _ => n + 1) := by
+  have hsN
+      : segMono ι i ^ (n + 1)
+        ∈ weightedHomogeneousSubmodule ℂ (blkW (ι := ι)) (fun _ => n + 1) := by
     rw [mem_weightedHomogeneousSubmodule]
     have h := (segMono_homog (ι := ι) i).pow (n + 1)
     have e1 : ((n + 1) • fun _ : K => (1 : ℕ)) = fun _ => n + 1 := by
@@ -224,27 +230,37 @@ theorem segre_rel [DecidableEq K] [∀ k, DecidableEq (ι k)] {Q : Ideal (MRingO
   have eN : ((fun _ : K => n + 1) - fun _ => 1) = fun _ : K => n := by
     funext k
     simp
-  have key : GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1) q +
-      ∑ j, GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n) (a j) *
-        psiPoly Ψ j = segMono ι i ^ (n + 1) := by
-    have h := congrArg
-      (GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)) hqt
+  have key
+      : GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1) q
+          + ∑ j, GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n) (a j) *
+              psiPoly Ψ j
+        = segMono ι i ^ (n + 1) := by
+    have h :=
+      congrArg
+        (GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)) hqt
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sum, GradedAlgebra.proj_apply (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)
-        (segMono ι i ^ (n + 1)),
-      DirectSum.decompose_of_mem_same _ hsN] at h
+      rw [map_add (f := _), map_sum,
+          GradedAlgebra.proj_apply (weightedHomogeneousSubmodule ℂ (blkW (ι := ι)))
+            (fun _ => n + 1)
+            (segMono ι i ^ (n + 1)),
+          DirectSum.decompose_of_mem_same _ hsN]
+        at h
     rw [← h]
     congr 1
     refine Finset.sum_congr rfl (fun j _ => ?_)
     rw [GradedAlgebra.proj_apply, GradedAlgebra.proj_apply,
       DirectSum.coe_decompose_mul_of_right_mem_of_le _ (psi_mem_lemma_4 Ψ j) hle1, eN]
-  have hb : ∀ j, GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n) (a j) ∈
-      weightedHomogeneousSubmodule ℂ (blkW (ι := ι)) (fun _ => n) := by
+  have hb
+      : ∀ j,
+        GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n) (a j)
+          ∈ weightedHomogeneousSubmodule ℂ (blkW (ι := ι)) (fun _ => n) := by
     intro j
     rw [GradedAlgebra.proj_apply]
     exact SetLike.coe_mem _
   choose G hGdeg hGev using fun j => exists_segre_poly_lemma_6 n _ (hb j)
-  have hqQ : GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1) q ∈ Q := by
+  have hqQ
+      : GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1) q
+        ∈ Q := by
     rw [GradedAlgebra.proj_apply]
     exact hQh _ hq
   refine ⟨n + 1, Nat.succ_pos n, G, fun j => by simpa using hGdeg j, fun z hz => ?_⟩
@@ -361,13 +377,17 @@ private lemma finite_zeros_lemma_9 {V : Type} [Fintype V] [DecidableEq V] (r : V
   rw [h3, Polynomial.coe_aeval_eq_eval] at h2
   exact h2
 
-theorem setFibre_finite_of_multiHomog {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
+theorem setFibre_finite_of_multiHomog
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
     (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : IsSetGoodProj (conePts Q) Ψ)
-    (y : Fin e → ℂ) : (setFibre (conePts Q) Ψ y).Finite := by
+    (y : Fin e → ℂ)
+    : (setFibre (conePts Q) Ψ y).Finite := by
   classical
   choose r hr G hGdeg hGrel using fun i => segre_rel hQ Ψ hΨ i
-  have hsub : setFibre (conePts Q) Ψ y ⊆ {w | ∀ v, eval w (X v ^ r v -
-      ∑ j, C ((Fin.cons 1 y : Fin (e + 1) → ℂ) j) * G v j) = 0} := by
+  have hsub
+      : setFibre (conePts Q) Ψ y
+        ⊆ {w | ∀ v, eval w (X v ^ r v -
+          ∑ j, C ((Fin.cons 1 y : Fin (e + 1) → ℂ) j) * G v j) = 0} := by
     rintro w ⟨z, hz, rfl, hw⟩
     intro v
     set_option synthInstance.maxHeartbeats 100000 in
@@ -383,9 +403,9 @@ theorem setFibre_finite_of_multiHomog {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMul
   have h3 := hr v
   omega
 
-theorem setFibre_finite :
-    ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
-      (Q : Ideal (MRingOver ℂ ι)) (e : ℕ) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)),
+theorem setFibre_finite
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Q : Ideal (MRingOver ℂ ι))
+        (e : ℕ) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)),
       IsCxVar Q e → IsSetGoodProj (conePts Q) Ψ → ∀ y, (setFibre (conePts Q) Ψ y).Finite := by
   intro K _ ι _ Q e Ψ hV hΨ y
   exact setFibre_finite_of_multiHomog hV.2.1.2.1 Ψ hΨ y

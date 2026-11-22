@@ -5,11 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-theorem UpperTheory.V.Two.layerFn :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (n : ℕ), (∃ ζ : F, IsPrimitiveRoot ζ l) → ∃ m, m ≤ n ∧ IsLayer l m F (Fn F Ω l n) := by
+theorem UpperTheory.V.Two.layerFn
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (n : ℕ),
+      (∃ ζ : F, IsPrimitiveRoot ζ l) → ∃ m, m ≤ n ∧ IsLayer l m F (Fn F Ω l n) := by
   intro F Ω _ _ _ _ _ l _ n hz
   obtain ⟨ζ0, hζ0⟩ := hz
   have hp : l.Prime := Fact.out
@@ -18,12 +22,15 @@ theorem UpperTheory.V.Two.layerFn :
   have hl : l ^ n ≠ 0 := pow_ne_zero _ hp.ne_zero
   haveI : NeZero ((l ^ n : ℕ) : Ω) := ⟨by exact_mod_cast hl⟩
   haveI : NeZero (l ^ n) := ⟨hl⟩
-  have key : Fn F Ω l n = IntermediateField.adjoin F {b : Ω | ∃ k ∈ ({l ^ n} : Set ℕ), k ≠ 0 ∧ b ^ k = 1} := by
+  have key
+      : Fn F Ω l n
+        = IntermediateField.adjoin F {b : Ω | ∃ k ∈ ({l ^ n} : Set ℕ), k ≠ 0 ∧ b ^ k = 1} := by
     unfold Fn
     congr 1
     ext x
     simp only [Polynomial.mem_rootSet, Set.mem_singleton_iff, Set.mem_setOf_eq, exists_eq_left]
-    simp only [map_sub, map_pow, Polynomial.aeval_X, map_one, sub_eq_zero, ne_eq, hl, not_false_eq_true, true_and]
+    simp only [map_sub, map_pow, Polynomial.aeval_X, map_one, sub_eq_zero, ne_eq, hl,
+      not_false_eq_true, true_and]
     constructor
     · exact fun h => h.2
     · intro h
@@ -38,7 +45,8 @@ theorem UpperTheory.V.Two.layerFn :
     exact HasEnoughRootsOfUnity.exists_primitiveRoot Ω (l ^ n)
   haveI : FiniteDimensional F (Fn F Ω l n) := IsCyclotomicExtension.finiteDimensional {l ^ n} F _
   haveI : IsGalois F (Fn F Ω l n) := IsCyclotomicExtension.isGalois {l ^ n} F _
-  obtain ⟨μ, hμ⟩ := IsCyclotomicExtension.exists_isPrimitiveRoot F (Fn F Ω l n) (Set.mem_singleton (l ^ n)) hl
+  obtain ⟨μ, hμ⟩ :=
+    IsCyclotomicExtension.exists_isPrimitiveRoot F (Fn F Ω l n) (Set.mem_singleton (l ^ n)) hl
   set f := hμ.autToPow F with hf
   have hinj : Function.Injective f := hμ.autToPow_injective F
   have hcardG : Nat.card Gal((Fn F Ω l n)/F) = Nat.card f.range :=
@@ -63,8 +71,7 @@ theorem UpperTheory.V.Two.layerFn :
         rw [hlk] at hω
         haveI : NeZero l := ⟨hp.ne_zero⟩
         obtain ⟨i, -, hi⟩ := h0.eq_pow_of_pow_eq_one hω.pow_eq_one
-        have hfix : σ (μ ^ l ^ k) = μ ^ l ^ k := by
-          rw [← hi, map_pow, AlgEquiv.commutes]
+        have hfix : σ (μ ^ l ^ k) = μ ^ l ^ k := by rw [← hi, map_pow, AlgEquiv.commutes]
         rw [map_pow, ← IsPrimitiveRoot.autToPow_spec F hμ σ, ← pow_mul, mul_comm, pow_mul] at hfix
         rw [← hf] at hfix
         generalize f σ = u at hfix ⊢
@@ -95,11 +102,14 @@ theorem UpperTheory.V.Two.layerFn :
       have hker : Nat.card g.ker = l ^ k := by
         have h1 := Subgroup.card_mul_index g.ker
         rw [hidx, Nat.card_eq_fintype_card (α := (ZMod (l ^ (k + 1)))ˣ), ZMod.card_units_eq_totient,
-          Nat.totient_prime_pow hp (Nat.succ_pos k)] at h1
+            Nat.totient_prime_pow hp (Nat.succ_pos k)]
+          at h1
         try simp only [Nat.add_sub_cancel] at h1
         exact Nat.eq_of_mul_eq_mul_right (Nat.sub_pos_of_lt hp.one_lt) h1
       rw [hcardG]
-      calc Nat.card f.range ∣ Nat.card g.ker := Subgroup.card_dvd_of_le hle
+      calc
+        Nat.card f.range
+          ∣ Nat.card g.ker := Subgroup.card_dvd_of_le hle
         _ = l ^ k := hker
         _ ∣ l ^ (k + 1) := pow_dvd_pow l (Nat.le_succ k)
   obtain ⟨m, hm, hmeq⟩ := (Nat.dvd_prime_pow hp).mp hdvd

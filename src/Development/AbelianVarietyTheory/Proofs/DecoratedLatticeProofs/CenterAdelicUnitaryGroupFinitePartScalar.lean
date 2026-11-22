@@ -10,12 +10,17 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 @[expose] public section
 
 open scoped InnerProductSpace TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField IsDedekindDomain
-open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict Formalism.L2.SG.PoincareInHH.PoincareSetting
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS GlobalTheory.Core.Mi
+open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict
+  Formalism.L2.SG.PoincareInHH.PoincareSetting
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS
+  GlobalTheory.Core.Mi
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.MiTop GlobalTheory.SeeSaw GlobalTheory.Fam ValuativeRel IsLocalRing GlobalTheory.FinPl
+open GlobalTheory.MiTop GlobalTheory.SeeSaw GlobalTheory.Fam ValuativeRel IsLocalRing
+  GlobalTheory.FinPl
 
 namespace GlobalTheory.CentreScalar
 
@@ -41,16 +46,22 @@ theorem cT_natCast' (σ : E →+* E) (N : ℕ) : cT σ (N : Matrix n n E) = N :=
   · subst h; simp
   · simp [h, Ne.symm h]
 
-theorem map_natCast' {R : Type} [CommRing R] (ψ : E →+* R) (N : ℕ) : (N : Matrix n n E).map ψ = N := by
+theorem map_natCast' {R : Type} [CommRing R] (ψ : E →+* R) (N : ℕ)
+    : (N : Matrix n n E).map ψ = N := by
   ext i j
   simp only [map_apply, Matrix.natCast_apply]
   by_cases h : i = j
   · subst h; simp
   · simp [h]
 
-theorem commute_of_skew {R : Type} [CommRing R] (ψ : E →+* R) (σ : E →+* E) (J : Matrix n n E) (hJ : J.det ≠ 0)
+theorem commute_of_skew
+    {R : Type} [CommRing R]
+    (ψ : E →+* R)
+    (σ : E →+* E)
+    (J : Matrix n n E) (hJ : J.det ≠ 0)
     (Z : Matrix n n R) (hZ : ∀ g ∈ UJ σ J, Commute Z ((g : Matrix n n E).map ψ))
-    (A : Matrix n n E) (hA : cT σ A * J + J * A = 0) : Commute Z (A.map ψ) := by
+    (A : Matrix n n E) (hA : cT σ A * J + J * A = 0)
+    : Commute Z (A.map ψ) := by
   obtain ⟨k, hk⟩ : ∃ k : ℕ, (A.charpoly).eval (((k + 1 : ℕ) : E)) ≠ 0 := by
     by_contra h
     push_neg at h
@@ -76,10 +87,11 @@ theorem commute_of_skew {R : Type} [CommRing R] (ψ : E →+* R) (σ : E →+* E
   have hcA : cT σ A * J = -(J * A) := eq_neg_of_add_eq_zero_left hA
   have key : cT σ P * J * P = cT σ B * J * B := by
     rw [hPdef, hBdef, cT_add', cT_sub', hcs]
-    have e1 : (s + cT σ A) * J * (s + A) - (s - cT σ A) * J * (s - A)
-        = (2 : ℕ) • (s * J * A + cT σ A * J * s) := by noncomm_ring
-    have e2 : cT σ A * J * s = s * (cT σ A * J) := by
-      rw [← (Nat.cast_commute N (cT σ A * J)).eq]
+    have e1
+        : (s + cT σ A) * J * (s + A) - (s - cT σ A) * J * (s - A)
+          = (2 : ℕ) • (s * J * A + cT σ A * J * s) := by
+      noncomm_ring
+    have e2 : cT σ A * J * s = s * (cT σ A * J) := by rw [← (Nat.cast_commute N (cT σ A * J)).eq]
     have e3 : s * J * A + cT σ A * J * s = 0 := by
       rw [e2, hcA, Matrix.mul_assoc, ← Matrix.mul_add, add_neg_cancel, Matrix.mul_zero]
     rw [e3, smul_zero] at e1
@@ -87,8 +99,9 @@ theorem commute_of_skew {R : Type} [CommRing R] (ψ : E →+* R) (σ : E →+* E
   set g : Matrix n n E := P * B⁻¹ with hgdef
   have hg : cT σ g * J * g = J := by
     rw [hgdef, cT_mul]
-    calc cT σ B⁻¹ * cT σ P * J * (P * B⁻¹) = cT σ B⁻¹ * (cT σ P * J * P) * B⁻¹ := by
-          simp only [Matrix.mul_assoc]
+    calc
+      cT σ B⁻¹ * cT σ P * J * (P * B⁻¹)
+        = cT σ B⁻¹ * (cT σ P * J * P) * B⁻¹ := by simp only [Matrix.mul_assoc]
       _ = cT σ B⁻¹ * (cT σ B * J * B) * B⁻¹ := by rw [key]
       _ = (cT σ B⁻¹ * cT σ B) * J * (B * B⁻¹) := by simp only [Matrix.mul_assoc]
       _ = J := by rw [← cT_mul, hBBi, cT_one, Matrix.one_mul, Matrix.mul_one]
@@ -109,8 +122,8 @@ theorem commute_of_skew {R : Type} [CommRing R] (ψ : E →+* R) (σ : E →+* E
     simp only [sub_mul, mul_sub, add_mul, mul_add, hsA]
     abel
   have hB1g : B * (1 + g) = ((2 * N : ℕ) : Matrix n n E) := by
-    rw [Matrix.mul_add, Matrix.mul_one, hgdef, ← Matrix.mul_assoc, hBP, Matrix.mul_assoc, hBBi, Matrix.mul_one,
-      hBdef, hPdef, hs]
+    rw [Matrix.mul_add, Matrix.mul_one, hgdef, ← Matrix.mul_assoc, hBP, Matrix.mul_assoc, hBBi,
+      Matrix.mul_one, hBdef, hPdef, hs]
     push_cast
     rw [two_mul]
     abel
@@ -131,20 +144,23 @@ theorem commute_of_skew {R : Type} [CommRing R] (ψ : E →+* R) (σ : E →+* E
     rw [← hgBR, Matrix.mul_sub, ← Matrix.mul_assoc, hZg.eq, Matrix.mul_assoc, Matrix.mul_assoc]
   rw [h1, h2] at h3
   have h4 : (1 + g.map ψ) * X = 0 := by
-    calc (1 + g.map ψ) * X = X + g.map ψ * X := by rw [Matrix.add_mul, Matrix.one_mul]
+    calc
+      (1 + g.map ψ) * X
+        = X + g.map ψ * X := by rw [Matrix.add_mul, Matrix.one_mul]
       _ = 0 := by nth_rewrite 1 [h3]; rw [Matrix.mul_neg, neg_add_cancel]
   have h5 : ((2 * N : ℕ) : Matrix n n R) * X = 0 := by
     have : ((B * (1 + g)).map ψ) * X = 0 := by
-      rw [Matrix.map_mul, Matrix.map_add _ (map_add ψ), Matrix.map_one _ (map_zero ψ) (map_one ψ), Matrix.mul_assoc, h4,
-        Matrix.mul_zero]
+      rw [Matrix.map_mul, Matrix.map_add _ (map_add ψ), Matrix.map_one _ (map_zero ψ) (map_one ψ),
+        Matrix.mul_assoc, h4, Matrix.mul_zero]
     rwa [hB1g, map_natCast'] at this
   have hN0 : ((2 * N : ℕ) : E) ≠ 0 := Nat.cast_ne_zero.2 (by omega)
   have hinv : ψ (((2 * N : ℕ) : E)⁻¹) * ((2 * N : ℕ) : R) = 1 := by
     rw [← map_natCast ψ, ← map_mul, inv_mul_cancel₀ hN0, map_one]
   have hX0 : X = 0 := by
-    calc X = (ψ (((2 * N : ℕ) : E)⁻¹) * ((2 * N : ℕ) : R)) • X := by rw [hinv, one_smul]
+    calc
+      X = (ψ (((2 * N : ℕ) : E)⁻¹) * ((2 * N : ℕ) : R)) • X := by rw [hinv, one_smul]
       _ = ψ (((2 * N : ℕ) : E)⁻¹) • (((2 * N : ℕ) : Matrix n n R) * X) := by
-          rw [mul_smul, ← nsmul_eq_mul, Nat.cast_smul_eq_nsmul]
+        rw [mul_smul, ← nsmul_eq_mul, Nat.cast_smul_eq_nsmul]
       _ = 0 := by rw [h5, smul_zero]
   exact sub_eq_zero.1 hX0
 
@@ -160,45 +176,51 @@ section Alg2
 
 variable {E : Type} [Field E] [CharZero E] {n : Type} [Fintype n] [DecidableEq n]
 
-theorem commute_all {R : Type} [CommRing R] (ψ : E →+* R) (σ : E →+* E) (hσσ : ∀ x, σ (σ x) = x)
-    (δ : E) (hδ : σ δ = -δ) (hδ0 : δ ≠ 0) (J : Matrix n n E) (hJh : cT σ J = J) (hJ : J.det ≠ 0)
+theorem commute_all
+    {R : Type} [CommRing R]
+    (ψ : E →+* R)
+    (σ : E →+* E) (hσσ : ∀ x, σ (σ x) = x)
+    (δ : E) (hδ : σ δ = -δ) (hδ0 : δ ≠ 0)
+    (J : Matrix n n E) (hJh : cT σ J = J) (hJ : J.det ≠ 0)
     (Z : Matrix n n R) (hZ : ∀ g ∈ UJ σ J, Commute Z ((g : Matrix n n E).map ψ))
-    (M : Matrix n n E) : Commute Z (M.map ψ) := by
-  let S : Submodule E (Matrix n n E) :=
-    { carrier := {M | Commute Z (M.map ψ)}
-      add_mem' := by
-        intro a b ha hb
-        show Commute Z ((a + b).map ψ)
-        rw [Matrix.map_add _ (map_add ψ)]
-        exact ha.add_right hb
-      zero_mem' := by
-        show Commute Z ((0 : Matrix n n E).map ψ)
-        rw [Matrix.map_zero _ (map_zero ψ)]
-        exact Commute.zero_right Z
-      smul_mem' := by
-        intro c a ha
-        show Commute Z ((c • a).map ψ)
-        have : (c • a).map ψ = ψ c • a.map ψ := by ext i j; simp
-        rw [this]
-        exact ha.smul_right (ψ c) }
+    (M : Matrix n n E)
+    : Commute Z (M.map ψ) := by
+  let S : Submodule E (Matrix n n E) := {
+    carrier := {M | Commute Z (M.map ψ)}
+    add_mem' := by
+      intro a b ha hb
+      show Commute Z ((a + b).map ψ)
+      rw [Matrix.map_add _ (map_add ψ)]
+      exact ha.add_right hb
+    zero_mem' := by
+      show Commute Z ((0 : Matrix n n E).map ψ)
+      rw [Matrix.map_zero _ (map_zero ψ)]
+      exact Commute.zero_right Z
+    smul_mem' := by
+      intro c a ha
+      show Commute Z ((c • a).map ψ)
+      have : (c • a).map ψ = ψ c • a.map ψ := by ext i j; simp
+      rw [this]
+      exact ha.smul_right (ψ c)
+  }
   have hmem : ∀ M, M ∈ S ↔ Commute Z (M.map ψ) := fun M => Iff.rfl
   have hJu : IsUnit J.det := isUnit_iff_ne_zero.2 hJ
-  have hcc : ∀ N : Matrix n n E, cT σ (cT σ N) = N := by
-    intro N; ext i j; simp [cT, hσσ]
+  have hcc : ∀ N : Matrix n n E, cT σ (cT σ N) = N := by intro N; ext i j; simp [cT, hσσ]
   have hskew : ∀ K : Matrix n n E, cT σ K = -K → J⁻¹ * K ∈ S := by
     intro K hK
     rw [hmem]
     refine commute_of_skew ψ σ J hJ Z hZ _ ?_
     rw [cT_mul, hK, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv J hJu, Matrix.one_mul]
     have : cT σ J⁻¹ * J = 1 := by
-      calc cT σ J⁻¹ * J = cT σ J⁻¹ * cT σ J := by rw [hJh]
+      calc
+        cT σ J⁻¹ * J
+          = cT σ J⁻¹ * cT σ J := by rw [hJh]
         _ = cT σ (J * J⁻¹) := (cT_mul σ J J⁻¹).symm
         _ = 1 := by rw [Matrix.mul_nonsing_inv J hJu, cT_one]
     rw [_root_.neg_mul, _root_.neg_mul, Matrix.mul_assoc, this, Matrix.mul_one, neg_add_cancel]
   have hall : ∀ N : Matrix n n E, J⁻¹ * N ∈ S := by
     intro N
-    have hK1 : cT σ (N - cT σ N) = -(N - cT σ N) := by
-      rw [cT_sub', hcc]; abel
+    have hK1 : cT σ (N - cT σ N) = -(N - cT σ N) := by rw [cT_sub', hcc]; abel
     have hK2 : cT σ (δ • (N + cT σ N)) = -(δ • (N + cT σ N)) := by
       rw [cT_smul', cT_add', hcc, hδ, neg_smul, add_comm (cT σ N) N]
     have hdec : N = (1 / 2 : E) • (N - cT σ N) + (2 * δ)⁻¹ • (δ • (N + cT σ N)) := by
@@ -209,10 +231,14 @@ theorem commute_all {R : Type} [CommRing R] (ψ : E →+* R) (σ : E →+* E) (h
   have := hall (J * M)
   rwa [Matrix.nonsing_inv_mul_cancel_left _ _ hJu] at this
 
-theorem eq_smul_one {R : Type} [CommRing R] (ψ : E →+* R) (σ : E →+* E) (hσσ : ∀ x, σ (σ x) = x)
-    (δ : E) (hδ : σ δ = -δ) (hδ0 : δ ≠ 0) (J : Matrix n n E) (hJh : cT σ J = J) (hJ : J.det ≠ 0)
-    (Z : Matrix n n R) (hZ : ∀ g ∈ UJ σ J, Commute Z ((g : Matrix n n E).map ψ)) :
-    ∃ c : R, Z = c • (1 : Matrix n n R) := by
+theorem eq_smul_one
+    {R : Type} [CommRing R]
+    (ψ : E →+* R)
+    (σ : E →+* E) (hσσ : ∀ x, σ (σ x) = x)
+    (δ : E) (hδ : σ δ = -δ) (hδ0 : δ ≠ 0)
+    (J : Matrix n n E) (hJh : cT σ J = J) (hJ : J.det ≠ 0)
+    (Z : Matrix n n R) (hZ : ∀ g ∈ UJ σ J, Commute Z ((g : Matrix n n E).map ψ))
+    : ∃ c : R, Z = c • (1 : Matrix n n R) := by
   have h : Z ∈ Set.range (Matrix.scalar n) := by
     apply Matrix.mem_range_scalar_of_commute_single
     intro i j _
@@ -230,29 +256,39 @@ noncomputable section
 
 namespace GlobalTheory.CentreScalar
 
-open Matrix Formalism.UG Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+open Matrix Formalism.UG Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice
 
 def ratE (D : D7) : D.host.E →+* Formalism.IndefR.Lev.EAf D :=
   (Formalism.IndefR.Lev.swapAE D).comp
     ((Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id D.host.F D.host.E)).toRingHom.comp
       (inclR (AF D.host.F)))
 
-def ratPt {D : D7} (V : Formalism.BasicNotions.TH.HSp D) (γ : GL (Fin V.rank) D.host.E)
-    (hγ : γ ∈ UJ (D.sp.cm.sig : D.host.E →+* D.host.E) V.gram) : GA D V :=
-  ⟨bc (inclR (F := D.host.F) (AF D.host.F)) γ, by
+def ratPt
+    {D : D7} (V : Formalism.BasicNotions.TH.HSp D) (γ : GL (Fin V.rank) D.host.E)
+    (hγ : γ ∈ UJ (D.sp.cm.sig : D.host.E →+* D.host.E) V.gram)
+    : GA D V := ⟨
+  bc (inclR (F := D.host.F) (AF D.host.F)) γ,
+  by
     show cT (sigR (AF D.host.F) D.sp.cm.sig) ((γ : Matrix _ _ _).map (inclR (F := D.host.F) (AF D.host.F))) *
         JR (AF D.host.F) V.gram * (γ : Matrix _ _ _).map (inclR (F := D.host.F) (AF D.host.F)) = JR (AF D.host.F) V.gram
     rw [GlobalTheory.AutFunCounterexample.cT_map_gen, JR, ← Matrix.map_mul, ← Matrix.map_mul]
-    exact congrArg (fun M => M.map (inclR (F := D.host.F) (AF D.host.F))) hγ⟩
+    exact congrArg (fun M => M.map (inclR (F := D.host.F) (AF D.host.F))) hγ
+⟩
 
-theorem finE_ratPt {D : D7} (V : Formalism.BasicNotions.TH.HSp D) (γ : GL (Fin V.rank) D.host.E)
-    (hγ : γ ∈ UJ (D.sp.cm.sig : D.host.E →+* D.host.E) V.gram) :
-    (Formalism.IndefR.Lev.finE V (ratPt V γ hγ)).val =
-      (γ : Matrix (Fin V.rank) (Fin V.rank) D.host.E).map (ratE D) := rfl
+theorem finE_ratPt
+    {D : D7} (V : Formalism.BasicNotions.TH.HSp D) (γ : GL (Fin V.rank) D.host.E)
+    (hγ : γ ∈ UJ (D.sp.cm.sig : D.host.E →+* D.host.E) V.gram)
+    : (Formalism.IndefR.Lev.finE V (ratPt V γ hγ)).val
+      = (γ : Matrix (Fin V.rank) (Fin V.rank) D.host.E).map (ratE D) :=
+  rfl
 
-theorem finE_center_scalar : ∀ {D : D7} (V : Formalism.BasicNotions.TH.HSp D) (z : GA D V), z ∈ Subgroup.center (GA D V) →
-    z ∈ GfC V → ∃ c : Formalism.IndefR.Lev.EAf D,
-      (Formalism.IndefR.Lev.finE V z).val = c • (1 : Matrix (Fin V.rank) (Fin V.rank) (Formalism.IndefR.Lev.EAf D)) := by
+theorem finE_center_scalar
+    : ∀ {D : D7} (V : Formalism.BasicNotions.TH.HSp D) (z : GA D V),
+      z ∈ Subgroup.center (GA D V) → z ∈ GfC V
+        → ∃ c : Formalism.IndefR.Lev.EAf D,
+          (Formalism.IndefR.Lev.finE V z).val
+            = c • (1 : Matrix (Fin V.rank) (Fin V.rank) (Formalism.IndefR.Lev.EAf D)) := by
   intro D V z hz _
   set σ : D.host.E →+* D.host.E := (D.sp.cm.sig : D.host.E →+* D.host.E) with hσdef
   have hσσ : ∀ x, σ (σ x) = x := fun x => star_star x
@@ -269,7 +305,8 @@ theorem finE_center_scalar : ∀ {D : D7} (V : Formalism.BasicNotions.TH.HSp D) 
     rw [D.sp.cm.deg2] at h1
     norm_num at h1
   refine eq_smul_one (ratE D) σ hσσ (x - σ x) ?_ (sub_ne_zero.2 (Ne.symm hx)) V.gram
-    (GlobalTheory.AutFunCounterexample.gram_herm V) (GlobalTheory.AutFunCounterexample.gram_det_ne V) _ ?_
+    (GlobalTheory.AutFunCounterexample.gram_herm V)
+    (GlobalTheory.AutFunCounterexample.gram_det_ne V) _ ?_
   · rw [map_sub, hσσ]; abel
   · intro γ hγ
     have hc := (Subgroup.mem_center_iff.1 hz) (ratPt V γ hγ)

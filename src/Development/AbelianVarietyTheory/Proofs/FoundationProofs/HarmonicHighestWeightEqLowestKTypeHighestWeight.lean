@@ -9,18 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AbsSubOfD
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts GlobalTheory.JointHarm
+open Formalism.BasicNotions.TH GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts GlobalTheory.JointHarm
 
 namespace GlobalTheory.HarmonicShape
 
-theorem weight_eq_wtK (p q n : ℕ) (hn : p + q < n) (ap : Fin p → ℕ) (am : Fin q → ℕ)
-    (μ : Ix p q → ℚ) (P : Pol p q n 0) (h1 : IsHW (fockAct1 p q n 0) μ P)
-    (h2 : P ∈ hwSub (fockAct2 p q n 0) (wtH n ap am))
-    (h3 : KilledByLower (fockAct1 p q n 0) P) : μ = wtK n ap am := by
+theorem weight_eq_wtK
+    (p q n : ℕ) (hn : p + q < n) (ap : Fin p → ℕ) (am : Fin q → ℕ) (μ : Ix p q → ℚ)
+    (P : Pol p q n 0) (h1 : IsHW (fockAct1 p q n 0) μ P)
+    (h2 : P ∈ hwSub (fockAct2 p q n 0) (wtH n ap am)) (h3 : KilledByLower (fockAct1 p q n 0) P)
+    : μ = wtK n ap am := by
   have hj : P ∈ jointHW μ (wtH n ap am) := by
     refine ⟨⟨h1.2, h2⟩, ⟨fun a b => ?_, fun a b => by simp⟩, fun _ j => j.elim0, fun i => i.elim0⟩
     have := h3 a b
-    rw [GlobalTheory.IndefiniteRowSideFullHecke.FockSingularValues.fockAct1_lower, neg_eq_zero] at this
+    rw [GlobalTheory.IndefiniteRowSideFullHecke.FockSingularValues.fockAct1_lower, neg_eq_zero]
+      at this
     exact this
   obtain ⟨α, β, γ, δ, ⟨-, -, -, -, a1, b1, c1, d1, -, -, -, -, e1, e2, e3, -⟩, -⟩ :=
     four_of_joint h1.1 hj

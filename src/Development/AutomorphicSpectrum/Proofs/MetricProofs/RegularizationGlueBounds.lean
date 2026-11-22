@@ -8,21 +8,23 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LoglogQuotNonn
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.RegFin
 
-theorem isPsh_of_posPot {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
-    (Θ : LocPot X) (h : IsPosPot A Θ) : IsPsh A Θ := by
+theorem isPsh_of_posPot
+    {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (Θ : LocPot X) (h : IsPosPot A Θ)
+    : IsPsh A Θ := by
   intro x j y hy w
   by_cases hw : w = 0
   · subst hw; rw [levi_zero]
   · exact (h x j y hy w hw).le
 
-theorem quot_mem_unit {t : ℝ} (ht : 0 < t) (hte : t ≤ Real.exp (-Real.exp 1)) :
-    0 ≤ Real.log (Real.log (1 / t)) / Real.log (1 / t) ∧
-      Real.log (Real.log (1 / t)) / Real.log (1 / t) ≤ 1 := by
+theorem quot_mem_unit {t : ℝ} (ht : 0 < t) (hte : t ≤ Real.exp (- Real.exp 1))
+    : 0 ≤ Real.log (Real.log (1 / t)) / Real.log (1 / t)
+      ∧ Real.log (Real.log (1 / t)) / Real.log (1 / t) ≤ 1 := by
   obtain ⟨h1, h2⟩ := GlobalTheory.CompanionTheory.Ar.Giv.log_inv_bounds ht hte
   have hl : 0 < Real.log (1 / t) := lt_of_lt_of_le (Real.exp_pos 1) h1
   refine ⟨div_nonneg (by linarith) hl.le, ?_⟩
@@ -30,16 +32,36 @@ theorem quot_mem_unit {t : ℝ} (ht : 0 < t) (hte : t ≤ Real.exp (-Real.exp 1)
   have := Real.log_le_sub_one_of_pos hl
   linarith
 
-theorem quot_mono {t t' : ℝ} (ht : 0 < t) (htt : t ≤ t') (hte : t' ≤ Real.exp (-Real.exp 1)) :
-    Real.log (Real.log (1 / t)) / Real.log (1 / t) ≤
-      Real.log (Real.log (1 / t')) / Real.log (1 / t') := by
+theorem quot_mono {t t' : ℝ} (ht : 0 < t) (htt : t ≤ t') (hte : t' ≤ Real.exp (- Real.exp 1))
+    : Real.log (Real.log (1 / t)) / Real.log (1 / t)
+      ≤ Real.log (Real.log (1 / t')) / Real.log (1 / t') := by
   have ht' := ht.trans_le htt
   have h1 := (GlobalTheory.CompanionTheory.Ar.Giv.log_inv_bounds ht' hte).1
   have hle : Real.log (1 / t') ≤ Real.log (1 / t) :=
     Real.log_le_log (by positivity) (one_div_le_one_div_of_le ht htt)
   exact Real.log_div_self_antitoneOn (Set.mem_Ici.2 h1) (Set.mem_Ici.2 (h1.trans hle)) hle
 
-theorem isRegFamily_of_glue : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B : FinHolAtlas e X) (Θ L th : LocPot X) (s : X → X → ℂ) (ph : X → ℝ) (C₅ K Cl t₀ : ℝ) (f : ℝ → Fin B.n → X → ℝ) (F : ℝ → X → ℝ), IsPotential A Θ → IsPosPot A Θ → IsPotential A th → (∀ y, logNormSec L s y ≤ 0) → (∀ y, ∃ j, y ∈ chartBall B j 1) → (∀ y ∉ bdry s, -C₅ * Real.log (rW L s y) ≤ ph y) → 0 < K → 1 ≤ Cl → 0 < t₀ → t₀ ≤ Real.exp (-Real.exp 1) → (∀ t, 0 < t → t ≤ t₀ → A.Smooth (F t) ∧ IsPsh A (th + LocPot.ofFun (F t) + Θ.rsmul (K * epsT Cl t)) ∧ ∀ j, ∀ y ∈ chartBall B j (5 / 4), f t j y ≤ F t y ∧ F t y ≤ f t j y + K * epsT Cl t) → (∀ t, 0 < t → t ≤ t₀ → ∀ j, ∀ y ∈ chartBall B j (5 / 4), f t j y ≤ Cl ∧ -Cl * Real.log (Real.log (1 / t)) ≤ f t j y ∧ (y ∉ bdry s → ph y ≤ f t j y ∧ (rW L s y ≤ Real.log (1 / t) → f t j y ≤ ph y + t ^ ((1 : ℝ) / 3)))) → (∀ t t', 0 < t → t ≤ t' → t' ≤ t₀ → ∀ j, ∀ y ∈ chartBall B j (5 / 4), f t j y ≤ f t' j y + epsT Cl t') → ∃ C : ℝ, IsRegFamily A Θ L s th ph F C t₀ := by
+theorem isRegFamily_of_glue
+    : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B : FinHolAtlas e X) (Θ L th : LocPot X)
+        (s : X → X → ℂ) (ph : X → ℝ) (C₅ K Cl t₀ : ℝ) (f : ℝ → Fin B.n → X → ℝ) (F : ℝ → X → ℝ),
+      IsPotential A Θ → IsPosPot A Θ → IsPotential A th → (∀ y, logNormSec L s y ≤ 0)
+        → (∀ y, ∃ j, y ∈ chartBall B j 1) → (∀ y ∉ bdry s, -C₅ * Real.log (rW L s y) ≤ ph y) → 0 < K
+        → 1 ≤ Cl → 0 < t₀ → t₀ ≤ Real.exp (- Real.exp 1)
+        → (∀ t,
+          0 < t → t ≤ t₀
+            → A.Smooth (F t) ∧ IsPsh A (th + LocPot.ofFun (F t) + Θ.rsmul (K * epsT Cl t))
+              ∧ ∀ j, ∀ y ∈ chartBall B j (5 / 4), f t j y ≤ F t y ∧ F t y ≤ f t j y + K * epsT Cl t)
+        → (∀ t,
+          0 < t → t ≤ t₀
+            → ∀ j, ∀ y ∈ chartBall B j (5 / 4),
+              f t j y ≤ Cl ∧ -Cl * Real.log (Real.log (1 / t)) ≤ f t j y
+                ∧ (y ∉ bdry s
+                  → ph y ≤ f t j y
+                    ∧ (rW L s y ≤ Real.log (1 / t) → f t j y ≤ ph y + t ^ ((1 : ℝ) / 3))))
+        → (∀ t t',
+          0 < t → t ≤ t' → t' ≤ t₀
+            → ∀ j, ∀ y ∈ chartBall B j (5 / 4), f t j y ≤ f t' j y + epsT Cl t')
+        → ∃ C : ℝ, IsRegFamily A Θ L s th ph F C t₀ := by
   intro e X _ A B Θ L th s ph C₅ K Cl t₀ f F hΘ hΘp hth hs hcov hph hK hCl ht₀ ht₀e hF hf hmono
   have hΘpsh := isPsh_of_posPot A Θ hΘp
   obtain ⟨C, hCdef⟩ : ∃ C : ℝ, C = Cl * (1 + K) + |C₅| + 1 := ⟨_, rfl⟩
@@ -56,7 +78,7 @@ theorem isRegFamily_of_glue : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B
     exact ⟨j, chartBall_mono B j (by norm_num) hj⟩
   have ht₀1 : t₀ < 1 :=
     lt_of_le_of_lt ht₀e (by
-      have := Real.exp_lt_exp.2 (show -Real.exp 1 < 0 by linarith [Real.exp_pos 1])
+      have := Real.exp_lt_exp.2 (show - Real.exp 1 < 0 by linarith [Real.exp_pos 1])
       rwa [Real.exp_zero] at this)
   refine ⟨C, ht₀, ht₀1, fun t ht htt => ?_⟩
   have hte := htt.trans ht₀e
@@ -77,8 +99,16 @@ theorem isRegFamily_of_glue : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B
     have h2 := (hf t ht htt j y hj).1
     rw [hεl] at h1
     nlinarith
-  refine ⟨hsm, fun y => (hFC y).trans hCK, fun y hy => ?_, fun y => ?_, ?_,
-    fun y hy hyr => ?_, fun y hy => ?_, fun t' htt' ht' y => ?_⟩
+  refine ⟨
+    hsm,
+    fun y => (hFC y).trans hCK,
+    fun y hy => ?_,
+    fun y => ?_,
+    ?_,
+    fun y hy hyr => ?_,
+    fun y hy => ?_,
+    fun t' htt' ht' y => ?_
+  ⟩
   · obtain ⟨j, hj⟩ := hpt y
     exact ((hf t ht htt j y hj).2.2 hy).1.trans (hFf j y hj).1
   · obtain ⟨j, hj⟩ := hpt y
@@ -87,7 +117,8 @@ theorem isRegFamily_of_glue : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B
     have : Cl * Real.log (Real.log (1 / t)) ≤ C * Real.log (Real.log (1 / t)) :=
       mul_le_mul_of_nonneg_right hCl' (by linarith)
     linarith
-  · refine GlobalTheory.CompanionTheory.Ar.Giv.isPsh_rsmul_mono A Θ th (F t) hΘ hΘpsh hth hsm ?_ hpsh
+  · refine GlobalTheory.CompanionTheory.Ar.Giv.isPsh_rsmul_mono A Θ th (F t) hΘ hΘpsh hth hsm ?_
+      hpsh
     rw [hεl, hεC]
     have := mul_le_mul_of_nonneg_right hKCl hg0
     nlinarith
@@ -123,13 +154,12 @@ theorem isRegFamily_of_glue : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B
       have hgr : 1 ≤ g * rW L s y := by
         have e1 : g * rW L s y = Real.log (Real.log (1 / t)) * (rW L s y / Real.log (1 / t)) := by
           rw [hgdef]; ring
-        have e2 : 1 ≤ rW L s y / Real.log (1 / t) := by
-          rw [le_div_iff₀ hlpos]; linarith
+        have e2 : 1 ≤ rW L s y / Real.log (1 / t) := by rw [le_div_iff₀ hlpos]; linarith
         rw [e1]
         nlinarith
       have hlr0 : 0 ≤ Real.log (rW L s y) := Real.log_nonneg (by linarith)
       have hph1 := hph y hy
-      have hph2 : -|C₅| * Real.log (rW L s y) ≤ -C₅ * Real.log (rW L s y) :=
+      have hph2 : - |C₅| * Real.log (rW L s y) ≤ -C₅ * Real.log (rW L s y) :=
         mul_le_mul_of_nonneg_right (by linarith [le_abs_self C₅]) hlr0
       have h4 : |C₅| * Real.log (rW L s y) ≤ |C₅| * (g * rW L s y) :=
         mul_le_mul_of_nonneg_left hlog' hC5
@@ -147,8 +177,10 @@ theorem isRegFamily_of_glue : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B
       ⟨_, rfl⟩
     rw [← hgdef'] at hg0' hg1'
     rw [← hgdef, ← hgdef'] at hgm
-    have hεC' : epsT C t' = C * g' := by rw [GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul, hgdef']
-    have hεl' : epsT Cl t' = Cl * g' := by rw [GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul, hgdef']
+    have hεC' : epsT C t' = C * g' := by
+      rw [GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul, hgdef']
+    have hεl' : epsT Cl t' = Cl * g' := by
+      rw [GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul, hgdef']
     obtain ⟨j, hj⟩ := hpt y
     have h1 := (hFf j y hj).2
     have h2 := hmono t t' ht htt' ht' j y hj

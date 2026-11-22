@@ -243,8 +243,7 @@ end Curve
 
 section Main
 
-variable {K : Type} [NormedField K] [IsUltrametricDist K] [DecidableEq K]
-  {W : WeierstrassCurve K}
+variable {K : Type} [NormedField K] [IsUltrametricDist K] [DecidableEq K] {W : WeierstrassCurve K}
 
 lemma two_tors_le (hW : IntCurve W) (h2 : ‖(2 : K)‖ = 2⁻¹) (P : W.toAffine.Point)
     (hP : P + P = 0) : ‖px W P‖ ≤ 4 := by
@@ -362,8 +361,9 @@ theorem kappa_norm_holds : KapNorm := by
   intro K _ _ _ W hM h2 x
   obtain ⟨h1, h2a, h3, h4, h6⟩ := hM
   obtain ⟨hb2, hb4, -, -⟩ := b_int W h1 h2a h3 h4 h6
-  have e : 3 * (x + W.b₂ / 12) ^ 2 - Formalism.L2.Th1.A.g₂ W / 4
-      = 3 * x ^ 2 + 2⁻¹ * W.b₂ * x + 2⁻¹ * W.b₄ := by
+  have e
+      : 3 * (x + W.b₂ / 12) ^ 2 - Formalism.L2.Th1.A.g₂ W / 4
+        = 3 * x ^ 2 + 2⁻¹ * W.b₂ * x + 2⁻¹ * W.b₄ := by
     simp only [Formalism.L2.Th1.A.g₂, WeierstrassCurve.c₄]
     ring
   have ni : ‖(2 : K)⁻¹‖ = 2 := by rw [norm_inv, h2, inv_inv]
@@ -384,6 +384,7 @@ theorem kappa_norm_holds : KapNorm := by
     norm_num
   · intro hx
     have r0 := norm_nonneg x
-    exact nadd_lt (nadd_lt (by rw [t1]; nlinarith) (t2.trans_lt (by linarith))) (t3.trans_lt (by norm_num))
+    exact nadd_lt (nadd_lt (by rw [t1]; nlinarith) (t2.trans_lt (by linarith)))
+      (t3.trans_lt (by norm_num))
 
 end Formalism.L2.Th1.B.KNorm

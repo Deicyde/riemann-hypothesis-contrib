@@ -15,8 +15,11 @@ namespace NullPf
 
 variable {K : Type*} [Field K]
 
-theorem exists_rows {m n : Type*} [Fintype m] [DecidableEq m] [Fintype n] (M : Matrix m n K) {k : ℕ} (hk : k ≤ M.rank) :
-    ∃ I : Fin k ↪ m, LinearIndependent K (fun p => M (I p)) := by
+theorem exists_rows
+    {m n : Type*} [Fintype m] [DecidableEq m] [Fintype n]
+    (M : Matrix m n K)
+    {k : ℕ} (hk : k ≤ M.rank)
+    : ∃ I : Fin k ↪ m, LinearIndependent K (fun p => M (I p)) := by
   classical
   obtain ⟨b, hbs, hspan, hli⟩ := exists_linearIndependent K (Set.range M.row)
   have hfin : b.Finite := (Set.finite_range _).subset hbs
@@ -40,8 +43,8 @@ theorem exists_rows {m n : Type*} [Fintype m] [DecidableEq m] [Fintype n] (M : M
   rw [h2]
   exact hli.comp e e.injective
 
-theorem exists_minor_ne_zero {n : ℕ} (M : Matrix (Fin n) (Fin n) K) {k : ℕ} (hk : k ≤ M.rank) :
-    ∃ I J : Fin k ↪ Fin n, (M.submatrix I J).det ≠ 0 := by
+theorem exists_minor_ne_zero {n : ℕ} (M : Matrix (Fin n) (Fin n) K) {k : ℕ} (hk : k ≤ M.rank)
+    : ∃ I J : Fin k ↪ Fin n, (M.submatrix I J).det ≠ 0 := by
   classical
   obtain ⟨I, hI⟩ := exists_rows M hk
   set R : Matrix (Fin k) (Fin n) K := M.submatrix I id with hR
@@ -62,8 +65,10 @@ theorem exists_minor_ne_zero {n : ℕ} (M : Matrix (Fin n) (Fin n) K) {k : ℕ} 
   rw [hTeq, det_transpose] at this
   exact this.ne_zero
 
-theorem rank_lt_of_minors {n : ℕ} (M : Matrix (Fin n) (Fin n) K) {k : ℕ}
-    (h : ∀ I J : Fin k ↪ Fin n, (M.submatrix I J).det = 0) : M.rank < k := by
+theorem rank_lt_of_minors
+    {n : ℕ} (M : Matrix (Fin n) (Fin n) K)
+    {k : ℕ} (h : ∀ I J : Fin k ↪ Fin n, (M.submatrix I J).det = 0)
+    : M.rank < k := by
   by_contra hc
   obtain ⟨I, J, hIJ⟩ := exists_minor_ne_zero M (not_lt.1 hc)
   exact hIJ (h I J)
@@ -71,12 +76,15 @@ theorem rank_lt_of_minors {n : ℕ} (M : Matrix (Fin n) (Fin n) K) {k : ℕ}
 theorem rank_add_le' {n : ℕ} (A B : Matrix (Fin n) (Fin n) K) : (A + B).rank ≤ A.rank + B.rank := by
   unfold Matrix.rank
   rw [Matrix.mulVecLin_add]
-  calc finrank K (LinearMap.range (A.mulVecLin + B.mulVecLin))
-      ≤ finrank K ↥(LinearMap.range A.mulVecLin ⊔ LinearMap.range B.mulVecLin : Submodule K (Fin n → K)) :=
-        Submodule.finrank_mono (LinearMap.range_add_le _ _)
+  calc
+    finrank K (LinearMap.range (A.mulVecLin + B.mulVecLin))
+        ≤ finrank K
+          ↥(LinearMap.range A.mulVecLin ⊔ LinearMap.range B.mulVecLin : Submodule K (Fin n → K)) :=
+      Submodule.finrank_mono (LinearMap.range_add_le _ _)
     _ ≤ _ := Submodule.finrank_add_le_finrank_add_finrank _ _
 
-theorem det_eq_zero_of_rank_lt {n : ℕ} (M : Matrix (Fin n) (Fin n) K) (h : M.rank < n) : M.det = 0 := by
+theorem det_eq_zero_of_rank_lt {n : ℕ} (M : Matrix (Fin n) (Fin n) K) (h : M.rank < n)
+    : M.det = 0 := by
   by_contra hd
   have := Matrix.rank_of_isUnit M ((Matrix.isUnit_iff_isUnit_det M).2 (Ne.isUnit hd))
   simp at this
@@ -102,13 +110,17 @@ theorem null : Null := by
   have hgen : ∀ s ∈ S, aeval x s = 0 := fun s hs => hx s (Ideal.subset_span hs)
   set A : Matrix (Fin n) (Fin n) ℂ := fun p q => x (false, p, q) with hA
   set B : Matrix (Fin n) (Fin n) ℂ := fun p q => x (true, p, q) with hB
-  have hminor : ∀ (b : Bool) {ρ : ℕ} (I J : Fin ρ ↪ Fin n),
-      aeval x (minorPolynomial b I J) = Matrix.det (fun p q : Fin ρ => x (b, I p, J q)) := by
+  have hminor
+      : ∀ (b : Bool) {ρ : ℕ} (I J : Fin ρ ↪ Fin n),
+        aeval x (minorPolynomial b I J) = Matrix.det (fun p q : Fin ρ => x (b, I p, J q)) := by
     intro b ρ I J
-    calc aeval x (minorPolynomial b I J) = ((aeval x : PAB n →ₐ[ℂ] ℂ) : PAB n →+* ℂ) (minorPolynomial b I J) := rfl
+    calc
+      aeval x (minorPolynomial b I J)
+        = ((aeval x : PAB n →ₐ[ℂ] ℂ) : PAB n →+* ℂ) (minorPolynomial b I J) := rfl
       _ = _ := by
-        have h := RingHom.map_det ((aeval x : PAB n →ₐ[ℂ] ℂ) : PAB n →+* ℂ)
-          (Matrix.of fun p q : Fin ρ => (X (b, I p, J q) : PAB n))
+        have h :=
+          RingHom.map_det ((aeval x : PAB n →ₐ[ℂ] ℂ) : PAB n →+* ℂ)
+            (Matrix.of fun p q : Fin ρ => (X (b, I p, J q) : PAB n))
         refine h.trans ?_
         congr 1
         ext p q
@@ -119,7 +131,9 @@ theorem null : Null := by
   have hBr : B.rank < n - m := by
     apply rank_lt_of_minors
     intro I J
-    have := hgen (minorPolynomial true I J ^ N₀) ⟨0, n - m, by omega, Or.inr (Or.inl ⟨rfl, hr, I, J, rfl⟩)⟩
+    have :=
+      hgen (minorPolynomial true I J ^ N₀)
+        ⟨0, n - m, by omega, Or.inr (Or.inl ⟨rfl, hr, I, J, rfl⟩)⟩
     rw [map_pow, hminor] at this
     exact hpow _ this
   have hsum : (A + B).rank < n := by
@@ -127,7 +141,9 @@ theorem null : Null := by
     · have hAr : A.rank < m + (n - m) := by
         apply rank_lt_of_minors
         intro I J
-        have := hgen (minorPolynomial false I J ^ N₀) ⟨n - m, 0, by omega, Or.inr (Or.inr (Or.inl ⟨hr, rfl, I, J, rfl⟩))⟩
+        have :=
+          hgen (minorPolynomial false I J ^ N₀)
+            ⟨n - m, 0, by omega, Or.inr (Or.inr (Or.inl ⟨hr, rfl, I, J, rfl⟩))⟩
         rw [map_pow, hminor] at this
         exact hpow _ this
       have := rank_add_le' A B
@@ -136,8 +152,13 @@ theorem null : Null := by
       have hAr : A.rank < m + (n - m - B.rank) := by
         apply rank_lt_of_minors
         intro I J
-        have := hgen (minorPolynomial false I J ^ N₀ * minorPolynomial true I' J' ^ N₀)
-          ⟨n - m - B.rank, B.rank, by omega, Or.inr (Or.inr (Or.inr ⟨by omega, hpos, I, J, I', J', rfl⟩))⟩
+        have :=
+          hgen (minorPolynomial false I J ^ N₀ * minorPolynomial true I' J' ^ N₀) ⟨
+            n - m - B.rank,
+            B.rank,
+            by omega,
+            Or.inr (Or.inr (Or.inr ⟨by omega, hpos, I, J, I', J', rfl⟩))
+          ⟩
         rw [map_mul, map_pow, map_pow, hminor, hminor] at this
         rcases mul_eq_zero.1 this with h | h
         · exact hpow _ h
@@ -145,15 +166,18 @@ theorem null : Null := by
       have := rank_add_le' A B
       omega
   have hdet := det_eq_zero_of_rank_lt (A + B) hsum
-  calc aeval x D = ((aeval x : PAB n →ₐ[ℂ] ℂ) : PAB n →+* ℂ) D := rfl
+  calc
+    aeval x D
+      = ((aeval x : PAB n →ₐ[ℂ] ℂ) : PAB n →+* ℂ) D := rfl
     _ = (A + B).det := by
-        have h := RingHom.map_det ((aeval x : PAB n →ₐ[ℂ] ℂ) : PAB n →+* ℂ)
+      have h :=
+        RingHom.map_det ((aeval x : PAB n →ₐ[ℂ] ℂ) : PAB n →+* ℂ)
           (Matrix.of fun p q : Fin n => (X (false, p, q) + X (true, p, q) : PAB n))
-        refine h.trans ?_
-        congr 1
-        ext p q
-        simp [A, B, Matrix.add_apply]
-        rfl
+      refine h.trans ?_
+      congr 1
+      ext p q
+      simp [A, B, Matrix.add_apply]
+      rfl
     _ = 0 := hdet
 
 end PositivityTheory.Rg.Sw.SP

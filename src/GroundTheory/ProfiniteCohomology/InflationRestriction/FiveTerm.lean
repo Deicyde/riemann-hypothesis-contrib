@@ -13,8 +13,10 @@ open CategoryTheory
 
 universe u
 
-variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  (A : Rep.{u} k G) [IsDiscreteRep A] (N : Subgroup G) [N.Normal]
+variable
+  {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+  (A : Rep.{u} k G) [IsDiscreteRep A]
+  (N : Subgroup G) [N.Normal]
 
 section Restriction
 
@@ -22,26 +24,30 @@ noncomputable def cohomologyResInv : cohomology A 1 →ₗ[k] cohomologyConjInva
   (cohomologyRes A N 1).hom.codRestrict _ (cohomologyRes_mem_cohomologyConjInvariants A N)
 
 @[simp]
-theorem coe_cohomologyResInv_apply (h : cohomology A 1) :
-    (cohomologyResInv A N h : cohomology (Rep.res N.subtype A) 1) = (cohomologyRes A N 1).hom h :=
+theorem coe_cohomologyResInv_apply (h : cohomology A 1)
+    : (cohomologyResInv A N h : cohomology (Rep.res N.subtype A) 1) = (cohomologyRes A N 1).hom h :=
   rfl
 
-theorem cocycleOneApply_cocyclesMapAlong (y : cocycles A 1) (n : N) :
-    cocycleOneApply A N ((cocyclesMapAlong N.subtype (continuous_subgroup_subtype N) (𝟙 _) 1).hom y)
-      n = cocycleOneApplyG A y n := by
+theorem cocycleOneApply_cocyclesMapAlong (y : cocycles A 1) (n : N)
+    : cocycleOneApply A N
+        ((cocyclesMapAlong N.subtype (continuous_subgroup_subtype N) (𝟙 _) 1).hom y) n
+      = cocycleOneApplyG A y n := by
   simp only [cocycleOneApply, cocyclesMapAlong, iCycles_cyclesMap_apply]
   rfl
 
-theorem cohomologyRes_π (y : cocycles A 1) :
-    (cohomologyRes A N 1).hom ((cohomologyπ A 1).hom y) = (cohomologyπ _ 1).hom
-      ((cocyclesMapAlong N.subtype (continuous_subgroup_subtype N) (𝟙 _) 1).hom y) := by
+theorem cohomologyRes_π (y : cocycles A 1)
+    : (cohomologyRes A N 1).hom ((cohomologyπ A 1).hom y)
+      = (cohomologyπ _ 1).hom
+        ((cocyclesMapAlong N.subtype (continuous_subgroup_subtype N) (𝟙 _) 1).hom y) := by
   rw [cohomologyRes, cohomologyMapAlong]
   erw [homologyMap_homologyπ_apply]
   rfl
 
-theorem isTgLift_cocycleOneApplyG (y : cocycles A 1) :
-    IsTgLift A N (cocycleOneApply A N ((cocyclesMapAlong N.subtype (continuous_subgroup_subtype N)
-      (𝟙 _) 1).hom y)) (cocycleOneApplyG A y) := by
+theorem isTgLift_cocycleOneApplyG (y : cocycles A 1)
+    : IsTgLift A N
+      (cocycleOneApply A N
+        ((cocyclesMapAlong N.subtype (continuous_subgroup_subtype N) (𝟙 _) 1).hom y))
+      (cocycleOneApplyG A y) := by
   refine ⟨cocycle_one_apply_one A (iCycles_d_apply _ 1 2 y), ?_, ?_⟩
   · intro g n
     rw [cocycleOneApply_cocyclesMapAlong, cocycleOneApplyG_mul]
@@ -51,29 +57,38 @@ theorem isTgLift_cocycleOneApplyG (y : cocycles A 1) :
       simp only [GroundTheory.GroupCoh.coe_conjHom_apply]; group
     have h1 := cocycleOneApplyG_mul A y h (GroundTheory.GroupCoh.conjHom N h n)
     rw [e, cocycleOneApplyG_mul A y n h] at h1
-    rw [show A.ρ h (cocycleOneApplyG A y (GroundTheory.GroupCoh.conjHom N h n)) =
-      cocycleOneApplyG A y n + A.ρ n (cocycleOneApplyG A y h) - cocycleOneApplyG A y h by
-        rw [h1]; abel]
+    rw [show A.ρ h (cocycleOneApplyG A y (GroundTheory.GroupCoh.conjHom N h n))
+        = cocycleOneApplyG A y n + A.ρ n (cocycleOneApplyG A y h) - cocycleOneApplyG A y h by
+      rw [h1]; abel]
     abel
 
-theorem isLocallyConstant_cocycleOneApplyG (y : cocycles A 1) :
-    IsLocallyConstant (cocycleOneApplyG A y) :=
+theorem isLocallyConstant_cocycleOneApplyG (y : cocycles A 1)
+    : IsLocallyConstant (cocycleOneApplyG A y) :=
   (((cochainsComplex A).iCycles 1).hom y).2.comp_continuous (continuous_pi fun _ => continuous_id)
 
-theorem isTransgression_cohomologyRes (h : cohomology A 1) :
-    IsTransgression A N ((cohomologyRes A N 1).hom h) 0 := by
+theorem isTransgression_cohomologyRes (h : cohomology A 1)
+    : IsTransgression A N ((cohomologyRes A N 1).hom h) 0 := by
   obtain ⟨y, rfl⟩ := homologyπ_surjective (cochainsComplex A) 1 h
-  refine ⟨_, _, isTgLift_cocycleOneApplyG A N y, isLocallyConstant_cocycleOneApplyG A y,
-    (cohomologyRes_π A N y).symm, ?_⟩
-  have h0 : cocycleOf 2 (tgCochain (isCocycleOne_cocycleOneApply A N _)
-      (isTgLift_cocycleOneApplyG A N y) (isLocallyConstant_cocycleOneApplyG A y))
-      (tgCochain_d _ _ _) = 0 := by
+  refine ⟨
+    _,
+    _,
+    isTgLift_cocycleOneApplyG A N y,
+    isLocallyConstant_cocycleOneApplyG A y,
+    (cohomologyRes_π A N y).symm,
+    ?_
+  ⟩
+  have h0
+      : cocycleOf 2
+          (tgCochain (isCocycleOne_cocycleOneApply A N _) (isTgLift_cocycleOneApplyG A N y)
+            (isLocallyConstant_cocycleOneApplyG A y))
+          (tgCochain_d _ _ _)
+        = 0 := by
     rw [cocycleOf_eq_iff, map_zero]
     apply Subtype.ext
     funext c
     apply Subtype.ext
-    change (0 : A) = A.ρ _ (cocycleOneApplyG A y _) - cocycleOneApplyG A y _ +
-      cocycleOneApplyG A y _
+    change (0 : A)
+      = A.ρ _ (cocycleOneApplyG A y _) - cocycleOneApplyG A y _ + cocycleOneApplyG A y _
     rw [cocycleOneApplyG_mul]
     abel
   simp only [tgClass, h0, map_zero]
@@ -84,9 +99,10 @@ section Inflation
 
 variable {A N}
 
-theorem cohomologyInfl_tgClass (z : cocycles (Rep.res N.subtype A) 1) {y : G → A}
-    (hy : IsTgLift A N (cocycleOneApply A N z) y) (hyc : IsLocallyConstant y) :
-    (cohomologyInfl A N 2).hom (tgClass z hy hyc) = 0 := by
+theorem cohomologyInfl_tgClass
+    (z : cocycles (Rep.res N.subtype A) 1)
+    {y : G → A} (hy : IsTgLift A N (cocycleOneApply A N z) y) (hyc : IsLocallyConstant y)
+    : (cohomologyInfl A N 2).hom (tgClass z hy hyc) = 0 := by
   simp only [tgClass]
   rw [cohomologyInfl, cohomologyMapAlong]
   erw [homologyMap_homologyπ_apply]
@@ -100,20 +116,20 @@ section Exactness
 
 variable [CompactSpace G] [TotallyDisconnectedSpace G] (hN : IsClosed (N : Set G))
 
-
 include hN in
-theorem cohomologyInfl_transgression (h : cohomologyConjInvariants A N 1) :
-    (cohomologyInfl A N 2).hom (transgression A N hN h) = 0 := by
+theorem cohomologyInfl_transgression (h : cohomologyConjInvariants A N 1)
+    : (cohomologyInfl A N 2).hom (transgression A N hN h) = 0 := by
   obtain ⟨z, y, hy, hyc, -, ht⟩ := isTransgression_transgression A N hN h
   rw [← ht]
   exact cohomologyInfl_tgClass z hy hyc
 
-theorem transgression_cohomologyResInv (h : cohomology A 1) :
-    transgression A N hN (cohomologyResInv A N h) = 0 :=
+theorem transgression_cohomologyResInv (h : cohomology A 1)
+    : transgression A N hN (cohomologyResInv A N h) = 0 :=
   (transgression_eq_iff A N hN _ 0).2 (isTransgression_cohomologyRes A N h)
 
-theorem exists_cohomologyResInv_eq (h : cohomologyConjInvariants A N 1)
-    (hh : transgression A N hN h = 0) : ∃ g, cohomologyResInv A N g = h := by
+theorem exists_cohomologyResInv_eq
+    (h : cohomologyConjInvariants A N 1) (hh : transgression A N hN h = 0)
+    : ∃ g, cohomologyResInv A N g = h := by
   obtain ⟨z, y, hy, hyc, hz, ht⟩ := (transgression_eq_iff A N hN h 0).1 hh
   have hxc := isCocycleOne_cocycleOneApply A N z
   obtain ⟨W, hW⟩ := (homologyπ_succ_eq_zero_iff _ 1 _).1 ht
@@ -121,16 +137,20 @@ theorem exists_cohomologyResInv_eq (h : cohomologyConjInvariants A N 1)
   let Wf : G → A := fun g => ((W.1 fun _ => (g : G ⧸ N)) : A)
   have hWf : ∀ g h : G, A.ρ g (Wf h) - Wf (g * h) + Wf g = tgDiff A y g h := by
     intro g h
-    have e := congrArg (fun v : locallyConstantCochains (A.quotientToInvariants N) 2 =>
-      ((v.1 ![(g : G ⧸ N), (h : G ⧸ N)] : Representation.invariants (A.ρ.comp N.subtype)) : A)) hW
-    have hd := congrArg Subtype.val
-      (cochainsComplex_d_one_apply (A.quotientToInvariants N) W ![(g : G ⧸ N), (h : G ⧸ N)])
+    have e :=
+      congrArg
+        (fun v : locallyConstantCochains (A.quotientToInvariants N) 2 =>
+          ((v.1 ![(g : G ⧸ N), (h : G ⧸ N)] : Representation.invariants (A.ρ.comp N.subtype)) : A))
+        hW
+    have hd :=
+      congrArg Subtype.val
+        (cochainsComplex_d_one_apply (A.quotientToInvariants N) W ![(g : G ⧸ N), (h : G ⧸ N)])
     rw [← hy.tgDiff_out hxc g h]
     exact hd.symm.trans e
   have hW1 : Wf 1 = 0 := by
     have := hWf 1 1
-    simp only [one_mul, map_one, Module.End.one_apply, tgDiff, hy.map_one, sub_self,
-      add_zero] at this
+    simp only [one_mul, map_one, Module.End.one_apply, tgDiff, hy.map_one, sub_self, add_zero]
+      at this
     simpa using this
   let y' : G → A := fun g => y g - Wf g
   have hWc : IsLocallyConstant Wf :=
@@ -162,17 +182,18 @@ theorem exists_cohomologyResInv_eq (h : cohomologyConjInvariants A N 1)
   have hWn : Wf (g 0 : G) = Wf 1 := by
     change ((W.1 fun _ => ((g 0 : G) : G ⧸ N)) : A) = ((W.1 fun _ => ((1 : G) : G ⧸ N)) : A)
     rw [hm]
-  rw [hWn, hW1, sub_zero, show ((g 0 : N) : G) = 1 * (g 0 : G) from (one_mul _).symm,
-    hy.mul_right, hy.map_one, zero_add, map_one, Module.End.one_apply]
+  rw [hWn, hW1, sub_zero, show ((g 0 : N) : G) = 1 * (g 0 : G) from (one_mul _).symm, hy.mul_right,
+    hy.map_one, zero_add, map_one, Module.End.one_apply]
 
 omit [CompactSpace G] [TotallyDisconnectedSpace G] in
-theorem comp_vecCons_mk (g h : G) :
-    (⇑(QuotientGroup.mk' N) ∘ ![g, h]) = ![(g : G ⧸ N), (h : G ⧸ N)] := by
+theorem comp_vecCons_mk (g h : G)
+    : (⇑(QuotientGroup.mk' N) ∘ ![g, h]) = ![(g : G ⧸ N), (h : G ⧸ N)] := by
   funext i
   fin_cases i <;> rfl
 
-theorem exists_transgression_eq (t : cohomology (A.quotientToInvariants N) 2)
-    (ht : (cohomologyInfl A N 2).hom t = 0) : ∃ h, transgression A N hN h = t := by
+theorem exists_transgression_eq
+    (t : cohomology (A.quotientToInvariants N) 2) (ht : (cohomologyInfl A N 2).hom t = 0)
+    : ∃ h, transgression A N hN h = t := by
   obtain ⟨ζ, rfl⟩ := homologyπ_surjective (cochainsComplex (A.quotientToInvariants N)) 2 t
   rw [cohomologyInfl, cohomologyMapAlong] at ht
   erw [homologyMap_homologyπ_apply] at ht
@@ -188,8 +209,10 @@ theorem exists_transgression_eq (t : cohomology (A.quotientToInvariants N) 2)
     have e := congrArg (fun v : locallyConstantCochains A 2 => v.1 ![g, h]) hy₀
     have hd := cochainsComplex_d_one_apply A y₀ ![g, h]
     refine hd.symm.trans (e.trans ?_)
-    change (((Zf.1 (⇑(QuotientGroup.mk' N) ∘ ![g, h])) :
-      Representation.invariants (A.ρ.comp N.subtype)) : A) = _
+    change (((Zf.1 (⇑(QuotientGroup.mk' N) ∘ ![g, h]))
+          : Representation.invariants (A.ρ.comp N.subtype))
+        : A)
+      = _
     rw [comp_vecCons_mk]
   set c : A := Y₀ 1 with hcdef
   have hc : c ∈ Representation.invariants (A.ρ.comp N.subtype) := by
@@ -220,8 +243,8 @@ theorem exists_transgression_eq (t : cohomology (A.quotientToInvariants N) 2)
     simp [tgDiff, hY1]
   have hL : ∀ (n : N) (h : G), tgDiff A Y n h = 0 := by
     intro n h
-    rw [hYdiff, hZA n 1 h h (hmk n) rfl, show A.ρ (n : G) c = A.ρ 1 c by
-      rw [map_one]; exact hc n, ← hYdiff]
+    rw [hYdiff, hZA n 1 h h (hmk n) rfl, show A.ρ (n : G) c = A.ρ 1 c by rw [map_one]; exact hc n,
+      ← hYdiff]
     simp [tgDiff, hY1]
   have hmr : ∀ (g : G) (n : N), Y (g * n) = Y g + A.ρ g (Y n) := by
     intro g n
@@ -255,18 +278,21 @@ theorem exists_transgression_eq (t : cohomology (A.quotientToInvariants N) 2)
     (cohomologyConj_π_eq_iff A N z g).2 ⟨Y g, hlift.conj g⟩
   refine ⟨⟨_, hinv⟩, (transgression_eq_iff A N hN _ _).2 ⟨z, Y, hlift, hYc, rfl, ?_⟩⟩
 
-  let w : locallyConstantCochains (A.quotientToInvariants N) 1 :=
-    ⟨fun _ => ⟨-c, (Representation.invariants (A.ρ.comp N.subtype)).neg_mem hc⟩,
-      IsLocallyConstant.const _⟩
-  have hw : ((cochainsComplex (A.quotientToInvariants N)).d 1 (1 + 1)).hom w =
-      tgCochain (isCocycleOne_cocycleOneApply A N z) hlift hYc - Zf := by
+  let w : locallyConstantCochains (A.quotientToInvariants N) 1 := ⟨
+    fun _ => ⟨-c, (Representation.invariants (A.ρ.comp N.subtype)).neg_mem hc⟩,
+    IsLocallyConstant.const _
+  ⟩
+  have hw
+      : ((cochainsComplex (A.quotientToInvariants N)).d 1 (1 + 1)).hom w
+        = tgCochain (isCocycleOne_cocycleOneApply A N z) hlift hYc - Zf := by
     apply Subtype.ext
     funext cc
     apply Subtype.ext
     have hd := congrArg Subtype.val (cochainsComplex_d_one_apply (A.quotientToInvariants N) w cc)
     refine hd.trans ?_
-    have hq := quotientToInvariants_ρ_apply_coe (A := A) (N := N) (cc 0)
-      ⟨-c, (Representation.invariants (A.ρ.comp N.subtype)).neg_mem hc⟩
+    have hq :=
+      quotientToInvariants_ρ_apply_coe (A := A) (N := N) (cc 0)
+        ⟨-c, (Representation.invariants (A.ρ.comp N.subtype)).neg_mem hc⟩
     simp only [Submodule.coe_add, Submodule.coe_sub]
     change _ - (-c) + (-c) = tgDiff A Y (cc 0).out (cc 1).out - ((Zf.1 cc : _) : A)
     rw [hq, hYdiff]

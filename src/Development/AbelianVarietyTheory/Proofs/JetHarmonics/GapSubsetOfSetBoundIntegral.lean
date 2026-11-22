@@ -16,14 +16,17 @@ namespace GlobalTheory.CompareIterDegree
 
 open Formalism.QuantumDeterminants Formalism.HermitianLatticeCounting.ExpansionTerms
 
-theorem fdeg_ratio_abs {n : ℕ} (μ : Fin n → ℝ) (s : Fin n) (t : ℝ) (hinj : Function.Injective μ) :
-    fdegHC (μ + Pi.single s t) / fdegHC μ = ∏ c ∈ univ.erase s, |(μ s + t - μ c) / (μ s - μ c)| := by
+theorem fdeg_ratio_abs {n : ℕ} (μ : Fin n → ℝ) (s : Fin n) (t : ℝ) (hinj : Function.Injective μ)
+    : fdegHC (μ + Pi.single s t) / fdegHC μ
+      = ∏ c ∈ univ.erase s, |(μ s + t - μ c) / (μ s - μ c)| := by
   set μ' : Fin n → ℝ := μ + Pi.single s t with hμ'
-  have hμ'a : ∀ a, μ' a = μ a + if a = s then t else 0 := by
-    intro a; simp [hμ', Pi.single_apply]
+  have hμ'a : ∀ a, μ' a = μ a + if a = s then t else 0 := by intro a; simp [hμ', Pi.single_apply]
   set r : Fin n → ℝ := fun c => |(μ s + t - μ c) / (μ s - μ c)| with hr
-  have hfac : ∀ a b : Fin n, a < b →
-      |μ' a - μ' b| / |μ a - μ b| = (if a = s then r b else 1) * (if b = s then r a else 1) := by
+  have hfac
+      : ∀ a b : Fin n,
+        a < b
+          → |μ' a - μ' b| / |μ a - μ b|
+            = (if a = s then r b else 1) * (if b = s then r a else 1) := by
     intro a b hab
     have hne : a ≠ b := ne_of_lt hab
     by_cases has : a = s
@@ -40,8 +43,10 @@ theorem fdeg_ratio_abs {n : ℕ} (μ : Fin n → ℝ) (s : Fin n) (t : ℝ) (hin
         have h0 : μ a - μ b ≠ 0 := sub_ne_zero.2 (fun h => hne (hinj h))
         simp only [add_zero, mul_one]
         exact div_self (abs_ne_zero.2 h0)
-  have hden : (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b),
-      (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ))) ≠ 0 := by
+  have hden
+      : (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b),
+          (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)))
+        ≠ 0 := by
     refine prod_ne_zero_iff.2 fun a _ => prod_ne_zero_iff.2 fun b hb => ?_
     have hab : a < b := (mem_filter.1 hb).2
     have : ((a : ℕ) : ℝ) < ((b : ℕ) : ℝ) := by exact_mod_cast hab
@@ -51,24 +56,30 @@ theorem fdeg_ratio_abs {n : ℕ} (μ : Fin n → ℝ) (s : Fin n) (t : ℝ) (hin
   simp_rw [← prod_div_distrib]
   rw [prod_congr rfl (fun a _ => prod_congr rfl (fun b hb => hfac a b (mem_filter.1 hb).2))]
   simp_rw [prod_mul_distrib]
-  have h1 : (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b),
-      (if a = s then r b else 1)) = ∏ b ∈ univ.filter (fun b : Fin n => s < b), r b := by
+  have h1
+      : (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b),
+          (if a = s then r b else 1))
+        = ∏ b ∈ univ.filter (fun b : Fin n => s < b), r b := by
     rw [prod_eq_single s]
     · simp
     · intro a _ has; simp [has]
     · intro h; exact absurd (mem_univ s) h
-  have h2 : (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b),
-      (if b = s then r a else 1)) = ∏ a ∈ univ.filter (fun a : Fin n => a < s), r a := by
+  have h2
+      : (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b),
+          (if b = s then r a else 1))
+        = ∏ a ∈ univ.filter (fun a : Fin n => a < s), r a := by
     rw [prod_filter]
     refine prod_congr rfl fun a _ => ?_
     rw [prod_ite_eq']
     simp
   rw [h1, h2, ← prod_filter_mul_prod_filter_not (univ.erase s) (fun c => s < c)]
   congr 1
-  · congr 1; ext c
+  · congr 1
+    ext c
     simp only [mem_filter, mem_erase, mem_univ, and_true, true_and, ne_eq, Fin.lt_def, Fin.ext_iff]
     constructor <;> intro h <;> omega
-  · congr 1; ext c
+  · congr 1
+    ext c
     simp only [mem_filter, mem_erase, mem_univ, and_true, true_and, ne_eq, Fin.lt_def, Fin.ext_iff]
     constructor <;> intro h <;> omega
 

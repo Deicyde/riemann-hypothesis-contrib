@@ -64,6 +64,7 @@ namespace UpperTheory.Lit
 
 open GlobalTheory.SepRows
 
-theorem burGapPos : Bur.BurGapPos := Bur.BurPos.burGapPos_of_bmu CompanionTheory.Bmu.besselMapUniqGap
+theorem burGapPos : Bur.BurGapPos :=
+  Bur.BurPos.burGapPos_of_bmu CompanionTheory.Bmu.besselMapUniqGap
 
 end UpperTheory.Lit

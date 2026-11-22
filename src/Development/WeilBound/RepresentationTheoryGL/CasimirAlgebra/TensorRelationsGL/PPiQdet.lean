@@ -21,13 +21,14 @@ theorem sg_swap {i j : Fin n} (h : i ≠ j) : sg (Equiv.swap i j) = -1 := by
 
 def IsAnti (g : TV n M (Fin n)) : Prop := ∀ σ : Equiv.Perm (Fin n), pm σ g = sg σ • g
 
-theorem anti_apply {g : TV n M (Fin n)} (hg : IsAnti g) (σ : Equiv.Perm (Fin n)) (I : Fin n → Fin n) :
-    g (I ∘ σ) = sg σ • g I := by
+theorem anti_apply {g : TV n M (Fin n)} (hg : IsAnti g) (σ : Equiv.Perm (Fin n)) (I : Fin n → Fin n)
+    : g (I ∘ σ) = sg σ • g I := by
   have h := congrFun (hg σ) I
   simpa [pm] using h
 
-theorem anti_zero {g : TV n M (Fin n)} (hg : IsAnti g) {I : Fin n → Fin n} (hI : ¬ Function.Injective I) :
-    g I = 0 := by
+theorem anti_zero
+    {g : TV n M (Fin n)} (hg : IsAnti g) {I : Fin n → Fin n} (hI : ¬ Function.Injective I)
+    : g I = 0 := by
   simp only [Function.Injective] at hI
   push_neg at hI
   obtain ⟨i, j, hij, hne⟩ := hI
@@ -62,11 +63,11 @@ theorem anti_ext {g : TV n M (Fin n)} (hg : IsAnti g) (h0 : g id = 0) : g = 0 :=
 theorem alt_anti (f : TV n M (Fin n)) : IsAnti (alt Finset.univ f) := by
   intro σ
   funext I
-  have key : ∀ J : Fin n → Fin n, alt Finset.univ f J = ∑ τ : Equiv.Perm (Fin n), sg τ • f (J ∘ ⇑τ) := by
+  have key
+      : ∀ J : Fin n → Fin n, alt Finset.univ f J = ∑ τ : Equiv.Perm (Fin n), sg τ • f (J ∘ ⇑τ) := by
     intro J
     simp [alt, pm, sg]
-  have hp : pm σ (alt Finset.univ f) I = alt Finset.univ f (I ∘ σ) := by
-    simp [pm]
+  have hp : pm σ (alt Finset.univ f) I = alt Finset.univ f (I ∘ σ) := by simp [pm]
   rw [hp]
   show alt Finset.univ f (I ∘ σ) = sg σ • alt Finset.univ f I
   rw [key (I ∘ σ), key I, Finset.smul_sum]
@@ -84,26 +85,39 @@ def X (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (j : Fin n) : Module.
 def T (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (j : Fin n) : Module.End ℂ (TV n M (Fin n)) :=
   algebraMap ℂ _ (u - (j : ℂ)) + Om E j
 
-theorem X_eq_T_of_antisymm_below (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (j : Fin n) (w : TV n M (Fin n))
-    (hw : ∀ i, i < j → pm (Equiv.swap i j) w = -w) : X E u j w = T E u j w := by
-  have hs : (∑ i ∈ Finset.univ.filter (fun i : Fin n => i < j), pm (Equiv.swap i j)) w = -(((j : ℕ) : ℂ) • w) := by
+theorem X_eq_T_of_antisymm_below
+    (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ)
+    (j : Fin n) (w : TV n M (Fin n)) (hw : ∀ i, i < j → pm (Equiv.swap i j) w = -w)
+    : X E u j w = T E u j w := by
+  have hs
+      : (∑ i ∈ Finset.univ.filter (fun i : Fin n => i < j), pm (Equiv.swap i j)) w
+        = -(((j : ℕ) : ℂ) • w) := by
     rw [LinearMap.sum_apply]
     rw [Finset.sum_congr rfl (fun i hi => hw i (Finset.mem_filter.mp hi).2)]
-    rw [Finset.sum_neg_distrib, Finset.sum_const, Finset.filter_gt_eq_Iio, Fin.card_Iio, Nat.cast_smul_eq_nsmul]
+    rw [Finset.sum_neg_distrib, Finset.sum_const, Finset.filter_gt_eq_Iio, Fin.card_Iio,
+      Nat.cast_smul_eq_nsmul]
   simp only [X, T, xJ, LinearMap.add_apply]
   rw [hs, Module.algebraMap_end_apply, Module.algebraMap_end_apply, sub_smul]
   abel
 
-theorem T_comm (hT : TensorGl) (E : Fin n → Fin n → Module.End ℂ M) (hE : GlRel E) (u : ℂ) (σ : Equiv.Perm (Fin n))
-    (j : Fin n) (hj : σ j = j) : Commute (pm σ) (T E u j) := by
+theorem T_comm
+    (hT : TensorGl)
+    (E : Fin n → Fin n → Module.End ℂ M) (hE : GlRel E)
+    (u : ℂ)
+    (σ : Equiv.Perm (Fin n)) (j : Fin n) (hj : σ j = j)
+    : Commute (pm σ) (T E u j) := by
   refine Commute.add_right (Algebra.commutes _ _).symm ?_
   have := (hT n M (Fin n) E hE ∅).2.2.2 σ j
   rw [hj] at this
   exact this
 
-theorem step1 (hT : TensorGl) (E : Fin n → Fin n → Module.End ℂ M) (hE : GlRel E) (u : ℂ) (g : TV n M (Fin n))
-    (hg : IsAnti g) (l : List (Fin n)) (hl : l.Pairwise (· < ·)) :
-    (l.map (X E u)).prod g = (l.map (T E u)).prod g := by
+theorem step1
+    (hT : TensorGl)
+    (E : Fin n → Fin n → Module.End ℂ M) (hE : GlRel E)
+    (u : ℂ)
+    (g : TV n M (Fin n)) (hg : IsAnti g)
+    (l : List (Fin n)) (hl : l.Pairwise (· < ·))
+    : (l.map (X E u)).prod g = (l.map (T E u)).prod g := by
   induction l with
   | nil => rfl
   | cons k l ih =>
@@ -125,12 +139,15 @@ theorem step1 (hT : TensorGl) (E : Fin n → Fin n → Module.End ℂ M) (hE : G
     rw [hg (Equiv.swap i k), sg_swap (ne_of_lt hi)]
     simp
 
-def ev (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) : List (Fin n) → (Fin n → Fin n) → TV n M (Fin n) → M
+def ev (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ)
+    : List (Fin n) → (Fin n → Fin n) → TV n M (Fin n) → M
   | [], I, h => h I
   | k :: l, I, h => ∑ a, Tm E (u - (k : ℂ)) a (I k) (ev E u l (Function.update I k a) h)
 
-theorem T_apply (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (k : Fin n) (h : TV n M (Fin n)) (I : Fin n → Fin n) :
-    T E u k h I = ∑ a, Tm E (u - (k : ℂ)) a (I k) (h (Function.update I k a)) := by
+theorem T_apply
+    (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (k : Fin n) (h : TV n M (Fin n))
+    (I : Fin n → Fin n)
+    : T E u k h I = ∑ a, Tm E (u - (k : ℂ)) a (I k) (h (Function.update I k a)) := by
   simp [T, Om, lift, eAt, Tm, Finset.sum_add_distrib, LinearMap.add_apply]
   congr 1
   · rw [Finset.sum_eq_single (I k)]
@@ -145,16 +162,21 @@ theorem T_apply (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (k : Fin n)
       simp [Ne.symm hb]
     · simp
 
-theorem evA (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (h : TV n M (Fin n)) (l : List (Fin n)) (I : Fin n → Fin n) :
-    (l.map (T E u)).prod h I = ev E u l I h := by
+theorem evA
+    (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (h : TV n M (Fin n)) (l : List (Fin n))
+    (I : Fin n → Fin n)
+    : (l.map (T E u)).prod h I = ev E u l I h := by
   induction l generalizing I with
   | nil => rfl
   | cons k l ih => simp only [List.map_cons, List.prod_cons, Module.End.mul_apply, ev, T_apply, ih]
 
-theorem evB (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (h : TV n M (Fin n)) (l : List (Fin n)) (hl : l.Nodup)
-    (I : Fin n → Fin n) :
-    ev E u l I h = ∑ c ∈ Finset.univ.filter (fun c : Fin n → Fin n => ∀ p, p ∉ l → c p = I p),
-      (l.map fun k : Fin n => Tm E (u - (k : ℂ)) (c k) (I k)).prod (h c) := by
+theorem evB
+    (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (h : TV n M (Fin n))
+    (l : List (Fin n)) (hl : l.Nodup)
+    (I : Fin n → Fin n)
+    : ev E u l I h
+      = ∑ c ∈ Finset.univ.filter (fun c : Fin n → Fin n => ∀ p, p ∉ l → c p = I p),
+        (l.map fun k : Fin n => Tm E (u - (k : ℂ)) (c k) (I k)).prod (h c) := by
   induction l generalizing I with
   | nil =>
     rw [Finset.sum_eq_single I]
@@ -191,8 +213,9 @@ theorem evB (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (h : TV n M (Fi
         · rw [H p ⟨hpk, hp⟩, Function.update_of_ne hpk]
     · simp only [Finset.mem_filter] at hc
       have hca : c k = a := hc.2
-      have hm : l.map (fun k' : Fin n => Tm E (u - (k' : ℂ)) (c k') (Function.update I k a k'))
-          = l.map (fun k' : Fin n => Tm E (u - (k' : ℂ)) (c k') (I k')) := by
+      have hm
+          : l.map (fun k' : Fin n => Tm E (u - (k' : ℂ)) (c k') (Function.update I k a k'))
+            = l.map (fun k' : Fin n => Tm E (u - (k' : ℂ)) (c k') (I k')) := by
         apply List.map_congr_left
         intro x hx
         have hxk : x ≠ k := by
@@ -201,20 +224,25 @@ theorem evB (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (h : TV n M (Fi
         rw [Function.update_of_ne hxk]
       simp only [List.map_cons, List.prod_cons, Module.End.mul_apply, hca, hm]
 
-theorem evQ (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (g : TV n M (Fin n)) (hg : IsAnti g) :
-    ev E u (List.finRange n) id g = qdet E u (g id) := by
+theorem evQ (E : Fin n → Fin n → Module.End ℂ M) (u : ℂ) (g : TV n M (Fin n)) (hg : IsAnti g)
+    : ev E u (List.finRange n) id g = qdet E u (g id) := by
   rw [evB E u g _ (List.nodup_finRange n) id]
-  have hfilt : Finset.univ.filter (fun c : Fin n → Fin n => ∀ p, p ∉ List.finRange n → c p = id p) = Finset.univ := by
+  have hfilt
+      : Finset.univ.filter (fun c : Fin n → Fin n => ∀ p, p ∉ List.finRange n → c p = id p)
+        = Finset.univ := by
     apply Finset.filter_true_of_mem
     intro c _ p hp
     exact absurd (List.mem_finRange p) hp
   rw [hfilt]
-  rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.map ⟨fun σ : Equiv.Perm (Fin n) => ⇑σ, DFunLike.coe_injective⟩)), Finset.sum_map]
+  rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.map
+      ⟨fun σ : Equiv.Perm (Fin n) => ⇑σ, DFunLike.coe_injective⟩)),
+    Finset.sum_map]
   · simp only [qdet, qminor, LinearMap.sum_apply, Function.Embedding.coeFn_mk]
     refine Finset.sum_congr rfl fun σ _ => ?_
     have ha := anti_apply hg σ id
     simp only [Function.id_comp] at ha
-    rw [ha, map_smul, Module.End.mul_apply, Module.End.intCast_apply, List.ofFn_eq_map, sg, Int.cast_smul_eq_zsmul]
+    rw [ha, map_smul, Module.End.mul_apply, Module.End.intCast_apply, List.ofFn_eq_map, sg,
+      Int.cast_smul_eq_zsmul]
     rfl
   · intro c _ hc
     have hnc : ¬ Function.Injective c := by
@@ -241,7 +269,9 @@ theorem piQdet_of : TensorGl → JMComm → PiQdet := by
   have hA : IsAnti (PiJ n E u g) := by
     intro σ
     have hc := ((hJ n M E hE n).2.2 u σ).eq
-    calc pm σ (PiJ n E u g) = ((pm σ * PiJ n E u : Module.End ℂ (TV n M (Fin n))) g) := rfl
+    calc
+      pm σ (PiJ n E u g)
+        = ((pm σ * PiJ n E u : Module.End ℂ (TV n M (Fin n))) g) := rfl
       _ = ((PiJ n E u * pm σ : Module.End ℂ (TV n M (Fin n))) g) := by rw [hc]
       _ = PiJ n E u (pm σ g) := rfl
       _ = sg σ • PiJ n E u g := by rw [hg σ, map_smul]

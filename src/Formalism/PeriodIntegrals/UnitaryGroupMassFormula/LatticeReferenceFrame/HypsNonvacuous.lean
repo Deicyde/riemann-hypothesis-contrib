@@ -14,8 +14,7 @@ namespace PI.ScRefExists.UnitaryGroupMassFormula
 
 variable (I : Formalism.MainNotions.S.AutInst)
 
-theorem hA_zero_left (y : VA I) : hA I 0 y = 0 := by
-  simp [hA, Formalism.UG.hform]
+theorem hA_zero_left (y : VA I) : hA I 0 y = 0 := by simp [hA, Formalism.UG.hform]
 
 theorem zmod_one_of_mem {c : I.E ⊗[I.F] Af I.F} (h : c ∈ IntAf I.F I.E) : ZMod' I 1 c := by
   unfold ZMod'
@@ -30,21 +29,24 @@ theorem mL_one : mL I 1 = I.Lf := by
   · intro x hx
     exact Submodule.subset_span ⟨x, hx, by simp⟩
 
-theorem ite_mem_int {p : Prop} [Decidable p] (x : I.E ⊗[I.F] Af I.F) (hx : x ∈ IntAf I.F I.E) :
-    (if p then x else 0) ∈ IntAf I.F I.E := by
+theorem ite_mem_int {p : Prop} [Decidable p] (x : I.E ⊗[I.F] Af I.F) (hx : x ∈ IntAf I.F I.E)
+    : (if p then x else 0) ∈ IntAf I.F I.E := by
   split_ifs
   · exact hx
   · exact zero_mem _
 
-def frameOne (r k : ℕ) (e f : Fin r → Fin I.n → I.E)
-    (he : ∀ a, InAt I 1 1 (incl I (e a)) ∧ InAt I 1 1 (incl I (f a))) : RefData I 1 r k e f where
+def frameOne
+    (r k : ℕ) (e f : Fin r → Fin I.n → I.E)
+    (he : ∀ a, InAt I 1 1 (incl I (e a)) ∧ InAt I 1 1 (incl I (f a)))
+    : RefData I 1 r k e f where
   e0 := fun _ => 0
   f0 := fun _ => 0
   z0 := 0
   bw := fun _ => 0
   bwd := fun _ => 0
   ew := 0
-  vectorsInLattice := ⟨fun _ => ⟨zero_mem _, zero_mem _⟩, zero_mem _, fun _ => ⟨zero_mem _, zero_mem _⟩⟩
+  vectorsInLattice :=
+    ⟨fun _ => ⟨zero_mem _, zero_mem _⟩, zero_mem _, fun _ => ⟨zero_mem _, zero_mem _⟩⟩
   basisApprox := by
     intro a
     constructor
@@ -65,9 +67,13 @@ def frameOne (r k : ℕ) (e f : Fin r → Fin I.n → I.E)
     · rw [hA_zero_left]; exact zero_mem _
   weightVectorsIntegral := by
     intro i
-    refine ⟨zmod_one_of_mem I ?_, zmod_one_of_mem I ?_, fun a => ⟨zmod_one_of_mem I ?_,
-      zmod_one_of_mem I ?_, zmod_one_of_mem I ?_, zmod_one_of_mem I ?_⟩⟩ <;>
-      (rw [hA_zero_left]; exact zero_mem _)
+    refine ⟨
+        zmod_one_of_mem I ?_,
+        zmod_one_of_mem I ?_,
+        fun a =>
+          ⟨zmod_one_of_mem I ?_, zmod_one_of_mem I ?_, zmod_one_of_mem I ?_, zmod_one_of_mem I ?_⟩
+      ⟩
+      <;> (rw [hA_zero_left]; exact zero_mem _)
   ew_idem := by simp
   ew_orth := by simp
   ew_int := zero_mem _
@@ -88,21 +94,26 @@ def frameOne (r k : ℕ) (e f : Fin r → Fin I.n → I.E)
     rw [mL_one]
     exact hy
 
-theorem refData_one (r k : ℕ) (e f : Fin r → Fin I.n → I.E)
-    (he : ∀ a, InAt I 1 1 (incl I (e a)) ∧ InAt I 1 1 (incl I (f a))) :
-    Nonempty (RefData I 1 r k e f) := ⟨frameOne I r k e f he⟩
+theorem refData_one
+    (r k : ℕ) (e f : Fin r → Fin I.n → I.E)
+    (he : ∀ a, InAt I 1 1 (incl I (e a)) ∧ InAt I 1 1 (incl I (f a)))
+    : Nonempty (RefData I 1 r k e f) :=
+  ⟨frameOne I r k e f he⟩
 
 def TargetTwo : Prop :=
-  ∀ (I : Formalism.MainNotions.S.AutInst) (g r k : ℕ) (e f : Fin r → Fin I.n → I.E), 2 ≤ g →
-    (∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 I.F), (g : 𝓞 I.F) ∈ v.asIdeal →
-      Nat.card {w : IsDedekindDomain.HeightOneSpectrum (𝓞 I.E) //
-        w.asIdeal.comap (algebraMap (𝓞 I.F) (𝓞 I.E)) = v.asIdeal} = 2) →
-    I.n = 2 * r + k + 1 →
-    (∀ a b, Formalism.UG.hform (starRingEnd I.E) I.J (e a) (e b) = 0) →
-    (∀ a b, Formalism.UG.hform (starRingEnd I.E) I.J (f a) (f b) = 0) →
-    (∀ a b, Formalism.UG.hform (starRingEnd I.E) I.J (e a) (f b) = if a = b then 1 else 0) →
-    (∀ a, InAt I g 1 (incl I (e a)) ∧ InAt I g 1 (incl I (f a))) →
-    Nonempty (RefData I g r k e f)
+  ∀ (I : Formalism.MainNotions.S.AutInst) (g r k : ℕ) (e f : Fin r → Fin I.n → I.E),
+    2 ≤ g
+      → (∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 I.F),
+        (g : 𝓞 I.F) ∈ v.asIdeal
+          → Nat.card
+              {w : IsDedekindDomain.HeightOneSpectrum (𝓞 I.E)
+                // w.asIdeal.comap (algebraMap (𝓞 I.F) (𝓞 I.E)) = v.asIdeal}
+            = 2)
+      → I.n = 2 * r + k + 1 → (∀ a b, Formalism.UG.hform (starRingEnd I.E) I.J (e a) (e b) = 0)
+      → (∀ a b, Formalism.UG.hform (starRingEnd I.E) I.J (f a) (f b) = 0)
+      → (∀ a b, Formalism.UG.hform (starRingEnd I.E) I.J (e a) (f b) = if a = b then 1 else 0)
+      → (∀ a, InAt I g 1 (incl I (e a)) ∧ InAt I g 1 (incl I (f a)))
+      → Nonempty (RefData I g r k e f)
 
 theorem target_of_two (h : TargetTwo) : Target := by
   unfold TargetTwo at h

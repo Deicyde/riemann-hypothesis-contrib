@@ -16,8 +16,10 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.CongGrp
 
-theorem finite_image_of_factor {α β γ : Type} (S : Set α) (f : α → β) (g : α → γ) [Finite β]
-    (h : ∀ x ∈ S, ∀ y ∈ S, f x = f y → g x = g y) : (g '' S).Finite := by
+theorem finite_image_of_factor
+    {α β γ : Type} (S : Set α) (f : α → β) (g : α → γ) [Finite β]
+    (h : ∀ x ∈ S, ∀ y ∈ S, f x = f y → g x = g y)
+    : (g '' S).Finite := by
   rcases S.eq_empty_or_nonempty with rfl | ⟨x0, _⟩
   · simp
   haveI : Nonempty α := ⟨x0⟩
@@ -27,8 +29,9 @@ theorem finite_image_of_factor {α β γ : Type} (S : Set α) (f : α → β) (g
   have hex : ∃ a ∈ S, f a = f x := ⟨x, hx, rfl⟩
   exact h _ (Function.invFunOn_mem hex) _ hx (Function.invFunOn_eq hex)
 
-theorem cont_pos {W : Type} [AddCommGroup W] (W0 : AddSubgroup W) (S : Set W) (h : IsCO W0 S)
-    (hS : S.Nonempty) : 0 < cont W0 S := by
+theorem cont_pos
+    {W : Type} [AddCommGroup W] (W0 : AddSubgroup W) (S : Set W) (h : IsCO W0 S) (hS : S.Nonempty)
+    : 0 < cont W0 S := by
   unfold cont
   rw [dif_pos h]
   obtain ⟨h1, h2, -, h4⟩ := h.choose_spec
@@ -40,19 +43,25 @@ theorem cont_pos {W : Type} [AddCommGroup W] (W0 : AddSubgroup W) (S : Set W) (h
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem intM_mul (L : LocE F E) {m : ℕ} {A B : Matrix (Fin m) (Fin m) E} (hA : IsIntM L A)
-    (hB : IsIntM L B) : IsIntM L (A * B) := fun a b => by
+theorem intM_mul
+    (L : LocE F E) {m : ℕ} {A B : Matrix (Fin m) (Fin m) E} (hA : IsIntM L A) (hB : IsIntM L B)
+    : IsIntM L (A * B) := fun a b => by
   rw [Matrix.mul_apply]
   exact sum_mem fun k _ => mul_mem (hA _ _) (hB _ _)
 
-theorem intM_add (L : LocE F E) {m : ℕ} {A B : Matrix (Fin m) (Fin m) E} (hA : IsIntM L A)
-    (hB : IsIntM L B) : IsIntM L (A + B) := fun a b => add_mem (hA a b) (hB a b)
+theorem intM_add
+    (L : LocE F E) {m : ℕ} {A B : Matrix (Fin m) (Fin m) E} (hA : IsIntM L A) (hB : IsIntM L B)
+    : IsIntM L (A + B) := fun a b =>
+  add_mem (hA a b) (hB a b)
 
-theorem intM_neg (L : LocE F E) {m : ℕ} {A : Matrix (Fin m) (Fin m) E} (hA : IsIntM L A) :
-    IsIntM L (-A) := fun a b => neg_mem (hA a b)
+theorem intM_neg (L : LocE F E) {m : ℕ} {A : Matrix (Fin m) (Fin m) E} (hA : IsIntM L A)
+    : IsIntM L (-A) := fun a b =>
+  neg_mem (hA a b)
 
-theorem intM_smul (L : LocE F E) {m : ℕ} {c : E} (hc : c ∈ L.O) {A : Matrix (Fin m) (Fin m) E}
-    (hA : IsIntM L A) : IsIntM L (c • A) := fun a b => mul_mem hc (hA a b)
+theorem intM_smul
+    (L : LocE F E) {m : ℕ} {c : E} (hc : c ∈ L.O) {A : Matrix (Fin m) (Fin m) E} (hA : IsIntM L A)
+    : IsIntM L (c • A) := fun a b =>
+  mul_mem hc (hA a b)
 
 theorem intM_one (L : LocE F E) {m : ℕ} : IsIntM L (1 : Matrix (Fin m) (Fin m) E) := fun a b => by
   rw [Matrix.one_apply]
@@ -60,8 +69,8 @@ theorem intM_one (L : LocE F E) {m : ℕ} : IsIntM L (1 : Matrix (Fin m) (Fin m)
   · exact one_mem _
   · exact zero_mem _
 
-theorem mem_congK (L : LocE F E) (ϖ : 𝒪[F]) {m i : ℕ} {A : Matrix (Fin m) (Fin m) E} :
-    A ∈ congK L ϖ m i ↔ ∃ C, IsIntM L C ∧ A = 1 + algebraMap F E ((ϖ : F) ^ i) • C := by
+theorem mem_congK (L : LocE F E) (ϖ : 𝒪[F]) {m i : ℕ} {A : Matrix (Fin m) (Fin m) E}
+    : A ∈ congK L ϖ m i ↔ ∃ C, IsIntM L C ∧ A = 1 + algebraMap F E ((ϖ : F) ^ i) • C := by
   constructor
   · intro h
     choose C hC hA using h
@@ -73,8 +82,8 @@ theorem mem_congK (L : LocE F E) (ϖ : 𝒪[F]) {m i : ℕ} {A : Matrix (Fin m) 
   · rintro ⟨C, hC, rfl⟩ a b
     exact ⟨C a b, hC a b, by simp⟩
 
-theorem cT_mul (L : LocE F E) {m : ℕ} (A B : Matrix (Fin m) (Fin m) E) :
-    cT L (A * B) = cT L B * cT L A := by
+theorem cT_mul (L : LocE F E) {m : ℕ} (A B : Matrix (Fin m) (Fin m) E)
+    : cT L (A * B) = cT L B * cT L A := by
   ext a b
   simp [cT, Matrix.mul_apply, mul_comm]
 
@@ -82,8 +91,8 @@ theorem cT_cT (L : LocE F E) {m : ℕ} (A : Matrix (Fin m) (Fin m) E) : cT L (cT
   ext a b
   simp [cT, L.cj_cj]
 
-theorem mem_hermLat (L : LocE F E) {m : ℕ} {X : Matrix (Fin m) (Fin m) E} :
-    X ∈ hermLat L m ↔ IsHerm L X ∧ IsIntM L X := by
+theorem mem_hermLat (L : LocE F E) {m : ℕ} {X : Matrix (Fin m) (Fin m) E}
+    : X ∈ hermLat L m ↔ IsHerm L X ∧ IsIntM L X := by
   refine ⟨fun h => ?_, fun h => AddSubgroup.subset_closure h⟩
   induction h using AddSubgroup.closure_induction with
   | mem x hx => exact hx
@@ -112,9 +121,10 @@ theorem pow_mem' (L : LocE F E) (ϖ : 𝒪[F]) (i : ℕ) : algebraMap F E ((ϖ :
   have := int_mem L (ϖ ^ i)
   simpa using this
 
-theorem norm_one_add (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {y : E} (hy : y ∈ L.O) :
-    ∃ u : (𝒪[F])ˣ, (1 + algebraMap F E (ϖ : F) * y) * L.cj (1 + algebraMap F E (ϖ : F) * y) =
-      algebraMap F E ((u : 𝒪[F]) : F) := by
+theorem norm_one_add (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {y : E} (hy : y ∈ L.O)
+    : ∃ u : (𝒪[F])ˣ,
+      (1 + algebraMap F E (ϖ : F) * y) * L.cj (1 + algebraMap F E (ϖ : F) * y)
+        = algebraMap F E ((u : 𝒪[F]) : F) := by
   obtain ⟨-, h2, -⟩ := GlobalTheory.UnramOrder.order_facts L ϖ hϖ
   obtain ⟨-, ⟨t, ht⟩, n, hn⟩ := h2 y hy
   have hu : IsUnit (1 + ϖ * (t + ϖ * n)) := by
@@ -130,22 +140,21 @@ theorem norm_one_add (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {y : E
   rw [← ht, ← hn]
   ring
 
-theorem vE_unit (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) (u : (𝒪[F])ˣ) :
-    vE L ϖ (algebraMap F E ((u : 𝒪[F]) : F)) = 0 := by
+theorem vE_unit (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) (u : (𝒪[F])ˣ)
+    : vE L ϖ (algebraMap F E ((u : 𝒪[F]) : F)) = 0 := by
   obtain ⟨h1, -, h3, -⟩ := GlobalTheory.UnramVal.vE_valuation L ϖ hϖ
   have hne : ∀ w : (𝒪[F])ˣ, ((w : 𝒪[F]) : F) ≠ 0 := fun w h => w.ne_zero (Subtype.ext h)
   have e1 := h1 1 1 one_ne_zero one_ne_zero
   have e2 := h1 _ _ (hne u) (hne u⁻¹)
-  have e3 : ((u : 𝒪[F]) : F) * ((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]) = 1 := by
-    rw [← Subring.coe_mul]; simp
+  have e3 : ((u : 𝒪[F]) : F) * ((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]) = 1 := by rw [← Subring.coe_mul]; simp
   rw [e3] at e2
   rw [mul_one] at e1
   have a1 := (h3 _ (hne u)).2 (u : 𝒪[F]).2
   have a2 := (h3 _ (hne u⁻¹)).2 ((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]).2
   omega
 
-theorem exists_pow_mul_mem (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) (x : E) :
-    ∃ n : ℕ, algebraMap F E ((ϖ : F) ^ n) * x ∈ L.O := by
+theorem exists_pow_mul_mem (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) (x : E)
+    : ∃ n : ℕ, algebraMap F E ((ϖ : F) ^ n) * x ∈ L.O := by
   haveI : Module.Finite F E := Module.finite_of_finrank_eq_succ L.rank
   have h1 : IsAlgebraic F x := Algebra.IsAlgebraic.isAlgebraic x
   have h2 : IsAlgebraic 𝒪[F] x := (IsFractionRing.isAlgebraic_iff 𝒪[F] F E).2 h1
@@ -153,17 +162,19 @@ theorem exists_pow_mul_mem (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) 
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hr hϖ
   refine ⟨n, ?_⟩
   have h3 := mul_mem (int_mem L ((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F])) ((L.O_def _).2 hi)
-  have e3 : (((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]) : F) * ((u : 𝒪[F]) : F) = 1 := by
-    rw [← Subring.coe_mul]; simp
+  have e3 : (((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]) : F) * ((u : 𝒪[F]) : F) = 1 := by rw [← Subring.coe_mul]; simp
   have e4 : ((u : 𝒪[F]) * ϖ ^ n) • x = algebraMap F E (((u : 𝒪[F]) : F) * (ϖ : F) ^ n) * x := by
     rw [Algebra.smul_def]
     rfl
   rw [e4, ← mul_assoc, ← map_mul, ← mul_assoc, e3, one_mul] at h3
   exact h3
 
-theorem congK_basic (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {m i : ℕ} (hi : 1 ≤ i)
-    {A : Matrix (Fin m) (Fin m) E} (hA : A ∈ congK L ϖ m i) :
-    IsUnit A.det ∧ vE L ϖ (A.det * L.cj A.det) = 0 ∧ IsIntM L A⁻¹ := by
+theorem congK_basic
+    (L : LocE F E)
+    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ)
+    {m i : ℕ} (hi : 1 ≤ i)
+    {A : Matrix (Fin m) (Fin m) E} (hA : A ∈ congK L ϖ m i)
+    : IsUnit A.det ∧ vE L ϖ (A.det * L.cj A.det) = 0 ∧ IsIntM L A⁻¹ := by
   obtain ⟨C, hC, hAC⟩ := (mem_congK L ϖ).1 hA
   obtain ⟨k, rfl⟩ : ∃ k, i = k + 1 := ⟨i - 1, by omega⟩
   let C' : Matrix (Fin m) (Fin m) L.O :=
@@ -178,8 +189,13 @@ theorem congK_basic (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {m i : 
     simp [C', p, pow_succ]
     ring
   obtain ⟨y, hy⟩ : ∃ y : L.O, A'.det = 1 + p * y := by
-    refine ⟨C'.trace + Polynomial.eval p (1 + (Polynomial.X : Polynomial L.O) •
-      C'.map Polynomial.C).det.divX.divX * p, ?_⟩
+    refine ⟨
+      C'.trace
+        + Polynomial.eval p
+            (1 + (Polynomial.X : Polynomial L.O) • C'.map Polynomial.C).det.divX.divX
+          * p,
+      ?_
+    ⟩
     simp only [A']
     rw [Matrix.det_one_add_smul]
     ring
@@ -187,14 +203,12 @@ theorem congK_basic (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {m i : 
     rw [hAA, ← RingHom.map_det, hy]
     rfl
   obtain ⟨u, hu⟩ := norm_one_add L ϖ hϖ y.2
-  have e3 : ((u : 𝒪[F]) : F) * ((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]) = 1 := by
-    rw [← Subring.coe_mul]; simp
+  have e3 : ((u : 𝒪[F]) : F) * ((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]) = 1 := by rw [← Subring.coe_mul]; simp
   have hcj : L.cj (1 + algebraMap F E (ϖ : F) * (y : E)) ∈ L.O :=
     ((GlobalTheory.UnramOrder.order_facts L ϖ hϖ).2.1 _
       (add_mem (one_mem _) (mul_mem (int_mem L ϖ) y.2))).1
   have hU : IsUnit A'.det := by
-    refine IsUnit.of_mul_eq_one
-      (⟨_, mul_mem hcj (int_mem L ((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]))⟩ : L.O) ?_
+    refine IsUnit.of_mul_eq_one (⟨_, mul_mem hcj (int_mem L ((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]))⟩ : L.O) ?_
     rw [hy]
     apply Subtype.ext
     change (1 + algebraMap F E (ϖ : F) * (y : E)) * (_ * _) = 1
@@ -211,26 +225,33 @@ theorem congK_basic (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {m i : 
     intro a b
     exact (A'⁻¹ a b).2
 
-theorem congK_int (L : LocE F E) (ϖ : 𝒪[F]) {m i : ℕ}
-    {A : Matrix (Fin m) (Fin m) E} (hA : A ∈ congK L ϖ m i) : IsIntM L A := by
+theorem congK_int
+    (L : LocE F E) (ϖ : 𝒪[F]) {m i : ℕ} {A : Matrix (Fin m) (Fin m) E} (hA : A ∈ congK L ϖ m i)
+    : IsIntM L A := by
   obtain ⟨C, hC, rfl⟩ := (mem_congK L ϖ).1 hA
   exact intM_add L (intM_one L) (intM_smul L (pow_mem' L ϖ i) hC)
 
-theorem congK_mul (L : LocE F E) (ϖ : 𝒪[F]) {m i : ℕ} {A B : Matrix (Fin m) (Fin m) E}
-    (hA : A ∈ congK L ϖ m i) (hB : B ∈ congK L ϖ m i) : A * B ∈ congK L ϖ m i := by
+theorem congK_mul
+    (L : LocE F E) (ϖ : 𝒪[F])
+    {m i : ℕ} {A B : Matrix (Fin m) (Fin m) E} (hA : A ∈ congK L ϖ m i) (hB : B ∈ congK L ϖ m i)
+    : A * B ∈ congK L ϖ m i := by
   have hB' := congK_int L ϖ hB
   obtain ⟨C, hC, rfl⟩ := (mem_congK L ϖ).1 hA
   obtain ⟨D, hD, hBD⟩ := (mem_congK L ϖ).1 hB
   refine (mem_congK L ϖ).2 ⟨D + C * B, intM_add L hD (intM_mul L hC hB'), ?_⟩
   rw [add_mul, one_mul, smul_add, ← add_assoc, ← hBD, Matrix.smul_mul]
 
-theorem congK_one (L : LocE F E) (ϖ : 𝒪[F]) {m i : ℕ} :
-    (1 : Matrix (Fin m) (Fin m) E) ∈ congK L ϖ m i := fun a b => ⟨0, zero_mem _, by simp⟩
+theorem congK_one (L : LocE F E) (ϖ : 𝒪[F]) {m i : ℕ}
+    : (1 : Matrix (Fin m) (Fin m) E) ∈ congK L ϖ m i := fun a b =>
+  ⟨0, zero_mem _, by simp⟩
 
-theorem horb_isCO (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {m i : ℕ} (hi : 1 ≤ i)
-    (Γ : Matrix (Fin m) (Fin m) E) (hΓ : IsHerm L Γ) (hdet : IsUnit Γ.det) :
-    IsCO (hermLat L m) (horb L ϖ Γ i) := by
-  obtain ⟨j, hj⟩ := GlobalTheory.T.congruentOneMatrices_transitive_near_hermitian L ϖ hϖ m Γ hΓ hdet i hi
+theorem horb_isCO
+    (L : LocE F E)
+    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ)
+    {m i : ℕ} (hi : 1 ≤ i) (Γ : Matrix (Fin m) (Fin m) E) (hΓ : IsHerm L Γ) (hdet : IsUnit Γ.det)
+    : IsCO (hermLat L m) (horb L ϖ Γ i) := by
+  obtain ⟨j, hj⟩ :=
+    GlobalTheory.T.congruentOneMatrices_transitive_near_hermitian L ϖ hϖ m Γ hΓ hdet i hi
   obtain ⟨-, hcj, -, -, -, hcard, hq, -⟩ := GlobalTheory.UnramOrder.order_facts L ϖ hϖ
   have hϖ0 : (ϖ : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   have hpu : ∀ n : ℕ, IsUnit (algebraMap F E ((ϖ : F) ^ n)) := fun n =>
@@ -241,17 +262,20 @@ theorem horb_isCO (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {m i : �
     intro X
     simp only [A, AddSubgroup.mem_map, mem_hermLat]
     rfl
-  have hfin : ∀ (c : ℕ) (S : Set (Matrix (Fin m) (Fin m) E)),
-      (∀ X ∈ S, IsHerm L X ∧ IsIntM L (algebraMap F E ((ϖ : F) ^ c) • X)) →
-      ((QuotientAddGroup.mk : _ → _ ⧸ A) '' S).Finite := by
+  have hfin
+      : ∀ (c : ℕ) (S : Set (Matrix (Fin m) (Fin m) E)),
+        (∀ X ∈ S, IsHerm L X ∧ IsIntM L (algebraMap F E ((ϖ : F) ^ c) • X))
+          → ((QuotientAddGroup.mk : _ → _ ⧸ A) '' S).Finite := by
     intro c S hS
     let I : Ideal L.O := Ideal.span {y : L.O | (y : E) = algebraMap F E ((ϖ : F) ^ (c + j))}
     haveI : Finite (L.O ⧸ I) := by
       apply Nat.finite_of_card_ne_zero
       rw [hcard]
       exact pow_ne_zero _ (by omega)
-    refine finite_image_of_factor S (fun X => fun a b : Fin m =>
-      if h : algebraMap F E ((ϖ : F) ^ c) * X a b ∈ L.O then Ideal.Quotient.mk I ⟨_, h⟩ else 0) _ ?_
+    refine finite_image_of_factor S
+      (fun X => fun a b : Fin m =>
+        if h : algebraMap F E ((ϖ : F) ^ c) * X a b ∈ L.O then Ideal.Quotient.mk I ⟨_, h⟩ else 0)
+      _ ?_
     intro X hX Y hY hXY
     have key : ∀ a b, ∃ d ∈ L.O, Y a b - X a b = algebraMap F E ((ϖ : F) ^ j) * d := by
       intro a b
@@ -268,8 +292,9 @@ theorem horb_isCO (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {m i : �
       rw [hI, Ideal.mem_span_singleton'] at h3
       obtain ⟨d, hd⟩ := h3
       refine ⟨d, d.2, (hpu c).mul_left_cancel ?_⟩
-      have h4 : (d : E) * algebraMap F E ((ϖ : F) ^ (c + j)) =
-        algebraMap F E ((ϖ : F) ^ c) * Y a b - algebraMap F E ((ϖ : F) ^ c) * X a b :=
+      have h4
+          : (d : E) * algebraMap F E ((ϖ : F) ^ (c + j))
+            = algebraMap F E ((ϖ : F) ^ c) * Y a b - algebraMap F E ((ϖ : F) ^ c) * X a b :=
         congrArg Subtype.val hd
       rw [pow_add, map_mul] at h4
       linear_combination -h4
@@ -331,7 +356,23 @@ theorem horb_isCO (L : LocE F E) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) {m i : �
       exact intM_mul L (intM_mul L (fun a b => (hcj _ (hCi b a)).1) hc) hCi
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem congK_group : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (ϖ : 𝒪[F]), Irreducible ϖ → ∀ (m i : ℕ), 1 ≤ i → (1 : Matrix (Fin m) (Fin m) E) ∈ congK L ϖ m i ∧ (∀ A ∈ congK L ϖ m i, IsIntM L A ∧ IsUnit A.det ∧ vE L ϖ (A.det * L.cj A.det) = 0 ∧ A⁻¹ ∈ congK L ϖ m i ∧ (∀ B ∈ congK L ϖ m i, A * B ∈ congK L ϖ m i) ∧ ∀ i' ≥ i, ∀ B ∈ congK L ϖ m i', A⁻¹ * B * A ∈ congK L ϖ m i' ∧ B ∈ congK L ϖ m i) ∧ ∀ Γ : Matrix (Fin m) (Fin m) E, IsHerm L Γ → IsUnit Γ.det → IsCO (hermLat L m) (horb L ϖ Γ i) ∧ 0 < cont (hermLat L m) (horb L ϖ Γ i) := by
+theorem congK_group
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (ϖ : 𝒪[F]),
+        Irreducible ϖ
+          → ∀ (m i : ℕ),
+            1 ≤ i
+              → (1 : Matrix (Fin m) (Fin m) E) ∈ congK L ϖ m i
+                ∧ (∀ A ∈ congK L ϖ m i,
+                  IsIntM L A ∧ IsUnit A.det ∧ vE L ϖ (A.det * L.cj A.det) = 0 ∧ A⁻¹ ∈ congK L ϖ m i
+                    ∧ (∀ B ∈ congK L ϖ m i, A * B ∈ congK L ϖ m i)
+                    ∧ ∀ i' ≥ i, ∀ B ∈ congK L ϖ m i',
+                      A⁻¹ * B * A ∈ congK L ϖ m i' ∧ B ∈ congK L ϖ m i)
+                ∧ ∀ Γ : Matrix (Fin m) (Fin m) E,
+                  IsHerm L Γ → IsUnit Γ.det
+                    → IsCO (hermLat L m) (horb L ϖ Γ i)
+                      ∧ 0 < cont (hermLat L m) (horb L ϖ Γ i) := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ m i hi
   refine ⟨congK_one L ϖ, fun A hA => ?_, fun Γ hΓ hdet => ?_⟩
   · obtain ⟨h1, h2, h3⟩ := congK_basic L ϖ hϖ hi hA

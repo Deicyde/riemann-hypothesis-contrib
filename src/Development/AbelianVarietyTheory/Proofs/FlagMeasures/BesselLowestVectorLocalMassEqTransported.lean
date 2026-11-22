@@ -13,7 +13,8 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.BridgeCSB
 @[expose] public section
 
 open scoped Classical ENNReal
-open MeasureTheory Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.LocWSOf GlobalTheory.TypeAsm
+open MeasureTheory Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.LocWSOf GlobalTheory.TypeAsm
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -22,32 +23,47 @@ namespace GlobalTheory.PhiTranslate
 
 variable {D : D7} {X : HidaSetting D}
 
-theorem transp_mem (C : Choice X 1) (τ : D.what₂.Tau) {m : MatKR D.R.k D.R.rS}
-    (hm : m ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS)) :
-    Formalism.REAL.inUJ (X.B.I.ε (vOf X τ)) (C.Q τ * m * C.Qi τ) := by
+theorem transp_mem
+    (C : Choice X 1) (τ : D.what₂.Tau)
+    {m : MatKR D.R.k D.R.rS}
+    (hm : m ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS))
+    : Formalism.REAL.inUJ (X.B.I.ε (vOf X τ)) (C.Q τ * m * C.Qi τ) := by
   obtain ⟨-, h2, h3, -⟩ := C.isT τ
-  have hm' : mᴴ * Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS * m = Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS := hm
+  have hm'
+      : mᴴ * Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS * m
+        = Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS :=
+    hm
   unfold Formalism.REAL.inUJ
-  calc (C.Q τ * m * C.Qi τ)ᴴ * Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * (C.Q τ * m * C.Qi τ)
-      = (C.Qi τ)ᴴ * (mᴴ * ((C.Q τ)ᴴ * Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * C.Q τ) * m) * C.Qi τ := by
-        simp only [conjTranspose_mul, Matrix.mul_assoc]
-    _ = (C.Qi τ)ᴴ * ((C.Q τ)ᴴ * Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * C.Q τ) * C.Qi τ := by rw [h3, hm']
+  calc
+    (C.Q τ * m * C.Qi τ)ᴴ * Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * (C.Q τ * m * C.Qi τ)
+        = (C.Qi τ)ᴴ * (mᴴ * ((C.Q τ)ᴴ * Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * C.Q τ) * m)
+          * C.Qi τ := by
+      simp only [conjTranspose_mul, Matrix.mul_assoc]
+    _ = (C.Qi τ)ᴴ * ((C.Q τ)ᴴ * Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * C.Q τ) * C.Qi τ := by
+      rw [h3, hm']
     _ = (C.Q τ * C.Qi τ)ᴴ * Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) * (C.Q τ * C.Qi τ) := by
-        simp only [conjTranspose_mul, Matrix.mul_assoc]
+      simp only [conjTranspose_mul, Matrix.mul_assoc]
     _ = Formalism.REAL.Jm (X.B.I.ε (vOf X τ)) := by rw [h2]; simp
 
-theorem exists_uj {n : ℕ} {ε : Fin n → Bool} {M : Matrix (Fin n) (Fin n) ℂ} (hM : Formalism.REAL.inUJ ε M) :
-    ∃ γ : Formalism.REAL.UJ ε, uMat γ = M := by
+theorem exists_uj
+    {n : ℕ} {ε : Fin n → Bool} {M : Matrix (Fin n) (Fin n) ℂ} (hM : Formalism.REAL.inUJ ε M)
+    : ∃ γ : Formalism.REAL.UJ ε, uMat γ = M := by
   have hM' : Mᴴ * Formalism.REAL.Jm ε * M = Formalism.REAL.Jm ε := hM
   have hl : (Formalism.REAL.Jm ε * Mᴴ * Formalism.REAL.Jm ε) * M = 1 := by
     rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc Mᴴ, hM', Formalism.REAL.Jm_mul_self]
   have hr : M * (Formalism.REAL.Jm ε * Mᴴ * Formalism.REAL.Jm ε) = 1 := mul_eq_one_comm.1 hl
   exact ⟨⟨⟨M, _, hr, hl⟩, hM⟩, rfl⟩
 
-theorem phiOf_eq (C : Choice X 1) (hB : WuBessel C) (u : D.what₂.Word) (τ : D.what₂.Tau) {m : MatKR D.R.k D.R.rS}
-    (hm : m ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS)) :
-    phiOf hB u τ m = wT C u τ (m * C.y τ) := by
-  have hmy : m * C.y τ ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS) := Formalism.FourierDecayAlt.P.DDSmoothness.uh_mul hm (C.y_mem τ)
+theorem phiOf_eq
+    (C : Choice X 1) (hB : WuBessel C)
+    (u : D.what₂.Word) (τ : D.what₂.Tau)
+    {m : MatKR D.R.k D.R.rS}
+    (hm : m ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS))
+    : phiOf hB u τ m = wT C u τ (m * C.y τ) := by
+  have hmy
+      : m * C.y τ
+        ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk D.R.k D.R.rS) :=
+    Formalism.FourierDecayAlt.P.DDSmoothness.uh_mul hm (C.y_mem τ)
   have hex : ∃ γ : Formalism.REAL.UJ (X.B.I.ε (vOf X τ)), uMat γ = C.Q τ * (m * C.y τ) * C.Qi τ :=
     exists_uj (transp_mem C τ hmy)
   unfold wT
@@ -60,8 +76,11 @@ theorem phiOf_eq (C : Choice X 1) (hB : WuBessel C) (u : D.what₂.Word) (τ : D
   rw [← ContinuousLinearMap.comp_apply, ← hmul, e]
   rfl
 
-theorem bessel_lowest_vector_local_mass_eq_transported : ∀ (D : D7) (X : HidaSetting D) (C : Choice X 1) (hB : WuBessel C), GoodLoc C hB →
-    ∀ (u : D.what₂.Word) (τ : D.what₂.Tau), l2SG (C.nuS u τ) (phiOf hB u τ) = l2SG (C.nuS u τ) (wT C u τ) := by
+theorem bessel_lowest_vector_local_mass_eq_transported
+    : ∀ (D : D7) (X : HidaSetting D) (C : Choice X 1) (hB : WuBessel C),
+      GoodLoc C hB
+        → ∀ (u : D.what₂.Word) (τ : D.what₂.Tau),
+          l2SG (C.nuS u τ) (phiOf hB u τ) = l2SG (C.nuS u τ) (wT C u τ) := by
   intro D X C hB hG u τ
   obtain ⟨hLF, hGW⟩ := hG
   obtain ⟨hW, -⟩ := hGW u τ
@@ -82,36 +101,56 @@ theorem bessel_lowest_vector_local_mass_eq_transported : ∀ (D : D7) (X : HidaS
   obtain ⟨hGG, hGH⟩ := GlobalTheory.unitaryGroup_matGroup_unimodular D.R.k D.R.rS
   obtain ⟨hGH1, hGH2⟩ := hGH _ hGm
   obtain ⟨hSG, hsub, hS1, hS2⟩ := GlobalTheory.muSof_isHaar _ _ _ _ _ hz hT hWm hN
-  have hset : PI.QuotientSetting (BranchingSupport.GG D.R.k D.R.rS) (Formalism.QuantumDeterminants.Sset D.R.k D.R.rS (zB X (C.Qi τ) u τ))
-      (muGB X (C.Q τ) (C.Qi τ) τ) (Formalism.FourierDecayAlt.ThreeDimData.muSof (C.muW u τ) (muNB D 1)) (C.nuS u τ) :=
+  have hset : PI.QuotientSetting (BranchingSupport.GG D.R.k D.R.rS)
+      (Formalism.QuantumDeterminants.Sset D.R.k D.R.rS (zB X (C.Qi τ) u τ))
+      (muGB X (C.Q τ) (C.Qi τ) τ)
+      (Formalism.FourierDecayAlt.ThreeDimData.muSof (C.muW u τ) (muNB D 1)) (C.nuS u τ) :=
     ⟨hGG, hSG, hsub, hGH1, hS1, hGH2, hS2, hq⟩
   obtain ⟨h0, h1⟩ := Formalism.FourierDecayAlt.P.DDSmoothness.muSof_facts hWm hN
   have hae := Formalism.FourierDecayAlt.P.DDSmoothness.ae_UH_of_quot hGm.2.2.1 h0 h1 hq
-  have hinv : ∀ s ∈ Formalism.QuantumDeterminants.Sset D.R.k D.R.rS (zB X (C.Qi τ) u τ), ∀ x ∈ BranchingSupport.GG D.R.k D.R.rS,
-      ‖wT C u τ (s * x)‖ = ‖wT C u τ x‖ := by
+  have hinv
+      : ∀ s ∈ Formalism.QuantumDeterminants.Sset D.R.k D.R.rS (zB X (C.Qi τ) u τ),
+        ∀ x ∈ BranchingSupport.GG D.R.k D.R.rS,
+          ‖wT C u τ (s * x)‖ = ‖wT C u τ x‖ := by
     rintro _ ⟨h', hh, m, hmN, rfl⟩ x hx
     rw [heq h' hh m hmN x hx, norm_smul,
-      show ‖psiS D (zB X (C.Qi τ) u τ) m‖ = 1 from Formalism.FourierDecayAlt.P.MatrixMultiplicationContinuity.psi_norm _ _ _, one_mul]
+      show ‖psiS D (zB X (C.Qi τ) u τ) m‖ = 1 from
+        Formalism.FourierDecayAlt.P.MatrixMultiplicationContinuity.psi_norm _ _ _,
+      one_mul]
     exact Formalism.FourierDecayAlt.P.MatrixMultiplicationContinuity.piW_unitary hT hc h' hh _
   set A : Set (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS) := {x | Matrix.of x ∈ BranchingSupport.GG D.R.k D.R.rS} with hA
-  have hAm : MeasurableSet A := IsClosed.measurableSet (α := Formalism.QuantumDeterminants.Mt D.R.k D.R.rS) hGG.1
-  have hc' : ContinuousOn (fun x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS => ‖wT C u τ (Matrix.of x)‖₊) A := hcont.nnnorm
-  have hm : Measurable (A.piecewise (fun x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS => ‖wT C u τ (Matrix.of x)‖₊)
+  have hAm : MeasurableSet A :=
+    IsClosed.measurableSet (α := Formalism.QuantumDeterminants.Mt D.R.k D.R.rS) hGG.1
+  have hc' : ContinuousOn
+      (fun x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS => ‖wT C u τ (Matrix.of x)‖₊)
+      A :=
+    hcont.nnnorm
+  have hm : Measurable (A.piecewise
+      (fun x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS => ‖wT C u τ (Matrix.of x)‖₊)
       (fun _ => 0)) :=
     hc'.measurable_piecewise continuousOn_const hAm
-  have hval : ∀ x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS, Matrix.of x ∈ BranchingSupport.GG D.R.k D.R.rS →
-      A.piecewise (fun x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS => ‖wT C u τ (Matrix.of x)‖₊) (fun _ => 0) x =
-        ‖wT C u τ (Matrix.of x)‖₊ :=
-    fun x hx => Set.piecewise_eq_of_mem _ _ _ hx
-  have key := GlobalTheory.QuotRightInv.quotInv _ _ _ _ _ _ hset _ (hm.coe_nnreal_ennreal.pow_const 2) (fun s hs x hx => by
-    rw [hval x hx, hval (fun i j => (s * Matrix.of x) i j) (hGG.2.2.1 s (hsub hs) _ hx)]
-    congr 2
-    exact NNReal.eq (hinv s hs _ hx)) (C.y τ) (C.y_mem τ)
+  have hval
+      : ∀ x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS,
+        Matrix.of x ∈ BranchingSupport.GG D.R.k D.R.rS
+          → A.piecewise
+              (fun x : Formalism.QuantumDeterminants.Mt D.R.k D.R.rS => ‖wT C u τ (Matrix.of x)‖₊)
+              (fun _ => 0)
+              x
+            = ‖wT C u τ (Matrix.of x)‖₊ := fun x hx =>
+    Set.piecewise_eq_of_mem _ _ _ hx
+  have key :=
+    GlobalTheory.QuotRightInv.quotInv _ _ _ _ _ _ hset _ (hm.coe_nnreal_ennreal.pow_const 2)
+      (fun s hs x hx => by
+        rw [hval x hx, hval (fun i j => (s * Matrix.of x) i j) (hGG.2.2.1 s (hsub hs) _ hx)]
+        congr 2
+        exact NNReal.eq (hinv s hs _ hx))
+      (C.y τ) (C.y_mem τ)
   unfold l2SG
   refine Eq.trans (lintegral_congr_ae (hae.mono fun x hx => ?_))
     (key.trans (lintegral_congr_ae (hae.mono fun x hx => ?_)))
   · simp only
-    rw [hval (fun i j => (Matrix.of x * C.y τ) i j) (hGG.2.2.1 _ hx _ (C.y_mem τ)), phiOf_eq C hB u τ hx]
+    rw [hval (fun i j => (Matrix.of x * C.y τ) i j) (hGG.2.2.1 _ hx _ (C.y_mem τ)),
+      phiOf_eq C hB u τ hx]
     rfl
   · simp only
     rw [hval x hx]

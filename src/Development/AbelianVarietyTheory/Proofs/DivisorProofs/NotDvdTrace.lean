@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemHeightOne
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.MainNotions.G NumberField GlobalTheory.IndefiniteRowSideFullHecke.LevelLossDegreeBounds
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.MainNotions.G
+  NumberField GlobalTheory.IndefiniteRowSideFullHecke.LevelLossDegreeBounds
 
 namespace GlobalTheory.LevelCoprime
 
@@ -17,8 +18,7 @@ section Host
 
 variable {R : Ranks} (H : Host R)
 
-theorem phi_conj (φ : H.E →+* ℂ) (x : H.E) : φ (H.conj x) = starRingEnd ℂ (φ x) :=
-  H.conjE_apply φ x
+theorem phi_conj (φ : H.E →+* ℂ) (x : H.E) : φ (H.conj x) = starRingEnd ℂ (φ x) := H.conjE_apply φ x
 
 theorem conj_conj (x : H.E) : H.conj (H.conj x) = x := by
   apply H.φ₀.injective
@@ -37,8 +37,9 @@ theorem conj_b : H.conj H.sqrtMinusD = -H.sqrtMinusD := by
   rw [phi_conj, map_neg, h3]
   simp
 
-theorem agree_on_K (σ τ : H.E ≃ₐ[ℚ] H.E) (h : σ H.sqrtMinusD = τ H.sqrtMinusD) (x : H.E) (hx : x ∈ H.K) :
-    σ x = τ x := by
+theorem agree_on_K
+    (σ τ : H.E ≃ₐ[ℚ] H.E) (h : σ H.sqrtMinusD = τ H.sqrtMinusD) (x : H.E) (hx : x ∈ H.K)
+    : σ x = τ x := by
   have hx' : x ∈ IntermediateField.adjoin ℚ {H.sqrtMinusD} := hx
   clear hx
   induction hx' using IntermediateField.adjoin_induction with
@@ -59,7 +60,8 @@ theorem trace_rat (x : H.E) (hx : x ∈ H.K) : ∃ r : ℚ, algebraMap ℚ H.E r
     rw [map_add (f := _), sigma_conj]
     rcases hb with hb | hb
     · have := agree_on_K H σ 1 hb x hx
-      rw [this]; rfl
+      rw [this]
+      rfl
     · have := agree_on_K H σ H.conj (hb.trans (conj_b H).symm) x hx
       rw [this, conj_conj, add_comm]
   exact IntermediateField.mem_bot.1 hmem
@@ -69,14 +71,15 @@ theorem trace_int (x : 𝓞 H.E) (hx : (x : H.E) ∈ H.K) : ∃ a : ℤ, (a : H.
   have h1 : IsIntegral ℤ (H.conj (x : H.E)) :=
     IsIntegral.map (H.conj : H.E →+* H.E).toIntAlgHom x.isIntegral_coe
   have h2 : IsIntegral ℤ (algebraMap ℚ H.E r) := hr ▸ x.isIntegral_coe.add h1
-  have h3 : IsIntegral ℤ r := (isIntegral_algebraMap_iff ).1 h2
+  have h3 : IsIntegral ℤ r := (isIntegral_algebraMap_iff).1 h2
   obtain ⟨a, ha⟩ := IsIntegrallyClosed.algebraMap_eq_of_integral h3
   refine ⟨a, ?_⟩
   rw [← hr, ← ha]
   simp
 
-theorem trace_sq_le (x : H.E) (a : ℤ) (T : ℕ) (ha : (a : H.E) = x + H.conj x) (hT : x * H.conj x = T) :
-    a ^ 2 ≤ 4 * T := by
+theorem trace_sq_le
+    (x : H.E) (a : ℤ) (T : ℕ) (ha : (a : H.E) = x + H.conj x) (hT : x * H.conj x = T)
+    : a ^ 2 ≤ 4 * T := by
   have h1 := congrArg H.φ₀ ha
   have h2 := congrArg H.φ₀ hT
   rw [map_add (f := _), phi_conj, map_intCast, Complex.add_conj] at h1
@@ -90,21 +93,24 @@ theorem trace_sq_le (x : H.E) (a : ℤ) (T : ℕ) (ha : (a : H.E) = x + H.conj x
 
 end Host
 
-theorem four_dvd {E : Type} [Field E] [NumberField E] (n : ℤ) (y : E) (hy : IsIntegral ℤ y)
-    (h : (n : E) = 4 * y) : (4 : ℤ) ∣ n := by
+theorem four_dvd
+    {E : Type} [Field E] [NumberField E] (n : ℤ) (y : E) (hy : IsIntegral ℤ y) (h : (n : E) = 4 * y)
+    : (4 : ℤ) ∣ n := by
   have h1 : y = algebraMap ℚ E ((n : ℚ) / 4) := by
     rw [map_div₀, map_intCast, h]
     simp
   rw [h1] at hy
-  have h3 := (isIntegral_algebraMap_iff ).1 hy
+  have h3 := (isIntegral_algebraMap_iff).1 hy
   obtain ⟨a, ha⟩ := IsIntegrallyClosed.algebraMap_eq_of_integral h3
   refine ⟨a, ?_⟩
   have h4 : (a : ℚ) = (n : ℚ) / 4 := by simpa using ha
   have h5 : (n : ℚ) = 4 * a := by rw [h4]; ring
   exact_mod_cast h5
 
-theorem not_dvd_trace {D : D7} (X : ErrX D) (u : D.what₂.Word) (a : ℤ)
-    (ha : (a : D.host.E) = X.piT u + D.host.conj (X.piT u)) : ¬ (((D.mem u).A.T : ℤ) ∣ a) := by
+theorem not_dvd_trace
+    {D : D7} (X : ErrX D) (u : D.what₂.Word)
+    (a : ℤ) (ha : (a : D.host.E) = X.piT u + D.host.conj (X.piT u))
+    : ¬(((D.mem u).A.T : ℤ) ∣ a) := by
   intro hd
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton.1 (X.piT_cong u)
   have hdiv : ∃ b : 𝓞 D.host.E, X.piT u = 1 + 4 * b := by
@@ -142,10 +148,11 @@ theorem not_dvd_trace {D : D7} (X : ErrX D) (u : D.what₂.Word) (a : ℤ)
     omega
   nlinarith [mul_pow T k 2]
 
-theorem coprime_conj {D : D7} (X : ErrX D) (u : D.what₂.Word) (w : D.what₂.places.Pl)
-    (hw : D.what₂.places.resChar w = (D.mem u).A.T) :
-    ¬ (0 < vAdd (D.plEq w) (D.embE (X.piT u : D.host.E)) ∧
-      0 < vAdd (D.plEq w) (star (D.embE (X.piT u : D.host.E)))) := by
+theorem coprime_conj
+    {D : D7} (X : ErrX D) (u : D.what₂.Word) (w : D.what₂.places.Pl)
+    (hw : D.what₂.places.resChar w = (D.mem u).A.T)
+    : ¬(0 < vAdd (D.plEq w) (D.embE (X.piT u : D.host.E))
+      ∧ 0 < vAdd (D.plEq w) (star (D.embE (X.piT u : D.host.E)))) := by
   rintro ⟨h1, h2⟩
   obtain ⟨a, ha⟩ := trace_int D.host (X.piT u) (X.piT_K u)
   have hp := (D.mem u).A.T_prime
@@ -156,13 +163,18 @@ theorem coprime_conj {D : D7} (X : ErrX D) (u : D.what₂.Word) (w : D.what₂.p
   have i1 : IsIntegral ℤ (D.embE (X.piT u : D.host.E)) :=
     IsIntegral.map D.embE.toIntAlgHom (X.piT u).isIntegral_coe
   have i2 : IsIntegral ℤ (D.embE (D.host.conj (X.piT u : D.host.E))) :=
-    IsIntegral.map (D.embE.comp (D.host.conj : D.host.E →+* D.host.E)).toIntAlgHom (X.piT u).isIntegral_coe
+    IsIntegral.map (D.embE.comp (D.host.conj : D.host.E →+* D.host.E)).toIntAlgHom
+      (X.piT u).isIntegral_coe
   let y : 𝓞 D.what₂.LL := ⟨_, i1⟩
   let z : 𝓞 D.what₂.LL := ⟨_, i2⟩
-  have hy : y ≠ 0 := fun h => (map_ne_zero D.embE).2 (left_ne_zero_of_mul hT0) (congrArg Subtype.val h)
-  have hz : z ≠ 0 := fun h => (map_ne_zero D.embE).2 (right_ne_zero_of_mul hT0) (congrArg Subtype.val h)
-  have m1 := (GlobalTheory.TypeLoss.mem_heightOneIdeal_iff_additiveValuation_pos (D.plEq w) y hy).2 h1
-  have m2 := (GlobalTheory.TypeLoss.mem_heightOneIdeal_iff_additiveValuation_pos (D.plEq w) z hz).2 h2
+  have hy : y ≠ 0 := fun h =>
+    (map_ne_zero D.embE).2 (left_ne_zero_of_mul hT0) (congrArg Subtype.val h)
+  have hz : z ≠ 0 := fun h =>
+    (map_ne_zero D.embE).2 (right_ne_zero_of_mul hT0) (congrArg Subtype.val h)
+  have m1 :=
+    (GlobalTheory.TypeLoss.mem_heightOneIdeal_iff_additiveValuation_pos (D.plEq w) y hy).2 h1
+  have m2 :=
+    (GlobalTheory.TypeLoss.mem_heightOneIdeal_iff_additiveValuation_pos (D.plEq w) z hz).2 h2
   have e : ((a : ℤ) : 𝓞 D.what₂.LL) = y + z := by
     apply RingOfIntegers.coe_injective
     rw [map_intCast, map_add (f := _)]

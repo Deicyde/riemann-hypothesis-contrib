@@ -13,17 +13,19 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyPow GlobalTheory.KeyKa
 
 namespace GlobalTheory
 
-theorem prod_comp_eq_of_finite_family {S : Type} (A : Finset (S → ℂ)) (a : S → S)
-    (h : ∀ f ∈ A, ∃ f' ∈ A, f = f' ∘ a) (w : ℂ) (x : S) :
-    ∏ f ∈ A, (w - f (a x)) = ∏ f ∈ A, (w - f x) := by
+theorem prod_comp_eq_of_finite_family
+    {S : Type} (A : Finset (S → ℂ)) (a : S → S) (h : ∀ f ∈ A, ∃ f' ∈ A, f = f' ∘ a) (w : ℂ) (x : S)
+    : ∏ f ∈ A, (w - f (a x)) = ∏ f ∈ A, (w - f x) := by
   classical
   choose! φ hφA hφ using h
   have hinj : Set.InjOn φ A := fun f hf k hk hfk => by rw [hφ f hf, hφ k hk, hfk]
@@ -32,14 +34,19 @@ theorem prod_comp_eq_of_finite_family {S : Type} (A : Finset (S → ℂ)) (a : S
     · obtain ⟨f, hf, rfl⟩ := Finset.mem_image.1 hy
       exact hφA f hf
     · rw [Finset.card_image_of_injOn hinj]
-  calc ∏ f ∈ A, (w - f (a x)) = ∏ f ∈ A.image φ, (w - f (a x)) := by rw [himg]
+  calc
+    ∏ f ∈ A, (w - f (a x))
+      = ∏ f ∈ A.image φ, (w - f (a x)) := by rw [himg]
     _ = ∏ f ∈ A, (w - φ f (a x)) := Finset.prod_image hinj
     _ = ∏ f ∈ A, (w - f x) :=
-        Finset.prod_congr rfl (fun f hf => congrArg (w - ·) (congrFun (hφ f hf) x).symm)
+      Finset.prod_congr rfl (fun f hf => congrArg (w - ·) (congrFun (hφ f hf) x).symm)
 
-theorem differentiableOn_finite_prod {K E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    {s : Set E} (A : Finset K) {f : K → E → ℂ} (h : ∀ i ∈ A, DifferentiableOn ℂ (f i) s) :
-    DifferentiableOn ℂ (fun x => ∏ i ∈ A, f i x) s := by
+theorem differentiableOn_finite_prod
+    {K E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {s : Set E}
+    (A : Finset K)
+    {f : K → E → ℂ} (h : ∀ i ∈ A, DifferentiableOn ℂ (f i) s)
+    : DifferentiableOn ℂ (fun x => ∏ i ∈ A, f i x) s := by
   classical
   induction A using Finset.induction_on with
   | empty => simp
@@ -47,8 +54,14 @@ theorem differentiableOn_finite_prod {K E : Type} [NormedAddCommGroup E] [Normed
     simp only [Finset.prod_insert hj]
     exact (h j (Finset.mem_insert_self j B)).mul (ih fun k hk => h k (Finset.mem_insert_of_mem hk))
 
-theorem const_of_finite_family_spAct :
-    Key.PhHoloStatement → ∀ (g : ℕ) (I : Type) [Finite I] (F : I → Matrix (Fin g) (Fin g) ℂ → ℂ), 2 ≤ g → (∀ i, Key.IsHoloSiegel g (F i)) → (∀ sp ∈ Matrix.symplecticGroup (Fin g) ℤ, ∀ i, ∃ j, ∀ τ ∈ ReciprocityTheory.PTheta.SiegelH (Fin g), F i τ = F j (Key.Chi.spAct sp τ)) → ∀ i, ∃ c, ∀ τ ∈ ReciprocityTheory.PTheta.SiegelH (Fin g), F i τ = c := by
+theorem const_of_finite_family_spAct
+    : Key.PhHoloStatement
+      → ∀ (g : ℕ) (I : Type) [Finite I] (F : I → Matrix (Fin g) (Fin g) ℂ → ℂ),
+        2 ≤ g → (∀ i, Key.IsHoloSiegel g (F i))
+          → (∀ sp ∈ Matrix.symplecticGroup (Fin g) ℤ, ∀ i, ∃ j,
+            ∀ τ ∈ ReciprocityTheory.PTheta.SiegelH (Fin g),
+              F i τ = F j (Key.Chi.spAct sp τ))
+          → ∀ i, ∃ c, ∀ τ ∈ ReciprocityTheory.PTheta.SiegelH (Fin g), F i τ = c := by
   intro hPh g I _ F hg hF h i
   classical
   have : Fintype I := Fintype.ofFinite I
@@ -60,8 +73,8 @@ theorem const_of_finite_family_spAct :
   have hA : ∀ f ∈ A, ∃ j, G j = f := fun f hf => by simpa [A] using hf
   have : Nonempty I := ⟨i⟩
   choose! rep hrep using hA
-  have heval : ∀ f ∈ A, ∀ τ (hτ : τ ∈ S), F (rep f) τ = f ⟨τ, hτ⟩ :=
-    fun f hf τ hτ => congrFun (hrep f hf) ⟨τ, hτ⟩
+  have heval : ∀ f ∈ A, ∀ τ (hτ : τ ∈ S), F (rep f) τ = f ⟨τ, hτ⟩ := fun f hf τ hτ =>
+    congrFun (hrep f hf) ⟨τ, hτ⟩
   have hsym : ∀ τ ∈ S, Key.phSym τ = τ := by
     intro τ hτ
     have ht : Matrix.transpose τ = τ := (hmem τ hτ).1.eq
@@ -86,11 +99,11 @@ theorem const_of_finite_family_spAct :
     have hstep := prod_comp_eq_of_finite_family A act hfam w ⟨τ, hτ⟩
     have hact : Key.phAct gm τ = Key.Chi.spAct gm τ := rfl
     show ∏ f ∈ A, (w - F (rep f) (Key.phAct gm τ)) = ∏ f ∈ A, (w - F (rep f) τ)
-    calc ∏ f ∈ A, (w - F (rep f) (Key.phAct gm τ)) = ∏ f ∈ A, (w - f (act ⟨τ, hτ⟩)) :=
-          Finset.prod_congr rfl (fun f hf => by rw [hact, heval f hf _ (Key.Chi.spAct_mem hgm hτ)])
+    calc
+      ∏ f ∈ A, (w - F (rep f) (Key.phAct gm τ)) = ∏ f ∈ A, (w - f (act ⟨τ, hτ⟩)) :=
+        Finset.prod_congr rfl (fun f hf => by rw [hact, heval f hf _ (Key.Chi.spAct_mem hgm hτ)])
       _ = ∏ f ∈ A, (w - f ⟨τ, hτ⟩) := hstep
-      _ = ∏ f ∈ A, (w - F (rep f) τ) :=
-          Finset.prod_congr rfl (fun f hf => by rw [heval f hf τ hτ])
+      _ = ∏ f ∈ A, (w - F (rep f) τ) := Finset.prod_congr rfl (fun f hf => by rw [heval f hf τ hτ])
   by_cases hne : S.Nonempty
   swap
   · exact ⟨0, fun τ hτ => (hne ⟨τ, hτ⟩).elim⟩
@@ -131,6 +144,7 @@ theorem const_of_finite_family_spAct :
       subst hst
       simpa using hy2
   exact hconv.isPreconnected.constant_of_mapsTo DiscreteTopology.isDiscrete hcont
-    (fun σ hσ => hval σ hσ) hτ hτ0
+    (fun σ hσ => hval σ hσ)
+    hτ hτ0
 
 end GlobalTheory

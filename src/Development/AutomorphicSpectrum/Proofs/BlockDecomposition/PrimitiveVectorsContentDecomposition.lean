@@ -13,20 +13,27 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalOrd
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
-open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free GlobalTheory.CompanionTheory.WeilSiegel.HypStep GlobalTheory.CompanionTheory.WeilSiegel.HypMass
+open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
+  GlobalTheory.CompanionTheory.WeilSiegel.HypStep GlobalTheory.CompanionTheory.WeilSiegel.HypMass
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.HypMass.PrimDec
 
-theorem hform_single {A : Type} [CommRing A] (τ : A →+* A) {N : ℕ} (H : Matrix (Fin N) (Fin N) A) (a b : Fin N) :
-    hform τ H (Pi.single a 1) (Pi.single b 1) = H a b := by
+theorem hform_single
+    {A : Type} [CommRing A] (τ : A →+* A) {N : ℕ} (H : Matrix (Fin N) (Fin N) A) (a b : Fin N)
+    : hform τ H (Pi.single a 1) (Pi.single b 1) = H a b := by
   simp [hform, Pi.single_apply, Finset.sum_ite_eq]
 
-theorem exists_content {T : Type} [CommRing T] [IsArtinianRing T] (O : Subring T) [IsPrincipalIdealRing O] {N : ℕ}
-    (y : Fin N → T) (hy : ∀ k, y k ∈ O) (hfree : ∀ c : T, (∀ k, c * y k = 0) → c = 0) :
-    ∃ x ∈ O, IsUnit x ∧ ∃ y₀ a : Fin N → T, (∀ k, y₀ k ∈ O) ∧ (∀ k, a k ∈ O) ∧ (∀ k, y k = x * y₀ k) ∧
-      ∑ k, a k * y₀ k = 1 := by
+theorem exists_content
+    {T : Type} [CommRing T] [IsArtinianRing T]
+    (O : Subring T) [IsPrincipalIdealRing O]
+    {N : ℕ} (y : Fin N → T) (hy : ∀ k, y k ∈ O) (hfree : ∀ c : T, (∀ k, c * y k = 0) → c = 0)
+    : ∃ x ∈ O,
+      IsUnit x
+        ∧ ∃ y₀ a : Fin N → T,
+          (∀ k, y₀ k ∈ O) ∧ (∀ k, a k ∈ O) ∧ (∀ k, y k = x * y₀ k) ∧ ∑ k, a k * y₀ k = 1 := by
   let yO : Fin N → O := fun k => ⟨y k, hy k⟩
   obtain ⟨x, hx⟩ := (IsPrincipalIdealRing.principal (Ideal.span (Set.range yO))).principal
   have hdiv : ∀ k, ∃ t : O, t * x = yO k := fun k => by
@@ -34,8 +41,7 @@ theorem exists_content {T : Type} [CommRing T] [IsArtinianRing T] (O : Subring T
     rw [hx] at h
     exact Ideal.mem_span_singleton'.1 h
   choose t ht using hdiv
-  have hxm : x ∈ Ideal.span (Set.range yO) := by
-    rw [hx]; exact Ideal.mem_span_singleton_self x
+  have hxm : x ∈ Ideal.span (Set.range yO) := by rw [hx]; exact Ideal.mem_span_singleton_self x
   obtain ⟨a, ha⟩ := Ideal.mem_span_range_iff_exists_fun.1 hxm
   have hyk : ∀ k, y k = (x : T) * (t k : T) := fun k => by
     have := congrArg Subtype.val (ht k)
@@ -57,19 +63,27 @@ theorem exists_content {T : Type} [CommRing T] [IsArtinianRing T] (O : Subring T
 
 section Loc
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) {M d : ℕ}
-  (J : Matrix (Fin M) (Fin M) E) (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {M d : ℕ} (J : Matrix (Fin M) (Fin M) E) (b : Module.Basis (Fin d) F E)
+  (v : HeightOneSpectrum (𝓞 F))
 
-theorem exists_of_mem_primV (O : Subring (Fv F v ⊗[F] E))
-    (hO : ∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
-    {y : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E} (hy : y ∈ primV σ J b v) :
-    (∀ i, y 0 i ∈ O) ∧ ∃ a : Fin (M + 2) → Fv F v ⊗[F] E, (∀ i, a i ∈ O) ∧ ∑ k, a k * y 0 k = 1 := by
+theorem exists_of_mem_primV
+    (O : Subring (Fv F v ⊗[F] E))
+    (hO : ∀ y,
+      y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+    {y : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E} (hy : y ∈ primV σ J b v)
+    : (∀ i, y 0 i ∈ O)
+      ∧ ∃ a : Fin (M + 2) → Fv F v ⊗[F] E, (∀ i, a i ∈ O) ∧ ∑ k, a k * y 0 k = 1 := by
   obtain ⟨g, hg, rfl⟩ := hy
   set G : GL (Fin (M + 2)) (Fv F v ⊗[F] E) := HA.mat (Fv F v) σ (hypOne J) g with hG
-  have hact : ∀ (X : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) (t : Fin 1),
-      actW (Fv F v) σ (hypOne J) g X t = (G : Matrix _ _ _) *ᵥ X t := fun _ _ => rfl
-  have hlat : ∀ X : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E, X ∈ latV b v ↔ ∀ a i, X a i ∈ O :=
-    fun X => GlobalTheory.CompanionTheory.SW.GoodTrans.mem_latV_iff b v O hO X
+  have hact
+      : ∀ (X : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) (t : Fin 1),
+        actW (Fv F v) σ (hypOne J) g X t = (G : Matrix _ _ _) *ᵥ X t := fun _ _ =>
+    rfl
+  have hlat : ∀ X : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E, X ∈ latV b v ↔ ∀ a i, X a i ∈ O := fun X =>
+    GlobalTheory.CompanionTheory.SW.GoodTrans.mem_latV_iff b v O hO X
   have he : (e0 (Fv F v ⊗[F] E) M) ∈ latV b v := by
     rw [hlat]
     intro a i
@@ -78,10 +92,10 @@ theorem exists_of_mem_primV (O : Subring (Fv F v ⊗[F] E))
     | succ i => exact O.zero_mem
   have hy := (hg _).2 he
   rw [hlat] at hy
-  let Gi : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E) := ((G⁻¹ : GL (Fin (M + 2)) (Fv F v ⊗[F] E)) : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E))
+  let Gi : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E) :=
+    ((G⁻¹ : GL (Fin (M + 2)) (Fv F v ⊗[F] E)) : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E))
   refine ⟨hy 0, fun k => Gi 0 k, fun k => ?_, ?_⟩
-  · let x : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E :=
-      fun _ => Gi *ᵥ Pi.single k 1
+  · let x : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E := fun _ => Gi *ᵥ Pi.single k 1
     have hgx : actW (Fv F v) σ (hypOne J) g x ∈ latV b v := by
       rw [hlat]
       intro a i
@@ -95,26 +109,33 @@ theorem exists_of_mem_primV (O : Subring (Fv F v ⊗[F] E))
     rw [hlat] at hx
     have := hx 0 0
     simpa [x, Matrix.mulVec_single_one] using this
-  · have h0 : Gi *ᵥ ((G : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E)) *ᵥ e0 (Fv F v ⊗[F] E) M 0) =
-        e0 (Fv F v ⊗[F] E) M 0 := by
+  · have h0
+        : Gi *ᵥ ((G : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E)) *ᵥ e0 (Fv F v ⊗[F] E) M 0)
+          = e0 (Fv F v ⊗[F] E) M 0 := by
       rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
     have h1 := congrFun h0 0
     rw [← hact] at h1
     simpa [Matrix.mulVec, dotProduct, e0] using h1
 
-theorem mem_primV_of (O : Subring (Fv F v ⊗[F] E))
-    (hO : ∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
-    (hstab : ∀ y ∈ O, sigR (Fv F v) σ y ∈ O) (hss : ∀ z, sigR (Fv F v) σ (sigR (Fv F v) σ z) = z)
-    (h2 : IsUnit (2 : O))
-    (hgood : ∀ s β : O, IsUnit β → sigR (Fv F v) σ β = β → ∃ ε z : O,
-      (ε : Fv F v ⊗[F] E) * sigR (Fv F v) σ ε = 1 ∧ ((β : Fv F v ⊗[F] E) - sigR (Fv F v) σ ε * s) * z = 1)
+theorem mem_primV_of
+    (O : Subring (Fv F v ⊗[F] E))
+    (hO : ∀ y,
+      y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+    (hstab : ∀ y ∈ O, sigR (Fv F v) σ y ∈ O)
+    (hss : ∀ z, sigR (Fv F v) σ (sigR (Fv F v) σ z) = z) (h2 : IsUnit (2 : O))
+    (hgood : ∀ s β : O,
+      IsUnit β → sigR (Fv F v) σ β = β
+        → ∃ ε z : O,
+          (ε : Fv F v ⊗[F] E) * sigR (Fv F v) σ ε = 1
+            ∧ ((β : Fv F v ⊗[F] E) - sigR (Fv F v) σ ε * s) * z = 1)
     (Hi : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E))
     (hHO : ∀ i j, JR (Fv F v) (hypOne J) i j ∈ O) (hHiO : ∀ i j, Hi i j ∈ O)
     (hmul : JR (Fv F v) (hypOne J) * Hi = 1)
     (hJ : ∀ i j, sigR (Fv F v) σ (JR (Fv F v) (hypOne J) j i) = JR (Fv F v) (hypOne J) i j)
     (y : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) (hy : ∀ i, y 0 i ∈ O)
     (a : Fin (M + 2) → Fv F v ⊗[F] E) (ha : ∀ i, a i ∈ O) (hsum : ∑ k, a k * y 0 k = 1)
-    (hiso : hform (sigR (Fv F v) σ) (JR (Fv F v) (hypOne J)) (y 0) (y 0) = 0) : y ∈ primV σ J b v := by
+    (hiso : hform (sigR (Fv F v) σ) (JR (Fv F v) (hypOne J)) (y 0) (y 0) = 0)
+    : y ∈ primV σ J b v := by
   set s := sigR (Fv F v) σ with hs
   set H : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E) := JR (Fv F v) (hypOne J) with hH
   let τ : O →+* O := s.restrict O O hstab
@@ -123,13 +144,18 @@ theorem mem_primV_of (O : Subring (Fv F v ⊗[F] E))
   let HiO : Matrix (Fin (M + 2)) (Fin (M + 2)) O := fun i j => ⟨Hi i j, hHiO i j⟩
   let y0 : Fin (M + 2) → O := fun i => ⟨y 0 i, hy i⟩
   let a0 : Fin (M + 2) → O := fun i => ⟨a i, ha i⟩
-  have hcoe : ∀ p q : Fin (M + 2) → O, ((hform τ HO p q : O) : Fv F v ⊗[F] E) =
-      hform s H (fun i => (p i : Fv F v ⊗[F] E)) (fun i => (q i : Fv F v ⊗[F] E)) := by
+  have hcoe
+      : ∀ p q : Fin (M + 2) → O,
+        ((hform τ HO p q : O) : Fv F v ⊗[F] E)
+          = hform s H (fun i => (p i : Fv F v ⊗[F] E)) (fun i => (q i : Fv F v ⊗[F] E)) := by
     intro p q
     simp [hform, hτ, HO]
-  have hval : ∀ g : GL (Fin (M + 2)) O, ((bc O.subtype g : GL (Fin (M + 2)) (Fv F v ⊗[F] E)) :
-      Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E)) =
-      (g : Matrix (Fin (M + 2)) (Fin (M + 2)) O).map O.subtype := fun g => rfl
+  have hval
+      : ∀ g : GL (Fin (M + 2)) O,
+        ((bc O.subtype g : GL (Fin (M + 2)) (Fv F v ⊗[F] E))
+            : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E))
+          = (g : Matrix (Fin (M + 2)) (Fin (M + 2)) O).map O.subtype := fun g =>
+    rfl
   have hmulO : HO * HiO = 1 := by
     refine Matrix.ext fun i j => Subtype.ext ?_
     have := congrFun (congrFun hmul i) j
@@ -138,19 +164,26 @@ theorem mem_primV_of (O : Subring (Fv F v ⊗[F] E))
     simp only [Subring.coe_mul, HO, HiO]
     rw [this]
     by_cases h : i = j <;> simp [Matrix.one_apply, h]
-  obtain ⟨g0, hg0, hgx⟩ := GlobalTheory.T.hyperbolic_pair_unitary_transitive O τ (fun z => Subtype.ext (hss z)) h2
-    (fun p β hβ hf => by
-      obtain ⟨ε, z, h1, h3⟩ := hgood p β hβ (congrArg Subtype.val hf)
-      exact ⟨ε, z, Subtype.ext h1, Subtype.ext h3⟩)
-    (M + 2) HO HiO hmulO (fun i j => Subtype.ext (hJ i j)) (Pi.single 0 1) (Pi.single 1 1) y0 a0
-    (by rw [hform_single]; exact Subtype.ext (by simp [HO, H, JR, hypOne_zero_zero]))
-    (by rw [hform_single]; exact Subtype.ext (by simp [HO, H, JR, hypOne_one_one]))
-    (by rw [hform_single]; exact Subtype.ext (by simp [HO, H, JR, hypOne_zero_one]))
-    (Subtype.ext (by rw [hcoe]; exact hiso))
-    (Subtype.ext (by simpa [a0, y0] using hsum))
+  obtain ⟨g0, hg0, hgx⟩ :=
+    GlobalTheory.T.hyperbolic_pair_unitary_transitive O τ
+      (fun z => Subtype.ext (hss z))
+      h2
+      (fun p β hβ hf => by
+        obtain ⟨ε, z, h1, h3⟩ := hgood p β hβ (congrArg Subtype.val hf)
+        exact ⟨ε, z, Subtype.ext h1, Subtype.ext h3⟩)
+      (M + 2) HO HiO hmulO
+      (fun i j => Subtype.ext (hJ i j))
+      (Pi.single 0 1) (Pi.single 1 1) y0 a0
+      (by rw [hform_single]; exact Subtype.ext (by simp [HO, H, JR, hypOne_zero_zero]))
+      (by rw [hform_single]; exact Subtype.ext (by simp [HO, H, JR, hypOne_one_one]))
+      (by rw [hform_single]; exact Subtype.ext (by simp [HO, H, JR, hypOne_zero_one]))
+      (Subtype.ext (by rw [hcoe]; exact hiso)) (Subtype.ext (by simpa [a0, y0] using hsum))
   have hmem : bc O.subtype g0 ∈ HR (Fv F v) σ (hypOne J) := by
-    have h0 : cT τ (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O) * HO *
-        (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O) = HO := hg0
+    have h0
+        : cT τ (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O) * HO
+            * (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O)
+          = HO :=
+      hg0
     have h1 := congrArg (RingHom.mapMatrix O.subtype) h0
     rw [map_mul, map_mul] at h1
     show cT s ((bc O.subtype g0 : GL (Fin (M + 2)) (Fv F v ⊗[F] E)) :
@@ -159,21 +192,30 @@ theorem mem_primV_of (O : Subring (Fv F v ⊗[F] E))
         Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E)) = H
     exact h1
   let h' : HA (Fv F v) σ (hypOne J) := (⟨bc O.subtype g0, hmem⟩ : HR (Fv F v) σ (hypOne J))
-  have hact : ∀ (X : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) (t : Fin 1),
-      actW (Fv F v) σ (hypOne J) h' X t = ((bc O.subtype g0 : GL (Fin (M + 2)) (Fv F v ⊗[F] E)) :
-        Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E)) *ᵥ X t := fun _ _ => rfl
+  have hact
+      : ∀ (X : Fin 1 → Fin (M + 2) → Fv F v ⊗[F] E) (t : Fin 1),
+        actW (Fv F v) σ (hypOne J) h' X t
+          = ((bc O.subtype g0 : GL (Fin (M + 2)) (Fv F v ⊗[F] E))
+              : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E))
+            *ᵥ X t := fun _ _ =>
+    rfl
   refine ⟨h', fun X => ?_, ?_⟩
-  · rw [GlobalTheory.CompanionTheory.SW.GoodTrans.mem_latV_iff b v O hO, GlobalTheory.CompanionTheory.SW.GoodTrans.mem_latV_iff b v O hO]
+  · rw [GlobalTheory.CompanionTheory.SW.GoodTrans.mem_latV_iff b v O hO,
+      GlobalTheory.CompanionTheory.SW.GoodTrans.mem_latV_iff b v O hO]
     constructor
     · intro hX t i
-      have e : X t = ((bc O.subtype g0⁻¹ : GL (Fin (M + 2)) (Fv F v ⊗[F] E)) :
-          Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E)) *ᵥ
-          (((bc O.subtype g0 : GL (Fin (M + 2)) (Fv F v ⊗[F] E)) :
-          Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E)) *ᵥ X t) := by
-        rw [Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one,
-          Matrix.one_mulVec]
+      have e
+          : X t
+            = ((bc O.subtype g0⁻¹ : GL (Fin (M + 2)) (Fv F v ⊗[F] E))
+                : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E))
+              *ᵥ (((bc O.subtype g0 : GL (Fin (M + 2)) (Fv F v ⊗[F] E))
+                  : Matrix (Fin (M + 2)) (Fin (M + 2)) (Fv F v ⊗[F] E))
+                *ᵥ X t) := by
+        rw [Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one,
+          Units.val_one, Matrix.one_mulVec]
       rw [e]
-      refine GlobalTheory.CompanionTheory.SW.GoodTrans.mulVec_mem O _ (fun p q => ?_) _ (fun j => ?_) i
+      refine
+        GlobalTheory.CompanionTheory.SW.GoodTrans.mulVec_mem O _ (fun p q => ?_) _ (fun j => ?_) i
       · rw [hval]
         exact ((g0⁻¹ : GL (Fin (M + 2)) O) : Matrix (Fin (M + 2)) (Fin (M + 2)) O) p q |>.2
       · rw [← hact]; exact hX t j
@@ -186,7 +228,9 @@ theorem mem_primV_of (O : Subring (Fv F v ⊗[F] E))
     rw [Fin.fin_one_eq_zero t, hact, hval]
     funext i
     have h1 := congrArg Subtype.val (congrFun hgx i)
-    have he : e0 (Fv F v ⊗[F] E) M 0 = fun j => ((Pi.single 0 1 : Fin (M + 2) → O) j : Fv F v ⊗[F] E) := by
+    have he
+        : e0 (Fv F v ⊗[F] E) M 0
+          = fun j => ((Pi.single 0 1 : Fin (M + 2) → O) j : Fv F v ⊗[F] E) := by
       funext j
       induction j using Fin.cases with
       | zero => simp [e0]

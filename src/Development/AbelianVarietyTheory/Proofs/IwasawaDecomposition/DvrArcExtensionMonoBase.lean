@@ -23,8 +23,11 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Abe
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsLocalRing TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.TorRef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam
+  GlobalTheory.TorRef
 open ReciprocityTheory.ChartRestriction.G.DVR
 
 noncomputable section
@@ -34,26 +37,36 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ArcExt
 
-theorem exists_ramified_ext (T : CDVR) {Ω : Type} [Field Ω] [Algebra T.Fr Ω] [Algebra.IsAlgebraic T.Fr Ω] [IsAlgClosed Ω]
-    (M : IntermediateField T.Fr Ω) [FiniteDimensional T.Fr M] (N : ℕ) (hN : 0 < N) (ϖ₀ : T.V) (h₀ : Irreducible ϖ₀) :
-    ∃ (T' : CDVR) (g : T.V →+* T'.V) (κ : M →+* T'.Fr) (e : ℕ) (ϖ : T'.V),
-      Function.Injective g ∧ IsLocalHom g ∧ Irreducible ϖ ∧
-      (∀ v, κ (algebraMap T.Fr M (algebraMap T.V T.Fr v)) = algebraMap T'.V T'.Fr (g v)) ∧
-      N ∣ e ∧ Associated (g ϖ₀) (ϖ ^ e) := by
+theorem exists_ramified_ext
+    (T : CDVR)
+    {Ω : Type} [Field Ω] [Algebra T.Fr Ω] [Algebra.IsAlgebraic T.Fr Ω] [IsAlgClosed Ω]
+    (M : IntermediateField T.Fr Ω) [FiniteDimensional T.Fr M]
+    (N : ℕ) (hN : 0 < N)
+    (ϖ₀ : T.V) (h₀ : Irreducible ϖ₀)
+    : ∃ (T' : CDVR) (g : T.V →+* T'.V) (κ : M →+* T'.Fr) (e : ℕ) (ϖ : T'.V),
+      Function.Injective g ∧ IsLocalHom g ∧ Irreducible ϖ
+        ∧ (∀ v, κ (algebraMap T.Fr M (algebraMap T.V T.Fr v)) = algebraMap T'.V T'.Fr (g v)) ∧ N ∣ e
+        ∧ Associated (g ϖ₀) (ϖ ^ e) := by
   haveI : CharZero T.Fr := algebraRat.charZero _
   obtain ⟨α, hα⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap T.Fr Ω (algebraMap T.V T.Fr ϖ₀)) hN
   let A := IntermediateField.adjoin T.Fr ({α} : Set Ω)
-  have : FiniteDimensional T.Fr A := IntermediateField.finiteDimensional_adjoin fun y _ => Algebra.IsIntegral.isIntegral y
+  have : FiniteDimensional T.Fr A :=
+    IntermediateField.finiteDimensional_adjoin fun y _ => Algebra.IsIntegral.isIntegral y
   let L : IntermediateField T.Fr Ω := M ⊔ A
   have : FiniteDimensional T.Fr L := inferInstance
-  obtain ⟨W, _, _, _, _, _, _, _, hc, -, hinj, hloc, -, -⟩ := GlobalTheory.SS.exists_complete_dvr_finite_extension T.V T.Fr L
+  obtain ⟨W, _, _, _, _, _, _, _, hc, -, hinj, hloc, -, -⟩ :=
+    GlobalTheory.SS.exists_complete_dvr_finite_extension T.V T.Fr L
   have : CharZero W := charZero_of_injective_algebraMap hinj
   let T' : CDVR := { V := W }
   let ψ : L ≃+* FractionRing W := (FractionRing.algEquiv W L).symm.toRingEquiv
   have hψ : ∀ w : W, ψ (algebraMap W L w) = algebraMap W (FractionRing W) w := fun w =>
     (FractionRing.algEquiv W L).symm.commutes w
-  let κ : M →+* FractionRing W := ψ.toRingHom.comp (IntermediateField.inclusion (le_sup_left : M ≤ L)).toRingHom
-  have hκ : ∀ v, κ (algebraMap T.Fr M (algebraMap T.V T.Fr v)) = algebraMap W (FractionRing W) (algebraMap T.V W v) := by
+  let κ : M →+* FractionRing W :=
+    ψ.toRingHom.comp (IntermediateField.inclusion (le_sup_left : M ≤ L)).toRingHom
+  have hκ
+      : ∀ v,
+        κ (algebraMap T.Fr M (algebraMap T.V T.Fr v))
+          = algebraMap W (FractionRing W) (algebraMap T.V W v) := by
     intro v
     have h1 : algebraMap T.Fr L (algebraMap T.V T.Fr v) = algebraMap W L (algebraMap T.V W v) :=
       (RingHom.congr_fun hc v).symm
@@ -84,8 +97,7 @@ theorem exists_ramified_ext (T : CDVR) {Ω : Type} [Field Ω] [Algebra T.Fr Ω] 
   obtain ⟨n, v₂, hv₂⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hy0 hϖ
   have hW : x ^ N = algebraMap T.V W ϖ₀ * y ^ N := by
     apply IsFractionRing.injective W (FractionRing W)
-    have hy' : algebraMap W (FractionRing W) y ≠ 0 := by
-      simpa using hy0
+    have hy' : algebraMap W (FractionRing W) y ≠ 0 := by simpa using hy0
     rw [map_pow, map_mul, map_pow, ← hb, ← hxy, div_pow, div_mul_cancel₀ _ (pow_ne_zero _ hy')]
   have he : m * N = e + n * N := by
     rw [hv₁, hv₂, hu, mul_pow, mul_pow, ← pow_mul, ← pow_mul] at hW
@@ -96,16 +108,21 @@ theorem exists_ramified_ext (T : CDVR) {Ω : Type} [Field Ω] [Algebra T.Fr Ω] 
   refine ⟨T', algebraMap T.V W, κ, e, ϖ, hinj, hloc, hϖ, hκ, ?_, ?_⟩
   · have : N ∣ e + n * N := ⟨m, by rw [← he, mul_comm]⟩
     exact (Nat.dvd_add_left (Dvd.intro_left n rfl)).1 this
-  · exact ⟨u⁻¹, by
-      show algebraMap T.V W ϖ₀ * ((u⁻¹ : Wˣ) : W) = ϖ ^ e
-      rw [hu, mul_comm (u : W), _root_.mul_assoc, Units.mul_inv, _root_.mul_one]⟩
+  · exact ⟨
+      u⁻¹,
+      by
+        show algebraMap T.V W ϖ₀ * ((u⁻¹ : Wˣ) : W) = ϖ ^ e
+        rw [hu, mul_comm (u : W), _root_.mul_assoc, Units.mul_inv, _root_.mul_one]
+    ⟩
 
 section Level
 
 open GlobalTheory.TorusExt GlobalTheory.QkNumberField GlobalTheory.ArcPull
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F}
 
 end Level
 
@@ -113,15 +130,15 @@ section Level2
 
 open GlobalTheory.TorusExt GlobalTheory.QkNumberField GlobalTheory.ArcPull
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
-
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F}
 
 end Level2
 section Main
 
 open GlobalTheory.TorusExt GlobalTheory.QkNumberField GlobalTheory.ArcPull
-
 
 end Main
 

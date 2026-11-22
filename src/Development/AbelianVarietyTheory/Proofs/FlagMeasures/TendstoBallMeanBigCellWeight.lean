@@ -5,14 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.Dchart
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.CellDens
+open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S
+  GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.CellDens
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.CellDens
 
-theorem tendsto_mean_ball_of_continuousAt {r : ℕ} (c : Fin r → ℂ) (f : (Fin r → ℂ) → ℝ≥0∞)
-    (hf : ContinuousAt f c) (h1 : f c = 1) :
-    Tendsto (fun ρ : ℝ => (∫⁻ x in Metric.ball c ρ, f x) / volume (Metric.ball (0 : Fin r → ℂ) ρ))
+theorem tendsto_mean_ball_of_continuousAt
+    {r : ℕ} (c : Fin r → ℂ) (f : (Fin r → ℂ) → ℝ≥0∞) (hf : ContinuousAt f c) (h1 : f c = 1)
+    : Tendsto
+      (fun ρ : ℝ => (∫⁻ x in Metric.ball c ρ, f x) / volume (Metric.ball (0 : Fin r → ℂ) ρ))
       (𝓝[>] 0) (𝓝 1) := by
   rw [ENNReal.tendsto_nhds ENNReal.one_ne_top]
   intro ε hε
@@ -34,14 +36,22 @@ theorem tendsto_mean_ball_of_continuousAt {r : ℕ} (c : Fin r → ℂ) (f : (Fi
     exact setLIntegral_mono' measurableSet_ball fun x hx => (hsub x hx).2
   rw [← hV]
   constructor
-  · calc 1 - ε = (1 - ε) * volume (Metric.ball c ρ) / volume (Metric.ball c ρ) :=
-          (ENNReal.mul_div_cancel_right hpos hfin).symm
+  · calc
+      1 - ε = (1 - ε) * volume (Metric.ball c ρ) / volume (Metric.ball c ρ) :=
+        (ENNReal.mul_div_cancel_right hpos hfin).symm
       _ ≤ _ := ENNReal.div_le_div_right hlo _
-  · calc _ ≤ (1 + ε) * volume (Metric.ball c ρ) / volume (Metric.ball c ρ) :=
-          ENNReal.div_le_div_right hhi _
+  · calc
+      _ ≤ (1 + ε) * volume (Metric.ball c ρ) / volume (Metric.ball c ρ) :=
+        ENNReal.div_le_div_right hhi _
       _ = 1 + ε := ENNReal.mul_div_cancel_right hpos hfin
 
-theorem tendsto_mean_cWeight : ∀ (k r : ℕ), Tendsto (fun ρ : ℝ => (∫⁻ x in Metric.ball (fun _ => 1 : Fin r → ℂ) ρ, ENNReal.ofReal (Formalism.FourierDecayAlt.B2.cWeight k r x)) / volume (Metric.ball (0 : Fin r → ℂ) ρ)) (𝓝[>] 0) (𝓝 1) := by
+theorem tendsto_mean_cWeight
+    : ∀ (k r : ℕ),
+      Tendsto
+        (fun ρ : ℝ =>
+          (∫⁻ x in Metric.ball (fun _ => 1 : Fin r → ℂ) ρ, ENNReal.ofReal (Formalism.FourierDecayAlt.B2.cWeight k r x))
+            / volume (Metric.ball (0 : Fin r → ℂ) ρ))
+        (𝓝[>] 0) (𝓝 1) := by
   intro k r
   apply tendsto_mean_ball_of_continuousAt
   · refine (ENNReal.continuous_ofReal.comp ?_).continuousAt

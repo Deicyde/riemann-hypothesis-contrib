@@ -73,8 +73,12 @@ theorem product_lfunction_key_inequality : BqKeyOf := by
     rw [hc0def]; have := abs_nonneg Cg; have := pow_nonneg (abs_nonneg CL) 3; linarith
   have hKgK : Kg ≤ K' := by rw [hK'def]; exact le_max_left _ _
   have h2K : (2 : ℝ) ≤ K' := by rw [hK'def]; exact le_max_right _ _
-  refine ⟨Real.exp 2 * Real.exp (Real.log (8 * c0) / (8 * ℓ)), K' / ℓ,
-    div_nonneg (by linarith) hℓ.le, ?_⟩
+  refine ⟨
+    Real.exp 2 * Real.exp (Real.log (8 * c0) / (8 * ℓ)),
+    K' / ℓ,
+    div_nonneg (by linarith) hℓ.le,
+    ?_
+  ⟩
   intro q₁ q₂ _ _ _ χ₁ χ₂ ψ h1 h2 h1ne h2ne hψne hψ σ hσ1 hσ2
   have h1σ : 0 < 1 - σ := by linarith
   have hq₁ : (1 : ℝ) ≤ q₁ := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne q₁)
@@ -88,8 +92,10 @@ theorem product_lfunction_key_inequality : BqKeyOf := by
     have e2 := norm_le_of_log_bound q₂ (hL q₂ χ₂ h2ne)
     have e3 := norm_le_of_log_bound (q₁ * q₂) (hL (q₁ * q₂) ψ hψne)
     simp only [lamBq, norm_mul]
-    calc _ ≤ (|CL| * (3 * q₁)) * (|CL| * (3 * q₂)) * (|CL| * (3 * ((q₁ * q₂ : ℕ) : ℝ))) :=
-          mul_le_mul (mul_le_mul e1 e2 (norm_nonneg _) (by positivity)) e3 (norm_nonneg _) (by positivity)
+    calc
+      _ ≤ (|CL| * (3 * q₁)) * (|CL| * (3 * q₂)) * (|CL| * (3 * ((q₁ * q₂ : ℕ) : ℝ))) :=
+        mul_le_mul (mul_le_mul e1 e2 (norm_nonneg _) (by positivity)) e3 (norm_nonneg _)
+          (by positivity)
       _ = 27 * |CL| ^ 3 * ((q₁ * q₂ : ℕ) : ℝ) ^ 2 := by rw [hN]; ring
   have hKg : ((q₁ * q₂ : ℕ) : ℝ) ^ Kg ≤ ((q₁ * q₂ : ℕ) : ℝ) ^ K' :=
     Real.rpow_le_rpow_of_exponent_le hN1 hKgK
@@ -111,8 +117,11 @@ theorem product_lfunction_key_inequality : BqKeyOf := by
       rw [norm_div, div_le_iff₀ (by linarith)]
       nlinarith [norm_nonneg (lamBq χ₁ χ₂ ψ)]
     have hc3 : 0 ≤ 54 * |CL| ^ 3 := by positivity
-    calc ‖G s‖ ≤ ‖Fbq χ₁ χ₂ ψ s‖ + ‖lamBq χ₁ χ₂ ψ / (s - 1)‖ := by rw [hGs]; exact norm_sub_le _ _
-      _ ≤ Cg * ((q₁ * q₂ : ℕ) : ℝ) ^ Kg + 2 * (27 * |CL| ^ 3 * ((q₁ * q₂ : ℕ) : ℝ) ^ 2) := by linarith
+    calc
+      ‖G s‖
+        ≤ ‖Fbq χ₁ χ₂ ψ s‖ + ‖lamBq χ₁ χ₂ ψ / (s - 1)‖ := by rw [hGs]; exact norm_sub_le _ _
+      _ ≤ Cg * ((q₁ * q₂ : ℕ) : ℝ) ^ Kg + 2 * (27 * |CL| ^ 3 * ((q₁ * q₂ : ℕ) : ℝ) ^ 2) := by
+        linarith
       _ ≤ c0 * ((q₁ * q₂ : ℕ) : ℝ) ^ K' := by
         rw [hc0def]
         nlinarith [mul_le_mul_of_nonneg_right (le_abs_self Cg) (by positivity : (0 : ℝ) ≤ ((q₁ * q₂ : ℕ) : ℝ) ^ Kg),
@@ -123,34 +132,44 @@ theorem product_lfunction_key_inequality : BqKeyOf := by
   obtain ⟨M, hM1, hTM, hMle⟩ := exists_taylor_truncation_order _ hT
   rw [← hℓdef] at hMle
   have hcore := lseries_taylor_lower_bound ha0 ha1 habs hG hFa hFG hB hσ1 hσ2 hM1
-  have hpow := two_sub_pow_le_exp (A := 2) (P := Real.log (8 * (c0 * ((q₁ * q₂ : ℕ) : ℝ) ^ K')) / ℓ)
-    (M := M) (by norm_num) hσ1 hσ2 (by linarith)
-  have hlogT : Real.log (8 * (c0 * ((q₁ * q₂ : ℕ) : ℝ) ^ K')) =
-      Real.log (8 * c0) + K' * Real.log ((q₁ * q₂ : ℕ) : ℝ) := by
+  have hpow :=
+    two_sub_pow_le_exp (A := 2) (P := Real.log (8 * (c0 * ((q₁ * q₂ : ℕ) : ℝ) ^ K')) / ℓ) (M := M)
+      (by norm_num) hσ1 hσ2 (by linarith)
+  have hlogT
+      : Real.log (8 * (c0 * ((q₁ * q₂ : ℕ) : ℝ) ^ K'))
+        = Real.log (8 * c0) + K' * Real.log ((q₁ * q₂ : ℕ) : ℝ) := by
     rw [← mul_assoc, Real.log_mul (by positivity) (Real.rpow_pos_of_pos (by linarith) _).ne',
       Real.log_rpow (by linarith)]
   have hlogc : 0 ≤ Real.log (8 * c0) := Real.log_nonneg (by linarith)
-  have hexp : Real.exp (Real.log (8 * (c0 * ((q₁ * q₂ : ℕ) : ℝ) ^ K')) / ℓ * (1 - σ)) ≤
-      Real.exp (Real.log (8 * c0) / (8 * ℓ)) * ((q₁ * q₂ : ℕ) : ℝ) ^ (K' / ℓ * (1 - σ)) := by
+  have hexp
+      : Real.exp (Real.log (8 * (c0 * ((q₁ * q₂ : ℕ) : ℝ) ^ K')) / ℓ * (1 - σ))
+        ≤ Real.exp (Real.log (8 * c0) / (8 * ℓ)) * ((q₁ * q₂ : ℕ) : ℝ) ^ (K' / ℓ * (1 - σ)) := by
     rw [Real.rpow_def_of_pos (show (0 : ℝ) < ((q₁ * q₂ : ℕ) : ℝ) by linarith) (K' / ℓ * (1 - σ)),
       ← Real.exp_add]
     apply Real.exp_le_exp.mpr
     rw [hlogT]
-    have eL : (Real.log (8 * c0) + K' * Real.log ((q₁ * q₂ : ℕ) : ℝ)) / ℓ * (1 - σ) =
-        (Real.log (8 * c0) * (1 - σ) + K' * Real.log ((q₁ * q₂ : ℕ) : ℝ) * (1 - σ)) / ℓ := by ring
-    have eR : Real.log (8 * c0) / (8 * ℓ) + Real.log ((q₁ * q₂ : ℕ) : ℝ) * (K' / ℓ * (1 - σ)) =
-        (Real.log (8 * c0) / 8 + K' * Real.log ((q₁ * q₂ : ℕ) : ℝ) * (1 - σ)) / ℓ := by ring
+    have eL
+        : (Real.log (8 * c0) + K' * Real.log ((q₁ * q₂ : ℕ) : ℝ)) / ℓ * (1 - σ)
+          = (Real.log (8 * c0) * (1 - σ) + K' * Real.log ((q₁ * q₂ : ℕ) : ℝ) * (1 - σ)) / ℓ := by
+      ring
+    have eR
+        : Real.log (8 * c0) / (8 * ℓ) + Real.log ((q₁ * q₂ : ℕ) : ℝ) * (K' / ℓ * (1 - σ))
+          = (Real.log (8 * c0) / 8 + K' * Real.log ((q₁ * q₂ : ℕ) : ℝ) * (1 - σ)) / ℓ := by
+      ring
     rw [eL, eR]
     apply div_le_div_of_nonneg_right _ hℓ.le
     nlinarith [mul_le_mul_of_nonneg_left (by linarith : 1 - σ ≤ 1 / 8) hlogc]
-  have hpow' : (2 - σ) ^ M ≤ Real.exp 2 * Real.exp (Real.log (8 * c0) / (8 * ℓ)) *
-      ((q₁ * q₂ : ℕ) : ℝ) ^ (K' / ℓ * (1 - σ)) :=
+  have hpow'
+      : (2 - σ) ^ M
+        ≤ Real.exp 2 * Real.exp (Real.log (8 * c0) / (8 * ℓ))
+          * ((q₁ * q₂ : ℕ) : ℝ) ^ (K' / ℓ * (1 - σ)) :=
     hpow.trans ((mul_le_mul_of_nonneg_left hexp (Real.exp_pos 2).le).trans_eq (by ring))
   have h34 : 4 * (c0 * ((q₁ * q₂ : ℕ) : ℝ) ^ K') * (3 / 4 : ℝ) ^ M ≤ 1 / 2 := by linarith
   have hlam0 := norm_nonneg (lamBq χ₁ χ₂ ψ)
-  have hdiv : ‖lamBq χ₁ χ₂ ψ‖ * (2 - σ) ^ M / (1 - σ) ≤
-      Real.exp 2 * Real.exp (Real.log (8 * c0) / (8 * ℓ)) * ‖lamBq χ₁ χ₂ ψ‖ *
-        ((q₁ * q₂ : ℕ) : ℝ) ^ (K' / ℓ * (1 - σ)) / (1 - σ) := by
+  have hdiv
+      : ‖lamBq χ₁ χ₂ ψ‖ * (2 - σ) ^ M / (1 - σ)
+        ≤ Real.exp 2 * Real.exp (Real.log (8 * c0) / (8 * ℓ)) * ‖lamBq χ₁ χ₂ ψ‖
+          * ((q₁ * q₂ : ℕ) : ℝ) ^ (K' / ℓ * (1 - σ)) / (1 - σ) := by
     apply div_le_div_of_nonneg_right _ h1σ.le
     nlinarith [mul_le_mul_of_nonneg_left hpow' hlam0]
   linarith

@@ -4,8 +4,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-theorem UpperTheory.V.KernelIndexFullLattice.absIrr_holds :
-    UpperTheory.V.KernelIndexFullLattice.AbsIrr := by
+theorem UpperTheory.V.KernelIndexFullLattice.absIrr_holds
+    : UpperTheory.V.KernelIndexFullLattice.AbsIrr := by
   intro G G₁ H L _ _ _ _ _ _ _ _ π ρ J r hr hρ X hXJ hX
   obtain ⟨⟨hXc, hXinv⟩, hXne, hXmin⟩ := hX
   have hVc : IsClosed ((Submodule.comap J.toLinearMap X : Submodule ℂ H) : Set H) :=

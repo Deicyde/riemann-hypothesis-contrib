@@ -14,7 +14,12 @@ namespace PositivityTheory.HtPt.Mc
 
 open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar NumberField
 
-theorem cramer_sub : ∀ (Ω : Type) [Field Ω] (E : Type) [AddCommGroup E] [Module Ω E] (A : Subring Ω) (r : ℕ) (b : Module.Basis (Fin r) Ω E) (κ : Type) (z : κ → E) (c₀ : Fin r → κ), b.det (z ∘ c₀) ≠ 0 → (∀ c : Fin r → κ, b.det (z ∘ c) / b.det (z ∘ c₀) ∈ A) → LinearIndependent Ω (z ∘ c₀) ∧ Submodule.span A (Set.range z) = Submodule.span A (Set.range (z ∘ c₀)) := by
+theorem cramer_sub
+    : ∀ (Ω : Type) [Field Ω] (E : Type) [AddCommGroup E] [Module Ω E] (A : Subring Ω) (r : ℕ)
+        (b : Module.Basis (Fin r) Ω E) (κ : Type) (z : κ → E) (c₀ : Fin r → κ),
+      b.det (z ∘ c₀) ≠ 0 → (∀ c : Fin r → κ, b.det (z ∘ c) / b.det (z ∘ c₀) ∈ A)
+        → LinearIndependent Ω (z ∘ c₀)
+          ∧ Submodule.span A (Set.range z) = Submodule.span A (Set.range (z ∘ c₀)) := by
   intro Ω _ E _ _ A r b κ z c₀ h0 h
   classical
   obtain ⟨li, sp⟩ := (Module.Basis.is_basis_iff_det b).2 (isUnit_iff_ne_zero.2 h0)
@@ -41,8 +46,9 @@ theorem cramer_sub : ∀ (Ω : Type) [Field Ω] (E : Type) [AddCommGroup E] [Mod
 section
 variable {Ω : Type} [Field Ω] {E : Type} [AddCommGroup E] [Module Ω E] (A : Subring Ω) {r : ℕ}
 
-theorem repr_mem {ι : Type} (B : Module.Basis ι Ω E) {v : E} (hv : v ∈ Submodule.span A (Set.range B)) (j : ι) :
-    B.repr v j ∈ A := by
+theorem repr_mem
+    {ι : Type} (B : Module.Basis ι Ω E) {v : E} (hv : v ∈ Submodule.span A (Set.range B)) (j : ι)
+    : B.repr v j ∈ A := by
   classical
   induction hv using Submodule.span_induction with
   | mem x hx =>
@@ -50,8 +56,10 @@ theorem repr_mem {ι : Type} (B : Module.Basis ι Ω E) {v : E} (hv : v ∈ Subm
     rw [B.repr_self, Finsupp.single_apply]
     split_ifs
     exacts [A.one_mem, A.zero_mem]
-  | zero => simp
-  | add x y _ _ hx hy => simpa using A.add_mem hx hy
+  | zero =>
+    simp
+  | add x y _ _ hx hy =>
+    simpa using A.add_mem hx hy
   | smul a x _ hx =>
     have : B.repr (a • x) j = (a : Ω) * B.repr x j := by
       show B.repr ((a : Ω) • x) j = _
@@ -59,19 +67,25 @@ theorem repr_mem {ι : Type} (B : Module.Basis ι Ω E) {v : E} (hv : v ∈ Subm
     rw [this]
     exact A.mul_mem a.2 hx
 
-theorem det_mem (B : Module.Basis (Fin r) Ω E) (v : Fin r → E)
-    (hv : ∀ i, v i ∈ Submodule.span A (Set.range B)) : B.det v ∈ A := by
+theorem det_mem
+    (B : Module.Basis (Fin r) Ω E) (v : Fin r → E) (hv : ∀ i, v i ∈ Submodule.span A (Set.range B))
+    : B.det v ∈ A := by
   rw [Module.Basis.det_apply, Matrix.det_apply']
   refine A.sum_mem fun s _ => A.mul_mem (intCast_mem _ _) (A.prod_mem fun i _ => ?_)
   exact repr_mem A B (hv _) _
 
-theorem det_mem_span (B : Module.Basis (Fin r) Ω E) {κ : Type} (z : κ → E) (v : Fin r → E)
-    (hv : ∀ i, v i ∈ Submodule.span A (Set.range z)) :
-    B.det v ∈ Submodule.span A (Set.range fun c : Fin r → κ => B.det (z ∘ c)) := by
+theorem det_mem_span
+    (B : Module.Basis (Fin r) Ω E)
+    {κ : Type} (z : κ → E)
+    (v : Fin r → E) (hv : ∀ i, v i ∈ Submodule.span A (Set.range z))
+    : B.det v ∈ Submodule.span A (Set.range fun c : Fin r → κ => B.det (z ∘ c)) := by
   classical
   choose c hc using fun i => Finsupp.mem_span_range_iff_exists_finsupp.1 (hv i)
   have e : v = fun i => ∑ k ∈ (c i).support, ((c i k : A) : Ω) • z k := funext fun i => (hc i).symm
-  have e2 := B.det.toMultilinearMap.map_sum_finset (fun i k => ((c i k : A) : Ω) • z k) fun i => (c i).support
+  have e2 :=
+    B.det.toMultilinearMap.map_sum_finset
+      (fun i k => ((c i k : A) : Ω) • z k)
+      fun i => (c i).support
   rw [e]
   refine (show B.det _ = _ from e2) ▸ Submodule.sum_mem _ fun s _ => ?_
   rw [MultilinearMap.map_smul_univ]
@@ -82,7 +96,13 @@ theorem det_mem_span (B : Module.Basis (Fin r) Ω E) {κ : Type} (z : κ → E) 
 
 end
 
-theorem frame_plucker : ∀ (Ω : Type) [Field Ω] (E : Type) [AddCommGroup E] [Module Ω E] (A : Subring Ω) [IsLocalRing A] (r : ℕ) (b : Module.Basis (Fin r) Ω E) (κ : Type) (z : κ → E) (f : Fin r → E), LinearIndependent Ω f → Submodule.span A (Set.range z) = Submodule.span A (Set.range f) → ∃ c₀ : Fin r → κ, b.det (z ∘ c₀) ≠ 0 ∧ ∀ c : Fin r → κ, b.det (z ∘ c) / b.det (z ∘ c₀) ∈ A := by
+theorem frame_plucker
+    : ∀ (Ω : Type) [Field Ω] (E : Type) [AddCommGroup E] [Module Ω E] (A : Subring Ω)
+        [IsLocalRing A] (r : ℕ) (b : Module.Basis (Fin r) Ω E) (κ : Type) (z : κ → E)
+        (f : Fin r → E),
+      LinearIndependent Ω f → Submodule.span A (Set.range z) = Submodule.span A (Set.range f)
+        → ∃ c₀ : Fin r → κ,
+          b.det (z ∘ c₀) ≠ 0 ∧ ∀ c : Fin r → κ, b.det (z ∘ c) / b.det (z ∘ c₀) ∈ A := by
   intro Ω _ E _ _ A _ r b κ z f li h
   classical
   haveI := Module.Finite.of_basis b
@@ -101,8 +121,8 @@ theorem frame_plucker : ∀ (Ω : Type) [Field Ω] (E : Type) [AddCommGroup E] [
   have : ∃ c₀, IsUnit (⟨_, hA c₀⟩ : A) := by
     by_contra hn
     push Not at hn
-    have : Submodule.span A (Set.range fun c : Fin r → κ => B.det (z ∘ c)) ≤
-        Submodule.map (Algebra.linearMap A Ω) (IsLocalRing.maximalIdeal A) := by
+    have : Submodule.span A (Set.range fun c : Fin r → κ => B.det (z ∘ c))
+        ≤ Submodule.map (Algebra.linearMap A Ω) (IsLocalRing.maximalIdeal A) := by
       refine Submodule.span_le.2 ?_
       rintro _ ⟨c, rfl⟩
       exact ⟨⟨_, hA c⟩, hn c, rfl⟩

@@ -18,8 +18,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Assoc
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc Formalism.L2.Pj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -32,13 +35,21 @@ namespace GlobalTheory.PsiFromTauEven
 
 open GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues
 
-theorem tauCoord_mul_sq (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] (D : DegPre A) (hB : D.TauBimult)
-    (hE : D.PsiEven) (y : D.X) (r : A) (hr : PsiCoord D y r) (x : (FractionRing A)ˣ) (hx : IsTauCoord D y (-y) x) :
-    ∃ w : Aˣ, (x : FractionRing A) * algebraMap A (FractionRing A) r ^ 2 = algebraMap A (FractionRing A) w := by
+theorem tauCoord_mul_sq
+    (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A]
+    (D : DegPre A) (hB : D.TauBimult) (hE : D.PsiEven) (y : D.X)
+    (r : A) (hr : PsiCoord D y r)
+    (x : (FractionRing A)ˣ) (hx : IsTauCoord D y (-y) x)
+    : ∃ w : Aˣ,
+      (x : FractionRing A) * algebraMap A (FractionRing A) r ^ 2
+        = algebraMap A (FractionRing A) w := by
   obtain ⟨x₀, hx₀, e₀⟩ := (GlobalTheory.PeriodFormCompare.psiCoord_iff D y r).1 hr
   have h0 : IsPsiCoord D (y + -y) (psiCoord D 0) := by rw [add_neg_cancel]; exact psiCoord_spec D 0
-  obtain ⟨u₂, hu₂⟩ := GlobalTheory.T.tauCoordinate_eq_unit_mul_psi_quotient A D y (-y) x _ _ _ hx h0 hx₀ (psiCoord_spec D (-y))
-  obtain ⟨u₃, hu₃⟩ := GlobalTheory.T.psiEven_coordinates_neg_differ_by_unit A D hE y _ _ hx₀ (psiCoord_spec D (-y))
+  obtain ⟨u₂, hu₂⟩ :=
+    GlobalTheory.T.tauCoordinate_eq_unit_mul_psi_quotient A D y (-y) x _ _ _ hx h0 hx₀
+      (psiCoord_spec D (-y))
+  obtain ⟨u₃, hu₃⟩ :=
+    GlobalTheory.T.psiEven_coordinates_neg_differ_by_unit A D hE y _ _ hx₀ (psiCoord_spec D (-y))
   obtain ⟨u₄, hu₄⟩ := GlobalTheory.MonoTriv.psiCoord_zero D hB _ (psiCoord_spec D 0)
   refine ⟨u₂ * u₄ * u₃⁻¹, ?_⟩
   have hne : (x₀ : FractionRing A) ≠ 0 := x₀.ne_zero
@@ -48,11 +59,24 @@ theorem tauCoord_mul_sq (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] (D 
   simp only [Units.val_mul, map_mul, map_units_inv]
   field_simp
 
-theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], IsDiscreteValuationRing V → ∀ (g : R →+* V) (gK : FractionRing R →+* FractionRing V), (∀ r, gK (algebraMap R _ r) = algebraMap V _ (g r)) →
-  ∀ (D : DegPre R) (D' : DegPre V), D.TauBimult → D.PsiEven → D'.TauBimult → D'.PsiEven → ∀ ρ : D.X →+ D'.X,
-    (∀ (a b : D.X) (x : (FractionRing R)ˣ) (x' : (FractionRing V)ˣ), GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D a b x → GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D' (ρ a) (ρ b) x' →
-      ∃ u : Vˣ, gK (x : FractionRing R) = algebraMap V (FractionRing V) (u : V) * (x' : FractionRing V)) →
-    ∀ (y : D.X) (r : R) (r' : V), PsiCoord D y r → PsiCoord D' (ρ y) r' → Associated (g r) r' := by
+theorem main
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (V : Type) [CommRing V] [IsDomain V]
+        [IsLocalRing V],
+      IsDiscreteValuationRing V
+        → ∀ (g : R →+* V) (gK : FractionRing R →+* FractionRing V),
+          (∀ r, gK (algebraMap R _ r) = algebraMap V _ (g r))
+            → ∀ (D : DegPre R) (D' : DegPre V),
+              D.TauBimult → D.PsiEven → D'.TauBimult → D'.PsiEven
+                → ∀ ρ : D.X →+ D'.X,
+                  (∀ (a b : D.X) (x : (FractionRing R)ˣ) (x' : (FractionRing V)ˣ),
+                      GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D a b x
+                        → GlobalTheory.IndefiniteRowSideFullHecke.GeneratorValues.IsTauCoord D'
+                          (ρ a) (ρ b) x'
+                        → ∃ u : Vˣ,
+                          gK (x : FractionRing R)
+                            = algebraMap V (FractionRing V) (u : V) * (x' : FractionRing V))
+                    → ∀ (y : D.X) (r : R) (r' : V),
+                      PsiCoord D y r → PsiCoord D' (ρ y) r' → Associated (g r) r' := by
   intro R _ _ _ V _ _ _ hV g gK hgK D D' hB hE hB' hE' ρ hρ y r r' hr hr'
   obtain ⟨x, hx⟩ := GlobalTheory.PsiFromTau.exists_isTauCoord R D y (-y)
   obtain ⟨x', hx'⟩ := GlobalTheory.PsiFromTau.exists_isTauCoord V D' (ρ y) (-(ρ y))
@@ -67,12 +91,14 @@ theorem main : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (V : Typ
     have k1 : ((u : V) * w') * (g r) ^ 2 = g w * r' ^ 2 := by
       apply IsFractionRing.injective V (FractionRing V)
       simp only [map_mul, map_pow]
-      rw [← hw', ← e]; ring
+      rw [← hw', ← e]
+      ring
     have hw1 : (g w : V) * ((Units.map g.toMonoidHom w)⁻¹ : Vˣ) = 1 := by
       have h : ((Units.map g.toMonoidHom w : Vˣ) : V) = g w := rfl
       rw [← h, Units.mul_inv]
     simp only [v, Units.val_mul]
-    calc g r ^ 2 * (↑u * ↑w' * ↑(Units.map g.toMonoidHom w)⁻¹)
+    calc
+      g r ^ 2 * (↑u * ↑w' * ↑(Units.map g.toMonoidHom w)⁻¹)
         = (↑u * ↑w') * g r ^ 2 * ↑(Units.map g.toMonoidHom w)⁻¹ := by ring
       _ = r' ^ 2 * ((g w : V) * ((Units.map g.toMonoidHom w)⁻¹ : Vˣ)) := by rw [k1]; ring
       _ = r' ^ 2 := by rw [hw1, _root_.mul_one]

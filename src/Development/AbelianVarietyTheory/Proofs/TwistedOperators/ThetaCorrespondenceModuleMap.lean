@@ -12,10 +12,13 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FockTheta.RealPlaceImaginar
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -27,9 +30,12 @@ namespace GlobalTheory.CoinvLine
 
 variable {D : D7}
 
-theorem isThetaFunO_of_mem_algF {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hθ : IsInfFam θ)
-    (hψ : IsStdChar D ψ (-1)) [Nonempty D.what₂.Tau] {W₁ X : HSp D} (A₁ : Fr W₁) (B : Fr X) {Ψ : WO W₁ X → ℂ}
-    (hΨ : Ψ ∈ algF ψ θ false A₁ B) : IsThetaFunO ψ W₁ X Ψ := by
+theorem isThetaFunO_of_mem_algF
+    {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hθ : IsInfFam θ) (hψ : IsStdChar D ψ (-1))
+    [Nonempty D.what₂.Tau]
+    {W₁ X : HSp D} (A₁ : Fr W₁) (B : Fr X)
+    {Ψ : WO W₁ X → ℂ} (hΨ : Ψ ∈ algF ψ θ false A₁ B)
+    : IsThetaFunO ψ W₁ X Ψ := by
   induction hΨ using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨f, P, hf, rfl⟩ := hx

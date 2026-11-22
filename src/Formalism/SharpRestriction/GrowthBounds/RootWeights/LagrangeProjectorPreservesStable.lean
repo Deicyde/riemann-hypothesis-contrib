@@ -17,12 +17,16 @@ section
 
 variable {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 
-theorem mem_weightSpace_iff_diagonal (E : GLOps n K V) (mu : Fin n → ℤ) (x : V) :
-    x ∈ weightSp E mu ↔ ∀ a, E a a x = (mu a : K) • x := by
+theorem mem_weightSpace_iff_diagonal (E : GLOps n K V) (mu : Fin n → ℤ) (x : V)
+    : x ∈ weightSp E mu ↔ ∀ a, E a a x = (mu a : K) • x := by
   simp [weightSp, Submodule.mem_iInf, LinearMap.mem_ker, sub_eq_zero]
 
-theorem weightSpace_disjoint [CharZero K] (E : GLOps n K V) {mu ka : Fin n → ℤ} (h : mu ≠ ka) {x : V}
-    (h1 : x ∈ weightSp E mu) (h2 : x ∈ weightSp E ka) : x = 0 := by
+theorem weightSpace_disjoint
+    [CharZero K]
+    (E : GLOps n K V)
+    {mu ka : Fin n → ℤ} (h : mu ≠ ka)
+    {x : V} (h1 : x ∈ weightSp E mu) (h2 : x ∈ weightSp E ka)
+    : x = 0 := by
   obtain ⟨a, ha⟩ := Function.ne_iff.1 h
   have e1 := (mem_weightSpace_iff_diagonal E mu x).1 h1 a
   have e2 := (mem_weightSpace_iff_diagonal E ka x).1 h2 a
@@ -32,16 +36,19 @@ theorem weightSpace_disjoint [CharZero K] (E : GLOps n K V) {mu ka : Fin n → �
   · exact absurd (by exact_mod_cast sub_eq_zero.1 h0) ha
   · exact h0
 
-
 open Classical in
 def lagrangeFactor (E : GLOps n K V) (mu nu : Fin n → ℤ) : Module.End K V :=
-  if h : nu = mu then 1 else
-    (((mu (Classical.choose (Function.ne_iff.1 h)) : K) - (nu (Classical.choose (Function.ne_iff.1 h)) : K))⁻¹) •
-      (E (Classical.choose (Function.ne_iff.1 h)) (Classical.choose (Function.ne_iff.1 h)) -
-        (nu (Classical.choose (Function.ne_iff.1 h)) : K) • (1 : Module.End K V))
+  if h : nu = mu then
+    1
+  else
+    (((mu (Classical.choose (Function.ne_iff.1 h)) : K)
+        - (nu (Classical.choose (Function.ne_iff.1 h)) : K))⁻¹)
+      • (E (Classical.choose (Function.ne_iff.1 h)) (Classical.choose (Function.ne_iff.1 h))
+        - (nu (Classical.choose (Function.ne_iff.1 h)) : K) • (1 : Module.End K V))
 
-theorem lagrange_factor_acts_scalar (E : GLOps n K V) (mu nu ka : Fin n → ℤ) {x : V} (hx : x ∈ weightSp E ka) :
-    ∃ c : K, lagrangeFactor E mu nu x = c • x := by
+theorem lagrange_factor_acts_scalar
+    (E : GLOps n K V) (mu nu ka : Fin n → ℤ) {x : V} (hx : x ∈ weightSp E ka)
+    : ∃ c : K, lagrangeFactor E mu nu x = c • x := by
   unfold lagrangeFactor
   split_ifs with h
   · exact ⟨1, by simp⟩
@@ -50,28 +57,35 @@ theorem lagrange_factor_acts_scalar (E : GLOps n K V) (mu nu ka : Fin n → ℤ)
     simp only [LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply]
     rw [(mem_weightSpace_iff_diagonal E ka x).1 hx a, ← sub_smul, smul_smul]
 
-theorem lagrange_factor_fixes_weight [CharZero K] (E : GLOps n K V) (mu nu : Fin n → ℤ) {x : V} (hx : x ∈ weightSp E mu) :
-    lagrangeFactor E mu nu x = x := by
+theorem lagrange_factor_fixes_weight
+    [CharZero K] (E : GLOps n K V) (mu nu : Fin n → ℤ) {x : V} (hx : x ∈ weightSp E mu)
+    : lagrangeFactor E mu nu x = x := by
   unfold lagrangeFactor
   split_ifs with h
   · simp
   · have ha := Classical.choose_spec (Function.ne_iff.1 h)
     set a := Classical.choose (Function.ne_iff.1 h)
     simp only [LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply]
-    rw [(mem_weightSpace_iff_diagonal E mu x).1 hx a, ← sub_smul, smul_smul, inv_mul_cancel₀, one_smul]
+    rw [(mem_weightSpace_iff_diagonal E mu x).1 hx a, ← sub_smul, smul_smul, inv_mul_cancel₀,
+      one_smul]
     intro h0
     exact ha (by exact_mod_cast (sub_eq_zero.1 h0).symm)
 
-theorem lagrange_factor_kills_other (E : GLOps n K V) {mu nu : Fin n → ℤ} (h : nu ≠ mu) {x : V} (hx : x ∈ weightSp E nu) :
-    lagrangeFactor E mu nu x = 0 := by
+theorem lagrange_factor_kills_other
+    (E : GLOps n K V) {mu nu : Fin n → ℤ} (h : nu ≠ mu) {x : V} (hx : x ∈ weightSp E nu)
+    : lagrangeFactor E mu nu x = 0 := by
   unfold lagrangeFactor
   rw [dite_eq_right h]
   set a := Classical.choose (Function.ne_iff.1 h)
   simp only [LinearMap.smul_apply, LinearMap.sub_apply, Module.End.one_apply]
   rw [(mem_weightSpace_iff_diagonal E nu x).1 hx a, sub_self, smul_zero]
 
-theorem lagrange_factor_preserves_stable (E : GLOps n K V) (mu nu : Fin n → ℤ) (U : Submodule K V)
-    (hU : ∀ a, ∀ x ∈ U, E a a x ∈ U) {x : V} (hx : x ∈ U) : lagrangeFactor E mu nu x ∈ U := by
+theorem lagrange_factor_preserves_stable
+    (E : GLOps n K V)
+    (mu nu : Fin n → ℤ)
+    (U : Submodule K V) (hU : ∀ a, ∀ x ∈ U, E a a x ∈ U)
+    {x : V} (hx : x ∈ U)
+    : lagrangeFactor E mu nu x ∈ U := by
   unfold lagrangeFactor
   split_ifs with h
   · simpa using hx
@@ -81,33 +95,46 @@ theorem lagrange_factor_preserves_stable (E : GLOps n K V) (mu nu : Fin n → �
 def lagrangeProjector (E : GLOps n K V) (mu : Fin n → ℤ) (L : List (Fin n → ℤ)) : Module.End K V :=
   (L.map fun nu => lagrangeFactor E mu nu).prod
 
-theorem lagrange_projector_acts_scalar (E : GLOps n K V) (mu ka : Fin n → ℤ) (L : List (Fin n → ℤ)) {x : V}
-    (hx : x ∈ weightSp E ka) : ∃ c : K, lagrangeProjector E mu L x = c • x := by
+theorem lagrange_projector_acts_scalar
+    (E : GLOps n K V) (mu ka : Fin n → ℤ) (L : List (Fin n → ℤ)) {x : V} (hx : x ∈ weightSp E ka)
+    : ∃ c : K, lagrangeProjector E mu L x = c • x := by
   induction L with
   | nil => exact ⟨1, by simp [lagrangeProjector]⟩
   | cons nu L ih =>
     obtain ⟨c, hc⟩ := ih
     obtain ⟨d, hd⟩ := lagrange_factor_acts_scalar E mu nu ka hx
     refine ⟨c * d, ?_⟩
-    have : lagrangeProjector E mu (nu :: L) x = lagrangeFactor E mu nu (lagrangeProjector E mu L x) := by
+    have : lagrangeProjector E mu (nu :: L) x
+        = lagrangeFactor E mu nu (lagrangeProjector E mu L x) := by
       simp [lagrangeProjector, Module.End.mul_apply]
     rw [this, hc, map_smul, hd, smul_smul]
 
-theorem lagrange_projector_fixes_weight [CharZero K] (E : GLOps n K V) (mu : Fin n → ℤ) (L : List (Fin n → ℤ)) {x : V}
-    (hx : x ∈ weightSp E mu) : lagrangeProjector E mu L x = x := by
+theorem lagrange_projector_fixes_weight
+    [CharZero K]
+    (E : GLOps n K V) (mu : Fin n → ℤ)
+    (L : List (Fin n → ℤ))
+    {x : V} (hx : x ∈ weightSp E mu)
+    : lagrangeProjector E mu L x = x := by
   induction L with
   | nil => simp [lagrangeProjector]
   | cons nu L ih =>
-    have : lagrangeProjector E mu (nu :: L) x = lagrangeFactor E mu nu (lagrangeProjector E mu L x) := by
+    have : lagrangeProjector E mu (nu :: L) x
+        = lagrangeFactor E mu nu (lagrangeProjector E mu L x) := by
       simp [lagrangeProjector, Module.End.mul_apply]
     rw [this, ih, lagrange_factor_fixes_weight E mu nu hx]
 
-theorem lagrange_projector_kills_other (E : GLOps n K V) {mu ka : Fin n → ℤ} (h : ka ≠ mu) (L : List (Fin n → ℤ)) (hL : ka ∈ L)
-    {x : V} (hx : x ∈ weightSp E ka) : lagrangeProjector E mu L x = 0 := by
+theorem lagrange_projector_kills_other
+    (E : GLOps n K V)
+    {mu ka : Fin n → ℤ} (h : ka ≠ mu)
+    (L : List (Fin n → ℤ)) (hL : ka ∈ L)
+    {x : V} (hx : x ∈ weightSp E ka)
+    : lagrangeProjector E mu L x = 0 := by
   induction L with
   | nil => simp at hL
   | cons nu L ih =>
-    have e : lagrangeProjector E mu (nu :: L) x = lagrangeFactor E mu nu (lagrangeProjector E mu L x) := by
+    have e
+        : lagrangeProjector E mu (nu :: L) x
+          = lagrangeFactor E mu nu (lagrangeProjector E mu L x) := by
       simp [lagrangeProjector, Module.End.mul_apply]
     rw [e]
     rcases List.mem_cons.1 hL with rfl | hL'
@@ -115,12 +142,18 @@ theorem lagrange_projector_kills_other (E : GLOps n K V) {mu ka : Fin n → ℤ}
       rw [hc, map_smul, lagrange_factor_kills_other E h hx, smul_zero]
     · rw [ih hL', map_zero]
 
-theorem lagrange_projector_preserves_stable (E : GLOps n K V) (mu : Fin n → ℤ) (L : List (Fin n → ℤ)) (U : Submodule K V)
-    (hU : ∀ a, ∀ x ∈ U, E a a x ∈ U) {x : V} (hx : x ∈ U) : lagrangeProjector E mu L x ∈ U := by
+theorem lagrange_projector_preserves_stable
+    (E : GLOps n K V)
+    (mu : Fin n → ℤ) (L : List (Fin n → ℤ))
+    (U : Submodule K V) (hU : ∀ a, ∀ x ∈ U, E a a x ∈ U)
+    {x : V} (hx : x ∈ U)
+    : lagrangeProjector E mu L x ∈ U := by
   induction L with
   | nil => simpa [lagrangeProjector] using hx
   | cons nu L ih =>
-    have e : lagrangeProjector E mu (nu :: L) x = lagrangeFactor E mu nu (lagrangeProjector E mu L x) := by
+    have e
+        : lagrangeProjector E mu (nu :: L) x
+          = lagrangeFactor E mu nu (lagrangeProjector E mu L x) := by
       simp [lagrangeProjector, Module.End.mul_apply]
     rw [e]
     exact lagrange_factor_preserves_stable E mu nu U hU ih
@@ -131,12 +164,15 @@ section
 
 variable {n : ℕ} {K V : Type*} [Field K] [CharZero K] [AddCommGroup V] [Module K V]
 
-theorem sum_lagrange_projectors_eq_self (E : GLOps n K V) (t : Finset (Fin n → ℤ))
-    (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu) (x : V) :
-    ∑ mu ∈ t, lagrangeProjector E mu t.toList x = x := by
+theorem sum_lagrange_projectors_eq_self
+    (E : GLOps n K V) (t : Finset (Fin n → ℤ)) (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu)
+    (x : V)
+    : ∑ mu ∈ t, lagrangeProjector E mu t.toList x = x := by
   have hx : x ∈ ⨆ mu ∈ t, weightSp E mu := ht Submodule.mem_top
-  refine Submodule.iSup_induction (fun mu => ⨆ (_ : mu ∈ t), weightSp E mu)
-    (motive := fun x => ∑ mu ∈ t, lagrangeProjector E mu t.toList x = x) hx ?_ ?_ ?_
+  refine Submodule.iSup_induction
+    (fun mu => ⨆ (_ : mu ∈ t), weightSp E mu)
+    (motive := fun x => ∑ mu ∈ t, lagrangeProjector E mu t.toList x = x)
+    hx ?_ ?_ ?_
   · intro ka y hy
     by_cases hk : ka ∈ t
     · have hy' : y ∈ weightSp E ka := by simpa [hk] using hy
@@ -151,28 +187,35 @@ theorem sum_lagrange_projectors_eq_self (E : GLOps n K V) (t : Finset (Fin n →
   · intro y z hy hz
     simp only [map_add (f := _), Finset.sum_add_distrib, hy, hz]
 
-theorem lagrange_projector_mem_weightSpace (E : GLOps n K V) (t : Finset (Fin n → ℤ))
-    (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu) (mu : Fin n → ℤ) (x : V) :
-    lagrangeProjector E mu t.toList x ∈ weightSp E mu := by
+theorem lagrange_projector_mem_weightSpace
+    (E : GLOps n K V) (t : Finset (Fin n → ℤ)) (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu)
+    (mu : Fin n → ℤ) (x : V)
+    : lagrangeProjector E mu t.toList x ∈ weightSp E mu := by
   have hx : x ∈ ⨆ mu ∈ t, weightSp E mu := ht Submodule.mem_top
-  refine Submodule.iSup_induction (fun mu => ⨆ (_ : mu ∈ t), weightSp E mu)
-    (motive := fun x => lagrangeProjector E mu t.toList x ∈ weightSp E mu) hx ?_ ?_ ?_
+  refine Submodule.iSup_induction
+    (fun mu => ⨆ (_ : mu ∈ t), weightSp E mu)
+    (motive := fun x => lagrangeProjector E mu t.toList x ∈ weightSp E mu)
+    hx ?_ ?_ ?_
   · intro ka y hy
     by_cases hk : ka ∈ t
     · have hy' : y ∈ weightSp E ka := by simpa [hk] using hy
       by_cases hkm : ka = mu
       · subst hkm
-        rw [lagrange_projector_fixes_weight E ka _ hy']; exact hy'
-      · rw [lagrange_projector_kills_other E hkm _ (by simpa using hk) hy']; exact Submodule.zero_mem _
+        rw [lagrange_projector_fixes_weight E ka _ hy']
+        exact hy'
+      · rw [lagrange_projector_kills_other E hkm _ (by simpa using hk) hy']
+        exact Submodule.zero_mem _
     · have : y = 0 := by simpa [hk] using hy
       simp [this]
   · simp
   · intro y z hy hz
-    rw [map_add (f := _)]; exact Submodule.add_mem _ hy hz
+    rw [map_add (f := _)]
+    exact Submodule.add_mem _ hy hz
 
-theorem nonzero_weight_mem_support (E : GLOps n K V) (t : Finset (Fin n → ℤ))
-    (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu) {ka : Fin n → ℤ} {y : V}
-    (hy : y ∈ weightSp E ka) (h0 : y ≠ 0) : ka ∈ t := by
+theorem nonzero_weight_mem_support
+    (E : GLOps n K V) (t : Finset (Fin n → ℤ)) (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu)
+    {ka : Fin n → ℤ} {y : V} (hy : y ∈ weightSp E ka) (h0 : y ≠ 0)
+    : ka ∈ t := by
   by_contra hk
   apply h0
   rw [← sum_lagrange_projectors_eq_self E t ht y]
@@ -180,13 +223,14 @@ theorem nonzero_weight_mem_support (E : GLOps n K V) (t : Finset (Fin n → ℤ)
   intro mu hmu
   obtain ⟨c, hc⟩ := lagrange_projector_acts_scalar E mu ka t.toList hy
   have h1 := lagrange_projector_mem_weightSpace E t ht mu y
-  have h2 : lagrangeProjector E mu t.toList y ∈ weightSp E ka := by rw [hc]; exact Submodule.smul_mem _ _ hy
+  have h2 : lagrangeProjector E mu t.toList y ∈ weightSp E ka := by
+    rw [hc]; exact Submodule.smul_mem _ _ hy
   exact weightSpace_disjoint E (by rintro rfl; exact hk hmu) h1 h2
 
-theorem stable_subspace_has_weight_vector (E : GLOps n K V) (t : Finset (Fin n → ℤ))
-    (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu) (U : Submodule K V)
-    (hU : ∀ a, ∀ x ∈ U, E a a x ∈ U) (hne : U ≠ ⊥) :
-    ∃ mu ∈ t, ∃ x ∈ U, x ≠ 0 ∧ x ∈ weightSp E mu := by
+theorem stable_subspace_has_weight_vector
+    (E : GLOps n K V) (t : Finset (Fin n → ℤ)) (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu)
+    (U : Submodule K V) (hU : ∀ a, ∀ x ∈ U, E a a x ∈ U) (hne : U ≠ ⊥)
+    : ∃ mu ∈ t, ∃ x ∈ U, x ≠ 0 ∧ x ∈ weightSp E mu := by
   obtain ⟨x, hx, h0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
   by_contra hcon
   push Not at hcon
@@ -195,13 +239,17 @@ theorem stable_subspace_has_weight_vector (E : GLOps n K V) (t : Finset (Fin n �
   apply Finset.sum_eq_zero
   intro mu hmu
   by_contra hP
-  exact hcon mu hmu _ (lagrange_projector_preserves_stable E mu _ U hU hx) hP (lagrange_projector_mem_weightSpace E t ht mu x)
+  exact hcon mu hmu _ (lagrange_projector_preserves_stable E mu _ U hU hx) hP
+    (lagrange_projector_mem_weightSpace E t ht mu x)
 
 omit [CharZero K] in
-theorem raising_shifts_weight_by_root (E : GLOps n K V)
-    (hrel : ∀ a b c d, E a b * E c d - E c d * E a b = (if b = c then E a d else 0) - (if d = a then E c b else 0))
-    {a b : Fin n} (hab : a ≠ b) {mu : Fin n → ℤ} {x : V} (hx : x ∈ weightSp E mu) :
-    E a b x ∈ weightSp E (mu + rootW a b) := by
+theorem raising_shifts_weight_by_root
+    (E : GLOps n K V)
+    (hrel : ∀ a b c d,
+      E a b * E c d - E c d * E a b = (if b = c then E a d else 0) - (if d = a then E c b else 0))
+    {a b : Fin n} (hab : a ≠ b)
+    {mu : Fin n → ℤ} {x : V} (hx : x ∈ weightSp E mu)
+    : E a b x ∈ weightSp E (mu + rootW a b) := by
   rw [mem_weightSpace_iff_diagonal] at hx ⊢
   intro c
   have h := congrArg (fun f : Module.End K V => f x) (hrel c c a b)
@@ -211,31 +259,35 @@ theorem raising_shifts_weight_by_root (E : GLOps n K V)
   by_cases hca : c = a
   · subst hca
     have hbc : ¬ b = c := fun h => hab h.symm
-    simp only [if_true, if_neg hbc, LinearMap.zero_apply, sub_zero, rootW, Pi.add_apply, Pi.sub_apply,
-      Pi.single_eq_same, Pi.single_eq_of_ne hab]
+    simp only [if_true, if_neg hbc, LinearMap.zero_apply, sub_zero, rootW, Pi.add_apply,
+      Pi.sub_apply, Pi.single_eq_same, Pi.single_eq_of_ne hab]
     push_cast
     rw [add_smul, one_smul, add_comm]
   · by_cases hcb : c = b
     · subst hcb
-      simp only [if_neg hca, if_true, LinearMap.zero_apply, zero_sub, rootW, Pi.add_apply, Pi.sub_apply,
-        Pi.single_eq_same, Pi.single_eq_of_ne hca]
+      simp only [if_neg hca, if_true, LinearMap.zero_apply, zero_sub, rootW, Pi.add_apply,
+        Pi.sub_apply, Pi.single_eq_same, Pi.single_eq_of_ne hca]
       push_cast
       rw [add_smul, neg_smul, one_smul, add_comm]
     · have hbc : ¬ b = c := fun h => hcb h.symm
-      simp only [if_neg hca, if_neg hbc, LinearMap.zero_apply, sub_zero, rootW, Pi.add_apply, Pi.sub_apply,
-        Pi.single_eq_of_ne hca, Pi.single_eq_of_ne hcb, zero_add, add_zero]
+      simp only [if_neg hca, if_neg hbc, LinearMap.zero_apply, sub_zero, rootW, Pi.add_apply,
+        Pi.sub_apply, Pi.single_eq_of_ne hca, Pi.single_eq_of_ne hcb, zero_add, add_zero]
 
 def weightHeight (mu : Fin n → ℤ) : ℤ := ∑ c : Fin n, ((c : ℕ) : ℤ) * mu c
 
-theorem weightHeight_add_root (mu : Fin n → ℤ) (a b : Fin n) :
-    weightHeight (mu + rootW a b) = weightHeight mu + ((a : ℕ) : ℤ) - ((b : ℕ) : ℤ) := by
-  simp [weightHeight, rootW, mul_add, mul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib, Pi.single_apply]
+theorem weightHeight_add_root (mu : Fin n → ℤ) (a b : Fin n)
+    : weightHeight (mu + rootW a b) = weightHeight mu + ((a : ℕ) : ℤ) - ((b : ℕ) : ℤ) := by
+  simp [weightHeight, rootW, mul_add, mul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+    Pi.single_apply]
   ring
 
-theorem exists_highest_weight_vector (E : GLOps n K V)
-    (hrel : ∀ a b c d, E a b * E c d - E c d * E a b = (if b = c then E a d else 0) - (if d = a then E c b else 0))
-    (t : Finset (Fin n → ℤ)) (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu) (U : Submodule K V)
-    (hU : ∀ a b, ∀ x ∈ U, E a b x ∈ U) (hne : U ≠ ⊥) : ∃ mu, ∃ x ∈ U, IsHWV E mu x := by
+theorem exists_highest_weight_vector
+    (E : GLOps n K V)
+    (hrel : ∀ a b c d,
+      E a b * E c d - E c d * E a b = (if b = c then E a d else 0) - (if d = a then E c b else 0))
+    (t : Finset (Fin n → ℤ)) (ht : (⊤ : Submodule K V) ≤ ⨆ mu ∈ t, weightSp E mu)
+    (U : Submodule K V) (hU : ∀ a b, ∀ x ∈ U, E a b x ∈ U) (hne : U ≠ ⊥)
+    : ∃ mu, ∃ x ∈ U, IsHWV E mu x := by
   classical
   have hT : (t.filter (fun mu => ∃ x ∈ U, x ≠ 0 ∧ x ∈ weightSp E mu)).Nonempty := by
     obtain ⟨mu, hmu, h⟩ := stable_subspace_has_weight_vector E t ht U (fun a => hU a a) hne
@@ -252,29 +304,63 @@ theorem exists_highest_weight_vector (E : GLOps n K V)
   omega
 
 omit [CharZero K] in
-theorem isotypic_stable_under_operators (E : GLOps n K V) (mu : Fin n → ℤ) (a b : Fin n) {x : V} (hx : x ∈ isoSub E mu) :
-    E a b x ∈ isoSub E mu := by
-  first | exact UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators .. | (apply UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> assumption) | (intros; apply UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> assumption) | (apply @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> assumption) | (apply @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> first | assumption | infer_instance) | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu a b x hx | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu a b x | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu a b | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu a | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n
+theorem isotypic_stable_under_operators
+    (E : GLOps n K V) (mu : Fin n → ℤ) (a b : Fin n) {x : V} (hx : x ∈ isoSub E mu)
+    : E a b x ∈ isoSub E mu := by
+  first
+  | exact UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators ..
+  | (apply UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> assumption)
+  | (intros; apply UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> assumption)
+  | (apply @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> assumption)
+  | (intros; apply @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators <;> assumption)
+  | (
+      apply @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators
+        <;> first | assumption | infer_instance
+    )
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu a
+      b x hx
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu a
+      b x
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu a
+      b
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu a
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E mu
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_› E
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_› ‹_›
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_› ‹_›
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V ‹_›
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K V
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n K
+  | exact @UpperTheory.Reformulated.B.Qf30.isotypic_stable_under_operators n
 
 end
 
-theorem isotypic_subspaces_span_top (D : Formalism.BasicNotions.D7) (h2 : adm2 D) (K V : Type) [Field K] [CharZero K] [AddCommGroup V]
-    [Module K V] [FiniteDimensional K V] (n : ℕ) (E : GLOps n K V) (hE : IsGLRep E) :
-    (⨆ mu : Fin n → ℤ, isoSub E mu) = ⊤ := by
+theorem isotypic_subspaces_span_top
+    (D : Formalism.BasicNotions.D7) (h2 : adm2 D)
+    (K V : Type) [Field K] [CharZero K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (n : ℕ) (E : GLOps n K V) (hE : IsGLRep E)
+    : (⨆ mu : Fin n → ℤ, isoSub E mu) = ⊤ := by
   obtain ⟨hrel, _, hw⟩ := hE
-  have hst : ∀ a b, ∀ x ∈ (⨆ mu : Fin n → ℤ, isoSub E mu), E a b x ∈ (⨆ mu : Fin n → ℤ, isoSub E mu) := by
+  have hst
+      : ∀ a b, ∀ x ∈ (⨆ mu : Fin n → ℤ, isoSub E mu),
+        E a b x ∈ (⨆ mu : Fin n → ℤ, isoSub E mu) := by
     intro a b x hx
-    refine Submodule.iSup_induction (fun mu => isoSub E mu)
-      (motive := fun x => E a b x ∈ (⨆ mu : Fin n → ℤ, isoSub E mu)) hx ?_ ?_ ?_
+    refine Submodule.iSup_induction
+      (fun mu => isoSub E mu)
+      (motive := fun x => E a b x ∈ (⨆ mu : Fin n → ℤ, isoSub E mu))
+      hx ?_ ?_ ?_
     · intro mu y hy
       exact Submodule.mem_iSup_of_mem mu (isotypic_stable_under_operators E mu a b hy)
     · simp
     · intro y z hy hz
-      rw [map_add (f := _)]; exact Submodule.add_mem _ hy hz
+      rw [map_add (f := _)]
+      exact Submodule.add_mem _ hy hz
   obtain ⟨W', hc, hW'⟩ := h2 K V n E ⟨hrel, ‹_›, hw⟩ _ hst
-  obtain ⟨t, ht⟩ := IsCompactElement.exists_finset_of_le_iSup
-    ((Submodule.fg_iff_compact (⊤ : Submodule K V)).1 Module.Finite.fg_top)
-    (fun mu => weightSp E mu) (le_of_eq hw.symm)
+  obtain ⟨t, ht⟩ :=
+    IsCompactElement.exists_finset_of_le_iSup
+      ((Submodule.fg_iff_compact (⊤ : Submodule K V)).1 Module.Finite.fg_top)
+      (fun mu => weightSp E mu)
+      (le_of_eq hw.symm)
   have hbot : W' = ⊥ := by
     by_contra hne
     obtain ⟨mu, x, hxW, hx⟩ := exists_highest_weight_vector E hrel t ht W' hW' hne
@@ -286,19 +372,25 @@ theorem isotypic_subspaces_span_top (D : Formalism.BasicNotions.D7) (h2 : adm2 D
   have := hc.sup_eq_top
   rwa [hbot, sup_bot_eq] at this
 
-theorem isotypic_projector_fixed_mem (D : Formalism.BasicNotions.D7) (h2 : adm2 D) : IsotypicProjectorFixedMem := by
+theorem isotypic_projector_fixed_mem (D : Formalism.BasicNotions.D7) (h2 : adm2 D)
+    : IsotypicProjectorFixedMem := by
   intro K V _ _ _ _ _ n E hE lam e he Y hY
   have hY' : Y ∈ (⨆ mu : Fin n → ℤ, isoSub E mu) := by
     rw [isotypic_subspaces_span_top D h2 K V n E hE]; exact Submodule.mem_top
   rw [← hY]
-  refine Submodule.iSup_induction (fun mu => isoSub E mu) (motive := fun y => e y ∈ isoSub E lam) hY' ?_ ?_ ?_
+  refine Submodule.iSup_induction
+    (fun mu => isoSub E mu)
+    (motive := fun y => e y ∈ isoSub E lam)
+    hY' ?_ ?_ ?_
   · intro mu y hy
     by_cases hm : mu = lam
     · subst hm
-      rw [he.1 y hy]; exact hy
+      rw [he.1 y hy]
+      exact hy
     · rw [he.2 mu hm y hy]; exact Submodule.zero_mem _
   · simp
   · intro y z hy hz
-    rw [map_add (f := _)]; exact Submodule.add_mem _ hy hz
+    rw [map_add (f := _)]
+    exact Submodule.add_mem _ hy hz
 
 end Formalism.MainNotions.G.GLWeightTheory

@@ -22,8 +22,8 @@ theorem pos_den {z w : ℂ} (h : 0 < z.im * w.im) : 0 < ‖z - conj w‖ ^ 2 := 
   rw [nsq]
   nlinarith [sq_nonneg (z.re - w.re), sq_nonneg z.im, sq_nonneg w.im]
 
-theorem kap_of {z w : P} (h : 0 < z.1.im * w.1.im) :
-    kap z w = 4 * (z.1.im * w.1.im) / ‖z.1 - conj w.1‖ ^ 2 := by
+theorem kap_of {z w : P} (h : 0 < z.1.im * w.1.im)
+    : kap z w = 4 * (z.1.im * w.1.im) / ‖z.1 - conj w.1‖ ^ 2 := by
   unfold kap
   rw [if_pos h]
 
@@ -37,8 +37,8 @@ theorem kap_nonneg (z w : P) : 0 ≤ kap z w := by
   · exact div_nonneg (by linarith) (sq_nonneg _)
   · exact le_rfl
 
-theorem key {z w u : ℂ} (h1 : 0 < z.im * w.im) (h2 : 0 < w.im * u.im) :
-    w.im ^ 2 * ‖z - conj u‖ ^ 2 ≤ ‖z - conj w‖ ^ 2 * ‖w - conj u‖ ^ 2 := by
+theorem key {z w u : ℂ} (h1 : 0 < z.im * w.im) (h2 : 0 < w.im * u.im)
+    : w.im ^ 2 * ‖z - conj u‖ ^ 2 ≤ ‖z - conj w‖ ^ 2 * ‖w - conj u‖ ^ 2 := by
   have h13 : 0 < z.im * u.im := by
     by_contra hc
     have hc := not_lt.mp hc
@@ -153,6 +153,13 @@ namespace UpperTheory.Esk
 
 theorem hyperbolic_kappa_properties_proof : B1c := by
   unfold B1c
-  exact ⟨HyperbolicKappaLemmas.p1, HyperbolicKappaLemmas.p2, HyperbolicKappaLemmas.p3, HyperbolicKappaLemmas.p4, HyperbolicKappaLemmas.p5, HyperbolicKappaLemmas.p6⟩
+  exact ⟨
+    HyperbolicKappaLemmas.p1,
+    HyperbolicKappaLemmas.p2,
+    HyperbolicKappaLemmas.p3,
+    HyperbolicKappaLemmas.p4,
+    HyperbolicKappaLemmas.p5,
+    HyperbolicKappaLemmas.p6
+  ⟩
 
 end UpperTheory.Esk

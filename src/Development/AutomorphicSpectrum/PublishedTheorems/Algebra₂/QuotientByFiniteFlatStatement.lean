@@ -24,12 +24,13 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 def QuotientByFiniteFlatStatement : Prop :=
   ∀ (R : Type) [CommRing R] (A : Over (Spec (CommRingCat.of R))) [GrpObj A] (L : LB A.left),
-    IsAbelianScheme A → L.IsLB → Out.RelAmple A L →
-    ∀ (B : Type) [CommRing B] [Algebra R B] (h : sp (R₀ := R) B ⟶ A), IsFinFlatSub A B h →
-    ∃ (A' : Over (Spec (CommRingCat.of R))) (_ : GrpObj A') (L' : LB A'.left) (q : A ⟶ A'),
-      IsAbelianScheme A' ∧ L'.IsLB ∧ Out.RelAmple A' L' ∧ IsMonHom q ∧
-      IsFinite q.left ∧ Flat q.left ∧ Surjective q.left ∧
-      ∀ (S : Type) [CommRing S] [Algebra R S] (z : sp (R₀ := R) S ⟶ A),
-        z ≫ q = 1 ↔ ∃ φ : B →ₐ[R] S, spMap φ ≫ h = z
+    IsAbelianScheme A → L.IsLB → Out.RelAmple A L
+      → ∀ (B : Type) [CommRing B] [Algebra R B] (h : sp (R₀ := R) B ⟶ A),
+        IsFinFlatSub A B h
+          → ∃ (A' : Over (Spec (CommRingCat.of R))) (_ : GrpObj A') (L' : LB A'.left) (q : A ⟶ A'),
+            IsAbelianScheme A' ∧ L'.IsLB ∧ Out.RelAmple A' L' ∧ IsMonHom q ∧ IsFinite q.left
+              ∧ Flat q.left ∧ Surjective q.left
+              ∧ ∀ (S : Type) [CommRing S] [Algebra R S] (z : sp (R₀ := R) S ⟶ A),
+                z ≫ q = 1 ↔ ∃ φ : B →ₐ[R] S, spMap φ ≫ h = z
 
 end GlobalTheory.CompanionTheory.Ar.GR

@@ -11,8 +11,10 @@ open MeasureTheory Matrix
 
 namespace GroundTheory.Heights₂.Heights
 
-theorem FsLogAverage.proof (h1 : BallAverageLinear.Statement) (h2 : FsLogPointOf.Statement)
-    (h3 : SphereMeanLinearBall.Statement) (h4 : BallVolume.Statement) : FsLogAverage.Statement := by
+theorem FsLogAverage.proof
+    (h1 : BallAverageLinear.Statement) (h2 : FsLogPointOf.Statement)
+    (h3 : SphereMeanLinearBall.Statement) (h4 : BallVolume.Statement)
+    : FsLogAverage.Statement := by
   intro n h y hy
   set y' : Fin n → ℂ := fun i => y i with hy'def
   have hy' : y' ≠ 0 := by
@@ -25,7 +27,7 @@ theorem FsLogAverage.proof (h1 : BallAverageLinear.Statement) (h2 : FsLogPointOf
     funext v
     exact h2 n h v y
   obtain ⟨hint, hle, hmean⟩ := h3 n y' hy'
-  have habs : (fun w => |φ w|) = fun w => -φ w := by
+  have habs : (fun w => |φ w|) = fun w => - φ w := by
     funext w
     exact abs_of_nonpos (hle w)
   have hmeanAbs : ⨍ v in ballH h, |φ (h.mat *ᵥ v)| = (harmonic (n - 1) : ℝ) / 2 := by

@@ -19,9 +19,12 @@ noncomputable section
 theorem maDensity_fin_zero (φ : Fin 0 → (Fin 0 → ℂ) → ℝ) (y : Fin 0 → ℂ) : maDensity φ y = 1 := by
   simp [maDensity, mixedDisc]
 
-theorem exists_isSheet_fin_zero {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {P : Ideal (MRing ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (0 + 1) → ℂ)}
-    {y : Fin 0 → ℂ} {w : ((k : K) → ι k) → ℂ} (hw : w ∈ fibre P Ψ y) : ∃ γ, IsSheet P Ψ y w γ := by
+theorem exists_isSheet_fin_zero
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (0 + 1) → ℂ)} {y : Fin 0 → ℂ}
+    {w : ((k : K) → ι k) → ℂ} (hw : w ∈ fibre P Ψ y)
+    : ∃ γ, IsSheet P Ψ y w γ := by
   obtain ⟨z, hz, rfl, hΨ⟩ := hw
   refine ⟨fun _ => z, rfl, Eventually.of_forall fun y' => ⟨differentiableAt_const _, hz, ?_⟩⟩
   rw [Subsingleton.elim y' y]
@@ -65,8 +68,8 @@ theorem regularityPointsSum_holds.proof : regularityPointsSum_holds.Statement :=
       simp [c]
     have hw₁ : segre (fun p => c p.1 * z p) ∈ fibre P hΨ.choose default := by
       refine ⟨_, mcPts_smul hP.2.1.2.1 c hc hz, rfl, funext fun i => ?_⟩
-      rw [Fin.eq_zero i, segre_smul, hprod, map_smul, Pi.smul_apply, smul_eq_mul,
-        ← ha_def, inv_mul_cancel₀ ha]
+      rw [Fin.eq_zero i, segre_smul, hprod, map_smul, Pi.smul_apply, smul_eq_mul, ← ha_def,
+        inv_mul_cancel₀ ha]
       rfl
     have hseg₁ : segre (fun p => c p.1 * z p) = a⁻¹ • segre z := by rw [segre_smul, hprod]
 
@@ -77,13 +80,15 @@ theorem regularityPointsSum_holds.proof : regularityPointsSum_holds.Statement :=
       have h1 : a = ∏ k, c' k := by
         rw [ha_def, hs, map_smul, Pi.smul_apply, smul_eq_mul, (hpick w hw).2, hone w hw, mul_one]
       rw [hs, ← h1, smul_smul, inv_mul_cancel₀ ha, one_smul]
-    refine ⟨pick (segre (fun p => c p.1 * z p)), ⟨Finset.mem_image_of_mem _ (hF.mem_toFinset.mpr hw₁), ?_⟩,
-      fun t ⟨ht, hzt⟩ => ?_⟩
+    refine ⟨
+      pick (segre (fun p => c p.1 * z p)),
+      ⟨Finset.mem_image_of_mem _ (hF.mem_toFinset.mpr hw₁), ?_⟩,
+      fun t ⟨ht, hzt⟩ => ?_
+    ⟩
     · refine sameOrbit_of_segre (hpick _ hw₁).1.1 a ha ?_
       rw [(hpick _ hw₁).2, hseg₁, smul_smul, mul_inv_cancel₀ ha, one_smul]
     · obtain ⟨w, hw, rfl⟩ := hR t ht
-      have hw' : w = segre (fun p => c p.1 * z p) := by
-        rw [← (hpick w hw).2, horb _ ht hzt, hseg₁]
+      have hw' : w = segre (fun p => c p.1 * z p) := by rw [← (hpick w hw).2, horb _ ht hzt, hseg₁]
       rw [hw']
   · unfold ptsIntegral
     rw [dif_pos hΨ]
@@ -92,9 +97,12 @@ theorem regularityPointsSum_holds.proof : regularityPointsSum_holds.Statement :=
     have hvol : (volume : Measure (Fin 0 → ℂ)).real Set.univ = 1 := by
       simp [Measure.real, MeasureTheory.volume_pi]
     rw [hvol, one_smul]
-    refine (?_ : ∀ y : Fin 0 → ℂ, ∑ᶠ w ∈ fibre P hΨ.choose y,
-      sheetDensity P hΨ.choose (Fin.elim0 : Fin 0 → ((Σ k, ι k) → ℂ) → ℝ) h y w =
-        ∑ t ∈ hF.toFinset.image pick, h t) _
+    refine (?_
+        : ∀ y : Fin 0 → ℂ,
+          ∑ᶠ w ∈ fibre P hΨ.choose y,
+              sheetDensity P hΨ.choose (Fin.elim0 : Fin 0 → ((Σ k, ι k) → ℂ) → ℝ) h y w
+            = ∑ t ∈ hF.toFinset.image pick, h t)
+      _
     intro y
     rw [Subsingleton.elim y default, finsum_mem_eq_finite_toFinset_sum _ hF,
       Finset.sum_image fun x hx y hy hxy => by

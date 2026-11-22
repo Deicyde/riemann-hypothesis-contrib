@@ -44,7 +44,8 @@ def ptIntSer (σ : Type*) : Subring (MvPowerSeries σ C) where
 
 variable {v}
 
-theorem ptMvIsInt_iff {σ : Type*} (f : MvPowerSeries σ C) : MvIsInt v f ↔ f ∈ ptIntSer v σ := Iff.rfl
+theorem ptMvIsInt_iff {σ : Type*} (f : MvPowerSeries σ C) : MvIsInt v f ↔ f ∈ ptIntSer v σ :=
+  Iff.rfl
 
 theorem ptIsIntV_iff (x : C) : IsIntV v x ↔ x ∈ ptIntSub v := Iff.rfl
 
@@ -68,15 +69,17 @@ theorem ptIntSer_X {σ : Type*} (s : σ) : (X s : MvPowerSeries σ C) ∈ ptIntS
   · exact Subring.one_mem _
   · exact Subring.zero_mem _
 
-theorem ptIntSer_smul {σ : Type*} {c : C} (hc : c ∈ ptIntSub v) {f : MvPowerSeries σ C}
-    (hf : f ∈ ptIntSer v σ) : c • f ∈ ptIntSer v σ := by
+theorem ptIntSer_smul
+    {σ : Type*} {c : C} (hc : c ∈ ptIntSub v) {f : MvPowerSeries σ C} (hf : f ∈ ptIntSer v σ)
+    : c • f ∈ ptIntSer v σ := by
   intro α
   rw [map_smul, smul_eq_mul]
   exact Subring.mul_mem _ hc (hf α)
 
-theorem ptIntSer_subst {σ τ : Type*} {A : σ → MvPowerSeries τ C} (hA : HasSubst A)
-    (hAi : ∀ s, A s ∈ ptIntSer v τ) {f : MvPowerSeries σ C} (hf : f ∈ ptIntSer v σ) :
-    subst A f ∈ ptIntSer v τ := by
+theorem ptIntSer_subst
+    {σ τ : Type*} {A : σ → MvPowerSeries τ C} (hA : HasSubst A) (hAi : ∀ s, A s ∈ ptIntSer v τ)
+    {f : MvPowerSeries σ C} (hf : f ∈ ptIntSer v σ)
+    : subst A f ∈ ptIntSer v τ := by
   intro e
   rw [MvPowerSeries.coeff_subst hA f e]
   have hmem : ∀ d : σ →₀ ℕ, coeff d f • coeff e (d.prod fun s n => A s ^ n) ∈ ptIntSub v := by
@@ -101,8 +104,8 @@ section Lin
 
 variable {R : Type*} [CommRing R]
 
-theorem pt_degree_eq_one {σ : Type*} {α : σ →₀ ℕ} (h : α.degree = 1) :
-    ∃ s, α = Finsupp.single s 1 := by
+theorem pt_degree_eq_one {σ : Type*} {α : σ →₀ ℕ} (h : α.degree = 1)
+    : ∃ s, α = Finsupp.single s 1 := by
   classical
   have hsum : ∑ i ∈ α.support, α i = 1 := h
   obtain ⟨s, hs⟩ : α.support.Nonempty := by
@@ -131,31 +134,28 @@ theorem pt_degree_eq_one {σ : Type*} {α : σ →₀ ℕ} (h : α.degree = 1) :
     rw [Finset.sum_pair hst] at h2
     omega
 
-private theorem vmul_lemma {ρ K : Type*} [CommRing K] {P Q : MvPowerSeries ρ K} {m n : ℕ}
-    (hP : ∀ e : ρ →₀ ℕ, e.degree < m → coeff e P = 0)
-    (hQ : ∀ e : ρ →₀ ℕ, e.degree < n → coeff e Q = 0) :
-    ∀ e : ρ →₀ ℕ, e.degree < m + n → coeff e (P * Q) = 0 := by
+private theorem vmul_lemma
+    {ρ K : Type*} [CommRing K]
+    {P Q : MvPowerSeries ρ K} {m n : ℕ} (hP : ∀ e : ρ →₀ ℕ, e.degree < m → coeff e P = 0)
+    (hQ : ∀ e : ρ →₀ ℕ, e.degree < n → coeff e Q = 0)
+    : ∀ e : ρ →₀ ℕ, e.degree < m + n → coeff e (P * Q) = 0 := by
   intro e he
   rw [coeff_mul]
   refine Finset.sum_eq_zero fun x hx => ?_
   have hx' : x.1 + x.2 = e := Finset.HasAntidiagonal.mem_antidiagonal.mp hx
   have hdeg : (x.1 + x.2).degree = x.1.degree + x.2.degree := by
-    first
-    | exact Finsupp.degree_add _ _
-    | exact map_add _ _ _
+    first | exact Finsupp.degree_add _ _ | exact map_add _ _ _
   rw [hx'] at hdeg
   by_cases h1 : x.1.degree < m
   · rw [hP _ h1, zero_mul]
   · rw [hQ _ (by omega), mul_zero]
 
 private theorem vzero_lemma_2 {ρ : Type*} {e : ρ →₀ ℕ} (h : e.degree = 0) : e = 0 := by
-  first
-  | exact (Finsupp.degree_eq_zero_iff _).mp h
-  | exact Finsupp.degree_eq_zero_iff.mp h
+  first | exact (Finsupp.degree_eq_zero_iff _).mp h | exact Finsupp.degree_eq_zero_iff.mp h
 
-private theorem vpow_lemma_3 {ρ K : Type*} [CommRing K] {A : MvPowerSeries ρ K}
-    (hA : constantCoeff A = 0) (k : ℕ) :
-    ∀ e : ρ →₀ ℕ, e.degree < k → coeff e (A ^ k) = 0 := by
+private theorem vpow_lemma_3
+    {ρ K : Type*} [CommRing K] {A : MvPowerSeries ρ K} (hA : constantCoeff A = 0) (k : ℕ)
+    : ∀ e : ρ →₀ ℕ, e.degree < k → coeff e (A ^ k) = 0 := by
   induction k with
   | zero => intro e he; omega
   | succ k ih =>
@@ -165,28 +165,31 @@ private theorem vpow_lemma_3 {ρ K : Type*} [CommRing K] {A : MvPowerSeries ρ K
     have h0 : e = 0 := vzero_lemma_2 (by omega)
     rw [h0, coeff_zero_eq_constantCoeff_apply, hA]
 
-private theorem vprod_lemma_4 {ι ρ K : Type*} [CommRing K] {A : ι → MvPowerSeries ρ K}
-    (hA : ∀ s, constantCoeff (A s) = 0) (d : ι →₀ ℕ) (T : Finset ι) :
-    ∀ e : ρ →₀ ℕ, e.degree < ∑ s ∈ T, d s → coeff e (∏ s ∈ T, A s ^ d s) = 0 := by
+private theorem vprod_lemma_4
+    {ι ρ K : Type*} [CommRing K]
+    {A : ι → MvPowerSeries ρ K} (hA : ∀ s, constantCoeff (A s) = 0)
+    (d : ι →₀ ℕ) (T : Finset ι)
+    : ∀ e : ρ →₀ ℕ, e.degree < ∑ s ∈ T, d s → coeff e (∏ s ∈ T, A s ^ d s) = 0 := by
   classical
   refine Finset.induction_on T (fun e he => by simp at he) (fun a T ha ih => ?_)
   rw [Finset.prod_insert ha, Finset.sum_insert ha]
   exact vmul_lemma (vpow_lemma_3 (hA a) (d a)) ih
 
-theorem pt_coeff_single_subst {σ τ : Type*} [Fintype σ]
+theorem pt_coeff_single_subst
+    {σ τ : Type*} [Fintype σ]
     {A : σ → MvPowerSeries τ R} (hA : HasSubst A) (hA0 : ∀ s, constantCoeff (A s) = 0)
-    {f : MvPowerSeries σ R} (hf : constantCoeff f = 0) (i : τ) :
-    coeff (Finsupp.single i 1) (subst A f) =
-      ∑ s, coeff (Finsupp.single s 1) f * coeff (Finsupp.single i 1) (A s) := by
+    {f : MvPowerSeries σ R} (hf : constantCoeff f = 0)
+    (i : τ)
+    : coeff (Finsupp.single i 1) (subst A f)
+      = ∑ s, coeff (Finsupp.single s 1) f * coeff (Finsupp.single i 1) (A s) := by
   classical
   rw [MvPowerSeries.coeff_subst hA f (Finsupp.single i 1)]
   have hi1 : (Finsupp.single i 1 : τ →₀ ℕ).degree = 1 := by
-    first
-    | exact Finsupp.degree_single i 1
-    | simp [Finsupp.degree]
-  have hsupp : (Function.support fun d : σ →₀ ℕ =>
-      coeff d f • coeff (Finsupp.single i 1) (d.prod fun s e => A s ^ e)) ⊆
-      ↑(Finset.univ.image fun s : σ => Finsupp.single s 1) := by
+    first | exact Finsupp.degree_single i 1 | simp [Finsupp.degree]
+  have hsupp
+      : (Function.support fun d : σ →₀ ℕ =>
+          coeff d f • coeff (Finsupp.single i 1) (d.prod fun s e => A s ^ e))
+        ⊆ ↑(Finset.univ.image fun s : σ => Finsupp.single s 1) := by
     intro d hd
     simp only [Function.mem_support, ne_eq] at hd
     by_contra hns
@@ -212,8 +215,8 @@ theorem pt_coeff_single_subst {σ τ : Type*} [Fintype σ]
   · intro s _ t _ hst
     exact (Finsupp.single_left_inj one_ne_zero).mp hst
 
-theorem pt_coeff_single_X {σ : Type*} (s t : σ) :
-    coeff (Finsupp.single s 1) (X t : MvPowerSeries σ R) = if s = t then 1 else 0 := by
+theorem pt_coeff_single_X {σ : Type*} (s t : σ)
+    : coeff (Finsupp.single s 1) (X t : MvPowerSeries σ R) = if s = t then 1 else 0 := by
   rw [coeff_X]
   by_cases h : s = t
   · subst h
@@ -222,9 +225,10 @@ theorem pt_coeff_single_X {σ : Type*} (s t : σ) :
     intro h'
     exact h ((Finsupp.single_left_inj one_ne_zero).mp h')
 
-theorem pt_hK_of_low {σ τ : Type*} {K : MvPowerSeries σ R}
-    (hK : ∀ α : σ →₀ ℕ, α.degree ≤ 1 → coeff α K = 0) (A A' : σ → MvPowerSeries τ R) :
-    ∀ α, coeff α K ≠ 0 → 2 ≤ α.degree ∨ ∀ s ∈ α.support, A s = A' s := by
+theorem pt_hK_of_low
+    {σ τ : Type*} {K : MvPowerSeries σ R}
+    (hK : ∀ α : σ →₀ ℕ, α.degree ≤ 1 → coeff α K = 0) (A A' : σ → MvPowerSeries τ R)
+    : ∀ α, coeff α K ≠ 0 → 2 ≤ α.degree ∨ ∀ s ∈ α.support, A s = A' s := by
   intro α hα
   left
   by_contra h
@@ -236,25 +240,28 @@ section Law
 
 variable {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {d : ℕ}
 
-theorem pt_F_lin (G : LogFGL v d) (a : Fin d) (i : Fin d ⊕ Fin d) :
-    coeff (Finsupp.single i 1) (G.F a) =
-      (if i = Sum.inl a then 1 else 0) + (if i = Sum.inr a then 1 else 0) := by
+theorem pt_F_lin (G : LogFGL v d) (a : Fin d) (i : Fin d ⊕ Fin d)
+    : coeff (Finsupp.single i 1) (G.F a)
+      = (if i = Sum.inl a then 1 else 0) + (if i = Sum.inr a then 1 else 0) := by
   have hF : HasSubst G.F := by
     first
     | exact HasSubst.of_constantCoeff_zero G.F_const
     | exact hasSubst_of_constantCoeff_zero G.F_const
-  have hX : ∀ e : Fin d → Fin d ⊕ Fin d,
-      HasSubst (fun b => (X (e b) : MvPowerSeries (Fin d ⊕ Fin d) C)) := by
+  have hX
+      : ∀ e : Fin d → Fin d ⊕ Fin d,
+        HasSubst (fun b => (X (e b) : MvPowerSeries (Fin d ⊕ Fin d) C)) := by
     intro e
     first
     | exact HasSubst.of_constantCoeff_zero fun b => constantCoeff_X _
     | exact hasSubst_of_constantCoeff_zero fun b => constantCoeff_X _
   have key := congrArg (coeff (Finsupp.single i 1)) (G.lg_F a)
   rw [map_add (f := _), pt_coeff_single_subst hF G.F_const (G.lg_const a),
-    pt_coeff_single_subst (hX Sum.inl) (fun b => constantCoeff_X _) (G.lg_const a),
-    pt_coeff_single_subst (hX Sum.inr) (fun b => constantCoeff_X _) (G.lg_const a)] at key
+      pt_coeff_single_subst (hX Sum.inl) (fun b => constantCoeff_X _) (G.lg_const a),
+      pt_coeff_single_subst (hX Sum.inr) (fun b => constantCoeff_X _) (G.lg_const a)]
+    at key
   simp only [G.lg_lin, pt_coeff_single_X, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true] at key
+      Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    at key
   convert key
 
 end Law

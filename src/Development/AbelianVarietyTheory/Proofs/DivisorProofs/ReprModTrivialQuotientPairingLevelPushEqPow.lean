@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WpQTrivRight
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -18,8 +20,8 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Ex
 
 variable {A U : Type} [CommGroup A] [CommGroup U] {θ : A → A → A → U}
 
-theorem cubN_mul_iter (h : IsCub θ) (n m : ℕ) (b x : A) :
-    cubN θ (n * m) 1 b x = cubN θ n 1 (b ^ m) x * cubN θ m 1 b x ^ n := by
+theorem cubN_mul_iter (h : IsCub θ) (n m : ℕ) (b x : A)
+    : cubN θ (n * m) 1 b x = cubN θ n 1 (b ^ m) x * cubN θ m 1 b x ^ n := by
   induction n with
   | zero => simp [cubN]
   | succ n ih =>
@@ -33,8 +35,8 @@ theorem cubN_mul_iter (h : IsCub θ) (n m : ℕ) (b x : A) :
     rw [e, ih, h.N_split m (b ^ (n * m)) b x, s1, ← pow_mul' b n m, pow_succ (cubN θ m 1 b x) n]
     ac_rfl
 
-theorem cubN_pow_right (h : IsCub θ) (k m : ℕ) (b x : A) :
-    cubN θ k 1 b (x ^ m) * cubN θ m 1 x b ^ k = cubN θ k 1 b x ^ m * cubN θ m 1 x (b ^ k) := by
+theorem cubN_pow_right (h : IsCub θ) (k m : ℕ) (b x : A)
+    : cubN θ k 1 b (x ^ m) * cubN θ m 1 x b ^ k = cubN θ k 1 b x ^ m * cubN θ m 1 x (b ^ k) := by
   induction m with
   | zero => simp [cubN, h.face₃]
   | succ m ih =>
@@ -56,8 +58,8 @@ theorem cubN_pow_right (h : IsCub θ) (k m : ℕ) (b x : A) :
 
 variable {O : Type} [CommRing O] (N : NumD O)
 
-theorem wp_pushRep (n m : ℕ) (hn : 0 < n) (p q : N.QT (n * m)) :
-    N.wp (pushRep N (n * m) n p) (pushRep N (n * m) n q) = N.wp p q ^ m := by
+theorem wp_pushRep (n m : ℕ) (hn : 0 < n) (p q : N.QT (n * m))
+    : N.wp (pushRep N (n * m) n p) (pushRep N (n * m) n q) = N.wp p q ^ m := by
   have hd : n ∣ n * m := dvd_mul_right n m
   have hM : n * m / n = m := Nat.mul_div_cancel_left m hn
   simp only [NumD.wp, NumD.tk, pushRep_fst N hd, pushRep_snd N hd, hM, NumD.Gt.pow_b]
@@ -84,6 +86,16 @@ theorem wp_pushRep (n m : ℕ) (hn : 0 < n) (p q : N.QT (n * m)) :
 
 end GlobalTheory.SympQ.PushPow
 
-theorem GlobalTheory.SympQ.wp_pushRep_pow : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], GlobalTheory.Mum.Base R → ∀ (D : DegData R (maximalIdeal R)) (F : Type) [Field F] [IsAlgClosed F] [Algebra (FractionRing R) F] (N : GlobalTheory.Ex.NumD F) (ν : GlobalTheory.Ex.NumOf D.toPre F N) (n m : ℕ), 0 < n → 0 < m → ∀ p q : N.QT (n * m), N.wp (GlobalTheory.SympQ.pushRep N (n * m) n p) (GlobalTheory.SympQ.pushRep N (n * m) n q) = N.wp p q ^ m := by
+theorem GlobalTheory.SympQ.wp_pushRep_pow
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      GlobalTheory.Mum.Base R
+        → ∀ (D : DegData R (maximalIdeal R)) (F : Type) [Field F] [IsAlgClosed F]
+            [Algebra (FractionRing R) F] (N : GlobalTheory.Ex.NumD F)
+            (ν : GlobalTheory.Ex.NumOf D.toPre F N) (n m : ℕ),
+          0 < n → 0 < m
+            → ∀ p q : N.QT (n * m),
+              N.wp (GlobalTheory.SympQ.pushRep N (n * m) n p)
+                  (GlobalTheory.SympQ.pushRep N (n * m) n q)
+                = N.wp p q ^ m := by
   intro R _ _ _ _ D F _ _ _ N ν n m hn hm p q
   exact GlobalTheory.SympQ.PushPow.wp_pushRep N n m hn p q

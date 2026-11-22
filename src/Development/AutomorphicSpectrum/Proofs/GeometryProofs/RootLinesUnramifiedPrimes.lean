@@ -20,59 +20,77 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FinrankFinit
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
 
 namespace GlobalTheory.CompanionTheory.Ar.Conj.HcptTie
 
 section Lattices
 
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {V : Type} [AddCommGroup V]
-  [Module Ω V]
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {V : Type} [AddCommGroup V] [Module Ω V]
 
-theorem flag_congr {L L' : Lat ξ V} {T T' : Set (Cpt ξ)} {r : ℕ} {b : Fin r → V} (hT : T' ⊆ T)
-    (h : ∀ q ∈ T', L' q = L q) (hL : L.IsFlagVBOn T b) : L'.IsFlagVBOn T' b := by
+theorem flag_congr
+    {L L' : Lat ξ V} {T T' : Set (Cpt ξ)} {r : ℕ} {b : Fin r → V}
+    (hT : T' ⊆ T) (h : ∀ q ∈ T', L' q = L q) (hL : L.IsFlagVBOn T b)
+    : L'.IsFlagVBOn T' b := by
   intro p hp
   obtain ⟨U, hU, c, hc, hf⟩ := hL p (hT hp)
   refine ⟨U, hU, c, hc, fun q hq hqU => ?_⟩
   have h1 := hf q (hT hq) hqU
   exact ⟨h1.1, (h q hq).trans h1.2⟩
 
-theorem gr_congr {L L' : Lat ξ V} {q : Cpt ξ} (h : L' q = L q) {r : ℕ} (b : Fin r → V) (i : Fin r) :
-    L'.gr b i q = L.gr b i q := by
+theorem gr_congr {L L' : Lat ξ V} {q : Cpt ξ} (h : L' q = L q) {r : ℕ} (b : Fin r → V) (i : Fin r)
+    : L'.gr b i q = L.gr b i q := by
   unfold Lat.gr
   rw [h]
 
-theorem flag_cast {L : Lat ξ V} {T : Set (Cpt ξ)} {r r' : ℕ} (h : r' = r) {b : Fin r → V}
-    (hL : L.IsFlagVBOn T b) : L.IsFlagVBOn T (b ∘ Fin.cast h) := by
+theorem flag_cast
+    {L : Lat ξ V} {T : Set (Cpt ξ)} {r r' : ℕ} (h : r' = r) {b : Fin r → V} (hL : L.IsFlagVBOn T b)
+    : L.IsFlagVBOn T (b ∘ Fin.cast h) := by
   subst h
   exact hL
 
-theorem gr_cast (L : Lat ξ V) {r r' : ℕ} (h : r' = r) (b : Fin r → V) (i : Fin r') :
-    L.gr (b ∘ Fin.cast h) i = L.gr b (Fin.cast h i) := by
+theorem gr_cast (L : Lat ξ V) {r r' : ℕ} (h : r' = r) (b : Fin r → V) (i : Fin r')
+    : L.gr (b ∘ Fin.cast h) i = L.gr b (Fin.cast h i) := by
   subst h
   rfl
 
-theorem ind_cast {r r' : ℕ} (h : r' = r) {b : Fin r → V} {W : Submodule Ω V}
-    (hb : LinearIndependent Ω b ∧ Submodule.span Ω (Set.range b) = W) :
-    LinearIndependent Ω (b ∘ Fin.cast h) ∧ Submodule.span Ω (Set.range (b ∘ Fin.cast h)) = W := by
+theorem ind_cast
+    {r r' : ℕ} (h : r' = r)
+    {b : Fin r → V} {W : Submodule Ω V}
+    (hb : LinearIndependent Ω b ∧ Submodule.span Ω (Set.range b) = W)
+    : LinearIndependent Ω (b ∘ Fin.cast h) ∧ Submodule.span Ω (Set.range (b ∘ Fin.cast h)) = W := by
   subst h
   exact hb
 
-theorem exists_gen {Λ : Lat ξ Ω} {T : Set (Cpt ξ)} (h : Λ.IsVBOn T 1 ⊤) {p : Cpt ξ} (hp : p ∈ T) :
-    ∃ s, Λ.IsGenAt p s := by
+theorem exists_gen {Λ : Lat ξ Ω} {T : Set (Cpt ξ)} (h : Λ.IsVBOn T 1 ⊤) {p : Cpt ξ} (hp : p ∈ T)
+    : ∃ s, Λ.IsGenAt p s := by
   obtain ⟨U, hU, b, -, hf⟩ := h p hp
   obtain ⟨hli, hs⟩ := hf p hp hU
   refine ⟨b 0, hli.ne_zero 0, ?_⟩
   rw [hs, Set.range_unique]
   rfl
 
-theorem tens_gen {G : Lat ξ Ω} {T : Set (Cpt ξ)} (hG : G.IsVBOn T 1 ⊤) (n : ℤ) {p : Cpt ξ} (hp : p ∈ T) {s : Ω}
-    (hs : G.IsGenAt p s) : (Lat.tens (fun _ : Unit => G) fun _ => n).IsGenAt p (s ^ n) := by
-  have h := (GlobalTheory.T.lattice_tensor_power_line_bundle X Ω ξ Unit (fun _ => G) T (fun _ => hG) fun _ => n).2 p hp (fun _ => s) fun _ => hs
+theorem tens_gen
+    {G : Lat ξ Ω} {T : Set (Cpt ξ)} (hG : G.IsVBOn T 1 ⊤)
+    (n : ℤ)
+    {p : Cpt ξ} (hp : p ∈ T)
+    {s : Ω} (hs : G.IsGenAt p s)
+    : (Lat.tens (fun _ : Unit => G) fun _ => n).IsGenAt p (s ^ n) := by
+  have h :=
+    (GlobalTheory.T.lattice_tensor_power_line_bundle X Ω ξ Unit
+      (fun _ => G)
+      T
+      (fun _ => hG)
+      fun _ => n).2 p hp (fun _ => s) fun _ => hs
   simpa using h
 
-theorem span_inv (R : Subring Ω) {s w : Ω} (hs : s ≠ 0) (h : Submodule.span R {s⁻¹} = Submodule.span R {w}) :
-    Submodule.span R {s} = Submodule.span R {w⁻¹} := by
+theorem span_inv
+    (R : Subring Ω) {s w : Ω} (hs : s ≠ 0) (h : Submodule.span R {s⁻¹} = Submodule.span R {w})
+    : Submodule.span R {s} = Submodule.span R {w⁻¹} := by
   have h1 : s⁻¹ ∈ Submodule.span R {w} := h ▸ Submodule.mem_span_singleton_self _
   have h2 : w ∈ Submodule.span R {s⁻¹} := h ▸ Submodule.mem_span_singleton_self _
   obtain ⟨a, ha⟩ := Submodule.mem_span_singleton.1 h1
@@ -100,17 +118,21 @@ theorem span_inv (R : Subring Ω) {s w : Ω} (hs : s ≠ 0) (h : Submodule.span 
 
 variable {K : Type} [Fintype K] {ι : K → Type} {y : (Σ k, ι k) → Ω}
 
-theorem deg_one {G G' : Lat ξ Ω} {T : Set (Cpt ξ)} {a : K → ℤ} {e : Ω} (hG : G.IsVBOn Set.univ 1 ⊤)
-    (hd : (Lat.tens (fun _ : Unit => G) fun _ => (1 : ℤ)).IsDegOn Set.univ y a e) (h : ∀ q ∈ T, G' q = G q) :
-    G'.IsDegOn T y a e := by
+theorem deg_one
+    {G G' : Lat ξ Ω} {T : Set (Cpt ξ)} {a : K → ℤ} {e : Ω} (hG : G.IsVBOn Set.univ 1 ⊤)
+    (hd : (Lat.tens (fun _ : Unit => G) fun _ => (1 : ℤ)).IsDegOn Set.univ y a e)
+    (h : ∀ q ∈ T, G' q = G q)
+    : G'.IsDegOn T y a e := by
   refine ⟨hd.1, fun q hq c hc => ?_⟩
   obtain ⟨s, hs⟩ := exists_gen hG (Set.mem_univ q)
   have ht := tens_gen hG 1 (Set.mem_univ q) hs
   rw [h q hq, hs.2, ← hd.2 q (Set.mem_univ q) c hc, ht.2, zpow_one]
 
-theorem deg_neg_one {G G' : Lat ξ Ω} {T : Set (Cpt ξ)} {a : K → ℤ} {e : Ω} (hG : G.IsVBOn Set.univ 1 ⊤)
-    (hd : (Lat.tens (fun _ : Unit => G) fun _ => (-1 : ℤ)).IsDegOn Set.univ y a e) (h : ∀ q ∈ T, G' q = G q) :
-    G'.IsDegOn T y (-a) e⁻¹ := by
+theorem deg_neg_one
+    {G G' : Lat ξ Ω} {T : Set (Cpt ξ)} {a : K → ℤ} {e : Ω} (hG : G.IsVBOn Set.univ 1 ⊤)
+    (hd : (Lat.tens (fun _ : Unit => G) fun _ => (-1 : ℤ)).IsDegOn Set.univ y a e)
+    (h : ∀ q ∈ T, G' q = G q)
+    : G'.IsDegOn T y (-a) e⁻¹ := by
   refine ⟨inv_ne_zero hd.1, fun q hq c hc => ?_⟩
   obtain ⟨s, hs⟩ := exists_gen hG (Set.mem_univ q)
   have ht := tens_gen hG (-1) (Set.mem_univ q) hs
@@ -122,7 +144,8 @@ theorem deg_neg_one {G G' : Lat ξ Ω} {T : Set (Cpt ξ)} {a : K → ℤ} {e : �
   rw [h q hq, hs.2, e1]
   exact h2
 
-theorem natCast_residue_eq_zero (q : Cpt ξ) {p : ℕ} (h : InFibre ξ p q) : (p : X.residueField q.1) = 0 := by
+theorem natCast_residue_eq_zero (q : Cpt ξ) {p : ℕ} (h : InFibre ξ p q)
+    : (p : X.residueField q.1) = 0 := by
   by_contra hne
   have hu : IsUnit (p : X.presheaf.stalk q.1) := by
     by_contra hnu
@@ -142,12 +165,16 @@ end Lattices
 
 section Main
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F} {Y : Model Xo c β} {S : Finset ℕ}
-  {Ω : Type} [Field Ω] {K : Type} [Fintype K] {J : K → Type} {y : (Σ k, J k) → Ω} {𝔐 : HodgeCpt Y S y}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F} {Y : Model Xo c β} {S : Finset ℕ} {Ω : Type} [Field Ω]
+  {K : Type} [Fintype K]
+  {J : K → Type} {y : (Σ k, J k) → Ω} {𝔐 : HodgeCpt Y S y}
 
-theorem flag_basis (Fl : 𝔐.Flag) (s : CMType H ⊕ CMType H) :
-    LinearIndependent Ω (Fl.b s) ∧ Submodule.span Ω (Set.range (Fl.b s)) = eigSp 𝔐.ρ (𝔐.emb s) := by
+theorem flag_basis (Fl : 𝔐.Flag) (s : CMType H ⊕ CMType H)
+    : LinearIndependent Ω (Fl.b s)
+      ∧ Submodule.span Ω (Set.range (Fl.b s)) = eigSp 𝔐.ρ (𝔐.emb s) := by
   have hli : LinearIndependent Ω (Fl.b s) := by
     letI := 𝔐.fn.toAlgebra
     obtain ⟨_, _, -, -, -, hli, -⟩ := Fl.generic
@@ -156,42 +183,68 @@ theorem flag_basis (Fl : 𝔐.Flag) (s : CMType H ⊕ CMType H) :
   let q0 : Cpt 𝔐.ξ := ⟨genPt 𝔐.ξ, specializes_rfl⟩
   obtain ⟨U, hU, b, hF, hb⟩ := Fl.sub s q0 (Set.mem_univ _)
   obtain ⟨U', hU', b', hs', hb'⟩ := 𝔐.vb s q0 (Set.mem_univ _)
-  have e3 : Submodule.span (regAt 𝔐.ξ q0) (Set.range b) = Submodule.span (regAt 𝔐.ξ q0) (Set.range b') :=
+  have e3
+      : Submodule.span (regAt 𝔐.ξ q0) (Set.range b)
+        = Submodule.span (regAt 𝔐.ξ q0) (Set.range b') :=
     (hb q0 (Set.mem_univ _) hU).2.symm.trans (hb' q0 (Set.mem_univ _) hU').2
   have e4 : Submodule.span Ω (Set.range b) = Submodule.span Ω (Set.range b') := by
-    rw [← Submodule.span_span_of_tower (regAt 𝔐.ξ q0) Ω (Set.range b), e3, Submodule.span_span_of_tower]
-  calc Submodule.span Ω (Set.range (Fl.b s)) = flagStep Ω (Fl.b s) (labelRk D s) := (FlagGr.step_top _).symm
+    rw [← Submodule.span_span_of_tower (regAt 𝔐.ξ q0) Ω (Set.range b), e3,
+      Submodule.span_span_of_tower]
+  calc
+    Submodule.span Ω (Set.range (Fl.b s))
+      = flagStep Ω (Fl.b s) (labelRk D s) := (FlagGr.step_top _).symm
     _ = flagStep Ω b (labelRk D s) := (hF _).symm
     _ = Submodule.span Ω (Set.range b) := FlagGr.step_top _
     _ = eigSp 𝔐.ρ (𝔐.emb s) := e4.trans hs'
 
-theorem eigLat_eq_V (s : CMType H ⊕ CMType H) {p : ℕ} (hp : p.Prime) (hS : p ∉ S) {q : Cpt 𝔐.ξ}
-    (hq : InFibre 𝔐.ξ p q) : 𝔐.M.eigLat 𝔐.ρ (𝔐.emb s) q = 𝔐.V s q := by
+theorem eigLat_eq_V
+    (s : CMType H ⊕ CMType H)
+    {p : ℕ} (hp : p.Prime) (hS : p ∉ S)
+    {q : Cpt 𝔐.ξ} (hq : InFibre 𝔐.ξ p q)
+    : 𝔐.M.eigLat 𝔐.ρ (𝔐.emb s) q = 𝔐.V s q := by
   refine (Lat.patch_of_not S _ _ fun p' hp' h' => ?_).symm
   have hne : p ≠ p' := fun e => hS (e ▸ hp')
   exact Lat.not_inFibre_of_coprime q ((Nat.coprime_primes hp (𝔐.S_prime _ hp')).2 hne) hq h'
 
 end Main
 
-theorem drTie_of_hodgeCpt : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ) [Fintype (CMType H)] (M : GlobalTheory.CompanionTheory.Ar.Top.RootModel (CMType H) (D.p + D.q)) (𝔐 : HodgeCpt Y S M.y) (Fl : 𝔐.Flag) (e : CMType H × Fin (D.p + D.q) → M.Ω), Fl.RootLines M.xdeg e → ∀ p : ℕ, p.Prime → p ∉ S → ¬ (p : ℤ) ∣ NumberField.discr E → (∀ z : Y.X, (p : Y.X.residueField z) = 0 → FibPF Y.t z) → Nonempty (DRTie M D.p p H) := by
+theorem drTie_of_hodgeCpt
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ)
+        [Fintype (CMType H)]
+        (M : GlobalTheory.CompanionTheory.Ar.Top.RootModel (CMType H) (D.p + D.q))
+        (𝔐 : HodgeCpt Y S M.y) (Fl : 𝔐.Flag) (e : CMType H × Fin (D.p + D.q) → M.Ω),
+      Fl.RootLines M.xdeg e
+        → ∀ p : ℕ,
+          p.Prime → p ∉ S → ¬ (p : ℤ) ∣ NumberField.discr E
+            → (∀ z : Y.X, (p : Y.X.residueField z) = 0 → FibPF Y.t z)
+            → Nonempty (DRTie M D.p p H) := by
   intro E _ _ _ H D l Xo c Y S _ M 𝔐 Fl e hR p hp hS hd hfib
-  obtain ⟨hint, -, -, hinj, -, -, -, hreg⟩ := GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c (𝓞 c.F) (algebraMap (𝓞 c.F) c.F) Y S M.Ω M.K M.ι
-    M.y 𝔐 Subtype.val_injective
+  obtain ⟨hint, -, -, hinj, -, -, -, hreg⟩ :=
+    GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c (𝓞 c.F) (algebraMap (𝓞 c.F) c.F) Y S M.Ω
+      M.K M.ι M.y 𝔐 Subtype.val_injective
   have hcard := (LabelCount.labels_injective_card E H l c M.Ω 𝔐.cst).2
-  have hnoeth := (GlobalTheory.T.regAt_noetherian_model_noetherian 𝔐.X M.Ω 𝔐.ξ ℤ ((k : M.K) → M.ι k) _ 𝔐.tie).2 𝔐.all
+  have hnoeth :=
+    (GlobalTheory.T.regAt_noetherian_model_noetherian 𝔐.X M.Ω 𝔐.ξ ℤ ((k : M.K) → M.ι k) _ 𝔐.tie).2
+      𝔐.all
   haveI := hnoeth.1
   haveI := hnoeth.2
-  have hpow : PowFns 𝔐.t := GlobalTheory.T.powFns_of_abelian_generic E H 𝔐.X 𝔐.t inferInstance inferInstance fun z hz => by
-    have h1 : genPt 𝔐.ξ = z := hz _ (𝔐.all z)
-    rw [← h1]
-    exact hint
-  have hc : ∀ τ : CMType H, D.p + D.q - D.p = labelRk D (.inr τ) := fun _ => Nat.add_sub_cancel_left _ _
+  have hpow : PowFns 𝔐.t :=
+    GlobalTheory.T.powFns_of_abelian_generic E H 𝔐.X 𝔐.t inferInstance inferInstance fun z hz => by
+      have h1 : genPt 𝔐.ξ = z := hz _ (𝔐.all z)
+      rw [← h1]
+      exact hint
+  have hc : ∀ τ : CMType H, D.p + D.q - D.p = labelRk D (.inr τ) := fun _ =>
+    Nat.add_sub_cancel_left _ _
   let G : (Σ s, Fin (labelRk D s)) → Lat 𝔐.ξ M.Ω := fun x => (𝔐.V x.1).gr (Fl.b x.1) x.2
   have hG : ∀ x, (G x).IsVBOn Set.univ 1 ⊤ := fun x =>
-    (Lat.IsFlagVBOn.isVBOn_gr_inter 𝔐.X M.Ω 𝔐.ξ 𝔐.Li (𝔐.V x.1) Set.univ _ (Fl.b x.1) (flag_basis Fl x.1).1
-      (Fl.sub x.1)).2.1 x.2
-  have hroot : ∀ r, (Lat.tens (fun _ : Unit => G (HodgeCpt.rootIdx D r)) fun _ => HodgeCpt.rootSgn D r).IsDegOn Set.univ
-      M.y (M.xdeg r) (e r) := hR
+    (Lat.IsFlagVBOn.isVBOn_gr_inter 𝔐.X M.Ω 𝔐.ξ 𝔐.Li (𝔐.V x.1) Set.univ _ (Fl.b x.1)
+      (flag_basis Fl x.1).1 (Fl.sub x.1)).2.1 x.2
+  have hroot
+      : ∀ r,
+        (Lat.tens (fun _ : Unit => G (HodgeCpt.rootIdx D r)) fun _ => HodgeCpt.rootSgn D r).IsDegOn
+          Set.univ M.y (M.xdeg r) (e r) :=
+    hR
   have hV := fun (s : CMType H ⊕ CMType H) (q : Cpt 𝔐.ξ) (hq : InFibre 𝔐.ξ p q) =>
     eigLat_eq_V (𝔐 := 𝔐) s hp hS hq
   refine ⟨{
@@ -200,7 +253,8 @@ theorem drTie_of_hodgeCpt : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     tie := 𝔐.tie
     t := 𝔐.t
     pow := hpow
-    fib := fun q hq => (GlobalTheory.T.fibre_power_free_pullback E H Y.X Y.t 𝔐.X 𝔐.t 𝔐.f 𝔐.m q.1).2 (hfib _ ?_)
+    fib := fun q hq =>
+      (GlobalTheory.T.fibre_power_free_pullback E H Y.X Y.t 𝔐.X 𝔐.t 𝔐.f 𝔐.m q.1).2 (hfib _ ?_)
     V := 𝔐.Li
     L := 𝔐.M
     r := 𝔐.ρ
@@ -216,9 +270,11 @@ theorem drTie_of_hodgeCpt : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     ind₁ := fun τ => flag_basis Fl (.inl τ)
     ind₂ := fun τ => ind_cast (hc τ) (flag_basis Fl (.inr τ))
     flag₁ := fun τ => flag_congr (Set.subset_univ _) (fun q hq => hV _ q hq) (Fl.sub (.inl τ))
-    flag₂ := fun τ => flag_cast (hc τ) (flag_congr (Set.subset_univ _) (fun q hq => hV _ q hq) (Fl.sub (.inr τ)))
+    flag₂ := fun τ =>
+      flag_cast (hc τ) (flag_congr (Set.subset_univ _) (fun q hq => hV _ q hq) (Fl.sub (.inr τ)))
     deg₁ := fun τ i h => ⟨e (τ, i), ?_⟩
-    deg₂ := fun τ i h hj => ⟨(e (τ, i))⁻¹, ?_⟩ }⟩
+    deg₂ := fun τ i h hj => ⟨(e (τ, i))⁻¹, ?_⟩
+  }⟩
   · have h0 := natCast_residue_eq_zero q hq
     have h1 : ((p : Y.X.residueField (𝔐.f q.1))) = 0 := by
       apply (𝔐.f.residueFieldMap q.1).hom.injective
@@ -233,7 +289,10 @@ theorem drTie_of_hodgeCpt : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     rw [hidx, hsgn] at h1
     exact deg_one (hG _) h1 fun q hq => gr_congr (hV _ q hq) _ _
   · have hn : ¬ (i : ℕ) < D.p := not_lt.2 hj
-    have hidx : HodgeCpt.rootIdx D (τ, i) = ⟨.inr τ, ⟨D.p + D.q - 1 - i, by have := i.2; show _ < D.q; omega⟩⟩ := dif_neg hn
+    have hidx
+        : HodgeCpt.rootIdx D (τ, i)
+          = ⟨.inr τ, ⟨D.p + D.q - 1 - i, by have := i.2; show _ < D.q; omega⟩⟩ :=
+      dif_neg hn
     have hsgn : HodgeCpt.rootSgn D (τ, i) = -1 := if_neg hn
     have h1 := hroot (τ, i)
     rw [hidx, hsgn] at h1

@@ -13,16 +13,22 @@ open GlobalTheory.KZ GlobalTheory.Sieg
 
 namespace GlobalTheory.KExp
 
-theorem norm_cexp_real (t : ℝ) (z : ℂ) :
-    ‖Complex.exp (2 * Real.pi * Complex.I * (t : ℂ) * z)‖ = Real.exp (-2 * Real.pi * t * z.im) := by
+theorem norm_cexp_real (t : ℝ) (z : ℂ)
+    : ‖Complex.exp (2 * Real.pi * Complex.I * (t : ℂ) * z)‖
+      = Real.exp (-2 * Real.pi * t * z.im) := by
   rw [Complex.norm_exp]
   congr 1
   simp [Complex.mul_re, Complex.mul_im]
 
-theorem uniq (d : ℚ → ℂ) (hwf : (Function.support d).IsWF) (S : Set ℂ)
-    (hz : ∀ z ∈ S, HasSum (fun r : ℚ => d r * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z)) 0)
-    (z1 : ℂ) (h1 : Summable (fun r : ℚ => d r * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z1)))
-    (hS : ∀ y : ℝ, ∃ z ∈ S, y < z.im) : d = 0 := by
+theorem uniq
+    (d : ℚ → ℂ) (hwf : (Function.support d).IsWF)
+    (S : Set ℂ)
+    (hz
+      : ∀ z ∈ S, HasSum (fun r : ℚ => d r * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z)) 0)
+    (z1 : ℂ)
+    (h1 : Summable (fun r : ℚ => d r * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z1)))
+    (hS : ∀ y : ℝ, ∃ z ∈ S, y < z.im)
+    : d = 0 := by
   by_contra hne
   have hnon : (Function.support d).Nonempty := by
     obtain ⟨r, hr⟩ := Function.ne_iff.mp hne
@@ -32,14 +38,17 @@ theorem uniq (d : ℚ → ℂ) (hwf : (Function.support d).IsWF) (S : Set ℂ)
   have hle : ∀ r, d r ≠ 0 → r0 ≤ r := fun r hr => hwf.min_le hnon hr
   choose zs hzS hzim using fun j : ℕ => hS (max z1.im 0 + j)
   set y1 := z1.im with hy1
-  have hnorm : ∀ (r : ℚ) (z : ℂ), ‖d r * Complex.exp (2 * Real.pi * Complex.I * ((r : ℂ) - r0) * z)‖
-      = ‖d r‖ * Real.exp (-2 * Real.pi * ((r : ℝ) - r0) * z.im) := by
+  have hnorm
+      : ∀ (r : ℚ) (z : ℂ),
+        ‖d r * Complex.exp (2 * Real.pi * Complex.I * ((r : ℂ) - r0) * z)‖
+          = ‖d r‖ * Real.exp (-2 * Real.pi * ((r : ℝ) - r0) * z.im) := by
     intro r z
     rw [norm_mul]
     have := norm_cexp_real ((r : ℝ) - r0) z
     push_cast at this
     rw [this]
-  let f : ℕ → ℚ → ℂ := fun j r => d r * Complex.exp (2 * Real.pi * Complex.I * ((r : ℂ) - r0) * zs j)
+  let f : ℕ → ℚ → ℂ := fun j r =>
+    d r * Complex.exp (2 * Real.pi * Complex.I * ((r : ℂ) - r0) * zs j)
   let g : ℚ → ℂ := fun r => if r = r0 then d r0 else 0
   let bound : ℚ → ℝ := fun r => ‖d r‖ * Real.exp (-2 * Real.pi * ((r : ℝ) - r0) * y1)
   have hb : Summable bound := by
@@ -54,7 +63,8 @@ theorem uniq (d : ℚ → ℂ) (hwf : (Function.support d).IsWF) (S : Set ℂ)
   have hlim := tendsto_tsum_of_dominated_convergence (𝓕 := Filter.atTop) (f := f) (g := g) hb ?_ ?_
   · have hf0 : ∀ j, ∑' r, f j r = 0 := by
       intro j
-      have h := (hz (zs j) (hzS j)).mul_left (Complex.exp (-(2 * Real.pi * Complex.I * (r0 : ℂ) * zs j)))
+      have h :=
+        (hz (zs j) (hzS j)).mul_left (Complex.exp (-(2 * Real.pi * Complex.I * (r0 : ℂ) * zs j)))
       rw [mul_zero] at h
       refine Eq.trans (tsum_congr fun r => ?_) h.tsum_eq
       simp only [f]
@@ -78,9 +88,12 @@ theorem uniq (d : ℚ → ℂ) (hwf : (Function.support d).IsWF) (S : Set ℂ)
     simp only [g, if_neg hr]
     rw [tendsto_zero_iff_norm_tendsto_zero]
     have hpos : 0 < 2 * Real.pi * ((r : ℝ) - r0) := by have := Real.pi_pos; nlinarith
-    have hT : Filter.Tendsto (fun j : ℕ => ‖d r‖ * Real.exp (-(2 * Real.pi * ((r : ℝ) - r0) * j))) Filter.atTop (nhds 0) := by
-      have := (Real.tendsto_exp_neg_atTop_nhds_zero.comp
-        (tendsto_natCast_atTop_atTop.const_mul_atTop hpos)).const_mul ‖d r‖
+    have hT : Filter.Tendsto
+        (fun j : ℕ => ‖d r‖ * Real.exp (-(2 * Real.pi * ((r : ℝ) - r0) * j)))
+        Filter.atTop (nhds 0) := by
+      have :=
+        (Real.tendsto_exp_neg_atTop_nhds_zero.comp (tendsto_natCast_atTop_atTop.const_mul_atTop
+          hpos)).const_mul ‖d r‖
       simpa using this
     refine squeeze_zero (fun j => norm_nonneg _) (fun j => ?_) hT
     simp only [f]
@@ -101,7 +114,7 @@ theorem uniq (d : ℚ → ℂ) (hwf : (Function.support d).IsWF) (S : Set ℂ)
     have : y1 ≤ (zs j).im := by
       have := hzim j
       have : y1 ≤ max y1 0 := le_max_left _ _
-      have : (0:ℝ) ≤ j := by positivity
+      have : (0 : ℝ) ≤ j := by positivity
       linarith
     have hp : 0 ≤ 2 * Real.pi * ((r : ℝ) - r0) := mul_nonneg (by positivity) (by linarith)
     nlinarith [mul_le_mul_of_nonneg_left this hp]
@@ -110,7 +123,19 @@ end GlobalTheory.KExp
 
 namespace GlobalTheory.KExp
 
-theorem siegel_exp : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε) (c : ℕ) (M a b : ℕ), 0 < M → a < M → admitted c ![(a : ℚ) / M, (b : ℚ) / M] → ∃ (k : ℤ) (A : ℕ → Ω), GlobalTheory.QFam.HasQ M (fun τ => sg c ![(a : ℚ) / M, (b : ℚ) / M] τ * ee (-((k : ℂ) / M) * (τ : ℂ))) (fun n => ε (A n)) ∧ (∀ n : ℕ, (T.exp (siegel T c ![(a : ℚ) / M, (b : ℚ) / M])).coeff (((k : ℚ) + n) / M) = A n) ∧ ∀ r : ℚ, (∀ n : ℕ, r ≠ ((k : ℚ) + n) / M) → (T.exp (siegel T c ![(a : ℚ) / M, (b : ℚ) / M])).coeff r = 0 := by
+theorem siegel_exp
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Tower Ω ε) (c : ℕ)
+        (M a b : ℕ),
+      0 < M → a < M → admitted c ![(a : ℚ) / M, (b : ℚ) / M]
+        → ∃ (k : ℤ) (A : ℕ → Ω),
+          GlobalTheory.QFam.HasQ M
+              (fun τ => sg c ![(a : ℚ) / M, (b : ℚ) / M] τ * ee (-((k : ℂ) / M) * (τ : ℂ)))
+              (fun n => ε (A n))
+            ∧ (∀ n : ℕ,
+              (T.exp (siegel T c ![(a : ℚ) / M, (b : ℚ) / M])).coeff (((k : ℚ) + n) / M) = A n)
+            ∧ ∀ r : ℚ,
+              (∀ n : ℕ, r ≠ ((k : ℚ) + n) / M)
+                → (T.exp (siegel T c ![(a : ℚ) / M, (b : ℚ) / M])).coeff r = 0 := by
   intro Ω _ _ _ ε T c M a b hM haM hadm
   classical
   set x : Fin 2 → ℚ := ![(a : ℚ) / M, (b : ℚ) / M] with hx
@@ -138,13 +163,19 @@ theorem siegel_exp : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
     simp only [B]
     rw [dite_eq_right]
     exact hr
-  have hBsum : ∀ z : ℂ, 0 < z.im →
-      HasSum (fun r : ℚ => B r * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z)) (sgC c x z) := by
+  have hBsum
+      : ∀ z : ℂ,
+        0 < z.im
+          → HasSum
+            (fun r : ℚ => B r * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z))
+            (sgC c x z) := by
     intro z hz
     have h2 := (hA' ⟨z, hz⟩).mul_left (ee ((k : ℂ) / M * z))
     rw [← hι.hasSum_iff (fun r hr => by simp [hB0 r hr])]
-    have e1 : ((fun r : ℚ => B r * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z)) ∘ ι) = fun n : ℕ =>
-        ee ((k : ℂ) / M * z) * (A' n * Complex.exp (2 * Real.pi * Complex.I * n * z / M)) := by
+    have e1
+        : ((fun r : ℚ => B r * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z)) ∘ ι)
+          = fun n : ℕ =>
+            ee ((k : ℂ) / M * z) * (A' n * Complex.exp (2 * Real.pi * Complex.I * n * z / M)) := by
       funext n
       simp only [Function.comp_apply, hBι, ι, ee]
       rw [mul_left_comm, ← Complex.exp_add]
@@ -154,7 +185,9 @@ theorem siegel_exp : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
     have e2 : sgC c x z = ee ((k : ℂ) / M * z) * (sg c x ⟨z, hz⟩ * ee (-((k : ℂ) / M) * z)) := by
       simp only [sgC, UpperHalfPlane.ofComplex_apply_of_im_pos hz]
       rw [mul_left_comm, ee, ee, ← Complex.exp_add]
-      have : 2 * Real.pi * Complex.I * ((k : ℂ) / M * z) + 2 * Real.pi * Complex.I * (-((k : ℂ) / M) * (z : ℂ)) = 0 := by
+      have : 2 * Real.pi * Complex.I * ((k : ℂ) / M * z)
+            + 2 * Real.pi * Complex.I * (-((k : ℂ) / M) * (z : ℂ))
+          = 0 := by
         ring
       rw [this, Complex.exp_zero, mul_one]
     rw [e1, e2]
@@ -170,7 +203,9 @@ theorem siegel_exp : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
     have hwim : w.im = Y := by simp [w]
     have hw : w ∈ Hs := by
       show 0 < w.im
-      rw [hwim]; have := le_max_right (max y C) 0; linarith
+      rw [hwim]
+      have := le_max_right (max y C) 0
+      linarith
     have h1 := mem_codiscreteWithin_iff_forall_mem_nhdsNE.mp hgerm w hw
     have h2 : Metric.ball w (1 / 2) ∈ nhdsWithin w {w}ᶜ :=
       nhdsWithin_le_nhds (Metric.ball_mem_nhds w (by norm_num))
@@ -183,8 +218,7 @@ theorem siegel_exp : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
     have hyY : y ≤ max (max y C) 0 := le_trans (le_max_left _ _) (le_max_left _ _)
     have hCY : C ≤ max (max y C) 0 := le_trans (le_max_right _ _) (le_max_left _ _)
     have h0Y : 0 ≤ max (max y C) 0 := le_max_right _ _
-    have hzim : max (max y C) 0 + 1 / 2 < z.im := by
-      have := (abs_lt.mp hdist).1; linarith
+    have hzim : max (max y C) 0 + 1 / 2 < z.im := by have := (abs_lt.mp hdist).1; linarith
     have hzH : z ∈ Hs := show 0 < z.im by linarith
     refine ⟨z, ⟨by linarith, by linarith, ?_⟩, by linarith⟩
     rcases hz1 with h | h
@@ -212,8 +246,7 @@ theorem siegel_exp : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
       have := (hsum z hz.1).sub (hBsum z hz.2.1)
       rw [hz.2.2, sub_self] at this
       simpa [d, sub_mul] using this
-    · have hzi : C < (Complex.I * (|C| + 1)).im := by
-        simp; have := le_abs_self C; linarith
+    · have hzi : C < (Complex.I * (|C| + 1)).im := by simp; have := le_abs_self C; linarith
       have hzp : 0 < (Complex.I * (|C| + 1)).im := by simp; positivity
       have := ((hsum _ hzi).summable.sub (hBsum _ hzp).summable)
       simpa [d, sub_mul] using this

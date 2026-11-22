@@ -14,14 +14,17 @@ namespace GroundTheory.Heights₂.Heights
 open MvPolynomial MeasureTheory Filter Topology Matrix ComplexSets
 open scoped ContDiff
 
-theorem StokesOnVariety.proof (hD : ComplexSets.DiscriminantCover.Statement)
-    (hS : StokesOffDiscriminant.Statement) (hL : CutOffLimit.Statement) :
-    StokesOnVariety.Statement := by
-  have key : ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (f g : (Fin n → ℂ) → ℝ)
-      (φ : Fin d → (Fin n → ℂ) → ℝ), J.IsPrime →
-      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ) →
-      SmoothNear (zeroSet J) f → SmoothNear (zeroSet J) g → (∀ i, SmoothNear (zeroSet J) (φ i)) →
-      HasCompactSupport f → varInt J (d + 1) f (vecCons g φ) = varInt J (d + 1) g (vecCons f φ) := by
+theorem StokesOnVariety.proof
+    (hD : ComplexSets.DiscriminantCover.Statement) (hS : StokesOffDiscriminant.Statement)
+    (hL : CutOffLimit.Statement)
+    : StokesOnVariety.Statement := by
+  have key
+      : ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (f g : (Fin n → ℂ) → ℝ)
+          (φ : Fin d → (Fin n → ℂ) → ℝ),
+        J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ)
+          → SmoothNear (zeroSet J) f → SmoothNear (zeroSet J) g
+          → (∀ i, SmoothNear (zeroSet J) (φ i)) → HasCompactSupport f
+          → varInt J (d + 1) f (vecCons g φ) = varInt J (d + 1) g (vecCons f φ) := by
     intro n d J f g φ hJ hdim hf hg hφ hc
     unfold varInt
     split_ifs with hA
@@ -46,8 +49,9 @@ theorem StokesOnVariety.proof (hD : ComplexSets.DiscriminantCover.Statement)
       obtain ⟨U, hU, hDU, hχ0⟩ := hχU k
       obtain ⟨V, hV, hZV, hfV⟩ := hf
       have hcχ : HasCompactSupport (fun x => χ k x * f x) := hc.mul_left (f := χ k)
-      refine (hS n d J A P hJ hdim hAf hP0 hsheet (fun x => χ k x * f x) g φ
-        ⟨V, hV, hZV, (hχs k).contDiffOn.mul hfV⟩ hg hφ hcχ ⟨U, hU, hDU, fun x hx => ?_⟩).symm
+      refine (hS n d J A P hJ hdim hAf hP0 hsheet
+        (fun x => χ k x * f x)
+        g φ ⟨V, hV, hZV, (hχs k).contDiffOn.mul hfV⟩ hg hφ hcχ ⟨U, hU, hDU, fun x hx => ?_⟩).symm
       rw [hχ0 x hx, zero_mul]
     · rfl
   intro n d J f g φ hJ hdim hf hg hφ hc

@@ -11,15 +11,20 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.RealPlaceLabe
 
 set_option autoImplicit false
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues
+  Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff)
 open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF (AvFSt HTFSt UpFSt)
 open GlobalTheory.RunDepth GlobalTheory.CharDepth
 
 namespace GlobalTheory.RunDepth
 
-theorem sum_fin_le_two_blocks {n K j : ℕ} (hn : n = K + j) (a : Fin n → ℝ) (A B : ℝ)
-    (h1 : ∀ i, i.1 < K → a i ≤ A) (h2 : ∀ i, K ≤ i.1 → a i ≤ B) : ∑ i, a i ≤ K * A + j * B := by
+theorem sum_fin_le_two_blocks
+    {n K j : ℕ} (hn : n = K + j) (a : Fin n → ℝ)
+    (A B : ℝ) (h1 : ∀ i, i.1 < K → a i ≤ A) (h2 : ∀ i, K ≤ i.1 → a i ≤ B)
+    : ∑ i, a i ≤ K * A + j * B := by
   subst hn
   rw [Fin.sum_univ_add]
   have e1 : ∑ i : Fin K, a (Fin.castAdd j i) ≤ ∑ _i : Fin K, A :=
@@ -29,8 +34,8 @@ theorem sum_fin_le_two_blocks {n K j : ℕ} (hn : n = K + j) (a : Fin n → ℝ)
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul] at e1 e2
   linarith
 
-theorem four_sq_lt_of_eighth {k b g : ℝ} (hk : 5 ≤ k) (hb : 1 ≤ b) (hg : (k * b) ^ 8 ≤ g) :
-    4 * k ^ 2 * b < (g - 2) / 2 := by
+theorem four_sq_lt_of_eighth {k b g : ℝ} (hk : 5 ≤ k) (hb : 1 ≤ b) (hg : (k * b) ^ 8 ≤ g)
+    : 4 * k ^ 2 * b < (g - 2) / 2 := by
   have h5 : 5 ≤ k * b := by nlinarith
   have h0 : k ^ 2 * b ≤ (k * b) ^ 2 := by
     have : 0 ≤ k ^ 2 * b * (b - 1) := by
@@ -44,7 +49,15 @@ theorem four_sq_lt_of_eighth {k b g : ℝ} (hk : 5 ≤ k) (hb : 1 ≤ b) (hg : (
   have h8 : y ^ 8 = y ^ 6 * y ^ 2 := by ring
   nlinarith
 
-theorem DF_kaR_le : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm) (hK : DV.KapDef D), 3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b → ∀ j, InR D j → (WeightAlgebra.DF (kaR Tp hK j) : ℝ) ≤ (D.R.k : ℝ) * (2 * (D.R.f : ℝ) * L.sc.b + (D.R.f : ℝ) * (L.Sc + L.etaSz)) ∧ ∀ i, (WeightAlgebra.DF (kaR Tp hK j) : ℝ) < ((D.host.g i : ℝ) - 2) / 2 := by
+theorem DF_kaR_le
+    : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm)
+        (hK : DV.KapDef D),
+      3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b
+        → ∀ j,
+          InR D j
+            → (WeightAlgebra.DF (kaR Tp hK j) : ℝ)
+                ≤ (D.R.k : ℝ) * (2 * (D.R.f : ℝ) * L.sc.b + (D.R.f : ℝ) * (L.Sc + L.etaSz))
+              ∧ ∀ i, (WeightAlgebra.DF (kaR Tp hK j) : ℝ) < ((D.host.g i : ℝ) - 2) / 2 := by
   intro D L Pm Tp hK hx hkb j hj
   obtain ⟨hSe, hw⟩ := GlobalTheory.T.cloudSizes_between_zero_and_twice_b D L Pm hx hkb
   have hw := (hw j hj).1
@@ -65,23 +78,34 @@ theorem DF_kaR_le : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L)
     exact Real.rpow_nonneg (by linarith) _
   have hS := L.Sc_pos
   have he := L.etaSz_pos
-  have hτ : ∀ τ : D.what₂.Tau, ((∑ i, ((kaR Tp hK j).aP τ i : ℝ)) + ∑ i, ((kaR Tp hK j).aM τ i : ℝ)) ≤
-      (D.R.k : ℝ) * (2 * L.sc.b + (L.Sc + L.etaSz)) := by
+  have hτ
+      : ∀ τ : D.what₂.Tau,
+        ((∑ i, ((kaR Tp hK j).aP τ i : ℝ)) + ∑ i, ((kaR Tp hK j).aM τ i : ℝ))
+          ≤ (D.R.k : ℝ) * (2 * L.sc.b + (L.Sc + L.etaSz)) := by
     intro τ
     obtain ⟨r1, r2, r3⟩ := hrow τ
-    have s1 := sum_fin_le_two_blocks (n := (D.R.sigW j).1) (K := D.R.k - 1) (j := j)
-      (by show D.R.k + j - 1 = _; omega) (fun i => ((kaR Tp hK j).aP τ i : ℝ)) (2 * L.sc.b + L.Sc) L.etaSz
-      (fun i hi => (r1 i hi).trans (by linarith [(hw τ).2])) r2
-    have s2 := sum_fin_le_two_blocks (n := (D.R.sigW j).2) (K := 0) (j := D.R.m - j)
-      (by show D.R.m - j = _; omega) (fun i => ((kaR Tp hK j).aM τ i : ℝ)) 0 L.etaSz
-      (fun i hi => absurd hi (Nat.not_lt_zero _)) (fun i _ => r3 i)
+    have s1 :=
+      sum_fin_le_two_blocks (n := (D.R.sigW j).1) (K := D.R.k - 1) (j := j)
+        (by show D.R.k + j - 1 = _; omega)
+        (fun i => ((kaR Tp hK j).aP τ i : ℝ))
+        (2 * L.sc.b + L.Sc) L.etaSz
+        (fun i hi => (r1 i hi).trans (by linarith [(hw τ).2]))
+        r2
+    have s2 :=
+      sum_fin_le_two_blocks (n := (D.R.sigW j).2) (K := 0) (j := D.R.m - j)
+        (by show D.R.m - j = _; omega)
+        (fun i => ((kaR Tp hK j).aM τ i : ℝ))
+        0 L.etaSz
+        (fun i hi => absurd hi (Nat.not_lt_zero _))
+        (fun i _ => r3 i)
     rw [Nat.cast_sub (by omega : 1 ≤ D.R.k)] at s1
     rw [Nat.cast_sub hj2] at s2
     have t1 : (D.R.m : ℝ) * L.etaSz ≤ D.R.k * L.etaSz := mul_le_mul_of_nonneg_right hmkR he.le
     push_cast at s1 s2
     nlinarith
-  have hmain : (WeightAlgebra.DF (kaR Tp hK j) : ℝ) ≤
-      (D.R.k : ℝ) * (2 * (D.R.f : ℝ) * L.sc.b + (D.R.f : ℝ) * (L.Sc + L.etaSz)) := by
+  have hmain
+      : (WeightAlgebra.DF (kaR Tp hK j) : ℝ)
+        ≤ (D.R.k : ℝ) * (2 * (D.R.f : ℝ) * L.sc.b + (D.R.f : ℝ) * (L.Sc + L.etaSz)) := by
     unfold WeightAlgebra.DF WeightAlgebra.degP
     push_cast
     refine (Finset.sum_le_sum fun τ _ => hτ τ).trans ?_
@@ -91,9 +115,12 @@ theorem DF_kaR_le : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L)
   refine ⟨hmain, fun i => ?_⟩
   obtain ⟨Y, hY, -, -, hg⟩ := Pm.g_Y
   refine lt_of_le_of_lt (hmain.trans ?_) (four_sq_lt_of_eighth hkR hb (hY.trans (hg i).1))
-  have u1 : (D.R.f : ℝ) * (L.Sc + L.etaSz) ≤ D.R.f * (2 * L.sc.b) := mul_le_mul_of_nonneg_left hSe hf0
+  have u1 : (D.R.f : ℝ) * (L.Sc + L.etaSz) ≤ D.R.f * (2 * L.sc.b) :=
+    mul_le_mul_of_nonneg_left hSe hf0
   have u2 : (D.R.f : ℝ) * L.sc.b ≤ D.R.k * L.sc.b := mul_le_mul_of_nonneg_right hfk (by linarith)
-  calc _ ≤ (D.R.k : ℝ) * (4 * (D.R.k * L.sc.b)) := mul_le_mul_of_nonneg_left (by linarith) (by linarith)
+  calc
+    _ ≤ (D.R.k : ℝ) * (4 * (D.R.k * L.sc.b)) :=
+      mul_le_mul_of_nonneg_left (by linarith) (by linarith)
     _ = _ := by ring
 
 end GlobalTheory.RunDepth

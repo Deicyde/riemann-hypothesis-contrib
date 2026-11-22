@@ -49,13 +49,16 @@ theorem cc_rv (i : Fin n) : cc a (rv a i) = cc a i := by unfold cc; rw [bk_rv]
 theorem cc_unit (i : Fin n) : IsUnit (cc a i) := Units.isUnit _
 
 theorem mat_apply (i j : Fin n) : a.mat i j = if j = rv a i then cc a i else 0 := by
-  have h := Formalism.MainNotions.LocalModelPeriodLattices.ptEntryL_eq a.blocks i j (by rw [a.size]; exact i.2)
+  have h :=
+    Formalism.MainNotions.LocalModelPeriodLattices.ptEntryL_eq a.blocks i j
+      (by rw [a.size]; exact i.2)
   show Loc.ptEntryL a.blocks i j = _
   rw [h]
   simp only [Fin.ext_iff, rv, cc, bk]
 
 theorem sameBlock_iff (i j : Fin n) : Loc.sameBlock a.blocks i j = true ↔ bk a i = bk a j :=
-  Formalism.MainNotions.LocalOrbitGerms.Cls.sameBlock_iff a.blocks i j (by rw [a.size]; exact i.2) (by rw [a.size]; exact j.2)
+  Formalism.MainNotions.LocalOrbitGerms.Cls.sameBlock_iff a.blocks i j (by rw [a.size]; exact i.2)
+    (by rw [a.size]; exact j.2)
 
 end Formalism.L2.SG.Pf.BlockCounting
 
@@ -65,7 +68,8 @@ open Formalism.MainNotions.S Matrix
 
 variable {R : Type} [CommRing R] {n : ℕ} (a : Loc.Pt R n)
 
-def bd (x : Matrix (Fin n) (Fin n) R) : Matrix (Fin n) (Fin n) R := fun i j => if bk a i = bk a j then x i j else 0
+def bd (x : Matrix (Fin n) (Fin n) R) : Matrix (Fin n) (Fin n) R := fun i j =>
+  if bk a i = bk a j then x i j else 0
 
 def rvM (M : Matrix (Fin n) (Fin n) R) : Matrix (Fin n) (Fin n) R := fun i j => M (rv a i) (rv a j)
 
@@ -74,7 +78,8 @@ variable {a}
 theorem bd_lo {x : Matrix (Fin n) (Fin n) R} (hx : IsLoUni x) : IsLoUni (bd a x) := by
   intro i j
   refine ⟨fun h => ?_, fun h => ?_⟩
-  · unfold bd; split_ifs
+  · unfold bd
+    split_ifs
     · exact (hx i j).1 h
     · rfl
   · subst h; unfold bd; rw [if_pos rfl]; exact (hx i i).2 rfl
@@ -85,10 +90,11 @@ theorem bd_one : bd a (1 : Matrix (Fin n) (Fin n) R) = 1 := by
   split_ifs with h
   · rfl
   · rw [Matrix.one_apply, if_neg]
-    rintro rfl; exact h rfl
+    rintro rfl
+    exact h rfl
 
-theorem bd_mul {x y : Matrix (Fin n) (Fin n) R} (hx : IsLoUni x) (hy : IsLoUni y) :
-    bd a (x * y) = bd a x * bd a y := by
+theorem bd_mul {x y : Matrix (Fin n) (Fin n) R} (hx : IsLoUni x) (hy : IsLoUni y)
+    : bd a (x * y) = bd a x * bd a y := by
   ext i j
   simp only [bd, Matrix.mul_apply]
   by_cases hij : bk a i = bk a j
@@ -117,8 +123,8 @@ theorem bd_inv {x : Matrix (Fin n) (Fin n) R} (hx : IsLoUni x) : bd a x⁻¹ = (
   have : bd a x * bd a x⁻¹ = 1 := by rw [← bd_mul hx hi, h2, bd_one]
   exact (Matrix.inv_eq_right_inv this).symm
 
-theorem bd_eq_one_iff {x : Matrix (Fin n) (Fin n) R} (hx : IsLoUni x) :
-    bd a x = 1 ↔ ∀ i j : Fin n, i ≠ j → bk a i = bk a j → x i j = 0 := by
+theorem bd_eq_one_iff {x : Matrix (Fin n) (Fin n) R} (hx : IsLoUni x)
+    : bd a x = 1 ↔ ∀ i j : Fin n, i ≠ j → bk a i = bk a j → x i j = 0 := by
   constructor
   · intro h i j hij hb
     have := congrFun (congrFun h i) j
@@ -183,7 +189,8 @@ theorem cc_eq (i : Fin n) : cc a i = (ccU a i : R) := rfl
 
 theorem ccU_rv (i : Fin n) : ccU a (rv a i) = ccU a i := by unfold ccU; rw [bk_rv]
 
-def matI (a : Loc.Pt R n) : Matrix (Fin n) (Fin n) R := fun i j => if j = rv a i then (((ccU a i)⁻¹ : Rˣ) : R) else 0
+def matI (a : Loc.Pt R n) : Matrix (Fin n) (Fin n) R := fun i j =>
+  if j = rv a i then (((ccU a i)⁻¹ : Rˣ) : R) else 0
 
 theorem matI_mul : matI a * a.mat = 1 := by
   ext i j
@@ -196,11 +203,14 @@ theorem matI_mul : matI a * a.mat = 1 := by
     rw [matI, if_neg hk, zero_mul]
   · simp
 
-theorem bd_of_stab {l ρ : Matrix (Fin n) (Fin n) R} (hl : IsLoUni l) (hρ : IsUpUni ρ)
-    (h : l * a.mat * ρ = a.mat) : bd a l = l := by
+theorem bd_of_stab
+    {l ρ : Matrix (Fin n) (Fin n) R} (hl : IsLoUni l) (hρ : IsUpUni ρ) (h : l * a.mat * ρ = a.mat)
+    : bd a l = l := by
   obtain ⟨hρi, -, hρ2⟩ := Formalism.L2.SG.Pf.ZsVolGrp.isUpUni_inv hρ
   have e : l * a.mat = a.mat * ρ⁻¹ := by
-    calc l * a.mat = l * a.mat * (ρ * ρ⁻¹) := by rw [hρ2, Matrix.mul_one]
+    calc
+      l * a.mat
+        = l * a.mat * (ρ * ρ⁻¹) := by rw [hρ2, Matrix.mul_one]
       _ = l * a.mat * ρ * ρ⁻¹ := by rw [Matrix.mul_assoc (l * a.mat)]
       _ = a.mat * ρ⁻¹ := by rw [h]
   ext i j
@@ -210,8 +220,7 @@ theorem bd_of_stab {l ρ : Matrix (Fin n) (Fin n) R} (hl : IsLoUni l) (hρ : IsU
   · symm
     rcases lt_or_gt_of_ne (show i ≠ j from fun h' => hb (by rw [h'])) with hij | hij
     · exact (hl i j).1 hij
-    ·
-      have e1 := congrFun (congrFun e i) (rv a j)
+    · have e1 := congrFun (congrFun e i) (rv a j)
       have lhs : (l * a.mat) i (rv a j) = l i j * cc a j := by
         rw [Matrix.mul_apply, Finset.sum_eq_single j]
         · rw [mat_apply, if_pos rfl]
@@ -229,23 +238,29 @@ theorem bd_of_stab {l ρ : Matrix (Fin n) (Fin n) R} (hl : IsLoUni l) (hρ : IsU
       rw [lhs, rhs, hz, mul_zero] at e1
       exact ((cc_unit a j).mul_left_eq_zero).1 e1
 
-theorem rho_of_stab {l ρ : Matrix (Fin n) (Fin n) R} (hl : IsLoUni l) (hρ : IsUpUni ρ)
-    (h : l * a.mat * ρ = a.mat) : ρ = rvM a (bd a l⁻¹) := by
+theorem rho_of_stab
+    {l ρ : Matrix (Fin n) (Fin n) R} (hl : IsLoUni l) (hρ : IsUpUni ρ) (h : l * a.mat * ρ = a.mat)
+    : ρ = rvM a (bd a l⁻¹) := by
   have hb := bd_of_stab hl hρ h
   obtain ⟨hli, h1, -⟩ := Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv hl
   have e : a.mat * ρ = l⁻¹ * a.mat := by
-    calc a.mat * ρ = (l⁻¹ * l) * a.mat * ρ := by rw [h1, Matrix.one_mul]
+    calc
+      a.mat * ρ
+        = (l⁻¹ * l) * a.mat * ρ := by rw [h1, Matrix.one_mul]
       _ = l⁻¹ * (l * a.mat * ρ) := by simp only [Matrix.mul_assoc]
       _ = l⁻¹ * a.mat := by rw [h]
   have hbi : bd a l⁻¹ = l⁻¹ := by rw [bd_inv hl, hb]
   have e2 : a.mat * ρ = a.mat * rvM a (bd a l⁻¹) := by rw [e, ← bd_mat, hbi]
-  calc ρ = matI a * (a.mat * ρ) := by rw [← Matrix.mul_assoc, matI_mul, Matrix.one_mul]
+  calc
+    ρ = matI a * (a.mat * ρ) := by rw [← Matrix.mul_assoc, matI_mul, Matrix.one_mul]
     _ = matI a * (a.mat * rvM a (bd a l⁻¹)) := by rw [e2]
     _ = rvM a (bd a l⁻¹) := by rw [← Matrix.mul_assoc, matI_mul, Matrix.one_mul]
 
 end Formalism.L2.SG.Pf.BlockCounting
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.ProdE Formalism.L2.SG.Pf.ProdEP2Cut Formalism.L2.SG.Pf.BlockCounting
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.ProdE Formalism.L2.SG.Pf.ProdEP2Cut
+  Formalism.L2.SG.Pf.BlockCounting
 
 namespace Formalism.L2.SG.Pf.CountAt
 
@@ -257,11 +272,19 @@ section Retr
 
 variable {p}
 
-def loU {l : MP p} (h : IsLoUni l) : GLp p :=
-  ⟨l, l⁻¹, (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv h).2.2, (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv h).2.1⟩
+def loU {l : MP p} (h : IsLoUni l) : GLp p := ⟨
+  l,
+  l⁻¹,
+  (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv h).2.2,
+  (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv h).2.1
+⟩
 
-def upU {l : MP p} (h : IsUpUni l) : GLp p :=
-  ⟨l, l⁻¹, (Formalism.L2.SG.Pf.ZsVolGrp.isUpUni_inv h).2.2, (Formalism.L2.SG.Pf.ZsVolGrp.isUpUni_inv h).2.1⟩
+def upU {l : MP p} (h : IsUpUni l) : GLp p := ⟨
+  l,
+  l⁻¹,
+  (Formalism.L2.SG.Pf.ZsVolGrp.isUpUni_inv h).2.2,
+  (Formalism.L2.SG.Pf.ZsVolGrp.isUpUni_inv h).2.1
+⟩
 
 variable (a : Loc.Pt (D.s.atP p).Ep (D.R.rS + 1))
 
@@ -269,19 +292,28 @@ theorem UP_lo (x : UP p) : IsLoUni (((x : GG p).1 : GLp p) : MP p) := x.2.1
 
 theorem UP_up (x : UP p) : IsUpUni (((x : GG p).2.unop : GLp p) : MP p) := x.2.2
 
-def retrFun (x : UP p) : UP p :=
-  ⟨(loU (bd_lo (a := a) (UP_lo x)),
-      MulOpposite.op (upU (rvM_up (a := a) (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv (UP_lo x)).1))),
-    bd_lo (UP_lo x), rvM_up (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv (UP_lo x)).1⟩
+def retrFun (x : UP p) : UP p := ⟨
+  (
+    loU (bd_lo (a := a) (UP_lo x)),
+    MulOpposite.op (upU (rvM_up (a := a) (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv (UP_lo x)).1))
+  ),
+  bd_lo (UP_lo x),
+  rvM_up (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv (UP_lo x)).1
+⟩
 
-theorem retrFun_fst (x : UP p) : ((((retrFun a x : UP p) : GG p).1 : GLp p) : MP p) =
-    bd a (((x : GG p).1 : GLp p) : MP p) := rfl
+theorem retrFun_fst (x : UP p)
+    : ((((retrFun a x : UP p) : GG p).1 : GLp p) : MP p) = bd a (((x : GG p).1 : GLp p) : MP p) :=
+  rfl
 
-theorem retrFun_snd (x : UP p) : ((((retrFun a x : UP p) : GG p).2.unop : GLp p) : MP p) =
-    rvM a (bd a (((x : GG p).1 : GLp p) : MP p)⁻¹) := rfl
+theorem retrFun_snd (x : UP p)
+    : ((((retrFun a x : UP p) : GG p).2.unop : GLp p) : MP p)
+      = rvM a (bd a (((x : GG p).1 : GLp p) : MP p)⁻¹) :=
+  rfl
 
-theorem UP_ext {x y : UP p} (h1 : (((x : GG p).1 : GLp p) : MP p) = (((y : GG p).1 : GLp p) : MP p))
-    (h2 : (((x : GG p).2.unop : GLp p) : MP p) = (((y : GG p).2.unop : GLp p) : MP p)) : x = y := by
+theorem UP_ext
+    {x y : UP p} (h1 : (((x : GG p).1 : GLp p) : MP p) = (((y : GG p).1 : GLp p) : MP p))
+    (h2 : (((x : GG p).2.unop : GLp p) : MP p) = (((y : GG p).2.unop : GLp p) : MP p))
+    : x = y := by
   apply Subtype.ext
   apply Prod.ext
   · exact Units.ext h1
@@ -303,19 +335,25 @@ def retr : UP p →* UP p where
       exact bd_mul hx hy
     · show rvM a (bd a ((((x * y : UP p) : GG p).1 : GLp p) : MP p)⁻¹) =
         rvM a (bd a (((y : GG p).1 : GLp p) : MP p)⁻¹) * rvM a (bd a (((x : GG p).1 : GLp p) : MP p)⁻¹)
-      have e : ((((x * y : UP p) : GG p).1 : GLp p) : MP p) =
-          (((x : GG p).1 : GLp p) : MP p) * (((y : GG p).1 : GLp p) : MP p) := rfl
-      rw [e, Matrix.mul_inv_rev, bd_mul (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv hy).1
-        (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv hx).1, rvM_mul]
+      have e
+          : ((((x * y : UP p) : GG p).1 : GLp p) : MP p)
+            = (((x : GG p).1 : GLp p) : MP p) * (((y : GG p).1 : GLp p) : MP p) :=
+        rfl
+      rw [e, Matrix.mul_inv_rev,
+        bd_mul (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv hy).1
+          (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv hx).1,
+        rvM_mul]
 
-theorem smul_UP (x : UP p) (X : MP p) :
-    x • X = (((x : GG p).1 : GLp p) : MP p) * X * (((x : GG p).2.unop : GLp p) : MP p) := rfl
+theorem smul_UP (x : UP p) (X : MP p)
+    : x • X = (((x : GG p).1 : GLp p) : MP p) * X * (((x : GG p).2.unop : GLp p) : MP p) :=
+  rfl
 
 theorem retr_stab (x : UP p) : retr a x • a.mat = a.mat := by
   rw [smul_UP]
   show bd a _ * a.mat * rvM a (bd a _) = a.mat
   have hx := UP_lo x
-  rw [bd_mat, Matrix.mul_assoc, ← rvM_mul, ← bd_mul hx (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv hx).1,
+  rw [bd_mat, Matrix.mul_assoc, ← rvM_mul,
+    ← bd_mul hx (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv hx).1,
     (Formalism.L2.SG.Pf.ZsVolGrp.isLoUni_inv hx).2.2, bd_one, rvM_one, Matrix.mul_one]
 
 theorem retr_id (s : UP p) (hs : s • a.mat = a.mat) : retr a s = s := by
@@ -324,19 +362,22 @@ theorem retr_id (s : UP p) (hs : s • a.mat = a.mat) : retr a s = s := by
   · exact bd_of_stab (UP_lo s) (UP_up s) hs
   · exact (rho_of_stab (UP_lo s) (UP_up s) hs).symm
 
-theorem intLow_bd {l : MP p} (h : Formalism.MainNotions.S.TieN.IntLow (M p) l) : Formalism.MainNotions.S.TieN.IntLow (M p) (bd a l) := by
+theorem intLow_bd {l : MP p} (h : Formalism.MainNotions.S.TieN.IntLow (M p) l)
+    : Formalism.MainNotions.S.TieN.IntLow (M p) (bd a l) := by
   obtain ⟨h1, h2, h3⟩ := h
   refine ⟨fun i => ?_, fun i j hij => ?_, fun i j => ?_⟩
   · unfold bd; rw [if_pos rfl]; exact h1 i
-  · unfold bd; split_ifs
+  · unfold bd
+    split_ifs
     · exact h2 i j hij
     · rfl
-  · unfold bd; split_ifs
+  · unfold bd
+    split_ifs
     · exact h3 i j
     · exact (M p).R.zero_mem
 
-theorem intUp_rvM {l : MP p} (h : Formalism.MainNotions.S.TieN.IntLow (M p) l) :
-    Formalism.MainNotions.S.TieN.IntUp (M p) (rvM a (bd a l)) := by
+theorem intUp_rvM {l : MP p} (h : Formalism.MainNotions.S.TieN.IntLow (M p) l)
+    : Formalism.MainNotions.S.TieN.IntUp (M p) (rvM a (bd a l)) := by
   have hl2 := h.2.1
   have hb := intLow_bd M a h
   obtain ⟨h1, h2, h3⟩ := hb
@@ -354,15 +395,25 @@ theorem retr_K (k : UP p) (hk : k ∈ KU M p) : retr a k ∈ KU M p := by
   exact ⟨intLow_bd M a h1, intUp_rvM M a hi⟩
 
 theorem blockRetr_holds : BlockRetr M p a := by
-  refine ⟨retr a, ⟨fun x => (MulAction.mem_stabilizer_iff).symm, fun x => retr_stab a x,
-    fun s hs => retr_id a s hs, fun x => MonoidHom.mem_ker, fun k hk => retr_K M a k hk⟩, fun x => ?_⟩
+  refine ⟨
+    retr a,
+    ⟨
+      fun x => (MulAction.mem_stabilizer_iff).symm,
+      fun x => retr_stab a x,
+      fun s hs => retr_id a s hs,
+      fun x => MonoidHom.mem_ker,
+      fun k hk => retr_K M a k hk
+    ⟩,
+    fun x => ?_
+  ⟩
   have hx := UP_lo x
   constructor
   · intro h
     have h1 : bd a (((x : GG p).1 : GLp p) : MP p) = 1 := by
       rw [← retrFun_fst a x]
       show ((((retr a x : UP p) : GG p).1 : GLp p) : MP p) = 1
-      rw [h]; rfl
+      rw [h]
+      rfl
     refine ⟨hx, fun i j hij hs => ?_⟩
     exact (bd_eq_one_iff hx).1 h1 i j hij ((sameBlock_iff a i j).1 hs)
   · rintro ⟨-, hV⟩
@@ -370,9 +421,11 @@ theorem blockRetr_holds : BlockRetr M p a := by
       (bd_eq_one_iff hx).2 fun i j hij hb => hV i j hij ((sameBlock_iff a i j).2 hb)
     apply UP_ext
     · show bd a _ = _
-      rw [h1]; rfl
+      rw [h1]
+      rfl
     · show rvM a (bd a _) = _
-      rw [bd_inv hx, h1, inv_one, rvM_one]; rfl
+      rw [bd_inv hx, h1, inv_one, rvM_one]
+      rfl
 
 end Retr
 

@@ -5,4 +5,6 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 @[expose] public section
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.muEx : UpperTheory.V.Z.Tf.GlobalTraceComparison.MuEx := PositivityTheory.Rg.BcB.F.Fok.Mu3.muExists
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.muEx
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.MuEx :=
+  PositivityTheory.Rg.BcB.F.Fok.Mu3.muExists

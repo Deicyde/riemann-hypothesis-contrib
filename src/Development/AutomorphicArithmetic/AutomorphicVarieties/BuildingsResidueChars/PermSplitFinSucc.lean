@@ -5,20 +5,24 @@ public import Mathlib.GroupTheory.Perm.Fin
 
 @[expose] public section
 
-private theorem cycle_range_conjugate_succAbove {n : ℕ} (i j : Fin (n + 1)) (τ : Equiv.Perm (Fin n)) (k : Fin n) :
-    ((Fin.cycleRange i)⁻¹ * Equiv.Perm.decomposeFin.symm (0, τ) * Fin.cycleRange j : Equiv.Perm (Fin (n + 1)))
-      (j.succAbove k) = i.succAbove (τ k) := by
+private theorem cycle_range_conjugate_succAbove
+    {n : ℕ} (i j : Fin (n + 1)) (τ : Equiv.Perm (Fin n)) (k : Fin n)
+    : ((Fin.cycleRange i)⁻¹ * Equiv.Perm.decomposeFin.symm (0, τ) * Fin.cycleRange j
+          : Equiv.Perm (Fin (n + 1)))
+        (j.succAbove k)
+      = i.succAbove (τ k) := by
   simp [Equiv.Perm.mul_apply, Equiv.Perm.inv_def, Fin.cycleRange_succAbove,
     Equiv.Perm.decomposeFin_symm_apply_succ, Fin.cycleRange_symm_succ]
 
-private theorem cycle_range_conjugate_pivot {n : ℕ} (i j : Fin (n + 1)) (τ : Equiv.Perm (Fin n)) :
-    ((Fin.cycleRange i)⁻¹ * Equiv.Perm.decomposeFin.symm (0, τ) * Fin.cycleRange j : Equiv.Perm (Fin (n + 1)))
-      j = i := by
+private theorem cycle_range_conjugate_pivot {n : ℕ} (i j : Fin (n + 1)) (τ : Equiv.Perm (Fin n))
+    : ((Fin.cycleRange i)⁻¹ * Equiv.Perm.decomposeFin.symm (0, τ) * Fin.cycleRange j
+          : Equiv.Perm (Fin (n + 1)))
+        j
+      = i := by
   simp [Equiv.Perm.mul_apply, Equiv.Perm.inv_def, Fin.cycleRange_self,
     Equiv.Perm.decomposeFin_symm_apply_zero, Fin.cycleRange_symm_zero]
 
-theorem UpperTheory.perm_split_fin_succ :
-    UpperTheory.V.Af.BA.PermSplit := by
+theorem UpperTheory.perm_split_fin_succ : UpperTheory.V.Af.BA.PermSplit := by
   intro n j
   classical
   let F : Fin (n + 1) × Equiv.Perm (Fin n) → Equiv.Perm (Fin (n + 1)) := fun p =>
@@ -39,8 +43,8 @@ theorem UpperTheory.perm_split_fin_succ :
     intro σ
     have hρ : (Fin.cycleRange (σ j) * σ * (Fin.cycleRange j)⁻¹) 0 = 0 := by
       simp [Equiv.Perm.mul_apply, Equiv.Perm.inv_def, Fin.cycleRange_symm_zero, Fin.cycleRange_self]
-    obtain ⟨⟨p, τ⟩, hp⟩ := Equiv.Perm.decomposeFin.symm.surjective
-      (Fin.cycleRange (σ j) * σ * (Fin.cycleRange j)⁻¹)
+    obtain ⟨⟨p, τ⟩, hp⟩ :=
+      Equiv.Perm.decomposeFin.symm.surjective (Fin.cycleRange (σ j) * σ * (Fin.cycleRange j)⁻¹)
     have hp0 : p = 0 := by
       have h0 := congrArg (fun s : Equiv.Perm (Fin (n + 1)) => s 0) hp
       simp only [Equiv.Perm.decomposeFin_symm_apply_zero] at h0
@@ -54,7 +58,7 @@ theorem UpperTheory.perm_split_fin_succ :
   intro i τ
   refine ⟨?_, fun k => cycle_range_conjugate_succAbove i j τ k⟩
   show ((Equiv.Perm.sign (F (i, τ)) : ℤ) : _) = _
-  simp only [F, map_mul, map_inv, Fin.sign_cycleRange,
-    Equiv.Perm.decomposeFin.symm_sign, if_pos rfl, one_mul, inv_pow, Int.units_inv_eq_self]
+  simp only [F, map_mul, map_inv, Fin.sign_cycleRange, Equiv.Perm.decomposeFin.symm_sign,
+    if_pos rfl, one_mul, inv_pow, Int.units_inv_eq_self]
   push_cast
   ring

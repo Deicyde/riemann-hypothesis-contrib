@@ -73,8 +73,7 @@ private lemma nsq_low (x : Fin 2 → ℤ) (z : ℍ) (hz : z ∈ ModularGroup.fd)
 
 end UpperTheory.V.Af.Rs
 
-theorem UpperTheory.V.Af.Rs.kerBd :
-    UpperTheory.V.Af.Rs.KerBd := by
+theorem UpperTheory.V.Af.Rs.kerBd : UpperTheory.V.Af.Rs.KerBd := by
   intro s hs
   obtain ⟨hs1, hs2⟩ := hs
   have hs0 : 0 < s := by linarith
@@ -88,20 +87,22 @@ theorem UpperTheory.V.Af.Rs.kerBd :
     by_cases hx : x = 0
     · subst hx
       have : ker s 0 = fun _ => 0 := funext hzero
-      rw [this]; exact continuous_const
+      rw [this]
+      exact continuous_const
     · unfold ker
       refine Continuous.rpow_const ?_ (fun _ => Or.inr hs0.le)
       refine Continuous.div UpperHalfPlane.continuous_im ?_ (fun z => (nsq_pos x hx z).ne')
-      exact Complex.continuous_normSq.comp
-        ((continuous_const.mul UpperHalfPlane.continuous_coe).add continuous_const)
+      exact Complex.continuous_normSq.comp ((continuous_const.mul UpperHalfPlane.continuous_coe).add
+        continuous_const)
   · intro x z
     exact Real.rpow_nonneg (hnn x z) _
   · intro γ z
     rw [ModularGroup.im_smul_eq_div_normSq, ModularGroup.denom_apply]
     rfl
   · intro n x z
-    have h : Complex.normSq (((((n : ℤ) • x) 0 : ℤ) : ℂ) * z + ((((n : ℤ) • x) 1 : ℤ) : ℂ)) =
-        Complex.normSq ((x 0 : ℂ) * z + (x 1 : ℂ)) * (n : ℝ) ^ (2 : ℝ) := by
+    have h
+        : Complex.normSq (((((n : ℤ) • x) 0 : ℤ) : ℂ) * z + ((((n : ℤ) • x) 1 : ℤ) : ℂ))
+          = Complex.normSq ((x 0 : ℂ) * z + (x 1 : ℂ)) * (n : ℝ) ^ (2 : ℝ) := by
       rw [nsq_eq, nsq_eq]
       simp
       ring
@@ -122,7 +123,9 @@ theorem UpperTheory.V.Af.Rs.kerBd :
       have h1 : z.im / Complex.normSq ((x 0 : ℂ) * z + (x 1 : ℂ)) ≤ 2 * z.im / ‖x‖ ^ (2 : ℝ) := by
         rw [Real.rpow_two, div_le_div_iff₀ hp (by positivity)]
         nlinarith
-      calc ker s x z ≤ (2 * z.im / ‖x‖ ^ (2 : ℝ)) ^ s := Real.rpow_le_rpow (hnn x z) h1 hs0.le
+      calc
+        ker s x z
+          ≤ (2 * z.im / ‖x‖ ^ (2 : ℝ)) ^ s := Real.rpow_le_rpow (hnn x z) h1 hs0.le
         _ = (2 * z.im) ^ s * ‖x‖ ^ (-(2 * s)) := by
           rw [Real.div_rpow (by positivity) (by positivity), ← Real.rpow_mul hn.le,
             Real.rpow_neg hn.le, div_eq_mul_inv]

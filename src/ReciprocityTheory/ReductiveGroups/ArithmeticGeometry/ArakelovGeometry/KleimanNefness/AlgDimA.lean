@@ -16,13 +16,16 @@ namespace ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.KrullDimensio
 
 open ReciprocityTheory.CA
 
-theorem ringKrullDim_quotient_ne_bot {R : Type*} [CommRing R] (I : Ideal R) (hI : I ≠ ⊤) :
-    ringKrullDim (R ⧸ I) ≠ ⊥ := by
+theorem ringKrullDim_quotient_ne_bot {R : Type*} [CommRing R] (I : Ideal R) (hI : I ≠ ⊤)
+    : ringKrullDim (R ⧸ I) ≠ ⊥ := by
   have : Nontrivial (R ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr hI
   exact ne_bot_of_le_ne_bot (by simp) ringKrullDim_nonneg_of_nontrivial
 
-theorem isCM_atPrime_of_le {S : Type*} [CommRing S] (𝔐 W : Ideal S) [𝔐.IsPrime] [W.IsPrime]
-    (h : IsCM (Localization.AtPrime 𝔐)) (hle : W ≤ 𝔐) : IsCM (Localization.AtPrime W) := by
+theorem isCM_atPrime_of_le
+    {S : Type*} [CommRing S]
+    (𝔐 W : Ideal S) [𝔐.IsPrime] [W.IsPrime]
+    (h : IsCM (Localization.AtPrime 𝔐)) (hle : W ≤ 𝔐)
+    : IsCM (Localization.AtPrime W) := by
   have hdisj : Disjoint (𝔐.primeCompl : Set S) (W : Set S) :=
     Set.disjoint_left.mpr fun x hx hxp => hx (hle hxp)
   let p := W.map (algebraMap S (Localization.AtPrime 𝔐))
@@ -33,17 +36,19 @@ theorem isCM_atPrime_of_le {S : Type*} [CommRing S] (𝔐 W : Ideal S) [𝔐.IsP
   have h2 := h.localization_atPrime p
   have : IsLocalization W.primeCompl (Localization.AtPrime p) := by
     have h0 : IsLocalization (p.comap (algebraMap S (Localization.AtPrime 𝔐))).primeCompl
-        (Localization.AtPrime p) := inferInstance
+        (Localization.AtPrime p) :=
+      inferInstance
     convert h0 using 2
     rw [hc]
   let e := IsLocalization.algEquiv W.primeCompl (Localization.AtPrime W) (Localization.AtPrime p)
   exact h2.of_ringEquiv e.symm.toRingEquiv
 
-theorem dimPIT_fin (F : Type) [Field F] (N : ℕ) (V W : Ideal (MvPolynomial (Fin N) F))
-    (s : MvPolynomial (Fin N) F) (hV : V.IsPrime) (hs : s ∉ V)
-    (hW : W ∈ (V ⊔ Ideal.span {s}).minimalPrimes) :
-    ringKrullDim (MvPolynomial (Fin N) F ⧸ W) + 1 =
-      ringKrullDim (MvPolynomial (Fin N) F ⧸ V) := by
+theorem dimPIT_fin
+    (F : Type) [Field F]
+    (N : ℕ) (V W : Ideal (MvPolynomial (Fin N) F)) (s : MvPolynomial (Fin N) F)
+    (hV : V.IsPrime) (hs : s ∉ V) (hW : W ∈ (V ⊔ Ideal.span {s}).minimalPrimes)
+    : ringKrullDim (MvPolynomial (Fin N) F ⧸ W) + 1
+      = ringKrullDim (MvPolynomial (Fin N) F ⧸ V) := by
   have hWp : W.IsPrime := hW.1.1
   have hVW : V ≤ W := le_sup_left.trans hW.1.2
   have hsW : s ∈ W := hW.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self s))
@@ -79,8 +84,9 @@ theorem dimPIT_fin (F : Type) [Field F] (N : ℕ) (V W : Ideal (MvPolynomial (Fi
   have eV := height_add_ringKrullDim_quotient_mvPolynomial_field F N V
   have eW := height_add_ringKrullDim_quotient_mvPolynomial_field F N W
   rw [hrel, h1] at eW
-  have := dimFormula_arith V.height 1 _ _ N (ringKrullDim_quotient_ne_bot W hWp.ne_top)
-    (ringKrullDim_quotient_ne_bot V hV.ne_top) eW eV
+  have :=
+    dimFormula_arith V.height 1 _ _ N (ringKrullDim_quotient_ne_bot W hWp.ne_top)
+      (ringKrullDim_quotient_ne_bot V hV.ne_top) eW eV
   rw [add_comm]
   exact_mod_cast this
 
@@ -97,8 +103,8 @@ theorem dimPIT' : DimPITStatement := by
   have hs' : eh s ∉ V.map eh := by
     rw [← hcm, Ideal.mem_comap]
     simpa [g, eh] using hs
-  have key := Ideal.comap_minimalPrimes_eq_of_surjective (f := g) e.symm.surjective
-    (V ⊔ Ideal.span {s})
+  have key :=
+    Ideal.comap_minimalPrimes_eq_of_surjective (f := g) e.symm.surjective (V ⊔ Ideal.span {s})
   have hmem : W.comap g ∈ ((V ⊔ Ideal.span {s}).comap g).minimalPrimes := key ▸ ⟨W, hW, rfl⟩
   rw [hcm, hcm, Ideal.map_sup, Ideal.map_span, Set.image_singleton] at hmem
   have := dimPIT_fin F _ _ _ _ hV' hs' hmem

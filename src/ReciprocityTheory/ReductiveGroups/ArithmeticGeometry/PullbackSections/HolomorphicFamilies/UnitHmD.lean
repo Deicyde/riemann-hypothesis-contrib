@@ -11,7 +11,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.UH
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Complex ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Complex
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}

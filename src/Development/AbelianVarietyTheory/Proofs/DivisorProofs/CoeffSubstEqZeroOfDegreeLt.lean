@@ -4,15 +4,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 namespace GlobalTheory
 
-theorem coeff_subst_eq_zero_of_degree_lt :
-    ∀ (R : Type) [CommRing R] (σ τ : Type) [Fintype σ] (u : σ → MvPowerSeries τ R)
-      (f : MvPowerSeries σ R) (M : ℕ), (∀ i, constantCoeff (u i) = 0) →
-      (∀ α : σ →₀ ℕ, α.degree < M → coeff α f = 0) →
-      ∀ β : τ →₀ ℕ, β.degree < M → coeff β (subst u f) = 0 := by
+theorem coeff_subst_eq_zero_of_degree_lt
+    : ∀ (R : Type) [CommRing R] (σ τ : Type) [Fintype σ] (u : σ → MvPowerSeries τ R)
+        (f : MvPowerSeries σ R) (M : ℕ),
+      (∀ i, constantCoeff (u i) = 0) → (∀ α : σ →₀ ℕ, α.degree < M → coeff α f = 0)
+        → ∀ β : τ →₀ ℕ, β.degree < M → coeff β (subst u f) = 0 := by
   intro R _ σ τ _ u f M hu hf β hβ
   have hs : HasSubst u := ⟨fun i => by rw [hu i]; exact IsNilpotent.zero, fun _ => Set.toFinite _⟩
   rw [coeff_subst hs]

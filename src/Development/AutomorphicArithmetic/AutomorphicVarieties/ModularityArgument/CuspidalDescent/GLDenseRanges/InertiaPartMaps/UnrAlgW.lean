@@ -142,20 +142,22 @@ private lemma good_point {O Λ B K : Type} [CommRing O] [CommRing Λ] [IsDomain 
 
 end UpperTheory.V.J
 
-theorem UpperTheory.V.Z.Desc.V0.unrAlgW :
-    UpperTheory.V.Z.Desc.V0.UnrAlgW := by
+theorem UpperTheory.V.Z.Desc.V0.unrAlgW : UpperTheory.V.Z.Desc.V0.UnrAlgW := by
   intro O Λ B K _ _ _ _ _ _ _ _ _ _ _ _ _ lam J M _ _ _ h x hxJ 𝒢 b₀ hb₀ hG0 hG δ hδ hδJ hδl
   haveI := h.free
   haveI := h.fin
   obtain ⟨t, hP, hS⟩ := UpperTheory.V.J.primEx O Λ B K lam J M h x hxJ
   obtain ⟨s, g, m, hF⟩ :=
-    UpperTheory.V.J.factEx Λ (LinearMap.charpoly (UpperTheory.V.J.actL lam M h.hs t)) (LinearMap.charpoly_monic _)
+    UpperTheory.V.J.factEx Λ (LinearMap.charpoly (UpperTheory.V.J.actL lam M h.hs t))
+      (LinearMap.charpoly_monic _)
   obtain ⟨hkill, hmin⟩ := UpperTheory.V.J.minPol O Λ B lam J M h t s g m hF
   have hC : UpperTheory.V.J.Cmp lam J t g :=
     ⟨h.tf, UpperTheory.V.J.intMod O Λ B lam J M h, hP, hF.monic, hF.irr, hF.inj, hkill, hmin⟩
-  have hsumAt : ∀ y : B →ₐ[O] K,
-      rootMultiplicity (y t) ((LinearMap.charpoly (UpperTheory.V.J.actL lam M h.hs t)).map (y.comp lam : Λ →+* K)) =
-        ∑ i, m i * rootMultiplicity (y t) ((g i).map (y.comp lam : Λ →+* K)) := by
+  have hsumAt
+      : ∀ y : B →ₐ[O] K,
+        rootMultiplicity (y t)
+            ((LinearMap.charpoly (UpperTheory.V.J.actL lam M h.hs t)).map (y.comp lam : Λ →+* K))
+          = ∑ i, m i * rootMultiplicity (y t) ((g i).map (y.comp lam : Λ →+* K)) := by
     intro y
     rw [hF.prod]
     exact UpperTheory.V.J.rm_map_prod _ g hF.monic m (y t)
@@ -166,8 +168,10 @@ theorem UpperTheory.V.Z.Desc.V0.unrAlgW :
     rw [UpperTheory.V.J.ev, Polynomial.map_prod, eval_prod, Finset.prod_eq_zero_iff] at hk
     obtain ⟨i, _, hi⟩ := hk
     exact ⟨i, (rootMultiplicity_pos ((hF.monic i).map _).ne_zero).2 hi⟩
-  have hle : ∀ i, 0 < rootMultiplicity (x t) ((g i).map (x.comp lam : Λ →+* K)) →
-      UpperTheory.V.J.mu lam M h.hs x ≤ m i := by
+  have hle
+      : ∀ i,
+        0 < rootMultiplicity (x t) ((g i).map (x.comp lam : Λ →+* K))
+          → UpperTheory.V.J.mu lam M h.hs x ≤ m i := by
     intro i hki
     have hcx := UpperTheory.V.J.comp_bound lam J t g hC x hS i hki
     have hdeg : 0 < (g i).natDegree := by
@@ -175,12 +179,14 @@ theorem UpperTheory.V.Z.Desc.V0.unrAlgW :
       have h1 : g i = 1 := Polynomial.eq_one_of_monic_natDegree_zero (hF.monic i) (by omega)
       rw [h1, Polynomial.map_one] at hki
       simp at hki
-    obtain ⟨y, hy𝒢, hyd, hye⟩ : ∃ y ∈ 𝒢,
-        y ((derivative (g i)).eval₂ (lam : Λ →+* B) t) ≠ 0 ∧
-          y ((∏ j ∈ Finset.univ.erase i, g j).eval₂ (lam : Λ →+* B) t) ≠ 0 := by
+    obtain ⟨y, hy𝒢, hyd, hye⟩
+        : ∃ y ∈ 𝒢,
+          y ((derivative (g i)).eval₂ (lam : Λ →+* B) t) ≠ 0
+            ∧ y ((∏ j ∈ Finset.univ.erase i, g j).eval₂ (lam : Λ →+* B) t) ≠ 0 := by
       by_contra hno
       push_neg at hno
-      have hmem : (derivative (g i)).eval₂ (lam : Λ →+* B) t * b₀ ∈ UpperTheory.V.J.cmp lam J t g i := by
+      have hmem
+          : (derivative (g i)).eval₂ (lam : Λ →+* B) t * b₀ ∈ UpperTheory.V.J.cmp lam J t g i := by
         rw [UpperTheory.V.J.mem_cmp, mul_right_comm]
         apply hG0
         intro y hy
@@ -196,15 +202,17 @@ theorem UpperTheory.V.Z.Desc.V0.unrAlgW :
     have hmu := UpperTheory.V.J.muLe O Λ B K lam M h.hs y t
     rw [hsumAt y, hgp] at hmu
     exact le_trans (hG y hy𝒢).2 hmu
-  have hsum1 := UpperTheory.V.J.num_core (fun i => rootMultiplicity (x t) ((g i).map (x.comp lam : Λ →+* K))) m
-    (UpperTheory.V.J.mu lam M h.hs x) hF.pos hge hle hex
+  have hsum1 :=
+    UpperTheory.V.J.num_core
+      (fun i => rootMultiplicity (x t) ((g i).map (x.comp lam : Λ →+* K)))
+      m (UpperTheory.V.J.mu lam M h.hs x) hF.pos hge hle hex
   have hprod1 : rootMultiplicity (x t) ((∏ j, g j).map (x.comp lam : Λ →+* K)) = 1 := by
     have e := UpperTheory.V.J.rm_map_prod (x.comp lam : Λ →+* K) g hF.monic (fun _ => 1) (x t)
     simp only [pow_one, one_mul] at e
     rw [e]
     exact hsum1
   obtain ⟨i, hi⟩ := hex
-  exact UpperTheory.V.J.derZero O Λ B K lam J t s g hC x i (UpperTheory.V.J.comp_bound lam J t g hC x hS i hi) hprod1
-    δ hδ hδJ hδl
+  exact UpperTheory.V.J.derZero O Λ B K lam J t s g hC x i
+    (UpperTheory.V.J.comp_bound lam J t g hC x hS i hi) hprod1 δ hδ hδJ hδl
 
 end

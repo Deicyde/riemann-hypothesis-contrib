@@ -9,9 +9,10 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem exists_galois_subfield_conj_stable (S : Finset ℂ) (hS : ∀ z ∈ S, IsAlgebraic ℚ z) :
-    ∃ K : IntermediateField ℚ ℂ, FiniteDimensional ℚ K ∧ IsGalois ℚ K ∧ (∀ z ∈ S, z ∈ K) ∧
-      Complex.I ∈ K ∧ ∀ z ∈ K, starRingEnd ℂ z ∈ K := by
+theorem exists_galois_subfield_conj_stable (S : Finset ℂ) (hS : ∀ z ∈ S, IsAlgebraic ℚ z)
+    : ∃ K : IntermediateField ℚ ℂ,
+      FiniteDimensional ℚ K ∧ IsGalois ℚ K ∧ (∀ z ∈ S, z ∈ K) ∧ Complex.I ∈ K
+        ∧ ∀ z ∈ K, starRingEnd ℂ z ∈ K := by
   classical
   have hI : IsIntegral ℚ Complex.I := by
     refine ⟨X ^ 2 + C 1, monic_X_pow_add_C 1 two_ne_zero, ?_⟩
@@ -36,9 +37,14 @@ theorem exists_galois_subfield_conj_stable (S : Finset ℂ) (hS : ∀ z ∈ S, I
     IntermediateField.adjoin_rootSet_isSplittingField (IsAlgClosed.splits (p.map (algebraMap ℚ ℂ)))
   have hfin : FiniteDimensional ℚ K := Polynomial.IsSplittingField.finiteDimensional K p
   have : Normal ℚ K := Normal.of_isSplittingField p
-  refine ⟨K, hfin, IsGalois.mk,
+  refine ⟨
+    K,
+    hfin,
+    IsGalois.mk,
     fun z hz => IntermediateField.subset_adjoin ℚ _ (hroot z (Finset.mem_insert_of_mem hz)),
-    IntermediateField.subset_adjoin ℚ _ (hroot _ (Finset.mem_insert_self _ _)), ?_⟩
+    IntermediateField.subset_adjoin ℚ _ (hroot _ (Finset.mem_insert_self _ _)),
+    ?_
+  ⟩
   let φ : ℂ →ₐ[ℚ] ℂ := Complex.conjAe.toAlgHom.restrictScalars ℚ
   have hsub : φ '' (p.rootSet ℂ) ⊆ p.rootSet ℂ := by
     rintro _ ⟨w, hw, rfl⟩

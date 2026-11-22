@@ -14,8 +14,8 @@ namespace RestTerms
 
 open MvPolynomial Finset
 
-theorem FlagIntegralTopComponent.proof (h1 : FlagVandermondeHomogeneous.Statement) :
-    FlagIntegralTopComponent.Statement := by
+theorem FlagIntegralTopComponent.proof (h1 : FlagVandermondeHomogeneous.Statement)
+    : FlagIntegralTopComponent.Statement := by
   intro f N Φ
   unfold flagIntegral
   refine Finset.sum_congr rfl fun α hα => ?_

@@ -6,13 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr
 open scoped Matrix
 set_option linter.overlappingInstances false
 
-private theorem fac_conj {Ω : Type} [Field Ω] [CharZero Ω] (l : ℕ) (A : ValuationSubring Ω) (g x : G ℚ Ω)
-    (hl : ¬ A.valuation (l : Ω) < 1) (hx : x ∈ Ine (F := ℚ) A) :
-    ∃ A' : ValuationSubring Ω, ¬ A'.valuation (l : Ω) < 1 ∧ g * x * g⁻¹ ∈ Ine (F := ℚ) A' := by
+private theorem fac_conj
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (l : ℕ) (A : ValuationSubring Ω)
+    (g x : G ℚ Ω)
+    (hl : ¬ A.valuation (l : Ω) < 1) (hx : x ∈ Ine (F := ℚ) A)
+    : ∃ A' : ValuationSubring Ω, ¬ A'.valuation (l : Ω) < 1 ∧ g * x * g⁻¹ ∈ Ine (F := ℚ) A' := by
   have h : IsLift (RingEquiv.refl ℚ) ((g.symm : Ω ≃ₐ[ℚ] Ω) : Ω ≃+* Ω) := fun q => g.symm.commutes q
   let σ : Ω ≃+* Ω := ((g.symm : Ω ≃ₐ[ℚ] Ω) : Ω ≃+* Ω)
   have hA : ∀ y : Ω, σ y ∈ A ↔ y ∈ A.comap (σ : Ω →+* Ω) := fun y => by
@@ -26,25 +31,37 @@ private theorem fac_conj {Ω : Type} [Field Ω] [CharZero Ω] (l : ℕ) (A : Val
     ext z
     rfl
 
-theorem UpperTheory.exists_frame_factorization_of_trivial_on_inertia :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {η : G ℚ Ω →* ℤˣ} {Ψ : G ℚ Ω →* Oˣ} {σ g₁ : G ℚ Ω} {B : ValuationSubring Ω} {M : ℕ} {L : Type} [Field L] [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω] {Φ : Fr.Frame l (ResidueField O)} (k : GalLink η Ψ σ g₁ B M L Φ) {n : ℕ} (r : G L Ω →* GL (Fin n) (Qbar l)), Continuous r → (∀ A : ValuationSubring Ω, ¬ A.valuation (l : Ω) < 1 → ∀ s ∈ Ine (F := L) A, Ψ (galEmb ℚ L Ω s) = 1 → r s = 1) → ∃ r' : Φ.G0 →* GL (Fin n) (Qbar l), Continuous r' ∧ (∀ s, r' (k.p0 s) = r s) ∧ ∀ P : GL (Fin n) (Qbar l), Sd.IsPair σ r 1 P → ∀ g, (r' g).valᵀ * P.val * (r' (Φ.conj g)).val = P.val := by
+theorem UpperTheory.exists_frame_factorization_of_trivial_on_inertia
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {O : Type}
+        [CommRing O] [IsLocalRing O] {η : G ℚ Ω →* ℤˣ} {Ψ : G ℚ Ω →* Oˣ} {σ g₁ : G ℚ Ω}
+        {B : ValuationSubring Ω} {M : ℕ} {L : Type} [Field L] [NumberField L] [Algebra L Ω]
+        [IsAlgClosure L Ω] {Φ : Fr.Frame l (ResidueField O)} (k : GalLink η Ψ σ g₁ B M L Φ) {n : ℕ}
+        (r : G L Ω →* GL (Fin n) (Qbar l)),
+      Continuous r
+        → (∀ A : ValuationSubring Ω,
+          ¬ A.valuation (l : Ω) < 1 → ∀ s ∈ Ine (F := L) A, Ψ (galEmb ℚ L Ω s) = 1 → r s = 1)
+        → ∃ r' : Φ.G0 →* GL (Fin n) (Qbar l),
+          Continuous r' ∧ (∀ s, r' (k.p0 s) = r s)
+            ∧ ∀ P : GL (Fin n) (Qbar l),
+              Sd.IsPair σ r 1 P → ∀ g, (r' g).valᵀ * P.val * (r' (Φ.conj g)).val = P.val := by
   intro Ω _ _ _ l _ O _ _ η Ψ σ g₁ B M L _ _ _ _ Φ k n r hr hine
   have hgal : ∀ s : G L Ω, galEmb ℚ L Ω s ∈ upl Ω L ⊓ η.ker := fun s => by
     have h := galEmb_mem ℚ L Ω s
     rwa [k.gal] at h
   have hmem : ∀ s : G L Ω, galEmb ℚ L Ω s ∈ upl Ω L := fun s => (hgal s).1
   have hq : ∀ s, (k.p0 s : Φ.Γ) = k.p ⟨galEmb ℚ L Ω s, hmem s⟩ := fun s => rfl
-  let q : G L Ω →* Φ.G0 :=
-    { toFun := k.p0
-      map_one' := by
-        apply Subtype.ext
-        rw [hq]
-        rw [show (⟨galEmb ℚ L Ω 1, hmem 1⟩ : upl Ω L) = 1 from Subtype.ext (map_one _), map_one]
-        rfl
-      map_mul' := fun s t => by
-        apply Subtype.ext
-        rw [Subgroup.coe_mul, hq, hq, hq, ← map_mul]
-        exact congrArg k.p (Subtype.ext (map_mul _ _ _)) }
+  let q : G L Ω →* Φ.G0 := {
+    toFun := k.p0
+    map_one' := by
+      apply Subtype.ext
+      rw [hq]
+      rw [show (⟨galEmb ℚ L Ω 1, hmem 1⟩ : upl Ω L) = 1 from Subtype.ext (map_one _), map_one]
+      rfl
+    map_mul' := fun s t => by
+      apply Subtype.ext
+      rw [Subgroup.coe_mul, hq, hq, hq, ← map_mul]
+      exact congrArg k.p (Subtype.ext (map_mul _ _ _))
+  }
   have hqv : ∀ s, ((q s : Φ.G0) : Φ.Γ) = k.p ⟨galEmb ℚ L Ω s, hmem s⟩ := fun s => rfl
   have hqs : Function.Surjective q := by
     intro x
@@ -82,9 +99,11 @@ theorem UpperTheory.exists_frame_factorization_of_trivial_on_inertia :
       have hi : IsClosed ((galEmb ℚ L Ω) '' (r.ker : Set (G L Ω))) :=
         (hk.isCompact.image hgc).isClosed
       exact hi.preimage continuous_subtype_val
-    have hX : Subgroup.normalClosure
-        {s : upl Ω L | ∃ B' : ValuationSubring Ω, ¬ B'.valuation (l : Ω) < 1 ∧ (s : G ℚ Ω) ∈ Ine B' ∧
-          η s = 1 ∧ barChar O Ψ s = 1} ≤ H' := by
+    have hX
+        : Subgroup.normalClosure
+            {s : upl Ω L | ∃ B' : ValuationSubring Ω, ¬ B'.valuation (l : Ω) < 1 ∧ (s : G ℚ Ω) ∈ Ine B' ∧
+              η s = 1 ∧ barChar O Ψ s = 1}
+          ≤ H' := by
       unfold Subgroup.normalClosure
       refine (Subgroup.closure_le _).2 ?_
       intro c hc
@@ -141,9 +160,12 @@ theorem UpperTheory.exists_frame_factorization_of_trivial_on_inertia :
   obtain ⟨hσ, hσc⟩ := k.c
   have hs'gal : σ * galEmb ℚ L Ω s * σ⁻¹ ∈ galOf ℚ L Ω := by
     rw [k.gal]
-    refine ⟨(upl Ω L).mul_mem ((upl Ω L).mul_mem hσ (hmem s)) ((upl Ω L).inv_mem hσ),
-      MonoidHom.mem_ker.mpr ?_⟩
-    rw [map_mul, map_mul, MonoidHom.mem_ker.mp (hgal s).2, mul_one, ← map_mul, mul_inv_cancel, map_one]
+    refine ⟨
+      (upl Ω L).mul_mem ((upl Ω L).mul_mem hσ (hmem s)) ((upl Ω L).inv_mem hσ),
+      MonoidHom.mem_ker.mpr ?_
+    ⟩
+    rw [map_mul, map_mul, MonoidHom.mem_ker.mp (hgal s).2, mul_one, ← map_mul, mul_inv_cancel,
+      map_one]
   rw [← range_galEmb ℚ L Ω] at hs'gal
   obtain ⟨s', hs'⟩ := hs'gal
   have hconj : Φ.conj (q s) = q s' := by

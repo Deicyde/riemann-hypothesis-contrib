@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUn
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -24,9 +26,12 @@ namespace GlobalTheory.Mum.LabTorsTrait
 
 open GlobalTheory.ArcPull GlobalTheory.Mum.Recog
 
-theorem labTors_of_oneTrait : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], Base R →
-    ∀ (D : DegData R (maximalIdeal R)) (A : PolAV (Sp (FractionRing R))) (lab : Labels D.toPre A),
-    OneTrait D.toPre A lab → ∀ k : ℕ, 1 ≤ k → LabTors D.toPre A k (lab k) := by
+theorem labTors_of_oneTrait
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      Base R
+        → ∀ (D : DegData R (maximalIdeal R)) (A : PolAV (Sp (FractionRing R)))
+            (lab : Labels D.toPre A),
+          OneTrait D.toPre A lab → ∀ k : ℕ, 1 ≤ k → LabTors D.toPre A k (lab k) := by
   intro R _ _ _ hR D A lab hT k hk
   obtain ⟨W, _, _, _, φ, G', _, _, D', A', U', hD, a, _, em, hW, iφ, _, hG, ha, c, H⟩ := hT
   have := hR.2
@@ -36,7 +41,9 @@ theorem labTors_of_oneTrait : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalR
   have bW : AdmBase W (maximalIdeal W) := ⟨inferInstance, inferInstance, inferInstance, hW.2.1⟩
   have hB' := D'.tau_bimult
   have c' : Compat φ (Kb W) := c
-  obtain ⟨f', hf'⟩ := GlobalTheory.TorsionIso.torsion_eq GlobalTheory.firstFiveLaws W (maximalIdeal W) bW D' A' G' hG U' (Kb W) k hk
+  obtain ⟨f', hf'⟩ :=
+    GlobalTheory.TorsionIso.torsion_eq GlobalTheory.firstFiveLaws W (maximalIdeal W) bW D' A' G' hG
+      U' (Kb W) k hk
   obtain ⟨ε, hε, iε, oε, wε⟩ := exists_ptHom ha c' em
   have e : ∀ p, f' (tr hD c' em hB' p) = ε (lab k p) := fun p => by
     obtain ⟨p₁, h₁, h₂, h₃⟩ := (lies_iff hD c' em hB' p (tr hD c' em hB' p)).2 rfl

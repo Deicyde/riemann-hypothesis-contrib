@@ -8,9 +8,11 @@ namespace Formalism.GaloisIrreducibility
 
 open scoped Pointwise
 
-theorem poc_powSmul_injective {M Y : Type*} [Group M] [MulAction M Y] (s : M) (p : ℕ) (hp : p.Prime)
-    (hs : s ^ p = 1) (y : Y) (hy : s • y ≠ y) :
-    ∀ i < p, ∀ j < p, s ^ i • y = s ^ j • y → i = j := by
+theorem poc_powSmul_injective
+    {M Y : Type*} [Group M] [MulAction M Y]
+    (s : M) (p : ℕ) (hp : p.Prime) (hs : s ^ p = 1)
+    (y : Y) (hy : s • y ≠ y)
+    : ∀ i < p, ∀ j < p, s ^ i • y = s ^ j • y → i = j := by
   have key : ∀ d : ℕ, 0 < d → d < p → s ^ d • y ≠ y := by
     intro d hd0 hdp hd
     have hnd : ¬ p ∣ d := fun h => absurd (Nat.le_of_dvd hd0 h) (by omega)
@@ -55,8 +57,7 @@ theorem primitive_of_p_cycle : PrimitiveOfPCycle := by
     by_contra h
     push_neg at h
     exact hnt (Set.eq_univ_of_forall h)
-  have hσp : σ ^ p = 1 := by
-    rw [← hsupp, ← hcyc.orderOf]; exact pow_orderOf_eq_one σ
+  have hσp : σ ^ p = 1 := by rw [← hsupp, ← hcyc.orderOf]; exact pow_orderOf_eq_one σ
   obtain ⟨x, hxs⟩ : σ.support.Nonempty := Finset.card_pos.mp (by rw [hsupp]; exact hp.pos)
   obtain ⟨s, hsσ⟩ : ∃ s : G, (s : Equiv.Perm α) = σ := ⟨⟨σ, hσG⟩, rfl⟩
   have hs : s ^ p = 1 := Subtype.ext (by simp [hsσ, hσp])
@@ -70,7 +71,8 @@ theorem primitive_of_p_cycle : PrimitiveOfPCycle := by
       induction i with
       | zero => simp
       | succ i ih => rw [pow_succ, ih, ht, pow_succ]; group
-    rw [e, hs]; group
+    rw [e, hs]
+    group
   have htb : t • b ≠ b := by
     intro h
     apply hx
@@ -80,9 +82,12 @@ theorem primitive_of_p_cycle : PrimitiveOfPCycle := by
   have blk : ∀ g₁ g₂ : G, g₁ • B ≠ g₂ • B → Disjoint (g₁ • B) (g₂ • B) := by
     intro g₁ g₂ hne
     rcases hB.smul_eq_or_disjoint (g₂⁻¹ * g₁) with h | h
-    · exfalso; apply hne
+    · exfalso
+      apply hne
       rw [mul_smul] at h
-      calc g₁ • B = g₂ • (g₂⁻¹ • g₁ • B) := (smul_inv_smul g₂ _).symm
+      calc
+        g₁ • B
+          = g₂ • (g₂⁻¹ • g₁ • B) := (smul_inv_smul g₂ _).symm
         _ = g₂ • B := by rw [h]
     · rw [Set.disjoint_left]
       intro a ha1 ha2
@@ -100,8 +105,7 @@ theorem primitive_of_p_cycle : PrimitiveOfPCycle := by
         rw [pow_succ', mul_smul, ← hE]
         exact Set.smul_mem_smul_set ih
     obtain ⟨h, hhb⟩ := MulAction.exists_smul_eq G b z
-    have hne : h • B ≠ B := by
-      intro e; apply hz; rw [← e, ← hhb]; exact Set.smul_mem_smul_set hb
+    have hne : h • B ≠ B := by intro e; apply hz; rw [← e, ← hhb]; exact Set.smul_mem_smul_set hb
     have hdis : Disjoint (h • B) B := by
       have h4 := blk h 1 (by rwa [one_smul])
       rwa [one_smul] at h4
@@ -118,16 +122,19 @@ theorem primitive_of_p_cycle : PrimitiveOfPCycle := by
         exact (Set.disjoint_left.mp hdis (Set.smul_mem_smul_set (hpow i))
           (by rw [hij]; exact hpow j)).elim
       · simp only [f, Sum.elim_inr] at hij
-        exact congrArg Sum.inr (Fin.ext (poc_powSmul_injective t p hp htp b htb i i.2 j j.2
-          ((smul_left_cancel_iff h).mp hij)))
+        exact congrArg Sum.inr
+          (Fin.ext (poc_powSmul_injective t p hp htp b htb i i.2 j j.2
+            ((smul_left_cancel_iff h).mp hij)))
     have hcd := Fintype.card_le_of_injective f hf
     simp only [Fintype.card_sum, Fintype.card_fin] at hcd
     omega
   · have htB : t • B ≠ B := by
-      intro e; rw [e] at hD
+      intro e
+      rw [e] at hD
       exact Set.disjoint_left.mp hD hb hb
     have hinj := poc_powSmul_injective t p hp htp B htB
-    have key : ∀ i j : Fin p, ∀ u v : α, u ∈ B → v ∈ B → t ^ (i : ℕ) • u = t ^ (j : ℕ) • v → i = j := by
+    have key
+        : ∀ i j : Fin p, ∀ u v : α, u ∈ B → v ∈ B → t ^ (i : ℕ) • u = t ^ (j : ℕ) • v → i = j := by
       intro i j u v hu hv e
       by_contra hij
       have hne : t ^ (i : ℕ) • B ≠ t ^ (j : ℕ) • B := fun h => hij (Fin.ext (hinj i i.2 j j.2 h))
@@ -137,15 +144,21 @@ theorem primitive_of_p_cycle : PrimitiveOfPCycle := by
     have hf : Function.Injective f := by
       rintro (i | i) (j | j) hij
       · simp only [f, Sum.elim_inl] at hij
-        have := key i j b b hb hb hij; subst this; rfl
+        have := key i j b b hb hb hij
+        subst this
+        rfl
       · simp only [f, Sum.elim_inl, Sum.elim_inr] at hij
-        have := key i j b c hb hc hij; subst this
+        have := key i j b c hb hc hij
+        subst this
         exact absurd ((smul_left_cancel_iff _).mp hij) hbc
       · simp only [f, Sum.elim_inl, Sum.elim_inr] at hij
-        have := key i j c b hc hb hij; subst this
+        have := key i j c b hc hb hij
+        subst this
         exact absurd ((smul_left_cancel_iff _).mp hij).symm hbc
       · simp only [f, Sum.elim_inr] at hij
-        have := key i j c c hc hc hij; subst this; rfl
+        have := key i j c c hc hc hij
+        subst this
+        rfl
     have hcd := Fintype.card_le_of_injective f hf
     simp only [Fintype.card_sum, Fintype.card_fin] at hcd
     omega

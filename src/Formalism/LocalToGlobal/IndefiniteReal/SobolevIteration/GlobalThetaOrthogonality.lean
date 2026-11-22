@@ -15,8 +15,10 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.PlaceDegreeData
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Mult
-  MeasureTheory IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Mult MeasureTheory IsDedekindDomain
+  NumberField
 
 namespace Formalism.IndefR.Tow
 
@@ -26,8 +28,6 @@ variable {D : D7}
 
 def KAt {k : ℕ} (G s : Matrix (Fin k) (Fin k) ℂ) : Set (Matrix (Fin k) (Fin k) ℂ) :=
   {g | g ∈ Formalism.QuantumDeterminants.UH G ∧ g * s = s * g}
-
-
 
 end Formalism.IndefR.Tow
 

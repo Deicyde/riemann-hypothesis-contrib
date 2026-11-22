@@ -9,15 +9,18 @@ open MvPolynomial Formalism.GradedWeylDivisibility GlobalTheory.GenCoef
 
 namespace GlobalTheory.UpperTransvection
 
-theorem upper_mem_closure (R : Type) [CommRing R] (N : ℕ) (c : Matrix (Fin N) (Fin N) R)
-    (hc : ∀ a b, b ≤ a → c a b = 0) :
-    1 + c ∈ Submonoid.closure
-      {M | ∃ (a b : Fin N) (r : R), a ≠ b ∧ M = Matrix.transvection a b r} := by
+theorem upper_mem_closure
+    (R : Type) [CommRing R] (N : ℕ) (c : Matrix (Fin N) (Fin N) R) (hc : ∀ a b, b ≤ a → c a b = 0)
+    : 1 + c
+      ∈ Submonoid.closure {M | ∃ (a b : Fin N) (r : R), a ≠ b ∧ M = Matrix.transvection a b r} := by
   classical
   set S := Submonoid.closure
       {M : Matrix (Fin N) (Fin N) R | ∃ (a b : Fin N) (r : R), a ≠ b ∧ M = Matrix.transvection a b r}
-  suffices key : ∀ n : ℕ, ∀ c : Matrix (Fin N) (Fin N) R, (∀ a b, b ≤ a → c a b = 0) →
-      (Finset.univ.filter fun p : Fin N × Fin N => c p.1 p.2 ≠ 0).card ≤ n → 1 + c ∈ S from
+  suffices key
+      : ∀ n : ℕ, ∀ c : Matrix (Fin N) (Fin N) R,
+        (∀ a b, b ≤ a → c a b = 0)
+          → (Finset.univ.filter fun p : Fin N × Fin N => c p.1 p.2 ≠ 0).card ≤ n
+          → 1 + c ∈ S from
     key _ c hc le_rfl
   intro n
   induction n with
@@ -58,11 +61,12 @@ theorem upper_mem_closure (R : Type) [CommRing R] (N : ℕ) (c : Matrix (Fin N) 
       simp only [hc', Matrix.sub_apply, Matrix.single_apply]
       by_cases h : i = a ∧ j = b
       · obtain ⟨rfl, rfl⟩ := h; simp [r]
-      · have h' : ¬ (a = i ∧ b = j) := fun ⟨h1, h2⟩ => h ⟨h1.symm, h2.symm⟩
+      · have h' : ¬(a = i ∧ b = j) := fun ⟨h1, h2⟩ => h ⟨h1.symm, h2.symm⟩
         simp [h, h']
     have hc'up : ∀ i j, j ≤ i → c' i j = 0 := by
       intro i j hji
-      rw [hc'_apply]; split_ifs
+      rw [hc'_apply]
+      split_ifs
       · rfl
       · exact hc i j hji
     have hT' : (Finset.univ.filter fun p : Fin N × Fin N => c' p.1 p.2 ≠ 0) ⊆ T.erase (a, b) := by
@@ -89,7 +93,8 @@ theorem upper_mem_closure (R : Type) [CommRing R] (N : ℕ) (c : Matrix (Fin N) 
       intro k _
       split_ifs with h
       · obtain ⟨rfl, rfl⟩ := h
-        rw [hc'_apply]; split_ifs
+        rw [hc'_apply]
+        split_ifs
         · simp
         · rw [hcol]; simp
       · simp

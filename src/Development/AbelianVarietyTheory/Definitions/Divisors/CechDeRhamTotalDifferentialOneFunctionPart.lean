@@ -21,7 +21,8 @@ section Complex
 
 variable {R : Type} [CommRing R] {C : Type u} [Category.{v} C] (F : C ⥤ CommAlgCat.{0} R)
 
-theorem semiHom_mp {T T' : C} (φ : T ⟶ T') : SemiHom (RingHom.id R) (mp F φ : F.obj T →+* F.obj T') := by
+theorem semiHom_mp {T T' : C} (φ : T ⟶ T')
+    : SemiHom (RingHom.id R) (mp F φ : F.obj T →+* F.obj T') := by
   intro r b
   simp
 
@@ -37,19 +38,22 @@ theorem p1_D (b : F.obj T) : p1 F φ (D R _ b) = D R _ (mp F φ b) := by
   unfold p1
   exact (semiHom_mp F φ).m1_D b
 
-theorem oneFormsMapOfFunctorMorphism_smul (b : F.obj T) (ω : Ω[F.obj T⁄R]) : p1 F φ (b • ω) = mp F φ b • p1 F φ ω := by
+theorem oneFormsMapOfFunctorMorphism_smul (b : F.obj T) (ω : Ω[F.obj T⁄R])
+    : p1 F φ (b • ω) = mp F φ b • p1 F φ ω := by
   unfold p1
   exact (semiHom_mp F φ).oneFormMap_smul_semilinear b ω
 
-theorem pOm_smul {j : ℕ} (b : F.obj T) (x : Om R (F.obj T) j) :
-    pOm F j φ (b • x) = mp F φ b • pOm F j φ x := by
+theorem pOm_smul {j : ℕ} (b : F.obj T) (x : Om R (F.obj T) j)
+    : pOm F j φ (b • x) = mp F φ b • pOm F j φ x := by
   unfold pOm
   exact (semiHom_mp F φ).mOm_smul b x
 
-theorem oneFormsMapOfFunctorMorphism_comp (ω : Ω[F.obj T⁄R]) : p1 F (φ ≫ ψ) ω = p1 F ψ (p1 F φ ω) := by
+theorem oneFormsMapOfFunctorMorphism_comp (ω : Ω[F.obj T⁄R])
+    : p1 F (φ ≫ ψ) ω = p1 F ψ (p1 F φ ω) := by
   unfold p1
   exact ((semiHom_mp F φ).oneFormMap_comp_oneFormMap (semiHom_mp F ψ) (semiHom_mp F (φ ≫ ψ))
-    (fun b ↦ (mp_comp F φ ψ b).symm) ω).symm
+    (fun b ↦ (mp_comp F φ ψ b).symm)
+    ω).symm
 
 theorem oneFormsMapOfFunctorMorphism_id (ω : Ω[F.obj T⁄R]) : p1 F (𝟙 T) ω = ω := by
   unfold p1
@@ -58,14 +62,15 @@ theorem oneFormsMapOfFunctorMorphism_id (ω : Ω[F.obj T⁄R]) : p1 F (𝟙 T) �
 theorem pOm_comp {j : ℕ} (x : Om R (F.obj T) j) : pOm F j (φ ≫ ψ) x = pOm F j ψ (pOm F j φ x) := by
   unfold pOm
   exact ((semiHom_mp F φ).mOm_mOm (semiHom_mp F ψ) (semiHom_mp F (φ ≫ ψ))
-    (fun b ↦ (mp_comp F φ ψ b).symm) x).symm
+    (fun b ↦ (mp_comp F φ ψ b).symm)
+    x).symm
 
 theorem pOm_id {j : ℕ} (x : Om R (F.obj T) j) : pOm F j (𝟙 T) x = x := by
   unfold pOm
   exact (semiHom_mp F (𝟙 T)).mOm_id (fun b ↦ mp_id F T b) x
 
-theorem pOm_dOm {j : ℕ} (x : Om R (F.obj T) j) :
-    pOm F (j + 1) φ (dOm R _ j x) = dOm R _ j (pOm F j φ x) := by
+theorem pOm_dOm {j : ℕ} (x : Om R (F.obj T) j)
+    : pOm F (j + 1) φ (dOm R _ j x) = dOm R _ j (pOm F j φ x) := by
   unfold pOm
   exact (semiHom_mp F φ).mOm_dOm x
 
@@ -77,8 +82,8 @@ theorem pOm_dTwo (x : Om R (F.obj T) 2) : pOm F 3 φ (dTwo R _ x) = dTwo R _ (pO
   unfold pOm
   exact (semiHom_mp F φ).mOm_dTwo x
 
-theorem pOm_wedge (a b : Ω[F.obj T⁄R]) :
-    pOm F 2 φ (wedge R _ a b) = wedge R _ (p1 F φ a) (p1 F φ b) := by
+theorem pOm_wedge (a b : Ω[F.obj T⁄R])
+    : pOm F 2 φ (wedge R _ a b) = wedge R _ (p1 F φ a) (p1 F φ b) := by
   unfold pOm p1
   exact (semiHom_mp F φ).mOm_wedge a b
 
@@ -110,26 +115,32 @@ def dTot0 : Tot0 F →ₗ[R] Tot1 F where
   map_smul' r g := Prod.ext (map_smul _ _ _) (funext fun T ↦ by simp)
 
 def dTot1 : Tot1 F →ₗ[R] Tot2 F where
-  toFun c := (d1 F c.1, fun T T' φ ↦ c.2 T' - p1 F φ (c.2 T) - D R _ (c.1 T T' φ),
-    fun T ↦ dOne R _ (c.2 T))
-  map_add' c c' := Prod.ext (map_add _ _ _) (Prod.ext (by funext T T' φ; simp; abel)
-    (funext fun T ↦ by simp))
-  map_smul' r c := Prod.ext (map_smul _ _ _) (Prod.ext (by funext T T' φ; simp [smul_sub])
-    (funext fun T ↦ by simp))
+  toFun c :=
+    (d1 F c.1, fun T T' φ ↦ c.2 T' - p1 F φ (c.2 T) - D R _ (c.1 T T' φ), fun T ↦ dOne R _ (c.2 T))
+  map_add' c c' :=
+    Prod.ext (map_add _ _ _) (Prod.ext (by funext T T' φ; simp; abel) (funext fun T ↦ by simp))
+  map_smul' r c :=
+    Prod.ext (map_smul _ _ _)
+      (Prod.ext (by funext T T' φ; simp [smul_sub]) (funext fun T ↦ by simp))
 
 def dTot2 : Tot2 F →ₗ[R] Tot3 F where
-  toFun c := (fun T T' T'' T''' φ ψ χ ↦ c.1 T' T'' T''' ψ χ - c.1 T T'' T''' (φ ≫ ψ) χ +
-      c.1 T T' T''' φ (ψ ≫ χ) - mp F χ (c.1 T T' T'' φ ψ),
-    fun T T' T'' φ ψ ↦ p1 F ψ (c.2.1 T T' φ) - c.2.1 T T'' (φ ≫ ψ) + c.2.1 T' T'' ψ +
-      D R _ (c.1 T T' T'' φ ψ),
+  toFun c := (
+    fun T T' T'' T''' φ ψ χ ↦
+      c.1 T' T'' T''' ψ χ - c.1 T T'' T''' (φ ≫ ψ) χ + c.1 T T' T''' φ (ψ ≫ χ)
+        - mp F χ (c.1 T T' T'' φ ψ),
+    fun T T' T'' φ ψ ↦
+      p1 F ψ (c.2.1 T T' φ) - c.2.1 T T'' (φ ≫ ψ) + c.2.1 T' T'' ψ + D R _ (c.1 T T' T'' φ ψ),
     fun T T' φ ↦ c.2.2 T' - pOm F 2 φ (c.2.2 T) - dOne R _ (c.2.1 T T' φ),
-    fun T ↦ dTwo R _ (c.2.2 T))
-  map_add' c c' := Prod.ext (by funext T T' T'' T''' φ ψ χ; simp; abel)
-    (Prod.ext (by funext T T' T'' φ ψ; simp; abel) (Prod.ext (by funext T T' φ; simp; abel)
-    (funext fun T ↦ by simp)))
-  map_smul' r c := Prod.ext (by funext T T' T'' T''' φ ψ χ; simp [smul_sub])
-    (Prod.ext (by funext T T' T'' φ ψ; simp [smul_sub]) (Prod.ext (by funext T T' φ; simp [smul_sub])
-    (funext fun T ↦ by simp)))
+    fun T ↦ dTwo R _ (c.2.2 T)
+  )
+  map_add' c c' :=
+    Prod.ext (by funext T T' T'' T''' φ ψ χ; simp; abel)
+      (Prod.ext (by funext T T' T'' φ ψ; simp; abel)
+        (Prod.ext (by funext T T' φ; simp; abel) (funext fun T ↦ by simp)))
+  map_smul' r c :=
+    Prod.ext (by funext T T' T'' T''' φ ψ χ; simp [smul_sub])
+      (Prod.ext (by funext T T' T'' φ ψ; simp [smul_sub])
+        (Prod.ext (by funext T T' φ; simp [smul_sub]) (funext fun T ↦ by simp)))
 
 section
 variable {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'')
@@ -138,30 +149,33 @@ theorem dTot0_f (g : Tot0 F) : (dTot0 F g).1 T T' φ = g T' - mp F φ (g T) := r
 
 theorem dTot0_ω (g : Tot0 F) (T : C) : (dTot0 F g).2 T = D R _ (g T) := rfl
 
-theorem cechDeRhamTotalDifferentialOne_functionPart (c : Tot1 F) :
-    (dTot1 F c).1 T T' T'' φ ψ = mp F ψ (c.1 T T' φ) - c.1 T T'' (φ ≫ ψ) + c.1 T' T'' ψ := rfl
+theorem cechDeRhamTotalDifferentialOne_functionPart (c : Tot1 F)
+    : (dTot1 F c).1 T T' T'' φ ψ = mp F ψ (c.1 T T' φ) - c.1 T T'' (φ ≫ ψ) + c.1 T' T'' ψ :=
+  rfl
 
-theorem dTot1_a (c : Tot1 F) :
-    (dTot1 F c).2.1 T T' φ = c.2 T' - p1 F φ (c.2 T) - D R _ (c.1 T T' φ) := rfl
+theorem dTot1_a (c : Tot1 F)
+    : (dTot1 F c).2.1 T T' φ = c.2 T' - p1 F φ (c.2 T) - D R _ (c.1 T T' φ) :=
+  rfl
 
 theorem dTot1_η (c : Tot1 F) (T : C) : (dTot1 F c).2.2 T = dOne R _ (c.2 T) := rfl
 
 end
 
-
 variable {F} in
-theorem Tot1.ext {c c' : Tot1 F} (h1 : ∀ T T' φ, c.1 T T' φ = c'.1 T T' φ) (h2 : ∀ T, c.2 T = c'.2 T) :
-    c = c' := by
+theorem Tot1.ext
+    {c c' : Tot1 F} (h1 : ∀ T T' φ, c.1 T T' φ = c'.1 T T' φ) (h2 : ∀ T, c.2 T = c'.2 T)
+    : c = c' := by
   refine Prod.ext ?_ ?_
   · funext T T' φ
     exact h1 T T' φ
   · funext T
     exact h2 T
 
-
 variable {F} in
-theorem Tot2.ext {c c' : Tot2 F} (h1 : ∀ T T' T'' φ ψ, c.1 T T' T'' φ ψ = c'.1 T T' T'' φ ψ)
-    (h2 : ∀ T T' φ, c.2.1 T T' φ = c'.2.1 T T' φ) (h3 : ∀ T, c.2.2 T = c'.2.2 T) : c = c' := by
+theorem Tot2.ext
+    {c c' : Tot2 F} (h1 : ∀ T T' T'' φ ψ, c.1 T T' T'' φ ψ = c'.1 T T' T'' φ ψ)
+    (h2 : ∀ T T' φ, c.2.1 T T' φ = c'.2.1 T T' φ) (h3 : ∀ T, c.2.2 T = c'.2.2 T)
+    : c = c' := by
   refine Prod.ext ?_ (Prod.ext ?_ ?_)
   · funext T T' T'' φ ψ
     exact h1 T T' T'' φ ψ
@@ -176,14 +190,17 @@ def cechDeRhamTotalCocyclesTwo : Submodule R (Tot2 F) := LinearMap.ker (dTot2 F)
 
 variable {F}
 
-theorem mem_cechDeRhamTotalCocyclesOne_iff {c : Tot1 F} : c ∈ cechDeRhamTotalCocyclesOne F ↔ c.1 ∈ Z1 F ∧
-    (∀ ⦃T T' : C⦄ (φ : T ⟶ T'), c.2 T' = p1 F φ (c.2 T) + D R _ (c.1 T T' φ)) ∧
-    ∀ T, dOne R _ (c.2 T) = 0 := by
-  rw [cechDeRhamTotalCocyclesOne, LinearMap.mem_ker, commAlgFunctorCocyclesOne_eq_ker, LinearMap.mem_ker]
+theorem mem_cechDeRhamTotalCocyclesOne_iff {c : Tot1 F}
+    : c ∈ cechDeRhamTotalCocyclesOne F
+      ↔ c.1 ∈ Z1 F ∧ (∀ ⦃T T' : C⦄ (φ : T ⟶ T'), c.2 T' = p1 F φ (c.2 T) + D R _ (c.1 T T' φ))
+        ∧ ∀ T, dOne R _ (c.2 T) = 0 := by
+  rw [cechDeRhamTotalCocyclesOne, LinearMap.mem_ker, commAlgFunctorCocyclesOne_eq_ker,
+    LinearMap.mem_ker]
   constructor
   · intro h
     refine ⟨congrArg Prod.fst h, fun T T' φ ↦ ?_, fun T ↦ ?_⟩
-    · have e : (dTot1 F c).2.1 T T' φ = 0 := congrFun (congrFun (congrFun (congrArg (fun x ↦ x.2.1) h) T) T') φ
+    · have e : (dTot1 F c).2.1 T T' φ = 0 :=
+        congrFun (congrFun (congrFun (congrArg (fun x ↦ x.2.1) h) T) T') φ
       rw [dTot1_a, sub_sub, sub_eq_zero] at e
       exact e
     · have e : (dTot1 F c).2.2 T = 0 := congrFun (congrArg (fun x ↦ x.2.2) h) T
@@ -198,27 +215,40 @@ theorem mem_cechDeRhamTotalCocyclesOne_iff {c : Tot1 F} : c ∈ cechDeRhamTotalC
     · funext T
       exact h3 T
 
-theorem mem_cechDeRhamTotalCocyclesTwo_iff {c : Tot2 F} : c ∈ cechDeRhamTotalCocyclesTwo F ↔ c.1 ∈ Z2 F ∧
-    (∀ ⦃T T' T'' : C⦄ (φ : T ⟶ T') (ψ : T' ⟶ T''), c.2.1 T T'' (φ ≫ ψ) =
-      p1 F ψ (c.2.1 T T' φ) + c.2.1 T' T'' ψ + D R _ (c.1 T T' T'' φ ψ)) ∧
-    (∀ ⦃T T' : C⦄ (φ : T ⟶ T'), c.2.2 T' = pOm F 2 φ (c.2.2 T) + dOne R _ (c.2.1 T T' φ)) ∧
-    ∀ T, dTwo R _ (c.2.2 T) = 0 := by
+theorem mem_cechDeRhamTotalCocyclesTwo_iff {c : Tot2 F}
+    : c ∈ cechDeRhamTotalCocyclesTwo F
+      ↔ c.1 ∈ Z2 F
+        ∧ (∀ ⦃T T' T'' : C⦄ (φ : T ⟶ T') (ψ : T' ⟶ T''),
+          c.2.1 T T'' (φ ≫ ψ) = p1 F ψ (c.2.1 T T' φ) + c.2.1 T' T'' ψ + D R _ (c.1 T T' T'' φ ψ))
+        ∧ (∀ ⦃T T' : C⦄ (φ : T ⟶ T'), c.2.2 T' = pOm F 2 φ (c.2.2 T) + dOne R _ (c.2.1 T T' φ))
+        ∧ ∀ T, dTwo R _ (c.2.2 T) = 0 := by
   rw [cechDeRhamTotalCocyclesTwo, LinearMap.mem_ker]
   constructor
   · intro h
     refine ⟨?_, fun T T' T'' φ ψ ↦ ?_, fun T T' φ ↦ ?_, fun T ↦ ?_⟩
     · intro T T' T'' T''' φ ψ χ
-      have e : c.1 T' T'' T''' ψ χ - c.1 T T'' T''' (φ ≫ ψ) χ + c.1 T T' T''' φ (ψ ≫ χ) -
-          mp F χ (c.1 T T' T'' φ ψ) = 0 :=
-        congrFun (congrFun (congrFun (congrFun (congrFun (congrFun (congrFun
-          (congrArg Prod.fst h) T) T') T'') T''') φ) ψ) χ
+      have e
+          : c.1 T' T'' T''' ψ χ - c.1 T T'' T''' (φ ≫ ψ) χ + c.1 T T' T''' φ (ψ ≫ χ)
+              - mp F χ (c.1 T T' T'' φ ψ)
+            = 0 :=
+        congrFun
+          (congrFun
+            (congrFun
+              (congrFun (congrFun (congrFun (congrFun (congrArg Prod.fst h) T) T') T'') T''') φ)
+            ψ)
+          χ
       linear_combination -e
-    · have e : p1 F ψ (c.2.1 T T' φ) - c.2.1 T T'' (φ ≫ ψ) + c.2.1 T' T'' ψ +
-          D R _ (c.1 T T' T'' φ ψ) = 0 :=
-        congrFun (congrFun (congrFun (congrFun (congrFun (congrArg (fun x ↦ x.2.1) h) T) T') T'') φ) ψ
-      have e' : c.2.1 T T'' (φ ≫ ψ) - (p1 F ψ (c.2.1 T T' φ) + c.2.1 T' T'' ψ +
-          D R _ (c.1 T T' T'' φ ψ)) = -(p1 F ψ (c.2.1 T T' φ) - c.2.1 T T'' (φ ≫ ψ) + c.2.1 T' T'' ψ +
-          D R _ (c.1 T T' T'' φ ψ)) := by abel
+    · have e
+          : p1 F ψ (c.2.1 T T' φ) - c.2.1 T T'' (φ ≫ ψ) + c.2.1 T' T'' ψ + D R _ (c.1 T T' T'' φ ψ)
+            = 0 :=
+        congrFun (congrFun (congrFun (congrFun (congrFun (congrArg (fun x ↦ x.2.1) h) T) T') T'') φ)
+          ψ
+      have e'
+          : c.2.1 T T'' (φ ≫ ψ)
+              - (p1 F ψ (c.2.1 T T' φ) + c.2.1 T' T'' ψ + D R _ (c.1 T T' T'' φ ψ))
+            = -(p1 F ψ (c.2.1 T T' φ) - c.2.1 T T'' (φ ≫ ψ) + c.2.1 T' T'' ψ
+              + D R _ (c.1 T T' T'' φ ψ)) := by
+        abel
       rw [e, neg_zero, sub_eq_zero] at e'
       exact e'
     · have e : c.2.2 T' - pOm F 2 φ (c.2.2 T) - dOne R _ (c.2.1 T T' φ) = 0 :=
@@ -248,26 +278,39 @@ theorem mem_cechDeRhamTotalCocyclesTwo_iff {c : Tot2 F} : c ∈ cechDeRhamTotalC
 section
 variable {T T' T'' T''' : C}
 
-theorem cechDeRhamTotalCocyclesOne.comp (c : cechDeRhamTotalCocyclesOne F) (φ : T ⟶ T') (ψ : T' ⟶ T'') :
-    c.1.1 T T'' (φ ≫ ψ) = mp F ψ (c.1.1 T T' φ) + c.1.1 T' T'' ψ := Z1.comp ⟨c.1.1, (mem_cechDeRhamTotalCocyclesOne_iff.1 c.2).1⟩ φ ψ
+theorem cechDeRhamTotalCocyclesOne.comp
+    (c : cechDeRhamTotalCocyclesOne F) (φ : T ⟶ T') (ψ : T' ⟶ T'')
+    : c.1.1 T T'' (φ ≫ ψ) = mp F ψ (c.1.1 T T' φ) + c.1.1 T' T'' ψ :=
+  Z1.comp ⟨c.1.1, (mem_cechDeRhamTotalCocyclesOne_iff.1 c.2).1⟩ φ ψ
 
-theorem cechDeRhamTotalCocyclesOne.conn (c : cechDeRhamTotalCocyclesOne F) (φ : T ⟶ T') : c.1.2 T' = p1 F φ (c.1.2 T) + D R _ (c.1.1 T T' φ) := (mem_cechDeRhamTotalCocyclesOne_iff.1 c.2).2.1 φ
+theorem cechDeRhamTotalCocyclesOne.conn (c : cechDeRhamTotalCocyclesOne F) (φ : T ⟶ T')
+    : c.1.2 T' = p1 F φ (c.1.2 T) + D R _ (c.1.1 T T' φ) :=
+  (mem_cechDeRhamTotalCocyclesOne_iff.1 c.2).2.1 φ
 
-theorem cechDeRhamTotalCocyclesOne.closed (c : cechDeRhamTotalCocyclesOne F) (T : C) : dOne R _ (c.1.2 T) = 0 := (mem_cechDeRhamTotalCocyclesOne_iff.1 c.2).2.2 T
+theorem cechDeRhamTotalCocyclesOne.closed (c : cechDeRhamTotalCocyclesOne F) (T : C)
+    : dOne R _ (c.1.2 T) = 0 :=
+  (mem_cechDeRhamTotalCocyclesOne_iff.1 c.2).2.2 T
 
-theorem cechDeRhamTotalCocyclesTwo.comp (c : cechDeRhamTotalCocyclesTwo F) (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T''') :
-    mp F χ (c.1.1 T T' T'' φ ψ) + c.1.1 T T'' T''' (φ ≫ ψ) χ =
-      c.1.1 T T' T''' φ (ψ ≫ χ) + c.1.1 T' T'' T''' ψ χ := by
+theorem cechDeRhamTotalCocyclesTwo.comp
+    (c : cechDeRhamTotalCocyclesTwo F) (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T''')
+    : mp F χ (c.1.1 T T' T'' φ ψ) + c.1.1 T T'' T''' (φ ≫ ψ) χ
+      = c.1.1 T T' T''' φ (ψ ≫ χ) + c.1.1 T' T'' T''' ψ χ := by
   have h := (mem_cechDeRhamTotalCocyclesTwo_iff.1 c.2).1
   exact h φ ψ χ
 
-theorem cechDeRhamTotalCocyclesTwo.one (c : cechDeRhamTotalCocyclesTwo F) (φ : T ⟶ T') (ψ : T' ⟶ T'') : c.1.2.1 T T'' (φ ≫ ψ) =
-    p1 F ψ (c.1.2.1 T T' φ) + c.1.2.1 T' T'' ψ + D R _ (c.1.1 T T' T'' φ ψ) := (mem_cechDeRhamTotalCocyclesTwo_iff.1 c.2).2.1 φ ψ
+theorem cechDeRhamTotalCocyclesTwo.one
+    (c : cechDeRhamTotalCocyclesTwo F) (φ : T ⟶ T') (ψ : T' ⟶ T'')
+    : c.1.2.1 T T'' (φ ≫ ψ)
+      = p1 F ψ (c.1.2.1 T T' φ) + c.1.2.1 T' T'' ψ + D R _ (c.1.1 T T' T'' φ ψ) :=
+  (mem_cechDeRhamTotalCocyclesTwo_iff.1 c.2).2.1 φ ψ
 
-theorem cechDeRhamTotalCocyclesTwo.two (c : cechDeRhamTotalCocyclesTwo F) (φ : T ⟶ T') :
-    c.1.2.2 T' = pOm F 2 φ (c.1.2.2 T) + dOne R _ (c.1.2.1 T T' φ) := (mem_cechDeRhamTotalCocyclesTwo_iff.1 c.2).2.2.1 φ
+theorem cechDeRhamTotalCocyclesTwo.two (c : cechDeRhamTotalCocyclesTwo F) (φ : T ⟶ T')
+    : c.1.2.2 T' = pOm F 2 φ (c.1.2.2 T) + dOne R _ (c.1.2.1 T T' φ) :=
+  (mem_cechDeRhamTotalCocyclesTwo_iff.1 c.2).2.2.1 φ
 
-theorem cechDeRhamTotalCocyclesTwo.closed (c : cechDeRhamTotalCocyclesTwo F) (T : C) : dTwo R _ (c.1.2.2 T) = 0 := (mem_cechDeRhamTotalCocyclesTwo_iff.1 c.2).2.2.2 T
+theorem cechDeRhamTotalCocyclesTwo.closed (c : cechDeRhamTotalCocyclesTwo F) (T : C)
+    : dTwo R _ (c.1.2.2 T) = 0 :=
+  (mem_cechDeRhamTotalCocyclesTwo_iff.1 c.2).2.2.2 T
 
 end
 
@@ -283,17 +326,21 @@ theorem dTot0_mem (g : Tot0 F) : dTot0 F g ∈ cechDeRhamTotalCocyclesOne F := b
 
 theorem dTot1_mem (c : Tot1 F) : dTot1 F c ∈ cechDeRhamTotalCocyclesTwo F := by
   rw [mem_cechDeRhamTotalCocyclesTwo_iff]
-  refine ⟨differential_one_mem_scaled_lattice F c.1, fun T T' T'' φ ψ ↦ ?_, fun T T' φ ↦ ?_, fun T ↦ ?_⟩
-  · simp only [dTot1_a, cechDeRhamTotalDifferentialOne_functionPart, oneFormsMapOfFunctorMorphism_comp, map_sub, map_add (f := _), p1_D]
+  refine
+    ⟨differential_one_mem_scaled_lattice F c.1, fun T T' T'' φ ψ ↦ ?_, fun T T' φ ↦ ?_, fun T ↦ ?_⟩
+  · simp only [dTot1_a, cechDeRhamTotalDifferentialOne_functionPart,
+      oneFormsMapOfFunctorMorphism_comp, map_sub, map_add (f := _), p1_D]
     abel
   · simp only [dTot1_η, dTot1_a, map_sub, pOm_dOne, dOne_D]
     abel
   · rw [dTot1_η]
     exact dTwo_dOne _
 
-def Hyp1 : Type _ := cechDeRhamTotalCocyclesOne F ⧸ LinearMap.range ((dTot0 F).codRestrict (cechDeRhamTotalCocyclesOne F) (dTot0_mem F))
+def Hyp1 : Type _ :=
+  cechDeRhamTotalCocyclesOne F ⧸ LinearMap.range ((dTot0 F).codRestrict (cechDeRhamTotalCocyclesOne F) (dTot0_mem F))
 
-def Hyp2 : Type _ := cechDeRhamTotalCocyclesTwo F ⧸ LinearMap.range ((dTot1 F).codRestrict (cechDeRhamTotalCocyclesTwo F) (dTot1_mem F))
+def Hyp2 : Type _ :=
+  cechDeRhamTotalCocyclesTwo F ⧸ LinearMap.range ((dTot1 F).codRestrict (cechDeRhamTotalCocyclesTwo F) (dTot1_mem F))
 
 instance : AddCommGroup (Hyp1 F) := inferInstanceAs (AddCommGroup (_ ⧸ LinearMap.range _))
 
@@ -313,7 +360,8 @@ theorem Hyp2.mk_surjective : Function.Surjective (Hyp2.mk F) := Submodule.mkQ_su
 
 variable {F}
 
-theorem Hyp1.mk_eq_zero {c : cechDeRhamTotalCocyclesOne F} : Hyp1.mk F c = 0 ↔ ∃ g, dTot0 F g = c.1 := by
+theorem Hyp1.mk_eq_zero {c : cechDeRhamTotalCocyclesOne F}
+    : Hyp1.mk F c = 0 ↔ ∃ g, dTot0 F g = c.1 := by
   show (Submodule.Quotient.mk c : cechDeRhamTotalCocyclesOne F ⧸ _) = 0 ↔ _
   rw [Submodule.Quotient.mk_eq_zero, LinearMap.mem_range]
   constructor
@@ -322,7 +370,8 @@ theorem Hyp1.mk_eq_zero {c : cechDeRhamTotalCocyclesOne F} : Hyp1.mk F c = 0 ↔
   · rintro ⟨g, hg⟩
     exact ⟨g, Subtype.ext hg⟩
 
-theorem Hyp2.mk_eq_zero {c : cechDeRhamTotalCocyclesTwo F} : Hyp2.mk F c = 0 ↔ ∃ e, dTot1 F e = c.1 := by
+theorem Hyp2.mk_eq_zero {c : cechDeRhamTotalCocyclesTwo F}
+    : Hyp2.mk F c = 0 ↔ ∃ e, dTot1 F e = c.1 := by
   show (Submodule.Quotient.mk c : cechDeRhamTotalCocyclesTwo F ⧸ _) = 0 ↔ _
   rw [Submodule.Quotient.mk_eq_zero, LinearMap.mem_range]
   constructor
@@ -331,11 +380,13 @@ theorem Hyp2.mk_eq_zero {c : cechDeRhamTotalCocyclesTwo F} : Hyp2.mk F c = 0 ↔
   · rintro ⟨e, he⟩
     exact ⟨e, Subtype.ext he⟩
 
-theorem Hyp1.mk_eq_mk {c c' : cechDeRhamTotalCocyclesOne F} : Hyp1.mk F c = Hyp1.mk F c' ↔ ∃ g, dTot0 F g = c.1 - c'.1 := by
+theorem Hyp1.mk_eq_mk {c c' : cechDeRhamTotalCocyclesOne F}
+    : Hyp1.mk F c = Hyp1.mk F c' ↔ ∃ g, dTot0 F g = c.1 - c'.1 := by
   rw [← sub_eq_zero, ← map_sub, Hyp1.mk_eq_zero]
   rfl
 
-theorem Hyp2.mk_eq_mk {c c' : cechDeRhamTotalCocyclesTwo F} : Hyp2.mk F c = Hyp2.mk F c' ↔ ∃ e, dTot1 F e = c.1 - c'.1 := by
+theorem Hyp2.mk_eq_mk {c c' : cechDeRhamTotalCocyclesTwo F}
+    : Hyp2.mk F c = Hyp2.mk F c' ↔ ∃ e, dTot1 F e = c.1 - c'.1 := by
   rw [← sub_eq_zero, ← map_sub, Hyp2.mk_eq_zero]
   rfl
 
@@ -343,41 +394,50 @@ variable (F)
 
 def cupTot : Tot1 F →ₗ[R] Tot1 F →ₗ[R] Tot2 F :=
   LinearMap.mk₂ R
-    (fun a b ↦ (fun T T' T'' φ ψ ↦ mp F ψ (a.1 T T' φ) * b.1 T' T'' ψ,
+    (fun a b ↦ (
+      fun T T' T'' φ ψ ↦ mp F ψ (a.1 T T' φ) * b.1 T' T'' ψ,
       fun T T' φ ↦ a.1 T T' φ • b.2 T' - b.1 T T' φ • p1 F φ (a.2 T),
-      fun T ↦ wedge R _ (a.2 T) (b.2 T)))
-    (fun a a' b ↦ Tot2.ext (by intros; simp [add_mul]) (by intros; simp [add_smul]; abel)
-      (by intros; simp))
-    (fun r a b ↦ Tot2.ext (by intros; simp) (by intros; simp [smul_sub, smul_comm r])
-      (by intros; simp [wedge_smul_left]))
-    (fun a b b' ↦ Tot2.ext (by intros; simp [mul_add]) (by intros; simp [add_smul]; abel)
-      (by intros; simp))
-    (fun r a b ↦ Tot2.ext (by intros; simp) (by intros; simp [smul_sub, smul_comm r])
-      (by intros; simp [wedge_smul_right]))
+      fun T ↦ wedge R _ (a.2 T) (b.2 T)
+    ))
+    (fun a a' b ↦
+      Tot2.ext (by intros; simp [add_mul]) (by intros; simp [add_smul]; abel) (by intros; simp))
+    (fun r a b ↦
+      Tot2.ext (by intros; simp) (by intros; simp [smul_sub, smul_comm r])
+        (by intros; simp [wedge_smul_left]))
+    (fun a b b' ↦
+      Tot2.ext (by intros; simp [mul_add]) (by intros; simp [add_smul]; abel) (by intros; simp))
+    (fun r a b ↦
+      Tot2.ext (by intros; simp) (by intros; simp [smul_sub, smul_comm r])
+        (by intros; simp [wedge_smul_right]))
 
 section
 variable {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') (a b : Tot1 F)
 
 theorem cupTot_apply : (cupTot F a b).1 T T' T'' φ ψ = mp F ψ (a.1 T T' φ) * b.1 T' T'' ψ := rfl
 
-theorem cupTot_a : (cupTot F a b).2.1 T T' φ = a.1 T T' φ • b.2 T' - b.1 T T' φ • p1 F φ (a.2 T) := rfl
+theorem cupTot_a : (cupTot F a b).2.1 T T' φ = a.1 T T' φ • b.2 T' - b.1 T T' φ • p1 F φ (a.2 T) :=
+  rfl
 
 theorem cupTot_η (T : C) : (cupTot F a b).2.2 T = wedge R _ (a.2 T) (b.2 T) := rfl
 
 end
 
-theorem cupTot_mem (a b : cechDeRhamTotalCocyclesOne F) : cupTot F a.1 b.1 ∈ cechDeRhamTotalCocyclesTwo F := by
+theorem cupTot_mem (a b : cechDeRhamTotalCocyclesOne F)
+    : cupTot F a.1 b.1 ∈ cechDeRhamTotalCocyclesTwo F := by
   rw [mem_cechDeRhamTotalCocyclesTwo_iff]
   refine ⟨?_, fun T T' T'' φ ψ ↦ ?_, fun T T' φ ↦ ?_, fun T ↦ ?_⟩
   · intro T T' T'' T''' φ ψ χ
-    simp only [cupTot_apply, cechDeRhamTotalCocyclesOne.comp a, cechDeRhamTotalCocyclesOne.comp b, map_mul, map_add (f := _), mp_comp]
+    simp only [cupTot_apply, cechDeRhamTotalCocyclesOne.comp a, cechDeRhamTotalCocyclesOne.comp b,
+      map_mul, map_add (f := _), mp_comp]
     ring
   · simp only [cupTot_a, cupTot_apply]
-    rw [cechDeRhamTotalCocyclesOne.comp a φ ψ, cechDeRhamTotalCocyclesOne.comp b φ ψ, cechDeRhamTotalCocyclesOne.conn b ψ, cechDeRhamTotalCocyclesOne.conn a φ]
-    simp only [map_add (f := _), map_sub, oneFormsMapOfFunctorMorphism_smul, oneFormsMapOfFunctorMorphism_comp, p1_D, Derivation.leibniz]
+    rw [cechDeRhamTotalCocyclesOne.comp a φ ψ, cechDeRhamTotalCocyclesOne.comp b φ ψ,
+      cechDeRhamTotalCocyclesOne.conn b ψ, cechDeRhamTotalCocyclesOne.conn a φ]
+    simp only [map_add (f := _), map_sub, oneFormsMapOfFunctorMorphism_smul,
+      oneFormsMapOfFunctorMorphism_comp, p1_D, Derivation.leibniz]
     module
-  · simp only [cupTot_η, cupTot_a, map_sub, dOne_smul, cechDeRhamTotalCocyclesOne.closed b, ← pOm_dOne, cechDeRhamTotalCocyclesOne.closed a,
-      map_zero, smul_zero, add_zero, pOm_wedge]
+  · simp only [cupTot_η, cupTot_a, map_sub, dOne_smul, cechDeRhamTotalCocyclesOne.closed b,
+      ← pOm_dOne, cechDeRhamTotalCocyclesOne.closed a, map_zero, smul_zero, add_zero, pOm_wedge]
     rw [cechDeRhamTotalCocyclesOne.conn a φ, cechDeRhamTotalCocyclesOne.conn b φ]
     simp only [map_add (f := _), LinearMap.add_apply]
     rw [wedge_swap (D R _ (b.1.1 T T' φ)) (p1 F φ (a.1.2 T))]
@@ -385,10 +445,14 @@ theorem cupTot_mem (a b : cechDeRhamTotalCocyclesOne F) : cupTot F a.1 b.1 ∈ c
   · rw [cupTot_η]
     exact dTwo_wedge (cechDeRhamTotalCocyclesOne.closed a T) (cechDeRhamTotalCocyclesOne.closed b T)
 
-def cupZZ : cechDeRhamTotalCocyclesOne F →ₗ[R] cechDeRhamTotalCocyclesOne F →ₗ[R] cechDeRhamTotalCocyclesTwo F :=
-  LinearMap.mk₂ R (fun a b ↦ ⟨cupTot F a.1 b.1, cupTot_mem F a b⟩)
-    (fun a a' b ↦ Subtype.ext (by simp)) (fun r a b ↦ Subtype.ext (by simp))
-    (fun a b b' ↦ Subtype.ext (by simp)) (fun r a b ↦ Subtype.ext (by simp))
+def cupZZ
+    : cechDeRhamTotalCocyclesOne F →ₗ[R] cechDeRhamTotalCocyclesOne F →ₗ[R] cechDeRhamTotalCocyclesTwo F :=
+  LinearMap.mk₂ R
+    (fun a b ↦ ⟨cupTot F a.1 b.1, cupTot_mem F a b⟩)
+    (fun a a' b ↦ Subtype.ext (by simp))
+    (fun r a b ↦ Subtype.ext (by simp))
+    (fun a b b' ↦ Subtype.ext (by simp))
+    (fun r a b ↦ Subtype.ext (by simp))
 
 theorem coe_cupZZ (a b : cechDeRhamTotalCocyclesOne F) : (cupZZ F a b).1 = cupTot F a.1 b.1 := rfl
 
@@ -397,10 +461,12 @@ def cupHyp : Hyp1 F →ₗ[R] Hyp1 F →ₗ[R] Hyp2 F :=
     (by
       rintro _ ⟨g, rfl⟩
       ext b
-      refine Hyp2.mk_eq_zero.2 ⟨(fun T T' φ ↦ mp F φ (g T) * b.1.1 T T' φ, fun T ↦ g T • b.1.2 T), ?_⟩
+      refine Hyp2.mk_eq_zero.2
+        ⟨(fun T T' φ ↦ mp F φ (g T) * b.1.1 T T' φ, fun T ↦ g T • b.1.2 T), ?_⟩
       refine Tot2.ext (fun T T' T'' φ ψ ↦ ?_) (fun T T' φ ↦ ?_) fun T ↦ ?_
-      · simp only [cechDeRhamTotalDifferentialOne_functionPart, coe_cupZZ, cupTot_apply, LinearMap.codRestrict_apply, dTot0_f, cechDeRhamTotalCocyclesOne.comp b,
-          map_mul, map_sub, mp_comp]
+      · simp only [cechDeRhamTotalDifferentialOne_functionPart, coe_cupZZ, cupTot_apply,
+          LinearMap.codRestrict_apply, dTot0_f, cechDeRhamTotalCocyclesOne.comp b, map_mul, map_sub,
+          mp_comp]
         ring
       · simp only [dTot1_a, coe_cupZZ, cupTot_a, LinearMap.codRestrict_apply, dTot0_f, dTot0_ω,
           oneFormsMapOfFunctorMorphism_smul, p1_D, Derivation.leibniz]
@@ -413,8 +479,8 @@ def cupHyp : Hyp1 F →ₗ[R] Hyp1 F →ₗ[R] Hyp2 F :=
       ext a
       refine Hyp2.mk_eq_zero.2 ⟨(fun T T' φ ↦ -(a.1.1 T T' φ * g T'), fun T ↦ -(g T • a.1.2 T)), ?_⟩
       refine Tot2.ext (fun T T' T'' φ ψ ↦ ?_) (fun T T' φ ↦ ?_) fun T ↦ ?_
-      · simp only [cechDeRhamTotalDifferentialOne_functionPart, coe_cupZZ, cupTot_apply, LinearMap.codRestrict_apply, dTot0_f, cechDeRhamTotalCocyclesOne.comp a,
-          map_mul, map_neg]
+      · simp only [cechDeRhamTotalDifferentialOne_functionPart, coe_cupZZ, cupTot_apply,
+          LinearMap.codRestrict_apply, dTot0_f, cechDeRhamTotalCocyclesOne.comp a, map_mul, map_neg]
         ring
       · simp only [dTot1_a, coe_cupZZ, cupTot_a, LinearMap.codRestrict_apply, dTot0_f, dTot0_ω,
           oneFormsMapOfFunctorMorphism_smul, map_neg, Derivation.leibniz]
@@ -424,7 +490,9 @@ def cupHyp : Hyp1 F →ₗ[R] Hyp1 F →ₗ[R] Hyp2 F :=
           map_neg, cechDeRhamTotalCocyclesOne.closed a, smul_zero, add_zero]
         exact (wedge_swap _ _).symm)
 
-theorem cupHyp_mk (a b : cechDeRhamTotalCocyclesOne F) : cupHyp F (Hyp1.mk F a) (Hyp1.mk F b) = Hyp2.mk F (cupZZ F a b) := rfl
+theorem cupHyp_mk (a b : cechDeRhamTotalCocyclesOne F)
+    : cupHyp F (Hyp1.mk F a) (Hyp1.mk F b) = Hyp2.mk F (cupZZ F a b) :=
+  rfl
 
 def cechDeRhamTotalCocyclesOne.fn : cechDeRhamTotalCocyclesOne F →ₗ[R] Z1 F where
   toFun c := ⟨c.1.1, (mem_cechDeRhamTotalCocyclesOne_iff.1 c.2).1⟩
@@ -434,7 +502,9 @@ def cechDeRhamTotalCocyclesOne.fn : cechDeRhamTotalCocyclesOne F →ₗ[R] Z1 F 
 def toO : Hyp1 F →ₗ[R] H1 F :=
   Submodule.mapQ _ _ (cechDeRhamTotalCocyclesOne.fn F) (by rintro _ ⟨g, rfl⟩; exact ⟨g, rfl⟩)
 
-theorem toO_mk (c : cechDeRhamTotalCocyclesOne F) : toO F (Hyp1.mk F c) = H1.mk F (cechDeRhamTotalCocyclesOne.fn F c) := rfl
+theorem toO_mk (c : cechDeRhamTotalCocyclesOne F)
+    : toO F (Hyp1.mk F c) = H1.mk F (cechDeRhamTotalCocyclesOne.fn F c) :=
+  rfl
 
 def Fil1 : Submodule R (Hyp1 F) := LinearMap.ker (toO F)
 
@@ -451,7 +521,10 @@ def Closed1 : Submodule R (Glob1 F) where
   smul_mem' r a ha T := by simp [ha T]
 
 def formZZ : Closed1 F →ₗ[R] cechDeRhamTotalCocyclesOne F where
-  toFun ω := ⟨(0, ω.1.1), mem_cechDeRhamTotalCocyclesOne_iff.2 ⟨zero_mem _, fun T T' φ ↦ by simpa using ω.1.2 φ, ω.2⟩⟩
+  toFun ω := ⟨
+    (0, ω.1.1),
+    mem_cechDeRhamTotalCocyclesOne_iff.2 ⟨zero_mem _, fun T T' φ ↦ by simpa using ω.1.2 φ, ω.2⟩
+  ⟩
   map_add' a b := Subtype.ext (Prod.ext (add_zero _).symm rfl)
   map_smul' r a := Subtype.ext (Prod.ext (smul_zero _).symm rfl)
 
@@ -470,13 +543,19 @@ theorem Fil1_eq_range : Fil1 F = LinearMap.range (ofForm F) := by
       show c.1.1 - d0 F g = 0
       rw [hg', sub_self]
     have hm := mem_cechDeRhamTotalCocyclesOne_iff.1 c'.2
-    let ω : Closed1 F := ⟨⟨c'.1.2, by
-      intro T T' φ
-      have e := hm.2.1 φ
-      rw [h1] at e
-      simpa using e⟩, by
-      intro T
-      exact hm.2.2 T⟩
+    let ω : Closed1 F := ⟨
+      ⟨
+        c'.1.2,
+        by
+          intro T T' φ
+          have e := hm.2.1 φ
+          rw [h1] at e
+          simpa using e
+      ⟩,
+      by
+        intro T
+        exact hm.2.2 T
+    ⟩
     refine ⟨ω, ?_⟩
     show Hyp1.mk F (formZZ F ω) = Hyp1.mk F c
     have hω : formZZ F ω = c' := Subtype.ext (Prod.ext h1.symm rfl)
@@ -493,16 +572,18 @@ theorem Fil1_eq_range : Fil1 F = LinearMap.range (ofForm F) := by
     rw [map_zero]
     rfl
 
-
 variable {F} in
-theorem ofForm_eq_zero {ω : Closed1 F} : ofForm F ω = 0 ↔
-    ∃ g : C0 F, (∀ ⦃T T' : C⦄ (φ : T ⟶ T'), g T' = mp F φ (g T)) ∧ ∀ T, D R _ (g T) = ω.1.1 T := by
+theorem ofForm_eq_zero {ω : Closed1 F}
+    : ofForm F ω = 0
+      ↔ ∃ g : C0 F,
+        (∀ ⦃T T' : C⦄ (φ : T ⟶ T'), g T' = mp F φ (g T)) ∧ ∀ T, D R _ (g T) = ω.1.1 T := by
   show Hyp1.mk F (formZZ F ω) = 0 ↔ _
   rw [Hyp1.mk_eq_zero]
   constructor
   · rintro ⟨g, hg⟩
     refine ⟨g, fun T T' φ ↦ ?_, fun T ↦ ?_⟩
-    · have e : (dTot0 F g).1 T T' φ = 0 := congrFun (congrFun (congrFun (congrArg Prod.fst hg) T) T') φ
+    · have e : (dTot0 F g).1 T T' φ = 0 :=
+        congrFun (congrFun (congrFun (congrArg Prod.fst hg) T) T') φ
       rw [dTot0_f] at e
       exact sub_eq_zero.1 e
     · have e : (dTot0 F g).2 T = ω.1.1 T := congrFun (congrArg Prod.snd hg) T

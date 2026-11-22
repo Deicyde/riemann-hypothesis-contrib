@@ -9,21 +9,23 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.BesselShellMomentBounds Formalism.HermitianLatticeCounting.ExpansionTerms Formalism.L2.SG.RowsConc
-  Formalism.L2.SG.Pf.MainEqCut Formalism.L2.SG.Pf.MainEqSteps
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.BesselShellMomentBounds Formalism.HermitianLatticeCounting.ExpansionTerms
+  Formalism.L2.SG.RowsConc Formalism.L2.SG.Pf.MainEqCut Formalism.L2.SG.Pf.MainEqSteps
 
 namespace Formalism.L2.SG.NGCut.LeadingMinorIntegrality.Gen
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-open Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt Formalism.L2.SG.NGData Formalism.L2.SG.NGCut in
+open Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full
+  Formalism.FourierDecayAlt Formalism.L2.SG.NGData Formalism.L2.SG.NGCut in
 theorem stepNormOneG_of
     (hOV : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
       Formalism.L2.SG.TermOp.KExpCut.OOVanish (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u') (X := X))
     (hAt : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word)
-      (t : Formalism.L2.SG.TermDef.Term D u u' (X.Fu u) (Y.what₂ u)), t.G ≠ 0 → t.relevant → ∃ w, t.atPt w) :
-    StepNormOneG := by
+        (t : Formalism.L2.SG.TermDef.Term D u u' (X.Fu u) (Y.what₂ u)),
+      t.G ≠ 0 → t.relevant → ∃ w, t.atPt w)
+    : StepNormOneG := by
   intro Cg cb Cw cT CT C0
   refine ⟨0, 0, fun C' Cl _ _ D large₂ X Y u _ νL νB ng γ hγ => ?_⟩
   obtain ⟨c, ν, t, ht, hv, -, hpt, -⟩ := hγ
@@ -56,8 +58,13 @@ theorem stepNormOneG_of
   rw [← hpt]
   show 1 ≤ NGPt D.host.rdE ((Tu D u : ℕ) * (Tu D u : ℕ)) (toPts (Formalism.L2.SG.PairVal.ptOf t.toTerm)) ∧
     1 ≤ NDPt D.host.rdE (toPts (Formalism.L2.SG.PairVal.ptOf t.toTerm))
-  have hlead : ∀ q, q ≤ D.R.rS + 1 → ∃ o ∈ dI D ^ (q * (2 * D.R.rS + 1 - q)),
-      (o : D.host.E) = leadingPrincipalMinor (ptMat (Formalism.L2.SG.PairVal.ptOf t.toTerm)) q := fun q hq => by
+  have hlead
+      : ∀ q,
+        q ≤ D.R.rS + 1
+          → ∃ o ∈ dI D ^ (q * (2 * D.R.rS + 1 - q)),
+            (o : D.host.E)
+              = leadingPrincipalMinor (ptMat (Formalism.L2.SG.PairVal.ptOf t.toTerm))
+                q := fun q hq => by
     obtain ⟨o, ho, e⟩ := lead_mem hun (lf D (X.Fu u)) F' hz hX hz' hX' q hq
     exact ⟨o, ho, e.trans (lead_cell _ _ hcell q).symm⟩
   constructor
@@ -66,22 +73,34 @@ theorem stepNormOneG_of
     obtain ⟨o0, ho0, e0⟩ := hlead D.R.rS (Nat.le_succ _)
     obtain ⟨o1', ho1', e1'⟩ := star_mem_pow _ o1 ho1
     obtain ⟨o0', ho0', e0'⟩ := star_mem_pow _ o0 ho0
-    have ex1 : (D.R.rS + 1) * (2 * D.R.rS + 1 - (D.R.rS + 1)) + (D.R.rS + 1) * (2 * D.R.rS + 1 - (D.R.rS + 1)) =
-        2 * D.R.rS * (D.R.rS + 1) := by
+    have ex1
+        : (D.R.rS + 1) * (2 * D.R.rS + 1 - (D.R.rS + 1))
+            + (D.R.rS + 1) * (2 * D.R.rS + 1 - (D.R.rS + 1))
+          = 2 * D.R.rS * (D.R.rS + 1) := by
       rw [show 2 * D.R.rS + 1 - (D.R.rS + 1) = D.R.rS by omega]; ring
-    have ex0 : D.R.rS * (2 * D.R.rS + 1 - D.R.rS) + D.R.rS * (2 * D.R.rS + 1 - D.R.rS) =
-        2 * D.R.rS * (D.R.rS + 1) := by
+    have ex0
+        : D.R.rS * (2 * D.R.rS + 1 - D.R.rS) + D.R.rS * (2 * D.R.rS + 1 - D.R.rS)
+          = 2 * D.R.rS * (D.R.rS + 1) := by
       rw [show 2 * D.R.rS + 1 - D.R.rS = D.R.rS + 1 by omega]; ring
     have hm1 : o1 * o1' ∈ dI D ^ (2 * D.R.rS * (D.R.rS + 1)) := by
       rw [← ex1, pow_add]; exact Ideal.mul_mem_mul ho1 ho1'
     have hm0 : o0 * o0' ∈ dI D ^ (2 * D.R.rS * (D.R.rS + 1)) := by
       rw [← ex0, pow_add]; exact Ideal.mul_mem_mul ho0 ho0'
-    refine one_le_NGPt _ _ (o1 * o1' - (((Tu D u : ℕ) * (Tu D u : ℕ) : ℕ) : 𝓞 D.host.E) * (o0 * o0'))
+    refine one_le_NGPt _ _
+      (o1 * o1' - (((Tu D u : ℕ) * (Tu D u : ℕ) : ℕ) : 𝓞 D.host.E) * (o0 * o0'))
       (Ideal.sub_mem _ hm1 (Ideal.mul_mem_left _ _ hm0)) ?_ (by rw [hGeq]; exact hGv)
-    have e1a : algebraMap (𝓞 D.host.E) D.host.E o1 = leadingPrincipalMinor (ptMat (Formalism.L2.SG.PairVal.ptOf t.toTerm)) (D.R.rS + 1) := e1
-    have e0a : algebraMap (𝓞 D.host.E) D.host.E o0 = leadingPrincipalMinor (ptMat (Formalism.L2.SG.PairVal.ptOf t.toTerm)) D.R.rS := e0
-    have e1b : algebraMap (𝓞 D.host.E) D.host.E o1' = star (algebraMap (𝓞 D.host.E) D.host.E o1) := e1'
-    have e0b : algebraMap (𝓞 D.host.E) D.host.E o0' = star (algebraMap (𝓞 D.host.E) D.host.E o0) := e0'
+    have e1a
+        : algebraMap (𝓞 D.host.E) D.host.E o1
+          = leadingPrincipalMinor (ptMat (Formalism.L2.SG.PairVal.ptOf t.toTerm)) (D.R.rS + 1) :=
+      e1
+    have e0a
+        : algebraMap (𝓞 D.host.E) D.host.E o0
+          = leadingPrincipalMinor (ptMat (Formalism.L2.SG.PairVal.ptOf t.toTerm)) D.R.rS :=
+      e0
+    have e1b : algebraMap (𝓞 D.host.E) D.host.E o1' = star (algebraMap (𝓞 D.host.E) D.host.E o1) :=
+      e1'
+    have e0b : algebraMap (𝓞 D.host.E) D.host.E o0' = star (algebraMap (𝓞 D.host.E) D.host.E o0) :=
+      e0'
     show algebraMap (𝓞 D.host.E) D.host.E _ = _
     unfold GPt
     rw [dlast_eq, dr_eq, map_sub, map_mul, map_mul, map_mul, map_natCast, e1b, e0b, e1a, e0a]
@@ -92,13 +111,15 @@ theorem stepNormOneG_of
     have hE := PtPf.blockEndMinors_of_cell _ (PtPf.zhatOM_isIntegral _ _ hun hF hF') _ hcell
     exact ⟨o, ho, by rw [e, endMin_eq], (hE a).2⟩
 
-
 open Formalism.L2.SG.TermOp.Vanish in
-theorem stepNormOneG_of_leaves (hA : AvgCore) (hU : GinfUnimod) (hN : NLamNinf) (hC : ChiTrivialC) (hG : PsiInfChar)
+theorem stepNormOneG_of_leaves
+    (hA : AvgCore) (hU : GinfUnimod) (hN : NLamNinf) (hC : ChiTrivialC) (hG : PsiInfChar)
     (h1 : RClosedC) (h2 : RODiscreteC) (h3 : RCocompactC) (h4 : NonRelCharC)
-    (hAt : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (Y : Formalism.L2.SG.Full.Full X) (u u' : D.what₂.Word)
-      (t : Formalism.L2.SG.TermDef.Term D u u' (X.Fu u) (Y.what₂ u)), t.G ≠ 0 → t.relevant → ∃ w, t.atPt w) :
-    Formalism.L2.SG.Pf.MainEqSteps.StepNormOneG := by
+    (hAt
+      : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (Y : Formalism.L2.SG.Full.Full X)
+          (u u' : D.what₂.Word) (t : Formalism.L2.SG.TermDef.Term D u u' (X.Fu u) (Y.what₂ u)),
+        t.G ≠ 0 → t.relevant → ∃ w, t.atPt w)
+    : Formalism.L2.SG.Pf.MainEqSteps.StepNormOneG := by
   refine stepNormOneG_of ?_ hAt
   intro D X Y u u'
   unfold Formalism.L2.SG.TermOp.KExpCut.OOVanish

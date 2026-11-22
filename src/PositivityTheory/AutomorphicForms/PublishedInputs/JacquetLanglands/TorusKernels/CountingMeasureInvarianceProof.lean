@@ -10,40 +10,42 @@ open MeasureTheory
 
 namespace UpperTheory.Esk.CountingMeasureInvariance
 
-variable {G Ω X : Type} [Group G] [MeasurableSpace Ω] [DiscreteMeasurableSpace Ω] [Countable Ω]
+variable
+  {G Ω X : Type} [Group G] [MeasurableSpace Ω] [DiscreteMeasurableSpace Ω] [Countable Ω]
   [MeasurableSpace X] [MulAction G Ω] [MulAction G X]
 
 theorem meas_of_left {f : Ω × X → ℝ} (hf : ∀ ω, Measurable fun x => f (ω, x)) : Measurable f := by
   intro s hs
-  have : f ⁻¹' s = ⋃ ω : Ω, ({ω} : Set Ω) ×ˢ ((fun x => f (ω, x)) ⁻¹' s) := by
-    ext ⟨ω, x⟩; simp
+  have : f ⁻¹' s = ⋃ ω : Ω, ({ω} : Set Ω) ×ˢ ((fun x => f (ω, x)) ⁻¹' s) := by ext ⟨ω, x⟩; simp
   rw [this]
   exact MeasurableSet.iUnion fun ω => (MeasurableSet.of_discrete (s := {ω})).prod (hf ω hs)
 
 omit [Countable Ω] in
-theorem count_pres (g : G) :
-    MeasurePreserving (fun ω : Ω => g • ω) Measure.count Measure.count := by
+theorem count_pres (g : G)
+    : MeasurePreserving (fun ω : Ω => g • ω) Measure.count Measure.count := by
   have hm : ∀ h : G, Measurable (fun ω : Ω => h • ω) := fun h => Measurable.of_discrete
   refine ⟨hm g, le_antisymm ((MulAction.injective g).map_count_le (hm g)) ?_⟩
-  calc (Measure.count : Measure Ω)
-      = (Measure.count.map (fun ω : Ω => g⁻¹ • ω)).map (fun ω => g • ω) := by
-        rw [Measure.map_map (hm g) (hm g⁻¹)]
-        simp [Function.comp_def]
+  calc
+    (Measure.count : Measure Ω)
+        = (Measure.count.map (fun ω : Ω => g⁻¹ • ω)).map (fun ω => g • ω) := by
+      rw [Measure.map_map (hm g) (hm g⁻¹)]
+      simp [Function.comp_def]
     _ ≤ Measure.count.map (fun ω : Ω => g • ω) :=
-        Measure.map_mono ((MulAction.injective g⁻¹).map_count_le (hm _)) (hm g)
+      Measure.map_mono ((MulAction.injective g⁻¹).map_count_le (hm _)) (hm g)
 
-theorem pres_prod (μ : Measure X) [SigmaFinite μ] (hμ : Pres G μ) :
-    Pres G ((Measure.count : Measure Ω).prod μ) := fun g =>
+theorem pres_prod (μ : Measure X) [SigmaFinite μ] (hμ : Pres G μ)
+    : Pres G ((Measure.count : Measure Ω).prod μ) := fun g =>
   (count_pres g).prod (hμ g)
-
 
 open Classical in
 def cut (R : Set Ω) (β : Ω → X → ℝ) (p : Ω × X) : ℝ := by
   classical
   exact if p.1 ∈ R then β p.1 p.2 else 0
 
-theorem cut_isCut (R : Set Ω) (hR : ∀ ω, ∃! r, r ∈ R ∧ r ∈ MulAction.orbit G ω) (β : Ω → X → ℝ)
-    (hβ : ∀ r ∈ R, IsCut (MulAction.stabilizer G r) (β r)) : IsCut G (cut R β) := by
+theorem cut_isCut
+    (R : Set Ω) (hR : ∀ ω, ∃! r, r ∈ R ∧ r ∈ MulAction.orbit G ω)
+    (β : Ω → X → ℝ) (hβ : ∀ r ∈ R, IsCut (MulAction.stabilizer G r) (β r))
+    : IsCut G (cut R β) := by
   refine ⟨?_, ?_, ?_⟩
   · refine meas_of_left fun ω => ?_
     by_cases h : ω ∈ R
@@ -81,18 +83,20 @@ theorem cut_isCut (R : Set Ω) (hR : ∀ ω, ∃! r, r ∈ R ∧ r ∈ MulAction
 end UpperTheory.Esk.CountingMeasureInvariance
 
 open UpperTheory.Esk.CountingMeasureInvariance in
-theorem UpperTheory.Esk.counting_measure_invariance_proof : UpperTheory.Esk.C1 → UpperTheory.Esk.C4 := by
+theorem UpperTheory.Esk.counting_measure_invariance_proof
+    : UpperTheory.Esk.C1 → UpperTheory.Esk.C4 := by
   intro hC1 G Ω X _ _ _ _ _ _ _ _ μ _ hμ b hb u hu hinv hint R hR β hβ
   have hP : Pres G ((Measure.count : Measure Ω).prod μ) := pres_prod μ hμ
   have hb' := cut_isCut R hR β hβ
-  obtain ⟨hI', hE⟩ := (hC1 G (Ω × X) ((Measure.count : Measure Ω).prod μ) hP b (cut R β) hb hb').2
-    u hu hinv hint
+  obtain ⟨hI', hE⟩ :=
+    (hC1 G (Ω × X) ((Measure.count : Measure Ω).prod μ) hP b (cut R β) hb hb').2 u hu hinv hint
   have hsec : ∀ ω, Integrable (fun x => cut R β (ω, x) • u (ω, x)) μ := by
     have := hI'.prod_right_ae
     rwa [Measure.ae_count_iff] at this
   have hF : Integrable (fun ω => ∫ x, cut R β (ω, x) • u (ω, x) ∂μ) Measure.count :=
     hI'.integral_prod_left
-  have hsum : HasSum (fun ω => ∫ x, cut R β (ω, x) • u (ω, x) ∂μ)
+  have hsum : HasSum
+      (fun ω => ∫ x, cut R β (ω, x) • u (ω, x) ∂μ)
       (∫ y, b y • u y ∂((Measure.count : Measure Ω).prod μ)) := by
     rw [hE, integral_prod _ hI', integral_countable hF]
     simp only [count_real_singleton, one_smul]

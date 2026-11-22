@@ -6,12 +6,27 @@ public import ReciprocityTheory.SemistableReduction.TorusL2CauchyInequality
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 namespace GlobalTheory.HSShortEnd
 
-theorem claimS_of_numbers : ∀ (T D δ d y e : ℕ) (n Λ β Λ₀ ΛD ΛT Hf H' dg : ℝ), 1 ≤ D → D + 1 ≤ T → 1 ≤ δ → 1 ≤ n → 1 ≤ Λ → 1 ≤ β → 1 ≤ Λ₀ → 1 ≤ ΛD → 1 ≤ ΛT → (T - 1).choose D * δ + y ≤ d → ∀ b : ℕ, (D + 1) * b = (T - 1).choose D * (T + D * (D + 1)) → b * ((D + 1) * δ) + e = (T - 1).choose D * δ * T + y * (T - D) → -(cst n Λ * ((D + 1) * δ)) ≤ Hf → -(cst n Λ * e) ≤ H' → b * Hf + H' - (((T - 1).choose D * δ : ℕ) * Real.log (Real.sqrt β ^ T * Λ₀) + y * Real.log (Real.sqrt β ^ (T - D) * ΛD) + (d - (T - 1).choose D * δ - y : ℕ) * Real.log ΛT) ≤ dg → 0 < d ∧ ClaimS T D n Λ β Λ₀ ΛD ΛT δ (Hf / (((D : ℝ) + 1) * δ)) d dg := by
+theorem claimS_of_numbers
+    : ∀ (T D δ d y e : ℕ) (n Λ β Λ₀ ΛD ΛT Hf H' dg : ℝ),
+      1 ≤ D → D + 1 ≤ T → 1 ≤ δ → 1 ≤ n → 1 ≤ Λ → 1 ≤ β → 1 ≤ Λ₀ → 1 ≤ ΛD → 1 ≤ ΛT
+        → (T - 1).choose D * δ + y ≤ d
+        → ∀ b : ℕ,
+          (D + 1) * b = (T - 1).choose D * (T + D * (D + 1))
+            → b * ((D + 1) * δ) + e = (T - 1).choose D * δ * T + y * (T - D)
+            → -(cst n Λ * ((D + 1) * δ)) ≤ Hf → -(cst n Λ * e) ≤ H'
+            → b * Hf + H'
+                - (((T - 1).choose D * δ : ℕ) * Real.log (Real.sqrt β ^ T * Λ₀)
+                  + y * Real.log (Real.sqrt β ^ (T - D) * ΛD)
+                  + (d - (T - 1).choose D * δ - y : ℕ) * Real.log ΛT)
+              ≤ dg
+            → 0 < d ∧ ClaimS T D n Λ β Λ₀ ΛD ΛT δ (Hf / (((D : ℝ) + 1) * δ)) d dg := by
   intro T D δ d y e n Λ β Λ₀ ΛD ΛT Hf H' dg hD hDT hδ hn hΛ hβ hΛ₀ hΛD hΛT hd b hb he hHf hH' hdg
   have hDT' : D ≤ T - 1 := by omega
   have hR : 1 ≤ (T - 1).choose D := Nat.choose_pos hDT'
@@ -41,7 +56,8 @@ theorem claimS_of_numbers : ∀ (T D δ d y e : ℕ) (n Λ β Λ₀ ΛD ΛT Hf H
     linarith
   have hsub : ((d - R * δ - y : ℕ) : ℝ) = d - R * δ - y := by
     rw [Nat.cast_sub (by omega), Nat.cast_sub (by omega)]
-    push_cast; ring
+    push_cast
+    ring
   have hsubTD : ((T - D : ℕ) : ℝ) = T - D := by rw [Nat.cast_sub hTD]
 
   have hβ0 : 0 < β := by linarith
@@ -49,7 +65,8 @@ theorem claimS_of_numbers : ∀ (T D δ d y e : ℕ) (n Λ β Λ₀ ΛD ΛT Hf H
   have hlb : Real.log (Real.sqrt β) = Real.log β / 2 := Real.log_sqrt hβ0.le
   have hL0 : Real.log (Real.sqrt β ^ T * Λ₀) = T * (Real.log β / 2) + Real.log Λ₀ := by
     rw [Real.log_mul (by positivity) (by positivity), Real.log_pow, hlb]
-  have hLD : Real.log (Real.sqrt β ^ (T - D) * ΛD) = ((T : ℝ) - D) * (Real.log β / 2) + Real.log ΛD := by
+  have hLD
+      : Real.log (Real.sqrt β ^ (T - D) * ΛD) = ((T : ℝ) - D) * (Real.log β / 2) + Real.log ΛD := by
     rw [Real.log_mul (by positivity) (by positivity), Real.log_pow, hlb, hsubTD]
   have lβ : 0 ≤ Real.log β := Real.log_nonneg hβ
   have lD : 0 ≤ Real.log ΛD := Real.log_nonneg hΛD
@@ -61,16 +78,19 @@ theorem claimS_of_numbers : ∀ (T D δ d y e : ℕ) (n Λ β Λ₀ ΛD ΛT Hf H
   set h := Hf / (((D : ℝ) + 1) * δ) with hhdef
   have hpos : (0 : ℝ) < ((D : ℝ) + 1) * δ := by positivity
   have hHfh : Hf = ((D : ℝ) + 1) * δ * h := by rw [hhdef]; field_simp
-  have hh : -c ≤ h := by
-    rw [hhdef, le_div_iff₀ hpos]; linarith
+  have hh : -c ≤ h := by rw [hhdef, le_div_iff₀ hpos]; linarith
   have hbHf : (b : ℝ) * Hf = R * δ * (T + D * (D + 1)) * h := by
     rw [hHfh]
-    calc (b : ℝ) * (((D : ℝ) + 1) * δ * h) = (((D : ℝ) + 1) * b) * δ * h := by ring
+    calc
+      (b : ℝ) * (((D : ℝ) + 1) * δ * h)
+        = (((D : ℝ) + 1) * b) * δ * h := by ring
       _ = _ := by rw [hbR]; ring
 
   have he2 : (e : ℝ) = y * ((T : ℝ) - D) - R * δ * (D * (D + 1)) := by
     have : (b : ℝ) * ((D + 1) * δ) = R * δ * (T + D * (D + 1)) := by
-      calc (b : ℝ) * ((D + 1) * δ) = (((D : ℝ) + 1) * b) * δ := by ring
+      calc
+        (b : ℝ) * ((D + 1) * δ)
+          = (((D : ℝ) + 1) * b) * δ := by ring
         _ = _ := by rw [hbR]; ring
     linarith
   have hy0 : (0 : ℝ) ≤ y := Nat.cast_nonneg y
@@ -88,8 +108,10 @@ theorem claimS_of_numbers : ∀ (T D δ d y e : ℕ) (n Λ β Λ₀ ΛD ΛT Hf H
     apply mul_nonneg (by linarith); positivity
   have hyD : 0 ≤ (y : ℝ) * D * Real.log β := by positivity
   have hyT : 0 ≤ (y : ℝ) * Real.log ΛT := by positivity
-  have key : (R : ℝ) * δ * (T * h - D * (D + 1) * c - Real.log Λ₀ - T / 2 * Real.log β) -
-      (d - R * δ) * (T * c + T / 2 * Real.log β + Real.log ΛD + Real.log ΛT) ≤ dg := by
+  have key
+      : (R : ℝ) * δ * (T * h - D * (D + 1) * c - Real.log Λ₀ - T / 2 * Real.log β)
+          - (d - R * δ) * (T * c + T / 2 * Real.log β + Real.log ΛD + Real.log ΛT)
+        ≤ dg := by
     linarith [hbHf, hce, hch, hX, hyD, hyT, hdg, hH']
   unfold ClaimS
   have hρ0 : (0 : ℝ) ≤ R * δ / d := div_nonneg hRδ0 hdR.le
@@ -97,13 +119,18 @@ theorem claimS_of_numbers : ∀ (T D δ d y e : ℕ) (n Λ β Λ₀ ΛD ΛT Hf H
   refine ⟨by push_cast; linarith, by push_cast; linarith, ?_⟩
   rw [le_div_iff₀ hdR]
   have hdne : (d : ℝ) ≠ 0 := hdR.ne'
-  have expand : ((1 - (1 - ((R : ℕ) : ℝ) * δ / d)) * (T * h - D * (D + 1) * c - Real.log Λ₀ - T / 2 * Real.log β) -
-      (1 - ((R : ℕ) : ℝ) * δ / d) * (T * c + T / 2 * Real.log β + Real.log ΛD + Real.log ΛT)) * d =
-      (R : ℝ) * δ * (T * h - D * (D + 1) * c - Real.log Λ₀ - T / 2 * Real.log β) -
-      (d - R * δ) * (T * c + T / 2 * Real.log β + Real.log ΛD + Real.log ΛT) := by
+  have expand
+      : ((1 - (1 - ((R : ℕ) : ℝ) * δ / d))
+              * (T * h - D * (D + 1) * c - Real.log Λ₀ - T / 2 * Real.log β)
+            - (1 - ((R : ℕ) : ℝ) * δ / d)
+              * (T * c + T / 2 * Real.log β + Real.log ΛD + Real.log ΛT))
+          * d
+        = (R : ℝ) * δ * (T * h - D * (D + 1) * c - Real.log Λ₀ - T / 2 * Real.log β)
+          - (d - R * δ) * (T * c + T / 2 * Real.log β + Real.log ΛD + Real.log ΛT) := by
     field_simp
     ring
   push_cast at expand ⊢
-  rw [expand]; exact key
+  rw [expand]
+  exact key
 
 end GlobalTheory.HSShortEnd

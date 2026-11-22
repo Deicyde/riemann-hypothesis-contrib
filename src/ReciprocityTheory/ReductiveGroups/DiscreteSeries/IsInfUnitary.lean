@@ -17,11 +17,10 @@ section Alg
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
 
 def IsGlRep (E : Fin n → Fin n → Module.End ℂ M) : Prop :=
-  ∀ a b c d : Fin n, E a b * E c d - E c d * E a b =
-    (if b = c then E a d else 0) - (if d = a then E c b else 0)
+  ∀ a b c d : Fin n,
+    E a b * E c d - E c d * E a b = (if b = c then E a d else 0) - (if d = a then E c b else 0)
 
-def casimir (E : Fin n → Fin n → Module.End ℂ M) : Module.End ℂ M :=
-  ∑ a, ∑ b, E a b * E b a
+def casimir (E : Fin n → Fin n → Module.End ℂ M) : Module.End ℂ M := ∑ a, ∑ b, E a b * E b a
 
 def casimirK (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) : Module.End ℂ M :=
   ∑ a, ∑ b ∈ univ.filter (fun b => ε b = ε a), E a b * E b a
@@ -29,7 +28,8 @@ def casimirK (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) : 
 def IsHWVec (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (v : M) : Prop :=
   (∀ a, E a a v = (μ a : ℂ) • v) ∧ ∀ a b, a < b → E a b v = 0
 
-def IsKHWVec (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (v : M) : Prop :=
+def IsKHWVec (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (v : M)
+    : Prop :=
   (∀ a, E a a v = (μ a : ℂ) • v) ∧ ∀ a b, a < b → ε a = ε b → E a b v = 0
 
 end Alg
@@ -56,12 +56,14 @@ def root (a b : Fin n) : Fin n → ℝ := Pi.single a 1 - Pi.single b 1
 def rho (n : ℕ) : Fin n → ℝ := fun a => ((n : ℝ) - 1) / 2 - (a : ℕ)
 
 def rhoC (ε : Fin n → Bool) : Fin n → ℝ := fun a =>
-  (((univ.filter fun b => a < b ∧ ε b = ε a).card : ℝ) -
-    ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℝ)) / 2
+  (((univ.filter fun b => a < b ∧ ε b = ε a).card : ℝ)
+      - ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℝ))
+    / 2
 
 def rhoN (ε : Fin n → Bool) : Fin n → ℝ := fun a =>
-  (((univ.filter fun b => a < b ∧ ε b ≠ ε a).card : ℝ) -
-    ((univ.filter fun b => b < a ∧ ε b ≠ ε a).card : ℝ)) / 2
+  (((univ.filter fun b => a < b ∧ ε b ≠ ε a).card : ℝ)
+      - ((univ.filter fun b => b < a ∧ ε b ≠ ε a).card : ℝ))
+    / 2
 
 def lowK (ε : Fin n → Bool) (lam : Fin n → ℝ) : Fin n → ℝ := lam + rhoN ε - rhoC ε
 
@@ -73,14 +75,16 @@ section KTypes
 
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
 
-def IsKStableSub (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (S : Submodule ℂ M) : Prop :=
+def IsKStableSub (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (S : Submodule ℂ M)
+    : Prop :=
   ∀ a b, ε a = ε b → ∀ v ∈ S, E a b v ∈ S
 
-def IsKIrrHW (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (Λ : Fin n → ℝ)
-    (S : Submodule ℂ M) : Prop :=
-  FiniteDimensional ℂ S ∧ IsKStableSub ε E S ∧
-    (∀ S' : Submodule ℂ M, S' ≤ S → IsKStableSub ε E S' → S' = ⊥ ∨ S' = S) ∧
-    ∃ w ∈ S, w ≠ 0 ∧ IsKHWVec ε E Λ w
+def IsKIrrHW
+    (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (Λ : Fin n → ℝ) (S : Submodule ℂ M)
+    : Prop :=
+  FiniteDimensional ℂ S ∧ IsKStableSub ε E S
+    ∧ (∀ S' : Submodule ℂ M, S' ≤ S → IsKStableSub ε E S' → S' = ⊥ ∨ S' = S)
+    ∧ ∃ w ∈ S, w ≠ 0 ∧ IsKHWVec ε E Λ w
 
 def genSub (E : Fin n → Fin n → Module.End ℂ M) (S : Submodule ℂ M) : Submodule ℂ M :=
   sInf {T | S ≤ T ∧ ∀ a b, ∀ v ∈ T, E a b v ∈ T}

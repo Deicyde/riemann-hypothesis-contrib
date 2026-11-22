@@ -18,8 +18,9 @@ end Chars
 
 section Step
 
-variable {G H S Sinf Ds Dt : Type*} [MeasurableSpace H]
-  [AddCommGroup Sinf] [Module ℂ Sinf] [AddCommGroup Ds] [Module ℂ Ds] [AddCommGroup Dt] [Module ℂ Dt]
+variable
+  {G H S Sinf Ds Dt : Type*} [MeasurableSpace H] [AddCommGroup Sinf] [Module ℂ Sinf]
+  [AddCommGroup Ds] [Module ℂ Ds] [AddCommGroup Dt] [Module ℂ Dt]
 
 end Step
 
@@ -31,7 +32,8 @@ end Adj
 
 section Chain
 
-variable {G : ℕ → Type*} {D : ℕ → Type*} [∀ j, AddCommGroup (D j)] [∀ j, Module ℂ (D j)]
+variable
+  {G : ℕ → Type*} {D : ℕ → Type*} [∀ j, AddCommGroup (D j)] [∀ j, Module ℂ (D j)]
   (CC : ∀ j, Submodule ℂ (D j →ₗ[ℂ] (G j → ℂ)))
 
 end Chain
@@ -44,8 +46,9 @@ end Rows
 
 section ThetaP
 
-variable {G' H' S' Sinf' TK Tau : Type*} [MeasurableSpace H']
-  [AddCommGroup Sinf'] [Module ℂ Sinf'] [AddCommGroup TK] [Module ℂ TK] [AddCommGroup Tau] [Module ℂ Tau]
+variable
+  {G' H' S' Sinf' TK Tau : Type*} [MeasurableSpace H'] [AddCommGroup Sinf'] [Module ℂ Sinf']
+  [AddCommGroup TK] [Module ℂ TK] [AddCommGroup Tau] [Module ℂ Tau]
 
 variable {A Amb : Type*} [AddCommGroup A] [Module ℂ A] [AddCommGroup Amb] [Module ℂ Amb]
 
@@ -55,8 +58,10 @@ section Kap
 
 variable {N : Type*} [AddCommGroup N] [Module ℂ N]
 
-def IsKap {Tup Sig : Type*} (m : ℕ) (dnup : Tup → N →ₗ[ℂ] N) (partE : Sig → Submodule ℂ N)
-    (lam : Tup → ℕ → Sig → ℝ) (κ : ℝ) : Prop :=
+def IsKap
+    {Tup Sig : Type*}
+    (m : ℕ) (dnup : Tup → N →ₗ[ℂ] N) (partE : Sig → Submodule ℂ N) (lam : Tup → ℕ → Sig → ℝ) (κ : ℝ)
+    : Prop :=
   ∀ μ σ, ∀ x ∈ partE σ, dnup μ x = ((κ * ∏ j ∈ Finset.Icc 1 m, lam μ j σ : ℝ) : ℂ) • x
 
 end Kap
@@ -75,16 +80,19 @@ end Statements
 
 section Kernels
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.IndefR.DatumF IsDedekindDomain NumberField
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.IndefR.DatumF
+  IsDedekindDomain NumberField
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
-  {Tau : Type} [Fintype Tau] (tauE : Tau → (E →+* ℂ)) (xi0 : E)
-
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {Tau : Type} [Fintype Tau]
+  (tauE : Tau → (E →+* ℂ)) (xi0 : E)
 
 variable (F) in
-def intAfF : Set (Af F) := {a | ∀ v : HeightOneSpectrum (𝓞 F), evalV F v a ∈ v.adicCompletionIntegers F}
-
+def intAfF : Set (Af F) :=
+  {a | ∀ v : HeightOneSpectrum (𝓞 F), evalV F v a ∈ v.adicCompletionIntegers F}
 
 variable (F E) in
 def intAEF : AddSubgroup (Af F ⊗[F] E) :=

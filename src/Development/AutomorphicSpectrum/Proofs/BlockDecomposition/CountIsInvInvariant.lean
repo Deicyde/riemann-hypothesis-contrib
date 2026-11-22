@@ -13,8 +13,10 @@ open scoped ENNReal
 
 namespace GlobalTheory.CompanionTheory.QuotNorm
 
-theorem count_isInvInvariant {G : Type*} [Group G] [MeasurableSpace G] [MeasurableInv G]
-    [MeasurableSingletonClass G] (H : Subgroup G) : (Measure.count : Measure H).IsInvInvariant := by
+theorem count_isInvInvariant
+    {G : Type*} [Group G] [MeasurableSpace G] [MeasurableInv G] [MeasurableSingletonClass G]
+    (H : Subgroup G)
+    : (Measure.count : Measure H).IsInvInvariant := by
   have hinv : MeasurableInv H := ⟨(measurable_subtype_coe.inv).subtype_mk⟩
   refine ⟨?_⟩
   ext s hs

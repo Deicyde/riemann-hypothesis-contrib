@@ -4,11 +4,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders GlobalTheory.BadCount Module
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders
+  GlobalTheory.BadCount Module
 
 namespace GlobalTheory.BadCount
 
-theorem embReg_of_isBaseChange : ∀ (K L Γ V W : Type) [Field K] [Field L] [Algebra K L] [Group Γ] [Finite Γ] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W] [Module L W] [IsScalarTower K L W] (f : V →ₗ[K] W), IsBaseChange L f → ∀ (ρ : Representation K Γ V) (ρ' : Representation L Γ W), (∀ g v, ρ' g (f v) = f (ρ g v)) → ∀ (H : Subgroup Γ) (n : ℕ), EmbReg ρ H n → EmbReg ρ' H n := by
+theorem embReg_of_isBaseChange
+    : ∀ (K L Γ V W : Type) [Field K] [Field L] [Algebra K L] [Group Γ] [Finite Γ] [AddCommGroup V]
+        [Module K V] [AddCommGroup W] [Module K W] [Module L W] [IsScalarTower K L W]
+        (f : V →ₗ[K] W),
+      IsBaseChange L f
+        → ∀ (ρ : Representation K Γ V) (ρ' : Representation L Γ W),
+          (∀ g v, ρ' g (f v) = f (ρ g v))
+            → ∀ (H : Subgroup Γ) (n : ℕ), EmbReg ρ H n → EmbReg ρ' H n := by
   intro K L Γ V W _ _ _ _ _ _ _ _ _ _ _ f hf ρ ρ' hρ H n hE
   obtain ⟨j, hj, hje⟩ := hE
   let eK : MonoidAlgebra K H ≃ₗ[K] (H →₀ K) := MonoidAlgebra.coeffLinearEquiv K
@@ -32,15 +40,17 @@ theorem embReg_of_isBaseChange : ∀ (K L Γ V W : Type) [Field K] [Field L] [Al
   let P : (Fin n → MonoidAlgebra L H) →ₗ[L] W := hφ.lift (f ∘ₗ p)
   have hPj : ∀ w, P (j' w) = w := by
     intro w
-    have : P ∘ₗ j' = LinearMap.id := hf.algHom_ext _ _ (fun v => by
-      rw [LinearMap.comp_apply, hj'f]
-      change hφ.lift (f ∘ₗ p) (φ (j v)) = f v
-      rw [hφ.lift_eq, LinearMap.comp_apply, ← LinearMap.comp_apply p j, hp, LinearMap.id_apply])
+    have : P ∘ₗ j' = LinearMap.id :=
+      hf.algHom_ext _ _ (fun v => by
+        rw [LinearMap.comp_apply, hj'f]
+        change hφ.lift (f ∘ₗ p) (φ (j v)) = f v
+        rw [hφ.lift_eq, LinearMap.comp_apply, ← LinearMap.comp_apply p j, hp, LinearMap.id_apply])
     exact LinearMap.congr_fun this w
   refine ⟨j', fun a b hab => by rw [← hPj a, ← hPj b, hab], ?_⟩
   intro h w i
-  have key : (LinearMap.proj i ∘ₗ j' ∘ₗ (ρ' h)) =
-      (LinearMap.mulLeft L (MonoidAlgebra.single h (1 : L)) ∘ₗ LinearMap.proj i ∘ₗ j') := by
+  have key
+      : (LinearMap.proj i ∘ₗ j' ∘ₗ (ρ' h))
+        = (LinearMap.mulLeft L (MonoidAlgebra.single h (1 : L)) ∘ₗ LinearMap.proj i ∘ₗ j') := by
     refine hf.algHom_ext _ _ (fun v => ?_)
     simp only [LinearMap.comp_apply, LinearMap.proj_apply, LinearMap.mulLeft_apply, hρ, hj'f]
     change φ0 (j (ρ h v) i) = MonoidAlgebra.single h 1 * φ0 (j v i)

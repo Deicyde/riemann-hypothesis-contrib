@@ -14,13 +14,16 @@ namespace GlobalTheory.DvrCriterion
 
 open Scheme.IdealSheafData TopologicalSpace
 
-theorem universallyClosed_of_finite_jointly_surjective {ι : Type} [Finite ι] {X Z : Scheme.{0}}
-    (A : ι → Scheme.{0}) (g : ∀ i, A i ⟶ X) (k : X ⟶ Z) (hcov : ∀ x : X, ∃ i, ∃ a, g i a = x)
-    (h : ∀ i, UniversallyClosed (g i ≫ k)) : UniversallyClosed k := by
+theorem universallyClosed_of_finite_jointly_surjective
+    {ι : Type} [Finite ι]
+    {X Z : Scheme.{0}} (A : ι → Scheme.{0}) (g : ∀ i, A i ⟶ X)
+    (k : X ⟶ Z)
+    (hcov : ∀ x : X, ∃ i, ∃ a, g i a = x) (h : ∀ i, UniversallyClosed (g i ≫ k))
+    : UniversallyClosed k := by
   constructor
   intro X' Y' i₁ i₂ f' H
-  have c := fun i ↦ (h i).universally_isClosedMap _ _ _
-    ((IsPullback.of_hasPullback i₁ (g i)).paste_horiz H)
+  have c := fun i ↦
+    (h i).universally_isClosedMap _ _ _ ((IsPullback.of_hasPullback i₁ (g i)).paste_horiz H)
   intro Zs hZ
   have e : f' '' Zs = ⋃ i, (pullback.fst i₁ (g i) ≫ f') '' (pullback.fst i₁ (g i) ⁻¹' Zs) := by
     apply le_antisymm
@@ -34,16 +37,19 @@ theorem universallyClosed_of_finite_jointly_surjective {ι : Type} [Finite ι] {
   rw [e]
   exact isClosed_iUnion_of_finite fun i ↦ c i _ (hZ.preimage (Scheme.Hom.continuous _))
 
-theorem universallyClosed_snd_of_lift {Y S : Scheme.{0}} (π : Y ⟶ S) [LocallyOfFiniteType π]
-    [QuasiCompact π] [IsSeparated π] (R : Type) [CommRing R] [IsNoetherianRing R] (u : Sp R ⟶ S)
+theorem universallyClosed_snd_of_lift
+    {Y S : Scheme.{0}} (π : Y ⟶ S) [LocallyOfFiniteType π] [QuasiCompact π] [IsSeparated π]
+    (R : Type) [CommRing R] [IsNoetherianRing R]
+    (u : Sp R ⟶ S)
     (H : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-      (x : Sp (FractionRing V) ⟶ Y) (y : Sp V ⟶ S), x ≫ π = Out.jK V ≫ y →
-        ∃ x' : Sp V ⟶ Y, Out.jK V ≫ x' = x ∧ x' ≫ π = y) :
-    UniversallyClosed (pullback.snd π u) := by
+        (x : Sp (FractionRing V) ⟶ Y) (y : Sp V ⟶ S),
+      x ≫ π = Out.jK V ≫ y → ∃ x' : Sp V ⟶ Y, Out.jK V ≫ x' = x ∧ x' ≫ π = y)
+    : UniversallyClosed (pullback.snd π u) := by
   classical
   set s := pullback.snd π u with hs
   have : CompactSpace (pullback π u : Scheme.{0}) := QuasiCompact.compactSpace_of_compactSpace s
-  have : IsLocallyNoetherian (pullback π u : Scheme.{0}) := LocallyOfFiniteType.isLocallyNoetherian s
+  have : IsLocallyNoetherian (pullback π u : Scheme.{0}) :=
+    LocallyOfFiniteType.isLocallyNoetherian s
   have : IsNoetherian (pullback π u : Scheme.{0}) := {}
   let C : irreducibleComponents (pullback π u : Scheme.{0}) → Closeds (pullback π u : Scheme.{0}) :=
     fun c ↦ ⟨c.1, isClosed_of_mem_irreducibleComponents _ c.2⟩
@@ -51,10 +57,15 @@ theorem universallyClosed_snd_of_lift {Y S : Scheme.{0}} (π : Y ⟶ S) [Locally
     NoetherianSpace.finite_irreducibleComponents.to_subtype
   have hr : ∀ c, Set.range (vanishingIdeal (C c)).subschemeι = c.1 := fun c ↦ by
     rw [range_subschemeι, coe_support_vanishingIdeal]; rfl
-  refine universallyClosed_of_finite_jointly_surjective (fun c ↦ (vanishingIdeal (C c)).subscheme)
-    (fun c ↦ (vanishingIdeal (C c)).subschemeι) s (fun x ↦ ?_) (fun c ↦ ?_)
+  refine universallyClosed_of_finite_jointly_surjective
+    (fun c ↦ (vanishingIdeal (C c)).subscheme)
+    (fun c ↦ (vanishingIdeal (C c)).subschemeι)
+    s
+    (fun x ↦ ?_)
+    (fun c ↦ ?_)
   · refine ⟨⟨_, irreducibleComponent_mem_irreducibleComponents x⟩, ?_⟩
-    have : x ∈ Set.range (vanishingIdeal (C ⟨_, irreducibleComponent_mem_irreducibleComponents x⟩)).subschemeι := by
+    have : x ∈ Set.range (vanishingIdeal (C
+        ⟨_, irreducibleComponent_mem_irreducibleComponents x⟩)).subschemeι := by
       rw [hr]; exact mem_irreducibleComponent
     exact this
   set I := vanishingIdeal (C c)
@@ -66,7 +77,8 @@ theorem universallyClosed_snd_of_lift {Y S : Scheme.{0}} (π : Y ⟶ S) [Locally
     I.subschemeι.isClosedEmbedding.isEmbedding.toHomeomorph.irreducibleSpace_iff.2 this
   have : IsIntegral I.subscheme := isIntegral_of_irreducibleSpace_of_isReduced _
   have hP : IsProper (I.subschemeι ≫ s) := by
-    refine GlobalTheory.TraitProper.isProper_of_lift_genericPoint R I.subscheme (I.subschemeι ≫ s) ?_
+    refine GlobalTheory.TraitProper.isProper_of_lift_genericPoint R I.subscheme (I.subschemeι ≫ s)
+      ?_
     intro V K _ _ _ _ _ _ _ x y _ hxy
     let e : FractionRing V ≃ₐ[V] K := IsLocalization.algEquiv (nonZeroDivisors V) (FractionRing V) K
     let ε : K →+* FractionRing V := e.symm.toRingEquiv.toRingHom
@@ -110,11 +122,15 @@ theorem universallyClosed_snd_of_lift {Y S : Scheme.{0}} (π : Y ⟶ S) [Locally
     have hrange : Set.range x3 ⊆ (C c : Set (pullback π u : Scheme.{0})) := by
       rintro _ ⟨v, rfl⟩
       have hv : v ∈ closure (Set.range (Out.jK V)) := (Out.jK V).denseRange v
-      have := map_mem_closure x3.continuous hv (t := (C c : Set (pullback π u : Scheme.{0}))) (by
-        rintro _ ⟨w, rfl⟩
-        change x3 (Out.jK V w) ∈ c.1
-        rw [← Scheme.Hom.comp_apply, h3, ← hr c]
-        exact ⟨(Spec.map (CommRingCat.ofHom ε) ≫ x) w, by rw [← Scheme.Hom.comp_apply, Category.assoc]⟩)
+      have :=
+        map_mem_closure x3.continuous hv (t := (C c : Set (pullback π u : Scheme.{0}))) (by
+          rintro _ ⟨w, rfl⟩
+          change x3 (Out.jK V w) ∈ c.1
+          rw [← Scheme.Hom.comp_apply, h3, ← hr c]
+          exact ⟨
+            (Spec.map (CommRingCat.ofHom ε) ≫ x) w,
+            by rw [← Scheme.Hom.comp_apply, Category.assoc]
+          ⟩)
       rwa [(C c).isClosed.closure_eq] at this
     have hker : I.subschemeι.ker ≤ x3.ker := by
       rw [I.ker_subschemeι]
@@ -124,10 +140,17 @@ theorem universallyClosed_snd_of_lift {Y S : Scheme.{0}} (π : Y ⟶ S) [Locally
       Category.assoc, h3, ← Category.assoc, ← Category.assoc, he3, Category.id_comp]
   exact inferInstance
 
-theorem existence_of_lift_discreteValuationRing : ∀ {Y S : Scheme.{0}} [IsLocallyNoetherian S] (π : Y ⟶ S), LocallyOfFiniteType π → QuasiCompact π → IsSeparated π → (∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (x : Sp (FractionRing V) ⟶ Y) (y : Sp V ⟶ S), x ≫ π = Out.jK V ≫ y → ∃ x' : Sp V ⟶ Y, Out.jK V ≫ x' = x ∧ x' ≫ π = y) → ValuativeCriterion.Existence π := by
+theorem existence_of_lift_discreteValuationRing
+    : ∀ {Y S : Scheme.{0}} [IsLocallyNoetherian S] (π : Y ⟶ S),
+      LocallyOfFiniteType π → QuasiCompact π → IsSeparated π
+        → (∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+            (x : Sp (FractionRing V) ⟶ Y) (y : Sp V ⟶ S),
+          x ≫ π = Out.jK V ≫ y → ∃ x' : Sp V ⟶ Y, Out.jK V ≫ x' = x ∧ x' ≫ π = y)
+        → ValuativeCriterion.Existence π := by
   intro Y S _ π _ _ _ H
   have hUC : UniversallyClosed π := by
-    rw [IsZariskiLocalAtTarget.iff_of_openCover (P := @UniversallyClosed) S.affineOpenCover.openCover]
+    rw [IsZariskiLocalAtTarget.iff_of_openCover (P := @UniversallyClosed)
+      S.affineOpenCover.openCover]
     intro i
     have := S.affineOpenCover.map_prop i
     have hR : IsNoetherianRing (S.affineOpenCover.X i) :=

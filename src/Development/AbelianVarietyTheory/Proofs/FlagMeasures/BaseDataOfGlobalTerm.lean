@@ -17,26 +17,31 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianFram
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.TermDef GlobalTheory.LocOver
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.TermDef
+  GlobalTheory.LocOver
 open scoped Classical
 
 namespace GlobalTheory.BaseTerm
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem tri_symm {K W : Type} [CommRing K] [AddCommGroup W] [Module K W] {n : ℕ} {f g : Fin n → W}
-    (h : Tri K f g) : Tri K g f := by
+theorem tri_symm
+    {K W : Type} [CommRing K] [AddCommGroup W] [Module K W]
+    {n : ℕ} {f g : Fin n → W} (h : Tri K f g)
+    : Tri K g f := by
   obtain ⟨A, hA, hc⟩ := h
   have hinv := inv_unitri A hA.1 hA.2
   have hbt : A.BlockTriangular id := fun i j hij => hA.1 i j hij
-  have hdet : A.det = 1 := by
-    rw [Matrix.det_of_upperTriangular hbt]; simp [hA.2]
+  have hdet : A.det = 1 := by rw [Matrix.det_of_upperTriangular hbt]; simp [hA.2]
   have hu : IsUnit A.det := by rw [hdet]; exact isUnit_one
   refine ⟨A⁻¹, hinv, fun b => ?_⟩
   have hm := Matrix.mul_nonsing_inv A hu
   have key : ∀ c, ∑ a, A c a * A⁻¹ a b = if c = b then (1 : K) else 0 := fun c => by
     rw [← Matrix.mul_apply, hm, Matrix.one_apply]
-  calc f b = ∑ c, (if c = b then (1 : K) else 0) • f c := by simp
+  calc
+    f b
+      = ∑ c, (if c = b then (1 : K) else 0) • f c := by simp
     _ = ∑ c, (∑ a, A c a * A⁻¹ a b) • f c := by simp only [key]
     _ = ∑ a, A⁻¹ a b • ∑ c, A c a • f c := by
       simp only [Finset.sum_smul, Finset.smul_sum, smul_smul]
@@ -44,13 +49,18 @@ theorem tri_symm {K W : Type} [CommRing K] [AddCommGroup W] [Module K W] {n : �
       exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun c _ => by rw [mul_comm]
     _ = ∑ a, A⁻¹ a b • g a := Finset.sum_congr rfl fun a _ => by rw [hc a]
 
-theorem tri_refl (K : Type) {W : Type} [CommRing K] [AddCommGroup W] [Module K W] {n : ℕ} (f : Fin n → W) :
-    Tri K f f := by
-  refine ⟨1, ⟨fun a b h => Matrix.one_apply_ne (ne_of_lt h).symm, fun a => Matrix.one_apply_eq a⟩, fun b => ?_⟩
+theorem tri_refl
+    (K : Type) {W : Type} [CommRing K] [AddCommGroup W] [Module K W] {n : ℕ} (f : Fin n → W)
+    : Tri K f f := by
+  refine ⟨
+    1,
+    ⟨fun a b h => Matrix.one_apply_ne (ne_of_lt h).symm, fun a => Matrix.one_apply_eq a⟩,
+    fun b => ?_
+  ⟩
   simp [Matrix.one_apply, ite_smul, Finset.sum_ite_eq']
 
-theorem finrank_Vp_eq {D : D7} (p : PlF D) :
-    Module.finrank (D.s.atP p).Ep (Vp D p) = D.R.k + 2 * D.R.rS + 1 := by
+theorem finrank_Vp_eq {D : D7} (p : PlF D)
+    : Module.finrank (D.s.atP p).Ep (Vp D p) = D.R.k + 2 * D.R.rS + 1 := by
   rw [finrank_Vp]
   unfold Ranks.r Ranks.rS
   obtain ⟨j, hj⟩ := D.R.m_even

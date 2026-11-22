@@ -14,8 +14,7 @@ variable {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} {K : Type
 
 def cor : Fin 2 → Fin 3 := ![0, 2]
 
-theorem w_cor (i : Fin 2) : w 3 (cor i) = w 2 i := by
-  fin_cases i <;> rfl
+theorem w_cor (i : Fin 2) : w 3 (cor i) = w 2 i := by fin_cases i <;> rfl
 
 structure IsCorner (ρ : NRep F 3 K) (σ : NRep F 2 K) : Prop where
   odd : ∀ g i j, Odd (w 3 i - w 3 j) → ρ.r g i j = 0
@@ -24,12 +23,14 @@ structure IsCorner (ρ : NRep F 3 K) (σ : NRep F 2 K) : Prop where
   mid : ∀ v g, ρ.r (F.loc0 v g) 1 1 = ρ.ψ v 1 g
 
 def CornerUnits (ρ : NRep F 3 K) : Prop :=
-  ∀ v, ∃ g, IsUnit (ρ.r (F.loc0 v g) 1 1 - ρ.ψ v 0 g) ∧ IsUnit (ρ.r (F.loc0 v g) 1 1 - ρ.ψ v 2 g) ∧
-    IsUnit ((ρ.r (F.loc0 v g) 0 0 - ρ.ψ v 1 g) * (ρ.r (F.loc0 v g) 2 2 - ρ.ψ v 1 g) -
-      ρ.r (F.loc0 v g) 0 2 * ρ.r (F.loc0 v g) 2 0)
+  ∀ v, ∃ g,
+    IsUnit (ρ.r (F.loc0 v g) 1 1 - ρ.ψ v 0 g) ∧ IsUnit (ρ.r (F.loc0 v g) 1 1 - ρ.ψ v 2 g)
+      ∧ IsUnit
+        ((ρ.r (F.loc0 v g) 0 0 - ρ.ψ v 1 g) * (ρ.r (F.loc0 v g) 2 2 - ρ.ψ v 1 g)
+          - ρ.r (F.loc0 v g) 0 2 * ρ.r (F.loc0 v g) 2 0)
 
-theorem mid_mul (ρ : NRep F 3 K) (h : ∀ g i j, Odd (w 3 i - w 3 j) → ρ.r g i j = 0) (g g' : F.G0) :
-    ρ.r (g * g') 1 1 = ρ.r g 1 1 * ρ.r g' 1 1 := by
+theorem mid_mul (ρ : NRep F 3 K) (h : ∀ g i j, Odd (w 3 i - w 3 j) → ρ.r g i j = 0) (g g' : F.G0)
+    : ρ.r (g * g') 1 1 = ρ.r g 1 1 * ρ.r g' 1 1 := by
   rw [map_mul, Matrix.mul_apply, Fin.sum_univ_three, h g 1 0 (by decide), h g 1 2 (by decide)]
   simp
 

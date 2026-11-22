@@ -6,8 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Loc.PK
 
-theorem UpperTheory.exists_discriminant_normal_form :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ → τ ^ 2 - 4 ≠ 0 → τ ∈ (algebraMap O K).range → ∀ (s : O) (ε : Oˣ), τ ^ 2 - 4 = algebraMap O K (ε * s ^ 2) → ∃ (π : O) (n : ℕ) (e : Oˣ) (h : O) (x : Etau K τ), Cond π n e h x ∧ Ideal.span {s} = Ideal.span {π ^ n} := by
+theorem UpperTheory.exists_discriminant_normal_form
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ → τ ^ 2 - 4 ≠ 0 → τ ∈ (algebraMap O K).range
+        → ∀ (s : O) (ε : Oˣ),
+          τ ^ 2 - 4 = algebraMap O K (ε * s ^ 2)
+            → ∃ (π : O) (n : ℕ) (e : Oˣ) (h : O) (x : Etau K τ),
+              Cond π n e h x ∧ Ideal.span {s} = Ideal.span {π ^ n} := by
   intro O K _ _ _ _ _ Δ τ hL hτ hτr s ε hs
   haveI := hL.frac
   have inj : Function.Injective (algebraMap O K) := IsFractionRing.injective O K
@@ -34,8 +40,9 @@ theorem UpperTheory.exists_discriminant_normal_form :
   have hP : algebraMap O K (ϖ ^ n) ≠ 0 := by
     rw [map_ne_zero_iff _ inj]
     exact pow_ne_zero _ hϖ.ne_zero
-  have hrel : algebraMap O K t ^ 2 - 4
-      = algebraMap O K ε * algebraMap O K μ ^ 2 * algebraMap O K (ϖ ^ n) ^ 2 := by
+  have hrel
+      : algebraMap O K t ^ 2 - 4
+        = algebraMap O K ε * algebraMap O K μ ^ 2 * algebraMap O K (ϖ ^ n) ^ 2 := by
     rw [hs, hμ]
     simp only [map_mul, map_pow]
     ring
@@ -48,8 +55,15 @@ theorem UpperTheory.exists_discriminant_normal_form :
     rw [trace_def, hxre, hxim]
     field_simp
     ring
-  refine ⟨ϖ, n, ε * μ * μ * (hL.two.unit)⁻¹ * (hL.two.unit)⁻¹, t * (((hL.two.unit)⁻¹ : Oˣ) : O), x,
-    ⟨hϖ, ⟨?_, ?_, ?_⟩, htr, ?_, ?_⟩, ?_⟩
+  refine ⟨
+    ϖ,
+    n,
+    ε * μ * μ * (hL.two.unit)⁻¹ * (hL.two.unit)⁻¹,
+    t * (((hL.two.unit)⁻¹ : Oˣ) : O),
+    x,
+    ⟨hϖ, ⟨?_, ?_, ?_⟩, htr, ?_, ?_⟩,
+    ?_
+  ⟩
   · rw [htr]
     exact ⟨0, map_zero _⟩
   · refine ⟨-((ε * μ * μ * (hL.two.unit)⁻¹ * (hL.two.unit)⁻¹ : Oˣ) : O), ?_⟩

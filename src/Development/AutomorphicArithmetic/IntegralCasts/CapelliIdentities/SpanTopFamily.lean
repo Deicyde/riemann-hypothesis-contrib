@@ -4,39 +4,43 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.SpanTopFamily.Mι :
-    {E K : Type} →
-      [inst : Field E] →
-        [inst_1 : Field K] →
-          (O : ValuationSubring K) →
-            (E →+* K) → {n : Type} → Submodule (NumberField.RingOfIntegers E) (n → E) → Submodule (↥O) (n → K) :=
-    fun {E K : Type} [Field E] [Field K] (O : ValuationSubring K) (ι : E →+* K) {n : Type}
-        (L : Submodule (NumberField.RingOfIntegers E) (n → E)) ↦
-      Submodule.span (↥O) ((fun (l : n → E) (j : n) ↦ (ι : E → K) (l j)) '' (↑L : Set (n → E)))
+noncomputable def UpperTheory.Reformulated.B.SpanTopFamily.Mι
+    : {E K : Type} → [inst : Field E] → [inst_1 : Field K] → (O : ValuationSubring K) → (E →+* K)
+      → {n : Type} → Submodule (NumberField.RingOfIntegers E) (n → E)
+      → Submodule (↥O) (n → K) :=
+  fun {E K : Type} [Field E] [Field K] (O : ValuationSubring K) (ι : E →+* K) {n : Type}
+      (L : Submodule (NumberField.RingOfIntegers E) (n → E)) ↦
+    Submodule.span (↥O) ((fun (l : n → E) (j : n) ↦ (ι : E → K) (l j)) '' (↑L : Set (n → E)))
 
-theorem UpperTheory.Reformulated.B.SpanTopFamily.span_top :
-    ∀ {E K : Type} [inst : Field E] [NumberField E] [inst_2 : Field K] (O : ValuationSubring K) (ι : E →+* K) {n : Type}
-      [Fintype n] [DecidableEq n] (L : Submodule (NumberField.RingOfIntegers E) (n → E)),
-      Submodule.span E (↑L : Set (n → E)) = ⊤ → Submodule.span K (↑(UpperTheory.Reformulated.B.SpanTopFamily.Mι O ι L) : Set (n → K)) = ⊤ := by
+theorem UpperTheory.Reformulated.B.SpanTopFamily.span_top
+    : ∀ {E K : Type} [inst : Field E] [NumberField E] [inst_2 : Field K] (O : ValuationSubring K)
+        (ι : E →+* K) {n : Type} [Fintype n] [DecidableEq n]
+        (L : Submodule (NumberField.RingOfIntegers E) (n → E)),
+      Submodule.span E (↑L : Set (n → E)) = ⊤
+        → Submodule.span K (↑(UpperTheory.Reformulated.B.SpanTopFamily.Mι O ι L) : Set (n → K))
+          = ⊤ := by
   intro E K _ _ _ O ι n _ _ L hL
-  have key : ∀ v : n → E, v ∈ Submodule.span E (↑L : Set (n → E)) →
-      (fun j => ι (v j)) ∈ Submodule.span K (↑(UpperTheory.Reformulated.B.SpanTopFamily.Mι O ι L) : Set (n → K)) := by
+  have key
+      : ∀ v : n → E,
+        v ∈ Submodule.span E (↑L : Set (n → E))
+          → (fun j => ι (v j)) ∈ Submodule.span K
+            (↑(UpperTheory.Reformulated.B.SpanTopFamily.Mι O ι L) : Set (n → K)) := by
     intro v hv
     induction hv using Submodule.span_induction with
-    | mem x hx =>
-      exact Submodule.subset_span (Submodule.subset_span ⟨x, hx, rfl⟩)
+    | mem x hx => exact Submodule.subset_span (Submodule.subset_span ⟨x, hx, rfl⟩)
     | zero =>
-      have : (fun j : n => ι ((0 : n → E) j)) = 0 := by
-        funext j; simp
-      rw [this]; exact Submodule.zero_mem _
+      have : (fun j : n => ι ((0 : n → E) j)) = 0 := by funext j; simp
+      rw [this]
+      exact Submodule.zero_mem _
     | add x y _ _ hx hy =>
       have : (fun j : n => ι ((x + y) j)) = (fun j => ι (x j)) + (fun j => ι (y j)) := by
         funext j; simp
-      rw [this]; exact Submodule.add_mem _ hx hy
+      rw [this]
+      exact Submodule.add_mem _ hx hy
     | smul a x _ hx =>
-      have : (fun j : n => ι ((a • x) j)) = ι a • (fun j => ι (x j)) := by
-        funext j; simp
-      rw [this]; exact Submodule.smul_mem _ _ hx
+      have : (fun j : n => ι ((a • x) j)) = ι a • (fun j => ι (x j)) := by funext j; simp
+      rw [this]
+      exact Submodule.smul_mem _ _ hx
   rw [eq_top_iff]
   intro w _
   rw [pi_eq_sum_univ' w]

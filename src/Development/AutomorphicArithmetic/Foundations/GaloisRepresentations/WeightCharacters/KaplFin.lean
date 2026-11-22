@@ -4,9 +4,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.Branching
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.Branching
 open UpperTheory.Gal.Gen (IsLevel fixedBy)
 open UpperTheory.Gal.Wt
 
@@ -60,8 +63,7 @@ private lemma exists_pow_small (M ε : ℝ) (hM : 0 ≤ M) (hε : 0 < ε) :
 end UpperTheory.Gal.Wt.KaplanskyFiniteness
 
 open UpperTheory.Gal.Wt.KaplanskyFiniteness in
-theorem UpperTheory.Gal.Wt.kaplFin_of :
-    UpperTheory.Gal.Wt.KaplFin := by
+theorem UpperTheory.Gal.Wt.kaplFin_of : UpperTheory.Gal.Wt.KaplFin := by
   classical
   intro k _ _ s δ ε hδ hε hε1
   refine Finset.induction_on_max_value (fun c : k => ‖c‖) s ?_ ?_
@@ -76,18 +78,22 @@ theorem UpperTheory.Gal.Wt.kaplFin_of :
       rw [h, norm_zero] at hδc
       linarith
     have hcpos : 0 < ‖c‖ := norm_pos_iff.mpr hc0
-    obtain ⟨n, hn⟩ := exists_pow_small (∑ i ∈ Finset.range (p'.natDegree + 1), ‖p'.coeff i‖ * ‖c‖ ^ i) ε
-      (Finset.sum_nonneg fun i _ => mul_nonneg (norm_nonneg _) (pow_nonneg (norm_nonneg _) _)) hε
-    have hev : ∀ x, ((p' * (1 - Polynomial.C c⁻¹ * Polynomial.X) ^ n).eval x) =
-        p'.eval x * (1 - c⁻¹ * x) ^ n := by
+    obtain ⟨n, hn⟩ :=
+      exists_pow_small (∑ i ∈ Finset.range (p'.natDegree + 1), ‖p'.coeff i‖ * ‖c‖ ^ i) ε
+        (Finset.sum_nonneg fun i _ => mul_nonneg (norm_nonneg _) (pow_nonneg (norm_nonneg _) _)) hε
+    have hev
+        : ∀ x,
+          ((p' * (1 - Polynomial.C c⁻¹ * Polynomial.X) ^ n).eval x)
+            = p'.eval x * (1 - c⁻¹ * x) ^ n := by
       intro x
       simp [Polynomial.eval_mul, Polynomial.eval_pow]
     refine ⟨p' * (1 - Polynomial.C c⁻¹ * Polynomial.X) ^ n, ?_, ?_, ?_⟩
     · intro x hx
       rw [hev, norm_mul, norm_pow]
       have hu := norm_unit_le c x hc0 (hx.trans hδc)
-      calc ‖p'.eval x‖ * ‖1 - c⁻¹ * x‖ ^ n ≤ 1 * 1 :=
-            mul_le_mul (h1 x hx) (pow_le_one₀ (norm_nonneg _) hu) (by positivity) zero_le_one
+      calc
+        ‖p'.eval x‖ * ‖1 - c⁻¹ * x‖ ^ n ≤ 1 * 1 :=
+          mul_le_mul (h1 x hx) (pow_le_one₀ (norm_nonneg _) hu) (by positivity) zero_le_one
         _ = 1 := one_mul 1
     · intro c' hc' x hx
       rw [hev, norm_mul, norm_pow]
@@ -97,15 +103,18 @@ theorem UpperTheory.Gal.Wt.kaplFin_of :
           have e : 1 - c'⁻¹ * x = c'⁻¹ * (c' - x) := by field_simp
           rw [e, norm_mul, norm_inv, norm_sub_rev, inv_mul_le_iff₀ hcpos]
           linarith
-        calc ‖p'.eval x‖ * ‖1 - c'⁻¹ * x‖ ^ n
-            ≤ (∑ i ∈ Finset.range (p'.natDegree + 1), ‖p'.coeff i‖ * ‖c'‖ ^ i) * (1 / 2 : ℝ) ^ n :=
-              mul_le_mul (eval_bound p' x _ hxc) (pow_le_pow_left₀ (norm_nonneg _) hu n)
-                (by positivity) ((norm_nonneg _).trans (eval_bound p' x _ hxc))
+        calc
+          ‖p'.eval x‖ * ‖1 - c'⁻¹ * x‖ ^ n
+              ≤ (∑ i ∈ Finset.range (p'.natDegree + 1), ‖p'.coeff i‖ * ‖c'‖ ^ i)
+                * (1 / 2 : ℝ) ^ n :=
+            mul_le_mul (eval_bound p' x _ hxc) (pow_le_pow_left₀ (norm_nonneg _) hu n)
+              (by positivity) ((norm_nonneg _).trans (eval_bound p' x _ hxc))
           _ ≤ ε := hn
       · have hxc : ‖x‖ ≤ ‖c‖ := (norm_le_of_near c' x hx).trans (hmax c' hc's)
         have hu := norm_unit_le c x hc0 hxc
-        calc ‖p'.eval x‖ * ‖1 - c⁻¹ * x‖ ^ n ≤ ε * 1 :=
-              mul_le_mul (h2 c' hc's x hx) (pow_le_one₀ (norm_nonneg _) hu) (by positivity) hε.le
+        calc
+          ‖p'.eval x‖ * ‖1 - c⁻¹ * x‖ ^ n ≤ ε * 1 :=
+            mul_le_mul (h2 c' hc's x hx) (pow_le_one₀ (norm_nonneg _) hu) (by positivity) hε.le
           _ = ε := mul_one ε
     · intro x hx
       have hxδ : ‖x‖ ≤ δ := hx.trans (by nlinarith)
@@ -113,14 +122,19 @@ theorem UpperTheory.Gal.Wt.kaplFin_of :
       have hu1 : ‖(1 - c⁻¹ * x) - 1‖ ≤ ε := by
         have e : (1 - c⁻¹ * x) - 1 = -(c⁻¹ * x) := by ring
         rw [e, norm_neg, norm_mul, norm_inv, inv_mul_le_iff₀ hcpos]
-        calc ‖x‖ ≤ δ * ε := hx
+        calc
+          ‖x‖
+            ≤ δ * ε := hx
           _ ≤ ‖c‖ * ε := mul_le_mul_of_nonneg_right hδc hε.le
       have hun := pow_near hε.le hu hu1 n
-      have e : p'.eval x * (1 - c⁻¹ * x) ^ n - 1 =
-          p'.eval x * ((1 - c⁻¹ * x) ^ n - 1) + (p'.eval x - 1) := by ring
+      have e
+          : p'.eval x * (1 - c⁻¹ * x) ^ n - 1
+            = p'.eval x * ((1 - c⁻¹ * x) ^ n - 1) + (p'.eval x - 1) := by
+        ring
       rw [hev, e]
       refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ (h3 x hx))
       rw [norm_mul]
-      calc ‖p'.eval x‖ * ‖(1 - c⁻¹ * x) ^ n - 1‖ ≤ 1 * ε :=
-            mul_le_mul (h1 x hxδ) hun (norm_nonneg _) zero_le_one
+      calc
+        ‖p'.eval x‖ * ‖(1 - c⁻¹ * x) ^ n - 1‖
+          ≤ 1 * ε := mul_le_mul (h1 x hxδ) hun (norm_nonneg _) zero_le_one
         _ = ε := one_mul ε

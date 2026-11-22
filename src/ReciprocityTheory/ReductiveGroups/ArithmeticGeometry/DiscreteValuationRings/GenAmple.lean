@@ -38,10 +38,9 @@ lemma flat_le {K : Type} [Fintype K] (p : (K → L₁.ι) × (K → L₂.ι)) (k
     Set.mem_iInter, Set.mem_preimage, SetLike.mem_coe] at hx ⊢
   exact ⟨fun _ => hx.2 k, fun _ => hx.1 k⟩
 
-def flatIso (w : LB.Iso (L₁.pull f₁) (L₂.pull f₂)) {K : Type} [Fintype K] (ε : K → ℤ) :
-    LB.Iso (LB.LinComb L₂ (fun _ : K => f₂) ε) (LB.LinComb L₁ (fun _ : K => f₁) ε) :=
+def flatIso (w : LB.Iso (L₁.pull f₁) (L₂.pull f₂)) {K : Type} [Fintype K] (ε : K → ℤ)
+    : LB.Iso (LB.LinComb L₂ (fun _ : K => f₂) ε) (LB.LinComb L₁ (fun _ : K => f₁) ε) :=
   ⟨fun p => ∏ k, res (flat_le L₁ L₂ f₁ f₂ p k) (w.s (fun _ => p.2 k, fun _ => p.1 k)) ^ (-ε k)⟩
-
 
 lemma comm_alg {M : Type*} [CommGroup M] (a b c : M) (n : ℤ) :
     (a * b⁻¹ * c) ^ (-n) = b ^ n * (a ^ n)⁻¹ * c ^ (-n) := by
@@ -57,8 +56,9 @@ lemma gm_pull_g' {Z : Scheme.{0}} {X : Scheme.{0}} (L : LB X) (f : Y ⟶ X) (r :
 
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor in
 set_option maxHeartbeats 1000000 in
-theorem flatIso_isGen (w : LB.Iso (L₁.pull f₁) (L₂.pull f₂)) (hw : w.IsGen) {K : Type} [Fintype K] (ε : K → ℤ) :
-    (flatIso L₁ L₂ f₁ f₂ w ε).IsGen := by
+theorem flatIso_isGen
+    (w : LB.Iso (L₁.pull f₁) (L₂.pull f₂)) (hw : w.IsGen) {K : Type} [Fintype K] (ε : K → ℤ)
+    : (flatIso L₁ L₂ f₁ f₂ w ε).IsGen := by
   have hP := (isGen_iff w).1 hw
   intro (p : (K → L₁.ι) × (K → L₂.ι)) (q : (K → L₁.ι) × (K → L₂.ι))
   apply unit_ext
@@ -69,8 +69,9 @@ theorem flatIso_isGen (w : LB.Iso (L₁.pull f₁) (L₂.pull f₂)) (hw : w.IsG
     gm (𝟙 Y) y _ ((res _ ((LB.LinComb L₁ (fun _ : K => f₁) ε).g p.1 q.1) *
       (res _ ((LB.LinComb L₂ (fun _ : K => f₂) ε).g p.2 q.2))⁻¹) *
       res _ (∏ k, res (flat_le L₁ L₂ f₁ f₂ q k) (w.s (fun _ => q.2 k, fun _ => q.1 k)) ^ (-ε k)))
-  erw [map_mul, map_mul, map_inv, gm_res _ y _ hy, gm_res _ y _ hy, gm_res _ y _ hy, gm_res _ y _ hy,
-    gm_linComb L₁ _ ε (𝟙 Y) y p.1 q.1 hp.1 hq.1, gm_linComb L₂ _ ε (𝟙 Y) y p.2 q.2 hp.2 hq.2]
+  erw [map_mul, map_mul, map_inv, gm_res _ y _ hy, gm_res _ y _ hy, gm_res _ y _ hy,
+    gm_res _ y _ hy, gm_linComb L₁ _ ε (𝟙 Y) y p.1 q.1 hp.1 hq.1,
+    gm_linComb L₂ _ ε (𝟙 Y) y p.2 q.2 hp.2 hq.2]
   erw [map_prod, map_prod]
   rw [← Finset.prod_inv_distrib, ← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun k _ => ?_
@@ -78,12 +79,17 @@ theorem flatIso_isGen (w : LB.Iso (L₁.pull f₁) (L₂.pull f₂)) (hw : w.IsG
   have h1' : f₁ y ∈ L₁.U (q.1 k) := Set.mem_iInter.1 hq.1 k
   have h2 : f₂ y ∈ L₂.U (p.2 k) := Set.mem_iInter.1 hp.2 k
   have h2' : f₂ y ∈ L₂.U (q.2 k) := Set.mem_iInter.1 hq.2 k
-  have e := hP Y (𝟙 Y) y (p.2 k) (q.2 k) (fun _ => p.1 k) (fun _ => q.1 k) (by simpa using h2) (by simpa using h2')
-    (Set.mem_iInter.2 fun _ => by simpa using h1) (Set.mem_iInter.2 fun _ => by simpa using h1')
+  have e :=
+    hP Y (𝟙 Y) y (p.2 k) (q.2 k)
+      (fun _ => p.1 k)
+      (fun _ => q.1 k)
+      (by simpa using h2) (by simpa using h2') (Set.mem_iInter.2 fun _ => by simpa using h1)
+      (Set.mem_iInter.2 fun _ => by simpa using h1')
   rw [gm_pull_g' L₁ f₁ (𝟙 Y) y (p.1 k) (q.1 k) (by simpa using h1) (by simpa using h1')] at e
   rw [map_zpow, map_zpow]
   erw [gm_res _ y _ hp, gm_res _ y _ hq]
-  change gw w (𝟙 Y) y (p.2 k) (fun _ => p.1 k) ^ (-ε k) = _ * _ * gw w (𝟙 Y) y (q.2 k) (fun _ => q.1 k) ^ (-ε k)
+  change gw w (𝟙 Y) y (p.2 k) (fun _ => p.1 k) ^ (- ε k)
+    = _ * _ * gw w (𝟙 Y) y (q.2 k) (fun _ => q.1 k) ^ (- ε k)
   rw [e]
   simp only [Category.id_comp]
   exact comm_alg _ _ _ _
@@ -98,8 +104,9 @@ lemma mem_nonzeroLocus {M : LB Y} (s : LB.Sec M) (y : Y) :
     y ∈ nonzeroLocus s ↔ ∃ j, y ∈ Y.basicOpen (s.f j) := by
   rw [nonzeroLocus, TopologicalSpace.Opens.mem_iSup]
 
-theorem nonzeroLocus_secOfIso {A B : LB Y} (u : LB.Iso A B) (t : LB.Sec B) (hu : u.IsGen) (hA : A.IsLB)
-    (hB : B.IsLB) : nonzeroLocus t ≤ nonzeroLocus (secOfIso (u := u) t hu hA hB) := by
+theorem nonzeroLocus_secOfIso
+    {A B : LB Y} (u : LB.Iso A B) (t : LB.Sec B) (hu : u.IsGen) (hA : A.IsLB) (hB : B.IsLB)
+    : nonzeroLocus t ≤ nonzeroLocus (secOfIso (u := u) t hu hA hB) := by
   intro y hy
   obtain ⟨b, hb⟩ := (mem_nonzeroLocus t y).1 hy
   have hyb : y ∈ B.U b := Y.basicOpen_le _ hb
@@ -109,9 +116,11 @@ theorem nonzeroLocus_secOfIso {A B : LB Y} (u : LB.Iso A B) (t : LB.Sec B) (hu :
   refine (mem_nonzeroLocus _ y).2 ⟨a, ?_⟩
   have e := secOfIso_spec (u := u) t hu hA hB a b
   have e2 := congrArg Y.basicOpen e
-  rw [isoCand, Scheme.basicOpen_mul, Scheme.basicOpen_of_isUnit _ (Units.isUnit _), Scheme.basicOpen_res,
-    Scheme.basicOpen_res] at e2
-  have hmem : y ∈ (A.U a ⊓ B.U b) ⊓ ((A.U a ⊓ B.U b) ⊓ Y.basicOpen (t.f b)) := ⟨⟨ha, hyb⟩, ⟨ha, hyb⟩, hb⟩
+  rw [isoCand, Scheme.basicOpen_mul, Scheme.basicOpen_of_isUnit _ (Units.isUnit _),
+      Scheme.basicOpen_res, Scheme.basicOpen_res]
+    at e2
+  have hmem : y ∈ (A.U a ⊓ B.U b) ⊓ ((A.U a ⊓ B.U b) ⊓ Y.basicOpen (t.f b)) :=
+    ⟨⟨ha, hyb⟩, ⟨ha, hyb⟩, hb⟩
   rw [← e2] at hmem
   exact hmem.2
 

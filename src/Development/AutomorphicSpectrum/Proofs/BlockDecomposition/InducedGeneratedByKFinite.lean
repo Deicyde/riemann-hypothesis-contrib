@@ -6,7 +6,19 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.CosetSum
 
-theorem mem_of_translated_bumps : ∀ {Γ J : Type} [Group Γ] [AddCommGroup J] [Module ℂ J] (Q K K₁ : Subgroup Γ) (π : Representation ℂ Q J) (M : Submodule ℂ (Γ → J)) (Gf : Γ → J), K₁ ≤ K → K₁.relIndex K ≠ 0 → (∀ κ ∈ K, ∀ b ∈ K₁, κ * b * κ⁻¹ ∈ K₁) → (∀ g : Γ, ∃ q : Q, ∃ κ ∈ K, g = (q : Γ) * κ) → (∀ φ ∈ M, ∀ x : Γ, (fun g => φ (g * x)) ∈ M) → (∀ φ ∈ M, ∀ (q : Q) (g : Γ), φ ((q : Γ) * g) = π q (φ g)) → (∀ (q : Q) (g : Γ), Gf ((q : Γ) * g) = π q (Gf g)) → (∀ (g : Γ), ∀ b ∈ K₁, Gf (g * b) = Gf g) → (∀ κ ∈ K, ∃ φ ∈ M, (∀ (q : Q), ∀ b ∈ K₁, φ ((q : Γ) * b) = π q (Gf κ)) ∧ ∀ g : Γ, (¬ ∃ q : Q, ∃ b ∈ K₁, g = (q : Γ) * b) → φ g = 0) → Gf ∈ M := by
+theorem mem_of_translated_bumps
+    : ∀ {Γ J : Type} [Group Γ] [AddCommGroup J] [Module ℂ J] (Q K K₁ : Subgroup Γ)
+        (π : Representation ℂ Q J) (M : Submodule ℂ (Γ → J)) (Gf : Γ → J),
+      K₁ ≤ K → K₁.relIndex K ≠ 0 → (∀ κ ∈ K, ∀ b ∈ K₁, κ * b * κ⁻¹ ∈ K₁)
+        → (∀ g : Γ, ∃ q : Q, ∃ κ ∈ K, g = (q : Γ) * κ)
+        → (∀ φ ∈ M, ∀ x : Γ, (fun g => φ (g * x)) ∈ M)
+        → (∀ φ ∈ M, ∀ (q : Q) (g : Γ), φ ((q : Γ) * g) = π q (φ g))
+        → (∀ (q : Q) (g : Γ), Gf ((q : Γ) * g) = π q (Gf g))
+        → (∀ (g : Γ), ∀ b ∈ K₁, Gf (g * b) = Gf g)
+        → (∀ κ ∈ K, ∃ φ ∈ M,
+          (∀ (q : Q), ∀ b ∈ K₁, φ ((q : Γ) * b) = π q (Gf κ))
+            ∧ ∀ g : Γ, (¬ ∃ q : Q, ∃ b ∈ K₁, g = (q : Γ) * b) → φ g = 0)
+        → Gf ∈ M := by
   intro Γ J _ _ _ Q K K₁ π M Gf hle hidx hconj hdec htr hlawM hlaw hinv hb
   classical
   let H : Subgroup K := K₁.subgroupOf K
@@ -20,11 +32,13 @@ theorem mem_of_translated_bumps : ∀ {Γ J : Type} [Group Γ] [AddCommGroup J] 
   have hPmul : ∀ x, ∀ b ∈ K₁, P x → P (x * b) := by
     rintro x b hb' ⟨q, c, hc, rfl⟩
     exact ⟨q, c * b, K₁.mul_mem hc hb', by simp [mul_assoc]⟩
-  have hb2 : ∀ κ : K, ∃ φ ∈ M, (∀ (q : Q), ∀ b ∈ K₁, φ ((q : Γ) * b) = π q (Gf κ)) ∧
-      ∀ g : Γ, (¬ P g) → φ g = 0 := fun κ => hb κ κ.2
+  have hb2
+      : ∀ κ : K, ∃ φ ∈ M,
+        (∀ (q : Q), ∀ b ∈ K₁, φ ((q : Γ) * b) = π q (Gf κ)) ∧ ∀ g : Γ, (¬ P g) → φ g = 0 := fun κ =>
+    hb κ κ.2
   choose φ hφM hφ1 hφ0 using hb2
-  have key : ∀ κ' κ : K, φ κ ((κ' : Γ) * (κ : Γ)⁻¹) =
-      if P ((κ' : Γ) * (κ : Γ)⁻¹) then Gf κ' else 0 := by
+  have key
+      : ∀ κ' κ : K, φ κ ((κ' : Γ) * (κ : Γ)⁻¹) = if P ((κ' : Γ) * (κ : Γ)⁻¹) then Gf κ' else 0 := by
     intro κ' κ
     split_ifs with h
     · obtain ⟨q, b, hbm, e⟩ := h
@@ -44,8 +58,7 @@ theorem mem_of_translated_bumps : ∀ {Γ J : Type} [Group Γ] [AddCommGroup J] 
     have := hPmul _ _ hm' hx
     simpa using this
   let Pd : K ⧸ H → Prop := fun ε => P (r ε)
-  have hPd : ∀ x : K, P x ↔ Pd (x : K ⧸ H) := fun x =>
-    ⟨hPcl _ _ (hr _).symm, hPcl _ _ (hr _)⟩
+  have hPd : ∀ x : K, P x ↔ Pd (x : K ⧸ H) := fun x => ⟨hPcl _ _ (hr _).symm, hPcl _ _ (hr _)⟩
   let Φ : Γ → J := ∑ δ : K ⧸ H, (fun g => φ (r δ) (g * ((r δ : K) : Γ)⁻¹))
   have hΦM : Φ ∈ M := M.sum_mem fun δ _ => htr _ (hφM _) _
   let n : ℕ := (Finset.univ.filter Pd).card
@@ -62,8 +75,9 @@ theorem mem_of_translated_bumps : ∀ {Γ J : Type} [Group Γ] [AddCommGroup J] 
       simp only [Subgroup.coe_mul, Subgroup.coe_inv] at this
       simp only [this]
     rw [h1]
-    have h2 := Equiv.sum_comp ((Equiv.inv (K ⧸ H)).trans (Equiv.mulLeft (κ' : K ⧸ H)))
-      (fun ε => if Pd ε then Gf κ' else 0)
+    have h2 :=
+      Equiv.sum_comp ((Equiv.inv (K ⧸ H)).trans (Equiv.mulLeft (κ' : K ⧸ H)))
+        (fun ε => if Pd ε then Gf κ' else 0)
     simp only [Equiv.trans_apply, Equiv.inv_apply, Equiv.coe_mulLeft] at h2
     rw [h2, ← Finset.sum_filter, Finset.sum_const]
   have hn : n ≠ 0 := by

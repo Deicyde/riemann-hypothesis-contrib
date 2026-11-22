@@ -17,10 +17,12 @@ theorem rat_four_sq (p : ℚ) (hp : 0 ≤ p) : ∃ a b c d : ℚ, p = a ^ 2 + b 
   have hd : (p.den : ℚ) ≠ 0 := by positivity
   have hn : ((p.num.toNat : ℕ) : ℚ) = (p.num : ℚ) := by exact_mod_cast Int.toNat_of_nonneg hnum
   have key : (x : ℚ) ^ 2 + (y : ℚ) ^ 2 + (z : ℚ) ^ 2 + (w : ℚ) ^ 2 = (p.num : ℚ) * p.den := by
-    have h1 : ((x ^ 2 + y ^ 2 + z ^ 2 + w ^ 2 : ℕ) : ℚ) = ((p.num.toNat * p.den : ℕ) : ℚ) := by rw [hs]
+    have h1 : ((x ^ 2 + y ^ 2 + z ^ 2 + w ^ 2 : ℕ) : ℚ) = ((p.num.toNat * p.den : ℕ) : ℚ) := by
+      rw [hs]
     push_cast at h1
     rw [h1, hn]
-  calc p = (p.num : ℚ) / p.den := (Rat.num_div_den p).symm
+  calc
+    p = (p.num : ℚ) / p.den := (Rat.num_div_den p).symm
     _ = ((p.num : ℚ) * p.den) / (p.den : ℚ) ^ 2 := by field_simp
     _ = _ := by rw [← key]; field_simp
 
@@ -33,8 +35,12 @@ structure Herm4 : Prop where
   add_left : ∀ x x' y, h (x + x') y = h x y + h x' y
   smul_left : ∀ (k : K) x y, h (k • x) y = k * h x y
   symm : ∀ x y, h y x = c (h x y)
-  pos : ∀ x, x ≠ 0 → h x x ≠ 0 ∧ ∃ p q r s : K, c p = p ∧ c q = q ∧ c r = r ∧ c s = s ∧
-    h x x = p ^ 2 + q ^ 2 + r ^ 2 + s ^ 2
+  pos
+    : ∀ x,
+      x ≠ 0
+        → h x x ≠ 0
+          ∧ ∃ p q r s : K,
+            c p = p ∧ c q = q ∧ c r = r ∧ c s = s ∧ h x x = p ^ 2 + q ^ 2 + r ^ 2 + s ^ 2
 
 variable {c h}
 
@@ -43,8 +49,11 @@ def Herm4.hl (H : Herm4 c h) (y : V) : V →ₗ[K] K where
   map_add' x x' := H.add_left x x' y
   map_smul' k x := H.smul_left k x y
 
-theorem Herm4.linInd (H : Herm4 c h) {ι : Type} [Fintype ι] [DecidableEq ι] (v : ι → V) (hv0 : ∀ i, v i ≠ 0)
-    (hv : ∀ i j, i ≠ j → h (v i) (v j) = 0) : LinearIndependent K v := by
+theorem Herm4.linInd
+    (H : Herm4 c h)
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (v : ι → V) (hv0 : ∀ i, v i ≠ 0) (hv : ∀ i j, i ≠ j → h (v i) (v j) = 0)
+    : LinearIndependent K v := by
   rw [linearIndependent_iff']
   intro s g hg i hi
   have h1 : H.hl (v i) (∑ j ∈ s, g j • v j) = 0 := by rw [hg, map_zero]

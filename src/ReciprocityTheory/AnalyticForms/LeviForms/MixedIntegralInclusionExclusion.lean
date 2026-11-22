@@ -14,19 +14,25 @@ open scoped ContDiff
 
 noncomputable section
 
-theorem locDens_expand {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
+theorem locDens_expand
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X)
     (Θ : LocPot X) (P : Fin e → LocPot X) (hΘ : IsPotential A Θ) (hP : ∀ i, IsPotential A (P i))
-    (j : Fin A.n) {y : Fin e → ℂ} (hy : y ∈ (A.chart j).target) :
-    locDens A (fun i => P i + Θ.rsmul (-1)) j y =
-      ∑ S : Finset (Fin e), (-1 : ℝ) ^ (e - S.card) *
-        locDens A (fun i => if i ∈ S then P i else Θ) j y := by
+    (j : Fin A.n)
+    {y : Fin e → ℂ} (hy : y ∈ (A.chart j).target)
+    : locDens A (fun i => P i + Θ.rsmul (-1)) j y
+      = ∑ S : Finset (Fin e), (-1 : ℝ) ^ (e - S.card) *
+          locDens A (fun i => if i ∈ S then P i else Θ) j y := by
   classical
   obtain ⟨M, hM⟩ := (by
     show ∃ F : MultilinearMap (RingHom.id ℂ)
         (fun _ : Fin e => Matrix (Fin e) (Fin e) ℂ) ℂ,
         ⇑F = _root_.ReciprocityTheory.AnForm.mdisc
-    refine ⟨MultilinearMap.mk' _root_.ReciprocityTheory.AnForm.mdisc
-      _root_.ReciprocityTheory.AnForm.A.mdisc_update_add ?_, rfl⟩
+    refine ⟨
+      MultilinearMap.mk' _root_.ReciprocityTheory.AnForm.mdisc
+        _root_.ReciprocityTheory.AnForm.A.mdisc_update_add ?_,
+      rfl
+    ⟩
     intro A k c B
     simpa only [RingHom.id_apply, smul_eq_mul] using
       (_root_.ReciprocityTheory.AnForm.A.mdisc_update_smul A k c B))
@@ -34,44 +40,69 @@ theorem locDens_expand {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtla
     fun k => hessC (fun y' => (P k).φ ((A.chart j).symm y) ((A.chart j).symm y')) y with ha
   set b : Matrix (Fin e) (Fin e) ℂ :=
     hessC (fun y' => Θ.φ ((A.chart j).symm y) ((A.chart j).symm y')) y with hb
-  have h1 : (fun k => hessC (fun y' => (P k + Θ.rsmul (-1)).φ ((A.chart j).symm y)
-      ((A.chart j).symm y')) y) = fun k => a k + (fun _ => (-1 : ℂ) • b) k := by
+  have h1
+      : (fun k =>
+          hessC (fun y' => (P k + Θ.rsmul (-1)).φ ((A.chart j).symm y) ((A.chart j).symm y')) y)
+        = fun k => a k + (fun _ => (-1 : ℂ) • b) k := by
     funext k
-    have : (fun y' => (P k + Θ.rsmul (-1)).φ ((A.chart j).symm y) ((A.chart j).symm y')) =
-        fun y' => (P k).φ ((A.chart j).symm y) ((A.chart j).symm y') +
-          (-1) * Θ.φ ((A.chart j).symm y) ((A.chart j).symm y') := rfl
-    rw [this, hessC_add' _ _ _ (potential_contDiffAt A (P k) (hP k) j hy)
-      ((potential_contDiffAt A Θ hΘ j hy).const_smul (-1 : ℝ) |>.congr_of_eventuallyEq
-        (Filter.Eventually.of_forall fun _ => by simp [smul_eq_mul])), hessC_const_mul']
+    have : (fun y' => (P k + Θ.rsmul (-1)).φ ((A.chart j).symm y) ((A.chart j).symm y'))
+        = fun y' =>
+          (P k).φ ((A.chart j).symm y) ((A.chart j).symm y')
+            + (-1) * Θ.φ ((A.chart j).symm y) ((A.chart j).symm y') :=
+      rfl
+    rw [this,
+      hessC_add' _ _ _ (potential_contDiffAt A (P k) (hP k) j hy)
+        ((potential_contDiffAt A Θ hΘ j hy).const_smul (-1 : ℝ)
+          |>.congr_of_eventuallyEq (Filter.Eventually.of_forall fun _ => by simp [smul_eq_mul])),
+      hessC_const_mul']
     simp [ha, hb]
-  have h2 : ∀ S : Finset (Fin e), (fun k => hessC (fun y' => (if k ∈ S then P k else Θ).φ
-      ((A.chart j).symm y) ((A.chart j).symm y')) y) = S.piecewise a (fun _ => b) := by
-    intro S; funext k
+  have h2
+      : ∀ S : Finset (Fin e),
+        (fun k =>
+            hessC
+              (fun y' => (if k ∈ S then P k else Θ).φ ((A.chart j).symm y) ((A.chart j).symm y'))
+              y)
+          = S.piecewise a (fun _ => b) := by
+    intro S
+    funext k
     by_cases hk : k ∈ S <;> simp [hk, Finset.piecewise, ha, hb]
-  have h2' : ∀ S : Finset (Fin e), mdisc (fun k => hessC (fun y' => (if k ∈ S then P k else Θ).φ
-      ((A.chart j).symm y) ((A.chart j).symm y')) y) = M (S.piecewise a (fun _ => b)) := fun S => by
+  have h2'
+      : ∀ S : Finset (Fin e),
+        mdisc (fun k =>
+            hessC
+              (fun y' => (if k ∈ S then P k else Θ).φ ((A.chart j).symm y) ((A.chart j).symm y'))
+              y)
+          = M (S.piecewise a (fun _ => b)) := fun S => by
     rw [hM, ← h2 S]
   unfold locDens maDens
   simp only [h2']
-  rw [h1, ← hM, show (fun k => a k + (fun _ => (-1 : ℂ) • b) k) = a + fun _ => (-1 : ℂ) • b from rfl,
+  rw [h1, ← hM,
+    show (fun k => a k + (fun _ => (-1 : ℂ) • b) k) = a + fun _ => (-1 : ℂ) • b from rfl,
     M.map_add_univ, Complex.re_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun S _ => ?_
   rw [mul_left_comm]
   congr 1
-  have h3 : S.piecewise a (fun _ => (-1 : ℂ) • b) =
-      Sᶜ.piecewise (fun k => (-1 : ℂ) • S.piecewise a (fun _ => b) k) (S.piecewise a (fun _ => b)) := by
+  have h3
+      : S.piecewise a (fun _ => (-1 : ℂ) • b)
+        = Sᶜ.piecewise
+          (fun k => (-1 : ℂ) • S.piecewise a (fun _ => b) k)
+          (S.piecewise a (fun _ => b)) := by
     funext k
     by_cases hk : k ∈ S <;> simp [hk, Finset.piecewise]
-  rw [h3, M.map_piecewise_smul, RingHom.id_apply, Finset.prod_const, Finset.card_compl, Fintype.card_fin, smul_eq_mul]
+  rw [h3, M.map_piecewise_smul, RingHom.id_apply, Finset.prod_const, Finset.card_compl,
+    Fintype.card_fin, smul_eq_mul]
   have : ((-1 : ℂ) ^ (e - S.card)) = (((-1 : ℝ) ^ (e - S.card) : ℝ) : ℂ) := by push_cast; rfl
   rw [this, Complex.re_ofReal_mul]
 
-theorem mixed_integral_inclusion_exclusion : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
-    (Θ : LocPot X) (P : Fin e → LocPot X), IsPotential A Θ → (∀ i, IsPotential A (P i)) →
-    ∀ g : X → ℝ, Continuous g →
-      mInt A (fun i => P i + Θ.rsmul (-1)) g =
-        ∑ S : Finset (Fin e), (-1 : ℝ) ^ (e - S.card) *
-          mInt A (fun i => if i ∈ S then P i else Θ) g := by
+theorem mixed_integral_inclusion_exclusion
+    : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
+        (Θ : LocPot X) (P : Fin e → LocPot X),
+      IsPotential A Θ → (∀ i, IsPotential A (P i))
+        → ∀ g : X → ℝ,
+          Continuous g
+            → mInt A (fun i => P i + Θ.rsmul (-1)) g
+              = ∑ S : Finset (Fin e), (-1 : ℝ) ^ (e - S.card) *
+                  mInt A (fun i => if i ∈ S then P i else Θ) g := by
   intro e X _ _ _ A Θ P hΘ hP g hg
   classical
   have hpot : ∀ S : Finset (Fin e), ∀ i, IsPotential A (if i ∈ S then P i else Θ) := by
@@ -91,11 +122,12 @@ theorem mixed_integral_inclusion_exclusion : ∀ {e : ℕ} {X : Type} [Topologic
     ring
   · simp
 
-theorem tendstoUniformlyOn_comp_continuous {α ι Z W : Type*} [PseudoMetricSpace Z] [ProperSpace Z]
-    [PseudoMetricSpace W] {l : Filter ι} {K : Set α} (G : Z → W) (hG : Continuous G)
-    (F : ι → α → Z) (f : α → Z) (hb : Bornology.IsBounded (f '' K))
-    (h : TendstoUniformlyOn F f l K) :
-    TendstoUniformlyOn (fun t y => G (F t y)) (fun y => G (f y)) l K := by
+theorem tendstoUniformlyOn_comp_continuous
+    {α ι Z W : Type*} [PseudoMetricSpace Z] [ProperSpace Z] [PseudoMetricSpace W]
+    {l : Filter ι} {K : Set α}
+    (G : Z → W) (hG : Continuous G)
+    (F : ι → α → Z) (f : α → Z) (hb : Bornology.IsBounded (f '' K)) (h : TendstoUniformlyOn F f l K)
+    : TendstoUniformlyOn (fun t y => G (F t y)) (fun y => G (f y)) l K := by
   rcases isEmpty_or_nonempty Z with hZ | ⟨⟨z0⟩⟩
   · rw [Metric.tendstoUniformlyOn_iff]
     intro ε _
@@ -118,17 +150,18 @@ theorem tendstoUniformlyOn_comp_continuous {α ι Z W : Type*} [PseudoMetricSpac
     linarith
   exact hδG _ hfy' _ hFy (lt_of_lt_of_le h1 (min_le_left _ _))
 
-def hessL {D : ℕ} (H : (Fin D → ℂ) →L[ℝ] (Fin D → ℂ) →L[ℝ] ℝ) : Fin D → Fin D → ℂ :=
-  fun i j =>
-    ((H (Pi.single i 1) (Pi.single j 1) +
-        H (Complex.I • Pi.single i 1) (Complex.I • Pi.single j 1) : ℝ) +
-      Complex.I * ((H (Pi.single i 1) (Complex.I • Pi.single j 1) -
-        H (Complex.I • Pi.single i 1) (Pi.single j 1) : ℝ))) / 4
+def hessL {D : ℕ} (H : (Fin D → ℂ) →L[ℝ] (Fin D → ℂ) →L[ℝ] ℝ) : Fin D → Fin D → ℂ := fun i j =>
+  ((H (Pi.single i 1) (Pi.single j 1) + H (Complex.I • Pi.single i 1) (Complex.I • Pi.single j 1)
+        : ℝ)
+      + Complex.I
+        * ((H (Pi.single i 1) (Complex.I • Pi.single j 1)
+            - H (Complex.I • Pi.single i 1) (Pi.single j 1)
+          : ℝ)))
+    / 4
 
 theorem continuous_hessL {D : ℕ} : Continuous (hessL (D := D)) := by
-  have hev : ∀ a b : Fin D → ℂ,
-      Continuous fun H : (Fin D → ℂ) →L[ℝ] (Fin D → ℂ) →L[ℝ] ℝ => H a b := fun a b =>
-    (continuous_id.clm_apply continuous_const).clm_apply continuous_const
+  have hev : ∀ a b : Fin D → ℂ, Continuous fun H : (Fin D → ℂ) →L[ℝ] (Fin D → ℂ) →L[ℝ] ℝ => H a b :=
+    fun a b => (continuous_id.clm_apply continuous_const).clm_apply continuous_const
   refine continuous_pi fun i => continuous_pi fun j => ?_
   show Continuous fun H : (Fin D → ℂ) →L[ℝ] (Fin D → ℂ) →L[ℝ] ℝ => ((H (Pi.single i 1) (Pi.single j 1) +
         H (Complex.I • Pi.single i 1) (Complex.I • Pi.single j 1) : ℝ) +
@@ -138,47 +171,55 @@ theorem continuous_hessL {D : ℕ} : Continuous (hessL (D := D)) := by
   exact (Complex.continuous_ofReal.comp ((hev _ _).add (hev _ _))).add
     (continuous_const.mul (Complex.continuous_ofReal.comp ((hev _ _).sub (hev _ _))))
 
-private theorem hessC_eq_lemma_3 {D : ℕ} (φ : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ) :
-    hessC φ z = hessL (fderiv ℝ (fderiv ℝ φ) z) := rfl
+private theorem hessC_eq_lemma_3 {D : ℕ} (φ : (Fin D → ℂ) → ℝ) (z : Fin D → ℂ)
+    : hessC φ z = hessL (fderiv ℝ (fderiv ℝ φ) z) :=
+  rfl
 
-private theorem hessL_add_lemma_2 {D : ℕ} (H1 H2 : (Fin D → ℂ) →L[ℝ] (Fin D → ℂ) →L[ℝ] ℝ) :
-    hessL (H1 + H2) = hessL H1 + hessL H2 := by
+private theorem hessL_add_lemma_2 {D : ℕ} (H1 H2 : (Fin D → ℂ) →L[ℝ] (Fin D → ℂ) →L[ℝ] ℝ)
+    : hessL (H1 + H2) = hessL H1 + hessL H2 := by
   funext i k
   simp only [hessL, ContinuousLinearMap.add_apply, Pi.add_apply]
   push_cast
   ring
 
-private theorem hessL_re_lemma {D : ℕ} (h : (Fin D → ℂ) → ℂ) (y : Fin D → ℂ)
-    (hh : ∀ᶠ z in 𝓝 y, AnalyticAt ℂ h z) :
-    hessL (fderiv ℝ (fderiv ℝ fun z => (h z).re) y) = 0 := by
-  obtain ⟨L, hL⟩ : ∃ L : ((Fin D → ℂ) →L[ℂ] ℂ) →L[ℝ] ((Fin D → ℂ) →L[ℝ] ℝ),
-      ∀ T, L T = Complex.reCLM.comp (T.restrictScalars ℝ) :=
-    ⟨(ContinuousLinearMap.compL ℝ (Fin D → ℂ) ℂ ℝ Complex.reCLM).comp
-      (ContinuousLinearMap.restrictScalarsL ℂ (Fin D → ℂ) ℂ ℝ ℝ), fun T => rfl⟩
+private theorem hessL_re_lemma
+    {D : ℕ} (h : (Fin D → ℂ) → ℂ) (y : Fin D → ℂ) (hh : ∀ᶠ z in 𝓝 y, AnalyticAt ℂ h z)
+    : hessL (fderiv ℝ (fderiv ℝ fun z => (h z).re) y) = 0 := by
+  obtain ⟨L, hL⟩
+      : ∃ L : ((Fin D → ℂ) →L[ℂ] ℂ) →L[ℝ] ((Fin D → ℂ) →L[ℝ] ℝ), ∀ T,
+        L T = Complex.reCLM.comp (T.restrictScalars ℝ) := ⟨
+    (ContinuousLinearMap.compL ℝ (Fin D → ℂ) ℂ ℝ Complex.reCLM).comp
+      (ContinuousLinearMap.restrictScalarsL ℂ (Fin D → ℂ) ℂ ℝ ℝ),
+    fun T => rfl
+  ⟩
   have h1 : fderiv ℝ (fun z => (h z).re) =ᶠ[𝓝 y] fun z => L (fderiv ℂ h z) := by
     filter_upwards [hh] with z hz
     rw [hL]
-    have h3 := (Complex.reCLM.hasFDerivAt.comp z
-      (hz.differentiableAt.hasFDerivAt.restrictScalars ℝ)).fderiv
+    have h3 :=
+      (Complex.reCLM.hasFDerivAt.comp z (hz.differentiableAt.hasFDerivAt.restrictScalars ℝ)).fderiv
     simpa [Function.comp_def] using h3
-  have h2 : HasFDerivAt (fun z => L (fderiv ℂ h z))
+  have h2 : HasFDerivAt
+      (fun z => L (fderiv ℂ h z))
       (L.comp ((fderiv ℂ (fderiv ℂ h) y).restrictScalars ℝ)) y :=
     L.hasFDerivAt.comp y (hh.self_of_nhds.fderiv.differentiableAt.hasFDerivAt.restrictScalars ℝ)
   rw [h1.fderiv_eq, h2.fderiv]
   funext i k
   simp [hessL, hL, Complex.mul_re]
 
-theorem hessC_base {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (P : LocPot X)
-    (hP : IsPotential A P) (j : Fin A.n) {y : Fin e → ℂ} (hy : y ∈ (A.chart j).target) (x : X)
-    (hx : (A.chart j).symm y ∈ P.U x) :
-    hessC (fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) y =
-      hessC (P.φ x ∘ (A.chart j).symm) y := by
+theorem hessC_base
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (P : LocPot X) (hP : IsPotential A P)
+    (j : Fin A.n)
+    {y : Fin e → ℂ} (hy : y ∈ (A.chart j).target)
+    (x : X) (hx : (A.chart j).symm y ∈ P.U x)
+    : hessC (fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) y
+      = hessC (P.φ x ∘ (A.chart j).symm) y := by
   obtain ⟨W, hWo, hxW, G, hG, hdiff⟩ :=
     hP.2 ((A.chart j).symm y) x ((A.chart j).symm y) ⟨P.mem_U _, hx⟩
-  have hN : (A.chart j).target ∩ (A.chart j).symm ⁻¹' (W ∩ P.U ((A.chart j).symm y) ∩ P.U x)
-      ∈ 𝓝 y :=
-    ((A.chart j).isOpen_inter_preimage_symm ((hWo.inter (P.isOpen_U _)).inter (P.isOpen_U _))).mem_nhds
-      ⟨hy, ⟨hxW, P.mem_U _⟩, hx⟩
+  have hN
+      : (A.chart j).target ∩ (A.chart j).symm ⁻¹' (W ∩ P.U ((A.chart j).symm y) ∩ P.U x) ∈ 𝓝 y :=
+    ((A.chart j).isOpen_inter_preimage_symm
+      ((hWo.inter (P.isOpen_U _)).inter (P.isOpen_U _))).mem_nhds ⟨hy, ⟨hxW, P.mem_U _⟩, hx⟩
   have hS1o : IsOpen ((A.chart j).target ∩ (A.chart j).symm ⁻¹' P.U x) :=
     (A.chart j).isOpen_inter_preimage_symm (P.isOpen_U x)
   have hS2 : (A.chart j).target ∩ (A.chart j).symm ⁻¹' W ∈ 𝓝 y :=
@@ -190,7 +231,15 @@ theorem hessC_base {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e 
     filter_upwards [hS2] with z hz
     exact hG j z hz
   have hd1 : ∀ᶠ z in 𝓝 y, DifferentiableAt ℝ (P.φ x ∘ (A.chart j).symm) z :=
-    hcd.mono fun z hz => hz.differentiableAt (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))
+    hcd.mono fun z hz =>
+      hz.differentiableAt (by
+        first
+        | exact le_top
+        | (simp; done)
+        | (norm_num; done)
+        | exact le_of_eq (by norm_num)
+        | exact le_of_eq one_add_one_eq_two
+        | (simp; exact le_of_eq one_add_one_eq_two))
   have hd2 : ∀ᶠ z in 𝓝 y, DifferentiableAt ℝ (fun z => (G ((A.chart j).symm z)).re) z :=
     han.mono fun z hz => by
       have h0 : ContDiffAt ℝ 1 (fun z => G ((A.chart j).symm z)) z :=
@@ -200,30 +249,43 @@ theorem hessC_base {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e 
     have h0 : ContDiffAt ℝ 2 (fun z => G ((A.chart j).symm z)) y :=
       (han.self_of_nhds.contDiffAt).restrict_scalars ℝ
     exact Complex.reCLM.contDiff.contDiffAt.comp y h0
-  have heq : (fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) =ᶠ[𝓝 y]
-      fun z => (P.φ x ∘ (A.chart j).symm) z + (G ((A.chart j).symm z)).re := by
+  have heq
+      : (fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) =ᶠ[𝓝 y]
+        fun z => (P.φ x ∘ (A.chart j).symm) z + (G ((A.chart j).symm z)).re := by
     filter_upwards [hN] with z hz
     have h4 := hdiff ((A.chart j).symm z) hz.2
     simp only [Function.comp_apply]
     linarith
-  have h1 : fderiv ℝ (fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) =ᶠ[𝓝 y]
-      fun z => fderiv ℝ (P.φ x ∘ (A.chart j).symm) z +
-        fderiv ℝ (fun z => (G ((A.chart j).symm z)).re) z := by
+  have h1
+      : fderiv ℝ (fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) =ᶠ[𝓝 y]
+        fun z => fderiv ℝ (P.φ x ∘ (A.chart j).symm) z +
+          fderiv ℝ (fun z => (G ((A.chart j).symm z)).re) z := by
     filter_upwards [heq.eventuallyEq_nhds, hd1, hd2] with z hz hz1 hz2
     rw [hz.fderiv_eq]
     exact fderiv_add hz1 hz2
-  have hF : fderiv ℝ (fderiv ℝ fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) y =
-      fderiv ℝ (fderiv ℝ (P.φ x ∘ (A.chart j).symm)) y +
-        fderiv ℝ (fderiv ℝ fun z => (G ((A.chart j).symm z)).re) y := by
+  have hF
+      : fderiv ℝ (fderiv ℝ fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) y
+        = fderiv ℝ (fderiv ℝ (P.φ x ∘ (A.chart j).symm)) y
+          + fderiv ℝ (fderiv ℝ fun z => (G ((A.chart j).symm z)).re) y := by
     rw [h1.fderiv_eq]
     exact fderiv_add
-      (((contDiffAt_infty.1 hcd.self_of_nhds 2).fderiv_right (m := 1) (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))).differentiableAt (by simp))
+      (((contDiffAt_infty.1 hcd.self_of_nhds 2).fderiv_right (m := 1) (by
+        first
+        | exact le_top
+        | (simp; done)
+        | (norm_num; done)
+        | exact le_of_eq (by norm_num)
+        | exact le_of_eq one_add_one_eq_two
+        | (simp; exact le_of_eq one_add_one_eq_two))).differentiableAt (by simp))
       ((hcd2.fderiv_right (m := 1) (le_of_eq one_add_one_eq_two)).differentiableAt (by simp))
   rw [hessC_eq_lemma_3, hessC_eq_lemma_3, hF, hessL_add_lemma_2, hessL_re_lemma _ y han, add_zero]
 
-theorem hessC_base_continuousOn {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
-    (P : LocPot X) (hP : IsPotential A P) (j : Fin A.n) :
-    ContinuousOn (fun y => hessC (fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) y)
+theorem hessC_base_continuousOn
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (P : LocPot X) (hP : IsPotential A P)
+    (j : Fin A.n)
+    : ContinuousOn
+      (fun y => hessC (fun y' => P.φ ((A.chart j).symm y) ((A.chart j).symm y')) y)
       (A.chart j).target := by
   intro y0 hy0
   apply ContinuousAt.continuousWithinAt
@@ -234,29 +296,91 @@ theorem hessC_base_continuousOn {e : ℕ} {X : Type} [TopologicalSpace X] (A : F
   have hcd : ContDiffAt ℝ ∞ (P.φ ((A.chart j).symm y0) ∘ (A.chart j).symm) y0 :=
     (hP.1 _ j).contDiffAt hS
   have hc : ContinuousAt
-      (fun y => fderiv ℝ (fderiv ℝ (P.φ ((A.chart j).symm y0) ∘ (A.chart j).symm)) y) y0 :=
-    (((contDiffAt_infty.1 hcd 2).fderiv_right (m := 1) (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))).fderiv_right (m := 0) (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))).continuousAt
+      (fun y => fderiv ℝ (fderiv ℝ (P.φ ((A.chart j).symm y0) ∘ (A.chart j).symm)) y)
+      y0 :=
+    (((contDiffAt_infty.1 hcd 2).fderiv_right (m := 1) (by
+        first
+        | exact le_top
+        | (simp; done)
+        | (norm_num; done)
+        | exact le_of_eq (by norm_num)
+        | exact le_of_eq one_add_one_eq_two
+        | (simp; exact le_of_eq one_add_one_eq_two))).fderiv_right (m := 0) (by
+      first
+      | exact le_top
+      | (simp; done)
+      | (norm_num; done)
+      | exact le_of_eq (by norm_num)
+      | exact le_of_eq one_add_one_eq_two
+      | (simp; exact le_of_eq one_add_one_eq_two))).continuousAt
   refine (continuous_hessL.continuousAt.comp hc).congr ?_
   filter_upwards [hS] with y hy
   simp only [Function.comp_apply]
   rw [hessC_base A P hP j hy.1 _ hy.2, hessC_eq_lemma_3]
 
-private theorem evCD_lemma_5 {D : ℕ} {g : (Fin D → ℂ) → ℝ} {O : Set (Fin D → ℂ)}
-    (hg : ContDiffOn ℝ ∞ g O) (hO : IsOpen O) {y : Fin D → ℂ} (hy : y ∈ O) :
-    ∀ᶠ z in 𝓝 y, ContDiffAt ℝ (2 : ℕ) g z := by
+private theorem evCD_lemma_5
+    {D : ℕ} {g : (Fin D → ℂ) → ℝ} {O : Set (Fin D → ℂ)} (hg : ContDiffOn ℝ ∞ g O) (hO : IsOpen O)
+    {y : Fin D → ℂ} (hy : y ∈ O)
+    : ∀ᶠ z in 𝓝 y, ContDiffAt ℝ (2 : ℕ) g z := by
   filter_upwards [hO.mem_nhds hy] with z hz
   exact contDiffAt_infty.1 (hg.contDiffAt (hO.mem_nhds hz)) 2
 
-private theorem hessC_add_lemma_4 {D : ℕ} (f g : (Fin D → ℂ) → ℝ) (y : Fin D → ℂ)
-    (hf : ∀ᶠ z in 𝓝 y, ContDiffAt ℝ (2 : ℕ) f z) (hg : ∀ᶠ z in 𝓝 y, ContDiffAt ℝ (2 : ℕ) g z) :
-    hessC (fun z => f z + g z) y = hessC f y + hessC g y := by
+private theorem hessC_add_lemma_4
+    {D : ℕ} (f g : (Fin D → ℂ) → ℝ) (y : Fin D → ℂ) (hf : ∀ᶠ z in 𝓝 y, ContDiffAt ℝ (2 : ℕ) f z)
+    (hg : ∀ᶠ z in 𝓝 y, ContDiffAt ℝ (2 : ℕ) g z)
+    : hessC (fun z => f z + g z) y = hessC f y + hessC g y := by
   have h1 : fderiv ℝ (fun z => f z + g z) =ᶠ[𝓝 y] fun z => fderiv ℝ f z + fderiv ℝ g z := by
     filter_upwards [hf, hg] with z hz1 hz2
-    exact fderiv_add (hz1.differentiableAt (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))) (hz2.differentiableAt (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two)))
-  have hsum : fderiv ℝ (fun z => fderiv ℝ f z + fderiv ℝ g z) y =
-      fderiv ℝ (fderiv ℝ f) y + fderiv ℝ (fderiv ℝ g) y :=
-    (((hf.self_of_nhds.fderiv_right (m := 1) (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))).differentiableAt (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))).hasFDerivAt.add
-      ((hg.self_of_nhds.fderiv_right (m := 1) (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))).differentiableAt (by first | exact le_top | (simp; done) | (norm_num; done) | exact le_of_eq (by norm_num) | exact le_of_eq one_add_one_eq_two | (simp; exact le_of_eq one_add_one_eq_two))).hasFDerivAt).fderiv
+    exact fderiv_add
+      (hz1.differentiableAt (by
+        first
+        | exact le_top
+        | (simp; done)
+        | (norm_num; done)
+        | exact le_of_eq (by norm_num)
+        | exact le_of_eq one_add_one_eq_two
+        | (simp; exact le_of_eq one_add_one_eq_two)))
+      (hz2.differentiableAt (by
+        first
+        | exact le_top
+        | (simp; done)
+        | (norm_num; done)
+        | exact le_of_eq (by norm_num)
+        | exact le_of_eq one_add_one_eq_two
+        | (simp; exact le_of_eq one_add_one_eq_two)))
+  have hsum
+      : fderiv ℝ (fun z => fderiv ℝ f z + fderiv ℝ g z) y
+        = fderiv ℝ (fderiv ℝ f) y + fderiv ℝ (fderiv ℝ g) y :=
+    (((hf.self_of_nhds.fderiv_right (m := 1) (by
+          first
+          | exact le_top
+          | (simp; done)
+          | (norm_num; done)
+          | exact le_of_eq (by norm_num)
+          | exact le_of_eq one_add_one_eq_two
+          | (simp; exact le_of_eq one_add_one_eq_two))).differentiableAt (by
+        first
+        | exact le_top
+        | (simp; done)
+        | (norm_num; done)
+        | exact le_of_eq (by norm_num)
+        | exact le_of_eq one_add_one_eq_two
+        | (simp; exact le_of_eq one_add_one_eq_two))).hasFDerivAt.add
+      ((hg.self_of_nhds.fderiv_right (m := 1) (by
+          first
+          | exact le_top
+          | (simp; done)
+          | (norm_num; done)
+          | exact le_of_eq (by norm_num)
+          | exact le_of_eq one_add_one_eq_two
+          | (simp; exact le_of_eq one_add_one_eq_two))).differentiableAt (by
+        first
+        | exact le_top
+        | (simp; done)
+        | (norm_num; done)
+        | exact le_of_eq (by norm_num)
+        | exact le_of_eq one_add_one_eq_two
+        | (simp; exact le_of_eq one_add_one_eq_two))).hasFDerivAt).fderiv
   rw [hessC_eq_lemma_3, hessC_eq_lemma_3, hessC_eq_lemma_3, h1.fderiv_eq, hsum, hessL_add_lemma_2]
   all_goals rfl
 

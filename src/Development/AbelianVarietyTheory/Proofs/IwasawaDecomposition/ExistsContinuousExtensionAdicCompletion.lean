@@ -5,17 +5,19 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
+open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
 
 namespace GlobalTheory
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.exists_continuous_extension_adicCompletion (E : Type) [Field E] [NumberField E] (l : ℕ)
-    [Fact l.Prime] (τ : E →+* _root_.Formalism.ConjugateSelfDual.Qbar l) (v : HeightOneSpectrum (𝓞 E))
-    (h : ∀ x : E, v.valuation E x < 1 ↔ ‖τ x‖ < 1) :
-    ∃ j : v.adicCompletion E →+* _root_.Formalism.ConjugateSelfDual.Qbar l, Continuous j ∧
-      j.comp (algebraMap E (v.adicCompletion E)) = τ := by
+theorem _root_.GlobalTheory.exists_continuous_extension_adicCompletion
+    (E : Type) [Field E] [NumberField E]
+    (l : ℕ) [Fact l.Prime]
+    (τ : E →+* _root_.Formalism.ConjugateSelfDual.Qbar l) (v : HeightOneSpectrum (𝓞 E))
+    (h : ∀ x : E, v.valuation E x < 1 ↔ ‖τ x‖ < 1)
+    : ∃ j : v.adicCompletion E →+* _root_.Formalism.ConjugateSelfDual.Qbar l,
+      Continuous j ∧ j.comp (algebraMap E (v.adicCompletion E)) = τ := by
   unfold _root_.Formalism.ConjugateSelfDual.Qbar at τ h ⊢
 
   let b := Module.finBasis ℚ E
@@ -30,10 +32,10 @@ theorem _root_.GlobalTheory.exists_continuous_extension_adicCompletion (E : Type
       rw [← b.sum_repr x, map_sum]
     refine sum_mem fun i _ => ?_
     rw [Rat.smul_def, map_mul, map_ratCast]
-    exact mul_mem (SubfieldClass.ratCast_mem K _)
-      (IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩)
+    exact mul_mem (SubfieldClass.ratCast_mem K _) (IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩)
 
-  let g : WithVal (v.valuation E) →+* PadicAlgCl l := τ.comp (WithVal.equiv (v.valuation E)).toRingHom
+  let g : WithVal (v.valuation E) →+* PadicAlgCl l :=
+    τ.comp (WithVal.equiv (v.valuation E)).toRingHom
   obtain ⟨π, hπ⟩ := HeightOneSpectrum.valuation_exists_uniformizer E v
   have hπ0 : π ≠ 0 := by
     intro h0
@@ -67,19 +69,23 @@ theorem _root_.GlobalTheory.exists_continuous_extension_adicCompletion (E : Type
     (τ.codRestrict K hmem).comp (WithVal.equiv (v.valuation E)).toRingHom
   have hτ' : Continuous τ' := continuous_induced_rng.2 hg
   let ext : (v.valuation E).Completion →+* K := UniformSpace.Completion.extensionHom τ' hτ'
-  let φ : v.adicCompletion E →+* (v.valuation E).Completion :=
-    { toFun := HeightOneSpectrum.adicCompletion.toCompletion
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let φ : v.adicCompletion E →+* (v.valuation E).Completion := {
+    toFun := HeightOneSpectrum.adicCompletion.toCompletion
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   have hφ : Continuous φ := uniformContinuous_comap.continuous
   refine ⟨(algebraMap K (PadicAlgCl l)).comp (ext.comp φ), ?_, ?_⟩
   · exact continuous_subtype_val.comp (UniformSpace.Completion.continuous_extension.comp hφ)
   · ext x
     simp only [RingHom.comp_apply, HeightOneSpectrum.algebraMap_adicCompletion, Function.comp_apply]
-    change ((ext ((WithVal.equiv (v.valuation E)).symm (algebraMap E E x) : (v.valuation E).Completion) : K) :
-      PadicAlgCl l) = τ x
+    change ((ext
+            ((WithVal.equiv (v.valuation E)).symm (algebraMap E E x) : (v.valuation E).Completion)
+          : K)
+        : PadicAlgCl l)
+      = τ x
     rw [UniformSpace.Completion.extensionHom_coe]
     rfl
 

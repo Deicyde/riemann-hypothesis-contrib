@@ -20,17 +20,20 @@ end
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.UnitRigidity
 
-theorem geometricallyConnected_of_isPullback_of_surjective {P X Y Z : Scheme.{0}} {a : P ⟶ X}
-    {b : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z} (h : IsPullback a b f g) [Surjective g]
-    [GeometricallyConnected b] : GeometricallyConnected f := by
+theorem geometricallyConnected_of_isPullback_of_surjective
+    {P X Y Z : Scheme.{0}} {a : P ⟶ X} {b : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z} (h : IsPullback a b f g)
+    [Surjective g] [GeometricallyConnected b]
+    : GeometricallyConnected f := by
   refine ⟨fun k _ y W fst snd hW => ?_⟩
   obtain ⟨z, -⟩ := (pullback.snd g y).surjective (Classical.arbitrary _)
   let p := (pullback g y).fromSpecResidueField z
-  have : Surjective (p ≫ pullback.snd g y) := ⟨fun x => ⟨Classical.arbitrary _, Subsingleton.elim _ _⟩⟩
+  have : Surjective (p ≫ pullback.snd g y) :=
+    ⟨fun x => ⟨Classical.arbitrary _, Subsingleton.elim _ _⟩⟩
   have h1 := (IsPullback.of_hasPullback snd (p ≫ pullback.snd g y)).paste_horiz hW
   rw [Category.assoc, ← pullback.condition, ← Category.assoc] at h1
   have h2 := IsPullback.of_right (by rwa [h.lift_fst]) (h.lift_snd _ _ h1.w) h
@@ -39,10 +42,11 @@ theorem geometricallyConnected_of_isPullback_of_surjective {P X Y Z : Scheme.{0}
   exact (pullback.fst snd (p ≫ pullback.snd g y)).surjective.connectedSpace
     (pullback.fst snd (p ≫ pullback.snd g y)).continuous
 
-theorem isPullback_act {S : Scheme.{0}} {T G B : Over S} [GrpObj T] [GrpObj G] [GrpObj B]
+theorem isPullback_act
+    {S : Scheme.{0}} {T G B : Over S} [GrpObj T] [GrpObj G] [GrpObj B]
     (i : T ⟶ G) (q : G ⟶ B) [IsMonHom i] [IsMonHom q]
-    (hk : IsPullback i (toUnit _) q (η : 𝟙_ _ ⟶ B)) :
-    IsPullback ((fst T G ≫ i) * snd T G) (snd T G) q q := by
+    (hk : IsPullback i (toUnit _) q (η : 𝟙_ _ ⟶ B))
+    : IsPullback ((fst T G ≫ i) * snd T G) (snd T G) q q := by
   have inj : ∀ {W : Over S} {x y : W ⟶ T}, x ≫ i = y ≫ i → x = y := fun h =>
     hk.hom_ext h (toUnit_unique _ _)
   have ex : ∀ {W : Over S} (x : W ⟶ G), x ≫ q = 1 → ∃ y : W ⟶ T, y ≫ i = x := fun x h =>
@@ -60,8 +64,9 @@ theorem isPullback_act {S : Scheme.{0}} {T G B : Over S} [GrpObj T] [GrpObj G] [
       rw [lift_fst, hW.choose_spec, ← h1, ← h2, MonObj.comp_mul, mul_div_cancel_right,
         Category.assoc]
 
-theorem smooth_geometricallyConnected_of_isGt {S : Scheme.{0}} (E : SplitExt S) (G : Over S) [GrpObj G]
-    (h : E.IsGt G) : Smooth G.hom ∧ GeometricallyConnected G.hom := by
+theorem smooth_geometricallyConnected_of_isGt
+    {S : Scheme.{0}} (E : SplitExt S) (G : Over S) [GrpObj G] (h : E.IsGt G)
+    : Smooth G.hom ∧ GeometricallyConnected G.hom := by
   obtain ⟨D⟩ := h
   have := D.q_hom
   have := D.i_hom
@@ -81,7 +86,8 @@ theorem smooth_geometricallyConnected_of_isGt {S : Scheme.{0}} (E : SplitExt S) 
     inferInstanceAs (GeometricallyConnected (pullback.snd (splitTorus S E.X).hom G.hom))
   have b1 : Smooth D.q.left :=
     MorphismProperty.of_isPullback_of_descendsAlong (P := @Smooth)
-      (Q := @Surjective ⊓ @Flat ⊓ @QuasiCompact) H.flip ⟨⟨‹_›, ‹_›⟩, (inferInstance : QuasiCompact D.q.left)⟩ a1
+      (Q := @Surjective ⊓ @Flat ⊓ @QuasiCompact) H.flip
+      ⟨⟨‹_›, ‹_›⟩, (inferInstance : QuasiCompact D.q.left)⟩ a1
   have b2 : GeometricallyConnected D.q.left :=
     @geometricallyConnected_of_isPullback_of_surjective _ _ _ _ _ _ _ _ H D.q_surjective a2
   rw [← Over.w D.q]
@@ -89,48 +95,62 @@ theorem smooth_geometricallyConnected_of_isGt {S : Scheme.{0}} (E : SplitExt S) 
 
 open scoped TensorProduct
 
-theorem noZeroDivisors_tensor {K A : Type} [Field K] [CommRing A] [Nontrivial A] [Algebra K A]
+theorem noZeroDivisors_tensor
+    {K A : Type} [Field K] [CommRing A] [Nontrivial A] [Algebra K A]
     {X : Scheme.{0}} (f : X ⟶ Spec (.of K)) [GeometricallyIntegral f]
     (g : Spec (.of A) ⟶ X) [IsOpenImmersion g]
     (hg : g ≫ f = Spec.map (CommRingCat.ofHom (algebraMap K A)))
-    (F : Type) [Field F] [Algebra K F] : NoZeroDivisors (F ⊗[K] A) := by
+    (F : Type) [Field F] [Algebra K F]
+    : NoZeroDivisors (F ⊗[K] A) := by
   let y := Spec.map (CommRingCat.ofHom (algebraMap K F))
   have : IsIntegral (pullback y f) :=
     pullback_of_geometrically' GeometricallyIntegral.geometrically_isIntegral F y
-  let m : Spec (.of (F ⊗[K] A)) ⟶ pullback y f := (pullbackSpecIso K F A).inv ≫
-    pullback.map _ _ _ _ (𝟙 _) g (𝟙 _) (by simp [y]) (by simp [hg])
+  let m : Spec (.of (F ⊗[K] A)) ⟶ pullback y f :=
+    (pullbackSpecIso K F A).inv ≫ pullback.map _ _ _ _ (𝟙 _) g (𝟙 _) (by simp [y]) (by simp [hg])
   have : IsIntegral (Spec (.of (F ⊗[K] A))) := isIntegral_of_isOpenImmersion m
   have : IsDomain (F ⊗[K] A) := (affine_isIntegral_iff (.of (F ⊗[K] A))).mp this
   infer_instance
 
-theorem unit_eq_one_of_axes {K : Type} [Field K] [IsAlgClosed K] {X : Scheme.{0}}
-    (f : X ⟶ Spec (.of K)) [GeometricallyIntegral f] (e : Spec (.of K) ⟶ X) (he : e ≫ f = 𝟙 _)
-    (a₁ a₂ : X ⟶ pullback f f) (h₁ : a₁ ≫ pullback.fst f f = 𝟙 X) (h₁' : a₁ ≫ pullback.snd f f = f ≫ e)
+theorem unit_eq_one_of_axes
+    {K : Type} [Field K] [IsAlgClosed K]
+    {X : Scheme.{0}} (f : X ⟶ Spec (.of K)) [GeometricallyIntegral f]
+    (e : Spec (.of K) ⟶ X) (he : e ≫ f = 𝟙 _)
+    (a₁ a₂ : X ⟶ pullback f f)
+    (h₁ : a₁ ≫ pullback.fst f f = 𝟙 X) (h₁' : a₁ ≫ pullback.snd f f = f ≫ e)
     (h₂ : a₂ ≫ pullback.fst f f = f ≫ e) (h₂' : a₂ ≫ pullback.snd f f = 𝟙 X)
-    (u : Γ(pullback f f, ⊤)) (hu : IsUnit u) (u₁ : a₁.appTop.hom u = 1) (u₂ : a₂.appTop.hom u = 1) :
-    u = 1 := by
+    (u : Γ(pullback f f, ⊤)) (hu : IsUnit u) (u₁ : a₁.appTop.hom u = 1) (u₂ : a₂.appTop.hom u = 1)
+    : u = 1 := by
   first
   | exact @_root_.GlobalTheory.PrimitiveUnitProduct.unit_on_product_eq_one
   | exact _root_.GlobalTheory.PrimitiveUnitProduct.unit_on_product_eq_one
   | (apply _root_.GlobalTheory.PrimitiveUnitProduct.unit_on_product_eq_one <;> assumption)
   | (intros; apply _root_.GlobalTheory.PrimitiveUnitProduct.unit_on_product_eq_one <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PrimitiveUnitProduct.unit_on_product_eq_one <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.PrimitiveUnitProduct.unit_on_product_eq_one
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PrimitiveUnitProduct.unit_on_product_eq_one ..)
 
 end GlobalTheory.UnitRigidity
 
 namespace GlobalTheory
 
-
 open UnitRigidity in
-theorem unit_eq_one_of_axes_of_isGt :
-    ∀ (K : Type) [Field K] [IsAlgClosed K] (E : SplitExt (Sp K)) (G : Over (Sp K)) [GrpObj G], E.IsGt G → ∀ u : Γ((G ⊗ G).left, ⊤), IsUnit u → (lift (𝟙 G) (1 : G ⟶ G)).left.appTop.hom u = 1 → (lift (1 : G ⟶ G) (𝟙 G)).left.appTop.hom u = 1 → u = 1 := by
+theorem unit_eq_one_of_axes_of_isGt
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (E : SplitExt (Sp K)) (G : Over (Sp K)) [GrpObj G],
+      E.IsGt G
+        → ∀ u : Γ((G ⊗ G).left, ⊤),
+          IsUnit u → (lift (𝟙 G) (1 : G ⟶ G)).left.appTop.hom u = 1
+            → (lift (1 : G ⟶ G) (𝟙 G)).left.appTop.hom u = 1
+            → u = 1 := by
   intro K _ _ E G _ h u hu u₁ u₂
   obtain ⟨_, _⟩ := UnitRigidity.smooth_geometricallyConnected_of_isGt E G h
   have := geometricallyIntegral_of_smooth G.hom
   have h1 : (1 : G ⟶ G).left = G.hom ≫ (η[G] : 𝟙_ _ ⟶ G).left := by
     rw [Hom.one_def, Over.comp_left, Over.toUnit_left]
-  refine UnitRigidity.unit_eq_one_of_axes G.hom (η[G] : 𝟙_ _ ⟶ G).left (Over.w _) _ _ ?_ ?_ ?_ ?_ u hu u₁ u₂
+  refine UnitRigidity.unit_eq_one_of_axes G.hom (η[G] : 𝟙_ _ ⟶ G).left (Over.w _) _ _ ?_ ?_ ?_ ?_ u
+    hu u₁ u₂
   · exact congrArg (·.left) (lift_fst (𝟙 G) (1 : G ⟶ G))
   · exact (congrArg (·.left) (lift_snd (𝟙 G) (1 : G ⟶ G))).trans h1
   · exact (congrArg (·.left) (lift_fst (1 : G ⟶ G) (𝟙 G))).trans h1

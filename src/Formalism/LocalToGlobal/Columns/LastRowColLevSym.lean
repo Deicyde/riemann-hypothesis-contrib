@@ -26,7 +26,8 @@ theorem xt_N_top {m2 : ℕ} (hm : R.m = m2 + 2) : R.N (m2 + 1 + 1) - 1 = R.r + R
   have e : (m2 + 1 + 1) * (R.t + 1) = (m2 + 2) * R.t + (m2 + 2) := by ring
   omega
 
-theorem lastRow_colLevSym (Ch : Chars X Pr R.m) {m2 : ℕ} (hm : R.m = m2 + 2) : LastRow (colLevSym Ch (m2 + 1 + 1)) := by
+theorem lastRow_colLevSym (Ch : Chars X Pr R.m) {m2 : ℕ} (hm : R.m = m2 + 2)
+    : LastRow (colLevSym Ch (m2 + 1 + 1)) := by
   intro w h' hh' l
   rw [colLevSym_top_H Ch (by omega) w] at hh'
   have hN := xt_N_top (R := R) hm

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChosenInject
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.EtRes
 

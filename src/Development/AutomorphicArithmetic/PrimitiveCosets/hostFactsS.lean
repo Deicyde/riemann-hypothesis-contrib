@@ -5,7 +5,10 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.ToEBij
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
 private lemma inPhi_of_jac {φ : Frame} (H : HostAx φ) (u : (ZMod H.toHostRaw.condN)ˣ) (k : ℕ)
@@ -45,20 +48,21 @@ private lemma toE_iod' (φ : Frame) : Multiplicative.toAdd (toE φ φ.iod) = sgc
   rw [(toE_bij φ).2.1]
   rfl
 
-private theorem hostFactsS_pf :
-    ∀ (φ : Frame) (H : HostAx φ), HostFactsS (arith H.toHostRaw) (H.QS * H.q).primeFactors := by
+private theorem hostFactsS_pf
+    : ∀ (φ : Frame) (H : HostAx φ), HostFactsS (arith H.toHostRaw) (H.QS * H.q).primeFactors := by
   intro φ H
   haveI : NeZero H.toHostRaw.condN := ⟨H.toHostRaw.condN_ne_zero⟩
   have hQq0 : H.QS * H.q ≠ 0 := Nat.mul_ne_zero H.QS_ne_zero H.q_prime.ne_zero
-  refine
-    { d_prime := H.d_prime
-      two_mem := Nat.mem_primeFactors.mpr ⟨Nat.prime_two, dvd_mul_of_dvd_left H.two_dvd_QS _, hQq0⟩
-      q1_mem := Nat.mem_primeFactors.mpr ⟨H.q_prime, dvd_mul_left _ _, hQq0⟩
-      d_not_mem := fun hm => H.d_not_dvd_QSq (Nat.dvd_of_mem_primeFactors hm)
-      unram := ?_
-      split_inertia := ?_
-      split_frob := ?_
-      inertia_d := ?_ }
+  refine {
+    d_prime := H.d_prime
+    two_mem := Nat.mem_primeFactors.mpr ⟨Nat.prime_two, dvd_mul_of_dvd_left H.two_dvd_QS _, hQq0⟩
+    q1_mem := Nat.mem_primeFactors.mpr ⟨H.q_prime, dvd_mul_left _ _, hQq0⟩
+    d_not_mem := fun hm => H.d_not_dvd_QSq (Nat.dvd_of_mem_primeFactors hm)
+    unram := ?_
+    split_inertia := ?_
+    split_frob := ?_
+    inertia_d := ?_
+  }
   · intro p hp hpS hpd
     have hpN : ¬ p ∣ H.toHostRaw.condN := by
       intro hdvd
@@ -85,8 +89,9 @@ private theorem hostFactsS_pf :
     exact inPhi_of_jac H _ p (Nat.ModEq.of_dvd (d_dvd_ordCompl H.toHostRaw hp hdvd) hf)
       (jac_of_dvd H.toHostRaw hp hdvd)
   · intro x
-    have hparts := parts_of_eq (N := H.toHostRaw.condN) (k := 1) (m := H.QS * H.q) H.d_prime
-      (by show H.QS * H.q * H.d = _; ring) H.d_not_dvd_QSq hQq0
+    have hparts :=
+      parts_of_eq (N := H.toHostRaw.condN) (k := 1) (m := H.QS * H.q) H.d_prime
+        (by show H.QS * H.q * H.d = _; ring) H.d_not_dvd_QSq hQq0
     refine (mem_inertia_iff H.q H.d (recH H.toHostRaw) H.d x).trans ?_
     constructor
     · rintro ⟨u, hu, rfl⟩
@@ -100,24 +105,28 @@ private theorem hostFactsS_pf :
         exact toE_iod' φ
     · rintro (rfl | rfl)
       · exact ⟨1, Subgroup.one_mem _, by simp⟩
-      · obtain ⟨u, hu1, hu2⟩ := exists_unit_crt (N := H.toHostRaw.condN) (a := H.QS * H.q) (b := H.d)
-          rfl H.coprime_QSq_d (dvd_mul_right _ _) H.d_dvd_condN 1 (-1)
+      · obtain ⟨u, hu1, hu2⟩ :=
+          exists_unit_crt (N := H.toHostRaw.condN) (a := H.QS * H.q) (b := H.d) rfl H.coprime_QSq_d
+            (dvd_mul_right _ _) H.d_dvd_condN 1 (-1)
         have hloc : (u : ZMod H.toHostRaw.condN).val ≡ 1 [MOD H.QS * H.q] :=
           (unitsMap_eq_one_iff _ u).mp hu1
         refine ⟨u, ?_, ?_⟩
         · rw [mem_localUnits_iff, hparts.2]
           exact hloc
-        · have hcast : (((u : ZMod H.toHostRaw.condN).val : ℤ) : ZMod H.d) = ((-1 : ℤ) : ZMod H.d) := by
+        · have hcast
+              : (((u : ZMod H.toHostRaw.condN).val : ℤ) : ZMod H.d) = ((-1 : ℤ) : ZMod H.d) := by
             have h3 := congrArg (fun v : (ZMod H.d)ˣ => (v : ZMod H.d)) hu2
             simp only [ZMod.unitsMap_def, Units.coe_map, MonoidHom.coe_coe, ZMod.castHom_apply,
-              Units.val_neg, Units.val_one] at h3
+                Units.val_neg, Units.val_one]
+              at h3
             push_cast
             rw [ZMod.natCast_val]
             exact h3
           rw [ZMod.intCast_eq_intCast_iff] at hcast
           have hjac : ((H.toHostRaw.art u).1.2 : ℤ) = -1 := by
             rw [H.der.art_ch u, jacobiSym.mod_left,
-              show (((u : ZMod H.toHostRaw.condN).val : ℕ) : ℤ) % (H.d : ℤ) = (-1) % (H.d : ℤ) from hcast,
+              show (((u : ZMod H.toHostRaw.condN).val : ℕ) : ℤ) % (H.d : ℤ) = (-1) % (H.d : ℤ) from
+                hcast,
               ← jacobiSym.mod_left, jacobiSym.at_neg_one (H.d_prime.odd_of_ne_two H.d_ne_two),
               ZMod.χ₄_nat_three_mod_four H.d_mod_four]
           rcases H.art_d u hloc with h | h
@@ -128,8 +137,8 @@ private theorem hostFactsS_pf :
             rw [h]
             exact toE_iod' φ
 
-theorem UpperTheory.Comparison₂.hostFactsS :
-    ∀ (φ : Frame) (H : HostAx φ), HostFactsS (arith H.toHostRaw) (insert H.q H.small) := by
+theorem UpperTheory.Comparison₂.hostFactsS
+    : ∀ (φ : Frame) (H : HostAx φ), HostFactsS (arith H.toHostRaw) (insert H.q H.small) := by
   intro φ H
   have hset : insert H.q H.small = (H.QS * H.q).primeFactors := by
     rw [Nat.primeFactors_mul H.QS_ne_zero H.q_prime.ne_zero, H.q_prime.primeFactors]

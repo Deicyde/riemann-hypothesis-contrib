@@ -17,8 +17,7 @@ private lemma mul_toAdd {Γ : Type} [Group Γ] {m : ℕ} (x : Γ →* Multiplica
     (x (g * h)).toAdd = (x g).toAdd + (x h).toAdd := by
   rw [map_mul, toAdd_mul]
 
-theorem UpperTheory.V.Z.Kato.Sym.PT.edgeGeo :
-    UpperTheory.V.Z.Kato.Sym.PT.EdgeGeo := by
+theorem UpperTheory.V.Z.Kato.Sym.PT.edgeGeo : UpperTheory.V.Z.Kato.Sym.PT.EdgeGeo := by
   intro Γ _ m Δ x y η hc
   refine ⟨fun g hg h hh => ?_, fun σ hσ g hg h hh => ?_⟩
   · have ha : g * h * g⁻¹ ∈ Δ := Δ.mul_mem (Δ.mul_mem hg hh) (Δ.inv_mem hg)

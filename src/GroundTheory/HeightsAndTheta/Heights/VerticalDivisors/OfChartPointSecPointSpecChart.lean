@@ -22,15 +22,18 @@ theorem FibreCompDim.full : FibreCompDim.Statement :=
 
 private theorem coneDim : GroundTheory.Heights₂.Heights.ConeDimOfChowForm.Statement :=
   GroundTheory.Heights₂.Heights.ConeDimOfChowForm.proof
-    (GroundTheory.Heights₂.Heights.IncIdealDim.proof GroundTheory.Heights₂.Heights.IncidenceGeneric.full
-      GroundTheory.Heights₂.Heights.GenericLinearTrdeg.full GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof)
+    (GroundTheory.Heights₂.Heights.IncIdealDim.proof
+      GroundTheory.Heights₂.Heights.IncidenceGeneric.full
+      GroundTheory.Heights₂.Heights.GenericLinearTrdeg.full
+      GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof)
     GroundTheory.Heights₂.Heights.IncIdealPrime.full
 
 theorem GenSecKer.full : GenSecKer.Statement := GenSecKer.proof SecAlgField.full coneDim
 
 theorem ChowFormSectionVertical.of_chartPoint_secPoint_specChart
     (hTrdeg : ChartPointTrdeg.Statement) (hSep : SecPointSeparable.Statement)
-    (hChart : SpecChart.Statement) : ChowFormSectionVertical.Statement :=
+    (hChart : SpecChart.Statement)
+    : ChowFormSectionVertical.Statement :=
   ChowFormSectionVertical.of_remaining
     (GenSecSeparable.proof SecAlgFinite.full GenSecDomain.full hTrdeg hSep)
     FibreClosedComponent.full GenSecKer.full hChart FiniteOrd.full

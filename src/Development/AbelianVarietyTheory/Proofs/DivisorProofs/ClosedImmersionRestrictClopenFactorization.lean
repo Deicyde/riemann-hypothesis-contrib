@@ -9,7 +9,16 @@ open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.
 
 namespace GlobalTheory
 
-theorem clopen_cut_closedImmersion : ∀ {X Z₁ : Scheme.{0}} (i : Z₁ ⟶ X), IsClosedImmersion i → ∀ (U : X.Opens), IsClosed (U : Set X) → ∃ (Z : Scheme.{0}) (j : Z ⟶ X), IsClosedImmersion j ∧ ∀ (T : Scheme.{0}) (g : T ⟶ X), ((∃ z : T ⟶ Z, z ≫ j = g) ↔ (∃ y : T ⟶ Z₁, y ≫ i = g) ∧ Set.range g.base ⊆ (U : Set X)) := by
+theorem clopen_cut_closedImmersion
+    : ∀ {X Z₁ : Scheme.{0}} (i : Z₁ ⟶ X),
+      IsClosedImmersion i
+        → ∀ (U : X.Opens),
+          IsClosed (U : Set X)
+            → ∃ (Z : Scheme.{0}) (j : Z ⟶ X),
+              IsClosedImmersion j
+                ∧ ∀ (T : Scheme.{0}) (g : T ⟶ X),
+                  ((∃ z : T ⟶ Z, z ≫ j = g)
+                    ↔ (∃ y : T ⟶ Z₁, y ≫ i = g) ∧ Set.range g.base ⊆ (U : Set X)) := by
   intro X Z₁ i hi U hU
   have hVc : IsClosed (Set.range (i ⁻¹ᵁ U).ι.base) := by
     rw [Scheme.Opens.range_ι]

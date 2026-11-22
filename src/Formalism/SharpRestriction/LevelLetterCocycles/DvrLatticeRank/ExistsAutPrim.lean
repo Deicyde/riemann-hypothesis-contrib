@@ -13,8 +13,9 @@ open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.Basi
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem exists_aut_prim (K : FinExt l) {z z' : Om l} (hz : IsPrimitiveRoot z l)
-    (hz' : IsPrimitiveRoot z' l) : ∃ g : Om l ≃ₐ[↥(K0 K)] Om l, g z = z' := by
+theorem exists_aut_prim
+    (K : FinExt l) {z z' : Om l} (hz : IsPrimitiveRoot z l) (hz' : IsPrimitiveRoot z' l)
+    : ∃ g : Om l ≃ₐ[↥(K0 K)] Om l, g z = z' := by
   have hl : l.Prime := Fact.out
   haveI : NeZero l := ⟨hl.ne_zero⟩
   haveI : Algebra.IsAlgebraic ↥(K0 K) (Om l) := Algebra.IsAlgebraic.tower_top (K := ℚ_[l]) _
@@ -36,8 +37,10 @@ theorem exists_aut_prim (K : FinExt l) {z z' : Om l} (hz : IsPrimitiveRoot z l)
   have hd : l - 1 ≤ (minpoly ↥(K0 K) z).natDegree := by
     rw [← IntermediateField.adjoin.finrank hint, ← hdeg]
     exact IntermediateField.finrank_le_of_le_right hsub
-  have hroot : ∀ {w : Om l}, IsPrimitiveRoot w l →
-      Polynomial.aeval w (Polynomial.cyclotomic l ↥(K0 K)) = 0 := fun {w} hw => by
+  have hroot
+      : ∀ {w : Om l},
+        IsPrimitiveRoot w l
+          → Polynomial.aeval w (Polynomial.cyclotomic l ↥(K0 K)) = 0 := fun {w} hw => by
     rw [Polynomial.aeval_def, ← Polynomial.eval_map, Polynomial.map_cyclotomic]
     exact hw.isRoot_cyclotomic hl.pos
   have hdvd : minpoly ↥(K0 K) z ∣ Polynomial.cyclotomic l ↥(K0 K) := minpoly.dvd _ _ (hroot hz)
@@ -48,14 +51,18 @@ theorem exists_aut_prim (K : FinExt l) {z z' : Om l} (hz : IsPrimitiveRoot z l)
   have h0 : Polynomial.aeval z' (minpoly ↥(K0 K) z) = 0 := heq ▸ hroot hz'
   exact minpoly.exists_algEquiv_of_root' hint.isAlgebraic h0
 
-theorem exists_pt (D : D7) (HW : HWOf D.loc) {K LL : FinExt l} (hG : Good K 1 LL)
-    (c : ZMod (finrank ℚ_[l] ↥(K0 K))) (ζ : ↥LL.1) (hζ : IsPrimitiveRoot ζ l) :
-    ∃ τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1, Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hG c ζ τ := by
+theorem exists_pt
+    (D : D7) (HW : HWOf D.loc)
+    {K LL : FinExt l}
+    (hG : Good K 1 LL) (c : ZMod (finrank ℚ_[l] ↥(K0 K))) (ζ : ↥LL.1) (hζ : IsPrimitiveRoot ζ l)
+    : ∃ τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1,
+      Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hG c ζ τ := by
   have : Algebra.IsAlgebraic ↥(K0 K) (Om l) := Algebra.IsAlgebraic.tower_top (K := ℚ_[l]) _
-  obtain ⟨σ, hσ⟩ := IsAlgClosed.surjective_domRestrict_of_isAlgebraic (K := ℚ_[l]) (L := ↥(K0 K))
-    (M := Om l) (E := Om l) ((LL.1.val).comp (((HW l).W K 1 LL hG).emb c))
-  have hσx : ∀ x : ↥(K0 K),
-      σ (x : Om l) = ((((HW l).W K 1 LL hG).emb c x : ↥LL.1) : Om l) := fun x => by
+  obtain ⟨σ, hσ⟩ :=
+    IsAlgClosed.surjective_domRestrict_of_isAlgebraic (K := ℚ_[l]) (L := ↥(K0 K)) (M := Om l)
+      (E := Om l) ((LL.1.val).comp (((HW l).W K 1 LL hG).emb c))
+  have hσx
+      : ∀ x : ↥(K0 K), σ (x : Om l) = ((((HW l).W K 1 LL hG).emb c x : ↥LL.1) : Om l) := fun x => by
     have := congrArg (fun f => f x) hσ
     simpa [AlgHom.domRestrict] using this
   have hζ₁ := Formalism.MainNotions.UnusedSlot80.LevR.root_of_unity_primitive D l
@@ -74,8 +81,12 @@ theorem exists_pt (D : D7) (HW : HWOf D.loc) {K LL : FinExt l} (hG : Good K 1 LL
   have hmem : ∀ y, ((σ.comp g').comp (Ks K 1).val) y ∈ LL.1 := hG.2.2.2 _
   let τs : ↥(Ks K 1) →ₐ[ℚ_[l]] ↥LL.1 :=
     ((σ.comp g').comp (Ks K 1).val).codRestrict LL.1.toSubalgebra hmem
-  refine ⟨τs.comp (IntermediateField.inclusion hG.2.2.1), τs,
-    ⟨fun x y hxy => ?_, fun y hy => ?_⟩, fun x y hxy => ?_⟩
+  refine ⟨
+    τs.comp (IntermediateField.inclusion hG.2.2.1),
+    τs,
+    ⟨fun x y hxy => ?_, fun y hy => ?_⟩,
+    fun x y hxy => ?_
+  ⟩
   · apply Subtype.ext
     show σ (g (y : Om l)) = _
     have hgx : g (x : Om l) = x := g.commutes x

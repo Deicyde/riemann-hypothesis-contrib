@@ -6,16 +6,22 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SelM
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.StepW GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GlobalTheory.CompanionTheory.Ar.PB.StepW GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.StepW
 
-theorem sum_sq_comp_blockMap {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)]
+theorem sum_sq_comp_blockMap
+    {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)]
     {Kk : Type} {ιk : Kk → Type} [∀ k, Fintype (ιk k)]
     {κ : Kk → K} {v : (Σ k, ιk k) → (Σ k, ι k)} (hv : IsBlockMap κ v)
-    (z : (Σ k, ι k) → ℂ) (k' : Kk) :
-    ∑ m, ‖(z ∘ v) ⟨k', m⟩‖ ^ 2 = ∑ i, ‖z ⟨κ k', i⟩‖ ^ 2 := by
+    (z : (Σ k, ι k) → ℂ) (k' : Kk)
+    : ∑ m, ‖(z ∘ v) ⟨k', m⟩‖ ^ 2 = ∑ i, ‖z ⟨κ k', i⟩‖ ^ 2 := by
   obtain ⟨hκ, hvi, hblk, hsurj⟩ := hv
   have key : ∀ m : ιk k', ∃ i : ι (κ k'), v ⟨k', m⟩ = ⟨κ k', i⟩ := by
     intro m
@@ -46,7 +52,12 @@ theorem sum_sq_comp_blockMap {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)
   refine Finset.sum_congr rfl fun m _ => ?_
   simp only [Function.comp_apply, hg]
 
-theorem fsHerm_h_blockMap : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Kk : Type) [Fintype Kk] (ιk : Kk → Type) [∀ k, Fintype (ιk k)] (κ : Kk → K) (v : (Σ k, ιk k) → (Σ k, ι k)) (a : K → ℤ) (z : (Σ k, ι k) → ℂ), IsBlockMap κ v → (∀ k, a k ≠ 0 → k ∈ Set.range κ) → (fsHerm ι a).h z = (fsHerm ιk fun k => a (κ k)).h (z ∘ v) := by
+theorem fsHerm_h_blockMap
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Kk : Type) [Fintype Kk]
+        (ιk : Kk → Type) [∀ k, Fintype (ιk k)] (κ : Kk → K) (v : (Σ k, ιk k) → (Σ k, ι k))
+        (a : K → ℤ) (z : (Σ k, ι k) → ℂ),
+      IsBlockMap κ v → (∀ k, a k ≠ 0 → k ∈ Set.range κ)
+        → (fsHerm ι a).h z = (fsHerm ιk fun k => a (κ k)).h (z ∘ v) := by
   intro K _ ι _ Kk _ ιk _ κ v a z hv ha
   rw [fsHerm_h, fsHerm_h]
   unfold refNorm

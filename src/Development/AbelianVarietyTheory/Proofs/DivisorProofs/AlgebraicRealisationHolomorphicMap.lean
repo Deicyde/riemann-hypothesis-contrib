@@ -12,10 +12,13 @@ open scoped Classical
 
 namespace GlobalTheory.CentSep
 
-theorem apply_basis_eq_smul {L V κ : Type} [Field L] [AddCommGroup V] [Module L V]
-    (b : Module.Basis κ L V) (μ : κ → L) (hμ : Function.Injective μ)
-    (f g : Module.End L V) (hf : ∀ k, f (b k) = μ k • b k) (hg : g ∘ₗ f = f ∘ₗ g) (k : κ) :
-    ∃ c : L, g (b k) = c • b k := by
+theorem apply_basis_eq_smul
+    {L V κ : Type} [Field L] [AddCommGroup V] [Module L V]
+    (b : Module.Basis κ L V)
+    (μ : κ → L) (hμ : Function.Injective μ)
+    (f g : Module.End L V) (hf : ∀ k, f (b k) = μ k • b k) (hg : g ∘ₗ f = f ∘ₗ g)
+    (k : κ)
+    : ∃ c : L, g (b k) = c • b k := by
   refine ⟨b.repr (g (b k)) k, ?_⟩
   set x := g (b k) with hx
   have hfx : f x = μ k • x := by
@@ -26,8 +29,8 @@ theorem apply_basis_eq_smul {L V κ : Type} [Field L] [AddCommGroup V] [Module L
     intro y j
     have key : (b.coord j).comp f = μ j • b.coord j := by
       refine b.ext fun i => ?_
-      simp only [LinearMap.comp_apply, hf, map_smul, Module.Basis.coord_apply, Module.Basis.repr_self,
-        LinearMap.smul_apply, smul_eq_mul, Finsupp.single_apply]
+      simp only [LinearMap.comp_apply, hf, map_smul, Module.Basis.coord_apply,
+        Module.Basis.repr_self, LinearMap.smul_apply, smul_eq_mul, Finsupp.single_apply]
       split_ifs with h
       · subst h; rfl
       · simp
@@ -43,22 +46,26 @@ theorem apply_basis_eq_smul {L V κ : Type} [Field L] [AddCommGroup V] [Module L
       rcases mul_eq_zero.mp h2 with h | h
       · exact absurd (hμ (sub_eq_zero.mp h)) hj
       · exact h
-    rw [h0, map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_apply, if_neg (Ne.symm hj),
-      smul_zero]
+    rw [h0, map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_apply,
+      if_neg (Ne.symm hj), smul_zero]
 
-theorem comm_of_eigenbasis {L V κ : Type} [Field L] [AddCommGroup V] [Module L V]
-    (b : Module.Basis κ L V) (μ : κ → L) (hμ : Function.Injective μ)
-    (f g h : Module.End L V) (hf : ∀ k, f (b k) = μ k • b k) (hg : g ∘ₗ f = f ∘ₗ g)
-    (hh : h ∘ₗ f = f ∘ₗ h) : g ∘ₗ h = h ∘ₗ g := by
+theorem comm_of_eigenbasis
+    {L V κ : Type} [Field L] [AddCommGroup V] [Module L V]
+    (b : Module.Basis κ L V)
+    (μ : κ → L) (hμ : Function.Injective μ)
+    (f g h : Module.End L V)
+    (hf : ∀ k, f (b k) = μ k • b k) (hg : g ∘ₗ f = f ∘ₗ g) (hh : h ∘ₗ f = f ∘ₗ h)
+    : g ∘ₗ h = h ∘ₗ g := by
   refine b.ext fun k => ?_
   obtain ⟨c, hc⟩ := apply_basis_eq_smul b μ hμ f g hf hg k
   obtain ⟨d, hd⟩ := apply_basis_eq_smul b μ hμ f h hf hh k
   simp only [LinearMap.comp_apply]
   rw [hd, map_smul, hc, map_smul, hd, smul_smul, smul_smul, mul_comm]
 
-theorem comm_of_separable_algClosed {L ι : Type} [Field L] [IsAlgClosed L] [Fintype ι] [DecidableEq ι]
-    (A G H : Matrix ι ι L) (hs : A.charpoly.Separable) (hG : G * A = A * G) (hH : H * A = A * H) :
-    G * H = H * G := by
+theorem comm_of_separable_algClosed
+    {L ι : Type} [Field L] [IsAlgClosed L] [Fintype ι] [DecidableEq ι]
+    (A G H : Matrix ι ι L) (hs : A.charpoly.Separable) (hG : G * A = A * G) (hH : H * A = A * H)
+    : G * H = H * G := by
   rcases isEmpty_or_nonempty ι with hι | hι
   · exact Subsingleton.elim _ _
   set f := Matrix.toLin' A with hfdef
@@ -74,8 +81,7 @@ theorem comm_of_separable_algClosed {L ι : Type} [Field L] [IsAlgClosed L] [Fin
     exact Polynomial.isRoot_of_mem_roots hμ
   choose v hv using fun μ : (s : Set L) => (hev μ).exists_hasEigenvector
   have hli := Module.End.eigenvectors_linearIndependent f (s : Set L) v hv
-  have hc : Fintype.card (s : Set L) = Module.finrank L (ι → L) := by
-    simp [hcard]
+  have hc : Fintype.card (s : Set L) = Module.finrank L (ι → L) := by simp [hcard]
   haveI : Nonempty (s : Set L) := by
     rw [← Fintype.card_pos_iff, hc, Module.finrank_fintype_fun_eq_card]; exact Fintype.card_pos
   let b := basisOfLinearIndependentOfCardEqFinrank hli hc
@@ -84,12 +90,14 @@ theorem comm_of_separable_algClosed {L ι : Type} [Field L] [IsAlgClosed L] [Fin
     exact (hv k).apply_eq_smul
   apply Matrix.toLin'.injective
   rw [Matrix.toLin'_mul, Matrix.toLin'_mul]
-  exact comm_of_eigenbasis b (fun k => (k : L)) Subtype.coe_injective f _ _ hb
-    (by rw [← Matrix.toLin'_mul, hG, Matrix.toLin'_mul])
+  exact comm_of_eigenbasis b
+    (fun k => (k : L))
+    Subtype.coe_injective f _ _ hb (by rw [← Matrix.toLin'_mul, hG, Matrix.toLin'_mul])
     (by rw [← Matrix.toLin'_mul, hH, Matrix.toLin'_mul])
 
-theorem centraliser_comm_of_separable : ∀ (K : Type) [Field K] (ι : Type) [Fintype ι] [DecidableEq ι] (γ g h : GL ι K),
-  (γ : Matrix ι ι K).charpoly.Separable → g * γ = γ * g → h * γ = γ * h → g * h = h * g := by
+theorem centraliser_comm_of_separable
+    : ∀ (K : Type) [Field K] (ι : Type) [Fintype ι] [DecidableEq ι] (γ g h : GL ι K),
+      (γ : Matrix ι ι K).charpoly.Separable → g * γ = γ * g → h * γ = γ * h → g * h = h * g := by
   intro K _ ι _ _ γ g h hs hg hh
   apply Units.ext
   have hg' := congrArg Units.val hg

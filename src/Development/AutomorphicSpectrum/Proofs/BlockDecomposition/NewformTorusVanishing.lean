@@ -29,7 +29,8 @@ end Loc
 
 section Main
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   [MeasurableSpace F] [BorelSpace F]
   {ψ : AddChar F Circle} {ω : Fˣ →* ℂˣ} {lam : ℂ} {W : GL (Fin 2) F → ℂ}
 

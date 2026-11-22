@@ -7,7 +7,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+  GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi
+  UpperTheory.V.Hi.CaseU
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterminantRing Pair)
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
@@ -22,12 +26,16 @@ section Abs
 
 variable {l : ℕ} [Fact l.Prime] {F' F : W.GFrame l} (h : W.FHom F' F)
 
-theorem ofRep_comap {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H] (ρ : G →* Matrix (Fin n) (Fin n) A) (φ : H →* G) :
-    (W.GDet.ofRep ρ).comap φ = W.GDet.ofRep (ρ.comp φ) := by
+theorem ofRep_comap
+    {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H]
+    (ρ : G →* Matrix (Fin n) (Fin n) A) (φ : H →* G)
+    : (W.GDet.ofRep ρ).comap φ = W.GDet.ofRep (ρ.comp φ) := by
   apply W.GDet.ext
   intro B _ _ y
-  have key : ∀ z : MonoidAlgebra B H,
-      W.GDet.repAlg ρ B (MonoidAlgebra.mapDomainRingHom B φ z) = W.GDet.repAlg (ρ.comp φ) B z := by
+  have key
+      : ∀ z : MonoidAlgebra B H,
+        W.GDet.repAlg ρ B (MonoidAlgebra.mapDomainRingHom B φ z)
+          = W.GDet.repAlg (ρ.comp φ) B z := by
     intro z
     induction z using MonoidAlgebra.induction_linear with
     | zero => simp
@@ -35,18 +43,24 @@ theorem ofRep_comap {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H] (�
     | single g b => simp [W.GDet.repAlg, MonoidAlgebra.lift_single]
   exact congrArg Matrix.det (key y)
 
-theorem chi_comap {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H] (D : W.GDet n A G) (φ : H →* G) (g : H) :
-    (D.comap φ).chi (MonoidAlgebra.single g 1) = D.chi (MonoidAlgebra.single (φ g) 1) := by
+theorem chi_comap
+    {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H] (D : W.GDet n A G) (φ : H →* G) (g : H)
+    : (D.comap φ).chi (MonoidAlgebra.single g 1) = D.chi (MonoidAlgebra.single (φ g) 1) := by
   simp only [W.GDet.chi, W.GDet.comap, MonoidAlgebra.mapRingHom_single, map_one]
   show (D.D A[X]) (MonoidAlgebra.mapDomainRingHom A[X] φ _) = _
   rw [map_sub, MonoidAlgebra.mapDomainRingHom_apply, MonoidAlgebra.mapDomainRingHom_apply,
     MonoidAlgebra.mapDomain_single, MonoidAlgebra.mapDomain_single, map_one]
 
-theorem polar_comap (O : Type) [CommRing O] [Algebra ℤ_[l] O] {R : Type} [CommRing R] [Algebra O R] {n : ℕ}
-    (D : W.GDet n R F.G₀) (hD : F.IsPolar O D) : F'.IsPolar O (D.comap h.π₀) := by
+theorem polar_comap
+    (O : Type) [CommRing O] [Algebra ℤ_[l] O]
+    {R : Type} [CommRing R] [Algebra O R]
+    {n : ℕ} (D : W.GDet n R F.G₀) (hD : F.IsPolar O D)
+    : F'.IsPolar O (D.comap h.π₀) := by
   intro B _ _ _ _ y
-  have key : ∀ z : MonoidAlgebra B F'.G₀, MonoidAlgebra.mapDomainRingHom B h.π₀ (F'.star O B n z) =
-      F.star O B n (MonoidAlgebra.mapDomainRingHom B h.π₀ z) := by
+  have key
+      : ∀ z : MonoidAlgebra B F'.G₀,
+        MonoidAlgebra.mapDomainRingHom B h.π₀ (F'.star O B n z)
+          = F.star O B n (MonoidAlgebra.mapDomainRingHom B h.π₀ z) := by
     intro z
     induction z using MonoidAlgebra.induction_linear with
     | zero => simp [W.GFrame.star]
@@ -68,22 +82,32 @@ theorem polar_comap (O : Type) [CommRing O] [Algebra ℤ_[l] O] {R : Type} [Comm
   rw [key]
   exact hD B _
 
-def upG {Lc : Pa.Loc} {G' G : Pa.Glob l Lc} (h : G'.Hom G) {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ}
-    (r : Resid G.frame O n) (h1 : ∀ i, IsOpen (((r.chib i).comp h.p₀).ker : Set G'.G₀))
+def upG
+    {Lc : Pa.Loc} {G' G : Pa.Glob l Lc} (h : G'.Hom G)
+    {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+    {n : ℕ} (r : Resid G.frame O n) (h1 : ∀ i, IsOpen (((r.chib i).comp h.p₀).ker : Set G'.G₀))
     (h2 : Function.Injective fun i => (r.chib i).comp h.p₀)
-    (h3 : G'.frame.IsPolar O (W.GDet.ofRep (W.diagRep fun i => (r.chib i).comp h.p₀))) : Resid G'.frame O n :=
+    (h3 : G'.frame.IsPolar O (W.GDet.ofRep (W.diagRep fun i => (r.chib i).comp h.p₀)))
+    : Resid G'.frame O n :=
   ⟨fun i => (r.chib i).comp h.p₀, h1, h2, h3, r.psib, r.psib_open, r.th, r.th_comm⟩
 
-theorem upG_compat {Lc : Pa.Loc} {G' G : Pa.Glob l Lc} (h : G'.Hom G) {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ}
-    (r : Resid G.frame O n) (h1 h2 h3) : Pa.Glob.Compat h (upG h r h1 h2 h3) r := ⟨fun _ => rfl, rfl, rfl⟩
+theorem upG_compat
+    {Lc : Pa.Loc} {G' G : Pa.Glob l Lc} (h : G'.Hom G)
+    {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+    {n : ℕ} (r : Resid G.frame O n)
+    (h1 h2 h3)
+    : Pa.Glob.Compat h (upG h r h1 h2 h3) r :=
+  ⟨fun _ => rfl, rfl, rfl⟩
 
 end Abs
 
 section Gen
 
-variable {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
-  {s : HidaSetting l L Ω} {V0 : s.Lev} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ} {r : Resid V0.frame O n} {V : s.Lev}
-  (h : (Pa.globOf r V).Hom (Pa.globOf r V0))
+variable
+  {l : ℕ} [Fact l.Prime]
+  {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+  {s : HidaSetting l L Ω} {V0 : s.Lev} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+  {n : ℕ} {r : Resid V0.frame O n} {V : s.Lev} (h : (Pa.globOf r V).Hom (Pa.globOf r V0))
 
 def fh : W.FHom V.frame V0.frame where
   π := h.p
@@ -99,7 +123,8 @@ def fh : W.FHom V.frame V0.frame where
 
 def p0 : V.frame.G₀ →* V0.frame.G₀ := (fh h).π₀
 
-theorem continuous_levelChangeBaseGroupHom : Continuous (p0 h) := (h.cont.comp continuous_subtype_val).subtype_mk _
+theorem continuous_levelChangeBaseGroupHom : Continuous (p0 h) :=
+  (h.cont.comp continuous_subtype_val).subtype_mk _
 
 theorem surjective_levelChangeBaseGroupHom : Function.Surjective (p0 h) := by
   intro g
@@ -110,14 +135,18 @@ theorem surjective_levelChangeBaseGroupHom : Function.Surjective (p0 h) := by
     exact this.symm.trans g.2
   exact ⟨⟨x, hxk⟩, Subtype.ext hx⟩
 
-theorem levelChangeBaseGroupHom_apply_projection (hp : ∀ g, h.p (toGS Ω V.S' g) = toGS Ω V0.S' g) (g : G L Ω) : p0 h (V.pr g) = V0.pr g := Subtype.ext (hp _)
+theorem levelChangeBaseGroupHom_apply_projection
+    (hp : ∀ g, h.p (toGS Ω V.S' g) = toGS Ω V0.S' g) (g : G L Ω)
+    : p0 h (V.pr g) = V0.pr g :=
+  Subtype.ext (hp _)
 
 def rUp : Resid V.frame O n where
   chib i := (r.chib i).comp (p0 h)
   chib_open i := (r.chib_open i).preimage (continuous_levelChangeBaseGroupHom h)
-  chib_inj i j e := r.chib_inj (MonoidHom.ext fun g => by
-    obtain ⟨x, rfl⟩ := surjective_levelChangeBaseGroupHom h g
-    exact DFunLike.congr_fun e x)
+  chib_inj i j e :=
+    r.chib_inj (MonoidHom.ext fun g => by
+      obtain ⟨x, rfl⟩ := surjective_levelChangeBaseGroupHom h g
+      exact DFunLike.congr_fun e x)
   polar := by
     have := polar_comap (fh h) O (W.GDet.ofRep (W.diagRep r.chib)) r.polar
     rw [ofRep_comap] at this
@@ -125,20 +154,31 @@ def rUp : Resid V.frame O n where
   psib := r.psib
   psib_open := r.psib_open
   th v i := @id (W.muG l (Dec (F := L) (s.A v.1)) →* Oˣ) (r.th v i)
-  th_comm v i := @id (∀ g : W.muG l (Dec (F := L) (s.A v.1)), (g : Dec (F := L) (s.A v.1)) ∈
-    (commutator (Dec (F := L) (s.A v.1))).topologicalClosure → @id (W.muG l (Dec (F := L) (s.A v.1)) →* Oˣ) (r.th v i) g = 1) (r.th_comm v i)
+  th_comm v i :=
+    @id
+      (∀ g : W.muG l (Dec (F := L) (s.A v.1)),
+        (g : Dec (F := L) (s.A v.1)) ∈ (commutator (Dec (F := L) (s.A v.1))).topologicalClosure
+          → @id (W.muG l (Dec (F := L) (s.A v.1)) →* Oˣ) (r.th v i) g = 1)
+      (r.th_comm v i)
 
 set_option maxHeartbeats 2000000 in
-theorem psi_up {R : Type} [CommRing R] [Algebra O R] [Alg.IsCO O R] (v : Vl l L) (i : Fin n) (ψ : Dec (F := L) (s.A v.1) →* Rˣ) :
-    (rUp h).IsPsi v i ψ ↔ r.IsPsi v i ψ := by
+theorem psi_up
+    {R : Type} [CommRing R] [Algebra O R] [Alg.IsCO O R]
+    (v : Vl l L)
+    (i : Fin n) (ψ : Dec (F := L) (s.A v.1) →* Rˣ)
+    : (rUp h).IsPsi v i ψ ↔ r.IsPsi v i ψ := by
   constructor
   · intro H
-    have hm : ∀ g : W.muG l (Dec (F := L) (s.A v.1)),
-        ((ψ g : Rˣ) : R) = algebraMap O R ((r.th v i g : Oˣ) : O) := fun g => H.mu g
+    have hm
+        : ∀ g : W.muG l (Dec (F := L) (s.A v.1)),
+          ((ψ g : Rˣ) : R) = algebraMap O R ((r.th v i g : Oˣ) : O) := fun g =>
+      H.mu g
     exact ⟨H.cont, H.red, hm⟩
   · intro H
-    have hm : ∀ g : W.muG l (Dec (F := L) (s.A v.1)),
-        ((ψ g : Rˣ) : R) = algebraMap O R ((r.th v i g : Oˣ) : O) := fun g => H.mu g
+    have hm
+        : ∀ g : W.muG l (Dec (F := L) (s.A v.1)),
+          ((ψ g : Rˣ) : R) = algebraMap O R ((r.th v i g : Oˣ) : O) := fun g =>
+      H.mu g
     exact ⟨H.cont, H.red, hm⟩
 
 theorem rUp_Dbar : (rUp h).Dbar = r.Dbar.comap (p0 h) := by
@@ -153,15 +193,27 @@ theorem rN_Ip_le (u : s.St) (g : V.η.ker) (hg : g ∈ (rN h).Ip u) : g ∈ (rUp
   obtain ⟨⟨γ, ⟨h1, -⟩, rfl⟩, h2⟩ := hg
   exact ⟨⟨Subtype.val γ, h1, rfl⟩, Subgroup.mem_iInf.2 fun i => Subgroup.mem_iInf.1 h2 i⟩
 
-theorem psi_N {R : Type} [CommRing R] [Algebra O R] [Alg.IsCO O R] (v : Vl l L) (i : Fin n) (ψ : Dec (F := L) (s.A v.1) →* Rˣ)
-    (H : (rUp h).IsPsi v i ψ) : (rN h).IsPsi v i ψ := by
-  have hm : ∀ g : W.muG l (Dec (F := L) (s.A v.1)),
-      ((ψ g : Rˣ) : R) = algebraMap O R ((r.th v i g : Oˣ) : O) := fun g => H.mu g
+theorem psi_N
+    {R : Type} [CommRing R] [Algebra O R] [Alg.IsCO O R]
+    (v : Vl l L) (i : Fin n) (ψ : Dec (F := L) (s.A v.1) →* Rˣ) (H : (rUp h).IsPsi v i ψ)
+    : (rN h).IsPsi v i ψ := by
+  have hm
+      : ∀ g : W.muG l (Dec (F := L) (s.A v.1)),
+        ((ψ g : Rˣ) : R) = algebraMap O R ((r.th v i g : Oˣ) : O) := fun g =>
+    H.mu g
   exact ⟨H.cont, H.red, hm⟩
 
-def pairN {B : Type} [CommRing B] [Algebra O B] [Alg.IsCO O B] (u : Pair (rUp h) B) : Pair (rN h) B :=
-  ⟨u.D, u.ψ, u.cont, u.red, fun v i => psi_N h v i _ (u.psi v i), u.P, u.Ord,
-    fun w g hg => u.I w g (rN_Ip_le h w g hg)⟩
+def pairN {B : Type} [CommRing B] [Algebra O B] [Alg.IsCO O B] (u : Pair (rUp h) B)
+    : Pair (rN h) B := ⟨
+  u.D,
+  u.ψ,
+  u.cont,
+  u.red,
+  fun v i => psi_N h v i _ (u.psi v i),
+  u.P,
+  u.Ord,
+  fun w g hg => u.I w g (rN_Ip_le h w g hg)
+⟩
 
 def lamUp (Λ : LamObj r) : LamObj (rUp h) where
   Λ := Λ.Λ
@@ -169,9 +221,10 @@ def lamUp (Λ : LamObj r) : LamObj (rUp h) where
   inert v i := by
     obtain ⟨ψ, hψ, e⟩ := Λ.inert v i
     exact ⟨ψ, (psi_up h v i ψ).2 hψ, e⟩
-  univ R _ _ _ κ' hκ := Λ.univ R κ' fun v i => by
-    obtain ⟨ψ, hψ, e⟩ := hκ v i
-    exact ⟨ψ, (psi_up h v i ψ).1 hψ, e⟩
+  univ R _ _ _ κ' hκ :=
+    Λ.univ R κ' fun v i => by
+      obtain ⟨ψ, hψ, e⟩ := hκ v i
+      exact ⟨ψ, (psi_up h v i ψ).1 hψ, e⟩
 
 end Gen
 

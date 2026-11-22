@@ -4,10 +4,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
-theorem UpperTheory.V.ZK.Cl.cSupp :
-    UpperTheory.V.ZK.Cl.CSupp := by
+theorem UpperTheory.V.ZK.Cl.cSupp : UpperTheory.V.ZK.Cl.CSupp := by
   intro L F _ _ _ _ _ 𝔡 b₀ hb₀
   refine ⟨b₀ * ∏ P ∈ 𝔡.support, ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 L), ?_, dvd_mul_right _ _, ?_⟩
   · refine mul_ne_zero hb₀ (Finset.prod_ne_zero_iff.mpr fun P _ => ?_)
@@ -16,10 +16,11 @@ theorem UpperTheory.V.ZK.Cl.cSupp :
   · intro P hP
     rw [map_mul, map_prod]
     apply Ideal.mul_mem_left
-    obtain ⟨c, hc⟩ := Finset.dvd_prod_of_mem
-      (fun Q : HeightOneSpectrum (𝓞 F) =>
-        algebraMap (𝓞 L) (𝓞 F) ((Ideal.absNorm Q.asIdeal : ℕ) : 𝓞 L))
-      (Finsupp.mem_support_iff.mpr hP)
+    obtain ⟨c, hc⟩ :=
+      Finset.dvd_prod_of_mem
+        (fun Q : HeightOneSpectrum (𝓞 F) =>
+          algebraMap (𝓞 L) (𝓞 F) ((Ideal.absNorm Q.asIdeal : ℕ) : 𝓞 L))
+        (Finsupp.mem_support_iff.mpr hP)
     rw [hc]
     apply Ideal.mul_mem_right
     rw [map_natCast]

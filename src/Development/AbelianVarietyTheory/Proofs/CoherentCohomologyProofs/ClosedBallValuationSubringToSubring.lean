@@ -55,8 +55,7 @@ variable {K}
 
 theorem mem_closedBallSubring {x : K} : x ∈ closedBallSubring K ↔ ‖x‖ ≤ 1 := Iff.rfl
 
-theorem mem_openBallIdeal {x : closedBallSubring K} :
-    x ∈ openBallIdeal K ↔ ‖(x : K)‖ < 1 := Iff.rfl
+theorem mem_openBallIdeal {x : closedBallSubring K} : x ∈ openBallIdeal K ↔ ‖(x : K)‖ < 1 := Iff.rfl
 
 theorem isUnit_iff_norm_eq_one {x : closedBallSubring K} : IsUnit x ↔ ‖(x : K)‖ = 1 := by
   constructor
@@ -64,16 +63,19 @@ theorem isUnit_iff_norm_eq_one {x : closedBallSubring K} : IsUnit x ↔ ‖(x : 
     have hu : ‖((u : closedBallSubring K) : K)‖ ≤ 1 := (u : closedBallSubring K).2
     have hv : ‖((u⁻¹ : (closedBallSubring K)ˣ) : closedBallSubring K).1‖ ≤ 1 :=
       ((u⁻¹ : (closedBallSubring K)ˣ) : closedBallSubring K).2
-    have hprod : ‖((u : closedBallSubring K) : K)‖ *
-        ‖((u⁻¹ : (closedBallSubring K)ˣ) : closedBallSubring K).1‖ = 1 := by
+    have hprod
+        : ‖((u : closedBallSubring K) : K)‖
+            * ‖((u⁻¹ : (closedBallSubring K)ˣ) : closedBallSubring K).1‖
+          = 1 := by
       rw [← norm_mul]
       have h := congrArg Subtype.val u.mul_inv
       simp only [Subring.coe_mul, Subring.coe_one] at h
       rw [h, norm_one]
     refine le_antisymm hu ?_
-    calc (1 : ℝ) = _ := hprod.symm
-      _ ≤ ‖((u : closedBallSubring K) : K)‖ * 1 :=
-          mul_le_mul_of_nonneg_left hv (norm_nonneg _)
+    calc
+      (1 : ℝ)
+        = _ := hprod.symm
+      _ ≤ ‖((u : closedBallSubring K) : K)‖ * 1 := mul_le_mul_of_nonneg_left hv (norm_nonneg _)
       _ = _ := mul_one _
   · intro h
     have hx0 : (x : K) ≠ 0 := by
@@ -87,8 +89,8 @@ theorem isUnit_iff_norm_eq_one {x : closedBallSubring K} : IsUnit x ↔ ‖(x : 
     simp only [Subring.coe_mul, Subring.coe_one]
     exact mul_inv_cancel₀ hx0
 
-theorem mem_openBallIdeal_iff_not_isUnit {x : closedBallSubring K} :
-    x ∈ openBallIdeal K ↔ ¬ IsUnit x := by
+theorem mem_openBallIdeal_iff_not_isUnit {x : closedBallSubring K}
+    : x ∈ openBallIdeal K ↔ ¬ IsUnit x := by
   rw [mem_openBallIdeal, isUnit_iff_norm_eq_one]
   have hle : ‖(x : K)‖ ≤ 1 := mem_closedBallSubring.mp x.2
   exact ⟨fun h he => (ne_of_lt h) he, fun h => lt_of_le_of_ne hle h⟩
@@ -98,8 +100,8 @@ variable (K)
 instance isLocalRing_closedBallSubring : IsLocalRing (closedBallSubring K) :=
   inferInstanceAs (IsLocalRing (closedBallValuationSubring K))
 
-theorem openBallIdeal_eq_maximalIdeal :
-    openBallIdeal K = IsLocalRing.maximalIdeal (closedBallSubring K) := by
+theorem openBallIdeal_eq_maximalIdeal
+    : openBallIdeal K = IsLocalRing.maximalIdeal (closedBallSubring K) := by
   ext x
   rw [mem_openBallIdeal_iff_not_isUnit, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
 

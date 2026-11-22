@@ -10,9 +10,13 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ChainPa
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChainOnto
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChainOnto
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.UnimodularTower
@@ -21,11 +25,13 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-abbrev Fn (D : D7) (u : D.what₂.Word) (i : ℕ) : Type := Formalism.MainNotions.product_first_zeroth_parts.Fn D u i
+abbrev Fn (D : D7) (u : D.what₂.Word) (i : ℕ) : Type :=
+  Formalism.MainNotions.product_first_zeroth_parts.Fn D u i
 
 abbrev Fm (D : D7) (u : D.what₂.Word) (i : ℕ) : Submodule ℂ (Fn D u i) := (D.fm u).Fi i
 
-abbrev Ram (D : D7) (u : D.what₂.Word) (i : ℕ) : Submodule ℂ (Fn D u i) := Formalism.MainNotions.product_first_zeroth_parts.MramI D u i
+abbrev Ram (D : D7) (u : D.what₂.Word) (i : ℕ) : Submodule ℂ (Fn D u i) :=
+  Formalism.MainNotions.product_first_zeroth_parts.MramI D u i
 
 abbrev Eps (D : D7) (u : D.what₂.Word) : Type := ∀ v : (D.mem u).A.vT, ((D.mem u).A.Fv v)ˣ
 
@@ -44,7 +50,8 @@ structure RowOn (V : HSp D) where
   ν : Measure (GA D V)
   fd : Set (GA D V)
 
-abbrev RowOn.st {V : HSp D} (r : RowOn V) : PiLocalization₂ D := ⟨V, r.par, r.M, r.Λ, r.β, r.L, r.ν, r.fd⟩
+abbrev RowOn.st {V : HSp D} (r : RowOn V) : PiLocalization₂ D :=
+  ⟨V, r.par, r.M, r.Λ, r.β, r.L, r.ν, r.fd⟩
 
 structure ColOn (c : Com D) (u : D.what₂.Word) (X : HSp D) (j : ℕ) where
   M : DSModel X (colPar D u j)

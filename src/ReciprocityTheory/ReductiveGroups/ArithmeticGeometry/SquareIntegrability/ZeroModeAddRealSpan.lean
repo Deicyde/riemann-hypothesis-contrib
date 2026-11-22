@@ -17,15 +17,18 @@ namespace ZM
 
 variable [IsCMField E] {X : PT E} {DF : ℕ} {P : Par X DF} {I : Submodule ℤ (Vsp X.dim)}
 
-theorem z_eq_inner {ι : Type} [Fintype ι] (K : Submodule ℝ (EuclideanSpace ℂ ι)) (k : Fin (dK K))
-    (v : EuclideanSpace ℂ ι) : z K k v = innerSL ℂ (e K k) v := by
+theorem z_eq_inner
+    {ι : Type} [Fintype ι]
+    (K : Submodule ℝ (EuclideanSpace ℂ ι)) (k : Fin (dK K))
+    (v : EuclideanSpace ℂ ι)
+    : z K k v = innerSL ℂ (e K k) v := by
   unfold z e Hf
   rw [innerSL_apply_apply, PiLp.inner_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [RCLike.inner_apply]
 
-theorem zmG_differentiable {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1) :
-    Differentiable ℂ (zmG I s) := by
+theorem zmG_differentiable {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1)
+    : Differentiable ℂ (zmG I s) := by
   unfold zmG
   have hs' : Differentiable ℂ s := (show Differentiable ℂ s ∧ _ from hs).1
   have h1 : Differentiable ℂ fun v : Vsp X.dim => s fun _ => v :=
@@ -35,16 +38,13 @@ theorem zmG_differentiable {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec
   have hz : ∀ k, Differentiable ℂ fun v : Vsp X.dim => z (IR I) k v ^ 2 := by
     intro k
     refine Differentiable.pow ?_ 2
-    have hk : z (IR I) k = ⇑(innerSL ℂ (e (IR I) k)) :=
-      funext fun v => z_eq_inner _ _ _
+    have hk : z (IR I) k = ⇑(innerSL ℂ (e (IR I) k)) := funext fun v => z_eq_inner _ _ _
     rw [hk]
     exact (innerSL ℂ (e (IR I) k)).differentiable
-  first
-    | exact Differentiable.fun_sum fun k _ => hz k
-    | exact Differentiable.sum fun k _ => hz k
+  first | exact Differentiable.fun_sum fun k _ => hz k | exact Differentiable.sum fun k _ => hz k
 
-theorem zmG_continuous {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1) :
-    Continuous (zmG I s) := (zmG_differentiable hs).continuous
+theorem zmG_continuous {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1) : Continuous (zmG I s) :=
+  (zmG_differentiable hs).continuous
 
 def tb (hI : IsSplit P I) (t : Fin (Module.finrank ℝ (IR I)) → ℝ) : Vsp X.dim :=
   ∑ i, t i • ((Ib hI i : IR I) : Vsp X.dim)
@@ -52,12 +52,12 @@ def tb (hI : IsSplit P I) (t : Fin (Module.finrank ℝ (IR I)) → ℝ) : Vsp X.
 theorem tb_mem (hI : IsSplit P I) (t : Fin (Module.finrank ℝ (IR I)) → ℝ) : tb hI t ∈ IR I :=
   Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Ib hI i).2
 
-theorem tb_add (hI : IsSplit P I) (t t' : Fin (Module.finrank ℝ (IR I)) → ℝ) :
-    tb hI (t + t') = tb hI t + tb hI t' := by
+theorem tb_add (hI : IsSplit P I) (t t' : Fin (Module.finrank ℝ (IR I)) → ℝ)
+    : tb hI (t + t') = tb hI t + tb hI t' := by
   simp only [tb, Pi.add_apply, add_smul, Finset.sum_add_distrib]
 
-theorem tb_int (hI : IsSplit P I) (n : Fin (Module.finrank ℝ (IR I)) → ℤ) :
-    tb hI (fun i => (n i : ℝ)) ∈ I := by
+theorem tb_int (hI : IsSplit P I) (n : Fin (Module.finrank ℝ (IR I)) → ℤ)
+    : tb hI (fun i => (n i : ℝ)) ∈ I := by
   unfold tb
   refine Submodule.sum_mem _ fun i _ => ?_
   have hK : (Ib hI i : IR I) ∈ IK I := by
@@ -67,12 +67,15 @@ theorem tb_int (hI : IsSplit P I) (n : Fin (Module.finrank ℝ (IR I)) → ℤ) 
   rw [Int.cast_smul_eq_zsmul]
   exact Submodule.smul_mem _ _ hmem
 
-theorem zmC_eq (hI : IsSplit P I) (s : (Fin 1 → Vsp X.dim) → ℂ) (n) (v : Vsp X.dim) :
-    zmC hI s n v = ∫ t in zmBox (Module.finrank ℝ (IR I)),
-      Complex.exp (-(2 * Real.pi * Complex.I * ∑ i, (n i : ℂ) * (t i : ℂ))) * zmG I s (v + tb hI t) := rfl
+theorem zmC_eq (hI : IsSplit P I) (s : (Fin 1 → Vsp X.dim) → ℂ) (n) (v : Vsp X.dim)
+    : zmC hI s n v
+      = ∫ t in zmBox (Module.finrank ℝ (IR I)),
+        Complex.exp (-(2 * Real.pi * Complex.I * ∑ i, (n i : ℂ) * (t i : ℂ))) * zmG I s (v + tb hI t) :=
+  rfl
 
-theorem fib_continuous (hI : IsSplit P I) {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1)
-    (v : Vsp X.dim) : Continuous fun t : Fin (Module.finrank ℝ (IR I)) → ℝ => zmG I s (v + tb hI t) := by
+theorem fib_continuous
+    (hI : IsSplit P I) {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1) (v : Vsp X.dim)
+    : Continuous fun t : Fin (Module.finrank ℝ (IR I)) → ℝ => zmG I s (v + tb hI t) := by
   refine (zmG_continuous hs).comp (continuous_const.add ?_)
   unfold tb
   exact continuous_finsetSum _ fun i _ => (continuous_apply i).smul continuous_const
@@ -177,23 +180,34 @@ private lemma zmG_add_mem_of_isSplit (hI : IsSplit P I) {s : (Fin 1 → Vsp X.di
   congr 2
   ring
 
-theorem fib_periodic (hI : IsSplit P I) {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1)
-    (v : Vsp X.dim) (t : Fin (Module.finrank ℝ (IR I)) → ℝ) (n : Fin (Module.finrank ℝ (IR I)) → ℤ) :
-    zmG I s (v + tb hI (t + fun i => (n i : ℝ))) = zmG I s (v + tb hI t) := by
+theorem fib_periodic
+    (hI : IsSplit P I)
+    {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1)
+    (v : Vsp X.dim) (t : Fin (Module.finrank ℝ (IR I)) → ℝ) (n : Fin (Module.finrank ℝ (IR I)) → ℤ)
+    : zmG I s (v + tb hI (t + fun i => (n i : ℝ))) = zmG I s (v + tb hI t) := by
   rw [tb_add, ← add_assoc]
   exact zmG_add_mem_of_isSplit hI hs _ _ (tb_int hI n)
 
-theorem zeroMode_add_realSpan (hI : IsSplit P I) {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1)
-    (v : Vsp X.dim) {a : Vsp X.dim} (ha : a ∈ IR I) : zmC hI s 0 (v + a) = zmC hI s 0 v := by
+theorem zeroMode_add_realSpan
+    (hI : IsSplit P I)
+    {s : (Fin 1 → Vsp X.dim) → ℂ} (hs : s ∈ X.Sec 1 1)
+    (v : Vsp X.dim)
+    {a : Vsp X.dim} (ha : a ∈ IR I)
+    : zmC hI s 0 (v + a) = zmC hI s 0 v := by
   set c := (Ib hI).repr ⟨a, ha⟩ with hc
   have hac : a = tb hI (fun i => c i) := by
     have h := congrArg Subtype.val ((Ib hI).sum_repr ⟨a, ha⟩)
     simp only [Submodule.coe_sum, Submodule.coe_smul] at h
-    rw [tb]; exact h.symm
+    rw [tb]
+    exact h.symm
   simp only [zmC_eq, Pi.zero_apply, Int.cast_zero, zero_mul, Finset.sum_const_zero, mul_zero,
     neg_zero, Complex.exp_zero, one_mul]
-  have hsh := tof_box_shift (fun t => zmG I s (v + tb hI t)) (fib_continuous hI hs v)
-    (fun t n => fib_periodic hI hs v t n) (fun i => c i)
+  have hsh :=
+    tof_box_shift
+      (fun t => zmG I s (v + tb hI t))
+      (fib_continuous hI hs v)
+      (fun t n => fib_periodic hI hs v t n)
+      (fun i => c i)
   rw [zmBox]
   rw [← hsh]
   congr 1

@@ -12,24 +12,27 @@ namespace PI.AprimeInfW.GenericDensity
 open scoped RealInnerProductSpace FourierTransform
 open MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
-variable {V W ι : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V]
-  [BorelSpace V] [NormedAddCommGroup W] [InnerProductSpace ℝ W] [FiniteDimensional ℝ W] [MeasurableSpace W]
-  [BorelSpace W] [Fintype ι] [DecidableEq ι]
+variable
+  {V W ι : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V]
+  [BorelSpace V] [NormedAddCommGroup W] [InnerProductSpace ℝ W] [FiniteDimensional ℝ W]
+  [MeasurableSpace W] [BorelSpace W] [Fintype ι] [DecidableEq ι]
 
-private theorem exists_linearMap_inner_eq_and_det_eq_gram_det (β : W → W → ℝ)
+private theorem exists_linearMap_inner_eq_and_det_eq_gram_det
+    (β : W → W → ℝ)
     (hL : ∀ x x' y, β (x + x') y = β x y + β x' y) (hR : ∀ x y y', β x (y + y') = β x y + β x y')
     (hcL : ∀ y, Continuous fun x => β x y) (hcR : ∀ x, Continuous fun y => β x y)
-    (b : OrthonormalBasis ι ℝ W) :
-    ∃ A : W →ₗ[ℝ] W, (∀ x y, β x y = ⟪x, A y⟫) ∧
-      LinearMap.det A = (Matrix.of fun i j => β (b i) (b j)).det := by
+    (b : OrthonormalBasis ι ℝ W)
+    : ∃ A : W →ₗ[ℝ] W,
+      (∀ x y, β x y = ⟪x, A y⟫) ∧ LinearMap.det A = (Matrix.of fun i j => β (b i) (b j)).det := by
   have sL : ∀ (r : ℝ) x y, β (r • x) y = r * β x y := fun r x y =>
     map_real_smul (AddMonoidHom.mk' (fun x => β x y) (fun x x' => hL x x' y)) (hcL y) r x
   have sR : ∀ (r : ℝ) x y, β x (r • y) = r * β x y := fun r x y =>
     map_real_smul (AddMonoidHom.mk' (fun y => β x y) (fun y y' => hR x y y')) (hcR x) r y
-  let A : W →ₗ[ℝ] W :=
-    { toFun := fun y => ∑ i, β (b i) y • b i
-      map_add' := fun y y' => by simp only [hR, add_smul, Finset.sum_add_distrib]
-      map_smul' := fun r y => by simp only [sR, mul_smul, Finset.smul_sum, RingHom.id_apply] }
+  let A : W →ₗ[ℝ] W := {
+    toFun := fun y => ∑ i, β (b i) y • b i
+    map_add' := fun y y' => by simp only [hR, add_smul, Finset.sum_add_distrib]
+    map_smul' := fun r y => by simp only [sR, mul_smul, Finset.smul_sum, RingHom.id_apply]
+  }
   have hA : ∀ x y, β x y = ⟪x, A y⟫ := by
     intro x y
     have h1 : β x y = ∑ i, ⟪b i, x⟫ * β (b i) y := by
@@ -38,8 +41,7 @@ private theorem exists_linearMap_inner_eq_and_det_eq_gram_det (β : W → W → 
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
       simp [sL]
-    have h2 : ⟪x, A y⟫ = ∑ i, β (b i) y * ⟪x, b i⟫ := by
-      simp [A, inner_sum, inner_smul_right]
+    have h2 : ⟪x, A y⟫ = ∑ i, β (b i) y * ⟪x, b i⟫ := by simp [A, inner_sum, inner_smul_right]
     rw [h1, h2]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [real_inner_comm, mul_comm]
@@ -50,13 +52,14 @@ private theorem exists_linearMap_inner_eq_and_det_eq_gram_det (β : W → W → 
   rw [LinearMap.toMatrix_apply, Matrix.of_apply, hA]
   simp [OrthonormalBasis.repr_apply_apply]
 
-private theorem integral_fourier_map_eq_neg_of_integrable (μ : Measure V) (χ : V → V → ℂ) (hμ : SelfDual μ χ) (e : V ≃ₜ W)
-    (he : ∀ x y, e (x + y) = e x + e y) (β : W → W → ℝ)
-    (hχ : ∀ x y, χ (e.symm x) (e.symm y) = ((𝐞 (β x y) : Circle) : ℂ))
+private theorem integral_fourier_map_eq_neg_of_integrable
+    (μ : Measure V) (χ : V → V → ℂ) (hμ : SelfDual μ χ)
+    (e : V ≃ₜ W) (he : ∀ x y, e (x + y) = e x + e y)
+    (β : W → W → ℝ) (hχ : ∀ x y, χ (e.symm x) (e.symm y) = ((𝐞 (β x y) : Circle) : ℂ))
     (Φ : W → ℂ) (hΦc : Continuous Φ) (hΦs : HasCompactSupport Φ)
     (hint : Integrable (fun y => ∫ x, Φ x * ((𝐞 (β x y) : Circle) : ℂ) ∂(μ.map e)) (μ.map e))
-    (z : W) :
-    ∫ y, (∫ x, Φ x * ((𝐞 (β x y) : Circle) : ℂ) ∂(μ.map e)) * ((𝐞 (β y z) : Circle) : ℂ) ∂(μ.map e)
+    (z : W)
+    : ∫ y, (∫ x, Φ x * ((𝐞 (β x y) : Circle) : ℂ) ∂(μ.map e)) * ((𝐞 (β y z) : Circle) : ℂ) ∂(μ.map e)
       = Φ (-z) := by
   have hme : MeasurableEmbedding e := e.measurableEmbedding
   have hmap : ∀ g : W → ℂ, ∫ w, g w ∂(μ.map e) = ∫ x, g (e x) ∂μ := fun g => hme.integral_map g
@@ -78,13 +81,17 @@ private theorem integral_fourier_map_eq_neg_of_integrable (μ : Measure V) (χ :
   simp only [hFdef, hmap]
   exact key
 
-private theorem false_of_degenerate_of_fourier_inversion (ν : Measure W) [ν.IsAddHaarMeasure] (β : W → W → ℝ)
+private theorem false_of_degenerate_of_fourier_inversion
+    (ν : Measure W) [ν.IsAddHaarMeasure]
+    (β : W → W → ℝ)
     (hL : ∀ x x' y, β (x + x') y = β x y + β x' y) (hcL : ∀ y, Continuous fun x => β x y)
     (k : W) (hk : k ≠ 0) (hk0 : ∀ y, β k y = 0)
-    (hP : ∀ Φ : W → ℂ, Continuous Φ → HasCompactSupport Φ →
-      Integrable (fun y => ∫ x, Φ x * ((𝐞 (β x y) : Circle) : ℂ) ∂ν) ν → ∀ z : W,
-      ∫ y, (∫ x, Φ x * ((𝐞 (β x y) : Circle) : ℂ) ∂ν) * ((𝐞 (β y z) : Circle) : ℂ) ∂ν = Φ (-z)) :
-    False := by
+    (hP : ∀ Φ : W → ℂ,
+      Continuous Φ → HasCompactSupport Φ
+        → Integrable (fun y => ∫ x, Φ x * ((𝐞 (β x y) : Circle) : ℂ) ∂ν) ν
+        → ∀ z : W,
+          ∫ y, (∫ x, Φ x * ((𝐞 (β x y) : Circle) : ℂ) ∂ν) * ((𝐞 (β y z) : Circle) : ℂ) ∂ν = Φ (-z))
+    : False := by
   have hkpos : 0 < ‖k‖ := norm_pos_iff.mpr hk
   let bump : ContDiffBump (0 : W) := ⟨‖k‖ / 2, ‖k‖, by positivity, by linarith⟩
   let ψ : W → ℂ := fun x => ((bump x : ℝ) : ℂ)
@@ -119,12 +126,16 @@ private theorem false_of_degenerate_of_fourier_inversion (ν : Measure W) [ν.Is
     exact le_rfl
   simp [Φ, ψ, h0, h1] at key
 
-private theorem measure_eq_sqrt_abs_det_smul_volume_of_inversion (ν : Measure W) [ν.IsAddHaarMeasure] (A : W →ₗ[ℝ] W)
-    (hdet : LinearMap.det A ≠ 0)
-    (hP : ∀ Φ : W → ℂ, Continuous Φ → HasCompactSupport Φ →
-      Integrable (fun y => ∫ x, Φ x * ((𝐞 ⟪x, A y⟫ : Circle) : ℂ) ∂ν) ν → ∀ z : W,
-      ∫ y, (∫ x, Φ x * ((𝐞 ⟪x, A y⟫ : Circle) : ℂ) ∂ν) * ((𝐞 ⟪A y, z⟫ : Circle) : ℂ) ∂ν = Φ (-z)) :
-    ν = ENNReal.ofReal (Real.sqrt |LinearMap.det A|) • volume := by
+private theorem measure_eq_sqrt_abs_det_smul_volume_of_inversion
+    (ν : Measure W) [ν.IsAddHaarMeasure]
+    (A : W →ₗ[ℝ] W) (hdet : LinearMap.det A ≠ 0)
+    (hP : ∀ Φ : W → ℂ,
+      Continuous Φ → HasCompactSupport Φ
+        → Integrable (fun y => ∫ x, Φ x * ((𝐞 ⟪x, A y⟫ : Circle) : ℂ) ∂ν) ν
+        → ∀ z : W,
+          ∫ y, (∫ x, Φ x * ((𝐞 ⟪x, A y⟫ : Circle) : ℂ) ∂ν) * ((𝐞 ⟪A y, z⟫ : Circle) : ℂ) ∂ν
+            = Φ (-z))
+    : ν = ENNReal.ofReal (Real.sqrt |LinearMap.det A|) • volume := by
   set s := ν.addHaarScalarFactor volume with hsdef
   have hs : 0 < s := Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure ν volume
   have hν : ν = (s : ENNReal) • volume := by
@@ -174,7 +185,8 @@ private theorem measure_eq_sqrt_abs_det_smul_volume_of_inversion (ν : Measure W
   have key := hP Φ hΦd.continuous hΦs hint 0
   simp only [hinner, inner_zero_right, AddChar.map_zero_eq_one, Circle.coe_one, mul_one] at key
   rw [hν, integral_smul_measure, integral_smul, hcomp, ENNReal.coe_toReal,
-    ENNReal.toReal_ofReal (abs_nonneg _)] at key
+      ENNReal.toReal_ofReal (abs_nonneg _)]
+    at key
   have hreal : (s : ℝ) * ((s : ℝ) * |(LinearMap.det A)⁻¹|) = 1 := by
     have h2 : Φ (-0) = 1 := by simp [Φ, h0]
     rw [h2] at key
@@ -190,15 +202,18 @@ private theorem measure_eq_sqrt_abs_det_smul_volume_of_inversion (ν : Measure W
   congr 1
   rw [← ENNReal.ofReal_coe_nnreal, ← hsq, Real.sqrt_sq s.coe_nonneg]
 
-theorem dens_generic (μ : Measure V) (χ : V → V → ℂ) (hμ : SelfDual μ χ) (e : V ≃ₜ W)
-    (he : ∀ x y, e (x + y) = e x + e y) (β : W → W → ℝ)
-    (hχ : ∀ x y, χ (e.symm x) (e.symm y) = ((𝐞 (β x y) : Circle) : ℂ))
+theorem dens_generic
+    (μ : Measure V) (χ : V → V → ℂ) (hμ : SelfDual μ χ)
+    (e : V ≃ₜ W) (he : ∀ x y, e (x + y) = e x + e y)
+    (β : W → W → ℝ) (hχ : ∀ x y, χ (e.symm x) (e.symm y) = ((𝐞 (β x y) : Circle) : ℂ))
     (hL : ∀ x x' y, β (x + x') y = β x y + β x' y) (hR : ∀ x y y', β x (y + y') = β x y + β x y')
     (hcL : ∀ y, Continuous fun x => β x y) (hcR : ∀ x, Continuous fun y => β x y)
-    (hS : ∀ x y, β x y = β y x) (b : OrthonormalBasis ι ℝ W) :
-    μ.map e = ENNReal.ofReal (Real.sqrt |(Matrix.of fun i j => β (b i) (b j)).det|) • volume := by
+    (hS : ∀ x y, β x y = β y x)
+    (b : OrthonormalBasis ι ℝ W)
+    : μ.map e = ENNReal.ofReal (Real.sqrt |(Matrix.of fun i j => β (b i) (b j)).det|) • volume := by
   obtain ⟨A, hA, hdet⟩ := exists_linearMap_inner_eq_and_det_eq_gram_det β hL hR hcL hcR b
-  have hP := fun Φ hc hs hi z => integral_fourier_map_eq_neg_of_integrable μ χ hμ e he β hχ Φ hc hs hi z
+  have hP := fun Φ hc hs hi z =>
+    integral_fourier_map_eq_neg_of_integrable μ χ hμ e he β hχ Φ hc hs hi z
   haveI : μ.IsAddHaarMeasure := hμ.1
   haveI : (μ.map e).IsAddHaarMeasure :=
     Measure.isAddHaarMeasure_map μ (AddMonoidHom.mk' e he) e.continuous e.surjective

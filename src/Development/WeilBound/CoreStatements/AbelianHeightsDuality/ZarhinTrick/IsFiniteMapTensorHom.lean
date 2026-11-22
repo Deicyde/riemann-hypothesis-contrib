@@ -15,7 +15,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 open GlobalTheory.CechPic GlobalTheory.AbDual
 open GlobalTheory.IndefiniteRowSideFullHecke.ZeroSectionBase (IsPrincipalPol sqToBase toBase)
@@ -37,8 +38,11 @@ def pr8 (A : Over S) : Fin 8 → (G4 (A ⊗ A) ⟶ A)
   | 7 => prj (A ⊗ A) 3 ≫ snd A A
 
 def lim8 (A : Over S) : IsLimit (Fan.mk (G4 (A ⊗ A)) (pr8 A)) :=
-  mkFanLimit _ (fun s => fourfoldProductLift ![lift (s.proj 0) (s.proj 1), lift (s.proj 2) (s.proj 3),
-      lift (s.proj 4) (s.proj 5), lift (s.proj 6) (s.proj 7)])
+  mkFanLimit _
+    (fun s =>
+      fourfoldProductLift
+        ![lift (s.proj 0) (s.proj 1), lift (s.proj 2) (s.proj 3),
+          lift (s.proj 4) (s.proj 5), lift (s.proj 6) (s.proj 7)])
     (fun s k => by fin_cases k <;> simp [pr8, fourfoldProductLift, prj])
     (fun s m hm => by
       have h0 : m ≫ pr8 A 0 = s.proj 0 := hm 0
@@ -51,20 +55,22 @@ def lim8 (A : Over S) : IsLimit (Fan.mk (G4 (A ⊗ A)) (pr8 A)) :=
       have h7 : m ≫ pr8 A 7 = s.proj 7 := hm 7
       simp only [pr8, prj, ← Category.assoc] at h0 h1 h2 h3 h4 h5 h6 h7
       refine CartesianMonoidalCategory.hom_ext _ _ (CartesianMonoidalCategory.hom_ext _ _ ?_ ?_)
-        (CartesianMonoidalCategory.hom_ext _ _ (CartesianMonoidalCategory.hom_ext _ _ ?_ ?_)
           (CartesianMonoidalCategory.hom_ext _ _ (CartesianMonoidalCategory.hom_ext _ _ ?_ ?_)
-            (CartesianMonoidalCategory.hom_ext _ _ ?_ ?_))) <;>
-        simp [fourfoldProductLift, ← h0, ← h1, ← h2, ← h3, ← h4, ← h5, ← h6, ← h7])
+            (CartesianMonoidalCategory.hom_ext _ _ (CartesianMonoidalCategory.hom_ext _ _ ?_ ?_)
+              (CartesianMonoidalCategory.hom_ext _ _ ?_ ?_)))
+        <;> simp [fourfoldProductLift, ← h0, ← h1, ← h2, ← h3, ← h4, ← h5, ← h6, ← h7])
 
 variable {T : Scheme.{0}} (s : T ⟶ S)
 
-theorem isFinite_map_tensorHom {X Y X' Y' : Over S} (f : X ⟶ Y) (g : X' ⟶ Y')
-    (hf : IsFinite ((Over.pullback s).map f).left) (hg : IsFinite ((Over.pullback s).map g).left) :
-    IsFinite ((Over.pullback s).map (f ⊗ₘ g)).left := by
+theorem isFinite_map_tensorHom
+    {X Y X' Y' : Over S} (f : X ⟶ Y) (g : X' ⟶ Y') (hf : IsFinite ((Over.pullback s).map f).left)
+    (hg : IsFinite ((Over.pullback s).map g).left)
+    : IsFinite ((Over.pullback s).map (f ⊗ₘ g)).left := by
   set F := Over.pullback s
-  have he : F.map (f ⊗ₘ g) =
-      CartesianMonoidalCategory.prodComparison F X X' ≫ (F.map f ⊗ₘ F.map g) ≫
-        inv (CartesianMonoidalCategory.prodComparison F Y Y') := by
+  have he
+      : F.map (f ⊗ₘ g)
+        = CartesianMonoidalCategory.prodComparison F X X' ≫ (F.map f ⊗ₘ F.map g)
+          ≫ inv (CartesianMonoidalCategory.prodComparison F Y Y') := by
     rw [← Category.assoc, ← CartesianMonoidalCategory.prodComparison_natural, Category.assoc,
       IsIso.hom_inv_id, Category.comp_id]
   have ht : IsFinite (Over.Hom.left (F.map f ⊗ₘ F.map g)) :=
@@ -77,7 +83,8 @@ theorem isFinite_map_tensorHom {X Y X' Y' : Over S} (f : X ⟶ Y) (g : X' ⟶ Y'
     (Over.forget T).map_isIso (CartesianMonoidalCategory.prodComparison F X X')
   haveI : IsIso (Over.Hom.left (inv (CartesianMonoidalCategory.prodComparison F Y Y'))) :=
     (Over.forget T).map_isIso (inv (CartesianMonoidalCategory.prodComparison F Y Y'))
-  have h1 : IsFinite (Over.Hom.left (CartesianMonoidalCategory.prodComparison F X X')) := inferInstance
+  have h1 : IsFinite (Over.Hom.left (CartesianMonoidalCategory.prodComparison F X X')) :=
+    inferInstance
   have h2 : IsFinite (Over.Hom.left (inv (CartesianMonoidalCategory.prodComparison F Y Y'))) :=
     inferInstance
   rw [he, Over.comp_left, Over.comp_left]

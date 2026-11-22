@@ -17,10 +17,11 @@ variable (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchim
 theorem secondCountableTopology_and_t2Space : SecondCountableTopology F ∧ T2Space F :=
   letI := IsTopologicalAddGroup.rightUniformSpace F
   haveI := isUniformAddGroup_of_addCommGroup (G := F)
-  letI : (Valued.v (R := F)).RankOne :=
-  { hom' := IsRankLeOne.nonempty.some.emb (R := F).comp MonoidWithZeroHom.ValueGroup₀.embedding
-    strictMono' := IsRankLeOne.nonempty.some.strictMono.comp
-        MonoidWithZeroHom.ValueGroup₀.embedding_strictMono }
+  letI : (Valued.v (R := F)).RankOne := {
+    hom' := IsRankLeOne.nonempty.some.emb (R := F).comp MonoidWithZeroHom.ValueGroup₀.embedding
+    strictMono' :=
+      IsRankLeOne.nonempty.some.strictMono.comp MonoidWithZeroHom.ValueGroup₀.embedding_strictMono
+  }
   open scoped Valued in
   haveI : ProperSpace F := .of_nontriviallyNormedField_of_weaklyLocallyCompactSpace F
   ⟨inferInstance, inferInstance⟩
@@ -31,7 +32,8 @@ end Top
 
 section Meas
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   [MeasurableSpace F] [BorelSpace F]
 
 end Meas

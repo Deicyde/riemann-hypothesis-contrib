@@ -15,7 +15,8 @@ noncomputable section
 
 universe u
 
-theorem HomLocRingIsLocal.proof (h : HomLocRingMem.Statement.{u}) : HomLocRingIsLocal.Statement.{u} := by
+theorem HomLocRingIsLocal.proof (h : HomLocRingMem.Statement.{u})
+    : HomLocRingIsLocal.Statement.{u} := by
   intro R _ K _ ι P W _ hW hPW
   let F := FractionRing (MRing ι R ⧸ P)
   let φ : MRing ι R →+* F := (algebraMap (MRing ι R ⧸ P) F).comp (Ideal.Quotient.mk P)
@@ -24,13 +25,16 @@ theorem HomLocRingIsLocal.proof (h : HomLocRingMem.Statement.{u}) : HomLocRingIs
     simp only [φ, RingHom.comp_apply]
     rw [IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem]
   have hne : ∀ a, a ∉ W → φ a ≠ 0 := fun a ha h0 => ha (hPW ((hφ a).1 h0))
-  have key : ∀ (b : K → ℕ) (f g : MRing ι R), IsMultiHomog f b → IsMultiHomog g b → g ∉ W →
-      ∀ hz : φ f / φ g ∈ homLocRing P W, IsUnit (⟨_, hz⟩ : homLocRing P W) ↔ f ∉ W := by
+  have key
+      : ∀ (b : K → ℕ) (f g : MRing ι R),
+        IsMultiHomog f b → IsMultiHomog g b → g ∉ W
+          → ∀ hz : φ f / φ g ∈ homLocRing P W, IsUnit (⟨_, hz⟩ : homLocRing P W) ↔ f ∉ W := by
     intro b f g hf hg hgW hz
     constructor
     · rintro ⟨u, hu⟩ hfW
       obtain ⟨b', f', g', -, -, hg'W, hw⟩ :=
-        (h R K ι P W hW hPW ((u⁻¹ : (homLocRing P W)ˣ) : homLocRing P W)).1 (u⁻¹ : (homLocRing P W)ˣ).1.2
+        (h R K ι P W hW hPW ((u⁻¹ : (homLocRing P W)ˣ) : homLocRing P W)).1
+          (u⁻¹ : (homLocRing P W)ˣ).1.2
       have h1 : (φ f / φ g) * (φ f' / φ g') = 1 := by
         have e := congrArg Subtype.val u.mul_inv
         rw [Subring.coe_mul, hu, Subring.coe_one] at e
@@ -54,8 +58,11 @@ theorem HomLocRingIsLocal.proof (h : HomLocRingMem.Statement.{u}) : HomLocRingIs
       rw [div_mul_div_comm, mul_comm (φ f) (φ g)]
       exact div_self (mul_ne_zero (hne g hgW) (hne f hfW))
   refine ⟨?_, key⟩
-  have hnu : ∀ z : homLocRing P W, ¬ IsUnit z → ∃ (b : K → ℕ) (f g : MRing ι R),
-      IsMultiHomog f b ∧ IsMultiHomog g b ∧ g ∉ W ∧ f ∈ W ∧ (z : F) = φ f / φ g := by
+  have hnu
+      : ∀ z : homLocRing P W,
+        ¬ IsUnit z
+          → ∃ (b : K → ℕ) (f g : MRing ι R),
+            IsMultiHomog f b ∧ IsMultiHomog g b ∧ g ∉ W ∧ f ∈ W ∧ (z : F) = φ f / φ g := by
     intro z hz
     obtain ⟨b, f, g, hf, hg, hgW, hzfg⟩ := (h R K ι P W hW hPW z).1 z.2
     refine ⟨b, f, g, hf, hg, hgW, ?_, hzfg⟩
@@ -73,8 +80,8 @@ theorem HomLocRingIsLocal.proof (h : HomLocRingMem.Statement.{u}) : HomLocRingIs
   have hden : IsMultiHomog (g₁ * g₂) (b₁ + b₂) := IsWeightedHomogeneous.mul hg₁ hg₂
   have hdenW : g₁ * g₂ ∉ W := fun h5 => (hW.mem_or_mem h5).elim hg₁W hg₂W
   have hsum : ((x + y : homLocRing P W) : F) = φ (f₁ * g₂ + f₂ * g₁) / φ (g₁ * g₂) := by
-    rw [Subring.coe_add, hx', hy', div_add_div _ _ (hne g₁ hg₁W) (hne g₂ hg₂W), map_add (f := _), map_mul, map_mul,
-      map_mul, mul_comm (φ g₁) (φ f₂)]
+    rw [Subring.coe_add, hx', hy', div_add_div _ _ (hne g₁ hg₁W) (hne g₂ hg₂W), map_add (f := _),
+      map_mul, map_mul, map_mul, mul_comm (φ g₁) (φ f₂)]
   have hmem : φ (f₁ * g₂ + f₂ * g₁) / φ (g₁ * g₂) ∈ homLocRing P W := hsum ▸ (x + y).2
   have e : x + y = ⟨_, hmem⟩ := Subtype.ext hsum
   rw [mem_nonunits_iff, e, key (b₁ + b₂) _ _ hnum hden hdenW hmem, not_not]

@@ -12,13 +12,14 @@ namespace PositivityTheory.KB.NaturalTheta
 
 section
 
-variable {C2 C1 C0 H V2 V1 V0 : Type} [AddCommGroup C2] [AddCommGroup C1] [AddCommGroup C0]
-  [AddCommGroup H] [Module ℤ H]
-  [AddCommGroup V2] [AddCommGroup V1] [AddCommGroup V0]
-  [Module ℝ V2] [Module ℝ V1] [Module ℝ V0]
-  (d1 : C2 →ₗ[ℤ] C1) (d0 : C1 →ₗ[ℤ] C0) (p : LinearMap.ker d0 →ₗ[ℤ] H)
-  (e2 : ℝ ⊗[ℤ] C2 ≃ₗ[ℝ] V2) (e1 : ℝ ⊗[ℤ] C1 ≃ₗ[ℝ] V1) (e0 : ℝ ⊗[ℤ] C0 ≃ₗ[ℝ] V0)
-  (D1 : V2 →ₗ[ℝ] V1) (D0 : V1 →ₗ[ℝ] V0)
+variable
+  {C2 C1 C0 H V2 V1 V0 : Type}
+  [AddCommGroup C2] [AddCommGroup C1] [AddCommGroup C0] [AddCommGroup H] [Module ℤ H]
+  [AddCommGroup V2] [AddCommGroup V1] [AddCommGroup V0] [Module ℝ V2] [Module ℝ V1] [Module ℝ V0]
+  (d1 : C2 →ₗ[ℤ] C1)
+  (d0 : C1 →ₗ[ℤ] C0) (p : LinearMap.ker d0 →ₗ[ℤ] H)
+  (e2 : ℝ ⊗[ℤ] C2 ≃ₗ[ℝ] V2) (e1 : ℝ ⊗[ℤ] C1 ≃ₗ[ℝ] V1) (e0 : ℝ ⊗[ℤ] C0 ≃ₗ[ℝ] V0) (D1 : V2 →ₗ[ℝ] V1)
+  (D0 : V1 →ₗ[ℝ] V0)
 
 def jz : ℝ ⊗[ℤ] LinearMap.ker d0 →ₗ[ℝ] V1 :=
   e1.toLinearMap ∘ₗ (LinearMap.ker d0).subtype.baseChange ℝ
@@ -30,8 +31,8 @@ theorem jz_injective : Function.Injective (jz d0 e1) := by
   rw [LinearMap.baseChange_eq_ltensor]
   exact Module.Flat.lTensor_preserves_injective_linearMap _ Subtype.val_injective
 
-theorem range_jz (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ) :
-    LinearMap.range (jz d0 e1) = LinearMap.ker D0 := by
+theorem range_jz (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ)
+    : LinearMap.range (jz d0 e1) = LinearMap.ker D0 := by
   have hex := Module.Flat.lTensor_exact ℝ (LinearMap.exact_subtype_ker_map d0)
   ext x
   constructor
@@ -57,29 +58,31 @@ theorem range_jz (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseC
     simp only [jz, LinearMap.comp_apply, LinearEquiv.coe_coe]
     rw [LinearMap.baseChange_eq_ltensor, hw]
 
-def th (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ) :
-    LinearMap.ker D0 →ₗ[ℝ] ℝ ⊗[ℤ] H :=
-  p.baseChange ℝ ∘ₗ (LinearEquiv.ofInjective _ (jz_injective d0 e1)).symm.toLinearMap ∘ₗ
-    (LinearEquiv.ofEq _ _ (range_jz d0 e1 e0 D0 h0).symm).toLinearMap
+def th (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ)
+    : LinearMap.ker D0 →ₗ[ℝ] ℝ ⊗[ℤ] H :=
+  p.baseChange ℝ ∘ₗ (LinearEquiv.ofInjective _ (jz_injective d0 e1)).symm.toLinearMap
+    ∘ₗ (LinearEquiv.ofEq _ _ (range_jz d0 e1 e0 D0 h0).symm).toLinearMap
 
-theorem th_jz (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ)
-    (w : ℝ ⊗[ℤ] LinearMap.ker d0) (hw : jz d0 e1 w ∈ LinearMap.ker D0) :
-    th d0 p e1 e0 D0 h0 ⟨jz d0 e1 w, hw⟩ = p.baseChange ℝ w := by
+theorem th_jz
+    (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ)
+    (w : ℝ ⊗[ℤ] LinearMap.ker d0) (hw : jz d0 e1 w ∈ LinearMap.ker D0)
+    : th d0 p e1 e0 D0 h0 ⟨jz d0 e1 w, hw⟩ = p.baseChange ℝ w := by
   simp only [th, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe]
   congr 1
   rw [LinearEquiv.symm_apply_eq]
   rfl
 
-theorem exists_jz (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ)
-    (z : LinearMap.ker D0) : ∃ w, jz d0 e1 w = z.1 := by
+theorem exists_jz
+    (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ) (z : LinearMap.ker D0)
+    : ∃ w, jz d0 e1 w = z.1 := by
   have hz : z.1 ∈ LinearMap.range (jz d0 e1) := by
     rw [range_jz d0 e1 e0 D0 h0]
     exact z.2
   exact LinearMap.mem_range.mp hz
 
-theorem th_surjective (hp : Function.Surjective p)
-    (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ) :
-    Function.Surjective (th d0 p e1 e0 D0 h0) := by
+theorem th_surjective
+    (hp : Function.Surjective p) (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ)
+    : Function.Surjective (th d0 p e1 e0 D0 h0) := by
   intro y
   have hs : Function.Surjective (p.baseChange ℝ) := by
     rw [LinearMap.baseChange_eq_ltensor]
@@ -90,11 +93,11 @@ theorem th_surjective (hp : Function.Surjective p)
     exact LinearMap.mem_range_self _ w
   exact ⟨⟨jz d0 e1 w, hw⟩, th_jz d0 p e1 e0 D0 h0 w hw⟩
 
-theorem th_eq_zero_iff (hdd : d0 ∘ₗ d1 = 0) (hker : ∀ x, p x = 0 ↔ x.1 ∈ LinearMap.range d1)
-    (hp : Function.Surjective p)
-    (h1 : D1 ∘ₗ e2.toLinearMap = e1.toLinearMap ∘ₗ d1.baseChange ℝ)
-    (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ) (z : LinearMap.ker D0) :
-    th d0 p e1 e0 D0 h0 z = 0 ↔ z.1 ∈ LinearMap.range D1 := by
+theorem th_eq_zero_iff
+    (hdd : d0 ∘ₗ d1 = 0) (hker : ∀ x, p x = 0 ↔ x.1 ∈ LinearMap.range d1)
+    (hp : Function.Surjective p) (h1 : D1 ∘ₗ e2.toLinearMap = e1.toLinearMap ∘ₗ d1.baseChange ℝ)
+    (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ) (z : LinearMap.ker D0)
+    : th d0 p e1 e0 D0 h0 z = 0 ↔ z.1 ∈ LinearMap.range D1 := by
   obtain ⟨zv, hzv⟩ := z
   obtain ⟨w, hw⟩ := exists_jz d0 e1 e0 D0 h0 ⟨zv, hzv⟩
   simp only at hw
@@ -138,24 +141,26 @@ end
 
 section Nat
 
-variable {C1 C0 H V1 V0 C1' C0' H' V1' V0' : Type} [AddCommGroup C1] [AddCommGroup C0]
-  [AddCommGroup H] [AddCommGroup V1] [AddCommGroup V0] [Module ℝ V1] [Module ℝ V0]
-  [AddCommGroup C1'] [AddCommGroup C0'] [AddCommGroup H'] [AddCommGroup V1'] [AddCommGroup V0']
-  [Module ℤ H] [Module ℤ H']
-  [Module ℝ V1'] [Module ℝ V0']
+variable
+  {C1 C0 H V1 V0 C1' C0' H' V1' V0' : Type}
+  [AddCommGroup C1] [AddCommGroup C0] [AddCommGroup H] [AddCommGroup V1] [AddCommGroup V0]
+  [Module ℝ V1] [Module ℝ V0] [AddCommGroup C1'] [AddCommGroup C0'] [AddCommGroup H']
+  [AddCommGroup V1'] [AddCommGroup V0'] [Module ℤ H] [Module ℤ H'] [Module ℝ V1'] [Module ℝ V0']
   (d0 : C1 →ₗ[ℤ] C0) (p : LinearMap.ker d0 →ₗ[ℤ] H)
   (e1 : ℝ ⊗[ℤ] C1 ≃ₗ[ℝ] V1) (e0 : ℝ ⊗[ℤ] C0 ≃ₗ[ℝ] V0) (D0 : V1 →ₗ[ℝ] V0)
   (d0' : C1' →ₗ[ℤ] C0') (p' : LinearMap.ker d0' →ₗ[ℤ] H')
   (e1' : ℝ ⊗[ℤ] C1' ≃ₗ[ℝ] V1') (e0' : ℝ ⊗[ℤ] C0' ≃ₗ[ℝ] V0') (D0' : V1' →ₗ[ℝ] V0')
 
-theorem th_natural (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ)
+theorem th_natural
+    (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.baseChange ℝ)
     (h0' : D0' ∘ₗ e1'.toLinearMap = e0'.toLinearMap ∘ₗ d0'.baseChange ℝ)
-    (c1 : C1 →ₗ[ℤ] C1') (q : H →ₗ[ℤ] H') (F : V1 →ₗ[ℝ] V1')
-    (hF : F ∘ₗ e1.toLinearMap = e1'.toLinearMap ∘ₗ c1.baseChange ℝ)
+    (c1 : C1 →ₗ[ℤ] C1')
+    (q : H →ₗ[ℤ] H')
+    (F : V1 →ₗ[ℝ] V1') (hF : F ∘ₗ e1.toLinearMap = e1'.toLinearMap ∘ₗ c1.baseChange ℝ)
     (hc : ∀ x ∈ LinearMap.ker d0, c1 x ∈ LinearMap.ker d0')
     (hq : ∀ x : LinearMap.ker d0, p' ⟨c1 x, hc x x.2⟩ = q (p x))
-    (z : LinearMap.ker D0) (z' : LinearMap.ker D0') (hz : z'.1 = F z.1) :
-    th d0' p' e1' e0' D0' h0' z' = q.baseChange ℝ (th d0 p e1 e0 D0 h0 z) := by
+    (z : LinearMap.ker D0) (z' : LinearMap.ker D0') (hz : z'.1 = F z.1)
+    : th d0' p' e1' e0' D0' h0' z' = q.baseChange ℝ (th d0 p e1 e0 D0 h0 z) := by
   obtain ⟨zv, hzv⟩ := z
   obtain ⟨w, hw⟩ := exists_jz d0 e1 e0 D0 h0 ⟨zv, hzv⟩
   simp only at hw
@@ -164,8 +169,8 @@ theorem th_natural (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.bas
   simp only at hz
   subst hz
   rw [th_jz d0 p e1 e0 D0 h0 w hzv]
-  have hcomp : c1 ∘ₗ (LinearMap.ker d0).subtype
-      = (LinearMap.ker d0').subtype ∘ₗ c1.restrict hc := LinearMap.ext fun x => rfl
+  have hcomp : c1 ∘ₗ (LinearMap.ker d0).subtype = (LinearMap.ker d0').subtype ∘ₗ c1.restrict hc :=
+    LinearMap.ext fun x => rfl
   have hj : F (jz d0 e1 w) = jz d0' e1' ((c1.restrict hc).baseChange ℝ w) := by
     simp only [jz, LinearMap.comp_apply, LinearEquiv.coe_coe]
     have := LinearMap.congr_fun hF ((LinearMap.ker d0).subtype.baseChange ℝ w)
@@ -173,8 +178,10 @@ theorem th_natural (h0 : D0 ∘ₗ e1.toLinearMap = e0.toLinearMap ∘ₗ d0.bas
     rw [this, ← LinearMap.comp_apply (c1.baseChange ℝ), ← LinearMap.baseChange_comp, hcomp,
       LinearMap.baseChange_comp, LinearMap.comp_apply]
   have hmem : jz d0' e1' ((c1.restrict hc).baseChange ℝ w) ∈ LinearMap.ker D0' := hj ▸ hzv'
-  have heq : (⟨F (jz d0 e1 w), hzv'⟩ : LinearMap.ker D0')
-      = ⟨jz d0' e1' ((c1.restrict hc).baseChange ℝ w), hmem⟩ := Subtype.ext hj
+  have heq
+      : (⟨F (jz d0 e1 w), hzv'⟩ : LinearMap.ker D0')
+        = ⟨jz d0' e1' ((c1.restrict hc).baseChange ℝ w), hmem⟩ :=
+    Subtype.ext hj
   rw [heq, th_jz d0' p' e1' e0' D0' h0' _ hmem, ← LinearMap.comp_apply (p'.baseChange ℝ),
     ← LinearMap.baseChange_comp, ← LinearMap.comp_apply (q.baseChange ℝ),
     ← LinearMap.baseChange_comp]

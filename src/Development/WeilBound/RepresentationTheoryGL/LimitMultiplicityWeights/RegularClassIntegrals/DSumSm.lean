@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RealLineCont
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain Matrix
-open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SiegelSet GlobalTheory.CompanionTheory.RapidDecay GlobalTheory.CompanionTheory.RegInt
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta GlobalTheory.TruncKer GlobalTheory.Cusp
+open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SiegelSet
+  GlobalTheory.CompanionTheory.RapidDecay GlobalTheory.CompanionTheory.RegInt
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta GlobalTheory.TruncKer
+  GlobalTheory.Cusp
 open scoped ContDiff Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -59,8 +62,9 @@ theorem sumSm : SmOf → SumSm := by
       continuous_const.mul (cont_prod k γ fun i =>
         GlobalTheory.RealLineCont.continuous_of_isRealLine F E σ h n J (γ i) (hγ i))
     obtain ⟨S, hS⟩ := loc_fin (Γ := Γ) hcs z hφ t₀
-    have hsum : ContDiffAt ℝ ∞ (fun t : Fin k → ℝ =>
-        ∑ ν ∈ S, f (z * ν * (g * (List.ofFn fun i => γ i (t i)).prod))) t₀ := by
+    have hsum : ContDiffAt ℝ ∞
+        (fun t : Fin k → ℝ => ∑ ν ∈ S, f (z * ν * (g * (List.ofFn fun i => γ i (t i)).prod)))
+        t₀ := by
       refine ContDiff.contDiffAt (ContDiff.sum fun ν _ => ?_)
       have := hs k γ hγ (z * ν * g)
       simpa only [mul_assoc] using this
@@ -69,15 +73,18 @@ theorem sumSm : SmOf → SumSm := by
   · intro b hb
     funext g
     have hbc := GlobalTheory.RealLineCont.continuous_of_isRealLine F E σ h n J b hb
-    obtain ⟨S, hS⟩ := loc_fin (Γ := Γ) (φ := fun t : ℝ => g * b t) hcs z (continuous_const.mul hbc) 0
+    obtain ⟨S, hS⟩ :=
+      loc_fin (Γ := Γ) (φ := fun t : ℝ => g * b t) hcs z (continuous_const.mul hbc) 0
     have hline : ∀ x : GAd σ J, ContDiff ℝ ∞ fun t : ℝ => f (x * b t) := by
       intro x
-      have := (hs 1 (fun _ => b) (fun _ => hb) x).comp
-        (contDiff_pi.2 fun _ => contDiff_id : ContDiff ℝ ∞ fun t : ℝ => fun _ : Fin 1 => t)
+      have :=
+        (hs 1 (fun _ => b) (fun _ => hb) x).comp
+          (contDiff_pi.2 fun _ => contDiff_id : ContDiff ℝ ∞ fun t : ℝ => fun _ : Fin 1 => t)
       convert this using 2
       simp [List.ofFn_succ]
-    have e1 : (fun t => nsum Γ f z (g * b t)) =ᶠ[𝓝 0]
-        fun t => ∑ ν ∈ S, f (z * ν * (g * b t)) :=
+    have e1
+        : (fun t => nsum Γ f z (g * b t)) =ᶠ[𝓝 0]
+          fun t => ∑ ν ∈ S, f (z * ν * (g * b t)) :=
       hS.mono fun t ht => tsum_eq_sum (s := S) (fun ν hν => ht ν hν)
     have e2 : ∀ ν ∉ S, lineDer b f (z * ν * g) = 0 := by
       intro ν hν

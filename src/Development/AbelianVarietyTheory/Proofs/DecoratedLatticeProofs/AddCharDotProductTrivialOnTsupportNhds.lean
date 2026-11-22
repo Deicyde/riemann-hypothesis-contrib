@@ -33,23 +33,29 @@ theorem nonarch : NonarchimedeanAddGroup (n → k) where
 
 variable [MeasurableSpace k] [BorelSpace k]
 
-theorem measureReal_box_ne (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (s : kˣ) :
-    (μ.real (box n s) : ℂ) ≠ 0 := by
+theorem measureReal_box_ne (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (s : kˣ)
+    : (μ.real (box n s) : ℂ) ≠ 0 := by
   have h1 : μ (box n s) ≠ 0 := ((isOpen_box s).measure_pos μ ⟨0, fun i _ => by simp [cball]⟩).ne'
   have h2 : μ (box n s) ≠ ⊤ := (isCompact_box s).measure_lt_top.ne
   exact_mod_cast ENNReal.toReal_ne_zero.2 ⟨h1, h2⟩
 
-theorem decomp_integral (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (s : kˣ) {φ : (n → k) → ℂ}
-    (hφ : φ ∈ SB (n → k)) (hinv : ∀ t ∈ box n s, ∀ x, φ (x + t) = φ x) :
-    ∃ S : Finset (n → k), (∀ y, φ y = ∑ x ∈ S, φ x * (box n s).indicator (fun _ => (1:ℂ)) (y - x)) ∧
-      ∀ F : (n → k) → ℂ, (∀ t ∈ box n s, ∀ x, F (x + t) = F x) →
-        ∫ y, φ y * F y ∂μ = (μ.real (box n s) : ℂ) * ∑ x ∈ S, φ x * F x := by
+theorem decomp_integral
+    (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
+    (s : kˣ)
+    {φ : (n → k) → ℂ} (hφ : φ ∈ SB (n → k)) (hinv : ∀ t ∈ box n s, ∀ x, φ (x + t) = φ x)
+    : ∃ S : Finset (n → k),
+      (∀ y, φ y = ∑ x ∈ S, φ x * (box n s).indicator (fun _ => (1:ℂ)) (y - x))
+        ∧ ∀ F : (n → k) → ℂ,
+          (∀ t ∈ box n s, ∀ x, F (x + t) = F x)
+            → ∫ y, φ y * F y ∂μ = (μ.real (box n s) : ℂ) * ∑ x ∈ S, φ x * F x := by
   classical
   haveI := secondCountable k
   obtain ⟨S, hS⟩ := GlobalTheory.WeilM.HaarUniq.exists_decomp (boxSub (n := n) s) hφ.2 hinv
   have hinj : ∀ q ∈ S, ∀ q' ∈ S, Quotient.out q = Quotient.out q' → q = q' := fun q _ q' _ h => by
     simpa using congrArg (QuotientAddGroup.mk (s := (boxSub (n := n) s).toAddSubgroup)) h
-  have hpt : ∀ y, φ y = ∑ x ∈ S.image Quotient.out, φ x * (box n s).indicator (fun _ => (1:ℂ)) (y - x) := by
+  have hpt
+      : ∀ y,
+        φ y = ∑ x ∈ S.image Quotient.out, φ x * (box n s).indicator (fun _ => (1:ℂ)) (y - x) := by
     intro y
     rw [Finset.sum_image hinj]
     have := congrFun hS y
@@ -59,26 +65,33 @@ theorem decomp_integral (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (s : kˣ)
     rw [sub_eq_add_neg]
     rfl
   refine ⟨S.image Quotient.out, hpt, fun F hF => ?_⟩
-  have h1 : ∀ y, φ y * F y = ∑ x ∈ S.image Quotient.out,
-      (φ x * F x) * (box n s).indicator (fun _ => (1:ℂ)) (y - x) := by
+  have h1
+      : ∀ y,
+        φ y * F y
+          = ∑ x ∈ S.image Quotient.out,
+            (φ x * F x) * (box n s).indicator (fun _ => (1:ℂ)) (y - x) := by
     intro y
     rw [hpt y, Finset.sum_mul]
     refine Finset.sum_congr rfl fun x _ => ?_
     by_cases hy : y - x ∈ box n s
     · have := hF (y - x) hy x
       rw [add_sub_cancel] at this
-      rw [this]; ring
+      rw [this]
+      ring
     · simp [Set.indicator_of_notMem hy]
-  have hint : ∀ x : n → k, Integrable (fun y => (box n s).indicator (fun _ => (1:ℂ)) (y - x)) μ := by
+  have hint
+      : ∀ x : n → k, Integrable (fun y => (box n s).indicator (fun _ => (1 : ℂ)) (y - x)) μ := by
     intro x
-    have : Integrable ((box n s).indicator (fun _ => (1:ℂ))) μ :=
+    have : Integrable ((box n s).indicator (fun _ => (1 : ℂ))) μ :=
       (integrable_indicator_iff (isOpen_box _).measurableSet).mpr
         (integrableOn_const (isCompact_box _).measure_lt_top.ne)
     exact this.comp_sub_right x
   rw [integral_congr_ae (Filter.Eventually.of_forall h1)]
-  have h2 : ∀ x : n → k, ∫ y, (box n s).indicator (fun _ => (1:ℂ)) (y - x) ∂μ = (μ.real (box n s) : ℂ) := by
+  have h2
+      : ∀ x : n → k,
+        ∫ y, (box n s).indicator (fun _ => (1:ℂ)) (y - x) ∂μ = (μ.real (box n s) : ℂ) := by
     intro x
-    rw [integral_sub_right_eq_self (fun y => (box n s).indicator (fun _ => (1:ℂ)) y) x,
+    rw [integral_sub_right_eq_self (fun y => (box n s).indicator (fun _ => (1 : ℂ)) y) x,
       integral_indicator_const _ (isOpen_box _).measurableSet]
     simp
   rw [integral_finsetSum _ fun x _ => (hint x).const_mul _, Finset.mul_sum]
@@ -88,8 +101,9 @@ theorem decomp_integral (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (s : kˣ)
 variable {χ : AddChar k Circle} {c : kˣ}
 
 omit [MeasurableSpace k] [BorelSpace k] in
-theorem addChar_dotProduct_trivial_on_tsupport_nhds (hχ : HasConductor χ c) {g : (n → k) → ℂ} (hg : g ∈ SB (n → k)) :
-    {t : n → k | ∀ η ∈ tsupport g, χ (η ⬝ᵥ t) = 1} ∈ 𝓝 (0 : n → k) := by
+theorem addChar_dotProduct_trivial_on_tsupport_nhds
+    (hχ : HasConductor χ c) {g : (n → k) → ℂ} (hg : g ∈ SB (n → k))
+    : {t : n → k | ∀ η ∈ tsupport g, χ (η ⬝ᵥ t) = 1} ∈ 𝓝 (0 : n → k) := by
   have h1 : ∀ᶠ t in 𝓝 (0 : n → k), ∀ η ∈ tsupport g, χ (η ⬝ᵥ t) = 1 := by
     refine IsCompact.eventually_forall_of_forall_eventually hg.2 fun η _ => ?_
     have h2 : IsLocallyConstant fun q : (n → k) × (n → k) => χ (q.2 ⬝ᵥ q.1) :=
@@ -103,34 +117,40 @@ theorem box_nhds (s : kˣ) : box n s ∈ 𝓝 (0 : n → k) :=
   (isOpen_box s).mem_nhds fun i _ => by simp [cball]
 
 omit [MeasurableSpace k] [BorelSpace k] in
-theorem invariant_nhds {f : (n → k) → ℂ} (hf : f ∈ SB (n → k)) :
-    {t : n → k | ∀ x, f (x + t) = f x} ∈ 𝓝 (0 : n → k) := by
+theorem invariant_nhds {f : (n → k) → ℂ} (hf : f ∈ SB (n → k))
+    : {t : n → k | ∀ x, f (x + t) = f x} ∈ 𝓝 (0 : n → k) := by
   classical
   obtain ⟨s, hs⟩ := exists_box_invariant hf
   exact Filter.mem_of_superset (box_nhds s) fun t ht => hs t ht
 
 omit [MeasurableSpace k] [BorelSpace k] in
-theorem tr_mem {a : (n → k) → ℂ} (ha : a ∈ SB (n → k)) (x : n → k) :
-    (fun y => a (y - x)) ∈ SB (n → k) :=
-  ⟨ha.1.comp_continuous (continuous_id.sub continuous_const), ha.2.comp_homeomorph (Homeomorph.subRight x)⟩
+theorem tr_mem {a : (n → k) → ℂ} (ha : a ∈ SB (n → k)) (x : n → k)
+    : (fun y => a (y - x)) ∈ SB (n → k) := ⟨
+  ha.1.comp_continuous (continuous_id.sub continuous_const),
+  ha.2.comp_homeomorph (Homeomorph.subRight x)
+⟩
 
 omit [MeasurableSpace k] [BorelSpace k] in
-theorem mc_mem (hχ : HasConductor χ c) {b : (n → k) → ℂ} (hb : b ∈ SB (n → k)) (x : n → k) :
-    (fun η => (χ (η ⬝ᵥ x) : ℂ) * b η) ∈ SB (n → k) := by
+theorem mc_mem (hχ : HasConductor χ c) {b : (n → k) → ℂ} (hb : b ∈ SB (n → k)) (x : n → k)
+    : (fun η => (χ (η ⬝ᵥ x) : ℂ) * b η) ∈ SB (n → k) := by
   refine ⟨?_, hb.2.mul_left⟩
   have h1 : IsLocallyConstant fun η : n → k => (χ (η ⬝ᵥ x) : ℂ) :=
     (hχ.isLocallyConstant.comp_continuous (continuous_id.dotProduct continuous_const)).comp _
   exact h1.mul hb.1
 
-theorem law_integrated (hχ : HasConductor χ c) (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
+theorem law_integrated
+    (hχ : HasConductor χ c)
+    (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
     (B : SB (n → k) →ₗ[ℂ] SB (n → k) →ₗ[ℂ] ℂ)
-    (h2 : ∀ (a a' b b' : SB (n → k)) (t : n → k), (∀ y, a'.1 y = a.1 (y - t)) →
-      (∀ η, b'.1 η = (χ (η ⬝ᵥ t) : ℂ) * b.1 η) → B a' b = B a b')
+    (h2 : ∀ (a a' b b' : SB (n → k)) (t : n → k),
+      (∀ y, a'.1 y = a.1 (y - t)) → (∀ η, b'.1 η = (χ (η ⬝ᵥ t) : ℂ) * b.1 η) → B a' b = B a b')
     (a b φ a' b' : SB (n → k)) (ha' : ∀ y, a'.1 y = ∫ t, φ.1 t * a.1 (y - t) ∂μ)
-    (hb' : ∀ η, b'.1 η = (∫ t, φ.1 t * (χ (η ⬝ᵥ t) : ℂ) ∂μ) * b.1 η) : B a' b = B a b' := by
+    (hb' : ∀ η, b'.1 η = (∫ t, φ.1 t * (χ (η ⬝ᵥ t) : ℂ) ∂μ) * b.1 η)
+    : B a' b = B a b' := by
   classical
-  obtain ⟨s, hs⟩ := exists_box_subset (Filter.inter_mem (invariant_nhds φ.2)
-    (Filter.inter_mem (invariant_nhds a.2) (addChar_dotProduct_trivial_on_tsupport_nhds hχ b.2)))
+  obtain ⟨s, hs⟩ :=
+    exists_box_subset (Filter.inter_mem (invariant_nhds φ.2)
+      (Filter.inter_mem (invariant_nhds a.2) (addChar_dotProduct_trivial_on_tsupport_nhds hχ b.2)))
   obtain ⟨S, -, hint⟩ := decomp_integral μ s φ.2 fun t ht x => (hs ht).1 x
   set m : ℂ := (μ.real (box n s) : ℂ)
   have hnegmem : ∀ t ∈ box n s, -t ∈ box n s := fun t ht i _ => neg_mem_cball (ht i trivial)
@@ -138,9 +158,12 @@ theorem law_integrated (hχ : HasConductor χ c) (μ : Measure (n → k)) [μ.Is
     apply Subtype.ext
     funext y
     rw [Submodule.coe_sum, Finset.sum_apply, ha' y]
-    rw [hint (fun t => a.1 (y - t)) fun t ht x => by
-      have := (hs (hnegmem t ht)).2.1 (y - x)
-      rw [← this]; abel_nf]
+    rw [hint
+      (fun t => a.1 (y - t))
+      fun t ht x => by
+        have := (hs (hnegmem t ht)).2.1 (y - x)
+        rw [← this]
+        abel_nf]
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun x _ => ?_
     simp only [SetLike.val_smul, Pi.smul_apply, smul_eq_mul]
@@ -150,8 +173,9 @@ theorem law_integrated (hχ : HasConductor χ c) (μ : Measure (n → k)) [μ.Is
     funext η
     rw [Submodule.coe_sum, Finset.sum_apply, hb' η]
     by_cases hη : η ∈ tsupport b.1
-    · rw [hint (fun t => (χ (η ⬝ᵥ t) : ℂ)) fun t ht x => by
-        rw [dotProduct_add, AddChar.map_add_eq_mul, (hs ht).2.2 η hη, mul_one]]
+    · rw [hint
+        (fun t => (χ (η ⬝ᵥ t) : ℂ))
+        fun t ht x => by rw [dotProduct_add, AddChar.map_add_eq_mul, (hs ht).2.2 η hη, mul_one]]
       rw [Finset.mul_sum, Finset.sum_mul]
       refine Finset.sum_congr rfl fun x _ => ?_
       simp only [SetLike.val_smul, Pi.smul_apply, smul_eq_mul]
@@ -166,16 +190,18 @@ theorem law_integrated (hχ : HasConductor χ c) (μ : Measure (n → k)) [μ.Is
   exact h2 a _ b _ x (fun y => rfl) (fun η => rfl)
 
 omit [MeasurableSpace k] [BorelSpace k] in
-theorem box_mono {s s' : kˣ} (h : valuation k (s : k) ≤ valuation k (s' : k)) : box n s ⊆ box n s' :=
-  fun x hx i _ => show valuation k (x i) ≤ valuation k (s' : k) from le_trans (hx i trivial) h
+theorem box_mono {s s' : kˣ} (h : valuation k (s : k) ≤ valuation k (s' : k))
+    : box n s ⊆ box n s' := fun x hx i _ =>
+  show valuation k (x i) ≤ valuation k (s' : k) from le_trans (hx i trivial) h
 
 omit [MeasurableSpace k] [BorelSpace k] in
 theorem box_total (s s' : kˣ) : box n s ⊆ box n s' ∨ box n s' ⊆ box n s :=
   (le_total (valuation k (s : k)) (valuation k (s' : k))).imp box_mono box_mono
 
 omit [MeasurableSpace k] [BorelSpace k] in
-theorem ind_add (s : kˣ) {t : n → k} (ht : t ∈ box n s) (z : n → k) :
-    (box n s).indicator (fun _ => (1 : ℂ)) (z + t) = (box n s).indicator (fun _ => (1 : ℂ)) z := by
+theorem ind_add (s : kˣ) {t : n → k} (ht : t ∈ box n s) (z : n → k)
+    : (box n s).indicator (fun _ => (1 : ℂ)) (z + t)
+      = (box n s).indicator (fun _ => (1 : ℂ)) z := by
   have h : z + t ∈ box n s ↔ z ∈ box n s :=
     add_mem_cancel_right (H := (boxSub (n := n) s).toAddSubgroup) ht
   by_cases hz : z ∈ box n s
@@ -189,47 +215,59 @@ theorem ind_mem (s : kˣ) : (box n s).indicator (fun _ => (1 : ℂ)) ∈ SB (n �
 
 def ind (s : kˣ) : SB (n → k) := ⟨_, ind_mem (n := n) s⟩
 
-theorem conv_ind (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (s : kˣ) {φ : (n → k) → ℂ}
-    (hφ : φ ∈ SB (n → k)) (hinv : ∀ t ∈ box n s, ∀ x, φ (x + t) = φ x) (y : n → k) :
-    ∫ t, φ t * (box n s).indicator (fun _ => (1 : ℂ)) (y - t) ∂μ = (μ.real (box n s) : ℂ) * φ y := by
+theorem conv_ind
+    (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
+    (s : kˣ)
+    {φ : (n → k) → ℂ} (hφ : φ ∈ SB (n → k)) (hinv : ∀ t ∈ box n s, ∀ x, φ (x + t) = φ x)
+    (y : n → k)
+    : ∫ t, φ t * (box n s).indicator (fun _ => (1 : ℂ)) (y - t) ∂μ
+      = (μ.real (box n s) : ℂ) * φ y := by
   obtain ⟨S, hpt, hint⟩ := decomp_integral μ s hφ hinv
   rw [hint _ fun t ht x => by
-    rw [show y - (x + t) = (y - x) + -t by abel, ind_add s (show -t ∈ box n s from fun i _ => neg_mem_cball (ht i trivial))],
+      rw [show y - (x + t) = (y - x) + -t by abel,
+        ind_add s (show -t ∈ box n s from fun i _ => neg_mem_cball (ht i trivial))],
     hpt y]
 
 def admitted (χ : AddChar k Circle) (s : kˣ) (g : (n → k) → ℂ) : Prop :=
   ∀ η, g η ≠ 0 → ∀ t ∈ box n s, χ (η ⬝ᵥ t) = 1
 
 omit [MeasurableSpace k] [BorelSpace k] in
-theorem isAdmissibleBoxForCharacter_of_subset {s : kˣ} {g : (n → k) → ℂ}
-    (h : box n s ⊆ {t : n → k | ∀ η ∈ tsupport g, χ (η ⬝ᵥ t) = 1}) : admitted χ s g :=
-  fun η hη t ht => h ht η (subset_tsupport _ hη)
+theorem isAdmissibleBoxForCharacter_of_subset
+    {s : kˣ} {g : (n → k) → ℂ} (h : box n s ⊆ {t : n → k | ∀ η ∈ tsupport g, χ (η ⬝ᵥ t) = 1})
+    : admitted χ s g := fun η hη t ht =>
+  h ht η (subset_tsupport _ hη)
 
-
-theorem ratio_indep (hχ : HasConductor χ c) (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
+theorem ratio_indep
+    (hχ : HasConductor χ c)
+    (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
     (B : SB (n → k) →ₗ[ℂ] SB (n → k) →ₗ[ℂ] ℂ)
-    (h2 : ∀ (a a' b b' : SB (n → k)) (t : n → k), (∀ y, a'.1 y = a.1 (y - t)) →
-      (∀ η, b'.1 η = (χ (η ⬝ᵥ t) : ℂ) * b.1 η) → B a' b = B a b')
-    {s s' : kˣ} (g : SB (n → k)) (hs : admitted χ s g.1) (hss : box n s' ⊆ box n s) :
-    (μ.real (box n s) : ℂ)⁻¹ * B (ind s) g = (μ.real (box n s') : ℂ)⁻¹ * B (ind s') g := by
+    (h2 : ∀ (a a' b b' : SB (n → k)) (t : n → k),
+      (∀ y, a'.1 y = a.1 (y - t)) → (∀ η, b'.1 η = (χ (η ⬝ᵥ t) : ℂ) * b.1 η) → B a' b = B a b')
+    {s s' : kˣ} (g : SB (n → k)) (hs : admitted χ s g.1)
+    (hss : box n s' ⊆ box n s)
+    : (μ.real (box n s) : ℂ)⁻¹ * B (ind s) g = (μ.real (box n s') : ℂ)⁻¹ * B (ind s') g := by
   haveI := secondCountable k
-  have key := law_integrated hχ μ B h2 (ind s') g (ind s) ((μ.real (box n s') : ℂ) • ind s)
-    ((μ.real (box n s) : ℂ) • g) (fun y => by
-      show (μ.real (box n s') : ℂ) * (box n s).indicator (fun _ => (1 : ℂ)) y =
-        ∫ t, (box n s).indicator (fun _ => (1 : ℂ)) t * (box n s').indicator (fun _ => (1 : ℂ)) (y - t) ∂μ
-      rw [conv_ind μ s' (ind_mem s) (fun t ht x => ind_add s (hss ht) x) y]) (fun η => by
-      show (μ.real (box n s) : ℂ) * g.1 η = _
-      by_cases hη : g.1 η = 0
-      · simp [hη]
-      · congr 1
-        have : ∀ t, (ind s).1 t * (χ (η ⬝ᵥ t) : ℂ) = (box n s).indicator (fun _ => (1 : ℂ)) t := by
-          intro t
-          by_cases ht : t ∈ box n s
-          · rw [hs η hη t ht]; simp [ind]
-          · simp [ind, Set.indicator_of_notMem ht]
-        simp only [this]
-        rw [integral_indicator_const _ (isOpen_box _).measurableSet]
-        simp)
+  have key :=
+    law_integrated hχ μ B h2 (ind s') g (ind s) ((μ.real (box n s') : ℂ) • ind s)
+      ((μ.real (box n s) : ℂ) • g)
+      (fun y => by
+        show (μ.real (box n s') : ℂ) * (box n s).indicator (fun _ => (1 : ℂ)) y =
+          ∫ t, (box n s).indicator (fun _ => (1 : ℂ)) t * (box n s').indicator (fun _ => (1 : ℂ)) (y - t) ∂μ
+        rw [conv_ind μ s' (ind_mem s) (fun t ht x => ind_add s (hss ht) x) y])
+      (fun η => by
+        show (μ.real (box n s) : ℂ) * g.1 η = _
+        by_cases hη : g.1 η = 0
+        · simp [hη]
+        · congr 1
+          have : ∀ t,
+              (ind s).1 t * (χ (η ⬝ᵥ t) : ℂ) = (box n s).indicator (fun _ => (1 : ℂ)) t := by
+            intro t
+            by_cases ht : t ∈ box n s
+            · rw [hs η hη t ht]; simp [ind]
+            · simp [ind, Set.indicator_of_notMem ht]
+          simp only [this]
+          rw [integral_indicator_const _ (isOpen_box _).measurableSet]
+          simp)
   rw [map_smul, LinearMap.smul_apply, map_smul, smul_eq_mul, smul_eq_mul] at key
   have h1 := measureReal_box_ne μ s
   have h1' := measureReal_box_ne μ s'
@@ -241,22 +279,25 @@ theorem exists_adm (hχ : HasConductor χ c) (g : SB (n → k)) : ∃ s : kˣ, a
   obtain ⟨s, hs⟩ := exists_box_subset (addChar_dotProduct_trivial_on_tsupport_nhds hχ g.2)
   exact ⟨s, isAdmissibleBoxForCharacter_of_subset hs⟩
 
-
 open scoped Classical in
 open Classical in
-def ell (χ : AddChar k Circle) (μ : Measure (n → k)) (B : SB (n → k) →ₗ[ℂ] SB (n → k) →ₗ[ℂ] ℂ)
-    (g : SB (n → k)) : ℂ :=
+def ell
+    (χ : AddChar k Circle) (μ : Measure (n → k)) (B : SB (n → k) →ₗ[ℂ] SB (n → k) →ₗ[ℂ] ℂ)
+    (g : SB (n → k))
+    : ℂ :=
   if h : ∃ s : kˣ, admitted χ s g.1 then (μ.real (box n h.choose) : ℂ)⁻¹ * B (ind h.choose) g else 0
 
 section Form
-variable (hχ : HasConductor χ c) (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
-    (B : SB (n → k) →ₗ[ℂ] SB (n → k) →ₗ[ℂ] ℂ)
-    (h2 : ∀ (a a' b b' : SB (n → k)) (t : n → k), (∀ y, a'.1 y = a.1 (y - t)) →
-      (∀ η, b'.1 η = (χ (η ⬝ᵥ t) : ℂ) * b.1 η) → B a' b = B a b')
+variable
+  (hχ : HasConductor χ c)
+  (μ : Measure (n → k)) [μ.IsAddHaarMeasure]
+  (B : SB (n → k) →ₗ[ℂ] SB (n → k) →ₗ[ℂ] ℂ)
+  (h2 : ∀ (a a' b b' : SB (n → k)) (t : n → k),
+    (∀ y, a'.1 y = a.1 (y - t)) → (∀ η, b'.1 η = (χ (η ⬝ᵥ t) : ℂ) * b.1 η) → B a' b = B a b')
 include hχ h2
 
-theorem ell_eq {s : kˣ} (g : SB (n → k)) (hs : admitted χ s g.1) :
-    ell χ μ B g = (μ.real (box n s) : ℂ)⁻¹ * B (ind s) g := by
+theorem ell_eq {s : kˣ} (g : SB (n → k)) (hs : admitted χ s g.1)
+    : ell χ μ B g = (μ.real (box n s) : ℂ)⁻¹ * B (ind s) g := by
   have h : ∃ s : kˣ, admitted χ s g.1 := ⟨s, hs⟩
   rw [ell, dite_eq_left h]
   rcases box_total (n := n) h.choose s with h1 | h1
@@ -266,7 +307,9 @@ theorem ell_eq {s : kˣ} (g : SB (n → k)) (hs : admitted χ s g.1) :
 def ellL : SB (n → k) →ₗ[ℂ] ℂ where
   toFun := ell χ μ B
   map_add' g g' := by
-    obtain ⟨s, hs⟩ := exists_box_subset (Filter.inter_mem (addChar_dotProduct_trivial_on_tsupport_nhds hχ g.2) (addChar_dotProduct_trivial_on_tsupport_nhds hχ g'.2))
+    obtain ⟨s, hs⟩ :=
+      exists_box_subset (Filter.inter_mem (addChar_dotProduct_trivial_on_tsupport_nhds hχ g.2)
+        (addChar_dotProduct_trivial_on_tsupport_nhds hχ g'.2))
     have a1 : admitted χ s g.1 := isAdmissibleBoxForCharacter_of_subset fun t ht => (hs ht).1
     have a2 : admitted χ s g'.1 := isAdmissibleBoxForCharacter_of_subset fun t ht => (hs ht).2
     have a3 : admitted χ s (g + g').1 := fun η hη t ht => by
@@ -282,23 +325,26 @@ def ellL : SB (n → k) →ₗ[ℂ] ℂ where
   map_smul' z g := by
     obtain ⟨s, hs⟩ := exists_adm hχ g
     have a3 : admitted χ s (z • g).1 := fun η hη t ht => hs η (fun h => hη (by simp [h])) t ht
-    rw [ell_eq hχ μ B h2 _ hs, ell_eq hχ μ B h2 _ a3, map_smul, smul_eq_mul, RingHom.id_apply, smul_eq_mul]
+    rw [ell_eq hχ μ B h2 _ hs, ell_eq hχ μ B h2 _ a3, map_smul, smul_eq_mul, RingHom.id_apply,
+      smul_eq_mul]
     ring
 
 theorem ell_translate
-    (h1 : ∀ (a a' b b' : SB (n → k)) (t : n → k), (∀ y, a'.1 y = (χ (t ⬝ᵥ y) : ℂ) * a.1 y) →
-      (∀ η, b'.1 η = b.1 (η - t)) → B a' b = B a b')
-    (g : SB (n → k)) (u : n → k) (hg' : (fun x => g.1 (x + u)) ∈ SB (n → k)) :
-    ell χ μ B ⟨_, hg'⟩ = ell χ μ B g := by
+    (h1 : ∀ (a a' b b' : SB (n → k)) (t : n → k),
+      (∀ y, a'.1 y = (χ (t ⬝ᵥ y) : ℂ) * a.1 y) → (∀ η, b'.1 η = b.1 (η - t)) → B a' b = B a b')
+    (g : SB (n → k)) (u : n → k) (hg' : (fun x => g.1 (x + u)) ∈ SB (n → k))
+    : ell χ μ B ⟨_, hg'⟩ = ell χ μ B g := by
   have hloc : {y : n → k | χ ((-u) ⬝ᵥ y) = 1} ∈ 𝓝 (0 : n → k) := by
     have h3 : IsLocallyConstant fun y : n → k => χ ((-u) ⬝ᵥ y) :=
       hχ.isLocallyConstant.comp_continuous (continuous_const.dotProduct continuous_id)
     filter_upwards [h3.eventually_eq 0] with y hy
     simpa using hy
-  obtain ⟨s, hs⟩ := exists_box_subset
-    (Filter.inter_mem (addChar_dotProduct_trivial_on_tsupport_nhds hχ g.2) (Filter.inter_mem (addChar_dotProduct_trivial_on_tsupport_nhds hχ hg') hloc))
+  obtain ⟨s, hs⟩ :=
+    exists_box_subset (Filter.inter_mem (addChar_dotProduct_trivial_on_tsupport_nhds hχ g.2)
+      (Filter.inter_mem (addChar_dotProduct_trivial_on_tsupport_nhds hχ hg') hloc))
   have a1 : admitted χ s g.1 := isAdmissibleBoxForCharacter_of_subset fun t ht => (hs ht).1
-  have a2 : admitted χ s (fun x => g.1 (x + u)) := isAdmissibleBoxForCharacter_of_subset fun t ht => (hs ht).2.1
+  have a2 : admitted χ s (fun x => g.1 (x + u)) :=
+    isAdmissibleBoxForCharacter_of_subset fun t ht => (hs ht).2.1
   rw [ell_eq hχ μ B h2 ⟨_, hg'⟩ a2, ell_eq hχ μ B h2 g a1]
   congr 1
   refine (h1 (ind s) (ind s) g ⟨_, hg'⟩ (-u) (fun y => ?_) (fun η => ?_)).symm
@@ -311,46 +357,68 @@ theorem ell_translate
   · show g.1 (η + u) = g.1 (η - -u)
     rw [sub_neg_eq_add]
 
-theorem form_eq_ell (a b : SB (n → k))
-    (hm : (fun η => (∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ) * b.1 η) ∈ SB (n → k)) :
-    B a b = ell χ μ B ⟨_, hm⟩ := by
+theorem form_eq_ell
+    (a b : SB (n → k)) (hm : (fun η => (∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ) * b.1 η) ∈ SB (n → k))
+    : B a b = ell χ μ B ⟨_, hm⟩ := by
   haveI := secondCountable k
-  obtain ⟨s, hs⟩ := exists_box_subset (Filter.inter_mem (invariant_nhds a.2) (addChar_dotProduct_trivial_on_tsupport_nhds hχ hm))
+  obtain ⟨s, hs⟩ :=
+    exists_box_subset (Filter.inter_mem (invariant_nhds a.2)
+      (addChar_dotProduct_trivial_on_tsupport_nhds hχ hm))
   have a1 : admitted χ s (fun η => (∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ) * b.1 η) :=
     isAdmissibleBoxForCharacter_of_subset fun t ht => (hs ht).2
   rw [ell_eq hχ μ B h2 ⟨_, hm⟩ a1]
-  have key := law_integrated hχ μ B h2 (ind s) b a ((μ.real (box n s) : ℂ) • a) ⟨_, hm⟩
-    (fun y => by
-      show (μ.real (box n s) : ℂ) * a.1 y = ∫ t, a.1 t * (box n s).indicator (fun _ => (1 : ℂ)) (y - t) ∂μ
-      rw [conv_ind μ s a.2 (fun t ht x => (hs ht).1 x) y]) (fun η => rfl)
+  have key :=
+    law_integrated hχ μ B h2 (ind s) b a ((μ.real (box n s) : ℂ) • a) ⟨_, hm⟩
+      (fun y => by
+        show (μ.real (box n s) : ℂ) * a.1 y = ∫ t, a.1 t * (box n s).indicator (fun _ => (1 : ℂ)) (y - t) ∂μ
+        rw [conv_ind μ s a.2 (fun t ht x => (hs ht).1 x) y])
+      (fun η => rfl)
   rw [map_smul, LinearMap.smul_apply, smul_eq_mul] at key
   rw [← key]
   field_simp [measureReal_box_ne μ s]
 
 end Form
 
-theorem heis_invariant_form : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (n : Type) [Fintype n] (χ : AddChar k Circle), Continuous χ → χ ≠ 1 → ∀ (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (B : SB (n → k) →ₗ[ℂ] SB (n → k) →ₗ[ℂ] ℂ), (∀ (a a' b b' : SB (n → k)) (t : n → k), (∀ y, a'.1 y = (χ (t ⬝ᵥ y) : ℂ) * a.1 y) → (∀ η, b'.1 η = b.1 (η - t)) → B a' b = B a b') → (∀ (a a' b b' : SB (n → k)) (t : n → k), (∀ y, a'.1 y = a.1 (y - t)) → (∀ η, b'.1 η = (χ (η ⬝ᵥ t) : ℂ) * b.1 η) → B a' b = B a b') → ∃ c : ℂ, ∀ a b : SB (n → k), B a b = c * ∫ η, (∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ) * b.1 η ∂μ := by
+theorem heis_invariant_form
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (n : Type) [Fintype n] (χ : AddChar k Circle),
+      Continuous χ → χ ≠ 1
+        → ∀ (μ : Measure (n → k)) [μ.IsAddHaarMeasure] (B : SB (n → k) →ₗ[ℂ] SB (n → k) →ₗ[ℂ] ℂ),
+          (∀ (a a' b b' : SB (n → k)) (t : n → k),
+              (∀ y, a'.1 y = (χ (t ⬝ᵥ y) : ℂ) * a.1 y) → (∀ η, b'.1 η = b.1 (η - t))
+                → B a' b = B a b')
+            → (∀ (a a' b b' : SB (n → k)) (t : n → k),
+              (∀ y, a'.1 y = a.1 (y - t)) → (∀ η, b'.1 η = (χ (η ⬝ᵥ t) : ℂ) * b.1 η)
+                → B a' b = B a b')
+            → ∃ c : ℂ, ∀ a b : SB (n → k),
+              B a b = c * ∫ η, (∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ) * b.1 η ∂μ := by
   intro k _ _ _ _ _ _ n _ χ hc hne μ _ B hL1 hL2
   classical
   obtain ⟨c, hχ⟩ := exists_hasConductor_of_continuous χ hc hne
   haveI := secondCountable k
   haveI := t2Space k
   haveI := nonarch (k := k) (n := n)
-  have hm : ∀ a b : SB (n → k), (fun η => (∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ) * b.1 η) ∈ SB (n → k) := by
+  have hm
+      : ∀ a b : SB (n → k), (fun η => (∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ) * b.1 η) ∈ SB (n → k) := by
     intro a b
     have h3 := fourier_mem_SB μ hχ a.2
-    have h4 : (fun η => ∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ) = fun η => ∫ x, a.1 x * (χ (x ⬝ᵥ η) : ℂ) ∂μ := by
+    have h4
+        : (fun η => ∫ y, a.1 y * (χ (η ⬝ᵥ y) : ℂ) ∂μ)
+          = fun η => ∫ x, a.1 x * (χ (x ⬝ᵥ η) : ℂ) ∂μ := by
       funext η
       simp only [dotProduct_comm η]
     rw [← h4] at h3
     exact ⟨h3.1.mul b.2.1, b.2.2.mul_left⟩
   obtain ⟨M, hM⟩ := LinearMap.exists_extend (ellL hχ μ B hL2)
   have hMe : ∀ g : SB (n → k), M g.1 = ell χ μ B g := fun g => LinearMap.congr_fun hM g
-  obtain ⟨C, hC⟩ := GlobalTheory.WeilM.HaarUniq.exists_eq_mul_integral (n → k) μ M (fun φ hφ u => by
-    have hmem : (fun x => φ (x + u)) ∈ SB (n → k) :=
-      ⟨hφ.1.comp_continuous (continuous_id.add continuous_const), hφ.2.comp_homeomorph (Homeomorph.addRight u)⟩
-    rw [hMe ⟨_, hmem⟩, ell_translate hχ μ B hL2 hL1 ⟨φ, hφ⟩ u hmem]
-    exact (hMe ⟨φ, hφ⟩).symm)
+  obtain ⟨C, hC⟩ :=
+    GlobalTheory.WeilM.HaarUniq.exists_eq_mul_integral (n → k) μ M (fun φ hφ u => by
+      have hmem : (fun x => φ (x + u)) ∈ SB (n → k) := ⟨
+        hφ.1.comp_continuous (continuous_id.add continuous_const),
+        hφ.2.comp_homeomorph (Homeomorph.addRight u)
+      ⟩
+      rw [hMe ⟨_, hmem⟩, ell_translate hχ μ B hL2 hL1 ⟨φ, hφ⟩ u hmem]
+      exact (hMe ⟨φ, hφ⟩).symm)
   refine ⟨C, fun a b => ?_⟩
   rw [form_eq_ell hχ μ B hL2 a b (hm a b), ← hMe, hC _ (hm a b)]
 

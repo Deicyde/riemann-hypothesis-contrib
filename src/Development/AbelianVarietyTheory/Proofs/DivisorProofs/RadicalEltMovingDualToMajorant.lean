@@ -9,14 +9,16 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem radical_elt_moving_dual_to_majorant (n p : ℕ) (J θ : Matrix (Fin n) (Fin n) ℂ)
-    (hJ : J.conjTranspose = J) (hθ : θ * θ = 1) (hQ : (J * θ).PosDef)
-    (X₂ Y₂ : Matrix (Fin n) (Fin p) ℂ) (hXX : X₂.conjTranspose * J * X₂ = 0)
-    (hYY : Y₂.conjTranspose * J * Y₂ = 0) (hXY : X₂.conjTranspose * J * Y₂ = 1) :
-    ∃ u₁ : GL (Fin n) ℂ, (u₁.1).conjTranspose * J * u₁.1 = J ∧ u₁.1 * X₂ = X₂ ∧
-      (∀ v : Fin n → ℂ, Matrix.mulVec (X₂.conjTranspose * J) v = 0 →
-        ∃ w : Fin p → ℂ, Matrix.mulVec u₁.1 v - v = Matrix.mulVec X₂ w) ∧
-      θ * X₂ = u₁.1 * Y₂ * (X₂.conjTranspose * (J * θ) * X₂) := by
+theorem radical_elt_moving_dual_to_majorant
+    (n p : ℕ) (J θ : Matrix (Fin n) (Fin n) ℂ) (hJ : J.conjTranspose = J) (hθ : θ * θ = 1)
+    (hQ : (J * θ).PosDef) (X₂ Y₂ : Matrix (Fin n) (Fin p) ℂ) (hXX : X₂.conjTranspose * J * X₂ = 0)
+    (hYY : Y₂.conjTranspose * J * Y₂ = 0) (hXY : X₂.conjTranspose * J * Y₂ = 1)
+    : ∃ u₁ : GL (Fin n) ℂ,
+      (u₁.1).conjTranspose * J * u₁.1 = J ∧ u₁.1 * X₂ = X₂
+        ∧ (∀ v : Fin n → ℂ,
+          Matrix.mulVec (X₂.conjTranspose * J) v = 0
+            → ∃ w : Fin p → ℂ, Matrix.mulVec u₁.1 v - v = Matrix.mulVec X₂ w)
+        ∧ θ * X₂ = u₁.1 * Y₂ * (X₂.conjTranspose * (J * θ) * X₂) := by
   have hθJ : θᴴ * J = J * θ := by
     have := hQ.isHermitian.eq
     rwa [conjTranspose_mul, hJ] at this
@@ -35,8 +37,7 @@ theorem radical_elt_moving_dual_to_majorant (n p : ℕ) (J θ : Matrix (Fin n) (
   have hPiP : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul P hdet
   have hPiH : (P⁻¹)ᴴ = P⁻¹ := by rw [conjTranspose_nonsing_inv, hP.isHermitian.eq]
   obtain ⟨Y', hY'⟩ : ∃ Y', Y' = θ * X₂ * P⁻¹ := ⟨_, rfl⟩
-  have hXY' : X₂ᴴ * J * Y' = 1 := by
-    rw [← hPPi, hY', hPdef]; simp only [Matrix.mul_assoc]
+  have hXY' : X₂ᴴ * J * Y' = 1 := by rw [← hPPi, hY', hPdef]; simp only [Matrix.mul_assoc]
   have hY'Y' : Y'ᴴ * J * Y' = 0 := by
     have h1 : ∀ B : Matrix (Fin n) (Fin p) ℂ, θᴴ * (J * (θ * B)) = J * B := by
       intro B
@@ -70,17 +71,19 @@ theorem radical_elt_moving_dual_to_majorant (n p : ℕ) (J θ : Matrix (Fin n) (
   have hXY'' : X₂ᴴ * (J * Y₂) = 1 := by rw [← Matrix.mul_assoc, hXY]
   obtain ⟨E, hE⟩ : ∃ E, E = Dᴴ * J * Y₂ := ⟨_, rfl⟩
   have hE' : Dᴴ * (J * Y₂) = E := by rw [hE, Matrix.mul_assoc]
-  obtain ⟨u, hu⟩ : ∃ u : Matrix (Fin n) (Fin n) ℂ,
-      u = 1 + (D * X₂ᴴ * J - X₂ * Dᴴ * J + X₂ * E * X₂ᴴ * J) := ⟨_, rfl⟩
+  obtain ⟨u, hu⟩
+      : ∃ u : Matrix (Fin n) (Fin n) ℂ, u = 1 + (D * X₂ᴴ * J - X₂ * Dᴴ * J + X₂ * E * X₂ᴴ * J) :=
+    ⟨_, rfl⟩
   have huJ : uᴴ * J * u = J := by
     have hexp : uᴴ * J * u = J + J * X₂ * (Dᴴ * J * D + Dᴴ * J * Y₂ + Y₂ᴴ * J * D) * X₂ᴴ * J := by
       rw [hu, hE]
       simp only [conjTranspose_add, conjTranspose_sub, conjTranspose_mul, conjTranspose_one,
         conjTranspose_conjTranspose, hJ, Matrix.mul_add, Matrix.add_mul, Matrix.mul_sub,
-        Matrix.sub_mul, Matrix.mul_assoc, Matrix.one_mul, Matrix.mul_one, tXX, tXD, tDX,
-        hXX', hXD', hDX', Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add, sub_zero, zero_sub]
+        Matrix.sub_mul, Matrix.mul_assoc, Matrix.one_mul, Matrix.mul_one, tXX, tXD, tDX, hXX', hXD',
+        hDX', Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add, sub_zero, zero_sub]
       abel
-    rw [hexp, hkey]; simp
+    rw [hexp, hkey]
+    simp
   have huX : u * X₂ = X₂ := by
     rw [hu]
     simp only [Matrix.add_mul, Matrix.sub_mul, Matrix.mul_assoc, Matrix.one_mul, hXX', hDX',
@@ -89,7 +92,8 @@ theorem radical_elt_moving_dual_to_majorant (n p : ℕ) (J θ : Matrix (Fin n) (
     rw [hu]
     simp only [Matrix.add_mul, Matrix.sub_mul, Matrix.mul_assoc, Matrix.one_mul, hXY'',
       Matrix.mul_one, hE']
-    rw [hD]; abel
+    rw [hD]
+    abel
   have hdetJ : J.det ≠ 0 := by
     intro h0
     have := hQ.det_pos

@@ -19,7 +19,6 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Ψ : Finset (E →+* ℂ)} {n N : ℕ}
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Ψ : Finset (E →+* ℂ)} {n N : ℕ} in
@@ -92,14 +91,15 @@ private lemma trace_quadratic_form_shift_expand {n N : ℕ} (X Y : Matrix (Fin n
     star_pow, Nat.cast_mul, Nat.cast_ofNat, ha, hb, star_star]
   ring
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Ψ : Finset (E →+* ℂ)} {n N : ℕ} in
-theorem _root_.GlobalTheory.SW.Parab.isSB_chiH (hΨ : _root_.GlobalTheory.SW.IsType Ψ)
-    {β : Matrix (Fin N) (Fin N) E} (hβ : _root_.GlobalTheory.SW.ccT β = β) (c : ℂ)
-    {φ : Matrix (Fin n) (Fin N) E → ℂ} (h : _root_.GlobalTheory.SW.IsSB φ) :
-    _root_.GlobalTheory.SW.IsSB fun x => c * _root_.GlobalTheory.SW.chiH Ψ β x * φ x := by
+theorem _root_.GlobalTheory.SW.Parab.isSB_chiH
+    (hΨ : _root_.GlobalTheory.SW.IsType Ψ)
+    {β : Matrix (Fin N) (Fin N) E} (hβ : _root_.GlobalTheory.SW.ccT β = β)
+    (c : ℂ)
+    {φ : Matrix (Fin n) (Fin N) E → ℂ} (h : _root_.GlobalTheory.SW.IsSB φ)
+    : _root_.GlobalTheory.SW.IsSB fun x => c * _root_.GlobalTheory.SW.chiH Ψ β x * φ x := by
   obtain ⟨R, hR, h1, h2⟩ := h
   obtain ⟨d, hd, hdβ⟩ := _root_.GlobalTheory.SW.Dict.exists_den (fun p : Fin N × Fin N => β p.1 p.2)
   have hdβ' : _root_.GlobalTheory.SW.IntM ((d : E) • β) := by
@@ -107,8 +107,9 @@ theorem _root_.GlobalTheory.SW.Parab.isSB_chiH (hΨ : _root_.GlobalTheory.SW.IsT
     intro i j
     rw [Matrix.smul_apply, smul_eq_mul, ← nsmul_eq_mul]
     exact hdβ (i, j)
-  have hcast : ∀ y : Matrix (Fin n) (Fin N) E,
-      ((2 * R * d : ℕ) : E) • y = (R : E) • ((2 * d : ℕ) : E) • y := by
+  have hcast
+      : ∀ y : Matrix (Fin n) (Fin N) E,
+        ((2 * R * d : ℕ) : E) • y = (R : E) • ((2 * d : ℕ) : E) • y := by
     intro y
     rw [smul_smul]
     congr 1
@@ -139,20 +140,22 @@ theorem _root_.GlobalTheory.SW.Parab.isSB_chiH (hΨ : _root_.GlobalTheory.SW.IsT
       · exact (by simpa using isIntegral_int_natCast (E := E) 2 : IsIntegral ℤ (2 : E)).mul
           (isIntegral_trace_mul_mul_ccT_of_intM hy hdβ' hRx)
       · exact ((by simpa using isIntegral_int_natCast (E := E) 2 : IsIntegral ℤ (2 : E)).mul
-          (((isIntegral_int_natCast R).pow 2).mul (isIntegral_int_natCast d))).mul
+            (((isIntegral_int_natCast R).pow 2).mul (isIntegral_int_natCast d))).mul
           (isIntegral_trace_mul_mul_ccT_of_intM hy hdβ' hy)
     obtain ⟨m, hm⟩ := exists_int_sum_embeddings_eq_of_isIntegral t htI
-    have hsum : ∑ τ : Ψ, τ.1 ((x + ((2 * R * d : ℕ) : E) • y) * β *
-        _root_.GlobalTheory.SW.ccT (x + ((2 * R * d : ℕ) : E) • y)).trace =
-        ∑ τ : Ψ, τ.1 (x * β * _root_.GlobalTheory.SW.ccT x).trace + m := by
+    have hsum
+        : ∑ τ : Ψ, τ.1 ((x + ((2 * R * d : ℕ) : E) • y) * β *
+            _root_.GlobalTheory.SW.ccT (x + ((2 * R * d : ℕ) : E) • y)).trace
+          = ∑ τ : Ψ, τ.1 (x * β * _root_.GlobalTheory.SW.ccT x).trace + m := by
       rw [← hm, _root_.GlobalTheory.SW.Dict.sum_type hΨ, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun τ _ => ?_
-      have hBh : (β.map τ.1)ᴴ = β.map τ.1 := by
-        rw [← _root_.GlobalTheory.SW.HAct.map_ccT, hβ]
-      rw [NumberField.ComplexEmbedding.conjugate_coe_eq, map_trace_mul_mul_ccT_eq_trace_conjTranspose, map_trace_mul_mul_ccT_eq_trace_conjTranspose,
-        Matrix.map_add _ (map_add τ.1), matrix_map_natCast_smul, trace_quadratic_form_shift_expand _ _ _ hBh R d, ht]
-      simp only [map_add (f := _), map_mul, map_pow, map_natCast, map_ofNat, map_trace_mul_mul_ccT_eq_trace_conjTranspose,
-        matrix_map_natCast_smul]
+      have hBh : (β.map τ.1)ᴴ = β.map τ.1 := by rw [← _root_.GlobalTheory.SW.HAct.map_ccT, hβ]
+      rw [NumberField.ComplexEmbedding.conjugate_coe_eq,
+        map_trace_mul_mul_ccT_eq_trace_conjTranspose, map_trace_mul_mul_ccT_eq_trace_conjTranspose,
+        Matrix.map_add _ (map_add τ.1), matrix_map_natCast_smul,
+        trace_quadratic_form_shift_expand _ _ _ hBh R d, ht]
+      simp only [map_add (f := _), map_mul, map_pow, map_natCast, map_ofNat,
+        map_trace_mul_mul_ccT_eq_trace_conjTranspose, matrix_map_natCast_smul]
       simp only [Complex.star_def, map_add (f := _), map_mul, map_pow, map_natCast, map_ofNat]
     unfold _root_.GlobalTheory.SW.chiH
     rw [hsum, mul_add, Complex.exp_add]
@@ -409,26 +412,53 @@ private lemma hFac_eq_prod_det_pow_of_toBlocks₂₁_eq_zero {E : Type} [Field E
   rw [RingHom.map_det]
   rfl
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real in
-theorem _root_.GlobalTheory.SW.weil_parabolic : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Finset (E →+* ℂ)), _root_.GlobalTheory.SW.IsType Ψ → ∀ (n N : ℕ), Even n → ∀ φ : Matrix (Fin n) (Fin N) E → ℂ, _root_.GlobalTheory.SW.IsSB φ → (∀ γ ∈ _root_.GlobalTheory.SW.UU E N, γ.toBlocks₂₁ = 0 → ∀ x, _root_.GlobalTheory.SW.weil Ψ γ φ x = (∏ τ : Ψ, τ.1 γ.toBlocks₂₂.det ^ n) * _root_.GlobalTheory.SW.chiH Ψ (-(γ.toBlocks₁₂ * _root_.GlobalTheory.SW.ccT γ.toBlocks₁₁)) x * φ (x * γ.toBlocks₁₁)) ∧ ∀ γ ∈ _root_.GlobalTheory.SW.UU E N, ∀ γ' ∈ _root_.GlobalTheory.SW.UU E N, _root_.GlobalTheory.SW.botSpan γ = _root_.GlobalTheory.SW.botSpan γ' → ∀ Z ∈ _root_.GlobalTheory.SW.Hn Ψ N, ∀ z z', _root_.GlobalTheory.SW.eisTerm Ψ γ φ Z z z' = _root_.GlobalTheory.SW.eisTerm Ψ γ' φ Z z z' := by
+theorem _root_.GlobalTheory.SW.weil_parabolic
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Finset (E →+* ℂ)),
+      _root_.GlobalTheory.SW.IsType Ψ
+        → ∀ (n N : ℕ),
+          Even n
+            → ∀ φ : Matrix (Fin n) (Fin N) E → ℂ,
+              _root_.GlobalTheory.SW.IsSB φ
+                → (∀ γ ∈ _root_.GlobalTheory.SW.UU E N,
+                    γ.toBlocks₂₁ = 0
+                      → ∀ x,
+                        _root_.GlobalTheory.SW.weil Ψ γ φ x
+                          = (∏ τ : Ψ, τ.1 γ.toBlocks₂₂.det ^ n)
+                            * _root_.GlobalTheory.SW.chiH Ψ
+                              (-(γ.toBlocks₁₂ * _root_.GlobalTheory.SW.ccT γ.toBlocks₁₁)) x
+                            * φ (x * γ.toBlocks₁₁))
+                  ∧ ∀ γ ∈ _root_.GlobalTheory.SW.UU E N, ∀ γ' ∈ _root_.GlobalTheory.SW.UU E N,
+                    _root_.GlobalTheory.SW.botSpan γ = _root_.GlobalTheory.SW.botSpan γ'
+                      → ∀ Z ∈ _root_.GlobalTheory.SW.Hn Ψ N, ∀ z z',
+                        _root_.GlobalTheory.SW.eisTerm Ψ γ φ Z z z'
+                          = _root_.GlobalTheory.SW.eisTerm Ψ γ' φ Z z z' := by
   intro E _ _ _ Ψ hΨ n N hn φ hφ
-  have hpar : ∀ γ ∈ _root_.GlobalTheory.SW.UU E N, γ.toBlocks₂₁ = 0 →
-      ∀ φ : Matrix (Fin n) (Fin N) E → ℂ, _root_.GlobalTheory.SW.IsSB φ → ∀ x,
-        _root_.GlobalTheory.SW.weil Ψ γ φ x = (∏ τ : Ψ, τ.1 γ.toBlocks₂₂.det ^ n) *
-          _root_.GlobalTheory.SW.chiH Ψ (-(γ.toBlocks₁₂ * _root_.GlobalTheory.SW.ccT γ.toBlocks₁₁)) x *
-            φ (x * γ.toBlocks₁₁) := by
+  have hpar
+      : ∀ γ ∈ _root_.GlobalTheory.SW.UU E N,
+        γ.toBlocks₂₁ = 0
+          → ∀ φ : Matrix (Fin n) (Fin N) E → ℂ,
+            _root_.GlobalTheory.SW.IsSB φ
+              → ∀ x,
+                _root_.GlobalTheory.SW.weil Ψ γ φ x
+                  = (∏ τ : Ψ, τ.1 γ.toBlocks₂₂.det ^ n)
+                    * _root_.GlobalTheory.SW.chiH Ψ
+                      (-(γ.toBlocks₁₂ * _root_.GlobalTheory.SW.ccT γ.toBlocks₁₁)) x
+                    * φ (x * γ.toBlocks₁₁) := by
     intro γ hγ h0 φ hφ x
     have hA := (isUnit_det_diag_blocks_of_lower_zero hγ h0).1
-    have hSB : _root_.GlobalTheory.SW.IsSB fun x => (∏ τ : Ψ, τ.1 γ.toBlocks₂₂.det ^ n) *
-        _root_.GlobalTheory.SW.chiH Ψ (-(γ.toBlocks₁₂ * _root_.GlobalTheory.SW.ccT γ.toBlocks₁₁)) x *
-          φ (x * γ.toBlocks₁₁) := by
+    have hSB : _root_.GlobalTheory.SW.IsSB fun x =>
+        (∏ τ : Ψ, τ.1 γ.toBlocks₂₂.det ^ n)
+          * _root_.GlobalTheory.SW.chiH Ψ
+            (-(γ.toBlocks₁₂ * _root_.GlobalTheory.SW.ccT γ.toBlocks₁₁)) x
+          * φ (x * γ.toBlocks₁₁) := by
       refine _root_.GlobalTheory.SW.Parab.isSB_chiH hΨ ?_ _
         (isSB_comp_mul_right_of_isUnit_det hA hφ)
       rw [ccT_neg_mul_ccT, toBlocks₁₁_mul_ccT_toBlocks₁₂_comm_of_mem_UU hγ h0]
-    have := (_root_.GlobalTheory.SW.weil_action E Ψ hΨ n N hn γ hγ φ hφ).2.2.1 _ hSB
-      (transH_chiH_mul_comp_of_toBlocks₂₁_eq_zero hγ h0 φ)
+    have :=
+      (_root_.GlobalTheory.SW.weil_action E Ψ hΨ n N hn γ hγ φ hφ).2.2.1 _ hSB
+        (transH_chiH_mul_comp_of_toBlocks₂₁_eq_zero hγ h0 φ)
     exact (congrFun this x).symm
   refine ⟨fun γ hγ h0 x => hpar γ hγ h0 φ hφ x, ?_⟩
   intro γ hγ γ' hγ' hspan Z hZ z z'
@@ -446,11 +476,13 @@ theorem _root_.GlobalTheory.SW.weil_parabolic : ∀ (E : Type) [Field E] [Number
     rw [Finset.prod_ne_zero_iff]
     intro τ _
     exact pow_ne_zero _ ((map_ne_zero τ.1).2 hD.ne_zero)
-  have hchi : _root_.GlobalTheory.SW.chiH Ψ (-(p.toBlocks₁₂ * _root_.GlobalTheory.SW.ccT p.toBlocks₁₁))
-      (0 : Matrix (Fin n) (Fin N) E) = 1 := by
+  have hchi
+      : _root_.GlobalTheory.SW.chiH Ψ (-(p.toBlocks₁₂ * _root_.GlobalTheory.SW.ccT p.toBlocks₁₁))
+          (0 : Matrix (Fin n) (Fin N) E)
+        = 1 := by
     unfold _root_.GlobalTheory.SW.chiH
     simp
   unfold _root_.GlobalTheory.SW.eisTerm
-  rw [hγ'eq, hcomp, hpar p hpU hp0 _ htest.1, hcoc, hFac_eq_prod_det_pow_of_toBlocks₂₁_eq_zero hp0, hchi,
-    Matrix.zero_mul, mul_inv, mul_one]
+  rw [hγ'eq, hcomp, hpar p hpU hp0 _ htest.1, hcoc, hFac_eq_prod_det_pow_of_toBlocks₂₁_eq_zero hp0,
+    hchi, Matrix.zero_mul, mul_inv, mul_one]
   field_simp

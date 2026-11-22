@@ -18,31 +18,50 @@ variable {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
 theorem coe_initSet_zero (N : ℕ) : ((initSet N 0 : Finset (Fin N)) : Set (Fin N)) = ∅ := by
   ext j; simp [initSet]
 
-theorem coe_initSet_succ (N : ℕ) (i : Fin N) :
-    ((initSet N (i.succ : Fin (N + 1)).val : Finset (Fin N)) : Set (Fin N)) = {j | j ≤ i} := by
+theorem coe_initSet_succ (N : ℕ) (i : Fin N)
+    : ((initSet N (i.succ : Fin (N + 1)).val : Finset (Fin N)) : Set (Fin N)) = {j | j ≤ i} := by
   ext j
   simp only [initSet, Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq, Fin.val_succ]
   rw [Fin.le_iff_val_le_val]
   omega
 
-theorem brSPAN [CharZero (G.KK O)] (S : G.UniformizedDVR p O) (h3 : Formalism.MainNotions.PlaneGramData.PolynomialSpanAtRing O) :
-    SPAN (G.KK O) (vQ p S) p := by
+theorem brSPAN
+    [CharZero (G.KK O)]
+    (S : G.UniformizedDVR p O) (h3 : Formalism.MainNotions.PlaneGramData.PolynomialSpanAtRing O)
+    : SPAN (G.KK O) (vQ p S) p := by
   classical
   intro _ N r _ sg d
   obtain ⟨h3a, h3b, h3c⟩ := h3
   let LL : G.Letters (Fin N) := ⟨sg⟩
   haveI : Finite (Idx N r LL d) := idx_finite h3a N r LL d
   letI : Fintype (Idx N r LL d) := Fintype.ofFinite _
-  have hint : ∀ F : MvPolynomial (Fin N × Fin r) (G.KK O), Integral (vQ p S) F →
-      ∀ m, ∃ o : O, AddMonoidAlgebra.coeff F m = algebraMap O (G.KK O) o :=
+  have hint
+      : ∀ F : MvPolynomial (Fin N × Fin r) (G.KK O),
+        Integral (vQ p S) F → ∀ m, ∃ o : O, AddMonoidAlgebra.coeff F m = algebraMap O (G.KK O) o :=
     fun F hF m => (vQ_nonneg_iff S _).1 (hF m)
-  let cI : (b : Idx N r LL d) → Fin #(G.colRange b.1.1.mu) → ℤ :=
-    fun b k => ((G.colRange b.1.1.mu).equivFin.symm k : ℤ)
-  refine ⟨Idx N r LL d, inferInstance, fun b => G.Psi (G.KK O) b.1.1.mu b.1.2, fun b => b.1.1.mu,
-    fun b => #(G.colRange b.1.1.mu), fun b k => G.Kcol (G.KK O) b.1.1.mu (cI b k) N (b.1.2 (cI b k)),
-    cI, fun b k i => b.1.1.h i (cI b k),
+  let cI : (b : Idx N r LL d) → Fin #(G.colRange b.1.1.mu) → ℤ := fun b k =>
+    ((G.colRange b.1.1.mu).equivFin.symm k : ℤ)
+  refine ⟨
+    Idx N r LL d,
+    inferInstance,
+    fun b => G.Psi (G.KK O) b.1.1.mu b.1.2,
+    fun b => b.1.1.mu,
+    fun b => #(G.colRange b.1.1.mu),
+    fun b k => G.Kcol (G.KK O) b.1.1.mu (cI b k) N (b.1.2 (cI b k)),
+    cI,
+    fun b k i => b.1.1.h i (cI b k),
     fun b k => Finset.univ.filter (fun i => G.IsUsed b.1.1.mu (cI b k) i),
-    ?_, li_K h3a N r LL d, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    ?_,
+    li_K h3a N r LL d,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro b
     refine ⟨?_, ?_⟩
     · rw [PolK_eq]
@@ -87,12 +106,15 @@ theorem brSPAN [CharZero (G.KK O)] (S : G.UniformizedDVR p O) (h3 : Formalism.Ma
       exact valS_empty_le LL F hF0 _ h0
     | succ j => exact hl1 b hlb j
   · intro b
-    exact (prod_fin_equiv (G.colRange b.1.1.mu) (fun c => G.Kcol (G.KK O) b.1.1.mu c N (b.1.2 c))).symm
+    exact (prod_fin_equiv (G.colRange b.1.1.mu)
+      (fun c => G.Kcol (G.KK O) b.1.1.mu c N (b.1.2 c))).symm
   · intro b k
     dsimp only
     rw [PolK, mem_restrictSupport_iff]
     intro m hm
-    rw [← Formalism.MainNotions.G.Joints.StandardMonomialSpace.lift_Kcol_map (algebraMap O (G.KK O))] at hm
+    rw [← Formalism.MainNotions.G.Joints.StandardMonomialSpace.lift_Kcol_map (algebraMap O
+        (G.KK O))]
+      at hm
     have hm' := MvPolynomial.support_map_subset _ _ hm
     intro i
     have h1 := (h3c N r LL d b.1.1).1 (cI b k) (b.1.2 (cI b k)) i m hm'

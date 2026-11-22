@@ -8,8 +8,9 @@ open scoped TensorProduct Polynomial
 
 namespace GlobalTheory
 
-theorem exists_numberField_of_finiteType_rat (R : Type) [CommRing R] [Nontrivial R] [Algebra ℚ R]
-    [Algebra.FiniteType ℚ R] : ∃ (K : Type) (_ : Field K) (_ : NumberField K) (φ : R →+* K), True := by
+theorem exists_numberField_of_finiteType_rat
+    (R : Type) [CommRing R] [Nontrivial R] [Algebra ℚ R] [Algebra.FiniteType ℚ R]
+    : ∃ (K : Type) (_ : Field K) (_ : NumberField K) (φ : R →+* K), True := by
   obtain ⟨m, hm⟩ := Ideal.exists_maximal R
   letI : Field (R ⧸ m) := Ideal.Quotient.field m
   haveI : Algebra.FiniteType ℚ (R ⧸ m) :=
@@ -26,9 +27,11 @@ theorem exists_numberField_of_finiteType_rat (R : Type) [CommRing R] [Nontrivial
   haveI : NumberField (R ⧸ m) := ⟨⟩
   exact ⟨R ⧸ m, inferInstance, inferInstance, Ideal.Quotient.mk m, trivial⟩
 
-theorem exists_numberField_point_ne_zero :
-    ∀ (A : Type) [CommRing A] [IsDomain A] [CharZero A], Algebra.FiniteType ℤ A →
-      ∀ a : A, a ≠ 0 → ∃ (K : Type) (_ : Field K) (_ : NumberField K) (χ : A →+* K), χ a ≠ 0 := by
+theorem exists_numberField_point_ne_zero
+    : ∀ (A : Type) [CommRing A] [IsDomain A] [CharZero A],
+      Algebra.FiniteType ℤ A
+        → ∀ a : A,
+          a ≠ 0 → ∃ (K : Type) (_ : Field K) (_ : NumberField K) (χ : A →+* K), χ a ≠ 0 := by
   intro A _ _ _ hA a ha
   classical
   obtain ⟨s, hs⟩ := hA.out
@@ -43,15 +46,15 @@ theorem exists_numberField_point_ne_zero :
       exact Algebra.subset_adjoin (Set.mem_insert_of_mem _ (by simpa using ⟨x, hx, rfl⟩))
     | algebraMap n =>
       have : f (algebraMap ℤ A n) = algebraMap ℚ F (n : ℚ) := by simp [f]
-      rw [this]; exact B.algebraMap_mem _
+      rw [this]
+      exact B.algebraMap_mem _
     | add x y _ _ hx hy => rw [map_add (f := _)]; exact B.add_mem hx hy
     | mul x y _ _ hx hy => rw [map_mul]; exact B.mul_mem hx hy
   have hinv : (f a)⁻¹ ∈ B := Algebra.subset_adjoin (Set.mem_insert _ _)
   haveI hBft : Algebra.FiniteType ℚ B := by
     rw [← Subalgebra.fg_iff_finiteType]
     exact ⟨insert (f a)⁻¹ (s.image f), by simp [B]⟩
-  have hfa : f a ≠ 0 := by
-    simpa [f] using (IsFractionRing.injective A F).ne ha
+  have hfa : f a ≠ 0 := by simpa [f] using (IsFractionRing.injective A F).ne ha
   let ψ : A →+* B := f.codRestrict B hmem
   have hu : IsUnit (ψ a) := by
     refine isUnit_iff_exists_inv.mpr ⟨⟨(f a)⁻¹, hinv⟩, Subtype.ext ?_⟩

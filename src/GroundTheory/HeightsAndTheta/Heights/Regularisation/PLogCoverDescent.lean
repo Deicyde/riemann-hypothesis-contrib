@@ -43,8 +43,7 @@ def periods (φ : (Fin n → ℂ) → ℂ) : AddSubgroup (Fin n → ℂ) where
     intro v hv w
     simp only [Set.mem_ofPred_eq] at hv
     have e : (w + -v) + v = w := by abel
-    have key : w + -v ∈ logCover h ↔ w ∈ logCover h := by
-      rw [← (hv (w + -v)).1, e]
+    have key : w + -v ∈ logCover h ↔ w ∈ logCover h := by rw [← (hv (w + -v)).1, e]
     refine ⟨key, fun hw => ?_⟩
     have := (hv (w + -v)).2 (key.2 hw)
     rw [e] at this
@@ -100,8 +99,8 @@ lemma eq_of_exp_eq {φ : (Fin n → ℂ) → ℂ} (hφ : ∀ (i : Fin a), ∀ w 
   have e : w + (w' - w) = w' := by abel
   rwa [e] at this
 
-def branchLift (a : ℕ) (z0 z : Fin n → ℂ) : Fin n → ℂ :=
-  fun k => if k.val < a then Complex.log (z k / z0 k) + Complex.log (z0 k) else z k
+def branchLift (a : ℕ) (z0 z : Fin n → ℂ) : Fin n → ℂ := fun k =>
+  if k.val < a then Complex.log (z k / z0 k) + Complex.log (z0 k) else z k
 
 omit h in
 lemma analyticAt_eval (k : Fin n) (z : Fin n → ℂ) : AnalyticAt ℂ (fun z : Fin n → ℂ => z k) z :=
@@ -157,7 +156,6 @@ lemma isOpen_puncturedChart : IsOpen (puncturedChart h (ball (0 : Fin n → ℂ)
     (isOpen_iInter_of_finite fun j => isOpen_ne_fun (continuous_apply _) continuous_const)
 
 end LogCoverDescent
-
 
 open LogCoverDescent in
 theorem LogCoverDescent.proof : LogCoverDescent.Statement := by

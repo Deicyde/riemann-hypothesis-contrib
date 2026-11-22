@@ -17,8 +17,9 @@ open scoped Pointwise
 
 universe u
 
-theorem alt_sum_telescope (a : ℕ → ℤ) (N : ℕ) :
-    ∑ n ∈ Finset.range (N + 1), (-1 : ℤ) ^ n * (a n + a (n + 1)) = a 0 + (-1) ^ N * a (N + 1) := by
+theorem alt_sum_telescope (a : ℕ → ℤ) (N : ℕ)
+    : ∑ n ∈ Finset.range (N + 1), (-1 : ℤ) ^ n * (a n + a (n + 1))
+      = a 0 + (-1) ^ N * a (N + 1) := by
   induction N with
   | zero => simp
   | succ N ih =>
@@ -42,8 +43,11 @@ theorem rankLen_holds : RankLenStatement.{u} := by
     ext x
     rw [hiH, LinearMap.mem_range, Submodule.mem_smul_pointwise_iff_exists]
     simp
-  have hlen : ∀ n, Module.length R (C.H n) =
-      Module.length R (QuotSMulTop (t ^ m) (L.H n)) + Module.length R (K (L.H (n + 1)) (t ^ m)) := by
+  have hlen
+      : ∀ n,
+        Module.length R (C.H n)
+          = Module.length R (QuotSMulTop (t ^ m) (L.H n))
+            + Module.length R (K (L.H (n + 1)) (t ^ m)) := by
     intro n
     have hexs : Function.Exact (LinearMap.ker (δ n)).subtype (δ n).rangeRestrict := by
       intro y
@@ -65,9 +69,10 @@ theorem rankLen_holds : RankLenStatement.{u} := by
     · rw [← LinearMap.exact_iff.1 (hles.exA n), hiH]
   have hfin : ∀ n, Module.Finite R (L.H n) := hfg.1
   have hq := fun n => @len_quot_eq R _ _ _ (L.H n) _ _ (hfin n) t ht m
-  have hKfin : ∀ n, Module.length R (K (L.H n) (t ^ m)) ≠ ⊤ :=
-    fun n => ne_top_of_le_ne_top (hq n).2.2 (hq n).2.1
-  obtain ⟨kk, hkk⟩ : ∃ kk : ℕ → ℕ, kk = fun n => (Module.length R (K (L.H n) (t ^ m))).toNat := ⟨_, rfl⟩
+  have hKfin : ∀ n, Module.length R (K (L.H n) (t ^ m)) ≠ ⊤ := fun n =>
+    ne_top_of_le_ne_top (hq n).2.2 (hq n).2.1
+  obtain ⟨kk, hkk⟩ : ∃ kk : ℕ → ℕ, kk = fun n => (Module.length R (K (L.H n) (t ^ m))).toNat :=
+    ⟨_, rfl⟩
   obtain ⟨rr, hrr⟩ : ∃ rr : ℕ → ℕ, rr = fun n => Module.finrank R (L.H n) := ⟨_, rfl⟩
   have hKn : ∀ n, Module.length R (K (L.H n) (t ^ m)) = (kk n : ℕ∞) := by
     intro n; rw [hkk]; exact (ENat.coe_toNat (hKfin n)).symm
@@ -95,15 +100,21 @@ theorem rankLen_holds : RankLenStatement.{u} := by
       rw [hker]; exact Module.length_eq_zero_iff.2 inferInstance
     rw [hKn] at h0
     exact_mod_cast h0
-  refine ⟨⟨fun n => Module.length_ne_top_iff.1 (by rw [hCn]; exact ENat.coe_ne_top _), fun n hn => ?_⟩,
-    ?_, fun n => ⟨?_, ?_⟩⟩
+  refine ⟨
+    ⟨fun n => Module.length_ne_top_iff.1 (by rw [hCn]; exact ENat.coe_ne_top _), fun n hn => ?_⟩,
+    ?_,
+    fun n => ⟨?_, ?_⟩
+  ⟩
   · apply (Module.length_eq_zero_iff (R := R)).1
     rw [hCn, (hzero n hn).1, (hzero n hn).2, (hzero (n + 1) (by omega)).1]
     simp
   · unfold Cx.chi Cx.chiRk
     simp_rw [hCnat]
-    have hterm : ∀ n, (-1 : ℤ) ^ n * ((m * rr n + kk n + kk (n + 1) : ℕ) : ℤ) =
-        (m : ℤ) * ((-1) ^ n * (Module.finrank R (L.H n) : ℤ)) + (-1) ^ n * ((kk n : ℤ) + kk (n + 1)) := by
+    have hterm
+        : ∀ n,
+          (-1 : ℤ) ^ n * ((m * rr n + kk n + kk (n + 1) : ℕ) : ℤ)
+            = (m : ℤ) * ((-1) ^ n * (Module.finrank R (L.H n) : ℤ))
+              + (-1) ^ n * ((kk n : ℤ) + kk (n + 1)) := by
       intro n; rw [hrr]; push_cast; ring
     rw [Finset.sum_congr rfl (fun n _ => hterm n), Finset.sum_add_distrib, ← Finset.mul_sum,
       alt_sum_telescope (fun n => (kk n : ℤ)) N, hk0, (hzero (N + 1) (by omega)).1]

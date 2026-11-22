@@ -12,18 +12,19 @@ open scoped ENNReal Pointwise
 
 namespace GlobalTheory.CompanionTheory.KernelColumns
 
-theorem exists_delta (c : ℝ≥0∞) (hc : c ≠ ⊤) (ε : ℝ) (hε : 0 < ε) :
-    ∃ δ : ℝ, 0 < δ ∧ ENNReal.ofReal δ ^ 2 * c ≤ ENNReal.ofReal ε ^ 2 := by
+theorem exists_delta (c : ℝ≥0∞) (hc : c ≠ ⊤) (ε : ℝ) (hε : 0 < ε)
+    : ∃ δ : ℝ, 0 < δ ∧ ENNReal.ofReal δ ^ 2 * c ≤ ENNReal.ofReal ε ^ 2 := by
   have hpos : 0 < Real.sqrt (c.toReal + 1) := Real.sqrt_pos.2 (by positivity)
   refine ⟨ε / Real.sqrt (c.toReal + 1), div_pos hε hpos, ?_⟩
   have hδ : 0 ≤ ε / Real.sqrt (c.toReal + 1) := (div_pos hε hpos).le
   rw [← ENNReal.ofReal_pow hδ, ← ENNReal.ofReal_pow hε.le]
   have hct : c = ENNReal.ofReal c.toReal := (ENNReal.ofReal_toReal hc).symm
-  calc ENNReal.ofReal ((ε / Real.sqrt (c.toReal + 1)) ^ 2) * c
-      = ENNReal.ofReal ((ε / Real.sqrt (c.toReal + 1)) ^ 2) * ENNReal.ofReal c.toReal := by
-        rw [← hct]
+  calc
+    ENNReal.ofReal ((ε / Real.sqrt (c.toReal + 1)) ^ 2) * c
+        = ENNReal.ofReal ((ε / Real.sqrt (c.toReal + 1)) ^ 2) * ENNReal.ofReal c.toReal := by
+      rw [← hct]
     _ = ENNReal.ofReal ((ε / Real.sqrt (c.toReal + 1)) ^ 2 * c.toReal) := by
-        rw [ENNReal.ofReal_mul (by positivity)]
+      rw [ENNReal.ofReal_mul (by positivity)]
     _ ≤ ENNReal.ofReal (ε ^ 2) := ?_
   apply ENNReal.ofReal_le_ofReal
   have hsq : Real.sqrt (c.toReal + 1) ^ 2 = c.toReal + 1 := Real.sq_sqrt (by positivity)
@@ -31,8 +32,8 @@ theorem exists_delta (c : ℝ≥0∞) (hc : c ≠ ⊤) (ε : ℝ) (hε : 0 < ε)
   have : 0 ≤ ε ^ 2 := by positivity
   nlinarith
 
-theorem vecLim_of (hCnt : CntBasic) (hCv : CvTest) (hCol : ColOp) (hA : ApproxU) (hVC : VecClose) :
-    VecLim := by
+theorem vecLim_of (hCnt : CntBasic) (hCv : CvTest) (hCol : ColOp) (hA : ApproxU) (hVC : VecClose)
+    : VecLim := by
   intro X ι _ Φ T y j k ε hΦ hT hk hε
   obtain ⟨N, hNc, hN1⟩ := exists_compact_mem_nhds (1 : X.G)
   have h1N : (1 : X.G) ∈ N := mem_of_mem_nhds hN1
@@ -54,16 +55,28 @@ theorem vecLim_of (hCnt : CntBasic) (hCv : CvTest) (hCol : ColOp) (hA : ApproxU)
     hsupp.trans (Set.inter_subset_right.trans (Set.iInter_subset _ l))
   have hvec : X.IsVec (fun l j => cv X.μ (Φ l j) ψ) y j (T u) := fun l =>
     (((hCol X ι ψ hψ.1).2 Φ T hΦ hT y j u hu).1 l)
-  have hfin := hVC X ι (fun l j => cv X.μ (Φ l j) ψ) Φ Ω δ y j (T u) k hΩc (fun l => by
-    have hcv := hCv X (Φ l j) ψ (hΦ l j) hψ.1
-    refine ⟨hcv.1, hΦ l j, ?_, ?_, fun z => ((hWlP l ψ hψ (hsl l) z).1)⟩
-    · exact hcv.2.1.trans (Set.mul_subset_mul (Set.subset_iUnion (fun l => tsupport (Φ l j)) l) hsN)
-    · intro z hz
-      exact ⟨z, Set.subset_iUnion (fun l => tsupport (Φ l j)) l (subset_tsupport _ hz), 1, h1N, mul_one z⟩)
-    hvec hk
+  have hfin :=
+    hVC X ι
+      (fun l j => cv X.μ (Φ l j) ψ)
+      Φ Ω δ y j (T u) k hΩc
+      (fun l => by
+        have hcv := hCv X (Φ l j) ψ (hΦ l j) hψ.1
+        refine ⟨hcv.1, hΦ l j, ?_, ?_, fun z => ((hWlP l ψ hψ (hsl l) z).1)⟩
+        · exact hcv.2.1.trans (Set.mul_subset_mul (Set.subset_iUnion (fun l => tsupport (Φ l j)) l)
+            hsN)
+        · intro z hz
+          exact ⟨
+            z,
+            Set.subset_iUnion (fun l => tsupport (Φ l j)) l (subset_tsupport _ hz),
+            1,
+            h1N,
+            mul_one z
+          ⟩)
+      hvec hk
   have hle : ‖T u - k‖ₑ ^ 2 ≤ ENNReal.ofReal ε ^ 2 := by
     refine hfin.trans (le_trans (le_of_eq ?_) hδc)
-    rw [hc]; ring
+    rw [hc]
+    ring
   have hle' : ‖T u - k‖ₑ ≤ ENNReal.ofReal ε := (ENNReal.pow_le_pow_left_iff two_ne_zero).1 hle
   rw [← ofReal_norm, ENNReal.ofReal_le_ofReal_iff hε.le] at hle'
   exact hle'

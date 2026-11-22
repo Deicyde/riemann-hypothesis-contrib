@@ -16,10 +16,15 @@ namespace Formalism.HermitianLattices.Ext.PrimesInProgressions
 
 open Formalism.ZeroFreeDirichlet
 
-theorem exm_neg {C₂ : ℝ} (hC₂ : 0 < C₂) {M : ℕ} [NeZero M] (χ : DirichletCharacter ℂ M) (T δ E : ℝ) (s : ℂ)
-    (hM : 3 ≤ M) (hT : 2 ≤ T) (hδ0 : 0 < δ) (him : |s.im| ≤ T + 1) (hE : 1 / ‖s - 1‖ ≤ E) (hE0 : 0 ≤ E)
-    (h : ‖negLD χ s‖ ≤ C₂ * Real.log ((M : ℝ) * (|s.im| + 2)) / δ + (if χ = 1 then 1 / ‖s - 1‖ else 0)) :
-    ‖negLD χ s‖ ≤ C₂ * (2 * Real.log ((M : ℝ) * T)) / δ + E := by
+theorem exm_neg
+    {C₂ : ℝ} (hC₂ : 0 < C₂)
+    {M : ℕ} [NeZero M]
+    (χ : DirichletCharacter ℂ M) (T δ E : ℝ) (s : ℂ)
+    (hM : 3 ≤ M) (hT : 2 ≤ T) (hδ0 : 0 < δ) (him : |s.im| ≤ T + 1) (hE : 1 / ‖s - 1‖ ≤ E)
+    (hE0 : 0 ≤ E)
+    (h : ‖negLD χ s‖
+      ≤ C₂ * Real.log ((M : ℝ) * (|s.im| + 2)) / δ + (if χ = 1 then 1 / ‖s - 1‖ else 0))
+    : ‖negLD χ s‖ ≤ C₂ * (2 * Real.log ((M : ℝ) * T)) / δ + E := by
   have hM' : (3 : ℝ) ≤ M := by exact_mod_cast hM
   have h1 := exm_log_le (M : ℝ) T |s.im| hM' hT (abs_nonneg _) him
   have h2 : (if χ = 1 then 1 / ‖s - 1‖ else 0) ≤ E := by split_ifs <;> assumption
@@ -32,19 +37,30 @@ theorem exm_rpow_sigma (y : ℝ) (hy : 2 ≤ y) : y ^ (1 + 1 / Real.log y) = Rea
   have hl0 : Real.log y ≠ 0 := by linarith
   rw [Real.rpow_add hy0, Real.rpow_one, Real.rpow_def_of_pos hy0, mul_one_div_cancel hl0, mul_comm]
 
-theorem exm_core : ∃ C₂ C₃ : ℝ, 0 < C₂ ∧ 0 ≤ C₃ ∧ ∀ (κ : ℝ), 0 < κ → κ ≤ 1 / 20 →
-    ∀ (M : ℕ) [NeZero M] (χ : DirichletCharacter ℂ M) (T σ₁ T' δ : ℝ), 3 ≤ M → 2 ≤ T →
-    1 - κ ≤ σ₁ → σ₁ ≤ 1 - 3 * κ / 4 → T ≤ T' → T' ≤ T + 1 → 0 < δ → δ ≤ 1 / 20 →
-    (∀ ρ : ℂ, exLF χ ρ = 0 → 9 / 10 ≤ ρ.re → |ρ.im| ≤ T + 3 → δ ≤ |σ₁ - ρ.re|) →
-    (∀ ρ : ℂ, exLF χ ρ = 0 → 9 / 10 ≤ ρ.re → δ ≤ |(|ρ.im| - T')|) →
-    ∀ Z : Finset ℂ, (∀ ρ : ℂ, ρ ∈ Z ↔ (exLF χ ρ = 0 ∧ σ₁ < ρ.re ∧ |ρ.im| < T')) →
-    ∀ y : ℝ, 2 ≤ y →
-      ‖Formalism.ZeroFreeDirichlet.Schi χ y / (y : ℂ) - explicitFormulaConstant χ - (if χ = 1 then ((Real.log y - 1 : ℝ) : ℂ) else 0) +
-                ∑ ρ ∈ Z, (exOrd χ ρ : ℂ) * (y : ℂ) ^ (ρ - 1) / (ρ * (ρ - 1))‖ ≤
-        1 / (2 * Real.pi * y) * (2 * (Real.log y + C₃) * (Real.exp 1 * y) / T' +
-          2 * T' * (C₂ * (2 * Real.log ((M : ℝ) * T)) / δ + 4 / (3 * κ)) * y ^ σ₁ / (σ₁ * (1 - σ₁)) +
-          (3 * (C₂ * (2 * Real.log ((M : ℝ) * T)) / δ + 1) * (Real.exp 1 * y) / T' ^ 2 +
-           3 * (C₂ * (2 * Real.log ((M : ℝ) * T)) / δ + 1) * (Real.exp 1 * y) / T' ^ 2)) := by
+theorem exm_core
+    : ∃ C₂ C₃ : ℝ,
+      0 < C₂ ∧ 0 ≤ C₃
+        ∧ ∀ (κ : ℝ),
+          0 < κ → κ ≤ 1 / 20
+            → ∀ (M : ℕ) [NeZero M] (χ : DirichletCharacter ℂ M) (T σ₁ T' δ : ℝ),
+              3 ≤ M → 2 ≤ T → 1 - κ ≤ σ₁ → σ₁ ≤ 1 - 3 * κ / 4 → T ≤ T' → T' ≤ T + 1 → 0 < δ
+                → δ ≤ 1 / 20
+                → (∀ ρ : ℂ, exLF χ ρ = 0 → 9 / 10 ≤ ρ.re → |ρ.im| ≤ T + 3 → δ ≤ |σ₁ - ρ.re|)
+                → (∀ ρ : ℂ, exLF χ ρ = 0 → 9 / 10 ≤ ρ.re → δ ≤ |(|ρ.im| - T')|)
+                → ∀ Z : Finset ℂ,
+                  (∀ ρ : ℂ, ρ ∈ Z ↔ (exLF χ ρ = 0 ∧ σ₁ < ρ.re ∧ |ρ.im| < T'))
+                    → ∀ y : ℝ,
+                      2 ≤ y
+                        → ‖Formalism.ZeroFreeDirichlet.Schi χ y / (y : ℂ) - explicitFormulaConstant χ - (if χ = 1 then ((Real.log y - 1 : ℝ) : ℂ) else 0) +
+                                    ∑ ρ ∈ Z, (exOrd χ ρ : ℂ) * (y : ℂ) ^ (ρ - 1) / (ρ * (ρ - 1))‖
+                          ≤ 1 / (2 * Real.pi * y)
+                            * (2 * (Real.log y + C₃) * (Real.exp 1 * y) / T'
+                              + 2 * T' * (C₂ * (2 * Real.log ((M : ℝ) * T)) / δ + 4 / (3 * κ))
+                                * y ^ σ₁ / (σ₁ * (1 - σ₁))
+                              + (3 * (C₂ * (2 * Real.log ((M : ℝ) * T)) / δ + 1) * (Real.exp 1 * y)
+                                  / T' ^ 2
+                                + 3 * (C₂ * (2 * Real.log ((M : ℝ) * T)) / δ + 1) * (Real.exp 1 * y)
+                                  / T' ^ 2)) := by
   obtain ⟨C₂, hC₂, hneg⟩ := ex_negLD_bound
   obtain ⟨C₃, hC₃, htail⟩ := ex_tail_bound
   refine ⟨C₂, C₃, hC₂, hC₃, ?_⟩
@@ -62,7 +78,8 @@ theorem exm_core : ∃ C₂ C₃ : ℝ, 0 < C₂ ∧ 0 ≤ C₃ ∧ ∀ (κ : �
     linarith
   have hσ₀3 : σ₀ ≤ 3 := by
     have : 1 / Real.log y ≤ 1 / (1 / 2) := one_div_le_one_div_of_le (by norm_num) hly
-    rw [hσ₀]; linarith
+    rw [hσ₀]
+    linarith
   have hyσ₀ : y ^ σ₀ = Real.exp 1 * y := exm_rpow_sigma y hy
   have hσ19 : 19 / 20 ≤ σ₁ := by linarith
   have hσ1 : σ₁ < 1 := by linarith
@@ -100,7 +117,8 @@ theorem exm_core : ∃ C₂ C₃ : ℝ, 0 < C₂ ∧ 0 ≤ C₃ ∧ ∀ (κ : �
     · have := one_div_le_one_div_of_le (by positivity : 0 < 3 * κ / 4) hnorm
       rwa [one_div_div] at this
 
-  have hBH : ∀ v : ℝ, |v| = T' → ∀ x : ℝ, σ₁ ≤ x → x ≤ σ₀ → ‖negLD χ ((x : ℂ) + v * I)‖ ≤ N + 1 := by
+  have hBH
+      : ∀ v : ℝ, |v| = T' → ∀ x : ℝ, σ₁ ≤ x → x ≤ σ₀ → ‖negLD χ ((x : ℂ) + v * I)‖ ≤ N + 1 := by
     intro v hv x hx hx'
     have hre : ((x : ℂ) + v * I).re = x := by simp
     have him : ((x : ℂ) + v * I).im = v := by simp
@@ -125,11 +143,15 @@ theorem exm_core : ∃ C₂ C₃ : ℝ, 0 < C₂ ∧ 0 ≤ C₃ ∧ ∀ (κ : �
       linarith
     · have := one_div_le_one_div_of_le (by norm_num : (0 : ℝ) < 1) hnorm
       simpa using this
-  have hH : ∀ v : ℝ, |v| = T' → ‖∫ x in σ₁..σ₀, Fchi χ y ((x : ℂ) + v * I)‖ ≤
-      3 * (N + 1) * (Real.exp 1 * y) / T' ^ 2 := by
+  have hH
+      : ∀ v : ℝ,
+        |v| = T'
+          → ‖∫ x in σ₁..σ₀, Fchi χ y ((x : ℂ) + v * I)‖
+            ≤ 3 * (N + 1) * (Real.exp 1 * y) / T' ^ 2 := by
     intro v hv
-    have h := ex_horiz_bound χ y σ₁ σ₀ v (N + 1) (by linarith) (by linarith) (by rw [hv]; linarith)
-      (by linarith) (hBH v hv)
+    have h :=
+      ex_horiz_bound χ y σ₁ σ₀ v (N + 1) (by linarith) (by linarith) (by rw [hv]; linarith)
+        (by linarith) (hBH v hv)
     have hv2 : v ^ 2 = T' ^ 2 := by rw [← hv, sq_abs]
     rw [hv2, hyσ₀] at h
     refine h.trans ?_
@@ -139,7 +161,8 @@ theorem exm_core : ∃ C₂ C₃ : ℝ, 0 < C₂ ∧ 0 ≤ C₃ ∧ ∀ (κ : �
   have hTl := htail M χ y σ₀ T' (by linarith) hσ₀1 (by linarith)
   have hinv : 1 / (σ₀ - 1) = Real.log y := by rw [hσ₀]; simp
   rw [hinv, hyσ₀] at hTl
-  have hedge : ∀ w : ℂ, σ₁ ≤ w.re → w.re ≤ σ₀ → |w.im| ≤ T' → exLF χ w = 0 → σ₁ < w.re ∧ |w.im| < T' := by
+  have hedge
+      : ∀ w : ℂ, σ₁ ≤ w.re → w.re ≤ σ₀ → |w.im| ≤ T' → exLF χ w = 0 → σ₁ < w.re ∧ |w.im| < T' := by
     intro w hw1 _ hw3 hw0
     have h1 := hgapre w hw0 (by linarith) (by linarith)
     have h2 := hgapim w hw0 (by linarith)
@@ -154,13 +177,15 @@ theorem exm_core : ∃ C₂ C₃ : ℝ, 0 < C₂ ∧ 0 ≤ C₃ ∧ ∀ (κ : �
   have hper := (perron_formula_character M χ y (by linarith) σ₀ hσ₀1).2
   unfold Formalism.ZF.rectInt at hrect
   have halg := exm_alg _ _ _ _ _ _ _ _ _ y hy0 hper hrect
-  have hD : (if χ = 1 then (y : ℂ) * (Real.log y : ℂ) - y else 0) / (y : ℂ) =
-      (if χ = 1 then ((Real.log y - 1 : ℝ) : ℂ) else 0) := by
+  have hD
+      : (if χ = 1 then (y : ℂ) * (Real.log y : ℂ) - y else 0) / (y : ℂ)
+        = (if χ = 1 then ((Real.log y - 1 : ℝ) : ℂ) else 0) := by
     split_ifs
     · push_cast; field_simp
     · simp
-  have hS : (∑ ρ ∈ Z, (exOrd χ ρ : ℂ) * exKer y ρ) / (y : ℂ) =
-      ∑ ρ ∈ Z, (exOrd χ ρ : ℂ) * (y : ℂ) ^ (ρ - 1) / (ρ * (ρ - 1)) := by
+  have hS
+      : (∑ ρ ∈ Z, (exOrd χ ρ : ℂ) * exKer y ρ) / (y : ℂ)
+        = ∑ ρ ∈ Z, (exOrd χ ρ : ℂ) * (y : ℂ) ^ (ρ - 1) / (ρ * (ρ - 1)) := by
     rw [Finset.sum_div]
     apply Finset.sum_congr rfl
     intro ρ _

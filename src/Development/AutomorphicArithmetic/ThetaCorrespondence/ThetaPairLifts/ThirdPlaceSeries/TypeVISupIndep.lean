@@ -9,7 +9,10 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 noncomputable section
 namespace GlobalTheory.HeightCounting.MtIndep
 section rep
@@ -17,34 +20,58 @@ variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 end rep
 section loc
 variable {D : D7}
-def phiSubmodule {cf : CharFrame D} {jE : D.host.E →+* Qb} (X : LocNd (lay0 D)) (Y : LocAut X) (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (M : MtFam D)
-    (σ' : D.ntypes.Par) (c : Y.naut.CG 1) (μ : D.what₂.Tup) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) :
-    Submodule ℂ (D.what₂.Mt μ j) :=
+def phiSubmodule
+    {cf : CharFrame D} {jE : D.host.E →+* Qb}
+    (X : LocNd (lay0 D)) (Y : LocAut X)
+    (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (M : MtFam D)
+    (σ' : D.ntypes.Par) (c : Y.naut.CG 1) (μ : D.what₂.Tup)
+    (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
+    : Submodule ℂ (D.what₂.Mt μ j) :=
   ⨆ (S' : Submodule ℂ (GAf D.host.E D.R.nV → (M μ j h1 h2).wt.W)) (h : NG.IsIrrRep (M μ j h1 h2).wt.ρ S')
     (_ : Good X Y σ' c j (A.au.cls j h1 h2 { (M μ j h1 h2).wt with S := S', irrS := h })),
     (NG.isoTyp (M μ j h1 h2).wt.ρ S').comap (M μ j h1 h2).real
-theorem phi_submodule_heq {cf : CharFrame D} {jE : D.host.E →+* Qb} (X : LocNd (lay0 D)) (Y : LocAut X) (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE)
-    (M : MtFam D) (σ' : D.ntypes.Par) (c : Y.naut.CG 1) {μ μ' : D.what₂.Tup} {j j' : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
-    (h1' : 1 ≤ j') (h2' : j' ≤ D.R.m) (hμ : μ = μ') (hj : j = j') :
-    HEq (_root_.GlobalTheory.HeightCounting.MtIndep.phiSubmodule X Y A M σ' c μ j h1 h2) (_root_.GlobalTheory.HeightCounting.MtIndep.phiSubmodule X Y A M σ' c μ' j' h1' h2') := by
+theorem phi_submodule_heq
+    {cf : CharFrame D} {jE : D.host.E →+* Qb}
+    (X : LocNd (lay0 D)) (Y : LocAut X)
+    (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (M : MtFam D)
+    (σ' : D.ntypes.Par) (c : Y.naut.CG 1)
+    {μ μ' : D.what₂.Tup} {j j' : ℕ}
+    (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (h1' : 1 ≤ j') (h2' : j' ≤ D.R.m) (hμ : μ = μ') (hj : j = j')
+    : HEq (_root_.GlobalTheory.HeightCounting.MtIndep.phiSubmodule X Y A M σ' c μ j h1 h2)
+      (_root_.GlobalTheory.HeightCounting.MtIndep.phiSubmodule X Y A M σ' c μ' j' h1' h2') := by
   subst hμ hj; rfl
 end loc
 end GlobalTheory.HeightCounting.MtIndep
 namespace GlobalTheory.HeightCounting.MtIndep
 section loc2
-variable {D : D7} {cf : CharFrame D} {jE : D.host.E →+* Qb} {A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE} {M : MtFam D}
+variable
+  {D : D7} {cf : CharFrame D} {jE : D.host.E →+* Qb}
+  {A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE} {M : MtFam D}
   {tup : D.what₂.Tup → Fin D.R.m → HChar D.host.E} {X : LocNd (lay0 D)}
   {iq : ∀ i : X.nd.Loc, FractionRing (X.nd.O i) →+* Qbar (X.nd.l i)} {Y : LocAut X} {Cb : LocBC Y}
-theorem supr_type_v_eq_phi_submodule (hS : _root_.GlobalTheory.HeightCounting.AutomorphicSpecialisation A M tup iq Y Cb) (σ' : D.ntypes.Par) (i : X.nd.Loc) :
-    (⨆ P ∈ {P | ∃ Sig, (∀ w, isoLoc X.nd Y.naut Sig w = D.ntypes.locPar σ' w) ∧ IsBCV X.nd Y.naut i P (twistIso X.nd Y.naut (Sig ++ [muPart X.nd Y.naut i]) Y.naut.etaTinv)}, Y.naut.typeV i P) =
-    _root_.GlobalTheory.HeightCounting.MtIndep.phiSubmodule X Y A M σ' (Y.muC i) (X.nd.mu i) (X.nd.j i) (X.nd.j_range i).1 (X.nd.j_range i).2 := by
-  have hc : ∀ P, (∃ Sig, (∀ w, isoLoc X.nd Y.naut Sig w = D.ntypes.locPar σ' w) ∧ IsBCV X.nd Y.naut i P (twistIso X.nd Y.naut (Sig ++ [muPart X.nd Y.naut i]) Y.naut.etaTinv)) ↔
-      Good X Y σ' (Y.muC i) (X.nd.j i) (A.au.cls (X.nd.j i) (X.nd.j_range i).1 (X.nd.j_range i).2
-        { (mlX M X i).wt with S := hS.S i P, irrS := hS.irr i P }) := by
+theorem supr_type_v_eq_phi_submodule
+    (hS : _root_.GlobalTheory.HeightCounting.AutomorphicSpecialisation A M tup iq Y Cb)
+    (σ' : D.ntypes.Par) (i : X.nd.Loc)
+    : (⨆ P ∈ {P | ∃ Sig, (∀ w, isoLoc X.nd Y.naut Sig w = D.ntypes.locPar σ' w) ∧ IsBCV X.nd Y.naut i P (twistIso X.nd Y.naut (Sig ++ [muPart X.nd Y.naut i]) Y.naut.etaTinv)}, Y.naut.typeV i P)
+      = _root_.GlobalTheory.HeightCounting.MtIndep.phiSubmodule X Y A M σ' (Y.muC i) (X.nd.mu i)
+        (X.nd.j i) (X.nd.j_range i).1 (X.nd.j_range i).2 := by
+  have hc
+      : ∀ P,
+        (∃ Sig,
+            (∀ w, isoLoc X.nd Y.naut Sig w = D.ntypes.locPar σ' w) ∧ IsBCV X.nd Y.naut i P
+              (twistIso X.nd Y.naut (Sig ++ [muPart X.nd Y.naut i]) Y.naut.etaTinv))
+          ↔ Good X Y σ' (Y.muC i) (X.nd.j i)
+            (A.au.cls (X.nd.j i) (X.nd.j_range i).1 (X.nd.j_range i).2 {
+              (mlX M X i).wt with
+              S := hS.S i P
+              irrS := hS.irr i P
+            }) := by
     intro P
-    have hl : Y.naut.locV i P = fun w => D.nbc.locAU (X.nd.j i) (Cb.embAV i P) w := funext (Cb.embAV_loc i P)
+    have hl : Y.naut.locV i P = fun w => D.nbc.locAU (X.nd.j i) (Cb.embAV i P) w :=
+      funext (Cb.embAV_loc i P)
     have hs : Y.naut.satV i P = D.nbc.satAU (X.nd.j i) (Cb.embAV i P) := funext (Cb.embAV_sat i P)
-    have hf : Y.naut.infWt i = D.nbc.infW (X.nd.j i) (D.nbc.wtAU (X.nd.j i) (Cb.embAV i P)) := Cb.embAV_inf i P
+    have hf : Y.naut.infWt i = D.nbc.infW (X.nd.j i) (D.nbc.wtAU (X.nd.j i) (Cb.embAV i P)) :=
+      Cb.embAV_inf i P
     rw [← hS.emb i P]
     unfold Good
     refine exists_congr fun Sig => and_congr_right fun _ => ?_
@@ -61,12 +88,21 @@ theorem supr_type_v_eq_phi_submodule (hS : _root_.GlobalTheory.HeightCounting.Au
     · obtain ⟨P, hP⟩ := hS.surj i S' hirr hb
       have ht : Y.naut.typeV i P = (NG.isoTyp (mlX M X i).wt.ρ S').comap (mlX M X i).real := by
         rw [hS.typeV i P, isoTyp_eq (hS.irr i P).1 hP]
-      have hcl : A.au.cls (X.nd.j i) (X.nd.j_range i).1 (X.nd.j_range i).2
-            { (mlX M X i).wt with S := hS.S i P, irrS := hS.irr i P } =
-          A.au.cls (X.nd.j i) (X.nd.j_range i).1 (X.nd.j_range i).2
-            { (mlX M X i).wt with S := S', irrS := hirr } :=
+      have hcl
+          : A.au.cls (X.nd.j i) (X.nd.j_range i).1 (X.nd.j_range i).2 {
+              (mlX M X i).wt with
+              S := hS.S i P
+              irrS := hS.irr i P
+            }
+            = A.au.cls (X.nd.j i) (X.nd.j_range i).1 (X.nd.j_range i).2 {
+              (mlX M X i).wt with
+              S := S'
+              irrS := hirr
+            } :=
         (A.au.iso _ _ _ _ _).2 ⟨⟨LinearEquiv.refl _ _, fun _ _ => rfl⟩, hP⟩
-      have hP' : P ∈ {P | ∃ Sig, (∀ w, isoLoc X.nd Y.naut Sig w = D.ntypes.locPar σ' w) ∧ IsBCV X.nd Y.naut i P (twistIso X.nd Y.naut (Sig ++ [muPart X.nd Y.naut i]) Y.naut.etaTinv)} :=
+      have hP'
+          : P
+            ∈ {P | ∃ Sig, (∀ w, isoLoc X.nd Y.naut Sig w = D.ntypes.locPar σ' w) ∧ IsBCV X.nd Y.naut i P (twistIso X.nd Y.naut (Sig ++ [muPart X.nd Y.naut i]) Y.naut.etaTinv)} :=
         (hc P).2 (hcl ▸ hg)
       exact le_iSup₂_of_le (f := fun P _ => Y.naut.typeV i P) P hP' ht.ge
 end loc2

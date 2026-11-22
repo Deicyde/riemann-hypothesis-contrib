@@ -14,21 +14,25 @@ section General
 universe v u
 variable {C : Type u} [Category.{v} C] [Preadditive C] {K K' L : CochainComplex C ℤ}
 
-def preC (g : K ⟶ K') {j : ℤ} (z : Cochain K' L j) : Cochain K L j := (Cochain.ofHom g).comp z (zero_add j)
+def preC (g : K ⟶ K') {j : ℤ} (z : Cochain K' L j) : Cochain K L j :=
+  (Cochain.ofHom g).comp z (zero_add j)
 
-theorem preC_v (g : K ⟶ K') {j : ℤ} (z : Cochain K' L j) (p q : ℤ) (h : p + j = q) :
-    (preC g z).v p q h = g.f p ≫ z.v p q h := by
+theorem preC_v (g : K ⟶ K') {j : ℤ} (z : Cochain K' L j) (p q : ℤ) (h : p + j = q)
+    : (preC g z).v p q h = g.f p ≫ z.v p q h := by
   simp [preC]
 
-theorem δ_preC (g : K ⟶ K') {j : ℤ} (z : Cochain K' L j) (k : ℤ) : δ j k (preC g z) = preC g (δ j k z) :=
+theorem δ_preC (g : K ⟶ K') {j : ℤ} (z : Cochain K' L j) (k : ℤ)
+    : δ j k (preC g z) = preC g (δ j k z) :=
   δ_ofHom_comp g z k
 
-theorem preC_zero (g : K ⟶ K') (j : ℤ) : preC g (0 : Cochain K' L j) = 0 := by
-  simp [preC]
+theorem preC_zero (g : K ⟶ K') (j : ℤ) : preC g (0 : Cochain K' L j) = 0 := by simp [preC]
 
-theorem preC_inj (g : K ⟶ K') (n : ℤ) (hg : ∀ p : ℤ, -(n + 1) ≤ p → IsIso (g.f p))
-    (hL : ∀ q : ℤ, q < 0 → IsZero (L.X q)) {j : ℤ} (hj : j ≤ n + 1) {x y : Cochain K' L j}
-    (h : preC g x = preC g y) : x = y := by
+theorem preC_inj
+    (g : K ⟶ K') (n : ℤ) (hg : ∀ p : ℤ, -(n + 1) ≤ p → IsIso (g.f p))
+    (hL : ∀ q : ℤ, q < 0 → IsZero (L.X q))
+    {j : ℤ} (hj : j ≤ n + 1)
+    {x y : Cochain K' L j} (h : preC g x = preC g y)
+    : x = y := by
   ext p q hpq
   by_cases hq : q < 0
   · exact (hL q hq).eq_of_tgt _ _
@@ -37,11 +41,16 @@ theorem preC_inj (g : K ⟶ K') (n : ℤ) (hg : ∀ p : ℤ, -(n + 1) ≤ p → 
     simp only [preC_v] at h'
     exact (cancel_epi (g.f p)).1 h'
 
-theorem preC_surj (g : K ⟶ K') (n : ℤ) (hg : ∀ p : ℤ, -(n + 1) ≤ p → IsIso (g.f p))
-    (hL : ∀ q : ℤ, q < 0 → IsZero (L.X q)) {j : ℤ} (hj : j ≤ n + 1) (y : Cochain K L j) :
-    ∃ x : Cochain K' L j, preC g x = y := by
-  refine ⟨Cochain.mk fun p q hpq =>
-    if h : -(n + 1) ≤ p then (haveI := hg p h; inv (g.f p)) ≫ y.v p q hpq else 0, ?_⟩
+theorem preC_surj
+    (g : K ⟶ K') (n : ℤ) (hg : ∀ p : ℤ, -(n + 1) ≤ p → IsIso (g.f p))
+    (hL : ∀ q : ℤ, q < 0 → IsZero (L.X q))
+    {j : ℤ} (hj : j ≤ n + 1) (y : Cochain K L j)
+    : ∃ x : Cochain K' L j, preC g x = y := by
+  refine ⟨
+    Cochain.mk fun p q hpq =>
+      if h : -(n + 1) ≤ p then (haveI := hg p h; inv (g.f p)) ≫ y.v p q hpq else 0,
+    ?_
+  ⟩
   ext p q hpq
   by_cases hq : q < 0
   · exact (hL q hq).eq_of_tgt _ _
@@ -50,12 +59,18 @@ theorem preC_surj (g : K ⟶ K') (n : ℤ) (hg : ∀ p : ℤ, -(n + 1) ≤ p →
 
 end General
 
-theorem res_isZero (R : Type) [CommRing R] (F : Shv R) (q : ℤ) (hq : q < 0) : IsZero ((res R F).X q) :=
+theorem res_isZero (R : Type) [CommRing R] (F : Shv R) (q : ℤ) (hq : q < 0)
+    : IsZero ((res R F).X q) :=
   CochainComplex.isZero_of_isStrictlyGE (injectiveResolution F).cochainComplex 0 q hq
 
-theorem pull_mk (R : Type) [CommRing R] (F : Shv R) {K K' : Cx R} (g : K ⟶ K') (m : ℤ) (x : Cocycle K' (res R F) m) :
-    ∃ y : Cocycle K (res R F) m, HK.pull R g F m (CohomologyClass.mk x) = CohomologyClass.mk y ∧
-      (y : Cochain K (res R F) m) = preC g (x : Cochain K' (res R F) m) :=
+theorem pull_mk
+    (R : Type) [CommRing R]
+    (F : Shv R)
+    {K K' : Cx R} (g : K ⟶ K')
+    (m : ℤ) (x : Cocycle K' (res R F) m)
+    : ∃ y : Cocycle K (res R F) m,
+      HK.pull R g F m (CohomologyClass.mk x) = CohomologyClass.mk y
+        ∧ (y : Cochain K (res R F) m) = preC g (x : Cochain K' (res R F) m) :=
   ⟨_, rfl, rfl⟩
 
 end LateralTheory.E.TruncBijPf

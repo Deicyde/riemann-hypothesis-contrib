@@ -7,13 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.HermitianTraceForms.PosInd
 @[expose] public section
 
 open scoped Matrix
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.DescB
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.DescB
 
 namespace GlobalTheory.IdxAll
 
-theorem eq_or_eq_comp {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
-    (h : IsCMExt F E σ) (e τ : E →+* ℂ) (heτ : e.comp (algebraMap F E) = τ.comp (algebraMap F E)) :
-    τ = e ∨ ∀ x, τ x = star (e x) := by
+theorem eq_or_eq_comp
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (h : IsCMExt F E σ)
+    (e τ : E →+* ℂ) (heτ : e.comp (algebraMap F E) = τ.comp (algebraMap F E))
+    : τ = e ∨ ∀ x, τ x = star (e x) := by
   obtain ⟨-, hc, h2, hσ⟩ := h
   haveI : Algebra.IsQuadraticExtension F E := { finrank_eq_two' := h2 }
   obtain ⟨g, hg⟩ := NumberField.ComplexEmbedding.exists_comp_symm_eq_of_comp_eq (k := F) e τ heτ

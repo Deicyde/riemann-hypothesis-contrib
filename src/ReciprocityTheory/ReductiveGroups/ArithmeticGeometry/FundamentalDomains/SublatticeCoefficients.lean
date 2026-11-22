@@ -6,10 +6,16 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.SublatticeCoefficients
 
-open NumberField Complex MeasureTheory ReciprocityTheory.L2DbarEstimates.Y ReciprocityTheory.ChartRestriction.G.FD
-  ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs ReciprocityTheory.ChartRestriction.G.FD.AdmissibleHermitianColumns ReciprocityTheory.ChartRestriction.G.FD.TransvectionPeriodicity
-  ReciprocityTheory.ChartRestriction.G.FD.RealEmbeddingCharacters ReciprocityTheory.ChartRestriction.G.FD.FlowMeanContinuity ReciprocityTheory.ChartRestriction.G.FD.TubeSummability
-  ReciprocityTheory.ChartRestriction.G.FD.TubeFourierExpansion ReciprocityTheory.ChartRestriction.G.FD.FrequencyIndexing
+open NumberField Complex MeasureTheory ReciprocityTheory.L2DbarEstimates.Y
+  ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
+  ReciprocityTheory.ChartRestriction.G.FD.AdmissibleHermitianColumns
+  ReciprocityTheory.ChartRestriction.G.FD.TransvectionPeriodicity
+  ReciprocityTheory.ChartRestriction.G.FD.RealEmbeddingCharacters
+  ReciprocityTheory.ChartRestriction.G.FD.FlowMeanContinuity
+  ReciprocityTheory.ChartRestriction.G.FD.TubeSummability
+  ReciprocityTheory.ChartRestriction.G.FD.TubeFourierExpansion
+  ReciprocityTheory.ChartRestriction.G.FD.FrequencyIndexing
 
 lemma ioc_orth (m : ℤ) :
     ∫ t in Set.Ioc (0 : ℝ) 1, cexp (2 * Real.pi * I * (m : ℂ) * (t : ℂ)) = if m = 0 then 1 else 0 := by
@@ -67,18 +73,20 @@ lemma freq_of_basis {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) {n : ℕ}
   refine Finset.sum_congr rfl fun τ _ => ?_
   ring
 
-theorem subCoeff {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ)
-    (hP : X.IsSec la P) (ξ : Fin r → E) (hξ : X.IsIso ξ) (x : Frame X.Ψ r) (hx : x ∈ X.dom)
-    (ω : Fin (Fintype.card X.Ψ) → X.Ψ → ℝ) (hωp : ∀ j, ω j ∈ X.periods la)
-    (hωi : LinearIndependent ℝ ω) (k : Fin (Fintype.card X.Ψ) → ℤ) (ν : X.Ψ → ℝ)
-    (hk : ∀ j, (k j : ℝ) = 2 * ∑ τ, ν τ * ω j τ) :
-    fourCoeff (fun t => P (X.flow ξ (fun τ => ∑ j, t j * (ω j τ : ℂ)) x)) 0 k = X.fj la ξ ν P x := by
+theorem subCoeff
+    {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P) (ξ : Fin r → E)
+    (hξ : X.IsIso ξ) (x : Frame X.Ψ r) (hx : x ∈ X.dom) (ω : Fin (Fintype.card X.Ψ) → X.Ψ → ℝ)
+    (hωp : ∀ j, ω j ∈ X.periods la) (hωi : LinearIndependent ℝ ω) (k : Fin (Fintype.card X.Ψ) → ℤ)
+    (ν : X.Ψ → ℝ) (hk : ∀ j, (k j : ℝ) = 2 * ∑ τ, ν τ * ω j τ)
+    : fourCoeff (fun t => P (X.flow ξ (fun τ => ∑ j, t j * (ω j τ : ℂ)) x)) 0 k
+      = X.fj la ξ ν P x := by
   classical
   obtain ⟨hξΛ, hξh, hξ0⟩ := hξ
   obtain ⟨β, hβ⟩ := exists_basis X la
   have hβp : ∀ j, β j ∈ X.periods la := fun j => by
     have : β j ∈ Submodule.span ℤ (Set.range β) := Submodule.subset_span ⟨j, rfl⟩
-    rw [hβ] at this; exact this
+    rw [hβ] at this
+    exact this
   set a : (Fin (Fintype.card X.Ψ) → ℤ) → ℂ := fun k' => X.fj la ξ (νk β k') P x with ha
 
   obtain ⟨hΩo, hΩc⟩ := Om_open_convex (ξ := ξ) (⇑β) hx
@@ -86,21 +94,24 @@ theorem subCoeff {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r →
   have h0t : (0 : Fin (Fintype.card X.Ψ) → ℂ) ∈ tube (Fintype.card X.Ψ) (Om X ξ x β) := by
     show (fun j => ((0 : Fin (Fintype.card X.Ψ) → ℂ) j).im) ∈ Om X ξ x β
     convert h0 using 1
-  obtain ⟨hsumβ, -⟩ := tube_expansion _ _ hΩo hΩc h0 (hline_diff X la P ξ x β hP hξh hx)
-    (hline_periodic X la P ξ x β hP hξΛ hξh hx hβp) 0 h0t
+  obtain ⟨hsumβ, -⟩ :=
+    tube_expansion _ _ hΩo hΩc h0 (hline_diff X la P ξ x β hP hξh hx)
+      (hline_periodic X la P ξ x β hP hξΛ hξh hx hβp) 0 h0t
   have hak : ∀ k', a k' = fourCoeff (hline X P ξ x β) 0 k' := fun k' =>
     fj_eq_fourCoeff X la P hP ⟨hξΛ, hξh, hξ0⟩ hx β hβ (νk β k') k' (νk_spec β k')
-  have hsa : Summable (fun k' => ‖a k'‖) := hsumβ.congr fun k' => by
-    rw [hak k']; simp
+  have hsa : Summable (fun k' => ‖a k'‖) := hsumβ.congr fun k' => by rw [hak k']; simp
 
   choose mZ hmZ using fun (k' : Fin (Fintype.card X.Ψ) → ℤ) j =>
     freq_of_basis X la β hβ (νk β k') k' (νk_spec β k') (ω j) (hωp j)
 
   set sR : (Fin (Fintype.card X.Ψ) → ℝ) → X.Ψ → ℝ := fun t τ => ∑ j, t j * ω j τ with hsR
-  have hexp : ∀ t : Fin (Fintype.card X.Ψ) → ℝ, HasSum
-      ((fun ν' : X.Ψ → ℝ => X.fj la ξ ν' P x *
-        cexp (4 * Real.pi * I * ∑ τ, (ν' τ : ℂ) * ((sR t τ : ℝ) : ℂ))) ∘ νk β)
-      (P (X.flow ξ (fun τ => ((sR t τ : ℝ) : ℂ)) x)) := by
+  have hexp
+      : ∀ t : Fin (Fintype.card X.Ψ) → ℝ,
+        HasSum
+          ((fun ν' : X.Ψ → ℝ =>
+              X.fj la ξ ν' P x * cexp (4 * Real.pi * I * ∑ τ, (ν' τ : ℂ) * ((sR t τ : ℝ) : ℂ)))
+            ∘ νk β)
+          (P (X.flow ξ (fun τ => ((sR t τ : ℝ) : ℂ)) x)) := by
     intro t
     have hdom := flow_real_mem_dom X hξh (sR t) x hx
     have hH := m3bExp_holds r X la P hP ξ ⟨hξΛ, hξh, hξ0⟩ x hx _ hdom
@@ -115,10 +126,16 @@ theorem subCoeff {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r →
 
   set F : (Fin (Fintype.card X.Ψ) → ℤ) → (Fin (Fintype.card X.Ψ) → ℝ) → ℂ := fun k' t =>
     a k' * cexp (2 * Real.pi * I * ∑ j, ((mZ k' j - k j : ℤ) : ℂ) * (t j : ℂ)) with hF
-  have hexpF : ∀ k' t, ((fun ν' : X.Ψ → ℝ => X.fj la ξ ν' P x *
-      cexp (4 * Real.pi * I * ∑ τ, (ν' τ : ℂ) * ((sR t τ : ℝ) : ℂ))) ∘ νk β) k' *
-      cexp (-2 * Real.pi * I * ∑ j, (k j : ℂ) * ((t j : ℂ) + ((0 : Fin (Fintype.card X.Ψ) → ℝ) j : ℂ) * I)) =
-      F k' t := by
+  have hexpF
+      : ∀ k' t,
+        ((fun ν' : X.Ψ → ℝ =>
+                  X.fj la ξ ν' P x * cexp (4 * Real.pi * I * ∑ τ, (ν' τ : ℂ) * ((sR t τ : ℝ) : ℂ)))
+                ∘ νk β)
+              k'
+            * cexp
+              (-2 * Real.pi * I
+                * ∑ j, (k j : ℂ) * ((t j : ℂ) + ((0 : Fin (Fintype.card X.Ψ) → ℝ) j : ℂ) * I))
+          = F k' t := by
     intro k' t
     simp only [Function.comp_apply, hF, ha, Pi.zero_apply, Complex.ofReal_zero, zero_mul, add_zero]
     rw [mul_assoc, ← Complex.exp_add]
@@ -128,30 +145,39 @@ theorem subCoeff {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r →
       have h2 : ((2 * ∑ τ, νk β k' τ * ω j τ : ℝ) : ℂ) = (mZ k' j : ℂ) := by rw [hmZ k' j]; simp
       push_cast at h2
       linear_combination h2 / 2
-    have hsum : ∑ τ, ((νk β k' τ : ℝ) : ℂ) * ((sR t τ : ℝ) : ℂ) =
-        (∑ j, (mZ k' j : ℂ) * (t j : ℂ)) / 2 := by
+    have hsum
+        : ∑ τ, ((νk β k' τ : ℝ) : ℂ) * ((sR t τ : ℝ) : ℂ)
+          = (∑ j, (mZ k' j : ℂ) * (t j : ℂ)) / 2 := by
       simp only [hsR]
       push_cast
       simp_rw [Finset.mul_sum]
       rw [Finset.sum_comm, Finset.sum_div]
       refine Finset.sum_congr rfl fun j _ => ?_
-      calc ∑ τ, ((νk β k' τ : ℝ) : ℂ) * ((t j : ℂ) * (ω j τ : ℂ))
-          = (t j : ℂ) * ∑ τ, ((νk β k' τ : ℝ) : ℂ) * (ω j τ : ℂ) := by
-            rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun τ _ => by ring
+      calc
+        ∑ τ, ((νk β k' τ : ℝ) : ℂ) * ((t j : ℂ) * (ω j τ : ℂ))
+            = (t j : ℂ) * ∑ τ, ((νk β k' τ : ℝ) : ℂ) * (ω j τ : ℂ) := by
+          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun τ _ => by ring
         _ = (mZ k' j : ℂ) * (t j : ℂ) / 2 := by rw [hpair j]; ring
     rw [hsum]
     push_cast
     simp only [sub_mul, Finset.sum_sub_distrib]
     ring
-  have hint : ∀ t ∈ Set.univ.pi (fun _ : Fin (Fintype.card X.Ψ) => Set.Ioc (0 : ℝ) 1),
-      (fun t => P (X.flow ξ (fun τ => ∑ j, t j * (ω j τ : ℂ)) x))
-        (fun j => (t j : ℂ) + ((0 : Fin (Fintype.card X.Ψ) → ℝ) j : ℂ) * I) *
-      cexp (-2 * Real.pi * I *
-        ∑ j, (k j : ℂ) * ((t j : ℂ) + ((0 : Fin (Fintype.card X.Ψ) → ℝ) j : ℂ) * I)) =
-      ∑' k', F k' t := by
+  have hint
+      : ∀ t ∈ Set.univ.pi (fun _ : Fin (Fintype.card X.Ψ) => Set.Ioc (0 : ℝ) 1),
+        (fun t => P (X.flow ξ (fun τ => ∑ j, t j * (ω j τ : ℂ)) x)) (fun j =>
+              (t j : ℂ) + ((0 : Fin (Fintype.card X.Ψ) → ℝ) j : ℂ) * I)
+            * cexp
+              (-2 * Real.pi * I
+                * ∑ j, (k j : ℂ) * ((t j : ℂ) + ((0 : Fin (Fintype.card X.Ψ) → ℝ) j : ℂ) * I))
+          = ∑' k', F k' t := by
     intro t _
-    have harg : X.flow ξ (fun τ => ∑ j, ((t j : ℂ) + ((0 : Fin (Fintype.card X.Ψ) → ℝ) j : ℂ) * I) *
-        (ω j τ : ℂ)) x = X.flow ξ (fun τ => ((sR t τ : ℝ) : ℂ)) x := by
+    have harg
+        : X.flow ξ
+            (fun τ =>
+              ∑ j, ((t j : ℂ) + ((0 : Fin (Fintype.card X.Ψ) → ℝ) j : ℂ) * I) *
+                (ω j τ : ℂ))
+            x
+          = X.flow ξ (fun τ => ((sR t τ : ℝ) : ℂ)) x := by
       congr 1
       funext τ
       simp [hsR]
@@ -169,18 +195,21 @@ theorem subCoeff {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r →
     rw [Real.volume_pi_Ioc]; simp
   have hFint : ∀ k', IntegrableOn (F k') (Set.univ.pi fun _ => Set.Ioc (0 : ℝ) 1) := by
     intro k'
-    refine Measure.integrableOn_of_bounded (M := ‖a k'‖) (by rw [hvol]; exact ENNReal.one_ne_top)
-      ?_ (Filter.Eventually.of_forall fun t => (hnormF k' t).le)
+    refine Measure.integrableOn_of_bounded (M := ‖a k'‖) (by rw [hvol]; exact ENNReal.one_ne_top) ?_
+      (Filter.Eventually.of_forall fun t => (hnormF k' t).le)
     refine Continuous.aestronglyMeasurable ?_
     simp only [hF]
     fun_prop
   have hFsum : Summable fun k' => ∫ t in Set.univ.pi (fun _ => Set.Ioc (0 : ℝ) 1), ‖F k' t‖ := by
     refine hsa.congr fun k' => ?_
     simp_rw [hnormF]
-    rw [setIntegral_const, measureReal_def, hvol]; simp
+    rw [setIntegral_const, measureReal_def, hvol]
+    simp
   rw [← integral_tsum_of_summable_integral_norm hFint hFsum]
-  have hcoef : ∀ k', ∫ t in Set.univ.pi (fun _ => Set.Ioc (0 : ℝ) 1), F k' t =
-      a k' * (if (fun j => mZ k' j - k j) = 0 then 1 else 0) := by
+  have hcoef
+      : ∀ k',
+        ∫ t in Set.univ.pi (fun _ => Set.Ioc (0 : ℝ) 1), F k' t
+          = a k' * (if (fun j => mZ k' j - k j) = 0 then 1 else 0) := by
     intro k'
     simp only [hF]
     rw [integral_const_mul]
@@ -200,8 +229,7 @@ theorem subCoeff {r : ℕ} (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r →
     intro k' h
     have hm : ∀ j, mZ k' j = k j := fun j => by
       have := congrFun h j; simp only [Pi.zero_apply] at this; omega
-    have e1 : νk β k' = νk ωB k := eq_νk ωB (νk β k') k (fun j => by
-      rw [hωB, hmZ k' j, hm j])
+    have e1 : νk β k' = νk ωB k := eq_νk ωB (νk β k') k (fun j => by rw [hωB, hmZ k' j, hm j])
     have e2 : ν = νk ωB k := eq_νk ωB ν k (fun j => by rw [hωB]; exact (hk j).symm)
     rw [e1, ← e2]
   by_cases hfreq : ∀ p ∈ X.periods la, ∃ z : ℤ, 2 * ∑ τ, ν τ * p τ = z

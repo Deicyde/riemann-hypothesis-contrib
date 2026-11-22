@@ -16,14 +16,16 @@ namespace GlobalTheory.CompanionTheory.EllipticCM
 
 open WeierstrassCurve GroundTheory.Global.Elliptic GroundTheory.Arith.Abelian
 
-theorem variableChangePoint_latticePoint {X : WeierstrassCurve ℂ} {L : PeriodPair}
-    {C : VariableChange ℂ} (h : C • X = GlobalTheory.latticeCurve L) (h' : C⁻¹ • weierstrassCurve L = X)
-    (z : ℂ) :
-    GlobalTheory.variableChangePoint C h (GlobalTheory.latticePoint L z) = vcPoint C⁻¹ h' (toPoint L z) := by
+theorem variableChangePoint_latticePoint
+    {X : WeierstrassCurve ℂ} {L : PeriodPair} {C : VariableChange ℂ}
+    (h : C • X = GlobalTheory.latticeCurve L) (h' : C⁻¹ • weierstrassCurve L = X)
+    (z : ℂ)
+    : GlobalTheory.variableChangePoint C h (GlobalTheory.latticePoint L z)
+      = vcPoint C⁻¹ h' (toPoint L z) := by
   by_cases hz : z ∈ L.lattice
   · rw [GlobalTheory.latticePoint_of_mem L hz, toPoint_of_mem hz, map_zero, vcPoint_zero]
-  · rw [GlobalTheory.latticePoint_of_notMem L hz, toPoint_of_notMem hz, GlobalTheory.variableChangePoint_some,
-      vcPoint_some, Affine.Point.some.injEq]
+  · rw [GlobalTheory.latticePoint_of_notMem L hz, toPoint_of_notMem hz,
+      GlobalTheory.variableChangePoint_some, vcPoint_some, Affine.Point.some.injEq]
     have hu : (C.u : ℂ) ≠ 0 := C.u.ne_zero
     constructor
     · simp only [vcX, VariableChange.inv_def, inv_inv, Units.val_inv_eq_inv_val]
@@ -33,37 +35,43 @@ theorem variableChangePoint_latticePoint {X : WeierstrassCurve ℂ} {L : PeriodP
       field_simp
       ring
 
-theorem isAnalyticUniformization_of_isAnalyticIso {K : Type} [Field K] [NumberField K]
-    [IsTotallyComplex K] [Algebra K ℂ] (_h2 : Module.finrank ℚ K = 2) (X : WeierstrassCurve ℂ)
-    [X.IsElliptic] (𝔞 : FractionalIdeal (𝓞 K)⁰ K) (_h𝔞 : 𝔞 ≠ 0)
+theorem isAnalyticUniformization_of_isAnalyticIso
+    {K : Type} [Field K] [NumberField K] [IsTotallyComplex K] [Algebra K ℂ]
+    (_h2 : Module.finrank ℚ K = 2)
+    (X : WeierstrassCurve ℂ) [X.IsElliptic]
+    (𝔞 : FractionalIdeal (𝓞 K)⁰ K) (_h𝔞 : 𝔞 ≠ 0)
     (ξ : (ℂ ⧸ GlobalTheory.EllipticCM.idealSub 𝔞) ≃+ X.toAffine.Point)
-    (hξ : GlobalTheory.EllipticCM.IsAnalyticIso ξ) :
-    GroundTheory.Global.Elliptic.IsAnalyticUniformization
+    (hξ : GlobalTheory.EllipticCM.IsAnalyticIso ξ)
+    : GroundTheory.Global.Elliptic.IsAnalyticUniformization
       (GroundTheory.Global.Elliptic.idealLattice (algebraMap K ℂ) 𝔞)
       (ξ.toAddMonoidHom.comp (QuotientAddGroup.mk' _)) := by
   obtain ⟨L, C, h⟩ := GlobalTheory.exists_variableChange_eq_latticeCurve X
   obtain ⟨α, hα, hΛ, hz⟩ := hξ.exists_mul h
   have e : GlobalTheory.latticeCurve L = weierstrassCurve L := by
     simp [GlobalTheory.latticeCurve, weierstrassCurve, neg_div]
-  have h' : C⁻¹ • weierstrassCurve L = X := by
-    rw [← e, ← h, inv_smul_smul]
+  have h' : C⁻¹ • weierstrassCurve L = X := by rw [← e, ← h, inv_smul_smul]
   have hΛ' : ∀ z, z ∈ idealLattice (algebraMap K ℂ) 𝔞 ↔ α * z ∈ L.lattice := fun z => by
     rw [← hΛ]
     rfl
   open Complex Filter Topology Set in
   open scoped PeriodPair in
-  have hf0 :
-      IsAnalyticUniformization L.lattice (toPointHom L) := by
+  have hf0 : IsAnalyticUniformization L.lattice (toPointHom L) := by
     refine {
       map_eq_zero_iff := fun z ↦ toPoint_eq_zero_iff
       surjective := toPoint_surjective
       analyticAt_affine := ?analyticAt_affine
-      analyticAt_infinity := ?analyticAt_infinity }
+      analyticAt_infinity := ?analyticAt_infinity
+    }
     case analyticAt_affine =>
       intro z hz
       have hz' : z ∉ L.lattice := fun h ↦ hz (toPoint_of_mem h)
-      refine ⟨℘[L], fun w ↦ ℘'[L] w / 2, L.analyticOnNhd_weierstrassP z hz',
-        (L.analyticOnNhd_derivWeierstrassP z hz').div_const, ?_⟩
+      refine ⟨
+        ℘[L],
+        fun w ↦ ℘'[L] w / 2,
+        L.analyticOnNhd_weierstrassP z hz',
+        (L.analyticOnNhd_derivWeierstrassP z hz').div_const,
+        ?_
+      ⟩
       filter_upwards [L.isClosed_lattice.isOpen_compl.mem_nhds hz'] with w hw
       exact ⟨_, toPoint_of_notMem hw⟩
     case analyticAt_infinity =>
@@ -72,8 +80,8 @@ theorem isAnalyticUniformization_of_isAnalyticIso {K : Type} [Field K] [NumberFi
       set F : ℂ → ℂ := fun w ↦ ℘[L] w / (℘'[L] w / 2)
       set G : ℂ → ℂ := fun w ↦ 1 / (℘'[L] w / 2)
       have hP := L.meromorphic_weierstrassP z
-      have hD : MeromorphicAt (fun w ↦ ℘'[L] w / 2) z := (L.meromorphic_derivWeierstrassP z).div
-        (MeromorphicAt.const 2 z)
+      have hD : MeromorphicAt (fun w ↦ ℘'[L] w / 2) z :=
+        (L.meromorphic_derivWeierstrassP z).div (MeromorphicAt.const 2 z)
       have oD : meromorphicOrderAt (fun w ↦ ℘'[L] w / 2) z = -3 := by
         have e : (fun w ↦ ℘'[L] w / 2) = (fun _ ↦ (2 : ℂ)⁻¹) * ℘'[L] := by
           funext w; simp only [Pi.mul_apply]; ring
@@ -83,18 +91,21 @@ theorem isAnalyticUniformization_of_isAnalyticIso {K : Type} [Field K] [NumberFi
       have hG : MeromorphicAt G z := (MeromorphicAt.const 1 z).div hD
       have oF : meromorphicOrderAt F z = 1 := by
         rw [show F = ℘[L] * (fun w ↦ ℘'[L] w / 2)⁻¹ from funext fun w ↦ div_eq_mul_inv _ _,
-          meromorphicOrderAt_mul hP hD.inv, meromorphicOrderAt_inv, oD,
-          L.order_weierstrassP z hzL]
+          meromorphicOrderAt_mul hP hD.inv, meromorphicOrderAt_inv, oD, L.order_weierstrassP z hzL]
         rfl
       have oG : meromorphicOrderAt G z = 3 := by
-        rw [show G = (fun w ↦ ℘'[L] w / 2)⁻¹ from funext fun w ↦ one_div _,
-          meromorphicOrderAt_inv, oD]
+        rw [show G = (fun w ↦ ℘'[L] w / 2)⁻¹ from funext fun w ↦ one_div _, meromorphicOrderAt_inv,
+          oD]
         rfl
       have hFz : limPunctured F z = 0 := limPunctured_eq_zero_of_pos (by rw [oF]; exact zero_lt_one)
       have hGz : limPunctured G z = 0 := limPunctured_eq_zero_of_pos (by rw [oG]; norm_num)
-      refine ⟨limPunctured F, limPunctured G,
+      refine ⟨
+        limPunctured F,
+        limPunctured G,
         analyticAt_limPunctured hF (by rw [oF]; exact zero_le_one),
-        analyticAt_limPunctured hG (by rw [oG]; norm_num), ?_⟩
+        analyticAt_limPunctured hG (by rw [oG]; norm_num),
+        ?_
+      ⟩
       have hne : ∀ᶠ w in 𝓝[≠] z, w ∉ L.lattice ∧ ℘'[L] w / 2 ≠ 0 := by
         refine (eventually_nhdsWithin_iff.2 ?_).and
           ((meromorphicOrderAt_ne_top_iff_eventually_ne_zero hD).1 (by rw [oD]; decide))
@@ -108,38 +119,44 @@ theorem isAnalyticUniformization_of_isAnalyticIso {K : Type} [Field K] [NumberFi
       obtain ⟨hwL, hw0⟩ := hw hwz
       have hDa : AnalyticAt ℂ (fun w ↦ ℘'[L] w / 2) w :=
         (L.analyticOnNhd_derivWeierstrassP w hwL).div_const
-      have hFw : limPunctured F w = F w := limPunctured_eq_of_continuousAt
-        ((L.analyticOnNhd_weierstrassP w hwL).div hDa hw0).continuousAt
-      have hGw : limPunctured G w = G w := limPunctured_eq_of_continuousAt
-        (analyticAt_const.div hDa hw0).continuousAt
+      have hFw : limPunctured F w = F w :=
+        limPunctured_eq_of_continuousAt ((L.analyticOnNhd_weierstrassP w hwL).div hDa
+          hw0).continuousAt
+      have hGw : limPunctured G w = G w :=
+        limPunctured_eq_of_continuousAt (analyticAt_const.div hDa hw0).continuousAt
       have hGne : G w ≠ 0 := one_div_ne_zero hw0
       have hw0' : ℘'[L] w ≠ 0 := fun h ↦ hw0 (by rw [h, zero_div])
-      have e1 : F w / G w = ℘[L] w := by
-        simp only [F, G]; field_simp
-      have e2 : 1 / G w = ℘'[L] w / 2 := by
-        simp only [G]; field_simp
+      have e1 : F w / G w = ℘[L] w := by simp only [F, G]; field_simp
+      have e2 : 1 / G w = ℘'[L] w / 2 := by simp only [G]; field_simp
       refine Or.inr ⟨by rw [hGw]; exact hGne, ?_⟩
       rw [hFw, hGw]
-      refine ⟨by rw [e1, e2]; exact WeierstrassCurve.Affine.equation_iff_nonsingular.1 (equation_weierstrassP L hwL), ?_⟩
+      refine ⟨
+        by
+          rw [e1, e2]
+          exact WeierstrassCurve.Affine.equation_iff_nonsingular.1 (equation_weierstrassP L hwL),
+        ?_
+      ⟩
       show toPoint L w = _
       rw [toPoint_of_notMem hwL]
       exact point_some_congr e1.symm e2.symm
-  have hvc {Λ : Submodule ℤ ℂ} {E E' : WeierstrassCurve ℂ} {f : ℂ →+ E.toAffine.Point}
-  (hf : IsAnalyticUniformization Λ f) (C : VariableChange ℂ)
-      (h : C • E = E') : IsAnalyticUniformization Λ ((vcPointEquiv C h).toAddMonoidHom.comp f) := by
+  have hvc
+      {Λ : Submodule ℤ ℂ} {E E' : WeierstrassCurve ℂ} {f : ℂ →+ E.toAffine.Point}
+      (hf : IsAnalyticUniformization Λ f)
+      (C : VariableChange ℂ) (h : C • E = E')
+      : IsAnalyticUniformization Λ ((vcPointEquiv C h).toAddMonoidHom.comp f) := by
     refine {
       map_eq_zero_iff := ?map_eq_zero_iff
       surjective := (vcPointEquiv C h).surjective.comp hf.surjective
       analyticAt_affine := ?analyticAt_affine
-      analyticAt_infinity := ?analyticAt_infinity }
+      analyticAt_infinity := ?analyticAt_infinity
+    }
     case map_eq_zero_iff =>
       intro z
-      rw [AddMonoidHom.comp_apply, AddEquiv.coe_toAddMonoidHom, vcPointEquiv_apply, vcPoint_eq_zero_iff,
-        hf.map_eq_zero_iff]
+      rw [AddMonoidHom.comp_apply, AddEquiv.coe_toAddMonoidHom, vcPointEquiv_apply,
+        vcPoint_eq_zero_iff, hf.map_eq_zero_iff]
     case analyticAt_affine =>
       intro z hz
-      have hz' : f z ≠ 0 := fun h0 ↦ hz (by
-        rw [AddMonoidHom.comp_apply, h0, map_zero])
+      have hz' : f z ≠ 0 := fun h0 ↦ hz (by rw [AddMonoidHom.comp_apply, h0, map_zero])
       obtain ⟨X, Y, hX, hY, hev⟩ := hf.analyticAt_affine z hz'
       refine ⟨fun w ↦ vcX C (X w), fun w ↦ vcY C (X w) (Y w), ?_, ?_, ?_⟩
       · simp only [vcX]; fun_prop
@@ -151,7 +168,8 @@ theorem isAnalyticUniformization_of_isAnalyticIso {K : Type} [Field K] [NumberFi
       intro z hz
       have hz' : f z = 0 := by
         rw [AddMonoidHom.comp_apply, AddEquiv.coe_toAddMonoidHom, vcPointEquiv_apply,
-          vcPoint_eq_zero_iff] at hz
+            vcPoint_eq_zero_iff]
+          at hz
         exact hz
       obtain ⟨U, V, hU, hV, hev⟩ := hf.analyticAt_infinity z hz'
       have h0 : U z = 0 ∧ V z = 0 := by
@@ -168,7 +186,8 @@ theorem isAnalyticUniformization_of_isAnalyticIso {K : Type} [Field K] [NumberFi
       refine ⟨fun w ↦ (U w - C.r * V w) / (v * D w), fun w ↦ V w / (v ^ 3 * D w), ?_, ?_, ?_⟩
       · exact (hU.sub (analyticAt_const.mul hV)).div (analyticAt_const.mul hD)
           (mul_ne_zero hv (by rw [hDz]; exact one_ne_zero))
-      · exact hV.div (analyticAt_const.mul hD) (mul_ne_zero (pow_ne_zero 3 hv) (by rw [hDz]; exact one_ne_zero))
+      · exact hV.div (analyticAt_const.mul hD)
+          (mul_ne_zero (pow_ne_zero 3 hv) (by rw [hDz]; exact one_ne_zero))
       filter_upwards [hev, hDne] with w hw hDw
       rw [AddMonoidHom.comp_apply, AddEquiv.coe_toAddMonoidHom, vcPointEquiv_apply]
       rcases hw with ⟨hf0, hU0, hV0⟩ | ⟨hV0, hw, e⟩
@@ -186,36 +205,50 @@ theorem isAnalyticUniformization_of_isAnalyticIso {K : Type} [Field K] [NumberFi
           field_simp
           ring
   have hmul
-  {Λ Λ' : Submodule ℤ ℂ} {E : WeierstrassCurve ℂ}
-      {f : ℂ →+ E.toAffine.Point} (hf : IsAnalyticUniformization Λ f) {c : ℂ} (hc : c ≠ 0)
-      (hΛ : ∀ z, z ∈ Λ' ↔ c * z ∈ Λ) :
-      IsAnalyticUniformization Λ' (f.comp (AddMonoidHom.mulLeft c)) := by
+      {Λ Λ' : Submodule ℤ ℂ} {E : WeierstrassCurve ℂ} {f : ℂ →+ E.toAffine.Point}
+      (hf : IsAnalyticUniformization Λ f)
+      {c : ℂ} (hc : c ≠ 0) (hΛ : ∀ z, z ∈ Λ' ↔ c * z ∈ Λ)
+      : IsAnalyticUniformization Λ' (f.comp (AddMonoidHom.mulLeft c)) := by
     refine {
       map_eq_zero_iff := ?map_eq_zero_iff
       surjective := ?surjective
       analyticAt_affine := ?analyticAt_affine
-      analyticAt_infinity := ?analyticAt_infinity }
+      analyticAt_infinity := ?analyticAt_infinity
+    }
     case map_eq_zero_iff =>
       intro z
       rw [AddMonoidHom.comp_apply, AddMonoidHom.coe_mulLeft, hf.map_eq_zero_iff, hΛ]
     case surjective =>
       intro P
       obtain ⟨y, rfl⟩ := hf.surjective P
-      exact ⟨c⁻¹ * y, by rw [AddMonoidHom.comp_apply, AddMonoidHom.coe_mulLeft, mul_inv_cancel_left₀ hc]⟩
+      exact ⟨
+        c⁻¹ * y,
+        by rw [AddMonoidHom.comp_apply, AddMonoidHom.coe_mulLeft, mul_inv_cancel_left₀ hc]
+      ⟩
     case analyticAt_affine =>
       intro z hz
       obtain ⟨X, Y, hX, hY, hev⟩ := hf.analyticAt_affine (c * z) hz
       have ht : Tendsto (fun w ↦ c * w) (𝓝 z) (𝓝 (c * z)) := (continuous_const_mul c).tendsto z
-      refine ⟨fun w ↦ X (c * w), fun w ↦ Y (c * w), hX.comp_of_eq (by fun_prop) rfl,
-        hY.comp_of_eq (by fun_prop) rfl, ?_⟩
+      refine ⟨
+        fun w ↦ X (c * w),
+        fun w ↦ Y (c * w),
+        hX.comp_of_eq (by fun_prop) rfl,
+        hY.comp_of_eq (by fun_prop) rfl,
+        ?_
+      ⟩
       filter_upwards [ht.eventually hev] with w hw
       exact hw
     case analyticAt_infinity =>
       intro z hz
       obtain ⟨U, V, hU, hV, hev⟩ := hf.analyticAt_infinity (c * z) hz
       have ht : Tendsto (fun w ↦ c * w) (𝓝 z) (𝓝 (c * z)) := (continuous_const_mul c).tendsto z
-      refine ⟨fun w ↦ U (c * w), fun w ↦ V (c * w), hU.comp_of_eq (by fun_prop) rfl,
-        hV.comp_of_eq (by fun_prop) rfl, ?_⟩
+      refine ⟨
+        fun w ↦ U (c * w),
+        fun w ↦ V (c * w),
+        hU.comp_of_eq (by fun_prop) rfl,
+        hV.comp_of_eq (by fun_prop) rfl,
+        ?_
+      ⟩
       filter_upwards [ht.eventually hev] with w hw
       exact hw
   have hf := hvc (hmul hf0 hα hΛ') C⁻¹ h'

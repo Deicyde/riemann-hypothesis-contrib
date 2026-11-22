@@ -17,15 +17,25 @@ public import Development.AbelianVarietyTheory.Counterexamples.ModuliSurvey.IsQP
 
 open AlgebraicGeometry CategoryTheory
 open NumberField IsDedekindDomain Filter Topology
-open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
-open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec GlobalTheory.CompanionTheory.Ar.Plug
+open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.BasicNotions Formalism.MainNotions
+open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
+  GlobalTheory.CompanionTheory.Ar.Plug
 attribute [-instance] GlobalTheory.CompHt.fintypePsi
 
 noncomputable section
 
 namespace ModelDimension
 
-theorem subring_spec_morphism_ext : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (Ω : Type) [Field Ω] (A : Subring Ω) (g₁ g₂ : Spec (CommRingCat.of A) ⟶ Y.X), Spec.map (CommRingCat.ofHom (algebraMap A Ω)) ≫ g₁ = Spec.map (CommRingCat.ofHom (algebraMap A Ω)) ≫ g₂ → g₁ = g₂ := by
+theorem subring_spec_morphism_ext
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
+        (Ω : Type) [Field Ω] (A : Subring Ω) (g₁ g₂ : Spec (CommRingCat.of A) ⟶ Y.X),
+      Spec.map (CommRingCat.ofHom (algebraMap A Ω)) ≫ g₁
+          = Spec.map (CommRingCat.ofHom (algebraMap A Ω)) ≫ g₂
+        → g₁ = g₂ := by
   intro E _ _ _ H Dw l Xo c O _ β Y Ω _ A g₁ g₂ h
   have hpr : IsProper Y.s := GlobalTheory.SchemeWords.isProper_of_isProjOver Y.proj
   have hsep : Y.X.IsSeparated := by

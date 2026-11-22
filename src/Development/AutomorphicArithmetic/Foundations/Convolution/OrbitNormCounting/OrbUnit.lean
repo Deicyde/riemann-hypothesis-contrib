@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.OrbitNor
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 private theorem avg_const' {H : Type} [Group H] (c : ℂ) : avg (fun _ : H => c) = c := by
@@ -19,8 +20,11 @@ private theorem avg_const' {H : Type} [Group H] (c : ℂ) : avg (fun _ : H => c)
   intro x hx
   exact absurd (QuotientGroup.subsingleton_quotient_top.elim x _) hx
 
-private theorem cptPart_conj {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (T : Subgroup G) {t c : G} (ht : t ∈ T) (hc : c ∈ cptPart T) : t⁻¹ * c * t ∈ cptPart T := by
+private theorem cptPart_conj
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (T : Subgroup G)
+    {t c : G} (ht : t ∈ T) (hc : c ∈ cptPart T)
+    : t⁻¹ * c * t ∈ cptPart T := by
   unfold cptPart at hc ⊢
   induction hc using Subgroup.closure_induction with
   | mem x hx =>
@@ -40,7 +44,8 @@ private theorem cptPart_conj {G : Type} [Group G] [TopologicalSpace G] [IsTopolo
         exact ⟨n, hz n⟩
     rw [himg, ← e.image_closure]
     exact hx.2.image e.continuous
-  | one => simp
+  | one =>
+    simp
   | mul x y _ _ hx hy =>
     have : t⁻¹ * (x * y) * t = (t⁻¹ * x * t) * (t⁻¹ * y * t) := by group
     rw [this]
@@ -50,8 +55,7 @@ private theorem cptPart_conj {G : Type} [Group G] [TopologicalSpace G] [IsTopolo
     rw [this]
     exact Subgroup.inv_mem _ hx
 
-theorem UpperTheory.ConvolutionTheory.G3.orbUnit :
-    UpperTheory.ConvolutionTheory.G3.OrbUnit := by
+theorem UpperTheory.ConvolutionTheory.G3.orbUnit : UpperTheory.ConvolutionTheory.G3.OrbUnit := by
   intro G _ _ _ θ K δ hθ hδ horb hcpt
   unfold twOrb
   rw [finsum_eq_single _ (DoubleCoset.mk (twCent θ δ) K 1)]
@@ -59,7 +63,8 @@ theorem UpperTheory.ConvolutionTheory.G3.orbUnit :
     generalize hxx : Quotient.out (DoubleCoset.mk (twCent θ δ) K 1) = x at hx ⊢
     rw [mul_one] at hx
     have ht' : t * δ = δ * θ t := ht
-    have h1 : (twCent θ δ ⊓ K.map (MulAut.conj x).toMonoidHom).relIndex (cptPart (twCent θ δ)) = 1 := by
+    have h1
+        : (twCent θ δ ⊓ K.map (MulAut.conj x).toMonoidHom).relIndex (cptPart (twCent θ δ)) = 1 := by
       rw [Subgroup.relIndex_eq_one]
       intro c hc
       have hc' := cptPart_conj _ ht hc
@@ -67,7 +72,9 @@ theorem UpperTheory.ConvolutionTheory.G3.orbUnit :
       refine ⟨hc.1, k⁻¹ * (t⁻¹ * c * t) * k, K.mul_mem (K.mul_mem (K.inv_mem hk) hc'.2) hk, ?_⟩
       rw [hx]
       simp [mul_assoc]
-    have h2 : (fun k' : K => (K : Set G).indicator (1 : G → ℂ) ((x * k')⁻¹ * δ * θ (x * k'))) = fun _ => 1 := by
+    have h2
+        : (fun k' : K => (K : Set G).indicator (1 : G → ℂ) ((x * k')⁻¹ * δ * θ (x * k')))
+          = fun _ => 1 := by
       funext k'
       have e : (x * k')⁻¹ * δ * θ (x * k') = (k * k')⁻¹ * δ * θ (k * k') := by
         have : δ * θ (x * k') = t * δ * θ (k * k') := by
@@ -81,8 +88,11 @@ theorem UpperTheory.ConvolutionTheory.G3.orbUnit :
     rw [h1, h2, avg_const']
     simp
   · intro q hq
-    have h2 : (fun k' : K => (K : Set G).indicator (1 : G → ℂ)
-        ((Quotient.out q * k')⁻¹ * δ * θ (Quotient.out q * k'))) = fun _ => 0 := by
+    have h2
+        : (fun k' : K =>
+            (K : Set G).indicator (1 : G → ℂ)
+              ((Quotient.out q * k')⁻¹ * δ * θ (Quotient.out q * k')))
+          = fun _ => 0 := by
       funext k'
       apply Set.indicator_of_notMem
       intro hy
@@ -95,7 +105,9 @@ theorem UpperTheory.ConvolutionTheory.G3.orbUnit :
       · generalize Quotient.out q * (k' : G) = g at e
         show g * k⁻¹ * δ = δ * θ (g * k⁻¹)
         rw [map_mul, map_inv]
-        calc g * k⁻¹ * δ = g * (k⁻¹ * δ * θ k) * (θ k)⁻¹ := by group
+        calc
+          g * k⁻¹ * δ
+            = g * (k⁻¹ * δ * θ k) * (θ k)⁻¹ := by group
           _ = δ * (θ g * (θ k)⁻¹) := by rw [← e]; group
       · show Quotient.out q = _
         group

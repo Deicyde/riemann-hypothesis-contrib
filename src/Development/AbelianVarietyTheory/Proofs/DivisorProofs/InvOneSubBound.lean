@@ -27,35 +27,37 @@ private lemma one_le_ramificationIdx_mul_inertiaDeg_of_mem (E : Type) [Field E]
     (Ideal.inertiaDeg'_pos p.asIdeal P).ne')
 
 open IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.HenQ.Regroup.mem_fin (E : Type) [Field E] [NumberField E]
-    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)) :
-    v.asIdeal ∈
-      IsDedekindDomain.primesOverFinset
-        (IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v).asIdeal
-        (NumberField.RingOfIntegers E) := by
+theorem _root_.GlobalTheory.HenQ.Regroup.mem_fin
+    (E : Type) [Field E] [NumberField E]
+    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E))
+    : v.asIdeal ∈ IsDedekindDomain.primesOverFinset
+      (IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v).asIdeal
+      (NumberField.RingOfIntegers E) := by
   haveI := (HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v).isMaximal
-  rw [IsDedekindDomain.mem_primesOverFinset_iff
-    (HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v).ne_bot,
+  rw [IsDedekindDomain.mem_primesOverFinset_iff (HeightOneSpectrum.under
+      (NumberField.RingOfIntegers ℚ) v).ne_bot,
     HeightOneSpectrum.under_asIdeal]
   exact ⟨v.isPrime, inferInstance⟩
 
 open IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.HenQ.Regroup.term_pos (E : Type) [Field E] [NumberField E]
-    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)) :
-    (1 : ℕ) ≤
-      (IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v).asIdeal.ramificationIdx'
-          v.asIdeal *
-        (IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v).asIdeal.inertiaDeg'
-          v.asIdeal :=
+theorem _root_.GlobalTheory.HenQ.Regroup.term_pos
+    (E : Type) [Field E] [NumberField E]
+    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E))
+    : (1 : ℕ)
+      ≤ (IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ)
+          v).asIdeal.ramificationIdx' v.asIdeal
+        * (IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ)
+          v).asIdeal.inertiaDeg' v.asIdeal :=
   one_le_ramificationIdx_mul_inertiaDeg_of_mem E _ (_root_.GlobalTheory.HenQ.Regroup.mem_fin E v)
 
 open IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.HenQ.Regroup.sum_eq (E : Type) [Field E] [NumberField E]
+theorem _root_.GlobalTheory.HenQ.Regroup.sum_eq
+    (E : Type) [Field E] [NumberField E]
     (hE : Module.finrank ℚ E = (2 : ℕ))
-    (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers ℚ)) :
-    ∑ P ∈ IsDedekindDomain.primesOverFinset p.asIdeal (NumberField.RingOfIntegers E),
-        p.asIdeal.ramificationIdx' P * p.asIdeal.inertiaDeg' P =
-      (2 : ℕ) := by
+    (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers ℚ))
+    : ∑ P ∈ IsDedekindDomain.primesOverFinset p.asIdeal (NumberField.RingOfIntegers E),
+          p.asIdeal.ramificationIdx' P * p.asIdeal.inertiaDeg' P
+      = (2 : ℕ) := by
   haveI := p.isMaximal
   rw [Ideal.sum_ramification_inertia (NumberField.RingOfIntegers E) ℚ E p.ne_bot, hE]
 
@@ -64,9 +66,10 @@ end GlobalTheory.HenQ.Regroup
 namespace GlobalTheory.HenQ.Regroup
 
 open IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.HenQ.Regroup.two_le_absNorm {K : Type} [Field K] [NumberField K]
-    (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers K)) :
-    (2 : ℕ) ≤ (Ideal.absNorm : Ideal (NumberField.RingOfIntegers K) → ℕ) p.asIdeal := by
+theorem _root_.GlobalTheory.HenQ.Regroup.two_le_absNorm
+    {K : Type} [Field K] [NumberField K]
+    (p : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers K))
+    : (2 : ℕ) ≤ (Ideal.absNorm : Ideal (NumberField.RingOfIntegers K) → ℕ) p.asIdeal := by
   have h0 : Ideal.absNorm p.asIdeal ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff]
     exact p.ne_bot
@@ -94,14 +97,16 @@ private lemma card_le_sum_ramificationIdx_mul_inertiaDeg_le_two (E : Type) [Fiel
       _ = 2 := _root_.GlobalTheory.HenQ.Regroup.sum_eq E hE p
 
 open IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.HenQ.Regroup.fiber_split (E : Type) [Field E] [NumberField E]
+theorem _root_.GlobalTheory.HenQ.Regroup.fiber_split
+    (E : Type) [Field E] [NumberField E]
     (hE : Module.finrank ℚ E = (2 : ℕ))
     (w w' v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E))
-    (hw' : IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w' =
-        IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w)
-    (hv : IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v =
-        IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w)
-    (hne : w' ≠ w) : v = w ∨ v = w' := by
+    (hw' : IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w'
+      = IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w)
+    (hv : IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v
+      = IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w)
+    (hne : w' ≠ w)
+    : v = w ∨ v = w' := by
   by_contra hcon
   push_neg at hcon
   have h1 : w.asIdeal ≠ w'.asIdeal := fun he => hne (HeightOneSpectrum.ext he).symm
@@ -112,10 +117,11 @@ theorem _root_.GlobalTheory.HenQ.Regroup.fiber_split (E : Type) [Field E] [Numbe
   have mv := _root_.GlobalTheory.HenQ.Regroup.mem_fin E v
   rw [hw'] at mw'
   rw [hv] at mv
-  have hsub : ({w.asIdeal, w'.asIdeal, v.asIdeal} : Finset (Ideal (NumberField.RingOfIntegers E))) ⊆
-      IsDedekindDomain.primesOverFinset
-        (HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w).asIdeal
-        (NumberField.RingOfIntegers E) := by
+  have hsub
+      : ({w.asIdeal, w'.asIdeal, v.asIdeal} : Finset (Ideal (NumberField.RingOfIntegers E)))
+        ⊆ IsDedekindDomain.primesOverFinset
+          (HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w).asIdeal
+          (NumberField.RingOfIntegers E) := by
     intro P hP
     simp only [Finset.mem_insert, Finset.mem_singleton] at hP
     rcases hP with rfl | rfl | rfl
@@ -123,22 +129,24 @@ theorem _root_.GlobalTheory.HenQ.Regroup.fiber_split (E : Type) [Field E] [Numbe
     · exact mw'
     · exact mv
   have hb := card_le_sum_ramificationIdx_mul_inertiaDeg_le_two E hE _ _ hsub
-  have hcard :
-      ({w.asIdeal, w'.asIdeal, v.asIdeal} : Finset (Ideal (NumberField.RingOfIntegers E))).card = 3 := by
+  have hcard
+      : ({w.asIdeal, w'.asIdeal, v.asIdeal} : Finset (Ideal (NumberField.RingOfIntegers E))).card
+        = 3 := by
     rw [Finset.card_insert_of_notMem (by simp [h1, h2]), Finset.card_pair h3]
   omega
 
 open IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.HenQ.Regroup.fiber_inert (E : Type) [Field E] [NumberField E]
+theorem _root_.GlobalTheory.HenQ.Regroup.fiber_inert
+    (E : Type) [Field E] [NumberField E]
     (hE : Module.finrank ℚ E = (2 : ℕ))
     (w v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E))
-    (hN : (Ideal.absNorm : Ideal (NumberField.RingOfIntegers E) → ℕ) w.asIdeal =
-        (Ideal.absNorm : Ideal (NumberField.RingOfIntegers ℚ) → ℕ)
-            (IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w).asIdeal ^
-          (2 : ℕ))
-    (hv : IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v =
-        IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w) :
-    v = w := by
+    (hN : (Ideal.absNorm : Ideal (NumberField.RingOfIntegers E) → ℕ) w.asIdeal
+      = (Ideal.absNorm : Ideal (NumberField.RingOfIntegers ℚ) → ℕ)
+          (IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w).asIdeal
+        ^ (2 : ℕ))
+    (hv : IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) v
+      = IsDedekindDomain.HeightOneSpectrum.under (NumberField.RingOfIntegers ℚ) w)
+    : v = w := by
   by_contra hne
   have hne' : w.asIdeal ≠ v.asIdeal := fun he => hne (HeightOneSpectrum.ext he).symm
   have hw := _root_.GlobalTheory.HenQ.Regroup.mem_fin E w
@@ -154,8 +162,9 @@ theorem _root_.GlobalTheory.HenQ.Regroup.fiber_inert (E : Type) [Field E] [Numbe
     (Nat.pow_right_injective (_root_.GlobalTheory.HenQ.Regroup.two_le_absNorm p) hn).symm
   have hwv := one_le_ramificationIdx_mul_inertiaDeg_of_mem E p hvm
   have hww := one_le_ramificationIdx_mul_inertiaDeg_of_mem E p hw
-  have hsub : ({w.asIdeal, v.asIdeal} : Finset (Ideal (NumberField.RingOfIntegers E))) ⊆
-      IsDedekindDomain.primesOverFinset p.asIdeal (NumberField.RingOfIntegers E) := by
+  have hsub
+      : ({w.asIdeal, v.asIdeal} : Finset (Ideal (NumberField.RingOfIntegers E)))
+        ⊆ IsDedekindDomain.primesOverFinset p.asIdeal (NumberField.RingOfIntegers E) := by
     intro P hP
     simp only [Finset.mem_insert, Finset.mem_singleton] at hP
     rcases hP with rfl | rfl
@@ -227,31 +236,34 @@ private lemma norm_inv_one_sub_sub_one_le_two_mul {z : ℂ} (hz : ‖z‖ ≤ 1 
   nlinarith [norm_nonneg z]
 
 open IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.HenQ.Regroup.multipliable_E (E : Type) [Field E] [NumberField E]
+theorem _root_.GlobalTheory.HenQ.Regroup.multipliable_E
+    (E : Type) [Field E] [NumberField E]
     (SE : Set (IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)))
-    (BE : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E) → Multiset ℂ)
-    (c₀ : ℝ) (r : ℕ)
+    (BE : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E) → Multiset ℂ) (c₀ : ℝ)
+    (r : ℕ)
     (hBE : ∀ w ∉ SE,
-      (BE w).card ≤ r ∧
-        ∀ b ∈ BE w,
+      (BE w).card ≤ r
+        ∧ ∀ b ∈ BE w,
           ‖b‖ ≤ (↑((Ideal.absNorm : Ideal (NumberField.RingOfIntegers E) → ℕ) w.asIdeal) : ℝ) ^ c₀)
-    (s : ℂ) (hs : c₀ + (1 : ℝ) < s.re) :
-    Multipliable fun (w : { w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E) //
-        w ∉ SE }) ↦
-      (Multiset.map
+    (s : ℂ) (hs : c₀ + (1 : ℝ) < s.re)
+    : Multipliable
+      fun (w : {w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E) // w ∉ SE}) ↦
+        (Multiset.map
           (fun (b : ℂ) ↦
-            ((1 : ℂ) -
-                b *
-                  (↑((Ideal.absNorm : Ideal (NumberField.RingOfIntegers E) → ℕ)
-                          (↑w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)).asIdeal) :
-                      ℂ) ^
-                    (-s))⁻¹)
+            ((1 : ℂ)
+              - b
+                * (↑((Ideal.absNorm : Ideal (NumberField.RingOfIntegers E) → ℕ)
+                      (↑w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers
+                        E)).asIdeal)
+                    : ℂ)
+                  ^ (-s))⁻¹)
           (BE (↑w : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)))).prod := by
   have hδ1 : 1 < s.re - c₀ := by linarith
   have hsum : Summable fun w : {w : HeightOneSpectrum (NumberField.RingOfIntegers E) // w ∉ SE} =>
-      ((Ideal.absNorm (w : HeightOneSpectrum (NumberField.RingOfIntegers E)).asIdeal : ℕ) : ℝ) ^
-        (-(s.re - c₀)) :=
-    ((_root_.GlobalTheory.countable_ideal_and_summable_absNorm_rpow E).2 (s.re - c₀) hδ1).2.subtype _
+      ((Ideal.absNorm (w : HeightOneSpectrum (NumberField.RingOfIntegers E)).asIdeal : ℕ) : ℝ)
+        ^ (-(s.re - c₀)) :=
+    ((_root_.GlobalTheory.countable_ideal_and_summable_absNorm_rpow E).2 (s.re - c₀) hδ1).2.subtype
+      _
   refine multipliable_of_norm_sub_one_le_summable _ _ (hsum.mul_left (2 * 2 ^ r)) (fun w => ?_)
   obtain ⟨hcard, hb⟩ := hBE w.1 w.2
   have hN2 : 2 ≤ Ideal.absNorm w.1.asIdeal := _root_.GlobalTheory.HenQ.Regroup.two_le_absNorm w.1
@@ -259,33 +271,37 @@ theorem _root_.GlobalTheory.HenQ.Regroup.multipliable_E (E : Type) [Field E] [Nu
   have hNR : (2 : ℝ) ≤ N := by exact_mod_cast hN2
   have hNpos : (0 : ℝ) < N := by linarith
   have hsmall : (N : ℝ) ^ (-(s.re - c₀)) ≤ 1 / 2 := by
-    calc (N : ℝ) ^ (-(s.re - c₀)) ≤ (N : ℝ) ^ (-1 : ℝ) :=
-          Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
+    calc
+      (N : ℝ) ^ (-(s.re - c₀))
+        ≤ (N : ℝ) ^ (-1 : ℝ) := Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
       _ = (N : ℝ)⁻¹ := Real.rpow_neg_one _
       _ ≤ 1 / 2 := by
-          rw [one_div]
-          exact inv_anti₀ (by norm_num) hNR
+        rw [one_div]
+        exact inv_anti₀ (by norm_num) hNR
   have hz : ∀ b ∈ BE w.1, ‖b * (N : ℂ) ^ (-s)‖ ≤ (N : ℝ) ^ (-(s.re - c₀)) := by
     intro b hbm
     rw [norm_mul, Complex.norm_natCast_cpow_of_pos (by omega), Complex.neg_re]
-    calc ‖b‖ * (N : ℝ) ^ (-s.re) ≤ (N : ℝ) ^ c₀ * (N : ℝ) ^ (-s.re) :=
-          mul_le_mul_of_nonneg_right (hb b hbm) (by positivity)
+    calc
+      ‖b‖ * (N : ℝ) ^ (-s.re)
+        ≤ (N : ℝ) ^ c₀ * (N : ℝ) ^ (-s.re) := mul_le_mul_of_nonneg_right (hb b hbm) (by positivity)
       _ = (N : ℝ) ^ (-(s.re - c₀)) := by
-          rw [← Real.rpow_add hNpos]
-          congr 1
-          ring
-  have hm := norm_multiset_prod_sub_one_le
-    (Multiset.map (fun b => (1 - b * (N : ℂ) ^ (-s))⁻¹) (BE w.1))
-    (ε := 2 * (N : ℝ) ^ (-(s.re - c₀))) (by positivity) (by linarith) (by
-      intro x hx
-      obtain ⟨b, hbm, rfl⟩ := Multiset.mem_map.mp hx
-      have := hz b hbm
-      exact (norm_inv_one_sub_sub_one_le_two_mul (by linarith)).trans (by linarith))
+        rw [← Real.rpow_add hNpos]
+        congr 1
+        ring
+  have hm :=
+    norm_multiset_prod_sub_one_le (Multiset.map (fun b => (1 - b * (N : ℂ) ^ (-s))⁻¹) (BE w.1))
+      (ε := 2 * (N : ℝ) ^ (-(s.re - c₀))) (by positivity) (by linarith)
+      (by
+        intro x hx
+        obtain ⟨b, hbm, rfl⟩ := Multiset.mem_map.mp hx
+        have := hz b hbm
+        exact (norm_inv_one_sub_sub_one_le_two_mul (by linarith)).trans (by linarith))
   rw [Multiset.card_map] at hm
   have hpow : (2 : ℝ) ^ (BE w.1).card ≤ 2 ^ r := pow_le_pow_right₀ (by norm_num) hcard
-  calc _ ≤ 2 * (N : ℝ) ^ (-(s.re - c₀)) * (2 ^ (BE w.1).card - 1) := hm
+  calc
+    _ ≤ 2 * (N : ℝ) ^ (-(s.re - c₀)) * (2 ^ (BE w.1).card - 1) := hm
     _ ≤ 2 * (N : ℝ) ^ (-(s.re - c₀)) * 2 ^ r :=
-        mul_le_mul_of_nonneg_left (by linarith) (by positivity)
+      mul_le_mul_of_nonneg_left (by linarith) (by positivity)
     _ = _ := by ring
 
 end GlobalTheory.HenQ.Regroup
@@ -293,15 +309,17 @@ end GlobalTheory.HenQ.Regroup
 namespace GlobalTheory.HenQ.Regroup
 
 open IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.HenQ.Regroup.fac_inert (B' : Multiset ℂ) (X : ℂ) :
-    (Multiset.map (fun (b : ℂ) ↦ ((1 : ℂ) - b * X)⁻¹) (B' + Multiset.map Neg.neg B')).prod =
-      (Multiset.map (fun (b : ℂ) ↦ ((1 : ℂ) - b * X ^ (2 : ℕ))⁻¹)
+theorem _root_.GlobalTheory.HenQ.Regroup.fac_inert (B' : Multiset ℂ) (X : ℂ)
+    : (Multiset.map (fun (b : ℂ) ↦ ((1 : ℂ) - b * X)⁻¹) (B' + Multiset.map Neg.neg B')).prod
+      = (Multiset.map
+        (fun (b : ℂ) ↦ ((1 : ℂ) - b * X ^ (2 : ℕ))⁻¹)
         (Multiset.map (fun (x : ℂ) ↦ x ^ (2 : ℕ)) B')).prod := by
   induction B' using Multiset.induction_on with
   | empty => simp
   | cons a m ih =>
     simp only [Multiset.map_cons, Multiset.cons_add, Multiset.prod_cons, Multiset.map_add (f := _),
-      Multiset.prod_add] at ih ⊢
+        Multiset.prod_add]
+      at ih ⊢
     rw [← ih]
     have hfac : ((1 : ℂ) - a ^ 2 * X ^ 2)⁻¹ = (1 - a * X)⁻¹ * (1 - -a * X)⁻¹ := by
       rw [← mul_inv]

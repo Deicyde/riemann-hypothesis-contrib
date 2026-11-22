@@ -12,11 +12,11 @@ section Chain
 
 variable {O : Type} [CommRing O] {M : Type} [AddCommGroup M] [Module O M]
 
-theorem chain_len_add (X Y Z : Submodule O M) (hXY : X ≤ Y) (hYZ : Y ≤ Z) :
-    Module.length O (↥Z ⧸ X.comap Z.subtype) =
-      Module.length O (↥Y ⧸ X.comap Y.subtype) + Module.length O (↥Z ⧸ Y.comap Z.subtype) := by
-  have hle : X.comap Y.subtype ≤ (X.comap Z.subtype).comap (Submodule.inclusion hYZ) :=
-    fun x hx => hx
+theorem chain_len_add (X Y Z : Submodule O M) (hXY : X ≤ Y) (hYZ : Y ≤ Z)
+    : Module.length O (↥Z ⧸ X.comap Z.subtype)
+      = Module.length O (↥Y ⧸ X.comap Y.subtype) + Module.length O (↥Z ⧸ Y.comap Z.subtype) := by
+  have hle : X.comap Y.subtype ≤ (X.comap Z.subtype).comap (Submodule.inclusion hYZ) := fun x hx =>
+    hx
   have hle2 : X.comap Z.subtype ≤ (Y.comap Z.subtype).comap LinearMap.id := fun x hx => hXY hx
   let f := Submodule.mapQ (X.comap Y.subtype) (X.comap Z.subtype) (Submodule.inclusion hYZ) hle
   let g := Submodule.mapQ (X.comap Z.subtype) (Y.comap Z.subtype) LinearMap.id hle2
@@ -46,10 +46,10 @@ theorem chain_len_add (X Y Z : Submodule O M) (hXY : X ≤ Y) (hYZ : Y ≤ Z) :
       exact y.2
   exact Module.length_eq_add_of_exact f g hf hg hfg
 
-theorem chain_len_le_of_le_sup (A X Z : Submodule O M) (hAZ : A ≤ Z) (hZ : Z ≤ A ⊔ X) :
-    Module.length O (↥Z ⧸ X.comap Z.subtype) ≤ Module.length O (↥A ⧸ X.comap A.subtype) := by
-  have hle : X.comap A.subtype ≤ (X.comap Z.subtype).comap (Submodule.inclusion hAZ) :=
-    fun x hx => hx
+theorem chain_len_le_of_le_sup (A X Z : Submodule O M) (hAZ : A ≤ Z) (hZ : Z ≤ A ⊔ X)
+    : Module.length O (↥Z ⧸ X.comap Z.subtype) ≤ Module.length O (↥A ⧸ X.comap A.subtype) := by
+  have hle : X.comap A.subtype ≤ (X.comap Z.subtype).comap (Submodule.inclusion hAZ) := fun x hx =>
+    hx
   apply Module.length_le_of_surjective (Submodule.mapQ _ _ (Submodule.inclusion hAZ) hle)
   intro q
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ q
@@ -60,8 +60,8 @@ theorem chain_len_le_of_le_sup (A X Z : Submodule O M) (hAZ : A ≤ Z) (hZ : Z �
   rw [← hax, show a - (a + x) = -x by abel]
   exact X.neg_mem hx
 
-theorem chain_len_le_top (A P : Submodule O M) (hA : ⊤ ≤ A ⊔ P) :
-    Module.length O (M ⧸ P) ≤ Module.length O (↥A ⧸ P.comap A.subtype) := by
+theorem chain_len_le_top (A P : Submodule O M) (hA : ⊤ ≤ A ⊔ P)
+    : Module.length O (M ⧸ P) ≤ Module.length O (↥A ⧸ P.comap A.subtype) := by
   apply Module.length_le_of_surjective (Submodule.mapQ (P.comap A.subtype) P A.subtype le_rfl)
   intro q
   obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective _ q
@@ -90,11 +90,15 @@ theorem column_chain_bound : ColChain := by
   | succ k ih =>
     have hk : F (k + 1) ≤ F k := hF k (Nat.lt_succ_self k)
     have ih' := ih (fun i hi => hF i (Nat.lt_succ_of_lt hi))
-    have e1 := chain_len_add (P ⊓ F k) ((F (k + 1) ⊔ P) ⊓ F k) (F k)
-      (inf_le_inf_right _ le_sup_right) inf_le_right
-    rw [comap_subtype_inf_of_le (F k) P (F k) le_rfl, comap_subtype_inf_of_le (F k) (F (k + 1) ⊔ P) (F k) le_rfl] at e1
-    have e2 := chain_len_le_of_le_sup (F (k + 1)) (P ⊓ F k) ((F (k + 1) ⊔ P) ⊓ F k)
-      (le_inf le_sup_left hk) (le_of_eq (sup_inf_assoc_of_le P hk))
+    have e1 :=
+      chain_len_add (P ⊓ F k) ((F (k + 1) ⊔ P) ⊓ F k) (F k) (inf_le_inf_right _ le_sup_right)
+        inf_le_right
+    rw [comap_subtype_inf_of_le (F k) P (F k) le_rfl,
+        comap_subtype_inf_of_le (F k) (F (k + 1) ⊔ P) (F k) le_rfl]
+      at e1
+    have e2 :=
+      chain_len_le_of_le_sup (F (k + 1)) (P ⊓ F k) ((F (k + 1) ⊔ P) ⊓ F k) (le_inf le_sup_left hk)
+        (le_of_eq (sup_inf_assoc_of_le P hk))
     rw [comap_subtype_inf_of_le (F (k + 1)) P (F k) hk] at e2
     rw [Finset.sum_range_succ, add_assoc]
     refine le_trans ih' (add_le_add le_rfl ?_)

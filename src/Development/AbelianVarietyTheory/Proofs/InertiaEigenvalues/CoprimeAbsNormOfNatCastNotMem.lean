@@ -8,10 +8,10 @@ namespace GlobalTheory.CoprimeAbsNorm
 
 open NumberField IsDedekindDomain
 
-theorem coprime_absNorm_of_natCast_notMem {E : Type} [Field E] [NumberField E]
-    {P : HeightOneSpectrum (RingOfIntegers E)} {m : ℕ}
-    (hm : (m : RingOfIntegers E) ∉ P.asIdeal) :
-    Nat.Coprime m (Ideal.absNorm P.asIdeal) := by
+theorem coprime_absNorm_of_natCast_notMem
+    {E : Type} [Field E] [NumberField E]
+    {P : HeightOneSpectrum (RingOfIntegers E)} {m : ℕ} (hm : (m : RingOfIntegers E) ∉ P.asIdeal)
+    : Nat.Coprime m (Ideal.absNorm P.asIdeal) := by
   apply Nat.coprime_of_dvd
   intro p hp hpm hpN
   haveI : Fact p.Prime := ⟨hp⟩
@@ -28,8 +28,7 @@ theorem coprime_absNorm_of_natCast_notMem {E : Type} [Field E] [NumberField E]
   have hpx : (p : RingOfIntegers E ⧸ P.asIdeal) * x = 0 := by
     rw [← nsmul_eq_mul, ← hx]
     exact addOrderOf_nsmul_eq_zero x
-  have hp0 : (p : RingOfIntegers E ⧸ P.asIdeal) = 0 :=
-    (mul_eq_zero.mp hpx).resolve_right hx0
+  have hp0 : (p : RingOfIntegers E ⧸ P.asIdeal) = 0 := (mul_eq_zero.mp hpx).resolve_right hx0
   have hpP : (p : RingOfIntegers E) ∈ P.asIdeal := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
     exact hp0

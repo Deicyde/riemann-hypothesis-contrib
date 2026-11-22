@@ -8,12 +8,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Filter Formalism.MainNotions.V.Pf.V2.Calc UpperTheory.V.Alg UpperTheory.V.Alg.M
 
-theorem UpperTheory.V.Alg.M.tsp_holds :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (K : Type) [Field K] [Algebra O K] [IsAlgClosed K] [FaithfulSMul O K]
-      (A : Type) [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O), IsWRing 𝒜 x →
-    ∀ I : Ideal A, I.IsHomogeneous 𝒜 → ∀ σ : 𝒜 0 →ₐ[O] K, (∀ b : 𝒜 0, (b : A) ∈ I → σ b = 0) →
-      ∃ ξ : A →ₐ[O] K, OnS I ξ ∧ res0 𝒜 ξ = σ := by
+theorem UpperTheory.V.Alg.M.tsp_holds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (K : Type) [Field K] [Algebra O K]
+        [IsAlgClosed K] [FaithfulSMul O K] (A : Type) [CommRing A] [Algebra O A]
+        (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O),
+      IsWRing 𝒜 x
+        → ∀ I : Ideal A,
+          I.IsHomogeneous 𝒜
+            → ∀ σ : 𝒜 0 →ₐ[O] K,
+              (∀ b : 𝒜 0, (b : A) ∈ I → σ b = 0) → ∃ ξ : A →ₐ[O] K, OnS I ξ ∧ res0 𝒜 ξ = σ := by
   intro O _ _ _ _ _ K _ _ _ _ A _ _ 𝒜 _ _ x hW I hI σ hσ
   haveI : Algebra.FiniteType (𝒜 0) A := (ft_holds O A 𝒜 x hW).1
   let p : A →ₗ[O] 𝒜 0 :=
@@ -57,7 +61,8 @@ theorem UpperTheory.V.Alg.M.tsp_holds :
       | mem w hw =>
         obtain ⟨c, hc, rfl⟩ := hw
         exact hgen c hc
-      | zero => simp
+      | zero =>
+        simp
       | add w w' _ _ hw hw' =>
         intro a
         rw [mul_add, map_add (f := _), map_add (f := _), hw, hw', add_zero]
@@ -68,9 +73,8 @@ theorem UpperTheory.V.Alg.M.tsp_holds :
     have h3 := h2 1
     rw [one_mul] at h3
     rw [map_add (f := _), map_add (f := _), h1, h3, add_zero]
-  obtain ⟨ξ, hξ1, hξ2, -⟩ := ns_holds O (𝒜 0) A K σ J 1
-    (fun b hb => Ideal.mem_sup_right (Ideal.mem_map_of_mem _ hb))
-    (by
+  obtain ⟨ξ, hξ1, hξ2, -⟩ :=
+    ns_holds O (𝒜 0) A K σ J 1 (fun b hb => Ideal.mem_sup_right (Ideal.mem_map_of_mem _ hb)) (by
       intro b n hb hmem
       apply hb
       rw [one_pow, mul_one] at hmem

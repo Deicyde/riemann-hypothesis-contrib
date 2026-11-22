@@ -13,8 +13,10 @@ namespace ReciprocityTheory.PGsh.Up.U3
 
 open ReciprocityTheory.PGsh.L2
 
-variable {p : ℕ} [hp : Fact p.Prime] {C : Type} [Field C] {v : Valuation C NNReal}
-  {R : Type} [CommRing R] [Algebra R C]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
 
 structure IsTeich (v : Valuation C NNReal) (ω : ZMod p → C) : Prop where
   pow : ∀ a, ω a ^ p = ω a
@@ -115,8 +117,8 @@ variable (hv : v.Integers R)
 include hv
 
 omit hv in
-theorem pow_mem' (AA : HopfOrder (C := C) R (ZMod p)) {f : ZMod p → C} (hf : f ∈ AA.carrier)
-    (n : ℕ) : f ^ n ∈ AA.carrier := by
+theorem pow_mem' (AA : HopfOrder (C := C) R (ZMod p)) {f : ZMod p → C} (hf : f ∈ AA.carrier) (n : ℕ)
+    : f ^ n ∈ AA.carrier := by
   induction n with
   | zero =>
     rw [pow_zero]
@@ -124,7 +126,6 @@ theorem pow_mem' (AA : HopfOrder (C := C) R (ZMod p)) {f : ZMod p → C} (hf : f
   | succ n ih =>
     rw [pow_succ]
     exact AA.mul_mem _ _ ih hf
-
 
 variable {ω : ZMod p → C} (hω : IsTeich v ω)
 include hω

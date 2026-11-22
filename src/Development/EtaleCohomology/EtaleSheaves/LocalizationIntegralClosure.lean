@@ -9,13 +9,14 @@ open Polynomial GlobalTheory.EtC
 
 namespace LateralTheory.E.LocalizationIntegralClosure
 
-theorem aic_loc (B : Type) [CommRing B] [IsDomain B] (M : Submonoid B) (hB : AIC B) :
-    AIC (Localization M) := by
+theorem aic_loc (B : Type) [CommRing B] [IsDomain B] (M : Submonoid B) (hB : AIC B)
+    : AIC (Localization M) := by
   classical
   intro p hp hd
   set L := Localization M
-  obtain ⟨s, hs⟩ := IsLocalization.exist_integer_multiples_of_finset (R := B) M
-    ((Finset.range (p.natDegree + 1)).image p.coeff) (S := L)
+  obtain ⟨s, hs⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (R := B) M
+      ((Finset.range (p.natDegree + 1)).image p.coeff) (S := L)
   set t : L := algebraMap B L (s : B) with ht
   have hlift : scaleRoots p t ∈ lifts (algebraMap B L) := by
     rw [lifts_iff_coeff_lifts]
@@ -36,8 +37,9 @@ theorem aic_loc (B : Type) [CommRing B] [IsDomain B] (M : Submonoid B) (hB : AIC
   refine ⟨algebraMap B L b * ((u⁻¹ : Lˣ) : L), ?_⟩
   have h1 : (scaleRoots p t).eval (algebraMap B L b) = 0 := by
     rw [← hq, eval_map, eval₂_at_apply, hb, map_zero]
-  have h2 : (scaleRoots p t).eval (t * (algebraMap B L b * ((u⁻¹ : Lˣ) : L))) =
-      t ^ p.natDegree * p.eval (algebraMap B L b * ((u⁻¹ : Lˣ) : L)) :=
+  have h2
+      : (scaleRoots p t).eval (t * (algebraMap B L b * ((u⁻¹ : Lˣ) : L)))
+        = t ^ p.natDegree * p.eval (algebraMap B L b * ((u⁻¹ : Lˣ) : L)) :=
     scaleRoots_eval₂_mul (p := p) (RingHom.id L) (algebraMap B L b * ((u⁻¹ : Lˣ) : L)) t
   have h3 : t * (algebraMap B L b * ((u⁻¹ : Lˣ) : L)) = algebraMap B L b := by
     rw [ht, ← hu, mul_comm (algebraMap B L b), ← mul_assoc, Units.mul_inv, one_mul]

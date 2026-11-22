@@ -6,7 +6,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cry
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CechPic GlobalTheory.TangentOrigin GlobalTheory.Vanishing GlobalTheory.CompHS
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CechPic
+  GlobalTheory.TangentOrigin GlobalTheory.Vanishing GlobalTheory.CompHS
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag psiSet TIx IsTanFrame)
 open scoped Classical
@@ -17,8 +20,8 @@ noncomputable section
 
 namespace GlobalTheory.ModifLift
 
-theorem spMap_fst_surjective_sqZero (K : Type) [Field K] (ι : Type) :
-    Function.Surjective (spMap (TrivSqZeroExt.fstHom K K (ι → K)).toRingHom) := by
+theorem spMap_fst_surjective_sqZero (K : Type) [Field K] (ι : Type)
+    : Function.Surjective (spMap (TrivSqZeroExt.fstHom K K (ι → K)).toRingHom) := by
   intro p
   refine ⟨(⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum K), ?_⟩
   refine PrimeSpectrum.ext (Ideal.ext fun x => ?_)
@@ -37,14 +40,19 @@ theorem spMap_fst_surjective_sqZero (K : Type) [Field K] (ι : Type) :
     have hu : IsUnit x := TrivSqZeroExt.isUnit_iff_isUnit_fst.2 (Ne.isUnit h0)
     exact p.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ hx hu)
 
-theorem exists_lift_sqZero {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-    {Xo : Moduli Dw l} {c : Coeff l} {Y : Model Xo c (RingHom.id c.F)} {X : FlagCover Y} {Z : Comp Xo c}
-    (M : Modif (str₀ X Z) (U₀ X Z) (dimFlag Dw)) {K : Type} [Field K] {ι : Type} (z : Sp K ⟶ M.X)
-    (hz : ⊤ ≤ z ⁻¹ᵁ M.off) (w : Sp (TrivSqZeroExt K (ι → K)) ⟶ X.YY)
-    (hw : spMap (TrivSqZeroExt.fstHom K K (ι → K)).toRingHom ≫ w = z ≫ toFlag M) :
-    ∃ w' : Sp (TrivSqZeroExt K (ι → K)) ⟶ M.X, w' ≫ toFlag M = w ∧
-      spMap (TrivSqZeroExt.fstHom K K (ι → K)).toRingHom ≫ w' = z ∧
-      ∀ O : M.X.Opens, ⊤ ≤ z ⁻¹ᵁ O → ⊤ ≤ w' ⁻¹ᵁ O := by
+theorem exists_lift_sqZero
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+    {Y : Model Xo c (RingHom.id c.F)} {X : FlagCover Y} {Z : Comp Xo c}
+    (M : Modif (str₀ X Z) (U₀ X Z) (dimFlag Dw))
+    {K : Type} [Field K]
+    {ι : Type}
+    (z : Sp K ⟶ M.X) (hz : ⊤ ≤ z ⁻¹ᵁ M.off)
+    (w : Sp (TrivSqZeroExt K (ι → K)) ⟶ X.YY)
+    (hw : spMap (TrivSqZeroExt.fstHom K K (ι → K)).toRingHom ≫ w = z ≫ toFlag M)
+    : ∃ w' : Sp (TrivSqZeroExt K (ι → K)) ⟶ M.X,
+      w' ≫ toFlag M = w ∧ spMap (TrivSqZeroExt.fstHom K K (ι → K)).toRingHom ≫ w' = z
+        ∧ ∀ O : M.X.Opens, ⊤ ≤ z ⁻¹ᵁ O → ⊤ ≤ w' ⁻¹ᵁ O := by
   set f := spMap (TrivSqZeroExt.fstHom K K (ι → K)).toRingHom with hf
   have hs := spMap_fst_surjective_sqZero K ι
   have hr : Set.range w ⊆ Set.range (inc₀ X Z) := by
@@ -71,7 +79,8 @@ theorem exists_lift_sqZero {E : Type} [Field E] [NumberField E] [IsCMField E] {H
   have hU' : ⊤ ≤ (f ≫ w₀) ⁻¹ᵁ U₀ X Z := fun s _ => hU (Set.mem_univ (f s))
   have hfw' : f ≫ w' = z := by
     obtain ⟨_, -, huniq⟩ := M.existsUnique_lift (f ≫ w₀) hU'
-    exact (huniq _ (show (f ≫ w') ≫ M.σ = f ≫ w₀ by rw [Category.assoc, hw'])).trans (huniq z hfw₀.symm).symm
+    exact (huniq _ (show (f ≫ w') ≫ M.σ = f ≫ w₀ by rw [Category.assoc, hw'])).trans
+      (huniq z hfw₀.symm).symm
   refine ⟨w', ?_, hfw', fun O hO t _ => ?_⟩
   · rw [toFlag, ← Category.assoc, hw', hw₀f]
   · obtain ⟨s, rfl⟩ := hs t

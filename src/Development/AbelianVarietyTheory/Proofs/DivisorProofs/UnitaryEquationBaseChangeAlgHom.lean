@@ -8,17 +8,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClosureDivMe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.Published
 open scoped TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem unitaryEq_baseChange {F E R K : Type} [Field F] [Field E] [Algebra F E] [CommRing R]
-    [Algebra F R] [CommRing K] [Algebra F K] (σ : E →ₐ[F] E) {M : ℕ}
-    (J : Matrix (Fin M) (Fin M) E) (φ : R →ₐ[F] K) (g : Matrix (Fin M) (Fin M) (R ⊗[F] E)) :
-    Formalism.UG.cT (sigR R σ) g * JR R J * g = JR R J →
-    Formalism.UG.cT (sigR K σ) (g.map (Algebra.TensorProduct.map φ (AlgHom.id F E))) * JR K J *
-      g.map (Algebra.TensorProduct.map φ (AlgHom.id F E)) = JR K J := by
+theorem unitaryEq_baseChange
+    {F E R K : Type}
+    [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R] [CommRing K] [Algebra F K]
+    (σ : E →ₐ[F] E)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+    (φ : R →ₐ[F] K) (g : Matrix (Fin M) (Fin M) (R ⊗[F] E))
+    : Formalism.UG.cT (sigR R σ) g * JR R J * g = JR R J
+      → Formalism.UG.cT (sigR K σ) (g.map (Algebra.TensorProduct.map φ (AlgHom.id F E))) * JR K J
+          * g.map (Algebra.TensorProduct.map φ (AlgHom.id F E))
+        = JR K J := by
   intro h
   set φ' : R ⊗[F] E →+* K ⊗[F] E := (Algebra.TensorProduct.map φ (AlgHom.id F E)).toRingHom
     with hφ'

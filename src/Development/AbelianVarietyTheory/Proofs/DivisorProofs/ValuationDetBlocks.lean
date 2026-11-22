@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NormSatak
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.Doubling
+  GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection
 open GlobalTheory.SplitFlip (omA omB invT IsUnif mem_KO_iff isOpen_KO)
 open GlobalTheory.StdLocZeta (StdSupp stdDatum)
 open GlobalTheory.StdLoc (glVol blockIdx)
@@ -34,10 +35,12 @@ end Renumber
 
 section Level
 
-variable {A A' D : Type} [Fintype A] [DecidableEq A] [Fintype A'] [DecidableEq A'] [Fintype D] [DecidableEq D]
+variable
+  {A A' D : Type}
+  [Fintype A] [DecidableEq A] [Fintype A'] [DecidableEq A'] [Fintype D] [DecidableEq D]
 
-theorem mem_image_KO {M : Matrix D D k} :
-    M ∈ Units.val '' (KO k D : Set (GL D k)) ↔ (∀ i j, M i j ∈ 𝒪[k]) ∧ valuation k M.det = 1 := by
+theorem mem_image_KO {M : Matrix D D k}
+    : M ∈ Units.val '' (KO k D : Set (GL D k)) ↔ (∀ i j, M i j ∈ 𝒪[k]) ∧ valuation k M.det = 1 := by
   constructor
   · rintro ⟨g, hg, rfl⟩
     exact ⟨((mem_KO_iff g).1 hg).1, SplitFlip.valuation_gdet_of_mem_KO hg⟩
@@ -52,11 +55,10 @@ theorem mem_image_KO {M : Matrix D D k} :
     change (algebraMap 𝒪[k] k).mapMatrix u.val = M
     rw [hu', e]
 
-theorem mem_KO_iff_det {g : GL D k} : g ∈ KO k D ↔ (∀ i j, g.val i j ∈ 𝒪[k]) ∧ valuation k g.val.det = 1 := by
+theorem mem_KO_iff_det {g : GL D k}
+    : g ∈ KO k D ↔ (∀ i j, g.val i j ∈ 𝒪[k]) ∧ valuation k g.val.det = 1 := by
   rw [← mem_image_KO]
   exact ⟨fun h => ⟨g, h, rfl⟩, fun ⟨u, hu, e⟩ => Units.ext e ▸ hu⟩
-
-
 
 variable {ϖ : kˣ} (hϖ : IsUnif ϖ) (c : ℕ) (σ : A ⊕ A' ≃ D)
 
@@ -68,20 +70,23 @@ section Pair
 
 variable {n n' : ℕ} {D : Type} [Fintype D] [DecidableEq D]
 
-def colDatum (ν : kˣ →* ℂˣ) (ϖ : kˣ) (c : ℕ) (σ : Fin n ⊕ Fin n' ≃ D) (X : Matrix (Fin n) D k) : ℂ :=
+def colDatum (ν : kˣ →* ℂˣ) (ϖ : kˣ) (c : ℕ) (σ : Fin n ⊕ Fin n' ≃ D) (X : Matrix (Fin n) D k)
+    : ℂ :=
   stdDatum ν ϖ c (Xᵀ.submatrix σ id)
 
 variable (ν : kˣ →* ℂˣ) (ϖ : kˣ) (c : ℕ) (σ : Fin n ⊕ Fin n' ≃ D)
 
-
 omit [Fintype D] [DecidableEq D] in
-theorem colDatum_eq {X : Matrix (Fin n) D k} {u : GL (Fin n) k} (hu : u ∈ KO k (Fin n))
-    (h₁ : ∀ i j, X i (σ (.inl j)) = u.val i j) (h₂ : ∀ i j, X i (σ (.inr j)) ∈ cball (ϖ ^ c)) :
-    colDatum ν ϖ c σ X = (((ν (GeneralLinearGroup.det u))⁻¹ : ℂˣ) : ℂ) := by
+theorem colDatum_eq
+    {X : Matrix (Fin n) D k} {u : GL (Fin n) k} (hu : u ∈ KO k (Fin n))
+    (h₁ : ∀ i j, X i (σ (.inl j)) = u.val i j) (h₂ : ∀ i j, X i (σ (.inr j)) ∈ cball (ϖ ^ c))
+    : colDatum ν ϖ c σ X = (((ν (GeneralLinearGroup.det u))⁻¹ : ℂˣ) : ℂ) := by
   have e : (Xᵀ.submatrix σ id).toRows₁ = u.valᵀ := by ext i j; exact h₁ j i
-  have h : StdSupp ϖ c (Xᵀ.submatrix σ id) :=
-    ⟨fun i j => by rw [e]; exact (mem_KO_iff_det.1 hu).1 j i, by rw [e, det_transpose]; exact (mem_KO_iff_det.1 hu).2,
-      fun i j => h₂ j i⟩
+  have h : StdSupp ϖ c (Xᵀ.submatrix σ id) := ⟨
+    fun i j => by rw [e]; exact (mem_KO_iff_det.1 hu).1 j i,
+    by rw [e, det_transpose]; exact (mem_KO_iff_det.1 hu).2,
+    fun i j => h₂ j i
+  ⟩
   rw [colDatum, stdDatum, dite_eq_left h]
   congr 3
   exact Units.ext (by simp [e])
@@ -89,7 +94,6 @@ theorem colDatum_eq {X : Matrix (Fin n) D k} {u : GL (Fin n) k} (hu : u ∈ KO k
 variable [MeasurableSpace k] [BorelSpace k] {m : Measure k}
 
 variable {ν ϖ}
-
 
 end Pair
 

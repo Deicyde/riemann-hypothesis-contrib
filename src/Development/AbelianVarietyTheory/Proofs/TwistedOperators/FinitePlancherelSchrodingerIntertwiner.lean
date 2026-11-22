@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.LocalIn
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.LiftRows
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -20,33 +23,35 @@ open Classical
 
 namespace GlobalTheory
 
-theorem finite_plancherel_schrodinger_intertwiner :
-∀ {X Aψ G : Type} [AddCommGroup X] [AddCommGroup Aψ] [AddCommGroup G] [Fintype G]
-  (ψ : AddChar Aψ ℂ) (B : X → X → Aψ) (Λc : AddSubgroup X) (red : Λc →+ G)
-  (T : (X → ℂ) →ₗ[ℂ] (X → ℂ)) (hs : X → (X → ℂ) → (X → ℂ)) (SB : (X → ℂ) → Prop) (Hd : X → Prop)
-  (Th : (X → ℂ) → Prop) (ip : (X → ℂ) → (X → ℂ) → ℂ) (f₀ : X → ℂ) (Gd : G → ℂ),
-  Function.Surjective red →
-  (∀ t k y, B (t + k) y = B t y + B k y) →
-  (∀ Ψ : X → ℂ, (∀ t, Ψ t ≠ 0 → t ∈ Λc) → (∀ t, ∀ u ∈ Λc, Ψ (t + Fintype.card G • u) = Ψ t) → SB Ψ) →
-  (∀ Φ, SB Φ → ∀ x ∈ Λc, T (fun t => Φ (t + x)) = hs x (T Φ)) →
-  (∀ Φ, SB Φ → ∀ y, Hd y → T (fun t => ψ (B t y) * Φ t) = hs y (T Φ)) →
-  T (fun t => if t ∈ Λc then 1 else 0) = f₀ →
-  (∀ x : Λc, red x ≠ 0 → ∃ y, Hd y ∧ (∀ k : Λc, red k = 0 → ψ (B k y) = 1) ∧ ψ (B x y) ≠ 1) →
-  (∀ w (a : ℂ) (f₁ f₂ : X → ℂ), hs w (a • f₁ + f₂) = a • hs w f₁ + hs w f₂) →
-  (∀ (a : ℂ) f₁ f₂, Th f₁ → Th f₂ → Th (a • f₁ + f₂)) →
-  (∀ w f, Th f → Th (hs w f)) →
-  (∀ (a : ℂ) f₁ f₂ g, Th f₁ → Th f₂ → Th g → ip (a • f₁ + f₂) g = a * ip f₁ g + ip f₂ g) →
-  (∀ f g, Th f → Th g → ip g f = starRingEnd ℂ (ip f g)) →
-  (∀ w f₁ f₂, Th f₁ → Th f₂ → ip (hs w f₁) (hs w f₂) = ip f₁ f₂) →
-  Th f₀ → ip f₀ f₀ = 1 →
-  ip (T fun t => if h : t ∈ Λc then Gd (red ⟨t, h⟩) else 0) (T fun t => if h : t ∈ Λc then Gd (red ⟨t, h⟩) else 0) =
-    ((∑ g, ‖Gd g‖ ^ 2 : ℝ) : ℂ) / (Fintype.card G : ℂ) := by
+theorem finite_plancherel_schrodinger_intertwiner
+    : ∀ {X Aψ G : Type} [AddCommGroup X] [AddCommGroup Aψ] [AddCommGroup G] [Fintype G]
+        (ψ : AddChar Aψ ℂ) (B : X → X → Aψ) (Λc : AddSubgroup X) (red : Λc →+ G)
+        (T : (X → ℂ) →ₗ[ℂ] (X → ℂ)) (hs : X → (X → ℂ) → (X → ℂ)) (SB : (X → ℂ) → Prop)
+        (Hd : X → Prop) (Th : (X → ℂ) → Prop) (ip : (X → ℂ) → (X → ℂ) → ℂ) (f₀ : X → ℂ)
+        (Gd : G → ℂ),
+      Function.Surjective red → (∀ t k y, B (t + k) y = B t y + B k y)
+        → (∀ Ψ : X → ℂ,
+          (∀ t, Ψ t ≠ 0 → t ∈ Λc) → (∀ t, ∀ u ∈ Λc, Ψ (t + Fintype.card G • u) = Ψ t) → SB Ψ)
+        → (∀ Φ, SB Φ → ∀ x ∈ Λc, T (fun t => Φ (t + x)) = hs x (T Φ))
+        → (∀ Φ, SB Φ → ∀ y, Hd y → T (fun t => ψ (B t y) * Φ t) = hs y (T Φ))
+        → T (fun t => if t ∈ Λc then 1 else 0) = f₀
+        → (∀ x : Λc, red x ≠ 0 → ∃ y, Hd y ∧ (∀ k : Λc, red k = 0 → ψ (B k y) = 1) ∧ ψ (B x y) ≠ 1)
+        → (∀ w (a : ℂ) (f₁ f₂ : X → ℂ), hs w (a • f₁ + f₂) = a • hs w f₁ + hs w f₂)
+        → (∀ (a : ℂ) f₁ f₂, Th f₁ → Th f₂ → Th (a • f₁ + f₂)) → (∀ w f, Th f → Th (hs w f))
+        → (∀ (a : ℂ) f₁ f₂ g, Th f₁ → Th f₂ → Th g → ip (a • f₁ + f₂) g = a * ip f₁ g + ip f₂ g)
+        → (∀ f g, Th f → Th g → ip g f = starRingEnd ℂ (ip f g))
+        → (∀ w f₁ f₂, Th f₁ → Th f₂ → ip (hs w f₁) (hs w f₂) = ip f₁ f₂) → Th f₀ → ip f₀ f₀ = 1
+        → ip (T fun t => if h : t ∈ Λc then Gd (red ⟨t, h⟩) else 0)
+            (T fun t => if h : t ∈ Λc then Gd (red ⟨t, h⟩) else 0)
+          = ((∑ g, ‖Gd g‖ ^ 2 : ℝ) : ℂ) / (Fintype.card G : ℂ) := by
   intro X Aψ G _ _ _ _ ψ B Λc red T hs SB Hd Th ip f₀ Gd hsurj hB hSB htr hmod hf₀ hwit hslin hThlin
     hThhs hiplin hipconj hiphs hThf₀ hip₀
   obtain ⟨rep, hrep⟩ : ∃ rep : G → Λc, ∀ c, red (rep c) = c :=
     ⟨Function.surjInv hsurj, Function.surjInv_eq hsurj⟩
-  obtain ⟨ind, hind⟩ : ∃ ind : G → X → ℂ, ∀ c t, ind c t =
-      if h : t ∈ Λc then (if red ⟨t, h⟩ = c then (1:ℂ) else 0) else 0 := ⟨_, fun _ _ => rfl⟩
+  obtain ⟨ind, hind⟩
+      : ∃ ind : G → X → ℂ, ∀ c t,
+        ind c t = if h : t ∈ Λc then (if red ⟨t, h⟩ = c then (1 : ℂ) else 0) else 0 :=
+    ⟨_, fun _ _ => rfl⟩
   obtain ⟨g, hg⟩ : ∃ g : G → X → ℂ, ∀ c, g c = T (ind c) := ⟨_, fun _ => rfl⟩
   obtain ⟨χ, hχd⟩ : ∃ χ : X → G → ℂ, ∀ y c, χ y c = ψ (B (rep c) y) := ⟨_, fun _ _ => rfl⟩
   have hB0 : ∀ y, B 0 y = 0 := fun y => by simpa using hB 0 0 y
@@ -65,12 +70,13 @@ theorem finite_plancherel_schrodinger_intertwiner :
     rw [hχd, ← AddChar.map_nsmul_eq_pow, ← hBn]
     have := hy (Fintype.card G • rep c) (by rw [map_nsmul, card_nsmul_eq_zero])
     simpa using this
-  have hχnorm : ∀ y, (∀ k : Λc, red k = 0 → ψ (B k y) = 1) → ∀ c, ‖χ y c‖ = 1 :=
-    fun y hy c => Complex.norm_eq_one_of_pow_eq_one (hχpow y hy c) Fintype.card_ne_zero
-  have hχconj : ∀ y, (∀ k : Λc, red k = 0 → ψ (B k y) = 1) → ∀ c,
-      starRingEnd ℂ (χ y c) * χ y c = 1 := by
+  have hχnorm : ∀ y, (∀ k : Λc, red k = 0 → ψ (B k y) = 1) → ∀ c, ‖χ y c‖ = 1 := fun y hy c =>
+    Complex.norm_eq_one_of_pow_eq_one (hχpow y hy c) Fintype.card_ne_zero
+  have hχconj
+      : ∀ y, (∀ k : Λc, red k = 0 → ψ (B k y) = 1) → ∀ c, starRingEnd ℂ (χ y c) * χ y c = 1 := by
     intro y hy c
-    rw [Complex.conj_mul', hχnorm y hy c]; simp
+    rw [Complex.conj_mul', hχnorm y hy c]
+    simp
   have hsep : ∀ c d, c ≠ d → ∃ y, Hd y ∧ (∀ k : Λc, red k = 0 → ψ (B k y) = 1) ∧ χ y c ≠ χ y d := by
     intro c d hcd
     obtain ⟨y, hHd, hy, hne⟩ := hwit (rep (c - d)) (by rw [hrep]; exact sub_ne_zero.mpr hcd)
@@ -97,8 +103,8 @@ theorem finite_plancherel_schrodinger_intertwiner :
         rw [hind, hind, dite_eq_left ht, dite_eq_left ht', he]
       · have ht' : t + Fintype.card G • u ∉ Λc := fun h => ht (by simpa using Λc.sub_mem h hnu)
         rw [hind, hind, dite_eq_right ht, dite_eq_right ht']
-  have hmodg : ∀ y, Hd y → (∀ k : Λc, red k = 0 → ψ (B k y) = 1) → ∀ c,
-      hs y (g c) = χ y c • g c := by
+  have hmodg
+      : ∀ y, Hd y → (∀ k : Λc, red k = 0 → ψ (B k y) = 1) → ∀ c, hs y (g c) = χ y c • g c := by
     intro y hHd hy c
     rw [hg, ← hmod (ind c) (hSBind c) y hHd, ← map_smul]
     congr 1
@@ -137,8 +143,8 @@ theorem finite_plancherel_schrodinger_intertwiner :
       rw [Finset.sum_insert hds]
       exact hThlin _ _ _ (h d (Finset.mem_insert_self _ _))
         (ih fun c hc => h c (Finset.mem_insert_of_mem hc))
-  have hsSum : ∀ w (a : G → ℂ) (s : Finset G),
-      hs w (∑ c ∈ s, a c • g c) = ∑ c ∈ s, a c • hs w (g c) := by
+  have hsSum
+      : ∀ w (a : G → ℂ) (s : Finset G), hs w (∑ c ∈ s, a c • g c) = ∑ c ∈ s, a c • hs w (g c) := by
     intro w a s
     induction s using Finset.induction_on with
     | empty => simpa using hhs0 w
@@ -168,8 +174,9 @@ theorem finite_plancherel_schrodinger_intertwiner :
     · simp [ht]
   have hThg : ∀ c, Th (g c) := by
     intro c
-    have key : ∀ S : Finset G, c ∉ S →
-        ∃ a : G → ℂ, a c = 1 ∧ (∀ e ∈ S, a e = 0) ∧ Th (∑ e, a e • g e) := by
+    have key
+        : ∀ S : Finset G,
+          c ∉ S → ∃ a : G → ℂ, a c = 1 ∧ (∀ e ∈ S, a e = 0) ∧ Th (∑ e, a e • g e) := by
       intro S
       induction S using Finset.induction_on with
       | empty => intro _; exact ⟨fun _ => 1, rfl, by simp, by simpa [hf0sum] using hThf₀⟩
@@ -187,9 +194,10 @@ theorem finite_plancherel_schrodinger_intertwiner :
           rcases Finset.mem_insert.mp he with rfl | he
           · simp
           · simp [ha0 e he]
-        · have hrw : ∑ e, (a e * ((χ y e - χ y d) / (χ y c - χ y d))) • g e =
-              (χ y c - χ y d)⁻¹ • hs y (∑ e, a e • g e) +
-                (-(χ y d) / (χ y c - χ y d)) • ∑ e, a e • g e := by
+        · have hrw
+              : ∑ e, (a e * ((χ y e - χ y d) / (χ y c - χ y d))) • g e
+                = (χ y c - χ y d)⁻¹ • hs y (∑ e, a e • g e)
+                  + (-(χ y d) / (χ y c - χ y d)) • ∑ e, a e • g e := by
             rw [hsSum, Finset.smul_sum, Finset.smul_sum, ← Finset.sum_add_distrib]
             refine Finset.sum_congr rfl fun e _ => ?_
             rw [hmodg y hHd hy e, smul_smul, smul_smul, smul_smul, ← add_smul]
@@ -208,11 +216,14 @@ theorem finite_plancherel_schrodinger_intertwiner :
   have hip0 : ∀ h, Th h → ip 0 h = 0 := fun h hh => by simpa using hiplin 1 0 0 h hTh0 hTh0 hh
   have hipsL : ∀ a f h, Th f → Th h → ip (a • f) h = a * ip f h := fun a f h hf hh => by
     simpa [hip0 h hh] using hiplin a f 0 h hf hTh0 hh
-  have hipsR : ∀ a f h, Th f → Th h → ip f (a • h) = starRingEnd ℂ a * ip f h :=
-    fun a f h hf hh => by
-      rw [hipconj (a • h) f (hThsmul a h hh) hf, hipsL a h f hh hf, map_mul, ← hipconj h f hh hf]
-  have hipsumL : ∀ h, Th h → ∀ (a : G → ℂ) (s : Finset G),
-      ip (∑ c ∈ s, a c • g c) h = ∑ c ∈ s, a c * ip (g c) h := by
+  have hipsR
+      : ∀ a f h, Th f → Th h → ip f (a • h) = starRingEnd ℂ a * ip f h := fun a f h hf hh => by
+    rw [hipconj (a • h) f (hThsmul a h hh) hf, hipsL a h f hh hf, map_mul, ← hipconj h f hh hf]
+  have hipsumL
+      : ∀ h,
+        Th h
+          → ∀ (a : G → ℂ) (s : Finset G),
+            ip (∑ c ∈ s, a c • g c) h = ∑ c ∈ s, a c * ip (g c) h := by
     intro h hh a s
     induction s using Finset.induction_on with
     | empty => simpa using hip0 h hh
@@ -224,7 +235,8 @@ theorem finite_plancherel_schrodinger_intertwiner :
     obtain ⟨y, hHd, hy, hne⟩ := hsep c d hcd
     have h1 := hiphs y (g c) (g d) (hThg c) (hThg d)
     rw [hmodg y hHd hy c, hmodg y hHd hy d, hipsL _ _ _ (hThg c) (hThsmul _ _ (hThg d)),
-      hipsR _ _ _ (hThg c) (hThg d)] at h1
+        hipsR _ _ _ (hThg c) (hThg d)]
+      at h1
     have hk : χ y c * starRingEnd ℂ (χ y d) ≠ 1 := by
       intro h
       apply hne
@@ -239,15 +251,17 @@ theorem finite_plancherel_schrodinger_intertwiner :
   have hdiag : ∀ c, ip (g c) (g c) = ip (g 0) (g 0) := by
     intro c
     rw [← htrg c, hiphs _ _ _ (hThg c) (hThg c)]
-  have hgram : ∀ a b : G → ℂ, ip (∑ e, a e • g e) (∑ e, b e • g e) =
-      (∑ e, a e * starRingEnd ℂ (b e)) * ip (g 0) (g 0) := by
+  have hgram
+      : ∀ a b : G → ℂ,
+        ip (∑ e, a e • g e) (∑ e, b e • g e)
+          = (∑ e, a e * starRingEnd ℂ (b e)) * ip (g 0) (g 0) := by
     intro a b
     have hS : Th (∑ e, b e • g e) := hThsum b _ fun c _ => hThg c
     rw [hipsumL _ hS a Finset.univ, Finset.sum_mul]
     refine Finset.sum_congr rfl fun e _ => ?_
     rw [hipconj _ _ hS (hThg e), hipsumL _ (hThg e) b Finset.univ,
-      Finset.sum_eq_single e (fun d _ hde => by rw [horth d e hde, mul_zero]) (by simp),
-      map_mul, hdiag e, ← hipconj _ _ (hThg 0) (hThg 0)]
+      Finset.sum_eq_single e (fun d _ hde => by rw [horth d e hde, mul_zero]) (by simp), map_mul,
+      hdiag e, ← hipconj _ _ (hThg 0) (hThg 0)]
     ring
   have hD : ip (g 0) (g 0) = 1 / (Fintype.card G : ℂ) := by
     have h1 := hgram (fun _ => 1) (fun _ => 1)
@@ -255,7 +269,8 @@ theorem finite_plancherel_schrodinger_intertwiner :
     rw [← hf0sum, hip₀] at h1
     have hc : (Fintype.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
     rw [eq_div_iff hc]
-    rw [h1]; simp [mul_comm]
+    rw [h1]
+    simp [mul_comm]
   rw [hΦsum, hgram, hD]
   have hn : ∀ z : ℂ, z * starRingEnd ℂ z = ((‖z‖ ^ 2 : ℝ) : ℂ) := fun z => by
     rw [Complex.mul_conj, Complex.normSq_eq_norm_sq]

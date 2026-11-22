@@ -30,9 +30,14 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteDim
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.Grow GlobalTheory.Size
 
 noncomputable section
@@ -41,8 +46,8 @@ namespace GlobalTheory.AvgCoeff
 
 open MeasureTheory
 
-theorem exists_finset_sep {K : Type} (S : Submodule ℂ (K → ℂ)) [FiniteDimensional ℂ S] :
-    ∃ T : Finset K, ∀ s ∈ S, (∀ t ∈ T, s t = 0) → s = 0 := by
+theorem exists_finset_sep {K : Type} (S : Submodule ℂ (K → ℂ)) [FiniteDimensional ℂ S]
+    : ∃ T : Finset K, ∀ s ∈ S, (∀ t ∈ T, s t = 0) → s = 0 := by
   classical
   let f : Finset K → Submodule ℂ S := fun T =>
     ⨅ t ∈ T, LinearMap.ker ((LinearMap.proj (R := ℂ) (φ := fun _ : K => ℂ) t).comp S.subtype)
@@ -61,11 +66,15 @@ theorem exists_finset_sep {K : Type} (S : Submodule ℂ (K → ℂ)) [FiniteDime
     exact ht ((hmem _ _).1 h1 t (Finset.mem_insert_self t T))
   exact hT (insert t T) trivial (Submodule.finrank_lt_finrank_of_lt hlt)
 
-theorem integral_mem {K K' : Type} [MeasurableSpace K'] (μ : Measure K') (S : Submodule ℂ (K → ℂ))
-    [FiniteDimensional ℂ S] (F : K' → K → ℂ) (hF : ∀ k', F k' ∈ S)
-    (hi : ∀ k, Integrable (fun k' => F k' k) μ) : (fun k => ∫ k', F k' k ∂μ) ∈ S := by
+theorem integral_mem
+    {K K' : Type} [MeasurableSpace K']
+    (μ : Measure K')
+    (S : Submodule ℂ (K → ℂ)) [FiniteDimensional ℂ S]
+    (F : K' → K → ℂ) (hF : ∀ k', F k' ∈ S) (hi : ∀ k, Integrable (fun k' => F k' k) μ)
+    : (fun k => ∫ k', F k' k ∂μ) ∈ S := by
   obtain ⟨T, hT⟩ := exists_finset_sep S
-  let R : S →ₗ[ℂ] (T → ℂ) := LinearMap.pi fun t : T => (LinearMap.proj (R := ℂ) (φ := fun _ : K => ℂ) (t : K)).comp S.subtype
+  let R : S →ₗ[ℂ] (T → ℂ) :=
+    LinearMap.pi fun t : T => (LinearMap.proj (R := ℂ) (φ := fun _ : K => ℂ) (t : K)).comp S.subtype
   have hker : LinearMap.ker R = ⊥ := by
     refine LinearMap.ker_eq_bot'.2 fun u hu => Subtype.ext ?_
     refine hT u u.2 fun t ht => ?_
@@ -75,7 +84,8 @@ theorem integral_mem {K K' : Type} [MeasurableSpace K'] (μ : Measure K') (S : S
   let b := Pi.basisFun ℂ T
   have hexp : ∀ s ∈ S, s = ∑ t : T, s t • ((L (b t) : S) : K → ℂ) := by
     intro s hs
-    have h1 : (⟨s, hs⟩ : S) = L (R ⟨s, hs⟩) := by rw [← LinearMap.comp_apply, hL, LinearMap.id_apply]
+    have h1 : (⟨s, hs⟩ : S) = L (R ⟨s, hs⟩) := by
+      rw [← LinearMap.comp_apply, hL, LinearMap.id_apply]
     have h2 : R ⟨s, hs⟩ = ∑ t : T, s t • b t := by
       conv_lhs => rw [← b.sum_repr (R ⟨s, hs⟩)]
       simp [R, b]
@@ -89,25 +99,48 @@ theorem integral_mem {K K' : Type} [MeasurableSpace K'] (μ : Measure K') (S : S
       conv_lhs => rw [hexp (F k') (hF k')]
       simp [Finset.sum_apply]
     simp_rw [hk]
-    rw [integral_finsetSum (f := fun (t : T) k' => F k' t * ((L (b t) : S) : K → ℂ) k) Finset.univ
+    rw [integral_finsetSum
+      (f := fun (t : T) k' => F k' t * ((L (b t) : S) : K → ℂ) k)
+      Finset.univ
       fun t _ => (hi t).mul_const _]
     simp [Finset.sum_apply, integral_mul_const]
   rw [this]
   exact Submodule.sum_mem _ fun t _ => Submodule.smul_mem _ _ (L (b t)).2
 
-theorem coeffSpan_finiteDimensional {K W : Type} [Group K] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
-    (ρ : Representation ℂ K W) : FiniteDimensional ℂ (GlobalTheory.Published.AutFin.coeffSpan ρ) := by
+theorem coeffSpan_finiteDimensional
+    {K W : Type} [Group K] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (ρ : Representation ℂ K W)
+    : FiniteDimensional ℂ (GlobalTheory.Published.AutFin.coeffSpan ρ) := by
   first
   | exact @_root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan
   | exact _root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan
-  | (apply _root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan <;> assumption)
-  | (intros; apply _root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan <;> first | assumption | infer_instance)
-  | (intros; exact _root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan ..)
+  | (
+      apply _root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan
+        <;> assumption
+    )
+  | (
+      intros
+      apply _root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan
+        <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan
+        <;> first | assumption | infer_instance
+    )
+  | (
+      intros
+      exact _root_.GlobalTheory.CoefficientSpanFiniteDimensional.finiteDimensional_coeffSpan ..
+    )
 
-theorem coeffSpan_mulRight {K W : Type} [Group K] [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ K W) (k' : K)
-    {f : K → ℂ} (hf : f ∈ GlobalTheory.Published.AutFin.coeffSpan ρ) : (fun k => f (k * k')) ∈ GlobalTheory.Published.AutFin.coeffSpan ρ := by
-  have : GlobalTheory.Published.AutFin.coeffSpan ρ ≤ (GlobalTheory.Published.AutFin.coeffSpan ρ).comap (LinearMap.funLeft ℂ ℂ (· * k')) := by
+theorem coeffSpan_mulRight
+    {K W : Type} [Group K] [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ K W)
+    (k' : K)
+    {f : K → ℂ} (hf : f ∈ GlobalTheory.Published.AutFin.coeffSpan ρ)
+    : (fun k => f (k * k')) ∈ GlobalTheory.Published.AutFin.coeffSpan ρ := by
+  have : GlobalTheory.Published.AutFin.coeffSpan ρ
+      ≤ (GlobalTheory.Published.AutFin.coeffSpan ρ).comap (LinearMap.funLeft ℂ ℂ (· * k')) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨ℓ, w, rfl⟩
     exact Submodule.subset_span ⟨ℓ, ρ k' w, funext fun k => by simp [LinearMap.funLeft, map_mul]⟩
@@ -119,10 +152,15 @@ namespace GlobalTheory.CuspKFin
 
 open Formalism.REAL GlobalTheory.Published.AutFin GlobalTheory.AvgCoeff
 
-theorem kFinAt_avg_of_kFinAt : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀ (N : GlobalTheory.Grid.Node D) (ψ : GA D N.V → ℂ),
-    IsAutFunSm θ N.V ψ → ∀ (τ τ' : D.what₂.Tau) (e : Formalism.REAL.KG (N.M.ε τ') → ℂ),
-    GlobalTheory.TypeSum.KFinFun (N.M.ε τ') e → GlobalTheory.CuspKFin.KFinAt θ N τ ψ →
-    GlobalTheory.CuspKFin.KFinAt θ N τ (GlobalTheory.SeriesToClosure.avg θ N.V τ' (N.M.ε τ') (N.M.fr τ') e ψ) := by
+theorem kFinAt_avg_of_kFinAt
+    : ∀ (D : D7) (θ : InfFam D),
+      IsInfFam θ
+        → ∀ (N : GlobalTheory.Grid.Node D) (ψ : GA D N.V → ℂ),
+          IsAutFunSm θ N.V ψ
+            → ∀ (τ τ' : D.what₂.Tau) (e : Formalism.REAL.KG (N.M.ε τ') → ℂ),
+              GlobalTheory.TypeSum.KFinFun (N.M.ε τ') e → GlobalTheory.CuspKFin.KFinAt θ N τ ψ
+                → GlobalTheory.CuspKFin.KFinAt θ N τ
+                  (GlobalTheory.SeriesToClosure.avg θ N.V τ' (N.M.ε τ') (N.M.fr τ') e ψ) := by
   intro D θ hθ N ψ hψ τ τ' e he hK
   obtain ⟨W, i1, i2, i3, ρ, hρc, hρ⟩ := hK
   refine ⟨W, i1, i2, i3, ρ, hρc, fun x => ?_⟩
@@ -131,11 +169,18 @@ theorem kFinAt_avg_of_kFinAt : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀
   have hec : Continuous e := by
     obtain ⟨F, -, heF, hc, -⟩ := he
     exact hc e heF
-  have hAc : Continuous fun k' : Formalism.REAL.KG (N.M.ε τ') => atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ') :=
-    (GlobalTheory.PointAtPlaceHom.continuousOn_atTau hθ N.V τ').comp_continuous GlobalTheory.SeriesToClosure.continuous_conjK
+  have hAc : Continuous fun k' : Formalism.REAL.KG (N.M.ε τ') =>
+      atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ') :=
+    (GlobalTheory.PointAtPlaceHom.continuousOn_atTau hθ N.V τ').comp_continuous
+      GlobalTheory.SeriesToClosure.continuous_conjK
       fun k => conj_mem_UH (N.M.fr_unit τ') (N.M.fr_gram τ') k
-  have hmem : ∀ k' : Formalism.REAL.KG (N.M.ε τ'), (fun k => ψ (x * kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k *
-      atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ'))) ∈ GlobalTheory.Published.AutFin.coeffSpan ρ := by
+  have hmem
+      : ∀ k' : Formalism.REAL.KG (N.M.ε τ'),
+        (fun k =>
+            ψ
+              (x * kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k
+                * atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ')))
+          ∈ GlobalTheory.Published.AutFin.coeffSpan ρ := by
     intro k'
     by_cases h : τ' = τ
     · subst h
@@ -145,22 +190,36 @@ theorem kFinAt_avg_of_kFinAt : ∀ (D : D7) (θ : InfFam D), IsInfFam θ → ∀
       congr 2
       simp only [kAt]
       rw [← GlobalTheory.SeriesToClosure.at_mul hθ (N.M.fr_unit τ') (N.M.fr_gram τ')
-        (GlobalTheory.TypeSum.K_le_UJ (GlobalTheory.TypeSum.toMK_mem_K k)) (GlobalTheory.TypeSum.K_le_UJ (GlobalTheory.TypeSum.toMK_mem_K k'))]
+        (GlobalTheory.TypeSum.K_le_UJ (GlobalTheory.TypeSum.toMK_mem_K k))
+        (GlobalTheory.TypeSum.K_le_UJ (GlobalTheory.TypeSum.toMK_mem_K k'))]
       rfl
-    · have hc : ∀ k, kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k * atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ') =
-          atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ') * kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k := fun k =>
+    · have hc
+          : ∀ k,
+            kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k
+                * atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ')
+              = atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ')
+                * kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k := fun k =>
         GlobalTheory.PointAtPlaceComm.atTau_comm D θ hθ N.V τ τ' (Ne.symm h) _
-          (conj_mem_UH (N.M.fr_unit τ) (N.M.fr_gram τ) k) _ (conj_mem_UH (N.M.fr_unit τ') (N.M.fr_gram τ') k')
+          (conj_mem_UH (N.M.fr_unit τ) (N.M.fr_gram τ) k) _
+          (conj_mem_UH (N.M.fr_unit τ') (N.M.fr_gram τ') k')
       have h2 := hρ (x * atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ'))
       convert h2 using 2 with k
       rw [mul_assoc, hc, ← mul_assoc]
-  have hcont : ∀ k, Continuous fun k' : Formalism.REAL.KG (N.M.ε τ') => e k' * ψ (x * kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k *
-      atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ')) := fun k =>
+  have hcont
+      : ∀ k,
+        Continuous fun k' : Formalism.REAL.KG (N.M.ε τ') =>
+          e k' * ψ
+            (x * kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k
+              * atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ')) := fun k =>
     hec.mul (hψ.cont.comp (continuous_const.mul hAc))
-  have key := GlobalTheory.AvgCoeff.integral_mem (muK (N.M.ε τ')) (GlobalTheory.Published.AutFin.coeffSpan ρ)
-    (fun k' k => e k' * ψ (x * kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k *
-      atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ')))
-    (fun k' => Submodule.smul_mem _ (e k') (hmem k')) (fun k => GlobalTheory.ExpansionAverage.integrable_K (hcont k))
+  have key :=
+    GlobalTheory.AvgCoeff.integral_mem (muK (N.M.ε τ')) (GlobalTheory.Published.AutFin.coeffSpan ρ)
+      (fun k' k =>
+        e k' * ψ
+          (x * kAt θ N.V τ (N.M.ε τ) (N.M.fr τ) k
+            * atTau θ N.V τ' ((N.M.fr τ')⁻¹ * Formalism.REAL.toMK k' * N.M.fr τ')))
+      (fun k' => Submodule.smul_mem _ (e k') (hmem k'))
+      (fun k => GlobalTheory.ExpansionAverage.integrable_K (hcont k))
   exact key
 
 end GlobalTheory.CuspKFin

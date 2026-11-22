@@ -11,8 +11,8 @@ namespace LateralTheory.E.FracAICPf
 open Classical in
 theorem FracAIC_of : LateralTheory.E.ULAStalkPf.FracAIC := by
   intro T K _ _ _ _ _ hT p hp hdeg
-  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors T)
-    (p.support.image p.coeff)
+  obtain ⟨b, hb⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors T) (p.support.image p.coeff)
   set s : K := algebraMap T K b with hs
   have hs0 : s ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors b.2
   set q := p.scaleRoots s with hq

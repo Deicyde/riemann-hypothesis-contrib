@@ -8,10 +8,10 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem bilinForm_injective_exists_mul_mem_range (La : Type) [AddCommGroup La]
-    [Module.Free ℤ La] [Module.Finite ℤ La] (EF : LinearMap.BilinForm ℤ La)
-    (hEF : Function.Injective EF) :
-    ∃ e : ℕ, 0 < e ∧ ∀ f : La →ₗ[ℤ] ℤ, ∃ x, EF x = e • f := by
+theorem bilinForm_injective_exists_mul_mem_range
+    (La : Type) [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La]
+    (EF : LinearMap.BilinForm ℤ La) (hEF : Function.Injective EF)
+    : ∃ e : ℕ, 0 < e ∧ ∀ f : La →ₗ[ℤ] ℤ, ∃ x, EF x = e • f := by
   classical
   set ι := Module.Free.ChooseBasisIndex ℤ La
   let b : Module.Basis ι ℤ La := Module.Free.chooseBasis ℤ La
@@ -20,13 +20,14 @@ theorem bilinForm_injective_exists_mul_mem_range (La : Type) [AddCommGroup La]
   have key : ∀ (c : ι → ℤ) (j : ι), EF (∑ i, c i • b i) (b j) = (c ᵥ* A) j := by
     intro c j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_smul, LinearMap.sum_apply, vecMul, dotProduct, A, smul_eq_mul]
+    simp [map_sum, map_smul, LinearMap.sum_apply, vecMul, dotProduct, A, smul_eq_mul]
   have hdet : A.det ≠ 0 := by
     intro h0
     obtain ⟨v, hv, hvA⟩ := (Matrix.exists_vecMul_eq_zero_iff (M := A)).2 h0
     have hx : EF (∑ i, v i • b i) = 0 := by
       refine b.ext fun j => ?_
-      rw [key, hvA]; simp
+      rw [key, hvA]
+      simp
     have : (∑ i, v i • b i) = 0 := hEF (by rw [hx, map_zero])
     apply hv
     funext i

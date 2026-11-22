@@ -31,7 +31,8 @@ theorem map_cO_map_cO (I : Ideal (𝓞 K)) : (I.map (cO K)).map (cO K) = I := by
   · intro hy
     exact ⟨cO K y, ⟨y, hy, rfl⟩, cO_cO y⟩
 
-theorem conjPl_conjPl (w : HeightOneSpectrum (𝓞 K)) : conjPl (conjPl w) = w := HeightOneSpectrum.ext (map_cO_map_cO w.asIdeal)
+theorem conjPl_conjPl (w : HeightOneSpectrum (𝓞 K)) : conjPl (conjPl w) = w :=
+  HeightOneSpectrum.ext (map_cO_map_cO w.asIdeal)
 
 theorem map_cO_le_iff (I J : Ideal (𝓞 K)) : I.map (cO K) ≤ J.map (cO K) ↔ I ≤ J := by
   constructor
@@ -41,14 +42,14 @@ theorem map_cO_le_iff (I J : Ideal (𝓞 K)) : I.map (cO K) ≤ J.map (cO K) ↔
   · intro h
     exact Ideal.map_mono (f := cO K) h
 
-theorem dvd_map_iff (v : HeightOneSpectrum (𝓞 K)) (J : Ideal (𝓞 K)) (n : ℕ) :
-    (v.asIdeal.map (cO K)) ^ n ∣ J.map (cO K) ↔ v.asIdeal ^ n ∣ J := by
+theorem dvd_map_iff (v : HeightOneSpectrum (𝓞 K)) (J : Ideal (𝓞 K)) (n : ℕ)
+    : (v.asIdeal.map (cO K)) ^ n ∣ J.map (cO K) ↔ v.asIdeal ^ n ∣ J := by
   rw [← Ideal.map_pow, Ideal.dvd_iff_le, Ideal.dvd_iff_le, map_cO_le_iff]
 
-theorem count_map (v : HeightOneSpectrum (𝓞 K)) (J : Ideal (𝓞 K)) (hJ : J ≠ 0) :
-    FractionalIdeal.count K (conjPl v) ((J.map (cO K) : Ideal (𝓞 K)) :
-      FractionalIdeal (nonZeroDivisors (𝓞 K)) K) =
-    FractionalIdeal.count K v (J : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) := by
+theorem count_map (v : HeightOneSpectrum (𝓞 K)) (J : Ideal (𝓞 K)) (hJ : J ≠ 0)
+    : FractionalIdeal.count K (conjPl v)
+        ((J.map (cO K) : Ideal (𝓞 K)) : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)
+      = FractionalIdeal.count K v (J : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) := by
   have hJ' : J.map (cO K) ≠ 0 := fun h =>
     hJ ((Ideal.map_eq_bot_iff_of_injective (cO K).injective).mp h)
   rw [FractionalIdeal.count_coe K (conjPl v) hJ', FractionalIdeal.count_coe K v hJ]
@@ -66,8 +67,8 @@ theorem count_map (v : HeightOneSpectrum (𝓞 K)) (J : Ideal (𝓞 K)) (hJ : J 
 theorem vw_zero (w : HeightOneSpectrum (𝓞 K)) : vw w (0 : K) = 0 := by
   simp only [vw, FractionalIdeal.spanSingleton_zero, FractionalIdeal.count_zero]
 
-theorem vw_mul (w : HeightOneSpectrum (𝓞 K)) (a b : K) (ha : a ≠ 0) (hb : b ≠ 0) :
-    vw w (a * b) = vw w a + vw w b := by
+theorem vw_mul (w : HeightOneSpectrum (𝓞 K)) (a b : K) (ha : a ≠ 0) (hb : b ≠ 0)
+    : vw w (a * b) = vw w a + vw w b := by
   have h1 : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) a ≠ 0 := by
     rwa [Ne, FractionalIdeal.spanSingleton_eq_zero_iff]
   have h2 : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) b ≠ 0 := by
@@ -84,9 +85,10 @@ theorem vw_one (w : HeightOneSpectrum (𝓞 K)) : vw w (1 : K) = 0 := by
   simp only [vw]
   rw [FractionalIdeal.spanSingleton_one, FractionalIdeal.count_one]
 
-theorem vw_int (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K) :
-    vw w (x : K) = FractionalIdeal.count K w
-      ((Ideal.span {x} : Ideal (𝓞 K)) : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) := by
+theorem vw_int (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K)
+    : vw w (x : K)
+      = FractionalIdeal.count K w
+        ((Ideal.span {x} : Ideal (𝓞 K)) : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) := by
   rw [FractionalIdeal.coeIdeal_span_singleton]
   rfl
 
@@ -94,8 +96,8 @@ theorem vw_int_nonneg (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K) : 0 ≤ vw w
   rw [vw_int]
   exact FractionalIdeal.count_coe_nonneg K w _
 
-theorem vw_star_int (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K) :
-    vw w (star (x : K)) = vw (conjPl w) (x : K) := by
+theorem vw_star_int (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K)
+    : vw w (star (x : K)) = vw (conjPl w) (x : K) := by
   by_cases hx : x = 0
   · subst hx
     simp [vw_zero]
@@ -105,12 +107,11 @@ theorem vw_star_int (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K) :
     rw [conjPl_conjPl] at key
     rw [← cO_apply, vw_int, vw_int, ← key, Ideal.map_span, Set.image_singleton]
 
-private theorem vw_div (w : HeightOneSpectrum (𝓞 K)) (a b : K) (ha : a ≠ 0) (hb : b ≠ 0) :
-    vw w (a / b) = vw w a - vw w b := by
+private theorem vw_div (w : HeightOneSpectrum (𝓞 K)) (a b : K) (ha : a ≠ 0) (hb : b ≠ 0)
+    : vw w (a / b) = vw w a - vw w b := by
   rw [div_eq_mul_inv, vw_mul w a b⁻¹ ha (inv_ne_zero hb), vw_inv, sub_eq_add_neg]
 
-theorem vw_star (w : HeightOneSpectrum (𝓞 K)) (a : K) :
-    vw w (star a) = vw (conjPl w) a := by
+theorem vw_star (w : HeightOneSpectrum (𝓞 K)) (a : K) : vw w (star a) = vw (conjPl w) a := by
   obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 K) a
   have e : ∀ z : 𝓞 K, algebraMap (𝓞 K) K z = (z : K) := fun _ => rfl
   have hy0 : (y : K) ≠ 0 := by
@@ -119,16 +120,16 @@ theorem vw_star (w : HeightOneSpectrum (𝓞 K)) (a : K) :
   rw [e, e]
   by_cases hx0 : (x : K) = 0
   · rw [hx0, zero_div, star_zero, vw_zero, vw_zero]
-  · rw [star_div₀, vw_div w _ _ (star_ne_zero.mpr hx0) (star_ne_zero.mpr hy0),
-      vw_div _ _ _ hx0 hy0, vw_star_int, vw_star_int]
+  · rw [star_div₀, vw_div w _ _ (star_ne_zero.mpr hx0) (star_ne_zero.mpr hy0), vw_div _ _ _ hx0 hy0,
+      vw_star_int, vw_star_int]
 
-theorem absNorm_map_ringEquiv {S : Type*} [CommRing S] [IsDedekindDomain S]
-    [Module.Free ℤ S] [Module.Finite ℤ S] (g : S ≃+* S) (I : Ideal S) :
-    Ideal.absNorm (I.map g) = Ideal.absNorm I := by
+theorem absNorm_map_ringEquiv
+    {S : Type*} [CommRing S] [IsDedekindDomain S] [Module.Free ℤ S] [Module.Finite ℤ S]
+    (g : S ≃+* S) (I : Ideal S)
+    : Ideal.absNorm (I.map g) = Ideal.absNorm I := by
   by_cases hI : I = ⊥
   · simp [hI]
-  have hI' : I.map g ≠ ⊥ := fun h =>
-    hI ((Ideal.map_eq_bot_iff_of_injective g.injective).mp h)
+  have hI' : I.map g ≠ ⊥ := fun h => hI ((Ideal.map_eq_bot_iff_of_injective g.injective).mp h)
   rw [Ideal.absNorm_of_ne_bot hI', Ideal.absNorm_of_ne_bot hI, Submodule.cardQuot_apply,
     Submodule.cardQuot_apply]
   exact (Nat.card_congr (Ideal.quotientEquiv I (I.map g) g rfl).toEquiv).symm
@@ -137,9 +138,10 @@ theorem lw_conjPl (w : HeightOneSpectrum (𝓞 K)) : lw (conjPl w) = lw w := by
   unfold lw
   rw [show (conjPl w).asIdeal = w.asIdeal.map (cO K) from rfl, absNorm_map_ringEquiv]
 
-theorem gramR_eq {K : Type} [Field K] [StarRing K] {D m : ℕ} (Γ : Matrix (Fin D) (Fin D) K)
-    (e : Fin m → Fin D → K) :
-    gramR Γ e = ((Matrix.of e).map star * Γ * (Matrix.of e).transpose).det := by
+theorem gramR_eq
+    {K : Type} [Field K] [StarRing K]
+    {D m : ℕ} (Γ : Matrix (Fin D) (Fin D) K) (e : Fin m → Fin D → K)
+    : gramR Γ e = ((Matrix.of e).map star * Γ * (Matrix.of e).transpose).det := by
   unfold gramR
   congr 1
   ext a b
@@ -155,8 +157,15 @@ open ValuationRepresentative
 
 theorem valuation_basic_properties : ValBasic := by
   intro K _ _ _ w
-  exact ⟨fun a b ha hb => vw_mul w a b ha hb, vw_star w, lw_conjPl w, conjPl_conjPl w,
-    vw_one w, vw_inv w, vw_int_nonneg w⟩
+  exact ⟨
+    fun a b ha hb => vw_mul w a b ha hb,
+    vw_star w,
+    lw_conjPl w,
+    conjPl_conjPl w,
+    vw_one w,
+    vw_inv w,
+    vw_int_nonneg w
+  ⟩
 
 theorem gram_matrix_change : GramChange := by
   intro K _ _ D m Γ e γ
@@ -168,8 +177,9 @@ theorem gram_matrix_change : GramChange := by
     simp only [Matrix.map_apply, Matrix.mul_apply, Matrix.transpose_apply, Matrix.of_apply,
       star_sum, star_mul']
   have hd : (γᵀ.map star).det = star γ.det := Matrix.det_conjTranspose γ
-  have hr : γᵀ.map star * (Matrix.of e).map star * Γ * ((Matrix.of e)ᵀ * γ) =
-      γᵀ.map star * ((Matrix.of e).map star * Γ * (Matrix.of e)ᵀ) * γ := by
+  have hr
+      : γᵀ.map star * (Matrix.of e).map star * Γ * ((Matrix.of e)ᵀ * γ)
+        = γᵀ.map star * ((Matrix.of e).map star * Γ * (Matrix.of e)ᵀ) * γ := by
     simp only [Matrix.mul_assoc]
   rw [gramR_eq, gramR_eq, h, hm, Matrix.transpose_mul, Matrix.transpose_transpose, hr,
     Matrix.det_mul, Matrix.det_mul, hd]

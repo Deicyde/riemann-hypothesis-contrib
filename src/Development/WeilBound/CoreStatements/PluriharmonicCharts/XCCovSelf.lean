@@ -10,7 +10,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BlockDiagFrame
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -18,8 +22,11 @@ namespace PositivityTheory.Xgp.c_cov_self
 
 open GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Φ : Type} [Field Φ] {y : (Σ k, ι k) → Φ}
-  {Ψ : Type} {N j : ℕ}
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Φ : Type} [Field Φ]
+  {y : (Σ k, ι k) → Φ} {Ψ : Type} {N j : ℕ}
 
 def idCover (M : FlagModel y Ψ N j) : FlagCover M M where
   κ := id
@@ -29,34 +36,82 @@ def idCover (M : FlagModel y Ψ N j) : FlagCover M M where
   x_eq _ := rfl
   deg_pos := by
     show 0 < IntermediateField.relfinrank (blockFnField M.x) (blockFnField M.x)
-    rw [IntermediateField.relfinrank_self]; exact one_pos
+    rw [IntermediateField.relfinrank_self]
+    exact one_pos
   agree z hz F' F h' h g' g τ a b := ⟨all_mem hz h h' g g' τ a b, all_mem hz h' h g' g τ a b⟩
 
-theorem trans_eq (M : FlagModel y Ψ N j) (F' F : FrameData ι Ψ N M.Ω M.blk) (zb) (τ : Ψ) :
-    (idCover M).trans F' F zb τ = valMat M.x zb ((F.T τ)⁻¹ * F'.T τ) := rfl
+theorem trans_eq (M : FlagModel y Ψ N j) (F' F : FrameData ι Ψ N M.Ω M.blk) (zb) (τ : Ψ)
+    : (idCover M).trans F' F zb τ = valMat M.x zb ((F.T τ)⁻¹ * F'.T τ) :=
+  rfl
 
-theorem log_refNorm_congr {a : K → ℤ} {z z' : (Σ k, ι k) → ℂ}
-    (h : ∀ k, a k ≠ 0 → ∀ m, z ⟨k, m⟩ = z' ⟨k, m⟩) : refNorm a z = refNorm a z' := by
+theorem log_refNorm_congr
+    {a : K → ℤ} {z z' : (Σ k, ι k) → ℂ} (h : ∀ k, a k ≠ 0 → ∀ m, z ⟨k, m⟩ = z' ⟨k, m⟩)
+    : refNorm a z = refNorm a z' := by
   unfold refNorm
   refine Finset.prod_congr rfl fun k _ => ?_
   by_cases hk : a k = 0
   · simp [hk]
   · simp only [h k hk]
 
-theorem metric_self [Fintype Ψ] [DecidableEq Ψ] (M : FlagModel y Ψ N j) (z : (Σ k, ι k) → ℂ)
-    (hz : z ∈ mcPts (mCoordIdeal y)) (z₀ : (Σ k, ι k) → ℂ) (F' F : FrameData ι Ψ N M.Ω M.blk)
+theorem metric_self
+    [Fintype Ψ] [DecidableEq Ψ]
+    (M : FlagModel y Ψ N j)
+    (z : (Σ k, ι k) → ℂ) (hz : z ∈ mcPts (mCoordIdeal y))
+    (z₀ : (Σ k, ι k) → ℂ)
+    (F' F : FrameData ι Ψ N M.Ω M.blk)
     (h' : M.IsFrame F') (h : M.IsFrame F) (g' : M.GoodAt F' (mCoordIdeal (basePart M.blk z)))
-    (g : M.GoodAt F (mCoordIdeal (basePart M.blk z))) (ho : SameOrbit (basePart M.blk z₀) (basePart M.blk z))
-    (p : Ψ × Fin N) (H : Matrix (Fin N) (Fin N) ℂ) (hH : IsBlockDiag j H) (e' : ((fun {jExact : ℕ} (mExact : _root_.GlobalTheory.CompanionTheory.Ar.PB.FlagModel _ _ _ jExact) (fExact : _root_.GlobalTheory.CompanionTheory.Ar.PB.FrameData _ _ _ mExact.Ω mExact.blk) (pExact : _) (zExact : _ → ℂ) (hExact : _root_.Matrix _ _ ℂ) => (∀ kExact, _root_.GlobalTheory.CompanionTheory.Ar.PB.basePart mExact.blk zExact ⟨kExact, fExact.c kExact⟩ = 1) ∧ ∀ kExact, mExact.blk pExact = some kExact → ∀ iExact, zExact ⟨kExact, iExact⟩ = _root_.Finset.sum _root_.Finset.univ (fun aExact => _root_.GroundTheory.Heights₂.Heights.LowerBoundFree.valAt mExact.x (fExact.u ⟨kExact, iExact⟩ aExact) (_root_.GlobalTheory.CompanionTheory.Ar.PB.basePart mExact.blk zExact) * _root_.GlobalTheory.CompanionTheory.Ar.PB.minorIJ hExact aExact (_root_.GlobalTheory.CompanionTheory.Ar.PB.stepCols _ jExact pExact.2))) M) F' p z H)
-    (e : ((fun {jExact : ℕ} (mExact : _root_.GlobalTheory.CompanionTheory.Ar.PB.FlagModel _ _ _ jExact) (fExact : _root_.GlobalTheory.CompanionTheory.Ar.PB.FrameData _ _ _ mExact.Ω mExact.blk) (pExact : _) (zExact : _ → ℂ) (hExact : _root_.Matrix _ _ ℂ) => (∀ kExact, _root_.GlobalTheory.CompanionTheory.Ar.PB.basePart mExact.blk zExact ⟨kExact, fExact.c kExact⟩ = 1) ∧ ∀ kExact, mExact.blk pExact = some kExact → ∀ iExact, zExact ⟨kExact, iExact⟩ = _root_.Finset.sum _root_.Finset.univ (fun aExact => _root_.GroundTheory.Heights₂.Heights.LowerBoundFree.valAt mExact.x (fExact.u ⟨kExact, iExact⟩ aExact) (_root_.GlobalTheory.CompanionTheory.Ar.PB.basePart mExact.blk zExact) * _root_.GlobalTheory.CompanionTheory.Ar.PB.minorIJ hExact aExact (_root_.GlobalTheory.CompanionTheory.Ar.PB.stepCols _ jExact pExact.2))) M) F p z₀ ((idCover M).trans F' F (basePart M.blk z) p.1 * H)) :
-    Real.log ((fsHerm ι (M.dy p)).h z) + M.upsLog F' p z =
-      Real.log ((fsHerm ι (M.dy p)).h z₀) + M.upsLog F p z₀ +
-        Real.log ‖detFac j p.2 ((idCover M).trans F' F (basePart M.blk z) p.1)‖ := by
+    (g : M.GoodAt F (mCoordIdeal (basePart M.blk z)))
+    (ho : SameOrbit (basePart M.blk z₀) (basePart M.blk z))
+    (p : Ψ × Fin N) (H : Matrix (Fin N) (Fin N) ℂ) (hH : IsBlockDiag j H)
+    (e' : ((fun {jExact : ℕ}
+            (mExact : _root_.GlobalTheory.CompanionTheory.Ar.PB.FlagModel _ _ _ jExact)
+            (fExact : _root_.GlobalTheory.CompanionTheory.Ar.PB.FrameData _ _ _ mExact.Ω mExact.blk)
+            (pExact : _) (zExact : _ → ℂ) (hExact : _root_.Matrix _ _ ℂ) =>
+          (∀ kExact,
+              _root_.GlobalTheory.CompanionTheory.Ar.PB.basePart mExact.blk zExact
+                  ⟨kExact, fExact.c kExact⟩
+                = 1)
+            ∧ ∀ kExact,
+              mExact.blk pExact = some kExact
+                → ∀ iExact,
+                  zExact ⟨kExact, iExact⟩
+                    = _root_.Finset.sum _root_.Finset.univ (fun aExact =>
+                      _root_.GroundTheory.Heights₂.Heights.LowerBoundFree.valAt mExact.x
+                          (fExact.u ⟨kExact, iExact⟩ aExact)
+                          (_root_.GlobalTheory.CompanionTheory.Ar.PB.basePart mExact.blk zExact)
+                        * _root_.GlobalTheory.CompanionTheory.Ar.PB.minorIJ hExact aExact
+                          (_root_.GlobalTheory.CompanionTheory.Ar.PB.stepCols _ jExact pExact.2)))
+        M)
+      F' p z H)
+    (e : ((fun {jExact : ℕ}
+            (mExact : _root_.GlobalTheory.CompanionTheory.Ar.PB.FlagModel _ _ _ jExact)
+            (fExact : _root_.GlobalTheory.CompanionTheory.Ar.PB.FrameData _ _ _ mExact.Ω mExact.blk)
+            (pExact : _) (zExact : _ → ℂ) (hExact : _root_.Matrix _ _ ℂ) =>
+          (∀ kExact,
+              _root_.GlobalTheory.CompanionTheory.Ar.PB.basePart mExact.blk zExact
+                  ⟨kExact, fExact.c kExact⟩
+                = 1)
+            ∧ ∀ kExact,
+              mExact.blk pExact = some kExact
+                → ∀ iExact,
+                  zExact ⟨kExact, iExact⟩
+                    = _root_.Finset.sum _root_.Finset.univ (fun aExact =>
+                      _root_.GroundTheory.Heights₂.Heights.LowerBoundFree.valAt mExact.x
+                          (fExact.u ⟨kExact, iExact⟩ aExact)
+                          (_root_.GlobalTheory.CompanionTheory.Ar.PB.basePart mExact.blk zExact)
+                        * _root_.GlobalTheory.CompanionTheory.Ar.PB.minorIJ hExact aExact
+                          (_root_.GlobalTheory.CompanionTheory.Ar.PB.stepCols _ jExact pExact.2)))
+        M)
+      F p z₀ ((idCover M).trans F' F (basePart M.blk z) p.1 * H))
+    : Real.log ((fsHerm ι (M.dy p)).h z) + M.upsLog F' p z
+      = Real.log ((fsHerm ι (M.dy p)).h z₀) + M.upsLog F p z₀
+        + Real.log ‖detFac j p.2 ((idCover M).trans F' F (basePart M.blk z) p.1)‖ := by
   have hzb := CPts.base_mem M hz
   have hT := FibreCount.trans_unit (idCover M) hzb h' h g' g p.1
   have hd := CPts.detFac_ne_zero M.j_le p.2 hT.1 hT.2
   have hρ := rhoC_ne g g' p
-  have hval : ∀ s, valAt M.x s (basePart M.blk z₀) = valAt M.x s (basePart M.blk z) := valAt_orbit ho hzb
+  have hval : ∀ s, valAt M.x s (basePart M.blk z₀) = valAt M.x s (basePart M.blk z) :=
+    valAt_orbit ho hzb
   rw [trans_eq] at hd e ⊢
   set dd := detFac j p.2 (valMat M.x (basePart M.blk z) ((F.T p.1)⁻¹ * F'.T p.1)) with hdd
   set ρ := rhoC M F F' p (basePart M.blk z) with hρd
@@ -66,8 +121,13 @@ theorem metric_self [Fintype Ψ] [DecidableEq Ψ] (M : FlagModel y Ψ N j) (z : 
     have h1 := e.1 k
     rw [hco] at h1
     rw [e'.1 k, one_div, ← eq_inv_of_mul_eq_one_left h1]
-  let t : K → ℂ := fun k => if hk : ∀ p', M.blk p' ≠ some k then c ⟨k, hk⟩ else
-    if M.blk p = some k then ρ / dd else 1
+  let t : K → ℂ := fun k =>
+    if hk : ∀ p', M.blk p' ≠ some k then
+      c ⟨k, hk⟩
+    else if M.blk p = some k then
+      ρ / dd
+    else
+      1
   have ht : ∀ k, t k ≠ 0 := fun k => by
     simp only [t]
     split_ifs
@@ -103,7 +163,8 @@ theorem metric_self [Fintype Ψ] [DecidableEq Ψ] (M : FlagModel y Ψ N j) (z : 
       | some k₀ =>
         have hk₀ : ¬ ∀ p', M.blk p' ≠ some k₀ := fun e => e p hp
         rw [Finset.prod_eq_single ⟨k₀, hk₀⟩]
-        · simp only [t, FlagModel.dy, dif_neg hk₀, if_pos hp, _root_.zpow_one, norm_div, Option.elim_some]
+        · simp only [t, FlagModel.dy, dif_neg hk₀, if_pos hp, _root_.zpow_one, norm_div,
+            Option.elim_some]
         · intro k _ hk
           have : M.blk p ≠ some k.1 := fun e => hk (Subtype.ext (Option.some.inj (e.symm.trans hp)))
           simp only [FlagModel.dy, dif_neg k.2, if_neg this, _root_.zpow_zero]
@@ -112,8 +173,9 @@ theorem metric_self [Fintype Ψ] [DecidableEq Ψ] (M : FlagModel y Ψ N j) (z : 
   have hpos := (fsHerm ι (M.dy p)).pos z hz.1
   have hρn : 0 < ‖ρ‖ := norm_pos_iff.2 hρ
   have hdn : 0 < ‖dd‖ := norm_pos_iff.2 hd
-  have e4 : (fsHerm ι (M.dy p)).h z₀ =
-      (‖ρ‖⁻¹ * (M.blk p).elim 1 fun _ => ‖ρ‖ / ‖dd‖) * (fsHerm ι (M.dy p)).h z := by
+  have e4
+      : (fsHerm ι (M.dy p)).h z₀
+        = (‖ρ‖⁻¹ * (M.blk p).elim 1 fun _ => ‖ρ‖ / ‖dd‖) * (fsHerm ι (M.dy p)).h z := by
     rw [← e2]; exact e1.trans e3
   rw [e4]
   unfold FlagModel.upsLog
@@ -129,25 +191,35 @@ theorem metric_self [Fintype Ψ] [DecidableEq Ψ] (M : FlagModel y Ψ N j) (z : 
     linarith
   | some k =>
     simp only [Option.elim_some]
-    rw [← mul_div_assoc, inv_mul_cancel₀ hρn.ne', Real.log_mul (one_div_pos.2 hdn).ne' hpos.ne', one_div,
-      Real.log_inv]
+    rw [← mul_div_assoc, inv_mul_cancel₀ hρn.ne', Real.log_mul (one_div_pos.2 hdn).ne' hpos.ne',
+      one_div, Real.log_inv]
     ring
 
-theorem isImg_self [Fintype Ψ] [DecidableEq Ψ] (M : FlagModel y Ψ N j) (z : (Σ k, ι k) → ℂ)
-    (hz : z ∈ mcPts (mCoordIdeal y)) (F' F : FrameData ι Ψ N M.Ω M.blk)
+theorem isImg_self
+    [Fintype Ψ] [DecidableEq Ψ]
+    (M : FlagModel y Ψ N j)
+    (z : (Σ k, ι k) → ℂ) (hz : z ∈ mcPts (mCoordIdeal y))
+    (F' F : FrameData ι Ψ N M.Ω M.blk)
     (h' : M.IsFrame F') (h : M.IsFrame F) (g' : M.GoodAt F' (mCoordIdeal (basePart M.blk z)))
-    (g : M.GoodAt F (mCoordIdeal (basePart M.blk z))) (H : Ψ → Matrix (Fin N) (Fin N) ℂ) (hH : M.IsFlagOf F' z H) :
-    ∃ z₀, SameOrbit z₀ z ∧ SameOrbit (basePart M.blk z₀) (basePart M.blk z) ∧
-      M.IsFlagOf F z₀ fun τ => (idCover M).trans F' F (basePart M.blk z) τ * H τ := by
+    (g : M.GoodAt F (mCoordIdeal (basePart M.blk z)))
+    (H : Ψ → Matrix (Fin N) (Fin N) ℂ) (hH : M.IsFlagOf F' z H)
+    : ∃ z₀,
+      SameOrbit z₀ z ∧ SameOrbit (basePart M.blk z₀) (basePart M.blk z)
+        ∧ M.IsFlagOf F z₀ fun τ => (idCover M).trans F' F (basePart M.blk z) τ * H τ := by
   have hzb := CPts.base_mem M hz
   have hT := FibreCount.trans_unit (idCover M) hzb h' h g' g
-  refine (GlobalTheory.T.block_diag_frame_at_good_point K ι Φ y Ψ N j M F z _ h hzb g (fun τ => ⟨(hT τ).1.mul (hH.2.1 τ).1, by
-    rw [det_mul]; exact mul_ne_zero (hT τ).2 (hH.2.1 τ).2⟩) fun p k hp => ?_).2
+  refine (GlobalTheory.T.block_diag_frame_at_good_point K ι Φ y Ψ N j M F z _ h hzb g
+    (fun τ => ⟨(hT τ).1.mul (hH.2.1 τ).1, by rw [det_mul]; exact mul_ne_zero (hT τ).2 (hH.2.1 τ).2⟩)
+    fun p k hp => ?_).2
   obtain ⟨a, ha, hz'⟩ := hH.2.2 p k hp
   have hd := CPts.detFac_ne_zero M.j_le p.2 (hT p.1).1 (hT p.1).2
   have hρ := rhoC_ne g g' p
-  refine ⟨a * detFac j p.2 ((idCover M).trans F' F (basePart M.blk z) p.1) / rhoC M F F' p (basePart M.blk z),
-    div_ne_zero (mul_ne_zero ha hd) hρ, fun m => ?_⟩
+  refine ⟨
+    a * detFac j p.2 ((idCover M).trans F' F (basePart M.blk z) p.1)
+      / rhoC M F F' p (basePart M.blk z),
+    div_ne_zero (mul_ne_zero ha hd) hρ,
+    fun m => ?_
+  ⟩
   have r := relC hzb h h' g g' hp (H p.1) (hH.2.1 p.1).1 m
   rw [hz' m, plk, trans_eq, div_mul_eq_mul_div, mul_assoc, r]
   field_simp
@@ -155,7 +227,13 @@ theorem isImg_self [Fintype Ψ] [DecidableEq Ψ] (M : FlagModel y Ψ N j) (z : (
 end PositivityTheory.Xgp.c_cov_self
 end
 
-theorem PositivityTheory.Xgp.t_c_cov_self : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ] (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (M : FlagModel y Ψ N j) (n d : ℕ) (BM : BaseMetric M n) (FA : FlagAn BM d), ∃ (Cv : FlagCover M M) (CR : CovReal FA Cv), Cv.deg = 1 ∧ (∀ p, CR.Re.ref p = FA.Re.ref (some p)) ∧ ∀ p t, CR.Re.line p t = FA.Re.line (some p) t := by
+theorem PositivityTheory.Xgp.t_c_cov_self
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
+        (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
+        (M : FlagModel y Ψ N j) (n d : ℕ) (BM : BaseMetric M n) (FA : FlagAn BM d),
+      ∃ (Cv : FlagCover M M) (CR : CovReal FA Cv),
+        Cv.deg = 1 ∧ (∀ p, CR.Re.ref p = FA.Re.ref (some p))
+          ∧ ∀ p t, CR.Re.line p t = FA.Re.line (some p) t := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M n d BM FA
   have hJ : ∀ z, z ∉ mcPts FA.Re.J := fun z h => by
     rw [FA.J_top] at h
@@ -177,9 +255,12 @@ theorem PositivityTheory.Xgp.t_c_cov_self : ∀ (K : Type) [Fintype K] (ι : K �
     have m2 : x' ∈ FA.Re.π ⁻¹' {FA.Re.π x'} := rfl
     rw [ha] at m1 m2
     exact m1.trans m2.symm
-  have hdeg : (PositivityTheory.Xgp.c_cov_self.idCover M).deg = 1 := IntermediateField.relfinrank_self _
-  refine ⟨PositivityTheory.Xgp.c_cov_self.idCover M,
-    { Re := FA.Re.comap some
+  have hdeg : (PositivityTheory.Xgp.c_cov_self.idCover M).deg = 1 :=
+    IntermediateField.relfinrank_self _
+  refine ⟨
+    PositivityTheory.Xgp.c_cov_self.idCover M,
+    {
+      Re := FA.Re.comap some
       deg_eq := FA.deg_one.trans hdeg.symm
       ref_deg := fun p => congrArg HermLine.a (FA.ref_some p)
       step := FA.step
@@ -188,7 +269,12 @@ theorem PositivityTheory.Xgp.t_c_cov_self : ∀ (K : Type) [Fintype K] (ι : K �
       π_eq := fun x => (hϖ _ x (Cj.sameOrbit_refl _)).symm
       line_pt := ?_
       flags := ?_
-      metric := ?_ }, hdeg, fun _ => rfl, fun _ _ => rfl⟩
+      metric := ?_
+    },
+    hdeg,
+    fun _ => rfl,
+    fun _ _ => rfl
+  ⟩
   · intro z z' hz ho
     obtain ⟨x, hx⟩ := FA.Re.R.surj z hz (hJ z)
     rw [hϖ z x hx, hϖ z' x (Cj.sameOrbit_trans hx (Cj.sameOrbit_symm ho))]

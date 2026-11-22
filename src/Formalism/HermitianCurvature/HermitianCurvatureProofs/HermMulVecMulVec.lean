@@ -11,15 +11,18 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.YangianSpanCharacter.T
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.YangianSpanCharacter.T
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section Wave
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq] {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {π : Mx k r → (Wp →L[ℂ] Wp)}
-  {π' : Mx k r → (Wq →L[ℂ] Wq)}
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+  {k r : ℕ}
+  {z z' : Fin (2 * r + k + 1) → ℂ} {π : Mx k r → (Wp →L[ℂ] Wp)} {π' : Mx k r → (Wq →L[ℂ] Wq)}
 
 lemma mul_mem (m : (Fin r → ℂ) × Mx k r → ℂ) (hm : ContDiff ℝ ∞ m)
     (hinv : ∀ x ∈ DomR k r z z', ∀ h ∈ UWset k r z, ∀ h' ∈ UWset k r z', m (x.1, h * x.2 * h') = m x)
@@ -40,9 +43,11 @@ lemma mul_mem (m : (Fin r → ℂ) × Mx k r → ℂ) (hm : ContDiff ℝ ∞ m)
     ext v
     simp
 
-def mulOp (m : (Fin r → ℂ) × Mx k r → ℂ) (hm : ContDiff ℝ ∞ m)
-    (hinv : ∀ x ∈ DomR k r z z', ∀ h ∈ UWset k r z, ∀ h' ∈ UWset k r z', m (x.1, h * x.2 * h') = m x) :
-    Module.End ℂ (RadSp k r z z' π π') where
+def mulOp
+    (m : (Fin r → ℂ) × Mx k r → ℂ) (hm : ContDiff ℝ ∞ m)
+    (hinv
+      : ∀ x ∈ DomR k r z z', ∀ h ∈ UWset k r z, ∀ h' ∈ UWset k r z', m (x.1, h * x.2 * h') = m x)
+    : Module.End ℂ (RadSp k r z z' π π') where
   toFun Φ := ⟨_, mul_mem m hm hinv Φ⟩
   map_add' Φ Ψ := by
     ext c g v
@@ -106,20 +111,30 @@ end Wave
 
 theorem waveCExists : WaveCExists := by
   intro Wp Wq _ _ _ _ k r z z' π π' l s
-  exact ⟨mulOp (π := π) (π' := π') (fun x => fsv s (x.1 l)) (contDiff_fsv_coord l s)
-    (fun _ _ _ _ _ _ => rfl), mulOp_isMulOp _ _ _⟩
+  exact ⟨
+    mulOp (π := π) (π' := π')
+      (fun x => fsv s (x.1 l))
+      (contDiff_fsv_coord l s)
+      (fun _ _ _ _ _ _ => rfl),
+    mulOp_isMulOp _ _ _
+  ⟩
 
 theorem waveZExists : WaveZExists := by
   intro Wp Wq _ _ _ _ k r z z' π π' s
-  exact ⟨mulOp (π := π) (π' := π') (fun x => fsv s (zeta k r z z' x.2))
-    ((contDiff_fsv s).comp (contDiff_zeta (k := k) (r := r) (z := z) (z' := z')))
-    (fun x _ h hh h' hh' => by
-      show fsv s (zeta k r z z' (h * x.2 * h')) = fsv s (zeta k r z z' x.2)
-      rw [zeta_inv _ _ _ hh hh']), mulOp_isMulOp _ _ _⟩
+  exact ⟨
+    mulOp (π := π) (π' := π')
+      (fun x => fsv s (zeta k r z z' x.2))
+      ((contDiff_fsv s).comp (contDiff_zeta (k := k) (r := r) (z := z) (z' := z')))
+      (fun x _ h hh h' hh' => by
+        show fsv s (zeta k r z z' (h * x.2 * h')) = fsv s (zeta k r z z' x.2)
+        rw [zeta_inv _ _ _ hh hh']),
+    mulOp_isMulOp _ _ _
+  ⟩
 
 section Zero
 
-variable {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {Wp Wq : Type} [NormedAddCommGroup Wp]
+variable
+  {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {Wp Wq : Type} [NormedAddCommGroup Wp]
   [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
   {π : Mx k r → (Wp →L[ℂ] Wp)} {π' : Mx k r → (Wq →L[ℂ] Wq)} {S : Type} [Fintype S] [DecidableEq S]
 

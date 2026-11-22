@@ -17,9 +17,11 @@ open GlobalTheory.FlagFibre (Low)
 
 namespace GlobalTheory.FlagCell
 
-theorem exists_elim_row {R : Type} [CommRing R] {m : ℕ} (A : Matrix (Fin m) (Fin m) R) (i : Fin m)
-    (h : IsUnit (A.submatrix (Fin.castLE i.2.le) (Fin.castLE i.2.le)).det) :
-    ∃ r : Fin m → R, r i = 1 ∧ (∀ k, i < k → r k = 0) ∧ ∀ j, j < i → ∑ k, r k * A k j = 0 := by
+theorem exists_elim_row
+    {R : Type} [CommRing R]
+    {m : ℕ} (A : Matrix (Fin m) (Fin m) R) (i : Fin m)
+    (h : IsUnit (A.submatrix (Fin.castLE i.2.le) (Fin.castLE i.2.le)).det)
+    : ∃ r : Fin m → R, r i = 1 ∧ (∀ k, i < k → r k = 0) ∧ ∀ j, j < i → ∑ k, r k * A k j = 0 := by
   classical
   set c : Fin i → Fin m := Fin.castLE i.2.le with hc
   set B := A.submatrix c c with hB
@@ -40,12 +42,15 @@ theorem exists_elim_row {R : Type} [CommRing R] {m : ℕ} (A : Matrix (Fin m) (F
     simp only [Matrix.vecMul, dotProduct, hB, Matrix.submatrix_apply, hj'] at h1
     simp only [Pi.sub_apply, Finset.sum_apply, sub_mul, Finset.sum_sub_distrib, Finset.sum_mul]
     rw [Finset.sum_comm]
-    simp only [Pi.single_apply, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true, one_mul]
+    simp only [Pi.single_apply, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true,
+      one_mul]
     rw [h1, sub_self]
 
-theorem exists_lu (R : Type) [CommRing R] (m : ℕ) (A : Matrix (Fin m) (Fin m) R)
-    (h : ∀ l : Fin (m + 1), IsUnit (A.submatrix (Fin.castLE l.is_le) (Fin.castLE l.is_le)).det) :
-    ∃ (n : Low m → R) (M : Matrix (Fin m) (Fin m) R),
+theorem exists_lu
+    (R : Type) [CommRing R]
+    (m : ℕ) (A : Matrix (Fin m) (Fin m) R)
+    (h : ∀ l : Fin (m + 1), IsUnit (A.submatrix (Fin.castLE l.is_le) (Fin.castLE l.is_le)).det)
+    : ∃ (n : Low m → R) (M : Matrix (Fin m) (Fin m) R),
       M.BlockTriangular id ∧ IsUnit M.det ∧ A = uniR n * M := by
   classical
   choose r h1 h0 hA using fun i : Fin m => exists_elim_row A i (h i.castSucc)
@@ -57,7 +62,8 @@ theorem exists_lu (R : Type) [CommRing R] (m : ℕ) (A : Matrix (Fin m) (Fin m) 
   have hu : IsUnit L.det := hdet ▸ isUnit_one
   have hAu : IsUnit A.det := by simpa using h (Fin.last m)
   letI := L.invertibleOfIsUnitDet hu
-  have hLi : L⁻¹.BlockTriangular OrderDual.toDual := Matrix.blockTriangular_inv_of_blockTriangular hL
+  have hLi : L⁻¹.BlockTriangular OrderDual.toDual :=
+    Matrix.blockTriangular_inv_of_blockTriangular hL
   have hd : ∀ i, L⁻¹ i i = 1 := by
     intro i
     have := congrFun (congrFun (Matrix.mul_nonsing_inv L hu) i) i

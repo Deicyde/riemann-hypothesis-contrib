@@ -13,9 +13,9 @@ namespace RestTerms
 
 open MvPolynomial
 
-theorem rename_comp_restrictToBlock (f N : ℕ) (τ : Fin f) (π : Equiv.Perm (Fin N)) :
-    (rename π).comp (restrictToBlock f N τ) =
-      (restrictToBlock f N τ).comp (blockPermute f N (Function.update 1 τ π)) := by
+theorem rename_comp_restrictToBlock (f N : ℕ) (τ : Fin f) (π : Equiv.Perm (Fin N))
+    : (rename π).comp (restrictToBlock f N τ)
+      = (restrictToBlock f N τ).comp (blockPermute f N (Function.update 1 τ π)) := by
   apply MvPolynomial.algHom_ext
   rintro ⟨σ, i⟩
   by_cases h : σ = τ
@@ -25,8 +25,10 @@ theorem rename_comp_restrictToBlock (f N : ℕ) (τ : Fin f) (π : Equiv.Perm (F
 
 theorem FlagRestrictSymmetric.proof : FlagRestrictSymmetric.Statement := by
   intro f N τ R hR π
-  have key := congrArg (fun φ : RootRing f N →ₐ[ℚ] MvPolynomial (Fin N) ℚ => φ R)
-    (rename_comp_restrictToBlock f N τ π)
+  have key :=
+    congrArg
+      (fun φ : RootRing f N →ₐ[ℚ] MvPolynomial (Fin N) ℚ => φ R)
+      (rename_comp_restrictToBlock f N τ π)
   simp only [AlgHom.comp_apply] at key
   rw [key, hR]
 

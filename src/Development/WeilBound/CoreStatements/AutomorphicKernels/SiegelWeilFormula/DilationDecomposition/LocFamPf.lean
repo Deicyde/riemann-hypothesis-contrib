@@ -7,21 +7,27 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix SchwartzMap Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 open GlobalTheory.Doubling (absE)
 
 namespace PositivityTheory.SiegelWeilFormula.Kdil
 
 open Matrix
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem fam_eq_L_pf {d : SD σ} (R : RD d) {w : InfinitePlace F}
-    {L : GR d.n → ((Fin d.m → Fin d.n → ℂ) → ℂ) → (Fin d.m → Fin d.n → ℂ) → ℂ}
+theorem fam_eq_L_pf
+    {d : SD σ} (R : RD d)
+    {w : InfinitePlace F} {L : GR d.n → ((Fin d.m → Fin d.n → ℂ) → ℂ) → (Fin d.m → Fin d.n → ℂ) → ℂ}
     (hT : TAll) (hG : GoodAwayEx) (hFP : FPSw) (hL : R.IsLocOp w L)
-    (X : Fin d.n → ℝ) (a : ℝ → GR d.n) (ha : ∀ s, IsDil X s (a s)) (s : ℝ) :
-    L (a s) (fP 1) = fun v => fam d.m X s v := by
+    (X : Fin d.n → ℝ) (a : ℝ → GR d.n) (ha : ∀ s, IsDil X s (a s))
+    (s : ℝ)
+    : L (a s) (fP 1) = fun v => fam d.m X s v := by
   obtain ⟨k, hk⟩ := R.locOp_mM_law w hT hG hL
   set A : Matrix (Fin d.n) (Fin d.n) ℂ := diagonal fun j => (Real.exp (s * X j) : ℂ) with hA
   have hdet : A.det = ((Real.exp (∑ j, s * X j) : ℝ) : ℂ) := by
@@ -39,8 +45,7 @@ theorem fam_eq_L_pf {d : SD σ} (R : RD d) {w : InfinitePlace F}
     change (Real.exp (-(s * X i)) : ℂ) * star (Real.exp (s * X i) : ℂ) = 1
     rw [Complex.star_def, Complex.conj_ofReal]
     rw [← Complex.ofReal_mul, ← Real.exp_add, neg_add_cancel, Real.exp_zero, Complex.ofReal_one]
-  have hy : mR (a s) = mLoc A := by
-    rw [show mR (a s) = _ from ha s, mLoc, hinv]
+  have hy : mR (a s) = mLoc A := by rw [show mR (a s) = _ from ha s, mLoc, hinv]
   rw [hk (a s) A hunit hy (fP 1) (hFP d.m d.n 1)]
   funext v
   have hn : ‖A.det‖ = Real.exp (∑ j, s * X j) := by
@@ -63,8 +68,8 @@ theorem fam_eq_L_pf {d : SD σ} (R : RD d) {w : InfinitePlace F}
       rw [hA, Matrix.mul_diagonal]
       rfl
     erw [he]
-    rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (Real.exp_pos _).le, Complex.ofReal_mul, mul_pow,
-      Complex.ofReal_exp, ← Complex.exp_nat_mul, mul_comm]
+    rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (Real.exp_pos _).le, Complex.ofReal_mul,
+      mul_pow, Complex.ofReal_exp, ← Complex.exp_nat_mul, mul_comm]
     congr 2
     push_cast
     ring

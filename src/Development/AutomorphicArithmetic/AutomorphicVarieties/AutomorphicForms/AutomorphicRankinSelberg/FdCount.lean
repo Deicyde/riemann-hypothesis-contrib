@@ -7,16 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 open MeasureTheory Set UpperHalfPlane
 open scoped MatrixGroups ENNReal
 
-theorem UpperTheory.V.Af.Rs.fdCount :
-    UpperTheory.V.Af.Rs.FdNull → UpperTheory.V.Af.Rs.FdCount := by
+theorem UpperTheory.V.Af.Rs.fdCount : UpperTheory.V.Af.Rs.FdNull → UpperTheory.V.Af.Rs.FdCount := by
   intro hN
   unfold UpperTheory.V.Af.Rs.FdNull at hN
   unfold UpperTheory.V.Af.Rs.FdCount
   haveI : Countable (Matrix (Fin 2) (Fin 2) ℤ) := inferInstanceAs (Countable (Fin 2 → Fin 2 → ℤ))
   haveI : Countable SL(2, ℤ) :=
     inferInstanceAs (Countable {A : Matrix (Fin 2) (Fin 2) ℤ // A.det = 1})
-  have hnull : ∀ γ : SL(2, ℤ),
-      volume ((fun z : ℍ => γ • z) ⁻¹' (ModularGroup.fd \ ModularGroup.fdo)) = 0 := by
+  have hnull
+      : ∀ γ : SL(2, ℤ),
+        volume ((fun z : ℍ => γ • z) ⁻¹' (ModularGroup.fd \ ModularGroup.fdo)) = 0 := by
     intro γ
     have : (fun z : ℍ => γ • z) = fun z : ℍ => ((γ : GL (Fin 2) ℝ)) • z := rfl
     rw [this, measure_preimage_smul]
@@ -47,8 +47,7 @@ theorem UpperTheory.V.Af.Rs.fdCount :
     simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hγ
     apply indicator_of_notMem
     intro hmem
-    have heq : γ • z = (γ * g⁻¹) • (g • z) := by
-      rw [smul_smul, inv_mul_cancel_right]
+    have heq : γ • z = (γ * g⁻¹) • (g • z) := by rw [smul_smul, inv_mul_cancel_right]
     rw [heq] at hmem
     rcases ModularGroup.eq_one_or_neg_one_of_mem_fdo_mem_fd hgo hmem with h | h
     · exact hγ.1 (mul_inv_eq_one.mp h)

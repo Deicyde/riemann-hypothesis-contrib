@@ -15,8 +15,9 @@ namespace PositivityTheory.Rg.BcB.E2.P
 
 namespace Speciso
 
-variable {K : Type} [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K] {S : Type}
-  [TopologicalSpace S] [CompactSpace S] [T2Space S] [MeasurableSpace S] [BorelSpace S]
+variable
+  {K : Type} [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K]
+  {S : Type} [TopologicalSpace S] [CompactSpace S] [T2Space S] [MeasurableSpace S] [BorelSpace S]
 
 def Lmap (π : C(S, ℂ) →⋆ₐ[ℂ] (K →L[ℂ] K)) (v : K) : C(S, ℂ) →ₗ[ℂ] K where
   toFun f := π f v
@@ -59,8 +60,9 @@ theorem speciso : SpecIso := by
   let V : Lp ℂ 2 ν →L[ℂ] K := (Lmap π v).extendOfNorm e.toLinearMap
   have hVe : ∀ f, V (e f) = π f v := fun f => LinearMap.extendOfNorm_eq hdl hb f
   refine ⟨V, fun h => ?_, fun f h h' hh' => ?_⟩
-  · refine hd.induction_on (p := fun h => ‖V h‖ = ‖h‖) h
-      (isClosed_eq (continuous_norm.comp V.continuous) continuous_norm) ?_
+  · refine hd.induction_on
+      (p := fun h => ‖V h‖ = ‖h‖)
+      h (isClosed_eq (continuous_norm.comp V.continuous) continuous_norm) ?_
     intro g
     show ‖V (e g)‖ = ‖e g‖
     rw [hVe]
@@ -76,8 +78,9 @@ theorem speciso : SpecIso := by
       rw [hs, ContinuousLinearMap.mul_apply', hFs]
     have key : ∀ g, V (M g) = π f (V g) := by
       intro g
-      refine hd.induction_on (p := fun g => V (M g) = π f (V g)) g
-        (isClosed_eq (V.continuous.comp M.continuous) ((π f).continuous.comp V.continuous)) ?_
+      refine hd.induction_on
+        (p := fun g => V (M g) = π f (V g))
+        g (isClosed_eq (V.continuous.comp M.continuous) ((π f).continuous.comp V.continuous)) ?_
       intro g
       have : M (e g) = e (f * g) := by
         apply Lp.ext

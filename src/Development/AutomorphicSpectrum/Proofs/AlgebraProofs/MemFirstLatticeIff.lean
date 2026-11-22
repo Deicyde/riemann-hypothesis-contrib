@@ -11,20 +11,23 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Num.PtDx
 
-open GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.GR ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up
+open GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.GR
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up
 
-variable {o C : Type} [CommRing o] [Field C] [Algebra o C] (RC : Subalgebra o C)
-  {F : Type} [Field F] {n : ℕ}
+variable
+  {o C : Type} [CommRing o] [Field C] [Algebra o C]
+  (RC : Subalgebra o C)
+  {F : Type} [Field F]
+  {n : ℕ}
 
-theorem mem_flagSub_iff (i : ℕ) (x : Fin n → F) :
-    x ∈ flagSub (Pi.basisFun F (Fin n)) i ↔ ∀ j : Fin n, i ≤ (j : ℕ) → x j = 0 :=
+theorem mem_flagSub_iff (i : ℕ) (x : Fin n → F)
+    : x ∈ flagSub (Pi.basisFun F (Fin n)) i ↔ ∀ j : Fin n, i ≤ (j : ℕ) → x j = 0 :=
   _root_.UpperTheory.Reformulated.B.Qi34.mem_flagSub_iff i x
 
 theorem mem_stdLat {ι : Type} (f : ι → C) : f ∈ stdLat RC ι ↔ ∀ x, f x ∈ RC := by
   simp [stdLat, AddSubgroup.mem_pi]
 
-theorem mem_pInt (p : ℕ) (y : C) :
-    y ∈ pInt (C := C) RC p ↔ ∃ r : RC, y = (r : C) * (p : C) := by
+theorem mem_pInt (p : ℕ) (y : C) : y ∈ pInt (C := C) RC p ↔ ∃ r : RC, y = (r : C) * (p : C) := by
   unfold pInt
   rw [Submodule.mem_span_singleton]
   constructor
@@ -33,22 +36,22 @@ theorem mem_pInt (p : ℕ) (y : C) :
   · rintro ⟨r, rfl⟩
     exact ⟨r, rfl⟩
 
-theorem mem_vanSub (i : ℕ) (f : (Fin n → F) → C) :
-    f ∈ vanSub C F n i ↔ ∀ x : Fin n → F, (∀ j : Fin n, i ≤ (j : ℕ) → x j = 0) → f x = 0 := by
+theorem mem_vanSub (i : ℕ) (f : (Fin n → F) → C)
+    : f ∈ vanSub C F n i ↔ ∀ x : Fin n → F, (∀ j : Fin n, i ≤ (j : ℕ) → x j = 0) → f x = 0 := by
   simp [vanSub, Submodule.mem_pi]
 
-theorem mem_annSub (i : ℕ) (l : Fin n → C) :
-    l ∈ annSub C n i ↔ ∀ j : Fin n, (j : ℕ) < i → l j = 0 := by
+theorem mem_annSub (i : ℕ) (l : Fin n → C)
+    : l ∈ annSub C n i ↔ ∀ j : Fin n, (j : ℕ) < i → l j = 0 := by
   simp [annSub, Submodule.mem_pi]
 
-theorem linMap_apply (χ : F → C) (l : Fin n → C) (x : Fin n → F) :
-    linMap n χ l x = ∑ j, l j * χ (x j) := by
+theorem linMap_apply (χ : F → C) (l : Fin n → C) (x : Fin n → F)
+    : linMap n χ l x = ∑ j, l j * χ (x j) := by
   simp [linMap, Fintype.linearCombination_apply]
 
 variable {Sg : Type} {r s : Sg → ℕ}
 
-theorem mem_first_lattice_iff (D : LieLatticeData C F n Sg r s) (p : ℕ) (f : (Fin n → F) → C) :
-    f ∈ D.l1 RC p ↔ ∃ m ∈ D.M, ∀ x, f x - m x ∈ pInt (C := C) RC p := by
+theorem mem_first_lattice_iff (D : LieLatticeData C F n Sg r s) (p : ℕ) (f : (Fin n → F) → C)
+    : f ∈ D.l1 RC p ↔ ∃ m ∈ D.M, ∀ x, f x - m x ∈ pInt (C := C) RC p := by
   unfold LieLatticeData.l1
   rw [AddSubgroup.mem_sup]
   constructor
@@ -64,11 +67,13 @@ theorem mem_first_lattice_iff (D : LieLatticeData C F n Sg r s) (p : ℕ) (f : (
     funext x
     have := ht x
     simp only [Pi.add_apply, DistribSMul.toAddMonoidHom_apply, Pi.smul_apply, smul_eq_mul]
-    rw [mul_comm, ← this]; ring
+    rw [mul_comm, ← this]
+    ring
 
-theorem mem_xId (D : LieLatticeData C F n Sg r s) (χ : F → C) (i : Fin n) (c : C) :
-    c ∈ D.xId χ i ↔ ∃ g ∈ D.M, ∀ x : Fin n → F, (∀ j : Fin n, (i : ℕ) + 1 ≤ (j : ℕ) → x j = 0) →
-      g x = c * χ (x i) := by
+theorem mem_xId (D : LieLatticeData C F n Sg r s) (χ : F → C) (i : Fin n) (c : C)
+    : c ∈ D.xId χ i
+      ↔ ∃ g ∈ D.M, ∀ x : Fin n → F,
+        (∀ j : Fin n, (i : ℕ) + 1 ≤ (j : ℕ) → x j = 0) → g x = c * χ (x i) := by
   unfold LieLatticeData.xId
   rw [AddSubgroup.mem_comap]
   simp only [LinearMap.toAddMonoidHom_coe, LinearMap.toSpanSingleton_apply]
@@ -84,10 +89,11 @@ theorem mem_xId (D : LieLatticeData C F n Sg r s) (χ : F → C) (i : Fin n) (c 
     refine (mem_vanSub _ _).2 fun x hx => ?_
     simp [h x hx]
 
-theorem mem_dId (D : LieLatticeData C F n Sg r s) (p : ℕ) (χ : F → C) (i : Fin n) (c : C) :
-    c ∈ D.dId RC p χ i ↔ ∃ l : Fin n → C,
-      (∃ m ∈ D.M, ∀ x, (∑ j, l j * χ (x j)) - m x ∈ pInt (C := C) RC p) ∧
-      (∀ j : Fin n, (j : ℕ) < (i : ℕ) → l j = 0) ∧ l i = c := by
+theorem mem_dId (D : LieLatticeData C F n Sg r s) (p : ℕ) (χ : F → C) (i : Fin n) (c : C)
+    : c ∈ D.dId RC p χ i
+      ↔ ∃ l : Fin n → C,
+        (∃ m ∈ D.M, ∀ x, (∑ j, l j * χ (x j)) - m x ∈ pInt (C := C) RC p)
+          ∧ (∀ j : Fin n, (j : ℕ) < (i : ℕ) → l j = 0) ∧ l i = c := by
   unfold LieLatticeData.dId LieLatticeData.af
   constructor
   · rintro ⟨l, ⟨h1, h2⟩, rfl⟩
@@ -98,8 +104,8 @@ theorem mem_dId (D : LieLatticeData C F n Sg r s) (p : ℕ) (χ : F → C) (i : 
     refine ⟨l, ⟨?_, (mem_annSub _ _).2 h2⟩, rfl⟩
     exact (mem_first_lattice_iff RC D p _).2 ⟨m, hm, fun x => by simpa [linMap_apply] using h x⟩
 
-theorem fund_pow (p : ℕ) [hp : Fact p.Prime] (σ : MulChar F RC) (hσ : IsFund p σ) (k : ℕ) :
-    IsFund p (σ ^ p ^ k) := by
+theorem fund_pow (p : ℕ) [hp : Fact p.Prime] (σ : MulChar F RC) (hσ : IsFund p σ) (k : ℕ)
+    : IsFund p (σ ^ p ^ k) := by
   intro a b
   have hq : p ^ k ≠ 0 := pow_ne_zero _ hp.out.ne_zero
   rw [MulChar.pow_apply' _ hq, MulChar.pow_apply' _ hq, MulChar.pow_apply' _ hq]
@@ -114,10 +120,10 @@ theorem fund_pow (p : ℕ) [hp : Fact p.Prime] (σ : MulChar F RC) (hσ : IsFund
   rw [hm, pow_succ ((p : RC) * t) m]
   ring
 
-theorem step_coord (i : Fin n) (a : F) (k : Fin n → F)
-    (hk : k ∈ flagSub (Pi.basisFun F (Fin n)) (i : ℕ)) :
-    (∀ j : Fin n, (i : ℕ) + 1 ≤ (j : ℕ) → (a • Pi.basisFun F (Fin n) i + k) j = 0) ∧
-      (a • Pi.basisFun F (Fin n) i + k) i = a := by
+theorem step_coord
+    (i : Fin n) (a : F) (k : Fin n → F) (hk : k ∈ flagSub (Pi.basisFun F (Fin n)) (i : ℕ))
+    : (∀ j : Fin n, (i : ℕ) + 1 ≤ (j : ℕ) → (a • Pi.basisFun F (Fin n) i + k) j = 0)
+      ∧ (a • Pi.basisFun F (Fin n) i + k) i = a := by
   have hk' := (mem_flagSub_iff i k).1 hk
   constructor
   · intro j hj
@@ -125,9 +131,8 @@ theorem step_coord (i : Fin n) (a : F) (k : Fin n → F)
     simp [Pi.single_apply, hne, hk' j (by omega)]
   · simp [hk' i le_rfl]
 
-theorem step_decomp (i : Fin n) (x : Fin n → F)
-    (hx : ∀ j : Fin n, (i : ℕ) + 1 ≤ (j : ℕ) → x j = 0) :
-    ∃ k ∈ flagSub (Pi.basisFun F (Fin n)) (i : ℕ), x = x i • Pi.basisFun F (Fin n) i + k := by
+theorem step_decomp (i : Fin n) (x : Fin n → F) (hx : ∀ j : Fin n, (i : ℕ) + 1 ≤ (j : ℕ) → x j = 0)
+    : ∃ k ∈ flagSub (Pi.basisFun F (Fin n)) (i : ℕ), x = x i • Pi.basisFun F (Fin n) i + k := by
   refine ⟨Function.update x i 0, (mem_flagSub_iff _ _).2 fun j hj => ?_, ?_⟩
   · by_cases h : j = i
     · subst h; simp
@@ -143,11 +148,17 @@ theorem pInt_le_RC (p : ℕ) {y : C} (hy : y ∈ pInt (C := C) RC p) : y ∈ RC 
   obtain ⟨r, rfl⟩ := (mem_pInt RC p y).1 hy
   exact RC.mul_mem r.2 (natCast_mem RC p)
 
-theorem xId_iff (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n → F) → C))
-    (hM : M.toAddSubgroup = D.M) (hint : D.M ≤ stdLat RC _) (ψ : MulChar F RC) (χ : F → C)
-    (hχ : ∀ a, χ a = ((ψ a : RC) : C)) (i : Fin n) (c : C) :
-    c ∈ D.xId χ i ↔ ∃ c' ∈ xIdeal (stepOrderRes M (flagSub (Pi.basisFun F (Fin n)) (i : ℕ))
-      (Pi.basisFun F (Fin n) i)) ψ, (c' : C) = c := by
+theorem xId_iff
+    (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n → F) → C))
+    (hM : M.toAddSubgroup = D.M)
+    (hint : D.M ≤ stdLat RC _)
+    (ψ : MulChar F RC) (χ : F → C) (hχ : ∀ a, χ a = ((ψ a : RC) : C))
+    (i : Fin n) (c : C)
+    : c ∈ D.xId χ i
+      ↔ ∃ c'
+          ∈ xIdeal
+            (stepOrderRes M (flagSub (Pi.basisFun F (Fin n)) (i : ℕ)) (Pi.basisFun F (Fin n) i)) ψ,
+        (c' : C) = c := by
   have hχ1 : χ 1 = 1 := by simp [hχ]
   rw [mem_xId]
   constructor
@@ -175,11 +186,14 @@ section dId
 
 variable [DecidableEq F]
 
-theorem dId_forward (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n → F) → C))
-    (hM : M.toAddSubgroup = D.M) (hint : D.M ≤ stdLat RC _) (p : ℕ) (ψ : MulChar F RC)
-    (hψ : IsFund p ψ) (χ : F → C) (hχ : ∀ a, χ a = ((ψ a : RC) : C)) (i : Fin n) (c : C)
-    (hc : c ∈ D.dId RC p χ i) :
-    ∃ c' ∈ idealD p M (flagSub (Pi.basisFun F (Fin n)) (i : ℕ)) (Pi.basisFun F (Fin n) i) ψ,
+theorem dId_forward
+    (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n → F) → C))
+    (hM : M.toAddSubgroup = D.M)
+    (hint : D.M ≤ stdLat RC _)
+    (p : ℕ) (ψ : MulChar F RC) (hψ : IsFund p ψ)
+    (χ : F → C) (hχ : ∀ a, χ a = ((ψ a : RC) : C))
+    (i : Fin n) (c : C) (hc : c ∈ D.dId RC p χ i)
+    : ∃ c' ∈ idealD p M (flagSub (Pi.basisFun F (Fin n)) (i : ℕ)) (Pi.basisFun F (Fin n) i) ψ,
       (c' : C) = c := by
   obtain ⟨l, ⟨m, hm, hd⟩, h0, rfl⟩ := (mem_dId RC D p χ i c).1 hc
   have hχ0 : χ 0 = 0 := by simp [hχ, MulChar.map_zero]
@@ -214,8 +228,9 @@ theorem dId_forward (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n 
     rwa [hSe] at h4
   have hSadd : ∀ x y, S (x + y) - S x - S y ∈ pInt (C := C) RC p := by
     intro x y
-    have e : S (x + y) - S x - S y =
-        ∑ j, (⟨l j, hl j⟩ : RC) • (χ (x j + y j) - χ (x j) - χ (y j)) := by
+    have e
+        : S (x + y) - S x - S y
+          = ∑ j, (⟨l j, hl j⟩ : RC) • (χ (x j + y j) - χ (x j) - χ (y j)) := by
       simp only [hS, Pi.add_apply, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun j _ => ?_
       simp only [Algebra.smul_def]
@@ -238,8 +253,9 @@ theorem dId_forward (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n 
     have := Submodule.neg_mem _ (hd x)
     simpa using this
   refine ⟨⟨l i, hl i⟩, ⟨m, ⟨hmM, fun x y => ?_⟩, fun a x => ?_, fun k hk => ?_, ?_⟩, rfl⟩
-  · have h := Submodule.add_mem _
-      (Submodule.sub_mem _ (hneg (x + y)) (Submodule.add_mem _ (hneg x) (hneg y))) (hSadd x y)
+  · have h :=
+      Submodule.add_mem _
+        (Submodule.sub_mem _ (hneg (x + y)) (Submodule.add_mem _ (hneg x) (hneg y))) (hSadd x y)
     show m (x + y) - m x - m y ∈ pInt (C := C) RC p
     convert h using 1
     ring
@@ -253,18 +269,22 @@ theorem dId_forward (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n 
   · have := hneg (Pi.basisFun F (Fin n) i)
     rwa [hSe] at this
 
-theorem dId_backward (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n → F) → C))
-    (hM : M.toAddSubgroup = D.M) (p : ℕ) (ψ : MulChar F RC) (χ : F → C)
-    (hχ : ∀ a, χ a = ((ψ a : RC) : C)) (i : Fin n) (c' : RC)
-    (hc : c' ∈ idealD p M (flagSub (Pi.basisFun F (Fin n)) (i : ℕ)) (Pi.basisFun F (Fin n) i) ψ) :
-    (c' : C) ∈ D.dId RC p χ i := by
+theorem dId_backward
+    (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n → F) → C))
+    (hM : M.toAddSubgroup = D.M)
+    (p : ℕ)
+    (ψ : MulChar F RC) (χ : F → C) (hχ : ∀ a, χ a = ((ψ a : RC) : C))
+    (i : Fin n) (c' : RC)
+    (hc : c' ∈ idealD p M (flagSub (Pi.basisFun F (Fin n)) (i : ℕ)) (Pi.basisFun F (Fin n) i) ψ)
+    : (c' : C) ∈ D.dId RC p χ i := by
   obtain ⟨g, ⟨hgM, hadd⟩, h1, h2, h3⟩ := hc
   have hadd' : ∀ x y, g (x + y) - g x - g y ∈ pInt (C := C) RC p := hadd
   have hg0 : g 0 ∈ pInt (C := C) RC p := by
     have := Submodule.neg_mem _ (hadd' 0 0)
     simpa using this
-  have hsum : ∀ (t : Finset (Fin n)) (y : Fin n → Fin n → F),
-      (∑ j ∈ t, g (y j)) - g (∑ j ∈ t, y j) ∈ pInt (C := C) RC p := by
+  have hsum
+      : ∀ (t : Finset (Fin n)) (y : Fin n → Fin n → F),
+        (∑ j ∈ t, g (y j)) - g (∑ j ∈ t, y j) ∈ pInt (C := C) RC p := by
     intro t y
     induction t using Finset.induction_on with
     | empty =>
@@ -275,8 +295,13 @@ theorem dId_backward (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n
       have := Submodule.sub_mem _ ih (hadd' (y a) (∑ j ∈ t, y j))
       convert this using 1
       ring
-  let l : Fin n → C := fun j => if j < i then 0 else if j = i then (c' : C) else
-    g (Pi.basisFun F (Fin n) j)
+  let l : Fin n → C := fun j =>
+    if j < i then
+      0
+    else if j = i then
+      (c' : C)
+    else
+      g (Pi.basisFun F (Fin n) j)
   have hle : ∀ j, l j - g (Pi.basisFun F (Fin n) j) ∈ pInt (C := C) RC p := by
     intro j
     by_cases hj : j < i
@@ -289,10 +314,13 @@ theorem dId_backward (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n
         have := Submodule.neg_mem _ h3
         simpa [l] using this
       · simp [l, hj, hji]
-  have hterm : ∀ (x : Fin n → F) j,
-      l j * χ (x j) - g (x j • Pi.basisFun F (Fin n) j) ∈ pInt (C := C) RC p := by
+  have hterm
+      : ∀ (x : Fin n → F) j,
+        l j * χ (x j) - g (x j • Pi.basisFun F (Fin n) j) ∈ pInt (C := C) RC p := by
     intro x j
-    have h := Submodule.sub_mem _ (Submodule.smul_mem _ (ψ (x j)) (hle j)) (h1 (x j) (Pi.basisFun F (Fin n) j))
+    have h :=
+      Submodule.sub_mem _ (Submodule.smul_mem _ (ψ (x j)) (hle j))
+        (h1 (x j) (Pi.basisFun F (Fin n) j))
     convert h using 1
     simp only [Algebra.smul_def, hχ]
     have : algebraMap RC C (ψ (x j)) = (ψ (x j) : C) := rfl
@@ -301,8 +329,9 @@ theorem dId_backward (D : LieLatticeData C F n Sg r s) (M : Submodule RC ((Fin n
   refine (mem_dId RC D p χ i _).2 ⟨l, ⟨g, (hM ▸ hgM : g ∈ D.M), fun x => ?_⟩, fun j hj => ?_, ?_⟩
   · have hx : ∑ j, x j • Pi.basisFun F (Fin n) j = x := by
       simpa using (Pi.basisFun F (Fin n)).sum_repr x
-    have h := Submodule.add_mem _ (Submodule.sum_mem _ fun j (_ : j ∈ Finset.univ) => hterm x j)
-      (hsum Finset.univ fun j => x j • Pi.basisFun F (Fin n) j)
+    have h :=
+      Submodule.add_mem _ (Submodule.sum_mem _ fun j (_ : j ∈ Finset.univ) => hterm x j)
+        (hsum Finset.univ fun j => x j • Pi.basisFun F (Fin n) j)
     convert h using 1
     rw [hx, Finset.sum_sub_distrib]
     ring
@@ -314,9 +343,32 @@ end dId
 
 end GlobalTheory.CompanionTheory.Ar.Num.PtDx
 
-
-open GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.GR ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up in
-theorem GlobalTheory.CompanionTheory.Ar.Num.PtDx.main : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C] [IsAlgClosed C] [CharZero C] (RC : Subalgebra o C) (v : Valuation C NNReal), (∀ c, c ∈ RC ↔ v c ≤ 1) → ∀ (p : ℕ) [Fact p.Prime], v (p : C) < 1 → ∀ {F : Type} [Field F] [Fintype F] [DecidableEq F] [CharP F p] {n : ℕ} {Sg : Type} {r s : Sg → ℕ} (D : LieLatticeData C F n Sg r s) (w : C) (χ : Sg → F → C) (φ : Equiv.Perm Sg), D.Base RC p w → ∀ AA : HopfOrder (C := C) RC (Fin n → F), AA.carrier.toAddSubgroup = D.M → FStable F AA.carrier → ∀ (σ : MulChar F RC), IsFund p σ → FlagConcl v p AA.carrier (Pi.basisFun F (Fin n)) σ → ∀ e : Sg → ℕ, (∀ τ a, χ τ a = ((σ ^ p ^ e τ) a : RC)) → (∀ τ, σ ^ p ^ e (φ τ) = σ ^ p ^ (e τ + 1)) → (∀ τ, (∀ g ∈ sqIdeal (augIdeal AA.carrier), (g, 0) ∈ D.Th τ) ∧ (∀ (a : F) g m, (g, m) ∈ D.Th τ → ((fun x => g (a • x)), χ τ a • m) ∈ D.Th τ) ∧ ∀ g ∈ eig AA.carrier (σ ^ p ^ e τ), (g, 0) ∈ D.Th τ → g ∈ sqIdeal (augIdeal AA.carrier)) → ∀ τ i, D.dId RC p (χ τ) i = D.xId (χ τ) i := by
+open GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.GR
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up in
+theorem GlobalTheory.CompanionTheory.Ar.Num.PtDx.main
+    : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C] [IsAlgClosed C] [CharZero C]
+        (RC : Subalgebra o C) (v : Valuation C NNReal),
+      (∀ c, c ∈ RC ↔ v c ≤ 1)
+        → ∀ (p : ℕ) [Fact p.Prime],
+          v (p : C) < 1
+            → ∀ {F : Type} [Field F] [Fintype F] [DecidableEq F] [CharP F p] {n : ℕ} {Sg : Type}
+                {r s : Sg → ℕ} (D : LieLatticeData C F n Sg r s) (w : C) (χ : Sg → F → C)
+                (φ : Equiv.Perm Sg),
+              D.Base RC p w
+                → ∀ AA : HopfOrder (C := C) RC (Fin n → F),
+                  AA.carrier.toAddSubgroup = D.M → FStable F AA.carrier
+                    → ∀ (σ : MulChar F RC),
+                      IsFund p σ → FlagConcl v p AA.carrier (Pi.basisFun F (Fin n)) σ
+                        → ∀ e : Sg → ℕ,
+                          (∀ τ a, χ τ a = ((σ ^ p ^ e τ) a : RC))
+                            → (∀ τ, σ ^ p ^ e (φ τ) = σ ^ p ^ (e τ + 1))
+                            → (∀ τ,
+                              (∀ g ∈ sqIdeal (augIdeal AA.carrier), (g, 0) ∈ D.Th τ)
+                                ∧ (∀ (a : F) g m,
+                                  (g, m) ∈ D.Th τ → ((fun x => g (a • x)), χ τ a • m) ∈ D.Th τ)
+                                ∧ ∀ g ∈ eig AA.carrier (σ ^ p ^ e τ),
+                                  (g, 0) ∈ D.Th τ → g ∈ sqIdeal (augIdeal AA.carrier))
+                            → ∀ τ i, D.dId RC p (χ τ) i = D.xId (χ τ) i := by
   intro o C _ _ _ _ _ RC v _ p _ _ F _ _ _ _ n Sg r s D w χ φ hB AA hM _ σ hσ hF e hχ _ _ τ i
   obtain ⟨c, δ, h, -, -⟩ := hF
   obtain ⟨-, -, hX, hD, -, -⟩ := h i (e τ)
@@ -324,8 +376,9 @@ theorem GlobalTheory.CompanionTheory.Ar.Num.PtDx.main : ∀ {o C : Type} [CommRi
   ext y
   constructor
   · intro hy
-    obtain ⟨c', hc', rfl⟩ := PtDx.dId_forward RC D AA.carrier hM hint p _
-      (PtDx.fund_pow RC p σ hσ (e τ)) (χ τ) (hχ τ) i y hy
+    obtain ⟨c', hc', rfl⟩ :=
+      PtDx.dId_forward RC D AA.carrier hM hint p _ (PtDx.fund_pow RC p σ hσ (e τ)) (χ τ) (hχ τ) i y
+        hy
     rw [hD, ← hX] at hc'
     exact (PtDx.xId_iff RC D AA.carrier hM hint _ (χ τ) (hχ τ) i _).2 ⟨c', hc', rfl⟩
   · intro hy

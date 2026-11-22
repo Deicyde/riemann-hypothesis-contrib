@@ -8,7 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Con
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum NumberField Matrix GlobalTheory.MixModel GlobalTheory.MixPer
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum NumberField Matrix GlobalTheory.MixModel
+  GlobalTheory.MixPer
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -16,12 +19,23 @@ set_option maxHeartbeats 1600000
 
 namespace GlobalTheory.FirstVec
 
-theorem first_col {K : Type} [CommRing K] {σ : ℕ} (T S : Matrix (Fin (σ + 1)) (Fin (σ + 1)) K) (h : S * T = 1)
-    (hl : T (Fin.last σ) (Fin.last σ) = 1) (hu : ∀ j j' : Fin (σ + 1), j'.1 = j.1 + 1 → ∀ a b, b ≤ a → T a j * S j' b = 0)
-    (hs : ∀ j j' : Fin (σ + 1), j'.1 = j.1 + 1 → (∑ a : Fin (σ + 1), ∑ b : Fin (σ + 1),
-      if b.1 = a.1 + 1 then T a j * S j' b else 0) = 1) : ∀ a, T a 0 = if a = 0 then 1 else 0 := by
-  have key : ∀ j j' : Fin (σ + 1), j'.1 = j.1 + 1 → (∀ b, j' < b → T b j' = 0) → ∀ a, j ≤ a →
-      T a j = if a = j then T j j * S j' j' * T j' j' else 0 := fun j j' e H a ha => by
+theorem first_col
+    {K : Type} [CommRing K]
+    {σ : ℕ} (T S : Matrix (Fin (σ + 1)) (Fin (σ + 1)) K) (h : S * T = 1)
+    (hl : T (Fin.last σ) (Fin.last σ) = 1)
+    (hu : ∀ j j' : Fin (σ + 1), j'.1 = j.1 + 1 → ∀ a b, b ≤ a → T a j * S j' b = 0)
+    (hs : ∀ j j' : Fin (σ + 1),
+      j'.1 = j.1 + 1
+        → (∑ a : Fin (σ + 1), ∑ b : Fin (σ + 1),
+            if b.1 = a.1 + 1 then T a j * S j' b else 0)
+          = 1)
+    : ∀ a, T a 0 = if a = 0 then 1 else 0 := by
+  have key
+      : ∀ j j' : Fin (σ + 1),
+        j'.1 = j.1 + 1 → (∀ b, j' < b → T b j' = 0)
+          → ∀ a,
+            j ≤ a
+              → T a j = if a = j then T j j * S j' j' * T j' j' else 0 := fun j j' e H a ha => by
     have e1 : T a j = ∑ b, T a j * S j' b * T b j' := by
       have := congrFun (congrFun h j') j'
       rw [Matrix.mul_apply, Matrix.one_apply_eq] at this
@@ -48,7 +62,9 @@ theorem first_col {K : Type} [CommRing K] {σ : ℕ} (T S : Matrix (Fin (σ + 1)
     | last => exact hl
     | cast j ih =>
       have h1 := hs j.castSucc j.succ rfl
-      rw [Finset.sum_eq_single j.castSucc, Finset.sum_eq_single j.succ, if_pos (show j.succ.1 = j.castSucc.1 + 1 from rfl)] at h1
+      rw [Finset.sum_eq_single j.castSucc, Finset.sum_eq_single j.succ,
+          if_pos (show j.succ.1 = j.castSucc.1 + 1 from rfl)]
+        at h1
       · rw [key j.castSucc j.succ rfl (tri _) _ le_rfl, if_pos rfl, h1, ih, one_mul]
       · exact fun b _ hb => if_neg fun e => hb (Fin.ext e)
       · exact fun h => absurd (Finset.mem_univ _) h
@@ -56,8 +72,12 @@ theorem first_col {K : Type} [CommRing K] {σ : ℕ} (T S : Matrix (Fin (σ + 1)
         refine Finset.sum_eq_zero fun b _ => ?_
         split_ifs with e
         · rcases lt_or_gt_of_ne ha with h2 | h2
-          · rw [show S j.succ b = 0 from triS (show b < j.succ by
-              rw [Fin.lt_def] at h2 ⊢; simp only [Fin.val_castSucc, Fin.val_succ] at h2 e ⊢; omega), mul_zero]
+          · rw [show S j.succ b = 0 from
+                triS (show b < j.succ by
+                  rw [Fin.lt_def] at h2 ⊢
+                  simp only [Fin.val_castSucc, Fin.val_succ] at h2 e ⊢
+                  omega),
+              mul_zero]
           · rw [tri _ a h2, zero_mul]
         · rfl
       · exact fun h => absurd (Finset.mem_univ _) h
@@ -68,25 +88,33 @@ theorem first_col {K : Type} [CommRing K] {σ : ℕ} (T S : Matrix (Fin (σ + 1)
 
 variable {D : D7} {S S₀ S₀' : HSp D}
 
-theorem eq_of_psiE {ψ : AddChar (AF D.host.F) ℂ} (hψ : ∃ s : AE D, psiE ψ s ≠ 1) {s s' : D.host.E}
-    (h : ∀ t : AE D, psiE ψ (t * incA D s) = psiE ψ (t * incA D s')) : s = s' := by
+theorem eq_of_psiE
+    {ψ : AddChar (AF D.host.F) ℂ} (hψ : ∃ s : AE D, psiE ψ s ≠ 1)
+    {s s' : D.host.E} (h : ∀ t : AE D, psiE ψ (t * incA D s) = psiE ψ (t * incA D s'))
+    : s = s' := by
   by_contra hne
   obtain ⟨y, hy⟩ := hψ
   have h0 : s - s' ≠ 0 := sub_ne_zero.2 hne
   have h1 := h (y * incA D (s - s')⁻¹)
   have e : y * incA D (s - s')⁻¹ * incA D s = y + y * incA D (s - s')⁻¹ * incA D s' := by
-    have : incA D (s - s')⁻¹ * (incA D s - incA D s') = 1 := by rw [← map_sub, ← map_mul, inv_mul_cancel₀ h0, map_one]
+    have : incA D (s - s')⁻¹ * (incA D s - incA D s') = 1 := by
+      rw [← map_sub, ← map_mul, inv_mul_cancel₀ h0, map_one]
     linear_combination y * this
   rw [e, psiE_add] at h1
-  have h2 : psiE ψ (y * incA D (s - s')⁻¹ * incA D s') * psiE ψ (-(y * incA D (s - s')⁻¹ * incA D s')) = 1 := by
+  have h2
+      : psiE ψ (y * incA D (s - s')⁻¹ * incA D s') * psiE ψ (-(y * incA D (s - s')⁻¹ * incA D s'))
+        = 1 := by
     rw [← psiE_add, add_neg_cancel, psiE_zero]
   exact hy (mul_right_cancel₀ (left_ne_zero_of_mul_eq_one h2) (h1.trans (one_mul _).symm))
 
 section
 
-variable {ρ : ℕ} (d : HypDec S S₀ ρ) (d' : HypDec S S₀' ρ) {z : Fin S₀.rank → D.host.E} {z' : Fin S₀'.rank → D.host.E}
+variable
+  {ρ : ℕ} (d : HypDec S S₀ ρ) (d' : HypDec S S₀' ρ)
+  {z : Fin S₀.rank → D.host.E} {z' : Fin S₀'.rank → D.host.E}
 
-theorem exists_b (hz' : z' ≠ 0) (i : Fin ρ) (t : AE D) : ∃ b : Mx D ρ S₀'.rank, b *ᵥ ratV z' = Pi.single i t := by
+theorem exists_b (hz' : z' ≠ 0) (i : Fin ρ) (t : AE D)
+    : ∃ b : Mx D ρ S₀'.rank, b *ᵥ ratV z' = Pi.single i t := by
   obtain ⟨k, hk⟩ := Function.ne_iff.1 hz'
   refine ⟨Matrix.single i k (t * incA D (z' k)⁻¹), ?_⟩
   rw [Matrix.single_mulVec]
@@ -94,30 +122,37 @@ theorem exists_b (hz' : z' ≠ 0) (i : Fin ρ) (t : AE D) : ∃ b : Mx D ρ S₀
   rw [mul_assoc, ← map_mul, inv_mul_cancel₀ hk, map_one, mul_one]
   rfl
 
-theorem coefX_eq (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (n : GA D S) :
-    coefX d z n = d.pX *ᵥ (mt S n *ᵥ (d'.j0 *ᵥ ratV z')) := by
-  have e : d.j0 *ᵥ ratV z = d'.j0 *ᵥ ratV z' := (ratV_mulVec _ _).symm.trans ((congrArg ratV hz).trans (ratV_mulVec _ _))
+theorem coefX_eq (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (n : GA D S)
+    : coefX d z n = d.pX *ᵥ (mt S n *ᵥ (d'.j0 *ᵥ ratV z')) := by
+  have e : d.j0 *ᵥ ratV z = d'.j0 *ᵥ ratV z' :=
+    (ratV_mulVec _ _).symm.trans ((congrArg ratV hz).trans (ratV_mulVec _ _))
   rw [coefX, ← mulVec_mulVec, ← mulVec_mulVec, e]
 
-theorem coefX_nB' (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (b : Mx D ρ S₀'.rank) :
-    coefX d z (d'.nB b) = (d.pX * d'.jX) *ᵥ (b *ᵥ ratV z') := by
+theorem coefX_nB' (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (b : Mx D ρ S₀'.rank)
+    : coefX d z (d'.nB b) = (d.pX * d'.jX) *ᵥ (b *ᵥ ratV z') := by
   have e0 : d.pX *ᵥ (d'.j0 *ᵥ ratV z') = 0 := by
     have := coefX_eq d d' hz 1
-    rw [GlobalTheory.MixModel.mt_one, one_mulVec, coefX, GlobalTheory.MixModel.mt_one, Matrix.one_mul, d.pX_j0, zero_mulVec] at this
+    rw [GlobalTheory.MixModel.mt_one, one_mulVec, coefX, GlobalTheory.MixModel.mt_one,
+        Matrix.one_mul, d.pX_j0, zero_mulVec]
+      at this
     exact this.symm
   rw [coefX_eq d d' hz, mulVec_mulVec _ (mt S _), d'.nB_j0, add_mulVec, mulVec_add, e0, zero_add]
   simp only [mulVec_mulVec, Matrix.mul_assoc]
 
-theorem e_eq (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (hz' : z' ≠ 0) (hN : ∀ n ∈ flagN d', n ∈ flagN d) : d'.e = d.e * (d.qX * d'.e) := by
+theorem e_eq (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (hz' : z' ≠ 0) (hN : ∀ n ∈ flagN d', n ∈ flagN d)
+    : d'.e = d.e * (d.qX * d'.e) := by
   apply rat_injective
   rw [rat_mul, rat_mul]
   change d'.jX = d.jX * (d.pX * d'.jX)
   ext k i : 2
   obtain ⟨b, hb⟩ := exists_b hz' i 1
-  have e : d.j0 *ᵥ ratV z = d'.j0 *ᵥ ratV z' := (ratV_mulVec _ _).symm.trans ((congrArg ratV hz).trans (ratV_mulVec _ _))
+  have e : d.j0 *ᵥ ratV z = d'.j0 *ᵥ ratV z' :=
+    (ratV_mulVec _ _).symm.trans ((congrArg ratV hz).trans (ratV_mulVec _ _))
   obtain ⟨u, -, b₁, c, hn⟩ := Decomp.flag_decomp d (hN _ (d'.nB_mem_NFlag b))
-  have h1 : mt S (d'.nB b) *ᵥ (d.j0 *ᵥ ratV z) = d.j0 *ᵥ ratV z + d.jX *ᵥ ((u.1 * b₁) *ᵥ ratV z) := by
-    rw [hn, mulVec_mulVec, Decomp.flag_unipotent_product_anisotropic_action, add_mulVec, mulVec_mulVec]
+  have h1
+      : mt S (d'.nB b) *ᵥ (d.j0 *ᵥ ratV z) = d.j0 *ᵥ ratV z + d.jX *ᵥ ((u.1 * b₁) *ᵥ ratV z) := by
+    rw [hn, mulVec_mulVec, Decomp.flag_unipotent_product_anisotropic_action, add_mulVec,
+      mulVec_mulVec]
   have h2 : mt S (d'.nB b) *ᵥ (d.j0 *ᵥ ratV z) = d.j0 *ᵥ ratV z + d'.jX *ᵥ Pi.single i 1 := by
     rw [e, mulVec_mulVec, d'.nB_j0, add_mulVec, ← mulVec_mulVec, hb]
   have h3 := add_left_cancel (h2.symm.trans h1)
@@ -129,10 +164,16 @@ theorem e_eq (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (hz' : z' ≠ 0) (hN : ∀ n
 
 end
 
-theorem first_eq {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) {ρ : ℕ} (d : HypDec S S₀ ρ) (d' : HypDec S S₀' ρ)
-    {z : Fin S₀.rank → D.host.E} {z' : Fin S₀'.rank → D.host.E} (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (hz0 : z ≠ 0) (hz' : z' ≠ 0)
-    (hN : ∀ n, n ∈ flagN d ↔ n ∈ flagN d') (hc : ∀ n ∈ flagN d, psiBes ψ d 1 z n = psiBes ψ d' 1 z' n)
-    (r : Fin ρ) (hr : r.1 = 0) (k : Fin S.rank) : d'.e k r = d.e k r := by
+theorem first_eq
+    {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1))
+    {ρ : ℕ} (d : HypDec S S₀ ρ) (d' : HypDec S S₀' ρ)
+    {z : Fin S₀.rank → D.host.E} {z' : Fin S₀'.rank → D.host.E}
+    (hz : d.i₀ *ᵥ z = d'.i₀ *ᵥ z') (hz0 : z ≠ 0) (hz' : z' ≠ 0)
+    (hN : ∀ n, n ∈ flagN d ↔ n ∈ flagN d')
+    (hc : ∀ n ∈ flagN d, psiBes ψ d 1 z n = psiBes ψ d' 1 z' n)
+    (r : Fin ρ) (hr : r.1 = 0)
+    (k : Fin S.rank)
+    : d'.e k r = d.e k r := by
   obtain _ | σ := ρ
   · exact r.elim0
   obtain rfl : r = 0 := Fin.ext hr
@@ -152,16 +193,23 @@ theorem first_eq {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) {�
     · intro b _ hb
       rw [ell, if_neg fun e => hb (Fin.ext (by simpa using e)), zero_mul]
     · exact fun h => absurd (Finset.mem_univ _) h
-  have hA : ∀ (j j' : Fin (σ + 1)) (t : AE D), j'.1 = j.1 + 1 → ∃ u ∈ UX D (σ + 1), u.1 = 1 + Matrix.single j j' t ∧
-      blockX d (d'.levi u) = 1 + Matrix.of fun a b => t * incA D (T a j * S' j' b) := fun j j' t e => by
-    obtain ⟨u, hu, hu1⟩ := Decomp.exists_unit (D := D) (T := Matrix.single j j' t) fun a b hab =>
-      Matrix.single_apply_of_ne _ _ _ _ _ (by rintro ⟨rfl, rfl⟩; rw [Fin.le_def] at hab; omega)
+  have hA
+      : ∀ (j j' : Fin (σ + 1)) (t : AE D),
+        j'.1 = j.1 + 1
+          → ∃ u ∈ UX D (σ + 1),
+            u.1 = 1 + Matrix.single j j' t
+              ∧ blockX d (d'.levi u)
+                = 1 + Matrix.of fun a b => t * incA D (T a j * S' j' b) := fun j j' t e => by
+    obtain ⟨u, hu, hu1⟩ :=
+      Decomp.exists_unit (D := D) (T := Matrix.single j j' t) fun a b hab =>
+        Matrix.single_apply_of_ne _ _ _ _ _ (by rintro ⟨rfl, rfl⟩; rw [Fin.le_def] at hab; omega)
     refine ⟨u, hu, hu1, ?_⟩
-    rw [blockX, hX, ← Matrix.mul_assoc (mt S _), d'.levi_jX, hu1, ← Matrix.mul_assoc, ← Matrix.mul_assoc, ← hT,
-      Matrix.mul_add, Matrix.add_mul, Matrix.mul_one, hTS]
+    rw [blockX, hX, ← Matrix.mul_assoc (mt S _), d'.levi_jX, hu1, ← Matrix.mul_assoc,
+      ← Matrix.mul_assoc, ← hT, Matrix.mul_add, Matrix.add_mul, Matrix.mul_one, hTS]
     congr 1
     ext a b : 2
-    rw [Matrix.mul_apply, Finset.sum_eq_single j', Matrix.mul_single_apply_same, Matrix.of_apply, map_mul]
+    rw [Matrix.mul_apply, Finset.sum_eq_single j', Matrix.mul_single_apply_same, Matrix.of_apply,
+      map_mul]
     · change incA D (T a j) * t * incA D (S' j' b) = _
       ring
     · intro c _ hc
@@ -175,7 +223,9 @@ theorem first_eq {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) {�
     have h1 := hc _ ((hN _).2 (d'.nB_mem_NFlag b))
     have h2 : blockX d (d'.nB b) = 1 := by
       rw [blockX, hX, ← Matrix.mul_assoc (mt S _), d'.nB_jX, ← hX, d.pX_jX]
-    rw [psiBes_nB, psiBes, simpleSum, h2, upSum_one, zero_add, coefX_nB' d d' hz, hb, hell, hell, ← hT, mulVec_single] at h1
+    rw [psiBes_nB, psiBes, simpleSum, h2, upSum_one, zero_add, coefX_nB' d d' hz, hb, hell, hell,
+        ← hT, mulVec_single]
+      at h1
     simp only [map_one, one_mul, Pi.single_eq_same, mul_one] at h1 ⊢
     rw [mul_comm t]
     exact h1
@@ -197,21 +247,27 @@ theorem first_eq {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsStdChar D ψ (-1)) {�
     have h3 := hc _ ((hN _).2 (d'.levi_mem_NFlag hu))
     have h4 : coefX d z (d'.levi u) = 0 := by
       have := coefX_nB' d d' hz 0
-      rw [zero_mulVec, mulVec_zero, coefX_eq d d' hz, d'.nB_zero, GlobalTheory.MixModel.mt_one, one_mulVec] at this
+      rw [zero_mulVec, mulVec_zero, coefX_eq d d' hz, d'.nB_zero, GlobalTheory.MixModel.mt_one,
+          one_mulVec]
+        at this
       rw [coefX_eq d d' hz, mulVec_mulVec _ (mt S _), d'.wittDecomp_levi_inclAnisotropic, this]
     have hadd : ∀ M : Mx D (σ + 1) (σ + 1), upSum (1 + M) = upSum M := fun M =>
-      Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by
-        split_ifs with h
-        · rw [Matrix.add_apply, Matrix.one_apply_ne (by rintro rfl; omega), zero_add]
-        · rfl
+      Finset.sum_congr rfl fun a _ =>
+        Finset.sum_congr rfl fun b _ => by
+          split_ifs with h
+          · rw [Matrix.add_apply, Matrix.one_apply_ne (by rintro rfl; omega), zero_add]
+          · rfl
     have h5 : upSum (Matrix.single j j' t : Mx D (σ + 1) (σ + 1)) = t := by
-      rw [upSum, Finset.sum_eq_single j, Finset.sum_eq_single j', if_pos e, Matrix.single_apply_same]
+      rw [upSum, Finset.sum_eq_single j, Finset.sum_eq_single j', if_pos e,
+        Matrix.single_apply_same]
       · exact fun b _ hb => if_neg fun e' => hb (Fin.ext (e'.trans e.symm))
       · exact fun h => absurd (Finset.mem_univ _) h
-      · exact fun a _ ha => Finset.sum_eq_zero fun b _ => by
-          rw [Matrix.single_apply_of_row_ne ha.symm, ite_self]
+      · exact fun a _ ha =>
+          Finset.sum_eq_zero fun b _ => by rw [Matrix.single_apply_of_row_ne ha.symm, ite_self]
       · exact fun h => absurd (Finset.mem_univ _) h
-    rw [psiBes_levi, psiUni, h1, hadd, h5, psiBes, simpleSum, h2, h4, hadd, dotProduct_zero, add_zero, map_one, one_mul] at h3
+    rw [psiBes_levi, psiUni, h1, hadd, h5, psiBes, simpleSum, h2, h4, hadd, dotProduct_zero,
+        add_zero, map_one, one_mul]
+      at h3
     rw [map_one, mul_one, ← h3]
     congr 1
     set_option synthInstance.maxHeartbeats 100000 in

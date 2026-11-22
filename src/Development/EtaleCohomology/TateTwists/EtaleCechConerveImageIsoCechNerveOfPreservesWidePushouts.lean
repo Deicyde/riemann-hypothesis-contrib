@@ -8,15 +8,18 @@ open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial GlobalTheory.Et
 
 namespace LateralTheory.EtaleFoundations.ConerveIsomorphism
 
-variable {T : Type 1} [Category.{0} T] [HasFiniteWidePushouts T] (Ψ : T ⥤ PShᵒᵖ)
-  {U V : T} (g : U ⟶ V)
+variable
+  {T : Type 1} [Category.{0} T] [HasFiniteWidePushouts T] (Ψ : T ⥤ PShᵒᵖ) {U V : T} (g : U ⟶ V)
 
-noncomputable def phi (n : ℕ) :
-    (Ψ.obj (widePushout U (fun _ : Fin (n+1) => V) (fun _ => g))).unop ⟶
-      widePullback (Ψ.obj U).unop (fun _ : Fin (n+1) => (Ψ.obj V).unop) (fun _ => (Ψ.map g).unop) :=
-  WidePullback.lift (Ψ.map (WidePushout.head _)).unop (fun j => (Ψ.map (WidePushout.ι _ j)).unop)
+noncomputable def phi (n : ℕ)
+    : (Ψ.obj (widePushout U (fun _ : Fin (n + 1) => V) (fun _ => g))).unop
+      ⟶ widePullback (Ψ.obj U).unop
+        (fun _ : Fin (n + 1) => (Ψ.obj V).unop)
+        (fun _ => (Ψ.map g).unop) :=
+  WidePullback.lift (Ψ.map (WidePushout.head _)).unop
+    (fun j => (Ψ.map (WidePushout.ι _ j)).unop)
     (fun j => by
-      have h := WidePushout.arrow_ι (fun _ : Fin (n+1) => g) j
+      have h := WidePushout.arrow_ι (fun _ : Fin (n + 1) => g) j
       rw [← unop_comp, ← Ψ.map_comp, h])
 
 lemma phi_π (n : ℕ) (j : Fin (n+1)) :
@@ -33,17 +36,23 @@ lemma aux (n : ℕ) (j : Fin (n+1)) :
   rw [← WidePullback.π_arrow (fun _ : Fin (n+1) => (Ψ.map g).unop) j]
   rfl
 
-noncomputable def cocone (n : ℕ) : Cocone (WidePushoutShape.wideSpan U (fun _ : Fin (n+1) => V) (fun _ => g) ⋙ Ψ) where
-  pt := op (widePullback (Ψ.obj U).unop (fun _ : Fin (n+1) => (Ψ.obj V).unop) (fun _ => (Ψ.map g).unop))
-  ι :=
-    { app := fun j => match j with
-        | none => (WidePullback.base _).op
-        | some j => (WidePullback.π _ j).op
-      naturality := by
-        rintro X Y (_ | j)
-        · rw [WidePushoutShape.hom_id, CategoryTheory.Functor.map_id, CategoryTheory.Functor.map_id,
-            Category.id_comp, Category.comp_id]
-        · exact (aux Ψ g n j).trans (Category.comp_id _).symm }
+noncomputable def cocone (n : ℕ)
+    : Cocone (WidePushoutShape.wideSpan U (fun _ : Fin (n + 1) => V) (fun _ => g) ⋙ Ψ) where
+  pt :=
+    op (widePullback (Ψ.obj U).unop
+      (fun _ : Fin (n + 1) => (Ψ.obj V).unop)
+      (fun _ => (Ψ.map g).unop))
+  ι := {
+    app := fun j =>
+      match j with
+      | none => (WidePullback.base _).op
+      | some j => (WidePullback.π _ j).op
+    naturality := by
+      rintro X Y (_ | j)
+      · rw [WidePushoutShape.hom_id, CategoryTheory.Functor.map_id, CategoryTheory.Functor.map_id,
+          Category.id_comp, Category.comp_id]
+      · exact (aux Ψ g n j).trans (Category.comp_id _).symm
+  }
 
 lemma natural (a b : ℕ) (σ : Fin (a+1) → Fin (b+1)) :
     (Ψ.map (WidePushout.desc (WidePushout.head (fun _ : Fin (b+1) => g))
@@ -61,14 +70,15 @@ lemma natural (a b : ℕ) (σ : Fin (a+1) → Fin (b+1)) :
 
 variable (hΨ : ∀ n : ℕ, PreservesColimitsOfShape (WidePushoutShape (Fin (n + 1))) Ψ)
 
-noncomputable def hc (n : ℕ) :
-    IsColimit (Ψ.mapCocone (colimit.cocone (WidePushoutShape.wideSpan U (fun _ : Fin (n+1) => V) (fun _ => g)))) :=
+noncomputable def hc (n : ℕ)
+    : IsColimit (Ψ.mapCocone (colimit.cocone
+      (WidePushoutShape.wideSpan U (fun _ : Fin (n + 1) => V) (fun _ => g)))) :=
   haveI := hΨ n
   isColimitOfPreserves Ψ (colimit.isColimit _)
 
-noncomputable def psi (n : ℕ) :
-    widePullback (Ψ.obj U).unop (fun _ : Fin (n+1) => (Ψ.obj V).unop) (fun _ => (Ψ.map g).unop) ⟶
-      (Ψ.obj (widePushout U (fun _ : Fin (n+1) => V) (fun _ => g))).unop :=
+noncomputable def psi (n : ℕ)
+    : widePullback (Ψ.obj U).unop (fun _ : Fin (n + 1) => (Ψ.obj V).unop) (fun _ => (Ψ.map g).unop)
+      ⟶ (Ψ.obj (widePushout U (fun _ : Fin (n + 1) => V) (fun _ => g))).unop :=
   ((hc Ψ g hΨ n).desc (cocone Ψ g n)).unop
 
 lemma desc_phi (n : ℕ) : (hc Ψ g hΨ n).desc (cocone Ψ g n) ≫ (phi Ψ g n).op = 𝟙 _ := by
@@ -81,9 +91,11 @@ lemma desc_phi (n : ℕ) : (hc Ψ g hΨ n).desc (cocone Ψ g n) ≫ (phi Ψ g n)
     exact (Category.assoc _ _ _).symm.trans ((congrArg (fun x => x ≫ (phi Ψ g n).op)
       ((hc Ψ g hΨ n).fac (cocone Ψ g n) (some j))).trans (Quiver.Hom.unop_inj (phi_π Ψ g n j)))
 
-noncomputable def levelIso (n : ℕ) :
-    (Ψ.obj (widePushout U (fun _ : Fin (n+1) => V) (fun _ => g))).unop ≅
-      widePullback (Ψ.obj U).unop (fun _ : Fin (n+1) => (Ψ.obj V).unop) (fun _ => (Ψ.map g).unop) where
+noncomputable def levelIso (n : ℕ)
+    : (Ψ.obj (widePushout U (fun _ : Fin (n + 1) => V) (fun _ => g))).unop
+      ≅ widePullback (Ψ.obj U).unop
+        (fun _ : Fin (n + 1) => (Ψ.obj V).unop)
+        (fun _ => (Ψ.map g).unop) where
   hom := phi Ψ g n
   inv := psi Ψ g hΨ n
   hom_inv_id := congrArg Quiver.Hom.unop (desc_phi Ψ g hΨ n)
@@ -98,7 +110,9 @@ noncomputable def levelIso (n : ℕ) :
 end LateralTheory.EtaleFoundations.ConerveIsomorphism
 
 open LateralTheory.EtaleFoundations.ConerveIsomorphism in
-theorem LateralTheory.EtaleFoundations.etale_cech_conerve_image_iso_cech_nerve_of_preserves_wide_pushouts : LateralTheory.EtaleFoundations.EtaleCechConerveImageIsoCechNerveOfPreservesWidePushouts := by
+theorem
+    LateralTheory.EtaleFoundations.etale_cech_conerve_image_iso_cech_nerve_of_preserves_wide_pushouts
+    : LateralTheory.EtaleFoundations.EtaleCechConerveImageIsoCechNerveOfPreservesWidePushouts := by
   intro T _ _ Ψ hΨ U V g
   refine ⟨NatIso.ofComponents (fun n => levelIso Ψ g hΨ n.unop.len) ?_, ?_⟩
   · intro m n h

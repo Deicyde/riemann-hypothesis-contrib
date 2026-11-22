@@ -9,8 +9,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-theorem UpperTheory.V.Z.Kato.Sym.difB :
-    UpperTheory.V.Z.Kato.Sym.DifB := by
+theorem UpperTheory.V.Z.Kato.Sym.difB : UpperTheory.V.Z.Kato.Sym.DifB := by
   classical
   intro Ω _ _ _ ε X m hm u v P Q hP hQ
   obtain ⟨-, -, l3, l4, -, l6, -⟩ := lgB Ω ε X m hm
@@ -22,8 +21,15 @@ theorem UpperTheory.V.Z.Kato.Sym.difB :
     rw [zero_pow hm.ne'] at h
     exact hw ((map_eq_zero (io X)).1 h.symm)
   have self0 : ∀ a : Kb X, a ≠ 0 → lg X m a a = 0 := fun a ha => l3 a a 0 ha (by simp)
-  refine ⟨fun g h hg hh => ?_, ?_, ?_, fun R hR h hh => ?_, fun h hh => ?_, fun σ hσ h hh => ?_,
-    fun τ s hτ σ hσ h hh => ?_⟩
+  refine ⟨
+    fun g h hg hh => ?_,
+    ?_,
+    ?_,
+    fun R hR h hh => ?_,
+    fun h hh => ?_,
+    fun σ hσ h hh => ?_,
+    fun τ s hτ σ hσ h hh => ?_
+  ⟩
   · have e1 := hP.cob g h hg hh
     have e2 := hQ.cob g h hg hh
     rw [(K Q.a u hu.1 hQ.ha).2.1 P.a hP.ha g hg, (K Q.b v hv.1 hQ.hb).2.1 P.b hP.hb h hh] at e1
@@ -36,8 +42,10 @@ theorem UpperTheory.V.Z.Kato.Sym.difB :
     obtain ⟨B4, h4⟩ := (K Q.b v hv.1 hQ.hb).2.2.1
     refine ⟨B1 ∪ B2 ∪ B3 ∪ B4, fun h h' hh hh' hB => ?_⟩
     simp only [dif]
-    rw [h1 h h' hh hh' fun b hb => hB b (by simp [hb]), h2 h h' hh hh' fun b hb => hB b (by simp [hb]),
-      h3 h h' hh hh' fun b hb => hB b (by simp [hb]), h4 h h' hh hh' fun b hb => hB b (by simp [hb])]
+    rw [h1 h h' hh hh' fun b hb => hB b (by simp [hb]),
+      h2 h h' hh hh' fun b hb => hB b (by simp [hb]),
+      h3 h h' hh hh' fun b hb => hB b (by simp [hb]),
+      h4 h h' hh hh' fun b hb => hB b (by simp [hb])]
   · intro B h hB hh hi
     simp only [dif]
     rw [hP.unr B h hB hh hi, hQ.unr B h hB hh hi, (K Q.a u hu.1 hQ.ha).2.2.2.1 hu B h hB hh hi,
@@ -62,10 +70,13 @@ theorem UpperTheory.V.Z.Kato.Sym.difB :
     rw [hm'] at e1 e3
     have e5 : ka X m P.b (σ⁻¹ * h * σ) = ka X m P.b h := by linear_combination e4 - e3
     rw [e5] at e1
-    change 1 ^ 2 * P.η (σ⁻¹ * h * σ) - P.η h + ka X m P.a h * ka X m P.b σ - ka X m P.a σ * ka X m P.b h = 0
+    change 1 ^ 2 * P.η (σ⁻¹ * h * σ) - P.η h + ka X m P.a h * ka X m P.b σ
+        - ka X m P.a σ * ka X m P.b h
+      = 0
     linear_combination e2 - e1
   · simp only [dif, Pt.mv]
-    rw [((K Q.a u hu.1 hQ.ha).2.2.2.2.1 σ τ s hτ hσ h hh).2, ((K Q.b v hv.1 hQ.hb).2.2.2.2.1 σ τ s hτ hσ h hh).2,
+    rw [((K Q.a u hu.1 hQ.ha).2.2.2.2.1 σ τ s hτ hσ h hh).2,
+      ((K Q.b v hv.1 hQ.hb).2.2.2.2.1 σ τ s hτ hσ h hh).2,
       l6 σ τ s hτ hσ P.a Q.a (nz _ _ hu.1 hQ.ha) (hP.ha.trans hQ.ha.symm),
       l6 σ τ s hτ hσ P.b Q.b (nz _ _ hv.1 hQ.hb) (hP.hb.trans hQ.hb.symm)]
     ring

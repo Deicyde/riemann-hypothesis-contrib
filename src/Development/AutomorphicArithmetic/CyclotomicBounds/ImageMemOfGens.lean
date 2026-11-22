@@ -15,22 +15,25 @@ open scoped Pointwise
 
 variable {R : Ranks} (H : Host R)
 
-theorem exists_unit_neg : ∃ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ 1 [MOD H.QS * H.d] ∧ (H.art u).1.1 = -1 := by
+theorem exists_unit_neg
+    : ∃ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ 1 [MOD H.QS * H.d] ∧ (H.art u).1.1 = -1 := by
   obtain ⟨hq, hd, hq8, hd16, -⟩ := H.hyp
   have hdq : Nat.Coprime H.d H.q := (Nat.coprime_primes hd hq).2 (by omega)
   have hsq : Nat.Coprime H.QS H.q := Nat.Coprime.coprime_dvd_right (dvd_mul_right _ _) H.QS_coprime
   have hcop : Nat.Coprime (H.QS * H.d) H.q := Nat.Coprime.mul_left hsq hdq
   obtain ⟨x, hx1, hx2⟩ := Nat.chineseRemainder hcop 1 (H.q - 1)
   have hq2 : 2 ≤ H.q := hq.two_le
-  have hxm : Nat.Coprime x (H.QS * H.d) := by
-    unfold Nat.Coprime; rw [Nat.ModEq.gcd_eq hx1]; simp
+  have hxm : Nat.Coprime x (H.QS * H.d) := by unfold Nat.Coprime; rw [Nat.ModEq.gcd_eq hx1]; simp
   have hxq : Nat.Coprime x H.q := by
-    unfold Nat.Coprime; rw [Nat.ModEq.gcd_eq hx2]
+    unfold Nat.Coprime
+    rw [Nat.ModEq.gcd_eq hx2]
     have : H.q - 1 + 1 = H.q := by omega
-    rw [← this, Nat.gcd_comm]; simp
+    rw [← this, Nat.gcd_comm]
+    simp
   have hxN : Nat.Coprime x H.condN := by
     have e : H.condN = H.QS * H.d * H.q := by simp only [Formalism.HC.HostRaw.condN]; ring
-    rw [e]; exact Nat.Coprime.mul_right hxm hxq
+    rw [e]
+    exact Nat.Coprime.mul_right hxm hxq
   refine ⟨ZMod.unitOfCoprime x hxN, ?_, ?_⟩
   · rw [ZMod.coe_unitOfCoprime, ZMod.val_natCast]
     refine Nat.ModEq.trans ?_ hx1
@@ -47,14 +50,18 @@ theorem exists_unit_neg : ∃ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ 1
         rw [← Int.natCast_mod, h4]
         push_cast [Nat.cast_sub (by omega : 1 ≤ H.q)]
         rw [show (-1 : ℤ) = ((H.q : ℤ) - 1) + (-1) * (H.q : ℤ) by ring, Int.add_mul_emod_self_right,
-          Int.emod_eq_of_lt] <;> omega
+            Int.emod_eq_of_lt]
+          <;> omega
       rw [h3, ← jacobiSym.mod_left, jacobiSym.at_neg_one (hq.odd_of_ne_two (by omega))]
       exact ZMod.χ₄_nat_three_mod_four (by omega)
     rw [hJ] at h
     exact Units.ext (by simpa using h)
 
-theorem inertia_q : ∃ g : R.GG, g ≠ 1 ∧ ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(H.q : ℤ)})]
-    (σ : H.E ≃ₐ[ℚ] H.E), (∀ x : 𝓞 H.E, σ • x - x ∈ P) ↔ (H.gal σ = 1 ∨ H.gal σ = g) := by
+theorem inertia_q
+    : ∃ g : R.GG,
+      g ≠ 1
+        ∧ ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(H.q : ℤ)})] (σ : H.E ≃ₐ[ℚ] H.E),
+          (∀ x : 𝓞 H.E, σ • x - x ∈ P) ↔ (H.gal σ = 1 ∨ H.gal σ = g) := by
   obtain ⟨hq, hd, hq8, hd16, -⟩ := H.hyp
   haveI : Fact (Nat.Prime H.q) := ⟨hq⟩
   obtain ⟨u0, hu0, hneg⟩ := exists_unit_neg H
@@ -62,8 +69,7 @@ theorem inertia_q : ∃ g : R.GG, g ≠ 1 ∧ ∀ (P : Ideal (𝓞 H.E)) [P.IsPr
   have hsq : Nat.Coprime H.QS H.q := Nat.Coprime.coprime_dvd_right (dvd_mul_right _ _) H.QS_coprime
   have hcop : Nat.Coprime (H.QS * H.d) H.q := Nat.Coprime.mul_left hsq hdq
   have hN : H.condN = H.QS * H.d * H.q := by simp only [Formalism.HC.HostRaw.condN]; ring
-  have hNpos : 0 < H.condN := by
-    rw [hN]; exact Nat.mul_pos (Nat.mul_pos H.QS_pos hd.pos) hq.pos
+  have hNpos : 0 < H.condN := by rw [hN]; exact Nat.mul_pos (Nat.mul_pos H.QS_pos hd.pos) hq.pos
   haveI : NeZero H.condN := ⟨hNpos.ne'⟩
   have hfq : H.condN.factorization H.q = 1 := by
     rw [hN, Nat.factorization_mul (Nat.mul_pos H.QS_pos hd.pos).ne' hq.ne_zero, Finsupp.add_apply,
@@ -87,15 +93,22 @@ theorem inertia_q : ∃ g : R.GG, g ≠ 1 ∧ ∀ (P : Ideal (𝓞 H.E)) [P.IsPr
     intro a b hab
     have ha := (hmem a).1 a.2
     have hb := (hmem b).1 b.2
-    have hab' : ((a.1 : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ ((b.1 : (ZMod H.condN)ˣ) : ZMod H.condN).val [MOD H.q] := by
-      rw [← ZMod.natCast_eq_natCast_iff]
-      have := congrArg (fun x : (ZMod H.q)ˣ => (x : ZMod H.q)) hab
-      change (((a.1 : (ZMod H.condN)ˣ) : ZMod H.condN).cast : ZMod H.q) = ((b.1 : (ZMod H.condN)ˣ) : ZMod H.condN).cast at this
-      rwa [ZMod.cast_eq_val, ZMod.cast_eq_val] at this
-    have hall : ((a.1 : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ ((b.1 : (ZMod H.condN)ˣ) : ZMod H.condN).val [MOD H.condN] := by
-      have h0 := (Nat.modEq_and_modEq_iff_modEq_mul hcop).1 ⟨ha.trans hb.symm, hab'⟩
-      rwa [← hN] at h0
-    apply Subtype.ext; apply Units.ext
+    have hab'
+        : ((a.1 : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ ((b.1 : (ZMod H.condN)ˣ) : ZMod H.condN).val [MOD H.q] :=
+      by
+        rw [← ZMod.natCast_eq_natCast_iff]
+        have := congrArg (fun x : (ZMod H.q)ˣ => (x : ZMod H.q)) hab
+        change (((a.1 : (ZMod H.condN)ˣ) : ZMod H.condN).cast : ZMod H.q)
+            = ((b.1 : (ZMod H.condN)ˣ) : ZMod H.condN).cast
+          at this
+        rwa [ZMod.cast_eq_val, ZMod.cast_eq_val] at this
+    have hall
+        : ((a.1 : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ ((b.1 : (ZMod H.condN)ˣ) : ZMod H.condN).val [MOD H.condN] :=
+      by
+        have h0 := (Nat.modEq_and_modEq_iff_modEq_mul hcop).1 ⟨ha.trans hb.symm, hab'⟩
+        rwa [← hN] at h0
+    apply Subtype.ext
+    apply Units.ext
     rw [← ZMod.natCast_eq_natCast_iff, ZMod.natCast_zmod_val, ZMod.natCast_zmod_val] at hall
     exact hall
   haveI : IsCyclic f.ker := isCyclic_of_injective fq hinj
@@ -104,8 +117,7 @@ theorem inertia_q : ∃ g : R.GG, g ≠ 1 ∧ ∀ (P : Ideal (𝓞 H.E)) [P.IsPr
   have key : ∀ u : (ZMod H.condN)ˣ, u ∈ f.ker → H.art u = 1 ∨ H.art u = H.art c := by
     intro u hu
     obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.1 (hc ⟨u, hu⟩)
-    have hu' : u = (c : (ZMod H.condN)ˣ) ^ k := by
-      rw [← Subgroup.coe_zpow, hk]
+    have hu' : u = (c : (ZMod H.condN)ˣ) ^ k := by rw [← Subgroup.coe_zpow, hk]
     rw [hu', map_zpow]
     have hc2' : H.art (c : (ZMod H.condN)ˣ) ^ (2 : ℤ) = 1 := by rw [zpow_ofNat]; exact hc2
     rcases Int.even_or_odd' k with ⟨j, rfl | rfl⟩

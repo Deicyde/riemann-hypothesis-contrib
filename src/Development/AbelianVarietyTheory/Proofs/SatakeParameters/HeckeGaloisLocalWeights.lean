@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.RankOn
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.NRows
 
 open Pointwise
 
-theorem ine_conj_of_smul {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    {A : ValuationSubring Ω} {g σ : G F Ω} (hσ : σ ∈ Ine (F := F) (g • A)) :
-    g⁻¹ * σ * g ∈ Ine (F := F) A := by
+theorem ine_conj_of_smul
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A : ValuationSubring Ω} {g σ : G F Ω} (hσ : σ ∈ Ine (F := F) (g • A))
+    : g⁻¹ * σ * g ∈ Ine (F := F) A := by
   have m : ∀ y : Ω, y ∈ g • A ↔ (g⁻¹ : G F Ω) y ∈ A := fun y => by
     rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def]
   have m' : ∀ y : Ω, (g • A).valuation y < 1 ↔ A.valuation ((g⁻¹ : G F Ω) y) < 1 := fun y => by
@@ -35,13 +37,49 @@ theorem ine_conj_of_smul {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Alg
     rw [map_sub, c] at h
     exact h
 
-theorem crys_unram_of_lgc : ∀ D : D7, SumRepresentations.tie0 D → SumRepresentations.adm1 D → (∀ (i : D.nd.Loc) (x : D.nd.X i) (P : D.naut.AV i) (Pa : List (Part D.naut.CG)), D.naut.ptV i P = some x → IsBCV D.nd D.naut i P Pa → ∀ ρ : Formalism.ConjugateSelfDual.G D.host.E D.nd.Om →* GL (Fin D.R.nV) (Qbar (D.nd.l i)), SumRepresentations.At.IsHeckeGaloisQ D.nd D.naut i x ρ → (∀ w, w ∉ placesOver D.host.E (D.nd.l i) → D.naut.wdOf i ρ w = D.naut.lpTw (isoLoc D.nd D.naut Pa w) ((1 - (D.R.nV : ℝ)) / 2)) ∧ ∀ w ∈ placesOver D.host.E (D.nd.l i), D.naut.IsdRW i ρ w ∧ D.naut.wdOf i ρ w = D.naut.lpTw (isoLoc D.nd D.naut Pa w) ((1 - (D.R.nV : ℝ)) / 2) ∧ ∀ τ, InducesW D.nd i τ w → D.naut.jumpsW i ρ τ = D.naut.locAutHodgeTateWeightsLevelZero i τ) → ∀ (i : D.nd.Loc) (r : D.nd.X i → (Formalism.ConjugateSelfDual.G D.host.E D.nd.Om →* GL (Fin D.R.nV) (D.nd.O i))), (∀ x, SumRepresentations.At.IsHeckeGaloisQ D.nd D.naut i x (mapRep (iotaOQ D.nd D.naut i) (r x))) → (∀ w ∈ placesOver D.host.E (D.nd.l i),
-      (D.nd.l i ≠ D.host.g 0 → D.nd.l i ≠ D.host.g 1 → ∀ x, D.naut.IsCrysW i (mapRep (iotaOQ D.nd D.naut i) (r x)) w ∧
-        ∀ τ, InducesW D.nd i τ w → D.naut.jumpsW i (mapRep (iotaOQ D.nd D.naut i) (r x)) τ = D.naut.locAutHodgeTateWeightsLevelZero i τ) ∧
-      ((D.nd.l i = D.host.g 0 ∨ D.nd.l i = D.host.g 1) → ∀ x,
-        (∀ P Pa, D.naut.ptV i P = some x → IsBCV D.nd D.naut i P Pa → D.naut.mono0 (isoLoc D.nd D.naut Pa w)) →
-        D.naut.IsPotCrysW i (mapRep (iotaOQ D.nd D.naut i) (r x)) w)) ∧
-    ∀ x w, w ∉ placesOver D.host.E (D.nd.l i) → w ∉ D.nd.S i → w ∉ D.nd.Q i → UnramAt (F := D.host.E) (r x) w := by
+theorem crys_unram_of_lgc
+    : ∀ D : D7,
+      SumRepresentations.tie0 D → SumRepresentations.adm1 D
+        → (∀ (i : D.nd.Loc) (x : D.nd.X i) (P : D.naut.AV i) (Pa : List (Part D.naut.CG)),
+          D.naut.ptV i P = some x → IsBCV D.nd D.naut i P Pa
+            → ∀ ρ
+                : Formalism.ConjugateSelfDual.G D.host.E D.nd.Om
+                  →* GL (Fin D.R.nV) (Qbar (D.nd.l i)),
+              SumRepresentations.At.IsHeckeGaloisQ D.nd D.naut i x ρ
+                → (∀ w,
+                    w ∉ placesOver D.host.E (D.nd.l i)
+                      → D.naut.wdOf i ρ w
+                        = D.naut.lpTw (isoLoc D.nd D.naut Pa w) ((1 - (D.R.nV : ℝ)) / 2))
+                  ∧ ∀ w ∈ placesOver D.host.E (D.nd.l i),
+                    D.naut.IsdRW i ρ w
+                      ∧ D.naut.wdOf i ρ w
+                        = D.naut.lpTw (isoLoc D.nd D.naut Pa w) ((1 - (D.R.nV : ℝ)) / 2)
+                      ∧ ∀ τ,
+                        InducesW D.nd i τ w
+                          → D.naut.jumpsW i ρ τ = D.naut.locAutHodgeTateWeightsLevelZero i τ)
+        → ∀ (i : D.nd.Loc)
+            (r : D.nd.X i
+              → (Formalism.ConjugateSelfDual.G D.host.E D.nd.Om →* GL (Fin D.R.nV) (D.nd.O i))),
+          (∀ x,
+              SumRepresentations.At.IsHeckeGaloisQ D.nd D.naut i x
+                (mapRep (iotaOQ D.nd D.naut i) (r x)))
+            → (∀ w ∈ placesOver D.host.E (D.nd.l i),
+                (D.nd.l i ≠ D.host.g 0 → D.nd.l i ≠ D.host.g 1
+                    → ∀ x,
+                      D.naut.IsCrysW i (mapRep (iotaOQ D.nd D.naut i) (r x)) w
+                        ∧ ∀ τ,
+                          InducesW D.nd i τ w
+                            → D.naut.jumpsW i (mapRep (iotaOQ D.nd D.naut i) (r x)) τ
+                              = D.naut.locAutHodgeTateWeightsLevelZero i τ)
+                  ∧ ((D.nd.l i = D.host.g 0 ∨ D.nd.l i = D.host.g 1)
+                    → ∀ x,
+                      (∀ P Pa,
+                          D.naut.ptV i P = some x → IsBCV D.nd D.naut i P Pa
+                            → D.naut.mono0 (isoLoc D.nd D.naut Pa w))
+                        → D.naut.IsPotCrysW i (mapRep (iotaOQ D.nd D.naut i) (r x)) w))
+              ∧ ∀ x w,
+                w ∉ placesOver D.host.E (D.nd.l i) → w ∉ D.nd.S i → w ∉ D.nd.Q i
+                  → UnramAt (F := D.host.E) (r x) w := by
   intro D htie hadm hLGC i r hr
   obtain ⟨-, -, hGal⟩ := htie
   have hl : (D.nd.l i).Prime := Fact.out
@@ -49,10 +87,11 @@ theorem crys_unram_of_lgc : ∀ D : D7, SumRepresentations.tie0 D → SumReprese
     obtain ⟨P, hP⟩ := D.naut.pt_surj i x
     obtain ⟨Pa, hPa⟩ := hadm i P
     exact ⟨P, Pa, hP, hPa⟩
-  have hunr : ∀ P Pa w, IsBCV D.nd D.naut i P Pa → w ∉ D.nd.Q i →
-      (∀ k, w ∉ placesOver D.host.E (D.host.g k)) →
-      w ∉ placesOver D.host.E (if D.nd.l i = D.host.pde then D.host.pde' else D.host.pde) →
-      D.naut.unr (isoLoc D.nd D.naut Pa w) := by
+  have hunr
+      : ∀ P Pa w,
+        IsBCV D.nd D.naut i P Pa → w ∉ D.nd.Q i → (∀ k, w ∉ placesOver D.host.E (D.host.g k))
+          → w ∉ placesOver D.host.E (if D.nd.l i = D.host.pde then D.host.pde' else D.host.pde)
+          → D.naut.unr (isoLoc D.nd D.naut Pa w) := by
     intro P Pa w hB hQ hg hp
     by_cases hs : IsSplitPl D.host w
     · rw [hB.2.2.2.1 w hs]
@@ -79,9 +118,10 @@ theorem crys_unram_of_lgc : ∀ D : D7, SumRepresentations.tie0 D → SumReprese
     exact hm P Pa hP hB
   · obtain ⟨P, Pa, hP, hB⟩ := key x
     have h := (hLGC i x P Pa hP hB _ (hr x)).1 w hwl
-    have hS : ¬ ((w ∈ placesOver D.host.E (D.host.g 0) ∨ w ∈ placesOver D.host.E (D.host.g 1) ∨
-        w ∈ placesOver D.host.E (if D.nd.l i = D.host.pde then D.host.pde' else D.host.pde)) ∧
-        w ∉ placesOver D.host.E (D.nd.l i)) := fun hh => hwS ((D.nd.S_def i w).2 hh)
+    have hS : ¬((w ∈ placesOver D.host.E (D.host.g 0) ∨ w ∈ placesOver D.host.E (D.host.g 1)
+          ∨ w ∈ placesOver D.host.E (if D.nd.l i = D.host.pde then D.host.pde' else D.host.pde))
+        ∧ w ∉ placesOver D.host.E (D.nd.l i)) := fun hh =>
+      hwS ((D.nd.S_def i w).2 hh)
     have hu : D.naut.unr (D.naut.wdOf i (mapRep (iotaOQ D.nd D.naut i) (r x)) w) := by
       rw [h, D.naut.unr_tw]
       refine hunr P Pa w hB hwQ (fun k hk => hS ⟨?_, hwl⟩) (fun hk => hS ⟨Or.inr (Or.inr hk), hwl⟩)

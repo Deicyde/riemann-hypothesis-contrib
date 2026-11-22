@@ -8,9 +8,15 @@ open IsDedekindDomain
 
 namespace GlobalTheory.InertiaFixedVal
 
-theorem valuation_le_exp_neg_card_inertia (R K L : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [PerfectField (IsLocalRing.ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field L] [Algebra K L] [FiniteDimensional K L] [IsGalois K L] [Algebra R L] [IsScalarTower R K L] [SMulCommClass (L ≃ₐ[K] L) R L] [IsDedekindDomain (integralClosure R L)] [IsFractionRing (integralClosure R L) L] (P : IsDedekindDomain.HeightOneSpectrum (integralClosure R L)) (y : L) :
-    (∀ σ ∈ P.asIdeal.inertia (L ≃ₐ[K] L), σ y = y) → P.valuation L y < 1 →
-      P.valuation L y ≤ WithZero.exp (-(Nat.card (P.asIdeal.inertia (L ≃ₐ[K] L)) : ℤ)) := by
+theorem valuation_le_exp_neg_card_inertia
+    (R K L : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    [PerfectField (IsLocalRing.ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K]
+    [Field L] [Algebra K L] [FiniteDimensional K L] [IsGalois K L] [Algebra R L]
+    [IsScalarTower R K L] [SMulCommClass (L ≃ₐ[K] L) R L] [IsDedekindDomain (integralClosure R L)]
+    [IsFractionRing (integralClosure R L) L]
+    (P : IsDedekindDomain.HeightOneSpectrum (integralClosure R L)) (y : L)
+    : (∀ σ ∈ P.asIdeal.inertia (L ≃ₐ[K] L), σ y = y) → P.valuation L y < 1
+      → P.valuation L y ≤ WithZero.exp (-(Nat.card (P.asIdeal.inertia (L ≃ₐ[K] L)) : ℤ)) := by
   intro hy hv
   classical
   let H : Subgroup (L ≃ₐ[K] L) := P.asIdeal.inertia (L ≃ₐ[K] L)
@@ -21,8 +27,9 @@ theorem valuation_le_exp_neg_card_inertia (R K L : Type) [CommRing R] [IsDomain 
   let OE := integralClosure R E
   haveI : IsFractionRing OE E := integralClosure.isFractionRing_of_finite_extension K E
   haveI : IsDedekindDomain OE := integralClosure.isDedekindDomain R K E
-  let f : OE →ₐ[R] integralClosure R L := ((IsScalarTower.toAlgHom R E L).comp OE.val).codRestrict _
-    (fun x => x.2.map (IsScalarTower.toAlgHom R E L))
+  let f : OE →ₐ[R] integralClosure R L :=
+    ((IsScalarTower.toAlgHom R E L).comp OE.val).codRestrict _
+      (fun x => x.2.map (IsScalarTower.toAlgHom R E L))
   letI : Algebra OE (integralClosure R L) := f.toRingHom.toAlgebra
   haveI : IsScalarTower OE (integralClosure R L) L := IsScalarTower.of_algebraMap_eq fun _ => rfl
   haveI : IsScalarTower R OE (integralClosure R L) := IsScalarTower.of_algebraMap_eq fun r => (f.commutes r).symm
@@ -41,8 +48,7 @@ theorem valuation_le_exp_neg_card_inertia (R K L : Type) [CommRing R] [IsDomain 
 
   let Q : Ideal OE := P.asIdeal.under OE
   have hPne : P.asIdeal ≠ ⊥ := P.ne_bot
-  have hQne : Q ≠ ⊥ := by
-    exact Ideal.under_ne_bot OE hPne
+  have hQne : Q ≠ ⊥ := by exact Ideal.under_ne_bot OE hPne
   haveI hQmax : Q.IsMaximal := Ideal.IsPrime.isMaximal inferInstance hQne
   have hQR : (Q.under R).IsMaximal := Ideal.IsMaximal.under R Q
   haveI : Q.LiesOver (IsLocalRing.maximalIdeal R) := ⟨(IsLocalRing.eq_maximalIdeal hQR).symm⟩
@@ -87,7 +93,8 @@ theorem valuation_le_exp_neg_card_inertia (R K L : Type) [CommRing R] [IsDomain 
       rw [WithZero.exp_le_exp]
       omega
   rw [← hval]
-  calc w.valuation E z ^ Nat.card H ≤ WithZero.exp (-1) ^ Nat.card H := pow_le_pow_left₀ zero_le hz1 _
-    _ = WithZero.exp (-(Nat.card H : ℤ)) := by
-      rw [← WithZero.exp_nsmul]; congr 1; simp
+  calc
+    w.valuation E z ^ Nat.card H
+      ≤ WithZero.exp (-1) ^ Nat.card H := pow_le_pow_left₀ zero_le hz1 _
+    _ = WithZero.exp (-(Nat.card H : ℤ)) := by rw [← WithZero.exp_nsmul]; congr 1; simp
 end GlobalTheory.InertiaFixedVal

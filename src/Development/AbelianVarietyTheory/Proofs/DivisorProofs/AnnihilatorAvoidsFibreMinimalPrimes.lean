@@ -9,11 +9,17 @@ open AlgebraicGeometry CategoryTheory Limits
 namespace GlobalTheory
 
 theorem annihilator_avoids_fibre_minimalPrimes
-    (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [Algebra.FiniteType A B] (b : B)
-    (hd : ∀ q : PrimeSpectrum B, q ∈ closure ({P : PrimeSpectrum B | ∃ s ∉ P.asIdeal, s * b = 0} ∩
-      PrimeSpectrum.comap (algebraMap A B) ⁻¹' {PrimeSpectrum.comap (algebraMap A B) q}))
-    (u : PrimeSpectrum B) : ∃ g : B, g * b = 0 ∧ ∀ Q ∈ ((u.asIdeal.comap (algebraMap A B)).map (algebraMap A B)).minimalPrimes,
-      Q ≤ u.asIdeal → g ∉ Q := by
+    (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [Algebra.FiniteType A B]
+    (b : B)
+    (hd : ∀ q : PrimeSpectrum B,
+      q ∈ closure
+        ({P : PrimeSpectrum B | ∃ s ∉ P.asIdeal, s * b = 0}
+          ∩ PrimeSpectrum.comap (algebraMap A B) ⁻¹' {PrimeSpectrum.comap (algebraMap A B) q}))
+    (u : PrimeSpectrum B)
+    : ∃ g : B,
+      g * b = 0
+        ∧ ∀ Q ∈ ((u.asIdeal.comap (algebraMap A B)).map (algebraMap A B)).minimalPrimes,
+          Q ≤ u.asIdeal → g ∉ Q := by
   classical
   let p : PrimeSpectrum A := PrimeSpectrum.comap (algebraMap A B) u
   let I₀ : Ideal B := p.asIdeal.map (algebraMap A B)
@@ -22,7 +28,8 @@ theorem annihilator_avoids_fibre_minimalPrimes
     let e := PrimeSpectrum.preimageOrderIsoFiber A B p
     haveI : IsNoetherianRing (p.asIdeal.Fiber B) :=
       Algebra.FiniteType.isNoetherianRing p.asIdeal.ResidueField _
-    have hM : {j : PrimeSpectrum (p.asIdeal.Fiber B) | j.asIdeal ∈ minimalPrimes (p.asIdeal.Fiber B)}.Finite :=
+    have hM
+        : {j : PrimeSpectrum (p.asIdeal.Fiber B) | j.asIdeal ∈ minimalPrimes (p.asIdeal.Fiber B)}.Finite :=
       (minimalPrimes.finite_of_isNoetherianRing _).preimage (fun x _ y _ h => PrimeSpectrum.ext h)
     refine (hM.image fun j => (e.symm j).1.asIdeal).subset ?_
     rintro Q ⟨hQmin, hQp⟩
@@ -30,18 +37,17 @@ theorem annihilator_avoids_fibre_minimalPrimes
     let Q' : PrimeSpectrum B := ⟨Q, hQprime⟩
     have hQ'mem : Q' ∈ PrimeSpectrum.comap (algebraMap A B) ⁻¹' {p} := by
       show PrimeSpectrum.comap (algebraMap A B) Q' = p
-      ext1; exact hQp
+      ext1
+      exact hQp
     obtain ⟨J, hJmin, hJle⟩ := Ideal.exists_minimalPrimes_le (bot_le : ⊥ ≤ (e ⟨Q', hQ'mem⟩).asIdeal)
     have hJprime : J.IsPrime := hJmin.1.1
     let j : PrimeSpectrum (p.asIdeal.Fiber B) := ⟨J, hJprime⟩
     refine ⟨j, hJmin, ?_⟩
-    have hle : e.symm j ≤ ⟨Q', hQ'mem⟩ := by
-      rw [← e.le_iff_le, e.apply_symm_apply]; exact hJle
+    have hle : e.symm j ≤ ⟨Q', hQ'mem⟩ := by rw [← e.le_iff_le, e.apply_symm_apply]; exact hJle
     have hle' : (e.symm j).1.asIdeal ≤ Q := hle
     have hover : (e.symm j).1.asIdeal.comap (algebraMap A B) = p.asIdeal :=
       congrArg PrimeSpectrum.asIdeal (e.symm j).2
-    have hge : I₀ ≤ (e.symm j).1.asIdeal := by
-      rw [Ideal.map_le_iff_le_comap, hover]
+    have hge : I₀ ≤ (e.symm j).1.asIdeal := by rw [Ideal.map_le_iff_le_comap, hover]
     exact le_antisymm hle' (hQmin.2 ⟨(e.symm j).1.isPrime, hge⟩ hle')
   obtain ⟨s, hs⟩ := hTfin.exists_finset_coe
   have hsT : ∀ i, i ∈ s ↔ i ∈ T := fun i => by rw [← hs]; rfl
@@ -69,16 +75,19 @@ theorem annihilator_avoids_fibre_minimalPrimes
       (congrArg PrimeSpectrum.asIdeal hPfib).trans hQ.2
     have hI₀P : I₀ ≤ P.asIdeal := by rw [Ideal.map_le_iff_le_comap, hPover]
     obtain ⟨Q', hQ'min, hQ'P⟩ := Ideal.exists_minimalPrimes_le hI₀P
-    have hQ'T : Q' ∈ T := ⟨hQ'min, le_antisymm ((Ideal.comap_mono hQ'P).trans hPover.le)
-      (Ideal.map_le_iff_le_comap.1 hQ'min.1.2)⟩
+    have hQ'T : Q' ∈ T := ⟨
+      hQ'min,
+      le_antisymm ((Ideal.comap_mono hQ'P).trans hPover.le) (Ideal.map_le_iff_le_comap.1 hQ'min.1.2)
+    ⟩
     by_cases hQQ : Q' = Q
     · subst hQQ
       exact htP (hQ'P (hKQ ((hK t).2 htb)))
     · exact hPf' (hQ'P (hfo Q' hQ'T hQQ))
   have hprime : ∀ i ∈ s, i ≠ ⊥ → i ≠ ⊥ → (id i : Ideal B).IsPrime := fun i hi _ _ =>
     ((hsT i).1 hi).1.1.1
-  have hnot := mt (Ideal.subset_union_prime (f := id) (I := K) ⊥ ⊥ hprime).1 (by
-    rintro ⟨i, hi, hKi⟩; exact key i ((hsT i).1 hi) hKi)
+  have hnot :=
+    mt (Ideal.subset_union_prime (f := id) (I := K) ⊥ ⊥ hprime).1
+      (by rintro ⟨i, hi, hKi⟩; exact key i ((hsT i).1 hi) hKi)
   rw [Set.not_subset] at hnot
   obtain ⟨g, hgK, hgU⟩ := hnot
   refine ⟨g, (hK g).1 hgK, fun Q hQ hQu hgQ => hgU ?_⟩

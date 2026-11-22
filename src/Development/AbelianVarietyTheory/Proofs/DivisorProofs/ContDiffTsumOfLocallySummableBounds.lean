@@ -8,11 +8,12 @@ open scoped ContDiff
 
 namespace GlobalTheory
 
-theorem contDiff_tsum_of_locally_summable_bounds {k : ℕ} {ι : Type} (f : ι → (Fin k → ℝ) → ℂ)
-    (hf : ∀ i, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (f i))
-    (hu : ∀ (n : ℕ) (R : ℝ), ∃ u : ι → ℝ, Summable u ∧
-      ∀ i t, ‖t‖ ≤ R → ‖iteratedFDeriv ℝ n (f i) t‖ ≤ u i) :
-    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun t => ∑' i, f i t) := by
+theorem contDiff_tsum_of_locally_summable_bounds
+    {k : ℕ} {ι : Type}
+    (f : ι → (Fin k → ℝ) → ℂ) (hf : ∀ i, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (f i))
+    (hu : ∀ (n : ℕ) (R : ℝ), ∃ u : ι → ℝ,
+      Summable u ∧ ∀ i t, ‖t‖ ≤ R → ‖iteratedFDeriv ℝ n (f i) t‖ ≤ u i)
+    : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun t => ∑' i, f i t) := by
   choose u hus hub using hu
   have hinf : ((⊤ : ℕ∞) : WithTop ℕ∞) = ∞ := rfl
   rw [hinf] at hf ⊢
@@ -20,7 +21,7 @@ theorem contDiff_tsum_of_locally_summable_bounds {k : ℕ} {ι : Type} (f : ι �
   intro n
   rw [contDiff_iff_contDiffAt]
   intro t₀
-  let ρ : ContDiffBump t₀ := ⟨1/2, 1, by norm_num, by norm_num⟩
+  let ρ : ContDiffBump t₀ := ⟨1 / 2, 1, by norm_num, by norm_num⟩
   set R : ℝ := ‖t₀‖ + 1 with hR
   let ρc : (Fin k → ℝ) → ℂ := fun t => ((ρ t : ℝ) : ℂ)
   have hρc : ContDiff ℝ ∞ ρc := Complex.ofRealCLM.contDiff.comp ρ.contDiff
@@ -40,8 +41,7 @@ theorem contDiff_tsum_of_locally_summable_bounds {k : ℕ} {ι : Type} (f : ι �
   have hunonneg : ∀ m i, 0 ≤ u m R i := fun m i =>
     (norm_nonneg _).trans (hub m R i 0 (by rw [norm_zero, hR]; positivity))
   have hB0 : ∀ j, 0 ≤ B j := fun j => (norm_nonneg _).trans (hB j 0)
-  let v : ℕ → ι → ℝ := fun m i =>
-    ∑ j ∈ Finset.range (m + 1), (m.choose j : ℝ) * B j * u (m - j) R i
+  let v : ℕ → ι → ℝ := fun m i => ∑ j ∈ Finset.range (m + 1), (m.choose j : ℝ) * B j * u (m - j) R i
   have hv : ∀ m, Summable (v m) := fun m => by
     apply summable_sum
     intro j _
@@ -55,15 +55,17 @@ theorem contDiff_tsum_of_locally_summable_bounds {k : ℕ} {ι : Type} (f : ι �
     · have hxR : ‖x‖ ≤ R := by
         rw [Metric.mem_closedBall, dist_eq_norm] at hx
         have := norm_sub_norm_le x t₀
-        rw [hR]; linarith
-      apply mul_le_mul _ (hub _ _ _ _ hxR) (norm_nonneg _)
-        (mul_nonneg (by positivity) (hB0 j))
+        rw [hR]
+        linarith
+      apply mul_le_mul _ (hub _ _ _ _ hxR) (norm_nonneg _) (mul_nonneg (by positivity) (hB0 j))
       exact mul_le_mul_of_nonneg_left (hB j x) (by positivity)
     · rw [hsupp j x hx, norm_zero, mul_zero, zero_mul]
       exact mul_nonneg (mul_nonneg (by positivity) (hB0 j)) (hunonneg _ _)
   have hsm : ContDiff ℝ ((n : ℕ∞) : WithTop ℕ∞) (fun t => ∑' i, ρc t * f i t) :=
-    contDiff_tsum (fun i => (hρc.mul (hf i)).of_le (by exact_mod_cast le_top))
-      (fun m _ => hv m) (fun m i x _ => hbound m i x)
+    contDiff_tsum
+      (fun i => (hρc.mul (hf i)).of_le (by exact_mod_cast le_top))
+      (fun m _ => hv m)
+      (fun m i x _ => hbound m i x)
   have heq : (fun t => ∑' i, f i t) =ᶠ[nhds t₀] (fun t => ∑' i, ρc t * f i t) := by
     filter_upwards [Metric.closedBall_mem_nhds t₀ (by norm_num : (0:ℝ) < 1/2)] with t ht
     rw [tsum_mul_left]

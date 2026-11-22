@@ -19,8 +19,12 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 @[expose] public section
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest GlobalTheory.SqTop GlobalTheory.SquareComm
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
+  GlobalTheory.SqTop GlobalTheory.SquareComm
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -28,37 +32,54 @@ noncomputable section
 namespace GlobalTheory.ThetaFinRelDef
 open GlobalTheory.SquareComm
 open scoped ComplexOrder
-theorem theta_integral_finite_relation_eq_zero : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsStdChar D ψ (-1) → IsInfFam θ → ∀ (M X : HSp D) (A : GlobalTheory.ChainFr.Fr M) (B : GlobalTheory.ChainFr.Fr X) (χ χ' : (AE D)ˣ →* Circle) (ω : GlobalTheory.Grid.WRep M X), GlobalTheory.Grid.IsWeil ψ false M X χ χ' ω → (∀ τ, Formalism.UG.HasSignature (gramAt D M τ) M.rank 0) → ∀ (ν : Measure (GA D M)) (𝓕 : Set (GA D M)), IsHaarFD M ν 𝓕 → ∀ Φ ∈ finRel ω (algF ψ θ false A B), thetaInt ω ν 𝓕 Φ = 0 := by
+theorem theta_integral_finite_relation_eq_zero
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D),
+        IsStdChar D ψ (-1) → IsInfFam θ
+          → ∀ (M X : HSp D) (A : GlobalTheory.ChainFr.Fr M) (B : GlobalTheory.ChainFr.Fr X)
+              (χ χ' : (AE D)ˣ →* Circle) (ω : GlobalTheory.Grid.WRep M X),
+            GlobalTheory.Grid.IsWeil ψ false M X χ χ' ω
+              → (∀ τ, Formalism.UG.HasSignature (gramAt D M τ) M.rank 0)
+              → ∀ (ν : Measure (GA D M)) (𝓕 : Set (GA D M)),
+                IsHaarFD M ν 𝓕 → ∀ Φ ∈ finRel ω (algF ψ θ false A B), thetaInt ω ν 𝓕 Φ = 0 := by
   intro _ D ψ θ hψ hθ M X A B χ χ' ω hω hsig ν 𝓕 hF
   have hω' : IsWeilDatumO ψ M X χ χ' ω := hω
-  have hpd : ∀ τ, (gramAt D M τ).PosDef := fun τ => GlobalTheory.Core.CoefGram.posDef_of_hasSignature _ (hsig τ)
-  have hcc : GlobalTheory.Unf.CoCpt M := (GlobalTheory.Unf.CoCptOf.coCpt_of_isAniso_or_posDef D M).2 hpd
+  have hpd : ∀ τ, (gramAt D M τ).PosDef := fun τ =>
+    GlobalTheory.Core.CoefGram.posDef_of_hasSignature _ (hsig τ)
+  have hcc : GlobalTheory.Unf.CoCpt M :=
+    (GlobalTheory.Unf.CoCptOf.coCpt_of_isAniso_or_posDef D M).2 hpd
   have hth : ∀ Φ ∈ algF ψ θ false A B, IsThetaFunO ψ M X Φ := fun Φ hΦ =>
     GlobalTheory.SquareComm.ThetaLeft.isThetaFunO_of_mem_algF hψ hθ A B hΦ
   have hleft := GlobalTheory.SquareComm.ThetaLeft.main D ψ θ hθ M X A B χ χ' ω hω
-  have hsub : ∀ g k (Φ Ψ : WO M X → ℂ), thetaKO ω g k (Φ - Ψ) = thetaKO ω g k Φ - thetaKO ω g k Ψ := by
+  have hsub
+      : ∀ g k (Φ Ψ : WO M X → ℂ), thetaKO ω g k (Φ - Ψ) = thetaKO ω g k Φ - thetaKO ω g k Ψ := by
     intros; simp [thetaKO, map_sub]
-  have hadd : ∀ g k (Φ Ψ : WO M X → ℂ), thetaKO ω g k (Φ + Ψ) = thetaKO ω g k Φ + thetaKO ω g k Ψ := by
+  have hadd
+      : ∀ g k (Φ Ψ : WO M X → ℂ), thetaKO ω g k (Φ + Ψ) = thetaKO ω g k Φ + thetaKO ω g k Ψ := by
     intros; simp [thetaKO, map_add (f := _)]
   have hsmul : ∀ g k (c : ℂ) (Φ : WO M X → ℂ), thetaKO ω g k (c • Φ) = c * thetaKO ω g k Φ := by
     intros; simp [thetaKO, map_smul]
-  have hzero : ∀ g k, thetaKO ω g k (0 : WO M X → ℂ) = 0 := by
-    intros; simp [thetaKO]
+  have hzero : ∀ g k, thetaKO ω g k (0 : WO M X → ℂ) = 0 := by intros; simp [thetaKO]
   have hint : ∀ Φ ∈ algF ψ θ false A B, ∀ h, IntegrableOn (fun g => thetaKO ω g h Φ) 𝓕 ν := by
     intro Φ hΦ h
-    exact (GlobalTheory.Unf.contAut_rapidDec_bounded_integrable D M hcc _
-      ⟨fun γ hγ g => hleft Φ hΦ γ hγ g h, (hω'.om_cont Φ (hth Φ hΦ) 0).comp (Continuous.prodMk_left h)⟩).2.2
-      ⟨ν, 𝓕, hF.1, hF.2⟩
+    exact (GlobalTheory.Unf.contAut_rapidDec_bounded_integrable D M hcc _ ⟨
+      fun γ hγ g => hleft Φ hΦ γ hγ g h,
+      (hω'.om_cont Φ (hth Φ hΦ) 0).comp (Continuous.prodMk_left h)
+    ⟩).2.2 ⟨ν, 𝓕, hF.1, hF.2⟩
   intro Φ hΦ
-  suffices key : (∀ h, IntegrableOn (fun g => thetaKO ω g h Φ) 𝓕 ν) ∧ thetaInt ω ν 𝓕 Φ = 0 from key.2
+  suffices key : (∀ h, IntegrableOn (fun g => thetaKO ω g h Φ) 𝓕 ν) ∧ thetaInt ω ν 𝓕 Φ = 0 from
+    key.2
   induction hΦ using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨u, -, Ψ, hΨ, rfl⟩ := hx
     have e : ∀ g k, thetaKO ω g k (ω (u, 1) Ψ) = thetaKO ω (g * u) k Ψ := fun g k => by
       unfold thetaKO
       rw [← Module.End.mul_apply, ← map_mul, Prod.mk_mul_mk, mul_one]
-    have tr := fun k => integral_rightTranslate hF (f := fun g => thetaKO ω g k Ψ)
-      (fun γ hγ g => hleft Ψ hΨ γ hγ g k) u
+    have tr := fun k =>
+      integral_rightTranslate hF
+        (f := fun g => thetaKO ω g k Ψ)
+        (fun γ hγ g => hleft Ψ hΨ γ hγ g k)
+        u
     have i1 : ∀ k, IntegrableOn (fun g => thetaKO ω g k (ω (u, 1) Ψ)) 𝓕 ν := fun k => by
       simp only [e]; exact (tr k).1.2 (hint Ψ hΨ k)
     refine ⟨fun k => ?_, ?_⟩
@@ -69,7 +90,8 @@ theorem theta_integral_finite_relation_eq_zero : _root_.GlobalTheory.FunPr.Theta
       simp only [e]
       rw [(tr k).2, sub_self]
   | zero =>
-    exact ⟨fun k => by simp only [hzero]; exact integrableOn_zero, by funext k; simp [thetaInt, hzero]⟩
+    exact
+      ⟨fun k => by simp only [hzero]; exact integrableOn_zero, by funext k; simp [thetaInt, hzero]⟩
   | add x y _ _ hx hy =>
     refine ⟨fun k => by simp only [hadd]; exact (hx.1 k).add (hy.1 k), ?_⟩
     funext k
@@ -89,12 +111,31 @@ end
 end
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest GlobalTheory.SqTop GlobalTheory.SquareComm
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
+  GlobalTheory.SqTop GlobalTheory.SquareComm
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.theta_integral_vanishes_on_finite_relations : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsStdChar D ψ (-1) → IsInfFam θ → ∀ (M X : HSp D) (A : GlobalTheory.ChainFr.Fr M) (B : GlobalTheory.ChainFr.Fr X) (χ χ' : (AE D)ˣ →* Circle) (ω : GlobalTheory.Grid.WRep M X), GlobalTheory.Grid.IsWeil ψ false M X χ χ' ω → (∀ τ, Formalism.UG.HasSignature (gramAt D M τ) M.rank 0) → ∀ (ν : Measure (GA D M)) (𝓕 : Set (GA D M)), IsHaarFD M ν 𝓕 → ∀ Φ ∈ finRel ω (algF ψ θ false A B), thetaInt ω ν 𝓕 Φ = 0 := by
-  first | exact @_root_.GlobalTheory.ThetaFinRelDef.theta_integral_finite_relation_eq_zero | exact _root_.GlobalTheory.ThetaFinRelDef.theta_integral_finite_relation_eq_zero | (intros; apply _root_.GlobalTheory.ThetaFinRelDef.theta_integral_finite_relation_eq_zero <;> assumption)
+theorem _root_.GlobalTheory.T.theta_integral_vanishes_on_finite_relations
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D),
+        IsStdChar D ψ (-1) → IsInfFam θ
+          → ∀ (M X : HSp D) (A : GlobalTheory.ChainFr.Fr M) (B : GlobalTheory.ChainFr.Fr X)
+              (χ χ' : (AE D)ˣ →* Circle) (ω : GlobalTheory.Grid.WRep M X),
+            GlobalTheory.Grid.IsWeil ψ false M X χ χ' ω
+              → (∀ τ, Formalism.UG.HasSignature (gramAt D M τ) M.rank 0)
+              → ∀ (ν : Measure (GA D M)) (𝓕 : Set (GA D M)),
+                IsHaarFD M ν 𝓕 → ∀ Φ ∈ finRel ω (algF ψ θ false A B), thetaInt ω ν 𝓕 Φ = 0 := by
+  first
+  | exact @_root_.GlobalTheory.ThetaFinRelDef.theta_integral_finite_relation_eq_zero
+  | exact _root_.GlobalTheory.ThetaFinRelDef.theta_integral_finite_relation_eq_zero
+  | (
+      intros
+      apply _root_.GlobalTheory.ThetaFinRelDef.theta_integral_finite_relation_eq_zero <;> assumption
+    )
 end

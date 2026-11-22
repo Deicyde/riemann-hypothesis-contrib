@@ -17,8 +17,8 @@ theorem hpk_ne_zero (k r : ℕ) : Hpk k r ≠ 0 := by
   split_ifs at this <;> first | omega | norm_num at this | skip
   all_goals simp_all
 
-theorem isMatGroup_of_isClosedSub {k r : ℕ} {S : Set (Mat k r)} (hS : IsClosedSub k r S) :
-    PI.IsMatGroup S := by
+theorem isMatGroup_of_isClosedSub {k r : ℕ} {S : Set (Mat k r)} (hS : IsClosedSub k r S)
+    : PI.IsMatGroup S := by
   obtain ⟨hU, hc, h1, hm, hi⟩ := hS
   refine ⟨hc, h1, hm, fun a ha => ⟨hi a ha, ?_⟩⟩
   by_cases hd : IsUnit a.det
@@ -31,9 +31,12 @@ theorem isMatGroup_of_isClosedSub {k r : ℕ} {S : Set (Mat k r)} (hS : IsClosed
     simp at this
     exact hpk_ne_zero k r this.symm
 
-theorem haarOn_unique : ∀ (k r : ℕ) (S : Set (Mat k r)) (μ μ' : Measure (Mt k r)), IsClosedSub k r S →
-    IsHaarOn S μ → IsHaarOn S μ' → ∃ c : ENNReal, 0 < c ∧ c < ⊤ ∧ μ' = c • μ := by
+theorem haarOn_unique
+    : ∀ (k r : ℕ) (S : Set (Mat k r)) (μ μ' : Measure (Mt k r)),
+      IsClosedSub k r S → IsHaarOn S μ → IsHaarOn S μ'
+        → ∃ c : ENNReal, 0 < c ∧ c < ⊤ ∧ μ' = c • μ := by
   intro k r S μ μ' hS hμ hμ'
-  exact (GlobalTheory.MatHaar.haar_unique_locFinite_openPos (2 * r + k + 1) S μ (isMatGroup_of_isClosedSub hS) hμ).1 μ' hμ'
+  exact (GlobalTheory.MatHaar.haar_unique_locFinite_openPos (2 * r + k + 1) S μ
+    (isMatGroup_of_isClosedSub hS) hμ).1 μ' hμ'
 
 end GlobalTheory.SgInf

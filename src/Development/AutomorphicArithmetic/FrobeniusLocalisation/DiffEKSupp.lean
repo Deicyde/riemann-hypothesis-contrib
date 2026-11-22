@@ -13,13 +13,17 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-private theorem natMem {M : Type} [Field M] [NumberField M] (l : ℕ) (P : Ideal (𝓞 M))
-    [h : P.LiesOver (span {(l : ℤ)})] (n : ℕ) : (n : 𝓞 M) ∈ P ↔ l ∣ n := by
+private theorem natMem
+    {M : Type} [Field M] [NumberField M]
+    (l : ℕ) (P : Ideal (𝓞 M)) [h : P.LiesOver (span {(l : ℤ)})]
+    (n : ℕ)
+    : (n : 𝓞 M) ∈ P ↔ l ∣ n := by
   have h1 : (n : 𝓞 M) = algebraMap ℤ (𝓞 M) (n : ℤ) := by simp
-  rw [h1, ← Ideal.mem_comap, ← Ideal.under_def, ← h.over, Ideal.mem_span_singleton, Int.natCast_dvd_natCast]
+  rw [h1, ← Ideal.mem_comap, ← Ideal.under_def, ← h.over, Ideal.mem_span_singleton,
+    Int.natCast_dvd_natCast]
 
-private theorem sq_lemma' {φ : Frame} (H : HostAx φ) (s : 𝓞 H.E) (hs : (s : H.E) = H.sqd) :
-    s * s = -(H.d : 𝓞 H.E) := by
+private theorem sq_lemma' {φ : Frame} (H : HostAx φ) (s : 𝓞 H.E) (hs : (s : H.E) = H.sqd)
+    : s * s = -(H.d : 𝓞 H.E) := by
   apply RingOfIntegers.coe_injective
   have h2 := H.sqd_sq
   rw [← hs] at h2
@@ -27,21 +31,34 @@ private theorem sq_lemma' {φ : Frame} (H : HostAx φ) (s : 𝓞 H.E) (hs : (s :
   push_cast
   exact h2
 
-theorem UpperTheory.HF.diff_EK_supp :
-    ∀ {φ : Frame} (H : HostAx φ), (∀ σ : H.E ≃ₐ[ℚ] H.E, σ • differentIdeal (𝓞 H.K) (𝓞 H.E) = differentIdeal (𝓞 H.K) (𝓞 H.E)) ∧ (∀ (P : Ideal (𝓞 H.E)) [P.IsPrime], P ∣ differentIdeal (𝓞 H.K) (𝓞 H.E) ↔ ∃ l ∈ H.ramI, P.LiesOver (span {(l : ℤ)})) ∧ (∀ l : ℕ, l.Prime → l ≠ H.d → ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})], (multiplicity P (differentIdeal (𝓞 H.K) (𝓞 H.E)) : ℝ) = H.el l * H.vdH l) ∧ 2 ∈ H.ramI := by
+theorem UpperTheory.HF.diff_EK_supp
+    : ∀ {φ : Frame} (H : HostAx φ),
+      (∀ σ : H.E ≃ₐ[ℚ] H.E, σ • differentIdeal (𝓞 H.K) (𝓞 H.E) = differentIdeal (𝓞 H.K) (𝓞 H.E))
+        ∧ (∀ (P : Ideal (𝓞 H.E)) [P.IsPrime],
+          P ∣ differentIdeal (𝓞 H.K) (𝓞 H.E) ↔ ∃ l ∈ H.ramI, P.LiesOver (span {(l : ℤ)}))
+        ∧ (∀ l : ℕ,
+          l.Prime → l ≠ H.d
+            → ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})],
+              (multiplicity P (differentIdeal (𝓞 H.K) (𝓞 H.E)) : ℝ) = H.el l * H.vdH l)
+        ∧ 2 ∈ H.ramI := by
   intro φ H
   have hd := H.der
   obtain ⟨-, s, hs, -, hdiff⟩ := discr_K H
-  have key : ∀ l : ℕ, l.Prime → l ≠ H.d → ∀ (P : Ideal (𝓞 H.E)) [P.LiesOver (span {(l : ℤ)})],
-      ¬ P ∣ span {s} := by
+  have key
+      : ∀ l : ℕ,
+        l.Prime → l ≠ H.d
+          → ∀ (P : Ideal (𝓞 H.E)) [P.LiesOver (span {(l : ℤ)})], ¬ P ∣ span {s} := by
     intro l hl hld P _ hPs
     rw [Ideal.dvd_span_singleton] at hPs
     have hsq : s * s ∈ P := P.mul_mem_left s hPs
     rw [sq_lemma' H s hs, neg_mem_iff, natMem l P] at hsq
     exact hld ((Nat.prime_dvd_prime_iff_eq hl H.d_prime).1 hsq)
-  have mult : ∀ l : ℕ, l.Prime → l ≠ H.d → ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime]
-      [P.LiesOver (span {(l : ℤ)})],
-      multiplicity P (differentIdeal (𝓞 H.K) (𝓞 H.E)) = multiplicity P (differentIdeal ℤ (𝓞 H.E)) := by
+  have mult
+      : ∀ l : ℕ,
+        l.Prime → l ≠ H.d
+          → ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})],
+            multiplicity P (differentIdeal (𝓞 H.K) (𝓞 H.E))
+              = multiplicity P (differentIdeal ℤ (𝓞 H.E)) := by
     intro l hl hld P hPp _
     have hP0 : P ≠ ⊥ := by
       intro h0
@@ -70,7 +87,8 @@ theorem UpperTheory.HF.diff_EK_supp :
       have h0 : multiplicity P (differentIdeal ℤ (𝓞 H.E)) = 0 := by
         rw [(diff_mult H hl P).2.2.1 (by rw [hel]; exact hl.not_dvd_one), hel]
       have hdv : P ∣ differentIdeal ℤ (𝓞 H.E) := hdiff ▸ dvd_mul_of_dvd_left hPd _
-      exact (multiplicity_eq_zero (Ideal.finiteMultiplicity hPp.ne_top differentIdeal_ne_bot)).1 h0 hdv
+      exact (multiplicity_eq_zero (Ideal.finiteMultiplicity hPp.ne_top differentIdeal_ne_bot)).1 h0
+        hdv
     · rintro ⟨l, hlI, hover⟩
       simp only [UpperTheory.HF.Formalism.HC.HostRaw.ramI, Finset.mem_erase] at hlI
       obtain ⟨hld, hlr⟩ := hlI
@@ -80,15 +98,16 @@ theorem UpperTheory.HF.diff_EK_supp :
       have hv : H.vdH l ≠ 0 := ((mem_ram H hl).2.2.1).1 hlr
       have hm := (diff_mult H hl P).1
       have hne : (H.el l : ℝ) * H.vdH l ≠ 0 :=
-        mul_ne_zero (by exact_mod_cast (UpperTheory.HF.Formalism.HC.HostRaw.el_pos H.toHostRaw l).ne') hv
+        mul_ne_zero
+          (by exact_mod_cast (UpperTheory.HF.Formalism.HC.HostRaw.el_pos H.toHostRaw l).ne') hv
       rw [← hm, ← mult l hl hld P] at hne
       by_contra hnd
       exact hne (by exact_mod_cast multiplicity_eq_zero_of_not_dvd hnd)
   · intro l hl hld P _ _
     rw [mult l hl hld P]
     exact (diff_mult H hl P).1
-  · simp only [UpperTheory.HF.Formalism.HC.HostRaw.ramI, Finset.mem_erase, UpperTheory.HF.Formalism.HC.HostRaw.ram,
-      Nat.mem_primeFactors]
+  · simp only [UpperTheory.HF.Formalism.HC.HostRaw.ramI, Finset.mem_erase,
+      UpperTheory.HF.Formalism.HC.HostRaw.ram, Nat.mem_primeFactors]
     refine ⟨H.d_ne_two.symm, Nat.prime_two, ?_, ?_⟩
     · exact Int.ofNat_dvd_left.1 hd.discr_primes.2.1
     · exact Int.natAbs_ne_zero.2 (NumberField.discr_ne_zero H.E)

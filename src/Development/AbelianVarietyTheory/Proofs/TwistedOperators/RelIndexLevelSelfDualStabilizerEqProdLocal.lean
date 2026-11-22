@@ -13,9 +13,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CardBlock
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.LiftRows
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -26,7 +29,8 @@ noncomputable section
 
 namespace GlobalTheory.ParIndex
 
-theorem gram_herm (D : D7) (V : HSp D) : Formalism.UG.IsHerm (D.sp.cm.sig : D.host.E →+* D.host.E) V.gram := by
+theorem gram_herm (D : D7) (V : HSp D)
+    : Formalism.UG.IsHerm (D.sp.cm.sig : D.host.E →+* D.host.E) V.gram := by
   refine Matrix.ext fun i j => ?_
   show (D.sp.cm.sig : D.host.E →+* D.host.E) (V.gram j i) = V.gram i j
   exact V.herm.eq (V.frame j) (V.frame i)
@@ -34,10 +38,11 @@ theorem gram_herm (D : D7) (V : HSp D) : Formalism.UG.IsHerm (D.sp.cm.sig : D.ho
 theorem gram_det_ne (D : D7) (V : HSp D) : V.gram.det ≠ 0 :=
   ((GlobalTheory.Mem.Vol.cmData_isCMExt_and_gram_isHermND _ _ D.sp.cm).2 V).2
 
-theorem hermitianSpace_standard_lattice_span_eq_top (D : D7) (V : HSp D) :
-    Submodule.span D.host.E (L0c D V) = ⊤ := by
+theorem hermitianSpace_standard_lattice_span_eq_top (D : D7) (V : HSp D)
+    : Submodule.span D.host.E (L0c D V) = ⊤ := by
   let f := V.frame.equivFun.toLinearMap
-  let L : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E) := V.L0.map (f.restrictScalars (𝓞 D.host.E))
+  let L : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E) :=
+    V.L0.map (f.restrictScalars (𝓞 D.host.E))
   have hL : (L : Set (Fin V.rank → D.host.E)) = L0c D V := by
     ext v
     constructor
@@ -60,28 +65,37 @@ theorem hermitianSpace_standard_lattice_span_eq_top (D : D7) (V : HSp D) :
         (V.frame.equivFun.trans (starLinearEquiv D.host.E)).trans V.frame.equivFun.symm
       let g : V.V →ₗ[D.host.E] Module.Dual D.host.E W :=
         (LinearMap.domRestrict' W).comp (V.hT.comp e.toLinearMap)
-      have hdim : Module.finrank D.host.E (Module.Dual D.host.E W) < Module.finrank D.host.E V.V := by
+      have hdim
+          : Module.finrank D.host.E (Module.Dual D.host.E W) < Module.finrank D.host.E V.V := by
         rw [Subspace.dual_finrank_eq]
         exact Submodule.finrank_lt h
-      obtain ⟨z, hz, hz₀⟩ := Submodule.exists_mem_ne_zero_of_ne_bot
-        (LinearMap.ker_ne_bot_of_finrank_lt (f := g) hdim)
+      obtain ⟨z, hz, hz₀⟩ :=
+        Submodule.exists_mem_ne_zero_of_ne_bot (LinearMap.ker_ne_bot_of_finrank_lt (f := g) hdim)
       have hsmul (a : D.host.E) : a • e z ∈ V.L0 := by
         rw [← V.baseLattice_isUnimodular, Formalism.HermitianLatticesTheory.dualBasic_mem_dual]
         intro y hy
         have hyz : V.hT (e z) y = 0 :=
-          congrArg (fun f : Module.Dual D.host.E W => f ⟨y, Submodule.subset_span hy⟩) (LinearMap.mem_ker.mp hz)
+          congrArg
+            (fun f : Module.Dual D.host.E W => f ⟨y, Submodule.subset_span hy⟩)
+            (LinearMap.mem_ker.mp hz)
         have := V.herm.eq (e z) y
         simp only [hyz, map_zero] at this
         simp [← this]
       let j : D.host.E →ₗ[𝓞 D.host.E] V.L0 :=
-        ((LinearMap.toSpanSingleton D.host.E _ (e z)).restrictScalars (𝓞 D.host.E)).codRestrict V.L0 hsmul
+        ((LinearMap.toSpanSingleton D.host.E _ (e z)).restrictScalars (𝓞 D.host.E)).codRestrict V.L0
+          hsmul
       let : Module.Finite (𝓞 D.host.E) V.L0 := Module.Finite.iff_fg.mpr V.standardTuple_isLattice.fg
-      let : Module.Finite (𝓞 D.host.E) D.host.E := Module.Finite.of_injective j fun a b hab =>
-        smul_left_injective D.host.E (fun hzero => hz₀ (e.map_eq_zero_iff.mp hzero)) (congrArg Subtype.val hab)
+      let : Module.Finite (𝓞 D.host.E) D.host.E :=
+        Module.Finite.of_injective j fun a b hab =>
+          smul_left_injective D.host.E
+            (fun hzero => hz₀ (e.map_eq_zero_iff.mp hzero))
+            (congrArg Subtype.val hab)
       exact RingOfIntegers.not_isField D.host.E
-        (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 D.host.E) D.host.E) (Field.toIsField D.host.E))
+        (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 D.host.E) D.host.E)
+          (Field.toIsField D.host.E))
     change x ∈ W
-    rw [hW]; trivial
+    rw [hW]
+    trivial
   have := Submodule.mem_map_of_mem (f := f) hx
   rw [Submodule.map_span] at this
   exact this

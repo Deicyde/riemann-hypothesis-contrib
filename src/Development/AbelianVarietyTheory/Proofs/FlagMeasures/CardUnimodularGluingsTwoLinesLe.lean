@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.SameK
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.GlueLines
 
@@ -215,34 +216,42 @@ private lemma star_mul_mul_fst_mem_integers_of_mem
   rw [star_dotProduct_diagonal_two_mulVec] at this
   simpa using this
 
-
 open MeasureTheory NumberField Matrix Finset in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] in
 variable [StarRing E] in
-theorem _root_.GlobalTheory.GlueLines.card_gluings_le : ∀ (E : Type) [Field E] [NumberField E] [StarRing E],
-    _root_.Formalism.HermitianLatticesTheory.IsCMUnram E → ∀ (β₁ β₂ : E) (N₁ N₂ : Submodule (𝓞 E) E) (𝔫 : Ideal (𝓞 E)), star β₁ = β₁ →
-    star β₂ = β₂ → β₁ ≠ 0 → β₂ ≠ 0 → Submodule.IsLattice E N₁ → Submodule.IsLattice E N₂ →
-    Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} =
-      Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫 →
-    ENat.card {M : Submodule (𝓞 E) (Fin 2 → E) // Submodule.IsLattice E M ∧
-      (∀ x, x ∈ M ↔ ∀ y ∈ M, star y ⬝ᵥ ((Matrix.diagonal ![β₁, β₂]) *ᵥ x) ∈
-        (algebraMap (𝓞 E) E).range) ∧
-      (∀ t, t ∈ N₁ ↔ ![t, 0] ∈ M) ∧ ∀ t, t ∈ N₂ ↔ ![0, t] ∈ M} ≤ (Ideal.absNorm 𝔫 : ENat) := by
+theorem _root_.GlobalTheory.GlueLines.card_gluings_le
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E],
+      _root_.Formalism.HermitianLatticesTheory.IsCMUnram E
+        → ∀ (β₁ β₂ : E) (N₁ N₂ : Submodule (𝓞 E) E) (𝔫 : Ideal (𝓞 E)),
+          star β₁ = β₁ → star β₂ = β₂ → β₁ ≠ 0 → β₂ ≠ 0 → Submodule.IsLattice E N₁
+            → Submodule.IsLattice E N₂
+            → Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y}
+              = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫
+            → ENat.card
+                {M : Submodule (𝓞 E) (Fin 2 → E) // Submodule.IsLattice E M
+                  ∧ (∀ x,
+                    x ∈ M
+                      ↔ ∀ y ∈ M,
+                        star y ⬝ᵥ ((Matrix.diagonal ![β₁, β₂]) *ᵥ x) ∈ (algebraMap (𝓞 E) E).range)
+                  ∧ (∀ t, t ∈ N₁ ↔ ![t, 0] ∈ M) ∧ ∀ t, t ∈ N₂ ↔ ![0, t] ∈ M}
+              ≤ (Ideal.absNorm 𝔫 : ENat) := by
   intro E _ _ _ _ β₁ β₂ N₁ N₂ 𝔫 hβ₁ hβ₂ hβ₁0 hβ₂0 hL₁ hL₂ hspan
   classical
-  let P : Submodule (𝓞 E) (Fin 2 → E) → Prop := fun M => Submodule.IsLattice E M ∧
-      (∀ x, x ∈ M ↔ ∀ y ∈ M, star y ⬝ᵥ ((Matrix.diagonal ![β₁, β₂]) *ᵥ x) ∈
-        (algebraMap (𝓞 E) E).range) ∧
-      (∀ t, t ∈ N₁ ↔ ![t, 0] ∈ M) ∧ ∀ t, t ∈ N₂ ↔ ![0, t] ∈ M
+  let P : Submodule (𝓞 E) (Fin 2 → E) → Prop := fun M =>
+    Submodule.IsLattice E M
+      ∧ (∀ x,
+        x ∈ M ↔ ∀ y ∈ M, star y ⬝ᵥ ((Matrix.diagonal ![β₁, β₂]) *ᵥ x) ∈ (algebraMap (𝓞 E) E).range)
+      ∧ (∀ t, t ∈ N₁ ↔ ![t, 0] ∈ M) ∧ ∀ t, t ∈ N₂ ↔ ![0, t] ∈ M
   change ENat.card {M // P M} ≤ _
   rcases isEmpty_or_nonempty {M // P M} with hS | hS
   · rw [(ENat.card_eq_zero_iff_empty _).2 hS]; exact bot_le
   obtain ⟨M₀⟩ := hS
-  have hcoord (i : Fin 2) (β : E) (hβ : β ≠ 0)
+  have hcoord
+      (i : Fin 2) (β : E) (hβ : β ≠ 0)
       (hpair : ∀ (y : Fin 2 → E) (t : E),
-        star y ⬝ᵥ ((Matrix.diagonal ![β₁, β₂]) *ᵥ (Pi.single i t)) = star (y i) * β * t) :
-      ∃ t : E, t ≠ 0 ∧ Pi.single i t ∈ M₀.1 := by
+        star y ⬝ᵥ ((Matrix.diagonal ![β₁, β₂]) *ᵥ (Pi.single i t)) = star (y i) * β * t)
+      : ∃ t : E, t ≠ 0 ∧ Pi.single i t ∈ M₀.1 := by
     let Q := M₀.1.map (LinearMap.proj (R := 𝓞 E) (φ := fun _ : Fin 2 => E) i)
     have hQ : IsFractional (𝓞 E)⁰ Q := FractionalIdeal.isFractional_of_fg (M₀.2.1.fg.map _)
     obtain ⟨d, hd, hdQ⟩ := hQ
@@ -251,7 +260,8 @@ theorem _root_.GlobalTheory.GlueLines.card_gluings_le : ∀ (E : Type) [Field E]
       apply (mem_nonZeroDivisors_iff_ne_zero.mp hd)
       apply (FaithfulSMul.algebraMap_injective (𝓞 E) E)
       simpa using hz
-    refine ⟨star (algebraMap (𝓞 E) E d) * β⁻¹, mul_ne_zero (star_ne_zero.2 hd0) (inv_ne_zero hβ), ?_⟩
+    refine
+      ⟨star (algebraMap (𝓞 E) E d) * β⁻¹, mul_ne_zero (star_ne_zero.2 hd0) (inv_ne_zero hβ), ?_⟩
     apply (M₀.2.2.1 _).2
     intro y hy
     rw [hpair]
@@ -261,37 +271,41 @@ theorem _root_.GlobalTheory.GlueLines.card_gluings_le : ∀ (E : Type) [Field E]
       simpa [Algebra.smul_def, IsLocalization.IsInteger] using h
     convert h' using 1 <;> simp [star_mul'] <;> field_simp
   have hn₁ : N₁ ≠ ⊥ := by
-    obtain ⟨t, ht, hm⟩ := hcoord 0 β₁ hβ₁0 (by intro y t; rw [star_dotProduct_diagonal_two_mulVec]; simp)
+    obtain ⟨t, ht, hm⟩ :=
+      hcoord 0 β₁ hβ₁0 (by intro y t; rw [star_dotProduct_diagonal_two_mulVec]; simp)
     intro h
     have : t ∈ N₁ := (M₀.2.2.2.1 t).2 (by convert hm using 1; funext j; fin_cases j <;> simp)
     rw [h, Submodule.mem_bot] at this
     exact ht this
   have hn₂ : N₂ ≠ ⊥ := by
-    obtain ⟨t, ht, hm⟩ := hcoord 1 β₂ hβ₂0 (by intro y t; rw [star_dotProduct_diagonal_two_mulVec]; simp)
+    obtain ⟨t, ht, hm⟩ :=
+      hcoord 1 β₂ hβ₂0 (by intro y t; rw [star_dotProduct_diagonal_two_mulVec]; simp)
     intro h
     have : t ∈ N₂ := (M₀.2.2.2.2 t).2 (by convert hm using 1; funext j; fin_cases j <;> simp)
     rw [h, Submodule.mem_bot] at this
     exact ht this
   have hNN : ∀ x ∈ N₁, ∀ y ∈ N₁, star x * β₁ * y ∈ (algebraMap (𝓞 E) E).range := by
     intro x hx y hy
-    have : star x * β₁ * y ∈
-        Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} :=
+    have : star x * β₁ * y ∈ Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} :=
       Submodule.subset_span ⟨x, hx, y, hy, rfl⟩
     rw [hspan] at this
     obtain ⟨c, -, hc⟩ := Submodule.mem_map.1 this
     exact ⟨c, hc⟩
-  have hideal : ∀ u : E, (∀ s ∈ N₁, star s * β₁ * u ∈ (algebraMap (𝓞 E) E).range) →
-      ∀ c ∈ 𝔫, c • u ∈ N₁ := by
+  have hideal
+      : ∀ u : E,
+        (∀ s ∈ N₁, star s * β₁ * u ∈ (algebraMap (𝓞 E) E).range) → ∀ c ∈ 𝔫, c • u ∈ N₁ := by
     intro u hu c hc
-    have hc' : algebraMap (𝓞 E) E c ∈
-        Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} := by
+    have hc'
+        : algebraMap (𝓞 E) E c
+          ∈ Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} := by
       rw [hspan]; exact Submodule.mem_map_of_mem hc
     rw [Algebra.smul_def]
     refine Submodule.span_induction (p := fun z _ => z * u ∈ N₁) ?_ ?_ ?_ ?_ hc'
     · rintro _ ⟨x, hx, y, hy, rfl⟩
       obtain ⟨d, hd⟩ := hu x hx
       have : star x * β₁ * y * u = d • y := by rw [Algebra.smul_def, hd]; ring
-      rw [this]; exact N₁.smul_mem d hy
+      rw [this]
+      exact N₁.smul_mem d hy
     · simp
     · intro a b _ _ ha hb; rw [add_mul]; exact N₁.add_mem ha hb
     · intro r a _ ha; rw [smul_mul_assoc]; exact N₁.smul_mem r ha
@@ -305,11 +319,13 @@ theorem _root_.GlobalTheory.GlueLines.card_gluings_le : ∀ (E : Type) [Field E]
     choose v hv using hv
     have hc : ∀ M : {M // P M}, ∃ c : 𝓞 E, v M - c • v M₀ ∈ N₂ := by
       intro M
-      obtain ⟨a, ha⟩ := exists_fst_mem_of_integral_dual_snd hβ₂ hβ₂0 M₀.2.1.fg hn₂ M₀.2.2.1 M₀.2.2.2.2
-        (b := v M) (fun s hs => by
-          simpa using star_mul_mul_snd_mem_integers_of_mem M.2.2.1 M.2.2.2.2 (hv M) hs)
-      obtain ⟨c, hc⟩ := hgen a (fun s hs => by
-        simpa using star_mul_mul_fst_mem_integers_of_mem M₀.2.2.1 M₀.2.2.2.1 ha hs)
+      obtain ⟨a, ha⟩ :=
+        exists_fst_mem_of_integral_dual_snd hβ₂ hβ₂0 M₀.2.1.fg hn₂ M₀.2.2.1 M₀.2.2.2.2 (b := v M)
+          (fun s hs => by
+            simpa using star_mul_mul_snd_mem_integers_of_mem M.2.2.1 M.2.2.2.2 (hv M) hs)
+      obtain ⟨c, hc⟩ :=
+        hgen a (fun s hs => by
+          simpa using star_mul_mul_fst_mem_integers_of_mem M₀.2.2.1 M₀.2.2.2.1 ha hs)
       refine ⟨c, (M₀.2.2.2.2 _).2 ?_⟩
       have : ![0, v M - c • v M₀] = ![a, v M] - c • ![u, v M₀] - ![a - c • u, 0] := by
         funext i; fin_cases i <;> simp
@@ -318,7 +334,8 @@ theorem _root_.GlobalTheory.GlueLines.card_gluings_le : ∀ (E : Type) [Field E]
     choose c hc using hc
     have hle : ∀ M M' : {M // P M}, v M - v M' ∈ N₂ → M.1 ≤ M'.1 := by
       intro M M' hvv x hx
-      obtain ⟨d, hd⟩ := hgen (x 0) (fun s hs => star_mul_mul_fst_mem_integers_of_mem M.2.2.1 M.2.2.2.1 hx hs)
+      obtain ⟨d, hd⟩ :=
+        hgen (x 0) (fun s hs => star_mul_mul_fst_mem_integers_of_mem M.2.2.1 M.2.2.2.1 hx hs)
       have h0 : x 1 - d • v M ∈ N₂ := by
         apply (M.2.2.2.2 _).2
         have : ![0, x 1 - d • v M] = x - d • ![u, v M] - ![x 0 - d • u, 0] := by
@@ -343,14 +360,14 @@ theorem _root_.GlobalTheory.GlueLines.card_gluings_le : ∀ (E : Type) [Field E]
       have hvv : v M - v M' ∈ N₂ := by
         have : v M - v M' = (v M - c M • v M₀) - (v M' - c M' • v M₀) + (c M - c M') • v M₀ := by
           rw [sub_smul]; abel
-        rw [this]; exact N₂.add_mem (N₂.sub_mem (hc M) (hc M')) h2
+        rw [this]
+        exact N₂.add_mem (N₂.sub_mem (hc M) (hc M')) h2
       have hvv' : v M' - v M ∈ N₂ := by rw [← neg_sub]; exact N₂.neg_mem hvv
       exact Subtype.ext (le_antisymm (hle M M' hvv) (hle M' M hvv'))
   have h𝔫 : 𝔫 ≠ ⊥ := by
     intro h
     obtain ⟨s, hs, hs0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hn₁
-    have : star s * β₁ * s ∈
-        Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} :=
+    have : star s * β₁ * s ∈ Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} :=
       Submodule.subset_span ⟨s, hs, s, hs, rfl⟩
     rw [hspan, h, Submodule.map_bot, Submodule.mem_bot] at this
     exact mul_ne_zero (mul_ne_zero (star_ne_zero.2 hs0) hβ₁0) hs0 this
@@ -360,7 +377,9 @@ theorem _root_.GlobalTheory.GlueLines.card_gluings_le : ∀ (E : Type) [Field E]
     apply h𝔫
     rw [← Ideal.absNorm_eq_zero_iff, Ideal.absNorm_apply, Submodule.cardQuot_apply]
     exact Nat.card_eq_zero_of_infinite
-  calc ENat.card {M // P M} ≤ ENat.card (𝓞 E ⧸ 𝔫) := ENat.card_le_card_of_injective hinj
+  calc
+    ENat.card {M // P M}
+      ≤ ENat.card (𝓞 E ⧸ 𝔫) := ENat.card_le_card_of_injective hinj
     _ = (Ideal.absNorm 𝔫 : ENat) := by
       rw [ENat.card_eq_coe_natCard, Ideal.absNorm_apply, Submodule.cardQuot_apply]
 

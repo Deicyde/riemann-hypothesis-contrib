@@ -5,29 +5,38 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InstSecon
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.HolDS Matrix MeasureTheory Filter Topology
+open Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.HolDS Matrix MeasureTheory Filter
+  Topology
 open scoped InnerProductSpace
 
 namespace GlobalTheory.HolDS
 
-theorem form_aeval_of_left_eigen {V : Type} [AddCommGroup V] [Module ℂ V] (T : Module.End ℂ V)
-    (φ : V →ₗ[ℂ] ℂ) (c : ℂ) (h : ∀ v, φ (T v) = c * φ v) (f : Polynomial ℂ) (v : V) :
-    φ (Polynomial.aeval T f v) = f.eval c * φ v := by
+theorem form_aeval_of_left_eigen
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (T : Module.End ℂ V) (φ : V →ₗ[ℂ] ℂ) (c : ℂ) (h : ∀ v, φ (T v) = c * φ v)
+    (f : Polynomial ℂ) (v : V)
+    : φ (Polynomial.aeval T f v) = f.eval c * φ v := by
   have hpow : ∀ (n : ℕ) (v : V), φ ((T ^ n) v) = c ^ n * φ v := by
     intro n
     induction n with
     | zero => intro v; simp
     | succ n ih =>
       intro v
-      rw [pow_succ, Module.End.mul_apply, ih, h]; ring
+      rw [pow_succ, Module.End.mul_apply, ih, h]
+      ring
   induction f using Polynomial.induction_on' with
   | add p q hp hq => simp [hp, hq, add_mul]
   | monomial n a =>
     rw [Polynomial.aeval_monomial, Polynomial.eval_monomial, Module.End.mul_apply,
       Module.algebraMap_end_apply, map_smul, hpow, smul_eq_mul, mul_assoc]
 
-theorem finiteDimensional_stable_le_iSup_eigen :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (U : H →L[ℂ] H), (∀ v, ‖U v‖ = ‖v‖) → ∀ (E : ℕ → Submodule ℂ H) (lam : ℕ → ℂ), Function.Injective lam → (∀ m, FiniteDimensional ℂ (E m)) → (∀ m, ∀ e ∈ E m, U e = lam m • e) → Dense ((⨆ m, E m : Submodule ℂ H) : Set H) → ∀ (W : Submodule ℂ H), FiniteDimensional ℂ W → (∀ w ∈ W, U w ∈ W) → W ≤ ⨆ m, E m := by
+theorem finiteDimensional_stable_le_iSup_eigen
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (U : H →L[ℂ] H),
+      (∀ v, ‖U v‖ = ‖v‖)
+        → ∀ (E : ℕ → Submodule ℂ H) (lam : ℕ → ℂ),
+          Function.Injective lam → (∀ m, FiniteDimensional ℂ (E m))
+            → (∀ m, ∀ e ∈ E m, U e = lam m • e) → Dense ((⨆ m, E m : Submodule ℂ H) : Set H)
+            → ∀ (W : Submodule ℂ H), FiniteDimensional ℂ W → (∀ w ∈ W, U w ∈ W) → W ≤ ⨆ m, E m := by
   intro H _ _ _ U hU E lam hinj hfin heig hdense W hW hst
   classical
   have hinner : ∀ a b : H, ⟪U a, U b⟫_ℂ = ⟪a, b⟫_ℂ := fun a b =>
@@ -58,8 +67,10 @@ theorem finiteDimensional_stable_le_iSup_eigen :
     have hne : f.eval (lam m) ≠ 0 := by
       intro h
       exact hm (hsfin.mem_toFinset.mpr h)
-    have := form_aeval_of_left_eigen T (((innerₛₗ ℂ e : H →ₗ[ℂ] ℂ)).comp W.subtype) (lam m)
-      (fun v => hleft m e he v) f ⟨y, hy⟩
+    have :=
+      form_aeval_of_left_eigen T (((innerₛₗ ℂ e : H →ₗ[ℂ] ℂ)).comp W.subtype) (lam m)
+        (fun v => hleft m e he v)
+        f ⟨y, hy⟩
     rw [hfT] at this
     simp only [LinearMap.zero_apply, map_zero] at this
     exact (mul_eq_zero.mp this.symm).resolve_left hne

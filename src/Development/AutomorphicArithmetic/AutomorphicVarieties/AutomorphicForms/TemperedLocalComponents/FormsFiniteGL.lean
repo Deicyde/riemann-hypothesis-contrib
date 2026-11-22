@@ -7,9 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-theorem UpperTheory.V.Af.formsFiniteGL :
-    GlobalTheory.Published.AutomorphicFormsFiniteGL := by
-  refine CoefficientSpans.finite_of (CoefficientSpans.charFinite_of Fin.formsFinite) (fun E _ _ _ a φ h => (Cm.isAutForm_iff φ).1 h)
+theorem UpperTheory.V.Af.formsFiniteGL : GlobalTheory.Published.AutomorphicFormsFiniteGL := by
+  refine CoefficientSpans.finite_of (CoefficientSpans.charFinite_of Fin.formsFinite)
+    (fun E _ _ _ a φ h => (Cm.isAutForm_iff φ).1 h)
     (fun E _ _ _ a => ⟨(Cm.cptEq E a).symm, fun φ k g => ?_⟩)
     (fun E _ _ _ a z hz => ⟨Cm.uTC E a z, ?_, fun _ _ => rfl⟩)
   · obtain ⟨k, rfl⟩ := (Cm.cptEq E a).surjective k

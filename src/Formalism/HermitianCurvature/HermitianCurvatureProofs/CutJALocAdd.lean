@@ -15,7 +15,8 @@ open NumberField Formalism.FourierDecayAlt.P.CutMP
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem locAdd_thr (k r : ℕ) {A : ℝ} (hA : 10 * ((r : ℝ) + 1) * nDim k r ^ 2 ≤ A) : JF.TransportedAlt k r A 0 := by
+theorem locAdd_thr (k r : ℕ) {A : ℝ} (hA : 10 * ((r : ℝ) + 1) * nDim k r ^ 2 ≤ A)
+    : JF.TransportedAlt k r A 0 := by
   unfold JF.TransportedAlt
   have hn : (1 : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) := by exact_mod_cast (by omega : 1 ≤ 2 * r + k + 1)
   have hr : (0 : ℝ) < (r : ℝ) + 1 := by positivity
@@ -36,7 +37,8 @@ theorem local_additivity_transfer : JALocAdd := by
   refine ⟨Formalism.FourierDecayAlt.P.Qx8.FFl_add hJ.1 hJ'.1, fun δ hδ => ?_⟩
   obtain ⟨F, hF1, hF2, hF3⟩ := hJ.2 δ hδ
   obtain ⟨F', hF1', hF2', hF3'⟩ := hJ'.2 δ hδ
-  refine ⟨F + F', Formalism.FourierDecayAlt.P.JCx2.ckOn_add' hF1 hF1', fun m => ?_, fun x hx hG => ?_⟩
+  refine
+    ⟨F + F', Formalism.FourierDecayAlt.P.JCx2.ckOn_add' hF1 hF1', fun m => ?_, fun x hx hG => ?_⟩
   · obtain ⟨c, hc⟩ := hF2 m
     obtain ⟨c', hc'⟩ := hF2' m
     exact ⟨c + c', Formalism.FourierDecayAlt.P.BetaSesquilinearity.CCle_add hc hc'⟩
@@ -44,10 +46,17 @@ theorem local_additivity_transfer : JALocAdd := by
     have hg := Formalism.FourierDecayAlt.P.BigCellHermitian.gqDom (T v).base hq
     have h0 : B.InCC A 0 F := by simpa using hF2 0
     have h0' : B.InCC A 0 F' := by simpa using hF2' 0
-    have i1 := (Formalism.FourierDecayAlt.P.bessel_integral_converges S.G.k S.G.r (Wp (S.pl v)) (Wq (S.pl v)) (T v).base A F hThr h0).1 _ hg
-    have i2 := (Formalism.FourierDecayAlt.P.bessel_integral_converges S.G.k S.G.r (Wp (S.pl v)) (Wq (S.pl v)) (T v).base A F' hThr h0').1 _ hg
-    have e : ∀ G : GFn S v, B.JF (T v).base G (B.gq (T v).base x) =
-        ∫ p, JF.integrand (T v).base G (B.gq (T v).base x) p ∂(T v).base.μSS := fun G => rfl
+    have i1 :=
+      (Formalism.FourierDecayAlt.P.bessel_integral_converges S.G.k S.G.r (Wp (S.pl v)) (Wq (S.pl v))
+        (T v).base A F hThr h0).1 _ hg
+    have i2 :=
+      (Formalism.FourierDecayAlt.P.bessel_integral_converges S.G.k S.G.r (Wp (S.pl v)) (Wq (S.pl v))
+        (T v).base A F' hThr h0').1 _ hg
+    have e
+        : ∀ G : GFn S v,
+          B.JF (T v).base G (B.gq (T v).base x)
+            = ∫ p, JF.integrand (T v).base G (B.gq (T v).base x) p ∂(T v).base.μSS := fun G =>
+      rfl
     rw [Pi.add_apply, hF3 x hx hG, hF3' x hx hG, e, e, e, ← integral_add i1 i2]
     congr 1
     funext p

@@ -8,7 +8,8 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.QuotientHomNonvanis
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 open scoped ENNReal
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.BaseSizes
@@ -44,30 +45,39 @@ variable (D : D7) (i : D.nd.Loc)
 def liftIx : Fin D.R.m := ⟨D.nd.j i - 1, by have := D.nd.j_range i; omega⟩
 
 def param (ρ : D.what₂.Tau) : Multiset ℚ :=
-  (Finset.univ : Finset (Fin (D.R.k - 1))).val.map (fun a => (D.hc ρ).v a) +
-  (Finset.univ : Finset (Fin D.R.m)).val.map (fun a => -(D.hc ρ).b a) +
-  (Finset.Icc 1 D.R.t).val.map
-    (fun c : ℕ => -(D.hc ρ).e (liftIx D i) + ((D.R.t : ℚ) + 1) / 2 - (c : ℚ))
+  (Finset.univ : Finset (Fin (D.R.k - 1))).val.map (fun a => (D.hc ρ).v a)
+    + (Finset.univ : Finset (Fin D.R.m)).val.map (fun a => - (D.hc ρ).b a)
+    + (Finset.Icc 1 D.R.t).val.map
+      (fun c : ℕ => - (D.hc ρ).e (liftIx D i) + ((D.R.t : ℚ) + 1) / 2 - (c : ℚ))
 
 def embSide (ρ : D.what₂.Tau) (s : Bool) : D.host.E →+* ℂ :=
-  if s then D.host.emb ((D.eTau ρ : D.R.Psi) : D.R.GG)
-  else ComplexEmbedding.conjugate (D.host.emb ((D.eTau ρ : D.R.Psi) : D.R.GG))
+  if s then
+    D.host.emb ((D.eTau ρ : D.R.Psi) : D.R.GG)
+  else
+    ComplexEmbedding.conjugate (D.host.emb ((D.eTau ρ : D.R.Psi) : D.R.GG))
 
 def WeightTie : Prop :=
   ∃ s : Bool, ∀ ρ : D.what₂.Tau, ∃ c : ℚ,
-    D.naut.infWt i (embSide D ρ s) = (param D i ρ).map (fun p => ((p + c : ℚ) : ℂ)) ∧
-    D.naut.infWt i (embSide D ρ (!s)) = (param D i ρ).map (fun p => ((-(p + c) : ℚ) : ℂ))
+    D.naut.infWt i (embSide D ρ s) = (param D i ρ).map (fun p => ((p + c : ℚ) : ℂ))
+      ∧ D.naut.infWt i (embSide D ρ (!s)) = (param D i ρ).map (fun p => ((-(p + c) : ℚ) : ℂ))
 
-def IsRankRPart (rπ : GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)) (ρ : GE D.nd →* GL (Fin D.R.r) (D.nd.O i)) : Prop :=
-  Continuous (fun g => ((ρ g : GL (Fin D.R.r) (D.nd.O i)) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O i))) ∧
-  ∃ e : (Fin D.R.nV → KK D.nd i) ≃ₗ[KK D.nd i] ((Fin D.R.r → KK D.nd i) × (Fin D.R.t → KK D.nd i)),
-    ∀ (g : GE D.nd) (u : Fin D.R.nV → KK D.nd i),
-      e ((((rπ g : GL (Fin D.R.nV) (D.nd.O i)) : Matrix (Fin D.R.nV) (Fin D.R.nV) (D.nd.O i)).map
-          (toK D.nd i)).mulVec u) =
-        ((((ρ g : GL (Fin D.R.r) (D.nd.O i)) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O i)).map
-            (toK D.nd i)).mulVec (e u).1,
-          fun c : Fin D.R.t =>
-            toK D.nd i ((D.nd.chi i ((c : ℕ) + 1) g : (D.nd.O i)ˣ) : D.nd.O i) * (e u).2 c)
+def IsRankRPart
+    (rπ : GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)) (ρ : GE D.nd →* GL (Fin D.R.r) (D.nd.O i))
+    : Prop :=
+  Continuous (fun g =>
+      ((ρ g : GL (Fin D.R.r) (D.nd.O i)) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O i)))
+    ∧ ∃ e
+        : (Fin D.R.nV → KK D.nd i) ≃ₗ[KK D.nd i] ((Fin D.R.r → KK D.nd i) × (Fin D.R.t → KK D.nd i)),
+      ∀ (g : GE D.nd) (u : Fin D.R.nV → KK D.nd i),
+        e
+            ((((rπ g : GL (Fin D.R.nV) (D.nd.O i))
+              : Matrix (Fin D.R.nV) (Fin D.R.nV) (D.nd.O i)).map (toK D.nd i)).mulVec u)
+          = (
+            (((ρ g : GL (Fin D.R.r) (D.nd.O i)) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O i)).map
+              (toK D.nd i)).mulVec (e u).1,
+            fun c : Fin D.R.t =>
+              toK D.nd i ((D.nd.chi i ((c : ℕ) + 1) g : (D.nd.O i)ˣ) : D.nd.O i) * (e u).2 c
+          )
 
 def vCC (π : D.nd.X i) : ℝ≥0∞ :=
   ⨅ f ∈ D.nd.cc i, vO (D.nd.O i) (D.nd.l i) (((f : D.nd.T i) : D.nd.X i → D.nd.O i) π)
@@ -83,26 +93,27 @@ def vClass : ℝ≥0∞ := (padicValNat (D.nd.l i) (NumberField.classNumber D.ho
 def zetaP (P : HeightOneSpectrum (𝓞 D.host.E)) : D.nd.O i :=
   ((D.ntw.psiL i (D.nd.gam0 i P) : (D.nd.O i)ˣ) : D.nd.O i)
 
-def epsQ : ℝ≥0∞ :=
-  (D.R.t : ℝ≥0∞) * ∑ P ∈ D.nd.Q i, vO (D.nd.O i) (D.nd.l i) (zetaP D i P - 1)
+def epsQ : ℝ≥0∞ := (D.R.t : ℝ≥0∞) * ∑ P ∈ D.nd.Q i, vO (D.nd.O i) (D.nd.l i) (zetaP D i P - 1)
 
 end HidaSetting
 
 def CongBound_at (D : D7) (L : SizeData₂ D) : Prop :=
   ∀ i : D.nd.Loc,
-    LevelStarExponents.lStar L < (D.nd.l i : ℝ) → (∀ k, D.nd.l i ≠ D.host.g k) → D.nd.l i ∉ Exc L →
-    WeightTie D i → HG D.nd D.naut i →
-    ∀ r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)), GoodR D.nd i r →
-    ∀ π ∈ D.nd.Z i, ∀ ρ : GE D.nd →* GL (Fin D.R.r) (D.nd.O i), IsRankRPart D i (r π) ρ →
-      vCC D i π ≤ sPi D i π ρ + shaSum D i + vClass D i + epsQ D i
+    LevelStarExponents.lStar L < (D.nd.l i : ℝ) → (∀ k, D.nd.l i ≠ D.host.g k) → D.nd.l i ∉ Exc L
+      → WeightTie D i → HG D.nd D.naut i
+      → ∀ r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)),
+        GoodR D.nd i r
+          → ∀ π ∈ D.nd.Z i, ∀ ρ : GE D.nd →* GL (Fin D.R.r) (D.nd.O i),
+            IsRankRPart D i (r π) ρ → vCC D i π ≤ sPi D i π ρ + shaSum D i + vClass D i + epsQ D i
 
-theorem zetaP_eq (D : D7) (i : D.nd.Loc) (P : HeightOneSpectrum (𝓞 D.host.E)) (hP : P ∈ D.nd.Q i) :
-    zetaP D i P = D.nd.zeta i P := by
+theorem zetaP_eq (D : D7) (i : D.nd.Loc) (P : HeightOneSpectrum (𝓞 D.host.E)) (hP : P ∈ D.nd.Q i)
+    : zetaP D i P = D.nd.zeta i P := by
   have hl : P ∉ placesOver D.host.E (D.nd.l i) := D.nd.SQ_l i P (Or.inr hP)
   have hS : P ∉ D.nd.S i := fun h => Finset.disjoint_left.1 (D.nd.SQ_disj i) h hP
   rw [D.nd.S_def] at hS
   have h1 : D.ntw.chi1 (D.ntw.twOf i) (D.nd.j i) (D.ntw.twSide i) (D.nd.gam0 i P) = 1 := by
-    refine D.ntw.twistCharacterFamily_unramified _ _ _ P ?_ ?_ ?_ (D.nd.plOm.1 P) (D.nd.plOm.2 P) _ (D.nd.locNd_chebotarevPlace_mem i P)
+    refine D.ntw.twistCharacterFamily_unramified _ _ _ P ?_ ?_ ?_ (D.nd.plOm.1 P) (D.nd.plOm.2 P) _
+      (D.nd.locNd_chebotarevPlace_mem i P)
     · rw [D.ntw.twOf_l]; exact hl
     · intro k hk
       apply hS
@@ -145,7 +156,8 @@ theorem vO_l (D : D7) (i : D.nd.Loc) : vO (D.nd.O i) (D.nd.l i) (D.nd.l i : D.nd
   have hu : ¬ IsUnit (D.nd.l i : D.nd.O i) := by
     intro hu
     have hinj : Function.Injective (algebraMap ℤ_[D.nd.l i] (D.nd.O i)) := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro z hz
       by_contra hz0
       rw [PadicInt.unitCoeff_spec hz0, map_mul, map_pow, map_natCast] at hz
@@ -154,7 +166,8 @@ theorem vO_l (D : D7) (i : D.nd.Loc) : vO (D.nd.O i) (D.nd.l i) (D.nd.l i : D.nd
       · exact h0 (pow_eq_zero_iff'.1 h).1
     haveI : FaithfulSMul ℤ_[D.nd.l i] (D.nd.O i) := (faithfulSMul_iff_algebraMap_injective _ _).2 hinj
     have : IsUnit ((D.nd.l i : ℕ) : ℤ_[D.nd.l i]) :=
-      IsLocalHom.map_nonunit (f := algebraMap ℤ_[D.nd.l i] (D.nd.O i)) _ (by rw [map_natCast]; exact hu)
+      IsLocalHom.map_nonunit (f := algebraMap ℤ_[D.nd.l i] (D.nd.O i)) _
+        (by rw [map_natCast]; exact hu)
     exact PadicInt.irreducible_p.not_isUnit this
   unfold vO nlen
   apply ENNReal.div_self

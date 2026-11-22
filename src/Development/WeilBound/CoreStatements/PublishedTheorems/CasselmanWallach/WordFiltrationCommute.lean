@@ -12,7 +12,8 @@ namespace PositivityTheory.CW
 
 namespace EigenSumRepresentation
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {ι : Type}
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {ι : Type}
 
 lemma inner_basis {b : Module.Basis ι ℂ V} (hb : Orthonormal ℂ b) (i : ι) (y : V) :
     inner ℂ (b i) y = b.repr y i := by
@@ -82,7 +83,8 @@ lemma mem_nc_swap {p : Fin n × Fin n} (hp : p ∈ nc ε) : p.swap ∈ nc ε := 
 end EigenSumRepresentation
 
 open EigenSumRepresentation in
-theorem basis_sum_of_orthogonality : A0 → FunctionalCalculusLaws → EigenspacesOrthogonalAlt → BasisSumAsFormValues := by
+theorem basis_sum_of_orthogonality
+    : A0 → FunctionalCalculusLaws → EigenspacesOrthogonalAlt → BasisSumAsFormValues := by
   intro _ _ h11c n ε V _ _ E hM ι b μ hB φ S hS
   classical
   set T : Finset ι := S ∪ S.biUnion (fun i => (nc ε).biUnion (fun p => (b.repr (E p.1 p.2 (b i))).support)) with hT
@@ -92,13 +94,16 @@ theorem basis_sum_of_orthogonality : A0 → FunctionalCalculusLaws → Eigenspac
     apply Finset.mem_union_right
     exact Finset.mem_biUnion.2 ⟨i, hi, Finset.mem_biUnion.2 ⟨p, hp, hj⟩⟩
   set H : V := ∑ j ∈ T, starRingEnd ℂ (f (b j)) • b j with hH
-  have hinner : ∀ y, (b.repr y).support ⊆ T → inner ℂ H y = f y := fun y hy => inner_h hB.on f T y hy
+  have hinner : ∀ y, (b.repr y).support ⊆ T → inner ℂ H y = f y := fun y hy =>
+    inner_h hB.on f T y hy
   have hfib : ∑ ν ∈ image μ T, (∑ j ∈ T with μ j = ν, starRingEnd ℂ (f (b j)) • b j) = H :=
     Finset.sum_fiberwise_of_maps_to (fun j hj => Finset.mem_image_of_mem μ hj) _
   have heig : ∀ ν, Eig ε E ν (∑ j ∈ T with μ j = ν, starRingEnd ℂ (f (b j)) • b j) := fun ν =>
     eig_sum hB.eig _ (fun j => starRingEnd ℂ (f (b j))) ν (fun j hj => (Finset.mem_filter.1 hj).2)
-  have hdiag : ∑ ν ∈ image μ T, beta ε E (fc b μ φ) (∑ j ∈ T with μ j = ν, starRingEnd ℂ (f (b j)) • b j)
-      (∑ j ∈ T with μ j = ν, starRingEnd ℂ (f (b j)) • b j) = beta ε E (fc b μ φ) H H := by
+  have hdiag
+      : ∑ ν ∈ image μ T, beta ε E (fc b μ φ) (∑ j ∈ T with μ j = ν, starRingEnd ℂ (f (b j)) • b j)
+          (∑ j ∈ T with μ j = ν, starRingEnd ℂ (f (b j)) • b j)
+        = beta ε E (fc b μ φ) H H := by
     rw [← hfib, beta_sum (v := fun ν => ∑ j ∈ T with μ j = ν, starRingEnd ℂ (f (b j)) • b j)]
     refine Finset.sum_congr rfl fun l hl => ?_
     rw [Finset.sum_eq_single_of_mem l hl]
@@ -111,10 +116,12 @@ theorem basis_sum_of_orthogonality : A0 → FunctionalCalculusLaws → Eigenspac
     have hsign : adjSign ε p.1 p.2 = -1 := by
       simp only [nc, Finset.mem_filter, Finset.mem_univ, true_and] at hp
       simp [adjSign, hp]
-    rw [← inner_basis hB.on, ← inner_conj_symm, hM.uni p.1 p.2 H (b i), hinner _ (hsupp i hi _ hsw), hsign]
+    rw [← inner_basis hB.on, ← inner_conj_symm, hM.uni p.1 p.2 H (b i), hinner _ (hsupp i hi _ hsw),
+      hsign]
     simp
-  have hbeta : beta ε E (fc b μ φ) H H =
-      ∑ p ∈ nc ε, ∑ i ∈ S, ((φ (μ i) * ‖f (E p.2 p.1 (b i))‖ ^ 2 : ℝ) : ℂ) := by
+  have hbeta
+      : beta ε E (fc b μ φ) H H
+        = ∑ p ∈ nc ε, ∑ i ∈ S, ((φ (μ i) * ‖f (E p.2 p.1 (b i))‖ ^ 2 : ℝ) : ℂ) := by
     unfold beta
     refine Finset.sum_congr rfl fun p hp => ?_
     rw [inner_fc hB.on μ φ S hS]
@@ -125,8 +132,12 @@ theorem basis_sum_of_orthogonality : A0 → FunctionalCalculusLaws → Eigenspac
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [← Finset.mul_sum]
   congr 1
-  exact Finset.sum_nbij' Prod.swap Prod.swap (fun p hp => mem_nc_swap hp) (fun p hp => mem_nc_swap hp)
-    (fun p _ => rfl) (fun p _ => rfl) (fun p _ => rfl)
+  exact Finset.sum_nbij' Prod.swap Prod.swap
+    (fun p hp => mem_nc_swap hp)
+    (fun p hp => mem_nc_swap hp)
+    (fun p _ => rfl)
+    (fun p _ => rfl)
+    (fun p _ => rfl)
 
 end PositivityTheory.CW
 

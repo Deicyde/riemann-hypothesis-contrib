@@ -14,11 +14,13 @@ open PositivityTheory.Rg.BcB.N3 PositivityTheory.Rg.BcB.N3.Pse PositivityTheory.
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem comp_injective {n : ℕ} {V W U : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    [AddCommGroup U] [Module ℂ U] {π : Representation ℂ (GL (Fin n) k) V} {ρ : Representation ℂ (GL (Fin n) k) W}
+theorem comp_injective
+    {n : ℕ} {V W U : Type}
+    [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] [AddCommGroup U] [Module ℂ U]
+    {π : Representation ℂ (GL (Fin n) k) V} {ρ : Representation ℂ (GL (Fin n) k) W}
     {τ : Representation ℂ (GL (Fin n) k) U} (hi : π.IsIrreducible) (hsph : IsSpherical π)
-    (f : π.IntertwiningMap ρ) (hf : Function.Injective f) (T : ρ.IntertwiningMap τ) (hT : KInj k T) :
-    Function.Injective (T.comp f) := by
+    (f : π.IntertwiningMap ρ) (hf : Function.Injective f) (T : ρ.IntertwiningMap τ) (hT : KInj k T)
+    : Function.Injective (T.comp f) := by
   classical
   set g := T.comp f with hg
   have hg' : ∀ v, g v = T (f v) := fun v => Representation.IntertwiningMap.comp_apply _ _ _ T f v
@@ -47,40 +49,47 @@ def wt {n : ℕ} (σ : Equiv.Perm (Fin n)) : ℕ := ∑ i : Fin n, (i : ℕ) * (
 
 theorem wt_le {n : ℕ} (σ : Equiv.Perm (Fin n)) : wt σ ≤ n * (n * n) := by
   unfold wt
-  calc ∑ i : Fin n, (i : ℕ) * (σ i : ℕ) ≤ ∑ _i : Fin n, n * n :=
-        Finset.sum_le_sum fun i _ => Nat.mul_le_mul i.2.le (σ i).2.le
+  calc
+    ∑ i : Fin n, (i : ℕ) * (σ i : ℕ)
+      ≤ ∑ _i : Fin n, n * n := Finset.sum_le_sum fun i _ => Nat.mul_le_mul i.2.le (σ i).2.le
     _ = n * (n * n) := by simp
 
-theorem wt_swap {n : ℕ} (σ : Equiv.Perm (Fin n)) (i j : Fin n) (hij : (j : ℕ) = i + 1) (hd : σ j < σ i) :
-    wt σ < wt (σ * Equiv.swap i j) := by
+theorem wt_swap
+    {n : ℕ} (σ : Equiv.Perm (Fin n)) (i j : Fin n) (hij : (j : ℕ) = i + 1) (hd : σ j < σ i)
+    : wt σ < wt (σ * Equiv.swap i j) := by
   classical
   have hne : i ≠ j := by
     intro h
     subst h
     omega
   unfold wt
-  have key : ∀ τ : Equiv.Perm (Fin n), ∑ k : Fin n, (k : ℕ) * (τ k : ℕ) =
-      (i : ℕ) * (τ i : ℕ) + ((j : ℕ) * (τ j : ℕ) +
-        ∑ k ∈ (Finset.univ.erase i).erase j, (k : ℕ) * (τ k : ℕ)) := by
+  have key
+      : ∀ τ : Equiv.Perm (Fin n),
+        ∑ k : Fin n, (k : ℕ) * (τ k : ℕ)
+          = (i : ℕ) * (τ i : ℕ)
+            + ((j : ℕ) * (τ j : ℕ) + ∑ k ∈ (Finset.univ.erase i).erase j, (k : ℕ) * (τ k : ℕ)) := by
     intro τ
-    rw [Finset.add_sum_erase (Finset.univ.erase i) (fun k : Fin n => (k : ℕ) * (τ k : ℕ))
+    rw [Finset.add_sum_erase (Finset.univ.erase i)
+      (fun k : Fin n => (k : ℕ) * (τ k : ℕ))
       (Finset.mem_erase.2 ⟨hne.symm, Finset.mem_univ j⟩)]
     rw [Finset.add_sum_erase Finset.univ (fun k : Fin n => (k : ℕ) * (τ k : ℕ)) (Finset.mem_univ i)]
   rw [key σ, key (σ * Equiv.swap i j)]
-  have hrest : ∑ k ∈ (Finset.univ.erase i).erase j, (k : ℕ) * ((σ * Equiv.swap i j) k : ℕ) =
-      ∑ k ∈ (Finset.univ.erase i).erase j, (k : ℕ) * (σ k : ℕ) := by
+  have hrest
+      : ∑ k ∈ (Finset.univ.erase i).erase j, (k : ℕ) * ((σ * Equiv.swap i j) k : ℕ)
+        = ∑ k ∈ (Finset.univ.erase i).erase j, (k : ℕ) * (σ k : ℕ) := by
     apply Finset.sum_congr rfl
     intro k hk
     have hkj := Finset.ne_of_mem_erase hk
     have hki := Finset.ne_of_mem_erase (Finset.mem_of_mem_erase hk)
     rw [Equiv.Perm.mul_apply, Equiv.swap_apply_of_ne_of_ne hki hkj]
-  rw [hrest, Equiv.Perm.mul_apply, Equiv.Perm.mul_apply, Equiv.swap_apply_left, Equiv.swap_apply_right]
+  rw [hrest, Equiv.Perm.mul_apply, Equiv.Perm.mul_apply, Equiv.swap_apply_left,
+    Equiv.swap_apply_right]
   have hd' : (σ j : ℕ) < σ i := hd
   rw [hij]
   nlinarith
 
-theorem exists_descent {n : ℕ} (σ : Equiv.Perm (Fin n)) (h1 : σ ≠ 1) :
-    ∃ i j : Fin n, (j : ℕ) = i + 1 ∧ σ j < σ i := by
+theorem exists_descent {n : ℕ} (σ : Equiv.Perm (Fin n)) (h1 : σ ≠ 1)
+    : ∃ i j : Fin n, (j : ℕ) = i + 1 ∧ σ j < σ i := by
   by_contra hne
   push_neg at hne
   apply h1
@@ -98,9 +107,10 @@ theorem exists_descent {n : ℕ} (σ : Equiv.Perm (Fin n)) (h1 : σ ≠ 1) :
 
 theorem bubble : Bubble k := by
   intro hSL hG2 n ξ hξ σ₀ V _ _ π hi hsph hf₀
-  have key : ∀ m : ℕ, ∀ σ : Equiv.Perm (Fin n), n * (n * n) - wt σ = m →
-      (∃ f : π.IntertwiningMap (iP (ξ ∘ ⇑σ)), Function.Injective ⇑f) →
-        ∃ f : π.IntertwiningMap (iP ξ), Function.Injective ⇑f := by
+  have key
+      : ∀ m : ℕ, ∀ σ : Equiv.Perm (Fin n),
+        n * (n * n) - wt σ = m → (∃ f : π.IntertwiningMap (iP (ξ ∘ ⇑σ)), Function.Injective ⇑f)
+          → ∃ f : π.IntertwiningMap (iP ξ), Function.Injective ⇑f := by
     intro m
     induction m using Nat.strong_induction_on with
     | _ m ih =>

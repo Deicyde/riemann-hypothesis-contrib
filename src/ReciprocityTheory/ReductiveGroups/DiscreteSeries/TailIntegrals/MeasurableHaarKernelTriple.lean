@@ -27,9 +27,11 @@ private lemma measurable_phiA (k : ℕ) (A : ℝ) : Measurable (PhiA k A) := by
   exact ENNReal.measurable_ofReal.comp (hc.measurable.pow_const (-A))
 
 private def Gf (k : ℕ) (σ : ℝ) (h g h' : Mt k 0) : ℝ≥0∞ :=
-  ENNReal.ofReal ((Real.sqrt 2)⁻¹ * ‖((Matrix.of h)ᴴ *ᵥ ((Matrix.of g * Matrix.of h') *ᵥ phiV' k 0 0)) (iW k) +
-    ((Matrix.of g * Matrix.of h') *ᵥ phiV' k 0 0) (iK k)‖) ^ (-σ)
-
+  ENNReal.ofReal
+      ((Real.sqrt 2)⁻¹
+        * ‖((Matrix.of h)ᴴ *ᵥ ((Matrix.of g * Matrix.of h') *ᵥ phiV' k 0 0)) (iW k) +
+          ((Matrix.of g * Matrix.of h') *ᵥ phiV' k 0 0) (iK k)‖)
+    ^ (-σ)
 
 set_option maxHeartbeats 800000 in
 private lemma measurable_Gf (k : ℕ) (σ : ℝ) :
@@ -217,21 +219,26 @@ theorem aStepBase_of (hB2 : InductiveHeisenbergInputs) (hT : TBoth) : AStepBase 
   have : IsFiniteMeasureOnCompacts μG := ⟨fun K hK => hμG.finite_compact K hK⟩
   have hC0 := haarIntegralConstant_lt_top hk hν' hνf hσ0 hσk
   have hK1f : C0 k (s 0) ν + ν Set.univ ≠ ∞ := ENNReal.add_ne_top.mpr ⟨hC0.ne, hνf.ne⟩
-  have hKc : (C0 k (s 0) ν + ν Set.univ) *
-      (ENNReal.ofReal (1 / 8) ^ (-s 0) * (C0 k (s 0) ν + ν Set.univ)) ≠ ∞ := by
+  have hKc
+      : (C0 k (s 0) ν + ν Set.univ)
+          * (ENNReal.ofReal (1 / 8) ^ (- s 0) * (C0 k (s 0) ν + ν Set.univ))
+        ≠ ∞ := by
     refine ENNReal.mul_ne_top hK1f (ENNReal.mul_ne_top ?_ hK1f)
-    rw [ENNReal.ofReal_rpow_of_pos (by norm_num)]; exact ENNReal.ofReal_ne_top
+    rw [ENNReal.ofReal_rpow_of_pos (by norm_num)]
+    exact ENNReal.ofReal_ne_top
   have key := avg_key hk hT (s := s) hμG A hν'
   have hfin : ∫⁻ g, PhiA k A g * ∫⁻ h', ∫⁻ h, Gf k (s 0) h g h' ∂ν ∂ν ∂μG < ∞ := by
-    calc ∫⁻ g, PhiA k A g * ∫⁻ h', ∫⁻ h, Gf k (s 0) h g h' ∂ν ∂ν ∂μG
-        ≤ ∫⁻ g, PhiA k A g * ((C0 k (s 0) ν + ν Set.univ) *
-            (ENNReal.ofReal (1 / 8) ^ (-s 0) * (C0 k (s 0) ν + ν Set.univ))) ∂μG := by
-          refine lintegral_mono_ae ?_
-          filter_upwards [measure_eq_zero_iff_ae_notMem.mp hμG.conc] with g hg
-          exact mul_le_mul' le_rfl (ptw hk hσ0 hν' hK1f g (not_not.mp hg))
-      _ = (∫⁻ g, PhiA k A g ∂μG) * ((C0 k (s 0) ν + ν Set.univ) *
-            (ENNReal.ofReal (1 / 8) ^ (-s 0) * (C0 k (s 0) ν + ν Set.univ))) :=
-          lintegral_mul_const' _ _ hKc
+    calc
+      ∫⁻ g, PhiA k A g * ∫⁻ h', ∫⁻ h, Gf k (s 0) h g h' ∂ν ∂ν ∂μG
+          ≤ ∫⁻ g, PhiA k A g * ((C0 k (s 0) ν + ν Set.univ) *
+              (ENNReal.ofReal (1 / 8) ^ (-s 0) * (C0 k (s 0) ν + ν Set.univ))) ∂μG := by
+        refine lintegral_mono_ae ?_
+        filter_upwards [measure_eq_zero_iff_ae_notMem.mp hμG.conc] with g hg
+        exact mul_le_mul' le_rfl (ptw hk hσ0 hν' hK1f g (not_not.mp hg))
+      _ = (∫⁻ g, PhiA k A g ∂μG)
+          * ((C0 k (s 0) ν + ν Set.univ)
+            * (ENNReal.ofReal (1 / 8) ^ (- s 0) * (C0 k (s 0) ν + ν Set.univ))) :=
+        lintegral_mul_const' _ _ hKc
       _ < ∞ := ENNReal.mul_lt_top (hGN k 0 μG A hμG hA) hKc.lt_top
   by_contra hc
   rw [not_lt, top_le_iff] at hc

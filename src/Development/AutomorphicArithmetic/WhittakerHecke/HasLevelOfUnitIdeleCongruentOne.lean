@@ -5,15 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Xg
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
+  UpperTheory.ConvolutionTheory.RankTwoDescent.Xg
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
 open UpperTheory.V.Af.Smo (EigAt)
 open scoped ComplexOrder
 
-theorem UpperTheory.hasLevel_of_unitIdele_congruent_one :
-    ∀ (L : ℕ), 0 < L → ∀ t : (A ℚ)ˣ, t ∈ UU → (∀ v, Dv L v ((t : A ℚ) - 1)) → Lev L (aE t) := by
+theorem UpperTheory.hasLevel_of_unitIdele_congruent_one
+    : ∀ (L : ℕ), 0 < L → ∀ t : (A ℚ)ˣ, t ∈ UU → (∀ v, Dv L v ((t : A ℚ) - 1)) → Lev L (aE t) := by
   intro L _ t ht hD
   have h1 : (t : A ℚ).1 = 1 := ht.1
   have hu : ∀ v : H.P ℚ, Valued.v (H.cp v (t : A ℚ)) = 1 := ht.2

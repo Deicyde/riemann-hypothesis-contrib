@@ -13,10 +13,11 @@ open Module NumberField
 
 namespace PtBasic
 
-variable {C O : Type} [Field C] [CommRing O] [Algebra O C] {E : Type} [Field E] [NumberField E]
-  {c : E ≃+* E} {κ : O} {N : ℕ}
-  {V Ω : Type} [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
-  [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
+variable
+  {C O : Type} [Field C] [CommRing O] [Algebra O C]
+  {E : Type} [Field E] [NumberField E]
+  {c : E ≃+* E} {κ : O} {N : ℕ} {V Ω : Type} [AddCommGroup V] [Module C V] [Module O V]
+  [IsScalarTower O C V] [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
   (P : HTPoint C O c κ N V Ω)
 
 theorem ht_surjective : Function.Surjective P.ht := by
@@ -67,15 +68,16 @@ theorem T_stable (a : 𝓞 E) : ∀ x ∈ P.T, P.ρ a x ∈ P.T := by
     rw [Submodule.span_le]
     rintro _ ⟨q, rfl⟩
     show P.ρ a (P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) ∈ P.T
-    rw [show P.ρ a (P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) =
-        (P.ρ a * P.ρ (RingOfIntegers.basis E q.2)) (P.t q.1) from rfl, ← map_mul]
+    rw [show P.ρ a (P.ρ (RingOfIntegers.basis E q.2) (P.t q.1))
+          = (P.ρ a * P.ρ (RingOfIntegers.basis E q.2)) (P.t q.1) from
+        rfl,
+      ← map_mul]
     exact rho_t_mem P _ _
   exact fun x hx => hle hx
 
-theorem ht_eigProj (σ : E →+* C) (x : V) :
-    P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x) := by
+theorem ht_eigProj (σ : E →+* C) (x : V) : P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, P.ht_lin]
+  simp only [eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, P.ht_lin]
 
 theorem om'_lattice : P.om'.IsLattice C := by
   have : P.om.IsFullLattice C := P.om_lat
@@ -85,10 +87,10 @@ theorem om'_lattice : P.om'.IsLattice C := by
   · rw [HTPoint.om']
     exact (T_lattice P).fg.map _
 
-theorem omHT_eq (σ : E →+* C) :
-    P.omHT σ = (eigQuot P.ρ σ P.T).map (P.ht.restrictScalars O) := by
-  have hcomm : ((eigProj P.ρΩ σ).restrictScalars O) ∘ₗ (P.ht.restrictScalars O) =
-      (P.ht.restrictScalars O) ∘ₗ ((eigProj P.ρ σ).restrictScalars O) :=
+theorem omHT_eq (σ : E →+* C) : P.omHT σ = (eigQuot P.ρ σ P.T).map (P.ht.restrictScalars O) := by
+  have hcomm
+      : ((eigProj P.ρΩ σ).restrictScalars O) ∘ₗ (P.ht.restrictScalars O)
+        = (P.ht.restrictScalars O) ∘ₗ ((eigProj P.ρ σ).restrictScalars O) :=
     LinearMap.ext fun x => (ht_eigProj P σ x).symm
   show (P.T.map (P.ht.restrictScalars O)).map ((eigProj P.ρΩ σ).restrictScalars O) =
     (P.T.map ((eigProj P.ρ σ).restrictScalars O)).map (P.ht.restrictScalars O)
@@ -133,9 +135,26 @@ theorem two_mul_finrank : 2 * finrank C Ω = finrank C V := by
 
 end PtBasic
 
-theorem htPoint_basic : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] (hv : v.Integers O) [IsAlgClosed C] [CharZero C] (E : Type) [Field E] [NumberField E] (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (κ : O) (N : ℕ) (V : Type) [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V] (Ω : Type) [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω] (P : HTPoint C O c κ N V Ω), Function.Surjective P.ht ∧ P.T.IsLattice C ∧ (∀ (a : 𝓞 E), ∀ x ∈ P.T, P.ρ a x ∈ P.T) ∧ (∀ (σ : E →+* C) x, P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x)) ∧ P.om'.IsLattice C ∧ (∀ σ : E →+* C, P.omHT σ = (eigQuot P.ρ σ P.T).map (P.ht.restrictScalars O)) ∧ dualLat P.e.flip P.T = P.T ∧ 2 * Module.finrank C Ω = Module.finrank C V := by
+theorem htPoint_basic
+    : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C]
+        (hv : v.Integers O) [IsAlgClosed C] [CharZero C] (E : Type) [Field E] [NumberField E]
+        (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (κ : O) (N : ℕ) (V : Type) [AddCommGroup V]
+        [Module C V] [Module O V] [IsScalarTower O C V] (Ω : Type) [AddCommGroup Ω] [Module C Ω]
+        [Module O Ω] [IsScalarTower O C Ω] (P : HTPoint C O c κ N V Ω),
+      Function.Surjective P.ht ∧ P.T.IsLattice C ∧ (∀ (a : 𝓞 E), ∀ x ∈ P.T, P.ρ a x ∈ P.T)
+        ∧ (∀ (σ : E →+* C) x, P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x)) ∧ P.om'.IsLattice C
+        ∧ (∀ σ : E →+* C, P.omHT σ = (eigQuot P.ρ σ P.T).map (P.ht.restrictScalars O))
+        ∧ dualLat P.e.flip P.T = P.T ∧ 2 * Module.finrank C Ω = Module.finrank C V := by
   intro C _ v O _ _ _ _ _ E _ _ c _ κ N V _ _ _ _ Ω _ _ _ _ P
-  exact ⟨PtBasic.ht_surjective P, PtBasic.T_lattice P, PtBasic.T_stable P, PtBasic.ht_eigProj P,
-    PtBasic.om'_lattice P, PtBasic.omHT_eq P, PtBasic.dualLat_flip P, PtBasic.two_mul_finrank P⟩
+  exact ⟨
+    PtBasic.ht_surjective P,
+    PtBasic.T_lattice P,
+    PtBasic.T_stable P,
+    PtBasic.ht_eigProj P,
+    PtBasic.om'_lattice P,
+    PtBasic.omHT_eq P,
+    PtBasic.dualLat_flip P,
+    PtBasic.two_mul_finrank P
+  ⟩
 
 end GlobalTheory.CompanionTheory.Ar.HT

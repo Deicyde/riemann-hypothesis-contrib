@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace Bl.SecondBlockLemmaN
 
-theorem goal1 :
-  ∀ (z : Complex),
-  (∀ (n : Nat), LT.lt.{0} (Norm.norm.{0} (HSub.hSub.{0, 0, 0} (HPow.hPow.{0, 0, 0} z n) 1)) (1 / 2)) → Eq.{1} z 1 := by
+theorem goal1
+    : ∀ (z : Complex),
+      (∀ (n : Nat),
+          LT.lt.{0} (Norm.norm.{0} (HSub.hSub.{0, 0, 0} (HPow.hPow.{0, 0, 0} z n) 1)) (1 / 2))
+        → Eq.{1} z 1 := by
   intro z h
   have key : ∀ k : ℕ, (3 / 2 : ℝ) ^ k * ‖z - 1‖ ≤ ‖z ^ (2 ^ k) - 1‖ := by
     intro k
@@ -24,7 +26,9 @@ theorem goal1 :
         simpa using this
       have h4 : ‖(2 : ℂ)‖ = 2 := by simp
       have h2 : (3 / 2 : ℝ) ≤ ‖(z ^ (2 ^ k) - 1) + 2‖ := by linarith
-      calc (3 / 2 : ℝ) ^ (k + 1) * ‖z - 1‖ = (3 / 2) * ((3 / 2) ^ k * ‖z - 1‖) := by ring
+      calc
+        (3 / 2 : ℝ) ^ (k + 1) * ‖z - 1‖
+          = (3 / 2) * ((3 / 2) ^ k * ‖z - 1‖) := by ring
         _ ≤ (3 / 2) * ‖z ^ (2 ^ k) - 1‖ := by gcongr
         _ ≤ ‖z ^ (2 ^ k) - 1‖ * ‖(z ^ (2 ^ k) - 1) + 2‖ := by
           rw [mul_comm]; exact mul_le_mul_of_nonneg_left h2 (norm_nonneg _)

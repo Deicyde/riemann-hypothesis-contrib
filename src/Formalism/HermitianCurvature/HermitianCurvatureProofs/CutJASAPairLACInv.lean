@@ -24,8 +24,10 @@ theorem averaging_invariance_holds : ACInv := by
   let π1 : B.Mat k r → (ℂ →L[ℂ] ℂ) := fun _ => 1
   have hpsi : ∀ (w : Fin (2 * r + k + 1) → ℂ) (y : B.Mat k r), psi k r w 0 y = 1 := by
     intro w y; simp [psi]
-  have hJ : ∀ x : B.Mat k r, besselJ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F x =
-      ((∫ p, φ₀ (B.sgs p x) ∂D.μSS : ℝ) : ℂ) • (1 : ℂ →L[ℂ] ℂ) := by
+  have hJ
+      : ∀ x : B.Mat k r,
+        besselJ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F x
+          = ((∫ p, φ₀ (B.sgs p x) ∂D.μSS : ℝ) : ℂ) • (1 : ℂ →L[ℂ] ℂ) := by
     intro x
     unfold besselJ
     simp only [hpsi, star_one, mul_one, one_smul, π1, F]
@@ -33,20 +35,31 @@ theorem averaging_invariance_holds : ACInv := by
     refine integral_congr_ae (Filter.Eventually.of_forall fun p => ?_)
     ext
     simp [B.sgs]
-  have hrep : ∀ U : Set (B.Mat k r), IsCRepOn U π1 := fun U => ⟨rfl, fun _ _ _ _ => by ext; simp [π1]⟩
-  have hN := bessel_unipotent_equiv_holds ℂ ℂ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F D.z_mem D.z'_mem D.haarN.conc
-    (fun n₀ h => D.haarN.left n₀ h)
-  have hU := bessel_unitary_equiv_holds ℂ ℂ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F D.z_mem D.z'_mem D.haarN.conc
-    D.haarW.conc D.haarW'.conc (fun h₀ hh₀ => D.haarW.left h₀ hh₀) (fun h₀ hh₀ => D.haarW'.left h₀ hh₀)
-    (Formalism.FourierDecayAlt.P.conjugation_invariance_every_setting k r Wp Wq D) (hrep _) (hrep _)
-  have hs : B.sgs p₀ g = (Matrix.of p₀.1.1 : B.Mat k r)⁻¹ *
-      ((Matrix.of p₀.1.2 : B.Mat k r)⁻¹ * g * (Matrix.of p₀.2.2 : B.Mat k r)) * (Matrix.of p₀.2.1 : B.Mat k r) := by
+  have hrep : ∀ U : Set (B.Mat k r), IsCRepOn U π1 := fun U =>
+    ⟨rfl, fun _ _ _ _ => by ext; simp [π1]⟩
+  have hN :=
+    bessel_unipotent_equiv_holds ℂ ℂ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F D.z_mem D.z'_mem
+      D.haarN.conc (fun n₀ h => D.haarN.left n₀ h)
+  have hU :=
+    bessel_unitary_equiv_holds ℂ ℂ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F D.z_mem D.z'_mem
+      D.haarN.conc D.haarW.conc D.haarW'.conc
+      (fun h₀ hh₀ => D.haarW.left h₀ hh₀)
+      (fun h₀ hh₀ => D.haarW'.left h₀ hh₀)
+      (Formalism.FourierDecayAlt.P.conjugation_invariance_every_setting k r Wp Wq D) (hrep _)
+      (hrep _)
+  have hs
+      : B.sgs p₀ g
+        = (Matrix.of p₀.1.1 : B.Mat k r)⁻¹
+          * ((Matrix.of p₀.1.2 : B.Mat k r)⁻¹ * g * (Matrix.of p₀.2.2 : B.Mat k r))
+          * (Matrix.of p₀.2.1 : B.Mat k r) := by
     show (Matrix.of p₀.1.1 : B.Mat k r)⁻¹ * (Matrix.of p₀.1.2 : B.Mat k r)⁻¹ * g * (Matrix.of p₀.2.2 : B.Mat k r) *
       (Matrix.of p₀.2.1 : B.Mat k r) = _
     simp only [Matrix.mul_assoc]
-  have key : besselJ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F (B.sgs p₀ g) =
-      besselJ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F g := by
-    rw [hs, hU _ _ (Formalism.FourierDecayAlt.P.BigCellInversePair.uw_inv h1) _ h3, hN _ _ (WeylGroupFacts.mem_n_inv h2) _ h4]
+  have key
+      : besselJ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F (B.sgs p₀ g)
+        = besselJ k r D.z D.z' 0 π1 π1 D.μW D.μN D.μW' F g := by
+    rw [hs, hU _ _ (Formalism.FourierDecayAlt.P.BigCellInversePair.uw_inv h1) _ h3,
+      hN _ _ (WeylGroupFacts.mem_n_inv h2) _ h4]
     ext
     simp [π1, hpsi]
   rw [hJ, hJ] at key

@@ -11,10 +11,14 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-theorem exists_component_mem_vanI_of_mem_span {ι : Type} [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ))
-    (l : ℂ →ₗ[ℚ] ℚ) (f : MvPolynomial (ι × ι) ℂ)
-    (hf : f ∈ Submodule.span ℂ ((MvPolynomial.map (algebraMap ℚ ℂ)) '' vanI Γ)) :
-    ∀ c : ℂ, ∃ f' ∈ vanI Γ, ∀ m, AddMonoidAlgebra.coeff f' m = l (c * AddMonoidAlgebra.coeff f m) := by
+theorem exists_component_mem_vanI_of_mem_span
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (Γ : Set (Matrix ι ι ℂ))
+    (l : ℂ →ₗ[ℚ] ℚ)
+    (f : MvPolynomial (ι × ι) ℂ)
+    (hf : f ∈ Submodule.span ℂ ((MvPolynomial.map (algebraMap ℚ ℂ)) '' vanI Γ))
+    : ∀ c : ℂ, ∃ f' ∈ vanI Γ, ∀ m,
+      AddMonoidAlgebra.coeff f' m = l (c * AddMonoidAlgebra.coeff f m) := by
   induction hf using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨p, hp, rfl⟩ := hx
@@ -53,10 +57,18 @@ theorem exists_component_mem_vanI_of_mem_span {ι : Type} [Fintype ι] [Decidabl
     obtain ⟨f', hf', h'⟩ := hx (c * a)
     exact ⟨f', hf', fun m => by rw [h', MvPolynomial.coeff_smul, smul_eq_mul, mul_assoc]⟩
 
-theorem component_mem_vanI : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)), (∀ σ : ℂ ≃+* ℂ, ∀ g ∈ Γ, g.map σ ∈ Γ) → ∀ f : MvPolynomial (ι × ι) ℂ, (∀ g ∈ Γ, evC f g = 0) → ∀ (l : ℂ →ₗ[ℚ] ℚ) (f' : MvPolynomial (ι × ι) ℚ), (∀ m, AddMonoidAlgebra.coeff f' m = l (AddMonoidAlgebra.coeff f m)) → f' ∈ vanI Γ := by
+theorem component_mem_vanI
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)),
+      (∀ σ : ℂ ≃+* ℂ, ∀ g ∈ Γ, g.map σ ∈ Γ)
+        → ∀ f : MvPolynomial (ι × ι) ℂ,
+          (∀ g ∈ Γ, evC f g = 0)
+            → ∀ (l : ℂ →ₗ[ℚ] ℚ) (f' : MvPolynomial (ι × ι) ℚ),
+              (∀ m, AddMonoidAlgebra.coeff f' m = l (AddMonoidAlgebra.coeff f m))
+                → f' ∈ vanI Γ := by
   intro ι _ _ Γ hΓ f hf l f' hf'
   obtain ⟨p, hp, hpc⟩ :=
-    exists_component_mem_vanI_of_mem_span Γ l f (GlobalTheory.T.mem_span_ratPolysVanishing_of_autStable ι Γ hΓ f hf) 1
+    exists_component_mem_vanI_of_mem_span Γ l f
+      (GlobalTheory.T.mem_span_ratPolysVanishing_of_autStable ι Γ hΓ f hf) 1
   have hfp : f' = p := by
     ext m
     rw [hf', hpc, one_mul]

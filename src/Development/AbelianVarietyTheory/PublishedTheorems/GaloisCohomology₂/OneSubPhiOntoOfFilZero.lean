@@ -42,7 +42,8 @@ theorem oneSubPhiOnto_of_filZero {C : Core l} (h : PhiSubOneOntoFilZero C) : C.O
   obtain ⟨x, -, hx⟩ := h (-y)
   exact ⟨x, by rw [← neg_sub, hx, neg_neg]⟩
 
-theorem filZero_of_onto {C : Core l} (h1 : C.OneSubPhiOnto) (h2 : C.FundOnto) : PhiSubOneOntoFilZero C := by
+theorem filZero_of_onto {C : Core l} (h1 : C.OneSubPhiOnto) (h2 : C.FundOnto)
+    : PhiSubOneOntoFilZero C := by
   intro y
   obtain ⟨x, hx⟩ := h1 y
   obtain ⟨b, hb, hF⟩ := h2 (C.ι x)
@@ -50,10 +51,17 @@ theorem filZero_of_onto {C : Core l} (h1 : C.OneSubPhiOnto) (h2 : C.FundOnto) : 
   rw [map_sub, hb, ← hx]
   ring
 
-theorem of_rest (h : ∀ (l : ℕ) [Fact l.Prime] (C : Core l),
-    C.TensorInj ∧ C.Fund ∧ C.FundOnto ∧ C.Regular) : FontaineBcris := fun l _ C =>
-  ⟨(h l C).1, phiB_injective l, (ULaws.u_laws l C).2.2.2.1, (h l C).2.1,
-    filZero_of_onto (one_sub_phi_onto l C) (h l C).2.2.1, (h l C).2.2.1, (h l C).2.2.2⟩
+theorem of_rest
+    (h : ∀ (l : ℕ) [Fact l.Prime] (C : Core l), C.TensorInj ∧ C.Fund ∧ C.FundOnto ∧ C.Regular)
+    : FontaineBcris := fun l _ C => ⟨
+  (h l C).1,
+  phiB_injective l,
+  (ULaws.u_laws l C).2.2.2.1,
+  (h l C).2.1,
+  filZero_of_onto (one_sub_phi_onto l C) (h l C).2.2.1,
+  (h l C).2.2.1,
+  (h l C).2.2.2
+⟩
 
 end FontaineBcris
 

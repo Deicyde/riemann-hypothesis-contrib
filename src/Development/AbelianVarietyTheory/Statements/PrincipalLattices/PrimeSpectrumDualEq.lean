@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Statements.PrincipalLattices.LogH
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped UpperHalfPlane
 
 namespace GlobalTheory.CMCurveTest
@@ -22,10 +24,14 @@ def scaleVec {A : Over (Sp R)} (c : R) (v : epsR R ⟶ A) : epsR R ⟶ A :=
     congr 1
     ext a <;> simp [epsScaleR, TrivSqZeroExt.algebraMap_eq_inl])
 
-theorem isVecOver_scaleVec {R' : Type} [CommRing R'] {f : R →+* R'} {A : Over (Sp R)} {A' : Over (Sp R')}
-    {φ : A'.left ⟶ A.left} {v : epsR R ⟶ A} {v' : epsR R' ⟶ A'} (h : IsVecOver f φ v v') (c : R) :
-    IsVecOver f φ (scaleVec c v) (scaleVec (f c) v') := by
-  change (spMap (epsScaleR (f c)) ≫ v'.left) ≫ φ = spMap (Chart.dualMapR f) ≫ spMap (epsScaleR c) ≫ v.left
+theorem isVecOver_scaleVec
+    {R' : Type} [CommRing R']
+    {f : R →+* R'} {A : Over (Sp R)} {A' : Over (Sp R')} {φ : A'.left ⟶ A.left} {v : epsR R ⟶ A}
+    {v' : epsR R' ⟶ A'} (h : IsVecOver f φ v v')
+    (c : R)
+    : IsVecOver f φ (scaleVec c v) (scaleVec (f c) v') := by
+  change (spMap (epsScaleR (f c)) ≫ v'.left) ≫ φ
+    = spMap (Chart.dualMapR f) ≫ spMap (epsScaleR c) ≫ v.left
   rw [Category.assoc, h, ← Category.assoc, ← Category.assoc]
   congr 1
   refine (spMap_comp_spMap _ _).trans (Eq.trans ?_ (spMap_comp_spMap _ _).symm)
@@ -37,7 +43,8 @@ theorem primeSpectrum_dual_eq (x y : PrimeSpectrum (DualNumber ℂ)) : x = y := 
     constructor
     · intro ha
       by_contra h0
-      exact z.2.ne_top (z.asIdeal.eq_top_of_isUnit_mem ha (TrivSqZeroExt.isUnit_iff_isUnit_fst.2 (Ne.isUnit h0)))
+      exact z.2.ne_top (z.asIdeal.eq_top_of_isUnit_mem ha
+        (TrivSqZeroExt.isUnit_iff_isUnit_fst.2 (Ne.isUnit h0)))
     · intro ha
       refine z.2.mem_of_pow_mem 2 ?_
       rw [show a ^ 2 = 0 by ext <;> simp [pow_two, ha]]
@@ -45,8 +52,12 @@ theorem primeSpectrum_dual_eq (x y : PrimeSpectrum (DualNumber ℂ)) : x = y := 
   ext a
   rw [h, h]
 
-theorem isDiff_scaleVec {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ} (u : HolUnif A L g) {w : Fin g → ℂ}
-    {v : epsR ℂ ⟶ A} (h : u.IsDiff w v) (c : ℂ) : u.IsDiff (c • w) (scaleVec c v) := by
+theorem isDiff_scaleVec
+    {A : Over (Sp ℂ)} [GrpObj A]
+    {L : LB A.left} {g : ℕ} (u : HolUnif A L g)
+    {w : Fin g → ℂ} {v : epsR ℂ ⟶ A} (h : u.IsDiff w v)
+    (c : ℂ)
+    : u.IsDiff (c • w) (scaleVec c v) := by
   intro U hU f
   have hU' : ⊤ ≤ v.left ⁻¹ᵁ U := fun x _ => by
     have := hU (Set.mem_univ x)
@@ -54,11 +65,14 @@ theorem isDiff_scaleVec {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ}
     change v.left ((spMap (epsScaleR c)) x) ∈ U at this
     rwa [hx] at this
   rw [map_smul, ← h U hU' f]
-  have e : (scaleVec c v).left.appLE U ⊤ hU = v.left.appLE U ⊤ hU' ≫ (spMap (epsScaleR c)).appTop := by
+  have e
+      : (scaleVec c v).left.appLE U ⊤ hU = v.left.appLE U ⊤ hU' ≫ (spMap (epsScaleR c)).appTop := by
     rw [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
     exact (Scheme.Hom.appLE_comp_appLE (spMap (epsScaleR c)) v.left U ⊤ ⊤ hU' le_rfl).symm
-  have e2 := congrArg (fun k => k.hom ((v.left.appLE U ⊤ hU').hom f))
-    (Scheme.ΓSpecIso_naturality (CommRingCat.ofHom (epsScaleR c)))
+  have e2 :=
+    congrArg
+      (fun k => k.hom ((v.left.appLE U ⊤ hU').hom f))
+      (Scheme.ΓSpecIso_naturality (CommRingCat.ofHom (epsScaleR c)))
   rw [e]
   refine (congrArg TrivSqZeroExt.snd e2).trans ?_
   simp [epsScaleR]

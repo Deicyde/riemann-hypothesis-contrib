@@ -19,12 +19,10 @@ private lemma isLo_of_blockTriangular_toDual {n : ℕ} {b : Matrix (Fin n) (Fin 
     (hb : b.BlockTriangular OrderDual.toDual) : IsLo b :=
   fun _ _ hij => hb (OrderDual.toDual_lt_toDual.mpr hij)
 
-theorem exists_isLo_mul_conjTranspose {n : ℕ} {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) :
-    ∃ b : Matrix (Fin n) (Fin n) ℂ, IsLo b ∧ x = b * bᴴ := by
+theorem exists_isLo_mul_conjTranspose {n : ℕ} {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef)
+    : ∃ b : Matrix (Fin n) (Fin n) ℂ, IsLo b ∧ x = b * bᴴ := by
   classical
-
-  have hLi : (LDL.lowerInv hx).BlockTriangular OrderDual.toDual :=
-    LDL.isLowerTriangular_lowerInv hx
+  have hLi : (LDL.lowerInv hx).BlockTriangular OrderDual.toDual := LDL.isLowerTriangular_lowerInv hx
   have hL : (LDL.lower hx).BlockTriangular OrderDual.toDual :=
     Matrix.blockTriangular_inv_of_blockTriangular hLi
 
@@ -34,8 +32,7 @@ theorem exists_isLo_mul_conjTranspose {n : ℕ} {x : Matrix (Fin n) (Fin n) ℂ}
     intro v w hvw
     have h := congrArg (fun u => u ᵥ* (LDL.lowerInv hx)⁻¹) hvw
     simpa [Matrix.vecMul_vecMul, Matrix.mul_inv_of_invertible] using h
-  have hd : ∀ i, 0 < LDL.diagEntries hx i := fun i => by
-    simpa [LDL.diag] using hD.diag_pos (i := i)
+  have hd : ∀ i, 0 < LDL.diagEntries hx i := fun i => by simpa [LDL.diag] using hD.diag_pos (i := i)
   let s : Fin n → ℂ := fun i => ((Real.sqrt (LDL.diagEntries hx i).re : ℝ) : ℂ)
   have hs : ∀ i, s i * star (s i) = LDL.diagEntries hx i := fun i => by
     obtain ⟨hre, him⟩ := Complex.pos_iff.mp (hd i)
@@ -43,8 +40,11 @@ theorem exists_isLo_mul_conjTranspose {n : ℕ} {x : Matrix (Fin n) (Fin n) ℂ}
     apply Complex.ext
     · simp [s, Complex.mul_re, hsq]
     · simp [s, Complex.mul_im, ← him]
-  refine ⟨LDL.lower hx * Matrix.diagonal s,
-    isLo_of_blockTriangular_toDual (hL.mul (Matrix.blockTriangular_diagonal s)), ?_⟩
+  refine ⟨
+    LDL.lower hx * Matrix.diagonal s,
+    isLo_of_blockTriangular_toDual (hL.mul (Matrix.blockTriangular_diagonal s)),
+    ?_
+  ⟩
   have hDs : LDL.diag hx = Matrix.diagonal s * (Matrix.diagonal s)ᴴ := by
     rw [Matrix.diagonal_conjTranspose, Matrix.diagonal_mul_diagonal]
     unfold LDL.diag
@@ -58,8 +58,9 @@ theorem one_mem_Omega_leadMinor (n : ℕ) : (1 : Matrix (Fin n) (Fin n) ℂ) ∈
   intro i
   simp [leadMinor, Matrix.submatrix_one _ (Fin.castLE_injective _)]
 
-theorem diag_ne_zero_of_posDef_mul_conjTranspose {n : ℕ} {b : Matrix (Fin n) (Fin n) ℂ} (hb : IsLo b)
-    (hx : (b * bᴴ).PosDef) (l : Fin n) : b l l ≠ 0 := by
+theorem diag_ne_zero_of_posDef_mul_conjTranspose
+    {n : ℕ} {b : Matrix (Fin n) (Fin n) ℂ} (hb : IsLo b) (hx : (b * bᴴ).PosDef) (l : Fin n)
+    : b l l ≠ 0 := by
   classical
   have hdet : (b * bᴴ).det ≠ 0 := hx.det_pos.ne'
   have hb' : b.det ≠ 0 := fun h => hdet (by rw [Matrix.det_mul, h, zero_mul])

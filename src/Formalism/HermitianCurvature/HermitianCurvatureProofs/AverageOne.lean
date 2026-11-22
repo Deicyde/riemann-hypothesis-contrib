@@ -56,8 +56,7 @@ lemma tendsto_lim_of_bdd (u : ℕ → ℂ) (B : ℝ) (hu : ∀ n, ‖u n‖ ≤ 
 lemma hyper_le_atTop : (hyperfilter ℕ : Filter ℕ) ≤ atTop := by
   rw [← Nat.cofinite_eq_atTop]; exact hyperfilter_le_cofinite
 
-def LIMf (e : ι → Λ) (c : ℕ → Λ) (g : Λ → ℂ) : ℂ :=
-  limUnder (hyperfilter ℕ : Filter ℕ) (avg e c g)
+def LIMf (e : ι → Λ) (c : ℕ → Λ) (g : Λ → ℂ) : ℂ := limUnder (hyperfilter ℕ : Filter ℕ) (avg e c g)
 
 lemma LIMf_eq_of_tendsto (e : ι → Λ) (c : ℕ → Λ) (g : Λ → ℂ) (a : ℂ)
     (h : Tendsto (avg e c g) (hyperfilter ℕ : Filter ℕ) (𝓝 a)) : LIMf e c g = a :=
@@ -283,9 +282,11 @@ lemma invAt_all (e : ι → Λ) (c : ℕ → Λ) (he : AddSubgroup.closure (Set.
   | add x y _ _ hx hy => exact invAt_add e c x y hx hy
   | neg x _ hx => exact invAt_neg e c x hx
 
-theorem exists_mean (e : ι → Λ) (he : AddSubgroup.closure (Set.range e) = ⊤) (c : ℕ → Λ) :
-    IsMean (LIMf e c) ∧ ∀ g, Bdd g →
-      (∀ ε > 0, ∀ᶠ n in atTop, ∀ m ∈ box ι (n + 1), ‖g (bpt e (c n) m)‖ ≤ ε) → LIMf e c g = 0 := by
+theorem exists_mean (e : ι → Λ) (he : AddSubgroup.closure (Set.range e) = ⊤) (c : ℕ → Λ)
+    : IsMean (LIMf e c)
+      ∧ ∀ g,
+        Bdd g → (∀ ε > 0, ∀ᶠ n in atTop, ∀ m ∈ box ι (n + 1), ‖g (bpt e (c n) m)‖ ≤ ε)
+          → LIMf e c g = 0 := by
   refine ⟨⟨?_, ?_, ?_, ?_, ?_⟩, ?_⟩
   · intro g h hg hh
     apply LIMf_eq_of_tendsto
@@ -303,7 +304,8 @@ theorem exists_mean (e : ι → Λ) (he : AddSubgroup.closure (Set.range e) = �
       (Filter.Eventually.of_forall (fun n => avg_real_nonneg e c g hpos n))
   · apply LIMf_eq_of_tendsto
     have : avg e c (fun _ => (1 : ℂ)) = fun _ => 1 := funext (avg_one e c)
-    rw [this]; exact tendsto_const_nhds
+    rw [this]
+    exact tendsto_const_nhds
   · intro g σ hg
     exact invAt_all e c he σ g hg
   · intro g hg hsmall
@@ -317,7 +319,8 @@ theorem exists_mean (e : ι → Λ) (he : AddSubgroup.closure (Set.range e) = �
     unfold avg
     rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (by positivity)]
     have h1 : ‖∑ m ∈ box ι (n + 1), g (bpt e (c n) m)‖ ≤ (box ι (n + 1)).card * (ε / 2) := by
-      calc _ ≤ ∑ m ∈ box ι (n + 1), ‖g (bpt e (c n) m)‖ := norm_sum_le _ _
+      calc
+        _ ≤ ∑ m ∈ box ι (n + 1), ‖g (bpt e (c n) m)‖ := norm_sum_le _ _
         _ ≤ ∑ _m ∈ box ι (n + 1), (ε / 2) := Finset.sum_le_sum (fun m hm => hn m hm)
         _ = _ := by rw [Finset.sum_const, nsmul_eq_mul]
     rw [card_box] at h1
@@ -388,13 +391,13 @@ theorem meanExists : MeanExists := by
     suffices hall : ∀ zL : La, (⟨zL.1, zL.2⟩ : Λ) ∈ AddSubgroup.closure (Set.range e) from
       hall ⟨z.1, z.2⟩
     intro zL
-    have hxs : zL ∈ Submodule.span ℤ (Set.range b) := by
-      rw [b.span_eq]; exact Submodule.mem_top
+    have hxs : zL ∈ Submodule.span ℤ (Set.range b) := by rw [b.span_eq]; exact Submodule.mem_top
     induction hxs using Submodule.span_induction with
     | mem z hz =>
       obtain ⟨i, rfl⟩ := hz
       exact AddSubgroup.subset_closure ⟨i, rfl⟩
-    | zero => exact (AddSubgroup.closure (Set.range e)).zero_mem
+    | zero =>
+      exact (AddSubgroup.closure (Set.range e)).zero_mem
     | add z1 z2 _ _ h1 h2 =>
       have := (AddSubgroup.closure (Set.range e)).add_mem h1 h2
       convert this using 1
@@ -415,20 +418,21 @@ theorem meanExists : MeanExists := by
     apply hT
     intro v
     show T ≤ ‖((bpt e (c n) m : Λ) : V f) v‖
-    have hcoe : ((bpt e (c n) m : Λ) : V f) = y n + ∑ i, m i • (b i : V f) := by
-      simp [bpt, c, e]
+    have hcoe : ((bpt e (c n) m : Λ) : V f) = y n + ∑ i, m i • (b i : V f) := by simp [bpt, c, e]
     rw [hcoe, Pi.add_apply]
     have hs : ‖(∑ i, m i • (b i : V f)) v‖ ≤ (n + 1) * β := by
-      calc ‖(∑ i, m i • (b i : V f)) v‖ ≤ ‖∑ i, m i • (b i : V f)‖ := norm_le_pi_norm _ v
+      calc
+        ‖(∑ i, m i • (b i : V f)) v‖
+          ≤ ‖∑ i, m i • (b i : V f)‖ := norm_le_pi_norm _ v
         _ ≤ ∑ i, ‖m i • (b i : V f)‖ := norm_sum_le _ _
         _ ≤ ∑ i, (m i : ℝ) * ‖(b i : V f)‖ := Finset.sum_le_sum (fun i _ => norm_nsmul_le)
         _ ≤ ∑ i, ((n : ℝ) + 1) * ‖(b i : V f)‖ := by
-            apply Finset.sum_le_sum
-            intro i _
-            have := Fintype.mem_piFinset.mp hm i
-            simp only [Finset.mem_range] at this
-            have : (m i : ℝ) ≤ n + 1 := by exact_mod_cast this.le
-            gcongr
+          apply Finset.sum_le_sum
+          intro i _
+          have := Fintype.mem_piFinset.mp hm i
+          simp only [Finset.mem_range] at this
+          have : (m i : ℝ) ≤ n + 1 := by exact_mod_cast this.le
+          gcongr
         _ = (n + 1) * β := by rw [hβ, Finset.mul_sum]
     have hyv := hy n v
     have htri := norm_sub_le (y n v + (∑ i, m i • (b i : V f)) v) ((∑ i, m i • (b i : V f)) v)
@@ -440,6 +444,8 @@ theorem meanExists : MeanExists := by
 
 end Lattice
 
-theorem _root_.Formalism.FourierDecayAlt.P.invariantMeanExists : Formalism.FourierDecayAlt.crystallineComparison.MeanExists := meanExists
+theorem _root_.Formalism.FourierDecayAlt.P.invariantMeanExists
+    : Formalism.FourierDecayAlt.crystallineComparison.MeanExists :=
+  meanExists
 
 end Formalism.FourierDecayAlt.P.BoxAverageLimits

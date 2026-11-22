@@ -14,12 +14,15 @@ namespace SecondLineEstimates
 
 variable {m n : ℕ}
 
-def hk (ε : Fin m → Bool) (c t : ℝ) (P : PX m n) (b : Matrix (Fin n) (Fin n) ℂ) (k : ℕ)
-    (x : Fin m → Fin n → ℂ) : ℂ :=
+def hk
+    (ε : Fin m → Bool) (c t : ℝ) (P : PX m n) (b : Matrix (Fin n) (Fin n) ℂ) (k : ℕ)
+    (x : Fin m → Fin n → ℂ)
+    : ℂ :=
   evX P x * gs c x * (Complex.I * t * (b * gramX ε x).trace) ^ k
 
-def Fk (ε : Fin m → Bool) (c t : ℝ) (P : PX m n) (b : Matrix (Fin n) (Fin n) ℂ) (k : ℕ) : ℂ → ℂ :=
-  fun z => ∫ x : Fin m → Fin n → ℂ, hk ε c t P b k x * Complex.exp (Complex.I * t * z * (b * gramX ε x).trace)
+def Fk (ε : Fin m → Bool) (c t : ℝ) (P : PX m n) (b : Matrix (Fin n) (Fin n) ℂ) (k : ℕ)
+    : ℂ → ℂ := fun z =>
+  ∫ x : Fin m → Fin n → ℂ, hk ε c t P b k x * Complex.exp (Complex.I * t * z * (b * gramX ε x).trace)
 
 def dl (c t : ℝ) (b : Matrix (Fin n) (Fin n) ℂ) : ℝ := c / (4 * (|t| * kb b + 1))
 
@@ -162,8 +165,11 @@ open SecondLineEstimates in
 theorem secLine : SecLine := by
   intro m n ε c t hc P b hb
   obtain ⟨Cp, hCp, D, hP⟩ := evX_bound P
-  have hF : (fun z : ℂ => ∫ x : Fin m → Fin n → ℂ, evX P x * gs c x *
-      Complex.exp (Complex.I * t * z * (b * gramX ε x).trace)) = Fk ε c t P b 0 := by
+  have hF
+      : (fun z : ℂ =>
+          ∫ x : Fin m → Fin n → ℂ, evX P x * gs c x *
+            Complex.exp (Complex.I * t * z * (b * gramX ε x).trace))
+        = Fk ε c t P b 0 := by
     funext z; simp [Fk, hk]
   refine ⟨dl c t b, dl_pos hc t b, ?_, ?_, ?_⟩
   · rw [hF]
@@ -175,6 +181,9 @@ theorem secLine : SecLine := by
     rw [hF, iter ε c t P b hb hc Cp hCp D hP k 0 (by simpa using dl_pos hc t b)]
     simp only [Fk, hk, mul_zero, zero_mul, Complex.exp_zero, mul_one]
     rw [← integral_const_mul]
-    congr 1; funext x; rw [mul_pow]; ring
+    congr 1
+    funext x
+    rw [mul_pow]
+    ring
 
 end PositivityTheory.Rg.Sw.FFTSteps

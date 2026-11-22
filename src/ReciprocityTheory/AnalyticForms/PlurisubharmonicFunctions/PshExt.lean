@@ -14,13 +14,11 @@ open ReciprocityTheory.AnForm.A
 variable {D : ℕ} {U : Set (Fin D → ℂ)} {S : Finset (Fin D)} {u : (Fin D → ℂ) → ℝ} {C κ : ℝ}
 
 theorem coordDiv_closed (S : Finset (Fin D)) : IsClosed (coordDiv S) := by
-  have : coordDiv S = ⋃ i ∈ S, {z : Fin D → ℂ | z i = 0} := by
-    ext z; simp [coordDiv]
+  have : coordDiv S = ⋃ i ∈ S, {z : Fin D → ℂ | z i = 0} := by ext z; simp [coordDiv]
   rw [this]
   exact isClosed_biUnion_finset fun i _ => isClosed_eq (continuous_apply i) continuous_const
 
-theorem nebot_diff (hU : IsOpen U) {z : Fin D → ℂ} (hz : z ∈ U) :
-    (𝓝[U \ coordDiv S] z).NeBot := by
+theorem nebot_diff (hU : IsOpen U) {z : Fin D → ℂ} (hz : z ∈ U) : (𝓝[U \ coordDiv S] z).NeBot := by
   have hT : Tendsto (fun t : ℝ => z + (t : ℂ) • (fun _ => (1 : ℂ))) (𝓝[>] (0 : ℝ)) (𝓝 z) := by
     have : Continuous (fun t : ℝ => z + (t : ℂ) • (fun _ => (1 : ℂ))) := by fun_prop
     simpa using (this.tendsto 0).mono_left nhdsWithin_le_nhds
@@ -46,8 +44,8 @@ theorem nebot_diff (hU : IsOpen U) {z : Fin D → ℂ} (hz : z ∈ U) :
 
 def trunc (u : (Fin D → ℂ) → ℝ) (κ : ℝ) : (Fin D → ℂ) → ℝ := fun z => max (u z) (-κ)
 
-noncomputable def vext (U : Set (Fin D → ℂ)) (S : Finset (Fin D)) (u : (Fin D → ℂ) → ℝ) (κ : ℝ) :
-    (Fin D → ℂ) → ℝ :=
+noncomputable def vext (U : Set (Fin D → ℂ)) (S : Finset (Fin D)) (u : (Fin D → ℂ) → ℝ) (κ : ℝ)
+    : (Fin D → ℂ) → ℝ :=
   limsupExt U (coordDiv S) (trunc u κ)
 
 theorem vext_of_not {z : Fin D → ℂ} (hz : z ∉ coordDiv S) : vext U S u κ z = max (u z) (-κ) := by
@@ -55,8 +53,8 @@ theorem vext_of_not {z : Fin D → ℂ} (hz : z ∉ coordDiv S) : vext U S u κ 
   rw [if_neg hz]
   rfl
 
-theorem vext_of_mem {z : Fin D → ℂ} (hz : z ∈ coordDiv S) :
-    vext U S u κ z = limsup (trunc u κ) (𝓝[U \ coordDiv S] z) := by
+theorem vext_of_mem {z : Fin D → ℂ} (hz : z ∈ coordDiv S)
+    : vext U S u κ z = limsup (trunc u κ) (𝓝[U \ coordDiv S] z) := by
   unfold vext limsupExt
   rw [if_pos hz]
 
@@ -65,21 +63,22 @@ theorem cont_circ (x w : Fin D → ℂ) (r : ℝ) : Continuous (fun θ : ℝ => 
 
 section partB
 
-variable (hU : IsOpen U) (hU1 : U ⊆ ball 0 1) (hc : ContinuousOn u (U \ coordDiv S))
-    (hpsh : IsPsh (U \ coordDiv S) u)
-    (hg : ∀ z ∈ U \ coordDiv S, u z ≤ C * log (exp 1 + ∑ i ∈ S, log ‖z i‖⁻¹))
+variable
+  (hU : IsOpen U) (hU1 : U ⊆ ball 0 1) (hc : ContinuousOn u (U \ coordDiv S))
+  (hpsh : IsPsh (U \ coordDiv S) u)
+  (hg : ∀ z ∈ U \ coordDiv S, u z ≤ C * log (exp 1 + ∑ i ∈ S, log ‖z i‖⁻¹))
 include hU hU1 hc hpsh hg
 
-theorem trunc_bdd {z : Fin D → ℂ} (hz : z ∈ U) :
-    IsBoundedUnder (· ≤ ·) (𝓝[U \ coordDiv S] z) (trunc u κ) := by
+theorem trunc_bdd {z : Fin D → ℂ} (hz : z ∈ U)
+    : IsBoundedUnder (· ≤ ·) (𝓝[U \ coordDiv S] z) (trunc u κ) := by
   obtain ⟨ρ, hρ, M, hM⟩ := local_bound hU hU1 hc hpsh hg hz
   refine isBoundedUnder_of_eventually_le (a := max M (-κ)) ?_
   filter_upwards [mem_nhdsWithin_of_mem_nhds (ball_mem_nhds z hρ), self_mem_nhdsWithin]
     with y hy hyV
   exact max_le_max (hM y ⟨hy, hyV.2⟩) le_rfl
 
-theorem trunc_cobdd {z : Fin D → ℂ} (hz : z ∈ U) :
-    IsCoboundedUnder (· ≤ ·) (𝓝[U \ coordDiv S] z) (trunc u κ) := by
+theorem trunc_cobdd {z : Fin D → ℂ} (hz : z ∈ U)
+    : IsCoboundedUnder (· ≤ ·) (𝓝[U \ coordDiv S] z) (trunc u κ) := by
   have := nebot_diff (S := S) hU hz
   exact isCoboundedUnder_le_of_le _ (fun y => le_max_right (u y) (-κ))
 
@@ -118,20 +117,19 @@ theorem vext_usc : UpperSemicontinuousOn (vext U S u κ) U := by
     rw [vext_of_not hyV.2]
     exact hy
 
-theorem vext_bdd {K : Set (Fin D → ℂ)} (hK : IsCompact K) (hKU : K ⊆ U) :
-    ∃ M, ∀ y ∈ K, vext U S u κ y ≤ M := by
-  obtain ⟨M, hM⟩ := UpperSemicontinuousOn.bddAbove_of_isCompact hK
-    ((vext_usc hU hU1 hc hpsh hg).mono hKU)
+theorem vext_bdd {K : Set (Fin D → ℂ)} (hK : IsCompact K) (hKU : K ⊆ U)
+    : ∃ M, ∀ y ∈ K, vext U S u κ y ≤ M := by
+  obtain ⟨M, hM⟩ :=
+    UpperSemicontinuousOn.bddAbove_of_isCompact hK ((vext_usc hU hU1 hc hpsh hg).mono hKU)
   exact ⟨M, fun y hy => hM ⟨y, hy, rfl⟩⟩
 
-theorem vext_circ_meas {P : ℝ → Fin D → ℂ} (hP : Continuous P) (hPU : ∀ θ, P θ ∈ U) :
-    Measurable (fun θ => vext U S u κ (P θ)) :=
+theorem vext_circ_meas {P : ℝ → Fin D → ℂ} (hP : Continuous P) (hPU : ∀ θ, P θ ∈ U)
+    : Measurable (fun θ => vext U S u κ (P θ)) :=
   (upperSemicontinuousOn_univ_iff.1 ((vext_usc hU hU1 hc hpsh hg).comp hP.continuousOn
     (fun θ _ => hPU θ))).measurable
 
-theorem good {z w : Fin D → ℂ} (hzA : z ∉ coordDiv S)
-    (hD : ∀ ζ : ℂ, ‖ζ‖ ≤ 1 → z + ζ • w ∈ U) :
-    vext U S u κ z ≤ circleAverage (fun ζ => vext U S u κ (z + ζ • w)) 0 1 := by
+theorem good {z w : Fin D → ℂ} (hzA : z ∉ coordDiv S) (hD : ∀ ζ : ℂ, ‖ζ‖ ≤ 1 → z + ζ • w ∈ U)
+    : vext U S u κ z ≤ circleAverage (fun ζ => vext U S u κ (z + ζ • w)) 0 1 := by
   set Fs : Finset ℂ := (S.filter (fun i => w i ≠ 0)).image (fun i => -z i / w i) with hFs
   have hnotA : ∀ ζ : ℂ, ζ ∉ Fs → z + ζ • w ∉ coordDiv S := by
     rintro ζ hζ ⟨i, hi, h0⟩
@@ -168,8 +166,7 @@ theorem good {z w : Fin D → ℂ} (hzA : z ∉ coordDiv S)
       · exact (eventually_nhdsWithin_of_eventually_nhds (lt_mem_nhds hf)).mono fun r hr => Or.inl hr
       · exact Eventually.of_forall fun r => Or.inr (not_lt.1 hf)
     filter_upwards [h1, h2, h3] with r a b c using ⟨a, b, c⟩
-  have hsm : ∀ r, 0 < r → r < 1 → (∀ f ∈ Fs, ‖f‖ < r ∨ 1 ≤ ‖f‖) →
-      g 0 ≤ circleAverage g 0 r := by
+  have hsm : ∀ r, 0 < r → r < 1 → (∀ f ∈ Fs, ‖f‖ < r ∨ 1 ≤ ‖f‖) → g 0 ≤ circleAverage g 0 r := by
     intro r hr0 hr1 hrF
     set F := Fs.filter (fun f => ‖f‖ < r) with hF
     have hinV : ∀ ζ ∈ closedBall (0 : ℂ) r, ζ ∉ F → z + ζ • w ∈ U \ coordDiv S := by
@@ -184,14 +181,14 @@ theorem good {z w : Fin D → ℂ} (hzA : z ∉ coordDiv S)
       simp only [hgdef]
       exact vext_of_not (hinV ζ hζ hζF).2
     have hcont : ContinuousOn g (closedBall 0 r \ ↑F) := by
-      have hmaps : Set.MapsTo (fun ζ : ℂ => z + ζ • w) (closedBall 0 r \ ↑F)
-          (U \ coordDiv S) := fun ζ hζ => hinV ζ hζ.1 hζ.2
+      have hmaps : Set.MapsTo (fun ζ : ℂ => z + ζ • w) (closedBall 0 r \ ↑F) (U \ coordDiv S) :=
+        fun ζ hζ => hinV ζ hζ.1 hζ.2
       have : ContinuousOn (fun ζ : ℂ => max (u (z + ζ • w)) (-κ)) (closedBall 0 r \ ↑F) :=
-        (hc.comp (by fun_prop : Continuous fun ζ : ℂ => z + ζ • w).continuousOn
-          hmaps).sup continuousOn_const
+        (hc.comp (by fun_prop : Continuous fun ζ : ℂ => z + ζ • w).continuousOn hmaps).sup
+          continuousOn_const
       exact this.congr fun ζ hζ => hgeq ζ hζ.1 hζ.2
-    have hsub : ∀ a s, 0 < s → closedBall a s ⊆ ball (0 : ℂ) r \ ↑F →
-        g a ≤ circleAverage g a s := by
+    have hsub
+        : ∀ a s, 0 < s → closedBall a s ⊆ ball (0 : ℂ) r \ ↑F → g a ≤ circleAverage g a s := by
       intro a s hs hsub'
       have hin : ∀ ζ ∈ closedBall a s, z + ζ • w ∈ U \ coordDiv S := fun ζ hζ =>
         hinV ζ (ball_subset_closedBall (hsub' hζ).1) (hsub' hζ).2
@@ -207,9 +204,11 @@ theorem good {z w : Fin D → ℂ} (hzA : z ∉ coordDiv S)
         have := hsub' (sphere_subset_closedBall hζ)
         rw [hgeq ζ (ball_subset_closedBall this.1) this.2]
         exact le_max_left _ _
-      · calc -κ = circleAverage (fun _ => -κ) a s := (circleAverage_const _ _ _).symm
-          _ ≤ circleAverage g a s := circleAverage_mono
-              (continuousOn_const.circleIntegrable hs.le) hgc fun ζ hζ => by
+      · calc
+          -κ
+            = circleAverage (fun _ => -κ) a s := (circleAverage_const _ _ _).symm
+          _ ≤ circleAverage g a s :=
+            circleAverage_mono (continuousOn_const.circleIntegrable hs.le) hgc fun ζ hζ => by
               rw [abs_of_pos hs] at hζ
               have := hsub' (sphere_subset_closedBall hζ)
               rw [hgeq ζ (ball_subset_closedBall this.1) this.2]
@@ -228,38 +227,46 @@ theorem good {z w : Fin D → ℂ} (hzA : z ∉ coordDiv S)
     exact hr.2.1.le
   have hP0K : ∀ θ, z + circleMap 0 1 θ • w ∈ Dk := fun θ =>
     ⟨circleMap 0 1 θ, mem_closedBall_zero_iff.2 (by rw [norm_circleMap_zero]; simp), rfl⟩
-  have hlimP : ∀ θ, Tendsto (fun r : ℝ => z + circleMap 0 r θ • w) (𝓝[<] 1)
-      (𝓝 (z + circleMap 0 1 θ • w)) := by
+  have hlimP
+      : ∀ θ,
+        Tendsto (fun r : ℝ => z + circleMap 0 r θ • w) (𝓝[<] 1) (𝓝 (z + circleMap 0 1 θ • w)) := by
     intro θ
     have hc1 : Continuous fun r : ℝ => circleMap 0 r θ := by
       show Continuous fun r : ℝ => (0 : ℂ) + (r : ℂ) * Complex.exp (θ * Complex.I)
       fun_prop
     exact ((continuous_const.add (hc1.smul continuous_const)).tendsto 1).mono_left
       nhdsWithin_le_nhds
-  have hlim := avg_lim (vext_usc (κ := κ) hU hU1 hc hpsh hg) hDkU
-    (fun y hy => vext_ge hU hU1 hc hpsh hg (hDkU hy)) hM
-    (fun r θ => z + circleMap 0 r θ • w) (fun θ => z + circleMap 0 1 θ • w)
-    (Eventually.of_forall fun r => cont_circ z w r) (cont_circ z w 1) hPK hP0K hlimP
-    (ε := 2 * π * ε) (by positivity)
+  have hlim :=
+    avg_lim (vext_usc (κ := κ) hU hU1 hc hpsh hg) hDkU
+      (fun y hy => vext_ge hU hU1 hc hpsh hg (hDkU hy))
+      hM
+      (fun r θ => z + circleMap 0 r θ • w)
+      (fun θ => z + circleMap 0 1 θ • w)
+      (Eventually.of_forall fun r => cont_circ z w r) (cont_circ z w 1) hPK hP0K hlimP
+      (ε := 2 * π * ε) (by positivity)
   obtain ⟨r, h1, h2⟩ := (hlim.and hev).exists
-  have key : ∫ θ in (0 : ℝ)..2 * π, g (circleMap 0 r θ) ≤
-      (∫ θ in (0 : ℝ)..2 * π, g (circleMap 0 1 θ)) + 2 * π * ε := h1
+  have key
+      : ∫ θ in (0 : ℝ)..2 * π, g (circleMap 0 r θ)
+        ≤ (∫ θ in (0 : ℝ)..2 * π, g (circleMap 0 1 θ)) + 2 * π * ε :=
+    h1
   have hs := hsm r h2.1 h2.2.1 h2.2.2
   have e0 : g 0 = vext U S u κ z := by simp [hgdef]
   rw [e0, circleAverage_def, smul_eq_mul] at hs
   rw [circleAverage_def, smul_eq_mul]
   have hpi : 0 < (2 * π)⁻¹ := by positivity
-  calc vext U S u κ z ≤ _ := hs
+  calc
+    vext U S u κ z
+      ≤ _ := hs
     _ ≤ (2 * π)⁻¹ * ((∫ θ in (0 : ℝ)..2 * π, g (circleMap 0 1 θ)) + 2 * π * ε) :=
-        mul_le_mul_of_nonneg_left key hpi.le
+      mul_le_mul_of_nonneg_left key hpi.le
     _ = _ := by
-        rw [mul_add]
-        congr 1
-        field_simp
+      rw [mul_add]
+      congr 1
+      field_simp
 
-theorem bad {z w : Fin D → ℂ} (hzU : z ∈ U) (hzA : z ∈ coordDiv S)
-    (hD : ∀ ζ : ℂ, ‖ζ‖ ≤ 1 → z + ζ • w ∈ U) :
-    vext U S u κ z ≤ circleAverage (fun ζ => vext U S u κ (z + ζ • w)) 0 1 := by
+theorem bad
+    {z w : Fin D → ℂ} (hzU : z ∈ U) (hzA : z ∈ coordDiv S) (hD : ∀ ζ : ℂ, ‖ζ‖ ≤ 1 → z + ζ • w ∈ U)
+    : vext U S u κ z ≤ circleAverage (fun ζ => vext U S u κ (z + ζ • w)) 0 1 := by
   set Dk := (fun ζ : ℂ => z + ζ • w) '' closedBall 0 1 with hDkdef
   have hDk : IsCompact Dk := (isCompact_closedBall _ _).image (by fun_prop)
   have hDkU : Dk ⊆ U := by
@@ -290,32 +297,39 @@ theorem bad {z w : Fin D → ℂ} (hzU : z ∈ U) (hzA : z ∈ coordDiv S)
     exact hmem x hx _ (by rw [norm_circleMap_zero]; simp)
   have hP0K : ∀ θ, z + circleMap 0 1 θ • w ∈ K2 := fun θ =>
     hmem z (mem_closedBall_self (half_pos hδ).le) _ (by rw [norm_circleMap_zero]; simp)
-  have hlim := avg_lim (vext_usc (κ := κ) hU hU1 hc hpsh hg) hK2U
-    (fun y hy => vext_ge hU hU1 hc hpsh hg (hK2U hy)) hM
-    (fun x θ => x + circleMap 0 1 θ • w) (fun θ => z + circleMap 0 1 θ • w)
-    (Eventually.of_forall fun x => cont_circ x w 1) (cont_circ z w 1) hPK hP0K
-    (fun θ => (continuous_add_const _).tendsto z) (ε := 2 * π * ε) (by positivity)
+  have hlim :=
+    avg_lim (vext_usc (κ := κ) hU hU1 hc hpsh hg) hK2U
+      (fun y hy => vext_ge hU hU1 hc hpsh hg (hK2U hy))
+      hM
+      (fun x θ => x + circleMap 0 1 θ • w)
+      (fun θ => z + circleMap 0 1 θ • w)
+      (Eventually.of_forall fun x => cont_circ x w 1) (cont_circ z w 1) hPK hP0K
+      (fun θ => (continuous_add_const _).tendsto z)
+      (ε := 2 * π * ε) (by positivity)
   rw [vext_of_mem hzA]
   refine limsup_le_of_le (trunc_cobdd hU hU1 hc hpsh hg hzU) ?_
   filter_upwards [eventually_nhdsWithin_of_eventually_nhds hlim,
     eventually_nhdsWithin_of_eventually_nhds (closedBall_mem_nhds z (half_pos hδ)),
     self_mem_nhdsWithin] with x h1 hx hxV
-  have hg0 := good hU hU1 hc hpsh hg (κ := κ) hxV.2 (w := w)
-    (fun ζ hζ => hK2U (hmem x hx ζ hζ))
+  have hg0 := good hU hU1 hc hpsh hg (κ := κ) hxV.2 (w := w) (fun ζ hζ => hK2U (hmem x hx ζ hζ))
   rw [vext_of_not hxV.2] at hg0
-  have key : ∫ θ in (0 : ℝ)..2 * π, vext U S u κ (x + circleMap 0 1 θ • w) ≤
-      (∫ θ in (0 : ℝ)..2 * π, vext U S u κ (z + circleMap 0 1 θ • w)) + 2 * π * ε := h1
+  have key
+      : ∫ θ in (0 : ℝ)..2 * π, vext U S u κ (x + circleMap 0 1 θ • w)
+        ≤ (∫ θ in (0 : ℝ)..2 * π, vext U S u κ (z + circleMap 0 1 θ • w)) + 2 * π * ε :=
+    h1
   rw [circleAverage_def, smul_eq_mul] at hg0
   rw [circleAverage_def, smul_eq_mul]
   have hpi : 0 < (2 * π)⁻¹ := by positivity
-  calc trunc u κ x = max (u x) (-κ) := rfl
+  calc
+    trunc u κ x
+      = max (u x) (-κ) := rfl
     _ ≤ _ := hg0
-    _ ≤ (2 * π)⁻¹ * ((∫ θ in (0 : ℝ)..2 * π, vext U S u κ (z + circleMap 0 1 θ • w)) +
-          2 * π * ε) := mul_le_mul_of_nonneg_left key hpi.le
+    _ ≤ (2 * π)⁻¹ * ((∫ θ in (0 : ℝ)..2 * π, vext U S u κ (z + circleMap 0 1 θ • w)) + 2 * π * ε) :=
+      mul_le_mul_of_nonneg_left key hpi.le
     _ = _ := by
-        rw [mul_add]
-        congr 1
-        field_simp
+      rw [mul_add]
+      congr 1
+      field_simp
 
 theorem vext_isPsh : IsPsh U (vext U S u κ) := by
   refine ⟨vext_usc hU hU1 hc hpsh hg, fun z w hD => ⟨?_, ?_⟩⟩
@@ -328,8 +342,10 @@ theorem vext_isPsh : IsPsh U (vext U S u κ) := by
     have hin : ∀ θ, z + circleMap 0 1 θ • w ∈ Dk := fun θ =>
       ⟨circleMap 0 1 θ, mem_closedBall_zero_iff.2 (by rw [norm_circleMap_zero]; simp), rfl⟩
     show IntervalIntegrable (fun θ => vext U S u κ (z + circleMap 0 1 θ • w)) volume 0 (2 * π)
-    refine ii_of_bdd (vext_circ_meas hU hU1 hc hpsh hg (cont_circ z w 1)
-      (fun θ => hDkU (hin θ))) (max |M| |κ|) (fun θ => ?_) _ _
+    refine ii_of_bdd (vext_circ_meas hU hU1 hc hpsh hg (cont_circ z w 1) (fun θ => hDkU (hin θ)))
+      (max |M| |κ|)
+      (fun θ => ?_)
+      _ _
     have h1 := hM _ (hin θ)
     have h2 := vext_ge (κ := κ) hU hU1 hc hpsh hg (hDkU (hin θ))
     rw [abs_le]
@@ -356,6 +372,9 @@ namespace ReciprocityTheory.AnForm.A
 
 theorem pshExtension_thm : PshExtensionStatement := by
   intro D S U u C hU hU1 hc hpsh hg
-  exact ⟨PlurisubharmonicExtension.part_a hU hU1 hc hpsh hg, fun κ => PlurisubharmonicExtension.vext_isPsh hU hU1 hc hpsh hg⟩
+  exact ⟨
+    PlurisubharmonicExtension.part_a hU hU1 hc hpsh hg,
+    fun κ => PlurisubharmonicExtension.vext_isPsh hU hU1 hc hpsh hg
+  ⟩
 
 end ReciprocityTheory.AnForm.A

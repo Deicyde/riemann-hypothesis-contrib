@@ -37,7 +37,8 @@ theorem revIn_revIn : ∀ (s : List ℕ) (j : ℕ), j < s.sum → revIn s (revIn
     simp only [List.sum_cons] at h
     by_cases hj : j < a
     · simp only [revIn, if_pos hj]
-      rw [if_pos (by omega)]; omega
+      rw [if_pos (by omega)]
+      omega
     · simp only [revIn, if_neg hj]
       rw [if_neg (by omega)]
       have e : a + revIn s (j - a) - a = revIn s (j - a) := by omega
@@ -73,8 +74,8 @@ theorem blk_mono : ∀ (s : List ℕ) (i j : ℕ), i ≤ j → blk s i ≤ blk s
     · have := ih (i - a) (j - a) (by omega)
       omega
 
-theorem revIn_anti : ∀ (s : List ℕ) (i j : ℕ), j < s.sum → i < j → blk s i = blk s j →
-    revIn s j < revIn s i := by
+theorem revIn_anti
+    : ∀ (s : List ℕ) (i j : ℕ), j < s.sum → i < j → blk s i = blk s j → revIn s j < revIn s i := by
   intro s
   induction s with
   | nil => simp
@@ -90,8 +91,9 @@ theorem revIn_anti : ∀ (s : List ℕ) (i j : ℕ), j < s.sum → i < j → blk
     · have := ih (i - a) (j - a) (by omega) (by omega) (by omega)
       omega
 
-theorem revIn_succ : ∀ (s : List ℕ) (j : ℕ), j + 1 < s.sum → blk s j = blk s (j + 1) →
-    revIn s (j + 1) + 1 = revIn s j := by
+theorem revIn_succ
+    : ∀ (s : List ℕ) (j : ℕ),
+      j + 1 < s.sum → blk s j = blk s (j + 1) → revIn s (j + 1) + 1 = revIn s j := by
   intro s
   induction s with
   | nil => simp
@@ -111,38 +113,46 @@ theorem revIn_succ : ∀ (s : List ℕ) (j : ℕ), j + 1 < s.sum → blk s j = b
 
 def revF (s : List ℕ) (a : Fin s.sum) : Fin s.sum := ⟨revIn s a, revIn_lt s a a.2⟩
 
-@[simp] theorem revF_val (s : List ℕ) (a : Fin s.sum) : (revF s a : ℕ) = revIn s a := rfl
+@[simp]
+theorem revF_val (s : List ℕ) (a : Fin s.sum) : (revF s a : ℕ) = revIn s a := rfl
 
-@[simp] theorem revF_revF (s : List ℕ) (a : Fin s.sum) : revF s (revF s a) = a := Fin.ext (revIn_revIn s a a.2)
+@[simp]
+theorem revF_revF (s : List ℕ) (a : Fin s.sum) : revF s (revF s a) = a :=
+  Fin.ext (revIn_revIn s a a.2)
 
-@[simp] theorem blk_revF (s : List ℕ) (a : Fin s.sum) : blk s (revF s a) = blk s a := blk_revIn s a a.2
+@[simp]
+theorem blk_revF (s : List ℕ) (a : Fin s.sum) : blk s (revF s a) = blk s a := blk_revIn s a a.2
 
 theorem revF_inj (s : List ℕ) {a c : Fin s.sum} (h : revF s a = revF s c) : a = c := by
-  calc a = revF s (revF s a) := (revF_revF s a).symm
+  calc
+    a = revF s (revF s a) := (revF_revF s a).symm
     _ = revF s (revF s c) := by rw [h]
     _ = c := revF_revF s c
 
-theorem revF_lt_of_blk_eq (s : List ℕ) {a c : Fin s.sum} (hb : blk s a = blk s c) (h : a < c) :
-    revF s c < revF s a := revIn_anti s a c c.2 h hb
+theorem revF_lt_of_blk_eq (s : List ℕ) {a c : Fin s.sum} (hb : blk s a = blk s c) (h : a < c)
+    : revF s c < revF s a :=
+  revIn_anti s a c c.2 h hb
 
-theorem revF_lt_of_blk_lt (s : List ℕ) {a c : Fin s.sum} (hb : blk s a < blk s c) :
-    revF s a < revF s c := by
+theorem revF_lt_of_blk_lt (s : List ℕ) {a c : Fin s.sum} (hb : blk s a < blk s c)
+    : revF s a < revF s c := by
   show revIn s a < revIn s c
   by_contra hcon
   have := blk_mono s (revIn s c) (revIn s a) (by omega)
   rw [blk_revIn s c c.2, blk_revIn s a a.2] at this
   omega
 
-theorem blk_lt_of_lt_of_ne (s : List ℕ) {a c : Fin s.sum} (h : a < c) (hb : blk s a ≠ blk s c) :
-    blk s a < blk s c := lt_of_le_of_ne (blk_mono s a c (le_of_lt h)) hb
+theorem blk_lt_of_lt_of_ne (s : List ℕ) {a c : Fin s.sum} (h : a < c) (hb : blk s a ≠ blk s c)
+    : blk s a < blk s c :=
+  lt_of_le_of_ne (blk_mono s a c (le_of_lt h)) hb
 
 variable {K : Type} [CommRing K]
 
-def mono (s : List ℕ) (f : Fin s.sum → K) : Matrix (Fin s.sum) (Fin s.sum) K :=
-  fun a c => if c = revF s a then f a else 0
+def mono (s : List ℕ) (f : Fin s.sum → K) : Matrix (Fin s.sum) (Fin s.sum) K := fun a c =>
+  if c = revF s a then f a else 0
 
-theorem mono_mul (s : List ℕ) (f : Fin s.sum → K) (M : Matrix (Fin s.sum) (Fin s.sum) K)
-    (a c : Fin s.sum) : (mono s f * M) a c = f a * M (revF s a) c := by
+theorem mono_mul
+    (s : List ℕ) (f : Fin s.sum → K) (M : Matrix (Fin s.sum) (Fin s.sum) K) (a c : Fin s.sum)
+    : (mono s f * M) a c = f a * M (revF s a) c := by
   rw [Matrix.mul_apply, Finset.sum_eq_single (revF s a)]
   · simp [mono]
   · intro b _ hb
@@ -150,8 +160,9 @@ theorem mono_mul (s : List ℕ) (f : Fin s.sum → K) (M : Matrix (Fin s.sum) (F
     rw [if_neg hb, zero_mul]
   · simp
 
-theorem mul_mono (s : List ℕ) (f : Fin s.sum → K) (M : Matrix (Fin s.sum) (Fin s.sum) K)
-    (a c : Fin s.sum) : (M * mono s f) a c = M a (revF s c) * f (revF s c) := by
+theorem mul_mono
+    (s : List ℕ) (f : Fin s.sum → K) (M : Matrix (Fin s.sum) (Fin s.sum) K) (a c : Fin s.sum)
+    : (M * mono s f) a c = M a (revF s c) * f (revF s c) := by
   rw [Matrix.mul_apply, Finset.sum_eq_single (revF s c)]
   · simp [mono]
   · intro b _ hb
@@ -159,8 +170,8 @@ theorem mul_mono (s : List ℕ) (f : Fin s.sum → K) (M : Matrix (Fin s.sum) (F
     rw [if_neg (fun h => hb (by rw [h, revF_revF])), mul_zero]
   · simp
 
-theorem pt_eq_mono (s : List ℕ) (t : ℕ → Kˣ) :
-    pt s t = mono s (fun a => ((t (blk s a) : Kˣ) : K)) := by
+theorem pt_eq_mono (s : List ℕ) (t : ℕ → Kˣ)
+    : pt s t = mono s (fun a => ((t (blk s a) : Kˣ) : K)) := by
   unfold pt
   funext a b
   simp only [mono]
@@ -189,48 +200,43 @@ theorem ptI_mul_pt (s : List ℕ) (t : ℕ → Kˣ) : ptI s t * pt s t = (1 : Ma
   · subst h; simp
   · simp [h, Ne.symm h]
 
-theorem conj_apply (s : List ℕ) (t : ℕ → Kˣ) (M : Matrix (Fin s.sum) (Fin s.sum) K)
-    (a c : Fin s.sum) : (ptI s t * M * pt s t) a c =
-      (((t (blk s a))⁻¹ : Kˣ) : K) * M (revF s a) (revF s c) * ((t (blk s c) : Kˣ) : K) := by
+theorem conj_apply
+    (s : List ℕ) (t : ℕ → Kˣ) (M : Matrix (Fin s.sum) (Fin s.sum) K) (a c : Fin s.sum)
+    : (ptI s t * M * pt s t) a c
+      = (((t (blk s a))⁻¹ : Kˣ) : K) * M (revF s a) (revF s c) * ((t (blk s c) : Kˣ) : K) := by
   rw [pt_eq_mono, mul_mono, ptI, mono_mul]
   simp only [blk_revF]
 
-theorem low_zero {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) {i j : Fin n}
-    (h : i < j) : x i j = 0 := by
-  first
-  | exact hx.1 h
-  | exact hx.1 (show OrderDual.toDual j < OrderDual.toDual i from h)
+theorem low_zero {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) {i j : Fin n} (h : i < j)
+    : x i j = 0 := by
+  first | exact hx.1 h | exact hx.1 (show OrderDual.toDual j < OrderDual.toDual i from h)
 
-theorem up_zero {n : ℕ} {y : Matrix (Fin n) (Fin n) K} (hy : IsUpUni y) {i j : Fin n}
-    (h : j < i) : y i j = 0 := by
-  first
-  | exact hy.1 h
-  | (unfold IsUpUni at hy; done)
+theorem up_zero {n : ℕ} {y : Matrix (Fin n) (Fin n) K} (hy : IsUpUni y) {i j : Fin n} (h : j < i)
+    : y i j = 0 := by
+  first | exact hy.1 h | (unfold IsUpUni at hy; done)
 
-theorem mul_inv_one_low {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) :
-    x * x⁻¹ = 1 := by
+theorem mul_inv_one_low {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) : x * x⁻¹ = 1 := by
   have hd : IsUnit x.det := by
     rw [Matrix.det_of_isLowerTriangular x hx.1]
     simp [hx.2]
   exact Matrix.mul_nonsing_inv x hd
 
-theorem inv_mul_one_low {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) :
-    x⁻¹ * x = 1 := by
+theorem inv_mul_one_low {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) : x⁻¹ * x = 1 := by
   have hd : IsUnit x.det := by
     rw [Matrix.det_of_isLowerTriangular x hx.1]
     simp [hx.2]
   exact Matrix.nonsing_inv_mul x hd
 
-theorem mul_inv_one_up {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) :
-    x * x⁻¹ = 1 := by
+theorem mul_inv_one_up {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) : x * x⁻¹ = 1 := by
   have hd : IsUnit x.det := by
     rw [Matrix.det_of_isUpperTriangular hx.1]
     simp [hx.2]
   exact Matrix.mul_nonsing_inv x hd
 
-theorem simple_add_zero {n : ℕ} {y z : Matrix (Fin n) (Fin n) K} (hy : IsUpUni y)
-    (hz : IsUpUni z) (hyz : y * z = 1) (j k : Fin n) (hk : (k : ℕ) = j + 1) :
-    y j k + z j k = 0 := by
+theorem simple_add_zero
+    {n : ℕ} {y z : Matrix (Fin n) (Fin n) K}
+    (hy : IsUpUni y) (hz : IsUpUni z) (hyz : y * z = 1) (j k : Fin n) (hk : (k : ℕ) = j + 1)
+    : y j k + z j k = 0 := by
   have hjk : j ≠ k := by
     intro h'
     rw [h'] at hk
@@ -303,24 +309,23 @@ theorem phase_main : PhaseWellDef := by
   unfold sLow sUp
   have hyinv : y⁻¹ = ptI s t * x * pt s t := by
     apply Matrix.inv_eq_left_inv
-    rw [show ptI s t * x * pt s t * y = ptI s t * (x * pt s t * y) by
-      simp only [Matrix.mul_assoc], h, ptI_mul_pt]
+    rw [show ptI s t * x * pt s t * y = ptI s t * (x * pt s t * y) by simp only [Matrix.mul_assoc],
+      h, ptI_mul_pt]
   have hzU : IsUpUni y⁻¹ := isUpUni_inv_lower_unipotent_orbits hy
-  have hz : ∀ a c, y⁻¹ (revF s a) (revF s c) =
-      ↑(t (blk s a))⁻¹ * x a c * ↑(t (blk s c)) := by
+  have hz : ∀ a c, y⁻¹ (revF s a) (revF s c) = ↑(t (blk s a))⁻¹ * x a c * ↑(t (blk s c)) := by
     intro a c
     rw [hyinv, conj_apply]
     simp only [revF_revF, blk_revF]
   have hxz : ∀ a c : Fin s.sum, (a : ℕ) = c + 1 → blk s a ≠ blk s c → x a c = 0 := by
     intro a c hac hb
-    have hlt : blk s c < blk s a :=
-      lt_of_le_of_ne (blk_mono s c a (by omega)) (Ne.symm hb)
+    have hlt : blk s c < blk s a := lt_of_le_of_ne (blk_mono s c a (by omega)) (Ne.symm hb)
     have h0 := hz a c
     rw [up_zero hzU (revF_lt_of_blk_lt s hlt)] at h0
     exact (Units.mul_right_eq_zero _).1 ((Units.mul_left_eq_zero _).1 h0.symm)
-  have hterm : ∀ a c : Fin s.sum,
-      (if (revF s c : ℕ) = revF s a + 1 then ↑(t (blk s a))⁻¹ * x a c * ↑(t (blk s c)) else 0) =
-      (if (a : ℕ) = c + 1 then x a c else 0) := by
+  have hterm
+      : ∀ a c : Fin s.sum,
+        (if (revF s c : ℕ) = revF s a + 1 then ↑(t (blk s a))⁻¹ * x a c * ↑(t (blk s c)) else 0)
+          = (if (a : ℕ) = c + 1 then x a c else 0) := by
     intro a c
     by_cases h1 : (a : ℕ) = c + 1
     · rw [if_pos h1]
@@ -336,8 +341,9 @@ theorem phase_main : PhaseWellDef := by
       · rw [if_pos h2]
         by_cases hb : blk s a = blk s c
         · exfalso
-          have hs := revIn_succ s (revF s a) (by have := (revF s c).2; omega)
-            (by rw [← h2, blk_revF, blk_revF, hb])
+          have hs :=
+            revIn_succ s (revF s a) (by have := (revF s c).2; omega)
+              (by rw [← h2, blk_revF, blk_revF, hb])
           rw [← h2] at hs
           have e1 : revIn s (revF s c) = c := congrArg Fin.val (revF_revF s c)
           have e2 : revIn s (revF s a) = a := congrArg Fin.val (revF_revF s a)
@@ -353,31 +359,34 @@ theorem phase_main : PhaseWellDef := by
           rw [low_zero hx hac, mul_zero, zero_mul]
       · rw [if_neg h2]
   have hy1 := mul_inv_one_up hy
-  have hyz : ∀ a c : Fin s.sum, (if (c : ℕ) = a + 1 then y a c else 0) =
-      -(if (c : ℕ) = a + 1 then y⁻¹ a c else 0) := by
+  have hyz
+      : ∀ a c : Fin s.sum,
+        (if (c : ℕ) = a + 1 then y a c else 0) = -(if (c : ℕ) = a + 1 then y⁻¹ a c else 0) := by
     intro a c
     split_ifs with hc
     · have := simple_add_zero hy hzU hy1 a c hc
       linear_combination this
     · simp
   rw [sum_subdiagonal_eq_sum_ite x, sum_superdiagonal_eq_sum_ite y]
-  have hS : (∑ a : Fin s.sum, ∑ c : Fin s.sum, if (c : ℕ) = a + 1 then y a c else 0) =
-      -∑ a : Fin s.sum, ∑ c : Fin s.sum, if (a : ℕ) = c + 1 then x a c else 0 := by
-    calc (∑ a : Fin s.sum, ∑ c : Fin s.sum, if (c : ℕ) = a + 1 then y a c else 0)
-        = -∑ a : Fin s.sum, ∑ c : Fin s.sum, if (c : ℕ) = a + 1 then y⁻¹ a c else 0 := by
-          simp only [hyz, Finset.sum_neg_distrib]
-      _ = -∑ a : Fin s.sum, ∑ c : Fin s.sum,
-            if (revF s c : ℕ) = revF s a + 1 then y⁻¹ (revF s a) (revF s c) else 0 := by
-          congr 1
-          refine Fintype.sum_equiv (Function.Involutive.toPerm _ (revF_revF s)) _ _ fun a => ?_
-          refine Fintype.sum_equiv (Function.Involutive.toPerm _ (revF_revF s)) _ _ fun c => ?_
-          first
-          | simp only [Function.Involutive.coe_toPerm, revF_revF]
-          | simp [Function.Involutive.toPerm, revF_revF]
-      _ = -∑ a : Fin s.sum, ∑ c : Fin s.sum, if (a : ℕ) = c + 1 then x a c else 0 := by
-          congr 1
-          refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun c _ => ?_
-          rw [hz a c, hterm a c]
+  have hS
+      : (∑ a : Fin s.sum, ∑ c : Fin s.sum, if (c : ℕ) = a + 1 then y a c else 0)
+        = - ∑ a : Fin s.sum, ∑ c : Fin s.sum, if (a : ℕ) = c + 1 then x a c else 0 := by
+    calc
+      (∑ a : Fin s.sum, ∑ c : Fin s.sum, if (c : ℕ) = a + 1 then y a c else 0)
+          = - ∑ a : Fin s.sum, ∑ c : Fin s.sum, if (c : ℕ) = a + 1 then y⁻¹ a c else 0 := by
+        simp only [hyz, Finset.sum_neg_distrib]
+      _ = - ∑ a : Fin s.sum, ∑ c : Fin s.sum,
+             if (revF s c : ℕ) = revF s a + 1 then y⁻¹ (revF s a) (revF s c) else 0 := by
+        congr 1
+        refine Fintype.sum_equiv (Function.Involutive.toPerm _ (revF_revF s)) _ _ fun a => ?_
+        refine Fintype.sum_equiv (Function.Involutive.toPerm _ (revF_revF s)) _ _ fun c => ?_
+        first
+        | simp only [Function.Involutive.coe_toPerm, revF_revF]
+        | simp [Function.Involutive.toPerm, revF_revF]
+      _ = - ∑ a : Fin s.sum, ∑ c : Fin s.sum, if (a : ℕ) = c + 1 then x a c else 0 := by
+        congr 1
+        refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun c _ => ?_
+        rw [hz a c, hterm a c]
   rw [hS]
   ring
 

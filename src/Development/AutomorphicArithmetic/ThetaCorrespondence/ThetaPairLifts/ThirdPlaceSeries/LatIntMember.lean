@@ -14,9 +14,22 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial GlobalTheory.CoefDuty
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial GlobalTheory.CoefDuty
 namespace GlobalTheory.CoefDuty
-theorem latInt_member_alt : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb) (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (M : MtFam D) (C : NChoice D) (tup : D.what₂.Tup → Fin D.R.m → HChar D.host.E), MtInput D M tup C.Q → ∀ big L, _root_.GlobalTheory.CoefDuty.BuiltAlt A M C tup big L → (∀ i, (withLoc L).nd.Q i = C.Q ((withLoc L).nd.w i)) ∧ ∀ j h1 h2 w, (withLoc L).what₂.muAt w ≠ (withLoc L).what₂.mu0 → LatInt (withLoc L) (mtL L M) (C.Q w) j h1 h2 w := by
+theorem latInt_member_alt
+    : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb)
+        (A : _root_.GlobalTheory.HeightCounting.CharFrameHostEmbedding D cf jE) (M : MtFam D)
+        (C : NChoice D) (tup : D.what₂.Tup → Fin D.R.m → HChar D.host.E),
+      MtInput D M tup C.Q
+        → ∀ big L,
+          _root_.GlobalTheory.CoefDuty.BuiltAlt A M C tup big L
+            → (∀ i, (withLoc L).nd.Q i = C.Q ((withLoc L).nd.w i))
+              ∧ ∀ j h1 h2 w,
+                (withLoc L).what₂.muAt w ≠ (withLoc L).what₂.mu0
+                  → LatInt (withLoc L) (mtL L M) (C.Q w) j h1 h2 w := by
   intro D cf jE A M C tup hM big L hB
   obtain ⟨Sp, -, -⟩ := hB
   refine ⟨fun i => ?_, fun j h1 h2 w hw => ?_⟩

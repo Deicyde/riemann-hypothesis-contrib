@@ -8,32 +8,45 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotDominates
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem formOrd_dForm_of_isPrimeOf : ∀ {L : Type} [Field L] (cL : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel cL Q) (D : ℕ) (x : Fin D → Q),
-  IsFreeGen Q (dForm (cL.codRestrict Q hQ.const_mem) x) →
-  ∀ P : Place cL, P.IsPrimeOf Q → (fun ω => @dite ℤ (∃ a, P.IsFormOrd ω a) (Classical.propDecidable _) (fun h => h.choose) (fun _ => 0)) (dForm cL (fun i => (x i : L))) = 0 := by
+theorem formOrd_dForm_of_isPrimeOf
+    : ∀ {L : Type} [Field L] (cL : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel cL Q) (D : ℕ)
+        (x : Fin D → Q),
+      IsFreeGen Q (dForm (cL.codRestrict Q hQ.const_mem) x)
+        → ∀ P : Place cL,
+          P.IsPrimeOf Q
+            → (fun ω =>
+                  @dite ℤ (∃ a, P.IsFormOrd ω a) (Classical.propDecidable _)
+                    (fun h => h.choose)
+                    (fun _ => 0))
+                (dForm cL (fun i => (x i : L)))
+              = 0 := by
   intro L _ cL Q hQ D x hx P hP
   let α : ℂ →+* Q := cL.codRestrict Q hQ.const_mem
   let ρ : Q →+* P.ring := RingHom.codRestrict Q.subtype P.ring (fun q => hP.1 q q.2)
   have hρ : ρ.comp α = P.const := RingHom.ext fun _ => Subtype.ext rfl
   have e : dForm cL (fun i => (x i : L)) = P.toRat D (dForm P.const fun i => ρ (x i)) := by
-    have h := TopForm.formMap_dForm (D := D) (α := P.const) (β := cL) P.ring.subtype rfl (fun i => ρ (x i))
+    have h :=
+      TopForm.formMap_dForm (D := D) (α := P.const) (β := cL) P.ring.subtype rfl (fun i => ρ (x i))
     refine Eq.trans ?_ h.symm
     congr 1
-  let S : Submonoid Q :=
-    { carrier := {b | (b : L) ≠ 0 ∧ P.ord b = 0}
-      mul_mem' := fun {a b} ha hb => by
-        refine ⟨?_, ?_⟩
-        · change (a : L) * b ≠ 0
-          exact mul_ne_zero ha.1 hb.1
-        · change P.ord ((a : L) * b) = 0
-          rw [P.ord_mul ha.1 hb.1, ha.2, hb.2, add_zero]
-      one_mem' := ⟨one_ne_zero, P.ord_one⟩ }
+  let S : Submonoid Q := {
+    carrier := {b | (b : L) ≠ 0 ∧ P.ord b = 0}
+    mul_mem' := fun {a b} ha hb => by
+      refine ⟨?_, ?_⟩
+      · change (a : L) * b ≠ 0
+        exact mul_ne_zero ha.1 hb.1
+      · change P.ord ((a : L) * b) = 0
+        rw [P.ord_mul ha.1 hb.1, ha.2, hb.2, add_zero]
+    one_mem' := ⟨one_ne_zero, P.ord_one⟩
+  }
   letI := α.toAlgebra
   letI := P.const.toAlgebra
   letI := ρ.toAlgebra

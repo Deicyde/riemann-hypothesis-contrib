@@ -13,7 +13,8 @@ namespace Formalism.InvariantFactorPaths.ColumnFamilies
 open Formalism.GradedWeylDivisibility
 open scoped MonomialOrder
 
-theorem qn_interlaced_lowerTri {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) (h : Interlaced m) : LowerTri m := by
+theorem qn_interlaced_lowerTri {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) (h : Interlaced m)
+    : LowerTri m := by
   have key : ∀ k : ℕ, ∀ s : Fin n, s.val = k → ∀ a : Fin r, a.val < k → m (a, s) = 0 := by
     intro k
     induction k with
@@ -47,10 +48,11 @@ theorem qn_lowerTriIntegral : LowerTriIntegral := by
     rw [← span_map_weightBasis_eq_dualWeyl (K := ℚ) hbB]
     apply Submodule.subset_span
     exact ⟨i, by rw [algebraMap_int_eq]; rfl⟩
-  suffices H : ∀ s : (colLex r n).syn, ∀ Q : MvPolynomial (Fin r × Fin n) ℚ,
-      (colLex r n).toSyn ((colLex r n).degree Q) = s → Q ∈ dualWeyl ℚ r n ν →
-      (∀ e : Fin r × Fin n →₀ ℕ, LowerTri e → ∃ z : ℤ, AddMonoidAlgebra.coeff Q e = z) →
-      ∃ Q' : MvPolynomial (Fin r × Fin n) ℤ, Q = intQ r n Q' by
+  suffices H
+      : ∀ s : (colLex r n).syn, ∀ Q : MvPolynomial (Fin r × Fin n) ℚ,
+        (colLex r n).toSyn ((colLex r n).degree Q) = s → Q ∈ dualWeyl ℚ r n ν
+          → (∀ e : Fin r × Fin n →₀ ℕ, LowerTri e → ∃ z : ℤ, AddMonoidAlgebra.coeff Q e = z)
+          → ∃ Q' : MvPolynomial (Fin r × Fin n) ℤ, Q = intQ r n Q' by
     intro Q hQ hint
     exact H _ Q rfl hQ hint
   intro s
@@ -95,15 +97,17 @@ theorem qn_lowerTriIntegral : LowerTriIntegral := by
     set Q1 := Q - (colLex r n).leadingCoeff Q • B with hQ1
     have hQ1mem : Q1 ∈ dualWeyl ℚ r n ν :=
       Submodule.sub_mem _ hQ (Submodule.smul_mem _ _ (hBmem mi))
-    have hQ1int : ∀ e : Fin r × Fin n →₀ ℕ, LowerTri e → ∃ z' : ℤ, AddMonoidAlgebra.coeff Q1 e = z' := by
+    have hQ1int
+        : ∀ e : Fin r × Fin n →₀ ℕ, LowerTri e → ∃ z' : ℤ, AddMonoidAlgebra.coeff Q1 e = z' := by
       intro e he
       obtain ⟨w, hw⟩ := hint e he
       refine ⟨w - z * (b mi).coeff e, ?_⟩
       rw [hQ1, coeff_sub, coeff_smul, hw, hlcQ, hBmap, coeff_map]
       push_cast
       simp [smul_eq_mul]
-    have hfinal : ∀ Q1' : MvPolynomial (Fin r × Fin n) ℤ, Q1 = intQ r n Q1' →
-        ∃ Q' : MvPolynomial (Fin r × Fin n) ℤ, Q = intQ r n Q' := by
+    have hfinal
+        : ∀ Q1' : MvPolynomial (Fin r × Fin n) ℤ,
+          Q1 = intQ r n Q1' → ∃ Q' : MvPolynomial (Fin r × Fin n) ℤ, Q = intQ r n Q' := by
       intro Q1' h
       refine ⟨Q1' + z • b mi, ?_⟩
       rw [map_add (f := _), map_zsmul, ← h, ← hB, hQ1, hlcQ, Int.cast_smul_eq_zsmul]

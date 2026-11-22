@@ -10,15 +10,18 @@ noncomputable section
 
 namespace Formalism.MainNotions.UnusedSlot33
 
-open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.TwoAdicCyclotomicDecomposition Ideal
+open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.TwoAdicCyclotomicDecomposition Ideal
 open Formalism.MainNotions.UnusedSlot33.SlopeTestRemainingChoices
 
 def InertPart (D : D7) : Prop :=
-  ∀ φ₀ : G0, (φ₀ = c0 ∨ φ₀ = sgc0) → ∀ h : HH D,
-    (∀ p : ℕ, p.Prime → (span {(p : ℤ)}).ramificationIdxIn (𝓞 D.host.E) = 1 →
-      frob D p = gOf D φ₀ h →
-      ∀ 𝔭 : Ideal (𝓞 D.host.F), 𝔭.IsPrime → 𝔭.LiesOver (span {(p : ℤ)}) →
-        (Inert D 𝔭 ↔ φ₀ = c0 ∧ Odd (addOrderOf h)))
+  ∀ φ₀ : G0,
+    (φ₀ = c0 ∨ φ₀ = sgc0)
+      → ∀ h : HH D,
+        (∀ p : ℕ,
+          p.Prime → (span {(p : ℤ)}).ramificationIdxIn (𝓞 D.host.E) = 1 → frob D p = gOf D φ₀ h
+            → ∀ 𝔭 : Ideal (𝓞 D.host.F),
+              𝔭.IsPrime → 𝔭.LiesOver (span {(p : ℤ)}) → (Inert D 𝔭 ↔ φ₀ = c0 ∧ Odd (addOrderOf h)))
 
 theorem tau_one_mem_orbit_set (φ : Formalism.HC.Frame) (t : φ.A) : φ.tau1 t ∈ φ.Psi := by
   show φ.chD (φ.tau1 t) = 1
@@ -29,26 +32,31 @@ private theorem neg_one_of_ne {x : ℤˣ} (h : x ≠ 1) : x = -1 := by
   · exact absurd hx h
   · exact hx
 
-private theorem no_three (R : Formalism.HC.Frame) {L : ℕ} (T : Finset ℕ) (hTr : ∀ s ∈ T, 4 * L * s < R.n0)
-    (hTn : NoRel T L) (u0 : R.A) (hL : 3 ≤ L) (φ : R.GG) (hφ : φ ∉ R.Psi) (hφc : φ ≠ R.cc)
-    (τ : R.GG) (hτ : τ ∈ R.Psi) (i : ℕ)
-    (h0 : ∃ s ∈ T, Formalism.HC.Frame.placeOf (φ ^ i * τ) = R.tau2 (R.dig s + u0))
+private theorem no_three
+    (R : Formalism.HC.Frame)
+    {L : ℕ} (T : Finset ℕ) (hTr : ∀ s ∈ T, 4 * L * s < R.n0) (hTn : NoRel T L)
+    (u0 : R.A)
+    (hL : 3 ≤ L)
+    (φ : R.GG) (hφ : φ ∉ R.Psi) (hφc : φ ≠ R.cc)
+    (τ : R.GG) (hτ : τ ∈ R.Psi)
+    (i : ℕ) (h0 : ∃ s ∈ T, Formalism.HC.Frame.placeOf (φ ^ i * τ) = R.tau2 (R.dig s + u0))
     (h1 : ∃ s ∈ T, Formalism.HC.Frame.placeOf (φ ^ (i + 1) * τ) = R.tau2 (R.dig s + u0))
-    (h2 : ∃ s ∈ T, Formalism.HC.Frame.placeOf (φ ^ (i + 2) * τ) = R.tau2 (R.dig s + u0)) : False := by
-  have key : ∀ (y : R.GG), (Formalism.HC.Frame.placeOf y).1.1 = -1 →
-      (Formalism.HC.Frame.placeOf (φ * y)).1.1 = -1 → φ.1.1 = -1 := by
+    (h2 : ∃ s ∈ T, Formalism.HC.Frame.placeOf (φ ^ (i + 2) * τ) = R.tau2 (R.dig s + u0))
+    : False := by
+  have key
+      : ∀ (y : R.GG),
+        (Formalism.HC.Frame.placeOf y).1.1 = -1 → (Formalism.HC.Frame.placeOf (φ * y)).1.1 = -1
+          → φ.1.1 = -1 := by
     intro y h0 h1
     have hφ2 : φ.1.2 = -1 := neg_one_of_ne hφ
     simp only [Formalism.HC.Frame.placeOf] at h0 h1
     rcases Int.units_eq_one_or y.1.2 with hy | hy
     · rw [if_pos hy] at h0
-      have hm : (φ * y).1.2 = -1 := by
-        simp [Prod.fst_mul, Prod.snd_mul, hφ2, hy]
+      have hm : (φ * y).1.2 = -1 := by simp [Prod.fst_mul, Prod.snd_mul, hφ2, hy]
       rw [if_neg (by rw [hm]; decide)] at h1
       simpa [Formalism.HC.Frame.cc, c0, Prod.fst_mul, Prod.snd_mul, h0] using h1
     · rw [if_neg (by rw [hy]; decide)] at h0
-      have hm : (φ * y).1.2 = 1 := by
-        simp [Prod.fst_mul, Prod.snd_mul, hφ2, hy]
+      have hm : (φ * y).1.2 = 1 := by simp [Prod.fst_mul, Prod.snd_mul, hφ2, hy]
       rw [if_pos hm] at h1
       have h0' : y.1.1 = 1 := by
         simpa [Formalism.HC.Frame.cc, c0, Prod.fst_mul, Prod.snd_mul] using h0
@@ -57,15 +65,20 @@ private theorem no_three (R : Formalism.HC.Frame) {L : ℕ} (T : Finset ℕ) (hT
   obtain ⟨s1, hs1, e1⟩ := h0
   obtain ⟨s2, hs2, e2⟩ := h1
   obtain ⟨s3, hs3, e3⟩ := h2
-  have hφ1 : φ.1.1 = -1 := key (φ ^ i * τ) (by rw [e1]; rfl)
-    (by rw [← mul_assoc, ← pow_succ', e2]; rfl)
-  have E : ∀ (k s : ℕ), Formalism.HC.Frame.placeOf (φ ^ k * τ) = R.tau2 (R.dig s + u0) →
-      k • R.iotaInv φ.2 + R.iotaInv τ.2 = R.dig s + u0 := by
+  have hφ1 : φ.1.1 = -1 :=
+    key (φ ^ i * τ) (by rw [e1]; rfl) (by rw [← mul_assoc, ← pow_succ', e2]; rfl)
+  have E
+      : ∀ (k s : ℕ),
+        Formalism.HC.Frame.placeOf (φ ^ k * τ) = R.tau2 (R.dig s + u0)
+          → k • R.iotaInv φ.2 + R.iotaInv τ.2 = R.dig s + u0 := by
     intro k s hk
-    have this : R.iotaInv (Formalism.HC.Frame.placeOf (φ ^ k * τ)).2 = R.iotaInv (R.tau2 (R.dig s + u0)).2 := by
+    have this
+        : R.iotaInv (Formalism.HC.Frame.placeOf (φ ^ k * τ)).2
+          = R.iotaInv (R.tau2 (R.dig s + u0)).2 := by
       rw [hk]
     rw [Formalism.HC.Frame.placeOf_snd, Prod.snd_mul, Prod.pow_snd, Formalism.HC.Frame.iotaInv_mul,
-      Formalism.HC.Frame.iotaInv_pow] at this
+        Formalism.HC.Frame.iotaInv_pow]
+      at this
     change _ = R.iotaInv (R.iota _) at this
     rw [Formalism.HC.Frame.iotaInv_iota] at this
     exact this
@@ -91,9 +104,10 @@ private theorem no_three (R : Formalism.HC.Frame) {L : ℕ} (T : Finset ℕ) (hT
     exact Prod.ext (Prod.ext hφ1 hφ2) h2
   have hzero : ((s1 : ℤ) + s3 - s2 - s2) • R.a0 = 0 := by
     rw [sub_zsmul, sub_zsmul, add_zsmul, natCast_zsmul, natCast_zsmul, natCast_zsmul]
-    change R.dig s1 + R.dig s3 + -R.dig s2 + -R.dig s2 = 0
-    have : R.dig s1 + R.dig s3 + -R.dig s2 + -R.dig s2 =
-        (R.dig s3 - R.dig s2) - (R.dig s2 - R.dig s1) := by abel
+    change R.dig s1 + R.dig s3 + - R.dig s2 + - R.dig s2 = 0
+    have : R.dig s1 + R.dig s3 + - R.dig s2 + - R.dig s2
+        = (R.dig s3 - R.dig s2) - (R.dig s2 - R.dig s1) := by
+      abel
     rw [this, hx1, hx2, sub_self]
   have hdvd : (R.n0 : ℤ) ∣ (s1 : ℤ) + s3 - s2 - s2 := addOrderOf_dvd_iff_zsmul_eq_zero.2 hzero
   have b1 := hTr s1 hs1
@@ -118,7 +132,8 @@ private theorem no_three (R : Formalism.HC.Frame) {L : ℕ} (T : Finset ℕ) (hT
     (by norm_num; omega) (by norm_num)
   linarith
 
-theorem even_addOrderOf_of_h_ne_zero (D : D7) {h : D.R.A} (hh : D.R.h h ≠ 0) : Even (addOrderOf h) := by
+theorem even_addOrderOf_of_h_ne_zero (D : D7) {h : D.R.A} (hh : D.R.h h ≠ 0)
+    : Even (addOrderOf h) := by
   have h1 : addOrderOf (D.R.h h) ∣ addOrderOf h := addOrderOf_map_dvd D.R.h h
   have h2 : addOrderOf (D.R.h h) ∣ 2 ^ D.R.e := by
     have := D.R.orderOf_H_dvd (Additive.toMul (D.R.h h))
@@ -137,8 +152,8 @@ theorem even_addOrderOf_of_h_ne_zero (D : D7) {h : D.R.A} (hh : D.R.h h ≠ 0) :
   rw [hk']
   exact dvd_pow_self 2 hk0
 
-theorem cc_mem_zpowers_gOf (D : D7) (φ₀ : G0) (h : HH D) :
-    D.R.cc ∈ Subgroup.zpowers (gOf D φ₀ h) ↔ φ₀ = c0 ∧ Odd (addOrderOf h) := by
+theorem cc_mem_zpowers_gOf (D : D7) (φ₀ : G0) (h : HH D)
+    : D.R.cc ∈ Subgroup.zpowers (gOf D φ₀ h) ↔ φ₀ = c0 ∧ Odd (addOrderOf h) := by
   have hu : ∀ (u : ℤˣ) (k : ℤ), u ^ k = -1 → u = -1 ∧ Odd k := by
     intro u k huk
     rcases Int.units_eq_one_or u with rfl | rfl
@@ -149,8 +164,7 @@ theorem cc_mem_zpowers_gOf (D : D7) (φ₀ : G0) (h : HH D) :
       · rw [he.neg_one_zpow] at huk
         exact absurd huk (by decide)
       · exact ho
-  have hc0sq : c0 ^ 2 = 1 := by
-    ext <;> simp [c0]
+  have hc0sq : c0 ^ 2 = 1 := by ext <;> simp [c0]
   rw [Subgroup.mem_zpowers_iff]
   constructor
   · rintro ⟨k, hk⟩
@@ -178,8 +192,7 @@ theorem cc_mem_zpowers_gOf (D : D7) (φ₀ : G0) (h : HH D) :
 theorem lemma_one_three_of_inert (D : D7) (hI : InertPart D) : PointsLemma D := by
   intro φ₀ hφ₀ h
   have hg1 : (gOf D φ₀ h).1 = φ₀ := rfl
-  have hsg : sgc0 = ((1 : ℤˣ), (-1 : ℤˣ)) := by
-    ext <;> simp [sgc0, c0]
+  have hsg : sgc0 = ((1 : ℤˣ), (-1 : ℤˣ)) := by ext <;> simp [sgc0, c0]
   have hg : (gOf D φ₀ h).1 = c0 ∨ (gOf D φ₀ h).1 = ((1 : ℤˣ), (-1 : ℤˣ)) := by
     rw [hg1, ← hsg]
     exact hφ₀
@@ -203,19 +216,23 @@ theorem lemma_one_three_of_inert (D : D7) (hI : InertPart D) : PointsLemma D := 
         decide
       · rw [← mul_assoc, cc_mul_cc, one_mul]
   · intro t i
-    have := (Formalism.HC.Frame.hostOrbitsPlaces (φ := D.R.toFrame) _ hg (D.R.tau1 t) (tau_one_mem_orbit_set D.R.toFrame t) i).1
+    have :=
+      (Formalism.HC.Frame.hostOrbitsPlaces (φ := D.R.toFrame) _ hg (D.R.tau1 t)
+        (tau_one_mem_orbit_set D.R.toFrame t) i).1
     show D.R.iotaInv (Formalism.HC.Frame.placeOf _).2 = _
     rw [this, Formalism.HC.Frame.iotaInv_mul, Formalism.HC.Frame.iotaInv_pow]
     change i • D.R.iotaInv (D.R.iota h) + D.R.iotaInv (D.R.iota t) = t + i • h
     rw [Formalism.HC.Frame.iotaInv_iota, Formalism.HC.Frame.iotaInv_iota, add_comm]
   · intro hc t i
-    have := (Formalism.HC.Frame.hostOrbitsPlaces (φ := D.R.toFrame) _ hg (D.R.tau1 t) (tau_one_mem_orbit_set D.R.toFrame t) i).2.1
-      (by rw [hg1]; exact hc)
+    have :=
+      (Formalism.HC.Frame.hostOrbitsPlaces (φ := D.R.toFrame) _ hg (D.R.tau1 t)
+        (tau_one_mem_orbit_set D.R.toFrame t) i).2.1 (by rw [hg1]; exact hc)
     rw [this]
     rfl
   · intro hs t i
-    have := (Formalism.HC.Frame.hostOrbitsPlaces (φ := D.R.toFrame) _ hg (D.R.tau1 t) (tau_one_mem_orbit_set D.R.toFrame t) i).2.2
-      (by rw [hg1, hs, hsg])
+    have :=
+      (Formalism.HC.Frame.hostOrbitsPlaces (φ := D.R.toFrame) _ hg (D.R.tau1 t)
+        (tau_one_mem_orbit_set D.R.toFrame t) i).2.2 (by rw [hg1, hs, hsg])
     rw [this]
     exact mul_one _
   · intro hc τ hτ
@@ -229,8 +246,8 @@ theorem no_three_consecutive_thick_places (D : D7) : TorusPairsWithVariant D := 
     intro g hg
     obtain ⟨s, hs, he⟩ := Finset.mem_image.1 hg
     exact ⟨s, hs, he.symm⟩
-  exact no_three D.R.toFrame D.host.T2 D.host.second_set_range D.host.second_set_no_relation D.host.u0 hL φ hφ hφc τ hτ i
-    (mem _ h0) (mem _ h1) (mem _ h2)
+  exact no_three D.R.toFrame D.host.T2 D.host.second_set_range D.host.second_set_no_relation
+    D.host.u0 hL φ hφ hφc τ hτ i (mem _ h0) (mem _ h1) (mem _ h2)
 
 end Formalism.MainNotions.UnusedSlot33
 

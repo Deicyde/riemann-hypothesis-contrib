@@ -16,13 +16,15 @@ open scoped Pointwise
 
 namespace Formalism.LatticeIndexTer.LatticeIndexValuation
 
-theorem length_map_inj {O Y X : Type} [CommRing O] [AddCommGroup Y] [Module O Y]
-    [AddCommGroup X] [Module O X] (ι : Y →ₗ[O] X) (hι : Function.Injective ι)
-    (P Q : Submodule O Y) :
-    Module.length O (P ⧸ Q.comap P.subtype) =
-      Module.length O (P.map ι ⧸ (Q.map ι).comap (P.map ι).subtype) := by
-  have e : (Q.comap P.subtype).map (Submodule.equivMapOfInjective ι hι P).toLinearMap =
-      (Q.map ι).comap (P.map ι).subtype := by
+theorem length_map_inj
+    {O Y X : Type} [CommRing O] [AddCommGroup Y] [Module O Y] [AddCommGroup X] [Module O X]
+    (ι : Y →ₗ[O] X) (hι : Function.Injective ι)
+    (P Q : Submodule O Y)
+    : Module.length O (P ⧸ Q.comap P.subtype)
+      = Module.length O (P.map ι ⧸ (Q.map ι).comap (P.map ι).subtype) := by
+  have e
+      : (Q.comap P.subtype).map (Submodule.equivMapOfInjective ι hι P).toLinearMap
+        = (Q.map ι).comap (P.map ι).subtype := by
     ext ⟨z, hz⟩
     obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.mp hz
     simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.subtype_apply, LinearEquiv.coe_coe]
@@ -30,9 +32,7 @@ theorem length_map_inj {O Y X : Type} [CommRing O] [AddCommGroup Y] [Module O Y]
     · rintro ⟨⟨w, hw⟩, hwQ, hwe⟩
       refine ⟨w, hwQ, ?_⟩
       have := congrArg Subtype.val hwe
-      first
-        | exact this
-        | simpa using this
+      first | exact this | simpa using this
     · rintro ⟨w, hwQ, hwe⟩
       refine ⟨⟨y, hy⟩, ?_, ?_⟩
       · have : w = y := hι hwe
@@ -47,12 +47,12 @@ namespace Formalism.LatticeIndexTer.LatticeIndexValuation
 
 section Sub
 
-variable {O K X : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-  [Algebra O K] [IsFractionRing O K] [AddCommGroup X] [Module K X] [Module O X]
-  [IsScalarTower O K X]
+variable
+  {O K X : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+  [IsFractionRing O K] [AddCommGroup X] [Module K X] [Module O X] [IsScalarTower O K X]
 
-theorem isLat_comap (A : Submodule O X) (hA : IsLat O K X A) (W : Submodule K X) :
-    IsLat O K W (A.comap ((W.subtype).restrictScalars O)) := by
+theorem isLat_comap (A : Submodule O X) (hA : IsLat O K X A) (W : Submodule K X)
+    : IsLat O K W (A.comap ((W.subtype).restrictScalars O)) := by
   let ι : W →ₗ[O] X := (W.subtype).restrictScalars O
   have hι : Function.Injective ι := Subtype.val_injective
   constructor

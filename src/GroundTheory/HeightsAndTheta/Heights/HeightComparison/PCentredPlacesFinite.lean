@@ -19,8 +19,7 @@ theorem CentredPlacesFinite.proof : CentredPlacesFinite.Statement := by
       (Ideal.Quotient.mkₐ_surjective ℤ m)
   let _ : Field (O ⧸ m) := Ideal.Quotient.field m
   obtain ⟨hp, -⟩ :=
-    @natCard_eq_pow_length_of_finiteType (O ⧸ m) _
-      (by convert hq <;> rfl) (ringChar (O ⧸ m))
+    @natCard_eq_pow_length_of_finiteType (O ⧸ m) _ (by convert hq <;> rfl) (ringChar (O ⧸ m))
       (ringChar.charP _)
   set p := ringChar (O ⧸ m)
   have hpm : (p : O) ∈ m := by

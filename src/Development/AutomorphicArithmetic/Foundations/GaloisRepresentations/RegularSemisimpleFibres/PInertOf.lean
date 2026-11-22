@@ -9,19 +9,28 @@ public import Development.DiscreteGroups.GlobalIrreducibility.DzIsoKO
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem tr_scalar {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {m : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin m) k) V)
-    {ω : kˣ →* ℂˣ} (h : HasCentralChar π ω) (u : 𝒪[k]ˣ) :
-    LinearMap.trace ℂ _ (levelZero π (Matrix.GeneralLinearGroup.scalar (Fin m) (unitRes k u))) =
-      (ω (unitIncl k u) : ℂ) * LinearMap.trace ℂ _ (levelZero π 1) := by
-  have key : ∀ g : KO k (Fin m), (g : GL (Fin m) k) = Matrix.GeneralLinearGroup.scalar (Fin m) (unitIncl k u) →
-      levelZero π (redK k (Fin m) g) = ((ω (unitIncl k u) : ℂˣ) : ℂ) • (1 : Module.End ℂ _) := by
+private theorem tr_scalar
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {m : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (GL (Fin m) k) V)
+    {ω : kˣ →* ℂˣ} (h : HasCentralChar π ω)
+    (u : 𝒪[k]ˣ)
+    : LinearMap.trace ℂ _ (levelZero π (Matrix.GeneralLinearGroup.scalar (Fin m) (unitRes k u)))
+      = (ω (unitIncl k u) : ℂ) * LinearMap.trace ℂ _ (levelZero π 1) := by
+  have key
+      : ∀ g : KO k (Fin m),
+        (g : GL (Fin m) k) = Matrix.GeneralLinearGroup.scalar (Fin m) (unitIncl k u)
+          → levelZero π (redK k (Fin m) g)
+            = ((ω (unitIncl k u) : ℂˣ) : ℂ) • (1 : Module.End ℂ _) := by
     intro g hg
     apply LinearMap.ext
     intro v
@@ -30,12 +39,18 @@ private theorem tr_scalar {k : Type} [Field k] [ValuativeRel k] [TopologicalSpac
     simp
   rw [← redK_scalar, key _ rfl, map_one, map_smul, smul_eq_mul]
 
-private theorem inflates_twist {E : Type} [Field E] [NumberField E] {w : HeightOneSpectrum (𝓞 E)} {g : ℕ} [Fact g.Prime]
-    (i : ℚ_[g] ≃+* w.adicCompletion E) (hi : Continuous i) {m : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ (GL (Fin m) (w.adicCompletion E)) V) (τ : FDRep ℂ (GlobalTheory.GLq.Gn g m))
+private theorem inflates_twist
+    {E : Type} [Field E] [NumberField E]
+    {w : HeightOneSpectrum (𝓞 E)} {g : ℕ} [Fact g.Prime]
+    (i : ℚ_[g] ≃+* w.adicCompletion E) (hi : Continuous i)
+    {m : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL (Fin m) (w.adicCompletion E)) V)
+    (τ : FDRep ℂ (GlobalTheory.GLq.Gn g m))
     {μ : (w.adicCompletion E)ˣ →* ℂˣ} (hμ : IsUnram μ)
-    (h : GlobalTheory.SerSys.TameGen.Inflates (ρ.comp (Matrix.GeneralLinearGroup.map i.toRingHom)) τ) :
-    GlobalTheory.SerSys.TameGen.Inflates ((twist ρ (detChar _ μ)).comp (Matrix.GeneralLinearGroup.map i.toRingHom)) τ := by
+    (h
+      : GlobalTheory.SerSys.TameGen.Inflates (ρ.comp (Matrix.GeneralLinearGroup.map i.toRingHom)) τ)
+    : GlobalTheory.SerSys.TameGen.Inflates
+      ((twist ρ (detChar _ μ)).comp (Matrix.GeneralLinearGroup.map i.toRingHom)) τ := by
   obtain ⟨φ, h0, hφ⟩ := h
   refine ⟨φ, h0, fun κ x => ?_⟩
   rw [hφ]
@@ -44,13 +59,16 @@ private theorem inflates_twist {E : Type} [Field E] [NumberField E] {w : HeightO
   rw [twist_apply, h1]
   simp
 
-private theorem map_surj {F F' : Type} [Field F] [Field F'] (r : F ≃+* F') {m : ℕ} (δ : GL (Fin m) F') :
-    ∃ γ : GL (Fin m) F, Matrix.GeneralLinearGroup.map r.toRingHom γ = δ :=
+private theorem map_surj
+    {F F' : Type} [Field F] [Field F'] (r : F ≃+* F') {m : ℕ} (δ : GL (Fin m) F')
+    : ∃ γ : GL (Fin m) F, Matrix.GeneralLinearGroup.map r.toRingHom γ = δ :=
   ⟨Matrix.GeneralLinearGroup.map r.symm.toRingHom δ, by ext a b; simp⟩
 
-private theorem exists_unr {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {m : ℕ} (hm : 0 < m) {ω ω' : kˣ →* ℂˣ} (h : ∀ u : 𝒪[k]ˣ, ω (unitIncl k u) = ω' (unitIncl k u)) :
-    ∃ μ : kˣ →* ℂˣ, IsUnram μ ∧ ω * μ ^ m = ω' := by
+private theorem exists_unr
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {m : ℕ} (hm : 0 < m)
+    {ω ω' : kˣ →* ℂˣ} (h : ∀ u : 𝒪[k]ˣ, ω (unitIncl k u) = ω' (unitIncl k u))
+    : ∃ μ : kˣ →* ℂˣ, IsUnram μ ∧ ω * μ ^ m = ω' := by
   obtain ⟨ϖ, hϖ⟩ := exists_uniformizer k
   have hχu : IsUnram (ω⁻¹ * ω') := by
     intro x hx
@@ -71,19 +89,22 @@ private theorem exists_unr {k : Type} [Field k] [ValuativeRel k] [TopologicalSpa
       ← zpow_natCast, ← zpow_mul, ← zpow_natCast, ← zpow_mul, mul_comm]
   rw [hpow, mul_inv_cancel_left]
 
-theorem UpperTheory.Gal.InertialTypesAlt.inertOf :
-    TypeChar → BaseQ → InertOf := by
+theorem UpperTheory.Gal.InertialTypesAlt.inertOf : TypeChar → BaseQ → InertOf := by
   intro hTC hBQ E Ω _ _ _ _ _ A v hv g _ i hi m x y hxc hyc hxd hyd htr
   obtain ⟨-, -, ⟨r⟩⟩ := hBQ E v g i hi
-  have hcls : ∀ c : IrrCl (GL (Fin m) (v.adicCompletion E)), GlobalTheory.LocLanglands.cls c.rep = ⟨m, c⟩ := by
+  have hcls
+      : ∀ c : IrrCl (GL (Fin m) (v.adicCompletion E)),
+        GlobalTheory.LocLanglands.cls c.rep = ⟨m, c⟩ := by
     intro c
     unfold GlobalTheory.LocLanglands.cls
     rw [IrrCl.cl_rep]
   have hm : 0 < m := (UpperTheory.Zero.LLC.clBasic (v.adicCompletion E) ⟨m, x⟩).2.2.2.1 hxc
-  obtain ⟨τx, hτx, hinfx⟩ := (UpperTheory.Zero.LLC.typeEx E Ω A v hv g i hi m hm x.rep).1
-    (by rw [hcls]; exact hxc) (by rw [hcls]; exact hxd)
-  obtain ⟨τy, hτy, hinfy⟩ := (UpperTheory.Zero.LLC.typeEx E Ω A v hv g i hi m hm y.rep).1
-    (by rw [hcls]; exact hyc) (by rw [hcls]; exact hyd)
+  obtain ⟨τx, hτx, hinfx⟩ :=
+    (UpperTheory.Zero.LLC.typeEx E Ω A v hv g i hi m hm x.rep).1 (by rw [hcls]; exact hxc)
+      (by rw [hcls]; exact hxd)
+  obtain ⟨τy, hτy, hinfy⟩ :=
+    (UpperTheory.Zero.LLC.typeEx E Ω A v hv g i hi m hm y.rep).1 (by rw [hcls]; exact hyc)
+      (by rw [hcls]; exact hyd)
   have hch : τx.character = τy.character := by
     funext δ
     obtain ⟨γ, hγ⟩ := map_surj r (δ : GL (Fin m) (ZMod g))
@@ -102,7 +123,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.inertOf :
     have : Nontrivial τx.V := by
       by_contra hnt
       rw [not_nontrivial_iff_subsingleton] at hnt
-      exact hφ (LinearMap.ext fun w => by rw [Subsingleton.elim w 0, map_zero, LinearMap.zero_apply])
+      exact hφ (LinearMap.ext fun w => by
+        rw [Subsingleton.elim w 0, map_zero, LinearMap.zero_apply])
     rw [map_one]
     refine fun h0 => ?_
     have h1 : (Module.finrank ℂ τx.V : ℂ) = 0 := e1.trans h0
@@ -118,15 +140,18 @@ theorem UpperTheory.Gal.InertialTypesAlt.inertOf :
   obtain ⟨μ, hμ, hμω⟩ := exists_unr hm hωu
   have hμs := isSmoothChar_of_isUnram hμ
   let σ' : IrrRep (GL (Fin m) (v.adicCompletion E)) :=
-    IrrRep.mk x.rep.V (twist x.rep.ρ (detChar (Fin m) μ))
-      (isSmooth_twist x.rep.smooth hμs.detChar) (isIrreducible_twist x.rep.irr _)
-  have hinfσ : GlobalTheory.SerSys.TameGen.Inflates (MonoidHom.comp σ'.ρ (Matrix.GeneralLinearGroup.map i.toRingHom)) τx :=
+    IrrRep.mk x.rep.V (twist x.rep.ρ (detChar (Fin m) μ)) (isSmooth_twist x.rep.smooth hμs.detChar)
+      (isIrreducible_twist x.rep.irr _)
+  have hinfσ : GlobalTheory.SerSys.TameGen.Inflates
+      (MonoidHom.comp σ'.ρ (Matrix.GeneralLinearGroup.map i.toRingHom)) τx :=
     inflates_twist i hi x.rep.ρ τx hμ hinfx
   have hωσ : HasCentralChar σ'.ρ ωy := by
     have := hasCentralChar_twist hωx μ
     rw [Fintype.card_fin, hμω] at this
     exact this
-  have hcl := UpperTheory.Zero.LLC.detByType E Ω A v hv g i hi m hm y.rep σ' τy τx ωy hτy hch hinfy hinfσ hωy hωσ
+  have hcl :=
+    UpperTheory.Zero.LLC.detByType E Ω A v hv g i hi m hm y.rep σ' τy τx ωy hτy hch hinfy hinfσ hωy
+      hωσ
   unfold IrrGL.Inert
   refine ⟨μ, hμ, ?_⟩
   have e3 : IrrGL.tw (⟨m, x⟩ : IrrGL (k := _)) μ hμs = GlobalTheory.LocLanglands.cls σ' := by

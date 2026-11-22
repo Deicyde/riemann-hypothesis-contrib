@@ -12,7 +12,8 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.IsSubquotientC
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.Cos
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc Zc.Cos
 
 noncomputable section
 
@@ -20,19 +21,42 @@ namespace GlobalTheory.CompanionTheory.FineProd.CellMulti
 
 set_option synthInstance.maxHeartbeats 400000
 
-theorem jhMult_cell_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], GlobalTheory.Published.IrreducibleAdmissibleGL → ∀ {h r : ℕ} (x : Fin h → IrrGL (k := k)) (y : Fin r → IrrGL (k := k)), (∀ j, (y j).IsCusp) → ∀ (b : Fin h → Fin r → ℕ) (hrow : ∀ i, ∑ j, b i j = (x i).1) (hcol : ∀ j, ∑ i, b i j = (y j).1) (j : Fin r) (i i' : Fin h), i ≠ i' → b i j ≠ 0 → b i' j ≠ 0 → jhMult (piTensor fun j => (y j).rep) (cellFunctor (c := fun i j => Fin (b i j)) (fun i => stdBlocks (b i) (hrow i)) (fun j => stdBlocks (fun i => b i j) (hcol j)) (piTensor fun i => (x i).rep)) = 0 := by
+theorem jhMult_cell_eq_zero
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      GlobalTheory.Published.IrreducibleAdmissibleGL
+        → ∀ {h r : ℕ} (x : Fin h → IrrGL (k := k)) (y : Fin r → IrrGL (k := k)),
+          (∀ j, (y j).IsCusp)
+            → ∀ (b : Fin h → Fin r → ℕ) (hrow : ∀ i, ∑ j, b i j = (x i).1)
+                (hcol : ∀ j, ∑ i, b i j = (y j).1) (j : Fin r) (i i' : Fin h),
+              i ≠ i' → b i j ≠ 0 → b i' j ≠ 0
+                → jhMult (piTensor fun j => (y j).rep)
+                    (cellFunctor
+                      (c := fun i j => Fin (b i j))
+                      (fun i => stdBlocks (b i) (hrow i))
+                      (fun j => stdBlocks (fun i => b i j) (hcol j))
+                      (piTensor fun i => (x i).rep))
+                  = 0 := by
   intro k _ _ _ _ hA h r x y hy b hrow hcol j i i' hii hi hi'
   classical
   by_contra h0
   have hBZ := GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness
-  have hτ : (piTensor fun j => (y j).rep).IsIrreducible := GlobalTheory.T.piExteriorTensor_smoothIrreducible_isIrreducible hBZ k _ _ fun j => (y j).2.rep
+  have hτ : (piTensor fun j => (y j).rep).IsIrreducible :=
+    GlobalTheory.T.piExteriorTensor_smoothIrreducible_isIrreducible hBZ k _ _ fun j => (y j).2.rep
   have hτs : IsSmooth (piTensor fun j => (y j).rep) := isSmooth_piTensor fun j => (y j).2.rep.smooth
-  obtain ⟨s, -, hS⟩ := GlobalTheory.CompanionTheory.Hypotheses₂.TD.exists_of_cell (GlobalTheory.CompanionTheory.GeoLink.geometricLemma k).2 _ _
-    (fun i => (x i).2.rep.smooth) (fun i => hasFiniteLength_of_isIrreducible (x i).2.rep.irr) hτ hτs h0
-  have h1 := GlobalTheory.LocGL.SupportUnique.isSubquotient_factor (fun j => multiProd (stdBlocks (fun i => b i j) (hcol j)) fun i => (s i j).ρ) j
-    (y j).2.rep.irr
-    ((GlobalTheory.CompanionTheory.Hypotheses₂.TD.isSubquotient_comp_mulSingle (fun j => (y j).rep) (fun j => (y j).2.rep.irr) j).trans
-      (GlobalTheory.LocGL.SupportUnique.isSubquotient_comp hS _))
+  obtain ⟨s, -, hS⟩ :=
+    GlobalTheory.CompanionTheory.Hypotheses₂.TD.exists_of_cell
+      (GlobalTheory.CompanionTheory.GeoLink.geometricLemma k).2 _ _
+      (fun i => (x i).2.rep.smooth)
+      (fun i => hasFiniteLength_of_isIrreducible (x i).2.rep.irr)
+      hτ hτs h0
+  have h1 :=
+    GlobalTheory.LocGL.SupportUnique.isSubquotient_factor
+      (fun j => multiProd (stdBlocks (fun i => b i j) (hcol j)) fun i => (s i j).ρ)
+      j (y j).2.rep.irr
+      ((GlobalTheory.CompanionTheory.Hypotheses₂.TD.isSubquotient_comp_mulSingle
+        (fun j => (y j).rep)
+        (fun j => (y j).2.rep.irr)
+        j).trans (GlobalTheory.LocGL.SupportUnique.isSubquotient_comp hS _))
   let Y : Fin h → IrrGL (k := k) := fun i => IrrGL.of (s i j).ρ (s i j).smooth (s i j).irr
   have hYb : ∀ c, (Y c).1 = b c j := fun _ => rfl
   let ψ := prodIrrEquiv (hcol j) (fun i => (s i j).ρ) (fun i => (s i j).smooth) fun i => (s i j).irr
@@ -49,10 +73,14 @@ theorem jhMult_cell_eq_zero : ∀ {k : Type} [Field k] [ValuativeRel k] [Topolog
       Fintype.sum_equiv (S.orderIsoOfFin rfl).toEquiv _ _ fun a => rfl
     rw [e1, Finset.sum_coe_sort S (fun c => b c j), ← hcol j]
     exact Finset.sum_subset (Finset.subset_univ _) fun c _ hc => by simpa [S] using hc
-  obtain ⟨E⟩ := GlobalTheory.T.induced_product_drop_zero_factors Y (hcol j) o o.strictMono hrange hsum
+  obtain ⟨E⟩ :=
+    GlobalTheory.T.induced_product_drop_zero_factors Y (hcol j) o o.strictMono hrange hsum
   have h3 := h2.trans (.of_injective E.toIntertwiningMap E.toLinearEquiv.injective)
   refine jhMult_ne_zero_iff.2 h3
-    (GlobalTheory.T.cuspidal_multiplicity_product_zero hA (y j) (fun a => Y (o a)) hsum (hy j) hcard fun a => Nat.pos_of_ne_zero ?_)
+    (GlobalTheory.T.cuspidal_multiplicity_product_zero hA (y j)
+      (fun a => Y (o a))
+      hsum (hy j) hcard
+      fun a => Nat.pos_of_ne_zero ?_)
   have := ho a
   simpa [S, hYb] using this
 

@@ -26,9 +26,8 @@ def perSub (K κ ι : Type) [Field K] (R : ℕ) : AddSubgroup (Matrix κ ι K) :
   AddSubgroup.closure {x | ∃ y : Matrix κ ι K, IntM y ∧ x = (R : K) • y}
 
 def haarAt (R : ℕ) (φ : Matrix κ ι K → ℂ) : ℂ :=
-  ((R : ℂ) ^ (Module.finrank ℚ K * (Fintype.card κ * Fintype.card ι)))⁻¹ *
-    ∑ᶠ q : Matrix κ ι K ⧸ perSub K κ ι R, φ q.out
-
+  ((R : ℂ) ^ (Module.finrank ℚ K * (Fintype.card κ * Fintype.card ι)))⁻¹
+    * ∑ᶠ q : Matrix κ ι K ⧸ perSub K κ ι R, φ q.out
 
 open Classical in
 def haar (φ : Matrix κ ι K → ℂ) : ℂ := by
@@ -65,9 +64,9 @@ def spAct (σ : Matrix (ι ⊕ ι) (ι ⊕ ι) ℚ) (τ : Matrix ι ι ℂ) : Ma
 
 def TransS (σ : Matrix (ι ⊕ ι) (ι ⊕ ι) ℚ) (φ ψ : Matrix κ ι ℚ → ℂ) : Prop :=
   ∀ τ ∈ Siegel ι, ∀ ζ : κ → ι → ℂ,
-    thS ψ (spAct σ τ) (fun k => ζ k ᵥ* (spDen σ τ)⁻¹) =
-      (spDen σ τ).det ^ (Fintype.card κ / 2) *
-        cexp (Real.pi * I * ∑ k, ζ k ⬝ᵥ ((spDen σ τ)⁻¹ * qm σ.toBlocks₂₁) *ᵥ ζ k) * thS φ τ ζ
+    thS ψ (spAct σ τ) (fun k => ζ k ᵥ* (spDen σ τ)⁻¹)
+      = (spDen σ τ).det ^ (Fintype.card κ / 2)
+        * cexp (Real.pi * I * ∑ k, ζ k ⬝ᵥ ((spDen σ τ)⁻¹ * qm σ.toBlocks₂₁) *ᵥ ζ k) * thS φ τ ζ
 
 def heisS (a b : Matrix κ ι ℚ) (φ : Matrix κ ι ℚ → ℂ) : Matrix κ ι ℚ → ℂ := fun x =>
   φ (x - b) * cexp (Real.pi * I * ((∑ k, (2 * (x k ⬝ᵥ a k) - a k ⬝ᵥ b k) : ℚ) : ℂ))

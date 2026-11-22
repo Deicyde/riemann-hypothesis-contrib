@@ -6,26 +6,33 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HasseOrderBound.
 
 noncomputable section
 
-open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
+open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField
+  IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
 
 namespace PI.HasseOrdBdW
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j}
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+  {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j}
 
 theorem kp_charZero (la : HeightOneSpectrum (𝓞 B.KO)) (N : ℕ) : CharZero (Kp X la N) := by
   have := Kl_charZero X la
   exact charZero_of_injective_algebraMap (algebraMap (X.Kl la) (Kp X la N)).injective
 
-theorem isUnif_unifO (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO))
-    (hfd : FiniteDimensional (Kp X la G.N) (OsK X la G.w)) :
-    IsUnif (OsK X la G.w) (unifO X la G.N) := by
+theorem isUnif_unifO
+    (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO))
+    (hfd : FiniteDimensional (Kp X la G.N) (OsK X la G.w))
+    : IsUnif (OsK X la G.w) (unifO X la G.N) := by
   have : Algebra.IsIntegral (Kp X la G.N) (OsK X la G.w) := Algebra.IsIntegral.of_finite _ _
   exact isUnif_of_field (Kp X la G.N)
-    (Op.irreducible_map X la G.N (Classical.choose_spec (IsDiscreteValuationRing.exists_irreducible (X.Ol la))))
+    (Op.irreducible_map X la G.N
+      (Classical.choose_spec (IsDiscreteValuationRing.exists_irreducible (X.Ol la))))
 
-theorem isDVRAt_pt (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO)) (hP : PublishedIntClos)
-    (hfd : FiniteDimensional (Kp X la G.N) (OsK X la G.w)) (hred : IsReduced (OsK X la G.w))
-    (ζ : PtsG G la) : IsDVRAt ζ := by
+theorem isDVRAt_pt
+    (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO))
+    (hP : PublishedIntClos) (hfd : FiniteDimensional (Kp X la G.N) (OsK X la G.w))
+    (hred : IsReduced (OsK X la G.w)) (ζ : PtsG G la)
+    : IsDVRAt ζ := by
   have := kp_charZero (X := X) la G.N
   exact (hP (Op X la G.N) (Kp X la G.N) (OsK X la G.w)).2 ζ
 

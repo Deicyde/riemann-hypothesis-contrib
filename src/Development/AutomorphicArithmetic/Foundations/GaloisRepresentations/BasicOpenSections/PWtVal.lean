@@ -13,11 +13,13 @@ open UpperTheory.Gal.crystallineComparison (resPt)
 
 namespace UpperTheory.Gal.Mod
 
-private theorem pt_comp {Ω : Type} [Field Ω] {X X' : Scheme.{0}} (x : gp Ω ⟶ X) (f : X ⟶ X') :
-    pt (x ≫ f) = f (pt x) := rfl
+private theorem pt_comp {Ω : Type} [Field Ω] {X X' : Scheme.{0}} (x : gp Ω ⟶ X) (f : X ⟶ X')
+    : pt (x ≫ f) = f (pt x) :=
+  rfl
 
-private theorem finsum_single {α : Type*} {s : Set α} {f : α → ℤ} {a : α} (ha : a ∈ s)
-    (h : ∀ b ∈ s, b ≠ a → f b = 0) : ∑ᶠ b ∈ s, f b = f a := by
+private theorem finsum_single
+    {α : Type*} {s : Set α} {f : α → ℤ} {a : α} (ha : a ∈ s) (h : ∀ b ∈ s, b ≠ a → f b = 0)
+    : ∑ᶠ b ∈ s, f b = f a := by
   have : ∑ᶠ b ∈ s, f b = ∑ᶠ b ∈ ({a} : Set α), f b := by
     apply finsum_mem_inter_support_eq
     ext b
@@ -31,10 +33,12 @@ private theorem finsum_single {α : Type*} {s : Set α} {f : α → ℤ} {a : α
       exact ⟨ha, hf⟩
   rw [this, finsum_mem_singleton]
 
-private theorem finsum_count {α : Type*} {s : Set α} (hs : s.Finite) (P : α → Prop) [DecidablePred P] :
-    ∑ᶠ b ∈ s, (if P b then (1 : ℤ) else 0) = ((s ∩ {b | P b}).ncard : ℤ) := by
+private theorem finsum_count
+    {α : Type*} {s : Set α} (hs : s.Finite) (P : α → Prop) [DecidablePred P]
+    : ∑ᶠ b ∈ s, (if P b then (1 : ℤ) else 0) = ((s ∩ {b | P b}).ncard : ℤ) := by
   have hB : (s ∩ {b | P b}).Finite := hs.subset Set.inter_subset_left
-  have : ∑ᶠ b ∈ s, (if P b then (1 : ℤ) else 0) = ∑ᶠ b ∈ s ∩ {b | P b}, (if P b then (1 : ℤ) else 0) := by
+  have : ∑ᶠ b ∈ s, (if P b then (1 : ℤ) else 0)
+      = ∑ᶠ b ∈ s ∩ {b | P b}, (if P b then (1 : ℤ) else 0) := by
     apply finsum_mem_inter_support_eq
     ext b
     simp only [Set.mem_inter_iff, Function.mem_support, Set.mem_setOf_eq]
@@ -76,9 +80,12 @@ theorem wtVal : FibExt → SecGen → ClopenAt → WtVal := by
     by_cases hx : x ∈ U
     · exact (if_pos hx).trans ((LocallyConstant.charFn_eq_one (Y := ℤ) x hU).2 hx).symm
     · exact (if_neg hx).trans ((LocallyConstant.charFn_eq_zero (Y := ℤ) x hU).2 hx).symm
-  obtain ⟨ψ, hψ, hsum⟩ : ∃ ψ : Spec (CommRingCat.of V) → ℤ, IsLocallyConstant ψ ∧
-      ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (x : gp Ω ⟶ Spec (CommRingCat.of V)),
-        ψ (pt x) = ∑ᶠ z ∈ fib r x, w Ω (z ≫ v) * φ (pt z) := hw.1 (TranscendenceTraces.Sq.of T.p y) φ hφ
+  obtain ⟨ψ, hψ, hsum⟩
+      : ∃ ψ : Spec (CommRingCat.of V) → ℤ,
+        IsLocallyConstant ψ
+          ∧ ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (x : gp Ω ⟶ Spec (CommRingCat.of V)),
+            ψ (pt x) = ∑ᶠ z ∈ fib r x, w Ω (z ≫ v) * φ (pt z) :=
+    hw.1 (TranscendenceTraces.Sq.of T.p y) φ hφ
   have hconn : PreconnectedSpace (Spec (CommRingCat.of V)) := inferInstance
   have hψc : ψ (pt η) = ψ (pt (resPt V)) := hψ.apply_eq_of_preconnectedSpace _ _
 
@@ -92,8 +99,8 @@ theorem wtVal : FibExt → SecGen → ClopenAt → WtVal := by
       have : pt b ∉ U := fun h => hne ((hUz b hb).1 h)
       simp [φ, this]
 
-  have hconst : ∀ σ : Spec (CommRingCat.of V) ⟶ pullback T.p y,
-      pt (η ≫ σ) ∈ U ↔ pt (resPt V ≫ σ) ∈ U := by
+  have hconst
+      : ∀ σ : Spec (CommRingCat.of V) ⟶ pullback T.p y, pt (η ≫ σ) ∈ U ↔ pt (resPt V ≫ σ) ∈ U := by
     intro σ
     have h := (hφ.comp_continuous σ.continuous).apply_eq_of_preconnectedSpace (pt η) (pt (resPt V))
     simp only [Function.comp_apply] at h
@@ -153,7 +160,8 @@ theorem wtVal : FibExt → SecGen → ClopenAt → WtVal := by
       have hσ₀ : resPt V ≫ σ = z₁ := by
         apply (hUz _ _).1 hσU
         rw [Category.assoc, hσ', Category.comp_id]
-      let s : T.Sec y := ⟨σ ≫ v, by rw [Category.assoc, hcond, ← Category.assoc, hσ', Category.id_comp]⟩
+      let s : T.Sec y :=
+        ⟨σ ≫ v, by rw [Category.assoc, hcond, ← Category.assoc, hσ', Category.id_comp]⟩
       have hsσ : sec s = σ := by
         apply pullback.hom_ext
         · change sec s ≫ v = σ ≫ v
@@ -165,7 +173,8 @@ theorem wtVal : FibExt → SecGen → ClopenAt → WtVal := by
         rw [← Category.assoc, hσ₀, hz₁v]
       · change η ≫ sec s = η ≫ σ
         rw [hsσ]
-  rw [← hcl, ← hψc, hgen, ← hrange, ← Nat.card_coe_set_eq, Nat.card_congr (Equiv.ofInjective e he).symm]
+  rw [← hcl, ← hψc, hgen, ← hrange, ← Nat.card_coe_set_eq,
+    Nat.card_congr (Equiv.ofInjective e he).symm]
 
 end UpperTheory.Gal.Mod
 

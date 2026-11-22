@@ -13,8 +13,12 @@ namespace Formalism.HC.Der
 
 open Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition
 
-theorem root_eq_of_sub_mem {S : Type*} [CommRing S] [IsDomain S] (P : Ideal S) [hP : P.IsPrime] {m : ℕ}
-    (hm : (m : S) ∉ P) {x y : S} (hx : x ^ m = 1) (hy : y ^ m = 1) (hxy : x - y ∈ P) : x = y := by
+theorem root_eq_of_sub_mem
+    {S : Type*} [CommRing S] [IsDomain S]
+    (P : Ideal S) [hP : P.IsPrime]
+    {m : ℕ} (hm : (m : S) ∉ P)
+    {x y : S} (hx : x ^ m = 1) (hy : y ^ m = 1) (hxy : x - y ∈ P)
+    : x = y := by
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hm (by simp)
@@ -27,8 +31,10 @@ theorem root_eq_of_sub_mem {S : Type*} [CommRing S] [IsDomain S] (P : Ideal S) [
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, map_zero] at h1
     simp only [map_mul, map_pow, hq] at h1
-    have h2 : ∀ i ∈ Finset.range m, (Ideal.Quotient.mk P y) ^ i * (Ideal.Quotient.mk P y) ^ (m - 1 - i) =
-        (Ideal.Quotient.mk P y) ^ (m - 1) := by
+    have h2
+        : ∀ i ∈ Finset.range m,
+          (Ideal.Quotient.mk P y) ^ i * (Ideal.Quotient.mk P y) ^ (m - 1 - i)
+            = (Ideal.Quotient.mk P y) ^ (m - 1) := by
       intro i hi
       rw [← pow_add]
       congr 1
@@ -46,17 +52,18 @@ theorem root_eq_of_sub_mem {S : Type*} [CommRing S] [IsDomain S] (P : Ideal S) [
       exact one_ne_zero h5
   · exact sub_eq_zero.1 hG
 
-theorem val_modEq_iff {M N : ℕ} [NeZero N] (h : M ∣ N) (u : (ZMod N)ˣ) (x : ℕ) :
-    (u : ZMod N).val ≡ x [MOD M] ↔ ((ZMod.unitsMap h u : (ZMod M)ˣ) : ZMod M) = (x : ZMod M) := by
+theorem val_modEq_iff {M N : ℕ} [NeZero N] (h : M ∣ N) (u : (ZMod N)ˣ) (x : ℕ)
+    : (u : ZMod N).val ≡ x [MOD M] ↔ ((ZMod.unitsMap h u : (ZMod M)ˣ) : ZMod M) = (x : ZMod M) := by
   rw [show ((ZMod.unitsMap h u : (ZMod M)ˣ) : ZMod M) = ((u : ZMod N).val : ZMod M) from
-    ZMod.cast_eq_val _, ZMod.natCast_eq_natCast_iff]
+      ZMod.cast_eq_val _,
+    ZMod.natCast_eq_natCast_iff]
 
-theorem val_modEq_one_iff {M N : ℕ} [NeZero N] (h : M ∣ N) (u : (ZMod N)ˣ) :
-    (u : ZMod N).val ≡ 1 [MOD M] ↔ ZMod.unitsMap h u = 1 := by
+theorem val_modEq_one_iff {M N : ℕ} [NeZero N] (h : M ∣ N) (u : (ZMod N)ˣ)
+    : (u : ZMod N).val ≡ 1 [MOD M] ↔ ZMod.unitsMap h u = 1 := by
   rw [val_modEq_iff h u 1, Nat.cast_one, Units.val_eq_one]
 
-theorem exists_unit_modEq {M N : ℕ} [NeZero N] (h : M ∣ N) (x : ℕ) (hx : x.Coprime M) :
-    ∃ u : (ZMod N)ˣ, (u : ZMod N).val ≡ x [MOD M] := by
+theorem exists_unit_modEq {M N : ℕ} [NeZero N] (h : M ∣ N) (x : ℕ) (hx : x.Coprime M)
+    : ∃ u : (ZMod N)ˣ, (u : ZMod N).val ≡ x [MOD M] := by
   obtain ⟨u, hu⟩ := ZMod.unitsMap_surjective h (ZMod.unitOfCoprime x hx)
   exact ⟨u, (val_modEq_iff h u x).2 (by rw [hu, ZMod.coe_unitOfCoprime])⟩
 
@@ -66,8 +73,7 @@ variable (N : ℕ) [NeZero N]
 
 def zO : 𝓞 (Cond.Cyc N) := (Cond.z_spec N).toInteger
 
-theorem zO_prim : IsPrimitiveRoot (zO N) N := by
-  exact (Cond.z_spec N).toInteger_isPrimitiveRoot
+theorem zO_prim : IsPrimitiveRoot (zO N) N := by exact (Cond.z_spec N).toInteger_isPrimitiveRoot
 
 theorem tauN_zO (u : (ZMod N)ˣ) : tauN N u • zO N = zO N ^ (u : ZMod N).val := by
   apply RingOfIntegers.ext
@@ -76,27 +82,38 @@ theorem tauN_zO (u : (ZMod N)ˣ) : tauN N u • zO N = zO N ^ (u : ZMod N).val :
   push_cast
   exact tauN_root N u _ (Cond.z_spec N).pow_eq_one
 
-theorem ringHom_ext_zO {R : Type*} [CommRing R] (f g : 𝓞 (Cond.Cyc N) →+* R) (h : f (zO N) = g (zO N))
-    (x : 𝓞 (Cond.Cyc N)) : f x = g x := by
+theorem ringHom_ext_zO
+    {R : Type*} [CommRing R]
+    (f g : 𝓞 (Cond.Cyc N) →+* R) (h : f (zO N) = g (zO N))
+    (x : 𝓞 (Cond.Cyc N))
+    : f x = g x := by
   have hx : x ∈ Algebra.adjoin ℤ {zO N} := by
-    rw [show Algebra.adjoin ℤ {zO N} = ⊤ from IsCyclotomicExtension.Rat.adjoin_singleton_eq_top (Cond.z_spec N)]
+    rw [show Algebra.adjoin ℤ {zO N} = ⊤ from
+      IsCyclotomicExtension.Rat.adjoin_singleton_eq_top (Cond.z_spec N)]
     exact Algebra.mem_top
-  refine Algebra.adjoin_induction (p := fun x _ => f x = g x) (fun y hy => ?_) (fun r => ?_)
-    (fun y z _ _ h1 h2 => ?_) (fun y z _ _ h1 h2 => ?_) hx
+  refine Algebra.adjoin_induction
+    (p := fun x _ => f x = g x)
+    (fun y hy => ?_)
+    (fun r => ?_)
+    (fun y z _ _ h1 h2 => ?_)
+    (fun y z _ _ h1 h2 => ?_)
+    hx
   · rw [Set.mem_singleton_iff.1 hy]
     exact h
   · simp only [algebraMap_int_eq, eq_intCast, map_intCast]
   · rw [map_add (f := _), map_add (f := _), h1, h2]
   · rw [map_mul, map_mul, h1, h2]
 
-variable (l : ℕ) [Fact l.Prime] (Q : Ideal (𝓞 (Cond.Cyc N))) [Q.IsPrime] [Q.LiesOver (span {(l : ℤ)})]
+variable
+  (l : ℕ) [Fact l.Prime] (Q : Ideal (𝓞 (Cond.Cyc N))) [Q.IsPrime] [Q.LiesOver (span {(l : ℤ)})]
 
 theorem charP_quot : CharP (𝓞 (Cond.Cyc N) ⧸ Q) l := by
   constructor
   intro x
   have hu : Q.under ℤ = span {(l : ℤ)} := (Ideal.LiesOver.over (P := Q) (p := span {(l : ℤ)})).symm
   rw [← map_natCast (Ideal.Quotient.mk Q), Ideal.Quotient.eq_zero_iff_mem,
-    show ((x : ℕ) : 𝓞 (Cond.Cyc N)) = algebraMap ℤ (𝓞 (Cond.Cyc N)) (x : ℤ) by simp, ← Ideal.mem_comap]
+    show ((x : ℕ) : 𝓞 (Cond.Cyc N)) = algebraMap ℤ (𝓞 (Cond.Cyc N)) (x : ℤ) by simp,
+    ← Ideal.mem_comap]
   change (x : ℤ) ∈ Q.under ℤ ↔ _
   rw [hu, Ideal.mem_span_singleton, Int.natCast_dvd_natCast]
 
@@ -126,21 +143,22 @@ theorem zO_sub_mem_iff (a b : ℕ) : zO N ^ a - zO N ^ b ∈ Q ↔ a ≡ b [MOD 
           exact hmem
         rw [CharP.cast_eq_zero_iff _ l] at h2
         exact Nat.not_dvd_ordCompl hl hN0 h2
-      · have ex : ordProj[l] N * (a * ordCompl[l] N) = N * a := by
-          rw [mul_left_comm, hnN, mul_comm]
+      · have ex : ordProj[l] N * (a * ordCompl[l] N) = N * a := by rw [mul_left_comm, hnN, mul_comm]
         rw [← pow_mul, ← pow_mul, ex, pow_mul, hζ.pow_eq_one, one_pow]
-      · have ex : ordProj[l] N * (b * ordCompl[l] N) = N * b := by
-          rw [mul_left_comm, hnN, mul_comm]
+      · have ex : ordProj[l] N * (b * ordCompl[l] N) = N * b := by rw [mul_left_comm, hnN, mul_comm]
         rw [← pow_mul, ← pow_mul, ex, pow_mul, hζ.pow_eq_one, one_pow]
       · rw [← Ideal.Quotient.eq]
         have e1 : (zO N ^ (ordProj[l] N)) ^ a = (zO N ^ a) ^ (ordProj[l] N) := by
           rw [← pow_mul, ← pow_mul, mul_comm]
         have e2 : (zO N ^ (ordProj[l] N)) ^ b = (zO N ^ b) ^ (ordProj[l] N) := by
           rw [← pow_mul, ← pow_mul, mul_comm]
-        rw [e1, e2, map_pow (Ideal.Quotient.mk Q) (zO N ^ a), map_pow (Ideal.Quotient.mk Q) (zO N ^ b), h]
+        rw [e1, e2, map_pow (Ideal.Quotient.mk Q) (zO N ^ a),
+          map_pow (Ideal.Quotient.mk Q) (zO N ^ b), h]
     have hprim : IsPrimitiveRoot (zO N ^ (ordProj[l] N)) (ordCompl[l] N) :=
       hζ.pow_of_dvd (pow_ne_zero _ hl.ne_zero) (Nat.ordProj_dvd N l)
-    have e : ∀ c, (zO N ^ (ordProj[l] N)) ^ c = (zO N ^ (ordProj[l] N)) ^ (c % ordCompl[l] N) := fun c => by
+    have e
+        : ∀ c,
+          (zO N ^ (ordProj[l] N)) ^ c = (zO N ^ (ordProj[l] N)) ^ (c % ordCompl[l] N) := fun c => by
       conv_lhs => rw [← Nat.mod_add_div c (ordCompl[l] N), pow_add, pow_mul, hprim.pow_eq_one, one_pow, mul_one]
     rw [e a, e b] at h1
     exact hprim.pow_inj (Nat.mod_lt _ hN'0) (Nat.mod_lt _ hN'0) h1
@@ -153,8 +171,8 @@ theorem zO_sub_mem_iff (a b : ℕ) : zO N ^ a - zO N ^ b ∈ Q ↔ a ≡ b [MOD 
       have hbc : b = a + ordCompl[l] N * c := by omega
       rw [hbc, pow_add, map_mul, key1, mul_one]
 
-theorem tauN_inertia_iff (u : (ZMod N)ˣ) :
-    (∀ y : 𝓞 (Cond.Cyc N), tauN N u • y - y ∈ Q) ↔ (u : ZMod N).val ≡ 1 [MOD ordCompl[l] N] := by
+theorem tauN_inertia_iff (u : (ZMod N)ˣ)
+    : (∀ y : 𝓞 (Cond.Cyc N), tauN N u • y - y ∈ Q) ↔ (u : ZMod N).val ≡ 1 [MOD ordCompl[l] N] := by
   constructor
   · intro h
     have h1 : zO N ^ (u : ZMod N).val - zO N ^ 1 ∈ Q := by
@@ -162,8 +180,9 @@ theorem tauN_inertia_iff (u : (ZMod N)ˣ) :
       exact h _
     exact (zO_sub_mem_iff N l Q _ 1).1 h1
   · intro hu y
-    have hfg := ringHom_ext_zO N ((Ideal.Quotient.mk Q).comp (MulSemiringAction.toRingHom _ _ (tauN N u)))
-      (Ideal.Quotient.mk Q) ?_ y
+    have hfg :=
+      ringHom_ext_zO N ((Ideal.Quotient.mk Q).comp (MulSemiringAction.toRingHom _ _ (tauN N u)))
+        (Ideal.Quotient.mk Q) ?_ y
     · simp only [RingHom.comp_apply, MulSemiringAction.toRingHom_apply] at hfg
       exact Ideal.Quotient.eq.1 hfg
     · simp only [RingHom.comp_apply, MulSemiringAction.toRingHom_apply]
@@ -172,7 +191,8 @@ theorem tauN_inertia_iff (u : (ZMod N)ˣ) :
       rw [pow_one] at h1
       exact Ideal.Quotient.eq.2 h1
 
-theorem tauN_frob (u : (ZMod N)ˣ) (hu : (u : ZMod N).val ≡ l [MOD ordCompl[l] N]) : IsArithFrobAt ℤ (tauN N u) Q := by
+theorem tauN_frob (u : (ZMod N)ˣ) (hu : (u : ZMod N).val ≡ l [MOD ordCompl[l] N])
+    : IsArithFrobAt ℤ (tauN N u) Q := by
   haveI := charP_quot N l Q
   have hcard : Nat.card (ℤ ⧸ Q.under ℤ) = l := by
     rw [← Ideal.LiesOver.over (P := Q) (p := span {(l : ℤ)}),
@@ -181,9 +201,11 @@ theorem tauN_frob (u : (ZMod N)ˣ) (hu : (u : ZMod N).val ≡ l [MOD ordCompl[l]
   intro y
   rw [hcard]
   simp only [MulSemiringAction.toAlgHom_apply]
-  have hfg := ringHom_ext_zO N ((Ideal.Quotient.mk Q).comp (MulSemiringAction.toRingHom _ _ (tauN N u)))
-    ((frobenius (𝓞 (Cond.Cyc N) ⧸ Q) l).comp (Ideal.Quotient.mk Q)) ?_ y
-  · simp only [RingHom.comp_apply, MulSemiringAction.toRingHom_apply, frobenius_def, ← map_pow] at hfg
+  have hfg :=
+    ringHom_ext_zO N ((Ideal.Quotient.mk Q).comp (MulSemiringAction.toRingHom _ _ (tauN N u)))
+      ((frobenius (𝓞 (Cond.Cyc N) ⧸ Q) l).comp (Ideal.Quotient.mk Q)) ?_ y
+  · simp only [RingHom.comp_apply, MulSemiringAction.toRingHom_apply, frobenius_def, ← map_pow]
+      at hfg
     exact Ideal.Quotient.eq.1 hfg
   · simp only [RingHom.comp_apply, MulSemiringAction.toRingHom_apply, frobenius_def, ← map_pow]
     rw [tauN_zO]
@@ -193,9 +215,12 @@ end Cyc
 
 variable {φ : Frame} (H : HostRaw φ)
 
-theorem inertia : ∀ (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
-    (σ : H.E ≃ₐ[ℚ] H.E), (∀ x : 𝓞 H.E, σ • x - x ∈ P) ↔
-      ∃ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ 1 [MOD ordCompl[l] H.condN] ∧ H.gal σ = H.art u := by
+theorem inertia
+    : ∀ (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+        (σ : H.E ≃ₐ[ℚ] H.E),
+      (∀ x : 𝓞 H.E, σ • x - x ∈ P)
+        ↔ ∃ u : (ZMod H.condN)ˣ,
+          (u : ZMod H.condN).val ≡ 1 [MOD ordCompl[l] H.condN] ∧ H.gal σ = H.art u := by
   intro l _ P _ _ σ
   have := cyc_isGalois H.condN
   obtain ⟨Q, _, _, h1, -⟩ := exists_over (emb H) l P
@@ -234,20 +259,26 @@ private lemma lift_lemma' (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsP
   congr 1
   exact RingHom.ext_int _ _
 
-theorem frob_of_modEq (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
-    (σ : H.E ≃ₐ[ℚ] H.E) (u : (ZMod H.condN)ˣ) (hu : (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN])
-    (h : H.gal σ = H.art u) : IsArithFrobAt ℤ σ P := by
+theorem frob_of_modEq
+    (l : ℕ) [Fact l.Prime]
+    (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+    (σ : H.E ≃ₐ[ℚ] H.E) (u : (ZMod H.condN)ˣ)
+    (hu : (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN]) (h : H.gal σ = H.art u)
+    : IsArithFrobAt ℤ σ P := by
   obtain ⟨Q, hQp, hQl, hQ⟩ := lift_lemma' H l P
   haveI := hQp
   haveI := hQl
   have hτ := tauN_frob H.condN l Q u hu
-  have hact : ∀ x : 𝓞 H.E, RingOfIntegers.mapRingHom (emb H).toRingHom (σ • x) =
-      tauN H.condN u • RingOfIntegers.mapRingHom (emb H).toRingHom x := by
+  have hact
+      : ∀ x : 𝓞 H.E,
+        RingOfIntegers.mapRingHom (emb H).toRingHom (σ • x)
+          = tauN H.condN u • RingOfIntegers.mapRingHom (emb H).toRingHom x := by
     intro x
     apply RingOfIntegers.ext
     exact (gal_eq_art_iff H σ u).1 h x
   have hcard : Nat.card (ℤ ⧸ P.under ℤ) = Nat.card (ℤ ⧸ Q.under ℤ) := by
-    rw [← Ideal.LiesOver.over (P := P) (p := span {(l : ℤ)}), ← Ideal.LiesOver.over (P := Q) (p := span {(l : ℤ)})]
+    rw [← Ideal.LiesOver.over (P := P) (p := span {(l : ℤ)}),
+      ← Ideal.LiesOver.over (P := Q) (p := span {(l : ℤ)})]
   unfold IsArithFrobAt at hτ ⊢
   intro x
   rw [hcard, ← hQ, Ideal.mem_comap]
@@ -255,17 +286,22 @@ theorem frob_of_modEq (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime
   rw [map_sub, map_pow, hact]
   exact hτ _
 
-theorem exists_frob (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})] :
-    ∃ (F : H.E ≃ₐ[ℚ] H.E) (w : (ZMod H.condN)ˣ), IsArithFrobAt ℤ F P ∧
-      (w : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN] ∧ H.gal F = H.art w := by
+theorem exists_frob
+    (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+    : ∃ (F : H.E ≃ₐ[ℚ] H.E) (w : (ZMod H.condN)ˣ),
+      IsArithFrobAt ℤ F P ∧ (w : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN]
+        ∧ H.gal F = H.art w := by
   have hl : l.Prime := Fact.out
   have hcop : l.Coprime (ordCompl[l] H.condN) := Nat.coprime_ordCompl hl (NeZero.ne _)
   obtain ⟨w, hw⟩ := exists_unit_modEq (Nat.ordCompl_dvd H.condN l) l hcop
   exact ⟨H.gal.symm (H.art w), w, frob_of_modEq H l P _ w hw (by simp), hw, by simp⟩
 
-theorem frob_any : ∀ (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
-    (σ : H.E ≃ₐ[ℚ] H.E), IsArithFrobAt ℤ σ P ↔
-      ∃ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN] ∧ H.gal σ = H.art u := by
+theorem frob_any
+    : ∀ (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+        (σ : H.E ≃ₐ[ℚ] H.E),
+      IsArithFrobAt ℤ σ P
+        ↔ ∃ u : (ZMod H.condN)ˣ,
+          (u : ZMod H.condN).val ≡ l [MOD ordCompl[l] H.condN] ∧ H.gal σ = H.art u := by
   intro l _ P _ _ σ
   refine ⟨fun hσ => ?_, fun ⟨u, h1, h2⟩ => frob_of_modEq H l P σ u h1 h2⟩
   obtain ⟨F, w, hF, hw, hFw⟩ := exists_frob H l P
@@ -277,9 +313,12 @@ theorem frob_any : ∀ (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrim
   rw [val_modEq_iff hM] at hw ⊢
   rw [map_mul, hu, one_mul, hw]
 
-theorem decomp : ∀ (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
-    (σ : H.E ≃ₐ[ℚ] H.E), σ ∈ MulAction.stabilizer _ P ↔
-      ∃ (u : (ZMod H.condN)ˣ) (k : ℕ), (u : ZMod H.condN).val ≡ l ^ k [MOD ordCompl[l] H.condN] ∧ H.gal σ = H.art u := by
+theorem decomp
+    : ∀ (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+        (σ : H.E ≃ₐ[ℚ] H.E),
+      σ ∈ MulAction.stabilizer _ P
+        ↔ ∃ (u : (ZMod H.condN)ˣ) (k : ℕ),
+          (u : ZMod H.condN).val ≡ l ^ k [MOD ordCompl[l] H.condN] ∧ H.gal σ = H.art u := by
   intro l _ P _ _ σ
   obtain ⟨F, w, hF, hw, hFw⟩ := exists_frob H l P
   have hM := Nat.ordCompl_dvd H.condN l
@@ -294,13 +333,15 @@ theorem decomp : ∀ (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime]
   · rintro ⟨u, k, hu, h1⟩
     have h2 : ∀ x : 𝓞 H.E, (σ * (F ^ k)⁻¹) • x - x ∈ P := by
       rw [inertia H l P]
-      refine ⟨u * (w ^ k)⁻¹, ?_, by rw [map_mul, map_mul, map_inv, map_inv, map_pow, map_pow, h1, hFw]⟩
+      refine
+        ⟨u * (w ^ k)⁻¹, ?_, by rw [map_mul, map_mul, map_inv, map_inv, map_pow, map_pow, h1, hFw]⟩
       rw [val_modEq_iff hM] at hu
       have h3 : ZMod.unitsMap hM u = ZMod.unitsMap hM (w ^ k) :=
         Units.ext (by rw [hu, map_pow, Units.val_pow_eq_pow_val, hw, Nat.cast_pow])
       rw [val_modEq_one_iff hM, map_mul, map_inv, h3, mul_inv_cancel]
-    have h4 := Subgroup.mul_mem _ (Decomp.mem_stab_of _ P (smul_mem_of_inertia _ P h2))
-      (Subgroup.pow_mem _ hF.mem_stabilizer k)
+    have h4 :=
+      Subgroup.mul_mem _ (Decomp.mem_stab_of _ P (smul_mem_of_inertia _ P h2))
+        (Subgroup.pow_mem _ hF.mem_stabilizer k)
     rwa [inv_mul_cancel_right] at h4
 
 end Formalism.HC.Der

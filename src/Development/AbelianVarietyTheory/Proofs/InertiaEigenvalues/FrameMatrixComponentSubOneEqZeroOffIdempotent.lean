@@ -15,9 +15,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelCharact
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
@@ -26,7 +29,18 @@ open Classical
 
 namespace GlobalTheory.FrameOff
 
-theorem cpt_frame_sub_one_eq_zero_of_suppF : ∀ (D : D7) (W : HSp D) (β : GL (Fin W.rank) (Formalism.IndefR.Lev.EAf D)) (f : AE D) (k : GA D W) (PP : Pl D.host.E), SuppF W f k → GlobalTheory.StdFrames.cpt PP (toEAf D f) = 0 → ∀ a b, GlobalTheory.StdFrames.cpt PP (((HMul.hMul (HMul.hMul ((β)⁻¹).val ((Formalism.L2.Theta.mt W k).map (toEAf D))) (β).val : Matrix (Fin (W).rank) (Fin (W).rank) (Formalism.IndefR.Datum.EAf D)) - 1) a b) = 0 := by
+theorem cpt_frame_sub_one_eq_zero_of_suppF
+    : ∀ (D : D7) (W : HSp D) (β : GL (Fin W.rank) (Formalism.IndefR.Lev.EAf D)) (f : AE D)
+        (k : GA D W) (PP : Pl D.host.E),
+      SuppF W f k → GlobalTheory.StdFrames.cpt PP (toEAf D f) = 0
+        → ∀ a b,
+          GlobalTheory.StdFrames.cpt PP
+              (((HMul.hMul (HMul.hMul ((β)⁻¹).val ((Formalism.L2.Theta.mt W k).map (toEAf D)))
+                      (β).val
+                    : Matrix (Fin (W).rank) (Fin (W).rank) (Formalism.IndefR.Datum.EAf D))
+                  - 1)
+                a b)
+            = 0 := by
   intro D W β f k PP hS hf a b
   set M := Formalism.L2.Theta.mt W k with hMdef
   have hmap : M.map (toEAf D) - 1 = (M - 1).map (toEAf D) := by
@@ -36,12 +50,15 @@ theorem cpt_frame_sub_one_eq_zero_of_suppF : ∀ (D : D7) (W : HSp D) (β : GL (
     refine Matrix.ext fun i j => ?_
     change GlobalTheory.StdFrames.cpt PP (toEAf D ((M - 1) i j)) = 0
     rw [← hS i j, RingHom.map_mul, RingHom.map_mul, hf, zero_mul]
-  have hk : (HMul.hMul (HMul.hMul ((β)⁻¹).val (M.map (toEAf D))) (β).val :
-        Matrix (Fin (W).rank) (Fin (W).rank) (Formalism.IndefR.Datum.EAf D)) - 1
-      = ((β)⁻¹).val * (M.map (toEAf D) - 1) * (β).val := by
+  have hk
+      : (HMul.hMul (HMul.hMul ((β)⁻¹).val (M.map (toEAf D))) (β).val
+            : Matrix (Fin (W).rank) (Fin (W).rank) (Formalism.IndefR.Datum.EAf D))
+          - 1
+        = ((β)⁻¹).val * (M.map (toEAf D) - 1) * (β).val := by
     rw [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Units.inv_mul]
   rw [hk]
-  change ((((β)⁻¹).val * (M.map (toEAf D) - 1) * (β).val).map (GlobalTheory.StdFrames.cpt PP)) a b = 0
+  change ((((β)⁻¹).val * (M.map (toEAf D) - 1) * (β).val).map (GlobalTheory.StdFrames.cpt PP)) a b
+    = 0
   rw [Matrix.map_mul, Matrix.map_mul, hmap, hM, Matrix.mul_zero, Matrix.zero_mul]
   rfl
 

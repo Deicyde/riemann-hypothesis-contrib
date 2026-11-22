@@ -4,15 +4,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.Z.Desc.V0
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.Z.Desc.V0
 
-theorem UpperTheory.unipotent_upper_map_surjective :
-    ∀ {S R : Type} [CommRing S] [CommRing R] (f : S →+* R), Function.Surjective f → ∀ (n : ℕ) (x : GL (Fin n) R), x ∈ unipB R (Fin n) →
-        ∃ y ∈ unipB S (Fin n), GeneralLinearGroup.map (n := Fin n) f y = x := by
+theorem UpperTheory.unipotent_upper_map_surjective
+    : ∀ {S R : Type} [CommRing S] [CommRing R] (f : S →+* R),
+      Function.Surjective f
+        → ∀ (n : ℕ) (x : GL (Fin n) R),
+          x ∈ unipB R (Fin n)
+            → ∃ y ∈ unipB S (Fin n), GeneralLinearGroup.map (n := Fin n) f y = x := by
   intro S R _ _ f hf n x hx
   obtain ⟨hlow, hdiag⟩ := (mem_unipB R).1 hx
   let A : Matrix (Fin n) (Fin n) S := fun i j =>
-    if i < j then Function.surjInv hf ((x : Matrix (Fin n) (Fin n) R) i j) else if i = j then 1 else 0
+    if i < j then
+      Function.surjInv hf ((x : Matrix (Fin n) (Fin n) R) i j)
+    else if i = j then
+      1
+    else
+      0
   have hA : A.BlockTriangular id := by
     intro i j hij
     have h1 : ¬ i < j := not_lt.2 (le_of_lt hij)
@@ -22,7 +31,8 @@ theorem UpperTheory.unipotent_upper_map_surjective :
     rw [Matrix.det_of_upperTriangular hA]
     exact Finset.prod_eq_one fun i _ => by simp [A]
   have hunit : IsUnit A.det := by simp [hdet, isUnit_one]
-  have hcoe : ((GeneralLinearGroup.mk'' A hunit : GL (Fin n) S) : Matrix (Fin n) (Fin n) S) = A := rfl
+  have hcoe : ((GeneralLinearGroup.mk'' A hunit : GL (Fin n) S) : Matrix (Fin n) (Fin n) S) = A :=
+    rfl
   refine ⟨GeneralLinearGroup.mk'' A hunit, (mem_unipB S).2 ⟨fun i j hji => ?_, fun i => ?_⟩, ?_⟩
   · rw [hcoe]
     exact hA hji
@@ -30,7 +40,12 @@ theorem UpperTheory.unipotent_upper_map_surjective :
     simp [A]
   · apply Units.ext
     ext i j
-    have hmap : ((GeneralLinearGroup.map (n := Fin n) f (GeneralLinearGroup.mk'' A hunit) : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j = f (A i j) := rfl
+    have hmap
+        : ((GeneralLinearGroup.map (n := Fin n) f (GeneralLinearGroup.mk'' A hunit) : GL (Fin n) R)
+              : Matrix (Fin n) (Fin n) R)
+            i j
+          = f (A i j) :=
+      rfl
     rw [hmap]
     rcases lt_trichotomy i j with h | h | h
     · simp only [A, if_pos h]

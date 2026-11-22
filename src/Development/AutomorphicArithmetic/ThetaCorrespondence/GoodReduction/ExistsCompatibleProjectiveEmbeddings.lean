@@ -16,18 +16,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsVeryAmpleB
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace UpperTheory.Lit.Nos.C3
 open GlobalTheory
 
-theorem appTop_cst {X Y : Scheme.{0}} {R R' : Type} [CommRing R] [CommRing R'] (β : Y ⟶ X)
-    (f : X ⟶ Sp R) (f' : Y ⟶ Sp R') (c : R →+* R') (h : β ≫ f = f' ≫ spMap c) (r : R) :
-    β.appTop (GlobalTheory.AbLaw.cst f ⊤ r) = GlobalTheory.AbLaw.cst f' ⊤ (c r) := by
+theorem appTop_cst
+    {X Y : Scheme.{0}} {R R' : Type} [CommRing R] [CommRing R']
+    (β : Y ⟶ X) (f : X ⟶ Sp R) (f' : Y ⟶ Sp R') (c : R →+* R') (h : β ≫ f = f' ≫ spMap c)
+    (r : R)
+    : β.appTop (GlobalTheory.AbLaw.cst f ⊤ r) = GlobalTheory.AbLaw.cst f' ⊤ (c r) := by
   simp only [GlobalTheory.AbLaw.cst, RingHom.comp_apply, GlobalTheory.AbLaw.rs_self]
-  have h1 := congrArg (fun φ : Y ⟶ Sp R => φ.appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).inv r)) h
+  have h1 :=
+    congrArg (fun φ : Y ⟶ Sp R => φ.appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).inv r)) h
   simp only [Scheme.Hom.comp_appTop, CommRingCat.hom_comp, RingHom.comp_apply] at h1
   rw [h1]
   congr 1
@@ -35,29 +39,37 @@ theorem appTop_cst {X Y : Scheme.{0}} {R R' : Type} [CommRing R] [CommRing R'] (
   simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_ofHom] at h2
   exact h2.symm
 
-theorem secPull_add {X Y : Scheme.{0}} {L : LB X} (s t : L.Sec) (φ : Y ⟶ X) :
-    Cartier.secPull (s + t) φ = Cartier.secPull s φ + Cartier.secPull t φ :=
-  GlobalTheory.LB.f_injective (funext fun i => by simp only [Cartier.secPull, GlobalTheory.LB.add_f, map_add (f := _)])
-
-theorem secPull_smul {X Y : Scheme.{0}} {L : LB X} (c : Γ(X, ⊤)) (s : L.Sec) (φ : Y ⟶ X) :
-    Cartier.secPull (c • s) φ = φ.appTop c • Cartier.secPull s φ :=
+theorem secPull_add {X Y : Scheme.{0}} {L : LB X} (s t : L.Sec) (φ : Y ⟶ X)
+    : Cartier.secPull (s + t) φ = Cartier.secPull s φ + Cartier.secPull t φ :=
   GlobalTheory.LB.f_injective (funext fun i => by
-    simp only [Cartier.secPull, GlobalTheory.LB.smul_f, map_mul, Cartier.app_resG, Cartier.resG_resG]
+    simp only [Cartier.secPull, GlobalTheory.LB.add_f, map_add (f := _)])
+
+theorem secPull_smul {X Y : Scheme.{0}} {L : LB X} (c : Γ(X, ⊤)) (s : L.Sec) (φ : Y ⟶ X)
+    : Cartier.secPull (c • s) φ = φ.appTop c • Cartier.secPull s φ :=
+  GlobalTheory.LB.f_injective (funext fun i => by
+    simp only [Cartier.secPull, GlobalTheory.LB.smul_f, map_mul, Cartier.app_resG,
+      Cartier.resG_resG]
     rfl)
 
-theorem secPull_sum_smul {X Y : Scheme.{0}} {L : LB X} {J : Type} (S : Finset J) (c : J → Γ(X, ⊤))
-    (s : J → L.Sec) (φ : Y ⟶ X) :
-    Cartier.secPull (∑ i ∈ S, c i • s i) φ = ∑ i ∈ S, φ.appTop (c i) • Cartier.secPull (s i) φ := by
+theorem secPull_sum_smul
+    {X Y : Scheme.{0}} {L : LB X} {J : Type}
+    (S : Finset J) (c : J → Γ(X, ⊤)) (s : J → L.Sec) (φ : Y ⟶ X)
+    : Cartier.secPull (∑ i ∈ S, c i • s i) φ
+      = ∑ i ∈ S, φ.appTop (c i) • Cartier.secPull (s i) φ := by
   classical
   induction S using Finset.induction_on with
   | empty =>
     simp only [Finset.sum_empty]
-    exact GlobalTheory.LB.f_injective (funext fun i => by simp [Cartier.secPull, GlobalTheory.LB.zero_f])
-  | insert a S ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, secPull_add, secPull_smul, ih]
+    exact GlobalTheory.LB.f_injective (funext fun i => by
+      simp [Cartier.secPull, GlobalTheory.LB.zero_f])
+  | insert a S ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, secPull_add, secPull_smul, ih]
 
-theorem secMaps_sum_smul {X : Scheme.{0}} {A B : LB X} (w : LB.Iso A B) {J : Type} (S : Finset J)
-    (c : J → Γ(X, ⊤)) (a : J → A.Sec) (b : J → B.Sec) (h : ∀ i, Cartier.SecMaps w (a i) (b i)) :
-    Cartier.SecMaps w (∑ i ∈ S, c i • a i) (∑ i ∈ S, c i • b i) := by
+theorem secMaps_sum_smul
+    {X : Scheme.{0}} {A B : LB X} (w : LB.Iso A B)
+    {J : Type} (S : Finset J) (c : J → Γ(X, ⊤)) (a : J → A.Sec) (b : J → B.Sec)
+    (h : ∀ i, Cartier.SecMaps w (a i) (b i))
+    : Cartier.SecMaps w (∑ i ∈ S, c i • a i) (∑ i ∈ S, c i • b i) := by
   classical
   induction S using Finset.induction_on with
   | empty =>
@@ -66,12 +78,14 @@ theorem secMaps_sum_smul {X : Scheme.{0}} {A B : LB X} (w : LB.Iso A B) {J : Typ
   | insert x S hx ih =>
     intro p
     rw [Finset.sum_insert hx, Finset.sum_insert hx]
-    simp only [GlobalTheory.LB.add_f, GlobalTheory.LB.smul_f, map_add (f := _), map_mul, ih p, h x p, Cartier.resG_resG]
+    simp only [GlobalTheory.LB.add_f, GlobalTheory.LB.smul_f, map_add (f := _), map_mul, ih p,
+      h x p, Cartier.resG_resG]
     ring
 
-theorem spMap_tower (R S T : Type) [CommRing R] [CommRing S] [CommRing T] [Algebra R S] [Algebra S T]
-    [Algebra R T] [IsScalarTower R S T] :
-    spMap (algebraMap S T) ≫ spMap (algebraMap R S) = spMap (algebraMap R T) := by
+theorem spMap_tower
+    (R S T : Type) [CommRing R] [CommRing S] [CommRing T] [Algebra R S] [Algebra S T] [Algebra R T]
+    [IsScalarTower R S T]
+    : spMap (algebraMap S T) ≫ spMap (algebraMap R S) = spMap (algebraMap R T) := by
   rw [← Spec.map_comp, IsScalarTower.algebraMap_eq R S T]
   rfl
 

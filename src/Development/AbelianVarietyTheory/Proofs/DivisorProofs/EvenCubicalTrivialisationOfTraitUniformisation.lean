@@ -14,18 +14,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvenOnTorusD
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem evenOn_of_unifTrait : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], Base R → ∀ (D : DegData R (maximalIdeal R))
-    (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G] (P : GlobalTheory.UU.CP G), IsSemiAbelian G → UnifTrait D G P.L.L →
-    ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X],
-    Nonempty (GlobalTheory.UU.TQ (thickObj R (maximalIdeal R) 0 G) X) → EvenOn P := by
+theorem evenOn_of_unifTrait
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      Base R
+        → ∀ (D : DegData R (maximalIdeal R)) (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
+            (P : GlobalTheory.UU.CP G),
+          IsSemiAbelian G → UnifTrait D G P.L.L
+            → ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X],
+              Nonempty (GlobalTheory.UU.TQ (thickObj R (maximalIdeal R) 0 G) X) → EvenOn P := by
   intro R _ _ _ _ D G _ _ P hG hU X _ _ _ hQ
   obtain ⟨W, _, _, _, φ, G', _, _, β, D', A', U', hW, -, hφ, hgp, hL, -⟩ := hU
   have hadm : AdmBase W (maximalIdeal W) := by
@@ -43,6 +49,7 @@ theorem evenOn_of_unifTrait : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalR
     rw [← Over.w U'.gen.hom]
     infer_instance
   have hL' : LBIso P'.L.L (P.L.L.pull β) := by rw [hP']; exact hL
-  exact GlobalTheory.T.evenOnTorus_descends_along_localHom R W φ hφ G hG G' β hgp hpr P P' hL' hE X hQ
+  exact GlobalTheory.T.evenOnTorus_descends_along_localHom R W φ hφ G hG G' β hgp hpr P P' hL' hE X
+    hQ
 
 end GlobalTheory.Mum

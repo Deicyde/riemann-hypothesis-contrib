@@ -15,15 +15,16 @@ open Formalism.UG
 
 section CsSpan
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {n : Type} [Fintype n] [DecidableEq n]
 
 local notation "𝒜" => E ⊗[F] FiniteAdeleRing (𝓞 F) F
 local notation "𝒮" => tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)
 local notation "ι" => inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)
 
-theorem csSpan_approx (hA : Formalism.UG.CS.IntAdApprox) (D : 𝓞 F) (hD : D ≠ 0) {s : 𝒜} (hs : s ∈ 𝒮) :
-    ∃ x : E, IsIntegral ℤ x ∧ ∃ w ∈ 𝒮, s = ι x + levelafC E D * w := by
+theorem csSpan_approx (hA : Formalism.UG.CS.IntAdApprox) (D : 𝓞 F) (hD : D ≠ 0) {s : 𝒜} (hs : s ∈ 𝒮)
+    : ∃ x : E, IsIntegral ℤ x ∧ ∃ w ∈ 𝒮, s = ι x + levelafC E D * w := by
   refine Subring.closure_induction
     (p := fun s _ => ∃ x : E, IsIntegral ℤ x ∧ ∃ w ∈ 𝒮, s = ι x + levelafC E D * w)
     ?_ ?_ ?_ ?_ ?_ ?_ hs
@@ -47,30 +48,35 @@ theorem csSpan_approx (hA : Formalism.UG.CS.IntAdApprox) (D : 𝓞 F) (hD : D �
     exact ⟨-x, hx.neg, -w, neg_mem hw, by rw [map_neg]; ring⟩
   · rintro a b _ _ ⟨x, hx, w, hw, rfl⟩ ⟨y, hy, w', hw', rfl⟩
     refine ⟨x * y, hx.mul hy, w * ι y + ι x * w' + levelafC E D * w * w', ?_, ?_⟩
-    · exact add_mem (add_mem (mul_mem hw (adelstabL_incl_int _ hy))
-        (mul_mem (adelstabL_incl_int _ hx) hw')) (mul_mem (mul_mem (levelafC_mem D) hw) hw')
+    · exact add_mem
+        (add_mem (mul_mem hw (adelstabL_incl_int _ hy)) (mul_mem (adelstabL_incl_int _ hx) hw'))
+        (mul_mem (mul_mem (levelafC_mem D) hw) hw')
     · rw [map_mul]; ring
 
-theorem csSpan_fwd (Λ : Submodule (𝓞 E) (n → E)) (g : GL n 𝒜) (u : n → 𝒜)
-    (hu : u ∈ Submodule.span 𝒮 ((fun x : n → E => fun i => ι (x i)) ''
-      (Formalism.UG.CS.globLat g Λ : Set (n → E)))) :
-    ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ u ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ := by
+theorem csSpan_fwd
+    (Λ : Submodule (𝓞 E) (n → E)) (g : GL n 𝒜) (u : n → 𝒜)
+    (hu : u ∈ Submodule.span 𝒮
+      ((fun x : n → E => fun i => ι (x i)) '' (Formalism.UG.CS.globLat g Λ : Set (n → E))))
+    : ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ u ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ := by
   let Φ : (n → 𝒜) →ₗ[𝒮] (n → 𝒜) :=
     (Matrix.mulVecLin ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜)).restrictScalars 𝒮
-  have hle : Submodule.span 𝒮 ((fun x : n → E => fun i => ι (x i)) ''
-      (Formalism.UG.CS.globLat g Λ : Set (n → E))) ≤
-      (latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ).comap Φ := by
+  have hle
+      : Submodule.span 𝒮
+          ((fun x : n → E => fun i => ι (x i)) '' (Formalism.UG.CS.globLat g Λ : Set (n → E)))
+        ≤ (latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ).comap Φ := by
     rw [Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
     exact hx
   exact hle hu
 
-theorem csSpan_back (hA : Formalism.UG.CS.IntAdApprox) (Λ : Submodule (𝓞 E) (n → E))
+theorem csSpan_back
+    (hA : Formalism.UG.CS.IntAdApprox)
+    (Λ : Submodule (𝓞 E) (n → E))
     (hfin : Module.Finite (𝓞 E) Λ) (hspan : Submodule.span E (Λ : Set (n → E)) = ⊤)
     (g : GL n 𝒜) (u : n → 𝒜)
-    (hu : ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ u ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ) :
-    u ∈ Submodule.span 𝒮 ((fun x : n → E => fun i => ι (x i)) ''
-      (Formalism.UG.CS.globLat g Λ : Set (n → E))) := by
+    (hu : ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ u ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ)
+    : u ∈ Submodule.span 𝒮
+      ((fun x : n → E => fun i => ι (x i)) '' (Formalism.UG.CS.globLat g Λ : Set (n → E))) := by
   obtain ⟨c₁, hc₁, h₁⟩ := adelstabL_lower (F := F) Λ hspan
   obtain ⟨c₂, hc₂, h₂⟩ := adelstabL_upper (F := F) Λ hfin
   obtain ⟨d, hd, c, hc, hg, hg'⟩ := levelaf_exists_denom (F := F) (E := E) g
@@ -84,28 +90,30 @@ theorem csSpan_back (hA : Formalism.UG.CS.IntAdApprox) (Λ : Submodule (𝓞 E) 
       rw [hw, mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, one_mulVec]
     rw [hu', mulVec, dotProduct, Finset.mul_sum]
     refine sum_mem fun j _ => ?_
-    have : levelafC E (d * c₂) * ((g : Matrix n n 𝒜) i j * w j) =
-        (levelafC E d * (g : Matrix n n 𝒜) i j) * (levelafC E c₂ * w j) := by
+    have : levelafC E (d * c₂) * ((g : Matrix n n 𝒜) i j * w j)
+        = (levelafC E d * (g : Matrix n n 𝒜) i j) * (levelafC E c₂ * w j) := by
       rw [levelafC_mul]; ring
     rw [this]
     exact mul_mem (eg i j) (h₂ w hu j)
 
-  have hM : ∀ v : n → 𝒜, (∀ i, v i ∈ 𝒮) →
-      ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => levelafC E (c₁ * d) * v i) ∈
-        latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ := by
+  have hM
+      : ∀ v : n → 𝒜,
+        (∀ i, v i ∈ 𝒮)
+          → ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => levelafC E (c₁ * d) * v i)
+            ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ := by
     intro v hv
-    have : ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => levelafC E (c₁ * d) * v i) =
-        fun i => levelafC E c₁ *
-          ∑ j, (levelafC E d * ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) i j) * v j := by
+    have : ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => levelafC E (c₁ * d) * v i)
+        = fun i =>
+          levelafC E c₁ * ∑ j, (levelafC E d * ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) i j) * v j := by
       ext i
       rw [mulVec, dotProduct, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
-      rw [levelafC_mul]; ring
+      rw [levelafC_mul]
+      ring
     rw [this]
     exact h₁ _ fun i => sum_mem fun j _ => mul_mem (eg' i j) (hv j)
 
-  have hD : d * c₂ * (c₁ * d) ≠ 0 :=
-    mul_ne_zero (mul_ne_zero hd hc₂) (mul_ne_zero hc₁ hd)
+  have hD : d * c₂ * (c₁ * d) ≠ 0 := mul_ne_zero (mul_ne_zero hd hc₂) (mul_ne_zero hc₁ hd)
   choose x' hx' w hw hxw using fun i => csSpan_approx hA _ hD (hint i)
   set α := algebraMap (𝓞 F) E (d * c₂) with hα
   have hα0 : α ≠ 0 := adelstab_algebraMap_ne_zero _ (mul_ne_zero hd hc₂)
@@ -128,8 +136,8 @@ theorem csSpan_back (hA : Formalism.UG.CS.IntAdApprox) (Λ : Submodule (𝓞 E) 
     intro k
     show ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => ι ((Pi.single k β : n → E) i)) ∈
       latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ
-    have : (fun i => ι ((Pi.single k β : n → E) i)) =
-        fun i => levelafC E (c₁ * d) * (Pi.single k (1 : 𝒜) : n → 𝒜) i := by
+    have : (fun i => ι ((Pi.single k β : n → E) i))
+        = fun i => levelafC E (c₁ * d) * (Pi.single k (1 : 𝒜) : n → 𝒜) i := by
       ext i
       by_cases h : i = k
       · subst h; simp [hβ, adelstab_incl_C, levelafC_mul]
@@ -139,8 +147,10 @@ theorem csSpan_back (hA : Formalism.UG.CS.IntAdApprox) (Λ : Submodule (𝓞 E) 
     by_cases h : i = k
     · subst h; simp only [Pi.single_eq_same]; exact one_mem _
     · rw [Pi.single_apply, ite_eq_right h]; exact zero_mem _
-  have hdec : u = (fun i => ι (x i)) +
-      ∑ k, (⟨w k, hw k⟩ : 𝒮) • (fun i => ι ((Pi.single k β : n → E) i)) := by
+  have hdec
+      : u
+        = (fun i => ι (x i))
+          + ∑ k, (⟨w k, hw k⟩ : 𝒮) • (fun i => ι ((Pi.single k β : n → E) i)) := by
     ext i
     rw [Pi.add_apply, Finset.sum_apply, Finset.sum_eq_single i, hux i]
     · show _ = _ + (_ : 𝒮) • ι ((Pi.single i β : n → E) i)
@@ -155,7 +165,8 @@ theorem csSpan_back (hA : Formalism.UG.CS.IntAdApprox) (Λ : Submodule (𝓞 E) 
 
 end CsSpan
 
-theorem span_recovery_of_integral_adelic_approx (hIntAdApprox : Formalism.UG.CS.IntAdApprox) : Formalism.UG.CS.SpanRecover := by
+theorem span_recovery_of_integral_adelic_approx (hIntAdApprox : Formalism.UG.CS.IntAdApprox)
+    : Formalism.UG.CS.SpanRecover := by
   intro F E _ _ _ _ _ n _ _ Λ hfin hspan g u
   exact ⟨csSpan_fwd Λ g u, csSpan_back hIntAdApprox Λ hfin hspan g u⟩
 

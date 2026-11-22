@@ -6,15 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsAlgCl
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation
 
 namespace GlobalTheory.ArtinSchreierWitt
 
 open Polynomial
 
-theorem frob_sub_mul_surjective (p : ℕ) [Fact p.Prime] (k : Type) [CommRing k] [CharP k p]
-    [PerfectRing k p] (h : ∀ c y : k, ∃ x : k, x ^ p - c * x = y) (c y : WittVector p k) :
-    ∃ β : WittVector p k, WittVector.frobenius β - c * β = y := by
+theorem frob_sub_mul_surjective
+    (p : ℕ) [Fact p.Prime]
+    (k : Type) [CommRing k] [CharP k p] [PerfectRing k p]
+    (h : ∀ c y : k, ∃ x : k, x ^ p - c * x = y) (c y : WittVector p k)
+    : ∃ β : WittVector p k, WittVector.frobenius β - c * β = y := by
   have hc : IsAdicComplete (Ideal.span {(p : ℤ)}) (WittVector p k) := by
     rw [← IsAdicComplete.map_algebraMap_iff (S := WittVector p k), Ideal.map_span,
       Set.image_singleton, map_natCast]
@@ -29,8 +32,9 @@ theorem frob_sub_mul_surjective (p : ℕ) [Fact p.Prime] (k : Type) [CommRing k]
     obtain ⟨x, hx⟩ := h (c.coeff 0) (g.coeff 0)
     refine ⟨WittVector.teichmuller p x, ?_⟩
     rw [LinearMap.comp_apply, Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq, hf]
-    have h0 : (WittVector.frobenius (WittVector.teichmuller p x)
-        - c * WittVector.teichmuller p x - g) ∈ Ideal.span {(p : WittVector p k)} := by
+    have h0
+        : (WittVector.frobenius (WittVector.teichmuller p x) - c * WittVector.teichmuller p x - g)
+          ∈ Ideal.span {(p : WittVector p k)} := by
       rw [← WittVector.ker_constantCoeff, RingHom.mem_ker, map_sub, map_sub, map_mul]
       simp only [WittVector.constantCoeff_apply, WittVector.coeff_frobenius_charP,
         WittVector.teichmuller_coeff_zero]
@@ -43,24 +47,28 @@ theorem frob_sub_mul_surjective (p : ℕ) [Fact p.Prime] (k : Type) [CommRing k]
   obtain ⟨β, hβ⟩ := hs y
   exact ⟨β, (hf β).symm.trans hβ⟩
 
-theorem monic_as (p : ℕ) [hp : Fact p.Prime] {k : Type} [CommRing k] [Nontrivial k] (c y : k) :
-    (X ^ p - (C c * X + C y) : k[X]).Monic ∧ (X ^ p - (C c * X + C y) : k[X]).degree = p := by
+theorem monic_as (p : ℕ) [hp : Fact p.Prime] {k : Type} [CommRing k] [Nontrivial k] (c y : k)
+    : (X ^ p - (C c * X + C y) : k[X]).Monic ∧ (X ^ p - (C c * X + C y) : k[X]).degree = p := by
   have h1 : (C c * X + C y : k[X]).degree < (p : WithBot ℕ) :=
     lt_of_le_of_lt degree_linear_le (by exact_mod_cast hp.out.one_lt)
   refine ⟨monic_X_pow_sub h1, ?_⟩
   rw [degree_sub_eq_left_of_degree_lt (by rwa [degree_X_pow]), degree_X_pow]
 
-theorem exists_root_field (p : ℕ) [hp : Fact p.Prime] {K : Type} [Field K] [IsAlgClosed K]
-    (c y : K) : ∃ x : K, x ^ p - c * x = y := by
-  obtain ⟨x, hx⟩ := IsAlgClosed.exists_root (X ^ p - (C c * X + C y) : K[X]) (by
-    rw [(monic_as p c y).2]; exact_mod_cast hp.out.ne_zero)
+theorem exists_root_field (p : ℕ) [hp : Fact p.Prime] {K : Type} [Field K] [IsAlgClosed K] (c y : K)
+    : ∃ x : K, x ^ p - c * x = y := by
+  obtain ⟨x, hx⟩ :=
+    IsAlgClosed.exists_root (X ^ p - (C c * X + C y) : K[X])
+      (by rw [(monic_as p c y).2]; exact_mod_cast hp.out.ne_zero)
   refine ⟨x, ?_⟩
   simp only [IsRoot.def, eval_sub, eval_pow, eval_X, eval_add, eval_mul, eval_C] at hx
   linear_combination hx
 
-theorem exists_root_ring (p : ℕ) [hp : Fact p.Prime] {O K : Type} [CommRing O] [IsDomain O]
-    [ValuationRing O] [Field K] [Algebra O K] [IsFractionRing O K] [IsAlgClosed K]
-    (c y : O) : ∃ x : O, x ^ p - c * x = y := by
+theorem exists_root_ring
+    (p : ℕ) [hp : Fact p.Prime]
+    {O K : Type} [CommRing O] [IsDomain O] [ValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K] [IsAlgClosed K]
+    (c y : O)
+    : ∃ x : O, x ^ p - c * x = y := by
   obtain ⟨x, hx⟩ := exists_root_field p (algebraMap O K c) (algebraMap O K y)
   have hi : IsIntegral O x := by
     refine ⟨X ^ p - (C c * X + C y), (monic_as p c y).1, ?_⟩
@@ -70,8 +78,11 @@ theorem exists_root_ring (p : ℕ) [hp : Fact p.Prime] {O K : Type} [CommRing O]
   refine ⟨z, IsFractionRing.injective O K ?_⟩
   rw [map_sub, map_pow, map_mul, hx]
 
-theorem fixed_frob (p : ℕ) [Fact p.Prime] (K : Type) [Field K] [CharP K p] (b : WittVector p K)
-    (hb : WittVector.map (frobenius K p) b = b) : ∃ z : ℤ_[p], b = zlW p K z := by
+theorem fixed_frob
+    (p : ℕ) [Fact p.Prime]
+    (K : Type) [Field K] [CharP K p]
+    (b : WittVector p K) (hb : WittVector.map (frobenius K p) b = b)
+    : ∃ z : ℤ_[p], b = zlW p K z := by
   have h : ∀ n, ∃ a : ZMod p, ZMod.castHom (dvd_refl p) K a = b.coeff n := by
     intro n
     have h1 : (b.coeff n) ^ p = b.coeff n := by
@@ -85,7 +96,11 @@ theorem fixed_frob (p : ℕ) [Fact p.Prime] (K : Type) [Field K] [CharP K p] (b 
   ext n
   simp [zlW, WittVector.map_coeff, ← ha]
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime], (∀ y : WCb l, ∃ b, frobW l b - b = y) ∧ (∀ b : WCb l, frobW l b = b → ∃ z : ℤ_[l], b = algebraMap ℤ_[l] (WCb l) z) ∧ ∀ (c p : Ainf l), ∃ β : Ainf l, WittVector.frobenius β - c * β = p := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime],
+      (∀ y : WCb l, ∃ b, frobW l b - b = y)
+        ∧ (∀ b : WCb l, frobW l b = b → ∃ z : ℤ_[l], b = algebraMap ℤ_[l] (WCb l) z)
+        ∧ ∀ (c p : Ainf l), ∃ β : Ainf l, WittVector.frobenius β - c * β = p := by
   intro l _
   obtain ⟨hK, hV⟩ := GlobalTheory.T.isAlgClosed_tiltField_and_valuationRing l
   refine ⟨fun y => ?_, fun b hb => fixed_frob l (Cb l) b hb, fun c p => ?_⟩

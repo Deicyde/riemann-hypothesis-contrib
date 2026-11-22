@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -18,7 +20,8 @@ private lemma eq_one_of_mul'' {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] {
   have := mul_le_mul' (le_refl a) hb
   rwa [h, mul_one] at this
 
-private noncomputable def ef (x : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) : (A ℚ)ˣ := (IdeleGroup.prodEquiv ℚ).symm (1, x)
+private noncomputable def ef (x : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) : (A ℚ)ˣ :=
+  (IdeleGroup.prodEquiv ℚ).symm (1, x)
 
 private lemma ef_fst (x : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) : ((ef x : (A ℚ)ˣ) : A ℚ).1 = 1 := rfl
 
@@ -64,8 +67,7 @@ private lemma nhds_cong (L : ℕ) (hL : 0 < L) (v : H.P ℚ) :
   rw [h0, map_zero]
   exact zero_le'
 
-theorem UpperTheory.finiteIdele_congruenceVolume_pos :
-    ∀ L : ℕ, 0 < L → 0 < cT L := by
+theorem UpperTheory.finiteIdele_congruenceVolume_pos : ∀ L : ℕ, 0 < L → 0 < cT L := by
   intro L hL
   set S : Set (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ := (fun u => (IdeleGroup.prodEquiv ℚ).symm (1, u)) ⁻¹' TT L with hS
   have hcT : cT L = (finiteIdeleMeasure ℚ S).toReal := rfl
@@ -75,17 +77,23 @@ theorem UpperTheory.finiteIdele_congruenceVolume_pos :
     refine (mem_finiteIntegralUnits ℚ).2 fun v => ?_
     have hi := inv_mul_at x v
     rw [hu v, mul_one] at hi
-    exact ⟨(HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 ℚ) ℚ v).2 (hu v).le,
-      (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 ℚ) ℚ v).2 hi.le⟩
+    exact ⟨
+      (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 ℚ) ℚ v).2 (hu v).le,
+      (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 ℚ) ℚ v).2 hi.le
+    ⟩
   have hnhds : S ∈ 𝓝 (1 : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) := by
-    have h1 : (finiteIntegralUnits ℚ : Set (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) ∈ 𝓝 (1 : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) :=
+    have h1
+        : (finiteIntegralUnits ℚ : Set (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ)
+          ∈ 𝓝 (1 : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) :=
       (isOpen_finiteIntegralUnits ℚ).mem_nhds (one_mem _)
     have h2 := (Filter.biInter_mem (finite_bad L hL)).2 fun v (_ : Bad L v) => nhds_cong L hL v
     filter_upwards [h1, h2] with x hx hc
     obtain hxi := (mem_finiteIntegralUnits ℚ).1 hx
     have hle : ∀ v : H.P ℚ, Valued.v ((x : FiniteAdeleRing (𝓞 ℚ) ℚ) v) ≤ 1 := fun v =>
       (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 ℚ) ℚ v).1 (hxi v).1
-    have hle' : ∀ v : H.P ℚ, Valued.v (((x⁻¹ : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) : FiniteAdeleRing (𝓞 ℚ) ℚ) v) ≤ 1 :=
+    have hle'
+        : ∀ v : H.P ℚ,
+          Valued.v (((x⁻¹ : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) : FiniteAdeleRing (𝓞 ℚ) ℚ) v) ≤ 1 :=
       fun v => (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 ℚ) ℚ v).1 (hxi v).2
     refine ⟨⟨ef_fst x, fun v => ?_⟩, fun v => ?_⟩
     · exact eq_one_of_mul'' (hle v) (hle' v) (by rw [mul_comm]; exact inv_mul_at x v)

@@ -9,12 +9,15 @@ open scoped InnerProductSpace BigOperators
 
 namespace GlobalTheory
 
-
 open Matrix in
-theorem finsum_char_det_fix_hyperplane_eq_zero :
-    ∀ (k : Type) [Field k] [Finite k] (r : ℕ) (ξ : kˣ →* ℂˣ), ξ ≠ 1 → ∀ a : Fin r → k, a ≠ 0 →
-      ∑ᶠ g ∈ {g : GL (Fin r) k | ∀ v, a ⬝ᵥ v = 0 → (g : Matrix (Fin r) (Fin r) k).mulVec v = v},
-        ((ξ (Matrix.GeneralLinearGroup.det g) : ℂˣ) : ℂ) = 0 := by
+theorem finsum_char_det_fix_hyperplane_eq_zero
+    : ∀ (k : Type) [Field k] [Finite k] (r : ℕ) (ξ : kˣ →* ℂˣ),
+      ξ ≠ 1
+        → ∀ a : Fin r → k,
+          a ≠ 0
+            → ∑ᶠ g ∈ {g : GL (Fin r) k | ∀ v, a ⬝ᵥ v = 0 → (g : Matrix (Fin r) (Fin r) k).mulVec v = v},
+                ((ξ (Matrix.GeneralLinearGroup.det g) : ℂˣ) : ℂ)
+              = 0 := by
   intro k _ _ r ξ hξ a ha
   set S : Set (GL (Fin r) k) :=
     {g : GL (Fin r) k | ∀ v, a ⬝ᵥ v = 0 → (g : Matrix (Fin r) (Fin r) k).mulVec v = v} with hS
@@ -27,8 +30,7 @@ theorem finsum_char_det_fix_hyperplane_eq_zero :
     push_neg at h
     exact ha (funext h)
   set v₀ : Fin r → k := Pi.single i (a i)⁻¹ with hv₀
-  have hav₀ : a ⬝ᵥ v₀ = 1 := by
-    rw [hv₀, dotProduct_single, mul_inv_cancel₀ hi]
+  have hav₀ : a ⬝ᵥ v₀ = 1 := by rw [hv₀, dotProduct_single, mul_inv_cancel₀ hi]
   set u : Fin r → k := ((c : k) - 1) • v₀ with hu
   set M : Matrix (Fin r) (Fin r) k :=
     1 + replicateCol (Fin 1) u * replicateRow (Fin 1) a with hM
@@ -75,8 +77,7 @@ theorem finsum_char_det_fix_hyperplane_eq_zero :
   have hc' : ((ξ c : ℂˣ) : ℂ) ≠ 1 := by
     intro h
     exact hc (Units.ext h)
-  have : (((ξ c : ℂˣ) : ℂ) - 1) * ∑ᶠ g ∈ S, F g = 0 := by
-    rw [sub_mul, key, one_mul, sub_self]
+  have : (((ξ c : ℂˣ) : ℂ) - 1) * ∑ᶠ g ∈ S, F g = 0 := by rw [sub_mul, key, one_mul, sub_self]
   rcases mul_eq_zero.mp this with h | h
   · exact absurd (sub_eq_zero.mp h) hc'
   · exact h

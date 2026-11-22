@@ -12,9 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsPow
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -22,22 +25,32 @@ open GlobalTheory.UT ReciprocityTheory.ChartRestriction.G.DVR
 
 namespace GlobalTheory.Poinc.IntTerm
 
-theorem torsion_lies_under : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], IsCN V →
-    ∀ (D : DegData V (maximalIdeal V)) (A : PolAV (Sp (FractionRing V))) (G : Over (Sp V)) [GrpObj G]
-      [IsCommMonObj G], IsSemiAbelian G → ∀ (U : Unif (maximalIdeal V) D A G) (N : ℕ), 1 ≤ N →
-      ∀ β : TF (R := V) (AlgebraicClosure (FractionRing V)) ⟶ D.toPre.P.A, β ^ N = 1 →
-      ∃ xb : TFK (R := V) (AlgebraicClosure (FractionRing V)) ⟶ A.A, xb ^ N = 1 ∧
-        (∃ p : QkPt D.toPre (AlgebraicClosure (FractionRing V)) N, p.y = 0 ∧
-          QkToAkU U.toUnifPre (AlgebraicClosure (FractionRing V)) N p xb) ∧
-        ∀ p : QkPt D.toPre (AlgebraicClosure (FractionRing V)) N, p.y = 0 →
-          QkToAkU U.toUnifPre (AlgebraicClosure (FractionRing V)) N p xb → p.g.b = β := by
+theorem torsion_lies_under
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
+      IsCN V
+        → ∀ (D : DegData V (maximalIdeal V)) (A : PolAV (Sp (FractionRing V))) (G : Over (Sp V))
+            [GrpObj G] [IsCommMonObj G],
+          IsSemiAbelian G
+            → ∀ (U : Unif (maximalIdeal V) D A G) (N : ℕ),
+              1 ≤ N
+                → ∀ β : TF (R := V) (AlgebraicClosure (FractionRing V)) ⟶ D.toPre.P.A,
+                  β ^ N = 1
+                    → ∃ xb : TFK (R := V) (AlgebraicClosure (FractionRing V)) ⟶ A.A,
+                      xb ^ N = 1
+                        ∧ (∃ p : QkPt D.toPre (AlgebraicClosure (FractionRing V)) N,
+                          p.y = 0 ∧ QkToAkU U.toUnifPre (AlgebraicClosure (FractionRing V)) N p xb)
+                        ∧ ∀ p : QkPt D.toPre (AlgebraicClosure (FractionRing V)) N,
+                          p.y = 0 → QkToAkU U.toUnifPre (AlgebraicClosure (FractionRing V)) N p xb
+                            → p.g.b = β := by
   intro V _ _ _ hCN D A G _ _ hG U N hN β hβ
   haveI : CharZero V := hCN.2.2.2
   have hA := GlobalTheory.TorRef.admissibleBase_of_completeNormalLocalCharZero hCN
-  obtain ⟨f, hf⟩ := GlobalTheory.TorsionIso.torsion_eq GlobalTheory.firstFiveLaws V (maximalIdeal V) hA D A G hG U
-    (AlgebraicClosure (FractionRing V)) N hN
-  obtain ⟨p, hpy, hpb⟩ := GlobalTheory.TorusExt.exists_qkPt_of_torsion (F := AlgebraicClosure (FractionRing V))
-    D.tau_bimult (n := N) (by omega) hβ
+  obtain ⟨f, hf⟩ :=
+    GlobalTheory.TorsionIso.torsion_eq GlobalTheory.firstFiveLaws V (maximalIdeal V) hA D A G hG U
+      (AlgebraicClosure (FractionRing V)) N hN
+  obtain ⟨p, hpy, hpb⟩ :=
+    GlobalTheory.TorusExt.exists_qkPt_of_torsion (F := AlgebraicClosure (FractionRing V))
+      D.tau_bimult (n := N) (by omega) hβ
   refine ⟨f p, ?_, ⟨p, hpy, (hf.1 p (f p)).2 rfl⟩, fun p' hp'y hp' => ?_⟩
   · obtain ⟨w, hw⟩ := U.ext
     exact ((hf.1 p (f p)).2 rfl w hw).1
@@ -52,8 +65,7 @@ theorem torsion_lies_under : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRi
       · omega
       · exact h
     subst hz
-    have hw : w.b = 1 := by
-      exact hw₁.1.trans (cPoint_zero _)
+    have hw : w.b = 1 := by exact hw₁.1.trans (cPoint_zero _)
     rw [hg, GlobalTheory.TorusExt.add_b, hw, _root_.mul_one, hpb]
 
 end GlobalTheory.Poinc.IntTerm

@@ -16,10 +16,12 @@ section Group
 
 variable {G : Type*} [CommGroup G]
 
-theorem mul_inv_mem_of_iterate_eq {l m : ℕ} (P O : Subgroup G) (s : G →* G)
-    (hPl : ∀ y : G, y ^ l ∈ P) (hO : ∀ x : G, s x * x⁻¹ ∈ O)
-    (hOP : ∀ e ∈ O, s e * e⁻¹ ∈ P) (hm : m.Coprime l) (hsm : ∀ x : G, s^[m] x = x) (x : G) :
-    s x * x⁻¹ ∈ P := by
+theorem mul_inv_mem_of_iterate_eq
+    {l m : ℕ}
+    (P O : Subgroup G) (s : G →* G)
+    (hPl : ∀ y : G, y ^ l ∈ P) (hO : ∀ x : G, s x * x⁻¹ ∈ O) (hOP : ∀ e ∈ O, s e * e⁻¹ ∈ P)
+    (hm : m.Coprime l) (hsm : ∀ x : G, s^[m] x = x) (x : G)
+    : s x * x⁻¹ ∈ P := by
   have hPn : P.Normal := Subgroup.normal_of_isMulCommutative P
   have hq : ∀ a b : G, a * b⁻¹ ∈ P → (a : G ⧸ P) = b := fun a b h => by
     rw [QuotientGroup.eq]
@@ -42,8 +44,8 @@ theorem mul_inv_mem_of_iterate_eq {l m : ℕ} (P O : Subgroup G) (s : G →* G)
     induction j with
     | zero => simp
     | succ j ih =>
-      rw [Function.iterate_succ_apply, hsx, iterate_map_mul, QuotientGroup.mk_mul, ih,
-        hcj, pow_succ, mul_assoc]
+      rw [Function.iterate_succ_apply, hsx, iterate_map_mul, QuotientGroup.mk_mul, ih, hcj,
+        pow_succ, mul_assoc]
   have h1 : (c : G ⧸ P) ^ m = 1 := by
     have h := hxj m
     rw [hsm] at h
@@ -62,23 +64,25 @@ section LocalField
 
 variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-theorem exists_map_units_eq_mul_pow {l m : ℕ} (hl : (l : 𝓀[F]) ≠ 0) (σ : F ≃+* F)
-    (hval : ∀ x : F, valuation F (σ x) = valuation F x)
+theorem exists_map_units_eq_mul_pow
+    {l m : ℕ} (hl : (l : 𝓀[F]) ≠ 0)
+    (σ : F ≃+* F) (hval : ∀ x : F, valuation F (σ x) = valuation F x)
     (hin : ∀ x : F, valuation F x ≤ 1 → valuation F (σ x - x) < 1)
-    (hm : m.Coprime l) (hσm : ∀ x : F, σ^[m] x = x) (u : Fˣ) :
-    ∃ y : Fˣ, Units.map (σ : F →* F) u = u * y ^ l := by
+    (hm : m.Coprime l) (hσm : ∀ x : F, σ^[m] x = x) (u : Fˣ)
+    : ∃ y : Fˣ, Units.map (σ : F →* F) u = u * y ^ l := by
   set s : Fˣ →* Fˣ := Units.map (σ : F →* F) with hs_def
   have hs : ∀ x : Fˣ, ((s x : Fˣ) : F) = σ x := fun x => rfl
   let P : Subgroup Fˣ := (powMonoidHom l : Fˣ →* Fˣ).range
-  let O : Subgroup Fˣ :=
-    { carrier := {x | valuation F (x : F) = 1}
-      one_mem' := by simp
-      mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_ofPred_eq, Units.val_mul, map_mul] at ha hb ⊢
-        rw [ha, hb, mul_one]
-      inv_mem' := fun {a} ha => by
-        simp only [Set.mem_ofPred_eq, Units.val_inv_eq_inv_val, map_inv₀] at ha ⊢
-        rw [ha, inv_one] }
+  let O : Subgroup Fˣ := {
+    carrier := {x | valuation F (x : F) = 1}
+    one_mem' := by simp
+    mul_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_ofPred_eq, Units.val_mul, map_mul] at ha hb ⊢
+      rw [ha, hb, mul_one]
+    inv_mem' := fun {a} ha => by
+      simp only [Set.mem_ofPred_eq, Units.val_inv_eq_inv_val, map_inv₀] at ha ⊢
+      rw [ha, inv_one]
+  }
   have hmemO : ∀ x : Fˣ, x ∈ O ↔ valuation F (x : F) = 1 := fun x => Iff.rfl
   have hv0 : ∀ x : Fˣ, valuation F (x : F) ≠ 0 := fun x => (valuation F).ne_zero_iff.2 x.ne_zero
   have hO : ∀ x : Fˣ, s x * x⁻¹ ∈ O := fun x => by
@@ -90,8 +94,7 @@ theorem exists_map_units_eq_mul_pow {l m : ℕ} (hl : (l : 𝓀[F]) ≠ 0) (σ :
     have htv : valuation F (t : F) = 1 := (hmemO t).1 (hO e)
     have ht1 : valuation F ((t : F) - 1) < 1 := by
       have e1 : (t : F) - 1 = (σ e - e) * (e : F)⁻¹ := by
-        rw [ht, Units.val_mul, hs, Units.val_inv_eq_inv_val, sub_mul,
-          mul_inv_cancel₀ e.ne_zero]
+        rw [ht, Units.val_mul, hs, Units.val_inv_eq_inv_val, sub_mul, mul_inv_cancel₀ e.ne_zero]
       rw [e1, map_mul, map_inv₀, he, inv_one, mul_one]
       exact hin _ he.le
     have hnt : normalizedValuation F (t : F) = 1 := by

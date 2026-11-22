@@ -11,43 +11,52 @@ namespace GlobalTheory
 
 noncomputable section
 
-theorem countable_GL_numberField {E : Type} [Field E] [NumberField E] (r : ℕ) :
-    Countable (GL (Fin r) E) := by
+theorem countable_GL_numberField {E : Type} [Field E] [NumberField E] (r : ℕ)
+    : Countable (GL (Fin r) E) := by
   haveI : Countable E := (Module.finBasis ℚ E).equivFun.toEquiv.injective.countable
   haveI : Countable (Matrix (Fin r) (Fin r) E) := inferInstanceAs (Countable (Fin r → Fin r → E))
   exact Function.Injective.countable
-    (f := fun g : GL (Fin r) E => (g : Matrix (Fin r) (Fin r) E)) fun _ _ h => Units.ext h
+    (f := fun g : GL (Fin r) E => (g : Matrix (Fin r) (Fin r) E))
+    fun _ _ h => Units.ext h
 
-theorem continuous_mat_lact {E : Type} [Field E] {Ψ : Finset (E →+* ℂ)} {r : ℕ}
-    (g : GL (Fin r) E) (τ : Ψ) :
-    Continuous fun z : Frame Ψ r => mat (lact g z) τ := by
+theorem continuous_mat_lact
+    {E : Type} [Field E] {Ψ : Finset (E →+* ℂ)} {r : ℕ} (g : GL (Fin r) E) (τ : Ψ)
+    : Continuous fun z : Frame Ψ r => mat (lact g z) τ := by
   have h : Continuous fun z : Frame Ψ r => mat z τ := continuous_apply τ
   exact continuous_const.matrix_mul h
 
-theorem baire_one_candidate {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
-    (X : Data E r) (S : Set (GL (Fin r) E)) (a c : GL (Fin r) E) (W : Set (Frame X.Ψ r)) :
-    IsOpen W → W.Nonempty → W ⊆ X.dom →
-    (∀ z ∈ W, ∃ γ ∈ S, ∃ b ∈ Bor X.Ψ r, lact c z = rmul (lact γ (lact a z)) b) →
-    ∃ γ ∈ S, ∃ V : Set (Frame X.Ψ r), IsOpen V ∧ V.Nonempty ∧ V ⊆ X.dom ∧
-      ∀ x ∈ V, ∃ b ∈ Bor X.Ψ r, lact ((γ * a)⁻¹ * c) x = rmul x b := by
+theorem baire_one_candidate
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} (X : Data E r) (S : Set (GL (Fin r) E)) (a c : GL (Fin r) E) (W : Set (Frame X.Ψ r))
+    : IsOpen W → W.Nonempty → W ⊆ X.dom
+      → (∀ z ∈ W, ∃ γ ∈ S, ∃ b ∈ Bor X.Ψ r, lact c z = rmul (lact γ (lact a z)) b)
+      → ∃ γ ∈ S, ∃ V : Set (Frame X.Ψ r),
+        IsOpen V ∧ V.Nonempty ∧ V ⊆ X.dom
+          ∧ ∀ x ∈ V, ∃ b ∈ Bor X.Ψ r, lact ((γ * a)⁻¹ * c) x = rmul x b := by
   intro hW hne hWdom hmove
-  let C : GL (Fin r) E → Set (Frame X.Ψ r) := fun g => {z | ∀ τ : X.Ψ, ∀ p q : Fin r, q < p →
-    ((mat (lact (g * a) z) τ).adjugate * mat (lact c z) τ) p q = 0}
+  let C : GL (Fin r) E → Set (Frame X.Ψ r) := fun g =>
+    {z | ∀ τ : X.Ψ, ∀ p q : Fin r, q < p →
+      ((mat (lact (g * a) z) τ).adjugate * mat (lact c z) τ) p q = 0}
   have hC : ∀ g, IsClosed (C g) := by
     intro g
     simp only [C, Set.setOf_forall]
-    refine isClosed_iInter fun τ => isClosed_iInter fun p => isClosed_iInter fun q =>
-      isClosed_iInter fun _ => ?_
-    exact isClosed_eq ((((continuous_mat_lact (g * a) τ).matrix_adjugate).matrix_mul
-      (continuous_mat_lact c τ)).matrix_elem p q) continuous_const
+    refine isClosed_iInter fun τ =>
+      isClosed_iInter fun p => isClosed_iInter fun q => isClosed_iInter fun _ => ?_
+    exact isClosed_eq
+      ((((continuous_mat_lact (g * a) τ).matrix_adjugate).matrix_mul
+        (continuous_mat_lact c τ)).matrix_elem p q)
+      continuous_const
   have cover : ∀ z ∈ W, ∃ γ ∈ S, z ∈ C γ := by
     intro z hz
     obtain ⟨γ, hγ, b, hb, heq⟩ := hmove z hz
     refine ⟨γ, hγ, fun τ p q hqp => ?_⟩
     have key : mat (lact c z) τ = mat (lact (γ * a) z) τ * mat b τ := by
-      have h1 : mat (lact c z) τ =
-          ((γ : Matrix (Fin r) (Fin r) E).map τ.1 * ((a : Matrix (Fin r) (Fin r) E).map τ.1 *
-            mat z τ)) * mat b τ := congrFun heq τ
+      have h1
+          : mat (lact c z) τ
+            = ((γ : Matrix (Fin r) (Fin r) E).map τ.1
+                * ((a : Matrix (Fin r) (Fin r) E).map τ.1 * mat z τ))
+              * mat b τ :=
+        congrFun heq τ
       rw [h1]
       show _ = (((γ * a : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 * mat z τ) * mat b τ
       rw [Units.val_mul, Matrix.map_mul]
@@ -73,14 +82,21 @@ theorem baire_one_candidate {E : Type} [Field E] [NumberField E] [IsCMField E] {
   cases o with
   | none => exact absurd hzW (interior_subset ho)
   | some γ =>
-    refine ⟨γ.1, γ.2, W ∩ interior (C γ.1), hW.inter isOpen_interior, ⟨z, hzW, ho⟩,
-      fun x hx => hWdom hx.1, fun x hx => ?_⟩
+    refine ⟨
+      γ.1,
+      γ.2,
+      W ∩ interior (C γ.1),
+      hW.inter isOpen_interior,
+      ⟨z, hzW, ho⟩,
+      fun x hx => hWdom hx.1,
+      fun x hx => ?_
+    ⟩
     have hxd : x ∈ X.dom := hWdom hx.1
     have hxC : x ∈ C γ.1 := interior_subset hx.2
     simp only [C, Set.mem_setOf_eq] at hxC
     generalize γ.1 * a = g at hxC ⊢
-    have hdetg : ∀ (g' : GL (Fin r) E) (τ : X.Ψ),
-        ((g' : Matrix (Fin r) (Fin r) E).map τ.1).det ≠ 0 := by
+    have hdetg
+        : ∀ (g' : GL (Fin r) E) (τ : X.Ψ), ((g' : Matrix (Fin r) (Fin r) E).map τ.1).det ≠ 0 := by
       intro g' τ
       have h := RingHom.map_det τ.1 (g' : Matrix (Fin r) (Fin r) E)
       rw [RingHom.mapMatrix_apply] at h
@@ -97,13 +113,14 @@ theorem baire_one_candidate {E : Type} [Field E] [NumberField E] [IsCMField E] {
     refine ⟨b, fun τ => ⟨?_, fun p q hqp => ?_⟩, ?_⟩
     · show ((mat (lact g x) τ)⁻¹ * mat (lact c x) τ).det ≠ 0
       rw [Matrix.det_mul]
-      exact mul_ne_zero
-        (Matrix.isUnit_nonsing_inv_det _ (isUnit_iff_ne_zero.2 (hdetA g τ))).ne_zero (hdetA c τ)
+      exact mul_ne_zero (Matrix.isUnit_nonsing_inv_det _ (isUnit_iff_ne_zero.2 (hdetA g τ))).ne_zero
+        (hdetA c τ)
     · show ((mat (lact g x) τ)⁻¹ * mat (lact c x) τ) p q = 0
       rw [Matrix.inv_def, Matrix.smul_mul, Matrix.smul_apply, hxC τ p q hqp, smul_zero]
     · funext τ
-      have hginv : ((g : Matrix (Fin r) (Fin r) E).map τ.1)⁻¹ =
-          ((g⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 := by
+      have hginv
+          : ((g : Matrix (Fin r) (Fin r) E).map τ.1)⁻¹
+            = ((g⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 := by
         apply Matrix.inv_eq_right_inv
         rw [← Matrix.map_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
           Matrix.map_one _ (map_zero _) (map_one _)]

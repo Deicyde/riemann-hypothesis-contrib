@@ -10,8 +10,10 @@ open Polynomial
 
 namespace UpperTheory.V.Z.Inf
 
-private theorem isExp_of_sum {ι : Type} (S : Finset ι) (t : ι → ℝ) (a : ι → ℂ) (f : ℂ → ℂ)
-    (h : ∀ s, f s = ∑ i ∈ S, a i * Complex.exp (t i * s)) : IsExp f := by
+private theorem isExp_of_sum
+    {ι : Type} (S : Finset ι) (t : ι → ℝ) (a : ι → ℂ)
+    (f : ℂ → ℂ) (h : ∀ s, f s = ∑ i ∈ S, a i * Complex.exp (t i * s))
+    : IsExp f := by
   classical
   refine ⟨S.image t, fun r => ∑ i ∈ S.filter (fun i => t i = r), a i, fun s => ?_⟩
   rw [h s]
@@ -42,8 +44,11 @@ theorem expAlg : ExpAlg := by
     rw [mul_add, Complex.exp_add]
     ring
   · intro p t z
-    refine isExp_of_sum (Finset.range (p.natDegree + 1)) (fun n => n * t)
-      (fun n => p.coeff n * Complex.exp (n * (t * z))) _ fun s => ?_
+    refine isExp_of_sum (Finset.range (p.natDegree + 1))
+      (fun n => n * t)
+      (fun n => p.coeff n * Complex.exp (n * (t * z)))
+      _
+      fun s => ?_
     rw [eval_eq_sum_range]
     refine Finset.sum_congr rfl fun n _ => ?_
     rw [← Complex.exp_nat_mul, mul_assoc, ← Complex.exp_add]

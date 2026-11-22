@@ -5,16 +5,23 @@ public import Mathlib.NumberTheory.Multiplicity
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp UpperTheory.V.Ws.Lk
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+  UpperTheory.V.Ws.Lk
 
-private theorem kill {Γ M : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CommGroup M] (f : Γ →* M)
-    (hf : IsClosed (f.ker : Set Γ)) {g : Γ} {n : ℕ} (hg : g ^ n ∈ (commutator Γ).topologicalClosure) : f g ^ n = 1 := by
+private theorem kill
+    {Γ M : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CommGroup M]
+    (f : Γ →* M) (hf : IsClosed (f.ker : Set Γ))
+    {g : Γ} {n : ℕ} (hg : g ^ n ∈ (commutator Γ).topologicalClosure)
+    : f g ^ n = 1 := by
   rw [← map_pow]
   have hle : (commutator Γ).topologicalClosure ≤ f.ker :=
     Subgroup.topologicalClosure_minimal _ (Abelianization.commutator_subset_ker f) hf
   exact hle hg
 
-private theorem padic_pow_l {l : ℕ} [hl : Fact l.Prime] (h2 : l ≠ 2) (x : ℤ_[l]) (hx : x ^ l = 1) : x = 1 := by
+private theorem padic_pow_l {l : ℕ} [hl : Fact l.Prime] (h2 : l ≠ 2) (x : ℤ_[l]) (hx : x ^ l = 1)
+    : x = 1 := by
   have hp := PadicInt.prime_p (p := l)
   have hodd : Odd l := hl.out.odd_of_ne_two h2
   have hc : PadicInt.toZMod x = 1 := by
@@ -23,8 +30,9 @@ private theorem padic_pow_l {l : ℕ} [hl : Fact l.Prime] (h2 : l ≠ 2) (x : �
     exact h1
   have hdvd : (l : ℤ_[l]) ∣ x - 1 := by
     have hs := PadicInt.toZMod_spec x
-    rw [hc, PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton, ZMod.cast_eq_val, ZMod.val_one,
-      Nat.cast_one] at hs
+    rw [hc, PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton, ZMod.cast_eq_val,
+        ZMod.val_one, Nat.cast_one]
+      at hs
     exact hs
   have hnd : ¬ (l : ℤ_[l]) ∣ x := by
     intro h
@@ -39,7 +47,9 @@ private theorem padic_pow_l {l : ℕ} [hl : Fact l.Prime] (h2 : l ≠ 2) (x : �
   rw [hfin.emultiplicity_eq_multiplicity] at key
   exact ENat.coe_ne_top (multiplicity (l : ℤ_[l]) (x - 1) + 1) (by push_cast; exact key.symm)
 
-private theorem padic_pow {l : ℕ} [Fact l.Prime] (h2 : l ≠ 2) (a : ℕ) (x : ℤ_[l]) (hx : x ^ l ^ a = 1) : x = 1 := by
+private theorem padic_pow
+    {l : ℕ} [Fact l.Prime] (h2 : l ≠ 2) (a : ℕ) (x : ℤ_[l]) (hx : x ^ l ^ a = 1)
+    : x = 1 := by
   induction a generalizing x with
   | zero => simpa using hx
   | succ a ih =>
@@ -48,8 +58,12 @@ private theorem padic_pow {l : ℕ} [Fact l.Prime] (h2 : l ≠ 2) (a : ℕ) (x :
     rw [← pow_mul, ← pow_succ]
     exact hx
 
-theorem UpperTheory.V.Ws.Lk.kapMu :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c} {T : Tower D} (P : Pre T), D.Good → ∀ (g : G T.L Ω) (a : ℕ), g ^ l ^ a ∈ (commutator (G T.L Ω)).topologicalClosure → P.κ g = 1 ∧ P.tL g = 1 := by
+theorem UpperTheory.V.Ws.Lk.kapMu
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        {D : Raw Ω c} {T : Tower D} (P : Pre T),
+      D.Good
+        → ∀ (g : G T.L Ω) (a : ℕ),
+          g ^ l ^ a ∈ (commutator (G T.L Ω)).topologicalClosure → P.κ g = 1 ∧ P.tL g = 1 := by
   intro Ω _ _ _ l _ c D T P hD g a hg
   have h2 : l ≠ 2 := Raw.Good.l_odd hD
   have hl := (Fact.out : l.Prime)

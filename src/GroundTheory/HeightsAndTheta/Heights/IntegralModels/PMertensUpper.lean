@@ -55,14 +55,14 @@ theorem MertensUpper.proof : MertensUpper.Statement := by
   have hlog : ∑ p ∈ P, ((N / p : ℕ) : ℝ) * Real.log p ≤ N * Real.log N := by
     have hprod : (0 : ℝ) < ∏ p ∈ P, ((p : ℝ) ^ (N / p)) :=
       Finset.prod_pos fun p hp => pow_pos (by linarith [hpos p hp]) _
-    have h := Real.log_le_log hprod
-      (show ∏ p ∈ P, ((p : ℝ) ^ (N / p)) ≤ (N : ℝ) ^ N by exact_mod_cast hle)
-    rw [Real.log_prod (fun p hp => (pow_pos (by linarith [hpos p hp]) _).ne'),
-      Real.log_pow] at h
+    have h :=
+      Real.log_le_log hprod (show ∏ p ∈ P, ((p : ℝ) ^ (N / p)) ≤ (N : ℝ) ^ N by exact_mod_cast hle)
+    rw [Real.log_prod (fun p hp => (pow_pos (by linarith [hpos p hp]) _).ne'), Real.log_pow] at h
     simpa [Real.log_pow] using h
 
-  have hfloor : ∀ p ∈ P, ((N : ℝ) / p - 1) * Real.log p ≤ ((N / p : ℕ) : ℝ) * Real.log p :=
-    fun p hp => mul_le_mul_of_nonneg_right
+  have hfloor
+      : ∀ p ∈ P, ((N : ℝ) / p - 1) * Real.log p ≤ ((N / p : ℕ) : ℝ) * Real.log p := fun p hp =>
+    mul_le_mul_of_nonneg_right
       (by rw [← Nat.floor_div_eq_div (K := ℝ)]; exact (Nat.sub_one_lt_floor _).le)
       (Real.log_nonneg (hpos p hp))
 
@@ -75,13 +75,15 @@ theorem MertensUpper.proof : MertensUpper.Statement := by
       constructor
       · rintro ⟨h1, h2⟩; exact ⟨⟨h2.pos, h1⟩, h2⟩
       · rintro ⟨⟨-, h1⟩, h2⟩; exact ⟨h1, h2⟩
-    rw [hset]; exact h
+    rw [hset]
+    exact h
   have key : (N : ℝ) * ∑ p ∈ P, Real.log p / p - ∑ p ∈ P, Real.log p ≤ N * Real.log N := by
-    calc (N : ℝ) * ∑ p ∈ P, Real.log p / p - ∑ p ∈ P, Real.log p
-        = ∑ p ∈ P, ((N : ℝ) / p - 1) * Real.log p := by
-          rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
-          refine Finset.sum_congr rfl fun p _ => ?_
-          ring
+    calc
+      (N : ℝ) * ∑ p ∈ P, Real.log p / p - ∑ p ∈ P, Real.log p
+          = ∑ p ∈ P, ((N : ℝ) / p - 1) * Real.log p := by
+        rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+        refine Finset.sum_congr rfl fun p _ => ?_
+        ring
       _ ≤ ∑ p ∈ P, ((N / p : ℕ) : ℝ) * Real.log p := Finset.sum_le_sum hfloor
       _ ≤ N * Real.log N := hlog
   have hS : ∑ p ∈ P, Real.log p / p ≤ Real.log N + Real.log 4 := by

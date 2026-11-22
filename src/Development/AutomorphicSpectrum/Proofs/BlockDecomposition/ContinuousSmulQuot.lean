@@ -16,31 +16,31 @@ open PositivityTheory.Rg.Rsw.Cell
 
 variable {G : Type} [Group G] [TopologicalSpace G]
 
-theorem mk_inv_mul' {P : Subgroup G} {p : G} (hp : p ∈ P) (g : G) :
-    (QuotientGroup.mk (p * g)⁻¹ : G ⧸ P) = QuotientGroup.mk g⁻¹ := by
+theorem mk_inv_mul' {P : Subgroup G} {p : G} (hp : p ∈ P) (g : G)
+    : (QuotientGroup.mk (p * g)⁻¹ : G ⧸ P) = QuotientGroup.mk g⁻¹ := by
   rw [QuotientGroup.eq]
   simpa using hp
 
 theorem mk_inv_rp' {P : Subgroup G} (q : G ⧸ P) : (QuotientGroup.mk (rp q)⁻¹ : G ⧸ P) = q := by
   simp [rp]
 
-theorem rp_mk_inv {P : Subgroup G} (g : G) :
-    ∃ p ∈ P, rp (QuotientGroup.mk g⁻¹ : G ⧸ P) = p * g := by
+theorem rp_mk_inv {P : Subgroup G} (g : G)
+    : ∃ p ∈ P, rp (QuotientGroup.mk g⁻¹ : G ⧸ P) = p * g := by
   have hmem : rp (QuotientGroup.mk g⁻¹ : G ⧸ P) * g⁻¹ ∈ P := by
     have := mk_inv_rp' (QuotientGroup.mk g⁻¹ : G ⧸ P)
     rw [QuotientGroup.eq] at this
     simpa using this
   exact ⟨_, hmem, by simp⟩
 
-theorem mk_inv_rp_mul {P : Subgroup G} (q : G ⧸ P) (x : G) :
-    (QuotientGroup.mk (rp q * x)⁻¹ : G ⧸ P) = x⁻¹ • q := by
+theorem mk_inv_rp_mul {P : Subgroup G} (q : G ⧸ P) (x : G)
+    : (QuotientGroup.mk (rp q * x)⁻¹ : G ⧸ P) = x⁻¹ • q := by
   conv_rhs => rw [← mk_inv_rp' q]
   rw [mul_inv_rev]
   rfl
 
-theorem density_rp {P : Subgroup G} {h : G → ℝ} {mu : (G → ℂ) → ℂ} (S : Setup P h mu) (x g : G) :
-    h (rp (QuotientGroup.mk g⁻¹ : G ⧸ P) * x) / h (rp (QuotientGroup.mk g⁻¹ : G ⧸ P)) =
-      h (g * x) / h g := by
+theorem density_rp {P : Subgroup G} {h : G → ℝ} {mu : (G → ℂ) → ℂ} (S : Setup P h mu) (x g : G)
+    : h (rp (QuotientGroup.mk g⁻¹ : G ⧸ P) * x) / h (rp (QuotientGroup.mk g⁻¹ : G ⧸ P))
+      = h (g * x) / h g := by
   obtain ⟨p, hp, e⟩ := rp_mk_inv (P := P) g
   rw [e]
   have h1 := (S.pos (p * g)).ne'
@@ -50,8 +50,12 @@ theorem density_rp {P : Subgroup G} {h : G → ℝ} {mu : (G → ℂ) → ℂ} (
   rw [mul_assoc]
   linarith
 
-theorem sec_translate {P : Subgroup G} {h : G → ℝ} {mu : (G → ℂ) → ℂ} [ContinuousMul G] (S : Setup P h mu)
-    {f : G → ℂ} (hf : Sec P h f) (x : G) : Sec P h (fun g => f (g * x)) := by
+theorem sec_translate
+    {P : Subgroup G} {h : G → ℝ} {mu : (G → ℂ) → ℂ} [ContinuousMul G]
+    (S : Setup P h mu)
+    {f : G → ℂ} (hf : Sec P h f)
+    (x : G)
+    : Sec P h (fun g => f (g * x)) := by
   refine ⟨hf.1.comp (continuous_mul_const x), fun p hp g => ?_⟩
   have h1 := hf.2 p hp (g * x)
   have h2 : ((h (p * g) : ℂ)) * h (g * x) = h g * h (p * (g * x)) := by
@@ -64,8 +68,9 @@ theorem sec_translate {P : Subgroup G} {h : G → ℝ} {mu : (G → ℂ) → ℂ
 
 variable [IsTopologicalGroup G]
 
-theorem sec_of_real {P : Subgroup G} {h : G → ℝ} (hc : Continuous h) {F : G ⧸ P → ℝ} (hF : Continuous F) :
-    Sec P h (fun g => ((F (QuotientGroup.mk g⁻¹) : ℝ) : ℂ) * (h g : ℂ)) := by
+theorem sec_of_real
+    {P : Subgroup G} {h : G → ℝ} (hc : Continuous h) {F : G ⧸ P → ℝ} (hF : Continuous F)
+    : Sec P h (fun g => ((F (QuotientGroup.mk g⁻¹) : ℝ) : ℂ) * (h g : ℂ)) := by
   refine ⟨?_, fun p hp g => ?_⟩
   · have : Continuous fun g : G => (QuotientGroup.mk g⁻¹ : G ⧸ P) :=
       QuotientGroup.continuous_mk.comp continuous_inv
@@ -73,13 +78,15 @@ theorem sec_of_real {P : Subgroup G} {h : G → ℝ} (hc : Continuous h) {F : G 
   · simp only [mk_inv_mul' hp]
     ring
 
-theorem continuous_density {P : Subgroup G} {h : G → ℝ} {mu : (G → ℂ) → ℂ} (S : Setup P h mu) (x : G) :
-    Continuous fun q : G ⧸ P => h (rp q * x) / h (rp q) := by
+theorem continuous_density
+    {P : Subgroup G} {h : G → ℝ} {mu : (G → ℂ) → ℂ} (S : Setup P h mu) (x : G)
+    : Continuous fun q : G ⧸ P => h (rp q * x) / h (rp q) := by
   have hq : IsQuotientMap fun g : G => (QuotientGroup.mk g⁻¹ : G ⧸ P) :=
-    (QuotientGroup.isOpenQuotientMap_mk (N := P)).isQuotientMap.comp (Homeomorph.inv G).isQuotientMap
+    (QuotientGroup.isOpenQuotientMap_mk (N := P)).isQuotientMap.comp
+      (Homeomorph.inv G).isQuotientMap
   rw [hq.continuous_iff]
-  have : ((fun q : G ⧸ P => h (rp q * x) / h (rp q)) ∘ fun g : G => (QuotientGroup.mk g⁻¹ : G ⧸ P)) =
-      fun g => h (g * x) / h g := by
+  have : ((fun q : G ⧸ P => h (rp q * x) / h (rp q)) ∘ fun g : G => (QuotientGroup.mk g⁻¹ : G ⧸ P))
+      = fun g => h (g * x) / h g := by
     funext g
     exact density_rp S x g
   rw [this]
@@ -89,8 +96,9 @@ theorem continuous_smul_quot {P : Subgroup G} (x : G) : Continuous fun q : G ⧸
   rw [(QuotientGroup.isOpenQuotientMap_mk (N := P)).isQuotientMap.continuous_iff]
   exact QuotientGroup.continuous_mk.comp (continuous_const_mul x)
 
-theorem compact_quot' {P : Subgroup G}
-    (hco : ∃ C : Set G, IsCompact C ∧ ∀ g, ∃ q ∈ P, ∃ c ∈ C, g = q * c) : CompactSpace (G ⧸ P) := by
+theorem compact_quot'
+    {P : Subgroup G} (hco : ∃ C : Set G, IsCompact C ∧ ∀ g, ∃ q ∈ P, ∃ c ∈ C, g = q * c)
+    : CompactSpace (G ⧸ P) := by
   obtain ⟨C, hC, hcov⟩ := hco
   have hK : IsCompact ((fun g : G => (QuotientGroup.mk g⁻¹ : G ⧸ P)) '' C) :=
     hC.image (QuotientGroup.continuous_mk.comp continuous_inv)
@@ -105,21 +113,28 @@ theorem compact_quot' {P : Subgroup G}
   rw [this, QuotientGroup.eq]
   simpa using hq
 
-theorem integral_translate {P : Subgroup G} [MeasurableSpace (G ⧸ P)] {h : G → ℝ} {mu : (G → ℂ) → ℂ}
-    (S : Setup P h mu) {ν : Measure (G ⧸ P)} (hR : Repr P h mu ν) {x : G} (hx : Inv P h mu x)
-    {F : G ⧸ P → ℝ} (hF : Continuous F) :
-    ∫ q, h (rp q * x) / h (rp q) * F (x⁻¹ • q) ∂ν = ∫ q, F q ∂ν := by
+theorem integral_translate
+    {P : Subgroup G} [MeasurableSpace (G ⧸ P)]
+    {h : G → ℝ} {mu : (G → ℂ) → ℂ} (S : Setup P h mu)
+    {ν : Measure (G ⧸ P)} (hR : Repr P h mu ν)
+    {x : G} (hx : Inv P h mu x)
+    {F : G ⧸ P → ℝ} (hF : Continuous F)
+    : ∫ q, h (rp q * x) / h (rp q) * F (x⁻¹ • q) ∂ν = ∫ q, F q ∂ν := by
   have hs := sec_of_real (P := P) S.cont hF
   have h1 := (hR.2 _ hs).2
   have h2 := (hR.2 _ (sec_translate S hs x)).2
   have h3 := hx _ hs
   rw [h1, h2] at h3
-  have e1 : ∀ q : G ⧸ P, (((F (QuotientGroup.mk (rp q)⁻¹) : ℝ) : ℂ) * (h (rp q) : ℂ)) / (h (rp q) : ℂ) =
-      ((F q : ℝ) : ℂ) := fun q => by
+  have e1
+      : ∀ q : G ⧸ P,
+        (((F (QuotientGroup.mk (rp q)⁻¹) : ℝ) : ℂ) * (h (rp q) : ℂ)) / (h (rp q) : ℂ)
+          = ((F q : ℝ) : ℂ) := fun q => by
     have : (h (rp q) : ℂ) ≠ 0 := by exact_mod_cast (S.pos _).ne'
     rw [mk_inv_rp', mul_div_cancel_right₀ _ this]
-  have e2 : ∀ q : G ⧸ P, (((F (QuotientGroup.mk (rp q * x)⁻¹) : ℝ) : ℂ) * (h (rp q * x) : ℂ)) / (h (rp q) : ℂ) =
-      ((h (rp q * x) / h (rp q) * F (x⁻¹ • q) : ℝ) : ℂ) := fun q => by
+  have e2
+      : ∀ q : G ⧸ P,
+        (((F (QuotientGroup.mk (rp q * x)⁻¹) : ℝ) : ℂ) * (h (rp q * x) : ℂ)) / (h (rp q) : ℂ)
+          = ((h (rp q * x) / h (rp q) * F (x⁻¹ • q) : ℝ) : ℂ) := fun q => by
     rw [mk_inv_rp_mul]
     push_cast
     ring
@@ -127,10 +142,14 @@ theorem integral_translate {P : Subgroup G} [MeasurableSpace (G ⧸ P)] {h : G �
   rw [integral_complex_ofReal, integral_complex_ofReal] at h3
   exact_mod_cast h3
 
-theorem inv_measure [T2Space G] [SecondCountableTopology G] (P : Subgroup G) [MeasurableSpace (G ⧸ P)]
-    [BorelSpace (G ⧸ P)] (h : G → ℝ) (mu : (G → ℂ) → ℂ) (S : Setup P h mu) (ν : Measure (G ⧸ P))
-    (hR : Repr P h mu ν) (x : G) (hx : Inv P h mu x) :
-    (ν.withDensity fun q => ENNReal.ofReal (h (rp q * x) / h (rp q))).map (fun q => x⁻¹ • q) = ν := by
+theorem inv_measure
+    [T2Space G] [SecondCountableTopology G]
+    (P : Subgroup G) [MeasurableSpace (G ⧸ P)] [BorelSpace (G ⧸ P)]
+    (h : G → ℝ) (mu : (G → ℂ) → ℂ) (S : Setup P h mu)
+    (ν : Measure (G ⧸ P)) (hR : Repr P h mu ν)
+    (x : G) (hx : Inv P h mu x)
+    : (ν.withDensity fun q => ENNReal.ofReal (h (rp q * x) / h (rp q))).map (fun q => x⁻¹ • q)
+      = ν := by
   have : IsClosed (P : Set G) := S.closed
   have : CompactSpace (G ⧸ P) := compact_quot' S.cocpt
   have : IsFiniteMeasure ν := hR.1
@@ -140,8 +159,8 @@ theorem inv_measure [T2Space G] [SecondCountableTopology G] (P : Subgroup G) [Me
     ENNReal.measurable_ofReal.comp hj.measurable
   have hjnn : ∀ q : G ⧸ P, 0 ≤ h (rp q * x) / h (rp q) := fun q => (div_pos (S.pos _) (S.pos _)).le
   have hfin : IsFiniteMeasure (ν.withDensity fun q => ENNReal.ofReal (h (rp q * x) / h (rp q))) :=
-    isFiniteMeasure_withDensity_ofReal
-      (hj.integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)).2
+    isFiniteMeasure_withDensity_ofReal (hj.integrable_of_hasCompactSupport
+      (HasCompactSupport.of_compactSpace _)).2
   have hfin' : IsFiniteMeasure
       ((ν.withDensity fun q => ENNReal.ofReal (h (rp q * x) / h (rp q))).map (fun q => x⁻¹ • q)) :=
     Measure.isFiniteMeasure_map _ _
@@ -159,11 +178,15 @@ theorem invM : InvM := by
   have hsm := continuous_smul_quot (P := P) x⁻¹
   have hjm : Measurable fun q : G ⧸ P => ENNReal.ofReal (h (rp q * x) / h (rp q)) :=
     ENNReal.measurable_ofReal.comp (continuous_density S x).measurable
-  have key : ∫⁻ q, F q ∂((ν.withDensity fun q => ENNReal.ofReal (h (rp q * x) / h (rp q))).map
-      (fun q => x⁻¹ • q)) = ∫⁻ q, F q ∂ν := by rw [inv_measure P h mu S ν hR x hx]
+  have key
+      : ∫⁻ q, F q ∂((ν.withDensity fun q => ENNReal.ofReal (h (rp q * x) / h (rp q))).map
+          (fun q => x⁻¹ • q))
+        = ∫⁻ q, F q ∂ν := by
+    rw [inv_measure P h mu S ν hR x hx]
   rw [lintegral_map hF hsm.measurable,
-    lintegral_withDensity_eq_lintegral_mul ν hjm
-      (show Measurable fun a => F (x⁻¹ • a) from hF.comp hsm.measurable)] at key
+      lintegral_withDensity_eq_lintegral_mul ν hjm
+        (show Measurable fun a => F (x⁻¹ • a) from hF.comp hsm.measurable)]
+    at key
   rw [← key]
   refine lintegral_congr fun q => ?_
   simp only [Pi.mul_apply, mul_comm]

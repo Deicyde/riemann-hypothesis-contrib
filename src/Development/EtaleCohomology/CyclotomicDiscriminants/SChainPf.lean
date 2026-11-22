@@ -129,9 +129,12 @@ lemma triv_bd {G : Type} [Group G] [Subsingleton G] (m : ℕ) (z : Ch A G (m + 1
   have := S_pair (A := A) (m + 1)
   linear_combination (-1 : A) * hc + (c) * this
 
-theorem SChain_of : UpperTheory.V.ZK.SChain :=
-  fun _ _ => ⟨fun _ _ m z => bd_bd m z, fun _ _ _ _ f m z => bd_cm f m z,
-    fun _ _ _ _ _ _ f g m z => cm_comp f g m z, fun _ _ _ _ f k m z => cm_prism f k m z,
-    fun _ _ _ m z hz => triv_bd m z hz⟩
+theorem SChain_of : UpperTheory.V.ZK.SChain := fun _ _ => ⟨
+  fun _ _ m z => bd_bd m z,
+  fun _ _ _ _ f m z => bd_cm f m z,
+  fun _ _ _ _ _ _ f g m z => cm_comp f g m z,
+  fun _ _ _ _ f k m z => cm_prism f k m z,
+  fun _ _ _ m z hz => triv_bd m z hz
+⟩
 
 end LateralTheory.Q.SChainPf

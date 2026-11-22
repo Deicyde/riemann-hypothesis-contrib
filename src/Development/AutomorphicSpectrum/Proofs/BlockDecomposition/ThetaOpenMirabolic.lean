@@ -15,8 +15,9 @@ namespace GlobalTheory.CompanionTheory.BZFun
 
 variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-def lastCol {n : ℕ} (u : MirUin k n) : Fin n → k :=
-  fun i => (((u : Mir k n) : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k) (Fin.castSucc i) (Fin.last n)
+def lastCol {n : ℕ} (u : MirUin k n) : Fin n → k := fun i =>
+  (((u : Mir k n) : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k) (Fin.castSucc i)
+    (Fin.last n)
 
 theorem continuous_lastCol (n : ℕ) : Continuous (lastCol k (n := n)) := by
   refine continuous_pi fun i => ?_
@@ -25,8 +26,8 @@ theorem continuous_lastCol (n : ℕ) : Continuous (lastCol k (n := n)) := by
     Units.continuous_val.comp (continuous_subtype_val.comp continuous_subtype_val)
   exact h.matrix_elem _ _
 
-theorem thetaA_apply (ψ : AddChar k Circle) {n : ℕ} (a : Fin n → k) (u : MirUin k n) :
-    thetaA k ψ a u = Circle.toUnits (ψ (a ⬝ᵥ lastCol k u)) := by
+theorem thetaA_apply (ψ : AddChar k Circle) {n : ℕ} (a : Fin n → k) (u : MirUin k n)
+    : thetaA k ψ a u = Circle.toUnits (ψ (a ⬝ᵥ lastCol k u)) := by
   obtain ⟨w, hw⟩ : ((u : Mir k n) : GL (Fin (n + 1)) k) ∈ MirU k n := Subgroup.mem_subgroupOf.1 u.2
   have key : (unipEquiv k n).symm ((Subgroup.subgroupOfEquivOfLe (MirU_le_Mir k n)) u) = w := by
     rw [MulEquiv.symm_apply_eq]
@@ -40,7 +41,8 @@ theorem thetaA_apply (ψ : AddChar k Circle) {n : ℕ} (a : Fin n → k) (u : Mi
     ((Subgroup.subgroupOfEquivOfLe (MirU_le_Mir k n)) u)).toAdd)) = _
   rw [key, hcol]
 
-theorem isOpen_addChar_eq_one (ψ : AddChar k Circle) (hψ : Continuous ψ) : IsOpen {x : k | ψ x = 1} := by
+theorem isOpen_addChar_eq_one (ψ : AddChar k Circle) (hψ : Continuous ψ)
+    : IsOpen {x : k | ψ x = 1} := by
   obtain ⟨s, hs⟩ := exists_cball_addChar_eq_one ψ hψ
   rw [isOpen_iff_mem_nhds]
   intro x hx
@@ -59,8 +61,9 @@ theorem thetaOpen : ThetaOpen k := by
     have h := continuous_lastCol k n
     simp only [dotProduct]
     exact continuous_finsetSum _ fun i _ => continuous_const.mul ((continuous_apply i).comp h)
-  have he : ((thetaA k ψ a).ker : Set (MirUin k n)) =
-      (fun u : MirUin k n => a ⬝ᵥ lastCol k u) ⁻¹' {x : k | ψ x = 1} := by
+  have he
+      : ((thetaA k ψ a).ker : Set (MirUin k n))
+        = (fun u : MirUin k n => a ⬝ᵥ lastCol k u) ⁻¹' {x : k | ψ x = 1} := by
     ext u
     simp only [SetLike.mem_coe, MonoidHom.mem_ker, thetaA_apply, Set.mem_preimage, Set.mem_setOf_eq]
     constructor

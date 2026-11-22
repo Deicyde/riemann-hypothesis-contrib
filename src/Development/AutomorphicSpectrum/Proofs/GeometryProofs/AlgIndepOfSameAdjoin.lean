@@ -6,11 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.FieldGen
 
-theorem isAlgebraic_adjoin_range_self {k E σ : Type} [Field k] [Field E] [Algebra k E] (y : σ → E) :
-    Algebra.IsAlgebraic
-      (Algebra.adjoin k (Set.range fun j =>
-        (⟨y j, IntermediateField.subset_adjoin k _ ⟨j, rfl⟩⟩ :
-          IntermediateField.adjoin k (Set.range y))))
+theorem isAlgebraic_adjoin_range_self {k E σ : Type} [Field k] [Field E] [Algebra k E] (y : σ → E)
+    : Algebra.IsAlgebraic
+      (Algebra.adjoin k
+        (Set.range fun j =>
+          (⟨y j, IntermediateField.subset_adjoin k _ ⟨j, rfl⟩⟩
+            : IntermediateField.adjoin k (Set.range y))))
       (IntermediateField.adjoin k (Set.range y)) := by
   set E' := IntermediateField.adjoin k (Set.range y) with hE'
   set y' : σ → E' := fun j => ⟨y j, IntermediateField.subset_adjoin k _ ⟨j, rfl⟩⟩ with hy'
@@ -50,11 +51,11 @@ theorem isAlgebraic_adjoin_range_self {k E σ : Type} [Field k] [Field E] [Algeb
     rw [hpp, hqq, hpq]
     field_simp
 
-theorem algebraicIndependent_of_adjoin_eq :
-    ∀ (K L J : Type) [Field K] [Field L] [Algebra K L] [Finite J] (x y : J → L),
-      AlgebraicIndependent K x →
-      IntermediateField.adjoin K (Set.range x) = IntermediateField.adjoin K (Set.range y) →
-      AlgebraicIndependent K y := by
+theorem algebraicIndependent_of_adjoin_eq
+    : ∀ (K L J : Type) [Field K] [Field L] [Algebra K L] [Finite J] (x y : J → L),
+      AlgebraicIndependent K x
+        → IntermediateField.adjoin K (Set.range x) = IntermediateField.adjoin K (Set.range y)
+        → AlgebraicIndependent K y := by
   intro K L J _ _ _ _ x y hx hxy
   set E := IntermediateField.adjoin K (Set.range y) with hE
   have hal := isAlgebraic_adjoin_range_self (k := K) y

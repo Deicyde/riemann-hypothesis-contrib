@@ -5,13 +5,14 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 
 @[expose] public section
 
-open PositivityTheory.JacquetShalikaLocal GroundTheory.Automorphic GroundTheory.Automorphic.Spherical
+open PositivityTheory.JacquetShalikaLocal GroundTheory.Automorphic
+  GroundTheory.Automorphic.Spherical
 
 namespace GlobalTheory.CompanionTheory.JSBound
 
-theorem evalAt_esymmL_eq_sum_prod {n : ℕ} (z : Fin n → ℂˣ) (r : ℕ) :
-    evalAt z (esymmL n r) =
-      ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, ∏ i ∈ S, (z i : ℂ) := by
+theorem evalAt_esymmL_eq_sum_prod {n : ℕ} (z : Fin n → ℂˣ) (r : ℕ)
+    : evalAt z (esymmL n r)
+      = ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, ∏ i ∈ S, (z i : ℂ) := by
   unfold esymmL
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -22,21 +23,24 @@ theorem evalAt_esymmL_eq_sum_prod {n : ℕ} (z : Fin n → ℂˣ) (r : ℕ) :
   refine Finset.prod_congr rfl fun i _ => ?_
   split_ifs <;> simp
 
-theorem prod_one_add_mul_eq {n : ℕ} (w : Fin n → ℂ) (t : ℂ) :
-    ∏ j, (1 + t * w j) = ∑ r ∈ Finset.range (n + 1),
-      t ^ r * ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, ∏ i ∈ S, w i := by
+theorem prod_one_add_mul_eq {n : ℕ} (w : Fin n → ℂ) (t : ℂ)
+    : ∏ j, (1 + t * w j)
+      = ∑ r ∈ Finset.range (n + 1),
+        t ^ r * ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, ∏ i ∈ S, w i := by
   have h := Finset.prod_add (fun j => t * w j) (fun _ => (1 : ℂ)) (Finset.univ : Finset (Fin n))
   simp only [Finset.prod_const_one, mul_one, Finset.prod_mul_distrib, Finset.prod_const] at h
-  rw [show (∏ j, (1 + t * w j)) = ∏ j, (t * w j + 1) from Finset.prod_congr rfl fun _ _ => add_comm _ _, h,
-    Finset.sum_powerset, Finset.card_univ, Fintype.card_fin]
+  rw [show (∏ j, (1 + t * w j)) = ∏ j, (t * w j + 1) from
+      Finset.prod_congr rfl fun _ _ => add_comm _ _,
+    h, Finset.sum_powerset, Finset.card_univ, Fintype.card_fin]
   refine Finset.sum_congr rfl fun r _ => ?_
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun S hS => ?_
   rw [(Finset.mem_powersetCard.1 hS).2]
 
-theorem prod_add_eq {n : ℕ} (z : Fin n → ℂ) (t : ℂ) :
-    ∏ j, (t + z j) = ∑ r ∈ Finset.range (n + 1),
-      t ^ (n - r) * ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, ∏ i ∈ S, z i := by
+theorem prod_add_eq {n : ℕ} (z : Fin n → ℂ) (t : ℂ)
+    : ∏ j, (t + z j)
+      = ∑ r ∈ Finset.range (n + 1),
+        t ^ (n - r) * ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, ∏ i ∈ S, z i := by
   rw [show (∏ j, (t + z j)) = ∏ j, (z j + t) from Finset.prod_congr rfl fun _ _ => add_comm _ _,
     Finset.prod_add, Finset.sum_powerset, Finset.card_univ, Fintype.card_fin]
   refine Finset.sum_congr rfl fun r _ => ?_
@@ -45,10 +49,12 @@ theorem prod_add_eq {n : ℕ} (z : Fin n → ℂ) (t : ℂ) :
   rw [Finset.prod_const, ← Finset.compl_eq_univ_sdiff, Finset.card_compl, Fintype.card_fin,
     (Finset.mem_powersetCard.1 hS).2, mul_comm]
 
-theorem mul_prod_one_add_conj_eq {n : ℕ} (z : Fin n → ℂˣ)
-    (h : ∀ r ≤ n, starRingEnd ℂ (evalAt z (esymmL n r)) * evalAt z (esymmL n n) =
-      evalAt z (esymmL n (n - r))) (t : ℂ) :
-    evalAt z (esymmL n n) * ∏ j, (1 + t * starRingEnd ℂ (z j : ℂ)) = ∏ j, (t + (z j : ℂ)) := by
+theorem mul_prod_one_add_conj_eq
+    {n : ℕ} (z : Fin n → ℂˣ)
+    (h : ∀ r ≤ n,
+      starRingEnd ℂ (evalAt z (esymmL n r)) * evalAt z (esymmL n n) = evalAt z (esymmL n (n - r)))
+    (t : ℂ)
+    : evalAt z (esymmL n n) * ∏ j, (1 + t * starRingEnd ℂ (z j : ℂ)) = ∏ j, (t + (z j : ℂ)) := by
   simp only [evalAt_esymmL_eq_sum_prod] at h ⊢
   rw [prod_one_add_mul_eq, prod_add_eq, Finset.mul_sum]
   conv_rhs => rw [← Finset.sum_range_reflect]

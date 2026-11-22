@@ -22,8 +22,8 @@ theorem continuous_hk (k l : ℕ) : Continuous (hk k l) := by
 theorem norm_hk (k l : ℕ) (z : ℂ) : ‖hk k l z‖ = ‖z‖ ^ (k + l) * Real.exp (-(‖z‖ ^ 2)) := by
   simp only [hk, e1, norm_mul, norm_pow, norm_star, Complex.norm_exp_ofReal, pow_add]
 
-theorem pow_exp_le (n : ℕ) : ∃ C : ℝ, ∀ t : ℝ, 0 ≤ t →
-    t ^ n * Real.exp (-(t ^ 2)) ≤ C * (1 + t) ^ (-(3 : ℝ)) := by
+theorem pow_exp_le (n : ℕ)
+    : ∃ C : ℝ, ∀ t : ℝ, 0 ≤ t → t ^ n * Real.exp (-(t ^ 2)) ≤ C * (1 + t) ^ (-(3 : ℝ)) := by
   refine ⟨((n + 3).factorial : ℝ) * Real.exp 2, fun t ht => ?_⟩
   have h1 : 0 < 1 + t := by linarith
   have hr : (1 + t) ^ (-(3 : ℝ)) = ((1 + t) ^ 3)⁻¹ := by
@@ -37,7 +37,8 @@ theorem pow_exp_le (n : ℕ) : ∃ C : ℝ, ∀ t : ℝ, 0 ≤ t →
   have hC : Real.exp (1 + t) * Real.exp (-(t ^ 2)) ≤ Real.exp 2 := by
     rw [← Real.exp_add]
     exact Real.exp_le_exp.2 (by nlinarith [sq_nonneg (t - 1 / 2)])
-  calc t ^ n * Real.exp (-(t ^ 2)) * (1 + t) ^ 3
+  calc
+    t ^ n * Real.exp (-(t ^ 2)) * (1 + t) ^ 3
       ≤ (1 + t) ^ n * Real.exp (-(t ^ 2)) * (1 + t) ^ 3 := by gcongr
     _ = (1 + t) ^ (n + 3) * Real.exp (-(t ^ 2)) := by ring
     _ ≤ ((n + 3).factorial : ℝ) * Real.exp (1 + t) * Real.exp (-(t ^ 2)) := by gcongr
@@ -65,21 +66,26 @@ theorem integral_hk_ne (k l : ℕ) (h : k ≠ l) : ∫ z, hk k l z = 0 := by
       rw [hθ]
       push_cast
       field_simp
-    have h3 : (k : ℂ) * (θ * I) + l * (-(θ * I)) = Real.pi * I := by
-      linear_combination I * h2
+    have h3 : (k : ℂ) * (θ * I) + l * (-(θ * I)) = Real.pi * I := by linear_combination I * h2
     rw [h3, Complex.exp_pi_mul_I]
-  have hrot : ∀ z : ℂ, hk k l (Complex.exp (θ * I) * z) = -hk k l z := by
+  have hrot : ∀ z : ℂ, hk k l (Complex.exp (θ * I) * z) = - hk k l z := by
     intro z
     have he : e1 (Complex.exp (θ * I) * z) = e1 z := by
       simp only [e1, norm_mul, Complex.norm_exp_ofReal_mul_I, one_mul]
     simp only [hk]
     rw [he, star_mul', mul_pow, mul_pow]
-    calc Complex.exp (θ * I) ^ k * z ^ k * (star (Complex.exp (θ * I)) ^ l * star z ^ l) * e1 z
-        = (Complex.exp (θ * I) ^ k * star (Complex.exp (θ * I)) ^ l) * (z ^ k * star z ^ l * e1 z) := by ring
+    calc
+      Complex.exp (θ * I) ^ k * z ^ k * (star (Complex.exp (θ * I)) ^ l * star z ^ l) * e1 z
+          = (Complex.exp (θ * I) ^ k * star (Complex.exp (θ * I)) ^ l)
+            * (z ^ k * star z ^ l * e1 z) := by
+        ring
       _ = -(z ^ k * star z ^ l * e1 z) := by rw [hfac]; ring
-  have key := (rotation (Circle.exp θ)).measurePreserving.integral_comp
-    (rotation (Circle.exp θ)).toHomeomorph.measurableEmbedding (hk k l)
-  simp only [LinearIsometryEquiv.coe_toHomeomorph, rotation_apply, Circle.coe_exp, hrot, integral_neg] at key
+  have key :=
+    (rotation (Circle.exp θ)).measurePreserving.integral_comp
+      (rotation (Circle.exp θ)).toHomeomorph.measurableEmbedding (hk k l)
+  simp only [LinearIsometryEquiv.coe_toHomeomorph, rotation_apply, Circle.coe_exp, hrot,
+      integral_neg]
+    at key
   linear_combination (-1 / 2 : ℂ) * key
 
 def jr (k : ℕ) : ℝ := ∫ z : ℂ, (‖z‖ ^ 2) ^ k * Real.exp (-(‖z‖ ^ 2))

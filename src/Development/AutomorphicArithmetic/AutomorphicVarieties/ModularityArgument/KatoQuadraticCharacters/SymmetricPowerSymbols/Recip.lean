@@ -8,8 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SpecialLi
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-theorem UpperTheory.V.Z.Kato.Sym.recip :
-    UpperTheory.V.Z.Kato.Sym.Recip := by
+theorem UpperTheory.V.Z.Kato.Sym.recip : UpperTheory.V.Z.Kato.Sym.Recip := by
   classical
   intro Ω _ _ _ ε X s γ S
   choose L hL hLf using X.level
@@ -35,13 +34,13 @@ theorem UpperTheory.V.Z.Kato.Sym.recip :
   haveI : NeZero (M : Ω) := ⟨by exact_mod_cast hM.ne'⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω M
   have hex : ∀ t : Ω ≃ₐ[ℚ] Ω, ∃ d : ℕ, t ζ = ζ ^ d := fun t => by
-    obtain ⟨i, -, hi⟩ := hζ.eq_pow_of_pow_eq_one (ξ := t ζ) (by rw [← map_pow, hζ.pow_eq_one, map_one])
+    obtain ⟨i, -, hi⟩ :=
+      hζ.eq_pow_of_pow_eq_one (ξ := t ζ) (by rw [← map_pow, hζ.pow_eq_one, map_one])
     exact ⟨i, hi.symm⟩
   obtain ⟨d, hd⟩ := hex s
   obtain ⟨e, he⟩ := hex s.symm
   have hde : (d : ZMod M) * e = 1 := by
-    have h1 : ζ ^ (d * e) = ζ ^ 1 := by
-      rw [pow_mul, ← hd, ← map_pow, ← he]; simp
+    have h1 : ζ ^ (d * e) = ζ ^ 1 := by rw [pow_mul, ← hd, ← map_pow, ← he]; simp
     have h2 := (hζ.isOfFinOrder hM.ne').pow_eq_pow_iff_modEq.mp h1
     rw [← hζ.eq_orderOf] at h2
     have := (ZMod.natCast_eq_natCast_iff _ _ _).mpr h2
@@ -51,13 +50,16 @@ theorem UpperTheory.V.Z.Kato.Sym.recip :
     rw [Matrix.det_fin_two] at h
     have := congrArg (Int.cast : ℤ → ZMod M) h
     simpa [en] using this
-  let A : SL(2, ZMod M) := ⟨!![(en γ 0 0 : ℤ), e * (en γ 0 1 : ℤ); d * (en γ 1 0 : ℤ), (en γ 1 1 : ℤ)], by
-    rw [Matrix.det_fin_two_of]
-    linear_combination hdet - ((en γ 0 1 : ℤ) : ZMod M) * (en γ 1 0 : ℤ) * hde⟩
+  let A : SL(2, ZMod M) := ⟨
+    !![(en γ 0 0 : ℤ), e * (en γ 0 1 : ℤ); d * (en γ 1 0 : ℤ), (en γ 1 1 : ℤ)],
+    by
+      rw [Matrix.det_fin_two_of]
+      linear_combination hdet - ((en γ 0 1 : ℤ) : ZMod M) * (en γ 1 0 : ℤ) * hde
+  ⟩
   obtain ⟨γ', hγ'⟩ := GlobalTheory.specialLinearGroup_map_intCast_zmod_surjective M A
-  have hent : ∀ i j, ((en γ' i j : ℤ) : ZMod M) = A.1 i j := fun i j => by
-    rw [← hγ']; rfl
-  refine ⟨γ', fun f hf => (X.recip M f hM (hfix f hf) ζ hζ s d (by rw [hd, zpow_natCast]) γ' γ ?_).symm⟩
+  have hent : ∀ i j, ((en γ' i j : ℤ) : ZMod M) = A.1 i j := fun i j => by rw [← hγ']; rfl
+  refine
+    ⟨γ', fun f hf => (X.recip M f hM (hfix f hf) ζ hζ s d (by rw [hd, zpow_natCast]) γ' γ ?_).symm⟩
   rw [hent, hent, hent, hent]
   refine ⟨by simp [A], ?_, by simp [A], by simp [A]⟩
   have : A.1 0 1 = e * (en γ 0 1 : ℤ) := by simp [A]

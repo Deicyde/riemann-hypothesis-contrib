@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsAdmissi
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-private theorem siegel_admissible_to_rat (c M : ℕ) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hM : 0 < M) (hcM : Nat.Coprime c M)
-    (x : Row M) (hx : x ≠ 0) : GlobalTheory.Sieg.admitted c (toQ M x) := by
+private theorem siegel_admissible_to_rat
+    (c M : ℕ) (hc : 1 < c) (h6 : Nat.Coprime c 6) (hM : 0 < M) (hcM : Nat.Coprime c M) (x : Row M)
+    (hx : x ≠ 0)
+    : GlobalTheory.Sieg.admitted c (toQ M x) := by
   haveI : NeZero M := ⟨hM.ne'⟩
   refine ⟨hc, h6, ?_⟩
   rintro ⟨⟨n0, hn0⟩, ⟨n1, hn1⟩⟩
@@ -41,18 +43,18 @@ private theorem add_mul_lt_mul {k M a v : ℕ} (ha : a < k) (hv : v < M) : v + a
   have h2 : (a + 1) * M ≤ k * M := Nat.mul_le_mul_right _ ha
   omega
 
-private theorem dn_val (k M : ℕ) [NeZero (k * M)] (x' : Row (k * M)) (i : Fin 2) :
-    (dn k M x' i).val = (x' i).val % M := by
+private theorem dn_val (k M : ℕ) [NeZero (k * M)] (x' : Row (k * M)) (i : Fin 2)
+    : (dn k M x' i).val = (x' i).val % M := by
   show (ZMod.castHom _ (ZMod M) (x' i)).val = _
   rw [ZMod.castHom_apply, ZMod.cast_eq_val, ZMod.val_natCast]
 
-private theorem val_lt_mul_of_zmod_mul {k M : ℕ} (y : ZMod (k * M)) (hkM : k * M ≠ 0) : y.val < M * k := by
+private theorem val_lt_mul_of_zmod_mul {k M : ℕ} (y : ZMod (k * M)) (hkM : k * M ≠ 0)
+    : y.val < M * k := by
   haveI : NeZero (k * M) := ⟨hkM⟩
   have h := ZMod.val_lt y
   linarith [Nat.mul_comm k M]
 
-theorem UpperTheory.V.Z.Kato.Sym.sgDist :
-    UpperTheory.V.Z.Kato.Sym.SgDist := by
+theorem UpperTheory.V.Z.Kato.Sym.sgDist : UpperTheory.V.Z.Kato.Sym.SgDist := by
   classical
   intro Ω _ _ _ ε X c k M _ hc h6 hcop x hx
   have hkM : k * M ≠ 0 := NeZero.ne _
@@ -63,8 +65,9 @@ theorem UpperTheory.V.Z.Kato.Sym.sgDist :
   have hck : c.Coprime k := Nat.Coprime.coprime_dvd_right (dvd_mul_right k M) hcop
   have hMq : (M : ℚ) ≠ 0 := by exact_mod_cast hM.ne'
   have hkq : (k : ℚ) ≠ 0 := by exact_mod_cast hk.ne'
-  have split : ∀ x' : Row (k * M), dn k M x' = x → ∀ i : Fin 2,
-      (x' i).val = (x i).val + (x' i).val / M * M := by
+  have split
+      : ∀ x' : Row (k * M),
+        dn k M x' = x → ∀ i : Fin 2, (x' i).val = (x i).val + (x' i).val / M * M := by
     intro x' hx' i
     have h := dn_val k M x' i
     rw [hx'] at h
@@ -73,8 +76,9 @@ theorem UpperTheory.V.Z.Kato.Sym.sgDist :
     Nat.div_lt_of_lt_mul (val_lt_mul_of_zmod_mul (x' i) hkM)
   let sel : ℕ × ℕ → Fin 2 → ℕ := fun p => ![p.1, p.2]
   let j : ℕ × ℕ → Row (k * M) := fun p i => (((x i).val + sel p i * M : ℕ) : ZMod (k * M))
-  have jval : ∀ p ∈ Finset.range k ×ˢ Finset.range k, ∀ i : Fin 2,
-      (j p i).val = (x i).val + sel p i * M := by
+  have jval
+      : ∀ p ∈ Finset.range k ×ˢ Finset.range k, ∀ i : Fin 2,
+        (j p i).val = (x i).val + sel p i * M := by
     intro p hp i
     rw [Finset.mem_product, Finset.mem_range, Finset.mem_range] at hp
     have hs : sel p i < k := by
@@ -84,7 +88,9 @@ theorem UpperTheory.V.Z.Kato.Sym.sgDist :
     show ((((x i).val + sel p i * M : ℕ)) : ZMod (k * M)).val = _
     rw [ZMod.val_natCast]
     exact Nat.mod_eq_of_lt (add_mul_lt_mul hs (ZMod.val_lt (x i)))
-  rw [sg, ← GlobalTheory.KZDist.siegel_distribution Ω ε X c k (toQ M x) (siegel_admissible_to_rat c M hc h6 hM hcM x hx) hk hck,
+  rw [sg,
+    ← GlobalTheory.KZDist.siegel_distribution Ω ε X c k (toQ M x)
+      (siegel_admissible_to_rat c M hc h6 hM hcM x hx) hk hck,
     ← Finset.prod_product']
   refine Finset.prod_nbij' (fun x' => ((x' 0).val / M, (x' 1).val / M)) j ?_ ?_ ?_ ?_ ?_
   · intro x' _
@@ -101,8 +107,7 @@ theorem UpperTheory.V.Z.Kato.Sym.sgDist :
     funext i
     have e := split x' hx'.2 i
     show ((((x i).val + sel _ i * M : ℕ)) : ZMod (k * M)) = x' i
-    have hsel : sel ((x' 0).val / M, (x' 1).val / M) i = (x' i).val / M := by
-      fin_cases i <;> rfl
+    have hsel : sel ((x' 0).val / M, (x' 1).val / M) i = (x' i).val / M := by fin_cases i <;> rfl
     rw [hsel, ← e, ZMod.natCast_zmod_val]
   · intro p hp
     have h0 := jval p hp 0

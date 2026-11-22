@@ -28,14 +28,17 @@ instance instAddCommGroup : AddCommGroup (ConjDual H) :=
 def toDual (H : Host E) : ConjDual H ≃ₗ[ℤ] Module.Dual ℤ (𝓞 E) :=
   (AddEquiv.refl (Module.Dual ℤ (𝓞 E)) : ConjDual H ≃+ Module.Dual ℤ (𝓞 E)).toIntLinearEquiv
 
-@[ext] theorem ext {f g : ConjDual H} (h : ∀ x, toDual H f x = toDual H g x) : f = g :=
+@[ext]
+theorem ext {f g : ConjDual H} (h : ∀ x, toDual H f x = toDual H g x) : f = g :=
   (toDual H).injective (LinearMap.ext h)
 
 instance instSMul : SMul (𝓞 E) (ConjDual H) :=
   ⟨fun a f => (toDual H).symm (toDual H f ∘ₗ LinearMap.mulLeft ℤ (H.bar a))⟩
 
-@[simp] theorem smul_apply (a : 𝓞 E) (f : ConjDual H) (x : 𝓞 E) :
-    toDual H (a • f) x = toDual H f (H.bar a * x) := rfl
+@[simp]
+theorem smul_apply (a : 𝓞 E) (f : ConjDual H) (x : 𝓞 E)
+    : toDual H (a • f) x = toDual H f (H.bar a * x) :=
+  rfl
 
 instance instModule : Module (𝓞 E) (ConjDual H) where
   one_smul f := by ext; simp
@@ -81,12 +84,15 @@ def traceDual (H : Host E) : 𝓞 E →ₗ[𝓞 E] ConjDual H where
   map_add' x y := by ext; simp
   map_smul' a x := by ext; simp [trForm_mul_left]
 
-theorem traceDual_injective (H : Host E) : Function.Injective (traceDual H) :=
-  fun _ _ h => trForm_injective H (congrArg (toDual H) h)
+theorem traceDual_injective (H : Host E) : Function.Injective (traceDual H) := fun _ _ h =>
+  trForm_injective H (congrArg (toDual H) h)
 
-theorem finrank_eq_of_injective {M N : Type} [AddCommGroup M] [AddCommGroup N] [Module (𝓞 E) M] [Module (𝓞 E) N]
-    [Module.Finite ℤ N] (φ : M →ₗ[𝓞 E] N) (hφ : Function.Injective φ) (h : finrank ℤ M = finrank ℤ N) :
-    finrank (𝓞 E) M = finrank (𝓞 E) N := by
+theorem finrank_eq_of_injective
+    {M N : Type}
+    [AddCommGroup M] [AddCommGroup N] [Module (𝓞 E) M] [Module (𝓞 E) N] [Module.Finite ℤ N]
+    (φ : M →ₗ[𝓞 E] N) (hφ : Function.Injective φ)
+    (h : finrank ℤ M = finrank ℤ N)
+    : finrank (𝓞 E) M = finrank (𝓞 E) N := by
   haveI : Module.Finite (𝓞 E) N := .of_restrictScalars_finite ℤ _ _
   have h1 := Submodule.finrank_quotient_add_finrank ((LinearMap.range φ).restrictScalars ℤ)
   have h2 := Submodule.finrank_quotient_add_finrank (LinearMap.range φ)
@@ -113,17 +119,23 @@ theorem finrank_hypLattice (H : Host E) : finrank (𝓞 E) (HypLattice H) = 2 :=
   simp
 
 def hypForm (H : Host E) : LinearMap.BilinForm ℤ (HypLattice H) :=
-  LinearMap.mk₂ ℤ (fun u v => toDual H u.2 v.1 - toDual H v.2 u.1)
-    (fun u u' v => by simp; ring) (fun c u v => by simp [mul_sub, -zsmul_eq_mul, Prod.smul_fst, Prod.smul_snd])
-    (fun u v v' => by simp; ring) (fun c u v => by simp [mul_sub, -zsmul_eq_mul, Prod.smul_fst, Prod.smul_snd])
+  LinearMap.mk₂ ℤ
+    (fun u v => toDual H u.2 v.1 - toDual H v.2 u.1)
+    (fun u u' v => by simp; ring)
+    (fun c u v => by simp [mul_sub, -zsmul_eq_mul, Prod.smul_fst, Prod.smul_snd])
+    (fun u v v' => by simp; ring)
+    (fun c u v => by simp [mul_sub, -zsmul_eq_mul, Prod.smul_fst, Prod.smul_snd])
 
-@[simp] theorem hypForm_apply (H : Host E) (u v : HypLattice H) :
-    hypForm H u v = toDual H u.2 v.1 - toDual H v.2 u.1 := rfl
+@[simp]
+theorem hypForm_apply (H : Host E) (u v : HypLattice H)
+    : hypForm H u v = toDual H u.2 v.1 - toDual H v.2 u.1 :=
+  rfl
 
 theorem hypForm_self (H : Host E) (u : HypLattice H) : hypForm H u u = 0 := by simp
 
-theorem hypForm_smul (H : Host E) (a : 𝓞 E) (u v : HypLattice H) :
-    hypForm H (a • u) v = hypForm H u (H.bar a • v) := by simp
+theorem hypForm_smul (H : Host E) (a : 𝓞 E) (u v : HypLattice H)
+    : hypForm H (a • u) v = hypForm H u (H.bar a • v) := by
+  simp
 
 theorem hypForm_bijective (H : Host E) : Function.Bijective (hypForm H) := by
   constructor
@@ -133,8 +145,9 @@ theorem hypForm_bijective (H : Host E) : Function.Bijective (hypForm H) := by
     · ext y
       simpa using LinearMap.congr_fun hu (y, 0)
   · intro φ
-    obtain ⟨x, hx⟩ := (Module.evalEquiv ℤ (𝓞 E)).surjective
-      (-(φ ∘ₗ LinearMap.inr ℤ _ _ ∘ₗ (toDual H).symm.toLinearMap))
+    obtain ⟨x, hx⟩ :=
+      (Module.evalEquiv ℤ (𝓞 E)).surjective
+        (-(φ ∘ₗ LinearMap.inr ℤ _ _ ∘ₗ (toDual H).symm.toLinearMap))
     refine ⟨(x, (toDual H).symm (φ ∘ₗ LinearMap.inl ℤ _ _)), LinearMap.ext fun v => ?_⟩
     have h := LinearMap.congr_fun hx (toDual H v.2)
     simp at h
@@ -145,20 +158,20 @@ abbrev BasisIndex (E : Type) [Field E] [NumberField E] : Type := Free.ChooseBasi
 def hypBasis (H : Host E) : Basis (BasisIndex E ⊕ BasisIndex E) ℤ (HypLattice H) :=
   (RingOfIntegers.basis E).prod ((RingOfIntegers.basis E).dualBasis.map (toDual H).symm)
 
-theorem hypBasis_inl (H : Host E) (i : BasisIndex E) :
-    hypBasis H (Sum.inl i) = (RingOfIntegers.basis E i, 0) := by
+theorem hypBasis_inl (H : Host E) (i : BasisIndex E)
+    : hypBasis H (Sum.inl i) = (RingOfIntegers.basis E i, 0) := by
   ext <;> simp [hypBasis]
 
-theorem hypBasis_inr (H : Host E) (i : BasisIndex E) :
-    hypBasis H (Sum.inr i) = (0, (toDual H).symm ((RingOfIntegers.basis E).coord i)) := by
+theorem hypBasis_inr (H : Host E) (i : BasisIndex E)
+    : hypBasis H (Sum.inr i) = (0, (toDual H).symm ((RingOfIntegers.basis E).coord i)) := by
   ext <;> simp [hypBasis]
 
-theorem hypBasis_repr_inl (H : Host E) (u : HypLattice H) (i : BasisIndex E) :
-    (hypBasis H).repr u (Sum.inl i) = (RingOfIntegers.basis E).repr u.1 i := by
+theorem hypBasis_repr_inl (H : Host E) (u : HypLattice H) (i : BasisIndex E)
+    : (hypBasis H).repr u (Sum.inl i) = (RingOfIntegers.basis E).repr u.1 i := by
   simp [hypBasis]
 
-theorem hypBasis_repr_inr (H : Host E) (u : HypLattice H) (i : BasisIndex E) :
-    (hypBasis H).repr u (Sum.inr i) = toDual H u.2 (RingOfIntegers.basis E i) := by
+theorem hypBasis_repr_inr (H : Host E) (u : HypLattice H) (i : BasisIndex E)
+    : (hypBasis H).repr u (Sum.inr i) = toDual H u.2 (RingOfIntegers.basis E i) := by
   simp [hypBasis]
 
 def hypRealBasis (H : Host E) : Basis (BasisIndex E ⊕ BasisIndex E) ℝ (ℝ ⊗[ℤ] HypLattice H) :=
@@ -171,18 +184,22 @@ theorem gram_transpose (H : Host E) : (gram H)ᵀ = gram H := by
   ext i j
   simp [gram, trForm_symm H (RingOfIntegers.basis E j)]
 
-theorem toMatrix_trForm_baseChange (H : Host E) :
-    LinearMap.BilinForm.toMatrix ((RingOfIntegers.basis E).baseChange ℝ) ((trForm H).baseChange ℝ) = gram H := by
+theorem toMatrix_trForm_baseChange (H : Host E)
+    : LinearMap.BilinForm.toMatrix ((RingOfIntegers.basis E).baseChange ℝ) ((trForm H).baseChange ℝ)
+      = gram H := by
   ext i j
   simp [gram]
 
 theorem gram_posDef (H : Host E) : (gram H).PosDef := by
-  refine Matrix.PosDef.of_dotProduct_mulVec_pos (by simpa [Matrix.IsHermitian] using gram_transpose H)
-    fun x hx => ?_
+  refine Matrix.PosDef.of_dotProduct_mulVec_pos
+    (by simpa [Matrix.IsHermitian] using gram_transpose H) fun x hx => ?_
   set b := (RingOfIntegers.basis E).baseChange ℝ
-  have h := trForm_baseChange_pos H (v := b.equivFun.symm x) (by simpa only [ne_eq, map_eq_zero_iff _ b.equivFun.symm.injective] using hx)
+  have h :=
+    trForm_baseChange_pos H (v := b.equivFun.symm x)
+      (by simpa only [ne_eq, map_eq_zero_iff _ b.equivFun.symm.injective] using hx)
   rw [LinearMap.BilinForm.apply_eq_dotProduct_toMatrix_mulVec b, toMatrix_trForm_baseChange,
-    ← Basis.equivFun_apply, LinearEquiv.apply_symm_apply] at h
+      ← Basis.equivFun_apply, LinearEquiv.apply_symm_apply]
+    at h
   exact h
 
 theorem isUnit_det_gram (H : Host E) : IsUnit (gram H).det := (gram_posDef H).det_pos.ne'.isUnit
@@ -190,38 +207,47 @@ theorem isUnit_det_gram (H : Host E) : IsUnit (gram H).det := (gram_posDef H).de
 def hypJ (H : Host E) : ℝ ⊗[ℤ] HypLattice H →ₗ[ℝ] ℝ ⊗[ℤ] HypLattice H :=
   Matrix.toLin (hypRealBasis H) (hypRealBasis H) (Matrix.fromBlocks 0 (-(gram H)⁻¹) (gram H) 0)
 
-theorem toMatrix_hypJ (H : Host E) : LinearMap.toMatrix (hypRealBasis H) (hypRealBasis H) (hypJ H) =
-    Matrix.fromBlocks 0 (-(gram H)⁻¹) (gram H) 0 := LinearMap.toMatrix_toLin _ _ _
+theorem toMatrix_hypJ (H : Host E)
+    : LinearMap.toMatrix (hypRealBasis H) (hypRealBasis H) (hypJ H)
+      = Matrix.fromBlocks 0 (-(gram H)⁻¹) (gram H) 0 :=
+  LinearMap.toMatrix_toLin _ _ _
 
 theorem hypJ_hypJ (H : Host E) (x) : hypJ H (hypJ H x) = -x := by
   have : hypJ H ∘ₗ hypJ H = -LinearMap.id := by
     apply (LinearMap.toMatrix (hypRealBasis H) (hypRealBasis H)).injective
     rw [LinearMap.toMatrix_comp _ (hypRealBasis H), toMatrix_hypJ, map_neg, LinearMap.toMatrix_id,
       Matrix.fromBlocks_multiply, ← Matrix.fromBlocks_one, Matrix.fromBlocks_neg]
-    simp [Matrix.mul_nonsing_inv _ (isUnit_det_gram H), Matrix.nonsing_inv_mul _ (isUnit_det_gram H)]
+    simp [Matrix.mul_nonsing_inv _ (isUnit_det_gram H),
+      Matrix.nonsing_inv_mul _ (isUnit_det_gram H)]
   exact LinearMap.congr_fun this x
 
-theorem toMatrix_hypForm (H : Host E) :
-    LinearMap.BilinForm.toMatrix (hypRealBasis H) ((hypForm H).baseChange ℝ) = Matrix.fromBlocks 0 (-1) 1 0 := by
-  ext (i | i) (j | j) <;>
-    simp [hypRealBasis, hypBasis_inl, hypBasis_inr, Matrix.one_apply, Finsupp.single_apply, eq_comm]
+theorem toMatrix_hypForm (H : Host E)
+    : LinearMap.BilinForm.toMatrix (hypRealBasis H) ((hypForm H).baseChange ℝ)
+      = Matrix.fromBlocks 0 (-1) 1 0 := by
+  ext (i | i) (j | j) <;> simp [hypRealBasis, hypBasis_inl, hypBasis_inr, Matrix.one_apply,
+    Finsupp.single_apply, eq_comm]
 
-theorem hypForm_hypJ_hypJ (H : Host E) (x y) :
-    (hypForm H).baseChange ℝ (hypJ H x) (hypJ H y) = (hypForm H).baseChange ℝ x y := by
+theorem hypForm_hypJ_hypJ (H : Host E) (x y)
+    : (hypForm H).baseChange ℝ (hypJ H x) (hypJ H y) = (hypForm H).baseChange ℝ x y := by
   have : ((hypForm H).baseChange ℝ).comp (hypJ H) (hypJ H) = (hypForm H).baseChange ℝ := by
     apply (LinearMap.BilinForm.toMatrix (hypRealBasis H)).injective
     rw [LinearMap.BilinForm.toMatrix_comp (hypRealBasis H), toMatrix_hypJ, toMatrix_hypForm]
-    simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_multiply, Matrix.transpose_nonsing_inv, gram_transpose,
-      Matrix.mul_nonsing_inv _ (isUnit_det_gram H), Matrix.nonsing_inv_mul _ (isUnit_det_gram H)]
+    simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_multiply, Matrix.transpose_nonsing_inv,
+      gram_transpose, Matrix.mul_nonsing_inv _ (isUnit_det_gram H),
+      Matrix.nonsing_inv_mul _ (isUnit_det_gram H)]
   exact LinearMap.congr_fun₂ this x y
 
-theorem hypForm_hypJ_pos (H : Host E) (x) (hx : x ≠ 0) : 0 < (hypForm H).baseChange ℝ (hypJ H x) x := by
-  have h : LinearMap.BilinForm.toMatrix (hypRealBasis H) (((hypForm H).baseChange ℝ).compLeft (hypJ H)) =
-      Matrix.fromBlocks (gram H) 0 0 (gram H)⁻¹ := by
+theorem hypForm_hypJ_pos (H : Host E) (x) (hx : x ≠ 0)
+    : 0 < (hypForm H).baseChange ℝ (hypJ H x) x := by
+  have h
+      : LinearMap.BilinForm.toMatrix (hypRealBasis H) (((hypForm H).baseChange ℝ).compLeft (hypJ H))
+        = Matrix.fromBlocks (gram H) 0 0 (gram H)⁻¹ := by
     rw [LinearMap.BilinForm.toMatrix_compLeft, toMatrix_hypJ, toMatrix_hypForm]
-    simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_multiply, Matrix.transpose_nonsing_inv, gram_transpose]
-  have h2 := LinearMap.BilinForm.apply_eq_dotProduct_toMatrix_mulVec (hypRealBasis H)
-    (((hypForm H).baseChange ℝ).compLeft (hypJ H)) x x
+    simp [Matrix.fromBlocks_transpose, Matrix.fromBlocks_multiply, Matrix.transpose_nonsing_inv,
+      gram_transpose]
+  have h2 :=
+    LinearMap.BilinForm.apply_eq_dotProduct_toMatrix_mulVec (hypRealBasis H)
+      (((hypForm H).baseChange ℝ).compLeft (hypJ H)) x x
   rw [h, LinearMap.BilinForm.compLeft_apply] at h2
   have hc : (hypRealBasis H).repr x ≠ 0 := by simpa using hx
   set c : BasisIndex E ⊕ BasisIndex E → ℝ := ⇑((hypRealBasis H).repr x) with hc'
@@ -247,10 +273,12 @@ theorem trace_mulMatrix (a : 𝓞 E) : (mulMatrix a).trace = (Algebra.trace ℤ 
   rw [Algebra.trace_eq_matrix_trace (RingOfIntegers.basis E)]
   simp [mulMatrix, Matrix.trace]
 
-theorem gram_mul_mulMatrix (H : Host E) (a : 𝓞 E) :
-    gram H * mulMatrix a = (mulMatrix (H.bar a))ᵀ * gram H := by
-  have h : ∀ (a : 𝓞 E) i j, (gram H * mulMatrix a) i j =
-      (trForm H (RingOfIntegers.basis E i) (a * RingOfIntegers.basis E j) : ℤ) := by
+theorem gram_mul_mulMatrix (H : Host E) (a : 𝓞 E)
+    : gram H * mulMatrix a = (mulMatrix (H.bar a))ᵀ * gram H := by
+  have h
+      : ∀ (a : 𝓞 E) i j,
+        (gram H * mulMatrix a) i j
+          = (trForm H (RingOfIntegers.basis E i) (a * RingOfIntegers.basis E j) : ℤ) := by
     intro a i j
     conv_rhs => rw [← (RingOfIntegers.basis E).sum_repr (a * RingOfIntegers.basis E j)]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -260,17 +288,19 @@ theorem gram_mul_mulMatrix (H : Host E) (a : 𝓞 E) :
   rw [← gram_transpose H, ← Matrix.transpose_mul, gram_transpose, Matrix.transpose_apply, h, h,
     trForm_symm, trForm_mul_left]
 
-theorem toMatrix_of_smul (H : Host E) (a : 𝓞 E) (A : ℝ ⊗[ℤ] HypLattice H →ₗ[ℝ] ℝ ⊗[ℤ] HypLattice H)
-    (hA : ∀ x, A (1 ⊗ₜ x) = 1 ⊗ₜ (a • x)) :
-    LinearMap.toMatrix (hypRealBasis H) (hypRealBasis H) A =
-      Matrix.fromBlocks (mulMatrix a) 0 0 (mulMatrix (H.bar a))ᵀ := by
-  ext (i | i) (j | j) <;>
-    simp [LinearMap.toMatrix_apply, hypRealBasis, hA, hypBasis_inl, hypBasis_inr, hypBasis_repr_inl,
-      hypBasis_repr_inr, mulMatrix, Algebra.leftMulMatrix_eq_repr_mul]
+theorem toMatrix_of_smul
+    (H : Host E) (a : 𝓞 E)
+    (A : ℝ ⊗[ℤ] HypLattice H →ₗ[ℝ] ℝ ⊗[ℤ] HypLattice H) (hA : ∀ x, A (1 ⊗ₜ x) = 1 ⊗ₜ (a • x))
+    : LinearMap.toMatrix (hypRealBasis H) (hypRealBasis H) A
+      = Matrix.fromBlocks (mulMatrix a) 0 0 (mulMatrix (H.bar a))ᵀ := by
+  ext (i | i) (j | j)
+    <;> simp [LinearMap.toMatrix_apply, hypRealBasis, hA, hypBasis_inl, hypBasis_inr,
+      hypBasis_repr_inl, hypBasis_repr_inr, mulMatrix, Algebra.leftMulMatrix_eq_repr_mul]
 
-theorem sum_add_conj_eq_trace (H : Host E) (a : 𝓞 E) :
-    ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
-      (τ (a : E) + starRingEnd ℂ (τ (a : E))) = (Algebra.trace ℤ (𝓞 E) a : ℤ) := by
+theorem sum_add_conj_eq_trace (H : Host E) (a : 𝓞 E)
+    : ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
+        (τ (a : E) + starRingEnd ℂ (τ (a : E)))
+      = (Algebra.trace ℤ (𝓞 E) a : ℤ) := by
   have hd : (H.d : ℂ) ≠ 0 := by exact_mod_cast H.d_prime.ne_zero
   have h0 : -H.rt0 ≠ H.rt0 := by
     intro h
@@ -298,17 +328,19 @@ theorem sum_add_conj_eq_trace (H : Host E) (a : 𝓞 E) :
 
 section Action
 
-variable (H : Host E) (a : 𝓞 E) (A : ℝ ⊗[ℤ] HypLattice H →ₗ[ℝ] ℝ ⊗[ℤ] HypLattice H)
-  (hA : ∀ x, A (1 ⊗ₜ x) = 1 ⊗ₜ (a • x))
+variable
+  (H : Host E) (a : 𝓞 E)
+  (A : ℝ ⊗[ℤ] HypLattice H →ₗ[ℝ] ℝ ⊗[ℤ] HypLattice H) (hA : ∀ x, A (1 ⊗ₜ x) = 1 ⊗ₜ (a • x))
 include hA
 
 theorem hypJ_comm : hypJ H ∘ₗ A = A ∘ₗ hypJ H := by
   apply (LinearMap.toMatrix (hypRealBasis H) (hypRealBasis H)).injective
   have h : (gram H)⁻¹ * (mulMatrix (H.bar a))ᵀ = mulMatrix a * (gram H)⁻¹ := by
     rw [← Matrix.mul_nonsing_inv_cancel_right (gram H) (mulMatrix (H.bar a))ᵀ (isUnit_det_gram H),
-      ← gram_mul_mulMatrix, Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_left _ _ (isUnit_det_gram H)]
-  rw [LinearMap.toMatrix_comp _ (hypRealBasis H), LinearMap.toMatrix_comp _ (hypRealBasis H), toMatrix_hypJ,
-    toMatrix_of_smul H a A hA]
+      ← gram_mul_mulMatrix, Matrix.mul_assoc,
+      Matrix.nonsing_inv_mul_cancel_left _ _ (isUnit_det_gram H)]
+  rw [LinearMap.toMatrix_comp _ (hypRealBasis H), LinearMap.toMatrix_comp _ (hypRealBasis H),
+    toMatrix_hypJ, toMatrix_of_smul H a A hA]
   simp [Matrix.fromBlocks_multiply, gram_mul_mulMatrix, h]
 
 theorem trace_of_smul : LinearMap.trace ℝ _ A = 2 * (Algebra.trace ℤ (𝓞 E) a : ℤ) := by
@@ -320,13 +352,14 @@ theorem trace_of_smul : LinearMap.trace ℝ _ A = 2 * (Algebra.trace ℤ (𝓞 E
   simp [Matrix.trace, Fintype.sum_sum_type, h1, h2]
 
 theorem trace_hypJ_comp : LinearMap.trace ℝ _ (hypJ H ∘ₗ A) = 0 := by
-  rw [LinearMap.trace_eq_matrix_trace ℝ (hypRealBasis H), LinearMap.toMatrix_comp _ (hypRealBasis H), toMatrix_hypJ,
-    toMatrix_of_smul H a A hA]
+  rw [LinearMap.trace_eq_matrix_trace ℝ (hypRealBasis H),
+    LinearMap.toMatrix_comp _ (hypRealBasis H), toMatrix_hypJ, toMatrix_of_smul H a A hA]
   simp [Matrix.fromBlocks_multiply, Matrix.trace, Fintype.sum_sum_type]
 
 end Action
 
-@[reducible] def hypDatum (H : Host E) : Datum H where
+@[reducible]
+def hypDatum (H : Host E) : Datum H where
   La := HypLattice H
   fin := inferInstance
   proj := inferInstance
@@ -337,18 +370,27 @@ end Action
   p := 1
   q := 1
   rank := finrank_hypLattice H
-  dom := ⟨hypJ H, hypJ_hypJ H, hypForm_hypJ_hypJ H, hypForm_hypJ_pos H, fun a A t hA ht => by
-    simp only [Nat.cast_one, one_mul, sum_add_conj_eq_trace] at ht
-    refine ⟨hypJ_comm H a A hA, ?_, ?_⟩
-    · rw [trace_of_smul H a A hA, ht, Complex.intCast_re]
-    · rw [trace_hypJ_comp H a A hA, ht, Complex.intCast_im, mul_zero]⟩
+  dom := ⟨
+    hypJ H,
+    hypJ_hypJ H,
+    hypForm_hypJ_hypJ H,
+    hypForm_hypJ_pos H,
+    fun a A t hA ht => by
+      simp only [Nat.cast_one, one_mul, sum_add_conj_eq_trace] at ht
+      refine ⟨hypJ_comm H a A hA, ?_, ?_⟩
+      · rw [trace_of_smul H a A hA, ht, Complex.intCast_re]
+      · rw [trace_hypJ_comp H a A hA, ht, Complex.intCast_im, mul_zero]
+  ⟩
 
-@[simp] theorem hypDatum_p (H : Host E) : (hypDatum H).p = 1 := rfl
+@[simp]
+theorem hypDatum_p (H : Host E) : (hypDatum H).p = 1 := rfl
 
-@[simp] theorem hypDatum_q (H : Host E) : (hypDatum H).q = 1 := rfl
+@[simp]
+theorem hypDatum_q (H : Host E) : (hypDatum H).q = 1 := rfl
 
-theorem hypDatum_smul (H : Host E) (a x : 𝓞 E) (f : ConjDual H) :
-    (a • (x, f) : (hypDatum H).La) = (a * x, a • f) := rfl
+theorem hypDatum_smul (H : Host E) (a x : 𝓞 E) (f : ConjDual H)
+    : (a • (x, f) : (hypDatum H).La) = (a * x, a • f) :=
+  rfl
 
 theorem hypDatum_EF_inl_inl (H : Host E) (x y : 𝓞 E) : (hypDatum H).EF (x, 0) (y, 0) = 0 := by simp
 

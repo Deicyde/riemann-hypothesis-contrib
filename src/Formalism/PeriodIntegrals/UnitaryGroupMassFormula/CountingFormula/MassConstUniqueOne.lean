@@ -6,7 +6,8 @@ public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepre
 
 @[expose] public section
 
-open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Pf.Cnt
+open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Pf.Cnt
 open Classical
 
 noncomputable section
@@ -30,20 +31,25 @@ section Const
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
-theorem massConst_unique_one (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {c c' : ℝ}
-    (hc : MassConst K F 1 c) (hc' : MassConst K F 1 c') : c = c' := by
+theorem massConst_unique_one
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {c c' : ℝ} (hc : MassConst K F 1 c) (hc' : MassConst K F 1 c')
+    : c = c' := by
   have ho := stdLat_isOrtho K 1
   have hs := stdForm_isSymm K 1
-  have e := hc _ (stdForm K 1) (stdLat K 1) hs (isTotPosDef_of_ortho hK hs ho) (finrank_of_ortho ho)
-    (isFullLattice_of_ortho ho) (isIntegralLat_of_ortho ho)
-  have e' := hc' _ (stdForm K 1) (stdLat K 1) hs (isTotPosDef_of_ortho hK hs ho) (finrank_of_ortho ho)
-    (isFullLattice_of_ortho ho) (isIntegralLat_of_ortho ho)
+  have e :=
+    hc _ (stdForm K 1) (stdLat K 1) hs (isTotPosDef_of_ortho hK hs ho) (finrank_of_ortho ho)
+      (isFullLattice_of_ortho ho) (isIntegralLat_of_ortho ho)
+  have e' :=
+    hc' _ (stdForm K 1) (stdLat K 1) hs (isTotPosDef_of_ortho hK hs ho) (finrank_of_ortho ho)
+      (isFullLattice_of_ortho ho) (isIntegralLat_of_ortho ho)
   rw [lamG_eq_one_of_ortho hK hF hs ho, mul_one] at e e'
   rw [← e, ← e']
 
 variable [Fact Formalism.HermitianLattices.Ext.L3.HermRepUnram] in
-theorem massConst_cMass (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (m : ℕ) (hm : 1 ≤ m) :
-    MassConst K F m (cMass K F m) := by
+theorem massConst_cMass
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (m : ℕ) (hm : 1 ≤ m)
+    : MassConst K F m (cMass K F m) := by
   obtain ⟨c₁, hc₁, hall⟩ := massConst_all hermRepUnram liStat hK hF
   have h1 : MassConst K F 1 c₁ := by
     have := hall 1 le_rfl
@@ -58,6 +64,5 @@ theorem massConst_cMass (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF
   exact hall m hm
 
 end Const
-
 
 end PI.UnitaryGroupMassFormula.CntFormula.RowsMassW

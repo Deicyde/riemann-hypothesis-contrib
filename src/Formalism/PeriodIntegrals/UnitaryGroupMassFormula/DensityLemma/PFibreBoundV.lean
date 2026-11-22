@@ -4,7 +4,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.DensityLemma.PFi
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 
 noncomputable section
 
@@ -245,22 +246,28 @@ lemma aux2 (x : ℂ) (j : Fin (k + 1)) : star (-hW k j * star x) * hW k j + x = 
   rw [star_mul', star_neg, star_star, star_hW]
   linear_combination (-x) * hW_sq j
 
-private theorem fin_eq_eI_or_wI_or_esI (i : Fin (2 * r + k + 1)) :
-    (∃ a, i = eI k r a) ∨ (∃ j, i = wI k r j) ∨ (∃ a, i = esI k r a) :=
-  cases3 (P := fun i => (∃ a, i = eI k r a) ∨ (∃ j, i = wI k r j) ∨ (∃ a, i = esI k r a))
-    (fun a => Or.inl ⟨a, rfl⟩) (fun j => Or.inr (Or.inl ⟨j, rfl⟩)) (fun a => Or.inr (Or.inr ⟨a, rfl⟩)) i
+private theorem fin_eq_eI_or_wI_or_esI (i : Fin (2 * r + k + 1))
+    : (∃ a, i = eI k r a) ∨ (∃ j, i = wI k r j) ∨ (∃ a, i = esI k r a) :=
+  cases3
+    (P := fun i => (∃ a, i = eI k r a) ∨ (∃ j, i = wI k r j) ∨ (∃ a, i = esI k r a))
+    (fun a => Or.inl ⟨a, rfl⟩)
+    (fun j => Or.inr (Or.inl ⟨j, rfl⟩))
+    (fun a => Or.inr (Or.inr ⟨a, rfl⟩))
+    i
 
 theorem nb_UH (hS : Sᴴ = -S) : unipotentBlockMatrix k r Bm S ∈ UH (Hpk k r) := by
   show (unipotentBlockMatrix k r Bm S)ᴴ * Hpk k r * unipotentBlockMatrix k r Bm S = Hpk k r
   ext p q
   rw [uh_entry, sum_split]
-  rcases fin_eq_eI_or_wI_or_esI p with ⟨a, rfl⟩ | ⟨j, rfl⟩ | ⟨a, rfl⟩ <;>
-    rcases fin_eq_eI_or_wI_or_esI q with ⟨b, rfl⟩ | ⟨i, rfl⟩ | ⟨b, rfl⟩ <;>
-    simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, mul_one, mul_zero, zero_mul,
-      nb_ee, nb_we, nb_se, nb_ew, nb_ww, nb_sw, nb_es, nb_ws, nb_ss, star_ite_one_zero, star_zero,
-      Finset.sum_const_zero, add_zero, zero_add, Hpk_ee, Hpk_ew, Hpk_es, Hpk_we, Hpk_ww, Hpk_ws, Hpk_se,
-      Hpk_sw, Hpk_ss, ite_mul, mul_ite, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
-  all_goals first
+  rcases fin_eq_eI_or_wI_or_esI p with ⟨a, rfl⟩ | ⟨j, rfl⟩ | ⟨a, rfl⟩
+    <;> rcases fin_eq_eI_or_wI_or_esI q with ⟨b, rfl⟩ | ⟨i, rfl⟩ | ⟨b, rfl⟩
+    <;> simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, mul_one, mul_zero,
+      zero_mul, nb_ee, nb_we, nb_se, nb_ew, nb_ww, nb_sw, nb_es, nb_ws, nb_ss, star_ite_one_zero,
+      star_zero, Finset.sum_const_zero, add_zero, zero_add, Hpk_ee, Hpk_ew, Hpk_es, Hpk_we, Hpk_ww,
+      Hpk_ws, Hpk_se, Hpk_sw, Hpk_ss, ite_mul, mul_ite, Finset.sum_ite_eq, Finset.sum_ite_eq',
+      Finset.mem_univ, ↓ reduceIte]
+  all_goals
+    first
     | exact aux1 _ _
     | exact aux2 _ _
     | (rw [mid_sum]; linear_combination cm_skew Bm S hS _ _)
@@ -299,12 +306,13 @@ lemma nb_z_wI {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (j : Fin (k + 
   simp only [nb_we, nb_ww, nb_ws, inWb_esI hz, zero_mul, mul_zero, Finset.sum_const_zero, zero_add,
     add_zero, ite_mul, one_mul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
 
-theorem nb_uMap {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hB : Bm *ᵥ zW k r z = 0) :
-    C2.uMap k r z (unipotentBlockMatrix k r Bm S) = 1 := by
+theorem nb_uMap {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hB : Bm *ᵥ zW k r z = 0)
+    : C2.uMap k r z (unipotentBlockMatrix k r Bm S) = 1 := by
   obtain ⟨hzW, hT⟩ := hz
   have hne : herm (Hpk k r) z z ≠ 0 := by
     intro h0
-    simp only [Formalism.QuantumDeterminants.Tz, h0, Complex.zero_re, neg_zero, lt_self_iff_false] at hT
+    simp only [Formalism.QuantumDeterminants.Tz, h0, Complex.zero_re, neg_zero, lt_self_iff_false]
+      at hT
   ext a b
   have ha' := a.isLt
   have hb' := b.isLt
@@ -317,15 +325,22 @@ theorem nb_uMap {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hB : Bm 
       by_cases hab : a = b
       · subst hab; simp
       · rw [if_neg hab, if_neg]
-        intro h; exact hab (Fin.ext (by simpa using congrArg Fin.val h))
+        intro h
+        exact hab (Fin.ext (by simpa using congrArg Fin.val h))
     · simp only [fvec, dif_neg hb, nb_z_eI Bm S hzW, hB, Pi.zero_apply]
       rw [if_neg]
-      intro h; apply hb; rw [← h]; exact ha
+      intro h
+      apply hb
+      rw [← h]
+      exact ha
   · rw [dif_neg ha, herm_Hpk_of_inWb_eq_sum_wI hzW (unipotentBlockMatrix k r Bm S *ᵥ fvec k r z b)]
     by_cases hb : b.val < r
     · simp only [fvec, dif_pos hb, mulVec_bvec, nb_we, mul_zero, Finset.sum_const_zero, zero_div]
       rw [if_neg]
-      intro h; apply ha; rw [h]; exact hb
+      intro h
+      apply ha
+      rw [h]
+      exact hb
     · simp only [fvec, dif_neg hb, nb_z_wI Bm S hzW]
       rw [← herm_Hpk_of_inWb_eq_sum_wI hzW z, div_self hne, if_pos]
       exact Fin.ext (by omega)
@@ -342,8 +357,9 @@ theorem nb_Nset (hS : Sᴴ = -S) : unipotentBlockMatrix k r Bm S ∈ Nset k r :=
     simp only [unipotentBlockMatrix, Matrix.of_apply]
     split_ifs <;> first | (exfalso; omega) | simp
 
-theorem nb_mem {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hB : Bm *ᵥ zW k r z = 0) (hS : Sᴴ = -S) :
-    unipotentBlockMatrix k r Bm S ∈ C2.N0set k r z := by
+theorem nb_mem
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hB : Bm *ᵥ zW k r z = 0) (hS : Sᴴ = -S)
+    : unipotentBlockMatrix k r Bm S ∈ C2.N0set k r z := by
   show _ ∧ _
   exact ⟨nb_Nset Bm S hS, nb_uMap Bm S hz hB⟩
 
@@ -370,8 +386,9 @@ lemma gz_eI {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (g : B.Mat k r) 
   simp only [inWb_eI hz, inWb_esI hz, mul_zero, Finset.sum_const_zero, zero_add, add_zero]
 
 omit Bm S in
-theorem nb_fwd {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (n : B.Mat k r) (hn : n ∈ C2.N0set k r z) :
-    ∃ (Bm : Matrix (Fin r) (Fin (k + 1)) ℂ) (S : Matrix (Fin r) (Fin r) ℂ),
+theorem nb_fwd
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (n : B.Mat k r) (hn : n ∈ C2.N0set k r z)
+    : ∃ (Bm : Matrix (Fin r) (Fin (k + 1)) ℂ) (S : Matrix (Fin r) (Fin r) ℂ),
       Bm *ᵥ zW k r z = 0 ∧ Sᴴ = -S ∧ n = unipotentBlockMatrix k r Bm S := by
   have hzW : inWb k r z := hz.1
   have hu : C2.uMap k r z n = 1 := hn.2
@@ -391,7 +408,8 @@ theorem nb_fwd {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (n : B.Mat
     by_cases hab : a = b
     · subst hab; simp
     · rw [if_neg hab, if_neg]
-      intro h; exact hab (Fin.ext (by simpa using congrArg Fin.val h))
+      intro h
+      exact hab (Fin.ext (by simpa using congrArg Fin.val h))
   have hlast : ∀ a : Fin r, (n *ᵥ z) (eI k r a) = 0 := by
     intro a
     have h1 := congrFun (congrFun hu ⟨a.val, by omega⟩) (Fin.last r)
@@ -402,14 +420,17 @@ theorem nb_fwd {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (n : B.Mat
       simp only [Fin.val_last, Fin.val_mk] at h2
       have := a.isLt
       omega
-  obtain ⟨B0, hB0⟩ : ∃ B0 : Matrix (Fin r) (Fin (k + 1)) ℂ, ∀ a j, B0 a j = n (eI k r a) (wI k r j) :=
+  obtain ⟨B0, hB0⟩
+      : ∃ B0 : Matrix (Fin r) (Fin (k + 1)) ℂ, ∀ a j, B0 a j = n (eI k r a) (wI k r j) :=
     ⟨Matrix.of fun a j => n (eI k r a) (wI k r j), fun _ _ => rfl⟩
   obtain ⟨C0, hC0⟩ : ∃ C0 : Matrix (Fin r) (Fin r) ℂ, ∀ a b, C0 a b = n (eI k r a) (esI k r b) :=
     ⟨Matrix.of fun a b => n (eI k r a) (esI k r b), fun _ _ => rfl⟩
-  obtain ⟨S0, hS0⟩ : ∃ S0 : Matrix (Fin r) (Fin r) ℂ,
-      ∀ a b, S0 a b = C0 a b + (1 / 2 : ℂ) * (B0 * Matrix.diagonal (hW k) * B0ᴴ) a b :=
-    ⟨C0 + (1 / 2 : ℂ) • (B0 * Matrix.diagonal (hW k) * B0ᴴ), fun a b => by
-      rw [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]⟩
+  obtain ⟨S0, hS0⟩
+      : ∃ S0 : Matrix (Fin r) (Fin r) ℂ, ∀ a b,
+        S0 a b = C0 a b + (1 / 2 : ℂ) * (B0 * Matrix.diagonal (hW k) * B0ᴴ) a b := ⟨
+    C0 + (1 / 2 : ℂ) • (B0 * Matrix.diagonal (hW k) * B0ᴴ),
+    fun a b => by rw [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
+  ⟩
   have hwe : ∀ j b, n (wI k r j) (eI k r b) = 0 := by
     intro j b
     have := b.isLt
@@ -423,38 +444,44 @@ theorem nb_fwd {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (n : B.Mat
     intro i j
     have := i.isLt
     have := j.isLt
-    rw [hmid (wI k r i) (wI k r j) (by rw [wI_val]; omega) (by rw [wI_val]; omega) (by rw [wI_val]; omega)]
+    rw [hmid (wI k r i) (wI k r j) (by rw [wI_val]; omega) (by rw [wI_val]; omega)
+      (by rw [wI_val]; omega)]
     simp only [wI_inj]
   have hsw : ∀ a j, n (esI k r a) (wI k r j) = 0 := by
     intro a j
     have := a.isLt
     have := j.isLt
     rw [hmid (esI k r a) (wI k r j) (by rw [wI_val]; omega) (by rw [wI_val]; omega)
-      (by rw [esI_val]; omega), if_neg (wI_ne_esI j a).symm]
+        (by rw [esI_val]; omega),
+      if_neg (wI_ne_esI j a).symm]
   have hss : ∀ a b, n (esI k r a) (esI k r b) = if a = b then 1 else 0 := by
     intro a b
     have h := hE (eI k r a) (esI k r b)
     rw [sum_split] at h
-    simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hee, hwe, hse, star_ite_one_zero,
-      star_zero, zero_mul, ite_mul, Finset.sum_const_zero, add_zero, Finset.sum_ite_eq',
-      Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, Hpk_es] at h
+    simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hee, hwe, hse,
+        star_ite_one_zero, star_zero, zero_mul, ite_mul, Finset.sum_const_zero, add_zero,
+        Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, ↓ reduceIte, Hpk_es]
+      at h
     exact h
   have hws : ∀ j b, n (wI k r j) (esI k r b) = -(hW k j) * star (B0 b j) := by
     intro j b
     have h := hE (wI k r j) (esI k r b)
     rw [sum_split] at h
-    simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hss, hww, hsw, star_ite_one_zero,
-      star_zero, zero_mul, mul_zero, mul_one, ite_mul, mul_ite, Finset.sum_const_zero, add_zero,
-      Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, Hpk_ws] at h
+    simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hss, hww, hsw,
+        star_ite_one_zero, star_zero, zero_mul, mul_zero, mul_one, ite_mul, mul_ite,
+        Finset.sum_const_zero, add_zero, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ,
+        ↓ reduceIte, Hpk_ws]
+      at h
     rw [hB0]
     linear_combination (hW k j) * h - n (wI k r j) (esI k r b) * hW_sq j
   have hcm : ∀ a b, C0 a b + star (C0 b a) + (B0 * Matrix.diagonal (hW k) * B0ᴴ) a b = 0 := by
     intro a b
     have h := hE (esI k r a) (esI k r b)
     rw [sum_split] at h
-    simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hss, hws, star_ite_one_zero,
-      mul_one, mul_zero, zero_mul, ite_mul, mul_ite, Finset.sum_const_zero, Finset.sum_ite_eq',
-      Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, Hpk_ss] at h
+    simp only [piI_eI, piI_wI, piI_esI, epsI_eI, epsI_wI, epsI_esI, one_mul, hss, hws,
+        star_ite_one_zero, mul_one, mul_zero, zero_mul, ite_mul, mul_ite, Finset.sum_const_zero,
+        Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, ↓ reduceIte, Hpk_ss]
+      at h
     rw [mid_sum] at h
     rw [hC0, hC0]
     linear_combination h
@@ -469,8 +496,8 @@ theorem nb_fwd {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (n : B.Mat
     rw [Matrix.conjTranspose_apply, Matrix.neg_apply, hS0, hS0, star_add, star_mul', X_herm, h12]
     linear_combination hcm a b
   · ext p q
-    rcases fin_eq_eI_or_wI_or_esI p with ⟨a, rfl⟩ | ⟨j, rfl⟩ | ⟨a, rfl⟩ <;>
-      rcases fin_eq_eI_or_wI_or_esI q with ⟨b, rfl⟩ | ⟨i, rfl⟩ | ⟨b, rfl⟩
+    rcases fin_eq_eI_or_wI_or_esI p with ⟨a, rfl⟩ | ⟨j, rfl⟩ | ⟨a, rfl⟩
+      <;> rcases fin_eq_eI_or_wI_or_esI q with ⟨b, rfl⟩ | ⟨i, rfl⟩ | ⟨b, rfl⟩
     · rw [nb_ee, hee]
     · rw [nb_ew, hB0]
     · rw [nb_es]
@@ -485,8 +512,12 @@ theorem nb_fwd {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (n : B.Mat
 
 end NBk
 
-theorem unipotent_eq_block : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), C2.StdZ k r z →
-    ∀ n ∈ C2.N0set k r z, ∃ (Bm : Matrix (Fin r) (Fin (k + 1)) ℂ) (S : Matrix (Fin r) (Fin r) ℂ),
-      Bm *ᵥ zW k r z = 0 ∧ Sᴴ = -S ∧ n = unipotentBlockMatrix k r Bm S := fun k r z hz n hn => NBk.nb_fwd hz n hn
+theorem unipotent_eq_block
+    : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ),
+      C2.StdZ k r z
+        → ∀ n ∈ C2.N0set k r z,
+          ∃ (Bm : Matrix (Fin r) (Fin (k + 1)) ℂ) (S : Matrix (Fin r) (Fin r) ℂ),
+            Bm *ᵥ zW k r z = 0 ∧ Sᴴ = -S ∧ n = unipotentBlockMatrix k r Bm S := fun k r z hz n hn =>
+  NBk.nb_fwd hz n hn
 
 end PI.UnitaryGroupMassFormula.DLm

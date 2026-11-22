@@ -44,8 +44,7 @@ private lemma circle_zero_null (r : Polynomial ℂ) (hr : r ≠ 0) :
     exact hs
   exact hfin.measure_zero _
 
-theorem UpperTheory.Gal.Gen.nullZero_pf :
-    UpperTheory.Gal.Gen.NullZero := by
+theorem UpperTheory.Gal.Gen.nullZero_pf : UpperTheory.Gal.Gen.NullZero := by
   intro n
   induction n with
   | zero =>
@@ -58,28 +57,34 @@ theorem UpperTheory.Gal.Gen.nullZero_pf :
     simpa using ha
   | succ n ih =>
     intro p hp
-    have hq : MvPolynomial.finSuccEquiv ℂ n p ≠ 0 := by
-      simpa using hp
-    have hc := ih (MvPolynomial.finSuccEquiv ℂ n p).leadingCoeff (Polynomial.leadingCoeff_ne_zero.mpr hq)
+    have hq : MvPolynomial.finSuccEquiv ℂ n p ≠ 0 := by simpa using hp
+    have hc :=
+      ih (MvPolynomial.finSuccEquiv ℂ n p).leadingCoeff (Polynomial.leadingCoeff_ne_zero.mpr hq)
     have hmp := volume_preserving_piFinSuccAbove (fun _ : Fin (n + 1) => UnitAddCircle) 0
     set e := MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1) => UnitAddCircle) 0 with he
-    have hclosed : IsClosed {θ : Fin (n + 1) → UnitAddCircle |
-        MvPolynomial.eval (fun i => (pt θ i : ℂ)) p = 0} :=
+    have hclosed : IsClosed
+        {θ : Fin (n + 1) → UnitAddCircle |
+          MvPolynomial.eval (fun i => (pt θ i : ℂ)) p = 0} :=
       isClosed_eq (continuous_eval_pt p) continuous_const
-    have hm : MeasurableSet {z : UnitAddCircle × (Fin n → UnitAddCircle) |
-        MvPolynomial.eval (fun i => (pt (e.symm z) i : ℂ)) p ≠ 0} :=
+    have hm : MeasurableSet
+        {z : UnitAddCircle × (Fin n → UnitAddCircle) |
+          MvPolynomial.eval (fun i => (pt (e.symm z) i : ℂ)) p ≠ 0} :=
       e.symm.measurable hclosed.measurableSet.compl
-    have hsymm : ∀ (s : UnitAddCircle) (θ : Fin n → UnitAddCircle),
-        e.symm (s, θ) = (Fin.cons s θ : Fin (n + 1) → UnitAddCircle) := by
+    have hsymm
+        : ∀ (s : UnitAddCircle) (θ : Fin n → UnitAddCircle),
+          e.symm (s, θ) = (Fin.cons s θ : Fin (n + 1) → UnitAddCircle) := by
       intro s θ
       simp [he, MeasurableEquiv.piFinSuccAbove, Fin.insertNth_zero']
-    have hprod : ∀ᵐ z ∂(volume.prod volume : Measure (UnitAddCircle × (Fin n → UnitAddCircle))),
-        MvPolynomial.eval (fun i => (pt (e.symm z) i : ℂ)) p ≠ 0 := by
+    have hprod
+        : ∀ᵐ z ∂(volume.prod volume : Measure (UnitAddCircle × (Fin n → UnitAddCircle))),
+          MvPolynomial.eval (fun i => (pt (e.symm z) i : ℂ)) p ≠ 0 := by
       refine (Measure.ae_prod_iff_ae_ae hm).2 ?_
       refine (Measure.ae_ae_comm hm).2 ?_
       filter_upwards [hc] with θ' hθ'
-      have hr : Polynomial.map (MvPolynomial.eval (fun i => (pt θ' i : ℂ)))
-          (MvPolynomial.finSuccEquiv ℂ n p) ≠ 0 := by
+      have hr
+          : Polynomial.map (MvPolynomial.eval (fun i => (pt θ' i : ℂ)))
+              (MvPolynomial.finSuccEquiv ℂ n p)
+            ≠ 0 := by
         intro h
         apply hθ'
         rw [Polynomial.leadingCoeff, ← Polynomial.coeff_map, h, Polynomial.coeff_zero]

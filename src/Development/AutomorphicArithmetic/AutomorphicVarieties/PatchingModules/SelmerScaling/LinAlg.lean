@@ -4,12 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem finrank_quotient_le_of_forall_dependent_mod {F V : Type} [Field F] [AddCommGroup V] [Module F V] [Module.Finite F V]
+private theorem finrank_quotient_le_of_forall_dependent_mod
+    {F V : Type} [Field F] [AddCommGroup V] [Module F V] [Module.Finite F V]
     (g : ℕ) (U : Submodule F V)
-    (h : ∀ z : Fin (g + 1) → V, ∃ c : Fin (g + 1) → F, c ≠ 0 ∧ ∑ i, c i • z i ∈ U) :
-    Module.finrank F (V ⧸ U) ≤ g := by
+    (h : ∀ z : Fin (g + 1) → V, ∃ c : Fin (g + 1) → F, c ≠ 0 ∧ ∑ i, c i • z i ∈ U)
+    : Module.finrank F (V ⧸ U) ≤ g := by
   by_contra hlt
   push_neg at hlt
   let b := Module.finBasis F (V ⧸ U)
@@ -22,12 +24,15 @@ private theorem finrank_quotient_le_of_forall_dependent_mod {F V : Type} [Field 
       rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
       exact hc
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, map_smul, hz] using this
+    simpa [map_sum, map_smul, hz] using this
   exact hc0 (funext fun i => Fintype.linearIndependent_iff.1 hli c hsum i)
 
-private theorem exists_spanning_family_of_finrank_le {F V : Type} [Field F] [AddCommGroup V] [Module F V] (N : ℕ)
-    (C : Submodule F V) [Module.Finite F C] (h : Module.finrank F C ≤ N) :
-    ∃ ψ : Fin N → V, (∀ i, ψ i ∈ C) ∧ C ≤ Submodule.span F (Set.range ψ) := by
+private theorem exists_spanning_family_of_finrank_le
+    {F V : Type} [Field F] [AddCommGroup V] [Module F V]
+    (N : ℕ)
+    (C : Submodule F V) [Module.Finite F C]
+    (h : Module.finrank F C ≤ N)
+    : ∃ ψ : Fin N → V, (∀ i, ψ i ∈ C) ∧ C ≤ Submodule.span F (Set.range ψ) := by
   classical
   let b := Module.finBasis F C
   refine ⟨fun i => if hi : (i : ℕ) < Module.finrank F C then (b ⟨i, hi⟩ : V) else 0, ?_, ?_⟩
@@ -43,12 +48,19 @@ private theorem exists_spanning_family_of_finrank_le {F V : Type} [Field F] [Add
       simp only [Submodule.coe_smul] at this
       exact this.symm
     rw [hf']
-    refine Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _
-      (Submodule.subset_span ⟨⟨k, lt_of_lt_of_le k.2 h⟩, ?_⟩)
+    refine Submodule.sum_mem _ fun k _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨⟨k, lt_of_lt_of_le k.2 h⟩, ?_⟩)
     simp [k.2]
 
-theorem UpperTheory.V.Pa.linAlg :
-    ∀ (F T : Type) [Field F] [AddCommGroup T] [Module F T] [Module.Finite F T] (g D0 : ℕ) (U : Submodule F (Fin g → T)), (∀ z : Fin (g + 1) → Fin g → T, ∃ c : Fin (g + 1) → F, c ≠ 0 ∧ ∑ i, c i • z i ∈ U) → (∀ (e : ℕ) (α : Fin e → T), LinearIndependent F α → (∀ i j, Pi.single j (α i) ∈ U) → e + g * g ≤ D0) → ∃ (X : Fin D0 → Module.Dual F T) (c : Fin g × Fin g → Fin D0 → F), Submodule.span F (Set.range X) = ⊤ ∧ LinearIndependent F c ∧ ∀ a ∈ U, ∀ i, ∑ j, ∑ k, c (i, j) k * X k (a j) = 0 := by
+theorem UpperTheory.V.Pa.linAlg
+    : ∀ (F T : Type) [Field F] [AddCommGroup T] [Module F T] [Module.Finite F T] (g D0 : ℕ)
+        (U : Submodule F (Fin g → T)),
+      (∀ z : Fin (g + 1) → Fin g → T, ∃ c : Fin (g + 1) → F, c ≠ 0 ∧ ∑ i, c i • z i ∈ U)
+        → (∀ (e : ℕ) (α : Fin e → T),
+          LinearIndependent F α → (∀ i j, Pi.single j (α i) ∈ U) → e + g * g ≤ D0)
+        → ∃ (X : Fin D0 → Module.Dual F T) (c : Fin g × Fin g → Fin D0 → F),
+          Submodule.span F (Set.range X) = ⊤ ∧ LinearIndependent F c
+            ∧ ∀ a ∈ U, ∀ i, ∑ j, ∑ k, c (i, j) k * X k (a j) = 0 := by
   intro F T _ _ _ _ g D0 U h1 h2
   classical
   have hAdim : Module.finrank F U.dualAnnihilator ≤ g := by
@@ -85,8 +97,10 @@ theorem UpperTheory.V.Pa.linAlg :
     rw [Submodule.mem_comap, ← Subspace.dualAnnihilator_dualCoannihilator_eq (W := U),
       Submodule.mem_dualCoannihilator]
     intro f hf
-    have hle : Submodule.span F (Set.range Φ) ≤ LinearMap.ker
-        (Module.Dual.eval F (Fin g → T) (LinearMap.single F (fun _ : Fin g => T) j t)) := by
+    have hle
+        : Submodule.span F (Set.range Φ)
+          ≤ LinearMap.ker (Module.Dual.eval F (Fin g → T)
+            (LinearMap.single F (fun _ : Fin g => T) j t)) := by
       rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       simp only [SetLike.mem_coe, LinearMap.mem_ker, Module.Dual.eval_apply]
@@ -114,8 +128,13 @@ theorem UpperTheory.V.Pa.linAlg :
   have hXκ : ∀ p, X (κ p) = φ p.1 p.2 := by
     intro p
     simp only [X, κ, Equiv.apply_symm_apply, Sum.elim_inl, Equiv.symm_apply_apply]
-  refine ⟨X, fun p => Pi.basisFun F (Fin D0) (κ p), ?_,
-    (Pi.basisFun F (Fin D0)).linearIndependent.comp κ hκ, ?_⟩
+  refine ⟨
+    X,
+    fun p => Pi.basisFun F (Fin D0) (κ p),
+    ?_,
+    (Pi.basisFun F (Fin D0)).linearIndependent.comp κ hκ,
+    ?_
+  ⟩
   · rw [eq_top_iff, ← hC.sup_eq_top, sup_le_iff]
     constructor
     · rw [hSdef, Submodule.span_le]

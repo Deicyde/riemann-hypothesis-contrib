@@ -8,15 +8,20 @@ noncomputable section
 
 namespace Formalism.MainNotions.G.SymmetricFormBlocks
 
-open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.G.GLWeightTheory Formalism.MainNotions.G.CountingStatementReduction
+open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.G.GLWeightTheory
+  Formalism.MainNotions.G.CountingStatementReduction
 
 section Dim
 
 variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem xi_span (ι : ℚ_[p] →+* KK O) {N r t b : ℕ} (g : MvPolynomial (BVar N r t) (KK O))
-    (hg : g ∈ XiPolZ O N r t b) :
-    g ∈ Submodule.span (KK O) (map ι '' (Formalism.GM.M.XiPolZ p N r t b : Set (MvPolynomial (Formalism.GM.M.BVar N r t) ℚ_[p]))) := by
+theorem xi_span
+    (ι : ℚ_[p] →+* KK O)
+    {N r t b : ℕ} (g : MvPolynomial (BVar N r t) (KK O)) (hg : g ∈ XiPolZ O N r t b)
+    : g ∈ Submodule.span (KK O)
+      (map ι
+        '' (Formalism.GM.M.XiPolZ p N r t b
+          : Set (MvPolynomial (Formalism.GM.M.BVar N r t) ℚ_[p]))) := by
   classical
   rw [g.as_sum]
   refine Submodule.sum_mem _ fun μ hμ => ?_
@@ -36,23 +41,29 @@ theorem xi_span (ι : ℚ_[p] →+* KK O) {N r t b : ℕ} (g : MvPolynomial (BVa
   rw [h2]
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, h1, rfl⟩)
 
-theorem finrank_span_image_le (ι : ℚ_[p] →+* KK O) {V₁ V₂ : Type} [AddCommGroup V₁] [Module ℚ_[p] V₁]
-    [AddCommGroup V₂] [Module (KK O) V₂] (f : V₁ → V₂) (hadd : ∀ u v, f (u + v) = f u + f v)
-    (hsm : ∀ (c : ℚ_[p]) u, f (c • u) = ι c • f u) (W : Submodule ℚ_[p] V₁) [FiniteDimensional ℚ_[p] W] :
-    Module.finrank (KK O) (Submodule.span (KK O) (f '' (W : Set V₁))) ≤ Module.finrank ℚ_[p] W := by
+theorem finrank_span_image_le
+    (ι : ℚ_[p] →+* KK O)
+    {V₁ V₂ : Type} [AddCommGroup V₁] [Module ℚ_[p] V₁] [AddCommGroup V₂] [Module (KK O) V₂]
+    (f : V₁ → V₂)
+    (hadd : ∀ u v, f (u + v) = f u + f v) (hsm : ∀ (c : ℚ_[p]) u, f (c • u) = ι c • f u)
+    (W : Submodule ℚ_[p] V₁) [FiniteDimensional ℚ_[p] W]
+    : Module.finrank (KK O) (Submodule.span (KK O) (f '' (W : Set V₁)))
+      ≤ Module.finrank ℚ_[p] W := by
   classical
   set bW := Module.finBasis ℚ_[p] W
   have h0 : f 0 = 0 := by
     have := hsm 0 0
     rwa [zero_smul, map_zero, zero_smul] at this
-  have hsum : ∀ (s : Finset (Fin (Module.finrank ℚ_[p] W))) (c : Fin (Module.finrank ℚ_[p] W) → ℚ_[p]),
-      f (∑ i ∈ s, c i • (bW i : V₁)) = ∑ i ∈ s, ι (c i) • f (bW i) := by
+  have hsum
+      : ∀ (s : Finset (Fin (Module.finrank ℚ_[p] W))) (c : Fin (Module.finrank ℚ_[p] W) → ℚ_[p]),
+        f (∑ i ∈ s, c i • (bW i : V₁)) = ∑ i ∈ s, ι (c i) • f (bW i) := by
     intro s c
     induction s using Finset.induction_on with
     | empty => simp [h0]
     | insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, hadd, hsm, ih]
-  have hle : Submodule.span (KK O) (f '' (W : Set V₁)) ≤
-      Submodule.span (KK O) (Set.range fun i => f (bW i)) := by
+  have hle
+      : Submodule.span (KK O) (f '' (W : Set V₁))
+        ≤ Submodule.span (KK O) (Set.range fun i => f (bW i)) := by
     rw [Submodule.span_le]
     rintro _ ⟨w, hw, rfl⟩
     have hw' : (⟨w, hw⟩ : W) = ∑ i, (bW.repr ⟨w, hw⟩ i) • bW i := (bW.sum_repr _).symm
@@ -65,15 +76,18 @@ theorem finrank_span_image_le (ι : ℚ_[p] →+* KK O) {V₁ V₂ : Type} [AddC
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
   haveI : FiniteDimensional (KK O) (Submodule.span (KK O) (Set.range fun i => f (bW i))) :=
     FiniteDimensional.span_of_finite (KK O) (Set.finite_range _)
-  calc Module.finrank (KK O) (Submodule.span (KK O) (f '' (W : Set V₁)))
-      ≤ Module.finrank (KK O) (Submodule.span (KK O) (Set.range fun i => f (bW i))) := Submodule.finrank_mono hle
+  calc
+    Module.finrank (KK O) (Submodule.span (KK O) (f '' (W : Set V₁)))
+        ≤ Module.finrank (KK O) (Submodule.span (KK O) (Set.range fun i => f (bW i))) :=
+      Submodule.finrank_mono hle
     _ ≤ Fintype.card (Fin (Module.finrank ℚ_[p] W)) := finrank_range_le_card _
     _ = Module.finrank ℚ_[p] W := Fintype.card_fin _
 
-theorem finrank_biSup_le {K V ι : Type} [Field K] [AddCommGroup V] [Module K V] (U : ι → Submodule K V)
-    (s : Finset ι) (hU : ∀ i ∈ s, FiniteDimensional K (U i)) :
-    FiniteDimensional K (⨆ i ∈ s, U i : Submodule K V) ∧
-      Module.finrank K (⨆ i ∈ s, U i : Submodule K V) ≤ ∑ i ∈ s, Module.finrank K (U i) := by
+theorem finrank_biSup_le
+    {K V ι : Type} [Field K] [AddCommGroup V] [Module K V]
+    (U : ι → Submodule K V) (s : Finset ι) (hU : ∀ i ∈ s, FiniteDimensional K (U i))
+    : FiniteDimensional K (⨆ i ∈ s, U i : Submodule K V)
+      ∧ Module.finrank K (⨆ i ∈ s, U i : Submodule K V) ≤ ∑ i ∈ s, Module.finrank K (U i) := by
   classical
   induction s using Finset.induction_on with
   | empty =>

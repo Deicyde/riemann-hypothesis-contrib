@@ -50,12 +50,18 @@ theorem LocalQuotColon.proof : LocalQuotColon.Statement.{u} := by
     obtain ⟨c, hc⟩ := (IsLocalization.eq_iff_exists U.primeCompl S).mp hps
     have hx : (c : R) * s * t' * r ∈ (P ⊔ Ideal.span {f}).colon {g} := by
       rw [Submodule.mem_colon_singleton, smul_eq_mul]
-      refine Submodule.mem_sup.mpr ⟨-((c : R) * p), P.neg_mem (P.mul_mem_left _ p.2),
-        (c : R) * s * t * r' * f, Ideal.mem_span_singleton'.mpr ⟨_, rfl⟩, ?_⟩
+      refine Submodule.mem_sup.mpr ⟨
+        -((c : R) * p),
+        P.neg_mem (P.mul_mem_left _ p.2),
+        (c : R) * s * t * r' * f,
+        Ideal.mem_span_singleton'.mpr ⟨_, rfl⟩,
+        ?_
+      ⟩
       linear_combination hc
-    have hy' : Ideal.Quotient.mk I (IsLocalization.mk' S r t) =
-        localQuotMap P U ((c : R) * s * t' * r) *
-          Ideal.Quotient.mk I (IsLocalization.mk' S (1 : R) (c * s * t' * t)) := by
+    have hy'
+        : Ideal.Quotient.mk I (IsLocalization.mk' S r t)
+          = localQuotMap P U ((c : R) * s * t' * r)
+            * Ideal.Quotient.mk I (IsLocalization.mk' S (1 : R) (c * s * t' * t)) := by
       rw [hφ, ← map_mul, IsLocalization.mul_mk'_eq_mk'_of_mul, mul_one]
       congr 1
       rw [IsLocalization.mk'_eq_iff_eq]

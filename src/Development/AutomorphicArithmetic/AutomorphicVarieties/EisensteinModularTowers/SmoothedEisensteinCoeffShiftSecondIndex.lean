@@ -6,10 +6,14 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsLamOfLS
 @[expose] public section
 
 open scoped MatrixGroups Matrix
-open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois UpperTheory.Kd.L
+open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois
+  UpperTheory.Kd.L
 
-private theorem zpow_cg {K : Type} [Field K] {M : ℕ} {ζ : K} (hM : 0 < M) (hζ : ζ ^ M = 1) {x y : ℤ}
-    (h : x ≡ y [ZMOD M]) : ζ ^ x = ζ ^ y := by
+private theorem zpow_cg
+    {K : Type} [Field K]
+    {M : ℕ} {ζ : K} (hM : 0 < M) (hζ : ζ ^ M = 1)
+    {x y : ℤ} (h : x ≡ y [ZMOD M])
+    : ζ ^ x = ζ ^ y := by
   have h0 : ζ ≠ 0 := by
     rintro rfl
     rw [zero_pow hM.ne'] at hζ
@@ -18,9 +22,12 @@ private theorem zpow_cg {K : Type} [Field K] {M : ℕ} {ζ : K} (hM : 0 < M) (h�
   have : y = x + (M : ℤ) * k := by linarith
   rw [this, zpow_add₀ h0, zpow_mul, zpow_natCast, hζ, one_zpow, mul_one]
 
-private theorem eisF_shift {K : Type} [Field K] [CharZero K] (j M : ℕ) (ζ : K) (a₁ a₂ e : ℤ) (hM : 0 < M)
-    (hζ : ζ ^ M = 1) (n : ℕ) :
-    eisF j M ζ a₁ (a₂ + e * a₁) n = ζ ^ (e * (n : ℤ)) * eisF j M ζ a₁ a₂ n := by
+private theorem eisF_shift
+    {K : Type} [Field K] [CharZero K]
+    (j M : ℕ)
+    (ζ : K)
+    (a₁ a₂ e : ℤ) (hM : 0 < M) (hζ : ζ ^ M = 1) (n : ℕ)
+    : eisF j M ζ a₁ (a₂ + e * a₁) n = ζ ^ (e * (n : ℤ)) * eisF j M ζ a₁ a₂ n := by
   have h0 : ζ ≠ 0 := by
     rintro rfl
     rw [zero_pow hM.ne'] at hζ
@@ -48,8 +55,10 @@ private theorem eisF_shift {K : Type} [Field K] [CharZero K] (j M : ℕ) (ζ : K
           apply zpow_cg hM hζ
           have h2 := ((h.symm.mul_left e).add_left a₂).mul_right (d : ℤ)
           refine h2.trans ?_
-          rw [show (a₂ + e * ((n / d : ℕ) : ℤ)) * d = e * (((n / d : ℕ) : ℤ) * d) + a₂ * d by ring, ← hnd]
-        rw [this]; ring
+          rw [show (a₂ + e * ((n / d : ℕ) : ℤ)) * d = e * (((n / d : ℕ) : ℤ) * d) + a₂ * d by ring,
+            ← hnd]
+        rw [this]
+        ring
       · rw [mul_zero]
     · split_ifs with h
       · have : ζ ^ (-((a₂ + e * a₁) * d)) = ζ ^ (e * (n : ℤ)) * ζ ^ (-(a₂ * d)) := by
@@ -57,12 +66,17 @@ private theorem eisF_shift {K : Type} [Field K] [CharZero K] (j M : ℕ) (ζ : K
           apply zpow_cg hM hζ
           have h2 := (((h.symm.mul_left e).add_left a₂).mul_right (d : ℤ)).neg
           refine h2.trans ?_
-          rw [show -((a₂ + e * -((n / d : ℕ) : ℤ)) * d) = e * (((n / d : ℕ) : ℤ) * d) + -(a₂ * d) by ring, ← hnd]
-        rw [this]; ring
+          rw [show -((a₂ + e * -((n / d : ℕ) : ℤ)) * d) = e * (((n / d : ℕ) : ℤ) * d) + -(a₂ * d) by
+              ring,
+            ← hnd]
+        rw [this]
+        ring
       · rw [mul_zero]
 
-theorem UpperTheory.smoothedEisensteinCoeff_shift_second_index :
-    ∀ {K : Type} [Field K] [CharZero K] (c : ℤ) (j M : ℕ) (ζ : K) (a₁ a₂ e : ℤ), 0 < M → ζ ^ M = 1 → ∀ n : ℕ, smF c j M ζ a₁ (a₂ + e * a₁) n = ζ ^ (e * (n : ℤ)) * smF c j M ζ a₁ a₂ n := by
+theorem UpperTheory.smoothedEisensteinCoeff_shift_second_index
+    : ∀ {K : Type} [Field K] [CharZero K] (c : ℤ) (j M : ℕ) (ζ : K) (a₁ a₂ e : ℤ),
+      0 < M → ζ ^ M = 1
+        → ∀ n : ℕ, smF c j M ζ a₁ (a₂ + e * a₁) n = ζ ^ (e * (n : ℤ)) * smF c j M ζ a₁ a₂ n := by
   intro K _ _ c j M ζ a₁ a₂ e hM hζ n
   unfold smF
   rw [show c * (a₂ + e * a₁) = c * a₂ + e * (c * a₁) by ring, eisF_shift j M ζ a₁ a₂ e hM hζ,

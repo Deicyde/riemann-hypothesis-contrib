@@ -14,9 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsT
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -26,13 +29,18 @@ noncomputable section
 
 namespace GlobalTheory.Poinc.Sep
 
-theorem realPt_comp_pow {S : Scheme.{0}} {A T T₀ : Over S} [GrpObj A] (u : T₀ ⟶ T) (x : T ⟶ A) (n : ℕ) :
-    u ≫ x ^ n = (u ≫ x) ^ n := by
+theorem realPt_comp_pow
+    {S : Scheme.{0}} {A T T₀ : Over S} [GrpObj A] (u : T₀ ⟶ T) (x : T ⟶ A) (n : ℕ)
+    : u ≫ x ^ n = (u ≫ x) ^ n := by
   induction n with
   | zero => rw [pow_zero, pow_zero, MonObj.comp_one]
   | succ n ih => rw [pow_succ, pow_succ, MonObj.comp_mul, ih]
 
-theorem realPt_inj_of_grpPullback : ∀ {o₂ Ω₂ : Type} [CommRing o₂] [Field Ω₂] [Algebra o₂ Ω₂] (S₂ : ThetaSys o₂ Ω₂) (ρ₂ : S₂.Real) {T : Scheme.{0}} (G : Over T) [GrpObj G] (f : Sp S₂.R ⟶ T) (φ : ρ₂.P.A.left ⟶ G.left), IsGrpPullback ρ₂.P.A G f φ → ∀ x y : S₂.Gam, (ρ₂.pt x).left ≫ φ = (ρ₂.pt y).left ≫ φ → x = y := by
+theorem realPt_inj_of_grpPullback
+    : ∀ {o₂ Ω₂ : Type} [CommRing o₂] [Field Ω₂] [Algebra o₂ Ω₂] (S₂ : ThetaSys o₂ Ω₂) (ρ₂ : S₂.Real)
+        {T : Scheme.{0}} (G : Over T) [GrpObj G] (f : Sp S₂.R ⟶ T) (φ : ρ₂.P.A.left ⟶ G.left),
+      IsGrpPullback ρ₂.P.A G f φ
+        → ∀ x y : S₂.Gam, (ρ₂.pt x).left ≫ φ = (ρ₂.pt y).left ≫ φ → x = y := by
   intro o₂ Ω₂ _ _ _ S₂ ρ₂ T G _ f φ hφ x y hxy
   have hpt : ρ₂.pt x = ρ₂.pt y := by
     ext
@@ -56,8 +64,7 @@ theorem realPt_inj_of_grpPullback : ∀ {o₂ Ω₂ : Type} [CommRing o₂] [Fie
   let K := AlgebraicClosure Ω₂
   let x₀ : Sp K ⟶ Sp S₂.R := spMap ((algebraMap Ω₂ K).comp (S₂.R.val : S₂.R →+* Ω₂))
   let u : Over.mk x₀ ⟶ baseOver (Sp S₂.R) := Over.homMk x₀ (by simp)
-  have hz : (u ≫ ρ₂.pt x) ^ (S₂.r * S₂.N) = 1 := by
-    rw [← realPt_comp_pow, hkill, MonObj.comp_one]
+  have hz : (u ≫ ρ₂.pt x) ^ (S₂.r * S₂.N) = 1 := by rw [← realPt_comp_pow, hkill, MonObj.comp_one]
   obtain ⟨a, _, huniq⟩ := ρ₂.pt_bij K x₀ (u ≫ ρ₂.pt x) hz
   have h1 := huniq x rfl
   have h2 := huniq y (by rw [hpt])

@@ -10,10 +10,11 @@ open Module
 
 namespace PI.Tr
 
-private theorem exists_generator_of_finrank_eq_one_zLattice {E : Type} [NormedAddCommGroup E]
-    [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] (Λ : Submodule ℤ E) [DiscreteTopology Λ]
-    [IsZLattice ℝ Λ] (h1 : finrank ℝ E = 1) :
-    ∃ a ∈ Λ, a ≠ 0 ∧ ∀ x ∈ Λ, ∃ k : ℤ, x = (k : ℝ) • a := by
+private theorem exists_generator_of_finrank_eq_one_zLattice
+    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ]
+    (h1 : finrank ℝ E = 1)
+    : ∃ a ∈ Λ, a ≠ 0 ∧ ∀ x ∈ Λ, ∃ k : ℤ, x = (k : ℝ) • a := by
   have hrk : finrank ℤ Λ = 1 := (ZLattice.rank ℝ Λ).trans h1
   let b := Module.finBasisOfFinrankEq ℤ Λ hrk
   refine ⟨(b 0 : E), (b 0).2, fun h => b.ne_zero 0 (Subtype.ext h), ?_⟩
@@ -45,9 +46,10 @@ theorem keySmall : KeySmall := by
       · rw [Int.cast_smul_eq_zsmul]
         exact Λ.smul_mem _ haΛ
       · rw [← sub_smul, norm_smul, Real.norm_eq_abs]
-        calc |t - ((round t : ℤ) : ℝ)| * ‖a‖ * lam ≤ (1 / 2) * ‖a‖ * lam :=
-              mul_le_mul_of_nonneg_right
-                (mul_le_mul_of_nonneg_right (abs_sub_round t) (norm_nonneg a)) hlam.le
+        calc
+          |t - ((round t : ℤ) : ℝ)| * ‖a‖ * lam ≤ (1 / 2) * ‖a‖ * lam :=
+            mul_le_mul_of_nonneg_right
+              (mul_le_mul_of_nonneg_right (abs_sub_round t) (norm_nonneg a)) hlam.le
           _ = (1 / 2) * (lam * ‖a‖) := by ring
           _ ≤ (1 / 2) * 1 := mul_le_mul_of_nonneg_left hc (by norm_num)
           _ = 1 / 2 := by ring
@@ -59,17 +61,18 @@ theorem keySmall : KeySmall := by
           inv_mul_cancel₀ hα2, mul_one]
       have hnorm : ‖(‖a‖ ^ 2)⁻¹ • a‖ < lam := by
         rw [norm_smul, norm_inv, norm_pow, norm_norm]
-        have e : (‖a‖ ^ 2)⁻¹ * ‖a‖ * ‖a‖ = 1 := by
-          rw [mul_assoc, ← sq, inv_mul_cancel₀ hα2]
+        have e : (‖a‖ ^ 2)⁻¹ * ‖a‖ * ‖a‖ = 1 := by rw [mul_assoc, ← sq, inv_mul_cancel₀ hα2]
         have hlt : (‖a‖ ^ 2)⁻¹ * ‖a‖ * ‖a‖ < lam * ‖a‖ := by
           rw [e]
           exact hc
         exact lt_of_mul_lt_mul_right hlt hα.le
-      obtain ⟨m, hm⟩ := hdual ((‖a‖ ^ 2)⁻¹ • a)
-        (by
-          intro x hx
-          obtain ⟨k, rfl⟩ := hmul x hx
-          exact ⟨k, key _⟩) hnorm
+      obtain ⟨m, hm⟩ :=
+        hdual ((‖a‖ ^ 2)⁻¹ • a)
+          (by
+            intro x hx
+            obtain ⟨k, rfl⟩ := hmul x hx
+            exact ⟨k, key _⟩)
+          hnorm
       rw [key] at hm
       refine ⟨(m : ℝ) • a, ?_, ?_⟩
       · rw [Int.cast_smul_eq_zsmul]

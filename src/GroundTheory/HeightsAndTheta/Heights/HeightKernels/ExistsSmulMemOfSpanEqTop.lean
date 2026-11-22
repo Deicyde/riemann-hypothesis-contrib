@@ -23,9 +23,10 @@ open NumberField NumberField.ComplexEmbedding TensorProduct Matrix GroundTheory.
 
 noncomputable section
 
-theorem genIndex_eq_div_of_le {M : Type*} [AddCommGroup M] {A B C : AddSubgroup M} (hCA : C ≤ A)
-    (hCB : C ≤ B) (hC : C.relIndex B ≠ 0) :
-    genIndex A B = (C.relIndex A : ℝ) / (C.relIndex B : ℝ) := by
+theorem genIndex_eq_div_of_le
+    {M : Type*} [AddCommGroup M]
+    {A B C : AddSubgroup M} (hCA : C ≤ A) (hCB : C ≤ B) (hC : C.relIndex B ≠ 0)
+    : genIndex A B = (C.relIndex A : ℝ) / (C.relIndex B : ℝ) := by
   have h1 : C.relIndex (A ⊓ B) * B.relIndex A = C.relIndex A := by
     rw [← AddSubgroup.inf_relIndex_left A B]
     exact AddSubgroup.relIndex_mul_relIndex _ _ _ (le_inf hCA hCB) inf_le_left

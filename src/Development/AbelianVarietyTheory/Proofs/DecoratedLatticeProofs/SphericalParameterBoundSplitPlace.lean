@@ -18,11 +18,11 @@ open Formalism.UG GlobalTheory.LFun
 
 variable {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] {K : Subgroup G}
 
-
 open Classical in
 def cosetInd (S : Finset (G ⧸ K)) : G → ℂ := fun g => if (g : G ⧸ K) ∈ S then 1 else 0
 
-theorem cosetInd_mem {S : Finset (G ⧸ K)} (hS : ∀ x ∈ K, ∀ c ∈ S, x • c ∈ S) : cosetInd S ∈ Hecke ℂ K := by
+theorem cosetInd_mem {S : Finset (G ⧸ K)} (hS : ∀ x ∈ K, ∀ c ∈ S, x • c ∈ S)
+    : cosetInd S ∈ Hecke ℂ K := by
   classical
   refine ⟨fun a b g => ?_, S.image Quotient.out, fun g hg => ?_⟩
   · have e : ((a * g * b : G) : G ⧸ K) = (a : G) • (g : G ⧸ K) := QuotientGroup.mk_mul_of_mem _ b.2
@@ -35,17 +35,23 @@ theorem cosetInd_mem {S : Finset (G ⧸ K)} (hS : ∀ x ∈ K, ∀ c ∈ S, x �
     obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul K g
     exact ⟨_, Finset.mem_image_of_mem _ h, 1, k⁻¹, by rw [hk]; simp⟩
 
-theorem heckeVec_cosetInd (ρ : Representation ℂ G V) (S : Finset (G ⧸ K)) (x : V) :
-    heckeVec ρ K (cosetInd S) x = ∑ c ∈ S, ρ c.out x := by
+theorem heckeVec_cosetInd (ρ : Representation ℂ G V) (S : Finset (G ⧸ K)) (x : V)
+    : heckeVec ρ K (cosetInd S) x = ∑ c ∈ S, ρ c.out x := by
   rw [heckeVec, finsum_eq_sum_of_support_subset (s := S)]
   · exact Finset.sum_congr rfl fun c hc => by simp [cosetInd, hc]
   · intro c hc
     by_contra h
     exact hc (by simp [cosetInd, show c ∉ S from h])
 
-theorem norm_le_card {ι : Type} (ρ : Representation ℂ G V) {x : V} (l : V →ₗ[ℂ] ℂ) {C : ℝ}
-    (hC : ∀ y, ‖l (ρ y x)‖ ≤ C) (h1 : l (ρ 1 x) ≠ 0) (S : Finset ι) (g : ι → G) (a : ℂ)
-    (h : ∑ c ∈ S, ρ (g c) x = a • x) : ‖a‖ ≤ S.card := by
+theorem norm_le_card
+    {ι : Type}
+    (ρ : Representation ℂ G V)
+    {x : V}
+    (l : V →ₗ[ℂ] ℂ)
+    {C : ℝ} (hC : ∀ y, ‖l (ρ y x)‖ ≤ C)
+    (h1 : l (ρ 1 x) ≠ 0)
+    (S : Finset ι) (g : ι → G) (a : ℂ) (h : ∑ c ∈ S, ρ (g c) x = a • x)
+    : ‖a‖ ≤ S.card := by
   have hb : BddAbove (Set.range fun y => ‖l (ρ y x)‖) := ⟨C, by rintro _ ⟨y, rfl⟩; exact hC y⟩
   set M := ⨆ y, ‖l (ρ y x)‖
   have hM : ∀ y, ‖l (ρ y x)‖ ≤ M := fun y => le_ciSup hb y
@@ -68,14 +74,20 @@ end Abstract
 
 section Linear
 
-open NumberField IsDedekindDomain Formalism.UG GlobalTheory.PRep GlobalTheory.LFun GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SatakeBound
+open NumberField IsDedekindDomain Formalism.UG GlobalTheory.PRep GlobalTheory.LFun GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.SatakeBound
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem norm_le_of_isSatVecGL {E : Type} [Field E] [NumberField E] {w : HeightOneSpectrum (𝓞 E)} {n : ℕ} {V : Type}
-    [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V} {x : V} {B : Multiset ℂˣ}
-    (hx : IsSatVecGL w ρ x B) (l : V →ₗ[ℂ] ℂ) {C : ℝ} (hC : ∀ y, ‖l (ρ y x)‖ ≤ C) (h1 : l (ρ 1 x) ≠ 0) :
-    ∀ β ∈ B, ‖(β : ℂ)‖ ≤ ((Ideal.absNorm w.asIdeal : ℕ) : ℝ) ^ (((n : ℝ) - 1) / 2) := by
+theorem norm_le_of_isSatVecGL
+    {E : Type} [Field E] [NumberField E]
+    {w : HeightOneSpectrum (𝓞 E)} {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    {ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V} {x : V} {B : Multiset ℂˣ}
+    (hx : IsSatVecGL w ρ x B)
+    (l : V →ₗ[ℂ] ℂ)
+    {C : ℝ} (hC : ∀ y, ‖l (ρ y x)‖ ≤ C)
+    (h1 : l (ρ 1 x) ≠ 0)
+    : ∀ β ∈ B, ‖(β : ℂ)‖ ≤ ((Ideal.absNorm w.asIdeal : ℕ) : ℝ) ^ (((n : ℝ) - 1) / 2) := by
   obtain ⟨α, rfl⟩ : ∃ α : Fin n → ℂˣ, Finset.univ.val.map α = B := by
     obtain ⟨l, rfl⟩ := Quot.exists_rep B
     obtain rfl : l.length = n := hx.2.2.1
@@ -97,18 +109,27 @@ theorem norm_le_of_isSatVecGL {E : Type} [Field E] [NumberField E] {w : HeightOn
       exact Finset.sum_congr rfl fun c _ => congrArg φ (one_mul _).symm
     rw [e3]
     exact norm_le_card ρ l hC h1 S _ c e1
-  have hs : IsBorelSph (w.adicCompletion E) (fun i : Fin n => (α i : ℂ) *
-      (((resCard (w.adicCompletion E) : ℝ) ^ (((i : ℕ) : ℝ) - ((n : ℝ) - 1) / 2) : ℝ) : ℂ)) φ := by
-    refine ⟨fun g k hk => congrFun (GlobalTheory.LGrp.mem_fixed.1 hy.2.1 k (hKO ▸ hk)) g, fun b hb' t ht => ?_⟩
+  have hs : IsBorelSph (w.adicCompletion E)
+      (fun i : Fin n =>
+        (α i : ℂ)
+          * (((resCard (w.adicCompletion E) : ℝ) ^ (((i : ℕ) : ℝ) - ((n : ℝ) - 1) / 2) : ℝ) : ℂ))
+      φ := by
+    refine ⟨
+      fun g k hk => congrFun (GlobalTheory.LGrp.mem_fixed.1 hy.2.1 k (hKO ▸ hk)) g,
+      fun b hb' t ht => ?_
+    ⟩
     obtain ⟨y, -, rfl⟩ := (SphCompletion.isSpherical_iff E w n α φ).1 hφ
     have h := GlobalTheory.SatakeBound.Rep.law α y b hb' t ht 1
     rwa [hφ1, mul_one, mul_one] at h
   intro β hβ
   obtain ⟨i, -, rfl⟩ := Multiset.mem_map.1 hβ
   have hq : (0 : ℝ) < resCard (w.adicCompletion E) := by
-    exact_mod_cast (GlobalTheory.IndefiniteRowSideFullHecke.SatakeTrivialRangeBound.one_lt_resCard (w.adicCompletion E)).le
+    exact_mod_cast (GlobalTheory.IndefiniteRowSideFullHecke.SatakeTrivialRangeBound.one_lt_resCard
+      (w.adicCompletion E)).le
   have h2 := norm_le_pow hs hb i
-  simp only [norm_mul, Complex.norm_real, Real.norm_of_nonneg (Real.rpow_nonneg hq.le _), ← Real.rpow_natCast] at h2
+  simp only [norm_mul, Complex.norm_real, Real.norm_of_nonneg (Real.rpow_nonneg hq.le _),
+      ← Real.rpow_natCast]
+    at h2
   rw [← le_div_iff₀ (Real.rpow_pos_of_pos hq _), ← Real.rpow_sub hq] at h2
   rw [← GlobalTheory.LFun.SatBoundGL.resCard_completion w]
   exact h2.trans_eq (congrArg _ (by ring))
@@ -116,16 +137,22 @@ theorem norm_le_of_isSatVecGL {E : Type} [Field E] [NumberField E] {w : HeightOn
 end Linear
 
 open scoped ComplexConjugate Matrix NNReal
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
 open GlobalTheory.Core.Rk.IP
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem paramBound_split : ∀ D : D7, ParamBoundOn D fun v => Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E) v := by
+theorem paramBound_split
+    : ∀ D : D7,
+      ParamBoundOn D fun v => Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E) v := by
   rintro D A L - v hv par c ⟨⟨C, hC⟩, V, _, _, ρ, x, l, hx, -, hc⟩ h1 w h
   refine ⟨(hx w h).card, fun β hβ => ?_⟩
   rcases hx w h with ⟨-, e, -, hx⟩ | ⟨hw, -⟩
-  · have hb := norm_le_of_isSatVecGL hx l (C := C) (fun y => (hc (e.symm y)) ▸ hC (e.symm y))
-      (by rw [hc] at h1; rwa [map_one, ← map_one ρ]) β hβ
+  · have hb :=
+      norm_le_of_isSatVecGL hx l (C := C)
+        (fun y => (hc (e.symm y)) ▸ hC (e.symm y))
+        (by rw [hc] at h1; rwa [map_one, ← map_one ρ]) β hβ
     refine hb.trans (Real.rpow_le_rpow_of_exponent_le ?_ (by linarith))
     exact_mod_cast (GlobalTheory.LFun.one_lt_absNorm w).le
   · exact absurd hv (GlobalTheory.LFun.not_isSplit_of_isInertAt hw)

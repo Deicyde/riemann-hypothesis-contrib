@@ -74,11 +74,13 @@ lemma pm_sum_cover (f : ℕ → ℝ) (hf : ∀ l, 0 ≤ f l) (M N : ℕ) (hM : 2
     sum_le_sum_of_subset_of_nonneg hsub (fun i _ _ => hf i)
   linarith
 
-private theorem log_le_log_of_pos_of_le {a b : ℝ} (ha : 0 < a) (h : a ≤ b) : Real.log a ≤ Real.log b := by
+private theorem log_le_log_of_pos_of_le {a b : ℝ} (ha : 0 < a) (h : a ≤ b)
+    : Real.log a ≤ Real.log b := by
   exact Real.log_le_log ha h
 
-private theorem div_le_div_of_mul_le_mul_of_pos' {a b c d : ℝ} (hb : 0 < b) (hd : 0 < d)
-    (h : a * d ≤ c * b) : a / b ≤ c / d := by
+private theorem div_le_div_of_mul_le_mul_of_pos'
+    {a b c d : ℝ} (hb : 0 < b) (hd : 0 < d) (h : a * d ≤ c * b)
+    : a / b ≤ c / d := by
   first
   | exact (div_le_div_iff_of_pos hb hd).mpr h
   | exact (div_le_div_iff hb hd).mpr h
@@ -100,8 +102,8 @@ lemma pm_key_Y (m x y Y : ℝ) (hx : 1 ≤ x) (hy : 1 ≤ y) (h1 : x * y / 2 ≤
 private theorem natCast_zmod_eq_zero_of_dvd {M a : ℕ} (h : M ∣ a) : (a : ZMod M) = 0 := by
   exact (CharP.cast_eq_zero_iff (ZMod M) M a).mpr h
 
-private theorem natCast_zmod_four_eq_one_or_neg_one_of_odd (l k : ℕ) (hk : k = 2) (hodd : l % 2 = 1) :
-    (l : ZMod (2 ^ k)) = 1 ∨ (l : ZMod (2 ^ k)) = -1 := by
+private theorem natCast_zmod_four_eq_one_or_neg_one_of_odd (l k : ℕ) (hk : k = 2) (hodd : l % 2 = 1)
+    : (l : ZMod (2 ^ k)) = 1 ∨ (l : ZMod (2 ^ k)) = -1 := by
   subst hk
   rcases (show l % 4 = 1 ∨ l % 4 = 3 by omega) with h | h
   · left
@@ -140,8 +142,8 @@ private theorem log_natCast_nonneg_real (n : ℕ) : 0 ≤ Real.log n := by
   · simp [h]
   · exact Real.log_nonneg (Nat.one_le_cast.mpr h)
 
-private theorem sum_range_inv_succ_le_one_add_log (N : ℕ) :
-    ∑ k ∈ range N, 1 / ((k : ℝ) + 1) ≤ 1 + Real.log N := by
+private theorem sum_range_inv_succ_le_one_add_log (N : ℕ)
+    : ∑ k ∈ range N, 1 / ((k : ℝ) + 1) ≤ 1 + Real.log N := by
   induction N with
   | zero => simp
   | succ n ih =>
@@ -256,16 +258,17 @@ theorem ordersSumY_of (hI : OrdersIff) : OrdersSumY := by
   intro e J Y s he hJ hY hs
   obtain ⟨hM2, -, hJM⟩ := pm_modulus_facts e J hJ
   have hY0 : 0 ≤ Y := by linarith
-  have hs' : ∀ l ∈ s, 3 ≤ l ∧ l ≤ ⌊Y⌋₊ ∧
-      ((l : ZMod (2 ^ (e + 2 - min e (Nat.log 2 J)))) = 1 ∨
-        (l : ZMod (2 ^ (e + 2 - min e (Nat.log 2 J)))) = -1) := by
+  have hs'
+      : ∀ l ∈ s,
+        3 ≤ l ∧ l ≤ ⌊Y⌋₊
+          ∧ ((l : ZMod (2 ^ (e + 2 - min e (Nat.log 2 J)))) = 1
+            ∨ (l : ZMod (2 ^ (e + 2 - min e (Nat.log 2 J)))) = -1) := by
     intro l hl
     obtain ⟨hp, h2, hlY, hl', hord⟩ := hs l hl
     have hodd : l % 2 = 1 := hp.eq_two_or_odd.resolve_left h2
     have h3 : 3 ≤ l := by have := hp.two_le; omega
     exact ⟨h3, Nat.le_floor hlY, pm_resid hI e J l hl' hodd hord⟩
-  have hsum := pm_y_sum _ ⌊Y⌋₊ hM2 Y hY (Nat.floor_le hY0) s hs'
-    (fun l hl => (hs l hl).2.2.1)
+  have hsum := pm_y_sum _ ⌊Y⌋₊ hM2 Y hY (Nat.floor_le hY0) s hs' (fun l hl => (hs l hl).2.2.1)
   set M : ℕ := 2 ^ (e + 2 - min e (Nat.log 2 J)) with hMdef
   have hm2 : (2 : ℝ) ≤ M := by exact_mod_cast hM2
   have hm0 : (0 : ℝ) < M := by linarith
@@ -282,7 +285,9 @@ theorem ordersSumY_of (hI : OrdersIff) : OrdersSumY := by
     nlinarith [mul_nonneg (sub_nonneg.mpr hΛ1) hlY, sq_nonneg ((e : ℝ) * Real.log 2),
       sq_nonneg (Real.log Y)]
   have hPpos : (0 : ℝ) < 2 ^ e := by positivity
-  calc ∑ l ∈ s, Real.log l / (l : ℝ) ≤ 4 * Real.log Y * (1 + Real.log Y) / M := hsum
+  calc
+    ∑ l ∈ s, Real.log l / (l : ℝ)
+      ≤ 4 * Real.log Y * (1 + Real.log Y) / M := hsum
     _ ≤ 12 * (J : ℝ) * Real.log ((2 : ℝ) ^ e * Y) ^ 2 / (2 : ℝ) ^ e := by
       apply div_le_div_of_mul_le_mul_of_pos' hm0 hPpos
       nlinarith [mul_nonneg (sub_nonneg.mpr hkey) hPpos.le,

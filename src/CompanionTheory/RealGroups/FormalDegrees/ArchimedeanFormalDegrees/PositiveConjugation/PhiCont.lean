@@ -28,8 +28,8 @@ theorem pP_posDef {ε : Fin n → Bool} (g : UJ ε) : (pP (toM g)).PosDef :=
 theorem phiCont : PhiCont := by
   intro n ε μ
   have hY : Continuous fun z : UJ ε × KG ε => toMK z.2⁻¹ * pP (toM z.1) * toMK z.2 :=
-    ((Ps1.continuous_toMK_inv.comp continuous_snd).matrix_mul ((continuous_pP ε).comp continuous_fst)).matrix_mul
-      (Ps1.continuous_toMK'.comp continuous_snd)
+    ((Ps1.continuous_toMK_inv.comp continuous_snd).matrix_mul
+      ((continuous_pP ε).comp continuous_fst)).matrix_mul (Ps1.continuous_toMK'.comp continuous_snd)
   refine continuous_iff_continuousAt.2 fun z => ?_
   have hpd := posDef_conj_toMK z.2 (pP_posDef z.1)
   have hΩ : toMK z.2⁻¹ * pP (toM z.1) * toMK z.2 ∈ OmegaSet n := posSet_subset_omega hpd

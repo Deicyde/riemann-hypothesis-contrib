@@ -11,13 +11,15 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLattice
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 open GlobalTheory.CompanionTheory.Ar.RiemannLimit GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 
-theorem exists_isKerProj (g : ℕ) (S : Matrix (Fin g) (Fin g) ℤ) :
-    ∃ Pr : Matrix (Fin g) (Fin g) ℝ, IsKerProj S Pr := by
+theorem exists_isKerProj (g : ℕ) (S : Matrix (Fin g) (Fin g) ℤ)
+    : ∃ Pr : Matrix (Fin g) (Fin g) ℝ, IsKerProj S Pr := by
   classical
   set M : Matrix (Fin g) (Fin g) ℝ := S.map (fun x : ℤ => (x : ℝ)) with hM
   let K : Submodule ℝ (EuclideanSpace ℝ (Fin g)) := LinearMap.ker (Matrix.toEuclideanLin M)

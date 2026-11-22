@@ -13,7 +13,13 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDoub
 open ValuativeRel Formalism.MainNotions.S.Loc GlobalTheory.HL
 open scoped Pointwise ENNReal Classical
 
-theorem GlobalTheory.HL.Frames.amp_mass_eq_one_of_one_orbit : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), ∀ (d : S.Datum) (P : Submodule L.O S.V → Prop), (∃ Λ, S.IsTerm d Λ) → (∀ Λ Λ', S.IsTerm d Λ → S.IsTerm d Λ' → ∃ h ∈ S.St, Λ' = h • Λ) → (∀ Λ, S.IsTerm d Λ → P Λ ∧ S.mu Λ = 1 ∧ S.om d Λ = 1) → S.amp d P = 1 ∧ S.mass d P = 1 := by
+theorem GlobalTheory.HL.Frames.amp_mass_eq_one_of_one_orbit
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k), ∀ (d : S.Datum) (P : Submodule L.O S.V → Prop),
+        (∃ Λ, S.IsTerm d Λ) → (∀ Λ Λ', S.IsTerm d Λ → S.IsTerm d Λ' → ∃ h ∈ S.St, Λ' = h • Λ)
+          → (∀ Λ, S.IsTerm d Λ → P Λ ∧ S.mu Λ = 1 ∧ S.om d Λ = 1)
+          → S.amp d P = 1 ∧ S.mass d P = 1 := by
   intro F _ _ _ _ _ E _ _ _ L r k S d P hex huniq hall
   obtain ⟨Λ, hΛ⟩ := hex
   let o₀ : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V) := Quotient.mk'' Λ
@@ -23,8 +29,9 @@ theorem GlobalTheory.HL.Frames.amp_mass_eq_one_of_one_orbit : ∀ {F : Type} [Fi
     obtain ⟨g, hg⟩ := hm
     rw [← hg]
     exact (GlobalTheory.T.hermitianFrames_stabilizer_acts_on_terms L r k S d Λ hΛ g.1 g.2).1
-  have hother : ∀ o : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V), o ≠ o₀ →
-      ¬ S.IsTerm d o.out := by
+  have hother
+      : ∀ o : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V),
+        o ≠ o₀ → ¬ S.IsTerm d o.out := by
     intro o ho ht
     obtain ⟨h, hh, e⟩ := huniq Λ o.out hΛ ht
     apply ho

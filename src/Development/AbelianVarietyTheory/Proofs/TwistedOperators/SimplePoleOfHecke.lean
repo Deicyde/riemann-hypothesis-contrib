@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Eventuall
 
 namespace GlobalTheory.LiftPoleObj
 
-theorem simplePole_of_hecke (hH : GlobalTheory.Published.HeckeLPartialContinuation) : GlobalTheory.IndefiniteRowSideFullHecke.SimplePoleTwistedLift.SimplePole :=
+theorem simplePole_of_hecke (hH : GlobalTheory.Published.HeckeLPartialContinuation)
+    : GlobalTheory.IndefiniteRowSideFullHecke.SimplePoleTwistedLift.SimplePole :=
   GlobalTheory.LiftPole.simplePole_of_hecke hH
 
 end GlobalTheory.LiftPoleObj

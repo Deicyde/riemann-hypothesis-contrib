@@ -6,14 +6,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.LineSCShortE
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry MvPolynomial MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxForm GlobalTheory.Points GlobalTheory.CxPts GlobalTheory.VB GlobalTheory.HermFrame GlobalTheory.LineForm
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxForm GlobalTheory.Points GlobalTheory.CxPts
+  GlobalTheory.VB GlobalTheory.HermFrame GlobalTheory.LineForm
 
 namespace GlobalTheory.PullTop
 
-theorem repr_eq_zero_of_card_ne {R M I : Type*} [CommRing R] [AddCommGroup M] [Module R M] [LinearOrder I]
-    (b : Module.Basis I R M) {k : ℕ} (x : ⋀[R]^k M) {S : Finset I} (hS : S.card ≠ k) :
-    b.ExteriorAlgebra.repr (x : ExteriorAlgebra R M) S = 0 := by
+theorem repr_eq_zero_of_card_ne
+    {R M I : Type*} [CommRing R] [AddCommGroup M] [Module R M] [LinearOrder I]
+    (b : Module.Basis I R M)
+    {k : ℕ} (x : ⋀[R]^k M)
+    {S : Finset I} (hS : S.card ≠ k)
+    : b.ExteriorAlgebra.repr (x : ExteriorAlgebra R M) S = 0 := by
   have h : (Finsupp.lapply S ∘ₗ b.ExteriorAlgebra.repr.toLinearMap ∘ₗ (⋀[R]^k M).subtype) = 0 := by
     refine (b.exteriorPower k).ext fun s => ?_
     have hs : (s : Finset I) ≠ S := fun e => hS (e ▸ s.2)

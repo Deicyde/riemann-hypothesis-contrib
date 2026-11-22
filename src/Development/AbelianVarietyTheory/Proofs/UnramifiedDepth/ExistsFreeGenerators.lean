@@ -16,21 +16,29 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.PadicUnitQ
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.LocalFactorFree
 
-private theorem aux {R S M I : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R] [CommRing S] [Algebra R S]
-    [AddCommGroup M] [Module R M] [Module S M] [IsScalarTower R S M] [Module.Finite R M] [Module.Free R M]
-    [Finite I] (e : S) (he : IsIdempotentElem e) [IsDomain (S ⧸ Ideal.span {1 - e})]
-    [IsPrincipalIdealRing (S ⧸ Ideal.span {1 - e})]
-    (b : Module.Basis I R (LinearMap.range (LinearMap.mulLeft R e))) :
-    ∃ (h : ℕ) (y : Fin h → M), LinearIndependent R (fun q : I × Fin h => (b q.1 : S) • y q.2) ∧
-      ∀ m : M, m ∈ Submodule.span R (Set.range fun q : I × Fin h => (b q.1 : S) • y q.2) ↔ (1 - e) • m = 0 := by
+private theorem aux
+    {R S M I : Type}
+    [CommRing R] [IsDomain R] [IsPrincipalIdealRing R] [CommRing S] [Algebra R S] [AddCommGroup M]
+    [Module R M] [Module S M] [IsScalarTower R S M] [Module.Finite R M] [Module.Free R M] [Finite I]
+    (e : S) (he : IsIdempotentElem e)
+    [IsDomain (S ⧸ Ideal.span {1 - e})] [IsPrincipalIdealRing (S ⧸ Ideal.span {1 - e})]
+    (b : Module.Basis I R (LinearMap.range (LinearMap.mulLeft R e)))
+    : ∃ (h : ℕ) (y : Fin h → M),
+      LinearIndependent R (fun q : I × Fin h => (b q.1 : S) • y q.2)
+        ∧ ∀ m : M,
+          m ∈ Submodule.span R (Set.range fun q : I × Fin h => (b q.1 : S) • y q.2)
+            ↔ (1 - e) • m = 0 := by
   classical
   let f : LinearMap.range (LinearMap.mulLeft R e) →ₗ[R] (S ⧸ Ideal.span {1 - e}) :=
     (Ideal.Quotient.mkₐ R (Ideal.span {1 - e})).toLinearMap ∘ₗ (Submodule.subtype _)
@@ -57,7 +65,8 @@ private theorem aux {R S M I : Type} [CommRing R] [IsDomain R] [IsPrincipalIdeal
   let N : Submodule S M := Submodule.torsionBy S M (1 - e)
   haveI : Module.Finite R N := Module.Finite.of_injective (N.subtype.restrictScalars R) Subtype.val_injective
   letI : Module (S ⧸ Ideal.span {1 - e}) N := inferInstanceAs (Module (S ⧸ Submodule.span S {1 - e}) (Submodule.torsionBy S M (1 - e)))
-  have hsm : ∀ (s : S) (n : N), (Ideal.Quotient.mk (Ideal.span {1 - e}) s) • n = s • n := fun _ _ => rfl
+  have hsm : ∀ (s : S) (n : N), (Ideal.Quotient.mk (Ideal.span {1 - e}) s) • n = s • n := fun _ _ =>
+    rfl
   haveI : IsScalarTower R (S ⧸ Ideal.span {1 - e}) N := ⟨fun r a n => by
     obtain ⟨s, rfl⟩ := Ideal.Quotient.mk_surjective a
     have : r • Ideal.Quotient.mk (Ideal.span {1 - e}) s = Ideal.Quotient.mk (Ideal.span {1 - e}) (r • s) := rfl
@@ -76,7 +85,8 @@ private theorem aux {R S M I : Type} [CommRing R] [IsDomain R] [IsPrincipalIdeal
     exact Subtype.ext ((smul_eq_zero.1 h2).resolve_left hr)
   let y := Module.finBasis (S ⧸ Ideal.span {1 - e}) N
   let B := bA.smulTower y
-  have hB : (fun q : I × Fin _ => (b q.1 : S) • (y q.2 : M)) = (N.subtype.restrictScalars R) ∘ B := by
+  have hB
+      : (fun q : I × Fin _ => (b q.1 : S) • (y q.2 : M)) = (N.subtype.restrictScalars R) ∘ B := by
     funext q
     simp only [B, Function.comp, Module.Basis.smulTower_apply]
     rfl
@@ -90,14 +100,16 @@ private theorem aux {R S M I : Type} [CommRing R] [IsDomain R] [IsPrincipalIdeal
     · intro hm
       exact ⟨⟨m, hm⟩, rfl⟩
 
-private theorem aux2 {R S I κ : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R] [CommRing S] [Algebra R S]
-    [Fintype κ] [DecidableEq κ]
-    [Finite I] (e : S) (he : IsIdempotentElem e) [IsDomain (S ⧸ Ideal.span {1 - e})]
-    [IsPrincipalIdealRing (S ⧸ Ideal.span {1 - e})]
-    (b : Module.Basis I R (LinearMap.range (LinearMap.mulLeft R e))) (ρ : S →ₐ[R] Matrix κ κ R) :
-    ∃ (h : ℕ) (y : Fin h → κ → R), LinearIndependent R (fun q : I × Fin h => ρ (b q.1 : S) *ᵥ y q.2) ∧
-      Submodule.span R (Set.range fun q : I × Fin h => ρ (b q.1 : S) *ᵥ y q.2) =
-        LinearMap.range (Matrix.mulVecLin (ρ e)) := by
+private theorem aux2
+    {R S I κ : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R] [CommRing S] [Algebra R S]
+    [Fintype κ] [DecidableEq κ] [Finite I]
+    (e : S) (he : IsIdempotentElem e)
+    [IsDomain (S ⧸ Ideal.span {1 - e})] [IsPrincipalIdealRing (S ⧸ Ideal.span {1 - e})]
+    (b : Module.Basis I R (LinearMap.range (LinearMap.mulLeft R e))) (ρ : S →ₐ[R] Matrix κ κ R)
+    : ∃ (h : ℕ) (y : Fin h → κ → R),
+      LinearIndependent R (fun q : I × Fin h => ρ (b q.1 : S) *ᵥ y q.2)
+        ∧ Submodule.span R (Set.range fun q : I × Fin h => ρ (b q.1 : S) *ᵥ y q.2)
+          = LinearMap.range (Matrix.mulVecLin (ρ e)) := by
   letI : Module S (κ → R) := Module.compHom (κ → R) (ρ : S →+* Matrix κ κ R)
   have hsm : ∀ (s : S) (v : κ → R), s • v = ρ s *ᵥ v := fun _ _ => rfl
   haveI : IsScalarTower R S (κ → R) := ⟨fun r s v => by
@@ -113,7 +125,16 @@ private theorem aux2 {R S I κ : Type} [CommRing R] [IsDomain R] [IsPrincipalIde
     change (1 - e) • e • v = 0
     rw [← mul_smul, he.one_sub_mul_self, zero_smul]
 
-theorem exists_free_generators : ∀ (p : ℕ) [Fact p.Prime] (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE] (w : PlaceU p OE) (b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e))) (κ : Type) [Fintype κ] [DecidableEq κ] (ρ : (ℤ_[p] ⊗[ℤ] OE) →ₐ[ℤ_[p]] Matrix κ κ ℤ_[p]), ∃ (h : ℕ) (y : Fin h → κ → ℤ_[p]), LinearIndependent ℤ_[p] (fun q : Fin w.n × Fin h => ρ (b q.1 : ℤ_[p] ⊗[ℤ] OE) *ᵥ y q.2) ∧ Submodule.span ℤ_[p] (Set.range fun q : Fin w.n × Fin h => ρ (b q.1 : ℤ_[p] ⊗[ℤ] OE) *ᵥ y q.2) = LinearMap.range (Matrix.mulVecLin (ρ w.e)) := by
+theorem exists_free_generators
+    : ∀ (p : ℕ) [Fact p.Prime] (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE]
+        [Module.Free ℤ OE] [Module.Finite ℤ OE] (w : PlaceU p OE)
+        (b : Module.Basis (Fin w.n) ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] w.e)))
+        (κ : Type) [Fintype κ] [DecidableEq κ] (ρ : (ℤ_[p] ⊗[ℤ] OE) →ₐ[ℤ_[p]] Matrix κ κ ℤ_[p]),
+      ∃ (h : ℕ) (y : Fin h → κ → ℤ_[p]),
+        LinearIndependent ℤ_[p] (fun q : Fin w.n × Fin h => ρ (b q.1 : ℤ_[p] ⊗[ℤ] OE) *ᵥ y q.2)
+          ∧ Submodule.span ℤ_[p]
+              (Set.range fun q : Fin w.n × Fin h => ρ (b q.1 : ℤ_[p] ⊗[ℤ] OE) *ᵥ y q.2)
+            = LinearMap.range (Matrix.mulVecLin (ρ w.e)) := by
   intro p _ OE _ _ _ _ _ w b κ _ _ ρ
   obtain ⟨h1, h2, -⟩ := GlobalTheory.T.padic_unit_quotient_principal_basis p OE w
   exact aux2 w.e w.idem b ρ

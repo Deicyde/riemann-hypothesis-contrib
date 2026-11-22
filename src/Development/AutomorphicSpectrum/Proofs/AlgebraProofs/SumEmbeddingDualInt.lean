@@ -9,19 +9,20 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.HT.EigDim
 
-open Module NumberField GlobalTheory.CompanionTheory.Ar.HT GlobalTheory.CompanionTheory.Ar.HT.LatBasic
+open Module NumberField GlobalTheory.CompanionTheory.Ar.HT
+  GlobalTheory.CompanionTheory.Ar.HT.LatBasic
 
-variable {K : Type} [Field K] {V : Type} [AddCommGroup V] [Module K V]
-  {E : Type} [Field E] [NumberField E]
+variable
+  {K : Type} [Field K] {V : Type} [AddCommGroup V] [Module K V] {E : Type} [Field E] [NumberField E]
 
-theorem trace_eigProj [FiniteDimensional K V] (ρ : 𝓞 E →+* Module.End K V) (σ : E →+* K) :
-    LinearMap.trace K V (eigProj ρ σ) = (finrank K (eigSp ρ σ) : K) :=
+theorem trace_eigProj [FiniteDimensional K V] (ρ : 𝓞 E →+* Module.End K V) (σ : E →+* K)
+    : LinearMap.trace K V (eigProj ρ σ) = (finrank K (eigSp ρ σ) : K) :=
   LinearMap.IsProj.trace (p := eigSp ρ σ)
     ⟨fun x => eigProj_mem ρ σ x, fun _ hx => eigProj_of_mem hx⟩
 
-theorem sum_embedding_dualInt [IsAlgClosed K] [CharZero K]
-    (k : Module.Free.ChooseBasisIndex ℤ (𝓞 E)) :
-    ∑ σ : E →+* K, σ (dualInt E k) = (((RingOfIntegers.basis E).repr 1 k : ℤ) : K) := by
+theorem sum_embedding_dualInt
+    [IsAlgClosed K] [CharZero K] (k : Module.Free.ChooseBasisIndex ℤ (𝓞 E))
+    : ∑ σ : E →+* K, σ (dualInt E k) = (((RingOfIntegers.basis E).repr 1 k : ℤ) : K) := by
   have h1 : ∑ σ : E →+* K, σ (dualInt E k) = ∑ σ : E →ₐ[ℚ] K, σ (dualInt E k) :=
     Fintype.sum_equiv (RingHom.equivRatAlgHom E K) _ _ fun _ => rfl
   have h2 := repr_eq_trace (E := E) 1 k
@@ -31,8 +32,8 @@ theorem sum_embedding_dualInt [IsAlgClosed K] [CharZero K]
   rw [← h2]
   simp
 
-theorem sum_eigProj [IsAlgClosed K] [CharZero K] (ρ : 𝓞 E →+* Module.End K V) :
-    ∑ σ : E →+* K, eigProj ρ σ = 1 := by
+theorem sum_eigProj [IsAlgClosed K] [CharZero K] (ρ : 𝓞 E →+* Module.End K V)
+    : ∑ σ : E →+* K, eigProj ρ σ = 1 := by
   unfold eigProj
   rw [Finset.sum_comm]
   simp_rw [← Finset.sum_smul, sum_embedding_dualInt]
@@ -41,12 +42,13 @@ theorem sum_eigProj [IsAlgClosed K] [CharZero K] (ρ : 𝓞 E →+* Module.End K
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul, Int.cast_smul_eq_zsmul]
 
-theorem finrank_eigSp_mul :
-    ∀ (K : Type) [Field K] [IsAlgClosed K] [CharZero K] (V : Type) [AddCommGroup V] [Module K V]
-      [FiniteDimensional K V] (E : Type) [Field E] [NumberField E] (ρ : 𝓞 E →+* Module.End K V),
-      (∀ a : 𝓞 E, ∃ n : ℤ, LinearMap.trace K V (ρ a) = (n : K)) →
-      ∀ σ : E →+* K, Module.finrank K (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ σ) * Module.finrank ℚ E =
-        Module.finrank K V := by
+theorem finrank_eigSp_mul
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] [CharZero K] (V : Type) [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] (E : Type) [Field E] [NumberField E] (ρ : 𝓞 E →+* Module.End K V),
+      (∀ a : 𝓞 E, ∃ n : ℤ, LinearMap.trace K V (ρ a) = (n : K))
+        → ∀ σ : E →+* K,
+          Module.finrank K (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ σ) * Module.finrank ℚ E
+            = Module.finrank K V := by
   intro K _ _ _ V _ _ _ E _ _ ρ htr σ
   choose m hm using fun k => htr (RingOfIntegers.basis E k)
   set l : E := ∑ k, (m k : E) * dualInt E k with hl

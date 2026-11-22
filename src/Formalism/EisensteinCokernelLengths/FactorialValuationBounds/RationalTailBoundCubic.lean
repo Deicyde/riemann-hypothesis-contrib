@@ -16,8 +16,7 @@ theorem exponentChainBound : ExponentChainBound := by
   have h0 : 0 < ℓ := by linarith
   have h1' : ℓ - 1 ≠ 0 := h1.ne'
   have h0' : ℓ ≠ 0 := h0.ne'
-  have key : b / (ℓ - 1) - b / ℓ = b / (ℓ * (ℓ - 1)) := by
-    field_simp; ring
+  have key : b / (ℓ - 1) - b / ℓ = b / (ℓ * (ℓ - 1)) := by field_simp; ring
   have hS1 : (S + 1) / (ℓ - 1) ≤ S + 1 := div_le_self (by linarith) (by linarith)
   have hsplit : ((b + S) + 1) / (ℓ - 1) = b / (ℓ - 1) + (S + 1) / (ℓ - 1) := by ring
   have hnn : 0 ≤ b / (ℓ * (ℓ - 1)) := div_nonneg hb (mul_pos h0 h1).le
@@ -38,8 +37,10 @@ theorem rationalTailBoundCubic : NumC := by
   have h1' : ℓ - 1 ≠ 0 := h1.ne'
   have h0' : ℓ ≠ 0 := h0.ne'
   have key := numC_cubic ℓ hℓ
-  have e : 8 * (2 * ℓ - 1) / (ℓ - 1) ^ 3 + 8 / (ℓ - 1) ^ 2 + 1 / (ℓ * (ℓ - 1)) =
-      (8 * (2 * ℓ - 1) * ℓ ^ 2 + 8 * ℓ ^ 2 * (ℓ - 1) + ℓ * (ℓ - 1) ^ 2) / (ℓ ^ 2 * (ℓ - 1) ^ 3) := by
+  have e
+      : 8 * (2 * ℓ - 1) / (ℓ - 1) ^ 3 + 8 / (ℓ - 1) ^ 2 + 1 / (ℓ * (ℓ - 1))
+        = (8 * (2 * ℓ - 1) * ℓ ^ 2 + 8 * ℓ ^ 2 * (ℓ - 1) + ℓ * (ℓ - 1) ^ 2)
+          / (ℓ ^ 2 * (ℓ - 1) ^ 3) := by
     field_simp
   have c : (31.11 : ℝ) = 3111 / 100 := by norm_num
   rw [e, div_le_div_iff₀ (mul_pos (pow_pos h0 2) (pow_pos h1 3)) (pow_pos h0 2), c]

@@ -43,11 +43,14 @@ lemma exists_kill {T : Type} [CommRing T] (p : Ideal T) [p.IsPrime] (f₀ : T)
   rw [hb] at h2
   exact hm.mul_right_eq_zero.1 h2
 
-theorem spread_out : ∀ (T A : Type) [CommRing T] [CommRing A] [Algebra T A]
-    [Algebra.FinitePresentation T A] (p : Ideal T) [p.IsPrime]
-    (φ : A →ₐ[T] Localization.AtPrime p), ∃ f : T, f ∉ p ∧
-      ∃ (s : A →ₐ[T] Localization.Away f) (ι : Localization.Away f →ₐ[T] Localization.AtPrime p),
-        ι.comp s = φ := by
+theorem spread_out
+    : ∀ (T A : Type) [CommRing T] [CommRing A] [Algebra T A] [Algebra.FinitePresentation T A]
+        (p : Ideal T) [p.IsPrime] (φ : A →ₐ[T] Localization.AtPrime p),
+      ∃ f : T,
+        f ∉ p
+          ∧ ∃ (s : A →ₐ[T] Localization.Away f)
+              (ι : Localization.Away f →ₐ[T] Localization.AtPrime p),
+            ι.comp s = φ := by
   intro T A _ _ _ _ p _ φ
   obtain ⟨n, π, hπ, hker⟩ := Algebra.FinitePresentation.out (R := T) (A := A)
   obtain ⟨G, hG⟩ := hker
@@ -61,8 +64,7 @@ theorem spread_out : ∀ (T A : Type) [CommRing T] [CommRing A] [Algebra T A]
   have hu : ∀ i, IsUnit (algebraMap T (Localization.Away f₀) (s i)) := fun i =>
     isUnit_of_dvd_unit (map_dvd _ (Finset.dvd_prod_of_mem s (Finset.mem_univ i)))
       (IsLocalization.Away.algebraMap_isUnit f₀)
-  let x : Fin n → Localization.Away f₀ := fun i =>
-    algebraMap T _ (a i) * ↑(hu i).unit⁻¹
+  let x : Fin n → Localization.Away f₀ := fun i => algebraMap T _ (a i) * ↑(hu i).unit⁻¹
   let ψ₀ : MvPolynomial (Fin n) T →ₐ[T] Localization.Away f₀ := MvPolynomial.aeval x
   have hι0 : ∀ i, ι₀ (x i) = φ (π (MvPolynomial.X i)) := by
     intro i
@@ -89,8 +91,7 @@ theorem spread_out : ∀ (T A : Type) [CommRing T] [CommRing A] [Algebra T A]
     rw [hg', map_zero]
   choose t ht hkill using fun g : G => exists_kill p f₀ (ψ₀ g) ι₀ (hzero g)
   set f : T := f₀ * ∏ g, t g with hfdef
-  have hfp : f ∉ p :=
-    p.primeCompl.mul_mem hf₀p (prod_not_mem p _ t (fun g _ => ht g))
+  have hfp : f ∉ p := p.primeCompl.mul_mem hf₀p (prod_not_mem p _ t (fun g _ => ht g))
   have huj : IsUnit ((Algebra.ofId T (Localization.Away f)) f₀) :=
     isUnit_of_dvd_unit (map_dvd _ (dvd_mul_right f₀ _)) (IsLocalization.Away.algebraMap_isUnit f)
   let j : Localization.Away f₀ →ₐ[T] Localization.Away f :=
@@ -102,24 +103,23 @@ theorem spread_out : ∀ (T A : Type) [CommRing T] [CommRing A] [Algebra T A]
     exact isUnit_of_dvd_unit
       (map_dvd _ (Dvd.dvd.mul_left (Finset.dvd_prod_of_mem t (Finset.mem_univ g)) f₀))
       (IsLocalization.Away.algebraMap_isUnit f)
-  have hspan : Ideal.span (G : Set (MvPolynomial (Fin n) T)) ≤
-      RingHom.ker (ψ : MvPolynomial (Fin n) T →+* Localization.Away f) := by
+  have hspan
+      : Ideal.span (G : Set (MvPolynomial (Fin n) T))
+        ≤ RingHom.ker (ψ : MvPolynomial (Fin n) T →+* Localization.Away f) := by
     rw [Ideal.span_le]
     intro g hg
     rw [SetLike.mem_coe, RingHom.mem_ker]
     exact hψG ⟨g, hg⟩
   have hψker : ∀ q : MvPolynomial (Fin n) T, q ∈ RingHom.ker π → ψ q = 0 := by
     intro q hq
-    have hq' : q ∈ Ideal.span (G : Set (MvPolynomial (Fin n) T)) := by
-      rw [hG]; exact hq
+    have hq' : q ∈ Ideal.span (G : Set (MvPolynomial (Fin n) T)) := by rw [hG]; exact hq
     exact (RingHom.mem_ker).1 (hspan hq')
   let sq := Ideal.Quotient.liftₐ (RingHom.ker π) ψ hψker
   let e := Ideal.quotientKerAlgEquivOfSurjective hπ
   let σ : A →ₐ[T] Localization.Away f := sq.comp e.symm.toAlgHom
   have hσ : ∀ q, σ (π q) = ψ q := by
     intro q
-    have : e.symm (π q) = Ideal.Quotient.mk (RingHom.ker π) q := by
-      rw [AlgEquiv.symm_apply_eq]; rfl
+    have : e.symm (π q) = Ideal.Quotient.mk (RingHom.ker π) q := by rw [AlgEquiv.symm_apply_eq]; rfl
     show sq (e.symm (π q)) = ψ q
     rw [this]
     simp only [sq, Ideal.Quotient.liftₐ_apply, Ideal.Quotient.lift_mk]
@@ -129,8 +129,7 @@ theorem spread_out : ∀ (T A : Type) [CommRing T] [CommRing A] [Algebra T A]
   let ι : Localization.Away f →ₐ[T] Localization.AtPrime p :=
     IsLocalization.Away.liftAlgHom (S := Localization.Away f) f huι
   refine ⟨f, hfp, σ, ι, ?_⟩
-  have hιj : ι.comp j = ι₀ :=
-    (IsLocalization.algHom_subsingleton (Submonoid.powers f₀)).elim _ _
+  have hιj : ι.comp j = ι₀ := (IsLocalization.algHom_subsingleton (Submonoid.powers f₀)).elim _ _
   apply AlgHom.ext
   intro y
   obtain ⟨q, rfl⟩ := hπ y

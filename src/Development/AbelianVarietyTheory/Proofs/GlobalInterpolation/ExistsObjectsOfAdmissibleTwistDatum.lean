@@ -9,18 +9,26 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ObjCOf
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
 
 namespace GlobalTheory.Fc
 
-theorem ObjCP.imp {Q Q' : Par → PtProp} (h : ObjCP Q) (hi : ∀ (κ : Par) (p : Pt κ.C), p.Has (Q κ) → p.Has (Q' κ)) : ObjCP Q' :=
-  ParEv.mono (fun κ ⟨x0, H⟩ => ⟨x0, fun s R G q0 a b M c u0 d1 d2 d3 d4 d5 d0 d6 d7 d8 d9 =>
-    let ⟨p, e1, e2, e3, e4, e5, e6⟩ := H s R G q0 a b M c u0 d1 d2 d3 d4 d5 d0 d6 d7 d8 d9
-    ⟨p, e1, e2, e3, e4, e5, hi κ p e6⟩⟩) h
-
+theorem ObjCP.imp
+    {Q Q' : Par → PtProp} (h : ObjCP Q) (hi : ∀ (κ : Par) (p : Pt κ.C), p.Has (Q κ) → p.Has (Q' κ))
+    : ObjCP Q' :=
+  ParEv.mono
+    (fun κ ⟨x0, H⟩ => ⟨
+      x0,
+      fun s R G q0 a b M c u0 d1 d2 d3 d4 d5 d0 d6 d7 d8 d9 =>
+        let ⟨p, e1, e2, e3, e4, e5, e6⟩ := H s R G q0 a b M c u0 d1 d2 d3 d4 d5 d0 d6 d7 d8 d9
+        ⟨p, e1, e2, e3, e4, e5, hi κ p e6⟩
+    ⟩)
+    h
 
 open GlobalTheory.EX.DC in
-theorem ObjCP.and_q0Pt {Q : Par → PtProp} (h : ObjCP Q) : ObjCP (fun κ => (Q κ).and twistingGlobalPointProp) := by
+theorem ObjCP.and_q0Pt {Q : Par → PtProp} (h : ObjCP Q)
+    : ObjCP (fun κ => (Q κ).and twistingGlobalPointProp) := by
   obtain ⟨ε0, h0, h⟩ := h
   refine ⟨ε0, h0, fun eps C8 C5 c6 Cb a1 a2 a3 a4 => ?_⟩
   obtain ⟨K0, h⟩ := h eps C8 C5 c6 Cb a1 a2 a3 a4
@@ -39,7 +47,8 @@ theorem ObjCP.and_q0Pt {Q : Par → PtProp} (h : ObjCP Q) : ObjCP (fun κ => (Q 
   dsimp only at d1 d4 d5 d6 d7
   rw [b2] at d5
   simp only [max_le_iff] at d2
-  obtain ⟨p, e1, e2, e3, e4, e5, e6⟩ := h s R H q0 a b M c u0 d1 d2.1.1 d3 d4 (b2 ▸ d5) d0 d6 d7 d8 d9
+  obtain ⟨p, e1, e2, e3, e4, e5, e6⟩ :=
+    h s R H q0 a b M c u0 d1 d2.1.1 d3 d4 (b2 ▸ d5) d0 d6 d7 d8 d9
   refine ⟨p, e1, e2, e3, e4, e5, e6, ?_⟩
   dsimp only at e2 p
   subst e1
@@ -58,21 +67,33 @@ theorem ObjCP.and_q0Pt {Q : Par → PtProp} (h : ObjCP Q) : ObjCP (fun κ => (Q 
     have hk : (1 : ℝ) ≤ p.D.R.k := by
       have := p.D.R.m_add_three_le_k
       exact_mod_cast (by omega : 1 ≤ p.D.R.k)
-    have hb1 : 1 ≤ p.L.sc.b := Real.one_le_exp (Real.rpow_nonneg (by linarith [p.L.sc.one_lt_alt]) _)
+    have hb1 : 1 ≤ p.L.sc.b :=
+      Real.one_le_exp (Real.rpow_nonneg (by linarith [p.L.sc.one_lt_alt]) _)
     have h5 : p.L.sc.b ≤ (p.D.R.k : ℝ) * p.L.sc.b := le_mul_of_one_le_left (by linarith) hk
-    have h6 : (p.D.R.k : ℝ) * p.L.sc.b ≤ ((p.D.R.k : ℝ) * p.L.sc.b) ^ 8 := le_self_pow₀ (by linarith) (by norm_num)
+    have h6 : (p.D.R.k : ℝ) * p.L.sc.b ≤ ((p.D.R.k : ℝ) * p.L.sc.b) ^ 8 :=
+      le_self_pow₀ (by linarith) (by norm_num)
     exact_mod_cast (show (q0Av p.D : ℝ) < p.D.host.g j by linarith)
-  refine ⟨?_, hs.1, hs.2.1, ?_, hX, hX.le.trans (hJ cD ch _ _ d1 d2.2.2 e2 P).2, (q0H_ne_pde_and_ne_pde' _).1, (q0H_ne_pde_and_ne_pde' _).2,
-    fun j => (hg j).ne, fun u => ((hg 0).trans (firstTypePrime_lt_rowPrime _ u)).ne⟩
+  refine ⟨
+    ?_,
+    hs.1,
+    hs.2.1,
+    ?_,
+    hX,
+    hX.le.trans (hJ cD ch _ _ d1 d2.2.2 e2 P).2,
+    (q0H_ne_pde_and_ne_pde' _).1,
+    (q0H_ne_pde_and_ne_pde' _).2,
+    fun j => (hg j).ne,
+    fun u => ((hg 0).trans (firstTypePrime_lt_rowPrime _ u)).ne
+  ⟩
   · rw [eq0]
     exact e4.2.2.2.2.2.2.2.2.1 (by rw [hlev]; simp)
   · rw [Real.log_le_iff_le_exp (by exact_mod_cast hs.1.pos)]
     exact hX.le.trans hXb
 
-
 open GlobalTheory.EX.DC GlobalTheory.EX.OB.Bridge in
-theorem objCP_and_of_recExP (QO : Par → ∀ D : D7, Obj D → Prop) (hLP : LevelPrime) (hRec : RecExP QO) :
-    ObjCP (fun κ => (ptO (QO κ)).and (TamePt.and (MinkPt.and TwPt))) := by
+theorem objCP_and_of_recExP
+    (QO : Par → ∀ D : D7, Obj D → Prop) (hLP : LevelPrime) (hRec : RecExP QO)
+    : ObjCP (fun κ => (ptO (QO κ)).and (TamePt.and (MinkPt.and TwPt))) := by
   obtain ⟨ε0, h0, hRec⟩ := hRec
   refine ⟨ε0, h0, fun eps C8 C5 c6 Cb e1 e2 e3 e4 => ?_⟩
   obtain ⟨K0, hRec⟩ := hRec eps C8 C5 c6 Cb e1 e2 e3 e4
@@ -98,7 +119,8 @@ theorem objCP_and_of_recExP (QO : Par → ∀ D : D7, Obj D → Prop) (hLP : Lev
   obtain ⟨⟨⟨y1, y2⟩, y3, y4⟩, y5, y6⟩ := hx
   dsimp only at hs hCT hH hW hM
   rw [hq0] at hH
-  obtain ⟨hcW, w0, k1, k2, k3, k4, k5, k6, k7, k8, hCh⟩ := h2 s R H a b M c u0 hs y2 hR hCT hH hW hM hc
+  obtain ⟨hcW, w0, k1, k2, k3, k4, k5, k6, k7, k8, hCh⟩ :=
+    h2 s R H a b M c u0 hs y2 hR hCT hH hW hM hc
   obtain ⟨du, Ds, hdu, hDs, hlog, hRec⟩ := hRec s _ _ _ _ hs y1 hCh
   obtain ⟨Lv, l1, l2, l3⟩ := h3 cD ch s _ _ _ _ _ du Ds hs y3 hCh.ok hdu hDs hlog
   obtain ⟨D, Y, hO, hRO, hLO, hTW, hQ⟩ := hRec Lv l1 l2 l3
@@ -115,15 +137,40 @@ theorem objCP_and_of_recExP (QO : Par → ∀ D : D7, Obj D → Prop) (hLP : Lev
     have : (0 : ℝ) < du u' := by exact_mod_cast hdu u'
     have : 0 < GamS C s R := Real.exp_pos _
     positivity
-  obtain ⟨p, n1, n2, n3, n4⟩ := Led.exists_ledPart C cD ch s D Y R.toFrame a b L0 hS hg (by rw [hDR]) m1 m2 m3 hA
-    (by rw [hDR]; exact h6 s R hs y6 hR) hT hRO hLO
-  exact ⟨p.pt, n1, p.pt_val n3, hA,
-    ⟨hDR, g1, g2, g3, g4, g5, g6, g7, g8, g9.trans (R.toFrame.val_ofNat_of_lt hu), g10, p.pt_wtEq n2, ⟨eW, g11⟩,
-      hO.field⟩, p.pt_canon n4,
-    hQ p n1 n2 n3 n4, hRO.tame, hRO.mink, twAt_tr (nPrime p.L) p.ht hTW⟩
+  obtain ⟨p, n1, n2, n3, n4⟩ :=
+    Led.exists_ledPart C cD ch s D Y R.toFrame a b L0 hS hg (by rw [hDR]) m1 m2 m3 hA
+      (by rw [hDR]; exact h6 s R hs y6 hR) hT hRO hLO
+  exact ⟨
+    p.pt,
+    n1,
+    p.pt_val n3,
+    hA,
+    ⟨
+      hDR,
+      g1,
+      g2,
+      g3,
+      g4,
+      g5,
+      g6,
+      g7,
+      g8,
+      g9.trans (R.toFrame.val_ofNat_of_lt hu),
+      g10,
+      p.pt_wtEq n2,
+      ⟨eW, g11⟩,
+      hO.field
+    ⟩,
+    p.pt_canon n4,
+    hQ p n1 n2 n3 n4,
+    hRO.tame,
+    hRO.mink,
+    twAt_tr (nPrime p.L) p.ht hTW
+  ⟩
 
-theorem objCP_of_recExP : ∀ QO : Par → ∀ D : D7, Obj D → Prop,
-    LevelPrime → RecExP QO → ObjCP (fun κ => DC.withObj (ptO (QO κ))) :=
-  fun QO hL hR => (objCP_and_of_recExP QO hL hR).and_q0Pt.imp fun _ _ hp => ⟨⟨hp.1.1, hp.2⟩, hp.1.2⟩
+theorem objCP_of_recExP
+    : ∀ QO : Par → ∀ D : D7, Obj D → Prop,
+      LevelPrime → RecExP QO → ObjCP (fun κ => DC.withObj (ptO (QO κ))) := fun QO hL hR =>
+  (objCP_and_of_recExP QO hL hR).and_q0Pt.imp fun _ _ hp => ⟨⟨hp.1.1, hp.2⟩, hp.1.2⟩
 
 end GlobalTheory.Fc

@@ -9,20 +9,27 @@ open Matrix Formalism.UG Formalism.L2.DIV GlobalTheory.LevNorm
 
 namespace GlobalTheory.LevNorm
 
-theorem exists_normOne_residues {A : Type} [CommRing A] {S : Subring A} {P : Type} {k : P → Type} [∀ Q, Field (k Q)]
-    {r : ∀ Q, S →+* k Q} (Z : PlaceSys A S P k r) (σ : A →+* A) (hσ : ∀ a, σ (σ a) = a) (hS : ∀ a ∈ S, σ a ∈ S)
-    (T : Finset P) (hT : ∀ Q ∈ T, ∀ Q' ∈ T, σ (Z.e Q) ≠ Z.e Q') (c : ∀ Q, (k Q)ˣ) :
-    ∃ z : S, (z : A) * σ z = 1 ∧ (∀ Q ∈ T, r Q z = c Q) ∧
-      ∀ b : A, (∀ Q ∈ T, Z.p Q b ∈ Z.O Q ∧ Z.p Q (σ b) ∈ Z.O Q) → (1 - (z : A)) * b ∈ S := by
+theorem exists_normOne_residues
+    {A : Type} [CommRing A]
+    {S : Subring A} {P : Type} {k : P → Type} [∀ Q, Field (k Q)]
+    {r : ∀ Q, S →+* k Q} (Z : PlaceSys A S P k r)
+    (σ : A →+* A) (hσ : ∀ a, σ (σ a) = a) (hS : ∀ a ∈ S, σ a ∈ S)
+    (T : Finset P) (hT : ∀ Q ∈ T, ∀ Q' ∈ T, σ (Z.e Q) ≠ Z.e Q')
+    (c : ∀ Q, (k Q)ˣ)
+    : ∃ z : S,
+      (z : A) * σ z = 1 ∧ (∀ Q ∈ T, r Q z = c Q)
+        ∧ ∀ b : A, (∀ Q ∈ T, Z.p Q b ∈ Z.O Q ∧ Z.p Q (σ b) ∈ Z.O Q) → (1 - (z : A)) * b ∈ S := by
   classical
-
-  have comp : ∀ (f : P → A) Q0, Z.p Q0 (∑ Q ∈ T, Z.e Q * f Q) = if Q0 ∈ T then Z.p Q0 (f Q0) else 0 := by
+  have comp
+      : ∀ (f : P → A) Q0, Z.p Q0 (∑ Q ∈ T, Z.e Q * f Q) = if Q0 ∈ T then Z.p Q0 (f Q0) else 0 := by
     intro f Q0
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     by_cases h : Q0 ∈ T
-    · rw [if_pos h, Finset.sum_eq_single_of_mem Q0 h
-        (fun Q _ hQ => by rw [map_mul, Z.e_ne Q Q0 (Ne.symm hQ), zero_mul]), map_mul, Z.e_self, one_mul]
+    · rw [if_pos h,
+        Finset.sum_eq_single_of_mem Q0 h
+          (fun Q _ hQ => by rw [map_mul, Z.e_ne Q Q0 (Ne.symm hQ), zero_mul]),
+        map_mul, Z.e_self, one_mul]
     · rw [if_neg h]
       exact Finset.sum_eq_zero fun Q hQ => by
         rw [map_mul, Z.e_ne Q Q0 (by rintro rfl; exact h hQ), zero_mul]
@@ -41,14 +48,12 @@ theorem exists_normOne_residues {A : Type} [CommRing A] {S : Subring A} {P : Typ
   have hinv : ∀ Q, (Z.p Q (s Q))⁻¹ ∈ Z.O Q := fun Q => by
     rw [← ValuationSubring.valuation_le_one_iff, map_inv₀, hval Q, inv_one]
   choose t ht using fun Q => Z.pO_surj Q ⟨_, hinv Q⟩
-  have hpt : ∀ Q, Z.p Q (t Q) = (Z.p Q (s Q))⁻¹ := fun Q => by
-    rw [← Z.pO_coe, ht Q]
+  have hpt : ∀ Q, Z.p Q (t Q) = (Z.p Q (s Q))⁻¹ := fun Q => by rw [← Z.pO_coe, ht Q]
 
   obtain ⟨E, hEd⟩ : ∃ E, E = ∑ Q ∈ T, Z.e Q * 1 := ⟨_, rfl⟩
   obtain ⟨a, had⟩ : ∃ a, a = ∑ Q ∈ T, Z.e Q * (s Q : A) := ⟨_, rfl⟩
   obtain ⟨bb, hbd⟩ : ∃ bb, bb = ∑ Q ∈ T, Z.e Q * (t Q : A) := ⟨_, rfl⟩
-  have pE : ∀ Q0, Z.p Q0 E = if Q0 ∈ T then 1 else 0 := fun Q0 => by
-    rw [hEd, comp, map_one]
+  have pE : ∀ Q0, Z.p Q0 E = if Q0 ∈ T then 1 else 0 := fun Q0 => by rw [hEd, comp, map_one]
   have pa : ∀ Q0, Z.p Q0 a = if Q0 ∈ T then Z.p Q0 (s Q0) else 0 := fun Q0 => by rw [had, comp]
   have pb : ∀ Q0, Z.p Q0 bb = if Q0 ∈ T then Z.p Q0 (t Q0) else 0 := fun Q0 => by rw [hbd, comp]
   have pF : ∀ Q0 ∈ T, Z.p Q0 (σ E) = 0 := fun Q0 hQ0 => by
@@ -61,18 +66,20 @@ theorem exists_normOne_residues {A : Type} [CommRing A] {S : Subring A} {P : Typ
   have amem : a ∈ S := had ▸ smem _ fun Q => (s Q).2
   have bmem : bb ∈ S := hbd ▸ smem _ fun Q => (t Q).2
   have hE : E * E = E := Z.ext' fun Q0 => by rw [map_mul, pE]; split_ifs <;> simp
-  have hEF : E * σ E = 0 := Z.ext' fun Q0 => by
-    rw [map_mul, map_zero]
-    by_cases h : Q0 ∈ T
-    · rw [pF Q0 h, mul_zero]
-    · rw [pE, if_neg h, zero_mul]
+  have hEF : E * σ E = 0 :=
+    Z.ext' fun Q0 => by
+      rw [map_mul, map_zero]
+      by_cases h : Q0 ∈ T
+      · rw [pF Q0 h, mul_zero]
+      · rw [pE, if_neg h, zero_mul]
   have ha : E * a = a := Z.ext' fun Q0 => by rw [map_mul, pE, pa]; split_ifs <;> simp
   have hb : E * bb = bb := Z.ext' fun Q0 => by rw [map_mul, pE, pb]; split_ifs <;> simp
-  have hab : a * bb = E := Z.ext' fun Q0 => by
-    rw [map_mul, pE, pa, pb]
-    split_ifs
-    · rw [hpt, mul_inv_cancel₀ (hne Q0)]
-    · simp
+  have hab : a * bb = E :=
+    Z.ext' fun Q0 => by
+      rw [map_mul, pE, pa, pb]
+      split_ifs
+      · rw [hpt, mul_inv_cancel₀ (hne Q0)]
+      · simp
   set F := σ E with hFd
   set x := σ a with hxd
   set y := σ bb with hyd
@@ -85,11 +92,15 @@ theorem exists_normOne_residues {A : Type} [CommRing A] {S : Subring A} {P : Typ
   have hFa : F * a = 0 := by rw [← ha, ← mul_assoc, mul_comm F E, hEF, zero_mul]
   have hFb : F * bb = 0 := by rw [← hb, ← mul_assoc, mul_comm F E, hEF, zero_mul]
   have hax : a * x = 0 := by
-    calc a * x = (E * a) * (F * x) := by rw [ha, hFx]
+    calc
+      a * x
+        = (E * a) * (F * x) := by rw [ha, hFx]
       _ = (E * F) * (a * x) := by ring
       _ = 0 := by rw [hEF, zero_mul]
   have hby : bb * y = 0 := by
-    calc bb * y = (E * bb) * (F * y) := by rw [hb, hFy]
+    calc
+      bb * y
+        = (E * bb) * (F * y) := by rw [hb, hFy]
       _ = (E * F) * (bb * y) := by ring
       _ = 0 := by rw [hEF, zero_mul]
   have zmem : 1 - E - F + a + y ∈ S :=
@@ -105,7 +116,8 @@ theorem exists_normOne_residues {A : Type} [CommRing A] {S : Subring A} {P : Typ
     refine Z.r_congr Q ?_
     show Z.p Q (1 - E - F + a + y) = Z.p Q (s Q)
     have hy0 : Z.p Q y = 0 := by rw [← hFy, map_mul, pF Q hQ, zero_mul]
-    rw [map_add (f := _), map_add (f := _), map_sub, map_sub, map_one, pE, if_pos hQ, pF Q hQ, pa, if_pos hQ, hy0]
+    rw [map_add (f := _), map_add (f := _), map_sub, map_sub, map_one, pE, if_pos hQ, pF Q hQ, pa,
+      if_pos hQ, hy0]
     ring
   · intro w hw
     show (1 - (1 - E - F + a + y)) * w ∈ S

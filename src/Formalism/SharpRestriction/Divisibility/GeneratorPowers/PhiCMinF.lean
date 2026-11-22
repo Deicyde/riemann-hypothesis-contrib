@@ -15,9 +15,10 @@ open Matrix
 
 theorem shortDual_holds : ShortDualStatement := by
   intro d L R μ hd hL hR hμ hmin δ hδ
-  obtain ⟨e, he⟩ : ∃ e : (Fin d → ℝ) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin d), ∀ a, (e a).ofLp = a :=
-    ⟨(WithLp.linearEquiv 2 ℝ (Fin d → ℝ)).symm,
-      fun a => (WithLp.linearEquiv 2 ℝ (Fin d → ℝ)).apply_symm_apply a⟩
+  obtain ⟨e, he⟩ : ∃ e : (Fin d → ℝ) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin d), ∀ a, (e a).ofLp = a := ⟨
+    (WithLp.linearEquiv 2 ℝ (Fin d → ℝ)).symm,
+    fun a => (WithLp.linearEquiv 2 ℝ (Fin d → ℝ)).apply_symm_apply a
+  ⟩
   have hin : ∀ a b : Fin d → ℝ, inner ℝ (e a) (e b) = a ⬝ᵥ b := by
     intro a b
     rw [EuclideanSpace.inner_eq_star_dotProduct, he, he, dotProduct_comm]
@@ -27,7 +28,9 @@ theorem shortDual_holds : ShortDualStatement := by
     rw [← real_inner_self_eq_norm_sq, hin]
   have hRR : R⁻¹ * R = 1 := Matrix.nonsing_inv_mul R hR
   have hRR' : R * R⁻¹ = 1 := Matrix.mul_nonsing_inv R hR
-  have hcast : ∀ j : Fin d, (fun i => (((Pi.single j (1 : ℤ) : Fin d → ℤ) i : ℤ) : ℝ)) = Pi.single j (1 : ℝ) := by
+  have hcast
+      : ∀ j : Fin d,
+        (fun i => (((Pi.single j (1 : ℤ) : Fin d → ℤ) i : ℤ) : ℝ)) = Pi.single j (1 : ℝ) := by
     intro j
     funext i
     by_cases hij : i = j
@@ -35,27 +38,33 @@ theorem shortDual_holds : ShortDualStatement := by
       simp
     · simp [hij]
 
-  obtain ⟨g, hg⟩ : ∃ g : (Fin d → ℤ) →ₗ[ℤ] EuclideanSpace ℝ (Fin d),
-      ∀ t, g t = e (R *ᵥ fun i => (t i : ℝ)) :=
-    ⟨(AddMonoidHom.mk' (fun t : Fin d → ℤ => e (R *ᵥ fun i => (t i : ℝ))) (by
-        intro a b
-        show e (R *ᵥ fun i => ((a + b) i : ℝ)) =
-          e (R *ᵥ fun i => (a i : ℝ)) + e (R *ᵥ fun i => (b i : ℝ))
-        have h1 : (fun i => ((a + b) i : ℝ)) = (fun i => (a i : ℝ)) + fun i => (b i : ℝ) := by
-          funext i
-          simp
-        rw [h1, Matrix.mulVec_add, map_add (f := _)])).toIntLinearMap, fun t => rfl⟩
+  obtain ⟨g, hg⟩
+      : ∃ g : (Fin d → ℤ) →ₗ[ℤ] EuclideanSpace ℝ (Fin d), ∀ t,
+        g t = e (R *ᵥ fun i => (t i : ℝ)) := ⟨
+    (AddMonoidHom.mk' (fun t : Fin d → ℤ => e (R *ᵥ fun i => (t i : ℝ))) (by
+      intro a b
+      show e (R *ᵥ fun i => ((a + b) i : ℝ)) =
+        e (R *ᵥ fun i => (a i : ℝ)) + e (R *ᵥ fun i => (b i : ℝ))
+      have h1 : (fun i => ((a + b) i : ℝ)) = (fun i => (a i : ℝ)) + fun i => (b i : ℝ) := by
+        funext i
+        simp
+      rw [h1, Matrix.mulVec_add, map_add (f := _)])).toIntLinearMap,
+    fun t => rfl
+  ⟩
 
-  obtain ⟨hZ, hh⟩ : ∃ hZ : (Fin d → ℤ) →ₗ[ℤ] EuclideanSpace ℝ (Fin d),
-      ∀ u, hZ u = e ((fun i => (u i : ℝ)) ᵥ* R⁻¹) :=
-    ⟨(AddMonoidHom.mk' (fun u : Fin d → ℤ => e ((fun i => (u i : ℝ)) ᵥ* R⁻¹)) (by
-        intro a b
-        show e ((fun i => ((a + b) i : ℝ)) ᵥ* R⁻¹) =
-          e ((fun i => (a i : ℝ)) ᵥ* R⁻¹) + e ((fun i => (b i : ℝ)) ᵥ* R⁻¹)
-        have h1 : (fun i => ((a + b) i : ℝ)) = (fun i => (a i : ℝ)) + fun i => (b i : ℝ) := by
-          funext i
-          simp
-        rw [h1, Matrix.add_vecMul, map_add (f := _)])).toIntLinearMap, fun u => rfl⟩
+  obtain ⟨hZ, hh⟩
+      : ∃ hZ : (Fin d → ℤ) →ₗ[ℤ] EuclideanSpace ℝ (Fin d), ∀ u,
+        hZ u = e ((fun i => (u i : ℝ)) ᵥ* R⁻¹) := ⟨
+    (AddMonoidHom.mk' (fun u : Fin d → ℤ => e ((fun i => (u i : ℝ)) ᵥ* R⁻¹)) (by
+      intro a b
+      show e ((fun i => ((a + b) i : ℝ)) ᵥ* R⁻¹) =
+        e ((fun i => (a i : ℝ)) ᵥ* R⁻¹) + e ((fun i => (b i : ℝ)) ᵥ* R⁻¹)
+      have h1 : (fun i => ((a + b) i : ℝ)) = (fun i => (a i : ℝ)) + fun i => (b i : ℝ) := by
+        funext i
+        simp
+      rw [h1, Matrix.add_vecMul, map_add (f := _)])).toIntLinearMap,
+    fun u => rfl
+  ⟩
   have hquad : ∀ t : Fin d → ℝ, ‖e (R *ᵥ t)‖ ^ 2 = t ⬝ᵥ (L *ᵥ t) := by
     intro t
     rw [hnorm, hL, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec t, Matrix.vecMul_transpose]
@@ -85,9 +94,11 @@ theorem shortDual_holds : ShortDualStatement := by
     intro x
     refine ⟨R⁻¹ *ᵥ e.symm x, ?_⟩
     rw [Matrix.mulVec_mulVec, hRR', Matrix.one_mulVec, LinearEquiv.apply_symm_apply]
-  have hspan : Submodule.span ℝ
-      ((LinearMap.range g : Submodule ℤ (EuclideanSpace ℝ (Fin d))) :
-        Set (EuclideanSpace ℝ (Fin d))) = ⊤ := by
+  have hspan
+      : Submodule.span ℝ
+          ((LinearMap.range g : Submodule ℤ (EuclideanSpace ℝ (Fin d)))
+            : Set (EuclideanSpace ℝ (Fin d)))
+        = ⊤ := by
     rw [eq_top_iff]
     rintro x -
     obtain ⟨w, rfl⟩ := hFsurj x
@@ -114,8 +125,14 @@ theorem shortDual_holds : ShortDualStatement := by
   have hS1 : μ ≤ PI.succMin (LinearMap.range g) 1 := by
     unfold PI.succMin
     apply le_csInf
-    · refine ⟨‖g (Pi.single i0 1)‖, norm_nonneg _, fun _ => g (Pi.single i0 1),
-        fun _ => LinearMap.mem_range_self g _, ?_, fun _ => le_rfl⟩
+    · refine ⟨
+        ‖g (Pi.single i0 1)‖,
+        norm_nonneg _,
+        fun _ => g (Pi.single i0 1),
+        fun _ => LinearMap.mem_range_self g _,
+        ?_,
+        fun _ => le_rfl
+      ⟩
       rw [linearIndependent_unique_iff]
       intro h0
       have h1 := hlow (Pi.single i0 1) hne0
@@ -126,7 +143,8 @@ theorem shortDual_holds : ShortDualStatement := by
       have ht0 : t ≠ 0 := by
         rintro rfl
         exact hvli.ne_zero 0 (by rw [← ht, map_zero])
-      calc μ ≤ ‖g t‖ := hlow t ht0
+      calc
+        μ ≤ ‖g t‖ := hlow t ht0
         _ = ‖v 0‖ := by rw [ht]
         _ ≤ b := hvb 0
 
@@ -144,16 +162,29 @@ theorem shortDual_holds : ShortDualStatement := by
     have h1 : a ᵥ* R⁻¹ = b ᵥ* R⁻¹ := e.injective h0
     have h2 := congrArg (fun x => x ᵥ* R) h1
     simpa only [Matrix.vecMul_vecMul, hRR, Matrix.vecMul_one] using h2
-  have hne2 : ∃ b : ℝ, 0 ≤ b ∧ ∃ v : Fin d → EuclideanSpace ℝ (Fin d),
-      (∀ j, v j ∈ PI.dualZ (LinearMap.range g)) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ b := by
-    refine ⟨∑ j, ‖hZ (Pi.single j 1)‖, Finset.sum_nonneg (fun j _ => norm_nonneg _),
-      fun j => hZ (Pi.single j 1), fun j => hdual _, ?_,
-      fun j => Finset.single_le_sum (f := fun j => ‖hZ (Pi.single j 1)‖)
-        (fun i _ => norm_nonneg _) (Finset.mem_univ j)⟩
-    have hli := (Pi.basisFun ℝ (Fin d)).linearIndependent.map'
-      (e.toLinearMap ∘ₗ Matrix.vecMulLinear R⁻¹) (LinearMap.ker_eq_bot.mpr hinj)
-    have hfun : (fun j => hZ (Pi.single j 1)) =
-        ⇑(e.toLinearMap ∘ₗ Matrix.vecMulLinear R⁻¹) ∘ ⇑(Pi.basisFun ℝ (Fin d)) := by
+  have hne2
+      : ∃ b : ℝ,
+        0 ≤ b
+          ∧ ∃ v : Fin d → EuclideanSpace ℝ (Fin d),
+            (∀ j, v j ∈ PI.dualZ (LinearMap.range g)) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ b := by
+    refine ⟨
+      ∑ j, ‖hZ (Pi.single j 1)‖,
+      Finset.sum_nonneg (fun j _ => norm_nonneg _),
+      fun j => hZ (Pi.single j 1),
+      fun j => hdual _,
+      ?_,
+      fun j =>
+        Finset.single_le_sum
+          (f := fun j => ‖hZ (Pi.single j 1)‖)
+          (fun i _ => norm_nonneg _)
+          (Finset.mem_univ j)
+    ⟩
+    have hli :=
+      (Pi.basisFun ℝ (Fin d)).linearIndependent.map' (e.toLinearMap ∘ₗ Matrix.vecMulLinear R⁻¹)
+        (LinearMap.ker_eq_bot.mpr hinj)
+    have hfun
+        : (fun j => hZ (Pi.single j 1))
+          = ⇑(e.toLinearMap ∘ₗ Matrix.vecMulLinear R⁻¹) ∘ ⇑(Pi.basisFun ℝ (Fin d)) := by
       funext j
       rw [hh, hcast]
       show _ = e ((Pi.basisFun ℝ (Fin d) j) ᵥ* R⁻¹)
@@ -169,25 +200,25 @@ theorem shortDual_holds : ShortDualStatement := by
   have hlt : PI.succMin (PI.dualZ (LinearMap.range g)) d < d / μ + δ := by linarith
   unfold PI.succMin at hlt
   obtain ⟨b, ⟨hb0, v, hvD, hvli, hvb⟩, hb⟩ := exists_lt_of_csInf_lt (by exact hne2) hlt
-  have hvD' : ∀ j, ∀ y ∈ LinearMap.range g, ∃ z : ℤ, inner ℝ (v j) y = (z : ℝ) :=
-    fun j => hvD j
-  have hc : ∀ j k, ∃ z : ℤ, inner ℝ (v j) (g (Pi.single k 1)) = (z : ℝ) :=
-    fun j k => hvD' j _ (LinearMap.mem_range_self g _)
+  have hvD' : ∀ j, ∀ y ∈ LinearMap.range g, ∃ z : ℤ, inner ℝ (v j) y = (z : ℝ) := fun j => hvD j
+  have hc : ∀ j k, ∃ z : ℤ, inner ℝ (v j) (g (Pi.single k 1)) = (z : ℝ) := fun j k =>
+    hvD' j _ (LinearMap.mem_range_self g _)
   choose c hc using hc
   have hv : ∀ j, v j = hZ (c j) := by
     intro j
     have hw : e.symm (v j) ᵥ* R = fun k => ((c j k : ℤ) : ℝ) := by
       funext k
       have h1 := hc j k
-      rw [hg (Pi.single k 1), hcast k, ← e.apply_symm_apply (v j), hin,
-        Matrix.dotProduct_mulVec, dotProduct_single, mul_one] at h1
+      rw [hg (Pi.single k 1), hcast k, ← e.apply_symm_apply (v j), hin, Matrix.dotProduct_mulVec,
+          dotProduct_single, mul_one]
+        at h1
       exact h1
-    calc v j = e (e.symm (v j)) := (e.apply_symm_apply _).symm
-      _ = e ((e.symm (v j) ᵥ* R) ᵥ* R⁻¹) := by
-        rw [Matrix.vecMul_vecMul, hRR', Matrix.vecMul_one]
+    calc
+      v j
+        = e (e.symm (v j)) := (e.apply_symm_apply _).symm
+      _ = e ((e.symm (v j) ᵥ* R) ᵥ* R⁻¹) := by rw [Matrix.vecMul_vecMul, hRR', Matrix.vecMul_one]
       _ = hZ (c j) := by rw [hw, hh]
-  have hliZ : LinearIndependent ℤ v :=
-    hvli.restrict_scalars (fun a b hab => by simpa using hab)
+  have hliZ : LinearIndependent ℤ v := hvli.restrict_scalars (fun a b hab => by simpa using hab)
   have hcli : LinearIndependent ℤ c := by
     apply LinearIndependent.of_comp hZ
     have hcomp : (hZ ∘ c) = v := funext fun j => (hv j).symm

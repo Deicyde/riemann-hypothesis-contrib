@@ -29,7 +29,8 @@ lemma P_ge {s : ℝ} (hs : 0 ≤ s) : 25 ≤ P s := by
 end Formalism.KernelCokernelLengths.CoefficientHeightLimitLemmas
 
 open Formalism.KernelCokernelLengths.CoefficientHeightLimitLemmas in
-theorem Formalism.KernelCokernelLengths.coefficient_height_limit : Formalism.KernelCokernelLengths.HCoefLim := by
+theorem Formalism.KernelCokernelLengths.coefficient_height_limit
+    : Formalism.KernelCokernelLengths.HCoefLim := by
   refine ⟨?_, ?_, ?_⟩
   · intro x hx y hy hxy
     simp only [Set.mem_Ici] at hx hy
@@ -44,8 +45,9 @@ theorem Formalism.KernelCokernelLengths.coefficient_height_limit : Formalism.Ker
     have : 0 < x - 1 := by linarith
     positivity
   · have hs : Filter.Tendsto (fun x : ℝ => 1 / (x - 1)) Filter.atTop (nhds 0) := by
-      have h := tendsto_inv_atTop_zero.comp
-        (Filter.tendsto_atTop_add_const_right Filter.atTop (-1 : ℝ) Filter.tendsto_id)
+      have h :=
+        tendsto_inv_atTop_zero.comp (Filter.tendsto_atTop_add_const_right Filter.atTop (-1 : ℝ)
+          Filter.tendsto_id)
       refine h.congr ?_
       intro x
       simp [sub_eq_add_neg]

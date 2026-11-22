@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open NumberField ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSCore GlobalTheory.Vanishing
+open GlobalTheory GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel
+  GlobalTheory.HSCore GlobalTheory.Vanishing
 
 namespace GlobalTheory.HSShort
 
@@ -32,7 +33,8 @@ def incl (X : Data F) (j : ℕ) : X.V j →ₗ[F] Tot X.toGeo := LinearMap.singl
 theorem incl_injective (X : Data F) (j : ℕ) : Function.Injective (incl X j) := fun a b h =>
   Subtype.ext (by simpa [incl] using congrFun h j)
 
-def inclEquiv (X : Data F) (j : ℕ) : X.V j ≃ₗ[F] LinearMap.range (incl X j) := LinearEquiv.ofInjective _ (incl_injective X j)
+def inclEquiv (X : Data F) (j : ℕ) : X.V j ≃ₗ[F] LinearMap.range (incl X j) :=
+  LinearEquiv.ofInjective _ (incl_injective X j)
 
 def sysOf (X : Data F) (Λ₀ : ℝ) : Sys F (Tot X.toGeo) where
   N := X.N
@@ -51,8 +53,8 @@ def sysOf (X : Data F) (Λ₀ : ℝ) : Sys F (Tot X.toGeo) where
   LamD := X.LamD
   LamT := X.LamT
 
-def totExt (G : Geo F) (E : Type) [Field E] [NumberField E] [Algebra F E] :
-    Tot G →ₛₗ[algebraMap F E] Tot (G.baseChange E) where
+def totExt (G : Geo F) (E : Type) [Field E] [NumberField E] [Algebra F E]
+    : Tot G →ₛₗ[algebraMap F E] Tot (G.baseChange E) where
   toFun x j := G.toExt E j (x j)
   map_add' x y := funext fun j => map_add _ _ _
   map_smul' c x := funext fun j => map_smulₛₗ (G.toExt E j) c (x j)
@@ -64,12 +66,13 @@ variable {X : Data F} {s : Fin X.D → Fin X.N → F} {hs : X.IsGood s} {δ : �
 def totRes (Co : Coord X.toGeo hs δ) : Tot X.toGeo →ₗ[F] (Fin δ → F) :=
   (Co.ev 0).toLinearMap ∘ₗ hs.res 0 ∘ₗ LinearMap.proj 0
 
-
 variable (X s) in
 def totFil (a : ℕ) : Submodule F (Tot X.toGeo) := (filV X s a).map (incl X X.T)
 
-def totSym (Co : Coord X.toGeo hs δ) (a : ℕ) : totFil X s a →ₗ[F] (MonoDeg (Fin X.D) a × Fin δ → F) :=
-  symV Co a ∘ₗ (Submodule.equivMapOfInjective _ (incl_injective X X.T) (filV X s a)).symm.toLinearMap
+def totSym (Co : Coord X.toGeo hs δ) (a : ℕ)
+    : totFil X s a →ₗ[F] (MonoDeg (Fin X.D) a × Fin δ → F) :=
+  symV Co a
+    ∘ₗ (Submodule.equivMapOfInjective _ (incl_injective X X.T) (filV X s a)).symm.toLinearMap
 
 end Split
 

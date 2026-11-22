@@ -15,8 +15,9 @@ def IsIntP {p : ℕ} [Fact p.Prime] (x : ℂ_[p]) : Prop := ‖x‖ ≤ 1
 def IntegralMv {σ : Type*} {p : ℕ} [Fact p.Prime] (F : MvPowerSeries σ ℂ_[p]) : Prop :=
   ∀ n, IsIntP (MvPowerSeries.coeff n F)
 
-def expMv {σ : Type*} {p : ℕ} [Fact p.Prime] (F : MvPowerSeries σ ℂ_[p]) : MvPowerSeries σ ℂ_[p] :=
-  fun α => ∑ n ∈ Finset.range ((α.sum fun _ k => k) + 1),
+def expMv {σ : Type*} {p : ℕ} [Fact p.Prime] (F : MvPowerSeries σ ℂ_[p])
+    : MvPowerSeries σ ℂ_[p] := fun α =>
+  ∑ n ∈ Finset.range ((α.sum fun _ k => k) + 1),
     MvPowerSeries.coeff α (F ^ n) / (n.factorial : ℂ_[p])
 
 def Simeq {σ : Type*} {p : ℕ} [Fact p.Prime] (f g : MvPowerSeries σ ℂ_[p]) : Prop :=
@@ -47,19 +48,22 @@ def be (a b : MvPowerSeries σ ℂ_[p]) : MvPowerSeries σ ℂ_[p] :=
 end FG
 
 def BeConjNorm : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (l ex ph : PowerSeries ℂ_[p]), PowerSeries.constantCoeff l = 0 → PowerSeries.constantCoeff ex = 0 →
-    PowerSeries.subst ex l = PowerSeries.X → PowerSeries.constantCoeff ph = 0 →
-    ∀ (S : Set (ℂ_[p] × ℂ_[p])),
-    (∀ α ∈ S, α.swap ∈ S) → (∀ α ∈ S, ∀ β ∈ S, α + β ∈ S) →
-    (∀ α ∈ S, IntegralMv (mulBy l ex α.1 (Xv ()) : MvPowerSeries Unit ℂ_[p])) →
-    IntegralMv (add l ex (Xv 0) (Xv 1) : MvPowerSeries (Fin 2) ℂ_[p]) →
-    (∀ α ∈ S, ∃ n : ℤ_[p], α.1 * α.2 = zc n) →
-    (∀ α ∈ S, ∃ β ∈ S, ∃ γ ∈ S, ‖β.1‖ = 1 ∧ ‖γ.1‖ = 1 ∧ α = β + γ) →
-    (∀ α ∈ S, Simeq (phAt ph (mulBy l ex α.1 (Xv ())) : MvPowerSeries Unit ℂ_[p])
-        (MvPowerSeries.C (α.1 * α.2) * phAt ph (Xv ()))) →
-    Simeq (be l ex ph (add l ex (Xv 0) (Xv 1)) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p])
-      (be l ex ph (Xv 0) (Xv 2) + be l ex ph (Xv 1) (Xv 2)) →
-    ∀ α ∈ S, Simeq (be l ex ph (mulBy l ex α.1 (Xv 0)) (Xv 1) : MvPowerSeries (Fin 2) ℂ_[p])
-        (be l ex ph (Xv 0) (mulBy l ex α.2 (Xv 1)))
+  ∀ (p : ℕ) [Fact p.Prime] (l ex ph : PowerSeries ℂ_[p]),
+    PowerSeries.constantCoeff l = 0 → PowerSeries.constantCoeff ex = 0
+      → PowerSeries.subst ex l = PowerSeries.X → PowerSeries.constantCoeff ph = 0
+      → ∀ (S : Set (ℂ_[p] × ℂ_[p])),
+        (∀ α ∈ S, α.swap ∈ S) → (∀ α ∈ S, ∀ β ∈ S, α + β ∈ S)
+          → (∀ α ∈ S, IntegralMv (mulBy l ex α.1 (Xv ()) : MvPowerSeries Unit ℂ_[p]))
+          → IntegralMv (add l ex (Xv 0) (Xv 1) : MvPowerSeries (Fin 2) ℂ_[p])
+          → (∀ α ∈ S, ∃ n : ℤ_[p], α.1 * α.2 = zc n)
+          → (∀ α ∈ S, ∃ β ∈ S, ∃ γ ∈ S, ‖β.1‖ = 1 ∧ ‖γ.1‖ = 1 ∧ α = β + γ)
+          → (∀ α ∈ S,
+            Simeq (phAt ph (mulBy l ex α.1 (Xv ())) : MvPowerSeries Unit ℂ_[p])
+              (MvPowerSeries.C (α.1 * α.2) * phAt ph (Xv ())))
+          → Simeq (be l ex ph (add l ex (Xv 0) (Xv 1)) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p])
+            (be l ex ph (Xv 0) (Xv 2) + be l ex ph (Xv 1) (Xv 2))
+          → ∀ α ∈ S,
+            Simeq (be l ex ph (mulBy l ex α.1 (Xv 0)) (Xv 1) : MvPowerSeries (Fin 2) ℂ_[p])
+              (be l ex ph (Xv 0) (mulBy l ex α.2 (Xv 1)))
 
 end PI.BeConjNorm

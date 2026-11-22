@@ -15,15 +15,18 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieMod
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.MetricOrth
 
-theorem exists_ext (E : Type) [Field E] [NumberField E] (φ : 𝓞 E →+* ℂ) :
-    ∃ τ : E →+* ℂ, τ.comp (algebraMap (𝓞 E) E) = φ := by
+theorem exists_ext (E : Type) [Field E] [NumberField E] (φ : 𝓞 E →+* ℂ)
+    : ∃ τ : E →+* ℂ, τ.comp (algebraMap (𝓞 E) E) = φ := by
   have hinj : Function.Injective φ := by
     rw [RingHom.injective_iff_ker_eq_bot]
     refine Ideal.eq_bot_of_comap_eq_bot (R := ℤ) ?_
@@ -38,17 +41,19 @@ theorem exists_ext (E : Type) [Field E] [NumberField E] (φ : 𝓞 E →+* ℂ) 
   simp
 
 def resEquiv (E : Type) [Field E] [NumberField E] : (E →+* ℂ) ≃ (𝓞 E →+* ℂ) :=
-  Equiv.ofBijective (fun τ => τ.comp (algebraMap (𝓞 E) E))
+  Equiv.ofBijective
+    (fun τ => τ.comp (algebraMap (𝓞 E) E))
     ⟨fun τ τ' h => IsFractionRing.injective_comp_algebraMap (A := 𝓞 E) h, fun φ => exists_ext E φ⟩
 
-instance fintypeIntEmb (E : Type) [Field E] [NumberField E] : Fintype (𝓞 E →+* ℂ) := Fintype.ofEquiv _ (resEquiv E)
+instance fintypeIntEmb (E : Type) [Field E] [NumberField E] : Fintype (𝓞 E →+* ℂ) :=
+  Fintype.ofEquiv _ (resEquiv E)
 
-theorem exists_coeff (E : Type) [Field E] [NumberField E] :
-    ∃ (Ix : Type) (_ : Fintype Ix) (α : Ix → 𝓞 E) (d : (𝓞 E →+* ℂ) → Ix → ℂ) (m : Ix → ℤ),
-      (∀ τ : 𝓞 E →+* ℂ, ∑ a, d τ a * τ (α a) = 1) ∧
-      (∀ σ τ : 𝓞 E →+* ℂ, σ ≠ τ → ∑ a, d τ a * σ (α a) = 0) ∧
-      (∀ (τ : 𝓞 E →+* ℂ) a, starRingEnd ℂ (d τ a) = d ((starRingEnd ℂ).comp τ) a) ∧
-      (∑ a, m a • α a = 1) ∧ ∀ a, ∑ τ, d τ a = m a := by
+theorem exists_coeff (E : Type) [Field E] [NumberField E]
+    : ∃ (Ix : Type) (_ : Fintype Ix) (α : Ix → 𝓞 E) (d : (𝓞 E →+* ℂ) → Ix → ℂ) (m : Ix → ℤ),
+      (∀ τ : 𝓞 E →+* ℂ, ∑ a, d τ a * τ (α a) = 1)
+        ∧ (∀ σ τ : 𝓞 E →+* ℂ, σ ≠ τ → ∑ a, d τ a * σ (α a) = 0)
+        ∧ (∀ (τ : 𝓞 E →+* ℂ) a, starRingEnd ℂ (d τ a) = d ((starRingEnd ℂ).comp τ) a)
+        ∧ (∑ a, m a • α a = 1) ∧ ∀ a, ∑ τ, d τ a = m a := by
   classical
   let Ix := Module.Free.ChooseBasisIndex ℤ (𝓞 E)
   let b := RingOfIntegers.basis E
@@ -70,13 +75,12 @@ theorem exists_coeff (E : Type) [Field E] [NumberField E] :
   have hA : A = Nᵀ.submatrix e₂.symm (Equiv.refl Ix) := by
     ext σ a
     obtain ⟨j, rfl⟩ := e₂.surjective σ
-    simp only [A, Matrix.of_apply, Matrix.submatrix_apply, Equiv.symm_apply_apply, Matrix.transpose_apply, N,
-      Algebra.embeddingsMatrixReindex, Algebra.embeddingsMatrix, Matrix.reindex_apply, Equiv.refl_apply,
-      Equiv.refl_symm, Equiv.symm_symm]
+    simp only [A, Matrix.of_apply, Matrix.submatrix_apply, Equiv.symm_apply_apply,
+      Matrix.transpose_apply, N, Algebra.embeddingsMatrixReindex, Algebra.embeddingsMatrix,
+      Matrix.reindex_apply, Equiv.refl_apply, Equiv.refl_symm, Equiv.symm_symm]
     simp [e₂, resEquiv, b, integralBasis_apply]
     rfl
-  have hNu : IsUnit Nᵀ.det := by
-    rw [Matrix.det_transpose]; exact isUnit_iff_ne_zero.2 hN
+  have hNu : IsUnit Nᵀ.det := by rw [Matrix.det_transpose]; exact isUnit_iff_ne_zero.2 hN
   let B : Matrix Ix T ℂ := (Nᵀ)⁻¹.submatrix (Equiv.refl Ix) e₂.symm
   have hAB : A * B = 1 := by
     rw [hA, Matrix.submatrix_mul_equiv, Matrix.mul_nonsing_inv _ hNu, Matrix.submatrix_one_equiv]
@@ -87,8 +91,7 @@ theorem exists_coeff (E : Type) [Field E] [NumberField E] :
   have hBA' : ∀ a c, ∑ τ : T, B a τ * τ (b c) = (1 : Matrix Ix Ix ℂ) a c := fun a c => by
     rw [← hBA, Matrix.mul_apply]
     rfl
-  have hcc : ∀ τ : T, (starRingEnd ℂ).comp ((starRingEnd ℂ).comp τ) = τ := fun τ => by
-    ext x; simp
+  have hcc : ∀ τ : T, (starRingEnd ℂ).comp ((starRingEnd ℂ).comp τ) = τ := fun τ => by ext x; simp
   let cj : T ≃ T := ⟨fun τ => (starRingEnd ℂ).comp τ, fun τ => (starRingEnd ℂ).comp τ, hcc, hcc⟩
   let B' : Matrix Ix T ℂ := Matrix.of fun a τ => starRingEnd ℂ (B a (cj τ))
   have hAB2 : A * B' = 1 := by
@@ -110,14 +113,19 @@ theorem exists_coeff (E : Type) [Field E] [NumberField E] :
       simp
     rw [this, mul_comm]
   have hB' : B' = B := by
-    calc B' = (B * A) * B' := by rw [hBA, Matrix.one_mul]
+    calc
+      B'
+        = (B * A) * B' := by rw [hBA, Matrix.one_mul]
       _ = B * (A * B') := Matrix.mul_assoc _ _ _
       _ = B := by rw [hAB2, Matrix.mul_one]
-  refine ⟨Ix, inferInstance, fun a => b a, fun τ a => B a τ, fun a => b.repr 1 a, ?_, ?_, ?_, ?_, ?_⟩
+  refine
+    ⟨Ix, inferInstance, fun a => b a, fun τ a => B a τ, fun a => b.repr 1 a, ?_, ?_, ?_, ?_, ?_⟩
   · intro τ
-    rw [hAB' τ τ]; simp
+    rw [hAB' τ τ]
+    simp
   · intro σ τ h
-    rw [hAB' σ τ]; simp [Matrix.one_apply, h]
+    rw [hAB' σ τ]
+    simp [Matrix.one_apply, h]
   · intro τ a
     have := congrFun (congrFun hB' a) (cj τ)
     simp only [B', Matrix.of_apply] at this
@@ -129,25 +137,35 @@ theorem exists_coeff (E : Type) [Field E] [NumberField E] :
     have h1 : ∀ τ : T, (1 : ℂ) = ∑ c, (b.repr 1 c : ℂ) * τ (b c) := fun τ => by
       have := congrArg τ (b.sum_repr 1)
       simpa using this.symm
-    calc ∑ τ : T, B a τ = ∑ τ : T, B a τ * ∑ c, (b.repr 1 c : ℂ) * τ (b c) :=
-          Finset.sum_congr rfl fun τ _ => by rw [← h1 τ, _root_.mul_one]
+    calc
+      ∑ τ : T, B a τ = ∑ τ : T, B a τ * ∑ c, (b.repr 1 c : ℂ) * τ (b c) :=
+        Finset.sum_congr rfl fun τ _ => by rw [← h1 τ, _root_.mul_one]
       _ = ∑ c, (b.repr 1 c : ℂ) * ∑ τ : T, B a τ * τ (b c) := by
-          simp only [Finset.mul_sum]
-          rw [Finset.sum_comm]
-          exact Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun τ _ => by ring
+        simp only [Finset.mul_sum]
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun τ _ => by ring
       _ = (b.repr 1 a : ℂ) := by
-          simp only [hBA', Matrix.one_apply]
-          simp
+        simp only [hBA', Matrix.one_apply]
+        simp
 
-theorem core_sum {V : Type} [AddCommGroup V] [Module ℂ V] {T : Type} [Fintype T] (core : InnerProductSpace.Core ℂ V)
-    (P : T → V →ₗ[ℂ] V) (hP : ∑ τ, P τ = 1) :
-    ∃ core' : InnerProductSpace.Core ℂ V, ∀ x y, core'.inner x y = ∑ τ, core.inner (P τ x) (P τ y) := by
-  refine ⟨{ inner := fun x y => ∑ τ, core.inner (P τ x) (P τ y)
-            conj_inner_symm := ?_
-            re_inner_nonneg := ?_
-            add_left := ?_
-            smul_left := ?_
-            definite := ?_ }, fun _ _ => rfl⟩
+theorem core_sum
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {T : Type} [Fintype T]
+    (core : InnerProductSpace.Core ℂ V)
+    (P : T → V →ₗ[ℂ] V) (hP : ∑ τ, P τ = 1)
+    : ∃ core' : InnerProductSpace.Core ℂ V, ∀ x y,
+      core'.inner x y = ∑ τ, core.inner (P τ x) (P τ y) := by
+  refine ⟨
+    {
+      inner := fun x y => ∑ τ, core.inner (P τ x) (P τ y)
+      conj_inner_symm := ?_
+      re_inner_nonneg := ?_
+      add_left := ?_
+      smul_left := ?_
+      definite := ?_
+    },
+    fun _ _ => rfl
+  ⟩
   · intro x y
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum]
@@ -164,7 +182,7 @@ theorem core_sum {V : Type} [AddCommGroup V] [Module ℂ V] {T : Type} [Fintype 
     have h1 : ∑ τ, RCLike.re (core.inner (P τ x) (P τ x)) = 0 := by
       have := congrArg RCLike.re hx
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_sum, map_zero] using this
+      simpa only [map_sum, map_zero] using this
     have h2 := (Finset.sum_eq_zero_iff_of_nonneg fun τ _ => core.re_inner_nonneg (P τ x)).1 h1
     have h3 : ∀ τ, P τ x = 0 := by
       intro τ
@@ -182,28 +200,34 @@ theorem core_sum {V : Type} [AddCommGroup V] [Module ℂ V] {T : Type} [Fintype 
     rw [this]
     exact Finset.sum_eq_zero fun τ _ => h3 τ
 
-theorem core_zero_left {V : Type} [AddCommGroup V] [Module ℂ V] (core : InnerProductSpace.Core ℂ V) (y : V) :
-    core.inner 0 y = 0 := by
+theorem core_zero_left
+    {V : Type} [AddCommGroup V] [Module ℂ V] (core : InnerProductSpace.Core ℂ V) (y : V)
+    : core.inner 0 y = 0 := by
   have h := core.smul_left 0 y 0
   simpa using h
 
-theorem core_zero_right {V : Type} [AddCommGroup V] [Module ℂ V] (core : InnerProductSpace.Core ℂ V) (x : V) :
-    core.inner x 0 = 0 := by
+theorem core_zero_right
+    {V : Type} [AddCommGroup V] [Module ℂ V] (core : InnerProductSpace.Core ℂ V) (x : V)
+    : core.inner x 0 = 0 := by
   rw [← core.conj_inner_symm, core_zero_left, map_zero]
 
-theorem core_sum_left {V : Type} [AddCommGroup V] [Module ℂ V] {Ix : Type} (core : InnerProductSpace.Core ℂ V)
-    (s : Finset Ix) (f : Ix → ℂ) (u : Ix → V) (y : V) :
-    core.inner (∑ a ∈ s, f a • u a) y = ∑ a ∈ s, starRingEnd ℂ (f a) * core.inner (u a) y := by
+theorem core_sum_left
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {Ix : Type}
+    (core : InnerProductSpace.Core ℂ V) (s : Finset Ix) (f : Ix → ℂ) (u : Ix → V) (y : V)
+    : core.inner (∑ a ∈ s, f a • u a) y = ∑ a ∈ s, starRingEnd ℂ (f a) * core.inner (u a) y := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using core_zero_left core y
   | insert a s ha ih =>
     rw [Finset.sum_insert ha, Finset.sum_insert ha, core.add_left, core.smul_left, ih]
 
-theorem core_expand {V : Type} [AddCommGroup V] [Module ℂ V] {Ix : Type} [Fintype Ix]
-    (core : InnerProductSpace.Core ℂ V) (f g : Ix → ℂ) (u w : Ix → V) :
-    core.inner (∑ a, f a • u a) (∑ b, g b • w b) =
-      ∑ a, ∑ b, starRingEnd ℂ (f a) * g b * core.inner (u a) (w b) := by
+theorem core_expand
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {Ix : Type} [Fintype Ix]
+    (core : InnerProductSpace.Core ℂ V) (f g : Ix → ℂ) (u w : Ix → V)
+    : core.inner (∑ a, f a • u a) (∑ b, g b • w b)
+      = ∑ a, ∑ b, starRingEnd ℂ (f a) * g b * core.inner (u a) (w b) := by
   rw [core_sum_left]
   refine Finset.sum_congr rfl fun a _ => ?_
   set_option synthInstance.maxHeartbeats 100000 in
@@ -216,12 +240,19 @@ section Geo
 
 open AlgebraicGeometry CategoryTheory
 
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {G : Over X} [GrpObj G] {ξ : Sp Ω ⟶ X}
-  {Li : Type} [AddCommGroup Li] [Module Ω Li]
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {G : Over X} [GrpObj G]
+  {ξ : Sp Ω ⟶ X} {Li : Type} [AddCommGroup Li] [Module Ω Li]
 
-theorem valAt_act (M : LieModel G ξ Li) {O : Type} [CommRing O] (act : OAct O G) (ρ : O →+* Module.End Ω Li)
-    (hρ : M.IsActOf act.act ρ) (z : Sp ℂ ⟶ X) (r : O) {e : Li} {w : epsAt z ⟶ G} (h : M.ValAt z e w) :
-    M.ValAt z (ρ r e) (w ≫ act.act r) := by
+theorem valAt_act
+    (M : LieModel G ξ Li)
+    {O : Type} [CommRing O]
+    (act : OAct O G) (ρ : O →+* Module.End Ω Li) (hρ : M.IsActOf act.act ρ)
+    (z : Sp ℂ ⟶ X)
+    (r : O)
+    {e : Li} {w : epsAt z ⟶ G} (h : M.ValAt z e w)
+    : M.ValAt z (ρ r e) (w ≫ act.act r) := by
   obtain ⟨hs, v, ⟨ht, hv⟩, hw⟩ := h
   haveI := act.hom r
   refine ⟨hs, v ≫ act.act r, ⟨ht.comp_monHom _, ?_⟩, ?_⟩
@@ -230,22 +261,32 @@ theorem valAt_act (M : LieModel G ξ Li) {O : Type} [CommRing O] (act : OAct O G
   · rw [Over.comp_left, hw, Over.comp_left]
     exact Category.assoc _ _ _
 
-theorem eig_act {V : Type} [AddCommGroup V] [Module ℂ V] {z : Sp ℂ ⟶ X} (Mz : LieModel G z V) {O : Type} [CommRing O]
-    (act : OAct O G) (ρz : O →+* Module.End ℂ V) (hρz : Mz.IsActOf act.act ρz) {τ : O →+* ℂ} {x : V}
-    (h : IsLieEigen act z τ (Mz.pt x)) (r : O) : ρz r x = τ r • x := by
+theorem eig_act
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {z : Sp ℂ ⟶ X} (Mz : LieModel G z V)
+    {O : Type} [CommRing O]
+    (act : OAct O G) (ρz : O →+* Module.End ℂ V) (hρz : Mz.IsActOf act.act ρz)
+    {τ : O →+* ℂ} {x : V} (h : IsLieEigen act z τ (Mz.pt x))
+    (r : O)
+    : ρz r x = τ r • x := by
   apply Mz.inj
   apply Over.OverMorphism.ext
   rw [Mz.smul, hρz r x]
   exact h.2 r
 
-theorem exists_orth (E : Type) [Field E] [NumberField E] [IsCommMonObj G] {K : Type} {J : K → Type}
-    {y : (Σ k, J k) → Ω} (M : LieModel G ξ Li) (act : OAct (𝓞 E) G) (ρ : 𝓞 E →+* Module.End Ω Li)
-    (hρ : M.IsActOf act.act ρ) (h₀ : LieMetric M y) : ∃ h : LieMetric M y, h.Orth act := by
+theorem exists_orth
+    (E : Type) [Field E] [NumberField E] [IsCommMonObj G]
+    {K : Type} {J : K → Type} {y : (Σ k, J k) → Ω}
+    (M : LieModel G ξ Li) (act : OAct (𝓞 E) G) (ρ : 𝓞 E →+* Module.End Ω Li)
+    (hρ : M.IsActOf act.act ρ)
+    (h₀ : LieMetric M y)
+    : ∃ h : LieMetric M y, h.Orth act := by
   obtain ⟨Ix, _, α, d, m, hd1, hd0, hdc, hm1, hm2⟩ := exists_coeff E
   let c : Ix → Ix → ℂ := fun a b => ∑ τ, starRingEnd ℂ (d τ a) * d τ b
   have hcc : ∀ τ : 𝓞 E →+* ℂ, (starRingEnd ℂ).comp ((starRingEnd ℂ).comp τ) = τ := fun τ => by
     ext x; simp
-  let cj : (𝓞 E →+* ℂ) ≃ (𝓞 E →+* ℂ) := ⟨fun τ => (starRingEnd ℂ).comp τ, fun τ => (starRingEnd ℂ).comp τ, hcc, hcc⟩
+  let cj : (𝓞 E →+* ℂ) ≃ (𝓞 E →+* ℂ) :=
+    ⟨fun τ => (starRingEnd ℂ).comp τ, fun τ => (starRingEnd ℂ).comp τ, hcc, hcc⟩
   have hc : ∀ a b, starRingEnd ℂ (c a b) = c a b := by
     intro a b
     set_option synthInstance.maxHeartbeats 100000 in
@@ -257,22 +298,29 @@ theorem exists_orth (E : Type) [Field E] [NumberField E] [IsCommMonObj G] {K : T
     rw [h1, h2, Complex.conj_conj]
   let ip' : ∀ z : Sp ℂ ⟶ X, (epsAt z ⟶ G) → (epsAt z ⟶ G) → ℂ := fun z v w =>
     ∑ a, ∑ b, c a b * h₀.ip z (v ≫ act.act (α a)) (w ≫ act.act (α b))
-  have hsum : ∀ {V : Type} [AddCommGroup V] [Module ℂ V] (ρz : 𝓞 E →+* Module.End ℂ V),
-      ∑ τ, ∑ a, d τ a • ρz (α a) = 1 := by
+  have hsum
+      : ∀ {V : Type} [AddCommGroup V] [Module ℂ V] (ρz : 𝓞 E →+* Module.End ℂ V),
+        ∑ τ, ∑ a, d τ a • ρz (α a) = 1 := by
     intro V _ _ ρz
     rw [Finset.sum_comm]
     simp only [← Finset.sum_smul, hm2, Int.cast_smul_eq_zsmul]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← map_one ρz, ← hm1, map_sum]
     simp only [map_zsmul]
-  have key : ∀ (z : Sp ℂ ⟶ X) (V : Type) [AddCommGroup V] [Module ℂ V] (Mz : LieModel G z V)
-      (ρz : 𝓞 E →+* Module.End ℂ V), Mz.IsActOf act.act ρz → ∀ core : InnerProductSpace.Core ℂ V,
-      (∀ a b, core.inner a b = h₀.ip z (Mz.pt a) (Mz.pt b)) → ∀ x x',
-      ip' z (Mz.pt x) (Mz.pt x') =
-        ∑ τ, core.inner ((∑ a, d τ a • ρz (α a)) x) ((∑ a, d τ a • ρz (α a)) x') := by
+  have key
+      : ∀ (z : Sp ℂ ⟶ X) (V : Type) [AddCommGroup V] [Module ℂ V] (Mz : LieModel G z V)
+          (ρz : 𝓞 E →+* Module.End ℂ V),
+        Mz.IsActOf act.act ρz
+          → ∀ core : InnerProductSpace.Core ℂ V,
+            (∀ a b, core.inner a b = h₀.ip z (Mz.pt a) (Mz.pt b))
+              → ∀ x x',
+                ip' z (Mz.pt x) (Mz.pt x')
+                  = ∑ τ, core.inner ((∑ a, d τ a • ρz (α a)) x) ((∑ a, d τ a • ρz (α a)) x') := by
     intro z V _ _ Mz ρz hρz core hcore x x'
-    have h1 : ∀ τ, core.inner ((∑ a, d τ a • ρz (α a)) x) ((∑ a, d τ a • ρz (α a)) x') =
-        ∑ a, ∑ b, starRingEnd ℂ (d τ a) * d τ b * core.inner (ρz (α a) x) (ρz (α b) x') := by
+    have h1
+        : ∀ τ,
+          core.inner ((∑ a, d τ a • ρz (α a)) x) ((∑ a, d τ a • ρz (α a)) x')
+            = ∑ a, ∑ b, starRingEnd ℂ (d τ a) * d τ b * core.inner (ρz (α a) x) (ρz (α b) x') := by
       intro τ
       rw [← core_expand]
       simp only [LinearMap.sum_apply, LinearMap.smul_apply]
@@ -284,7 +332,8 @@ theorem exists_orth (E : Type) [Field E] [NumberField E] [IsCommMonObj G] {K : T
     rw [hcore, hρz (α a) x, hρz (α b) x', ← Finset.sum_mul]
   refine ⟨{ ip := ip', herm := ?_, conj := ?_, cont := ?_ }, ?_⟩
   · intro z V _ _ Mz
-    obtain ⟨ρz, hρz, -⟩ := lieModel_exists_unique_act X G ℂ z V Mz (𝓞 E) act.act act.hom act.one act.mul act.add
+    obtain ⟨ρz, hρz, -⟩ :=
+      lieModel_exists_unique_act X G ℂ z V Mz (𝓞 E) act.act act.hom act.one act.mul act.add
     obtain ⟨core, hcore⟩ := h₀.herm z V Mz
     obtain ⟨core', h'⟩ := core_sum core (fun τ => ∑ a, d τ a • ρz (α a)) (hsum ρz)
     exact ⟨core', fun a b => (h' a b).trans (key z V Mz ρz hρz core hcore a b).symm⟩
@@ -299,22 +348,30 @@ theorem exists_orth (E : Type) [Field E] [NumberField E] [IsCommMonObj G] {K : T
   · intro a b
     choose F hF1 hF2 using fun i j => h₀.cont (ρ (α i) a) (ρ (α j) b)
     refine ⟨fun w => ∑ i, ∑ j, c i j * F i j w, ?_, ?_⟩
-    · refine continuousOn_finsetSum _ fun i _ => continuousOn_finsetSum _ fun j _ =>
-        continuousOn_const.mul ((hF1 i j).mono ?_)
+    · refine continuousOn_finsetSum _ fun i _ =>
+        continuousOn_finsetSum _ fun j _ => continuousOn_const.mul ((hF1 i j).mono ?_)
       rintro w ⟨z, va, vb, hw, ha, hb⟩
-      exact ⟨z, va ≫ act.act (α i), vb ≫ act.act (α j), hw, valAt_act M act ρ hρ z _ ha,
-        valAt_act M act ρ hρ z _ hb⟩
+      exact ⟨
+        z,
+        va ≫ act.act (α i),
+        vb ≫ act.act (α j),
+        hw,
+        valAt_act M act ρ hρ z _ ha,
+        valAt_act M act ρ hρ z _ hb
+      ⟩
     · intro z w va vb hw ha hb
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       rw [hF2 i j z w _ _ hw (valAt_act M act ρ hρ z _ ha) (valAt_act M act ρ hρ z _ hb)]
   · intro z τ τ' v w hne hv hw
     obtain ⟨V, _, _, ⟨Mz⟩⟩ := lieModel_exists X G ℂ z
-    obtain ⟨ρz, hρz, -⟩ := lieModel_exists_unique_act X G ℂ z V Mz (𝓞 E) act.act act.hom act.one act.mul act.add
+    obtain ⟨ρz, hρz, -⟩ :=
+      lieModel_exists_unique_act X G ℂ z V Mz (𝓞 E) act.act act.hom act.one act.mul act.add
     obtain ⟨core, hcore⟩ := h₀.herm z V Mz
     obtain ⟨x, rfl⟩ := Mz.onto v hv.1
     obtain ⟨x', rfl⟩ := Mz.onto w hw.1
-    have hP : ∀ (σ υ : 𝓞 E →+* ℂ) (u : V), IsLieEigen act z υ (Mz.pt u) → σ ≠ υ →
-        (∑ a, d σ a • ρz (α a)) u = 0 := by
+    have hP
+        : ∀ (σ υ : 𝓞 E →+* ℂ) (u : V),
+          IsLieEigen act z υ (Mz.pt u) → σ ≠ υ → (∑ a, d σ a • ρz (α a)) u = 0 := by
       intro σ υ u hu hne'
       simp only [LinearMap.sum_apply, LinearMap.smul_apply, eig_act Mz act ρz hρz hu, smul_smul]
       rw [← Finset.sum_smul, hd0 υ σ hne'.symm, zero_smul]
@@ -327,7 +384,13 @@ theorem exists_orth (E : Type) [Field E] [NumberField E] [IsCommMonObj G] {K : T
 
 end Geo
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y), ∃ h : LieMetric 𝔐.M y, h.Orth 𝔐.t.act := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ)
+        (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)]
+        (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y),
+      ∃ h : LieMetric 𝔐.M y,
+        h.Orth 𝔐.t.act := by
   intro E _ _ _ H D l Xo c Y S Ω _ K _ J _ y 𝔐
   haveI : Smooth 𝔐.t.G.hom := 𝔐.t.semi.smooth
   have hch : CharZero Ω := (RingHom.charZero_iff 𝔐.cst.injective).1 inferInstance

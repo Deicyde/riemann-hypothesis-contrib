@@ -15,10 +15,11 @@ section
 variable {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
 variable {M : Type} [AddCommGroup M] [Module R M]
 
-theorem length_quot_le_of_pow_smul (ϖ : R) (hϖ : Irreducible ϖ) (N : Type) [AddCommGroup N]
-    [Module R N] [Module.Free R N] [Module.Finite R N] (T : Submodule R N) (e : ℕ)
-    (hT : ∀ x : N, ϖ ^ e • x ∈ T) :
-    Module.length R (N ⧸ T) ≤ (e * Module.finrank R N : ℕ) := by
+theorem length_quot_le_of_pow_smul
+    (ϖ : R) (hϖ : Irreducible ϖ)
+    (N : Type) [AddCommGroup N] [Module R N] [Module.Free R N] [Module.Finite R N]
+    (T : Submodule R N) (e : ℕ) (hT : ∀ x : N, ϖ ^ e • x ∈ T)
+    : Module.length R (N ⧸ T) ≤ (e * Module.finrank R N : ℕ) := by
   classical
   obtain ⟨r, hr⟩ : ∃ r, r = Module.finrank R N := ⟨_, rfl⟩
   have b : Basis (Fin (Module.finrank R N)) R N := Module.finBasis R N
@@ -44,9 +45,10 @@ theorem length_quot_le_of_pow_smul (ϖ : R) (hϖ : Irreducible ϖ) (N : Type) [A
     refine ⟨fun i => Submodule.Quotient.mk (b.repr n i), ?_⟩
     simp only [ψ, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply, comp,
       Submodule.liftQ_apply, LinearMap.toSpanSingleton_apply]
-    calc ∑ i, (b.repr n i) • T.mkQ (b i) = T.mkQ (∑ i, (b.repr n i) • b i) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]; simp only [map_smul]
+    calc
+      ∑ i, (b.repr n i) • T.mkQ (b i) = T.mkQ (∑ i, (b.repr n i) • b i) := by
+        set_option synthInstance.maxHeartbeats 100000 in
+        rw [map_sum]; simp only [map_smul]
       _ = Submodule.Quotient.mk n := by rw [b.sum_repr]; rfl
   have hlen := Module.length_le_of_surjective ψ hsurj
   rw [Module.length_pi, IsDiscreteValuationRing.length_quotient_pow_maximalIdeal] at hlen

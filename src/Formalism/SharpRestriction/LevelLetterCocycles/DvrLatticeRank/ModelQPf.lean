@@ -12,7 +12,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 set_option maxHeartbeats 1000000 in
 theorem modelqlink_pf : ModelQLinkStep := by
@@ -23,7 +25,8 @@ theorem modelqlink_pf : ModelQLinkStep := by
   have hs : 1 ≤ sK l K := by
     have := frobpin_sK_pos hl K LL hG
     omega
-  obtain ⟨-, -, -, -, -, -, -, -, hπu, hπΔ, -⟩ := gradNPf_hyps D HW F Cm h1 l hl K LL hG π' E hR T hT hs
+  obtain ⟨-, -, -, -, -, -, -, -, hπu, hπΔ, -⟩ :=
+    gradNPf_hyps D HW F Cm h1 l hl K LL hG π' E hR T hT hs
   obtain ⟨w₁, hw₁⟩ := hR.2.2.1
   obtain ⟨w₂, hw₂⟩ := hR.2.2.2.2.1
   obtain ⟨-, -, -, -, -, -, -, -, h9W, -⟩ := h1 l K 1 LL hG
@@ -36,7 +39,8 @@ theorem modelqlink_pf : ModelQLinkStep := by
   haveI hdvr : IsDiscreteValuationRing ↥(OL LL) := GenPf.isDVR (D.loc l) LL
   obtain ⟨bL⟩ := MQ.basis_L ((HW l).W K 1 LL hG) T π' (sK l K) hs w₁ hw₁ hR.2.1 b hbΔ hbu hbe c
   have hι : Function.Injective (algebraMap ↥(OL LL) ↥LL.1) := Subtype.val_injective
-  have hRv : ∀ y : ↥LL.1, 0 ≤ (D.loc l).v LL y ↔ ∃ a : ↥(OL LL), algebraMap ↥(OL LL) ↥LL.1 a = y := by
+  have hRv
+      : ∀ y : ↥LL.1, 0 ≤ (D.loc l).v LL y ↔ ∃ a : ↥(OL LL), algebraMap ↥(OL LL) ↥LL.1 a = y := by
     intro y
     rw [(D.loc l).v_O LL y]
     exact ⟨fun h => ⟨⟨y, h⟩, rfl⟩, fun ⟨a, ha⟩ => ha ▸ a.2⟩
@@ -60,13 +64,18 @@ theorem modelqlink_pf : ModelQLinkStep := by
     show ((HW l).W K 1 LL hG).γ₀ δ (Polynomial.aeval (π' i) (E i)) = Polynomial.aeval (π' i) (E i)
     rw [← Polynomial.aeval_algHom_apply,
       show ((HW l).W K 1 LL hG).γ₀ δ (π' i) = π' i from congrFun (hπΔ δ hδ) i]
-  have hEe : Formalism.MainNotions.DeltaInvariantLattices.Eat E π' = ((w₂⁻¹ : (LetA ↥(OL LL) _)ˣ) : LetA ↥(OL LL) _) * ((HW l).W K 1 LL hG).q := by
+  have hEe
+      : Formalism.MainNotions.DeltaInvariantLattices.Eat E π'
+        = ((w₂⁻¹ : (LetA ↥(OL LL) _)ˣ) : LetA ↥(OL LL) _) * ((HW l).W K 1 LL hG).q := by
     rw [hw₂, ← mul_assoc, Units.inv_mul, one_mul]
-  have hEu : IsUnit (algebraMap _ ((HW l).W K 1 LL hG).EE (Formalism.MainNotions.DeltaInvariantLattices.Eat E π')) := by
+  have hEu : IsUnit (algebraMap _ ((HW l).W K 1 LL hG).EE
+      (Formalism.MainNotions.DeltaInvariantLattices.Eat E π')) := by
     rw [hEe, map_mul]
     exact ((w₂⁻¹).isUnit.map _).mul (MQ.q_unit ((HW l).W K 1 LL hG) hpP)
-  obtain ⟨D', S, hdiv⟩ := MQ.div_at ((HW l).W K 1 LL hG) hpP (sK l K) h' π' (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') w₁ w₂ hw₁ hw₂
-    hΔu.unit hΔu.unit_spec hR.1 hEΔ c
+  obtain ⟨D', S, hdiv⟩ :=
+    MQ.div_at ((HW l).W K 1 LL hG) hpP (sK l K) h' π'
+      (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') w₁ w₂ hw₁ hw₂ hΔu.unit hΔu.unit_spec
+      hR.1 hEΔ c
   have hp0 : (((D.loc l).PD K).p : ↥(OL LL)) ≠ 0 := by
     intro h0
     have : (D.loc l).v LL (algebraMap ↥(OL LL) ↥LL.1 (((D.loc l).PD K).p : ↥(OL LL))) = 1 := by
@@ -89,9 +98,14 @@ theorem modelqlink_pf : ModelQLinkStep := by
       have e' : (1 + q : ℚ) = 0 := by exact_mod_cast e
       have hq0 : (0 : ℚ) ≤ q := by exact_mod_cast hb0
       linarith
-  refine ⟨MQ.finite_of (Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hG) π' (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') h' c hEu hL4
-    (MQ.finite_L ((HW l).W K 1 LL hG) T π' (sK l K) hs w₁ hw₁ hR.2.1 b hbΔ hbu hbe c) D' S hdiv, ?_⟩
-  exact MQ.tf_of (Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hG) π' (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') h' c hπu hL1 hL5
+  refine ⟨
+    MQ.finite_of (Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hG) π'
+      (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') h' c hEu hL4
+      (MQ.finite_L ((HW l).W K 1 LL hG) T π' (sK l K) hs w₁ hw₁ hR.2.1 b hbΔ hbu hbe c) D' S hdiv,
+    ?_
+  ⟩
+  exact MQ.tf_of (Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hG) π'
+    (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') h' c hπu hL1 hL5
     (MQ.sat_of π' c bL (MQ.hlet_of ((HW l).W K 1 LL hG) (sK l K) hs π' w₁ hw₁ hR.1 hπu c))
     (MQ.dvd_pow_of_dvr _ hp0 hpu)
 

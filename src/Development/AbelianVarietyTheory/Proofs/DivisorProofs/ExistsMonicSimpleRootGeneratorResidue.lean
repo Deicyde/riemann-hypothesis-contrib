@@ -9,12 +9,14 @@ open IsLocalRing GlobalTheory.Toroidal Polynomial
 
 namespace GlobalTheory
 
-theorem exists_monic_simple_root_generator_residue : ∀ (O R' Ω : Type) [CommRing O] [IsLocalRing O] [CommRing R']
-    [IsLocalRing R'] [Field Ω] (φ' : O →+* R') (u' : R' →+* Ω), IsEtaleCompletion φ' →
-    ((residue R').comp φ').FormallyUnramified → RingHom.ker u' = maximalIdeal R' →
-    ∃ (G : Polynomial O) (β : Ω), G.Monic ∧ (G.map (u'.comp φ')).eval β = 0 ∧
-      (G.map (u'.comp φ')).derivative.eval β ≠ 0 ∧
-      ∀ r : R', ∃ q : Polynomial O, u' r = (q.map (u'.comp φ')).eval β := by
+theorem exists_monic_simple_root_generator_residue
+    : ∀ (O R' Ω : Type) [CommRing O] [IsLocalRing O] [CommRing R'] [IsLocalRing R'] [Field Ω]
+        (φ' : O →+* R') (u' : R' →+* Ω),
+      IsEtaleCompletion φ' → ((residue R').comp φ').FormallyUnramified
+        → RingHom.ker u' = maximalIdeal R'
+        → ∃ (G : Polynomial O) (β : Ω),
+          G.Monic ∧ (G.map (u'.comp φ')).eval β = 0 ∧ (G.map (u'.comp φ')).derivative.eval β ≠ 0
+            ∧ ∀ r : R', ∃ q : Polynomial O, u' r = (q.map (u'.comp φ')).eval β := by
   intro O R' Ω _ _ _ _ _ φ u hφ hur hker
   obtain ⟨-, hmax, hfin⟩ := hφ
   haveI : IsLocalHom φ := by
@@ -35,11 +37,12 @@ theorem exists_monic_simple_root_generator_residue : ∀ (O R' Ω : Type) [CommR
   haveI : Algebra.FormallyUnramified (ResidueField O) (ResidueField R') := hur'
   haveI : Algebra.IsSeparable (ResidueField O) (ResidueField R') :=
     Algebra.FormallyUnramified.isSeparable _ _
-  let ι : ResidueField R' →+* Ω := Ideal.Quotient.lift (maximalIdeal R') u
-    (fun a ha => by rwa [← RingHom.mem_ker, hker])
+  let ι : ResidueField R' →+* Ω :=
+    Ideal.Quotient.lift (maximalIdeal R') u (fun a ha => by rwa [← RingHom.mem_ker, hker])
   have hι : ∀ r, ι (residue R' r) = u r := fun r => Ideal.Quotient.lift_mk _ _ _
-  have hres : ∀ (P : O[X]) (x : ResidueField R'),
-      (P.map (u.comp φ)).eval (ι x) = ι (aeval x (P.map (residue O))) := by
+  have hres
+      : ∀ (P : O[X]) (x : ResidueField R'),
+        (P.map (u.comp φ)).eval (ι x) = ι (aeval x (P.map (residue O))) := by
     intro P x
     rw [aeval_def, hom_eval₂, eval₂_map, eval_map]
     congr 1
@@ -53,7 +56,8 @@ theorem exists_monic_simple_root_generator_residue : ∀ (O R' Ω : Type) [CommR
   · rw [hres, hGmap, minpoly.aeval, map_zero]
   · rw [derivative_map, hres, ← derivative_map, hGmap]
     refine (map_ne_zero ι).2 ?_
-    exact (Algebra.IsSeparable.isSeparable (ResidueField O) α).aeval_derivative_ne_zero (minpoly.aeval _ _)
+    exact (Algebra.IsSeparable.isSeparable (ResidueField O) α).aeval_derivative_ne_zero
+      (minpoly.aeval _ _)
   · intro r
     have hr : residue R' r ∈ Algebra.adjoin (ResidueField O) {α} := by
       rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic,

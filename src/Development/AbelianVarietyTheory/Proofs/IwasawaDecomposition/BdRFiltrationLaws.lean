@@ -18,9 +18,12 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc.FilLaws
 
-theorem toNat_iff_zpow {R K : Type} [CommRing R] [CommRing K] (ι : R →+* K) (ξ : R) (u : Kˣ)
-    (hu : (u : K) = ι ξ) (a : ℤ) (x : K) :
-    (∃ y : R, x * ι ξ ^ (-a).toNat = ι (ξ ^ a.toNat * y)) ↔ ∃ y : R, x = ((u ^ a : Kˣ) : K) * ι y := by
+theorem toNat_iff_zpow
+    {R K : Type} [CommRing R] [CommRing K]
+    (ι : R →+* K) (ξ : R) (u : Kˣ) (hu : (u : K) = ι ξ)
+    (a : ℤ) (x : K)
+    : (∃ y : R, x * ι ξ ^ (-a).toNat = ι (ξ ^ a.toNat * y))
+      ↔ ∃ y : R, x = ((u ^ a : Kˣ) : K) * ι y := by
   refine exists_congr fun y => ?_
   rw [map_mul, map_pow, ← hu]
   have h : u ^ a * u ^ (-a).toNat = u ^ a.toNat := by
@@ -49,18 +52,18 @@ theorem exists_isEps (l : ℕ) [Fact l.Prime] : ∃ e : Per.Fl l, IsEps e := by
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem σDp_alg (g : Per.Gq l) (x : Per.AinfP l) :
-    Per.σDp g (algebraMap (Per.AinfP l) (Per.BdRp l) x) =
-      algebraMap (Per.AinfP l) (Per.BdRp l) (Per.extP (Per.σA g) x) :=
+theorem σDp_alg (g : Per.Gq l) (x : Per.AinfP l)
+    : Per.σDp g (algebraMap (Per.AinfP l) (Per.BdRp l) x)
+      = algebraMap (Per.AinfP l) (Per.BdRp l) (Per.extP (Per.σA g) x) :=
   GlobalTheory.RingIface.sigDp_alg l g x
 
-theorem σD_alg (g : Per.Gq l) (y : Per.BdRp l) :
-    Per.σD g (algebraMap (Per.BdRp l) (Per.BdR l) y) =
-      algebraMap (Per.BdRp l) (Per.BdR l) (Per.σDp g y) :=
+theorem σD_alg (g : Per.Gq l) (y : Per.BdRp l)
+    : Per.σD g (algebraMap (Per.BdRp l) (Per.BdR l) y)
+      = algebraMap (Per.BdRp l) (Per.BdR l) (Per.σDp g y) :=
   GlobalTheory.RingIface.sigD_alg l g y
 
-theorem σDp_mem_FilP (g : Per.Gq l) (n : ℕ) (y : Per.BdRp l) (hy : y ∈ Per.FilP l n) :
-    Per.σDp g y ∈ Per.FilP l n := by
+theorem σDp_mem_FilP (g : Per.Gq l) (n : ℕ) (y : Per.BdRp l) (hy : y ∈ Per.FilP l n)
+    : Per.σDp g y ∈ Per.FilP l n := by
   obtain ⟨e, he⟩ := exists_isEps l
   obtain ⟨hP, -, -, -⟩ := GlobalTheory.T.bdRPlus_filtration_eq_fontaineXi_pow l e he
   have hk := GlobalTheory.T.kerThetaLocalized_eq_span_fontaineXiElement l e he
@@ -77,8 +80,8 @@ theorem σDp_mem_FilP (g : Per.Gq l) (n : ℕ) (y : Per.BdRp l) (hy : y ∈ Per.
   rw [hP, map_mul, map_pow]
   exact (pow_dvd_pow_of_dvd h3 n).mul_right _
 
-theorem σDp_xi (e : Per.Fl l) (he : IsEps e) (g : Per.Gq l) :
-    ∃ c d : Per.BdRp l, Per.σDp g (aDp l (xi e)) = aDp l (xi e) * c ∧ c * d = 1 := by
+theorem σDp_xi (e : Per.Fl l) (he : IsEps e) (g : Per.Gq l)
+    : ∃ c d : Per.BdRp l, Per.σDp g (aDp l (xi e)) = aDp l (xi e) * c ∧ c * d = 1 := by
   obtain ⟨hP, hreg, -, -⟩ := GlobalTheory.T.bdRPlus_filtration_eq_fontaineXi_pow l e he
   have hξ : aDp l (xi e) ∈ Per.FilP l 1 := (hP 1 _).2 (by rw [pow_one])
   have hd : ∀ g : Per.Gq l, aDp l (xi e) ∣ Per.σDp g (aDp l (xi e)) := fun g => by
@@ -87,8 +90,8 @@ theorem σDp_xi (e : Per.Fl l) (he : IsEps e) (g : Per.Gq l) :
   obtain ⟨c, hc⟩ := hd g
   obtain ⟨c', hc'⟩ := hd g⁻¹
   have hinv : Per.σDp g (Per.σDp g⁻¹ (aDp l (xi e))) = aDp l (xi e) := by
-    change Per.σDp g (Per.σDp g⁻¹ (algebraMap (Per.AinfP l) (Per.BdRp l) _)) =
-      algebraMap (Per.AinfP l) (Per.BdRp l) _
+    change Per.σDp g (Per.σDp g⁻¹ (algebraMap (Per.AinfP l) (Per.BdRp l) _))
+      = algebraMap (Per.AinfP l) (Per.BdRp l) _
     rw [σDp_alg, σDp_alg, GlobalTheory.RingBasics.extP_inv]
   refine ⟨c, Per.σDp g c', hc, ?_⟩
   rw [hc', map_mul, hc] at hinv
@@ -104,9 +107,17 @@ theorem eq_zero_of_forall_mem_FilP (y : Per.BdRp l) (hy : ∀ n, y ∈ Per.FilP 
 
 end GlobalTheory.MemLoc.FilLaws
 
-
 open GlobalTheory.MemLoc.FilLaws in
-theorem GlobalTheory.MemLoc.filD_laws : ∀ (l : ℕ) [Fact l.Prime], (∀ a : ℤ, Per.FilD l (a + 1) ≤ Per.FilD l a) ∧ (1 : Per.BdR l) ∈ Per.FilD l 0 ∧ (∀ (a b : ℤ) (x y : Per.BdR l), x ∈ Per.FilD l a → y ∈ Per.FilD l b → x * y ∈ Per.FilD l (a + b)) ∧ (∀ x : Per.BdR l, ∃ a, x ∈ Per.FilD l a) ∧ (∀ x : Per.BdR l, (∀ a, x ∈ Per.FilD l a) → x = 0) ∧ (∀ (g : Per.Gq l) (a : ℤ) (x : Per.BdR l), x ∈ Per.FilD l a → Per.σD g x ∈ Per.FilD l a) ∧ ∀ (n : ℕ) (y : Per.BdRp l), algebraMap (Per.BdRp l) (Per.BdR l) y ∈ Per.FilD l n ↔ y ∈ Per.FilP l n := by
+theorem GlobalTheory.MemLoc.filD_laws
+    : ∀ (l : ℕ) [Fact l.Prime],
+      (∀ a : ℤ, Per.FilD l (a + 1) ≤ Per.FilD l a) ∧ (1 : Per.BdR l) ∈ Per.FilD l 0
+        ∧ (∀ (a b : ℤ) (x y : Per.BdR l),
+          x ∈ Per.FilD l a → y ∈ Per.FilD l b → x * y ∈ Per.FilD l (a + b))
+        ∧ (∀ x : Per.BdR l, ∃ a, x ∈ Per.FilD l a)
+        ∧ (∀ x : Per.BdR l, (∀ a, x ∈ Per.FilD l a) → x = 0)
+        ∧ (∀ (g : Per.Gq l) (a : ℤ) (x : Per.BdR l), x ∈ Per.FilD l a → Per.σD g x ∈ Per.FilD l a)
+        ∧ ∀ (n : ℕ) (y : Per.BdRp l),
+          algebraMap (Per.BdRp l) (Per.BdR l) y ∈ Per.FilD l n ↔ y ∈ Per.FilP l n := by
   intro l _
   obtain ⟨e, he⟩ := exists_isEps l
   obtain ⟨hdom, hinj, hfield, hden⟩ := GlobalTheory.T.bdRPlus_isDomain_bdR_isField l
@@ -121,11 +132,14 @@ theorem GlobalTheory.MemLoc.filD_laws : ∀ (l : ℕ) [Fact l.Prime], (∀ a : �
     exact one_ne_zero (hreg 1 (by rw [h0, zero_mul]))
   obtain ⟨v, hv⟩ := hfield.mul_inv_cancel hne
   obtain ⟨u, hu⟩ : IsUnit (algebraMap (Per.BdRp l) (Per.BdR l) ξ) := IsUnit.of_mul_eq_one v hv
-  have hZ : ∀ (a : ℤ) (x : Per.BdR l), x ∈ Per.FilD l a ↔
-      ∃ y, x = ((u ^ a : (Per.BdR l)ˣ) : Per.BdR l) * algebraMap (Per.BdRp l) (Per.BdR l) y :=
+  have hZ
+      : ∀ (a : ℤ) (x : Per.BdR l),
+        x ∈ Per.FilD l a
+          ↔ ∃ y, x = ((u ^ a : (Per.BdR l)ˣ) : Per.BdR l) * algebraMap (Per.BdRp l) (Per.BdR l) y :=
     fun a x => (hD a x).trans (toNat_iff_zpow _ ξ u hu a x)
-  have hlast : ∀ (n : ℕ) (y : Per.BdRp l),
-      algebraMap (Per.BdRp l) (Per.BdR l) y ∈ Per.FilD l n ↔ y ∈ Per.FilP l n := by
+  have hlast
+      : ∀ (n : ℕ) (y : Per.BdRp l),
+        algebraMap (Per.BdRp l) (Per.BdR l) y ∈ Per.FilD l n ↔ y ∈ Per.FilP l n := by
     intro n y
     rw [hZ, hP, zpow_natCast, Units.val_pow_eq_pow_val, hu]
     refine exists_congr fun z => ?_
@@ -157,8 +171,10 @@ theorem GlobalTheory.MemLoc.filD_laws : ∀ (l : ℕ) [Fact l.Prime], (∀ a : �
     have h1 := congrArg (Per.σD g) hy
     rw [map_mul, map_pow, σD_alg, σD_alg, map_mul (Per.σDp g), map_pow, hc] at h1
     refine (hD _ _).2 ⟨d ^ (-a).toNat * (c ^ a.toNat * Per.σDp g y), ?_⟩
-    have h2 : algebraMap (Per.BdRp l) (Per.BdR l) ξ =
-        algebraMap (Per.BdRp l) (Per.BdR l) (ξ * c) * algebraMap (Per.BdRp l) (Per.BdR l) d := by
+    have h2
+        : algebraMap (Per.BdRp l) (Per.BdR l) ξ
+          = algebraMap (Per.BdRp l) (Per.BdR l) (ξ * c)
+            * algebraMap (Per.BdRp l) (Per.BdR l) d := by
       rw [← map_mul, mul_assoc, hcd, mul_one]
     rw [h2, mul_pow, ← mul_assoc, h1, ← map_pow, ← map_mul]
     congr 1

@@ -8,20 +8,25 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteRea
 
 open NumberField MeasureTheory
 open scoped Classical
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum
 open Formalism.MainNotions.TaylorLogMetric (VC embT tor0 Hf lamOf area Th U)
 open Formalism.MainNotions.StandardLatticesGL3 (WeilO HeckeU TT stdL pt oddE0)
 open GlobalTheory.NormSum (Pair Tup minorPol ratG intG Cls gam)
 open GlobalTheory.NormDict GlobalTheory.NormExact
 open GlobalTheory.BotFormula (IsFinPt)
-open GlobalTheory.IndefiniteRowSideFullHecke.ClassFunctionSumIntegral (IsDefiniteSpace IsOpenCompactLevel)
+open GlobalTheory.IndefiniteRowSideFullHecke.ClassFunctionSumIntegral
+  (IsDefiniteSpace IsOpenCompactLevel)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.FinPtUnique
 
-theorem eq_of_isFinPt : ∀ {D : D7} (V : HSp D) {n : ℕ} (g g' : GA D V) (x : Formalism.MainNotions.StandardLatticesGL3.GA D n),
-    IsFinPt V g x → IsFinPt V g' x → g = g' := by
+theorem eq_of_isFinPt
+    : ∀ {D : D7} (V : HSp D) {n : ℕ} (g g' : GA D V)
+        (x : Formalism.MainNotions.StandardLatticesGL3.GA D n),
+      IsFinPt V g x → IsFinPt V g' x → g = g' := by
   intro D V n g g' x ⟨hg, e, he⟩ ⟨hg', e', he'⟩
   apply GlobalTheory.FinRealComm.GA_ext_inf_fin V
   · have h1 : infHom V g = 1 := hg

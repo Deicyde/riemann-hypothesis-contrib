@@ -14,22 +14,26 @@ noncomputable section
 
 variable {W : Scheme.{0}}
 
-
 open Classical in
 def ordAlong (G : W.IdealSheafData) (C : Set W) : ℕ :=
   if h : IsIrreducible C then
     (Module.length (W.presheaf.stalk h.genericPoint)
       (W.presheaf.stalk h.genericPoint ⧸ FinalTheorems.stalkId G h.genericPoint)).toNat
-  else 0
+  else
+    0
 
-theorem stalkId_eq_monomial [IsNoetherian W] {Z G : W.IdealSheafData} (hG : FinalTheorems.EffCartier G)
-    (hGZ : (G.support : Set W) ⊆ Z.support) (y : W) (U : W.affineOpens) (hy : y ∈ U.1) {n : ℕ}
-    (f : Fin n → Γ(W, U.1)) (J : Finset (Fin n)) [IsRegularLocalRing (W.presheaf.stalk y)]
+theorem stalkId_eq_monomial
+    [IsNoetherian W]
+    {Z G : W.IdealSheafData}
+    (hG : FinalTheorems.EffCartier G) (hGZ : (G.support : Set W) ⊆ Z.support)
+    (y : W) (U : W.affineOpens) (hy : y ∈ U.1)
+    {n : ℕ} (f : Fin n → Γ(W, U.1)) (J : Finset (Fin n))
+    [IsRegularLocalRing (W.presheaf.stalk y)]
     (hrsp : FinalTheorems.Rsp (W.presheaf.stalk y) n (fun i => W.presheaf.germ U.1 y hy (f i)))
     (hZy : FinalTheorems.stalkId Z y = Ideal.span {∏ i ∈ J, W.presheaf.germ U.1 y hy (f i)})
-    (σ : Fin n → Set W) (hσ : ∀ i ∈ J, IsBranch (Z.support : Set W) (f i) y (σ i)) :
-    FinalTheorems.stalkId G y =
-      Ideal.span {∏ i ∈ J, W.presheaf.germ U.1 y hy (f i) ^ ordAlong G (σ i)} := by
+    (σ : Fin n → Set W) (hσ : ∀ i ∈ J, IsBranch (Z.support : Set W) (f i) y (σ i))
+    : FinalTheorems.stalkId G y
+      = Ideal.span {∏ i ∈ J, W.presheaf.germ U.1 y hy (f i) ^ ordAlong G (σ i)} := by
   classical
   have hU : IsAffineOpen U.1 := U.2
   let yU : U.1 := ⟨y, hy⟩
@@ -50,8 +54,9 @@ theorem stalkId_eq_monomial [IsNoetherian W] {Z G : W.IdealSheafData} (hG : Fina
     let : Algebra Γ(W, U'.1) (W.presheaf.stalk y) :=
       TopCat.Presheaf.algebra_section_stalk W.presheaf (⟨y, hyU'⟩ : U'.1)
     have := hU'.isLocalization_stalk ⟨y, hyU'⟩
-    obtain ⟨⟨c, hc⟩, hcg⟩ := (IsLocalization.map_eq_zero_iff
-      (M := (hU'.primeIdealOf ⟨y, hyU'⟩).asIdeal.primeCompl) (S := W.presheaf.stalk y) g).mp h0
+    obtain ⟨⟨c, hc⟩, hcg⟩ :=
+      (IsLocalization.map_eq_zero_iff (M := (hU'.primeIdealOf ⟨y, hyU'⟩).asIdeal.primeCompl)
+        (S := W.presheaf.stalk y) g).mp h0
     have hc0 : c = 0 := (mul_right_mem_nonZeroDivisors_eq_zero_iff hg).mp hcg
     exact hc (by rw [hc0]; exact Ideal.zero_mem _)
 
@@ -78,9 +83,10 @@ theorem stalkId_eq_monomial [IsNoetherian W] {Z G : W.IdealSheafData} (hG : Fina
     obtain ⟨hCc, hyC, hirr, hηU, hηf⟩ := hσ i hi
     have hCm : Maximal (fun C => IsIrreducible C ∧ C ⊆ (Z.support : Set W)) (σ i) := hCc
     have hCcl : IsClosed (σ i) := by
-      have h := hCm.eq_of_subset ⟨hirr.closure, closure_minimal hCm.1.2 Z.support.isClosed⟩
-        subset_closure
-      rw [h]; exact isClosed_closure
+      have h :=
+        hCm.eq_of_subset ⟨hirr.closure, closure_minimal hCm.1.2 Z.support.isClosed⟩ subset_closure
+      rw [h]
+      exact isClosed_closure
     have hgen : IsGenericPoint hirr.genericPoint (σ i) := by
       have := hirr.isGenericPoint_genericPoint_closure
       rwa [hCcl.closure_eq] at this
@@ -111,13 +117,15 @@ theorem stalkId_eq_monomial [IsNoetherian W] {Z G : W.IdealSheafData} (hG : Fina
       Set.disjoint_left.mpr fun x hx hx' => hx ((show Pη.asIdeal ≤ Py.asIdeal from hle) hx')
     have hPiη : Pi ≤ Pη := by
       show (Ideal.span {f' i}).comap (algebraMap Γ(W, U.1) (W.presheaf.stalk y)) ≤ Pη.asIdeal
-      calc _ ≤ (Pη.asIdeal.map (algebraMap Γ(W, U.1) (W.presheaf.stalk y))).comap
-              (algebraMap Γ(W, U.1) (W.presheaf.stalk y)) := by
-            apply Ideal.comap_mono
-            rw [Ideal.span_le, Set.singleton_subset_iff]
-            exact Ideal.mem_map_of_mem _ hfη
-        _ = Pη.asIdeal := IsLocalization.under_map_of_isPrime_disjoint Py.asIdeal.primeCompl
-              (W.presheaf.stalk y) Pη.isPrime hdisj
+      calc
+        _ ≤ (Pη.asIdeal.map (algebraMap Γ(W, U.1) (W.presheaf.stalk y))).comap
+            (algebraMap Γ(W, U.1) (W.presheaf.stalk y)) := by
+          apply Ideal.comap_mono
+          rw [Ideal.span_le, Set.singleton_subset_iff]
+          exact Ideal.mem_map_of_mem _ hfη
+        _ = Pη.asIdeal :=
+          IsLocalization.under_map_of_isPrime_disjoint Py.asIdeal.primeCompl (W.presheaf.stalk y)
+            Pη.isPrime hdisj
     have hζZ : hU.fromSpec Pi ∈ (Z.support : Set W) := by
       rw [WMult.mem_support_fromSpec_iff Z U hU]
       show Z.ideal U ≤ (Ideal.span {f' i}).comap (W.presheaf.germ U.1 y hy).hom
@@ -138,8 +146,8 @@ theorem stalkId_eq_monomial [IsNoetherian W] {Z G : W.IdealSheafData} (hG : Fina
       rw [specializes_iff_mem_closure, hcl, hCeq]
       exact subset_closure (Set.mem_singleton _)
     have hηPi : Pη ≤ Pi := (hspec _ _).mp (by rw [hfromη]; exact hηζ)
-    have hPeq : Pη.asIdeal =
-        (Ideal.span {f' i}).comap (algebraMap Γ(W, U.1) (W.presheaf.stalk y)) :=
+    have hPeq
+        : Pη.asIdeal = (Ideal.span {f' i}).comap (algebraMap Γ(W, U.1) (W.presheaf.stalk y)) :=
       congrArg PrimeSpectrum.asIdeal (le_antisymm hηPi hPiη)
 
     let T := Localization.AtPrime (Ideal.span {f' i})
@@ -148,10 +156,13 @@ theorem stalkId_eq_monomial [IsNoetherian W] {Z G : W.IdealSheafData} (hG : Fina
       IsLocalization.isLocalization_isLocalization_atPrime_isLocalization
         (M := Py.asIdeal.primeCompl) (S := W.presheaf.stalk y) (T := T) (Ideal.span {f' i})
     have hT' : IsLocalization Pη.asIdeal.primeCompl T := by
-      have hsm : Pη.asIdeal.primeCompl =
-          (Ideal.comap (algebraMap Γ(W, U.1) (W.presheaf.stalk y)) (Ideal.span {f' i})).primeCompl := by
+      have hsm
+          : Pη.asIdeal.primeCompl
+            = (Ideal.comap (algebraMap Γ(W, U.1) (W.presheaf.stalk y))
+              (Ideal.span {f' i})).primeCompl := by
         ext x; rw [Ideal.mem_primeCompl_iff, Ideal.mem_primeCompl_iff, hPeq]
-      rw [hsm]; exact hT
+      rw [hsm]
+      exact hT
     let ηU : U.1 := ⟨η, hηU⟩
     let algη : Algebra Γ(W, U.1) (W.presheaf.stalk η) :=
       TopCat.Presheaf.algebra_section_stalk W.presheaf ηU
@@ -161,27 +172,33 @@ theorem stalkId_eq_monomial [IsNoetherian W] {Z G : W.IdealSheafData} (hG : Fina
     let algYη : Algebra (W.presheaf.stalk y) (W.presheaf.stalk η) :=
       (φ.symm.toRingEquiv.toRingHom.comp (algebraMap (W.presheaf.stalk y) T)).toAlgebra
     have hlocYη : IsLocalization.AtPrime (W.presheaf.stalk η) (Ideal.span {f' i}) :=
-      (IsLocalization.isLocalization_iff_of_ringEquiv (M := (Ideal.span {f' i}).primeCompl)
-        (S := T) φ.symm.toRingEquiv).mp inferInstance
-    have hgerm : ∀ a : Γ(W, U.1), W.presheaf.germ U.1 η hηU a =
-        algebraMap (W.presheaf.stalk y) (W.presheaf.stalk η) (W.presheaf.germ U.1 y hy a) := by
+      (IsLocalization.isLocalization_iff_of_ringEquiv (M := (Ideal.span {f' i}).primeCompl) (S := T)
+        φ.symm.toRingEquiv).mp inferInstance
+    have hgerm
+        : ∀ a : Γ(W, U.1),
+          W.presheaf.germ U.1 η hηU a
+            = algebraMap (W.presheaf.stalk y) (W.presheaf.stalk η)
+              (W.presheaf.germ U.1 y hy a) := by
       intro a
       have h1 := (φ.symm.commutes a).symm
       rw [IsScalarTower.algebraMap_apply Γ(W, U.1) (W.presheaf.stalk y) T] at h1
       exact h1
-    have hGη : FinalTheorems.stalkId G η =
-        Ideal.span {algebraMap (W.presheaf.stalk y) (W.presheaf.stalk η) γ} := by
+    have hGη
+        : FinalTheorems.stalkId G η
+          = Ideal.span {algebraMap (W.presheaf.stalk y) (W.presheaf.stalk η) γ} := by
       rw [WMult.stalkId_eq_map_germ G η U hηU]
-      have hcomp : (W.presheaf.germ U.1 η hηU).hom =
-          (algebraMap (W.presheaf.stalk y) (W.presheaf.stalk η)).comp
-            (W.presheaf.germ U.1 y hy).hom :=
+      have hcomp
+          : (W.presheaf.germ U.1 η hηU).hom
+            = (algebraMap (W.presheaf.stalk y) (W.presheaf.stalk η)).comp
+              (W.presheaf.germ U.1 y hy).hom :=
         RingHom.ext fun a => hgerm a
       rw [hcomp, ← Ideal.map_map, ← WMult.stalkId_eq_map_germ G y U hy, hGy, Ideal.map_span,
         Set.image_singleton]
-    have hordS := WMult.ord_isLocalization_eq_exponent f' hrsp.1 hrsp.2 J u m i hi
-      (W.presheaf.stalk η)
-    have hlen : Module.length (W.presheaf.stalk η) (W.presheaf.stalk η ⧸ FinalTheorems.stalkId G η) =
-        (m i : ℕ∞) := by
+    have hordS :=
+      WMult.ord_isLocalization_eq_exponent f' hrsp.1 hrsp.2 J u m i hi (W.presheaf.stalk η)
+    have hlen
+        : Module.length (W.presheaf.stalk η) (W.presheaf.stalk η ⧸ FinalTheorems.stalkId G η)
+          = (m i : ℕ∞) := by
       rw [hGη, hγu]; exact hordS
     unfold ordAlong
     rw [dite_eq_left hirr, ← hη, hlen]
@@ -196,24 +213,31 @@ section Chart
 
 variable {s : W ⟶ Spec (.of ℂ)}
 
-theorem monomial_chart [IsNoetherian W] [LocallyOfFiniteType s] {Z G : W.IdealSheafData}
-    (hG : FinalTheorems.EffCartier G) (hGZ : (G.support : Set W) ⊆ Z.support) (P : AffPres s) {rc : ℕ}
-    (c : Fin rc ≃ comps (Z.support : Set W)) (e : ℕ) (x : W) (hx : x ∈ P.V)
-    (hcl : IsClosed ({x} : Set W)) [IsRegularLocalRing (W.presheaf.stalk x)]
-    (hdim : ringKrullDim (W.presheaf.stalk x) = e) {pt : Fin P.n → ℂ} (hpt : P.coord x hx = pt)
-    (S : SncData P.K (P.bdIdeal Z) pt e rc)
-    (hσ : ∀ l ∈ S.J, ∃ k, S.σ l = some k ∧
-      IsBranch (Z.support : Set W) (P.secHom (S.r l)) x (c k))
+theorem monomial_chart
+    [IsNoetherian W] [LocallyOfFiniteType s]
+    {Z G : W.IdealSheafData}
+    (hG : FinalTheorems.EffCartier G) (hGZ : (G.support : Set W) ⊆ Z.support)
+    (P : AffPres s)
+    {rc : ℕ} (c : Fin rc ≃ comps (Z.support : Set W))
+    (e : ℕ)
+    (x : W) (hx : x ∈ P.V) (hcl : IsClosed ({x} : Set W)) [IsRegularLocalRing (W.presheaf.stalk x)]
+    (hdim : ringKrullDim (W.presheaf.stalk x) = e)
+    {pt : Fin P.n → ℂ} (hpt : P.coord x hx = pt) (S : SncData P.K (P.bdIdeal Z) pt e rc)
+    (hσ : ∀ l ∈ S.J, ∃ k, S.σ l = some k ∧ IsBranch (Z.support : Set W) (P.secHom (S.r l)) x (c k))
     (a : MvPolynomial (Fin P.n) ℂ)
-    (ha : FinalTheorems.stalkId G x = Ideal.span {W.presheaf.germ P.V x hx (P.secHom a)}) :
-    ∃ u : locRing P.K pt, IsUnit u ∧
-      algebraMap _ (locRing P.K pt) a =
-        u * ∏ l ∈ S.J, algebraMap _ (locRing P.K pt) (S.r l) ^
-          (S.σ l).elim 0 fun k => ordAlong G (c k) := by
+    (ha : FinalTheorems.stalkId G x = Ideal.span {W.presheaf.germ P.V x hx (P.secHom a)})
+    : ∃ u : locRing P.K pt,
+      IsUnit u
+        ∧ algebraMap _ (locRing P.K pt) a
+          = u
+            * ∏ l ∈ S.J, algebraMap _ (locRing P.K pt) (S.r l) ^
+              (S.σ l).elim 0 fun k => ordAlong G (c k) := by
   classical
   subst hpt
-  have hψ : ∀ g, P.stalkEquiv x hx hcl (W.presheaf.germ P.V x hx (P.secHom g)) =
-      algebraMap _ (locRing P.K (P.coord x hx)) g :=
+  have hψ
+      : ∀ g,
+        P.stalkEquiv x hx hcl (W.presheaf.germ P.V x hx (P.secHom g))
+          = algebraMap _ (locRing P.K (P.coord x hx)) g :=
     P.stalkEquiv_germ x hx hcl
   have : IsDomain (W.presheaf.stalk x) := isDomain_of_isRegularLocalRing
   let σ' : Fin e → Set W := fun l => (S.σ l).elim ∅ fun k => (c k : Set W)
@@ -229,38 +253,51 @@ theorem monomial_chart [IsNoetherian W] [LocallyOfFiniteType s] {Z G : W.IdealSh
     refine ⟨?_, ?_⟩
     · simpa only [hψ] using S.span_eq
     · rw [← P.ringKrullDim_stalk x hx hcl, hdim]
-  have hZ : FinalTheorems.stalkId Z x =
-      Ideal.span {∏ l ∈ S.J, W.presheaf.germ P.V x hx (P.secHom (S.r l))} := by
+  have hZ
+      : FinalTheorems.stalkId Z x
+        = Ideal.span {∏ l ∈ S.J, W.presheaf.germ P.V x hx (P.secHom (S.r l))} := by
     let ψ : W.presheaf.stalk x →+* locRing P.K (P.coord x hx) := P.stalkEquiv x hx hcl
     have hsecmap : Ideal.map P.secHom (P.bdIdeal Z) = Z.ideal P.affOpen :=
       Ideal.map_comap_of_surjective _ (IrreducibleComponentPreimages.secHom_surjective P) _
-    have hZmap : FinalTheorems.stalkId Z x =
-        Ideal.map (W.presheaf.germ P.V x hx).hom (Ideal.map P.secHom (P.bdIdeal Z)) := by
+    have hZmap
+        : FinalTheorems.stalkId Z x
+          = Ideal.map (W.presheaf.germ P.V x hx).hom (Ideal.map P.secHom (P.bdIdeal Z)) := by
       rw [hsecmap]
       exact WMult.stalkId_eq_map_germ Z x P.affOpen hx
-    have hcomp : (ψ.comp (W.presheaf.germ P.V x hx).hom).comp P.secHom =
-        algebraMap _ (locRing P.K (P.coord x hx)) := RingHom.ext hψ
-    have hmap : Ideal.map ψ (FinalTheorems.stalkId Z x) =
-        Ideal.map ψ (Ideal.span {∏ l ∈ S.J, W.presheaf.germ P.V x hx (P.secHom (S.r l))}) := by
-      rw [hZmap, Ideal.map_map, Ideal.map_map, hcomp, WMult.map_bd_eq_span S,
-        Ideal.map_span, Set.image_singleton, map_prod]
+    have hcomp
+        : (ψ.comp (W.presheaf.germ P.V x hx).hom).comp P.secHom
+          = algebraMap _ (locRing P.K (P.coord x hx)) :=
+      RingHom.ext hψ
+    have hmap
+        : Ideal.map ψ (FinalTheorems.stalkId Z x)
+          = Ideal.map ψ (Ideal.span {∏ l ∈ S.J, W.presheaf.germ P.V x hx (P.secHom (S.r l))}) := by
+      rw [hZmap, Ideal.map_map, Ideal.map_map, hcomp, WMult.map_bd_eq_span S, Ideal.map_span,
+        Set.image_singleton, map_prod]
       simp only [ψ, RingHom.coe_coe, hψ]
-    have := congrArg (Ideal.map ((P.stalkEquiv x hx hcl).symm :
-      locRing P.K (P.coord x hx) →+* W.presheaf.stalk x)) hmap
+    have :=
+      congrArg
+        (Ideal.map
+          ((P.stalkEquiv x hx hcl).symm : locRing P.K (P.coord x hx) →+* W.presheaf.stalk x))
+        hmap
     rwa [Ideal.map_of_equiv, Ideal.map_of_equiv] at this
-  have hmain : FinalTheorems.stalkId G x = Ideal.span {(∏ l ∈ S.J,
-      W.presheaf.germ P.V x hx (P.secHom (S.r l)) ^ ordAlong G (σ' l))} :=
+  have hmain
+      : FinalTheorems.stalkId G x
+        = Ideal.span
+          {(∏ l ∈ S.J,
+             W.presheaf.germ P.V x hx (P.secHom (S.r l)) ^ ordAlong G (σ' l))} :=
     stalkId_eq_monomial (U := P.affOpen) hG hGZ x hx (fun l => P.secHom (S.r l)) S.J hrsp hZ σ' hσ'
   rw [ha] at hmain
   obtain ⟨v, hv⟩ := Ideal.span_singleton_eq_span_singleton.mp hmain
   refine ⟨P.stalkEquiv x hx hcl ↑v⁻¹, (Units.isUnit v⁻¹).map _, ?_⟩
-  have hv' : W.presheaf.germ P.V x hx (P.secHom a) =
-      (∏ l ∈ S.J, W.presheaf.germ P.V x hx (P.secHom (S.r l)) ^ ordAlong G (σ' l)) * ↑v⁻¹ := by
+  have hv'
+      : W.presheaf.germ P.V x hx (P.secHom a)
+        = (∏ l ∈ S.J, W.presheaf.germ P.V x hx (P.secHom (S.r l)) ^ ordAlong G (σ' l)) * ↑v⁻¹ := by
     rw [← hv, mul_assoc, Units.mul_inv, mul_one]
-  have hprod : P.stalkEquiv x hx hcl
-      (∏ l ∈ S.J, W.presheaf.germ P.V x hx (P.secHom (S.r l)) ^ ordAlong G (σ' l)) =
-      ∏ l ∈ S.J, algebraMap _ (locRing P.K (P.coord x hx)) (S.r l) ^
-          (S.σ l).elim 0 fun k => ordAlong G (c k) := by
+  have hprod
+      : P.stalkEquiv x hx hcl
+          (∏ l ∈ S.J, W.presheaf.germ P.V x hx (P.secHom (S.r l)) ^ ordAlong G (σ' l))
+        = ∏ l ∈ S.J, algebraMap _ (locRing P.K (P.coord x hx)) (S.r l) ^
+              (S.σ l).elim 0 fun k => ordAlong G (c k) := by
     rw [map_prod]
     refine Finset.prod_congr rfl fun l hl => ?_
     obtain ⟨k, hk, -⟩ := hσ l hl

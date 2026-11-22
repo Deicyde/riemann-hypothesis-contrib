@@ -9,15 +9,14 @@ open GlobalTheory.SgAlg Matrix
 
 namespace GlobalTheory.SgAlg
 
-theorem isField_or_exists_idempotent_of_isQA {E : Type} [CommRing E] (σ : E →+* E) (h : IsQA σ) :
-    IsField E ∨ ∃ e : E, e * e = e ∧ e + σ e = 1 ∧ ∀ x : E, e * x ≠ 0 → ∃ y, e * x * y = e := by
+theorem isField_or_exists_idempotent_of_isQA {E : Type} [CommRing E] (σ : E →+* E) (h : IsQA σ)
+    : IsField E ∨ ∃ e : E, e * e = e ∧ e + σ e = 1 ∧ ∀ x : E, e * x ≠ 0 → ∃ y, e * x * y = e := by
   obtain ⟨hinv, ⟨x₀, hx₀⟩, hred, -, hunit⟩ := h
   by_cases hN : ∀ y : E, y ≠ 0 → y * σ y ≠ 0
   · left
     refine ⟨⟨σ x₀, x₀, hx₀⟩, mul_comm, ?_⟩
     intro y hy
-    have hfix : σ (y * σ y) = y * σ y := by
-      rw [map_mul, hinv, mul_comm]
+    have hfix : σ (y * σ y) = y * σ y := by rw [map_mul, hinv, mul_comm]
     obtain ⟨u, hu⟩ := hunit _ hfix (hN y hy)
     refine ⟨σ y * (↑u⁻¹ : E), ?_⟩
     rw [← mul_assoc, ← hu]
@@ -25,8 +24,7 @@ theorem isField_or_exists_idempotent_of_isQA {E : Type} [CommRing E] (σ : E →
   · right
     push Not at hN
     obtain ⟨y, hy, hyy⟩ := hN
-    have hsfix : σ (y + σ y) = y + σ y := by
-      rw [map_add (f := _), hinv, add_comm]
+    have hsfix : σ (y + σ y) = y + σ y := by rw [map_add (f := _), hinv, add_comm]
     have hs : y + σ y ≠ 0 := by
       intro h0
       have h1 : σ y = -y := eq_neg_of_add_eq_zero_right h0
@@ -38,20 +36,21 @@ theorem isField_or_exists_idempotent_of_isQA {E : Type} [CommRing E] (σ : E →
     obtain ⟨s, hs'⟩ := hunit _ hsfix hs
     have hsum : (↑s⁻¹ : E) * (y + σ y) = 1 := by rw [← hs', Units.inv_mul]
     have hσs : σ (↑s⁻¹ : E) * (y + σ y) = 1 := by
-      have : σ ((↑s⁻¹ : E) * (y + σ y)) = 1 := by
-        rw [hsum, map_one]
+      have : σ ((↑s⁻¹ : E) * (y + σ y)) = 1 := by rw [hsum, map_one]
       rwa [map_mul, hsfix] at this
     have hσs' : σ (↑s⁻¹ : E) = ↑s⁻¹ := by
-      calc σ (↑s⁻¹ : E) = σ (↑s⁻¹ : E) * ((y + σ y) * ↑s⁻¹) := by
-            rw [mul_comm (y + σ y), hsum, mul_one]
+      calc
+        σ (↑s⁻¹ : E)
+          = σ (↑s⁻¹ : E) * ((y + σ y) * ↑s⁻¹) := by rw [mul_comm (y + σ y), hsum, mul_one]
         _ = ↑s⁻¹ := by rw [← mul_assoc, hσs, one_mul]
     set e : E := y * ↑s⁻¹ with he
     have hσe : σ e = σ y * ↑s⁻¹ := by rw [he, map_mul, hσs']
-    have hadd : e + σ e = 1 := by
-      rw [hσe, he, ← add_mul, mul_comm]; exact hsum
+    have hadd : e + σ e = 1 := by rw [hσe, he, ← add_mul, mul_comm]; exact hsum
     have horth : e * σ e = 0 := by
       rw [hσe, he]
-      calc y * ↑s⁻¹ * (σ y * ↑s⁻¹) = (y * σ y) * (↑s⁻¹ * ↑s⁻¹) := by ring
+      calc
+        y * ↑s⁻¹ * (σ y * ↑s⁻¹)
+          = (y * σ y) * (↑s⁻¹ * ↑s⁻¹) := by ring
         _ = 0 := by rw [hyy, zero_mul]
     have hidem : e * e = e := by
       have : e * (e + σ e) = e := by rw [hadd, mul_one]

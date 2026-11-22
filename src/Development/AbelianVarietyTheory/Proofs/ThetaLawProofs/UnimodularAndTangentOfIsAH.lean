@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.HermFor
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 namespace UnifCompare
@@ -44,7 +46,6 @@ lemma isDiff_iff (u u₀ : HolUnif A L g) (F : (Fin g → ℂ) ≃L[ℂ] (Fin g 
     rw [e, ContinuousLinearEquiv.comp_right_fderiv, map_zero]
     rfl
   simp only [HolUnif.IsDiff, key]
-
 
 open PullHermitian in
 lemma hermForm_eq (hL : L.IsLB) (u u₀ : HolUnif A L g) {Hm H₀ : Matrix (Fin g) (Fin g) ℂ}
@@ -124,33 +125,41 @@ lemma hermForm_eq (hL : L.IsLB) (u u₀ : HolUnif A L g) {Hm H₀ : Matrix (Fin 
 
 end UnifCompare
 
-
 open UnifCompare in
-theorem unimodular_and_tangent_of_isAH :
-    ThetaUnifAV → ∀ (P : Out.PolAV (Sp ℂ)) (rig : LB.Gen (P.L.pull (eSec P.A))), rig.IsGen →
-    ∀ (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ), u.IsAH Hm χ →
-    (∃ Ef : LinearMap.BilinForm ℤ u.Λ, (∀ a b : u.Λ, (Ef a b : ℝ) = (hermForm Hm a b).im) ∧ Function.Bijective Ef) ∧
-    (∀ v, IsTangent v → ∃! w, u.IsDiff w v) ∧ (∀ w, ∃! v, IsTangent v ∧ u.IsDiff w v) := by
+theorem unimodular_and_tangent_of_isAH
+    : ThetaUnifAV
+      → ∀ (P : Out.PolAV (Sp ℂ)) (rig : LB.Gen (P.L.pull (eSec P.A))),
+        rig.IsGen
+          → ∀ (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ),
+            u.IsAH Hm χ
+              → (∃ Ef : LinearMap.BilinForm ℤ u.Λ,
+                  (∀ a b : u.Λ, (Ef a b : ℝ) = (hermForm Hm a b).im) ∧ Function.Bijective Ef)
+                ∧ (∀ v, IsTangent v → ∃! w, u.IsDiff w v)
+                ∧ (∀ w, ∃! v, IsTangent v ∧ u.IsDiff w v) := by
   intro hT P rig hrig u Hm χ hu
   obtain ⟨u₀, H₀, χ₀, E₀, hu₀, -, hv, hw, -, -, hE, hEb, -⟩ := hT P rig hrig
-  obtain ⟨F, hF, -⟩ := GlobalTheory.existsUnique_linear_lift_of_isHolTo P.A P.isAb P.L P.g P.g u₀ hv hw u.ex u.ex_add
-    (fun U f => by simpa only [Set.mem_univ, true_and] using u.hol U f)
+  obtain ⟨F, hF, -⟩ :=
+    GlobalTheory.existsUnique_linear_lift_of_isHolTo P.A P.isAb P.L P.g P.g u₀ hv hw u.ex u.ex_add
+      (fun U f => by simpa only [Set.mem_univ, true_and] using u.hol U f)
   have hinj := injective u u₀ F hF
   let e : (Fin P.g → ℂ) ≃ₗ[ℂ] (Fin P.g → ℂ) := LinearEquiv.ofInjectiveEndo F hinj
   have he : ∀ z, e z = F z := fun z => rfl
-  have hd : ∀ w v, u.IsDiff w v ↔ u₀.IsDiff (e w) v :=
-    isDiff_iff u u₀ e.toContinuousLinearEquiv hF
+  have hd : ∀ w v, u.IsDiff w v ↔ u₀.IsDiff (e w) v := isDiff_iff u u₀ e.toContinuousLinearEquiv hF
   refine ⟨?_, fun v hv' => ?_, fun w => ?_⟩
-  · let φ : u.Λ ≃ₗ[ℤ] u₀.Λ :=
-      { toFun := fun a => ⟨e a, (mem_iff u u₀ F hF a).2 a.2⟩
-        invFun := fun b => ⟨e.symm b, (mem_iff u u₀ F hF _).1 (by
-          rw [← he, e.apply_symm_apply]; exact b.2)⟩
-        map_add' := fun a b => Subtype.ext (map_add e a.1 b.1)
-        map_smul' := fun n a => Subtype.ext (map_zsmul e n a.1)
-        left_inv := fun a => Subtype.ext (e.symm_apply_apply a.1)
-        right_inv := fun b => Subtype.ext (e.apply_symm_apply b.1) }
-    refine ⟨φ.dualMap.toLinearMap ∘ₗ E₀ ∘ₗ φ.toLinearMap, fun a b => ?_,
-      φ.dualMap.bijective.comp (hEb.comp φ.bijective)⟩
+  · let φ : u.Λ ≃ₗ[ℤ] u₀.Λ := {
+      toFun := fun a => ⟨e a, (mem_iff u u₀ F hF a).2 a.2⟩
+      invFun := fun b =>
+        ⟨e.symm b, (mem_iff u u₀ F hF _).1 (by rw [← he, e.apply_symm_apply]; exact b.2)⟩
+      map_add' := fun a b => Subtype.ext (map_add e a.1 b.1)
+      map_smul' := fun n a => Subtype.ext (map_zsmul e n a.1)
+      left_inv := fun a => Subtype.ext (e.symm_apply_apply a.1)
+      right_inv := fun b => Subtype.ext (e.apply_symm_apply b.1)
+    }
+    refine ⟨
+      φ.dualMap.toLinearMap ∘ₗ E₀ ∘ₗ φ.toLinearMap,
+      fun a b => ?_,
+      φ.dualMap.bijective.comp (hEb.comp φ.bijective)
+    ⟩
     rw [← hermForm_eq P.isLB u u₀ hu hu₀ F hF]
     exact hE (φ a) (φ b)
   · obtain ⟨w, h1, h2⟩ := hv v hv'

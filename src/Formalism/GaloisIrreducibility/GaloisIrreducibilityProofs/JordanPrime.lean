@@ -12,8 +12,8 @@ namespace CycleCommutantPowers
 
 variable {α : Type} [Fintype α] [DecidableEq α]
 
-theorem conj_pow_eq (x g : Perm α) (u : ℤ) (hx : x * g * x⁻¹ = g ^ u) :
-    ∀ n : ℕ, x ^ n * g * (x ^ n)⁻¹ = g ^ (u ^ n) := by
+theorem conj_pow_eq (x g : Perm α) (u : ℤ) (hx : x * g * x⁻¹ = g ^ u)
+    : ∀ n : ℕ, x ^ n * g * (x ^ n)⁻¹ = g ^ (u ^ n) := by
   intro n
   induction n with
   | zero => simp
@@ -21,17 +21,16 @@ theorem conj_pow_eq (x g : Perm α) (u : ℤ) (hx : x * g * x⁻¹ = g ^ u) :
     have key : x ^ n * g ^ u * (x ^ n)⁻¹ = (x ^ n * g * (x ^ n)⁻¹) ^ u := by
       have h := map_zpow (MulAut.conj (x ^ n)) g u
       simpa only [MulAut.conj_apply] using h
-    calc x ^ (n + 1) * g * (x ^ (n + 1))⁻¹ = x ^ n * (x * g * x⁻¹) * (x ^ n)⁻¹ := by
-          first
-            | (rw [pow_succ, mul_inv_rev]; simp only [mul_assoc])
-            | group
+    calc
+      x ^ (n + 1) * g * (x ^ (n + 1))⁻¹ = x ^ n * (x * g * x⁻¹) * (x ^ n)⁻¹ := by
+        first | (rw [pow_succ, mul_inv_rev]; simp only [mul_assoc]) | group
       _ = x ^ n * g ^ u * (x ^ n)⁻¹ := by rw [hx]
       _ = (x ^ n * g * (x ^ n)⁻¹) ^ u := key
       _ = (g ^ (u ^ n)) ^ u := by rw [ih]
       _ = g ^ (u ^ (n + 1)) := by rw [pow_succ, zpow_mul]
 
-theorem conj_inv_exists (x g : Perm α) (u : ℤ) (hx : x * g * x⁻¹ = g ^ u) :
-    ∃ v : ℤ, x⁻¹ * g * x⁻¹⁻¹ = g ^ v := by
+theorem conj_inv_exists (x g : Perm α) (u : ℤ) (hx : x * g * x⁻¹ = g ^ u)
+    : ∃ v : ℤ, x⁻¹ * g * x⁻¹⁻¹ = g ^ v := by
   obtain ⟨k, hk⟩ : ∃ k : ℕ, x ^ (k + 1) = 1 :=
     ⟨orderOf x - 1, by rw [Nat.sub_add_cancel (orderOf_pos x)]; exact pow_orderOf_eq_one x⟩
   have hinv : x⁻¹ = x ^ k := by
@@ -41,15 +40,15 @@ theorem conj_inv_exists (x g : Perm α) (u : ℤ) (hx : x * g * x⁻¹ = g ^ u) 
   rw [hinv]
   exact conj_pow_eq x g u hx k
 
-theorem conj_key (c g : Perm α) (e : ℤ) (hc : c * g * c⁻¹ = g ^ e) (m : ℤ) :
-    c * g ^ m * c⁻¹ = g ^ (e * m) := by
+theorem conj_key (c g : Perm α) (e : ℤ) (hc : c * g * c⁻¹ = g ^ e) (m : ℤ)
+    : c * g ^ m * c⁻¹ = g ^ (e * m) := by
   have h := map_zpow (MulAut.conj c) g m
   simp only [MulAut.conj_apply] at h
   rw [h, hc, ← zpow_mul]
 
-theorem comm_of_conj (x y g : Perm α) (u w : ℤ) (hx : x * g * x⁻¹ = g ^ u)
-    (hy : y * g * y⁻¹ = g ^ w) :
-    (x * y * x⁻¹ * y⁻¹) * g * (x * y * x⁻¹ * y⁻¹)⁻¹ = g := by
+theorem comm_of_conj
+    (x y g : Perm α) (u w : ℤ) (hx : x * g * x⁻¹ = g ^ u) (hy : y * g * y⁻¹ = g ^ w)
+    : (x * y * x⁻¹ * y⁻¹) * g * (x * y * x⁻¹ * y⁻¹)⁻¹ = g := by
   obtain ⟨v, hv0⟩ := conj_inv_exists x g u hx
   obtain ⟨v', hw0⟩ := conj_inv_exists y g w hy
   have hv : x⁻¹ * g * x = g ^ v := by rw [inv_inv] at hv0; exact hv0
@@ -62,15 +61,16 @@ theorem comm_of_conj (x y g : Perm α) (u w : ℤ) (hx : x * g * x⁻¹ = g ^ u)
     first | group | simp [mul_assoc]
   have k1 := conj_key x⁻¹ g v hv0 v'
   rw [inv_inv] at k1
-  have e1 : (x * y * x⁻¹ * y⁻¹) * g * (x * y * x⁻¹ * y⁻¹)⁻¹ =
-      x * (y * (x⁻¹ * (y⁻¹ * g * y) * x) * y⁻¹) * x⁻¹ := by
+  have e1
+      : (x * y * x⁻¹ * y⁻¹) * g * (x * y * x⁻¹ * y⁻¹)⁻¹
+        = x * (y * (x⁻¹ * (y⁻¹ * g * y) * x) * y⁻¹) * x⁻¹ := by
     first | group | simp only [mul_inv_rev, inv_inv, mul_assoc]
   rw [e1, hw, k1, conj_key y g w hy (v * v'), conj_key x g u hx (w * (v * v'))]
   have he : u * (w * (v * v')) = (u * v) * (w * v') := by ring
   rw [he, zpow_mul, huv, hwv]
 
-theorem eq_zpow_on_support (g z : Perm α) (hg : g.IsCycle) (hz : z * g = g * z) :
-    ∃ j : ℤ, ∀ d, g d ≠ d → z d = (g ^ j) d := by
+theorem eq_zpow_on_support (g z : Perm α) (hg : g.IsCycle) (hz : z * g = g * z)
+    : ∃ j : ℤ, ∀ d, g d ≠ d → z d = (g ^ j) d := by
   obtain ⟨a, ha, hcyc⟩ := hg
   have hza : g (z a) ≠ z a := by
     intro h
@@ -83,7 +83,9 @@ theorem eq_zpow_on_support (g z : Perm α) (hg : g.IsCycle) (hz : z * g = g * z)
   refine ⟨j, fun d hd => ?_⟩
   obtain ⟨i, rfl⟩ := hcyc hd
   have hcomm : z * g ^ i = g ^ i * z := ((show Commute z g from hz).zpow_right i).eq
-  calc z ((g ^ i) a) = (z * g ^ i) a := rfl
+  calc
+    z ((g ^ i) a)
+      = (z * g ^ i) a := rfl
     _ = (g ^ i * z) a := by rw [hcomm]
     _ = (g ^ i) (z a) := rfl
     _ = (g ^ i) ((g ^ j) a) := by rw [hj]
@@ -91,9 +93,9 @@ theorem eq_zpow_on_support (g z : Perm α) (hg : g.IsCycle) (hz : z * g = g * z)
     _ = (g ^ j * g ^ i) a := by rw [← zpow_add, ← zpow_add, add_comm]
     _ = (g ^ j) ((g ^ i) a) := rfl
 
-theorem exists_agree (G : Subgroup (Perm α)) (Γ : Finset α)
-    (hG : IsMultiplyPretransitive G α Γ.card) (π : Perm α) :
-    ∃ x ∈ G, ∀ γ ∈ Γ, x γ = π γ := by
+theorem exists_agree
+    (G : Subgroup (Perm α)) (Γ : Finset α) (hG : IsMultiplyPretransitive G α Γ.card) (π : Perm α)
+    : ∃ x ∈ G, ∀ γ ∈ Γ, x γ = π γ := by
   classical
   let e : Fin Γ.card ↪ α :=
     ⟨fun i => ((Γ.equivFin.symm i : Γ) : α), fun i j h => Γ.equivFin.symm.injective (Subtype.ext h)⟩
@@ -107,14 +109,16 @@ theorem exists_agree (G : Subgroup (Perm α)) (Γ : Finset α)
     rw [Equiv.symm_apply_apply]
   have h3 : (g : Perm α) (e (Γ.equivFin ⟨γ, hγ⟩)) = π (e (Γ.equivFin ⟨γ, hγ⟩)) := by
     first
-      | exact h
-      | (simp only [Function.Embedding.smul_apply, Subgroup.smul_def, Perm.smul_def] at h; exact h)
+    | exact h
+    | (simp only [Function.Embedding.smul_apply, Subgroup.smul_def, Perm.smul_def] at h; exact h)
   rwa [h2] at h3
 
-theorem sylow_adjust (G : Subgroup (Perm α)) (g : Perm α) (p : ℕ) (hp : p.Prime)
+theorem sylow_adjust
+    (G : Subgroup (Perm α)) (g : Perm α)
+    (p : ℕ) (hp : p.Prime)
     (hgG : g ∈ G) (hgc : g.IsCycle) (hgp : g.support.card = p)
-    (x : Perm α) (hxG : x ∈ G) (hxΓ : ∀ γ, g γ = γ → g (x⁻¹ γ) = x⁻¹ γ) :
-    ∃ f ∈ G, (∀ γ, g γ = γ → f γ = γ) ∧ ∃ e : ℤ, (f * x) * g * (f * x)⁻¹ = g ^ e := by
+    (x : Perm α) (hxG : x ∈ G) (hxΓ : ∀ γ, g γ = γ → g (x⁻¹ γ) = x⁻¹ γ)
+    : ∃ f ∈ G, (∀ γ, g γ = γ → f γ = γ) ∧ ∃ e : ℤ, (f * x) * g * (f * x)⁻¹ = g ^ e := by
   classical
   have := Fact.mk hp
   set Γ : Set α := {γ | g γ = γ} with hΓ
@@ -136,14 +140,19 @@ theorem sylow_adjust (G : Subgroup (Perm α)) (g : Perm α) (p : ℕ) (hp : p.Pr
         · intro h
           have h2 := hσΓ _ h
           have h3 : σ t = t := σ.injective h2
-          rw [h3] at h; exact h
+          rw [h3] at h
+          exact h
         · intro h; rw [hσΓ t h]; exact h
       refine MonoidHom.mem_range.2 ⟨σ.subtypePerm h1, ?_⟩
       apply Perm.ofSubtype_subtypePerm
-      intro t ht; rw [Perm.mem_support]; intro h; exact ht (hσΓ t h)
+      intro t ht
+      rw [Perm.mem_support]
+      intro h
+      exact ht (hσΓ t h)
     have h1 := Subgroup.card_dvd_of_le hle
-    have h2 := Nat.card_congr (MonoidHom.ofInjective
-      (Perm.ofSubtype_injective (p := fun x => x ∈ g.support))).toEquiv
+    have h2 :=
+      Nat.card_congr (MonoidHom.ofInjective (Perm.ofSubtype_injective
+        (p := fun x => x ∈ g.support))).toEquiv
     rw [← h2, Nat.card_perm, Nat.card_eq_finsetCard, hgp] at h1
     exact h1
   have hpF : p ∣ Nat.card F := by
@@ -185,7 +194,8 @@ theorem sylow_adjust (G : Subgroup (Perm α)) (g : Perm α) (p : ℕ) (hp : p.Pr
   refine ⟨f, hfF.1, hfF.2, e, ?_⟩
   have := congrArg Subtype.val he
   simp only [SubgroupClass.coe_zpow, Subgroup.coe_mul, InvMemClass.coe_inv, g', c'] at this
-  rw [this]; group
+  rw [this]
+  group
 
 end CycleCommutantPowers
 
@@ -197,7 +207,8 @@ theorem jordan_prime_cycle_theorem : JordanPrime := by
   have hΓcard : Γ.card + p = Fintype.card α := by
     rw [hΓdef, Finset.card_compl, hgp]
     have := Finset.card_le_univ g.support
-    rw [hgp] at this; omega
+    rw [hgp] at this
+    omega
   have hk : 3 ≤ Γ.card := by omega
 
   have hmt : IsMultiplyPretransitive G α Γ.card := by
@@ -206,8 +217,7 @@ theorem jordan_prime_cycle_theorem : JordanPrime := by
       apply Nat.add_left_cancel
       rw [Set.ncard_add_ncard_compl, Set.ncard_coe_finset, hgp, Nat.card_eq_fintype_card]
       omega
-    have hsn' : m + 2 < Nat.card α := by
-      rw [Nat.card_eq_fintype_card]; have := hp.two_le; omega
+    have hsn' : m + 2 < Nat.card α := by rw [Nat.card_eq_fintype_card]; have := hp.two_le; omega
     have hprim : IsPreprimitive (fixingSubgroup G ((g.support : Set α)ᶜ))
         (SubMulAction.ofFixingSubgroup G ((g.support : Set α)ᶜ)) := by
       have := Equiv.Perm.isPretransitive_of_isCycle_mem hgc hgG
@@ -218,23 +228,28 @@ theorem jordan_prime_cycle_theorem : JordanPrime := by
       ext x
       simp [SubMulAction.mem_ofFixingSubgroup_iff]
     have h1 := hG.isMultiplyPreprimitive hsn hsn' hprim
-    have h2 : IsMultiplyPretransitive G α (m + 2) := IsMultiplyPreprimitive.isMultiplyPretransitive ..
+    have h2 : IsMultiplyPretransitive G α (m + 2) :=
+      IsMultiplyPreprimitive.isMultiplyPretransitive ..
     rw [hm]
     exact isMultiplyPretransitive_of_le (n := m + 2) (by omega) (by omega)
   obtain ⟨a, b, c, ha, hb, hc, hab, hac, hbc⟩ := Finset.two_lt_card_iff.1 (by omega : 2 < Γ.card)
   rw [hmemΓ] at ha hb hc
 
-  have build : ∀ π : Perm α, (∀ γ, g γ = γ → g (π γ) = π γ) → π * π = 1 →
-      ∃ x ∈ G, (∀ γ, g γ = γ → x γ = π γ) ∧ (∀ γ, g γ = γ → x⁻¹ γ = π γ) ∧
-        ∃ e : ℤ, x * g * x⁻¹ = g ^ e := by
+  have build
+      : ∀ π : Perm α,
+        (∀ γ, g γ = γ → g (π γ) = π γ) → π * π = 1
+          → ∃ x ∈ G,
+            (∀ γ, g γ = γ → x γ = π γ) ∧ (∀ γ, g γ = γ → x⁻¹ γ = π γ)
+              ∧ ∃ e : ℤ, x * g * x⁻¹ = g ^ e := by
     intro π hπ hπ2
     have hinvOf : ∀ y : Perm α, (∀ γ, g γ = γ → y γ = π γ) → ∀ γ, g γ = γ → y⁻¹ γ = π γ := by
       intro y hy γ hγ
       rw [Perm.inv_eq_iff_eq, hy _ (hπ γ hγ), ← Perm.mul_apply, hπ2, Perm.one_apply]
     obtain ⟨x0, hx0G, hx0⟩ := CycleCommutantPowers.exists_agree G Γ hmt π
     have hx0' : ∀ γ, g γ = γ → x0 γ = π γ := fun γ hγ => hx0 γ ((hmemΓ γ).2 hγ)
-    obtain ⟨f, hfG, hfΓ, e, he⟩ := CycleCommutantPowers.sylow_adjust G g p hp hgG hgc hgp x0 hx0G
-      (fun γ hγ => by rw [hinvOf x0 hx0' γ hγ]; exact hπ γ hγ)
+    obtain ⟨f, hfG, hfΓ, e, he⟩ :=
+      CycleCommutantPowers.sylow_adjust G g p hp hgG hgc hgp x0 hx0G
+        (fun γ hγ => by rw [hinvOf x0 hx0' γ hγ]; exact hπ γ hγ)
     have hfx : ∀ γ, g γ = γ → (f * x0) γ = π γ := by
       intro γ hγ
       rw [Perm.mul_apply, hx0' γ hγ, hfΓ _ (hπ γ hγ)]
@@ -249,7 +264,9 @@ theorem jordan_prime_cycle_theorem : JordanPrime := by
   have hzG : z ∈ G := G.mul_mem (G.mul_mem (G.mul_mem hxG hyG) (G.inv_mem hxG)) (G.inv_mem hyG)
   have hz : z * g * z⁻¹ = g := CycleCommutantPowers.comm_of_conj x y g u w hu hw
   have hzc : z * g = g * z := by
-    calc z * g = z * g * z⁻¹ * z := by group
+    calc
+      z * g
+        = z * g * z⁻¹ * z := by group
       _ = g * z := by rw [hz]
   obtain ⟨j, hj⟩ := CycleCommutantPowers.eq_zpow_on_support g z hgc hzc
   set t := swap a b * swap a c with htdef
@@ -257,8 +274,7 @@ theorem jordan_prime_cycle_theorem : JordanPrime := by
   have hwt : g ^ (-j) * z = t * t := by
     ext d
     by_cases hd : g d = d
-    ·
-      have hzd : z d = swap a b (swap a c (swap a b (swap a c d))) := by
+    · have hzd : z d = swap a b (swap a c (swap a b (swap a c d))) := by
         have e1 := hswap a c ha hc d hd
         have e2 := hswap a b ha hb _ e1
         have e3 := hswap a c ha hc _ e2
@@ -269,8 +285,7 @@ theorem jordan_prime_cycle_theorem : JordanPrime := by
         exact hswap a b ha hb _ (hswap a c ha hc _ (hswap a b ha hb _ (hswap a c ha hc d hd)))
       rw [Perm.mul_apply, zpow_apply_eq_self_of_apply_eq_self hzΓ, hzd, htdef]
       simp only [Perm.mul_apply]
-    ·
-      have hda : d ≠ a := fun h => hd (h ▸ ha)
+    · have hda : d ≠ a := fun h => hd (h ▸ ha)
       have hdb : d ≠ b := fun h => hd (h ▸ hb)
       have hdc : d ≠ c := fun h => hd (h ▸ hc)
       rw [Perm.mul_apply, hj d hd, ← Perm.mul_apply, ← zpow_add, neg_add_cancel, zpow_zero,

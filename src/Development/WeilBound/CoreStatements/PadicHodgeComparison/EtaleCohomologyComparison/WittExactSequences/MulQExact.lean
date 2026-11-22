@@ -22,8 +22,9 @@ def mulQ (a : U) (n : ℕ) : U ⧸ Ideal.span {a ^ 1} →ₗ[U] U ⧸ Ideal.span
     rw [pow_one, ← pow_succ]
     exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _))
 
-theorem mulQ_mk (a : U) (n : ℕ) (x : U) :
-    mulQ a n (Ideal.Quotient.mk _ x) = Ideal.Quotient.mk _ (a ^ n * x) := rfl
+theorem mulQ_mk (a : U) (n : ℕ) (x : U)
+    : mulQ a n (Ideal.Quotient.mk _ x) = Ideal.Quotient.mk _ (a ^ n * x) :=
+  rfl
 
 theorem mulQ_inj (a : U) (ha : a ∈ nonZeroDivisors U) (n : ℕ) : Function.Injective (mulQ a n) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -37,8 +38,10 @@ theorem mulQ_inj (a : U) (ha : a ∈ nonZeroDivisors U) (n : ℕ) : Function.Inj
   rw [pow_one]
   exact (mul_cancel_left_mem_nonZeroDivisors hn).1 hc
 
-theorem mulQ_exact (a : U) (n : ℕ) :
-    Function.Exact (mulQ a n) (Ideal.Quotient.factor (Ideal.span_singleton_le_span_singleton.2 (pow_dvd_pow a n.le_succ))) := by
+theorem mulQ_exact (a : U) (n : ℕ)
+    : Function.Exact (mulQ a n)
+      (Ideal.Quotient.factor (Ideal.span_singleton_le_span_singleton.2 (pow_dvd_pow a
+        n.le_succ))) := by
   intro x
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective x
   rw [Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton']

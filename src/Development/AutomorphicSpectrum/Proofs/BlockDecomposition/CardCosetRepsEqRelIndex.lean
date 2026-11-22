@@ -8,15 +8,18 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.Transversal
 
-theorem card_eq_relIndex (X : Type) [AddCommGroup X] (A L : AddSubgroup X) (T : Finset X)
-    (_hLA : L ≤ A) (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ L) :
-    T.card = L.relIndex A := by
+theorem card_eq_relIndex
+    (X : Type) [AddCommGroup X]
+    (A L : AddSubgroup X) (T : Finset X)
+    (_hLA : L ≤ A) (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ L)
+    : T.card = L.relIndex A := by
   classical
   let f : T → A ⧸ L.addSubgroupOf A := fun t => QuotientAddGroup.mk ⟨t.1, hT t.1 t.2⟩
   have hf : Function.Bijective f := by
     constructor
     · rintro ⟨t, ht⟩ ⟨t', ht'⟩ h
-      have h' : -(⟨t, hT t ht⟩ : A) + ⟨t', hT t' ht'⟩ ∈ L.addSubgroupOf A := QuotientAddGroup.eq.mp h
+      have h' : -(⟨t, hT t ht⟩ : A) + ⟨t', hT t' ht'⟩ ∈ L.addSubgroupOf A :=
+        QuotientAddGroup.eq.mp h
       rw [AddSubgroup.mem_addSubgroupOf] at h'
       have hL : t - t' ∈ L := by
         have h2 := L.neg_mem h'
@@ -37,7 +40,9 @@ theorem card_eq_relIndex (X : Type) [AddCommGroup X] (A L : AddSubgroup X) (T : 
         abel
       rw [e]
       exact hat
-  calc T.card = Nat.card T := (Nat.card_eq_finsetCard T).symm
+  calc
+    T.card
+      = Nat.card T := (Nat.card_eq_finsetCard T).symm
     _ = Nat.card (A ⧸ L.addSubgroupOf A) := Nat.card_congr (Equiv.ofBijective f hf)
     _ = L.relIndex A := by simp only [AddSubgroup.relIndex, AddSubgroup.index]
 

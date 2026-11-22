@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HasSignatureC
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.RadCov
 
-theorem exists_biorth {E : Type} [Field E] {n m : ℕ} {r : ℕ → ℕ}
-    (T : ∀ b, Matrix (Fin n) (Fin (r b)) E) (hr : ∀ b, m ≤ b → r b = 0)
+theorem exists_biorth
+    {E : Type} [Field E]
+    {n m : ℕ} {r : ℕ → ℕ} (T : ∀ b, Matrix (Fin n) (Fin (r b)) E) (hr : ∀ b, m ≤ b → r b = 0)
     (hn : n = ∑ b ∈ Finset.range m, r b)
-    (hs : ∀ y : Fin n → E, ∃ u : ∀ b, Fin (r b) → E, y = ∑ b ∈ Finset.range m, T b *ᵥ u b) :
-    ∃ T' : ∀ b, Matrix (Fin (r b)) (Fin n) E, Biorth r m T T' := by
+    (hs : ∀ y : Fin n → E, ∃ u : ∀ b, Fin (r b) → E, y = ∑ b ∈ Finset.range m, T b *ᵥ u b)
+    : ∃ T' : ∀ b, Matrix (Fin (r b)) (Fin n) E, Biorth r m T T' := by
   classical
   let Φ : ((b : Fin m) → Fin (r b) → E) →ₗ[E] (Fin n → E) :=
     ∑ b : Fin m, (T b).mulVecLin ∘ₗ LinearMap.proj b
@@ -33,9 +35,12 @@ theorem exists_biorth {E : Type} [Field E] {n m : ℕ} {r : ℕ → ℕ}
     rw [hn, Fin.sum_univ_eq_sum_range]
   let e := LinearEquiv.ofBijective Φ ⟨hinj, hsurj⟩
   let T' : ∀ b, Matrix (Fin (r b)) (Fin n) E := fun b =>
-    if h : b < m then LinearMap.toMatrix'
-      ((LinearMap.proj (⟨b, h⟩ : Fin m) : ((b : Fin m) → Fin (r b) → E) →ₗ[E] _) ∘ₗ e.symm.toLinearMap)
-    else 0
+    if h : b < m then
+      LinearMap.toMatrix'
+        ((LinearMap.proj (⟨b, h⟩ : Fin m) : ((b : Fin m) → Fin (r b) → E) →ₗ[E] _)
+          ∘ₗ e.symm.toLinearMap)
+    else
+      0
   have hemp : ∀ b, ¬ b < m → IsEmpty (Fin (r b)) := fun b hb => by
     rw [hr b (by omega)]; infer_instance
   have hT' : ∀ (b : Fin m) y, T' b *ᵥ y = e.symm y b := fun b y => by
@@ -54,7 +59,8 @@ theorem exists_biorth {E : Type} [Field E] {n m : ℕ} {r : ℕ → ℕ}
     rw [← H1 (Pi.single c v) b]
     congr 1
     by_cases hc : c < m
-    · rw [Finset.sum_eq_single c (fun d _ hd => by simp [Pi.single_eq_of_ne hd])
+    · rw [Finset.sum_eq_single c
+        (fun d _ hd => by simp [Pi.single_eq_of_ne hd])
         (fun h => absurd (Finset.mem_range.2 hc) h)]
       simp
     · have := hemp c hc
@@ -63,10 +69,12 @@ theorem exists_biorth {E : Type} [Field E] {n m : ℕ} {r : ℕ → ℕ}
   refine ⟨T', fun b => ?_, fun b c hbc => ?_, ?_⟩
   · refine Matrix.toLin'.injective (LinearMap.ext fun v => ?_)
     simp only [Matrix.toLin'_apply]
-    rw [← Matrix.mulVec_mulVec, H2]; simp
+    rw [← Matrix.mulVec_mulVec, H2]
+    simp
   · refine Matrix.toLin'.injective (LinearMap.ext fun v => ?_)
     simp only [Matrix.toLin'_apply]
-    rw [← Matrix.mulVec_mulVec, H2]; simp [Pi.single_eq_of_ne hbc]
+    rw [← Matrix.mulVec_mulVec, H2]
+    simp [Pi.single_eq_of_ne hbc]
   · refine Matrix.toLin'.injective (LinearMap.ext fun y => ?_)
     obtain ⟨u, rfl⟩ := hs y
     simp only [Matrix.toLin'_apply]
@@ -74,7 +82,16 @@ theorem exists_biorth {E : Type} [Field E] {n m : ℕ} {r : ℕ → ℕ}
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [← Matrix.mulVec_mulVec, H1]
 
-theorem exists_biorth_of_saturated_flag : ∀ (E : Type) [Field E] [NumberField E] (n m : ℕ) (F : ℕ → Submodule (𝓞 E) (Fin n → E)) (r : ℕ → ℕ), Monotone F → F 0 = ⊥ → (∀ b, m ≤ b → F b = F m) → Submodule.IsFullLattice E (F m) → (∀ b, ∀ y ∈ F m, y ∈ Submodule.span E (F b : Set (Fin n → E)) → y ∈ F b) → (∀ b, Formalism.HN.rkK (F (b + 1)) = Formalism.HN.rkK (F b) + r b) → ∃ (T : ∀ b, Matrix (Fin n) (Fin (r b)) E) (T' : ∀ b, Matrix (Fin (r b)) (Fin n) E) (Λ : ∀ b, Submodule (𝓞 E) (Fin (r b) → E)), Biorth r m T T' ∧ (∀ b, Submodule.IsFullLattice E (Λ b)) ∧ ∀ k y, y ∈ F k ↔ ∀ b, T' b *ᵥ y ∈ Λ b ∧ (k ≤ b → T' b *ᵥ y = 0) := by
+theorem exists_biorth_of_saturated_flag
+    : ∀ (E : Type) [Field E] [NumberField E] (n m : ℕ) (F : ℕ → Submodule (𝓞 E) (Fin n → E))
+        (r : ℕ → ℕ),
+      Monotone F → F 0 = ⊥ → (∀ b, m ≤ b → F b = F m) → Submodule.IsFullLattice E (F m)
+        → (∀ b, ∀ y ∈ F m, y ∈ Submodule.span E (F b : Set (Fin n → E)) → y ∈ F b)
+        → (∀ b, Formalism.HN.rkK (F (b + 1)) = Formalism.HN.rkK (F b) + r b)
+        → ∃ (T : ∀ b, Matrix (Fin n) (Fin (r b)) E) (T' : ∀ b, Matrix (Fin (r b)) (Fin n) E)
+            (Λ : ∀ b, Submodule (𝓞 E) (Fin (r b) → E)),
+          Biorth r m T T' ∧ (∀ b, Submodule.IsFullLattice E (Λ b))
+            ∧ ∀ k y, y ∈ F k ↔ ∀ b, T' b *ᵥ y ∈ Λ b ∧ (k ≤ b → T' b *ᵥ y = 0) := by
   intro E _ _ n m F r hmono h0 hm hL hsat hrk
   letI := hL
   have hle : ∀ b, F b ≤ F m := fun b => by
@@ -97,8 +114,9 @@ theorem exists_biorth_of_saturated_flag : ∀ (E : Type) [Field E] [NumberField 
     omega
   choose Λ T hΛ hT using fun b => AdaptedExists.exists_model (A b)
     (Submodule.FG.of_le hL.fg ((hAF b).trans (hle _))) (hAr b)
-  have hdec : ∀ k, ∀ y ∈ F k, ∃ u : ∀ b, Fin (r b) → E, (∀ b, u b ∈ Λ b) ∧
-      y = ∑ b ∈ Finset.range k, T b *ᵥ u b := by
+  have hdec
+      : ∀ k, ∀ y ∈ F k, ∃ u : ∀ b, Fin (r b) → E,
+        (∀ b, u b ∈ Λ b) ∧ y = ∑ b ∈ Finset.range k, T b *ᵥ u b := by
     intro k
     induction k with
     | zero =>
@@ -131,23 +149,27 @@ theorem exists_biorth_of_saturated_flag : ∀ (E : Type) [Field E] [NumberField 
   have hn : n = ∑ b ∈ Finset.range m, r b := by
     rw [← hsum, Formalism.HN.rkK, Submodule.IsFullLattice.span_eq_top (A := E) (M := F m)]
     simp
-  obtain ⟨T', hB⟩ := exists_biorth T hr0 hn (fun y => by
-    obtain ⟨c, hc, hcy⟩ := AdaptedExists.exists_smul_mem (L := F m) (x := y)
-      (by rw [Submodule.IsFullLattice.span_eq_top (A := E) (M := F m)]; trivial)
-    obtain ⟨u, -, hu⟩ := hdec m _ hcy
-    have hc' : (c : E) ≠ 0 := by simpa using hc
-    refine ⟨fun b => (c : E)⁻¹ • u b, ?_⟩
-    simp only [Matrix.mulVec_smul]
-    rw [← Finset.smul_sum, ← hu, eq_inv_smul_iff₀ hc']
-    rfl)
+  obtain ⟨T', hB⟩ :=
+    exists_biorth T hr0 hn (fun y => by
+      obtain ⟨c, hc, hcy⟩ :=
+        AdaptedExists.exists_smul_mem (L := F m) (x := y)
+          (by rw [Submodule.IsFullLattice.span_eq_top (A := E) (M := F m)]; trivial)
+      obtain ⟨u, -, hu⟩ := hdec m _ hcy
+      have hc' : (c : E) ≠ 0 := by simpa using hc
+      refine ⟨fun b => (c : E)⁻¹ • u b, ?_⟩
+      simp only [Matrix.mulVec_smul]
+      rw [← Finset.smul_sum, ← hu, eq_inv_smul_iff₀ hc']
+      rfl)
   refine ⟨T, T', Λ, hB, hΛ, fun k y => ⟨fun hy b => ?_, fun hy => ?_⟩⟩
   · obtain ⟨u, hu, rfl⟩ := hdec k y hy
     have h1 : T' b *ᵥ (∑ c ∈ Finset.range k, T c *ᵥ u c) = if b < k then u b else 0 := by
       rw [Matrix.mulVec_sum]
       simp only [Matrix.mulVec_mulVec]
       split_ifs with hb
-      · rw [Finset.sum_eq_single b (fun c _ hc => by rw [hB.2.1 b c hc.symm, Matrix.zero_mulVec])
-          (fun h => absurd (Finset.mem_range.2 hb) h), hB.1, Matrix.one_mulVec]
+      · rw [Finset.sum_eq_single b
+            (fun c _ hc => by rw [hB.2.1 b c hc.symm, Matrix.zero_mulVec])
+            (fun h => absurd (Finset.mem_range.2 hb) h),
+          hB.1, Matrix.one_mulVec]
       · refine Finset.sum_eq_zero fun c hc => ?_
         rw [hB.2.1 b c (by have := Finset.mem_range.1 hc; omega), Matrix.zero_mulVec]
     rw [h1]

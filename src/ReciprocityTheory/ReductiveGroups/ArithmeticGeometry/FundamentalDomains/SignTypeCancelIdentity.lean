@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.OrthonormalChartBounds
 
-open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData
+open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData
 open scoped ComplexConjugate ComplexOrder
 
 noncomputable section
@@ -178,8 +179,9 @@ lemma minor_gt {x : Frame X.Ψ r} (ho : X.IsOrtho x) {Z : X.Coord} (hZ : X.zN Z 
   rw [heq]
   exact signType_cancel_identity k _ (pos_re_of_posDef hpd)
 
-theorem xZ_mem_dom {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {Z : X.Coord} (hZ : X.zN Z < 1) :
-    X.xZ x Z ∈ X.dom := by
+theorem xZ_mem_dom
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {Z : X.Coord} (hZ : X.zN Z < 1)
+    : X.xZ x Z ∈ X.dom := by
   rw [Data.mem_dom_iff] at hx ⊢
   intro τ
   refine ⟨?_, fun i => ?_⟩

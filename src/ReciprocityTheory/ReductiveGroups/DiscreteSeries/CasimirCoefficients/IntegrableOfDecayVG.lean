@@ -15,9 +15,13 @@ open ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem volGrowthVG (ε : Fin n → Bool) (s : Bool) (ν : Measure (UJ ε)) [ν.IsHaarMeasure] :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ R : ℝ, 1 ≤ R →
-      ν {g | hs (toM g) ≤ R ^ 2} ≤ ENNReal.ofReal (C * R ^ (2 * (n * Fintype.card (SgIxV ε s)))) := by
+theorem volGrowthVG (ε : Fin n → Bool) (s : Bool) (ν : Measure (UJ ε)) [ν.IsHaarMeasure]
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ R : ℝ,
+          1 ≤ R
+            → ν {g | hs (toM g) ≤ R ^ 2}
+              ≤ ENNReal.ofReal (C * R ^ (2 * (n * Fintype.card (SgIxV ε s)))) := by
   classical
   let Q := SgIxV ε s
   let lam : Measure (REV n Q) := Measure.addHaar
@@ -26,10 +30,11 @@ theorem volGrowthVG (ε : Fin n → Bool) (s : Bool) (ν : Measure (UJ ε)) [ν.
   let W : Set (UJ ε) := {k | hs (toM k) ≤ r0}
   let N : ℕ := 2 * (n * Fintype.card Q)
   have hof : Continuous (fun x : REV n Q => (Matrix.of x : Matrix (Fin n) Q ℂ)) := continuous_id
-  have hofs : Continuous (fun x : Matrix (Fin n) Q ℂ => (Matrix.of.symm x : REV n Q)) := continuous_id
-  have hO_open : IsOpen O :=
-    isOpen_lt (hsRV_cont.comp (hof.sub continuous_const)) continuous_const
-  have hO_pos : 0 < lam O := hO_open.measure_pos lam ⟨Matrix.of.symm (signedIdentityColumns ε s), by simp [O, hsRV]⟩
+  have hofs : Continuous (fun x : Matrix (Fin n) Q ℂ => (Matrix.of.symm x : REV n Q)) :=
+    continuous_id
+  have hO_open : IsOpen O := isOpen_lt (hsRV_cont.comp (hof.sub continuous_const)) continuous_const
+  have hO_pos : 0 < lam O :=
+    hO_open.measure_pos lam ⟨Matrix.of.symm (signedIdentityColumns ε s), by simp [O, hsRV]⟩
   have hO_fin : lam O < ⊤ :=
     (measure_mono (fun x hx => O_bddRV hx)).trans_lt measure_closedBall_lt_top
   have hW_fin : ν W < ⊤ := ballFiniteVG ε ν r0
@@ -79,34 +84,37 @@ theorem volGrowthVG (ε : Fin n → Bool) (s : Bool) (ν : Measure (UJ ε)) [ν.
     rw [lintegral_indicator_const hS_meas, mul_comm]
   have h2 : (ν.prod lam) T ≤ ν W * lam (closedBall 0 ρ) := by
     rw [Measure.prod_apply_symm hT]
-    calc ∫⁻ x, ν ((fun g => (g, x)) ⁻¹' T) ∂lam
-        ≤ ∫⁻ x, (closedBall (0 : REV n Q) ρ).indicator (fun _ => ν W) x ∂lam := by
-          refine lintegral_mono fun x => ?_
-          by_cases hne : ((fun g => (g, x)) ⁻¹' T).Nonempty
-          · obtain ⟨h, hh⟩ := hne
-            have hh1 : hs (toM h) ≤ R ^ 2 := hh.1
-            have hh2 : hsRV (Matrix.of (RLV (toM h⁻¹) x) - signedIdentityColumns ε s) < 1 / 16 := hh.2
-            rw [of_RLV] at hh2
-            have hx : x ∈ closedBall (0 : REV n Q) ρ := by
-              rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg hρ0]
-              intro i
-              rw [pi_norm_le_iff_of_nonneg hρ0]
-              intro j
-              have := entryRV (g := toM h) hR0 hh1 hh2 i j
-              rw [← Matrix.mul_assoc, toM_mul_invVG, Matrix.one_mul] at this
-              exact this
-            rw [Set.indicator_of_mem hx]
-            calc ν ((fun g => (g, x)) ⁻¹' T) ≤ ν ((fun g => h⁻¹ * g) ⁻¹' W) := by
-                  refine measure_mono fun g hg => ?_
-                  have hg2 : hsRV (Matrix.of (RLV (toM g⁻¹) x) - signedIdentityColumns ε s) < 1 / 16 := hg.2
-                  rw [of_RLV] at hg2
-                  show hs (toM (h⁻¹ * g)) ≤ r0
-                  refine smallRV (h⁻¹ * g).2 hg2 hh2 ?_
-                  rw [toM_mulVG, ← Matrix.mul_assoc, Matrix.mul_assoc (toM h⁻¹),
-                    toM_mul_invVG, Matrix.mul_one]
-              _ = ν W := measure_preimage_mul ν h⁻¹ W
-          · rw [Set.not_nonempty_iff_eq_empty.1 hne, measure_empty]
-            exact bot_le
+    calc
+      ∫⁻ x, ν ((fun g => (g, x)) ⁻¹' T) ∂lam
+          ≤ ∫⁻ x, (closedBall (0 : REV n Q) ρ).indicator (fun _ => ν W) x ∂lam := by
+        refine lintegral_mono fun x => ?_
+        by_cases hne : ((fun g => (g, x)) ⁻¹' T).Nonempty
+        · obtain ⟨h, hh⟩ := hne
+          have hh1 : hs (toM h) ≤ R ^ 2 := hh.1
+          have hh2 : hsRV (Matrix.of (RLV (toM h⁻¹) x) - signedIdentityColumns ε s) < 1 / 16 := hh.2
+          rw [of_RLV] at hh2
+          have hx : x ∈ closedBall (0 : REV n Q) ρ := by
+            rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg hρ0]
+            intro i
+            rw [pi_norm_le_iff_of_nonneg hρ0]
+            intro j
+            have := entryRV (g := toM h) hR0 hh1 hh2 i j
+            rw [← Matrix.mul_assoc, toM_mul_invVG, Matrix.one_mul] at this
+            exact this
+          rw [Set.indicator_of_mem hx]
+          calc
+            ν ((fun g => (g, x)) ⁻¹' T) ≤ ν ((fun g => h⁻¹ * g) ⁻¹' W) := by
+              refine measure_mono fun g hg => ?_
+              have hg2 : hsRV (Matrix.of (RLV (toM g⁻¹) x) - signedIdentityColumns ε s) < 1 / 16 :=
+                hg.2
+              rw [of_RLV] at hg2
+              show hs (toM (h⁻¹ * g)) ≤ r0
+              refine smallRV (h⁻¹ * g).2 hg2 hh2 ?_
+              rw [toM_mulVG, ← Matrix.mul_assoc, Matrix.mul_assoc (toM h⁻¹), toM_mul_invVG,
+                Matrix.mul_one]
+            _ = ν W := measure_preimage_mul ν h⁻¹ W
+        · rw [Set.not_nonempty_iff_eq_empty.1 hne, measure_empty]
+          exact bot_le
       _ = ν W * lam (closedBall 0 ρ) := lintegral_indicator_const measurableSet_closedBall _
   have hfr : Module.finrank ℝ (REV n Q) = N := by
     simp [REV, N, Module.finrank_pi_fintype, Complex.finrank_real_complex]; ring
@@ -117,9 +125,10 @@ theorem volGrowthVG (ε : Fin n → Bool) (s : Bool) (ν : Measure (UJ ε)) [ν.
     refine h2.trans (le_of_eq ?_)
     rw [h3, hK, div_eq_mul_inv]
     have : (lam O)⁻¹ * lam O = 1 := ENNReal.inv_mul_cancel hO_pos.ne' hO_fin.ne
-    calc ν W * (ENNReal.ofReal (ρ ^ N) * lam (ball 0 1))
-        = ν W * (ENNReal.ofReal (ρ ^ N) * lam (ball 0 1)) * ((lam O)⁻¹ * lam O) := by
-          rw [this, mul_one]
+    calc
+      ν W * (ENNReal.ofReal (ρ ^ N) * lam (ball 0 1))
+          = ν W * (ENNReal.ofReal (ρ ^ N) * lam (ball 0 1)) * ((lam O)⁻¹ * lam O) := by
+        rw [this, mul_one]
       _ = _ := by ring
   have h5 : ν S ≤ K * ENNReal.ofReal (ρ ^ N) :=
     (ENNReal.mul_le_mul_iff_left hO_pos.ne' hO_fin.ne).1 h4
@@ -129,13 +138,18 @@ theorem volGrowthVG (ε : Fin n → Bool) (s : Bool) (ν : Measure (UJ ε)) [ν.
   congr 1
   ring
 
-theorem integrable_of_decayVG {E : Type*} [NormedAddCommGroup E] (ε : Fin n → Bool) (s : Bool)
-    (ν : Measure (UJ ε)) [ν.IsHaarMeasure] (f : UJ ε → E) (hf : AEStronglyMeasurable f ν) (M : ℝ)
-    (hM : ∀ g, hs (toM g) ≤ (n : ℝ) * Real.exp 2 + 1 → ‖f g‖ ≤ M) (a : ℝ)
-    (ha : ((2 * (n * Fintype.card (SgIxV ε s)) : ℕ) : ℝ) < a)
-    (hdec : ∀ g, (n : ℝ) * Real.exp 2 + 1 < hs (toM g) →
-      ∃ t : ℝ, hs (toM g) ≤ n * Real.exp (2 * t) ∧ ‖f g‖ ≤ M * Real.exp (-(a * t))) :
-    Integrable f ν := by
+theorem integrable_of_decayVG
+    {E : Type*} [NormedAddCommGroup E]
+    (ε : Fin n → Bool)
+    (s : Bool)
+    (ν : Measure (UJ ε)) [ν.IsHaarMeasure]
+    (f : UJ ε → E) (hf : AEStronglyMeasurable f ν)
+    (M : ℝ) (hM : ∀ g, hs (toM g) ≤ (n : ℝ) * Real.exp 2 + 1 → ‖f g‖ ≤ M)
+    (a : ℝ) (ha : ((2 * (n * Fintype.card (SgIxV ε s)) : ℕ) : ℝ) < a)
+    (hdec : ∀ g,
+      (n : ℝ) * Real.exp 2 + 1 < hs (toM g)
+        → ∃ t : ℝ, hs (toM g) ≤ n * Real.exp (2 * t) ∧ ‖f g‖ ≤ M * Real.exp (-(a * t)))
+    : Integrable f ν := by
   obtain ⟨C, hC0, hC⟩ := volGrowthVG ε s ν
   set N : ℕ := 2 * (n * Fintype.card (SgIxV ε s)) with hN
   have ha0 : 0 < a := lt_of_le_of_lt (Nat.cast_nonneg N) ha
@@ -168,11 +182,12 @@ theorem integrable_of_decayVG {E : Type*} [NormedAddCommGroup E] (ε : Fin n →
   have hpt : ∀ g, ‖f g‖ₑ ≤ F g := by
     intro g
     by_cases hg : g ∈ B0
-    · calc ‖f g‖ₑ ≤ ENNReal.ofReal M := by
-            rw [← ofReal_norm]
-            exact ENNReal.ofReal_le_ofReal (hM g hg)
+    · calc
+        ‖f g‖ₑ ≤ ENNReal.ofReal M := by
+          rw [← ofReal_norm]
+          exact ENNReal.ofReal_le_ofReal (hM g hg)
         _ = B0.indicator (fun _ => ENNReal.ofReal M) g :=
-            (Set.indicator_of_mem hg (fun _ => ENNReal.ofReal M)).symm
+          (Set.indicator_of_mem hg (fun _ => ENNReal.ofReal M)).symm
         _ ≤ F g := le_self_add
     · have hg' : (n : ℝ) * Real.exp 2 + 1 < hs (toM g) := not_le.1 hg
       obtain ⟨t, ht1, ht2⟩ := hdec g hg'
@@ -189,7 +204,8 @@ theorem integrable_of_decayVG {E : Type*} [NormedAddCommGroup E] (ε : Fin n →
         show hs (toM g) ≤ ((2 : ℝ) ^ (j + 1)) ^ 2
         have : ((2 : ℝ) ^ (j + 1)) ^ 2 = 4 ^ (j + 1) := by
           rw [← pow_mul, mul_comm, pow_mul]; norm_num
-        rw [this]; exact hj2.le
+        rw [this]
+        exact hj2.le
       have hlog : (j : ℝ) * Real.log 2 - Real.log n / 2 ≤ t := by
         have h4 : (4 : ℝ) ^ j ≤ n * Real.exp (2 * t) := hj1.trans ht1
         have h5 := Real.log_le_log (by positivity) h4
@@ -203,26 +219,29 @@ theorem integrable_of_decayVG {E : Type*} [NormedAddCommGroup E] (ε : Fin n →
         rw [← Real.exp_nat_mul, ← Real.exp_add, Real.exp_le_exp]
         nlinarith
       have hb : ‖f g‖ ≤ M * (A0 * y ^ j) := ht2.trans (mul_le_mul_of_nonneg_left hexp hM0)
-      calc ‖f g‖ₑ ≤ c j := by
-            rw [← ofReal_norm]
-            exact ENNReal.ofReal_le_ofReal hb
-        _ = (S (j + 1)).indicator (fun _ => c j) g := (Set.indicator_of_mem hmem (fun _ => c j)).symm
+      calc
+        ‖f g‖ₑ ≤ c j := by
+          rw [← ofReal_norm]
+          exact ENNReal.ofReal_le_ofReal hb
+        _ = (S (j + 1)).indicator (fun _ => c j) g :=
+          (Set.indicator_of_mem hmem (fun _ => c j)).symm
         _ ≤ ∑' j, (S (j + 1)).indicator (fun _ => c j) g :=
-            ENNReal.le_tsum (f := fun j => (S (j + 1)).indicator (fun _ => c j) g) j
+          ENNReal.le_tsum (f := fun j => (S (j + 1)).indicator (fun _ => c j) g) j
         _ ≤ F g := le_add_self
   have hterm : ∀ j, c j * ν (S (j + 1)) ≤ ENNReal.ofReal (M * A0 * C * 2 ^ N * r ^ j) := by
     intro j
     have h2 : (1 : ℝ) ≤ 2 ^ (j + 1) := one_le_pow₀ (by norm_num)
-    calc c j * ν (S (j + 1)) ≤ c j * ENNReal.ofReal (C * (2 ^ (j + 1)) ^ N) := by
-          gcongr
-          exact hC _ h2
+    calc
+      c j * ν (S (j + 1)) ≤ c j * ENNReal.ofReal (C * (2 ^ (j + 1)) ^ N) := by
+        gcongr
+        exact hC _ h2
       _ = ENNReal.ofReal (M * (A0 * y ^ j) * (C * (2 ^ (j + 1)) ^ N)) :=
-          (ENNReal.ofReal_mul (mul_nonneg hM0 (by positivity))).symm
+        (ENNReal.ofReal_mul (mul_nonneg hM0 (by positivity))).symm
       _ = ENNReal.ofReal (M * A0 * C * 2 ^ N * r ^ j) := by
-          congr 1
-          show M * (A0 * y ^ j) * (C * (2 ^ (j + 1)) ^ N) = M * A0 * C * 2 ^ N * (2 ^ N * y) ^ j
-          rw [mul_pow]
-          ring
+        congr 1
+        show M * (A0 * y ^ j) * (C * (2 ^ (j + 1)) ^ N) = M * A0 * C * 2 ^ N * (2 ^ N * y) ^ j
+        rw [mul_pow]
+        ring
   have hFint : ∫⁻ g, F g ∂ν < ⊤ := by
     have e1 : ∫⁻ g, F g ∂ν = ENNReal.ofReal M * ν B0 + ∑' j, c j * ν (S (j + 1)) := by
       show ∫⁻ g, (B0.indicator (fun _ => ENNReal.ofReal M) g +
@@ -235,18 +254,22 @@ theorem integrable_of_decayVG {E : Type*} [NormedAddCommGroup E] (ε : Fin n →
     refine ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top ENNReal.ofReal_lt_top (ballFiniteVG ε ν _), ?_⟩
     have hsum : Summable fun j : ℕ => M * A0 * C * 2 ^ N * r ^ j :=
       (summable_geometric_of_lt_one hr0 hr1).mul_left _
-    calc ∑' j, c j * ν (S (j + 1)) ≤ ∑' j, ENNReal.ofReal (M * A0 * C * 2 ^ N * r ^ j) :=
-          ENNReal.tsum_le_tsum hterm
+    calc
+      ∑' j, c j * ν (S (j + 1))
+        ≤ ∑' j, ENNReal.ofReal (M * A0 * C * 2 ^ N * r ^ j) := ENNReal.tsum_le_tsum hterm
       _ = ENNReal.ofReal (∑' j, M * A0 * C * 2 ^ N * r ^ j) :=
-          (ENNReal.ofReal_tsum_of_nonneg (fun j => by
+        (ENNReal.ofReal_tsum_of_nonneg
+          (fun j => by
             have := mul_nonneg hM0 (by positivity : (0 : ℝ) ≤ A0 * C * 2 ^ N * r ^ j)
-            simpa only [mul_assoc] using this) hsum).symm
+            simpa only [mul_assoc] using this)
+          hsum).symm
       _ < ⊤ := ENNReal.ofReal_lt_top
   exact ⟨hf, lt_of_le_of_lt (lintegral_mono hpt) hFint⟩
 
 section ExpB
 
-attribute [local instance] Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedRing Matrix.frobeniusNormedAlgebra
+attribute [local instance]
+  Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedRing Matrix.frobeniusNormedAlgebra
 
 lemma sqrt_hs_frobVG (A : Matrix (Fin n) (Fin n) ℂ) : Real.sqrt (hs A) = ‖A‖ := by
   rw [hs_eq_frobVG, Real.sqrt_sq (norm_nonneg _)]
@@ -279,16 +302,18 @@ lemma norm_exp_frobVG (X : Matrix (Fin n) (Fin n) ℂ) :
 
 end ExpB
 
-theorem hs_exp_leVG (X : Matrix (Fin n) (Fin n) ℂ) :
-    hs (NormedSpace.exp X) ≤ n * Real.exp (2 * Real.sqrt (hs X)) := by
+theorem hs_exp_leVG (X : Matrix (Fin n) (Fin n) ℂ)
+    : hs (NormedSpace.exp X) ≤ n * Real.exp (2 * Real.sqrt (hs X)) := by
   have h := norm_exp_frobVG X
   rw [← sqrt_hs_frobVG, ← sqrt_hs_frobVG] at h
   have h0 : 0 ≤ hs (NormedSpace.exp X) := hs_nonnegVG _
-  calc hs (NormedSpace.exp X) = Real.sqrt (hs (NormedSpace.exp X)) ^ 2 := (Real.sq_sqrt h0).symm
+  calc
+    hs (NormedSpace.exp X)
+      = Real.sqrt (hs (NormedSpace.exp X)) ^ 2 := (Real.sq_sqrt h0).symm
     _ ≤ (Real.sqrt n * Real.exp (Real.sqrt (hs X))) ^ 2 := pow_le_pow_left₀ (Real.sqrt_nonneg _) h 2
     _ = _ := by
-        rw [mul_pow, Real.sq_sqrt (Nat.cast_nonneg n), ← Real.exp_nat_mul]
-        norm_num
+      rw [mul_pow, Real.sq_sqrt (Nat.cast_nonneg n), ← Real.exp_nat_mul]
+      norm_num
 
 lemma hs_eq_traceVG (A : Matrix (Fin n) (Fin n) ℂ) : ((Aᴴ * A).trace).re = hs A := by
   have key : ∀ z : ℂ, (star z * z).re = ‖z‖ ^ 2 := fun z => by
@@ -299,7 +324,8 @@ lemma hs_eq_traceVG (A : Matrix (Fin n) (Fin n) ℂ) : ((Aᴴ * A).trace).re = h
     key]
   exact Finset.sum_comm
 
-theorem hs_kmulVG {ε : Fin n → Bool} (k : KG ε) (A : Matrix (Fin n) (Fin n) ℂ) : hs (toMK k * A) = hs A := by
+theorem hs_kmulVG {ε : Fin n → Bool} (k : KG ε) (A : Matrix (Fin n) (Fin n) ℂ)
+    : hs (toMK k * A) = hs A := by
   have hk : (toMK k)ᴴ * toMK k = 1 := Matrix.mem_unitaryGroup_iff'.mp (k.2 : toMK k ∈ Kset ε).1
   rw [← hs_eq_traceVG, ← hs_eq_traceVG, Matrix.conjTranspose_mul, Matrix.mul_assoc,
     ← Matrix.mul_assoc (toMK k)ᴴ, hk, Matrix.one_mul]

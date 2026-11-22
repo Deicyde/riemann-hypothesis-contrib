@@ -9,10 +9,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-private theorem topNil_map_mem {R M M' κ : Type} [CommRing R] [AddCommGroup M] [Module R M]
-    [AddCommGroup M'] [Module R M'] (I : Ideal R) (T : κ → Module.End R M)
-    (T' : κ → Module.End R M') (f : M →ₗ[R] M') (hf : ∀ i x, f (T i x) = T' i (f x))
-    {x : M} (hx : x ∈ topNil I T) : f x ∈ topNil I T' := by
+private theorem topNil_map_mem
+    {R M M' κ : Type} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup M'] [Module R M']
+    (I : Ideal R)
+    (T : κ → Module.End R M) (T' : κ → Module.End R M') (f : M →ₗ[R] M')
+    (hf : ∀ i x, f (T i x) = T' i (f x))
+    {x : M} (hx : x ∈ topNil I T)
+    : f x ∈ topNil I T' := by
   change ∀ i (j : ℕ), ∀ᶠ r : ℕ in atTop, (T i ^ r) x ∈ (I ^ j • ⊤ : Submodule R M) at hx
   change ∀ i (j : ℕ), ∀ᶠ r : ℕ in atTop, (T' i ^ r) (f x) ∈ (I ^ j • ⊤ : Submodule R M')
   intro i j
@@ -28,11 +31,20 @@ private theorem topNil_map_mem {R M M' κ : Type} [CommRing R] [AddCommGroup M] 
   rw [← hpow]
   exact hle ⟨_, hr, rfl⟩
 
-theorem UpperTheory.V.AlgebraTools.topNil_map :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsAdicComplete (IsLocalRing.maximalIdeal R) R] (κ : Type) (M : Type) [AddCommGroup M] [Module R M] (M' : Type) [AddCommGroup M'] [Module R M'] [Module.Finite R M] [Module.Finite R M'] (T : κ → Module.End R M) (T' : κ → Module.End R M'),
-      (∀ i j, Commute (T i) (T j)) → (∀ i j, Commute (T' i) (T' j)) → ∀ f : M →ₗ[R] M', (∀ i x, f (T i x) = T' i (f x)) →
-      (topNil (IsLocalRing.maximalIdeal R) T).map f = topNil (IsLocalRing.maximalIdeal R) T' ⊓ LinearMap.range f ∧
-      ∀ I : Ideal R, LinearMap.ker f = I • ⊤ → LinearMap.ker f ⊓ topNil (IsLocalRing.maximalIdeal R) T = I • topNil (IsLocalRing.maximalIdeal R) T := by
+theorem UpperTheory.V.AlgebraTools.topNil_map
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+        [IsAdicComplete (IsLocalRing.maximalIdeal R) R] (κ : Type) (M : Type) [AddCommGroup M]
+        [Module R M] (M' : Type) [AddCommGroup M'] [Module R M'] [Module.Finite R M]
+        [Module.Finite R M'] (T : κ → Module.End R M) (T' : κ → Module.End R M'),
+      (∀ i j, Commute (T i) (T j)) → (∀ i j, Commute (T' i) (T' j))
+        → ∀ f : M →ₗ[R] M',
+          (∀ i x, f (T i x) = T' i (f x))
+            → (topNil (IsLocalRing.maximalIdeal R) T).map f
+                = topNil (IsLocalRing.maximalIdeal R) T' ⊓ LinearMap.range f
+              ∧ ∀ I : Ideal R,
+                LinearMap.ker f = I • ⊤
+                  → LinearMap.ker f ⊓ topNil (IsLocalRing.maximalIdeal R) T
+                    = I • topNil (IsLocalRing.maximalIdeal R) T := by
   intro R _ _ _ _ κ M _ _ M' _ _ _ _ T T' hT hT' f hf
   have hsmul := (topNil_free R κ M T hT).2.1
   refine ⟨le_antisymm ?_ ?_, fun I hI => by rw [hI]; exact hsmul I⟩

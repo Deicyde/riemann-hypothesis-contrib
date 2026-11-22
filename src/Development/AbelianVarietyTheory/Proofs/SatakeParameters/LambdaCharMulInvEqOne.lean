@@ -5,7 +5,8 @@ public import Formalism.LocalToGlobal.Columns.FiniteSumNonzeroLargeDepth
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col
 
 namespace GlobalTheory
 
@@ -48,16 +49,15 @@ noncomputable def redHom : intRing P →+* 𝓞 E ⧸ P.asIdeal where
   map_zero' := reduction_zero P
   map_add' a b := reduction_add a.2 b.2
 
-theorem reduction_sum₂ {ι : Type*} (s : Finset ι) (f : ι → E) (hf : ∀ i, IntAt P (f i)) :
-    redP P (∑ i ∈ s, f i) = ∑ i ∈ s, redP P (f i) := by
+theorem reduction_sum₂ {ι : Type*} (s : Finset ι) (f : ι → E) (hf : ∀ i, IntAt P (f i))
+    : redP P (∑ i ∈ s, f i) = ∑ i ∈ s, redP P (f i) := by
   have h := map_sum (redHom P) (fun i => (⟨f i, hf i⟩ : intRing P)) s
-  have h2 : ((∑ i ∈ s, (⟨f i, hf i⟩ : intRing P) : intRing P) : E) = ∑ i ∈ s, f i := by
-    simp
+  have h2 : ((∑ i ∈ s, (⟨f i, hf i⟩ : intRing P) : intRing P) : E) = ∑ i ∈ s, f i := by simp
   rw [← h2]
   exact h
 
-theorem reduction_det {t : ℕ} (A : Matrix (Fin t) (Fin t) E) (hA : ∀ i j, IntAt P (A i j)) :
-    redP P A.det = (Matrix.of fun i j => redP P (A i j)).det := by
+theorem reduction_det {t : ℕ} (A : Matrix (Fin t) (Fin t) E) (hA : ∀ i j, IntAt P (A i j))
+    : redP P A.det = (Matrix.of fun i j => redP P (A i j)).det := by
   let B : Matrix (Fin t) (Fin t) (intRing P) := Matrix.of fun i j => ⟨A i j, hA i j⟩
   have h1 : (B.det : E) = A.det := by
     have := (intRing P).subtype.map_det B
@@ -66,26 +66,22 @@ theorem reduction_det {t : ℕ} (A : Matrix (Fin t) (Fin t) E) (hA : ∀ i j, In
   rw [← h1]
   exact h2
 
-
 end Red
 
 section Ent
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)) (q : ℕ)
 
-theorem mem_sclLat (N : ℕ) (e : ℕ → ℤ) (v : Sp E N) :
-    v ∈ sclLat P q N e ↔ ∀ l : Fin N, IntAt P (((q : E) ^ e l.1)⁻¹ * v l) := by
+theorem mem_sclLat (N : ℕ) (e : ℕ → ℤ) (v : Sp E N)
+    : v ∈ sclLat P q N e ↔ ∀ l : Fin N, IntAt P (((q : E) ^ e l.1)⁻¹ * v l) := by
   unfold sclLat stdAt
   rw [Submodule.mem_comap, mem_localization_standardLattice]
   simp
-
-
 
 variable {P q} {k₀ r t n : ℕ} {g : Sp E (n + 0) ≃ₗ[E] Sp E (n + 0)}
 
 end Ent
 
 end RowTypeInv
-
 
 end GlobalTheory

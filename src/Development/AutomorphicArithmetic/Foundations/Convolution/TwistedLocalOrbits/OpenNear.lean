@@ -4,21 +4,25 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
 
 section SlopeTestRemainingChoices
 
 variable {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
 
-private theorem lim_ex (a : ℕ → E) (s : ℕ → ValueGroupWithZero E) (hs : ∀ m, s (m + 1) ≤ s m)
-    (ha : ∀ m, valuation E (a (m + 1) - a m) ≤ s m) : ∃ L, ∀ m, valuation E (L - a m) ≤ s m := by
+private theorem lim_ex
+    (a : ℕ → E) (s : ℕ → ValueGroupWithZero E)
+    (hs : ∀ m, s (m + 1) ≤ s m) (ha : ∀ m, valuation E (a (m + 1) - a m) ≤ s m)
+    : ∃ L, ∀ m, valuation E (L - a m) ≤ s m := by
   have hT : T2Space E := by
     let := IsTopologicalAddGroup.rightUniformSpace E
     have := isUniformAddGroup_of_addCommGroup (G := E)
     infer_instance
   let S : ℕ → Set E := fun m => {y | valuation E (y - a m) ≤ s m}
   have hc : ∀ m, IsCompact (S m) := fun m => by
-    have h := (IsNonarchimedeanLocalField.isCompact_closedBall E (s m)).image (continuous_add_const (a m))
+    have h :=
+      (IsNonarchimedeanLocalField.isCompact_closedBall E (s m)).image (continuous_add_const (a m))
     convert h using 1
     ext y
     constructor
@@ -31,14 +35,18 @@ private theorem lim_ex (a : ℕ → E) (s : ℕ → ValueGroupWithZero E) (hs : 
     show valuation E (y - a m) ≤ s m
     rw [this]
     exact Valuation.map_add_le _ (le_trans hy (hs m)) (ha m)
-  obtain ⟨L, hL⟩ := (hc 0).nonempty_iInter_of_sequence_nonempty_isCompact_isClosed S hn
-    (fun m => ⟨a m, by simp [S]⟩) (fun m => (hc m).isClosed)
+  obtain ⟨L, hL⟩ :=
+    (hc 0).nonempty_iInter_of_sequence_nonempty_isCompact_isClosed S hn
+      (fun m => ⟨a m, by simp [S]⟩)
+      (fun m => (hc m).isClosed)
   exact ⟨L, fun m => Set.mem_iInter.mp hL m⟩
 
-private theorem eq_zero_of_le_pow {x c R : ValueGroupWithZero E} (hc : c < 1) (h : ∀ m : ℕ, x ≤ c ^ m * R) :
-    x = 0 := by
+private theorem eq_zero_of_le_pow
+    {x c R : ValueGroupWithZero E} (hc : c < 1) (h : ∀ m : ℕ, x ≤ c ^ m * R)
+    : x = 0 := by
   by_contra hx
-  have hA : MulArchimedean (ValueGroupWithZero E) := ValuativeRel.isRankLeOne_iff_mulArchimedean.mp inferInstance
+  have hA : MulArchimedean (ValueGroupWithZero E) :=
+    ValuativeRel.isRankLeOne_iff_mulArchimedean.mp inferInstance
   have hR : R ≠ 0 := by
     rintro rfl
     exact hx (by simpa using h 0)
@@ -47,11 +55,15 @@ private theorem eq_zero_of_le_pow {x c R : ValueGroupWithZero E} (hc : c < 1) (h
   rw [Units.val_mk0, lt_div_iff₀ (zero_lt_iff.mpr hR)] at hm
   exact absurd this (not_le.mpr hm)
 
-private theorem fix_ex {ι κ : Type} (f : Matrix ι κ E → Matrix ι κ E) (c R : ValueGroupWithZero E) (hc : c < 1)
-    (hm : ∀ x, (∀ i j, valuation E (x i j) ≤ R) → ∀ i j, valuation E (f x i j) ≤ R)
-    (hl : ∀ x y s, (∀ i j, valuation E (x i j) ≤ R) → (∀ i j, valuation E (y i j) ≤ R) →
-      (∀ i j, valuation E ((x - y) i j) ≤ s) → ∀ i j, valuation E ((f x - f y) i j) ≤ c * s) :
-    ∃ x, (∀ i j, valuation E (x i j) ≤ R) ∧ f x = x := by
+private theorem fix_ex
+    {ι κ : Type} (f : Matrix ι κ E → Matrix ι κ E)
+    (c R : ValueGroupWithZero E)
+    (hc : c < 1) (hm : ∀ x, (∀ i j, valuation E (x i j) ≤ R) → ∀ i j, valuation E (f x i j) ≤ R)
+    (hl : ∀ x y s,
+      (∀ i j, valuation E (x i j) ≤ R) → (∀ i j, valuation E (y i j) ≤ R)
+        → (∀ i j, valuation E ((x - y) i j) ≤ s)
+        → ∀ i j, valuation E ((f x - f y) i j) ≤ c * s)
+    : ∃ x, (∀ i j, valuation E (x i j) ≤ R) ∧ f x = x := by
   let a : ℕ → Matrix ι κ E := fun m => f^[m] 0
   have hs : ∀ m, a (m + 1) = f (a m) := fun m => Function.iterate_succ_apply' _ _ _
   have h0 : a 0 = 0 := rfl
@@ -81,19 +93,21 @@ private theorem fix_ex {ι κ : Type} (f : Matrix ι κ E → Matrix ι κ E) (c
   have h1 := hl (Matrix.of L) (a m) _ hLR (hb m) (fun i j => hL i j m) i j
   rw [← hs, ← mul_assoc, ← pow_succ'] at h1
   have h2 := hL i j (m + 1)
-  have : f (Matrix.of L) i j - Matrix.of L i j = (f (Matrix.of L) - a (m + 1)) i j - (L i j - a (m + 1) i j) := by
+  have : f (Matrix.of L) i j - Matrix.of L i j
+      = (f (Matrix.of L) - a (m + 1)) i j - (L i j - a (m + 1) i j) := by
     simp
   rw [this]
   exact (Valuation.map_sub_le _ h1 h2).trans (hdec m)
 
 omit [TopologicalSpace E] [IsNonarchimedeanLocalField E] in
-private theorem lin_ex (σ : E ≃+* E) (q : ℕ) (hi : ∀ x, valuation E (σ x) = valuation E x)
-    (ho : ∀ x, σ^[q] x = x) (hq : (q : E) ≠ 0) :
-    ∃ t p : E →+ E, (∀ x, σ (t x) = t x) ∧ (∀ x, t x + σ (p x) - p x = x) ∧
-      (∀ x, valuation E (t x) ≤ valuation E x / valuation E (q : E)) ∧
-      (∀ x, valuation E (p x) ≤ valuation E x / valuation E (q : E)) := by
-  have hp : ∀ (j : ℕ) x, (σ ^ j) x = σ^[j] x := fun j x => by
-    rw [RingAut.coe_pow]
+private theorem lin_ex
+    (σ : E ≃+* E) (q : ℕ)
+    (hi : ∀ x, valuation E (σ x) = valuation E x) (ho : ∀ x, σ^[q] x = x) (hq : (q : E) ≠ 0)
+    : ∃ t p : E →+ E,
+      (∀ x, σ (t x) = t x) ∧ (∀ x, t x + σ (p x) - p x = x)
+        ∧ (∀ x, valuation E (t x) ≤ valuation E x / valuation E (q : E))
+        ∧ (∀ x, valuation E (p x) ≤ valuation E x / valuation E (q : E)) := by
+  have hp : ∀ (j : ℕ) x, (σ ^ j) x = σ^[j] x := fun j x => by rw [RingAut.coe_pow]
   have hiv : ∀ (j : ℕ) x, valuation E (σ^[j] x) = valuation E x := fun j x => by
     induction j with
     | zero => rfl
@@ -104,8 +118,14 @@ private theorem lin_ex (σ : E ≃+* E) (q : ℕ) (hi : ∀ x, valuation E (σ x
     induction j with
     | zero => simp
     | succ j ih => rw [Nat.cast_succ]; exact Valuation.map_add_le _ ih (by simp)
-  refine ⟨AddMonoidHom.mk' (fun x => (∑ j ∈ Finset.range q, σ^[j] x) / q) ?_,
-    AddMonoidHom.mk' (fun x => (∑ j ∈ Finset.range q, (j : E) * σ^[j] x) / q) ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    AddMonoidHom.mk' (fun x => (∑ j ∈ Finset.range q, σ^[j] x) / q) ?_,
+    AddMonoidHom.mk' (fun x => (∑ j ∈ Finset.range q, (j : E) * σ^[j] x) / q) ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro x y
     simp only [hadd, Finset.sum_add_distrib, add_div]
   · intro x y
@@ -125,8 +145,9 @@ private theorem lin_ex (σ : E ≃+* E) (q : ℕ) (hi : ∀ x, valuation E (σ x
     have h2 := Finset.sum_range_succ' (fun j => (j : E) * σ^[j] x) q
     have h3 := Finset.sum_range_succ (fun j => σ^[j] x) q
     have h4 := Finset.sum_range_succ' (fun j => σ^[j] x) q
-    simp only [Function.iterate_succ_apply', Function.iterate_zero, id, ho, Nat.cast_succ, add_mul, one_mul,
-      Finset.sum_add_distrib, Nat.cast_zero, zero_mul, add_zero] at h1 h2 h3 h4
+    simp only [Function.iterate_succ_apply', Function.iterate_zero, id, ho, Nat.cast_succ, add_mul,
+        one_mul, Finset.sum_add_distrib, Nat.cast_zero, zero_mul, add_zero]
+      at h1 h2 h3 h4
     field_simp
     linear_combination h1 - h2 - h3 + h4
   · intro x
@@ -167,19 +188,24 @@ private theorem Bd.mul (h : Bd s M) (h' : Bd s' N) : Bd (s * s') (M * N) := fun 
   rw [map_mul]
   exact mul_le_mul' (h i k) (h' k j)
 
-private theorem Bd.mul' (h : Bd s M) (h' : Bd s' N) : Bd (s' * s) (M * N) := mul_comm s s' ▸ h.mul h'
+private theorem Bd.mul' (h : Bd s M) (h' : Bd s' N) : Bd (s' * s) (M * N) :=
+  mul_comm s s' ▸ h.mul h'
 
 private theorem Bd.mul_one_left (h : Bd 1 M) (h' : Bd s N) : Bd s (M * N) := one_mul s ▸ h.mul h'
 
-private theorem Bd.isUnit [TopologicalSpace E] [IsNonarchimedeanLocalField E] (h : Bd s M) (hs : s < 1) :
-    IsUnit (1 + M) := by
-  obtain ⟨N, -, hN⟩ := fix_ex (fun N => -M - M * N) s s hs
-    (fun x hx => h.neg.sub ((h.mono hs.le).mul_one_left hx))
-    (fun x y s' _ _ hd => by
-      have : (-M - M * x) - (-M - M * y) = -(M * (x - y)) := by noncomm_ring
-      show Bd _ ((-M - M * x) - (-M - M * y))
-      rw [this]
-      exact (h.mul hd).neg)
+private theorem Bd.isUnit
+    [TopologicalSpace E] [IsNonarchimedeanLocalField E] (h : Bd s M) (hs : s < 1)
+    : IsUnit (1 + M) := by
+  obtain ⟨N, -, hN⟩ :=
+    fix_ex
+      (fun N => -M - M * N)
+      s s hs
+      (fun x hx => h.neg.sub ((h.mono hs.le).mul_one_left hx))
+      (fun x y s' _ _ hd => by
+        have : (-M - M * x) - (-M - M * y) = -(M * (x - y)) := by noncomm_ring
+        show Bd _ ((-M - M * x) - (-M - M * y))
+        rw [this]
+        exact (h.mul hd).neg)
   have : (1 + M) * (1 + N) = 1 := by
     have : (1 + M) * (1 + N) = 1 + (N - (-M - M * N)) := by noncomm_ring
     rw [this, hN, sub_self, add_zero]
@@ -187,10 +213,16 @@ private theorem Bd.isUnit [TopologicalSpace E] [IsNonarchimedeanLocalField E] (h
 
 end Bd
 
-theorem UpperTheory.ConvolutionTheory.Loc.openNear :
-    ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] (n : ℕ) (σ : E ≃+* E) (q : ℕ), Cyc σ q → ∀ r ρ : ValueGroupWithZero E, r < valuation E (q : E) → ρ ≤ r →
-      ∀ u₀ ∈ ball n r, sg σ u₀ = u₀ → ∀ g ∈ ball n (ρ * valuation E (q : E)),
-        ∃ k ∈ ball n ρ, ∃ u ∈ ball n ρ, sg σ u = u ∧ u₀ * g = k⁻¹ * (u₀ * u) * sg σ k := by
+theorem UpperTheory.ConvolutionTheory.Loc.openNear
+    : ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
+        (n : ℕ) (σ : E ≃+* E) (q : ℕ),
+      Cyc σ q
+        → ∀ r ρ : ValueGroupWithZero E,
+          r < valuation E (q : E) → ρ ≤ r
+            → ∀ u₀ ∈ ball n r,
+              sg σ u₀ = u₀
+                → ∀ g ∈ ball n (ρ * valuation E (q : E)), ∃ k ∈ ball n ρ, ∃ u ∈ ball n ρ,
+                  sg σ u = u ∧ u₀ * g = k⁻¹ * (u₀ * u) * sg σ k := by
   intro E _ _ _ _ n σ q hC r ρ hr hρ u₀ hu₀ _ g hg
   have hw0 : valuation E (q : E) ≠ 0 := (lt_of_le_of_lt zero_le hr).ne'
   have hq : (q : E) ≠ 0 := by simpa using hw0
@@ -226,44 +258,60 @@ theorem UpperTheory.ConvolutionTheory.Loc.openNear :
   have sU : ∀ Y Z, U (Y - Z) = U Y - U Z := fun Y Z => by ext i j; simp [U]
   have sK : ∀ Y Z, K (Y - Z) = K Y - K Z := fun Y Z => by ext i j; simp [K]
   have sS : ∀ Y Z, S (Y - Z) = S Y - S Z := fun Y Z => by ext i j; simp [S]
-  obtain ⟨Y, bY, hY⟩ := fix_ex
-    (fun Y => X + A * X + K Y * (A + X + A * X) - U Y * S Y - A * U Y - A * S Y - A * (U Y * S Y))
-    (r / w) (ρ * w) ((div_lt_one₀ (zero_lt_iff.mpr hw0)).mpr hr)
-    (fun Y hY => by
-      have hUS : Bd (ρ * w) (U Y * S Y) := (((bU' hY).mono hρ).mul (bS' hY)).mono hrρ
-      exact (((((bX.add (bA1.mul_one_left bX)).add (((bK' hY).mul' bB).mono hrρ)).sub hUS).sub
-        ((bA.mul (bU' hY)).mono hrρ)).sub ((bA.mul (bS' hY)).mono hrρ)).sub (bA1.mul_one_left hUS))
-    (fun Y Z s hY hZ hd => by
-      have e : r / w * s = r * (s / w) := by rw [div_mul_eq_mul_div, mul_div_assoc]
-      have hUS : Bd (r * (s / w)) (U (Y - Z) * S Y + U Z * S (Y - Z)) :=
-        ((bU hd).mul' ((bS' hY).mono hρ)).add (((bU' hZ).mono hρ).mul (bS hd))
-      have : (X + A * X + K Y * (A + X + A * X) - U Y * S Y - A * U Y - A * S Y - A * (U Y * S Y)) -
-          (X + A * X + K Z * (A + X + A * X) - U Z * S Z - A * U Z - A * S Z - A * (U Z * S Z)) =
-          K (Y - Z) * (A + X + A * X) - (U (Y - Z) * S Y + U Z * S (Y - Z)) - A * U (Y - Z) - A * S (Y - Z) -
-            A * (U (Y - Z) * S Y + U Z * S (Y - Z)) := by
-        rw [sU, sK, sS]; noncomm_ring
-      show Bd _ ((X + A * X + K Y * (A + X + A * X) - U Y * S Y - A * U Y - A * S Y - A * (U Y * S Y)) -
-          (X + A * X + K Z * (A + X + A * X) - U Z * S Z - A * U Z - A * S Z - A * (U Z * S Z)))
-      rw [this, e]
-      exact (((((bK hd).mul' bB).sub hUS).sub (bA.mul (bU hd))).sub (bA.mul (bS hd))).sub
-        (bA1.mul_one_left hUS))
+  obtain ⟨Y, bY, hY⟩ :=
+    fix_ex
+      (fun Y => X + A * X + K Y * (A + X + A * X) - U Y * S Y - A * U Y - A * S Y - A * (U Y * S Y))
+      (r / w) (ρ * w) ((div_lt_one₀ (zero_lt_iff.mpr hw0)).mpr hr)
+      (fun Y hY => by
+        have hUS : Bd (ρ * w) (U Y * S Y) := (((bU' hY).mono hρ).mul (bS' hY)).mono hrρ
+        exact (((((bX.add (bA1.mul_one_left bX)).add (((bK' hY).mul' bB).mono hrρ)).sub hUS).sub
+            ((bA.mul (bU' hY)).mono hrρ)).sub ((bA.mul (bS' hY)).mono hrρ)).sub
+          (bA1.mul_one_left hUS))
+      (fun Y Z s hY hZ hd => by
+        have e : r / w * s = r * (s / w) := by rw [div_mul_eq_mul_div, mul_div_assoc]
+        have hUS : Bd (r * (s / w)) (U (Y - Z) * S Y + U Z * S (Y - Z)) :=
+          ((bU hd).mul' ((bS' hY).mono hρ)).add (((bU' hZ).mono hρ).mul (bS hd))
+        have : (X + A * X + K Y * (A + X + A * X) - U Y * S Y - A * U Y - A * S Y - A * (U Y * S Y))
+              - (X + A * X + K Z * (A + X + A * X) - U Z * S Z - A * U Z - A * S Z
+                - A * (U Z * S Z))
+            = K (Y - Z) * (A + X + A * X) - (U (Y - Z) * S Y + U Z * S (Y - Z)) - A * U (Y - Z)
+              - A * S (Y - Z) - A * (U (Y - Z) * S Y + U Z * S (Y - Z)) := by
+          rw [sU, sK, sS]; noncomm_ring
+        show Bd _ ((X + A * X + K Y * (A + X + A * X) - U Y * S Y - A * U Y - A * S Y - A * (U Y * S Y)) -
+            (X + A * X + K Z * (A + X + A * X) - U Z * S Z - A * U Z - A * S Z - A * (U Z * S Z)))
+        rw [this, e]
+        exact (((((bK hd).mul' bB).sub hUS).sub (bA.mul (bU hd))).sub (bA.mul (bS hd))).sub
+          (bA1.mul_one_left hUS))
   have hlin : U Y + S Y - K Y = Y := by ext i j; simpa [U, S, K] using htp (Y i j)
   have hρ1 : ρ < 1 := hρ.trans_lt hr1
   obtain ⟨k, hk⟩ := (bK' bY).isUnit hρ1
   obtain ⟨u, hu⟩ := (bU' bY).isUnit hρ1
-  have hsg : ∀ x : GL (Fin n) E, ((sg σ x : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) =
-      (x : Matrix (Fin n) (Fin n) E).map σ := fun x => rfl
+  have hsg
+      : ∀ x : GL (Fin n) E,
+        ((sg σ x : GL (Fin n) E) : Matrix (Fin n) (Fin n) E)
+          = (x : Matrix (Fin n) (Fin n) E).map σ := fun x =>
+    rfl
   have hsk : ((sg σ k : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) = 1 + S Y := by
     rw [hsg, hk]; ext i j; simp [S, K, Matrix.one_apply, apply_ite σ]
-  refine ⟨k, fun i j => by simpa [hk] using bK' bY i j, u, fun i j => by simpa [hu] using bU' bY i j, ?_, ?_⟩
+  refine ⟨
+    k,
+    fun i j => by simpa [hk] using bK' bY i j,
+    u,
+    fun i j => by simpa [hu] using bU' bY i j,
+    ?_,
+    ?_
+  ⟩
   · apply Units.ext
-    rw [hsg, hu]; ext i j; simp [U, ht, Matrix.one_apply, apply_ite σ]
+    rw [hsg, hu]
+    ext i j
+    simp [U, ht, Matrix.one_apply, apply_ite σ]
   · rw [mul_assoc, eq_inv_mul_iff_mul_eq]
     apply Units.ext
     simp only [Units.val_mul, hsk, hk, hu, hA, hX]
     rw [← sub_eq_zero]
-    have : (1 + K Y) * ((1 + A) * (1 + X)) - (1 + A) * (1 + U Y) * (1 + S Y) =
-        (X + A * X + K Y * (A + X + A * X) - U Y * S Y - A * U Y - A * S Y - A * (U Y * S Y)) -
-          (U Y + S Y - K Y) := by noncomm_ring
+    have : (1 + K Y) * ((1 + A) * (1 + X)) - (1 + A) * (1 + U Y) * (1 + S Y)
+        = (X + A * X + K Y * (A + X + A * X) - U Y * S Y - A * U Y - A * S Y - A * (U Y * S Y))
+          - (U Y + S Y - K Y) := by
+      noncomm_ring
     rw [this, hlin]
     exact sub_eq_zero.mpr hY

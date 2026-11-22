@@ -18,8 +18,7 @@ section General
 
 variable {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem continuous_partialProd (n : ℕ) :
-    Continuous fun g : Fin n → G => Fin.partialProd g := by
+theorem continuous_partialProd (n : ℕ) : Continuous fun g : Fin n → G => Fin.partialProd g := by
   refine continuous_pi fun i => ?_
   induction i using Fin.induction with
   | zero => simpa using continuous_const
@@ -29,9 +28,12 @@ theorem continuous_partialProd (n : ℕ) :
 
 variable {k : Type u} [CommRing k]
 
-theorem isLocallyConstant_ρ_apply {Y : Type*} [TopologicalSpace Y] (A : Rep.{u} k G)
-    [IsDiscreteRep A] {p : Y → G} (hp : Continuous p) {ψ : Y → A} (hψ : IsLocallyConstant ψ) :
-    IsLocallyConstant fun y => A.ρ (p y) (ψ y) := by
+theorem isLocallyConstant_ρ_apply
+    {Y : Type*} [TopologicalSpace Y]
+    (A : Rep.{u} k G) [IsDiscreteRep A]
+    {p : Y → G} (hp : Continuous p)
+    {ψ : Y → A} (hψ : IsLocallyConstant ψ)
+    : IsLocallyConstant fun y => A.ρ (p y) (ψ y) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro y
   have h1 : ∀ᶠ z in nhds y, ψ z = ψ y := hψ.eventually_eq y
@@ -42,7 +44,8 @@ theorem isLocallyConstant_ρ_apply {Y : Type*} [TopologicalSpace Y] (A : Rep.{u}
 
 end General
 
-variable {k G : Type u} [CommRing k] [TopologicalSpace k] [Group G] [TopologicalSpace G]
+variable
+  {k G : Type u} [CommRing k] [TopologicalSpace k] [Group G] [TopologicalSpace G]
   [IsTopologicalGroup G] [LocallyCompactSpace G]
 
 section Invariant
@@ -52,11 +55,6 @@ variable (X : TopRep.{u} k G)
 end Invariant
 
 variable (X : TopRep.{u} k G) [DiscreteTopology X] [IsDiscreteRep (underlyingRep X)]
-
-
-
-
-
 
 section Discrete
 

@@ -39,8 +39,7 @@ variable {S} {r : ℕ} {T : E}
 
 def FlagG.fvec (F : FlagG S r T) : Fin (r + 1) → S.V := Fin.snoc (α := fun _ => S.V) F.e F.z
 
-def FlagG.Xa (F : FlagG S r T) (a : ℕ) : Submodule E S.V :=
-  Submodule.span E (F.e '' {i | i.1 < a})
+def FlagG.Xa (F : FlagG S r T) (a : ℕ) : Submodule E S.V := Submodule.span E (F.e '' {i | i.1 < a})
 
 def FlagG.X (F : FlagG S r T) : Submodule E S.V := Submodule.span E (Set.range F.e)
 
@@ -80,8 +79,8 @@ def FlagG.ell (F : FlagG S r T) (Y : S.V →ₗ[E] S.V) : E :=
 def FlagG.dpsi (K : Type) [Field K] [Algebra K E] (F : FlagG S r T) (Y : S.V →ₗ[E] S.V) : K :=
   Algebra.trace K E (F.ell Y)
 
-def Relevant (K : Type) [Field K] [Algebra K E] {T' : E} (F : FlagG S r T) (F' : FlagG S r T') :
-    Prop :=
+def Relevant (K : Type) [Field K] [Algebra K E] {T' : E} (F : FlagG S r T) (F' : FlagG S r T')
+    : Prop :=
   ∀ Y ∈ F.LieN ∩ F'.LieN, F.dpsi K Y = F'.dpsi K Y
 
 def xv (S : HSpace E) (x v : S.V) : S.V →ₗ[E] S.V where
@@ -96,11 +95,10 @@ def blockEnds {T' : E} (F : FlagG S r T) (F' : FlagG S r T') (j : ℕ) : Finset 
 def frameExp (r l : ℕ) : ℕ := ∑ a ∈ Finset.Icc 1 l, (r + 1 - a)
 
 def Nloc (dd : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (r l : ℕ) (x : E) : ℚ :=
-  FractionalIdeal.absNorm (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 E)) x *
-    dd ^ (-(2 * (frameExp r l : ℤ))))
+  FractionalIdeal.absNorm
+    (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 E)) x * dd ^ (-(2 * (frameExp r l : ℤ))))
 
-def absReal (rd : ℝ) (τ : E →+* ℂ) (r l : ℕ) (x : E) : ℝ :=
-  ‖τ x‖ * rd ^ (-(2 * (frameExp r l : ℝ)))
+def absReal (rd : ℝ) (τ : E →+* ℂ) (r l : ℕ) (x : E) : ℝ := ‖τ x‖ * rd ^ (-(2 * (frameExp r l : ℝ)))
 
 end Generic
 
@@ -108,21 +106,21 @@ section D7
 
 variable (D : D7)
 
-@[reducible] def starE : StarRing D.host.E := D.host.cmStar
+@[reducible]
+def starE : StarRing D.host.E := D.host.cmStar
 
 attribute [local instance] starE
 
 abbrev VS : HSpace D.host.E := D.sp.Y 0
 
-abbrev FlagS (u : D.what₂.Word) : Type :=
-  FlagG (VS D) D.R.rS ((((D.mem u).A.T : ℕ) : D.host.E))
+abbrev FlagS (u : D.what₂.Word) : Type := FlagG (VS D) D.R.rS ((((D.mem u).A.T : ℕ) : D.host.E))
 
 def ddS : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E :=
-  ((Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (differentIdeal ℤ (𝓞 D.host.F)) :
-    Ideal (𝓞 D.host.E)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
+  ((Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) (differentIdeal ℤ (𝓞 D.host.F))
+      : Ideal (𝓞 D.host.E))
+    : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
 
-def embS (τ : D.what₂.Tau) : D.host.E →+* ℂ :=
-  D.host.emb ((D.eTau τ : D.R.Psi) : D.R.GG)
+def embS (τ : D.what₂.Tau) : D.host.E →+* ℂ := D.host.emb ((D.eTau τ : D.R.Psi) : D.R.GG)
 
 end D7
 

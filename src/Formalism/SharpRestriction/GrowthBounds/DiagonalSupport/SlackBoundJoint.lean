@@ -10,15 +10,17 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.Proposition5Numerics
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
 open Formalism.MainNotions.G.WittFrameLocaliserOrders Formalism.MainNotions.G.symbolGeneratorData
 
 section Geo
 
 variable {n' r : ℕ} [NeZero n'] {Fr : Frames n' r} {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ}
 
-theorem LL_sub_letters (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j y : ℤ) (hy : y ∈ Fr.LLset j) :
-    y ∈ Fr.letters j ∧ ¬ Fr.IsW j y := by
+theorem LL_sub_letters (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j y : ℤ) (hy : y ∈ Fr.LLset j)
+    : y ∈ Fr.letters j ∧ ¬ Fr.IsW j y := by
   simp only [Frames.LLset, Finset.mem_filter, Finset.mem_Ioo] at hy
   obtain ⟨⟨h1, h2⟩, hT⟩ := hy
   have hr0 : r - 1 < r := by omega
@@ -30,8 +32,8 @@ theorem LL_sub_letters (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j y : ℤ) (hy 
   · simp only [Frames.IsW]
     omega
 
-theorem LL_gap (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 1 ≤ r) (j y : ℤ) (hy : y ∈ Fr.LLset j) :
-    y + L₂ < Fr.fr j 0 := by
+theorem LL_gap (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 1 ≤ r) (j y : ℤ) (hy : y ∈ Fr.LLset j)
+    : y + L₂ < Fr.fr j 0 := by
   have hV := hF.2.1
   have hG := hF.2.2.2.2 j
   obtain ⟨hyl, -⟩ := LL_sub_letters hV hr j y hy
@@ -43,14 +45,20 @@ theorem LL_gap (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 1 ≤ r) (j y : ℤ
   have hne : S.Nonempty := ⟨y, hyS⟩
   have hm := Finset.max'_mem S hne
   rw [Finset.mem_filter] at hm
-  have key := hG (S.max' hne) hm.1 hm.2 (fun z hz hzl => Finset.le_max' S z (Finset.mem_filter.mpr ⟨hz, hzl⟩))
+  have key :=
+    hG (S.max' hne) hm.1 hm.2 (fun z hz hzl => Finset.le_max' S z (Finset.mem_filter.mpr ⟨hz, hzl⟩))
   have := Finset.le_max' S y hyS
   omega
 
-theorem Bo_ge (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (p : ℕ) (hp : 1 ≤ p) (deg : Fin n' → ℕ) (a : ℝ)
-    (hdeg : ∀ s ∈ Fr.TT, a ≤ (deg s : ℝ)) (j x : ℤ) (hx : x ∈ Fr.letters j) (hW : ¬ Fr.IsW j x) :
-    a / (p : ℝ) ^ (Fr.fr j (r - 1) - Fr.fr (j - 1) 0).toNat ≤ Bo p Fr deg j x := by
-  have ho := Formalism.MainNotions.G.WittFrameLocaliserOrders.oldest_mem_segment_letters Fr L₁ N₁ hV hr j x hx hW
+theorem Bo_ge
+    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r)
+    (p : ℕ) (hp : 1 ≤ p)
+    (deg : Fin n' → ℕ) (a : ℝ) (hdeg : ∀ s ∈ Fr.TT, a ≤ (deg s : ℝ))
+    (j x : ℤ) (hx : x ∈ Fr.letters j) (hW : ¬ Fr.IsW j x)
+    : a / (p : ℝ) ^ (Fr.fr j (r - 1) - Fr.fr (j - 1) 0).toNat ≤ Bo p Fr deg j x := by
+  have ho :=
+    Formalism.MainNotions.G.WittFrameLocaliserOrders.oldest_mem_segment_letters Fr L₁ N₁ hV hr j x
+      hx hW
   set o := Fr.oldest j x with ho_def
   have hoL := ho
   simp only [Frames.letters, Finset.mem_filter, Finset.mem_Icc] at hoL
@@ -68,11 +76,13 @@ theorem Bo_ge (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (p : ℕ) (hp : 1 ≤ p) 
   show a / _ ≤ levDeg p Fr deg j o
   simp only [levDeg]
   rcases le_or_gt a 0 with ha | ha
-  · have h1 : a / (p : ℝ) ^ (Fr.fr j (r - 1) - Fr.fr (j - 1) 0).toNat ≤ 0 := div_nonpos_of_nonpos_of_nonneg ha hpos2.le
+  · have h1 : a / (p : ℝ) ^ (Fr.fr j (r - 1) - Fr.fr (j - 1) 0).toNat ≤ 0 :=
+      div_nonpos_of_nonpos_of_nonneg ha hpos2.le
     have h2 : (0 : ℝ) ≤ (deg (posOf n' o) : ℝ) / (p : ℝ) ^ Fr.dist j o := by positivity
     linarith
-  · calc a / (p : ℝ) ^ (Fr.fr j (r - 1) - Fr.fr (j - 1) 0).toNat ≤ a / (p : ℝ) ^ Fr.dist j o :=
-          div_le_div_of_nonneg_left ha.le hpos1 hpow
+  · calc
+      a / (p : ℝ) ^ (Fr.fr j (r - 1) - Fr.fr (j - 1) 0).toNat
+        ≤ a / (p : ℝ) ^ Fr.dist j o := div_le_div_of_nonneg_left ha.le hpos1 hpow
       _ ≤ _ := div_le_div_of_nonneg_right had hpos1.le
 
 end Geo
@@ -81,8 +91,10 @@ section Shift
 
 variable {n' r : ℕ} [NeZero n'] {Fr : Frames n' r} {L₁ N₁ : ℕ} {J : ℕ} [NeZero J]
 
-theorem seg_shift (hV : Fr.Valid L₁ N₁) (hJ : J = Fr.J) (j : ZMod J) :
-    ∃ s : ℤ, ∀ i, Fr.fr (segZ j + 1) i = Fr.fr (segZ (j + 1)) i + s ∧ Fr.fr (segZ j) i = Fr.fr (segZ (j + 1) - 1) i + s := by
+theorem seg_shift (hV : Fr.Valid L₁ N₁) (hJ : J = Fr.J) (j : ZMod J)
+    : ∃ s : ℤ, ∀ i,
+      Fr.fr (segZ j + 1) i = Fr.fr (segZ (j + 1)) i + s
+        ∧ Fr.fr (segZ j) i = Fr.fr (segZ (j + 1) - 1) i + s := by
   have hJ1 := hV.2.1
   subst hJ
   have hJpos : 0 < Fr.J := Nat.pos_of_ne_zero (NeZero.ne _)
@@ -113,13 +125,19 @@ end Shift
 
 section HypH
 
-variable {n' r : ℕ} [NeZero n'] {Fr : Frames n' r} {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ}
-  {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {J : ℕ} [NeZero J]
+variable
+  {n' r : ℕ} [NeZero n']
+  {Fr : Frames n' r} {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ} {p : ℕ} {O : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {J : ℕ} [NeZero J]
 
-theorem dLL_le (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 1 ≤ r) (hp : 3 ≤ p) (hL : L₁ ≤ L₂) (Dt : SignedChainData p O r J)
-    (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card) (a : ℝ) (ha : 0 ≤ a)
-    (hd : ∀ x, (lowP Fr p x : ℝ) * (Dt.d x : ℝ) ≤ 2 * a) (j : ZMod J) :
-    (Dt.dLL j : ℝ) ≤ 3 * a * (p : ℝ) ^ (-((Fr.dist (segZ j) (Fr.fr (segZ j) 0) : ℕ) : ℤ) - L₁ - 1) := by
+theorem dLL_le
+    (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 1 ≤ r) (hp : 3 ≤ p) (hL : L₁ ≤ L₂)
+    (Dt : SignedChainData p O r J) (hnL : ∀ j, Dt.nL j = (Fr.LLset (segZ j)).card)
+    (a : ℝ) (ha : 0 ≤ a) (hd : ∀ x, (lowP Fr p x : ℝ) * (Dt.d x : ℝ) ≤ 2 * a)
+    (j : ZMod J)
+    : (Dt.dLL j : ℝ)
+      ≤ 3 * a * (p : ℝ) ^ (-((Fr.dist (segZ j) (Fr.fr (segZ j) 0) : ℕ) : ℤ) - L₁ - 1) := by
   have hV := hF.2.1
   have hr' : 0 < r := by omega
   set jj := segZ j with hjj
@@ -197,14 +215,17 @@ theorem dLL_le (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 1 ≤ r) (hp : 3 �
     rw [div_le_iff₀ h1q]
     have hqn : 0 ≤ q ^ (D + L₁ + 1) := pow_nonneg hq0 _
     nlinarith
-  calc (Dt.dLL j : ℝ) ≤ 2 * a * ∑ k ∈ S, q ^ k := hsum
+  calc
+    (Dt.dLL j : ℝ)
+      ≤ 2 * a * ∑ k ∈ S, q ^ k := hsum
     _ ≤ 2 * a * (3 / 2 * q ^ (D + L₁ + 1)) := by
-        apply mul_le_mul_of_nonneg_left (hgeo.trans hfrac)
-        linarith
+      apply mul_le_mul_of_nonneg_left (hgeo.trans hfrac)
+      linarith
     _ = 3 * a * q ^ (D + L₁ + 1) := by ring
 
-theorem slack_bound_real (r : ℕ) (x c s : ℝ) (h1 : x ≤ s / 8) (h2 : 100 * (r : ℝ) ^ 2 * c ≤ s) (hr : 2 ≤ r) (hc : 0 ≤ c) :
-    x + 26 * (r : ℝ) * c ≤ 3 / 8 * s := by
+theorem slack_bound_real
+    (r : ℕ) (x c s : ℝ) (h1 : x ≤ s / 8) (h2 : 100 * (r : ℝ) ^ 2 * c ≤ s) (hr : 2 ≤ r) (hc : 0 ≤ c)
+    : x + 26 * (r : ℝ) * c ≤ 3 / 8 * s := by
   have hr' : (2 : ℝ) ≤ r := by exact_mod_cast hr
   have h3 : 26 * (r : ℝ) * c ≤ 25 * (r : ℝ) ^ 2 * c := by
     have : 26 * (r : ℝ) ≤ 25 * (r : ℝ) ^ 2 := by nlinarith
@@ -215,11 +236,15 @@ end HypH
 
 section HypH2
 
-variable {n' r : ℕ} [NeZero n'] {Fr : Frames n' r} {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ}
-  {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {J : ℕ} [NeZero J]
+variable
+  {n' r : ℕ} [NeZero n']
+  {Fr : Frames n' r} {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ} {p : ℕ} {O : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {J : ℕ} [NeZero J]
 
-theorem posU_mem (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) (u : ℕ) (hu : u ≤ (Fr.LLset j).card) :
-    posU Fr (Fr.LLset j).card j u ∈ Fr.letters j ∧ ¬ Fr.IsW j (posU Fr (Fr.LLset j).card j u) := by
+theorem posU_mem (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) (u : ℕ) (hu : u ≤ (Fr.LLset j).card)
+    : posU Fr (Fr.LLset j).card j u ∈ Fr.letters j
+      ∧ ¬ Fr.IsW j (posU Fr (Fr.LLset j).card j u) := by
   unfold posU
   split_ifs with hlt
   · exact LL_sub_letters hV hr j _ (Formalism.MainNotions.Proposition5Numerics.llPos_mem Fr j u hlt)
@@ -237,18 +262,27 @@ theorem posU_mem (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) (u : ℕ) (h
     · simp only [Frames.IsW]
       omega
 
-theorem slack_bound_joint (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 2 ≤ r) (hp : 3 ≤ p) (hL : L₁ ≤ L₂) (deg : Fin n' → ℕ) (Y : ℝ)
-    (k mS : ℕ) (K : ℕ) [NeZero K] (Dt : SignedChainData p O r J) (dPl : TL J Dt.nL r → ℕ) (ka : ZMod J → ℕ → Fin K → ℤ)
-    (hT : Tied Fr p deg Y k mS K Dt dPl ka) (cPr : ℝ) (hc : Dt.c = cPr) (hc0 : 0 ≤ cPr)
+theorem slack_bound_joint
+    (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 2 ≤ r) (hp : 3 ≤ p) (hL : L₁ ≤ L₂)
+    (deg : Fin n' → ℕ) (Y : ℝ)
+    (k mS : ℕ)
+    (K : ℕ) [NeZero K]
+    (Dt : SignedChainData p O r J) (dPl : TL J Dt.nL r → ℕ)
+    (ka : ZMod J → ℕ → Fin K → ℤ) (hT : Tied Fr p deg Y k mS K Dt dPl ka)
+    (cPr : ℝ) (hc : Dt.c = cPr) (hc0 : 0 ≤ cPr)
     (hsl : ∀ j (i : Fin (Dt.nch j)), Dt.sl j i = 3 / 8 * slU Fr p deg Y k Dt.nL j i.val)
     (a : ℝ) (ha : 0 ≤ a) (hdeg : ∀ s ∈ Fr.TT, a ≤ (deg s : ℝ))
     (hd : ∀ x, (lowP Fr p x : ℝ) * (Dt.d x : ℝ) ≤ 2 * a)
-    (hII5 : ∀ (Dd : ℕ) (Qj dj B : ℝ), (p : ℝ) ^ Dd ≤ Formalism.CountingSumsFrames.QII p G' → 1 ≤ Qj → Qj ≤ Formalism.CountingSumsFrames.QII p G' →
-      dj ≤ 3 * a * (p : ℝ) ^ (-(Dd : ℤ) - L₁ - 1) → a / ((p : ℝ) ^ Dd * Qj) ≤ B →
-      r * dj / Qj ≤ 3 * r * (p : ℝ) ^ (-(L₁ : ℤ) - 1) * B ∧
-        3 * r * (p : ℝ) ^ (-(L₁ : ℤ) - 1) * B ≤ Formalism.CountingSumsFrames.slII Y k B / 8)
-    (hII0 : ∀ B : ℝ, a / Formalism.CountingSumsFrames.QII p G' ≤ B → 100 * (r : ℝ) ^ 2 * cPr ≤ Formalism.CountingSumsFrames.slII Y k B) :
-    Dt.Hyp 26 := by
+    (hII5 : ∀ (Dd : ℕ) (Qj dj B : ℝ),
+      (p : ℝ) ^ Dd ≤ Formalism.CountingSumsFrames.QII p G' → 1 ≤ Qj
+        → Qj ≤ Formalism.CountingSumsFrames.QII p G' → dj ≤ 3 * a * (p : ℝ) ^ (-(Dd : ℤ) - L₁ - 1)
+        → a / ((p : ℝ) ^ Dd * Qj) ≤ B
+        → r * dj / Qj ≤ 3 * r * (p : ℝ) ^ (-(L₁ : ℤ) - 1) * B
+          ∧ 3 * r * (p : ℝ) ^ (-(L₁ : ℤ) - 1) * B ≤ Formalism.CountingSumsFrames.slII Y k B / 8)
+    (hII0 : ∀ B : ℝ,
+      a / Formalism.CountingSumsFrames.QII p G' ≤ B
+        → 100 * (r : ℝ) ^ 2 * cPr ≤ Formalism.CountingSumsFrames.slII Y k B)
+    : Dt.Hyp 26 := by
   have hV := hF.2.1
   have hG := hF.2.2.1
   have hr1 : 1 ≤ r := by omega
@@ -274,8 +308,7 @@ theorem slack_bound_joint (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 2 ≤ r)
   set Dd := Fr.dist jj (Fr.fr jj 0) with hDd
   set g := (Fr.fr (jj + 1) (r - 1) - Fr.fr jj (r - 1)).toNat with hg
   set E := (Fr.fr jj' (r - 1) - Fr.fr (jj' - 1) 0).toNat with hE
-  have hDdz : (Dd : ℤ) = Fr.fr jj (r - 1) - Fr.fr jj 0 := by
-    simp only [hDd, Frames.dist]; omega
+  have hDdz : (Dd : ℤ) = Fr.fr jj (r - 1) - Fr.fr jj 0 := by simp only [hDd, Frames.dist]; omega
   have hgz : (g : ℤ) = Fr.fr (jj + 1) (r - 1) - Fr.fr jj (r - 1) := by simp only [hg]; omega
   have hEz : (E : ℤ) = Fr.fr jj' (r - 1) - Fr.fr (jj' - 1) 0 := by simp only [hE]; omega
   have hEq : Dd + g = E := by
@@ -312,12 +345,13 @@ theorem slack_bound_joint (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 2 ≤ r)
     rw [hnL1]
     rfl
   have hQII : Formalism.CountingSumsFrames.QII p G' = (p : ℝ) ^ G' := rfl
-  have hDdQ : (p : ℝ) ^ Dd ≤ Formalism.CountingSumsFrames.QII p G' := by rw [hQII]; exact pow_le_pow_right₀ hpR hDdG
+  have hDdQ : (p : ℝ) ^ Dd ≤ Formalism.CountingSumsFrames.QII p G' := by
+    rw [hQII]; exact pow_le_pow_right₀ hpR hDdG
   have hQ1 : 1 ≤ (p : ℝ) ^ g := one_le_pow₀ hpR
-  have hQQ : (p : ℝ) ^ g ≤ Formalism.CountingSumsFrames.QII p G' := by rw [hQII]; exact pow_le_pow_right₀ hpR hgG
+  have hQQ : (p : ℝ) ^ g ≤ Formalism.CountingSumsFrames.QII p G' := by
+    rw [hQII]; exact pow_le_pow_right₀ hpR hgG
   have hdj := dLL_le hF hr1 hp hL Dt hnL a ha hd j
-  have hB5 : a / ((p : ℝ) ^ Dd * (p : ℝ) ^ g) ≤ B := by
-    rw [← pow_add, hEq]; exact hBge
+  have hB5 : a / ((p : ℝ) ^ Dd * (p : ℝ) ^ g) ≤ B := by rw [← pow_add, hEq]; exact hBge
   obtain ⟨h5a, h5b⟩ := hII5 Dd ((p : ℝ) ^ g) (Dt.dLL j) B hDdQ hQ1 hQQ hdj hB5
   have hB0 : a / Formalism.CountingSumsFrames.QII p G' ≤ B := by
     refine le_trans ?_ hBge
@@ -326,8 +360,9 @@ theorem slack_bound_joint (hF : FramesOK TT L₁ L₂ N₁ G' Fr) (hr : 2 ≤ r)
   have h0 := hII0 B hB0
   show (r : ℝ) * (Dt.dLL j : ℝ) / (Dt.P j m : ℝ) + 26 * (r : ℝ) * Dt.c ≤ Dt.sl (j + 1) i
   rw [hslB, hc, hP]
-  have key := slack_bound_real r ((r : ℝ) * (Dt.dLL j : ℝ) / (p : ℝ) ^ g) cPr (Formalism.CountingSumsFrames.slII Y k B)
-    (h5a.trans h5b) h0 hr hc0
+  have key :=
+    slack_bound_real r ((r : ℝ) * (Dt.dLL j : ℝ) / (p : ℝ) ^ g) cPr
+      (Formalism.CountingSumsFrames.slII Y k B) (h5a.trans h5b) h0 hr hc0
   linarith
 
 end HypH2

@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.LineLat
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.FinPl ValuativeRel
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -20,14 +23,15 @@ def lineLat (L : HSp D) (ζ : Fin L.rank → D.host.E) (𝔠 : FI D) : Lat L :=
   (𝔠 : Submodule (𝓞 D.host.E) D.host.E).map
     ((LinearMap.toSpanSingleton D.host.E (Fin L.rank → D.host.E) ζ).restrictScalars (𝓞 D.host.E))
 
-theorem tmul_mul_incA (α : AF D.host.F) (x z : D.host.E) :
-    (α ⊗ₜ[D.host.F] x : AE D) * incA D z = α ⊗ₜ[D.host.F] (x * z) := by
+theorem tmul_mul_incA (α : AF D.host.F) (x z : D.host.E)
+    : (α ⊗ₜ[D.host.F] x : AE D) * incA D z = α ⊗ₜ[D.host.F] (x * z) := by
   change (α ⊗ₜ[D.host.F] x : AE D) * (1 ⊗ₜ[D.host.F] z) = _
   rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one]
 
-theorem latV_lineLat (L : HSp D) (ζ : Fin L.rank → D.host.E) (𝔠 : FI D) (v : Pl D) :
-    latV L (lineLat L ζ 𝔠) (· = v) =
-      (idV 𝔠 v).map (LinearMap.toSpanSingleton (AE D) (Fin L.rank → AE D) (ratV ζ)).toAddMonoidHom := by
+theorem latV_lineLat (L : HSp D) (ζ : Fin L.rank → D.host.E) (𝔠 : FI D) (v : Pl D)
+    : latV L (lineLat L ζ 𝔠) (· = v)
+      = (idV 𝔠 v).map
+        (LinearMap.toSpanSingleton (AE D) (Fin L.rank → AE D) (ratV ζ)).toAddMonoidHom := by
   unfold GlobalTheory.FinPl.latV GlobalTheory.FinPl.latMul idV
   rw [AddMonoidHom.map_closure]
   congr 1
@@ -42,8 +46,8 @@ theorem latV_lineLat (L : HSp D) (ζ : Fin L.rank → D.host.E) (𝔠 : FI D) (v
     funext i
     simp [ratV, tmul_mul_incA]
 
-theorem lineLatAt_lineLat (L : HSp D) {ζ : Fin L.rank → D.host.E} (hζ : ζ ≠ 0) (𝔠 : FI D) (v : Pl D) :
-    LineLatAt L ζ 𝔠 (lineLat L ζ 𝔠) v := by
+theorem lineLatAt_lineLat (L : HSp D) {ζ : Fin L.rank → D.host.E} (hζ : ζ ≠ 0) (𝔠 : FI D) (v : Pl D)
+    : LineLatAt L ζ 𝔠 (lineLat L ζ 𝔠) v := by
   intro a _
   rw [latV_lineLat]
   refine ⟨?_, fun h => ⟨a, h, rfl⟩⟩
@@ -63,8 +67,9 @@ theorem idV_le_idAt (𝔞 : FI D) (v : Pl D) : ∀ a ∈ idV 𝔞 v, a ∈ idAt 
   · change (evalV D.host.F w.1 α) ⊗ₜ[D.host.F] x = 0
     rw [h2 _ w.2, TensorProduct.zero_tmul]
 
-theorem one_tmul_one_ne (F A E : Type) [Field F] [Field A] [Field E] [Algebra F A] [Algebra F E] :
-    (1 : A) ⊗ₜ[F] (1 : E) ≠ 0 := one_ne_zero (α := A ⊗[F] E)
+theorem one_tmul_one_ne (F A E : Type) [Field F] [Field A] [Field E] [Algebra F A] [Algebra F E]
+    : (1 : A) ⊗ₜ[F] (1 : E) ≠ 0 :=
+  one_ne_zero (α := A ⊗[F] E)
 
 theorem idV_ne_bot {𝔞 : FI D} (h : 𝔞 ≠ 0) (v : Pl D) : idV 𝔞 v ≠ ⊥ := by
   classical
@@ -95,8 +100,11 @@ theorem AA_ne (hP : FactPrincipalDatum) : D.host.AA ≠ 0 ∧ D.host.AAbar ≠ 0
 
 variable {a : XPart D u} {b : YPart a}
 
-theorem lineId_of_split {S A L : HSp D} (o : OrthDec S A L) (ζ : Fin L.rank → D.host.E) (M : Lat S) (LA : Lat A) (LL : Lat L)
-    (𝔠 : FI D) (v : Pl D) (h : LineLatAt L ζ 𝔠 LL v) (ho : OrthAt o M LA LL v) : LineId o ζ M 𝔠 v := by
+theorem lineId_of_split
+    {S A L : HSp D}
+    (o : OrthDec S A L) (ζ : Fin L.rank → D.host.E) (M : Lat S) (LA : Lat A) (LL : Lat L)
+    (𝔠 : FI D) (v : Pl D) (h : LineLatAt L ζ 𝔠 LL v) (ho : OrthAt o M LA LL v)
+    : LineId o ζ M 𝔠 v := by
   intro a ha
   have e : ratV (vecB o ζ) = o.jB *ᵥ ratV ζ := by
     funext i

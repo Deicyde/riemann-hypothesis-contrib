@@ -12,12 +12,13 @@ universe u
 
 variable {k G V : Type*} [CommRing k] [Group G] [AddCommGroup V] [Module k V]
 
-def funDiagRepresentation (X : Type*) [MulAction G X] (ρ : Representation k G V) :
-    Representation k G (X → V) where
-  toFun g :=
-    { toFun := fun F x => ρ g (F (g⁻¹ • x))
-      map_add' := fun F F' => funext fun x => map_add (ρ g) _ _
-      map_smul' := fun c F => funext fun x => map_smul (ρ g) c _ }
+def funDiagRepresentation (X : Type*) [MulAction G X] (ρ : Representation k G V)
+    : Representation k G (X → V) where
+  toFun g := {
+    toFun := fun F x => ρ g (F (g⁻¹ • x))
+    map_add' := fun F F' => funext fun x => map_add (ρ g) _ _
+    map_smul' := fun c F => funext fun x => map_smul (ρ g) c _
+  }
   map_one' := by
     refine LinearMap.ext fun F => funext fun x => ?_
     simp
@@ -25,8 +26,9 @@ def funDiagRepresentation (X : Type*) [MulAction G X] (ρ : Representation k G V
     refine LinearMap.ext fun F => funext fun x => ?_
     simp [mul_smul]
 
-abbrev funDiagRep {k G : Type u} [CommRing k] [Group G] (X : Type u) [MulAction G X]
-    (A : Rep.{u} k G) : Rep.{u} k G :=
+abbrev funDiagRep
+    {k G : Type u} [CommRing k] [Group G] (X : Type u) [MulAction G X] (A : Rep.{u} k G)
+    : Rep.{u} k G :=
   Rep.of (funDiagRepresentation X A.ρ)
 
 end GroundTheory.ProfCoh

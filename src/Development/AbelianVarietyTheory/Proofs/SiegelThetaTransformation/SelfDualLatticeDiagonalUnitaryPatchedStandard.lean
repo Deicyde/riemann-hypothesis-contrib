@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsSt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
 open GlobalTheory.SW hiding Level
 open Formalism.L2.Pj Formalism.L2.PjFree
@@ -20,10 +23,14 @@ open GlobalTheory.SW.Base
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem exists_nat_coprime (𝔞 : Ideal (𝓞 E)) (M : ℕ) (h0 : 𝔞 ≠ ⊥)
-    (h : IsCoprime 𝔞 (Ideal.span {(M : 𝓞 E)})) : ∃ a : ℕ, 0 < a ∧ a.Coprime M ∧ (a : 𝓞 E) ∈ 𝔞 := by
-  have ex : ∃ a : ℕ, 0 < a ∧ (a : 𝓞 E) ∈ 𝔞 :=
-    ⟨Ideal.absNorm 𝔞, Nat.pos_of_ne_zero (by rwa [Ne, Ideal.absNorm_eq_zero_iff]), Ideal.absNorm_mem 𝔞⟩
+theorem exists_nat_coprime
+    (𝔞 : Ideal (𝓞 E)) (M : ℕ) (h0 : 𝔞 ≠ ⊥) (h : IsCoprime 𝔞 (Ideal.span {(M : 𝓞 E)}))
+    : ∃ a : ℕ, 0 < a ∧ a.Coprime M ∧ (a : 𝓞 E) ∈ 𝔞 := by
+  have ex : ∃ a : ℕ, 0 < a ∧ (a : 𝓞 E) ∈ 𝔞 := ⟨
+    Ideal.absNorm 𝔞,
+    Nat.pos_of_ne_zero (by rwa [Ne, Ideal.absNorm_eq_zero_iff]),
+    Ideal.absNorm_mem 𝔞
+  ⟩
   obtain ⟨ha0, ha⟩ := Nat.find_spec ex
   refine ⟨Nat.find ex, ha0, ?_, ha⟩
   obtain ⟨x, hx, y, hy, hxy⟩ := Ideal.isCoprime_iff_exists.1 h
@@ -35,7 +42,8 @@ theorem exists_nat_coprime (𝔞 : Ideal (𝓞 E)) (M : ℕ) (h0 : 𝔞 ≠ ⊥)
   have hmem : (a' : 𝓞 E) ∈ 𝔞 := by
     have e : (a' : 𝓞 E) = a' * x + (z * m') * (Nat.find ex : ℕ) := by
       have e1 : (M : 𝓞 E) = g * m' := by exact_mod_cast congrArg (Nat.cast : ℕ → 𝓞 E) hm'
-      have e2 : ((Nat.find ex : ℕ) : 𝓞 E) = g * a' := by exact_mod_cast congrArg (Nat.cast : ℕ → 𝓞 E) ha'
+      have e2 : ((Nat.find ex : ℕ) : 𝓞 E) = g * a' := by
+        exact_mod_cast congrArg (Nat.cast : ℕ → 𝓞 E) ha'
       rw [e2]
       rw [e1] at hxy
       linear_combination (-(a' : 𝓞 E)) * hxy
@@ -68,37 +76,46 @@ theorem herm_nat_right (c : ℕ) (x y : Fin n → E) : herm 1 x ((c : E) • y) 
   simp [Base.herm_one, Finset.mul_sum, cc, mul_left_comm]
 
 omit [IsCMField E] in
-theorem int_of_coprime {a b : ℕ} (h : a.Coprime b) {x : E} (h1 : IsIntegral ℤ ((a : E) * x))
-    (h2 : IsIntegral ℤ ((b : E) * x)) : IsIntegral ℤ x := by
+theorem int_of_coprime
+    {a b : ℕ} (h : a.Coprime b)
+    {x : E} (h1 : IsIntegral ℤ ((a : E) * x)) (h2 : IsIntegral ℤ ((b : E) * x))
+    : IsIntegral ℤ x := by
   obtain ⟨u, v, huv⟩ : IsCoprime (a : ℤ) (b : ℤ) := Nat.isCoprime_iff_coprime.2 h
-  have hbezout : (u : E) * a + (v : E) * b = 1 := by
-    exact_mod_cast congrArg (Int.cast : ℤ → E) huv
+  have hbezout : (u : E) * a + (v : E) * b = 1 := by exact_mod_cast congrArg (Int.cast : ℤ → E) huv
   have hx : (u : E) * ((a : E) * x) + (v : E) * ((b : E) * x) = x := by
     rw [← _root_.mul_assoc, ← _root_.mul_assoc, ← add_mul, hbezout, _root_.one_mul]
   rw [← hx]
   exact ((isIntegral_intCast u).mul h1).add ((isIntegral_intCast v).mul h2)
 
-theorem patch {M t : ℕ} (ht : 0 < t) (htM : t.Coprime M) (J J' : Ideal (𝓞 E)) (hJ : (M : 𝓞 E) ∈ J)
-    (hJ' : (M : 𝓞 E) ∈ J') (A : Lt E n) (hA : A.FG) (hsd : ∀ x, x ∈ A ↔ ∀ y ∈ A, IsIntegral ℤ (herm 1 x y))
+theorem patch
+    {M t : ℕ} (ht : 0 < t) (htM : t.Coprime M)
+    (J J' : Ideal (𝓞 E)) (hJ : (M : 𝓞 E) ∈ J) (hJ' : (M : 𝓞 E) ∈ J')
+    (A : Lt E n) (hA : A.FG) (hsd : ∀ x, x ∈ A ↔ ∀ y ∈ A, IsIntegral ℤ (herm 1 x y))
     (h1 : ∀ j ∈ J, ∀ v ∈ A, (j : E) • (t : E) • v ∈ stdL E n)
-    (h2 : ∀ j ∈ J', ∀ v ∈ stdL E n, (j : E) • (t : E) • v ∈ A) :
-    ∃ C ∈ Vset E n M, (J * J') • A ≤ C ∧ (J * J') • C ≤ A := by
+    (h2 : ∀ j ∈ J', ∀ v ∈ stdL E n, (j : E) • (t : E) • v ∈ A)
+    : ∃ C ∈ Vset E n M, (J * J') • A ≤ C ∧ (J * J') • C ≤ A := by
   obtain ⟨hS, hSsd, -⟩ := Base.stdL_mem_Vset (E := E) n M
   have k1 : ∀ v ∈ A, (M : E) • (t : E) • v ∈ stdL E n := fun v hv => by simpa using h1 _ hJ v hv
   have k2 : ∀ v ∈ stdL E n, (M : E) • (t : E) • v ∈ A := fun v hv => by simpa using h2 _ hJ' v hv
-  let C : Lt E n :=
-    { carrier := {v | (M : E) • v ∈ A ∧ (t : E) • v ∈ stdL E n}
-      add_mem' := fun ha hb => ⟨by rw [smul_add]; exact A.add_mem ha.1 hb.1,
-        by rw [smul_add]; exact (stdL E n).add_mem ha.2 hb.2⟩
-      zero_mem' := ⟨by simp, by simp⟩
-      smul_mem' := fun c v hv => ⟨by rw [smul_comm]; exact A.smul_mem c hv.1,
-        by rw [smul_comm]; exact (stdL E n).smul_mem c hv.2⟩ }
+  let C : Lt E n := {
+    carrier := {v | (M : E) • v ∈ A ∧ (t : E) • v ∈ stdL E n}
+    add_mem' := fun ha hb => ⟨
+      by rw [smul_add]; exact A.add_mem ha.1 hb.1,
+      by rw [smul_add]; exact (stdL E n).add_mem ha.2 hb.2
+    ⟩
+    zero_mem' := ⟨by simp, by simp⟩
+    smul_mem' := fun c v hv => ⟨
+      by rw [smul_comm]; exact A.smul_mem c hv.1,
+      by rw [smul_comm]; exact (stdL E n).smul_mem c hv.2
+    ⟩
+  }
   have mC : ∀ v, v ∈ C ↔ (M : E) • v ∈ A ∧ (t : E) • v ∈ stdL E n := fun v => Iff.rfl
   have cA : ∀ v ∈ A, (M : E) • v ∈ C := fun v hv =>
     (mC _).2 ⟨nat_smul_mem _ _ (nat_smul_mem _ _ hv), by rw [smul_comm]; exact k1 v hv⟩
   have cS : ∀ v ∈ stdL E n, (t : E) • v ∈ C := fun v hv =>
     (mC _).2 ⟨k2 v hv, nat_smul_mem _ _ (nat_smul_mem _ _ hv)⟩
-  refine ⟨C, ⟨?_, fun x => ⟨fun hx y hy => ?_, fun hx => ?_⟩, t, ht, htM, fun v hv => hv.2, cS⟩, ?_, ?_⟩
+  refine
+    ⟨C, ⟨?_, fun x => ⟨fun hx y hy => ?_, fun hx => ?_⟩, t, ht, htM, fun v hv => hv.2, cS⟩, ?_, ?_⟩
   · have hle : C ≤ A ⊔ stdL E n := fun v hv =>
       mem_of_coprime _ htM (Submodule.mem_sup_right hv.2) (Submodule.mem_sup_left hv.1)
     haveI := isNoetherian_of_fg_of_noetherian _ (hA.sup hS)
@@ -112,31 +129,39 @@ theorem patch {M t : ℕ} (ht : 0 < t) (htM : t.Coprime M) (J J' : Ideal (𝓞 E
     · rw [herm_smul_left, ← herm_nat_right]; exact hx _ (cA y hy)
     · rw [herm_smul_left, ← herm_nat_right]; exact hx _ (cS y hy)
   · refine Submodule.smul_le.2 fun j hj v hv => (mC _).2 ⟨nat_smul_mem _ _ (A.smul_mem j hv), ?_⟩
-    rw [smul_comm (t : E) j v]; exact h1 j (mem_left hj) v hv
+    rw [smul_comm (t : E) j v]
+    exact h1 j (mem_left hj) v hv
   · refine Submodule.smul_le.2 fun j hj v hv => ?_
     refine mem_of_coprime A (s := t * t) (R := M) (Nat.Coprime.mul_left htM htM) ?_ ?_
     · have := h2 j (mem_right hj) _ ((mC v).1 hv).2
-      rw [smul_comm _ j v, Nat.cast_mul, mul_smul]; exact this
+      rw [smul_comm _ j v, Nat.cast_mul, mul_smul]
+      exact this
     · rw [smul_comm _ j v]; exact A.smul_mem j ((mC v).1 hv).1
 
 theorem cc_mul (x y : E) : cc (x * y) = cc x * cc y := by simp [cc]
 
-theorem moved (d : Fin n → E) (hd : ∀ k, cc (d k) * d k = 1) (Λ : Lt E n) (hfg : Λ.FG)
-    (hsd : ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y)) :
-    ∃ A : Lt E n, A.FG ∧ (∀ x, x ∈ A ↔ ∀ y ∈ A, IsIntegral ℤ (herm 1 x y)) ∧
-      ∀ v, v ∈ A ↔ (fun k => cc (d k) * v k) ∈ Λ := by
-  let g : (Fin n → E) →ₗ[𝓞 E] (Fin n → E) := (Matrix.mulVecLin (Matrix.diagonal d)).restrictScalars (𝓞 E)
-  have hg : ∀ v, g v = fun k => d k * v k := fun v => by
-    ext k; simp [g, Matrix.mulVec_diagonal]
+theorem moved
+    (d : Fin n → E) (hd : ∀ k, cc (d k) * d k = 1)
+    (Λ : Lt E n) (hfg : Λ.FG) (hsd : ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y))
+    : ∃ A : Lt E n,
+      A.FG ∧ (∀ x, x ∈ A ↔ ∀ y ∈ A, IsIntegral ℤ (herm 1 x y))
+        ∧ ∀ v, v ∈ A ↔ (fun k => cc (d k) * v k) ∈ Λ := by
+  let g : (Fin n → E) →ₗ[𝓞 E] (Fin n → E) :=
+    (Matrix.mulVecLin (Matrix.diagonal d)).restrictScalars (𝓞 E)
+  have hg : ∀ v, g v = fun k => d k * v k := fun v => by ext k; simp [g, Matrix.mulVec_diagonal]
   have mA : ∀ v, v ∈ Λ.map g ↔ (fun k => cc (d k) * v k) ∈ Λ := fun v => by
     constructor
     · rintro ⟨w, hw, rfl⟩
       have : (fun k => cc (d k) * g w k) = w := by
         ext k; rw [hg]; simp only; rw [← _root_.mul_assoc, hd, _root_.one_mul]
-      rw [this]; exact hw
+      rw [this]
+      exact hw
     · intro hv
       refine ⟨_, hv, ?_⟩
-      ext k; rw [hg]; simp only; rw [← _root_.mul_assoc, mul_comm (d k), hd, _root_.one_mul]
+      ext k
+      rw [hg]
+      simp only
+      rw [← _root_.mul_assoc, mul_comm (d k), hd, _root_.one_mul]
   have hh : ∀ x y : Fin n → E, herm 1 (fun k => cc (d k) * x k) y = herm 1 x (g y) := fun x y => by
     rw [hg, Base.herm_one, Base.herm_one]
     exact Finset.sum_congr rfl fun k _ => by rw [cc_mul]; ring
@@ -145,7 +170,16 @@ theorem moved (d : Fin n → E) (hd : ∀ k, cc (d k) * d k = 1) (Λ : Lt E n) (
   simp only [hh]
   exact ⟨by rintro h _ ⟨y, hy, rfl⟩; exact h y hy, fun h y hy => h _ ⟨y, hy, rfl⟩⟩
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n r M : ℕ) (𝔍 𝔞 : Ideal (𝓞 E)) (α : 𝓞 E), 0 < M → (M : 𝓞 E) ∈ 𝔍 → IsCoprime 𝔍 (conjI 𝔍) → α ≠ 0 → Ideal.span {α} = 𝔍 * 𝔞 → IsCoprime 𝔞 (Ideal.span {(M : 𝓞 E)}) → ∀ h : Matrix (Fin n) (Fin n) E, h = Matrix.diagonal (fun k : Fin n => if (k : ℕ) < r then 1 else cc (α : E) / (α : E)) → ccT h * h = 1 ∧ ∀ Λ ∈ Vset E n M, ∃ Λ' ∈ Vset E n M, ∃ Λ'' ∈ Vset E n 1, Moves h Λ Λ'' ∧ (𝔍 * conjI 𝔍) • Λ'' ≤ Λ' ∧ (𝔍 * conjI 𝔍) • Λ' ≤ Λ'' := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n r M : ℕ) (𝔍 𝔞 : Ideal (𝓞 E))
+        (α : 𝓞 E),
+      0 < M → (M : 𝓞 E) ∈ 𝔍 → IsCoprime 𝔍 (conjI 𝔍) → α ≠ 0 → Ideal.span {α} = 𝔍 * 𝔞
+        → IsCoprime 𝔞 (Ideal.span {(M : 𝓞 E)})
+        → ∀ h : Matrix (Fin n) (Fin n) E,
+          h = Matrix.diagonal (fun k : Fin n => if (k : ℕ) < r then 1 else cc (α : E) / (α : E))
+            → ccT h * h = 1
+              ∧ ∀ Λ ∈ Vset E n M, ∃ Λ' ∈ Vset E n M, ∃ Λ'' ∈ Vset E n 1,
+                Moves h Λ Λ'' ∧ (𝔍 * conjI 𝔍) • Λ'' ≤ Λ' ∧ (𝔍 * conjI 𝔍) • Λ' ≤ Λ'' := by
   intro E _ _ _ n r M 𝔍 𝔞 α hM hMJ _ hα hsp hco h hh
   have hα' : (α : E) ≠ 0 := by exact_mod_cast hα
   have hcα : cc (α : E) ≠ 0 := by simpa [cc] using hα'
@@ -153,7 +187,9 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n r M : �
   have hcd : ∀ k, cc (d k) = if (k : ℕ) < r then 1 else (α : E) / cc (α : E) := fun k => by
     simp only [hdd]; split_ifs <;> simp [cc]
   have hd : ∀ k, cc (d k) * d k = 1 := fun k => by
-    rw [hcd]; simp only [hdd]; split_ifs
+    rw [hcd]
+    simp only [hdd]
+    split_ifs
     · simp
     · field_simp
   refine ⟨?_, ?_⟩
@@ -177,27 +213,35 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n r M : �
     obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.1 this
     have e : (j : E) * a / α = z := by
       rw [div_eq_iff hα']; exact_mod_cast congrArg (fun u : 𝓞 E => (u : E)) hz.symm
-    rw [e]; exact z.isIntegral_coe
+    rw [e]
+    exact z.isIntegral_coe
   have q2 : ∀ j ∈ conjI 𝔍, IsIntegral ℤ ((j : E) * a / cc (α : E)) := fun j hj => by
     induction hj using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨b, hb, e⟩ := hx
       have := isIntegral_cc (q1 b hb)
-      rw [e]; simpa [cc] using this
-    | zero => simpa using isIntegral_zero
+      rw [e]
+      simpa [cc] using this
+    | zero =>
+      simpa using isIntegral_zero
     | add x y _ _ hx hy =>
       refine int_congr (hx.add hy) ?_
-      push_cast; ring
+      push_cast
+      ring
     | smul c x _ hx =>
       refine int_congr (c.isIntegral_coe.mul hx) ?_
-      rw [smul_eq_mul]; push_cast; ring
+      rw [smul_eq_mul]
+      push_cast
+      ring
   have p1 : ∀ j ∈ 𝔍, ∀ k, IsIntegral ℤ ((j : E) * a * d k) := fun j hj k => by
-    simp only [hdd]; split_ifs
+    simp only [hdd]
+    split_ifs
     · rw [_root_.mul_one]; exact j.isIntegral_coe.mul (cnat a)
     · refine int_congr ((q1 j hj).mul (isIntegral_cc α.isIntegral_coe)) ?_
       ring
   have p2 : ∀ j ∈ conjI 𝔍, ∀ k, IsIntegral ℤ ((j : E) * a * cc (d k)) := fun j hj k => by
-    rw [hcd]; split_ifs
+    rw [hcd]
+    split_ifs
     · rw [_root_.mul_one]; exact j.isIntegral_coe.mul (cnat a)
     · refine int_congr ((q2 j hj).mul α.isIntegral_coe) ?_
       ring
@@ -206,19 +250,41 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n r M : �
     have := (mem_stdL _).1 (hΛS _ ((mA v).1 hv))
     refine (mem_stdL _).2 fun k => ?_
     refine int_congr ((p1 j hj k).mul (this k)) ?_
-    simp only [Pi.smul_apply, smul_eq_mul]; push_cast
+    simp only [Pi.smul_apply, smul_eq_mul]
+    push_cast
     linear_combination (-((j : E) * a * s * v k)) * hd k
-  have h2 : ∀ j ∈ conjI 𝔍, ∀ v ∈ stdL E n, (j : E) • ((s * a : ℕ) : E) • v ∈ A := fun j hj v hv => by
-    have := hSΛ (fun k => (j : E) * a * cc (d k) * v k)
-      ((mem_stdL _).2 fun k => (p2 j hj k).mul ((mem_stdL _).1 hv k))
+  have h2
+      : ∀ j ∈ conjI 𝔍, ∀ v ∈ stdL E n, (j : E) • ((s * a : ℕ) : E) • v ∈ A := fun j hj v hv => by
+    have :=
+      hSΛ
+        (fun k => (j : E) * a * cc (d k) * v k)
+        ((mem_stdL _).2 fun k => (p2 j hj k).mul ((mem_stdL _).1 hv k))
     rw [mA]
     convert this using 1
     ext k
-    simp only [Pi.smul_apply, smul_eq_mul]; push_cast; ring
+    simp only [Pi.smul_apply, smul_eq_mul]
+    push_cast
+    ring
   have ht : 0 < s * a := Nat.mul_pos hs ha0
-  obtain ⟨C, hC, c1, c2⟩ := patch ht (Nat.Coprime.mul_left hsM haM) 𝔍 (conjI 𝔍) hMJ hMJ' A hA hAsd h1 h2
-  refine ⟨C, hC, A, ⟨hA, hAsd, M * (s * a), Nat.mul_pos hM ht, Nat.coprime_one_right _, fun v hv => ?_,
-    fun v hv => ?_⟩, fun v => ?_, c1, c2⟩
+  obtain ⟨C, hC, c1, c2⟩ :=
+    patch ht (Nat.Coprime.mul_left hsM haM) 𝔍 (conjI 𝔍) hMJ hMJ' A hA hAsd h1 h2
+  refine ⟨
+    C,
+    hC,
+    A,
+    ⟨
+      hA,
+      hAsd,
+      M * (s * a),
+      Nat.mul_pos hM ht,
+      Nat.coprime_one_right _,
+      fun v hv => ?_,
+      fun v hv => ?_
+    ⟩,
+    fun v => ?_,
+    c1,
+    c2
+  ⟩
   · rw [Nat.cast_mul, mul_smul]; simpa using h1 _ hMJ v hv
   · rw [Nat.cast_mul, mul_smul]; simpa using h2 _ hMJ' v hv
   · rw [mA, hh]

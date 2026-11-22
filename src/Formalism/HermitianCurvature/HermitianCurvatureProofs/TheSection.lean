@@ -11,13 +11,15 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.TheSec
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.SettingConstruction
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.SettingConstruction
 
 variable (k : ℕ)
 
-theorem herm_last_scaled (t : ℝ) (ht : 0 < t) :
-    herm (Hb k) (((Real.sqrt t : ℝ) : ℂ) • Pi.single (Fin.last k) 1)
-      (((Real.sqrt t : ℝ) : ℂ) • Pi.single (Fin.last k) 1) = -(t : ℂ) := by
+theorem herm_last_scaled (t : ℝ) (ht : 0 < t)
+    : herm (Hb k) (((Real.sqrt t : ℝ) : ℂ) • Pi.single (Fin.last k) 1)
+        (((Real.sqrt t : ℝ) : ℂ) • Pi.single (Fin.last k) 1)
+      = -(t : ℂ) := by
   have hcs : star ((Real.sqrt t : ℝ) : ℂ) = ((Real.sqrt t : ℝ) : ℂ) := Complex.conj_ofReal _
   have hs : ((Real.sqrt t : ℝ) : ℂ) * ((Real.sqrt t : ℝ) : ℂ) = (t : ℂ) := by
     rw [← Complex.ofReal_mul, Real.mul_self_sqrt ht.le]
@@ -26,7 +28,7 @@ theorem herm_last_scaled (t : ℝ) (ht : 0 < t) :
   · simp only [Matrix.mulVec_diagonal, Matrix.mulVec_smul, Pi.star_apply, Pi.smul_apply,
       Pi.single_eq_same, if_pos rfl, smul_eq_mul, mul_one, star_mul', star_one]
     rw [hcs]
-    simp only [↓reduceIte]
+    simp only [↓ reduceIte]
     linear_combination (-1 : ℂ) * hs
   · intro i _ hi
     simp [Matrix.mulVec_diagonal, Pi.single_apply, hi]
@@ -36,30 +38,32 @@ theorem herm_last_scaled (t : ℝ) (ht : 0 < t) :
 def gA (a : Fin (k + 1) → ℂ) (T : ℝ) : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ :=
   if h : 0 < T ∧ herm (Hb k) a a = -(T : ℂ) then
     Classical.choose (transitive (Hb k) (Hb_herm k) _ a T h.1 (herm_last_scaled k T h.1) h.2)
-  else 1
+  else
+    1
 
 def gB (b : Fin (k + 1) → ℂ) (T' : ℝ) : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ :=
   if h : 0 < T' ∧ herm (Hb k) b b = -(T' : ℂ) then
     Classical.choose (transitive (Hb k) (Hb_herm k) b _ T' h.1 h.2 (herm_last_scaled k T' h.1))
-  else 1
+  else
+    1
 
-theorem gA_spec {a : Fin (k + 1) → ℂ} {T : ℝ} (hT : 0 < T) (ha : herm (Hb k) a a = -(T : ℂ)) :
-    (gA k a T)ᴴ * Hb k * gA k a T = Hb k ∧
-      gA k a T *ᵥ (((Real.sqrt T : ℝ) : ℂ) • Pi.single (Fin.last k) 1) = a := by
+theorem gA_spec {a : Fin (k + 1) → ℂ} {T : ℝ} (hT : 0 < T) (ha : herm (Hb k) a a = -(T : ℂ))
+    : (gA k a T)ᴴ * Hb k * gA k a T = Hb k
+      ∧ gA k a T *ᵥ (((Real.sqrt T : ℝ) : ℂ) • Pi.single (Fin.last k) 1) = a := by
   have h : 0 < T ∧ herm (Hb k) a a = -(T : ℂ) := ⟨hT, ha⟩
   unfold gA
   rw [dite_eq_left h]
-  exact Classical.choose_spec
-    (transitive (Hb k) (Hb_herm k) _ a T h.1 (herm_last_scaled k T h.1) h.2)
+  exact Classical.choose_spec (transitive (Hb k) (Hb_herm k) _ a T h.1 (herm_last_scaled k T h.1)
+    h.2)
 
-theorem gB_spec {b : Fin (k + 1) → ℂ} {T' : ℝ} (hT' : 0 < T') (hb : herm (Hb k) b b = -(T' : ℂ)) :
-    (gB k b T')ᴴ * Hb k * gB k b T' = Hb k ∧
-      gB k b T' *ᵥ b = ((Real.sqrt T' : ℝ) : ℂ) • Pi.single (Fin.last k) 1 := by
+theorem gB_spec {b : Fin (k + 1) → ℂ} {T' : ℝ} (hT' : 0 < T') (hb : herm (Hb k) b b = -(T' : ℂ))
+    : (gB k b T')ᴴ * Hb k * gB k b T' = Hb k
+      ∧ gB k b T' *ᵥ b = ((Real.sqrt T' : ℝ) : ℂ) • Pi.single (Fin.last k) 1 := by
   have h : 0 < T' ∧ herm (Hb k) b b = -(T' : ℂ) := ⟨hT', hb⟩
   unfold gB
   rw [dite_eq_left h]
-  exact Classical.choose_spec
-    (transitive (Hb k) (Hb_herm k) b _ T' h.1 h.2 (herm_last_scaled k T' h.1))
+  exact Classical.choose_spec (transitive (Hb k) (Hb_herm k) b _ T' h.1 h.2
+    (herm_last_scaled k T' h.1))
 
 def wZ (T T' : ℝ) (ζ : ℂ) : ℂ := (-((Real.sqrt T * Real.sqrt T' : ℝ) : ℂ)⁻¹) * ζ
 
@@ -68,25 +72,44 @@ def sZ (T T' : ℝ) (ζ : ℂ) : ℂ := ((Real.sqrt (Complex.normSq ζ / (T * T'
 def theSecB (a b : Fin (k + 1) → ℂ) (T T' : ℝ) (ζ : ℂ) : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ :=
   gA k a T * nu k (wZ T T' ζ) (sZ T T' ζ) * gB k b T'
 
-def theSection (r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ :=
+def theSection (r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
+    : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ :=
   theSecB k (wbPart k r z) (wbPart k r z') (Tz k r z) (Tz k r z')
 
-private theorem herm_mulVec_of_conjTranspose_mul_eq (H g : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (hg : gᴴ * H * g = H)
-    (x y : Fin (k + 1) → ℂ) : herm H (g *ᵥ x) (g *ᵥ y) = herm H x y := by
+private theorem herm_mulVec_of_conjTranspose_mul_eq
+    (H g : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (hg : gᴴ * H * g = H) (x y : Fin (k + 1) → ℂ)
+    : herm H (g *ᵥ x) (g *ᵥ y) = herm H x y := by
   unfold herm
-  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hg]
+  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
+    hg]
 
-private theorem mul_conjTranspose_form_preserving (H A B : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (hA : Aᴴ * H * A = H)
-    (hB : Bᴴ * H * B = H) : (A * B)ᴴ * H * (A * B) = H := by
+private theorem mul_conjTranspose_form_preserving
+    (H A B : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (hA : Aᴴ * H * A = H) (hB : Bᴴ * H * B = H)
+    : (A * B)ᴴ * H * (A * B) = H := by
   rw [Matrix.conjTranspose_mul]
-  calc Bᴴ * Aᴴ * H * (A * B) = Bᴴ * (Aᴴ * H * A) * B := by simp only [Matrix.mul_assoc]
+  calc
+    Bᴴ * Aᴴ * H * (A * B)
+      = Bᴴ * (Aᴴ * H * A) * B := by simp only [Matrix.mul_assoc]
     _ = H := by rw [hA, hB]
 
-private theorem nu_apply' (hk : 1 ≤ k) (w s : ℂ) (l m : Fin (k + 1)) :
-    nu k w s l m =
-      if m = 0 then (if l = 0 then star w else if l = Fin.last k then s else 0)
-      else if m = Fin.last k then (if l = 0 then s else if l = Fin.last k then w else 0)
-      else (if l = m then 1 else 0) := by
+private theorem nu_apply' (hk : 1 ≤ k) (w s : ℂ) (l m : Fin (k + 1))
+    : nu k w s l m
+      = if m = 0 then
+          (if l = 0 then
+             star w
+           else if l = Fin.last k then
+             s
+           else
+             0)
+        else if m = Fin.last k then
+          (if l = 0 then
+             s
+           else if l = Fin.last k then
+             w
+           else
+             0)
+        else
+          (if l = m then 1 else 0) := by
   have h0L : (0 : Fin (k + 1)) ≠ Fin.last k := by
     intro h
     have h' := congrArg Fin.val h
@@ -115,8 +138,9 @@ private theorem nu_apply' (hk : 1 ≤ k) (w s : ℂ) (l m : Fin (k + 1)) :
         · simp [hl0, hlL, h0L.symm]
     · simp [hm0, hmL]
 
-private theorem nu_conjTranspose_mul_Hb_mul_nu (hk : 1 ≤ k) (w s : ℂ) (hs : star s = s)
-    (hws : star w * w - s * s = 1) : (nu k w s)ᴴ * Hb k * nu k w s = Hb k := by
+private theorem nu_conjTranspose_mul_Hb_mul_nu
+    (hk : 1 ≤ k) (w s : ℂ) (hs : star s = s) (hws : star w * w - s * s = 1)
+    : (nu k w s)ᴴ * Hb k * nu k w s = Hb k := by
   have h0L : (0 : Fin (k + 1)) ≠ Fin.last k := by
     intro h
     have h' := congrArg Fin.val h
@@ -131,13 +155,13 @@ private theorem nu_conjTranspose_mul_Hb_mul_nu (hk : 1 ≤ k) (w s : ℂ) (hs : 
     rw [Fintype.sum_eq_add 0 (Fin.last k) h0L]
     · by_cases hj0 : j = 0
       · subst hj0
-        simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false,
-          ↓reduceIte, mul_one, one_mul, mul_neg, neg_mul]
+        simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false, ↓ reduceIte,
+          mul_one, one_mul, mul_neg, neg_mul]
         linear_combination hws
       · by_cases hjL : j = Fin.last k
         · subst hjL
-          simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false,
-            ↓reduceIte, mul_one, one_mul, mul_neg, neg_mul]
+          simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false, ↓ reduceIte,
+            mul_one, one_mul, mul_neg, neg_mul]
           ring
         · simp [h0L, h0L.symm, hj0, hjL, Ne.symm hj0, Ne.symm hjL]
     · intro x hx
@@ -147,19 +171,19 @@ private theorem nu_conjTranspose_mul_Hb_mul_nu (hk : 1 ≤ k) (w s : ℂ) (hs : 
       rw [Fintype.sum_eq_add 0 (Fin.last k) h0L]
       · by_cases hj0 : j = 0
         · subst hj0
-          simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false,
-            ↓reduceIte, mul_one, one_mul, mul_neg, neg_mul]
+          simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false, ↓ reduceIte,
+            mul_one, one_mul, mul_neg, neg_mul]
           ring
         · by_cases hjL : j = Fin.last k
           · subst hjL
             simp only [h0L, h0L.symm, hs, star_star, eq_self_iff_true, if_true, if_false,
-              ↓reduceIte, mul_one, one_mul, mul_neg, neg_mul]
+              ↓ reduceIte, mul_one, one_mul, mul_neg, neg_mul]
             linear_combination (-1 : ℂ) * hws
           · simp [h0L, h0L.symm, hj0, hjL, Ne.symm hj0, Ne.symm hjL]
       · intro x hx
         simp [hx.1, hx.2]
     · rw [Fintype.sum_eq_single i]
-      · simp only [hi0, hiL, if_false, if_true, ↓reduceIte, eq_self_iff_true, star_one, one_mul]
+      · simp only [hi0, hiL, if_false, if_true, ↓ reduceIte, eq_self_iff_true, star_one, one_mul]
         by_cases hj0 : j = 0
         · subst hj0
           simp [hi0, hiL]
@@ -173,8 +197,8 @@ private theorem nu_conjTranspose_mul_Hb_mul_nu (hk : 1 ≤ k) (w s : ℂ) (hs : 
       · intro x hx
         simp [hi0, hiL, hx]
 
-private theorem nu_mulVec_single_last (hk : 1 ≤ k) (w s : ℂ) :
-    nu k w s *ᵥ Pi.single (Fin.last k) 1 = s • Pi.single 0 1 + w • Pi.single (Fin.last k) 1 := by
+private theorem nu_mulVec_single_last (hk : 1 ≤ k) (w s : ℂ)
+    : nu k w s *ᵥ Pi.single (Fin.last k) 1 = s • Pi.single 0 1 + w • Pi.single (Fin.last k) 1 := by
   have h0L : (0 : Fin (k + 1)) ≠ Fin.last k := by
     intro h
     have h' := congrArg Fin.val h
@@ -192,12 +216,16 @@ private theorem nu_mulVec_single_last (hk : 1 ≤ k) (w s : ℂ) :
       simp [h0L.symm]
     · simp [hl0, hlL, h0L.symm]
 
-theorem theSecB_core (hk : 1 ≤ k) (a b : Fin (k + 1) → ℂ) (T T' : ℝ) (hT : 0 < T) (hT' : 0 < T')
-    (ha : herm (Hb k) a a = -(T : ℂ)) (hb : herm (Hb k) b b = -(T' : ℂ)) :
-    (∀ i j, ContDiffOn ℝ ∞ (fun ζ => theSecB k a b T T' ζ i j) {ζ : ℂ | T * T' < Complex.normSq ζ}) ∧
-      ∀ ζ : ℂ, T * T' < Complex.normSq ζ →
-        (theSecB k a b T T' ζ)ᴴ * Hb k * theSecB k a b T T' ζ = Hb k ∧
-          herm (Hb k) (theSecB k a b T T' ζ *ᵥ b) a = ζ := by
+theorem theSecB_core
+    (hk : 1 ≤ k)
+    (a b : Fin (k + 1) → ℂ) (T T' : ℝ)
+    (hT : 0 < T) (hT' : 0 < T') (ha : herm (Hb k) a a = -(T : ℂ)) (hb : herm (Hb k) b b = -(T' : ℂ))
+    : (∀ i j,
+        ContDiffOn ℝ ∞ (fun ζ => theSecB k a b T T' ζ i j) {ζ : ℂ | T * T' < Complex.normSq ζ})
+      ∧ ∀ ζ : ℂ,
+        T * T' < Complex.normSq ζ
+          → (theSecB k a b T T' ζ)ᴴ * Hb k * theSecB k a b T T' ζ = Hb k
+            ∧ herm (Hb k) (theSecB k a b T T' ζ *ᵥ b) a = ζ := by
   have hTT : 0 < T * T' := mul_pos hT hT'
   let S : Set ℂ := {ζ : ℂ | T * T' < Complex.normSq ζ}
   have hw : ContDiff ℝ ∞ (fun ζ : ℂ => wZ T T' ζ) := by
@@ -226,11 +254,8 @@ theorem theSecB_core (hk : 1 ≤ k) (a b : Fin (k + 1) → ℂ) (T T' : ℝ) (hT
     intro y x
     simp only [nu_apply' k hk]
     split_ifs
-    all_goals first
-      | exact contDiffOn_const
-      | exact hws.contDiffOn
-      | exact hw.contDiffOn
-      | exact hsz
+    all_goals
+      first | exact contDiffOn_const | exact hws.contDiffOn | exact hw.contDiffOn | exact hsz
   refine ⟨?_, ?_⟩
   · intro i j
     simp only [theSecB, Matrix.mul_apply]
@@ -258,8 +283,9 @@ theorem theSecB_core (hk : 1 ≤ k) (a b : Fin (k + 1) → ℂ) (T T' : ℝ) (hT
       have h1 : Complex.normSq (wZ T T' ζ) = Complex.normSq ζ / (T * T') := by
         unfold wZ
         rw [Complex.normSq_mul, Complex.normSq_neg, Complex.normSq_inv, Complex.normSq_ofReal]
-        rw [show Real.sqrt T * Real.sqrt T' * (Real.sqrt T * Real.sqrt T') =
-            (Real.sqrt T * Real.sqrt T) * (Real.sqrt T' * Real.sqrt T') by ring,
+        rw [show Real.sqrt T * Real.sqrt T' * (Real.sqrt T * Real.sqrt T')
+              = (Real.sqrt T * Real.sqrt T) * (Real.sqrt T' * Real.sqrt T') by
+            ring,
           Real.mul_self_sqrt hT.le, Real.mul_self_sqrt hT'.le, div_eq_inv_mul]
       have h2 : star (wZ T T' ζ) * wZ T T' ζ = (Complex.normSq (wZ T T' ζ) : ℂ) :=
         Complex.normSq_eq_conj_mul_self.symm
@@ -273,19 +299,23 @@ theorem theSecB_core (hk : 1 ≤ k) (a b : Fin (k + 1) → ℂ) (T T' : ℝ) (hT
     have hB := gB_spec k hT' hb
     refine ⟨?_, ?_⟩
     · unfold theSecB
-      exact mul_conjTranspose_form_preserving k _ _ _ (mul_conjTranspose_form_preserving k _ _ _ hA.1 (nu_conjTranspose_mul_Hb_mul_nu k hk _ _ hsr hkey)) hB.1
+      exact mul_conjTranspose_form_preserving k _ _ _
+        (mul_conjTranspose_form_preserving k _ _ _ hA.1
+          (nu_conjTranspose_mul_Hb_mul_nu k hk _ _ hsr hkey))
+        hB.1
     · unfold theSecB
       rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hB.2]
       conv_lhs => arg 3; rw [← hA.2]
-      rw [herm_mulVec_of_conjTranspose_mul_eq k _ _ hA.1, Matrix.mulVec_smul, nu_mulVec_single_last k hk]
+      rw [herm_mulVec_of_conjTranspose_mul_eq k _ _ hA.1, Matrix.mulVec_smul,
+        nu_mulVec_single_last k hk]
       have hcs : star ((Real.sqrt T : ℝ) : ℂ) = ((Real.sqrt T : ℝ) : ℂ) := Complex.conj_ofReal _
       have hT0 : ((Real.sqrt T : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (Real.sqrt_pos.2 hT).ne'
       have hT0' : ((Real.sqrt T' : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (Real.sqrt_pos.2 hT').ne'
       unfold herm Hb
       rw [dotProduct, Finset.sum_eq_single (Fin.last k)]
       · simp only [Matrix.mulVec_diagonal, Pi.star_apply, Pi.smul_apply, Pi.add_apply,
-          Pi.single_eq_same, Pi.single_eq_of_ne h0L.symm, smul_eq_mul, mul_one, mul_zero,
-          zero_add, star_mul', star_one, eq_self_iff_true, if_true, ↓reduceIte]
+          Pi.single_eq_same, Pi.single_eq_of_ne h0L.symm, smul_eq_mul, mul_one, mul_zero, zero_add,
+          star_mul', star_one, eq_self_iff_true, if_true, ↓ reduceIte]
         rw [hcs]
         unfold wZ
         push_cast
@@ -295,10 +325,12 @@ theorem theSecB_core (hk : 1 ≤ k) (a b : Fin (k + 1) → ℂ) (T T' : ℝ) (hT
       · intro h
         exact absurd (Finset.mem_univ _) h
 
-private theorem herm_Hb_wbPart_eq_herm_Hpk_of_inWb (r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) :
-    herm (Hb k) (wbPart k r z) (wbPart k r z) = herm (Hpk k r) z z := by
-  have hin : ∀ i : Fin (2 * r + k + 1), r ≤ i.val → i.val ≤ r + k →
-      (Hpk k r *ᵥ z) i = (if i.val = r + k then -1 else 1) * z i := by
+private theorem herm_Hb_wbPart_eq_herm_Hpk_of_inWb
+    (r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z)
+    : herm (Hb k) (wbPart k r z) (wbPart k r z) = herm (Hpk k r) z z := by
+  have hin
+      : ∀ i : Fin (2 * r + k + 1),
+        r ≤ i.val → i.val ≤ r + k → (Hpk k r *ᵥ z) i = (if i.val = r + k then -1 else 1) * z i := by
     intro i h1 h2
     simp only [Matrix.mulVec, dotProduct]
     rw [Finset.sum_eq_single i]
@@ -308,9 +340,11 @@ private theorem herm_Hb_wbPart_eq_herm_Hpk_of_inWb (r : ℕ) (z : Fin (2 * r + k
       by_cases hj : j.val < r ∨ r + k < j.val
       · rw [hz j hj, mul_zero]
       · simp only [Hpk]
-        rw [if_neg (by omega), if_neg (by omega), if_neg (by
-          rintro ⟨_, _, h⟩
-          exact hji h.symm), zero_mul]
+        rw [if_neg (by omega), if_neg (by omega),
+          if_neg (by
+            rintro ⟨_, _, h⟩
+            exact hji h.symm),
+          zero_mul]
     · intro h
       exact absurd (Finset.mem_univ _) h
   unfold herm
@@ -334,16 +368,16 @@ private theorem herm_Hb_wbPart_eq_herm_Hpk_of_inWb (r : ℕ) (z : Fin (2 * r + k
     rw [hin _ h1 h2]
     unfold Hb
     rw [Matrix.mulVec_diagonal]
-    have hc : (j = Fin.last k) ↔ (wI k r j).val = r + k := by
-      simp [wI, Fin.ext_iff]
+    have hc : (j = Fin.last k) ↔ (wI k r j).val = r + k := by simp [wI, Fin.ext_iff]
     simp only [wbPart]
     by_cases hjl : j = Fin.last k
     · rw [if_pos hjl, if_pos (hc.1 hjl)]
     · rw [if_neg hjl, if_neg (fun h => hjl (hc.2 h))]
 
-theorem theSection_isSection (r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hk : 1 ≤ k) (hz : inWb k r z)
-    (hz' : inWb k r z') (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z') :
-    IsSection k r z z' (theSection k r z z') := by
+theorem theSection_isSection
+    (r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
+    (hk : 1 ≤ k) (hz : inWb k r z) (hz' : inWb k r z') (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z')
+    : IsSection k r z z' (theSection k r z z') := by
   have hreal : ∀ x : Fin (k + 1) → ℂ, (herm (Hb k) x x).im = 0 := by
     intro x
     unfold herm Hb
@@ -352,8 +386,9 @@ theorem theSection_isSection (r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hk 
     intro j _
     rw [Matrix.mulVec_diagonal]
     split_ifs <;> simp [Complex.mul_im] <;> (try ring)
-  have hrel : ∀ v : Fin (2 * r + k + 1) → ℂ, inWb k r v →
-      herm (Hb k) (wbPart k r v) (wbPart k r v) = -(Tz k r v : ℂ) := by
+  have hrel
+      : ∀ v : Fin (2 * r + k + 1) → ℂ,
+        inWb k r v → herm (Hb k) (wbPart k r v) (wbPart k r v) = -(Tz k r v : ℂ) := by
     intro v hv
     have e := herm_Hb_wbPart_eq_herm_Hpk_of_inWb k r v hv
     unfold Tz

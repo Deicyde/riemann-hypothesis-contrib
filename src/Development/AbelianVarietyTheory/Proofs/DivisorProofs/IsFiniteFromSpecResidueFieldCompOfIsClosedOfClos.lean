@@ -7,20 +7,29 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Admissi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory
 
-theorem isFinite_fromSpecResidueField_comp_of_isClosed_of_closedPoint : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Over (Sp R)), LocallyOfFiniteType X.hom → ∀ x : X.left, X.hom x = closedPoint R → IsClosed ({x} : Set X.left) → IsFinite (X.left.fromSpecResidueField x ≫ X.hom) := by
+theorem isFinite_fromSpecResidueField_comp_of_isClosed_of_closedPoint
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Over (Sp R)),
+      LocallyOfFiniteType X.hom
+        → ∀ x : X.left,
+          X.hom x = closedPoint R → IsClosed ({x} : Set X.left)
+            → IsFinite (X.left.fromSpecResidueField x ≫ X.hom) := by
   intro R _ _ X hX x hx hc
   haveI := hX
   haveI := isClosed_singleton_iff_isClosedImmersion.mp hc
   have hf : LocallyOfFiniteType (X.left.fromSpecResidueField x ≫ X.hom) := inferInstance
-  have hpt : ∀ p : Spec (X.left.residueField x), (X.left.fromSpecResidueField x ≫ X.hom) p = closedPoint R := by
+  have hpt
+      : ∀ p : Spec (X.left.residueField x),
+        (X.left.fromSpecResidueField x ≫ X.hom) p = closedPoint R := by
     intro p
     rw [Scheme.Hom.comp_apply, Scheme.fromSpecResidueField_apply, hx]
   rw [← Spec.map_preimage (X.left.fromSpecResidueField x ≫ X.hom)] at hf hpt ⊢
@@ -36,10 +45,10 @@ theorem isFinite_fromSpecResidueField_comp_of_isClosed_of_closedPoint : ∀ (R :
     have h3 : Ideal.comap φ.hom ⊥ = (closedPoint R).asIdeal := by simpa [p0] using h1
     exact h3
   let k := ResidueField R
-  let ψ : k →+* K := Ideal.Quotient.lift (maximalIdeal R) φ.hom (fun a ha => by
-    rw [← RingHom.mem_ker, hker]; exact ha)
-  have hφ : φ.hom = ψ.comp (residue R) := by
-    ext a; rfl
+  let ψ : k →+* K :=
+    Ideal.Quotient.lift (maximalIdeal R) φ.hom
+      (fun a ha => by rw [← RingHom.mem_ker, hker]; exact ha)
+  have hφ : φ.hom = ψ.comp (residue R) := by ext a; rfl
   rw [hφ] at hf ⊢
   have hψ : ψ.FiniteType := RingHom.FiniteType.of_comp_finiteType hf
   letI : Algebra k K := ψ.toAlgebra

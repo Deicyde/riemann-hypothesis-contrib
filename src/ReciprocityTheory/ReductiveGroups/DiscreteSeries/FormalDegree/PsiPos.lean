@@ -104,16 +104,20 @@ lemma psiPos_posDef_conj (k : KG ε) {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.Po
 
 end PsiPosAux
 
-theorem psi_exp_isPositive {ε : Fin n → Bool} {lam : Fin n → ℝ} (T : S7.KType ε (lowK ε lam))
-    (Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)) (μ : Fin n → ℤ) (hμ : S7.IsMu lam μ)
-    (hform : ∀ X, inP ε X → Ψ (NormedSpace.exp X) =
-      ((Module.finrank ℂ T.V : ℂ) / ((S7.muK ε Set.univ).toReal : ℂ)) •
-        ∫ k, S7.PhiM μ (S7.toMK k⁻¹ * NormedSpace.exp X * S7.toMK k)⁻¹ • (T.op k * S7.projW T * T.op k⁻¹)
-          ∂(S7.muK ε)) :
-    ∀ X, inP ε X → (Ψ (NormedSpace.exp X)).IsPositive := by
+theorem psi_exp_isPositive
+    {ε : Fin n → Bool} {lam : Fin n → ℝ}
+    (T : S7.KType ε (lowK ε lam)) (Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V))
+    (μ : Fin n → ℤ) (hμ : S7.IsMu lam μ)
+    (hform : ∀ X,
+      inP ε X
+        → Ψ (NormedSpace.exp X)
+          = ((Module.finrank ℂ T.V : ℂ) / ((S7.muK ε Set.univ).toReal : ℂ))
+            • ∫ k, S7.PhiM μ (S7.toMK k⁻¹ * NormedSpace.exp X * S7.toMK k)⁻¹ • (T.op k * S7.projW T * T.op k⁻¹)
+                ∂(S7.muK ε))
+    : ∀ X, inP ε X → (Ψ (NormedSpace.exp X)).IsPositive := by
   intro X hX
-  have hpd : ∀ k : S7.KG ε, (S7.toMK k⁻¹ * NormedSpace.exp X * S7.toMK k)⁻¹.PosDef :=
-    fun k => (psiPos_posDef_conj k (S7.exp_noncompactPart_posDef hX)).inv
+  have hpd : ∀ k : S7.KG ε, (S7.toMK k⁻¹ * NormedSpace.exp X * S7.toMK k)⁻¹.PosDef := fun k =>
+    (psiPos_posDef_conj k (S7.exp_noncompactPart_posDef hX)).inv
   let g : S7.KG ε → ℝ := fun k => (S7.PhiM μ (S7.toMK k⁻¹ * NormedSpace.exp X * S7.toMK k)⁻¹).re
   have hphi : ∀ k, S7.PhiM μ (S7.toMK k⁻¹ * NormedSpace.exp X * S7.toMK k)⁻¹ = ((g k : ℝ) : ℂ) := by
     intro k
@@ -122,8 +126,9 @@ theorem psi_exp_isPositive {ε : Fin n → Bool} {lam : Fin n → ℝ} (T : S7.K
     · simp [g, (S7.phiM_posDef μ (hpd k)).2]
   have hc : (0 : ℝ) ≤ (Module.finrank ℂ T.V : ℝ) / (S7.muK ε Set.univ).toReal :=
     div_nonneg (Nat.cast_nonneg _) ENNReal.toReal_nonneg
-  have hcc : ((Module.finrank ℂ T.V : ℂ) / ((S7.muK ε Set.univ).toReal : ℂ)) =
-      ((((Module.finrank ℂ T.V : ℝ) / (S7.muK ε Set.univ).toReal : ℝ)) : ℂ) := by
+  have hcc
+      : ((Module.finrank ℂ T.V : ℂ) / ((S7.muK ε Set.univ).toReal : ℂ))
+        = ((((Module.finrank ℂ T.V : ℝ) / (S7.muK ε Set.univ).toReal : ℝ)) : ℂ) := by
     push_cast
     rfl
   rw [hform X hX, hcc]

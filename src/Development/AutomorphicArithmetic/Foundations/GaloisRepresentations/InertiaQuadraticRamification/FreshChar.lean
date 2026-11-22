@@ -5,12 +5,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-private theorem chi_of_pow {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {p : ℕ} [Fact p.Prime] {ζ : Ω}
-    (hζ : IsPrimitiveRoot ζ p) (g : G F Ω) (k : ℕ) (h : g ζ = ζ ^ k) :
-    ((hζ.autToPow F g : (ZMod p)ˣ) : ZMod p) = (k : ZMod p) := by
+private theorem chi_of_pow
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    {p : ℕ} [Fact p.Prime]
+    {ζ : Ω} (hζ : IsPrimitiveRoot ζ p)
+    (g : G F Ω) (k : ℕ) (h : g ζ = ζ ^ k)
+    : ((hζ.autToPow F g : (ZMod p)ˣ) : ZMod p) = (k : ZMod p) := by
   have h1 := hζ.autToPow_spec F g
   have hfin : IsOfFinOrder ζ :=
     isOfFinOrder_iff_pow_eq_one.2 ⟨p, (Fact.out : p.Prime).pos, hζ.pow_eq_one⟩
@@ -18,22 +22,31 @@ private theorem chi_of_pow {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {p 
   rw [← ZMod.natCast_zmod_val ((hζ.autToPow F g : (ZMod p)ˣ) : ZMod p)]
   exact (ZMod.natCast_eq_natCast_iff _ _ _).2 h1
 
-private theorem chi_one {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {p : ℕ} [Fact p.Prime] {ζ : Ω}
-    (hζ : IsPrimitiveRoot ζ p) (g : G F Ω) (h : g ζ = ζ) : hζ.autToPow F g = 1 := by
+private theorem chi_one
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    {p : ℕ} [Fact p.Prime]
+    {ζ : Ω} (hζ : IsPrimitiveRoot ζ p)
+    (g : G F Ω) (h : g ζ = ζ)
+    : hζ.autToPow F g = 1 := by
   apply Units.ext
   rw [chi_of_pow hζ g 1 (by rw [h, pow_one])]
   simp
 
-private theorem exists_prim {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    (p : ℕ) [Fact p.Prime] : ∃ ζ : Ω, IsPrimitiveRoot ζ p := by
+private theorem exists_prim
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (p : ℕ) [Fact p.Prime]
+    : ∃ ζ : Ω, IsPrimitiveRoot ζ p := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   haveI : NeZero (p : Ω) := ⟨by exact_mod_cast (Fact.out : p.Prime).ne_zero⟩
   exact HasEnoughRootsOfUnity.exists_primitiveRoot Ω p
 
-private theorem chi_conj {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {p : ℕ} [Fact p.Prime] {ζ : Ω}
-    (hζ : IsPrimitiveRoot ζ p) (j : Ω →+* ℂ) (c : G F Ω) (hc : ∀ x, j (c x) = starRingEnd ℂ (j x)) :
-    hζ.autToPow F c = -1 := by
+private theorem chi_conj
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    {p : ℕ} [Fact p.Prime]
+    {ζ : Ω} (hζ : IsPrimitiveRoot ζ p)
+    (j : Ω →+* ℂ) (c : G F Ω) (hc : ∀ x, j (c x) = starRingEnd ℂ (j x))
+    : hζ.autToPow F c = -1 := by
   have hp := (Fact.out : p.Prime)
   have hw : (j ζ) ^ p = 1 := by rw [← map_pow, hζ.pow_eq_one, map_one]
   have hn : ‖j ζ‖ = 1 := Complex.norm_eq_one_of_pow_eq_one hw hp.ne_zero
@@ -47,9 +60,12 @@ private theorem chi_conj {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {p : 
   rw [chi_of_pow hζ c (p - 1) hcz, Nat.cast_sub hp.one_lt.le, ZMod.natCast_self]
   simp
 
-private theorem good_ker {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {p : ℕ}
-    [Fact p.Prime] {ζ : Ω} (hζ : IsPrimitiveRoot ζ p) (lam : (ZMod p)ˣ →* ℂˣ) (h1 : lam (-1) = 1) :
-    Good (lam.comp (hζ.autToPow F)).ker := by
+private theorem good_ker
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {p : ℕ} [Fact p.Prime]
+    {ζ : Ω} (hζ : IsPrimitiveRoot ζ p)
+    (lam : (ZMod p)ˣ →* ℂˣ) (h1 : lam (-1) = 1)
+    : Good (lam.comp (hζ.autToPow F)).ker := by
   haveI : Algebra.IsIntegral F Ω := (IsAlgClosure.isAlgebraic (R := F) (K := Ω)).isIntegral
   refine ⟨?_, Abelianization.commutator_subset_ker _, ?_⟩
   · refine Subgroup.isOpen_mono (H₁ := MulAction.stabilizer (G F Ω) ζ) ?_
@@ -59,12 +75,13 @@ private theorem good_ker {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Alg
   · intro j c hc
     rw [MonoidHom.mem_ker, MonoidHom.comp_apply, chi_conj hζ j c hc, h1]
 
-private theorem lam_pow {p n : ℕ} [Fact p.Prime] (lam : (ZMod p)ˣ →* ℂˣ) (hn : lam ^ n = 1) (a : (ZMod p)ˣ) :
-    lam a ^ n = 1 := by
+private theorem lam_pow
+    {p n : ℕ} [Fact p.Prime] (lam : (ZMod p)ˣ →* ℂˣ) (hn : lam ^ n = 1) (a : (ZMod p)ˣ)
+    : lam a ^ n = 1 := by
   rw [← MonoidHom.pow_apply, hn, MonoidHom.one_apply]
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.freshChar :
-    PowChar → InertiaGen → DecPow → FreshPrime → FreshChar := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.freshChar
+    : PowChar → InertiaGen → DecPow → FreshPrime → FreshChar := by
   intro hPow hIG hDP hFP F Ω _ _ _ _ _ U hU T hT n hn
   obtain ⟨u, huT, hpr, hpu, hpu2, hdec, hdvd, hTt⟩ := hFP F Ω U hU T hT n hn
   haveI : Fact (Nat.Prime (normV u)) := ⟨hpr⟩

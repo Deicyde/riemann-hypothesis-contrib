@@ -7,44 +7,47 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
-private theorem nu_eq_one_of_mem_n_of_good_of_ok {k : Type} [Field k] (g : GL (Fin 3) k) :
-    (th' k g).1 =
-      !![(g⁻¹).1 2 2, -(g⁻¹).1 1 2, (g⁻¹).1 0 2;
-        -(g⁻¹).1 2 1, (g⁻¹).1 1 1, -(g⁻¹).1 0 1;
-        (g⁻¹).1 2 0, -(g⁻¹).1 1 0, (g⁻¹).1 0 0] := by
+private theorem nu_eq_one_of_mem_n_of_good_of_ok {k : Type} [Field k] (g : GL (Fin 3) k)
+    : (th' k g).1
+      = !![(g⁻¹).1 2 2, -(g⁻¹).1 1 2, (g⁻¹).1 0 2;
+          -(g⁻¹).1 2 1, (g⁻¹).1 1 1, -(g⁻¹).1 0 1;
+          (g⁻¹).1 2 0, -(g⁻¹).1 1 0, (g⁻¹).1 0 0] := by
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [th', th, GlobalTheory.CuspRep.invT, Reformulated.TransposeInverseTheory.transposeInv,
-      Reformulated.TransposeInverseTheory.transposeInvFun, Phi, MulAut.conj, Matrix.mul_apply, Fin.sum_univ_three,
-      Matrix.vecMul, dotProduct] <;>
-    rw [← Matrix.GeneralLinearGroup.coe_inv] <;> rfl
+  fin_cases i <;> fin_cases j
+    <;> simp [th', th, GlobalTheory.CuspRep.invT, Reformulated.TransposeInverseTheory.transposeInv,
+      Reformulated.TransposeInverseTheory.transposeInvFun, Phi, MulAut.conj, Matrix.mul_apply,
+      Fin.sum_univ_three, Matrix.vecMul, dotProduct]
+    <;> rw [← Matrix.GeneralLinearGroup.coe_inv] <;> rfl
 
-private theorem nu_eq_one_of_mem_mu_of_good_of_deep {k : Type} [Field k] (g : GL (Fin 3) k) :
-    ((th' k g)⁻¹).1 =
-      !![g.1 2 2, -g.1 1 2, g.1 0 2;
-        -g.1 2 1, g.1 1 1, -g.1 0 1;
-        g.1 2 0, -g.1 1 0, g.1 0 0] := by
+private theorem nu_eq_one_of_mem_mu_of_good_of_deep {k : Type} [Field k] (g : GL (Fin 3) k)
+    : ((th' k g)⁻¹).1
+      = !![g.1 2 2, -g.1 1 2, g.1 0 2;
+          -g.1 2 1, g.1 1 1, -g.1 0 1;
+          g.1 2 0, -g.1 1 0, g.1 0 0] := by
   rw [← map_inv, nu_eq_one_of_mem_n_of_good_of_ok, inv_inv]
 
-private theorem mul_self_eq_one_and_nu_neg_one_of_isCC {k : Type} [Field k] (t : Fin 3 → kˣ) :
-    th' k (diagT k (Fin 3) t) = diagT k (Fin 3) ![(t 2)⁻¹, (t 1)⁻¹, (t 0)⁻¹] := by
+private theorem mul_self_eq_one_and_nu_neg_one_of_isCC {k : Type} [Field k] (t : Fin 3 → kˣ)
+    : th' k (diagT k (Fin 3) t) = diagT k (Fin 3) ![(t 2)⁻¹, (t 1)⁻¹, (t 0)⁻¹] := by
   apply Units.ext
   rw [nu_eq_one_of_mem_n_of_good_of_ok, ← map_inv, val_diagT, val_diagT]
   ext i j
   fin_cases i <;> fin_cases j <;> simp [Matrix.diagonal]
 
-private theorem exists_rt_ne_cycF_of_good_of_ok {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (c : ℕ) (g : GL (Fin 3) k) (hg : g ∈ Kc k 3 c) :
-    th' k g ∈ Kc k 3 c := by
+private theorem exists_rt_ne_cycF_of_good_of_ok
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (c : ℕ) (g : GL (Fin 3) k) (hg : g ∈ Kc k 3 c)
+    : th' k g ∈ Kc k 3 c := by
   rw [GlAx.mem_Kc] at hg ⊢
   obtain ⟨h1, h2⟩ := hg
   simp only [GlAx.Bd] at h1 h2 ⊢
   refine ⟨fun i j => ?_, fun i j => ?_⟩
   · rw [nu_eq_one_of_mem_n_of_good_of_ok]
-    fin_cases i <;> fin_cases j <;>
-      first
+    fin_cases i <;> fin_cases j
+      <;> first
         | simpa [Matrix.one_apply] using h2 0 0
         | simpa [Matrix.one_apply] using h2 0 1
         | simpa [Matrix.one_apply] using h2 0 2
@@ -55,8 +58,8 @@ private theorem exists_rt_ne_cycF_of_good_of_ok {k : Type} [Field k] [ValuativeR
         | simpa [Matrix.one_apply] using h2 2 1
         | simpa [Matrix.one_apply] using h2 2 2
   · rw [nu_eq_one_of_mem_mu_of_good_of_deep]
-    fin_cases i <;> fin_cases j <;>
-      first
+    fin_cases i <;> fin_cases j
+      <;> first
         | simpa [Matrix.one_apply] using h1 0 0
         | simpa [Matrix.one_apply] using h1 0 1
         | simpa [Matrix.one_apply] using h1 0 2
@@ -67,9 +70,10 @@ private theorem exists_rt_ne_cycF_of_good_of_ok {k : Type} [Field k] [ValuativeR
         | simpa [Matrix.one_apply] using h1 2 1
         | simpa [Matrix.one_apply] using h1 2 2
 
-private theorem th'_mem_n {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (g : GL (Fin 3) k) (hg : g ∈ (glIwa k 3).N) :
-    th' k g ∈ (glIwa k 3).N := by
+private theorem th'_mem_n
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (g : GL (Fin 3) k) (hg : g ∈ (glIwa k 3).N)
+    : th' k g ∈ (glIwa k 3).N := by
   have hg' : g ∈ unipB k (Fin 3) ⊓ KO k (Fin 3) := hg
   show th' k g ∈ unipB k (Fin 3) ⊓ KO k (Fin 3)
   obtain ⟨hu, hk⟩ := Subgroup.mem_inf.1 hg'
@@ -91,10 +95,13 @@ private theorem th'_mem_n {k : Type} [Field k] [ValuativeRel k] [TopologicalSpac
   · rw [← GlAx.Kc_zero] at hk ⊢
     exact exists_rt_ne_cycF_of_good_of_ok 0 g hk
 
-private theorem th'_mem_nm {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (c : ℕ) (g : GL (Fin 3) k) (hg : g ∈ (glIwa k 3).Nm c) :
-    th' k g ∈ (glIwa k 3).Nm c := by
-  have hg' : g ∈ Subgroup.comap (GlobalTheory.CuspRep.invT 3 k) (unipB k (Fin 3)) ⊓ Kc k 3 (c + 1) := hg
+private theorem th'_mem_nm
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (c : ℕ) (g : GL (Fin 3) k) (hg : g ∈ (glIwa k 3).Nm c)
+    : th' k g ∈ (glIwa k 3).Nm c := by
+  have hg'
+      : g ∈ Subgroup.comap (GlobalTheory.CuspRep.invT 3 k) (unipB k (Fin 3)) ⊓ Kc k 3 (c + 1) :=
+    hg
   show th' k g ∈ Subgroup.comap (GlobalTheory.CuspRep.invT 3 k) (unipB k (Fin 3)) ⊓ Kc k 3 (c + 1)
   obtain ⟨hu, hk⟩ := Subgroup.mem_inf.1 hg'
   refine Subgroup.mem_inf.2 ⟨?_, exists_rt_ne_cycF_of_good_of_ok _ g hk⟩
@@ -113,21 +120,20 @@ private theorem th'_mem_nm {k : Type} [Field k] [ValuativeRel k] [TopologicalSpa
   · rw [nu_eq_one_of_mem_n_of_good_of_ok]
     fin_cases i <;> simp_all
 
-private theorem th_th' {k : Type} [Field k] (n : ℕ) (g : GL (Fin n) k) :
-    th k n (th k n g) = g := by
+private theorem th_th' {k : Type} [Field k] (n : ℕ) (g : GL (Fin n) k) : th k n (th k n g) = g := by
   apply Units.ext
   show ((g : Matrix (Fin n) (Fin n) k)ᵀ)ᵀ = g
   exact Matrix.transpose_transpose _
 
-private theorem th'_th' {k : Type} [Field k] (g : GL (Fin 3) k) :
-    th' k (th' k g) = g := by
+private theorem th'_th' {k : Type} [Field k] (g : GL (Fin 3) k) : th' k (th' k g) = g := by
   apply Units.ext
   ext i j
   rw [nu_eq_one_of_mem_n_of_good_of_ok, ← map_inv, nu_eq_one_of_mem_n_of_good_of_ok, inv_inv]
   fin_cases i <;> fin_cases j <;> simp
 
-private theorem continuous_th'' {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] : Continuous (th' k) := by
+private theorem continuous_th''
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : Continuous (th' k) := by
   have e1 : ∀ g : GL (Fin 3) k, (th' k g).1 = (Phi k).1 * ((g⁻¹).1)ᵀ * ((Phi k)⁻¹).1 := fun g => rfl
   have e2 : ∀ g : GL (Fin 3) k, ((th' k g)⁻¹).1 = (Phi k).1 * (g.1)ᵀ * ((Phi k)⁻¹).1 := by
     intro g
@@ -150,10 +156,8 @@ theorem UpperTheory.V.Z.Sym.Sig.thFacts : UpperTheory.V.Z.Sym.Sig.ThFacts := by
     refine Subgroup.mem_map.2 ⟨_, ?_, rfl⟩
     rw [Subgroup.mem_pi] at ht ⊢
     intro i _
-    fin_cases i <;> simp <;>
-      first
-        | exact ht _ (Set.mem_univ _)
-        | exact inv_mem (ht _ (Set.mem_univ _))
+    fin_cases i <;> simp
+      <;> first | exact ht _ (Set.mem_univ _) | exact inv_mem (ht _ (Set.mem_univ _))
   have hP : Pres V (th' k) :=
     ⟨continuous_th'', th'_th', th'_mem_n, hT, th'_mem_nm, exists_rt_ne_cycF_of_good_of_ok⟩
   refine ⟨hP, ?_, ?_, ?_, ?_, ?_, ?_⟩

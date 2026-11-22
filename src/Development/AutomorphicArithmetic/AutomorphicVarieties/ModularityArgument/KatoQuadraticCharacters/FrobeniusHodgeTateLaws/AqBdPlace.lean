@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Untwisted
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.K4
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.K4
 open UpperTheory.V.Z.Kato.Joint
 open scoped Pointwise
 
@@ -21,8 +23,9 @@ private theorem aqBd_place {q : ℕ} (hq : q.Prime) : ∃ w : Pl, ((q : ℕ) : �
   rw [h, Ideal.mem_bot] at hmem
   exact hq.ne_zero (Nat.cast_eq_zero.1 hmem)
 
-private theorem aqBd_frob (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {q : ℕ} (hq : q.Prime) :
-    ∃ s : Ω ≃ₐ[ℚ] Ω, FrobAt q s := by
+private theorem aqBd_frob
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {q : ℕ} (hq : q.Prime)
+    : ∃ s : Ω ≃ₐ[ℚ] Ω, FrobAt q s := by
   obtain ⟨w, hw⟩ := aqBd_place hq
   obtain ⟨V, hV⟩ := exists_isPlaceOver (F := ℚ) Ω w
   obtain ⟨σ, hσ⟩ := exists_isFrob (F := ℚ) hV
@@ -34,15 +37,16 @@ private theorem aqBd_frob (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure 
     rw [← h]
     exact ValuationSubring.smul_mem_pointwise_smul σ x V hx
 
-theorem UpperTheory.V.Z.Kato.Joint.aqBd :
-    UpperTheory.V.Z.Kato.Joint.AqBd := by
+theorem UpperTheory.V.Z.Kato.Joint.aqBd : UpperTheory.V.Z.Kato.Joint.AqBd := by
   intro l _ Ω _ _ _ ι e S A W g χ hN hχ hatt
   obtain ⟨S0, hS0⟩ := GlobalTheory.RhoAdm.frob_trace_det ι e W g χ hatt
-  have hc := (Continuous.matrix_trace
-    (Units.continuous_val.comp (GlobalTheory.RhoAdm.untw_cont e W χ hN.cont hχ))).norm
+  have hc :=
+    (Continuous.matrix_trace (Units.continuous_val.comp (GlobalTheory.RhoAdm.untw_cont e W χ hN.cont
+      hχ))).norm
   haveI : CompactSpace (Ω ≃ₐ[ℚ] Ω) := inferInstance
   obtain ⟨C, hC⟩ := (isCompact_range hc).bddAbove
-  obtain ⟨k, hk⟩ := GlobalTheory.KummerEisensteinGalois.exists_le_l_pow l (max C (∑ q ∈ S0, ‖ι.symm (g.a q)‖))
+  obtain ⟨k, hk⟩ :=
+    GlobalTheory.KummerEisensteinGalois.exists_le_l_pow l (max C (∑ q ∈ S0, ‖ι.symm (g.a q)‖))
   refine ⟨k, fun q hq => le_trans ?_ hk⟩
   by_cases hqS : q ∈ S0
   · exact le_max_of_le_right

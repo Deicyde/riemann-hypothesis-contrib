@@ -8,11 +8,12 @@ namespace GlobalTheory.CompanionTheory.LuFields
 
 open Matrix
 
-theorem entries_mem_of_eq_mul {K L : Type} [Field K] [Field L] [Algebra K L] {n : ℕ}
-    (F : IntermediateField K L) (C v w : Matrix (Fin n) (Fin n) L) (hC : ∀ i k, C i k ∈ F)
-    (hv1 : ∀ k, v k k = 1) (hv0 : ∀ l k, l < k → v l k = 0)
-    (hw0 : ∀ l k, k < l → w l k = 0) (hwd : ∀ k, w k k ≠ 0) (h : C = v * w) :
-    (∀ i k, v i k ∈ F) ∧ (∀ i k, w i k ∈ F) := by
+theorem entries_mem_of_eq_mul
+    {K L : Type} [Field K] [Field L] [Algebra K L]
+    {n : ℕ} (F : IntermediateField K L) (C v w : Matrix (Fin n) (Fin n) L) (hC : ∀ i k, C i k ∈ F)
+    (hv1 : ∀ k, v k k = 1) (hv0 : ∀ l k, l < k → v l k = 0) (hw0 : ∀ l k, k < l → w l k = 0)
+    (hwd : ∀ k, w k k ≠ 0) (h : C = v * w)
+    : (∀ i k, v i k ∈ F) ∧ (∀ i k, w i k ∈ F) := by
   have hC' : ∀ i k, ∑ l, v i l * w l k ∈ F := fun i k => by
     have := hC i k
     rwa [h, Matrix.mul_apply] at this
@@ -64,17 +65,19 @@ theorem entries_mem_of_eq_mul {K L : Type} [Field K] [Field L] [Algebra K L] {n 
           refine ⟨hv i k hk hlt, ?_⟩
           rw [hw0 i k hlt]
           exact F.zero_mem
-  exact ⟨fun i k => (key (i + 1) i k (Or.inl (Nat.lt_succ_self _))).1,
-    fun i k => (key (i + 1) i k (Or.inl (Nat.lt_succ_self _))).2⟩
+  exact ⟨
+    fun i k => (key (i + 1) i k (Or.inl (Nat.lt_succ_self _))).1,
+    fun i k => (key (i + 1) i k (Or.inl (Nat.lt_succ_self _))).2
+  ⟩
 
-theorem adjoin_entries_eq (K L : Type) [Field K] [Field L] [Algebra K L] (n : ℕ)
-    (A : Matrix (Fin n) (Fin n) K) (u v w : Matrix (Fin n) (Fin n) L) (hA : A.det ≠ 0)
-    (hu1 : ∀ k, u k k = 1) (hu0 : ∀ l k, l < k → u l k = 0)
-    (hv1 : ∀ k, v k k = 1) (hv0 : ∀ l k, l < k → v l k = 0)
-    (hw0 : ∀ l k, k < l → w l k = 0) (hwd : ∀ k, w k k ≠ 0)
-    (h : A.map (algebraMap K L) * u = v * w) :
-    IntermediateField.adjoin K (Set.range fun p : Fin n × Fin n => u p.1 p.2) =
-      IntermediateField.adjoin K (Set.range fun p : Fin n × Fin n => v p.1 p.2) := by
+theorem adjoin_entries_eq
+    (K L : Type) [Field K] [Field L] [Algebra K L]
+    (n : ℕ) (A : Matrix (Fin n) (Fin n) K) (u v w : Matrix (Fin n) (Fin n) L)
+    (hA : A.det ≠ 0) (hu1 : ∀ k, u k k = 1) (hu0 : ∀ l k, l < k → u l k = 0) (hv1 : ∀ k, v k k = 1)
+    (hv0 : ∀ l k, l < k → v l k = 0) (hw0 : ∀ l k, k < l → w l k = 0) (hwd : ∀ k, w k k ≠ 0)
+    (h : A.map (algebraMap K L) * u = v * w)
+    : IntermediateField.adjoin K (Set.range fun p : Fin n × Fin n => u p.1 p.2)
+      = IntermediateField.adjoin K (Set.range fun p : Fin n × Fin n => v p.1 p.2) := by
   have hwT : w.BlockTriangular id := by
     intro l k hkl
     exact hw0 l k hkl
@@ -105,8 +108,10 @@ theorem adjoin_entries_eq (K L : Type) [Field K] [Field L] [Algebra K L] (n : �
   apply le_antisymm
   · rw [IntermediateField.adjoin_le_iff]
     rintro _ ⟨p, rfl⟩
-    have hC : ∀ i k, (A⁻¹.map (algebraMap K L) * v) i k ∈
-        IntermediateField.adjoin K (Set.range fun p : Fin n × Fin n => v p.1 p.2) := by
+    have hC
+        : ∀ i k,
+          (A⁻¹.map (algebraMap K L) * v) i k
+            ∈ IntermediateField.adjoin K (Set.range fun p : Fin n × Fin n => v p.1 p.2) := by
       intro i k
       rw [Matrix.mul_apply]
       refine sum_mem fun l _ => IntermediateField.mul_mem _ ?_ ?_
@@ -116,8 +121,10 @@ theorem adjoin_entries_eq (K L : Type) [Field K] [Field L] [Algebra K L] (n : �
     exact (entries_mem_of_eq_mul _ _ u w⁻¹ hC hu1 hu0 (fun l k hkl => hwiT hkl) hwid hC').1 p.1 p.2
   · rw [IntermediateField.adjoin_le_iff]
     rintro _ ⟨p, rfl⟩
-    have hC : ∀ i k, (A.map (algebraMap K L) * u) i k ∈
-        IntermediateField.adjoin K (Set.range fun p : Fin n × Fin n => u p.1 p.2) := by
+    have hC
+        : ∀ i k,
+          (A.map (algebraMap K L) * u) i k
+            ∈ IntermediateField.adjoin K (Set.range fun p : Fin n × Fin n => u p.1 p.2) := by
       intro i k
       rw [Matrix.mul_apply]
       refine sum_mem fun l _ => IntermediateField.mul_mem _ ?_ ?_

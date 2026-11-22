@@ -8,17 +8,21 @@ open scoped TensorProduct
 
 namespace PositivityTheory.KB.TwOdd
 
-theorem rank_span_le {A : Type} [AddCommGroup A] [inst : Module ℤ A] (S : Set A) {ι C : Type} [Fintype ι] [AddCommGroup C]
-    [Module ℝ C] (θ : C →ₗ[ℝ] ℝ ⊗[ℤ] A) (T : C →ₗ[ℝ] (ι → ℝ)) (h0 : ∀ z, T z = 0 → θ z = 0)
-    (hS : ∀ s ∈ S, ∃ z, θ z = (1 : ℝ) ⊗ₜ s) :
-    Module.rank ℤ (Submodule.span ℤ S) ≤ Fintype.card ι := by
+theorem rank_span_le
+    {A : Type} [AddCommGroup A] [inst : Module ℤ A]
+    (S : Set A)
+    {ι C : Type} [Fintype ι] [AddCommGroup C] [Module ℝ C]
+    (θ : C →ₗ[ℝ] ℝ ⊗[ℤ] A) (T : C →ₗ[ℝ] (ι → ℝ)) (h0 : ∀ z, T z = 0 → θ z = 0)
+    (hS : ∀ s ∈ S, ∃ z, θ z = (1 : ℝ) ⊗ₜ s)
+    : Module.rank ℤ (Submodule.span ℤ S) ≤ Fintype.card ι := by
   classical
   obtain rfl : inst = AddCommGroup.toIntModule A := Subsingleton.elim _ _
   have hker : LinearMap.ker T ≤ LinearMap.ker θ := fun z hz => h0 z hz
   have hrank : Module.rank ℝ (LinearMap.range θ) ≤ Fintype.card ι := by
     have e1 : LinearMap.range ((LinearMap.ker T).liftQ θ hker) = LinearMap.range θ :=
       Submodule.range_liftQ _ _ _
-    calc Module.rank ℝ (LinearMap.range θ)
+    calc
+      Module.rank ℝ (LinearMap.range θ)
         = Module.rank ℝ (LinearMap.range ((LinearMap.ker T).liftQ θ hker)) := by rw [e1]
       _ ≤ Module.rank ℝ (C ⧸ LinearMap.ker T) := rank_range_le _
       _ = Module.rank ℝ (LinearMap.range T) := T.quotKerEquivRange.rank_eq
@@ -30,7 +34,8 @@ theorem rank_span_le {A : Type} [AddCommGroup A] [inst : Module ℤ A] (S : Set 
     | mem s hs =>
       obtain ⟨z, hz⟩ := hS s hs
       exact ⟨z, hz⟩
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [TensorProduct.tmul_add]
       exact add_mem hx hy

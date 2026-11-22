@@ -6,13 +6,14 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
+open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
 
 namespace GlobalTheory.CompanionTheory.LocalIntegers
 
-theorem exists_finset_generators (l : ℕ) [Fact l.Prime]
-    (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K] :
-    ∃ s : Finset (OK l K), ∀ a : OK l K, ∃ c : OK l K → ℤ_[l],
+theorem exists_finset_generators
+    (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K]
+    : ∃ s : Finset (OK l K), ∀ a : OK l K, ∃ c : OK l K → ℤ_[l],
       (((a : K) : PadicAlgCl l)) = ∑ i ∈ s, ((c i : ℚ_[l]) • (((i : K) : PadicAlgCl l))) := by
   classical
   haveI : Algebra.IsSeparable ℚ_[l] K := Algebra.IsSeparable.of_integral ℚ_[l] K
@@ -28,7 +29,9 @@ theorem exists_finset_generators (l : ℕ) [Fact l.Prime]
     intro x y hxy
     exact Subtype.ext (congrArg (fun z : OK l K => (z : K)) hxy)
   refine ⟨t.image e, fun a => ?_⟩
-  have ha : (⟨(a : K), (hmem _).1 a.2⟩ : integralClosure ℤ_[l] K) ∈ Submodule.span ℤ_[l] (t : Set _) := by
+  have ha
+      : (⟨(a : K), (hmem _).1 a.2⟩ : integralClosure ℤ_[l] K)
+        ∈ Submodule.span ℤ_[l] (t : Set _) := by
     rw [ht]
     trivial
   obtain ⟨f, -, hf⟩ := Submodule.mem_span_finset.mp ha

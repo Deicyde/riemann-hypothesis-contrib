@@ -9,16 +9,21 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.SumRepresentations
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL
 
 namespace GlobalTheory.AboveL
 
-theorem exists_open_trace_ne_zero (Ω : Type) [Field Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
-    (l : ℕ) [Fact l.Prime] (a : ℕ) (ha : 1 ≤ a) (r : G K Ω →* GL (Fin a) (Qbar l)) (hr : Continuous r) :
-    ∃ N : Subgroup (G K Ω), IsOpen (N : Set (G K Ω)) ∧ ∀ n ∈ N, (r n).val.trace ≠ 0 := by
+theorem exists_open_trace_ne_zero
+    (Ω : Type) [Field Ω]
+    (K : Type) [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
+    (l : ℕ) [Fact l.Prime]
+    (a : ℕ) (ha : 1 ≤ a) (r : G K Ω →* GL (Fin a) (Qbar l)) (hr : Continuous r)
+    : ∃ N : Subgroup (G K Ω), IsOpen (N : Set (G K Ω)) ∧ ∀ n ∈ N, (r n).val.trace ≠ 0 := by
   have hc : Continuous fun g : G K Ω => (r g).val.trace :=
     (Units.continuous_val.comp hr).matrix_trace
   set U : Set (G K Ω) := {g | (r g).val.trace ≠ 0} with hU

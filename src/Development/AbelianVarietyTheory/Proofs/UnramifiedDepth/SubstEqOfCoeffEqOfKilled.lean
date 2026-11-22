@@ -6,8 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem subst_eq_of_coeff_eq_of_killed :
-    ∀ (C : Type) [Field C] (σ τ : Type) [Fintype σ] [Fintype τ] (P : σ → Prop) (f : σ → MvPowerSeries τ C) (F F' : MvPowerSeries σ C), (∀ w, MvPowerSeries.constantCoeff (f w) = 0) → (∀ w, ¬ P w → f w = 0) → (∀ μ : σ →₀ ℕ, (∀ w ∈ μ.support, P w) → MvPowerSeries.coeff μ F = MvPowerSeries.coeff μ F') → MvPowerSeries.subst f F = MvPowerSeries.subst f F' := by
+theorem subst_eq_of_coeff_eq_of_killed
+    : ∀ (C : Type) [Field C] (σ τ : Type) [Fintype σ] [Fintype τ] (P : σ → Prop)
+        (f : σ → MvPowerSeries τ C) (F F' : MvPowerSeries σ C),
+      (∀ w, MvPowerSeries.constantCoeff (f w) = 0) → (∀ w, ¬ P w → f w = 0)
+        → (∀ μ : σ →₀ ℕ,
+          (∀ w ∈ μ.support, P w) → MvPowerSeries.coeff μ F = MvPowerSeries.coeff μ F')
+        → MvPowerSeries.subst f F = MvPowerSeries.subst f F' := by
   intro C _ σ τ _ _ P f F F' h0 hk hF
   have hs : MvPowerSeries.HasSubst f := MvPowerSeries.hasSubst_of_constantCoeff_zero h0
   ext ν

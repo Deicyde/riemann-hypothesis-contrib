@@ -147,7 +147,11 @@ private lemma le_iSup_eigPart_inf_of_invariant {I A : Type} [NormedAddCommGroup 
 
 theorem decompOfNormal : DecompOfNormalStatement := by
   intro I A _ _ _ op good hc ha hgood
-  exact ⟨le_iSup_eigPart_inf_of_invariant op hc ha _ good rfl hgood, fun c _ c' _ hcc x hx y hy =>
-    inner_eq_zero_of_mem_eigPart_ne op hc ha hcc (Submodule.mem_inf.mp hx).1 (Submodule.mem_inf.mp hy).1⟩
+  exact ⟨
+    le_iSup_eigPart_inf_of_invariant op hc ha _ good rfl hgood,
+    fun c _ c' _ hcc x hx y hy =>
+      inner_eq_zero_of_mem_eigPart_ne op hc ha hcc (Submodule.mem_inf.mp hx).1
+        (Submodule.mem_inf.mp hy).1
+  ⟩
 
 end Formalism.IndefR.U2

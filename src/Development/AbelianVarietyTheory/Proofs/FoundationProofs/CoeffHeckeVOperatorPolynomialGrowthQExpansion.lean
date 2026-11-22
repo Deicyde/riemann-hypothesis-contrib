@@ -6,13 +6,15 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
 
-theorem Vo_polyB_qs : ∀ (l : ℕ) (a : ℕ → ℂ), 0 < l → PolyB a →
-    PolyB (Vo l a) ∧ ∀ τ σ : ℍ, (σ : ℂ) = l * τ → qs (Vo l a) τ = qs a σ := by
+theorem Vo_polyB_qs
+    : ∀ (l : ℕ) (a : ℕ → ℂ),
+      0 < l → PolyB a → PolyB (Vo l a) ∧ ∀ τ σ : ℍ, (σ : ℂ) = l * τ → qs (Vo l a) τ = qs a σ := by
   intro l a hl ha
   refine ⟨?_, ?_⟩
   · obtain ⟨C, A, h⟩ := ha
@@ -29,10 +31,11 @@ theorem Vo_polyB_qs : ∀ (l : ℕ) (a : ℕ → ℂ), 0 < l → PolyB a →
     · simp only [norm_zero]; positivity
   · intro τ σ hσ
     unfold qs
-    have hinj : Function.Injective (fun m : ℕ => l * m) :=
-      fun x y hxy => Nat.eq_of_mul_eq_mul_left hl hxy
-    have hsupp : Function.support (fun n : ℕ => Vo l a n * cexp (2 * π * Complex.I * n * τ)) ⊆
-        Set.range (fun m : ℕ => l * m) := by
+    have hinj : Function.Injective (fun m : ℕ => l * m) := fun x y hxy =>
+      Nat.eq_of_mul_eq_mul_left hl hxy
+    have hsupp
+        : Function.support (fun n : ℕ => Vo l a n * cexp (2 * π * Complex.I * n * τ))
+          ⊆ Set.range (fun m : ℕ => l * m) := by
       intro n hn
       by_contra hr
       apply hn

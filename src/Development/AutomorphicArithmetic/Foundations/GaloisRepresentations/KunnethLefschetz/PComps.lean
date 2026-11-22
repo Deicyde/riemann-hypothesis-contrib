@@ -25,14 +25,18 @@ theorem comps_holds : Comps := by
   have hmem : ∀ j (x : X), x ∈ (U j : Set X) ↔ e j = (x : _root_.ConnectedComponents X) := by
     intro j x
     rw [← hrep]
-    exact ⟨fun h => ConnectedComponents.coe_eq_coe.mpr (connectedComponent_eq h),
+    exact ⟨
+      fun h => ConnectedComponents.coe_eq_coe.mpr (connectedComponent_eq h),
       fun h => by
         have := ConnectedComponents.coe_eq_coe.mp h
         show x ∈ connectedComponent (rep j)
-        rw [this]; exact mem_connectedComponent⟩
+        rw [this]
+        exact mem_connectedComponent
+    ⟩
   refine ⟨m, U, fun j => ?_, fun x => ?_, fun j j' hj => ?_⟩
   · have h2 := clopen_smoothProper_projective d p hp hX (U j) (hUc j)
-    have hc : ConnectedSpace (U j) := isConnected_iff_connectedSpace.mp isConnected_connectedComponent
+    have hc : ConnectedSpace (U j) :=
+      isConnected_iff_connectedSpace.mp isConnected_connectedComponent
     exact ⟨h2.1, h2.2, LCompInt_of k d ((U j).ι ≫ p) h2.1 hc⟩
   · refine ⟨e.symm (x : _root_.ConnectedComponents X), ?_⟩
     show x ∈ (U _ : Set X)

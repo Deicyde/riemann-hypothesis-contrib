@@ -29,11 +29,12 @@ section Core
 open NumberField.mixedEmbedding NumberField.InfinitePlace MeasureTheory
 open scoped ENNReal NNReal nonZeroDivisors
 
-theorem mk_lt (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+theorem mk_lt
+    (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
     (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (g : InfinitePlace K → ℝ) (hg : ∀ w, 0 < g w)
-    (h : (FractionalIdeal.absNorm I.1 : ℝ) * (2:ℝ) ^ nrComplexPlaces K * Real.sqrt |(discr K : ℝ)| <
-      Real.pi ^ nrComplexPlaces K * ∏ w, g w ^ 2) :
-    ∃ a ∈ (I : FractionalIdeal (𝓞 K)⁰ K), a ≠ 0 ∧ ∀ w : InfinitePlace K, w a < g w := by
+    (h : (FractionalIdeal.absNorm I.1 : ℝ) * (2 : ℝ) ^ nrComplexPlaces K * Real.sqrt |(discr K : ℝ)|
+      < Real.pi ^ nrComplexPlaces K * ∏ w, g w ^ 2)
+    : ∃ a ∈ (I : FractionalIdeal (𝓞 K)⁰ K), a ≠ 0 ∧ ∀ w : InfinitePlace K, w a < g w := by
   classical
   let f : InfinitePlace K → NNReal := fun w => (g w).toNNReal
   have hmx : ∀ i, max (g i) 0 = g i := fun i => max_eq_left (hg i).le
@@ -58,18 +59,25 @@ theorem mk_lt (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotally
   have key : minkowskiBound K I < volume (convexBodyLT K f) := by
     rw [← ENNReal.toReal_lt_toReal hL hR, convexBodyLT_volume]
     unfold minkowskiBound
-    rw [volume_fundamentalDomain_fractionalIdealLatticeBasis, volume_fundamentalDomain_latticeBasis, hd]
+    rw [volume_fundamentalDomain_fractionalIdealLatticeBasis, volume_fundamentalDomain_latticeBasis,
+      hd]
     simp [hm, hr, convexBodyLTFactor, f, hmx]
-    rw [ENNReal.toReal_ofReal (by first | exact_mod_cast FractionalIdeal.absNorm_nonneg _ | positivity),
+    rw [ENNReal.toReal_ofReal (by
+        first | exact_mod_cast FractionalIdeal.absNorm_nonneg _ | positivity),
       Int.norm_eq_abs]
-    have e : ∀ N s : ℝ, N * (((2:ℝ) ^ nrComplexPlaces K)⁻¹ * s) * (2:ℝ) ^ (2 * nrComplexPlaces K) =
-        N * 2 ^ nrComplexPlaces K * s := by
+    have e
+        : ∀ N s : ℝ,
+          N * (((2 : ℝ) ^ nrComplexPlaces K)⁻¹ * s) * (2 : ℝ) ^ (2 * nrComplexPlaces K)
+            = N * 2 ^ nrComplexPlaces K * s := by
       intro N s
-      have h2 : (2:ℝ) ^ nrComplexPlaces K ≠ 0 := by positivity
+      have h2 : (2 : ℝ) ^ nrComplexPlaces K ≠ 0 := by positivity
       rw [two_mul, pow_add]
-      calc N * (((2:ℝ) ^ nrComplexPlaces K)⁻¹ * s) * ((2:ℝ) ^ nrComplexPlaces K * (2:ℝ) ^ nrComplexPlaces K)
-          = N * (2:ℝ) ^ nrComplexPlaces K * s *
-              (((2:ℝ) ^ nrComplexPlaces K)⁻¹ * (2:ℝ) ^ nrComplexPlaces K) := by ring
+      calc
+        N * (((2 : ℝ) ^ nrComplexPlaces K)⁻¹ * s)
+              * ((2 : ℝ) ^ nrComplexPlaces K * (2 : ℝ) ^ nrComplexPlaces K)
+            = N * (2 : ℝ) ^ nrComplexPlaces K * s
+              * (((2 : ℝ) ^ nrComplexPlaces K)⁻¹ * (2 : ℝ) ^ nrComplexPlaces K) := by
+          ring
         _ = N * 2 ^ nrComplexPlaces K * s := by rw [inv_mul_cancel₀ h2, mul_one]
     rw [e]
     first | exact h | linarith [h]
@@ -80,13 +88,18 @@ end Core
 
 section Line
 
-variable {K V ι : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] [AddCommGroup V]
+variable
+  {K V ι : Type}
+  [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] [AddCommGroup V]
   [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [Fintype ι] [DecidableEq ι]
 
-theorem muDef_line_eq (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (hX : ∀ v, IsUnit (X v).det) (x : V) (hx : x ≠ 0) :
-    muDef b X (Submodule.span (𝓞 K) ({x} : Set V)) =
-      -((1 / (nPl K : ℝ)) * ∑ v, 2 * Real.log (Formalism.HermitianLatticesTheory.normAt b X v x)) := by
+theorem muDef_line_eq
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (x : V) (hx : x ≠ 0)
+    : muDef b X (Submodule.span (𝓞 K) ({x} : Set V))
+      = -((1 / (nPl K : ℝ))
+        * ∑ v, 2 * Real.log (Formalism.HermitianLatticesTheory.normAt b X v x)) := by
   set L : Submodule (𝓞 K) V := Submodule.span (𝓞 K) ({x} : Set V) with hL
   have hLfg : L.FG := Submodule.fg_span (Set.finite_singleton x)
   have hL0 : L ≠ ⊥ := by
@@ -108,11 +121,16 @@ theorem muDef_line_eq (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι �
     rw [Matrix.det_fin_one]
     simp only [gramPl, Matrix.of_apply]
     rw [majAt_self_re]
-  have hlog : Real.log (ht b X L) = ∑ v, 2 * Real.log (Formalism.HermitianLatticesTheory.normAt b X v x) := by
-    rw [hht, Real.log_prod (s := Finset.univ) (f := fun v => Formalism.HermitianLatticesTheory.normAt b X v x ^ 2)
-      (fun v _ => pow_ne_zero 2 (mink_normAt_pos b X hX v x hx).ne')]
+  have hlog
+      : Real.log (ht b X L)
+        = ∑ v, 2 * Real.log (Formalism.HermitianLatticesTheory.normAt b X v x) := by
+    rw [hht,
+      Real.log_prod (s := Finset.univ)
+        (f := fun v => Formalism.HermitianLatticesTheory.normAt b X v x ^ 2)
+        (fun v _ => pow_ne_zero 2 (mink_normAt_pos b X hX v x hx).ne')]
     refine Finset.sum_congr rfl fun v _ => ?_
-    rw [Real.log_pow]; norm_num
+    rw [Real.log_pow]
+    norm_num
   rw [hmu]
   unfold size
   rw [Real.log_rpow hpos, hrk, hlog, Nat.cast_one]

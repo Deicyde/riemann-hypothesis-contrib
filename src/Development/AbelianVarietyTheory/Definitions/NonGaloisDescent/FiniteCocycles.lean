@@ -15,9 +15,12 @@ def AdicCont {Γ R : Type} [TopologicalSpace Γ] [CommRing R] (I : Ideal R) (f :
 
 structure Det (n : ℕ) (A E : Type) [CommRing A] [Ring E] [Algebra A E] : Type 1 where
   D : ∀ (B : Type) [CommRing B] [Algebra A B], B ⊗[A] E →* B
-  nat : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B') (x : B ⊗[A] E),
-    D B' (Algebra.TensorProduct.map f (AlgHom.id A E) x) = f (D B x)
-  homog : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : B ⊗[A] E), D B (b • x) = b ^ n * D B x
+  nat
+    : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B')
+        (x : B ⊗[A] E),
+      D B' (Algebra.TensorProduct.map f (AlgHom.id A E) x) = f (D B x)
+  homog
+    : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : B ⊗[A] E), D B (b • x) = b ^ n * D B x
 
 namespace Det
 
@@ -33,9 +36,13 @@ end Det
 
 structure GDet (n : ℕ) (A G : Type) [CommRing A] [Group G] : Type 1 where
   D : ∀ (B : Type) [CommRing B] [Algebra A B], MonoidAlgebra B G →* B
-  nat : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B') (x : MonoidAlgebra B G),
-    D B' (MonoidAlgebra.mapRingHom G (f : B →+* B') x) = f (D B x)
-  homog : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : MonoidAlgebra B G), D B (b • x) = b ^ n * D B x
+  nat
+    : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B')
+        (x : MonoidAlgebra B G),
+      D B' (MonoidAlgebra.mapRingHom G (f : B →+* B') x) = f (D B x)
+  homog
+    : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : MonoidAlgebra B G),
+      D B (b • x) = b ^ n * D B x
 
 namespace GDet
 
@@ -49,8 +56,11 @@ def map {A' : Type} [CommRing A'] (f : A →+* A') : GDet n A' G where
     D.nat B B' { (g : B →+* B') with commutes' := fun a => g.commutes (f a) } x
   homog B _ _ b x := letI : Algebra A B := ((algebraMap A' B).comp f).toAlgebra; D.homog B b x
 
-def repAlg {ι : Type} [Fintype ι] [DecidableEq ι] (ρ : G →* Matrix ι ι A) (B : Type) [CommRing B] [Algebra A B] :
-    MonoidAlgebra B G →ₐ[B] Matrix ι ι B :=
+def repAlg
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (ρ : G →* Matrix ι ι A)
+    (B : Type) [CommRing B] [Algebra A B]
+    : MonoidAlgebra B G →ₐ[B] Matrix ι ι B :=
   MonoidAlgebra.lift B (Matrix ι ι B) G ((RingHom.mapMatrix (algebraMap A B)).toMonoidHom.comp ρ)
 
 def ofRep (ρ : G →* Matrix (Fin n) (Fin n) A) : GDet n A G where
@@ -67,7 +77,8 @@ def ofRep (ρ : G →* Matrix (Fin n) (Fin n) A) : GDet n A G where
     change (repAlg ρ B (b • x)).det = b ^ n * (repAlg ρ B x).det
     rw [map_smul, Matrix.det_smul, Fintype.card_fin]
 
-def chi (y : MonoidAlgebra A G) : A[X] := D.D A[X] (MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C y)
+def chi (y : MonoidAlgebra A G) : A[X] :=
+  D.D A[X] (MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C y)
 
 def lam (i : ℕ) (y : MonoidAlgebra A G) : A := (-1) ^ i * (D.chi y).coeff (n - i)
 
@@ -95,14 +106,16 @@ open IsLocalRing
 
 namespace GlobalTheory.Pat
 
-def ContM {X : Type} [TopologicalSpace X] (A : Type) [CommRing A] [IsLocalRing A] (f : X → A) : Prop :=
+def ContM {X : Type} [TopologicalSpace X] (A : Type) [CommRing A] [IsLocalRing A] (f : X → A)
+    : Prop :=
   AdicCont (maximalIdeal A) f
 
 def PhiFin (l : ℕ) (G : Type) [Group G] [TopologicalSpace G] : Prop :=
-  ∀ H : Subgroup G, IsOpen (H : Set G) →
-    {f : H →* Multiplicative (ZMod l) | IsOpen (f.ker : Set H)}.Finite
+  ∀ H : Subgroup G,
+    IsOpen (H : Set G) → {f : H →* Multiplicative (ZMod l) | IsOpen (f.ker : Set H)}.Finite
 
-theorem PhiFin.of_finite (l : ℕ) [NeZero l] (G : Type) [Group G] [Finite G] [TopologicalSpace G] : PhiFin l G := by
+theorem PhiFin.of_finite (l : ℕ) [NeZero l] (G : Type) [Group G] [Finite G] [TopologicalSpace G]
+    : PhiFin l G := by
   intro H _
   haveI : Finite (H →* Multiplicative (ZMod l)) := Finite.of_injective _ DFunLike.coe_injective
   exact Set.toFinite _
@@ -130,7 +143,9 @@ structure Frame where
   [hl : Fact l.Prime]
   l_odd : l ≠ 2
   O : Type
-  [iO : CommRing O] [iOd : IsDomain O] [iOv : IsDiscreteValuationRing O]
+  [iO : CommRing O]
+  [iOd : IsDomain O]
+  [iOv : IsDiscreteValuationRing O]
   O_cpl : IsAdicComplete (maximalIdeal O) O
   k_fin : Finite (ResidueField O)
   l_mem : (l : O) ∈ maximalIdeal O
@@ -145,10 +160,11 @@ structure Frame where
   [iSt : Fintype St]
   Iu : St → PG
   Iu_phi : ∀ u, PhiFin l (Iu u).G
-
   Lk : ∀ v, Set (Fin n × (Gv v).G × MvPowerSeries (Fin d0) O)
-  Lk_gen : TopGen (MvPowerSeries (Fin d0) O)
-    (Set.range (MvPowerSeries.C : O →+* MvPowerSeries (Fin d0) O) ∪ {a | ∃ v i g, (i, g, a) ∈ Lk v})
+  Lk_gen
+    : TopGen (MvPowerSeries (Fin d0) O)
+      (Set.range (MvPowerSeries.C : O →+* MvPowerSeries (Fin d0) O)
+        ∪ {a | ∃ v i g, (i, g, a) ∈ Lk v})
   Lk_mu : ∀ v i, ∀ g ∈ Mu v, ∃ θ : O, θ - 1 ∈ maximalIdeal O ∧ (i, g, MvPowerSeries.C θ) ∈ Lk v
 
 attribute [instance] Frame.hl Frame.iO Frame.iOd Frame.iOv Frame.iVl Frame.iSt
@@ -179,36 +195,43 @@ structure PolGp (Φ : Frame) where
   chi : Fin Φ.n → (Γ.G →* Φ.kˣ)
   chi_open : ∀ i, IsOpen ((chi i).ker : Set Γ.G)
   chi_inj : Function.Injective chi
-
   fg : PhiFin Φ.l Γ.G
 
 abbrev DetG (n : ℕ) (Γ B : Type) [Group Γ] [CommRing B] : Type 1 := GDet n B Γ
 
-abbrev gp {Γ : Type} (B : Type) [Group Γ] [CommRing B] (g : Γ) : MonoidAlgebra B Γ := MonoidAlgebra.single g 1
+abbrev gp {Γ : Type} (B : Type) [Group Γ] [CommRing B] (g : Γ) : MonoidAlgebra B Γ :=
+  MonoidAlgebra.single g 1
 
-abbrev sc {B : Type} (Γ : Type) [Group Γ] [CommRing B] (b : B) : MonoidAlgebra B Γ := MonoidAlgebra.single 1 b
+abbrev sc {B : Type} (Γ : Type) [Group Γ] [CommRing B] (b : B) : MonoidAlgebra B Γ :=
+  MonoidAlgebra.single 1 b
 
-def DetCont {n : ℕ} {Γ B : Type} [Group Γ] [TopologicalSpace Γ] [CommRing B] [IsLocalRing B]
-    (D : DetG n Γ B) : Prop :=
+def DetCont
+    {n : ℕ} {Γ B : Type} [Group Γ] [TopologicalSpace Γ] [CommRing B] [IsLocalRing B]
+    (D : DetG n Γ B)
+    : Prop :=
   D.IsCont (maximalIdeal B)
 
-def Red {O B : Type} [CommRing O] [IsLocalRing O] [CommRing B] [IsLocalRing B] (j : O →+* B) (b : B)
-    (x : ResidueField O) : Prop :=
+def Red
+    {O B : Type} [CommRing O] [IsLocalRing O] [CommRing B] [IsLocalRing B]
+    (j : O →+* B) (b : B) (x : ResidueField O)
+    : Prop :=
   ∃ o : O, residue O o = x ∧ b - j o ∈ maximalIdeal B
 
-def diagRep {n : ℕ} {Γ K : Type} [Group Γ] [CommRing K] (chi : Fin n → (Γ →* Kˣ)) :
-    Γ →* Matrix (Fin n) (Fin n) K where
+def diagRep {n : ℕ} {Γ K : Type} [Group Γ] [CommRing K] (chi : Fin n → (Γ →* Kˣ))
+    : Γ →* Matrix (Fin n) (Fin n) K where
   toFun g := Matrix.diagonal (fun i => ((chi i g : Kˣ) : K))
   map_one' := by simp
   map_mul' a b := by simp [Matrix.diagonal_mul_diagonal]
 
-def DetLifts {n : ℕ} {Γ O B : Type} [Group Γ] [CommRing O] [IsLocalRing O] [CommRing B] [IsLocalRing B]
-    (j : O →+* B) (D : DetG n Γ B) (chi : Fin n → (Γ →* (ResidueField O)ˣ)) : Prop :=
-  ∀ κ : ResidueField O →+* ResidueField B, κ.comp (residue O) = (residue B).comp j →
-    D.map (residue B) = (GDet.ofRep (diagRep chi)).map κ
+def DetLifts
+    {n : ℕ} {Γ O B : Type} [Group Γ] [CommRing O] [IsLocalRing O] [CommRing B] [IsLocalRing B]
+    (j : O →+* B) (D : DetG n Γ B) (chi : Fin n → (Γ →* (ResidueField O)ˣ))
+    : Prop :=
+  ∀ κ : ResidueField O →+* ResidueField B,
+    κ.comp (residue O) = (residue B).comp j → D.map (residue B) = (GDet.ofRep (diagRep chi)).map κ
 
-structure IsCNL {O B : Type} [CommRing O] [IsLocalRing O] [CommRing B] [IsLocalRing B] (j : O →+* B) :
-    Prop where
+structure IsCNL {O B : Type} [CommRing O] [IsLocalRing O] [CommRing B] [IsLocalRing B] (j : O →+* B)
+    : Prop where
   noeth : IsNoetherianRing B
   complete : IsAdicComplete (maximalIdeal B) B
   loc : IsLocalHom j
@@ -220,14 +243,16 @@ variable {Φ : Frame} (G : PolGp Φ) {B : Type} [CommRing B]
 def star (j : Φ.O →+* B) (x : MonoidAlgebra B G.Γ.G) : MonoidAlgebra B G.Γ.G :=
   x.coeff.sum (fun g a => MonoidAlgebra.single (G.sig g)⁻¹ (a * j ((G.mu g : Φ.Oˣ) : Φ.O)))
 
-def oEl (v : Φ.Vl) (ψ : Fin Φ.n → ((Φ.Gv v).G →* Bˣ)) (g : Fin Φ.n → (Φ.Gv v).G) : MonoidAlgebra B G.Γ.G :=
+def oEl (v : Φ.Vl) (ψ : Fin Φ.n → ((Φ.Gv v).G →* Bˣ)) (g : Fin Φ.n → (Φ.Gv v).G)
+    : MonoidAlgebra B G.Γ.G :=
   (List.ofFn fun i => gp B (G.iv v (g i)) - sc G.Γ.G ((ψ i (g i) : Bˣ) : B)).prod
 
 end Elements
 
 structure Pair {Φ : Frame} (G : PolGp Φ) where
   B : Type
-  [iB : CommRing B] [iL : IsLocalRing B]
+  [iB : CommRing B]
+  [iL : IsLocalRing B]
   lam : Φ.abelian₂ →+* B
   lam_loc : IsLocalHom lam
   cnl : IsCNL (lam.comp (MvPowerSeries.C : Φ.O →+* Φ.abelian₂))
@@ -236,11 +261,14 @@ structure Pair {Φ : Frame} (G : PolGp Φ) where
   cont : DetCont D
   lift : DetLifts (lam.comp (MvPowerSeries.C : Φ.O →+* Φ.abelian₂)) D G.chi
   psi_cont : ∀ v i, ContM B (fun g => ((psi v i g : Bˣ) : B))
-  psi_lift : ∀ v i g, Red (lam.comp (MvPowerSeries.C : Φ.O →+* Φ.abelian₂)) ((psi v i g : Bˣ) : B)
-    ((Φ.psib v i g : Φ.kˣ) : Φ.k)
+  psi_lift
+    : ∀ v i g,
+      Red (lam.comp (MvPowerSeries.C : Φ.O →+* Φ.abelian₂)) ((psi v i g : Bˣ) : B)
+        ((Φ.psib v i g : Φ.kˣ) : Φ.k)
   link : ∀ v i g a, (i, g, a) ∈ Φ.Lk v → ((psi v i g : Bˣ) : B) = lam a
-  relP : ∀ (g : G.Γ.G) (i : ℕ),
-    D.lam i (star G (lam.comp (MvPowerSeries.C : Φ.O →+* Φ.abelian₂)) (gp B g)) = D.lam i (gp B g)
+  relP
+    : ∀ (g : G.Γ.G) (i : ℕ),
+      D.lam i (star G (lam.comp (MvPowerSeries.C : Φ.O →+* Φ.abelian₂)) (gp B g)) = D.lam i (gp B g)
   relO : ∀ v (g : Fin Φ.n → (Φ.Gv v).G) (h : G.Γ.G), D.tr (gp B h * oEl G v (psi v) g) = 0
   relI : ∀ u (g : (Φ.Iu u).G) (h : G.Γ.G), D.tr (gp B h * (gp B (G.iu u g) - 1)) = 0
 
@@ -271,9 +299,10 @@ open IsLocalRing Polynomial
 
 namespace GlobalTheory.Pat.Example
 
-theorem chi_ofRep {n : ℕ} {A G : Type} [CommRing A] [Group G]
-    (ρ : G →* Matrix (Fin n) (Fin n) A) (y : MonoidAlgebra A G) :
-    (GDet.ofRep ρ).chi y = (GDet.repAlg ρ A y).charpoly := by
+theorem chi_ofRep
+    {n : ℕ} {A G : Type} [CommRing A] [Group G]
+    (ρ : G →* Matrix (Fin n) (Fin n) A) (y : MonoidAlgebra A G)
+    : (GDet.ofRep ρ).chi y = (GDet.repAlg ρ A y).charpoly := by
   change (GDet.repAlg ρ A[X] _).det = _
   unfold Matrix.charpoly Matrix.charmatrix
   congr 1
@@ -285,9 +314,10 @@ theorem chi_ofRep {n : ℕ} {A G : Type} [CommRing A] [Group G]
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
     | single g r => ext i j; simp [GDet.repAlg]
 
-theorem tr_ofRep {n : ℕ} {A G : Type} [CommRing A] [Nontrivial A] [Group G]
-    (ρ : G →* Matrix (Fin (n+1)) (Fin (n+1)) A) (y : MonoidAlgebra A G) :
-    (GDet.ofRep ρ).tr y = (GDet.repAlg ρ A y).trace := by
+theorem tr_ofRep
+    {n : ℕ} {A G : Type} [CommRing A] [Nontrivial A] [Group G]
+    (ρ : G →* Matrix (Fin (n + 1)) (Fin (n + 1)) A) (y : MonoidAlgebra A G)
+    : (GDet.ofRep ρ).tr y = (GDet.repAlg ρ A y).trace := by
   unfold GDet.tr GDet.lam
   rw [chi_ofRep, Matrix.trace_eq_neg_charpoly_coeff]
   simp
@@ -301,14 +331,28 @@ instance (G : Type) [Group G] [Finite G] : DiscreteTopology (finPG G) := ⟨rfl�
 
 instance (G : Type) [Group G] [Finite G] : Finite (finPG G) := inferInstanceAs (Finite G)
 
-theorem adic {X R : Type} [TopologicalSpace X] [DiscreteTopology X] [CommRing R] (I : Ideal R) (f : X → R) :
-    AdicCont I f := fun _ => IsLocallyConstant.of_discrete _
+theorem adic
+    {X R : Type} [TopologicalSpace X] [DiscreteTopology X] [CommRing R] (I : Ideal R) (f : X → R)
+    : AdicCont I f := fun _ =>
+  IsLocallyConstant.of_discrete _
 
 abbrev S3 := DihedralGroup 3
 
 def rZ : S3 → Matrix (Fin 2) (Fin 2) ℤ
-  | .r i => if i = 0 then !![1,0;0,1] else if i = 1 then !![1,1;-3,-2] else !![-2,-1;3,1]
-  | .sr i => if i = 0 then !![1,1;0,-1] else if i = 1 then !![-2,-1;3,2] else !![1,0;-3,-1]
+  | .r i =>
+    if i = 0 then
+      !![1,0;0,1]
+    else if i = 1 then
+      !![1,1;-3,-2]
+    else
+      !![-2,-1;3,1]
+  | .sr i =>
+    if i = 0 then
+      !![1,1;0,-1]
+    else if i = 1 then
+      !![-2,-1;3,2]
+    else
+      !![1,0;-3,-1]
 
 def rhoZ : S3 →* Matrix (Fin 2) (Fin 2) ℤ where
   toFun := rZ
@@ -316,7 +360,10 @@ def rhoZ : S3 →* Matrix (Fin 2) (Fin 2) ℤ where
   map_mul' := by decide
 
 def sgn : S3 →* ℤˣ where
-  toFun g := match g with | .r _ => 1 | .sr _ => -1
+  toFun g :=
+    match g with
+    | .r _ => 1
+    | .sr _ => -1
   map_one' := by decide
   map_mul' := by decide
 
@@ -328,7 +375,8 @@ def inc : ℤˣ →* S3 where
 def rho (A : Type) [CommRing A] : S3 →* Matrix (Fin 2) (Fin 2) A :=
   (Int.castRingHom A).mapMatrix.toMonoidHom.comp rhoZ
 
-def chs (A : Type) [CommRing A] : Fin 2 → (ℤˣ →* Aˣ) := ![1, Units.map (Int.castRingHom A).toMonoidHom]
+def chs (A : Type) [CommRing A] : Fin 2 → (ℤˣ →* Aˣ) :=
+  ![1, Units.map (Int.castRingHom A).toMonoidHom]
 
 theorem three_mem : ((3 : ℕ) : ℤ_[3]) ∈ maximalIdeal ℤ_[3] := by
   rw [PadicInt.maximalIdeal_eq_span_p]; exact Ideal.mem_span_singleton_self _
@@ -393,9 +441,13 @@ def pol : PolGp frame where
   chi i := (chs _ i).comp sgn
   chi_open _ := isOpen_discrete _
   chi_inj := by
-    have key : ((chs (ResidueField ℤ_[3]) 0).comp sgn) ≠ ((chs (ResidueField ℤ_[3]) 1).comp sgn) := by
+    have key
+        : ((chs (ResidueField ℤ_[3]) 0).comp sgn) ≠ ((chs (ResidueField ℤ_[3]) 1).comp sgn) := by
       intro h
-      have := congrArg (fun f => ((f (DihedralGroup.sr 0) : (ResidueField ℤ_[3])ˣ) : ResidueField ℤ_[3])) h
+      have :=
+        congrArg
+          (fun f => ((f (DihedralGroup.sr 0) : (ResidueField ℤ_[3])ˣ) : ResidueField ℤ_[3]))
+          h
       simp [chs, sgn] at this
       exact neg_one_ne this.symm
     intro i j h
@@ -412,7 +464,8 @@ theorem rep_gp (A : Type) [CommRing A] (g : S3) : GDet.repAlg (rho A) A (gp A g)
 theorem star_gp (j : ℤ_[3] →+* ℤ_[3]) (g : S3) : star pol j (gp ℤ_[3] g) = gp ℤ_[3] g⁻¹ := by
   unfold star
   change (MonoidAlgebra.single g (1 : ℤ_[3])).coeff.sum
-    (fun (g : S3) (a : ℤ_[3]) => MonoidAlgebra.single g⁻¹ (a * j 1)) = _
+      (fun (g : S3) (a : ℤ_[3]) => MonoidAlgebra.single g⁻¹ (a * j 1))
+    = _
   rw [MonoidAlgebra.coeff_single, Finsupp.sum_single_index] <;> simp
 
 end GlobalTheory.Pat.Example

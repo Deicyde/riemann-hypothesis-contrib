@@ -74,12 +74,12 @@ variable {ι : Type w} (U : ι → Opens X) {F I Q : (Opens X)ᵒᵖ ⥤ AddComm
 structure IsCechShortExact (f : F ⟶ I) (g : I ⟶ Q) : Prop where
   zero : f ≫ g = 0
   injective : ∀ {n : ℕ} (i : Fin (n + 1) → ι), Function.Injective (f.app (op (inter U i)))
-  exact : ∀ {n : ℕ} (i : Fin (n + 1) → ι) (y : I.obj (op (inter U i))),
-    g.app _ y = 0 → ∃ x, f.app _ x = y
+  exact
+    : ∀ {n : ℕ} (i : Fin (n + 1) → ι) (y : I.obj (op (inter U i))),
+      g.app _ y = 0 → ∃ x, f.app _ x = y
   surjective : ∀ {n : ℕ} (i : Fin (n + 1) → ι), Function.Surjective (g.app (op (inter U i)))
 
-def DeltaRel (f : F ⟶ I) (g : I ⟶ Q) (n : ℕ) (σ : Cochain Q U n) (c : cechH F U (n + 1)) :
-    Prop :=
+def DeltaRel (f : F ⟶ I) (g : I ⟶ Q) (n : ℕ) (σ : Cochain Q U n) (c : cechH F U (n + 1)) : Prop :=
   ∃ (τ : Cochain I U n) (ρ : Cochain F U (n + 1)) (hρ : d F U (n + 1) ρ = 0),
     push U g n τ = σ ∧ push U f (n + 1) ρ = d I U n τ ∧ c = cls ρ hρ
 
@@ -151,10 +151,12 @@ lemma deltaFun_spec (n : ℕ) (σ : cocycles Q U n) : DeltaRel U f g n σ.1 (hS.
 
 def delta (n : ℕ) : cocycles Q U n →+ cechH F U (n + 1) where
   toFun := hS.deltaFun n
-  map_zero' := hS.deltaRel_unique (hS.deltaFun_spec n 0)
-    ⟨0, 0, map_zero _, map_zero _, by rw [map_zero, map_zero], cls_zero.symm⟩
-  map_add' σ σ' := hS.deltaRel_unique (hS.deltaFun_spec n (σ + σ'))
-    ((hS.deltaFun_spec n σ).add (hS.deltaFun_spec n σ'))
+  map_zero' :=
+    hS.deltaRel_unique (hS.deltaFun_spec n 0)
+      ⟨0, 0, map_zero _, map_zero _, by rw [map_zero, map_zero], cls_zero.symm⟩
+  map_add' σ σ' :=
+    hS.deltaRel_unique (hS.deltaFun_spec n (σ + σ'))
+      ((hS.deltaFun_spec n σ).add (hS.deltaFun_spec n σ'))
 
 lemma delta_spec (n : ℕ) (σ : cocycles Q U n) : DeltaRel U f g n σ.1 (hS.delta n σ) :=
   hS.deltaFun_spec n σ
@@ -206,8 +208,7 @@ lemma ker_delta_succ (hI : CechAcyclic I U) (m : ℕ) :
     obtain ⟨θ', hθ'⟩ := hS.push_surjective m θ
     exact ⟨d I U m θ', d_d I U m θ', by rw [hpush, hθ', hθ]⟩
 
-def deltaEquiv (hI : CechAcyclic I U) (m : ℕ) :
-    cechH Q U (m + 1) ≃+ cechH F U (m + 2) :=
+def deltaEquiv (hI : CechAcyclic I U) (m : ℕ) : cechH Q U (m + 1) ≃+ cechH F U (m + 2) :=
   (QuotientAddGroup.quotientAddEquivOfEq (hS.ker_delta_succ hI m).symm).trans
     (QuotientAddGroup.quotientKerEquivOfSurjective _ (hS.delta_surjective hI (m + 1)))
 
@@ -220,8 +221,10 @@ section Sections
 variable {ι : Type w} (P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}) (U : ι → Opens X)
 
 def globalCocycle : P.obj (op ⊤) →+ cocycles P U 0 where
-  toFun s := ⟨constCochain P U (fun _ => le_top) s,
-    (mem_cocycles _).2 (d_constCochain P U (fun _ => le_top) s)⟩
+  toFun s := ⟨
+    constCochain P U (fun _ => le_top) s,
+    (mem_cocycles _).2 (d_constCochain P U (fun _ => le_top) s)
+  ⟩
   map_zero' := Subtype.ext (funext fun _ => map_zero _)
   map_add' _ _ := Subtype.ext (funext fun _ => map_add _ _ _)
 
@@ -257,33 +260,39 @@ def globalCocycleEquiv : P.obj (op ⊤) ≃+ cocycles P U 0 :=
     ⟨globalCocycle_injective P U hP hU, globalCocycle_surjective P U hP hU⟩
 
 def cechHZeroEquiv : cechH P U 0 ≃+ P.obj (op ⊤) :=
-  ((QuotientAddGroup.quotientAddEquivOfEq
-    (by rw [coboundaries_zero, AddSubgroup.bot_addSubgroupOf])).trans
-      QuotientAddGroup.quotientBot).trans (globalCocycleEquiv P U hP hU).symm
+  ((QuotientAddGroup.quotientAddEquivOfEq (by
+      rw [coboundaries_zero, AddSubgroup.bot_addSubgroupOf])).trans
+    QuotientAddGroup.quotientBot).trans (globalCocycleEquiv P U hP hU).symm
 
 end Sections
 
 section Cartan
 
-structure IsCoverSystem (B : Opens X → Prop)
-    (Good : ∀ {κ : Type u}, Opens X → (κ → Opens X) → Prop) : Prop where
+structure IsCoverSystem (B : Opens X → Prop) (Good : ∀ {κ : Type u}, Opens X → (κ → Opens X) → Prop)
+    : Prop where
   iSup_eq : ∀ (V : Opens X) {κ : Type u} (U : κ → Opens X), Good V U → iSup U = V
-  inter_mem : ∀ (V : Opens X) {κ : Type u} (U : κ → Opens X), Good V U →
-    ∀ {n : ℕ} (i : Fin (n + 1) → κ), B (inter U i)
-  exists_refinement : ∀ V, B V → ∀ O : V → Opens X, (∀ x, x.1 ∈ O x) →
-    ∃ (κ : Type u) (_ : Finite κ) (U : κ → Opens X), Good V U ∧ ∀ a, ∃ x, U a ≤ O x
+  inter_mem
+    : ∀ (V : Opens X) {κ : Type u} (U : κ → Opens X),
+      Good V U → ∀ {n : ℕ} (i : Fin (n + 1) → κ), B (inter U i)
+  exists_refinement
+    : ∀ V,
+      B V
+        → ∀ O : V → Opens X,
+          (∀ x, x.1 ∈ O x)
+            → ∃ (κ : Type u) (_ : Finite κ) (U : κ → Opens X), Good V U ∧ ∀ a, ∃ x, U a ≤ O x
 
 variable (B : Opens X → Prop) (Good : ∀ {κ : Type u}, Opens X → (κ → Opens X) → Prop)
 
 def GoodAcyclic (G : TopCat.Sheaf AddCommGrpCat.{u} X) : Prop :=
   ∀ V, B V → ∀ (κ : Type u) [Finite κ] (U : κ → Opens X), Good V U → CechAcyclic G.obj U
 
-variable {B Good} (hC : IsCoverSystem B Good)
+variable
+  {B Good} (hC : IsCoverSystem B Good)
   {S : ShortComplex (TopCat.Sheaf AddCommGrpCat.{u} X)} (hS : S.ShortExact)
 include hC hS
 
-theorem surjective_of_goodAcyclic (hF : GoodAcyclic B Good S.X₁) (V : Opens X) (hV : B V) :
-    Function.Surjective (S.g.hom.app (op V)) := by
+theorem surjective_of_goodAcyclic (hF : GoodAcyclic B Good S.X₁) (V : Opens X) (hV : B V)
+    : Function.Surjective (S.g.hom.app (op V)) := by
   intro s
   have hls := (TopCat.Sheaf.isLocallySurjective_iff_epi S.g).mpr hS.epi_g
   have hloc := (TopCat.Presheaf.isLocallySurjective_iff S.g.hom).mp hls
@@ -293,8 +302,8 @@ theorem surjective_of_goodAcyclic (hF : GoodAcyclic B Good S.X₁) (V : Opens X)
   choose x hx using hUO
   have hUV : ∀ a, U a ≤ V := fun a => (hx a).trans (hOV (x a))
   have hsup : iSup U = V := hC.iSup_eq V U hgood
-  have hpush {P P' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (φ : P ⟶ P') (k : ℕ)
-      (σ : Cochain P U k) : push U φ (k + 1) (d P U k σ) = d P' U k (push U φ k σ) := by
+  have hpush {P P' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (φ : P ⟶ P') (k : ℕ) (σ : Cochain P U k)
+      : push U φ (k + 1) (d P U k σ) = d P' U k (push U φ k σ) := by
     funext i
     simp only [push, AddMonoidHom.coe_mk, ZeroHom.coe_mk, d_apply, map_sum, map_zsmul, app_res]
   let τ0 : Cochain S.X₂.obj U 0 := fun i =>
@@ -304,13 +313,12 @@ theorem surjective_of_goodAcyclic (hF : GoodAcyclic B Good S.X₁) (V : Opens X)
     simp only [push, τ0, constCochain, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
     rw [app_res, ht]
     exact res_res _ _ _ s
-  have hdτ0 : push U S.g.hom 1 (d _ U 0 τ0) = 0 := by
-    rw [hpush, hτ0, d_constCochain]
+  have hdτ0 : push U S.g.hom 1 (d _ U 0 τ0) = 0 := by rw [hpush, hτ0, d_constCochain]
   choose ρ hρ using fun j => app_exact_of_shortExact hS _ _ (congrFun hdτ0 j)
   have hρ' : push U S.f.hom 1 ρ = d _ U 0 τ0 := funext hρ
   have hρc : d S.X₁.obj U 1 ρ = 0 := by
-    have hinj : Function.Injective (push U S.f.hom 2) :=
-      fun _ _ h => funext fun j => app_injective_of_shortExact hS _ (congrFun h j)
+    have hinj : Function.Injective (push U S.f.hom 2) := fun _ _ h =>
+      funext fun j => app_injective_of_shortExact hS _ (congrFun h j)
     apply hinj
     rw [map_zero, hpush, hρ', d_d]
   obtain ⟨β, hβ⟩ := hF V hV κ U hgood 0 ρ hρc
@@ -320,21 +328,20 @@ theorem surjective_of_goodAcyclic (hF : GoodAcyclic B Good S.X₁) (V : Opens X)
   refine ⟨t', ?_⟩
   apply TopCat.Sheaf.eq_of_locally_eq' S.X₃ U V (fun a => homOfLE (hUV a)) hsup.ge
   intro a
-  have key : res S.X₃.obj ((inter_le U (fun _ : Fin 1 => a) 0).trans (hUV a))
-      (S.g.hom.app _ t') =
-      res S.X₃.obj ((inter_le U (fun _ : Fin 1 => a) 0).trans (hUV a)) s := by
+  have key
+      : res S.X₃.obj ((inter_le U (fun _ : Fin 1 => a) 0).trans (hUV a)) (S.g.hom.app _ t')
+        = res S.X₃.obj ((inter_le U (fun _ : Fin 1 => a) 0).trans (hUV a)) s := by
     rw [← app_res, ht' (fun _ => a), Pi.sub_apply, map_sub]
-    have h1 : S.g.hom.app _ ((push U S.f.hom 0 β) (fun _ => a)) = 0 :=
-      app_comp_apply_eq_zero _ _
+    have h1 : S.g.hom.app _ ((push U S.f.hom 0 β) (fun _ => a)) = 0 := app_comp_apply_eq_zero _ _
     rw [h1, sub_zero]
     exact congrFun hτ0 (fun _ => a)
   have := congrArg (res S.X₃.obj (le_inter_const U a)) key
   rw [res_res, res_res] at this
   exact this
 
-theorem goodAcyclic_of_shortExact (hF : GoodAcyclic B Good S.X₁)
-    (hI : ∀ (κ : Type u) (U : κ → Opens X), CechAcyclic S.X₂.obj U) :
-    GoodAcyclic B Good S.X₃ := by
+theorem goodAcyclic_of_shortExact
+    (hF : GoodAcyclic B Good S.X₁) (hI : ∀ (κ : Type u) (U : κ → Opens X), CechAcyclic S.X₂.obj U)
+    : GoodAcyclic B Good S.X₃ := by
   intro V hV κ _ U hU
   exact CechAcyclic.of_shortExact' U S.f.hom S.g.hom comp_hom_eq_zero
     (fun i => app_injective_of_shortExact hS _)
@@ -357,27 +364,29 @@ lemma isCechShortExact_of_surjective {S : ShortComplex (TopCat.Sheaf AddCommGrpC
 
 variable [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]
 
-def cechHZeroEquivH (G : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) (U : ι → Opens X)
-    (hU : iSup U = ⊤) : cechH G.obj U 0 ≃+ Sheaf.H.{w'} G 0 :=
+def cechHZeroEquivH
+    (G : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) (U : ι → Opens X) (hU : iSup U = ⊤)
+    : cechH G.obj U 0 ≃+ Sheaf.H.{w'} G 0 :=
   (cechHZeroEquiv G.obj U G.property hU).trans (Sheaf.H.equiv₀ G isTerminalTop).symm
 
-variable {S : ShortComplex (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})}
-  (hS : S.ShortExact) [Injective S.X₂]
+variable
+  {S : ShortComplex (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})} (hS : S.ShortExact)
+  [Injective S.X₂]
 
 def hDeltaEquiv (m : ℕ) : Sheaf.H.{w'} S.X₃ (m + 1) ≃+ Sheaf.H.{w'} S.X₁ (m + 2) :=
-  AddEquiv.ofBijective (H.δ hS (m + 1) (m + 2) rfl)
-    ⟨(injective_iff_map_eq_zero _).2 fun y hy => by
-        obtain ⟨x, hx⟩ := H.exact₃ hS rfl y hy
-        rw [← hx, H.eq_zero_of_injective S.X₂ x, map_zero],
-      fun x => H.exact₁ hS rfl x (H.eq_zero_of_injective S.X₂ _)⟩
-
+  AddEquiv.ofBijective (H.δ hS (m + 1) (m + 2) rfl) ⟨
+    (injective_iff_map_eq_zero _).2 fun y hy => by
+      obtain ⟨x, hx⟩ := H.exact₃ hS rfl y hy
+      rw [← hx, H.eq_zero_of_injective S.X₂ x, map_zero],
+    fun x => H.exact₁ hS rfl x (H.eq_zero_of_injective S.X₂ _)
+  ⟩
 
 include hS in
-theorem nonempty_cechH_one_equiv (U : ι → Opens X) (hU : iSup U = ⊤)
-    (hC : IsCechShortExact U S.f.hom S.g.hom) (hI : CechAcyclic S.X₂.obj U) :
-    Nonempty (cechH S.X₁.obj U 1 ≃+ Sheaf.H.{w'} S.X₁ 1) := by
-  let pC : S.X₃.obj.obj (op ⊤) →+ cechH S.X₁.obj U 1 :=
-    (hC.delta 0).comp (globalCocycle S.X₃.obj U)
+theorem nonempty_cechH_one_equiv
+    (U : ι → Opens X)
+    (hU : iSup U = ⊤) (hC : IsCechShortExact U S.f.hom S.g.hom) (hI : CechAcyclic S.X₂.obj U)
+    : Nonempty (cechH S.X₁.obj U 1 ≃+ Sheaf.H.{w'} S.X₁ 1) := by
+  let pC : S.X₃.obj.obj (op ⊤) →+ cechH S.X₁.obj U 1 := (hC.delta 0).comp (globalCocycle S.X₃.obj U)
   let pH : S.X₃.obj.obj (op ⊤) →+ Sheaf.H.{w'} S.X₁ 1 :=
     (H.δ hS 0 1 rfl).comp (Sheaf.H.equiv₀ S.X₃ isTerminalTop).symm.toAddMonoidHom
   have hpC : Function.Surjective pC :=
@@ -394,14 +403,16 @@ theorem nonempty_cechH_one_equiv (U : ι → Opens X) (hU : iSup U = ⊤)
       rw [hC.delta_eq_zero_iff]
       constructor
       · rintro ⟨κ, hκ, hgκ⟩
-        obtain ⟨t, ht⟩ := globalCocycle_surjective _ U S.X₂.property hU
-          ⟨κ, (mem_cocycles κ).2 hκ⟩
+        obtain ⟨t, ht⟩ := globalCocycle_surjective _ U S.X₂.property hU ⟨κ, (mem_cocycles κ).2 hκ⟩
         refine ⟨t, globalCocycle_injective _ U S.X₃.property hU (Subtype.ext ?_)⟩
         rw [← push_globalCocycle, ht]
         exact hgκ
       · rintro ⟨t, rfl⟩
-        exact ⟨(globalCocycle S.X₂.obj U t).1, (mem_cocycles _).1 (globalCocycle _ U t).2,
-          push_globalCocycle U _ t⟩
+        exact ⟨
+          (globalCocycle S.X₂.obj U t).1,
+          (mem_cocycles _).1 (globalCocycle _ U t).2,
+          push_globalCocycle U _ t
+        ⟩
     have e2 : pH s = 0 ↔ ∃ t, S.g.hom.app (op ⊤) t = s := by
       change H.δ hS 0 1 rfl ((Sheaf.H.equiv₀ S.X₃ isTerminalTop).symm s) = 0 ↔ _
       constructor
@@ -422,13 +433,16 @@ end Leray
 
 section LerayTheorem
 
-variable {ι : Type w} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]
+variable
+  {ι : Type w} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]
   {B : Opens X → Prop} {Good : ∀ {κ : Type u}, Opens X → (κ → Opens X) → Prop}
 
-theorem nonempty_cechH_equiv (hC : IsCoverSystem B Good) (U : ι → Opens X) (hU : iSup U = ⊤)
-    (hUB : ∀ {n : ℕ} (i : Fin (n + 1) → ι), B (inter U i)) (n : ℕ)
-    (G : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) (hG : GoodAcyclic B Good G) :
-    Nonempty (cechH G.obj U n ≃+ Sheaf.H.{w'} G n) := by
+theorem nonempty_cechH_equiv
+    (hC : IsCoverSystem B Good)
+    (U : ι → Opens X) (hU : iSup U = ⊤) (hUB : ∀ {n : ℕ} (i : Fin (n + 1) → ι), B (inter U i))
+    (n : ℕ)
+    (G : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) (hG : GoodAcyclic B Good G)
+    : Nonempty (cechH G.obj U n ≃+ Sheaf.H.{w'} G n) := by
   cases n with
   | zero => exact ⟨cechHZeroEquivH G U hU⟩
   | succ n =>
@@ -438,15 +452,16 @@ theorem nonempty_cechH_equiv (hC : IsCoverSystem B Good) (U : ι → Opens X) (h
       have hI : CechAcyclic (injectiveSequence G).X₂.obj U :=
         @cechAcyclic_of_injective X (injectiveSequence G).X₂
           (inferInstanceAs (Injective (Injective.under G))) ι U
-      exact nonempty_cechH_one_equiv hS U hU (isCechShortExact_of_surjective hS U
-        fun i => surjective_of_goodAcyclic hC hS hG _ (hUB i)) hI
+      exact nonempty_cechH_one_equiv hS U hU
+        (isCechShortExact_of_surjective hS U fun i => surjective_of_goodAcyclic hC hS hG _ (hUB i))
+        hI
     | succ m ih =>
       have hS := injectiveSequence_shortExact G
       have hI : CechAcyclic (injectiveSequence G).X₂.obj U :=
         @cechAcyclic_of_injective X (injectiveSequence G).X₂
           (inferInstanceAs (Injective (Injective.under G))) ι U
-      have hSC := isCechShortExact_of_surjective hS U
-        fun i => surjective_of_goodAcyclic hC hS hG _ (hUB i)
+      have hSC :=
+        isCechShortExact_of_surjective hS U fun i => surjective_of_goodAcyclic hC hS hG _ (hUB i)
       have hQ : GoodAcyclic B Good (injectiveSequence G).X₃ :=
         goodAcyclic_of_shortExact hC hS hG fun κ V =>
           @cechAcyclic_of_injective X (injectiveSequence G).X₂

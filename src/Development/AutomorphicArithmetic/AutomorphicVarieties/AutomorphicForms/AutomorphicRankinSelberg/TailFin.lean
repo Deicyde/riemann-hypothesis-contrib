@@ -27,13 +27,14 @@ private lemma tail_fin :
     rw [Real.rpow_neg hy0, Real.rpow_two, one_div]
   exact h'.lintegral_lt_top
 
-theorem UpperTheory.V.Af.Rs.fdFin :
-    UpperTheory.V.Af.Rs.StripIm → UpperTheory.V.Af.Rs.VolMap → UpperTheory.V.Af.Rs.FdFin := by
+theorem UpperTheory.V.Af.Rs.fdFin
+    : UpperTheory.V.Af.Rs.StripIm → UpperTheory.V.Af.Rs.VolMap → UpperTheory.V.Af.Rs.FdFin := by
   rintro - ⟨hm, hv⟩
   refine ⟨fd_meas, ?_⟩
   rw [hv, Measure.map_apply hm fd_meas]
-  have hsub : (fun p : ℝ × ℝ => UpperTheory.V.Af.Rs.pt p.1 p.2) ⁻¹' ModularGroup.fd ⊆
-      (Icc (-(1 / 2) : ℝ) (1 / 2) ×ˢ Ioi (1 / 2 : ℝ)) ∪ ((univ : Set ℝ) ×ˢ Iic (0 : ℝ)) := by
+  have hsub
+      : (fun p : ℝ × ℝ => UpperTheory.V.Af.Rs.pt p.1 p.2) ⁻¹' ModularGroup.fd
+        ⊆ (Icc (-(1 / 2) : ℝ) (1 / 2) ×ˢ Ioi (1 / 2 : ℝ)) ∪ ((univ : Set ℝ) ×ˢ Iic (0 : ℝ)) := by
     rintro ⟨x, y⟩ hp
     rcases le_or_gt y 0 with hy | hy
     · exact Or.inr ⟨mem_univ _, hy⟩
@@ -56,8 +57,7 @@ theorem UpperTheory.V.Af.Rs.fdFin :
   · rw [withDensity_apply _ (measurableSet_Icc.prod measurableSet_Ioi), ← Measure.prod_restrict,
       lintegral_prod _ (by fun_prop)]
     simp only [lintegral_const]
-    rw [Measure.restrict_restrict measurableSet_Ioi,
-      inter_eq_left.2 (Ioi_subset_Ioi (by norm_num))]
+    rw [Measure.restrict_restrict measurableSet_Ioi, inter_eq_left.2 (Ioi_subset_Ioi (by norm_num))]
     exact ENNReal.mul_lt_top tail_fin (by simp)
   · rw [withDensity_absolutelyContinuous _ _ (by simp [Measure.prod_prod, Iic_inter_Ioi])]
     exact ENNReal.zero_lt_top

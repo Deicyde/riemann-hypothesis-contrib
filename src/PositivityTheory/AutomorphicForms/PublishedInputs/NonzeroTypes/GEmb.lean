@@ -8,13 +8,16 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 open scoped TensorProduct
 
 namespace UpperTheory.TNZ
 
-theorem gEmb (e1 : TensorProductVectors) (e2 : LeviSubgroupRestriction) (e3 : ParabolicInductionKernel) (e4 : InducedDeterminantTwist)
-    (e5 : InductionExtension) : GEmb := by
+theorem gEmb
+    (e1 : TensorProductVectors) (e2 : LeviSubgroupRestriction) (e3 : ParabolicInductionKernel)
+    (e4 : InducedDeterminantTwist) (e5 : InductionExtension)
+    : GEmb := by
   intro k _ _ _ _ n G V _ _ π hπ
   obtain ⟨X, instA, instM, σ, -, -, hdet, ⟨e⟩⟩ := hπ
   let _ := instA
@@ -36,8 +39,11 @@ theorem gEmb (e1 : TensorProductVectors) (e2 : LeviSubgroupRestriction) (e3 : Pa
       change _ = c • (F φ).1.1 κ
       rw [h1, h2, smul_smul]
       rfl
-  let f0 : ↥G.V0sp →ₗ[ℂ] IndSp G.e (piTensor σ) :=
-    { toFun := F, map_add' := hadd, map_smul' := hsmul }
+  let f0 : ↥G.V0sp →ₗ[ℂ] IndSp G.e (piTensor σ) := {
+    toFun := F
+    map_add' := hadd
+    map_smul' := hsmul
+  }
   refine ⟨e.symm.toLinearEquiv.toLinearMap ∘ₗ f0, fun φ ψ h => ?_, fun κ φ φ' hφ' => ?_⟩
   · have h' : F φ = F ψ := e.symm.toLinearEquiv.injective h
     refine Subtype.ext (funext fun κ => ?_)
@@ -50,6 +56,7 @@ theorem gEmb (e1 : TensorProductVectors) (e2 : LeviSubgroupRestriction) (e3 : Pa
         rfl
     change e.symm.toLinearEquiv (F φ') = π κ (e.symm.toLinearEquiv (F φ))
     rw [key, Representation.Equiv.toLinearEquiv_apply, Representation.Equiv.toLinearEquiv_apply]
-    exact Representation.IntertwiningMap.isIntertwining _ _ e.symm.toIntertwiningMap (κ : GL (Fin n) k) (F φ)
+    exact Representation.IntertwiningMap.isIntertwining _ _ e.symm.toIntertwiningMap
+      (κ : GL (Fin n) k) (F φ)
 
 end UpperTheory.TNZ

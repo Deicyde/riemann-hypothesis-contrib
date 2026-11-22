@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 Filter Topology
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 Filter
+  Topology
 
 noncomputable section
 
@@ -20,22 +21,30 @@ set_option linter.unusedSectionVars false
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem G5.fderiv_fderiv_eq_of_add_const {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {f g : E → ℝ} {y : E}
-    (b : ℝ) (h : ∀ᶠ y' in 𝓝 y, f y' = g y' + b) : fderiv ℝ (fderiv ℝ f) y = fderiv ℝ (fderiv ℝ g) y := by
+theorem G5.fderiv_fderiv_eq_of_add_const
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {f g : E → ℝ} {y : E}
+    (b : ℝ) (h : ∀ᶠ y' in 𝓝 y, f y' = g y' + b)
+    : fderiv ℝ (fderiv ℝ f) y = fderiv ℝ (fderiv ℝ g) y := by
   apply Filter.EventuallyEq.fderiv_eq
   filter_upwards [h.eventually_nhds] with y' hy'
   have hfg : f =ᶠ[𝓝 y'] fun x => g x + b := hy'
   rw [hfg.fderiv_eq, fderiv_add_const]
 
-theorem G5.ptsIntegral_eq_of_add_const {e : ℕ} (P : Ideal (MRing ι)) (φ ψ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
-    (h : ∀ j, ∃ b : ℝ, ∀ z ∈ mcPts P, φ j z = ψ j z + b) (g : ((Σ k, ι k) → ℂ) → ℝ) :
-    ptsIntegral P φ g = ptsIntegral P ψ g := by
+theorem G5.ptsIntegral_eq_of_add_const
+    {e : ℕ} (P : Ideal (MRing ι)) (φ ψ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
+    (h : ∀ j, ∃ b : ℝ, ∀ z ∈ mcPts P, φ j z = ψ j z + b)
+    (g : ((Σ k, ι k) → ℂ) → ℝ)
+    : ptsIntegral P φ g = ptsIntegral P ψ g := by
   have hs : ∀ Ψ y w, sheetDensity P Ψ φ g y w = sheetDensity P Ψ ψ g y w := by
     intro Ψ y w
     unfold sheetDensity
     split_ifs with hγ
     · congr 1
-      have hH : ∀ j, cxHessian (fun y' => φ j (hγ.choose y')) y = cxHessian (fun y' => ψ j (hγ.choose y')) y := by
+      have hH
+          : ∀ j,
+            cxHessian (fun y' => φ j (hγ.choose y')) y
+              = cxHessian (fun y' => ψ j (hγ.choose y')) y := by
         intro j
         obtain ⟨b, hb⟩ := h j
         have hev : ∀ᶠ y' in 𝓝 y, φ j (hγ.choose y') = ψ j (hγ.choose y') + b :=
@@ -47,8 +56,9 @@ theorem G5.ptsIntegral_eq_of_add_const {e : ℕ} (P : Ideal (MRing ι)) (φ ψ :
   unfold ptsIntegral ptsIntegralAt
   simp only [hs]
 
-theorem G5.ptsIntegral_const {e : ℕ} (P : Ideal (MRing ι)) (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (c : ℝ) :
-    ptsIntegral P φ (fun _ => c) = c * ptsIntegral P φ (fun _ => 1) := by
+theorem G5.ptsIntegral_const
+    {e : ℕ} (P : Ideal (MRing ι)) (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (c : ℝ)
+    : ptsIntegral P φ (fun _ => c) = c * ptsIntegral P φ (fun _ => 1) := by
   unfold ptsIntegral
   split_ifs with hΨ
   · unfold ptsIntegralAt
@@ -65,27 +75,35 @@ theorem G5.isSmoothHerm_constLine (c : ℝ) : IsSmoothHerm (constLine (ι := ι)
   show ContDiffOn ℝ _ (fun _ => Real.exp (-c)) _
   exact contDiffOn_const
 
-theorem G5.log_tensor_constLine (A : ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) (c : ℝ) (z : (Σ k, ι k) → ℂ) (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) :
-    Real.log ((A.tensor (constLine c)).h z) = Real.log (A.h z) + -c := by
+theorem G5.log_tensor_constLine
+    (A : ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) (c : ℝ)
+    (z : (Σ k, ι k) → ℂ) (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+    : Real.log ((A.tensor (constLine c)).h z) = Real.log (A.h z) + -c := by
   show Real.log (A.h z * Real.exp (-c)) = _
   rw [Real.log_mul (A.pos z hz).ne' (Real.exp_pos _).ne', Real.log_exp]
 
-theorem G5.top_tensor_constLine (I : Ideal (MRing ι) → (n : ℕ) → (Fin n → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) → ℝ)
-    (hI : IsIntersectionFamily I) (P : Ideal (MRing ι)) (D : ℕ) (A : ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) (c : ℝ)
-    (hP : IsArithVar P (D + 1)) (hA : IsSmoothHerm A) :
-    I P (D + 1) (fun _ => A.tensor (constLine c)) =
-      I P (D + 1) (fun _ => A) - ((D + 1 : ℕ) : ℝ) * c * geomDeg P A D := by
+theorem G5.top_tensor_constLine
+    (I : Ideal (MRing ι) → (n : ℕ) → (Fin n → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι)
+      → ℝ)
+    (hI : IsIntersectionFamily I)
+    (P : Ideal (MRing ι)) (D : ℕ) (A : ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι)
+    (c : ℝ) (hP : IsArithVar P (D + 1)) (hA : IsSmoothHerm A)
+    : I P (D + 1) (fun _ => A.tensor (constLine c))
+      = I P (D + 1) (fun _ => A) - ((D + 1 : ℕ) : ℝ) * c * geomDeg P A D := by
   set A' := A.tensor (constLine (ι := ι) c) with hA'def
   have hA' : IsSmoothHerm A' := hA.mul (G5.isSmoothHerm_constLine c)
-  let L : ℕ → Fin (D + 1) → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι := fun k j => if (j : ℕ) < k then A' else A
+  let L : ℕ → Fin (D + 1) → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι := fun k j =>
+    if (j : ℕ) < k then A' else A
   have hL2 : ∀ k j, L k j = A ∨ L k j = A' := fun k j => by
     by_cases h : (j : ℕ) < k
     · exact Or.inr (if_pos h)
     · exact Or.inl (if_neg h)
-  have hLs : ∀ k j, IsSmoothHerm (L k j) := fun k j => (hL2 k j).elim (fun h => h ▸ hA) (fun h => h ▸ hA')
+  have hLs : ∀ k j, IsSmoothHerm (L k j) := fun k j =>
+    (hL2 k j).elim (fun h => h ▸ hA) (fun h => h ▸ hA')
 
-  have hint : ∀ M : Fin D → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι, (∀ j, M j = A ∨ M j = A') →
-      ptsIntegral P (pot M) (fun _ => c) = c * geomDeg P A D := by
+  have hint
+      : ∀ M : Fin D → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι,
+        (∀ j, M j = A ∨ M j = A') → ptsIntegral P (pot M) (fun _ => c) = c * geomDeg P A D := by
     intro M hM
     rw [G5.ptsIntegral_const]
     congr 1
@@ -93,13 +111,16 @@ theorem G5.top_tensor_constLine (I : Ideal (MRing ι) → (n : ℕ) → (Fin n �
     rcases hM j with h | h
     · exact ⟨0, fun z _ => by simp [pot, h]⟩
     · exact ⟨-c, fun z hz => by simp only [pot, h]; exact G5.log_tensor_constLine A c z hz.1⟩
-  have step : ∀ k, k ≤ D + 1 → I P (D + 1) (L k) = I P (D + 1) (fun _ => A) - (k : ℝ) * c * geomDeg P A D := by
+  have step
+      : ∀ k,
+        k ≤ D + 1 → I P (D + 1) (L k) = I P (D + 1) (fun _ => A) - (k : ℝ) * c * geomDeg P A D := by
     intro k
     induction k with
     | zero =>
       intro _
       have : L 0 = fun _ => A := by funext j; simp [L]
-      rw [this]; simp
+      rw [this]
+      simp
     | succ k ih =>
       intro hk
       have hkD : k < D + 1 := by omega
@@ -133,13 +154,16 @@ theorem G5.top_tensor_constLine (I : Ideal (MRing ι) → (n : ℕ) → (Fin n �
           exact hMk j
       have hM : ∀ j, M j = A ∨ M j = A' := fun j => hL2 _ _
       have hMs : ∀ j, IsSmoothHerm (M j) := fun j => hLs _ _
-      have hmc := metricChange K ι I hI P D M A (fun _ => c) (fun _ _ _ => rfl) hP hMs hA contDiffOn_const
+      have hmc :=
+        metricChange K ι I hI P D M A (fun _ => c) (fun _ _ _ => rfl) hP hMs hA contDiffOn_const
       have s1 := hI.1 P (D + 1) (L (k + 1)) σ hP (hLs _)
       have s0 := hI.1 P (D + 1) (L k) σ hP (hLs _)
       rw [e1] at s1
       rw [e0] at s0
-      have hsnoc : I P (D + 1) (Fin.snoc M A') =
-          I P (D + 1) (Fin.snoc M A) - ptsIntegral P (pot M) (fun _ => c) := hmc
+      have hsnoc
+          : I P (D + 1) (Fin.snoc M A')
+            = I P (D + 1) (Fin.snoc M A) - ptsIntegral P (pot M) (fun _ => c) :=
+        hmc
       rw [← s1, hsnoc, s0, ih (by omega), hint M hM]
       push_cast
       ring

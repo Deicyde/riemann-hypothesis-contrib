@@ -6,12 +6,14 @@ public import GroundTheory.AutomorphicForms.SupercuspidalCoefficients
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult
-private theorem block_zj_eq_diagonal (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (h N : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N) (t : kˣ)
-    (j : Fin h) :
-    ((leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) =
-      Matrix.diagonal fun i => if Zl.JC.blockIdx d hd i ≤ j then (t : k) else 1 := by
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult
+private theorem block_zj_eq_diagonal
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (h N : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N)
+    (t : kˣ) (j : Fin h)
+    : ((leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
+      = Matrix.diagonal fun i => if Zl.JC.blockIdx d hd i ≤ j then (t : k) else 1 := by
   ext i l
   obtain ⟨⟨a, i'⟩, rfl⟩ := (stdBlocks d hd).surjective i
   obtain ⟨⟨b, l'⟩, rfl⟩ := (stdBlocks d hd).surjective l
@@ -23,19 +25,23 @@ private theorem block_zj_eq_diagonal (k : Type) [Field k] [ValuativeRel k] [Topo
       by_cases haj : a ≤ j
       · simp [Zl.JC.zj, Zl.JC.blockIdx, haj, Matrix.GeneralLinearGroup.scalar]
       · simp [Zl.JC.zj, Zl.JC.blockIdx, haj]
-    · have hne : (stdBlocks d hd) ⟨a, i'⟩ ≠ (stdBlocks d hd) ⟨a, l'⟩ := fun e => hil (by
-        simpa using (stdBlocks d hd).injective e)
+    · have hne : (stdBlocks d hd) ⟨a, i'⟩ ≠ (stdBlocks d hd) ⟨a, l'⟩ := fun e =>
+        hil (by simpa using (stdBlocks d hd).injective e)
       rw [Matrix.diagonal_apply_ne _ hne]
       by_cases haj : a ≤ j
       · simp [Zl.JC.zj, haj, Matrix.GeneralLinearGroup.scalar, hil]
       · simp [Zl.JC.zj, haj, hil]
-  · have hne : (stdBlocks d hd) ⟨a, i'⟩ ≠ (stdBlocks d hd) ⟨b, l'⟩ := fun e => hab (by
-      simpa using congrArg Sigma.fst ((stdBlocks d hd).injective e))
+  · have hne : (stdBlocks d hd) ⟨a, i'⟩ ≠ (stdBlocks d hd) ⟨b, l'⟩ := fun e =>
+      hab (by simpa using congrArg Sigma.fst ((stdBlocks d hd).injective e))
     rw [leviEmb_apply_ne k _ _ hab, Matrix.diagonal_apply_ne _ hne]
 
-
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.block_central_element_commutes_levi : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], ∀ (h N : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N) (t : kˣ) (j : Fin h), ∀ y ∈ GroundTheory.Automorphic.Parabolic.levi k N (Zl.JC.blockIdx d hd), leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) * y = y * leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) := by
+theorem _root_.GlobalTheory.T.block_central_element_commutes_levi
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      ∀ (h N : ℕ) (d : Fin h → ℕ) (hd : ∑ a, d a = N) (t : kˣ) (j : Fin h),
+        ∀ y ∈ GroundTheory.Automorphic.Parabolic.levi k N (Zl.JC.blockIdx d hd),
+          leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) * y
+            = y * leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) := by
   intro k _ _ _ _ h N d hd t j y hy
   apply Units.ext
   rw [Units.val_mul, Units.val_mul, block_zj_eq_diagonal]
@@ -47,4 +53,3 @@ theorem _root_.GlobalTheory.T.block_central_element_commutes_levi : ∀ (k : Typ
   · have h0 : (y : Matrix (Fin N) (Fin N) k) i l = 0 :=
       GroundTheory.Automorphic.Parabolic.mem_levi.1 hy i l hil
     rw [h0, mul_zero, zero_mul]
-

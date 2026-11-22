@@ -10,13 +10,16 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 namespace LateralTheory.EtaleTrace.Cov
 
-def GenOnAgree : Prop := ∀ (k : Type) [Field k] {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ S k) (N : ℕ)
-  (w : Fin (N + 1) → X.functionField) (U U' : X.Opens) (πU : U.toScheme ⟶ PN k N) (πU' : U'.toScheme ⟶ PN k N),
-  GenOn p w U πU → GenOn p w U' πU' → pullback.fst U.ι U'.ι ≫ πU = pullback.snd U.ι U'.ι ≫ πU'
+def GenOnAgree : Prop :=
+  ∀ (k : Type) [Field k] {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ S k) (N : ℕ)
+      (w : Fin (N + 1) → X.functionField) (U U' : X.Opens) (πU : U.toScheme ⟶ PN k N)
+      (πU' : U'.toScheme ⟶ PN k N),
+    GenOn p w U πU → GenOn p w U' πU' → pullback.fst U.ι U'.ι ≫ πU = pullback.snd U.ι U'.ι ≫ πU'
 
-def GenOnGen : Prop := ∀ (k : Type) [Field k] {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ S k) (N : ℕ)
-  (w : Fin (N + 1) → X.functionField) (π : X ⟶ PN k N) (U : X.Opens),
-  genericPoint X ∈ U → GenOn p w U (U.ι ≫ π) → Gen p π w
+def GenOnGen : Prop :=
+  ∀ (k : Type) [Field k] {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ S k) (N : ℕ)
+      (w : Fin (N + 1) → X.functionField) (π : X ⟶ PN k N) (U : X.Opens),
+    genericPoint X ∈ U → GenOn p w U (U.ι ≫ π) → Gen p π w
 
 theorem GenOutGlue_of (h1 : GenOnAgree) (h2 : GenOnGen) : GenOutGlue := by
   intro k _ X _ p N w hloc
@@ -56,7 +59,6 @@ theorem genOnGen : GenOnGen := by
     exact (Scheme.Hom.germ_stalkMap_apply U.ι (π ⁻¹ᵁ Proj.basicOpen _ f) ⟨genericPoint X, hη⟩ h
       (π.app _ (Proj.awayToSection _ f (HomogeneousLocalization.Away.mk _ hf m g hg))))
 
-theorem GenOutGlue_of_agree (h1 : GenOnAgree) : GenOutGlue :=
-  GenOutGlue_of h1 genOnGen
+theorem GenOutGlue_of_agree (h1 : GenOnAgree) : GenOutGlue := GenOutGlue_of h1 genOnGen
 
 end LateralTheory.EtaleTrace.Cov

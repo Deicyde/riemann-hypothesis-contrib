@@ -35,8 +35,7 @@ def ζQ : ℕ → Om l
 
 theorem ζQ_zero : ζQ l 0 = 1 := rfl
 
-theorem ζQ_one : ζQ l 1 ≠ 1 := by
-  exact (exists_root_ne_one l).choose_spec.2
+theorem ζQ_one : ζQ l 1 ≠ 1 := by exact (exists_root_ne_one l).choose_spec.2
 
 theorem ζQ_succ (m : ℕ) : ζQ l (m + 1) ^ l = ζQ l m := by
   cases m with
@@ -64,31 +63,29 @@ theorem ζQ_primitive (m : ℕ) : IsPrimitiveRoot (ζQ l m) (l ^ m) := by
 
 variable {l}
 
-theorem one_lt_l : (1 : ℝ) < (l : ℝ) := by
-  exact_mod_cast (Fact.out : l.Prime).one_lt
+theorem one_lt_l : (1 : ℝ) < (l : ℝ) := by exact_mod_cast (Fact.out : l.Prime).one_lt
 
 theorem norm_l : ‖((l : ℕ) : Om l)‖ = (l : ℝ)⁻¹ := by
   have h : ‖algebraMap ℚ_[l] (Om l) (l : ℚ_[l])‖ = ‖(l : ℚ_[l])‖ := PadicAlgCl.norm_extends l _
   rw [map_natCast] at h
   rw [h]
-  first
-  | exact Padic.norm_p
-  | simp
+  first | exact Padic.norm_p | simp
 
 abbrev Q0 (l : ℕ) [Fact l.Prime] : IntermediateField ℚ_[l] (Om l) := ⊥
 
-theorem finiteDimensional_Q0_alt : FiniteDimensional ℚ_[l] (Q0 l) := by
-  infer_instance
+theorem finiteDimensional_Q0_alt : FiniteDimensional ℚ_[l] (Q0 l) := by infer_instance
 
-def ofGQ (g : GQ l) : Neutral.B1.GK l (Q0 l) :=
-  { g.toRingEquiv with
-    commutes' := fun r => by
-      obtain ⟨a, ha⟩ := IntermediateField.mem_bot.1 r.2
-      change g (r : Om l) = r
-      rw [← ha]
-      exact g.commutes a }
+def ofGQ (g : GQ l) : Neutral.B1.GK l (Q0 l) := {
+  g.toRingEquiv with
+  commutes' := fun r => by
+    obtain ⟨a, ha⟩ := IntermediateField.mem_bot.1 r.2
+    change g (r : Om l) = r
+    rw [← ha]
+    exact g.commutes a
+}
 
-theorem Kur_eq : LocalClassField.MaximalUnramifiedExtension l (Q0 l) = MaximalUnramifiedExtension l := by
+theorem Kur_eq
+    : LocalClassField.MaximalUnramifiedExtension l (Q0 l) = MaximalUnramifiedExtension l := by
   rw [LocalClassField.Kur_eq finiteDimensional_Q0_alt, bot_sup_eq, MaximalUnramifiedExtension]
   congr 1
   ext x
@@ -105,7 +102,8 @@ theorem norm_Kur {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) : ∃ a : 
   obtain ⟨a, rfl⟩ := IntermediateField.mem_bot.1 hy
   exact ⟨a, h.trans (PadicAlgCl.norm_extends l a)⟩
 
-theorem norm_Kur_zpow {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) (h0 : x ≠ 0) : ∃ k : ℤ, ‖x‖ = (l : ℝ) ^ k := by
+theorem norm_Kur_zpow {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) (h0 : x ≠ 0)
+    : ∃ k : ℤ, ‖x‖ = (l : ℝ) ^ k := by
   obtain ⟨a, ha⟩ := norm_Kur hx
   have ha0 : a ≠ 0 := by
     rintro rfl
@@ -113,17 +111,15 @@ theorem norm_Kur_zpow {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) (h0 :
     exact h0 ha
   refine ⟨-a.valuation, ?_⟩
   rw [ha]
-  first
-  | exact Padic.norm_eq_zpow_neg_valuation ha0
-  | exact Padic.norm_eq_pow_val ha0
+  first | exact Padic.norm_eq_zpow_neg_valuation ha0 | exact Padic.norm_eq_pow_val ha0
 
 theorem norm_eq_one_of_pow {n : ℕ} (hn : n ≠ 0) {z : Om l} (hz : z ^ n = 1) : ‖z‖ = 1 := by
   have h := congrArg norm hz
   rw [norm_pow, norm_one] at h
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hn).mp h
 
-theorem prod_one_sub_primitiveRoots {k : ℕ} (hk : 0 < k) :
-    ∏ x ∈ primitiveRoots (l ^ k) (Om l), (1 - x) = (l : Om l) := by
+theorem prod_one_sub_primitiveRoots {k : ℕ} (hk : 0 < k)
+    : ∏ x ∈ primitiveRoots (l ^ k) (Om l), (1 - x) = (l : Om l) := by
   obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by omega⟩
   rw [← eval_one_cyclotomic_prime_pow (R := Om l) (p := l) k',
     cyclotomic_eq_prod_X_sub_primitiveRoots (ζQ_primitive l (k' + 1)), eval_prod]
@@ -139,8 +135,9 @@ theorem norm_one_sub_pow_le {z : Om l} (hz : ‖z‖ ≤ 1) (a : ℕ) : ‖1 - z
     rw [norm_mul, norm_pow]
     exact mul_le_of_le_one_left (norm_nonneg _) (pow_le_one₀ (norm_nonneg _) hz)
 
-theorem norm_one_sub_eq {k : ℕ} {z z' : Om l} (hz : IsPrimitiveRoot z (l ^ k))
-    (hz' : IsPrimitiveRoot z' (l ^ k)) : ‖1 - z‖ = ‖1 - z'‖ := by
+theorem norm_one_sub_eq
+    {k : ℕ} {z z' : Om l} (hz : IsPrimitiveRoot z (l ^ k)) (hz' : IsPrimitiveRoot z' (l ^ k))
+    : ‖1 - z‖ = ‖1 - z'‖ := by
   have hpos : l ^ k ≠ 0 := pow_ne_zero _ (Fact.out : l.Prime).ne_zero
   have n1 : ‖z‖ ≤ 1 := (norm_eq_one_of_pow hpos hz.pow_eq_one).le
   have n2 : ‖z'‖ ≤ 1 := (norm_eq_one_of_pow hpos hz'.pow_eq_one).le
@@ -152,34 +149,43 @@ theorem norm_one_sub_eq {k : ℕ} {z z' : Om l} (hz : IsPrimitiveRoot z (l ^ k))
   · rw [← hi]
     exact norm_one_sub_pow_le n1 i
 
-theorem norm_one_sub_pow {k : ℕ} (hk : 0 < k) {z : Om l} (hz : IsPrimitiveRoot z (l ^ k)) :
-    ‖1 - z‖ ^ (l ^ k).totient = (l : ℝ)⁻¹ := by
+theorem norm_one_sub_pow {k : ℕ} (hk : 0 < k) {z : Om l} (hz : IsPrimitiveRoot z (l ^ k))
+    : ‖1 - z‖ ^ (l ^ k).totient = (l : ℝ)⁻¹ := by
   have hpos : 0 < l ^ k := pow_pos (Fact.out : l.Prime).pos k
   have h := congrArg norm (prod_one_sub_primitiveRoots (l := l) hk)
   rw [norm_prod, norm_l] at h
   rw [Finset.prod_congr rfl (fun x hx => norm_one_sub_eq ((mem_primitiveRoots hpos).mp hx) hz),
-    Finset.prod_const, hz.card_primitiveRoots] at h
+      Finset.prod_const, hz.card_primitiveRoots]
+    at h
   exact h
 
 section Irr
 
 variable {F : IntermediateField ℚ_[l] (Om l)}
 
-theorem minpoly_dvd_cyclotomic {k : ℕ} {z : Om l} (hz : IsPrimitiveRoot z (l ^ k)) :
-    minpoly F z ∣ cyclotomic (l ^ k) F := by
+theorem minpoly_dvd_cyclotomic {k : ℕ} {z : Om l} (hz : IsPrimitiveRoot z (l ^ k))
+    : minpoly F z ∣ cyclotomic (l ^ k) F := by
   apply minpoly.dvd
   rw [aeval_def, eval₂_eq_eval_map, map_cyclotomic]
   exact (hz.isRoot_cyclotomic (pow_pos (Fact.out : l.Prime).pos k)).eq_zero
 
-theorem natDegree_minpoly_eq (hF : F ≤ MaximalUnramifiedExtension l) {k : ℕ} (hk : 0 < k) {z : Om l}
-    (hz : IsPrimitiveRoot z (l ^ k)) : (minpoly F z).natDegree = (l ^ k).totient := by
+theorem natDegree_minpoly_eq
+    (hF : F ≤ MaximalUnramifiedExtension l)
+    {k : ℕ} (hk : 0 < k)
+    {z : Om l} (hz : IsPrimitiveRoot z (l ^ k))
+    : (minpoly F z).natDegree = (l ^ k).totient := by
   have hl := (Fact.out : l.Prime)
   have hpos : 0 < l ^ k := pow_pos hl.pos k
-  have hint : IsIntegral F z := ⟨_, cyclotomic.monic _ _, by
-    rw [eval₂_eq_eval_map, map_cyclotomic]
-    exact (hz.isRoot_cyclotomic hpos).eq_zero⟩
+  have hint : IsIntegral F z := ⟨
+    _,
+    cyclotomic.monic _ _,
+    by
+      rw [eval₂_eq_eval_map, map_cyclotomic]
+      exact (hz.isRoot_cyclotomic hpos).eq_zero
+  ⟩
   have hle : (minpoly F z).natDegree ≤ (l ^ k).totient := by
-    have h := natDegree_le_of_dvd (minpoly_dvd_cyclotomic (F := F) hz) (cyclotomic_ne_zero (l ^ k) F)
+    have h :=
+      natDegree_le_of_dvd (minpoly_dvd_cyclotomic (F := F) hz) (cyclotomic_ne_zero (l ^ k) F)
     rwa [natDegree_cyclotomic] at h
   set m := minpoly F z with hm
   set P := m.map (algebraMap F (Om l)) with hP
@@ -236,9 +242,7 @@ theorem natDegree_minpoly_eq (hF : F ≤ MaximalUnramifiedExtension l) {k : ℕ}
   have hinj : -(m.natDegree : ℤ) = j * (l ^ k).totient :=
     zpow_right_injective₀ (zero_lt_one.trans one_lt_l) one_lt_l.ne' (e1.symm.trans e2)
   have hφpos : 0 < (l ^ k).totient := by
-    first
-    | exact Nat.totient_pos.mpr hpos
-    | exact Nat.totient_pos hpos
+    first | exact Nat.totient_pos.mpr hpos | exact Nat.totient_pos hpos
   have hj' : j ≤ -1 := by
     by_contra hc
     push_neg at hc

@@ -15,8 +15,11 @@ namespace SimpleNormalCrossingSliceCharts
 
 variable {X : Type} [TopologicalSpace X]
 
-theorem isClosed_divisorComponent {e : ℕ} (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ) {r : ℕ}
-    (m : Fin r → ℕ) (W : Fin r → Set X) (h : IsSNC A L s m W) (k : Fin r) : IsClosed (W k) := by
+theorem isClosed_divisorComponent
+    {e : ℕ} (A : FinHolAtlas e X)
+    (L : LocPot X) (s : X → X → ℂ)
+    {r : ℕ} (m : Fin r → ℕ) (W : Fin r → Set X) (h : IsSNC A L s m W) (k : Fin r)
+    : IsClosed (W k) := by
   rw [← isOpen_compl_iff, isOpen_iff_forall_mem_open]
   intro x hx
   obtain ⟨ψ, -, hxψ, -, σ, -, hW, -⟩ := h x
@@ -47,15 +50,19 @@ theorem isClosed_divisorComponent {e : ℕ} (A : FinHolAtlas e X) (L : LocPot X)
       rw [← hWk] at hm
       exact hx hm.1
 
-
 open Classical in
-def sliceChart {e : ℕ} (ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ)) (i : Fin (e + 1))
-    (S : Set X) (hS : ∀ y ∈ ψ.source, y ∈ S ↔ ψ y i = 0) (w0 : S) :
-    OpenPartialHomeomorph S (Fin e → ℂ) where
+def sliceChart
+    {e : ℕ} (ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ)) (i : Fin (e + 1))
+    (S : Set X) (hS : ∀ y ∈ ψ.source, y ∈ S ↔ ψ y i = 0) (w0 : S)
+    : OpenPartialHomeomorph S (Fin e → ℂ) where
   toFun w := i.removeNth (ψ w)
-  invFun z := if h : Fin.insertNth (α := fun _ => ℂ) i 0 z ∈ ψ.target then
-      ⟨ψ.symm (Fin.insertNth (α := fun _ => ℂ) i 0 z),
-        (hS _ (ψ.map_target h)).2 (by rw [ψ.right_inv h]; simp)⟩ else w0
+  invFun z :=
+    if h : Fin.insertNth (α := fun _ => ℂ) i 0 z ∈ ψ.target then ⟨
+      ψ.symm (Fin.insertNth (α := fun _ => ℂ) i 0 z),
+      (hS _ (ψ.map_target h)).2 (by rw [ψ.right_inv h]; simp)
+    ⟩
+    else
+      w0
   source := Subtype.val ⁻¹' ψ.source
   target := {z | Fin.insertNth (α := fun _ => ℂ) i 0 z ∈ ψ.target}
   map_source' := by
@@ -76,8 +83,8 @@ def sliceChart {e : ℕ} (ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ)) (i
     have h1 : ψ w i = 0 := (hS _ hw).1 w.2
     have h2 : Fin.insertNth (α := fun _ => ℂ) i 0 (i.removeNth (ψ w)) = ψ w := by
       rw [Fin.insertNth_removeNth, Function.update_eq_self_iff, h1]
-    have hmem : Fin.insertNth (α := fun _ => ℂ) i 0 (i.removeNth (ψ w)) ∈ ψ.target :=
-      by rw [h2]; exact ψ.map_source hw
+    have hmem : Fin.insertNth (α := fun _ => ℂ) i 0 (i.removeNth (ψ w)) ∈ ψ.target := by
+      rw [h2]; exact ψ.map_source hw
     simp only [dif_pos hmem]
     apply Subtype.ext
     simp only [h2]
@@ -103,10 +110,11 @@ def sliceChart {e : ℕ} (ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ)) (i
     simp only [Function.comp_apply, dif_pos hz']
 
 open Classical in
-theorem sliceChart_symm_val {e : ℕ} (ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ))
-    (i : Fin (e + 1)) (S : Set X) (hS : ∀ y ∈ ψ.source, y ∈ S ↔ ψ y i = 0) (w0 : S)
-    {z : Fin e → ℂ} (hz : Fin.insertNth (α := fun _ => ℂ) i 0 z ∈ ψ.target) :
-    ((sliceChart ψ i S hS w0).symm z : X) = ψ.symm (Fin.insertNth (α := fun _ => ℂ) i 0 z) := by
+theorem sliceChart_symm_val
+    {e : ℕ} (ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ)) (i : Fin (e + 1))
+    (S : Set X) (hS : ∀ y ∈ ψ.source, y ∈ S ↔ ψ y i = 0) (w0 : S)
+    {z : Fin e → ℂ} (hz : Fin.insertNth (α := fun _ => ℂ) i 0 z ∈ ψ.target)
+    : ((sliceChart ψ i S hS w0).symm z : X) = ψ.symm (Fin.insertNth (α := fun _ => ℂ) i 0 z) := by
   obtain ⟨w, hw⟩ : ∃ w, w = (sliceChart ψ i S hS w0).symm z := ⟨_, rfl⟩
   rw [← hw]
   have hws : w ∈ (sliceChart ψ i S hS w0).source := by
@@ -123,8 +131,8 @@ theorem sliceChart_symm_val {e : ℕ} (ψ : OpenPartialHomeomorph X (Fin (e + 1)
   rw [hrem] at h2
   rw [h2, ψ.left_inv hψw]
 
-theorem analyticAt_ins {e : ℕ} (i : Fin (e + 1)) (z : Fin e → ℂ) :
-    AnalyticAt ℂ (fun z' : Fin e → ℂ => Fin.insertNth (α := fun _ => ℂ) i 0 z') z := by
+theorem analyticAt_ins {e : ℕ} (i : Fin (e + 1)) (z : Fin e → ℂ)
+    : AnalyticAt ℂ (fun z' : Fin e → ℂ => Fin.insertNth (α := fun _ => ℂ) i 0 z') z := by
   rw [analyticAt_pi_iff]
   intro j
   by_cases hj : j = i
@@ -135,16 +143,21 @@ theorem analyticAt_ins {e : ℕ} (i : Fin (e + 1)) (z : Fin e → ℂ) :
     simp only [Fin.insertNth_apply_succAbove]
     exact analyticAt_pi_iff.1 analyticAt_id j'
 
-theorem analyticAt_removeNth_comp {e : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (i : Fin (e + 1)) {F : E → Fin (e + 1) → ℂ} {z : E} (hF : AnalyticAt ℂ F z) :
-    AnalyticAt ℂ (fun z' => i.removeNth (F z')) z := by
+theorem analyticAt_removeNth_comp
+    {e : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (i : Fin (e + 1))
+    {F : E → Fin (e + 1) → ℂ} {z : E} (hF : AnalyticAt ℂ F z)
+    : AnalyticAt ℂ (fun z' => i.removeNth (F z')) z := by
   rw [analyticAt_pi_iff] at hF ⊢
   intro j
   exact hF (i.succAbove j)
 
-theorem compat_trans {e : ℕ} (A : FinHolAtlas e X) {ψ₁ ψ₂ : OpenPartialHomeomorph X (Fin e → ℂ)}
-    (h₁ : IsCompatChart A ψ₁) (h₂ : IsCompatChart A ψ₂) {v : Fin e → ℂ} (hv : v ∈ ψ₁.target)
-    (hv2 : ψ₁.symm v ∈ ψ₂.source) : AnalyticAt ℂ (ψ₂ ∘ ψ₁.symm) v := by
+theorem compat_trans
+    {e : ℕ} (A : FinHolAtlas e X)
+    {ψ₁ ψ₂ : OpenPartialHomeomorph X (Fin e → ℂ)}
+    (h₁ : IsCompatChart A ψ₁) (h₂ : IsCompatChart A ψ₂)
+    {v : Fin e → ℂ} (hv : v ∈ ψ₁.target) (hv2 : ψ₁.symm v ∈ ψ₂.source)
+    : AnalyticAt ℂ (ψ₂ ∘ ψ₁.symm) v := by
   obtain ⟨j, hj⟩ := A.cover (ψ₁.symm v)
   have ha : AnalyticAt ℂ (A.chart j ∘ ψ₁.symm) v := (h₁ j).2 v ⟨hv, hj⟩
   have hb : AnalyticAt ℂ (ψ₂ ∘ (A.chart j).symm) ((A.chart j ∘ ψ₁.symm) v) := by
@@ -160,13 +173,15 @@ theorem compat_trans {e : ℕ} (A : FinHolAtlas e X) {ψ₁ ψ₂ : OpenPartialH
   filter_upwards [hn] with w hw
   simp only [Function.comp_apply, (A.chart j).left_inv hw]
 
-theorem slice_trans {e : ℕ} (A : FinHolAtlas (e + 1) X) (S : Set X)
+theorem slice_trans
+    {e : ℕ} (A : FinHolAtlas (e + 1) X)
+    (S : Set X)
     {ψ₁ ψ₂ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ)} {i₁ i₂ : Fin (e + 1)}
     (h₁ : ∀ y ∈ ψ₁.source, y ∈ S ↔ ψ₁ y i₁ = 0) (h₂ : ∀ y ∈ ψ₂.source, y ∈ S ↔ ψ₂ y i₂ = 0)
-    (w₁ w₂ : S) (hc₁ : IsCompatChart A ψ₁) (hc₂ : IsCompatChart A ψ₂) :
-    AnalyticOnNhd ℂ (sliceChart ψ₂ i₂ S h₂ w₂ ∘ (sliceChart ψ₁ i₁ S h₁ w₁).symm)
-      ((sliceChart ψ₁ i₁ S h₁ w₁).target ∩
-        (sliceChart ψ₁ i₁ S h₁ w₁).symm ⁻¹' (sliceChart ψ₂ i₂ S h₂ w₂).source) := by
+    (w₁ w₂ : S) (hc₁ : IsCompatChart A ψ₁) (hc₂ : IsCompatChart A ψ₂)
+    : AnalyticOnNhd ℂ (sliceChart ψ₂ i₂ S h₂ w₂ ∘ (sliceChart ψ₁ i₁ S h₁ w₁).symm)
+      ((sliceChart ψ₁ i₁ S h₁ w₁).target
+        ∩ (sliceChart ψ₁ i₁ S h₁ w₁).symm ⁻¹' (sliceChart ψ₂ i₂ S h₂ w₂).source) := by
   intro z hz
   have hzt : Fin.insertNth (α := fun _ => ℂ) i₁ 0 z ∈ ψ₁.target := hz.1
   have hval := sliceChart_symm_val ψ₁ i₁ S h₁ w₁ hzt
@@ -175,7 +190,8 @@ theorem slice_trans {e : ℕ} (A : FinHolAtlas (e + 1) X) (S : Set X)
     rw [← hval]
     exact h2
   have hF : AnalyticAt ℂ
-      (fun z' : Fin e → ℂ => (ψ₂ ∘ ψ₁.symm) (Fin.insertNth (α := fun _ => ℂ) i₁ 0 z')) z :=
+      (fun z' : Fin e → ℂ => (ψ₂ ∘ ψ₁.symm) (Fin.insertNth (α := fun _ => ℂ) i₁ 0 z'))
+      z :=
     (compat_trans A hc₁ hc₂ hzt hsrc).comp (analyticAt_ins i₁ z)
   have hG := analyticAt_removeNth_comp i₂ hF
   apply hG.congr
@@ -184,12 +200,15 @@ theorem slice_trans {e : ℕ} (A : FinHolAtlas (e + 1) X) (S : Set X)
   rw [sliceChart_symm_val ψ₁ i₁ S h₁ w₁ hz']
   rfl
 
-theorem slice_holo {e : ℕ} (A : FinHolAtlas (e + 1) X) (S : Set X)
+theorem slice_holo
+    {e : ℕ} (A : FinHolAtlas (e + 1) X)
+    (S : Set X)
     {ψ : OpenPartialHomeomorph X (Fin (e + 1) → ℂ)} {i : Fin (e + 1)}
-    (hS : ∀ y ∈ ψ.source, y ∈ S ↔ ψ y i = 0) (w0 : S) (hc : IsCompatChart A ψ) (k : Fin A.n) :
-    AnalyticOnNhd ℂ (A.chart k ∘ Subtype.val ∘ (sliceChart ψ i S hS w0).symm)
-      ((sliceChart ψ i S hS w0).target ∩
-        (sliceChart ψ i S hS w0).symm ⁻¹' (Subtype.val ⁻¹' (A.chart k).source)) := by
+    (hS : ∀ y ∈ ψ.source, y ∈ S ↔ ψ y i = 0)
+    (w0 : S) (hc : IsCompatChart A ψ) (k : Fin A.n)
+    : AnalyticOnNhd ℂ (A.chart k ∘ Subtype.val ∘ (sliceChart ψ i S hS w0).symm)
+      ((sliceChart ψ i S hS w0).target
+        ∩ (sliceChart ψ i S hS w0).symm ⁻¹' (Subtype.val ⁻¹' (A.chart k).source)) := by
   intro z hz
   have hzt : Fin.insertNth (α := fun _ => ℂ) i 0 z ∈ ψ.target := hz.1
   have hval := sliceChart_symm_val ψ i S hS w0 hzt
@@ -198,7 +217,8 @@ theorem slice_holo {e : ℕ} (A : FinHolAtlas (e + 1) X) (S : Set X)
     rw [← hval]
     exact h2
   have hF : AnalyticAt ℂ
-      (fun z' : Fin e → ℂ => (A.chart k ∘ ψ.symm) (Fin.insertNth (α := fun _ => ℂ) i 0 z')) z :=
+      (fun z' : Fin e → ℂ => (A.chart k ∘ ψ.symm) (Fin.insertNth (α := fun _ => ℂ) i 0 z'))
+      z :=
     ((hc k).2 _ ⟨hzt, hsrc⟩).comp (analyticAt_ins i z)
   apply hF.congr
   filter_upwards [(sliceChart ψ i S hS w0).open_target.mem_nhds hz.1] with z' hz'
@@ -211,9 +231,9 @@ end SimpleNormalCrossingSliceCharts
 open SimpleNormalCrossingSliceCharts
 
 def SNCClosedStatement : Prop :=
-  ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X)
-    (s : X → X → ℂ) {r : ℕ} (m : Fin r → ℕ) (W : Fin r → Set X), IsSNC A L s m W →
-      ∀ k, IsClosed (W k)
+  ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ)
+      {r : ℕ} (m : Fin r → ℕ) (W : Fin r → Set X),
+    IsSNC A L s m W → ∀ k, IsClosed (W k)
 
 theorem sncClosed : SNCClosedStatement := by
   unfold SNCClosedStatement
@@ -226,8 +246,9 @@ theorem sncInducedAtlas : SNCInducedAtlasStatement := by
   have hK : IsCompact (W k) := (isClosed_divisorComponent A L s m W h k).isCompact
   unfold IsSNC at h
   choose ψ hψ using h
-  have h' : ∀ x, ∃ σ : Fin r → Option (Fin (e + 1)),
-      ∀ k', W k' ∩ (ψ x).source = {y ∈ (ψ x).source | ∃ i, σ k' = some i ∧ (ψ x) y i = 0} := by
+  have h'
+      : ∀ x, ∃ σ : Fin r → Option (Fin (e + 1)), ∀ k',
+        W k' ∩ (ψ x).source = {y ∈ (ψ x).source | ∃ i, σ k' = some i ∧ (ψ x) y i = 0} := by
     intro x
     obtain ⟨-, -, -, σ, -, hW, -⟩ := hψ x
     exact ⟨σ, hW⟩
@@ -254,15 +275,25 @@ theorem sncInducedAtlas : SNCInducedAtlasStatement := by
         ⟨hy, ι x, hι x, h0⟩
       rw [← hσ x.1 k] at hm
       exact hm.1
-  obtain ⟨t, ht⟩ := hK.elim_finite_subcover (fun x : W k => (ψ x.1).source)
-    (fun x => (ψ x.1).open_source) (fun y hy => Set.mem_iUnion.2 ⟨⟨y, hy⟩, (hψ y).2.1⟩)
-  refine ⟨{ n := t.card
-            chart := fun j => sliceChart (ψ (t.equivFin.symm j).1.1) (ι (t.equivFin.symm j).1) (W k)
-              (hS (t.equivFin.symm j).1) (t.equivFin.symm j).1
-            cover := ?_
-            holo := fun j j' => slice_trans A (W k) (hS (t.equivFin.symm j).1)
-              (hS (t.equivFin.symm j').1) (t.equivFin.symm j).1 (t.equivFin.symm j').1
-              (hψ (t.equivFin.symm j).1.1).1 (hψ (t.equivFin.symm j').1.1).1 }, ?_⟩
+  obtain ⟨t, ht⟩ :=
+    hK.elim_finite_subcover
+      (fun x : W k => (ψ x.1).source)
+      (fun x => (ψ x.1).open_source)
+      (fun y hy => Set.mem_iUnion.2 ⟨⟨y, hy⟩, (hψ y).2.1⟩)
+  refine ⟨
+    {
+      n := t.card
+      chart := fun j =>
+        sliceChart (ψ (t.equivFin.symm j).1.1) (ι (t.equivFin.symm j).1) (W k)
+          (hS (t.equivFin.symm j).1) (t.equivFin.symm j).1
+      cover := ?_
+      holo := fun j j' =>
+        slice_trans A (W k) (hS (t.equivFin.symm j).1) (hS (t.equivFin.symm j').1)
+          (t.equivFin.symm j).1 (t.equivFin.symm j').1 (hψ (t.equivFin.symm j).1.1).1
+          (hψ (t.equivFin.symm j').1.1).1
+    },
+    ?_
+  ⟩
   · intro y
     obtain ⟨x, hxt, hyx⟩ := Set.mem_iUnion₂.1 (ht y.2)
     refine ⟨t.equivFin ⟨x, hxt⟩, ?_⟩

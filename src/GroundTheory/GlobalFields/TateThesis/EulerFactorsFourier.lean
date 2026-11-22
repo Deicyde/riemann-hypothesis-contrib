@@ -28,40 +28,46 @@ namespace HeckeCharacter
 
 variable (χ : HeckeCharacter K)
 
-theorem exists_ofFinite_toFractionalIdeal_eq :
-    ∃ δ : (FiniteAdeleRing (𝓞 K) K)ˣ, toFractionalIdeal (ofFinite δ) =
-      idealUnit χ.conductor χ.conductor_ne_bot * differentUnit := by
-  obtain ⟨x, hx⟩ := toFractionalIdeal_surjective (K := K)
-    (idealUnit χ.conductor χ.conductor_ne_bot * differentUnit)
+theorem exists_ofFinite_toFractionalIdeal_eq
+    : ∃ δ : (FiniteAdeleRing (𝓞 K) K)ˣ,
+      toFractionalIdeal (ofFinite δ)
+        = idealUnit χ.conductor χ.conductor_ne_bot * differentUnit := by
+  obtain ⟨x, hx⟩ :=
+    toFractionalIdeal_surjective (K := K) (idealUnit χ.conductor χ.conductor_ne_bot * differentUnit)
   refine ⟨toFinite K x, ?_⟩
   rw [← hx, toFractionalIdeal_eq_iff]
   intro v
   rw [count_toFractionalIdeal]
   rfl
 
-theorem valued_of_toFractionalIdeal_eq {δ : (FiniteAdeleRing (𝓞 K) K)ˣ}
+theorem valued_of_toFractionalIdeal_eq
+    {δ : (FiniteAdeleRing (𝓞 K) K)ˣ}
     (hδ : toFractionalIdeal (ofFinite δ) = idealUnit χ.conductor χ.conductor_ne_bot * differentUnit)
-    (v : HeightOneSpectrum (𝓞 K)) :
-    Valued.v ((δ : FiniteAdeleRing (𝓞 K) K) v) = WithZero.exp (-(χ.condExp v + differentExp v)) := by
+    (v : HeightOneSpectrum (𝓞 K))
+    : Valued.v ((δ : FiniteAdeleRing (𝓞 K) K) v)
+      = WithZero.exp (-(χ.condExp v + differentExp v)) := by
   rw [valued_eq_exp_ord, ← count_toFractionalIdeal, hδ, Units.val_mul,
     FractionalIdeal.count_mul K v (idealUnit χ.conductor χ.conductor_ne_bot).ne_zero
       (differentUnit (K := K)).ne_zero]
   rfl
 
 def fourierConst (δ : (FiniteAdeleRing (𝓞 K) K)ˣ) : ℂ :=
-  (∏ w, (-I) ^ (χ.infiniteWeight w).natAbs) *
-    finiteFourier K χ.finiteTestFun ((δ⁻¹ : (FiniteAdeleRing (𝓞 K) K)ˣ) : FiniteAdeleRing (𝓞 K) K)
+  (∏ w, (-I) ^ (χ.infiniteWeight w).natAbs)
+    * finiteFourier K χ.finiteTestFun ((δ⁻¹ : (FiniteAdeleRing (𝓞 K) K)ˣ) : FiniteAdeleRing (𝓞 K) K)
 
-theorem fourierConst_ne_zero {δ : (FiniteAdeleRing (𝓞 K) K)ˣ}
-    (hδ : toFractionalIdeal (ofFinite δ) = idealUnit χ.conductor χ.conductor_ne_bot * differentUnit) :
-    χ.fourierConst δ ≠ 0 :=
+theorem fourierConst_ne_zero
+    {δ : (FiniteAdeleRing (𝓞 K) K)ˣ}
+    (hδ : toFractionalIdeal (ofFinite δ) = idealUnit χ.conductor χ.conductor_ne_bot * differentUnit)
+    : χ.fourierConst δ ≠ 0 :=
   mul_ne_zero (Finset.prod_ne_zero_iff.2 fun _ _ ↦ pow_ne_zero _ (neg_ne_zero.2 I_ne_zero))
     (χ.finiteFourier_finiteTestFun_ne_zero δ (χ.valued_of_toFractionalIdeal_eq hδ))
 
-theorem adelicFourier_testFunction {δ : (FiniteAdeleRing (𝓞 K) K)ˣ}
+theorem adelicFourier_testFunction
+    {δ : (FiniteAdeleRing (𝓞 K) K)ˣ}
     (hδ : toFractionalIdeal (ofFinite δ) = idealUnit χ.conductor χ.conductor_ne_bot * differentUnit)
-    (y : 𝔸[K]) :
-    adelicFourier K χ.testFunction y = χ.fourierConst δ * (χ⁻¹).testFunction (ofFinite δ • y) := by
+    (y : 𝔸[K])
+    : adelicFourier K χ.testFunction y
+      = χ.fourierConst δ * (χ⁻¹).testFunction (ofFinite δ • y) := by
   have hy1 : (ofFinite δ • y).1 = y.1 := by
     change (1 : InfiniteAdeleRing K) * y.1 = y.1
     exact one_mul _

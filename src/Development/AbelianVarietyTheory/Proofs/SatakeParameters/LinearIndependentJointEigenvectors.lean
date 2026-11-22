@@ -6,11 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.JointEigenvectorsIndependentSatakeParameters
 
-theorem linearIndependent_jointEigenvectors {J V : Type} [AddCommGroup V] [Module ℂ V]
+theorem linearIndependent_jointEigenvectors
+    {J V : Type} [AddCommGroup V] [Module ℂ V]
     (T : J → V →ₗ[ℂ] V) (S : Set (J → ℂ)) (v : S → V)
-    (hv : ∀ χ : S, v χ ≠ 0)
-    (hT : ∀ (χ : S) (j : J), T j (v χ) = (χ : J → ℂ) j • v χ) :
-    LinearIndependent ℂ v := by
+    (hv : ∀ χ : S, v χ ≠ 0) (hT : ∀ (χ : S) (j : J), T j (v χ) = (χ : J → ℂ) j • v χ)
+    : LinearIndependent ℂ v := by
   classical
   rw [linearIndependent_iff']
   intro s
@@ -29,18 +29,19 @@ theorem linearIndependent_jointEigenvectors {J V : Type} [AddCommGroup V] [Modul
       have e2 : ∑ i ∈ s, (g i * (i : J → ℂ) j) • v i = -((g a * (a : J → ℂ) j) • v a) := by
         have := congrArg (T j) e1
         set_option synthInstance.maxHeartbeats 100000 in
-          simpa [map_sum, map_smul, hT, smul_smul] using this
+        simpa [map_sum, map_smul, hT, smul_smul] using this
       have e3 : ∑ i ∈ s, ((a : J → ℂ) j * g i) • v i = -(((a : J → ℂ) j * g a) • v a) := by
         have := congrArg (fun x => (a : J → ℂ) j • x) e1
         simpa [Finset.smul_sum, smul_smul] using this
       have h2 : ∑ i ∈ s, (g i * ((i : J → ℂ) j - (a : J → ℂ) j)) • v i = 0 := by
-        calc ∑ i ∈ s, (g i * ((i : J → ℂ) j - (a : J → ℂ) j)) • v i
-            = ∑ i ∈ s, (g i * (i : J → ℂ) j) • v i - ∑ i ∈ s, ((a : J → ℂ) j * g i) • v i := by
-              rw [← Finset.sum_sub_distrib]
-              refine Finset.sum_congr rfl fun i _ => ?_
-              rw [← sub_smul]
-              congr 1
-              ring
+        calc
+          ∑ i ∈ s, (g i * ((i : J → ℂ) j - (a : J → ℂ) j)) • v i
+              = ∑ i ∈ s, (g i * (i : J → ℂ) j) • v i - ∑ i ∈ s, ((a : J → ℂ) j * g i) • v i := by
+            rw [← Finset.sum_sub_distrib]
+            refine Finset.sum_congr rfl fun i _ => ?_
+            rw [← sub_smul]
+            congr 1
+            ring
           _ = 0 := by rw [e2, e3, mul_comm ((a : J → ℂ) j) (g a)]; exact sub_self _
       have := ih (fun i => g i * ((i : J → ℂ) j - (a : J → ℂ) j)) h2 i hi
       exact (mul_eq_zero.mp this).resolve_right (sub_ne_zero.mpr hj)

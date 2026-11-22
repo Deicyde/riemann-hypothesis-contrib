@@ -4,9 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.prod_primeFactors_pow_ceil_padicValNat_mul_eq_pow :
-    ∀ (Q T a b : ℕ), Q ≠ 0 → ∏ p ∈ Q.primeFactors.filter Nat.Prime,
-      p ^ (T * ⌈(padicValNat p Q : ℝ) * (a : ℝ)⌉.toNat + ⌈(padicValNat p Q : ℝ) * (b : ℝ)⌉.toNat) = Q ^ (T * a + b) := by
+theorem UpperTheory.prod_primeFactors_pow_ceil_padicValNat_mul_eq_pow
+    : ∀ (Q T a b : ℕ),
+      Q ≠ 0
+        → ∏ p ∈ Q.primeFactors.filter Nat.Prime,
+            p ^ (T * ⌈(padicValNat p Q : ℝ) * (a : ℝ)⌉.toNat + ⌈(padicValNat p Q : ℝ) * (b : ℝ)⌉.toNat)
+          = Q ^ (T * a + b) := by
   intro Q T a b hQ
   have hc : ∀ m n : ℕ, ⌈(m : ℝ) * (n : ℝ)⌉.toNat = m * n := by
     intro m n

@@ -6,14 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedOrbit
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat GlobalTheory.KapOrb
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat GlobalTheory.KapOrb
 open scoped Classical
 
 noncomputable section
 
 namespace GlobalTheory.KapOrb
 
-theorem pullLat_mul_eq_mulLat : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E) (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.UnitLemma.InvAlg K) (n : ℕ) (ψ : B.A ≃+ (Fin n → w.adicCompletion E)) (h g : GLw n w) (a : B.Aˣ), (∀ y, ψ ((a : B.A) * y) = h.val *ᵥ ψ y) → pullLat w B ψ (h * g) = GlobalTheory.UnitLemma.mulLat K.O (a : B.A) (pullLat w B ψ g) := by
+theorem pullLat_mul_eq_mulLat
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E)
+        (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.UnitLemma.InvAlg K) (n : ℕ)
+        (ψ : B.A ≃+ (Fin n → w.adicCompletion E)) (h g : GLw n w) (a : B.Aˣ),
+      (∀ y, ψ ((a : B.A) * y) = h.val *ᵥ ψ y)
+        → pullLat w B ψ (h * g)
+          = GlobalTheory.UnitLemma.mulLat K.O (a : B.A) (pullLat w B ψ g) := by
   intro E _ _ _ w K B n ψ h g a ha
   have hinv : ∀ z, ψ (((a⁻¹ : B.Aˣ) : B.A) * z) = (h⁻¹ : GLw n w).val *ᵥ ψ z := by
     intro z

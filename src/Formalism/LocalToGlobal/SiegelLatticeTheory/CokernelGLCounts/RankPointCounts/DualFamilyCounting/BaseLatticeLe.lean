@@ -26,15 +26,16 @@ theorem base_lattice_le : X.Lb ≤ (VS D).L0 := by
 theorem Lb_le_aaLbS (b : Fin D.R.rS) : X.Lb ≤ aaLbS X b := fun l hl =>
   Submodule.subset_span ⟨1, one_mem_aaD b, l, hl, by rw [one_smul]⟩
 
-theorem aaLbS_le_span (b : Fin D.R.rS) :
-    aaLbS X b ≤ (Submodule.span D.host.E (X.Lb : Set (VS D).V)).restrictScalars (𝓞 D.host.E) := by
+theorem aaLbS_le_span (b : Fin D.R.rS)
+    : aaLbS X b ≤ (Submodule.span D.host.E (X.Lb : Set (VS D).V)).restrictScalars (𝓞 D.host.E) := by
   unfold aaLbS
   rw [Submodule.span_le]
   rintro _ ⟨c, -, l, hl, rfl⟩
   exact Submodule.smul_mem _ c (Submodule.subset_span hl)
 
-theorem span_aaLbS (b : Fin D.R.rS) :
-    Submodule.span D.host.E (aaLbS X b : Set (VS D).V) = Submodule.span D.host.E (X.Lb : Set (VS D).V) :=
+theorem span_aaLbS (b : Fin D.R.rS)
+    : Submodule.span D.host.E (aaLbS X b : Set (VS D).V)
+      = Submodule.span D.host.E (X.Lb : Set (VS D).V) :=
   le_antisymm (Submodule.span_le.2 (aaLbS_le_span X b)) (Submodule.span_mono (Lb_le_aaLbS X b))
 
 theorem aaD_ne_zero' (b : Fin D.R.rS) : aaD D b ≠ 0 := by
@@ -63,14 +64,16 @@ theorem fg_aaLbS (b : Fin D.R.rS) : (aaLbS X b).FG := by
     unfold aaLbS
     rw [Submodule.map_span, Submodule.span_le]
     rintro _ ⟨_, ⟨c, hc, l, hl, rfl⟩, rfl⟩
-    have hmul : ((N : ℕ) : D.host.E) * c ∈ ((1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) :
-        Set D.host.E) := by
+    have hmul
+        : ((N : ℕ) : D.host.E) * c
+          ∈ ((1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) : Set D.host.E) := by
       have := FractionalIdeal.mul_mem_mul hN hc
       rwa [inv_mul_cancel₀ (aaD_ne_zero' b)] at this
     obtain ⟨o, ho⟩ := (FractionalIdeal.mem_one_iff _).1 hmul
     have e : f (c • l) = o • l := by
       show (N : 𝓞 D.host.E) • (c • l) = o • l
-      rw [← algebraMap_smul D.host.E (N : 𝓞 D.host.E), smul_smul, ← algebraMap_smul D.host.E o l, ho]
+      rw [← algebraMap_smul D.host.E (N : 𝓞 D.host.E), smul_smul, ← algebraMap_smul D.host.E o l,
+        ho]
       push_cast
       rfl
     rw [e]

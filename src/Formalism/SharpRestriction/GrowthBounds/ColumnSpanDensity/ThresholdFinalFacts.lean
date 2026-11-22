@@ -32,12 +32,14 @@ private theorem natCast_sub_le_natCast_natSub (x y : ℕ) : (x : ℝ) - y ≤ ((
   · rw [Nat.sub_eq_zero_of_le hxy, Nat.cast_zero, sub_nonpos]
     exact_mod_cast hxy
 
-theorem winFacts_of (K : Cst) (hK : K.Pos) (CH : ℝ) (hCH : K.TLP ≤ CH) (X : Dat) (h : X.Hyp K.C₀ CH) :
-    WinFacts K X := by
+theorem winFacts_of (K : Cst) (hK : K.Pos) (CH : ℝ) (hCH : K.TLP ≤ CH) (X : Dat) (h : X.Hyp K.C₀ CH)
+    : WinFacts K X := by
   have B := base_of K hK CH hCH X h
   have hH := h
   unfold Dat.Hyp HypI at hH
-  obtain ⟨_, _, _, _, _, _, _, _, h9, h10, h11, h12, h13, h14, _, h16, _, _, _, _, _, _, h23, h24⟩ := hH
+  obtain
+      ⟨_, _, _, _, _, _, _, _, h9, h10, h11, h12, h13, h14, _, h16, _, _, _, _, _, _, h23, h24⟩ :=
+    hH
   have hN : (X.TT.card : ℝ) = X.N := rfl
   have hk : (X.m : ℝ) + 1 = X.k := rfl
   rw [hN, hk] at h12 h16
@@ -76,10 +78,11 @@ theorem winFacts_of (K : Cst) (hK : K.Pos) (CH : ℝ) (hCH : K.TLP ≤ CH) (X : 
     have e5 : (X.lb : ℝ) = ⌈X.bl⌉₊ := rfl
     linarith
 
-theorem below_abs (N wa wb c : ℕ) (Y : ℝ) (hY : 1 ≤ Y) (ha : 2 * Y * N * c ≤ wa) (hb : 2 * Y * N * c ≤ wb)
-    (hwa : 0 < wa) (hwb : 0 < wb) :
-    (wa : ℝ) ^ N * (wb : ℝ) ^ N - ((wa - c : ℕ) : ℝ) ^ N * ((wb - c : ℕ) : ℝ) ^ N ≤
-      1 / Y * ((wa : ℝ) ^ N * (wb : ℝ) ^ N) := by
+theorem below_abs
+    (N wa wb c : ℕ) (Y : ℝ) (hY : 1 ≤ Y) (ha : 2 * Y * N * c ≤ wa) (hb : 2 * Y * N * c ≤ wb)
+    (hwa : 0 < wa) (hwb : 0 < wb)
+    : (wa : ℝ) ^ N * (wb : ℝ) ^ N - ((wa - c : ℕ) : ℝ) ^ N * ((wb - c : ℕ) : ℝ) ^ N
+      ≤ 1 / Y * ((wa : ℝ) ^ N * (wb : ℝ) ^ N) := by
   rcases Nat.eq_zero_or_pos N with hN | hN
   · subst hN
     simp only [pow_zero, mul_one, sub_self]
@@ -128,16 +131,21 @@ theorem below_abs (N wa wb c : ℕ) (Y : ℝ) (hY : 1 ≤ Y) (ha : 2 * Y * N * c
   set p := (N : ℝ) * c / wa
   set q := (N : ℝ) * c / wb
   have hX : 0 ≤ (wa : ℝ) ^ N * (wb : ℝ) ^ N := by positivity
-  have hprod : (wa : ℝ) ^ N * (1 - p) * ((wb : ℝ) ^ N * (1 - q)) ≤ ((wa : ℝ) - c) ^ N * ((wb : ℝ) - c) ^ N :=
+  have hprod
+      : (wa : ℝ) ^ N * (1 - p) * ((wb : ℝ) ^ N * (1 - q))
+        ≤ ((wa : ℝ) - c) ^ N * ((wb : ℝ) - c) ^ N :=
     mul_le_mul h1 h2 (by nlinarith [pow_pos hB N]) (by nlinarith [pow_pos hA N])
   have hpq : 1 - 1 / Y ≤ (1 - p) * (1 - q) := by
     have e : 1 / Y = 1 / (2 * Y) + 1 / (2 * Y) := by field_simp; ring
     nlinarith [mul_nonneg hp0 hq0]
-  have h3 : (wa : ℝ) ^ N * (wb : ℝ) ^ N * (1 - 1 / Y) ≤ (wa : ℝ) ^ N * (wb : ℝ) ^ N * ((1 - p) * (1 - q)) :=
+  have h3
+      : (wa : ℝ) ^ N * (wb : ℝ) ^ N * (1 - 1 / Y)
+        ≤ (wa : ℝ) ^ N * (wb : ℝ) ^ N * ((1 - p) * (1 - q)) :=
     mul_le_mul_of_nonneg_left hpq hX
   nlinarith
 
-theorem threshold_final_facts (K : Cst) (hK : K.Pos) : TransportedAlt K (fun _ => ColumnSpanNumericalFacts K) := by
+theorem threshold_final_facts (K : Cst) (hK : K.Pos)
+    : TransportedAlt K (fun _ => ColumnSpanNumericalFacts K) := by
   have h108T : (108 : ℝ) ≤ K.TLP := (le_max_left _ _).trans (le_max_left _ _)
   refine ⟨K.TLP, 1, by linarith, one_pos, ?_⟩
   intro CH hCH C _ X h
@@ -145,7 +153,9 @@ theorem threshold_final_facts (K : Cst) (hK : K.Pos) : TransportedAlt K (fun _ =
   have B := base_of K hK CH hCH X h
   have hH := h
   unfold Dat.Hyp HypI at hH
-  obtain ⟨_, _, _, _, _, _, _, _, h9, h10, h11, h12, h13, h14, _, h16, _, _, _, _, _, _, h23, h24⟩ := hH
+  obtain
+      ⟨_, _, _, _, _, _, _, _, h9, h10, h11, h12, h13, h14, _, h16, _, _, _, _, _, _, h23, h24⟩ :=
+    hH
   have hN : (X.TT.card : ℝ) = X.N := rfl
   have hk : (X.m : ℝ) + 1 = X.k := rfl
   rw [hN, hk] at h24
@@ -178,7 +188,9 @@ theorem threshold_final_facts (K : Cst) (hK : K.Pos) : TransportedAlt K (fun _ =
     have : 0 ≤ CH := by linarith
     positivity
   have hC : CH * X.k ^ 3 * (X.N * X.ccl * X.Y) ≤ X.b' := by
-    calc CH * X.k ^ 3 * (X.N * X.ccl * X.Y) = CH * X.k ^ 3 * X.N * X.Y * X.ccl := by ring
+    calc
+      CH * X.k ^ 3 * (X.N * X.ccl * X.Y)
+        = CH * X.k ^ 3 * X.N * X.Y * X.ccl := by ring
       _ ≤ CH * X.k ^ 3 * X.N * X.Y * (q * S) := mul_le_mul_of_nonneg_left hcc hR
       _ = CH * X.k ^ 3 * X.N * q * S * X.Y := by ring
       _ ≤ X.b' := h24
@@ -193,7 +205,8 @@ theorem threshold_final_facts (K : Cst) (hK : K.Pos) : TransportedAlt K (fun _ =
     have f1 : (1 : ℝ) ≤ CH * X.k ^ 2 := by linarith
     have f2 : (1 : ℝ) ≤ CH * X.k ^ 2 * X.N := one_le_mul_of_one_le_of_one_le f1 hN1
     have f3 : (1 : ℝ) ≤ CH * X.k ^ 2 * X.N * q := one_le_mul_of_one_le_of_one_le f2 hq
-    have f4 : (1 : ℝ) ≤ CH * X.k ^ 2 * X.N * q * S := one_le_mul_of_one_le_of_one_le f3 (by linarith)
+    have f4 : (1 : ℝ) ≤ CH * X.k ^ 2 * X.N * q * S :=
+      one_le_mul_of_one_le_of_one_le f3 (by linarith)
     have f5 : (1 : ℝ) ≤ CH * X.k ^ 2 * X.N * q * S * X.Y := one_le_mul_of_one_le_of_one_le f4 hY
     have f6 := mul_le_mul_of_nonneg_left f5 hk0.le
     linarith
@@ -224,7 +237,9 @@ theorem threshold_final_facts (K : Cst) (hK : K.Pos) : TransportedAlt K (fun _ =
   have hwb0 : 0 < (X.Wb 0).card := by
     have : (0 : ℝ) < (X.Wb 0).card := by
       have : (1 : ℝ) ≤ X.b' / X.k := (one_le_div hk0).2 hbk
-      have e : X.Yb * X.N * LaI K.C₀ X.N₁ X.ar * X.b' / X.k = X.Yb * X.N * LaI K.C₀ X.N₁ X.ar * (X.b' / X.k) := by
+      have e
+          : X.Yb * X.N * LaI K.C₀ X.N₁ X.ar * X.b' / X.k
+            = X.Yb * X.N * LaI K.C₀ X.N₁ X.ar * (X.b' / X.k) := by
         ring
       have := mul_le_mul hQ2 this (by norm_num) (by linarith)
       linarith
@@ -233,8 +248,18 @@ theorem threshold_final_facts (K : Cst) (hK : K.Pos) : TransportedAlt K (fun _ =
     rw [Nat.card_Icc, card_first_window, Nat.sub_sub]
   have eb : (Finset.Icc (X.lb + X.ccl) X.ub).card = (X.Wb 0).card - X.ccl := by
     rw [Nat.card_Icc, card_second_window, Nat.sub_sub]
-  refine ⟨W.arnn, W.uann, by linarith [W.blge], W.bunn, hY, by exact_mod_cast B.hN1,
-    by exact_mod_cast (show (1 : ℝ) ≤ X.N by linarith), ⟨hwa0, hwb0⟩, ?_, ?_⟩
+  refine ⟨
+    W.arnn,
+    W.uann,
+    by linarith [W.blge],
+    W.bunn,
+    hY,
+    by exact_mod_cast B.hN1,
+    by exact_mod_cast (show (1 : ℝ) ≤ X.N by linarith),
+    ⟨hwa0, hwb0⟩,
+    ?_,
+    ?_
+  ⟩
   · rw [ea, eb]
     exact below_abs X.N _ _ X.ccl X.Y hY haN hbN hwa0 hwb0
   · have hb0 : 0 < X.b' := by linarith

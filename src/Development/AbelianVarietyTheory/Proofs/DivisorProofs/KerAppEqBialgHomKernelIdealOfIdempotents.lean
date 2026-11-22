@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.WittOnFalse
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 set_option autoImplicit false
 
@@ -16,9 +17,12 @@ namespace GlobalTheory
 
 namespace PDivGroup
 
-theorem ker_app_eq_kerIdeal_of_idempotents (p : ℕ) [Fact p.Prime] (k : Type) [CommRing k]
+theorem ker_app_eq_kerIdeal_of_idempotents
+    (p : ℕ) [Fact p.Prime]
+    (k : Type) [CommRing k]
     (G : PDivGroup p k) (u v : G ⟶ G) (huv : u + v = 𝟙 G) (h1 : u ≫ v = 0) (_h2 : v ≫ u = 0)
-    (n : ℕ) : RingHom.ker (u.app n) = kerIdeal (v.app n) := by
+    (n : ℕ)
+    : RingHom.ker (u.app n) = kerIdeal (v.app n) := by
   apply le_antisymm
   · intro a ha
     rw [RingHom.mem_ker] at ha
@@ -28,12 +32,12 @@ theorem ker_app_eq_kerIdeal_of_idempotents (p : ℕ) [Fact p.Prime] (k : Type) [
         rw [RingHom.mem_ker]
         exact Ideal.Quotient.eq_zero_iff_mem.2 hb
     let P := (ptsPush (G.A n) (x : G.A n →ₐ[k] _)).comp toPts
-    have hP : P (Hom.conv v n) = 1 := WithConv.ofConv_injective (AlgHom.ext fun c => by
-      change x (v.app n c) = _
-      rw [hv]
-      simp)
-    have e : P (Hom.conv (u + v) n) = P (Hom.conv u n) := by
-      rw [add_conv, map_mul, hP, mul_one]
+    have hP : P (Hom.conv v n) = 1 :=
+      WithConv.ofConv_injective (AlgHom.ext fun c => by
+        change x (v.app n c) = _
+        rw [hv]
+        simp)
+    have e : P (Hom.conv (u + v) n) = P (Hom.conv u n) := by rw [add_conv, map_mul, hP, mul_one]
     rw [huv] at e
     have e' := congrArg (fun y => y.ofConv a) e
     change x a = x (u.app n a) at e'

@@ -19,7 +19,12 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem j_in_frac : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Frac Ω ε), ∃ a : GlobalTheory.FN.ring ε.range, (a : ℍ → ℂ) = jT ∧ (∀ γ : SL(2, ℤ), T.sl (ofSL γ) (T.io a) = T.io a) ∧ (T.exp (T.io a)).coeff (-1) = 1 ∧ (∀ r : ℚ, r < -1 → (T.exp (T.io a)).coeff r = 0) ∧ ∀ r : ℚ, ∃ n : ℤ, (T.exp (T.io a)).coeff r = n := by
+theorem j_in_frac
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Frac Ω ε),
+      ∃ a : GlobalTheory.FN.ring ε.range,
+        (a : ℍ → ℂ) = jT ∧ (∀ γ : SL(2, ℤ), T.sl (ofSL γ) (T.io a) = T.io a)
+          ∧ (T.exp (T.io a)).coeff (-1) = 1 ∧ (∀ r : ℚ, r < -1 → (T.exp (T.io a)).coeff r = 0)
+          ∧ ∀ r : ℚ, ∃ n : ℤ, (T.exp (T.io a)).coeff r = n := by
   intro Ω _ _ _ ε T
   have hlv := (GlobalTheory.T.lv_jT_one_and_jT_smul_eq ε.range).1
   let a : GlobalTheory.FN.ring ε.range := ⟨jT, mem_ring_of_inR ⟨1, 1, one_pos, hlv⟩⟩

@@ -4,11 +4,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open scoped TensorProduct
 
-theorem UpperTheory.V.Lit.Bor.inclFacts :
-    UpperTheory.V.Lit.Bor.InclFacts := by
+theorem UpperTheory.V.Lit.Bor.inclFacts : UpperTheory.V.Lit.Bor.InclFacts := by
   intro E _ _ _ a π Ξ r
   have hA : ∀ X m, incl π Ξ (lieA π Ξ X m) = smA Ξ X (incl π Ξ m) := fun X m => by
     induction m using TensorProduct.induction_on with

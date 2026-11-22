@@ -14,8 +14,9 @@ theorem tracePow : TracePow := by
   set p := φ.charpoly with hp
   have hc : p.coeff 0 ≠ 0 := by
     intro h0
-    obtain ⟨m, hm, hm0⟩ := (LinearMap.charpoly_constantCoeff_eq_zero_iff φ).1
-      (by rw [Polynomial.constantCoeff_apply]; exact h0)
+    obtain ⟨m, hm, hm0⟩ :=
+      (LinearMap.charpoly_constantCoeff_eq_zero_iff φ).1
+        (by rw [Polynomial.constantCoeff_apply]; exact h0)
     exact hm (hφ (by rw [hm0, map_zero]))
   set t : Polynomial ℂ := -Polynomial.C (p.coeff 0)⁻¹ * Polynomial.divX p with ht
   have hinv : φ * Polynomial.aeval φ t = 1 := by
@@ -24,9 +25,8 @@ theorem tracePow : TracePow := by
     simp only [map_add (f := _), map_mul, Polynomial.aeval_X, Polynomial.aeval_C] at h
     have h' : φ * Polynomial.aeval φ (Polynomial.divX p) = -(algebraMap ℂ _ (p.coeff 0)) :=
       eq_neg_of_add_eq_zero_left h
-    rw [ht, map_mul, map_neg, Polynomial.aeval_C, neg_mul, mul_neg, ← mul_assoc,
-      ← Algebra.commutes, mul_assoc, h', mul_neg, neg_neg, ← map_mul, inv_mul_cancel₀ hc,
-      map_one]
+    rw [ht, map_mul, map_neg, Polynomial.aeval_C, neg_mul, mul_neg, ← mul_assoc, ← Algebra.commutes,
+      mul_assoc, h', mul_neg, neg_neg, ← map_mul, inv_mul_cancel₀ hc, map_one]
   set Q : Polynomial ℂ := (Polynomial.X * t) ^ k₀ with hQ
   have hQ1 : Polynomial.aeval φ Q = 1 := by
     rw [hQ, map_pow, map_mul, Polynomial.aeval_X, hinv, one_pow]

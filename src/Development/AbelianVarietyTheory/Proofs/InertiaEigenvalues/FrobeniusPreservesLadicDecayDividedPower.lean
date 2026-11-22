@@ -6,14 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffOf
 @[expose] public section
 
 noncomputable section
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
 open scoped Formalism.Per
 
 namespace GlobalTheory.CrysPrism.Decay
 
-theorem pow_add_mul_range {M R : Type} [AddCommGroup M] [CommRing R] (f : M →+ R)
-    (hm : ∀ x y : M, ∃ z, f z = f x * f y) (x y : M) (c n : ℕ) :
-    ∃ p g : M, f p = f x ^ (n + 1) ∧ (f x + c * f y) ^ (n + 1) = f x ^ (n + 1) + c * f g := by
+theorem pow_add_mul_range
+    {M R : Type} [AddCommGroup M] [CommRing R]
+    (f : M →+ R) (hm : ∀ x y : M, ∃ z, f z = f x * f y)
+    (x y : M) (c n : ℕ)
+    : ∃ p g : M, f p = f x ^ (n + 1) ∧ (f x + c * f y) ^ (n + 1) = f x ^ (n + 1) + c * f g := by
   induction n with
   | zero => exact ⟨x, y, by simp, by simp⟩
   | succ n ih =>
@@ -26,8 +30,12 @@ theorem pow_add_mul_range {M R : Type} [AddCommGroup M] [CommRing R] (f : M →+
     rw [pow_succ, hg, map_add (f := _), map_add (f := _), map_nsmul, h1, h2, h3, hp, nsmul_eq_mul]
     ring
 
-variable {l : ℕ} [hl : Fact l.Prime] {a : ℕ} [NeZero a] {O : Type} [CommRing O] [Algebra ℤ_[l] O]
-  (t : Wq l a →ₐ[ℤ_[l]] O) (K : Type) [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+variable
+  {l : ℕ} [hl : Fact l.Prime]
+  {a : ℕ} [NeZero a]
+  {O : Type} [CommRing O] [Algebra ℤ_[l] O]
+  (t : Wq l a →ₐ[ℤ_[l]] O)
+  (K : Type) [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
   (e : ℕ)
 
 def ofWHom : (ℕ × ℕ → Wq l a) →+ (ZMod a → K⟦X⟧⟦X⟧) :=
@@ -38,18 +46,22 @@ def ofWHom : (ℕ × ℕ → Wq l a) →+ (ZMod a → K⟦X⟧⟦X⟧) :=
 
 theorem ofWHom_apply (w : ℕ × ℕ → Wq l a) : ofWHom t K e w = ofW t K e w := rfl
 
-theorem eq_zero_of_coeff [CharZero K]
+theorem eq_zero_of_coeff
+    [CharZero K]
     (hinj : ∀ τ : ZMod a, Function.Injective fun c : Wq l a => algebraMap O K (emb t τ c))
-    (w : ℕ × ℕ → Wq l a) (i n : ℕ) (h : coeff n (coeff i (ofW t K e w 0)) = 0) : w (i, n) = 0 := by
+    (w : ℕ × ℕ → Wq l a) (i n : ℕ) (h : coeff n (coeff i (ofW t K e w 0)) = 0)
+    : w (i, n) = 0 := by
   rw [coeff_ofW, div_eq_zero_iff] at h
   have h2 : (dpDen e i n : K) ≠ 0 := Nat.cast_ne_zero.2 (dpDen_pos e i n).ne'
   apply hinj 0
   simpa using h.resolve_right h2
 
-theorem ofWHom_injective [CharZero K]
-    (hinj : ∀ τ : ZMod a, Function.Injective fun c : Wq l a => algebraMap O K (emb t τ c)) :
-    Function.Injective (ofWHom t K e) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem ofWHom_injective
+    [CharZero K]
+    (hinj : ∀ τ : ZMod a, Function.Injective fun c : Wq l a => algebraMap O K (emb t τ c))
+    : Function.Injective (ofWHom t K e) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro w hw
   funext ⟨i, n⟩
   apply eq_zero_of_coeff t K e hinj
@@ -68,19 +80,25 @@ end GlobalTheory.CrysPrism.Decay
 namespace GlobalTheory.CrysPrism
 open Decay
 
-theorem frob_keeps_decay (l : ℕ) [hl : Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O]
-    [Algebra ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K]
+theorem frob_keeps_decay
+    (l : ℕ) [hl : Fact l.Prime]
+    (a e : ℕ) [NeZero a] [NeZero e]
+    (O K : Type) [CommRing O] [Algebra ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
+    [IsUnitBall O K] [NormedAlgebra ℚ_[l] K]
     (t : Wq l a →ₐ[ℤ_[l]] O) (φ₂ : K⟦X⟧⟦X⟧ →+* K⟦X⟧⟦X⟧)
     (hinj : ∀ τ : ZMod a, Function.Injective fun c : Wq l a => algebraMap O K (emb t τ c))
     (hmul : ∀ x ∈ QSet t K e, ∀ y ∈ QSet t K e, x * y ∈ QSet t K e)
     (hQ : ∀ z ∈ QSet t K e, z ∈ GoodSet t e φ₂)
-    (hsupp : ∀ (N : ℕ) (w : ℕ × ℕ → Wq l a), (∀ i n, N < i ∨ N < n → w (i, n) = 0) →
-      ∃ M : ℕ, ∀ (τ : ZMod a) (i n : ℕ), M < i ∨ M < n →
-        coeff n (coeff i (frob2 φ₂ (ofW t K e w) τ)) = 0 ∧ coeff n (coeff i ((ofW t K e w ^ l) τ)) = 0)
-    (w : ℕ × ℕ → Wq l a) (hw : LTo0 l w) (v b : ℕ × ℕ → Wq l a)
-    (hv : frob2 φ₂ (ofW t K e w) = ofW t K e v)
-    (hb : frob2 φ₂ (ofW t K e w) = ofW t K e w ^ l + (l : ZMod a → K⟦X⟧⟦X⟧) * ofW t K e b) :
-    LTo0 l v ∧ LTo0 l b := by
+    (hsupp : ∀ (N : ℕ) (w : ℕ × ℕ → Wq l a),
+      (∀ i n, N < i ∨ N < n → w (i, n) = 0)
+        → ∃ M : ℕ, ∀ (τ : ZMod a) (i n : ℕ),
+          M < i ∨ M < n
+            → coeff n (coeff i (frob2 φ₂ (ofW t K e w) τ)) = 0
+              ∧ coeff n (coeff i ((ofW t K e w ^ l) τ)) = 0)
+    (w : ℕ × ℕ → Wq l a) (hw : LTo0 l w)
+    (v b : ℕ × ℕ → Wq l a) (hv : frob2 φ₂ (ofW t K e w) = ofW t K e v)
+    (hb : frob2 φ₂ (ofW t K e w) = ofW t K e w ^ l + (l : ZMod a → K⟦X⟧⟦X⟧) * ofW t K e b)
+    : LTo0 l v ∧ LTo0 l b := by
   classical
   haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ_[l] K).injective
   have hl0 : (l : K) ≠ 0 := Nat.cast_ne_zero.2 hl.out.ne_zero
@@ -114,17 +132,20 @@ theorem frob_keeps_decay (l : ℕ) [hl : Fact l.Prime] (a e : ℕ) [NeZero a] [N
     obtain ⟨-, ⟨v1, hv1⟩, _, ⟨b1, rfl⟩, hb1⟩ := hQ _ ⟨w1, rfl⟩
     obtain ⟨-, ⟨v2, hv2⟩, -⟩ := hQ _ ⟨w2, rfl⟩
     obtain ⟨k, hk⟩ : ∃ k, l = k + 1 := Nat.exists_eq_succ_of_ne_zero hl.out.ne_zero
-    obtain ⟨-, g, -, hg⟩ := pow_add_mul_range (ofWHom t K e)
-      (fun x y => hmul _ ⟨x, rfl⟩ _ ⟨y, rfl⟩) w1 w2 (l ^ (r + 1)) k
+    obtain ⟨-, g, -, hg⟩ :=
+      pow_add_mul_range (ofWHom t K e) (fun x y => hmul _ ⟨x, rfl⟩ _ ⟨y, rfl⟩) w1 w2 (l ^ (r + 1)) k
     rw [← hk] at hg
-    have hF : ofW t K e w = ofW t K e w1 + ((l ^ (r + 1) : ℕ) : ZMod a → K⟦X⟧⟦X⟧) * ofW t K e w2 := by
+    have hF
+        : ofW t K e w = ofW t K e w1 + ((l ^ (r + 1) : ℕ) : ZMod a → K⟦X⟧⟦X⟧) * ofW t K e w2 := by
       rw [← ofWHom_apply, hw12, map_add (f := _), map_nsmul, nsmul_eq_mul]; rfl
-    have hφ : frob2 φ₂ (ofW t K e w) =
-        ofW t K e v1 + ((l ^ (r + 1) : ℕ) : ZMod a → K⟦X⟧⟦X⟧) * ofW t K e v2 := by
+    have hφ
+        : frob2 φ₂ (ofW t K e w)
+          = ofW t K e v1 + ((l ^ (r + 1) : ℕ) : ZMod a → K⟦X⟧⟦X⟧) * ofW t K e v2 := by
       rw [hF, map_add (f := _), map_mul, map_natCast, hv1, hv2]
     have e1 : v = v1 + (l ^ (r + 1) : ℕ) • v2 := by
       apply hI
-      rw [map_add (f := _), map_nsmul, nsmul_eq_mul, ofWHom_apply, ← hv, hφ]; rfl
+      rw [map_add (f := _), map_nsmul, nsmul_eq_mul, ofWHom_apply, ← hv, hφ]
+      rfl
     have e2 : b = b1 + (l ^ r : ℕ) • (v2 - g) := by
       apply hI
       rw [map_add (f := _), map_nsmul, map_sub, nsmul_eq_mul, ← sub_eq_zero]
@@ -139,8 +160,9 @@ theorem frob_keeps_decay (l : ℕ) [hl : Fact l.Prime] (a e : ℕ) [NeZero a] [N
     have z1 : v1 (i, n) = 0 := eq_zero_of_coeff t K e hinj v1 i n (by rw [hv1]; exact m1)
     have z2 : b1 (i, n) = 0 := by
       apply eq_zero_of_coeff t K e hinj
-      rw [hb1, ← nsmul_eq_mul, Pi.add_apply, map_add (f := _), map_add (f := _), m2, zero_add, Pi.smul_apply, map_nsmul, map_nsmul,
-        nsmul_eq_mul] at m1
+      rw [hb1, ← nsmul_eq_mul, Pi.add_apply, map_add (f := _), map_add (f := _), m2, zero_add,
+          Pi.smul_apply, map_nsmul, map_nsmul, nsmul_eq_mul]
+        at m1
       exact (mul_eq_zero.1 m1).resolve_left hl0
     constructor
     · rw [e1]

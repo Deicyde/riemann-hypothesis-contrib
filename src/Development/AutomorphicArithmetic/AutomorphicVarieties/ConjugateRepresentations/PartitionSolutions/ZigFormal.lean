@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 open UpperTheory.V.Cj.A
 
-theorem UpperTheory.V.Cj.A.zigFormal :
-    ZigFormal := by
+theorem UpperTheory.V.Cj.A.zigFormal : ZigFormal := by
   intro Γ V S I _ _ _ _ d G
   refine ⟨fun q k u u' c h hz => ?_, fun ι hι q => ?_⟩
   · cases q with
@@ -20,7 +19,12 @@ theorem UpperTheory.V.Cj.A.zigFormal :
     | zero => exact fun k u c hz x hx => hz (x.map ι) (by rw [List.length_map, hx])
     | succ q ih =>
       rintro k u c ⟨b, hb, hdb, hz⟩
-      refine ⟨fun x => b (x.map ι), fun γ x hx => ?_, fun x hx => hdb (x.map ι) (by rw [List.length_map, hx]), ?_⟩
+      refine ⟨
+        fun x => b (x.map ι),
+        fun γ x hx => ?_,
+        fun x hx => hdb (x.map ι) (by rw [List.length_map, hx]),
+        ?_
+      ⟩
       · have h := hb γ (x.map ι) (by rw [List.length_map, hx])
         refine Eq.trans ?_ h
         simp only [List.map_map]
@@ -28,7 +32,9 @@ theorem UpperTheory.V.Cj.A.zigFormal :
         funext δ
         exact hι γ δ
       · have h := ih (k + 1) _ c hz
-        have e : (fun x : List Γ => UpperTheory.V.Lit.Geo.hd b (x.map ι)) = UpperTheory.V.Lit.Geo.hd (fun x : List Γ => b (x.map ι)) :=
+        have e
+            : (fun x : List Γ => UpperTheory.V.Lit.Geo.hd b (x.map ι))
+              = UpperTheory.V.Lit.Geo.hd (fun x : List Γ => b (x.map ι)) :=
           funext fun x => (hdFacts.2.2.1 I Γ _ ι b x).symm
         rw [e] at h
         exact h

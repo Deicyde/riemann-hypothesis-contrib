@@ -16,17 +16,22 @@ noncomputable section
 
 namespace GlobalTheory.ObjExCompare
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory NumberField GlobalTheory.EX GlobalTheory.IndefiniteRowSideFullHecke.FewBadPrimes
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.L2.GlobalTheoryTheory NumberField GlobalTheory.EX
+  GlobalTheory.IndefiniteRowSideFullHecke.FewBadPrimes
 
 variable {R : Ranks}
 
 theorem one_lt_condE (H : Host R) : 1 < condE H := by
   unfold condE
-  exact lt_of_lt_of_le H.hyp.2.1.one_lt (Nat.le_mul_of_pos_left _ (Nat.mul_pos H.QS_pos H.hyp.1.pos))
+  exact lt_of_lt_of_le H.hyp.2.1.one_lt
+    (Nat.le_mul_of_pos_left _ (Nat.mul_pos H.QS_pos H.hyp.1.pos))
 
-theorem norm_modEq (H : Host R) (π : 𝓞 H.E) {T N : ℕ} (hN : N ≠ 0)
-    (hn : (π : H.E) * H.conj (π : H.E) = (T : H.E)) (h1 : π - 1 ∈ Ideal.span {((N : ℕ) : 𝓞 H.E)}) :
-    T ≡ 1 [MOD N] := by
+theorem norm_modEq
+    (H : Host R) (π : 𝓞 H.E)
+    {T N : ℕ} (hN : N ≠ 0) (hn : (π : H.E) * H.conj (π : H.E) = (T : H.E))
+    (h1 : π - 1 ∈ Ideal.span {((N : ℕ) : 𝓞 H.E)})
+    : T ≡ 1 [MOD N] := by
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.1 h1
   have hyi : IsIntegral ℤ (a : H.E) := RingOfIntegers.isIntegral_coe a
   have hπ : (π : H.E) = 1 + N * (a : H.E) := by
@@ -43,7 +48,7 @@ theorem norm_modEq (H : Host R) (π : 𝓞 H.E) {T N : ℕ} (hN : N ≠ 0)
     have hM0' : (N : H.E) ≠ 0 := by exact_mod_cast hN
     rw [map_div₀, map_sub, map_one, map_natCast, map_natCast, eq_div_iff hM0', hz]
     linear_combination hn
-  rw [h4, isIntegral_algebraMap_iff ] at hzi
+  rw [h4, isIntegral_algebraMap_iff] at hzi
   obtain ⟨n, hn'⟩ := IsIntegrallyClosed.isIntegral_iff.1 hzi
   have h5 : (((T : ℤ) - ((1 : ℕ) : ℤ) : ℤ) : ℚ) = ((N * n : ℤ) : ℚ) := by
     have : (n : ℚ) = ((T : ℚ) - 1) / N := by simpa using hn'

@@ -12,12 +12,13 @@ open CompanionTheory.Rg.Fl
 
 namespace GlobalTheory.CompanionTheory.RgFl
 
-theorem finrank_sq_le_of_span {A V : Type} [Ring A] [Algebra ℂ A] [AddCommGroup V] [Module ℂ V]
-    [FiniteDimensional ℂ V] (ρ : A →ₐ[ℂ] Module.End ℂ V) (hρ : Function.Surjective ρ) {d l : ℕ}
-    (x y : Fin d → A) (a : Fin l → A)
-    (hs : Submodule.span ℂ {z | ∃ i j, ∃ c ∈ Algebra.adjoin ℂ (Set.range a), z = x i * c * y j} = ⊤) :
-    Module.finrank ℂ V ^ 2 ≤
-      d ^ 2 * Module.finrank ℂ (Algebra.adjoin ℂ (Set.range fun i => ρ (a i))) := by
+theorem finrank_sq_le_of_span
+    {A V : Type} [Ring A] [Algebra ℂ A] [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : A →ₐ[ℂ] Module.End ℂ V) (hρ : Function.Surjective ρ)
+    {d l : ℕ} (x y : Fin d → A) (a : Fin l → A)
+    (hs : Submodule.span ℂ {z | ∃ i j, ∃ c ∈ Algebra.adjoin ℂ (Set.range a), z = x i * c * y j} = ⊤)
+    : Module.finrank ℂ V ^ 2
+      ≤ d ^ 2 * Module.finrank ℂ (Algebra.adjoin ℂ (Set.range fun i => ρ (a i))) := by
   classical
   set B := Algebra.adjoin ℂ (Set.range fun i => ρ (a i)) with hB
   have hmap : ∀ c ∈ Algebra.adjoin ℂ (Set.range a), ρ c ∈ B := by
@@ -29,8 +30,7 @@ theorem finrank_sq_le_of_span {A V : Type} [Ring A] [Algebra ℂ A] [AddCommGrou
     exact ⟨c, hc, rfl⟩
   let G : Fin d × Fin d → (B →ₗ[ℂ] Module.End ℂ V) := fun p =>
     (LinearMap.mulLeft ℂ (ρ (x p.1))) ∘ₗ (LinearMap.mulRight ℂ (ρ (y p.2))) ∘ₗ B.val.toLinearMap
-  let F : (Fin d × Fin d → B) →ₗ[ℂ] Module.End ℂ V :=
-    ∑ p : Fin d × Fin d, G p ∘ₗ LinearMap.proj p
+  let F : (Fin d × Fin d → B) →ₗ[ℂ] Module.End ℂ V := ∑ p : Fin d × Fin d, G p ∘ₗ LinearMap.proj p
   have hFs : ∀ (p : Fin d × Fin d) (b : B), F (Pi.single p b) = ρ (x p.1) * b * ρ (y p.2) := by
     intro p b
     simp only [F, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply]
@@ -43,7 +43,9 @@ theorem finrank_sq_le_of_span {A V : Type} [Ring A] [Algebra ℂ A] [AddCommGrou
     rw [eq_top_iff]
     rintro f -
     obtain ⟨g, rfl⟩ := hρ f
-    have hg : g ∈ Submodule.span ℂ {z | ∃ i j, ∃ c ∈ Algebra.adjoin ℂ (Set.range a), z = x i * c * y j} := by
+    have hg
+        : g ∈ Submodule.span ℂ
+          {z | ∃ i j, ∃ c ∈ Algebra.adjoin ℂ (Set.range a), z = x i * c * y j} := by
       rw [hs]; exact Submodule.mem_top
     induction hg using Submodule.span_induction with
     | mem z hz =>

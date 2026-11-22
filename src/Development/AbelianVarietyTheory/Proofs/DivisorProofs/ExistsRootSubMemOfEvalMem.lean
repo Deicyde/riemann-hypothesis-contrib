@@ -8,10 +8,12 @@ open IsLocalRing Polynomial
 
 namespace GlobalTheory.AbsIntClosedLocal
 
-theorem exists_root_sub_mem_of_eval_mem (T : Type) [CommRing T] [IsLocalRing T] [IsDomain T]
-    (hroot : ∀ f : Polynomial T, f.Monic → 0 < f.natDegree → ∃ x : T, f.eval x = 0) :
-    ∀ (n : ℕ) (f : T[X]), f.Monic → f.natDegree = n → ∀ a₀ : T, f.eval a₀ ∈ maximalIdeal T →
-      ∃ a : T, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal T := by
+theorem exists_root_sub_mem_of_eval_mem
+    (T : Type) [CommRing T] [IsLocalRing T] [IsDomain T]
+    (hroot : ∀ f : Polynomial T, f.Monic → 0 < f.natDegree → ∃ x : T, f.eval x = 0)
+    : ∀ (n : ℕ) (f : T[X]),
+      f.Monic → f.natDegree = n
+        → ∀ a₀ : T, f.eval a₀ ∈ maximalIdeal T → ∃ a : T, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal T := by
   intro n
   induction n with
   | zero =>
@@ -33,7 +35,8 @@ theorem exists_root_sub_mem_of_eval_mem (T : Type) [CommRing T] [IsLocalRing T] 
     have hgdeg : g.natDegree = n := by
       have := natDegree_divByMonic f (monic_X_sub_C r)
       rw [natDegree_X_sub_C] at this
-      rw [hg, this, hdeg]; omega
+      rw [hg, this, hdeg]
+      omega
     have hev : f.eval a₀ = (a₀ - r) * g.eval a₀ := by
       conv_lhs => rw [← hdiv]
       simp [eval_mul]
@@ -47,11 +50,11 @@ theorem exists_root_sub_mem_of_eval_mem (T : Type) [CommRing T] [IsLocalRing T] 
       rw [← hdiv]
       simp [IsRoot, eval_mul, ha.eq_zero]
 
-theorem henselian_isAlgClosed_pow_surj :
-    ∀ (T : Type) [CommRing T] [IsLocalRing T], (IsDomain T ∧ ∀ f : Polynomial T, f.Monic →
-      0 < f.natDegree → ∃ x : T, f.eval x = 0) →
-      HenselianLocalRing T ∧ IsAlgClosed (ResidueField T) ∧
-        ∀ (n : ℕ) (u : Tˣ), 0 < n → ∃ v : Tˣ, v ^ n = u := by
+theorem henselian_isAlgClosed_pow_surj
+    : ∀ (T : Type) [CommRing T] [IsLocalRing T],
+      (IsDomain T ∧ ∀ f : Polynomial T, f.Monic → 0 < f.natDegree → ∃ x : T, f.eval x = 0)
+        → HenselianLocalRing T ∧ IsAlgClosed (ResidueField T)
+          ∧ ∀ (n : ℕ) (u : Tˣ), 0 < n → ∃ v : Tˣ, v ^ n = u := by
   intro T _ _ ⟨hdom, hroot⟩
   refine ⟨⟨fun f hf a₀ h₁ _ => exists_root_sub_mem_of_eval_mem T hroot _ f hf rfl a₀ h₁⟩, ?_, ?_⟩
   · refine IsAlgClosed.of_exists_root _ (fun p hpm hpirr => ?_)
@@ -61,8 +64,9 @@ theorem henselian_isAlgClosed_pow_surj :
     refine ⟨residue T x, ?_⟩
     rw [← hq, eval_map, eval₂_hom, hx, map_zero]
   · intro n u hn
-    obtain ⟨x, hx⟩ := hroot (X ^ n - C (u : T)) (monic_X_pow_sub_C _ hn.ne')
-      (by rw [natDegree_X_pow_sub_C _]; exact hn)
+    obtain ⟨x, hx⟩ :=
+      hroot (X ^ n - C (u : T)) (monic_X_pow_sub_C _ hn.ne')
+        (by rw [natDegree_X_pow_sub_C _]; exact hn)
     have hxn : x ^ n = (u : T) := by
       simp only [eval_sub, eval_pow, eval_X, eval_C] at hx
       exact sub_eq_zero.1 hx

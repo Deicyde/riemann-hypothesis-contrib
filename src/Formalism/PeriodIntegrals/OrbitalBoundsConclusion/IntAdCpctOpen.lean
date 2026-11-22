@@ -6,4 +6,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdicIntegersComp
 
 @[expose] public section
 
-theorem finiteAdeleIntegers_compactOpen : Formalism.L2.Props.IntAdelesCompactOpen := PI.IntAdCpctOpenWork.main
+theorem finiteAdeleIntegers_compactOpen : Formalism.L2.Props.IntAdelesCompactOpen :=
+  PI.IntAdCpctOpenWork.main

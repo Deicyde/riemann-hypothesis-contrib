@@ -16,15 +16,18 @@ structure IsHermSemilocal (S : Subring K) : Prop where
   star_mem : ∀ a ∈ S, star a ∈ S
   frac : ∀ a : K, ∃ t ∈ S, t ≠ 0 ∧ t * a ∈ S
   unram : ∃ θ ∈ S, IsUnitIn S (θ - star θ)
-  principal : ∀ A : AddSubgroup K, (∀ s ∈ S, ∀ a ∈ A, s * a ∈ A) → (∃ a ∈ A, a ≠ 0) →
-    (∃ t : K, t ≠ 0 ∧ ∀ a ∈ A, t * a ∈ S) → ∃ α ∈ A, α ≠ 0 ∧ ∀ a ∈ A, a * α⁻¹ ∈ S
-  unit_or : ∀ a ∈ S, ∀ κ ∈ S, ∀ μ : K, a⁻¹ ∉ S → IsUnitIn S μ →
-    IsUnitIn S (1 - κ * a) ∨ IsUnitIn S (1 - (κ + μ) * a)
+  principal
+    : ∀ A : AddSubgroup K,
+      (∀ s ∈ S, ∀ a ∈ A, s * a ∈ A) → (∃ a ∈ A, a ≠ 0) → (∃ t : K, t ≠ 0 ∧ ∀ a ∈ A, t * a ∈ S)
+        → ∃ α ∈ A, α ≠ 0 ∧ ∀ a ∈ A, a * α⁻¹ ∈ S
+  unit_or
+    : ∀ a ∈ S, ∀ κ ∈ S, ∀ μ : K,
+      a⁻¹ ∉ S → IsUnitIn S μ → IsUnitIn S (1 - κ * a) ∨ IsUnitIn S (1 - (κ + μ) * a)
 
 variable {S : Subring K}
 
-theorem exists_trace_eq (hS : IsHermSemilocal S) {s : K} (hs : s ∈ S) (hss : star s = s) :
-    ∃ c ∈ S, c + star c = s := by
+theorem exists_trace_eq (hS : IsHermSemilocal S) {s : K} (hs : s ∈ S) (hss : star s = s)
+    : ∃ c ∈ S, c + star c = s := by
   obtain ⟨θ, hθ, hμ0, -, hμi⟩ := hS.unram
   refine ⟨s * θ * (θ - star θ)⁻¹, S.mul_mem (S.mul_mem hs hθ) hμi, ?_⟩
   have h2 : star θ - θ ≠ 0 := by
@@ -32,23 +35,23 @@ theorem exists_trace_eq (hS : IsHermSemilocal S) {s : K} (hs : s ∈ S) (hss : s
     apply hμ0
     rw [← neg_sub, h, neg_zero]
   simp only [star_mul', star_inv₀, star_sub, star_star, hss]
-  have h3 : (star θ - θ)⁻¹ = -(θ - star θ)⁻¹ := by
-    rw [← neg_sub, neg_inv]
+  have h3 : (star θ - θ)⁻¹ = -(θ - star θ)⁻¹ := by rw [← neg_sub, neg_inv]
   rw [h3]
   field_simp
   ring
 
-theorem exists_norm_one_mul_mem (hS : IsHermSemilocal S) {a : K} (ha : star a * a ∈ S) :
-    ∃ b : K, star b * b = 1 ∧ a * b ∈ S := by
-  let A : AddSubgroup K :=
-    { carrier := {z | ∃ x ∈ S, ∃ y ∈ S, z = x + y * a}
-      zero_mem' := ⟨0, S.zero_mem, 0, S.zero_mem, by simp⟩
-      add_mem' := by
-        rintro _ _ ⟨x, hx, y, hy, rfl⟩ ⟨x', hx', y', hy', rfl⟩
-        exact ⟨x + x', S.add_mem hx hx', y + y', S.add_mem hy hy', by ring⟩
-      neg_mem' := by
-        rintro _ ⟨x, hx, y, hy, rfl⟩
-        exact ⟨-x, S.neg_mem hx, -y, S.neg_mem hy, by ring⟩ }
+theorem exists_norm_one_mul_mem (hS : IsHermSemilocal S) {a : K} (ha : star a * a ∈ S)
+    : ∃ b : K, star b * b = 1 ∧ a * b ∈ S := by
+  let A : AddSubgroup K := {
+    carrier := {z | ∃ x ∈ S, ∃ y ∈ S, z = x + y * a}
+    zero_mem' := ⟨0, S.zero_mem, 0, S.zero_mem, by simp⟩
+    add_mem' := by
+      rintro _ _ ⟨x, hx, y, hy, rfl⟩ ⟨x', hx', y', hy', rfl⟩
+      exact ⟨x + x', S.add_mem hx hx', y + y', S.add_mem hy hy', by ring⟩
+    neg_mem' := by
+      rintro _ ⟨x, hx, y, hy, rfl⟩
+      exact ⟨-x, S.neg_mem hx, -y, S.neg_mem hy, by ring⟩
+  }
   have h1A : (1 : K) ∈ A := ⟨1, S.one_mem, 0, S.zero_mem, by simp⟩
   have haA : a ∈ A := ⟨0, S.zero_mem, 1, S.one_mem, by simp⟩
   have hAS : ∀ s ∈ S, ∀ z ∈ A, s * z ∈ A := by
@@ -74,31 +77,37 @@ theorem exists_norm_one_mul_mem (hS : IsHermSemilocal S) {a : K} (ha : star a * 
   · rw [star_div₀, star_star]
     field_simp
   · have hq : (x * star (a * s) + y * (star a * a) * star s) * s = star (a * s) := by
-      calc (x * star (a * s) + y * (star a * a) * star s) * s
+      calc
+        (x * star (a * s) + y * (star a * a) * star s) * s
           = star (a * s) * (x * s + y * (a * s)) := by rw [star_mul']; ring
         _ = star (a * s) := by rw [h1, mul_one]
     have : a * (s / star s) = star (x * star (a * s) + y * (star a * a) * star s) := by
       rw [← mul_div_assoc, div_eq_iff hss0, ← star_mul', hq, star_star]
     rw [this]
-    exact hS.star_mem _ (S.add_mem (S.mul_mem hx (hS.star_mem _ hrS))
-      (S.mul_mem (S.mul_mem hy ha) (hS.star_mem _ hsS)))
+    exact hS.star_mem _
+      (S.add_mem (S.mul_mem hx (hS.star_mem _ hrS))
+        (S.mul_mem (S.mul_mem hy ha) (hS.star_mem _ hsS)))
 
 variable {V : Type*} [AddCommGroup V] [Module K V]
 
-theorem exists_norm_one_of_pair (hS : IsHermSemilocal S) {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
-    {y w : V} {a : K} (ha : a ∈ S) (ha0 : a ≠ 0) (hy : h y y = star a * a) (hyw : h y w = 1)
-    (hw : h w w ∈ S) :
-    ∃ c ∈ S, ∃ d ∈ S, h (c • w + d • y) (c • w + d • y) = 1 := by
+theorem exists_norm_one_of_pair
+    (hS : IsHermSemilocal S)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
+    {y w : V} {a : K}
+    (ha : a ∈ S) (ha0 : a ≠ 0) (hy : h y y = star a * a) (hyw : h y w = 1) (hw : h w w ∈ S)
+    : ∃ c ∈ S, ∃ d ∈ S, h (c • w + d • y) (c • w + d • y) = 1 := by
   have hwy : h w y = 1 := by
     have := hs.eq y w
     rw [hyw, map_one] at this
     exact this.symm
   have hH : star (h w w) = h w w := hs.eq w w
-  have key : ∀ c d : K, h (c • w + d • y) (c • w + d • y) =
-      star c * c * h w w + star c * d + star d * c + star d * d * (star a * a) := by
+  have key
+      : ∀ c d : K,
+        h (c • w + d • y) (c • w + d • y)
+          = star c * c * h w w + star c * d + star d * c + star d * d * (star a * a) := by
     intro c d
-    simp only [map_add (f := _), LinearMap.add_apply, map_smulₛₗ, LinearMap.smul_apply,
-      smul_eq_mul, hy, hyw, hwy, starRingEnd_apply, RingHom.id_apply]
+    simp only [map_add (f := _), LinearMap.add_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
+      hy, hyw, hwy, starRingEnd_apply, RingHom.id_apply]
     ring
   by_cases hu : a⁻¹ ∈ S
   · refine ⟨0, S.zero_mem, a⁻¹, hu, ?_⟩
@@ -113,26 +122,35 @@ theorem exists_norm_one_of_pair (hS : IsHermSemilocal S) {h : V →ₗ⋆[K] V �
       · exact S.sub_mem (S.mul_mem (S.mul_mem (hS.star_mem _ h1a) h1a) hw) S.one_mem
       · simp only [star_sub, star_mul', star_star, hH, star_one]
         ring
-    have fin : ∀ κ' ∈ S, κ' + star κ' = star (1 + a) * (1 + a) * h w w - 1 →
-        IsUnitIn S (1 - κ' * a) →
-        ∃ c ∈ S, ∃ d ∈ S, h (c • w + d • y) (c • w + d • y) = 1 := by
+    have fin
+        : ∀ κ' ∈ S,
+          κ' + star κ' = star (1 + a) * (1 + a) * h w w - 1 → IsUnitIn S (1 - κ' * a)
+            → ∃ c ∈ S, ∃ d ∈ S, h (c • w + d • y) (c • w + d • y) = 1 := by
       rintro κ' hκ' ht ⟨h0, -, h2⟩
-      refine ⟨star (1 + a) * (1 - κ' * a)⁻¹, S.mul_mem (hS.star_mem _ h1a) h2,
-        -κ' * (1 - κ' * a)⁻¹, S.mul_mem (S.neg_mem hκ') h2, ?_⟩
+      refine ⟨
+        star (1 + a) * (1 - κ' * a)⁻¹,
+        S.mul_mem (hS.star_mem _ h1a) h2,
+        -κ' * (1 - κ' * a)⁻¹,
+        S.mul_mem (S.neg_mem hκ') h2,
+        ?_
+      ⟩
       have h0' : star (1 - κ' * a) ≠ 0 := star_ne_zero.mpr h0
       have hb : star (1 + a) * (1 + a) * h w w = κ' + star κ' + 1 := by rw [ht]; ring
       rw [key]
-      have e : star (star (1 + a) * (1 - κ' * a)⁻¹) * (star (1 + a) * (1 - κ' * a)⁻¹) * h w w +
-          star (star (1 + a) * (1 - κ' * a)⁻¹) * (-κ' * (1 - κ' * a)⁻¹) +
-          star (-κ' * (1 - κ' * a)⁻¹) * (star (1 + a) * (1 - κ' * a)⁻¹) +
-          star (-κ' * (1 - κ' * a)⁻¹) * (-κ' * (1 - κ' * a)⁻¹) * (star a * a) =
-          (star (1 - κ' * a))⁻¹ * (1 - κ' * a)⁻¹ * (star (1 + a) * (1 + a) * h w w
-            - (1 + a) * κ' - star κ' * star (1 + a) + star κ' * κ' * (star a * a)) := by
+      have e
+          : star (star (1 + a) * (1 - κ' * a)⁻¹) * (star (1 + a) * (1 - κ' * a)⁻¹) * h w w
+              + star (star (1 + a) * (1 - κ' * a)⁻¹) * (-κ' * (1 - κ' * a)⁻¹)
+              + star (-κ' * (1 - κ' * a)⁻¹) * (star (1 + a) * (1 - κ' * a)⁻¹)
+              + star (-κ' * (1 - κ' * a)⁻¹) * (-κ' * (1 - κ' * a)⁻¹) * (star a * a)
+            = (star (1 - κ' * a))⁻¹ * (1 - κ' * a)⁻¹
+              * (star (1 + a) * (1 + a) * h w w - (1 + a) * κ' - star κ' * star (1 + a)
+                + star κ' * κ' * (star a * a)) := by
         simp only [star_mul', star_inv₀, star_star, star_neg]
         ring
       rw [e, hb]
-      have e2 : κ' + star κ' + 1 - (1 + a) * κ' - star κ' * star (1 + a) +
-          star κ' * κ' * (star a * a) = star (1 - κ' * a) * (1 - κ' * a) := by
+      have e2
+          : κ' + star κ' + 1 - (1 + a) * κ' - star κ' * star (1 + a) + star κ' * κ' * (star a * a)
+            = star (1 - κ' * a) * (1 - κ' * a) := by
         simp only [star_sub, star_add, star_mul', star_one]
         ring
       rw [e2]

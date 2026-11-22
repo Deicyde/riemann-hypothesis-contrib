@@ -96,8 +96,7 @@ lemma bd_cone {q : ℕ} (c : ι) (z : Chain ι (q + 1)) :
       cons_comp_succAbove_succ', map_zsmul, cone_single, pow_succ, mul_neg, mul_one, neg_smul,
       Finset.sum_neg_distrib, sub_eq_add_neg]
 
-def Supp {q : ℕ} (Q : (Fin (q + 1) → ι) → Prop) (z : Chain ι q) : Prop :=
-  ∀ t, z t ≠ 0 → Q t
+def Supp {q : ℕ} (Q : (Fin (q + 1) → ι) → Prop) (z : Chain ι q) : Prop := ∀ t, z t ≠ 0 → Q t
 
 section Supp
 
@@ -270,10 +269,8 @@ lemma bd_ocone {q : ℕ} (c : ι) (S : Set ι) (hc : ∀ s ∈ S, c ≤ s) (z : 
     rw [h3]
     simp
 
-
 omit [LinearOrder ι] in
-noncomputable def aug {q : ℕ} : Chain ι q →+ ℤ :=
-  Finsupp.liftAddHom fun _ => AddMonoidHom.id ℤ
+noncomputable def aug {q : ℕ} : Chain ι q →+ ℤ := Finsupp.liftAddHom fun _ => AddMonoidHom.id ℤ
 
 omit [LinearOrder ι] in
 lemma aug_single {q : ℕ} (t : Fin (q + 1) → ι) (k : ℤ) : aug (Finsupp.single t k) = k := by
@@ -301,8 +298,7 @@ lemma bd_ocone_zero (c : ι) (S : Set ι) (hc : ∀ s ∈ S, c ≤ s) (z : Chain
     rw [ite_eq_right hct, smul_zero, map_zero, ht]
     simp
 
-noncomputable def minR {q : ℕ} (i : Fin (q + 1) → ι) : ι :=
-  Finset.univ.inf' Finset.univ_nonempty i
+noncomputable def minR {q : ℕ} (i : Fin (q + 1) → ι) : ι := Finset.univ.inf' Finset.univ_nonempty i
 
 lemma minR_le {q : ℕ} (i : Fin (q + 1) → ι) (a : Fin (q + 1)) : minR i ≤ i a :=
   Finset.inf'_le _ (Finset.mem_univ a)
@@ -351,8 +347,9 @@ lemma bd_lin_proj (q : ℕ)
   rw [← lin_comp, ← lin_bd_single]
   exact congrArg (lin · z) (funext hq)
 
-theorem bd_proj : ∀ (q : ℕ) (i : Fin (q + 2) → ι),
-    bd q (proj (q + 1) i) = lin (proj q) (bd q (Finsupp.single i 1))
+theorem bd_proj
+    : ∀ (q : ℕ) (i : Fin (q + 2) → ι),
+      bd q (proj (q + 1) i) = lin (proj q) (bd q (Finsupp.single i 1))
   | 0, i => by
     have hw : lin (proj 0) (bd 0 (Finsupp.single i 1)) = bd 0 (Finsupp.single i 1) :=
       lin_single_id _
@@ -362,31 +359,31 @@ theorem bd_proj : ∀ (q : ℕ) (i : Fin (q + 2) → ι),
           rw [bd_single, map_sum]
         simp [aug_single, Fin.sum_univ_two]
       rw [this, zero_smul, sub_zero]
-    · exact Supp.bd (Supp.single (Q := fun t => InRange i t) _ fun a => ⟨a, rfl⟩)
-        fun t ht a => ht _
+    · exact Supp.bd (Supp.single (Q := fun t => InRange i t) _ fun a => ⟨a, rfl⟩) fun t ht a => ht _
   | q + 1, i => by
     rw [proj, bd_ocone (minR i) (Set.range i) (fun s ⟨a, ha⟩ => ha ▸ minR_le i a)]
     · rw [bd_lin_proj q (bd_proj q), bd_bd, map_zero, map_zero, sub_zero]
     · rw [lin_bd_single_apply]
-      exact Supp.sum _ _ fun a _ => ((proj_supp (q + 1) _).mono fun s hs =>
-        ⟨hs.1, fun b => inRange_face a hs.2 b⟩).smul _
+      exact Supp.sum _ _ fun a _ =>
+        ((proj_supp (q + 1) _).mono fun s hs => ⟨hs.1, fun b => inRange_face a hs.2 b⟩).smul _
 
-theorem proj_of_strictMono : ∀ (q : ℕ) (i : Fin (q + 1) → ι), StrictMono i →
-    proj q i = Finsupp.single i 1
+theorem proj_of_strictMono
+    : ∀ (q : ℕ) (i : Fin (q + 1) → ι), StrictMono i → proj q i = Finsupp.single i 1
   | 0, i, _ => rfl
   | q + 1, i, hi => by
-    have hmin : minR i = i 0 := le_antisymm (minR_le i 0) (by
-      obtain ⟨a, ha⟩ := minR_mem i
-      rw [← ha]
-      exact hi.monotone (Fin.zero_le a))
+    have hmin : minR i = i 0 :=
+      le_antisymm (minR_le i 0) (by
+        obtain ⟨a, ha⟩ := minR_mem i
+        rw [← ha]
+        exact hi.monotone (Fin.zero_le a))
     rw [proj, lin_bd_single_apply, hmin]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [fun a : Fin (q + 2) => proj_of_strictMono q _ (hi.comp (Fin.strictMono_succAbove a)),
-      map_sum, map_zsmul, ocone_single, one_smul]
+      simp only [fun a : Fin (q + 2) =>
+          proj_of_strictMono q _ (hi.comp (Fin.strictMono_succAbove a)),
+        map_sum, map_zsmul, ocone_single, one_smul]
     rw [Fin.sum_univ_succ]
     have h1 : i 0 < (i ∘ (0 : Fin (q + 2)).succAbove) 0 := hi (by simp)
-    have h2 : ∀ b : Fin (q + 1), ¬ i 0 < (i ∘ b.succ.succAbove) 0 := fun b => by
-      simp
+    have h2 : ∀ b : Fin (q + 1), ¬ i 0 < (i ∘ b.succ.succAbove) 0 := fun b => by simp
     simp only [h1, h2, ite_true, ite_false, smul_zero, Finset.sum_const_zero, add_zero,
       Fin.val_zero, pow_zero, one_smul]
     congr 1
@@ -395,8 +392,8 @@ theorem proj_of_strictMono : ∀ (q : ℕ) (i : Fin (q + 1) → ι), StrictMono 
     | zero => rfl
     | succ a => simp
 
-theorem proj_eq_zero_of_not_injective (q : ℕ) (i : Fin (q + 1) → ι)
-    (hi : ¬ Function.Injective i) : proj q i = 0 := by
+theorem proj_eq_zero_of_not_injective (q : ℕ) (i : Fin (q + 1) → ι) (hi : ¬ Function.Injective i)
+    : proj q i = 0 := by
   classical
   ext t
   by_contra h
@@ -413,8 +410,8 @@ theorem proj_eq_zero_of_not_injective (q : ℕ) (i : Fin (q + 1) → ι)
 
 noncomputable def hom : (q : ℕ) → (Fin (q + 1) → ι) → Chain ι (q + 1)
   | 0, _ => 0
-  | q + 1, i => cone (i 0)
-      (Finsupp.single i 1 - proj (q + 1) i - lin (hom q) (bd q (Finsupp.single i 1)))
+  | q + 1, i =>
+    cone (i 0) (Finsupp.single i 1 - proj (q + 1) i - lin (hom q) (bd q (Finsupp.single i 1)))
 
 lemma hom_supp : ∀ (q : ℕ) (i : Fin (q + 1) → ι), Supp (fun t => InRange i t) (hom q i)
   | 0, _ => Supp.zero
@@ -431,9 +428,10 @@ lemma hom_supp : ∀ (q : ℕ) (i : Fin (q + 1) → ι), Supp (fun t => InRange 
     | zero => exact ⟨0, rfl⟩
     | succ a => simpa using ht a
 
-theorem bd_hom : ∀ (q : ℕ) (i : Fin (q + 2) → ι),
-    bd (q + 1) (hom (q + 1) i) =
-      Finsupp.single i 1 - proj (q + 1) i - lin (hom q) (bd q (Finsupp.single i 1))
+theorem bd_hom
+    : ∀ (q : ℕ) (i : Fin (q + 2) → ι),
+      bd (q + 1) (hom (q + 1) i)
+        = Finsupp.single i 1 - proj (q + 1) i - lin (hom q) (bd q (Finsupp.single i 1))
   | 0, i => by
     rw [hom, bd_cone]
     have : bd 0 (Finsupp.single i 1 - proj 1 i - lin (hom 0) (bd 0 (Finsupp.single i 1))) = 0 := by
@@ -444,8 +442,10 @@ theorem bd_hom : ∀ (q : ℕ) (i : Fin (q + 2) → ι),
     rw [this, map_zero, sub_zero]
   | q + 1, i => by
     rw [hom, bd_cone]
-    have : bd (q + 1) (Finsupp.single i 1 - proj (q + 2) i -
-        lin (hom (q + 1)) (bd (q + 1) (Finsupp.single i 1))) = 0 := by
+    have : bd (q + 1)
+          (Finsupp.single i 1 - proj (q + 2) i
+            - lin (hom (q + 1)) (bd (q + 1) (Finsupp.single i 1)))
+        = 0 := by
       rw [map_sub, map_sub, bd_proj, ← lin_comp]
       simp only [bd_hom q]
       rw [lin_sub', lin_sub', lin_single_id, lin_bd_single, bd_bd, map_zero]
@@ -469,12 +469,10 @@ lemma inter_le_of_inRange {q r : ℕ} {i : Fin (r + 1) → ι} {t : Fin (q + 1) 
 
 variable {P U}
 
-
 open scoped Classical in
 open Classical in
 noncomputable def pair {q : ℕ} (σ : Cochain P U q) (V : Opens X) : Chain ι q →+ P.obj (op V) :=
-  Finsupp.liftAddHom fun t =>
-    if h : V ≤ inter U t then zmultiplesHom _ (res P h (σ t)) else 0
+  Finsupp.liftAddHom fun t => if h : V ≤ inter U t then zmultiplesHom _ (res P h (σ t)) else 0
 
 lemma pair_single {q : ℕ} (σ : Cochain P U q) {V : Opens X} (t : Fin (q + 1) → ι) (k : ℤ)
     (h : V ≤ inter U t) : pair σ V (Finsupp.single t k) = k • res P h (σ t) := by
@@ -520,8 +518,9 @@ end Pairing
 
 section Cochains
 
-variable {ι : Type w} [LinearOrder ι] {X : TopCat.{u}} (P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u})
-  (U : ι → Opens X)
+variable
+  {ι : Type w} [LinearOrder ι]
+  {X : TopCat.{u}} (P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}) (U : ι → Opens X)
 
 omit [LinearOrder ι] in
 lemma supp_inter {q r : ℕ} {i : Fin (r + 1) → ι} {Q : (Fin (q + 1) → ι) → Prop} {z : Chain ι q}
@@ -546,71 +545,75 @@ lemma altProj_apply (q : ℕ) (σ : Cochain P U q) (i : Fin (q + 1) → ι) :
 lemma homotopy_apply (q : ℕ) (σ : Cochain P U (q + 1)) (i : Fin (q + 1) → ι) :
     homotopy P U q σ i = pair σ (inter U i) (hom q i) := rfl
 
-theorem altProj_apply_of_strictMono (q : ℕ) (σ : Cochain P U q) {i : Fin (q + 1) → ι}
-    (hi : StrictMono i) : altProj P U q σ i = σ i := by
+theorem altProj_apply_of_strictMono
+    (q : ℕ) (σ : Cochain P U q) {i : Fin (q + 1) → ι} (hi : StrictMono i)
+    : altProj P U q σ i = σ i := by
   rw [altProj_apply, proj_of_strictMono q i hi, pair_single _ _ _ le_rfl, one_smul, res_refl]
 
-theorem altProj_apply_of_not_injective (q : ℕ) (σ : Cochain P U q) {i : Fin (q + 1) → ι}
-    (hi : ¬ Function.Injective i) : altProj P U q σ i = 0 := by
+theorem altProj_apply_of_not_injective
+    (q : ℕ) (σ : Cochain P U q) {i : Fin (q + 1) → ι} (hi : ¬ Function.Injective i)
+    : altProj P U q σ i = 0 := by
   rw [altProj_apply, proj_eq_zero_of_not_injective q i hi, map_zero]
 
-theorem altProj_eq_zero [Fintype ι] {q : ℕ} (hq : Fintype.card ι ≤ q) (σ : Cochain P U q) :
-    altProj P U q σ = 0 := by
+theorem altProj_eq_zero [Fintype ι] {q : ℕ} (hq : Fintype.card ι ≤ q) (σ : Cochain P U q)
+    : altProj P U q σ = 0 := by
   funext i
   refine altProj_apply_of_not_injective q σ fun hi => ?_
   have := Fintype.card_le_of_injective i hi
   rw [Fintype.card_fin] at this
   omega
 
-theorem d_altProj (q : ℕ) (σ : Cochain P U q) :
-    d P U q (altProj P U q σ) = altProj P U (q + 1) (d P U q σ) := by
+theorem d_altProj (q : ℕ) (σ : Cochain P U q)
+    : d P U q (altProj P U q σ) = altProj P U (q + 1) (d P U q σ) := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
     rw [d_apply, altProj_apply, pair_d σ (supp_inter U (proj_supp (q + 1) i) fun t ht => ht.2),
-    bd_proj, lin_bd_single_apply, map_sum]
+      bd_proj, lin_bd_single_apply, map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [altProj_apply, res_pair σ _ (supp_inter U (proj_supp q _) fun t ht => ht.2), map_zsmul]
 
-theorem d_homotopy_add (q : ℕ) (σ : Cochain P U (q + 1)) :
-    d P U q (homotopy P U q σ) + homotopy P U (q + 1) (d P U (q + 1) σ) =
-      σ - altProj P U (q + 1) σ := by
+theorem d_homotopy_add (q : ℕ) (σ : Cochain P U (q + 1))
+    : d P U q (homotopy P U q σ) + homotopy P U (q + 1) (d P U (q + 1) σ)
+      = σ - altProj P U (q + 1) σ := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Pi.add_apply, Pi.sub_apply, d_apply, homotopy_apply,
-    pair_d σ (supp_inter U (hom_supp (q + 1) i) fun t ht => ht), bd_hom, map_sub, map_sub,
-    lin_bd_single_apply, map_sum, pair_single _ _ _ le_rfl, one_smul, res_refl, altProj_apply]
+      pair_d σ (supp_inter U (hom_supp (q + 1) i) fun t ht => ht), bd_hom, map_sub, map_sub,
+      lin_bd_single_apply, map_sum, pair_single _ _ _ le_rfl, one_smul, res_refl, altProj_apply]
   have : ∑ a : Fin (q + 2), ((-1 : ℤ) ^ (a : ℕ)) •
-      res P (inter_le_comp U i a.succAbove) (homotopy P U q σ (i ∘ a.succAbove)) =
-      ∑ a : Fin (q + 2), pair σ (inter U i) (((-1 : ℤ) ^ (a : ℕ)) • hom q (i ∘ a.succAbove)) := by
+        res P (inter_le_comp U i a.succAbove) (homotopy P U q σ (i ∘ a.succAbove))
+      = ∑ a : Fin (q + 2), pair σ (inter U i) (((-1 : ℤ) ^ (a : ℕ)) • hom q (i ∘ a.succAbove)) := by
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [homotopy_apply, res_pair σ _ (supp_inter U (hom_supp q _) fun t ht => ht), map_zsmul]
   rw [this]
   abel
 
-theorem exists_d_eq_sub_altProj (q : ℕ) (σ : Cochain P U (q + 1)) (hσ : d P U (q + 1) σ = 0) :
-    ∃ τ, d P U q τ = σ - altProj P U (q + 1) σ :=
+theorem exists_d_eq_sub_altProj (q : ℕ) (σ : Cochain P U (q + 1)) (hσ : d P U (q + 1) σ = 0)
+    : ∃ τ, d P U q τ = σ - altProj P U (q + 1) σ :=
   ⟨homotopy P U q σ, by rw [← d_homotopy_add, hσ, map_zero, add_zero]⟩
 
-theorem exists_d_eq_of_card_le [Fintype ι] (q : ℕ) (hq : Fintype.card ι ≤ q + 1)
-    (σ : Cochain P U (q + 1)) (hσ : d P U (q + 1) σ = 0) : ∃ τ, d P U q τ = σ := by
+theorem exists_d_eq_of_card_le
+    [Fintype ι]
+    (q : ℕ) (hq : Fintype.card ι ≤ q + 1) (σ : Cochain P U (q + 1)) (hσ : d P U (q + 1) σ = 0)
+    : ∃ τ, d P U q τ = σ := by
   obtain ⟨τ, hτ⟩ := exists_d_eq_sub_altProj q σ hσ
   exact ⟨τ, by rw [hτ, altProj_eq_zero hq, sub_zero]⟩
 
-theorem altProj_congr (q : ℕ) {σ σ' : Cochain P U q} (h : ∀ t, StrictMono t → σ t = σ' t) :
-    altProj P U q σ = altProj P U q σ' := by
+theorem altProj_congr (q : ℕ) {σ σ' : Cochain P U q} (h : ∀ t, StrictMono t → σ t = σ' t)
+    : altProj P U q σ = altProj P U q σ' := by
   funext i
   refine eq_of_supp (pair σ (inter U i)) (pair σ' (inter U i)) (proj_supp q i) fun t k ht => ?_
   have hle := inter_le_of_inRange U ht.2
   rw [pair_single _ _ _ hle, pair_single _ _ _ hle, h t ht.1]
 
-theorem cls_altProj (q : ℕ) (σ : Cochain P U (q + 1)) (hσ : d P U (q + 1) σ = 0) :
-    cls (altProj P U (q + 1) σ) (by rw [d_altProj, hσ, map_zero]) = cls σ hσ := by
+theorem cls_altProj (q : ℕ) (σ : Cochain P U (q + 1)) (hσ : d P U (q + 1) σ = 0)
+    : cls (altProj P U (q + 1) σ) (by rw [d_altProj, hσ, map_zero]) = cls σ hσ := by
   rw [cls_eq_cls_iff, coboundaries_succ]
   obtain ⟨τ, hτ⟩ := exists_d_eq_sub_altProj q σ hσ
   exact ⟨τ, hτ⟩
 
-theorem subsingleton_cechH [Fintype ι] {n : ℕ} (hn : Fintype.card ι ≤ n) (hn0 : 0 < n) :
-    Subsingleton (cechH P U n) := by
+theorem subsingleton_cechH [Fintype ι] {n : ℕ} (hn : Fintype.card ι ≤ n) (hn0 : 0 < n)
+    : Subsingleton (cechH P U n) := by
   obtain ⟨q, rfl⟩ : ∃ q, n = q + 1 := ⟨n - 1, by omega⟩
   refine subsingleton_of_forall_eq 0 fun c => ?_
   obtain ⟨σ, hσ, rfl⟩ := exists_cls c

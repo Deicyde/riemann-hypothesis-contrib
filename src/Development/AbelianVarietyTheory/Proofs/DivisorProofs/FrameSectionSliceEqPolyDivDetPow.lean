@@ -10,10 +10,10 @@ open NumberField ReciprocityTheory.ChartRestriction.G.FD
 
 namespace GlobalTheory
 
-theorem differentiable_det_of {r : ℕ} :
-    Differentiable ℂ (fun y : Fin r → Fin r → ℂ => (Matrix.of y).det) := by
-  have : (fun y : Fin r → Fin r → ℂ => (Matrix.of y).det) =
-      fun y => ∑ σ : Equiv.Perm (Fin r), (Equiv.Perm.sign σ : ℂ) * ∏ i, y (σ i) i := by
+theorem differentiable_det_of {r : ℕ}
+    : Differentiable ℂ (fun y : Fin r → Fin r → ℂ => (Matrix.of y).det) := by
+  have : (fun y : Fin r → Fin r → ℂ => (Matrix.of y).det)
+      = fun y => ∑ σ : Equiv.Perm (Fin r), (Equiv.Perm.sign σ : ℂ) * ∏ i, y (σ i) i := by
     funext y
     rw [Matrix.det_apply]
     refine Finset.sum_congr rfl fun σ _ => ?_
@@ -22,9 +22,9 @@ theorem differentiable_det_of {r : ℕ} :
   rw [this]
   fun_prop
 
-theorem differentiable_update_frame {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {r : ℕ}
-    (x : Ψ → Fin r → Fin r → ℂ) (τ : Ψ) :
-    Differentiable ℂ (fun y : Fin r → Fin r → ℂ => Function.update x τ y) := by
+theorem differentiable_update_frame
+    {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {r : ℕ} (x : Ψ → Fin r → Fin r → ℂ) (τ : Ψ)
+    : Differentiable ℂ (fun y : Fin r → Fin r → ℂ => Function.update x τ y) := by
   intro y
   exact (hasFDerivAt_update x y).differentiableAt
 
@@ -32,20 +32,23 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem section_slice_eq_poly_div_det_pow :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) [DecidableEq X.Ψ],
-      (∀ x : Frame X.Ψ r, x ∈ X.dom ↔ ∀ τ, (mat x τ).det ≠ 0) →
-      ∀ (la : Wt X.Ψ r) (N : ℕ), (∀ τ i, 0 ≤ la τ i + N) →
-      ∀ P : Frame X.Ψ r → ℂ, X.IsSec la P → ∀ x ∈ X.dom, ∀ τ : X.Ψ,
-        ∃ F : MvPolynomial (Fin r × Fin r) ℂ, F.IsHomogeneous (∑ i, (la τ i + N).toNat) ∧
-          ∀ y : Fin r → Fin r → ℂ, (Matrix.of y).det ≠ 0 →
-            P (Function.update x τ y) =
-              MvPolynomial.eval (fun ij => y ij.1 ij.2) F * ((Matrix.of y).det)⁻¹ ^ N := by
+theorem section_slice_eq_poly_div_det_pow
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) [DecidableEq X.Ψ],
+      (∀ x : Frame X.Ψ r, x ∈ X.dom ↔ ∀ τ, (mat x τ).det ≠ 0)
+        → ∀ (la : Wt X.Ψ r) (N : ℕ),
+          (∀ τ i, 0 ≤ la τ i + N)
+            → ∀ P : Frame X.Ψ r → ℂ,
+              X.IsSec la P
+                → ∀ x ∈ X.dom, ∀ τ : X.Ψ, ∃ F : MvPolynomial (Fin r × Fin r) ℂ,
+                  F.IsHomogeneous (∑ i, (la τ i + N).toNat)
+                    ∧ ∀ y : Fin r → Fin r → ℂ,
+                      (Matrix.of y).det ≠ 0
+                        → P (Function.update x τ y)
+                          = MvPolynomial.eval (fun ij => y ij.1 ij.2) F
+                            * ((Matrix.of y).det)⁻¹ ^ N := by
   intro E _ _ _ r X _ hdom la N hN P hP x hx τ
   classical
-
-  have hupd : ∀ y : Fin r → Fin r → ℂ,
-      Function.update x τ y ∈ X.dom ↔ (Matrix.of y).det ≠ 0 := by
+  have hupd : ∀ y : Fin r → Fin r → ℂ, Function.update x τ y ∈ X.dom ↔ (Matrix.of y).det ≠ 0 := by
     intro y
     rw [hdom]
     have hx' := (hdom x).1 hx
@@ -64,11 +67,12 @@ theorem section_slice_eq_poly_div_det_pow :
 
   have hholo : ReciprocityTheory.MultiplicativeHeights.IsHoloGL h := by
     unfold ReciprocityTheory.MultiplicativeHeights.IsHoloGL
-    have h1 : DifferentiableOn ℂ (fun y : Fin r → Fin r → ℂ => P (Function.update x τ y))
+    have h1 : DifferentiableOn ℂ
+        (fun y : Fin r → Fin r → ℂ => P (Function.update x τ y))
         {y | (Matrix.of y).det ≠ 0} :=
-      hP.1.comp (differentiable_update_frame x τ).differentiableOn
-        (fun y hy => (hupd y).2 hy)
-    have h2 : DifferentiableOn ℂ (fun y : Fin r → Fin r → ℂ => (Matrix.of y).det ^ N)
+      hP.1.comp (differentiable_update_frame x τ).differentiableOn (fun y hy => (hupd y).2 hy)
+    have h2 : DifferentiableOn ℂ
+        (fun y : Fin r → Fin r → ℂ => (Matrix.of y).det ^ N)
         {y | (Matrix.of y).det ≠ 0} :=
       (differentiable_det_of.pow N).differentiableOn
     exact h1.mul h2
@@ -84,23 +88,29 @@ theorem section_slice_eq_poly_div_det_pow :
       · subst hσ
         refine ⟨?_, fun c d hcd => ?_⟩
         · change (Matrix.of (b' σ)).det ≠ 0
-          rw [hbτ]; exact hb
+          rw [hbτ]
+          exact hb
         · rw [hbτ]; exact hbt hcd
       · refine ⟨?_, fun c d hcd => ?_⟩
         · change (Matrix.of (b' σ)).det ≠ 0
-          rw [hbσ σ hσ]; change (1 : Matrix (Fin r) (Fin r) ℂ).det ≠ 0; simp
+          rw [hbσ σ hσ]
+          change (1 : Matrix (Fin r) (Fin r) ℂ).det ≠ 0
+          simp
         · rw [hbσ σ hσ, Matrix.one_apply, if_neg (ne_of_lt hcd).symm]
-    have hrm : rmul (Function.update x τ (fun i j => y i j)) b' =
-        Function.update x τ (fun i j => (y * b) i j) := by
+    have hrm
+        : rmul (Function.update x τ (fun i j => y i j)) b'
+          = Function.update x τ (fun i j => (y * b) i j) := by
       funext σ
       by_cases hσ : σ = τ
       · subst hσ
-        change (Matrix.of (Function.update x σ (fun i j => y i j) σ) * Matrix.of (b' σ) :
-          Matrix (Fin r) (Fin r) ℂ) = Function.update x σ (fun i j => (y * b) i j) σ
+        change (Matrix.of (Function.update x σ (fun i j => y i j) σ) * Matrix.of (b' σ)
+            : Matrix (Fin r) (Fin r) ℂ)
+          = Function.update x σ (fun i j => (y * b) i j) σ
         rw [hbτ, Function.update_self, Function.update_self]
         rfl
-      · change (Matrix.of (Function.update x τ (fun i j => y i j) σ) * Matrix.of (b' σ) :
-          Matrix (Fin r) (Fin r) ℂ) = Function.update x τ (fun i j => (y * b) i j) σ
+      · change (Matrix.of (Function.update x τ (fun i j => y i j) σ) * Matrix.of (b' σ)
+            : Matrix (Fin r) (Fin r) ℂ)
+          = Function.update x τ (fun i j => (y * b) i j) σ
         rw [hbσ σ hσ, Function.update_of_ne hσ, Function.update_of_ne hσ]
         exact Matrix.mul_one _
     have hbc : bchar la b' = ∏ i, b i i ^ la τ i := by
@@ -119,7 +129,9 @@ theorem section_slice_eq_poly_div_det_pow :
       intro i
       rw [hdb] at hb
       exact Finset.prod_ne_zero_iff.mp hb i (Finset.mem_univ i)
-    have hchar : (∏ i, b i i ^ la τ i) * b.det ^ N = ReciprocityTheory.MultiplicativeHeights.triChar a b := by
+    have hchar
+        : (∏ i, b i i ^ la τ i) * b.det ^ N
+          = ReciprocityTheory.MultiplicativeHeights.triChar a b := by
       rw [hdb, ← Finset.prod_pow, ← Finset.prod_mul_distrib]
       unfold ReciprocityTheory.MultiplicativeHeights.triChar
       refine Finset.prod_congr rfl fun i _ => ?_
@@ -132,8 +144,10 @@ theorem section_slice_eq_poly_div_det_pow :
   obtain ⟨F, hF, hFe⟩ := ReciprocityTheory.MultiplicativeHeights.Closed.bwPoly r a h hholo htri
   refine ⟨F, hF, fun y hy => ?_⟩
   have e := hFe (Matrix.of y) hy
-  have e' : P (Function.update x τ y) * (Matrix.of y).det ^ N =
-      MvPolynomial.eval (fun ij => y ij.1 ij.2) F := e
+  have e'
+      : P (Function.update x τ y) * (Matrix.of y).det ^ N
+        = MvPolynomial.eval (fun ij => y ij.1 ij.2) F :=
+    e
   rw [← e', inv_pow, mul_assoc, mul_inv_cancel₀ (pow_ne_zero _ hy), mul_one]
 
 end GlobalTheory

@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial GlobalTheory.GalOfCusp UpperTheory.V.Af
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+  GlobalTheory.GalOfCusp UpperTheory.V.Af
 
-theorem UpperTheory.exists_normV_eq_prime_pow_le_finrank :
-    ∀ (K : Type) [Field K] [NumberField K] (p : ℕ) (w : HeightOneSpectrum (𝓞 K)), p.Prime → (p : 𝓞 K) ∈ w.asIdeal → ∃ h : ℕ, 1 ≤ h ∧ h ≤ Module.finrank ℚ K ∧ normV w = p ^ h := by
+theorem UpperTheory.exists_normV_eq_prime_pow_le_finrank
+    : ∀ (K : Type) [Field K] [NumberField K] (p : ℕ) (w : HeightOneSpectrum (𝓞 K)),
+      p.Prime → (p : 𝓞 K) ∈ w.asIdeal
+        → ∃ h : ℕ, 1 ≤ h ∧ h ≤ Module.finrank ℚ K ∧ normV w = p ^ h := by
   intro K _ _ p w hp hpw
   have hcard : normV w = Ideal.absNorm w.asIdeal := by
     unfold normV

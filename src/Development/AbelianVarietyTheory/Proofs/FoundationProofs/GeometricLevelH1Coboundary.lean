@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRep
 noncomputable section
 
 open scoped MatrixGroups
-open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisensteinGalois Polynomial
+open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisensteinGalois
+  Polynomial
 
 namespace GlobalTheory.K5.Reb
 
@@ -56,14 +57,19 @@ theorem isInt_iff (hψ : IsReb T L ψ) (x : Ω) : @IsInt p _ (RebT Ω ψ) _ _ x 
   · rintro ⟨f, hf, h⟩
     let A := Algebra.adjoin (O0 p) {T.qq L}
     have hq : IsIntegral (O0 p) (T.qq L) := by
-      refine ⟨X ^ (p ^ L) - C (qO p), monic_X_pow_sub_C _ (pow_ne_zero _ (Fact.out : p.Prime).ne_zero), ?_⟩
+      refine ⟨
+        X ^ (p ^ L) - C (qO p),
+        monic_X_pow_sub_C _ (pow_ne_zero _ (Fact.out : p.Prime).ne_zero),
+        ?_
+      ⟩
       rw [← aeval_def]
       simp [GlobalTheory.K5.Basic.qq_pow]
     haveI : Algebra.IsIntegral (O0 p) A := Algebra.IsIntegral.adjoin (by rintro _ rfl; exact hq)
-    let g : O0 p →+* A := ψ.codRestrict A (fun b => by
-      have := ψ.mem_range_self b
-      rw [hψ.rng] at this
-      exact this)
+    let g : O0 p →+* A :=
+      ψ.codRestrict A (fun b => by
+        have := ψ.mem_range_self b
+        rw [hψ.rng] at this
+        exact this)
     have hA : IsIntegral A x := by
       refine ⟨f.map g, hf.map g, ?_⟩
       rw [eval₂_map]
@@ -78,8 +84,8 @@ theorem isInt_iff (hψ : IsReb T L ψ) (x : Ω) : @IsInt p _ (RebT Ω ψ) _ _ x 
     rw [comp_jj]
     exact h
 
-theorem cong_iff (hψ : IsReb T L ψ) (k : ℕ) (x y : Ω) :
-    @Cong p _ (RebT Ω ψ) _ _ k x y ↔ Cong (p := p) k x y := by
+theorem cong_iff (hψ : IsReb T L ψ) (k : ℕ) (x y : Ω)
+    : @Cong p _ (RebT Ω ψ) _ _ k x y ↔ Cong (p := p) k x y := by
   constructor
   · rintro ⟨z, hz, e⟩
     exact ⟨z, (isInt_iff hψ z).1 hz, e⟩
@@ -98,8 +104,8 @@ theorem isClo (hΩ : IsClo p Ω) (hψ : IsReb T L ψ) : IsClo p (RebT Ω ψ) := 
   rw [eval₂_map, comp_jj, ← aeval_def]
   exact h
 
-theorem zp_eq (hψ : IsReb T L ψ) (z : ℤ_[p]) :
-    ψ (algebraMap ℤ_[p] (O0 p) z) = algebraMap (O0 p) Ω (algebraMap ℤ_[p] (O0 p) z) := by
+theorem zp_eq (hψ : IsReb T L ψ) (z : ℤ_[p])
+    : ψ (algebraMap ℤ_[p] (O0 p) z) = algebraMap (O0 p) Ω (algebraMap ℤ_[p] (O0 p) z) := by
   have e : algebraMap ℤ_[p] (O0 p) z = algebraMap (Lau p) (O0 p) (HahnSeries.C z) := by
     rw [IsScalarTower.algebraMap_apply ℤ_[p] (Lau p) (O0 p)]
     congr 1
@@ -117,7 +123,8 @@ theorem zp_eq (hψ : IsReb T L ψ) (z : ℤ_[p]) :
     simp [HahnSeries.C_apply, HahnSeries.coeff_single, this]
 
 theorem isAlgZp_iff (hψ : IsReb T L ψ) (x : Ω) : @IsAlgZp p _ (RebT Ω ψ) _ _ x ↔ IsAlgZp p x := by
-  have hc : ψ.comp (algebraMap ℤ_[p] (O0 p)) = (algebraMap (O0 p) Ω).comp (algebraMap ℤ_[p] (O0 p)) :=
+  have hc
+      : ψ.comp (algebraMap ℤ_[p] (O0 p)) = (algebraMap (O0 p) Ω).comp (algebraMap ℤ_[p] (O0 p)) :=
     RingHom.ext (zp_eq hψ)
   constructor
   · rintro ⟨P, hP, h⟩
@@ -145,12 +152,15 @@ def down (hψ : IsReb T L ψ) (g : Gal p (RebT Ω ψ)) : Gal p Ω :=
     rw [← hb]
     exact g.commutes b)
 
-theorem down_mul (hψ : IsReb T L ψ) (g h : Gal p (RebT Ω ψ)) : down hψ (g * h) = down hψ g * down hψ h :=
+theorem down_mul (hψ : IsReb T L ψ) (g h : Gal p (RebT Ω ψ))
+    : down hψ (g * h) = down hψ g * down hψ h :=
   AlgEquiv.ext fun _ => rfl
 
-theorem fix_range (hψ : IsReb T L ψ) (g : Gal p Ω) (hg : g (T.qq L) = T.qq L) (a : O0 p) : g (ψ a) = ψ a := by
+theorem fix_range (hψ : IsReb T L ψ) (g : Gal p Ω) (hg : g (T.qq L) = T.qq L) (a : O0 p)
+    : g (ψ a) = ψ a := by
   have h1 : ψ a ∈ (Algebra.adjoin (O0 p) {T.qq L}).toSubring := hψ.rng ▸ ψ.mem_range_self a
-  have h2 : Algebra.adjoin (O0 p) {T.qq L} ≤ AlgHom.equalizer (g : Ω →ₐ[O0 p] Ω) (AlgHom.id (O0 p) Ω) :=
+  have h2
+      : Algebra.adjoin (O0 p) {T.qq L} ≤ AlgHom.equalizer (g : Ω →ₐ[O0 p] Ω) (AlgHom.id (O0 p) Ω) :=
     Algebra.adjoin_le (by rintro x rfl; exact hg)
   exact (AlgHom.mem_equalizer _ _ _).1 (h2 h1)
 
@@ -158,27 +168,49 @@ def up (hψ : IsReb T L ψ) (g : Gal p Ω) (hg : g (T.qq L) = T.qq L) : Gal p (R
   AlgEquiv.ofRingEquiv (f := (g.toRingEquiv : RebT Ω ψ ≃+* RebT Ω ψ)) (fun a => fix_range hψ g hg a)
 
 theorem isAlgZp_zeta (T : GlobalTheory.K5.Tower p Ω) (L : ℕ) : IsAlgZp p (T.ζ L) := by
-  refine ⟨X ^ (p ^ L) - C 1, (monic_X_pow_sub_C _ (pow_ne_zero _ (Fact.out : p.Prime).ne_zero)).ne_zero, ?_⟩
+  refine ⟨
+    X ^ (p ^ L) - C 1,
+    (monic_X_pow_sub_C _ (pow_ne_zero _ (Fact.out : p.Prime).ne_zero)).ne_zero,
+    ?_
+  ⟩
   simp [(T.prim L).pow_eq_one]
 
-theorem mem_H (hψ : IsReb T L ψ) {g : Gal p (RebT Ω ψ)} (hg : g ∈ Ggeo p (RebT Ω ψ)) :
-    down hψ g ∈ Ggeo p Ω ⊓ Gn T L := by
+theorem mem_H (hψ : IsReb T L ψ) {g : Gal p (RebT Ω ψ)} (hg : g ∈ Ggeo p (RebT Ω ψ))
+    : down hψ g ∈ Ggeo p Ω ⊓ Gn T L := by
   have hgeo : down hψ g ∈ Ggeo p Ω := fun x hx => hg x ((isAlgZp_iff hψ x).2 hx)
-  refine Subgroup.mem_inf.2 ⟨hgeo, (GlobalTheory.K5.Basic.mem_gn T L _).2 ⟨hgeo _ (isAlgZp_zeta T L), ?_⟩⟩
+  refine Subgroup.mem_inf.2
+    ⟨hgeo, (GlobalTheory.K5.Basic.mem_gn T L _).2 ⟨hgeo _ (isAlgZp_zeta T L), ?_⟩⟩
   have h : g (ψ (qO p)) = ψ (qO p) := g.commutes (qO p)
   rw [hψ.par] at h
   exact h
 
-theorem exists_up (hψ : IsReb T L ψ) {g : Gal p Ω} (hg : g ∈ Ggeo p Ω ⊓ Gn T L) :
-    ∃ g' : Gal p (RebT Ω ψ), g' ∈ Ggeo p (RebT Ω ψ) ∧ down hψ g' = g := by
+theorem exists_up (hψ : IsReb T L ψ) {g : Gal p Ω} (hg : g ∈ Ggeo p Ω ⊓ Gn T L)
+    : ∃ g' : Gal p (RebT Ω ψ), g' ∈ Ggeo p (RebT Ω ψ) ∧ down hψ g' = g := by
   have hg1 := (Subgroup.mem_inf.1 hg).1
   have hq := ((GlobalTheory.K5.Basic.mem_gn T L g).1 (Subgroup.mem_inf.1 hg).2).2
   exact ⟨up hψ g hq, fun x hx => hg1 x ((isAlgZp_iff hψ x).1 hx), AlgEquiv.ext fun _ => rfl⟩
 
-theorem h1_geometric_level_coboundary : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∃ c : ℕ, ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω → ∀ (T : GlobalTheory.K5.Tower p Ω) (L n : ℕ), n ≤ L → ∀ lq : Gal p Ω → ZMod (p ^ n), IsKum T n (Ggeo p Ω ⊓ Gn T L) (T.qq (L + n)) lq →
-  (∀ a : Gal p Ω → Ω, IntegralLocallyConstCochainModPow n (Ggeo p Ω ⊓ Gn T L) a → (∀ g ∈ (Ggeo p Ω ⊓ Gn T L), ∀ h ∈ (Ggeo p Ω ⊓ Gn T L), Cong (p := p) n (a (g * h)) (a g + g (a h))) →
-    ∃ o : Ω, IsInt (p := p) o ∧ (∀ g ∈ (Ggeo p Ω ⊓ Gn T L), g o = o) ∧ Cob1 n (Ggeo p Ω ⊓ Gn T L) (fun g => (p : Ω) ^ c * a g - o * ((lq g).val : Ω))) ∧
-  (∀ o : Ω, IsInt (p := p) o → (∀ g ∈ (Ggeo p Ω ⊓ Gn T L), g o = o) → Cob1 n (Ggeo p Ω ⊓ Gn T L) (fun g => o * ((lq g).val : Ω)) → Cong (p := p) n ((p : Ω) ^ c * o) 0) := by
+theorem h1_geometric_level_coboundary
+    : ∀ (p : ℕ) [Fact p.Prime],
+      p ≠ 2
+        → ∃ c : ℕ, ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+          IsClo p Ω
+            → ∀ (T : GlobalTheory.K5.Tower p Ω) (L n : ℕ),
+              n ≤ L
+                → ∀ lq : Gal p Ω → ZMod (p ^ n),
+                  IsKum T n (Ggeo p Ω ⊓ Gn T L) (T.qq (L + n)) lq
+                    → (∀ a : Gal p Ω → Ω,
+                        IntegralLocallyConstCochainModPow n (Ggeo p Ω ⊓ Gn T L) a
+                          → (∀ g ∈ (Ggeo p Ω ⊓ Gn T L), ∀ h ∈ (Ggeo p Ω ⊓ Gn T L),
+                            Cong (p := p) n (a (g * h)) (a g + g (a h)))
+                          → ∃ o : Ω,
+                            IsInt (p := p) o ∧ (∀ g ∈ (Ggeo p Ω ⊓ Gn T L), g o = o)
+                              ∧ Cob1 n (Ggeo p Ω ⊓ Gn T L)
+                                (fun g => (p : Ω) ^ c * a g - o * ((lq g).val : Ω)))
+                      ∧ (∀ o : Ω,
+                        IsInt (p := p) o → (∀ g ∈ (Ggeo p Ω ⊓ Gn T L), g o = o)
+                          → Cob1 n (Ggeo p Ω ⊓ Gn T L) (fun g => o * ((lq g).val : Ω))
+                          → Cong (p := p) n ((p : Ω) ^ c * o) 0) := by
   intro p _ hp2
   have hkum := GlobalTheory.K5.TopGeo.top p hp2
   obtain ⟨c, hc⟩ := hkum
@@ -189,11 +221,13 @@ theorem h1_geometric_level_coboundary : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 �
   obtain ⟨h1, h2⟩ := hc (RebT Ω ψ) (isClo hΩ hψ) (tw hψ) n (fun _ => 0) _ hk
   constructor
   · intro a ha hcoc
-    have hlc : IntegralLocallyConstCochainModPow n (Ggeo p (RebT Ω ψ)) (fun g => a (down hψ g)) := by
+    have hlc
+        : IntegralLocallyConstCochainModPow n (Ggeo p (RebT Ω ψ)) (fun g => a (down hψ g)) := by
       refine ⟨fun g hg => (isInt_iff hψ _).2 (ha.1 _ (mem_H hψ hg)), fun g hg => ?_⟩
       obtain ⟨S, hS⟩ := ha.2 _ (mem_H hψ hg)
       exact ⟨S, fun h hh hx => (cong_iff hψ n _ _).2 (hS _ (mem_H hψ hh) hx)⟩
-    have hco : IsTwistedOneCocycle 0 n (Ggeo p (RebT Ω ψ)) (fun _ => 0) (fun g => a (down hψ g)) := by
+    have hco
+        : IsTwistedOneCocycle 0 n (Ggeo p (RebT Ω ψ)) (fun _ => 0) (fun g => a (down hψ g)) := by
       intro g hg h hh
       simp only [pow_zero, one_mul]
       rw [down_mul]
@@ -208,8 +242,10 @@ theorem h1_geometric_level_coboundary : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 �
       exact (cong_iff hψ n _ _).1 e
   · intro o ho hof hcob
     obtain ⟨x, hx, hxc⟩ := hcob
-    refine (cong_iff hψ n _ _).1 (h2 o ((isInt_iff hψ o).2 ho) (fun g hg => hof _ (mem_H hψ hg))
-      ⟨x, (isInt_iff hψ x).2 hx, fun g hg => ?_⟩)
+    refine (cong_iff hψ n _ _).1
+      (h2 o ((isInt_iff hψ o).2 ho)
+        (fun g hg => hof _ (mem_H hψ hg))
+        ⟨x, (isInt_iff hψ x).2 hx, fun g hg => ?_⟩)
     rw [pow_zero, one_mul]
     exact (cong_iff hψ n _ _).2 (hxc _ (mem_H hψ hg))
 

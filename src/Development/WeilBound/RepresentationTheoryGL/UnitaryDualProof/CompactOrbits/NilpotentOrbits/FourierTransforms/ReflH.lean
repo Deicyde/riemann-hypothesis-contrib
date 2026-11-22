@@ -14,8 +14,9 @@ namespace PositivityTheory.RgUd.T.Nil.Four.Phi2
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
-  {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {n : ℕ} {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)}
 
 def ReflH (hZ : CR Z) (h : Hyp Z) : Sp k n ≃ₜ Sp k n where
   toFun := Refl (Z := Z)
@@ -24,10 +25,12 @@ def ReflH (hZ : CR Z) (h : Hyp Z) : Sp k n ≃ₜ Sp k n where
   right_inv := Refl_Refl hZ h
   continuous_toFun := by
     show Continuous fun p : Sp k n => (p.1 - (2 : k) • Pr Z p.1, p.2)
-    exact (continuous_fst.sub (((continuous_Pr Z).comp continuous_fst).const_smul (2 : k))).prodMk continuous_snd
+    exact (continuous_fst.sub (((continuous_Pr Z).comp continuous_fst).const_smul (2 : k))).prodMk
+      continuous_snd
   continuous_invFun := by
     show Continuous fun p : Sp k n => (p.1 - (2 : k) • Pr Z p.1, p.2)
-    exact (continuous_fst.sub (((continuous_Pr Z).comp continuous_fst).const_smul (2 : k))).prodMk continuous_snd
+    exact (continuous_fst.sub (((continuous_Pr Z).comp continuous_fst).const_smul (2 : k))).prodMk
+      continuous_snd
 
 theorem d_eq [CharZero k] (hZ : CR Z) : d Z = dB0 Z := by
   classical
@@ -42,17 +45,20 @@ theorem d_eq [CharZero k] (hZ : CR Z) : d Z = dB0 Z := by
     ext x
     simp only [LinearMap.mem_ker, LinearMap.domRestrict_apply, Submodule.mem_comap,
       Submodule.subtype_apply, B0, Submodule.mem_inf, x.2, true_and]
-  have e : Module.finrank k (LinearMap.ker ((qL Z).domRestrict (BzL Z))) =
-      Module.finrank k (B0 Z) := by
+  have e
+      : Module.finrank k (LinearMap.ker ((qL Z).domRestrict (BzL Z)))
+        = Module.finrank k (B0 Z) := by
     rw [hker]
     exact (Submodule.comapSubtypeEquivOfLe (inf_le_left : B0 Z ≤ BzL Z)).finrank_eq
-  have hS : Subalgebra.toSubmodule (Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))) =
-      BzL Z := by
+  have hS
+      : Subalgebra.toSubmodule (Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)))
+        = BzL Z := by
     ext x
     rw [Subalgebra.mem_toSubmodule, Subalgebra.mem_centralizer_iff]
     rfl
-  have hC : Module.finrank k (Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))) =
-      Module.finrank k (BzL Z) := by
+  have hC
+      : Module.finrank k (Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)))
+        = Module.finrank k (BzL Z) := by
     rw [← Subalgebra.finrank_toSubmodule, hS]
   show Module.finrank k (B0 Z) = Module.finrank k _ - Module.finrank k _
   rw [hC]
@@ -61,28 +67,39 @@ theorem d_eq [CharZero k] (hZ : CR Z) : d Z = dB0 Z := by
 theorem phiP [CharZero k] : PhiP (k := k) := by
   intro n Z hZ
   borelize k
-  have h : Hyp Z := ⟨PositivityTheory.RgUd.T.Nil.Four.Alg.piZ_mem hZ, PositivityTheory.RgUd.T.Nil.Four.Alg.qZ_piZ hZ,
+  have h : Hyp Z := ⟨
+    PositivityTheory.RgUd.T.Nil.Four.Alg.piZ_mem hZ,
+    PositivityTheory.RgUd.T.Nil.Four.Alg.qZ_piZ hZ,
     fun x c hc hq => PositivityTheory.RgUd.T.Nil.Four.Alg.piZ_eq hZ hc hq,
-    fun w hw hb => PositivityTheory.RgUd.T.Nil.Four.Alg.trB_nondeg hZ hw hb⟩
+    fun w hw hb => PositivityTheory.RgUd.T.Nil.Four.Alg.trB_nondeg hZ hw hb
+  ⟩
   obtain ⟨ψ, hψ⟩ := exists_hasConductor_one k
   let ν : Measure k := Measure.addHaar
-  have hcomp : ∀ (U : Set (Sp k n)) (e : Sp k n ≃ₜ Sp k n), (∀ x, e x ∈ U → x ∈ U) →
-      ∀ f : Sp k n → ℂ, f ∈ supportedIn U → (fun p => f (e p)) ∈ supportedIn U := by
+  have hcomp
+      : ∀ (U : Set (Sp k n)) (e : Sp k n ≃ₜ Sp k n),
+        (∀ x, e x ∈ U → x ∈ U)
+          → ∀ f : Sp k n → ℂ, f ∈ supportedIn U → (fun p => f (e p)) ∈ supportedIn U := by
     intro U e he f hf
     rw [mem_supportedIn, GroundTheory.Automorphic.mem_locallyConstantCompactSupport] at hf ⊢
     obtain ⟨⟨hlc, hcs⟩, hsu⟩ := hf
     refine ⟨⟨hlc.comp_continuous e.continuous, hcs.comp_homeomorph e⟩, ?_⟩
     intro x hx
     exact he x (hsu hx)
-  have hU : ∀ (e : Sp k n ≃ₜ Sp k n) (f : Sp k n → ℂ), f ∈ supportedIn (Set.univ : Set (Sp k n)) →
-      (fun p => f (e p)) ∈ supportedIn (Set.univ : Set (Sp k n)) :=
-    fun e => hcomp Set.univ e (fun _ _ => Set.mem_univ _)
-  have hRf : ∀ f : Sp k n → ℂ, f ∈ supportedIn (Set.univ : Set (Sp k n)) →
-      (fun p => f (Refl (Z := Z) p)) ∈ supportedIn (Set.univ : Set (Sp k n)) :=
-    fun f hf => hU (ReflH hZ h) f hf
-  have hRU : ∀ f : Sp k n → ℂ, f ∈ supportedIn (UU : Set (Sp k n)) →
-      (fun p => f (Refl (Z := Z) p)) ∈ supportedIn (UU : Set (Sp k n)) :=
-    fun f hf => hcomp UU (ReflH hZ h) (fun _ hx => hx) f hf
+  have hU
+      : ∀ (e : Sp k n ≃ₜ Sp k n) (f : Sp k n → ℂ),
+        f ∈ supportedIn (Set.univ : Set (Sp k n))
+          → (fun p => f (e p)) ∈ supportedIn (Set.univ : Set (Sp k n)) := fun e =>
+    hcomp Set.univ e (fun _ _ => Set.mem_univ _)
+  have hRf
+      : ∀ f : Sp k n → ℂ,
+        f ∈ supportedIn (Set.univ : Set (Sp k n))
+          → (fun p => f (Refl (Z := Z) p)) ∈ supportedIn (Set.univ : Set (Sp k n)) := fun f hf =>
+    hU (ReflH hZ h) f hf
+  have hRU
+      : ∀ f : Sp k n → ℂ,
+        f ∈ supportedIn (UU : Set (Sp k n))
+          → (fun p => f (Refl (Z := Z) p)) ∈ supportedIn (UU : Set (Sp k n)) := fun f hf =>
+    hcomp UU (ReflH hZ h) (fun _ hx => hx) f hf
   obtain ⟨q, hq⟩ := (supportedIn (Set.univ : Set (Sp k n))).exists_isCompl
   let Φ : (Sp k n → ℂ) →ₗ[ℂ] Sp k n → ℂ :=
     (phiS ψ ν hZ h hψ.continuous).comp ((supportedIn (Set.univ : Set (Sp k n))).projectionOnto q hq)
@@ -92,11 +109,12 @@ theorem phiP [CharZero k] : PhiP (k := k) := by
       Submodule.linearProjOfIsCompl_apply_left hq ⟨f, hf⟩
     simp only [Φ, LinearMap.comp_apply, e1]
     rfl
-  let κ : ℂ := (((distribHaarChar k (GeneralLinearGroup.det (Gu hZ h)) : NNReal) : ℝ) : ℂ)⁻¹ *
-    (((ν.real (𝒪[k] : Set k) ^ 2 * nabs k 1) ^ d Z : ℝ) : ℂ)
+  let κ : ℂ :=
+    (((distribHaarChar k (GeneralLinearGroup.det (Gu hZ h)) : NNReal) : ℝ) : ℂ)⁻¹
+      * (((ν.real (𝒪[k] : Set k) ^ 2 * nabs k 1) ^ d Z : ℝ) : ℂ)
   have hχ : (distribHaarChar k (GeneralLinearGroup.det (Gu hZ h)) : NNReal) ≠ 0 := by
-    have e2 := map_mul_eq_one (distribHaarChar k)
-      (mul_inv_cancel (GeneralLinearGroup.det (Gu hZ h)))
+    have e2 :=
+      map_mul_eq_one (distribHaarChar k) (mul_inv_cancel (GeneralLinearGroup.det (Gu hZ h)))
     exact left_ne_zero_of_mul_eq_one e2
   have hO : IsOpen ((𝒪[k] : Set k)) := (ValuativeRel.valuation k).isOpen_integer
   have hC : IsCompact ((𝒪[k] : Set k)) :=
@@ -104,17 +122,16 @@ theorem phiP [CharZero k] : PhiP (k := k) := by
   have hν : 0 < ν.real (𝒪[k] : Set k) := by
     rw [measureReal_def]
     exact ENNReal.toReal_pos (hO.measure_ne_zero ν ⟨0, zero_mem _⟩) hC.measure_lt_top.ne
-  have hn1 : nabs k 1 = 1 := by
-    simp [nabs]
+  have hn1 : nabs k 1 = 1 := by simp [nabs]
   have hκ : κ ≠ 0 := by
     refine mul_ne_zero (inv_ne_zero ?_) ?_
     · exact_mod_cast hχ
     · rw [hn1, mul_one]
       exact_mod_cast pow_ne_zero _ (pow_pos hν 2).ne'
-  let Φ' : (Sp k n → ℂ) →ₗ[ℂ] Sp k n → ℂ :=
-    κ⁻¹ • (Φ.comp (LinearMap.funLeft ℂ ℂ (Refl (Z := Z))))
-  have hΦ' : ∀ f ∈ supportedIn (Set.univ : Set (Sp k n)),
-      Φ' f = κ⁻¹ • phi0 ψ ν hZ h (fun p => f (Refl (Z := Z) p)) := by
+  let Φ' : (Sp k n → ℂ) →ₗ[ℂ] Sp k n → ℂ := κ⁻¹ • (Φ.comp (LinearMap.funLeft ℂ ℂ (Refl (Z := Z))))
+  have hΦ'
+      : ∀ f ∈ supportedIn (Set.univ : Set (Sp k n)),
+        Φ' f = κ⁻¹ • phi0 ψ ν hZ h (fun p => f (Refl (Z := Z) p)) := by
     intro f hf
     show κ⁻¹ • Φ (fun p => f (Refl (Z := Z) p)) = _
     rw [hΦ _ (hRf f hf)]

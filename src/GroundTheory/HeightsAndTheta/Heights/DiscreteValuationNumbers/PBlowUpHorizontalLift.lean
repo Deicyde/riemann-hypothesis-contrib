@@ -48,7 +48,8 @@ theorem BlowUpHorizontalLift.full : BlowUpHorizontalLift.Statement.{u} := by
     exact hvW j hj
   have ha : ∀ j, V * u j - u j₀ * a j ∈ P := by
     intro j
-    have e : V * u j - u j₀ * a j = (∏ i ∈ Finset.univ.erase j, v i) * (v j * u j - w j * u j₀) := by
+    have e
+        : V * u j - u j₀ * a j = (∏ i ∈ Finset.univ.erase j, v i) * (v j * u j - w j * u j₀) := by
       simp only [hV, ha_def]
       rw [← Finset.mul_prod_erase Finset.univ v (Finset.mem_univ j)]
       ring
@@ -94,9 +95,15 @@ theorem BlowUpHorizontalLift.full : BlowUpHorizontalLift.Statement.{u} := by
     have hxQ : liftForm x ∈ Q := hQ.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
     have hle : Q.comap (liftForm (J := J)) ≤ W := fun s hs => (hcomap s).1 (hQWt hs)
     have hQ₀ : Q.comap (liftForm (J := J)) = W :=
-      le_antisymm hle (hWmin.2 ⟨Ideal.comap_isPrime _ _,
-        sup_le (fun p hp => hBQ (liftForm_mem_blowUpOf hp))
-          ((Ideal.span_singleton_le_iff_mem _).mpr hxQ)⟩ hle)
+      le_antisymm hle
+        (hWmin.2
+          ⟨
+            Ideal.comap_isPrime _ _,
+            sup_le
+              (fun p hp => hBQ (liftForm_mem_blowUpOf hp))
+              ((Ideal.span_singleton_le_iff_mem _).mpr hxQ)
+          ⟩
+          hle)
     intro F hF
     refine mem_of_aeval_chartSubst_mem hQp hQ₀.ge j₀ (fun h => haW ?_) (fun j => hBQ ?_) hF
     · rw [← hQ₀]
@@ -106,8 +113,7 @@ theorem BlowUpHorizontalLift.full : BlowUpHorizontalLift.Statement.{u} := by
       rw [e]
       exact P.sub_mem (ha j) (P.mul_mem_left _ hVa)
   refine ⟨Wt, ?_, fun h => hϖW ((hcomap _).1 (by rw [liftForm_C]; exact h)), ?_⟩
-  ·
-    unfold divCycle
+  · unfold divCycle
     rw [dite_eq_left ⟨hmin, hrelWt⟩]
     have hne := length_localizedQuot_ne_top (blowUpOf P u ⊔ Ideal.span {liftForm x}) Wt hmin
     have hnz : multAt (blowUpOf P u ⊔ Ideal.span {liftForm x}) Wt ≠ 0 := by
@@ -116,10 +122,11 @@ theorem BlowUpHorizontalLift.full : BlowUpHorizontalLift.Statement.{u} := by
       intro hs
       obtain ⟨r, hr, hr0⟩ := hs (Ideal.Quotient.mk _ 1)
       rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, mul_one,
-        Ideal.Quotient.eq_zero_iff_mem] at hr0
+          Ideal.Quotient.eq_zero_iff_mem]
+        at hr0
       exact hr (hmin.1.2 hr0)
-    have htn : (multAt (blowUpOf P u ⊔ Ideal.span {liftForm x}) Wt).toNat ≠ 0 :=
-      fun h0 => (ENat.toNat_eq_zero.mp h0).elim hnz hne
+    have htn : (multAt (blowUpOf P u ⊔ Ideal.span {liftForm x}) Wt).toNat ≠ 0 := fun h0 =>
+      (ENat.toNat_eq_zero.mp h0).elim hnz hne
     exact_mod_cast htn
   · ext s
     rw [Ideal.mem_comap]

@@ -11,7 +11,9 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel.OtherVar
 
@@ -113,18 +115,26 @@ lemma meanP_support (l : ℕ) {i k : Fin r} (h : k ≠ i) {v : (Fin r → ℕ) �
   unfold meanP
   rw [Finset.sum_eq_zero fun t _ => partialSum_support h hs _ (by rwa [Function.update_of_ne h]), zero_div]
 
-theorem good_support_other (r l : ℕ) (i k : Fin r) (v : (Fin r → ℕ) → ℚ) (h : k ≠ i) :
-    (GoodAt l k v → GoodAt l k (Aop l i v) ∧ GoodAt l k (Bop l i v)) ∧
-    ((∀ m, m k ≠ 0 → v m = 0) → (∀ m, m k ≠ 0 → Aop l i v m = 0) ∧ (∀ m, m k ≠ 0 → Bop l i v m = 0)) := by
-  refine ⟨fun hg => ⟨⟨Aop_period h hg.1, Aop_zero h hg.2⟩, ⟨Bop_period h hg.1, Bop_zero h hg.2⟩⟩, fun hs => ⟨fun m hm => ?_, fun m hm => ?_⟩⟩
+theorem good_support_other (r l : ℕ) (i k : Fin r) (v : (Fin r → ℕ) → ℚ) (h : k ≠ i)
+    : (GoodAt l k v → GoodAt l k (Aop l i v) ∧ GoodAt l k (Bop l i v))
+      ∧ ((∀ m, m k ≠ 0 → v m = 0)
+        → (∀ m, m k ≠ 0 → Aop l i v m = 0) ∧ (∀ m, m k ≠ 0 → Bop l i v m = 0)) := by
+  refine ⟨
+    fun hg => ⟨⟨Aop_period h hg.1, Aop_zero h hg.2⟩, ⟨Bop_period h hg.1, Bop_zero h hg.2⟩⟩,
+    fun hs => ⟨fun m hm => ?_, fun m hm => ?_⟩
+  ⟩
   · unfold Aop
-    rw [partialSum_support h hs _ (by simpa [Pi.single_eq_of_ne h] using hm), meanP_support l h hs m hm, sub_zero]
+    rw [partialSum_support h hs _ (by simpa [Pi.single_eq_of_ne h] using hm),
+      meanP_support l h hs m hm, sub_zero]
   · unfold Bop
     rw [meanP_support l h hs m hm, ite_self]
 
-theorem otherVar_main : ∀ (r l : ℕ) (i k : Fin r) (v : (Fin r → ℕ) → ℚ), k ≠ i →
-    (GoodAt l k v → GoodAt l k (Aop l i v) ∧ GoodAt l k (Bop l i v)) ∧
-    ((∀ m, m k ≠ 0 → v m = 0) → (∀ m, m k ≠ 0 → Aop l i v m = 0) ∧ (∀ m, m k ≠ 0 → Bop l i v m = 0)) :=
+theorem otherVar_main
+    : ∀ (r l : ℕ) (i k : Fin r) (v : (Fin r → ℕ) → ℚ),
+      k ≠ i
+        → (GoodAt l k v → GoodAt l k (Aop l i v) ∧ GoodAt l k (Bop l i v))
+          ∧ ((∀ m, m k ≠ 0 → v m = 0)
+            → (∀ m, m k ≠ 0 → Aop l i v m = 0) ∧ (∀ m, m k ≠ 0 → Bop l i v m = 0)) :=
   fun r l i k v h => good_support_other r l i k v h
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel.OtherVar

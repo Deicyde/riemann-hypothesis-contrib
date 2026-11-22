@@ -13,35 +13,43 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TateIsoDiffer
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
 section
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D D' : Datum H} {k : Type} [Field k]
-  {Q : Type} [Group Q] {act : 𝓞 E → Q → Q} {e : ℕ → Q → Q → kˣ → Prop}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D D' : Datum H} {k : Type} [Field k]
+  {Q : Type} [Group Q]
+  {act : 𝓞 E → Q → Q} {e : ℕ → Q → Q → kˣ → Prop}
 
-theorem tateIso_ev_eq_iff_add (I : TateIso D k Q act e) {n : ℕ} (hn : 0 < n) (a b : D.La) :
-    I.ev n a = I.ev n b ↔ ∃ c, a = b + n • c := by
+theorem tateIso_ev_eq_iff_add (I : TateIso D k Q act e) {n : ℕ} (hn : 0 < n) (a b : D.La)
+    : I.ev n a = I.ev n b ↔ ∃ c, a = b + n • c := by
   rw [tateIso_ev_eq_iff I hn]
   exact exists_congr fun c => sub_eq_iff_eq_add'
 
-theorem tateIso_exists_lift_of_two_data (I : TateIso D k Q act e) (I' : TateIso D' k Q act e) {n : ℕ} (hn : 0 < n) :
-    ∃ f : D.La →ₗ[𝓞 E] D'.La, ∀ a, I.ev n a = I'.ev n (f a) := by
-  let R : Submodule (𝓞 E) (D.La × D'.La) :=
-    { carrier := {p | I.ev n p.1 = I'.ev n p.2}
-      add_mem' := fun {p q} hp hq => by
-        change I.ev n (p.1 + q.1) = I'.ev n (p.2 + q.2)
-        rw [I.add, I'.add, show I.ev n p.1 = I'.ev n p.2 from hp, show I.ev n q.1 = I'.ev n q.2 from hq]
-      zero_mem' := by
-        change I.ev n 0 = I'.ev n 0
-        rw [(I.ker n hn 0).2 ⟨0, by simp⟩, (I'.ker n hn 0).2 ⟨0, by simp⟩]
-      smul_mem' := fun c p hp => by
-        change I.ev n (c • p.1) = I'.ev n (c • p.2)
-        rw [I.lin, I'.lin, show I.ev n p.1 = I'.ev n p.2 from hp] }
+theorem tateIso_exists_lift_of_two_data
+    (I : TateIso D k Q act e) (I' : TateIso D' k Q act e) {n : ℕ} (hn : 0 < n)
+    : ∃ f : D.La →ₗ[𝓞 E] D'.La, ∀ a, I.ev n a = I'.ev n (f a) := by
+  let R : Submodule (𝓞 E) (D.La × D'.La) := {
+    carrier := {p | I.ev n p.1 = I'.ev n p.2}
+    add_mem' := fun {p q} hp hq => by
+      change I.ev n (p.1 + q.1) = I'.ev n (p.2 + q.2)
+      rw [I.add, I'.add, show I.ev n p.1 = I'.ev n p.2 from hp,
+        show I.ev n q.1 = I'.ev n q.2 from hq]
+    zero_mem' := by
+      change I.ev n 0 = I'.ev n 0
+      rw [(I.ker n hn 0).2 ⟨0, by simp⟩, (I'.ker n hn 0).2 ⟨0, by simp⟩]
+    smul_mem' := fun c p hp => by
+      change I.ev n (c • p.1) = I'.ev n (c • p.2)
+      rw [I.lin, I'.lin, show I.ev n p.1 = I'.ev n p.2 from hp]
+  }
   have hs : Function.Surjective ((LinearMap.fst (𝓞 E) D.La D'.La).comp R.subtype) := fun a => by
     obtain ⟨b, hb⟩ := (I'.onto n hn _).1 (tateIso_ev_pow I hn a)
     exact ⟨⟨(a, b), hb.symm⟩, rfl⟩
@@ -54,14 +62,16 @@ theorem tateIso_exists_lift_of_two_data (I : TateIso D k Q act e) (I' : TateIso 
   exact h2
 
 theorem tateIso_similar_of_two_data
-    (he : ∀ n x y c c', e n x y c → e n x y c' → c = c') (I : TateIso D k Q act e) (I' : TateIso D' k Q act e) :
-    ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ),
-      (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e) ∧
-      (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧
-      (∀ n : ℕ, 0 < n → IsCoprime (ν n) (n : ℤ)) ∧
-      (∀ n m : ℕ, 0 < n → 0 < m → (n : ℤ) ∣ ν (n * m) - ν n) ∧
-      (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧
-      ∀ n : ℕ, 0 < n → ∀ a, I.ev n a = I'.ev n (f n a) := by
+    (he : ∀ n x y c c', e n x y c → e n x y c' → c = c') (I : TateIso D k Q act e)
+    (I' : TateIso D' k Q act e)
+    : ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ),
+      (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e)
+        ∧ (∀ n : ℕ,
+          0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e)
+        ∧ (∀ n : ℕ, 0 < n → IsCoprime (ν n) (n : ℤ))
+        ∧ (∀ n m : ℕ, 0 < n → 0 < m → (n : ℤ) ∣ ν (n * m) - ν n)
+        ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a')
+        ∧ ∀ n : ℕ, 0 < n → ∀ a, I.ev n a = I'.ev n (f n a) := by
   have h1 : ∀ n : ℕ, ∃ f : D.La →ₗ[𝓞 E] D'.La, 0 < n → ∀ a, I.ev n a = I'.ev n (f a) := by
     intro n
     rcases Nat.eq_zero_or_pos n with h | h
@@ -73,15 +83,16 @@ theorem tateIso_similar_of_two_data
     rcases Nat.eq_zero_or_pos n with h | hn
     · exact ⟨1, fun h' => absurd h h'.ne'⟩
     · haveI : NeZero n := ⟨hn.ne'⟩
-      obtain ⟨i, -, hi⟩ := (I'.ζ_prim n hn).eq_pow_of_mem_rootsOfUnity
-        ((mem_rootsOfUnity _ _).2 (I.ζ_prim n hn).pow_eq_one)
+      obtain ⟨i, -, hi⟩ :=
+        (I'.ζ_prim n hn).eq_pow_of_mem_rootsOfUnity
+          ((mem_rootsOfUnity _ _).2 (I.ζ_prim n hn).pow_eq_one)
       exact ⟨i, fun _ => hi.symm⟩
   choose f hf using h1
   choose ν hν using h2
   refine ⟨f, fun n => ν n, ?_, ?_, ?_, ?_, ?_, hf⟩
   · intro n m hn hm a
-    rw [← tateIso_ev_eq_iff_add I' hn, ← hf n hn, ← I'.tower n m hn hm, ← hf (n * m) (Nat.mul_pos hn hm),
-      I.tower n m hn hm]
+    rw [← tateIso_ev_eq_iff_add I' hn, ← hf n hn, ← I'.tower n m hn hm,
+      ← hf (n * m) (Nat.mul_pos hn hm), I.tower n m hn hm]
   · intro n hn
     refine ⟨fun a => ?_, fun a' => ?_⟩
     · rw [← I'.ker n hn, ← I.ker n hn, hf n hn]
@@ -94,9 +105,10 @@ theorem tateIso_similar_of_two_data
     exact Nat.isCoprime_iff_coprime.2 (((I'.ζ_prim n hn).pow_iff_coprime hn _).1 h)
   · intro n m hn hm
     have h : I'.ζ n ^ ν (n * m) = I'.ζ n ^ ν n := by
-      rw [← hν n hn, ← I.ζ_pow n m hn hm, hν (n * m) (Nat.mul_pos hn hm), ← I'.ζ_pow n m hn hm, ← pow_mul,
-        ← pow_mul, mul_comm m]
-    rw [← (I'.ζ_prim n hn).zpow_eq_one_iff_dvd, zpow_sub, zpow_natCast, zpow_natCast, h, mul_inv_cancel]
+      rw [← hν n hn, ← I.ζ_pow n m hn hm, hν (n * m) (Nat.mul_pos hn hm), ← I'.ζ_pow n m hn hm,
+        ← pow_mul, ← pow_mul, mul_comm m]
+    rw [← (I'.ζ_prim n hn).zpow_eq_one_iff_dvd, zpow_sub, zpow_natCast, zpow_natCast, h,
+      mul_inv_cancel]
   · intro n hn a b
     have e1 := I'.isom n hn (f n a) (f n b)
     have e2 := I.isom n hn a b
@@ -110,17 +122,18 @@ end
 noncomputable def expNegUnit (n : ℕ) : ℂˣ :=
   (Units.mk0 (Complex.exp (2 * Real.pi * Complex.I / n)) (Complex.exp_ne_zero _))⁻¹
 
-theorem expNegUnit_zpow_val (n : ℕ) (j : ℤ) :
-    ((expNegUnit n ^ j : ℂˣ) : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (j : ℂ) / n) := by
-  rw [Units.val_zpow_eq_zpow_val, expNegUnit, Units.val_inv_eq_inv_val, Units.val_mk0, ← Complex.exp_neg,
-    ← Complex.exp_int_mul]
+theorem expNegUnit_zpow_val (n : ℕ) (j : ℤ)
+    : ((expNegUnit n ^ j : ℂˣ) : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (j : ℂ) / n) := by
+  rw [Units.val_zpow_eq_zpow_val, expNegUnit, Units.val_inv_eq_inv_val, Units.val_mk0,
+    ← Complex.exp_neg, ← Complex.exp_int_mul]
   congr 1
   ring
 
 theorem expNegUnit_isPrimitiveRoot {n : ℕ} (hn : 0 < n) : IsPrimitiveRoot (expNegUnit n) n :=
   (IsPrimitiveRoot.coe_units_iff.1 (Complex.isPrimitiveRoot_exp n hn.ne')).inv
 
-theorem expNegUnit_mul_pow {n m : ℕ} (hn : 0 < n) (hm : 0 < m) : expNegUnit (n * m) ^ m = expNegUnit n := by
+theorem expNegUnit_mul_pow {n m : ℕ} (hn : 0 < n) (hm : 0 < m)
+    : expNegUnit (n * m) ^ m = expNegUnit n := by
   have hn' : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hn.ne'
   have hm' : (m : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hm.ne'
   apply Units.ext
@@ -131,20 +144,23 @@ theorem expNegUnit_mul_pow {n m : ℕ} (hn : 0 < n) (hm : 0 < m) : expNegUnit (n
 
 section
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {σ : KA l →+* ℂ} {g : ℕ} {ty : Fin g → (E →+* ℂ)} (U : FamilyUnif Xo σ ty) {i : Fin U.n}
-  {P : (U.Di i).La →+ (Fin g → ℂ)}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {σ : KA l →+* ℂ} {g : ℕ}
+  {ty : Fin g → (E →+* ℂ)} (U : FamilyUnif Xo σ ty)
+  {i : Fin U.n} {P : (U.Di i).La →+ (Fin g → ℂ)}
 
-theorem familyUnif_ex_nsmul (hP : IsPeriod (U.Di i) ty P) (n : ℕ) (z : Fin g → ℂ) :
-    U.ex i P ((n : ℂ) • z) = U.ex i P z ^ n := by
+theorem familyUnif_ex_nsmul (hP : IsPeriod (U.Di i) ty P) (n : ℕ) (z : Fin g → ℂ)
+    : U.ex i P ((n : ℂ) • z) = U.ex i P z ^ n := by
   induction n with
   | zero =>
     rw [Nat.cast_zero, zero_smul, pow_zero]
     exact (U.ex_ker i P hP 0).2 (zero_mem _)
   | succ n ih => rw [Nat.cast_succ, add_smul, one_smul, U.ex_add i P hP, ih, pow_succ]
 
-noncomputable def familyUnifTateIso (hP : IsPeriod (U.Di i) ty P) :
-    TateIso (U.Di i) ℂ (Over.mk (U.u i P) ⟶ Xo.univ.t.G) (fun a x => x ≫ Xo.univ.t.act.act a)
+noncomputable def familyUnifTateIso (hP : IsPeriod (U.Di i) ty P)
+    : TateIso (U.Di i) ℂ (Over.mk (U.u i P) ⟶ Xo.univ.t.G)
+      (fun a x => x ≫ Xo.univ.t.act.act a)
       (fun n x x' c => Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L n x x' (unitOn c)) where
   ζ := expNegUnit
   ζ_prim _ hn := expNegUnit_isPrimitiveRoot hn
@@ -184,11 +200,28 @@ noncomputable def familyUnifTateIso (hP : IsPeriod (U.Di i) ty P) :
 
 end
 
-theorem familyUnif_lattice_similar : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (U : FamilyUnif Xo σ ty) (i : Fin U.n) (P : (U.Di i).La →+ (Fin g → ℂ)), IsPeriod (U.Di i) ty P → ∃ (f : ℕ → D.La →ₗ[𝓞 E] (U.Di i).La) (ν : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → IsCoprime (ν n) (n : ℤ)) ∧ (∀ n m : ℕ, 0 < n → 0 < m → (n : ℤ) ∣ ν (n * m) - ν n) ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ (U.Di i).EF (f n a) (f n a') - ν n * D.EF a a') ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), ∃ e, f l.M a = U.t i a + l.M • e) ∧ ∀ a, ∃ e, f l.A a = U.t i a + l.A • e := by
+theorem familyUnif_lattice_similar
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (U : FamilyUnif Xo σ ty)
+        (i : Fin U.n) (P : (U.Di i).La →+ (Fin g → ℂ)),
+      IsPeriod (U.Di i) ty P
+        → ∃ (f : ℕ → D.La →ₗ[𝓞 E] (U.Di i).La) (ν : ℕ → ℤ),
+          (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e)
+            ∧ (∀ n : ℕ,
+              0 < n
+                → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e)
+            ∧ (∀ n : ℕ, 0 < n → IsCoprime (ν n) (n : ℤ))
+            ∧ (∀ n m : ℕ, 0 < n → 0 < m → (n : ℤ) ∣ ν (n * m) - ν n)
+            ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ (U.Di i).EF (f n a) (f n a') - ν n * D.EF a a')
+            ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), ∃ e,
+              f l.M a = U.t i a + l.M • e)
+            ∧ ∀ a, ∃ e, f l.A a = U.t i a + l.A • e := by
   intro E _ _ _ H D l Xo σ g ty U i P hP
   obtain ⟨-, I, -, hA, hM⟩ := Xo.univ.geom ℂ (U.u i P) σ (U.over_σ i P hP)
-  obtain ⟨f, ν, h1, h2, h3, h4, h5, h6⟩ := tateIso_similar_of_two_data
-    (fun n x y c c' => weilIs_unique_fieldPoint _ _ _ Xo.univ.t.PP.isLB ℂ _ n x y c c') I (familyUnifTateIso U hP)
+  obtain ⟨f, ν, h1, h2, h3, h4, h5, h6⟩ :=
+    tateIso_similar_of_two_data
+      (fun n x y c c' => weilIs_unique_fieldPoint _ _ _ Xo.univ.t.PP.isLB ℂ _ n x y c c')
+      I (familyUnifTateIso U hP)
   have hM0 : 0 < l.M := lt_of_lt_of_le (by norm_num) l.three_le
   refine ⟨f, ν, h1, h2, h3, h4, h5, fun a ha => ?_, fun a => ?_⟩
   · rw [← tateIso_ev_eq_iff_add (familyUnifTateIso U hP) hM0, ← h6 _ hM0, ← hM a ha]

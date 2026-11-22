@@ -13,8 +13,10 @@ open NumberField GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSp
 
 namespace PositivityTheory.RSHS.L1
 
-theorem cuspDiscrete (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (N : ℕ) (hN : 1 ≤ N) :
-    PositivityTheory.RSHS.CuspDiscrete E N := by
+theorem cuspDiscrete
+    (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    (N : ℕ) (hN : 1 ≤ N)
+    : PositivityTheory.RSHS.CuspDiscrete E N := by
   intro π hu hn
   refine ⟨fun φ hφ => (π.cusp φ hφ).1, fun φ hφ => ?_, π.stable, π.ne_bot, π.irred⟩
   obtain ⟨C, hC⟩ := GlobalTheory.CompanionTheory.CuspFinGL.cuspFormsBoundedGL.of_isUnitary hu hφ

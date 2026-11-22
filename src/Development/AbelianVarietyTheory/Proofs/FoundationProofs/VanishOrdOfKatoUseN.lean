@@ -9,7 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2.VanishNarrow
@@ -17,7 +19,6 @@ namespace GlobalTheory.Ord2.VanishNarrow
 open Polynomial
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {l : ℕ} [Fact l.Prime]
-
 
 omit [Fact l.Prime] in
 theorem valuation_lt_one {A : ValuationSubring Ω} (h : OverL l A) : A.valuation (l : Ω) < 1 := by

@@ -5,15 +5,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory
+  UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
 
-private theorem mem_Cc_mul_right {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    {f : G → ℂ} (hf : f ∈ Cc G) (u : G) : (fun x => f (x * u)) ∈ Cc G := by
+private theorem mem_Cc_mul_right
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {f : G → ℂ} (hf : f ∈ Cc G)
+    (u : G)
+    : (fun x => f (x * u)) ∈ Cc G := by
   rw [GroundTheory.Automorphic.mem_locallyConstantCompactSupport] at hf ⊢
   refine ⟨hf.1.comp_continuous (continuous_mul_const u), ?_⟩
   exact hf.2.comp_homeomorph (Homeomorph.mulRight u)
 
-@[reducible] private def act {G : Type} [Group G] (B N : Subgroup G) : MulAction (B × N) G where
+@[reducible]
+private def act {G : Type} [Group G] (B N : Subgroup G) : MulAction (B × N) G where
   smul h g := (h.1 : G) * g * (h.2 : G)⁻¹
   one_smul g := by
     show ((1 : B × N).1 : G) * g * ((1 : B × N).2 : G)⁻¹ = g
@@ -24,8 +29,8 @@ private theorem mem_Cc_mul_right {G : Type} [Group G] [TopologicalSpace G] [IsTo
     simp only [Prod.fst_mul, Prod.snd_mul, Subgroup.coe_mul, _root_.mul_inv_rev]
     group
 
-private theorem orbit_act {G : Type} [Group G] (B N : Subgroup G) (w : G) :
-    letI := act B N; orbit (B × N) w = cell B N w := by
+private theorem orbit_act {G : Type} [Group G] (B N : Subgroup G) (w : G)
+    : letI := act B N; orbit (B × N) w = cell B N w := by
   letI := act B N
   show orbit (B × N) w = cell B N w
   ext g
@@ -37,8 +42,7 @@ private theorem orbit_act {G : Type} [Group G] (B N : Subgroup G) (w : G) :
     show b * w * (((⟨u, hu⟩⁻¹ : N) : G))⁻¹ = b * w * u
     simp
 
-theorem UpperTheory.Gal.LocD.biInv :
-    DistInv → BiInv := by
+theorem UpperTheory.Gal.LocD.biInv : DistInv → BiInv := by
   intro hD G _ _ _ _ _ _ _ B N hB hN s p hp hs hsp hsB hsN hC η θ hη hθ hηs hθs D hDB hDN f hf
   obtain ⟨L, hLo, hL⟩ := hη
   obtain ⟨k, w, hw1, hw2, hw3⟩ := hC
@@ -67,7 +71,8 @@ theorem UpperTheory.Gal.LocD.biInv :
       intro h
       simp only [Function.iterate_succ_apply']
       exact ⟨by rw [← (ih h).1]; rfl, by rw [← (ih h).2]; rfl⟩
-  let χ : B × N →* ℂ := (η.comp (MonoidHom.fst B N)) * ((Units.coeHom ℂ).comp (θ.comp (MonoidHom.snd B N)))
+  let χ : B × N →* ℂ :=
+    (η.comp (MonoidHom.fst B N)) * ((Units.coeHom ℂ).comp (θ.comp (MonoidHom.snd B N)))
   have hχ : ∀ h : B × N, χ h = η h.1 * (θ h.2 : ℂ) := fun h => rfl
   refine hD G (B × N) s τ p hp hs hτc hsp ?_ ?_ χ ?_ ?_ k w hw1 ?_ ?_ D ?_ f hf
   · intro h
@@ -91,7 +96,9 @@ theorem UpperTheory.Gal.LocD.biInv :
     simpa only [orbit_act] using hw3 j
   · intro h g hg
     have hg' : (fun x => g (x * (h.2 : G))) ∈ Cc G := mem_Cc_mul_right hg _
-    have e : GroundTheory.Automorphic.Whittaker.transl h g = fun x => (fun y => g (y * (h.2 : G))) ((h.1 : G)⁻¹ * x) := by
+    have e
+        : GroundTheory.Automorphic.Whittaker.transl h g
+          = fun x => (fun y => g (y * (h.2 : G))) ((h.1 : G)⁻¹ * x) := by
       funext x
       show g (((h⁻¹).1 : G) * x * ((h⁻¹).2 : G)⁻¹) = g ((h.1 : G)⁻¹ * x * h.2)
       simp

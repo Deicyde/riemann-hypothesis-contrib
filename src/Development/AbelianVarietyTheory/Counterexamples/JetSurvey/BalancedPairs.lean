@@ -13,15 +13,19 @@ open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem emb_bar (H : Host E) (τ : E →+* ℂ) (a : 𝓞 E) :
-    τ ((H.bar a : 𝓞 E) : E) = ComplexEmbedding.conjugate τ (a : E) := by
+theorem emb_bar (H : Host E) (τ : E →+* ℂ) (a : 𝓞 E)
+    : τ ((H.bar a : 𝓞 E) : E) = ComplexEmbedding.conjugate τ (a : E) := by
   rw [H.bar_eq, IsCMField.complexEmbedding_complexConj]
   rfl
 
-theorem balanced_pairs (H : Host E) {l : Level H} (c : Coeff l) {S : Type} [CommRing S] [Algebra c.F S]
+theorem balanced_pairs
+    (H : Host E)
+    {l : Level H} (c : Coeff l)
+    {S : Type} [CommRing S] [Algebra c.F S]
     (τ τ' : E →+* ℂ) (v : S)
     (hv : ∀ a : 𝓞 E, algebraMap c.F S (embK c τ a) * v = algebraMap c.F S (embK c τ' (H.bar a)) * v)
-    (hne : τ ≠ ComplexEmbedding.conjugate τ') : v = 0 := by
+    (hne : τ ≠ ComplexEmbedding.conjugate τ')
+    : v = 0 := by
   have : ∃ a : 𝓞 E, embK c τ a ≠ embK c τ' (H.bar a) := by
     by_contra hcon
     push_neg at hcon

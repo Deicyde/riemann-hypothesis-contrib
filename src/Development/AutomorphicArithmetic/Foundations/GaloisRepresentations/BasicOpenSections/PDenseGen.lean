@@ -11,14 +11,17 @@ open UpperTheory.Gal.crystallineComparison (resPt twist PtId fn)
 open GlobalTheory.SS.FrobField (absFrob)
 open UpperTheory.Gal UpperTheory.Gal.Mod
 
-private theorem mem_basicOpen_fn {O : Type} [CommRing O] {Y : Scheme.{0}} (g : Y ⟶ Spec (CommRingCat.of O)) (a : O) (y : Y) :
-    y ∈ Y.basicOpen (fn g a) ↔ g y ∈ PrimeSpectrum.basicOpen a := by
+private theorem mem_basicOpen_fn
+    {O : Type} [CommRing O] {Y : Scheme.{0}} (g : Y ⟶ Spec (CommRingCat.of O)) (a : O) (y : Y)
+    : y ∈ Y.basicOpen (fn g a) ↔ g y ∈ PrimeSpectrum.basicOpen a := by
   rw [fn, ← Scheme.preimage_basicOpen_top, basicOpen_eq_of_affine]
   rfl
 
-private theorem exists_min {S : Scheme.{0}} (x : S) : ∃ x' : S, x' ⤳ x ∧ ∀ t : S, t ⤳ x' → t = x' := by
-  obtain ⟨Z, hZ, hxZ⟩ := exists_mem_irreducibleComponents_subset_of_isIrreducible _
-    (isIrreducible_singleton (x := x)).closure
+private theorem exists_min {S : Scheme.{0}} (x : S)
+    : ∃ x' : S, x' ⤳ x ∧ ∀ t : S, t ⤳ x' → t = x' := by
+  obtain ⟨Z, hZ, hxZ⟩ :=
+    exists_mem_irreducibleComponents_subset_of_isIrreducible _
+      (isIrreducible_singleton (x := x)).closure
   have hZc : IsClosed Z := isClosed_of_mem_irreducibleComponents Z hZ
   have hZi : IsIrreducible Z := hZ.1
   set η := hZi.genericPoint with hη
@@ -37,10 +40,14 @@ private theorem exists_min {S : Scheme.{0}} (x : S) : ∃ x' : S, x' ⤳ x ∧ �
       exact subset_closure rfl
     exact (ht.antisymm h3).eq
 
-private theorem dense_generic_points {O A k : Type} [CommRing O] [Field A] [Field k] (q : O →+* A) (hq : Function.Surjective q)
-    (β₀ : A →+* k) (ϖ : O) (hϖ : RingHom.ker q = Ideal.span {ϖ}) (Y S : Scheme.{0}) (g : Y ⟶ Spec (CommRingCat.of O))
-    (s : S ⟶ Y) (bS : S ⟶ gp k) (hpb : IsPullback s bS g (sp (β₀.comp q))) :
-    Dense {x : S | crystallineComparison.GenPt (fn g ϖ) (s x)} := by
+private theorem dense_generic_points
+    {O A k : Type} [CommRing O] [Field A] [Field k]
+    (q : O →+* A) (hq : Function.Surjective q)
+    (β₀ : A →+* k)
+    (ϖ : O) (hϖ : RingHom.ker q = Ideal.span {ϖ})
+    (Y S : Scheme.{0}) (g : Y ⟶ Spec (CommRingCat.of O)) (s : S ⟶ Y) (bS : S ⟶ gp k)
+    (hpb : IsPullback s bS g (sp (β₀.comp q)))
+    : Dense {x : S | crystallineComparison.GenPt (fn g ϖ) (s x)} := by
   classical
   have hcomp : Mod.sp (β₀.comp q) = Mod.sp β₀ ≫ Mod.sp q := by
     simp only [Mod.sp, CommRingCat.ofHom_comp, Spec.map_comp]
@@ -65,13 +72,13 @@ private theorem dense_generic_points {O A k : Type} [CommRing O] [Field A] [Fiel
   have memV : ∀ y : Y, y ∉ Y.basicOpen (fn g ϖ) ↔ ϖ ∈ (g y).asIdeal := by
     intro y
     rw [mem_basicOpen_fn]
-    change ¬ (ϖ ∉ (g y).asIdeal) ↔ _
+    change ¬(ϖ ∉ (g y).asIdeal) ↔ _
     exact not_not
   have hϖker : ϖ ∈ RingHom.ker q := by
     rw [hϖ]
     exact Ideal.mem_span_singleton_self ϖ
-  have hV_of : ∀ p : ↥(pullback g (Mod.sp q)),
-      pullback.fst g (Mod.sp q) p ∉ Y.basicOpen (fn g ϖ) := by
+  have hV_of
+      : ∀ p : ↥(pullback g (Mod.sp q)), pullback.fst g (Mod.sp q) p ∉ Y.basicOpen (fn g ϖ) := by
     intro p
     rw [memV]
     have h1 : g (pullback.fst g (Mod.sp q) p) = Mod.sp q (pullback.snd g (Mod.sp q) p) := by
@@ -92,8 +99,7 @@ private theorem dense_generic_points {O A k : Type} [CommRing O] [Field A] [Fiel
   rintro U hU ⟨x, hx⟩
   obtain ⟨x', hx'x, hmin⟩ := exists_min x
   refine ⟨x', hx'x.mem_open hU hx, ?_⟩
-  have hsx : s x' = pullback.fst g (Mod.sp q) (φ x') := by
-    rw [← Scheme.Hom.comp_apply, hφi]
+  have hsx : s x' = pullback.fst g (Mod.sp q) (φ x') := by rw [← Scheme.Hom.comp_apply, hφi]
   refine ⟨hsx ▸ hV_of _, ?_⟩
   intro y' hy' hspec
   obtain ⟨p', rfl⟩ := hV_to y' hy'
@@ -103,15 +109,22 @@ private theorem dense_generic_points {O A k : Type} [CommRing O] [Field A] [Fiel
   rw [hmin x'' hx''] at hφx''
   rw [hφx'']
 
-theorem UpperTheory.Gal.Mod.denseGen :
-    DenseGen := by
+theorem UpperTheory.Gal.Mod.denseGen : DenseGen := by
   intro O _ _ _ ϖ hϖ k _ β hβ Y S g s bS hpb
-  obtain ⟨A, _, q, hq, β₀, hker, hβeq⟩ : ∃ (A : Type) (_ : Field A) (q : O →+* A),
-      Function.Surjective q ∧ ∃ β₀ : A →+* k, RingHom.ker q = Ideal.span {ϖ} ∧ β₀.comp q = β := by
+  obtain ⟨A, _, q, hq, β₀, hker, hβeq⟩
+      : ∃ (A : Type) (_ : Field A) (q : O →+* A),
+        Function.Surjective q ∧ ∃ β₀ : A →+* k, RingHom.ker q = Ideal.span {ϖ} ∧ β₀.comp q = β := by
     haveI hmax : (Ideal.span {ϖ}).IsMaximal := PrincipalIdealRing.isMaximal_of_irreducible hϖ
-    refine ⟨O ⧸ Ideal.span {ϖ}, Ideal.Quotient.field _, Ideal.Quotient.mk _,
-      Ideal.Quotient.mk_surjective, Ideal.Quotient.lift _ β (fun a ha => by
+    refine ⟨
+      O ⧸ Ideal.span {ϖ},
+      Ideal.Quotient.field _,
+      Ideal.Quotient.mk _,
+      Ideal.Quotient.mk_surjective,
+      Ideal.Quotient.lift _ β (fun a ha => by
         obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp ha
-        simp [hβ]), Ideal.mk_ker, Ideal.Quotient.lift_comp_mk _ _ _⟩
+        simp [hβ]),
+      Ideal.mk_ker,
+      Ideal.Quotient.lift_comp_mk _ _ _
+    ⟩
   subst hβeq
   exact dense_generic_points q hq β₀ ϖ hker Y S g s bS hpb

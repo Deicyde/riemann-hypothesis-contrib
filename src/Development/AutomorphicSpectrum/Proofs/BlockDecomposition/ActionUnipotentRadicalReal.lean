@@ -15,8 +15,10 @@ open Finset
 namespace GlobalTheory.CompanionTheory.PairBridge
 
 open CompanionTheory.D.LK (Pos key)
-open PositivityTheory.RgBcC.RealD (annL creL liftL xL bdL adLL adCL evLc evLv evKP kA pA inUU omU SuppL DegL IsPairA)
-open GlobalTheory.CompanionTheory.PairMult (annq creq liftq Tl Ts bdq adLq lFq c1 c2 ev2 evB SuppQ DegQ inUL inKU omQ topq PairRel IsSubL)
+open PositivityTheory.RgBcC.RealD
+  (annL creL liftL xL bdL adLL adCL evLc evLv evKP kA pA inUU omU SuppL DegL IsPairA)
+open GlobalTheory.CompanionTheory.PairMult
+  (annq creq liftq Tl Ts bdq adLq lFq c1 c2 ev2 evB SuppQ DegQ inUL inKU omQ topq PairRel IsSubL)
 
 variable {n : ℕ}
 
@@ -28,7 +30,8 @@ def fl : Lr n ≃ Lr n where
   left_inv l := by simp
   right_inv l := by simp
 
-@[simp] theorem fl_fl (l : Lr n) : fl (fl l) = l := by simp [fl]
+@[simp]
+theorem fl_fl (l : Lr n) : fl (fl l) = l := by simp [fl]
 
 def flS (A : Finset (Lr n)) : Finset (Lr n) := A.map fl.toEmbedding
 
@@ -37,7 +40,8 @@ theorem mem_flS {l : Lr n} {A : Finset (Lr n)} : l ∈ flS A ↔ fl l ∈ A := b
   rw [Finset.mem_map_equiv]
   rfl
 
-@[simp] theorem flS_flS (A : Finset (Lr n)) : flS (flS A) = A := by
+@[simp]
+theorem flS_flS (A : Finset (Lr n)) : flS (flS A) = A := by
   ext l
   simp [mem_flS]
 
@@ -59,17 +63,22 @@ theorem key_lt (i : Pos n) : key i < n * n := by
   unfold key
   nlinarith
 
-theorem key_iff (m l : Lr n) : PositivityTheory.RgBcC.RealD.keyL m < PositivityTheory.RgBcC.RealD.keyL l ↔
-    GlobalTheory.CompanionTheory.PairMult.keyL (fl m) < GlobalTheory.CompanionTheory.PairMult.keyL (fl l) := by
+theorem key_iff (m l : Lr n)
+    : PositivityTheory.RgBcC.RealD.keyL m < PositivityTheory.RgBcC.RealD.keyL l
+      ↔ GlobalTheory.CompanionTheory.PairMult.keyL (fl m)
+        < GlobalTheory.CompanionTheory.PairMult.keyL (fl l) := by
   obtain ⟨s, i⟩ := m
   obtain ⟨t, j⟩ := l
   have hi := key_lt i
   have hj := key_lt j
   have hn : n * n ≤ (n + 1) * (n + 1) := by nlinarith
-  cases s <;> cases t <;> simp [PositivityTheory.RgBcC.RealD.keyL, GlobalTheory.CompanionTheory.PairMult.keyL, fl] <;> omega
+  cases s <;> cases t
+    <;> simp [PositivityTheory.RgBcC.RealD.keyL, GlobalTheory.CompanionTheory.PairMult.keyL, fl]
+    <;> omega
 
-theorem sg_eq (l : Lr n) (A : Finset (Lr n)) :
-    PositivityTheory.RgBcC.RealD.sgL l (flS A) = GlobalTheory.CompanionTheory.PairMult.sgL (fl l) A := by
+theorem sg_eq (l : Lr n) (A : Finset (Lr n))
+    : PositivityTheory.RgBcC.RealD.sgL l (flS A)
+      = GlobalTheory.CompanionTheory.PairMult.sgL (fl l) A := by
   unfold PositivityTheory.RgBcC.RealD.sgL GlobalTheory.CompanionTheory.PairMult.sgL
   congr 1
   unfold flS
@@ -88,7 +97,8 @@ def Phi : (Finset (Lr n) → V) →ₗ[ℂ] (Finset (Lr n) → V) := LinearMap.f
 
 theorem Phi_apply (x : Finset (Lr n) → V) (A : Finset (Lr n)) : Phi x A = x (flS A) := rfl
 
-@[simp] theorem Phi_Phi (x : Finset (Lr n) → V) : Phi (Phi x) = x := by
+@[simp]
+theorem Phi_Phi (x : Finset (Lr n) → V) : Phi (Phi x) = x := by
   funext A
   simp [Phi_apply]
 
@@ -104,13 +114,16 @@ theorem Phi_cre (l : Lr n) (x : Finset (Lr n) → V) : Phi (creL l x) = creq (fl
     if fl l ∈ A then GlobalTheory.CompanionTheory.PairMult.sgL (fl l) A • x (flS (A.erase (fl l))) else 0
   simp only [mem_flS, sg_eq, flS_erase]
 
-theorem Phi_lift (T : V →ₗ[ℂ] V) (x : Finset (Lr n) → V) : Phi (liftL n T x) = liftq n T (Phi x) := rfl
+theorem Phi_lift (T : V →ₗ[ℂ] V) (x : Finset (Lr n) → V) : Phi (liftL n T x) = liftq n T (Phi x) :=
+  rfl
 
-theorem xL_eq (E1 E2 : Fin n → Fin n → Module.End ℂ V) (l : Lr n) : xL E1 E2 l = Tl E1 E2 (fl l) := by
+theorem xL_eq (E1 E2 : Fin n → Fin n → Module.End ℂ V) (l : Lr n)
+    : xL E1 E2 l = Tl E1 E2 (fl l) := by
   obtain ⟨s, i⟩ := l
   cases s <;> simp [xL, Tl, Ts, fl, kA, pA]
 
-def supS (V : Type) [AddCommGroup V] [Module ℂ V] (P : Lr n → Prop) : Submodule ℂ (Finset (Lr n) → V) where
+def supS (V : Type) [AddCommGroup V] [Module ℂ V] (P : Lr n → Prop)
+    : Submodule ℂ (Finset (Lr n) → V) where
   carrier := {x | SuppL P x}
   add_mem' := by
     intro x y hx hy A h l hl
@@ -127,8 +140,8 @@ def supS (V : Type) [AddCommGroup V] [Module ℂ V] (P : Lr n → Prop) : Submod
 
 theorem mem_supS {P : Lr n → Prop} {x : Finset (Lr n) → V} : x ∈ supS V P ↔ SuppL P x := Iff.rfl
 
-theorem ann_zero {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) {l : Lr n} (hl : ¬ P l) :
-    annL l x = 0 := by
+theorem ann_zero {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) {l : Lr n} (hl : ¬ P l)
+    : annL l x = 0 := by
   funext A
   show (if l ∈ A then 0 else PositivityTheory.RgBcC.RealD.sgL l A • x (insert l A)) = 0
   by_cases h : l ∈ A
@@ -136,7 +149,8 @@ theorem ann_zero {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) 
   · have : x (insert l A) = 0 := by_contra fun h0 => hl (hx _ h0 l (Finset.mem_insert_self l A))
     simp [h, this]
 
-theorem ann_supp {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) (l : Lr n) : SuppL P (annL l x) := by
+theorem ann_supp {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) (l : Lr n)
+    : SuppL P (annL l x) := by
   intro A hA m hm
   have h1 : (if l ∈ A then 0 else PositivityTheory.RgBcC.RealD.sgL l A • x (insert l A)) ≠ 0 := hA
   by_cases h : l ∈ A
@@ -145,8 +159,8 @@ theorem ann_supp {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) 
     have h2 : x (insert l A) ≠ 0 := fun h0 => h1 (by rw [h0, smul_zero])
     exact hx _ h2 m (Finset.mem_insert_of_mem hm)
 
-theorem cre_supp {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) {l : Lr n} (hl : P l) :
-    SuppL P (creL l x) := by
+theorem cre_supp {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) {l : Lr n} (hl : P l)
+    : SuppL P (creL l x) := by
   intro A hA m hm
   have h1 : (if l ∈ A then PositivityTheory.RgBcC.RealD.sgL l A • x (A.erase l) else 0) ≠ 0 := hA
   by_cases h : l ∈ A
@@ -158,11 +172,12 @@ theorem cre_supp {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) 
   · simp [h] at h1
 
 open Classical in
-theorem bdL_apply (S : Lr n → Prop) (E1 E2 : Fin n → Fin n → Module.End ℂ V) (x : Finset (Lr n) → V) :
-    bdL S E1 E2 x = (∑ l : Lr n, if S l then liftL n (xL E1 E2 l) (annL l x) else 0) +
-      ∑ l : Lr n, ∑ m : Lr n, ∑ k : Lr n,
-        if S l ∧ S m ∧ l.2.1.2 = m.2.1.1 ∧ k.1 = xor l.1 m.1 ∧ k.2.1.1 = l.2.1.1 ∧ k.2.1.2 = m.2.1.2 then
-          creL k (annL m (annL l x)) else 0 := by
+theorem bdL_apply (S : Lr n → Prop) (E1 E2 : Fin n → Fin n → Module.End ℂ V) (x : Finset (Lr n) → V)
+    : bdL S E1 E2 x
+      = (∑ l : Lr n, if S l then liftL n (xL E1 E2 l) (annL l x) else 0)
+        + ∑ l : Lr n, ∑ m : Lr n, ∑ k : Lr n,
+            if S l ∧ S m ∧ l.2.1.2 = m.2.1.1 ∧ k.1 = xor l.1 m.1 ∧ k.2.1.1 = l.2.1.1 ∧ k.2.1.2 = m.2.1.2 then
+              creL k (annL m (annL l x)) else 0 := by
   unfold bdL
   rw [LinearMap.add_apply, LinearMap.sum_apply, LinearMap.sum_apply]
   congr 1
@@ -175,61 +190,72 @@ theorem bdL_apply (S : Lr n → Prop) (E1 E2 : Fin n → Fin n → Module.End �
     refine Finset.sum_congr rfl fun k _ => ?_
     split_ifs <;> simp [Module.End.mul_apply]
 
-theorem bdq_apply (E1 E2 : Fin n → Fin n → Module.End ℂ V) (y : Finset (Lr n) → V) :
-    bdq E1 E2 y = (∑ l : Lr n, liftq n (Tl E1 E2 l) (annq l y)) +
-      ∑ s : Bool, ∑ t : Bool, ∑ i : Pos n, ∑ j : Pos n, ∑ k : Pos n,
-        if i.1.2 = j.1.1 ∧ k.1.1 = i.1.1 ∧ k.1.2 = j.1.2 then creq ((s == t), k) (annq (t, j) (annq (s, i) y)) else 0 := by
-  unfold bdq
-  rw [LinearMap.add_apply]
-  refine congrArg₂ (· + ·) ?_ ?_
-  · rw [LinearMap.sum_apply]
-    rfl
-  · rw [LinearMap.sum_apply]
-    refine Finset.sum_congr rfl fun s _ => ?_
-    rw [LinearMap.sum_apply]
-    refine Finset.sum_congr rfl fun t _ => ?_
-    rw [LinearMap.sum_apply]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    rw [LinearMap.sum_apply]
-    refine Finset.sum_congr rfl fun j _ => ?_
-    rw [LinearMap.sum_apply]
-    refine Finset.sum_congr rfl fun k _ => ?_
-    split_ifs
-    · rfl
-    · rfl
+theorem bdq_apply (E1 E2 : Fin n → Fin n → Module.End ℂ V) (y : Finset (Lr n) → V)
+    : bdq E1 E2 y
+      = (∑ l : Lr n, liftq n (Tl E1 E2 l) (annq l y))
+        + ∑ s : Bool, ∑ t : Bool, ∑ i : Pos n, ∑ j : Pos n, ∑ k : Pos n,
+            if i.1.2 = j.1.1 ∧ k.1.1 = i.1.1 ∧ k.1.2 = j.1.2 then creq ((s == t), k) (annq (t, j) (annq (s, i) y)) else 0 :=
+  by
+    unfold bdq
+    rw [LinearMap.add_apply]
+    refine congrArg₂ (· + ·) ?_ ?_
+    · rw [LinearMap.sum_apply]
+      rfl
+    · rw [LinearMap.sum_apply]
+      refine Finset.sum_congr rfl fun s _ => ?_
+      rw [LinearMap.sum_apply]
+      refine Finset.sum_congr rfl fun t _ => ?_
+      rw [LinearMap.sum_apply]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [LinearMap.sum_apply]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [LinearMap.sum_apply]
+      refine Finset.sum_congr rfl fun k _ => ?_
+      split_ifs
+      · rfl
+      · rfl
 
-theorem sum_letters {M : Type} [AddCommGroup M] (H : Lr n → Lr n → Lr n → M) :
-    (∑ l : Lr n, ∑ m : Lr n, ∑ k : Lr n,
-      if l.2.1.2 = m.2.1.1 ∧ k.1 = xor l.1 m.1 ∧ k.2.1.1 = l.2.1.1 ∧ k.2.1.2 = m.2.1.2 then H (fl l) (fl m) (fl k) else 0) =
-    ∑ s : Bool, ∑ t : Bool, ∑ i : Pos n, ∑ j : Pos n, ∑ k : Pos n,
-      if i.1.2 = j.1.1 ∧ k.1.1 = i.1.1 ∧ k.1.2 = j.1.2 then H (s, i) (t, j) ((s == t), k) else 0 := by
-  have e : ∀ l m : Lr n, (∑ k : Lr n,
-      if (fl l).2.1.2 = (fl m).2.1.1 ∧ k.1 = xor (fl l).1 (fl m).1 ∧ k.2.1.1 = (fl l).2.1.1 ∧ k.2.1.2 = (fl m).2.1.2 then
-        H (fl (fl l)) (fl (fl m)) (fl k) else 0) =
-      ∑ k : Pos n, if l.2.1.2 = m.2.1.1 ∧ k.1.1 = l.2.1.1 ∧ k.1.2 = m.2.1.2 then H l m ((l.1 == m.1), k) else 0 := by
-    intro l m
-    rw [← Equiv.sum_comp fl, Fintype.sum_prod_type, Fintype.sum_bool]
-    obtain ⟨s, i⟩ := l
-    obtain ⟨t, j⟩ := m
-    cases s <;> cases t <;> simp [fl]
+theorem sum_letters {M : Type} [AddCommGroup M] (H : Lr n → Lr n → Lr n → M)
+    : (∑ l : Lr n, ∑ m : Lr n, ∑ k : Lr n,
+        if l.2.1.2 = m.2.1.1 ∧ k.1 = xor l.1 m.1 ∧ k.2.1.1 = l.2.1.1 ∧ k.2.1.2 = m.2.1.2 then H (fl l) (fl m) (fl k) else 0)
+      = ∑ s : Bool, ∑ t : Bool, ∑ i : Pos n, ∑ j : Pos n, ∑ k : Pos n,
+          if i.1.2 = j.1.1 ∧ k.1.1 = i.1.1 ∧ k.1.2 = j.1.2 then H (s, i) (t, j) ((s == t), k) else 0 := by
+  have e
+      : ∀ l m : Lr n,
+        (∑ k : Lr n,
+          if (fl l).2.1.2 = (fl m).2.1.1 ∧ k.1 = xor (fl l).1 (fl m).1 ∧ k.2.1.1 = (fl l).2.1.1 ∧ k.2.1.2 = (fl m).2.1.2 then
+            H (fl (fl l)) (fl (fl m)) (fl k) else 0)
+          = ∑ k : Pos n, if l.2.1.2 = m.2.1.1 ∧ k.1.1 = l.2.1.1 ∧ k.1.2 = m.2.1.2 then H l m ((l.1 == m.1), k) else 0 :=
+    by
+      intro l m
+      rw [← Equiv.sum_comp fl, Fintype.sum_prod_type, Fintype.sum_bool]
+      obtain ⟨s, i⟩ := l
+      obtain ⟨t, j⟩ := m
+      cases s <;> cases t <;> simp [fl]
   rw [← Equiv.sum_comp fl]
-  have e2 : ∀ l : Lr n, (∑ m : Lr n, ∑ k : Lr n,
-      if (fl l).2.1.2 = m.2.1.1 ∧ k.1 = xor (fl l).1 m.1 ∧ k.2.1.1 = (fl l).2.1.1 ∧ k.2.1.2 = m.2.1.2 then
-        H (fl (fl l)) (fl m) (fl k) else 0) =
-      ∑ t : Bool, ∑ j : Pos n, ∑ k : Pos n,
-        if l.2.1.2 = j.1.1 ∧ k.1.1 = l.2.1.1 ∧ k.1.2 = j.1.2 then H l (t, j) ((l.1 == t), k) else 0 := by
-    intro l
-    rw [← Equiv.sum_comp fl]
-    refine (Finset.sum_congr rfl fun m _ => e l m).trans ?_
-    rw [Fintype.sum_prod_type]
+  have e2
+      : ∀ l : Lr n,
+        (∑ m : Lr n, ∑ k : Lr n,
+          if (fl l).2.1.2 = m.2.1.1 ∧ k.1 = xor (fl l).1 m.1 ∧ k.2.1.1 = (fl l).2.1.1 ∧ k.2.1.2 = m.2.1.2 then
+            H (fl (fl l)) (fl m) (fl k) else 0)
+          = ∑ t : Bool, ∑ j : Pos n, ∑ k : Pos n,
+              if l.2.1.2 = j.1.1 ∧ k.1.1 = l.2.1.1 ∧ k.1.2 = j.1.2 then H l (t, j) ((l.1 == t), k) else 0 :=
+    by
+      intro l
+      rw [← Equiv.sum_comp fl]
+      refine (Finset.sum_congr rfl fun m _ => e l m).trans ?_
+      rw [Fintype.sum_prod_type]
   refine (Finset.sum_congr rfl fun l _ => e2 l).trans ?_
   rw [Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun s _ => ?_
   exact Finset.sum_comm
 
 open Classical in
-theorem Phi_bd (S : Lr n → Prop) (E1 E2 : Fin n → Fin n → Module.End ℂ V) {x : Finset (Lr n) → V} (hx : SuppL S x) :
-    Phi (bdL S E1 E2 x) = bdq E1 E2 (Phi x) := by
+theorem Phi_bd
+    (S : Lr n → Prop)
+    (E1 E2 : Fin n → Fin n → Module.End ℂ V)
+    {x : Finset (Lr n) → V} (hx : SuppL S x)
+    : Phi (bdL S E1 E2 x) = bdq E1 E2 (Phi x) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [bdL_apply, bdq_apply, map_add (f := _), map_sum, map_sum]
   refine congrArg₂ (· + ·) ?_ ?_
@@ -246,7 +272,8 @@ theorem Phi_bd (S : Lr n → Prop) (E1 E2 : Fin n → Fin n → Module.End ℂ V
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
-    have hk : Phi (creL k (annL m (annL l x))) = creq (fl k) (annq (fl m) (annq (fl l) (Phi x))) := by
+    have hk
+        : Phi (creL k (annL m (annL l x))) = creq (fl k) (annq (fl m) (annq (fl l) (Phi x))) := by
       rw [Phi_cre, Phi_ann, Phi_ann]
     by_cases hR : l.2.1.2 = m.2.1.1 ∧ k.1 = xor l.1 m.1 ∧ k.2.1.1 = l.2.1.1 ∧ k.2.1.2 = m.2.1.2
     · rw [if_pos hR]
@@ -259,9 +286,10 @@ theorem Phi_bd (S : Lr n → Prop) (E1 E2 : Fin n → Fin n → Module.End ℂ V
         simp
     · rw [if_neg hR, if_neg (fun h => hR h.2.2), map_zero]
 
-theorem adLL_apply (lev : Fin n → ℕ) (s : Bool) (p q : Fin n) (x : Finset (Lr n) → V) :
-    adLL lev s p q x = ∑ l : Lr n, ∑ k : Lr n,
-      if inUU lev l then adCL s p q l k • creL k (annL l x) else 0 := by
+theorem adLL_apply (lev : Fin n → ℕ) (s : Bool) (p q : Fin n) (x : Finset (Lr n) → V)
+    : adLL lev s p q x
+      = ∑ l : Lr n, ∑ k : Lr n,
+        if inUU lev l then adCL s p q l k • creL k (annL l x) else 0 := by
   unfold adLL
   rw [LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun l _ => ?_
@@ -271,9 +299,10 @@ theorem adLL_apply (lev : Fin n → ℕ) (s : Bool) (p q : Fin n) (x : Finset (L
   · rfl
   · rfl
 
-theorem adLq_apply (s : Bool) (p q : Fin n) (y : Finset (Lr n) → V) :
-    adLq s p q y = ∑ t : Bool, ∑ i : Pos n, ∑ k : Pos n,
-      CompanionTheory.RgExh.U.adC p q i k • creq ((s == t), k) (annq (t, i) y) := by
+theorem adLq_apply (s : Bool) (p q : Fin n) (y : Finset (Lr n) → V)
+    : adLq s p q y
+      = ∑ t : Bool, ∑ i : Pos n, ∑ k : Pos n,
+        CompanionTheory.RgExh.U.adC p q i k • creq ((s == t), k) (annq (t, i) y) := by
   unfold adLq
   rw [LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun t _ => ?_
@@ -283,23 +312,29 @@ theorem adLq_apply (s : Bool) (p q : Fin n) (y : Finset (Lr n) → V) :
   refine Finset.sum_congr rfl fun k _ => ?_
   rfl
 
-theorem adC_eq (s t c : Bool) (p q : Fin n) (i k : Pos n) :
-    adCL s p q (fl (t, i)) (fl (c, k)) = if c = (!s == t) then CompanionTheory.RgExh.U.adC p q i k else 0 := by
+theorem adC_eq (s t c : Bool) (p q : Fin n) (i k : Pos n)
+    : adCL s p q (fl (t, i)) (fl (c, k))
+      = if c = (! s == t) then CompanionTheory.RgExh.U.adC p q i k else 0 := by
   cases s <;> cases t <;> cases c <;> simp [adCL, fl, CompanionTheory.RgExh.U.adC]
 
-theorem Phi_ad (lev : Fin n → ℕ) (s : Bool) (p q : Fin n) {x : Finset (Lr n) → V} (hx : SuppL (inUU lev) x) :
-    Phi (adLL lev s p q x) = adLq (!s) p q (Phi x) := by
+theorem Phi_ad
+    (lev : Fin n → ℕ) (s : Bool) (p q : Fin n) {x : Finset (Lr n) → V} (hx : SuppL (inUU lev) x)
+    : Phi (adLL lev s p q x) = adLq (!s) p q (Phi x) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [adLL_apply, adLq_apply, map_sum]
-  have h1 : ∀ l k : Lr n, Phi (if inUU lev l then adCL s p q l k • creL k (annL l x) else 0) =
-      adCL s p q l k • creq (fl k) (annq (fl l) (Phi x)) := by
+  have h1
+      : ∀ l k : Lr n,
+        Phi (if inUU lev l then adCL s p q l k • creL k (annL l x) else 0)
+          = adCL s p q l k • creq (fl k) (annq (fl l) (Phi x)) := by
     intro l k
     by_cases h : inUU lev l
     · rw [if_pos h, map_smul, Phi_cre, Phi_ann]
     · rw [if_neg h, map_zero, ← Phi_ann, ann_zero hx h]
       simp
-  have h2 : ∀ l : Lr n, Phi (∑ k : Lr n, if inUU lev l then adCL s p q l k • creL k (annL l x) else 0) =
-      ∑ k : Lr n, adCL s p q l k • creq (fl k) (annq (fl l) (Phi x)) := by
+  have h2
+      : ∀ l : Lr n,
+        Phi (∑ k : Lr n, if inUU lev l then adCL s p q l k • creL k (annL l x) else 0)
+          = ∑ k : Lr n, adCL s p q l k • creq (fl k) (annq (fl l) (Phi x)) := by
     intro l
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
@@ -312,11 +347,15 @@ theorem Phi_ad (lev : Fin n → ℕ) (s : Bool) (p q : Fin n) {x : Finset (Lr n)
   cases s <;> cases t <;> simp
 
 def tau : FreeAlgebra ℂ (Bool × Fin n × Fin n) →ₐ[ℂ] FreeAlgebra ℂ (Bool × Fin n × Fin n) :=
-  FreeAlgebra.lift ℂ fun p => if p.1 then FreeAlgebra.ι ℂ (true, p.2) - FreeAlgebra.ι ℂ (false, p.2)
-    else FreeAlgebra.ι ℂ (true, p.2) + FreeAlgebra.ι ℂ (false, p.2)
+  FreeAlgebra.lift ℂ fun p =>
+    if p.1 then
+      FreeAlgebra.ι ℂ (true, p.2) - FreeAlgebra.ι ℂ (false, p.2)
+    else
+      FreeAlgebra.ι ℂ (true, p.2) + FreeAlgebra.ι ℂ (false, p.2)
 
-theorem evalPair_tau_eq_evalKPair (E1 E2 : Fin n → Fin n → Module.End ℂ V) (a : FreeAlgebra ℂ (Bool × Fin n × Fin n)) :
-    ev2 E1 E2 (tau a) = evKP E1 E2 a := by
+theorem evalPair_tau_eq_evalKPair
+    (E1 E2 : Fin n → Fin n → Module.End ℂ V) (a : FreeAlgebra ℂ (Bool × Fin n × Fin n))
+    : ev2 E1 E2 (tau a) = evKP E1 E2 a := by
   have h : (ev2 E1 E2).comp tau = evKP E1 E2 := by
     refine FreeAlgebra.hom_ext ?_
     funext p
@@ -324,8 +363,10 @@ theorem evalPair_tau_eq_evalKPair (E1 E2 : Fin n → Fin n → Module.End ℂ V)
     cases s <;> simp [tau, ev2, evKP, pA, kA]
   exact DFunLike.congr_fun h a
 
-theorem evB_tau (lev : Fin n → ℕ) (E1 E2 : Fin n → Fin n → Module.End ℂ V) (b : FreeAlgebra ℂ (Bool × Fin n × Fin n)) :
-    evB lev E1 E2 (tau b) = evLv lev E1 E2 b := by
+theorem evB_tau
+    (lev : Fin n → ℕ) (E1 E2 : Fin n → Fin n → Module.End ℂ V)
+    (b : FreeAlgebra ℂ (Bool × Fin n × Fin n))
+    : evB lev E1 E2 (tau b) = evLv lev E1 E2 b := by
   have h : (evB lev E1 E2).comp tau = evLv lev E1 E2 := by
     refine FreeAlgebra.hom_ext ?_
     funext p
@@ -333,37 +374,41 @@ theorem evB_tau (lev : Fin n → ℕ) (E1 E2 : Fin n → Fin n → Module.End �
     by_cases hl : lev p = lev q <;> cases s <;> simp [tau, evB, evLv, pA, kA, hl]
   exact DFunLike.congr_fun h b
 
-theorem c_add (E1 E2 : Fin n → Fin n → Module.End ℂ V) (p q : Fin n) :
-    c1 E1 E2 p q + c2 E1 E2 p q = lFq E1 E2 true p q := by
+theorem c_add (E1 E2 : Fin n → Fin n → Module.End ℂ V) (p q : Fin n)
+    : c1 E1 E2 p q + c2 E1 E2 p q = lFq E1 E2 true p q := by
   unfold c1 c2
   rw [← smul_add]
-  have : lFq E1 E2 true p q + lFq E1 E2 false p q + (lFq E1 E2 true p q - lFq E1 E2 false p q) =
-      (2 : ℂ) • lFq E1 E2 true p q := by
+  have : lFq E1 E2 true p q + lFq E1 E2 false p q + (lFq E1 E2 true p q - lFq E1 E2 false p q)
+      = (2 : ℂ) • lFq E1 E2 true p q := by
     rw [two_smul]
     abel
   rw [this, smul_smul]
   norm_num
 
-theorem c_sub (E1 E2 : Fin n → Fin n → Module.End ℂ V) (p q : Fin n) :
-    c1 E1 E2 p q - c2 E1 E2 p q = lFq E1 E2 false p q := by
+theorem c_sub (E1 E2 : Fin n → Fin n → Module.End ℂ V) (p q : Fin n)
+    : c1 E1 E2 p q - c2 E1 E2 p q = lFq E1 E2 false p q := by
   unfold c1 c2
   rw [← smul_sub]
-  have : lFq E1 E2 true p q + lFq E1 E2 false p q - (lFq E1 E2 true p q - lFq E1 E2 false p q) =
-      (2 : ℂ) • lFq E1 E2 false p q := by
+  have : lFq E1 E2 true p q + lFq E1 E2 false p q - (lFq E1 E2 true p q - lFq E1 E2 false p q)
+      = (2 : ℂ) • lFq E1 E2 false p q := by
     rw [two_smul]
     abel
   rw [this, smul_smul]
   norm_num
 
-theorem lift_supp {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) (T : V →ₗ[ℂ] V) :
-    SuppL P (liftL n T x) := by
+theorem lift_supp {P : Lr n → Prop} {x : Finset (Lr n) → V} (hx : SuppL P x) (T : V →ₗ[ℂ] V)
+    : SuppL P (liftL n T x) := by
   intro A hA
   refine hx A fun h => hA ?_
   show T (x A) = 0
   rw [h, map_zero]
 
-theorem ad_supp (lev : Fin n → ℕ) (s : Bool) {p q : Fin n} (hpq : lev p = lev q) {x : Finset (Lr n) → V}
-    (hx : SuppL (inUU lev) x) : SuppL (inUU lev) (adLL lev s p q x) := by
+theorem ad_supp
+    (lev : Fin n → ℕ)
+    (s : Bool)
+    {p q : Fin n} (hpq : lev p = lev q)
+    {x : Finset (Lr n) → V} (hx : SuppL (inUU lev) x)
+    : SuppL (inUU lev) (adLL lev s p q x) := by
   rw [adLL_apply, ← mem_supS]
   refine Submodule.sum_mem _ fun l _ => Submodule.sum_mem _ fun k _ => ?_
   by_cases hl : inUU lev l
@@ -376,13 +421,13 @@ theorem ad_supp (lev : Fin n → ℕ) (s : Bool) {p q : Fin n} (hpq : lev p = le
         by_contra hk
         apply hc
         have h0 : lev l.2.1.1 < lev l.2.1.2 := hl
-        have h1 : ¬ (q = l.2.1.1 ∧ k.1 = xor s l.1 ∧ k.2.1 = (p, l.2.1.2)) := by
+        have h1 : ¬(q = l.2.1.1 ∧ k.1 = xor s l.1 ∧ k.2.1 = (p, l.2.1.2)) := by
           rintro ⟨rfl, _, h3⟩
           apply hk
           show lev k.2.1.1 < lev k.2.1.2
           rw [h3]
           simpa [hpq] using h0
-        have h2 : ¬ (l.2.1.2 = p ∧ k.1 = xor s l.1 ∧ k.2.1 = (l.2.1.1, q)) := by
+        have h2 : ¬(l.2.1.2 = p ∧ k.1 = xor s l.1 ∧ k.2.1 = (l.2.1.1, q)) := by
           rintro ⟨rfl, _, h3⟩
           apply hk
           show lev k.2.1.1 < lev k.2.1.2
@@ -393,10 +438,13 @@ theorem ad_supp (lev : Fin n → ℕ) (s : Bool) {p q : Fin n} (hpq : lev p = le
   · rw [if_neg hl]
     exact Submodule.zero_mem _
 
-theorem Phi_evLc (lev : Fin n → ℕ) (E1 E2 : Fin n → Fin n → Module.End ℂ V)
-    (b : FreeAlgebra ℂ (Bool × Fin n × Fin n)) :
-    ∀ x : Finset (Lr n) → V, SuppL (inUU lev) x → SuppL (inUU lev) (evLc lev E1 E2 b x) ∧
-      Phi (evLc lev E1 E2 b x) = evB lev (c1 E1 E2) (c2 E1 E2) (tau b) (Phi x) := by
+theorem Phi_evLc
+    (lev : Fin n → ℕ) (E1 E2 : Fin n → Fin n → Module.End ℂ V)
+    (b : FreeAlgebra ℂ (Bool × Fin n × Fin n))
+    : ∀ x : Finset (Lr n) → V,
+      SuppL (inUU lev) x
+        → SuppL (inUU lev) (evLc lev E1 E2 b x)
+          ∧ Phi (evLc lev E1 E2 b x) = evB lev (c1 E1 E2) (c2 E1 E2) (tau b) (Phi x) := by
   induction b using FreeAlgebra.induction with
   | grade0 r =>
     intro x hx
@@ -406,15 +454,20 @@ theorem Phi_evLc (lev : Fin n → ℕ) (E1 E2 : Fin n → Fin n → Module.End �
     intro x hx
     obtain ⟨s, p, q⟩ := p
     by_cases hl : lev p = lev q
-    · have e1 : evLc lev E1 E2 (FreeAlgebra.ι ℂ (s, p, q)) x =
-          liftL n (if s then pA E1 E2 p q else kA E1 E2 p q) x + adLL lev s p q x := by
+    · have e1
+          : evLc lev E1 E2 (FreeAlgebra.ι ℂ (s, p, q)) x
+            = liftL n (if s then pA E1 E2 p q else kA E1 E2 p q) x + adLL lev s p q x := by
         simp [evLc, hl]
-      have e2 : evB lev (c1 E1 E2) (c2 E1 E2) (tau (FreeAlgebra.ι ℂ (s, p, q))) = lFq E1 E2 (!s) p q := by
+      have e2
+          : evB lev (c1 E1 E2) (c2 E1 E2) (tau (FreeAlgebra.ι ℂ (s, p, q)))
+            = lFq E1 E2 (!s) p q := by
         cases s <;> simp [tau, evB, hl, c_add, c_sub]
       rw [e1, e2]
       refine ⟨(supS V (inUU lev)).add_mem (lift_supp hx _) (ad_supp lev s hl hx), ?_⟩
       rw [map_add (f := _), Phi_lift, Phi_ad lev s p q hx]
-      have e3 : lFq E1 E2 (!s) p q (Phi x) = liftq n (Ts E1 E2 (!s) p q) (Phi x) + adLq (!s) p q (Phi x) := by
+      have e3
+          : lFq E1 E2 (!s) p q (Phi x)
+            = liftq n (Ts E1 E2 (!s) p q) (Phi x) + adLq (!s) p q (Phi x) := by
         unfold lFq
         rw [LinearMap.add_apply]
       rw [e3]
@@ -459,7 +512,8 @@ theorem Phi_top (lev : Fin n → ℕ) (u : V) : Phi (Pi.single (omU lev) u) = to
       simpa using this
     rw [Pi.single_eq_of_ne h', Pi.single_eq_of_ne h]
 
-theorem lift_top (lev : Fin n → ℕ) (T : V →ₗ[ℂ] V) (u : V) : liftq n T (topq lev u) = topq lev (T u) := by
+theorem lift_top (lev : Fin n → ℕ) (T : V →ₗ[ℂ] V) (u : V)
+    : liftq n T (topq lev u) = topq lev (T u) := by
   funext A
   show T (topq lev u A) = topq lev (T u) A
   unfold topq
@@ -468,7 +522,8 @@ theorem lift_top (lev : Fin n → ℕ) (T : V →ₗ[ℂ] V) (u : V) : liftq n T
     simp
   · rw [Pi.single_eq_of_ne h, Pi.single_eq_of_ne h, map_zero]
 
-theorem single_supp (lev : Fin n → ℕ) (u : V) : SuppL (inUU lev) (Pi.single (omU lev) u : Finset (Lr n) → V) := by
+theorem single_supp (lev : Fin n → ℕ) (u : V)
+    : SuppL (inUU lev) (Pi.single (omU lev) u : Finset (Lr n) → V) := by
   intro A hA l hl
   have hAe : A = omU lev := by
     by_contra h
@@ -506,10 +561,12 @@ theorem isSubL_inKU (lev : Fin n → ℕ) : IsSubL lev (inKU lev) := by
   rw [h1] at hs2
   exact hs2.trans ht2
 
-theorem omQ_card (lev : Fin n → ℕ) : (omQ lev).card = (omU lev).card := by
-  rw [← flS_omQ, card_flS]
+theorem omQ_card (lev : Fin n → ℕ) : (omQ lev).card = (omU lev).card := by rw [← flS_omQ, card_flS]
 
-theorem actUU_of (hG : GlobalTheory.CompanionTheory.PairMult.GenCOU2) (hT : GlobalTheory.CompanionTheory.PairMult.TopCyc) : PositivityTheory.RgBcC.RealD.ActUU := by
+theorem actUU_of
+    (hG : GlobalTheory.CompanionTheory.PairMult.GenCOU2)
+    (hT : GlobalTheory.CompanionTheory.PairMult.TopCyc)
+    : PositivityTheory.RgBcC.RealD.ActUU := by
   intro n lev hlev a b ha hab V _ _ E1 E2 hE v hv
   have hP : PairRel E1 E2 := hE
   have hcyc : bdq E1 E2 (topq lev v) = 0 := by
@@ -519,23 +576,25 @@ theorem actUU_of (hG : GlobalTheory.CompanionTheory.PairMult.GenCOU2) (hT : Glob
     subst hs
     have := hv (fl (true, i)) rfl hi
     rwa [xL_eq, fl_fl] at this
-  obtain ⟨w, hw1, hw2, hw3⟩ := hG n lev (inKU lev) (tau a) (tau b) hlev (isSubL_inKU lev) (by
-    intro V _ _ E1 E2 hP
-    refine ⟨?_, ?_⟩
-    · rintro ⟨s, i⟩ ⟨hs, _⟩
-      simp only at hs
-      subst hs
-      rw [evalPair_tau_eq_evalKPair]
-      exact ha V E1 E2 hP i.1.1 i.1.2
-    · intro x
-      obtain ⟨w, hw⟩ := hab V E1 E2 hP x
-      refine ⟨fun l => w (fl l), ?_⟩
-      rw [evalPair_tau_eq_evalKPair, evB_tau, hw, ← Equiv.sum_comp fl]
-      refine Finset.sum_congr rfl fun l _ => ?_
-      by_cases h : inUU lev l
-      · rw [if_pos h, if_pos (show inUL lev (fl l) from h), xL_eq, fl_fl]
-      · rw [if_neg h, if_neg (show ¬ inUL lev (fl l) from h)]) V E1 E2 hP (omQ lev).card (topq lev v)
-    (top_supp lev v) (top_deg lev v) hcyc
+  obtain ⟨w, hw1, hw2, hw3⟩ :=
+    hG n lev (inKU lev) (tau a) (tau b) hlev (isSubL_inKU lev)
+      (by
+        intro V _ _ E1 E2 hP
+        refine ⟨?_, ?_⟩
+        · rintro ⟨s, i⟩ ⟨hs, _⟩
+          simp only at hs
+          subst hs
+          rw [evalPair_tau_eq_evalKPair]
+          exact ha V E1 E2 hP i.1.1 i.1.2
+        · intro x
+          obtain ⟨w, hw⟩ := hab V E1 E2 hP x
+          refine ⟨fun l => w (fl l), ?_⟩
+          rw [evalPair_tau_eq_evalKPair, evB_tau, hw, ← Equiv.sum_comp fl]
+          refine Finset.sum_congr rfl fun l _ => ?_
+          by_cases h : inUU lev l
+          · rw [if_pos h, if_pos (show inUL lev (fl l) from h), xL_eq, fl_fl]
+          · rw [if_neg h, if_neg (show ¬ inUL lev (fl l) from h)])
+      V E1 E2 hP (omQ lev).card (topq lev v) (top_supp lev v) (top_deg lev v) hcyc
   have hsw : SuppL (inUU lev) (Phi w) := by
     intro A hA l hl
     exact hw1 (flS A) hA (fl l) (by simpa [mem_flS] using hl)
@@ -545,9 +604,11 @@ theorem actUU_of (hG : GlobalTheory.CompanionTheory.PairMult.GenCOU2) (hT : Glob
   refine ⟨Phi w, hsw, hdw, ?_⟩
   apply (show Function.Injective (Phi : (Finset (Lr n) → V) → _) from
     Function.LeftInverse.injective Phi_Phi)
-  rw [Phi_bd _ E1 E2 hsw, Phi_Phi, ← hw3, map_sub, Phi_top, (Phi_evLc lev E1 E2 b _ (single_supp lev v)).2, Phi_top,
-    lift_top, evalPair_tau_eq_evalKPair]
+  rw [Phi_bd _ E1 E2 hsw, Phi_Phi, ← hw3, map_sub, Phi_top,
+    (Phi_evLc lev E1 E2 b _ (single_supp lev v)).2, Phi_top, lift_top, evalPair_tau_eq_evalKPair]
 
-theorem actUU : PositivityTheory.RgBcC.RealD.ActUU := actUU_of GlobalTheory.T.pair_multiplicity_generic_unitary GlobalTheory.T.pair_multiplicity_top_cycle
+theorem actUU : PositivityTheory.RgBcC.RealD.ActUU :=
+  actUU_of GlobalTheory.T.pair_multiplicity_generic_unitary
+    GlobalTheory.T.pair_multiplicity_top_cycle
 
 end GlobalTheory.CompanionTheory.PairBridge

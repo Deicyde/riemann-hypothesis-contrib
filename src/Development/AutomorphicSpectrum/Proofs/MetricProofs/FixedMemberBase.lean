@@ -5,13 +5,14 @@ public import ReciprocityTheory.AnalyticForms.LeviForms.ConvExpandStatement
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
-theorem epsT_small (C : ℝ) :
-    ∃ a : ℝ, 0 < a ∧ ∀ t, 0 < t → t ≤ a → |epsT C t| ≤ 1 / 2 ∧ C * epsT C t ≤ 1 := by
+theorem epsT_small (C : ℝ)
+    : ∃ a : ℝ, 0 < a ∧ ∀ t, 0 < t → t ≤ a → |epsT C t| ≤ 1 / 2 ∧ C * epsT C t ≤ 1 := by
   have hL : Tendsto (fun t : ℝ => Real.log (1 / t)) (𝓝[>] 0) atTop := by
     have hinv : Tendsto (fun t : ℝ => t⁻¹) (𝓝[>] 0) atTop := by
       first | exact tendsto_inv_nhdsGT_zero | exact tendsto_inv_zero_atTop
@@ -32,24 +33,33 @@ theorem epsT_small (C : ℝ) :
     have h := he.const_mul C
     rw [mul_zero] at h
     exact h.eventually (gt_mem_nhds (by norm_num))
-  obtain ⟨u, hu, hsub⟩ : ∃ u ∈ Set.Ioi (0:ℝ), Set.Ioc 0 u ⊆ {t | |epsT C t| < 1 / 2 ∧ C * epsT C t < 1} := by
-    first | exact mem_nhdsGT_iff_exists_Ioc_subset.mp (ha.and hb) | exact mem_nhdsWithin_Ioi_iff_exists_Ioc_subset.mp (ha.and hb)
+  obtain ⟨u, hu, hsub⟩
+      : ∃ u ∈ Set.Ioi (0 : ℝ), Set.Ioc 0 u ⊆ {t | |epsT C t| < 1 / 2 ∧ C * epsT C t < 1} := by
+    first
+    | exact mem_nhdsGT_iff_exists_Ioc_subset.mp (ha.and hb)
+    | exact mem_nhdsWithin_Ioi_iff_exists_Ioc_subset.mp (ha.and hb)
   refine ⟨u, hu, fun t ht htu => ?_⟩
   obtain ⟨h1, h2⟩ := hsub ⟨ht, htu⟩
   exact ⟨h1.le, h2.le⟩
 
-private theorem contDiffAt_comp_chart_symm_of_smoothOn {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
-    (U : Set X) (f : X → ℝ) (hU : IsOpen U) (hf : A.SmoothOn U f) (j : Fin A.n) (y : Fin e → ℂ)
-    (hy : y ∈ (A.chart j).target) (hyU : (A.chart j).symm y ∈ U) :
-    ContDiffAt ℝ 2 (f ∘ (A.chart j).symm) y := by
+private theorem contDiffAt_comp_chart_symm_of_smoothOn
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (U : Set X)
+    (f : X → ℝ)
+    (hU : IsOpen U) (hf : A.SmoothOn U f)
+    (j : Fin A.n) (y : Fin e → ℂ) (hy : y ∈ (A.chart j).target) (hyU : (A.chart j).symm y ∈ U)
+    : ContDiffAt ℝ 2 (f ∘ (A.chart j).symm) y := by
   have hopen : IsOpen ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U) :=
     (A.chart j).continuousOn_symm.isOpen_inter_preimage (A.chart j).open_target hU
   refine ((hf j).contDiffAt (hopen.mem_nhds ⟨hy, hyU⟩)).of_le ?_
   first | exact_mod_cast (le_top : ((2 : ℕ∞)) ≤ ⊤) | simp | decide
 
-private theorem levi_add_mul {ι : Type} [Fintype ι] (F G : (ι → ℂ) → ℝ) (y w : ι → ℂ) (k : ℝ)
-    (hF : ContDiffAt ℝ 2 F y) (hG : ContDiffAt ℝ 2 G y) :
-    levi (fun z => F z + k * G z) y w = levi F y w + k * levi G y w := by
+private theorem levi_add_mul
+    {ι : Type} [Fintype ι]
+    (F G : (ι → ℂ) → ℝ)
+    (y w : ι → ℂ)
+    (k : ℝ) (hF : ContDiffAt ℝ 2 F y) (hG : ContDiffAt ℝ 2 G y)
+    : levi (fun z => F z + k * G z) y w = levi F y w + k * levi G y w := by
   have hF1 : ∀ᶠ z in 𝓝 y, DifferentiableAt ℝ F z :=
     (hF.eventually (by simp)).mono fun z hz => hz.differentiableAt (by norm_num)
   have hG1 : ∀ᶠ z in 𝓝 y, DifferentiableAt ℝ G z :=
@@ -61,8 +71,9 @@ private theorem levi_add_mul {ι : Type} [Fintype ι] (F G : (ι → ℂ) → �
     (hF.fderiv_right (m := 1) (by norm_num)).differentiableAt (by norm_num)
   have hG2 : DifferentiableAt ℝ (fderiv ℝ G) y :=
     (hG.fderiv_right (m := 1) (by norm_num)).differentiableAt (by norm_num)
-  have h2 : fderiv ℝ (fderiv ℝ fun z => F z + k * G z) y =
-      fderiv ℝ (fderiv ℝ F) y + k • fderiv ℝ (fderiv ℝ G) y := by
+  have h2
+      : fderiv ℝ (fderiv ℝ fun z => F z + k * G z) y
+        = fderiv ℝ (fderiv ℝ F) y + k • fderiv ℝ (fderiv ℝ G) y := by
     rw [hD.fderiv_eq]
     exact (hF2.hasFDerivAt.add (hG2.hasFDerivAt.const_smul k)).fderiv
   unfold levi
@@ -70,16 +81,24 @@ private theorem levi_add_mul {ι : Type} [Fintype ι] (F G : (ι → ℂ) → �
   simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul]
   ring
 
-theorem levi_split {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (Θ th : LocPot X)
-    (u : X → ℝ) (hΘ : IsPotential A Θ) (hth : IsPotential A th) (hu : A.Smooth u) (ε c : ℝ) (x : X)
-    (j : Fin A.n) (y : Fin e → ℂ) (hy : y ∈ (A.chart j).target)
-    (h1 : (A.chart j).symm y ∈ th.U x) (h2 : (A.chart j).symm y ∈ Θ.U x) (w : Fin e → ℂ) :
-    levi (fun z => th.φ x ((A.chart j).symm z) + u ((A.chart j).symm z) +
-        c * Θ.φ x ((A.chart j).symm z)) y w =
-      levi ((th + LocPot.ofFun u + Θ.rsmul ε).φ x ∘ (A.chart j).symm) y w +
-        (c - ε) * levi (Θ.φ x ∘ (A.chart j).symm) y w := by
-  have hthC := contDiffAt_comp_chart_symm_of_smoothOn A (th.U x) (th.φ x) (th.isOpen_U x) (hth.1 x) j y hy h1
-  have hΘC := contDiffAt_comp_chart_symm_of_smoothOn A (Θ.U x) (Θ.φ x) (Θ.isOpen_U x) (hΘ.1 x) j y hy h2
+theorem levi_split
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (Θ th : LocPot X)
+    (u : X → ℝ)
+    (hΘ : IsPotential A Θ) (hth : IsPotential A th) (hu : A.Smooth u) (ε c : ℝ)
+    (x : X) (j : Fin A.n) (y : Fin e → ℂ) (hy : y ∈ (A.chart j).target)
+    (h1 : (A.chart j).symm y ∈ th.U x) (h2 : (A.chart j).symm y ∈ Θ.U x)
+    (w : Fin e → ℂ)
+    : levi
+        (fun z =>
+          th.φ x ((A.chart j).symm z) + u ((A.chart j).symm z) + c * Θ.φ x ((A.chart j).symm z))
+        y w
+      = levi ((th + LocPot.ofFun u + Θ.rsmul ε).φ x ∘ (A.chart j).symm) y w
+        + (c - ε) * levi (Θ.φ x ∘ (A.chart j).symm) y w := by
+  have hthC :=
+    contDiffAt_comp_chart_symm_of_smoothOn A (th.U x) (th.φ x) (th.isOpen_U x) (hth.1 x) j y hy h1
+  have hΘC :=
+    contDiffAt_comp_chart_symm_of_smoothOn A (Θ.U x) (Θ.φ x) (Θ.isOpen_U x) (hΘ.1 x) j y hy h2
   have huC := contDiffAt_comp_chart_symm_of_smoothOn A Set.univ u isOpen_univ hu j y hy trivial
   have hPC : ContDiffAt ℝ 2 ((th + LocPot.ofFun u + Θ.rsmul ε).φ x ∘ (A.chart j).symm) y :=
     (hthC.add huC).add (contDiffAt_const.mul hΘC)
@@ -90,38 +109,50 @@ theorem levi_split {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e 
     (c - ε) * Θ.φ x ((A.chart j).symm z)
   ring
 
-private theorem levi_sub_const' {ι : Type} [Fintype ι] (g : (ι → ℂ) → ℝ) (a : ℝ) (y w : ι → ℂ) :
-    levi (fun z => g z - a) y w = levi g y w := by
+private theorem levi_sub_const' {ι : Type} [Fintype ι] (g : (ι → ℂ) → ℝ) (a : ℝ) (y w : ι → ℂ)
+    : levi (fun z => g z - a) y w = levi g y w := by
   have h : fderiv ℝ (fun z => g z - a) = fderiv ℝ g := by
     funext z
     by_cases hg : DifferentiableAt ℝ g z
     · exact (hg.hasFDerivAt.sub_const a).fderiv
-    · have hg' : ¬ DifferentiableAt ℝ (fun z => g z - a) z := fun h => hg (by simpa using h.add_const a)
+    · have hg' : ¬ DifferentiableAt ℝ (fun z => g z - a) z := fun h =>
+        hg (by simpa using h.add_const a)
       rw [fderiv_zero_of_not_differentiableAt hg, fderiv_zero_of_not_differentiableAt hg']
   unfold levi
   rw [h]
 
-private theorem levi_zero' {ι : Type} [Fintype ι] (g : (ι → ℂ) → ℝ) (y : ι → ℂ) : levi g y 0 = 0 := by
+private theorem levi_zero' {ι : Type} [Fintype ι] (g : (ι → ℂ) → ℝ) (y : ι → ℂ)
+    : levi g y 0 = 0 := by
   unfold levi
   simp
 
-theorem isPsh_of_le {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
-    (Θ th : LocPot X) (u : X → ℝ) (hΘ : IsPotential A Θ) (hpos : IsPosPot A Θ)
-    (hth : IsPotential A th) (hu : A.Smooth u) (ε c a : ℝ) (hεc : ε ≤ c)
-    (hP : IsPsh A (th + LocPot.ofFun u + Θ.rsmul ε)) (Q : LocPot X)
-    (hU : ∀ x, Q.U x ⊆ th.U x ∩ Θ.U x)
-    (hφ : ∀ x z, Q.φ x z = th.φ x z + u z + c * Θ.φ x z - a) : IsPsh A Q := by
+theorem isPsh_of_le
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X)
+    (Θ th : LocPot X) (u : X → ℝ)
+    (hΘ : IsPotential A Θ) (hpos : IsPosPot A Θ) (hth : IsPotential A th) (hu : A.Smooth u)
+    (ε c a : ℝ) (hεc : ε ≤ c) (hP : IsPsh A (th + LocPot.ofFun u + Θ.rsmul ε))
+    (Q : LocPot X)
+    (hU : ∀ x, Q.U x ⊆ th.U x ∩ Θ.U x) (hφ : ∀ x z, Q.φ x z = th.φ x z + u z + c * Θ.φ x z - a)
+    : IsPsh A Q := by
   intro x j y hy w
   obtain ⟨hyt, hyQ⟩ := hy
   have hsub := hU x hyQ
-  have hfun : Q.φ x ∘ (A.chart j).symm = fun z => (th.φ x ((A.chart j).symm z) + u ((A.chart j).symm z) +
-      c * Θ.φ x ((A.chart j).symm z)) - a := by
+  have hfun
+      : Q.φ x ∘ (A.chart j).symm
+        = fun z =>
+          (th.φ x ((A.chart j).symm z) + u ((A.chart j).symm z) + c * Θ.φ x ((A.chart j).symm z))
+            - a := by
     funext z
     simp only [Function.comp_apply, hφ]
-  rw [hfun, levi_sub_const' (fun z => th.φ x ((A.chart j).symm z) + u ((A.chart j).symm z) +
-      c * Θ.φ x ((A.chart j).symm z)) a y w,
+  rw [hfun,
+    levi_sub_const'
+      (fun z =>
+        th.φ x ((A.chart j).symm z) + u ((A.chart j).symm z) + c * Θ.φ x ((A.chart j).symm z))
+      a y w,
     levi_split A Θ th u hΘ hth hu ε c x j y hyt hsub.1 hsub.2 w]
-  have hmem : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (th + LocPot.ofFun u + Θ.rsmul ε).U x := by
+  have hmem
+      : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (th + LocPot.ofFun u + Θ.rsmul ε).U x := by
     refine ⟨hyt, ?_⟩
     show (A.chart j).symm y ∈ th.U x ∩ Set.univ ∩ Θ.U x
     exact ⟨⟨hsub.1, trivial⟩, hsub.2⟩
@@ -132,21 +163,28 @@ theorem isPsh_of_le {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e
     have hce : 0 ≤ c - ε := sub_nonneg.mpr hεc
     nlinarith
 
-theorem isPosPot_of_lt {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
-    (Θ th : LocPot X) (u : X → ℝ) (hΘ : IsPotential A Θ) (hpos : IsPosPot A Θ)
-    (hth : IsPotential A th) (hu : A.Smooth u) (ε c : ℝ) (hεc : ε < c)
-    (hP : IsPsh A (th + LocPot.ofFun u + Θ.rsmul ε)) (Q : LocPot X)
-    (hU : ∀ x, Q.U x ⊆ th.U x ∩ Θ.U x)
-    (hφ : ∀ x z, Q.φ x z = th.φ x z + u z + c * Θ.φ x z) : IsPosPot A Q := by
+theorem isPosPot_of_lt
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X)
+    (Θ th : LocPot X) (u : X → ℝ)
+    (hΘ : IsPotential A Θ) (hpos : IsPosPot A Θ) (hth : IsPotential A th) (hu : A.Smooth u)
+    (ε c : ℝ) (hεc : ε < c) (hP : IsPsh A (th + LocPot.ofFun u + Θ.rsmul ε))
+    (Q : LocPot X)
+    (hU : ∀ x, Q.U x ⊆ th.U x ∩ Θ.U x) (hφ : ∀ x z, Q.φ x z = th.φ x z + u z + c * Θ.φ x z)
+    : IsPosPot A Q := by
   intro x j y hy w hw
   obtain ⟨hyt, hyQ⟩ := hy
   have hsub := hU x hyQ
-  have hfun : Q.φ x ∘ (A.chart j).symm = fun z => th.φ x ((A.chart j).symm z) + u ((A.chart j).symm z) +
-      c * Θ.φ x ((A.chart j).symm z) := by
+  have hfun
+      : Q.φ x ∘ (A.chart j).symm
+        = fun z =>
+          th.φ x ((A.chart j).symm z) + u ((A.chart j).symm z)
+            + c * Θ.φ x ((A.chart j).symm z) := by
     funext z
     simp only [Function.comp_apply, hφ]
   rw [hfun, levi_split A Θ th u hΘ hth hu ε c x j y hyt hsub.1 hsub.2 w]
-  have hmem : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (th + LocPot.ofFun u + Θ.rsmul ε).U x := by
+  have hmem
+      : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (th + LocPot.ofFun u + Θ.rsmul ε).U x := by
     refine ⟨hyt, ?_⟩
     show (A.chart j).symm y ∈ th.U x ∩ Set.univ ∩ Θ.U x
     exact ⟨⟨hsub.1, trivial⟩, hsub.2⟩
@@ -155,21 +193,27 @@ theorem isPosPot_of_lt {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtla
   have hce : 0 < c - ε := sub_pos.mpr hεc
   nlinarith
 
-private theorem isPotential_add' {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
-    (P Q : LocPot X) (hP : IsPotential A P) (hQ : IsPotential A Q) : IsPotential A (P + Q) := by
+private theorem isPotential_add'
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (P Q : LocPot X) (hP : IsPotential A P) (hQ : IsPotential A Q)
+    : IsPotential A (P + Q) := by
   refine ⟨fun x j => ?_, fun x x' y hy => ?_⟩
   · show ContDiffOn ℝ _ (fun z => P.φ x ((A.chart j).symm z) + Q.φ x ((A.chart j).symm z))
       ((A.chart j).target ∩ (A.chart j).symm ⁻¹' (P.U x ∩ Q.U x))
-    exact ((hP.1 x j).mono fun z (hz : z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (P.U x ∩ Q.U x)) =>
-      ⟨hz.1, hz.2.1⟩).add ((hQ.1 x j).mono fun z
-        (hz : z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (P.U x ∩ Q.U x)) => ⟨hz.1, hz.2.2⟩)
+    exact ((hP.1 x j).mono
+        fun z (hz : z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (P.U x ∩ Q.U x)) =>
+          ⟨hz.1, hz.2.1⟩).add
+      ((hQ.1 x j).mono fun z (hz : z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (P.U x ∩ Q.U x)) =>
+        ⟨hz.1, hz.2.2⟩)
   · obtain ⟨⟨hPx, hQx⟩, hPx', hQx'⟩ := hy
     obtain ⟨W1, hW1o, hyW1, G1, hG1, hd1⟩ := hP.2 x x' y ⟨hPx, hPx'⟩
     obtain ⟨W2, hW2o, hyW2, G2, hG2, hd2⟩ := hQ.2 x x' y ⟨hQx, hQx'⟩
-    refine ⟨W1 ∩ W2, hW1o.inter hW2o, ⟨hyW1, hyW2⟩, fun z => G1 z + G2 z, fun j => ?_, fun z hz => ?_⟩
+    refine
+      ⟨W1 ∩ W2, hW1o.inter hW2o, ⟨hyW1, hyW2⟩, fun z => G1 z + G2 z, fun j => ?_, fun z hz => ?_⟩
     · exact ((hG1 j).mono fun z (hz : z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (W1 ∩ W2)) =>
-        ⟨hz.1, hz.2.1⟩).add ((hG2 j).mono fun z
-          (hz : z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (W1 ∩ W2)) => ⟨hz.1, hz.2.2⟩)
+          ⟨hz.1, hz.2.1⟩).add
+        ((hG2 j).mono fun z (hz : z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (W1 ∩ W2)) =>
+          ⟨hz.1, hz.2.2⟩)
     · obtain ⟨⟨⟨hz1, hz2⟩, hzPx, hzQx⟩, hzPx', hzQx'⟩ := hz
       have e1 := hd1 z ⟨⟨hz1, hzPx⟩, hzPx'⟩
       have e2 := hd2 z ⟨⟨hz2, hzQx⟩, hzQx'⟩
@@ -177,7 +221,28 @@ private theorem isPotential_add' {e : ℕ} {X : Type} [TopologicalSpace X] (A : 
       rw [Complex.add_re, ← e1, ← e2]
       ring
 
-theorem fixedMember_base : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (Θ L : LocPot X) (s : X → X → ℂ) (th : LocPot X) (ph : X → ℝ) (phT : ℝ → X → ℝ) (C₅ C t₀ : ℝ), IsPotential A Θ → IsPosPot A Θ → (∀ y, logNormSec L s y ≤ 0) → IsSingWeight A L s th ph C₅ → IsRegFamily A Θ L s th ph phT C t₀ → ∃ t₂ : ℝ, 0 < t₂ ∧ t₂ ≤ t₀ ∧ ∀ t₁, 0 < t₁ → t₁ ≤ t₂ → IsPotential A (th + LocPot.ofFun (phT t₁) + Θ) ∧ IsPsh A (th + LocPot.ofFun (phT t₁) + Θ + Θ.rsmul (-(1 / 2))) ∧ IsPosPot A (th + LocPot.ofFun (phT t₁) + Θ) ∧ ∀ t, 0 < t → t ≤ t₁ → A.Smooth (fun y => phT t y - phT t₁ y - C * epsT C t₁) ∧ IsPsh A (th + LocPot.ofFun (phT t₁) + Θ + LocPot.ofFun (fun y => phT t y - phT t₁ y - C * epsT C t₁)) ∧ (∀ y, phT t y - phT t₁ y - C * epsT C t₁ ≤ 0) ∧ ∀ y ∉ bdry s, -(|C₅| + |C| + 1) * Real.log (rW L s y) ≤ phT t y - phT t₁ y - C * epsT C t₁ := by
+theorem fixedMember_base
+    : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (Θ L : LocPot X)
+        (s : X → X → ℂ) (th : LocPot X) (ph : X → ℝ) (phT : ℝ → X → ℝ) (C₅ C t₀ : ℝ),
+      IsPotential A Θ → IsPosPot A Θ → (∀ y, logNormSec L s y ≤ 0) → IsSingWeight A L s th ph C₅
+        → IsRegFamily A Θ L s th ph phT C t₀
+        → ∃ t₂ : ℝ,
+          0 < t₂ ∧ t₂ ≤ t₀
+            ∧ ∀ t₁,
+              0 < t₁ → t₁ ≤ t₂
+                → IsPotential A (th + LocPot.ofFun (phT t₁) + Θ)
+                  ∧ IsPsh A (th + LocPot.ofFun (phT t₁) + Θ + Θ.rsmul (-(1 / 2)))
+                  ∧ IsPosPot A (th + LocPot.ofFun (phT t₁) + Θ)
+                  ∧ ∀ t,
+                    0 < t → t ≤ t₁
+                      → A.Smooth (fun y => phT t y - phT t₁ y - C * epsT C t₁)
+                        ∧ IsPsh A
+                          (th + LocPot.ofFun (phT t₁) + Θ
+                            + LocPot.ofFun (fun y => phT t y - phT t₁ y - C * epsT C t₁))
+                        ∧ (∀ y, phT t y - phT t₁ y - C * epsT C t₁ ≤ 0)
+                        ∧ ∀ y ∉ bdry s,
+                          -(|C₅| + |C| + 1) * Real.log (rW L s y)
+                            ≤ phT t y - phT t₁ y - C * epsT C t₁ := by
   intro e X _ A Θ L s th ph phT C₅ C t₀ hΘ hpos hlog hSW hRF
   obtain ⟨a, ha, hab⟩ := epsT_small C
   obtain ⟨ht0, -, hR⟩ := hRF
@@ -188,8 +253,12 @@ theorem fixedMember_base : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A : Fi
   obtain ⟨hsm1, hC1, -, -, hpsh1, -, -, -⟩ := hR t₁ ht₁ ht₁0
   obtain ⟨he1, he1'⟩ := hab t₁ ht₁ ht₁a
   have hepsle : epsT C t₁ ≤ 1 / 2 := (le_abs_self _).trans he1
-  refine ⟨isPotential_add' A _ _ (isPotential_add' A _ _ hthP (isPotential_ofFun A _ hsm1)) hΘ,
-    ?_, ?_, fun t ht htt₁ => ?_⟩
+  refine ⟨
+    isPotential_add' A _ _ (isPotential_add' A _ _ hthP (isPotential_ofFun A _ hsm1)) hΘ,
+    ?_,
+    ?_,
+    fun t ht htt₁ => ?_
+  ⟩
   · exact isPsh_of_le A Θ th (phT t₁) hΘ hpos hthP hsm1 (epsT C t₁) (1 / 2) 0 hepsle hpsh1 _
       (fun x z (hz : z ∈ th.U x ∩ Set.univ ∩ Θ.U x ∩ Θ.U x) => ⟨hz.1.1.1, hz.1.2⟩)
       (fun x z => by

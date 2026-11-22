@@ -14,10 +14,12 @@ open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
 section hw
 
-variable {n : ℕ} {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {n : ℕ} {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   {V : Type*} [AddCommGroup V] [Module (KK O) V] [Module O V] [IsScalarTower O (KK O) V]
 
-theorem gl_operator_mem_integral_enveloping (E : GLOps n (KK O) V) (a b : Fin n) : E a b ∈ UZmon E := by
+theorem gl_operator_mem_integral_enveloping (E : GLOps n (KK O) V) (a b : Fin n)
+    : E a b ∈ UZmon E := by
   rw [UZmon.eq_1]
   apply Submonoid.subset_closure
   simp only [UZgens.eq_1, Set.mem_setOf_eq]
@@ -33,9 +35,11 @@ theorem enveloping_le_integral_enveloping (E : GLOps n (KK O) V) : Umon E ≤ UZ
   rintro _ ⟨⟨a, b⟩, rfl⟩
   exact gl_operator_mem_integral_enveloping E a b
 
-theorem mem_nabla_iff_coordinate_integral {E : GLOps n (KK O) V} {lam : Fin n → ℤ} {v : V} {xi : V →ₗ[KK O] KK O} (h1 : xi v = 1)
-    (h2 : ∀ w ∈ otherWts E lam, xi w = 0) (h3 : ∀ x, x - xi x • v ∈ otherWts E lam) (x : V) :
-    x ∈ Nabla (O := O) E lam v ↔ ∀ u ∈ UZmon E, ∃ c : O, xi (u x) = algebraMap O (KK O) c := by
+theorem mem_nabla_iff_coordinate_integral
+    {E : GLOps n (KK O) V} {lam : Fin n → ℤ} {v : V} {xi : V →ₗ[KK O] KK O}
+    (h1 : xi v = 1) (h2 : ∀ w ∈ otherWts E lam, xi w = 0) (h3 : ∀ x, x - xi x • v ∈ otherWts E lam)
+    (x : V)
+    : x ∈ Nabla (O := O) E lam v ↔ ∀ u ∈ UZmon E, ∃ c : O, xi (u x) = algebraMap O (KK O) c := by
   rw [Nabla.eq_1, Set.mem_setOf_eq]
   constructor
   · intro H u hu
@@ -51,13 +55,16 @@ theorem mem_nabla_iff_coordinate_integral {E : GLOps n (KK O) V} {lam : Fin n �
     rw [hc] at h
     exact h
 
-theorem enveloping_coordinate_separates [NeZero n] [CharZero (KK O)] {E : GLOps n (KK O) V} {lam : Fin n → ℤ} {v : V}
-    (hI : IsIrrHW E lam v)
-    (hCR : ∀ W : Submodule (KK O) V, (∀ a b, ∀ x ∈ W, E a b x ∈ W) →
-      ∃ W' : Submodule (KK O) V, IsCompl W W' ∧ ∀ a b, ∀ x ∈ W', E a b x ∈ W')
-    {xi : V →ₗ[KK O] KK O} (h1 : xi v = 1) {x : V} (hx : ∀ u ∈ UZmon E, xi (u x) = 0) : x = 0 := by
+theorem enveloping_coordinate_separates
+    [NeZero n] [CharZero (KK O)]
+    {E : GLOps n (KK O) V} {lam : Fin n → ℤ} {v : V} (hI : IsIrrHW E lam v)
+    (hCR : ∀ W : Submodule (KK O) V,
+      (∀ a b, ∀ x ∈ W, E a b x ∈ W)
+        → ∃ W' : Submodule (KK O) V, IsCompl W W' ∧ ∀ a b, ∀ x ∈ W', E a b x ∈ W')
+    {xi : V →ₗ[KK O] KK O} (h1 : xi v = 1)
+    {x : V} (hx : ∀ u ∈ UZmon E, xi (u x) = 0)
+    : x = 0 := by
   classical
-
   let W : Submodule (KK O) V := ⨅ u : UZmon E, LinearMap.ker (xi ∘ₗ (u : Module.End (KK O) V))
   have hmemW : ∀ y, y ∈ W ↔ ∀ u ∈ UZmon E, xi (u y) = 0 := by
     intro y
@@ -97,7 +104,8 @@ theorem enveloping_coordinate_separates [NeZero n] [CharZero (KK O)] {E : GLOps 
     unfold weightSp
     refine (Submodule.mem_iInf _).mpr fun a => ?_
     rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply]
-    have hd : E a a w - (lam a : KK O) • w ∈ W := sub_mem (hWst a a w hw) (Submodule.smul_mem W _ hw)
+    have hd : E a a w - (lam a : KK O) • w ∈ W :=
+      sub_mem (hWst a a w hw) (Submodule.smul_mem W _ hw)
     have hd' : E a a w' - (lam a : KK O) • w' ∈ W' :=
       sub_mem (hW'st a a w' hw') (Submodule.smul_mem W' _ hw')
     have hsum : (E a a w - (lam a : KK O) • w) + (E a a w' - (lam a : KK O) • w') = 0 := by
@@ -119,14 +127,14 @@ theorem enveloping_coordinate_separates [NeZero n] [CharZero (KK O)] {E : GLOps 
     rw [e]
     exact sub_mem hww (Submodule.smul_mem _ c hv.2.1)
   have hz0 : z = 0 :=
-    weight_support_sum_eq_zero E (fun nu => weightHeightAscending lam < weightHeightAscending nu) hzw hz (lt_irrefl _)
-  have hwc : w = c • v := by
-    rw [← hyz, hz0, add_zero]
+    weight_support_sum_eq_zero E
+      (fun nu => weightHeightAscending lam < weightHeightAscending nu)
+      hzw hz (lt_irrefl _)
+  have hwc : w = c • v := by rw [← hyz, hz0, add_zero]
   have hc0 : c = 0 := by
     by_contra hc
     apply hvW
-    have e : v = c⁻¹ • w := by
-      rw [hwc, smul_smul, inv_mul_cancel₀ hc, one_smul]
+    have e : v = c⁻¹ • w := by rw [hwc, smul_smul, inv_mul_cancel₀ hc, one_smul]
     rw [e]
     exact Submodule.smul_mem W _ hw
   have hvW' : v ∈ W' := by
@@ -139,10 +147,12 @@ theorem enveloping_coordinate_separates [NeZero n] [CharZero (KK O)] {E : GLOps 
     exact Submodule.mem_top
   exact (Submodule.disjoint_def.mp hC.disjoint) x hxW hxW'
 
-theorem lattice_fg_of_integral_functionals {W : Type*} [AddCommGroup W] [Module (KK O) W] [Module O W] [IsScalarTower O (KK O) W]
-    [FiniteDimensional (KK O) W] (N : Submodule O W) (Xi : Set (W →ₗ[KK O] KK O))
-    (hsep : ∀ w, (∀ ξ ∈ Xi, ξ w = 0) → w = 0)
-    (hint : ∀ ξ ∈ Xi, ∀ w ∈ N, ∃ c : O, ξ w = algebraMap O (KK O) c) : N.FG := by
+theorem lattice_fg_of_integral_functionals
+    {W : Type*} [AddCommGroup W] [Module (KK O) W] [Module O W] [IsScalarTower O (KK O) W]
+    [FiniteDimensional (KK O) W]
+    (N : Submodule O W) (Xi : Set (W →ₗ[KK O] KK O)) (hsep : ∀ w, (∀ ξ ∈ Xi, ξ w = 0) → w = 0)
+    (hint : ∀ ξ ∈ Xi, ∀ w ∈ N, ∃ c : O, ξ w = algebraMap O (KK O) c)
+    : N.FG := by
   classical
   obtain ⟨b, hbXi, hbspan, hbli⟩ := exists_linearIndependent (KK O) Xi
   have hbfin : b.Finite := hbli.setFinite

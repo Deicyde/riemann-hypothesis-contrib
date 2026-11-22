@@ -14,14 +14,32 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL
 
-theorem invVol_conj_modular : ∀ {G : Type} [Group G] (H K : Subgroup G), K ≤ H → (∀ h ∈ H, K.relIndex (MulAut.conj h • K) ≠ 0 ∧ (MulAut.conj h • K).relIndex K ≠ 0) → (∀ a ∈ H, ∀ b ∈ H, invVol K (MulAut.conj (a * b) • K) = invVol K (MulAut.conj a • K) * invVol K (MulAut.conj b • K)) ∧ (∀ a ∈ H, 0 < invVol K (MulAut.conj a • K)) ∧ (∀ α : G ≃* G, K.map α.toMonoidHom = K → ∀ a ∈ H, invVol K (MulAut.conj (α a) • K) = invVol K (MulAut.conj a • K)) ∧ ∀ K' : Subgroup G, K.relIndex K' ≠ 0 → K'.relIndex K ≠ 0 → ∀ a ∈ H, invVol K (MulAut.conj a • K') = invVol K (MulAut.conj a • K) * invVol K K' ∧ (MulAut.conj a • K' = K' → invVol K (MulAut.conj a • K) = 1) := by
+theorem invVol_conj_modular
+    : ∀ {G : Type} [Group G] (H K : Subgroup G),
+      K ≤ H → (∀ h ∈ H, K.relIndex (MulAut.conj h • K) ≠ 0 ∧ (MulAut.conj h • K).relIndex K ≠ 0)
+        → (∀ a ∈ H, ∀ b ∈ H,
+            invVol K (MulAut.conj (a * b) • K)
+              = invVol K (MulAut.conj a • K) * invVol K (MulAut.conj b • K))
+          ∧ (∀ a ∈ H, 0 < invVol K (MulAut.conj a • K))
+          ∧ (∀ α : G ≃* G,
+            K.map α.toMonoidHom = K
+              → ∀ a ∈ H, invVol K (MulAut.conj (α a) • K) = invVol K (MulAut.conj a • K))
+          ∧ ∀ K' : Subgroup G,
+            K.relIndex K' ≠ 0 → K'.relIndex K ≠ 0
+              → ∀ a ∈ H,
+                invVol K (MulAut.conj a • K') = invVol K (MulAut.conj a • K) * invVol K K'
+                  ∧ (MulAut.conj a • K' = K' → invVol K (MulAut.conj a • K) = 1) := by
   intro G _ H K _ hc
-  have e : ∀ (g : G) (A B : Subgroup G),
-      (MulAut.conj g • A).relIndex (MulAut.conj g • B) = A.relIndex B := fun g A B =>
+  have e
+      : ∀ (g : G) (A B : Subgroup G),
+        (MulAut.conj g • A).relIndex (MulAut.conj g • B) = A.relIndex B := fun g A B =>
     Subgroup.relIndex_map_map_of_injective (f := (MulAut.conj g).toMonoidHom) A B
       (MulAut.conj g).injective
-  have key : ∀ K' : Subgroup G, K.relIndex K' ≠ 0 → K'.relIndex K ≠ 0 → ∀ a ∈ H,
-      invVol K (MulAut.conj a • K') = invVol K (MulAut.conj a • K) * invVol K K' := by
+  have key
+      : ∀ K' : Subgroup G,
+        K.relIndex K' ≠ 0 → K'.relIndex K ≠ 0
+          → ∀ a ∈ H,
+            invVol K (MulAut.conj a • K') = invVol K (MulAut.conj a • K) * invVol K K' := by
     intro K' h1 h2 a ha
     have p1 : K.relIndex (MulAut.conj a • K') ≠ 0 :=
       Subgroup.relIndex_ne_zero_trans (hc a ha).1 (by rw [e]; exact h1)
@@ -36,8 +54,7 @@ theorem invVol_conj_modular : ∀ {G : Type} [Group G] (H K : Subgroup G), K ≤
   · intro a ha
     exact (invVol_mul_pos_le_conj K _ _ (hc a ha).1 (hc a ha).2 (hc a ha).1 (hc a ha).2).2.1
   · intro α hα a _
-    have h1 : (MulAut.conj a • K).map α.toMonoidHom
-        = MulAut.conj (α a) • K.map α.toMonoidHom := by
+    have h1 : (MulAut.conj a • K).map α.toMonoidHom = MulAut.conj (α a) • K.map α.toMonoidHom := by
       change (K.map (MulAut.conj a).toMonoidHom).map α.toMonoidHom
         = (K.map α.toMonoidHom).map (MulAut.conj (α a)).toMonoidHom
       rw [Subgroup.map_map, Subgroup.map_map]
@@ -45,9 +62,9 @@ theorem invVol_conj_modular : ∀ {G : Type} [Group G] (H K : Subgroup G), K ≤
       ext x
       simp
     rw [hα] at h1
-    have f : ∀ A B : Subgroup G,
-        (A.map α.toMonoidHom).relIndex (B.map α.toMonoidHom) = A.relIndex B := fun A B =>
-      Subgroup.relIndex_map_map_of_injective (f := α.toMonoidHom) A B α.injective
+    have f
+        : ∀ A B : Subgroup G, (A.map α.toMonoidHom).relIndex (B.map α.toMonoidHom) = A.relIndex B :=
+      fun A B => Subgroup.relIndex_map_map_of_injective (f := α.toMonoidHom) A B α.injective
     have f1 := f K (MulAut.conj a • K)
     have f2 := f (MulAut.conj a • K) K
     rw [hα, h1] at f1 f2

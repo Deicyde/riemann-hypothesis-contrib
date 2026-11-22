@@ -17,8 +17,10 @@ open Classical
 
 namespace Cx1
 
-theorem psd_pullback {α β : Type} (Y : Finset α) (φ : α → β) (k : β → β → ℂ) (Z : Finset β)
-    (hZ : ∀ x ∈ Y, φ x ∈ Z) (h : TB.PSDOn Z k) : TB.PSDOn Y (fun x y => k (φ x) (φ y)) := by
+theorem psd_pullback
+    {α β : Type} (Y : Finset α) (φ : α → β) (k : β → β → ℂ) (Z : Finset β) (hZ : ∀ x ∈ Y, φ x ∈ Z)
+    (h : TB.PSDOn Z k)
+    : TB.PSDOn Y (fun x y => k (φ x) (φ y)) := by
   simp only [TB.PSDOn] at h ⊢
   exact h.submatrix (fun x : Y => (⟨φ x, hZ x x.2⟩ : Z))
 
@@ -31,8 +33,9 @@ end Cx1
 theorem gram_positive_semidefinite : C.GramPSDOfParts := by
   intro E _ _ _ Wp Wq _ _ _ _ S hP _ Kr hK0 Th e ε hε i w Y
   show TB.PSDOn Y (S.gram ε i w.1)
-  have prodPSD : ∀ (s : Finset (Fin S.f)) (k : Fin S.f → TB.Pt E → TB.Pt E → ℂ),
-      (∀ v, TB.PSDOn Y (k v)) → TB.PSDOn Y (fun p q => ∏ v ∈ s, k v p q) := by
+  have prodPSD
+      : ∀ (s : Finset (Fin S.f)) (k : Fin S.f → TB.Pt E → TB.Pt E → ℂ),
+        (∀ v, TB.PSDOn Y (k v)) → TB.PSDOn Y (fun p q => ∏ v ∈ s, k v p q) := by
     intro s k hk
     induction s using Finset.induction_on with
     | empty =>
@@ -44,20 +47,24 @@ theorem gram_positive_semidefinite : C.GramPSDOfParts := by
       simp [A, Matrix.mul_apply]
     | @insert a s ha ih =>
       simp only [TB.PSDOn] at ih ⊢
-      have h1 : (Matrix.of fun x y : Y => ∏ v ∈ insert a s, k v x y) =
-          (Matrix.of fun x y : Y => k a x y).hadamard (Matrix.of fun x y : Y => ∏ v ∈ s, k v x y) := by
+      have h1
+          : (Matrix.of fun x y : Y => ∏ v ∈ insert a s, k v x y)
+            = (Matrix.of fun x y : Y => k a x y).hadamard
+              (Matrix.of fun x y : Y => ∏ v ∈ s, k v x y) := by
         ext x y
         simp [Finset.prod_insert ha, Matrix.hadamard]
       rw [h1]
       exact (hk a).hadamard ih
   by_cases hi : i ≤ S.G.r + 1
-  · have hg : S.gram ε i w.1 =
-        fun p q => ∏ v, S.gramLoc v ε i (w.1 v) (loc (S.σ v) p) (loc (S.σ v) q) := by
+  · have hg
+        : S.gram ε i w.1
+          = fun p q => ∏ v, S.gramLoc v ε i (w.1 v) (loc (S.σ v) p) (loc (S.σ v) q) := by
       funext p q
       simp [Formalism.FourierDecayAlt.C.HidaSetting.gram, hi]
     rw [hg]
     exact prodPSD Finset.univ _ fun v =>
-      Cx1.psd_pullback Y (loc (S.σ v)) _ _ (fun x hx => Finset.mem_image_of_mem _ hx)
+      Cx1.psd_pullback Y (loc (S.σ v)) _ _
+        (fun x hx => Finset.mem_image_of_mem _ hx)
         (hP v ε hε i hi w _)
   · have hg : S.gram ε i w.1 = fun _ _ => 0 := by
       funext p q
@@ -96,8 +103,12 @@ theorem words_pos_of_parts : C.WordsPosOfParts := by
 theorem wave_estimate_of_integral : C.EstWaveOfParts := by
   intro E _ _ _ Wp Wq _ _ _ _ S hG hI hP Kr hK0 Th e ε hε i hi1 hi2 w hw hcnt
   obtain ⟨θ, hθ, hb⟩ := hP ε hε i hi1 hi2 w hw hcnt
-  exact ⟨θ, hθ, fun Y hY κ hκ => ⟨(hI ε hε i hi1 hi2 w Y hY κ hκ).2,
-    fun l hl hl0 => ⟨S.bigPlaces i l, hb Y hY κ hκ l hl hl0⟩⟩⟩
+  exact ⟨
+    θ,
+    hθ,
+    fun Y hY κ hκ =>
+      ⟨(hI ε hε i hi1 hi2 w Y hY κ hκ).2, fun l hl hl0 => ⟨S.bigPlaces i l, hb Y hY κ hκ l hl hl0⟩⟩
+  ⟩
 
 theorem lift_estimate_of_base : C.EstLiftOfParts := by
   intro E _ _ _ Wp Wq _ _ _ _ S h Kr hK0 Th e
@@ -109,7 +120,8 @@ theorem block_estimate_of_base : C.EstBlockOfParts := by
 
 theorem level_zero_estimate_product : C.EstEOfParts := by
   intro E _ _ _ Wp Wq _ _ _ _ S jv hG hE Kr hK0 Th e w _
-  have hgram : ∀ ε, (S.mkData Kr hK0 Th e).gram ε 0 w [] [] = ∏ v, (S.pd v).RR ε 0 (w.1 v) [] [] := by
+  have hgram
+      : ∀ ε, (S.mkData Kr hK0 Th e).gram ε 0 w [] [] = ∏ v, (S.pd v).RR ε 0 (w.1 v) [] [] := by
     intro ε
     show S.gram ε 0 w.1 [] [] = _
     simp [HidaSetting.gram, HidaSetting.gramLoc, loc, nLoc, nAux]
@@ -117,12 +129,14 @@ theorem level_zero_estimate_product : C.EstEOfParts := by
   have hpos : 0 < ∏ v, S.sizeAt v (w.1 v) := by
     rw [← hsize]
     exact words_pos_of_parts E Wp Wq S hG Kr hK0 Th e w
-  have hlim : Tendsto (fun ε => ∏ v, (S.pd v).RR ε 0 (w.1 v) [] []) (𝓝[>] 0)
-      (𝓝 (∏ v, ((S.sizeAt v (w.1 v) * jv v : ℝ) : ℂ))) :=
+  have hlim : Tendsto
+      (fun ε => ∏ v, (S.pd v).RR ε 0 (w.1 v) [] [])
+      (𝓝[>] 0) (𝓝 (∏ v, ((S.sizeAt v (w.1 v) * jv v : ℝ) : ℂ))) :=
     tendsto_finsetProd _ (fun v _ => hE w v)
   have hre := ((Complex.continuous_re.tendsto _).comp hlim).div_const (∏ v, S.sizeAt v (w.1 v))
-  have key : (∏ v, ((S.sizeAt v (w.1 v) * jv v : ℝ) : ℂ)).re /
-      (∏ v, S.sizeAt v (w.1 v)) = ∏ v, jv v := by
+  have key
+      : (∏ v, ((S.sizeAt v (w.1 v) * jv v : ℝ) : ℂ)).re / (∏ v, S.sizeAt v (w.1 v))
+        = ∏ v, jv v := by
     rw [← Complex.ofReal_prod, Complex.ofReal_re, Finset.prod_mul_distrib,
       mul_div_cancel_left₀ _ hpos.ne']
   rw [key] at hre

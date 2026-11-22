@@ -26,8 +26,8 @@ def IsHermND (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) : Prop :=
 
 def IsIntM (L : LocE F E) {m n : Type} (A : Matrix m n E) : Prop := ∀ i j, A i j ∈ L.O
 
-def perp (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (Y : Submodule E (Fin n → E)) :
-    Submodule E (Fin n → E) where
+def perp (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (Y : Submodule E (Fin n → E))
+    : Submodule E (Fin n → E) where
   carrier := {x | ∀ y ∈ Y, hf L Hm x y = 0}
   zero_mem' := by intro y _; simp [hf]
   add_mem' := by
@@ -37,18 +37,18 @@ def perp (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (Y : Submodule
     rw [h, ha y hy, hb y hy, add_zero]
   smul_mem' := by
     intro c a ha y hy
-    have h : hf L Hm (c • a) y = c * hf L Hm a y := by
-      simp [hf, Finset.mul_sum, mul_assoc]
+    have h : hf L Hm (c • a) y = c * hf L Hm a y := by simp [hf, Finset.mul_sum, mul_assoc]
     rw [h, ha y hy, mul_zero]
 
 def IsLat (L : LocE F E) {n : ℕ} (Λ : Submodule L.O (Fin n → E)) : Prop :=
   Λ.FG ∧ Submodule.span E (Λ : Set (Fin n → E)) = ⊤
 
-def IsSD (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (Λ : Submodule L.O (Fin n → E)) : Prop :=
+def IsSD (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (Λ : Submodule L.O (Fin n → E))
+    : Prop :=
   IsLat L Λ ∧ ∀ y, (∀ x ∈ Λ, hf L Hm x y ∈ L.O) ↔ y ∈ Λ
 
-def isomG (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) :
-    Subgroup ((Fin n → E) ≃ₗ[E] (Fin n → E)) where
+def isomG (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
+    : Subgroup ((Fin n → E) ≃ₗ[E] (Fin n → E)) where
   carrier := {g | ∀ x y, hf L Hm (g x) (g y) = hf L Hm x y}
   one_mem' := fun _ _ => rfl
   mul_mem' := by
@@ -78,13 +78,13 @@ def unipOn {n : ℕ} (A B : Submodule E (Fin n → E)) : Subgroup ((Fin n → E)
     refine ⟨h1, fun v hv => ?_⟩
     have h2 := ha' _ ((h1 v).2 hv)
     simp only [LinearEquiv.apply_symm_apply] at h2
-    have h3 : a⁻¹ v - v = -(v - a.symm v) := by
-      rw [neg_sub]; rfl
+    have h3 : a⁻¹ v - v = -(v - a.symm v) := by rw [neg_sub]; rfl
     rw [h3]
     exact B.neg_mem h2
 
-def eich (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x u : Fin n → E) (s : E)
-    (v : Fin n → E) : Fin n → E :=
+def eich
+    (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x u : Fin n → E) (s : E) (v : Fin n → E)
+    : Fin n → E :=
   v + hf L Hm v u • x - hf L Hm v x • (u + s • x)
 
 def invVol {G : Type*} [Group G] (K0 K : Subgroup G) : ℝ :=

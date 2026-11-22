@@ -20,7 +20,8 @@ def placesRing {L : Type*} [Field L] [NumberField L] (S : Set (FinitePlace L)) :
     rw [map_mul]
     exact mul_le_one₀ (hx w hw) (apply_nonneg w _) (hy w hw)
 
-theorem mem_placesRing {L : Type*} [Field L] [NumberField L] (S : Set (FinitePlace L)) (x : L) :
-    x ∈ placesRing S ↔ ∀ w ∈ S, w x ≤ 1 := Iff.rfl
+theorem mem_placesRing {L : Type*} [Field L] [NumberField L] (S : Set (FinitePlace L)) (x : L)
+    : x ∈ placesRing S ↔ ∀ w ∈ S, w x ≤ 1 :=
+  Iff.rfl
 
 end GroundTheory.Heights₂.Heights

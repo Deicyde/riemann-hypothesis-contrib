@@ -4,15 +4,18 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Yvb3.main :
-    ∀ (g : ℤ → ENNReal) (n : ℕ), ∑' (m : Fin n → ℤ), ∏ i : Fin n, g (m i) = (∑' (k : ℤ), g k) ^ n := by
+theorem UpperTheory.Reformulated.B.Yvb3.main
+    : ∀ (g : ℤ → ENNReal) (n : ℕ),
+      ∑' (m : Fin n → ℤ), ∏ i : Fin n, g (m i) = (∑' (k : ℤ), g k) ^ n := by
   intro g n
   induction n with
   | zero => simp
   | succ n ih =>
-    rw [← (Fin.consEquiv (fun _ : Fin (n+1) => ℤ)).tsum_eq]
-    have h : ∀ p : ℤ × (Fin n → ℤ),
-        (∏ i : Fin (n+1), g ((Fin.consEquiv (fun _ : Fin (n+1) => ℤ)) p i)) = g p.1 * ∏ i : Fin n, g (p.2 i) := by
+    rw [← (Fin.consEquiv (fun _ : Fin (n + 1) => ℤ)).tsum_eq]
+    have h
+        : ∀ p : ℤ × (Fin n → ℤ),
+          (∏ i : Fin (n+1), g ((Fin.consEquiv (fun _ : Fin (n+1) => ℤ)) p i))
+            = g p.1 * ∏ i : Fin n, g (p.2 i) := by
       intro p
       rw [Fin.prod_univ_succ]
       simp [Fin.consEquiv]

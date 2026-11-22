@@ -11,7 +11,8 @@ namespace Formalism.MainNotions.N.FrobeniusPowerSeries
 
 open PowerSeries
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 
 noncomputable def cont (ϖ : O) (g f : O⟦X⟧) : ℕ∞ :=
@@ -29,8 +30,9 @@ theorem Cont.enat_le_of_forall {a b : ℕ∞} (h : ∀ k : ℕ, (k : ℕ∞) ≤
   norm_cast at h2
   omega
 
-theorem Cont.mem_pair_mono (ϖ : O) (g f : O⟦X⟧) {j k : ℕ} (hjk : j ≤ k)
-    (h : f ∈ Ideal.span {C ϖ ^ k, g}) : f ∈ Ideal.span {C ϖ ^ j, g} := by
+theorem Cont.mem_pair_mono
+    (ϖ : O) (g f : O⟦X⟧) {j k : ℕ} (hjk : j ≤ k) (h : f ∈ Ideal.span {C ϖ ^ k, g})
+    : f ∈ Ideal.span {C ϖ ^ j, g} := by
   refine (Ideal.span_le.2 ?_) h
   intro x hx
   rcases hx with rfl | rfl
@@ -43,8 +45,8 @@ theorem Cont.mem_zero (ϖ : O) (g f : O⟦X⟧) : f ∈ Ideal.span {C ϖ ^ 0, g}
   have h1 : (1 : O⟦X⟧) ∈ Ideal.span {C ϖ ^ 0, g} := Ideal.subset_span (by simp)
   simpa using Ideal.mul_mem_left _ f h1
 
-theorem Cont.mem_iff_le (ϖ : O) (g f : O⟦X⟧) (k : ℕ) :
-    f ∈ Ideal.span {C ϖ ^ k, g} ↔ (k : ℕ∞) ≤ cont ϖ g f := by
+theorem Cont.mem_iff_le (ϖ : O) (g f : O⟦X⟧) (k : ℕ)
+    : f ∈ Ideal.span {C ϖ ^ k, g} ↔ (k : ℕ∞) ≤ cont ϖ g f := by
   unfold cont
   constructor
   · intro h
@@ -75,8 +77,9 @@ theorem Cont.C_unif_ne_zero {ϖ : O} (hϖ : Irreducible ϖ) : (C ϖ : O⟦X⟧) 
   have h1 := congrArg PowerSeries.constantCoeff h
   simpa using h1
 
-theorem Cont.C_dvd_of_map_eq_zero {ϖ : O} (hϖ : Irreducible ϖ) (f : O⟦X⟧)
-    (hf : f.map (IsLocalRing.residue O) = 0) : C ϖ ∣ f := by
+theorem Cont.C_dvd_of_map_eq_zero
+    {ϖ : O} (hϖ : Irreducible ϖ) (f : O⟦X⟧) (hf : f.map (IsLocalRing.residue O) = 0)
+    : C ϖ ∣ f := by
   have hmax : IsLocalRing.maximalIdeal O = Ideal.span {ϖ} :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).1 hϖ
   have hc : ∀ n, ∃ c, PowerSeries.coeff n f = ϖ * c := by
@@ -107,13 +110,16 @@ theorem Cont.prime_C_unif {ϖ : O} (hϖ : Irreducible ϖ) : Prime (C ϖ : O⟦X�
     · exact Or.inl (Cont.C_dvd_of_map_eq_zero hϖ f h)
     · exact Or.inr (Cont.C_dvd_of_map_eq_zero hϖ g h)
 
-theorem Cont.not_C_dvd {ϖ : O} (hϖ : Irreducible ϖ) {g : O⟦X⟧} (hg : IsDist g) : ¬ (C ϖ ∣ g) := by
+theorem Cont.not_C_dvd {ϖ : O} (hϖ : Irreducible ϖ) {g : O⟦X⟧} (hg : IsDist g) : ¬(C ϖ ∣ g) := by
   rintro ⟨h, hh⟩
   apply hg
   rw [hh, map_mul, PowerSeries.map_C, Cont.residue_unif hϖ, map_zero, zero_mul]
 
-theorem Cont.mem_of_pow_mul_mem {ϖ : O} (hϖ : Irreducible ϖ) {g : O⟦X⟧} (hg : IsDist g) (n : ℕ)
-    (h : O⟦X⟧) (hm : C ϖ ^ n * h ∈ Ideal.span {g}) : h ∈ Ideal.span {g} := by
+theorem Cont.mem_of_pow_mul_mem
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {g : O⟦X⟧} (hg : IsDist g)
+    (n : ℕ) (h : O⟦X⟧) (hm : C ϖ ^ n * h ∈ Ideal.span {g})
+    : h ∈ Ideal.span {g} := by
   induction n generalizing h with
   | zero => simpa using hm
   | succ n ih =>
@@ -124,7 +130,9 @@ theorem Cont.mem_of_pow_mul_mem {ϖ : O} (hϖ : Irreducible ϖ) {g : O⟦X⟧} (
     · rw [Ideal.mem_span_singleton']
       refine ⟨q', ?_⟩
       have h1 : C ϖ * (q' * g) = C ϖ * (C ϖ ^ n * h) := by
-        calc C ϖ * (q' * g) = C ϖ * q' * g := by ring
+        calc
+          C ϖ * (q' * g)
+            = C ϖ * q' * g := by ring
           _ = C ϖ ^ (n + 1) * h := hq
           _ = C ϖ * (C ϖ ^ n * h) := by ring
       exact mul_left_cancel₀ (Cont.C_unif_ne_zero hϖ) h1
@@ -133,9 +141,9 @@ theorem Cont.mem_of_pow_mul_mem {ϖ : O} (hϖ : Irreducible ϖ) {g : O⟦X⟧} (
 variable {ϖ : O} (hϖ : Irreducible ϖ)
 include hϖ
 
-theorem C2' {g : O⟦X⟧} (hg : IsDist g) (f : O⟦X⟧) (k : ℕ) :
-    (∃ (a : O⟦X⟧) (n : ℕ), C ϖ ^ n * (f - C ϖ ^ k * a) ∈ Ideal.span {g}) ↔
-      f ∈ Ideal.span {C ϖ ^ k, g} := by
+theorem C2' {g : O⟦X⟧} (hg : IsDist g) (f : O⟦X⟧) (k : ℕ)
+    : (∃ (a : O⟦X⟧) (n : ℕ), C ϖ ^ n * (f - C ϖ ^ k * a) ∈ Ideal.span {g})
+      ↔ f ∈ Ideal.span {C ϖ ^ k, g} := by
   constructor
   · rintro ⟨a, n, h⟩
     have h1 := Cont.mem_of_pow_mul_mem hϖ hg n _ h
@@ -149,12 +157,12 @@ theorem C2' {g : O⟦X⟧} (hg : IsDist g) (f : O⟦X⟧) (k : ℕ) :
     rw [pow_zero, one_mul, ← huv, Ideal.mem_span_singleton']
     exact ⟨v, by ring⟩
 
-theorem mem_iff_le_cont {g : O⟦X⟧} (hg : IsDist g) (f : O⟦X⟧) (k : ℕ) :
-    f ∈ Ideal.span {C ϖ ^ k, g} ↔ (k : ℕ∞) ≤ cont ϖ g f := by
+theorem mem_iff_le_cont {g : O⟦X⟧} (hg : IsDist g) (f : O⟦X⟧) (k : ℕ)
+    : f ∈ Ideal.span {C ϖ ^ k, g} ↔ (k : ℕ∞) ≤ cont ϖ g f := by
   exact Cont.mem_iff_le ϖ g f k
 
-theorem m1 {g g' : O⟦X⟧} (hg : IsDist g) (hg' : IsDist g') (hdvd : g ∣ g') (f : O⟦X⟧) :
-    cont ϖ g' f ≤ cont ϖ g f := by
+theorem m1 {g g' : O⟦X⟧} (hg : IsDist g) (hg' : IsDist g') (hdvd : g ∣ g') (f : O⟦X⟧)
+    : cont ϖ g' f ≤ cont ϖ g f := by
   apply Cont.enat_le_of_forall
   intro k hk
   have h1 := (Cont.mem_iff_le ϖ g' f k).2 hk
@@ -170,6 +178,5 @@ theorem m2 {g : O⟦X⟧} (hg : IsDist g) (k f : O⟦X⟧) : cont ϖ g f ≤ con
   apply Cont.enat_le_of_forall
   intro j hj
   exact (Cont.mem_iff_le ϖ g _ j).1 (Ideal.mul_mem_left _ k ((Cont.mem_iff_le ϖ g f j).2 hj))
-
 
 end Formalism.MainNotions.N.FrobeniusPowerSeries

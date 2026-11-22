@@ -244,7 +244,8 @@ lemma tp_sub (B : Finset (Fin d → ℤ)) (c : (Fin d → ℤ) → ℂ) (z z₀ 
   push_cast
   ring
 
-noncomputable def pk (y : Fin d → ℝ) : ℝ := ∏ j, ‖1 + Complex.exp (2 * π * Complex.I * (y j : ℂ))‖ ^ 2
+noncomputable def pk (y : Fin d → ℝ) : ℝ :=
+  ∏ j, ‖1 + Complex.exp (2 * π * Complex.I * (y j : ℂ))‖ ^ 2
 
 lemma fac_eq (t : ℝ) : ‖1 + Complex.exp (2 * π * Complex.I * (t : ℂ))‖ ^ 2 = 2 + 2 * Real.cos (2 * π * t) := by
   have h : (2 * π * Complex.I * (t : ℂ)) = ((2 * π * t : ℝ) : ℂ) * Complex.I := by push_cast; ring
@@ -422,7 +423,8 @@ end Formalism.FourierDecayAlt.P.HLsc
 
 namespace Formalism.FourierDecayAlt.P
 
-open Real Filter Topology Finset MeasureTheory Formalism.FourierDecayAlt.P.Herglotz Formalism.FourierDecayAlt.P.HLsc
+open Real Filter Topology Finset MeasureTheory Formalism.FourierDecayAlt.P.Herglotz
+  Formalism.FourierDecayAlt.P.HLsc
 
 theorem herglotz_lower_semicontinuous : Formalism.FourierDecayAlt.E.HerglotzLSC := by
   intro d N A hN0 hlsc hint hPD hsum z₀ S
@@ -433,13 +435,15 @@ theorem herglotz_lower_semicontinuous : Formalism.FourierDecayAlt.E.HerglotzLSC 
   refine le_of_forall_pos_le_add (fun ε hε => ?_)
   set η : ℝ := ε / ((S.card : ℝ) + 1) with hη
   have hηpos : 0 < η := by positivity
-  have hev : ∀ᶠ y in 𝓝 (0 : Fin d → ℝ), ∀ m ∈ S,
-      N (fun j => z₀ j + (m j : ℝ)) - η < N (fun j => z₀ j + (m j : ℝ) + y j) := by
+  have hev
+      : ∀ᶠ y in 𝓝 (0 : Fin d → ℝ), ∀ m ∈ S,
+        N (fun j => z₀ j + (m j : ℝ)) - η < N (fun j => z₀ j + (m j : ℝ) + y j) := by
     rw [Filter.eventually_all_finset]
     intro m _
     have h1 := hlsc (fun j => z₀ j + (m j : ℝ)) (N (fun j => z₀ j + (m j : ℝ)) - η) (by linarith)
-    have h2 : Tendsto (fun y : Fin d → ℝ => (fun j => z₀ j + (m j : ℝ) + y j)) (𝓝 0)
-        (𝓝 (fun j => z₀ j + (m j : ℝ))) := by
+    have h2 : Tendsto
+        (fun y : Fin d → ℝ => (fun j => z₀ j + (m j : ℝ) + y j))
+        (𝓝 0) (𝓝 (fun j => z₀ j + (m j : ℝ))) := by
       have hc : Continuous (fun y : Fin d → ℝ => (fun j => z₀ j + (m j : ℝ) + y j)) := by fun_prop
       exact hc.tendsto' _ _ (by simp)
     exact h2.eventually h1
@@ -448,31 +452,39 @@ theorem herglotz_lower_semicontinuous : Formalism.FourierDecayAlt.E.HerglotzLSC 
     rw [mem_ball_zero_iff] at hy
     exact lt_of_le_of_lt (norm_le_pi_norm y j) hy
   obtain ⟨U, hUsub, hUo, h0U⟩ := mem_nhds_iff.1 (hev.and hball)
-  have hT := tendsto_setIntegral_pow_smul_of_unique_maximum_of_isCompact_of_integrableOn
-    (μ := (volume : Measure (Fin d → ℝ))) (x₀ := 0) (g := U.indicator (fun _ => (1 : ℝ)))
-    isCompact_cube continuous_pk.continuousOn pk_lt (fun x _ => pk_nonneg x)
-    (by rw [pk_zero]; positivity)
-    (subset_closure (mem_interior_iff_mem_nhds.2
-      (pi_Icc_mem_nhds (fun _ => by norm_num) (fun _ => by norm_num))))
-    ((integrableOn_const (isCompact_cube.measure_lt_top.ne)).indicator hUo.measurableSet)
-    (by
-      have : U.indicator (fun _ => (1 : ℝ)) =ᶠ[𝓝 0] fun _ => (1 : ℝ) := by
-        filter_upwards [hUo.mem_nhds h0U] with y hy
-        exact Set.indicator_of_mem hy _
-      exact (continuousAt_const.congr this.symm).continuousWithinAt)
+  have hT :=
+    tendsto_setIntegral_pow_smul_of_unique_maximum_of_isCompact_of_integrableOn
+      (μ := (volume : Measure (Fin d → ℝ))) (x₀ := 0) (g := U.indicator (fun _ => (1 : ℝ)))
+      isCompact_cube continuous_pk.continuousOn pk_lt
+      (fun x _ => pk_nonneg x)
+      (by rw [pk_zero]; positivity)
+      (subset_closure (mem_interior_iff_mem_nhds.2
+        (pi_Icc_mem_nhds (fun _ => by norm_num) (fun _ => by norm_num))))
+      ((integrableOn_const (isCompact_cube.measure_lt_top.ne)).indicator hUo.measurableSet)
+      (by
+        have : U.indicator (fun _ => (1 : ℝ)) =ᶠ[𝓝 0] fun _ => (1 : ℝ) := by
+          filter_upwards [hUo.mem_nhds h0U] with y hy
+          exact Set.indicator_of_mem hy _
+        exact (continuousAt_const.congr this.symm).continuousWithinAt)
   rw [Set.indicator_of_mem h0U] at hT
-  have hle : ∀ n : ℕ, (∑ m ∈ S, (N (fun j => z₀ j + (m j : ℝ)) - η)) *
-      ((∫ x in cube d, pk x ^ n)⁻¹ • ∫ x in cube d, pk x ^ n • U.indicator (fun _ => (1 : ℝ)) x) ≤ K := by
+  have hle
+      : ∀ n : ℕ,
+        (∑ m ∈ S, (N (fun j => z₀ j + (m j : ℝ)) - η))
+            * ((∫ x in cube d, pk x ^ n)⁻¹
+              • ∫ x in cube d, pk x ^ n • U.indicator (fun _ => (1 : ℝ)) x)
+          ≤ K := by
     intro n
-    have h1 := (lower_pk hN0 hint z₀ S η U hUo (fun y hy => (hUsub hy).1) (fun y hy => (hUsub hy).2) n).trans
-      (upper_pk hint hPD hsum z₀ n)
+    have h1 :=
+      (lower_pk hN0 hint z₀ S η U hUo (fun y hy => (hUsub hy).1) (fun y hy => (hUsub hy).2) n).trans
+        (upper_pk hint hPD hsum z₀ n)
     have hI : 0 ≤ ∫ x in cube d, pk x ^ n := integral_nonneg (fun x => pow_nonneg (pk_nonneg x) n)
     have h2 := mul_le_mul_of_nonneg_right h1 (inv_nonneg.2 hI)
     have h3 : K * (∫ x in cube d, pk x ^ n) * (∫ x in cube d, pk x ^ n)⁻¹ ≤ K := by
       rw [mul_assoc]
       exact mul_le_of_le_one_right hK0 mul_inv_le_one
     rw [smul_eq_mul]
-    calc _ = _ := by ring
+    calc
+      _ = _ := by ring
       _ ≤ _ := h2
       _ ≤ K := h3
   have hlim := le_of_tendsto' (hT.const_mul (∑ m ∈ S, (N (fun j => z₀ j + (m j : ℝ)) - η))) hle

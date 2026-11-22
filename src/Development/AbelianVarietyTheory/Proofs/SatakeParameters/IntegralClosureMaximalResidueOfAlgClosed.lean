@@ -9,11 +9,14 @@ open GlobalTheory.EtC
 
 namespace GlobalTheory
 
-theorem integralClosure_maximal_residue_algClosed : ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] (φ : k →+* K) (D : Subring K) (m₀ : Ideal D),
-    φ.range ≤ D → m₀.IsMaximal → (∀ r : D, ∃ c : k, ∃ h : φ c ∈ D, r - ⟨φ c, h⟩ ∈ m₀) →
-    (∀ x : K, ∃ d : D, d ≠ 0 ∧ IsIntegral D ((d : K) * x)) →
-    ∃ (R : Subring K) (𝔪 : Ideal R), φ.range ≤ R ∧ 𝔪.IsMaximal ∧ (∀ r : R, ∃ c : k, ∃ h : φ c ∈ R, r - ⟨φ c, h⟩ ∈ 𝔪) ∧
-      (∀ x : K, ∃ d : R, d ≠ 0 ∧ (d : K) * x ∈ R) ∧ ∀ x : K, IsIntegral R x → x ∈ R := by
+theorem integralClosure_maximal_residue_algClosed
+    : ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] (φ : k →+* K) (D : Subring K)
+        (m₀ : Ideal D),
+      φ.range ≤ D → m₀.IsMaximal → (∀ r : D, ∃ c : k, ∃ h : φ c ∈ D, r - ⟨φ c, h⟩ ∈ m₀)
+        → (∀ x : K, ∃ d : D, d ≠ 0 ∧ IsIntegral D ((d : K) * x))
+        → ∃ (R : Subring K) (𝔪 : Ideal R),
+          φ.range ≤ R ∧ 𝔪.IsMaximal ∧ (∀ r : R, ∃ c : k, ∃ h : φ c ∈ R, r - ⟨φ c, h⟩ ∈ 𝔪)
+            ∧ (∀ x : K, ∃ d : R, d ≠ 0 ∧ (d : K) * x ∈ R) ∧ ∀ x : K, IsIntegral R x → x ∈ R := by
   intro k K _ _ _ φ D m₀ hφD hm₀ hres hfrac
   let A := integralClosure D K
   have hφA : ∀ c : k, φ c ∈ A := fun c =>
@@ -48,7 +51,9 @@ theorem integralClosure_maximal_residue_algClosed : ∀ (k K : Type) [Field k] [
     obtain ⟨f, hfm, hf⟩ := hr
     have hlift : f.map (algebraMap D (A ⧸ 𝔪)) ∈ Polynomial.lifts ψ := by
       rw [Polynomial.lifts_iff_coeff_lifts]
-      intro n; rw [Polynomial.coeff_map]; exact hcoef _
+      intro n
+      rw [Polynomial.coeff_map]
+      exact hcoef _
     obtain ⟨q, hq, -, hqm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic hlift (hfm.map _)
     have hint : IsIntegral k (Ideal.Quotient.mk 𝔪 r) := by
       refine ⟨q, hqm, ?_⟩

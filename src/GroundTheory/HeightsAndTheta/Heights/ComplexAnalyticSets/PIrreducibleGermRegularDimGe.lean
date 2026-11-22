@@ -13,8 +13,8 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology
 
-theorem IrreducibleGermRegularDimGe.proof (hS : FiniteProjectionSheetsDense.Statement) :
-    IrreducibleGermRegularDimGe.Statement := by
+theorem IrreducibleGermRegularDimGe.proof (hS : FiniteProjectionSheetsDense.Statement)
+    : IrreducibleGermRegularDimGe.Statement := by
   intro σ _ X w d A hX hirr hiso hnd
   obtain ⟨N, hN, hsub⟩ := hS σ X w d A hX hirr hiso hnd
   refine ⟨N, hN, ?_⟩

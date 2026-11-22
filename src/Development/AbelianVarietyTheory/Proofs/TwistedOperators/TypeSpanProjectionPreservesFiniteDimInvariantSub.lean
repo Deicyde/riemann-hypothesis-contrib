@@ -16,9 +16,14 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.KStableOf
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open scoped TensorProduct
 open Classical
 
@@ -26,16 +31,20 @@ noncomputable section
 
 namespace GlobalTheory.KTypeProj
 
-theorem typeSpan_proj_mem {M ι : Type} [AddCommGroup M] [Module ℂ M] (b : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ) (G : Submodule ℂ M)
-    (ρ : ι → M →ₗ[ℂ] M) (inv : ι → ι) (hpos : ∀ x ∈ G, x ≠ 0 → 0 < (b x x).re)
-    (hherm : ∀ x ∈ G, ∀ y ∈ G, star (b x y) = b y x)
+theorem typeSpan_proj_mem
+    {M ι : Type} [AddCommGroup M] [Module ℂ M]
+    (b : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ)
+    (G : Submodule ℂ M) (ρ : ι → M →ₗ[ℂ] M)
+    (inv : ι → ι)
+    (hpos : ∀ x ∈ G, x ≠ 0 → 0 < (b x x).re) (hherm : ∀ x ∈ G, ∀ y ∈ G, star (b x y) = b y x)
     (_hρG : ∀ i, ∀ x ∈ G, ρ i x ∈ G) (hadj : ∀ i, ∀ x ∈ G, ∀ y ∈ G, b (ρ i x) y = b x (ρ (inv i) y))
-    (hproj : ∀ F : Submodule ℂ M, F ≤ G → FiniteDimensional ℂ F →
-      ∃ π : M →ₗ[ℂ] M, (∀ x, π x ∈ F) ∧ ∀ x, ∀ f ∈ F, b (π x) f = b x f)
-    (Y₀ : Submodule ℂ M) (e : M →ₗ[ℂ] M) (he : ∀ x, e x ∈ typeSpan ρ Y₀ G)
-    (he' : ∀ x, ∀ f ∈ typeSpan ρ Y₀ G, b (e x) f = b x f)
-    (Y : Submodule ℂ M) (hYf : FiniteDimensional ℂ Y) (hYG : Y ≤ G) (hYρ : ∀ i, ∀ y ∈ Y, ρ i y ∈ Y) :
-    ∀ x ∈ Y, e x ∈ Y := by
+    (hproj : ∀ F : Submodule ℂ M,
+      F ≤ G → FiniteDimensional ℂ F
+        → ∃ π : M →ₗ[ℂ] M, (∀ x, π x ∈ F) ∧ ∀ x, ∀ f ∈ F, b (π x) f = b x f)
+    (Y₀ : Submodule ℂ M) (e : M →ₗ[ℂ] M)
+    (he : ∀ x, e x ∈ typeSpan ρ Y₀ G) (he' : ∀ x, ∀ f ∈ typeSpan ρ Y₀ G, b (e x) f = b x f)
+    (Y : Submodule ℂ M) (hYf : FiniteDimensional ℂ Y) (hYG : Y ≤ G) (hYρ : ∀ i, ∀ y ∈ Y, ρ i y ∈ Y)
+    : ∀ x ∈ Y, e x ∈ Y := by
   intro x hx
   have hzero : ∀ d ∈ G, b d d = 0 → d = 0 := by
     intro d hd h

@@ -11,10 +11,10 @@ public import Development.AutomorphicArithmetic.FrobeniusLocalisation.LogRdSum
 open UpperTheory.HF
 open NumberField Formalism.HC
 
-theorem UpperTheory.KR.sum_log_bad_le :
-    ∀ {φ : Frame} (H : HostAx φ) (M : ℕ) (S : Finset ℕ), M ≠ 0 →
-      (∀ p ∈ S, p.Prime ∧ (p = 2 ∨ p = H.d ∨ p ∣ (discr H.E).natAbs ∨ p ∣ M)) →
-        ∑ p ∈ S, Real.log p ≤ 2 * Real.log H.rd + Real.log M := by
+theorem UpperTheory.KR.sum_log_bad_le
+    : ∀ {φ : Frame} (H : HostAx φ) (M : ℕ) (S : Finset ℕ),
+      M ≠ 0 → (∀ p ∈ S, p.Prime ∧ (p = 2 ∨ p = H.d ∨ p ∣ (discr H.E).natAbs ∨ p ∣ M))
+        → ∑ p ∈ S, Real.log p ≤ 2 * Real.log H.rd + Real.log M := by
   intro φ H M S hM hS
   have hD : (discr H.E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (discr_ne_zero H.E)
   obtain ⟨hA, hB, -⟩ := UpperTheory.HF.ram_eq H
@@ -38,7 +38,8 @@ theorem UpperTheory.KR.sum_log_bad_le :
     · exact Nat.cast_le.2 (Nat.le_of_dvd (Nat.pos_of_ne_zero hM) (Nat.prod_primeFactors_dvd M))
   have h3 : ∑ p ∈ S, Real.log p ≤ ∑ p ∈ H.ram ∪ M.primeFactors, Real.log p :=
     Finset.sum_le_sum_of_subset_of_nonneg hsub fun p _ _ => Real.log_natCast_nonneg p
-  have h4 := Finset.sum_union_inter (s₁ := H.ram) (s₂ := M.primeFactors) (f := fun p : ℕ => Real.log p)
+  have h4 :=
+    Finset.sum_union_inter (s₁ := H.ram) (s₂ := M.primeFactors) (f := fun p : ℕ => Real.log p)
   have h5 : 0 ≤ ∑ p ∈ H.ram ∩ M.primeFactors, Real.log p :=
     Finset.sum_nonneg fun p _ => Real.log_natCast_nonneg p
   linarith

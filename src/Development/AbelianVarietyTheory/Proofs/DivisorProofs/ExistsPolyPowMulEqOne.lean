@@ -10,9 +10,9 @@ open scoped Classical
 
 namespace GlobalTheory
 
-theorem prod_X_sub_C_dvd_pow_of_isRoot (g : ℂ[X]) :
-    ∀ s : Multiset ℂ, (∀ a ∈ s, g.IsRoot a) →
-      (s.map fun a => X - C a).prod ∣ g ^ Multiset.card s := by
+theorem prod_X_sub_C_dvd_pow_of_isRoot (g : ℂ[X])
+    : ∀ s : Multiset ℂ,
+      (∀ a ∈ s, g.IsRoot a) → (s.map fun a => X - C a).prod ∣ g ^ Multiset.card s := by
   intro s
   induction s using Multiset.induction_on with
   | empty => intro _; simp
@@ -22,8 +22,9 @@ theorem prod_X_sub_C_dvd_pow_of_isRoot (g : ℂ[X]) :
     exact mul_dvd_mul (dvd_iff_isRoot.mpr (h a (Multiset.mem_cons_self a s)))
       (ih fun b hb => h b (Multiset.mem_cons_of_mem hb))
 
-theorem dvd_pow_natDegree_of_forall_isRoot (f g : ℂ[X]) (hf : f.Monic)
-    (h : ∀ a ∈ f.roots, g.IsRoot a) : f ∣ g ^ f.natDegree := by
+theorem dvd_pow_natDegree_of_forall_isRoot
+    (f g : ℂ[X]) (hf : f.Monic) (h : ∀ a ∈ f.roots, g.IsRoot a)
+    : f ∣ g ^ f.natDegree := by
   have hc : Multiset.card f.roots = f.natDegree := IsAlgClosed.card_roots_eq_natDegree
   have key := prod_X_sub_C_dvd_pow_of_isRoot g f.roots h
   rw [hc] at key
@@ -31,8 +32,9 @@ theorem dvd_pow_natDegree_of_forall_isRoot (f g : ℂ[X]) (hf : f.Monic)
   rw [hf.leadingCoeff, C_1, one_mul] at hf'
   rwa [hf'] at key
 
-theorem exists_poly_pow_mul_eq_one : ∀ (n l : ℕ) (B : Matrix (Fin n) (Fin n) ℂ), 0 < l → IsUnit B →
-    ∃ p : ℂ[X], (aeval B p) ^ l * B = 1 := by
+theorem exists_poly_pow_mul_eq_one
+    : ∀ (n l : ℕ) (B : Matrix (Fin n) (Fin n) ℂ),
+      0 < l → IsUnit B → ∃ p : ℂ[X], (aeval B p) ^ l * B = 1 := by
   intro n l B hl hB
   obtain ⟨k, rfl⟩ : ∃ k, l = k + 1 := ⟨l - 1, by omega⟩
   set f := B.charpoly with hf
@@ -55,8 +57,8 @@ theorem exists_poly_pow_mul_eq_one : ∀ (n l : ℕ) (B : Matrix (Fin n) (Fin n)
   let q : ℂ[X] := Lagrange.interpolate f.roots.toFinset id c
   have hq : ∀ a ∈ f.roots, q.eval a = c a := by
     intro a ha
-    exact Lagrange.eval_interpolate_at_node (s := f.roots.toFinset) (v := id) c
-      (Set.injOn_id _) (Multiset.mem_toFinset.mpr ha)
+    exact Lagrange.eval_interpolate_at_node (s := f.roots.toFinset) (v := id) c (Set.injOn_id _)
+      (Multiset.mem_toFinset.mpr ha)
   let g : ℂ[X] := X * q ^ (k + 1) - 1
   have hg : ∀ a ∈ f.roots, g.IsRoot a := by
     intro a ha

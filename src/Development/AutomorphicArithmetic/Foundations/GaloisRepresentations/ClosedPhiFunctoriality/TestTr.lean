@@ -5,19 +5,24 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong GlobalTheory.WeilDeligne Matrix
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal
+  GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim
+  GlobalTheory.Cong GlobalTheory.WeilDeligne Matrix
 open scoped Formalism.Per NNReal
 open UpperTheory.Gal.ClosedPhiFromClosedTrace
 
-theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.testTr_holds :
-    TestTr := by
+theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.testTr_holds : TestTr := by
   intro l _ P AI T d s v v₀ t p hv h lam
   subst hv
   let Λ : OB P →ₗ[↥(MaximalUnramifiedExtension l)] Bst P :=
     (TensorProduct.lid (↥(MaximalUnramifiedExtension l)) (Bst P)).toLinearMap ∘ₗ lam.rTensor (Bst P)
   have hΛ : ∀ (x : Om l) (b : Bst P), Λ (x ⊗ₜ b) = lam x • b := by
     intro x b
-    change TensorProduct.lid (↥(MaximalUnramifiedExtension l)) (Bst P) (lam.rTensor (Bst P) (x ⊗ₜ b)) = lam x • b
+    change TensorProduct.lid (↥(MaximalUnramifiedExtension l)) (Bst P)
+        (lam.rTensor (Bst P) (x ⊗ₜ b))
+      = lam x • b
     rw [LinearMap.rTensor_tmul, TensorProduct.lid_tmul]
   have h1 := congrArg Λ h
   set_option synthInstance.maxHeartbeats 100000 in

@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.wtCrit_of :
-    PtEx → WtCrit := by
+theorem UpperTheory.Gal.TranscendenceTraces.wtCrit_of : PtEx → WtCrit := by
   intro hPt Z S p w h A φ hφ
   choose N c hN hu hc using h A φ hφ
   refine ⟨c, ?_, fun Ω _ _ x => (hc (pt x) Ω x (hu (pt x))).symm⟩

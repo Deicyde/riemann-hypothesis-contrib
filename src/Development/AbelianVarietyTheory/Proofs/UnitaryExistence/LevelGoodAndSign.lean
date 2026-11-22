@@ -16,14 +16,21 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Landherr₂.Exi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
 open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
 open scoped TensorProduct Topology
 open GlobalTheory.RecDict
 
 namespace GlobalTheory.RecDict
 
-theorem level_good_and_sign : ∀ (D : D7) (Q : Par D), Q.Pins → (∀ p : ℕ, p.Prime → Q.l.GoodAt p) ∧ Q.l.A = 1 ∧ ∀ τ : D.host.E →+* ℂ, τ (Q.H.rt : D.host.E) = Q.H.rt0 → (τ (-D.host.xi0)).im < 0 := by
+theorem level_good_and_sign
+    : ∀ (D : D7) (Q : Par D),
+      Q.Pins
+        → (∀ p : ℕ, p.Prime → Q.l.GoodAt p) ∧ Q.l.A = 1
+          ∧ ∀ τ : D.host.E →+* ℂ, τ (Q.H.rt : D.host.E) = Q.H.rt0 → (τ (-D.host.xi0)).im < 0 := by
   rintro D Q ⟨⟨-, hrt, hrt0, -⟩, ⟨hM, hA⟩, -, -⟩
   refine ⟨fun p hp => ?_, hA, fun τ hτ => ?_⟩
   · have hodd := Q.l.odd
@@ -39,7 +46,8 @@ theorem level_good_and_sign : ∀ (D : D7) (Q : Par D), Q.Pins → (∀ p : ℕ,
     unfold ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level.GoodAt
     have hM0 : Q.l.M ≠ 0 := by have := Q.l.three_le; omega
     have key : ∀ c, 3 ≤ c → c ∣ Q.l.M → ¬ p ∣ c → 3 ≤ Q.l.M / p ^ Q.l.M.factorization p :=
-      fun c hc hd hn => hc.trans (Nat.le_of_dvd (Nat.ordCompl_pos p hM0) (Nat.dvd_ordCompl_of_dvd_not_dvd hd hn))
+      fun c hc hd hn =>
+        hc.trans (Nat.le_of_dvd (Nat.ordCompl_pos p hM0) (Nat.dvd_ordCompl_of_dvd_not_dvd hd hn))
     by_cases h : p ∣ D.host.g 0
     · refine key _ hb (hM ▸ dvd_mul_left _ _) fun h' => hp.one_lt.ne' ?_
       exact Nat.eq_one_of_dvd_coprimes hab h h'

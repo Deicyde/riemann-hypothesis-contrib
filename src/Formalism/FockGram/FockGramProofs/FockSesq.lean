@@ -11,9 +11,8 @@ namespace Formalism.E
 section
 variable {R τ : Type*} [CommRing R] [StarRing R]
 
-theorem fock_eq_sum_of_subset (f g : MvPolynomial τ R) (s : Finset (τ →₀ ℕ))
-    (h : f.support ⊆ s) :
-    fock f g = ∑ m ∈ s, f.coeff m * star (g.coeff m) * (Formalism.A.mfact m : R) := by
+theorem fock_eq_sum_of_subset (f g : MvPolynomial τ R) (s : Finset (τ →₀ ℕ)) (h : f.support ⊆ s)
+    : fock f g = ∑ m ∈ s, f.coeff m * star (g.coeff m) * (Formalism.A.mfact m : R) := by
   classical
   unfold fock
   refine Finset.sum_subset h ?_

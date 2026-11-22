@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OmegaFactorP
 @[expose] public section
 
 open NumberField UpperHalfPlane GlobalTheory.HilbFam GlobalTheory.QFam
-open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
+open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
+  (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
 open GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates (iterD partialD)
 open scoped Classical MatrixGroups nonZeroDivisors
 
@@ -24,17 +25,36 @@ private lemma powerSeries_map_mk' (g : ℂ ≃+* ℂ) (c : ℕ → ℂ) :
 
 open NumberField UpperHalfPlane in
 open scoped Classical MatrixGroups nonZeroDivisors in
-theorem _root_.GlobalTheory.HilbFam.hser_conj : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (𝔞 𝔟 : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Frac F) (a₀ : ℂ) (a : F → ℂ) (x : F) (s N : ℕ) (g : ℂ ≃+* ℂ) (m : ℤ) (π : Equiv.Perm (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F)) (κ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ) (c : ℕ → ℂ) (n : ℕ), k = 2 * s → 0 < N → _root_.GlobalTheory.HilbFam.IsCoef k 𝔞 𝔟 a₀ a → g a₀ = a₀ → _root_.GlobalTheory.HilbFam.HasLevel N (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x) → g (Complex.exp ((2 * Real.pi * Complex.I) / N)) = Complex.exp ((2 * Real.pi * Complex.I) * m / N) → (∀ (i : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F) (y : F), g ((i y : ℝ) : ℂ) = ((π i y : ℝ) : ℂ)) → g (PowerSeries.coeff n (_root_.GlobalTheory.HilbFam.hser k N 𝔞 a x κ c)) = PowerSeries.coeff n (_root_.GlobalTheory.HilbFam.hser k N 𝔞 a (m * x) (fun j ↦ κ (π.symm j)) (fun n ↦ g (c n))) := by
+theorem _root_.GlobalTheory.HilbFam.hser_conj
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ)
+        (𝔞 𝔟 : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Frac F) (a₀ : ℂ)
+        (a : F → ℂ) (x : F) (s N : ℕ) (g : ℂ ≃+* ℂ) (m : ℤ)
+        (π : Equiv.Perm (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F))
+        (κ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ)
+        (c : ℕ → ℂ) (n : ℕ),
+      k = 2 * s → 0 < N → _root_.GlobalTheory.HilbFam.IsCoef k 𝔞 𝔟 a₀ a → g a₀ = a₀
+        → _root_.GlobalTheory.HilbFam.HasLevel N (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x)
+        → g (Complex.exp ((2 * Real.pi * Complex.I) / N))
+          = Complex.exp ((2 * Real.pi * Complex.I) * m / N)
+        → (∀ (i : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F) (y : F),
+          g ((i y : ℝ) : ℂ) = ((π i y : ℝ) : ℂ))
+        → g (PowerSeries.coeff n (_root_.GlobalTheory.HilbFam.hser k N 𝔞 a x κ c))
+          = PowerSeries.coeff n
+            (_root_.GlobalTheory.HilbFam.hser k N 𝔞 a (m * x)
+              (fun j ↦ κ (π.symm j))
+              (fun n ↦ g (c n))) := by
   intro F _ _ _ k 𝔞 𝔟 a₀ a x s N g m π κ c n hk hN ha hga hlev hexp hemb
-  have htr : ∀ μ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ,
-      PowerSeries.map (g : ℂ →+* ℂ) (PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a x μ)) =
-        PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a (m * x) fun j ↦ μ (π.symm j)) := by
+  have htr
+      : ∀ μ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ,
+        PowerSeries.map (g : ℂ →+* ℂ) (PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a x μ))
+          = PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a (m * x) fun j ↦
+            μ (π.symm j)) := by
     intro μ
     rw [powerSeries_map_mk']
     congr 1
     funext j
-    exact _root_.GlobalTheory.HilbFam.ecoef_ringEquiv F k 𝔞 𝔟 a₀ a x N g m π μ j hN ha hga hlev
-      hexp hemb
+    exact _root_.GlobalTheory.HilbFam.ecoef_ringEquiv F k 𝔞 𝔟 a₀ a x N g m π μ j hN ha hga hlev hexp
+      hemb
   unfold _root_.GlobalTheory.HilbFam.hser
   subst hk
   set_option synthInstance.maxHeartbeats 100000 in
@@ -57,11 +77,12 @@ theorem _root_.GlobalTheory.HilbFam.hser_conj : ∀ (F : Type) [Field F] [Number
     funext j
     simp
   · intro μ _
-    have hcoeff : ∀ φ : PowerSeries ℂ,
-        g (PowerSeries.coeff n φ) = PowerSeries.coeff n (PowerSeries.map (g : ℂ →+* ℂ) φ) :=
-      fun φ ↦ by
-        rw [PowerSeries.coeff_map]
-        rfl
+    have hcoeff
+        : ∀ φ : PowerSeries ℂ,
+          g (PowerSeries.coeff n φ)
+            = PowerSeries.coeff n (PowerSeries.map (g : ℂ →+* ℂ) φ) := fun φ ↦ by
+      rw [PowerSeries.coeff_map]
+      rfl
     rw [map_mul, map_intCast, hcoeff, map_mul, map_pow, powerSeries_map_mk', htr]
     rw [Equiv.prod_comp π.symm fun i ↦
         _root_.GlobalTheory.HilbFam.rco (2 * s) (κ i) (μ i) * (-1) ^ μ i,

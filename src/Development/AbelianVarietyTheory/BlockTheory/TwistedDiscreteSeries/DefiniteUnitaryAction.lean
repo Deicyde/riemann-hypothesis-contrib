@@ -12,7 +12,9 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.DefiniteUnitaryAction
 
-def IsUnitaryRep {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ρ : Representation ℂ G H) : Prop :=
+def IsUnitaryRep
+    {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ρ : Representation ℂ G H)
+    : Prop :=
   ∀ (g : G) (x y : H), inner ℂ (ρ g x) (ρ g y) = inner ℂ x y
 
 section ClassSum
@@ -35,27 +37,28 @@ section Statement
 variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
 
 structure DefiniteUnitary (A : FamIn D.what₂.LL G Pl0 T D.R.m) : Prop where
-
   what₂ : ∀ (t : T) (σ : D.what₂.LL →+* ℂ), IsUnitaryAt (A.MtildeCSD t) σ (A.leftGroupActionRight t)
+  lifts
+    : ∀ (i : Fin D.R.m) (t : T) (σ : D.what₂.LL →+* ℂ),
+      IsUnitaryAt (A.MtCSD i t) σ (A.leftGroupActionLift i t)
 
-  lifts : ∀ (i : Fin D.R.m) (t : T) (σ : D.what₂.LL →+* ℂ), IsUnitaryAt (A.MtCSD i t) σ (A.leftGroupActionLift i t)
-
-variable {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+variable
+  {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
 
 structure ActsUnitarily (R : RealDat D A Ks) : Prop where
-
   what₂ : IsUnitaryRep R.gE
-
   formsW : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), IsUnitaryRep (R.gW i σ)
-
   definite : DefiniteUnitary A
 
 end Statement
 
 section Basic₂
 
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
 
 end Basic₂
 

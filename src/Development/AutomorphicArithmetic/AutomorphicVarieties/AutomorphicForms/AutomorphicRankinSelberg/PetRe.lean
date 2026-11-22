@@ -13,8 +13,11 @@ private lemma pet_re (k : ℕ) (f : ℍ → ℂ) (z : ℍ) :
   rw [zpow_natCast, Complex.conj_mul', ← Complex.ofReal_pow, ← Complex.ofReal_pow, ← Complex.ofReal_mul,
     Complex.ofReal_re, Complex.sq_norm]
 
-theorem UpperTheory.V.Af.Rs.core :
-    UpperTheory.V.Af.Rs.TBdd → UpperTheory.V.Af.Rs.TTop → UpperTheory.V.Af.Rs.ClsEx → UpperTheory.V.Af.Rs.ClsProp → UpperTheory.V.Af.Rs.TEq → UpperTheory.V.Af.Rs.LBd → UpperTheory.V.Af.Rs.NicePet → UpperTheory.V.Af.Rs.PetChar → UpperTheory.V.Af.Rs.Cmp → UpperTheory.V.Af.Rs.Core := by
+theorem UpperTheory.V.Af.Rs.core
+    : UpperTheory.V.Af.Rs.TBdd → UpperTheory.V.Af.Rs.TTop → UpperTheory.V.Af.Rs.ClsEx
+      → UpperTheory.V.Af.Rs.ClsProp → UpperTheory.V.Af.Rs.TEq → UpperTheory.V.Af.Rs.LBd
+      → UpperTheory.V.Af.Rs.NicePet → UpperTheory.V.Af.Rs.PetChar → UpperTheory.V.Af.Rs.Cmp
+      → UpperTheory.V.Af.Rs.Core := by
   intro hTB hTT hCE hCP hTE hLB hNP hPC hCmp k L _ hk χ ψ g h hap hχ
   by_contra hne
   have hne' : χ * ψ⁻¹ ≠ 1 := fun e => hne (mul_inv_eq_one.mp e)
@@ -55,14 +58,17 @@ theorem UpperTheory.V.Af.Rs.core :
   have h2 : ‖(2 : ℂ)‖ = 2 := by simp
   rw [e1, norm_mul, norm_mul, h2] at hCs
   have hre := Complex.re_le_norm (Rs.TT L G0 s)
-  have hnorm : ‖Rs.TT L G0 s‖ = ‖Rs.Lps (1 : DirichletCharacter ℂ L) s‖ *
-      (2 * ‖Rs.stripI (petersson (k : ℤ) g.f g.f) s‖) := by
+  have hnorm
+      : ‖Rs.TT L G0 s‖
+        = ‖Rs.Lps (1 : DirichletCharacter ℂ L) s‖
+          * (2 * ‖Rs.stripI (petersson (k : ℤ) g.f g.f) s‖) := by
     rw [e0, norm_mul, norm_mul, h2]
   have hA := norm_nonneg (Rs.stripI (petersson (k : ℤ) h.f g.f) s)
   have hB := norm_nonneg (Rs.stripI (petersson (k : ℤ) g.f g.f) s)
   have hX : ‖Rs.stripI (petersson (k : ℤ) h.f g.f) s‖ ≤ 2 * C := by nlinarith
-  have hY : ‖Rs.Lps (1 : DirichletCharacter ℂ L) s‖ * (2 * ‖Rs.stripI (petersson (k : ℤ) g.f g.f) s‖)
-      ≤ 2 * (2 * (7 * (2 * C))) := by
+  have hY
+      : ‖Rs.Lps (1 : DirichletCharacter ℂ L) s‖ * (2 * ‖Rs.stripI (petersson (k : ℤ) g.f g.f) s‖)
+        ≤ 2 * (2 * (7 * (2 * C))) := by
     apply mul_le_mul hL0 _ (by positivity) (by norm_num)
     linarith
   linarith

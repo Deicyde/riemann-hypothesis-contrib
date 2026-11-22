@@ -8,10 +8,10 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-
 open Polynomial in
-theorem exists_prod_abs_sub_ge_on_segment : ∀ (N : ℕ) (x : Fin N → ℝ) (a δ : ℝ), 0 < δ →
-    ∃ r : ℝ, a ≤ r ∧ r ≤ a + δ ∧ (δ / (2 * Real.exp 1)) ^ N ≤ ∏ i, |r - x i| := by
+theorem exists_prod_abs_sub_ge_on_segment
+    : ∀ (N : ℕ) (x : Fin N → ℝ) (a δ : ℝ),
+      0 < δ → ∃ r : ℝ, a ≤ r ∧ r ≤ a + δ ∧ (δ / (2 * Real.exp 1)) ^ N ≤ ∏ i, |r - x i| := by
   intro N x a δ hδ
   rcases Nat.eq_zero_or_pos N with rfl | hN
   · exact ⟨a, le_rfl, by linarith, by simp⟩
@@ -28,14 +28,16 @@ theorem exists_prod_abs_sub_ge_on_segment : ∀ (N : ℕ) (x : Fin N → ℝ) (a
   have hdeg : P.degree ≤ N := by
     have : P.degree = ∑ _i : Fin N, (1 : WithBot ℕ) := by
       simp only [P, degree_prod, degree_linear he0.ne']
-    rw [this]; simp
+    rw [this]
+    simp
   have hb : ∀ t ∈ Set.Icc (-1 : ℝ) 1, |P.eval t| ≤ 1 := by
     intro t ht
     have h1 := hcon (a + δ / 2 + δ / 2 * t) (by nlinarith [ht.1]) (by nlinarith [ht.2])
     have h2 : |P.eval t| = (∏ i, |a + δ / 2 + δ / 2 * t - x i|) / m ^ N := by
       simp only [P, eval_prod, Finset.abs_prod]
-      have : ∀ i : Fin N, |eval t (C (Real.exp 1) * X + C ((a + δ / 2 - x i) / m))|
-          = |a + δ / 2 + δ / 2 * t - x i| / m := by
+      have : ∀ i : Fin N,
+          |eval t (C (Real.exp 1) * X + C ((a + δ / 2 - x i) / m))|
+            = |a + δ / 2 + δ / 2 * t - x i| / m := by
         intro i
         have : eval t (C (Real.exp 1) * X + C ((a + δ / 2 - x i) / m))
             = (a + δ / 2 + δ / 2 * t - x i) / m := by

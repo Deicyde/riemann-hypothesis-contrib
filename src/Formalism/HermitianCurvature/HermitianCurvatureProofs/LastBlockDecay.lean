@@ -15,8 +15,9 @@ noncomputable section
 
 section dil
 
-theorem map_mul_volume (ρ : ℂ) (hρ : ρ ≠ 0) :
-    Measure.map (fun z : ℂ => ρ * z) volume = ENNReal.ofReal ((‖ρ‖ ^ 2)⁻¹) • (volume : Measure ℂ) := by
+theorem map_mul_volume (ρ : ℂ) (hρ : ρ ≠ 0)
+    : Measure.map (fun z : ℂ => ρ * z) volume
+      = ENNReal.ofReal ((‖ρ‖ ^ 2)⁻¹) • (volume : Measure ℂ) := by
   have hdet : LinearMap.det (LinearMap.mulLeft ℝ ρ) = ‖ρ‖ ^ 2 := by
     rw [← Complex.normSq_eq_norm_sq, ← Algebra.norm_complex_apply, Algebra.norm_apply]
     rfl
@@ -31,45 +32,47 @@ def mulEquiv (ρ : ℂ) (hρ : ρ ≠ 0) : ℂ ≃ᵐ ℂ := (Homeomorph.mulLeft
 
 theorem mulEquiv_apply (ρ : ℂ) (hρ : ρ ≠ 0) (z : ℂ) : mulEquiv ρ hρ z = ρ * z := rfl
 
-theorem map_mulEquiv (ρ : ℂ) (hρ : ρ ≠ 0) :
-    Measure.map (mulEquiv ρ hρ) volume = ENNReal.ofReal ((‖ρ‖ ^ 2)⁻¹) • (volume : Measure ℂ) := by
+theorem map_mulEquiv (ρ : ℂ) (hρ : ρ ≠ 0)
+    : Measure.map (mulEquiv ρ hρ) volume = ENNReal.ofReal ((‖ρ‖ ^ 2)⁻¹) • (volume : Measure ℂ) := by
   have h : ⇑(mulEquiv ρ hρ) = fun z => ρ * z := funext (mulEquiv_apply ρ hρ)
   rw [h]
   exact map_mul_volume ρ hρ
 
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
-theorem integral_comp_mul_C (g : ℂ → E) (ρ : ℂ) (hρ : ρ ≠ 0) :
-    ∫ z, g (ρ * z) = (‖ρ‖ ^ 2)⁻¹ • ∫ z, g z := by
+theorem integral_comp_mul_C (g : ℂ → E) (ρ : ℂ) (hρ : ρ ≠ 0)
+    : ∫ z, g (ρ * z) = (‖ρ‖ ^ 2)⁻¹ • ∫ z, g z := by
   have h := integral_map_equiv (μ := (volume : Measure ℂ)) (mulEquiv ρ hρ) g
   rw [map_mulEquiv, integral_smul_measure, ENNReal.toReal_ofReal (by positivity)] at h
   exact h.symm
 
-theorem memLp_comp_mul {p : ENNReal} {f : ℂ → E} (hf : MemLp f p volume) (ρ : ℂ) (hρ : ρ ≠ 0) :
-    MemLp (fun z => f (ρ * z)) p volume := by
+theorem memLp_comp_mul {p : ENNReal} {f : ℂ → E} (hf : MemLp f p volume) (ρ : ℂ) (hρ : ρ ≠ 0)
+    : MemLp (fun z => f (ρ * z)) p volume := by
   have h1 : MemLp f p (Measure.map (mulEquiv ρ hρ) volume) := by
     rw [map_mulEquiv]
     exact hf.smul_measure ENNReal.ofReal_ne_top
   exact h1.comp_of_map (mulEquiv ρ hρ).measurable.aemeasurable
 
-theorem integral_norm_dil_sq (f : ℂ → E) (ρ : ℂ) (hρ : ρ ≠ 0) :
-    ∫ z, ‖‖ρ‖ • f (ρ * z)‖ ^ 2 = ∫ z, ‖f z‖ ^ 2 := by
+theorem integral_norm_dil_sq (f : ℂ → E) (ρ : ℂ) (hρ : ρ ≠ 0)
+    : ∫ z, ‖‖ρ‖ • f (ρ * z)‖ ^ 2 = ∫ z, ‖f z‖ ^ 2 := by
   have hρ0 : 0 < ‖ρ‖ := norm_pos_iff.mpr hρ
   have e : (fun z => ‖‖ρ‖ • f (ρ * z)‖ ^ 2) = fun z => ‖ρ‖ ^ 2 * ‖f (ρ * z)‖ ^ 2 := by
     funext z
     rw [norm_smul, norm_norm, mul_pow]
-  rw [e, integral_const_mul, integral_comp_mul_C (fun z => ‖f z‖ ^ 2) ρ hρ, smul_eq_mul, ← mul_assoc,
-    mul_inv_cancel₀ (by positivity), one_mul]
+  rw [e, integral_const_mul, integral_comp_mul_C (fun z => ‖f z‖ ^ 2) ρ hρ, smul_eq_mul,
+    ← mul_assoc, mul_inv_cancel₀ (by positivity), one_mul]
 
-theorem memLp_dil {f : ℂ → E} (hf : MemLp f 2 volume) (ρ : ℂ) (hρ : ρ ≠ 0) :
-    MemLp (fun z => ‖ρ‖ • f (ρ * z)) 2 volume :=
+theorem memLp_dil {f : ℂ → E} (hf : MemLp f 2 volume) (ρ : ℂ) (hρ : ρ ≠ 0)
+    : MemLp (fun z => ‖ρ‖ • f (ρ * z)) 2 volume :=
   (memLp_comp_mul hf ρ hρ).const_smul ‖ρ‖
 
-theorem integrable_sq_of_memLp {u : ℂ → E} (hu : MemLp u 2 volume) : Integrable (fun z => ‖u z‖ ^ 2) volume :=
+theorem integrable_sq_of_memLp {u : ℂ → E} (hu : MemLp u 2 volume)
+    : Integrable (fun z => ‖u z‖ ^ 2) volume :=
   (memLp_two_iff_integrable_sq_norm hu.aestronglyMeasurable).1 hu
 
-theorem tendsto_dil_cpt (g : ℂ → E) (hgc : Continuous g) (hgs : HasCompactSupport g) (ζ : ℂ) (hζ : ζ ≠ 0) :
-    Tendsto (fun ρ : ℂ => ∫ z, ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2) (𝓝 ζ) (𝓝 0) := by
+theorem tendsto_dil_cpt
+    (g : ℂ → E) (hgc : Continuous g) (hgs : HasCompactSupport g) (ζ : ℂ) (hζ : ζ ≠ 0)
+    : Tendsto (fun ρ : ℂ => ∫ z, ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2) (𝓝 ζ) (𝓝 0) := by
   obtain ⟨M, hM⟩ := hgc.bounded_above_of_compact_support hgs
   obtain ⟨R, hR⟩ := hgs.isCompact.isBounded.subset_closedBall (0 : ℂ)
   have hM0 : 0 ≤ M := (norm_nonneg _).trans (hM 0)
@@ -83,11 +86,13 @@ theorem tendsto_dil_cpt (g : ℂ → E) (hgc : Continuous g) (hgs : HasCompactSu
     linarith [le_max_left R 0]
   have hR0 : 0 ≤ max R 0 := le_max_right R 0
   have hr0 : 0 ≤ 2 * max R 0 / ‖ζ‖ := by positivity
-  have hlim := tendsto_integral_filter_of_dominated_convergence
-    (F := fun ρ z => ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2)
-    (f := fun z => ‖‖ζ‖ • g (ζ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2)
-    (μ := volume) (l := 𝓝 ζ)
-    ((Metric.closedBall (0 : ℂ) (2 * max R 0 / ‖ζ‖)).indicator fun _ => (3 * ‖ζ‖ * M) ^ 2) ?_ ?_ ?_ ?_
+  have hlim :=
+    tendsto_integral_filter_of_dominated_convergence
+      (F := fun ρ z => ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2)
+      (f := fun z => ‖‖ζ‖ • g (ζ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2)
+      (μ := volume) (l := 𝓝 ζ)
+      ((Metric.closedBall (0 : ℂ) (2 * max R 0 / ‖ζ‖)).indicator fun _ => (3 * ‖ζ‖ * M) ^ 2) ?_ ?_
+      ?_ ?_
   · simpa using hlim
   · refine Filter.Eventually.of_forall fun ρ => ?_
     have hc : Continuous fun z => ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2 := by fun_prop
@@ -107,13 +112,14 @@ theorem tendsto_dil_cpt (g : ℂ → E) (hgc : Continuous g) (hgs : HasCompactSu
     by_cases hz : z ∈ Metric.closedBall (0 : ℂ) (2 * max R 0 / ‖ζ‖)
     · rw [Set.indicator_of_mem hz]
       have h1 : ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ≤ 3 * ‖ζ‖ * M := by
-        calc ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖
+        calc
+          ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖
             ≤ ‖‖ρ‖ • g (ρ * z)‖ + ‖‖ζ‖ • g (ζ * z)‖ := norm_sub_le _ _
           _ = ‖ρ‖ * ‖g (ρ * z)‖ + ‖ζ‖ * ‖g (ζ * z)‖ := by
-              rw [norm_smul, norm_smul, norm_norm, norm_norm]
+            rw [norm_smul, norm_smul, norm_norm, norm_norm]
           _ ≤ 2 * ‖ζ‖ * M + ‖ζ‖ * M :=
-              add_le_add (mul_le_mul hρhi (hM _) (norm_nonneg _) (by positivity))
-                (mul_le_mul_of_nonneg_left (hM _) (norm_nonneg _))
+            add_le_add (mul_le_mul hρhi (hM _) (norm_nonneg _) (by positivity))
+              (mul_le_mul_of_nonneg_left (hM _) (norm_nonneg _))
           _ = 3 * ‖ζ‖ * M := by ring
       exact pow_le_pow_left₀ (norm_nonneg _) h1 2
     · rw [Set.indicator_of_notMem hz]
@@ -121,13 +127,17 @@ theorem tendsto_dil_cpt (g : ℂ → E) (hgc : Continuous g) (hgs : HasCompactSu
       have e1 : g (ρ * z) = 0 := by
         apply hzero
         rw [norm_mul]
-        calc max R 0 = ‖ζ‖ / 2 * (2 * max R 0 / ‖ζ‖) := by field_simp
+        calc
+          max R 0
+            = ‖ζ‖ / 2 * (2 * max R 0 / ‖ζ‖) := by field_simp
           _ < ‖ζ‖ / 2 * ‖z‖ := by gcongr
           _ ≤ ‖ρ‖ * ‖z‖ := by gcongr
       have e2 : g (ζ * z) = 0 := by
         apply hzero
         rw [norm_mul]
-        calc max R 0 ≤ ‖ζ‖ / 2 * (2 * max R 0 / ‖ζ‖) := by field_simp; rfl
+        calc
+          max R 0
+            ≤ ‖ζ‖ / 2 * (2 * max R 0 / ‖ζ‖) := by field_simp; rfl
           _ < ‖ζ‖ / 2 * ‖z‖ := by gcongr
           _ ≤ ‖ζ‖ * ‖z‖ := by gcongr; linarith
       rw [e1, e2]
@@ -138,8 +148,8 @@ theorem tendsto_dil_cpt (g : ℂ → E) (hgc : Continuous g) (hgs : HasCompactSu
     have hc : Continuous fun ρ : ℂ => ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2 := by fun_prop
     exact hc.tendsto ζ
 
-theorem tendsto_dil (f : ℂ → E) (hf : MemLp f 2 volume) (ζ : ℂ) (hζ : ζ ≠ 0) :
-    Tendsto (fun ρ : ℂ => ∫ z, ‖‖ρ‖ • f (ρ * z) - ‖ζ‖ • f (ζ * z)‖ ^ 2) (𝓝 ζ) (𝓝 0) := by
+theorem tendsto_dil (f : ℂ → E) (hf : MemLp f 2 volume) (ζ : ℂ) (hζ : ζ ≠ 0)
+    : Tendsto (fun ρ : ℂ => ∫ z, ‖‖ρ‖ • f (ρ * z) - ‖ζ‖ • f (ζ * z)‖ ^ 2) (𝓝 ζ) (𝓝 0) := by
   rw [Metric.tendsto_nhds]
   intro ε hε
   have hf' : MemLp f (ENNReal.ofReal 2) volume := by simpa using hf
@@ -174,41 +184,53 @@ theorem tendsto_dil (f : ℂ → E) (hf : MemLp f 2 volume) (ζ : ℂ) (hζ : ζ
     congr 1
     funext z
     rw [norm_sub_rev]
-  have hmono : ∫ z, ‖‖ρ‖ • f (ρ * z) - ‖ζ‖ • f (ζ * z)‖ ^ 2 ≤
-      ∫ z, 3 * (‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2 +
-        ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2 + ‖‖ζ‖ • (g (ζ * z) - f (ζ * z))‖ ^ 2) := by
+  have hmono
+      : ∫ z, ‖‖ρ‖ • f (ρ * z) - ‖ζ‖ • f (ζ * z)‖ ^ 2
+        ≤ ∫ z, 3 * (‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2 +
+            ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2 + ‖‖ζ‖ • (g (ζ * z) - f (ζ * z))‖ ^ 2) := by
     refine integral_mono iL (((iA.add iB).add iC).const_mul 3) fun z => ?_
-    have e : ‖ρ‖ • f (ρ * z) - ‖ζ‖ • f (ζ * z) = ‖ρ‖ • (f (ρ * z) - g (ρ * z)) +
-        (‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)) + ‖ζ‖ • (g (ζ * z) - f (ζ * z)) := by
+    have e
+        : ‖ρ‖ • f (ρ * z) - ‖ζ‖ • f (ζ * z)
+          = ‖ρ‖ • (f (ρ * z) - g (ρ * z)) + (‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z))
+            + ‖ζ‖ • (g (ζ * z) - f (ζ * z)) := by
       rw [smul_sub, smul_sub]
       abel
     simp only
     rw [e]
     exact h3 _ _ _
-  have hs1 : ∫ z, (‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2 +
-        ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2 + ‖‖ζ‖ • (g (ζ * z) - f (ζ * z))‖ ^ 2) =
-      (∫ z, (‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2 + ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2)) +
-        ∫ z, ‖‖ζ‖ • (g (ζ * z) - f (ζ * z))‖ ^ 2 :=
+  have hs1
+      : ∫ z, (‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2 +
+          ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2 + ‖‖ζ‖ • (g (ζ * z) - f (ζ * z))‖ ^ 2)
+        = (∫ z, (‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2 + ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2))
+          + ∫ z, ‖‖ζ‖ • (g (ζ * z) - f (ζ * z))‖ ^ 2 :=
     integral_add (iA.add iB) iC
-  have hs2 : ∫ z, (‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2 + ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2) =
-      (∫ z, ‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2) + ∫ z, ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2 :=
+  have hs2
+      : ∫ z, (‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2 + ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2)
+        = (∫ z, ‖‖ρ‖ • (f (ρ * z) - g (ρ * z))‖ ^ 2)
+          + ∫ z, ‖‖ρ‖ • g (ρ * z) - ‖ζ‖ • g (ζ * z)‖ ^ 2 :=
     integral_add iA iB
   rw [integral_const_mul, hs1, hs2] at hmono
   rw [hA, hC, hgf] at hmono
   linarith
 
-theorem tendsto_inner_dil {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (b c : ℂ → H)
-    (hb : MemLp b 2 volume) (hc : MemLp c 2 volume) (ζ : ℂ) (hζ : ζ ≠ 0) :
-    Tendsto (fun ρ : ℂ => ∫ z, ‖⟪b z, ((‖ρ‖ : ℝ) : ℂ) • c (ρ * z)⟫_ℂ - ⟪b z, ((‖ζ‖ : ℝ) : ℂ) • c (ζ * z)⟫_ℂ‖)
+theorem tendsto_inner_dil
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (b c : ℂ → H) (hb : MemLp b 2 volume) (hc : MemLp c 2 volume)
+    (ζ : ℂ) (hζ : ζ ≠ 0)
+    : Tendsto
+      (fun ρ : ℂ =>
+        ∫ z, ‖⟪b z, ((‖ρ‖ : ℝ) : ℂ) • c (ρ * z)⟫_ℂ - ⟪b z, ((‖ζ‖ : ℝ) : ℂ) • c (ζ * z)⟫_ℂ‖)
       (𝓝 ζ) (𝓝 0) := by
   have hT := tendsto_dil c hc ζ hζ
   set K : ℝ := (∫ z, ‖b z‖ ^ (2 : ℝ)) ^ (1 / (2 : ℝ))
-  have hG : Tendsto (fun ρ : ℂ => K * (∫ z, ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖ ^ 2) ^ (1 / (2 : ℝ)))
+  have hG : Tendsto
+      (fun ρ : ℂ => K * (∫ z, ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖ ^ 2) ^ (1 / (2 : ℝ)))
       (𝓝 ζ) (𝓝 0) := by
     have h1 := ((Real.continuous_rpow_const (by norm_num : (0 : ℝ) ≤ 1 / 2)).tendsto 0).comp hT
     rw [Real.zero_rpow (by norm_num)] at h1
     simpa using h1.const_mul K
-  refine squeeze_zero' (Filter.Eventually.of_forall fun ρ => integral_nonneg fun _ => norm_nonneg _) ?_ hG
+  refine squeeze_zero' (Filter.Eventually.of_forall fun ρ => integral_nonneg fun _ => norm_nonneg _)
+    ?_ hG
   filter_upwards [eventually_ne_nhds hζ] with ρ hρ0
   have hb2 : MemLp b (ENNReal.ofReal 2) volume := by simpa using hb
   have hd : MemLp (fun z => ‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)) 2 volume :=
@@ -217,25 +239,28 @@ theorem tendsto_inner_dil {H : Type} [NormedAddCommGroup H] [InnerProductSpace �
     simpa using hd
   have hint : Integrable (fun z => ‖b z‖ * ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖) volume :=
     hb.norm.integrable_mul hd.norm
-  have hpt : ∀ z, ‖⟪b z, ((‖ρ‖ : ℝ) : ℂ) • c (ρ * z)⟫_ℂ - ⟪b z, ((‖ζ‖ : ℝ) : ℂ) • c (ζ * z)⟫_ℂ‖ ≤
-      ‖b z‖ * ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖ := by
+  have hpt
+      : ∀ z,
+        ‖⟪b z, ((‖ρ‖ : ℝ) : ℂ) • c (ρ * z)⟫_ℂ - ⟪b z, ((‖ζ‖ : ℝ) : ℂ) • c (ζ * z)⟫_ℂ‖
+          ≤ ‖b z‖ * ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖ := by
     intro z
     rw [← inner_sub_right, Complex.coe_smul, Complex.coe_smul]
     exact norm_inner_le_norm _ _
-  calc ∫ z, ‖⟪b z, ((‖ρ‖ : ℝ) : ℂ) • c (ρ * z)⟫_ℂ - ⟪b z, ((‖ζ‖ : ℝ) : ℂ) • c (ζ * z)⟫_ℂ‖
-      ≤ ∫ z, ‖b z‖ * ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖ :=
-        integral_mono_of_nonneg (Filter.Eventually.of_forall fun _ => norm_nonneg _) hint
-          (Filter.Eventually.of_forall hpt)
+  calc
+    ∫ z, ‖⟪b z, ((‖ρ‖ : ℝ) : ℂ) • c (ρ * z)⟫_ℂ - ⟪b z, ((‖ζ‖ : ℝ) : ℂ) • c (ζ * z)⟫_ℂ‖
+        ≤ ∫ z, ‖b z‖ * ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖ :=
+      integral_mono_of_nonneg (Filter.Eventually.of_forall fun _ => norm_nonneg _) hint
+        (Filter.Eventually.of_forall hpt)
     _ ≤ K * (∫ z, ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖ ^ (2 : ℝ)) ^ (1 / (2 : ℝ)) :=
-        integral_mul_norm_le_Lp_mul_Lq Real.HolderConjugate.two_two hb2 hd2
+      integral_mul_norm_le_Lp_mul_Lq Real.HolderConjugate.two_two hb2 hd2
     _ = K * (∫ z, ‖‖ρ‖ • c (ρ * z) - ‖ζ‖ • c (ζ * z)‖ ^ 2) ^ (1 / (2 : ℝ)) := by
-        congr 2
-        congr 1
-        funext z
-        exact Real.rpow_two _
+      congr 2
+      congr 1
+      funext z
+      exact Real.rpow_two _
 
-theorem tendsto_dil_real (ab : ℂ → ℝ) (hab : MemLp ab 2 volume) :
-    Tendsto (fun ρ : ℂ => ∫ z, (‖ρ‖ * ab (ρ * z) - ab z) ^ 2) (𝓝 1) (𝓝 0) := by
+theorem tendsto_dil_real (ab : ℂ → ℝ) (hab : MemLp ab 2 volume)
+    : Tendsto (fun ρ : ℂ => ∫ z, (‖ρ‖ * ab (ρ * z) - ab z) ^ 2) (𝓝 1) (𝓝 0) := by
   have h := tendsto_dil ab hab 1 one_ne_zero
   refine h.congr fun ρ => ?_
   congr 1

@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DenseRangeEm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization GlobalTheory.WeightTwoSum
+open NumberField IsDedekindDomain GlobalTheory.CMVal
+  GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates
+  GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization GlobalTheory.WeightTwoSum
 open scoped ContDiff nonZeroDivisors
 
 open NumberField IsDedekindDomain GlobalTheory.CMVal
@@ -21,16 +23,24 @@ theorem denseRange_embeddings : DenseRange fun (x : E) (w : InfinitePlace E) => 
   | exact _root_.GlobalTheory.DenseEmbeddingProduct.denseRange_embedding_pi
   | (apply _root_.GlobalTheory.DenseEmbeddingProduct.denseRange_embedding_pi <;> assumption)
   | (intros; apply _root_.GlobalTheory.DenseEmbeddingProduct.denseRange_embedding_pi <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.DenseEmbeddingProduct.denseRange_embedding_pi <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.DenseEmbeddingProduct.denseRange_embedding_pi
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.DenseEmbeddingProduct.denseRange_embedding_pi ..)
 
-theorem exists_im_pos (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Type) [Fintype I]
-    (φ : I → E →+* ℂ) (hφ : IsCMType φ) : ∃ θ : E, ∀ i, 0 < (φ i θ).im := by
+theorem exists_im_pos
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (I : Type) [Fintype I]
+    (φ : I → E →+* ℂ) (hφ : IsCMType φ)
+    : ∃ θ : E, ∀ i, 0 < (φ i θ).im := by
   classical
-
   let f : I → (InfinitePlace E → ℂ) → ℝ := fun i z =>
-    if (InfinitePlace.mk (φ i)).embedding = φ i then (z (InfinitePlace.mk (φ i))).im
-    else -(z (InfinitePlace.mk (φ i))).im
+    if (InfinitePlace.mk (φ i)).embedding = φ i then
+      (z (InfinitePlace.mk (φ i))).im
+    else
+      -(z (InfinitePlace.mk (φ i))).im
   have hfc : ∀ i, Continuous (f i) := by
     intro i
     by_cases h : (InfinitePlace.mk (φ i)).embedding = φ i
@@ -59,7 +69,8 @@ theorem exists_im_pos (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Ty
         obtain ⟨k, _, hk⟩ := hφ (InfinitePlace.mk (φ i)).embedding
         have hi : i = k := hk i (Or.inr h)
         have hj' : j = k := hk j (Or.inl hj)
-        subst hi; subst hj'
+        subst hi
+        subst hj'
         exact hne hj
       simp [f, y, hne, hex]
   obtain ⟨θ, hθ⟩ := denseRange_embeddings.exists_mem_open hU ⟨y, hy⟩

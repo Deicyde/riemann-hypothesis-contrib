@@ -8,16 +8,19 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat
 
 namespace Formalism.L2.SG.Pf.FibreCounting
 
 section Nilp
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
-  {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {S : HSpace E} {r : ℕ} {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V}
 
-theorem orth_xflag_maps (hn : n ∈ NLam Λ F) (j : ℕ) : ∀ x ∈ orth S (Xflag F j), n x ∈ orth S (Xflag F j) := by
+theorem orth_xflag_maps (hn : n ∈ NLam Λ F) (j : ℕ)
+    : ∀ x ∈ orth S (Xflag F j), n x ∈ orth S (Xflag F j) := by
   intro x hx
   rw [Formalism.L2.SG.Pf.mem_orth_iff_td] at hx ⊢
   intro y hy
@@ -29,7 +32,8 @@ theorem orth_xflag_maps (hn : n ∈ NLam Λ F) (j : ℕ) : ∀ x ∈ orth S (Xfl
   rw [hiso]
   exact hx y' hy'X
 
-theorem orth_step (hn : n ∈ NLam Λ F) (j : ℕ) : ∀ x ∈ orth S (Xflag F j), n x - x ∈ orth S (Xflag F (j + 1)) := by
+theorem orth_step (hn : n ∈ NLam Λ F) (j : ℕ)
+    : ∀ x ∈ orth S (Xflag F j), n x - x ∈ orth S (Xflag F (j + 1)) := by
   intro x hx
   have hnx := orth_xflag_maps hn j x hx
   rw [Formalism.L2.SG.Pf.mem_orth_iff_td] at hx hnx ⊢
@@ -72,8 +76,8 @@ theorem chain_step (hn : n ∈ NLam Λ F) (i : ℕ) : ∀ x ∈ chainC F (i + 1)
         rw [Formalism.L2.SG.Pf.xflag_zero_td, Submodule.mem_bot] at hy
         rw [hy, map_zero, LinearMap.zero_apply]
 
-theorem chain_pow (hn : n ∈ NLam Λ F) (j : ℕ) :
-    ∀ i, ∀ x ∈ chainC F (i + j), (((n : S.V →ₗ[E] S.V) - 1) ^ j) x ∈ chainC F i := by
+theorem chain_pow (hn : n ∈ NLam Λ F) (j : ℕ)
+    : ∀ i, ∀ x ∈ chainC F (i + j), (((n : S.V →ₗ[E] S.V) - 1) ^ j) x ∈ chainC F i := by
   induction j with
   | zero => intro i x hx; simpa using hx
   | succ j ih =>
@@ -98,10 +102,12 @@ theorem nlam_nilp (hn : n ∈ NLam Λ F) : ((n : S.V →ₗ[E] S.V) - 1) ^ (2 * 
   rw [if_pos (Nat.zero_le _), Formalism.L2.SG.Pf.xflag_zero_td, Submodule.mem_bot] at h
   rw [h, LinearMap.zero_apply]
 
-theorem conj_nilp (hn : n ∈ NLam Λ F) (γ : S.V ≃ₗ[E] S.V) :
-    (((γ⁻¹ * n * γ : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) - 1) ^ (2 * r + 1) = 0 := by
-  have key : ∀ (N : ℕ) (x : S.V), ((((γ⁻¹ * n * γ : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) - 1) ^ N :
-      Module.End E S.V) x = γ⁻¹ ((((n : S.V →ₗ[E] S.V) - 1) ^ N : Module.End E S.V) (γ x)) := by
+theorem conj_nilp (hn : n ∈ NLam Λ F) (γ : S.V ≃ₗ[E] S.V)
+    : (((γ⁻¹ * n * γ : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) - 1) ^ (2 * r + 1) = 0 := by
+  have key
+      : ∀ (N : ℕ) (x : S.V),
+        ((((γ⁻¹ * n * γ : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) - 1) ^ N : Module.End E S.V) x
+          = γ⁻¹ ((((n : S.V →ₗ[E] S.V) - 1) ^ N : Module.End E S.V) (γ x)) := by
     intro N
     induction N with
     | zero => intro x; simp [LinearEquiv.coe_inv]
@@ -119,21 +125,21 @@ section Unip
 
 variable {K M : Type*} [Field K] [CharZero K] [AddCommGroup M] [Module K M]
 
-
 open Polynomial in
-theorem unip_fin (A : Module.End K M) {k N : ℕ} (hk : 0 < k) (h1 : A ^ k = 1) (h2 : (A - 1) ^ N = 0) : A = 1 := by
+theorem unip_fin (A : Module.End K M) {k N : ℕ} (hk : 0 < k) (h1 : A ^ k = 1) (h2 : (A - 1) ^ N = 0)
+    : A = 1 := by
   set B := A - 1 with hB
   have hA : A = B + 1 := by rw [hB]; abel
 
   have hd : X ∣ ((X + 1 : K[X]) ^ k - 1) := by
-    rw [X_dvd_iff, coeff_sub, coeff_X_add_one_pow, coeff_one, if_pos rfl, Nat.choose_zero_right, Nat.cast_one, sub_self]
+    rw [X_dvd_iff, coeff_sub, coeff_X_add_one_pow, coeff_one, if_pos rfl, Nat.choose_zero_right,
+      Nat.cast_one, sub_self]
   obtain ⟨q, hq⟩ := hd
   have hq0 : q.coeff 0 = (k : K) := by
     have := congrArg (fun p : K[X] => p.coeff 1) hq
     simp only [coeff_sub, coeff_X_add_one_pow, Nat.choose_one_right, coeff_one, coeff_X_mul] at this
     simpa using this.symm
-  have hd2 : X ∣ q - C (k : K) := by
-    rw [X_dvd_iff, coeff_sub, coeff_C_zero, hq0, sub_self]
+  have hd2 : X ∣ q - C (k : K) := by rw [X_dvd_iff, coeff_sub, coeff_C_zero, hq0, sub_self]
   obtain ⟨r0, hr0⟩ := hd2
   have hq' : q = C (k : K) + X * r0 := by rw [← hr0]; ring
   have hev : aeval B ((X + 1 : K[X]) ^ k - 1) = 0 := by
@@ -144,10 +150,11 @@ theorem unip_fin (A : Module.End K M) {k N : ℕ} (hk : 0 < k) (h1 : A ^ k = 1) 
     intro i hi
     have e : B ^ i * (B * (algebraMap K (Module.End K M) (k : K) + B * aeval B r0)) = 0 := by
       rw [hev, mul_zero]
-    have e3 : B ^ i * (B * (algebraMap K (Module.End K M) (k : K) + B * aeval B r0)) =
-        (k : K) • B ^ (i + 1) + B ^ (i + 1 + 1) * aeval B r0 := by
-      rw [Algebra.smul_def, mul_add, mul_add, ← mul_assoc, ← pow_succ, ← Algebra.commutes, ← mul_assoc,
-        ← mul_assoc, ← pow_succ, ← pow_succ]
+    have e3
+        : B ^ i * (B * (algebraMap K (Module.End K M) (k : K) + B * aeval B r0))
+          = (k : K) • B ^ (i + 1) + B ^ (i + 1 + 1) * aeval B r0 := by
+      rw [Algebra.smul_def, mul_add, mul_add, ← mul_assoc, ← pow_succ, ← Algebra.commutes,
+        ← mul_assoc, ← mul_assoc, ← pow_succ, ← pow_succ]
     rw [e3, hi, zero_mul, add_zero] at e
     rcases smul_eq_zero.1 e with h | h
     · exact absurd h (Nat.cast_ne_zero.2 hk.ne')
@@ -161,7 +168,8 @@ theorem unip_fin (A : Module.End K M) {k N : ℕ} (hk : 0 < k) (h1 : A ^ k = 1) 
     rcases N with _ | N
     · rw [pow_zero] at h2
       have : (1 : Module.End K M) = 0 := h2
-      calc B = 1 * B := (one_mul B).symm
+      calc
+        B = 1 * B := (one_mul B).symm
         _ = 0 := by rw [this, zero_mul]
     · simpa using down N h2
   rw [hA, hB1, zero_add]
@@ -172,30 +180,38 @@ section Ind
 
 variable {D : D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
 
-def indL (f : (VS D).V →ₗ[D.host.E] (VS D).V) (hP : ∀ y ∈ perpS (VS D) F0.X, f y ∈ perpS (VS D) F0.X)
-    (hX : ∀ y ∈ F0.X, f y ∈ F0.X) : Module.End D.host.E (WbQ D F0) :=
+def indL
+    (f : (VS D).V →ₗ[D.host.E] (VS D).V)
+    (hP : ∀ y ∈ perpS (VS D) F0.X, f y ∈ perpS (VS D) F0.X) (hX : ∀ y ∈ F0.X, f y ∈ F0.X)
+    : Module.End D.host.E (WbQ D F0) :=
   Submodule.mapQ _ _ (f.restrict hP) (by
     intro y hy
     simp only [Submodule.mem_comap, Submodule.coe_subtype] at hy ⊢
     rw [LinearMap.restrict_coe_apply]
     exact hX _ hy)
 
-theorem indL_mk (f : (VS D).V →ₗ[D.host.E] (VS D).V) (hP : ∀ y ∈ perpS (VS D) F0.X, f y ∈ perpS (VS D) F0.X)
-    (hX : ∀ y ∈ F0.X, f y ∈ F0.X) (x : perpS (VS D) F0.X) :
-    indL F0 f hP hX (Submodule.Quotient.mk x) = Submodule.Quotient.mk ⟨f x, hP _ x.2⟩ := by
+theorem indL_mk
+    (f : (VS D).V →ₗ[D.host.E] (VS D).V)
+    (hP : ∀ y ∈ perpS (VS D) F0.X, f y ∈ perpS (VS D) F0.X) (hX : ∀ y ∈ F0.X, f y ∈ F0.X)
+    (x : perpS (VS D) F0.X)
+    : indL F0 f hP hX (Submodule.Quotient.mk x) = Submodule.Quotient.mk ⟨f x, hP _ x.2⟩ := by
   unfold indL
   rw [Submodule.mapQ_apply]
   rfl
 
-theorem pow_maps {p : Submodule D.host.E (VS D).V} (f : (VS D).V →ₗ[D.host.E] (VS D).V) (h : ∀ y ∈ p, f y ∈ p) (N : ℕ) :
-    ∀ y ∈ p, (f ^ N) y ∈ p := by
+theorem pow_maps
+    {p : Submodule D.host.E (VS D).V} (f : (VS D).V →ₗ[D.host.E] (VS D).V) (h : ∀ y ∈ p, f y ∈ p)
+    (N : ℕ)
+    : ∀ y ∈ p, (f ^ N) y ∈ p := by
   induction N with
   | zero => intro y hy; simpa using hy
   | succ N ih => intro y hy; rw [pow_succ, mul_apply_eq_comp]; exact ih _ (h y hy)
 
-theorem indL_pow (f : (VS D).V →ₗ[D.host.E] (VS D).V) (hP : ∀ y ∈ perpS (VS D) F0.X, f y ∈ perpS (VS D) F0.X)
-    (hX : ∀ y ∈ F0.X, f y ∈ F0.X) (N : ℕ) :
-    indL F0 f hP hX ^ N = indL F0 (f ^ N) (pow_maps f hP N) (pow_maps f hX N) := by
+theorem indL_pow
+    (f : (VS D).V →ₗ[D.host.E] (VS D).V)
+    (hP : ∀ y ∈ perpS (VS D) F0.X, f y ∈ perpS (VS D) F0.X) (hX : ∀ y ∈ F0.X, f y ∈ F0.X)
+    (N : ℕ)
+    : indL F0 f hP hX ^ N = indL F0 (f ^ N) (pow_maps f hP N) (pow_maps f hX N) := by
   induction N with
   | zero =>
     refine LinearMap.ext fun w => ?_

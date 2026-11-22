@@ -259,8 +259,12 @@ private lemma thetaConst_one_zero_eq_eta_mul_weberF₂_sq (hTP : _root_.GlobalTh
 open Complex in
 open UpperHalfPlane hiding I in
 open scoped Real in
-theorem _root_.GlobalTheory.ThetaWeberProof.thetaWeber_of_tripleProduct (hTP : _root_.GlobalTheory.ThetaWeberRoad.TripleProduct) (τ : ℍ) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.ThetaWeber τ :=
-  ⟨thetaConst_zero_zero_eq_eta_mul_weberF_sq hTP τ, thetaConst_zero_one_eq_eta_mul_weberF₁_sq hTP τ, thetaConst_one_zero_eq_eta_mul_weberF₂_sq hTP τ⟩
+theorem _root_.GlobalTheory.ThetaWeberProof.thetaWeber_of_tripleProduct
+    (hTP : _root_.GlobalTheory.ThetaWeberRoad.TripleProduct) (τ : ℍ)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaConstantWeber.ThetaWeber τ := ⟨
+  thetaConst_zero_zero_eq_eta_mul_weberF_sq hTP τ,
+  thetaConst_zero_one_eq_eta_mul_weberF₁_sq hTP τ,
+  thetaConst_one_zero_eq_eta_mul_weberF₂_sq hTP τ
+⟩
 
 end GlobalTheory.ThetaWeberProof

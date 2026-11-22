@@ -33,9 +33,12 @@ theorem melSum : MelSum := by
   have h4 : 0 < 4 * Real.pi := by positivity
   have hCpos : 0 < (4 * Real.pi) ^ t / Real.Gamma t := div_pos (Real.rpow_pos_of_pos h4 t) hΓ
   have hr : ∀ n : ℕ, 0 < 4 * Real.pi * ((n + 1 : ℕ) : ℝ) := fun n => by positivity
-  have hval : ∀ n : ℕ, c (n + 1) / ((n + 1 : ℕ) : ℝ) ^ t =
-      (4 * Real.pi) ^ t / Real.Gamma t * ∫ y in Ioi (0 : ℝ),
-        c (n + 1) * Real.exp (-(4 * Real.pi * ((n + 1 : ℕ) : ℝ)) * y) * y ^ (t - 1) := by
+  have hval
+      : ∀ n : ℕ,
+        c (n + 1) / ((n + 1 : ℕ) : ℝ) ^ t
+          = (4 * Real.pi) ^ t / Real.Gamma t
+            * ∫ y in Ioi (0 : ℝ),
+              c (n + 1) * Real.exp (-(4 * Real.pi * ((n + 1 : ℕ) : ℝ)) * y) * y ^ (t - 1) := by
     intro n
     rw [melSum_val ht (hr n)]
     have hm : (0 : ℝ) < ((n + 1 : ℕ) : ℝ) := by positivity
@@ -43,8 +46,10 @@ theorem melSum : MelSum := by
     have h5 : 0 < ((n + 1 : ℕ) : ℝ) ^ t := Real.rpow_pos_of_pos hm t
     have h6 : 0 < (4 * Real.pi) ^ t := Real.rpow_pos_of_pos h4 t
     field_simp
-  have hbound : ∀ N, ∑ n ∈ Finset.range N, c (n + 1) / ((n + 1 : ℕ) : ℝ) ^ t ≤
-      (4 * Real.pi) ^ t / Real.Gamma t * ∫ y in Ioi (0 : ℝ), P y * y ^ (t - 1) := by
+  have hbound
+      : ∀ N,
+        ∑ n ∈ Finset.range N, c (n + 1) / ((n + 1 : ℕ) : ℝ) ^ t
+          ≤ (4 * Real.pi) ^ t / Real.Gamma t * ∫ y in Ioi (0 : ℝ), P y * y ^ (t - 1) := by
     intro N
     simp_rw [hval]
     rw [← Finset.mul_sum, ← integral_finsetSum _ (fun n _ => melSum_int ht (hr n) _)]
@@ -65,7 +70,8 @@ theorem melSum : MelSum := by
       linarith
   have hs : Summable (fun n : ℕ => c (n + 1) / ((n + 1 : ℕ) : ℝ) ^ t) :=
     summable_of_sum_range_le
-      (fun n => div_nonneg (hc _) (Real.rpow_nonneg (Nat.cast_nonneg _) _)) hbound
+      (fun n => div_nonneg (hc _) (Real.rpow_nonneg (Nat.cast_nonneg _) _))
+      hbound
   exact (summable_nat_add_iff 1 (f := fun n : ℕ => c n / (n : ℝ) ^ t)).mp hs
 
 end UpperTheory.V.Af.Rs

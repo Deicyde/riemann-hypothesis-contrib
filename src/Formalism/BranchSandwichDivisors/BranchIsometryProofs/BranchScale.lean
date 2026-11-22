@@ -133,19 +133,22 @@ lemma bs_hwspace {n : ℕ} (sg : Fin n → ℕ) (hsg : Antitone sg) (q : MvPolyn
   have hk' : (1 : ℤ) ≤ k := by exact_mod_cast hk
   nlinarith
 
-structure BsForm {n : ℕ} (sg : Fin n → ℕ)
-    (D : MvPolynomial (Fin n × Fin n) ℂ → MvPolynomial (Fin n × Fin n) ℂ → ℂ) : Prop where
+structure BsForm
+    {n : ℕ}
+    (sg : Fin n → ℕ) (D : MvPolynomial (Fin n × Fin n) ℂ → MvPolynomial (Fin n × Fin n) ℂ → ℂ)
+    : Prop where
   addl : ∀ p p' q, D (p + p') q = D p q + D p' q
   smull : ∀ (c : ℂ) p q, D (c • p) q = c * D p q
   addr : ∀ p q q', D p (q + q') = D p q + D p q'
   smulr : ∀ (c : ℂ) p q, D p (c • q) = star c * D p q
-  adj : ∀ (g : Matrix (Fin n) (Fin n) ℂ), ∀ p ∈ dualWeyl ℂ n n sg, ∀ q ∈ dualWeyl ℂ n n sg,
-    D (rowAct ℂ g p) q = D p (rowAct ℂ g.conjTranspose q)
+  adj
+    : ∀ (g : Matrix (Fin n) (Fin n) ℂ), ∀ p ∈ dualWeyl ℂ n n sg, ∀ q ∈ dualWeyl ℂ n n sg,
+      D (rowAct ℂ g p) q = D p (rowAct ℂ g.conjTranspose q)
 
 namespace BsForm
 
-variable {n : ℕ} {sg : Fin n → ℕ}
-  {D : MvPolynomial (Fin n × Fin n) ℂ → MvPolynomial (Fin n × Fin n) ℂ → ℂ}
+variable
+  {n : ℕ} {sg : Fin n → ℕ} {D : MvPolynomial (Fin n × Fin n) ℂ → MvPolynomial (Fin n × Fin n) ℂ → ℂ}
 
 lemma zerol (H : BsForm sg D) (q) : D 0 q = 0 := by
   have := H.smull 0 0 q
@@ -243,11 +246,12 @@ lemma rad_rowDiv (H : BsForm sg D) (p : MvPolynomial (Fin n × Fin n) ℂ) (hp :
     if_pos hk, Polynomial.coeff_zero] at this
   exact this
 
-theorem eq_zero (H : BsForm sg D) (hsg : Antitone sg)
-    (h0 : D (hw ℂ le_rfl sg) (hw ℂ le_rfl sg) = 0) :
-    ∀ p ∈ dualWeyl ℂ n n sg, ∀ q ∈ dualWeyl ℂ n n sg, D p q = 0 := by
-  have W : ∀ w : List (Fin n × Fin n × ℕ), applyWord ℂ w (hw ℂ le_rfl sg) ∈ dualWeyl ℂ n n sg ∧
-      ∀ q ∈ dualWeyl ℂ n n sg, D (applyWord ℂ w (hw ℂ le_rfl sg)) q = 0 := by
+theorem eq_zero (H : BsForm sg D) (hsg : Antitone sg) (h0 : D (hw ℂ le_rfl sg) (hw ℂ le_rfl sg) = 0)
+    : ∀ p ∈ dualWeyl ℂ n n sg, ∀ q ∈ dualWeyl ℂ n n sg, D p q = 0 := by
+  have W
+      : ∀ w : List (Fin n × Fin n × ℕ),
+        applyWord ℂ w (hw ℂ le_rfl sg) ∈ dualWeyl ℂ n n sg
+          ∧ ∀ q ∈ dualWeyl ℂ n n sg, D (applyWord ℂ w (hw ℂ le_rfl sg)) q = 0 := by
     intro w
     induction w with
     | nil => exact ⟨hwMem ℂ n n le_rfl sg hsg, H.hw_rad hsg h0⟩

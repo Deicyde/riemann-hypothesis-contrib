@@ -14,11 +14,11 @@ open MeasureTheory Topology Filter Set Formalism.MainNotions.GlobalTheoryTheory.
 
 section Core
 
-variable {V X Y : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V]
-  [MeasurableSpace V] [BorelSpace V] [AddCommGroup X] [TopologicalSpace X]
-  [IsTopologicalAddGroup X] [T2Space X] [LocallyCompactSpace X] [SecondCountableTopology X]
-  [MeasurableSpace X] [BorelSpace X]
+variable
+  {V X Y : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+  [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+  [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [T2Space X]
+  [LocallyCompactSpace X] [SecondCountableTopology X] [MeasurableSpace X] [BorelSpace X]
 
 private lemma module_finite_F_E {W : Type} [MeasurableSpace W] (m : Measure W) (s : Set W)
     (hs : MeasurableSet s) (h : Integrable (s.indicator (1 : W → ℝ)) m) : m s ≠ ⊤ := by
@@ -29,15 +29,20 @@ private lemma module_finite_F_E {W : Type} [MeasurableSpace W] (m : Measure W) (
   rw [e, lintegral_indicator_one hs] at h1
   exact h1.ne
 
-theorem fib_of_ratio (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
-    (f : V → Y) (ι : X → Y) (hι : Function.Injective ι) (G : V → X) (hGc : Continuous G)
-    (hfG : ∀ x, f x = ι (G x)) (U : Set V) (B : Set X) (fib : X → Measure V)
-    (hfib : IsFibreFamily μ f ι U ν B fib) (T : X) (hB : B ∈ 𝓝 T) (Nb : Set X) (hNb : Nb ∈ 𝓝 T)
-    (hNbU : ∀ x, G x ∈ Nb → x ∈ U) (Q : Set V) (hQo : IsOpen Q) (hQcl : IsClosed Q)
-    (hQc : IsCompact Q) (H : ℕ → AddSubgroup X) (hHo : ∀ n, IsOpen (H n : Set X))
-    (hHc : ∀ n, IsCompact (H n : Set X)) (hHb : ∀ N' ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N')
-    (κ : ℝ) (hratio : ∀ n, μ.real (Q ∩ G ⁻¹' {z | z - T ∈ H n}) = κ * ν.real (H n)) :
-    ∫ x, Q.indicator (1 : V → ℂ) x ∂(fib T) = (κ : ℂ) := by
+theorem fib_of_ratio
+    (μ : Measure V)
+    (ν : Measure X) [ν.IsAddHaarMeasure]
+    (f : V → Y)
+    (ι : X → Y) (hι : Function.Injective ι)
+    (G : V → X) (hGc : Continuous G) (hfG : ∀ x, f x = ι (G x))
+    (U : Set V) (B : Set X) (fib : X → Measure V) (hfib : IsFibreFamily μ f ι U ν B fib)
+    (T : X) (hB : B ∈ 𝓝 T)
+    (Nb : Set X) (hNb : Nb ∈ 𝓝 T) (hNbU : ∀ x, G x ∈ Nb → x ∈ U)
+    (Q : Set V) (hQo : IsOpen Q) (hQcl : IsClosed Q) (hQc : IsCompact Q)
+    (H : ℕ → AddSubgroup X) (hHo : ∀ n, IsOpen (H n : Set X)) (hHc : ∀ n, IsCompact (H n : Set X))
+    (hHb : ∀ N' ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N')
+    (κ : ℝ) (hratio : ∀ n, μ.real (Q ∩ G ⁻¹' {z | z - T ∈ H n}) = κ * ν.real (H n))
+    : ∫ x, Q.indicator (1 : V → ℂ) x ∂(fib T) = (κ : ℂ) := by
   classical
   obtain ⟨hconc, hdis, hcont⟩ := hfib
   obtain ⟨S, hSdef⟩ : ∃ S : ℕ → Set X, S = fun n => {z | z - T ∈ H n} := ⟨_, rfl⟩
@@ -101,8 +106,9 @@ theorem fib_of_ratio (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
   have hφcs : HasCompactSupport ((Q ∩ G ⁻¹' S n₀).indicator (1 : V → ℝ)) :=
     hQ'c.of_isClosed_subset (isClosed_tsupport _) hts
   obtain ⟨hint, hFc0⟩ := hcont _ hφc hφcs (hts.trans hQ'U)
-  obtain ⟨F, hFdef⟩ : ∃ F : X → ℝ,
-      F = fun b => ∫ v, (Q ∩ G ⁻¹' S n₀).indicator (1 : V → ℝ) v ∂(fib b) := ⟨_, rfl⟩
+  obtain ⟨F, hFdef⟩
+      : ∃ F : X → ℝ, F = fun b => ∫ v, (Q ∩ G ⁻¹' S n₀).indicator (1 : V → ℝ) v ∂(fib b) :=
+    ⟨_, rfl⟩
   have hFc : ContinuousOn F B := by
     rw [hFdef]
     exact hFc0
@@ -115,10 +121,9 @@ theorem fib_of_ratio (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
     exact ENNReal.toReal_nonneg
   have hGb : ∀ b x, x ∈ f ⁻¹' {ι b} ∩ U → G x = b := fun b x hx =>
     hι ((hfG x).symm.trans (Set.mem_singleton_iff.1 hx.1))
-  have hfibS : ∀ b (R : Set V), fib b R = fib b (R ∩ (f ⁻¹' {ι b} ∩ U)) :=
-    fun b R => (measure_inter_conull (hconc b)).symm
-  have hcut : ∀ b m, b ∈ S m →
-      (Q ∩ G ⁻¹' S m) ∩ (f ⁻¹' {ι b} ∩ U) = Q ∩ (f ⁻¹' {ι b} ∩ U) := by
+  have hfibS : ∀ b (R : Set V), fib b R = fib b (R ∩ (f ⁻¹' {ι b} ∩ U)) := fun b R =>
+    (measure_inter_conull (hconc b)).symm
+  have hcut : ∀ b m, b ∈ S m → (Q ∩ G ⁻¹' S m) ∩ (f ⁻¹' {ι b} ∩ U) = Q ∩ (f ⁻¹' {ι b} ∩ U) := by
     intro b m hb
     ext x
     constructor
@@ -129,7 +134,8 @@ theorem fib_of_ratio (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
       show G x ∈ S m
       rw [hGb b x hxA]
       exact hb
-  have hfin : ∀ b ∈ B, fib b (Q ∩ G ⁻¹' S n₀) ≠ ⊤ := fun b hb => module_finite_F_E (fib b) _ hQ'm (hint b hb)
+  have hfin : ∀ b ∈ B, fib b (Q ∩ G ⁻¹' S n₀) ≠ ⊤ := fun b hb =>
+    module_finite_F_E (fib b) _ hQ'm (hint b hb)
   have hmain : ∀ n, S n ⊆ S n₀ → ∫ b in S n, F b ∂ν = κ * ν.real (H n) := by
     intro n hn
     have hSvm : MeasurableSet (Q ∩ G ⁻¹' S n) := (hQo.inter ((hSo n).preimage hGc)).measurableSet
@@ -137,16 +143,15 @@ theorem fib_of_ratio (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
     have h1 := hdis ((Q ∩ G ⁻¹' S n).indicator 1) (measurable_one.indicator hSvm)
     rw [lintegral_indicator_one hSvm, Measure.restrict_apply hSvm, Set.inter_eq_left.2 hSvU] at h1
     simp_rw [lintegral_indicator_one hSvm] at h1
-    have hpt : ∀ b, fib b (Q ∩ G ⁻¹' S n) =
-        (S n).indicator (fun b => ENNReal.ofReal (F b)) b := by
+    have hpt : ∀ b, fib b (Q ∩ G ⁻¹' S n) = (S n).indicator (fun b => ENNReal.ofReal (F b)) b := by
       intro b
       simp only [Set.indicator_apply]
       split_ifs with hb
       · rw [hfibS b, hcut b n hb, ← hcut b n₀ (hn hb), ← hfibS b, hFval,
           ENNReal.ofReal_toReal (hfin b (hS0B (hn hb)))]
       · rw [hfibS b]
-        have e : (Q ∩ G ⁻¹' S n) ∩ (f ⁻¹' {ι b} ∩ U) = ∅ := Set.subset_empty_iff.1 fun x hx =>
-          hb (by rw [← hGb b x hx.2]; exact hx.1.2)
+        have e : (Q ∩ G ⁻¹' S n) ∩ (f ⁻¹' {ι b} ∩ U) = ∅ :=
+          Set.subset_empty_iff.1 fun x hx => hb (by rw [← hGb b x hx.2]; exact hx.1.2)
         rw [e, measure_empty]
     have h2 : μ (Q ∩ G ⁻¹' S n) = ∫⁻ b in S n, ENNReal.ofReal (F b) ∂ν := by
       rw [h1, lintegral_congr hpt, lintegral_indicator (hSm n)]
@@ -195,36 +200,45 @@ theorem fib_of_ratio (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
     linarith
   have hQQ : fib T Q = fib T (Q ∩ G ⁻¹' S n₀) := by
     rw [hfibS T (Q ∩ G ⁻¹' S n₀), hcut T n₀ (hTS n₀), ← hfibS T Q]
-  have hint' : ∫ x, Q.indicator (1 : V → ℂ) x ∂(fib T) =
-      ∫ x, ((Q.indicator (1 : V → ℝ) x : ℝ) : ℂ) ∂(fib T) :=
+  have hint'
+      : ∫ x, Q.indicator (1 : V → ℂ) x ∂(fib T)
+        = ∫ x, ((Q.indicator (1 : V → ℝ) x : ℝ) : ℂ) ∂(fib T) :=
     integral_congr_ae (ae_of_all _ fun x => by by_cases hx : x ∈ Q <;> simp [hx])
-  rw [hint', integral_complex_ofReal, integral_indicator_one hQo.measurableSet, measureReal_def, hQQ,
-    ← hFval, ← hk]
+  rw [hint', integral_complex_ofReal, integral_indicator_one hQo.measurableSet, measureReal_def,
+    hQQ, ← hFval, ← hk]
 
 end Core
 
 section Lat
 
-variable {V X : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [MeasurableSpace V] [BorelSpace V] [AddCommGroup X] [TopologicalSpace X]
-  [IsTopologicalAddGroup X] [MeasurableSpace X] [BorelSpace X]
+variable
+  {V X : Type}
+  [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
+  [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [MeasurableSpace X] [BorelSpace X]
 
 omit [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
   [TopologicalSpace X] [IsTopologicalAddGroup X] [MeasurableSpace X] [BorelSpace X] in
-theorem cos_inter_eq (Λ0 : AddSubgroup V) (Hn : AddSubgroup X) (G : V → X) (y : V) (T : X) :
-    {x | x - y ∈ Λ0} ∩ G ⁻¹' {z | z - T ∈ Hn} = (fun x => -y + x) ⁻¹' hlev Λ0 Hn G y T := by
+theorem cos_inter_eq (Λ0 : AddSubgroup V) (Hn : AddSubgroup X) (G : V → X) (y : V) (T : X)
+    : {x | x - y ∈ Λ0} ∩ G ⁻¹' {z | z - T ∈ Hn} = (fun x => -y + x) ⁻¹' hlev Λ0 Hn G y T := by
   ext x
   simp [hlev, neg_add_eq_sub]
 
-theorem cos_ratio (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.IsAddHaarMeasure]
-    (Λ : ℕ → AddSubgroup V) (H : ℕ → AddSubgroup X) (hΛo : ∀ n, IsOpen (Λ n : Set V))
-    (hΛa : Antitone Λ) (hHo : ∀ n, IsOpen (H n : Set X)) (hHc : ∀ n, IsCompact (H n : Set X))
-    (D : V →+ X) (hD : ∀ n, (Λ n).map D = H n) (G : V → X) (y : V)
+theorem cos_ratio
+    (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.IsAddHaarMeasure]
+    (Λ : ℕ → AddSubgroup V)
+    (H : ℕ → AddSubgroup X)
+    (hΛo : ∀ n, IsOpen (Λ n : Set V)) (hΛa : Antitone Λ) (hHo : ∀ n, IsOpen (H n : Set X))
+    (hHc : ∀ n, IsCompact (H n : Set X))
+    (D : V →+ X) (hD : ∀ n, (Λ n).map D = H n)
+    (G : V → X) (y : V)
     (hG : ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n, G (y + Z + W) - G (y + Z) - D W ∈ H (n + 1))
-    (T : X) (hyT : G y - T ∈ H 0) (n : ℕ) :
-    μ ({x | x - y ∈ Λ 0} ∩ G ⁻¹' {z | z - T ∈ H n}) * ν (H 0) = μ (Λ 0) * ν (H n) := by
-  have hset : {x | x - y ∈ Λ 0} ∩ G ⁻¹' {z | z - T ∈ H n} =
-      (fun x => -y + x) ⁻¹' hlev (Λ 0) (H n) G y T := cos_inter_eq (Λ 0) (H n) G y T
+    (T : X) (hyT : G y - T ∈ H 0)
+    (n : ℕ)
+    : μ ({x | x - y ∈ Λ 0} ∩ G ⁻¹' {z | z - T ∈ H n}) * ν (H 0) = μ (Λ 0) * ν (H n) := by
+  have hset
+      : {x | x - y ∈ Λ 0} ∩ G ⁻¹' {z | z - T ∈ H n}
+        = (fun x => -y + x) ⁻¹' hlev (Λ 0) (H n) G y T :=
+    cos_inter_eq (Λ 0) (H n) G y T
   rw [hset, measure_preimage_add]
   exact hensel_main μ ν Λ H hΛo hΛa hHo hHc D hD G y hG T
     (by simpa [neg_sub] using (H 0).neg_mem hyT) n
@@ -233,11 +247,11 @@ end Lat
 
 section Fin
 
-variable {V X Y : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V]
-  [MeasurableSpace V] [BorelSpace V] [AddCommGroup X] [TopologicalSpace X]
-  [IsTopologicalAddGroup X] [T2Space X] [LocallyCompactSpace X] [SecondCountableTopology X]
-  [MeasurableSpace X] [BorelSpace X]
+variable
+  {V X Y : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+  [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+  [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [T2Space X]
+  [LocallyCompactSpace X] [SecondCountableTopology X] [MeasurableSpace X] [BorelSpace X]
 
 end Fin
 

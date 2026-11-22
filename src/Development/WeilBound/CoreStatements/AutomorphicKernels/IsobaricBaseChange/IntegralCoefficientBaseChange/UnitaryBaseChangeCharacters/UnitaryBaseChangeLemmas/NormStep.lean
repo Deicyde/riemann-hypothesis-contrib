@@ -13,18 +13,19 @@ namespace GlobalTheory.UsideLeaf.UnitaryLocalCharpoly
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem norm_step [CompleteSpace L] (σ : L →+* L) (ϖ : L) (q : ℕ) (h : IsUnramInv ϖ σ q) {n : ℕ}
-    (γ J Ji Hn Hi : Matrix (Fin n) (Fin n) L) (Q₀ : (intL L)[X])
+theorem norm_step
+    [CompleteSpace L]
+    (σ : L →+* L) (ϖ : L) (q : ℕ) (h : IsUnramInv ϖ σ q)
+    {n : ℕ} (γ J Ji Hn Hi : Matrix (Fin n) (Fin n) L)
+    (Q₀ : (intL L)[X])
     (hγ : ∀ i j, γ i j ∈ intL L) (hJ : ∀ i j, J i j ∈ intL L) (hJi : ∀ i j, Ji i j ∈ intL L)
-    (hH : ∀ i j, Hn i j ∈ intL L) (hHi : ∀ i j, Hi i j ∈ intL L)
-    (hJJ : J * Ji = 1) (hHH : Hn * Hi = 1) (hJh : cT σ J = J) (hHh : cT σ Hn = Hn)
-    (hγJ : cT σ γ * J * γ = J) (hγH : cT σ γ * Hn * γ = Hn)
-    (hch : γ.charpoly = Q₀.map (intL L).subtype) (hsep : Q₀.Separable) :
-    ∃ b : GL (Fin n) L, b.val * γ = γ * b.val ∧ cT σ b.val * J * b.val = Hn := by
+    (hH : ∀ i j, Hn i j ∈ intL L) (hHi : ∀ i j, Hi i j ∈ intL L) (hJJ : J * Ji = 1)
+    (hHH : Hn * Hi = 1) (hJh : cT σ J = J) (hHh : cT σ Hn = Hn) (hγJ : cT σ γ * J * γ = J)
+    (hγH : cT σ γ * Hn * γ = Hn) (hch : γ.charpoly = Q₀.map (intL L).subtype) (hsep : Q₀.Separable)
+    : ∃ b : GL (Fin n) L, b.val * γ = γ * b.val ∧ cT σ b.val * J * b.val = Hn := by
   set sO := GlobalTheory.NormEq.sigO σ h.2.1 with hsO
   let Φ : Matrix (Fin n) (Fin n) (intL L) →+* Matrix (Fin n) (Fin n) L := (intL L).subtype.mapMatrix
-  have hΦinj : Function.Injective Φ := fun a b hab => by
-    ext i j; exact congrFun (congrFun hab i) j
+  have hΦinj : Function.Injective Φ := fun a b hab => by ext i j; exact congrFun (congrFun hab i) j
   have hΦcT : ∀ M, Φ (cT sO M) = cT σ (Φ M) := fun M => rfl
   let γO : Matrix (Fin n) (Fin n) (intL L) := fun i j => ⟨γ i j, hγ i j⟩
   let JO : Matrix (Fin n) (Fin n) (intL L) := fun i j => ⟨J i j, hJ i j⟩
@@ -53,7 +54,8 @@ theorem norm_step [CompleteSpace L] (σ : L →+* L) (ϖ : L) (q : ℕ) (h : IsU
   let P : GlobalTheory.UTr.Csr sO := ⟨Q₀, hcsr⟩
   have hg : aeval γO P.1 = 0 := by
     show aeval γO Q₀ = 0
-    rw [← hchO]; exact Matrix.aeval_self_charpoly γO
+    rw [← hchO]
+    exact Matrix.aeval_self_charpoly γO
   let ev := GlobalTheory.UTr.evalMat P γO hg
   have hev : ∀ r : (intL L)[X], ev (aeval (GlobalTheory.UTr.root P) r) = aeval γO r := fun r => by
     rw [← aeval_algHom_apply, GlobalTheory.UTr.evalMat_root]
@@ -70,13 +72,16 @@ theorem norm_step [CompleteSpace L] (σ : L →+* L) (ϖ : L) (q : ℕ) (h : IsU
     show JiO * cT sO γO * JO * γO = 1
     rw [Matrix.mul_assoc JiO, Matrix.mul_assoc JiO, hγJO, hJJO']
   let gU : UJ sO JO := ⟨⟨γO, γiO, mul_eq_one_comm.1 hγi, hγi⟩, hγJO⟩
-  have hcT : ∀ z, cT sO (ev z) * JO = JO * ev (GlobalTheory.UTr.conj P z) := fun z => GlobalTheory.UTr.cT_evalMat P gU hg z
+  have hcT : ∀ z, cT sO (ev z) * JO = JO * ev (GlobalTheory.UTr.conj P z) := fun z =>
+    GlobalTheory.UTr.cT_evalMat P gU hg z
 
   have hxc : (JiO * HO) * γO = γO * (JiO * HO) := by
     have hA : cT sO γO * (JO * γO * JiO) = 1 := by
       rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hγJO, hJJO]
     have hA' : (JO * γO * JiO) * cT sO γO = 1 := mul_eq_one_comm.1 hA
-    calc JiO * HO * γO = JiO * ((JO * γO * JiO) * cT sO γO) * HO * γO := by rw [hA', Matrix.mul_one]
+    calc
+      JiO * HO * γO
+        = JiO * ((JO * γO * JiO) * cT sO γO) * HO * γO := by rw [hA', Matrix.mul_one]
       _ = γO * JiO * (cT sO γO * HO * γO) := by
         simp only [Matrix.mul_assoc]
         rw [← Matrix.mul_assoc JiO JO, hJJO', Matrix.one_mul]
@@ -93,8 +98,8 @@ theorem norm_step [CompleteSpace L] (σ : L →+* L) (ϖ : L) (q : ℕ) (h : IsU
     rw [htO]
     exact isUnit_iff_exists_inv.2 ⟨tiO.det, by rw [← Matrix.det_mul, htiO, Matrix.det_one]⟩
   have hunit : IsUnit tz := by
-    have h0 : aeval tz (ev tz).charpoly = 0 := hevinj (by
-      rw [← aeval_algHom_apply, map_zero]; exact Matrix.aeval_self_charpoly (ev tz))
+    have h0 : aeval tz (ev tz).charpoly = 0 :=
+      hevinj (by rw [← aeval_algHom_apply, map_zero]; exact Matrix.aeval_self_charpoly (ev tz))
     have hc0 : IsUnit ((ev tz).charpoly.coeff 0) := by
       have := Matrix.det_eq_sign_charpoly_coeff (ev tz)
       rw [this] at hdet
@@ -108,31 +113,34 @@ theorem norm_step [CompleteSpace L] (σ : L →+* L) (ϖ : L) (q : ℕ) (h : IsU
   let T : (GlobalTheory.UTr.Alg P)ˣ := hunit.unit
 
   have hcTJi : cT sO JiO = JiO := by
-    have h1 : cT sO JiO * JO = 1 := by
-      rw [← hJhO, ← cT_mul, hJJO, cT_one]
-    calc cT sO JiO = cT sO JiO * (JO * JiO) := by rw [hJJO, Matrix.mul_one]
+    have h1 : cT sO JiO * JO = 1 := by rw [← hJhO, ← cT_mul, hJJO, cT_one]
+    calc
+      cT sO JiO
+        = cT sO JiO * (JO * JiO) := by rw [hJJO, Matrix.mul_one]
       _ = JiO := by rw [← Matrix.mul_assoc, h1, Matrix.one_mul]
   have hconj : GlobalTheory.UTr.conj P tz = tz := by
     apply hevinj
     have h1 : JO * ev (GlobalTheory.UTr.conj P tz) = JO * ev tz := by
-      rw [← hcT, htO, cT_mul, hHhO, hcTJi, Matrix.mul_assoc, hJJO', Matrix.mul_one, ← Matrix.mul_assoc, hJJO,
-        Matrix.one_mul]
+      rw [← hcT, htO, cT_mul, hHhO, hcTJi, Matrix.mul_assoc, hJJO', Matrix.mul_one,
+        ← Matrix.mul_assoc, hJJO, Matrix.one_mul]
     have h2 := congrArg (JiO * ·) h1
     simpa only [← Matrix.mul_assoc, hJJO', Matrix.one_mul] using h2
-  have hT : T ∈ GlobalTheory.UTr.plus P := (GlobalTheory.UTr.mem_plus (P := P)).2 (by rw [IsUnit.unit_spec]; exact hconj)
+  have hT : T ∈ GlobalTheory.UTr.plus P :=
+    (GlobalTheory.UTr.mem_plus (P := P)).2 (by rw [IsUnit.unit_spec]; exact hconj)
   have hsepP : (P : (intL L)[X]).Separable := hsep
   obtain ⟨u, hu⟩ := GlobalTheory.NormEq.normU_surj L σ ϖ q h P hsepP T hT
   have hu' : (u : GlobalTheory.UTr.Alg P) * GlobalTheory.UTr.conj P u = tz := by
     have := congrArg (fun z : (GlobalTheory.UTr.Alg P)ˣ => (z : GlobalTheory.UTr.Alg P)) hu
     simpa [GlobalTheory.UTr.normU, T] using this
-  let Ψ : GlobalTheory.UTr.Alg P →* Matrix (Fin n) (Fin n) L := (Φ.comp ev.toRingHom : GlobalTheory.UTr.Alg P →+* _)
+  let Ψ : GlobalTheory.UTr.Alg P →* Matrix (Fin n) (Fin n) L :=
+    (Φ.comp ev.toRingHom : GlobalTheory.UTr.Alg P →+* _)
   refine ⟨Units.map Ψ u, ?_, ?_⟩
   · show Φ (ev u) * γ = γ * Φ (ev u)
     rw [← eγ, ← map_mul, ← map_mul]
     congr 1
     rw [← GlobalTheory.UTr.evalMat_root P γO hg, ← map_mul, ← map_mul, mul_comm]
   · show cT σ (Φ (ev u)) * J * Φ (ev u) = Hn
-    rw [← hΦcT, ← eJ, ← map_mul, ← map_mul, hcT, Matrix.mul_assoc, ← map_mul, mul_comm (GlobalTheory.UTr.conj P _), hu',
-      htO, ← Matrix.mul_assoc, hJJO, Matrix.one_mul, eH]
+    rw [← hΦcT, ← eJ, ← map_mul, ← map_mul, hcT, Matrix.mul_assoc, ← map_mul,
+      mul_comm (GlobalTheory.UTr.conj P _), hu', htO, ← Matrix.mul_assoc, hJJO, Matrix.one_mul, eH]
 
 end GlobalTheory.UsideLeaf.UnitaryLocalCharpoly

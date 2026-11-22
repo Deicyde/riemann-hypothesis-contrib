@@ -23,9 +23,13 @@ theorem BdDivides.proof (hdiv : CoordDivDivisible.Statement) : BdDivides.Stateme
   have hF : AnalyticOnNhd ℂ F Ω := by
     intro z hz
     have ht : AnalyticAt ℂ (R.ψ k ∘ (R.ψ j).symm) z :=
-      ReciprocityTheory.AnForm.M.SimpleNormalCrossingSliceCharts.compat_trans A (R.compat j) (R.compat k) hz.1 hz.2.2.1
-    exact Finset.analyticAt_fun_prod (f := fun i z => R.ψ k ((R.ψ j).symm z) i) _
-      fun i _ => (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin D => ℂ) i).analyticAt _ |>.comp ht
+      ReciprocityTheory.AnForm.M.SimpleNormalCrossingSliceCharts.compat_trans A (R.compat j)
+        (R.compat k) hz.1 hz.2.2.1
+    exact Finset.analyticAt_fun_prod
+      (f := fun i z => R.ψ k ((R.ψ j).symm z) i)
+      _
+      fun i _ =>
+        (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin D => ℂ) i).analyticAt _ |>.comp ht
   have hvan : ∀ z ∈ Ω, z ∈ coordDiv (R.S j) → F z = 0 := by
     intro z hz hzS
     obtain ⟨hzt, ⟨_, hzW⟩, ⟨hyk, hykW⟩⟩ := hz
@@ -40,10 +44,13 @@ theorem BdDivides.proof (hdiv : CoordDivDivisible.Statement) : BdDivides.Stateme
     obtain ⟨i, hi, h0⟩ := hk
     exact Finset.prod_eq_zero hi h0
   obtain ⟨G, hG, hFG⟩ := hdiv D Ω F (R.S j) hΩ hF hvan
-  have hmem : ∀ y ∈ bdDom R j ∩ bdDom R k, R.ψ j y ∈ Ω := fun y hy =>
-    ⟨(R.ψ j).map_source hy.1.1, by
+  have hmem : ∀ y ∈ bdDom R j ∩ bdDom R k, R.ψ j y ∈ Ω := fun y hy => ⟨
+    (R.ψ j).map_source hy.1.1,
+    by
       show (R.ψ j).symm (R.ψ j y) ∈ bdDom R j ∩ bdDom R k
-      rw [(R.ψ j).left_inv hy.1.1]; exact hy⟩
+      rw [(R.ψ j).left_inv hy.1.1]
+      exact hy
+  ⟩
   refine ⟨fun y => G (R.ψ j y), ?_, ?_, ?_⟩
   · intro m w hw
     have hx : (A.chart m).symm w ∈ bdDom R j ∩ bdDom R k := hw.2

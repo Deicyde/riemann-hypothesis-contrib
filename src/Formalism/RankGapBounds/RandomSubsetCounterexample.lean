@@ -14,18 +14,20 @@ def hOf (e l : ℕ) (hl : Nat.Coprime l (4 * 2 ^ e)) : Hgrp e :=
   QuotientGroup.mk (ZMod.unitOfCoprime l hl)
 
 def OrdersIff : Prop :=
-  ∀ (e j l : ℕ) (hl : Nat.Coprime l (4 * 2 ^ e)), j ≤ e →
-    ((hOf e l hl) ^ (2 ^ j) = 1 ↔
-      ((l : ZMod (2 ^ (e + 2 - j))) = 1 ∨ (l : ZMod (2 ^ (e + 2 - j))) = -1))
+  ∀ (e j l : ℕ) (hl : Nat.Coprime l (4 * 2 ^ e)),
+    j ≤ e
+      → ((hOf e l hl) ^ (2 ^ j) = 1
+        ↔ ((l : ZMod (2 ^ (e + 2 - j))) = 1 ∨ (l : ZMod (2 ^ (e + 2 - j))) = -1))
 
 def OrdersBound : Prop :=
-  ∀ (e J l : ℕ) (hl : Nat.Coprime l (4 * 2 ^ e)), 1 ≤ J → 1 < l →
-    orderOf (hOf e l hl) ≤ J → (4 * 2 ^ e : ℝ) / J - 1 ≤ l
+  ∀ (e J l : ℕ) (hl : Nat.Coprime l (4 * 2 ^ e)),
+    1 ≤ J → 1 < l → orderOf (hOf e l hl) ≤ J → (4 * 2 ^ e : ℝ) / J - 1 ≤ l
 
 def OrdersSumY : Prop :=
-  ∃ C : ℝ, ∀ (e J : ℕ) (Y : ℝ) (s : Finset ℕ), 1 ≤ e → 1 ≤ J → 1 ≤ Y →
-    (∀ l ∈ s, l.Prime ∧ l ≠ 2 ∧ (l : ℝ) ≤ Y ∧
-      ∃ hl : Nat.Coprime l (4 * 2 ^ e), orderOf (hOf e l hl) ≤ J) →
-    ∑ l ∈ s, Real.log l / (l : ℝ) ≤ C * J * Real.log (2 ^ e * Y) ^ 2 / (2 : ℝ) ^ e
+  ∃ C : ℝ, ∀ (e J : ℕ) (Y : ℝ) (s : Finset ℕ),
+    1 ≤ e → 1 ≤ J → 1 ≤ Y
+      → (∀ l ∈ s,
+        l.Prime ∧ l ≠ 2 ∧ (l : ℝ) ≤ Y ∧ ∃ hl : Nat.Coprime l (4 * 2 ^ e), orderOf (hOf e l hl) ≤ J)
+      → ∑ l ∈ s, Real.log l / (l : ℝ) ≤ C * J * Real.log (2 ^ e * Y) ^ 2 / (2 : ℝ) ^ e
 
 end Formalism.RankGapBounds.LocalQuadraticParts

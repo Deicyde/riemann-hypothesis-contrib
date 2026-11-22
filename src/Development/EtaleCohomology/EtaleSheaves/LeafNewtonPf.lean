@@ -78,9 +78,10 @@ lemma part3 {A : Type 1} [CommRing A] (c : ℕ → A) (x : A) (h0 : c 0 = 1) (h1
   obtain ⟨m, rfl⟩ : ∃ m, k = m + 1 := ⟨k - 1, by omega⟩
   rw [key, mul_comm (C x) X, mul_assoc, coeff_succ_X_mul, coeff_C_mul, coeff_mk, pow_succ, mul_comm]
 
-theorem LeafNewton_of : LateralTheory.E.D2.LeafNewton :=
-  ⟨fun _ _ _ _ φ c h0 k => part1 φ c h0 k,
-   fun _ _ c d e hc hd he k => part2 c d e hc hd he k,
-   fun _ _ c x h0 h1 h2 k hk => part3 c x h0 h1 h2 k hk⟩
+theorem LeafNewton_of : LateralTheory.E.D2.LeafNewton := ⟨
+  fun _ _ _ _ φ c h0 k => part1 φ c h0 k,
+  fun _ _ c d e hc hd he k => part2 c d e hc hd he k,
+  fun _ _ c x h0 h1 h2 k hk => part3 c x h0 h1 h2 k hk
+⟩
 
 end LateralTheory.E.LeafNewtonPf

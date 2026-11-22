@@ -8,11 +8,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
 open UpperTheory.V.Lit.Dr
 
-theorem UpperTheory.V.Lit.Dr.corrBasic :
-    CorrBasic := by
+theorem UpperTheory.V.Lit.Dr.corrBasic : CorrBasic := by
   intro E _ _ _ a U Ξ q α w hc
-  have two : ∀ (s : GL (Fin a) (Af E) ⧸ U) (p : HV E a) (v : Fin q → HV E a),
-      w s p (fun i => (2 : ℝ) • v i) = (∏ _i : Fin q, (2 : ℝ)) • w s p v := fun s p v =>
+  have two
+      : ∀ (s : GL (Fin a) (Af E) ⧸ U) (p : HV E a) (v : Fin q → HV E a),
+        w s p (fun i => (2 : ℝ) • v i) = (∏ _i : Fin q, (2 : ℝ)) • w s p v := fun s p v =>
     (w s p).toContinuousMultilinearMap.map_smul_univ (fun _ => (2 : ℝ)) v
   have hs : ∀ (g : GL (Fin a) (Cinf E)) (p : HV E a), sand g (sand g⁻¹ p) = p := fun g p => by
     rw [← ContinuousLinearMap.mul_apply, ← map_mul, mul_inv_cancel, map_one]; rfl
@@ -41,5 +41,7 @@ theorem UpperTheory.V.Lit.Dr.corrBasic :
     have hX : hv (X i) = hOne E a := congrArg hv (Subtype.ext hi)
     rw [two, h _ _ ⟨g, rfl⟩ (fun j => sand g (hv (X j))) i (by rw [hX]), smul_zero, hy] at h1
     have h2 := congrArg (fun v => Ξ.mat g⁻¹ *ᵥ v) h1
-    simp only [Matrix.mulVec_zero, Matrix.mulVec_mulVec, ← map_mul, inv_mul_cancel, map_one, Matrix.one_mulVec] at h2
+    simp only [Matrix.mulVec_zero, Matrix.mulVec_mulVec, ← map_mul, inv_mul_cancel, map_one,
+        Matrix.one_mulVec]
+      at h2
     exact h2.symm

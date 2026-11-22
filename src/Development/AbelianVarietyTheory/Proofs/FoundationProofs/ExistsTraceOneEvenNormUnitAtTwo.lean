@@ -9,13 +9,16 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsInt
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.EvenTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.EvenTheta
 open scoped BigOperators
 
 namespace GlobalTheory.EvenTheta
 
-theorem norm_eq_one_or_of_add_eq_one {L : Type*} [NormedField L] [IsUltrametricDist L] {b c : L}
-    (h : b + c = 1) (hn : ‖b * c‖ < 1) : ‖b‖ = 1 ∨ ‖c‖ = 1 := by
+theorem norm_eq_one_or_of_add_eq_one
+    {L : Type*} [NormedField L] [IsUltrametricDist L] {b c : L} (h : b + c = 1) (hn : ‖b * c‖ < 1)
+    : ‖b‖ = 1 ∨ ‖c‖ = 1 := by
   by_contra hne
   push_neg at hne
   obtain ⟨hb, hc⟩ := hne
@@ -42,8 +45,12 @@ theorem norm_two_mul_natCast_lt_one (k : ℕ) : ‖((2 * k : ℕ) : ℂ_[2])‖ 
   rw [norm_mul]
   nlinarith [norm_nonneg (k : ℂ_[2]), norm_nonneg (2 : ℂ_[2])]
 
-theorem exists_int_trace_one_unit_at_two :
-    ∀ (D : D7) (lam : Qbar →+* ℂ_[2]), ∃ (a : 𝓞 D.host.K) (β : ℂ) (k : ℕ), D.host.φ₀ (((a : D.host.K) : D.host.E)) = β ∧ β ∈ Qbar ∧ ‖lamC lam β‖ = 1 ∧ β + starRingEnd ℂ β = 1 ∧ β * starRingEnd ℂ β = ((2 * k : ℕ) : ℂ) ∧ ∀ (Λ : AddSubgroup ℂ) (t₀ : ℂ), GL3Theta.IsTwoTorsionPointUnkilled D Λ t₀ → β * t₀ ∉ Λ ∧ (1 - β) * t₀ ∉ Λ := by
+theorem exists_int_trace_one_unit_at_two
+    : ∀ (D : D7) (lam : Qbar →+* ℂ_[2]), ∃ (a : 𝓞 D.host.K) (β : ℂ) (k : ℕ),
+      D.host.φ₀ (((a : D.host.K) : D.host.E)) = β ∧ β ∈ Qbar ∧ ‖lamC lam β‖ = 1
+        ∧ β + starRingEnd ℂ β = 1 ∧ β * starRingEnd ℂ β = ((2 * k : ℕ) : ℂ)
+        ∧ ∀ (Λ : AddSubgroup ℂ) (t₀ : ℂ),
+          GL3Theta.IsTwoTorsionPointUnkilled D Λ t₀ → β * t₀ ∉ Λ ∧ (1 - β) * t₀ ∉ Λ := by
   intro D lam
   have hm : ∀ x, D.host.φ₀ x ∈ Qbar := fun x => by
     rw [mem_algebraicClosure_iff]
@@ -59,7 +66,8 @@ theorem exists_int_trace_one_unit_at_two :
   have hw' : 1 - StandardLatticesGL3.w0 D = (1 - Complex.I * (Real.sqrt D.host.d : ℂ)) / 2 := by
     rw [hw]; ring
   have hc : starRingEnd ℂ (StandardLatticesGL3.w0 D) = 1 - StandardLatticesGL3.w0 D := by
-    rw [hw', hw, map_div₀, map_add (f := _), map_mul, map_one, map_ofNat, Complex.conj_I, Complex.conj_ofReal]
+    rw [hw', hw, map_div₀, map_add (f := _), map_mul, map_one, map_ofNat, Complex.conj_I,
+      Complex.conj_ofReal]
     ring
   have hp : StandardLatticesGL3.w0 D * (1 - StandardLatticesGL3.w0 D) = ((2 * k : ℕ) : ℂ) := by
     rw [hw', hw]
@@ -68,13 +76,16 @@ theorem exists_int_trace_one_unit_at_two :
       - (1 / 4 : ℂ) * ((Real.sqrt D.host.d : ℝ) : ℂ) ^ 2 * Complex.I_sq
   have hQ : StandardLatticesGL3.w0 D ∈ Qbar := ha ▸ hm _
   have hQ' : 1 - StandardLatticesGL3.w0 D ∈ Qbar := Qbar.sub_mem Qbar.one_mem hQ
-  have hadd : lamC lam (StandardLatticesGL3.w0 D) + lamC lam (1 - StandardLatticesGL3.w0 D) = 1 := by
+  have hadd
+      : lamC lam (StandardLatticesGL3.w0 D) + lamC lam (1 - StandardLatticesGL3.w0 D) = 1 := by
     simp only [lamC, dif_pos hQ, dif_pos hQ']
     rw [← map_add (f := _), ← map_one lam]
     congr 1
     apply Subtype.ext
     simp
-  have hmul : lamC lam (StandardLatticesGL3.w0 D) * lamC lam (1 - StandardLatticesGL3.w0 D) = ((2 * k : ℕ) : ℂ_[2]) := by
+  have hmul
+      : lamC lam (StandardLatticesGL3.w0 D) * lamC lam (1 - StandardLatticesGL3.w0 D)
+        = ((2 * k : ℕ) : ℂ_[2]) := by
     simp only [lamC, dif_pos hQ, dif_pos hQ']
     rw [← map_mul, ← map_natCast lam]
     congr 1

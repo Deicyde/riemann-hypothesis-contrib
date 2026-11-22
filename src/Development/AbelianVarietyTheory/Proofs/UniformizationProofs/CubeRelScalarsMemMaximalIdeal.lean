@@ -11,20 +11,22 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValua
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem exists_dvr_fraction_order (V : Type) [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] :
-    ∃ o : (FractionRing V)ˣ → ℤ, (∀ x y, o (x * y) = o x + o y) ∧
-      (∀ (x y : (FractionRing V)ˣ) (u : Vˣ),
-        x.val = algebraMap V (FractionRing V) u.val * y.val → o x = o y) ∧
-      ∀ x, 0 < o x ↔ ∃ r ∈ IsLocalRing.maximalIdeal V,
-        algebraMap V (FractionRing V) r = x.val := by
+theorem exists_dvr_fraction_order (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    : ∃ o : (FractionRing V)ˣ → ℤ,
+      (∀ x y, o (x * y) = o x + o y)
+        ∧ (∀ (x y : (FractionRing V)ˣ) (u : Vˣ),
+          x.val = algebraMap V (FractionRing V) u.val * y.val → o x = o y)
+        ∧ ∀ x,
+          0 < o x ↔ ∃ r ∈ IsLocalRing.maximalIdeal V, algebraMap V (FractionRing V) r = x.val := by
   let v := (IsDiscreteValuationRing.maximalIdeal V).valuation (FractionRing V)
   have hne : ∀ x : (FractionRing V)ˣ, v x.val ≠ 0 := fun x =>
     (Valuation.ne_zero_iff v).mpr x.ne_zero
@@ -51,7 +53,17 @@ theorem exists_dvr_fraction_order (V : Type) [CommRing V] [IsDomain V]
       rw [← h]
       exact (IsDedekindDomain.HeightOneSpectrum.valuation_lt_one_iff_mem _ r).mpr hr
 
-theorem cubeRel_scalars_mem_maximalIdeal : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (X : Type) [AddCommGroup X] [Module.Free ℤ X] (a : X → (FractionRing V)ˣ), (∀ x y z, ∃ u : Vˣ, (a (x + y + z) * a x * a y * a z).val = algebraMap V (FractionRing V) u.val * (a (x + y) * a (x + z) * a (y + z)).val) → (∀ x, ∃ u : Vˣ, (a (-x)).val = algebraMap V (FractionRing V) u.val * (a x).val) → {x | ¬ ∃ r ∈ IsLocalRing.maximalIdeal V, algebraMap V (FractionRing V) r = (a x).val}.Finite → ∀ x, x ≠ 0 → ∃ r ∈ IsLocalRing.maximalIdeal V, algebraMap V (FractionRing V) r = (a x).val := by
+theorem cubeRel_scalars_mem_maximalIdeal
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (X : Type) [AddCommGroup X]
+        [Module.Free ℤ X] (a : X → (FractionRing V)ˣ),
+      (∀ x y z, ∃ u : Vˣ,
+          (a (x + y + z) * a x * a y * a z).val
+            = algebraMap V (FractionRing V) u.val * (a (x + y) * a (x + z) * a (y + z)).val)
+        → (∀ x, ∃ u : Vˣ, (a (-x)).val = algebraMap V (FractionRing V) u.val * (a x).val)
+        → {x | ¬ ∃ r ∈ IsLocalRing.maximalIdeal V, algebraMap V (FractionRing V) r = (a x).val}.Finite
+        → ∀ x,
+          x ≠ 0
+            → ∃ r ∈ IsLocalRing.maximalIdeal V, algebraMap V (FractionRing V) r = (a x).val := by
   intro V _ _ _ X _ _ a hc he hfin x hx
   obtain ⟨o, hmul, hunit, hpos⟩ := exists_dvr_fraction_order V
   rw [← hpos]

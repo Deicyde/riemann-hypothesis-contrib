@@ -9,7 +9,12 @@ open scoped Pointwise ENNReal
 
 namespace GlobalTheory.CompanionTheory.Ar.Cmp
 
-theorem relIndex_ratio_cocycle : ∀ (G : Type) [Group G] (A B C : Subgroup G), A.relIndex B ≠ 0 → B.relIndex A ≠ 0 → B.relIndex C ≠ 0 → C.relIndex B ≠ 0 → A.relIndex C ≠ 0 ∧ C.relIndex A ≠ 0 ∧ B.relIndex A * C.relIndex B * A.relIndex C = A.relIndex B * B.relIndex C * C.relIndex A := by
+theorem relIndex_ratio_cocycle
+    : ∀ (G : Type) [Group G] (A B C : Subgroup G),
+      A.relIndex B ≠ 0 → B.relIndex A ≠ 0 → B.relIndex C ≠ 0 → C.relIndex B ≠ 0
+        → A.relIndex C ≠ 0 ∧ C.relIndex A ≠ 0
+          ∧ B.relIndex A * C.relIndex B * A.relIndex C
+            = A.relIndex B * B.relIndex C * C.relIndex A := by
   intro G _ A B C hAB hBA hBC hCB
   have hAC : A.relIndex C ≠ 0 := Subgroup.relIndex_ne_zero_trans hAB hBC
   have hCA : C.relIndex A ≠ 0 := Subgroup.relIndex_ne_zero_trans hCB hBA
@@ -35,12 +40,15 @@ theorem relIndex_ratio_cocycle : ∀ (G : Type) [Group G] (A B C : Subgroup G), 
   have hy : T.relIndex (B ⊓ C) ≠ 0 := left_ne_zero_of_mul (h4 ▸ hTC)
   have hz : T.relIndex (A ⊓ C) ≠ 0 := left_ne_zero_of_mul (h6 ▸ hTC)
   apply mul_left_cancel₀ (mul_ne_zero (mul_ne_zero hx hy) hz)
-  calc T.relIndex (A ⊓ B) * T.relIndex (B ⊓ C) * T.relIndex (A ⊓ C) *
-        (B.relIndex A * C.relIndex B * A.relIndex C)
-      = (T.relIndex (A ⊓ B) * B.relIndex A) * (T.relIndex (B ⊓ C) * C.relIndex B) *
-        (T.relIndex (A ⊓ C) * A.relIndex C) := by ring
-    _ = (T.relIndex (A ⊓ C) * C.relIndex A) * (T.relIndex (A ⊓ B) * A.relIndex B) *
-        (T.relIndex (B ⊓ C) * B.relIndex C) := by rw [h1, h2, h3, h4, h5, h6]
+  calc
+    T.relIndex (A ⊓ B) * T.relIndex (B ⊓ C) * T.relIndex (A ⊓ C)
+          * (B.relIndex A * C.relIndex B * A.relIndex C)
+        = (T.relIndex (A ⊓ B) * B.relIndex A) * (T.relIndex (B ⊓ C) * C.relIndex B)
+          * (T.relIndex (A ⊓ C) * A.relIndex C) := by
+      ring
+    _ = (T.relIndex (A ⊓ C) * C.relIndex A) * (T.relIndex (A ⊓ B) * A.relIndex B)
+        * (T.relIndex (B ⊓ C) * B.relIndex C) := by
+      rw [h1, h2, h3, h4, h5, h6]
     _ = _ := by ring
 
 end GlobalTheory.CompanionTheory.Ar.Cmp

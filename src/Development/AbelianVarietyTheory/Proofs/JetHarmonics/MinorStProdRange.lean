@@ -8,21 +8,31 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValua
 @[expose] public section
 
 set_option autoImplicit false
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
-open ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm Formalism.MainNotions.ModuliIntegralCharts.H1 Formalism.MainNotions.ModuliIntegralCharts.H1.ExpBijectiveUniformisation Formalism.MainNotions.ModuliIntegralCharts.H1.GSt
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm
+  Formalism.MainNotions.ModuliIntegralCharts.H1
+  Formalism.MainNotions.ModuliIntegralCharts.H1.ExpBijectiveUniformisation
+  Formalism.MainNotions.ModuliIntegralCharts.H1.GSt
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 attribute [local instance] Over.cartesianMonoidalCategory
-open Formalism.MainNotions.ModuliIntegralCharts.H1.BoxTuple Formalism.MainNotions.ModuliIntegralCharts.H1.BidegreeTwoJet GlobalTheory GlobalTheory.PowGerm
+open Formalism.MainNotions.ModuliIntegralCharts.H1.BoxTuple
+  Formalism.MainNotions.ModuliIntegralCharts.H1.BidegreeTwoJet GlobalTheory GlobalTheory.PowGerm
 open ReciprocityTheory.ChartRestriction.G.TB (colM dAct)
 
 namespace GlobalTheory.PowGerm
 
 @[to_additive]
-theorem minorSt_prod_range {M : Type} [CommMonoid M] {N r : ℕ} (hr : r ≤ N) (g : ℕ → M)
-    (hg : ∀ s, ¬ (1 ≤ s ∧ s ≤ r) → g s = 1) :
-    ∏ s ∈ Finset.range (N + 1), g s = ∏ s : Fin r, g (s.val + 1) := by
-  rw [Finset.prod_range_succ', hg 0 (by omega), _root_.mul_one, Fin.prod_univ_eq_prod_range (fun s => g (s + 1)) r]
+theorem minorSt_prod_range
+    {M : Type} [CommMonoid M]
+    {N r : ℕ} (hr : r ≤ N)
+    (g : ℕ → M) (hg : ∀ s, ¬(1 ≤ s ∧ s ≤ r) → g s = 1)
+    : ∏ s ∈ Finset.range (N + 1), g s = ∏ s : Fin r, g (s.val + 1) := by
+  rw [Finset.prod_range_succ', hg 0 (by omega), _root_.mul_one,
+    Fin.prod_univ_eq_prod_range (fun s => g (s + 1)) r]
   symm
   apply Finset.prod_subset (Finset.range_subset_range.mpr hr)
   intro s _ hs
@@ -37,13 +47,16 @@ theorem minorSt : MinorSt := by
   have hrk : ∀ τ, rk τ ≤ Dw.mult τ := fun τ => min_le_left _ _
   have hrk1 : ∀ τ, typ τ → rk τ ≤ n₁ := fun τ h => (min_le_right _ _).trans (by simp [h])
   have hrk2 : ∀ τ, ¬ typ τ → rk τ ≤ n₂ := fun τ h => (min_le_right _ _).trans (by simp [h])
-  have hm0 : ∀ τ s, ¬ (1 ≤ s ∧ s ≤ rk τ) → m τ s = 0 := by
+  have hm0 : ∀ τ s, ¬(1 ≤ s ∧ s ≤ rk τ) → m τ s = 0 := by
     intro τ s hs
     by_contra h
     obtain ⟨h1, h2, h3⟩ := hm τ s h
     exact hs ⟨h1, le_min h2 h3⟩
   let col : ∀ τ, Fin (rk τ) → Fin (n₁ + n₂) := fun τ i =>
-    if h : typ τ then Fin.castAdd n₂ (Fin.castLE (hrk1 τ h) i) else Fin.natAdd n₁ (Fin.castLE (hrk2 τ h) i)
+    if h : typ τ then
+      Fin.castAdd n₂ (Fin.castLE (hrk1 τ h) i)
+    else
+      Fin.natAdd n₁ (Fin.castLE (hrk2 τ h) i)
   refine ⟨rk, hrk, col, fun τ s => m τ (s.val + 1), ?_, ?_, ?_, ?_⟩
   · intro τ i j hij
     by_cases h : typ τ
@@ -78,7 +91,8 @@ theorem minorSt : MinorSt := by
       unfold leadMinor
       congr 2
       ext a i : 2
-      simp only [col, dif_pos h, Matrix.of_apply, AlgHom.mapMatrix_apply, Matrix.map_apply, MvPolynomial.rename_X]
+      simp only [col, dif_pos h, Matrix.of_apply, AlgHom.mapMatrix_apply, Matrix.map_apply,
+        MvPolynomial.rename_X]
       rfl
     · rw [if_neg h, if_pos h, _root_.one_mul,
         minorSt_prod_range (hrk τ) _ (fun s hs => by rw [hm0 τ s hs, pow_zero])]
@@ -89,7 +103,8 @@ theorem minorSt : MinorSt := by
       unfold leadMinor
       congr 2
       ext a i : 2
-      simp only [col, dif_neg h, Matrix.of_apply, AlgHom.mapMatrix_apply, Matrix.map_apply, MvPolynomial.rename_X]
+      simp only [col, dif_neg h, Matrix.of_apply, AlgHom.mapMatrix_apply, Matrix.map_apply,
+        MvPolynomial.rename_X]
       rfl
 
 end GlobalTheory.PowGerm

@@ -15,19 +15,18 @@ variable (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyCompl
 
 theorem continuous_psiInf : Continuous (psiInf (E := E)) := by
   have hs : Continuous (fun z : Cinf E => sInf E z) :=
-    ((continuous_infEq E).prodMk continuous_const :
-      Continuous fun x : Cinf E => ((infEq E x, 0) : InfiniteAdeleRing E × Af E))
+    ((continuous_infEq E).prodMk continuous_const
+      : Continuous fun x : Cinf E => ((infEq E x, 0) : InfiniteAdeleRing E × Af E))
   exact continuous_subtype_val.comp ((GroundTheory.Global.continuous_adelicChar (K := E)).comp hs)
 
-theorem psiInf_zero : psiInf (0 : Cinf E) = 1 := by
-  simp [psiInf, map_zero]
+theorem psiInf_zero : psiInf (0 : Cinf E) = 1 := by simp [psiInf, map_zero]
 
 variable {E} {n : ℕ}
 
 theorem continuous_sdM_of : Continuous fun x : Lie E n => sdM (Matrix.of x) := by
   unfold sdM
-  exact continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
-    (continuous_apply j).comp (continuous_apply i)
+  exact continuous_finsetSum _ fun i _ =>
+    continuous_finsetSum _ fun j _ => (continuous_apply j).comp (continuous_apply i)
 
 theorem sdM_one : sdM (1 : Matrix (Fin n) (Fin n) (Cinf E)) = 0 := by
   unfold sdM
@@ -50,9 +49,11 @@ theorem nu_zero : nu (0 : Vp E n) = 1 := by
   · simp [nu, hij, Matrix.one_apply, hij.ne]
   · simp [nu, hij, Matrix.one_apply]
 
-theorem exists_bumpInf_oneL_ne_zero (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (n : ℕ) :
-    ∃ f : Lie E n → ℝ, ContDiff ℝ ∞ f ∧ HasCompactSupport f ∧ tsupport f ⊆ invSet E n ∧
-      bumpInf f (oneL E n) ≠ 0 := by
+theorem exists_bumpInf_oneL_ne_zero
+    (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (n : ℕ)
+    : ∃ f : Lie E n → ℝ,
+      ContDiff ℝ ∞ f ∧ HasCompactSupport f ∧ tsupport f ⊆ invSet E n
+        ∧ bumpInf f (oneL E n) ≠ 0 := by
   classical
   set h : Lie E n → ℝ := fun x => (psiInf (-sdM (Matrix.of x))).re with hh
   have hc : Continuous h :=
@@ -68,7 +69,8 @@ theorem exists_bumpInf_oneL_ne_zero (E : Type) [Field E] [NumberField E] [_root_
   set φ : Vp E n → Lie E n := fun t => toL (nu t) with hφ
   have hφc : Continuous φ := continuous_toL_nu
   set ψ : Lie E n → Vp E n := fun x p => x p.1.1 p.1.2 with hψ
-  have hψc : Continuous ψ := continuous_pi fun p => (continuous_apply p.1.2).comp (continuous_apply p.1.1)
+  have hψc : Continuous ψ :=
+    continuous_pi fun p => (continuous_apply p.1.2).comp (continuous_apply p.1.1)
   have hψφ : ∀ t, ψ (φ t) = t := fun t => by
     funext p
     change nu t p.1.1 p.1.2 = t p
@@ -79,7 +81,8 @@ theorem exists_bumpInf_oneL_ne_zero (E : Type) [Field E] [NumberField E] [_root_
     exact ht ⟨φ t, subset_tsupport _ hne, hψφ t⟩
   have hsd : ∀ t, sdM (nu t) = sdM (Matrix.of (φ t)) := fun t => by
     rw [hφ]; simp only [toL, Equiv.apply_symm_apply]
-  have hb : bumpInf f (oneL E n) = ∫ t : Vp E n, (f (φ t) : ℂ) * psiInf (-sdM (Matrix.of (φ t))) := by
+  have hb
+      : bumpInf f (oneL E n) = ∫ t : Vp E n, (f (φ t) : ℂ) * psiInf (-sdM (Matrix.of (φ t))) := by
     rw [bumpInf, hof]
     simp only [Matrix.mul_one, hsd]
     rfl
@@ -100,7 +103,9 @@ theorem exists_bumpInf_oneL_ne_zero (E : Type) [Field E] [NumberField E] [_root_
   haveI : (volume : Measure (Vp E n)).IsOpenPosMeasure := Measure.pi.isOpenPosMeasure _
   have hpos : 0 < ∫ t, f (φ t) * h (φ t) := by
     refine Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero (x := (0 : Vp E n))
-      ((hfd.continuous.comp hφc).mul (hc.comp hφc)) hfφ.mul_right (fun t => ?_) ?_
+      ((hfd.continuous.comp hφc).mul (hc.comp hφc)) hfφ.mul_right
+      (fun t => ?_)
+      ?_
     · have h0 : 0 ≤ f (φ t) := (hfr ⟨φ t, rfl⟩).1
       by_cases hz : f (φ t) = 0
       · simp [hz]

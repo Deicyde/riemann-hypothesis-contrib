@@ -5,5 +5,6 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.RadialDecomposit
 
 @[expose] public section
 
-theorem Formalism.FourierDecayAlt.P.q_radial_decomposition_of_pieces : Formalism.FourierDecayAlt.Q.RadialDecompositionOfParts :=
+theorem Formalism.FourierDecayAlt.P.q_radial_decomposition_of_pieces
+    : Formalism.FourierDecayAlt.Q.RadialDecompositionOfParts :=
   radial_decomposition_of_parts

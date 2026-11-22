@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.InstAddCo
 
 @[expose] public section
 
-open GlobalTheory GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.SmGL.Exponents ValuativeRel
+open GlobalTheory GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.SmGL.Exponents ValuativeRel
 open scoped TensorProduct
 
 noncomputable section
@@ -21,20 +22,22 @@ def boolPair (v : X false) (w : X true) : ∀ x, X x
   | true => w
 
 def boolMulti : (∀ x, X x) →ₘₗ[ℂ] (X false ⊗[ℂ] X true) :=
-  MultilinearMap.mk' (fun x => x false ⊗ₜ[ℂ] x true)
+  MultilinearMap.mk'
+    (fun x => x false ⊗ₜ[ℂ] x true)
     (fun m i x y => by cases i <;> simp [TensorProduct.add_tmul, TensorProduct.tmul_add])
     (fun m i c x => by cases i <;> simp [TensorProduct.smul_tmul', TensorProduct.tmul_smul])
 
-theorem boolPair_eq_right (v : X false) (w w' : X true) :
-    boolPair v w = Function.update (boolPair v w') true w := by
+theorem boolPair_eq_right (v : X false) (w w' : X true)
+    : boolPair v w = Function.update (boolPair v w') true w := by
   funext x; cases x <;> simp [boolPair]
 
-theorem boolPair_eq_left (v v' : X false) (w : X true) :
-    boolPair v w = Function.update (boolPair v' w) false v := by
+theorem boolPair_eq_left (v v' : X false) (w : X true)
+    : boolPair v w = Function.update (boolPair v' w) false v := by
   funext x; cases x <;> simp [boolPair]
 
 def boolBilin : X false →ₗ[ℂ] X true →ₗ[ℂ] PiTensorProduct ℂ X :=
-  LinearMap.mk₂ ℂ (fun v w => PiTensorProduct.tprod ℂ (boolPair v w))
+  LinearMap.mk₂ ℂ
+    (fun v w => PiTensorProduct.tprod ℂ (boolPair v w))
     (fun v v' w => by
       rw [boolPair_eq_left (v + v') 0, boolPair_eq_left v 0, boolPair_eq_left v' 0,
         MultilinearMap.map_update_add])
@@ -62,17 +65,17 @@ def boolTensorEquiv : PiTensorProduct ℂ X ≃ₗ[ℂ] X false ⊗[ℂ] X true 
       funext i
       cases i <;> rfl)
 
-theorem boolTensorEquiv_tprod (x : ∀ i, X i) :
-    boolTensorEquiv (PiTensorProduct.tprod ℂ x) = x false ⊗ₜ[ℂ] x true := by
+theorem boolTensorEquiv_tprod (x : ∀ i, X i)
+    : boolTensorEquiv (PiTensorProduct.tprod ℂ x) = x false ⊗ₜ[ℂ] x true := by
   simp [boolTensorEquiv, boolMulti]
 
 end Bool
 
-def piTensorTwoEquiv {R a b V W : Type} [CommRing R] [Fintype a] [DecidableEq a] [Fintype b]
-    [DecidableEq b] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    (π₁ : Representation ℂ (GL a R) V) (π₂ : Representation ℂ (GL b R) W) :
-    (piTensor (twoRep π₁ π₂)).Equiv
-      ((extTensor π₁ π₂).comp (leviTwo R a b).symm.toMonoidHom) :=
+def piTensorTwoEquiv
+    {R a b V W : Type} [CommRing R] [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
+    [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (π₁ : Representation ℂ (GL a R) V) (π₂ : Representation ℂ (GL b R) W)
+    : (piTensor (twoRep π₁ π₂)).Equiv ((extTensor π₁ π₂).comp (leviTwo R a b).symm.toMonoidHom) :=
   .mk (boolTensorEquiv (X := Two V W)) fun g => by
     refine PiTensorProduct.ext (MultilinearMap.ext fun x => ?_)
     show boolTensorEquiv (X := Two V W) (piTensor (twoRep π₁ π₂) g (PiTensorProduct.tprod ℂ x)) =
@@ -80,11 +83,14 @@ def piTensorTwoEquiv {R a b V W : Type} [CommRing R] [Fintype a] [DecidableEq a]
     rw [piTensor_tprod, boolTensorEquiv_tprod, boolTensorEquiv_tprod]
     exact (extTensor_tmul π₁ π₂ ((leviTwo R a b).symm g) (x false) (x true)).symm
 
-theorem prod₂_equiv_multiProd (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (r t : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (W : Type)
-    [AddCommGroup W] [Module ℂ W] (π₁ : Representation ℂ (GL (Fin r) k) V)
-    (π₂ : Representation ℂ (GL (Fin t) k) W) :
-    Nonempty ((prod₂ π₁ π₂).Equiv (multiProd (two (stdSum (rfl : r + t = r + t))) (twoRep π₁ π₂))) :=
+theorem prod₂_equiv_multiProd
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (r t : ℕ)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (W : Type) [AddCommGroup W] [Module ℂ W]
+    (π₁ : Representation ℂ (GL (Fin r) k) V) (π₂ : Representation ℂ (GL (Fin t) k) W)
+    : Nonempty ((prod₂ π₁ π₂).Equiv
+      (multiProd (two (stdSum (rfl : r + t = r + t))) (twoRep π₁ π₂))) :=
   ⟨(LocGL.parIndEquiv (two (stdSum (rfl : r + t = r + t))) (piTensorTwoEquiv π₁ π₂)).symm⟩
 
 end GlobalTheory.SmGL.Exponents

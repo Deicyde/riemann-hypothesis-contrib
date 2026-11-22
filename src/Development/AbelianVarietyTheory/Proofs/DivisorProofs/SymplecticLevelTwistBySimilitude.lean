@@ -5,15 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ZetaAwayPowS
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor GlobalTheory.HTSympCover
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor
+  GlobalTheory.HTSympCover
 
 noncomputable section
 
 namespace GlobalTheory.HTSympCover
 
-theorem reduceMod_eq_zero_iff {h : ℕ} (M : ℕ) (u : Fin h ⊕ Fin h → ℤ) :
-    reduceMod M u = 0 ↔ ∃ c, u = M • c := by
+theorem reduceMod_eq_zero_iff {h : ℕ} (M : ℕ) (u : Fin h ⊕ Fin h → ℤ)
+    : reduceMod M u = 0 ↔ ∃ c, u = M • c := by
   constructor
   · intro hu
     refine ⟨fun i => u i / M, ?_⟩
@@ -26,15 +29,19 @@ theorem reduceMod_eq_zero_iff {h : ℕ} (M : ℕ) (u : Fin h ⊕ Fin h → ℤ) 
     funext i
     simp [reduceMod]
 
-theorem omegaStd_cast {h : ℕ} (M : ℕ) (u v : Fin h ⊕ Fin h → ℤ) :
-    ((omegaStd u v : ℤ) : ZMod M) = omegaMod M (reduceMod M u) (reduceMod M v) := by
+theorem omegaStd_cast {h : ℕ} (M : ℕ) (u v : Fin h ⊕ Fin h → ℤ)
+    : ((omegaStd u v : ℤ) : ZMod M) = omegaMod M (reduceMod M u) (reduceMod M v) := by
   simp [omegaStd, omegaMod, reduceMod]
 
-theorem sympCond_twist : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N h M : ℕ), 0 < M →
-  ∀ (S : Scheme.{0}) (t : S ⟶ Sp R) (o : Obj b N t) (T : Over S) (t₁ : T.left ⟶ Sp (cycAway M))
-    (lv : (Fin h ⊕ Fin h → ℤ) → (T ⟶ o.A)), SympCond o h M T t₁ lv →
-    ∀ (a : sympSimGrp h M) (n : ℕ) (σ : cycAway M →+* cycAway M), IsMultOf a n →
-      σ (zetaAway M) = zetaAway M ^ n → SympCond o h M T (t₁ ≫ spMap σ) (sympTwist a lv) := by
+theorem sympCond_twist
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N h M : ℕ),
+      0 < M
+        → ∀ (S : Scheme.{0}) (t : S ⟶ Sp R) (o : Obj b N t) (T : Over S)
+            (t₁ : T.left ⟶ Sp (cycAway M)) (lv : (Fin h ⊕ Fin h → ℤ) → (T ⟶ o.A)),
+          SympCond o h M T t₁ lv
+            → ∀ (a : sympSimGrp h M) (n : ℕ) (σ : cycAway M →+* cycAway M),
+              IsMultOf a n → σ (zetaAway M) = zetaAway M ^ n
+                → SympCond o h M T (t₁ ≫ spMap σ) (sympTwist a lv) := by
   intro p _ D R _ b N h M hM S t o T t₁ lv hlv a n σ hn hσ
   haveI : NeZero M := ⟨hM.ne'⟩
   obtain ⟨hadd, htor, hgeo⟩ := hlv
@@ -64,17 +71,14 @@ theorem sympCond_twist : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
     apply per
     rw [reduceMod_liftMod, redAdd, redAdd, reduceMod_liftMod, reduceMod_liftMod, map_add (f := _)]
   · rw [tw]; exact htor _
-  ·
-    set β : cycAway M →+* k := (Spec.preimage (x ≫ t₁)).hom with hβdef
+  · set β : cycAway M →+* k := (Spec.preimage (x ≫ t₁)).hom with hβdef
     have hβ : x ≫ t₁ = spMap β := by
       simp only [spMap, hβdef, CommRingCat.ofHom_hom, Spec.map_preimage]
     have hβ' : β' = β.comp σ := by
-      have e : spMap β' = spMap (β.comp σ) := by
-        rw [spMap_comp, ← hx', ← hβ, Category.assoc]
+      have e : spMap β' = spMap (β.comp σ) := by rw [spMap_comp, ← hx', ← hβ, Category.assoc]
       have := Spec.map_injective e
       exact congrArg CommRingCat.Hom.hom this
-    have hζM : β (zetaAway M) ^ M = 1 := by
-      rw [← map_pow, zetaAway_pow_self M hM.ne', map_one]
+    have hζM : β (zetaAway M) ^ M = 1 := by rw [← map_pow, zetaAway_pow_self M hM.ne', map_one]
     have hne : β (zetaAway M) ≠ 0 := by
       intro h0
       rw [h0, zero_pow hM.ne'] at hζM
@@ -106,14 +110,18 @@ theorem sympCond_twist : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
     · rw [tw, tw]
       set u' := liftMod (g (reduceMod M u))
       set c' := liftMod (g (reduceMod M c))
-      have hcast : ((2 * omegaStd u' c' : ℤ) : ZMod M) = (((n : ℤ) * (2 * omegaStd u c) : ℤ) : ZMod M) := by
+      have hcast
+          : ((2 * omegaStd u' c' : ℤ) : ZMod M)
+            = (((n : ℤ) * (2 * omegaStd u c) : ℤ) : ZMod M) := by
         push_cast
         rw [omegaStd_cast, omegaStd_cast, reduceMod_liftMod, reduceMod_liftMod]
-        rw [show omegaMod M (g (reduceMod M u)) (g (reduceMod M c)) = n * omegaMod M (reduceMod M u) (reduceMod M c)
-          from hn _ _]
+        rw [show omegaMod M (g (reduceMod M u)) (g (reduceMod M c))
+            = n * omegaMod M (reduceMod M u) (reduceMod M c) from
+          hn _ _]
         ring
       have e : z' ^ (2 * omegaStd u c) = z ^ (2 * omegaStd u' c') := by
-        rw [hzz, ← zpow_natCast z, ← zpow_mul, zpow_eq_zpow_emod _ hzM, zpow_eq_zpow_emod (2 * omegaStd u' c') hzM]
+        rw [hzz, ← zpow_natCast z, ← zpow_mul, zpow_eq_zpow_emod _ hzM,
+          zpow_eq_zpow_emod (2 * omegaStd u' c') hzM]
         congr 1
         exact ((ZMod.intCast_eq_intCast_iff' _ _ _).1 hcast).symm
       rw [e]

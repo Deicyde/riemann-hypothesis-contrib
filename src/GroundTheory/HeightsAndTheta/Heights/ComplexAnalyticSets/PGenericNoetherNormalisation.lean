@@ -19,8 +19,6 @@ section Nagata
 variable {A : Type*} [CommRing A] [IsDomain A] {n : ℕ} (f : MvPolynomial (Fin (n + 1)) A)
 variable (v w : Fin (n + 1) →₀ ℕ)
 
-
-
 end Nagata
 
 section Combination

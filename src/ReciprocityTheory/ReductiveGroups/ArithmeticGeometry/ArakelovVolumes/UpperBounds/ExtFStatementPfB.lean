@@ -6,19 +6,22 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Metric
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology Metric
 open scoped ENNReal Matrix
 
 noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-theorem cont_dmin (τ : X.Ψ) (i : Fin (r + 1)) : Continuous fun x : Frame X.Ψ r => dmin X.Gm x τ i := by
+theorem cont_dmin (τ : X.Ψ) (i : Fin (r + 1))
+    : Continuous fun x : Frame X.Ψ r => dmin X.Gm x τ i := by
   unfold dmin lminor gram hermC col mat
   first
-    | fun_prop
-    | (apply Continuous.matrix_det; apply Continuous.matrix_submatrix; fun_prop)
-    | continuity
+  | fun_prop
+  | (apply Continuous.matrix_det; apply Continuous.matrix_submatrix; fun_prop)
+  | continuity
 
 theorem nfac_contOn (la : Wt X.Ψ r) : ContinuousOn (X.nfac la) X.dom := by
   have hd : ∀ (τ : X.Ψ) (i : Fin (r + 1)), Continuous fun x : Frame X.Ψ r => dmin X.Gm x τ i :=
@@ -93,8 +96,8 @@ theorem Gf_meas (hF : DifferentiableOn ℂ F (OmF X x0)) : Measurable (Gf D la F
   have hfc : ContinuousOn (fun x => bchar la (D.bOf x) * F (D.zOf x)) (cell D) := by
     have hzc : ContinuousOn D.zOf (cell D) := D.hz.continuousOn
     have hbc : ContinuousOn D.bOf (cell D) := D.hb.continuousOn
-    have hsplit : ∀ x ∈ cell D, D.zOf x ∈ OmF X x0 ∧ D.bOf x ∈ Bor X.Ψ r :=
-      fun x hx => ⟨(D.split x hx.1 hx.2).1, (D.split x hx.1 hx.2).2.1⟩
+    have hsplit : ∀ x ∈ cell D, D.zOf x ∈ OmF X x0 ∧ D.bOf x ∈ Bor X.Ψ r := fun x hx =>
+      ⟨(D.split x hx.1 hx.2).1, (D.split x hx.1 hx.2).2.1⟩
     refine ContinuousOn.mul ?_ (hF.continuousOn.comp hzc fun x hx => (hsplit x hx).1)
     unfold bchar
     apply continuousOn_finsetProd
@@ -102,10 +105,7 @@ theorem Gf_meas (hF : DifferentiableOn ℂ F (OmF X x0)) : Measurable (Gf D la F
     apply continuousOn_finsetProd
     intro i _
     apply ContinuousOn.zpow₀
-    · have hent : Continuous fun y : Frame X.Ψ r => y τ i i := by
-        first
-          | fun_prop
-          | continuity
+    · have hent : Continuous fun y : Frame X.Ψ r => y τ i i := by first | fun_prop | continuity
       exact hent.comp_continuousOn hbc
     · intro x hx
       left
@@ -115,9 +115,7 @@ theorem Gf_meas (hF : DifferentiableOn ℂ F (OmF X x0)) : Measurable (Gf D la F
     by_cases h : x ∈ cell D
     · rw [Set.piecewise_eq_of_mem _ _ _ h]
       exact if_pos h
-    · first
-        | rw [Set.piecewise_eq_of_notMem _ _ _ h]
-        | rw [Set.piecewise_eq_of_not_mem _ _ _ h]
+    · first | rw [Set.piecewise_eq_of_notMem _ _ _ h] | rw [Set.piecewise_eq_of_not_mem _ _ _ h]
       exact if_neg h
   have hPm : Measurable (P0 D la F) := by
     rw [hP]
@@ -133,13 +131,15 @@ theorem Gf_meas (hF : DifferentiableOn ℂ F (OmF X x0)) : Measurable (Gf D la F
   unfold Gf
   simp only [hp]
   first
-    | exact ((hPm.norm.mul hnf).pow_const 2).ennreal_ofReal
-    | exact ENNReal.measurable_ofReal.comp ((hPm.norm.mul hnf).pow_const 2)
+  | exact ((hPm.norm.mul hnf).pow_const 2).ennreal_ofReal
+  | exact ENNReal.measurable_ofReal.comp ((hPm.norm.mul hnf).pow_const 2)
 
-theorem Gf_inv {x b : Frame X.Ψ r} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ r) :
-    Gf D la F (rmul x b) = Gf D la F x := by
+theorem Gf_inv {x b : Frame X.Ψ r} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ r)
+    : Gf D la F (rmul x b) = Gf D la F x := by
   unfold Gf
-  rw [FrameDegreeData.pnorm_rmul X la _ (fun y hy b' hb' => poincareLift_borel_equivariant D la F hy hb') x hx b hb]
+  rw [FrameDegreeData.pnorm_rmul X la _
+    (fun y hy b' hb' => poincareLift_borel_equivariant D la F hy hb')
+    x hx b hb]
 
 private lemma one_mem_bor_upper_bounds {Ψ : Finset (E →+* ℂ)} :
     (fun _ => (1 : Matrix (Fin r) (Fin r) ℂ) : Frame Ψ r) ∈ Bor Ψ r := by
@@ -150,8 +150,9 @@ private lemma one_mem_bor_upper_bounds {Ψ : Finset (E →+* ℂ)} :
   · show (1 : Matrix (Fin r) (Fin r) ℂ) a c = 0
     exact Matrix.one_apply_ne hca.ne'
 
-theorem Gf_cpt {z : V (nd X)} (hz : z ∈ OmF X x0) :
-    Gf D la F (cpt X x0 z) = ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) := by
+theorem Gf_cpt {z : V (nd X)} (hz : z ∈ OmF X x0)
+    : Gf D la F (cpt X x0 z)
+      = ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (- phla X la (cpt X x0 z))) := by
   have hzd : cpt X x0 z ∈ X.dom := hz
   have hne : ∀ (τ : X.Ψ) (i : Fin (r + 1)), dmin X.Gm (cpt X x0 z) τ i ≠ 0 := by
     intro τ i h0
@@ -176,8 +177,9 @@ theorem Gf_cpt {z : V (nd X)} (hz : z ∈ OmF X x0) :
     rw [if_pos (show cpt X x0 z ∈ X.dom ∧ D.Δ (cpt X x0 z) ≠ 0 from ⟨hzd, hΔ⟩), hzo, hbo]
     simp [bchar]
   unfold Gf
-  have hp : X.pnorm la (P0 D la F) (cpt X x0 z) =
-      ‖P0 D la F (cpt X x0 z)‖ * X.nfac la (cpt X x0 z) := rfl
+  have hp
+      : X.pnorm la (P0 D la F) (cpt X x0 z) = ‖P0 D la F (cpt X x0 z)‖ * X.nfac la (cpt X x0 z) :=
+    rfl
   rw [hp, hP]
   congr 1
   unfold phla
@@ -187,8 +189,9 @@ theorem Gf_cpt {z : V (nd X)} (hz : z ∈ OmF X x0) :
     ring
   rw [hl, Real.exp_log (pow_pos hpos 2), mul_pow]
 
-theorem norm_poincareLift_sq_le {x : Frame X.Ψ r} (_hx : x ∈ X.dom) {m : ℝ} (hm : 0 < m) (hmx : m ≤ X.nfac la x) :
-    ENNReal.ofReal (‖P0 D la F x‖ ^ 2) ≤ ENNReal.ofReal ((m ^ 2)⁻¹) * Gf D la F x := by
+theorem norm_poincareLift_sq_le
+    {x : Frame X.Ψ r} (_hx : x ∈ X.dom) {m : ℝ} (hm : 0 < m) (hmx : m ≤ X.nfac la x)
+    : ENNReal.ofReal (‖P0 D la F x‖ ^ 2) ≤ ENNReal.ofReal ((m ^ 2)⁻¹) * Gf D la F x := by
   unfold Gf
   rw [← ENNReal.ofReal_mul (inv_nonneg.2 (sq_nonneg m))]
   apply ENNReal.ofReal_le_ofReal
@@ -205,37 +208,45 @@ theorem norm_poincareLift_sq_le {x : Frame X.Ψ r} (_hx : x ∈ X.dom) {m : ℝ}
   exact le_mul_of_one_le_right (sq_nonneg _) h2
 
 theorem ae_OmF : ∀ᵐ z ∂muF X x0, z ∈ OmF X x0 := by
-  have hmeas : MeasurableSet (OmF X x0) :=
-    (dom_isOpen.preimage continuous_cpt').measurableSet
+  have hmeas : MeasurableSet (OmF X x0) := (dom_isOpen.preimage continuous_cpt').measurableSet
   unfold muF
   exact (withDensity_absolutelyContinuous _ _).ae_le (ae_restrict_mem hmeas)
 
-theorem poincareLift_locally_squareIntegrable (hM : FrameMeasStatement (E := E)) (hx0 : IsOrth X x0)
-    (hF : DifferentiableOn ℂ F (OmF X x0))
-    (hL2 : ∀ C : Set (Frame X.Ψ r), IsCompact C → C ⊆ X.dom →
-      ∫⁻ z in sat X x0 C, ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) ∂muF X x0 < ⊤)
-    {C : Set (Frame X.Ψ r)} (hC : IsCompact C) (hCd : C ⊆ X.dom) :
-    ∫⁻ x in C, ENNReal.ofReal (‖P0 D la F x‖ ^ 2) < ⊤ := by
+theorem poincareLift_locally_squareIntegrable
+    (hM : FrameMeasStatement (E := E)) (hx0 : IsOrth X x0) (hF : DifferentiableOn ℂ F (OmF X x0))
+    (hL2 : ∀ C : Set (Frame X.Ψ r),
+      IsCompact C → C ⊆ X.dom
+        → ∫⁻ z in sat X x0 C, ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) ∂muF X x0
+          < ⊤)
+    {C : Set (Frame X.Ψ r)} (hC : IsCompact C) (hCd : C ⊆ X.dom)
+    : ∫⁻ x in C, ENNReal.ofReal (‖P0 D la F x‖ ^ 2) < ⊤ := by
   obtain ⟨K, hK, hKG⟩ := hM r X x0 hx0 C hC hCd
   obtain ⟨m, hm, hmC⟩ : ∃ m : ℝ, 0 < m ∧ ∀ x ∈ C, m ≤ X.nfac la x := by
     rcases C.eq_empty_or_nonempty with h | h
     · exact ⟨1, one_pos, by simp [h]⟩
     obtain ⟨x1, hx1, hmin⟩ := hC.exists_isMinOn h ((nfac_contOn X la).mono hCd)
     exact ⟨X.nfac la x1, FlowCoefficientBounds.nfac_pos X (hCd hx1) la, fun x hx => hmin hx⟩
-  have h1 : ∫⁻ x in C, ENNReal.ofReal (‖P0 D la F x‖ ^ 2) ≤
-      ENNReal.ofReal ((m ^ 2)⁻¹) * ∫⁻ x in C, Gf D la F x := by
+  have h1
+      : ∫⁻ x in C, ENNReal.ofReal (‖P0 D la F x‖ ^ 2)
+        ≤ ENNReal.ofReal ((m ^ 2)⁻¹) * ∫⁻ x in C, Gf D la F x := by
     rw [← lintegral_const_mul _ (Gf_meas D la F hF)]
-    exact setLIntegral_mono' hC.measurableSet fun x hx => norm_poincareLift_sq_le D la F (hCd hx) hm (hmC x hx)
+    exact setLIntegral_mono' hC.measurableSet fun x hx =>
+      norm_poincareLift_sq_le D la F (hCd hx) hm (hmC x hx)
   have h2 := hKG (Gf D la F) (Gf_meas D la F hF) fun x hx b hb => Gf_inv D la F hx hb
-  have h3 : ∫⁻ z in sat X x0 C, Gf D la F (cpt X x0 z) ∂muF X x0 ≤
-      ∫⁻ z in sat X x0 C, ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) ∂muF X x0 := by
-    refine lintegral_mono_ae ?_
-    filter_upwards [ae_restrict_of_ae (ae_OmF (x0 := x0))] with z hz
-    rw [Gf_cpt D la F hz]
-  calc ∫⁻ x in C, ENNReal.ofReal (‖P0 D la F x‖ ^ 2)
-      ≤ ENNReal.ofReal ((m ^ 2)⁻¹) * (K * ∫⁻ z in sat X x0 C,
-          ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) ∂muF X x0) :=
-        h1.trans (mul_le_mul' le_rfl (h2.trans (mul_le_mul' le_rfl h3)))
+  have h3
+      : ∫⁻ z in sat X x0 C, Gf D la F (cpt X x0 z) ∂muF X x0
+        ≤ ∫⁻ z in sat X x0 C, ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) ∂muF X x0 :=
+    by
+      refine lintegral_mono_ae ?_
+      filter_upwards [ae_restrict_of_ae (ae_OmF (x0 := x0))] with z hz
+      rw [Gf_cpt D la F hz]
+  calc
+    ∫⁻ x in C, ENNReal.ofReal (‖P0 D la F x‖ ^ 2)
+        ≤ ENNReal.ofReal ((m ^ 2)⁻¹)
+          * (K
+            * ∫⁻ z in sat X x0 C,
+              ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) ∂muF X x0) :=
+      h1.trans (mul_le_mul' le_rfl (h2.trans (mul_le_mul' le_rfl h3)))
     _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top (ENNReal.mul_lt_top hK (hL2 C hC hCd))
 
 end

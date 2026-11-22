@@ -13,11 +13,14 @@ noncomputable section
 
 namespace GlobalTheory.KZ.ES
 
-
 open GlobalTheory.KroneckerCongruence in
-theorem nq_sub_gal_small : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
-    ∀ (M q : ℕ), 0 < M → q.Prime → ∀ (V : ValuationSubring Ω) (s : Ω ≃ₐ[ℚ] Ω), FrobV V q s →
-    ∀ a : X.K, Lev X M a → IntC X V a → SmallC X V (Nq X M q a - X.gal s a) := by
+theorem nq_sub_gal_small
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
+      ∀ (M q : ℕ),
+        0 < M → q.Prime
+          → ∀ (V : ValuationSubring Ω) (s : Ω ≃ₐ[ℚ] Ω),
+            FrobV V q s
+              → ∀ a : X.K, Lev X M a → IntC X V a → SmallC X V (Nq X M q a - X.gal s a) := by
   intro Ω _ _ _ ε X M q hM hq V s hFr f hf hfV
   obtain ⟨hqV, hs⟩ := hFr
   have hε : Function.Injective ε := ε.injective
@@ -35,12 +38,17 @@ theorem nq_sub_gal_small : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
     rw [← sub_eq_zero, ← map_pow, ← map_sub, hρ0]
     simpa using (hs x x.2).2.2
   set c := X.exp f with hc
-  have hdet : ∀ j : ℕ, 0 < (!![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)] : Matrix (Fin 2) (Fin 2) ℤ).det := by
+  have hdet
+      : ∀ j : ℕ, 0 < (!![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)] : Matrix (Fin 2) (Fin 2) ℤ).det := by
     intro j; simp [Matrix.det_fin_two]; exact_mod_cast hq.pos
-  have hFj : ∀ (j : ℕ) (t : ℚ), (X.exp (X.sl (toGQ !![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)]) f)).coeff t =
-      eOm ε (t * j * M) * c.coeff (t * q) := by
+  have hFj
+      : ∀ (j : ℕ) (t : ℚ),
+        (X.exp (X.sl (toGQ !![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)]) f)).coeff t
+          = eOm ε (t * j * M) * c.coeff (t * q) := by
     intro j t
-    have h := X.exp_upper (toGQ !![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)]) (by rw [ent_toGQ _ (hdet j)]; simp) f (t * q)
+    have h :=
+      X.exp_upper (toGQ !![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)]) (by rw [ent_toGQ _ (hdet j)]; simp) f
+        (t * q)
     rw [ent_toGQ _ (hdet j), ent_toGQ _ (hdet j), ent_toGQ _ (hdet j)] at h
     simp at h
     convert h using 2 <;> first | field_simp | (congr 1; field_simp)
@@ -52,9 +60,12 @@ theorem nq_sub_gal_small : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
     have hmem : eOm ε (t * j * M) ∈ V := mem_of_pow_eq_one V hq.ne_zero h1
     refine ⟨hmem, ?_⟩
     have h2 : (⟨_, hmem⟩ : V) ^ q = 1 := Subtype.ext (by simpa using h1)
-    have h3 : (ρ ⟨_, hmem⟩ - 1) ^ q = 0 := by rw [sub_pow_char, ← map_pow, h2, map_one, one_pow, sub_self]
+    have h3 : (ρ ⟨_, hmem⟩ - 1) ^ q = 0 := by
+      rw [sub_pow_char, ← map_pow, h2, map_one, one_pow, sub_self]
     exact sub_eq_zero.1 (pow_eq_zero_iff hq.ne_zero |>.1 h3)
-  have memF : ∀ (j : ℕ) (t : ℚ), (X.exp (X.sl (toGQ !![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)]) f)).coeff t ∈ V := by
+  have memF
+      : ∀ (j : ℕ) (t : ℚ),
+        (X.exp (X.sl (toGQ !![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)]) f)).coeff t ∈ V := by
     intro j t
     rw [hFj]
     by_cases h0 : c.coeff (t * q) = 0
@@ -73,18 +84,24 @@ theorem nq_sub_gal_small : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
   set LF : ℕ → HahnSeries ℚ V := fun j => liftV V _ (memF j) with hLF
   set LC := liftV V _ memC with hLC
   have h1 : ∀ j, hahnSeriesCoeffRingHomMap ρ (LF j) = hahnSeriesCoeffRingHomMap ρ (LF 0) := by
-    intro j; ext t; rw [hahnSeriesCoeffRingHomMap_coeff, hahnSeriesCoeffRingHomMap_coeff]; exact (redF j t).trans (redF 0 t).symm
+    intro j
+    ext t
+    rw [hahnSeriesCoeffRingHomMap_coeff, hahnSeriesCoeffRingHomMap_coeff]
+    exact (redF j t).trans (redF 0 t).symm
   have h2 : hahnSeriesCoeffRingHomMap ρ (LF 0) ^ q = hahnSeriesCoeffRingHomMap ρ LC := by
     ext t
     rw [coeff_pow_char q, hahnSeriesCoeffRingHomMap_coeff, hahnSeriesCoeffRingHomMap_coeff]
     show ρ ⟨_, memF 0 (t / q)⟩ ^ q = ρ ⟨_, memC t⟩
     rw [redF 0 (t / q), ← hfrob]
     exact congrArg ρ (Subtype.ext (by simp only; rw [X.gal_exp, div_mul_cancel₀ t hq0]))
-  have hexp : X.exp ((∏ j ∈ Finset.range q, X.sl (toGQ !![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)]) f) - X.gal s f) =
-      hahnSeriesCoeffRingHomMap V.subtype ((∏ j ∈ Finset.range q, LF j) - LC) := by
+  have hexp
+      : X.exp
+          ((∏ j ∈ Finset.range q, X.sl (toGQ !![1, ((j : ℤ) * M : ℤ); 0, (q : ℤ)]) f) - X.gal s f)
+        = hahnSeriesCoeffRingHomMap V.subtype ((∏ j ∈ Finset.range q, LF j) - LC) := by
     simp only [map_sub, map_prod, hLF, hLC, map_liftV]
   have hW : hahnSeriesCoeffRingHomMap ρ ((∏ j ∈ Finset.range q, LF j) - LC) = 0 := by
-    rw [map_sub, map_prod, Finset.prod_congr rfl (fun j _ => h1 j), Finset.prod_const, Finset.card_range, h2, sub_self]
+    rw [map_sub, map_prod, Finset.prod_congr rfl (fun j _ => h1 j), Finset.prod_const,
+      Finset.card_range, h2, sub_self]
   intro r
   unfold Nq
   rw [hexp, hahnSeriesCoeffRingHomMap_coeff, ValuationSubring.mem_nonunits_iff]

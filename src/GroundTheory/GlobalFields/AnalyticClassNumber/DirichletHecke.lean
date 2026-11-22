@@ -32,10 +32,11 @@ theorem exists_eq_span_natCast (I : Ideal (𝓞 ℚ)) : ∃ m : ℕ, I = Ideal.s
       eq_intCast (Rat.ringOfIntegersEquiv.symm : ℤ →+* 𝓞 ℚ) k]
   rcases Int.natAbs_eq k with h | h
   · rw [h, Int.cast_natCast, Int.natAbs_natCast]
-  · rw [h, Int.natAbs_neg, Int.natAbs_natCast, Int.cast_neg, Int.cast_natCast, Ideal.span_singleton_neg]
+  · rw [h, Int.natAbs_neg, Int.natAbs_natCast, Int.cast_neg, Int.cast_natCast,
+      Ideal.span_singleton_neg]
 
-theorem eq_span_of_absNorm_eq {I : Ideal (𝓞 ℚ)} {n : ℕ} (h : Ideal.absNorm I = n) :
-    I = Ideal.span {(n : 𝓞 ℚ)} := by
+theorem eq_span_of_absNorm_eq {I : Ideal (𝓞 ℚ)} {n : ℕ} (h : Ideal.absNorm I = n)
+    : I = Ideal.span {(n : 𝓞 ℚ)} := by
   obtain ⟨m, rfl⟩ := exists_eq_span_natCast I
   rw [absNorm_span_natCast] at h
   rw [h]

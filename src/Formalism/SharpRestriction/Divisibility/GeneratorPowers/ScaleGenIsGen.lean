@@ -16,12 +16,16 @@ noncomputable section
 
 namespace Formalism.MainNotions.ModuliIntegralCharts.H1.ExpGA
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable {Xo : Moduli Dw l} {c : Coeff l} [StarRing (𝓞 E)]
 variable {S : Type} [CommRing S] [Algebra c.F S] [Algebra ℚ S] {y : FrPt Xo c S}
 
@@ -146,47 +150,71 @@ private lemma corr_scale_lemma_7 {Y : Scheme.{0}} {K K' : Type} [Fintype K] [Fin
 
 theorem eL_isGen (C : ChartAt Xo c y) (m : ℕ) : (eL y C.d C.x C.B.A.act C.e C.wP m).IsGen := by
   first
-  | exact mulGen_isGen_lemma_5 (pullGen_isGen_lemma_4 C.prim.1) (pullGen_isGen_lemma_4 (C.frame.gen m))
-  | (dsimp only [Formalism.L2.Pj.eL, Formalism.L2.Pj.pe]
-     exact mulGen_isGen_lemma_5 (pullGen_isGen_lemma_4 C.prim.1) (pullGen_isGen_lemma_4 (C.frame.gen m)))
+  | exact mulGen_isGen_lemma_5 (pullGen_isGen_lemma_4 C.prim.1)
+      (pullGen_isGen_lemma_4 (C.frame.gen m))
+  | (
+      dsimp only [Formalism.L2.Pj.eL, Formalism.L2.Pj.pe]
+      exact mulGen_isGen_lemma_5 (pullGen_isGen_lemma_4 C.prim.1)
+        (pullGen_isGen_lemma_4 (C.frame.gen m))
+    )
 
-theorem scaleGen_isGen {Y : Scheme.{0}} {K : Type} [Fintype K] (φ : K → (Y ⟶ Xo.univ.t.G.left)) (ε : K → ℤ)
-    (v : Γ(Y, ⊤)ˣ) (g : LB.Gen (LB.LinComb Xo.univ.t.PP.L φ ε)) (hg : g.IsGen) : (scaleGen φ ε v g).IsGen := by
+theorem scaleGen_isGen
+    {Y : Scheme.{0}} {K : Type} [Fintype K]
+    (φ : K → (Y ⟶ Xo.univ.t.G.left)) (ε : K → ℤ)
+    (v : Γ(Y, ⊤)ˣ)
+    (g : LB.Gen (LB.LinComb Xo.univ.t.PP.L φ ε)) (hg : g.IsGen)
+    : (scaleGen φ ε v g).IsGen := by
   intro i j
   have H := hg i j
   simp only [Formalism.L2.Pj.scaleGen, map_mul, res_res_lemma]
   rw [H]
   exact mul_left_comm _ _ _
 
-theorem exists_tau (C : ChartAt Xo c y) (m : ℕ) :
-    ∃ τ : LB.Gen (LB.LinComb Xo.univ.t.PP.L (Y := (jO y C.d m 1).left) (K := Fin 1) (fun _ => (C.x m).left)
-      fun _ => (1 : ℤ)), τ.IsGen ∧ LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _ τ (eL y C.d C.x C.B.A.act C.e C.wP m) := by
+theorem exists_tau (C : ChartAt Xo c y) (m : ℕ)
+    : ∃ τ : LB.Gen (LB.LinComb Xo.univ.t.PP.L (Y := (jO y C.d m 1).left) (K := Fin 1)
+        (fun _ => (C.x m).left)
+        fun _ => (1 : ℤ)),
+      τ.IsGen ∧ LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _ τ (eL y C.d C.x C.B.A.act C.e C.wP m) := by
   have hL := Xo.univ.t.PP.isLB
   have hch := (isChart_iff y C.d C.B.G.F C.B.A.act C.uvec C.x).1 C.chart
-  obtain ⟨τ, hτ, hv⟩ := exists_gen hL (φ' := fun _ : Fin 1 => (C.x m).left) (ε' := fun _ => (1 : ℤ)) (by
-      intro U _ hU
-      have hf : ∀ I : ULift.{0} (Finset (Fin 2)),
-          (C.x m).left ≫ cφ ![𝟙 Xo.univ.t.G, Xo.univ.t.act.act H.w0] I =
-            (homAt y.x (jetSubstP m fun p : Fin 2 × Fin C.d =>
-              (![fun j => MvPolynomial.X ((0 : Fin 1), j), fun j => psIn C.d m ![0] (C.B.A.act H.w0 j)] :
-                Fin 2 → Fin C.d → MvPolynomial (Fin 1 × Fin C.d) S) p.1 p.2)).left ≫
-              cφ ![jpt y C.d C.x m (0 : Fin 2), jpt y C.d C.x m (1 : Fin 2)] I :=
-        fun I => GermD.formEq_eL hch m I
-      simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, Fin.prod_univ_one, Category.comp_id, hf]
-      rw [_root_.mul_assoc, ← Finset.prod_mul_distrib]
-      simp only [← zpow_add, neg_add_cancel, zpow_zero, Finset.prod_const_one, _root_.mul_one]) _ (eL_isGen C m)
+  obtain ⟨τ, hτ, hv⟩ :=
+    exists_gen hL
+      (φ' := fun _ : Fin 1 => (C.x m).left)
+      (ε' := fun _ => (1 : ℤ))
+      (by
+        intro U _ hU
+        have hf
+            : ∀ I : ULift.{0} (Finset (Fin 2)),
+              (C.x m).left ≫ cφ ![𝟙 Xo.univ.t.G, Xo.univ.t.act.act H.w0] I
+                = (homAt y.x
+                    (jetSubstP m fun p : Fin 2 × Fin C.d =>
+                      (![fun j => MvPolynomial.X ((0 : Fin 1), j), fun j => psIn C.d m ![0] (C.B.A.act H.w0 j)]
+                          : Fin 2 → Fin C.d → MvPolynomial (Fin 1 × Fin C.d) S)
+                        p.1 p.2)).left
+                  ≫ cφ ![jpt y C.d C.x m (0 : Fin 2), jpt y C.d C.x m (1 : Fin 2)] I := fun I =>
+          GermD.formEq_eL hch m I
+        simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, Fin.prod_univ_one,
+          Category.comp_id, hf]
+        rw [_root_.mul_assoc, ← Finset.prod_mul_distrib]
+        simp only [← zpow_add, neg_add_cancel, zpow_zero, Finset.prod_const_one, _root_.mul_one])
+      _ (eL_isGen C m)
   exact ⟨τ, hτ, corr_of_val hL fun y' J hJ => hv _ (𝟙 _) y' J hJ⟩
 
 theorem const_hL (C : ChartAt Xo c y) : MvPowerSeries.constantCoeff (C.B.hL S C.h H.w0) = 0 := by
   have hh0 : MvPowerSeries.constantCoeff C.h = 0 := by
-    have e := Formalism.MainNotions.ModuliIntegralCharts.H1.Sym.const_ev (n := 1) ![0, Germ.pt S (n := 1) C.d 0] (by intro p q; fin_cases p <;> simp [Germ.pt])
-      C.h
+    have e :=
+      Formalism.MainNotions.ModuliIntegralCharts.H1.Sym.const_ev (n := 1)
+        ![0, Germ.pt S (n := 1) C.d 0] (by intro p q; fin_cases p <;> simp [Germ.pt]) C.h
     rw [C.gauge.ax0, map_zero] at e
     exact e.symm
-  have hact : ∀ q, MvPowerSeries.constantCoeff (Germ.comp1 (C.B.actK S H.w0) (Germ.pt S (n := 1) C.d 0) q) = 0 := by
+  have hact
+      : ∀ q,
+        MvPowerSeries.constantCoeff (Germ.comp1 (C.B.actK S H.w0) (Germ.pt S (n := 1) C.d 0) q)
+          = 0 := by
     intro q
     unfold Germ.comp1
-    rw [Formalism.MainNotions.ModuliIntegralCharts.H1.Sym.const_ev _ (by intro p' q'; fin_cases p'; simp [Germ.pt])]
+    rw [Formalism.MainNotions.ModuliIntegralCharts.H1.Sym.const_ev _
+      (by intro p' q'; fin_cases p'; simp [Germ.pt])]
     unfold Germ.FB.actK
     rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_map,
       MvPowerSeries.coeff_zero_eq_constantCoeff_apply, C.B.A.const, map_zero]
@@ -198,17 +226,23 @@ theorem const_hL (C : ChartAt Xo c y) : MvPowerSeries.constantCoeff (C.B.hL S C.
     · exact hact q)]
   exact hh0
 
-theorem exists_uJ (C : ChartAt Xo c y) (φ : Fin C.d → MvPowerSeries (Fin 1 × Fin (dL Dw)) S)
-    (hφ : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0) (m : ℕ) :
-    ∃ u : (Jet S (Fin 1 × Fin (dL Dw)) m)ˣ,
-      (u : Jet S (Fin 1 × Fin (dL Dw)) m) = psJet m (Germ.FB.expS S (-(compL φ (C.B.hL S C.h H.w0)))) := by
+theorem exists_uJ
+    (C : ChartAt Xo c y) (φ : Fin C.d → MvPowerSeries (Fin 1 × Fin (dL Dw)) S)
+    (hφ : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0)
+    (m : ℕ)
+    : ∃ u : (Jet S (Fin 1 × Fin (dL Dw)) m)ˣ,
+      (u : Jet S (Fin 1 × Fin (dL Dw)) m)
+        = psJet m (Germ.FB.expS S (-(compL φ (C.B.hL S C.h H.w0)))) := by
   have h0 : MvPowerSeries.constantCoeff (compL φ (C.B.hL S C.h H.w0)) = 0 := by
     unfold compL
-    rw [ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.Val.const_subst (fun p : Fin 1 × Fin C.d => hφ p.2)]
+    rw [ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.Val.const_subst
+      (fun p : Fin 1 × Fin C.d => hφ p.2)]
     exact const_hL C
   have h1 : MvPowerSeries.constantCoeff (Germ.FB.expS S (-(compL φ (C.B.hL S C.h H.w0)))) = 1 := by
     unfold Germ.FB.expS
-    rw [PowerSeries.subst, ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.Val.const_subst (fun _ => by rw [map_neg, h0, neg_zero])]
+    rw [PowerSeries.subst,
+      ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.Val.const_subst (fun _ => by
+        rw [map_neg, h0, neg_zero])]
     exact PowerSeries.constantCoeff_exp
   obtain ⟨v, hv⟩ : IsUnit (Germ.FB.expS S (-(compL φ (C.B.hL S C.h H.w0)))) :=
     MvPowerSeries.isUnit_iff_constantCoeff.mpr (by rw [h1]; exact isUnit_one)
@@ -217,21 +251,30 @@ theorem exists_uJ (C : ChartAt Xo c y) (φ : Fin C.d → MvPowerSeries (Fin 1 ×
   · rw [← FBIdJet.psJet_mul, Units.inv_mul, FBIdJet.psJet_one]
   · simp only [hv]
 
-def eG (C : ChartAt Xo c y) (φ : Fin C.d → MvPowerSeries (Fin 1 × Fin (dL Dw)) S)
-    (τ : ∀ m, LB.Gen (LB.LinComb Xo.univ.t.PP.L (Y := (jO y C.d m 1).left) (K := Fin 1) (fun _ => (C.x m).left)
-      fun _ => (1 : ℤ)))
-    (u : ∀ m, (Jet S (Fin 1 × Fin (dL Dw)) m)ˣ) (m : ℕ) : ExpFr y (xExp y C φ) m :=
+def eG
+    (C : ChartAt Xo c y) (φ : Fin C.d → MvPowerSeries (Fin 1 × Fin (dL Dw)) S)
+    (τ : ∀ m,
+      LB.Gen (LB.LinComb Xo.univ.t.PP.L (Y := (jO y C.d m 1).left) (K := Fin 1)
+        (fun _ => (C.x m).left)
+        fun _ => (1 : ℤ)))
+    (u : ∀ m, (Jet S (Fin 1 × Fin (dL Dw)) m)ˣ) (m : ℕ)
+    : ExpFr y (xExp y C φ) m :=
   scaleGen _ _ (unitΓ (u m)) (LB.pullGen Xo.univ.t.PP.L _ _ (τ m) (homAt y.x (jφ φ m)).left)
 
-theorem exists_eG (C : ChartAt Xo c y) (φ : Fin C.d → MvPowerSeries (Fin 1 × Fin (dL Dw)) S)
-    (hφ : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0) :
-    ∃ (τ : ∀ m, LB.Gen (LB.LinComb Xo.univ.t.PP.L (Y := (jO y C.d m 1).left) (K := Fin 1)
-      (fun _ => (C.x m).left) fun _ => (1 : ℤ))) (u : ∀ m, (Jet S (Fin 1 × Fin (dL Dw)) m)ˣ),
-      (∀ m, (τ m).IsGen) ∧
-      (∀ m, LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _ (τ m) (eL y C.d C.x C.B.A.act C.e C.wP m)) ∧
-      (∀ m, (u m : Jet S (Fin 1 × Fin (dL Dw)) m) =
-        psJet m (Germ.FB.expS S (-(compL φ (C.B.hL S C.h H.w0))))) ∧
-      (∀ m, (eG C φ τ u m).IsGen) ∧ IsExpGaugeOf y C φ (eG C φ τ u) := by
+theorem exists_eG
+    (C : ChartAt Xo c y) (φ : Fin C.d → MvPowerSeries (Fin 1 × Fin (dL Dw)) S)
+    (hφ : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0)
+    : ∃ (τ : ∀ m,
+        LB.Gen (LB.LinComb Xo.univ.t.PP.L (Y := (jO y C.d m 1).left) (K := Fin 1)
+          (fun _ => (C.x m).left)
+          fun _ => (1 : ℤ)))
+        (u : ∀ m, (Jet S (Fin 1 × Fin (dL Dw)) m)ˣ),
+      (∀ m, (τ m).IsGen)
+        ∧ (∀ m, LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _ (τ m) (eL y C.d C.x C.B.A.act C.e C.wP m))
+        ∧ (∀ m,
+          (u m : Jet S (Fin 1 × Fin (dL Dw)) m)
+            = psJet m (Germ.FB.expS S (-(compL φ (C.B.hL S C.h H.w0)))))
+        ∧ (∀ m, (eG C φ τ u m).IsGen) ∧ IsExpGaugeOf y C φ (eG C φ τ u) := by
   choose τ hτ hτc using exists_tau C
   choose u hu using exists_uJ C φ hφ
   refine ⟨τ, u, hτ, hτc, hu, fun m => ?_, ?_⟩
@@ -241,6 +284,11 @@ theorem exists_eG (C : ChartAt Xo c y) (φ : Fin C.d → MvPowerSeries (Fin 1 ×
   · first
     | exact fun m => ⟨u m, hu m, corr_scale_lemma_7 (corr_pull_lemma_6 (hτc m))⟩
     | (intro m; exact ⟨u m, hu m, corr_scale_lemma_7 (corr_pull_lemma_6 (hτc m))⟩)
-    | (intro m; refine ⟨u m, hu m, ?_⟩; unfold eG; exact corr_scale_lemma_7 (corr_pull_lemma_6 (hτc m)))
+    | (
+        intro m
+        refine ⟨u m, hu m, ?_⟩
+        unfold eG
+        exact corr_scale_lemma_7 (corr_pull_lemma_6 (hτc m))
+      )
 
 end Formalism.MainNotions.ModuliIntegralCharts.H1.ExpGA

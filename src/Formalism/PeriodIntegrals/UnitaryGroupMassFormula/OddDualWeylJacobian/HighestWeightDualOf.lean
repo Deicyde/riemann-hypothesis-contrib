@@ -181,8 +181,10 @@ theorem highestWeightDual_of (h : JacRev) : W4hw := by
   intro R _ m lam hlam
   have hJ := fun s : Fin (m + 1) => h R (m + 1) s.val s.isLt
   choose u hu hD using hJ
-  obtain ⟨U, hU, hprod⟩ := PI.OddDualWeyl.LowA.prodStar (R := R) lam hlam 1
-    (fun s => dualSub R (m + 1) (pMinor R Fin.revPerm (s.val + 1) s.isLt)) u hu hD
+  obtain ⟨U, hU, hprod⟩ :=
+    PI.OddDualWeyl.LowA.prodStar (R := R) lam hlam 1
+      (fun s => dualSub R (m + 1) (pMinor R Fin.revPerm (s.val + 1) s.isLt))
+      u hu hD
   refine ⟨U, hU, ?_⟩
   have hC : C U * C U = (1 : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R) := by
     rw [← map_mul]

@@ -18,6 +18,7 @@ theorem RatPtIn_of : RatPtIn := by
   refine ⟨⟨pointOfClosedPoint r x hxc, pointOfClosedPoint_comp r x hxc⟩, fun a => ?_⟩
   have h := pointOfClosedPoint_apply r x hxc a
   show (pointOfClosedPoint r x hxc) a ∈ V
-  rw [h]; exact hxV
+  rw [h]
+  exact hxV
 
 end LateralTheory.EtaleTrace.Cov

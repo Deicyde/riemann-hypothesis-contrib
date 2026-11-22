@@ -15,24 +15,35 @@ noncomputable section
 
 namespace Formalism.IndefR.CxPass
 
-open Formalism.DivisionValues Formalism.L2.Indef Formalism.L2.DIV Formalism.IndefR.Cx Formalism.L2.GlobalTheoryTheory.DivPassage
+open Formalism.DivisionValues Formalism.L2.Indef Formalism.L2.DIV Formalism.IndefR.Cx
+  Formalism.L2.GlobalTheoryTheory.DivPassage
 
 section Bridge
 
-variable {K : Type} [Field K] [NumberField K] {G : Type} [Group G] [Fintype G]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {G : Type} [Group G] [Fintype G]
   {U : Type} [AddCommGroup U] [Module K U]
 
-theorem epOp_eq_epP (σ : Representation K G U) (P : Subgroup G) (ψ : P →* Kˣ) (χ : P →* (𝓞 K)ˣ)
-    (hχ : ∀ h, (((χ h : (𝓞 K)ˣ) : 𝓞 K) : K) = ((ψ h : Kˣ) : K)) :
-    Formalism.IndefR.IndefiniteEpsilonOperator.epOp σ ⟨P, ψ⟩ = Formalism.IndefR.TransferLatticeStatement.epP P χ σ := by
-  unfold Formalism.IndefR.IndefiniteEpsilonOperator.epOp Formalism.IndefR.TransferLatticeStatement.epP
+theorem epOp_eq_epP
+    (σ : Representation K G U)
+    (P : Subgroup G) (ψ : P →* Kˣ) (χ : P →* (𝓞 K)ˣ)
+    (hχ : ∀ h, (((χ h : (𝓞 K)ˣ) : 𝓞 K) : K) = ((ψ h : Kˣ) : K))
+    : Formalism.IndefR.IndefiniteEpsilonOperator.epOp σ ⟨P, ψ⟩
+      = Formalism.IndefR.TransferLatticeStatement.epP P χ σ := by
+  unfold Formalism.IndefR.IndefiniteEpsilonOperator.epOp
+    Formalism.IndefR.TransferLatticeStatement.epP
   simp only [hχ]
   congr
   exact Subsingleton.elim _ _
 
-theorem nOf_eq_nS {W : Type} [AddCommGroup W] [Module K W] (τ : Representation K G W) (P : Subgroup G) (ψ : P →* Kˣ)
-    (χ : P →* (𝓞 K)ˣ) (hχ : ∀ h, (((χ h : (𝓞 K)ˣ) : 𝓞 K) : K) = ((ψ h : Kˣ) : K)) :
-    Formalism.IndefR.IndefiniteEpsilonOperator.nOf τ ⟨P, ψ⟩ = Formalism.IndefR.TransferLatticeStatement.nS τ P χ := by
+theorem nOf_eq_nS
+    {W : Type} [AddCommGroup W] [Module K W]
+    (τ : Representation K G W)
+    (P : Subgroup G) (ψ : P →* Kˣ) (χ : P →* (𝓞 K)ˣ)
+    (hχ : ∀ h, (((χ h : (𝓞 K)ˣ) : 𝓞 K) : K) = ((ψ h : Kˣ) : K))
+    : Formalism.IndefR.IndefiniteEpsilonOperator.nOf τ ⟨P, ψ⟩
+      = Formalism.IndefR.TransferLatticeStatement.nS τ P χ := by
   unfold Formalism.IndefR.IndefiniteEpsilonOperator.nOf Formalism.IndefR.TransferLatticeStatement.nS
   first
   | (unfold Formalism.IndefR.IndefiniteEpsilonOperator.epSp; rw [epOp_eq_epP τ P ψ χ hχ])
@@ -43,8 +54,10 @@ end Bridge
 
 namespace In
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ}
-  (I : In K G Pl0 T m)
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {m : ℕ} (I : In K G Pl0 T m)
 
 end In
 

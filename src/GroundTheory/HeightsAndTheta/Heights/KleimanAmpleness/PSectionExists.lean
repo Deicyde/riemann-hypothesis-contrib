@@ -16,10 +16,14 @@ open Filter
 
 universe u w
 
-theorem exists_pos_of_eventually_lower {d : ℕ} {A : ℤ} (hA : 0 < A) {C : ℝ} {f : ℕ → ℝ}
-    (h : ∀ᶠ n : ℕ in atTop,
-      (A : ℝ) * (n : ℝ) ^ (d + 1) / ((d + 1).factorial : ℝ) - C * (n : ℝ) ^ d ≤ f n)
-    (D : ℕ) (hD : 0 < D) : ∃ n₁ : ℕ, 0 < n₁ ∧ 0 < f (D * n₁) := by
+theorem exists_pos_of_eventually_lower
+    {d : ℕ} {A : ℤ} (hA : 0 < A)
+    {C : ℝ} {f : ℕ → ℝ}
+    (h
+      : ∀ᶠ n : ℕ in atTop,
+        (A : ℝ) * (n : ℝ) ^ (d + 1) / ((d + 1).factorial : ℝ) - C * (n : ℝ) ^ d ≤ f n)
+    (D : ℕ) (hD : 0 < D)
+    : ∃ n₁ : ℕ, 0 < n₁ ∧ 0 < f (D * n₁) := by
   obtain ⟨n₀, hn₀⟩ := eventually_atTop.mp h
   obtain ⟨K, hK⟩ := exists_nat_gt (C * ((d + 1).factorial : ℝ) / A)
   refine ⟨n₀ + K + 1, by omega, ?_⟩
@@ -36,20 +40,24 @@ theorem exists_pos_of_eventually_lower {d : ℕ} {A : ℤ} (hA : 0 < A) {C : ℝ
     have := lt_trans hK hnK
     rwa [div_lt_iff₀ hA', mul_comm n] at this
   have h2 : C < A * n / ((d + 1).factorial : ℝ) := by rw [lt_div_iff₀ hF]; exact h1
-  have h3 : (A : ℝ) * n ^ (d + 1) / ((d + 1).factorial : ℝ) - C * n ^ d =
-      n ^ d * (A * n / ((d + 1).factorial : ℝ) - C) := by ring
+  have h3
+      : (A : ℝ) * n ^ (d + 1) / ((d + 1).factorial : ℝ) - C * n ^ d
+        = n ^ d * (A * n / ((d + 1).factorial : ℝ) - C) := by
+    ring
   rw [h3]
   exact mul_pos (pow_pos hnpos d) (by linarith)
 
-theorem sectionExists_of_gap (hcount : SectionCount.Statement.{u, w})
-    (hlead : LeadingCoeffPos.Statement.{u, w}) {k : Type u} [Field k] {Ω : Type w} [Field Ω]
-    [Algebra k Ω] {N : ℕ} {x : Fin (N + 1) → Ω} {d : ℕ} {M : LineBundle k x} {t s' : ℚ}
+theorem sectionExists_of_gap
+    (hcount : SectionCount.Statement.{u, w}) (hlead : LeadingCoeffPos.Statement.{u, w})
+    {k : Type u} [Field k]
+    {Ω : Type w} [Field Ω] [Algebra k Ω]
+    {N : ℕ} {x : Fin (N + 1) → Ω} {d : ℕ} {M : LineBundle k x} {t s' : ℚ}
     (hZ : IsSubvar x (primeOf (S := k) x) (d + 1)) (hM : Nef M.toSubSystem) (hs' : 0 < s')
     {Q : ℕ} {mQ : ℤ} (hQ : 0 < Q) (hmQ : (mQ : ℚ) = Q * t)
-    (hva : IsVeryAmple (twistMul M.toSubSystem Q mQ))
-    (hgap : 1 < (Q : ℚ) * (t / (d + 1) - s')) :
-    ∃ (p : ℕ) (m c₁ : ℤ), 1 ≤ p ∧ (m : ℚ) = p * (t - s') ∧ 1 ≤ c₁ ∧
-      ∃ σ ∈ (twistMul M.toSubSystem p (m - c₁)).secs, σ ≠ 0 := by
+    (hva : IsVeryAmple (twistMul M.toSubSystem Q mQ)) (hgap : 1 < (Q : ℚ) * (t / (d + 1) - s'))
+    : ∃ (p : ℕ) (m c₁ : ℤ),
+      1 ≤ p ∧ (m : ℚ) = p * (t - s') ∧ 1 ≤ c₁
+        ∧ ∃ σ ∈ (twistMul M.toSubSystem p (m - c₁)).secs, σ ≠ 0 := by
   obtain ⟨Nb, hNb⟩ := exists_lineBundle_twistMul M Q mQ
   have hvaN : IsVeryAmple Nb.toSubSystem := hNb ▸ hva
 
@@ -86,8 +94,17 @@ theorem sectionExists_of_gap (hcount : SectionCount.Statement.{u, w})
     simp at hpos
   obtain ⟨σ, hσ, hσne⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
   rw [hNb, twistMul_twistMul] at hσ
-  refine ⟨D * n₁ * Q, ((D * n₁ : ℕ) : ℤ) * mQ - n₁ * E, ((D * n₁ : ℕ) : ℤ) * b - n₁ * E,
-    Nat.mul_pos (Nat.mul_pos hD1 hn₁) hQ, ?_, ?_, σ, ?_, hσne⟩
+  refine ⟨
+    D * n₁ * Q,
+    ((D * n₁ : ℕ) : ℤ) * mQ - n₁ * E,
+    ((D * n₁ : ℕ) : ℤ) * b - n₁ * E,
+    Nat.mul_pos (Nat.mul_pos hD1 hn₁) hQ,
+    ?_,
+    ?_,
+    σ,
+    ?_,
+    hσne
+  ⟩
   · push_cast
     rw [hmQ, ← hden]
     ring
@@ -100,14 +117,17 @@ theorem sectionExists_of_gap (hcount : SectionCount.Statement.{u, w})
       linarith
     have : (0 : ℤ) < ((D * n₁ : ℕ) : ℤ) * b - n₁ * E := by exact_mod_cast hpos'
     omega
-  · have hm : ((D * n₁ : ℕ) : ℤ) * mQ - n₁ * E - (((D * n₁ : ℕ) : ℤ) * b - n₁ * E) =
-        ((D * n₁ : ℕ) : ℤ) * mQ + -(((D * n₁ : ℕ) : ℤ) * b) := by ring
+  · have hm
+        : ((D * n₁ : ℕ) : ℤ) * mQ - n₁ * E - (((D * n₁ : ℕ) : ℤ) * b - n₁ * E)
+          = ((D * n₁ : ℕ) : ℤ) * mQ + -(((D * n₁ : ℕ) : ℤ) * b) := by
+      ring
     rw [hm]
     exact hσ
 
-theorem SectionExists.proof (hcount : SectionCount.Statement.{u, w})
-    (hpow : VeryAmplePow.Statement.{u, w}) (hlead : LeadingCoeffPos.Statement.{u, w}) :
-    SectionExists.Statement.{u, w} := by
+theorem SectionExists.proof
+    (hcount : SectionCount.Statement.{u, w}) (hpow : VeryAmplePow.Statement.{u, w})
+    (hlead : LeadingCoeffPos.Statement.{u, w})
+    : SectionExists.Statement.{u, w} := by
   intro k _ Ω _ _ N x d M t s' hZ hM hs' hst hq
   obtain ⟨q, m, hq1, hm, hva⟩ := hq
   have hδ : 0 < t / (d + 1) - s' := by linarith
@@ -117,8 +137,9 @@ theorem SectionExists.proof (hcount : SectionCount.Statement.{u, w})
   rw [div_lt_iff₀ hqδ] at hj₀
   have hgap : 1 < (((j₀ + 1) * q : ℕ) : ℚ) * (t / (d + 1) - s') := by
     push_cast
-    have : ((j₀ : ℚ) + 1) * q * (t / (d + 1) - s') =
-        j₀ * (q * (t / (d + 1) - s')) + q * (t / (d + 1) - s') := by ring
+    have : ((j₀ : ℚ) + 1) * q * (t / (d + 1) - s')
+        = j₀ * (q * (t / (d + 1) - s')) + q * (t / (d + 1) - s') := by
+      ring
     rw [this]
     linarith
   obtain ⟨Nb0, hNb0⟩ := exists_lineBundle_twistMul M q m

@@ -4,12 +4,29 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.C.Sf
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.C.Sf
 open scoped InnerProductSpace
 
-theorem UpperTheory.integralOperator_fixed_invariant_of_left_invariant_kernel :
-    ∀ (G H S : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] [AddCommGroup S] [Module ℂ S] (π : UnitaryRep G H) (τ : Representation ℂ G S) (m : Measure G) [m.IsMulLeftInvariant] (φ : G → ℂ) (T : H →L[ℂ] H) (A : S →ₗ[ℂ] S) (U : Subgroup G), IsOp π m φ T → IsIntegralOp m τ φ A → (∀ u ∈ U, ∀ g, φ (u * g) = φ g) → (∀ v, T v ∈ fixU π U) ∧ (∀ x, A x ∈ fixedVectors τ U) ∧ (∀ D : Submodule ℂ H, IsClosed (D : Set H) → π.IsInvariant D → ∀ v ∈ D, T v ∈ D) ∧ (∀ B : H →L[ℂ] H, (∀ g v, π g (B v) = B (π g v)) → (∀ g v, π g (ContinuousLinearMap.adjoint B v) = ContinuousLinearMap.adjoint B (π g v)) → ∀ v, T (B v) = B (T v)) ∧ ∀ f : S →ₗ[ℂ] H, Eqv τ π ⊤ f → ∀ x, T (f x) = f (A x) := by
+theorem UpperTheory.integralOperator_fixed_invariant_of_left_invariant_kernel
+    : ∀ (G H S : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+        [BorelSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        [AddCommGroup S] [Module ℂ S] (π : UnitaryRep G H) (τ : Representation ℂ G S)
+        (m : Measure G) [m.IsMulLeftInvariant] (φ : G → ℂ) (T : H →L[ℂ] H) (A : S →ₗ[ℂ] S)
+        (U : Subgroup G),
+      IsOp π m φ T → IsIntegralOp m τ φ A → (∀ u ∈ U, ∀ g, φ (u * g) = φ g)
+        → (∀ v, T v ∈ fixU π U) ∧ (∀ x, A x ∈ fixedVectors τ U)
+          ∧ (∀ D : Submodule ℂ H, IsClosed (D : Set H) → π.IsInvariant D → ∀ v ∈ D, T v ∈ D)
+          ∧ (∀ B : H →L[ℂ] H,
+            (∀ g v, π g (B v) = B (π g v))
+              → (∀ g v,
+                π g (ContinuousLinearMap.adjoint B v) = ContinuousLinearMap.adjoint B (π g v))
+              → ∀ v, T (B v) = B (T v))
+          ∧ ∀ f : S →ₗ[ℂ] H, Eqv τ π ⊤ f → ∀ x, T (f x) = f (A x) := by
   intro G H S _ _ _ _ _ _ _ _ _ _ π τ m _ φ T A U hT hA hφ
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro v u hu

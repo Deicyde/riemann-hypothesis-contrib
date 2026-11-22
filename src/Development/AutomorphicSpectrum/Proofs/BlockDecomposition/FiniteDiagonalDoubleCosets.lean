@@ -10,9 +10,10 @@ open scoped Classical
 
 namespace GlobalTheory.CompanionTheory.OrbitCount
 
-theorem finsum_comp_eq {P D : Type} (g : P → D) (f : D → ℂ) (S : Finset D)
-    (hS : ∀ Q, f Q ≠ 0 → Q ∈ S) (hfin : ∀ Q ∈ S, (g ⁻¹' {Q}).Finite) :
-    ∑ᶠ p, f (g p) = ∑ Q ∈ S, (Nat.card (g ⁻¹' {Q}) : ℂ) * f Q := by
+theorem finsum_comp_eq
+    {P D : Type} (g : P → D) (f : D → ℂ) (S : Finset D) (hS : ∀ Q, f Q ≠ 0 → Q ∈ S)
+    (hfin : ∀ Q ∈ S, (g ⁻¹' {Q}).Finite)
+    : ∑ᶠ p, f (g p) = ∑ Q ∈ S, (Nat.card (g ⁻¹' {Q}) : ℂ) * f Q := by
   have hT : (g ⁻¹' (S : Set D)).Finite := Set.Finite.preimage' S.finite_toSet hfin
   have hsupp : Function.support (fun p => f (g p)) ⊆ (hT.toFinset : Set P) := by
     intro p hp
@@ -37,11 +38,10 @@ theorem finsum_comp_eq {P D : Type} (g : P → D) (f : D → ℂ) (S : Finset D)
     have : g p = Q := by simpa using hp
     rw [this]
 
-theorem abstract_sum {D D₁ P : Type} (π : D → D₁) (Ψ : D₁ → P → D)
-    (hπ : ∀ q p, π (Ψ q p) = q) (f : D → ℂ) (hf : (Function.support f).Finite) (c : D₁ → ℂ)
-    (hfib : ∀ Q, f Q ≠ 0 → (Ψ (π Q) ⁻¹' {Q}).Finite) :
-    ∑ᶠ Q, (c (π Q) * (Nat.card (Ψ (π Q) ⁻¹' {Q}) : ℂ)) * f Q =
-      ∑ᶠ q, c q * ∑ᶠ p, f (Ψ q p) := by
+theorem abstract_sum
+    {D D₁ P : Type} (π : D → D₁) (Ψ : D₁ → P → D) (hπ : ∀ q p, π (Ψ q p) = q) (f : D → ℂ)
+    (hf : (Function.support f).Finite) (c : D₁ → ℂ) (hfib : ∀ Q, f Q ≠ 0 → (Ψ (π Q) ⁻¹' {Q}).Finite)
+    : ∑ᶠ Q, (c (π Q) * (Nat.card (Ψ (π Q) ⁻¹' {Q}) : ℂ)) * f Q = ∑ᶠ q, c q * ∑ᶠ p, f (Ψ q p) := by
   have hS : ∀ Q, f Q ≠ 0 → Q ∈ hf.toFinset := fun Q h => by simpa using h
   have hempty : ∀ q Q, π Q ≠ q → Ψ q ⁻¹' {Q} = ∅ := by
     intro q Q hne
@@ -49,8 +49,11 @@ theorem abstract_sum {D D₁ P : Type} (π : D → D₁) (Ψ : D₁ → P → D)
     simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_empty_iff_false, iff_false]
     intro h
     exact hne (h ▸ hπ q p)
-  have hinner : ∀ q, c q * ∑ᶠ p, f (Ψ q p) = ∑ Q ∈ hf.toFinset,
-      if π Q = q then (c (π Q) * (Nat.card (Ψ (π Q) ⁻¹' {Q}) : ℂ)) * f Q else 0 := by
+  have hinner
+      : ∀ q,
+        c q * ∑ᶠ p, f (Ψ q p)
+          = ∑ Q ∈ hf.toFinset,
+            if π Q = q then (c (π Q) * (Nat.card (Ψ (π Q) ⁻¹' {Q}) : ℂ)) * f Q else 0 := by
     intro q
     rw [finsum_comp_eq (Ψ q) f hf.toFinset hS, Finset.mul_sum]
     · refine Finset.sum_congr rfl fun Q _ => ?_
@@ -65,8 +68,9 @@ theorem abstract_sum {D D₁ P : Type} (π : D → D₁) (Ψ : D₁ → P → D)
         exact hfib Q (by simpa using hQ)
       · rw [hempty q Q hq]
         exact Set.finite_empty
-  have hsupp : Function.support (fun q => c q * ∑ᶠ p, f (Ψ q p)) ⊆
-      ((hf.toFinset.image π : Finset D₁) : Set D₁) := by
+  have hsupp
+      : Function.support (fun q => c q * ∑ᶠ p, f (Ψ q p))
+        ⊆ ((hf.toFinset.image π : Finset D₁) : Set D₁) := by
     intro q hq
     by_contra hnot
     apply hq
@@ -76,8 +80,9 @@ theorem abstract_sum {D D₁ P : Type} (π : D → D₁) (Ψ : D₁ → P → D)
     rw [if_neg]
     intro h
     exact hnot (by simpa using ⟨Q, by simpa using hQ, h⟩)
-  have hsuppL : Function.support
-      (fun Q => (c (π Q) * (Nat.card (Ψ (π Q) ⁻¹' {Q}) : ℂ)) * f Q) ⊆ (hf.toFinset : Set D) := by
+  have hsuppL
+      : Function.support (fun Q => (c (π Q) * (Nat.card (Ψ (π Q) ⁻¹' {Q}) : ℂ)) * f Q)
+        ⊆ (hf.toFinset : Set D) := by
     intro Q hQ
     have : f Q ≠ 0 := fun h => hQ (by simp [h])
     simpa using this
@@ -93,12 +98,10 @@ variable {H : Type} [Group H]
 abbrev cj {G : Type} [Group G] (L : Subgroup G) (x : G) : Subgroup G :=
   L.map (MulAut.conj x).toMonoidHom
 
-theorem mem_cj {G : Type} [Group G] {L : Subgroup G} {x g : G} :
-    g ∈ cj L x ↔ x⁻¹ * g * x ∈ L := by
+theorem mem_cj {G : Type} [Group G] {L : Subgroup G} {x g : G} : g ∈ cj L x ↔ x⁻¹ * g * x ∈ L := by
   constructor
   · rintro ⟨l, hl, rfl⟩
-    have : x⁻¹ * (MulAut.conj x).toMonoidHom l * x = l := by
-      simp [MulAut.conj_apply, mul_assoc]
+    have : x⁻¹ * (MulAut.conj x).toMonoidHom l * x = l := by simp [MulAut.conj_apply, mul_assoc]
     rw [this]
     exact hl
   · intro h
@@ -115,12 +118,14 @@ theorem mem_map_dg {Z : Subgroup H} {g : H × H} : g ∈ Z.map dg ↔ g.1 = g.2 
   · rintro ⟨e, h⟩
     exact ⟨g.1, h, Prod.ext rfl e⟩
 
-theorem inf_diag {Z L : Subgroup H} {Δ M : Subgroup (H × H)}
-    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L) (y : H × H) :
-    Δ ⊓ M.map (MulAut.conj y).toMonoidHom = ((Z ⊓ cj L y.1) ⊓ cj L y.2).map dg := by
+theorem inf_diag
+    {Z L : Subgroup H} {Δ M : Subgroup (H × H)}
+    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
+    (y : H × H)
+    : Δ ⊓ M.map (MulAut.conj y).toMonoidHom = ((Z ⊓ cj L y.1) ⊓ cj L y.2).map dg := by
   ext g
-  have hc : g ∈ M.map (MulAut.conj y).toMonoidHom ↔
-      y.1⁻¹ * g.1 * y.1 ∈ L ∧ y.2⁻¹ * g.2 * y.2 ∈ L := by
+  have hc
+      : g ∈ M.map (MulAut.conj y).toMonoidHom ↔ y.1⁻¹ * g.1 * y.1 ∈ L ∧ y.2⁻¹ * g.2 * y.2 ∈ L := by
     have := mem_cj (L := M) (x := y) (g := g)
     rw [this, hM]
     rfl
@@ -131,13 +136,13 @@ theorem inf_diag {Z L : Subgroup H} {Δ M : Subgroup (H × H)}
   · rintro ⟨e, ⟨hz, h1⟩, h2⟩
     exact ⟨⟨e, hz⟩, h1, e ▸ h2⟩
 
-noncomputable def wt (Z L C : Subgroup H) (y : H × H) : ℕ :=
-  ((Z ⊓ cj L y.1) ⊓ cj L y.2).relIndex C
+noncomputable def wt (Z L C : Subgroup H) (y : H × H) : ℕ := ((Z ⊓ cj L y.1) ⊓ cj L y.2).relIndex C
 
-theorem relIndex_diag {Z L : Subgroup H} {Δ M : Subgroup (H × H)}
+theorem relIndex_diag
+    {Z L : Subgroup H} {Δ M : Subgroup (H × H)}
     (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
-    (C : Subgroup H) (y : H × H) :
-    (Δ ⊓ M.map (MulAut.conj y).toMonoidHom).relIndex (C.map dg) = wt Z L C y := by
+    (C : Subgroup H) (y : H × H)
+    : (Δ ⊓ M.map (MulAut.conj y).toMonoidHom).relIndex (C.map dg) = wt Z L C y := by
   rw [inf_diag hΔ hM, Subgroup.relIndex_map_map_of_injective _ _ dg_injective, wt]
 
 theorem cj_mul_right {L : Subgroup H} {l : H} (hl : l ∈ L) (x : H) : cj L (x * l) = cj L x := by
@@ -159,8 +164,9 @@ theorem cj_mul_left (L : Subgroup H) (t x : H) : cj L (t * x) = cj (cj L x) t :=
   have e : (t * x)⁻¹ * g * (t * x) = x⁻¹ * (t⁻¹ * g * t) * x := by group
   rw [e]
 
-theorem cj_eq_self {K : Subgroup H} {t : H} (h1 : ∀ c ∈ K, t * c * t⁻¹ ∈ K)
-    (h2 : ∀ c ∈ K, t⁻¹ * c * t ∈ K) : cj K t = K := by
+theorem cj_eq_self
+    {K : Subgroup H} {t : H} (h1 : ∀ c ∈ K, t * c * t⁻¹ ∈ K) (h2 : ∀ c ∈ K, t⁻¹ * c * t ∈ K)
+    : cj K t = K := by
   ext g
   rw [mem_cj]
   constructor
@@ -173,14 +179,19 @@ theorem cj_eq_self {K : Subgroup H} {t : H} (h1 : ∀ c ∈ K, t * c * t⁻¹ �
 theorem conj_injective (t : H) : Function.Injective (MulAut.conj t).toMonoidHom :=
   (MulAut.conj t).injective
 
-theorem wt_invariant {Z L C : Subgroup H} (hC : ∀ t ∈ Z, ∀ c ∈ C, t * c * t⁻¹ ∈ C)
-    {t l l' : H} (ht : t ∈ Z) (hl : l ∈ L) (hl' : l' ∈ L) (x h : H) :
-    wt Z L C (t * x * l, t * h * l') = wt Z L C (x, h) := by
-  have hZ : cj Z t = Z := cj_eq_self (fun c hc => Z.mul_mem (Z.mul_mem ht hc) (Z.inv_mem ht))
-    (fun c hc => Z.mul_mem (Z.mul_mem (Z.inv_mem ht) hc) ht)
-  have hCt : cj C t = C := cj_eq_self (hC t ht) (fun c hc => by
-    have := hC t⁻¹ (Z.inv_mem ht) c hc
-    rwa [inv_inv] at this)
+theorem wt_invariant
+    {Z L C : Subgroup H} (hC : ∀ t ∈ Z, ∀ c ∈ C, t * c * t⁻¹ ∈ C)
+    {t l l' : H} (ht : t ∈ Z) (hl : l ∈ L) (hl' : l' ∈ L)
+    (x h : H)
+    : wt Z L C (t * x * l, t * h * l') = wt Z L C (x, h) := by
+  have hZ : cj Z t = Z :=
+    cj_eq_self
+      (fun c hc => Z.mul_mem (Z.mul_mem ht hc) (Z.inv_mem ht))
+      (fun c hc => Z.mul_mem (Z.mul_mem (Z.inv_mem ht) hc) ht)
+  have hCt : cj C t = C :=
+    cj_eq_self (hC t ht) (fun c hc => by
+      have := hC t⁻¹ (Z.inv_mem ht) c hc
+      rwa [inv_inv] at this)
   simp only [wt]
   rw [cj_mul_right hl, cj_mul_right hl', cj_mul_left, cj_mul_left]
   have e : (Z ⊓ cj (cj L x) t) ⊓ cj (cj L h) t = cj ((Z ⊓ cj L x) ⊓ cj L h) t := by
@@ -195,10 +206,10 @@ section Classes
 
 variable {Z L : Subgroup H} {Δ M : Subgroup (H × H)}
 
-theorem mk_eq_iff (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
-    (y y' : H × H) :
-    DoubleCoset.mk Δ M y = DoubleCoset.mk Δ M y' ↔
-      ∃ t ∈ Z, ∃ l ∈ L, ∃ l' ∈ L, y'.1 = t * y.1 * l ∧ y'.2 = t * y.2 * l' := by
+theorem mk_eq_iff
+    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L) (y y' : H × H)
+    : DoubleCoset.mk Δ M y = DoubleCoset.mk Δ M y'
+      ↔ ∃ t ∈ Z, ∃ l ∈ L, ∃ l' ∈ L, y'.1 = t * y.1 * l ∧ y'.2 = t * y.2 * l' := by
   rw [DoubleCoset.eq]
   constructor
   · rintro ⟨d, hd, m, hm, e⟩
@@ -212,10 +223,12 @@ theorem mk_eq_iff (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ 
   · rintro ⟨t, ht, l, hl, l', hl', e1, e2⟩
     exact ⟨(t, t), (hΔ _).2 ⟨rfl, ht⟩, (l, l'), (hM _).2 ⟨hl, hl'⟩, Prod.ext e1 e2⟩
 
-theorem out_invariant {α : Type} (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z)
-    (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L) (G : H × H → α)
-    (hG : ∀ t ∈ Z, ∀ l ∈ L, ∀ l' ∈ L, ∀ x h, G (t * x * l, t * h * l') = G (x, h)) (y : H × H) :
-    G (Quotient.out (DoubleCoset.mk Δ M y)) = G y := by
+theorem out_invariant
+    {α : Type}
+    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
+    (G : H × H → α) (hG : ∀ t ∈ Z, ∀ l ∈ L, ∀ l' ∈ L, ∀ x h, G (t * x * l, t * h * l') = G (x, h))
+    (y : H × H)
+    : G (Quotient.out (DoubleCoset.mk Δ M y)) = G y := by
   obtain ⟨t, ht, l, hl, l', hl', e1, e2⟩ :=
     (mk_eq_iff hΔ hM y (Quotient.out (DoubleCoset.mk Δ M y))).1
       (DoubleCoset.out_eq' (DoubleCoset.mk Δ M y)).symm
@@ -223,44 +236,45 @@ theorem out_invariant {α : Type} (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 �
   rw [e]
   exact hG t ht l hl l' hl' y.1 y.2
 
-
 variable (Z L Δ M) in
-noncomputable def proj (Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H))) :
-    DoubleCoset.Quotient (Z : Set H) (L : Set H) :=
+noncomputable def proj (Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)))
+    : DoubleCoset.Quotient (Z : Set H) (L : Set H) :=
   DoubleCoset.mk Z L (Quotient.out Q).1
 
-
 variable (Z L Δ M) in
-noncomputable def lift (q : DoubleCoset.Quotient (Z : Set H) (L : Set H)) (p : H ⧸ L) :
-    DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)) :=
+noncomputable def lift (q : DoubleCoset.Quotient (Z : Set H) (L : Set H)) (p : H ⧸ L)
+    : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)) :=
   DoubleCoset.mk Δ M (Quotient.out q, p.out)
 
-theorem proj_mk (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
-    (y : H × H) : proj Z L Δ M (DoubleCoset.mk Δ M y) = DoubleCoset.mk Z L y.1 := by
+theorem proj_mk
+    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L) (y : H × H)
+    : proj Z L Δ M (DoubleCoset.mk Δ M y) = DoubleCoset.mk Z L y.1 := by
   obtain ⟨t, ht, l, hl, l', hl', e1, -⟩ :=
     (mk_eq_iff hΔ hM (Quotient.out (DoubleCoset.mk Δ M y)) y).1
       (DoubleCoset.out_eq' (DoubleCoset.mk Δ M y))
   rw [proj, DoubleCoset.eq]
   exact ⟨t, ht, l, hl, e1⟩
 
-theorem proj_lift (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
-    (q : DoubleCoset.Quotient (Z : Set H) (L : Set H)) (p : H ⧸ L) :
-    proj Z L Δ M (lift Z L Δ M q p) = q := by
+theorem proj_lift
+    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
+    (q : DoubleCoset.Quotient (Z : Set H) (L : Set H)) (p : H ⧸ L)
+    : proj Z L Δ M (lift Z L Δ M q p) = q := by
   rw [lift, proj_mk hΔ hM]
   exact DoubleCoset.out_eq' q
 
-theorem exists_rep (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
-    (Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H))) :
-    ∃ h : H, DoubleCoset.mk Δ M (Quotient.out (proj Z L Δ M Q), h) = Q := by
+theorem exists_rep
+    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
+    (Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)))
+    : ∃ h : H, DoubleCoset.mk Δ M (Quotient.out (proj Z L Δ M Q), h) = Q := by
   obtain ⟨t, ht, l, hl, e⟩ := (DoubleCoset.eq).1 (DoubleCoset.out_eq' (proj Z L Δ M Q))
   refine ⟨t⁻¹ * (Quotient.out Q).2, Eq.trans ?_ (DoubleCoset.out_eq' Q)⟩
   rw [mk_eq_iff hΔ hM]
   exact ⟨t, ht, l, hl, 1, L.one_mem, e, by simp⟩
 
-theorem fiber_eq_orbit (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z)
-    (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L) (x h : H) :
-    {p : H ⧸ L | DoubleCoset.mk Δ M (x, p.out) = DoubleCoset.mk Δ M (x, h)} =
-      MulAction.orbit (Z ⊓ cj L x : Subgroup H) (QuotientGroup.mk h : H ⧸ L) := by
+theorem fiber_eq_orbit
+    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L) (x h : H)
+    : {p : H ⧸ L | DoubleCoset.mk Δ M (x, p.out) = DoubleCoset.mk Δ M (x, h)}
+      = MulAction.orbit (Z ⊓ cj L x : Subgroup H) (QuotientGroup.mk h : H ⧸ L) := by
   ext p
   simp only [Set.mem_ofPred_eq, MulAction.mem_orbit_iff]
   rw [mk_eq_iff hΔ hM]
@@ -305,8 +319,8 @@ theorem fiber_eq_orbit (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z)
     · show h = b⁻¹ * p.out * (p.out⁻¹ * (b * h))
       group
 
-theorem ncard_orbit (L B : Subgroup H) (h : H) :
-    (MulAction.orbit B (QuotientGroup.mk h : H ⧸ L)).ncard = (B ⊓ cj L h).relIndex B := by
+theorem ncard_orbit (L B : Subgroup H) (h : H)
+    : (MulAction.orbit B (QuotientGroup.mk h : H ⧸ L)).ncard = (B ⊓ cj L h).relIndex B := by
   rw [← MulAction.index_stabilizer, Subgroup.relIndex]
   congr 1
   ext b
@@ -317,36 +331,44 @@ theorem ncard_orbit (L B : Subgroup H) (h : H) :
   rw [e]
   exact ⟨fun hh => ⟨b.2, hh⟩, fun hh => hh.2⟩
 
-theorem weight_fiber {C : Subgroup H} (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z)
-    (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
+theorem weight_fiber
+    {C : Subgroup H}
+    (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
     (h1 : ∀ x : H, Z ⊓ cj L x ≤ C ∧ (Z ⊓ cj L x).relIndex C ≠ 0)
     (h2 : ∀ t ∈ Z, ∀ c ∈ C, t * c * t⁻¹ ∈ C)
-    (Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H))) :
-    (lift Z L Δ M (proj Z L Δ M Q) ⁻¹' {Q}).Finite ∧
-      wt Z L C (Quotient.out Q) = (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))).relIndex C *
-        Nat.card (lift Z L Δ M (proj Z L Δ M Q) ⁻¹' {Q}) := by
+    (Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)))
+    : (lift Z L Δ M (proj Z L Δ M Q) ⁻¹' {Q}).Finite
+      ∧ wt Z L C (Quotient.out Q)
+        = (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))).relIndex C
+          * Nat.card (lift Z L Δ M (proj Z L Δ M Q) ⁻¹' {Q}) := by
   obtain ⟨h, hh⟩ := exists_rep (Z := Z) (L := L) hΔ hM Q
-  have hw := out_invariant hΔ hM (wt Z L C)
-    (fun t ht l hl l' hl' x h => wt_invariant h2 ht hl hl' x h) (Quotient.out (proj Z L Δ M Q), h)
+  have hw :=
+    out_invariant hΔ hM (wt Z L C)
+      (fun t ht l hl l' hl' x h => wt_invariant h2 ht hl hl' x h)
+      (Quotient.out (proj Z L Δ M Q), h)
   rw [hh] at hw
-  have hset : lift Z L Δ M (proj Z L Δ M Q) ⁻¹' {Q} =
-      MulAction.orbit (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q)) : Subgroup H)
-        (QuotientGroup.mk h : H ⧸ L) := by
+  have hset
+      : lift Z L Δ M (proj Z L Δ M Q) ⁻¹' {Q}
+        = MulAction.orbit (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q)) : Subgroup H)
+          (QuotientGroup.mk h : H ⧸ L) := by
     rw [← fiber_eq_orbit hΔ hM, hh]
     rfl
-  have hmul := Subgroup.relIndex_mul_relIndex
-    ((Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ cj L h)
-    (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) C inf_le_left
-    (h1 (Quotient.out (proj Z L Δ M Q))).1
+  have hmul :=
+    Subgroup.relIndex_mul_relIndex ((Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ cj L h)
+      (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) C inf_le_left
+      (h1 (Quotient.out (proj Z L Δ M Q))).1
   have hA : ((Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ cj L h).relIndex C ≠ 0 := by
     have := Subgroup.relIndex_inf_ne_zero (h1 (Quotient.out (proj Z L Δ M Q))).2 (h1 h).2
-    have e : (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ (Z ⊓ cj L h) =
-        (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ cj L h :=
+    have e
+        : (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ (Z ⊓ cj L h)
+          = (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ cj L h :=
       le_antisymm (le_inf inf_le_left (inf_le_right.trans inf_le_right))
         (le_inf inf_le_left (le_inf (inf_le_left.trans inf_le_left) inf_le_right))
     rwa [e] at this
-  have hB : ((Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ cj L h).relIndex
-      (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ≠ 0 := by
+  have hB
+      : ((Z ⊓ cj L (Quotient.out (proj Z L Δ M Q))) ⊓ cj L h).relIndex
+          (Z ⊓ cj L (Quotient.out (proj Z L Δ M Q)))
+        ≠ 0 := by
     intro h0
     rw [h0, zero_mul] at hmul
     exact hA hmul.symm
@@ -360,33 +382,38 @@ theorem weight_fiber {C : Subgroup H} (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g
 
 end Classes
 
-theorem orbit_count_gen (Z L C : Subgroup H) (Δ M : Subgroup (H × H))
+theorem orbit_count_gen
+    (Z L C : Subgroup H) (Δ M : Subgroup (H × H))
     (hΔ : ∀ g, g ∈ Δ ↔ g.1 = g.2 ∧ g.1 ∈ Z) (hM : ∀ g, g ∈ M ↔ g.1 ∈ L ∧ g.2 ∈ L)
     (F : H × H → ℂ)
-    (h1 : ∀ x : H, Z ⊓ L.map (MulAut.conj x).toMonoidHom ≤ C ∧
-      (Z ⊓ L.map (MulAut.conj x).toMonoidHom).relIndex C ≠ 0)
-    (h2 : ∀ t ∈ Z, ∀ c ∈ C, t * c * t⁻¹ ∈ C)
-    (h3 : ∀ t ∈ Z, ∀ x h, F (t * x, t * h) = F (x, h))
+    (h1 : ∀ x : H,
+      Z ⊓ L.map (MulAut.conj x).toMonoidHom ≤ C
+        ∧ (Z ⊓ L.map (MulAut.conj x).toMonoidHom).relIndex C ≠ 0)
+    (h2 : ∀ t ∈ Z, ∀ c ∈ C, t * c * t⁻¹ ∈ C) (h3 : ∀ t ∈ Z, ∀ x h, F (t * x, t * h) = F (x, h))
     (h4 : ∀ l ∈ L, ∀ l' ∈ L, ∀ x h, F (x * l, h * l') = F (x, h))
-    (hfin : {Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)) |
-      F (Quotient.out Q) ≠ 0}.Finite) :
-    ∑ᶠ Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)),
-        (((Δ ⊓ M.map (MulAut.conj (Quotient.out Q)).toMonoidHom).relIndex
-          (C.map ((MonoidHom.id H).prod (MonoidHom.id H))) : ℕ) : ℂ) * F (Quotient.out Q) =
-      ∑ᶠ q : DoubleCoset.Quotient (Z : Set H) (L : Set H),
-        (((Z ⊓ L.map (MulAut.conj (Quotient.out q)).toMonoidHom).relIndex C : ℕ) : ℂ) *
-          ∑ᶠ p : H ⧸ L, F (Quotient.out q, p.out) := by
+    (hfin
+      : {Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)) |
+        F (Quotient.out Q) ≠ 0}.Finite)
+    : ∑ᶠ Q : DoubleCoset.Quotient (Δ : Set (H × H)) (M : Set (H × H)),
+          (((Δ ⊓ M.map (MulAut.conj (Quotient.out Q)).toMonoidHom).relIndex
+            (C.map ((MonoidHom.id H).prod (MonoidHom.id H))) : ℕ) : ℂ) * F (Quotient.out Q)
+      = ∑ᶠ q : DoubleCoset.Quotient (Z : Set H) (L : Set H),
+          (((Z ⊓ L.map (MulAut.conj (Quotient.out q)).toMonoidHom).relIndex C : ℕ) : ℂ) *
+            ∑ᶠ p : H ⧸ L, F (Quotient.out q, p.out) := by
   have hF : ∀ t ∈ Z, ∀ l ∈ L, ∀ l' ∈ L, ∀ x h, F (t * x * l, t * h * l') = F (x, h) := by
     intro t ht l hl l' hl' x h
     rw [h4 l hl l' hl', h3 t ht]
   have hw := weight_fiber (C := C) hΔ hM h1 h2
-  have key := abstract_sum (proj Z L Δ M) (lift Z L Δ M) (proj_lift hΔ hM)
-    (fun Q => F (Quotient.out Q)) hfin
-    (fun q => (((Z ⊓ L.map (MulAut.conj (Quotient.out q)).toMonoidHom).relIndex C : ℕ) : ℂ))
-    (fun Q _ => (hw Q).1)
-  have hR : ∀ q : DoubleCoset.Quotient (Z : Set H) (L : Set H),
-      (∑ᶠ p : H ⧸ L, F (Quotient.out (lift Z L Δ M q p))) =
-        ∑ᶠ p : H ⧸ L, F (Quotient.out q, p.out) := fun q =>
+  have key :=
+    abstract_sum (proj Z L Δ M) (lift Z L Δ M) (proj_lift hΔ hM)
+      (fun Q => F (Quotient.out Q))
+      hfin
+      (fun q => (((Z ⊓ L.map (MulAut.conj (Quotient.out q)).toMonoidHom).relIndex C : ℕ) : ℂ))
+      (fun Q _ => (hw Q).1)
+  have hR
+      : ∀ q : DoubleCoset.Quotient (Z : Set H) (L : Set H),
+        (∑ᶠ p : H ⧸ L, F (Quotient.out (lift Z L Δ M q p)))
+          = ∑ᶠ p : H ⧸ L, F (Quotient.out q, p.out) := fun q =>
     finsum_congr fun p => out_invariant hΔ hM F hF _
   simp only [hR] at key
   rw [← key]

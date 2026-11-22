@@ -10,14 +10,14 @@ open scoped BigOperators ComplexConjugate
 namespace Formalism.L2.Th1.Top.FrP.UnitaryGroupMassFormula.HermFrame
 open Formalism.L2.Th1.Top.FrP
 
-theorem sq_conj (d : ℕ) : conj (sq d) = -sq d := by
-  simp [sq, Complex.conj_ofReal]
+theorem sq_conj (d : ℕ) : conj (sq d) = - sq d := by simp [sq, Complex.conj_ofReal]
 
 theorem sq_mul_sq (d : ℕ) : sq d * sq d = -(d : ℂ) := by
   rw [← pow_two]
   have h : ((Real.sqrt d : ℝ) : ℂ) ^ 2 = (d : ℂ) := by
     rw [← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg _)]; simp
-  rw [sq, mul_pow, h, Complex.I_sq]; ring
+  rw [sq, mul_pow, h, Complex.I_sq]
+  ring
 
 def Kc (d : ℕ) (hd : 0 < d) : Subfield ℂ where
   carrier := {z | ∃ q₁ q₂ : ℚ, z = q₁ + q₂ * sq d}
@@ -48,7 +48,10 @@ def Kc (d : ℕ) (hd : 0 < d) : Subfield ℂ where
           positivity
         linarith
       have ha : a = 0 := by subst hb; simpa using hn
-      apply h0; subst ha; subst hb; simp
+      apply h0
+      subst ha
+      subst hb
+      simp
     refine ⟨a / (a ^ 2 + d * b ^ 2), -b / (a ^ 2 + d * b ^ 2), ?_⟩
     have hn' : ((a ^ 2 + d * b ^ 2 : ℚ) : ℂ) ≠ 0 := by exact_mod_cast hn
     refine (eq_inv_of_mul_eq_one_left ?_).symm

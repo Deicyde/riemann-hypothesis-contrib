@@ -15,10 +15,10 @@ noncomputable section
 
 namespace GlobalTheory.NoPr.Model
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.FourierDecayAlt.ThreeDimData
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.FourierDecayAlt.ThreeDimData
 
 theorem ampKF0_iff_gapIn : AmpKF0 ↔ GlobalTheory.GapIn.AmpKF0 := Iff.rfl
-
 
 open Formalism.MainNotions.S.Pv.AmpDDPf in
 theorem ampKF0_holds : AmpKF0 := by
@@ -33,7 +33,8 @@ theorem ampKF0_holds : AmpKF0 := by
   obtain ⟨hγ, hGf, hmono, hrel, hμR, hOQ, hQ⟩ := hCD
   have hσ : PI.UpqRep.IsDSHpk k r L.ε L.lam L.σ := L.hσ
   obtain ⟨d, hd, hSch⟩ := hSchH k r L.ε L.lam L.Hs L.σ μG L.hlam hσ hμG
-  have hw0K : PI.UpqRep.IsKFinHpk (k := k) (r := r) L.σ w0 := Formalism.MainNotions.KFiniteLowUnitary.kFin_of_lowUnitH' hw0
+  have hw0K : PI.UpqRep.IsKFinHpk (k := k) (r := r) L.σ w0 :=
+    Formalism.MainNotions.KFiniteLowUnitary.kFin_of_lowUnitH' hw0
   have hw0s : w0 ∈ PI.UpqRep.smoothVecs (k := k) (r := r) L.σ :=
     hIn.2.2 k r L.ε L.lam L.Hs L.σ L.hlam hσ w0 hw0K
   obtain ⟨P, hP, hw⟩ := hw0
@@ -49,19 +50,32 @@ theorem ampKF0_holds : AmpKF0 := by
     Formalism.FourierDecayAlt.P.S3dx6.fdeg_of_schur hw0ne hd (hSch w0 w0 w0 w0).2
   obtain ⟨C1, Ws1, -, hC1⟩ := hIn.2.1 k r L.ε L.lam h L.Hs L.σ L.hlam hσ hgap hOK v hv
   obtain ⟨C2, Ws2, -, hC2⟩ := hIn.2.1 k r L.ε L.lam h L.Hs L.σ L.hlam hσ hgap hOK v' hv'
-  have e1 : (1 : ℝ) - Formalism.FourierDecayAlt.ThreeDimData.aOf r h = -(Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1) := by ring
-  have hC1' : ∀ g ∈ UH (Hpk k r), ‖⟪v, L.σ g w0⟫_ℂ‖ ≤
-      (C1 * (Ws1.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) L.σ W w0‖).sum) *
-        Formalism.FourierDecayAlt.B.gN g ^ (-(Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1)) := fun g hg => by
+  have e1
+      : (1 : ℝ) - Formalism.FourierDecayAlt.ThreeDimData.aOf r h
+        = -(Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1) := by
+    ring
+  have hC1'
+      : ∀ g ∈ UH (Hpk k r),
+        ‖⟪v, L.σ g w0⟫_ℂ‖
+          ≤ (C1 * (Ws1.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) L.σ W w0‖).sum)
+            * Formalism.FourierDecayAlt.B.gN g
+              ^ (-(Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1)) := fun g hg => by
     rw [← e1]; exact hC1 w0 hw0s g hg
-  have hC2' : ∀ g ∈ UH (Hpk k r), ‖⟪v', L.σ g w0⟫_ℂ‖ ≤
-      (C2 * (Ws2.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) L.σ W w0‖).sum) *
-        Formalism.FourierDecayAlt.B.gN g ^ (-(Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1)) := fun g hg => by
+  have hC2'
+      : ∀ g ∈ UH (Hpk k r),
+        ‖⟪v', L.σ g w0⟫_ℂ‖
+          ≤ (C2 * (Ws2.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) L.σ W w0‖).sum)
+            * Formalism.FourierDecayAlt.B.gN g
+              ^ (-(Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1)) := fun g hg => by
     rw [← e1]; exact hC2 w0 hw0s g hg
-  have hAG0 : 0 ≤ Formalism.FourierDecayAlt.ThreeDimData.AG k r := by unfold Formalism.FourierDecayAlt.ThreeDimData.AG; positivity
+  have hAG0 : 0 ≤ Formalism.FourierDecayAlt.ThreeDimData.AG k r := by
+    unfold Formalism.FourierDecayAlt.ThreeDimData.AG; positivity
   have hab : b ≤ Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1 := by linarith
-  have hIG : Integrable (fun x : Mt k r =>
-      Formalism.FourierDecayAlt.B.gN (Matrix.of x) ^ (b - (Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1))) μG := by
+  have hIG : Integrable
+      (fun x : Mt k r =>
+        Formalism.FourierDecayAlt.B.gN (Matrix.of x)
+          ^ (b - (Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1)))
+      μG := by
     have h1 := hGG k r μG (Formalism.FourierDecayAlt.ThreeDimData.aOf r h - 1 - b) hμG (by linarith)
     simpa only [neg_sub] using h1
   have hinv : MeasurePreserving (Formalism.FourierDecayAlt.P.B7.invM (k := k) (r := r)) μR μR :=
@@ -69,7 +83,8 @@ theorem ampKF0_holds : AmpKF0 := by
   rw [hfd]
   exact amp_core' L hμG hd hSch hNI hw1 l l' hγ hrel hμR hOQ hQ hinv hb hab hIG hpm
     (fun t ht => hK1 _ (Formalism.FourierDecayAlt.P.S3dx6.mem_DD L.σ w0 ht) v hv)
-    (fun t ht => hK2 _ (Formalism.FourierDecayAlt.P.S3dx6.mem_DD L.σ w0 ht) v' hv') hC1' hC2' ξ ξ'
+    (fun t ht => hK2 _ (Formalism.FourierDecayAlt.P.S3dx6.mem_DD L.σ w0 ht) v' hv')
+    hC1' hC2' ξ ξ'
 
 end GlobalTheory.NoPr.Model
 

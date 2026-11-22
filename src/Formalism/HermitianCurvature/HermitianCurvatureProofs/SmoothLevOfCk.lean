@@ -22,7 +22,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5.Rad
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.Ux10
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.Ux10
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -96,8 +97,11 @@ lemma glev0 {g : Mx k r} (hg : g ∈ B.GV k r) : g ∈ Glev k r 0 := by
   intro a ha
   simp at ha
 
-theorem smoothLev_of_ck {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {D : Set (Mx k r)} (hD : IsOpen D)
-    {f : Mx k r → E} (hf : ∀ m : ℕ, CkLev k r 0 m D f) : SmoothLev k r 0 D f := by
+theorem smoothLev_of_ck
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {D : Set (Mx k r)} (hD : IsOpen D)
+    {f : Mx k r → E} (hf : ∀ m : ℕ, CkLev k r 0 m D f)
+    : SmoothLev k r 0 D f := by
   intro g₀ hg₀
   have hG₀ : g₀ ∈ B.GV k r := hg₀.1.1
   have hU : IsOpen (retDom g₀ ∩ ret g₀ ⁻¹' D) :=

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CyclicSolv
 
 @[expose] public section
 
-open Formalism.L2.FormalSeriesBounds Formalism.L2.DIV Formalism.BasicNotions Formalism.UnitaryBoundIntegral
+open Formalism.L2.FormalSeriesBounds Formalism.L2.DIV Formalism.BasicNotions
+  Formalism.UnitaryBoundIntegral
 
 namespace GlobalTheory.LevelsOrbits
 
@@ -50,7 +51,9 @@ theorem levelBound : LevelBound := by
       have := Real.exp_one_lt_d9
       linarith
     have h4 : (j : ℝ) ≤ j * Real.log l := le_mul_of_one_le_right (by positivity) h2
-    rw [hj]; push_cast; linarith
+    rw [hj]
+    push_cast
+    linarith
 
 lemma sum_range_ite (d : ℕ) (f : ℕ → ℝ) :
     ∑ i ∈ Finset.range d, (if Odd i ∧ i < d then f i else 0) = ∑ i ∈ Formalism.IncomingBounds.oddLevels d, f i := by
@@ -204,11 +207,9 @@ theorem fInertReps : FInertReps := by
     exact lpF_eq _ _ _
   · intro h0 h1 hX
     unfold NumDatum.FjP
-    have hr : N.cls l ≠ PrimeClass.ramD := by
-      rcases hc with h | h <;> rw [h] <;> simp
+    have hr : N.cls l ≠ PrimeClass.ramD := by rcases hc with h | h <;> rw [h] <;> simp
     rw [if_neg (by tauto), if_neg hr, if_pos ⟨hc, hX⟩]
 
-theorem main : ThlEq ∧ LevelBound ∧ LemmaFe ∧ FInertReps :=
-  ⟨thlEq, levelBound, lemmaFe, fInertReps⟩
+theorem main : ThlEq ∧ LevelBound ∧ LemmaFe ∧ FInertReps := ⟨thlEq, levelBound, lemmaFe, fInertReps⟩
 
 end GlobalTheory.LevelsOrbits

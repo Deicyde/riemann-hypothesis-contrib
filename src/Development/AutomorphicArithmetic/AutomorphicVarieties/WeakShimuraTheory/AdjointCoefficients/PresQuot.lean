@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.X1.presQuot :
-    ∀ (Λ R' R : Type) [CommRing Λ] [CommRing R'] [Algebra Λ R'] [CommRing R] [Algebra Λ R] (a b : ℕ) (τ : Type) [Finite τ] (g : R' →ₐ[Λ] R) (e : τ → R'), HasPres Λ R' a b → Function.Surjective g → RingHom.ker g = Ideal.span (Set.range e) → HasPres Λ R a (b + Nat.card τ) := by
+theorem UpperTheory.V.Ws.X1.presQuot
+    : ∀ (Λ R' R : Type) [CommRing Λ] [CommRing R'] [Algebra Λ R'] [CommRing R] [Algebra Λ R]
+        (a b : ℕ) (τ : Type) [Finite τ] (g : R' →ₐ[Λ] R) (e : τ → R'),
+      HasPres Λ R' a b → Function.Surjective g → RingHom.ker g = Ideal.span (Set.range e)
+        → HasPres Λ R a (b + Nat.card τ) := by
   intro Λ R' R _ _ _ _ _ a b τ _ g e hP hg he
   obtain ⟨π, f, hπ, hk⟩ := hP
   obtain ⟨σ⟩ : Nonempty (τ ≃ Fin (Nat.card τ)) := ⟨Finite.equivFin τ⟩

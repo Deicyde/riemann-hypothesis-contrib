@@ -16,40 +16,71 @@ section General
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private theorem sum_pairSingle_mul_eq_ite (i j : ι) (hij : i ≠ j) (x y z w : R) (p : ι) (v : ι → R) :
-    ∑ r, (if p = i then Pi.single i x + Pi.single j y
-      else if p = j then Pi.single i z + Pi.single j w else Pi.single p 1 : ι → R) r * v r =
-      if p = i then x * v i + y * v j else if p = j then z * v i + w * v j else v p := by
+private theorem sum_pairSingle_mul_eq_ite (i j : ι) (hij : i ≠ j) (x y z w : R) (p : ι) (v : ι → R)
+    : ∑ r, (if p = i then Pi.single i x + Pi.single j y
+        else if p = j then Pi.single i z + Pi.single j w else Pi.single p 1 : ι → R) r * v r
+      = if p = i then
+          x * v i + y * v j
+        else if p = j then
+          z * v i + w * v j
+        else
+          v p := by
   by_cases hpi : p = i
   · simp [hpi, Pi.single_apply, add_mul, Finset.sum_add_distrib, ite_mul]
   · by_cases hpj : p = j
     · simp [hpi, hpj, Ne.symm hij, Pi.single_apply, add_mul, Finset.sum_add_distrib, ite_mul]
     · simp [hpi, hpj, Pi.single_apply, ite_mul]
 
-private theorem unit_lemma' (i j : ι) (hij : i ≠ j) (x y a' b' : R) (key : x * a' + y * b' = 1) :
-    IsUnit (Matrix.of fun p => if p = i then Pi.single i x + Pi.single j y
-      else if p = j then Pi.single i (-b') + Pi.single j a' else Pi.single p 1 : Matrix ι ι R) := by
-  have h : (Matrix.of fun p => if p = i then Pi.single i x + Pi.single j y
-      else if p = j then Pi.single i (-b') + Pi.single j a' else Pi.single p 1 : Matrix ι ι R) * (Matrix.of fun p => if p = i then Pi.single i a' + Pi.single j (-y)
-      else if p = j then Pi.single i b' + Pi.single j x else Pi.single p 1 : Matrix ι ι R) = 1 := by
+private theorem unit_lemma' (i j : ι) (hij : i ≠ j) (x y a' b' : R) (key : x * a' + y * b' = 1)
+    : IsUnit
+      (Matrix.of fun p =>
+          if p = i then
+            Pi.single i x + Pi.single j y
+          else if p = j then
+            Pi.single i (-b') + Pi.single j a'
+          else
+            Pi.single p 1
+        : Matrix ι ι R) := by
+  have h
+      : (Matrix.of fun p =>
+              if p = i then
+                Pi.single i x + Pi.single j y
+              else if p = j then
+                Pi.single i (-b') + Pi.single j a'
+              else
+                Pi.single p 1
+            : Matrix ι ι R)
+          * (Matrix.of fun p =>
+              if p = i then
+                Pi.single i a' + Pi.single j (-y)
+              else if p = j then
+                Pi.single i b' + Pi.single j x
+              else
+                Pi.single p 1
+            : Matrix ι ι R)
+        = 1 := by
     ext p q
     rw [Matrix.mul_apply]
     simp only [Matrix.of_apply]
     rw [sum_pairSingle_mul_eq_ite i j hij x y (-b') a' p, Matrix.one_apply]
-    by_cases hpi : p = i <;> by_cases hpj : p = j <;> by_cases hqi : q = i <;> by_cases hqj : q = j <;>
-      simp_all [Pi.single_apply, Ne.symm hij] <;>
-      first | ring1 | linear_combination key | (intro h; exact hqi h.symm) | (intro h; exact hqj h.symm) | (simp only [@eq_comm _ q p])
+    by_cases hpi : p = i <;> by_cases hpj : p = j <;> by_cases hqi : q = i <;> by_cases hqj : q = j
+      <;> simp_all [Pi.single_apply, Ne.symm hij]
+      <;> first
+        | ring1
+        | linear_combination key
+        | (intro h; exact hqi h.symm)
+        | (intro h; exact hqj h.symm)
+        | (simp only [@eq_comm _ q p])
   exact (Matrix.isUnit_iff_isUnit_det _).mpr (Matrix.isUnit_det_of_right_inverse h)
 
-theorem exists_row_gcd (B : Matrix ι ι R) (i j c : ι) (hij : i ≠ j) (h0 : B i c ≠ 0) :
-    ∃ U : Matrix ι ι R, IsUnit U ∧ (U * B) i c ∣ B i c ∧ (U * B) i c ∣ B j c := by
+theorem exists_row_gcd (B : Matrix ι ι R) (i j c : ι) (hij : i ≠ j) (h0 : B i c ≠ 0)
+    : ∃ U : Matrix ι ι R, IsUnit U ∧ (U * B) i c ∣ B i c ∧ (U * B) i c ∣ B j c := by
   obtain ⟨d, hd⟩ := (IsPrincipalIdealRing.principal (Ideal.span {B i c, B j c})).principal
   have ha : B i c ∈ (Submodule.span R {d} : Ideal R) := by
     rw [← hd]; exact Ideal.subset_span (Set.mem_insert _ _)
   have hb : B j c ∈ (Submodule.span R {d} : Ideal R) := by
     rw [← hd]; exact Ideal.subset_span (Set.mem_insert_of_mem _ rfl)
-  have hdm : d ∈ Ideal.span {B i c, B j c} := by
-    rw [hd]; exact Submodule.mem_span_singleton_self d
+  have hdm : d ∈ Ideal.span {B i c, B j c} := by rw [hd]; exact Submodule.mem_span_singleton_self d
   obtain ⟨a', ha'⟩ := Ideal.mem_span_singleton'.mp ha
   obtain ⟨b', hb'⟩ := Ideal.mem_span_singleton'.mp hb
   obtain ⟨x, y, hxy⟩ := Ideal.mem_span_pair.mp hdm
@@ -60,15 +91,25 @@ theorem exists_row_gcd (B : Matrix ι ι R) (i j c : ι) (hij : i ≠ j) (h0 : B
   have key : x * a' + y * b' = 1 := by
     apply mul_right_cancel₀ hd0
     rw [one_mul, add_mul, mul_assoc, mul_assoc, ha', hb', hxy]
-  have hUB : ((Matrix.of fun p => if p = i then Pi.single i x + Pi.single j y
-      else if p = j then Pi.single i (-b') + Pi.single j a' else Pi.single p 1 : Matrix ι ι R) * B) i c = d := by
+  have hUB
+      : ((Matrix.of fun p =>
+                if p = i then
+                  Pi.single i x + Pi.single j y
+                else if p = j then
+                  Pi.single i (-b') + Pi.single j a'
+                else
+                  Pi.single p 1
+              : Matrix ι ι R)
+            * B)
+          i c
+        = d := by
     simp [Matrix.mul_apply, Pi.single_apply, add_mul, Finset.sum_add_distrib, ite_mul, hxy]
   refine ⟨_, unit_lemma' i j hij x y a' b' key, ?_, ?_⟩
   · rw [hUB]; exact ⟨a', by rw [← ha', mul_comm]⟩
   · rw [hUB]; exact ⟨b', by rw [← hb', mul_comm]⟩
 
-theorem exists_col_gcd (B : Matrix ι ι R) (i j a : ι) (hij : i ≠ j) (h0 : B a i ≠ 0) :
-    ∃ V : Matrix ι ι R, IsUnit V ∧ (B * V) a i ∣ B a i ∧ (B * V) a i ∣ B a j := by
+theorem exists_col_gcd (B : Matrix ι ι R) (i j a : ι) (hij : i ≠ j) (h0 : B a i ≠ 0)
+    : ∃ V : Matrix ι ι R, IsUnit V ∧ (B * V) a i ∣ B a i ∧ (B * V) a i ∣ B a j := by
   obtain ⟨U, hU, h1, h2⟩ := exists_row_gcd Bᵀ i j a hij h0
   have e : (B * Uᵀ) a i = (U * Bᵀ) i a := by
     have h := congrFun (congrFun (Matrix.transpose_mul U Bᵀ) a) i
@@ -82,15 +123,15 @@ theorem exists_col_gcd (B : Matrix ι ι R) (i j a : ι) (hij : i ≠ j) (h0 : B
   · rw [e]; exact h1
   · rw [e]; exact h2
 
-theorem exists_move_row (B : Matrix ι ι R) (i j : ι) :
-    ∃ U : Matrix ι ι R, IsUnit U ∧ ∀ c, (U * B) i c = B j c := by
+theorem exists_move_row (B : Matrix ι ι R) (i j : ι)
+    : ∃ U : Matrix ι ι R, IsUnit U ∧ ∀ c, (U * B) i c = B j c := by
   refine ⟨(Equiv.swap i j).toPEquiv.toMatrix, ?_, fun c => ?_⟩
   · rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_permutation]
     exact (Equiv.Perm.sign _).isUnit.map (Int.castRingHom R)
   · simp [PEquiv.toMatrix_toPEquiv_mul, Matrix.submatrix_apply, Equiv.swap_apply_left]
 
-theorem exists_move_col (B : Matrix ι ι R) (i j : ι) :
-    ∃ V : Matrix ι ι R, IsUnit V ∧ ∀ a, (B * V) a i = B a j := by
+theorem exists_move_col (B : Matrix ι ι R) (i j : ι)
+    : ∃ V : Matrix ι ι R, IsUnit V ∧ ∀ a, (B * V) a i = B a j := by
   refine ⟨(Equiv.swap i j).toPEquiv.toMatrix, ?_, fun a => ?_⟩
   · rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_permutation]
     exact (Equiv.Perm.sign _).isUnit.map (Int.castRingHom R)
@@ -98,8 +139,8 @@ theorem exists_move_col (B : Matrix ι ι R) (i j : ι) :
 
 end General
 
-theorem exists_blk {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) R) :
-    ∃ (b : R) (D : Matrix (Fin n) (Fin n) R), Eqv A (blk b D) ∧ ∀ i k, b ∣ D i k := by
+theorem exists_blk {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) R)
+    : ∃ (b : R) (D : Matrix (Fin n) (Fin n) R), Eqv A (blk b D) ∧ ∀ i k, b ∣ D i k := by
   by_cases hA : A = 0
   · refine ⟨0, 0, ?_, fun i k => by simp⟩
     have h0 : blk (0 : R) (0 : Matrix (Fin n) (Fin n) R) = A := by
@@ -144,7 +185,7 @@ theorem exists_blk {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) R) :
     exact (key _ hmem h1).trans h2
 
   choose t ht using hcol B hAB hB
-  let t' : Fin (n + 1) → R := fun j => if j = 0 then 0 else -t j
+  let t' : Fin (n + 1) → R := fun j => if j = 0 then 0 else - t j
   have hL : IsUnit (1 + vecMulVec t' (Pi.single (0 : Fin (n + 1)) (1 : R))) :=
     isUnit_one_add_vecMulVec _ _ (by simp [t'])
   have hAB1 := hAB.mul_left hL
@@ -158,7 +199,7 @@ theorem exists_blk {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) R) :
     ring
 
   choose s hs using hrow B1 hAB1 h1_00
-  let s' : Fin (n + 1) → R := fun j => if j = 0 then 0 else -s j
+  let s' : Fin (n + 1) → R := fun j => if j = 0 then 0 else - s j
   have hRt : IsUnit (1 + vecMulVec (Pi.single (0 : Fin (n + 1)) (1 : R)) s') :=
     isUnit_one_add_vecMulVec _ _ (by simp [s'])
   have hAB2 := hAB1.mul_right hRt
@@ -186,8 +227,9 @@ theorem exists_blk {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) R) :
     rw [e3] at h
     simpa [h2_r] using h
 
-theorem smith (n : ℕ) : ∀ A : Matrix (Fin n) (Fin n) R,
-    ∃ d : Fin n → R, Eqv A (diagonal d) ∧ ∀ i j, i ≤ j → d i ∣ d j := by
+theorem smith (n : ℕ)
+    : ∀ A : Matrix (Fin n) (Fin n) R, ∃ d : Fin n → R,
+      Eqv A (diagonal d) ∧ ∀ i j, i ≤ j → d i ∣ d j := by
   induction n with
   | zero =>
     intro A

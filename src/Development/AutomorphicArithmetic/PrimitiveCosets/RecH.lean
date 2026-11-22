@@ -9,10 +9,13 @@ noncomputable section
 
 namespace UpperTheory.Comparison₂
 
-open Formalism Formalism.HC Formalism.D5 Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.LHost
+open Formalism Formalism.HC Formalism.D5 Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.LHost
 
 def toE (φ : Frame) : φ.GG →* Multiplicative (E0 × φ.A) where
-  toFun g := Multiplicative.ofAdd ((Multiplicative.toAdd (sgn2 g.1.2), Multiplicative.toAdd (sgn2 g.1.1)), φ.iotaInv g.2)
+  toFun g :=
+    Multiplicative.ofAdd
+      ((Multiplicative.toAdd (sgn2 g.1.2), Multiplicative.toAdd (sgn2 g.1.1)), φ.iotaInv g.2)
   map_one' := by
     simp only [Prod.snd_one, Prod.fst_one, map_one]
     rfl

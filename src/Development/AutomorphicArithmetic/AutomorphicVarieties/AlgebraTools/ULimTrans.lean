@@ -9,11 +9,27 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.ULim.trans_ker :
-    ∀ (R : Type) [CommRing R] (F : Filter ℕ), F ≤ atTop → ∀ (I : ℕ → Ideal R) (M : ℕ → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)] (a b : Ideal R), a.FG → Antitone I → ∀ h : b ≤ a,
-      Function.Surjective (ULim.map F (I := fun j => b ⊔ I j) (I' := fun j => a ⊔ I j) (M := M) (fun _ => sup_le_sup_right h _) fun _ => LinearMap.id) ∧
-      LinearMap.ker (ULim.map F (I := fun j => b ⊔ I j) (I' := fun j => a ⊔ I j) (M := M) (fun _ => sup_le_sup_right h _) fun _ => LinearMap.id) = a • ⊤ ∧
-      (a • ⊤ : Submodule R (ULim F (fun j => a ⊔ I j) M)) = ⊥ := by
+theorem UpperTheory.V.AlgebraTools.ULim.trans_ker
+    : ∀ (R : Type) [CommRing R] (F : Filter ℕ),
+      F ≤ atTop
+        → ∀ (I : ℕ → Ideal R) (M : ℕ → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)]
+            (a b : Ideal R),
+          a.FG → Antitone I
+            → ∀ h : b ≤ a,
+              Function.Surjective (ULim.map F
+                  (I := fun j => b ⊔ I j)
+                  (I' := fun j => a ⊔ I j)
+                  (M := M)
+                  (fun _ => sup_le_sup_right h _)
+                  fun _ => LinearMap.id)
+                ∧ LinearMap.ker (ULim.map F
+                    (I := fun j => b ⊔ I j)
+                    (I' := fun j => a ⊔ I j)
+                    (M := M)
+                    (fun _ => sup_le_sup_right h _)
+                    fun _ => LinearMap.id)
+                  = a • ⊤
+                ∧ (a • ⊤ : Submodule R (ULim F (fun j => a ⊔ I j) M)) = ⊥ := by
   intro R _ F hF I M _ _ a b ha hI h
   have hI1 : Antitone fun j => b ⊔ I j := fun i j hij => sup_le_sup_left (hI hij) b
   have hI2 : Antitone fun j => a ⊔ I j := fun i j hij => sup_le_sup_left (hI hij) a

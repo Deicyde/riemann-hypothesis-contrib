@@ -22,30 +22,37 @@ open MonObj
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem exists_tanEquiv {V : Type} [CommRing V] {X0 : Scheme.{0}} {t : SAB H X0} {x : Sp V ⟶ X0} {G : SAB H (Sp V)}
-    (m : SABMap G t x) :
-    ∃ B : (epsOver V V ⟶ G.G) ≃* (tEpsG x ⟶ t.G), (∀ v, (B v).left = v.left ≫ m.φ) ∧
-      (∀ v, IsTanAtG t x (B v).left ↔ IsTan v) ∧
-      (∀ v (a : 𝓞 E) (r : V), (B v).left ≫ (t.act.act a).left = spMap (epsMul r) ≫ (B v).left ↔
-        (v ≫ G.act.act a).left = spMap (epsMul r) ≫ v.left) ∧
-      ∀ (n : ℕ) (v : Fin n → (epsOver V V ⟶ G.G)) a w,
-        IsCombAtG t x (fun i => (B (v i)).left) a (B w).left ↔ IsComb v a w := by
+theorem exists_tanEquiv
+    {V : Type} [CommRing V]
+    {X0 : Scheme.{0}} {t : SAB H X0} {x : Sp V ⟶ X0} {G : SAB H (Sp V)} (m : SABMap G t x)
+    : ∃ B : (epsOver V V ⟶ G.G) ≃* (tEpsG x ⟶ t.G),
+      (∀ v, (B v).left = v.left ≫ m.φ) ∧ (∀ v, IsTanAtG t x (B v).left ↔ IsTan v)
+        ∧ (∀ v (a : 𝓞 E) (r : V),
+          (B v).left ≫ (t.act.act a).left = spMap (epsMul r) ≫ (B v).left
+            ↔ (v ≫ G.act.act a).left = spMap (epsMul r) ≫ v.left)
+        ∧ ∀ (n : ℕ) (v : Fin n → (epsOver V V ⟶ G.G)) a w,
+          IsCombAtG t x (fun i => (B (v i)).left) a (B w).left ↔ IsComb v a w := by
   have h := m.cart
   have hid : spMap (algebraMap V V) = 𝟙 _ := Spec.map_id _
-  obtain ⟨B, hB⟩ := GlobalTheory.Exist.FlagBaseChange.exists_pointEquiv h
-    (spMap ((algebraMap V (DualNumber V)).comp (algebraMap V V)))
-    (spMap (algebraMap V (DualNumber V)) ≫ x) rfl
-  obtain ⟨A, hA⟩ := GlobalTheory.Exist.FlagBaseChange.exists_pointEquiv h (spMap (algebraMap V V)) x
-    (by rw [hid, Category.id_comp])
-  have hw : ∀ v : epsOver V V ⟶ G.G, v.left ≫ G.G.hom = spMap (algebraMap V (DualNumber V)) := fun v => Over.w v
-  have sc : ∀ (a : V) (u v : epsOver V V ⟶ G.G),
-      (B u).left = spMap (epsMul a) ≫ (B v).left ↔ u.left = spMap (epsMul a) ≫ v.left := by
+  obtain ⟨B, hB⟩ :=
+    GlobalTheory.Exist.FlagBaseChange.exists_pointEquiv h
+      (spMap ((algebraMap V (DualNumber V)).comp (algebraMap V V)))
+      (spMap (algebraMap V (DualNumber V)) ≫ x) rfl
+  obtain ⟨A, hA⟩ :=
+    GlobalTheory.Exist.FlagBaseChange.exists_pointEquiv h (spMap (algebraMap V V)) x
+      (by rw [hid, Category.id_comp])
+  have hw : ∀ v : epsOver V V ⟶ G.G, v.left ≫ G.G.hom = spMap (algebraMap V (DualNumber V)) :=
+    fun v => Over.w v
+  have sc
+      : ∀ (a : V) (u v : epsOver V V ⟶ G.G),
+        (B u).left = spMap (epsMul a) ≫ (B v).left ↔ u.left = spMap (epsMul a) ≫ v.left := by
     intro a u v
     rw [hB, hB]
     refine ⟨fun e => h.1.hom_ext (by rw [e, Category.assoc]) ?_, fun e => by rw [e, Category.assoc]⟩
     rw [Category.assoc, hw, hw, GlobalTheory.Exist.FlagBaseChange.epsMul_over]
-  have prod : ∀ (n : ℕ) (u : Fin n → (epsOver V V ⟶ G.G)),
-      B (List.ofFn u).prod = (List.ofFn fun i => B (u i)).prod := by
+  have prod
+      : ∀ (n : ℕ) (u : Fin n → (epsOver V V ⟶ G.G)),
+        B (List.ofFn u).prod = (List.ofFn fun i => B (u i)).prod := by
     intro n u
     rw [map_list_prod, List.map_ofFn]
     rfl
@@ -53,7 +60,8 @@ theorem exists_tanEquiv {V : Type} [CommRing V] {X0 : Scheme.{0}} {t : SAB H X0}
   · unfold IsTanAtG IsTan
     refine (and_iff_right (Over.w (B v))).trans ?_
     rw [← map_one A, hA, hB]
-    refine ⟨fun e => h.1.hom_ext (by rw [← e, Category.assoc]) ?_, fun e => by rw [← e, Category.assoc]⟩
+    refine
+      ⟨fun e => h.1.hom_ext (by rw [← e, Category.assoc]) ?_, fun e => by rw [← e, Category.assoc]⟩
     rw [Category.assoc, hw, GlobalTheory.Exist.FlagBaseChange.fst_over]
     exact ((Over.w (1 : ptOver V V ⟶ G.G)).trans hid).symm
   · have e : (B v).left ≫ (t.act.act a).left = (B (v ≫ G.act.act a)).left := by
@@ -62,7 +70,11 @@ theorem exists_tanEquiv {V : Type} [CommRing V] {X0 : Scheme.{0}} {t : SAB H X0}
     exact sc _ _ _
   · constructor
     · rintro ⟨u, hu, e⟩
-      refine ⟨fun i => B.symm (u i), fun i => (sc _ _ _).1 (by rw [B.apply_symm_apply]; exact hu i), B.injective ?_⟩
+      refine ⟨
+        fun i => B.symm (u i),
+        fun i => (sc _ _ _).1 (by rw [B.apply_symm_apply]; exact hu i),
+        B.injective ?_
+      ⟩
       rw [prod, ← Over.OverMorphism.ext e]
       simp
     · rintro ⟨u, hu, e⟩

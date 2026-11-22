@@ -6,7 +6,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.BaseLengthBound.
 
 noncomputable section
 
-open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
+open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField
+  IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
 
 namespace PoleLengthBounds
 

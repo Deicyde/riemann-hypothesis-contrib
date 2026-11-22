@@ -14,7 +14,8 @@ namespace PI.NglqJacSplitW
 
 section Diag
 
-variable {F : Type} [Field F] [TopologicalSpace F] [IsTopologicalDivisionRing F]
+variable
+  {F : Type} [Field F] [TopologicalSpace F] [IsTopologicalDivisionRing F]
   {ι : Type} [Fintype ι] [DecidableEq ι]
 
 def scaleAt (i : ι) (a : F) (ha : a ≠ 0) : (ι → F) ≃ₜ+ (ι → F) where
@@ -41,9 +42,9 @@ def scaleAt (i : ι) (a : F) (ha : a ≠ 0) : (ι → F) ≃ₜ+ (ι → F) wher
   continuous_toFun := continuous_id.update i (continuous_const.mul (continuous_apply i))
   continuous_invFun := continuous_id.update i (continuous_const.mul (continuous_apply i))
 
-theorem image_update_pi (i : ι) (a : F) (_ha : a ≠ 0) (s : ι → Set F) :
-    (fun x => update x i (a * x i)) '' (univ.pi s) =
-      univ.pi (update s i ((fun y => a * y) '' s i)) := by
+theorem image_update_pi (i : ι) (a : F) (_ha : a ≠ 0) (s : ι → Set F)
+    : (fun x => update x i (a * x i)) '' (univ.pi s)
+      = univ.pi (update s i ((fun y => a * y) '' s i)) := by
   ext y
   simp only [Set.mem_image, Set.mem_univ_pi]
   constructor
@@ -86,11 +87,11 @@ theorem diagonal_one_jacobian : DiagOne := by
   set μ : Measure F := Measure.addHaar with hμ
   set P : Measure (ι → F) := Measure.pi fun _ => μ with hP
   set m' : ℝ≥0 := distribHaarChar F (Units.mk0 a ha) with hm'
-  have hmod : modF F a = (m' : ℝ≥0∞) := by
-    rw [modF, dif_neg ha, hm']
+  have hmod : modF F a = (m' : ℝ≥0∞) := by rw [modF, dif_neg ha, hm']
   set φ := scaleAt i a ha with hφ
   have himg : ∀ T : Set (ι → F), φ '' T = φ.symm ⁻¹' T := fun T => by
-    rw [Set.image_eq_preimage_of_inverse (fun x => φ.symm_apply_apply x)
+    rw [Set.image_eq_preimage_of_inverse
+      (fun x => φ.symm_apply_apply x)
       (fun x => φ.apply_symm_apply x)]
   have hφm : Measurable φ.symm := φ.symm.continuous.measurable
   have hscal : ∀ t : Set F, μ ((fun y => a * y) '' t) = m' * μ t := fun t => by
@@ -108,9 +109,10 @@ theorem diagonal_one_jacobian : DiagOne := by
   have hA : Measure.pi μs = Measure.map φ.symm P := by
     refine Measure.pi_eq fun s hs => ?_
     rw [Measure.map_apply hφm (MeasurableSet.univ_pi hs), ← himg]
-    rw [show ((φ : (ι → F) → (ι → F)) '' univ.pi s) =
-        (fun x => update x i (a * x i)) '' univ.pi s from rfl, image_update_pi i a ha s, hP,
-      Measure.pi_pi]
+    rw [show ((φ : (ι → F) → (ι → F)) '' univ.pi s)
+          = (fun x => update x i (a * x i)) '' univ.pi s from
+        rfl,
+      image_update_pi i a ha s, hP, Measure.pi_pi]
     refine Finset.prod_congr rfl fun j _ => ?_
     by_cases hj : j = i
     · subst hj
@@ -122,15 +124,13 @@ theorem diagonal_one_jacobian : DiagOne := by
       ← Finset.mul_prod_erase Finset.univ (fun j => μs j (s j)) (Finset.mem_univ i),
       ← Finset.mul_prod_erase Finset.univ (fun j => μ (s j)) (Finset.mem_univ i)]
     have herase : ∏ j ∈ Finset.univ.erase i, μs j (s j) = ∏ j ∈ Finset.univ.erase i, μ (s j) :=
-      Finset.prod_congr rfl fun j hj => by
-        simp only [hμs, update_of_ne (Finset.ne_of_mem_erase hj)]
+      Finset.prod_congr rfl fun j hj => by simp only [hμs, update_of_ne (Finset.ne_of_mem_erase hj)]
     rw [herase]
     simp only [hμs, update_self, Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
     ring
   have hmap : Measure.map φ.symm P = m' • P := hA.symm.trans hB
   have hPS : P (φ '' S) = m' * P S := by
-    rw [himg, ← Measure.map_apply hφm hS, hmap, Measure.smul_apply, ENNReal.smul_def,
-      smul_eq_mul]
+    rw [himg, ← Measure.map_apply hφm hS, hmap, Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
   have hνP : ν = ν.addHaarScalarFactor P • P := Measure.isAddLeftInvariant_eq_smul ν P
   show ν (φ '' S) = modF F a * ν S
   rw [hmod, hνP, Measure.smul_apply, Measure.smul_apply, hPS, ENNReal.smul_def, ENNReal.smul_def,

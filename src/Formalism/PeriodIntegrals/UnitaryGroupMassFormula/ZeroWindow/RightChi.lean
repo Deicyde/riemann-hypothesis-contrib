@@ -67,8 +67,9 @@ theorem rightChi_of (hJ : JensenCount) : RightChi := by
   have hM1 : (1 : ℝ) ≤ 1 + 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4)) := by
     have : 0 ≤ 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4)) := by positivity
     linarith
-  have hbd : ∀ z ∈ sphere (2 + t * I) (19 / 10), ‖DirichletCharacter.LFunction χ z‖ ≤
-      1 + 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4)) := by
+  have hbd
+      : ∀ z ∈ sphere (2 + t * I) (19 / 10),
+        ‖DirichletCharacter.LFunction χ z‖ ≤ 1 + 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4)) := by
     intro z hz
     obtain ⟨hre, hnorm⟩ := sphere_facts hz
     have hz0 : 0 < z.re := by linarith
@@ -78,23 +79,31 @@ theorem rightChi_of (hJ : JensenCount) : RightChi := by
       nlinarith [mul_le_mul_of_nonneg_left hre (by positivity : (0 : ℝ) ≤ 10 * (|t| + 4))]
     have h2 := mul_le_mul_of_nonneg_left h1 (by positivity : (0 : ℝ) ≤ 2 * ((N : ℝ) + 1))
     nlinarith
-  have hS : RightNear χ t ⊆ {z | z ∈ closedBall (2 + t * I) (37 / 20) ∧ DirichletCharacter.LFunction χ z = 0} :=
+  have hS
+      : RightNear χ t
+        ⊆ {z | z ∈ closedBall (2 + t * I) (37 / 20) ∧ DirichletCharacter.LFunction χ z = 0} :=
     fun ρ hρ => ⟨mem_closedBall_of_right hρ.1 hρ.2.1 hρ.2.2.1, hρ.2.2.2⟩
-  obtain ⟨hfin, hsum⟩ := hJ (DirichletCharacter.LFunction χ) (2 + t * I) _ han hc0 hM1 hbd (RightNear χ t) hS
+  obtain ⟨hfin, hsum⟩ :=
+    hJ (DirichletCharacter.LFunction χ) (2 + t * I) _ han hc0 hM1 hbd (RightNear χ t) hS
   refine ⟨hfin, hsum.trans ?_⟩
   have hX : 2 ≤ (N : ℝ) * (|t| + 2) := by nlinarith [abs_nonneg t]
   have htN : |t| ≤ N * |t| := le_mul_of_one_le_left (abs_nonneg t) hNr
   have hM85 : 1 + 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4)) ≤ 85 * ((N : ℝ) * (|t| + 2)) := by
     nlinarith [abs_nonneg t]
-  have hM' : (1 + 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4))) / ‖DirichletCharacter.LFunction χ (2 + t * I)‖ ≤
-      170 * ((N : ℝ) * (|t| + 2)) := by
+  have hM'
+      : (1 + 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4)))
+          / ‖DirichletCharacter.LFunction χ (2 + t * I)‖
+        ≤ 170 * ((N : ℝ) * (|t| + 2)) := by
     rw [div_le_iff₀ hpos]
     nlinarith [mul_le_mul_of_nonneg_left hfc (by linarith : (0 : ℝ) ≤ (N : ℝ) * (|t| + 2))]
   have h9 := log_le_nine _ _ hX (by positivity) hM'
-  calc Real.log ((1 + 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4))) /
-        ‖DirichletCharacter.LFunction χ (2 + t * I)‖) / Real.log ((19 / 10) / (37 / 20))
-      ≤ (9 * Real.log ((N : ℝ) * (|t| + 2))) / Real.log ((19 / 10) / (37 / 20)) :=
-        div_le_div_of_nonneg_right h9 hl.le
+  calc
+    Real.log
+            ((1 + 2 * ((N : ℝ) + 1) * (1 + 10 * (|t| + 4)))
+              / ‖DirichletCharacter.LFunction χ (2 + t * I)‖)
+          / Real.log ((19 / 10) / (37 / 20))
+        ≤ (9 * Real.log ((N : ℝ) * (|t| + 2))) / Real.log ((19 / 10) / (37 / 20)) :=
+      div_le_div_of_nonneg_right h9 hl.le
     _ = 9 / Real.log ((19 / 10) / (37 / 20)) * Real.log ((N : ℝ) * (|t| + 2)) := by ring
 
 end PI.ZW

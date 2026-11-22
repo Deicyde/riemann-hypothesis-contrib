@@ -6,14 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 open IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Ws.H5
 
-theorem UpperTheory.V.Ws.H5.twChOps :
-    ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) {R : Type} [CommRing R] [IsLocalRing R] (γ : F.G₀ →* Rˣ), TwCh F γ → (∀ m : ℕ, TwCh F (γ ^ m)) ∧ TwCh F γ⁻¹ ∧ ∀ (R' : Type) [CommRing R'] [IsLocalRing R'] (e : R →+* R'), IsLocalHom e → TwCh F (pushCh e γ) := by
+theorem UpperTheory.V.Ws.H5.twChOps
+    : ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) {R : Type} [CommRing R] [IsLocalRing R]
+        (γ : F.G₀ →* Rˣ),
+      TwCh F γ
+        → (∀ m : ℕ, TwCh F (γ ^ m)) ∧ TwCh F γ⁻¹
+          ∧ ∀ (R' : Type) [CommRing R'] [IsLocalRing R'] (e : R →+* R'),
+            IsLocalHom e → TwCh F (pushCh e γ) := by
   intro l _ F R _ _ γ hγ
   have hq : ∀ g, Ideal.Quotient.mk (maximalIdeal R) (γ g : R) = 1 := fun g => by
     rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk _), ← map_sub, Ideal.Quotient.eq_zero_iff_mem]
     exact hγ.red g
-  refine ⟨fun m => ⟨hγ.toAnti.mono ?_, ?_, ?_⟩, ⟨hγ.toAnti.mono ?_, ?_, ?_⟩,
-    fun R' _ _ e he => ⟨hγ.toAnti.mono ?_, ?_, ?_⟩⟩
+  refine ⟨
+    fun m => ⟨hγ.toAnti.mono ?_, ?_, ?_⟩,
+    ⟨hγ.toAnti.mono ?_, ?_, ?_⟩,
+    fun R' _ _ e he => ⟨hγ.toAnti.mono ?_, ?_, ?_⟩
+  ⟩
   · intro g hg
     rw [MonoidHom.mem_ker] at hg ⊢
     simp [hg]
@@ -32,8 +40,11 @@ theorem UpperTheory.V.Ws.H5.twChOps :
     have hc := (hγ.cont N).comp Ring.inverse
     convert hc using 1
     funext g
-    have hu : Ideal.Quotient.mk (maximalIdeal R ^ N) (γ g : R) =
-        ((Units.map (Ideal.Quotient.mk (maximalIdeal R ^ N) : R →* R ⧸ maximalIdeal R ^ N) (γ g) : _)) := rfl
+    have hu
+        : Ideal.Quotient.mk (maximalIdeal R ^ N) (γ g : R)
+          = ((Units.map (Ideal.Quotient.mk (maximalIdeal R ^ N) : R →* R ⧸ maximalIdeal R ^ N) (γ g)
+            : _)) :=
+      rfl
     simp only [Function.comp_apply]
     rw [hu, Ring.inverse_unit, Units.coe_map_inv]
     rfl
@@ -48,7 +59,8 @@ theorem UpperTheory.V.Ws.H5.twChOps :
   · intro N
     have hle : maximalIdeal R ^ N ≤ Ideal.comap e (maximalIdeal R' ^ N) := by
       rw [← Ideal.map_le_iff_le_comap, Ideal.map_pow]
-      exact Ideal.pow_right_mono (Ideal.map_le_iff_le_comap.mpr (fun x hx => Ideal.mem_comap.mpr (map_nonunit e x hx))) N
+      exact Ideal.pow_right_mono
+        (Ideal.map_le_iff_le_comap.mpr (fun x hx => Ideal.mem_comap.mpr (map_nonunit e x hx))) N
     have hc := (hγ.cont N).comp (Ideal.quotientMap _ e hle)
     convert hc using 1
     funext g

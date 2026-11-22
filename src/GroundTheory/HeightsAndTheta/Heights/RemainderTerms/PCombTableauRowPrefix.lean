@@ -15,8 +15,7 @@ theorem CombTableauRowPrefix.proof : CombTableauRowPrefix.Statement := by
   intro m lam T hT t
   set c := T.symm t with hc
   have hTc : T c = t := by simp [hc]
-  have key : ∀ p : youngCells lam, p.1.1 = c.1.1 →
-      ((T p : ℕ) < (t : ℕ) ↔ p.1.2 < c.1.2) := by
+  have key : ∀ p : youngCells lam, p.1.1 = c.1.1 → ((T p : ℕ) < (t : ℕ) ↔ p.1.2 < c.1.2) := by
     intro p hp
     constructor
     · intro hlt
@@ -36,8 +35,8 @@ theorem CombTableauRowPrefix.proof : CombTableauRowPrefix.Statement := by
       exact Fin.lt_def.mp (lt_of_le_of_ne hle hne')
   have hcmem : c.1 ∈ youngCells lam := c.2
   simp only [youngCells, mem_filter, mem_product, mem_univ, true_and, mem_range] at hcmem
-  rw [show (univ.filter fun p : youngCells lam => p.1.1 = c.1.1 ∧ (T p : ℕ) < (t : ℕ)) =
-      univ.filter fun p : youngCells lam => p.1.1 = c.1.1 ∧ p.1.2 < c.1.2 from
+  rw [show (univ.filter fun p : youngCells lam => p.1.1 = c.1.1 ∧ (T p : ℕ) < (t : ℕ))
+      = univ.filter fun p : youngCells lam => p.1.1 = c.1.1 ∧ p.1.2 < c.1.2 from
     filter_congr fun p _ => and_congr_right (key p)]
   refine Eq.trans ?_ (card_range c.1.2)
   refine card_bij (fun p _ => p.1.2) ?_ ?_ ?_

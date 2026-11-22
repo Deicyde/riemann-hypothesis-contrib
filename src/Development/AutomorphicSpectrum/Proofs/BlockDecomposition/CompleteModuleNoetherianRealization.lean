@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsNoe
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE TensorProduct
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE TensorProduct
 
 namespace GlobalTheory.CompanionTheory.GE.CompletionTower
 
@@ -14,17 +15,17 @@ open AdicCompletion
 
 variable {B : Type} [CommRing B] (I : Ideal B) {N : Type} [AddCommGroup N] [Module B N]
 
-theorem exists_eval_smul (r : AdicCompletion I B) (x : AdicCompletion I N) (n : ℕ) :
-    ∃ b : B, eval I N n (r • x) = b • eval I N n x := by
+theorem exists_eval_smul (r : AdicCompletion I B) (x : AdicCompletion I N) (n : ℕ)
+    : ∃ b : B, eval I N n (r • x) = b • eval I N n x := by
   obtain ⟨b, hb⟩ := Submodule.Quotient.mk_surjective _ (r.val n)
   exact ⟨b, by show (r • x).val n = b • x.val n; rw [smul_eval, ← hb]; rfl⟩
 
-theorem finite_adicCompletion [Module.Finite B N] :
-    Module.Finite (AdicCompletion I B) (AdicCompletion I N) :=
+theorem finite_adicCompletion [Module.Finite B N]
+    : Module.Finite (AdicCompletion I B) (AdicCompletion I N) :=
   Module.Finite.of_surjective (ofTensorProduct I N) (ofTensorProduct_surjective_of_finite I N)
 
-theorem span_range_of [Module.Finite B N] :
-    Submodule.span (AdicCompletion I B) (Set.range (of I N)) = ⊤ := by
+theorem span_range_of [Module.Finite B N]
+    : Submodule.span (AdicCompletion I B) (Set.range (of I N)) = ⊤ := by
   refine Submodule.eq_top_iff'.2 fun x ↦ ?_
   obtain ⟨t, rfl⟩ := ofTensorProduct_surjective_of_finite I N x
   induction t with
@@ -41,8 +42,8 @@ noncomputable def toQuot (n : ℕ) : AdicCompletion I N →ₗ[B] N ⧸ T n :=
 theorem toQuot_of (n : ℕ) (e : N) : toQuot T hT n (of I N e) = (T n).mkQ e := by
   simp [toQuot, eval_of, Submodule.factor_mk]
 
-theorem toQuot_mk (n : ℕ) (f : AdicCauchySequence I N) :
-    toQuot T hT n (AdicCompletion.mk I N f) = (T n).mkQ (f (n + 1)) := by
+theorem toQuot_mk (n : ℕ) (f : AdicCauchySequence I N)
+    : toQuot T hT n (AdicCompletion.mk I N f) = (T n).mkQ (f (n + 1)) := by
   show Submodule.factor (hT n) ((AdicCompletion.mk I N f).val (n + 1)) = _
   rw [mk_apply_coe, Submodule.factor_mk]
 
@@ -58,13 +59,17 @@ noncomputable def Tb (n : ℕ) : Submodule (AdicCompletion I B) (AdicCompletion 
 
 theorem mem_Tb (n : ℕ) (x : AdicCompletion I N) : x ∈ Tb T hT n ↔ toQuot T hT n x = 0 := Iff.rfl
 
-theorem antitone_of_eq_sup_pow_smul_whole_module (hT' : ∀ n, T n = T (n + 1) ⊔ I ^ (n + 1) • (⊤ : Submodule B N)) : Antitone T :=
+theorem antitone_of_eq_sup_pow_smul_whole_module
+    (hT' : ∀ n, T n = T (n + 1) ⊔ I ^ (n + 1) • (⊤ : Submodule B N))
+    : Antitone T :=
   antitone_nat_of_succ_le fun n ↦ (hT' n).symm ▸ le_sup_left
 
-theorem exists_lift (hT' : ∀ n, T n = T (n + 1) ⊔ I ^ (n + 1) • (⊤ : Submodule B N)) (n : ℕ) (e : N)
-    (he : e ∈ T n) : ∃ l ∈ ⨅ m, Tb T hT m, eval I N (n + 1) l = eval I N (n + 1) (of I N e) := by
-  have step : ∀ j (x : T (n + j)), ∃ y : T (n + j + 1),
-      (x : N) - y ∈ I ^ (n + j + 1) • (⊤ : Submodule B N) := by
+theorem exists_lift
+    (hT' : ∀ n, T n = T (n + 1) ⊔ I ^ (n + 1) • (⊤ : Submodule B N)) (n : ℕ) (e : N) (he : e ∈ T n)
+    : ∃ l ∈ ⨅ m, Tb T hT m, eval I N (n + 1) l = eval I N (n + 1) (of I N e) := by
+  have step
+      : ∀ j (x : T (n + j)), ∃ y : T (n + j + 1),
+        (x : N) - y ∈ I ^ (n + j + 1) • (⊤ : Submodule B N) := by
     intro j x
     have hx : (x : N) ∈ T (n + j + 1) ⊔ I ^ (n + j + 1) • (⊤ : Submodule B N) := by
       rw [← hT']; exact x.2
@@ -94,7 +99,8 @@ theorem exists_lift (hT' : ∀ n, T n = T (n + 1) ⊔ I ^ (n + 1) • (⊤ : Sub
     rcases Nat.lt_or_ge m n with hm | hm
     · rw [hs0 _ (by omega)]; exact antitone_of_eq_sup_pow_smul_whole_module T hT' hm.le he
     · obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le hm
-      rw [show n + j + 1 = n + 1 + j by omega, hs1]; exact (u j).2
+      rw [show n + j + 1 = n + 1 + j by omega, hs1]
+      exact (u j).2
   · show (AdicCompletion.mk I N F).val (n + 1) = _
     rw [mk_apply_coe, eval_of, hF, hs0 _ le_rfl]
 
@@ -104,25 +110,38 @@ namespace GlobalTheory.CompanionTheory.GE.CompletionTower
 
 open AdicCompletion
 
-theorem exists_completion_tower : ∀ {B : Type} [CommRing B] [IsNoetherianRing B] (I : Ideal B)
-    {N : Type} [AddCommGroup N] [Module B N] [Module.Finite B N] (T : ℕ → Submodule B N),
-    (∀ n, I ^ (n + 1) • (⊤ : Submodule B N) ≤ T n) →
-    (∀ n, T n = T (n + 1) ⊔ I ^ (n + 1) • (⊤ : Submodule B N)) →
-    ∃ (R : Type) (_ : CommRing R) (_ : IsNoetherianRing R) (_ : Algebra B R) (M : Type)
-      (_ : AddCommGroup M) (_ : Module R M) (_ : Module B M) (_ : IsScalarTower B R M)
-      (_ : Module.Finite R M) (μ : N →ₗ[B] M), I.map (algebraMap B R) ≤ Ideal.jacobson ⊥ ∧
-      Submodule.span R (Set.range μ) = ⊤ ∧
-      ∀ n e, e ∈ T n ↔ μ e ∈ (I ^ (n + 1) • ⊤ : Submodule B M) := by
+theorem exists_completion_tower
+    : ∀ {B : Type} [CommRing B] [IsNoetherianRing B] (I : Ideal B) {N : Type} [AddCommGroup N]
+        [Module B N] [Module.Finite B N] (T : ℕ → Submodule B N),
+      (∀ n, I ^ (n + 1) • (⊤ : Submodule B N) ≤ T n)
+        → (∀ n, T n = T (n + 1) ⊔ I ^ (n + 1) • (⊤ : Submodule B N))
+        → ∃ (R : Type) (_ : CommRing R) (_ : IsNoetherianRing R) (_ : Algebra B R) (M : Type)
+            (_ : AddCommGroup M) (_ : Module R M) (_ : Module B M) (_ : IsScalarTower B R M)
+            (_ : Module.Finite R M) (μ : N →ₗ[B] M),
+          I.map (algebraMap B R) ≤ Ideal.jacobson ⊥ ∧ Submodule.span R (Set.range μ) = ⊤
+            ∧ ∀ n e, e ∈ T n ↔ μ e ∈ (I ^ (n + 1) • ⊤ : Submodule B M) := by
   intro B _ _ I N _ _ _ T hT hT'
   haveI := finite_adicCompletion I (N := N)
   haveI := AdicCompletion.isAdicComplete_self I I.fg_of_isNoetherianRing
   let L : Submodule (AdicCompletion I B) (AdicCompletion I N) := ⨅ m, Tb T hT m
   let μ : N →ₗ[B] AdicCompletion I N ⧸ L := (L.mkQ.restrictScalars B) ∘ₗ of I N
-  refine ⟨AdicCompletion I B, inferInstance, GlobalTheory.AdicNoeth.isNoetherianRing_adicCompletion B I,
-    inferInstance, AdicCompletion I N ⧸ L, inferInstance, inferInstance, inferInstance,
-    inferInstance, inferInstance, μ, IsAdicComplete.le_jacobson_bot _, ?_, ?_⟩
-  · have : Set.range μ = L.mkQ '' Set.range (of I N) := by
-      ext y; simp [μ]
+  refine ⟨
+    AdicCompletion I B,
+    inferInstance,
+    GlobalTheory.AdicNoeth.isNoetherianRing_adicCompletion B I,
+    inferInstance,
+    AdicCompletion I N ⧸ L,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    μ,
+    IsAdicComplete.le_jacobson_bot _,
+    ?_,
+    ?_
+  ⟩
+  · have : Set.range μ = L.mkQ '' Set.range (of I N) := by ext y; simp [μ]
     rw [this, ← Submodule.map_span, span_range_of, Submodule.map_top, Submodule.range_mkQ]
   · intro n e
     constructor
@@ -139,8 +158,9 @@ theorem exists_completion_tower : ∀ {B : Type} [CommRing B] [IsNoetherianRing 
       rw [hμ]
       exact Submodule.smul_mono le_rfl le_top h2
     · intro hμ
-      have key : (I ^ (n + 1) • ⊤ : Submodule B (AdicCompletion I N ⧸ L)) ≤
-          (LinearMap.ker (toQuot T hT n)).map (L.mkQ.restrictScalars B) := by
+      have key
+          : (I ^ (n + 1) • ⊤ : Submodule B (AdicCompletion I N ⧸ L))
+            ≤ (LinearMap.ker (toQuot T hT n)).map (L.mkQ.restrictScalars B) := by
         rw [Submodule.smul_le]
         intro i hi m _
         obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective L m
@@ -154,7 +174,8 @@ theorem exists_completion_tower : ∀ {B : Type} [CommRing B] [IsNoetherianRing 
       have hd : x - of I N e ∈ L := (Submodule.Quotient.eq L).1 hxe
       have hd' := (Submodule.mem_iInf _).1 hd n
       rw [mem_Tb, map_sub, LinearMap.mem_ker.1 hx, zero_sub, neg_eq_zero, toQuot_of,
-        Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at hd'
+          Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+        at hd'
       exact hd'
 
 end GlobalTheory.CompanionTheory.GE.CompletionTower

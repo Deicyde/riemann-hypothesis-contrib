@@ -10,11 +10,12 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 open UpperTheory.ConvolutionTheory.RankTwoDescent
 
-theorem UpperTheory.ConvolutionTheory.RankTwoDescent.cenEx_of :
-    CenEx := by
+theorem UpperTheory.ConvolutionTheory.RankTwoDescent.cenEx_of : CenEx := by
   intro E _ _ _ hE P hP
   obtain ⟨ω, hω⟩ := GlobalTheory.CuspRep.Central.exists_hasCentChar (GlobalTheory.CuspRep.CG.mk P)
-  obtain ⟨χ, hχ⟩ := UpperTheory.ConvolutionTheory.RankTwoDescent.A.normChar_of_inv hE ω (UpperTheory.centralChar_galois_invariant_of_conjInv E P ω hω hP)
+  obtain ⟨χ, hχ⟩ :=
+    UpperTheory.ConvolutionTheory.RankTwoDescent.A.normChar_of_inv hE ω
+      (UpperTheory.centralChar_galois_invariant_of_conjInv E P ω hω hP)
   refine ⟨χ, fun f hf z g => ?_⟩
   have h1 := (GlobalTheory.CuspRep.CuspSub.hasCentral_iff (π := P) (ω := ω)).2 hω z f hf
   have h2 := congrFun (congrArg Subtype.val h1) g

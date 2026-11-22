@@ -8,30 +8,42 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GenWeil
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-def preDualBasis {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module Ω V] [FiniteDimensional Ω V] {r : ℕ}
-    (B : Module.Basis (Fin r) Ω (Module.Dual Ω V)) : Module.Basis (Fin r) Ω V :=
+def preDualBasis
+    {Ω : Type} [Field Ω]
+    {V : Type} [AddCommGroup V] [Module Ω V] [FiniteDimensional Ω V]
+    {r : ℕ} (B : Module.Basis (Fin r) Ω (Module.Dual Ω V))
+    : Module.Basis (Fin r) Ω V :=
   B.dualBasis.map (Module.evalEquiv Ω V).symm
 
-theorem apply_preDualBasis {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module Ω V] [FiniteDimensional Ω V]
-    {r : ℕ} (B : Module.Basis (Fin r) Ω (Module.Dual Ω V)) (i j : Fin r) :
-    B i (preDualBasis B j) = if i = j then 1 else 0 := by
-  have h : ∀ x : Module.Dual Ω (Module.Dual Ω V), B i ((Module.evalEquiv Ω V).symm x) = x (B i) := by
+theorem apply_preDualBasis
+    {Ω : Type} [Field Ω]
+    {V : Type} [AddCommGroup V] [Module Ω V] [FiniteDimensional Ω V]
+    {r : ℕ} (B : Module.Basis (Fin r) Ω (Module.Dual Ω V)) (i j : Fin r)
+    : B i (preDualBasis B j) = if i = j then 1 else 0 := by
+  have h
+      : ∀ x : Module.Dual Ω (Module.Dual Ω V), B i ((Module.evalEquiv Ω V).symm x) = x (B i) := by
     intro x
     obtain ⟨y, rfl⟩ := (Module.evalEquiv Ω V).surjective x
     rw [LinearEquiv.symm_apply_apply]
     rfl
   rw [preDualBasis, Module.Basis.map_apply, h, Module.Basis.dualBasis_apply_self]
 
-theorem sum_apply_smul_preDualBasis {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module Ω V]
-    [FiniteDimensional Ω V] {r : ℕ} (B : Module.Basis (Fin r) Ω (Module.Dual Ω V)) (v : V) :
-    ∑ i, B i v • preDualBasis B i = v := by
+theorem sum_apply_smul_preDualBasis
+    {Ω : Type} [Field Ω]
+    {V : Type} [AddCommGroup V] [Module Ω V] [FiniteDimensional Ω V]
+    {r : ℕ} (B : Module.Basis (Fin r) Ω (Module.Dual Ω V))
+    (v : V)
+    : ∑ i, B i v • preDualBasis B i = v := by
   have hc : ∀ i, (preDualBasis B).coord i = B i := by
     intro i
     refine (preDualBasis B).ext (fun j => ?_)
@@ -44,11 +56,13 @@ theorem sum_apply_smul_preDualBasis {Ω : Type} [Field Ω] {V : Type} [AddCommGr
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [← Module.Basis.coord_apply, hc]
 
-theorem Lat.predualIn_isFrameAt {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {Li : Type} [AddCommGroup Li]
-    [Module Ω Li] {L : Lat ξ (Module.Dual Ω Li)} {V : Submodule Ω Li} [FiniteDimensional Ω V] {r : ℕ}
-    (B : Module.Basis (Fin r) Ω (Module.Dual Ω V)) {q : Cpt ξ}
-    (h : (L.map V.dualRestrict) q = Submodule.span (regAt ξ q) (Set.range B)) :
-    (L.predualIn V).IsFrameAt (fun j => (preDualBasis B j : Li)) q := by
+theorem Lat.predualIn_isFrameAt
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {Li : Type} [AddCommGroup Li] [Module Ω Li]
+    {L : Lat ξ (Module.Dual Ω Li)} {V : Submodule Ω Li} [FiniteDimensional Ω V]
+    {r : ℕ} (B : Module.Basis (Fin r) Ω (Module.Dual Ω V))
+    {q : Cpt ξ} (h : (L.map V.dualRestrict) q = Submodule.span (regAt ξ q) (Set.range B))
+    : (L.predualIn V).IsFrameAt (fun j => (preDualBasis B j : Li)) q := by
   have hB : ∀ i, ∃ w ∈ L q, V.dualRestrict w = B i := by
     intro i
     have hi : B i ∈ (L.map V.dualRestrict) q := by
@@ -90,8 +104,10 @@ theorem Lat.predualIn_isFrameAt {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp
       simpa only [Submodule.coe_smul] using hs.symm
     rw [hv']
     refine Submodule.sum_mem _ (fun i _ => ?_)
-    have he : B i ⟨v, hvV⟩ • (preDualBasis B i : Li) =
-        (⟨B i ⟨v, hvV⟩, hcoef i⟩ : regAt ξ q) • (preDualBasis B i : Li) := rfl
+    have he
+        : B i ⟨v, hvV⟩ • (preDualBasis B i : Li)
+          = (⟨B i ⟨v, hvV⟩, hcoef i⟩ : regAt ξ q) • (preDualBasis B i : Li) :=
+      rfl
     rw [he]
     exact Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_range_self i))
   · rw [Submodule.span_le]
@@ -99,18 +115,21 @@ theorem Lat.predualIn_isFrameAt {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp
     show (preDualBasis B j : Li) ∈ V ∧ ∀ w ∈ L q, w (preDualBasis B j : Li) ∈ regAt ξ q
     exact ⟨(preDualBasis B j).2, fun w hwL => hw w hwL j⟩
 
-theorem Lat.predualIn_isVBOn : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (Li : Type) [AddCommGroup Li]
-    [Module Ω Li] (L : Lat ξ (Module.Dual Ω Li)) (T : Set (Cpt ξ)) (r : ℕ) (V : Submodule Ω Li)
-    [FiniteDimensional Ω V],
-    (L.map V.dualRestrict).IsVBOn T r ⊤ → (L.predualIn V).IsVBOn T r V := by
+theorem Lat.predualIn_isVBOn
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (Li : Type) [AddCommGroup Li]
+        [Module Ω Li] (L : Lat ξ (Module.Dual Ω Li)) (T : Set (Cpt ξ)) (r : ℕ) (V : Submodule Ω Li)
+        [FiniteDimensional Ω V],
+      (L.map V.dualRestrict).IsVBOn T r ⊤ → (L.predualIn V).IsVBOn T r V := by
   intro X Ω _ ξ Li _ _ L T r V _ hL p hp
   obtain ⟨U, hpU, b, hbspan, hfr⟩ := hL p hp
   have hli : LinearIndependent Ω b := (hfr p hp hpU).1
   refine ⟨U, hpU, fun j => (preDualBasis (Module.Basis.mk hli hbspan.ge) j : Li), ?_, ?_⟩
-  · have he : (fun j => (preDualBasis (Module.Basis.mk hli hbspan.ge) j : Li)) =
-        V.subtype ∘ preDualBasis (Module.Basis.mk hli hbspan.ge) := rfl
-    rw [he, Set.range_comp, Submodule.span_image, (preDualBasis (Module.Basis.mk hli hbspan.ge)).span_eq,
-      Submodule.map_subtype_top]
+  · have he
+        : (fun j => (preDualBasis (Module.Basis.mk hli hbspan.ge) j : Li))
+          = V.subtype ∘ preDualBasis (Module.Basis.mk hli hbspan.ge) :=
+      rfl
+    rw [he, Set.range_comp, Submodule.span_image,
+      (preDualBasis (Module.Basis.mk hli hbspan.ge)).span_eq, Submodule.map_subtype_top]
   · intro q hq hqU
     apply Lat.predualIn_isFrameAt (Module.Basis.mk hli hbspan.ge)
     rw [(hfr q hq hqU).2, Module.Basis.coe_mk]

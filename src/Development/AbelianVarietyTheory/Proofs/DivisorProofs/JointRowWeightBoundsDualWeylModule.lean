@@ -9,7 +9,12 @@ public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.BideterminantDo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.ExpTie GlobalTheory.ExpFrame Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.LogSmallConstantBounds Formalism.CohomologicalDescent.ShortWeightBounds Formalism.CohomologicalDescent.LD Formalism.RankGapBounds.FormsTensorLocalization
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.ExpTie GlobalTheory.ExpFrame
+  Formalism.CohomologicalDescent.DepthNonnegative
+  Formalism.CohomologicalDescent.LogSmallConstantBounds
+  Formalism.CohomologicalDescent.ShortWeightBounds Formalism.CohomologicalDescent.LD
+  Formalism.RankGapBounds.FormsTensorLocalization
 
 set_option autoImplicit false
 
@@ -17,10 +22,12 @@ open MvPolynomial Formalism.GradedWeylDivisibility
 
 namespace GlobalTheory.HighWt
 
-theorem dualWeyl_rowDeg_dominance (O : Type) [CommRing O] [IsDomain O] (N : ℕ) (ν : Fin N → ℕ)
-    (f : MvPolynomial (Fin N × Fin N) O) (hf : f ∈ dualWeyl O N N ν) : ∀ m ∈ f.support,
-      (∀ k : ℕ, (∑ a : Fin N with a.val < k, rowDeg m a) ≤ ∑ t : Fin N with t.val < k, ν t) ∧
-      ∑ a : Fin N, rowDeg m a = ∑ t : Fin N, ν t := by
+theorem dualWeyl_rowDeg_dominance
+    (O : Type) [CommRing O] [IsDomain O]
+    (N : ℕ) (ν : Fin N → ℕ) (f : MvPolynomial (Fin N × Fin N) O) (hf : f ∈ dualWeyl O N N ν)
+    : ∀ m ∈ f.support,
+      (∀ k : ℕ, (∑ a : Fin N with a.val < k, rowDeg m a) ≤ ∑ t : Fin N with t.val < k, ν t)
+        ∧ ∑ a : Fin N, rowDeg m a = ∑ t : Fin N, ν t := by
   classical
   rw [standardMonomialSpanDomain O N N ν] at hf
   induction hf using Submodule.span_induction with
@@ -42,21 +49,25 @@ theorem dualWeyl_rowDeg_dominance (O : Type) [CommRing O] [IsDomain O] (N : ℕ)
     intro m hm
     exact hx m (support_smul hm)
 
-theorem rename_rowPerm_mem (O : Type) [CommRing O] (N : ℕ) (ν : Fin N → ℕ) (σ : Equiv.Perm (Fin N))
-    (f : MvPolynomial (Fin N × Fin N) O) (hf : f ∈ dualWeyl O N N ν) :
-    rename (fun v : Fin N × Fin N => (σ v.1, v.2)) f ∈ dualWeyl O N N ν := by
+theorem rename_rowPerm_mem
+    (O : Type) [CommRing O]
+    (N : ℕ) (ν : Fin N → ℕ) (σ : Equiv.Perm (Fin N)) (f : MvPolynomial (Fin N × Fin N) O)
+    (hf : f ∈ dualWeyl O N N ν)
+    : rename (fun v : Fin N × Fin N => (σ v.1, v.2)) f ∈ dualWeyl O N N ν := by
   classical
-  have h : (rename (fun v : Fin N × Fin N => (σ v.1, v.2)) : MvPolynomial (Fin N × Fin N) O →ₐ[O] _) =
-      rowAct O (Matrix.of fun a b : Fin N => if σ a = b then (1 : O) else 0) := by
+  have h
+      : (rename (fun v : Fin N × Fin N => (σ v.1, v.2)) : MvPolynomial (Fin N × Fin N) O →ₐ[O] _)
+        = rowAct O (Matrix.of fun a b : Fin N => if σ a = b then (1 : O) else 0) := by
     apply MvPolynomial.algHom_ext
     intro v
     simp [rowAct]
   rw [h]
   exact dualWeylRowStable O N N ν _ f hf
 
-theorem weight_rowW_eq_rowDeg {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (a : Fin N) :
-    Finsupp.weight (rowW N N) m a = rowDeg m a := by
-  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply, Fintype.sum_prod_type]
+theorem weight_rowW_eq_rowDeg {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (a : Fin N)
+    : Finsupp.weight (rowW N N) m a = rowDeg m a := by
+  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply,
+    Fintype.sum_prod_type]
   rw [Finset.sum_eq_single a]
   · simp [rowW, rowDeg]
   · intro b _ hb
@@ -69,14 +80,15 @@ namespace GlobalTheory.HighWt
 
 open MvPolynomial Formalism.GradedWeylDivisibility
 
-theorem sum_fin_lt_one {N : ℕ} (h : 0 < N) (g : Fin N → ℕ) : ∑ b : Fin N with b.val < 1, g b = g ⟨0, h⟩ := by
+theorem sum_fin_lt_one {N : ℕ} (h : 0 < N) (g : Fin N → ℕ)
+    : ∑ b : Fin N with b.val < 1, g b = g ⟨0, h⟩ := by
   rw [Finset.sum_eq_single_of_mem (⟨0, h⟩ : Fin N) (by simp)]
   intro b hb hne
   simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hb
   exact absurd (Fin.ext (by simp; omega)) hne
 
-theorem sum_fin_split_last {N : ℕ} (h : 0 < N) (g : Fin N → ℕ) :
-    ∑ b : Fin N, g b = ∑ b : Fin N with b.val < N - 1, g b + g ⟨N - 1, by omega⟩ := by
+theorem sum_fin_split_last {N : ℕ} (h : 0 < N) (g : Fin N → ℕ)
+    : ∑ b : Fin N, g b = ∑ b : Fin N with b.val < N - 1, g b + g ⟨N - 1, by omega⟩ := by
   rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (fun b : Fin N => b.val < N - 1)]
   congr 1
   rw [Finset.sum_eq_single_of_mem (⟨N - 1, by omega⟩ : Fin N) (by simp; omega)]
@@ -84,17 +96,24 @@ theorem sum_fin_split_last {N : ℕ} (h : 0 < N) (g : Fin N → ℕ) :
   simp only [Finset.mem_filter, Finset.mem_univ, true_and, not_lt] at hb
   exact absurd (Fin.ext (by simp; omega)) hne
 
-theorem jointWt_bounds : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (N : ℕ) (ι : Type) [Fintype ι]
-    [DecidableEq ι] (lam : ι → ℕ → ℕ), (∀ τ, Antitone (res N (lam τ))) → ∀ (Gm : Type) [AddCommGroup Gm] [Module (alg O N lam) Gm]
-    (w : ι → Fin N → ℕ), GlobalTheory.HighWt.JointWt O N lam Gm w → ∀ τ, ∑ a : Fin N, w τ a = ∑ a : Fin N, lam τ a ∧
-      ∀ a : Fin N, lam τ (N - 1) ≤ w τ a ∧ w τ a ≤ lam τ 0 := by
+theorem jointWt_bounds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (N : ℕ)
+        (ι : Type) [Fintype ι] [DecidableEq ι] (lam : ι → ℕ → ℕ),
+      (∀ τ, Antitone (res N (lam τ)))
+        → ∀ (Gm : Type) [AddCommGroup Gm] [Module (alg O N lam) Gm] (w : ι → Fin N → ℕ),
+          GlobalTheory.HighWt.JointWt O N lam Gm w
+            → ∀ τ,
+              ∑ a : Fin N, w τ a = ∑ a : Fin N, lam τ a
+                ∧ ∀ a : Fin N, lam τ (N - 1) ≤ w τ a ∧ w τ a ≤ lam τ 0 := by
   intro O _ _ _ _ N ι _ _ lam _ Gm _ _ w hw τ
   classical
   obtain ⟨z, hz0, hz⟩ := hw
   obtain ⟨a0, ha0, -⟩ := GlobalTheory.ExpFrame.exists_unique_isProj O N ι lam τ (w τ)
   have hmem : a0 ∈ alg O N lam := Algebra.subset_adjoin (Or.inr ⟨τ, w τ, ha0⟩)
-  have hex : ∃ x : ∀ τ, dualWeyl O N N (res N (lam τ)),
-      weightedHomogeneousComponent (rowW N N) (w τ) (x τ : MvPolynomial (Fin N × Fin N) O) ≠ 0 := by
+  have hex
+      : ∃ x : ∀ τ, dualWeyl O N N (res N (lam τ)),
+        weightedHomogeneousComponent (rowW N N) (w τ) (x τ : MvPolynomial (Fin N × Fin N) O)
+          ≠ 0 := by
     by_contra hne
     push_neg at hne
     have ha0z : a0 = 0 := by
@@ -111,13 +130,17 @@ theorem jointWt_bounds : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteVal
   obtain ⟨x, hx⟩ := hex
   set f := weightedHomogeneousComponent (rowW N N) (w τ) (x τ : MvPolynomial (Fin N × Fin N) O) with hfdef
   have hfmem : f ∈ dualWeyl O N N (res N (lam τ)) := dualWeylRowGraded O N N _ _ _ (x τ).2
-  have hfhom : IsWeightedHomogeneous (rowW N N) f (w τ) := weightedHomogeneousComponent_isWeightedHomogeneous _ _
+  have hfhom : IsWeightedHomogeneous (rowW N N) f (w τ) :=
+    weightedHomogeneousComponent_isWeightedHomogeneous _ _
   obtain ⟨m, hm⟩ := support_nonempty.2 hx
   have hrd : ∀ a, rowDeg m a = w τ a := fun a => by
     rw [← weight_rowW_eq_rowDeg, hfhom (mem_support_iff.1 hm)]
-  have key : ∀ σ : Equiv.Perm (Fin N),
-      (∀ k : ℕ, (∑ b : Fin N with b.val < k, w τ (σ.symm b)) ≤ ∑ t : Fin N with t.val < k, res N (lam τ) t) ∧
-      ∑ b : Fin N, w τ (σ.symm b) = ∑ t : Fin N, res N (lam τ) t := by
+  have key
+      : ∀ σ : Equiv.Perm (Fin N),
+        (∀ k : ℕ,
+            (∑ b : Fin N with b.val < k, w τ (σ.symm b))
+              ≤ ∑ t : Fin N with t.val < k, res N (lam τ) t)
+          ∧ ∑ b : Fin N, w τ (σ.symm b) = ∑ t : Fin N, res N (lam τ) t := by
     intro σ
     let e : Fin N × Fin N → Fin N × Fin N := fun v => (σ v.1, v.2)
     have he : Function.Injective e := by

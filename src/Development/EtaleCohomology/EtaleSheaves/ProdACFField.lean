@@ -5,7 +5,8 @@ public import Development.EtaleCohomology.EtaleSheaves.BuildCut
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.E.t_E2Cut LateralTheory.E.CoverCut LateralTheory.E.BuildCut
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.E.t_E2Cut
+  LateralTheory.E.CoverCut LateralTheory.E.BuildCut
 
 namespace LateralTheory.E.PtsPf
 
@@ -45,8 +46,9 @@ abbrev WA (R : CommRingCat.{0}) : Type :=
   ∀ p : PrimeSpectrum R, AlgebraicClosure p.asIdeal.ResidueField
 
 def phiA (R : CommRingCat.{0}) : R →+* WA R :=
-  RingHom.pi fun p => (algebraMap p.asIdeal.ResidueField (AlgebraicClosure p.asIdeal.ResidueField)).comp
-    (algebraMap R p.asIdeal.ResidueField)
+  RingHom.pi fun p =>
+    (algebraMap p.asIdeal.ResidueField (AlgebraicClosure p.asIdeal.ResidueField)).comp
+      (algebraMap R p.asIdeal.ResidueField)
 
 lemma surj_phiA (R : CommRingCat.{0}) : Surjective (Spec.map (CommRingCat.ofHom (phiA R))) := by
   refine ⟨fun p' => ?_⟩
@@ -77,8 +79,8 @@ theorem Pts_of : Pts := by
       apply Surjective.sigmaDesc_of_union_range_eq_univ
       have hr : ∀ i, Set.range (g i) = Set.range (𝒰.f i) := fun i => by
         have := surj_phiA (R i)
-        rw [range_eq_range_of_surjective (g i) (𝒰.f i) (Spec.map (CommRingCat.ofHom (phiA (R i))) ≫ (𝒰.X i).isoSpec.inv)
-          (by simp [g, f])]
+        rw [range_eq_range_of_surjective (g i) (𝒰.f i)
+          (Spec.map (CommRingCat.ofHom (phiA (R i))) ≫ (𝒰.X i).isoSpec.inv) (by simp [g, f])]
       simp_rw [hr]
       exact 𝒰.iUnion_range
     infer_instance

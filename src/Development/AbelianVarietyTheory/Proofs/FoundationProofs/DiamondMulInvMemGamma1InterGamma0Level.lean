@@ -9,8 +9,10 @@ open scoped MatrixGroups ModularForm Manifold
 
 namespace GlobalTheory.Hk
 
-theorem dia_mul_inv_mem_lev : ∀ (N l : ℕ) (d : ℤ) (σ τ : SL(2, ℤ)), 0 < N →
-    GlobalTheory.Hk.IsDia N l d σ → GlobalTheory.Hk.IsDia N l d τ → τ * σ⁻¹ ∈ GlobalTheory.Hk.lev N l := by
+theorem dia_mul_inv_mem_lev
+    : ∀ (N l : ℕ) (d : ℤ) (σ τ : SL(2, ℤ)),
+      0 < N → GlobalTheory.Hk.IsDia N l d σ → GlobalTheory.Hk.IsDia N l d τ
+        → τ * σ⁻¹ ∈ GlobalTheory.Hk.lev N l := by
   intro N l d σ τ _ hσ hτ
   obtain ⟨hσc, hσd⟩ := hσ
   obtain ⟨hτc, hτd⟩ := hτ
@@ -19,13 +21,16 @@ theorem dia_mul_inv_mem_lev : ∀ (N l : ℕ) (d : ℤ) (σ τ : SL(2, ℤ)), 0 
   rw [Matrix.det_fin_two] at detσ detτ
   have e00 : ((τ * σ⁻¹) 0 0 : ℤ) = τ 0 0 * σ 1 1 - τ 0 1 * σ 1 0 := by
     simp [Matrix.SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two, Matrix.mul_apply,
-      Fin.sum_univ_two]; ring
+      Fin.sum_univ_two]
+    ring
   have e10 : ((τ * σ⁻¹) 1 0 : ℤ) = τ 1 0 * σ 1 1 - τ 1 1 * σ 1 0 := by
     simp [Matrix.SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two, Matrix.mul_apply,
-      Fin.sum_univ_two]; ring
+      Fin.sum_univ_two]
+    ring
   have e11 : ((τ * σ⁻¹) 1 1 : ℤ) = τ 1 1 * σ 0 0 - τ 1 0 * σ 0 1 := by
     simp [Matrix.SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two, Matrix.mul_apply,
-      Fin.sum_univ_two]; ring
+      Fin.sum_univ_two]
+    ring
   rw [ZMod.intCast_zmod_eq_zero_iff_dvd] at hσc hτc
   push_cast at hσc hτc
   have hNl : (N : ℤ) * l ∣ (τ * σ⁻¹) 1 0 := by
@@ -42,10 +47,12 @@ theorem dia_mul_inv_mem_lev : ∀ (N l : ℕ) (d : ℤ) (σ τ : SL(2, ℤ)), 0 
   refine Subgroup.mem_inf.2 ⟨?_, ?_⟩
   · rw [Gamma1_mem]
     refine ⟨?_, ?_, ?_⟩
-    · rw [e00]; push_cast
+    · rw [e00]
+      push_cast
       linear_combination (τ 0 0 : ZMod N) * hσd - (τ 0 0 : ZMod N) * hτd + dτ
         + (τ 0 1 : ZMod N) * hτN - (τ 0 1 : ZMod N) * hσN
-    · rw [e11]; push_cast
+    · rw [e11]
+      push_cast
       linear_combination (σ 0 0 : ZMod N) * hτd - (σ 0 0 : ZMod N) * hσd + dσ
         + (σ 0 1 : ZMod N) * hσN - (σ 0 1 : ZMod N) * hτN
     · exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).2 (dvd_trans (dvd_mul_right _ _) hNl)

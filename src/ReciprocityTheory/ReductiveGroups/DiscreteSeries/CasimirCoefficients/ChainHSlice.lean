@@ -48,8 +48,8 @@ lemma top_opL (x : ℂ) (a b : Fin n) (F : 𝕄 → E) :
   rw [Matrix.neg_mul, map_neg]
   split_ifs <;> simp
 
-def sσ (u : ℂ) (σ : Equiv.Perm (Fin n)) : Fin n → ℂ × 𝕄 :=
-  fun i => (if σ i = i then u - ((i : ℕ) : ℂ) else 0, -(Matrix.single (σ i) i 1))
+def sσ (u : ℂ) (σ : Equiv.Perm (Fin n)) : Fin n → ℂ × 𝕄 := fun i =>
+  (if σ i = i then u - ((i : ℕ) : ℂ) else 0, -(Matrix.single (σ i) i 1))
 
 lemma qdet_chain (u : ℂ) (F : 𝕄 → E) (z : 𝕄) :
     Formalism.QuantumDeterminants.qdetOp negL u F z = ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : ℂ) • chainL (sσ u σ) F z := by
@@ -191,11 +191,12 @@ end CapPs
 variable {ε : Fin n → Bool} {Λ : Fin n → ℝ}
 
 open CapPs in
-theorem cap_psM (T : KType ε Λ) (μ : Fin n → ℤ) (lam : Fin n → ℝ) (hμ : IsMu lam μ) :
-    ∃ U : Set (Matrix (Fin n) (Fin n) ℂ), IsOpen U ∧ posSet n ⊆ U ∧ DifferentiableOn ℂ (psM T μ) U ∧
-      ∀ (Y : ℂ), ∀ z ∈ U,
-        Formalism.QuantumDeterminants.qdetOp negL (Y + ((n : ℂ) - 1) / 2) (psM T μ) z =
-          Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) Y • psM T μ z := by
+theorem cap_psM (T : KType ε Λ) (μ : Fin n → ℤ) (lam : Fin n → ℝ) (hμ : IsMu lam μ)
+    : ∃ U : Set (Matrix (Fin n) (Fin n) ℂ),
+      IsOpen U ∧ posSet n ⊆ U ∧ DifferentiableOn ℂ (psM T μ) U
+        ∧ ∀ (Y : ℂ), ∀ z ∈ U,
+          Formalism.QuantumDeterminants.qdetOp negL (Y + ((n : ℂ) - 1) / 2) (psM T μ) z
+            = Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) Y • psM T μ z := by
   have := compactSpace_KG ε
   have hK : ∀ k : KG ε, toMK k⁻¹ * toMK k = 1 ∧ toMK k * toMK k⁻¹ = 1 := fun k => by
     rw [Ps1.toMK_inv_eq, ← Matrix.star_eq_conjTranspose]
@@ -205,59 +206,69 @@ theorem cap_psM (T : KType ε Λ) (μ : Fin n → ℤ) (lam : Fin n → ℝ) (h�
     have hg := GPs.smooth_g0_on_Wset μ
     have hop : Continuous (fun k : KG ε => T.op k) := continuous_subtype_val.comp T.cont
     have hPk : Continuous (GPs.Pk T) := (hop.mul continuous_const).mul (hop.comp continuous_inv)
-    have hmem (q : 𝕄 × KG ε) (hq : q ∈ Ps1.Uset ε ×ˢ Set.univ) :
-        GPs.emb q.1 q.2 ∈ GPs.Wset n := GPs.emb_mem hq.1 q.2
-    have hf (k : KG ε) {x : 𝕄} (hx : x ∈ Ps1.Uset ε) :
-        HasFDerivAt (fun y => f y k)
-          (((fderiv ℂ (GPs.g0 μ) (GPs.emb x k)).comp (GPs.I0 n)).smulRight (GPs.Pk T k)) x :=
+    have hmem (q : 𝕄 × KG ε) (hq : q ∈ Ps1.Uset ε ×ˢ Set.univ) : GPs.emb q.1 q.2 ∈ GPs.Wset n :=
+      GPs.emb_mem hq.1 q.2
+    have hf (k : KG ε) {x : 𝕄} (hx : x ∈ Ps1.Uset ε) : HasFDerivAt
+        (fun y => f y k)
+        (((fderiv ℂ (GPs.g0 μ) (GPs.emb x k)).comp (GPs.I0 n)).smulRight (GPs.Pk T k)) x :=
       ((GPs.dAtW hg (GPs.emb_mem hx k)).hasFDerivAt.comp x
         (GPs.hasFDerivAt_slice (toMK k, toMK k⁻¹) x)).smul_const (GPs.Pk T k)
     have hdiff : DifferentiableAt ℂ (fun x => ∫ k, f x k ∂(muK ε)) z := by
       refine (hasFDerivAt_integral_of_continuousOn_fderiv (𝕜 := ℂ) (F := f)
         (Ps1.isOpen_Uset.mem_nhds hz) (k := Set.univ) (s := Set.univ) isCompact_univ
-        MeasurableSet.univ (isCompact_univ.measure_lt_top (μ := muK ε)).ne le_rfl
-        ?_ ?_ ?_).differentiableAt.congr_of_eventuallyEq ?_
+        MeasurableSet.univ (isCompact_univ.measure_lt_top (μ := muK ε)).ne le_rfl ?_ ?_
+        ?_).differentiableAt.congr_of_eventuallyEq ?_
       · exact (hg.continuousOn.comp GPs.continuous_emb.continuousOn hmem).smul
           (hPk.comp continuous_snd).continuousOn
       · exact fun k _ x hx => (hf k hx).differentiableAt.differentiableWithinAt
       · rw [continuousOn_clm_apply]
         intro H
         refine (((hg.continuousOn_fderiv_of_isOpen GPs.isOpen_kappaOpenNeighbourhood (by simp)).comp
-          GPs.continuous_emb.continuousOn hmem).clm_apply (continuousOn_const (c := (H, 0)))).smul
-          (hPk.comp continuous_snd).continuousOn |>.congr ?_
+              GPs.continuous_emb.continuousOn hmem).clm_apply
+            (continuousOn_const (c := (H, 0)))).smul (hPk.comp continuous_snd).continuousOn
+          |>.congr ?_
         intro q hq
-        change fderiv ℂ (fun y => f y q.2) q.1 H =
-          fderiv ℂ (GPs.g0 μ) (GPs.emb q.1 q.2) (H, 0) • GPs.Pk T q.2
+        change fderiv ℂ (fun y => f y q.2) q.1 H
+          = fderiv ℂ (GPs.g0 μ) (GPs.emb q.1 q.2) (H, 0) • GPs.Pk T q.2
         rw [(hf q.2 hq.1).fderiv, ContinuousLinearMap.smulRight_apply,
           ContinuousLinearMap.comp_apply, GPs.zeroEmbedding_apply]
       · exact Filter.Eventually.of_forall fun x => by rw [Measure.restrict_univ]
     exact (hdiff.const_smul (GPs.cK T)).differentiableWithinAt
   set u : ℂ := Y + ((n : ℂ) - 1) / 2 with hu
   set C : ℂ := Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) Y with hC
-  have hint : ∀ k : KG ε, ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : ℂ) •
-      chainH (sσ u σ) (GPs.g0 μ) (GPs.emb z k) = C * GPs.g0 μ (GPs.emb z k) := by
+  have hint
+      : ∀ k : KG ε,
+        ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : ℂ) •
+            chainH (sσ u σ) (GPs.g0 μ) (GPs.emb z k)
+          = C * GPs.g0 μ (GPs.emb z k) := by
     intro k
-    rw [Finset.sum_congr rfl fun σ _ => by rw [chainH_slice _ (GPs.smooth_g0_on_Wset μ) _ (GPs.emb_mem hz k)], ← qdet_chain]
+    rw [Finset.sum_congr rfl fun σ _ => by
+        rw [chainH_slice _ (GPs.smooth_g0_on_Wset μ) _ (GPs.emb_mem hz k)],
+      ← qdet_chain]
     exact cap_conj_phi μ lam hμ Y (toMK k⁻¹) (toMK k) (hK k).1 (hK k).2 (GPs.emb_mem hz k)
-  have hI : ∀ σ : Equiv.Perm (Fin n),
-      Integrable (fun k => chainH (sσ u σ) (GPs.g0 μ) (GPs.emb z k) • GPs.Pk T k) (muK ε) :=
+  have hI
+      : ∀ σ : Equiv.Perm (Fin n),
+        Integrable (fun k => chainH (sσ u σ) (GPs.g0 μ) (GPs.emb z k) • GPs.Pk T k) (muK ε) :=
     fun σ => GPs.int_int T (sm_chainH _ (GPs.smooth_g0_on_Wset μ)) hz
-  rw [GPs.psM_eq, qdet_chain, Finset.sum_congr rfl fun σ _ => by rw [chain_Fint T _ (GPs.smooth_g0_on_Wset μ) z hz]]
-  calc ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : ℂ) • GPs.Fint T (chainH (sσ u σ) (GPs.g0 μ)) z
-      = GPs.cK T • ∫ k, ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : ℂ) •
-          (chainH (sσ u σ) (GPs.g0 μ) (GPs.emb z k) • GPs.Pk T k) ∂(muK ε) := by
-        have e := integral_finsetSum (μ := muK ε) Finset.univ
+  rw [GPs.psM_eq, qdet_chain,
+    Finset.sum_congr rfl fun σ _ => by rw [chain_Fint T _ (GPs.smooth_g0_on_Wset μ) z hz]]
+  calc
+    ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : ℂ) • GPs.Fint T (chainH (sσ u σ) (GPs.g0 μ)) z
+        = GPs.cK T
+          • ∫ k, ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : ℂ) •
+            (chainH (sσ u σ) (GPs.g0 μ) (GPs.emb z k) • GPs.Pk T k) ∂(muK ε) := by
+      have e :=
+        integral_finsetSum (μ := muK ε) Finset.univ
           (fun σ _ => (hI σ).smul (((Equiv.Perm.sign σ : ℤ) : ℂ)))
-        simp only [Pi.smul_apply] at e
-        rw [e, Finset.smul_sum]
-        refine Finset.sum_congr rfl fun σ _ => ?_
-        rw [integral_smul, GPs.Fint, smul_comm]
+      simp only [Pi.smul_apply] at e
+      rw [e, Finset.smul_sum]
+      refine Finset.sum_congr rfl fun σ _ => ?_
+      rw [integral_smul, GPs.Fint, smul_comm]
     _ = GPs.cK T • ∫ k, C • (GPs.g0 μ (GPs.emb z k) • GPs.Pk T k) ∂(muK ε) := by
-        congr 1
-        refine integral_congr_ae (Filter.Eventually.of_forall fun k => ?_)
-        simp only [← smul_assoc, ← Finset.sum_smul]
-        rw [hint k, smul_eq_mul]
-    _ = C • GPs.Fint T (GPs.g0 μ) z := by
-        rw [integral_smul, GPs.Fint, smul_comm]
+      congr 1
+      refine integral_congr_ae (Filter.Eventually.of_forall fun k => ?_)
+      simp only [← smul_assoc, ← Finset.sum_smul]
+      rw [hint k, smul_eq_mul]
+    _ = C • GPs.Fint T (GPs.g0 μ) z := by rw [integral_smul, GPs.Fint, smul_comm]
 
 end ReciprocityTheory.ChartRestriction.DS.S7

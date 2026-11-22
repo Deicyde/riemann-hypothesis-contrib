@@ -28,15 +28,18 @@ namespace ComponentResBridge
 open ReciprocityTheory.ChartRestriction.G.Geo MvPolynomial MeasureTheory ReciprocityTheory.AnForm.M
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Inter (Res logH)
 
-variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
+variable
+  {K : Type} [Fintype K] [DecidableEq K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
   {W : Ideal (MvPolynomial (Σ k, ι k) ℂ)} {e : ℕ}
   (R : Res ι W e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
 
 set_option linter.unusedSectionVars false
 
-theorem isMultiHomogIdeal_of_mem_minimalPrimes {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
-    (hW : W ∈ (P.map (MvPolynomial.map (Int.castRingHom ℂ))).minimalPrimes) :
-    IsMultiHomogIdeal W := by
+theorem isMultiHomogIdeal_of_mem_minimalPrimes
+    {P : Ideal (MRing ι)} (hP : IsArithVar P (e + 1))
+    (hW : W ∈ (P.map (MvPolynomial.map (Int.castRingHom ℂ))).minimalPrimes)
+    : IsMultiHomogIdeal W := by
   have hPCh : IsMultiHomogIdeal (P.map (MvPolynomial.map (Int.castRingHom ℂ))) := by
     obtain ⟨T, hT, hPT⟩ := hP.2.1.2.1
     refine ⟨MvPolynomial.map (Int.castRingHom ℂ) '' T, ?_, by rw [hPT, Ideal.map_span]⟩
@@ -49,6 +52,7 @@ theorem isMultiHomogIdeal_of_mem_minimalPrimes {P : Ideal (MRing ι)} (hP : IsAr
 
 end ComponentResBridge
 
-open ReciprocityTheory.ChartRestriction.G.Geo MvPolynomial MeasureTheory ReciprocityTheory.AnForm.M ComponentResBridge
+open ReciprocityTheory.ChartRestriction.G.Geo MvPolynomial MeasureTheory ReciprocityTheory.AnForm.M
+  ComponentResBridge
 
 end GroundTheory.Heights₂.Heights.HilbertSamuel

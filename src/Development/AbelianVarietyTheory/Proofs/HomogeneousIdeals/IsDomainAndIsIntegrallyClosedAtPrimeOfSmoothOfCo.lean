@@ -10,19 +10,22 @@ universe u
 
 namespace GlobalTheory
 
-theorem isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization {B : Type*} [CommRing B]
+theorem isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization
+    {B : Type*} [CommRing B]
     (M : Submonoid B) (T : Type*) [CommRing T] [Algebra B T] [IsLocalization M T]
-    (p : Ideal B) [hp : p.IsPrime] (hM : Disjoint (M : Set B) (p : Set B))
+    (p : Ideal B) [hp : p.IsPrime]
+    (hM : Disjoint (M : Set B) (p : Set B))
     (h : ∀ (q : Ideal T) [q.IsPrime],
       IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q))
-    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p] :
-    IsDomain Bp ∧ IsIntegrallyClosed Bp := by
+    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p]
+    : IsDomain Bp ∧ IsIntegrallyClosed Bp := by
   have hq : (p.map (algebraMap B T)).IsPrime :=
     IsLocalization.isPrime_of_isPrime_disjoint M T p hp hM
   have hc : (p.map (algebraMap B T)).comap (algebraMap B T) = p :=
     IsLocalization.under_map_of_isPrime_disjoint M T hp hM
-  have h1 := IsLocalization.isLocalization_isLocalization_atPrime_isLocalization M
-    (Localization.AtPrime (p.map (algebraMap B T))) (p.map (algebraMap B T))
+  have h1 :=
+    IsLocalization.isLocalization_isLocalization_atPrime_isLocalization M
+      (Localization.AtPrime (p.map (algebraMap B T))) (p.map (algebraMap B T))
   have h2 : IsLocalization p.primeCompl (Localization.AtPrime (p.map (algebraMap B T))) := by
     convert h1 using 1
     ext x
@@ -32,24 +35,29 @@ theorem isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization {B : Type*} [C
     IsLocalization.algEquiv p.primeCompl _ _
   exact ⟨e.symm.injective.isDomain _, IsIntegrallyClosed.of_equiv e.toRingEquiv⟩
 
-theorem isDomain_and_isIntegrallyClosed_atPrime_of_isDomain {B : Type*} [CommRing B] [IsDomain B]
-    [IsIntegrallyClosed B] (p : Ideal B) [hp : p.IsPrime]
-    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p] :
-    IsDomain Bp ∧ IsIntegrallyClosed Bp :=
-  ⟨IsLocalization.isDomain_of_le_nonZeroDivisors Bp p.primeCompl_le_nonZeroDivisors,
-    isIntegrallyClosed_of_isLocalization Bp p.primeCompl p.primeCompl_le_nonZeroDivisors⟩
+theorem isDomain_and_isIntegrallyClosed_atPrime_of_isDomain
+    {B : Type*} [CommRing B] [IsDomain B] [IsIntegrallyClosed B]
+    (p : Ideal B) [hp : p.IsPrime]
+    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p]
+    : IsDomain Bp ∧ IsIntegrallyClosed Bp := ⟨
+  IsLocalization.isDomain_of_le_nonZeroDivisors Bp p.primeCompl_le_nonZeroDivisors,
+  isIntegrallyClosed_of_isLocalization Bp p.primeCompl p.primeCompl_le_nonZeroDivisors
+⟩
 
-theorem isDomain_and_isIntegrallyClosed_atPrime_of_isIntegrallyClosedIn_pi {B : Type*} [CommRing B]
-    {ι : Type*} [Finite ι] (K : ι → Type*) [∀ i, Field (K i)] [Algebra B (Π i, K i)]
-    [hB : IsIntegrallyClosedIn B (Π i, K i)] (p : Ideal B) [hp : p.IsPrime]
-    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p] :
-    IsDomain Bp ∧ IsIntegrallyClosed Bp := by
+theorem isDomain_and_isIntegrallyClosed_atPrime_of_isIntegrallyClosedIn_pi
+    {B : Type*} [CommRing B]
+    {ι : Type*} [Finite ι]
+    (K : ι → Type*)
+    [∀ i, Field (K i)] [Algebra B (Π i, K i)] [hB : IsIntegrallyClosedIn B (Π i, K i)]
+    (p : Ideal B) [hp : p.IsPrime]
+    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p]
+    : IsDomain Bp ∧ IsIntegrallyClosed Bp := by
   classical
   have := Fintype.ofFinite ι
   have hinj : Function.Injective (algebraMap B (Π i, K i)) := (isIntegrallyClosedIn_iff.mp hB).1
   let φ (i : ι) : B →+* K i := (Pi.evalRingHom K i).comp (algebraMap B (Π i, K i))
-  have key (i : ι) (x : K i) (hx : (φ i).IsIntegralElem x) :
-      ∃ b : B, algebraMap B (Π i, K i) b = Pi.single i x := by
+  have key (i : ι) (x : K i) (hx : (φ i).IsIntegralElem x)
+      : ∃ b : B, algebraMap B (Π i, K i) b = Pi.single i x := by
     apply IsIntegrallyClosedIn.algebraMap_eq_of_integral
     obtain ⟨f, hf, hfx⟩ := hx
     refine ⟨Polynomial.X * f, Polynomial.monic_X.mul hf, ?_⟩
@@ -58,8 +66,8 @@ theorem isDomain_and_isIntegrallyClosed_atPrime_of_isIntegrallyClosedIn_pi {B : 
     by_cases hj : j = i
     · subst hj
       have : (Polynomial.eval₂ (algebraMap B (Π i, K i)) (Pi.single j x) f) j = 0 := by
-        have := Polynomial.hom_eval₂ f (algebraMap B (Π i, K i)) (Pi.evalRingHom K j)
-          (Pi.single j x)
+        have :=
+          Polynomial.hom_eval₂ f (algebraMap B (Π i, K i)) (Pi.evalRingHom K j) (Pi.single j x)
         simpa [φ] using this.trans (by simpa [φ] using hfx)
       simp [this]
     · simp [hj]
@@ -95,17 +103,19 @@ theorem isDomain_and_isIntegrallyClosed_atPrime_of_isIntegrallyClosedIn_pi {B : 
     exact ⟨b, by simp [φ, hb]⟩
   have : IsIntegrallyClosed D := IsIntegrallyClosed.of_isIntegrallyClosedIn D (K i)
   refine isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization (.powers (e i)) D p ?_
-    (fun q _ ↦ isDomain_and_isIntegrallyClosed_atPrime_of_isDomain q _) Bp
+    (fun q _ ↦ isDomain_and_isIntegrallyClosed_atPrime_of_isDomain q _)
+    Bp
   rwa [Ideal.disjoint_powers_iff_notMem_of_isPrime]
 
-theorem isIntegrallyClosedIn_tensor_of_smooth {A B L : Type*} [CommRing A] [CommRing B]
-    [CommRing L] [Algebra A B] [Algebra A L] [Algebra.Smooth A B] [hL : IsIntegrallyClosedIn A L] :
-    IsIntegrallyClosedIn B (B ⊗[A] L) := by
+theorem isIntegrallyClosedIn_tensor_of_smooth
+    {A B L : Type*} [CommRing A] [CommRing B] [CommRing L] [Algebra A B] [Algebra A L]
+    [Algebra.Smooth A B] [hL : IsIntegrallyClosedIn A L]
+    : IsIntegrallyClosedIn B (B ⊗[A] L) := by
   obtain ⟨hinj, hcl⟩ := isIntegrallyClosedIn_iff.mp hL
   refine isIntegrallyClosedIn_iff.mpr ⟨?_, fun {x} hx ↦ ?_⟩
   · exact Algebra.TensorProduct.includeLeft_injective (S := A) hinj
-  · obtain ⟨y, hy⟩ := (TensorProduct.toIntegralClosure_bijective_of_smooth
-      (R := A) (S := B) (B := L)).2 ⟨x, hx⟩
+  · obtain ⟨y, hy⟩ :=
+      (TensorProduct.toIntegralClosure_bijective_of_smooth (R := A) (S := B) (B := L)).2 ⟨x, hx⟩
     have hy' : Algebra.TensorProduct.map (.id B B) (integralClosure A L).val y = x :=
       congrArg Subtype.val hy
     subst hy'
@@ -122,17 +132,20 @@ theorem isIntegrallyClosedIn_tensor_of_smooth {A B L : Type*} [CommRing A] [Comm
         Subalgebra.coe_val, ← ha, Algebra.algebraMap_eq_smul_one a, ← TensorProduct.smul_tmul]
       rfl
 
-theorem isIntegrallyClosed_mvPolynomial_fin (A : Type*) [CommRing A] [IsDomain A]
-    [IsIntegrallyClosed A] (n : ℕ) : IsIntegrallyClosed (MvPolynomial (Fin n) A) := by
+theorem isIntegrallyClosed_mvPolynomial_fin
+    (A : Type*) [CommRing A] [IsDomain A] [IsIntegrallyClosed A] (n : ℕ)
+    : IsIntegrallyClosed (MvPolynomial (Fin n) A) := by
   induction n with
   | zero => exact IsIntegrallyClosed.of_equiv (MvPolynomial.isEmptyRingEquiv A (Fin 0)).symm
   | succ n ih => exact IsIntegrallyClosed.of_equiv (MvPolynomial.finSuccEquiv A n).symm.toRingEquiv
 
-theorem isDomain_and_isIntegrallyClosed_atPrime_of_etale (A : Type*) {B : Type*} [CommRing A]
-    [CommRing B] [IsDomain A] [IsIntegrallyClosed A] [Algebra A B] [Algebra.Etale A B]
+theorem isDomain_and_isIntegrallyClosed_atPrime_of_etale
+    (A : Type*)
+    {B : Type*}
+    [CommRing A] [CommRing B] [IsDomain A] [IsIntegrallyClosed A] [Algebra A B] [Algebra.Etale A B]
     (p : Ideal B) [hp : p.IsPrime]
-    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p] :
-    IsDomain Bp ∧ IsIntegrallyClosed Bp := by
+    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p]
+    : IsDomain Bp ∧ IsIntegrallyClosed Bp := by
   let L := FractionRing A
   have h1 : IsIntegrallyClosedIn B (B ⊗[A] L) := isIntegrallyClosedIn_tensor_of_smooth
   have := Algebra.FormallyUnramified.finite_of_free L (L ⊗[A] B)
@@ -145,66 +158,76 @@ theorem isDomain_and_isIntegrallyClosed_atPrime_of_etale (A : Type*) {B : Type*}
     Ideal.Quotient.field m.asIdeal
   have := (((IsArtinianRing.equivPi (B ⊗[A] L)).restrictScalars B).isIntegrallyClosedIn).mp h1
   exact isDomain_and_isIntegrallyClosed_atPrime_of_isIntegrallyClosedIn_pi
-    (fun m : MaximalSpectrum (B ⊗[A] L) ↦ (B ⊗[A] L) ⧸ m.asIdeal) p Bp
+    (fun m : MaximalSpectrum (B ⊗[A] L) ↦ (B ⊗[A] L) ⧸ m.asIdeal)
+    p Bp
 
-theorem isDomain_and_isIntegrallyClosed_atPrime_of_smooth (A : Type*) {B : Type*} [CommRing A]
-    [CommRing B] [IsDomain A] [IsIntegrallyClosed A] [Algebra A B] [Algebra.Smooth A B]
+theorem isDomain_and_isIntegrallyClosed_atPrime_of_smooth
+    (A : Type*)
+    {B : Type*}
+    [CommRing A] [CommRing B] [IsDomain A] [IsIntegrallyClosed A] [Algebra A B] [Algebra.Smooth A B]
     (p : Ideal B) [hp : p.IsPrime]
-    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p] :
-    IsDomain Bp ∧ IsIntegrallyClosed Bp := by
+    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p]
+    : IsDomain Bp ∧ IsIntegrallyClosed Bp := by
   obtain ⟨f, hfm, n, _, _, _⟩ :=
     Algebra.IsSmoothAt.exists_isStandardEtale_mvPolynomial (R := A) (p := p)
   have := isIntegrallyClosed_mvPolynomial_fin A n
-  refine isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization (.powers f)
-    (Localization.Away f) p ?_
-    (fun q _ ↦ isDomain_and_isIntegrallyClosed_atPrime_of_etale (MvPolynomial (Fin n) A) q _) Bp
+  refine isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization (.powers f) (Localization.Away f)
+    p ?_
+    (fun q _ ↦ isDomain_and_isIntegrallyClosed_atPrime_of_etale (MvPolynomial (Fin n) A) q _)
+    Bp
   rwa [Ideal.disjoint_powers_iff_notMem_of_isPrime]
 
-theorem isDomain_and_isIntegrallyClosed_atPrime_of_smooth_of_comap {A B : Type*} [CommRing A]
-    [CommRing B] [Algebra A B] [Algebra.Smooth A B] (p : Ideal B) [hp : p.IsPrime]
-    (Ap : Type*) [CommRing Ap] [Algebra A Ap]
-    [IsLocalization.AtPrime Ap (p.comap (algebraMap A B))] [IsDomain Ap] [IsIntegrallyClosed Ap]
-    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p] :
-    IsDomain Bp ∧ IsIntegrallyClosed Bp := by
+theorem isDomain_and_isIntegrallyClosed_atPrime_of_smooth_of_comap
+    {A B : Type*} [CommRing A] [CommRing B] [Algebra A B] [Algebra.Smooth A B]
+    (p : Ideal B) [hp : p.IsPrime]
+    (Ap : Type*) [CommRing Ap] [Algebra A Ap] [IsLocalization.AtPrime Ap (p.comap (algebraMap A B))]
+    [IsDomain Ap] [IsIntegrallyClosed Ap]
+    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p]
+    : IsDomain Bp ∧ IsIntegrallyClosed Bp := by
   let M := (p.comap (algebraMap A B)).primeCompl
   letI : Algebra B (Ap ⊗[A] B) := Algebra.TensorProduct.rightAlgebra
   have : IsLocalization (Algebra.algebraMapSubmonoid B M) (Ap ⊗[A] B) :=
     IsLocalization.tensorRight _ _
-  refine isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization
-    (Algebra.algebraMapSubmonoid B M) (Ap ⊗[A] B) p ?_
-    (fun q _ ↦ isDomain_and_isIntegrallyClosed_atPrime_of_smooth Ap q _) Bp
+  refine isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization (Algebra.algebraMapSubmonoid B M)
+    (Ap ⊗[A] B) p ?_
+    (fun q _ ↦ isDomain_and_isIntegrallyClosed_atPrime_of_smooth Ap q _)
+    Bp
   rw [Set.disjoint_left]
   rintro _ ⟨a, ha, rfl⟩ h
   exact ha h
 
-theorem isDomain_and_isIntegrallyClosed_atPrime_of_smooth_of_forall (A : Type*) {B : Type*}
-    [CommRing A] [CommRing B] [Algebra A B] [Algebra.Smooth A B]
+theorem isDomain_and_isIntegrallyClosed_atPrime_of_smooth_of_forall
+    (A : Type*)
+    {B : Type*} [CommRing A] [CommRing B] [Algebra A B] [Algebra.Smooth A B]
     (hA : ∀ (q : Ideal A) [q.IsPrime],
       IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q))
     (p : Ideal B) [hp : p.IsPrime]
-    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p] :
-    IsDomain Bp ∧ IsIntegrallyClosed Bp := by
+    (Bp : Type*) [CommRing Bp] [Algebra B Bp] [IsLocalization.AtPrime Bp p]
+    : IsDomain Bp ∧ IsIntegrallyClosed Bp := by
   obtain ⟨_, _⟩ := hA (p.comap (algebraMap A B))
   exact isDomain_and_isIntegrallyClosed_atPrime_of_smooth_of_comap (A := A) p
     (Localization.AtPrime (p.comap (algebraMap A B))) Bp
 
-theorem isIntegrallyClosed_of_smooth (A B : Type*) [CommRing A] [CommRing B] [IsDomain A]
-    [IsIntegrallyClosed A] [Algebra A B] [Algebra.Smooth A B] [IsDomain B] :
-    IsIntegrallyClosed B :=
+theorem isIntegrallyClosed_of_smooth
+    (A B : Type*) [CommRing A] [CommRing B] [IsDomain A] [IsIntegrallyClosed A] [Algebra A B]
+    [Algebra.Smooth A B] [IsDomain B]
+    : IsIntegrallyClosed B :=
   IsIntegrallyClosed.of_localization_maximal fun p _ _ ↦
     (isDomain_and_isIntegrallyClosed_atPrime_of_smooth A p _).2
 
-theorem isReduced_of_smooth_of_isIntegrallyClosed (A B : Type*) [CommRing A] [CommRing B]
-    [IsDomain A] [IsIntegrallyClosed A] [Algebra A B] [Algebra.Smooth A B] : IsReduced B :=
+theorem isReduced_of_smooth_of_isIntegrallyClosed
+    (A B : Type*)
+    [CommRing A] [CommRing B] [IsDomain A] [IsIntegrallyClosed A] [Algebra A B] [Algebra.Smooth A B]
+    : IsReduced B :=
   isReduced_ofLocalizationMaximal B fun p _ ↦
     have := (isDomain_and_isIntegrallyClosed_atPrime_of_smooth A p (Localization.AtPrime p)).1
     inferInstance
 
-
 open AlgebraicGeometry in
-theorem isDomain_and_isIntegrallyClosed_stalk_of_smooth {X Y : Scheme.{u}} (f : X ⟶ Y) [Smooth f]
-    (x : X) [IsDomain (Y.presheaf.stalk (f x))] [IsIntegrallyClosed (Y.presheaf.stalk (f x))] :
-    IsDomain (X.presheaf.stalk x) ∧ IsIntegrallyClosed (X.presheaf.stalk x) := by
+theorem isDomain_and_isIntegrallyClosed_stalk_of_smooth
+    {X Y : Scheme.{u}} (f : X ⟶ Y) [Smooth f]
+    (x : X) [IsDomain (Y.presheaf.stalk (f x))] [IsIntegrallyClosed (Y.presheaf.stalk (f x))]
+    : IsDomain (X.presheaf.stalk x) ∧ IsIntegrallyClosed (X.presheaf.stalk x) := by
   obtain ⟨U, hU, V, hV, hx, e, -⟩ := Smooth.exists_isStandardSmooth f x
   have hs := f.smooth_appLE hU hV e
   algebraize [(f.appLE U V e).hom]
@@ -212,8 +235,9 @@ theorem isDomain_and_isIntegrallyClosed_stalk_of_smooth {X Y : Scheme.{u}} (f : 
   letI := Y.presheaf.algebra_section_stalk (⟨f x, e hx⟩ : U)
   have h1 := hV.isLocalization_stalk ⟨x, hx⟩
   have h2 := hU.isLocalization_stalk ⟨f x, e hx⟩
-  have h3 : (hV.primeIdealOf ⟨x, hx⟩).asIdeal.comap (algebraMap Γ(Y, U) Γ(X, V)) =
-      (hU.primeIdealOf ⟨f x, e hx⟩).asIdeal :=
+  have h3
+      : (hV.primeIdealOf ⟨x, hx⟩).asIdeal.comap (algebraMap Γ(Y, U) Γ(X, V))
+        = (hU.primeIdealOf ⟨f x, e hx⟩).asIdeal :=
     congrArg PrimeSpectrum.asIdeal (IsAffineOpen.comap_primeIdealOf_appLE U hU V hV e hx)
   have h4 : IsLocalization.AtPrime (Y.presheaf.stalk (f x))
       ((hV.primeIdealOf ⟨x, hx⟩).asIdeal.comap (algebraMap Γ(Y, U) Γ(X, V))) := by
@@ -221,12 +245,11 @@ theorem isDomain_and_isIntegrallyClosed_stalk_of_smooth {X Y : Scheme.{u}} (f : 
   exact isDomain_and_isIntegrallyClosed_atPrime_of_smooth_of_comap (A := Γ(Y, U))
     (hV.primeIdealOf ⟨x, hx⟩).asIdeal (Y.presheaf.stalk (f x)) (X.presheaf.stalk x)
 
-
 open AlgebraicGeometry in
-theorem forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth {X Y : Scheme.{u}} (f : X ⟶ Y)
-    [Smooth f]
-    (hY : ∀ y : Y, IsDomain (Y.presheaf.stalk y) ∧ IsIntegrallyClosed (Y.presheaf.stalk y))
-    (x : X) : IsDomain (X.presheaf.stalk x) ∧ IsIntegrallyClosed (X.presheaf.stalk x) :=
+theorem forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth
+    {X Y : Scheme.{u}} (f : X ⟶ Y) [Smooth f]
+    (hY : ∀ y : Y, IsDomain (Y.presheaf.stalk y) ∧ IsIntegrallyClosed (Y.presheaf.stalk y)) (x : X)
+    : IsDomain (X.presheaf.stalk x) ∧ IsIntegrallyClosed (X.presheaf.stalk x) :=
   have := (hY (f x)).1
   have := (hY (f x)).2
   isDomain_and_isIntegrallyClosed_stalk_of_smooth f x

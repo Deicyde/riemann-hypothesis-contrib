@@ -33,8 +33,13 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.MiTop GlobalTheory.Fam GlobalTheory.Mem.Col2 ValuativeRel IsLocalRing
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS
+  GlobalTheory.MiTop GlobalTheory.Fam GlobalTheory.Mem.Col2 ValuativeRel IsLocalRing
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -42,12 +47,18 @@ noncomputable section
 
 namespace GlobalTheory.FamTrace.LastRow
 
-theorem row_lt_of_smul_pair_eq {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {n : ℕ} (Q : GlobalTheory.LatPair.Pair k (Fin n)) (b b' M : Matrix (Fin n) (Fin n) k) (hb : b * b' = 1) (c : k) (r₀ : Fin n)
-    (hQ : ∀ (x : Fin n → k) (a : 𝓀[k]), Q.HasVal x a ↔ ∃ y : Fin n → 𝒪[k], (∀ r, (y r : k) = (b *ᵥ x) r) ∧
-      ∃ s : 𝒪[k], (s : k) = c ∧ a = residue 𝒪[k] (s * y r₀))
-    (g : GL (Fin n) k) (hg : M = b * g.val * b') (hfix : g • Q = Q) (s : Fin n) :
-    valuation k (M r₀ s - (1 : Matrix (Fin n) (Fin n) k) r₀ s) < 1 := by
+theorem row_lt_of_smul_pair_eq
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : ℕ}
+    (Q : GlobalTheory.LatPair.Pair k (Fin n)) (b b' M : Matrix (Fin n) (Fin n) k) (hb : b * b' = 1)
+    (c : k) (r₀ : Fin n)
+    (hQ : ∀ (x : Fin n → k) (a : 𝓀[k]),
+      Q.HasVal x a
+        ↔ ∃ y : Fin n → 𝒪[k],
+          (∀ r, (y r : k) = (b *ᵥ x) r) ∧ ∃ s : 𝒪[k], (s : k) = c ∧ a = residue 𝒪[k] (s * y r₀))
+    (g : GL (Fin n) k) (hg : M = b * g.val * b') (hfix : g • Q = Q)
+    (s : Fin n)
+    : valuation k (M r₀ s - (1 : Matrix (Fin n) (Fin n) k) r₀ s) < 1 := by
   obtain ⟨x0, hx0⟩ : ∃ x, Q.fn x ≠ 0 := by
     by_contra h
     exact Q.fn_ne (LinearMap.ext fun x => not_not.1 fun hx => h ⟨x, hx⟩)
@@ -77,18 +88,21 @@ theorem row_lt_of_smul_pair_eq {k : Type} [Field k] [ValuativeRel k] [Topologica
   have h3 : residue 𝒪[k] (y1 r₀ - yE r₀) = 0 := by
     rw [map_mul, map_mul] at ha1
     rw [map_sub, mul_left_cancel₀ hu ha1, sub_self]
-  have h4 := Valuation.Integer.not_isUnit_iff_valuation_lt_one.1
-    ((IsLocalRing.mem_maximalIdeal _).1 ((IsLocalRing.residue_eq_zero_iff _).1 h3))
+  have h4 :=
+    Valuation.Integer.not_isUnit_iff_valuation_lt_one.1 ((IsLocalRing.mem_maximalIdeal _).1
+      ((IsLocalRing.residue_eq_zero_iff _).1 h3))
   have h5 : ((y1 r₀ - yE r₀ : 𝒪[k]) : k) = M r₀ s - (1 : Matrix (Fin n) (Fin n) k) r₀ s := by
     rw [AddSubgroupClass.coe_sub, hM, hyE, Pi.single_apply, Matrix.one_apply]
   rw [← h5]
   exact h4
 
-
 set_option maxHeartbeats 1000000 in
-theorem exists_gl {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {p : GlobalTheory.FinPl.SplitPt D k} {V : HSp D} (β : GlobalTheory.FinPl.Frame p V (Fin V.rank)) (κ : GA D V) :
-    ∃ g : GL (Fin V.rank) k, (mt V κ).map p.pr = β.b * g.val * β.b' := by
+theorem exists_gl
+    {D : D7} {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {p : GlobalTheory.FinPl.SplitPt D k} {V : HSp D}
+    (β : GlobalTheory.FinPl.Frame p V (Fin V.rank)) (κ : GA D V)
+    : ∃ g : GL (Fin V.rank) k, (mt V κ).map p.pr = β.b * g.val * β.b' := by
   have hm : ∀ x y : GA D V, x * y = 1 → (mt V x).map p.pr * (mt V y).map p.pr = 1 := by
     intro x y h
     have e : mt V x * mt V y = 1 := by
@@ -96,32 +110,58 @@ theorem exists_gl {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpa
       rw [← Units.val_mul, ← map_mul, h, map_one, Units.val_one]
     rw [← Matrix.map_mul, e]
     exact Matrix.map_one _ (map_zero _) (map_one _)
-  have hc : ∀ A A' : Matrix (Fin V.rank) (Fin V.rank) k, A * A' = 1 → (β.b' * A * β.b) * (β.b' * A' * β.b) = 1 := by
+  have hc
+      : ∀ A A' : Matrix (Fin V.rank) (Fin V.rank) k,
+        A * A' = 1 → (β.b' * A * β.b) * (β.b' * A' * β.b) = 1 := by
     intro A A' h
-    calc (β.b' * A * β.b) * (β.b' * A' * β.b) = β.b' * (A * ((β.b * β.b') * A')) * β.b := by simp only [Matrix.mul_assoc]
+    calc
+      (β.b' * A * β.b) * (β.b' * A' * β.b)
+        = β.b' * (A * ((β.b * β.b') * A')) * β.b := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [β.bb', Matrix.one_mul, h, Matrix.mul_one, β.b'b]
-  refine ⟨⟨β.b' * (mt V κ).map p.pr * β.b, β.b' * (mt V κ⁻¹).map p.pr * β.b, hc _ _ (hm _ _ (mul_inv_cancel κ)),
-    hc _ _ (hm _ _ (inv_mul_cancel κ))⟩, ?_⟩
-  calc (mt V κ).map p.pr = (β.b * β.b') * (mt V κ).map p.pr * (β.b * β.b') := by rw [β.bb', Matrix.one_mul, Matrix.mul_one]
+  refine ⟨
+    ⟨
+      β.b' * (mt V κ).map p.pr * β.b,
+      β.b' * (mt V κ⁻¹).map p.pr * β.b,
+      hc _ _ (hm _ _ (mul_inv_cancel κ)),
+      hc _ _ (hm _ _ (inv_mul_cancel κ))
+    ⟩,
+    ?_
+  ⟩
+  calc
+    (mt V κ).map p.pr = (β.b * β.b') * (mt V κ).map p.pr * (β.b * β.b') := by
+      rw [β.bb', Matrix.one_mul, Matrix.mul_one]
     _ = _ := by simp only [Matrix.mul_assoc]
 
-
 set_option maxHeartbeats 2000000 in
-theorem entry_cong (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (p : GlobalTheory.FinPl.SplitPt D k) (P : HeightOneSpectrum (𝓞 D.host.E)) (hP : Formalism.L2.NTheta.IsIdemAt p.e P) (T : ℕ)
-    (t t' : 𝓞 D.host.E) (h1 : (t' : D.host.E) = star (t : D.host.E)) (h2 : t * t' = (T : 𝓞 D.host.E)) (h3 : IsCoprime t t')
-    (h4 : t ∈ P.asIdeal) (h5 : (T : 𝓞 D.host.F) ∈ p.v.asIdeal) (h6 : (T : 𝓞 D.host.F) ∉ p.v.asIdeal ^ 2)
-    (V : HSp D) {n : ℕ} (hn : V.rank = n) (κ : GA D V) (r s : Fin n)
-    (hi : Formalism.UG.prV (E := D.host.E) p.v (GlobalTheory.AdForm.finM V hn κ r s) ∈ Formalism.BasicNotions.intV D.host.E p.v)
-    (hl : valuation k (((mt V κ).map p.pr) ((finCongr hn).symm r) ((finCongr hn).symm s) -
-      (1 : Matrix (Fin V.rank) (Fin V.rank) k) ((finCongr hn).symm r) ((finCongr hn).symm s)) < 1) :
-    ∃ c ∈ Formalism.BasicNotions.intV D.host.E p.v, Formalism.UG.prV (E := D.host.E) p.v (GlobalTheory.AdForm.finM V hn κ r s) -
-      (1 : Matrix (Fin n) (Fin n) (D.host.E ⊗[D.host.F] p.v.adicCompletion D.host.F)) r s =
-        Formalism.UG.inclE (F := D.host.F) (p.v.adicCompletion D.host.F) (t : D.host.E) * c := by
+theorem entry_cong
+    (D : D7)
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (p : GlobalTheory.FinPl.SplitPt D k) (P : HeightOneSpectrum (𝓞 D.host.E))
+    (hP : Formalism.L2.NTheta.IsIdemAt p.e P)
+    (T : ℕ) (t t' : 𝓞 D.host.E) (h1 : (t' : D.host.E) = star (t : D.host.E))
+    (h2 : t * t' = (T : 𝓞 D.host.E)) (h3 : IsCoprime t t') (h4 : t ∈ P.asIdeal)
+    (h5 : (T : 𝓞 D.host.F) ∈ p.v.asIdeal) (h6 : (T : 𝓞 D.host.F) ∉ p.v.asIdeal ^ 2)
+    (V : HSp D)
+    {n : ℕ} (hn : V.rank = n)
+    (κ : GA D V) (r s : Fin n)
+    (hi : Formalism.UG.prV (E := D.host.E) p.v (GlobalTheory.AdForm.finM V hn κ r s)
+      ∈ Formalism.BasicNotions.intV D.host.E p.v)
+    (hl : valuation k
+        (((mt V κ).map p.pr) ((finCongr hn).symm r) ((finCongr hn).symm s)
+          - (1 : Matrix (Fin V.rank) (Fin V.rank) k) ((finCongr hn).symm r) ((finCongr hn).symm s))
+      < 1)
+    : ∃ c ∈ Formalism.BasicNotions.intV D.host.E p.v,
+      Formalism.UG.prV (E := D.host.E) p.v (GlobalTheory.AdForm.finM V hn κ r s)
+          - (1 : Matrix (Fin n) (Fin n) (D.host.E ⊗[D.host.F] p.v.adicCompletion D.host.F)) r s
+        = Formalism.UG.inclE (F := D.host.F) (p.v.adicCompletion D.host.F) (t : D.host.E) * c := by
   subst hn
   let y : AE D := mt V κ r s - (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) r s
-  have hy : Formalism.UG.prV (E := D.host.E) p.v (toEAf D y) = Formalism.UG.prV (E := D.host.E) p.v (GlobalTheory.AdForm.finM V rfl κ r s) -
-      (1 : Matrix (Fin V.rank) (Fin V.rank) (D.host.E ⊗[D.host.F] p.v.adicCompletion D.host.F)) r s := by
+  have hy
+      : Formalism.UG.prV (E := D.host.E) p.v (toEAf D y)
+        = Formalism.UG.prV (E := D.host.E) p.v (GlobalTheory.AdForm.finM V rfl κ r s)
+          - (1
+              : Matrix (Fin V.rank) (Fin V.rank) (D.host.E ⊗[D.host.F] p.v.adicCompletion D.host.F))
+            r s := by
     simp only [y]
     rw [RingHom.map_sub, RingHom.map_sub]
     congr 1
@@ -129,13 +169,17 @@ theorem entry_cong (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSp
     · subst h
       rw [Matrix.one_apply_eq, Matrix.one_apply_eq, RingHom.map_one, RingHom.map_one]
     · rw [Matrix.one_apply_ne h, Matrix.one_apply_ne h, RingHom.map_zero, RingHom.map_zero]
-  have h7 : p.pr ((1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) r s) = (1 : Matrix (Fin V.rank) (Fin V.rank) k) r s := by
+  have h7
+      : p.pr ((1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) r s)
+        = (1 : Matrix (Fin V.rank) (Fin V.rank) k) r s := by
     simp only [Matrix.one_apply]; split_ifs <;> simp
   rw [← hy]
-  refine GlobalTheory.LocMod.SplitUnif.eq_mul_of_val_lt_one D k p P hP T t t' h1 h2 h3 h4 h5 h6 y ?_ ?_
+  refine GlobalTheory.LocMod.SplitUnif.eq_mul_of_val_lt_one D k p P hP T t t' h1 h2 h3 h4 h5 h6 y ?_
+    ?_
   · rw [hy]
     refine Subring.sub_mem _ hi ?_
-    simp only [Matrix.one_apply]; split_ifs
+    simp only [Matrix.one_apply]
+    split_ifs
     · exact Subring.one_mem _
     · exact Subring.zero_mem _
   · simp only [y]
@@ -143,6 +187,5 @@ theorem entry_cong (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSp
     exact hl
 
 end GlobalTheory.FamTrace.LastRow
-
 
 end

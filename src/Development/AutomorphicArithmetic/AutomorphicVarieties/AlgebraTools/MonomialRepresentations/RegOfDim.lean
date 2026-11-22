@@ -7,9 +7,10 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.RegularLocalRegu
 
 open Polynomial Matrix
 
-theorem UpperTheory.V.AlgebraTools.regOfDim :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (J : Ideal R), J ≠ ⊤ →
-      ((IsLocalRing.maximalIdeal R).spanFinrank : WithBot ℕ∞) ≤ ringKrullDim (R ⧸ J) → J = ⊥ := by
+theorem UpperTheory.V.AlgebraTools.regOfDim
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (J : Ideal R),
+      J ≠ ⊤ → ((IsLocalRing.maximalIdeal R).spanFinrank : WithBot ℕ∞) ≤ ringKrullDim (R ⧸ J)
+        → J = ⊥ := by
   intro R _ _ _ J hJ hdim
   have hR := ringKrullDim_le_spanFinrank_maximalIdeal R
   have hq := ringKrullDim_quotient_le J
@@ -25,9 +26,12 @@ theorem UpperTheory.V.AlgebraTools.regOfDim :
   have h1 := ringKrullDim_quotient_succ_le_of_nonZeroDivisor hnz
   have hsub : Ideal.span {r} ≤ J := (Ideal.span_singleton_le_iff_mem J).2 hrJ
   have h2 : ringKrullDim (R ⧸ J) ≤ ringKrullDim (R ⧸ Ideal.span {r}) :=
-    ringKrullDim_le_of_surjective (Ideal.Quotient.factor hsub) (Ideal.Quotient.factor_surjective hsub)
+    ringKrullDim_le_of_surjective (Ideal.Quotient.factor hsub)
+      (Ideal.Quotient.factor_surjective hsub)
   have h3 : ringKrullDim (R ⧸ J) + 1 ≤ ringKrullDim (R ⧸ J) := by
-    calc ringKrullDim (R ⧸ J) + 1 ≤ ringKrullDim (R ⧸ Ideal.span {r}) + 1 := by gcongr
+    calc
+      ringKrullDim (R ⧸ J) + 1
+        ≤ ringKrullDim (R ⧸ Ideal.span {r}) + 1 := by gcongr
       _ ≤ ringKrullDim R := h1
       _ = ringKrullDim (R ⧸ J) := by rw [hJeq, heq]
   rw [hJeq] at h3

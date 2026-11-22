@@ -13,10 +13,12 @@ private lemma exists_local_generator {B : Type} [CommRing B] [IsDedekindDomain B
     ∃ π ∈ I, ∃ s, s ∉ p ∧ ∀ x ∈ I, s * x ∈ Ideal.span {π} :=
   _root_.UpperTheory.Reformulated.B.ExistsLocalGenerator.exists_local_generator I p
 
-theorem UpperTheory.dedekind_spec_open_isAffine :
-    ∀ (B : Type) [CommRing B] [IsDedekindDomain B] (W : (Spec (CommRingCat.of B)).Opens), IsAffineOpen W := by
+theorem UpperTheory.dedekind_spec_open_isAffine
+    : ∀ (B : Type) [CommRing B] [IsDedekindDomain B] (W : (Spec (CommRingCat.of B)).Opens),
+      IsAffineOpen W := by
   intro B _ _ W
-  let S : Set (PrimeSpectrum B) := ((W : Set (Spec (CommRingCat.of B)))ᶜ : Set (Spec (CommRingCat.of B)))
+  let S : Set (PrimeSpectrum B) :=
+    ((W : Set (Spec (CommRingCat.of B)))ᶜ : Set (Spec (CommRingCat.of B)))
   have hS : IsClosed S := W.isOpen.isClosed_compl
   let I : Ideal B := PrimeSpectrum.vanishingIdeal S
   have hWc : PrimeSpectrum.zeroLocus (I : Set B) = S := by
@@ -26,8 +28,9 @@ theorem UpperTheory.dedekind_spec_open_isAffine :
     PrimeSpectrum.basicOpen (R := CommRingCat.of B) r
   have hbasic : ∀ r : B, IsAffineOpen (D r) := by
     intro r
-    have h := (isAffineOpen_top (Spec (CommRingCat.of B))).basicOpen
-      ((Scheme.ΓSpecIso (CommRingCat.of B)).inv r)
+    have h :=
+      (isAffineOpen_top (Spec (CommRingCat.of B))).basicOpen
+        ((Scheme.ΓSpecIso (CommRingCat.of B)).inv r)
     rwa [basicOpen_eq_of_affine] at h
   have hmain : IsAffineHom W.ι := by
     refine isAffineHom_of_forall_exists_isAffineOpen _ fun x => ?_
@@ -47,12 +50,13 @@ theorem UpperTheory.dedekind_spec_open_isAffine :
         rcases hqp.mem_or_mem hm with h | h
         · exact hsq h
         · refine hIq fun y hy => ?_
-          have h2 : s * y ∈ q.asIdeal :=
-            (Ideal.span_singleton_le_iff_mem q.asIdeal).2 h (hsI y hy)
+          have h2 : s * y ∈ q.asIdeal := (Ideal.span_singleton_le_iff_mem q.asIdeal).2 h (hsI y hy)
           exact (hqp.mem_or_mem h2).resolve_left hsq
       · intro hm
-        refine ⟨fun hsub => hm (Ideal.mul_mem_left _ _ (hsub hπ)),
-          fun h => hm (Ideal.mul_mem_right _ _ h)⟩
+        refine ⟨
+          fun hsub => hm (Ideal.mul_mem_left _ _ (hsub hπ)),
+          fun h => hm (Ideal.mul_mem_right _ _ h)
+        ⟩
     have h := hbasic (s * π)
     rw [← hEq] at h
     have h2 := h.preimage_of_isOpenImmersion W.ι (by simp)

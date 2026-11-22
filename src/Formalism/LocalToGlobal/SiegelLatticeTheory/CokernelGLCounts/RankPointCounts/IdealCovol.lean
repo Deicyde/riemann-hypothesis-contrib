@@ -12,20 +12,30 @@ open MeasureTheory NumberField NumberField.mixedEmbedding
 
 namespace Formalism.L2.SG.NGCut.SplitEmbedding
 
-theorem idealCovol (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePlace K // w.IsReal}]
-    (ι : Type) [Fintype ι] (φ : ι → (K →+* ℂ)) (σ : ι ≃ {w : InfinitePlace K // w.IsComplex})
+theorem idealCovol
+    (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePlace K // w.IsReal}]
+    (ι : Type) [Fintype ι]
+    (φ : ι → (K →+* ℂ)) (σ : ι ≃ {w : InfinitePlace K // w.IsComplex})
     (hφ : ∀ i, φ i = (σ i).1.embedding ∨ φ i = ComplexEmbedding.conjugate (σ i).1.embedding)
     (I : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ) (Λ : AddSubgroup K)
-    (hΛ : ∀ a ∈ Λ, a ∈ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)) (k : ℕ)
-    (hk : Λ.relIndex (((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup) = k)
-    (hk0 : k ≠ 0) (s : ℝ) (hs : s ≠ 0) (F : Set (ι → ℂ)) (hF : MeasurableSet F)
-    (hFd : ∀ v, ∃! a : Λ, (fun i => (s : ℂ) * φ i a) + v ∈ F) :
-    volume F = ENNReal.ofReal ((k : ℝ) * (FractionalIdeal.absNorm (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : ℝ) *
-      2⁻¹ ^ Fintype.card ι * √|(discr K : ℝ)| * |s| ^ (2 * Fintype.card ι)) := by
+    (hΛ : ∀ a ∈ Λ, a ∈ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K))
+    (k : ℕ)
+    (hk : Λ.relIndex
+        (((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup)
+      = k)
+    (hk0 : k ≠ 0)
+    (s : ℝ) (hs : s ≠ 0)
+    (F : Set (ι → ℂ))
+    (hF : MeasurableSet F) (hFd : ∀ v, ∃! a : Λ, (fun i => (s : ℂ) * φ i a) + v ∈ F)
+    : volume F
+      = ENNReal.ofReal
+        ((k : ℝ) * (FractionalIdeal.absNorm (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : ℝ)
+          * 2⁻¹ ^ Fintype.card ι * √ |(discr K : ℝ)| * |s| ^ (2 * Fintype.card ι)) := by
   set cj : ι → Prop := fun i => φ i ≠ (σ i).1.embedding
   have hψ : MeasurePreserving (phiMap σ cj (K := K)) volume volume := phiMap_mp σ cj
   have hψe : ∀ a : K, phiMap σ cj (mixedEmbedding K a) = fun i => φ i a := by
-    intro a; funext i
+    intro a
+    funext i
     simp only [phiMap, mixedEmbedding_apply_isComplex]
     by_cases hi : cj i
     · rw [if_pos hi]
@@ -43,7 +53,9 @@ theorem idealCovol (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePl
   have hmem : ∀ y : ι → ℂ, y ∈ s⁻¹ • F ↔ s • y ∈ F := by
     intro y
     rw [Set.mem_smul_set_iff_inv_smul_mem₀ (inv_ne_zero hs), inv_inv]
-  have hsm : ∀ a : K, ∀ x : mixedSpace K, s • phiMap σ cj (emb a + x) = (fun i => (s : ℂ) * φ i a) + s • phiMap σ cj x := by
+  have hsm
+      : ∀ a : K, ∀ x : mixedSpace K,
+        s • phiMap σ cj (emb a + x) = (fun i => (s : ℂ) * φ i a) + s • phiMap σ cj x := by
     intro a x
     rw [phiMap_add, smul_add, show emb a = mixedEmbedding K a from rfl, hψe]
     funext i
@@ -53,26 +65,29 @@ theorem idealCovol (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePl
     obtain ⟨a, ha, hu⟩ := hFd (s • phiMap σ cj x)
     refine ⟨⟨emb a, AddSubgroup.mem_map_of_mem emb a.2⟩, ?_, ?_⟩
     · show phiMap σ cj (emb a + x) ∈ s⁻¹ • F
-      rw [hmem, hsm]; exact ha
+      rw [hmem, hsm]
+      exact ha
     · rintro ⟨b, hb⟩ hbG
       obtain ⟨a', ha', rfl⟩ := AddSubgroup.mem_map.1 hb
       have h1 : (fun i => (s : ℂ) * φ i (⟨a', ha'⟩ : Λ)) + s • phiMap σ cj x ∈ F := by
         have : phiMap σ cj (emb a' + x) ∈ s⁻¹ • F := hbG
-        rw [hmem, hsm] at this; exact this
+        rw [hmem, hsm] at this
+        exact this
       have := hu ⟨a', ha'⟩ h1
       apply Subtype.ext
       show emb a' = emb a
       rw [show a' = (a : K) from congrArg Subtype.val this]
 
   set L := (idealLattice K I).toAddSubgroup
-  have hL : L = (((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup).map emb := by
+  have hL
+      : L
+        = (((I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K).toAddSubgroup).map
+          emb := by
     ext x
     simp only [L, Submodule.mem_toAddSubgroup, mem_idealLattice, AddSubgroup.mem_map]
     rfl
-  have hle : Λm ≤ L := by
-    rw [hL]; exact AddSubgroup.map_mono (fun a ha => hΛ a ha)
-  have hk' : Λm.relIndex L = k := by
-    rw [hL, AddSubgroup.relIndex_map_map_of_injective _ _ hinj, hk]
+  have hle : Λm ≤ L := by rw [hL]; exact AddSubgroup.map_mono (fun a ha => hΛ a ha)
+  have hk' : Λm.relIndex L = k := by rw [hL, AddSubgroup.relIndex_map_map_of_injective _ _ hinj, hk]
   have hcount : Countable L := by
     have b := Module.Free.chooseBasis ℤ (idealLattice K I)
     exact (Module.Free.chooseBasis ℤ (idealLattice K I)).equivFun.injective.countable
@@ -99,13 +114,17 @@ theorem idealCovol (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePl
   have hcov := ZLattice.covolume_eq_measure_fundamentalDomain (idealLattice K I) volume hfd
   rw [covolume_idealLattice] at hcov
   have hfin : volume FL ≠ ⊤ := (ZSpan.fundamentalDomain_isBounded b').measure_lt_top.ne
-  have hFLv : volume FL = ENNReal.ofReal ((FractionalIdeal.absNorm (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : ℝ) *
-      2⁻¹ ^ InfinitePlace.nrComplexPlaces K * √|(discr K : ℝ)|) := by
+  have hFLv
+      : volume FL
+        = ENNReal.ofReal
+          ((FractionalIdeal.absNorm (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : ℝ)
+            * 2⁻¹ ^ InfinitePlace.nrComplexPlaces K * √ |(discr K : ℝ)|) := by
     rw [hcov, measureReal_def, ENNReal.ofReal_toReal hfin]
   have hr2 : InfinitePlace.nrComplexPlaces K = Fintype.card ι := by
     rw [InfinitePlace.nrComplexPlaces, Fintype.card_congr σ.symm]
 
-  have hGv : volume G = volume (s⁻¹ • F) := hψ.measure_preimage (hF.const_smul₀ (s⁻¹)).nullMeasurableSet
+  have hGv : volume G = volume (s⁻¹ • F) :=
+    hψ.measure_preimage (hF.const_smul₀ (s⁻¹)).nullMeasurableSet
   have hscale : volume F = ENNReal.ofReal |s ^ Module.finrank ℝ (ι → ℂ)| * volume (s⁻¹ • F) := by
     conv_lhs => rw [← smul_inv_smul₀ hs F]
     exact Measure.addHaar_smul volume s (s⁻¹ • F)
@@ -113,7 +132,8 @@ theorem idealCovol (K : Type) [Field K] [NumberField K] [IsEmpty {w : InfinitePl
     rw [Module.finrank_pi_fintype]
     simp [Complex.finrank_real_complex, mul_comm]
   rw [hscale, ← hGv, hidx, hFLv, hr2, hdim]
-  rw [← ENNReal.ofReal_natCast k, ← ENNReal.ofReal_mul (Nat.cast_nonneg _), ← ENNReal.ofReal_mul (abs_nonneg _)]
+  rw [← ENNReal.ofReal_natCast k, ← ENNReal.ofReal_mul (Nat.cast_nonneg _),
+    ← ENNReal.ofReal_mul (abs_nonneg _)]
   congr 1
   rw [abs_pow]
   ring

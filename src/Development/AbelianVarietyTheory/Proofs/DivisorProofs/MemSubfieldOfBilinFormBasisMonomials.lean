@@ -6,8 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem mem_subfield_of_zpow_mem {K : Type} [Field K] (k₀ : Subfield K) [IsAlgClosed k₀]
-    (u : Kˣ) (m : ℤ) (hm : m ≠ 0) (h : ((u ^ m : Kˣ) : K) ∈ k₀) : (u : K) ∈ k₀ := by
+theorem mem_subfield_of_zpow_mem
+    {K : Type} [Field K]
+    (k₀ : Subfield K) [IsAlgClosed k₀]
+    (u : Kˣ) (m : ℤ) (hm : m ≠ 0) (h : ((u ^ m : Kˣ) : K) ∈ k₀)
+    : (u : K) ∈ k₀ := by
   have h1 : (u : K) ^ m.natAbs ∈ k₀ := by
     rw [Units.val_zpow_eq_zpow_val] at h
     rcases Int.natAbs_eq m with h2 | h2
@@ -17,34 +20,41 @@ theorem mem_subfield_of_zpow_mem {K : Type} [Field K] (k₀ : Subfield K) [IsAlg
   have hint : IsIntegral k₀ (u : K) := by
     apply IsIntegral.of_pow (Int.natAbs_pos.mpr hm)
     exact isIntegral_algebraMap (R := k₀) (x := ⟨_, h1⟩)
-  obtain ⟨y, hy⟩ := minpoly.mem_range_of_degree_eq_one k₀ (u : K)
-    (IsAlgClosed.degree_eq_one_of_irreducible k₀ (minpoly.irreducible hint))
+  obtain ⟨y, hy⟩ :=
+    minpoly.mem_range_of_degree_eq_one k₀ (u : K)
+      (IsAlgClosed.degree_eq_one_of_irreducible k₀ (minpoly.irreducible hint))
   rw [← hy]
   exact y.2
 
-def monomialExponents {I : Type} [Fintype I] {K : Type} [Field K] (k₀ : Subfield K)
-    (t : I → Kˣ) : Submodule ℤ (I → ℤ) :=
-  AddSubgroup.toIntSubmodule
-  { carrier := {v | ((∏ k, t k ^ v k : Kˣ) : K) ∈ k₀}
+def monomialExponents {I : Type} [Fintype I] {K : Type} [Field K] (k₀ : Subfield K) (t : I → Kˣ)
+    : Submodule ℤ (I → ℤ) :=
+  AddSubgroup.toIntSubmodule {
+    carrier := {v | ((∏ k, t k ^ v k : Kˣ) : K) ∈ k₀}
     zero_mem' := by simp [k₀.one_mem]
     add_mem' := by
       intro a b ha hb
-      simp only [Set.mem_setOf_eq, Pi.add_apply, zpow_add, Finset.prod_mul_distrib,
-        Units.val_mul] at *
+      simp only [Set.mem_setOf_eq, Pi.add_apply, zpow_add, Finset.prod_mul_distrib, Units.val_mul]
+        at *
       exact k₀.mul_mem ha hb
     neg_mem' := by
       intro a ha
       simp only [Set.mem_setOf_eq, Pi.neg_apply, zpow_neg, Finset.prod_inv_distrib,
-        Units.val_inv_eq_inv_val] at *
-      exact k₀.inv_mem ha }
+          Units.val_inv_eq_inv_val]
+        at *
+      exact k₀.inv_mem ha
+  }
 
-theorem mem_monomialExponents {I : Type} [Fintype I] {K : Type} [Field K] (k₀ : Subfield K)
-    (t : I → Kˣ) (v : I → ℤ) :
-    v ∈ monomialExponents k₀ t ↔ ((∏ k, t k ^ v k : Kˣ) : K) ∈ k₀ := Iff.rfl
+theorem mem_monomialExponents
+    {I : Type} [Fintype I] {K : Type} [Field K] (k₀ : Subfield K) (t : I → Kˣ) (v : I → ℤ)
+    : v ∈ monomialExponents k₀ t ↔ ((∏ k, t k ^ v k : Kˣ) : K) ∈ k₀ :=
+  Iff.rfl
 
-theorem mem_monomialExponents_of_smul {I : Type} [Fintype I] {K : Type} [Field K]
-    (k₀ : Subfield K) [IsAlgClosed k₀] (t : I → Kˣ) (v : I → ℤ) (m : ℤ) (hm : m ≠ 0)
-    (h : m • v ∈ monomialExponents k₀ t) : v ∈ monomialExponents k₀ t := by
+theorem mem_monomialExponents_of_smul
+    {I : Type} [Fintype I]
+    {K : Type} [Field K]
+    (k₀ : Subfield K) [IsAlgClosed k₀]
+    (t : I → Kˣ) (v : I → ℤ) (m : ℤ) (hm : m ≠ 0) (h : m • v ∈ monomialExponents k₀ t)
+    : v ∈ monomialExponents k₀ t := by
   rw [mem_monomialExponents] at h ⊢
   apply mem_subfield_of_zpow_mem k₀ _ m hm
   convert h using 2
@@ -52,11 +62,15 @@ theorem mem_monomialExponents_of_smul {I : Type} [Fintype I] {K : Type} [Field K
   refine Finset.prod_congr rfl fun k _ => ?_
   rw [← zpow_mul, Pi.smul_apply, smul_eq_mul, mul_comm]
 
-theorem mem_subfield_of_bilinForm_monomials :
-    ∀ (X : Type) [AddCommGroup X] (S : Submodule ℤ (LinearMap.BilinForm ℤ X)) (I : Type) [Fintype I]
-    (ε : Module.Basis I ℤ S) (K : Type) [Field K] (k₀ : Subfield K), IsAlgClosed k₀ → ∀ (n : ℤ), n ≠ 0 →
-    ∀ (t : I → Kˣ), (∀ a b : X, ((∏ k, t k ^ (n * (ε k : LinearMap.BilinForm ℤ X) a b) : Kˣ) : K) ∈ k₀) →
-    ∀ k, (t k : K) ∈ k₀ := by
+theorem mem_subfield_of_bilinForm_monomials
+    : ∀ (X : Type) [AddCommGroup X] (S : Submodule ℤ (LinearMap.BilinForm ℤ X)) (I : Type)
+        [Fintype I] (ε : Module.Basis I ℤ S) (K : Type) [Field K] (k₀ : Subfield K),
+      IsAlgClosed k₀
+        → ∀ (n : ℤ),
+          n ≠ 0
+            → ∀ (t : I → Kˣ),
+              (∀ a b : X, ((∏ k, t k ^ (n * (ε k : LinearMap.BilinForm ℤ X) a b) : Kˣ) : K) ∈ k₀)
+                → ∀ k, (t k : K) ∈ k₀ := by
   intro X _ S I _ ε K _ k₀ hk n hn t h k
   classical
   set P := monomialExponents k₀ t with hP
@@ -80,8 +94,9 @@ theorem mem_subfield_of_bilinForm_monomials :
       ext a b
       have h0 : φ (P.mkQ (fun k => (ε k : LinearMap.BilinForm ℤ X) a b)) = 0 := by
         rw [Submodule.mkQ_apply, (Submodule.Quotient.mk_eq_zero P).mpr (hv a b), map_zero]
-      have h1 : (fun k => (ε k : LinearMap.BilinForm ℤ X) a b)
-          = ∑ j, (ε j : LinearMap.BilinForm ℤ X) a b • (Pi.single j 1 : I → ℤ) := by
+      have h1
+          : (fun k => (ε k : LinearMap.BilinForm ℤ X) a b)
+            = ∑ j, (ε j : LinearMap.BilinForm ℤ X) a b • (Pi.single j 1 : I → ℤ) := by
         funext i
         simp [Finset.sum_apply, Pi.single_apply]
       set_option synthInstance.maxHeartbeats 100000 in

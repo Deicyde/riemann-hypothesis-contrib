@@ -18,9 +18,10 @@ variable {ι : Type} {N : ℕ}
 abbrev mt (x : G ι N) (w : ι) : Matrix (Fin N) (Fin N) ℂ :=
   ((x w : SpecialLinearGroup (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ)
 
-def dg (s : Fin N → ℝ) (hs : ∑ i, s i = 0) : G ι N := fun _ =>
-  ⟨diagonal fun i => ((Real.exp (s i) : ℝ) : ℂ), by
-    rw [det_diagonal, ← Complex.ofReal_prod, ← Real.exp_sum, hs, Real.exp_zero, Complex.ofReal_one]⟩
+def dg (s : Fin N → ℝ) (hs : ∑ i, s i = 0) : G ι N := fun _ => ⟨
+  diagonal fun i => ((Real.exp (s i) : ℝ) : ℂ),
+  by rw [det_diagonal, ← Complex.ofReal_prod, ← Real.exp_sum, hs, Real.exp_zero, Complex.ofReal_one]
+⟩
 
 def Cone (T : ℝ) (s : Fin N → ℝ) : Prop := ∀ i j : Fin N, (j : ℕ) = i + 1 → s j ≤ s i + T
 

@@ -13,9 +13,9 @@ namespace GlobalTheory.CompanionTheory.SegOrder
 
 variable {T : Type u}
 
-theorem exists_last_start (s : T → T) (hs : ∀ (t : T) (j : ℕ), 0 < j → s^[j] t ≠ t)
-    (m : Multiset (ASeg T)) (hm : m ≠ 0) :
-    ∃ a ∈ m, ∀ b ∈ m, ¬ ∃ j : ℕ, 0 < j ∧ b.start = s^[j] a.start := by
+theorem exists_last_start
+    (s : T → T) (hs : ∀ (t : T) (j : ℕ), 0 < j → s^[j] t ≠ t) (m : Multiset (ASeg T)) (hm : m ≠ 0)
+    : ∃ a ∈ m, ∀ b ∈ m, ¬ ∃ j : ℕ, 0 < j ∧ b.start = s^[j] a.start := by
   have irr : ∀ a : ASeg T, ¬ ∃ j : ℕ, 0 < j ∧ a.start = s^[j] a.start := by
     rintro a ⟨j, hj, h⟩
     exact hs a.start j hj h.symm
@@ -45,9 +45,11 @@ theorem exists_last_start (s : T → T) (hs : ∀ (t : T) (j : ℕ), 0 < j → s
         · exact hax
         · exact hmax b hbm
 
-theorem exists_ordered_form : ∀ {T : Type u} (s : T → T), Function.Injective s →
-    (∀ (t : T) (j : ℕ), 0 < j → s^[j] t ≠ t) →
-    ∀ m : Multiset (ASeg T), ∃ L : List (ASeg T), (L : Multiset (ASeg T)) = m ∧ AOrdered s L := by
+theorem exists_ordered_form
+    : ∀ {T : Type u} (s : T → T),
+      Function.Injective s → (∀ (t : T) (j : ℕ), 0 < j → s^[j] t ≠ t)
+        → ∀ m : Multiset (ASeg T), ∃ L : List (ASeg T),
+          (L : Multiset (ASeg T)) = m ∧ AOrdered s L := by
   classical
   intro T s _ hs m
   induction hn : Multiset.card m generalizing m with

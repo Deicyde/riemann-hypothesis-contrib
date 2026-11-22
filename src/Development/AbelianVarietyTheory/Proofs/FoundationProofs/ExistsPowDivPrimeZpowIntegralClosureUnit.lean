@@ -15,12 +15,14 @@ namespace GlobalTheory.K5
 
 open Polynomial
 
-theorem exists_valuation_pow_eq (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω]
-    [Algebra.IsAlgebraic K Ω] (f : AbsoluteValue K ℝ) (hna : IsNonarchimedean f)
-    (hnt : f.IsNontrivial) (hc : CompleteSpace (WithAbs f)) :
-    ∃ v : Valuation Ω ℝ≥0, (∀ x : K, (v (algebraMap K Ω x) : ℝ) = f x) ∧
-      (∀ x : Ω, v x ≤ 1 ↔ ∀ i, f ((minpoly K x).coeff i) ≤ 1) ∧
-      ∀ x : Ω, (v x : ℝ) ^ (minpoly K x).natDegree = f ((minpoly K x).coeff 0) := by
+theorem exists_valuation_pow_eq
+    (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω]
+    (f : AbsoluteValue K ℝ)
+    (hna : IsNonarchimedean f) (hnt : f.IsNontrivial) (hc : CompleteSpace (WithAbs f))
+    : ∃ v : Valuation Ω ℝ≥0,
+      (∀ x : K, (v (algebraMap K Ω x) : ℝ) = f x)
+        ∧ (∀ x : Ω, v x ≤ 1 ↔ ∀ i, f ((minpoly K x).coeff i) ≤ 1)
+        ∧ ∀ x : Ω, (v x : ℝ) ^ (minpoly K x).natDegree = f ((minpoly K x).coeff 0) := by
   obtain ⟨a, ha⟩ := hnt.exists_abv_gt_one
   letI : NontriviallyNormedField (WithAbs f) :=
     NontriviallyNormedField.ofNormNeOne ⟨WithAbs.toAbs f a, by
@@ -33,24 +35,25 @@ theorem exists_valuation_pow_eq (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω
   have hmin : ∀ x : Ω, minpoly (WithAbs f) x = (minpoly K x).map (algebraMap K (WithAbs f)) := by
     intro x
     have hx : IsIntegral K x := (Algebra.IsAlgebraic.isAlgebraic x).isIntegral
-    have hmap : (minpoly K x).map (algebraMap K (WithAbs f)) =
-        Polynomial.mapEquiv (WithAbs.equiv f).symm (minpoly K x) := by
+    have hmap
+        : (minpoly K x).map (algebraMap K (WithAbs f))
+          = Polynomial.mapEquiv (WithAbs.equiv f).symm (minpoly K x) := by
       rw [Polynomial.mapEquiv_apply]; rfl
     symm
     apply minpoly.eq_of_irreducible_of_monic
     · rw [hmap]; exact (MulEquiv.irreducible_iff _).mpr (minpoly.irreducible hx)
     · rw [Polynomial.aeval_map_algebraMap]; exact minpoly.aeval K x
     · exact (minpoly.monic hx).map _
-  let v : Valuation Ω ℝ≥0 :=
-    { toFun := fun x => ⟨spectralNorm (WithAbs f) Ω x, spectralNorm_nonneg x⟩
-      map_zero' := by ext; exact spectralNorm_zero
-      map_one' := by ext; exact spectralNorm_one
-      map_mul' := fun x y => by
-        ext; exact spectralAlgNorm_mul (K := WithAbs f) (L := Ω) x y
-      map_add_le_max' := fun x y => by
-        show spectralNorm (WithAbs f) Ω (x + y) ≤
-          max (spectralNorm (WithAbs f) Ω x) (spectralNorm (WithAbs f) Ω y)
-        exact isNonarchimedean_spectralNorm x y }
+  let v : Valuation Ω ℝ≥0 := {
+    toFun := fun x => ⟨spectralNorm (WithAbs f) Ω x, spectralNorm_nonneg x⟩
+    map_zero' := by ext; exact spectralNorm_zero
+    map_one' := by ext; exact spectralNorm_one
+    map_mul' := fun x y => by ext; exact spectralAlgNorm_mul (K := WithAbs f) (L := Ω) x y
+    map_add_le_max' := fun x y => by
+      show spectralNorm (WithAbs f) Ω (x + y) ≤
+        max (spectralNorm (WithAbs f) Ω x) (spectralNorm (WithAbs f) Ω y)
+      exact isNonarchimedean_spectralNorm x y
+  }
   have hv : ∀ x : Ω, (v x : ℝ) = spectralNorm (WithAbs f) Ω x := fun _ => rfl
   have hco : ∀ (x : Ω) (i : ℕ), ‖(minpoly (WithAbs f) x).coeff i‖ = f ((minpoly K x).coeff i) := by
     intro x i
@@ -71,12 +74,15 @@ theorem exists_valuation_pow_eq (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω
     rw [hv, spectralNorm.spectralNorm_eq_norm_coeff_zero_rpow (WithAbs f) Ω x, hco, hd, one_div]
     exact Real.rpow_inv_natCast_pow (f.nonneg _) (minpoly.natDegree_pos hx).ne'
 
-theorem exists_pow_div_zpow_isIntegral (R K Ω : Type) [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] [IsAdicComplete (IsLocalRing.maximalIdeal R) R] [Field K]
-    [Algebra R K] [IsFractionRing R K] [Field Ω] [Algebra K Ω] [Algebra R Ω] [IsScalarTower R K Ω]
-    [Algebra.IsAlgebraic K Ω] (π : R) (hπ : Irreducible π) (x : Ω) (hx : x ≠ 0) :
-    ∃ (a : ℤ) (b : ℕ), 0 < b ∧ IsIntegral R (x ^ b / (algebraMap R Ω π) ^ a) ∧
-      IsIntegral R ((algebraMap R Ω π) ^ a / x ^ b) := by
+theorem exists_pow_div_zpow_isIntegral
+    (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    [IsAdicComplete (IsLocalRing.maximalIdeal R) R] [Field K] [Algebra R K] [IsFractionRing R K]
+    [Field Ω] [Algebra K Ω] [Algebra R Ω] [IsScalarTower R K Ω] [Algebra.IsAlgebraic K Ω]
+    (π : R) (hπ : Irreducible π)
+    (x : Ω) (hx : x ≠ 0)
+    : ∃ (a : ℤ) (b : ℕ),
+      0 < b ∧ IsIntegral R (x ^ b / (algebraMap R Ω π) ^ a)
+        ∧ IsIntegral R ((algebraMap R Ω π) ^ a / x ^ b) := by
   obtain ⟨f, hna, hnt, hball, hc⟩ :=
     GlobalTheory.KLC.exists_absoluteValue_completeSpace_of_isDiscreteValuationRing R K
   obtain ⟨v, hext, hle, hpow⟩ := exists_valuation_pow_eq K Ω f hna hnt hc
@@ -97,15 +103,15 @@ theorem exists_pow_div_zpow_isIntegral (R K Ω : Type) [CommRing R] [IsDomain R]
     have h1 : v (algebraMap R Ω u) * v (algebraMap R Ω (u⁻¹ : Rˣ)) = 1 := by
       rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
     refine le_antisymm (hR _) ?_
-    calc 1 = _ := h1.symm
+    calc
+      1 = _ := h1.symm
       _ ≤ v (algebraMap R Ω u) * 1 := by gcongr; exact hR _
       _ = _ := mul_one _
   have hxK : IsIntegral K x := (Algebra.IsAlgebraic.isAlgebraic x).isIntegral
   have hinj : Function.Injective (algebraMap R Ω) := by
     rw [IsScalarTower.algebraMap_eq R K Ω]
     exact (algebraMap K Ω).injective.comp (IsFractionRing.injective R K)
-  have hπ0 : v (algebraMap R Ω π) ≠ 0 :=
-    (map_ne_zero v).2 ((map_ne_zero_iff _ hinj).2 hπ.ne_zero)
+  have hπ0 : v (algebraMap R Ω π) ≠ 0 := (map_ne_zero v).2 ((map_ne_zero_iff _ hinj).2 hπ.ne_zero)
   have hc0 : (minpoly K x).coeff 0 ≠ 0 := minpoly.coeff_zero_ne_zero hxK hx
   obtain ⟨r, s, hs, hrs⟩ := IsFractionRing.div_surjective (A := R) ((minpoly K x).coeff 0)
   have hr0 : r ≠ 0 := by
@@ -126,9 +132,14 @@ theorem exists_pow_div_zpow_isIntegral (R K Ω : Type) [CommRing R] [IsDomain R]
   · rw [map_div₀, ← key, div_self hx0]
   · rw [map_div₀, ← key, div_self hx0]
 
-theorem exists_pow_div_p_zpow_isInt : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
-  ∀ x : Ω, x ≠ 0 → ∃ (a : ℤ) (b : ℕ), 0 < b ∧ IsInt (p := p) (x ^ b / (p : Ω) ^ a) ∧
-    IsInt (p := p) ((p : Ω) ^ a / x ^ b) := by
+theorem exists_pow_div_p_zpow_isInt
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      IsClo p Ω
+        → ∀ x : Ω,
+          x ≠ 0
+            → ∃ (a : ℤ) (b : ℕ),
+              0 < b ∧ IsInt (p := p) (x ^ b / (p : Ω) ^ a)
+                ∧ IsInt (p := p) ((p : Ω) ^ a / x ^ b) := by
   intro p _ Ω _ _ hΩ x hx
   obtain ⟨hdom, hdvr, hirr⟩ := completed_laurent_isDVR p
   have hmax : IsLocalRing.maximalIdeal (O0 p) = Ideal.span {(p : O0 p)} :=

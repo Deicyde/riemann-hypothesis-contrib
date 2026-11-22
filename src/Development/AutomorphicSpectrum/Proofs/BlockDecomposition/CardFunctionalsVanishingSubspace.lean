@@ -8,13 +8,15 @@ open Matrix Classical PositivityTheory.Rg.Rs GlobalTheory.CompanionTheory.GLFirs
 
 namespace GlobalTheory.CompanionTheory.GapOpCount
 
-theorem card_forms_vanishing_missing_line : ∀ (k : Type) [Field k] [Fintype k] (n j : ℕ) (M : Submodule k (Fin (n + 1) → k)), e0 k n ∉ M →
-    Module.finrank k M + (j + 1) = n + 1 →
-    (Finset.univ.filter (fun a : Fin (n + 1) → k => a ⬝ᵥ e0 k n = 1 ∧ ∀ x ∈ M, a ⬝ᵥ x = 0)).card = Fintype.card k ^ j := by
+theorem card_forms_vanishing_missing_line
+    : ∀ (k : Type) [Field k] [Fintype k] (n j : ℕ) (M : Submodule k (Fin (n + 1) → k)),
+      e0 k n ∉ M → Module.finrank k M + (j + 1) = n + 1
+        → (Finset.univ.filter (fun a : Fin (n + 1) → k =>
+            a ⬝ᵥ e0 k n = 1 ∧ ∀ x ∈ M, a ⬝ᵥ x = 0)).card
+          = Fintype.card k ^ j := by
   intro k _ _ n j M hM hdim
   let E := dotProductEquiv k (Fin (n + 1))
-  have hE : ∀ a x : Fin (n + 1) → k, E a x = a ⬝ᵥ x := fun a x => by
-    simp [E, dotProductEquiv]
+  have hE : ∀ a x : Fin (n + 1) → k, E a x = a ⬝ᵥ x := fun a x => by simp [E, dotProductEquiv]
   let W : Submodule k (Fin (n + 1) → k) := M ⊔ Submodule.span k {e0 k n}
   let T : Submodule k (Fin (n + 1) → k) := W.dualAnnihilator.comap E.toLinearMap
   have hT : ∀ a, a ∈ T ↔ a ⬝ᵥ e0 k n = 0 ∧ ∀ x ∈ M, a ⬝ᵥ x = 0 := by
@@ -22,8 +24,10 @@ theorem card_forms_vanishing_missing_line : ∀ (k : Type) [Field k] [Fintype k]
     simp only [T, W, Submodule.mem_comap, Submodule.mem_dualAnnihilator, LinearEquiv.coe_coe, hE]
     constructor
     · intro h
-      exact ⟨h _ (Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)),
-        fun x hx => h x (Submodule.mem_sup_left hx)⟩
+      exact ⟨
+        h _ (Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)),
+        fun x hx => h x (Submodule.mem_sup_left hx)
+      ⟩
     · rintro ⟨h0, h1⟩ w hw
       obtain ⟨x, hx, y, hy, rfl⟩ := Submodule.mem_sup.1 hw
       obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hy
@@ -50,8 +54,9 @@ theorem card_forms_vanishing_missing_line : ∀ (k : Type) [Field k] [Fintype k]
     exact inv_mul_cancel₀ hb0
   have ha0M : ∀ x ∈ M, a0 ⬝ᵥ x = 0 := fun x hx => by
     simp only [a0, smul_dotProduct, hbM x hx, smul_zero]
-  have hcard : (Finset.univ.filter (fun a : Fin (n + 1) → k => a ⬝ᵥ e0 k n = 1 ∧ ∀ x ∈ M, a ⬝ᵥ x = 0)).card
-      = (Finset.univ : Finset T).card := by
+  have hcard
+      : (Finset.univ.filter (fun a : Fin (n + 1) → k => a ⬝ᵥ e0 k n = 1 ∧ ∀ x ∈ M, a ⬝ᵥ x = 0)).card
+        = (Finset.univ : Finset T).card := by
     refine Finset.card_bij' (fun a ha => ⟨a - a0, ?_⟩) (fun t _ => t.1 + a0) ?_ ?_ ?_ ?_
     · obtain ⟨-, h1, h2⟩ := Finset.mem_filter.1 ha
       refine (hT _).2 ⟨?_, fun x hx => ?_⟩

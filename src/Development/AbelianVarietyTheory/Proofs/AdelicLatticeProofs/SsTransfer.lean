@@ -10,7 +10,10 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-theorem ss_transfer : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S Γ : Set (Matrix ι ι ℂ)), (S ⊆ Γ → Γ ⊆ (Submodule.span ℂ S : Set (Matrix ι ι ℂ)) → SS S → SS Γ) ∧ ∀ P : Matrix ι ι ℂ, IsUnit P.det → SS ((fun x => P * x * P⁻¹) '' S) → SS S := by
+theorem ss_transfer
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S Γ : Set (Matrix ι ι ℂ)),
+      (S ⊆ Γ → Γ ⊆ (Submodule.span ℂ S : Set (Matrix ι ι ℂ)) → SS S → SS Γ)
+        ∧ ∀ P : Matrix ι ι ℂ, IsUnit P.det → SS ((fun x => P * x * P⁻¹) '' S) → SS S := by
   intro ι _ _ S Γ
   refine ⟨fun h1 h2 hS W hW => ?_, fun P hP hS W hW => ?_⟩
   · obtain ⟨W', hW', hc⟩ := hS W (fun g hg => hW g (h1 hg))
@@ -24,18 +27,20 @@ theorem ss_transfer : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S Γ : Set 
     | smul a x _ hx => rw [Matrix.smul_mulVec]; exact W'.smul_mem a hx
   · have h1 : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv P hP
     have h2 : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul P hP
-    let e : (ι → ℂ) ≃ₗ[ℂ] (ι → ℂ) :=
-      { P.mulVecLin with
-        invFun := fun v => P⁻¹ *ᵥ v
-        left_inv := fun v => by simp [Matrix.mulVec_mulVec, h2]
-        right_inv := fun v => by simp [Matrix.mulVec_mulVec, h1] }
+    let e : (ι → ℂ) ≃ₗ[ℂ] (ι → ℂ) := {
+      P.mulVecLin with
+      invFun := fun v => P⁻¹ *ᵥ v
+      left_inv := fun v => by simp [Matrix.mulVec_mulVec, h2]
+      right_inv := fun v => by simp [Matrix.mulVec_mulVec, h1]
+    }
     have he : ∀ v, e v = P *ᵥ v := fun v => rfl
     have key : ∀ (x : Matrix ι ι ℂ) (v : ι → ℂ), (P * x * P⁻¹) *ᵥ (P *ᵥ v) = P *ᵥ (x *ᵥ v) := by
       intro x v
       rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, Matrix.mul_assoc, h2, Matrix.mul_one]
-    obtain ⟨W', hW', hc⟩ := hS (Submodule.orderIsoMapComap e W) (by
-      rintro _ ⟨x, hx, rfl⟩ _ ⟨v, hv, rfl⟩
-      exact ⟨x *ᵥ v, hW x hx v hv, (key x v).symm⟩)
+    obtain ⟨W', hW', hc⟩ :=
+      hS (Submodule.orderIsoMapComap e W) (by
+        rintro _ ⟨x, hx, rfl⟩ _ ⟨v, hv, rfl⟩
+        exact ⟨x *ᵥ v, hW x hx v hv, (key x v).symm⟩)
     refine ⟨(Submodule.orderIsoMapComap e).symm W', fun g hg v hv => ?_, ?_⟩
     · have hv' : P *ᵥ v ∈ W' := hv
       have := hW' _ ⟨g, hg, rfl⟩ _ hv'

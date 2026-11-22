@@ -21,7 +21,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 namespace UpperTheory.V.Cj
 
 theorem A.absTrans : A.AbsTrans :=
-  A.absTrans_of A.hdFacts A.zigFwd A.zigBwd A.bwdLast A.zigFormal A.pullOp A.pullAct A.zigMap A.coverEx A.satClosed A.satFacts
+  A.absTrans_of A.hdFacts A.zigFwd A.zigBwd A.bwdLast A.zigFormal A.pullOp A.pullAct A.zigMap
+    A.coverEx A.satClosed A.satFacts
 
 theorem partA : PartA := A.partA_of A.absTrans A.suppFwd A.suppBwd A.levCorr
 

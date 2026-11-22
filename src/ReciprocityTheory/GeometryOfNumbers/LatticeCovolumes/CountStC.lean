@@ -11,17 +11,20 @@ open scoped Classical ComplexOrder
 
 variable {K : Type*} [Field K] [NumberField K] {V : Type*} [AddCommGroup V] [Module K V]
 
-noncomputable def gramR (h : HermFam K V) {r : ℕ} (v : Fin r → V)
-    (w : {w : InfinitePlace K // w.IsReal}) : Matrix (Fin r) (Fin r) ℝ :=
+noncomputable def gramR
+    (h : HermFam K V) {r : ℕ} (v : Fin r → V) (w : {w : InfinitePlace K // w.IsReal})
+    : Matrix (Fin r) (Fin r) ℝ :=
   (h.gram w.1.embedding v).map Complex.re
 
-def ellS (h : HermFam K V) {r : ℕ} (v : Fin r → V) (R : ℝ) :
-    Set (Fin r → mixedEmbedding.mixedSpace K) :=
+def ellS (h : HermFam K V) {r : ℕ} (v : Fin r → V) (R : ℝ)
+    : Set (Fin r → mixedEmbedding.mixedSpace K) :=
   {y | (∀ w, qR (gramR h v w) (fun i => (y i).1 w) ≤ R ^ 2) ∧
     ∀ w : {w : InfinitePlace K // w.IsComplex}, qC (h.gram w.1.embedding v) (fun i => (y i).2 w) ≤ R ^ 2}
 
-theorem gram_posDef (h : HermFam K V) (σ : K →+* ℂ) {r : ℕ} {v : Fin r → V}
-    (hli : LinearIndependent K v) : (h.gram σ v).PosDef := h.posDef σ r v hli
+theorem gram_posDef
+    (h : HermFam K V) (σ : K →+* ℂ) {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v)
+    : (h.gram σ v).PosDef :=
+  h.posDef σ r v hli
 
 private lemma finsupp_sum_sum_star_mul_eq_qR {r : ℕ} (M : Matrix (Fin r) (Fin r) ℝ) (y : Fin r →₀ ℝ) :
     (y.sum fun i xi => y.sum fun j xj => star xi * M i j * xj) = qR M y := by
@@ -57,8 +60,11 @@ private lemma qR_map_re_eq_qC_ofReal {r : ℕ} (G : Matrix (Fin r) (Fin r) ℂ) 
   refine Finset.sum_congr rfl fun j _ => ?_
   simp [Complex.re_ofReal_mul, Complex.re_mul_ofReal, Matrix.map_apply] <;> ring
 
-theorem gramR_posDef (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v)
-    (w : {w : InfinitePlace K // w.IsReal}) : (gramR h v w).PosDef := by
+theorem gramR_posDef
+    (h : HermFam K V)
+    {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v)
+    (w : {w : InfinitePlace K // w.IsReal})
+    : (gramR h v w).PosDef := by
   have hG := gram_posDef h w.1.embedding hli
   refine ⟨Matrix.IsHermitian.ext fun i j => ?_, fun y hy => ?_⟩
   · simp only [gramR, Matrix.map_apply, star_trivial]
@@ -71,8 +77,9 @@ theorem gramR_posDef (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : Linear
       simpa using DFunLike.congr_fun h0 i
     have h1 := (Complex.lt_def.mp (hG.2 hz)).1
     rw [finsupp_sum_sum_star_mul_re_eq_qC] at h1
-    have h2 : (⇑(Finsupp.mapRange (fun a : ℝ => (a : ℂ)) Complex.ofReal_zero y)) =
-        fun i => (y i : ℂ) := by
+    have h2
+        : (⇑(Finsupp.mapRange (fun a : ℝ => (a : ℂ)) Complex.ofReal_zero y))
+          = fun i => (y i : ℂ) := by
       funext i
       simp
     rw [h2, ← qR_map_re_eq_qC_ofReal] at h1
@@ -96,8 +103,9 @@ private lemma form_sum_smul_left (h : HermFam K V) (σ : K →+* ℂ) (y : V) {�
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, h.conj_symm]
 
-def psi (K : Type*) [Field K] [NumberField K] (r : ℕ) (y : Fin r → mixedEmbedding.mixedSpace K) :
-    ({w : InfinitePlace K // w.IsReal} → Fin r → ℝ) × ({w : InfinitePlace K // w.IsComplex} → Fin r → ℂ) :=
+def psi (K : Type*) [Field K] [NumberField K] (r : ℕ) (y : Fin r → mixedEmbedding.mixedSpace K)
+    : ({w : InfinitePlace K // w.IsReal} → Fin r → ℝ)
+      × ({w : InfinitePlace K // w.IsComplex} → Fin r → ℂ) :=
   (fun w i => (y i).1 w, fun w i => (y i).2 w)
 
 private lemma measurePreserving_pi_pi_swap {ι κ X : Type*} [Fintype ι] [Fintype κ] [MeasurableSpace X]
@@ -139,20 +147,26 @@ private lemma measurePreserving_pi_pi_swap {ι κ X : Type*} [Fintype ι] [Finty
     exact Finset.prod_congr rfl fun j _ => by rw [Measure.pi_pi]
   exact (h2.symm e).comp h1
 
-theorem measurePreserving_psi (r : ℕ) :
-    MeasurePreserving (psi K r) volume
+theorem measurePreserving_psi (r : ℕ)
+    : MeasurePreserving (psi K r) volume
       ((Measure.pi fun _ => Measure.pi fun _ => volume).prod
         (Measure.pi fun _ => Measure.pi fun _ => volume)) := by
-  have hA := measurePreserving_arrowProdEquivProdArrow ({w : InfinitePlace K // w.IsReal} → ℝ)
-    ({w : InfinitePlace K // w.IsComplex} → ℂ) (Fin r) (fun _ => volume) (fun _ => volume)
+  have hA :=
+    measurePreserving_arrowProdEquivProdArrow ({w : InfinitePlace K // w.IsReal} → ℝ)
+      ({w : InfinitePlace K // w.IsComplex} → ℂ) (Fin r)
+      (fun _ => volume)
+      (fun _ => volume)
   exact ((measurePreserving_pi_pi_swap (ι := Fin r) (κ := {w : InfinitePlace K // w.IsReal})
-    (volume : Measure ℝ)).prod (measurePreserving_pi_pi_swap (ι := Fin r) (κ := {w : InfinitePlace K // w.IsComplex})
-    (volume : Measure ℂ))).comp hA
+      (volume : Measure ℝ)).prod
+    (measurePreserving_pi_pi_swap (ι := Fin r) (κ := {w : InfinitePlace K // w.IsComplex})
+      (volume : Measure ℂ))).comp hA
 
-theorem ellS_eq (h : HermFam K V) {r : ℕ} (v : Fin r → V) (R : ℝ) :
-    ellS h v R = psi K r ⁻¹' ((Set.pi univ fun w => {u | qR (gramR h v w) u ≤ R ^ 2}) ×ˢ
-      (Set.pi univ fun w : {w : InfinitePlace K // w.IsComplex} =>
-        {u | qC (h.gram w.1.embedding v) u ≤ R ^ 2})) := by
+theorem ellS_eq (h : HermFam K V) {r : ℕ} (v : Fin r → V) (R : ℝ)
+    : ellS h v R
+      = psi K r
+        ⁻¹' ((Set.pi univ fun w => {u | qR (gramR h v w) u ≤ R ^ 2})
+          ×ˢ (Set.pi univ fun w : {w : InfinitePlace K // w.IsComplex} =>
+            {u | qC (h.gram w.1.embedding v) u ≤ R ^ 2})) := by
   ext y
   simp [ellS, psi, Set.mem_pi]
 
@@ -165,16 +179,15 @@ open scoped Classical ComplexOrder
 
 variable {K : Type*} [Field K] [NumberField K] {V : Type*} [AddCommGroup V] [Module K V]
 
-def ellT (h : HermFam K V) {r : ℕ} (v : Fin r → V) (R : ℝ) :
-    Set (({w : InfinitePlace K // w.IsReal} → Fin r → ℝ) ×
-      ({w : InfinitePlace K // w.IsComplex} → Fin r → ℂ)) :=
-  (Set.pi univ fun w => {u | qR (gramR h v w) u ≤ R ^ 2}) ×ˢ
-    (Set.pi univ fun w : {w : InfinitePlace K // w.IsComplex} =>
-      {u | qC (h.gram w.1.embedding v) u ≤ R ^ 2})
+def ellT (h : HermFam K V) {r : ℕ} (v : Fin r → V) (R : ℝ)
+    : Set
+      (({w : InfinitePlace K // w.IsReal} → Fin r → ℝ)
+        × ({w : InfinitePlace K // w.IsComplex} → Fin r → ℂ)) :=
+  (Set.pi univ fun w => {u | qR (gramR h v w) u ≤ R ^ 2}) ×ˢ (Set.pi univ
+    fun w : {w : InfinitePlace K // w.IsComplex} => {u | qC (h.gram w.1.embedding v) u ≤ R ^ 2})
 
-theorem ellT_props (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v)
-    (R : ℝ) : Convex ℝ (ellT h v R) ∧ Bornology.IsBounded (ellT h v R) ∧
-      MeasurableSet (ellT h v R) := by
+theorem ellT_props (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v) (R : ℝ)
+    : Convex ℝ (ellT h v R) ∧ Bornology.IsBounded (ellT h v R) ∧ MeasurableSet (ellT h v R) := by
   have hR := fun w => ellipsoidR_props (gramR_posDef h hli w) R
   have hC := fun w : {w : InfinitePlace K // w.IsComplex} =>
     ellipsoidC_props (gram_posDef h w.1.embedding hli) R
@@ -185,32 +198,35 @@ theorem ellT_props (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIn
   · exact (MeasurableSet.univ_pi fun w => (hR w).2.2.2).prod
       (MeasurableSet.univ_pi fun w => (hC w).2.2.2)
 
-def psiL (K : Type*) [Field K] [NumberField K] (r : ℕ) :
-    (Fin r → mixedEmbedding.mixedSpace K) →ₗ[ℝ]
-      (({w : InfinitePlace K // w.IsReal} → Fin r → ℝ) ×
-        ({w : InfinitePlace K // w.IsComplex} → Fin r → ℂ)) where
+def psiL (K : Type*) [Field K] [NumberField K] (r : ℕ)
+    : (Fin r → mixedEmbedding.mixedSpace K) →ₗ[ℝ]
+        (({w : InfinitePlace K // w.IsReal} → Fin r → ℝ) ×
+          ({w : InfinitePlace K // w.IsComplex} → Fin r → ℂ)) where
   toFun := psi K r
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem norm_le_norm_psi {r : ℕ} (y : Fin r → mixedEmbedding.mixedSpace K) :
-    ‖y‖ ≤ ‖psi K r y‖ := by
+theorem norm_le_norm_psi {r : ℕ} (y : Fin r → mixedEmbedding.mixedSpace K) : ‖y‖ ≤ ‖psi K r y‖ := by
   refine (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun i => ?_
   refine norm_prod_le_iff.2 ⟨?_, ?_⟩
   · refine (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun w => ?_
-    calc ‖(y i).1 w‖ = ‖(psi K r y).1 w i‖ := rfl
+    calc
+      ‖(y i).1 w‖
+        = ‖(psi K r y).1 w i‖ := rfl
       _ ≤ ‖(psi K r y).1 w‖ := norm_le_pi_norm _ i
       _ ≤ ‖(psi K r y).1‖ := norm_le_pi_norm _ w
       _ ≤ ‖psi K r y‖ := norm_fst_le _
   · refine (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun w => ?_
-    calc ‖(y i).2 w‖ = ‖(psi K r y).2 w i‖ := rfl
+    calc
+      ‖(y i).2 w‖
+        = ‖(psi K r y).2 w i‖ := rfl
       _ ≤ ‖(psi K r y).2 w‖ := norm_le_pi_norm _ i
       _ ≤ ‖(psi K r y).2‖ := norm_le_pi_norm _ w
       _ ≤ ‖psi K r y‖ := norm_snd_le _
 
-theorem ellS_props (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v)
-    (R : ℝ) : Convex ℝ (ellS h v R) ∧ (∀ y ∈ ellS h v R, -y ∈ ellS h v R) ∧
-      Bornology.IsBounded (ellS h v R) ∧ MeasurableSet (ellS h v R) := by
+theorem ellS_props (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v) (R : ℝ)
+    : Convex ℝ (ellS h v R) ∧ (∀ y ∈ ellS h v R, -y ∈ ellS h v R) ∧ Bornology.IsBounded (ellS h v R)
+      ∧ MeasurableSet (ellS h v R) := by
   obtain ⟨hcv, hbd, hms⟩ := ellT_props h hli R
   have he : ellS h v R = psi K r ⁻¹' ellT h v R := ellS_eq h v R
   refine ⟨?_, ?_, ?_, ?_⟩
@@ -227,15 +243,15 @@ theorem ellS_props (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIn
   · rw [he]
     exact hms.preimage (measurePreserving_psi (K := K) r).measurable
 
-theorem volume_ellS (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v)
-    (R : ℝ) : (volume (ellS h v R)).toReal =
-      (∏ w, (volume {u : Fin r → ℝ | qR (gramR h v w) u ≤ R ^ 2}).toReal) *
-        ∏ w : {w : InfinitePlace K // w.IsComplex},
-          (volume {u : Fin r → ℂ | qC (h.gram w.1.embedding v) u ≤ R ^ 2}).toReal := by
+theorem volume_ellS (h : HermFam K V) {r : ℕ} {v : Fin r → V} (hli : LinearIndependent K v) (R : ℝ)
+    : (volume (ellS h v R)).toReal
+      = (∏ w, (volume {u : Fin r → ℝ | qR (gramR h v w) u ≤ R ^ 2}).toReal)
+        * ∏ w : {w : InfinitePlace K // w.IsComplex},
+            (volume {u : Fin r → ℂ | qC (h.gram w.1.embedding v) u ≤ R ^ 2}).toReal := by
   rw [show ellS h v R = psi K r ⁻¹' ellT h v R from ellS_eq h v R,
     (measurePreserving_psi r).measure_preimage (ellT_props h hli R).2.2.nullMeasurableSet, ellT,
-    Measure.prod_prod, Measure.pi_pi,
-    Measure.pi_pi, ENNReal.toReal_mul, ENNReal.toReal_prod, ENNReal.toReal_prod]
+    Measure.prod_prod, Measure.pi_pi, Measure.pi_pi, ENNReal.toReal_mul, ENNReal.toReal_prod,
+    ENNReal.toReal_prod]
   all_goals rfl
 
 end ReciprocityTheory.GeometryOfNumbersTheory

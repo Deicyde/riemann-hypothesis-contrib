@@ -9,20 +9,31 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Constant
 noncomputable section
 
 open NumberField IsDedekindDomain
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.CompanionTheory.CTFin GlobalTheory.BlockCap PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL
+  GlobalTheory.CompanionTheory.CTFin GlobalTheory.BlockCap PositivityTheory.Rg.Rs
+  PositivityTheory.Rg.Rs.InducedTensorMap
 
 namespace PositivityTheory.Rg.BcB.SpectralAccumulation.Cz.BlockCapelli
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {r s : ℕ}
 
-theorem cap_coeff (a : ℕ) (τ : E →+* ℂ) (d : ℂ) : ∃ f : ℕ → Module.End ℂ (Sm E a), f a = 1 ∧ (∀ k, f k ∈ Zalg E a) ∧
-    ∀ u : ℂ, cap τ (u + d) = ∑ k ∈ Finset.range (a + 1), u ^ k • f k := by
-  obtain ⟨f, h1, hspan, heq⟩ := QdetCoeff.qdet_shift_coeff (Module.End ℂ (Sm E a)) a (Eop (a := a) τ) (d + ((a : ℂ) - 1) / 2)
-  have hc : ∀ u : ℂ, cap τ (u + d) = Formalism.REAL.qdet (Eop (a := a) τ) (u + (d + ((a : ℂ) - 1) / 2)) := fun u => by
+theorem cap_coeff (a : ℕ) (τ : E →+* ℂ) (d : ℂ)
+    : ∃ f : ℕ → Module.End ℂ (Sm E a),
+      f a = 1 ∧ (∀ k, f k ∈ Zalg E a)
+        ∧ ∀ u : ℂ, cap τ (u + d) = ∑ k ∈ Finset.range (a + 1), u ^ k • f k := by
+  obtain ⟨f, h1, hspan, heq⟩ :=
+    QdetCoeff.qdet_shift_coeff (Module.End ℂ (Sm E a)) a (Eop (a := a) τ) (d + ((a : ℂ) - 1) / 2)
+  have hc
+      : ∀ u : ℂ,
+        cap τ (u + d)
+          = Formalism.REAL.qdet (Eop (a := a) τ) (u + (d + ((a : ℂ) - 1) / 2)) := fun u => by
     rw [← add_assoc]; rfl
   refine ⟨f, h1, fun k => ?_, fun u => (hc u).trans (heq u)⟩
-  have hle : Submodule.span ℂ (Set.range fun u : ℂ => Formalism.REAL.qdet (Eop (a := a) τ) (u + (d + ((a : ℂ) - 1) / 2))) ≤
-      Subalgebra.toSubmodule (Zalg E a) := by
+  have hle
+      : Submodule.span ℂ
+          (Set.range fun u : ℂ =>
+            Formalism.REAL.qdet (Eop (a := a) τ) (u + (d + ((a : ℂ) - 1) / 2)))
+        ≤ Subalgebra.toSubmodule (Zalg E a) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨u, rfl⟩
     change Formalism.REAL.qdet (Eop (a := a) τ) (u + (d + ((a : ℂ) - 1) / 2)) ∈ Zalg E a
@@ -31,16 +42,24 @@ theorem cap_coeff (a : ℕ) (τ : E →+* ℂ) (d : ℂ) : ∃ f : ℕ → Modul
   exact hle (hspan k)
 
 def zspan {a : ℕ} {k : ℕ} (b : Fin k → Sm E a) : Submodule ℂ (Sm E a) :=
-  Submodule.span ℂ (⋃ i, (fun z : Module.End ℂ (Sm E a) => z (b i)) '' (Zalg E a : Set (Module.End ℂ (Sm E a))))
+  Submodule.span ℂ
+    (⋃ i, (fun z : Module.End ℂ (Sm E a) => z (b i)) '' (Zalg E a : Set (Module.End ℂ (Sm E a))))
 
-theorem zspan_fd {a : ℕ} {k : ℕ} (b : Fin k → Sm E a) (hb : ∀ i, IsAutForm (b i)) : FiniteDimensional ℂ (zspan b) := by
-  have : ∀ i, FiniteDimensional ℂ (Submodule.span ℂ ((fun z : Module.End ℂ (Sm E a) => z (b i)) ''
-      (Zalg E a : Set (Module.End ℂ (Sm E a))))) := fun i => (hb i).zfin
+theorem zspan_fd {a : ℕ} {k : ℕ} (b : Fin k → Sm E a) (hb : ∀ i, IsAutForm (b i))
+    : FiniteDimensional ℂ (zspan b) := by
+  have : ∀ i,
+      FiniteDimensional ℂ
+        (Submodule.span ℂ
+          ((fun z : Module.End ℂ (Sm E a) => z (b i))
+            '' (Zalg E a : Set (Module.End ℂ (Sm E a))))) := fun i =>
+    (hb i).zfin
   rw [zspan, Submodule.span_iUnion]
   infer_instance
 
-theorem zspan_le {a : ℕ} {k : ℕ} (b : Fin k → Sm E a) {L : Submodule ℂ (Sm E a)} (hb : ∀ i, b i ∈ L)
-    (hL : ∀ z ∈ Zalg E a, ∀ φ ∈ L, z φ ∈ L) : zspan b ≤ L := by
+theorem zspan_le
+    {a : ℕ} {k : ℕ} (b : Fin k → Sm E a)
+    {L : Submodule ℂ (Sm E a)} (hb : ∀ i, b i ∈ L) (hL : ∀ z ∈ Zalg E a, ∀ φ ∈ L, z φ ∈ L)
+    : zspan b ≤ L := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨_, ⟨i, rfl⟩, z, hz, rfl⟩
   exact hL z hz _ (hb i)
@@ -48,8 +67,9 @@ theorem zspan_le {a : ℕ} {k : ℕ} (b : Fin k → Sm E a) {L : Submodule ℂ (
 theorem mem_zspan {a : ℕ} {k : ℕ} (b : Fin k → Sm E a) (i : Fin k) : b i ∈ zspan b :=
   Submodule.subset_span (Set.mem_iUnion.2 ⟨i, 1, Subalgebra.one_mem _, rfl⟩)
 
-theorem zspan_stable {a : ℕ} {k : ℕ} (b : Fin k → Sm E a) {z : Module.End ℂ (Sm E a)} (hz : z ∈ Zalg E a) :
-    ∀ φ ∈ zspan b, z φ ∈ zspan b := by
+theorem zspan_stable
+    {a : ℕ} {k : ℕ} (b : Fin k → Sm E a) {z : Module.End ℂ (Sm E a)} (hz : z ∈ Zalg E a)
+    : ∀ φ ∈ zspan b, z φ ∈ zspan b := by
   intro φ hφ
   induction hφ using Submodule.span_induction with
   | mem x hx =>

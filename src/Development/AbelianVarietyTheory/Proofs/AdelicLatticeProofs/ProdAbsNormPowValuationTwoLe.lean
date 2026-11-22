@@ -10,8 +10,11 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem prod_absNorm_pow_le_two_pow :
-    ∀ (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F))) (e : HeightOneSpectrum (𝓞 F) → ℕ), (∀ v ∈ S, v.valuation F 2 = WithZero.exp (-(e v : ℤ))) → ∏ v ∈ S, Ideal.absNorm v.asIdeal ^ e v ≤ 2 ^ Module.finrank ℚ F := by
+theorem prod_absNorm_pow_le_two_pow
+    : ∀ (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F)))
+        (e : HeightOneSpectrum (𝓞 F) → ℕ),
+      (∀ v ∈ S, v.valuation F 2 = WithZero.exp (-(e v : ℤ)))
+        → ∏ v ∈ S, Ideal.absNorm v.asIdeal ^ e v ≤ 2 ^ Module.finrank ℚ F := by
   intro F _ _ S e h
   have hdvd : ∀ v ∈ S, v.asIdeal ^ e v ∣ Ideal.span {(2 : 𝓞 F)} := by
     intro v hv

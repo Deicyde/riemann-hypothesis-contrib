@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qj15.ep_eq_one_iff :
-    ∀ (t : ℝ),
-    Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑t : ℂ)) = (1 : ℂ) ↔ ∃ (n : ℤ), t = (↑n : ℝ) := by
+theorem UpperTheory.Reformulated.B.Qj15.ep_eq_one_iff
+    : ∀ (t : ℝ),
+      Complex.exp ((2 : ℂ) * (↑Real.pi : ℂ) * Complex.I * (↑t : ℂ)) = (1 : ℂ)
+        ↔ ∃ (n : ℤ), t = (↑n : ℝ) := by
   intro t
   rw [Complex.exp_eq_one_iff]
   refine exists_congr fun n => ?_

@@ -16,44 +16,53 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.Fourier
 section hpk
 variable (k r : ℕ)
 
-theorem Hpk_out {i : Fin (2 * r + k + 1)} (h : i.val < r ∨ r + k < i.val) (j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if j.val = 2 * r + k - i.val then 1 else 0 := by
+theorem Hpk_out {i : Fin (2 * r + k + 1)} (h : i.val < r ∨ r + k < i.val) (j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if j.val = 2 * r + k - i.val then 1 else 0 := by
   have hi := i.isLt
   have hj := j.isLt
   simp only [Hpk, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem Hpk_mid {i : Fin (2 * r + k + 1)} (h : ¬(i.val < r ∨ r + k < i.val)) (j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if j.val = i.val then (if i.val = r + k then -1 else 1) else 0 := by
+theorem Hpk_mid
+    {i : Fin (2 * r + k + 1)} (h : ¬(i.val < r ∨ r + k < i.val)) (j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if j.val = i.val then (if i.val = r + k then -1 else 1) else 0 := by
   have hi := i.isLt
   have hj := j.isLt
   simp only [Hpk, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem Hpk_mulVec (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) :
-    (Hpk k r *ᵥ v) i = if i.val < r ∨ r + k < i.val then v ⟨2 * r + k - i.val, by omega⟩
-      else if i.val = r + k then -v i else v i := by
+theorem Hpk_mulVec (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1))
+    : (Hpk k r *ᵥ v) i
+      = if i.val < r ∨ r + k < i.val then
+          v ⟨2 * r + k - i.val, by omega⟩
+        else if i.val = r + k then
+          - v i
+        else
+          v i := by
   by_cases h : i.val < r ∨ r + k < i.val
   · rw [if_pos h]
     simp only [mulVec, dotProduct, Hpk_out k r h]
-    have e : ∀ j : Fin (2 * r + k + 1), (if j.val = 2 * r + k - i.val then (1 : ℂ) else 0) * v j =
-        if j = ⟨2 * r + k - i.val, by omega⟩ then v j else 0 := by
+    have e
+        : ∀ j : Fin (2 * r + k + 1),
+          (if j.val = 2 * r + k - i.val then (1 : ℂ) else 0) * v j
+            = if j = ⟨2 * r + k - i.val, by omega⟩ then v j else 0 := by
       intro j
       by_cases hj : j.val = 2 * r + k - i.val
       · rw [if_pos hj, if_pos (Fin.ext hj), one_mul]
       · rw [if_neg hj, if_neg (fun e => hj (congrArg Fin.val e)), zero_mul]
-    simp only [e, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+    simp only [e, Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte]
   · rw [if_neg h]
     simp only [mulVec, dotProduct, Hpk_mid k r h]
-    have e : ∀ j : Fin (2 * r + k + 1),
-        (if j.val = i.val then (if i.val = r + k then (-1 : ℂ) else 1) else 0) * v j =
-        if j = i then (if i.val = r + k then (-1 : ℂ) else 1) * v j else 0 := by
+    have e
+        : ∀ j : Fin (2 * r + k + 1),
+          (if j.val = i.val then (if i.val = r + k then (-1 : ℂ) else 1) else 0) * v j
+            = if j = i then (if i.val = r + k then (-1 : ℂ) else 1) * v j else 0 := by
       intro j
       by_cases hj : j = i
       · subst hj
         simp
       · rw [if_neg (fun e => hj (Fin.ext e)), if_neg hj, zero_mul]
-    simp only [e, Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+    simp only [e, Finset.sum_ite_eq', Finset.mem_univ, ↓ reduceIte]
     split_ifs <;> simp
 
 theorem Hpk_mulVec_mulVec (v : Fin (2 * r + k + 1) → ℂ) : Hpk k r *ᵥ (Hpk k r *ᵥ v) = v := by
@@ -63,14 +72,19 @@ theorem Hpk_mulVec_mulVec (v : Fin (2 * r + k + 1) → ℂ) : Hpk k r *ᵥ (Hpk 
   by_cases h : i.val < r ∨ r + k < i.val
   · rw [if_pos h, Hpk_mulVec]
     split_ifs with h3 h4
-    all_goals first
-      | (congr 1
-         apply Fin.ext
-         show 2 * r + k - (2 * r + k - i.val) = i.val
-         omega)
-      | (exfalso
-         have h3' : ¬(2 * r + k - i.val < r ∨ r + k < 2 * r + k - i.val) := h3
-         omega)
+    all_goals
+      first
+      | (
+          congr 1
+          apply Fin.ext
+          show 2 * r + k - (2 * r + k - i.val) = i.val
+          omega
+        )
+      | (
+          exfalso
+          have h3' : ¬(2 * r + k - i.val < r ∨ r + k < 2 * r + k - i.val) := h3
+          omega
+        )
   · rw [if_neg h, Hpk_mulVec, if_neg h]
     split_ifs <;> simp
 
@@ -78,7 +92,8 @@ theorem mat_eq_of_mulVec' {A B : Mat k r} (h : ∀ v, A *ᵥ v = B *ᵥ v) : A =
   ext i j
   have e := congrFun (h (Pi.single j 1)) i
   simp only [mulVec, dotProduct, Pi.single_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
-    Finset.mem_univ, ↓reduceIte] at e
+      Finset.mem_univ, ↓ reduceIte]
+    at e
   exact e
 
 theorem Hpk_sq : Hpk k r * Hpk k r = 1 := by
@@ -115,8 +130,9 @@ theorem gbar_mul (g g' : Mat k r) : gbar k r γ (g * g') = gbar k r γ g * gbar 
     rw [← Matrix.mul_assoc, h1, Matrix.one_mul]
   have h2' : ∀ X : Mat k r, embWb k r γ * ((embWb k r γ)⁻¹ * X) = X := fun X => by
     rw [← Matrix.mul_assoc, h2, Matrix.one_mul]
-  have hB : (embWb k r γ)⁻¹ * (g * g') * embWb k r γ =
-      ((embWb k r γ)⁻¹ * g * embWb k r γ) * ((embWb k r γ)⁻¹ * g' * embWb k r γ) := by
+  have hB
+      : (embWb k r γ)⁻¹ * (g * g') * embWb k r γ
+        = ((embWb k r γ)⁻¹ * g * embWb k r γ) * ((embWb k r γ)⁻¹ * g' * embWb k r γ) := by
     simp only [Matrix.mul_assoc, h2']
   rw [hB, Matrix.map_mul]
   simp only [Matrix.mul_assoc, h1']

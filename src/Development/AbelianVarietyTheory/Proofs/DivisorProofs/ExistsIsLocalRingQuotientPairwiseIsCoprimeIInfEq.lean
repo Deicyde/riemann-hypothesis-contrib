@@ -10,8 +10,8 @@ open Function
 
 namespace GlobalTheory
 
-theorem exists_isLocalRing_quotient_pairwise_isCoprime_iInf_eq_bot_padicInt :
-    ∀ (ℓ : ℕ) [Fact ℓ.Prime] (A : Type) [CommRing A] [Algebra ℤ_[ℓ] A] [Module.Finite ℤ_[ℓ] A],
+theorem exists_isLocalRing_quotient_pairwise_isCoprime_iInf_eq_bot_padicInt
+    : ∀ (ℓ : ℕ) [Fact ℓ.Prime] (A : Type) [CommRing A] [Algebra ℤ_[ℓ] A] [Module.Finite ℤ_[ℓ] A],
       ∃ (ι : Type) (_ : Fintype ι) (I : ι → Ideal A),
         (∀ i, IsLocalRing (A ⧸ I i)) ∧ Pairwise (IsCoprime on I) ∧ ⨅ i, I i = ⊥ := by
   intro ℓ _ A _ _ _

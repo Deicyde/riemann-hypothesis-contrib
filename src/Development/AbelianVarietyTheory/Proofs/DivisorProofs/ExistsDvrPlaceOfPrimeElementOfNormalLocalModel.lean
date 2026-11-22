@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.AdjKltOfLtDi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 
 set_option autoImplicit false
 
@@ -17,7 +19,14 @@ noncomputable section
 
 namespace GlobalTheory.FieldPair.PrimeElementPlace
 
-theorem main : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (n : ℕ) (T : Subring L) (hT : IsLocModel cL T) (ψ : T →+* K) (f : T), IsIntegrallyClosed T → (∀ a, ψ ⟨cL a, hT.const_mem a⟩ = cK a) → RingHom.ker ψ = Ideal.span {f} → f ≠ 0 → IsLocModel cK ψ.range → ∃ (S : Place cL) (hS : S.IsPrimeOf T) (ψS : S.ring →+* K), Function.Surjective ψS ∧ (∀ a, ψS (S.const a) = cK a) ∧ (∀ t : T, ψS ⟨t, hS.1 t t.2⟩ = ψ t) ∧ Irreducible (⟨f, hS.1 f f.2⟩ : S.ring) := by
+theorem main
+    : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (n : ℕ) (T : Subring L)
+        (hT : IsLocModel cL T) (ψ : T →+* K) (f : T),
+      IsIntegrallyClosed T → (∀ a, ψ ⟨cL a, hT.const_mem a⟩ = cK a) → RingHom.ker ψ = Ideal.span {f}
+        → f ≠ 0 → IsLocModel cK ψ.range
+        → ∃ (S : Place cL) (hS : S.IsPrimeOf T) (ψS : S.ring →+* K),
+          Function.Surjective ψS ∧ (∀ a, ψS (S.const a) = cK a)
+            ∧ (∀ t : T, ψS ⟨t, hS.1 t t.2⟩ = ψ t) ∧ Irreducible (⟨f, hS.1 f f.2⟩ : S.ring) := by
   intro L K _ _ cL cK n T hT ψ f _ hc hker hf hR
   classical
   haveI hfr : IsFractionRing T L := IsFractionRing.of_field T L fun z => by
@@ -27,7 +36,8 @@ theorem main : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ
     rw [← e, mul_div_cancel_right₀ _ hb0]
   haveI hP : (RingHom.ker ψ).IsPrime := RingHom.ker_isPrime ψ
   let A : Subalgebra T L :=
-    Localization.subalgebra.ofField L (RingHom.ker ψ).primeCompl (RingHom.ker ψ).primeCompl_le_nonZeroDivisors
+    Localization.subalgebra.ofField L (RingHom.ker ψ).primeCompl
+      (RingHom.ker ψ).primeCompl_le_nonZeroDivisors
   haveI : IsLocalization.AtPrime A (RingHom.ker ψ) := (inferInstance : IsLocalization (RingHom.ker ψ).primeCompl A)
   haveI : IsLocalRing A := IsLocalization.AtPrime.isLocalRing A (RingHom.ker ψ)
   letI : Algebra ℂ T := (cL.codRestrict T hT.const_mem).toAlgebra
@@ -54,25 +64,35 @@ theorem main : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ
     · left; rw [← hy]; exact y.2
     · right; rw [← hy]; exact y.2
   let V : ValuationSubring L := ValuationSubring.ofSubring A.toSubring hval
-  let e : A ≃+* V :=
-    { toFun := fun x => ⟨x.1, x.2⟩, invFun := fun y => ⟨y.1, y.2⟩, left_inv := fun _ => rfl,
-      right_inv := fun _ => rfl, map_mul' := fun _ _ => rfl, map_add' := fun _ _ => rfl }
+  let e : A ≃+* V := {
+    toFun := fun x => ⟨x.1, x.2⟩
+    invFun := fun y => ⟨y.1, y.2⟩
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+    map_mul' := fun _ _ => rfl
+    map_add' := fun _ _ => rfl
+  }
   have hTA : ∀ t : L, t ∈ T → t ∈ V := fun t ht => A.algebraMap_mem (⟨t, ht⟩ : T)
   have hcV : ∀ a, cL a ∈ V := fun a => hTA _ (hT.const_mem a)
   have heft : (cL.codRestrict V hcV).EssFiniteType := by
-    have h2 : (algebraMap T A).EssFiniteType := RingHom.essFiniteType_algebraMap.2
-      (Algebra.EssFiniteType.of_isLocalization A (RingHom.ker ψ).primeCompl)
-    have h3 := (hT.essFiniteType.comp h2).comp
-      (RingHom.FiniteType.of_surjective e.toRingHom e.surjective).essFiniteType
-    have e' : e.toRingHom.comp ((algebraMap T A).comp (cL.codRestrict T hT.const_mem)) =
-        cL.codRestrict V hcV := RingHom.ext fun a => Subtype.ext rfl
+    have h2 : (algebraMap T A).EssFiniteType :=
+      RingHom.essFiniteType_algebraMap.2 (Algebra.EssFiniteType.of_isLocalization A
+        (RingHom.ker ψ).primeCompl)
+    have h3 :=
+      (hT.essFiniteType.comp h2).comp
+        (RingHom.FiniteType.of_surjective e.toRingHom e.surjective).essFiniteType
+    have e'
+        : e.toRingHom.comp ((algebraMap T A).comp (cL.codRestrict T hT.const_mem))
+          = cL.codRestrict V hcV :=
+      RingHom.ext fun a => Subtype.ext rfl
     exact e' ▸ h3
-  let S : Place cL := ⟨V, hcV, IsDiscreteValuationRing.RingEquivClass.isDiscreteValuationRing e, heft⟩
+  let S : Place cL :=
+    ⟨V, hcV, IsDiscreteValuationRing.RingEquivClass.isDiscreteValuationRing e, heft⟩
   have hS : S.IsPrimeOf T := by
     refine ⟨fun t ht => hTA t ht, fun x hx => ?_⟩
     obtain ⟨a, s, hs, rfl⟩ := hx
-    have hs0 : (s : L) ≠ 0 := fun h => hs (by
-      rw [show s = 0 from Subtype.ext h]; exact (RingHom.ker ψ).zero_mem)
+    have hs0 : (s : L) ≠ 0 := fun h =>
+      hs (by rw [show s = 0 from Subtype.ext h]; exact (RingHom.ker ψ).zero_mem)
     have hinv : (s : L)⁻¹ ∈ V := ⟨1, s, hs, by rw [map_one, one_mul]; rfl⟩
     have hsV : (s : L) ∈ V := hTA _ s.2
     have hu : IsUnit (⟨(s : L), hsV⟩ : S.ring) :=

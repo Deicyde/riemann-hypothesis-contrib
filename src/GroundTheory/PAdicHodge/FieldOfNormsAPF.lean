@@ -19,9 +19,10 @@ namespace GroundTheory.PAdicHodge
 
 open GroundTheory.LocalField ValuativeRel Filter Topology IntermediateField
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] [IsGalois K Ω]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] [IsGalois K Ω]
 
 section GaloisAPF
 
@@ -57,17 +58,13 @@ variable (d : APFData L)
 
 def u (n : ℕ) : ℝ := d.u₀ + n * (d.c / 2)
 
-
 end APFData
 
 end Construction
 
-
-
 namespace APFData
 
 variable {L : IntermediateField K Ω} [IsGalois K L] (d : APFData L)
-
 
 end APFData
 

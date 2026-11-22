@@ -4,14 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
-open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
+open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+  UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
 open UpperTheory.V.W (Plc Lp)
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.V.Z.Sym.Dict.Br.evenVal :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (P : Pre L), Dict.Unr L → ∀ v : Pl (Lp L), EvenVal (Ov v) (cv v P.Δ) := by
+theorem UpperTheory.V.Z.Sym.Dict.Br.evenVal
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (P : Pre L),
+      Dict.Unr L → ∀ v : Pl (Lp L), EvenVal (Ov v) (cv v P.Δ) := by
   intro L _ _ _ P hU v
   have hval : ∀ x : Lp L, Valued.v (cv v x) = v.valuation (Lp L) x := fun x =>
     IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
@@ -44,7 +47,7 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.evenVal :
     intro h0
     rw [h0, map_zero] at hπ
     exact WithZero.zero_ne_coe hπ
-  let t : Lp L := π ^ (-WithZero.log (w.valuation L (P.e QuadraticAlgebra.omega)))
+  let t : Lp L := π ^ (- WithZero.log (w.valuation L (P.e QuadraticAlgebra.omega)))
   have ht0 : t ≠ 0 := zpow_ne_zero _ hπ0
   have ht : v.valuation (Lp L) t = w.valuation L (P.e QuadraticAlgebra.omega) := by
     simp only [t, map_zpow₀, hπ, ← WithZero.exp_zsmul, smul_eq_mul, mul_neg, mul_one, neg_neg]
@@ -52,14 +55,20 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.evenVal :
   have hu1 : Valued.v (cv v (P.Δ / t ^ 2)) = 1 := by
     rw [hval, map_div₀, map_pow, ht, hv, sq]
     exact div_self (mul_ne_zero hw0 hw0)
-  have hu2 : Valued.v (cv v (P.Δ / t ^ 2)⁻¹) = 1 := by
-    rw [hval, map_inv₀, ← hval, hu1, inv_one]
-  have hne : P.Δ / t ^ 2 ≠ 0 := div_ne_zero (by
-      intro h0
-      apply hδ0
-      exact mul_self_eq_zero.mp (by rw [hδ, h0, map_zero])) (pow_ne_zero _ ht0)
-  refine ⟨⟨⟨cv v (P.Δ / t ^ 2), le_of_eq hu1⟩, ⟨cv v (P.Δ / t ^ 2)⁻¹, le_of_eq hu2⟩, ?_, ?_⟩,
-    cv v t, (map_ne_zero (cv v)).2 ht0, ?_⟩
+  have hu2 : Valued.v (cv v (P.Δ / t ^ 2)⁻¹) = 1 := by rw [hval, map_inv₀, ← hval, hu1, inv_one]
+  have hne : P.Δ / t ^ 2 ≠ 0 :=
+    div_ne_zero
+      (by
+        intro h0
+        apply hδ0
+        exact mul_self_eq_zero.mp (by rw [hδ, h0, map_zero]))
+      (pow_ne_zero _ ht0)
+  refine ⟨
+    ⟨⟨cv v (P.Δ / t ^ 2), le_of_eq hu1⟩, ⟨cv v (P.Δ / t ^ 2)⁻¹, le_of_eq hu2⟩, ?_, ?_⟩,
+    cv v t,
+    (map_ne_zero (cv v)).2 ht0,
+    ?_
+  ⟩
   · apply Subtype.ext
     show cv v (P.Δ / t ^ 2) * cv v (P.Δ / t ^ 2)⁻¹ = 1
     rw [← map_mul, mul_inv_cancel₀ hne, map_one]

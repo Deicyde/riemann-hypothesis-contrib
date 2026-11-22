@@ -8,58 +8,80 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical
-open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
-  Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount Formalism.L2.SG.Pf.FrameGlobalPatching
+open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+  Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount
+  Formalism.L2.SG.Pf.FrameGlobalPatching
 
 namespace Formalism.L2.SG.Pf.FrameGlobalPatching.FStar
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : Formalism.BasicNotions.D7} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)}
-  {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
+variable
+  {D : Formalism.BasicNotions.D7} {u u' : D.what₂.Word}
+  {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
-def starInU (γ : TermDef.Term D u u' F0 what₂) (F'₂ : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) : Prop :=
+def starInU
+    (γ : TermDef.Term D u u' F0 what₂)
+    (F'₂ : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
+    : Prop :=
   ∀ b, frame F'₂ b ∈ Submodule.span D.host.E (Set.range (Sum.elim (frame (lf D F0)) (starFrame γ)))
 
 def starOmL (f f' : Fin (D.R.rS + 1) → (VS D).V) : (VS D).V :=
   ∑ a, star ((starZh f f').adjugate (Fin.last D.R.rS) a) • f a
 
-theorem star_frame_lead_minor (γ : TermDef.Term D u u' F0 what₂) (l : ℕ) :
-    leadMinorE (starZh (frame (lf D F0)) (starFrame γ)) l = leadMinorE (ZhatL (lf D F0) (repF γ)) l := by
-  obtain ⟨hξ1, hξ2⟩ := inv_unitri _ (admissibility_witness_unitriangular γ.lam (lf D F0) (repF γ)).1 (admissibility_witness_unitriangular γ.lam (lf D F0) (repF γ)).2
-  have hZ : starZh (frame (lf D F0)) (starFrame γ) =
-      1 * ZhatL (lf D F0) (repF γ) *
-        (Matrix.of fun a b => (((admXi D γ.lam (lf D F0) (repF γ))⁻¹ a b : 𝓞 D.host.E) : D.host.E)) := by
+theorem star_frame_lead_minor (γ : TermDef.Term D u u' F0 what₂) (l : ℕ)
+    : leadMinorE (starZh (frame (lf D F0)) (starFrame γ)) l
+      = leadMinorE (ZhatL (lf D F0) (repF γ)) l := by
+  obtain ⟨hξ1, hξ2⟩ :=
+    inv_unitri _ (admissibility_witness_unitriangular γ.lam (lf D F0) (repF γ)).1
+      (admissibility_witness_unitriangular γ.lam (lf D F0) (repF γ)).2
+  have hZ
+      : starZh (frame (lf D F0)) (starFrame γ)
+        = 1 * ZhatL (lf D F0) (repF γ)
+          * (Matrix.of fun a b =>
+            (((admXi D γ.lam (lf D F0) (repF γ))⁻¹ a b : 𝓞 D.host.E) : D.host.E)) := by
     rw [Matrix.one_mul]
     exact FsLA.gram_comb_left (S := VS D) (frame (repF γ)) _ (frame (lf D F0))
-  rw [hZ, Formalism.L2.SG.Pf.leadMinor_uni 1 _ _ (fun a c h => Matrix.one_apply_ne (ne_of_lt h))
-    (fun a => Matrix.one_apply_eq a) (fun d b h => by simp [Matrix.of_apply, hξ1 d b h])
-    (fun b => by simp [Matrix.of_apply, hξ2 b]) l]
+  rw [hZ,
+    Formalism.L2.SG.Pf.leadMinor_uni 1 _ _
+      (fun a c h => Matrix.one_apply_ne (ne_of_lt h))
+      (fun a => Matrix.one_apply_eq a)
+      (fun d b h => by simp [Matrix.of_apply, hξ1 d b h])
+      (fun b => by simp [Matrix.of_apply, hξ2 b])
+      l]
 
-theorem starG_ne (γ : TermDef.Term D u u' F0 what₂) (w : Point D.host.E (D.R.rS + 1)) (hγ : EligAt γ w) :
-    (starZh (frame (lf D F0)) (starFrame γ)).det * star (starZh (frame (lf D F0)) (starFrame γ)).det -
-      CntLocal.Tn u * ((Tu D u' : ℕ) : D.host.E) *
-        (leadMinorE (starZh (frame (lf D F0)) (starFrame γ)) D.R.rS *
-          star (leadMinorE (starZh (frame (lf D F0)) (starFrame γ)) D.R.rS)) ≠ 0 := by
+theorem starG_ne
+    (γ : TermDef.Term D u u' F0 what₂) (w : Point D.host.E (D.R.rS + 1)) (hγ : EligAt γ w)
+    : (starZh (frame (lf D F0)) (starFrame γ)).det
+          * star (starZh (frame (lf D F0)) (starFrame γ)).det
+        - CntLocal.Tn u * ((Tu D u' : ℕ) : D.host.E)
+          * (leadMinorE (starZh (frame (lf D F0)) (starFrame γ)) D.R.rS
+            * star (leadMinorE (starZh (frame (lf D F0)) (starFrame γ)) D.R.rS))
+      ≠ 0 := by
   obtain ⟨-, hG⟩ := hγ.1
   obtain ⟨h2, h2e⟩ := starRepF_rep γ
-  have hrel2 := (Formalism.L2.SG.Pf.double_coset_equivalence γ.lam (lf D F0) (PD D γ.lam (lf D F0) u') (Quot.out γ.cls)
-    ⟨repF γ, h2⟩).1 ((Quot.out_eq γ.cls).trans h2e.symm)
+  have hrel2 :=
+    (Formalism.L2.SG.Pf.double_coset_equivalence γ.lam (lf D F0) (PD D γ.lam (lf D F0) u')
+      (Quot.out γ.cls) ⟨repF γ, h2⟩).1 ((Quot.out_eq γ.cls).trans h2e.symm)
   have hGv : Gval (lf D F0) (repF γ) ≠ 0 := by
     have he := Formalism.L2.SG.Pf.gval_rel (lf D F0) hrel2
     change Gval (lf D F0) (repF γ) = _ at he
-    rw [he]; exact hG
+    rw [he]
+    exact hG
   rw [← FsLA.leadMinorE_full, star_frame_lead_minor, star_frame_lead_minor]
   exact hGv
 
-theorem starGlob (γ : TermDef.Term D u u' F0 what₂) (Z : PairVal.MatR D) (hC : Ctx γ Z)
-    (F'₂ : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (hZ : ZhatL (lf D F0) F'₂ = Z)
-    (hU : starInU γ F'₂) :
-    ∃ (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (y : Fin (D.R.rS + 1) ⊕ Fin (D.R.rS + 1) → (VS D).V),
-      (∀ x x', (VS D).hT (g x) (g x') = (VS D).hT x x') ∧ (∀ b, g (starFrame γ b) = frame F'₂ b) ∧
-      (∀ v, g v = v + ∑ k, (VS D).hT (Sum.elim (frame (lf D F0)) (starFrame γ) k) v • y k) ∧
-      star (starZh (frame (lf D F0)) (starFrame γ)).det • starOmL (frame (lf D F0)) (frame F'₂) -
-        star Z.det • g (starOmL (frame (lf D F0)) (starFrame γ)) ∈ Xsp F'₂ := by
+theorem starGlob
+    (γ : TermDef.Term D u u' F0 what₂) (Z : PairVal.MatR D) (hC : Ctx γ Z)
+    (F'₂ : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
+    (hZ : ZhatL (lf D F0) F'₂ = Z) (hU : starInU γ F'₂)
+    : ∃ (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (y : Fin (D.R.rS + 1) ⊕ Fin (D.R.rS + 1) → (VS D).V),
+      (∀ x x', (VS D).hT (g x) (g x') = (VS D).hT x x') ∧ (∀ b, g (starFrame γ b) = frame F'₂ b)
+        ∧ (∀ v, g v = v + ∑ k, (VS D).hT (Sum.elim (frame (lf D F0)) (starFrame γ) k) v • y k)
+        ∧ star (starZh (frame (lf D F0)) (starFrame γ)).det • starOmL (frame (lf D F0)) (frame F'₂)
+            - star Z.det • g (starOmL (frame (lf D F0)) (starFrame γ))
+          ∈ Xsp F'₂ := by
   obtain ⟨w, hγ, -⟩ := id hC
   obtain ⟨hZd, hZ₁d, hx⟩ := starMinors_holds u u' F0 what₂ γ Z hC
   set f := frame (lf D F0) with hf
@@ -77,14 +99,17 @@ theorem starGlob (γ : TermDef.Term D u u' F0 what₂) (Z : PairVal.MatR D) (hC 
   obtain ⟨hf1a, hf1b⟩ := star_frame_orthogonal γ
   have h1f : ∀ a b, (a ≠ Fin.last D.R.rS ∨ b ≠ Fin.last D.R.rS) → (VS D).hT (f a) (f b) = 0 :=
     fun a b h => FsLA.gram_fvec_zero F0 a b h
-  have h2f : (VS D).hT (f (Fin.last D.R.rS)) (f (Fin.last D.R.rS)) = -CntLocal.Tn u := FsLA.gram_fvec_last F0
+  have h2f : (VS D).hT (f (Fin.last D.R.rS)) (f (Fin.last D.R.rS)) = - CntLocal.Tn u :=
+    FsLA.gram_fvec_last F0
   have hdZ1h : Z₁ᴴ.det ≠ 0 := by rw [Matrix.det_conjTranspose]; exact star_ne_zero.2 hZ₁d
   have hdg2 : (FsLA.gram (VS D) f F₂.fvec).det ≠ 0 := by
     rw [hg2, Matrix.det_conjTranspose]; exact star_ne_zero.2 hZd
-  have hx2 : leadMinorE (FsLA.gram (VS D) f F₂.fvec) D.R.rS * Z₁ᴴ.det =
-      leadMinorE Z₁ᴴ D.R.rS * (FsLA.gram (VS D) f F₂.fvec).det := by
-    rw [hg2, FsLA.lm_conjTranspose, FsLA.lm_conjTranspose, Matrix.det_conjTranspose, Matrix.det_conjTranspose,
-      ← star_mul', ← star_mul', mul_comm (leadMinorE Z D.R.rS), hx, mul_comm]
+  have hx2
+      : leadMinorE (FsLA.gram (VS D) f F₂.fvec) D.R.rS * Z₁ᴴ.det
+        = leadMinorE Z₁ᴴ D.R.rS * (FsLA.gram (VS D) f F₂.fvec).det := by
+    rw [hg2, FsLA.lm_conjTranspose, FsLA.lm_conjTranspose, Matrix.det_conjTranspose,
+      Matrix.det_conjTranspose, ← star_mul', ← star_mul', mul_comm (leadMinorE Z D.R.rS), hx,
+      mul_comm]
   obtain ⟨F₃, hZ3, hom3, hsp3⟩ := FsLA.frame_la F₂ f h1f h2f Z₁ᴴ hdZ1h hdg2 hx2
   set h := F₃.fvec with hh
   set uu := Sum.elim f f₁ with huu
@@ -133,8 +158,14 @@ theorem starGlob (γ : TermDef.Term D u u' F0 what₂) (Z : PairVal.MatR D) (hC 
     · exact Submodule.span_le.2 hsub (hsp3 a)
     · exact hU b
   obtain ⟨g, hiso, hgu, -, hform⟩ := FsLA.isom_ext uu uu' hGr hdet hsp
-  refine ⟨g, fun k => ∑ m, (FsLA.gram (VS D) uu uu)⁻¹ m k • (uu' m - uu m), hiso, fun b => hgu (Sum.inr b),
-    hform, ?_⟩
+  refine ⟨
+    g,
+    fun k => ∑ m, (FsLA.gram (VS D) uu uu)⁻¹ m k • (uu' m - uu m),
+    hiso,
+    fun b => hgu (Sum.inr b),
+    hform,
+    ?_
+  ⟩
 
   have homf : FsLA.om (VS D) F₂.fvec f = starOmL f (frame F'₂) := by
     rw [FsLA.om, hg2, ← Matrix.adjugate_conjTranspose]

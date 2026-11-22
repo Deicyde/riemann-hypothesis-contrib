@@ -15,8 +15,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct ContDiff
 open GlobalTheory.KS
 
@@ -26,7 +28,8 @@ end GlobalTheory.GlueFn
 
 namespace GlobalTheory
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct ContDiff in
 private lemma exists_complex_section_through_closed_point (X : Scheme) (p : X ⟶ Spec (CommRingCat.of ℂ))
     [LocallyOfFiniteType p] (x : X) (hx : IsClosed ({x} : Set X)) :
@@ -63,7 +66,8 @@ private lemma valAt'_sub_of_top_le {X : Scheme} (q : _root_.ReciprocityTheory.Ch
   unfold _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt
   simp only [map_sub]
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct ContDiff in
 private lemma not_mem_basicOpen_of_valAt'_eq_zero {X : Scheme} (q : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ ⟶ X)
     (U : X.Opens) (hU : ⊤ ≤ q ⁻¹ᵁ U) (f : Γ(X, U)) (hf : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' q U f = 0)
@@ -87,7 +91,8 @@ private lemma not_mem_basicOpen_of_valAt'_eq_zero {X : Scheme} (q : _root_.Recip
   rw [← hres] at this
   exact this
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct ContDiff in
 private lemma valAt'_presheaf_map {X : Scheme} (q : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ ⟶ X) {U V : X.Opens} (i : V ⟶ U)
     (hV : ⊤ ≤ q ⁻¹ᵁ V) (a : Γ(X, U)) : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' q V (X.presheaf.map i.op a) = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' q U a := by
@@ -98,77 +103,120 @@ private lemma valAt'_presheaf_map {X : Scheme} (q : _root_.ReciprocityTheory.Cha
   rw [← Scheme.Hom.map_appLE q hV i.op]
   rfl
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct ContDiff in
-theorem _root_.GlobalTheory.existsUnique_section_of_locally_regular :
-    ∀ (P₀ : _root_.ReciprocityTheory.ChartRestriction.G.Out.PolAV (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ)) (u : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.HolUnif P₀.A P₀.L P₀.g) (Hm : Matrix (Fin P₀.g) (Fin P₀.g) ℂ) (χ : u.Λ → ℂ), _root_.GlobalTheory.KS.GoodU u Hm χ → ∀ (O : P₀.A.left.Opens) (h : (Fin P₀.g → ℂ) → ℂ), (∀ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ O → ∃ (O' : P₀.A.left.Opens) (a : Γ(P₀.A.left, O')), O' ≤ O ∧ ⊤ ≤ (u.ex z).left ⁻¹ᵁ O' ∧ ∀ z', ⊤ ≤ (u.ex z').left ⁻¹ᵁ O' → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z').left O' a = h z') → ∃! a : Γ(P₀.A.left, O), ∀ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ O → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left O a = h z := by
-  intro P₀ u Hm χ _ O h H
-  haveI := P₀.smoothDim
-  have hsm : Smooth P₀.A.hom := SmoothOfRelativeDimension.smooth P₀.g P₀.A.hom
-  haveI := hsm
-  haveI : IsReduced P₀.A.left := _root_.GlobalTheory.isReduced_of_smooth_complex _ _ hsm
-  haveI : JacobsonSpace P₀.A.left := LocallyOfFiniteType.jacobsonSpace P₀.A.hom
-  have hpt : ∀ y : P₀.A.left, IsClosed ({y} : Set P₀.A.left) →
-      ∃ z, ∀ s, (u.ex z).left.base s = y := by
-    intro y hy
-    obtain ⟨q, hq, hqy⟩ := exists_complex_section_through_closed_point P₀.A.left P₀.A.hom y hy
-    obtain ⟨z, hz⟩ := u.ex_onto (Over.homMk q hq : 𝟙_ (Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ)) ⟶ P₀.A)
-    exact ⟨z, fun s => by rw [hz]; exact hqy s⟩
-  have hs₀ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ := IsLocalRing.closedPoint ℂ
-  have huniq : ∀ (V : P₀.A.left.Opens) (a b : Γ(P₀.A.left, V)), (∀ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ V →
-      _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left V a = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left V b) → a = b := by
-    intro V a b hab
-    rw [← sub_eq_zero, ← basicOpen_eq_bot_iff]
-    by_contra hne
-    obtain ⟨y, hyB, hyc⟩ := nonempty_inter_closedPoints
-      ((TopologicalSpace.Opens.ne_bot_iff_nonempty _).mp hne)
-      (P₀.A.left.basicOpen (a - b)).isOpen.isLocallyClosed
-    obtain ⟨z, hz⟩ := hpt y (mem_closedPoints_iff.mp hyc)
-    have hzV : ⊤ ≤ (u.ex z).left ⁻¹ᵁ V := fun s _ => by
-      show (u.ex z).left.base s ∈ V
-      rw [hz]
-      exact P₀.A.left.basicOpen_le _ hyB
-    have h0 : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left V (a - b) = 0 := by
-      rw [valAt'_sub_of_top_le _ _ hzV, hab z hzV, sub_self]
-    exact not_mem_basicOpen_of_valAt'_eq_zero _ _ hzV _ h0 hs₀ (by rw [hz]; exact hyB)
-  have hloc : ∀ w : {z // ⊤ ≤ (u.ex z).left ⁻¹ᵁ O}, ∃ (O' : P₀.A.left.Opens)
-      (a : Γ(P₀.A.left, O')), O' ≤ O ∧ ⊤ ≤ (u.ex w.1).left ⁻¹ᵁ O' ∧ ∀ z', ⊤ ≤ (u.ex z').left ⁻¹ᵁ O' →
-        _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z').left O' a = h z' := fun w => H w.1 w.2
-  choose W aW hWO hWz hWv using hloc
-  have hcover : O ≤ iSup W := by
-    by_contra hle
-    have hZ : ((O : Set P₀.A.left) ∩ ((iSup W : P₀.A.left.Opens) : Set P₀.A.left)ᶜ).Nonempty := by
-      rw [← Set.diff_eq, Set.diff_nonempty]
-      exact hle
-    have hZlc : IsLocallyClosed ((O : Set P₀.A.left) ∩ ((iSup W : P₀.A.left.Opens) : Set P₀.A.left)ᶜ) :=
-      ⟨O, ((iSup W : P₀.A.left.Opens) : Set P₀.A.left)ᶜ, O.isOpen, (iSup W).isOpen.isClosed_compl, rfl⟩
-    obtain ⟨y, ⟨hyO, hyW⟩, hyc⟩ := nonempty_inter_closedPoints hZ hZlc
-    obtain ⟨z, hz⟩ := hpt y (mem_closedPoints_iff.mp hyc)
-    have hzO : ⊤ ≤ (u.ex z).left ⁻¹ᵁ O := fun s _ => by
-      show (u.ex z).left.base s ∈ O
-      rw [hz]
-      exact hyO
-    have hyz : y ∈ W ⟨z, hzO⟩ := by
-      rw [← hz hs₀]
-      exact hWz ⟨z, hzO⟩ (show hs₀ ∈ (⊤ : (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ).Opens) from trivial)
-    exact hyW (TopologicalSpace.Opens.mem_iSup.mpr ⟨_, hyz⟩)
-  have hcompat : TopCat.Presheaf.IsCompatible P₀.A.left.sheaf.obj W aW := by
-    intro i j
-    apply huniq
-    intro z hz
-    have hi : ⊤ ≤ (u.ex z).left ⁻¹ᵁ W i := fun s hs => (inf_le_left : W i ⊓ W j ≤ W i) (hz hs)
-    have hj : ⊤ ≤ (u.ex z).left ⁻¹ᵁ W j := fun s hs => (inf_le_right : W i ⊓ W j ≤ W j) (hz hs)
-    erw [valAt'_presheaf_map _ _ hz, valAt'_presheaf_map _ _ hz]
-    rw [hWv i z hi, hWv j z hj]
-  obtain ⟨a, ha, -⟩ := P₀.A.left.sheaf.existsUnique_gluing' W O (fun i => homOfLE (hWO i))
-    hcover aW hcompat
-  have hval : ∀ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ O → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left O a = h z := by
-    intro z hz
-    rw [← valAt'_presheaf_map (u.ex z).left (homOfLE (hWO ⟨z, hz⟩)) (hWz ⟨z, hz⟩) a]
-    erw [ha ⟨z, hz⟩]
-    exact hWv ⟨z, hz⟩ z (hWz ⟨z, hz⟩)
-  refine ⟨a, hval, fun b hb => huniq O b a fun z hz => ?_⟩
-  rw [hb z hz, hval z hz]
+theorem _root_.GlobalTheory.existsUnique_section_of_locally_regular
+    : ∀ (P₀ : _root_.ReciprocityTheory.ChartRestriction.G.Out.PolAV
+        (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ))
+        (u : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.HolUnif P₀.A P₀.L P₀.g)
+        (Hm : Matrix (Fin P₀.g) (Fin P₀.g) ℂ) (χ : u.Λ → ℂ),
+      _root_.GlobalTheory.KS.GoodU u Hm χ
+        → ∀ (O : P₀.A.left.Opens) (h : (Fin P₀.g → ℂ) → ℂ),
+          (∀ z,
+              ⊤ ≤ (u.ex z).left ⁻¹ᵁ O
+                → ∃ (O' : P₀.A.left.Opens) (a : Γ(P₀.A.left, O')),
+                  O' ≤ O ∧ ⊤ ≤ (u.ex z).left ⁻¹ᵁ O'
+                    ∧ ∀ z',
+                      ⊤ ≤ (u.ex z').left ⁻¹ᵁ O'
+                        → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z').left
+                            O' a
+                          = h z')
+            → ∃! a : Γ(P₀.A.left, O), ∀ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ O → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left O a = h z :=
+  by
+    intro P₀ u Hm χ _ O h H
+    haveI := P₀.smoothDim
+    have hsm : Smooth P₀.A.hom := SmoothOfRelativeDimension.smooth P₀.g P₀.A.hom
+    haveI := hsm
+    haveI : IsReduced P₀.A.left := _root_.GlobalTheory.isReduced_of_smooth_complex _ _ hsm
+    haveI : JacobsonSpace P₀.A.left := LocallyOfFiniteType.jacobsonSpace P₀.A.hom
+    have hpt
+        : ∀ y : P₀.A.left, IsClosed ({y} : Set P₀.A.left) → ∃ z, ∀ s, (u.ex z).left.base s = y := by
+      intro y hy
+      obtain ⟨q, hq, hqy⟩ := exists_complex_section_through_closed_point P₀.A.left P₀.A.hom y hy
+      obtain ⟨z, hz⟩ :=
+        u.ex_onto
+          (Over.homMk q hq
+            : 𝟙_ (Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ)) ⟶ P₀.A)
+      exact ⟨z, fun s => by rw [hz]; exact hqy s⟩
+    have hs₀ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ := IsLocalRing.closedPoint ℂ
+    have huniq
+        : ∀ (V : P₀.A.left.Opens) (a b : Γ(P₀.A.left, V)),
+          (∀ z,
+              ⊤ ≤ (u.ex z).left ⁻¹ᵁ V
+                → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left V a
+                  = _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left V b)
+            → a = b := by
+      intro V a b hab
+      rw [← sub_eq_zero, ← basicOpen_eq_bot_iff]
+      by_contra hne
+      obtain ⟨y, hyB, hyc⟩ :=
+        nonempty_inter_closedPoints ((TopologicalSpace.Opens.ne_bot_iff_nonempty _).mp hne)
+          (P₀.A.left.basicOpen (a - b)).isOpen.isLocallyClosed
+      obtain ⟨z, hz⟩ := hpt y (mem_closedPoints_iff.mp hyc)
+      have hzV : ⊤ ≤ (u.ex z).left ⁻¹ᵁ V := fun s _ => by
+        show (u.ex z).left.base s ∈ V
+        rw [hz]
+        exact P₀.A.left.basicOpen_le _ hyB
+      have h0
+          : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left V (a - b)
+            = 0 := by
+        rw [valAt'_sub_of_top_le _ _ hzV, hab z hzV, sub_self]
+      exact not_mem_basicOpen_of_valAt'_eq_zero _ _ hzV _ h0 hs₀ (by rw [hz]; exact hyB)
+    have hloc
+        : ∀ w : {z // ⊤ ≤ (u.ex z).left ⁻¹ᵁ O}, ∃ (O' : P₀.A.left.Opens) (a : Γ(P₀.A.left, O')),
+          O' ≤ O ∧ ⊤ ≤ (u.ex w.1).left ⁻¹ᵁ O'
+            ∧ ∀ z',
+              ⊤ ≤ (u.ex z').left ⁻¹ᵁ O'
+                → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z').left O' a
+                  = h z' := fun w =>
+      H w.1 w.2
+    choose W aW hWO hWz hWv using hloc
+    have hcover : O ≤ iSup W := by
+      by_contra hle
+      have hZ : ((O : Set P₀.A.left) ∩ ((iSup W : P₀.A.left.Opens) : Set P₀.A.left)ᶜ).Nonempty := by
+        rw [← Set.diff_eq, Set.diff_nonempty]
+        exact hle
+      have hZlc : IsLocallyClosed
+          ((O : Set P₀.A.left) ∩ ((iSup W : P₀.A.left.Opens) : Set P₀.A.left)ᶜ) := ⟨
+        O,
+        ((iSup W : P₀.A.left.Opens) : Set P₀.A.left)ᶜ,
+        O.isOpen,
+        (iSup W).isOpen.isClosed_compl,
+        rfl
+      ⟩
+      obtain ⟨y, ⟨hyO, hyW⟩, hyc⟩ := nonempty_inter_closedPoints hZ hZlc
+      obtain ⟨z, hz⟩ := hpt y (mem_closedPoints_iff.mp hyc)
+      have hzO : ⊤ ≤ (u.ex z).left ⁻¹ᵁ O := fun s _ => by
+        show (u.ex z).left.base s ∈ O
+        rw [hz]
+        exact hyO
+      have hyz : y ∈ W ⟨z, hzO⟩ := by
+        rw [← hz hs₀]
+        exact hWz ⟨z, hzO⟩
+          (show hs₀ ∈ (⊤ : (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℂ).Opens) from
+            trivial)
+      exact hyW (TopologicalSpace.Opens.mem_iSup.mpr ⟨_, hyz⟩)
+    have hcompat : TopCat.Presheaf.IsCompatible P₀.A.left.sheaf.obj W aW := by
+      intro i j
+      apply huniq
+      intro z hz
+      have hi : ⊤ ≤ (u.ex z).left ⁻¹ᵁ W i := fun s hs => (inf_le_left : W i ⊓ W j ≤ W i) (hz hs)
+      have hj : ⊤ ≤ (u.ex z).left ⁻¹ᵁ W j := fun s hs => (inf_le_right : W i ⊓ W j ≤ W j) (hz hs)
+      erw [valAt'_presheaf_map _ _ hz, valAt'_presheaf_map _ _ hz]
+      rw [hWv i z hi, hWv j z hj]
+    obtain ⟨a, ha, -⟩ :=
+      P₀.A.left.sheaf.existsUnique_gluing' W O (fun i => homOfLE (hWO i)) hcover aW hcompat
+    have hval
+        : ∀ z,
+          ⊤ ≤ (u.ex z).left ⁻¹ᵁ O
+            → _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.valAt' (u.ex z).left O a
+              = h z := by
+      intro z hz
+      rw [← valAt'_presheaf_map (u.ex z).left (homOfLE (hWO ⟨z, hz⟩)) (hWz ⟨z, hz⟩) a]
+      erw [ha ⟨z, hz⟩]
+      exact hWv ⟨z, hz⟩ z (hWz ⟨z, hz⟩)
+    refine ⟨a, hval, fun b hb => huniq O b a fun z hz => ?_⟩
+    rw [hb z hz, hval z hz]
 
 end GlobalTheory

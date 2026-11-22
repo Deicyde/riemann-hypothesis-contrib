@@ -9,12 +9,16 @@ open Formalism.L2 Formalism.AUTREP ReciprocityTheory.Aut NumberField
 
 namespace GlobalTheory.IsoFix
 
-variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
+variable
+  {L : Type} [Field L] [NumberField L] [IsCMField L]
+  {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
 
-theorem fixed_transport {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (GAf L n → W)} (K : Set (GAf L n))
-    (hS : NG.IsSubrep ρ S) (hiso : NG.IsoRep S S') {x : GAf L n → W} (hx : x ∈ S') (hx0 : x ≠ 0)
-    (hfix : ∀ κ ∈ K, NG.rt L n κ x = x) :
-    ∃ f' ∈ S, f' ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ f' = f' := by
+theorem fixed_transport
+    {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (GAf L n → W)}
+    (K : Set (GAf L n))
+    (hS : NG.IsSubrep ρ S) (hiso : NG.IsoRep S S')
+    {x : GAf L n → W} (hx : x ∈ S') (hx0 : x ≠ 0) (hfix : ∀ κ ∈ K, NG.rt L n κ x = x)
+    : ∃ f' ∈ S, f' ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ f' = f' := by
   obtain ⟨T, hT⟩ := hiso
   have hTf0 : T (T.symm ⟨x, hx⟩) = ⟨x, hx⟩ := T.apply_symm_apply _
   refine ⟨(T.symm ⟨x, hx⟩ : S), (T.symm ⟨x, hx⟩).2, ?_, ?_⟩
@@ -23,7 +27,8 @@ theorem fixed_transport {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule �
     have h2 : (⟨x, hx⟩ : S') = 0 := by rw [← hTf0, h1, map_zero]
     exact hx0 (congrArg Subtype.val h2)
   · intro κ hκ
-    have hmem : NG.rt L n κ ((T.symm ⟨x, hx⟩ : S) : GAf L n → W) ∈ S := hS.stable κ _ (T.symm ⟨x, hx⟩).2
+    have hmem : NG.rt L n κ ((T.symm ⟨x, hx⟩ : S) : GAf L n → W) ∈ S :=
+      hS.stable κ _ (T.symm ⟨x, hx⟩).2
     have key := hT κ (T.symm ⟨x, hx⟩) ⟨_, hmem⟩ rfl
     rw [hTf0] at key
     have h3 : T ⟨_, hmem⟩ = T (T.symm ⟨x, hx⟩) := by
@@ -32,19 +37,22 @@ theorem fixed_transport {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule �
       exact hfix κ hκ
     exact congrArg Subtype.val (T.injective h3)
 
-theorem iSup_finset_stable (s : Finset (Submodule ℂ (GAf L n → W)))
-    (hs : ∀ i ∈ s, ∀ h, ∀ f ∈ i, NG.rt L n h f ∈ i) (h : GAf L n) :
-    ∀ f ∈ (⨆ i ∈ s, i), NG.rt L n h f ∈ (⨆ i ∈ s, i) := by
+theorem iSup_finset_stable
+    (s : Finset (Submodule ℂ (GAf L n → W))) (hs : ∀ i ∈ s, ∀ h, ∀ f ∈ i, NG.rt L n h f ∈ i)
+    (h : GAf L n)
+    : ∀ f ∈ (⨆ i ∈ s, i), NG.rt L n h f ∈ (⨆ i ∈ s, i) := by
   have hle : (⨆ i ∈ s, i) ≤ (⨆ i ∈ s, i).comap (NG.rt L n h) := by
     refine iSup₂_le fun i hi => ?_
     intro f hf
     exact (le_iSup₂ (f := fun i (_ : i ∈ s) => i) i hi) (hs i hi h f hf)
   exact fun f hf => hle hf
 
-theorem fixed_of_mem_finset_sum (ρ : Representation ℂ (GQ L n) W) (S : Submodule ℂ (GAf L n → W))
-    (K : Set (GAf L n)) (hS : NG.IsIrrRep ρ S) (s : Finset (Submodule ℂ (GAf L n → W))) :
-    (↑s ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'}) → ∀ f ∈ (⨆ i ∈ s, i), f ≠ 0 →
-      (∀ κ ∈ K, NG.rt L n κ f = f) → ∃ f' ∈ S, f' ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ f' = f' := by
+theorem fixed_of_mem_finset_sum
+    (ρ : Representation ℂ (GQ L n) W) (S : Submodule ℂ (GAf L n → W))
+    (K : Set (GAf L n)) (hS : NG.IsIrrRep ρ S) (s : Finset (Submodule ℂ (GAf L n → W)))
+    : (↑s ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'})
+      → ∀ f ∈ (⨆ i ∈ s, i),
+        f ≠ 0 → (∀ κ ∈ K, NG.rt L n κ f = f) → ∃ f' ∈ S, f' ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ f' = f' := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -54,8 +62,8 @@ theorem fixed_of_mem_finset_sum (ρ : Representation ℂ (GQ L n) W) (S : Submod
   | insert a s ha ih =>
     intro hsub f hf hf0 hfix
     have haF : NG.IsIrrRep ρ a ∧ NG.IsoRep S a := hsub (Finset.mem_insert_self a s)
-    have hsF : (↑s : Set _) ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'} :=
-      fun x hx => hsub (Finset.mem_insert_of_mem hx)
+    have hsF : (↑s : Set _) ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'} := fun x hx =>
+      hsub (Finset.mem_insert_of_mem hx)
     rw [Finset.iSup_insert] at hf
     have hMst : ∀ h, ∀ g ∈ (⨆ i ∈ s, i), NG.rt L n h g ∈ (⨆ i ∈ s, i) :=
       iSup_finset_stable s (fun i hi => (hsF hi).1.1.stable)
@@ -84,10 +92,14 @@ theorem fixed_of_mem_finset_sum (ρ : Representation ℂ (GQ L n) W) (S : Submod
     · have hle : a ≤ ⨆ i ∈ s, i := inf_eq_left.1 htop
       exact ih hsF f ((sup_le hle le_rfl) hf) hf0 hfix
 
-theorem fixed_of_isoTyp : ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W]
-    [Module ℂ W] (ρ : Representation ℂ (GQ L n) W) (S : Submodule ℂ (GAf L n → W)) (K : Set (GAf L n)),
-    NG.IsIrrRep ρ S → ∀ f ∈ NG.isoTyp ρ S, f ≠ 0 → (∀ κ ∈ K, NG.rt L n κ f = f) →
-      ∃ f' ∈ S, f' ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ f' = f' := by
+theorem fixed_of_isoTyp
+    : ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W]
+        [Module ℂ W] (ρ : Representation ℂ (GQ L n) W) (S : Submodule ℂ (GAf L n → W))
+        (K : Set (GAf L n)),
+      NG.IsIrrRep ρ S
+        → ∀ f ∈ NG.isoTyp ρ S,
+          f ≠ 0 → (∀ κ ∈ K, NG.rt L n κ f = f)
+            → ∃ f' ∈ S, f' ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ f' = f' := by
   intro L _ _ _ n W _ _ ρ S K hS f hf hf0 hfix
   obtain ⟨s, hs, hfs⟩ := Submodule.mem_sSup_iff_exists_finset.1 hf
   exact fixed_of_mem_finset_sum ρ S K hS s hs f hfs hf0 hfix

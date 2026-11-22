@@ -6,7 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsHal
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.MainNotions.StandardLattice Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT GlobalTheory.CoverRead
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+  Formalism.MainNotions.StandardLattice Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Datum Formalism.IndefR.FWT GlobalTheory.CoverRead
 
 set_option autoImplicit false
 
@@ -14,10 +19,16 @@ noncomputable section
 
 namespace GlobalTheory.HalfCharacter
 
-theorem exists_half_of_auxiliary_split_level : ∀ (D : D7) (T : CoreJ D), LawsJ T → ∀ pd : ℕ, GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels.IsAuxiliarySplitSquarefreeLevel D T.Q.l.M pd →
-  ∃ I : Ideal (𝓞 D.host.E), I = Ideal.span {x | x ∈ I ∧ x ∈ Algebra.adjoin ℤ {T.Q.H.w0}} ∧
-    I * I.map (T.Q.H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) = Ideal.span {(pd : 𝓞 D.host.E)} ∧
-    I ⊔ I.map (T.Q.H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) = ⊤ := by
+theorem exists_half_of_auxiliary_split_level
+    : ∀ (D : D7) (T : CoreJ D),
+      LawsJ T
+        → ∀ pd : ℕ,
+          GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels.IsAuxiliarySplitSquarefreeLevel
+              D T.Q.l.M pd
+            → ∃ I : Ideal (𝓞 D.host.E),
+              I = Ideal.span {x | x ∈ I ∧ x ∈ Algebra.adjoin ℤ {T.Q.H.w0}}
+                ∧ I * I.map (T.Q.H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) = Ideal.span {(pd : 𝓞 D.host.E)}
+                ∧ I ⊔ I.map (T.Q.H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) = ⊤ := by
   intro D T hJ pd haux
   obtain ⟨hodd, -, hjac, -, -⟩ := haux
   have hH : T.Q.PinHost := hJ.toLawsM.pins.1

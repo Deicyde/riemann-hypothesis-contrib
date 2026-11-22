@@ -25,14 +25,16 @@ theorem isNormalScheme_of_smooth (f : X ⟶ S) [Smooth f] [IsNormalScheme S] : I
   (isNormalScheme_iff X).mpr
     (forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth f ((isNormalScheme_iff S).mp ‹_›))
 
-theorem isIntegral_of_smooth_of_connectedSpace (f : X ⟶ S) [Smooth f] [IsNormalScheme S]
-    [IsLocallyNoetherian S] [ConnectedSpace X] : IsIntegral X :=
+theorem isIntegral_of_smooth_of_connectedSpace
+    (f : X ⟶ S) [Smooth f] [IsNormalScheme S] [IsLocallyNoetherian S] [ConnectedSpace X]
+    : IsIntegral X :=
   have := isNormalScheme_of_smooth f
   have := LocallyOfFiniteType.isLocallyNoetherian f
   IsNormalScheme.isIntegral_of_connectedSpace X
 
-theorem isIntegral_of_smooth_field {K : Type u} [Field K] (f : X ⟶ Spec (.of K)) [Smooth f]
-    [ConnectedSpace X] : IsIntegral X :=
+theorem isIntegral_of_smooth_field
+    {K : Type u} [Field K] (f : X ⟶ Spec (.of K)) [Smooth f] [ConnectedSpace X]
+    : IsIntegral X :=
   isIntegral_of_smooth_of_connectedSpace f
 
 theorem geometricallyReduced_of_smooth (f : X ⟶ S) [Smooth f] : GeometricallyReduced f := by
@@ -41,46 +43,52 @@ theorem geometricallyReduced_of_smooth (f : X ⟶ S) [Smooth f] : GeometricallyR
   have := isNormalScheme_of_smooth snd
   exact IsNormalScheme.isReduced
 
-theorem geometricallyIntegral_of_smooth (f : X ⟶ S) [Smooth f] [GeometricallyConnected f] :
-    GeometricallyIntegral f := by
+theorem geometricallyIntegral_of_smooth (f : X ⟶ S) [Smooth f] [GeometricallyConnected f]
+    : GeometricallyIntegral f := by
   refine ⟨fun K _ y Z fst snd h ↦ ?_⟩
   have : Smooth snd := MorphismProperty.of_isPullback h ‹_›
   have : ConnectedSpace Z := GeometricallyConnected.geometrically_connectedSpace y fst snd h
   exact isIntegral_of_smooth_field snd
 
-theorem geometricallyConnected_of_geometricallyIntegral (f : X ⟶ S) [GeometricallyIntegral f] :
-    GeometricallyConnected f := by
+theorem geometricallyConnected_of_geometricallyIntegral (f : X ⟶ S) [GeometricallyIntegral f]
+    : GeometricallyConnected f := by
   refine ⟨fun K _ y Z fst snd h ↦ ?_⟩
   have : IsIntegral Z := GeometricallyIntegral.geometrically_isIntegral y fst snd h
   exact inferInstanceAs (ConnectedSpace Z)
 
-theorem isIntegral_of_geometricallyIntegral (f : X ⟶ S) [GeometricallyIntegral f] [Flat f]
-    [UniversallyOpen f] [IsIntegral S] : IsIntegral X := by
+theorem isIntegral_of_geometricallyIntegral
+    (f : X ⟶ S) [GeometricallyIntegral f] [Flat f] [UniversallyOpen f] [IsIntegral S]
+    : IsIntegral X := by
   have : Finite (irreducibleComponents S) := by
     rw [irreducibleComponents_eq_singleton]
     infer_instance
   rw [isIntegral_iff_irreducibleSpace_and_isReduced]
-  exact ⟨GeometricallyIrreducible.irreducibleSpace f f.isOpenMap,
-    GeometricallyReduced.isReduced_of_flat_of_finite_irreducibleComponents f⟩
+  exact ⟨
+    GeometricallyIrreducible.irreducibleSpace f f.isOpenMap,
+    GeometricallyReduced.isReduced_of_flat_of_finite_irreducibleComponents f
+  ⟩
 
-theorem isIntegral_of_smooth_of_geometricallyConnected (f : X ⟶ S) [Smooth f]
-    [GeometricallyConnected f] [IsIntegral S] : IsIntegral X :=
+theorem isIntegral_of_smooth_of_geometricallyConnected
+    (f : X ⟶ S) [Smooth f] [GeometricallyConnected f] [IsIntegral S]
+    : IsIntegral X :=
   have := geometricallyIntegral_of_smooth f
   isIntegral_of_geometricallyIntegral f
 
-theorem isIntegral_of_isPullback_of_smooth {Z : Scheme.{u}} {fst : Z ⟶ X} {snd : Z ⟶ Y}
-    {f : X ⟶ S} {g : Y ⟶ S} (h : IsPullback fst snd f g) [Smooth f] [GeometricallyConnected f]
-    [IsIntegral Y] : IsIntegral Z :=
+theorem isIntegral_of_isPullback_of_smooth
+    {Z : Scheme.{u}} {fst : Z ⟶ X} {snd : Z ⟶ Y} {f : X ⟶ S} {g : Y ⟶ S}
+    (h : IsPullback fst snd f g) [Smooth f] [GeometricallyConnected f] [IsIntegral Y]
+    : IsIntegral Z :=
   have : Smooth snd := MorphismProperty.of_isPullback h ‹_›
   have : GeometricallyConnected snd := MorphismProperty.of_isPullback h ‹_›
   isIntegral_of_smooth_of_geometricallyConnected snd
 
-theorem isIntegral_pullback_of_smooth (f : X ⟶ S) (g : Y ⟶ S) [Smooth f]
-    [GeometricallyConnected f] [IsIntegral Y] : IsIntegral (pullback f g) :=
+theorem isIntegral_pullback_of_smooth
+    (f : X ⟶ S) (g : Y ⟶ S) [Smooth f] [GeometricallyConnected f] [IsIntegral Y]
+    : IsIntegral (pullback f g) :=
   isIntegral_of_isPullback_of_smooth (.of_hasPullback f g)
 
-theorem isIntegral_fiber_of_smooth (f : X ⟶ S) [Smooth f] [GeometricallyConnected f] (s : S) :
-    IsIntegral (f.fiber s) :=
+theorem isIntegral_fiber_of_smooth (f : X ⟶ S) [Smooth f] [GeometricallyConnected f] (s : S)
+    : IsIntegral (f.fiber s) :=
   have := geometricallyIntegral_of_smooth f
   inferInstance
 
@@ -92,20 +100,21 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 variable {S : Scheme.{u}}
 
-theorem smooth_tensorObj_hom (G H : Over S) [Smooth G.hom] [Smooth H.hom] :
-    Smooth (G ⊗ H).hom := by
+theorem smooth_tensorObj_hom (G H : Over S) [Smooth G.hom] [Smooth H.hom] : Smooth (G ⊗ H).hom := by
   rw [Over.tensorObj_hom]
   infer_instance
 
-theorem geometricallyConnected_tensorObj_hom (G H : Over S) [Smooth G.hom] [Smooth H.hom]
-    [GeometricallyConnected G.hom] [GeometricallyConnected H.hom] :
-    GeometricallyConnected (G ⊗ H).hom := by
+theorem geometricallyConnected_tensorObj_hom
+    (G H : Over S)
+    [Smooth G.hom] [Smooth H.hom] [GeometricallyConnected G.hom] [GeometricallyConnected H.hom]
+    : GeometricallyConnected (G ⊗ H).hom := by
   rw [Over.tensorObj_hom]
   exact GeometricallyConnected.comp _ _
 
-theorem geometricallyIntegral_tensorObj_hom (G H : Over S) [Smooth G.hom] [Smooth H.hom]
-    [GeometricallyConnected G.hom] [GeometricallyConnected H.hom] :
-    GeometricallyIntegral (G ⊗ H).hom :=
+theorem geometricallyIntegral_tensorObj_hom
+    (G H : Over S)
+    [Smooth G.hom] [Smooth H.hom] [GeometricallyConnected G.hom] [GeometricallyConnected H.hom]
+    : GeometricallyIntegral (G ⊗ H).hom :=
   have := smooth_tensorObj_hom G H
   have := geometricallyConnected_tensorObj_hom G H
   geometricallyIntegral_of_smooth _
@@ -193,14 +202,16 @@ section Local
 
 variable {X : Scheme.{u}} {V : Type u} [CommRing V]
 
-theorem isIntegral_specialFibre_of_smooth [IsLocalRing V] (f : X ⟶ Spec (.of V)) [Smooth f]
-    [GeometricallyConnected f] :
-    IsIntegral (pullback f (Spec.map (CommRingCat.ofHom (IsLocalRing.residue V)))) :=
+theorem isIntegral_specialFibre_of_smooth
+    [IsLocalRing V] (f : X ⟶ Spec (.of V)) [Smooth f] [GeometricallyConnected f]
+    : IsIntegral (pullback f (Spec.map (CommRingCat.ofHom (IsLocalRing.residue V)))) :=
   isIntegral_pullback_of_smooth _ _
 
-theorem isIntegral_genericFibre_of_smooth [IsDomain V] (K : Type u) [Field K] [Algebra V K]
-    [IsFractionRing V K] (f : X ⟶ Spec (.of V)) [Smooth f] [GeometricallyConnected f] :
-    IsIntegral (pullback f (Spec.map (CommRingCat.ofHom (algebraMap V K)))) :=
+theorem isIntegral_genericFibre_of_smooth
+    [IsDomain V]
+    (K : Type u) [Field K] [Algebra V K] [IsFractionRing V K]
+    (f : X ⟶ Spec (.of V)) [Smooth f] [GeometricallyConnected f]
+    : IsIntegral (pullback f (Spec.map (CommRingCat.ofHom (algebraMap V K)))) :=
   isIntegral_pullback_of_smooth _ _
 
 end Local
@@ -213,26 +224,28 @@ open ReciprocityTheory.ChartRestriction.G.Semi
 
 variable {S : Scheme.{u}}
 
-theorem geometricallyIntegral_of_isAbelianScheme (A : Over S) [GrpObj A] [h : IsAbelianScheme A] :
-    GeometricallyIntegral A.hom :=
+theorem geometricallyIntegral_of_isAbelianScheme (A : Over S) [GrpObj A] [h : IsAbelianScheme A]
+    : GeometricallyIntegral A.hom :=
   have := h.smooth
   have := h.geomConnected
   geometricallyIntegral_of_smooth _
 
-theorem geometricallyIntegral_of_isSemiAbelian (G : Over S) [GrpObj G] [h : IsSemiAbelian G] :
-    GeometricallyIntegral G.hom :=
+theorem geometricallyIntegral_of_isSemiAbelian (G : Over S) [GrpObj G] [h : IsSemiAbelian G]
+    : GeometricallyIntegral G.hom :=
   have := h.smooth
   have := h.geomConnected
   geometricallyIntegral_of_smooth _
 
-theorem isIntegral_left_of_isAbelianScheme (A : Over S) [GrpObj A] [h : IsAbelianScheme A]
-    [IsIntegral S] : IsIntegral A.left :=
+theorem isIntegral_left_of_isAbelianScheme
+    (A : Over S) [GrpObj A] [h : IsAbelianScheme A] [IsIntegral S]
+    : IsIntegral A.left :=
   have := h.smooth
   have := h.geomConnected
   isIntegral_of_smooth_of_geometricallyConnected A.hom
 
-theorem isIntegral_left_of_isSemiAbelian (G : Over S) [GrpObj G] [h : IsSemiAbelian G]
-    [IsIntegral S] : IsIntegral G.left :=
+theorem isIntegral_left_of_isSemiAbelian
+    (G : Over S) [GrpObj G] [h : IsSemiAbelian G] [IsIntegral S]
+    : IsIntegral G.left :=
   have := h.smooth
   have := h.geomConnected
   isIntegral_of_smooth_of_geometricallyConnected G.hom
@@ -245,33 +258,43 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-theorem geometricallyIntegral_of_smooth_of_geometricallyConnected :
-    (∀ {X S : Scheme.{u}} (f : X ⟶ S) [Smooth f] [GeometricallyConnected f],
-      GeometricallyIntegral f ∧ (IsIntegral S → IsIntegral X)) ∧
-    (∀ {S : Scheme.{u}} (A : Over S) [GrpObj A], IsAbelianScheme A ∨ IsSemiAbelian A →
-      ∀ T ∈ [A, G2 A, G3 A, G4 A],
-        GeometricallyIntegral T.hom ∧ (IsIntegral S → IsIntegral T.left)) ∧
-    (∀ {S : Scheme.{u}} (G : Over S) [Smooth G.hom] [GeometricallyConnected G.hom],
-      ∀ T ∈ [G, G2 G, G3 G, G4 G],
-        GeometricallyIntegral T.hom ∧ (IsIntegral S → IsIntegral T.left)) ∧
-    (∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (G : Over (Sp V))
-      [Smooth G.hom] [GeometricallyConnected G.hom], ∀ T ∈ [G, G2 G, G3 G, G4 G],
-        IsIntegral T.left ∧ IsLocallyNoetherian T.left ∧
-        IsIntegral (pullback T.hom (spMap (IsLocalRing.residue V))) ∧
-        IsIntegral (pullback T.hom (spMap (algebraMap V (FractionRing V))))) := by
-  have key : ∀ {S : Scheme.{u}} (G : Over S) [Smooth G.hom] [GeometricallyConnected G.hom],
-      ∀ T ∈ [G, G2 G, G3 G, G4 G],
-        GeometricallyIntegral T.hom ∧ (IsIntegral S → IsIntegral T.left) := by
+theorem geometricallyIntegral_of_smooth_of_geometricallyConnected
+    : (∀ {X S : Scheme.{u}} (f : X ⟶ S) [Smooth f] [GeometricallyConnected f],
+        GeometricallyIntegral f ∧ (IsIntegral S → IsIntegral X))
+      ∧ (∀ {S : Scheme.{u}} (A : Over S) [GrpObj A],
+        IsAbelianScheme A ∨ IsSemiAbelian A
+          → ∀ T ∈ [A, G2 A, G3 A, G4 A],
+            GeometricallyIntegral T.hom ∧ (IsIntegral S → IsIntegral T.left))
+      ∧ (∀ {S : Scheme.{u}} (G : Over S) [Smooth G.hom] [GeometricallyConnected G.hom],
+        ∀ T ∈ [G, G2 G, G3 G, G4 G],
+          GeometricallyIntegral T.hom ∧ (IsIntegral S → IsIntegral T.left))
+      ∧ (∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (G : Over (Sp V))
+          [Smooth G.hom] [GeometricallyConnected G.hom],
+        ∀ T ∈ [G, G2 G, G3 G, G4 G],
+          IsIntegral T.left ∧ IsLocallyNoetherian T.left
+            ∧ IsIntegral (pullback T.hom (spMap (IsLocalRing.residue V)))
+            ∧ IsIntegral (pullback T.hom (spMap (algebraMap V (FractionRing V))))) := by
+  have key
+      : ∀ {S : Scheme.{u}} (G : Over S) [Smooth G.hom] [GeometricallyConnected G.hom],
+        ∀ T ∈ [G, G2 G, G3 G, G4 G],
+          GeometricallyIntegral T.hom ∧ (IsIntegral S → IsIntegral T.left) := by
     intro S G _ _ T hT
     simp only [List.mem_cons, List.not_mem_nil, or_false] at hT
     rcases hT with rfl | rfl | rfl | rfl
-    · exact ⟨geometricallyIntegral_of_smooth _,
-        fun _ ↦ isIntegral_of_smooth_of_geometricallyConnected T.hom⟩
+    · exact ⟨
+        geometricallyIntegral_of_smooth _,
+        fun _ ↦ isIntegral_of_smooth_of_geometricallyConnected T.hom
+      ⟩
     · exact ⟨geometricallyIntegral_square_hom G, fun _ ↦ isIntegral_square_left G⟩
     · exact ⟨geometricallyIntegral_cube_hom G, fun _ ↦ isIntegral_cube_left G⟩
     · exact ⟨geometricallyIntegral_fourthPower_hom G, fun _ ↦ isIntegral_fourthPower_left G⟩
-  refine ⟨fun f _ _ ↦ ⟨geometricallyIntegral_of_smooth f,
-    fun _ ↦ isIntegral_of_smooth_of_geometricallyConnected f⟩, ?_, key, ?_⟩
+  refine ⟨
+    fun f _ _ ↦
+      ⟨geometricallyIntegral_of_smooth f, fun _ ↦ isIntegral_of_smooth_of_geometricallyConnected f⟩,
+    ?_,
+    key,
+    ?_
+  ⟩
   · rintro S A _ (h | h)
     all_goals
       have := h.smooth
@@ -285,9 +308,12 @@ theorem geometricallyIntegral_of_smooth_of_geometricallyConnected :
       · exact ⟨smooth_square_hom G, geometricallyConnected_square_hom G⟩
       · exact ⟨smooth_cube_hom G, geometricallyConnected_cube_hom G⟩
       · exact ⟨smooth_fourthPower_hom G, geometricallyConnected_fourthPower_hom G⟩
-    exact ⟨isIntegral_of_smooth_of_geometricallyConnected T.hom,
-      LocallyOfFiniteType.isLocallyNoetherian T.hom, isIntegral_specialFibre_of_smooth T.hom,
-      isIntegral_genericFibre_of_smooth (FractionRing V) T.hom⟩
+    exact ⟨
+      isIntegral_of_smooth_of_geometricallyConnected T.hom,
+      LocallyOfFiniteType.isLocallyNoetherian T.hom,
+      isIntegral_specialFibre_of_smooth T.hom,
+      isIntegral_genericFibre_of_smooth (FractionRing V) T.hom
+    ⟩
 
 end Main
 

@@ -10,21 +10,29 @@ open NumberField Ideal Matrix IsDedekindDomain
 
 namespace PI.UnitaryGroupMassFormula.IAT
 
-open Formalism.BasicNotions Formalism.L2.Forms Formalism.L2.Host Formalism.L2.GlobalTheoryTheory.LocalLatticeBases Formalism.UG
+open Formalism.BasicNotions Formalism.L2.Forms Formalism.L2.Host
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases Formalism.UG
 
 variable {D : D7} {u : D.what₂.Word}
 
 def AwayLat0 (T : Forms0 D u) : Prop :=
-  ∀ (v v' : (D.mem u).A.vT), v' ≠ v → ∀ (c c' : (D.mem u).C.cls 0)
-    (γ : UJ (sigD D : D.host.E →+* D.host.E) (gramN D 0 (Nat.zero_le _)))
-    (η : UPts (sigD D) (gramN D 0 (Nat.zero_le _)) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)) (κ : T.cls0.lev.U),
-    (∀ v'', v'' ≠ (T.atT.eV v).1 → bc (prV (E := D.host.E) v'') η.1 = 1) →
-    bc (inclE (F := D.host.F) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)) γ.1 * (T.cls0.y c').1 = (T.cls0.y c).1 * η.1 * κ.1 →
-    Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v') (mulLat γ.1.1 (Ld D u 0 (Nat.zero_le _) c')) =
-      Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v') (Ld D u 0 (Nat.zero_le _) c)
+  ∀ (v v' : (D.mem u).A.vT),
+    v' ≠ v
+      → ∀ (c c' : (D.mem u).C.cls 0)
+          (γ : UJ (sigD D : D.host.E →+* D.host.E) (gramN D 0 (Nat.zero_le _)))
+          (η : UPts (sigD D) (gramN D 0 (Nat.zero_le _)) (FiniteAdeleRing (𝓞 D.host.F) D.host.F))
+          (κ : T.cls0.lev.U),
+        (∀ v'', v'' ≠ (T.atT.eV v).1 → bc (prV (E := D.host.E) v'') η.1 = 1)
+          → bc (inclE (F := D.host.F) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)) γ.1 * (T.cls0.y c').1
+            = (T.cls0.y c).1 * η.1 * κ.1
+          → Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v')
+              (mulLat γ.1.1 (Ld D u 0 (Nat.zero_le _) c'))
+            = Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v')
+              (Ld D u 0 (Nat.zero_le _) c)
 
-theorem unif (A : AtTTied u) (v : (D.mem u).A.vT) (p : 𝓞 D.host.E) (hp : p ∈ A.Pv v) :
-    ∃ s : 𝓞 D.host.E, s ∉ A.Pv v ∧ ∃ t : 𝓞 D.host.E, p * s = ((D.mem u).A.T : 𝓞 D.host.E) * t := by
+theorem unif (A : AtTTied u) (v : (D.mem u).A.vT) (p : 𝓞 D.host.E) (hp : p ∈ A.Pv v)
+    : ∃ s : 𝓞 D.host.E,
+      s ∉ A.Pv v ∧ ∃ t : 𝓞 D.host.E, p * s = ((D.mem u).A.T : 𝓞 D.host.E) * t := by
   have : Fact (D.mem u).A.T.Prime := ⟨(D.mem u).A.T_prime⟩
   have : CharP ((D.mem u).A.Fv v) (D.mem u).A.T := charP_of_card_eq_prime ((D.mem u).A.card_Fv v)
   have hPmax : (A.Pv v).IsMaximal := RingHom.ker_isMaximal_of_surjective (A.res v) (A.res_surj v)
@@ -40,7 +48,8 @@ theorem unif (A : AtTTied u) (v : (D.mem u).A.vT) (p : 𝓞 D.host.E) (hp : p �
       exact (hres_nat _).2 dvd_rfl
     have hmax : (span {((D.mem u).A.T : ℤ)}).IsMaximal := by
       refine this.isMaximal ?_
-      rw [Ne, Ideal.span_singleton_eq_bot]; exact_mod_cast (D.mem u).A.T_prime.ne_zero
+      rw [Ne, Ideal.span_singleton_eq_bot]
+      exact_mod_cast (D.mem u).A.T_prime.ne_zero
     exact hmax.eq_of_le (Ideal.comap_ne_top _ hPmax.ne_top) hle
   have hN := T_ne A v
   obtain ⟨I, hI, hIP⟩ := map_eq_mul_coprime D.host (D.mem u).A.T hN (A.Pv v)
@@ -51,28 +60,33 @@ theorem unif (A : AtTTied u) (v : (D.mem u).A.vT) (p : 𝓞 D.host.E) (hp : p �
   obtain ⟨z, hz⟩ := hps
   exact ⟨s, hsP, z, by rw [← hz, mul_comm]⟩
 
-theorem up_smul_mem (A : AtTTied u) (v : (D.mem u).A.vT) (L : Submodule (𝓞 D.host.E) (Fin (D.R.N 0) → D.host.E))
-    (z : Fin (D.R.N 0) → D.host.E) (hz : z ∈ L) (p : 𝓞 D.host.E) (hp : p ∈ A.Pv v) (x : Fin (D.R.N 0) → D.host.E)
-    (hx : x ∈ Formalism.HermitianLatticesTheory.localization₂ (A.Pv v) (L ⊔ Submodule.span (𝓞 D.host.E) {(((D.mem u).A.T : ℕ) : D.host.E)⁻¹ • z})) :
-    p • x ∈ Formalism.HermitianLatticesTheory.localization₂ (A.Pv v) L := by
-
-  change ∃ s ∈ (A.Pv v).primeCompl, s • x ∈
-    (L ⊔ Submodule.span (𝓞 D.host.E) {(((D.mem u).A.T : ℕ) : D.host.E)⁻¹ • z}) at hx
+theorem up_smul_mem
+    (A : AtTTied u) (v : (D.mem u).A.vT)
+    (L : Submodule (𝓞 D.host.E) (Fin (D.R.N 0) → D.host.E)) (z : Fin (D.R.N 0) → D.host.E)
+    (hz : z ∈ L)
+    (p : 𝓞 D.host.E) (hp : p ∈ A.Pv v)
+    (x : Fin (D.R.N 0) → D.host.E)
+    (hx : x ∈ Formalism.HermitianLatticesTheory.localization₂ (A.Pv v)
+      (L ⊔ Submodule.span (𝓞 D.host.E) {(((D.mem u).A.T : ℕ) : D.host.E)⁻¹ • z}))
+    : p • x ∈ Formalism.HermitianLatticesTheory.localization₂ (A.Pv v) L := by
+  change ∃ s ∈ (A.Pv v).primeCompl,
+      s • x ∈ (L ⊔ Submodule.span (𝓞 D.host.E) {(((D.mem u).A.T : ℕ) : D.host.E)⁻¹ • z})
+    at hx
   show ∃ s ∈ (A.Pv v).primeCompl, s • (p • x) ∈ L
   obtain ⟨s, hs, hsx⟩ := hx
   obtain ⟨l, hl, y, hy, hly⟩ := Submodule.mem_sup.mp hsx
   obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hy
   obtain ⟨s', hs', t, hpt⟩ := unif A v p hp
   refine ⟨s' * s, (A.Pv v).primeCompl.mul_mem hs' hs, ?_⟩
-  have e : (s' * s) • (p • x) = (s' * p) • (s • x) := by
-    rw [smul_smul, smul_smul, mul_right_comm]
+  have e : (s' * s) • (p • x) = (s' * p) • (s • x) := by rw [smul_smul, smul_smul, mul_right_comm]
   rw [e, ← hly, smul_add]
   refine L.add_mem (L.smul_mem _ hl) ?_
   by_cases hT0 : (((D.mem u).A.T : ℕ) : D.host.E) = 0
   · rw [hT0, _root_.inv_zero, zero_smul, smul_zero, smul_zero]
     exact L.zero_mem
-  · have hc : algebraMap (𝓞 D.host.E) D.host.E (s' * p) =
-        (((D.mem u).A.T : ℕ) : D.host.E) * algebraMap (𝓞 D.host.E) D.host.E t := by
+  · have hc
+        : algebraMap (𝓞 D.host.E) D.host.E (s' * p)
+          = (((D.mem u).A.T : ℕ) : D.host.E) * algebraMap (𝓞 D.host.E) D.host.E t := by
       rw [mul_comm s' p, hpt, map_mul, map_natCast]
     have key : (s' * p) • (a • ((((D.mem u).A.T : ℕ) : D.host.E)⁻¹ • z)) = (a * t) • z := by
       funext i
@@ -91,22 +105,36 @@ theorem upLatLoc0_of (T : Forms0 D u) (hA : AwayLat0 T) : UpLatLoc0 T := by
   · subst hτ
     rw [if_pos rfl]
     refine intInv_of_loc T.atT w hw hs v B' B γ.1 hB' hB ?_ ?_
-    · calc Ld D u 0 (Nat.zero_le _) c ≤ Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v) (Ld D u 0 (Nat.zero_le _) c) := le_locP' (T.atT.Pv v) _
+    · calc
+        Ld D u 0 (Nat.zero_le _) c
+            ≤ Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v)
+              (Ld D u 0 (Nat.zero_le _) c) :=
+          le_locP' (T.atT.Pv v) _
         _ = Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v)
-            (mulLat γ.1.1 (clsCrd D u 0 (Nat.zero_le _) ((D.fm u).up 0 v c (T.lv0.pr v c z)))) := h3.symm
+            (mulLat γ.1.1 (clsCrd D u 0 (Nat.zero_le _) ((D.fm u).up 0 v c (T.lv0.pr v c z)))) :=
+          h3.symm
         _ ≤ _ := localization_mono' _ (Submodule.map_mono le_sup_left)
     · intro x hx
       obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.1 hx
       obtain ⟨y1, hy1, y2, hy2, rfl⟩ := Submodule.mem_sup.1 hy
       simp only [LinearMap.coe_restrictScalars, Matrix.mulVecLin_apply, Matrix.mulVec_add]
       refine add_mem ?_ ?_
-      · have hm : γ.1.1 *ᵥ y1 ∈ mulLat γ.1.1 (clsCrd D u 0 (Nat.zero_le _) ((D.fm u).up 0 v c (T.lv0.pr v c z))) :=
+      · have hm
+            : γ.1.1 *ᵥ y1
+              ∈ mulLat γ.1.1 (clsCrd D u 0 (Nat.zero_le _) ((D.fm u).up 0 v c (T.lv0.pr v c z))) :=
           Submodule.mem_map_of_mem hy1
         rw [← h3]
         exact le_locP' (T.atT.Pv v) _ hm
-      · refine Submodule.smul_induction_on (p := fun y => γ.1.1 *ᵥ y ∈
-            Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v) (Ld D u 0 (Nat.zero_le _) c)) hy2 (fun p hp l hl => ?_) (fun a b ha hb => ?_)
-        · have hm : γ.1.1 *ᵥ l ∈ mulLat γ.1.1 (Ld D u 0 (Nat.zero_le _) ((D.fm u).up 0 v c (T.lv0.pr v c z))) :=
+      · refine Submodule.smul_induction_on
+          (p := fun y =>
+            γ.1.1 *ᵥ y ∈ Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v)
+              (Ld D u 0 (Nat.zero_le _) c))
+          hy2
+          (fun p hp l hl => ?_)
+          (fun a b ha hb => ?_)
+        · have hm
+              : γ.1.1 *ᵥ l
+                ∈ mulLat γ.1.1 (Ld D u 0 (Nat.zero_le _) ((D.fm u).up 0 v c (T.lv0.pr v c z))) :=
             Submodule.mem_map_of_mem hl
           have hm' := le_locP' (T.atT.Pv v) _ hm
           rw [h4] at hm'

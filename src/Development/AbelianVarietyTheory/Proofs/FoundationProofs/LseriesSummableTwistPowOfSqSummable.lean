@@ -8,8 +8,13 @@ open Complex Filter Topology
 
 namespace GlobalTheory
 
-theorem lseriesSummable_twist_pow_of_sq_summable :
-    ∀ (e : ℕ) (ψ g : ℕ → ℂ) (s : ℝ), 1 ≤ e → 0 < s → (∀ n, ‖ψ n‖ ≤ 1) → (∀ t : ℝ, 0 < t → Summable fun n : ℕ => ‖g n‖ ^ 2 / (n : ℝ) ^ (((2 * e + 1 : ℕ) : ℝ) + t)) → LSeriesSummable (fun n : ℕ => ψ n * (n : ℂ) ^ (e - 1) * g n) (((2 * (e : ℝ) + s : ℝ)) : ℂ) := by
+theorem lseriesSummable_twist_pow_of_sq_summable
+    : ∀ (e : ℕ) (ψ g : ℕ → ℂ) (s : ℝ),
+      1 ≤ e → 0 < s → (∀ n, ‖ψ n‖ ≤ 1)
+        → (∀ t : ℝ, 0 < t → Summable fun n : ℕ => ‖g n‖ ^ 2 / (n : ℝ) ^ (((2 * e + 1 : ℕ) : ℝ) + t))
+        → LSeriesSummable
+          (fun n : ℕ => ψ n * (n : ℂ) ^ (e - 1) * g n)
+          (((2 * (e : ℝ) + s : ℝ)) : ℂ) := by
   intro e ψ g s he hs hψ hg
   have h1 := hg s hs
   have h2 : Summable fun n : ℕ => 1 / (n : ℝ) ^ (1 + s) :=
@@ -35,8 +40,7 @@ theorem lseriesSummable_twist_pow_of_sq_summable :
       push_cast
       ring
     have e2 : 1 / x ^ (1 + s) = q ^ 2 := by
-      rw [hq, ← Real.rpow_natCast (x ^ _) 2, ← Real.rpow_mul hx.le, one_div,
-        ← Real.rpow_neg hx.le]
+      rw [hq, ← Real.rpow_natCast (x ^ _) 2, ← Real.rpow_mul hx.le, one_div, ← Real.rpow_neg hx.le]
       congr 1
       push_cast
       ring
@@ -49,8 +53,7 @@ theorem lseriesSummable_twist_pow_of_sq_summable :
     have e4 : ‖ψ n‖ * x ^ k * A / x ^ (2 * ((k + 1 : ℕ) : ℝ) + s) = ‖ψ n‖ * (A * p * q) := by
       rw [mul_assoc A, ← e3]; ring
     rw [e4]
-    have h3 : ‖ψ n‖ * (A * p * q) ≤ A * p * q :=
-      mul_le_of_le_one_left (by positivity) (hψ n)
+    have h3 : ‖ψ n‖ * (A * p * q) ≤ A * p * q := mul_le_of_le_one_left (by positivity) (hψ n)
     have h4 : 0 ≤ A * p * q := by positivity
     nlinarith [sq_nonneg (A * p - q)]
 

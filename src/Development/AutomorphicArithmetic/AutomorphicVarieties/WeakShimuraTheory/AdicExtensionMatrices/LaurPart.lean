@@ -5,11 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUni
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-private theorem laurPart_prod {S R' ι : Type} [CommRing S] [CommRing R'] (e : S →+* LaurentSeries R')
-    (w : ι → ℤ) (z : ι → S) (h : ∀ s, ∃ y, e (z s) = HahnSeries.single (w s) y) (d : ι → ℕ) (t : Finset ι) :
-    ∃ y, e (∏ i ∈ t, z i ^ d i) = HahnSeries.single (∑ i ∈ t, d i • w i) y := by
+private theorem laurPart_prod
+    {S R' ι : Type} [CommRing S] [CommRing R']
+    (e : S →+* LaurentSeries R') (w : ι → ℤ) (z : ι → S)
+    (h : ∀ s, ∃ y, e (z s) = HahnSeries.single (w s) y)
+    (d : ι → ℕ) (t : Finset ι)
+    : ∃ y, e (∏ i ∈ t, z i ^ d i) = HahnSeries.single (∑ i ∈ t, d i • w i) y := by
   classical
   induction t using Finset.induction_on with
   | empty => exact ⟨1, by simp⟩
@@ -17,11 +21,21 @@ private theorem laurPart_prod {S R' ι : Type} [CommRing S] [CommRing R'] (e : S
     obtain ⟨y, hy⟩ := ih
     obtain ⟨u, hu⟩ := h a
     refine ⟨u ^ d a * y, ?_⟩
-    rw [Finset.prod_insert ha, Finset.sum_insert ha, map_mul, map_pow, hy, hu, HahnSeries.single_pow,
-      HahnSeries.single_mul_single]
+    rw [Finset.prod_insert ha, Finset.sum_insert ha, map_mul, map_pow, hy, hu,
+      HahnSeries.single_pow, HahnSeries.single_mul_single]
 
-theorem UpperTheory.V.Ws.sxLaurPart :
-    ∀ {Λ : Type} [CommRing Λ] [IsLocalRing Λ] [IsNoetherianRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ] {X : Type} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R] (W : WPres Λ X R), (∀ s, W.z s ∈ maximalIdeal R) → ∀ {R' : Type} [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] {S : Type} [CommRing S] [Algebra Λ S] [IsCO Λ S] {c : ℕ} {e : S →+* LaurentSeries R'}, Laur (Λ := Λ) c e → ∀ (τ : X →+ ℤ) (F : R →ₐ[Λ] S), (∀ s, ∃ y, e (F (W.z s)) = HahnSeries.single (τ (W.wt s)) y) → ∀ j, ∀ x ∈ W.part j, ∃ y, e (F x) = HahnSeries.single (τ j) y := by
+theorem UpperTheory.V.Ws.sxLaurPart
+    : ∀ {Λ : Type} [CommRing Λ] [IsLocalRing Λ] [IsNoetherianRing Λ]
+        [IsAdicComplete (maximalIdeal Λ) Λ] {X : Type} [AddCommGroup X] [Module.Free ℤ X]
+        [Module.Finite ℤ X] [DecidableEq X] {R : Type} [CommRing R] [Algebra Λ R] [IsCO Λ R]
+        (W : WPres Λ X R),
+      (∀ s, W.z s ∈ maximalIdeal R)
+        → ∀ {R' : Type} [CommRing R'] [Algebra Λ R'] [IsCO Λ R'] {S : Type} [CommRing S]
+            [Algebra Λ S] [IsCO Λ S] {c : ℕ} {e : S →+* LaurentSeries R'},
+          Laur (Λ := Λ) c e
+            → ∀ (τ : X →+ ℤ) (F : R →ₐ[Λ] S),
+              (∀ s, ∃ y, e (F (W.z s)) = HahnSeries.single (τ (W.wt s)) y)
+                → ∀ j, ∀ x ∈ W.part j, ∃ y, e (F x) = HahnSeries.single (τ j) y := by
   intro Λ _ _ _ _ X _ _ _ _ R _ _ _ W hW R' _ _ _ S _ _ _ c e hL τ F hF j x hx
   classical
   obtain ⟨g, hg, rfl⟩ := hx

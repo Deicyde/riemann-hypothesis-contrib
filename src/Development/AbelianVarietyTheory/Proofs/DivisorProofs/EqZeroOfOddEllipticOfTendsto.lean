@@ -35,7 +35,13 @@ private lemma exists_eq_mul_of_three_roots {A : ℂ[X]} {a b c : ℂ} (hab : b �
   obtain ⟨B, rfl⟩ := dvd_iff_isRoot.mpr hc₂
   exact ⟨B, rfl⟩
 
-theorem eq_zero_of_odd_elliptic_of_tendsto : ∀ (L : PeriodPair) (f : ℂ → ℂ), (∀ z, z ∉ L.lattice → DifferentiableAt ℂ f z) → (∀ z l, z ∉ L.lattice → l ∈ L.lattice → f (z + l) = f z) → (∀ z, z ∉ L.lattice → f (-z) = -f z) → Filter.Tendsto (fun z : ℂ => z ^ 3 * f z) (𝓝[≠] 0) (𝓝 0) → ∀ z, z ∉ L.lattice → f z = 0 := by
+theorem eq_zero_of_odd_elliptic_of_tendsto
+    : ∀ (L : PeriodPair) (f : ℂ → ℂ),
+      (∀ z, z ∉ L.lattice → DifferentiableAt ℂ f z)
+        → (∀ z l, z ∉ L.lattice → l ∈ L.lattice → f (z + l) = f z)
+        → (∀ z, z ∉ L.lattice → f (-z) = - f z)
+        → Filter.Tendsto (fun z : ℂ => z ^ 3 * f z) (𝓝[≠] 0) (𝓝 0)
+        → ∀ z, z ∉ L.lattice → f z = 0 := by
   classical
   intro L f hd hp ho ht
   let g : ℂ → ℂ := fun z ↦ if z ∈ L.lattice then 0 else f z ^ 2
@@ -71,8 +77,8 @@ theorem eq_zero_of_odd_elliptic_of_tendsto : ∀ (L : PeriodPair) (f : ℂ → �
     rw [ho z hz, show -z + (z + z) = z by ring, CharZero.eq_neg_self_iff] at h1
     rw [← hA z hz]
     simp [g, h1]
-  have key : ∀ a b : ℚ, (a * L.ω₁ + b * L.ω₂ : ℂ) ∈ L.lattice ↔ a.den = 1 ∧ b.den = 1 :=
-    fun a b ↦ L.mul_ω₁_add_mul_ω₂_mem_lattice
+  have key : ∀ a b : ℚ, (a * L.ω₁ + b * L.ω₂ : ℂ) ∈ L.lattice ↔ a.den = 1 ∧ b.den = 1 := fun a b ↦
+    L.mul_ω₁_add_mul_ω₂_mem_lattice
   let p : ℚ → ℚ → ℂ := fun a b ↦ a * L.ω₁ + b * L.ω₂
   have padd : ∀ a b c d, p a b + p c d = p (a + c) (b + d) := fun a b c d ↦ by
     simp only [p]; push_cast; ring
@@ -82,14 +88,14 @@ theorem eq_zero_of_odd_elliptic_of_tendsto : ∀ (L : PeriodPair) (f : ℂ → �
   have n1 : p (1 / 2) 0 ∉ L.lattice := by rw [pm]; norm_num
   have n2 : p 0 (1 / 2) ∉ L.lattice := by rw [pm]; norm_num
   have n3 : p (1 / 2) (1 / 2) ∉ L.lattice := by rw [pm]; norm_num
-  obtain ⟨B, hB⟩ := exists_eq_mul_of_three_roots (A := A) (a := ℘[L] (p (1 / 2) 0))
-    (b := ℘[L] (p 0 (1 / 2))) (c := ℘[L] (p (1 / 2) (1 / 2)))
-    (by rw [Ne, weierstrassP_eq_iff L n2 n1, padd, psub, pm, pm]; norm_num)
-    (by rw [Ne, weierstrassP_eq_iff L n3 n1, padd, psub, pm, pm]; norm_num)
-    (by rw [Ne, weierstrassP_eq_iff L n3 n2, padd, psub, pm, pm]; norm_num)
-    (hhalf _ n1 (by rw [padd, pm]; norm_num))
-    (hhalf _ n2 (by rw [padd, pm]; norm_num))
-    (hhalf _ n3 (by rw [padd, pm]; norm_num))
+  obtain ⟨B, hB⟩ :=
+    exists_eq_mul_of_three_roots (A := A) (a := ℘[L] (p (1 / 2) 0)) (b := ℘[L] (p 0 (1 / 2)))
+      (c := ℘[L] (p (1 / 2) (1 / 2)))
+      (by rw [Ne, weierstrassP_eq_iff L n2 n1, padd, psub, pm, pm]; norm_num)
+      (by rw [Ne, weierstrassP_eq_iff L n3 n1, padd, psub, pm, pm]; norm_num)
+      (by rw [Ne, weierstrassP_eq_iff L n3 n2, padd, psub, pm, pm]; norm_num)
+      (hhalf _ n1 (by rw [padd, pm]; norm_num)) (hhalf _ n2 (by rw [padd, pm]; norm_num))
+      (hhalf _ n3 (by rw [padd, pm]; norm_num))
   set a := ℘[L] (p (1 / 2) 0)
   set b := ℘[L] (p 0 (1 / 2))
   set c := ℘[L] (p (1 / 2) (1 / 2))

@@ -10,15 +10,17 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.ZM.IsGaloisCover
 
-theorem exists_algClosed_point (T : Scheme.{0}) (p : T) :
-    ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (j : Sp K ⟶ T), p ∈ Set.range j := by
+theorem exists_algClosed_point (T : Scheme.{0}) (p : T)
+    : ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (j : Sp K ⟶ T), p ∈ Set.range j := by
   let k := T.residueField p
   let K := AlgebraicClosure k
   let i : Spec (CommRingCat.of K) ⟶ Spec k := Spec.map (CommRingCat.ofHom (algebraMap k K))
@@ -32,8 +34,9 @@ theorem exists_algClosed_point (T : Scheme.{0}) (p : T) :
 
 variable {X Y : Scheme.{0}} {π : X ⟶ Y} {Ga : Type} [Group Ga] {ρ : Ga → (X ⟶ X)}
 
-theorem exists_local_geom (h : IsGaloisCover Ga ρ π) {T : Scheme.{0}} (x x' : T ⟶ X) (hx : x ≫ π = x' ≫ π) (p : T) :
-    ∃ (V : T.Opens) (a : Ga), p ∈ V ∧ V.ι ≫ x ≫ ρ a = V.ι ≫ x' := by
+theorem exists_local_geom
+    (h : IsGaloisCover Ga ρ π) {T : Scheme.{0}} (x x' : T ⟶ X) (hx : x ≫ π = x' ≫ π) (p : T)
+    : ∃ (V : T.Opens) (a : Ga), p ∈ V ∧ V.ι ≫ x ≫ ρ a = V.ι ≫ x' := by
   have := h.etale
   let D := pullback.diagonal π
   let m : Ga → (T ⟶ pullback π π) := fun a =>
@@ -44,9 +47,11 @@ theorem exists_local_geom (h : IsGaloisCover Ga ρ π) {T : Scheme.{0}} (x x' : 
   have hm2 : m a ≫ pullback.snd π π = x' := pullback.lift_snd _ _ _
   have hjm : j ≫ m a = j ≫ x' ≫ D := by
     apply pullback.hom_ext
-    · rw [Category.assoc, hm1, Category.assoc, Category.assoc, pullback.diagonal_fst, Category.comp_id]
+    · rw [Category.assoc, hm1, Category.assoc, Category.assoc, pullback.diagonal_fst,
+        Category.comp_id]
       simpa only [Category.assoc] using ha
-    · rw [Category.assoc, hm2, Category.assoc, Category.assoc, pullback.diagonal_snd, Category.comp_id]
+    · rw [Category.assoc, hm2, Category.assoc, Category.assoc, pullback.diagonal_snd,
+        Category.comp_id]
   let V : T.Opens := (m a) ⁻¹ᵁ D.opensRange
   have hpV : p ∈ V := by
     show (m a) p ∈ Set.range D
@@ -71,8 +76,9 @@ theorem exists_local_geom (h : IsGaloisCover Ga ρ π) {T : Scheme.{0}} (x x' : 
     rw [← h2, ← Category.assoc l, hl, Category.assoc, hm2]
   rw [e1, e2]
 
-theorem existsUnique_desc (h : IsGaloisCover Ga ρ π) {Z : Scheme.{0}} (f : X ⟶ Z) (hf : ∀ a, ρ a ≫ f = f) :
-    ∃! f' : Y ⟶ Z, π ≫ f' = f := by
+theorem existsUnique_desc
+    (h : IsGaloisCover Ga ρ π) {Z : Scheme.{0}} (f : X ⟶ Z) (hf : ∀ a, ρ a ≫ f = f)
+    : ∃! f' : Y ⟶ Z, π ≫ f' = f := by
   have := h.fin
   have := h.etale
   have := h.onto
@@ -82,7 +88,9 @@ theorem existsUnique_desc (h : IsGaloisCover Ga ρ π) {Z : Scheme.{0}} (f : X �
     intro p
     obtain ⟨V, a, hp, hV⟩ := h.exists_local_geom g₁ g₂ hg p
     refine ⟨V, hp, ?_⟩
-    calc V.ι ≫ g₁ ≫ f = V.ι ≫ g₁ ≫ ρ a ≫ f := by rw [hf]
+    calc
+      V.ι ≫ g₁ ≫ f
+        = V.ι ≫ g₁ ≫ ρ a ≫ f := by rw [hf]
       _ = (V.ι ≫ g₁ ≫ ρ a) ≫ f := by simp only [Category.assoc]
       _ = V.ι ≫ g₂ ≫ f := by rw [hV, Category.assoc]
   refine ⟨EffectiveEpi.desc π f key, EffectiveEpi.fac π f key, ?_⟩
@@ -92,11 +100,13 @@ theorem existsUnique_desc (h : IsGaloisCover Ga ρ π) {Z : Scheme.{0}} (f : X �
 
 variable {X' Y' : Scheme.{0}} {π' : X' ⟶ Y'} {ρ' : Ga → (X' ⟶ X')} {u : X' ⟶ X} {v : Y' ⟶ Y}
 
-private theorem existsUnique_act_of_isPullback_isGaloisCover (h : IsGaloisCover Ga ρ π) (hp : IsPullback u π' π v)
-    (hu : ∀ a, ρ' a ≫ u = u ≫ ρ a) (hπ : ∀ a, ρ' a ≫ π' = π') (K : Type) [Field K] [IsAlgClosed K]
-    (y y' : Sp K ⟶ X') (hy : y ≫ π' = y' ≫ π') : ∃! a, y ≫ ρ' a = y' := by
-  have hyu : (y ≫ u) ≫ π = (y' ≫ u) ≫ π := by
-    simp only [Category.assoc, hp.w, reassoc_of% hy]
+private theorem existsUnique_act_of_isPullback_isGaloisCover
+    (h : IsGaloisCover Ga ρ π) (hp : IsPullback u π' π v) (hu : ∀ a, ρ' a ≫ u = u ≫ ρ a)
+    (hπ : ∀ a, ρ' a ≫ π' = π')
+    (K : Type) [Field K] [IsAlgClosed K]
+    (y y' : Sp K ⟶ X') (hy : y ≫ π' = y' ≫ π')
+    : ∃! a, y ≫ ρ' a = y' := by
+  have hyu : (y ≫ u) ≫ π = (y' ≫ u) ≫ π := by simp only [Category.assoc, hp.w, reassoc_of% hy]
   obtain ⟨a, ha, hauniq⟩ := h.fibre K (y ≫ u) (y' ≫ u) hyu
   refine ⟨a, ?_, ?_⟩
   · apply hp.hom_ext
@@ -106,16 +116,20 @@ private theorem existsUnique_act_of_isPullback_isGaloisCover (h : IsGaloisCover 
     apply hauniq
     rw [Category.assoc, ← hu, ← Category.assoc, hb]
 
-theorem isPullback (h : IsGaloisCover Ga ρ π) (h' : IsGaloisCover Ga ρ' π') (hu : ∀ a, ρ' a ≫ u = u ≫ ρ a)
-    (w : u ≫ π = π' ≫ v) : IsPullback u π' π v := by
+theorem isPullback
+    (h : IsGaloisCover Ga ρ π) (h' : IsGaloisCover Ga ρ' π') (hu : ∀ a, ρ' a ≫ u = u ≫ ρ a)
+    (w : u ≫ π = π' ≫ v)
+    : IsPullback u π' π v := by
   have := h.fin
   have := h.etale
   have := h.onto
   have := h'.fin
   have := h'.etale
   let ρP : Ga → (pullback π v ⟶ pullback π v) := fun a =>
-    pullback.map π v π v (ρ a) (𝟙 Y') (𝟙 Y) (by rw [Category.comp_id, h.inv]) (by rw [Category.comp_id, Category.id_comp])
-  have huP : ∀ a, ρP a ≫ pullback.fst π v = pullback.fst π v ≫ ρ a := fun a => pullback.lift_fst _ _ _
+    pullback.map π v π v (ρ a) (𝟙 Y') (𝟙 Y) (by rw [Category.comp_id, h.inv])
+      (by rw [Category.comp_id, Category.id_comp])
+  have huP : ∀ a, ρP a ≫ pullback.fst π v = pullback.fst π v ≫ ρ a := fun a =>
+    pullback.lift_fst _ _ _
   have hπP : ∀ a, ρP a ≫ pullback.snd π v = pullback.snd π v := fun a => by
     rw [← Category.comp_id (pullback.snd π v)]
     exact pullback.lift_snd _ _ _
@@ -142,20 +156,21 @@ theorem isPullback (h : IsGaloisCover Ga ρ π) (h' : IsGaloisCover Ga ρ' π') 
     have ha : (j ≫ V.ι ≫ g₁ ≫ u) ≫ ρ a = j ≫ V.ι ≫ g₁ ≫ u := by
       simp only [Category.assoc] at e ⊢
       rw [e]
-    have h1 : (j ≫ V.ι ≫ g₁ ≫ u) ≫ ρ 1 = j ≫ V.ι ≫ g₁ ≫ u := by
-      rw [h.one, Category.comp_id]
+    have h1 : (j ≫ V.ι ≫ g₁ ≫ u) ≫ ρ 1 = j ≫ V.ι ≫ g₁ ≫ u := by rw [h.one, Category.comp_id]
     have ha1 : a = 1 := (h.fibre K _ _ rfl).unique ha h1
     rw [← hV, ha1, h'.one, Category.comp_id]
   have hsurj : Surjective φ := by
     constructor
     intro q
     obtain ⟨y, hy⟩ := h'.onto.surj (pullback.snd π v q)
-    obtain ⟨r, hr1, hr2⟩ := Scheme.Pullback.exists_preimage_pullback (f := pullback.snd π v)
-      (g := pullback.snd π v) (φ y) q (by rw [← Scheme.Hom.comp_apply, hφ2, hy])
+    obtain ⟨r, hr1, hr2⟩ :=
+      Scheme.Pullback.exists_preimage_pullback (f := pullback.snd π v) (g := pullback.snd π v) (φ y)
+        q (by rw [← Scheme.Hom.comp_apply, hφ2, hy])
     obtain ⟨K, _, _, j, z, hz⟩ := exists_algClosed_point _ r
-    obtain ⟨a, ha, -⟩ := existsUnique_act_of_isPullback_isGaloisCover h (IsPullback.of_hasPullback π v) huP hπP K
-      (j ≫ pullback.fst _ _) (j ≫ pullback.snd _ _)
-      (by simp only [Category.assoc, pullback.condition])
+    obtain ⟨a, ha, -⟩ :=
+      existsUnique_act_of_isPullback_isGaloisCover h (IsPullback.of_hasPullback π v) huP hπP K
+        (j ≫ pullback.fst _ _) (j ≫ pullback.snd _ _)
+        (by simp only [Category.assoc, pullback.condition])
     refine ⟨ρ' a y, ?_⟩
     have hz' := congrArg (fun m : Sp K ⟶ _ => m z) ha
     simp only [Scheme.Hom.comp_apply, hz, hr1, hr2] at hz'
@@ -171,8 +186,10 @@ theorem isPullback (h : IsGaloisCover Ga ρ π) (h' : IsGaloisCover Ga ρ' π') 
   have : IsIso φ := Flat.isIso_of_surjective_of_mono φ
   exact IsPullback.of_iso_pullback ⟨w⟩ (asIso φ) hφ1 hφ2
 
-theorem of_isPullback (h : IsGaloisCover Ga ρ π) (hp : IsPullback u π' π v) (hu : ∀ a, ρ' a ≫ u = u ≫ ρ a)
-    (hπ : ∀ a, ρ' a ≫ π' = π') : IsGaloisCover Ga ρ' π' := by
+theorem of_isPullback
+    (h : IsGaloisCover Ga ρ π) (hp : IsPullback u π' π v) (hu : ∀ a, ρ' a ≫ u = u ≫ ρ a)
+    (hπ : ∀ a, ρ' a ≫ π' = π')
+    : IsGaloisCover Ga ρ' π' := by
   refine ⟨h.finite, ?_, ?_, hπ, ?_, ?_, ?_, existsUnique_act_of_isPullback_isGaloisCover h hp hu hπ⟩
   · apply hp.hom_ext
     · rw [hu 1, h.one, Category.id_comp, Category.comp_id]
@@ -189,9 +206,19 @@ end GlobalTheory.ZM.IsGaloisCover
 
 namespace GlobalTheory.ZM
 
-theorem galoisCover_descent : ∀ (X Y : Scheme.{0}) (π : X ⟶ Y) (Ga : Type) [Group Ga] (ρ : Ga → (X ⟶ X)), IsGaloisCover Ga ρ π → (∀ (Z : Scheme.{0}) (f : X ⟶ Z), (∀ a, ρ a ≫ f = f) → ∃! f' : Y ⟶ Z, π ≫ f' = f) ∧ (∀ (T : Scheme.{0}) (x x' : T ⟶ X), x ≫ π = x' ≫ π → ∀ p : T, ∃ (V : T.Opens) (a : Ga), p ∈ V ∧ V.ι ≫ x ≫ ρ a = V.ι ≫ x') ∧ ∀ (X' Y' : Scheme.{0}) (π' : X' ⟶ Y') (ρ' : Ga → (X' ⟶ X')) (u : X' ⟶ X) (v : Y' ⟶ Y), (∀ a, ρ' a ≫ u = u ≫ ρ a) → u ≫ π = π' ≫ v → (IsGaloisCover Ga ρ' π' → IsPullback u π' π v) ∧ (IsPullback u π' π v → (∀ a, ρ' a ≫ π' = π') → IsGaloisCover Ga ρ' π') := by
+theorem galoisCover_descent
+    : ∀ (X Y : Scheme.{0}) (π : X ⟶ Y) (Ga : Type) [Group Ga] (ρ : Ga → (X ⟶ X)),
+      IsGaloisCover Ga ρ π
+        → (∀ (Z : Scheme.{0}) (f : X ⟶ Z), (∀ a, ρ a ≫ f = f) → ∃! f' : Y ⟶ Z, π ≫ f' = f)
+          ∧ (∀ (T : Scheme.{0}) (x x' : T ⟶ X),
+            x ≫ π = x' ≫ π → ∀ p : T, ∃ (V : T.Opens) (a : Ga), p ∈ V ∧ V.ι ≫ x ≫ ρ a = V.ι ≫ x')
+          ∧ ∀ (X' Y' : Scheme.{0}) (π' : X' ⟶ Y') (ρ' : Ga → (X' ⟶ X')) (u : X' ⟶ X) (v : Y' ⟶ Y),
+            (∀ a, ρ' a ≫ u = u ≫ ρ a) → u ≫ π = π' ≫ v
+              → (IsGaloisCover Ga ρ' π' → IsPullback u π' π v)
+                ∧ (IsPullback u π' π v → (∀ a, ρ' a ≫ π' = π') → IsGaloisCover Ga ρ' π') := by
   intro X Y π Ga _ ρ h
-  refine ⟨fun Z f hf => h.existsUnique_desc f hf, fun T x x' hx p => h.exists_local_geom x x' hx p, ?_⟩
+  refine
+    ⟨fun Z f hf => h.existsUnique_desc f hf, fun T x x' hx p => h.exists_local_geom x x' hx p, ?_⟩
   intro X' Y' π' ρ' u v hu w
   exact ⟨fun h' => h.isPullback h' hu w, fun hp hπ => h.of_isPullback hp hu hπ⟩
 

@@ -8,41 +8,49 @@ open FractionalIdeal nonZeroDivisors
 
 namespace GlobalTheory.ClosingLemma
 
-theorem main {Ω : Type} [Field Ω] (S : Type) [CommRing S] [IsDomain S] [IsDedekindDomain S]
-    [Algebra S Ω] [IsFractionRing S Ω] (A : ValuationSubring Ω)
-    (hS : ∀ s : S, algebraMap S Ω s ∈ A) {x : Ω} (hx : x ∈ A) :
-    ∃ s t : S, A.valuation (algebraMap S Ω s) = 1 ∧ algebraMap S Ω s * x = algebraMap S Ω t := by
+theorem main
+    {Ω : Type} [Field Ω]
+    (S : Type) [CommRing S] [IsDomain S] [IsDedekindDomain S] [Algebra S Ω] [IsFractionRing S Ω]
+    (A : ValuationSubring Ω) (hS : ∀ s : S, algebraMap S Ω s ∈ A)
+    {x : Ω} (hx : x ∈ A)
+    : ∃ s t : S, A.valuation (algebraMap S Ω s) = 1 ∧ algebraMap S Ω s * x = algebraMap S Ω t := by
   by_contra hcon
   push_neg at hcon
-  have hSle : ∀ c : S, A.valuation (algebraMap S Ω c) ≤ 1 := fun c => (A.valuation_le_one_iff _).2 (hS c)
-  let M : Submodule S Ω :=
-    { carrier := {z | A.valuation z < 1}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
-        exact Valuation.map_add_lt _ ha hb
-      zero_mem' := by simp
-      smul_mem' := by
-        intro c z hz
-        simp only [Set.mem_setOf_eq, Algebra.smul_def, map_mul] at hz ⊢
-        calc A.valuation (algebraMap S Ω c) * A.valuation z ≤ 1 * A.valuation z := by
-              gcongr; exact hSle c
-          _ < 1 := by simpa using hz }
-  let N : Submodule S Ω :=
-    { carrier := {z | A.valuation z ≤ 1}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
-        exact (Valuation.map_add _ _ _).trans (max_le ha hb)
-      zero_mem' := by simp
-      smul_mem' := by
-        intro c z hz
-        simp only [Set.mem_setOf_eq, Algebra.smul_def, map_mul] at hz ⊢
-        calc A.valuation (algebraMap S Ω c) * A.valuation z ≤ 1 * 1 := by
-              gcongr; exact hSle c
-          _ = 1 := one_mul 1 }
+  have hSle : ∀ c : S, A.valuation (algebraMap S Ω c) ≤ 1 := fun c =>
+    (A.valuation_le_one_iff _).2 (hS c)
+  let M : Submodule S Ω := {
+    carrier := {z | A.valuation z < 1}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq] at ha hb ⊢
+      exact Valuation.map_add_lt _ ha hb
+    zero_mem' := by simp
+    smul_mem' := by
+      intro c z hz
+      simp only [Set.mem_setOf_eq, Algebra.smul_def, map_mul] at hz ⊢
+      calc
+        A.valuation (algebraMap S Ω c) * A.valuation z
+          ≤ 1 * A.valuation z := by gcongr; exact hSle c
+        _ < 1 := by simpa using hz
+  }
+  let N : Submodule S Ω := {
+    carrier := {z | A.valuation z ≤ 1}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq] at ha hb ⊢
+      exact (Valuation.map_add _ _ _).trans (max_le ha hb)
+    zero_mem' := by simp
+    smul_mem' := by
+      intro c z hz
+      simp only [Set.mem_setOf_eq, Algebra.smul_def, map_mul] at hz ⊢
+      calc
+        A.valuation (algebraMap S Ω c) * A.valuation z
+          ≤ 1 * 1 := by gcongr; exact hSle c
+        _ = 1 := one_mul 1
+  }
   let J : FractionalIdeal S⁰ Ω := 1 + spanSingleton S⁰ x
   have hJ1 : (1 : FractionalIdeal S⁰ Ω) ≤ J := by
     show (1 : FractionalIdeal S⁰ Ω) ≤ 1 + spanSingleton S⁰ x
-    rw [← sup_eq_add]; exact le_sup_left
+    rw [← sup_eq_add]
+    exact le_sup_left
   have hJ0 : J ≠ 0 := by
     intro h
     rw [h] at hJ1
@@ -75,7 +83,9 @@ theorem main {Ω : Type} [Field Ω] (S : Type) [CommRing S] [IsDomain S] [IsDede
     intro z hz y hy
     show A.valuation (z * y) < 1
     rw [map_mul]
-    calc A.valuation z * A.valuation y ≤ 1 * A.valuation y := by gcongr; exact hJN hz
+    calc
+      A.valuation z * A.valuation y
+        ≤ 1 * A.valuation y := by gcongr; exact hJN hz
       _ < 1 := by rw [one_mul]; exact hinv hy
   rw [mul_inv_cancel₀ hJ0, coe_one] at hmul
   have := hmul (Submodule.one_le.1 le_rfl)

@@ -8,8 +8,9 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace UpperTheory.Gal.Mod
 
-theorem spUnit : ∀ (A k : Type) [CommRing A] [IsLocalRing A] [Field k] (r : A →+* k),
-    Function.Surjective r → ∀ q : ℕ, IsUnit (q : k) → IsUnit (q : A) := by
+theorem spUnit
+    : ∀ (A k : Type) [CommRing A] [IsLocalRing A] [Field k] (r : A →+* k),
+      Function.Surjective r → ∀ q : ℕ, IsUnit (q : k) → IsUnit (q : A) := by
   intro A k _ _ _ r hr q hq
   have hmax : (RingHom.ker r).IsMaximal := RingHom.ker_isMaximal_of_surjective r hr
   have heq : RingHom.ker r = IsLocalRing.maximalIdeal A := IsLocalRing.eq_maximalIdeal hmax

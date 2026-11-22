@@ -6,8 +6,9 @@ public import Mathlib
 
 open IsLocalRing
 
-theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.eigKill :
-    ∀ {K V : Type} [Field K] [AddCommGroup V] [Module K V] (φ : Module.End K V) (k : ℕ) (F : V), F ∈ ⨆ μ : K, φ.eigenspace μ → (φ ^ k) F = 0 → φ F = 0 := by
+theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.eigKill
+    : ∀ {K V : Type} [Field K] [AddCommGroup V] [Module K V] (φ : Module.End K V) (k : ℕ) (F : V),
+      F ∈ ⨆ μ : K, φ.eigenspace μ → (φ ^ k) F = 0 → φ F = 0 := by
   intro K V _ _ _ φ k F hF hk
   have hdisj := Module.End.eigenspaces_iSupIndep φ 0
   set S := ⨆ (μ : K) (_ : μ ≠ 0), φ.eigenspace μ with hS
@@ -44,7 +45,6 @@ theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.eigKill :
     have h0 : y + z = 0 := by simpa using hk
     rw [h0, map_zero]
   | succ k =>
-    have hyk : (φ ^ (k + 1)) y = 0 := by
-      rw [pow_succ, Module.End.mul_apply, hy', map_zero]
+    have hyk : (φ ^ (k + 1)) y = 0 := by rw [pow_succ, Module.End.mul_apply, hy', map_zero]
     rw [map_add (f := _), hyk, zero_add] at hk
     rw [map_add (f := _), hy', hpow _ z hz hk, map_zero, add_zero]

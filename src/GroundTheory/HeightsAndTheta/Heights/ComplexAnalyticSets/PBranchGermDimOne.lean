@@ -15,8 +15,9 @@ namespace GroundTheory.Heights₂.Heights
 open MvPolynomial ComplexSets Filter Topology
 open scoped NNReal ENNReal
 
-theorem VarBranch.dimH_image_le_two {n : ℕ} {I : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
-    (c : VarBranch I 1 q) : dimH c.image ≤ 2 := by
+theorem VarBranch.dimH_image_le_two
+    {n : ℕ} {I : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ} (c : VarBranch I 1 q)
+    : dimH c.image ≤ 2 := by
   let ι : ℂ → (Fin 1 → ℂ) := fun τ _ ↦ τ
   have hι : ∀ τ : ℂ, ‖ι τ‖ = ‖τ‖ := fun τ ↦ by simp [ι, pi_norm_const]
   have himg : c.image = (c.toFun ∘ ι) '' Metric.ball 0 c.radius := by
@@ -43,13 +44,16 @@ theorem VarBranch.dimH_image_le_two {n : ℕ} {I : Ideal (MvPolynomial (Fin n) �
   have hcd : ContDiffOn ℝ 1 (c.toFun ∘ ι) (Metric.ball 0 c.radius) :=
     (hd.contDiffOn Metric.isOpen_ball).restrict_scalars ℝ
   rw [himg]
-  calc dimH ((c.toFun ∘ ι) '' Metric.ball 0 c.radius) ≤ dimH (Metric.ball (0 : ℂ) c.radius) :=
-        hcd.dimH_image_le (convex_ball 0 c.radius) le_rfl
+  calc
+    dimH ((c.toFun ∘ ι) '' Metric.ball 0 c.radius)
+      ≤ dimH (Metric.ball (0 : ℂ) c.radius) := hcd.dimH_image_le (convex_ball 0 c.radius) le_rfl
     _ ≤ dimH (Set.univ : Set ℂ) := dimH_mono (Set.subset_univ _)
     _ = 2 := by rw [Real.dimH_univ_eq_finrank ℂ, Complex.finrank_real_complex]; norm_num
 
-theorem BranchGermDimOne.proof (h₀ : LocalDimComponentBound.Statement) (h₁ : ZeroDimIsolated.Statement)
-    (h₂ : IndefiniteRowSideFullHecke.ComplexSets.ZeroSetOpenMass.Statement) : BranchGermDimOne.Statement := by
+theorem BranchGermDimOne.proof
+    (h₀ : LocalDimComponentBound.Statement) (h₁ : ZeroDimIsolated.Statement)
+    (h₂ : IndefiniteRowSideFullHecke.ComplexSets.ZeroSetOpenMass.Statement)
+    : BranchGermDimOne.Statement := by
   intro n I q m c hm ⟨N, hN, hcov⟩
   let c₀ := c ⟨0, hm⟩
   have hq : q ∈ zeroSet I := c₀.map_zero ▸ c₀.mapsTo (Metric.mem_ball_self c₀.radius_pos)
@@ -59,8 +63,8 @@ theorem BranchGermDimOne.proof (h₀ : LocalDimComponentBound.Statement) (h₁ :
   · obtain ⟨W, hW, hIW, hqW, hle⟩ := h₀ n I q hq
     have hup : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) ≤ (n : ℕ) := by
       refine (ringKrullDim_quotient_le W).trans (le_of_eq ?_)
-      rw [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field, zero_add,
-        Nat.card_eq_fintype_card, Fintype.card_fin]
+      rw [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
+        zero_add, Nat.card_eq_fintype_card, Fintype.card_fin]
     have hnn : (0 : WithBot ℕ∞) ≤ ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) := by
       have := hW
       exact ringKrullDim_nonneg_of_nontrivial
@@ -81,8 +85,8 @@ theorem BranchGermDimOne.proof (h₀ : LocalDimComponentBound.Statement) (h₁ :
       by_contra h
       exact hlt (by exact_mod_cast (by omega : d ≤ 1))
     have hpos := h₂ n d W hW hd q (interior N) isOpen_interior (mem_interior_iff_mem_nhds.2 hN) hqW
-    have hsub : zeroSet W ∩ interior N ⊆ zeroSet I ∩ N :=
-      fun x hx ↦ ⟨fun f hf ↦ hx.1 f (hIW hf), interior_subset hx.2⟩
+    have hsub : zeroSet W ∩ interior N ⊆ zeroSet I ∩ N := fun x hx ↦
+      ⟨fun f hf ↦ hx.1 f (hIW hf), interior_subset hx.2⟩
     have hlt' : dimH (zeroSet W ∩ interior N) < (((2 * d : ℕ) : ℝ≥0) : ℝ≥0∞) := by
       refine ((dimH_mono hsub).trans hdimH).trans_lt ?_
       rw [ENNReal.coe_natCast]
@@ -109,7 +113,8 @@ theorem BranchGermDimOne.proof (h₀ : LocalDimComponentBound.Statement) (h₁ :
     have hev : ∀ᶠ t in 𝓝 (0 : Fin 1 → ℂ), t ∈ Metric.ball 0 c₀.radius ∧ c₀.toFun t ∈ N' :=
       Filter.Eventually.and (Metric.ball_mem_nhds 0 c₀.radius_pos) (hcont hN'')
     have hne : (𝓝[≠] (0 : Fin 1 → ℂ)).NeBot := inferInstance
-    have hev' : ∀ᶠ t in 𝓝[≠] (0 : Fin 1 → ℂ), (t ∈ Metric.ball 0 c₀.radius ∧ c₀.toFun t ∈ N') ∧ t ≠ 0 :=
+    have hev'
+        : ∀ᶠ t in 𝓝[≠] (0 : Fin 1 → ℂ), (t ∈ Metric.ball 0 c₀.radius ∧ c₀.toFun t ∈ N') ∧ t ≠ 0 :=
       (Filter.Eventually.filter_mono nhdsWithin_le_nhds hev).and self_mem_nhdsWithin
     obtain ⟨t, ⟨ht, htN⟩, ht0⟩ := hev'.exists
     have hx : c₀.toFun t = q := hiso ⟨c₀.mapsTo ht, htN⟩

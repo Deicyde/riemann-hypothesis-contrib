@@ -6,8 +6,9 @@ public import Mathlib
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-private theorem sum_matrix_single_diag_one_eq_one {F : Type} [Field F] {n : Type} [Fintype n] [DecidableEq n] :
-    ∑ i : n, Matrix.single i i (1 : F) = 1 := by
+private theorem sum_matrix_single_diag_one_eq_one
+    {F : Type} [Field F] {n : Type} [Fintype n] [DecidableEq n]
+    : ∑ i : n, Matrix.single i i (1 : F) = 1 := by
   ext u v
   by_cases h : u = v
   · subst h
@@ -20,12 +21,12 @@ private theorem sum_matrix_single_diag_one_eq_one {F : Type} [Field F] {n : Type
     rw [he]
     simp
 
-private theorem intertwiner_of_ker {F : Type} [Field F] {σ : Type} (d : σ → Type)
-    [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)]
+private theorem intertwiner_of_ker
+    {F : Type} [Field F]
+    {σ : Type} (d : σ → Type) [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)]
     (S : Subalgebra F (∀ s, Matrix (d s) (d s) F)) (s t : σ)
-    (ht : ∀ B : Matrix (d t) (d t) F, ∃ x ∈ S, x t = B)
-    (hk : ∀ x ∈ S, x t = 0 → x s = 0) :
-    ∃ V : Matrix (d s) (d t) F, V ≠ 0 ∧ ∀ x ∈ S, x s * V = V * x t := by
+    (ht : ∀ B : Matrix (d t) (d t) F, ∃ x ∈ S, x t = B) (hk : ∀ x ∈ S, x t = 0 → x s = 0)
+    : ∃ V : Matrix (d s) (d t) F, V ≠ 0 ∧ ∀ x ∈ S, x s * V = V * x t := by
   have key : ∀ x ∈ S, ∀ y ∈ S, x t = y t → x s = y s := by
     intro x hx y hy h
     have := hk (x - y) (S.sub_mem hx hy) (by rw [Pi.sub_apply, h, sub_self])
@@ -38,14 +39,16 @@ private theorem intertwiner_of_ker {F : Type} [Field F] {σ : Type} (d : σ → 
     intro h0
     have hx0 : ∀ j, xx j s = 0 := by
       intro j
-      have := key (xx j * xx i0) (S.mul_mem (hxS j) (hxS i0)) (xx j) (hxS j)
-        (by rw [Pi.mul_apply, hxt, hxt, Matrix.single_mul_single_same, one_mul])
+      have :=
+        key (xx j * xx i0) (S.mul_mem (hxS j) (hxS i0)) (xx j) (hxS j)
+          (by rw [Pi.mul_apply, hxt, hxt, Matrix.single_mul_single_same, one_mul])
       rw [← this, Pi.mul_apply, h0, mul_zero]
-    have h1 := key (∑ j, xx j * z j) (Subalgebra.sum_mem _ fun j _ => S.mul_mem (hxS j) (hzS j)) 1 S.one_mem
-      (by
-        rw [Finset.sum_apply]
-        simp only [Pi.mul_apply, hxt, hzt, Matrix.single_mul_single_same, one_mul, Pi.one_apply]
-        exact sum_matrix_single_diag_one_eq_one)
+    have h1 :=
+      key (∑ j, xx j * z j) (Subalgebra.sum_mem _ fun j _ => S.mul_mem (hxS j) (hzS j)) 1 S.one_mem
+        (by
+          rw [Finset.sum_apply]
+          simp only [Pi.mul_apply, hxt, hzt, Matrix.single_mul_single_same, one_mul, Pi.one_apply]
+          exact sum_matrix_single_diag_one_eq_one)
     rw [Finset.sum_apply] at h1
     simp only [Pi.mul_apply, hx0, zero_mul, Finset.sum_const_zero, Pi.one_apply] at h1
     exact zero_ne_one h1
@@ -60,24 +63,29 @@ private theorem intertwiner_of_ker {F : Type} [Field F] {σ : Type} (d : σ → 
     simpa using this
   · intro x hx
     ext u k
-    have e := key (x * xx k) (S.mul_mem hx (hxS k)) (∑ j, x t j k • xx j)
-      (Subalgebra.sum_mem _ fun j _ => S.smul_mem (hxS j) _) (by
-        rw [Pi.mul_apply, hxt, Finset.sum_apply]
-        simp only [Pi.smul_apply, hxt]
-        ext p q
-        by_cases hq : i0 = q <;> simp [Matrix.mul_apply, Matrix.sum_apply, Matrix.single_apply, hq])
+    have e :=
+      key (x * xx k) (S.mul_mem hx (hxS k)) (∑ j, x t j k • xx j)
+        (Subalgebra.sum_mem _ fun j _ => S.smul_mem (hxS j) _)
+        (by
+          rw [Pi.mul_apply, hxt, Finset.sum_apply]
+          simp only [Pi.smul_apply, hxt]
+          ext p q
+          by_cases hq : i0 = q
+            <;> simp [Matrix.mul_apply, Matrix.sum_apply, Matrix.single_apply, hq])
     have e2 := congrFun (congrFun e u) b
-    simp only [Pi.mul_apply, Finset.sum_apply, Matrix.sum_apply, Pi.smul_apply, Matrix.smul_apply, smul_eq_mul,
-      Matrix.mul_apply] at e2
+    simp only [Pi.mul_apply, Finset.sum_apply, Matrix.sum_apply, Pi.smul_apply, Matrix.smul_apply,
+        smul_eq_mul, Matrix.mul_apply]
+      at e2
     simp only [Matrix.mul_apply, Matrix.of_apply]
     rw [e2]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
-private theorem separate {F : Type} [Field F] {σ : Type} (d : σ → Type)
-    [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)]
+private theorem separate
+    {F : Type} [Field F]
+    {σ : Type} (d : σ → Type) [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)]
     (S : Subalgebra F (∀ s, Matrix (d s) (d s) F)) (s t : σ)
-    (hs : ∀ B : Matrix (d s) (d s) F, ∃ x ∈ S, x s = B)
-    (hk : ∃ x ∈ S, x t = 0 ∧ x s ≠ 0) : ∃ x ∈ S, x t = 0 ∧ x s = 1 := by
+    (hs : ∀ B : Matrix (d s) (d s) F, ∃ x ∈ S, x s = B) (hk : ∃ x ∈ S, x t = 0 ∧ x s ≠ 0)
+    : ∃ x ∈ S, x t = 0 ∧ x s = 1 := by
   obtain ⟨x, hxS, hxt, hxs⟩ := hk
   obtain ⟨a, b, hab⟩ : ∃ a b, x s a b ≠ 0 := by
     by_contra h
@@ -103,15 +111,24 @@ private theorem separate {F : Type} [Field F] {σ : Type} (d : σ → Type)
       rw [he]
       simp
 
-theorem UpperTheory.V.AlgebraTools.density_prod :
-    ∀ {F Γ : Type} [Field F] [Monoid Γ] {σ : Type} [Fintype σ] [DecidableEq σ] (d : σ → Type) [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)] (ρ : ∀ s, Γ →* Matrix (d s) (d s) F), (∀ s, Submodule.span F (Set.range (ρ s)) = ⊤) → (∀ s t, s ≠ t → ∀ V : Matrix (d s) (d t) F, (∀ g, ρ s g * V = V * ρ t g) → V = 0) → Submodule.span F (Set.range fun g => (fun s => ρ s g : ∀ s, Matrix (d s) (d s) F)) = ⊤ := by
+theorem UpperTheory.V.AlgebraTools.density_prod
+    : ∀ {F Γ : Type} [Field F] [Monoid Γ] {σ : Type} [Fintype σ] [DecidableEq σ] (d : σ → Type)
+        [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)]
+        (ρ : ∀ s, Γ →* Matrix (d s) (d s) F),
+      (∀ s, Submodule.span F (Set.range (ρ s)) = ⊤)
+        → (∀ s t, s ≠ t → ∀ V : Matrix (d s) (d t) F, (∀ g, ρ s g * V = V * ρ t g) → V = 0)
+        → Submodule.span F (Set.range fun g => (fun s => ρ s g : ∀ s, Matrix (d s) (d s) F))
+          = ⊤ := by
   intro F Γ _ _ σ _ _ d _ _ _ ρ hspan hint
-  let φ : Γ →* ((s : σ) → Matrix (d s) (d s) F) :=
-    { toFun := fun g s => ρ s g
-      map_one' := funext fun s => map_one (ρ s)
-      map_mul' := fun g h => funext fun s => map_mul (ρ s) g h }
-  obtain ⟨S, hSdef⟩ : ∃ S : Subalgebra F ((s : σ) → Matrix (d s) (d s) F),
-      S = Algebra.adjoin F (Set.range fun g => (fun s => ρ s g : ∀ s, Matrix (d s) (d s) F)) := ⟨_, rfl⟩
+  let φ : Γ →* ((s : σ) → Matrix (d s) (d s) F) := {
+    toFun := fun g s => ρ s g
+    map_one' := funext fun s => map_one (ρ s)
+    map_mul' := fun g h => funext fun s => map_mul (ρ s) g h
+  }
+  obtain ⟨S, hSdef⟩
+      : ∃ S : Subalgebra F ((s : σ) → Matrix (d s) (d s) F),
+        S = Algebra.adjoin F (Set.range fun g => (fun s => ρ s g : ∀ s, Matrix (d s) (d s) F)) :=
+    ⟨_, rfl⟩
   have hmem : ∀ g, (fun s => ρ s g : ∀ s, Matrix (d s) (d s) F) ∈ S := by
     intro g
     rw [hSdef]
@@ -125,7 +142,8 @@ theorem UpperTheory.V.AlgebraTools.density_prod :
     | mem y hy =>
       obtain ⟨g, rfl⟩ := hy
       exact ⟨_, hmem g, rfl⟩
-    | zero => exact ⟨0, S.zero_mem, rfl⟩
+    | zero =>
+      exact ⟨0, S.zero_mem, rfl⟩
     | add y z _ _ hy hz =>
       obtain ⟨x1, h1, e1⟩ := hy
       obtain ⟨x2, h2, e2⟩ := hz
@@ -176,8 +194,9 @@ theorem UpperTheory.V.AlgebraTools.density_prod :
         exact absurd (Finset.mem_univ u) h
     rw [hY]
     exact Subalgebra.sum_mem _ fun s _ => S.mul_mem (hzS s) (heS s)
-  have h2 : Submodule.span F (Set.range fun g => (fun s => ρ s g : ∀ s, Matrix (d s) (d s) F)) =
-      Subalgebra.toSubmodule S := by
+  have h2
+      : Submodule.span F (Set.range fun g => (fun s => ρ s g : ∀ s, Matrix (d s) (d s) F))
+        = Subalgebra.toSubmodule S := by
     apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨g, rfl⟩
@@ -185,7 +204,8 @@ theorem UpperTheory.V.AlgebraTools.density_prod :
     · rw [hSdef, Algebra.adjoin_eq_span, Submodule.span_le]
       intro x hx
       have hx' : x ∈ MonoidHom.mrange φ :=
-        (Submonoid.closure_le.mpr (by rintro _ ⟨g, rfl⟩; exact MonoidHom.mem_mrange.mpr ⟨g, rfl⟩)) hx
+        (Submonoid.closure_le.mpr (by rintro _ ⟨g, rfl⟩; exact MonoidHom.mem_mrange.mpr ⟨g, rfl⟩))
+          hx
       obtain ⟨g, rfl⟩ := MonoidHom.mem_mrange.mp hx'
       exact Submodule.subset_span ⟨g, rfl⟩
   rw [h2, htop]

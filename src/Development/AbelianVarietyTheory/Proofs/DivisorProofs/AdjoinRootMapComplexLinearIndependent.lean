@@ -10,13 +10,14 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem adjoinRoot_map_complex_linearIndependent :
-    ∀ (D : ℕ) (P : Polynomial (MvPolynomial (Fin D) ℚ)), P.Monic →
-      ∃ τ : AdjoinRoot P →+* AdjoinRoot (P.map (MvPolynomial.map (algebraMap ℚ ℂ))),
-        (∀ i, τ (AdjoinRoot.of P (MvPolynomial.X i)) = AdjoinRoot.of _ (MvPolynomial.X i)) ∧
-        (∀ (q : ℚ) u, τ (q • u) = (q : ℂ) • τ u) ∧
-        ∀ (J : Type) (e : J → AdjoinRoot P), LinearIndependent ℚ e →
-          LinearIndependent ℂ (fun j => τ (e j)) := by
+theorem adjoinRoot_map_complex_linearIndependent
+    : ∀ (D : ℕ) (P : Polynomial (MvPolynomial (Fin D) ℚ)),
+      P.Monic
+        → ∃ τ : AdjoinRoot P →+* AdjoinRoot (P.map (MvPolynomial.map (algebraMap ℚ ℂ))),
+          (∀ i, τ (AdjoinRoot.of P (MvPolynomial.X i)) = AdjoinRoot.of _ (MvPolynomial.X i))
+            ∧ (∀ (q : ℚ) u, τ (q • u) = (q : ℂ) • τ u)
+            ∧ ∀ (J : Type) (e : J → AdjoinRoot P),
+              LinearIndependent ℚ e → LinearIndependent ℂ (fun j => τ (e j)) := by
   intro D P hP
   set f : MvPolynomial (Fin D) ℚ →+* MvPolynomial (Fin D) ℂ := MvPolynomial.map (algebraMap ℚ ℂ)
   set Q := P.map f
@@ -29,18 +30,19 @@ theorem adjoinRoot_map_complex_linearIndependent :
   have hroot : τ (AdjoinRoot.root P) = AdjoinRoot.root Q := AdjoinRoot.lift_root _
   have hsmul : ∀ (q : ℚ) u, τ (q • u) = (q : ℂ) • τ u := by
     intro q u
-    rw [Algebra.smul_def, Algebra.smul_def, map_mul, IsScalarTower.algebraMap_apply ℚ (MvPolynomial (Fin D) ℚ),
-      AdjoinRoot.algebraMap_eq, hof, IsScalarTower.algebraMap_apply ℂ (MvPolynomial (Fin D) ℂ),
-      AdjoinRoot.algebraMap_eq]
+    rw [Algebra.smul_def, Algebra.smul_def, map_mul,
+      IsScalarTower.algebraMap_apply ℚ (MvPolynomial (Fin D) ℚ), AdjoinRoot.algebraMap_eq, hof,
+      IsScalarTower.algebraMap_apply ℂ (MvPolynomial (Fin D) ℂ), AdjoinRoot.algebraMap_eq]
     simp [f, MvPolynomial.algebraMap_eq]
   refine ⟨τ, fun i => by rw [hof]; simp [f], hsmul, ?_⟩
   intro J e he
-  let τL : AdjoinRoot P →ₗ[ℚ] AdjoinRoot Q :=
-    { toFun := τ
-      map_add' := map_add τ
-      map_smul' := fun q u => by
-        rw [hsmul]
-        exact algebraMap_smul ℂ q (τ u) }
+  let τL : AdjoinRoot P →ₗ[ℚ] AdjoinRoot Q := {
+    toFun := τ
+    map_add' := map_add τ
+    map_smul' := fun q u => by
+      rw [hsmul]
+      exact algebraMap_smul ℂ q (τ u)
+  }
   let bA := (MvPolynomial.basisMonomials (Fin D) ℚ).smulTower (AdjoinRoot.powerBasis' hP).basis
   let bB := (MvPolynomial.basisMonomials (Fin D) ℂ).smulTower (AdjoinRoot.powerBasis' hQ).basis
   have hdim : (AdjoinRoot.powerBasis' hP).dim = (AdjoinRoot.powerBasis' hQ).dim := by
@@ -57,12 +59,13 @@ theorem adjoinRoot_map_complex_linearIndependent :
     simp [f, MvPolynomial.map_monomial]
   have hkey : ∀ v, E (1 ⊗ₜ[ℚ] v) = τ v := by
     intro v
-    have := bA.ext (f₁ := (E.toLinearMap.restrictScalars ℚ).comp (TensorProduct.mk ℚ ℂ _ 1))
-      (f₂ := τL) (fun k => by
-        simp only [LinearMap.coe_comp, Function.comp_apply, TensorProduct.mk_apply,
-          LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
-        rw [← Algebra.TensorProduct.basis_apply, Module.Basis.equiv_apply]
-        exact (hbas k).symm)
+    have :=
+      bA.ext (f₁ := (E.toLinearMap.restrictScalars ℚ).comp (TensorProduct.mk ℚ ℂ _ 1)) (f₂ := τL)
+        (fun k => by
+          simp only [LinearMap.coe_comp, Function.comp_apply, TensorProduct.mk_apply,
+            LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
+          rw [← Algebra.TensorProduct.basis_apply, Module.Basis.equiv_apply]
+          exact (hbas k).symm)
     exact congrArg (fun g => g v) this
   have hli : LinearIndependent ℂ (fun j => (1 : ℂ) ⊗ₜ[ℚ] e j) :=
     Module.Flat.linearIndependent_one_tmul he

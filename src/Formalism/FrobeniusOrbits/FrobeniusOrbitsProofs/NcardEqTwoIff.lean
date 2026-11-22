@@ -36,8 +36,15 @@ theorem cases (g : K ≃ₐ[K⁺] K) : g = 1 ∨ g = IsCMField.complexConj K := 
   haveI : Fintype (K ≃ₐ[K⁺] K) := Fintype.ofFinite _
   rw [Nat.card_eq_fintype_card] at h2
   have h3 : ({1, IsCMField.complexConj K, g} : Finset (K ≃ₐ[K⁺] K)).card = 3 :=
-    Finset.card_eq_three.mpr ⟨1, IsCMField.complexConj K, g,
-      (IsCMField.complexConj_ne_one K).symm, hne.1.symm, hne.2.symm, rfl⟩
+    Finset.card_eq_three.mpr ⟨
+      1,
+      IsCMField.complexConj K,
+      g,
+      (IsCMField.complexConj_ne_one K).symm,
+      hne.1.symm,
+      hne.2.symm,
+      rfl
+    ⟩
   have h4 := Finset.card_le_univ ({1, IsCMField.complexConj K, g} : Finset (K ≃ₐ[K⁺] K))
   omega
 
@@ -49,22 +56,24 @@ instance isGaloisGroup : IsGaloisGroup (K ≃ₐ[K⁺] K) (𝓞 K⁺) (𝓞 K) :
   IsGaloisGroup.of_isFractionRing _ _ _ K⁺ K
 
 theorem split_or_inert
-    (hunr : ∀ P : Ideal (𝓞 K), P.IsPrime → P ≠ ⊥ →
-      ¬ ∀ x : 𝓞 K, IsCMField.complexConj K • x - x ∈ P)
-    (𝔭 : Ideal (𝓞 K⁺)) [𝔭.IsPrime] (h𝔭 : 𝔭 ≠ ⊥) :
-    (primesOver 𝔭 (𝓞 K)).ncard = 2 ∨
-      ((primesOver 𝔭 (𝓞 K)).ncard = 1 ∧ 𝔭.inertiaDegIn (𝓞 K) = 2) := by
+    (hunr : ∀ P : Ideal (𝓞 K), P.IsPrime → P ≠ ⊥ → ¬ ∀ x : 𝓞 K, IsCMField.complexConj K • x - x ∈ P)
+    (𝔭 : Ideal (𝓞 K⁺)) [𝔭.IsPrime]
+    (h𝔭 : 𝔭 ≠ ⊥)
+    : (primesOver 𝔭 (𝓞 K)).ncard = 2
+      ∨ ((primesOver 𝔭 (𝓞 K)).ncard = 1 ∧ 𝔭.inertiaDegIn (𝓞 K) = 2) := by
   classical
   have hmax : 𝔭.IsMaximal := Ideal.IsPrime.isMaximal inferInstance h𝔭
   obtain ⟨P, hPp, hPl⟩ : ∃ P : Ideal (𝓞 K), P.IsPrime ∧ P.LiesOver 𝔭 := by
     first
     | exact Ideal.nonempty_primesOver (S := 𝓞 K) 𝔭
     | (obtain ⟨Q, hQ⟩ := Ideal.nonempty_primesOver (S := 𝓞 K) 𝔭; exact ⟨Q, hQ.1, hQ.2⟩)
-    | (obtain ⟨Q, hQm, hQ⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral 𝔭
-          (S := 𝓞 K) (by
+    | (
+        obtain ⟨Q, hQm, hQ⟩ :=
+          Ideal.exists_ideal_over_maximal_of_isIntegral 𝔭 (S := 𝓞 K) (by
             rw [(RingHom.injective_iff_ker_eq_bot _).mp (FaithfulSMul.algebraMap_injective _ _)]
             exact bot_le)
-       exact ⟨Q, hQm.isPrime, ⟨hQ.symm⟩⟩)
+        exact ⟨Q, hQm.isPrime, ⟨hQ.symm⟩⟩
+      )
   have hP0 : P ≠ ⊥ := Ideal.ne_bot_of_liesOver_of_ne_bot h𝔭 P
   have hin : P.inertia (K ≃ₐ[K⁺] K) = ⊥ := by
     rw [Subgroup.eq_bot_iff_forall]
@@ -87,16 +96,18 @@ theorem split_or_inert
   · left; rfl
 
 theorem ncard_eq_two_iff
-    (hunr : ∀ P : Ideal (𝓞 K), P.IsPrime → P ≠ ⊥ →
-      ¬ ∀ x : 𝓞 K, IsCMField.complexConj K • x - x ∈ P)
-    (P : Ideal (𝓞 K)) [P.IsPrime] (hP0 : P ≠ ⊥) :
-    (primesOver (P.under (𝓞 K⁺)) (𝓞 K)).ncard = 2 ↔ IsCMField.complexConj K • P ≠ P := by
+    (hunr : ∀ P : Ideal (𝓞 K), P.IsPrime → P ≠ ⊥ → ¬ ∀ x : 𝓞 K, IsCMField.complexConj K • x - x ∈ P)
+    (P : Ideal (𝓞 K)) [P.IsPrime]
+    (hP0 : P ≠ ⊥)
+    : (primesOver (P.under (𝓞 K⁺)) (𝓞 K)).ncard = 2 ↔ IsCMField.complexConj K • P ≠ P := by
   classical
-  have h1 := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (P.under (𝓞 K⁺)) (𝓞 K) (K ≃ₐ[K⁺] K)
+  have h1 :=
+    Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (P.under (𝓞 K⁺)) (𝓞 K)
+      (K ≃ₐ[K⁺] K)
   have h2 := Ideal.card_stabilizer_eq (G := K ≃ₐ[K⁺] K) (P.under (𝓞 K⁺)) P
   rw [← h2, card_gal K] at h1
-  have hmem : ∀ g : K ≃ₐ[K⁺] K, g ∈ MulAction.stabilizer (K ≃ₐ[K⁺] K) P ↔ g • P = P :=
-    fun g => MulAction.mem_stabilizer_iff
+  have hmem : ∀ g : K ≃ₐ[K⁺] K, g ∈ MulAction.stabilizer (K ≃ₐ[K⁺] K) P ↔ g • P = P := fun g =>
+    MulAction.mem_stabilizer_iff
   constructor
   · intro h hcP
     have hne : MulAction.stabilizer (K ≃ₐ[K⁺] K) P ≠ ⊥ := by
@@ -104,8 +115,8 @@ theorem ncard_eq_two_iff
       have hc : IsCMField.complexConj K ∈ MulAction.stabilizer (K ≃ₐ[K⁺] K) P := (hmem _).mpr hcP
       rw [hb, Subgroup.mem_bot] at hc
       exact IsCMField.complexConj_ne_one K hc
-    have h3 : Nat.card (MulAction.stabilizer (K ≃ₐ[K⁺] K) P) ≠ 1 :=
-      fun h' => hne (Subgroup.card_eq_one.mp h')
+    have h3 : Nat.card (MulAction.stabilizer (K ≃ₐ[K⁺] K) P) ≠ 1 := fun h' =>
+      hne (Subgroup.card_eq_one.mp h')
     rw [h] at h1
     omega
   · intro hcP
@@ -131,8 +142,8 @@ def cQ (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) : hostE ζ a b ≃ₐ
   haveI := isCMField_hostE hqd h
   (IsCMField.complexConj (hostE ζ a b)).restrictScalars ℚ
 
-theorem galE_cQ (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) :
-    galE e ζ a b (cQ hqd h) = cc e := by
+theorem galE_cQ (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b)
+    : galE e ζ a b (cQ hqd h) = cc e := by
   haveI := isCMField_hostE hqd h
   obtain ⟨-, -, hmul, hbij⟩ := hostGalois e q d hqd L ζ a b h
   obtain ⟨σ0, hσ0⟩ := hbij.2 (cc e)
@@ -146,8 +157,7 @@ theorem galE_cQ (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) :
     rw [hσ1, g1] at hσ0
     have := congrArg (fun x : GG e => ((x.1.1 : ℤˣ) : ℤ)) hσ0
     simp [cc, c0] at this
-  · have hc : cQ hqd h = σ0 :=
-      AlgEquiv.ext fun x => (DFunLike.congr_fun h1 x).symm
+  · have hc : cQ hqd h = σ0 := AlgEquiv.ext fun x => (DFunLike.congr_fun h1 x).symm
     rw [hc, hσ0]
 
 end Host
@@ -162,14 +172,18 @@ theorem hostEta : HostEta := by
   haveI hCM : IsCMField (hostE ζ a b) := isCMField_hostE hqd hL
   obtain ⟨-, -, hmul, hbij⟩ := hostGalois e q d hqd L ζ a b hL
   have hc := galE_cQ hqd hL
-  have hunr : ∀ P : Ideal (𝓞 (hostE ζ a b)), P.IsPrime → P ≠ ⊥ →
-      ¬ ∀ x : 𝓞 (hostE ζ a b), IsCMField.complexConj (hostE ζ a b) • x - x ∈ P :=
+  have hunr
+      : ∀ P : Ideal (𝓞 (hostE ζ a b)),
+        P.IsPrime → P ≠ ⊥
+          → ¬ ∀ x : 𝓞 (hostE ζ a b), IsCMField.complexConj (hostE ζ a b) • x - x ∈ P :=
     fun P hP hP0 hx => hostUnramEF e q d hH L ζ a b hL P hP hP0 (cQ hqd hL) hc (fun x => hx x)
-  have hstab : ∀ P : Ideal (𝓞 (hostE ζ a b)),
-      cQ hqd hL ∈ MulAction.stabilizer _ P ↔ IsCMField.complexConj (hostE ζ a b) • P = P :=
+  have hstab
+      : ∀ P : Ideal (𝓞 (hostE ζ a b)),
+        cQ hqd hL ∈ MulAction.stabilizer _ P ↔ IsCMField.complexConj (hostE ζ a b) • P = P :=
     fun P => MulAction.mem_stabilizer_iff
-  have hbot : ∀ (p : ℕ) [Fact p.Prime] (P : Ideal (𝓞 (hostE ζ a b)))
-      [P.LiesOver (span {(p : ℤ)})], P ≠ ⊥ := by
+  have hbot
+      : ∀ (p : ℕ) [Fact p.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P.LiesOver (span {(p : ℤ)})],
+        P ≠ ⊥ := by
     intro p hp P _
     have hne : span {(p : ℤ)} ≠ ⊥ := by
       rw [Ne, Ideal.span_singleton_eq_bot]
@@ -181,11 +195,13 @@ theorem hostEta : HostEta := by
   · intro p _ hp2 hpq hpd P _ _ σ hσ
     have hF := hostFrob_of hostGalois hostGalSpec e q d hqd L ζ a b hL p hp2 hpq hpd P
     have key := Eta.ncard_eq_two_iff (hostE ζ a b) hunr P (hbot p P)
-    have hM : ∀ (τ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (k : ℕ),
-        galE e ζ a b (τ ^ k) = galE e ζ a b τ ^ k :=
-      fun τ k => map_pow (MonoidHom.mk' (galE e ζ a b) hmul) τ k
-    have hE : etaF ζ a b (P.comap (algebraMap (𝓞 (hostF ζ a b)) (𝓞 (hostE ζ a b)))) = -1 ↔
-        cQ hqd hL ∈ MulAction.stabilizer _ P := by
+    have hM
+        : ∀ (τ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (k : ℕ),
+          galE e ζ a b (τ ^ k) = galE e ζ a b τ ^ k := fun τ k =>
+      map_pow (MonoidHom.mk' (galE e ζ a b) hmul) τ k
+    have hE
+        : etaF ζ a b (P.comap (algebraMap (𝓞 (hostF ζ a b)) (𝓞 (hostE ζ a b)))) = -1
+          ↔ cQ hqd hL ∈ MulAction.stabilizer _ P := by
       rw [hstab]
       unfold etaF
       split_ifs with h2

@@ -82,13 +82,27 @@ private lemma norm_tpow_apply_le_pow_of_forall_norm_le {ι : Type} (n : ℕ) (y 
         Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun k _ => hy _ _
     _ = B ^ n := by simp
 
-
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct in
-theorem _root_.GlobalTheory.ClassFin.ActNorm.act_norm_continuity : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ℕ) (d : Fin m → ℕ), (∀ (v : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ) (U : Matrix ι ι ℂ), U * Uᴴ = 1 → _root_.GlobalTheory.ClassFin.nsq (_root_.GlobalTheory.ClassFin.act d v U) = _root_.GlobalTheory.ClassFin.nsq v) ∧ (∀ C : ℝ, ∃ C' : ℝ, 0 ≤ C' ∧ ∀ (v : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ) (y : Matrix ι ι ℂ), (∀ i j, ‖y i j‖ ≤ C) → _root_.GlobalTheory.ClassFin.nsq (_root_.GlobalTheory.ClassFin.act d v y) ≤ C' * _root_.GlobalTheory.ClassFin.nsq v) ∧ ∀ v : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ, Continuous (_root_.GlobalTheory.ClassFin.act d v) := by
+theorem _root_.GlobalTheory.ClassFin.ActNorm.act_norm_continuity
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ℕ) (d : Fin m → ℕ),
+      (∀ (v : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ) (U : Matrix ι ι ℂ),
+          U * Uᴴ = 1
+            → _root_.GlobalTheory.ClassFin.nsq (_root_.GlobalTheory.ClassFin.act d v U)
+              = _root_.GlobalTheory.ClassFin.nsq v)
+        ∧ (∀ C : ℝ, ∃ C' : ℝ,
+          0 ≤ C'
+            ∧ ∀ (v : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ) (y : Matrix ι ι ℂ),
+              (∀ i j, ‖y i j‖ ≤ C)
+                → _root_.GlobalTheory.ClassFin.nsq (_root_.GlobalTheory.ClassFin.act d v y)
+                  ≤ C' * _root_.GlobalTheory.ClassFin.nsq v)
+        ∧ ∀ v : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ,
+          Continuous (_root_.GlobalTheory.ClassFin.act d v) := by
   intro ι _ _ m d
   refine ⟨fun v U hU => ?_, fun C => ?_, fun v => ?_⟩
-  · have hK : ∀ n, _root_.GlobalTheory.ClassFin.tpow n U * (_root_.GlobalTheory.ClassFin.tpow n U)ᴴ = 1 := by
+  · have hK
+        : ∀ n,
+          _root_.GlobalTheory.ClassFin.tpow n U * (_root_.GlobalTheory.ClassFin.tpow n U)ᴴ = 1 := by
       intro n
       have h := (_root_.GlobalTheory.ClassFin.tpow_act_algebra ι ℂ).1 n
       rw [tpow_conjTranspose, ← h.2.1, hU, h.1]
@@ -97,17 +111,22 @@ theorem _root_.GlobalTheory.ClassFin.ActNorm.act_norm_continuity : ∀ (ι : Typ
     simp only [act_apply_eq_vecMul_tpow]
     exact sum_norm_sq_vecMul_eq_of_mul_conjTranspose_eq_one _ _ (hK _)
   · set B := max C 0
-    refine ⟨∑ i, (Fintype.card (Fin (d i) → ι) : ℝ) ^ 2 * (B ^ d i) ^ 2,
-      Finset.sum_nonneg fun _ _ => by positivity, fun v y hy => ?_⟩
+    refine ⟨
+      ∑ i, (Fintype.card (Fin (d i) → ι) : ℝ) ^ 2 * (B ^ d i) ^ 2,
+      Finset.sum_nonneg fun _ _ => by positivity,
+      fun v y hy => ?_
+    ⟩
     have hyB : ∀ i j, ‖y i j‖ ≤ B := fun i j => (hy i j).trans (le_max_left _ _)
     rw [nsq_eq_sum_sum_norm_sq_components, nsq_eq_sum_sum_norm_sq_components, Finset.mul_sum]
     refine Finset.sum_le_sum fun i _ => ?_
     simp only [act_apply_eq_vecMul_tpow]
-    refine (sum_norm_sq_vecMul_le_card_sq_mul_bound_sq _ _ _ (norm_tpow_apply_le_pow_of_forall_norm_le _ y B hyB)).trans ?_
+    refine (sum_norm_sq_vecMul_le_card_sq_mul_bound_sq _ _ _
+      (norm_tpow_apply_le_pow_of_forall_norm_le _ y B hyB)).trans ?_
     gcongr
     exact Finset.single_le_sum
       (f := fun i => (Fintype.card (Fin (d i) → ι) : ℝ) ^ 2 * (B ^ d i) ^ 2)
-      (fun _ _ => by positivity) (Finset.mem_univ i)
+      (fun _ _ => by positivity)
+      (Finset.mem_univ i)
   · unfold _root_.GlobalTheory.ClassFin.act
     simp only [vecMul, dotProduct, tpow_apply_eq_prod]
     fun_prop

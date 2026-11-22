@@ -13,10 +13,13 @@ open NumberField Polynomial GlobalTheory.CompanionTheory.Ar
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem exists_uniform_factor (w : 𝓞 E) :
-    ∃ x : 𝓞 E, x ≠ 0 ∧ ∀ (Ω : Type) [Field Ω] (V : Type) [AddCommGroup V] [Module Ω V]
-      (ρ : 𝓞 E →+* Module.End Ω V) (σ : 𝓞 E →+* Ω),
-      ∃ T ∈ opRing ρ σ, (ρ w - scal V σ w) * T = 0 ∧ ∀ v, ρ w v = σ w • v → T v = σ x • v := by
+theorem exists_uniform_factor (w : 𝓞 E)
+    : ∃ x : 𝓞 E,
+      x ≠ 0
+        ∧ ∀ (Ω : Type) [Field Ω] (V : Type) [AddCommGroup V] [Module Ω V]
+            (ρ : 𝓞 E →+* Module.End Ω V) (σ : 𝓞 E →+* Ω),
+          ∃ T ∈ opRing ρ σ,
+            (ρ w - scal V σ w) * T = 0 ∧ ∀ v, ρ w v = σ w • v → T v = σ x • v := by
   obtain ⟨f, -, hroot, hder⟩ := exists_sep_poly w
   have key : ∀ p : ℤ[X], eval₂ (Int.castRingHom (𝓞 E)) w p = aeval w p := fun p => by
     rw [aeval_def, algebraMap_int_eq]
@@ -24,8 +27,7 @@ theorem exists_uniform_factor (w : 𝓞 E) :
     rw [IsRoot, eval_map, key]
     exact hroot
   set g := f.map (Int.castRingHom (𝓞 E)) /ₘ (X - C w) with hg
-  have hfac : (X - C w) * g = f.map (Int.castRingHom (𝓞 E)) :=
-    (mul_divByMonic_eq_iff_isRoot).2 hF
+  have hfac : (X - C w) * g = f.map (Int.castRingHom (𝓞 E)) := (mul_divByMonic_eq_iff_isRoot).2 hF
   refine ⟨g.eval w, ?_, ?_⟩
   · have hd : (derivative (f.map (Int.castRingHom (𝓞 E)))).eval w = g.eval w := by
       rw [← hfac, derivative_mul]
@@ -34,10 +36,9 @@ theorem exists_uniform_factor (w : 𝓞 E) :
     exact hder
   · intro Ω _ V _ _ ρ σ
     refine ⟨eval₂ (scal V σ) (ρ w) g, eval₂_mem_opRing ρ σ w g, ?_, ?_⟩
-    · have hcomm : ∀ k, Commute (scal V σ (g.coeff k)) (ρ w) :=
-        fun k => commute_scal σ (g.coeff k) (ρ w)
-      have h1 : ρ w - scal V σ w = eval₂ (scal V σ) (ρ w) (X - C w) := by
-        simp [eval₂_sub]
+    · have hcomm : ∀ k, Commute (scal V σ (g.coeff k)) (ρ w) := fun k =>
+        commute_scal σ (g.coeff k) (ρ w)
+      have h1 : ρ w - scal V σ w = eval₂ (scal V σ) (ρ w) (X - C w) := by simp [eval₂_sub]
       rw [h1, ← eval₂_mul_noncomm _ _ hcomm, hfac, eval₂_map]
       have hc : (scal V σ).comp (Int.castRingHom (𝓞 E)) = ρ.comp (Int.castRingHom (𝓞 E)) :=
         RingHom.ext_int _ _
@@ -45,15 +46,20 @@ theorem exists_uniform_factor (w : 𝓞 E) :
     · intro v hv
       exact eval₂_apply_of_eigen ρ σ w hv g
 
-private theorem mem_eigSp_iff_geometry {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module Ω V]
-    (ρ : 𝓞 E →+* Module.End Ω V) (σ : 𝓞 E →+* Ω) (v : V) :
-    v ∈ eigSp ρ σ ↔ ∀ a, ρ a v = σ a • v := by
+private theorem mem_eigSp_iff_geometry
+    {Ω : Type} [Field Ω]
+    {V : Type} [AddCommGroup V] [Module Ω V]
+    (ρ : 𝓞 E →+* Module.End Ω V) (σ : 𝓞 E →+* Ω) (v : V)
+    : v ∈ eigSp ρ σ ↔ ∀ a, ρ a v = σ a • v := by
   simp [eigSp, Submodule.mem_iInf, LinearMap.mem_ker, sub_eq_zero]
 
-theorem exists_uniform_product (W : Finset (𝓞 E)) :
-    ∃ x : 𝓞 E, x ≠ 0 ∧ ∀ (Ω : Type) [Field Ω] (V : Type) [AddCommGroup V] [Module Ω V]
-      (ρ : 𝓞 E →+* Module.End Ω V) (σ : 𝓞 E →+* Ω),
-      ∃ T ∈ opRing ρ σ, (∀ w ∈ W, (ρ w - scal V σ w) * T = 0) ∧ ∀ v ∈ eigSp ρ σ, T v = σ x • v := by
+theorem exists_uniform_product (W : Finset (𝓞 E))
+    : ∃ x : 𝓞 E,
+      x ≠ 0
+        ∧ ∀ (Ω : Type) [Field Ω] (V : Type) [AddCommGroup V] [Module Ω V]
+            (ρ : 𝓞 E →+* Module.End Ω V) (σ : 𝓞 E →+* Ω),
+          ∃ T ∈ opRing ρ σ,
+            (∀ w ∈ W, (ρ w - scal V σ w) * T = 0) ∧ ∀ v ∈ eigSp ρ σ, T v = σ x • v := by
   classical
   induction W using Finset.induction_on with
   | empty =>
@@ -79,10 +85,13 @@ theorem exists_uniform_product (W : Finset (𝓞 E)) :
       change Ta (T' v) = _
       rw [hT'e v hv, map_smul, hTae v hva, smul_smul, map_mul, mul_comm (σ xa)]
 
-theorem exists_eigen_op_uniform : ∀ (E : Type) [Field E] [NumberField E], ∃ D : ℕ, 0 < D ∧
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] (V : Type) [AddCommGroup V] [Module Ω V]
-      (ρ : 𝓞 E →+* Module.End Ω V) (σ : 𝓞 E →+* Ω),
-      ∃ T ∈ opRing ρ σ, (∀ v, T v ∈ eigSp ρ σ) ∧ ∀ v ∈ eigSp ρ σ, T v = (D : Ω) • v := by
+theorem exists_eigen_op_uniform
+    : ∀ (E : Type) [Field E] [NumberField E], ∃ D : ℕ,
+      0 < D
+        ∧ ∀ (Ω : Type) [Field Ω] [CharZero Ω] (V : Type) [AddCommGroup V] [Module Ω V]
+            (ρ : 𝓞 E →+* Module.End Ω V) (σ : 𝓞 E →+* Ω),
+          ∃ T ∈ opRing ρ σ,
+            (∀ v, T v ∈ eigSp ρ σ) ∧ ∀ v ∈ eigSp ρ σ, T v = (D : Ω) • v := by
   intro E _ _
   obtain ⟨S, hS⟩ := (Module.Finite.fg_top : (⊤ : Submodule ℤ (𝓞 E)).FG)
   obtain ⟨x, hx, hT⟩ := exists_uniform_product S
@@ -115,13 +124,12 @@ theorem exists_eigen_op_uniform : ∀ (E : Type) [Field E] [NumberField E], ∃ 
       change (ρ w - scal V σ w) (T v) = 0 at h
       rw [LinearMap.sub_apply, scal_apply, sub_eq_zero] at h
       exact h
-    | zero => simp
+    | zero =>
+      simp
     | add a b _ _ iha ihb =>
       rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, iha, ihb, add_smul]
-    | smul m a _ ih =>
-      rw [map_zsmul, map_zsmul, LinearMap.smul_apply, ih, smul_assoc]
-  have hs : scal V σ y ∈ opRing ρ σ := by
-    simpa using eval₂_mem_opRing ρ σ 0 (C y)
+    | smul m a _ ih => rw [map_zsmul, map_zsmul, LinearMap.smul_apply, ih, smul_assoc]
+  have hs : scal V σ y ∈ opRing ρ σ := by simpa using eval₂_mem_opRing ρ σ 0 (C y)
   refine ⟨scal V σ y * T, (opRing ρ σ).mul_mem hs hTm, ?_, ?_⟩
   · intro v
     change scal V σ y (T v) ∈ eigSp ρ σ

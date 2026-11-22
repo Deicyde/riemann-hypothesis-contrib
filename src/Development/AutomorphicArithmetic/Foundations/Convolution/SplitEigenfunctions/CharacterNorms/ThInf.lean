@@ -8,7 +8,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open UpperTheory.ConvolutionTheory.R2.G (FS2 nE)
 
@@ -18,9 +20,12 @@ variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyCompl
 
 def thInf (D : Dat ℚ E) : Cinf E := pInf E (rt D.θ)
 
-def nC (z : Cinf E) : GL (Fin 2) (Cinf E) :=
-  ⟨!![1, z; 0, 1], !![1, -z; 0, 1], by ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two],
-    by ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]⟩
+def nC (z : Cinf E) : GL (Fin 2) (Cinf E) := ⟨
+  !![1, z; 0, 1],
+  !![1, -z; 0, 1],
+  by ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two],
+  by ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
+⟩
 
 def kInf (k : GL (Fin 2) (A E)) : GL (Fin 2) (Cinf E) := Matrix.GeneralLinearGroup.map (pInf E) k
 

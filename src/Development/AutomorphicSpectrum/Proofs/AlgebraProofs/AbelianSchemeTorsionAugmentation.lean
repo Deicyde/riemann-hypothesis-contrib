@@ -32,18 +32,21 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.Ar.GR
 
-theorem one_comp_monHom {S : Scheme.{0}} {T G H : Over S} [GrpObj G] [GrpObj H] (f : G ⟶ H)
-    [IsMonHom f] : (1 : T ⟶ G) ≫ f = 1 := by
+theorem one_comp_monHom
+    {S : Scheme.{0}} {T G H : Over S} [GrpObj G] [GrpObj H] (f : G ⟶ H) [IsMonHom f]
+    : (1 : T ⟶ G) ≫ f = 1 := by
   simp [Hom.one_def]
 
-theorem sub_abelianScheme : QuotientByFiniteFlatStatement → ZarhinStatement →
-    HodgeTateDatumStatement → ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C]
-    [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R →
-    v (p : C) < 1 → IsAdicComplete (Ideal.span {(p : R)}) R →
-    ∀ (A : Over (Spec (CommRingCat.of R))) [GrpObj A] (L : LB A.left), IsAbelianScheme A →
-    L.IsLB → Out.RelAmple A L → ∀ (T : TorsRep A p) (N : Type) [AddCommGroup N] [Fintype N]
-    [DecidableEq N] (pt : N → (sp (R₀ := R) R ⟶ A)), IsTorsPts A p pt →
-    ∀ K : AddSubgroup N, GenAF p (torsFun C T pt) K := by
+theorem sub_abelianScheme
+    : QuotientByFiniteFlatStatement → ZarhinStatement → HodgeTateDatumStatement
+      → ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+          (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+        v.Integers R → v (p : C) < 1 → IsAdicComplete (Ideal.span {(p : R)}) R
+          → ∀ (A : Over (Spec (CommRingCat.of R))) [GrpObj A] (L : LB A.left),
+            IsAbelianScheme A → L.IsLB → Out.RelAmple A L
+              → ∀ (T : TorsRep A p) (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N]
+                  (pt : N → (sp (R₀ := R) R ⟶ A)),
+                IsTorsPts A p pt → ∀ K : AddSubgroup N, GenAF p (torsFun C T pt) K := by
   intro hQ hZ hD p _ C _ _ _ v R _ _ hint hp hc A _ L hA hL hamp T N _ _ _ pt hpt K
   haveI : IsCommMonObj A := hA.comm
   have hsub := GlobalTheory.T.torsion_points_finite_flat_subgroup p C v R hint hp A T N pt hpt K
@@ -53,9 +56,11 @@ theorem sub_abelianScheme : QuotientByFiniteFlatStatement → ZarhinStatement �
   haveI := hq
   haveI := hi
   haveI := hr
-  have hj : ∀ (S : Type) [CommRing S] [Algebra R S] (z : sp (R₀ := R) S ⟶ A),
-      z ≫ (q ≫ i) = 1 ↔ ∃ φ : (T.A ⧸ vanIdeal T pt K) →ₐ[R] S,
-        spMap φ ≫ (spMap (Ideal.Quotient.mkₐ R (vanIdeal T pt K)) ≫ T.y) = z := by
+  have hj
+      : ∀ (S : Type) [CommRing S] [Algebra R S] (z : sp (R₀ := R) S ⟶ A),
+        z ≫ (q ≫ i) = 1
+          ↔ ∃ φ : (T.A ⧸ vanIdeal T pt K) →ₐ[R] S,
+            spMap φ ≫ (spMap (Ideal.Quotient.mkₐ R (vanIdeal T pt K)) ≫ T.y) = z := by
     intro S _ _ z
     rw [← hker S z]
     constructor
@@ -67,15 +72,20 @@ theorem sub_abelianScheme : QuotientByFiniteFlatStatement → ZarhinStatement �
   letI : Algebra ℤ_[p] R := (Av.zpLift p R hc).toAlgebra
   obtain ⟨⟨T'⟩, cp, -, -, pt', hpt', -⟩ := hD p C v R hint hp hc P
   have hjm : IsMonHom (q ≫ i) := inferInstance
-  obtain ⟨jN, -, hjN, -, hpull⟩ := GlobalTheory.T.torsion_points_isogeny_hopf_order p C v R hint hp A P.A T N pt hpt T' _ pt' hpt'
-    (q ≫ i) hjm
-  obtain ⟨hK, hid⟩ := GlobalTheory.T.torsion_points_homomorphism_compatible p C v R hint hp A P.A T N pt hpt T' _ pt' hpt' (q ≫ i) hjm K
-    hj jN hjN
+  obtain ⟨jN, -, hjN, -, hpull⟩ :=
+    GlobalTheory.T.torsion_points_isogeny_hopf_order p C v R hint hp A P.A T N pt hpt T' _ pt' hpt'
+      (q ≫ i) hjm
+  obtain ⟨hK, hid⟩ :=
+    GlobalTheory.T.torsion_points_homomorphism_compatible p C v R hint hp A P.A T N pt hpt T' _ pt'
+      hpt' (q ≫ i) hjm K hj jN hjN
   obtain ⟨⟨AA, hAA⟩, -⟩ := GlobalTheory.T.torsion_points_hopf_order p C v R hint hp A T N pt hpt
-  obtain ⟨⟨AP, hAP⟩, -⟩ := GlobalTheory.T.torsion_points_hopf_order p C v R hint hp P.A T' _ pt' hpt'
-  have hinv := GlobalTheory.T.hopf_order_pullback_along_hom p C v R hint hp N AA _ AP jN
-    (by rw [hAA, hAP]; exact hpull) (by rw [hAA, hAP]; exact hid)
+  obtain ⟨⟨AP, hAP⟩, -⟩ :=
+    GlobalTheory.T.torsion_points_hopf_order p C v R hint hp P.A T' _ pt' hpt'
+  have hinv :=
+    GlobalTheory.T.hopf_order_pullback_along_hom p C v R hint hp N AA _ AP jN
+      (by rw [hAA, hAP]; exact hpull) (by rw [hAA, hAP]; exact hid)
   rw [hAA, hAP, hK] at hinv
-  exact GlobalTheory.T.generation_along_invariants p C R N _ _ _ jN K hinv (gp_polAV hD p C v R hint hp hc P T' _ pt' hpt').1
+  exact GlobalTheory.T.generation_along_invariants p C R N _ _ _ jN K hinv
+    (gp_polAV hD p C v R hint hp hc P T' _ pt' hpt').1
 
 end GlobalTheory.CompanionTheory.Ar.GR

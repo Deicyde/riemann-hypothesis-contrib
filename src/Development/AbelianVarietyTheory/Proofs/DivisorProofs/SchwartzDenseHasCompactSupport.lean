@@ -10,11 +10,12 @@ open scoped ContDiff
 
 namespace GlobalTheory
 
-theorem schwartz_dense_hasCompactSupport :
-    ∀ {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V],
-    Dense {f : SchwartzMap V ℂ | HasCompactSupport (f : V → ℂ)} := by
+theorem schwartz_dense_hasCompactSupport
+    : ∀ {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V],
+      Dense {f : SchwartzMap V ℂ | HasCompactSupport (f : V → ℂ)} := by
   intro V _ _ _
-  obtain ⟨χ, -, hχc, hχs, -, hχ0⟩ := exists_contDiff_tsupport_subset (n := ⊤) (Filter.univ_mem (f := 𝓝 (0 : V)))
+  obtain ⟨χ, -, hχc, hχs, -, hχ0⟩ :=
+    exists_contDiff_tsupport_subset (n := ⊤) (Filter.univ_mem (f := 𝓝 (0 : V)))
   set L : ℝ → V →L[ℝ] V := fun r => r • ContinuousLinearMap.id ℝ V with hL
   have hLx : ∀ r x, L r x = r • x := fun r x => by simp [hL]
   have hLn : ∀ r, ‖L r‖ ≤ |r| := fun r => by
@@ -42,19 +43,22 @@ theorem schwartz_dense_hasCompactSupport :
   set F : ℝ → SchwartzMap V ℂ := fun r => SchwartzMap.smulLeftCLM ℂ (g r) f with hF
   have hFx : ∀ r, (F r : V → ℂ) = fun y => g r y * f y := fun r => by
     ext y; simp [hF, SchwartzMap.smulLeftCLM_apply_apply (htg r)]
-  have hF0 : F 0 = f := by
-    ext y; rw [hFx]; simp [hgx, hχ0]
+  have hF0 : F 0 = f := by ext y; rw [hFx]; simp [hgx, hχ0]
   have hcont : ContinuousAt F 0 := by
     refine schwartz_continuousAt_of_pointwise_of_bounded F 0 (fun v => ?_) (fun k n => ?_)
     · simp only [hFx, hgx]
-      exact ((Complex.continuous_ofReal.comp (hχs.continuous.comp
-        (continuous_id.smul continuous_const))).mul continuous_const).continuousAt
-    · refine ⟨∑ i ∈ Finset.range (n + 1), (n.choose i : ℝ) * |M i| * SchwartzMap.seminorm ℂ k (n - i) f, ?_⟩
+      exact ((Complex.continuous_ofReal.comp (hχs.continuous.comp (continuous_id.smul
+        continuous_const))).mul continuous_const).continuousAt
+    · refine ⟨
+        ∑ i ∈ Finset.range (n + 1), (n.choose i : ℝ) * |M i| * SchwartzMap.seminorm ℂ k (n - i) f,
+        ?_
+      ⟩
       filter_upwards [Metric.closedBall_mem_nhds (0 : ℝ) one_pos] with r hr v
       have hr1 : |r| ≤ 1 := by simpa [Real.dist_0_eq_abs] using hr
       rw [hFx]
-      refine (mul_le_mul_of_nonneg_left (norm_iteratedFDeriv_mul_le (N := ∞) (hgs r) (f.smooth ⊤) v
-        (mod_cast le_top)) (by positivity)).trans ?_
+      refine (mul_le_mul_of_nonneg_left
+        (norm_iteratedFDeriv_mul_le (N := ∞) (hgs r) (f.smooth ⊤) v (mod_cast le_top))
+        (by positivity)).trans ?_
       rw [Finset.mul_sum]
       refine Finset.sum_le_sum fun i _ => ?_
       have h1 : ‖iteratedFDeriv ℝ i (g r) v‖ ≤ |M i| := by
@@ -63,10 +67,16 @@ theorem schwartz_dense_hasCompactSupport :
         exact mul_le_of_le_one_right (abs_nonneg _)
           (pow_le_one₀ (norm_nonneg _) ((hLn r).trans hr1))
       have h2 := SchwartzMap.le_seminorm ℂ k (n - i) f v
-      calc ‖v‖ ^ k * ((n.choose i : ℝ) * ‖iteratedFDeriv ℝ i (g r) v‖ * ‖iteratedFDeriv ℝ (n - i) (⇑f) v‖)
-          = (n.choose i : ℝ) * ‖iteratedFDeriv ℝ i (g r) v‖ * (‖v‖ ^ k * ‖iteratedFDeriv ℝ (n - i) (⇑f) v‖) := by ring
+      calc
+        ‖v‖ ^ k
+              * ((n.choose i : ℝ) * ‖iteratedFDeriv ℝ i (g r) v‖
+                * ‖iteratedFDeriv ℝ (n - i) (⇑f) v‖)
+            = (n.choose i : ℝ) * ‖iteratedFDeriv ℝ i (g r) v‖
+              * (‖v‖ ^ k * ‖iteratedFDeriv ℝ (n - i) (⇑f) v‖) := by
+          ring
         _ ≤ (n.choose i : ℝ) * |M i| * SchwartzMap.seminorm ℂ k (n - i) f :=
-          mul_le_mul (mul_le_mul_of_nonneg_left h1 (by positivity)) h2 (by positivity) (by positivity)
+          mul_le_mul (mul_le_mul_of_nonneg_left h1 (by positivity)) h2 (by positivity)
+            (by positivity)
   have ht : Tendsto F (𝓝[≠] 0) (𝓝 f) := by
     rw [← hF0]; exact hcont.tendsto.mono_left nhdsWithin_le_nhds
   refine mem_closure_of_tendsto ht (eventually_nhdsWithin_of_forall fun r hr => ?_)

@@ -8,7 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open CongruenceSubgroup UpperHalfPlane UpperTheory.V.Af UpperTheory.V.Sd
 open scoped MatrixGroups ModularForm
 
-private theorem zmod_cast_eq_of_dvd_of_cast_eq {N L : ℕ} (hd : N ∣ L) {a b : ℤ} (h : (a : ZMod L) = b) : (a : ZMod N) = b := by
+private theorem zmod_cast_eq_of_dvd_of_cast_eq
+    {N L : ℕ} (hd : N ∣ L) {a b : ℤ} (h : (a : ZMod L) = b)
+    : (a : ZMod N) = b := by
   rw [ZMod.intCast_eq_intCast_iff_dvd_sub] at h ⊢
   exact (Int.natCast_dvd_natCast.2 hd).trans h
 
@@ -21,11 +23,13 @@ private theorem gamma1_le_of_dvd' {N L : ℕ} (hd : N ∣ L) : Gamma1 L ≤ Gamm
   · exact_mod_cast zmod_cast_eq_of_dvd_of_cast_eq (b := 1) hd (by exact_mod_cast h2)
   · exact_mod_cast zmod_cast_eq_of_dvd_of_cast_eq (b := 0) hd (by exact_mod_cast h3)
 
-private theorem mem_gamma0_of_dvd_of_mem {N L : ℕ} (hd : N ∣ L) {A : SL(2, ℤ)} (hA : A ∈ Gamma0 L) : A ∈ Gamma0 N := by
+private theorem mem_gamma0_of_dvd_of_mem {N L : ℕ} (hd : N ∣ L) {A : SL(2, ℤ)} (hA : A ∈ Gamma0 L)
+    : A ∈ Gamma0 N := by
   rw [Gamma0_mem] at hA ⊢
   exact_mod_cast zmod_cast_eq_of_dvd_of_cast_eq (b := 0) hd (by exact_mod_cast hA)
 
-private theorem isUnit_lower_right_of_mem_gamma0 {L : ℕ} {A : SL(2, ℤ)} (hA : A ∈ Gamma0 L) : IsUnit ((A 1 1 : ℤ) : ZMod L) := by
+private theorem isUnit_lower_right_of_mem_gamma0 {L : ℕ} {A : SL(2, ℤ)} (hA : A ∈ Gamma0 L)
+    : IsUnit ((A 1 1 : ℤ) : ZMod L) := by
   rw [Gamma0_mem] at hA
   have hdet : A 0 0 * A 1 1 - A 0 1 * A 1 0 = 1 := by
     have := A.det_coe
@@ -37,14 +41,24 @@ private theorem isUnit_lower_right_of_mem_gamma0 {L : ℕ} {A : SL(2, ℤ)} (hA 
     exact this
   exact ⟨⟨_, _, by rw [mul_comm]; exact h, h⟩, rfl⟩
 
-private theorem raise (k N L : ℕ) [NeZero N] [NeZero L] (hd : N ∣ L) (χ : DirichletCharacter ℂ N)
-    (f : CuspForm (Gamma1 N) (k : ℤ)) (hf : HasChar k χ f) :
-    ∃ g : CuspForm (Gamma1 L) (k : ℤ), (g : ℍ → ℂ) = f ∧ HasChar k (DirichletCharacter.changeLevel hd χ) g := by
-  have hle : (Gamma1 L : Subgroup (GL (Fin 2) ℝ)) ≤ Gamma1 N := Subgroup.map_mono (gamma1_le_of_dvd' hd)
-  refine ⟨{ toFun := f
-            slash_action_eq' := fun γ hγ => f.slash_action_eq' γ (hle hγ)
-            holo' := f.holo'
-            zero_at_cusps' := fun hc => f.zero_at_cusps' (hc.mono hle) }, rfl, ?_⟩
+private theorem raise
+    (k N L : ℕ) [NeZero N] [NeZero L]
+    (hd : N ∣ L)
+    (χ : DirichletCharacter ℂ N) (f : CuspForm (Gamma1 N) (k : ℤ)) (hf : HasChar k χ f)
+    : ∃ g : CuspForm (Gamma1 L) (k : ℤ),
+      (g : ℍ → ℂ) = f ∧ HasChar k (DirichletCharacter.changeLevel hd χ) g := by
+  have hle : (Gamma1 L : Subgroup (GL (Fin 2) ℝ)) ≤ Gamma1 N :=
+    Subgroup.map_mono (gamma1_le_of_dvd' hd)
+  refine ⟨
+    {
+      toFun := f
+      slash_action_eq' := fun γ hγ => f.slash_action_eq' γ (hle hγ)
+      holo' := f.holo'
+      zero_at_cusps' := fun hc => f.zero_at_cusps' (hc.mono hle)
+    },
+    rfl,
+    ?_
+  ⟩
   intro γ hγ
   have h := hf γ (mem_gamma0_of_dvd_of_mem hd hγ)
   change (f : ℍ → ℂ) ∣[(k : ℤ)] γ = _ • (f : ℍ → ℂ)
@@ -53,16 +67,16 @@ private theorem raise (k N L : ℕ) [NeZero N] [NeZero L] (hd : N ∣ L) (χ : D
   obtain ⟨u, hu⟩ := isUnit_lower_right_of_mem_gamma0 hγ
   rw [← hu, DirichletCharacter.changeLevel_eq_cast_of_dvd, hu, ZMod.cast_intCast hd]
 
-private theorem chg {N L p : ℕ} (hd : N ∣ L) (χ : DirichletCharacter ℂ N) (hu : IsUnit (p : ZMod L)) :
-    DirichletCharacter.changeLevel hd χ (p : ZMod L) = χ (p : ZMod N) := by
+private theorem chg {N L p : ℕ} (hd : N ∣ L) (χ : DirichletCharacter ℂ N) (hu : IsUnit (p : ZMod L))
+    : DirichletCharacter.changeLevel hd χ (p : ZMod L) = χ (p : ZMod N) := by
   obtain ⟨u, hu'⟩ := hu
   rw [← hu', DirichletCharacter.changeLevel_eq_cast_of_dvd, hu', ZMod.cast_natCast hd]
 
-theorem UpperTheory.V.Af.Rs.deplete :
-    UpperTheory.V.Af.Rs.Deplete := by
+theorem UpperTheory.V.Af.Rs.deplete : UpperTheory.V.Af.Rs.Deplete := by
   intro k N L _ _ hk hd χ g
   obtain ⟨f1, hf1, hc1⟩ := raise k N L hd χ g.f g.char
-  obtain ⟨h, hh, hcoef⟩ := UpperTheory.V.Br.clTwist L k (DirichletCharacter.changeLevel hd χ) 1 f1 hc1
+  obtain ⟨h, hh, hcoef⟩ :=
+    UpperTheory.V.Br.clTwist L k (DirichletCharacter.changeLevel hd χ) 1 f1 hc1
   have hψu : ∀ m : ℕ, ¬ m.Coprime L → (1 : DirichletCharacter ℂ L) (m : ZMod L) = 0 := fun m hm =>
     MulChar.map_nonunit _ (by rwa [ZMod.isUnit_iff_coprime])
   have hψ1 : ∀ m : ℕ, m.Coprime L → (1 : DirichletCharacter ℂ L) (m : ZMod L) = 1 := fun m hm =>
@@ -70,16 +84,27 @@ theorem UpperTheory.V.Af.Rs.deplete :
   have hc : ∀ n, coef h n = (1 : DirichletCharacter ℂ L) (n : ZMod L) * coef g.f n := by
     intro n
     rw [hcoef, hf1]
-  have hmul : ∀ a b : ℕ, (1 : DirichletCharacter ℂ L) ((a * b : ℕ) : ZMod L)
-      = (1 : DirichletCharacter ℂ L) (a : ZMod L) * (1 : DirichletCharacter ℂ L) (b : ZMod L) :=
-    fun a b => by rw [Nat.cast_mul, map_mul]
-  have hχ' : ∀ p : ℕ, p.Coprime L → DirichletCharacter.changeLevel (dvd_mul_right L L)
-      (DirichletCharacter.changeLevel hd χ * 1 ^ 2) (p : ZMod (L * L)) = χ (p : ZMod N) := by
+  have hmul
+      : ∀ a b : ℕ,
+        (1 : DirichletCharacter ℂ L) ((a * b : ℕ) : ZMod L)
+          = (1 : DirichletCharacter ℂ L) (a : ZMod L)
+            * (1 : DirichletCharacter ℂ L) (b : ZMod L) := fun a b => by
+    rw [Nat.cast_mul, map_mul]
+  have hχ'
+      : ∀ p : ℕ,
+        p.Coprime L
+          → DirichletCharacter.changeLevel (dvd_mul_right L L)
+              (DirichletCharacter.changeLevel hd χ * 1 ^ 2) (p : ZMod (L * L))
+            = χ (p : ZMod N) := by
     intro p hp
-    rw [chg _ _ ((ZMod.isUnit_iff_coprime p (L * L)).2 (Nat.Coprime.mul_right hp hp)), one_pow, mul_one,
-      chg _ _ ((ZMod.isUnit_iff_coprime p L).2 hp)]
-  have hχ0 : ∀ p : ℕ, ¬ p.Coprime L → DirichletCharacter.changeLevel (dvd_mul_right L L)
-      (DirichletCharacter.changeLevel hd χ * 1 ^ 2) (p : ZMod (L * L)) = 0 := by
+    rw [chg _ _ ((ZMod.isUnit_iff_coprime p (L * L)).2 (Nat.Coprime.mul_right hp hp)), one_pow,
+      mul_one, chg _ _ ((ZMod.isUnit_iff_coprime p L).2 hp)]
+  have hχ0
+      : ∀ p : ℕ,
+        ¬ p.Coprime L
+          → DirichletCharacter.changeLevel (dvd_mul_right L L)
+              (DirichletCharacter.changeLevel hd χ * 1 ^ 2) (p : ZMod (L * L))
+            = 0 := by
     intro p hp
     apply MulChar.map_nonunit
     rw [ZMod.isUnit_iff_coprime]

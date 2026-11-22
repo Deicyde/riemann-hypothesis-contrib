@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteWeilRe
 
 open NumberField MeasureTheory IsDedekindDomain
 open scoped Classical
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum
 open Formalism.MainNotions.TaylorLogMetric (VC embT tor0 Hf lamOf area Th U)
 open Formalism.MainNotions.StandardLatticesGL3 (WeilO HeckeU TT stdL pt oddE0)
 open GlobalTheory.NormExact
@@ -20,7 +22,8 @@ open GlobalTheory.BotClassDict (finQ)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
-open Formalism.MainNotions.StandardLattice Matrix GlobalTheory.WeilParts GlobalTheory.FinWeil GlobalTheory.FinWeilO
+open Formalism.MainNotions.StandardLattice Matrix GlobalTheory.WeilParts GlobalTheory.FinWeil
+  GlobalTheory.FinWeilO
 
 namespace GlobalTheory.SplitProj
 
@@ -49,10 +52,11 @@ theorem cA_spl (ε : AE D) : cA D (spl ε) = spl ε := by
 
 theorem infPart_spl (hε : GlobalTheory.RatAut.IsHalfIdem D ε) : infPart D (spl ε) = 0 := by
   unfold spl
-  rw [RingHom.map_add (f := _), (GlobalTheory.IdemSupport.parts_cA ε).1, hε.2.2.1, RingHom.map_zero, add_zero]
+  rw [RingHom.map_add (f := _), (GlobalTheory.IdemSupport.parts_cA ε).1, hε.2.2.1, RingHom.map_zero,
+    add_zero]
 
-theorem spl_mul_split (hε : GlobalTheory.RatAut.IsHalfIdem D ε) {e : AE D} (he : IsSplitIdem D e) :
-    spl ε * (e + cA D e) = e + cA D e := by
+theorem spl_mul_split (hε : GlobalTheory.RatAut.IsHalfIdem D ε) {e : AE D} (he : IsSplitIdem D e)
+    : spl ε * (e + cA D e) = e + cA D e := by
   have k1 : ∀ x y : AE D, x * y = 0 → cA D x * cA D y = 0 := fun x y h => by
     rw [← RingHom.map_mul, h, RingHom.map_zero]
   have k2 : ∀ x y : AE D, x * y = y → cA D x * cA D y = cA D y := fun x y h => by
@@ -68,8 +72,10 @@ theorem spl_mul_split (hε : GlobalTheory.RatAut.IsHalfIdem D ε) {e : AE D} (he
     rw [cA_cA] at c2
     linear_combination a + b + c1 + c2
 
-theorem spl_mul_nonSplit (hε : GlobalTheory.RatAut.IsHalfIdem D ε) {v : HeightOneSpectrum (𝓞 D.host.F)} {η : AF D.host.F}
-    (hv : NonSplitAt D v η) : spl ε * algebraMap (AF D.host.F) (AE D) η = 0 := by
+theorem spl_mul_nonSplit
+    (hε : GlobalTheory.RatAut.IsHalfIdem D ε)
+    {v : HeightOneSpectrum (𝓞 D.host.F)} {η : AF D.host.F} (hv : NonSplitAt D v η)
+    : spl ε * algebraMap (AF D.host.F) (AE D) η = 0 := by
   have h := hε.2.2.2.2 v η hv
   have h' : algebraMap (AF D.host.F) (AE D) η * cA D ε = 0 := by
     rw [← GlobalTheory.IdemSupport.cA_algebraMap η, ← RingHom.map_mul, h, RingHom.map_zero]
@@ -79,21 +85,27 @@ theorem spl_mul_nonSplit (hε : GlobalTheory.RatAut.IsHalfIdem D ε) {v : Height
 def pc (hε : GlobalTheory.RatAut.IsHalfIdem D ε) (V : HSp D) (g : GA D V) : GA D V :=
   ⟨piece (spl_idem hε) g.1, piece_mem _ _ (spl_idem hε) (cA_spl ε) g.2⟩
 
-theorem mt_pc (hε : GlobalTheory.RatAut.IsHalfIdem D ε) (V : HSp D) (g : GA D V) :
-    mt V (pc hε V g) = spl ε • mt V g + (1 - spl ε) • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) := rfl
+theorem mt_pc (hε : GlobalTheory.RatAut.IsHalfIdem D ε) (V : HSp D) (g : GA D V)
+    : mt V (pc hε V g)
+      = spl ε • mt V g + (1 - spl ε) • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) :=
+  rfl
 
 def proj (hε : GlobalTheory.RatAut.IsHalfIdem D ε) (V : HSp D) : GA D V →* GA D V :=
-  MonoidHom.mk' (pc hε V) fun g h => mt_inj V (by
-    simp only [mt_pc, GlobalTheory.IdemSupport.mt_mul]
-    rw [mix_mul (spl_idem hε), one_mul])
+  MonoidHom.mk' (pc hε V) fun g h =>
+    mt_inj V (by
+      simp only [mt_pc, GlobalTheory.IdemSupport.mt_mul]
+      rw [mix_mul (spl_idem hε), one_mul])
 
 variable (hε : GlobalTheory.RatAut.IsHalfIdem D ε) {V : HSp D}
 include hε
 
-theorem mt_proj (g : GA D V) :
-    mt V (proj hε V g) = spl ε • mt V g + (1 - spl ε) • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) := mt_pc hε V g
+theorem mt_proj (g : GA D V)
+    : mt V (proj hε V g)
+      = spl ε • mt V g + (1 - spl ε) • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) :=
+  mt_pc hε V g
 
-theorem proj_eq_self {g : GA D V} (hg : ∀ i j, spl ε * (mt V g - 1) i j = (mt V g - 1) i j) : proj hε V g = g :=
+theorem proj_eq_self {g : GA D V} (hg : ∀ i j, spl ε * (mt V g - 1) i j = (mt V g - 1) i j)
+    : proj hε V g = g :=
   mt_inj V (by
     rw [mt_proj]
     ext i j
@@ -114,15 +126,20 @@ theorem proj_mem_GfC (g : GA D V) : proj hε V g ∈ GfC V :=
 
 theorem proj_of_suppAt {g : GA D V} (hg : SuppAt ε V g) : proj hε V g = g := proj_eq_self hε hg
 
-theorem proj_of_split {e : AE D} (he : IsSplitIdem D e) {g : GA D V} (hg : SuppAt e V g) : proj hε V g = g :=
+theorem proj_of_split {e : AE D} (he : IsSplitIdem D e) {g : GA D V} (hg : SuppAt e V g)
+    : proj hε V g = g :=
   proj_eq_self hε fun i j => by rw [← hg i j, ← mul_assoc, spl_mul_split hε he]
 
-theorem proj_of_nonSplit {v : HeightOneSpectrum (𝓞 D.host.F)} {η : AF D.host.F} (hv : NonSplitAt D v η) {g : GA D V}
-    (hg : SuppPl η V g) : proj hε V g = 1 :=
+theorem proj_of_nonSplit
+    {v : HeightOneSpectrum (𝓞 D.host.F)} {η : AF D.host.F} (hv : NonSplitAt D v η)
+    {g : GA D V} (hg : SuppPl η V g)
+    : proj hε V g = 1 :=
   proj_eq_one hε fun i j => by rw [← hg i j, ← mul_assoc, spl_mul_nonSplit hε hv, zero_mul]
 
 theorem proj_of_real {g : GA D V} (hg : g ∈ GinfC V) : proj hε V g = 1 := by
-  refine proj_eq_one hε fun i j => GlobalTheory.PlaceIdem.parts_inj D _ _ (by rw [RingHom.map_mul, infPart_spl hε, zero_mul, RingHom.map_zero]) ?_
+  refine proj_eq_one hε fun i j =>
+    GlobalTheory.PlaceIdem.parts_inj D _ _
+      (by rw [RingHom.map_mul, infPart_spl hε, zero_mul, RingHom.map_zero]) ?_
   have h1 : (finPart D).mapMatrix (Formalism.L2.Theta.mt V g) = 1 := congrArg Units.val hg
   have h2 : (finPart D).mapMatrix (Formalism.L2.Theta.mt V g - 1) = 0 := by
     rw [RingHom.map_sub, h1, RingHom.map_one, sub_self]

@@ -43,7 +43,8 @@ theorem nonvanishingNearHalfMax_holds : NonvanishingNearHalfMax (E := E) := by
     · rw [← h, zero_mul] at h1
       exact absurd h1 (lt_irrefl 0)
   have hzt : ∀ t : ℂ, ‖t‖ < 5 → X.zN (t • Z) ≤ ρ := fun t ht =>
-    (OrthogonalFrameDomain.zN_smul_le (X := X) t Z).trans (by nlinarith [OrthogonalFrameDomain.zN_nonneg (X := X) Z, norm_nonneg t])
+    (OrthogonalFrameDomain.zN_smul_le (X := X) t Z).trans
+      (by nlinarith [OrthogonalFrameDomain.zN_nonneg (X := X) Z, norm_nonneg t])
   have hdom : ∀ t : ℂ, ‖t‖ < 5 → X.xZ x0 (t • Z) ∈ X.dom := fun t ht =>
     OrthonormalChartBounds.xZ_mem_dom (X := X) hx0d hx0o (lt_of_le_of_lt (hzt t ht) (by linarith))
   have hbound : ∀ t : ℂ, ‖t‖ < 5 → ‖P (X.xZ x0 (t • Z))‖ < 3 * ‖P x0‖ := by
@@ -55,37 +56,41 @@ theorem nonvanishingNearHalfMax_holds : NonvanishingNearHalfMax (E := E) := by
     have hz2 : 4 * w * r * X.zN (t • Z) ^ 2 ≤ 1 / 25 := by
       rw [← hρsq]
       have hwr4 : 0 ≤ 4 * w * r := by nlinarith
-      exact mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (OrthogonalFrameDomain.zN_nonneg (X := X) _) (hzt t ht) 2) hwr4
+      exact mul_le_mul_of_nonneg_left
+        (pow_le_pow_left₀ (OrthogonalFrameDomain.zN_nonneg (X := X) _) (hzt t ht) 2) hwr4
     have hlow : Real.log (X.nfac la x0) - 1 / 25 ≤ Real.log (X.nfac la (X.xZ x0 (t • Z))) := by
       have := (abs_le.mp (hlog.trans hz2)).1
       linarith
     have hexp : X.nfac la x0 * Real.exp (-(1 / 25)) ≤ X.nfac la (X.xZ x0 (t • Z)) := by
       rw [← Real.exp_log hnx, ← Real.exp_log hny, ← Real.exp_add]
       exact Real.exp_le_exp.mpr (by linarith)
-    have hpy : X.pnorm la P (X.xZ x0 (t • Z)) ≤ 2 * X.pnorm la P x0 := by
-      rw [hpx]; exact hmax _ hyd
+    have hpy : X.pnorm la P (X.xZ x0 (t • Z)) ≤ 2 * X.pnorm la P x0 := by rw [hpx]; exact hmax _ hyd
     rw [hpn, hpn] at hpy
-    have h1 : ‖P (X.xZ x0 (t • Z))‖ * (X.nfac la x0 * Real.exp (-(1 / 25))) ≤
-        2 * (‖P x0‖ * X.nfac la x0) :=
+    have h1
+        : ‖P (X.xZ x0 (t • Z))‖ * (X.nfac la x0 * Real.exp (-(1 / 25)))
+          ≤ 2 * (‖P x0‖ * X.nfac la x0) :=
       (mul_le_mul_of_nonneg_left hexp (norm_nonneg _)).trans hpy
     have h2 : ‖P (X.xZ x0 (t • Z))‖ * Real.exp (-(1 / 25)) ≤ 2 * ‖P x0‖ := by
-      have h3 : (‖P (X.xZ x0 (t • Z))‖ * Real.exp (-(1 / 25))) * X.nfac la x0 ≤
-          (2 * ‖P x0‖) * X.nfac la x0 := by nlinarith
+      have h3
+          : (‖P (X.xZ x0 (t • Z))‖ * Real.exp (-(1 / 25))) * X.nfac la x0
+            ≤ (2 * ‖P x0‖) * X.nfac la x0 := by
+        nlinarith
       exact le_of_mul_le_mul_right h3 hnx
-    have hE : Real.exp (-(1 / 25)) * Real.exp (1 / 25) = 1 := by
-      rw [← Real.exp_add]; simp
+    have hE : Real.exp (-(1 / 25)) * Real.exp (1 / 25) = 1 := by rw [← Real.exp_add]; simp
     have h4 : ‖P (X.xZ x0 (t • Z))‖ ≤ 2 * ‖P x0‖ * Real.exp (1 / 25) := by
-      calc ‖P (X.xZ x0 (t • Z))‖
-          = ‖P (X.xZ x0 (t • Z))‖ * Real.exp (-(1 / 25)) * Real.exp (1 / 25) := by
-            rw [mul_assoc, hE, mul_one]
-        _ ≤ 2 * ‖P x0‖ * Real.exp (1 / 25) :=
-            mul_le_mul_of_nonneg_right h2 (Real.exp_pos _).le
+      calc
+        ‖P (X.xZ x0 (t • Z))‖
+            = ‖P (X.xZ x0 (t • Z))‖ * Real.exp (-(1 / 25)) * Real.exp (1 / 25) := by
+          rw [mul_assoc, hE, mul_one]
+        _ ≤ 2 * ‖P x0‖ * Real.exp (1 / 25) := mul_le_mul_of_nonneg_right h2 (Real.exp_pos _).le
     have he := OrthogonalFrameDomain.exp_small
     nlinarith [mul_lt_mul_of_pos_left he hM0]
   have h5 : ∀ s ∈ Metric.ball (1 : ℂ) 4, ‖s‖ < 5 := by
     intro s hs
     rw [Metric.mem_ball, dist_eq_norm] at hs
-    calc ‖s‖ = ‖(s - 1) + 1‖ := by rw [sub_add_cancel]
+    calc
+      ‖s‖
+        = ‖(s - 1) + 1‖ := by rw [sub_add_cancel]
       _ ≤ ‖s - 1‖ + ‖(1 : ℂ)‖ := norm_add_le _ _
       _ < 5 := by rw [norm_one]; linarith
   set g : ℂ → ℂ := fun t => P (X.xZ x0 (t • Z)) with hg
@@ -94,7 +99,8 @@ theorem nonvanishingNearHalfMax_holds : NonvanishingNearHalfMax (E := E) := by
   have hgd : DifferentiableOn ℂ g (Metric.ball 1 4) := by
     intro t ht
     have hin : DifferentiableAt ℂ (fun s : ℂ => X.xZ x0 (s • Z)) t :=
-      (OrthogonalFrameDomain.xZ_diff (X := X) x0).differentiableAt.comp t (differentiableAt_id.smul_const Z)
+      (OrthogonalFrameDomain.xZ_diff (X := X) x0).differentiableAt.comp t
+        (differentiableAt_id.smul_const Z)
     exact (hSec.1 _ (hdom t (h5 t ht))).comp t hin.differentiableWithinAt
       (fun s hs => hdom s (h5 s hs))
   have hmaps : Set.MapsTo g (Metric.ball 1 4) (Metric.closedBall (g 1) (3 * ‖P x0‖)) := by

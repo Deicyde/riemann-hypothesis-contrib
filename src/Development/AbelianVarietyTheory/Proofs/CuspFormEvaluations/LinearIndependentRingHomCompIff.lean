@@ -6,18 +6,23 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem linearIndependent_ringHom_comp_iff {A F : Type} [CommRing A] [Field F] (φ : A →+* F)
-    (hφ : Function.Injective φ) {ι μ : Type} [Finite μ] (c : ι → μ → A) :
-    LinearIndependent F (fun i m => φ (c i m)) ↔ LinearIndependent A c := by
+theorem linearIndependent_ringHom_comp_iff
+    {A F : Type} [CommRing A] [Field F]
+    (φ : A →+* F) (hφ : Function.Injective φ)
+    {ι μ : Type} [Finite μ]
+    (c : ι → μ → A)
+    : LinearIndependent F (fun i m => φ (c i m)) ↔ LinearIndependent A c := by
   letI : Algebra A F := φ.toAlgebra
   haveI : FaithfulSMul A F := (faithfulSMul_iff_algebraMap_injective A F).2 hφ
   exact linearIndependent_algebraMap_comp_iff (R := A) (S := F) (v := c)
 
-theorem finrank_span_ringHom_comp_le {A F F' : Type} [CommRing A] [Field F] [Field F']
+theorem finrank_span_ringHom_comp_le
+    {A F F' : Type} [CommRing A] [Field F] [Field F']
     (φ : A →+* F) (ψ : A →+* F') (hφ : Function.Injective φ) (hψ : Function.Injective ψ)
-    {ι μ : Type} [Finite ι] [Finite μ] (c : ι → μ → A) :
-    Module.finrank F (Submodule.span F (Set.range fun i m => φ (c i m))) ≤
-      Module.finrank F' (Submodule.span F' (Set.range fun i m => ψ (c i m))) := by
+    {ι μ : Type} [Finite ι] [Finite μ]
+    (c : ι → μ → A)
+    : Module.finrank F (Submodule.span F (Set.range fun i m => φ (c i m)))
+      ≤ Module.finrank F' (Submodule.span F' (Set.range fun i m => ψ (c i m))) := by
   obtain ⟨κ, a, ha, hs, hl⟩ := exists_linearIndependent' F (fun i m => φ (c i m))
   haveI : Finite κ := Finite.of_injective a ha
   letI : Fintype κ := Fintype.ofFinite κ
@@ -31,19 +36,21 @@ theorem finrank_span_ringHom_comp_le {A F F' : Type} [CommRing A] [Field F] [Fie
   rintro _ ⟨k, rfl⟩
   exact ⟨a k, rfl⟩
 
-theorem finrank_span_ringHom_comp_eq {A F F' : Type} [CommRing A] [Field F] [Field F']
+theorem finrank_span_ringHom_comp_eq
+    {A F F' : Type} [CommRing A] [Field F] [Field F']
     (φ : A →+* F) (ψ : A →+* F') (hφ : Function.Injective φ) (hψ : Function.Injective ψ)
-    {ι μ : Type} [Finite ι] [Finite μ] (c : ι → μ → A) :
-    Module.finrank F (Submodule.span F (Set.range fun i m => φ (c i m))) =
-      Module.finrank F' (Submodule.span F' (Set.range fun i m => ψ (c i m))) :=
-  le_antisymm (finrank_span_ringHom_comp_le φ ψ hφ hψ c)
-    (finrank_span_ringHom_comp_le ψ φ hψ hφ c)
+    {ι μ : Type} [Finite ι] [Finite μ]
+    (c : ι → μ → A)
+    : Module.finrank F (Submodule.span F (Set.range fun i m => φ (c i m)))
+      = Module.finrank F' (Submodule.span F' (Set.range fun i m => ψ (c i m))) :=
+  le_antisymm (finrank_span_ringHom_comp_le φ ψ hφ hψ c) (finrank_span_ringHom_comp_le ψ φ hψ hφ c)
 
-theorem mem_span_iff_finrank_option_eq {F V ι : Type} [Field F] [AddCommGroup V] [Module F V]
-    [FiniteDimensional F V] (v : Option ι → V) :
-    v none ∈ Submodule.span F (Set.range fun i => v (some i)) ↔
-      Module.finrank F (Submodule.span F (Set.range fun i => v (some i))) =
-        Module.finrank F (Submodule.span F (Set.range v)) := by
+theorem mem_span_iff_finrank_option_eq
+    {F V ι : Type} [Field F] [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (v : Option ι → V)
+    : v none ∈ Submodule.span F (Set.range fun i => v (some i))
+      ↔ Module.finrank F (Submodule.span F (Set.range fun i => v (some i)))
+        = Module.finrank F (Submodule.span F (Set.range v)) := by
   have hle : Submodule.span F (Set.range fun i => v (some i)) ≤ Submodule.span F (Set.range v) := by
     apply Submodule.span_mono
     rintro _ ⟨k, rfl⟩
@@ -60,8 +67,16 @@ theorem mem_span_iff_finrank_option_eq {F V ι : Type} [Field F] [AddCommGroup V
     rw [Submodule.eq_of_le_of_finrank_eq hle h]
     exact Submodule.subset_span ⟨none, rfl⟩
 
-theorem rank_indep_mem_embedding_invariant :
-    ∀ (A F F' : Type) [CommRing A] [Field F] [Field F'] (φ : A →+* F) (ψ : A →+* F'), Function.Injective φ → Function.Injective ψ → ∀ (ι μ : Type) [Fintype ι] [Fintype μ] (c : ι → μ → A), (LinearIndependent F (fun i m => φ (c i m)) ↔ LinearIndependent F' (fun i m => ψ (c i m))) ∧ (∀ q : μ → A, (fun m => φ (q m)) ∈ Submodule.span F (Set.range fun i m => φ (c i m)) ↔ (fun m => ψ (q m)) ∈ Submodule.span F' (Set.range fun i m => ψ (c i m))) ∧ Module.finrank F (Submodule.span F (Set.range fun i m => φ (c i m))) = Module.finrank F' (Submodule.span F' (Set.range fun i m => ψ (c i m))) := by
+theorem rank_indep_mem_embedding_invariant
+    : ∀ (A F F' : Type) [CommRing A] [Field F] [Field F'] (φ : A →+* F) (ψ : A →+* F'),
+      Function.Injective φ → Function.Injective ψ
+        → ∀ (ι μ : Type) [Fintype ι] [Fintype μ] (c : ι → μ → A),
+          (LinearIndependent F (fun i m => φ (c i m)) ↔ LinearIndependent F' (fun i m => ψ (c i m)))
+            ∧ (∀ q : μ → A,
+              (fun m => φ (q m)) ∈ Submodule.span F (Set.range fun i m => φ (c i m))
+                ↔ (fun m => ψ (q m)) ∈ Submodule.span F' (Set.range fun i m => ψ (c i m)))
+            ∧ Module.finrank F (Submodule.span F (Set.range fun i m => φ (c i m)))
+              = Module.finrank F' (Submodule.span F' (Set.range fun i m => ψ (c i m))) := by
   intro A F F' _ _ _ φ ψ hφ hψ ι μ _ _ c
   refine ⟨?_, fun q => ?_, finrank_span_ringHom_comp_eq φ ψ hφ hψ c⟩
   · rw [linearIndependent_ringHom_comp_iff φ hφ, linearIndependent_ringHom_comp_iff ψ hψ]

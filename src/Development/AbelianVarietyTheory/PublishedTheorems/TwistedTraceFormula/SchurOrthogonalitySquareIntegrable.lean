@@ -16,27 +16,29 @@ namespace GlobalTheory
 namespace Published
 
 def SchurOrthogonalitySquareIntegrable : Prop :=
-  ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-    [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] [μ.Regular]
-    [μ.IsMulRightInvariant]
-    (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    (π : G →* (H →L[ℂ] H)),
-    (∀ g v, ‖π g v‖ = ‖v‖) →
-    (∀ v, Continuous fun g => π g v) →
-    (∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ v ∈ S, π g v ∈ S) → S = ⊥ ∨ S = ⊤) →
-    (∃ v₀ w₀ : H, v₀ ≠ 0 ∧ w₀ ≠ 0 ∧ MemLp (fun g => ⟪w₀, π g v₀⟫_ℂ) 2 μ) →
-    (∀ v w : H, MemLp (fun g => ⟪w, π g v⟫_ℂ) 2 μ) ∧
-    ∃ d : ℝ, 0 < d ∧ ∀ v w v' w' : H,
-      Integrable (fun g => ⟪w, π g v⟫_ℂ * star ⟪w', π g v'⟫_ℂ) μ ∧
-      ∫ g, ⟪w, π g v⟫_ℂ * star ⟪w', π g v'⟫_ℂ ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ)
+  ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+      [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] [μ.Regular]
+      [μ.IsMulRightInvariant] (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+      [CompleteSpace H] (π : G →* (H →L[ℂ] H)),
+    (∀ g v, ‖π g v‖ = ‖v‖) → (∀ v, Continuous fun g => π g v)
+      → (∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ v ∈ S, π g v ∈ S) → S = ⊥ ∨ S = ⊤)
+      → (∃ v₀ w₀ : H, v₀ ≠ 0 ∧ w₀ ≠ 0 ∧ MemLp (fun g => ⟪w₀, π g v₀⟫_ℂ) 2 μ)
+      → (∀ v w : H, MemLp (fun g => ⟪w, π g v⟫_ℂ) 2 μ)
+        ∧ ∃ d : ℝ,
+          0 < d
+            ∧ ∀ v w v' w' : H,
+              Integrable (fun g => ⟪w, π g v⟫_ℂ * star ⟪w', π g v'⟫_ℂ) μ
+                ∧ ∫ g, ⟪w, π g v⟫_ℂ * star ⟪w', π g v'⟫_ℂ ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ)
 
 end Published
 
 namespace SqIntRep
 
-theorem isInvInvariant_of_unimodular {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure]
-    [μ.Regular] [μ.IsMulRightInvariant] : μ.IsInvInvariant := by
+theorem isInvInvariant_of_unimodular
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsHaarMeasure] [μ.Regular] [μ.IsMulRightInvariant]
+    : μ.IsInvInvariant := by
   constructor
   let c : ENNReal := Measure.haarScalarFactor μ.inv μ
   have hc : μ.inv = c • μ := Measure.isMulLeftInvariant_eq_smul_of_regular μ.inv μ
@@ -52,15 +54,17 @@ theorem isInvInvariant_of_unimodular {G : Type*} [Group G] [TopologicalSpace G] 
     simp
   have h3 : c ^ 2 = 1 ^ 2 :=
     (ENNReal.mul_left_inj (Measure.measure_pos_of_nonempty_interior _ K.interior_nonempty).ne'
-          K.isCompact.measure_lt_top.ne).1 h2
+      K.isCompact.measure_lt_top.ne).1 h2
   have h4 : c = 1 := (ENNReal.pow_right_strictMono two_ne_zero).injective h3
   rw [hc, h4, one_smul]
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  {G : Type} [Group G] [MeasurableSpace G] {μ : Measure G}
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {G : Type} [Group G] [MeasurableSpace G]
+  {μ : Measure G}
 
-def coefGraph (μ : Measure G) (π : G → (H →L[ℂ] H)) (w : H) :
-    Submodule ℂ (WithLp 2 (H × Lp ℂ 2 μ)) where
+def coefGraph (μ : Measure G) (π : G → (H →L[ℂ] H)) (w : H)
+    : Submodule ℂ (WithLp 2 (H × Lp ℂ 2 μ)) where
   carrier := {p | (p.snd : G → ℂ) =ᵐ[μ] fun g => ⟪w, π g p.fst⟫_ℂ}
   zero_mem' := by
     change ((0 : Lp ℂ 2 μ) : G → ℂ) =ᵐ[μ] fun g => ⟪w, π g 0⟫_ℂ
@@ -78,12 +82,13 @@ def coefGraph (μ : Measure G) (π : G → (H →L[ℂ] H)) (w : H) :
     rw [h1, Pi.smul_apply, h2, map_smul, inner_smul_right, smul_eq_mul]
 
 omit [Group G] in
-theorem mem_coefGraph {π : G → (H →L[ℂ] H)} {w : H} {p : WithLp 2 (H × Lp ℂ 2 μ)} :
-    p ∈ coefGraph μ π w ↔ (p.snd : G → ℂ) =ᵐ[μ] fun g => ⟪w, π g p.fst⟫_ℂ := Iff.rfl
+theorem mem_coefGraph {π : G → (H →L[ℂ] H)} {w : H} {p : WithLp 2 (H × Lp ℂ 2 μ)}
+    : p ∈ coefGraph μ π w ↔ (p.snd : G → ℂ) =ᵐ[μ] fun g => ⟪w, π g p.fst⟫_ℂ :=
+  Iff.rfl
 
 omit [Group G] in
-theorem isClosed_coefGraph (π : G → (H →L[ℂ] H)) (w : H) :
-    IsClosed (coefGraph μ π w : Set (WithLp 2 (H × Lp ℂ 2 μ))) := by
+theorem isClosed_coefGraph (π : G → (H →L[ℂ] H)) (w : H)
+    : IsClosed (coefGraph μ π w : Set (WithLp 2 (H × Lp ℂ 2 μ))) := by
   refine isSeqClosed_iff_isClosed.1 fun u p hu hp => ?_
   have h1 : Filter.Tendsto (fun i => (u i).fst) Filter.atTop (nhds p.fst) :=
     ((WithLp.continuous_fst 2 H (Lp ℂ 2 μ)).tendsto p).comp hp
@@ -94,24 +99,27 @@ theorem isClosed_coefGraph (π : G → (H →L[ℂ] H)) (w : H) :
     ae_all_iff.2 fun i => hu i
   refine mem_coefGraph.2 ?_
   filter_upwards [hae, hall] with g h3 h4
-  have h5 : Filter.Tendsto (fun i => ⟪w, π g (u (ns i)).fst⟫_ℂ) Filter.atTop
-      (nhds ⟪w, π g p.fst⟫_ℂ) :=
+  have h5
+      : Filter.Tendsto (fun i => ⟪w, π g (u (ns i)).fst⟫_ℂ) Filter.atTop (nhds ⟪w, π g p.fst⟫_ℂ) :=
     Filter.Tendsto.inner tendsto_const_nhds
       (((π g).continuous.tendsto _).comp (h1.comp hns.tendsto_atTop))
   refine tendsto_nhds_unique h3 ?_
   simpa only [h4] using h5
 
-theorem memLp_coef_right [CompleteSpace H] [MeasurableMul G] [μ.IsMulRightInvariant]
+theorem memLp_coef_right
+    [CompleteSpace H] [MeasurableMul G] [μ.IsMulRightInvariant]
     (π : G →* (H →L[ℂ] H)) (hπ : ∀ g v, ‖π g v‖ = ‖v‖)
     (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ v ∈ S, π g v ∈ S) → S = ⊥ ∨ S = ⊤)
-    {w v₀ : H} (hv₀ : v₀ ≠ 0) (h : MemLp (fun g => ⟪w, π g v₀⟫_ℂ) 2 μ) (v : H) :
-    MemLp (fun g => ⟪w, π g v⟫_ℂ) 2 μ := by
+    {w v₀ : H} (hv₀ : v₀ ≠ 0) (h : MemLp (fun g => ⟪w, π g v₀⟫_ℂ) 2 μ)
+    (v : H)
+    : MemLp (fun g => ⟪w, π g v⟫_ℂ) 2 μ := by
   set Γ := coefGraph μ π w with hΓ
   haveI : CompleteSpace Γ := (isClosed_coefGraph (μ := μ) π w).completeSpace_coe
   let ρ : G → (Lp ℂ 2 μ →ₗᵢ[ℂ] Lp ℂ 2 μ) := fun g =>
     Lp.compMeasurePreservingₗᵢ ℂ (fun x => x * g) (measurePreserving_mul_right μ g)
-  have hρ : ∀ g (a : H) (f : Lp ℂ 2 μ), WithLp.toLp 2 (a, f) ∈ Γ →
-      WithLp.toLp 2 (π g a, ρ g f) ∈ Γ := by
+  have hρ
+      : ∀ g (a : H) (f : Lp ℂ 2 μ),
+        WithLp.toLp 2 (a, f) ∈ Γ → WithLp.toLp 2 (π g a, ρ g f) ∈ Γ := by
     intro g a f hf
     have h1 : (f : G → ℂ) =ᵐ[μ] fun x => ⟪w, π x a⟫_ℂ := hf
     have h2 := (measurePreserving_mul_right μ g).quasiMeasurePreserving.ae_eq_comp h1
@@ -119,8 +127,9 @@ theorem memLp_coef_right [CompleteSpace H] [MeasurableMul G] [μ.IsMulRightInvar
     change ((ρ g f : Lp ℂ 2 μ) : G → ℂ) =ᵐ[μ] fun x => ⟪w, π x (π g a)⟫_ℂ
     refine (h3.trans h2).trans (Filter.Eventually.of_forall fun x => ?_)
     simp [map_mul]
-  have huniq : ∀ (a : H) (f f' : Lp ℂ 2 μ), WithLp.toLp 2 (a, f) ∈ Γ → WithLp.toLp 2 (a, f') ∈ Γ →
-      f = f' := by
+  have huniq
+      : ∀ (a : H) (f f' : Lp ℂ 2 μ),
+        WithLp.toLp 2 (a, f) ∈ Γ → WithLp.toLp 2 (a, f') ∈ Γ → f = f' := by
     intro a f f' hf hf'
     have h1 : (f : G → ℂ) =ᵐ[μ] fun x => ⟪w, π x a⟫_ℂ := hf
     have h2 : (f' : G → ℂ) =ᵐ[μ] fun x => ⟪w, π x a⟫_ℂ := hf'
@@ -151,8 +160,8 @@ theorem memLp_coef_right [CompleteSpace H] [MeasurableMul G] [μ.IsMulRightInvar
       rw [WithLp.prod_inner_apply]
       change ⟪a - p.fst, π g⁻¹ q.fst⟫_ℂ + ⟪0 - p.snd, ρ g⁻¹ q.snd⟫_ℂ = 0 at h4
       change ⟪π g a - π g p.fst, q.fst⟫_ℂ + ⟪0 - ρ g p.snd, q.snd⟫_ℂ = 0
-      rw [SchurOrth.inner_rep π hπ, inv_inv, map_sub, ← (ρ g).inner_map_map, h3, map_sub,
-        map_zero] at h4
+      rw [SchurOrth.inner_rep π hπ, inv_inv, map_sub, ← (ρ g).inner_map_map, h3, map_sub, map_zero]
+        at h4
       exact h4
     rw [key]
     rfl
@@ -171,17 +180,18 @@ theorem memLp_coef_right [CompleteSpace H] [MeasurableMul G] [μ.IsMulRightInvar
     rw [hp1, hp2] at h4
     simp at h4
     exact hv₀ h4
-  have hv : (Γ.starProjection (ι (c⁻¹ • v))).fst = v := by
-    rw [← hA, hc]; simp [smul_smul, hc0]
+  have hv : (Γ.starProjection (ι (c⁻¹ • v))).fst = v := by rw [← hA, hc]; simp [smul_smul, hc0]
   have hm := mem_coefGraph.1 (Γ.starProjection_apply_mem (ι (c⁻¹ • v)))
   rw [hv] at hm
   exact (Lp.memLp _).ae_eq hm
 
-theorem memLp_coef [CompleteSpace H] [MeasurableMul G] [MeasurableInv G] [μ.IsMulRightInvariant]
-    [μ.IsInvInvariant] (π : G →* (H →L[ℂ] H)) (hπ : ∀ g v, ‖π g v‖ = ‖v‖)
+theorem memLp_coef
+    [CompleteSpace H] [MeasurableMul G] [MeasurableInv G] [μ.IsMulRightInvariant] [μ.IsInvInvariant]
+    (π : G →* (H →L[ℂ] H)) (hπ : ∀ g v, ‖π g v‖ = ‖v‖)
     (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g, ∀ v ∈ S, π g v ∈ S) → S = ⊥ ∨ S = ⊤)
-    {v₀ w₀ : H} (hv₀ : v₀ ≠ 0) (hw₀ : w₀ ≠ 0) (h : MemLp (fun g => ⟪w₀, π g v₀⟫_ℂ) 2 μ) (v w : H) :
-    MemLp (fun g => ⟪w, π g v⟫_ℂ) 2 μ := by
+    {v₀ w₀ : H} (hv₀ : v₀ ≠ 0) (hw₀ : w₀ ≠ 0) (h : MemLp (fun g => ⟪w₀, π g v₀⟫_ℂ) 2 μ)
+    (v w : H)
+    : MemLp (fun g => ⟪w, π g v⟫_ℂ) 2 μ := by
   have h1 := memLp_coef_right π hπ hirr hv₀ h w
   have h2 : MemLp (fun g => ⟪w, π g w₀⟫_ℂ) 2 μ := by
     have h3 := (h1.comp_measurePreserving (Measure.measurePreserving_inv μ)).star
@@ -193,7 +203,8 @@ theorem memLp_coef [CompleteSpace H] [MeasurableMul G] [MeasurableInv G] [μ.IsM
 
 end SqIntRep
 
-theorem Published.schurOrthogonalitySquareIntegrable' : Published.SchurOrthogonalitySquareIntegrable := by
+theorem Published.schurOrthogonalitySquareIntegrable'
+    : Published.SchurOrthogonalitySquareIntegrable := by
   intro G _ _ _ _ _ _ _ μ _ _ _ H _ _ _ π hπ hc hirr ⟨v₀, w₀, hv₀, hw₀, h⟩
   haveI := SqIntRep.isInvInvariant_of_unimodular μ
   haveI : Nontrivial H := nontrivial_of_ne v₀ 0 hv₀

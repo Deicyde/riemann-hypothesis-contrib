@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaFamilyOrigin.IsThetaP
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 
@@ -19,13 +20,17 @@ namespace GlobalTheory.ThetaInvPart
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {S : ThetaSys o Ω}
 
-theorem diag_eq [IsDomain o] {Q : Type} [AddCommGroup Q] [Fintype Q] (π : S.Gam →+ Q) (i₀ : S.J)
+theorem diag_eq
+    [IsDomain o]
+    {Q : Type} [AddCommGroup Q] [Fintype Q]
+    (π : S.Gam →+ Q) (i₀ : S.J)
     (hc : Fintype.card S.J = Fintype.card Q)
     (hfix : ∀ a, π a = 0 → ∀ l, S.ρ a l i₀ = if l = i₀ then 1 else 0)
-    (horb : ∀ i, ∃ a, ∃ e : ℕ, ∀ l, S.ρ a l i₀ = if l = i then S.ζ ^ e else 0) (a : S.Gam) :
-    S.ρ a i₀ i₀ = if π a = 0 then 1 else 0 := by
-  have hζ : S.ζ ≠ 0 := S.prim.ne_zero (pow_ne_zero _ (Nat.mul_ne_zero (by have := S.r_pos; omega)
-    (by have := S.N_ge; omega)))
+    (horb : ∀ i, ∃ a, ∃ e : ℕ, ∀ l, S.ρ a l i₀ = if l = i then S.ζ ^ e else 0) (a : S.Gam)
+    : S.ρ a i₀ i₀ = if π a = 0 then 1 else 0 := by
+  have hζ : S.ζ ≠ 0 :=
+    S.prim.ne_zero (pow_ne_zero _
+      (Nat.mul_ne_zero (by have := S.r_pos; omega) (by have := S.N_ge; omega)))
   choose c e hce using horb
   have key : ∀ a b, π a = π b → ∃ k : ℕ, ∀ l, S.ρ b l i₀ = S.ζ ^ k * S.ρ a l i₀ := fun a b h => by
     obtain ⟨k, hk⟩ := S.ρ_mul b (a - b)
@@ -54,8 +59,11 @@ theorem diag_eq [IsDomain o] {Q : Type} [AddCommGroup Q] [Fintype Q] (π : S.Gam
       rw [hfix 0 (map_zero π), if_pos rfl] at this
       exact one_ne_zero this
 
-theorem rho_fix (hG : GlobalFnsSt) (hi : Function.Injective (algebraMap o Ω)) (ρ : S.Real) (a : S.Gam)
-    (ha : (ρ.n ^ ρ.k) • S.r • a = 0) (l : S.J) : S.ρ a l ρ.i₀ = if l = ρ.i₀ then 1 else 0 := by
+theorem rho_fix
+    (hG : GlobalFnsSt) (hi : Function.Injective (algebraMap o Ω))
+    (ρ : S.Real) (a : S.Gam) (ha : (ρ.n ^ ρ.k) • S.r • a = 0)
+    (l : S.J)
+    : S.ρ a l ρ.i₀ = if l = ρ.i₀ then 1 else 0 := by
   have := ρ.P.isAb.comm
   have h0 : ρ.pt 0 = 1 := by
     have := ρ.pt_add 0 0
@@ -69,11 +77,15 @@ theorem rho_fix (hG : GlobalFnsSt) (hi : Function.Injective (algebraMap o Ω)) (
   have hN : ρ.pt (S.r • a) ^ S.N = 1 :=
     (congrArg _ (ρ.N_eq.trans (sq _))).trans (by rw [pow_mul, hm, one_pow])
   obtain ⟨ν, hν⟩ := exists_gen_negLB hG _ ρ.P 1 (baseOver (Sp S.R))
-  have hact := ThetaCoord.isActOf_self hG ρ.P.isAb ρ.P.isLB (q := S.N) (b := 1)
-    (by rw [ρ.N_eq]; exact ρ.n_odd.pow.pow) hν ρ.α_gen ρ.s_zero hm hN (ρ.U_sym a)
+  have hact :=
+    ThetaCoord.isActOf_self hG ρ.P.isAb ρ.P.isLB (q := S.N) (b := 1)
+      (by rw [ρ.N_eq]; exact ρ.n_odd.pow.pow) hν ρ.α_gen ρ.s_zero hm hN (ρ.U_sym a)
   have h₁ := ρ.U_act a ρ.i₀ _ hact
-  have h₂ : ∀ j, (ρ.s ρ.i₀).f j = ∑ l, liftFun ρ.P.A _ (fn (algebraMap o S.R (if l = ρ.i₀ then 1 else 0))) *
-      (ρ.s l).f j := fun j => by
+  have h₂
+      : ∀ j,
+        (ρ.s ρ.i₀).f j
+          = ∑ l, liftFun ρ.P.A _ (fn (algebraMap o S.R (if l = ρ.i₀ then 1 else 0))) *
+            (ρ.s l).f j := fun j => by
     rw [Finset.sum_eq_single ρ.i₀ (fun b _ hb => by simp [hb, liftFun]) (by simp)]
     simp [liftFun]
   have h₃ := congrFun ((ρ.s_basis (ρ.s ρ.i₀)).unique h₁ h₂) l
@@ -86,9 +98,11 @@ namespace GlobalTheory
 
 open ThetaInvPart
 
-theorem proj_zero_pullback_ne_zero : GlobalTheory.UT.LL → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω]
-    (S : ThetaSys o Ω) (ρ : S.Real) (k : Type) [Field k] (y : o →+* k) (T : AddSubgroup S.Gam), S.IsoFree T →
-    ∃ j, y (S.proj T 0 j ρ.i₀) ≠ 0 := by
+theorem proj_zero_pullback_ne_zero
+    : GlobalTheory.UT.LL
+      → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
+          (ρ : S.Real) (k : Type) [Field k] (y : o →+* k) (T : AddSubgroup S.Gam),
+        S.IsoFree T → ∃ j, y (S.proj T 0 j ρ.i₀) ≠ 0 := by
   intro hL o Ω _ _ _ hA S ρ k _ y T _
   have hN := S.N_ge
   have hr := S.r_pos
@@ -99,16 +113,21 @@ theorem proj_zero_pullback_ne_zero : GlobalTheory.UT.LL → ∀ (o Ω : Type) [C
     rw [ρ.N_eq]; exact Dvd.dvd.mul_left (dvd_pow_self _ two_ne_zero) _
   let π : S.Gam →+ (Fin S.g ⊕ Fin S.g → ZMod (ρ.n ^ ρ.k)) :=
     (ZMod.castHom hd (ZMod (ρ.n ^ ρ.k))).toAddMonoidHom.compLeft _
-  have hdiag := diag_eq π ρ.i₀ (by
-      rw [ρ.card, ρ.N_eq, ← pow_mul]
-      simp [two_mul])
-    (fun a ha => rho_fix hL.1.globalFns hA.inj ρ a (funext fun i => by
-      have h : ZMod.castHom hd (ZMod (ρ.n ^ ρ.k)) (a i) = 0 := congrFun ha i
-      rw [← ZMod.natCast_zmod_val (a i), map_natCast, ZMod.natCast_eq_zero_iff] at h
-      obtain ⟨c, hc⟩ := h
-      rw [Pi.smul_apply, Pi.smul_apply, ← ZMod.natCast_zmod_val (a i), hc, nsmul_eq_mul, nsmul_eq_mul,
-        ← Nat.cast_mul, ← Nat.cast_mul, Pi.zero_apply, ZMod.natCast_eq_zero_iff]
-      exact ⟨c, by rw [ρ.N_eq]; ring⟩)) ρ.orbit
+  have hdiag :=
+    diag_eq π ρ.i₀
+      (by
+        rw [ρ.card, ρ.N_eq, ← pow_mul]
+        simp [two_mul])
+      (fun a ha =>
+        rho_fix hL.1.globalFns hA.inj ρ a
+          (funext fun i => by
+            have h : ZMod.castHom hd (ZMod (ρ.n ^ ρ.k)) (a i) = 0 := congrFun ha i
+            rw [← ZMod.natCast_zmod_val (a i), map_natCast, ZMod.natCast_eq_zero_iff] at h
+            obtain ⟨c, hc⟩ := h
+            rw [Pi.smul_apply, Pi.smul_apply, ← ZMod.natCast_zmod_val (a i), hc, nsmul_eq_mul,
+              nsmul_eq_mul, ← Nat.cast_mul, ← Nat.cast_mul, Pi.zero_apply, ZMod.natCast_eq_zero_iff]
+            exact ⟨c, by rw [ρ.N_eq]; ring⟩))
+      ρ.orbit
   have hu : ∀ n : ℕ, n ∣ Nat.card S.Gam → IsUnit (n : o) := fun n hn => by
     refine isUnit_of_dvd_unit (Nat.cast_dvd_cast hn) ?_
     rw [Nat.card_fun, Nat.card_zmod, Nat.cast_pow]

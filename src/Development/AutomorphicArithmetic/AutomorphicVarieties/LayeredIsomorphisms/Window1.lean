@@ -5,11 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LayeredIsom
 
 @[expose] public section
 
-open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
+open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V
+  UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
 
-theorem UpperTheory.V.Win.window1 :
-    ∀ (R : ℕ) (B U : ℝ) (T : Finset ℝ), 1 ≤ B → 0 < U → T.card ≤ R →
-      ∃ y : ℝ, U / (2 ^ (R + 2) * B ^ R) ≤ y ∧ 2 * y ≤ U ∧ ∀ a ∈ T, ∀ u : ℝ, y ≤ u → u ≤ 2 * y → a ≤ u → B * a ≤ u := by
+theorem UpperTheory.V.Win.window1
+    : ∀ (R : ℕ) (B U : ℝ) (T : Finset ℝ),
+      1 ≤ B → 0 < U → T.card ≤ R
+        → ∃ y : ℝ,
+          U / (2 ^ (R + 2) * B ^ R) ≤ y ∧ 2 * y ≤ U
+            ∧ ∀ a ∈ T, ∀ u : ℝ, y ≤ u → u ≤ 2 * y → a ≤ u → B * a ≤ u := by
   intro R
   induction R with
   | zero =>
@@ -26,14 +30,15 @@ theorem UpperTheory.V.Win.window1 :
     have hB0 : 0 < B := by linarith
     by_cases h : ∃ a ∈ T, U / (2 * B) < a ∧ a ≤ U
     · obtain ⟨a0, ha0, h1, h2⟩ := h
-      obtain ⟨y, hy1, hy2, hy3⟩ := ih B (U / (2 * B)) (T.erase a0) hB (by positivity)
-        (by rw [Finset.card_erase_of_mem ha0]; omega)
+      obtain ⟨y, hy1, hy2, hy3⟩ :=
+        ih B (U / (2 * B)) (T.erase a0) hB (by positivity)
+          (by rw [Finset.card_erase_of_mem ha0]; omega)
       refine ⟨y, ?_, ?_, ?_⟩
-      · calc U / (2 ^ (n + 1 + 2) * B ^ (n + 1))
-            = U / (2 * B) / (2 ^ (n + 2) * B ^ n) := by
-              rw [div_div]
-              congr 1
-              ring
+      · calc
+          U / (2 ^ (n + 1 + 2) * B ^ (n + 1)) = U / (2 * B) / (2 ^ (n + 2) * B ^ n) := by
+            rw [div_div]
+            congr 1
+            ring
           _ ≤ y := hy1
       · have : U / (2 * B) ≤ U := div_le_self hU.le (by linarith)
         linarith

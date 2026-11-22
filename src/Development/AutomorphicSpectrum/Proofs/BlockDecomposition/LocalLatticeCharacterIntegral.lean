@@ -8,23 +8,27 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal TensorProduct
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.WhitFree GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.AvgFree MeasureTheory
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.WhitFree
+  GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.AvgFree MeasureTheory
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.AvgFree.Cov
 
-theorem exists_sep {K : Type} [AddCommGroup K] (H : AddSubgroup K) (T : Finset K) :
-    ∃ Rep : Finset K, Rep ⊆ T ∧ (∀ x ∈ T, ∃ r ∈ Rep, x - r ∈ H) ∧
-      ∀ r ∈ Rep, ∀ r' ∈ Rep, r - r' ∈ H → r = r' :=
+theorem exists_sep {K : Type} [AddCommGroup K] (H : AddSubgroup K) (T : Finset K)
+    : ∃ Rep : Finset K,
+      Rep ⊆ T ∧ (∀ x ∈ T, ∃ r ∈ Rep, x - r ∈ H) ∧ ∀ r ∈ Rep, ∀ r' ∈ Rep, r - r' ∈ H → r = r' :=
   _root_.UpperTheory.Reformulated.B.P6.r08a.GlobalTheory.CompanionTheory.AvgFree.Cov.exists_sep H T
 
-theorem exists_reps {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [MeasurableSpace K]
-    [BorelSpace K] (μ : Measure K) [μ.IsAddHaarMeasure] (O : Subring K) (hOc : IsCompact (O : Set K))
-    (hOo : IsOpen (O : Set K)) (s : Kˣ) (hs : (s : K) ∈ O) (c : ℝ≥0)
-    (hμ : ∀ Y : Set K, μ ((fun x => (s : K) * x) '' Y) = c * μ Y) :
-    ∃ Rep : Finset K, (Rep.card : ℝ≥0) ≤ c⁻¹ ∧ (∀ r ∈ Rep, r ∈ O) ∧
-      ∀ a ∈ O, ∃ r ∈ Rep, ∃ o ∈ O, a - r = s * o := by
+theorem exists_reps
+    {K : Type}
+    [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [MeasurableSpace K] [BorelSpace K]
+    (μ : Measure K) [μ.IsAddHaarMeasure]
+    (O : Subring K) (hOc : IsCompact (O : Set K)) (hOo : IsOpen (O : Set K))
+    (s : Kˣ) (hs : (s : K) ∈ O)
+    (c : ℝ≥0) (hμ : ∀ Y : Set K, μ ((fun x => (s : K) * x) '' Y) = c * μ Y)
+    : ∃ Rep : Finset K,
+      (Rep.card : ℝ≥0) ≤ c⁻¹ ∧ (∀ r ∈ Rep, r ∈ O) ∧ ∀ a ∈ O, ∃ r ∈ Rep, ∃ o ∈ O, a - r = s * o := by
   classical
   let H : AddSubgroup K := O.toAddSubgroup.map (AddMonoidHom.mulLeft (s : K))
   have hHmem : ∀ x, x ∈ H ↔ ∃ o ∈ O, x = s * o := by
@@ -118,11 +122,14 @@ theorem exists_reps {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalR
     rwa [e] at this
   exact (hHmem _).1 h1
 
-theorem sum_near {K : Type} [CommRing K] (O : Subring K) (L : Submodule O K) (s : K) {n M : ℕ}
-    (X : Fin n → Fin M → K) (hX : ∀ i k, X i k ∈ L) (l : Fin n) (a a0 : Fin n → K) (hl : a l = a0 l)
-    (h : ∀ i, i ≠ l → ∃ o ∈ O, a i - a0 i = s * o) (k : Fin M)
-    (h0 : ∑ i, X i k * a0 i ∈ (fun x => s * x) '' (L : Set K)) :
-    ∑ i, X i k * a i ∈ (fun x => s * x) '' (L : Set K) := by
+theorem sum_near
+    {K : Type} [CommRing K]
+    (O : Subring K) (L : Submodule O K)
+    (s : K)
+    {n M : ℕ} (X : Fin n → Fin M → K) (hX : ∀ i k, X i k ∈ L) (l : Fin n) (a a0 : Fin n → K)
+    (hl : a l = a0 l) (h : ∀ i, i ≠ l → ∃ o ∈ O, a i - a0 i = s * o) (k : Fin M)
+    (h0 : ∑ i, X i k * a0 i ∈ (fun x => s * x) '' (L : Set K))
+    : ∑ i, X i k * a i ∈ (fun x => s * x) '' (L : Set K) := by
   let T : AddSubgroup K := L.toAddSubgroup.map (AddMonoidHom.mulLeft s)
   have hT : ∀ x, x ∈ T ↔ x ∈ (fun x => s * x) '' (L : Set K) := by
     intro x
@@ -149,10 +156,15 @@ theorem sum_near {K : Type} [CommRing K] (O : Subring K) (L : Submodule O K) (s 
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
 
-theorem rmul_mem_tupIn {n M : ℕ} (L : Set (R ⊗[F] E)) (s : (R ⊗[F] E)ˣ) (l : Fin n) (a : Fin n → R ⊗[F] E)
-    (X : Fin n → Fin M → R ⊗[F] E) (hX : X ∈ tupIn R L)
-    (h : ∀ k, ∑ i, X i k * a i ∈ (fun x => (s : R ⊗[F] E) * x) '' L) :
-    GlobalTheory.CompanionTheory.SW.rmul R X (eMat R l a * dMat R l ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E)) ∈ tupIn R L := by
+theorem rmul_mem_tupIn
+    {n M : ℕ}
+    (L : Set (R ⊗[F] E)) (s : (R ⊗[F] E)ˣ)
+    (l : Fin n)
+    (a : Fin n → R ⊗[F] E) (X : Fin n → Fin M → R ⊗[F] E)
+    (hX : X ∈ tupIn R L) (h : ∀ k, ∑ i, X i k * a i ∈ (fun x => (s : R ⊗[F] E) * x) '' L)
+    : GlobalTheory.CompanionTheory.SW.rmul R X
+        (eMat R l a * dMat R l ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E))
+      ∈ tupIn R L := by
   classical
   intro c k
   show ∑ e, X e k * (eMat R l a * dMat R l ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E)) e c ∈ L
@@ -160,17 +172,20 @@ theorem rmul_mem_tupIn {n M : ℕ} (L : Set (R ⊗[F] E)) (s : (R ⊗[F] E)ˣ) (
   by_cases hc : c = l
   · subst hc
     obtain ⟨y, hy, hye⟩ := h k
-    have : ∑ e, X e k * (eMat R c a e c * Function.update (1 : Fin n → R ⊗[F] E) c ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E) c) = y := by
+    have : ∑ e, X e k * (eMat R c a e c * Function.update (1 : Fin n → R ⊗[F] E) c ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E) c)
+        = y := by
       simp only [eMat, Matrix.updateCol_self, Function.update_self]
-      have e1 : ∑ e, X e k * (a e * ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E)) =
-          ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E) * ∑ e, X e k * a e := by
+      have e1
+          : ∑ e, X e k * (a e * ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E))
+            = ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E) * ∑ e, X e k * a e := by
         rw [Finset.mul_sum]
         exact Finset.sum_congr rfl fun e _ => by ring
       rw [e1, ← hye]
       exact Units.inv_mul_cancel_left s y
     rw [this]
     exact hy
-  · have : ∑ e, X e k * (eMat R l a e c * Function.update (1 : Fin n → R ⊗[F] E) l ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E) c) = X c k := by
+  · have : ∑ e, X e k * (eMat R l a e c * Function.update (1 : Fin n → R ⊗[F] E) l ((s⁻¹ : (R ⊗[F] E)ˣ) : R ⊗[F] E) c)
+        = X c k := by
       simp only [eMat, Matrix.updateCol_ne hc, Function.update_of_ne hc, Pi.one_apply, mul_one,
         Matrix.one_apply]
       simp
@@ -179,9 +194,37 @@ theorem rmul_mem_tupIn {n M : ℕ} (L : Set (R ⊗[F] E)) (s : (R ⊗[F] E)ˣ) (
 
 end GlobalTheory.CompanionTheory.AvgFree.Cov
 
-
 open GlobalTheory.CompanionTheory.AvgFree.Cov in
-theorem GlobalTheory.CompanionTheory.AvgFree.nearNF_cover : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) (lv : Measure (Fv F v)), GlobalTheory.CompanionTheory.SW.IsStdV v lv → ∀ (O : Subring (Fv F v ⊗[F] E)) (S : Finset ((Fv F v ⊗[F] E)ˣ × (Fv F v ⊗[F] E))), IsOrdData (Fv F v) σ b lv O S → ∀ L : Submodule O (Fv F v ⊗[F] E), IsCompact (L : Set (Fv F v ⊗[F] E)) → IsOpen (L : Set (Fv F v ⊗[F] E)) → ∀ (n M : ℕ), 0 < n → ∀ p ∈ S, ∀ θ : ℝ≥0, (∀ Y : Set (Fv F v ⊗[F] E), (GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv) ((fun x => (p.1 : (Fv F v ⊗[F] E)) * x) '' Y) = θ * (GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv) Y) → ∀ j : ℕ, ∃ G : Finset (Fin n × (Fin n → (Fv F v ⊗[F] E))), ((G.card : ℝ≥0) ≤ n * (θ⁻¹) ^ (j * n)) ∧ (∀ q ∈ G, (∀ i, q.2 i ∈ O) ∧ q.2 q.1 = 1) ∧ ∀ X ∈ nearNF (M := M) (n := n) (Fv F v) (O : Set (Fv F v ⊗[F] E)) (L : Set (Fv F v ⊗[F] E)) (p.1 : (Fv F v ⊗[F] E)) j, ∃ q ∈ G, GlobalTheory.CompanionTheory.SW.rmul (Fv F v) X (eMat (Fv F v) q.1 q.2 * dMat (Fv F v) q.1 ((p.1 ^ j)⁻¹ : (Fv F v ⊗[F] E)ˣ)) ∈ tupIn (Fv F v) (L : Set (Fv F v ⊗[F] E)) := by
+theorem GlobalTheory.CompanionTheory.AvgFree.nearNF_cover
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E)
+            (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F))
+            (lv : Measure (Fv F v)),
+          GlobalTheory.CompanionTheory.SW.IsStdV v lv
+            → ∀ (O : Subring (Fv F v ⊗[F] E)) (S : Finset ((Fv F v ⊗[F] E)ˣ × (Fv F v ⊗[F] E))),
+              IsOrdData (Fv F v) σ b lv O S
+                → ∀ L : Submodule O (Fv F v ⊗[F] E),
+                  IsCompact (L : Set (Fv F v ⊗[F] E)) → IsOpen (L : Set (Fv F v ⊗[F] E))
+                    → ∀ (n M : ℕ),
+                      0 < n
+                        → ∀ p ∈ S, ∀ θ : ℝ≥0,
+                          (∀ Y : Set (Fv F v ⊗[F] E),
+                              (GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv)
+                                  ((fun x => (p.1 : (Fv F v ⊗[F] E)) * x) '' Y)
+                                = θ * (GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv) Y)
+                            → ∀ j : ℕ, ∃ G : Finset (Fin n × (Fin n → (Fv F v ⊗[F] E))),
+                              ((G.card : ℝ≥0) ≤ n * (θ⁻¹) ^ (j * n))
+                                ∧ (∀ q ∈ G, (∀ i, q.2 i ∈ O) ∧ q.2 q.1 = 1)
+                                ∧ ∀ X
+                                    ∈ nearNF (M := M) (n := n) (Fv F v) (O : Set (Fv F v ⊗[F] E))
+                                      (L : Set (Fv F v ⊗[F] E)) (p.1 : (Fv F v ⊗[F] E)) j,
+                                  ∃ q ∈ G,
+                                    GlobalTheory.CompanionTheory.SW.rmul (Fv F v) X
+                                        (eMat (Fv F v) q.1 q.2
+                                          * dMat (Fv F v) q.1 ((p.1 ^ j)⁻¹ : (Fv F v ⊗[F] E)ˣ))
+                                      ∈ tupIn (Fv F v) (L : Set (Fv F v ⊗[F] E)) := by
   intro F E _ _ _ _ _ σ hσ d b v lv hlv O S hOrd L _ _ n M _ p hp θ hθ j
   classical
   obtain ⟨r1, r2, r3, r4, -⟩ := GlobalTheory.CompanionTheory.SW.LocFv.isLocR_Fv F v
@@ -190,27 +233,32 @@ theorem GlobalTheory.CompanionTheory.AvgFree.nearNF_cover : ∀ (F E : Type) [Fi
   haveI := r3
   haveI := r4
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
-  obtain ⟨a1, a2, a3, a4, -, -, -, a8, -, -⟩ := GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ (Fv F v)
+  obtain ⟨a1, a2, a3, a4, -, -, -, a8, -, -⟩ :=
+    GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ (Fv F v)
   haveI := a1
   haveI := a2
   haveI := a3
   haveI := a4
   haveI := hlv.1
-  obtain ⟨hK, -, -⟩ := GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hσ (Fv F v) d b lv hlv.1
+  obtain ⟨hK, -, -⟩ :=
+    GlobalTheory.CompanionTheory.SW.coord_measures_haar F E σ hσ (Fv F v) d b lv hlv.1
   haveI := hK
   obtain ⟨hOc, hOo, -, hS, -⟩ := hOrd
   have htO : (p.1 : Fv F v ⊗[F] E) ∈ O := (hS p hp).1
-  have hpow : ∀ (i : ℕ) (Y : Set (Fv F v ⊗[F] E)),
-      GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv ((fun x => ((p.1 ^ i : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * x) '' Y) =
-        ((θ ^ i : ℝ≥0) : ℝ≥0∞) * GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv Y := by
+  have hpow
+      : ∀ (i : ℕ) (Y : Set (Fv F v ⊗[F] E)),
+        GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv
+            ((fun x => ((p.1 ^ i : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * x) '' Y)
+          = ((θ ^ i : ℝ≥0) : ℝ≥0∞) * GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv Y := by
     intro i
     induction i with
     | zero => intro Y; simp
     | succ i ih =>
       intro Y
-      have e : (fun x => ((p.1 ^ (i + 1) : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * x) '' Y =
-          (fun x => (p.1 : Fv F v ⊗[F] E) * x) ''
-            ((fun x => ((p.1 ^ i : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * x) '' Y) := by
+      have e
+          : (fun x => ((p.1 ^ (i + 1) : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * x) '' Y
+            = (fun x => (p.1 : Fv F v ⊗[F] E) * x)
+              '' ((fun x => ((p.1 ^ i : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * x) '' Y) := by
         rw [Set.image_image]
         refine Set.image_congr fun x _ => ?_
         rw [pow_succ', Units.val_mul, mul_assoc]
@@ -218,11 +266,13 @@ theorem GlobalTheory.CompanionTheory.AvgFree.nearNF_cover : ∀ (F E : Type) [Fi
   have hsO : ((p.1 ^ j : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) ∈ O := by
     rw [Units.val_pow_eq_pow_val]
     exact O.pow_mem htO j
-  obtain ⟨Rep, hcard, hRO, hRep⟩ := GlobalTheory.CompanionTheory.AvgFree.Cov.exists_reps (GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv) O hOc hOo (p.1 ^ j) hsO
-    (θ ^ j) (hpow j)
+  obtain ⟨Rep, hcard, hRO, hRep⟩ :=
+    GlobalTheory.CompanionTheory.AvgFree.Cov.exists_reps
+      (GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv) O hOc hOo (p.1 ^ j) hsO (θ ^ j)
+      (hpow j)
   let G : Finset (Fin n × (Fin n → (Fv F v ⊗[F] E))) :=
-    ((Finset.univ : Finset (Fin n)) ×ˢ Fintype.piFinset (fun _ : Fin n => Rep)).image
-      fun q => (q.1, Function.update q.2 q.1 1)
+    ((Finset.univ : Finset (Fin n)) ×ˢ Fintype.piFinset (fun _ : Fin n => Rep)).image fun q =>
+      (q.1, Function.update q.2 q.1 1)
   refine ⟨G, ?_, ?_, ?_⟩
   · have h1 : G.card ≤ n * Rep.card ^ n := by
       refine Finset.card_image_le.trans ?_
@@ -244,8 +294,11 @@ theorem GlobalTheory.CompanionTheory.AvgFree.nearNF_cover : ∀ (F E : Type) [Fi
     refine ⟨(l, Function.update r l 1), ?_, ?_⟩
     · refine Finset.mem_image.2 ⟨(l, r), Finset.mem_product.2 ⟨Finset.mem_univ _, ?_⟩, rfl⟩
       exact Fintype.mem_piFinset.2 hrRep
-    · refine GlobalTheory.CompanionTheory.AvgFree.Cov.rmul_mem_tupIn (Fv F v) (L : Set (Fv F v ⊗[F] E)) (p.1 ^ j) l _ X hX fun k => ?_
-      refine GlobalTheory.CompanionTheory.AvgFree.Cov.sum_near O L _ X hX l _ a0 (by simp [hl0]) (fun i hi => ?_) k ?_
+    · refine GlobalTheory.CompanionTheory.AvgFree.Cov.rmul_mem_tupIn (Fv F v)
+        (L : Set (Fv F v ⊗[F] E)) (p.1 ^ j) l _ X hX fun k => ?_
+      refine GlobalTheory.CompanionTheory.AvgFree.Cov.sum_near O L _ X hX l _ a0 (by simp [hl0])
+        (fun i hi => ?_)
+        k ?_
       · refine ⟨- o i, O.neg_mem (ho i), ?_⟩
         change Function.update r l 1 i - a0 i = _
         rw [Function.update_of_ne hi, mul_neg, ← hoe i]

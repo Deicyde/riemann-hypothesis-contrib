@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianSchem
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZM GlobalTheory.SiegelTor
 open scoped CategoryTheory.Obj
 
@@ -17,10 +18,12 @@ set_option backward.isDefEq.respectTransparency false
 
 namespace GlobalTheory.AbelianLimit
 
-theorem abelianScheme_descends_to_fg_subring_anyDim :
-    ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (F : Finset R), IsAbelianScheme A →
-    ∃ (S : Subring R) (B : Over (Sp S)) (_ : GrpObj B) (φ : A.left ⟶ B.left), (F : Set R) ⊆ S ∧
-      Algebra.FiniteType ℤ S ∧ IsAbelianScheme B ∧ IsGrpPullback A B (spMap S.subtype) φ := by
+theorem abelianScheme_descends_to_fg_subring_anyDim
+    : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (F : Finset R),
+      IsAbelianScheme A
+        → ∃ (S : Subring R) (B : Over (Sp S)) (_ : GrpObj B) (φ : A.left ⟶ B.left),
+          (F : Set R) ⊆ S ∧ Algebra.FiniteType ℤ S ∧ IsAbelianScheme B
+            ∧ IsGrpPullback A B (spMap S.subtype) φ := by
   intro R _ A _ F hA
   have := hA.comm
   have := hA.proper
@@ -42,7 +45,15 @@ theorem abelianScheme_descends_to_fg_subring_anyDim :
     ⟨(PrimeSpectrum.denseRange_comap_iff_ker_le_nilRadical S.toSubring.subtype).2 (by
       rw [(RingHom.injective_iff_ker_eq_bot _).1 Subtype.val_injective]
       exact bot_le)⟩
-  exact ⟨S.toSubring, (Over.pullback t).obj A₀, inferInstance, φ, fun x hx => S.algebraMap_mem ⟨x, hF hx⟩,
-    SpreadGroup.finiteType_of_fg hk (Subalgebra.fg_adjoin_finset s), isAbelianScheme_of_isDominant hφ hA, hφ⟩
+  exact ⟨
+    S.toSubring,
+    (Over.pullback t).obj A₀,
+    inferInstance,
+    φ,
+    fun x hx => S.algebraMap_mem ⟨x, hF hx⟩,
+    SpreadGroup.finiteType_of_fg hk (Subalgebra.fg_adjoin_finset s),
+    isAbelianScheme_of_isDominant hφ hA,
+    hφ
+  ⟩
 
 end GlobalTheory.AbelianLimit

@@ -9,7 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteP
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix GlobalTheory.ExportSeries
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain
+  NumberField Matrix GlobalTheory.ExportSeries
 open Formalism.IndefR.Links (PolF)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -22,7 +25,9 @@ namespace GlobalTheory.ExportSeries.SpecGood
 
 variable {D : D7}
 
-theorem infPart_eq_zero_of_isIdemAt : ∀ (D : D7) (P : Pl D.host.E) (e : AE D), Formalism.L2.NTheta.IsIdemAt e P → infPart D e = 0 := by
+theorem infPart_eq_zero_of_isIdemAt
+    : ∀ (D : D7) (P : Pl D.host.E) (e : AE D),
+      Formalism.L2.NTheta.IsIdemAt e P → infPart D e = 0 := by
   intro D P e h
   obtain ⟨⟨h1, h2, v, ε, ⟨α, rfl, -⟩, h3⟩, -⟩ := h
   have k1 := congrArg (infPart D) h1
@@ -36,37 +41,52 @@ theorem infPart_eq_zero_of_isIdemAt : ∀ (D : D7) (P : Pl D.host.E) (e : AE D),
   rw [k4] at k3
   linear_combination -k1 + infPart D e * k3 - k2
 
-theorem finUnit_of_res (P : Pl D.host.E) (hP : Formalism.L2.NTheta.IsIdemAt (idemAt P) P) (x : (AE D)ˣ)
-    (h1 : (1 - idemAt P) * (x : AE D) = 1 - idemAt P)
-    (hx : toEAf D (x : AE D) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E) (v : (kP P)ˣ)
-    (hv : resS D.host.F P ⟨_, hx⟩ = v) :
-    infPart D (x : AE D) = 1 ∧ finPart D (x : AE D) ∈ intAE D ∧ finPart D ((x⁻¹ : (AE D)ˣ) : AE D) ∈ intAE D := by
+theorem finUnit_of_res
+    (P : Pl D.host.E) (hP : Formalism.L2.NTheta.IsIdemAt (idemAt P) P)
+    (x : (AE D)ˣ) (h1 : (1 - idemAt P) * (x : AE D) = 1 - idemAt P)
+    (hx : toEAf D (x : AE D) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E)
+    (v : (kP P)ˣ) (hv : resS D.host.F P ⟨_, hx⟩ = v)
+    : infPart D (x : AE D) = 1 ∧ finPart D (x : AE D) ∈ intAE D
+      ∧ finPart D ((x⁻¹ : (AE D)ˣ) : AE D) ∈ intAE D := by
   obtain ⟨ι, i1, i2, -⟩ := GlobalTheory.HostAdeleIso.exists_finiteAdele_equiv D
-  refine ⟨?_, GlobalTheory.T.finite_part_integral_unit_of_unit_residue D ι i1 i2 P (idemAt P) (GlobalTheory.T.place_idempotent_finite_adele_zero_elsewhere D ι i1 i2 P _ hP) x h1 hx v hv⟩
+  refine ⟨
+    ?_,
+    GlobalTheory.T.finite_part_integral_unit_of_unit_residue D ι i1 i2 P (idemAt P)
+      (GlobalTheory.T.place_idempotent_finite_adele_zero_elsewhere D ι i1 i2 P _ hP) x h1 hx v hv
+  ⟩
   have := congrArg (infPart D) h1
-  rwa [RingHom.map_mul, RingHom.map_sub, RingHom.map_one, infPart_eq_zero_of_isIdemAt D P _ hP, sub_zero, one_mul] at this
+  rwa [RingHom.map_mul, RingHom.map_sub, RingHom.map_one, infPart_eq_zero_of_isIdemAt D P _ hP,
+      sub_zero, one_mul]
+    at this
 
 variable {C A : Type} [AddCommGroup C] [CommGroup A]
 
-theorem idemAt_mul_idem {Q : Finset (Pl D.host.E)} (h : SplitSet Q) {P : Pl D.host.E} (hP : P ∈ Q) :
-    idemAt P * idem Q = idemAt P :=
-  GlobalTheory.PlaceModelSum.mul_sum_orth (fun a ha => (h.isIdemAt ha).1) (fun a ha b hb hab => h.mul_eq_zero ha hb hab) hP
+theorem idemAt_mul_idem {Q : Finset (Pl D.host.E)} (h : SplitSet Q) {P : Pl D.host.E} (hP : P ∈ Q)
+    : idemAt P * idem Q = idemAt P :=
+  GlobalTheory.PlaceModelSum.mul_sum_orth
+    (fun a ha => (h.isIdemAt ha).1)
+    (fun a ha b hb hab => h.mul_eq_zero ha hb hab)
+    hP
 
-theorem idemAt_mul_conj_idem {Q : Finset (Pl D.host.E)} (h : SplitSet Q) {P : Pl D.host.E} (hP : P ∈ Q) :
-    idemAt P * cA D (idem Q) = 0 := by
+theorem idemAt_mul_conj_idem
+    {Q : Finset (Pl D.host.E)} (h : SplitSet Q) {P : Pl D.host.E} (hP : P ∈ Q)
+    : idemAt P * cA D (idem Q) = 0 := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [idem, map_sum, Finset.mul_sum]
   exact Finset.sum_eq_zero fun j hj => h.mul_conj hP hj
 
-theorem delQ_eq_one {u : UnivTwist D C} {Q : Finset (Pl D.host.E)} {x : (AE D)ˣ} (hx : ∀ P ∈ Q, u.del P x = 1) :
-    u.delQ Q x = 1 := by
+theorem delQ_eq_one
+    {u : UnivTwist D C} {Q : Finset (Pl D.host.E)} {x : (AE D)ˣ} (hx : ∀ P ∈ Q, u.del P x = 1)
+    : u.delQ Q x = 1 := by
   ext PP
   exact congrArg Multiplicative.toAdd (hx PP.1 PP.2)
 
-
 open Classical in
-theorem spec_good (D : D7) (C A : Type) [AddCommGroup C] [CommGroup A] (u : UnivTwist D C) (Q : Finset (Pl D.host.E))
-    (χ : Multiplicative (↥Q → C) →* A) (h : u.Good Q) : (u.spec Q χ).Good := by
+theorem spec_good
+    (D : D7)
+    (C A : Type) [AddCommGroup C] [CommGroup A]
+    (u : UnivTwist D C) (Q : Finset (Pl D.host.E)) (χ : Multiplicative (↥Q → C) →* A) (h : u.Good Q)
+    : (u.spec Q χ).Good := by
   have cc := GlobalTheory.DualPairCheck.cA_cA (D := D)
   refine ⟨?_, ?_, ?_, h.1, ?_, ?_⟩
   · haveI := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.isTopRing (F := D.host.F) (E := D.host.E)
@@ -97,13 +117,16 @@ theorem spec_good (D : D7) (C A : Type) [AddCommGroup C] [CommGroup A] (u : Univ
     have k3 : cA D (idemAt P) * idem Q = 0 := by
       have := congrArg (cA D) k2
       rwa [RingHom.map_mul, cc, RingHom.map_zero] at this
-    have k4 : cA D (idemAt P) * cA D (idem Q) = cA D (idemAt P) := by
-      rw [← RingHom.map_mul, k1]
+    have k4 : cA D (idemAt P) * cA D (idem Q) = cA D (idemAt P) := by rw [← RingHom.map_mul, k1]
     linear_combination (idemAt P + cA D (idemAt P)) * h4 + (1 - (x : AE D)) * (k1 + k2 + k3 + k4)
   · intro PP hPP x h1 hx v hv
     show χ (u.delQ Q x) = (u.spec Q χ).res PP v
-    rw [show (u.spec Q χ).res PP = χ.comp ((AddMonoidHom.toMultiplicative (AddMonoidHom.single (fun _ : ↥Q => C) ⟨PP, hPP⟩)).comp
-      (u.kap PP)) from dif_pos hPP, MonoidHom.comp_apply]
+    rw [show (u.spec Q χ).res PP
+          = χ.comp
+            ((AddMonoidHom.toMultiplicative (AddMonoidHom.single (fun _ : ↥Q => C) ⟨PP, hPP⟩)).comp
+              (u.kap PP)) from
+        dif_pos hPP,
+      MonoidHom.comp_apply]
     have hfu := finUnit_of_res PP (h.1.isIdemAt hPP) x h1 hx v hv
     refine congrArg χ ?_
     ext ⟨P', hP'⟩

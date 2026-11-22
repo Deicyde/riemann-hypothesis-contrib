@@ -16,7 +16,9 @@ open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris
 
 namespace CrystallineSemistableComparison.Pb
 
-theorem gr_neg_van : ∀ {b : Base} (L : b.Fun) (Q : ObjectProperty (Thick L)) (r : ℤ), r < 0 → ∀ j : ℕ,
-    Subsingleton (HU (gr (Φ := thP L) (thFil L) r) Q j) := GlobalTheory.T.thickening_graded_vanish_negative
+theorem gr_neg_van
+    : ∀ {b : Base} (L : b.Fun) (Q : ObjectProperty (Thick L)) (r : ℤ),
+      r < 0 → ∀ j : ℕ, Subsingleton (HU (gr (Φ := thP L) (thFil L) r) Q j) :=
+  GlobalTheory.T.thickening_graded_vanish_negative
 
 end CrystallineSemistableComparison.Pb

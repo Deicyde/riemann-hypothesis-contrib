@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open MeasureTheory Topology PositivityTheory.Rg.Tf.Loc
 open scoped ENNReal
 
-theorem UpperTheory.V.Z.Tf.Orb.normEx :
-    UpperTheory.V.Z.Tf.Orb.NormEx := by
+theorem UpperTheory.V.Z.Tf.Orb.normEx : UpperTheory.V.Z.Tf.Orb.NormEx := by
   classical
   intro G _ _ _ _ _ _ _ _ ⟨K, hKo, hKc⟩ H hH μ hμ hr
   let r : G → G := fun g => (DoubleCoset.mk H K g).out
@@ -29,12 +28,19 @@ theorem UpperTheory.V.Z.Tf.Orb.normEx :
   have hk : ∀ g, ∀ k ∈ K, ρ (g * k) = ρ g := fun g k hk => by
     have : r (g * k) = r g := by simpa using hr2 1 H.one_mem g k hk
     simp only [ρ, this, ← mul_assoc, K.mul_mem_cancel_right hk]
-  have hlc : IsLocallyConstant ρ := (IsLocallyConstant.iff_exists_open ρ).2 fun g =>
-    ⟨(fun z => g⁻¹ * z) ⁻¹' K, hKo.preimage (by fun_prop), by simp [K.one_mem], fun z hz => by
-      rw [← hk g _ hz, mul_inv_cancel_left]⟩
+  have hlc : IsLocallyConstant ρ :=
+    (IsLocallyConstant.iff_exists_open ρ).2 fun g => ⟨
+      (fun z => g⁻¹ * z) ⁻¹' K,
+      hKo.preimage (by fun_prop),
+      by simp [K.one_mem],
+      fun z hz => by rw [← hk g _ hz, mul_inv_cancel_left]
+    ⟩
   refine ⟨ρ, ⟨hlc.continuous.measurable, fun g => ?_⟩, fun g => ?_⟩
   · obtain ⟨h₀, hh, k, hk', e⟩ := hr1 g
-    have e1 : ∀ h : H, ρ (h * g) = (A (r g)).indicator (fun _ => (μ (A (r g)))⁻¹) (h * (⟨h₀, hh⟩ : H)⁻¹) := fun h => by
+    have e1
+        : ∀ h : H,
+          ρ (h * g)
+            = (A (r g)).indicator (fun _ => (μ (A (r g)))⁻¹) (h * (⟨h₀, hh⟩ : H)⁻¹) := fun h => by
       have h1 : r (h * g) = r g := by simpa using hr2 h h.2 g 1 K.one_mem
       have h2 : (r g)⁻¹ * (h * g) ∈ K ↔ h * (⟨h₀, hh⟩ : H)⁻¹ ∈ A (r g) := by
         rw [← K.mul_mem_cancel_right hk']
@@ -44,8 +50,8 @@ theorem UpperTheory.V.Z.Tf.Orb.normEx :
           group
         rw [this]
       simp only [ρ, h1, Set.indicator, h2]
-    rw [lintegral_congr e1, lintegral_mul_right_eq_self, lintegral_indicator_const (hAo _).measurableSet,
-      ENNReal.inv_mul_cancel (h0 _) (ht _)]
+    rw [lintegral_congr e1, lintegral_mul_right_eq_self,
+      lintegral_indicator_const (hAo _).measurableSet, ENNReal.inv_mul_cancel (h0 _) (ht _)]
   · simp only [ρ]
     split_ifs
     · exact ENNReal.inv_ne_top.2 (h0 _)

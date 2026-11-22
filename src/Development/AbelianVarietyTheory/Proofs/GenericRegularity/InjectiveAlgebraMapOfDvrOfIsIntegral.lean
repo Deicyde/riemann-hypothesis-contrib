@@ -9,19 +9,19 @@ namespace GlobalTheory
 
 open IsLocalRing
 
-
 open IsLocalRing in
-theorem _root_.GlobalTheory.dvr_finite_over_complete_dvr :
-    ∀ (O V : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-      [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [CharZero O] [CommRing V] [IsDomain V]
-      [IsDiscreteValuationRing V] [Algebra O V] [Module.Finite O V],
-      Function.Injective (algebraMap O V) ∧ IsLocalHom (algebraMap O V) ∧
-        IsAdicComplete (IsLocalRing.maximalIdeal V) V ∧ CharZero V ∧
-          (Finite (IsLocalRing.ResidueField O) → Finite (IsLocalRing.ResidueField V)) := by
+theorem _root_.GlobalTheory.dvr_finite_over_complete_dvr
+    : ∀ (O V : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [CharZero O] [CommRing V] [IsDomain V]
+        [IsDiscreteValuationRing V] [Algebra O V] [Module.Finite O V],
+      Function.Injective (algebraMap O V) ∧ IsLocalHom (algebraMap O V)
+        ∧ IsAdicComplete (IsLocalRing.maximalIdeal V) V ∧ CharZero V
+        ∧ (Finite (IsLocalRing.ResidueField O) → Finite (IsLocalRing.ResidueField V)) := by
   intro O V _ _ _ _ _ _ _ _ _ _
   haveI : Algebra.IsIntegral O V := Algebra.IsIntegral.of_finite O V
   have hinj : Function.Injective (algebraMap O V) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     by_contra h
     push_neg at h
     obtain ⟨a, ha, ha0⟩ := h
@@ -50,19 +50,20 @@ theorem _root_.GlobalTheory.dvr_finite_over_complete_dvr :
   have hp0 : algebraMap O V π ≠ 0 := (map_ne_zero_iff _ hinj).2 hπ.ne_zero
   have hpm : algebraMap O V π ∈ maximalIdeal V :=
     (mem_maximalIdeal _).2 (mem_nonunits_iff.2 fun hu => hπ.not_isUnit ((isUnit_map_iff _ _).1 hu))
-  obtain ⟨e, he⟩ := IsDiscreteValuationRing.ideal_eq_span_pow_irreducible
-    (s := Ideal.span {algebraMap O V π}) (by simpa using hp0) hq
+  obtain ⟨e, he⟩ :=
+    IsDiscreteValuationRing.ideal_eq_span_pow_irreducible (s := Ideal.span {algebraMap O V π})
+      (by simpa using hp0) hq
   have hpow : ∀ k, maximalIdeal V ^ (e * k) = Ideal.span {algebraMap O V π ^ k} := by
     intro k
     rw [hq.maximalIdeal_eq, Ideal.span_singleton_pow, pow_mul, ← Ideal.span_singleton_pow, ← he,
       Ideal.span_singleton_pow]
-  refine
-    { toIsHausdorff := IsHausdorff.of_isLocalRing _ _ (maximalIdeal.isMaximal V).ne_top
-      toIsPrecomplete := ⟨fun f hf => ?_⟩ }
+  refine {
+    toIsHausdorff := IsHausdorff.of_isLocalRing _ _ (maximalIdeal.isMaximal V).ne_top
+    toIsPrecomplete := ⟨fun f hf => ?_⟩
+  }
   have hf' : ∀ m n, m ≤ n → f m - f n ∈ maximalIdeal V ^ m := fun m n h => by
     simpa using SModEq.sub_mem.1 (hf h)
-  have hg : ∀ m n, m ≤ n →
-      ∃ y, f (e * m + m) - f (e * n + n) = algebraMap O V π ^ m * y := by
+  have hg : ∀ m n, m ≤ n → ∃ y, f (e * m + m) - f (e * n + n) = algebraMap O V π ^ m * y := by
     intro m n h
     have h1 := hf' _ _ (Nat.add_le_add (Nat.mul_le_mul_left e h) h)
     have h2 : f (e * m + m) - f (e * n + n) ∈ Ideal.span {algebraMap O V π ^ m} := by
@@ -71,9 +72,11 @@ theorem _root_.GlobalTheory.dvr_finite_over_complete_dvr :
     obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 h2
     exact ⟨y, by rw [← hy, mul_comm]⟩
   let b := Module.Free.chooseBasis O V
-  have hc : ∀ i, ∀ {m n : ℕ}, m ≤ n →
-      b.repr (f (e * m + m)) i ≡ b.repr (f (e * n + n)) i
-        [SMOD (maximalIdeal O ^ m • ⊤ : Submodule O O)] := by
+  have hc
+      : ∀ i, ∀ {m n : ℕ},
+        m ≤ n
+          → b.repr (f (e * m + m)) i ≡ b.repr (f (e * n + n)) i
+              [SMOD (maximalIdeal O ^ m • ⊤ : Submodule O O)] := by
     intro i m n h
     obtain ⟨y, hy⟩ := hg m n h
     have hdiff : b.repr (f (e * m + m)) i - b.repr (f (e * n + n)) i = π ^ m * b.repr y i := by
@@ -95,8 +98,7 @@ theorem _root_.GlobalTheory.dvr_finite_over_complete_dvr :
       obtain ⟨t, ht⟩ := hmem
       exact ⟨t, by rw [← ht, mul_comm]⟩
     choose t ht using hex
-    have hsum : f (e * n + n) - ∑ i, l i • b i =
-        algebraMap O V π ^ n * ∑ i, t i • b i := by
+    have hsum : f (e * n + n) - ∑ i, l i • b i = algebraMap O V π ^ n * ∑ i, t i • b i := by
       conv_lhs => rw [← b.sum_repr (f (e * n + n))]
       rw [← Finset.sum_sub_distrib, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_

@@ -38,29 +38,32 @@ theorem tends_pow_zero {a : C} (ha : V.MM a) : Tends V (fun n => a ^ V.l ^ n) 0 
       WithTop.coe_le_coe, nsmul_eq_mul]
     have h1 : (n : ℝ) ≤ ((V.l ^ n : ℕ) : ℝ) := by
       first
-        | exact_mod_cast (Nat.lt_pow_self V.l_prime.one_lt n).le
-        | exact_mod_cast (Nat.lt_pow_self V.l_prime.one_lt).le
+      | exact_mod_cast (Nat.lt_pow_self V.l_prime.one_lt n).le
+      | exact_mod_cast (Nat.lt_pow_self V.l_prime.one_lt).le
     have h2 : w / r ≤ n := le_trans (Nat.le_ceil _) (by exact_mod_cast hn)
     exact (div_mul_cancel₀ w hr0.ne').ge.trans (mul_le_mul_of_nonneg_right (h2.trans h1) hr0.le)
 
 variable [CharZero C] {O : Type} [CommRing O] {n d : ℕ}
 
-theorem chi_kill (K : KeyData C V O n d) (w : Fin n → C) (hw : w ≠ 0) (hP : Matrix.mulVec K.P w = w)
-    (χ : O →+* C) (hχ : ∀ x, Matrix.mulVec (K.ρ x) w = χ x • w) :
-    (∀ y, V.Ge 0 (χ y)) ∧ ∀ z, (∀ a, V.MM (K.em a z)) → V.MM (χ z) := by
+theorem chi_kill
+    (K : KeyData C V O n d) (w : Fin n → C) (hw : w ≠ 0) (hP : Matrix.mulVec K.P w = w)
+    (χ : O →+* C) (hχ : ∀ x, Matrix.mulVec (K.ρ x) w = χ x • w)
+    : (∀ y, V.Ge 0 (χ y)) ∧ ∀ z, (∀ a, V.MM (K.em a z)) → V.MM (χ z) := by
   have hint : ∀ y, V.Ge 0 (χ y) := fun y => eig_int (K.ρ y) (K.ρ_int y) w hw (χ y) (hχ y)
   refine ⟨hint, ?_⟩
-  obtain ⟨i, hi⟩ : ∃ i, w i ≠ 0 := by
-    by_contra hc; push_neg at hc; exact hw (funext hc)
+  obtain ⟨i, hi⟩ : ∃ i, w i ≠ 0 := by by_contra hc; push_neg at hc; exact hw (funext hc)
 
   have hT : Tends V (fun m => χ K.ε ^ V.l ^ m * w i) (w i) := by
-    have h1 : Tends V (fun m => Matrix.mulVec (K.ρ (K.ε ^ V.l ^ m)) w i) (Matrix.mulVec K.P w i) := by
+    have h1
+        : Tends V (fun m => Matrix.mulVec (K.ρ (K.ε ^ V.l ^ m)) w i) (Matrix.mulVec K.P w i) := by
       simp only [Matrix.mulVec, dotProduct]
       refine Tends.sum _ fun j _ => Tends.mul ?_ (tends_const _)
       exact RowTiePProj.tends_of_nat fun N => K.P_lim N i j
-    have e : (fun m => Matrix.mulVec (K.ρ (K.ε ^ V.l ^ m)) w i) = fun m => χ K.ε ^ V.l ^ m * w i := by
+    have e
+        : (fun m => Matrix.mulVec (K.ρ (K.ε ^ V.l ^ m)) w i) = fun m => χ K.ε ^ V.l ^ m * w i := by
       funext m
-      rw [hχ, map_pow]; rfl
+      rw [hχ, map_pow]
+      rfl
     rw [e, hP] at h1
     exact h1
   have hunit : ¬ V.MM (χ K.ε) := by
@@ -79,7 +82,9 @@ theorem chi_kill (K : KeyData C V O n d) (w : Fin n → C) (hw : w ≠ 0) (hP : 
   rw [h1]
   have := hint y
   unfold VF.Ge at this
-  calc (0 : WithTop ℝ) < 1 := by exact_mod_cast one_pos
+  calc
+    (0 : WithTop ℝ)
+      < 1 := by exact_mod_cast one_pos
     _ = 1 + 0 := (add_zero _).symm
     _ ≤ 1 + V.v (χ y) := add_le_add le_rfl (by exact_mod_cast this)
 
@@ -87,13 +92,24 @@ end Glue
 
 section Top
 
-theorem keyLA_of (hE : KeyEigSt) (hR : KeyResSt) (hD : KeyDeltaSt) (C : Type) [Field C] [CharZero C] (V : VF C)
+theorem keyLA_of
+    (hE : KeyEigSt) (hR : KeyResSt) (hD : KeyDeltaSt)
+    (C : Type) [Field C] [CharZero C]
+    (V : VF C)
     (hac : IsAlgClosed C)
     (hcpl : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
-    (O : Type) [CommRing O] (n d : ℕ) [NeZero d] (K : KeyData C V O n d) (x : O) :
-    Polynomial.aeval (K.ρ x) (∏ c : ZMod d, (Polynomial.X - Polynomial.C (K.em c x))) * K.P = 0 := by
-  have hv : ∀ v : Fin n → C,
-      Matrix.mulVec (Polynomial.aeval (K.ρ x) (∏ c : ZMod d, (Polynomial.X - Polynomial.C (K.em c x))) * K.P) v = 0 := by
+    (O : Type) [CommRing O]
+    (n d : ℕ) [NeZero d]
+    (K : KeyData C V O n d) (x : O)
+    : Polynomial.aeval (K.ρ x) (∏ c : ZMod d, (Polynomial.X - Polynomial.C (K.em c x))) * K.P
+      = 0 := by
+  have hv
+      : ∀ v : Fin n → C,
+        Matrix.mulVec
+            (Polynomial.aeval (K.ρ x) (∏ c : ZMod d, (Polynomial.X - Polynomial.C (K.em c x)))
+              * K.P)
+            v
+          = 0 := by
     intro v
     obtain ⟨m, w, χ, hPv, hw⟩ := hE C V hac hcpl O n d K v
     rw [← Matrix.mulVec_mulVec, hPv, Matrix.mulVec_sum]
@@ -106,8 +122,8 @@ theorem keyLA_of (hE : KeyEigSt) (hR : KeyResSt) (hD : KeyDeltaSt) (C : Type) [F
     have heq := hD C V O n d K (χ j) c hint hc
     rw [aeval_mulVec _ _ _ (hχ x), Polynomial.eval_prod]
     have : ∏ c' : ZMod d, Polynomial.eval (χ j x) (Polynomial.X - Polynomial.C (K.em c' x)) = 0 :=
-      Finset.prod_eq_zero (Finset.mem_univ c) (by rw [Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C,
-        heq, sub_self])
+      Finset.prod_eq_zero (Finset.mem_univ c)
+        (by rw [Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C, heq, sub_self])
     rw [this, zero_smul]
   ext i j
   have := congrFun (hv (Pi.single j 1)) i

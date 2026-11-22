@@ -10,7 +10,14 @@ open scoped BigOperators
 
 namespace GlobalTheory
 
-theorem exists_complexLinear_extension_of_traceIsometry : ∀ (K E : Type) [Field K] [Field E] [Algebra K E] (cj : E → E) (ι : Type) [Fintype ι] (φ : E →+* ℂ) (emb : ι → E →+* ℂ), (∀ y, φ (cj y) = starRingEnd ℂ (φ y)) → (∀ τ y, emb τ (cj y) = starRingEnd ℂ (emb τ y)) → (∀ τ (x : K), emb τ (algebraMap K E x) = φ (algebraMap K E x)) → (∀ y, ∑ τ, emb τ y = φ (algebraMap K E (Algebra.trace K E y))) → ∀ γ : IsoKG K E cj ι, ∃ gC : (Fin 4 × ι → ℂ) ≃ₗ[ℂ] (Fin 4 × ι → ℂ), ∀ x : Fin 4 → E, gC (fun w => emb w.2 (x w.1)) = fun w => φ (algebraMap K E (γ.g x w)) := by
+theorem exists_complexLinear_extension_of_traceIsometry
+    : ∀ (K E : Type) [Field K] [Field E] [Algebra K E] (cj : E → E) (ι : Type) [Fintype ι]
+        (φ : E →+* ℂ) (emb : ι → E →+* ℂ),
+      (∀ y, φ (cj y) = starRingEnd ℂ (φ y)) → (∀ τ y, emb τ (cj y) = starRingEnd ℂ (emb τ y))
+        → (∀ τ (x : K), emb τ (algebraMap K E x) = φ (algebraMap K E x))
+        → (∀ y, ∑ τ, emb τ y = φ (algebraMap K E (Algebra.trace K E y)))
+        → ∀ γ : IsoKG K E cj ι, ∃ gC : (Fin 4 × ι → ℂ) ≃ₗ[ℂ] (Fin 4 × ι → ℂ), ∀ x : Fin 4 → E,
+          gC (fun w => emb w.2 (x w.1)) = fun w => φ (algebraMap K E (γ.g x w)) := by
   intro K E _ _ _ cj ι _ φ emb hφ hemb hK htr γ
   classical
   let b : Fin 4 × ι → Fin 4 → E := fun w => γ.g.symm (Pi.single w 1)
@@ -21,8 +28,9 @@ theorem exists_complexLinear_extension_of_traceIsometry : ∀ (K E : Type) [Fiel
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [b, LinearEquiv.apply_symm_apply, map_sum, map_mul, hφ, ← htr, hemb] at h
     rw [Matrix.mul_apply, Fintype.sum_prod_type]
-    have h2 : ∑ a, ∑ τ, Bᴴ w' (a, τ) * B (a, τ) w
-        = ∑ a, ∑ τ, emb τ (b w a) * starRingEnd ℂ (emb τ (b w' a)) := by
+    have h2
+        : ∑ a, ∑ τ, Bᴴ w' (a, τ) * B (a, τ) w
+          = ∑ a, ∑ τ, emb τ (b w a) * starRingEnd ℂ (emb τ (b w' a)) := by
       refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun τ _ => ?_
       rw [Matrix.conjTranspose_apply, mul_comm]
       rfl
@@ -41,8 +49,8 @@ theorem exists_complexLinear_extension_of_traceIsometry : ∀ (K E : Type) [Fiel
       simp only [b, map_sum, map_smul, LinearEquiv.apply_symm_apply]
     ext u
     simp [Finset.sum_apply, Pi.single_apply]
-  have hv : (fun w : Fin 4 × ι => emb w.2 (x w.1))
-      = B *ᵥ (fun w => φ (algebraMap K E (γ.g x w))) := by
+  have hv
+      : (fun w : Fin 4 × ι => emb w.2 (x w.1)) = B *ᵥ (fun w => φ (algebraMap K E (γ.g x w))) := by
     ext v
     have := congrArg (fun y => emb v.2 (y v.1)) hx
     set_option synthInstance.maxHeartbeats 100000 in

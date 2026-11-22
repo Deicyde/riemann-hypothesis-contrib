@@ -9,16 +9,19 @@ open GlobalTheory.IsoTriv
 
 namespace GlobalTheory.IsoTriv.PrimeIdempotent
 
-theorem mem_pow_of_map_dvd {R V : Type} [CommRing R] [IsDedekindDomain R] [CommRing V]
-    [IsDomain V] [IsDiscreteValuationRing V] (φ : R →+* V) (b a : R) (hb : φ b ≠ 0) (n : ℕ)
+theorem mem_pow_of_map_dvd
+    {R V : Type}
+    [CommRing R] [IsDedekindDomain R] [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    (φ : R →+* V) (b a : R) (hb : φ b ≠ 0)
+    (n : ℕ)
     (hw : (Ideal.comap φ (IsLocalRing.maximalIdeal V)).IsMaximal)
-    (hbn : b ∈ Ideal.comap φ (IsLocalRing.maximalIdeal V) ^ n) (z : V) (hz : φ a = φ b * z) :
-    a ∈ Ideal.comap φ (IsLocalRing.maximalIdeal V) ^ n := by
+    (hbn : b ∈ Ideal.comap φ (IsLocalRing.maximalIdeal V) ^ n)
+    (z : V) (hz : φ a = φ b * z)
+    : a ∈ Ideal.comap φ (IsLocalRing.maximalIdeal V) ^ n := by
   set w := Ideal.comap φ (IsLocalRing.maximalIdeal V) with hwdef
   by_cases ha : a = 0
   · rw [ha]; exact Ideal.zero_mem _
-  have hspan : Ideal.span {a} ≠ ⊥ := by
-    rwa [Ne, Ideal.span_singleton_eq_bot]
+  have hspan : Ideal.span {a} ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
   obtain ⟨J, hJ, hfac⟩ := Ideal.eq_prime_pow_mul_coprime hspan w
   generalize Multiset.count w (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {a})) = i
     at hfac
@@ -49,8 +52,7 @@ theorem epsSt : EpsSt := by
   have hwp : w.IsPrime := Ideal.comap_isPrime φ _
   have hw0 : w ≠ ⊥ := fun h => hq0 (by rw [h] at hqw; exact hqw)
   have hw : w.IsMaximal := hwp.isMaximal hw0
-  have hspan : Ideal.span {q} ≠ ⊥ := by
-    rwa [Ne, Ideal.span_singleton_eq_bot]
+  have hspan : Ideal.span {q} ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
   obtain ⟨J, hJ, hfac⟩ := Ideal.eq_prime_pow_mul_coprime hspan w
   generalize Multiset.count w (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {q})) = e
     at hfac
@@ -65,14 +67,14 @@ theorem epsSt : EpsSt := by
     have h1 : φ x ∈ Ideal.span {φ q ^ N} := by
       have h2 : φ x ∈ (Ideal.map φ w) ^ k := by
         rw [← Ideal.map_pow]; exact Ideal.mem_map_of_mem φ hx
-      have h3 : φ x ∈ IsLocalRing.maximalIdeal V ^ k :=
-        Ideal.pow_right_mono Ideal.map_comap_le k h2
+      have h3 : φ x ∈ IsLocalRing.maximalIdeal V ^ k := Ideal.pow_right_mono Ideal.map_comap_le k h2
       rw [hϖ.maximalIdeal_eq, Ideal.span_singleton_pow] at h3
       rwa [Ideal.span_singleton_eq_span_singleton.mpr hk]
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton.mp h1
     refine ⟨y, hy, -c, ?_⟩
     have h4 : φ x + φ y = 1 := by rw [← map_add (f := _), hxy, map_one]
-    rw [← h4, hc]; ring
+    rw [← h4, hc]
+    ring
   choose ε hεJ hε using key
   refine ⟨ε, fun N => ⟨hε N, fun M hM a ⟨z, hz⟩ => ?_⟩⟩
   have hqM : q ^ M ∈ w ^ (e * M) := by

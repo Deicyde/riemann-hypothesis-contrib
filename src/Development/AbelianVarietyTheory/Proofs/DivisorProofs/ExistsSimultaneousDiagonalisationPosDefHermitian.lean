@@ -10,11 +10,12 @@ open scoped ComplexOrder Matrix
 
 namespace GlobalTheory.HSAmp
 
-theorem exists_unitary_conj_diagonal {ι : Type} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℂ)
-    (hA : A.IsHermitian) :
-    ∃ U : Matrix ι ι ℂ, Uᴴ * U = 1 ∧
-      Uᴴ * A * U = Matrix.diagonal fun i => (hA.eigenvalues i : ℂ) := by
-  have h1 : (hA.eigenvectorUnitary : Matrix ι ι ℂ)ᴴ * (hA.eigenvectorUnitary : Matrix ι ι ℂ) = 1 := by
+theorem exists_unitary_conj_diagonal
+    {ι : Type} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℂ) (hA : A.IsHermitian)
+    : ∃ U : Matrix ι ι ℂ,
+      Uᴴ * U = 1 ∧ Uᴴ * A * U = Matrix.diagonal fun i => (hA.eigenvalues i : ℂ) := by
+  have h1
+      : (hA.eigenvectorUnitary : Matrix ι ι ℂ)ᴴ * (hA.eigenvectorUnitary : Matrix ι ι ℂ) = 1 := by
     have := hA.eigenvectorUnitary.2.1
     simpa [Matrix.star_eq_conjTranspose] using this
   refine ⟨hA.eigenvectorUnitary, h1, ?_⟩
@@ -24,14 +25,18 @@ theorem exists_unitary_conj_diagonal {ι : Type} [Fintype ι] [DecidableEq ι] (
   set D : Matrix ι ι ℂ := Matrix.diagonal (RCLike.ofReal ∘ hA.eigenvalues) with hD
   have h2 : Uᴴ * A * U = D := by
     rw [h, Matrix.star_eq_conjTranspose]
-    calc Uᴴ * (U * D * Uᴴ) * U = (Uᴴ * U) * D * (Uᴴ * U) := by simp only [Matrix.mul_assoc]
+    calc
+      Uᴴ * (U * D * Uᴴ) * U
+        = (Uᴴ * U) * D * (Uᴴ * U) := by simp only [Matrix.mul_assoc]
       _ = D := by rw [h1]; simp
-  rw [h2, hD]; rfl
+  rw [h2, hD]
+  rfl
 
-theorem simultaneous_diagonalisation :
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (G G' : Matrix ι ι ℂ), G.PosDef → G'.IsHermitian →
-      ∃ (T : Matrix ι ι ℂ) (d : ι → ℝ), IsUnit T.det ∧ Tᴴ * G * T = 1 ∧
-        Tᴴ * G' * T = Matrix.diagonal fun i => (d i : ℂ) := by
+theorem simultaneous_diagonalisation
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (G G' : Matrix ι ι ℂ),
+      G.PosDef → G'.IsHermitian
+        → ∃ (T : Matrix ι ι ℂ) (d : ι → ℝ),
+          IsUnit T.det ∧ Tᴴ * G * T = 1 ∧ Tᴴ * G' * T = Matrix.diagonal fun i => (d i : ℂ) := by
   intro ι _ _ G G' hG hG'
   obtain ⟨U, hU, hUG⟩ := exists_unitary_conj_diagonal G hG.1
   have hpos : ∀ i, 0 < hG.1.eigenvalues i := hG.eigenvalues_pos
@@ -51,13 +56,13 @@ theorem simultaneous_diagonalisation :
     funext i
     have hs : 0 < Real.sqrt (hG.1.eigenvalues i) := Real.sqrt_pos.2 (hpos i)
     have hs2 := Real.mul_self_sqrt (hpos i).le
-    have : (Real.sqrt (hG.1.eigenvalues i))⁻¹ * hG.1.eigenvalues i *
-        (Real.sqrt (hG.1.eigenvalues i))⁻¹ = 1 := by
+    have : (Real.sqrt (hG.1.eigenvalues i))⁻¹ * hG.1.eigenvalues i
+          * (Real.sqrt (hG.1.eigenvalues i))⁻¹
+        = 1 := by
       field_simp
       nlinarith
     exact_mod_cast this
-  have hH : ((U * S)ᴴ * G' * (U * S)).IsHermitian :=
-    Matrix.isHermitian_conjTranspose_mul_mul _ hG'
+  have hH : ((U * S)ᴴ * G' * (U * S)).IsHermitian := Matrix.isHermitian_conjTranspose_mul_mul _ hG'
   obtain ⟨V, hV, hVG⟩ := exists_unitary_conj_diagonal _ hH
   have h1 : (U * S * V)ᴴ * G * (U * S * V) = 1 := by
     have : (U * S * V)ᴴ * G * (U * S * V) = Vᴴ * ((U * S)ᴴ * G * (U * S)) * V := by

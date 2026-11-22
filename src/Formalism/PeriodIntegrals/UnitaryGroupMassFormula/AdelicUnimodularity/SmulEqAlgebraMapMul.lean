@@ -14,8 +14,8 @@ open IsDedekindDomain IsDedekindDomain.HeightOneSpectrum NumberField
 open Formalism.MainNotions.S (Af)
 open scoped TensorProduct
 
-theorem exists_den {K : Type} [Field K] [NumberField K] (x : K) :
-    ∃ m : ℕ, 0 < m ∧ ∃ a : 𝓞 K, (m : K) * x = algebraMap (𝓞 K) K a := by
+theorem exists_den {K : Type} [Field K] [NumberField K] (x : K)
+    : ∃ m : ℕ, 0 < m ∧ ∃ a : 𝓞 K, (m : K) * x = algebraMap (𝓞 K) K a := by
   obtain ⟨a, s, hs, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 K) x
   have hs0 : s ≠ 0 := nonZeroDivisors.ne_zero hs
   have hN0 : Ideal.absNorm (Ideal.span {s}) ≠ 0 := by
@@ -24,7 +24,8 @@ theorem exists_den {K : Type} [Field K] [NumberField K] (x : K) :
   refine ⟨Ideal.absNorm (Ideal.span {s}), Nat.pos_of_ne_zero hN0, t * a, ?_⟩
   have hsK : algebraMap (𝓞 K) K s ≠ 0 := by
     rwa [Ne, map_eq_zero_iff _ (FaithfulSMul.algebraMap_injective (𝓞 K) K)]
-  have : ((Ideal.absNorm (Ideal.span {s}) : ℕ) : K) = algebraMap (𝓞 K) K t * algebraMap (𝓞 K) K s := by
+  have : ((Ideal.absNorm (Ideal.span {s}) : ℕ) : K)
+      = algebraMap (𝓞 K) K t * algebraMap (𝓞 K) K s := by
     rw [← map_mul, ht, map_natCast]
   rw [this, map_mul]
   field_simp
@@ -33,11 +34,13 @@ variable {F : Type} [Field F] [NumberField F]
 
 def IntF (f : F) : Prop := algebraMap F (FiniteAdeleRing (𝓞 F) F) f ∈ Ohat F
 
-theorem ohat_mul {a c : FiniteAdeleRing (𝓞 F) F} (ha : a ∈ Ohat F) (hc : c ∈ Ohat F) : a * c ∈ Ohat F := by
+theorem ohat_mul {a c : FiniteAdeleRing (𝓞 F) F} (ha : a ∈ Ohat F) (hc : c ∈ Ohat F)
+    : a * c ∈ Ohat F := by
   intro v
   exact mul_mem (ha v) (hc v)
 
-theorem ohat_add {a c : FiniteAdeleRing (𝓞 F) F} (ha : a ∈ Ohat F) (hc : c ∈ Ohat F) : a + c ∈ Ohat F := by
+theorem ohat_add {a c : FiniteAdeleRing (𝓞 F) F} (ha : a ∈ Ohat F) (hc : c ∈ Ohat F)
+    : a + c ∈ Ohat F := by
   intro v
   exact add_mem (ha v) (hc v)
 
@@ -53,8 +56,9 @@ theorem ohat_one : (1 : FiniteAdeleRing (𝓞 F) F) ∈ Ohat F := by
   intro v
   exact (v.adicCompletionIntegers F).one_mem
 
-theorem ohat_sum {κ : Type*} (s : Finset κ) {f : κ → FiniteAdeleRing (𝓞 F) F} (hf : ∀ i ∈ s, f i ∈ Ohat F) :
-    ∑ i ∈ s, f i ∈ Ohat F := by
+theorem ohat_sum
+    {κ : Type*} (s : Finset κ) {f : κ → FiniteAdeleRing (𝓞 F) F} (hf : ∀ i ∈ s, f i ∈ Ohat F)
+    : ∑ i ∈ s, f i ∈ Ohat F := by
   classical
   induction s using Finset.induction_on with
   | empty => rw [Finset.sum_empty]; exact ohat_zero
@@ -78,8 +82,8 @@ theorem intF_of_int (a : 𝓞 F) : IntF (algebraMap (𝓞 F) F a) := by
   intro v
   exact IsDedekindDomain.HeightOneSpectrum.coe_algebraMap_mem (𝓞 F) F v a
 
-theorem exists_den_fin {κ : Type} [Fintype κ] (f : κ → F) :
-    ∃ m : ℕ, 0 < m ∧ ∀ i, IntF ((m : F) * f i) := by
+theorem exists_den_fin {κ : Type} [Fintype κ] (f : κ → F)
+    : ∃ m : ℕ, 0 < m ∧ ∀ i, IntF ((m : F) * f i) := by
   classical
   choose m hm a ha using fun i => exists_den (f i)
   refine ⟨∏ i, m i, Finset.prod_pos fun i _ => hm i, fun i => ?_⟩
@@ -103,8 +107,8 @@ theorem intC_add {x y : E ⊗[F] Af F} (hx : IntC b x) (hy : IntC b y) : IntC b 
   rw [map_add (f := _)]
   exact ohat_add (hx k) (hy k)
 
-theorem intC_sum {κ : Type*} (s : Finset κ) {f : κ → E ⊗[F] Af F} (hf : ∀ i ∈ s, IntC b (f i)) :
-    IntC b (∑ i ∈ s, f i) := by
+theorem intC_sum {κ : Type*} (s : Finset κ) {f : κ → E ⊗[F] Af F} (hf : ∀ i ∈ s, IntC b (f i))
+    : IntC b (∑ i ∈ s, f i) := by
   intro k
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, Finset.sum_apply]
@@ -113,16 +117,17 @@ theorem intC_sum {κ : Type*} (s : Finset κ) {f : κ → E ⊗[F] Af F} (hf : �
 theorem smul_eq_algebraMap_mul (c : F) (a : Af F) : c • a = algebraMap F (Af F) c * a :=
   Algebra.smul_def c a
 
-theorem exists_den_mul (b : Module.Basis ι F E) :
-    ∃ m : ℕ, 0 < m ∧ ∀ x y : E ⊗[F] Af F, IntC b x → IntC b y → IntC b (m • (x * y)) := by
+theorem exists_den_mul (b : Module.Basis ι F E)
+    : ∃ m : ℕ, 0 < m ∧ ∀ x y : E ⊗[F] Af F, IntC b x → IntC b y → IntC b (m • (x * y)) := by
   obtain ⟨m, hm, h⟩ := exists_den_fin (fun p : ι × ι × ι => b.repr (b p.1 * b p.2.1) p.2.2)
   refine ⟨m, hm, fun x y hx hy k => ?_⟩
   rw [map_nsmul, coord_mul]
   simp only [Pi.smul_apply, Finset.smul_sum]
   refine ohat_sum _ fun i _ => ohat_sum _ fun j _ => ?_
   rw [smul_eq_algebraMap_mul, nsmul_eq_mul, ← mul_assoc]
-  have h1 : (m : Af F) * algebraMap F (Af F) (b.repr (b i * b j) k) =
-      algebraMap F (Af F) ((m : F) * b.repr (b i * b j) k) := by
+  have h1
+      : (m : Af F) * algebraMap F (Af F) (b.repr (b i * b j) k)
+        = algebraMap F (Af F) ((m : F) * b.repr (b i * b j) k) := by
     simp
   rw [h1]
   exact ohat_mul (h (i, j, k)) (ohat_mul (hx i) (hy j))

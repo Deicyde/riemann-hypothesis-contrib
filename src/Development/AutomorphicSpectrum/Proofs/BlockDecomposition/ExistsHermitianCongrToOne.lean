@@ -10,21 +10,29 @@ open PositivityTheory.PfSWUS.Loc GlobalTheory.CompanionTheory.UnrDens
 
 namespace GlobalTheory.CompanionTheory.UnrDens
 
-theorem exists_congr_one : ∀ (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ), ResAlg E τ q ε →
-    ∀ (n : ℕ) (T : Matrix (Fin n) (Fin n) E), cT τ T = T → IsUnit T.det →
-      ∃ g : Matrix (Fin n) (Fin n) E, IsUnit g.det ∧ cT τ g * T * g = 1 := by
+theorem exists_congr_one
+    : ∀ (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ),
+      ResAlg E τ q ε
+        → ∀ (n : ℕ) (T : Matrix (Fin n) (Fin n) E),
+          cT τ T = T → IsUnit T.det
+            → ∃ g : Matrix (Fin n) (Fin n) E, IsUnit g.det ∧ cT τ g * T * g = 1 := by
   intro E _ τ q ε hR n T hT hdet
   have hinv : ∀ a : E, τ (τ a) = a := hR.inv
   have hq : 1 < q := hR.one_lt
   have hcard : Nat.card (Fin n → E) = q ^ (2 * n) := by
     rw [Nat.card_fun, Nat.card_eq_fintype_card (α := Fin n), Fintype.card_fin, hR.card, ← pow_mul]
-  have hcnt := GlobalTheory.T.card_orthonormal_frames_hermitian_space E τ q ε hR n n le_rfl (Fin n → E) (HermSp.ofMatrix hinv T hT hdet) hcard
+  have hcnt :=
+    GlobalTheory.T.card_orthonormal_frames_hermitian_space E τ q ε hR n n le_rfl (Fin n → E)
+      (HermSp.ofMatrix hinv T hT hdet) hcard
   have hε : ε = -1 ∨ ε = 1 := by
     rcases hR.eps with h | h
     · exact Or.inl h.1
     · exact Or.inr h.1
-  have hne : Nat.card {x : Fin n → Fin n → E // ∀ i j : Fin n,
-      (HermSp.ofMatrix hinv T hT hdet).h (x i) (x j) = if i = j then 1 else 0} ≠ 0 := by
+  have hne
+      : Nat.card
+          {x : Fin n → Fin n → E // ∀ i j : Fin n,
+            (HermSp.ofMatrix hinv T hT hdet).h (x i) (x j) = if i = j then 1 else 0}
+        ≠ 0 := by
     intro h0
     rw [h0, Nat.cast_zero, eq_comm, Finset.prod_eq_zero_iff] at hcnt
     obtain ⟨i, -, hi⟩ := hcnt
@@ -40,12 +48,12 @@ theorem exists_congr_one : ∀ (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ
     · rw [sub_eq_zero] at h
       have h2 := congrArg abs h
       rw [abs_one, abs_pow, abs_div, Nat.abs_cast] at h2
-      have key : ∀ {F : Type} [Field F] [LinearOrder F] [IsStrictOrderedRing F] (e : ℤ) (k : ℕ),
-          (e = -1 ∨ e = 1) → k ≠ 0 → (1 : F) ≠ (|(e : F)| / (q : F)) ^ k := by
+      have key
+          : ∀ {F : Type} [Field F] [LinearOrder F] [IsStrictOrderedRing F] (e : ℤ) (k : ℕ),
+            (e = -1 ∨ e = 1) → k ≠ 0 → (1 : F) ≠ (|(e : F)| / (q : F)) ^ k := by
         intro F _ _ _ e k he hk' hh
         have hqF : (1 : F) < q := by exact_mod_cast hq
-        have habs : |(e : F)| = 1 := by
-          rcases he with rfl | rfl <;> simp
+        have habs : |(e : F)| = 1 := by rcases he with rfl | rfl <;> simp
         rw [habs] at hh
         have hlt : (1 / (q : F)) ^ k < 1 :=
           pow_lt_one₀ (by positivity) ((div_lt_one (by linarith)).mpr hqF) hk'

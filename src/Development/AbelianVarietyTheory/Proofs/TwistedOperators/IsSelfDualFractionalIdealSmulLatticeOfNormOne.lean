@@ -5,11 +5,16 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
+open GlobalTheory.FinPl
+  (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 
@@ -80,11 +85,12 @@ lemma GlobalTheory.IdLatDual.idLat_fg {D : D7} {n : ℕ} (Λ : Submodule (𝓞 D
   have hfg : ((idLat I Λ).map f).FG := Submodule.FG.of_le hΛ hle
   exact Submodule.fg_of_fg_map_injective f hinj hfg
 
-
 open GlobalTheory.IdLatDual in
-theorem GlobalTheory.idLat_isSelfDualC : ∀ {D : D7} (S : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
-    (I I' : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E), IsSelfDualC S Λ → I * I' = 1 →
-    (∀ x : D.host.E, x ∈ I' ↔ star x ∈ I) → IsSelfDualC S (idLat I Λ) := by
+theorem GlobalTheory.idLat_isSelfDualC
+    : ∀ {D : D7} (S : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+        (I I' : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E),
+      IsSelfDualC S Λ → I * I' = 1 → (∀ x : D.host.E, x ∈ I' ↔ star x ∈ I)
+        → IsSelfDualC S (idLat I Λ) := by
   intro D S Λ I I' hΛ hII' hconj
   obtain ⟨hlat, hdual⟩ := hΛ
   have intL : ∀ x ∈ Λ, ∀ y ∈ Λ, IsO (hp S x y) := fun x hx y hy => (hdual y).1 hy x hx
@@ -94,7 +100,9 @@ theorem GlobalTheory.idLat_isSelfDualC : ∀ {D : D7} (S : HSp D) (Λ : Submodul
 
   have hspan : ∀ y ∈ Λ, y ∈ Submodule.span D.host.E (idLat I Λ : Set (Fin S.rank → D.host.E)) := by
     intro y hy
-    have key : ∀ z ∈ I * I', z • y ∈ Submodule.span D.host.E (idLat I Λ : Set (Fin S.rank → D.host.E)) := by
+    have key
+        : ∀ z ∈ I * I',
+          z • y ∈ Submodule.span D.host.E (idLat I Λ : Set (Fin S.rank → D.host.E)) := by
       intro z hz
       refine FractionalIdeal.mul_induction_on hz (fun i hi c _ => ?_) (fun a b ha hb => ?_)
       · rw [mul_comm, mul_smul]
@@ -103,8 +111,7 @@ theorem GlobalTheory.idLat_isSelfDualC : ∀ {D : D7} (S : HSp D) (Λ : Submodul
     simpa using key 1 one_mem
   have hfg : (idLat I Λ).FG := idLat_fg Λ hlat.fg I
   refine ⟨Submodule.IsLattice.of_fg D.host.E hfg, fun y => ⟨fun hy => ?_, fun hy => ?_⟩⟩
-  ·
-    have stepA : ∀ s ∈ I, ∀ x₀ ∈ Λ, ∀ y ∈ idLat I Λ, IsO (hp S (s • x₀) y) := by
+  · have stepA : ∀ s ∈ I, ∀ x₀ ∈ Λ, ∀ y ∈ idLat I Λ, IsO (hp S (s • x₀) y) := by
       intro s hs x₀ hx₀ y hy
       induction hy using Submodule.span_induction with
       | mem z hz =>
@@ -122,7 +129,8 @@ theorem GlobalTheory.idLat_isSelfDualC : ∀ {D : D7} (S : HSp D) (Λ : Submodul
       obtain ⟨s, hs, x₀, hx₀, rfl⟩ := hz
       obtain ⟨b, hb⟩ := stepA s hs x₀ hx₀ y hy
       exact ⟨b, hb⟩
-    | zero => exact ⟨0, by rw [← hp, hp_zero_left]; simp⟩
+    | zero =>
+      exact ⟨0, by rw [← hp, hp_zero_left]; simp⟩
     | add a b _ _ ha hb =>
       have h : IsO (hp S a y + hp S b y) := isO_add ha hb
       rw [← hp_add_left] at h

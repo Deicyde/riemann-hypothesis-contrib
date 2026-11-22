@@ -9,24 +9,32 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ImportsBisRe
 
 open scoped TensorProduct Matrix nonZeroDivisors
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.PlaneSkew
+open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.PlaneSkew
 
 namespace GlobalTheory.PlaneSkew
 
-theorem exists_ne_zero_smul_mem_of_mem_span {E : Type} [Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (𝓞 E) (Fin n → E)) (x : Fin n → E)
-    (hx : x ∈ Submodule.span E (L : Set (Fin n → E))) :
-    ∃ d : 𝓞 E, d ≠ 0 ∧ d • x ∈ L := by
+theorem exists_ne_zero_smul_mem_of_mem_span
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (x : Fin n → E)
+    (hx : x ∈ Submodule.span E (L : Set (Fin n → E)))
+    : ∃ d : 𝓞 E, d ≠ 0 ∧ d • x ∈ L := by
   first
   | exact @_root_.GlobalTheory.HermitianEigenvalueInequality.main
   | exact _root_.GlobalTheory.HermitianEigenvalueInequality.main
   | (apply _root_.GlobalTheory.HermitianEigenvalueInequality.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.HermitianEigenvalueInequality.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.HermitianEigenvalueInequality.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.HermitianEigenvalueInequality.main
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.HermitianEigenvalueInequality.main ..)
 
-theorem isLattice_lowLat : ∀ (E : Type) [Field E] [NumberField E] (n n₁ : ℕ) (L : Submodule (𝓞 E) (Fin n → E))
-    (ι : Matrix (Fin n) (Fin n₁) E), L.IsLattice E → Function.Injective ι.mulVec → (lowLat ι L).IsLattice E := by
+theorem isLattice_lowLat
+    : ∀ (E : Type) [Field E] [NumberField E] (n n₁ : ℕ) (L : Submodule (𝓞 E) (Fin n → E))
+        (ι : Matrix (Fin n) (Fin n₁) E),
+      L.IsLattice E → Function.Injective ι.mulVec → (lowLat ι L).IsLattice E := by
   intro E _ _ n n₁ L ι hL hι
   have hfg : L.FG := Submodule.IsLattice.fg (self := hL)
   refine ⟨?_, ?_⟩

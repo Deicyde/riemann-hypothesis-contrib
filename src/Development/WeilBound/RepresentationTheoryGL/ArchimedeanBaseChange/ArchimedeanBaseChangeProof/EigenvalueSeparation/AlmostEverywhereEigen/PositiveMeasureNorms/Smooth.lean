@@ -15,9 +15,10 @@ theorem smooth : ConvCont → Smooth := by
   set f : ι → X.G → ℂ := fun i x => (lam c₀)⁻¹ * ∑ j, ∫ y, Φ c₀ i j y * u j (x * y) ∂X.μ with hf
   have hcont : ∀ i, Continuous (f i) := fun i =>
     continuous_const.mul (continuous_finsetSum _ fun j _ => hconv X _ _ (hΦ c₀ i j) (hu j))
-  have hae : ∀ i, f i =ᵐ[X.μ] u i := fun i => (heq c₀ i).mono fun x hx => by
-    simp only [hf]
-    rw [hx, ← mul_assoc, inv_mul_cancel₀ hlam, one_mul]
+  have hae : ∀ i, f i =ᵐ[X.μ] u i := fun i =>
+    (heq c₀ i).mono fun x hx => by
+      simp only [hf]
+      rw [hx, ← mul_assoc, inv_mul_cancel₀ hlam, one_mul]
   refine ⟨f, fun i => ⟨hcont i, hae i, fun γ hγ x => ?_⟩, fun c i x => ?_⟩
   · simp only [hf]
     congr 1
@@ -25,7 +26,8 @@ theorem smooth : ConvCont → Smooth := by
     congr 1
     funext y
     rw [mul_assoc, hinv j γ hγ]
-  · have hconv' : ∀ x, ∑ j, ∫ y, Φ c i j y * f j (x * y) ∂X.μ = ∑ j, ∫ y, Φ c i j y * u j (x * y) ∂X.μ := by
+  · have hconv'
+        : ∀ x, ∑ j, ∫ y, Φ c i j y * f j (x * y) ∂X.μ = ∑ j, ∫ y, Φ c i j y * u j (x * y) ∂X.μ := by
       intro x
       refine Finset.sum_congr rfl fun j _ => ?_
       refine integral_congr_ae ?_
@@ -36,7 +38,8 @@ theorem smooth : ConvCont → Smooth := by
     have hc1 : Continuous fun x => ∑ j, ∫ y, Φ c i j y * u j (x * y) ∂X.μ :=
       continuous_finsetSum _ fun j _ => hconv X _ _ (hΦ c i j) (hu j)
     have hc2 : Continuous fun x => lam c * f i x := continuous_const.mul (hcont i)
-    have hae2 : (fun x => ∑ j, ∫ y, Φ c i j y * u j (x * y) ∂X.μ) =ᵐ[X.μ] fun x => lam c * f i x := by
+    have hae2
+        : (fun x => ∑ j, ∫ y, Φ c i j y * u j (x * y) ∂X.μ) =ᵐ[X.μ] fun x => lam c * f i x := by
       filter_upwards [heq c i, hae i] with x h1 h2
       rw [h1, h2]
     have := (Continuous.ae_eq_iff_eq X.μ hc1 hc2).1 hae2

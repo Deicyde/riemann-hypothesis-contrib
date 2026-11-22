@@ -22,7 +22,8 @@ theorem trivial_log_deriv_bound : TrivLogDeriv := by
   have hlq : 0 ≤ Real.log q := Real.log_nonneg hq
   have hT : 0 ≤ Real.log (|t| + 2) := Real.log_nonneg (by linarith [abs_nonneg t])
   have hlog : Real.log ((q : ℝ) * (|t| + 2)) = Real.log q + Real.log (|t| + 2) :=
-    Real.log_mul (by linarith : (0 : ℝ) < q).ne' (by linarith [abs_nonneg t] : (0 : ℝ) < |t| + 2).ne'
+    Real.log_mul (by linarith : (0 : ℝ) < q).ne'
+      (by linarith [abs_nonneg t] : (0 : ℝ) < |t| + 2).ne'
   rw [hlog]
   nlinarith [mul_nonneg hK0 hlq]
 

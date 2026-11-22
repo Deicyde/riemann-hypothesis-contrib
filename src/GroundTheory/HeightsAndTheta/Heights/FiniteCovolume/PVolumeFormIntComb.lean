@@ -9,7 +9,8 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open Module Matrix
 
-variable (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+variable
+  (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   (d : ℕ) [Fact (finrank ℝ V = d)]
 
 theorem VolumeFormIntComb.proof : VolumeFormIntComb.Statement V d := by
@@ -20,14 +21,13 @@ theorem VolumeFormIntComb.proof : VolumeFormIntComb.Statement V d := by
     intro v
     conv_lhs => rw [AlternatingMap.eq_smul_basis_det e o.volumeForm]
     rfl
-  have hmat : e.toMatrix (fun i => ∑ j, (T i j : ℝ) • b j) =
-      e.toMatrix b * (T.map (Int.cast : ℤ → ℝ))ᵀ := by
+  have hmat
+      : e.toMatrix (fun i => ∑ j, (T i j : ℝ) • b j)
+        = e.toMatrix b * (T.map (Int.cast : ℤ → ℝ))ᵀ := by
     ext k i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Basis.toMatrix_apply, Matrix.mul_apply, map_sum, map_smul, Finset.sum_apply,
-      mul_comm]
-  rw [key, key b, Basis.det_apply, Basis.det_apply, hmat, det_mul, det_transpose,
-    Int.cast_det T]
+    simp [Basis.toMatrix_apply, Matrix.mul_apply, map_sum, map_smul, Finset.sum_apply, mul_comm]
+  rw [key, key b, Basis.det_apply, Basis.det_apply, hmat, det_mul, det_transpose, Int.cast_det T]
   ring
 
 end GroundTheory.Heights₂.Heights.FiniteCovolume

@@ -14,15 +14,29 @@ noncomputable section
 
 namespace GlobalTheory
 
-theorem exists_basicOpen_free_avoiding_finite : ∀ {X Y : Scheme.{0}} (f : Y ⟶ X) (n : ℕ) (V : X.Opens), IsAffineOpen V → IsAffineOpen (f ⁻¹ᵁ V) → (letI := (f.app V).hom.toAlgebra; Module.Free Γ(X, V) Γ(Y, f ⁻¹ᵁ V) ∧ Module.Finite Γ(X, V) Γ(Y, f ⁻¹ᵁ V) ∧ Module.finrank Γ(X, V) Γ(Y, f ⁻¹ᵁ V) = n) → ∀ (x : X), x ∈ V → ∀ (T : Set X), T.Finite → (∀ y ∈ T, IsClosed ({y} : Set X)) → x ∉ T → ∃ W : X.Opens, x ∈ W ∧ W ≤ V ∧ (∀ y ∈ T, y ∉ W) ∧ IsAffineOpen W ∧ IsAffineOpen (f ⁻¹ᵁ W) ∧ (letI := (f.app W).hom.toAlgebra; Module.Free Γ(X, W) Γ(Y, f ⁻¹ᵁ W) ∧ Module.Finite Γ(X, W) Γ(Y, f ⁻¹ᵁ W) ∧ Module.finrank Γ(X, W) Γ(Y, f ⁻¹ᵁ W) = n) := by
+theorem exists_basicOpen_free_avoiding_finite
+    : ∀ {X Y : Scheme.{0}} (f : Y ⟶ X) (n : ℕ) (V : X.Opens),
+      IsAffineOpen V → IsAffineOpen (f ⁻¹ᵁ V)
+        → (letI := (f.app V).hom.toAlgebra
+           Module.Free Γ(X, V) Γ(Y, f ⁻¹ᵁ V) ∧ Module.Finite Γ(X, V) Γ(Y, f ⁻¹ᵁ V)
+             ∧ Module.finrank Γ(X, V) Γ(Y, f ⁻¹ᵁ V) = n)
+        → ∀ (x : X),
+          x ∈ V
+            → ∀ (T : Set X),
+              T.Finite → (∀ y ∈ T, IsClosed ({y} : Set X)) → x ∉ T
+                → ∃ W : X.Opens,
+                  x ∈ W ∧ W ≤ V ∧ (∀ y ∈ T, y ∉ W) ∧ IsAffineOpen W ∧ IsAffineOpen (f ⁻¹ᵁ W)
+                    ∧ (letI := (f.app W).hom.toAlgebra
+                       Module.Free Γ(X, W) Γ(Y, f ⁻¹ᵁ W) ∧ Module.Finite Γ(X, W) Γ(Y, f ⁻¹ᵁ W)
+                         ∧ Module.finrank Γ(X, W) Γ(Y, f ⁻¹ᵁ W) = n) := by
   intro X Y f n V hV hV' hfree x hx T hT hcl hxT
   have hTc : IsClosed T := by
     rw [← Set.biUnion_of_singleton T]
     exact hT.isClosed_biUnion hcl
   let O : X.Opens := V ⊓ ⟨Tᶜ, hTc.isOpen_compl⟩
   obtain ⟨a, haO, hxa⟩ := hV.exists_basicOpen_le (V := O) ⟨x, hx, hxT⟩ hx
-  refine ⟨X.basicOpen a, hxa, X.basicOpen_le a, fun y hy hya => (haO hya).2 hy, hV.basicOpen a,
-    ?_, ?_⟩
+  refine
+    ⟨X.basicOpen a, hxa, X.basicOpen_le a, fun y hy hya => (haO hya).2 hy, hV.basicOpen a, ?_, ?_⟩
   · rw [Scheme.preimage_basicOpen]; exact hV'.basicOpen _
   letI : Algebra Γ(X, V) Γ(Y, f ⁻¹ᵁ V) := (f.app V).hom.toAlgebra
   obtain ⟨hF, hFin, hr⟩ := hfree
@@ -37,10 +51,11 @@ theorem exists_basicOpen_free_avoiding_finite : ∀ {X Y : Scheme.{0}} (f : Y �
       (algebraMap Γ(X, V) Γ(Y, f ⁻¹ᵁ V))).toAlgebra
   haveI : IsScalarTower Γ(X, V) Γ(Y, f ⁻¹ᵁ V) Γ(Y, f ⁻¹ᵁ X.basicOpen a) :=
     IsScalarTower.of_algebraMap_eq' rfl
-  have hcomm : (algebraMap Γ(X, X.basicOpen a) Γ(Y, f ⁻¹ᵁ X.basicOpen a)).comp
-      (algebraMap Γ(X, V) Γ(X, X.basicOpen a)) =
-      (algebraMap Γ(Y, f ⁻¹ᵁ V) Γ(Y, f ⁻¹ᵁ X.basicOpen a)).comp
-        (algebraMap Γ(X, V) Γ(Y, f ⁻¹ᵁ V)) :=
+  have hcomm
+      : (algebraMap Γ(X, X.basicOpen a) Γ(Y, f ⁻¹ᵁ X.basicOpen a)).comp
+          (algebraMap Γ(X, V) Γ(X, X.basicOpen a))
+        = (algebraMap Γ(Y, f ⁻¹ᵁ V) Γ(Y, f ⁻¹ᵁ X.basicOpen a)).comp
+          (algebraMap Γ(X, V) Γ(Y, f ⁻¹ᵁ V)) :=
     congrArg CommRingCat.Hom.hom (f.naturality iX.op)
   haveI : IsScalarTower Γ(X, V) Γ(X, X.basicOpen a) Γ(Y, f ⁻¹ᵁ X.basicOpen a) :=
     IsScalarTower.of_algebraMap_eq' hcomm.symm
@@ -56,8 +71,7 @@ theorem exists_basicOpen_free_avoiding_finite : ∀ {X Y : Scheme.{0}} (f : Y �
     isLocalizedModule_iff_isLocalization.mpr this
   have hbc : IsBaseChange Γ(X, X.basicOpen a)
       (IsScalarTower.toAlgHom Γ(X, V) Γ(Y, f ⁻¹ᵁ V) Γ(Y, f ⁻¹ᵁ X.basicOpen a)).toLinearMap :=
-    (isLocalizedModule_iff_isBaseChange (Submonoid.powers a) Γ(X, X.basicOpen a) _).mp
-      inferInstance
+    (isLocalizedModule_iff_isBaseChange (Submonoid.powers a) Γ(X, X.basicOpen a) _).mp inferInstance
   haveI : Nonempty V := ⟨⟨x, hx⟩⟩
   haveI : Nonempty (X.basicOpen a) := ⟨⟨x, hxa⟩⟩
   haveI : Nontrivial Γ(X, V) := Scheme.component_nontrivial X V

@@ -9,7 +9,9 @@ open Matrix
 namespace GlobalTheory
 namespace IwasawaLowerTri
 
-variable (V F : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field F] [Algebra V F] [IsFractionRing V F]
+variable
+  (V F : Type)
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field F] [Algebra V F] [IsFractionRing V F]
 
 lemma permMatrix_map {n : ℕ} (σ : Equiv.Perm (Fin n)) :
     (σ.permMatrix V).map (algebraMap V F) = σ.permMatrix F := by
@@ -76,8 +78,9 @@ lemma clear_last_column {n : ℕ} (A : Matrix (Fin (n+1)) (Fin (n+1)) F) :
     · intro x hx
       simp [E, Matrix.map_apply, Ne.symm hx.1, hx.2]
 
-def blockExt {n : ℕ} (k : Matrix (Fin n) (Fin n) V) : Matrix (Fin (n+1)) (Fin (n+1)) V :=
-  Matrix.reindex finSumFinEquiv finSumFinEquiv (Matrix.fromBlocks k 0 0 (1 : Matrix (Fin 1) (Fin 1) V))
+def blockExt {n : ℕ} (k : Matrix (Fin n) (Fin n) V) : Matrix (Fin (n + 1)) (Fin (n + 1)) V :=
+  Matrix.reindex finSumFinEquiv finSumFinEquiv
+    (Matrix.fromBlocks k 0 0 (1 : Matrix (Fin 1) (Fin 1) V))
 
 lemma blockExt_det {n : ℕ} (k : Matrix (Fin n) (Fin n) V) : (blockExt V k).det = k.det := by
   simp [blockExt, Matrix.det_reindex_self, Matrix.det_fromBlocks_zero₂₁]
@@ -97,9 +100,9 @@ lemma blockExt_mul_apply {n : ℕ} (k : Matrix (Fin n) (Fin n) V) (A : Matrix (F
   simp only [Matrix.mul_apply, Fin.sum_univ_castSucc, Matrix.map_apply, blockExt_cc, blockExt_cl,
     map_zero, zero_mul, add_zero, Matrix.submatrix_apply, id]
 
-theorem iwasawa_lowerTriangular (n : ℕ) (A : Matrix (Fin n) (Fin n) F) :
-    ∃ k : Matrix (Fin n) (Fin n) V, IsUnit k.det ∧
-      ∀ i j, i < j → (k.map (algebraMap V F) * A) i j = 0 := by
+theorem iwasawa_lowerTriangular (n : ℕ) (A : Matrix (Fin n) (Fin n) F)
+    : ∃ k : Matrix (Fin n) (Fin n) V,
+      IsUnit k.det ∧ ∀ i j, i < j → (k.map (algebraMap V F) * A) i j = 0 := by
   induction n with
   | zero => exact ⟨1, by simp, fun i => i.elim0⟩
   | succ n ih =>
@@ -123,6 +126,10 @@ theorem iwasawa_lowerTriangular (n : ℕ) (A : Matrix (Fin n) (Fin n) F) :
 end IwasawaLowerTri
 end GlobalTheory
 
-theorem GlobalTheory.iwasawa_lowerTriangular_of_det :
-    ∀ (V F : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field F] [Algebra V F] [IsFractionRing V F] (n : ℕ) (A : Matrix (Fin n) (Fin n) F), A.det ≠ 0 → ∃ k : Matrix (Fin n) (Fin n) V, IsUnit k.det ∧ ∀ i j, i < j → (k.map (algebraMap V F) * A) i j = 0 :=
+theorem GlobalTheory.iwasawa_lowerTriangular_of_det
+    : ∀ (V F : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field F] [Algebra V F]
+        [IsFractionRing V F] (n : ℕ) (A : Matrix (Fin n) (Fin n) F),
+      A.det ≠ 0
+        → ∃ k : Matrix (Fin n) (Fin n) V,
+          IsUnit k.det ∧ ∀ i j, i < j → (k.map (algebraMap V F) * A) i j = 0 :=
   fun V F _ _ _ _ _ _ n A _ => GlobalTheory.IwasawaLowerTri.iwasawa_lowerTriangular V F n A

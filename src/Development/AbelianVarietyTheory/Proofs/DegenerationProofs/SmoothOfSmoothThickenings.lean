@@ -11,18 +11,23 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsSmoot
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SmoothThickenings
 
-theorem mem_smoothLocus {V : Type} [CommRing V] [IsLocalRing V] [IsNoetherianRing V]
+theorem mem_smoothLocus
+    {V : Type} [CommRing V] [IsLocalRing V] [IsNoetherianRing V]
     (I : Ideal V) (hI : I ≠ ⊤)
     {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of V)) [LocallyOfFinitePresentation f]
     (h : ∀ e, Smooth (pullback.snd f (thick V I e)))
-    (x : X) (hx : f x = IsLocalRing.closedPoint V) : x ∈ f.smoothLocus := by
+    (x : X) (hx : f x = IsLocalRing.closedPoint V)
+    : x ∈ f.smoothLocus := by
   obtain ⟨_, ⟨W, hW, rfl⟩, hxW, -⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
   have hW' : IsAffineOpen W := hW
@@ -46,8 +51,8 @@ theorem mem_smoothLocus {V : Type} [CommRing V] [IsLocalRing V] [IsNoetherianRin
       rw [← hjf]
       exact (congrArg f hpx).trans hx
     exact congrArg PrimeSpectrum.asIdeal h3
-  have hsm : ∀ e : ℕ, Algebra.Smooth (V ⧸ I ^ (e + 1))
-      (TensorProduct V (V ⧸ I ^ (e + 1)) Γ(X, W)) := by
+  have hsm
+      : ∀ e : ℕ, Algebra.Smooth (V ⧸ I ^ (e + 1)) (TensorProduct V (V ⧸ I ^ (e + 1)) Γ(X, W)) := by
     intro e
     have hg : thick V I e = Spec.map (CommRingCat.ofHom (algebraMap V (V ⧸ I ^ (e + 1)))) := by
       unfold thick
@@ -67,33 +72,46 @@ theorem mem_smoothLocus {V : Type} [CommRing V] [IsLocalRing V] [IsNoetherianRin
       infer_instance
     rw [pullbackSpecIso_inv_snd] at h4
     have h5 := (HasRingHomProperty.Spec_iff (P := @Smooth)).mp h4
-    have h6 := RingHom.Smooth.propertyIsLocal.respectsIso.1 _
-      (Algebra.TensorProduct.comm V Γ(X, W) (V ⧸ I ^ (e + 1))).toRingEquiv h5
-    have heq : algebraMap (V ⧸ I ^ (e + 1)) (TensorProduct V (V ⧸ I ^ (e + 1)) Γ(X, W)) =
-        (Algebra.TensorProduct.comm V Γ(X, W) (V ⧸ I ^ (e + 1))).toRingEquiv.toRingHom.comp
-          (Algebra.TensorProduct.includeRight : (V ⧸ I ^ (e + 1)) →ₐ[V] _).toRingHom := by
+    have h6 :=
+      RingHom.Smooth.propertyIsLocal.respectsIso.1 _
+        (Algebra.TensorProduct.comm V Γ(X, W) (V ⧸ I ^ (e + 1))).toRingEquiv h5
+    have heq
+        : algebraMap (V ⧸ I ^ (e + 1)) (TensorProduct V (V ⧸ I ^ (e + 1)) Γ(X, W))
+          = (Algebra.TensorProduct.comm V Γ(X, W) (V ⧸ I ^ (e + 1))).toRingEquiv.toRingHom.comp
+            (Algebra.TensorProduct.includeRight : (V ⧸ I ^ (e + 1)) →ₐ[V] _).toRingHom := by
       ext t
       simp
     rw [← RingHom.smooth_algebraMap, heq]
     exact h6
-  have hq : Algebra.IsSmoothAt V p.asIdeal := GlobalTheory.T.isSmoothAt_of_smooth_mod_ideal_powers V I hI Γ(X, W) hsm p.asIdeal hcomap
+  have hq : Algebra.IsSmoothAt V p.asIdeal :=
+    GlobalTheory.T.isSmoothAt_of_smooth_mod_ideal_powers V I hI Γ(X, W) hsm p.asIdeal hcomap
   rw [Scheme.Hom.mem_smoothLocus, formallySmooth_stalkMap_iff ⊤ (isAffineOpen_top _) W hW' hWle hxW]
   let : Algebra Γ(Spec (CommRingCat.of V), ⊤) Γ(X, W) := ψ.hom.toAlgebra
   show Algebra.FormallySmooth Γ(Spec (CommRingCat.of V), ⊤) (Localization.AtPrime p.asIdeal)
   rw [← RingHom.formallySmooth_algebraMap]
   rw [Algebra.IsSmoothAt, ← RingHom.formallySmooth_algebraMap] at hq
-  have e2 := RingHom.FormallySmooth.respectsIso.2 _
-    (Scheme.ΓSpecIso (CommRingCat.of V)).commRingCatIsoToRingEquiv hq
+  have e2 :=
+    RingHom.FormallySmooth.respectsIso.2 _
+      (Scheme.ΓSpecIso (CommRingCat.of V)).commRingCatIsoToRingEquiv hq
   convert e2 using 1
   ext a
   rw [RingHom.comp_apply,
-    IsScalarTower.algebraMap_apply Γ(Spec (CommRingCat.of V), ⊤) Γ(X, W) (Localization.AtPrime p.asIdeal),
+    IsScalarTower.algebraMap_apply Γ(Spec (CommRingCat.of V), ⊤) Γ(X, W)
+      (Localization.AtPrime p.asIdeal),
     IsScalarTower.algebraMap_apply V Γ(X, W) (Localization.AtPrime p.asIdeal)]
   congr 1
   show ψ a = φ ((Scheme.ΓSpecIso (CommRingCat.of V)).hom a)
   rw [hφ, CommRingCat.comp_apply, Iso.hom_inv_id_apply]
 
-theorem smooth_of_smooth_thickenings : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (I : Ideal R), I ≠ ⊤ → ∀ (B : Over (Spec (CommRingCat.of R))), IsProper B.hom → ∀ (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1))))) (b : ∀ e, (Y e).left ⟶ B.left), (∀ e, IsPullback (b e) (Y e).hom B.hom (thick R I e)) → (∀ e, Smooth (Y e).hom) → Smooth B.hom := by
+theorem smooth_of_smooth_thickenings
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (I : Ideal R),
+      I ≠ ⊤
+        → ∀ (B : Over (Spec (CommRingCat.of R))),
+          IsProper B.hom
+            → ∀ (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))))
+                (b : ∀ e, (Y e).left ⟶ B.left),
+              (∀ e, IsPullback (b e) (Y e).hom B.hom (thick R I e)) → (∀ e, Smooth (Y e).hom)
+                → Smooth B.hom := by
   intro R _ _ _ I hI B _ Y b hpb hY
   have : LocallyOfFinitePresentation B.hom := inferInstance
   rw [← Scheme.Hom.smoothLocus_eq_top_iff]

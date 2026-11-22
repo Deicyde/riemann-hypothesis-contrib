@@ -8,11 +8,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-theorem UpperTheory.V.CA.k_mem :
-    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (x : E), Polynomial.aeval x (D.chi x) ∈ D.CH := by
+theorem UpperTheory.V.CA.k_mem
+    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (x : E),
+      Polynomial.aeval x (D.chi x) ∈ D.CH := by
   intro n A E _ _ _ D x
-  have key : ∀ w ∈ Submodule.span A ((fun z : E => (1 : A) ⊗ₜ[A] z) '' (D.CH : Set E)),
-      Algebra.TensorProduct.lid A E w ∈ D.CH := by
+  have key
+      : ∀ w ∈ Submodule.span A ((fun z : E => (1 : A) ⊗ₜ[A] z) '' (D.CH : Set E)),
+        Algebra.TensorProduct.lid A E w ∈ D.CH := by
     intro w hw
     induction hw using Submodule.span_induction with
     | mem y hy =>

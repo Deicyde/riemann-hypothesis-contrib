@@ -209,7 +209,8 @@ lemma prod_shifted_ratio_bounds (n : ℕ) (μ : Fin n → ℝ) (s : Fin n) (hμ 
   rw [heq, ← hcard]
   exact hc
 
-theorem degree_increment_bound : Formalism.HermitianLatticeCounting.ExpansionTerms.DegStepBound := by
+theorem degree_increment_bound
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.DegStepBound := by
   intro n μ s hμ hint
   refine ⟨fun hinj => prod_shifted_ratio_bounds n μ s hμ hint hinj, fun hinj => ?_⟩
   have hμ' : Function.Injective (-μ) := fun a b h => hμ (neg_injective h)
@@ -222,16 +223,18 @@ theorem degree_increment_bound : Formalism.HermitianLatticeCounting.ExpansionTer
     simp only [Pi.add_apply, Pi.neg_apply, Pi.sub_apply] at h ⊢
     linarith
   have hb := prod_shifted_ratio_bounds n (-μ) s hμ' hint' hinj'
-  have heq : ∏ s' ∈ univ.erase s, ((-μ) s + 1 - (-μ) s') / ((-μ) s - (-μ) s') =
-      ∏ s' ∈ univ.erase s, (μ s - 1 - μ s') / (μ s - μ s') := by
+  have heq
+      : ∏ s' ∈ univ.erase s, ((-μ) s + 1 - (-μ) s') / ((-μ) s - (-μ) s')
+        = ∏ s' ∈ univ.erase s, (μ s - 1 - μ s') / (μ s - μ s') := by
     refine Finset.prod_congr rfl (fun s' _ => ?_)
     simp only [Pi.neg_apply]
-    rw [show -μ s + 1 - -μ s' = -(μ s - 1 - μ s') by ring, show -μ s - -μ s' = -(μ s - μ s') by ring,
-      neg_div_neg_eq]
+    rw [show - μ s + 1 - - μ s' = -(μ s - 1 - μ s') by ring,
+      show - μ s - - μ s' = -(μ s - μ s') by ring, neg_div_neg_eq]
   rw [heq] at hb
   exact hb
 
-theorem degree_set_cardinality_bound : Formalism.HermitianLatticeCounting.ExpansionTerms.DegSetBound := by
+theorem degree_set_cardinality_bound
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.DegSetBound := by
   intro n μ I hμ hint hgap
   classical
   have hanti : ∀ J : Finset (Fin n), StrictAnti (fun a => μ a + if a ∈ J then (1 : ℝ) else 0) := by
@@ -239,8 +242,9 @@ theorem degree_set_cardinality_bound : Formalism.HermitianLatticeCounting.Expans
     have := hgap a b hab
     show μ b + (if b ∈ J then (1 : ℝ) else 0) < μ a + if a ∈ J then (1 : ℝ) else 0
     split_ifs <;> linarith
-  have hintJ : ∀ J : Finset (Fin n), ∀ a b, ∃ m : ℤ,
-      (μ a + if a ∈ J then (1 : ℝ) else 0) - (μ b + if b ∈ J then (1 : ℝ) else 0) = (m : ℝ) := by
+  have hintJ
+      : ∀ J : Finset (Fin n), ∀ a b, ∃ m : ℤ,
+        (μ a + if a ∈ J then (1 : ℝ) else 0) - (μ b + if b ∈ J then (1 : ℝ) else 0) = (m : ℝ) := by
     intro J a b
     obtain ⟨m, hm⟩ := hint a b
     by_cases ha : a ∈ J <;> by_cases hb : b ∈ J
@@ -251,13 +255,13 @@ theorem degree_set_cardinality_bound : Formalism.HermitianLatticeCounting.Expans
   have fμ := Formalism.QuantumDeterminants.fdegPos n μ hμ.injective
   induction I using Finset.induction_on with
   | empty =>
-    have : (fun a => μ a + if a ∈ (∅ : Finset (Fin n)) then (1 : ℝ) else 0) = μ := by
-      funext a; simp
+    have : (fun a => μ a + if a ∈ (∅ : Finset (Fin n)) then (1 : ℝ) else 0) = μ := by funext a; simp
     rw [this, div_self fμ.ne']
     simp
   | insert s J hs ih =>
-    have hstep : (fun a => μ a + if a ∈ insert s J then (1 : ℝ) else 0) =
-        (fun a => μ a + if a ∈ J then (1 : ℝ) else 0) + Pi.single s 1 := by
+    have hstep
+        : (fun a => μ a + if a ∈ insert s J then (1 : ℝ) else 0)
+          = (fun a => μ a + if a ∈ J then (1 : ℝ) else 0) + Pi.single s 1 := by
       funext a
       by_cases ha : a = s
       · subst ha; simp [hs]
@@ -273,11 +277,18 @@ theorem degree_set_cardinality_bound : Formalism.HermitianLatticeCounting.Expans
     have hn : (0 : ℝ) < n := by
       have : 0 < n := Nat.lt_of_le_of_lt (Nat.zero_le _) s.2
       exact_mod_cast this
-    have hprod : Formalism.QuantumDeterminants.fdegHC (ν + Pi.single s 1) / Formalism.QuantumDeterminants.fdegHC μ =
-        (Formalism.QuantumDeterminants.fdegHC (ν + Pi.single s 1) / Formalism.QuantumDeterminants.fdegHC ν) * (Formalism.QuantumDeterminants.fdegHC ν / Formalism.QuantumDeterminants.fdegHC μ) := by
+    have hprod
+        : Formalism.QuantumDeterminants.fdegHC (ν + Pi.single s 1)
+            / Formalism.QuantumDeterminants.fdegHC μ
+          = (Formalism.QuantumDeterminants.fdegHC (ν + Pi.single s 1)
+              / Formalism.QuantumDeterminants.fdegHC ν)
+            * (Formalism.QuantumDeterminants.fdegHC ν
+              / Formalism.QuantumDeterminants.fdegHC μ) := by
       field_simp
     rw [hprod]
-    have hq0 : 0 ≤ Formalism.QuantumDeterminants.fdegHC ν / Formalism.QuantumDeterminants.fdegHC μ := (div_pos fν fμ).le
+    have hq0
+        : 0 ≤ Formalism.QuantumDeterminants.fdegHC ν / Formalism.QuantumDeterminants.fdegHC μ :=
+      (div_pos fν fμ).le
     constructor
     · rw [pow_succ, mul_inv, mul_comm]
       rw [one_div] at hb
@@ -370,12 +381,33 @@ lemma one_le_abs_of_int_ne_zero (y : ℝ) (z : ℤ) (h : y = (z : ℝ)) (hy : y 
     simp [h0]
   exact_mod_cast Int.one_le_abs hz
 
-theorem first_operator_norm_bound : Formalism.HermitianLatticeCounting.ExpansionTerms.supL2RatioMajorant := by
+theorem first_operator_norm_bound
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.supL2RatioMajorant := by
   intro k M lam mu u b bv ga q0 s hk hM hyp hreg
-  obtain ⟨hlam, hlamZ, hluZ, hlu1, hlu2, hcloud, hnode, hlamb, hub, hgap, hga, hmuZ, hmu, hsum, hq1, hq2, hq3⟩ := hyp
+  obtain ⟨
+      hlam,
+      hlamZ,
+      hluZ,
+      hlu1,
+      hlu2,
+      hcloud,
+      hnode,
+      hlamb,
+      hub,
+      hgap,
+      hga,
+      hmuZ,
+      hmu,
+      hsum,
+      hq1,
+      hq2,
+      hq3
+    ⟩ :=
+    hyp
   have hδ0 : ∀ a, 0 ≤ |mu a - lam a| := fun a => abs_nonneg _
   have hδq : ∀ a, |mu a - lam a| ≤ q0 := fun a =>
-    le_trans (Finset.single_le_sum (f := fun a => |mu a - lam a|) (fun a _ => hδ0 a) (mem_univ a)) hsum
+    le_trans (Finset.single_le_sum (f := fun a => |mu a - lam a|) (fun a _ => hδ0 a) (mem_univ a))
+      hsum
   have hq0 : 0 ≤ q0 := le_trans (hδ0 s) (hδq s)
   have hmu1 : ∀ a, mu a ≤ lam a + |mu a - lam a| := fun a => by
     have := le_abs_self (mu a - lam a); linarith
@@ -393,7 +425,8 @@ theorem first_operator_norm_bound : Formalism.HermitianLatticeCounting.Expansion
     have e : a = Fin.castAdd M ⟨(a : ℕ), ha⟩ := Fin.ext rfl
     obtain ⟨z, hz⟩ := hluZ a i
     have h1 : u i < lam a := by rw [e]; exact hlu2 ⟨(a : ℕ), ha⟩ i h
-    have := half_integer_neg_le_neg_half (u i - lam a) (-z - 1) (by push_cast; linarith) (by linarith)
+    have :=
+      half_integer_neg_le_neg_half (u i - lam a) (-z - 1) (by push_cast; linarith) (by linarith)
     linarith
 
   have hbv : 1 ≤ bv := by
@@ -423,20 +456,25 @@ theorem first_operator_norm_bound : Formalism.HermitianLatticeCounting.Expansion
     have h3 := hmu1 s
     have h4 := hmu2 s
     have h5 := hδq s
-    rw [abs_le]; constructor <;> linarith
+    rw [abs_le]
+    constructor <;> linarith
   have hDpos : 0 < ∏ a ∈ univ.erase s, |mu s - 1 - mu a| :=
     Finset.prod_pos fun a ha => lt_of_lt_of_le one_pos (hD a ha)
   have hsumle : ∀ c : ℝ, 0 < c → ∑ a ∈ univ.erase s, 2 * |mu a - lam a| / c ≤ 2 * q0 / c := by
     intro c hc
-    calc ∑ a ∈ univ.erase s, 2 * |mu a - lam a| / c ≤ ∑ a, 2 * |mu a - lam a| / c :=
-          Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) (fun a _ _ => by positivity)
+    calc
+      ∑ a ∈ univ.erase s, 2 * |mu a - lam a| / c ≤ ∑ a, 2 * |mu a - lam a| / c :=
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) (fun a _ _ => by positivity)
       _ = 2 * (∑ a, |mu a - lam a|) / c := by rw [Finset.mul_sum, Finset.sum_div]
       _ ≤ 2 * q0 / c := by gcongr
   rw [div_le_iff₀ hDpos]
   by_cases hs : (s : ℕ) + 1 < k
   · rw [if_pos hs]
-    have above : ∀ (i : Fin k) (a : Fin (k + M)), (a : ℕ) + 1 = (i : ℕ) → (i : ℕ) < (s : ℕ) →
-        |mu s - 1 / 2 - u i| ≤ Real.exp (2 * |mu a - lam a| / (ga / 2)) * |mu s - 1 - mu a| := by
+    have above
+        : ∀ (i : Fin k) (a : Fin (k + M)),
+          (a : ℕ) + 1 = (i : ℕ) → (i : ℕ) < (s : ℕ)
+            → |mu s - 1 / 2 - u i|
+              ≤ Real.exp (2 * |mu a - lam a| / (ga / 2)) * |mu s - 1 - mu a| := by
       intro i a hai his
       have g1 := hgap ⟨(i : ℕ), by have := i.isLt; omega⟩ s (by simp [Fin.lt_def]; exact his) hs
       have f1 := F1 i ⟨(i : ℕ), by have := i.isLt; omega⟩ rfl
@@ -452,11 +490,15 @@ theorem first_operator_norm_bound : Formalism.HermitianLatticeCounting.Expansion
       · linarith
       · exact hδ0 a
       · linarith
-    have below : ∀ (i : Fin k) (a : Fin (k + M)), (a : ℕ) = (i : ℕ) → (s : ℕ) + 2 ≤ (i : ℕ) →
-        |mu s - 1 / 2 - u i| ≤ Real.exp (2 * |mu a - lam a| / (ga / 2)) * |mu s - 1 - mu a| := by
+    have below
+        : ∀ (i : Fin k) (a : Fin (k + M)),
+          (a : ℕ) = (i : ℕ) → (s : ℕ) + 2 ≤ (i : ℕ)
+            → |mu s - 1 / 2 - u i|
+              ≤ Real.exp (2 * |mu a - lam a| / (ga / 2)) * |mu s - 1 - mu a| := by
       intro i a hai his
-      have g1 := hgap s ⟨(i : ℕ) - 1, by have := i.isLt; omega⟩ (by simp [Fin.lt_def]; omega)
-        (by have := i.isLt; simp; omega)
+      have g1 :=
+        hgap s ⟨(i : ℕ) - 1, by have := i.isLt; omega⟩ (by simp [Fin.lt_def]; omega)
+          (by have := i.isLt; simp; omega)
       have f1 := F1 i a hai
       have f2 := F2 i ⟨(i : ℕ) - 1, by have := i.isLt; omega⟩ (by simp; omega)
       have h3 := hmu2 s
@@ -470,70 +512,87 @@ theorem first_operator_norm_bound : Formalism.HermitianLatticeCounting.Expansion
       · linarith
       · exact hδ0 a
       · linarith
-    have key := paired_sum_exp_bound (univ : Finset (Fin k))
-      (univ.filter fun i : Fin k => (1 ≤ (i : ℕ) ∧ (i : ℕ) < (s : ℕ)) ∨ (s : ℕ) + 2 ≤ (i : ℕ))
-      (univ.erase s) (fun i => |mu s - 1 / 2 - u i|) (fun a => |mu s - 1 - mu a|)
-      (fun a => 2 * |mu a - lam a| / (ga / 2))
-      (fun i => ⟨if (i : ℕ) < (s : ℕ) then (i : ℕ) - 1 else (i : ℕ), by
-        have := i.isLt; split_ifs <;> omega⟩) (4 * b) 3 (Finset.subset_univ _)
-      (by
-        intro i hi
-        have h := (Finset.mem_filter.mp hi).2
-        apply Finset.mem_erase.mpr ⟨?_, mem_univ _⟩
-        intro e
-        have e' := congrArg Fin.val e
-        simp only at e'
-        split_ifs at e' <;> omega)
-      (by
-        intro i hi j hj e
-        have h1 := (Finset.mem_filter.mp (Finset.mem_coe.mp hi)).2
-        have h2 := (Finset.mem_filter.mp (Finset.mem_coe.mp hj)).2
-        have e' := congrArg Fin.val e
-        simp only at e'
-        apply Fin.ext
-        split_ifs at e' <;> omega)
-      (fun i _ => abs_nonneg _)
-      (by
-        intro i hi
-        have h := (Finset.mem_filter.mp hi).2
-        by_cases c : (i : ℕ) < (s : ℕ)
-        · apply above i _ _ c
-          simp only [c, if_true]; omega
-        · apply below i _ _ (by omega)
-          simp only [c, if_false])
-      (fun i _ => hN i) (by linarith)
-      (by
-        have hsub : (univ : Finset (Fin k)) \
-            (univ.filter fun i : Fin k => (1 ≤ (i : ℕ) ∧ (i : ℕ) < (s : ℕ)) ∨ (s : ℕ) + 2 ≤ (i : ℕ)) ⊆
-            {(⟨0, by omega⟩ : Fin k), ⟨(s : ℕ), by omega⟩, ⟨(s : ℕ) + 1, hs⟩} := by
+    have key :=
+      paired_sum_exp_bound (univ : Finset (Fin k))
+        (univ.filter fun i : Fin k => (1 ≤ (i : ℕ) ∧ (i : ℕ) < (s : ℕ)) ∨ (s : ℕ) + 2 ≤ (i : ℕ))
+        (univ.erase s)
+        (fun i => |mu s - 1 / 2 - u i|)
+        (fun a => |mu s - 1 - mu a|)
+        (fun a => 2 * |mu a - lam a| / (ga / 2))
+        (fun i => ⟨
+          if (i : ℕ) < (s : ℕ) then (i : ℕ) - 1 else (i : ℕ),
+          by have := i.isLt; split_ifs <;> omega
+        ⟩)
+        (4 * b) 3 (Finset.subset_univ _)
+        (by
           intro i hi
-          have h := (Finset.mem_sdiff.mp hi).2
-          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at h
-          simp only [Finset.mem_insert, Finset.mem_singleton, Fin.ext_iff]
-          omega
-        exact le_trans (Finset.card_le_card hsub) Finset.card_le_three)
-      hD (fun a _ => by positivity)
+          have h := (Finset.mem_filter.mp hi).2
+          apply Finset.mem_erase.mpr ⟨?_, mem_univ _⟩
+          intro e
+          have e' := congrArg Fin.val e
+          simp only at e'
+          split_ifs at e' <;> omega)
+        (by
+          intro i hi j hj e
+          have h1 := (Finset.mem_filter.mp (Finset.mem_coe.mp hi)).2
+          have h2 := (Finset.mem_filter.mp (Finset.mem_coe.mp hj)).2
+          have e' := congrArg Fin.val e
+          simp only at e'
+          apply Fin.ext
+          split_ifs at e' <;> omega)
+        (fun i _ => abs_nonneg _)
+        (by
+          intro i hi
+          have h := (Finset.mem_filter.mp hi).2
+          by_cases c : (i : ℕ) < (s : ℕ)
+          · apply above i _ _ c
+            simp only [c, if_true]
+            omega
+          · apply below i _ _ (by omega)
+            simp only [c, if_false])
+        (fun i _ => hN i)
+        (by linarith)
+        (by
+          have hsub
+              : (univ : Finset (Fin k))
+                  \ (univ.filter fun i : Fin k =>
+                    (1 ≤ (i : ℕ) ∧ (i : ℕ) < (s : ℕ)) ∨ (s : ℕ) + 2 ≤ (i : ℕ))
+                ⊆ {(⟨0, by omega⟩ : Fin k), ⟨(s : ℕ), by omega⟩, ⟨(s : ℕ) + 1, hs⟩} := by
+            intro i hi
+            have h := (Finset.mem_sdiff.mp hi).2
+            simp only [Finset.mem_filter, Finset.mem_univ, true_and] at h
+            simp only [Finset.mem_insert, Finset.mem_singleton, Fin.ext_iff]
+            omega
+          exact le_trans (Finset.card_le_card hsub) Finset.card_le_three)
+        hD
+        (fun a _ => by positivity)
     have hS := hsumle (ga / 2) (by linarith)
-    have hS2 : 2 * q0 / (ga / 2) ≤ 1 := by
-      rw [div_le_iff₀ (by linarith)]; linarith
+    have hS2 : 2 * q0 / (ga / 2) ≤ 1 := by rw [div_le_iff₀ (by linarith)]; linarith
     have hexp : Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (ga / 2)) ≤ Real.exp 1 :=
       Real.exp_le_exp.mpr (le_trans hS hS2)
-    have hsq : 1 ≤ Real.sqrt k := by
-      rw [Real.one_le_sqrt]; exact_mod_cast hk
-    calc ∏ i, |mu s - 1 / 2 - u i|
-        ≤ (4 * b) ^ 3 * Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (ga / 2)) *
-          ∏ a ∈ univ.erase s, |mu s - 1 - mu a| := key
+    have hsq : 1 ≤ Real.sqrt k := by rw [Real.one_le_sqrt]; exact_mod_cast hk
+    calc
+      ∏ i, |mu s - 1 / 2 - u i|
+          ≤ (4 * b) ^ 3 * Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (ga / 2))
+            * ∏ a ∈ univ.erase s, |mu s - 1 - mu a| :=
+        key
       _ ≤ 64 * Real.exp 1 * Real.sqrt k * b ^ 3 * ∏ a ∈ univ.erase s, |mu s - 1 - mu a| := by
-          apply mul_le_mul_of_nonneg_right _ hDpos.le
-          have h1 : (4 * b) ^ 3 * Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (ga / 2)) ≤
-              (4 * b) ^ 3 * Real.exp 1 := mul_le_mul_of_nonneg_left hexp (by positivity)
-          have h2 : (4 * b) ^ 3 * Real.exp 1 * 1 ≤ (4 * b) ^ 3 * Real.exp 1 * Real.sqrt k :=
-            mul_le_mul_of_nonneg_left hsq (by positivity)
-          calc _ ≤ (4 * b) ^ 3 * Real.exp 1 * Real.sqrt k := by linarith
-            _ = 64 * Real.exp 1 * Real.sqrt k * b ^ 3 := by ring
+        apply mul_le_mul_of_nonneg_right _ hDpos.le
+        have h1
+            : (4 * b) ^ 3 * Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (ga / 2))
+              ≤ (4 * b) ^ 3 * Real.exp 1 :=
+          mul_le_mul_of_nonneg_left hexp (by positivity)
+        have h2 : (4 * b) ^ 3 * Real.exp 1 * 1 ≤ (4 * b) ^ 3 * Real.exp 1 * Real.sqrt k :=
+          mul_le_mul_of_nonneg_left hsq (by positivity)
+        calc
+          _ ≤ (4 * b) ^ 3 * Real.exp 1 * Real.sqrt k := by linarith
+          _ = 64 * Real.exp 1 * Real.sqrt k * b ^ 3 := by ring
   · rw [if_neg hs]
-    have above : ∀ (i : Fin k) (a : Fin (k + M)), (a : ℕ) + 1 = (i : ℕ) → (i : ℕ) + 1 < k →
-        |mu s - 1 / 2 - u i| ≤ Real.exp (2 * |mu a - lam a| / (bv / 2)) * |mu s - 1 - mu a| := by
+    have above
+        : ∀ (i : Fin k) (a : Fin (k + M)),
+          (a : ℕ) + 1 = (i : ℕ) → (i : ℕ) + 1 < k
+            → |mu s - 1 / 2 - u i|
+              ≤ Real.exp (2 * |mu a - lam a| / (bv / 2)) * |mu s - 1 - mu a| := by
       intro i a hai hik
       have g1 := hcloud ⟨(i : ℕ), by have := i.isLt; omega⟩ hik
       have g2 := hnode s (by omega)
@@ -550,60 +609,71 @@ theorem first_operator_norm_bound : Formalism.HermitianLatticeCounting.Expansion
       · linarith [g1.1, g2.2]
       · exact hδ0 a
       · linarith [g1.1, g2.2]
-    have key := paired_sum_exp_bound (univ : Finset (Fin k))
-      (univ.filter fun i : Fin k => 1 ≤ (i : ℕ) ∧ (i : ℕ) + 1 < k)
-      (univ.erase s) (fun i => |mu s - 1 / 2 - u i|) (fun a => |mu s - 1 - mu a|)
-      (fun a => 2 * |mu a - lam a| / (bv / 2))
-      (fun i => ⟨(i : ℕ) - 1, by have := i.isLt; omega⟩) (4 * b) 2 (Finset.subset_univ _)
-      (by
-        intro i hi
-        have h := (Finset.mem_filter.mp hi).2
-        apply Finset.mem_erase.mpr ⟨?_, mem_univ _⟩
-        intro e
-        have e' := congrArg Fin.val e
-        simp only at e'
-        omega)
-      (by
-        intro i hi j hj e
-        have h1 := (Finset.mem_filter.mp (Finset.mem_coe.mp hi)).2
-        have h2 := (Finset.mem_filter.mp (Finset.mem_coe.mp hj)).2
-        have e' := congrArg Fin.val e
-        simp only at e'
-        apply Fin.ext
-        omega)
-      (fun i _ => abs_nonneg _)
-      (by
-        intro i hi
-        have h := (Finset.mem_filter.mp hi).2
-        apply above i _ _ h.2
-        simp only; omega)
-      (fun i _ => hN i) (by linarith)
-      (by
-        have hsub : (univ : Finset (Fin k)) \
-            (univ.filter fun i : Fin k => 1 ≤ (i : ℕ) ∧ (i : ℕ) + 1 < k) ⊆
-            {(⟨0, by omega⟩ : Fin k), ⟨k - 1, by omega⟩} := by
+    have key :=
+      paired_sum_exp_bound (univ : Finset (Fin k))
+        (univ.filter fun i : Fin k => 1 ≤ (i : ℕ) ∧ (i : ℕ) + 1 < k) (univ.erase s)
+        (fun i => |mu s - 1 / 2 - u i|)
+        (fun a => |mu s - 1 - mu a|)
+        (fun a => 2 * |mu a - lam a| / (bv / 2))
+        (fun i => ⟨(i : ℕ) - 1, by have := i.isLt; omega⟩)
+        (4 * b) 2 (Finset.subset_univ _)
+        (by
           intro i hi
-          have h := (Finset.mem_sdiff.mp hi).2
-          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at h
-          simp only [Finset.mem_insert, Finset.mem_singleton, Fin.ext_iff]
-          have := i.isLt
-          omega
-        exact le_trans (Finset.card_le_card hsub) Finset.card_le_two)
-      hD (fun a _ => by positivity)
+          have h := (Finset.mem_filter.mp hi).2
+          apply Finset.mem_erase.mpr ⟨?_, mem_univ _⟩
+          intro e
+          have e' := congrArg Fin.val e
+          simp only at e'
+          omega)
+        (by
+          intro i hi j hj e
+          have h1 := (Finset.mem_filter.mp (Finset.mem_coe.mp hi)).2
+          have h2 := (Finset.mem_filter.mp (Finset.mem_coe.mp hj)).2
+          have e' := congrArg Fin.val e
+          simp only at e'
+          apply Fin.ext
+          omega)
+        (fun i _ => abs_nonneg _)
+        (by
+          intro i hi
+          have h := (Finset.mem_filter.mp hi).2
+          apply above i _ _ h.2
+          simp only
+          omega)
+        (fun i _ => hN i)
+        (by linarith)
+        (by
+          have hsub
+              : (univ : Finset (Fin k))
+                  \ (univ.filter fun i : Fin k => 1 ≤ (i : ℕ) ∧ (i : ℕ) + 1 < k)
+                ⊆ {(⟨0, by omega⟩ : Fin k), ⟨k - 1, by omega⟩} := by
+            intro i hi
+            have h := (Finset.mem_sdiff.mp hi).2
+            simp only [Finset.mem_filter, Finset.mem_univ, true_and] at h
+            simp only [Finset.mem_insert, Finset.mem_singleton, Fin.ext_iff]
+            have := i.isLt
+            omega
+          exact le_trans (Finset.card_le_card hsub) Finset.card_le_two)
+        hD
+        (fun a _ => by positivity)
     have hS := hsumle (bv / 2) (by linarith)
-    have hS2 : 2 * q0 / (bv / 2) ≤ 1 := by
-      rw [div_le_iff₀ (by linarith)]; linarith
+    have hS2 : 2 * q0 / (bv / 2) ≤ 1 := by rw [div_le_iff₀ (by linarith)]; linarith
     have hexp : Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (bv / 2)) ≤ Real.exp 1 :=
       Real.exp_le_exp.mpr (le_trans hS hS2)
-    calc ∏ i, |mu s - 1 / 2 - u i|
-        ≤ (4 * b) ^ 2 * Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (bv / 2)) *
-          ∏ a ∈ univ.erase s, |mu s - 1 - mu a| := key
+    calc
+      ∏ i, |mu s - 1 / 2 - u i|
+          ≤ (4 * b) ^ 2 * Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (bv / 2))
+            * ∏ a ∈ univ.erase s, |mu s - 1 - mu a| :=
+        key
       _ ≤ 16 * Real.exp 1 * b ^ 2 * ∏ a ∈ univ.erase s, |mu s - 1 - mu a| := by
-          apply mul_le_mul_of_nonneg_right _ hDpos.le
-          have h1 : (4 * b) ^ 2 * Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (bv / 2)) ≤
-              (4 * b) ^ 2 * Real.exp 1 := mul_le_mul_of_nonneg_left hexp (by positivity)
-          calc _ ≤ (4 * b) ^ 2 * Real.exp 1 := h1
-            _ = 16 * Real.exp 1 * b ^ 2 := by ring
+        apply mul_le_mul_of_nonneg_right _ hDpos.le
+        have h1
+            : (4 * b) ^ 2 * Real.exp (∑ a ∈ univ.erase s, 2 * |mu a - lam a| / (bv / 2))
+              ≤ (4 * b) ^ 2 * Real.exp 1 :=
+          mul_le_mul_of_nonneg_left hexp (by positivity)
+        calc
+          _ ≤ (4 * b) ^ 2 * Real.exp 1 := h1
+          _ = 16 * Real.exp 1 * b ^ 2 := by ring
 
 end G6
 

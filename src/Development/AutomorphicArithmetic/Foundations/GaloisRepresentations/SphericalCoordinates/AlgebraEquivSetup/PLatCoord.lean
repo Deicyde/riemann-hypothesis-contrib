@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo
+  GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  UpperTheory.Gal.W2.Seed
 open UpperTheory.Gal.CertificateRingHomMap (GUf Gam0 AfQ Plc sim mat comp rat lev ZU)
 open scoped TensorProduct
 
@@ -61,8 +63,8 @@ private lemma beta_rep (rep : Matrix (Fin n) (Fin n) E →ₐ[ℚ] Module.End �
     have h3 : β (rep x (1 ⊗ₜ v)) = x *ᵥ β (1 ⊗ₜ v) := smul_right_injective _ hmq key
     rw [hq, map_smul, map_smul, map_smul, mulVec_smul, h3]
 
-private def nu (R : Type) [CommRing R] [Algebra ℚ R] (β : ℚ ⊗[ℤ] (Fin n → 𝓞 E) ≃ₗ[ℚ] (Fin n → E)) :
-    R ⊗[ℚ] (ℚ ⊗[ℤ] (Fin n → 𝓞 E)) ≃+ (Fin n → R ⊗[ℚ] E) :=
+private def nu (R : Type) [CommRing R] [Algebra ℚ R] (β : ℚ ⊗[ℤ] (Fin n → 𝓞 E) ≃ₗ[ℚ] (Fin n → E))
+    : R ⊗[ℚ] (ℚ ⊗[ℤ] (Fin n → 𝓞 E)) ≃+ (Fin n → R ⊗[ℚ] E) :=
   ((TensorProduct.congr (LinearEquiv.refl ℚ R) β).trans
     (TensorProduct.piRight ℚ ℚ R (fun _ : Fin n => E))).toAddEquiv
 
@@ -148,8 +150,7 @@ namespace UpperTheory.Gal.W2.Seed
 
 open LatticeTensorCoordinates
 
-theorem pLatCoord :
-    RepLaws → LatCoord := by
+theorem pLatCoord : RepLaws → LatCoord := by
   intro _ E _ _ _ A n p _ S μ hμ
   obtain ⟨β, hβ⟩ := pRepEx E n
   have hr : ∀ x z, β (S.L.rep x z) = x *ᵥ β z := beta_rep S.L.rep S.L_rep β hβ

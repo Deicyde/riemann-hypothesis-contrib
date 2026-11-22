@@ -13,16 +13,19 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.FlDeg
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
-open GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Inter
-open GroundTheory.Heights₂.Heights.LowerBoundFree.FlagRatioTrdeg GroundTheory.Heights₂.Heights.LowerBoundFree.FlagArithVar
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Inter
+open GroundTheory.Heights₂.Heights.LowerBoundFree.FlagRatioTrdeg
+  GroundTheory.Heights₂.Heights.LowerBoundFree.FlagArithVar
 
-theorem pivotRatio_algebraicIndependent (F : Type) [Field F] (Ψ : Type) (n : ℕ) :
-    AlgebraicIndependent F (pivotRatio F Ψ n) := by
+theorem pivotRatio_algebraicIndependent (F : Type) [Field F] (Ψ : Type) (n : ℕ)
+    : AlgebraicIndependent F (pivotRatio F Ψ n) := by
   classical
   have hy := pivot_indep F Ψ n
-  let δ : PivotIdxLe Ψ n → PivotIdxLe Ψ n :=
-    fun q => (q.1, ⟨q.2.1, ⟨Fin.castLE (Nat.sub_le n 1) q.2.1, by simp⟩⟩)
+  let δ : PivotIdxLe Ψ n → PivotIdxLe Ψ n := fun q =>
+    (q.1, ⟨q.2.1, ⟨Fin.castLE (Nat.sub_le n 1) q.2.1, by simp⟩⟩)
   have hz := ratio_indep F hy δ (fun q => rfl)
   let incl : PivotIdx Ψ n → PivotIdxLe Ψ n := fun q => (q.1, ⟨q.2.1, ⟨q.2.2.1, q.2.2.2.le⟩⟩)
   have hincl : Function.Injective incl := by
@@ -33,9 +36,15 @@ theorem pivotRatio_algebraicIndependent (F : Type) [Field F] (Ψ : Type) (n : �
     simp only [heq_eq_eq, Subtype.mk.injEq] at h2
     subst h2
     rfl
-  have hrat : (fun q : PivotIdxLe Ψ n => if δ q = q then pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1 else
-      pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1 / pivotMinor (genMatFr F Ψ n (δ q).1) (δ q).2.1 (δ q).2.2.1) ∘
-        incl = pivotRatio F Ψ n := by
+  have hrat
+      : (fun q : PivotIdxLe Ψ n =>
+            if δ q = q then
+              pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1
+            else
+              pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1
+                / pivotMinor (genMatFr F Ψ n (δ q).1) (δ q).2.1 (δ q).2.2.1)
+          ∘ incl
+        = pivotRatio F Ψ n := by
     funext q
     have hne : δ (incl q) ≠ incl q := by
       intro h
@@ -47,13 +56,20 @@ theorem pivotRatio_algebraicIndependent (F : Type) [Field F] (Ψ : Type) (n : �
     rfl
   exact hrat ▸ hz.comp incl hincl
 
-theorem flag_mem_of_le (F : Type) [Field F] {K : Type} [Field K] [Algebra F K] {m : ℕ}
-    (g : Matrix (Fin m) (Fin m) K) (A : IntermediateField F K) (hL : ∀ a, leadMinor g a ≠ 0)
+theorem flag_mem_of_le
+    (F : Type) [Field F]
+    {K : Type} [Field K] [Algebra F K]
+    {m : ℕ} (g : Matrix (Fin m) (Fin m) K)
+    (A : IntermediateField F K)
+    (hL : ∀ a, leadMinor g a ≠ 0)
     (j : Fin (m - 1))
-    (hA : ∀ (a : Fin (m - 1)) (b : Fin m), (a : ℕ) ≤ j → (a : ℕ) < b → pivotMinor g a b / leadMinor g a ∈ A)
-    (S : PluckerBlocks m m j) : flagMinor g j S / leadMinor g j ∈ A := by
+    (hA : ∀ (a : Fin (m - 1)) (b : Fin m),
+      (a : ℕ) ≤ j → (a : ℕ) < b → pivotMinor g a b / leadMinor g a ∈ A)
+    (S : PluckerBlocks m m j)
+    : flagMinor g j S / leadMinor g j ∈ A := by
   have hj : (j : ℕ) + 1 ≤ m := by have := j.2; omega
-  have hent : ∀ (a : Fin (m - 1)) (b : Fin m), (a : ℕ) ≤ j → pivotMinor g a b / leadMinor g a ∈ A := by
+  have hent
+      : ∀ (a : Fin (m - 1)) (b : Fin m), (a : ℕ) ≤ j → pivotMinor g a b / leadMinor g a ∈ A := by
     intro a b haj
     rcases lt_trichotomy (b : ℕ) a with h | h | h
     · rw [pivotMinor_eq_zero g a b h, zero_div]
@@ -64,19 +80,24 @@ theorem flag_mem_of_le (F : Type) [Field F] {K : Type} [Field K] [Algebra F K] {
       rw [div_self (hL a)]
       exact A.one_mem
     · exact hA a b haj h
-  let U : Matrix (Fin (j + 1)) (Fin (j + 1)) K := Matrix.of fun r s =>
-    pivotMinor g ⟨r, by have := r.2; have := j.2; omega⟩ (S.1.orderEmbOfFin S.2 s) /
-      leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩
-  have hP : (pivotMatrix g).submatrix (Fin.castLE hj) (S.1.orderEmbOfFin S.2) =
-      Matrix.diagonal (fun r : Fin (j + 1) => leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩) * U := by
+  let U : Matrix (Fin (j + 1)) (Fin (j + 1)) K :=
+    Matrix.of fun r s =>
+      pivotMinor g ⟨r, by have := r.2; have := j.2; omega⟩ (S.1.orderEmbOfFin S.2 s)
+        / leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩
+  have hP
+      : (pivotMatrix g).submatrix (Fin.castLE hj) (S.1.orderEmbOfFin S.2)
+        = Matrix.diagonal (fun r : Fin (j + 1) =>
+            leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩)
+          * U := by
     ext r s
     rw [Matrix.diagonal_mul]
     simp only [Matrix.submatrix_apply, pivotMatrix, Matrix.of_apply, U]
     rw [dite_eq_left (by simp only [Fin.val_castLE]; have := r.2; have := j.2; omega)]
     rw [mul_div_cancel₀ _ (hL _)]
     rfl
-  have hdet : flagMinor (pivotMatrix g) j S =
-      (∏ r : Fin (j + 1), leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩) * U.det := by
+  have hdet
+      : flagMinor (pivotMatrix g) j S
+        = (∏ r : Fin (j + 1), leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩) * U.det := by
     unfold flagMinor
     rw [hP, Matrix.det_mul, Matrix.det_diagonal]
   have hid := FlagPivotIdentity.proof K m g j S
@@ -98,8 +119,8 @@ abbrev PivPos (j : K → FlBlock Ψ N) : Type := Σ k : K, {b : Fin N // ((j k).
 
 def pivPosIncl (j : K → FlBlock Ψ N) (x : PivPos j) : PivotIdx Ψ N := ((j x.1).1, ⟨(j x.1).2, x.2⟩)
 
-theorem pivPosIncl_injective {j : K → FlBlock Ψ N} (hj : Function.Injective j) :
-    Function.Injective (pivPosIncl j) := by
+theorem pivPosIncl_injective {j : K → FlBlock Ψ N} (hj : Function.Injective j)
+    : Function.Injective (pivPosIncl j) := by
   rintro ⟨k, b, hb⟩ ⟨k', b', hb'⟩ h
   simp only [pivPosIncl, Prod.mk.injEq, Sigma.mk.inj_iff] at h
   obtain ⟨h0, h1, h2⟩ := h
@@ -113,25 +134,29 @@ theorem card_pivPos [Fintype K] (j : K → FlBlock Ψ N) : Fintype.card (PivPos 
   rw [Fintype.card_sigma, cellDim]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Fintype.card_subtype]
-  have : (Finset.univ.filter fun b : Fin N => ((j k).2 : ℕ) < b) =
-      Finset.Ioi (Fin.castLE (Nat.sub_le N 1) (j k).2) := by
+  have : (Finset.univ.filter fun b : Fin N => ((j k).2 : ℕ) < b)
+      = Finset.Ioi (Fin.castLE (Nat.sub_le N 1) (j k).2) := by
     ext b
     simp [Fin.lt_def]
   rw [this, Fin.card_Ioi]
   simp
 
-theorem pivotRatio_algebraicIndependent_of_eq (Ψ : Type) (N : ℕ) (I : Algebra ℚ (ΩFl Ψ N))
-    (hI : I = OreLocalization.instAlgebra) :
-    @AlgebraicIndependent _ ℚ (ΩFl Ψ N) (pivotRatio ℚ Ψ N) _ _ I := by
+theorem pivotRatio_algebraicIndependent_of_eq
+    (Ψ : Type) (N : ℕ) (I : Algebra ℚ (ΩFl Ψ N)) (hI : I = OreLocalization.instAlgebra)
+    : @AlgebraicIndependent _ ℚ (ΩFl Ψ N) (pivotRatio ℚ Ψ N) _ _ I := by
   subst hI
   exact pivotRatio_algebraicIndependent ℚ Ψ N
 
-theorem pivotRatio_rat_algebraicIndependent (Ψ : Type) (N : ℕ) :
-    AlgebraicIndependent ℚ (pivotRatio ℚ Ψ N : PivotIdx Ψ N → ΩFl Ψ N) :=
+theorem pivotRatio_rat_algebraicIndependent (Ψ : Type) (N : ℕ)
+    : AlgebraicIndependent ℚ (pivotRatio ℚ Ψ N : PivotIdx Ψ N → ΩFl Ψ N) :=
   pivotRatio_algebraicIndependent_of_eq Ψ N _ (Subsingleton.elim _ _)
 
-theorem isArithVar_pPart (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (K : Type) [Fintype K] [Nonempty K]
-    (j : K → FlBlock Ψ N) (hj : IsChain j) : IsArithVar (PPart j) (cellDim j + 1) := by
+theorem isArithVar_pPart
+    (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ]
+    (N : ℕ)
+    (K : Type) [Fintype K] [Nonempty K]
+    (j : K → FlBlock Ψ N) (hj : IsChain j)
+    : IsArithVar (PPart j) (cellDim j + 1) := by
   classical
   let e : PivPos j ≃ Fin (cellDim j) := Fintype.equivFinOfCardEq (card_pivPos j)
   let t : Fin (cellDim j) → ΩFl Ψ N := fun i => pivotRatio ℚ Ψ N (pivPosIncl j (e.symm i))
@@ -150,7 +175,8 @@ theorem isArithVar_pPart (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (K 
     refine IntermediateField.subset_adjoin ℚ _ ?_
     show pivotRatio ℚ Ψ N (pivPosIncl j (e.symm i)) ∈ coneRatios (yPart j) c
     obtain ⟨k, b, hb⟩ := e.symm i
-    let S : PluckerBlocks N N (j k).2 := ⟨Finset.univ.image (pivotCols (j k).2 b), card_image_pivotCols _ b hb.le⟩
+    let S : PluckerBlocks N N (j k).2 :=
+      ⟨Finset.univ.image (pivotCols (j k).2 b), card_image_pivotCols _ b hb.le⟩
     refine ⟨⟨k, ⟨S.1.orderEmbOfFin S.2, (S.1.orderEmbOfFin S.2).strictMono⟩⟩, ?_⟩
     have h1 := flagMinor_eq_yFl Ψ N (j k).1 (j k).2 S
     have h2 := pivotMinor_eq_flagMinor (genMatFr ℚ Ψ N (j k).1) (j k).2 b hb.le
@@ -161,15 +187,21 @@ theorem isArithVar_pPart (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (K 
     rw [h3]
     congr 1
     exact h1.symm.trans h2.symm
-  have halg : ∀ r ∈ coneRatios (yPart j) c, IsAlgebraic (IntermediateField.adjoin ℚ (Set.range t)) r := by
+  have halg
+      : ∀ r ∈ coneRatios (yPart j) c, IsAlgebraic (IntermediateField.adjoin ℚ (Set.range t)) r := by
     rintro _ ⟨⟨k, A⟩, rfl⟩
-    have hT : ∀ (k' : K) (b : Fin N) (h : ((j k').2 : ℕ) < b),
-        pivotMinor (genMatFr ℚ Ψ N (j k').1) (j k').2 b / leadMinor (genMatFr ℚ Ψ N (j k').1) (j k').2 ∈
-          IntermediateField.adjoin ℚ (Set.range t) := fun k' b h =>
-      IntermediateField.subset_adjoin ℚ _ ⟨e ⟨k', b, h⟩, by
-        show pivotRatio ℚ Ψ N (pivPosIncl j (e.symm (e ⟨k', b, h⟩))) = _
-        rw [e.symm_apply_apply]
-        rfl⟩
+    have hT
+        : ∀ (k' : K) (b : Fin N) (h : ((j k').2 : ℕ) < b),
+          pivotMinor (genMatFr ℚ Ψ N (j k').1) (j k').2 b
+              / leadMinor (genMatFr ℚ Ψ N (j k').1) (j k').2
+            ∈ IntermediateField.adjoin ℚ (Set.range t) := fun k' b h =>
+      IntermediateField.subset_adjoin ℚ _ ⟨
+        e ⟨k', b, h⟩,
+        by
+          show pivotRatio ℚ Ψ N (pivPosIncl j (e.symm (e ⟨k', b, h⟩))) = _
+          rw [e.symm_apply_apply]
+          rfl
+      ⟩
     have hm : yPart j ⟨k, A⟩ / yPart j ⟨k, c k⟩ ∈ IntermediateField.adjoin ℚ (Set.range t) := by
       show yFl Ψ N ⟨j k, A⟩ / yFl Ψ N ⟨j k, leadIdx Ψ N (j k)⟩ ∈ _
       rw [yFl_lead, yFl_eq_flagMinor]

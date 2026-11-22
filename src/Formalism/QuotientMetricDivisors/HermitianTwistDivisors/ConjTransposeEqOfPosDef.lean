@@ -16,8 +16,9 @@ namespace R0
 
 variable {K : Type} [Field K] [StarRing K]
 
-theorem map_inv_field {F : Type} [Field F] (f : K →+* F) {ι : Type} [Fintype ι] [DecidableEq ι]
-    (A : Matrix ι ι K) : A⁻¹.map f = (A.map f)⁻¹ := by
+theorem map_inv_field
+    {F : Type} [Field F] (f : K →+* F) {ι : Type} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι K)
+    : A⁻¹.map f = (A.map f)⁻¹ := by
   have hdet : (A.map f).det = f A.det := (RingHom.map_det f A).symm
   by_cases h : IsUnit A.det
   · symm
@@ -30,14 +31,19 @@ theorem map_inv_field {F : Type} [Field F] (f : K →+* F) {ι : Type} [Fintype 
     rw [Matrix.nonsing_inv_apply_not_isUnit _ h, Matrix.nonsing_inv_apply_not_isUnit _ h',
       Matrix.map_zero _ f.map_zero]
 
-theorem conjTranspose_map (σ : K →+* ℂ) (hσ : ∀ a : K, σ (star a) = starRingEnd ℂ (σ a))
-    {m n : Type} (A : Matrix m n K) : Aᴴ.map σ = (A.map σ)ᴴ := by
+theorem conjTranspose_map
+    (σ : K →+* ℂ) (hσ : ∀ a : K, σ (star a) = starRingEnd ℂ (σ a)) {m n : Type} (A : Matrix m n K)
+    : Aᴴ.map σ = (A.map σ)ᴴ := by
   ext i j
-  rw [Matrix.map_apply, Matrix.conjTranspose_apply, Matrix.conjTranspose_apply, Matrix.map_apply, hσ]
+  rw [Matrix.map_apply, Matrix.conjTranspose_apply, Matrix.conjTranspose_apply, Matrix.map_apply,
+    hσ]
   rfl
 
-theorem conjTranspose_eq_of_posDef [NumberField K] (v0 : InfinitePlace K) (hv0 : IsConjAt v0)
-    {n : ℕ} (H : Matrix (Fin n) (Fin n) K) (hH : (H.map v0.embedding).PosDef) : Hᴴ = H := by
+theorem conjTranspose_eq_of_posDef
+    [NumberField K]
+    (v0 : InfinitePlace K) (hv0 : IsConjAt v0)
+    {n : ℕ} (H : Matrix (Fin n) (Fin n) K) (hH : (H.map v0.embedding).PosDef)
+    : Hᴴ = H := by
   have h1 := conjTranspose_map v0.embedding hv0 H
   have h2 : (H.map v0.embedding)ᴴ = H.map v0.embedding := hH.isHermitian
   ext i j
@@ -45,15 +51,15 @@ theorem conjTranspose_eq_of_posDef [NumberField K] (v0 : InfinitePlace K) (hv0 :
   simp only [Matrix.map_apply] at h3
   exact v0.embedding.injective h3
 
-theorem gramMat_conjTranspose {D m : ℕ} (Γ : Matrix (Fin D) (Fin D) K) (hΓ : Γᴴ = Γ)
-    (e : Fin m → Fin D → K) :
-    (Matrix.of fun a b => star (e a) ⬝ᵥ Γ.mulVec (e b))ᴴ =
-      Matrix.of fun a b => star (e a) ⬝ᵥ Γ.mulVec (e b) := by
+theorem gramMat_conjTranspose
+    {D m : ℕ} (Γ : Matrix (Fin D) (Fin D) K) (hΓ : Γᴴ = Γ) (e : Fin m → Fin D → K)
+    : (Matrix.of fun a b => star (e a) ⬝ᵥ Γ.mulVec (e b))ᴴ
+      = Matrix.of fun a b => star (e a) ⬝ᵥ Γ.mulVec (e b) := by
   ext i j
   simp only [Matrix.conjTranspose_apply, Matrix.of_apply]
   have h1 : star (star (e j) ⬝ᵥ Γ.mulVec (e i)) = star (e i) ⬝ᵥ Γᴴ.mulVec (e j) := by
-    simp only [dotProduct, Matrix.mulVec, star_sum, star_mul', star_star, Matrix.conjTranspose_apply,
-      Finset.mul_sum, Pi.star_apply]
+    simp only [dotProduct, Matrix.mulVec, star_sum, star_mul', star_star,
+      Matrix.conjTranspose_apply, Finset.mul_sum, Pi.star_apply]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
     ring
@@ -72,7 +78,8 @@ theorem gram_determinant_quotient_metric : GramDeterminantQuotientMetric := by
   have hΓmap : (quotGram P H).map v0.embedding = ((XQ v0)⁻¹)ᴴ * (XQ v0)⁻¹ := by
     rw [(hQ v0).2]
     unfold quotGram
-    rw [map_inv_field, Matrix.map_mul, Matrix.map_mul, map_inv_field, conjTranspose_map v0.embedding hv0]
+    rw [map_inv_field, Matrix.map_mul, Matrix.map_mul, map_inv_field,
+      conjTranspose_map v0.embedding hv0]
   refine ⟨?_, ?_⟩
   · unfold gramR
     rw [← Matrix.det_conjTranspose, gramMat_conjTranspose _ hΓ e]
@@ -80,10 +87,12 @@ theorem gram_determinant_quotient_metric : GramDeterminantQuotientMetric := by
     rw [RingHom.map_det]
     congr 1
     ext a c
-    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Formalism.HermitianLatticesTheory.majAt,
-      Formalism.HermitianLatticesTheory.fcoord, Formalism.HermitianLatticesTheory.vecAt, Pi.basisFun_repr]
-    have hY : ∀ (Y : Matrix (Fin D) (Fin D) ℂ) (x y : Fin D → ℂ),
-        ∑ i, star ((Y *ᵥ x) i) * (Y *ᵥ y) i = ∑ i, star (x i) * ((Yᴴ * Y) *ᵥ y) i := by
+    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
+      Formalism.HermitianLatticesTheory.majAt, Formalism.HermitianLatticesTheory.fcoord,
+      Formalism.HermitianLatticesTheory.vecAt, Pi.basisFun_repr]
+    have hY
+        : ∀ (Y : Matrix (Fin D) (Fin D) ℂ) (x y : Fin D → ℂ),
+          ∑ i, star ((Y *ᵥ x) i) * (Y *ᵥ y) i = ∑ i, star (x i) * ((Yᴴ * Y) *ᵥ y) i := by
       intro Y x y
       have e1 : ∑ i, star ((Y *ᵥ x) i) * (Y *ᵥ y) i = star (Y *ᵥ x) ⬝ᵥ (Y *ᵥ y) := rfl
       have e2 : ∑ i, star (x i) * ((Yᴴ * Y) *ᵥ y) i = star x ⬝ᵥ ((Yᴴ * Y) *ᵥ y) := rfl

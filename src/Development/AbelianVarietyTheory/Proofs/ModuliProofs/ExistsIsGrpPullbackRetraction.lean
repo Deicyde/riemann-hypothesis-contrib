@@ -13,8 +13,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct ContDiff
 open GlobalTheory.KS
 
@@ -26,14 +28,18 @@ def translInvIso {S : Scheme.{0}} (B : Over S) [GrpObj B] (c : 𝟙_ (Over S) �
   hom_inv_id := by
     rw [MonObj.comp_mul, Category.comp_id, ← Category.assoc, comp_toUnit, inv_mul_cancel_right]
   inv_hom_id := by
-    rw [MonObj.comp_mul, Category.comp_id, GrpObj.comp_inv, ← Category.assoc, comp_toUnit, mul_inv_cancel_right]
+    rw [MonObj.comp_mul, Category.comp_id, GrpObj.comp_inv, ← Category.assoc, comp_toUnit,
+      mul_inv_cancel_right]
 
-theorem comp_translInvIso_hom {S : Scheme.{0}} {B T : Over S} [GrpObj B] (c : 𝟙_ (Over S) ⟶ B) (x : T ⟶ B) :
-    x ≫ (translInvIso B c).hom = x * (toUnit T ≫ c)⁻¹ := by
+theorem comp_translInvIso_hom
+    {S : Scheme.{0}} {B T : Over S} [GrpObj B] (c : 𝟙_ (Over S) ⟶ B) (x : T ⟶ B)
+    : x ≫ (translInvIso B c).hom = x * (toUnit T ≫ c)⁻¹ := by
   simp [translInvIso, MonObj.comp_mul, GrpObj.comp_inv]
 
-theorem unit_left_comp {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G'] {f : S' ⟶ S}
-    {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) : η[G'].left ≫ φ = f ≫ η[G].left := by
+theorem unit_left_comp
+    {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    : η[G'].left ≫ φ = f ≫ η[G].left := by
   have hw : (η[G'].left ≫ φ) ≫ G.hom = (Over.mk ((𝟙_ (Over S')).hom ≫ f)).hom := by
     rw [Category.assoc, h.1.w, ← Category.assoc, Over.w]
     rfl
@@ -49,17 +55,21 @@ theorem unit_left_comp {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G
   have := congrArg (fun v => CommaMorphism.left v) hu1
   simpa [u, Hom.one_def] using this
 
-theorem exists_isGrpPullback_retraction (rig : Out.RigiditySt) {S S' : Scheme.{0}} (A₀ : Over S) [GrpObj A₀]
-    (A' : Over S') [GrpObj A'] (f : S' ⟶ S) (i : S ⟶ S') (ρ₀ : A'.left ⟶ A₀.left) (j : A₀.left ⟶ A'.left)
+theorem exists_isGrpPullback_retraction
+    (rig : Out.RigiditySt)
+    {S S' : Scheme.{0}} (A₀ : Over S) [GrpObj A₀]
+    (A' : Over S') [GrpObj A']
+    (f : S' ⟶ S) (i : S ⟶ S') (ρ₀ : A'.left ⟶ A₀.left) (j : A₀.left ⟶ A'.left)
     (h₀ : IsAbelianScheme A₀) (h' : IsAbelianScheme A') (hj : IsGrpPullback A₀ A' i j)
-    (hρ : IsPullback ρ₀ A'.hom A₀.hom f) (hjρ : j ≫ ρ₀ = 𝟙 _) :
-    ∃ ρ, IsGrpPullback A' A₀ f ρ ∧ j ≫ ρ = 𝟙 _ := by
+    (hρ : IsPullback ρ₀ A'.hom A₀.hom f) (hjρ : j ≫ ρ₀ = 𝟙 _)
+    : ∃ ρ, IsGrpPullback A' A₀ f ρ ∧ j ≫ ρ = 𝟙 _ := by
   let adj := Over.mapPullbackAdj f
   let B : Over S' := Over.mk (pullback.snd A₀.hom f)
   let F : (Over S')ᵒᵖ ⥤ GrpCat := (Over.map f).op ⋙ yonedaGrpObj A₀
-  let α : (F ⋙ forget _).RepresentableBy B :=
-    { homEquiv := (adj.homEquiv _ _).symm
-      homEquiv_comp := fun g h => (adj.representableBy A₀).homEquiv_comp g h }
+  let α : (F ⋙ forget _).RepresentableBy B := {
+    homEquiv := (adj.homEquiv _ _).symm
+    homEquiv_comp := fun g h => (adj.representableBy A₀).homEquiv_comp g h
+  }
   let _ : GrpObj B := GrpObj.ofRepresentableBy B F α
   let E : ∀ T : Over S', (T ⟶ B) ≃ ((Over.map f).obj T ⟶ A₀) := fun T => (adj.homEquiv T A₀).symm
   have hmul : ∀ {T : Over S'} (x y : T ⟶ B), E T (x * y) = E T x * E T y := by
@@ -97,7 +107,8 @@ theorem exists_isGrpPullback_retraction (rig : Out.RigiditySt) {S S' : Scheme.{0
         apply pullback.hom_ext
         · rw [IsPullback.isoPullback_hom_fst]; exact hm₀
         · rw [IsPullback.isoPullback_hom_snd]; exact Over.w m₀
-      rw [e]; infer_instance
+      rw [e]
+      infer_instance
     have h2 : IsIso (translInvIso B c).hom.left :=
       inferInstanceAs (IsIso ((Over.forget S').map (translInvIso B c).hom))
     have h3 : IsIso m.left := by
@@ -109,7 +120,8 @@ theorem exists_isGrpPullback_retraction (rig : Out.RigiditySt) {S S' : Scheme.{0
     rwa [Category.id_comp] at this
   · intro T x y x₁ y₁ hx hy
     rw [hB.2 T (x ≫ m) (y ≫ m) x₁ y₁ (by rw [hx, ← Category.assoc]; rfl)
-      (by rw [hy, ← Category.assoc]; rfl), ← MonObj.mul_comp, ← Category.assoc]
+        (by rw [hy, ← Category.assoc]; rfl),
+      ← MonObj.mul_comp, ← Category.assoc]
     rfl
   · have hJ : j ≫ ((Over.map f).obj A').hom = A₀.hom := by
       change j ≫ A'.hom ≫ f = A₀.hom
@@ -129,15 +141,23 @@ theorem exists_isGrpPullback_retraction (rig : Out.RigiditySt) {S S' : Scheme.{0
     have hJx : J ≫ x₀ = 𝟙 A₀ := by
       ext1
       exact hjρ
-    calc j ≫ m.left ≫ pullback.fst A₀.hom f = (J ≫ (x₀ * (E A' (toUnit A' ≫ c))⁻¹)).left := by
-          rw [hρm]; rfl
+    calc
+      j ≫ m.left ≫ pullback.fst A₀.hom f
+        = (J ≫ (x₀ * (E A' (toUnit A' ≫ c))⁻¹)).left := by rw [hρm]; rfl
       _ = 𝟙 A₀.left := by
-          rw [MonObj.comp_mul, GrpObj.comp_inv, hJx, hz, _root_.inv_one, _root_.mul_one]; rfl
+        rw [MonObj.comp_mul, GrpObj.comp_inv, hJx, hz, _root_.inv_one, _root_.mul_one]; rfl
 
-theorem exists_isConst_of_isPullback :
-    Out.Laws → ∀ (A₀ : Over (Sp ℂ)) [GrpObj A₀] (A' : Over (Sp (DualNumber ℂ))) [GrpObj A'] (ρ₀ : A'.left ⟶ A₀.left) (j : A₀.left ⟶ A'.left), IsAbelianScheme A₀ → IsAbelianScheme A' → IsGrpPullback A₀ A' (spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom) j → IsPullback ρ₀ A'.hom A₀.hom (spMap (algebraMap ℂ (DualNumber ℂ))) → j ≫ ρ₀ = 𝟙 _ → ∃ ρ, IsConst A' A₀ ρ j := by
+theorem exists_isConst_of_isPullback
+    : Out.Laws
+      → ∀ (A₀ : Over (Sp ℂ)) [GrpObj A₀] (A' : Over (Sp (DualNumber ℂ))) [GrpObj A']
+          (ρ₀ : A'.left ⟶ A₀.left) (j : A₀.left ⟶ A'.left),
+        IsAbelianScheme A₀ → IsAbelianScheme A'
+          → IsGrpPullback A₀ A' (spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom) j
+          → IsPullback ρ₀ A'.hom A₀.hom (spMap (algebraMap ℂ (DualNumber ℂ))) → j ≫ ρ₀ = 𝟙 _
+          → ∃ ρ, IsConst A' A₀ ρ j := by
   intro hL A₀ _ A' _ ρ₀ j h₀ h' hj hρ hjρ
-  obtain ⟨ρ, hρ', hjρ'⟩ := exists_isGrpPullback_retraction hL.rigidity A₀ A' _ _ ρ₀ j h₀ h' hj hρ hjρ
+  obtain ⟨ρ, hρ', hjρ'⟩ :=
+    exists_isGrpPullback_retraction hL.rigidity A₀ A' _ _ ρ₀ j h₀ h' hj hρ hjρ
   exact ⟨ρ, by unfold IsConst; exact ⟨hρ', hj, hjρ'⟩⟩
 
 end GlobalTheory.KS

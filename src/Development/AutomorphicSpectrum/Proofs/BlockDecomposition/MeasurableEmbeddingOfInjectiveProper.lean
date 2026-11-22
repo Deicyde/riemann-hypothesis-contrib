@@ -10,18 +10,24 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.SW.FibreUniq
 
-theorem fibreFamily_eq_inter (V X Y : Type) [TopologicalSpace V] [LocallyCompactSpace V]
-    [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
-    [TopologicalSpace X] [LocallyCompactSpace X] [SecondCountableTopology X] [T2Space X]
-    [MeasurableSpace X] [BorelSpace X] (μ : Measure V) (ν : Measure X)
+theorem fibreFamily_eq_inter
+    (V X Y : Type) [TopologicalSpace V] [LocallyCompactSpace V] [SecondCountableTopology V]
+    [T2Space V] [MeasurableSpace V] [BorelSpace V] [TopologicalSpace X] [LocallyCompactSpace X]
+    [SecondCountableTopology X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
+    (μ : Measure V) (ν : Measure X)
     [IsLocallyFiniteMeasure μ] [IsLocallyFiniteMeasure ν] [ν.IsOpenPosMeasure]
-    (f : V → Y) (g : V → X) (ι : X → Y) (hι : Function.Injective ι) (hg : Continuous g)
-    (hf : ∀ v, f v = ι (g v)) (W : Set V) (hW : IsOpen W)
+    (f : V → Y) (g : V → X)
+    (ι : X → Y) (hι : Function.Injective ι)
+    (hg : Continuous g) (hf : ∀ v, f v = ι (g v))
+    (W : Set V) (hW : IsOpen W)
     (B B' : Set X) (hB : IsOpen B) (hB' : IsOpen B') (hBB : B' ⊆ B)
     (fib fib' : X → Measure V)
-    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι (g ⁻¹' B ∩ W) ν B fib)
-    (h' : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι (g ⁻¹' B' ∩ W) ν B' fib')
-    (b : X) (hb : b ∈ B') : fib' b = fib b := by
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι (g ⁻¹' B ∩ W)
+      ν B fib)
+    (h' : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι
+      (g ⁻¹' B' ∩ W) ν B' fib')
+    (b : X) (hb : b ∈ B')
+    : fib' b = fib b := by
   have hO : IsOpen (g ⁻¹' B' ∩ W) := (hB'.preimage hg).inter hW
   have hOU : g ⁻¹' B' ∩ W ⊆ g ⁻¹' B ∩ W := Set.inter_subset_inter_left _ (Set.preimage_mono hBB)
   have hbB : b ∈ B := hBB hb
@@ -47,38 +53,47 @@ theorem fibreFamily_eq_inter (V X Y : Type) [TopologicalSpace V] [LocallyCompact
       simp [hz]
     have hF : ∀ c ∈ B, ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib c) = ENNReal.ofReal (∫ v, φ v ∂(fib c)) :=
       fun c hc => (ofReal_integral_eq_lintegral_ofReal (hint c hc) (ae_of_all _ hφnn)).symm
-    have hF' : ∀ c ∈ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib' c) =
-        ENNReal.ofReal (∫ v, φ v ∂(fib' c)) :=
+    have hF'
+        : ∀ c ∈ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib' c) = ENNReal.ofReal (∫ v, φ v ∂(fib' c)) :=
       fun c hc => (ofReal_integral_eq_lintegral_ofReal (hint' c hc) (ae_of_all _ hφnn)).symm
-    have hset : ∀ S, MeasurableSet S →
-        ∫⁻ c in S ∩ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib c) ∂ν =
-          ∫⁻ c in S ∩ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib' c) ∂ν := by
+    have hset
+        : ∀ S,
+          MeasurableSet S
+            → ∫⁻ c in S ∩ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib c) ∂ν
+              = ∫⁻ c in S ∩ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib' c) ∂ν := by
       intro S hS
       have hS' : MeasurableSet (S ∩ B') := hS.inter hB'.measurableSet
       have e1 := lintegral_preimage hι hg hf hO hOU h (fun v => ENNReal.ofReal (φ v)) hψm hψ0 _ hS'
-      have e2 := lintegral_preimage hι hg hf hO Set.Subset.rfl h' (fun v => ENNReal.ofReal (φ v))
-        hψm hψ0 _ hS'
+      have e2 :=
+        lintegral_preimage hι hg hf hO Set.Subset.rfl h'
+          (fun v => ENNReal.ofReal (φ v))
+          hψm hψ0 _ hS'
       exact e1.symm.trans e2
-    have key : ∀ (k k' : X → ℝ≥0∞) (T : Set X), MeasurableSet T → (∀ c ∈ T, k c = k' c) →
-        ∫⁻ c in T, k c ∂ν = ∫⁻ c in T, k' c ∂ν := fun k k' T hT hkk =>
+    have key
+        : ∀ (k k' : X → ℝ≥0∞) (T : Set X),
+          MeasurableSet T → (∀ c ∈ T, k c = k' c)
+            → ∫⁻ c in T, k c ∂ν = ∫⁻ c in T, k' c ∂ν := fun k k' T hT hkk =>
       lintegral_congr_ae ((ae_restrict_iff' hT).2 (Filter.Eventually.of_forall hkk))
-    have hae : (fun c => ENNReal.ofReal (∫ v, φ v ∂(fib c))) =ᵐ[ν.restrict B']
-        (fun c => ENNReal.ofReal (∫ v, φ v ∂(fib' c))) := by
+    have hae
+        : (fun c => ENNReal.ofReal (∫ v, φ v ∂(fib c))) =ᵐ[ν.restrict B']
+          (fun c => ENNReal.ofReal (∫ v, φ v ∂(fib' c))) := by
       refine ae_eq_of_forall_setLIntegral_eq_of_sigmaFinite₀ ?_ ?_ ?_
       · exact ((hcont.mono hBB).aemeasurable hB'.measurableSet).ennreal_ofReal
       · exact (hcont'.aemeasurable hB'.measurableSet).ennreal_ofReal
       · intro S hS _
         rw [Measure.restrict_restrict hS]
         have hT : MeasurableSet (S ∩ B') := hS.inter hB'.measurableSet
-        calc ∫⁻ c in S ∩ B', ENNReal.ofReal (∫ v, φ v ∂(fib c)) ∂ν
-            = ∫⁻ c in S ∩ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib c) ∂ν :=
-              key _ _ _ hT (fun c hc => (hF c (hBB hc.2)).symm)
+        calc
+          ∫⁻ c in S ∩ B', ENNReal.ofReal (∫ v, φ v ∂(fib c)) ∂ν
+              = ∫⁻ c in S ∩ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib c) ∂ν :=
+            key _ _ _ hT (fun c hc => (hF c (hBB hc.2)).symm)
           _ = ∫⁻ c in S ∩ B', ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib' c) ∂ν := hset S hS
           _ = ∫⁻ c in S ∩ B', ENNReal.ofReal (∫ v, φ v ∂(fib' c)) ∂ν :=
-              key _ _ _ hT (fun c hc => hF' c hc.2)
-    have heq := Measure.eqOn_open_of_ae_eq hae hB'
-      (ENNReal.continuous_ofReal.comp_continuousOn (hcont.mono hBB))
-      (ENNReal.continuous_ofReal.comp_continuousOn hcont') hb
+            key _ _ _ hT (fun c hc => hF' c hc.2)
+    have heq :=
+      Measure.eqOn_open_of_ae_eq hae hB'
+        (ENNReal.continuous_ofReal.comp_continuousOn (hcont.mono hBB))
+        (ENNReal.continuous_ofReal.comp_continuousOn hcont') hb
     rw [hF' b hb, hF b hbB]
     exact heq.symm
 

@@ -26,14 +26,15 @@ def locBlocksFrom (ρ : ℕ → ℕ → ℝ) (v : D.what₂.Tau) : ℕ → List 
 def locBlocks (ρ : ℕ → ℕ → ℝ) (v : D.what₂.Tau) (bs : List (D.host.E × ℕ)) : List (ℂ × ℕ) :=
   locBlocksFrom D ρ v 0 bs
 
-theorem locBlocksFrom_snd (ρ : ℕ → ℕ → ℝ) (v : D.what₂.Tau) (bs : List (D.host.E × ℕ)) :
-    ∀ a, (locBlocksFrom D ρ v a bs).map Prod.snd = bs.map Prod.snd := by
+theorem locBlocksFrom_snd (ρ : ℕ → ℕ → ℝ) (v : D.what₂.Tau) (bs : List (D.host.E × ℕ))
+    : ∀ a, (locBlocksFrom D ρ v a bs).map Prod.snd = bs.map Prod.snd := by
   induction bs with
   | nil => intro a; rfl
   | cons b bs ih => intro a; obtain ⟨t, s⟩ := b; simp [locBlocksFrom, ih]
 
-theorem locBlocksFrom_ok (ρ : ℕ → ℕ → ℝ) (hρ : ∀ i s, ρ i s ≠ 0) (v : D.what₂.Tau) (bs : List (D.host.E × ℕ)) :
-    ∀ a, (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) → ∀ p ∈ locBlocksFrom D ρ v a bs, p.1 ≠ 0 ∧ 1 ≤ p.2 := by
+theorem locBlocksFrom_ok
+    (ρ : ℕ → ℕ → ℝ) (hρ : ∀ i s, ρ i s ≠ 0) (v : D.what₂.Tau) (bs : List (D.host.E × ℕ))
+    : ∀ a, (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) → ∀ p ∈ locBlocksFrom D ρ v a bs, p.1 ≠ 0 ∧ 1 ≤ p.2 := by
   induction bs with
   | nil => intro a _ p hp; simp [locBlocksFrom] at hp
   | cons b bs ih =>
@@ -45,9 +46,12 @@ theorem locBlocksFrom_ok (ρ : ℕ → ℕ → ℝ) (hρ : ∀ i s, ρ i s ≠ 0
       exact ⟨mul_ne_zero (by exact_mod_cast hρ (a + 1) s) ((map_ne_zero (plEmb D v)).2 hb.1), hb.2⟩
     · exact ih (a + s) (fun b hb => h b (by simp [hb])) p hp
 
-def ptLocS (ρ : ℕ → ℕ → ℝ) (hρ : ∀ i s, ρ i s ≠ 0) (v : D.what₂.Tau) {i : ℕ} (γ : Point D.host.E i) : Point ℂ i :=
-  ⟨locBlocks D ρ v γ.1, locBlocksFrom_ok D ρ hρ v γ.1 0 γ.2.1, by
-    rw [locBlocks, locBlocksFrom_snd]; exact γ.2.2⟩
+def ptLocS (ρ : ℕ → ℕ → ℝ) (hρ : ∀ i s, ρ i s ≠ 0) (v : D.what₂.Tau) {i : ℕ} (γ : Point D.host.E i)
+    : Point ℂ i := ⟨
+  locBlocks D ρ v γ.1,
+  locBlocksFrom_ok D ρ hρ v γ.1 0 γ.2.1,
+  by rw [locBlocks, locBlocksFrom_snd]; exact γ.2.2
+⟩
 
 theorem rdE_pos : 0 < D.host.rdE := by
   unfold Formalism.BasicNotions.Host.rdE
@@ -61,14 +65,16 @@ theorem rhoReal_pos (i s : ℕ) : 0 < rhoReal D i s := zpow_pos (rdE_pos D) _
 def ptWeightG (ρ : ℕ → ℕ → ℝ) (T T' : ℝ) (bs : List (D.host.E × ℕ)) : ℝ :=
   ∏ v, ptWeightFrom D.R.k D.R.rS T T' 0 (locBlocks D ρ v bs)
 
-def ptSnoc {j : ℕ} (h : Point D.host.E j) (t : D.host.E) (ht : t ≠ 0) (s : ℕ) (hs : 1 ≤ s) :
-    Point D.host.E (j + s) :=
-  ⟨h.1 ++ [(t, s)], by
+def ptSnoc {j : ℕ} (h : Point D.host.E j) (t : D.host.E) (ht : t ≠ 0) (s : ℕ) (hs : 1 ≤ s)
+    : Point D.host.E (j + s) := ⟨
+  h.1 ++ [(t, s)],
+  by
     refine ⟨fun b hb => ?_, ?_⟩
     · rcases List.mem_append.1 hb with hb | hb
       · exact h.2.1 b hb
       · rw [List.mem_singleton.1 hb]; exact ⟨ht, hs⟩
-    · simp [h.2.2]⟩
+    · simp [h.2.2]
+⟩
 
 def embInf : D.host.E →+ (D.what₂.Tau → ℂ) := (RingHom.pi fun v => plEmb D v).toAddMonoidHom
 
@@ -79,17 +85,18 @@ def kaV (δ : D.host.E) (v : D.what₂.Tau) : ℝ := 2 * Real.pi / ‖plEmb D v 
 def dualPsi (δ : D.host.E) (L : Submodule ℤ D.host.E) : Set D.host.E :=
   {l | ∀ c ∈ L, ∃ z : ℤ, Algebra.trace ℚ D.host.E (l * c / δ) = (z : ℚ)}
 
-def FullLat (L : Submodule ℤ D.host.E) : Prop :=
-  L.FG ∧ Submodule.span ℚ (L : Set D.host.E) = ⊤
+def FullLat (L : Submodule ℤ D.host.E) : Prop := L.FG ∧ Submodule.span ℚ (L : Set D.host.E) = ⊤
 
-def embInfS (c : ℝ) : D.host.E →+ (D.what₂.Tau → ℂ) :=
-  { toFun := fun x v => ((c : ℝ) : ℂ) * plEmb D v x
-    map_zero' := by funext v; simp
-    map_add' := fun x y => by funext v; simp [mul_add] }
+def embInfS (c : ℝ) : D.host.E →+ (D.what₂.Tau → ℂ) := {
+  toFun := fun x v => ((c : ℝ) : ℂ) * plEmb D v x
+  map_zero' := by funext v; simp
+  map_add' := fun x y => by funext v; simp [mul_add]
+}
 
 def IsCovol (κ c : ℝ) (L : Submodule ℤ D.host.E) : Prop :=
-  ∃ F : Set (D.what₂.Tau → ℂ), MeasurableSet F ∧
-    IsAddFundamentalDomain (L.toAddSubgroup.map (embInfS D c)) F volume ∧ volume F = ENNReal.ofReal κ
+  ∃ F : Set (D.what₂.Tau → ℂ),
+    MeasurableSet F ∧ IsAddFundamentalDomain (L.toAddSubgroup.map (embInfS D c)) F volume
+      ∧ volume F = ENNReal.ofReal κ
 
 end S1bNum
 
@@ -130,12 +137,18 @@ structure KernelData where
 def IsBlockSL2Embedding (i s : ℕ) : Prop := 1 ≤ i ∧ 1 ≤ s ∧ i - 1 + s ≤ D.R.rS + 1
 
 def LatAx (δ : D.host.E) (L : LatticeDataWithDual D) : Prop :=
-  0 < L.κ ∧ ∀ i s, IsBlockSL2Embedding D i s →
-    0 < L.ρ i s ∧ FullLat D (L.La i s) ∧ FullLat D (L.La' i s) ∧ IsCovol D L.κ (L.ρ i s) (L.La i s) ∧
-    dualPsi D δ (L.La i s) ⊆ (L.aaV i s : Set D.host.E) ∧ (L.La' i s : Set D.host.E) ⊆ (L.aaP i s : Set D.host.E)
+  0 < L.κ
+    ∧ ∀ i s,
+      IsBlockSL2Embedding D i s
+        → 0 < L.ρ i s ∧ FullLat D (L.La i s) ∧ FullLat D (L.La' i s)
+          ∧ IsCovol D L.κ (L.ρ i s) (L.La i s) ∧ dualPsi D δ (L.La i s) ⊆ (L.aaV i s : Set D.host.E)
+          ∧ (L.La' i s : Set D.host.E) ⊆ (L.aaP i s : Set D.host.E)
 
 def IsFrameScale (L : LatticeDataWithDual D) (ϱ : ℝ) : Prop :=
-  0 < ϱ ∧ ∀ i s, IsBlockSL2Embedding D i s → L.ρ i s = ϱ ^ (-((((2 * D.R.rS + 3 : ℕ) : ℤ) - 2 * (i : ℤ) - (s : ℤ))))
+  0 < ϱ
+    ∧ ∀ i s,
+      IsBlockSL2Embedding D i s
+        → L.ρ i s = ϱ ^ (-((((2 * D.R.rS + 3 : ℕ) : ℤ) - 2 * (i : ℤ) - (s : ℤ))))
 
 end S1bData
 
@@ -147,29 +160,37 @@ def supBe (ka T T' : ℝ) (x : LocalDataRealPlace D) (J : Set ℝ) : ℝ :=
   sSup ((beS ka D.R.rS x.lam T T' x.u x.u') '' J)
 
 def xSz (C1 C2 N ka T T' : ℝ) (x : LocalDataRealPlace D) (i : ℕ) : ℝ :=
-  C1 * supBe D ka T T' x (if i = 1 then Set.Icc x.a1 x.b1 else Set.Icc x.a x.b) *
-    (C2 * ka * N / (x.b - x.a)) ^ (2 * i - 2)
+  C1 * supBe D ka T T' x (if i = 1 then Set.Icc x.a1 x.b1 else Set.Icc x.a x.b)
+    * (C2 * ka * N / (x.b - x.a)) ^ (2 * i - 2)
 
 def LamSz (C1 C2 N ka T T' : ℝ) (x : LocalDataRealPlace D) (i s : ℕ) : ℝ :=
   C1 * supBe D ka T T' x (Set.Icc x.a x.b) * (C2 * ka * N / (x.b - x.a)) ^ (2 * (i - 1) + s - 1)
 
 def LamPSz (C1 C2 N ka T T' : ℝ) (x : LocalDataRealPlace D) (i : ℕ) : ℝ :=
-  Real.sqrt (C1 * supBe D ka T T' x (Set.Icc x.a x.b) * ka ^ (2 * i - 1) * (T * T') ^ (-(1 / 2 : ℝ)) *
-    (C2 * N / (x.b - x.a)) ^ (2 * (i - 1)))
+  Real.sqrt
+    (C1 * supBe D ka T T' x (Set.Icc x.a x.b) * ka ^ (2 * i - 1) * (T * T') ^ (-(1 / 2 : ℝ))
+      * (C2 * N / (x.b - x.a)) ^ (2 * (i - 1)))
 
 def nrmHalf (aa : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : ℝ :=
   Real.sqrt ((FractionalIdeal.absNorm aa : ℚ) : ℝ)
 
-def ThInvF (C1 C2 N T T' : ℝ) (δ : D.host.E) (x : D.what₂.Tau → LocalDataRealPlace D) (L : LatticeDataWithDual D) : ℝ :=
-  sSup ({y | ∃ i, 1 ≤ i ∧ i ≤ D.R.rS + 1 ∧
-          y = (∏ v, xSz D C1 C2 N (kaV D δ v) T T' (x v) i) / nrmHalf D (L.aaV i 1)} ∪
-        {y | ∃ i s, 1 ≤ i ∧ 2 ≤ s ∧ i - 1 + s ≤ D.R.rS + 1 ∧
+def ThInvF
+    (C1 C2 N T T' : ℝ) (δ : D.host.E) (x : D.what₂.Tau → LocalDataRealPlace D)
+    (L : LatticeDataWithDual D)
+    : ℝ :=
+  sSup
+    ({y | ∃ i, 1 ≤ i ∧ i ≤ D.R.rS + 1 ∧
+       y = (∏ v, xSz D C1 C2 N (kaV D δ v) T T' (x v) i) / nrmHalf D (L.aaV i 1)}
+      ∪ {y | ∃ i s, 1 ≤ i ∧ 2 ≤ s ∧ i - 1 + s ≤ D.R.rS + 1 ∧
           y = (∏ v, LamSz D C1 C2 N (kaV D δ v) T T' (x v) i s) /
-            min (nrmHalf D (L.aaV i s)) (nrmHalf D (L.aaP i (s - 1)))} ∪
-        {y | ∃ i, 1 ≤ i ∧ i ≤ D.R.rS ∧
+            min (nrmHalf D (L.aaV i s)) (nrmHalf D (L.aaP i (s - 1)))}
+      ∪ {y | ∃ i, 1 ≤ i ∧ i ≤ D.R.rS ∧
           y = (∏ v, LamPSz D C1 C2 N (kaV D δ v) T T' (x v) i) / nrmHalf D (L.aaP i (D.R.rS + 2 - i))})
 
-def ThS (C1 C2 N T T' : ℝ) (δ : D.host.E) (x : D.what₂.Tau → LocalDataRealPlace D) (L : LatticeDataWithDual D) : ℝ :=
+def ThS
+    (C1 C2 N T T' : ℝ) (δ : D.host.E) (x : D.what₂.Tau → LocalDataRealPlace D)
+    (L : LatticeDataWithDual D)
+    : ℝ :=
   ThInvF D C1 C2 N T T' δ x L ^ (-(1 / (D.R.f : ℝ)))
 
 end Sizes

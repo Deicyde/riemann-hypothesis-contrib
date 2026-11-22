@@ -6,11 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.SiegelKlingen
 
-theorem exists_unique_minimal_translate :
-    ∀ {G M : Type} [Group G] [Monoid M] (φ : G →* M) (f : G →* ℝ), (∀ g, 0 < f g) →
-    Function.Injective f → ∀ (D : Set M),
-    {g : G | ∃ x ∈ D, φ g * x ∈ D}.Finite → ∀ (x : M), (∃ g, φ g * x ∈ D) →
-    ∃! g, φ g * x ∈ {y ∈ D | ∀ g' : G, f g' < 1 → φ g' * y ∉ D} := by
+theorem exists_unique_minimal_translate
+    : ∀ {G M : Type} [Group G] [Monoid M] (φ : G →* M) (f : G →* ℝ),
+      (∀ g, 0 < f g) → Function.Injective f
+        → ∀ (D : Set M),
+          {g : G | ∃ x ∈ D, φ g * x ∈ D}.Finite
+            → ∀ (x : M),
+              (∃ g, φ g * x ∈ D) → ∃! g, φ g * x ∈ {y ∈ D | ∀ g' : G, f g' < 1 → φ g' * y ∉ D} := by
   intro G M _ _ φ f hpos hinj D hfin x ⟨g0, hg0⟩
   have key : ∀ a b : G, φ (a * b⁻¹) * (φ b * x) = φ a * x := by
     intro a b

@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFactor
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
 noncomputable section
 
@@ -23,24 +25,33 @@ open scoped Classical
 
 variable {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
 
-abbrev ind (w : Pl (F := F)) : (κ → Fv F w) → ℂ := Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1
+abbrev ind (w : Pl (F := F)) : (κ → Fv F w) → ℂ :=
+  Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1
 
-def archPt (a : κ → mixedEmbedding.mixedSpace F) : κ → AF F :=
-  fun i => ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (a i), 0)
+def archPt (a : κ → mixedEmbedding.mixedSpace F) : κ → AF F := fun i =>
+  ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (a i), 0)
 
-theorem evFin_archPt (a : κ → mixedEmbedding.mixedSpace F) (w : Pl (F := F)) (i : κ) : evFin F w (archPt a i) = 0 := by
+theorem evFin_archPt (a : κ → mixedEmbedding.mixedSpace F) (w : Pl (F := F)) (i : κ)
+    : evFin F w (archPt a i) = 0 := by
   change (evalV F w) (0 : Af F) = 0
   exact map_zero _
 
 theorem evI_archPt (a : κ → mixedEmbedding.mixedSpace F) (i : κ) : evI F (archPt a i) = a i := by
-  change (InfiniteAdeleRing.ringEquiv_mixedSpace F)
-    ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (a i)) = a i
+  change (InfiniteAdeleRing.ringEquiv_mixedSpace F) ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm
+      (a i))
+    = a i
   exact (InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply (a i)
 
-theorem cancel (v : Pl (F := F)) (g : SInf F κ) (hg : g ≠ 0) (r : (κ → AF F) → ℂ)
-    (hr : ∀ x z, At (evFin F v) z → r (x + z) = r x)
-    (hrt : ∀ ψ₀ : (κ → Fv F v) → ℂ, tens (evFin F v) ψ₀ r = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure g (Function.update ind v ψ₀))
-    (φ₁ φ₂ : (κ → Fv F v) → ℂ) (h : tens (evFin F v) φ₁ r = tens (evFin F v) φ₂ r) : φ₁ = φ₂ := by
+theorem cancel
+    (v : Pl (F := F))
+    (g : SInf F κ) (hg : g ≠ 0)
+    (r : (κ → AF F) → ℂ) (hr : ∀ x z, At (evFin F v) z → r (x + z) = r x)
+    (hrt : ∀ ψ₀ : (κ → Fv F v) → ℂ,
+      tens (evFin F v) ψ₀ r
+        = GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure g
+          (Function.update ind v ψ₀))
+    (φ₁ φ₂ : (κ → Fv F v) → ℂ) (h : tens (evFin F v) φ₁ r = tens (evFin F v) φ₂ r)
+    : φ₁ = φ₂ := by
   obtain ⟨a, ha⟩ : ∃ a, g a ≠ 0 := by
     obtain ⟨a, ha⟩ := DFunLike.ne_iff.mp hg
     exact ⟨a, by simpa using ha⟩
@@ -50,7 +61,9 @@ theorem cancel (v : Pl (F := F)) (g : SInf F κ) (hg : g ≠ 0) (r : (κ → AF 
     rw [e]
     unfold GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure
     have hI : (fun i => evI F (archPt a i)) = a := funext fun i => evI_archPt a i
-    have hP : (∏ᶠ w, Function.update (ind (κ := κ)) v (fun _ => 1) w fun i => evFin F w (archPt a i)) = 1 := by
+    have hP
+        : (∏ᶠ w, Function.update (ind (κ := κ)) v (fun _ => 1) w fun i => evFin F w (archPt a i))
+          = 1 := by
       refine finprod_eq_one_of_forall_eq_one fun w => ?_
       by_cases hw : w = v
       · subst hw; rw [Function.update_self]
@@ -76,18 +89,28 @@ theorem cancel (v : Pl (F := F)) (g : SInf F κ) (hg : g ≠ 0) (r : (κ → AF 
 
 end GlobalTheory.ThK.EvUniq.LocFin
 
-
 open scoped Classical in
-theorem GlobalTheory.ThK.EvUniq.finRel_of_ev : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E)
-    (n d d₁ r s r' s' i₀ i₁ : ℕ) (X : Spc F E n) (W : Spc F E d) (W₁ : Spc F E d₁) (H' : Plane E d d₁) (M : Model σ X W)
-    (M₁ : Model σ X W₁), B.IsGood σ → X.IsHerm σ B r s → W.IsSkew σ B r' s' → M.IsGood B.ψ → H'.IsAdapted σ B W W₁ i₀ i₁ →
-    M₁.IsGood B.ψ → ∀ (e : Fn F n d →ₗ[ℂ] Fn F n d₁), IsEv B M M₁ 1 H'.ι (iso0 n H') e →
-    ∀ (ei : SInf F (Fin n × Fin d) →L[ℂ] SInf F (Fin n × Fin d₁))
-      (ev : ∀ v : Pl (F := F), ((Fin n × Fin d → Fv F v) → ℂ) →ₗ[ℂ] (Fin n × Fin d₁ → Fv F v) → ℂ), ei ≠ 0 →
-      (∀ v, ev v (M.vac v) = M₁.vac v ∧ (SB _).map (ev v) = SB _) →
-      (∀ f φ, (∀ v, φ v ∈ SB _) → (∀ᶠ v in cofinite, φ v = M.vac v) → e (pure f φ) = pure (ei f) fun v => ev v (φ v)) → ∀ v, GlobalTheory.ThK.EvUniq.FinRel B M M₁ H' v (ev v) := by
-  intro F E _ _ _ _ _ σ B n d d₁ r s r' s' i₀ i₁ X W W₁ H' M M₁ hB hX hW hM hH hM₁ e he ei ev hei hvm hloc v
-  have hpre : ∀ w, ∃ ψ ∈ SB (Fin n × Fin d → Fv F w), ev w ψ = GlobalTheory.ThK.EvUniq.LocFin.ind w := fun w => by
+theorem GlobalTheory.ThK.EvUniq.finRel_of_ev
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) (n d d₁ r s r' s' i₀ i₁ : ℕ) (X : Spc F E n) (W : Spc F E d)
+        (W₁ : Spc F E d₁) (H' : Plane E d d₁) (M : Model σ X W) (M₁ : Model σ X W₁),
+      B.IsGood σ → X.IsHerm σ B r s → W.IsSkew σ B r' s' → M.IsGood B.ψ
+        → H'.IsAdapted σ B W W₁ i₀ i₁ → M₁.IsGood B.ψ
+        → ∀ (e : Fn F n d →ₗ[ℂ] Fn F n d₁),
+          IsEv B M M₁ 1 H'.ι (iso0 n H') e
+            → ∀ (ei : SInf F (Fin n × Fin d) →L[ℂ] SInf F (Fin n × Fin d₁))
+                (ev : ∀ v : Pl (F := F),
+                  ((Fin n × Fin d → Fv F v) → ℂ) →ₗ[ℂ] (Fin n × Fin d₁ → Fv F v) → ℂ),
+              ei ≠ 0 → (∀ v, ev v (M.vac v) = M₁.vac v ∧ (SB _).map (ev v) = SB _)
+                → (∀ f φ,
+                  (∀ v, φ v ∈ SB _) → (∀ᶠ v in cofinite, φ v = M.vac v)
+                    → e (pure f φ) = pure (ei f) fun v => ev v (φ v))
+                → ∀ v, GlobalTheory.ThK.EvUniq.FinRel B M M₁ H' v (ev v) := by
+  intro F E _ _ _ _ _ σ B n d d₁ r s r' s' i₀ i₁ X W W₁ H' M M₁ hB hX hW hM hH hM₁ e he ei ev hei
+    hvm hloc v
+  have hpre
+      : ∀ w, ∃ ψ ∈ SB (Fin n × Fin d → Fv F w),
+        ev w ψ = GlobalTheory.ThK.EvUniq.LocFin.ind w := fun w => by
     have h := GlobalTheory.StdVacuum.indicator_mem_SB (κ := Fin n × Fin d₁) w
     rw [← (hvm w).2] at h
     obtain ⟨ψ, hψ, e⟩ := Submodule.mem_map.mp h
@@ -105,32 +128,40 @@ theorem GlobalTheory.ThK.EvUniq.finRel_of_ev : ∀ (F E : Type) [Field F] [Numbe
   have hψM : ∀ᶠ w in cofinite, ψs w = M.vac w := by
     filter_upwards [hM₁.std] with w hw
     simp only [ψs, if_pos hw]
-  have hψind : ∀ᶠ w in cofinite, ψs w = Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1 := by
+  have hψind
+      : ∀ᶠ w in cofinite, ψs w = Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1 := by
     filter_upwards [hψM, hM.std] with w h1 h2
     rw [h1, h2]
   obtain ⟨f, hf⟩ : ∃ f, ei f ≠ 0 := by
     obtain ⟨f, hf⟩ := DFunLike.ne_iff.mp hei
     exact ⟨f, by simpa using hf⟩
-  have hind : ∀ᶠ w in cofinite, (GlobalTheory.ThK.EvUniq.LocFin.ind (κ := Fin n × Fin d₁) w) =
-      Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1 := Eventually.of_forall fun _ => rfl
+  have hind
+      : ∀ᶠ w in cofinite, (GlobalTheory.ThK.EvUniq.LocFin.ind (κ := Fin n × Fin d₁) w) =
+        Set.indicator {x | ∀ i, x i ∈ w.adicCompletionIntegers F} 1 :=
+    Eventually.of_forall fun _ => rfl
   obtain ⟨ρ, hρ, hρt⟩ := GlobalTheory.PureFactor.exists_rest_factor v f ψs hψind
   obtain ⟨ρ₁, hρ₁, hρt₁⟩ := GlobalTheory.PureFactor.exists_rest_factor v (ei f) _ hind
   have hRest : ∀ φ ∈ SB (Fin n × Fin d → Fv F v), Rest (evFin F v) φ ρ := fun φ hφ => by
     refine ⟨hρ, ?_⟩
     rw [hρt φ]
-    refine GlobalTheory.TensUniq.pure_mem_schA f _ (fun w => ?_) (GlobalTheory.PureFactor.update_eventually ψs v φ hψind)
+    refine GlobalTheory.TensUniq.pure_mem_schA f _
+      (fun w => ?_)
+      (GlobalTheory.PureFactor.update_eventually ψs v φ hψind)
     by_cases hw : w = v
     · subst hw; rw [Function.update_self]; exact hφ
     · rw [Function.update_of_ne hw]; exact hψSB w
   have hRest₁ : ∀ φ ∈ SB (Fin n × Fin d₁ → Fv F v), Rest (evFin F v) φ ρ₁ := fun φ hφ => by
     refine ⟨hρ₁, ?_⟩
     rw [hρt₁ φ]
-    refine GlobalTheory.TensUniq.pure_mem_schA (ei f) _ (fun w => ?_) (GlobalTheory.PureFactor.update_eventually _ v φ hind)
+    refine GlobalTheory.TensUniq.pure_mem_schA (ei f) _
+      (fun w => ?_)
+      (GlobalTheory.PureFactor.update_eventually _ v φ hind)
     by_cases hw : w = v
     · subst hw; rw [Function.update_self]; exact hφ
     · rw [Function.update_of_ne hw]; exact GlobalTheory.StdVacuum.indicator_mem_SB w
-  have key : ∀ φ ∈ SB (Fin n × Fin d → Fv F v),
-      e (tens (evFin F v) φ ρ) = tens (evFin F v) (ev v φ) ρ₁ := fun φ hφ => by
+  have key
+      : ∀ φ ∈ SB (Fin n × Fin d → Fv F v),
+        e (tens (evFin F v) φ ρ) = tens (evFin F v) (ev v φ) ρ₁ := fun φ hφ => by
     rw [hρt φ, hρt₁ (ev v φ)]
     have hSB : ∀ w, Function.update ψs v φ w ∈ SB _ := fun w => by
       by_cases hw : w = v

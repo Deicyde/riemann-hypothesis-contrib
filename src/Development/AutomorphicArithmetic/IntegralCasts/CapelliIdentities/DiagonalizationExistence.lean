@@ -4,13 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DiagonalizationExistence.exists_diag :
-    ∀ {κ : Type} [inst : Field κ] {n : ℕ}
-    (M : Matrix (Fin n) (Fin n) κ) (a : Fin n → κ),
-    Function.Injective a →
-      M.charpoly = ∏ i : Fin n, (Polynomial.X - (Polynomial.C : κ → Polynomial κ) (a i)) →
-        ∃ (P : GL (Fin n) κ),
-          M * (↑P : Matrix (Fin n) (Fin n) κ) = (↑P : Matrix (Fin n) (Fin n) κ) * Matrix.diagonal a := by
+theorem UpperTheory.Reformulated.B.DiagonalizationExistence.exists_diag
+    : ∀ {κ : Type} [inst : Field κ] {n : ℕ} (M : Matrix (Fin n) (Fin n) κ) (a : Fin n → κ),
+      Function.Injective a
+        → M.charpoly = ∏ i : Fin n, (Polynomial.X - (Polynomial.C : κ → Polynomial κ) (a i))
+        → ∃ (P : GL (Fin n) κ),
+          M * (↑P : Matrix (Fin n) (Fin n) κ)
+            = (↑P : Matrix (Fin n) (Fin n) κ) * Matrix.diagonal a := by
   intro κ _ n M a ha hM
   have hev : ∀ i, Module.End.HasEigenvalue (Matrix.toLin' M) (a i) := by
     intro i

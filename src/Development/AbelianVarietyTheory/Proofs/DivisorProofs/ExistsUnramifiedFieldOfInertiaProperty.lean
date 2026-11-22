@@ -8,16 +8,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CompositumIn
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.PureType GlobalTheory.CompRat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.PureType
+  GlobalTheory.CompRat
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.InertiaGood
 
-theorem not_dvd_discr_of_inertia_fix (E N : Type) [Field E] [NumberField E] [Field N] [NumberField N]
-    [Algebra E N] [IsGalois ℚ N] (q : ℕ) (hq : q.Prime)
-    (h : ∀ Q : Ideal (𝓞 N), Q.IsMaximal → (q : 𝓞 N) ∈ Q → ∀ τ : N ≃ₐ[ℚ] N, (∀ x : 𝓞 N, τ • x - x ∈ Q) →
-      ∀ y : E, τ (algebraMap E N y) = algebraMap E N y) : ¬ (q : ℤ) ∣ discr E := by
+theorem not_dvd_discr_of_inertia_fix
+    (E N : Type) [Field E] [NumberField E] [Field N] [NumberField N] [Algebra E N] [IsGalois ℚ N]
+    (q : ℕ) (hq : q.Prime)
+    (h : ∀ Q : Ideal (𝓞 N),
+      Q.IsMaximal → (q : 𝓞 N) ∈ Q
+        → ∀ τ : N ≃ₐ[ℚ] N,
+          (∀ x : 𝓞 N, τ • x - x ∈ Q) → ∀ y : E, τ (algebraMap E N y) = algebraMap E N y)
+    : ¬ (q : ℤ) ∣ discr E := by
   have hqz : Prime (q : ℤ) := Nat.prime_iff_prime_int.1 hq
   refine (not_dvd_discr_iff_forall_mem E (𝓞 E) hqz).2 fun P hP hqP => ?_
   have hqP' : (q : 𝓞 E) ∈ P := by simpa using hqP
@@ -32,15 +39,25 @@ theorem not_dvd_discr_of_inertia_fix (E N : Type) [Field E] [NumberField E] [Fie
   have h1 := (GlobalTheory.UnramCompositum.ramificationIdx_eq_one_iff_fix ℚ E N Q).2 (h Q hQ hqQ)
   rw [← Ideal.over_def Q P] at h1
   have hu : Algebra.IsUnramifiedAt ℤ (P.under (𝓞 ℚ)) :=
-    (not_dvd_discr_iff_forall_mem ℚ (𝓞 ℚ) hqz).1 (by
-      rw [Rat.numberField_discr]; exact hqz.not_dvd_one) _ inferInstance (by
-      rw [Ideal.under, Ideal.mem_comap, map_intCast]; exact hqP)
+    (not_dvd_discr_iff_forall_mem ℚ (𝓞 ℚ) hqz).1
+      (by rw [Rat.numberField_discr]; exact hqz.not_dvd_one) _ inferInstance
+      (by rw [Ideal.under, Ideal.mem_comap, map_intCast]; exact hqP)
   have h2 : P.ramificationIdx ℤ = (P.under (𝓞 ℚ)).ramificationIdx ℤ * P.ramificationIdx (𝓞 ℚ) :=
     Ideal.ramificationIdx_tower (P.under (𝓞 ℚ)) P
   rw [h1, Ideal.ramificationIdx_eq_one (P.under (𝓞 ℚ)) ℤ, Nat.mul_one] at h2
   exact Ideal.ramificationIdx_eq_one_iff.1 h2
 
-theorem exists_unramified_field_good : ∀ (N : IntermediateField ℚ ℂ) [NumberField N] [IsGalois ℚ N] (q : ℕ), q.Prime → ∀ Good : (ℂ ≃+* ℂ) → Prop, (∀ τ τ', Good τ → Good τ' → Good (τ.trans τ')) → (∀ (τ : ℂ ≃+* ℂ) (𝔮 : Ideal (𝓞 N)), 𝔮.IsMaximal → (q : 𝓞 N) ∈ 𝔮 → (∀ x : 𝓞 N, ∃ y : 𝓞 N, ((y : N) : ℂ) = τ ((x : N) : ℂ) ∧ y - x ∈ 𝔮) → Good τ) → ∃ (F' : IntermediateField ℚ ℂ) (_ : NumberField F'), ¬ (q : ℤ) ∣ discr F' ∧ ∀ τ : ℂ ≃+* ℂ, (∀ x ∈ F', τ x = x) → Good τ := by
+theorem exists_unramified_field_good
+    : ∀ (N : IntermediateField ℚ ℂ) [NumberField N] [IsGalois ℚ N] (q : ℕ),
+      q.Prime
+        → ∀ Good : (ℂ ≃+* ℂ) → Prop,
+          (∀ τ τ', Good τ → Good τ' → Good (τ.trans τ'))
+            → (∀ (τ : ℂ ≃+* ℂ) (𝔮 : Ideal (𝓞 N)),
+              𝔮.IsMaximal → (q : 𝓞 N) ∈ 𝔮
+                → (∀ x : 𝓞 N, ∃ y : 𝓞 N, ((y : N) : ℂ) = τ ((x : N) : ℂ) ∧ y - x ∈ 𝔮)
+                → Good τ)
+            → ∃ (F' : IntermediateField ℚ ℂ) (_ : NumberField F'),
+              ¬ (q : ℤ) ∣ discr F' ∧ ∀ τ : ℂ ≃+* ℂ, (∀ x ∈ F', τ x = x) → Good τ := by
   intro N _ _ q hq Good hmul hin
   have : Countable N := (Module.finBasis ℚ N).equivFun.injective.countable
   let T : Set (N ≃ₐ[ℚ] N) :=
@@ -51,25 +68,34 @@ theorem exists_unramified_field_good : ∀ (N : IntermediateField ℚ ℂ) [Numb
     exact hin τ 𝔮 h1 h2 fun x => ⟨σ • x, (hτ x).symm, AddSubgroup.mem_inertia.1 h3 x⟩
   have h1 : (1 : N ≃ₐ[ℚ] N) ∈ T := by
     have hp : Prime (q : ℤ) := Nat.prime_iff_prime_int.1 hq
-    have : (Ideal.span {(q : ℤ)}).IsMaximal := PrincipalIdealRing.isMaximal_of_irreducible hp.irreducible
-    obtain ⟨Q, hQ, hQP⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 N) (Ideal.span {(q : ℤ)})
+    have : (Ideal.span {(q : ℤ)}).IsMaximal :=
+      PrincipalIdealRing.isMaximal_of_irreducible hp.irreducible
+    obtain ⟨Q, hQ, hQP⟩ :=
+      Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 N) (Ideal.span {(q : ℤ)})
     refine ⟨Q, hQ, ?_, one_mem _⟩
     have := (Ideal.mem_of_liesOver Q (Ideal.span {(q : ℤ)}) _).1 (Ideal.mem_span_singleton_self _)
     rwa [map_natCast] at this
   have hSmul : ∀ σ σ', S σ → S σ' → S (σ * σ') := by
     intro σ σ' hσ hσ' τ hτ
-    obtain ⟨τ', hτ'⟩ := GlobalTheory.CompRat.exists_ringEquiv_complex_comp_eq N (algebraMap N ℂ)
-      ((algebraMap N ℂ).comp (σ' : N →+* N))
+    obtain ⟨τ', hτ'⟩ :=
+      GlobalTheory.CompRat.exists_ringEquiv_complex_comp_eq N (algebraMap N ℂ)
+        ((algebraMap N ℂ).comp (σ' : N →+* N))
     have hτ'' : ∀ x : N, τ' (x : ℂ) = (σ' x : ℂ) := hτ'
-    have g2 : Good (τ'.symm.trans τ) := hσ _ fun x => by
-      have e : τ'.symm (x : ℂ) = (σ'.symm x : ℂ) := by
-        rw [RingEquiv.symm_apply_eq, hτ'', AlgEquiv.apply_symm_apply]
-      rw [RingEquiv.trans_apply, e, hτ, AlgEquiv.mul_apply, AlgEquiv.apply_symm_apply]
+    have g2 : Good (τ'.symm.trans τ) :=
+      hσ _ fun x => by
+        have e : τ'.symm (x : ℂ) = (σ'.symm x : ℂ) := by
+          rw [RingEquiv.symm_apply_eq, hτ'', AlgEquiv.apply_symm_apply]
+        rw [RingEquiv.trans_apply, e, hτ, AlgEquiv.mul_apply, AlgEquiv.apply_symm_apply]
     have e : τ'.trans (τ'.symm.trans τ) = τ := RingEquiv.ext fun z => by simp
     exact e ▸ hmul _ _ (hσ' τ' hτ'') g2
   have hIS : ∀ σ ∈ Subgroup.closure T, S σ := fun σ hσ =>
-    Subgroup.closure_induction'' (p := fun σ _ => S σ) hT
-      (fun x ⟨𝔮, a, b, c⟩ => hT _ ⟨𝔮, a, b, inv_mem c⟩) (hT _ h1) (fun x y _ _ => hSmul x y) hσ
+    Subgroup.closure_induction''
+      (p := fun σ _ => S σ)
+      hT
+      (fun x ⟨𝔮, a, b, c⟩ => hT _ ⟨𝔮, a, b, inv_mem c⟩)
+      (hT _ h1)
+      (fun x y _ _ => hSmul x y)
+      hσ
   let F₀ := IntermediateField.fixedField (Subgroup.closure T)
   have : NumberField (IntermediateField.lift F₀) :=
     have : FiniteDimensional ℚ (IntermediateField.lift F₀) :=

@@ -7,16 +7,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 open UpperTheory.V.Cj.A
 
-theorem UpperTheory.V.Cj.A.satClosed :
-    SatClosed := by
+theorem UpperTheory.V.Cj.A.satClosed : SatClosed := by
   intro Γ V S _ _ _ _ d G hP hC l hl T K hT hK hKY s
   have hcont : ∀ s', ContinuousOn (fun p : V => l s' p • p) G.Y := fun s' =>
     (hl.1 s').1.continuousOn.smul continuousOn_id
-  have hmem : ∀ s', ∀ p ∈ G.Y, l s' p • p ∈ G.Y := fun s' p hp =>
-    hC _ ((hl.1 s').2.1 p hp) p hp
-  have horb : ∀ s', IsOpen (G.Y \ {p | ∃ γ : Γ, G.σ γ s = s' ∧ G.ρ γ p ∈ (fun p : V => l s' p • p) '' K}) := fun s' =>
-    orbClosed Γ V S d G hP _ (by rintro _ ⟨k, hk, rfl⟩; exact hmem s' k (hKY hk))
-      (hK.image_of_continuousOn ((hcont s').mono hKY)) s s'
+  have hmem : ∀ s', ∀ p ∈ G.Y, l s' p • p ∈ G.Y := fun s' p hp => hC _ ((hl.1 s').2.1 p hp) p hp
+  have horb
+      : ∀ s',
+        IsOpen (G.Y \ {p | ∃ γ : Γ, G.σ γ s = s' ∧ G.ρ γ p ∈ (fun p : V => l s' p • p) '' K}) :=
+    fun s' =>
+      orbClosed Γ V S d G hP _ (by rintro _ ⟨k, hk, rfl⟩; exact hmem s' k (hKY hk))
+        (hK.image_of_continuousOn ((hcont s').mono hKY)) s s'
   have hopen := (hcont s).isOpen_inter_preimage G.isOpen (hT.isOpen_biInter fun s' _ => horb s')
   convert hopen using 1
   ext p

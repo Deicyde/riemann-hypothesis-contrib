@@ -11,8 +11,9 @@ noncomputable section
 
 namespace Formalism.H
 
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
-  [MeasurableSpace V] [BorelSpace V] [FiniteDimensional ℝ V]
+variable
+  {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MeasurableSpace V] [BorelSpace V]
+  [FiniteDimensional ℝ V]
 
 lemma covolDual_nondegenerate : (innerₗ V).Nondegenerate := by
   constructor <;> intro m hm <;> simpa using hm m

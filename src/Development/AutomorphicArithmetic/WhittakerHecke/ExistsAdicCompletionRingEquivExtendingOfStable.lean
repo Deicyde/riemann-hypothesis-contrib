@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Complet
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
 
 private lemma intValuation_le_of_equiv {L : Type} [Field L] [NumberField L]
     (u : HeightOneSpectrum (𝓞 L)) (σ : 𝓞 L ≃+* 𝓞 L)
@@ -58,36 +59,51 @@ private lemma valuation_eq_of_equiv {L : Type} [Field L] [NumberField L]
   rw [map_div₀, map_div₀, map_div₀, key, key]
 
 open scoped WithZeroTopology in
-theorem UpperTheory.exists_adicCompletion_ringEquiv_extending_of_stable :
-    ∀ {L : Type} [Field L] [NumberField L] (u : HeightOneSpectrum (𝓞 L)) (s : L ≃+* L),
-        (∀ x : 𝓞 L, RingOfIntegers.mapRingHom (s : L →+* L) x ∈ u.asIdeal ↔ x ∈ u.asIdeal) →
-        ∃ i : u.adicCompletion L ≃+* u.adicCompletion L, Continuous i ∧
-          (∀ x, i (algebraMap L _ x) = algebraMap L _ (s x)) ∧ ∀ x, Valued.v (i x) = Valued.v x := by
+theorem UpperTheory.exists_adicCompletion_ringEquiv_extending_of_stable
+    : ∀ {L : Type} [Field L] [NumberField L] (u : HeightOneSpectrum (𝓞 L)) (s : L ≃+* L),
+      (∀ x : 𝓞 L, RingOfIntegers.mapRingHom (s : L →+* L) x ∈ u.asIdeal ↔ x ∈ u.asIdeal)
+        → ∃ i : u.adicCompletion L ≃+* u.adicCompletion L,
+          Continuous i ∧ (∀ x, i (algebraMap L _ x) = algebraMap L _ (s x))
+            ∧ ∀ x, Valued.v (i x) = Valued.v x := by
   intro L _ _ u s h
-  have h' : ∀ x : 𝓞 L, RingOfIntegers.mapRingHom (s.symm : L →+* L) x ∈ u.asIdeal ↔ x ∈ u.asIdeal := by
+  have h'
+      : ∀ x : 𝓞 L, RingOfIntegers.mapRingHom (s.symm : L →+* L) x ∈ u.asIdeal ↔ x ∈ u.asIdeal := by
     intro x
     rw [← h (RingOfIntegers.mapRingHom (s.symm : L →+* L) x)]
-    have e : RingOfIntegers.mapRingHom (s : L →+* L) (RingOfIntegers.mapRingHom (s.symm : L →+* L) x) = x := by
+    have e
+        : RingOfIntegers.mapRingHom (s : L →+* L) (RingOfIntegers.mapRingHom (s.symm : L →+* L) x)
+          = x := by
       apply RingOfIntegers.ext
       simp
     rw [e]
   obtain ⟨μ, hμc, hμ⟩ := GlobalTheory.CompositumCompletion.exists_completion_map (s : L →+* L) u u h
-  obtain ⟨μ', hμ'c, hμ'⟩ := GlobalTheory.CompositumCompletion.exists_completion_map (s.symm : L →+* L) u u h'
+  obtain ⟨μ', hμ'c, hμ'⟩ :=
+    GlobalTheory.CompositumCompletion.exists_completion_map (s.symm : L →+* L) u u h'
   have h1 : ∀ a, μ' (μ a) = a := fun a =>
-    congrFun ((HeightOneSpectrum.denseRange_algebraMap L u).equalizer (hμ'c.comp hμc) continuous_id
-      (funext fun x => by simp [hμ, hμ'])) a
+    congrFun
+      ((HeightOneSpectrum.denseRange_algebraMap L u).equalizer (hμ'c.comp hμc) continuous_id
+        (funext fun x => by simp [hμ, hμ']))
+      a
   have h2 : ∀ a, μ (μ' a) = a := fun a =>
-    congrFun ((HeightOneSpectrum.denseRange_algebraMap L u).equalizer (hμc.comp hμ'c) continuous_id
-      (funext fun x => by simp [hμ, hμ'])) a
-  let i : u.adicCompletion L ≃+* u.adicCompletion L :=
-    { μ with invFun := μ', left_inv := h1, right_inv := h2 }
+    congrFun
+      ((HeightOneSpectrum.denseRange_algebraMap L u).equalizer (hμc.comp hμ'c) continuous_id
+        (funext fun x => by simp [hμ, hμ']))
+      a
+  let i : u.adicCompletion L ≃+* u.adicCompletion L := {
+    μ with
+    invFun := μ'
+    left_inv := h1
+    right_inv := h2
+  }
   have hi : ∀ a, i a = μ a := fun _ => rfl
   refine ⟨i, hμc, fun x => hμ x, fun x => ?_⟩
   refine (HeightOneSpectrum.denseRange_algebraMap L u).induction_on
-    (p := fun x => Valued.v (i x) = Valued.v x) x
+    (p := fun x => Valued.v (i x) = Valued.v x)
+    x
     (isClosed_eq
       ((Valued.continuous_valuation_of_surjective (u.valuedAdicCompletion_surjective L)).comp hμc)
-      (Valued.continuous_valuation_of_surjective (u.valuedAdicCompletion_surjective L))) fun k => ?_
+      (Valued.continuous_valuation_of_surjective (u.valuedAdicCompletion_surjective L)))
+    fun k => ?_
   rw [hi, hμ]
   have e : ∀ y : L, Valued.v (algebraMap L (u.adicCompletion L) y) = u.valuation L y := fun y =>
     (HeightOneSpectrum.valuedAdicCompletion_eq_valuation' u y)

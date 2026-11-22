@@ -13,16 +13,29 @@ set_option maxHeartbeats 800000
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp
+  Matrix IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
-theorem UpperTheory.V.Z.J.ptHyp_of_autB_of_lemW_of_isBase :
-    U3.CohInp → _root_.UpperTheory.V.Z.Kato.WeilSphericalRecords.KatoTwoW → _root_.UpperTheory.V.Th.RigidityFirstCase → _root_.UpperTheory.V.Th.RigiditySecondCase → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
-      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) {U : (_root_.UpperTheory.V.U3.Univ (_root_.UpperTheory.V.U3.GCond.noCondition _ (D.η.comp D.ι) (D.Ψ.comp D.ι)))} {g₁ : G ℚ Ω}, D.Marked g₁ → ∀ (S : D.Ring U g₁), ∀ [IsCMField K] (ι : Qbar l ≃+* ℂ), _root_.UpperTheory.V.Aut.AutBAlt D ι g₁ → _root_.UpperTheory.V.Aut.LemWAlt D ι g₁ →
-      ∀ x₀ : S.R →ₐ[c.O] c.O, IsBase D.η D.Ψ S.r.hom x₀ → PtHyp D.η S.r.hom x₀ := by
+theorem UpperTheory.V.Z.J.ptHyp_of_autB_of_lemW_of_isBase
+    : U3.CohInp → _root_.UpperTheory.V.Z.Kato.WeilSphericalRecords.KatoTwoW
+      → _root_.UpperTheory.V.Th.RigidityFirstCase → _root_.UpperTheory.V.Th.RigiditySecondCase
+      → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K]
+          [Algebra K Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ}
+          {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ)
+          {U : (_root_.UpperTheory.V.U3.Univ (_root_.UpperTheory.V.U3.GCond.noCondition _
+            (D.η.comp D.ι) (D.Ψ.comp D.ι)))}
+          {g₁ : G ℚ Ω},
+        D.Marked g₁
+          → ∀ (S : D.Ring U g₁), ∀ [IsCMField K] (ι : Qbar l ≃+* ℂ),
+            _root_.UpperTheory.V.Aut.AutBAlt D ι g₁ → _root_.UpperTheory.V.Aut.LemWAlt D ι g₁
+              → ∀ x₀ : S.R →ₐ[c.O] c.O, IsBase D.η D.Ψ S.r.hom x₀ → PtHyp D.η S.r.hom x₀ := by
   intro hC hK hRI hRII Ω _ _ _ K _ _ _ l _ c N _ e ψ D U g₁ hM S _ ι hB hW x₀ hx
   have h0 : push (toBar x₀) S.r.hom = r0 D.η D.ΨQ := by
-    have e1 : push (toBar x₀) S.r.hom =
-        (GG.map (algebraMap c.O (PadicAlgCl l))).comp (push x₀ S.r.hom) := rfl
+    have e1
+        : push (toBar x₀) S.r.hom
+          = (GG.map (algebraMap c.O (PadicAlgCl l))).comp (push x₀ S.r.hom) :=
+      rfl
     rw [e1, show push x₀ S.r.hom = r0 D.η D.Ψ from hx]
     refine MonoidHom.ext fun g => SemidirectProduct.ext (Units.ext ?_) rfl
     let φ := algebraMap c.O (PadicAlgCl l)
@@ -32,9 +45,11 @@ theorem UpperTheory.V.Z.J.ptHyp_of_autB_of_lemW_of_isBase :
     congr 1
     funext i
     exact congrArg Units.val (map_zpow (Units.map φ.toMonoidHom) (D.Ψ g) (wt1 i))
-  have hCob {Γ κ : Type} [Group Γ] [CommRing κ] (r : Γ →* GG (m := 3) (R := κ))
-      (γ : Γ → Matrix (Fin 3) (Fin 3) κ) (h : γ ∈ ReciprocityTheory.Gal.B1 (adRep r)) :
-      ∃ X, γ = cob r X := by
+  have hCob
+      {Γ κ : Type} [Group Γ] [CommRing κ]
+      (r : Γ →* GG (m := 3) (R := κ)) (γ : Γ → Matrix (Fin 3) (Fin 3) κ)
+      (h : γ ∈ ReciprocityTheory.Gal.B1 (adRep r))
+      : ∃ X, γ = cob r X := by
     obtain ⟨X, rfl⟩ := LinearMap.mem_range.mp h
     refine ⟨-X, funext fun g => ?_⟩
     show adRep r g X - X = -X - adRep r g (-X)
@@ -78,7 +93,8 @@ theorem UpperTheory.V.Z.J.ptHyp_of_autB_of_lemW_of_isBase :
     have hz : Af.BlochKatoSelmerVanishes l (adRep (push f S.r.hom)) := by
       rcases (twoPt_shape S D.gd.l_odd hM f hf).1 with h | h
       · exact hRI D hM S f hf.1 hp.mult ι h (hB U S _ _ hp.mult hPush h)
-      · exact _root_.UpperTheory.V.Z.Kato.WeilSphericalRecords.bloch_kato_selmer_vanishes_of_type_ii_modular_ext hC hK hRII D hM S f hf.1 ι h
-          (hW U S _ _ hPush h (typeII_facts hC D hM hp h).1)
+      · exact
+          _root_.UpperTheory.V.Z.Kato.WeilSphericalRecords.bloch_kato_selmer_vanishes_of_type_ii_modular_ext
+            hC hK hRII D hM S f hf.1 ι h (hW U S _ _ hPush h (typeII_facts hC D hM hp h).1)
     exact hCob _ _ (hz _ h1.1 h1.2)
 end

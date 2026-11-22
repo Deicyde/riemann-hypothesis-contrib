@@ -13,13 +13,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.EllipticTwist
 
-theorem exists_eigenbasis {n : ℕ} (N : Matrix (Fin n) (Fin n) ℂ) (hs : N.charpoly.Separable) :
-    ∃ (h : GL (Fin n) ℂ) (γ : Fin n → ℂ), Function.Injective γ ∧ (∀ i, N.charpoly.IsRoot (γ i)) ∧
-      N * h.val = h.val * diagonal γ := by
+theorem exists_eigenbasis {n : ℕ} (N : Matrix (Fin n) (Fin n) ℂ) (hs : N.charpoly.Separable)
+    : ∃ (h : GL (Fin n) ℂ) (γ : Fin n → ℂ),
+      Function.Injective γ ∧ (∀ i, N.charpoly.IsRoot (γ i)) ∧ N * h.val = h.val * diagonal γ := by
   have hne : N.charpoly ≠ 0 := (Matrix.charpoly_monic N).ne_zero
   have hcard : N.charpoly.roots.toFinset.card = n := by
-    rw [Multiset.toFinset_card_of_nodup (nodup_roots hs), splits_iff_card_roots.1 (IsAlgClosed.splits _),
-      charpoly_natDegree_eq_dim, Fintype.card_fin]
+    rw [Multiset.toFinset_card_of_nodup (nodup_roots hs),
+      splits_iff_card_roots.1 (IsAlgClosed.splits _), charpoly_natDegree_eq_dim, Fintype.card_fin]
   let e := Finset.equivFinOfCardEq hcard
   let γ : Fin n → ℂ := fun i => (e.symm i).1
   have hinj : Function.Injective γ := fun i j hij => e.symm.injective (Subtype.ext hij)
@@ -35,8 +35,8 @@ theorem exists_eigenbasis {n : ℕ} (N : Matrix (Fin n) (Fin n) ℂ) (hs : N.cha
     ext k
     simp [scalar_apply, mulVec_diagonal]
   have hli : LinearIndependent ℂ v :=
-    Module.End.eigenvectors_linearIndependent' (Matrix.toLin' N) γ hinj v
-      (fun i => Module.End.hasEigenvector_iff.2
+    Module.End.eigenvectors_linearIndependent' (Matrix.toLin' N) γ hinj v (fun i =>
+      Module.End.hasEigenvector_iff.2
         ⟨Module.End.mem_eigenspace_iff.2 (by simpa using hNv i), hv0 i⟩)
   have hu : IsUnit (Matrix.of v)ᵀ := linearIndependent_cols_iff_isUnit.1 hli
   obtain ⟨h, hh⟩ := hu
@@ -50,21 +50,22 @@ theorem exists_eigenbasis {n : ℕ} (N : Matrix (Fin n) (Fin n) ℂ) (hs : N.cha
 
 variable {n : ℕ}
 
-theorem theta_val (g : GL (Fin n) ℂ) :
-    (thetaR (starRingEnd ℂ) n g).val = (g⁻¹).valᴴ := by
+theorem theta_val (g : GL (Fin n) ℂ) : (thetaR (starRingEnd ℂ) n g).val = (g⁻¹).valᴴ := by
   ext i j
   simp [thetaR_val, conjTranspose_apply]
 
-theorem theta_inv_val (g : GL (Fin n) ℂ) :
-    ((thetaR (starRingEnd ℂ) n g)⁻¹).val = g.valᴴ := by
+theorem theta_inv_val (g : GL (Fin n) ℂ) : ((thetaR (starRingEnd ℂ) n g)⁻¹).val = g.valᴴ := by
   rw [← map_inv, theta_val, inv_inv]
 
-theorem theta_theta (g : GL (Fin n) ℂ) :
-    thetaR (starRingEnd ℂ) n (thetaR (starRingEnd ℂ) n g) = g :=
+theorem theta_theta (g : GL (Fin n) ℂ)
+    : thetaR (starRingEnd ℂ) n (thetaR (starRingEnd ℂ) n g) = g :=
   Units.ext (by rw [theta_val, theta_inv_val, conjTranspose_conjTranspose])
 
-theorem offDiag_eq_zero (D : Matrix (Fin n) (Fin n) ℂ) (γ : Fin n → ℂ) (hγ : ∀ i, ‖γ i‖ = 1)
-    (hinj : Function.Injective γ) (hD : D = diagonal γ * Dᴴ) {i j : Fin n} (hij : i ≠ j) : D i j = 0 := by
+theorem offDiag_eq_zero
+    (D : Matrix (Fin n) (Fin n) ℂ) (γ : Fin n → ℂ)
+    (hγ : ∀ i, ‖γ i‖ = 1) (hinj : Function.Injective γ) (hD : D = diagonal γ * Dᴴ)
+    {i j : Fin n} (hij : i ≠ j)
+    : D i j = 0 := by
   have h2 : Dᴴ = D * diagonal (star γ) := by
     conv_lhs => rw [hD]
     rw [conjTranspose_mul, conjTranspose_conjTranspose, diagonal_conjTranspose]
@@ -120,14 +121,16 @@ theorem ellDiag : EllDiag := by
     simpa [conjTranspose_apply] using h1
   let s : Fin n → ℂ := fun i => ((Real.sqrt ‖b i‖ : ℝ) : ℂ)
   have hnb : ∀ i, 0 < ‖b i‖ := fun i => norm_pos_iff.2 (hb0 i)
-  have hs0 : ∀ i, s i ≠ 0 := fun i =>
-    Complex.ofReal_ne_zero.2 (Real.sqrt_pos.2 (hnb i)).ne'
+  have hs0 : ∀ i, s i ≠ 0 := fun i => Complex.ofReal_ne_zero.2 (Real.sqrt_pos.2 (hnb i)).ne'
   have hss : ∀ i, s i * s i = (‖b i‖ : ℂ) := fun i => by
     simp only [s]
     rw [← Complex.ofReal_mul, Real.mul_self_sqrt (hnb i).le]
-  let t : GL (Fin n) ℂ := ⟨diagonal s, diagonal fun i => (s i)⁻¹,
+  let t : GL (Fin n) ℂ := ⟨
+    diagonal s,
+    diagonal fun i => (s i)⁻¹,
     by rw [diagonal_mul_diagonal, ← diagonal_one]; congr 1; ext i; exact mul_inv_cancel₀ (hs0 i),
-    by rw [diagonal_mul_diagonal, ← diagonal_one]; congr 1; ext i; exact inv_mul_cancel₀ (hs0 i)⟩
+    by rw [diagonal_mul_diagonal, ← diagonal_one]; congr 1; ext i; exact inv_mul_cancel₀ (hs0 i)
+  ⟩
   have htinv : (t⁻¹).val = diagonal fun i => (s i)⁻¹ := rfl
   have htθ : (θ t).val = diagonal fun i => (s i)⁻¹ := by
     rw [hθ, theta_val, htinv, diagonal_conjTranspose]
@@ -145,7 +148,8 @@ theorem ellDiag : EllDiag := by
     ring
   refine ⟨(h * t)⁻¹, twConj θ t d₁, z, ?_, ?_, ?_, ?_⟩
   · change (t⁻¹ * d₁ * θ t).val = _
-    rw [Units.val_mul, Units.val_mul, htinv, hdiag, htθ, diagonal_mul_diagonal, diagonal_mul_diagonal]
+    rw [Units.val_mul, Units.val_mul, htinv, hdiag, htθ, diagonal_mul_diagonal,
+      diagonal_mul_diagonal]
     congr 1
     ext i
     have := hss i

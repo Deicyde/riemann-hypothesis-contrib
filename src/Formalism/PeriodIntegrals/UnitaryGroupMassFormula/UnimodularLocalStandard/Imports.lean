@@ -30,7 +30,8 @@ theorem stepC : StepC := by
   obtain ⟨β, hβ⟩ : ∃ β : ℕ → ℂ, ∀ u, β u = 1 + ((u * l : ℕ) : ℂ) * θ := ⟨_, fun _ => rfl⟩
   obtain ⟨βb, hβb⟩ : ∃ βb : ℕ → ℂ, ∀ u, βb u = 1 + ((u * l : ℕ) : ℂ) * ((b : ℂ) - θ) :=
     ⟨_, fun _ => rfl⟩
-  obtain ⟨K, hKdef⟩ : ∃ K : ℕ → ℤ, ∀ u, K u = 1 + ((u * l : ℕ) : ℤ) * b + ((u * l : ℕ) : ℤ) ^ 2 * a * c :=
+  obtain ⟨K, hKdef⟩
+      : ∃ K : ℕ → ℤ, ∀ u, K u = 1 + ((u * l : ℕ) : ℤ) * b + ((u * l : ℕ) : ℤ) ^ 2 * a * c :=
     ⟨_, fun _ => rfl⟩
   have hconj : ∀ u, (starRingEnd ℂ) (β u) = βb u := by
     intro u
@@ -92,8 +93,7 @@ theorem stepC : StepC := by
     intro x y
     show stdH (cmL a b d ha hd lam hlam) m (w • g x) (w • g y) = stdH (cmL a b d ha hd lam hlam) m x y
     rw [LinearMap.map_smul (stdH (cmL a b d ha hd lam hlam) m) w (g x), LinearMap.smul_apply,
-      LinearMap.map_smulₛₗ, smul_eq_mul, smul_eq_mul,
-      ← mul_assoc, mul_comm w, hww, one_mul]
+      LinearMap.map_smulₛₗ, smul_eq_mul, smul_eq_mul, ← mul_assoc, mul_comm w, hww, one_mul]
     exact hiso x y
   have himg : imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λa = X.map (smulHom w) := by
     rw [hXdef]
@@ -103,13 +103,14 @@ theorem stepC : StepC := by
 
   set Nn := (K u).toNat with hNndef
   have hNnZ : ((Nn : ℕ) : ℤ) = K u := Int.toNat_of_nonneg (hKpos u).le
-  have hNn : ((Nn : ℕ) : ℂ) = β u * βb u := by
-    rw [hK u, ← hNnZ, Int.cast_natCast]
+  have hNn : ((Nn : ℕ) : ℂ) = β u * βb u := by rw [hK u, ← hNnZ, Int.cast_natCast]
   have hN0 : Nn ≠ 0 := by have := hKpos u; omega
   have ha' : ∀ x ∈ X, (Nn : ℂ) • w • x ∈ X := by
     intro x hx
-    have heq : (Nn : ℂ) * w = (((1 - ((u * l : ℕ) : ℤ) ^ 2 * a * c : ℤ)) : ℂ) +
-        (((2 * ((u * l : ℕ) : ℤ) + ((u * l : ℕ) : ℤ) ^ 2 * b : ℤ)) : ℂ) * θ := by
+    have heq
+        : (Nn : ℂ) * w
+          = (((1 - ((u * l : ℕ) : ℤ) ^ 2 * a * c : ℤ)) : ℂ)
+            + (((2 * ((u * l : ℕ) : ℤ) + ((u * l : ℕ) : ℤ) ^ 2 * b : ℤ)) : ℂ) * θ := by
       rw [hNn, hwdef]
       have : β u * βb u * (β u / βb u) = β u * β u := by field_simp [hβb0 u]
       rw [this, hβ]
@@ -119,8 +120,12 @@ theorem stepC : StepC := by
     exact hlin _ _ x hx
   have hb' : ∀ x ∈ X, (Nn : ℂ) • w⁻¹ • x ∈ X := by
     intro x hx
-    have heq : (Nn : ℂ) * w⁻¹ = ((((1 + ((u * l : ℕ) : ℤ) * b) ^ 2 - ((u * l : ℕ) : ℤ) ^ 2 * a * c : ℤ)) : ℂ) +
-        ((((u * l : ℕ) : ℤ) ^ 2 * b - 2 * (1 + ((u * l : ℕ) : ℤ) * b) * ((u * l : ℕ) : ℤ) : ℤ) : ℂ) * θ := by
+    have heq
+        : (Nn : ℂ) * w⁻¹
+          = ((((1 + ((u * l : ℕ) : ℤ) * b) ^ 2 - ((u * l : ℕ) : ℤ) ^ 2 * a * c : ℤ)) : ℂ)
+            + ((((u * l : ℕ) : ℤ) ^ 2 * b - 2 * (1 + ((u * l : ℕ) : ℤ) * b) * ((u * l : ℕ) : ℤ) : ℤ)
+                : ℂ)
+              * θ := by
       rw [hNn, hwdef, inv_div]
       have : β u * βb u * (βb u / β u) = βb u * βb u := by field_simp [hβ0 u]
       rw [this, hβb]
@@ -148,23 +153,27 @@ theorem stepC : StepC := by
     have h4 : (l : ℤ) = 1 := Int.eq_one_of_dvd_one (by positivity) h3
     exact hl.one_lt.ne' (by exact_mod_cast h4)
   have hln : ¬ l ∣ S.relIndex X * Nn := fun h => ((Nat.Prime.dvd_mul hl).1 h).elim hl1 hNl
-  have hdvd := not_dvd_relIndex (A := S) (B := X.map (smulHom w)) (l := l) (n := S.relIndex X * Nn) hl hi1
-    (by
-      rintro _ ⟨x, hx, rfl⟩
-      rw [smulHom_apply, mul_smul, ← Nat.cast_smul_eq_nsmul ℂ Nn]
-      exact hM _ (ha' x hx)) hln
+  have hdvd :=
+    not_dvd_relIndex (A := S) (B := X.map (smulHom w)) (l := l) (n := S.relIndex X * Nn) hl hi1
+      (by
+        rintro _ ⟨x, hx, rfl⟩
+        rw [smulHom_apply, mul_smul, ← Nat.cast_smul_eq_nsmul ℂ Nn]
+        exact hM _ (ha' x hx))
+      hln
   refine ⟨δ, hisoδ, ?_, ?_, ?_, ?_⟩
   · intro x hx
     by_contra hx0
     apply hu
     have hgx : (g : Module.End ℂ (m → ℂ)) x = w⁻¹ • x := by
       rw [hδ] at hx
-      calc (g : Module.End ℂ (m → ℂ)) x = w⁻¹ • (w • g x) := by rw [inv_smul_smul₀ hw0]; rfl
+      calc
+        (g : Module.End ℂ (m → ℂ)) x
+          = w⁻¹ • (w • g x) := by rw [inv_smul_smul₀ hw0]; rfl
         _ = w⁻¹ • x := by rw [hx]
     refine Module.End.hasEigenvalue_of_hasEigenvector (x := x) ?_
     first
-      | exact Module.End.hasEigenvector_iff.2 ⟨Module.End.mem_eigenspace_iff.2 hgx, hx0⟩
-      | exact ⟨Module.End.mem_eigenspace_iff.2 hgx, hx0⟩
+    | exact Module.End.hasEigenvector_iff.2 ⟨Module.End.mem_eigenspace_iff.2 hgx, hx0⟩
+    | exact ⟨Module.End.mem_eigenspace_iff.2 hgx, hx0⟩
   · unfold relIdx
     rw [himg]
     exact hi1

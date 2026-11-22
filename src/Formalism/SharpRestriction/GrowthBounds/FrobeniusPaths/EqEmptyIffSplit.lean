@@ -93,7 +93,8 @@ section Orders
 
 variable {σ : Type*} {R : Type*} [CommRing R] (wv : σ → ℕ)
 
-def Ord (b : ℕ) (f : MvPolynomial σ R) : Prop := ∀ m, Finsupp.weight wv m < b → AddMonoidAlgebra.coeff f m = 0
+def Ord (b : ℕ) (f : MvPolynomial σ R) : Prop :=
+  ∀ m, Finsupp.weight wv m < b → AddMonoidAlgebra.coeff f m = 0
 
 def IsW (y : MvPolynomial σ R) (a : ℕ) : Prop := y = 0 ∨ ∃ v, y = X v ∧ wv v = a
 
@@ -174,7 +175,8 @@ end Orders
 
 section Generic
 
-def KG {n : ℕ} {P : Type*} [CommRing P] (c : ℤ) (hs : ℕ → ℕ) (x : ℕ → Fin n → P) : ℕ → Finset (Fin n) → P
+def KG {n : ℕ} {P : Type*} [CommRing P] (c : ℤ) (hs : ℕ → ℕ) (x : ℕ → Fin n → P)
+    : ℕ → Finset (Fin n) → P
   | 0 => extOne
   | j + 1 => colStep c (hs j) (hs (j + 1)) (x j) (KG c hs x j)
 
@@ -389,7 +391,12 @@ structure Dat (N r K : ℕ) (σ : Type*) (R : Type*) [CommRing R] (wv : σ → �
   x : ℕ → Fin (r + K) → MvPolynomial σ R
   hxp : ∀ j a, IsW wv (x j (Fin.castAdd K a)) (if vec j then 0 else om j)
   hxt : ∀ j b, IsW wv (x j (Fin.natAdd r b)) (if vec j then om j else 0)
-  hstep : ∀ j, if vec j then hs j ≤ hs (j + 1) ∧ hs (j + 1) ≤ hs j + 1 else hs (j + 1) ≤ hs j ∧ hs j ≤ hs (j + 1) + 1
+  hstep
+    : ∀ j,
+      if vec j then
+        hs j ≤ hs (j + 1) ∧ hs (j + 1) ≤ hs j + 1
+      else
+        hs (j + 1) ≤ hs j ∧ hs j ≤ hs (j + 1) + 1
   hom : ∀ i j, i < j → j < N → om j < om i
   hpos : ∀ j, j < N → 0 < om j
 
@@ -429,10 +436,15 @@ lemma vec_of_fall {j : ℕ} (h : d.hs (j + 1) < d.hs j) : ¬ (d.vec j = true) :=
 lemma o_succ (j : ℕ) : d.o (j + 1) = d.cost j + d.o j := by
   rw [o, Finset.sum_range_succ, add_comm]; rfl
 
-theorem inv_pos (hc : 1 ≤ c) (h0 : d.hs 0 = 0) : ∀ j, j ≤ N →
-    (∀ w, (∀ i, i < j → w ≤ d.om i) → ∀ J,
-      Ord wv (d.o j + (min (d.hs j) r - (Jp J).card) * w) (d.Kf c j J)) ∧
-    ∀ J, weightedHomogeneousComponent wv (d.o j) (d.Kf c j J) = d.pl c j (Jp J) * d.tn c j (Jt J) := by
+theorem inv_pos (hc : 1 ≤ c) (h0 : d.hs 0 = 0)
+    : ∀ j,
+      j ≤ N
+        → (∀ w,
+            (∀ i, i < j → w ≤ d.om i)
+              → ∀ J, Ord wv (d.o j + (min (d.hs j) r - (Jp J).card) * w) (d.Kf c j J))
+          ∧ ∀ J,
+            weightedHomogeneousComponent wv (d.o j) (d.Kf c j J)
+              = d.pl c j (Jp J) * d.tn c j (Jt J) := by
   intro j
   induction j with
   | zero =>
@@ -477,13 +489,15 @@ theorem inv_pos (hc : 1 ≤ c) (h0 : d.hs 0 = 0) : ∀ j, j ≤ N →
           · refine Ord.term (hxp a) (A' _) ?_
             rw [Jp_erase_ca, Finset.card_erase_of_mem ha]
             have h3 := Finset.card_pos.mpr ⟨a, ha⟩
-            have := ar0 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - ((Jp J).card - 1))
-              (by omega) hwom
+            have :=
+              ar0 (d' := min (d.hs (j + 1)) r - (Jp J).card)
+                (d := min (d.hs j) r - ((Jp J).card - 1)) (by omega) hwom
             omega
           · refine Ord.term (hxt b) (A' _) ?_
             rw [Jp_erase_na]
-            have := ar1 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - (Jp J).card)
-              (by omega) hwom
+            have :=
+              ar1 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - (Jp J).card)
+                (by omega) hwom
             omega
         · rw [hK, hpl, htn, ho, hcost]
           exact wedge_pl ihD hxp (fun J b hb e => Ord.term (hxt b) (A0 _) (by omega)) htz J
@@ -499,13 +513,15 @@ theorem inv_pos (hc : 1 ≤ c) (h0 : d.hs 0 = 0) : ∀ j, j ≤ N →
             rw [Jp_erase_ca, Finset.card_erase_of_mem ha]
             have h3 := Finset.card_pos.mpr ⟨a, ha⟩
             have h4 := Jp_card_le J
-            have := ar2 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - ((Jp J).card - 1))
-              (by omega) hwom
+            have :=
+              ar2 (d' := min (d.hs (j + 1)) r - (Jp J).card)
+                (d := min (d.hs j) r - ((Jp J).card - 1)) (by omega) hwom
             omega
           · refine Ord.term (hxt b) (A' _) ?_
             rw [Jp_erase_na]
-            have := ar0 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - (Jp J).card)
-              (by omega) hwom
+            have :=
+              ar0 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - (Jp J).card)
+                (by omega) hwom
             omega
         · rw [hK, hpl, htn, ho, hcost]
           refine wedge_tan ihD hxt (fun J a ha e => Ord.term (hxp a) (A' _) ?_) J
@@ -540,13 +556,15 @@ theorem inv_pos (hc : 1 ≤ c) (h0 : d.hs 0 = 0) : ∀ j, j ≤ N →
           refine ordContr (fun a ha e => ?_) (fun b hb e => ?_)
           · refine Ord.term (hxp a) (A' _) ?_
             rw [Jp_insert_ca, Finset.card_insert_of_notMem ha]
-            have := ar1 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - ((Jp J).card + 1))
-              (by omega) hwom
+            have :=
+              ar1 (d' := min (d.hs (j + 1)) r - (Jp J).card)
+                (d := min (d.hs j) r - ((Jp J).card + 1)) (by omega) hwom
             omega
           · refine Ord.term (hxt b) (A' _) ?_
             rw [Jp_insert_na]
-            have := ar0 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - (Jp J).card)
-              (by omega) hwom
+            have :=
+              ar0 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - (Jp J).card)
+                (by omega) hwom
             omega
         · rw [hK, hpl, htn, ho, hcost]
           exact contr_tan ihD hxt (fun J a ha e => Ord.term (hxp a) (A0 _) (by omega)) J
@@ -558,8 +576,10 @@ theorem inv_pos (hc : 1 ≤ c) (h0 : d.hs 0 = 0) : ∀ j, j ≤ N →
           by_contra hne
           have := hcardT J'' hne
           exact hJ (Finset.card_eq_zero.mp (by omega))
-        have hoffT : ∀ (J : Finset (Fin (r + K))) (b : Fin K), b ∉ Jt J → d.Kf c j (insert (Fin.natAdd r b) J) ≠ 0 →
-            (Jp J).card + 1 ≤ d.hs j := fun J b hb hne => by
+        have hoffT
+            : ∀ (J : Finset (Fin (r + K))) (b : Fin K),
+              b ∉ Jt J → d.Kf c j (insert (Fin.natAdd r b) J) ≠ 0
+                → (Jp J).card + 1 ≤ d.hs j := fun J b hb hne => by
           have h5 := hcardK _ hne
           rw [Finset.card_insert_of_notMem (by simpa using hb), card_split] at h5
           omega
@@ -569,16 +589,18 @@ theorem inv_pos (hc : 1 ≤ c) (h0 : d.hs 0 = 0) : ∀ j, j ≤ N →
           refine ordContr (fun a ha e => ?_) (fun b hb e => ?_)
           · refine Ord.term (hxp a) (A' _) ?_
             rw [Jp_insert_ca, Finset.card_insert_of_notMem ha]
-            have := ar0 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - ((Jp J).card + 1))
-              (by omega) hwom
+            have :=
+              ar0 (d' := min (d.hs (j + 1)) r - (Jp J).card)
+                (d := min (d.hs j) r - ((Jp J).card + 1)) (by omega) hwom
             omega
           · by_cases hne : d.Kf c j (insert (Fin.natAdd r b) J) = 0
             · rw [hne, mul_zero]; exact Ord.zero _
             · have h5 := hoffT J b hb hne
               refine Ord.term (hxt b) (A' _) ?_
               rw [Jp_insert_na]
-              have := ar2 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - (Jp J).card)
-                (by omega) hwom
+              have :=
+                ar2 (d' := min (d.hs (j + 1)) r - (Jp J).card) (d := min (d.hs j) r - (Jp J).card)
+                  (by omega) hwom
               omega
         · rw [hK, hpl, htn, ho, hcost]
           refine contr_pl ihD hxp (fun J b hb e => ?_) htz J
@@ -590,9 +612,13 @@ theorem inv_pos (hc : 1 ≤ c) (h0 : d.hs 0 = 0) : ∀ j, j ≤ N →
             have := ar3 (d := min (d.hs j) r - (Jp J).card) (om := d.om j) (by omega)
             omega
 
-theorem inv_neg (hc : ¬ 1 ≤ c) (hr : ∀ j, j ≤ N → r ≤ d.hs j) : ∀ j, j ≤ N →
-    (∀ w, (∀ i, i < j → w ≤ d.om i) → ∀ J, Ord wv (d.o j + (Jp J).card * w) (d.Kf c j J)) ∧
-    ∀ J, weightedHomogeneousComponent wv (d.o j) (d.Kf c j J) = d.pl c j (Jp J) * d.tn c j (Jt J) := by
+theorem inv_neg (hc : ¬ 1 ≤ c) (hr : ∀ j, j ≤ N → r ≤ d.hs j)
+    : ∀ j,
+      j ≤ N
+        → (∀ w, (∀ i, i < j → w ≤ d.om i) → ∀ J, Ord wv (d.o j + (Jp J).card * w) (d.Kf c j J))
+          ∧ ∀ J,
+            weightedHomogeneousComponent wv (d.o j) (d.Kf c j J)
+              = d.pl c j (Jp J) * d.tn c j (Jt J) := by
   intro j
   induction j with
   | zero =>
@@ -601,9 +627,11 @@ theorem inv_neg (hc : ¬ 1 ≤ c) (hr : ∀ j, j ≤ N → r ≤ d.hs j) : ∀ j
     · by_cases hJ : J = ∅
       · subst hJ
         intro m hm
-        exfalso; simp [o, Jp] at hm
+        exfalso
+        simp [o, Jp] at hm
       · show Ord wv _ (extOne J)
-        rw [extOne, if_neg hJ]; exact Ord.zero _
+        rw [extOne, if_neg hJ]
+        exact Ord.zero _
     · have h00 : d.o 0 = 0 := by simp [o]
       rw [h00]
       exact cmp_extOne (wv := wv) (R := R) J
@@ -682,9 +710,11 @@ lemma hs_ge (h0 : d.hs 0 = r + K) : ∀ j, r + K ≤ d.hs j + j
   | 0 => by omega
   | j + 1 => by have := hs_ge h0 j; have := d.hst2 j; omega
 
-theorem low (hNK : N ≤ K) (h0 : if 1 ≤ c then d.hs 0 = 0 else d.hs 0 = r + K) (J : Finset (Fin (r + K))) :
-    Ord wv (d.o N) (d.Kf c N J) ∧
-    weightedHomogeneousComponent wv (d.o N) (d.Kf c N J) = d.pl c N (Jp J) * d.tn c N (Jt J) := by
+theorem low
+    (hNK : N ≤ K) (h0 : if 1 ≤ c then d.hs 0 = 0 else d.hs 0 = r + K) (J : Finset (Fin (r + K)))
+    : Ord wv (d.o N) (d.Kf c N J)
+      ∧ weightedHomogeneousComponent wv (d.o N) (d.Kf c N J)
+        = d.pl c N (Jp J) * d.tn c N (Jt J) := by
   by_cases hc : 1 ≤ c
   · rw [if_pos hc] at h0
     obtain ⟨hA, hD⟩ := d.inv_pos c hc h0 N le_rfl
@@ -754,9 +784,11 @@ section Translate
 
 variable (R : Type*) [CommRing R] {N : ℕ}
 
-def hsOf {n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) (c : ℤ) (j : ℕ) : ℕ := colH (mu ⟨min j N, by omega⟩) c
+def hsOf {n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) (c : ℤ) (j : ℕ) : ℕ :=
+  colH (mu ⟨min j N, by omega⟩) c
 
-def xOf (N n : ℕ) (j : ℕ) (m : Fin n) : MvPolynomial (Fin N × Fin n) R := if h : j < N then X (⟨j, h⟩, m) else 0
+def xOf (N n : ℕ) (j : ℕ) (m : Fin n) : MvPolynomial (Fin N × Fin n) R :=
+  if h : j < N then X (⟨j, h⟩, m) else 0
 
 lemma hsOf_eq {n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) (c : ℤ) (j : ℕ) (h : j < N + 1) :
     hsOf mu c j = colH (mu ⟨j, h⟩) c := by
@@ -795,8 +827,11 @@ section Final
 
 variable (R : Type*) [CommRing R] {N r K : ℕ}
 
-def mkDat (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ) (hom : StrictAnti om) (hpos : ∀ i, 0 < om i)
-    (P : PPath (r + K) N LL B) (c : ℤ) : Dat N r K (Fin N × Fin (r + K)) R (symWt (r := r) (K := K) LL om) where
+def mkDat
+    (LL : Letters (Fin N)) (B : Fin N → ℕ)
+    (om : Fin N → ℕ) (hom : StrictAnti om) (hpos : ∀ i, 0 < om i)
+    (P : PPath (r + K) N LL B) (c : ℤ)
+    : Dat N r K (Fin N × Fin (r + K)) R (symWt (r := r) (K := K) LL om) where
   hs := hsOf P.mu c
   vec := fun j => if h : j < N then LL.vec ⟨j, h⟩ else true
   om := fun j => if h : j < N then om ⟨j, h⟩ else 0
@@ -834,7 +869,8 @@ def mkDat (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ) (hom :
       · exact colH_strip (P.dom _) (P.dom _) hs c
     · have : hsOf P.mu c j = hsOf P.mu c (j + 1) := by
         unfold hsOf
-        have e : (⟨min j N, by omega⟩ : Fin (N + 1)) = ⟨min (j + 1) N, by omega⟩ := Fin.ext (by simp; omega)
+        have e : (⟨min j N, by omega⟩ : Fin (N + 1)) = ⟨min (j + 1) N, by omega⟩ :=
+          Fin.ext (by simp; omega)
         rw [e]
       rw [this]
       split_ifs <;> omega
@@ -844,7 +880,8 @@ def mkDat (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ) (hom :
     exact hom (by rw [Fin.lt_def]; exact hij)
   hpos := by
     intro j hj
-    rw [dif_pos hj]; exact hpos _
+    rw [dif_pos hj]
+    exact hpos _
 
 lemma mkDat_o (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ) (hom : StrictAnti om) (hpos : ∀ i, 0 < om i)
     (P : PPath (r + K) N LL B) (c : ℤ) : (mkDat R LL B om hom hpos P c).o N = oc om P.mu c := by
@@ -859,23 +896,32 @@ lemma mkDat_o (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ) (h
   · rw [if_pos hC]; exact if_pos hC
   · rw [if_neg hC]; exact if_neg hC
 
-theorem kcol_low (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ) (hNK : N + r ≤ K) (hom : StrictAnti om)
-    (hpos : ∀ i, 0 < om i) (P : PPath (r + K) N LL B) (c : ℤ) (J : Finset (Fin (r + K))) :
-    (∀ m ∈ (Kcol R P.mu c N J).support, oc om P.mu c ≤ monWt LL om m) ∧
-    weightedHomogeneousComponent (symWt (r := r) (K := K) LL om) (oc om P.mu c) (Kcol R P.mu c N J) =
-      plTanCol R P.mu c J := by
-  have h0 : if 1 ≤ c then (mkDat R LL B om hom hpos P c).hs 0 = 0
-      else (mkDat R LL B om hom hpos P c).hs 0 = r + K := by
+theorem kcol_low
+    (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ)
+    (hNK : N + r ≤ K) (hom : StrictAnti om) (hpos : ∀ i, 0 < om i) (P : PPath (r + K) N LL B)
+    (c : ℤ) (J : Finset (Fin (r + K)))
+    : (∀ m ∈ (Kcol R P.mu c N J).support, oc om P.mu c ≤ monWt LL om m)
+      ∧ weightedHomogeneousComponent (symWt (r := r) (K := K) LL om) (oc om P.mu c)
+          (Kcol R P.mu c N J)
+        = plTanCol R P.mu c J := by
+  have h0
+      : if 1 ≤ c then
+          (mkDat R LL B om hom hpos P c).hs 0 = 0
+        else
+          (mkDat R LL B om hom hpos P c).hs 0 = r + K := by
     have e0 : (mkDat R LL B om hom hpos P c).hs 0 = colH (P.mu 0) c := hsOf_eq P.mu c 0 (by omega)
     rw [e0, P.zero]
     unfold colH
     split_ifs with hc
     · rw [Finset.card_eq_zero, Finset.filter_eq_empty_iff]
-      intro m _; simp; omega
+      intro m _
+      simp
+      omega
     · rw [Finset.filter_true_of_mem (fun m _ => by simp; omega)]; simp
   obtain ⟨hA, hD⟩ := (mkDat R LL B om hom hpos P c).low c (by omega) h0 J
   rw [mkDat_o] at hA hD
-  have hK : (mkDat R LL B om hom hpos P c).Kf c N = Kcol R P.mu c N := (Kcol_eq_KG R P.mu c N le_rfl).symm
+  have hK : (mkDat R LL B om hom hpos P c).Kf c N = Kcol R P.mu c N :=
+    (Kcol_eq_KG R P.mu c N le_rfl).symm
   rw [hK] at hA hD
   refine ⟨fun m hm => ?_, ?_⟩
   · by_contra hlt
@@ -884,33 +930,47 @@ theorem kcol_low (LL : Letters (Fin N)) (B : Fin N → ℕ) (om : Fin N → ℕ)
     unfold plTanCol
     congr 1
     · rw [Kcol_eq_KG R (plPart P.mu) c N le_rfl]
-      have := map_KG (rename (plVar (N := N) (r := r) (K := K)) :
-        MvPolynomial (Fin N × Fin r) R →ₐ[R] MvPolynomial (Fin N × Fin (r + K)) R).toRingHom c
-        (hsOf (plPart P.mu) c) (xOf R N r) N (Jp J)
+      have :=
+        map_KG
+          (rename (plVar (N := N) (r := r) (K := K))
+            : MvPolynomial (Fin N × Fin r) R →ₐ[R] MvPolynomial (Fin N × Fin (r + K)) R).toRingHom
+          c (hsOf (plPart P.mu) c) (xOf R N r) N (Jp J)
       refine Eq.trans ?_ this.symm
       have e1 : hsOf (plPart P.mu) c = fun j => min ((mkDat R LL B om hom hpos P c).hs j) r := by
         funext j; exact colH_pl (P.dom _) c
-      have e2 : (fun (j : ℕ) (m : Fin r) => (rename (plVar (N := N) (r := r) (K := K)) :
-          MvPolynomial (Fin N × Fin r) R →ₐ[R] MvPolynomial (Fin N × Fin (r + K)) R).toRingHom (xOf R N r j m)) =
-          fun j a => (mkDat R LL B om hom hpos P c).x j (Fin.castAdd K a) := by
+      have e2
+          : (fun (j : ℕ) (m : Fin r) =>
+              (rename (plVar (N := N) (r := r) (K := K))
+                  : MvPolynomial (Fin N × Fin r) R →ₐ[R] MvPolynomial (Fin N × Fin (r + K)) R).toRingHom
+                (xOf R N r j m))
+            = fun j a => (mkDat R LL B om hom hpos P c).x j (Fin.castAdd K a) := by
         funext j a
         show (rename (plVar (N := N) (r := r) (K := K))) (xOf R N r j a) = xOf R N (r + K) j (Fin.castAdd K a)
-        unfold xOf; split_ifs <;> simp [plVar]
-      rw [e1, e2]; rfl
+        unfold xOf
+        split_ifs <;> simp [plVar]
+      rw [e1, e2]
+      rfl
     · rw [Kcol_eq_KG R (tanPart P.mu) c N le_rfl]
-      have := map_KG (rename (tanVar (N := N) (r := r) (K := K)) :
-        MvPolynomial (Fin N × Fin K) R →ₐ[R] MvPolynomial (Fin N × Fin (r + K)) R).toRingHom c
-        (hsOf (tanPart P.mu) c) (xOf R N K) N (Jt J)
+      have :=
+        map_KG
+          (rename (tanVar (N := N) (r := r) (K := K))
+            : MvPolynomial (Fin N × Fin K) R →ₐ[R] MvPolynomial (Fin N × Fin (r + K)) R).toRingHom
+          c (hsOf (tanPart P.mu) c) (xOf R N K) N (Jt J)
       refine Eq.trans ?_ this.symm
       have e1 : hsOf (tanPart P.mu) c = fun j => (mkDat R LL B om hom hpos P c).hs j - r := by
         funext j; exact colH_tan (P.dom _) c
-      have e2 : (fun (j : ℕ) (m : Fin K) => (rename (tanVar (N := N) (r := r) (K := K)) :
-          MvPolynomial (Fin N × Fin K) R →ₐ[R] MvPolynomial (Fin N × Fin (r + K)) R).toRingHom (xOf R N K j m)) =
-          fun j b => (mkDat R LL B om hom hpos P c).x j (Fin.natAdd r b) := by
+      have e2
+          : (fun (j : ℕ) (m : Fin K) =>
+              (rename (tanVar (N := N) (r := r) (K := K))
+                  : MvPolynomial (Fin N × Fin K) R →ₐ[R] MvPolynomial (Fin N × Fin (r + K)) R).toRingHom
+                (xOf R N K j m))
+            = fun j b => (mkDat R LL B om hom hpos P c).x j (Fin.natAdd r b) := by
         funext j b
         show (rename (tanVar (N := N) (r := r) (K := K))) (xOf R N K j b) = xOf R N (r + K) j (Fin.natAdd r b)
-        unfold xOf; split_ifs <;> simp [tanVar]
-      rw [e1, e2]; rfl
+        unfold xOf
+        split_ifs <;> simp [tanVar]
+      rw [e1, e2]
+      rfl
 
 end Final
 

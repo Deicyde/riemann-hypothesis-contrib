@@ -22,8 +22,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Smoot
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj
 
@@ -33,68 +35,82 @@ namespace GlobalTheory.PowUnif
 
 section Level
 
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.BoxFamily GlobalTheory.UnifPullRig GlobalTheory.WCub
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.BoxFamily GlobalTheory.UnifPullRig
+  GlobalTheory.WCub
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {j : ℕ} {D D' : DegData R I}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {j : ℕ} {D D' : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G G' : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] [GrpObj G'] [IsCommMonObj G']
 
 omit [IsDomain R] [IsCommMonObj G] [IsCommMonObj G'] in
-theorem rho_fst (pG : IsPowGrp G' G j) (e : ℕ) (i : Fin j) :
-    rhoE I pG e i ≫ fGl I G e = fGl I G' e ≫ (pG.pr i).left := pullback.lift_fst _ _ _
+theorem rho_fst (pG : IsPowGrp G' G j) (e : ℕ) (i : Fin j)
+    : rhoE I pG e i ≫ fGl I G e = fGl I G' e ≫ (pG.pr i).left :=
+  pullback.lift_fst _ _ _
 
 omit [IsCommMonObj G] [IsCommMonObj G'] in
-theorem thickMap_rho (pG : IsPowGrp G' G j) (e : ℕ) (i : Fin j) :
-    thickMap R I e G' ≫ rhoE I pG (e + 1) i = rhoE I pG e i ≫ thickMap R I e G := by
+theorem thickMap_rho (pG : IsPowGrp G' G j) (e : ℕ) (i : Fin j)
+    : thickMap R I e G' ≫ rhoE I pG (e + 1) i = rhoE I pG e i ≫ thickMap R I e G := by
   have : Mono (fGl I G (e + 1)) := mono_fstG I (e + 1) G
   have a : thickMap R I e G ≫ fGl I G (e + 1) = fGl I G e := thickMap_fstG I e G
   have a' : thickMap R I e G' ≫ fGl I G' (e + 1) = fGl I G' e := thickMap_fstG I e G'
-  rw [← cancel_mono (fGl I G (e + 1)), Category.assoc, Category.assoc, rho_fst, a, rho_fst, ← Category.assoc, a']
+  rw [← cancel_mono (fGl I G (e + 1)), Category.assoc, Category.assoc, rho_fst, a, rho_fst,
+    ← Category.assoc, a']
 
-theorem thickMap_pG (pD : IsPowDeg D'.toPre D.toPre j) (pG : IsPowGrp G' G j) (U : UnifPre I D A G) (e : ℕ)
+theorem thickMap_pG
+    (pD : IsPowDeg D'.toPre D.toPre j) (pG : IsPowGrp G' G j) (U : UnifPre I D A G) (e : ℕ)
     (g₀ : GtCoord I D'.toPre e G') (g₁ : GtCoord I D'.toPre (e + 1) G')
     (h₀ : ∀ i, g₀.pG.left ≫ (pD.pw.pr i).left = rhoE I pG e i ≫ (U.gt e).pG.left)
-    (h₁ : ∀ i, g₁.pG.left ≫ (pD.pw.pr i).left = rhoE I pG (e + 1) i ≫ (U.gt (e + 1)).pG.left) :
-    thickMap R I e G' ≫ g₁.pG.left = g₀.pG.left := by
-  have h : LevelCompat.thickMapOver I e G' ≫ g₁.pG = g₀.pG := pD.pw.lim.hom_ext fun ⟨i⟩ =>
-    Over.OverMorphism.ext ((Category.assoc _ _ _).trans ((congrArg (thickMap R I e G' ≫ ·) (h₁ i)).trans
-      ((Category.assoc _ _ _).symm.trans ((congrArg (· ≫ (U.gt (e + 1)).pG.left) (thickMap_rho pG e i)).trans
-        ((Category.assoc _ _ _).trans ((congrArg (rhoE I pG e i ≫ ·) (U.gt_q e)).trans (h₀ i).symm))))))
+    (h₁ : ∀ i, g₁.pG.left ≫ (pD.pw.pr i).left = rhoE I pG (e + 1) i ≫ (U.gt (e + 1)).pG.left)
+    : thickMap R I e G' ≫ g₁.pG.left = g₀.pG.left := by
+  have h : LevelCompat.thickMapOver I e G' ≫ g₁.pG = g₀.pG :=
+    pD.pw.lim.hom_ext fun ⟨i⟩ =>
+      Over.OverMorphism.ext ((Category.assoc _ _ _).trans
+        ((congrArg (thickMap R I e G' ≫ ·) (h₁ i)).trans
+          ((Category.assoc _ _ _).symm.trans
+            ((congrArg (· ≫ (U.gt (e + 1)).pG.left) (thickMap_rho pG e i)).trans
+              ((Category.assoc _ _ _).trans
+                ((congrArg (rhoE I pG e i ≫ ·) (U.gt_q e)).trans (h₀ i).symm))))))
   exact congrArg (fun z => z.left) h
 
-variable (pD : IsPowDeg D'.toPre D.toPre j) (pG : IsPowGrp G' G j) (U : UnifPre I D A G)
-    (e : ℕ) (g' : GtCoord I D'.toPre e G')
-    (hq : ∀ i, g'.pG.left ≫ (pD.pw.pr i).left = rhoE I pG e i ≫ (U.gt e).pG.left)
-    (w' : LB.Iso ((boxLB U.LG.L pG.pr).pull (fstG I e G').left) (D'.toPre.P.L.pull g'.pG.left))
-    (Q : BoxSquare (T := (thickObj R I e G).left) (T' := (thickObj R I e G').left) pD.w (U.w e) w' (rhoE I pG e))
+variable
+  (pD : IsPowDeg D'.toPre D.toPre j) (pG : IsPowGrp G' G j) (U : UnifPre I D A G) (e : ℕ)
+  (g' : GtCoord I D'.toPre e G')
+  (hq : ∀ i, g'.pG.left ≫ (pD.pw.pr i).left = rhoE I pG e i ≫ (U.gt e).pG.left)
+  (w' : LB.Iso ((boxLB U.LG.L pG.pr).pull (fstG I e G').left) (D'.toPre.P.L.pull g'.pG.left))
+  (Q : BoxSquare (T := (thickObj R I e G).left) (T' := (thickObj R I e G').left) pD.w (U.w e) w'
+    (rhoE I pG e))
 include hq Q
 
-theorem rig_level : RigAlong (T := (thickObj R I e G').left) w' (eSec (thickObj R I e G')) (thick R I e)
-    (boxRig pG U.LG.L U.LG.rig) D'.toPre.rig := by
+theorem rig_level
+    : RigAlong (T := (thickObj R I e G').left) w' (eSec (thickObj R I e G')) (thick R I e)
+      (boxRig pG U.LG.L U.LG.rig) D'.toPre.rig := by
   obtain ⟨b, b₁, b₂⟩ := pD.w_rig
-  exact rig_box (T := (thickObj R I e G).left) (T' := (thickObj R I e G').left) D.toPre.P.isLB D'.toPre.P.isLB
-    U.LG.isLB (U.w_gen e) Q (rho_fst pG e) hq U.LG.rigGen (U.w_rig e)
+  exact rig_box (T := (thickObj R I e G).left) (T' := (thickObj R I e G').left) D.toPre.P.isLB
+    D'.toPre.P.isLB U.LG.isLB (U.w_gen e) Q (rho_fst pG e) hq U.LG.rigGen (U.w_rig e)
     (fun i => by
       have := pG.hom i
       exact BoxSymmetry.eSec_comp_hom ((Over.pullback (thick R I e)).map (pG.pr i)))
     (eSec_fstG I e G) (eSec_pG I (U.gt e)) (eSec_pG I g')
-    (fun i _ => letI := pG.hom i; (CubeMap.ofHom (pG.pr i)).e_comm) b b₁ b₂
+    (fun i _ => letI := pG.hom i; (CubeMap.ofHom (pG.pr i)).e_comm)
+    b b₁ b₂
 
-theorem even_level (hG : GlobalFnsSt) : EvenAlong (T := (thickObj R I e G').left) w' (ι[thickObj R I e G']).left
-    (boxSym pG U.LG.L U.symG) D'.toPre.sym := by
+theorem even_level (hG : GlobalFnsSt)
+    : EvenAlong (T := (thickObj R I e G').left) w' (ι[thickObj R I e G']).left
+      (boxSym pG U.LG.L U.symG) D'.toPre.sym := by
   have := g'.q_hom
   have := (U.gt e).q_hom
-  exact even_box (T := (thickObj R I e G).left) (T' := (thickObj R I e G').left) D.toPre.P.isLB D'.toPre.P.isLB
-    U.LG.isLB (U.w_gen e) Q (rho_fst pG e) hq
+  exact even_box (T := (thickObj R I e G).left) (T' := (thickObj R I e G').left) D.toPre.P.isLB
+    D'.toPre.P.isLB U.LG.isLB (U.w_gen e) Q (rho_fst pG e) hq
     (fun i => by
       have := pG.hom i
       exact EvenPull.inv_left_comp ((Over.pullback (thick R I e)).map (pG.pr i)))
-    (EvenPull.inv_fst _ G) (EvenPull.inv_hom_fst _ _ (U.gt e).q) (EvenPull.inv_hom_fst _ _ g'.q) (inv_pr pG)
-    U.symG U.symG_gen D.toPre.sym D'.toPre.sym
-    (fun y J J' hJ hJ' => PsiEvenBox.sym_box hG pD g'.pG.left y hJ hJ') (U.w_even e)
+    (EvenPull.inv_fst _ G) (EvenPull.inv_hom_fst _ _ (U.gt e).q) (EvenPull.inv_hom_fst _ _ g'.q)
+    (inv_pr pG) U.symG U.symG_gen D.toPre.sym D'.toPre.sym
+    (fun y J J' hJ hJ' => PsiEvenBox.sym_box hG pD g'.pG.left y hJ hJ')
+    (U.w_even e)
 
 end Level
-
 
 open GlobalTheory.WCub in
 set_option maxHeartbeats 1600000 in

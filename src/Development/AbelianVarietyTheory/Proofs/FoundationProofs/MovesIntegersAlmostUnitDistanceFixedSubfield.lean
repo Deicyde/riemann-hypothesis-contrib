@@ -11,10 +11,13 @@ namespace GlobalTheory.AlmostEt
 
 open Polynomial
 
-theorem moves_fix_of_moves : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (G : Type) [Group G]
-    [MulSemiringAction G L] [Finite G], (∀ (g : G) (x : L), v (g • x) = v x) →
-    ∀ (N : Subgroup G) (i : ℝ≥0), i < 1 → (∀ τ ∈ N, ∀ x : L, v x ≤ 1 → v (τ • x - x) ≤ i) →
-    ∀ σ : G, Moves v ⊤ σ → Moves v (Fix L N) σ := by
+theorem moves_fix_of_moves
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (G : Type) [Group G] [MulSemiringAction G L]
+        [Finite G],
+      (∀ (g : G) (x : L), v (g • x) = v x)
+        → ∀ (N : Subgroup G) (i : ℝ≥0),
+          i < 1 → (∀ τ ∈ N, ∀ x : L, v x ≤ 1 → v (τ • x - x) ≤ i)
+            → ∀ σ : G, Moves v ⊤ σ → Moves v (Fix L N) σ := by
   intro L _ v G _ _ _ hinv N i hi hN σ hσ r hr
   classical
   by_contra hcon
@@ -25,7 +28,8 @@ theorem moves_fix_of_moves : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) 
   set t : ℝ≥0 := max i (r ^ ((n : ℝ)⁻¹)) with ht_def
   have ht1 : t < 1 := max_lt hi (NNReal.rpow_lt_one hr (by positivity))
   have hrt : r ≤ t ^ n := by
-    calc r = (r ^ ((n : ℝ)⁻¹)) ^ n := (NNReal.rpow_inv_natCast_pow r hn).symm
+    calc
+      r = (r ^ ((n : ℝ)⁻¹)) ^ n := (NNReal.rpow_inv_natCast_pow r hn).symm
       _ ≤ t ^ n := pow_le_pow_left₀ zero_le (le_max_right _ _) n
   obtain ⟨x, -, hx1, hxt⟩ := hσ t ht1
 
@@ -41,8 +45,7 @@ theorem moves_fix_of_moves : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) 
   have hint : ∀ τ : N, (τ : G) • x ∈ v.integer := fun τ => by
     rw [Valuation.mem_integer_iff, hinv]; exact hx1
   set Q : (v.integer)[X] := ∏ τ : N, (X - C (⟨(τ : G) • x, hint τ⟩ : v.integer)) with hQ_def
-  have hPQ : P = Q.map (v.integer.subtype) := by
-    simp [hP_def, hQ_def, Polynomial.map_prod]
+  have hPQ : P = Q.map (v.integer.subtype) := by simp [hP_def, hQ_def, Polynomial.map_prod]
   have hcint : ∀ k, v (P.coeff k) ≤ 1 := by
     intro k
     rw [hPQ, coeff_map]
@@ -59,7 +62,8 @@ theorem moves_fix_of_moves : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) 
   have hPx : P.eval x = 0 := by
     rw [hP_def, eval_prod]
     exact Finset.prod_eq_zero (Finset.mem_univ 1) (by simp)
-  have hPσx : (P.map (MulSemiringAction.toRingHom G L σ)).eval x = ∏ τ : N, (x - σ • ((τ : G) • x)) := by
+  have hPσx
+      : (P.map (MulSemiringAction.toRingHom G L σ)).eval x = ∏ τ : N, (x - σ • ((τ : G) • x)) := by
     simp [hP_def, Polynomial.map_prod, eval_prod]
 
   have hdiff : v ((P.map (MulSemiringAction.toRingHom G L σ) - P).eval x) ≤ r := by
@@ -67,8 +71,9 @@ theorem moves_fix_of_moves : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) 
     apply Valuation.map_sum_le
     intro k _
     rw [map_mul, map_pow, coeff_sub, coeff_map, MulSemiringAction.toRingHom_apply]
-    calc v (σ • P.coeff k - P.coeff k) * v x ^ k ≤ r * 1 :=
-          mul_le_mul' (hcon _ (hcfix k) (hcint k)) (pow_le_one₀ zero_le hx1)
+    calc
+      v (σ • P.coeff k - P.coeff k) * v x ^ k
+        ≤ r * 1 := mul_le_mul' (hcon _ (hcfix k) (hcint k)) (pow_le_one₀ zero_le hx1)
       _ = r := mul_one r
   rw [eval_sub, hPx, sub_zero, hPσx, map_prod] at hdiff
   simp only [hfac, Finset.prod_const, Finset.card_univ] at hdiff

@@ -9,9 +9,9 @@ open CategoryTheory Limits Opposite GlobalTheory.EtC
 
 namespace LateralTheory.CohomologicalPurity.Thom.ExcSp
 
-theorem chainsXIso_nat (R : Type) [CommRing R] {E E' : Spc} (f : E ⟶ E') (p : ℕ) :
-    (chainsXIso R E p).hom ≫ (free R).map (f.app (op (SimplexCategory.mk p))) =
-      ((chains R).map f).f (-(p : ℤ)) ≫ (chainsXIso R E' p).hom := by
+theorem chainsXIso_nat (R : Type) [CommRing R] {E E' : Spc} (f : E ⟶ E') (p : ℕ)
+    : (chainsXIso R E p).hom ≫ (free R).map (f.app (op (SimplexCategory.mk p)))
+      = ((chains R).map f).f (-(p : ℤ)) ≫ (chainsXIso R E' p).hom := by
   have h : ComplexShape.embeddingDownNat.f p = -(p : ℤ) := rfl
   change _ = (HomologicalComplex.extendMap ((chainsN R).map f) _).f _ ≫ _
   rw [HomologicalComplex.extendMap_f _ _ h]
@@ -22,12 +22,12 @@ theorem chainsXIso_nat (R : Type) [CommRing R] {E E' : Spc} (f : E ⟶ E') (p : 
 instance freePresSpan (R : Type) [CommRing R] : PreservesColimitsOfShape WalkingSpan (free R) := by
   have : PreservesColimitsOfShape WalkingSpan (ModuleCat.free.{1} (ULift.{1} R)) :=
     (ModuleCat.adj (ULift.{1} R)).leftAdjoint_preservesColimits.preservesColimitsOfShape
-  have : PreservesColimitsOfShape WalkingSpan (freeP R) := by
-    unfold freeP; infer_instance
-  unfold free; infer_instance
+  have : PreservesColimitsOfShape WalkingSpan (freeP R) := by unfold freeP; infer_instance
+  unfold free
+  infer_instance
 
-theorem free_isPushout (R : Type) [CommRing R] (P : Arrow Spc) (p : ℕ) :
-    IsPushout ((free R).map (P.hom.app (op (SimplexCategory.mk p))))
+theorem free_isPushout (R : Type) [CommRing R] (P : Arrow Spc) (p : ℕ)
+    : IsPushout ((free R).map (P.hom.app (op (SimplexCategory.mk p))))
       ((free R).map (P.hom.app (op (SimplexCategory.mk p))))
       ((free R).map ((dbl.inl P).app (op (SimplexCategory.mk p))))
       ((free R).map ((dbl.inr P).app (op (SimplexCategory.mk p)))) := by
@@ -35,12 +35,12 @@ theorem free_isPushout (R : Type) [CommRing R] (P : Arrow Spc) (p : ℕ) :
   have h1 := h0.map ((evaluation _ PSh).obj (op (SimplexCategory.mk p)))
   exact h1.map (free R)
 
-theorem chains_isPushout (R : Type) [CommRing R] (P : Arrow Spc) (p : ℕ) :
-    IsPushout (((chains R).map P.hom).f (-(p : ℤ))) (((chains R).map P.hom).f (-(p : ℤ)))
+theorem chains_isPushout (R : Type) [CommRing R] (P : Arrow Spc) (p : ℕ)
+    : IsPushout (((chains R).map P.hom).f (-(p : ℤ))) (((chains R).map P.hom).f (-(p : ℤ)))
       (((chains R).map (dbl.inl P)).f (-(p : ℤ))) (((chains R).map (dbl.inr P)).f (-(p : ℤ))) :=
   (free_isPushout R P p).of_iso' (chainsXIso R _ p) (chainsXIso R _ p) (chainsXIso R _ p)
-    (chainsXIso R _ p) (chainsXIso_nat R _ p) (chainsXIso_nat R _ p)
-    (chainsXIso_nat R _ p) (chainsXIso_nat R _ p)
+    (chainsXIso R _ p) (chainsXIso_nat R _ p) (chainsXIso_nat R _ p) (chainsXIso_nat R _ p)
+    (chainsXIso_nat R _ p)
 
 theorem leafDblCok_of : LeafDblCok := by
   intro R _ P _ n

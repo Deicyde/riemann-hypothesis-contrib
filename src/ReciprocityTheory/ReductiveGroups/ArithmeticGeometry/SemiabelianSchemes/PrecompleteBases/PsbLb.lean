@@ -78,7 +78,7 @@ lemma mem_of_cover {L : LB X} (hL : L.IsLB) (x : X) : ∃ i, x ∈ L.U i := by
   exact TopologicalSpace.Opens.mem_iSup.1 hx
 
 abbrev triv (X : Scheme.{u}) : LB X where
-  ι := PUnit.{u+1}
+  ι := PUnit.{u + 1}
   U := fun _ => ⊤
   g := fun _ _ => 1
 
@@ -88,10 +88,14 @@ theorem isLB_triv (X : Scheme.{u}) : (triv X).IsLB := by
   simp only [triv, map_one, mul_one]
 
 def dg (M L : LB X) (p q : M.ι × L.ι) : Γ(X, M.U p.1 ⊓ L.U p.2 ⊓ (M.U q.1 ⊓ L.U q.2))ˣ :=
-  res (le_inf (inf_le_left.trans inf_le_left) (inf_le_right.trans inf_le_left) :
-      M.U p.1 ⊓ L.U p.2 ⊓ (M.U q.1 ⊓ L.U q.2) ≤ M.U p.1 ⊓ M.U q.1) (M.g p.1 q.1) *
-    (res (le_inf (inf_le_left.trans inf_le_right) (inf_le_right.trans inf_le_right) :
-      M.U p.1 ⊓ L.U p.2 ⊓ (M.U q.1 ⊓ L.U q.2) ≤ L.U p.2 ⊓ L.U q.2) (L.g p.2 q.2))⁻¹
+  res
+      (le_inf (inf_le_left.trans inf_le_left) (inf_le_right.trans inf_le_left)
+        : M.U p.1 ⊓ L.U p.2 ⊓ (M.U q.1 ⊓ L.U q.2) ≤ M.U p.1 ⊓ M.U q.1)
+      (M.g p.1 q.1)
+    * (res
+      (le_inf (inf_le_left.trans inf_le_right) (inf_le_right.trans inf_le_right)
+        : M.U p.1 ⊓ L.U p.2 ⊓ (M.U q.1 ⊓ L.U q.2) ≤ L.U p.2 ⊓ L.U q.2)
+      (L.g p.2 q.2))⁻¹
 
 lemma res_dg (M L : LB X) (p q : M.ι × L.ι) {W : X.Opens}
     (hW : W ≤ M.U p.1 ⊓ L.U p.2 ⊓ (M.U q.1 ⊓ L.U q.2)) :
@@ -132,12 +136,11 @@ lemma wchart_inter_le (φ : K → (Y ⟶ X)) (j j' : K → L.ι) (k : K) :
     wchart L φ j ⊓ wchart L φ j' ≤ φ k ⁻¹ᵁ (L.U (j k) ⊓ L.U (j' k)) :=
   le_inf (inf_le_left.trans (wchart_le L φ j k)) (inf_le_right.trans (wchart_le L φ j' k))
 
-def lcg (φ : K → (Y ⟶ X)) (ε : K → ℤ) (j j' : K → L.ι) :
-    Γ(Y, wchart L φ j ⊓ wchart L φ j')ˣ :=
+def lcg (φ : K → (Y ⟶ X)) (ε : K → ℤ) (j j' : K → L.ι) : Γ(Y, wchart L φ j ⊓ wchart L φ j')ˣ :=
   ∏ k, (res (wchart_inter_le L φ j j' k) (pullU (φ k) _ (L.g (j k) (j' k)))) ^ (ε k)
 
-def ts {L : LB X} {φ : K → (Y ⟶ X)} {ε : K → ℤ} (t : Gen (LinComb L φ ε)) (j : K → L.ι) :
-    Γ(Y, wchart L φ j)ˣ :=
+def ts {L : LB X} {φ : K → (Y ⟶ X)} {ε : K → ℤ} (t : Gen (LinComb L φ ε)) (j : K → L.ι)
+    : Γ(Y, wchart L φ j)ˣ :=
   t.s j
 
 lemma res_lcg (φ : K → (Y ⟶ X)) (ε : K → ℤ) (j j' : K → L.ι) {W : Y.Opens}
@@ -175,15 +178,14 @@ lemma lcg_cocycle {L : LB X} (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → �
   rw [← mul_zpow]
   exact congrArg (· ^ ε k) (pull_cocycle hL (φ k) _ _ _ _ _ _)
 
-theorem isLB_linComb {L : LB X} (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → ℤ) :
-    (LinComb L φ ε).IsLB := by
+theorem isLB_linComb {L : LB X} (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → ℤ)
+    : (LinComb L φ ε).IsLB := by
   refine ⟨?_, lcg_self hL φ ε, lcg_cocycle hL φ ε⟩
   refine eq_top_iff.2 fun y _ => ?_
   choose j hj using fun k => mem_of_cover hL ((φ k).base y)
   exact TopologicalSpace.Opens.mem_iSup.2 ⟨j, Set.mem_iInter.2 hj⟩
 
-theorem isLB_pull {L : LB X} (hL : L.IsLB) (f : Y ⟶ X) : (L.pull f).IsLB :=
-  isLB_linComb hL _ _
+theorem isLB_pull {L : LB X} (hL : L.IsLB) (f : Y ⟶ X) : (L.pull f).IsLB := isLB_linComb hL _ _
 
 lemma lcg_empty (i j : PEmpty.{u+1} → L.ι) :
     lcg L (Y := Y) (K := PEmpty) PEmpty.elim PEmpty.elim i j = 1 :=
@@ -220,11 +222,12 @@ lemma lcg_comp (φ : K → (Y ⟶ X)) (ε : K → ℤ) (h : Z ⟶ Y) (i j : K �
   rw [map_zpow, map_zpow]
   exact congrArg (· ^ ε k) (pull_res_comp h (φ k) _ _ _ _ _).symm
 
-theorem isGen_pullGen (φ : K → (Y ⟶ X)) (ε : K → ℤ) (c : Gen (LinComb L φ ε)) (hc : c.IsGen)
-    (h : Z ⟶ Y) : (pullGen L φ ε c h).IsGen := by
+theorem isGen_pullGen
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (c : Gen (LinComb L φ ε)) (hc : c.IsGen) (h : Z ⟶ Y)
+    : (pullGen L φ ε c h).IsGen := by
   refine (isGen_iff L _).2 fun i j => ?_
-  have key := congrArg (fun x => res (wchart_comp_le₂ L h φ i j) (pullU h _ x))
-    ((isGen_iff L c).1 hc i j)
+  have key :=
+    congrArg (fun x => res (wchart_comp_le₂ L h φ i j) (pullU h _ x)) ((isGen_iff L c).1 hc i j)
   simp only [map_mul, pullU_res, res_res] at key
   rw [ts_pullGen, ts_pullGen, lcg_comp]
   simp only [res_res]
@@ -262,14 +265,16 @@ lemma lcg_sum (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (
   rw [res_lcg, res_lcg, lcg, Fintype.prod_sum_type]
   rfl
 
-theorem isGen_mulGen (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
-    (t : Gen (LinComb L φ ε)) (t' : Gen (LinComb L φ' ε')) (ht : t.IsGen) (ht' : t'.IsGen) :
-    (mulGen L φ ε φ' ε' t t').IsGen := by
+theorem isGen_mulGen
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
+    (t : Gen (LinComb L φ ε)) (t' : Gen (LinComb L φ' ε')) (ht : t.IsGen) (ht' : t'.IsGen)
+    : (mulGen L φ ε φ' ε' t t').IsGen := by
   refine (isGen_iff L _).2 fun j j' => ?_
-  have k₁ := congrArg (res (wchart_inl_le₂ L φ φ' j j'))
-    ((isGen_iff L t).1 ht (j ∘ Sum.inl) (j' ∘ Sum.inl))
-  have k₂ := congrArg (res (wchart_inr_le₂ L φ φ' j j'))
-    ((isGen_iff L t').1 ht' (j ∘ Sum.inr) (j' ∘ Sum.inr))
+  have k₁ :=
+    congrArg (res (wchart_inl_le₂ L φ φ' j j')) ((isGen_iff L t).1 ht (j ∘ Sum.inl) (j' ∘ Sum.inl))
+  have k₂ :=
+    congrArg (res (wchart_inr_le₂ L φ φ' j j'))
+      ((isGen_iff L t').1 ht' (j ∘ Sum.inr) (j' ∘ Sum.inr))
   simp only [map_mul, res_res] at k₁ k₂
   rw [ts_mulGen, ts_mulGen, lcg_sum]
   simp only [map_mul, res_res]
@@ -283,8 +288,8 @@ lemma lcg_neg (φ : K → (Y ⟶ X)) (ε : K → ℤ) (i j : K → L.ι) :
     lcg L φ (fun k => - ε k) i j = (lcg L φ ε i j)⁻¹ := by
   simp only [lcg, zpow_neg, Finset.prod_inv_distrib]
 
-theorem isGen_invGen (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : Gen (LinComb L φ ε)) (ht : t.IsGen) :
-    (invGen L φ ε t).IsGen := by
+theorem isGen_invGen (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : Gen (LinComb L φ ε)) (ht : t.IsGen)
+    : (invGen L φ ε t).IsGen := by
   refine (isGen_iff L _).2 fun i j => ?_
   rw [ts_invGen, ts_invGen, lcg_neg, map_inv, map_inv, (isGen_iff L t).1 ht i j, mul_inv]
 
@@ -309,11 +314,11 @@ lemma lcg_pull (M : LB X) (f : Y ⟶ X) (i j : PUnit.{u+1} → M.ι) :
       res (wchart_pu_le M f i j) (pullU f _ (M.g (i PUnit.unit) (j PUnit.unit))) := by
   rw [lcg, Fintype.prod_unique, zpow_one]
 
-theorem isGen_genPull (M : LB X) (c : Gen M) (hc : c.IsGen) (f : Y ⟶ X) :
-    (genPull M c f).IsGen := by
+theorem isGen_genPull (M : LB X) (c : Gen M) (hc : c.IsGen) (f : Y ⟶ X)
+    : (genPull M c f).IsGen := by
   refine (isGen_iff M _).2 fun i j => ?_
-  have key := congrArg (fun x => res (wchart_pu_le M f i j) (pullU f _ x))
-    (hc (i PUnit.unit) (j PUnit.unit))
+  have key :=
+    congrArg (fun x => res (wchart_pu_le M f i j) (pullU f _ x)) (hc (i PUnit.unit) (j PUnit.unit))
   simp only [map_mul, pullU_res, res_res] at key
   rw [ts_genPull, ts_genPull, lcg_pull]
   simp only [res_res]

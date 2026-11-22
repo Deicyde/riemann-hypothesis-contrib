@@ -14,10 +14,13 @@ namespace Formalism.L2.SG.Pf.G2
 
 open Formalism.HermitianLattices.Ext.L3
 
-theorem smul_top_pi {R : Type*} [CommRing R] {κ : Type*} [Fintype κ] [DecidableEq κ]
-    {N : κ → Type*} [∀ i, AddCommGroup (N i)] [∀ i, Module R (N i)] (J : Ideal R) :
-    (J • ⊤ : Submodule R (∀ i, N i)) =
-      Submodule.pi Set.univ (fun i => J • (⊤ : Submodule R (N i))) := by
+theorem smul_top_pi
+    {R : Type*} [CommRing R]
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    {N : κ → Type*} [∀ i, AddCommGroup (N i)] [∀ i, Module R (N i)]
+    (J : Ideal R)
+    : (J • ⊤ : Submodule R (∀ i, N i))
+      = Submodule.pi Set.univ (fun i => J • (⊤ : Submodule R (N i))) := by
   apply le_antisymm
   · rw [Submodule.smul_le]
     intro r hr n _
@@ -33,14 +36,15 @@ theorem smul_top_pi {R : Type*} [CommRing R] {κ : Type*} [Fintype κ] [Decidabl
     rw [Submodule.map_smul''] at h1
     exact Submodule.smul_mono le_rfl le_top h1
 
-theorem card_quot_smul_top_congr {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    [AddCommGroup N] [Module R N] (f : M ≃ₗ[R] N) (J : Ideal R) :
-    Nat.card (M ⧸ (J • ⊤ : Submodule R M)) = Nat.card (N ⧸ (J • ⊤ : Submodule R N)) := by
+theorem card_quot_smul_top_congr
+    {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (f : M ≃ₗ[R] N) (J : Ideal R)
+    : Nat.card (M ⧸ (J • ⊤ : Submodule R M)) = Nat.card (N ⧸ (J • ⊤ : Submodule R N)) := by
   refine Nat.card_congr (Submodule.Quotient.equiv _ _ f ?_).toEquiv
   rw [Submodule.map_smul'', Submodule.map_top, LinearEquiv.range]
 
-theorem card_quot_quot {A : Type*} [CommRing A] (E J : Ideal A) :
-    Nat.card ((A ⧸ E) ⧸ (J • ⊤ : Submodule A (A ⧸ E))) = Nat.card (A ⧸ (E ⊔ J)) := by
+theorem card_quot_quot {A : Type*} [CommRing A] (E J : Ideal A)
+    : Nat.card ((A ⧸ E) ⧸ (J • ⊤ : Submodule A (A ⧸ E))) = Nat.card (A ⧸ (E ⊔ J)) := by
   have h1 : (J • ⊤ : Submodule A (A ⧸ E)) = Submodule.map E.mkQ J := by
     conv_lhs => rw [← Submodule.range_mkQ E, LinearMap.range_eq_map, ← Submodule.map_smul'',
       Ideal.smul_eq_mul, Ideal.mul_top]
@@ -75,12 +79,14 @@ theorem two_le_absNorm {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) : 2 ≤ 
   have ha1 : Ideal.absNorm (extP K 𝔭) ≠ 1 := fun h => h1 (Ideal.absNorm_eq_one_iff.mp h)
   omega
 
-theorem card_pi_quot (𝔭 : Ideal (𝓞 F)) {κ : Type} [Fintype κ] [DecidableEq κ] (e : κ → ℕ) (j : ℕ) :
-    Nat.card ((∀ i, 𝓞 K ⧸ extP K 𝔭 ^ e i) ⧸
-        (extP K 𝔭 ^ j • ⊤ : Submodule (𝓞 K) (∀ i, 𝓞 K ⧸ extP K 𝔭 ^ e i))) =
-      Ideal.absNorm (extP K 𝔭) ^ ∑ i, min (e i) j := by
-  rw [smul_top_pi, Nat.card_congr (Submodule.quotientPi
-    (fun i => (extP K 𝔭 ^ j • ⊤ : Submodule (𝓞 K) (𝓞 K ⧸ extP K 𝔭 ^ e i)))).toEquiv,
+theorem card_pi_quot (𝔭 : Ideal (𝓞 F)) {κ : Type} [Fintype κ] [DecidableEq κ] (e : κ → ℕ) (j : ℕ)
+    : Nat.card
+        ((∀ i, 𝓞 K ⧸ extP K 𝔭 ^ e i) ⧸
+          (extP K 𝔭 ^ j • ⊤ : Submodule (𝓞 K) (∀ i, 𝓞 K ⧸ extP K 𝔭 ^ e i)))
+      = Ideal.absNorm (extP K 𝔭) ^ ∑ i, min (e i) j := by
+  rw [smul_top_pi,
+    Nat.card_congr (Submodule.quotientPi (fun i =>
+      (extP K 𝔭 ^ j • ⊤ : Submodule (𝓞 K) (𝓞 K ⧸ extP K 𝔭 ^ e i)))).toEquiv,
     Nat.card_pi, ← Finset.prod_pow_eq_pow_sum]
   refine Finset.prod_congr rfl (fun i _ => ?_)
   have hsup : extP K 𝔭 ^ e i ⊔ extP K 𝔭 ^ j = extP K 𝔭 ^ min (e i) j := by

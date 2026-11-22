@@ -13,19 +13,27 @@ namespace PI.VolStabSW
 
 open MeasureTheory Topology Set
 
-theorem densCos_of_filt (hP1 : HenselCount) (hP2 : CosDens) {V X Y : Type} [AddCommGroup V]
-    [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
-    [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [T2Space X]
-    [MeasurableSpace X] [BorelSpace X] (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure]
-    [ν.IsAddHaarMeasure] (f : V → Y) (ι : X → Y) (hι : Function.Injective ι) (G : V → X)
-    (hG : Continuous G) (hfG : ∀ v, f v = ι (G v)) (y : V) (Λ : ℕ → AddSubgroup V)
-    (H : ℕ → AddSubgroup X) (hΛo : ∀ n, IsOpen (Λ n : Set V)) (hΛc : ∀ n, IsCompact (Λ n : Set V))
-    (hΛa : Antitone Λ) (hHo : ∀ n, IsOpen (H n : Set X)) (hHc : ∀ n, IsCompact (H n : Set X))
-    (hHb : ∀ N ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N) (D : V →+ X) (hD : ∀ n, (Λ n).map D = H n)
-    (hyp : ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n, G (y + Z + W) - G (y + Z) - D W ∈ H (n + 1)) :
-    ∃ g : X → ℝ, Continuous g ∧ ∀ S : Set X, IsCompact S →
-      ∫ v in f ⁻¹' (ι '' S), {z | z - y ∈ Λ 0}.indicator (fun _ => (1 : ℝ)) v ∂μ =
-        ∫ b in S, g b ∂ν := by
+theorem densCos_of_filt
+    (hP1 : HenselCount) (hP2 : CosDens)
+    {V X Y : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+    [MeasurableSpace V] [BorelSpace V] [AddCommGroup X] [TopologicalSpace X]
+    [IsTopologicalAddGroup X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
+    (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.IsAddHaarMeasure]
+    (f : V → Y)
+    (ι : X → Y) (hι : Function.Injective ι)
+    (G : V → X) (hG : Continuous G) (hfG : ∀ v, f v = ι (G v))
+    (y : V)
+    (Λ : ℕ → AddSubgroup V) (H : ℕ → AddSubgroup X) (hΛo : ∀ n, IsOpen (Λ n : Set V))
+    (hΛc : ∀ n, IsCompact (Λ n : Set V)) (hΛa : Antitone Λ) (hHo : ∀ n, IsOpen (H n : Set X))
+    (hHc : ∀ n, IsCompact (H n : Set X)) (hHb : ∀ N ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N)
+    (D : V →+ X) (hD : ∀ n, (Λ n).map D = H n)
+    (hyp : ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n, G (y + Z + W) - G (y + Z) - D W ∈ H (n + 1))
+    : ∃ g : X → ℝ,
+      Continuous g
+        ∧ ∀ S : Set X,
+          IsCompact S
+            → ∫ v in f ⁻¹' (ι '' S), {z | z - y ∈ Λ 0}.indicator (fun _ => (1 : ℝ)) v ∂μ
+              = ∫ b in S, g b ∂ν := by
   classical
   have hHa : Antitone H := by
     intro a b hab
@@ -55,8 +63,7 @@ theorem densCos_of_filt (hP1 : HenselCount) (hP2 : CosDens) {V X Y : Type} [AddC
       simp [sub_eq_neg_add]
     rw [he, measure_preimage_add]
   set κ : ENNReal := μ (Λ 0 : Set V) / ν (H 0 : Set X) with hκ
-  have hdens : ∀ k (h : X), h - G y ∈ H 0 →
-      m {z | z - h ∈ H k} = κ * ν {z | z - h ∈ H k} := by
+  have hdens : ∀ k (h : X), h - G y ∈ H 0 → m {z | z - h ∈ H k} = κ * ν {z | z - h ∈ H k} := by
     intro k h hh
     have hH := hP1 V X μ ν inferInstance inferInstance Λ H hΛo hΛc hΛa hHo hHc D hD G y hyp k h hh
     rw [hmT _ (hopen h k).measurableSet, htrans, hκ, div_eq_mul_inv, mul_right_comm,
@@ -72,8 +79,7 @@ theorem densCos_of_filt (hP1 : HenselCount) (hP2 : CosDens) {V X Y : Type} [AddC
       have h2 : D Z ∈ H 0 := by
         rw [← hD 0]
         exact AddSubgroup.mem_map_of_mem D hZ
-      have hmem : G (y + Z) - G y ∈ H 0 := by
-        simpa using (H 0).add_mem (hHa (Nat.zero_le 1) h1) h2
+      have hmem : G (y + Z) - G y ∈ H 0 := by simpa using (H 0).add_mem (hHa (Nat.zero_le 1) h1) h2
       exact hZ' hmem
     · intro hZ
       exact False.elim hZ

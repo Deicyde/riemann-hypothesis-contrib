@@ -11,7 +11,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open IsLocalRing
 
-theorem EmultiplicityOrd.proof (h₁ : LocalizationPrimeDVR.Statement) : EmultiplicityOrd.Statement := by
+theorem EmultiplicityOrd.proof (h₁ : LocalizationPrimeDVR.Statement)
+    : EmultiplicityOrd.Statement := by
   intro R _ _ _ _ q x p _ hq hp hx
   have : IsDiscreteValuationRing (Localization.AtPrime p) := h₁ R q p hq hp
   set O := Localization.AtPrime p
@@ -30,8 +31,7 @@ theorem EmultiplicityOrd.proof (h₁ : LocalizationPrimeDVR.Statement) : Emultip
       Ideal.map_span, Set.image_singleton]
   have hirr : Irreducible (algebraMap R O q) :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer _).mpr hmax
-  have hnz : algebraMap R O q ∈ nonZeroDivisors O :=
-    mem_nonZeroDivisors_of_ne_zero hirr.ne_zero
+  have hnz : algebraMap R O q ∈ nonZeroDivisors O := mem_nonZeroDivisors_of_ne_zero hirr.ne_zero
   conv_rhs => rw [hxy, map_mul, map_pow, Ring.ord_mul_of_isUnit_right hyu, Ring.ord_pow hnz,
     Ring.ord_of_irreducible hirr]
   simp

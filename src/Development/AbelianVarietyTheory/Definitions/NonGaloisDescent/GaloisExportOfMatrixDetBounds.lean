@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Galo
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen
 open scoped ENNReal TensorProduct
 
 namespace GlobalTheory.TwSys.Test
@@ -17,9 +19,9 @@ variable (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
 end Ord
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂} {X : NTw D.R D.host D.what₂ D.LL0 N}
-
-
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+  {X : NTw D.R D.host D.what₂ D.LL0 N}
 
 end GlobalTheory.TwSys.Test
 

@@ -35,8 +35,8 @@ theorem hT_sub_left (x y v : S.V) : S.hT (x - y) v = S.hT x v - S.hT y v := by
 theorem hT_smul_left (a : E) (x v : S.V) : S.hT (a • x) v = star a * S.hT x v := by
   rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
 
-theorem mem_orth_span {s : Set S.V} {v : S.V} :
-    v ∈ orth S (Submodule.span E s) ↔ ∀ x ∈ s, S.hT x v = 0 := by
+theorem mem_orth_span {s : Set S.V} {v : S.V}
+    : v ∈ orth S (Submodule.span E s) ↔ ∀ x ∈ s, S.hT x v = 0 := by
   rw [mem_orth]
   refine ⟨fun h x hx => h x (Submodule.subset_span hx), fun h x hx => ?_⟩
   induction hx using Submodule.span_induction with
@@ -45,8 +45,8 @@ theorem mem_orth_span {s : Set S.V} {v : S.V} :
   | add x y _ _ hx hy => rw [hT_add_left, hx, hy, add_zero]
   | smul a x _ hx => rw [hT_smul_left, hx, mul_zero]
 
-theorem finrank_orth (U : Submodule E S.V) :
-    finrank E U + finrank E (orth S U) = finrank E S.V := by
+theorem finrank_orth (U : Submodule E S.V)
+    : finrank E U + finrank E (orth S U) = finrank E S.V := by
   let b := Module.finBasis E U
   let u : Fin (finrank E U) → S.V := fun i => (b i : S.V)
   let φ : Fin (finrank E U) → Module.Dual E S.V := fun i => S.hT (u i)
@@ -59,8 +59,7 @@ theorem finrank_orth (U : Submodule E S.V) :
         rw [map_sum]
       simp only [LinearMap.map_smulₛₗ, starRingEnd_apply, star_star]
       exact hc
-    have h2 : ∑ i, star (c i) • u i = 0 :=
-      S.nondeg.1 _ (fun y => by rw [h1, LinearMap.zero_apply])
+    have h2 : ∑ i, star (c i) • u i = 0 := S.nondeg.1 _ (fun y => by rw [h1, LinearMap.zero_apply])
     have h3 := Fintype.linearIndependent_iff.1 hu _ h2
     intro i
     simpa using congrArg star (h3 i)
@@ -116,18 +115,17 @@ variable {S : HSpace E} {r : ℕ} {T T' : E}
 theorem fvec_castSucc (F : FlagG S r T) (a : Fin r) : F.fvec (Fin.castSucc a) = F.e a := by
   simp [FlagG.fvec]
 
-theorem fvec_last (F : FlagG S r T) : F.fvec (Fin.last r) = F.z := by
-  simp [FlagG.fvec]
+theorem fvec_last (F : FlagG S r T) : F.fvec (Fin.last r) = F.z := by simp [FlagG.fvec]
 
-theorem zhat_apply (F : FlagG S r T) (F' : FlagG S r T') (i j : Fin (r + 1)) :
-    Zhat F F' i j = S.hT (F.fvec i) (F'.fvec j) := by
+theorem zhat_apply (F : FlagG S r T) (F' : FlagG S r T') (i j : Fin (r + 1))
+    : Zhat F F' i j = S.hT (F.fvec i) (F'.fvec j) := by
   simp only [Zhat, brS]
 
 theorem Xplus_eq (F : FlagG S r T) : F.Xplus = Submodule.span E (Set.range F.e ∪ {F.z}) := by
   rw [FlagG.Xplus, FlagG.X, Submodule.span_union]
 
-theorem mem_orth_Xplus (F : FlagG S r T) {v : S.V} :
-    v ∈ orth S F.Xplus ↔ (∀ a, S.hT (F.e a) v = 0) ∧ S.hT F.z v = 0 := by
+theorem mem_orth_Xplus (F : FlagG S r T) {v : S.V}
+    : v ∈ orth S F.Xplus ↔ (∀ a, S.hT (F.e a) v = 0) ∧ S.hT F.z v = 0 := by
   rw [Xplus_eq, mem_orth_span]
   constructor
   · intro h
@@ -144,14 +142,16 @@ theorem X_le_orth_Xplus (F : FlagG S r T) : F.X ≤ orth S F.Xplus := by
   rw [SetLike.mem_coe, mem_orth_Xplus]
   exact ⟨fun a' => F.e_iso a' a, by rw [hT_swap, F.z_orth a, star_zero]⟩
 
-theorem G_eq (F : FlagG S r T) (F' : FlagG S r T') :
-    Gflag F F' = (Zhat F F').det * star (Zhat F F').det -
-      T * T' * (((Zhat F F').submatrix Fin.castSucc Fin.castSucc).det *
-        star ((Zhat F F').submatrix Fin.castSucc Fin.castSucc).det) := by
+theorem G_eq (F : FlagG S r T) (F' : FlagG S r T')
+    : Gflag F F'
+      = (Zhat F F').det * star (Zhat F F').det
+        - T * T'
+          * (((Zhat F F').submatrix Fin.castSucc Fin.castSucc).det
+            * star ((Zhat F F').submatrix Fin.castSucc Fin.castSucc).det) := by
   simp only [Gflag, PI.PairCorankPos.W.Dl_top, PI.PairCorankPos.W.Dl_r]
 
-theorem exists_b (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0) (hD : Dl F F' r = 0) :
-    ∃ b ∈ F'.X, (∀ a, S.hT (F.e a) b = 0) ∧ S.hT F.z b = T := by
+theorem exists_b (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0) (hD : Dl F F' r = 0)
+    : ∃ b ∈ F'.X, (∀ a, S.hT (F.e a) b = 0) ∧ S.hT F.z b = T := by
   rw [PI.PairCorankPos.W.Dl_r] at hD
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hD
   let v' : Fin (r + 1) → E := Fin.snoc (α := fun _ => E) v 0
@@ -160,13 +160,16 @@ theorem exists_b (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0) (
     intro i
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [v', w, Matrix.mulVec, dotProduct, Fin.sum_univ_castSucc, Fin.snoc_castSucc,
-      Fin.snoc_last, mul_zero, add_zero, map_sum, map_smul, smul_eq_mul, zhat_apply, fvec_castSucc]
+        Fin.snoc_last, mul_zero, add_zero, map_sum, map_smul, smul_eq_mul, zhat_apply,
+        fvec_castSucc]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
-  have hsub : ∀ a, (Zhat F F' *ᵥ v') (Fin.castSucc a) =
-      ((Zhat F F').submatrix Fin.castSucc Fin.castSucc *ᵥ v) a := by
+  have hsub
+      : ∀ a,
+        (Zhat F F' *ᵥ v') (Fin.castSucc a)
+          = ((Zhat F F').submatrix Fin.castSucc Fin.castSucc *ᵥ v) a := by
     intro a
-    simp only [v', Matrix.mulVec, dotProduct, Fin.sum_univ_castSucc, Fin.snoc_castSucc, Fin.snoc_last,
-      mul_zero, add_zero, Matrix.submatrix_apply]
+    simp only [v', Matrix.mulVec, dotProduct, Fin.sum_univ_castSucc, Fin.snoc_castSucc,
+      Fin.snoc_last, mul_zero, add_zero, Matrix.submatrix_apply]
   have he : ∀ a, S.hT (F.e a) w = 0 := by
     intro a
     rw [← fvec_castSucc F a, ← hrow, hsub, hv]
@@ -196,8 +199,10 @@ theorem exists_b (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0) (
     rw [map_smul, he a, smul_zero]
   · rw [map_smul, smul_eq_mul, mul_assoc, inv_mul_cancel₀ hc, mul_one]
 
-theorem Dr_zero_of (F : FlagG S r T) (F' : FlagG S r T') {w : S.V} (hw : w ∈ F'.X) (hw0 : w ≠ 0)
-    (he : ∀ a, S.hT (F.e a) w = 0) : Dl F F' r = 0 := by
+theorem Dr_zero_of
+    (F : FlagG S r T) (F' : FlagG S r T')
+    {w : S.V} (hw : w ∈ F'.X) (hw0 : w ≠ 0) (he : ∀ a, S.hT (F.e a) w = 0)
+    : Dl F F' r = 0 := by
   rw [PI.PairCorankPos.W.Dl_r]
   rw [FlagG.X, Submodule.mem_span_range_iff_exists_fun] at hw
   obtain ⟨v, rfl⟩ := hw
@@ -214,8 +219,10 @@ theorem Dr_zero_of (F : FlagG S r T) (F' : FlagG S r T') {w : S.V} (hw : w ∈ F
     rw [← this]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
-theorem eq_zero_of_orth (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0) {x : S.V}
-    (hx : x ∈ F.X) (ho : ∀ b, S.hT (F'.fvec b) x = 0) : x = 0 := by
+theorem eq_zero_of_orth
+    (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0)
+    {x : S.V} (hx : x ∈ F.X) (ho : ∀ b, S.hT (F'.fvec b) x = 0)
+    : x = 0 := by
   rw [FlagG.X, Submodule.mem_span_range_iff_exists_fun] at hx
   obtain ⟨c, rfl⟩ := hx
   by_contra hne
@@ -234,7 +241,7 @@ theorem eq_zero_of_orth (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' �
     rw [hT_swap S (∑ a, c a • F.e a) (F'.fvec b), star_eq_zero] at h
     rw [← h]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, hT_smul_left, zhat_apply, fvec_castSucc]
+    simp only [map_sum, LinearMap.sum_apply, hT_smul_left, zhat_apply, fvec_castSucc]
   apply hG
   let v' : Fin (r + 1) → E := Fin.snoc (α := fun _ => E) (fun a => star (c a)) 0
   have hne' : v' ≠ 0 := by
@@ -245,8 +252,8 @@ theorem eq_zero_of_orth (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' �
     simpa [v'] using this
   have h1 : v' ᵥ* Zhat F F' = 0 := by
     funext b
-    simp only [v', Matrix.vecMul, dotProduct, Fin.sum_univ_castSucc, Fin.snoc_castSucc, Fin.snoc_last,
-      zero_mul, add_zero, Pi.zero_apply]
+    simp only [v', Matrix.vecMul, dotProduct, Fin.sum_univ_castSucc, Fin.snoc_castSucc,
+      Fin.snoc_last, zero_mul, add_zero, Pi.zero_apply]
     exact hrow b
   have h2 : (fun a => star (c a)) ᵥ* ((Zhat F F').submatrix Fin.castSucc Fin.castSucc) = 0 := by
     funext b

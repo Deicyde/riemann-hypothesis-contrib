@@ -7,15 +7,16 @@ public import GroundTheory.AutomorphicForms.SupercuspidalCoefficients
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult
 namespace ContractingCosetsPort
 open ValuativeRel Matrix GroundTheory.Automorphic.GLnLocal
 open GlobalTheory.CompanionTheory.ContractingCosets
 variable {k : Type} [Field k] [ValuativeRel k]
 
-theorem coe_leviEmb_zj {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (t : kˣ) (j : Fin h) :
-    (leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) : Matrix (Fin N) (Fin N) k) =
-      diagonal fun i => if Zl.JC.blockIdx d hd i ≤ j then (t : k) else 1 := by
+theorem coe_leviEmb_zj {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (t : kˣ) (j : Fin h)
+    : (leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j) : Matrix (Fin N) (Fin N) k)
+      = diagonal fun i => if Zl.JC.blockIdx d hd i ≤ j then (t : k) else 1 := by
   ext x y
   obtain ⟨⟨a, i⟩, rfl⟩ := (stdBlocks d hd).surjective x
   obtain ⟨⟨b, l⟩, rfl⟩ := (stdBlocks d hd).surjective y
@@ -40,28 +41,33 @@ theorem coe_leviEmb_zj {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (t 
 
 variable [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem le_of_mk_eq {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (hpos : ∀ a, 0 < d a) (t : kˣ)
-    (ht : valuation k (t : k) < 1) (j : Fin h) (hj : j.val + 1 < h) (m : ℕ)
-    {x y x' y' : GL (Fin N) k} (hx : x ∈ congruenceSubgroup k N m)
-    (hy : y ∈ congruenceSubgroup k N m) (hx' : x' ∈ congruenceSubgroup k N m)
-    (hy' : y' ∈ congruenceSubgroup k N m) {r r' : ℕ}
-    (e : (QuotientGroup.mk (x * (leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j)) ^ r * y) : AdGL k N) =
-      QuotientGroup.mk (x' * (leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j)) ^ r' * y')) :
-    r' ≤ r := by
+theorem le_of_mk_eq
+    {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) (hpos : ∀ a, 0 < d a)
+    (t : kˣ) (ht : valuation k (t : k) < 1)
+    (j : Fin h) (hj : j.val + 1 < h)
+    (m : ℕ)
+    {x y x' y' : GL (Fin N) k}
+    (hx : x ∈ congruenceSubgroup k N m) (hy : y ∈ congruenceSubgroup k N m)
+    (hx' : x' ∈ congruenceSubgroup k N m) (hy' : y' ∈ congruenceSubgroup k N m)
+    {r r' : ℕ}
+    (e : (QuotientGroup.mk (x * (leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j)) ^ r * y) : AdGL k N)
+      = QuotientGroup.mk (x' * (leviEmb k (stdBlocks d hd) (Zl.JC.zj d t j)) ^ r' * y'))
+    : r' ≤ r := by
   have hz := QuotientGroup.eq.1 e
   have hK := congruenceSubgroup_le k N m
   have heq := eq_central_mul hz
-  refine le_of_eq_central_mul (δ := fun i => if Zl.JC.blockIdx d hd i ≤ j then (t : k) else 1) t ht
-    (fun i => ?_) (i₁ := stdBlocks d hd ⟨j, ⟨0, hpos j⟩⟩)
-    (i₂ := stdBlocks d hd ⟨⟨j.val + 1, hj⟩, ⟨0, hpos _⟩⟩) ?_ ?_
-    (coe_leviEmb_zj d hd t j)
-    (mul_mem (inv_mem (hK hx')) (hK hx)) (mul_mem (hK hy) (inv_mem (hK hy'))) hz heq
+  refine le_of_eq_central_mul
+    (δ := fun i => if Zl.JC.blockIdx d hd i ≤ j then (t : k) else 1)
+    t ht
+    (fun i => ?_)
+    (i₁ := stdBlocks d hd ⟨j, ⟨0, hpos j⟩⟩) (i₂ := stdBlocks d hd ⟨⟨j.val + 1, hj⟩, ⟨0, hpos _⟩⟩) ?_
+    ?_ (coe_leviEmb_zj d hd t j) (mul_mem (inv_mem (hK hx')) (hK hx))
+    (mul_mem (hK hy) (inv_mem (hK hy'))) hz heq
   · by_cases hi : Zl.JC.blockIdx d hd i ≤ j
     · exact Or.inl (if_pos hi)
     · exact Or.inr (if_neg hi)
   · simp [Zl.JC.blockIdx]
-  · have : ¬ (⟨j.val + 1, hj⟩ : Fin h) ≤ j := by
-      rw [Fin.le_def]; simp
+  · have : ¬ (⟨j.val + 1, hj⟩ : Fin h) ≤ j := by rw [Fin.le_def]; simp
     simp [Zl.JC.blockIdx, this]
 
 end ContractingCosetsPort

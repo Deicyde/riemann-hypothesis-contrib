@@ -10,9 +10,10 @@ open AlgebraicGeometry CategoryTheory
 
 noncomputable section
 
-theorem sncAt_of_not_mem {Y : Scheme.{0}} (B : TopologicalSpace.Closeds Y) (y : Y)
-    (hy : y ∉ (B : Set Y)) (hreg : IsRegularLocalRing (Y.presheaf.stalk y)) :
-    FinalTheorems.SncAt (Scheme.IdealSheafData.vanishingIdeal B) y := by
+theorem sncAt_of_not_mem
+    {Y : Scheme.{0}} (B : TopologicalSpace.Closeds Y) (y : Y) (hy : y ∉ (B : Set Y))
+    (hreg : IsRegularLocalRing (Y.presheaf.stalk y))
+    : FinalTheorems.SncAt (Scheme.IdealSheafData.vanishingIdeal B) y := by
   refine ⟨hreg, ?_⟩
   have hfg : (IsLocalRing.maximalIdeal (Y.presheaf.stalk y)).FG := IsNoetherian.noetherian _
   obtain ⟨s, hs, hspan⟩ := Submodule.FG.exists_span_finset_card_eq_spanFinrank hfg
@@ -44,8 +45,9 @@ theorem sncAt_of_not_mem {Y : Scheme.{0}} (B : TopologicalSpace.Closeds Y) (y : 
     have hpV : hV.fromSpec p ∈ (V : Set Y) := hV.range_fromSpec ▸ ⟨p, rfl⟩
     exact ((hVS hpV).2 hp).elim
 
-theorem isIso_morphismRestrict_of_le {X Y : Scheme.{0}} (f : X ⟶ Y) {U V : Y.Opens} (h : V ≤ U)
-    [IsIso (f ∣_ U)] : IsIso (f ∣_ V) := by
+theorem isIso_morphismRestrict_of_le
+    {X Y : Scheme.{0}} (f : X ⟶ Y) {U V : Y.Opens} (h : V ≤ U) [IsIso (f ∣_ U)]
+    : IsIso (f ∣_ V) := by
   have e : U.ι ''ᵁ (U.ι ⁻¹ᵁ V) = V := by
     ext x
     simp only [Scheme.Hom.coe_image, Scheme.Hom.coe_preimage, Set.image_preimage_eq_inter_range,

@@ -14,68 +14,75 @@ universe u
 
 section Elements
 
-variable {R : Type u} [Ring R] {ι : Type*} {c : ComplexShape ι}
-  (K : HomologicalComplex (ModuleCat.{u} R) c)
+variable
+  {R : Type u} [Ring R]
+  {ι : Type*} {c : ComplexShape ι} (K : HomologicalComplex (ModuleCat.{u} R) c)
 
-theorem exists_iCycles_eq {i : ι} (x : K.X i) (hx : (K.d i (c.next i)).hom x = 0) :
-    ∃ z : K.cycles i, (K.iCycles i).hom z = x := by
+theorem exists_iCycles_eq {i : ι} (x : K.X i) (hx : (K.d i (c.next i)).hom x = 0)
+    : ∃ z : K.cycles i, (K.iCycles i).hom z = x := by
   refine ⟨(K.sc i).moduleCatCyclesIso.inv ⟨x, hx⟩, ?_⟩
   have := ShortComplex.moduleCatCyclesIso_inv_iCycles_apply (K.sc i) ⟨x, hx⟩
   exact this
 
-theorem shortComplex_homologyπ_eq_zero_iff (S : ShortComplex (ModuleCat.{u} R)) (z : S.cycles) :
-    S.homologyπ.hom z = 0 ↔ ∃ w : S.X₁, S.f.hom w = S.iCycles.hom z := by
+theorem shortComplex_homologyπ_eq_zero_iff (S : ShortComplex (ModuleCat.{u} R)) (z : S.cycles)
+    : S.homologyπ.hom z = 0 ↔ ∃ w : S.X₁, S.f.hom w = S.iCycles.hom z := by
   have hinj : Function.Injective S.moduleCatHomologyIso.hom.hom :=
     (ModuleCat.mono_iff_injective _).1 inferInstance
-  have h1 : S.moduleCatHomologyIso.hom.hom (S.homologyπ.hom z) =
-      S.moduleCatLeftHomologyData.π.hom (S.moduleCatCyclesIso.hom.hom z) :=
+  have h1
+      : S.moduleCatHomologyIso.hom.hom (S.homologyπ.hom z)
+        = S.moduleCatLeftHomologyData.π.hom (S.moduleCatCyclesIso.hom.hom z) :=
     ShortComplex.π_moduleCatCyclesIso_hom_apply S z
-  have h2 : S.moduleCatLeftHomologyData.i.hom (S.moduleCatCyclesIso.hom.hom z) =
-      S.iCycles.hom z :=
+  have h2 : S.moduleCatLeftHomologyData.i.hom (S.moduleCatCyclesIso.hom.hom z) = S.iCycles.hom z :=
     ShortComplex.moduleCatCyclesIso_hom_i_apply S z
   have h0 : S.homologyπ.hom z = 0 ↔ S.moduleCatHomologyIso.hom.hom (S.homologyπ.hom z) = 0 :=
     ⟨fun h => by rw [h, map_zero], fun h => hinj (h.trans (map_zero _).symm)⟩
   rw [h0, h1]
   change Submodule.Quotient.mk (p := LinearMap.range S.moduleCatToCycles)
-    (S.moduleCatCyclesIso.hom.hom z) = 0 ↔ _
+        (S.moduleCatCyclesIso.hom.hom z)
+      = 0
+    ↔ _
   refine (Submodule.Quotient.mk_eq_zero (LinearMap.range S.moduleCatToCycles)
     (x := (S.moduleCatCyclesIso.hom.hom z : LinearMap.ker S.g.hom))).trans ?_
   constructor
   · rintro ⟨w, hw⟩
     exact ⟨w, (congrArg S.moduleCatLeftHomologyData.i.hom hw).trans h2⟩
   · rintro ⟨w, hw⟩
-    exact ⟨w, (ModuleCat.mono_iff_injective S.moduleCatLeftHomologyData.i).1 inferInstance
-      (hw.trans h2.symm)⟩
+    exact ⟨
+      w,
+      (ModuleCat.mono_iff_injective S.moduleCatLeftHomologyData.i).1 inferInstance
+        (hw.trans h2.symm)
+    ⟩
 
-theorem homologyπ_eq_zero_iff {i : ι} (z : K.cycles i) :
-    (K.homologyπ i).hom z = 0 ↔
-      ∃ w : K.X (c.prev i), (K.d (c.prev i) i).hom w = (K.iCycles i).hom z :=
+theorem homologyπ_eq_zero_iff {i : ι} (z : K.cycles i)
+    : (K.homologyπ i).hom z = 0
+      ↔ ∃ w : K.X (c.prev i), (K.d (c.prev i) i).hom w = (K.iCycles i).hom z :=
   shortComplex_homologyπ_eq_zero_iff (K.sc i) z
 
 end Elements
 
 section Apply
 
-variable {R : Type u} [Ring R] {ι : Type*} {c : ComplexShape ι}
-  {K L : HomologicalComplex (ModuleCat.{u} R) c}
+variable
+  {R : Type u} [Ring R]
+  {ι : Type*} {c : ComplexShape ι} {K L : HomologicalComplex (ModuleCat.{u} R) c}
 
-theorem hom_f_d_apply (φ : K ⟶ L) (i j : ι) (x : K.X i) :
-    (φ.f j).hom ((K.d i j).hom x) = (L.d i j).hom ((φ.f i).hom x) :=
+theorem hom_f_d_apply (φ : K ⟶ L) (i j : ι) (x : K.X i)
+    : (φ.f j).hom ((K.d i j).hom x) = (L.d i j).hom ((φ.f i).hom x) :=
   (congrArg (fun g => ModuleCat.Hom.hom g x) (φ.comm i j)).symm
 
-theorem iCycles_d_apply (K : HomologicalComplex (ModuleCat.{u} R) c) (i j : ι) (z : K.cycles i) :
-    (K.d i j).hom ((K.iCycles i).hom z) = 0 := by
+theorem iCycles_d_apply (K : HomologicalComplex (ModuleCat.{u} R) c) (i j : ι) (z : K.cycles i)
+    : (K.d i j).hom ((K.iCycles i).hom z) = 0 := by
   rw [← LinearMap.comp_apply, ← ModuleCat.hom_comp, K.iCycles_d, ModuleCat.hom_zero,
     LinearMap.zero_apply]
 
-theorem iCycles_cyclesMap_apply (φ : K ⟶ L) (i : ι) (z : K.cycles i) :
-    (L.iCycles i).hom ((HomologicalComplex.cyclesMap φ i).hom z) =
-      (φ.f i).hom ((K.iCycles i).hom z) :=
+theorem iCycles_cyclesMap_apply (φ : K ⟶ L) (i : ι) (z : K.cycles i)
+    : (L.iCycles i).hom ((HomologicalComplex.cyclesMap φ i).hom z)
+      = (φ.f i).hom ((K.iCycles i).hom z) :=
   congrArg (fun g => ModuleCat.Hom.hom g z) (HomologicalComplex.cyclesMap_i φ i)
 
-theorem homologyMap_homologyπ_apply (φ : K ⟶ L) (i : ι) (z : K.cycles i) :
-    (HomologicalComplex.homologyMap φ i).hom ((K.homologyπ i).hom z) =
-      (L.homologyπ i).hom ((HomologicalComplex.cyclesMap φ i).hom z) := by
+theorem homologyMap_homologyπ_apply (φ : K ⟶ L) (i : ι) (z : K.cycles i)
+    : (HomologicalComplex.homologyMap φ i).hom ((K.homologyπ i).hom z)
+      = (L.homologyπ i).hom ((HomologicalComplex.cyclesMap φ i).hom z) := by
   rw [← LinearMap.comp_apply, ← ModuleCat.hom_comp, HomologicalComplex.homologyπ_naturality]
   rfl
 
@@ -83,23 +90,24 @@ end Apply
 
 section Filtered
 
-variable {R : Type u} [Ring R] {ι : Type*} {c : ComplexShape ι}
-  {J : Type u} [SmallCategory J] [IsFiltered J]
+variable
+  {R : Type u} [Ring R]
+  {ι : Type*} {c : ComplexShape ι} {J : Type u} [SmallCategory J] [IsFiltered J]
   {F : J ⥤ HomologicalComplex (ModuleCat.{u} R) c} (t : Cocone F)
 
 omit [IsFiltered J] in
-theorem cocone_w_apply {j j' : J} (f : j ⟶ j') (i : ι) (y : (F.obj j).X i) :
-    ((t.ι.app j').f i).hom (((F.map f).f i).hom y) = ((t.ι.app j).f i).hom y :=
+theorem cocone_w_apply {j j' : J} (f : j ⟶ j') (i : ι) (y : (F.obj j).X i)
+    : ((t.ι.app j').f i).hom (((F.map f).f i).hom y) = ((t.ι.app j).f i).hom y :=
   congrArg (fun φ : F.obj j ⟶ t.pt => (φ.f i).hom y) (t.w f)
 
-
 omit [IsFiltered J] in
-theorem exists_homologyMap_eq_of_cocone (i : ι)
-    (hsurj : ∀ x : t.pt.X i, ∃ (j : J) (y : (F.obj j).X i), ((t.ι.app j).f i).hom y = x)
-    (hinj : ∀ (j : J) (y : (F.obj j).X (c.next i)), ((t.ι.app j).f (c.next i)).hom y = 0 →
-      ∃ (j' : J) (f : j ⟶ j'), ((F.map f).f (c.next i)).hom y = 0)
-    (z : t.pt.homology i) :
-    ∃ (j : J) (y : (F.obj j).homology i),
+theorem exists_homologyMap_eq_of_cocone
+    (i : ι) (hsurj : ∀ x : t.pt.X i, ∃ (j : J) (y : (F.obj j).X i), ((t.ι.app j).f i).hom y = x)
+    (hinj : ∀ (j : J) (y : (F.obj j).X (c.next i)),
+      ((t.ι.app j).f (c.next i)).hom y = 0
+        → ∃ (j' : J) (f : j ⟶ j'), ((F.map f).f (c.next i)).hom y = 0)
+    (z : t.pt.homology i)
+    : ∃ (j : J) (y : (F.obj j).homology i),
       (HomologicalComplex.homologyMap (t.ι.app j) i).hom y = z := by
   obtain ⟨z, rfl⟩ := (ModuleCat.epi_iff_surjective (t.pt.homologyπ i)).1 inferInstance z
   obtain ⟨j, y, hy⟩ := hsurj ((t.pt.iCycles i).hom z)
@@ -115,14 +123,15 @@ theorem exists_homologyMap_eq_of_cocone (i : ι)
   apply (ModuleCat.mono_iff_injective (t.pt.iCycles i)).1 inferInstance
   rw [iCycles_cyclesMap_apply, hz', cocone_w_apply, hy]
 
-theorem exists_homologyMap_map_eq_zero_of_cocone (i : ι)
-    (hsurj : ∀ x : t.pt.X (c.prev i),
-      ∃ (j : J) (y : (F.obj j).X (c.prev i)), ((t.ι.app j).f (c.prev i)).hom y = x)
-    (hinj : ∀ (j : J) (y : (F.obj j).X i), ((t.ι.app j).f i).hom y = 0 →
-      ∃ (j' : J) (f : j ⟶ j'), ((F.map f).f i).hom y = 0)
+theorem exists_homologyMap_map_eq_zero_of_cocone
+    (i : ι)
+    (hsurj : ∀ x : t.pt.X (c.prev i), ∃ (j : J) (y : (F.obj j).X (c.prev i)),
+      ((t.ι.app j).f (c.prev i)).hom y = x)
+    (hinj : ∀ (j : J) (y : (F.obj j).X i),
+      ((t.ι.app j).f i).hom y = 0 → ∃ (j' : J) (f : j ⟶ j'), ((F.map f).f i).hom y = 0)
     (j : J) (y : (F.obj j).homology i)
-    (hy : (HomologicalComplex.homologyMap (t.ι.app j) i).hom y = 0) :
-    ∃ (j' : J) (f : j ⟶ j'), (HomologicalComplex.homologyMap (F.map f) i).hom y = 0 := by
+    (hy : (HomologicalComplex.homologyMap (t.ι.app j) i).hom y = 0)
+    : ∃ (j' : J) (f : j ⟶ j'), (HomologicalComplex.homologyMap (F.map f) i).hom y = 0 := by
   obtain ⟨z, rfl⟩ := (ModuleCat.epi_iff_surjective ((F.obj j).homologyπ i)).1 inferInstance y
   rw [homologyMap_homologyπ_apply, homologyπ_eq_zero_iff, iCycles_cyclesMap_apply] at hy
   obtain ⟨w, hw⟩ := hy
@@ -130,8 +139,9 @@ theorem exists_homologyMap_map_eq_zero_of_cocone (i : ι)
   let m := IsFiltered.max j j₁
   let a : j ⟶ m := IsFiltered.leftToMax j j₁
   let b : j₁ ⟶ m := IsFiltered.rightToMax j j₁
-  let e : (F.obj m).X i := ((F.map a).f i).hom (((F.obj j).iCycles i).hom z) -
-    ((F.obj m).d (c.prev i) i).hom (((F.map b).f (c.prev i)).hom v)
+  let e : (F.obj m).X i :=
+    ((F.map a).f i).hom (((F.obj j).iCycles i).hom z)
+      - ((F.obj m).d (c.prev i) i).hom (((F.map b).f (c.prev i)).hom v)
   have he : ((t.ι.app m).f i).hom e = 0 := by
     simp only [e, map_sub]
     rw [cocone_w_apply, hom_f_d_apply, cocone_w_apply, hv]

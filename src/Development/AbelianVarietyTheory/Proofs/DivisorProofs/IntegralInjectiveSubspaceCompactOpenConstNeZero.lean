@@ -6,15 +6,24 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.RankEqCardIf
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels MeasureTheory GlobalTheory.LatVac GlobalTheory.InertVacLag GlobalTheory.InertLagChar
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels MeasureTheory GlobalTheory.LatVac
+  GlobalTheory.InertVacLag GlobalTheory.InertLagChar
 open scoped TensorProduct Matrix GlobalTheory.VacAny
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem GlobalTheory.integral_indicator_preimage_injective_ne_zero : ∀ (F : Type) [Field F] [NumberField F] (v : Pl (F := F)) (κ : Type) [Fintype κ],
-    ∀ (N : ℕ) (ν : @Measure (Fin N → Fv F v) (borel _)), @Measure.IsAddHaarMeasure _ _ _ (borel _) ν →
-    ∀ j : (Fin N → Fv F v) →ₗ[Fv F v] (κ → Fv F v) × (κ → Fv F v), Function.Injective j →
-    ∀ c : ℂ, c ≠ 0 → ∀ U : Set ((κ → Fv F v) × (κ → Fv F v)), IsOpen U → IsCompact U → 0 ∈ U →
-    ∫ y, U.indicator (fun _ => c) (j y) ∂ν ≠ 0 := by
+theorem GlobalTheory.integral_indicator_preimage_injective_ne_zero
+    : ∀ (F : Type) [Field F] [NumberField F] (v : Pl (F := F)) (κ : Type) [Fintype κ],
+      ∀ (N : ℕ) (ν : @Measure (Fin N → Fv F v) (borel _)),
+        @Measure.IsAddHaarMeasure _ _ _ (borel _) ν
+          → ∀ j : (Fin N → Fv F v) →ₗ[Fv F v] (κ → Fv F v) × (κ → Fv F v),
+            Function.Injective j
+              → ∀ c : ℂ,
+                c ≠ 0
+                  → ∀ U : Set ((κ → Fv F v) × (κ → Fv F v)),
+                    IsOpen U → IsCompact U → 0 ∈ U
+                      → ∫ y, U.indicator (fun _ => c) (j y) ∂ν ≠ 0 := by
   intro F _ _ v κ _ N ν hν j hj c hc U hUo hUc h0
   letI : MeasurableSpace (Fin N → Fv F v) := borel _
   haveI : BorelSpace (Fin N → Fv F v) := ⟨rfl⟩

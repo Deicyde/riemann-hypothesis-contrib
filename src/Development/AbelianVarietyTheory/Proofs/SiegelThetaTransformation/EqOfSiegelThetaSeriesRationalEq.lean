@@ -12,9 +12,9 @@ open scoped ComplexConjugate Real
 
 namespace GlobalTheory.SW
 
-theorem exists_int_div_of_intM {κ ι : Type} (R S : ℕ) (hR : 0 < R) (hS : 0 < S)
-    (x : Matrix κ ι ℚ) (h : IntM ((R : ℚ) • x)) :
-    ∃ s : κ × ι → ℤ, (Matrix.of fun k i => (s (k, i) : ℚ) / ((R * S : ℕ) : ℚ)) = x := by
+theorem exists_int_div_of_intM
+    {κ ι : Type} (R S : ℕ) (hR : 0 < R) (hS : 0 < S) (x : Matrix κ ι ℚ) (h : IntM ((R : ℚ) • x))
+    : ∃ s : κ × ι → ℤ, (Matrix.of fun k i => (s (k, i) : ℚ) / ((R * S : ℕ) : ℚ)) = x := by
   have h' : ∀ p : κ × ι, ∃ n : ℤ, (n : ℚ) = (R : ℚ) * x p.1 p.2 := by
     intro p
     have := h p.1 p.2
@@ -30,7 +30,9 @@ theorem exists_int_div_of_intM {κ ι : Type} (R S : ℕ) (hR : 0 < R) (hS : 0 <
   rw [hn (k, i)]
   field_simp
 
-theorem eq_of_thS_eq : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι] (φ ψ : Matrix κ ι ℚ → ℂ), IsSB φ → IsSB ψ → ∀ τ ∈ Siegel ι, (∀ ζ, thS φ τ ζ = thS ψ τ ζ) → φ = ψ := by
+theorem eq_of_thS_eq
+    : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι] (φ ψ : Matrix κ ι ℚ → ℂ),
+      IsSB φ → IsSB ψ → ∀ τ ∈ Siegel ι, (∀ ζ, thS φ τ ζ = thS ψ τ ζ) → φ = ψ := by
   intro κ ι _ _ _ φ ψ hφ hψ τ hτ h
   obtain ⟨R, hR, hRφ, -⟩ := id hφ
   obtain ⟨S, hS, hSψ, -⟩ := id hψ
@@ -48,8 +50,7 @@ theorem eq_of_thS_eq : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq
   have hrange : ∀ x, φ x - ψ x ≠ 0 → x ∈ Set.range e := by
     intro x hx
     by_cases h1 : φ x = 0
-    · have h2 : ψ x ≠ 0 := by
-        intro h2; exact hx (by rw [h1, h2, sub_zero])
+    · have h2 : ψ x ≠ 0 := by intro h2; exact hx (by rw [h1, h2, sub_zero])
       obtain ⟨s, hs⟩ := exists_int_div_of_intM S R hS hR x (hSψ x h2)
       exact ⟨s, by rw [← hs, Nat.mul_comm S R]⟩
     · exact exists_int_div_of_intM R S hR hS x (hRφ x h1)
@@ -65,31 +66,36 @@ theorem eq_of_thS_eq : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq
     simp only [sub_mul]
     rw [(hsφ ζ).tsum_sub (hsψ ζ)]
     exact sub_eq_zero.2 (h ζ)
-  have key := GlobalTheory.coeff_eq_zero_of_fourier_series_eq_zero (κ × ι)
-    (fun s => (φ (e s) - ψ (e s)) * E 0 (e s))
-    (((hs 0).comp_injective he).norm) (by
-      intro y
-      have h0 := hz (fun k i => ((R * S : ℕ) : ℂ) * (y (k, i) : ℂ))
-      rw [← he.tsum_eq (f := fun x => (φ x - ψ x) * E (fun k i => ((R * S : ℕ) : ℂ) * (y (k, i) : ℂ)) x)
-        (by
-          intro x hx
-          exact hrange x (left_ne_zero_of_mul hx))] at h0
-      rw [← h0]
-      refine tsum_congr fun s => ?_
-      rw [mul_assoc]
-      congr 1
-      simp only [E]
-      rw [← Complex.exp_add]
-      congr 1
-      have : ∀ k, qv (e s k) ⬝ᵥ (fun i => ((R * S : ℕ) : ℂ) * (y (k, i) : ℂ)) =
-          ∑ i, (s (k, i) : ℂ) * (y (k, i) : ℂ) := by
-        intro k
-        refine Finset.sum_congr rfl fun i _ => ?_
-        simp only [qv, e, Matrix.of_apply, Rat.cast_div, Rat.cast_intCast, Rat.cast_natCast]
-        field_simp
-      simp only [this, Pi.zero_apply, dotProduct_zero, mul_zero, add_zero, Finset.sum_add_distrib,
-        ← Finset.mul_sum, Fintype.sum_prod_type]
-      ring)
+  have key :=
+    GlobalTheory.coeff_eq_zero_of_fourier_series_eq_zero (κ × ι)
+      (fun s => (φ (e s) - ψ (e s)) * E 0 (e s))
+      (((hs 0).comp_injective he).norm)
+      (by
+        intro y
+        have h0 := hz (fun k i => ((R * S : ℕ) : ℂ) * (y (k, i) : ℂ))
+        rw [← he.tsum_eq
+            (f := fun x => (φ x - ψ x) * E (fun k i => ((R * S : ℕ) : ℂ) * (y (k, i) : ℂ)) x)
+            (by
+              intro x hx
+              exact hrange x (left_ne_zero_of_mul hx))]
+          at h0
+        rw [← h0]
+        refine tsum_congr fun s => ?_
+        rw [mul_assoc]
+        congr 1
+        simp only [E]
+        rw [← Complex.exp_add]
+        congr 1
+        have : ∀ k,
+            qv (e s k) ⬝ᵥ (fun i => ((R * S : ℕ) : ℂ) * (y (k, i) : ℂ))
+              = ∑ i, (s (k, i) : ℂ) * (y (k, i) : ℂ) := by
+          intro k
+          refine Finset.sum_congr rfl fun i _ => ?_
+          simp only [qv, e, Matrix.of_apply, Rat.cast_div, Rat.cast_intCast, Rat.cast_natCast]
+          field_simp
+        simp only [this, Pi.zero_apply, dotProduct_zero, mul_zero, add_zero, Finset.sum_add_distrib,
+          ← Finset.mul_sum, Fintype.sum_prod_type]
+        ring)
   funext x
   by_contra hx
   obtain ⟨s, rfl⟩ := hrange x (sub_ne_zero.2 hx)

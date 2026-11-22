@@ -13,17 +13,33 @@ namespace GlobalTheory.FlagEmb.CellLU
 
 variable {K : Type} [Field K] {n : ℕ}
 
-theorem exists_lower_mul_upper (A : Matrix (Fin n) (Fin n) K)
-    (hA : ∀ (k : ℕ) (h : k ≤ n), (A.submatrix (Fin.castLE h) (Fin.castLE h)).det ≠ 0) :
-    ∃ L : Matrix (Fin n) (Fin n) K, (∀ i k, i < k → L i k = 0) ∧ (∀ i, L i i = 1) ∧
-      ∀ i j, j < i → (L * A) i j = 0 := by
-  have hw : ∀ i : Fin n, ∃ v : Fin i → K, vecMul v (A.submatrix (Fin.castLE i.isLt.le) (Fin.castLE i.isLt.le)) =
-      fun j : Fin i => A i (Fin.castLE i.isLt.le j) := fun i =>
-    ⟨vecMul (fun j : Fin i => A i (Fin.castLE i.isLt.le j))
-      (A.submatrix (Fin.castLE i.isLt.le) (Fin.castLE i.isLt.le))⁻¹, by
-      rw [vecMul_vecMul, nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr (hA _ _)), vecMul_one]⟩
+theorem exists_lower_mul_upper
+    (A : Matrix (Fin n) (Fin n) K)
+    (hA : ∀ (k : ℕ) (h : k ≤ n), (A.submatrix (Fin.castLE h) (Fin.castLE h)).det ≠ 0)
+    : ∃ L : Matrix (Fin n) (Fin n) K,
+      (∀ i k, i < k → L i k = 0) ∧ (∀ i, L i i = 1) ∧ ∀ i j, j < i → (L * A) i j = 0 := by
+  have hw
+      : ∀ i : Fin n, ∃ v : Fin i → K,
+        vecMul v (A.submatrix (Fin.castLE i.isLt.le) (Fin.castLE i.isLt.le))
+          = fun j : Fin i => A i (Fin.castLE i.isLt.le j) := fun i => ⟨
+    vecMul
+      (fun j : Fin i => A i (Fin.castLE i.isLt.le j))
+      (A.submatrix (Fin.castLE i.isLt.le) (Fin.castLE i.isLt.le))⁻¹,
+    by rw [vecMul_vecMul, nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr (hA _ _)), vecMul_one]
+  ⟩
   choose v hv using hw
-  refine ⟨Matrix.of fun i k => if h : (k : ℕ) < i then -v i ⟨k, h⟩ else if k = i then 1 else 0, ?_, ?_, ?_⟩
+  refine ⟨
+    Matrix.of fun i k =>
+      if h : (k : ℕ) < i then
+        - v i ⟨k, h⟩
+      else if k = i then
+        1
+      else
+        0,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro i k h
     simp only [Matrix.of_apply]
     rw [dite_eq_right (by have := Fin.lt_def.mp h; omega), if_neg (ne_of_gt h)]
@@ -31,9 +47,19 @@ theorem exists_lower_mul_upper (A : Matrix (Fin n) (Fin n) K)
     simp
   · intro i j h
     rw [Matrix.mul_apply]
-    have hsplit : ∀ k : Fin n,
-        (Matrix.of fun i k : Fin n => if h : (k : ℕ) < i then -v i ⟨k, h⟩ else if k = i then (1 : K) else 0) i k * A k j =
-        (if h : (k : ℕ) < i then -v i ⟨k, h⟩ * A k j else 0) + (if k = i then A i j else 0) := by
+    have hsplit
+        : ∀ k : Fin n,
+          (Matrix.of fun i k : Fin n =>
+                  if h : (k : ℕ) < i then
+                    - v i ⟨k, h⟩
+                  else if k = i then
+                    (1 : K)
+                  else
+                    0)
+                i k
+              * A k j
+            = (if h : (k : ℕ) < i then - v i ⟨k, h⟩ * A k j else 0)
+              + (if k = i then A i j else 0) := by
       intro k
       simp only [Matrix.of_apply]
       rcases lt_trichotomy k i with h | h | h
@@ -41,12 +67,15 @@ theorem exists_lower_mul_upper (A : Matrix (Fin n) (Fin n) K)
         rw [dite_eq_left hk, dite_eq_left hk, if_neg (ne_of_lt h), add_zero]
       · subst h; simp
       · have hk : ¬ (k : ℕ) < i := by have := Fin.lt_def.mp h; omega
-        rw [dite_eq_right hk, dite_eq_right hk, if_neg (ne_of_gt h), if_neg (ne_of_gt h), zero_mul, add_zero]
+        rw [dite_eq_right hk, dite_eq_right hk, if_neg (ne_of_gt h), if_neg (ne_of_gt h), zero_mul,
+          add_zero]
     rw [Finset.sum_congr rfl fun k _ => hsplit k, Finset.sum_add_distrib, Finset.sum_ite_eq',
       if_pos (Finset.mem_univ _)]
-    have hs : ∑ k : Fin i, -v i k * A (Fin.castLE i.isLt.le k) j =
-        ∑ k : Fin n, (if h : (k : ℕ) < i then -v i ⟨k, h⟩ * A k j else 0) := by
-      refine Fintype.sum_of_injective (Fin.castLE i.isLt.le) (Fin.castLE_injective _) _ _ (fun k hk => ?_)
+    have hs
+        : ∑ k : Fin i, -v i k * A (Fin.castLE i.isLt.le k) j
+          = ∑ k : Fin n, (if h : (k : ℕ) < i then -v i ⟨k, h⟩ * A k j else 0) := by
+      refine Fintype.sum_of_injective (Fin.castLE i.isLt.le) (Fin.castLE_injective _) _ _
+        (fun k hk => ?_)
         (fun k => by simp)
       rw [dite_eq_right]
       intro hlt
@@ -60,10 +89,12 @@ theorem exists_lower_mul_upper (A : Matrix (Fin n) (Fin n) K)
     simp only [neg_mul, Finset.sum_neg_distrib]
     ring
 
-theorem exists_lu (A : Matrix (Fin n) (Fin n) K)
-    (hA : ∀ (k : ℕ) (h : k ≤ n), (A.submatrix (Fin.castLE h) (Fin.castLE h)).det ≠ 0) :
-    ∃ N b : Matrix (Fin n) (Fin n) K, (∀ i k, i < k → N i k = 0) ∧ (∀ i, N i i = 1) ∧
-      (∀ i j, j < i → b i j = 0) ∧ (∀ i, b i i ≠ 0) ∧ A = N * b := by
+theorem exists_lu
+    (A : Matrix (Fin n) (Fin n) K)
+    (hA : ∀ (k : ℕ) (h : k ≤ n), (A.submatrix (Fin.castLE h) (Fin.castLE h)).det ≠ 0)
+    : ∃ N b : Matrix (Fin n) (Fin n) K,
+      (∀ i k, i < k → N i k = 0) ∧ (∀ i, N i i = 1) ∧ (∀ i j, j < i → b i j = 0) ∧ (∀ i, b i i ≠ 0)
+        ∧ A = N * b := by
   obtain ⟨L, hup, hd, hz⟩ := exists_lower_mul_upper A hA
   have hLt : L.BlockTriangular OrderDual.toDual := fun i k h => hup i k h
   have hL : L.det = 1 := by
@@ -88,23 +119,33 @@ theorem exists_lu (A : Matrix (Fin n) (Fin n) K)
     exact Finset.prod_ne_zero_iff.1 h1 i (Finset.mem_univ _)
   · rw [← Matrix.mul_assoc, nonsing_inv_mul _ hu, Matrix.one_mul]
 
-theorem sum_lform_plk {S : Type} [CommRing S] {M k : ℕ} {ι ι' : Type} (D : ι' → Fin (M + 1) → S)
-    (u : ι → Fin (M + 1) → S) (ρ : Fin k → ι') (e : Fin k → ι) :
-    ∑ q, lform D ρ q * plk u e q = (Matrix.of fun l l' => ∑ r, D (ρ l') r * u (e l) r).det := by
-  have h := Equiv.sum_comp (plE M k)
-    (fun q : Fin k → Fin (M + 1) => (∏ l, D (ρ l) (q l)) * (Matrix.of fun l l' => u (e l) (q l')).det)
+theorem sum_lform_plk
+    {S : Type} [CommRing S]
+    {M k : ℕ} {ι ι' : Type}
+    (D : ι' → Fin (M + 1) → S) (u : ι → Fin (M + 1) → S) (ρ : Fin k → ι') (e : Fin k → ι)
+    : ∑ q, lform D ρ q * plk u e q = (Matrix.of fun l l' => ∑ r, D (ρ l') r * u (e l) r).det := by
+  have h :=
+    Equiv.sum_comp (plE M k) (fun q : Fin k → Fin (M + 1) =>
+      (∏ l, D (ρ l) (q l)) * (Matrix.of fun l l' => u (e l) (q l')).det)
   refine Eq.trans h ?_
-  simp only [det_apply', Matrix.of_apply, Finset.prod_univ_sum, Fintype.piFinset_univ, Finset.mul_sum]
+  simp only [det_apply', Matrix.of_apply, Finset.prod_univ_sum, Fintype.piFinset_univ,
+    Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun σ _ => Finset.sum_congr rfl fun q _ => ?_
   rw [Finset.prod_mul_distrib]
   ring
 
-theorem exists_cell (T : Type) (m : T → ℕ) (K : Type) [Field K] (M : ℕ) (D c u : Let m → Fin (M + 1) → K) (w : Pm m)
+theorem exists_cell
+    (T : Type) (m : T → ℕ)
+    (K : Type) [Field K]
+    (M : ℕ) (D c u : Let m → Fin (M + 1) → K)
+    (w : Pm m)
     (hD : LeftInv D c) (hu : InBlock c u)
-    (h : ∀ τ j hj, ∑ q, lform D (wLet w ∘ std τ j hj) q * plk u (std τ j hj) q ≠ 0) :
-    ∃ (x : CellVar m → K) (d : Let m → K), (∀ z, d z ≠ 0) ∧ Tri (cellVec c w x) u d := by
-  have hA : ∀ τ, ∃ A : Matrix (Fin (m τ)) (Fin (m τ)) K, ∀ j, u ⟨τ, j⟩ = ∑ i, A i j • c ⟨τ, w τ i⟩ := fun τ => by
+    (h : ∀ τ j hj, ∑ q, lform D (wLet w ∘ std τ j hj) q * plk u (std τ j hj) q ≠ 0)
+    : ∃ (x : CellVar m → K) (d : Let m → K), (∀ z, d z ≠ 0) ∧ Tri (cellVec c w x) u d := by
+  have hA
+      : ∀ τ, ∃ A : Matrix (Fin (m τ)) (Fin (m τ)) K, ∀ j,
+        u ⟨τ, j⟩ = ∑ i, A i j • c ⟨τ, w τ i⟩ := fun τ => by
     have := fun j => (Submodule.mem_span_range_iff_exists_fun K).1 (hu ⟨τ, j⟩)
     choose a ha using this
     refine ⟨Matrix.of fun i j => a j (w τ i), fun j => ?_⟩
@@ -115,12 +156,15 @@ theorem exists_cell (T : Type) (m : T → ℕ) (K : Type) [Field K] (M : ℕ) (D
     rw [hA]
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
-    have : ∀ i', ∑ r, D (wLet w ⟨τ, i⟩) r * (A τ i' j * c ⟨τ, w τ i'⟩ r) = if i' = i then A τ i' j else 0 := by
+    have : ∀ i',
+        ∑ r, D (wLet w ⟨τ, i⟩) r * (A τ i' j * c ⟨τ, w τ i'⟩ r)
+          = if i' = i then A τ i' j else 0 := by
       intro i'
       have h1 := hD (wLet w ⟨τ, i⟩) ⟨τ, w τ i'⟩
-      rw [show (∑ r, D (wLet w ⟨τ, i⟩) r * (A τ i' j * c ⟨τ, w τ i'⟩ r)) =
-        A τ i' j * ∑ r, D (wLet w ⟨τ, i⟩) r * c ⟨τ, w τ i'⟩ r by
-          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun r _ => by ring, h1]
+      rw [show (∑ r, D (wLet w ⟨τ, i⟩) r * (A τ i' j * c ⟨τ, w τ i'⟩ r))
+            = A τ i' j * ∑ r, D (wLet w ⟨τ, i⟩) r * c ⟨τ, w τ i'⟩ r by
+          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun r _ => by ring,
+        h1]
       by_cases hi : i' = i
       · subst hi; simp [wLet]
       · rw [if_neg hi, if_neg, mul_zero]
@@ -128,7 +172,8 @@ theorem exists_cell (T : Type) (m : T → ℕ) (K : Type) [Field K] (M : ℕ) (D
         simp only [wLet, Sigma.mk.injEq, heq_eq_eq, true_and] at he
         exact hi ((w τ).injective he).symm
     simp [this]
-  have hmin : ∀ τ (k : ℕ) (hk : k ≤ m τ), ((A τ).submatrix (Fin.castLE hk) (Fin.castLE hk)).det ≠ 0 := by
+  have hmin
+      : ∀ τ (k : ℕ) (hk : k ≤ m τ), ((A τ).submatrix (Fin.castLE hk) (Fin.castLE hk)).det ≠ 0 := by
     intro τ k hk
     have h1 := h τ k hk
     rw [sum_lform_plk, ← det_transpose] at h1
@@ -145,7 +190,9 @@ theorem exists_cell (T : Type) (m : T → ℕ) (K : Type) [Field K] (M : ℕ) (D
     · subst h; simp [hN1]
     · rw [dite_eq_left h]
   rintro ⟨τ, j⟩
-  have hexp : u ⟨τ, j⟩ = ∑ k, b τ k j • cellVec c w (fun y : CellVar m => N y.1 y.2.1.1 y.2.1.2) ⟨τ, k⟩ := by
+  have hexp
+      : u ⟨τ, j⟩
+        = ∑ k, b τ k j • cellVec c w (fun y : CellVar m => N y.1 y.2.1.1 y.2.1.2) ⟨τ, k⟩ := by
     rw [hA, hNb]
     simp only [cellVec, hcell, Matrix.mul_apply, Finset.sum_smul, Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]

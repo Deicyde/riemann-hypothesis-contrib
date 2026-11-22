@@ -20,8 +20,7 @@ variable {n : ℕ}
 
 theorem JJ_sq : JJ n * JJ n = -1 := by
   ext i j
-  rcases i with i | i <;> rcases j with j | j <;>
-    simp [JJ, fromBlocks_multiply, Matrix.one_apply]
+  rcases i with i | i <;> rcases j with j | j <;> simp [JJ, fromBlocks_multiply, Matrix.one_apply]
 
 theorem cayley_inverse_conjTranspose : (C1 n)ᴴ = (1 / 2 : ℂ) • C0 n := by
   simp [C1, conjTranspose_smul]
@@ -41,7 +40,9 @@ theorem cayley_mul_inverse_apply (X : M2 n) : C0 n * (C1 n * X) = X := by
 def mkGR (M : M2 n) (h : InG M) : GR n :=
   have hl : (-(JJ n) * Mᴴ * JJ n) * M = 1 := by
     have h' : Mᴴ * JJ n * M = JJ n := h
-    calc (-(JJ n) * Mᴴ * JJ n) * M = -(JJ n * (Mᴴ * JJ n * M)) := by simp only [Matrix.mul_assoc, Matrix.neg_mul]
+    calc
+      (-(JJ n) * Mᴴ * JJ n) * M
+        = -(JJ n * (Mᴴ * JJ n * M)) := by simp only [Matrix.mul_assoc, Matrix.neg_mul]
       _ = 1 := by rw [h', JJ_sq, neg_neg]
   ⟨⟨M, -(JJ n) * Mᴴ * JJ n, mul_eq_one_comm.mp hl, hl⟩, h⟩
 
@@ -52,83 +53,99 @@ theorem conj_G (N : M2 n) (hN : Nᴴ * S0 n * N = S0 n) : InG (C0 n * N * C1 n) 
     simp only [← Matrix.mul_assoc, hN]
   show (C0 n * N * C1 n)ᴴ * JJ n * (C0 n * N * C1 n) = JJ n
   rw [JJ_eq]
-  simp only [conjTranspose_mul, cayley_inverse_conjTranspose, Matrix.mul_assoc, cayley_conjTranspose_mul_apply, cayley_inverse_mul_apply, hN',
-    Matrix.smul_mul, Matrix.mul_smul, smul_smul]
+  simp only [conjTranspose_mul, cayley_inverse_conjTranspose, Matrix.mul_assoc,
+    cayley_conjTranspose_mul_apply, cayley_inverse_mul_apply, hN', Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul]
   module
 
 theorem conj_U (N : M2 n) (hN : Nᴴ * N = 1) : (C0 n * N * C1 n)ᴴ * (C0 n * N * C1 n) = 1 := by
-  have hN' : ∀ X : M2 n, Nᴴ * (N * X) = X := fun X => by
-    rw [← Matrix.mul_assoc, hN, Matrix.one_mul]
-  simp only [conjTranspose_mul, cayley_inverse_conjTranspose, Matrix.mul_assoc, cayley_conjTranspose_mul_apply, hN', cayley_mul_inverse,
-    Matrix.smul_mul, Matrix.mul_smul, smul_smul]
+  have hN' : ∀ X : M2 n, Nᴴ * (N * X) = X := fun X => by rw [← Matrix.mul_assoc, hN, Matrix.one_mul]
+  simp only [conjTranspose_mul, cayley_inverse_conjTranspose, Matrix.mul_assoc,
+    cayley_conjTranspose_mul_apply, hN', cayley_mul_inverse, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul]
   norm_num
 
-theorem block_unitary_preserves_form (u v : Matrix (Fin n) (Fin n) ℂ) (hu : uᴴ * u = 1) (hv : vᴴ * v = 1) :
-    (fromBlocks u 0 0 v)ᴴ * S0 n * fromBlocks u 0 0 v = S0 n := by
+theorem block_unitary_preserves_form
+    (u v : Matrix (Fin n) (Fin n) ℂ) (hu : uᴴ * u = 1) (hv : vᴴ * v = 1)
+    : (fromBlocks u 0 0 v)ᴴ * S0 n * fromBlocks u 0 0 v = S0 n := by
   simp [S0, fromBlocks_conjTranspose, fromBlocks_multiply, hu, hv]
 
-theorem blk_U (u v : Matrix (Fin n) (Fin n) ℂ) (hu : uᴴ * u = 1) (hv : vᴴ * v = 1) :
-    (fromBlocks u 0 0 v)ᴴ * fromBlocks u 0 0 v = 1 := by
+theorem blk_U (u v : Matrix (Fin n) (Fin n) ℂ) (hu : uᴴ * u = 1) (hv : vᴴ * v = 1)
+    : (fromBlocks u 0 0 v)ᴴ * fromBlocks u 0 0 v = 1 := by
   rw [← fromBlocks_one]
   simp [fromBlocks_conjTranspose, fromBlocks_multiply, hu, hv]
 
-theorem diag_real_conj (s : Fin n → ℝ) : (diagonal fun j => (s j : ℂ))ᴴ = diagonal fun j => (s j : ℂ) := by
+theorem diag_real_conj (s : Fin n → ℝ)
+    : (diagonal fun j => (s j : ℂ))ᴴ = diagonal fun j => (s j : ℂ) := by
   rw [diagonal_conjTranspose]
   congr 1
   funext j
   simp
 
-private theorem coshSinh_conjTranspose_mul_S0_mul_eq_S0 (X : Fin n → ℝ) :
-    (fromBlocks (diagonal fun j => (Real.cosh (X j) : ℂ)) (diagonal fun j => (Real.sinh (X j) : ℂ))
-        (diagonal fun j => (Real.sinh (X j) : ℂ)) (diagonal fun j => (Real.cosh (X j) : ℂ)))ᴴ * S0 n *
-      fromBlocks (diagonal fun j => (Real.cosh (X j) : ℂ)) (diagonal fun j => (Real.sinh (X j) : ℂ))
-        (diagonal fun j => (Real.sinh (X j) : ℂ)) (diagonal fun j => (Real.cosh (X j) : ℂ)) = S0 n := by
+private theorem coshSinh_conjTranspose_mul_S0_mul_eq_S0 (X : Fin n → ℝ)
+    : (fromBlocks (diagonal fun j => (Real.cosh (X j) : ℂ))
+          (diagonal fun j => (Real.sinh (X j) : ℂ)) (diagonal fun j => (Real.sinh (X j) : ℂ))
+          (diagonal fun j => (Real.cosh (X j) : ℂ)))ᴴ
+        * S0 n
+        * fromBlocks (diagonal fun j => (Real.cosh (X j) : ℂ))
+          (diagonal fun j => (Real.sinh (X j) : ℂ)) (diagonal fun j => (Real.sinh (X j) : ℂ))
+          (diagonal fun j => (Real.cosh (X j) : ℂ))
+      = S0 n := by
   rw [fromBlocks_conjTranspose, diag_real_conj, diag_real_conj, S0, fromBlocks_multiply,
     fromBlocks_multiply]
-  refine fromBlocks_inj.mpr ⟨?_, ?_, ?_, ?_⟩ <;>
-  · ext i j
-    by_cases h : i = j
-    · subst h
-      simp [diagonal_apply, Matrix.one_apply]
-      all_goals first
-        | ring1
-        | linear_combination Complex.cosh_sq (X i : ℂ)
-        | linear_combination -Complex.cosh_sq (X i : ℂ)
-    · simp [diagonal_apply, Matrix.one_apply, h]
+  refine fromBlocks_inj.mpr ⟨?_, ?_, ?_, ?_⟩
+    <;> · ext i j
+          by_cases h : i = j
+          · subst h
+            simp [diagonal_apply, Matrix.one_apply]
+            all_goals
+              first
+              | ring1
+              | linear_combination Complex.cosh_sq (X i : ℂ)
+              | linear_combination -Complex.cosh_sq (X i : ℂ)
+          · simp [diagonal_apply, Matrix.one_apply, h]
 
-private theorem coshSinh_blocks_mul_C1_eq_exp_diag (X : Fin n → ℝ) :
-    C0 n * fromBlocks (diagonal fun j => (Real.cosh (X j) : ℂ)) (diagonal fun j => (Real.sinh (X j) : ℂ))
-        (diagonal fun j => (Real.sinh (X j) : ℂ)) (diagonal fun j => (Real.cosh (X j) : ℂ)) * C1 n =
-      fromBlocks (diagonal fun j => (Real.exp (1 * X j) : ℂ)) 0 0
+private theorem coshSinh_blocks_mul_C1_eq_exp_diag (X : Fin n → ℝ)
+    : C0 n
+        * fromBlocks (diagonal fun j => (Real.cosh (X j) : ℂ))
+          (diagonal fun j => (Real.sinh (X j) : ℂ)) (diagonal fun j => (Real.sinh (X j) : ℂ))
+          (diagonal fun j => (Real.cosh (X j) : ℂ))
+        * C1 n
+      = fromBlocks (diagonal fun j => (Real.exp (1 * X j) : ℂ)) 0 0
         (diagonal fun j => (Real.exp (-(1 * X j)) : ℂ)) := by
-  rw [C1, cayley_conjTranspose_eq, C0, Matrix.mul_smul, fromBlocks_multiply, fromBlocks_multiply, fromBlocks_smul]
-  refine fromBlocks_inj.mpr ⟨?_, ?_, ?_, ?_⟩ <;>
-  · ext i j
-    by_cases h : i = j
-    · subst h
-      simp [diagonal_apply, Matrix.one_apply, ← Real.cosh_add_sinh, ← Real.cosh_sub_sinh]
-      all_goals first
-        | ring1
-        | linear_combination (Complex.sinh (X i : ℂ) - Complex.cosh (X i : ℂ)) * Complex.I_sq
-    · simp [diagonal_apply, Matrix.one_apply, h]
+  rw [C1, cayley_conjTranspose_eq, C0, Matrix.mul_smul, fromBlocks_multiply, fromBlocks_multiply,
+    fromBlocks_smul]
+  refine fromBlocks_inj.mpr ⟨?_, ?_, ?_, ?_⟩
+    <;> · ext i j
+          by_cases h : i = j
+          · subst h
+            simp [diagonal_apply, Matrix.one_apply, ← Real.cosh_add_sinh, ← Real.cosh_sub_sinh]
+            all_goals
+              first
+              | ring1
+              | linear_combination (Complex.sinh (X i : ℂ) - Complex.cosh (X i : ℂ)) * Complex.I_sq
+          · simp [diagonal_apply, Matrix.one_apply, h]
 
-private theorem exists_unitary_coshSinh_decomposition (N : M2 n) (hN : Nᴴ * S0 n * N = S0 n) :
-    ∃ (U1 U2 W V : Matrix (Fin n) (Fin n) ℂ) (X : Fin n → ℝ),
-      U1ᴴ * U1 = 1 ∧ U2ᴴ * U2 = 1 ∧ Wᴴ * W = 1 ∧ Vᴴ * V = 1 ∧
-      N = fromBlocks U1 0 0 U2 *
-        fromBlocks (diagonal fun j => (Real.cosh (X j) : ℂ)) (diagonal fun j => (Real.sinh (X j) : ℂ))
-          (diagonal fun j => (Real.sinh (X j) : ℂ)) (diagonal fun j => (Real.cosh (X j) : ℂ)) *
-        fromBlocks W 0 0 V := by
+private theorem exists_unitary_coshSinh_decomposition (N : M2 n) (hN : Nᴴ * S0 n * N = S0 n)
+    : ∃ (U1 U2 W V : Matrix (Fin n) (Fin n) ℂ) (X : Fin n → ℝ),
+      U1ᴴ * U1 = 1 ∧ U2ᴴ * U2 = 1 ∧ Wᴴ * W = 1 ∧ Vᴴ * V = 1
+        ∧ N
+          = fromBlocks U1 0 0 U2
+            * fromBlocks (diagonal fun j => (Real.cosh (X j) : ℂ))
+              (diagonal fun j => (Real.sinh (X j) : ℂ)) (diagonal fun j => (Real.sinh (X j) : ℂ))
+              (diagonal fun j => (Real.cosh (X j) : ℂ))
+            * fromBlocks W 0 0 V := by
   set P := N.toBlocks₁₁ with hPd
   set Q := N.toBlocks₁₂ with hQd
   set R := N.toBlocks₂₁ with hRd
   set S := N.toBlocks₂₂ with hSd
   have hNb : N = fromBlocks P Q R S := (fromBlocks_toBlocks N).symm
   have e := hN
-  rw [hNb, fromBlocks_conjTranspose, S0, fromBlocks_multiply, fromBlocks_multiply,
-    fromBlocks_inj] at e
+  rw [hNb, fromBlocks_conjTranspose, S0, fromBlocks_multiply, fromBlocks_multiply, fromBlocks_inj]
+    at e
   simp only [Matrix.mul_zero, Matrix.zero_mul, Matrix.mul_one, Matrix.mul_neg, Matrix.neg_mul,
-    add_zero, zero_add] at e
+      add_zero, zero_add]
+    at e
   obtain ⟨e1, e2, -, e4⟩ := e
   have e1' : Pᴴ * P = 1 + Rᴴ * R := by
     rw [← e1]
@@ -152,11 +169,12 @@ private theorem exists_unitary_coshSinh_decomposition (N : M2 n) (hN : Nᴴ * S0
   have hc2 : ∀ j, Real.cosh (X j) ^ 2 = 1 + l j := fun j => by
     rw [Real.cosh_sq, hs2]
     ring
-  obtain ⟨U2, hU2, hRW⟩ := gram_diag_unitary (R * W) (fun j => Real.sinh (X j)) (by
-    rw [hl]
-    congr 1
-    funext j
-    rw [hs2])
+  obtain ⟨U2, hU2, hRW⟩ :=
+    gram_diag_unitary (R * W) (fun j => Real.sinh (X j)) (by
+      rw [hl]
+      congr 1
+      funext j
+      rw [hs2])
   have hPW : (P * W)ᴴ * (P * W) = diagonal fun j => ((Real.cosh (X j) ^ 2 : ℝ) : ℂ) := by
     have h1 : (P * W)ᴴ * (P * W) = Wᴴ * W + (R * W)ᴴ * (R * W) := by
       simp only [conjTranspose_mul, Matrix.mul_assoc]
@@ -182,13 +200,11 @@ private theorem exists_unitary_coshSinh_decomposition (N : M2 n) (hN : Nᴴ * S0
   have hU1' : U1 * U1ᴴ = 1 := mul_eq_one_comm.mp hU1
   have hU2' : U2 * U2ᴴ = 1 := mul_eq_one_comm.mp hU2
   have hcross : cX * (U1ᴴ * Q) = sX * (U2ᴴ * S) := by
-    have h1 : (P * W)ᴴ * Q = (R * W)ᴴ * S := by
-      simp only [conjTranspose_mul, Matrix.mul_assoc, e2']
+    have h1 : (P * W)ᴴ * Q = (R * W)ᴴ * S := by simp only [conjTranspose_mul, Matrix.mul_assoc, e2']
     rw [hPc, hRs, conjTranspose_mul, conjTranspose_mul, hcH, hsH] at h1
     simpa only [Matrix.mul_assoc] using h1
   set cI : Matrix (Fin n) (Fin n) ℂ := diagonal fun j => ((Real.cosh (X j) : ℂ))⁻¹ with hcId
-  have hcne : ∀ j, (Real.cosh (X j) : ℂ) ≠ 0 := fun j => by
-    exact_mod_cast (Real.cosh_pos (X j)).ne'
+  have hcne : ∀ j, (Real.cosh (X j) : ℂ) ≠ 0 := fun j => by exact_mod_cast (Real.cosh_pos (X j)).ne'
   have hcI : cI * cX = 1 := by
     rw [hcId, hcXd, diagonal_mul_diagonal, ← diagonal_one]
     congr 1
@@ -206,11 +222,15 @@ private theorem exists_unitary_coshSinh_decomposition (N : M2 n) (hN : Nᴴ * S0
     ring
   obtain ⟨V, hVd⟩ : ∃ V, V = cI * (U2ᴴ * S) := ⟨_, rfl⟩
   have hQ' : U1ᴴ * Q = sX * V := by
-    calc U1ᴴ * Q = cI * cX * (U1ᴴ * Q) := by rw [hcI, Matrix.one_mul]
+    calc
+      U1ᴴ * Q
+        = cI * cX * (U1ᴴ * Q) := by rw [hcI, Matrix.one_mul]
       _ = cI * (sX * (U2ᴴ * S)) := by rw [Matrix.mul_assoc, hcross]
       _ = sX * V := by rw [hVd, ← Matrix.mul_assoc, hcomm, Matrix.mul_assoc]
   have hS' : U2ᴴ * S = cX * V := by
-    calc U2ᴴ * S = cX * cI * (U2ᴴ * S) := by rw [hcI', Matrix.one_mul]
+    calc
+      U2ᴴ * S
+        = cX * cI * (U2ᴴ * S) := by rw [hcI', Matrix.one_mul]
       _ = cX * V := by rw [hVd, Matrix.mul_assoc]
   have hd : sX * sX - cX * cX = -1 := by
     ext i j
@@ -237,10 +257,12 @@ private theorem exists_unitary_coshSinh_decomposition (N : M2 n) (hN : Nᴴ * S0
   rw [hNb, fromBlocks_multiply, fromBlocks_multiply]
   simp only [Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add]
   refine fromBlocks_inj.mpr ⟨?_, ?_, ?_, ?_⟩
-  · calc P = P * W * Wᴴ := by rw [Matrix.mul_assoc, hW2, Matrix.mul_one]
+  · calc
+      P = P * W * Wᴴ := by rw [Matrix.mul_assoc, hW2, Matrix.mul_one]
       _ = U1 * cX * Wᴴ := by rw [hPc]
   · rw [Matrix.mul_assoc, ← hQ', ← Matrix.mul_assoc, hU1', Matrix.one_mul]
-  · calc R = R * W * Wᴴ := by rw [Matrix.mul_assoc, hW2, Matrix.mul_one]
+  · calc
+      R = R * W * Wᴴ := by rw [Matrix.mul_assoc, hW2, Matrix.mul_one]
       _ = U2 * sX * Wᴴ := by rw [hRs]
   · rw [Matrix.mul_assoc, ← hS', ← Matrix.mul_assoc, hU2', Matrix.one_mul]
 
@@ -257,8 +279,9 @@ theorem kAK : KAK := by
     match_scalars
     simp [Complex.I_mul_I]
   have hN : (C1 n * mR y * C0 n)ᴴ * S0 n * (C1 n * mR y * C0 n) = S0 n := by
-    simp only [conjTranspose_mul, cayley_inverse_conjTranspose, Matrix.mul_assoc, Matrix.smul_mul, Matrix.mul_smul,
-      hJ', hYJ, complex_structure_cayley, cayley_conjTranspose_mul_apply, smul_smul]
+    simp only [conjTranspose_mul, cayley_inverse_conjTranspose, Matrix.mul_assoc, Matrix.smul_mul,
+      Matrix.mul_smul, hJ', hYJ, complex_structure_cayley, cayley_conjTranspose_mul_apply,
+      smul_smul]
     match_scalars
     simp [Complex.I_mul_I]
     all_goals ring_nf

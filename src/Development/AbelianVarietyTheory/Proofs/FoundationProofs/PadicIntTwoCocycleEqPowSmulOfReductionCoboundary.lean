@@ -5,18 +5,27 @@ public import Formalism.GaloisCohomology.LocalTateDualityK
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology
 
 namespace GlobalTheory
 
-theorem padicInt_two_cocycle_eq_pow_smul_of_reduction_coboundary :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [ContinuousMul Γ] (ρ : Representation ℤ_[l] Γ ℤ_[l]), ContAction ρ → ∀ (r : ℕ) (ρr : Representation (ZMod (l ^ r)) Γ (ZMod (l ^ r))), (∀ g x, PadicInt.toZModPow r (ρ g x) = ρr g (PadicInt.toZModPow r x)) → ∀ z ∈ Z2 ρ, (fun p => PadicInt.toZModPow r (z p)) ∈ B2 ρr → ∃ w ∈ Z2 ρ, z - (l : ℤ_[l]) ^ r • w ∈ B2 ρ := by
+theorem padicInt_two_cocycle_eq_pow_smul_of_reduction_coboundary
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [ContinuousMul Γ]
+        (ρ : Representation ℤ_[l] Γ ℤ_[l]),
+      ContAction ρ
+        → ∀ (r : ℕ) (ρr : Representation (ZMod (l ^ r)) Γ (ZMod (l ^ r))),
+          (∀ g x, PadicInt.toZModPow r (ρ g x) = ρr g (PadicInt.toZModPow r x))
+            → ∀ z ∈ Z2 ρ,
+              (fun p => PadicInt.toZModPow r (z p)) ∈ B2 ρr
+                → ∃ w ∈ Z2 ρ, z - (l : ℤ_[l]) ^ r • w ∈ B2 ρ := by
   intro l _ Γ _ _ _ ρ hρ r ρr hc z hz hB
   obtain ⟨c, hcc, hcd⟩ := (separated_dvr_second_cohomology_mem _ _).1 hB
   have hsurj : Function.Surjective (PadicInt.toZModPow (p := l) r) := ZMod.ringHom_surjective _
   choose s hs using hsurj
   have hsc : Continuous s := continuous_of_discreteTopology
-  have hb : d1 ρ (s ∘ c) ∈ B2 ρ := (separated_dvr_second_cohomology_mem _ _).2 ⟨s ∘ c, hsc.comp hcc, rfl⟩
+  have hb : d1 ρ (s ∘ c) ∈ B2 ρ :=
+    (separated_dvr_second_cohomology_mem _ _).2 ⟨s ∘ c, hsc.comp hcc, rfl⟩
   have hy : z - d1 ρ (s ∘ c) ∈ Z2 ρ := (Z2 ρ).sub_mem hz (coboundaries2_le_cocycles2 ρ hρ hb)
   have hdiv : ∀ p, ∃ a : ℤ_[l], (l : ℤ_[l]) ^ r * a = (z - d1 ρ (s ∘ c)) p := by
     rintro ⟨g, h⟩
@@ -30,11 +39,9 @@ theorem padicInt_two_cocycle_eq_pow_smul_of_reduction_coboundary :
     obtain ⟨a, ha⟩ := h1
     exact ⟨a, ha.symm⟩
   choose w hw using hdiv
-  have hne : (l : ℤ_[l]) ^ r ≠ 0 :=
-    pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
+  have hne : (l : ℤ_[l]) ^ r ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
   have hemb : Topology.IsClosedEmbedding (fun x : ℤ_[l] => (l : ℤ_[l]) ^ r * x) :=
-    Continuous.isClosedEmbedding (continuous_const.mul continuous_id)
-      (mul_right_injective₀ hne)
+    Continuous.isClosedEmbedding (continuous_const.mul continuous_id) (mul_right_injective₀ hne)
   have hw' : (l : ℤ_[l]) ^ r • w = z - d1 ρ (s ∘ c) := funext hw
   refine ⟨w, (mem_cocycles2 _ _).2 ⟨?_, fun g h k => ?_⟩, ?_⟩
   · refine hemb.isInducing.continuous_iff.2 ?_

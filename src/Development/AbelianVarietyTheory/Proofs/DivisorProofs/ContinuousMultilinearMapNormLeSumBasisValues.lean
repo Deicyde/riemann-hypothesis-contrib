@@ -9,9 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdeleJoinZer
 open IsDedekindDomain NumberField
 open scoped Classical
 
-theorem GlobalTheory.continuousMultilinear_norm_le_basis_sum : ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] (ι : Type) [Fintype ι] (b : Module.Basis ι ℝ E) (j : ℕ),
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ M : ContinuousMultilinearMap ℝ (fun _ : Fin j => E) ℂ,
-      ‖M‖ ≤ K * ∑ cs : Fin j → ι, ‖M (fun r => b (cs r))‖ := by
+theorem GlobalTheory.continuousMultilinear_norm_le_basis_sum
+    : ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] (ι : Type) [Fintype ι]
+        (b : Module.Basis ι ℝ E) (j : ℕ),
+      ∃ K : ℝ,
+        0 ≤ K
+          ∧ ∀ M : ContinuousMultilinearMap ℝ (fun _ : Fin j => E) ℂ,
+            ‖M‖ ≤ K * ∑ cs : Fin j → ι, ‖M (fun r => b (cs r))‖ := by
   intro E _ _ ι _ b j
   haveI : FiniteDimensional ℝ E := Module.Finite.of_basis b
   set C := ‖(b.equivFunL : E →L[ℝ] (ι → ℝ))‖ with hC
@@ -33,7 +37,8 @@ theorem GlobalTheory.continuousMultilinear_norm_le_basis_sum : ∀ (E : Type) [N
     refine Finset.sum_congr rfl fun cs _ => ?_
     exact M.map_smul_univ (fun r => b.repr (v r) (cs r)) (fun r => b (cs r))
   rw [key]
-  calc ‖∑ cs : Fin j → ι, (∏ r, b.repr (v r) (cs r)) • M (fun r => b (cs r))‖
+  calc
+    ‖∑ cs : Fin j → ι, (∏ r, b.repr (v r) (cs r)) • M (fun r => b (cs r))‖
       ≤ ∑ cs : Fin j → ι, ‖(∏ r, b.repr (v r) (cs r)) • M (fun r => b (cs r))‖ := norm_sum_le _ _
     _ ≤ ∑ cs : Fin j → ι, (C ^ j * ∏ r, ‖v r‖) * ‖M (fun r => b (cs r))‖ := by
       refine Finset.sum_le_sum fun cs _ => ?_

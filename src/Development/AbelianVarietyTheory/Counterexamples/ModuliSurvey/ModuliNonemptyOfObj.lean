@@ -7,27 +7,30 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 noncomputable section
 namespace GlobalTheory.ModuliProbe
-open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
 theorem zeta_prim (n : ℕ) (hn : 0 < n) : IsPrimitiveRoot (zeta n) n :=
   Complex.isPrimitiveRoot_exp n hn.ne'
 
-theorem le_of_conj (l : Level H) (F : IntermediateField ℚ ℂ) (hc : ∀ (τ : E →+* ℂ) (a : E), τ a ∈ F)
-    (hz : zeta l.M' ∈ F) : KA l ≤ F := by
+theorem le_of_conj
+    (l : Level H) (F : IntermediateField ℚ ℂ)
+    (hc : ∀ (τ : E →+* ℂ) (a : E), τ a ∈ F) (hz : zeta l.M' ∈ F)
+    : KA l ≤ F := by
   rw [KA, IntermediateField.adjoin_le_iff]
   rintro x (rfl | rfl)
   · obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
     have h0 : ((H.rt : E)) ^ 2 = -(H.d : E) := by
       have := congrArg (algebraMap (𝓞 E) E) H.rt_sq
       simpa using this
-    have h1 : (τ (H.rt : E)) ^ 2 = H.rt0 ^ 2 := by
-      rw [← map_pow, h0, H.sqrt_neg_disc_sq]; simp
+    have h1 : (τ (H.rt : E)) ^ 2 = H.rt0 ^ 2 := by rw [← map_pow, h0, H.sqrt_neg_disc_sq]; simp
     rcases sq_eq_sq_iff_eq_or_eq_neg.1 h1 with h | h
     · rw [← h]; exact hc τ _
     · have : H.rt0 = τ (-(H.rt : E)) := by rw [map_neg, h, neg_neg]
-      rw [this]; exact hc τ _
+      rw [this]
+      exact hc τ _
   · have hM : 0 < l.M' := Nat.lcm_pos (by have := l.three_le; omega) l.A_pos
     haveI : NeZero l.M' := ⟨hM.ne'⟩
     have hp : zeta l.A ^ l.M' = 1 := by

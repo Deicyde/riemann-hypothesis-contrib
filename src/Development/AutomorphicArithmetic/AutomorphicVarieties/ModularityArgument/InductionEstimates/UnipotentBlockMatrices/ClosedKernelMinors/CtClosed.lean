@@ -5,14 +5,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Set Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 
-private def ctKer {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure] (r : ℕ) :
-    Submodule ℂ (L2 μ) where
+private def ctKer
+    {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure] (r : ℕ)
+    : Submodule ℂ (L2 μ) where
   carrier := {w | constantTermL2 μ r w =ᵐ[μ] 0}
   zero_mem' := by
     change constantTermL2 μ r 0 =ᵐ[μ] 0
@@ -33,8 +36,9 @@ private def ctKer {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (
     rw [e1, e2]
     simp
 
-private theorem ctKer_closed {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
-    (r : ℕ) : IsClosed (ctKer μ r : Set (L2 μ)) := by
+private theorem ctKer_closed
+    {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure] (r : ℕ)
+    : IsClosed (ctKer μ r : Set (L2 μ)) := by
   refine isClosed_of_closure_subset fun φ hφ => ?_
   change constantTermL2 μ r φ =ᵐ[μ] 0
   refine ae_of_forall_isCompact μ fun S hS => ?_
@@ -57,8 +61,9 @@ private theorem ctKer_closed {K : Type} [Field K] [NumberField K] {n : ℕ} (μ 
     refine le_antisymm ?_ zero_le
     have ht : Tendsto (fun ε : ℝ => C * ENNReal.ofReal ε ^ 2) (𝓝[>] 0) (𝓝 0) := by
       have h1 : Tendsto (fun ε : ℝ => ENNReal.ofReal ε ^ 2) (𝓝[>] 0) (𝓝 0) := by
-        have := (((ENNReal.continuous_pow 2).comp ENNReal.continuous_ofReal).tendsto 0).mono_left
-          (nhdsWithin_le_nhds (s := Set.Ioi (0 : ℝ)))
+        have :=
+          (((ENNReal.continuous_pow 2).comp ENNReal.continuous_ofReal).tendsto 0).mono_left
+            (nhdsWithin_le_nhds (s := Set.Ioi (0 : ℝ)))
         simpa [Function.comp_def] using this
       simpa using ENNReal.Tendsto.const_mul h1 (Or.inr hC)
     exact ge_of_tendsto ht (eventually_nhdsWithin_of_forall fun ε hε => hle ε hε)
@@ -68,8 +73,10 @@ private theorem ctKer_closed {K : Type} [Field K] [NumberField K] {n : ℕ} (μ 
   filter_upwards [(lintegral_eq_zero_iff' hm).1 hI'] with y hy
   simpa using hy
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.ctClosed :
-    ∀ {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure] (r : ℕ), ∃ S : Submodule ℂ (L2 μ), IsClosed (S : Set (L2 μ)) ∧
-      ∀ w, w ∈ S ↔ constantTermL2 μ r w =ᵐ[μ] 0 := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.ctClosed
+    : ∀ {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
+        (r : ℕ),
+      ∃ S : Submodule ℂ (L2 μ),
+        IsClosed (S : Set (L2 μ)) ∧ ∀ w, w ∈ S ↔ constantTermL2 μ r w =ᵐ[μ] 0 := by
   intro K _ _ n μ _ r
   exact ⟨ctKer μ r, ctKer_closed μ r, fun _ => Iff.rfl⟩

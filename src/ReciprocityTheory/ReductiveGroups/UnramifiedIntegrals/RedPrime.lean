@@ -8,8 +8,8 @@ namespace ReciprocityTheory.ChartRestriction.L1
 
 open scoped NumberTheorySymbols
 
-theorem prime_choice_class (d : ℕ) (hsq : Squarefree d) (hd4 : d % 4 = 3) (h3 : 3 ∣ d) (hd3 : d ≠ 3) :
-    ∃ a : ℕ, a % 3 = 2 ∧ J((a : ℤ) | d) = 1 := by
+theorem prime_choice_class (d : ℕ) (hsq : Squarefree d) (hd4 : d % 4 = 3) (h3 : 3 ∣ d) (hd3 : d ≠ 3)
+    : ∃ a : ℕ, a % 3 = 2 ∧ J((a : ℤ) | d) = 1 := by
   obtain ⟨d', rfl⟩ := h3
   have hd'4 : d' % 4 = 1 := by omega
   have hd'1 : d' ≠ 1 := by
@@ -21,7 +21,8 @@ theorem prime_choice_class (d : ℕ) (hsq : Squarefree d) (hd4 : d % 4 = 3) (h3 
     obtain ⟨t, ht⟩ := hqd
     omega
   haveI := Fact.mk hq
-  obtain ⟨c, hc⟩ := FiniteField.exists_nonsquare (F := ZMod q) (by rw [ZMod.ringChar_zmod_n]; exact hq2)
+  obtain ⟨c, hc⟩ :=
+    FiniteField.exists_nonsquare (F := ZMod q) (by rw [ZMod.ringChar_zmod_n]; exact hq2)
   obtain ⟨d'', rfl⟩ := hqd
   have hd''0 : d'' ≠ 0 := by
     rintro rfl
@@ -63,8 +64,8 @@ theorem prime_choice_class (d : ℕ) (hsq : Squarefree d) (hd4 : d % 4 = 3) (h3 
   rw [jacobiSym.mul_right, jacobiSym.mul_right, hJ3, hJq, hJd]
   norm_num
 
-theorem prime_choice_recip (d p : ℕ) (hd4 : d % 4 = 3) (hp : Odd p) :
-    J(-(d : ℤ) | p) = J((p : ℤ) | d) := by
+theorem prime_choice_recip (d p : ℕ) (hd4 : d % 4 = 3) (hp : Odd p)
+    : J(-(d : ℤ) | p) = J((p : ℤ) | d) := by
   have hd : Odd d := Nat.odd_iff.mpr (by omega)
   rw [jacobiSym.neg _ hp]
   rcases Nat.odd_mod_four_iff.mp (Nat.odd_iff.mp hp) with h | h
@@ -72,8 +73,9 @@ theorem prime_choice_recip (d p : ℕ) (hd4 : d % 4 = 3) (hp : Odd p) :
   · rw [ZMod.χ₄_nat_three_mod_four h, jacobiSym.quadratic_reciprocity_three_mod_four hd4 h]
     ring
 
-theorem prime_choice_lift (d p s : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (hd0 : 0 < d) (hdp : d < p)
-    (hs : p ∣ s ^ 2 + d) : ∃ r : ℕ, Even r ∧ p ∣ r ^ 2 + d ∧ ¬ p ^ 2 ∣ r ^ 2 + d := by
+theorem prime_choice_lift
+    (d p s : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (hd0 : 0 < d) (hdp : d < p) (hs : p ∣ s ^ 2 + d)
+    : ∃ r : ℕ, Even r ∧ p ∣ r ^ 2 + d ∧ ¬ p ^ 2 ∣ r ^ 2 + d := by
   have hpodd : Odd p := hp.odd_of_ne_two hp2
   obtain ⟨r0, hr0e, hr0⟩ : ∃ r0 : ℕ, Even r0 ∧ p ∣ r0 ^ 2 + d := by
     rcases Nat.even_or_odd s with he | ho
@@ -89,8 +91,7 @@ theorem prime_choice_lift (d p s : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (hd0 : 0 
     have := Nat.le_of_dvd hd0 hpd
     omega
   by_cases hsq : p ^ 2 ∣ r0 ^ 2 + d
-  ·
-    refine ⟨r0 + 2 * p, hr0e.add (even_two_mul p), ?_, ?_⟩
+  · refine ⟨r0 + 2 * p, hr0e.add (even_two_mul p), ?_, ?_⟩
     · have e : (r0 + 2 * p) ^ 2 + d = (r0 ^ 2 + d) + p * (4 * r0 + 4 * p) := by ring
       rw [e]
       exact dvd_add hr0 (dvd_mul_right _ _)
@@ -106,21 +107,22 @@ theorem prime_choice_lift (d p s : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (hd0 : 0 
       · exact hndvd h4
   · exact ⟨r0, hr0e, hr0, hsq⟩
 
-theorem prime_choice (d b : ℕ) (hsq : Squarefree d) (hd4 : d % 4 = 3) (h3 : 3 ∣ d) (hd3 : d ≠ 3) :
-    ∃ p r : ℕ, p.Prime ∧ b < p ∧ d < p ∧ p % 3 = 2 ∧ Even r ∧ p ∣ r ^ 2 + d ∧ ¬ p ^ 2 ∣ r ^ 2 + d := by
+theorem prime_choice (d b : ℕ) (hsq : Squarefree d) (hd4 : d % 4 = 3) (h3 : 3 ∣ d) (hd3 : d ≠ 3)
+    : ∃ p r : ℕ,
+      p.Prime ∧ b < p ∧ d < p ∧ p % 3 = 2 ∧ Even r ∧ p ∣ r ^ 2 + d ∧ ¬ p ^ 2 ∣ r ^ 2 + d := by
   obtain ⟨a, ha3, ha⟩ := prime_choice_class d hsq hd4 h3 hd3
   have hd0 : d ≠ 0 := by omega
   haveI : NeZero d := ⟨hd0⟩
   have hunit : IsUnit (a : ZMod d) := by
     rw [ZMod.isUnit_iff_coprime]
     by_contra hnc
-    have h0 : J((a : ℤ) | d) = 0 := jacobiSym.eq_zero_iff.mpr ⟨hd0, by simpa [Int.gcd_natCast_natCast] using hnc⟩
+    have h0 : J((a : ℤ) | d) = 0 :=
+      jacobiSym.eq_zero_iff.mpr ⟨hd0, by simpa [Int.gcd_natCast_natCast] using hnc⟩
     rw [ha] at h0
     exact one_ne_zero h0
   obtain ⟨p, hpgt, hp, hpa⟩ := Nat.forall_exists_prime_gt_and_eq_mod hunit (b + d)
   have hpd : p % d = a % d := (ZMod.natCast_eq_natCast_iff' p a d).mp hpa
-  have hp3 : p % 3 = 2 := by
-    rw [← Nat.mod_mod_of_dvd p h3, hpd, Nat.mod_mod_of_dvd a h3, ha3]
+  have hp3 : p % 3 = 2 := by rw [← Nat.mod_mod_of_dvd p h3, hpd, Nat.mod_mod_of_dvd a h3, ha3]
   have hpodd : Odd p := hp.odd_of_ne_two (by omega)
   have hmod : (p : ℤ) % (d : ℤ) = (a : ℤ) % (d : ℤ) := by exact_mod_cast hpd
   have hJ : J(-(d : ℤ) | p) = 1 := by

@@ -6,15 +6,20 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevOk
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.FullDt ReciprocityTheory.Neutral.Bridge.HCFR Neutral.B1
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV
+  GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.FullDt
+  ReciprocityTheory.Neutral.Bridge.HCFR Neutral.B1
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.LevTwist
 
-theorem T_notMem_under_uSG : ∀ (B : Base) (X : PreX B.toPre) (I : ColIn B X), I.Ok → ∀ (u : B.Word)
-    (P : HeightOneSpectrum (𝓞 B.host.E)), P ∈ uSG (B.primes X).vGs I.SQ →
-    (B.T u : 𝓞 B.host.F) ∉ (P.under (𝓞 B.host.F)).asIdeal := by
+theorem T_notMem_under_uSG
+    : ∀ (B : Base) (X : PreX B.toPre) (I : ColIn B X),
+      I.Ok
+        → ∀ (u : B.Word) (P : HeightOneSpectrum (𝓞 B.host.E)),
+          P ∈ uSG (B.primes X).vGs I.SQ
+            → (B.T u : 𝓞 B.host.F) ∉ (P.under (𝓞 B.host.F)).asIdeal := by
   classical
   intro B X I hI u P hP hm
   have hPr := (GlobalTheory.BasePrimes.primes_ok B X).1

@@ -14,35 +14,34 @@ namespace GlobalTheory
 
 section InertialCharacters
 
-variable {G : Type} [Group G] {Qp K₀ K K₀' K' : Type} [Field Qp] [Field K₀] [Field K]
-    [Field K₀'] [Field K']
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    [Algebra Qp K₀'] [Algebra Qp K'] [Algebra K₀' K'] [IsScalarTower Qp K₀' K']
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra K₀' B] [IsScalarTower Qp K₀' B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    [Algebra K₀' BdR] [Algebra K' BdR] [IsScalarTower Qp K' BdR]
-    [IsScalarTower K₀' K' BdR] [IsScalarTower Qp K₀' BdR]
-    (PC : PotCrysData G Qp K₀ K K₀' K' B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K K₀' K' : Type} [Field Qp] [Field K₀] [Field K] [Field K₀'] [Field K'] [Algebra Qp K₀]
+  [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] [Algebra Qp K₀'] [Algebra Qp K']
+  [Algebra K₀' K'] [IsScalarTower Qp K₀' K']
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra K₀' B] [IsScalarTower Qp K₀' B] [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR]
+  [IsScalarTower Qp K BdR] [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] [Algebra K₀' BdR]
+  [Algebra K' BdR] [IsScalarTower Qp K' BdR] [IsScalarTower K₀' K' BdR] [IsScalarTower Qp K₀' BdR]
+  (PC : PotCrysData G Qp K₀ K K₀' K' B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
 
-theorem inertialEig_mem_iff (ρ : Representation LL G V) (I : Subgroup G) (a : I →* LLˣ)
-    (w : V ⊗[Qp] B) :
-    w ∈ PC.Eig ρ I a ↔ w ∈ PC.Dpcris ρ ∧ ∀ g : I, actVB PC.PD ρ (g : G) w = ((a g : LLˣ) : LL) • w := by
+theorem inertialEig_mem_iff
+    (ρ : Representation LL G V) (I : Subgroup G) (a : I →* LLˣ) (w : V ⊗[Qp] B)
+    : w ∈ PC.Eig ρ I a
+      ↔ w ∈ PC.Dpcris ρ ∧ ∀ g : I, actVB PC.PD ρ (g : G) w = ((a g : LLˣ) : LL) • w := by
   simp [PotCrysData.Eig, Submodule.mem_iInf, LinearMap.mem_ker, sub_eq_zero]
 
-theorem actVB_one_apply (ρ : Representation LL G V) (x : V ⊗[Qp] B) :
-    actVB PC.PD ρ 1 x = x := by
+theorem actVB_one_apply (ρ : Representation LL G V) (x : V ⊗[Qp] B) : actVB PC.PD ρ 1 x = x := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v b => simp [actVB]
   | add a b ha hb => simp only [map_add (f := _), ha, hb]
 
-theorem inertialEig_inf_iSup_eq_bot (ρ : Representation LL G V) (I : Subgroup G) (b : I →* LLˣ)
-    (T : Finset (I →* LLˣ)) (hb : b ∉ T) :
-    PC.Eig ρ I b ⊓ (⨆ a ∈ T, PC.Eig ρ I a) = ⊥ := by
+theorem inertialEig_inf_iSup_eq_bot
+    (ρ : Representation LL G V) (I : Subgroup G) (b : I →* LLˣ) (T : Finset (I →* LLˣ)) (hb : b ∉ T)
+    : PC.Eig ρ I b ⊓ (⨆ a ∈ T, PC.Eig ρ I a) = ⊥ := by
   classical
   induction T using Finset.induction_on with
   | empty => simp
@@ -59,8 +58,9 @@ theorem inertialEig_inf_iSup_eq_bot (ρ : Representation LL G V) (I : Subgroup G
       exact hg (Units.ext (sub_eq_zero.mp h))
     set f : V ⊗[Qp] B →ₗ[LL] V ⊗[Qp] B :=
       actVB PC.PD ρ (g : G) - ((a0 g : LLˣ) : LL) • LinearMap.id with hf
-    have hfE : ∀ (a : I →* LLˣ) w, w ∈ PC.Eig ρ I a →
-        f w = (((a g : LLˣ) : LL) - ((a0 g : LLˣ) : LL)) • w := by
+    have hfE
+        : ∀ (a : I →* LLˣ) w,
+          w ∈ PC.Eig ρ I a → f w = (((a g : LLˣ) : LL) - ((a0 g : LLˣ) : LL)) • w := by
       intro a w hw
       rw [inertialEig_mem_iff] at hw
       simp [hf, hw.2 g, sub_smul]
@@ -79,8 +79,9 @@ theorem inertialEig_inf_iSup_eq_bot (ρ : Representation LL G V) (I : Subgroup G
     obtain ⟨y, hy, z, hz, rfl⟩ := hxs
     have hfx : f (y + z) = (((b g : LLˣ) : LL) - ((a0 g : LLˣ) : LL)) • (y + z) := hfE b _ hxb
     have hfy : f y = 0 := by rw [hfE a0 y hy, sub_self, zero_smul]
-    have hmem : (((b g : LLˣ) : LL) - ((a0 g : LLˣ) : LL)) • (y + z) ∈
-        PC.Eig ρ I b ⊓ (⨆ a ∈ T', PC.Eig ρ I a) := by
+    have hmem
+        : (((b g : LLˣ) : LL) - ((a0 g : LLˣ) : LL)) • (y + z)
+          ∈ PC.Eig ρ I b ⊓ (⨆ a ∈ T', PC.Eig ρ I a) := by
       refine ⟨Submodule.smul_mem _ _ hxb, ?_⟩
       rw [← hfx, map_add (f := _), hfy, zero_add]
       exact hmapT z hz
@@ -101,10 +102,12 @@ def inerConj (F : G) : PC.Iner →* PC.Iner where
   map_one' := by ext; simp
   map_mul' x y := by ext; simp [mul_assoc]
 
-theorem exists_frobStable_inertiaThrough {ι : Type} (ρ : ι → Representation LL G V) (F : G)
-    (S : Finset (PC.Iner →* LLˣ)) (h1 : 1 ∈ S) (hS : ∀ x, PC.InertiaThrough (ρ x) S) :
-    ∃ Sig : Finset (PC.Iner →* LLˣ), Sig ⊆ S ∧ 1 ∈ Sig ∧ FrobStable PC.Iner F Sig ∧
-      ∀ x, PC.InertiaThrough (ρ x) Sig := by
+theorem exists_frobStable_inertiaThrough
+    {ι : Type} (ρ : ι → Representation LL G V)
+    (F : G)
+    (S : Finset (PC.Iner →* LLˣ)) (h1 : 1 ∈ S) (hS : ∀ x, PC.InertiaThrough (ρ x) S)
+    : ∃ Sig : Finset (PC.Iner →* LLˣ),
+      Sig ⊆ S ∧ 1 ∈ Sig ∧ FrobStable PC.Iner F Sig ∧ ∀ x, PC.InertiaThrough (ρ x) Sig := by
   classical
   let Sig : Finset (PC.Iner →* LLˣ) :=
     insert 1 (S.filter (fun a => ∃ x, PC.Eig (ρ x) PC.Iner a ≠ ⊥))
@@ -182,21 +185,21 @@ theorem exists_frobStable_inertiaThrough {ι : Type} (ρ : ι → Representation
 
 end InertialCharacters
 
-theorem frobStable_inertial_subset : ∀ {G : Type} [Group G] {Qp K₀ K K₀' K' : Type} [Field Qp] [Field K₀] [Field K] [Field K₀'] [Field K']
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    [Algebra Qp K₀'] [Algebra Qp K'] [Algebra K₀' K'] [IsScalarTower Qp K₀' K']
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra K₀' B] [IsScalarTower Qp K₀' B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    [Algebra K₀' BdR] [Algebra K' BdR] [IsScalarTower Qp K' BdR]
-    [IsScalarTower K₀' K' BdR] [IsScalarTower Qp K₀' BdR]
-    (PC : PotCrysData G Qp K₀ K K₀' K' B BdR) {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    {ι : Type} (ρ : ι → Representation LL G V) (F : G) (S : Finset (PC.Iner →* LLˣ)),
-    1 ∈ S → (∀ x, PC.InertiaThrough (ρ x) S) →
-    ∃ Sig : Finset (PC.Iner →* LLˣ), Sig ⊆ S ∧ 1 ∈ Sig ∧ FrobStable PC.Iner F Sig ∧
-      ∀ x, PC.InertiaThrough (ρ x) Sig := by
+theorem frobStable_inertial_subset
+    : ∀ {G : Type} [Group G] {Qp K₀ K K₀' K' : Type} [Field Qp] [Field K₀] [Field K] [Field K₀']
+        [Field K'] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+        [Algebra Qp K₀'] [Algebra Qp K'] [Algebra K₀' K'] [IsScalarTower Qp K₀' K'] {B BdR : Type}
+        [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+        [Algebra K₀' B] [IsScalarTower Qp K₀' B] [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR]
+        [IsScalarTower Qp K BdR] [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+        [Algebra K₀' BdR] [Algebra K' BdR] [IsScalarTower Qp K' BdR] [IsScalarTower K₀' K' BdR]
+        [IsScalarTower Qp K₀' BdR] (PC : PotCrysData G Qp K₀ K K₀' K' B BdR) {LL : Type} [Field LL]
+        [Algebra Qp LL] {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V]
+        [IsScalarTower Qp LL V] {ι : Type} (ρ : ι → Representation LL G V) (F : G)
+        (S : Finset (PC.Iner →* LLˣ)),
+      1 ∈ S → (∀ x, PC.InertiaThrough (ρ x) S)
+        → ∃ Sig : Finset (PC.Iner →* LLˣ),
+          Sig ⊆ S ∧ 1 ∈ Sig ∧ FrobStable PC.Iner F Sig ∧ ∀ x, PC.InertiaThrough (ρ x) Sig := by
   intros
   apply exists_frobStable_inertiaThrough <;> assumption
 

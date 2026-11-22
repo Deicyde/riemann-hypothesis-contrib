@@ -16,7 +16,8 @@ namespace GlobalTheory.HomStab.FacePerm
 
 variable (R : Type) [CommRing R] {n : ℕ}
 
-def pm (f : Fin n → Fin n) : Matrix (Fin n) (Fin n) R := Matrix.of fun a b => if f b = a then 1 else 0
+def pm (f : Fin n → Fin n) : Matrix (Fin n) (Fin n) R :=
+  Matrix.of fun a b => if f b = a then 1 else 0
 
 theorem pm_mul (f h : Fin n → Fin n) : pm R f * pm R h = pm R (f ∘ h) := by
   ext a c
@@ -29,50 +30,80 @@ theorem pm_id : pm R (id : Fin n → Fin n) = 1 := by
     simp [pm]
   · simp [pm, Matrix.one_apply, h, Ne.symm h]
 
-def pmU (f g : Fin n → Fin n) (h1 : ∀ k, f (g k) = k) (h2 : ∀ k, g (f k) = k) : GL (Fin n) R :=
-  ⟨pm R f, pm R g, by rw [pm_mul, show f ∘ g = id from funext h1, pm_id],
-    by rw [pm_mul, show g ∘ f = id from funext h2, pm_id]⟩
+def pmU (f g : Fin n → Fin n) (h1 : ∀ k, f (g k) = k) (h2 : ∀ k, g (f k) = k) : GL (Fin n) R := ⟨
+  pm R f,
+  pm R g,
+  by rw [pm_mul, show f ∘ g = id from funext h1, pm_id],
+  by rw [pm_mul, show g ∘ f = id from funext h2, pm_id]
+⟩
 
-theorem pm_mulVec (f : Fin n → Fin n) (k : Fin n) :
-    pm R f *ᵥ (fun a : Fin n => if a = k then (1 : R) else 0) = fun a => if a = f k then 1 else 0 := by
+theorem pm_mulVec (f : Fin n → Fin n) (k : Fin n)
+    : pm R f *ᵥ (fun a : Fin n => if a = k then (1 : R) else 0)
+      = fun a => if a = f k then 1 else 0 := by
   funext a
-  simp only [pm, Matrix.mulVec, dotProduct, Matrix.of_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [pm, Matrix.mulVec, dotProduct, Matrix.of_apply, mul_ite, mul_one, mul_zero,
+    Finset.sum_ite_eq', Finset.mem_univ, if_true]
   by_cases h : a = f k
   · simp [h]
   · simp [h, Ne.symm h]
 
-theorem vecMul_pm (f g : Fin n → Fin n) (h1 : ∀ k, f (g k) = k) (h2 : ∀ k, g (f k) = k) (k : Fin n) :
-    (fun a : Fin n => if a = k then (1 : R) else 0) ᵥ* pm R g = fun c => if c = f k then 1 else 0 := by
+theorem vecMul_pm (f g : Fin n → Fin n) (h1 : ∀ k, f (g k) = k) (h2 : ∀ k, g (f k) = k) (k : Fin n)
+    : (fun a : Fin n => if a = k then (1 : R) else 0) ᵥ* pm R g
+      = fun c => if c = f k then 1 else 0 := by
   funext c
   have key : g c = k ↔ c = f k := ⟨fun e => by rw [← e, h1], fun e => by rw [e, h2]⟩
-  simp only [pm, Matrix.vecMul, dotProduct, Matrix.of_apply, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [pm, Matrix.vecMul, dotProduct, Matrix.of_apply, ite_mul, one_mul, zero_mul,
+    Finset.sum_ite_eq', Finset.mem_univ, if_true]
   simp only [key]
 
-theorem pm_mul_apply (f g : Fin n → Fin n) (h1 : ∀ k, f (g k) = k) (h2 : ∀ k, g (f k) = k)
-    (M : Matrix (Fin n) (Fin n) R) (a c : Fin n) : (pm R f * M) a c = M (g a) c := by
+theorem pm_mul_apply
+    (f g : Fin n → Fin n) (h1 : ∀ k, f (g k) = k) (h2 : ∀ k, g (f k) = k)
+    (M : Matrix (Fin n) (Fin n) R) (a c : Fin n)
+    : (pm R f * M) a c = M (g a) c := by
   have key : ∀ b, f b = a ↔ b = g a := fun b => ⟨fun e => by rw [← e, h2], fun e => by rw [e, h1]⟩
-  simp only [pm, Matrix.mul_apply, Matrix.of_apply, ite_mul, one_mul, zero_mul, key, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [pm, Matrix.mul_apply, Matrix.of_apply, ite_mul, one_mul, zero_mul, key,
+    Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
-theorem mul_pm_apply (f : Fin n → Fin n) (M : Matrix (Fin n) (Fin n) R) (a c : Fin n) :
-    (M * pm R f) a c = M a (f c) := by
+theorem mul_pm_apply (f : Fin n → Fin n) (M : Matrix (Fin n) (Fin n) R) (a c : Fin n)
+    : (M * pm R f) a c = M a (f c) := by
   simp [pm, Matrix.mul_apply, mul_ite, Finset.sum_ite_eq]
 
 variable (m i : ℕ) (hmi : m + i < n)
 
 def cyc (k : Fin n) : Fin n :=
-  if h : m ≤ (k : ℕ) ∧ (k : ℕ) < m + i then ⟨k + 1, by omega⟩
-  else if (k : ℕ) = m + i then ⟨m, by omega⟩ else k
+  if h : m ≤ (k : ℕ) ∧ (k : ℕ) < m + i then
+    ⟨k + 1, by omega⟩
+  else if (k : ℕ) = m + i then
+    ⟨m, by omega⟩
+  else
+    k
 
 def cycInv (k : Fin n) : Fin n :=
-  if h : m < (k : ℕ) ∧ (k : ℕ) ≤ m + i then ⟨k - 1, by omega⟩
-  else if (k : ℕ) = m then ⟨m + i, hmi⟩ else k
+  if h : m < (k : ℕ) ∧ (k : ℕ) ≤ m + i then
+    ⟨k - 1, by omega⟩
+  else if (k : ℕ) = m then
+    ⟨m + i, hmi⟩
+  else
+    k
 
-theorem cyc_val (k : Fin n) : (cyc m i hmi k : ℕ) =
-    if m ≤ (k : ℕ) ∧ (k : ℕ) < m + i then (k : ℕ) + 1 else if (k : ℕ) = m + i then m else k := by
+theorem cyc_val (k : Fin n)
+    : (cyc m i hmi k : ℕ)
+      = if m ≤ (k : ℕ) ∧ (k : ℕ) < m + i then
+          (k : ℕ) + 1
+        else if (k : ℕ) = m + i then
+          m
+        else
+          k := by
   unfold cyc; split_ifs <;> rfl
 
-theorem cycInv_val (k : Fin n) : (cycInv m i hmi k : ℕ) =
-    if m < (k : ℕ) ∧ (k : ℕ) ≤ m + i then (k : ℕ) - 1 else if (k : ℕ) = m then m + i else k := by
+theorem cycInv_val (k : Fin n)
+    : (cycInv m i hmi k : ℕ)
+      = if m < (k : ℕ) ∧ (k : ℕ) ≤ m + i then
+          (k : ℕ) - 1
+        else if (k : ℕ) = m then
+          m + i
+        else
+          k := by
   unfold cycInv; split_ifs <;> rfl
 
 theorem cyc_cycInv (k : Fin n) : cyc m i hmi (cycInv m i hmi k) = k := by
@@ -91,24 +122,33 @@ namespace GlobalTheory.HomStab.FacePerm
 
 variable (R : Type) [CommRing R] {n : ℕ}
 
-theorem pairAct_pmU (f g : Fin n → Fin n) (h1 : ∀ k, f (g k) = k) (h2 : ∀ k, g (f k) = k) (K : ℕ)
-    (hK : K < n) (L : ℕ) (hL : (f ⟨K, hK⟩ : ℕ) = L) :
-    pairAct R n (pmU R f g h1 h2) ((fun a : Fin n => if (a : ℕ) = K then (1 : R) else 0),
-      (fun a : Fin n => if (a : ℕ) = K then (1 : R) else 0)) =
-    ((fun a : Fin n => if (a : ℕ) = L then (1 : R) else 0),
-      (fun a : Fin n => if (a : ℕ) = L then (1 : R) else 0)) := by
+theorem pairAct_pmU
+    (f g : Fin n → Fin n) (h1 : ∀ k, f (g k) = k) (h2 : ∀ k, g (f k) = k)
+    (K : ℕ) (hK : K < n)
+    (L : ℕ) (hL : (f ⟨K, hK⟩ : ℕ) = L)
+    : pairAct R n (pmU R f g h1 h2) (
+        (fun a : Fin n => if (a : ℕ) = K then (1 : R) else 0),
+        (fun a : Fin n => if (a : ℕ) = K then (1 : R) else 0)
+      )
+      = (
+        (fun a : Fin n => if (a : ℕ) = L then (1 : R) else 0),
+        (fun a : Fin n => if (a : ℕ) = L then (1 : R) else 0)
+      ) := by
   subst hL
-  have e1 : (fun a : Fin n => if (a : ℕ) = K then (1 : R) else 0) = fun a => if a = ⟨K, hK⟩ then 1 else 0 := by
+  have e1
+      : (fun a : Fin n => if (a : ℕ) = K then (1 : R) else 0)
+        = fun a => if a = ⟨K, hK⟩ then 1 else 0 := by
     funext a
     simp [Fin.ext_iff]
-  have e2 : (fun a : Fin n => if (a : ℕ) = (f ⟨K, hK⟩ : ℕ) then (1 : R) else 0) = fun a => if a = f ⟨K, hK⟩ then 1 else 0 := by
+  have e2
+      : (fun a : Fin n => if (a : ℕ) = (f ⟨K, hK⟩ : ℕ) then (1 : R) else 0)
+        = fun a => if a = f ⟨K, hK⟩ then 1 else 0 := by
     funext a
     simp [Fin.ext_iff]
   rw [e1, e2]
   exact Prod.ext (pm_mulVec R f ⟨K, hK⟩) (vecMul_pm R f g h1 h2 ⟨K, hK⟩)
 
 end GlobalTheory.HomStab.FacePerm
-
 
 open GlobalTheory.HomStab.FacePerm in
 theorem GlobalTheory.HomStab.exists_perm_face_stdSeq : ∀ (R : Type) [CommRing R] (n p : ℕ) (h : p + 1 ≤ n) (i : Fin (p + 1)), ∃ g : GL (Fin n) R, g • face R n p i (stdSeq R n (p + 1) h) = stdSeq R n p (by omega) ∧ ∀ x : GL (Fin (n - (p + 1))) R, g * stab R (n - (p + 1)) n (Nat.sub_le _ _) x = stab R (n - (p + 1)) n (Nat.sub_le _ _) x * g := open GlobalTheory.HomStab.FacePerm in by
@@ -177,7 +217,12 @@ end
 
 section
 open CategoryTheory CategoryTheory.Limits GlobalTheory.HomStab GlobalTheory.SeqCx UpperTheory.V.KL
-theorem _root_.GlobalTheory.T.face_stdSeq_GL_conjugate_commuting_stab : ∀ (R : Type) [CommRing R] (n p : ℕ) (h : p + 1 ≤ n) (i : Fin (p + 1)), ∃ g : GL (Fin n) R, g • face R n p i (stdSeq R n (p + 1) h) = stdSeq R n p (by omega) ∧ ∀ x : GL (Fin (n - (p + 1))) R, g * stab R (n - (p + 1)) n (Nat.sub_le _ _) x = stab R (n - (p + 1)) n (Nat.sub_le _ _) x * g := by
+theorem _root_.GlobalTheory.T.face_stdSeq_GL_conjugate_commuting_stab
+    : ∀ (R : Type) [CommRing R] (n p : ℕ) (h : p + 1 ≤ n) (i : Fin (p + 1)), ∃ g : GL (Fin n) R,
+      g • face R n p i (stdSeq R n (p + 1) h) = stdSeq R n p (by omega)
+        ∧ ∀ x : GL (Fin (n - (p + 1))) R,
+          g * stab R (n - (p + 1)) n (Nat.sub_le _ _) x
+            = stab R (n - (p + 1)) n (Nat.sub_le _ _) x * g := by
   first
   | exact @GlobalTheory.HomStab.exists_perm_face_stdSeq
   | exact @GlobalTheory.HomStab.FacePerm.pairAct_pmU

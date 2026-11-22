@@ -13,7 +13,8 @@ namespace GlobalTheory.ThK.Dbl
 
 open scoped TensorProduct NNReal Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open GlobalTheory.HeckeBridge GlobalTheory.IndefiniteRowSideFullHecke.CompletedLStripBounds
 open GlobalTheory.CMVal (IsHeckeL IsCMType eulerFactor)
 
@@ -26,13 +27,25 @@ theorem lInt2 : LInt2 := by
   obtain ⟨w₀⟩ : Nonempty (InfinitePlace F) := inferInstance
   have k0 := h.geo.kappa
   rcases hχ with rfl | rfl
-  · obtain ⟨L, hL, hz⟩ := PositivityTheory.ThKRed.HK.heckeL_ne_zero hφ hu hn ⟨w₀, by have := k0 w₀; omega⟩
-    exact ⟨L, hL.1, fun s hs => eq_charL hu hloc hL hs, fun z h1 => hz z fun w => by
-      have := k0 w; have := le_abs_self (B.mα w - B.mβ w); omega⟩
+  · obtain ⟨L, hL, hz⟩ :=
+      PositivityTheory.ThKRed.HK.heckeL_ne_zero hφ hu hn ⟨w₀, by have := k0 w₀; omega⟩
+    exact ⟨
+      L,
+      hL.1,
+      fun s hs => eq_charL hu hloc hL hs,
+      fun z h1 => hz z fun w => by have := k0 w; have := le_abs_self (B.mα w - B.mβ w); omega
+    ⟩
   · have hu' := GlobalTheory.Published.HeckeFEModel.isUnitary_inv hu
-    obtain ⟨L, hL, hz⟩ := PositivityTheory.ThKRed.HK.heckeL_ne_zero hφ hu' (GlobalTheory.Published.HeckeFEModel.hasInf_inv hn) ⟨w₀, by have := k0 w₀; omega⟩
-    refine ⟨L, hL.1, fun s hs => eq_charL hu' (fun W x => ?_) hL hs, fun z h1 => hz z fun w => by
-      have := k0 w; have := le_abs_self (B.mα w - B.mβ w); rw [abs_neg]; omega⟩
+    obtain ⟨L, hL, hz⟩ :=
+      PositivityTheory.ThKRed.HK.heckeL_ne_zero hφ hu'
+        (GlobalTheory.Published.HeckeFEModel.hasInf_inv hn) ⟨w₀, by have := k0 w₀; omega⟩
+    refine ⟨
+      L,
+      hL.1,
+      fun s hs => eq_charL hu' (fun W x => ?_) hL hs,
+      fun z h1 =>
+        hz z fun w => by have := k0 w; have := le_abs_self (B.mα w - B.mβ w); rw [abs_neg]; omega
+    ⟩
     have loc_inv : (H⁻¹).loc W x = (H.loc W x)⁻¹ := rfl
     rw [loc_inv, hloc]
     exact (map_inv Circle.toUnits _).symm

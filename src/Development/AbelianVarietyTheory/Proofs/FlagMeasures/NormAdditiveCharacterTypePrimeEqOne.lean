@@ -15,15 +15,17 @@ namespace GlobalTheory.FramePsi
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-def pairL (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (y : Fin n → E) :
-    (Fin n → E) →ₗ[E] E where
+def pairL (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (y : Fin n → E)
+    : (Fin n → E) →ₗ[E] E where
   toFun x := hf L Hm x y
   map_add' a b := by simp [hf, add_mul, Finset.sum_add_distrib]
   map_smul' c a := by simp [hf, Finset.mul_sum, mul_assoc]
 
-theorem hf_span_right (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x : Fin n → E)
-    (s : Set (Fin n → E)) (hs : ∀ y ∈ s, hf L Hm x y = 0) :
-    ∀ y ∈ Submodule.span E s, hf L Hm x y = 0 := by
+theorem hf_span_right
+    (L : LocE F E)
+    {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x : Fin n → E) (s : Set (Fin n → E))
+    (hs : ∀ y ∈ s, hf L Hm x y = 0)
+    : ∀ y ∈ Submodule.span E s, hf L Hm x y = 0 := by
   intro y hy
   induction hy using Submodule.span_induction with
   | mem y h => exact hs y h
@@ -38,12 +40,14 @@ theorem hf_span_right (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
     rw [this, ha, mul_zero]
 
-theorem coef_mul {L : LocE F E} {r k : ℕ} (S : Frames L r k) (g : Fin (r + 1) → S.V)
-    (gs : Fin r → S.V) (t : E)
-    (hg : ∀ a b, hf L S.Hm (g a) (g b) = if a = Fin.last r ∧ b = Fin.last r then t else 0)
+theorem coef_mul
+    {L : LocE F E} {r k : ℕ} (S : Frames L r k) (g : Fin (r + 1) → S.V) (gs : Fin r → S.V)
+    (t : E) (hg : ∀ a b, hf L S.Hm (g a) (g b) = if a = Fin.last r ∧ b = Fin.last r then t else 0)
     (hd : ∀ a j, hf L S.Hm (g a) (gs j) = if a = j.castSucc then 1 else 0)
-    (a : S.GLV) (ha : a ∈ S.Nof g) (b : S.GLV) (hb : b ∈ S.Nof g) (j : Fin r) :
-    S.coef g gs (a * b) j = S.coef g gs a j + S.coef g gs b j := by
+    (a : S.GLV) (ha : a ∈ S.Nof g)
+    (b : S.GLV) (hb : b ∈ S.Nof g)
+    (j : Fin r)
+    : S.coef g gs (a * b) j = S.coef g gs a j + S.coef g gs b j := by
   simp only [Frames.Nof, Subgroup.mem_inf, Subgroup.mem_iInf] at ha hb
   obtain ⟨⟨-, ha1⟩, -⟩ := ha
   obtain ⟨⟨-, hb1⟩, hb2⟩ := hb
@@ -74,13 +78,13 @@ theorem coef_mul {L : LocE F E} {r k : ℕ} (S : Frames L r k) (g : Fin (r + 1) 
     have := congrArg Fin.val h
     simp at this
   have h1 := LinearMap.mem_ker.1 (hK hB)
-  change pairL L S.Hm (gs j) (a (b (g j.succ))) =
-    pairL L S.Hm (gs j) (a (g j.succ)) + pairL L S.Hm (gs j) (b (g j.succ))
+  change pairL L S.Hm (gs j) (a (b (g j.succ)))
+    = pairL L S.Hm (gs j) (a (g j.succ)) + pairL L S.Hm (gs j) (b (g j.succ))
   simp only [map_sub] at h1
   linear_combination h1 - h0
 
-theorem exists_nsmul_mem [IsNonarchimedeanLocalField F] (L : LocE F E) (y : E) :
-    ∃ n : ℕ, n ≠ 0 ∧ (n : E) * y ∈ L.O := by
+theorem exists_nsmul_mem [IsNonarchimedeanLocalField F] (L : LocE F E) (y : E)
+    : ∃ n : ℕ, n ≠ 0 ∧ (n : E) * y ∈ L.O := by
   haveI : Module.Finite F E := Module.finite_of_finrank_pos (by rw [L.rank]; norm_num)
   have hyF : IsAlgebraic F y := Algebra.IsAlgebraic.isAlgebraic y
   have hy : IsAlgebraic 𝒪[F] y := (IsFractionRing.isAlgebraic_iff 𝒪[F] F E).2 hyF
@@ -103,7 +107,9 @@ theorem exists_nsmul_mem [IsNonarchimedeanLocalField F] (L : LocE F E) (y : E) :
   rw [this]
   exact hcy.smul d
 
-theorem norm_additiveCharacter_typePrime_eq_one [IsNonarchimedeanLocalField F] (L : LocE F E) (y : E) : ‖L.psi0 y‖ = 1 := by
+theorem norm_additiveCharacter_typePrime_eq_one
+    [IsNonarchimedeanLocalField F] (L : LocE F E) (y : E)
+    : ‖L.psi0 y‖ = 1 := by
   obtain ⟨n, hn, hy⟩ := exists_nsmul_mem L y
   have h1 : L.psi0 ((n : E) * y) = 1 := by
     simpa using (L.additive_character_dual_ring _).2 hy 1 L.O.one_mem
@@ -112,10 +118,21 @@ theorem norm_additiveCharacter_typePrime_eq_one [IsNonarchimedeanLocalField F] (
   rw [norm_pow, norm_one] at h2
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hn).1 h2
 
-theorem psi_unitary_character : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), (∀ a ∈ S.N, ∀ b ∈ S.N, S.psi (a * b) = S.psi a * S.psi b) ∧ (∀ a ∈ S.N', ∀ b ∈ S.N', S.psi' (a * b) = S.psi' a * S.psi' b) ∧ (∀ a, ‖S.psi a‖ = 1 ∧ ‖S.psi' a‖ = 1) ∧ ∀ y : E, ‖L.psi0 y‖ = 1 := by
+theorem psi_unitary_character
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k),
+        (∀ a ∈ S.N, ∀ b ∈ S.N, S.psi (a * b) = S.psi a * S.psi b)
+          ∧ (∀ a ∈ S.N', ∀ b ∈ S.N', S.psi' (a * b) = S.psi' a * S.psi' b)
+          ∧ (∀ a, ‖S.psi a‖ = 1 ∧ ‖S.psi' a‖ = 1) ∧ ∀ y : E, ‖L.psi0 y‖ = 1 := by
   intro F _ _ _ _ _ E _ _ _ L r k S
-  refine ⟨fun a ha b hb => ?_, fun a ha b hb => ?_,
-    fun a => ⟨norm_additiveCharacter_typePrime_eq_one L _, norm_additiveCharacter_typePrime_eq_one L _⟩, norm_additiveCharacter_typePrime_eq_one L⟩
+  refine ⟨
+    fun a ha b hb => ?_,
+    fun a ha b hb => ?_,
+    fun a =>
+      ⟨norm_additiveCharacter_typePrime_eq_one L _, norm_additiveCharacter_typePrime_eq_one L _⟩,
+    norm_additiveCharacter_typePrime_eq_one L
+  ⟩
   · simp only [Frames.psi, Frames.psiOf]
     rw [← AddChar.map_add_eq_mul, ← mul_add, ← Finset.sum_add_distrib]
     simp only [coef_mul S S.f S.es _ S.gram S.dual a ha b hb]

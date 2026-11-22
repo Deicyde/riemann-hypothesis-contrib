@@ -11,26 +11,44 @@ public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.IsOp
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem ideal_map_stalk_isPrime_of_closedPoint : ∀ (R' : Type) [CommRing R'] [IsDomain R'] [IsLocalRing R'], AdmBase R' (maximalIdeal R') → ∀ (G₁ : Over (Sp R')) [GrpObj G₁] [IsCommMonObj G₁], IsSemiAbelian G₁ → ∀ x : G₁.left, G₁.hom x = closedPoint R' → ∀ q : Ideal R', q.IsPrime → (Ideal.map ((G₁.left.presheaf.germ ⊤ x trivial).hom.comp ((G₁.hom.appTop).hom.comp (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom)) q).IsPrime := by
+theorem ideal_map_stalk_isPrime_of_closedPoint
+    : ∀ (R' : Type) [CommRing R'] [IsDomain R'] [IsLocalRing R'],
+      AdmBase R' (maximalIdeal R')
+        → ∀ (G₁ : Over (Sp R')) [GrpObj G₁] [IsCommMonObj G₁],
+          IsSemiAbelian G₁
+            → ∀ x : G₁.left,
+              G₁.hom x = closedPoint R'
+                → ∀ q : Ideal R',
+                  q.IsPrime
+                    → (Ideal.map
+                      ((G₁.left.presheaf.germ ⊤ x trivial).hom.comp
+                        ((G₁.hom.appTop).hom.comp (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom))
+                      q).IsPrime := by
   intro R' _ _ _ _ G₁ _ _ hG x hx q hq
   have := hG.smooth
   have := hG.geomConnected
-  obtain ⟨U, hU, hxU, -⟩ := TopologicalSpace.Opens.isBasis_iff_nbhd.mp G₁.left.isBasis_affineOpens
-    (show x ∈ (⊤ : G₁.left.Opens) from trivial)
+  obtain ⟨U, hU, hxU, -⟩ :=
+    TopologicalSpace.Opens.isBasis_iff_nbhd.mp G₁.left.isBasis_affineOpens
+      (show x ∈ (⊤ : G₁.left.Opens) from trivial)
   replace hU : IsAffineOpen U := hU
   let A := Γ(G₁.left, U)
-  let ψ : R' →+* A := (G₁.left.presheaf.map (homOfLE le_top : U ⟶ ⊤).op).hom.comp
-    ((G₁.hom.appTop).hom.comp (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom)
-  have hφ : (G₁.left.presheaf.germ ⊤ x trivial).hom.comp ((G₁.hom.appTop).hom.comp
-      (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom) = (G₁.left.presheaf.germ U x hxU).hom.comp ψ := by
+  let ψ : R' →+* A :=
+    (G₁.left.presheaf.map (homOfLE le_top : U ⟶ ⊤).op).hom.comp
+      ((G₁.hom.appTop).hom.comp (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom)
+  have hφ
+      : (G₁.left.presheaf.germ ⊤ x trivial).hom.comp
+          ((G₁.hom.appTop).hom.comp (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom)
+        = (G₁.left.presheaf.germ U x hxU).hom.comp ψ := by
     ext r
     rw [← TopCat.Presheaf.germ_res G₁.left.presheaf (homOfLE le_top : U ⟶ ⊤) x hxU]
     rfl
@@ -53,7 +71,8 @@ theorem ideal_map_stalk_isPrime_of_closedPoint : ∀ (R' : Type) [CommRing R'] [
   have hle : Ideal.map ψ q ≤ P.asIdeal := by
     rw [Ideal.map_le_iff_le_comap]
     intro r hr
-    rw [Ideal.mem_comap, ← IsLocalization.AtPrime.to_map_mem_maximal_iff (G₁.left.presheaf.stalk x) P.asIdeal]
+    rw [Ideal.mem_comap,
+      ← IsLocalization.AtPrime.to_map_mem_maximal_iff (G₁.left.presheaf.stalk x) P.asIdeal]
     exact hnu r hr
   have hI : (Ideal.map ψ q).IsPrime := by
     haveI := hq
@@ -76,8 +95,9 @@ theorem ideal_map_stalk_isPrime_of_closedPoint : ∀ (R' : Type) [CommRing R'] [
       (affine_isIntegral_iff _).mpr (inferInstanceAs (IsDomain (R' ⧸ q)))
     haveI : IsIntegral (pullback G₁.hom (Spec.map (CommRingCat.ofHom (algebraMap R' (R' ⧸ q))))) :=
       GlobalTheory.isIntegral_pullback_of_smooth _ _
-    let j := (pullbackSpecIso R' A (R' ⧸ q)).inv ≫ (pullback.congrHom eSp rfl).hom ≫
-      (pullbackRightPullbackFstIso G₁.hom _ hU.fromSpec).inv ≫ pullback.snd _ _
+    let j :=
+      (pullbackSpecIso R' A (R' ⧸ q)).inv ≫ (pullback.congrHom eSp rfl).hom
+        ≫ (pullbackRightPullbackFstIso G₁.hom _ hU.fromSpec).inv ≫ pullback.snd _ _
     haveI : Nonempty (Spec (CommRingCat.of (TensorProduct R' A (R' ⧸ q)))) :=
       inferInstanceAs (Nonempty (PrimeSpectrum _))
     haveI := isIntegral_of_isOpenImmersion j

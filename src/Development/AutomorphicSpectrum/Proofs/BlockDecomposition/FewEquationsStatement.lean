@@ -21,7 +21,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.FewEq
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.FewEq
 open GlobalTheory.AbLaw (rs)
 
 namespace GlobalTheory.CompanionTheory.FewEq
@@ -84,11 +85,15 @@ theorem fewEq : FewEqSt := by
     rw [this]
     exact neg_mem h2
   obtain ⟨b, hb1, hb2⟩ := cocycle R X s _ I r t ht hIm M hM A V j hj u w hw hc
-  have hb3 : ∀ i a c d, rs X (le₁₂ V a c d) (b i a c) + rs X (le₂₃ V a c d) (b i c d) -
-        rs X (le₁₃ V a c d) (b i a d) ∈ ext s (IsLocalRing.maximalIdeal R) (V a ⊓ V c ⊓ V d) := fun i a c d =>
+  have hb3
+      : ∀ i a c d,
+        rs X (le₁₂ V a c d) (b i a c) + rs X (le₂₃ V a c d) (b i c d)
+            - rs X (le₁₃ V a c d) (b i a d)
+          ∈ ext s (IsLocalRing.maximalIdeal R) (V a ⊓ V c ⊓ V d) := fun i a c d =>
     flat R _ _ (GlobalTheory.SmallExtLift.cst_flat s (hAAA a c d)) r t I ht hmin _ (hb1 a c d) i
   obtain ⟨e, β, ⟨l, hl⟩, he⟩ := fibre dep R X s inferInstance n r (not_le.1 hrn) hF A V hV hA b hb3
-  obtain ⟨J, y, z', hIJ, hy1, hy2⟩ := finish R X s I r t ht hIm hmin M A V j hj u w b e β l hw hb2 hl he
+  obtain ⟨J, y, z', hIJ, hy1, hy2⟩ :=
+    finish R X s I r t ht hIm hmin M A V j hj u w b e β l hw hb2 hl he
   exact hIJ ((hJ J).1 (gen R X s J M hM A V j hj hV y z' hy1 hy2))
 
 end GlobalTheory.CompanionTheory.FewEq

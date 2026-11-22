@@ -15,12 +15,17 @@ namespace Frame
 
 section Of
 
-variable {A' : Type} [AddCommGroup A'] (e : ℕ) {n : ℕ} (ε : Idx n ≃ A') (h' : A' →+ Additive (HGrp e))
-  (hs : Function.Surjective h') (a' : A') (hk : ∀ k : ℤ, h' (k • a') = 0 → k • a' = 0)
+variable
+  {A' : Type} [AddCommGroup A']
+  (e : ℕ)
+  {n : ℕ} (ε : Idx n ≃ A')
+  (h' : A' →+ Additive (HGrp e)) (hs : Function.Surjective h')
+  (a' : A') (hk : ∀ k : ℤ, h' (k • a') = 0 → k • a' = 0)
 
 def ofEquiv : Frame :=
   letI : AddCommGroup (Idx n) := ε.addCommGroup
-  { e := e
+  {
+    e := e
     ord := n
     grp := ε.addCommGroup
     h0 := h'.comp ε.addEquiv.toAddMonoidHom
@@ -34,7 +39,8 @@ def ofEquiv : Frame :=
       rw [h1, map_zero]
       apply hk
       rw [← h1]
-      exact hk0 }
+      exact hk0
+  }
 
 def ofEquivIso : (ofEquiv e ε h' hs a' hk).A ≃+ A' :=
   letI : AddCommGroup (Idx n) := ε.addCommGroup
@@ -72,8 +78,9 @@ def cycIso (e : ℕ) : Multiplicative (ZMod (2 ^ e)) ≃* HGrp e :=
   Classical.choose (hostGroup e).2.2.2.2.2.2.2.2
 
 def cycHom (e : ℕ) : ZMod (2 ^ e) →+ Additive (HGrp e) :=
-  AddMonoidHom.mk' (fun i => Additive.ofMul (cycIso e (Multiplicative.ofAdd i))) (fun i j => by
-    rw [ofAdd_add, map_mul, ofMul_mul])
+  AddMonoidHom.mk'
+    (fun i => Additive.ofMul (cycIso e (Multiplicative.ofAdd i)))
+    (fun i j => by rw [ofAdd_add, map_mul, ofMul_mul])
 
 theorem cycHom_bijective (e : ℕ) : Function.Bijective (cycHom e) := by
   show Function.Bijective (fun i => Additive.ofMul (cycIso e (Multiplicative.ofAdd i)))

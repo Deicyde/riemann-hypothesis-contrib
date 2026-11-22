@@ -11,15 +11,22 @@ namespace GlobalTheory.CompanionTheory.Ar.HT
 
 open Module NumberField
 
-theorem diffGen_v_le_one {C : Type} [Field C] (v : Valuation C NNReal)
-    {E : Type} [Field E] [NumberField E] (σ : E →+* C) (a : 𝓞 E) : v (σ (a : E)) ≤ 1 := by
+theorem diffGen_v_le_one
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    {E : Type} [Field E] [NumberField E]
+    (σ : E →+* C) (a : 𝓞 E)
+    : v (σ (a : E)) ≤ 1 := by
   have h1 : IsIntegral ℤ (σ (a : E)) := (RingOfIntegers.isIntegral_coe a).map σ.toIntAlgHom
   have h2 : IsIntegral v.integer (σ (a : E)) := h1.tower_top
   exact (Valuation.integer.integers v).mem_of_integral h2
 
-theorem diffGen_exists_max {C : Type} [Field C] (v : Valuation C NNReal)
-    {E : Type} [Field E] [NumberField E] (σ : E →+* C) (D : Ideal (𝓞 E)) :
-    ∃ x₀ ∈ D, ∀ x ∈ D, v (σ ((x : 𝓞 E) : E)) ≤ v (σ ((x₀ : 𝓞 E) : E)) := by
+theorem diffGen_exists_max
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    {E : Type} [Field E] [NumberField E]
+    (σ : E →+* C) (D : Ideal (𝓞 E))
+    : ∃ x₀ ∈ D, ∀ x ∈ D, v (σ ((x : 𝓞 E) : E)) ≤ v (σ ((x₀ : 𝓞 E) : E)) := by
   classical
   obtain ⟨s, hs⟩ := (IsNoetherian.noetherian D : D.FG)
   rcases s.eq_empty_or_nonempty with h | h
@@ -35,21 +42,31 @@ theorem diffGen_exists_max {C : Type} [Field C] (v : Valuation C NNReal)
     | mem y hy => exact hmax y hy
     | zero => simp
     | add y z _ _ hy hz =>
-      calc v (σ ((y + z : 𝓞 E) : E)) = v (σ (y : E) + σ (z : E)) := by simp
+      calc
+        v (σ ((y + z : 𝓞 E) : E))
+          = v (σ (y : E) + σ (z : E)) := by simp
         _ ≤ max (v (σ (y : E))) (v (σ (z : E))) := v.map_add _ _
         _ ≤ _ := max_le hy hz
     | smul r y _ hy =>
-      calc v (σ ((r • y : 𝓞 E) : E)) = v (σ (r : E)) * v (σ (y : E)) := by simp [smul_eq_mul]
+      calc
+        v (σ ((r • y : 𝓞 E) : E))
+          = v (σ (r : E)) * v (σ (y : E)) := by simp [smul_eq_mul]
         _ ≤ 1 * v (σ (x₀ : E)) := mul_le_mul' (diffGen_v_le_one v σ r) hy
         _ = _ := one_mul _
 
-theorem exists_diff_generator (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O]
-    [Algebra O C] (hv : v.Integers O) [CharZero C] (E : Type) [Field E] [NumberField E]
-    (σ : E →+* C) :
-    (∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap O C).range) ∧
-      ∃ d : O, algebraMap O C d ≠ 0 ∧ v (algebraMap O C d) = diffAbs v σ ∧
-        Submodule.span O {algebraMap O C d} =
-          Submodule.span O {y : C | ∃ x ∈ differentIdeal ℤ (𝓞 E), y = σ (x : E)} := by
+theorem exists_diff_generator
+    (C : Type) [Field C]
+    (v : Valuation C NNReal)
+    (O : Type) [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    [CharZero C]
+    (E : Type) [Field E] [NumberField E]
+    (σ : E →+* C)
+    : (∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap O C).range)
+      ∧ ∃ d : O,
+        algebraMap O C d ≠ 0 ∧ v (algebraMap O C d) = diffAbs v σ
+          ∧ Submodule.span O {algebraMap O C d}
+            = Submodule.span O {y : C | ∃ x ∈ differentIdeal ℤ (𝓞 E), y = σ (x : E)} := by
   have hint : ∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap O C).range := by
     intro a
     have h1 : IsIntegral ℤ (σ (a : E)) := (a.isIntegral_coe).map σ.toIntAlgHom
@@ -69,7 +86,8 @@ theorem exists_diff_generator (C : Type) [Field C] (v : Valuation C NNReal) (O :
   refine ⟨d, by rw [hd]; exact hx0ne, ?_, ?_⟩
   · rw [hd, diffAbs]
     apply le_antisymm
-    · exact le_ciSup (f := fun x : differentIdeal ℤ (𝓞 E) => v (σ ((x : 𝓞 E) : E)))
+    · exact le_ciSup
+        (f := fun x : differentIdeal ℤ (𝓞 E) => v (σ ((x : 𝓞 E) : E)))
         ⟨v (σ (x₀ : E)), by rintro _ ⟨x, rfl⟩; exact hmax x x.2⟩ ⟨x₀, hx₀⟩
     · exact ciSup_le fun x => hmax x x.2
   · rw [hd]

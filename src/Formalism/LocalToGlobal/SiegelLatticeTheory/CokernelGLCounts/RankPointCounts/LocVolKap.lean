@@ -9,13 +9,15 @@ noncomputable section
 
 namespace Formalism.L2.SG.LocVolKap
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol Formalism.L2.SG.TypedSets Formalism.L2.SG.HidaSetting
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol Formalism.L2.SG.TypedSets Formalism.L2.SG.HidaSetting
 open NumberField IsDedekindDomain Matrix
 open scoped TensorProduct
 
 section Sc
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
 theorem sc_mul (a b : Fv F v) : sc (E := E) v (a * b) = sc (E := E) v a * sc (E := E) v b := by
@@ -30,21 +32,23 @@ theorem sc_natCast (m : ℕ) : sc (E := E) v (m : Fv F v) = (m : Fv F v ⊗[F] E
     rw [Nat.cast_succ, Nat.cast_succ, ← ih]
     simp only [sc, TensorProduct.add_tmul, Algebra.TensorProduct.one_def]
 
-theorem smul_eq_sc {n : ℕ} (c : v.adicCompletionIntegers F) (y : Fin n → Fv F v ⊗[F] E) :
-    c • y = sc (E := E) v (c : Fv F v) • y := by
+theorem smul_eq_sc {n : ℕ} (c : v.adicCompletionIntegers F) (y : Fin n → Fv F v ⊗[F] E)
+    : c • y = sc (E := E) v (c : Fv F v) • y := by
   funext i
   show (c : Fv F v) • y i = ((c : Fv F v) ⊗ₜ[F] (1 : E)) * y i
   rw [Algebra.smul_def, Algebra.TensorProduct.algebraMap_apply]
   rfl
 
-theorem sc_smul_mem {n : ℕ} (Λ : Set (Fin n → E)) (d : Fv F v) (hd : d ∈ v.adicCompletionIntegers F)
-    (y : Fin n → Fv F v ⊗[F] E) (hy : y ∈ latLoc (E := E) v Λ) :
-    sc (E := E) v d • y ∈ latLoc (E := E) v Λ := by
+theorem sc_smul_mem
+    {n : ℕ} (Λ : Set (Fin n → E))
+    (d : Fv F v) (hd : d ∈ v.adicCompletionIntegers F)
+    (y : Fin n → Fv F v ⊗[F] E) (hy : y ∈ latLoc (E := E) v Λ)
+    : sc (E := E) v d • y ∈ latLoc (E := E) v Λ := by
   have h := Submodule.smul_mem (latLoc (E := E) v Λ) (⟨d, hd⟩ : v.adicCompletionIntegers F) hy
   rwa [smul_eq_sc] at h
 
-theorem natCast_not_mem (c g : ℕ) (hcg : Nat.Coprime c g) (hg : (g : 𝓞 F) ∈ v.asIdeal) :
-    (c : 𝓞 F) ∉ v.asIdeal := by
+theorem natCast_not_mem (c g : ℕ) (hcg : Nat.Coprime c g) (hg : (g : 𝓞 F) ∈ v.asIdeal)
+    : (c : 𝓞 F) ∉ v.asIdeal := by
   intro hc
   have hz := Nat.gcd_eq_gcd_ab c g
   rw [Nat.Coprime.gcd_eq_one hcg] at hz
@@ -55,8 +59,8 @@ theorem natCast_not_mem (c g : ℕ) (hcg : Nat.Coprime c g) (hg : (g : 𝓞 F) �
     exact add_mem (Ideal.mul_mem_right _ _ hc) (Ideal.mul_mem_right _ _ hg)
   exact v.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h1)
 
-theorem inv_natCast_mem (c : ℕ) (hc : (c : 𝓞 F) ∉ v.asIdeal) :
-    (c : Fv F v)⁻¹ ∈ v.adicCompletionIntegers F ∧ (c : Fv F v) ≠ 0 := by
+theorem inv_natCast_mem (c : ℕ) (hc : (c : 𝓞 F) ∉ v.asIdeal)
+    : (c : Fv F v)⁻¹ ∈ v.adicCompletionIntegers F ∧ (c : Fv F v) ≠ 0 := by
   have hv : Valued.v (c : Fv F v) = 1 := by
     have h := HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := F) v (c : 𝓞 F)
     rw [HeightOneSpectrum.valuation_of_algebraMap] at h
@@ -92,12 +96,14 @@ def rhoE : I.E ⊗[I.F] Af I.F →+* Fv I.F v ⊗[I.F] I.E :=
 theorem rhoE_tmul (x : I.E) (a : Af I.F) : rhoE I v (x ⊗ₜ[I.F] a) = evalV I.F v a ⊗ₜ[I.F] x := by
   simp [rhoE]
 
-theorem rhoE_inclE (x : I.E) : rhoE I v (Formalism.UG.inclE (F := I.F) (Af I.F) x) = inclR (Fv I.F v) x := by
+theorem rhoE_inclE (x : I.E)
+    : rhoE I v (Formalism.UG.inclE (F := I.F) (Af I.F) x) = inclR (Fv I.F v) x := by
   show rhoE I v (x ⊗ₜ[I.F] (1 : Af I.F)) = (1 : Fv I.F v) ⊗ₜ[I.F] x
   rw [rhoE_tmul, map_one]
 
-theorem rhoE_sig : (rhoE I v).comp (Formalism.UG.sigR I.cm.sig (Af I.F)) =
-    (sigR (Fv I.F v) I.cm.sig).comp (rhoE I v) := by
+theorem rhoE_sig
+    : (rhoE I v).comp (Formalism.UG.sigR I.cm.sig (Af I.F))
+      = (sigR (Fv I.F v) I.cm.sig).comp (rhoE I v) := by
   apply RingHom.ext
   intro x
   induction x using TensorProduct.induction_on with
@@ -105,55 +111,62 @@ theorem rhoE_sig : (rhoE I v).comp (Formalism.UG.sigR I.cm.sig (Af I.F)) =
   | tmul a b =>
     simp only [RingHom.comp_apply]
     rw [show Formalism.UG.sigR I.cm.sig (Af I.F) (a ⊗ₜ[I.F] b) = I.cm.sig a ⊗ₜ[I.F] b by
-      simp [Formalism.UG.sigR], rhoE_tmul, rhoE_tmul]
+        simp [Formalism.UG.sigR],
+      rhoE_tmul, rhoE_tmul]
     simp [sigR]
   | add x y hx hy =>
     simp only [RingHom.comp_apply, map_add (f := _)] at *
     rw [hx, hy]
 
-theorem bc_rhoE_mem (x : I.Gf) :
-    Formalism.UG.bc (rhoE I v) (x : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) ∈ HR (Fv I.F v) I.cm.sig I.J := by
-  have h := Formalism.UG.P.bc_mem (Formalism.UG.sigR I.cm.sig (Af I.F)) (sigR (Fv I.F v) I.cm.sig) (rhoE I v)
-    (rhoE_sig I v) (I.J.map (Formalism.UG.inclE (F := I.F) (Af I.F))) x (by exact x.2)
-  have hJ : (I.J.map (Formalism.UG.inclE (F := I.F) (Af I.F))).map (rhoE I v) = JR (Fv I.F v) I.J := by
+theorem bc_rhoE_mem (x : I.Gf)
+    : Formalism.UG.bc (rhoE I v) (x : GL (Fin I.n) (I.E ⊗[I.F] Af I.F))
+      ∈ HR (Fv I.F v) I.cm.sig I.J := by
+  have h :=
+    Formalism.UG.P.bc_mem (Formalism.UG.sigR I.cm.sig (Af I.F)) (sigR (Fv I.F v) I.cm.sig)
+      (rhoE I v) (rhoE_sig I v) (I.J.map (Formalism.UG.inclE (F := I.F) (Af I.F))) x (by exact x.2)
+  have hJ
+      : (I.J.map (Formalism.UG.inclE (F := I.F) (Af I.F))).map (rhoE I v) = JR (Fv I.F v) I.J := by
     ext i j
     simp [JR, rhoE_inclE]
   rw [hJ] at h
   exact h
 
 def kap (x : I.Gf) : HA (Fv I.F v) I.cm.sig I.J :=
-  (⟨Formalism.UG.bc (rhoE I v) (x : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)), bc_rhoE_mem I v x⟩ :
-    HR (Fv I.F v) I.cm.sig I.J)
+  (⟨Formalism.UG.bc (rhoE I v) (x : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)), bc_rhoE_mem I v x⟩
+    : HR (Fv I.F v) I.cm.sig I.J)
 
-def rhoV (w : Fin I.n → I.E ⊗[I.F] Af I.F) : Fin I.n → Fv I.F v ⊗[I.F] I.E := fun i => rhoE I v (w i)
+def rhoV (w : Fin I.n → I.E ⊗[I.F] Af I.F) : Fin I.n → Fv I.F v ⊗[I.F] I.E := fun i =>
+  rhoE I v (w i)
 
 theorem rhoV_incl (y : Fin I.n → I.E) : rhoV I v (incl I y) = ratV (F := I.F) (Fv I.F v) y := by
   funext i
   exact rhoE_inclE I v (y i)
 
-theorem rhoV_sub (a b : Fin I.n → I.E ⊗[I.F] Af I.F) : rhoV I v (a - b) = rhoV I v a - rhoV I v b := by
+theorem rhoV_sub (a b : Fin I.n → I.E ⊗[I.F] Af I.F)
+    : rhoV I v (a - b) = rhoV I v a - rhoV I v b := by
   funext i
   simp [rhoV]
 
-theorem rhoV_smul (t : I.E ⊗[I.F] Af I.F) (a : Fin I.n → I.E ⊗[I.F] Af I.F) :
-    rhoV I v (t • a) = rhoE I v t • rhoV I v a := by
+theorem rhoV_smul (t : I.E ⊗[I.F] Af I.F) (a : Fin I.n → I.E ⊗[I.F] Af I.F)
+    : rhoV I v (t • a) = rhoE I v t • rhoV I v a := by
   funext i
   simp [rhoV]
 
-theorem map_mulVec_rhoV (M : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Af I.F)) (w : Fin I.n → I.E ⊗[I.F] Af I.F) :
-    (M.map (rhoE I v)) *ᵥ rhoV I v w = rhoV I v (M *ᵥ w) := by
+theorem map_mulVec_rhoV
+    (M : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Af I.F)) (w : Fin I.n → I.E ⊗[I.F] Af I.F)
+    : (M.map (rhoE I v)) *ᵥ rhoV I v w = rhoV I v (M *ᵥ w) := by
   funext i
   simp only [rhoV]
   rw [RingHom.map_mulVec]
   rfl
 
-theorem kap_smul_ratTup {a : ℕ} (x : I.Gf) (Y : Fin a → Fin I.n → I.E) (b : Fin a) :
-    ((kap I v x) • ratTup (F := I.F) (Fv I.F v) Y) b = rhoV I v (I.fmat x *ᵥ incl I (Y b)) := by
+theorem kap_smul_ratTup {a : ℕ} (x : I.Gf) (Y : Fin a → Fin I.n → I.E) (b : Fin a)
+    : ((kap I v x) • ratTup (F := I.F) (Fv I.F v) Y) b = rhoV I v (I.fmat x *ᵥ incl I (Y b)) := by
   rw [← map_mulVec_rhoV, rhoV_incl]
   rfl
 
-theorem ratTup_eq {a : ℕ} (Y : Fin a → Fin I.n → I.E) (b : Fin a) :
-    ratTup (F := I.F) (Fv I.F v) Y b = rhoV I v (incl I (Y b)) := by
+theorem ratTup_eq {a : ℕ} (Y : Fin a → Fin I.n → I.E) (b : Fin a)
+    : ratTup (F := I.F) (Fv I.F v) Y b = rhoV I v (incl I (Y b)) := by
   rw [rhoV_incl]
   rfl
 
@@ -172,23 +185,30 @@ section Lat
 
 variable (I : Formalism.MainNotions.S.AutInst) (v : HeightOneSpectrum (𝓞 I.F))
 
-theorem inclR_smul_mem (o : 𝓞 I.E) (y : Fin I.n → Fv I.F v ⊗[I.F] I.E)
-    (hy : y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E))) :
-    inclR (F := I.F) (Fv I.F v) (o : I.E) • y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)) := by
-  have hy' : y ∈ Submodule.span (v.adicCompletionIntegers I.F)
-      (ratV (F := I.F) (Fv I.F v) '' (I.L : Set (Fin I.n → I.E))) := hy
+theorem inclR_smul_mem
+    (o : 𝓞 I.E)
+    (y : Fin I.n → Fv I.F v ⊗[I.F] I.E) (hy : y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)))
+    : inclR (F := I.F) (Fv I.F v) (o : I.E) • y
+      ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)) := by
+  have hy'
+      : y ∈ Submodule.span (v.adicCompletionIntegers I.F)
+        (ratV (F := I.F) (Fv I.F v) '' (I.L : Set (Fin I.n → I.E))) :=
+    hy
   clear hy
   induction hy' using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨l, hl, rfl⟩ := hz
     have hol : o • l ∈ I.L := I.L.smul_mem o hl
-    have e : inclR (F := I.F) (Fv I.F v) (o : I.E) • ratV (F := I.F) (Fv I.F v) l = ratV (F := I.F) (Fv I.F v) (o • l) := by
+    have e
+        : inclR (F := I.F) (Fv I.F v) (o : I.E) • ratV (F := I.F) (Fv I.F v) l
+          = ratV (F := I.F) (Fv I.F v) (o • l) := by
       funext i
       show inclR (F := I.F) (Fv I.F v) (o : I.E) * inclR (F := I.F) (Fv I.F v) (l i) = inclR (F := I.F) (Fv I.F v) (o • l i)
       rw [← map_mul, Algebra.smul_def (R := 𝓞 I.E)]
     rw [e]
     exact Submodule.subset_span ⟨_, hol, rfl⟩
-  | zero => simp
+  | zero =>
+    simp
   | add a b _ _ ha hb =>
     rw [smul_add]
     exact add_mem ha hb
@@ -196,18 +216,23 @@ theorem inclR_smul_mem (o : 𝓞 I.E) (y : Fin I.n → Fv I.F v ⊗[I.F] I.E)
     rw [smul_eq_sc, smul_smul, mul_comm, ← smul_smul, ← smul_eq_sc]
     exact Submodule.smul_mem _ c ha
 
-theorem rhoE_int (t : I.E ⊗[I.F] Af I.F) (ht : t ∈ Formalism.MainNotions.S.IntAf I.F I.E) :
-    ∀ y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)),
+theorem rhoE_int (t : I.E ⊗[I.F] Af I.F) (ht : t ∈ Formalism.MainNotions.S.IntAf I.F I.E)
+    : ∀ y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)),
       rhoE I v t • y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)) := by
-  have ht' : t ∈ Subring.closure (Set.range (fun x : Formalism.UG.intOE I.E => (x : I.E) ⊗ₜ[I.F] (1 : Af I.F)) ∪
-      Set.range (fun y : Formalism.UG.intAd I.F => (1 : I.E) ⊗ₜ[I.F] (y : Af I.F))) := ht
+  have ht'
+      : t ∈ Subring.closure
+        (Set.range (fun x : Formalism.UG.intOE I.E => (x : I.E) ⊗ₜ[I.F] (1 : Af I.F))
+          ∪ Set.range (fun y : Formalism.UG.intAd I.F => (1 : I.E) ⊗ₜ[I.F] (y : Af I.F))) :=
+    ht
   clear ht
   induction ht' using Subring.closure_induction with
   | mem x hx =>
     rcases hx with ⟨⟨o, ho⟩, rfl⟩ | ⟨⟨a, ha⟩, rfl⟩
     · obtain ⟨o', rfl⟩ := ho
       intro y hy
-      have e : rhoE I v (((algebraMap (𝓞 I.E) I.E) o') ⊗ₜ[I.F] (1 : Af I.F)) = inclR (F := I.F) (Fv I.F v) (o' : I.E) := by
+      have e
+          : rhoE I v (((algebraMap (𝓞 I.E) I.E) o') ⊗ₜ[I.F] (1 : Af I.F))
+            = inclR (F := I.F) (Fv I.F v) (o' : I.E) := by
         rw [rhoE_tmul, map_one]
         rfl
       rw [e]
@@ -237,16 +262,20 @@ theorem rhoE_int (t : I.E ⊗[I.F] Af I.F) (ht : t ∈ Formalism.MainNotions.S.I
 theorem incl_mem_Lf (l : Fin I.n → I.E) (hl : l ∈ I.L) : incl I l ∈ I.Lf :=
   Submodule.subset_span ⟨⟨l, hl⟩, rfl⟩
 
-theorem rhoV_Lf (w : Fin I.n → I.E ⊗[I.F] Af I.F) (hw : w ∈ I.Lf) :
-    rhoV I v w ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)) := by
-  have hw' : w ∈ Submodule.span (Formalism.MainNotions.S.IntAf I.F I.E)
-      (Set.range fun x : I.L => fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((x : Fin I.n → I.E) i)) := hw
+theorem rhoV_Lf (w : Fin I.n → I.E ⊗[I.F] Af I.F) (hw : w ∈ I.Lf)
+    : rhoV I v w ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)) := by
+  have hw'
+      : w ∈ Submodule.span (Formalism.MainNotions.S.IntAf I.F I.E)
+        (Set.range fun x : I.L => fun i =>
+          Formalism.UG.inclE (F := I.F) (Af I.F) ((x : Fin I.n → I.E) i)) :=
+    hw
   clear hw
   induction hw' using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨⟨l, hl⟩, rfl⟩ := hz
-    rw [show rhoV I v (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (l i)) = ratV (F := I.F) (Fv I.F v) l
-      from rhoV_incl I v l]
+    rw [show rhoV I v (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (l i))
+        = ratV (F := I.F) (Fv I.F v) l from
+      rhoV_incl I v l]
     exact Submodule.subset_span ⟨l, hl, rfl⟩
   | zero =>
     have e : rhoV I v 0 = 0 := by
@@ -274,10 +303,13 @@ section Lat2
 
 variable (I : Formalism.MainNotions.S.AutInst) (v : HeightOneSpectrum (𝓞 I.F))
 
-theorem rhoV_mL (m : ℕ) (w : Fin I.n → I.E ⊗[I.F] Af I.F) (hw : w ∈ mL I m) :
-    ∃ y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)), rhoV I v w = sc (E := I.E) v (m : Fv I.F v) • y := by
-  have hw' : w ∈ Submodule.span (Formalism.MainNotions.S.IntAf I.F I.E)
-      {y | ∃ x ∈ I.Lf, y = (m : I.E ⊗[I.F] Af I.F) • x} := hw
+theorem rhoV_mL (m : ℕ) (w : Fin I.n → I.E ⊗[I.F] Af I.F) (hw : w ∈ mL I m)
+    : ∃ y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)),
+      rhoV I v w = sc (E := I.E) v (m : Fv I.F v) • y := by
+  have hw'
+      : w ∈ Submodule.span (Formalism.MainNotions.S.IntAf I.F I.E)
+        {y | ∃ x ∈ I.Lf, y = (m : I.E ⊗[I.F] Af I.F) • x} :=
+    hw
   clear hw
   induction hw' using Submodule.span_induction with
   | mem z hz =>
@@ -305,8 +337,8 @@ theorem rhoV_mL (m : ℕ) (w : Fin I.n → I.E ⊗[I.F] Af I.F) (hw : w ∈ mL I
       exact map_mul _ _ _
     rw [e, ea, smul_smul, smul_smul, mul_comm]
 
-theorem natCast_smul_mL (m c : ℕ) (w : Fin I.n → I.E ⊗[I.F] Af I.F) (hw : w ∈ mL I m) :
-    (c : I.E ⊗[I.F] Af I.F) • w ∈ mL I m := by
+theorem natCast_smul_mL (m c : ℕ) (w : Fin I.n → I.E ⊗[I.F] Af I.F) (hw : w ∈ mL I m)
+    : (c : I.E ⊗[I.F] Af I.F) • w ∈ mL I m := by
   rw [Nat.cast_smul_eq_nsmul]
   exact nsmul_mem hw c
 
@@ -320,11 +352,14 @@ theorem kset_mul (x y : I.Gf) (hx : x ∈ I.Kset) (hy : y ∈ I.Kset) : x * y �
   rw [Subgroup.coe_mul]
   exact (Formalism.UG.stabGL I.Lf).mul_mem hx hy
 
-theorem kap_fwd (x : I.Gf) (hx : x ∈ I.Kset) (y : Fin I.n → Fv I.F v ⊗[I.F] I.E)
-    (hy : y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E))) :
-    (I.fmat x).map (rhoE I v) *ᵥ y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)) := by
-  have hy' : y ∈ Submodule.span (v.adicCompletionIntegers I.F)
-      (ratV (F := I.F) (Fv I.F v) '' (I.L : Set (Fin I.n → I.E))) := hy
+theorem kap_fwd
+    (x : I.Gf) (hx : x ∈ I.Kset)
+    (y : Fin I.n → Fv I.F v ⊗[I.F] I.E) (hy : y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)))
+    : (I.fmat x).map (rhoE I v) *ᵥ y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)) := by
+  have hy'
+      : y ∈ Submodule.span (v.adicCompletionIntegers I.F)
+        (ratV (F := I.F) (Fv I.F v) '' (I.L : Set (Fin I.n → I.E))) :=
+    hy
   clear hy
   induction hy' using Submodule.span_induction with
   | mem z hz =>
@@ -341,15 +376,16 @@ theorem kap_fwd (x : I.Gf) (hx : x ∈ I.Kset) (y : Fin I.n → Fv I.F v ⊗[I.F
     rw [smul_eq_sc, Matrix.mulVec_smul, ← smul_eq_sc]
     exact Submodule.smul_mem _ c ha
 
-theorem kap_K (x : I.Gf) (hx : x ∈ I.Kset) :
-    kap I v x ∈ Kv I.cm.sig I.J (I.L : Set (Fin I.n → I.E)) v := by
+theorem kap_K (x : I.Gf) (hx : x ∈ I.Kset)
+    : kap I v x ∈ Kv I.cm.sig I.J (I.L : Set (Fin I.n → I.E)) v := by
   show ∀ y, y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E)) ↔
     (I.fmat x).map (rhoE I v) *ᵥ y ∈ latLoc (E := I.E) v (I.L : Set (Fin I.n → I.E))
   intro y
   refine ⟨kap_fwd I v x hx y, fun h => ?_⟩
   have h2 := kap_fwd I v x⁻¹ (kset_inv I x hx) _ h
   rwa [Matrix.mulVec_mulVec, ← Matrix.map_mul, fmat_inv_mul,
-    Matrix.map_one _ (map_zero _) (map_one _), Matrix.one_mulVec] at h2
+      Matrix.map_one _ (map_zero _) (map_one _), Matrix.one_mulVec]
+    at h2
 
 end Lat2
 
@@ -359,8 +395,9 @@ open Formalism.BasicNotions
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem typed_mem (p : TypX X) :
-    ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal ∨ ((D.host.g 1 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal := by
+theorem typed_mem (p : TypX X)
+    : ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal
+      ∨ ((D.host.g 1 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal := by
   have h := p.2
   unfold typSet at h
   split_ifs at h with hf
@@ -379,36 +416,45 @@ theorem gAt_dvd (v : PlX X) : ∃ k : ℕ, X.B.g = gAt X v * k := by
   · exact ⟨D.host.g 1, X.g_eq⟩
   · exact ⟨D.host.g 0, by rw [X.g_eq, mul_comm]⟩
 
-theorem alp_last (v : PlX X) (r : ℕ) : alp v r (Fin.last r) = 1 := by
-  simp [alp]
+theorem alp_last (v : PlX X) (r : ℕ) : alp v r (Fin.last r) = 1 := by simp [alp]
 
-theorem locF_last {v : PlX X} {r : ℕ} (Y : TupV (E := X.B.I.E) v X.B.I.n (r + 1)) :
-    locF v Y (Fin.last r) = Y (Fin.last r) := by
+theorem locF_last {v : PlX X} {r : ℕ} (Y : TupV (E := X.B.I.E) v X.B.I.n (r + 1))
+    : locF v Y (Fin.last r) = Y (Fin.last r) := by
   rw [locF, alp_last, sc_one, one_smul]
 
-theorem glob_diff {R : Type} [CommRing R] {n : ℕ} (A Ai A'i : Matrix (Fin n) (Fin n) R) (h : A * Ai = 1)
-    (z z' z0 : Fin n → R) :
-    (A * A'i) *ᵥ z' - z = A *ᵥ ((A'i *ᵥ z' - z0) - (Ai *ᵥ z - z0)) := by
+theorem glob_diff
+    {R : Type} [CommRing R]
+    {n : ℕ} (A Ai A'i : Matrix (Fin n) (Fin n) R) (h : A * Ai = 1) (z z' z0 : Fin n → R)
+    : (A * A'i) *ᵥ z' - z = A *ᵥ ((A'i *ᵥ z' - z0) - (Ai *ᵥ z - z0)) := by
   simp only [Matrix.mulVec_sub, Matrix.mulVec_mulVec, h, Matrix.one_mulVec]
   abel
 
-theorem kapX (_hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (u u' : D.what₂.Word) : KapX X u u' := by
+theorem kapX (_hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (u u' : D.what₂.Word)
+    : KapX X u u' := by
   intro p
-  refine ⟨kap X.B.I p.1 (X.xu u * (X.xu u')⁻¹),
-    kap_K X.B.I p.1 _ (kset_mul X.B.I _ _ (X.xu_K u) (kset_inv X.B.I _ (X.xu_K u'))), ?_⟩
+  refine ⟨
+    kap X.B.I p.1 (X.xu u * (X.xu u')⁻¹),
+    kap_K X.B.I p.1 _ (kset_mul X.B.I _ _ (X.xu_K u) (kset_inv X.B.I _ (X.xu_K u'))),
+    ?_
+  ⟩
   intro a
   induction a using Fin.lastCases with
   | cast b =>
     refine ⟨0, zero_mem _, ?_⟩
-    have hfix : X.B.I.fmat (X.xu u * (X.xu u')⁻¹) *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.eX b)) =
-        incl X.B.I (crdOf X.B.I X.ιE X.bas (X.eX b)) := by
-      have h1 : X.B.I.fmat (X.xu u')⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.eX b)) =
-          incl X.B.I (crdOf X.B.I X.ιE X.bas (X.eX b)) := by
+    have hfix
+        : X.B.I.fmat (X.xu u * (X.xu u')⁻¹) *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.eX b))
+          = incl X.B.I (crdOf X.B.I X.ιE X.bas (X.eX b)) := by
+      have h1
+          : X.B.I.fmat (X.xu u')⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.eX b))
+            = incl X.B.I (crdOf X.B.I X.ιE X.bas (X.eX b)) := by
         conv_lhs => rw [← (X.xu_fix u' b).1]
         rw [Matrix.mulVec_mulVec, fmat_inv_mul, Matrix.one_mulVec]
       rw [fmat_mul, ← Matrix.mulVec_mulVec, h1, (X.xu_fix u b).1]
-    have heq : (kap X.B.I p.1 (X.xu u * (X.xu u')⁻¹) • ratTup (F := X.B.I.F) (Fv X.B.I.F p.1) (F0 (frameOf X u')))
-        (Fin.castSucc b) = ratTup (F := X.B.I.F) (Fv X.B.I.F p.1) (F0 (frameOf X u)) (Fin.castSucc b) := by
+    have heq
+        : (kap X.B.I p.1 (X.xu u * (X.xu u')⁻¹)
+              • ratTup (F := X.B.I.F) (Fv X.B.I.F p.1) (F0 (frameOf X u')))
+            (Fin.castSucc b)
+          = ratTup (F := X.B.I.F) (Fv X.B.I.F p.1) (F0 (frameOf X u)) (Fin.castSucc b) := by
       rw [kap_smul_ratTup, ratTup_eq]
       simp only [F0, frameOf, Fin.snoc_castSucc]
       rw [hfix]
@@ -416,10 +462,11 @@ theorem kapX (_hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (u u' : D.what�
   | last =>
     obtain ⟨c1, hc1, hm1⟩ := X.xu_z u
     obtain ⟨c2, hc2, hm2⟩ := X.xu_z u'
-    have hm : ((c1 * c2 : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) •
-        ((X.B.I.fmat (X.xu u')⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.zu u')) - X.z0) -
-          (X.B.I.fmat (X.xu u)⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.zu u)) - X.z0)) ∈
-        mL X.B.I X.B.g := by
+    have hm
+        : ((c1 * c2 : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F)
+            • ((X.B.I.fmat (X.xu u')⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.zu u')) - X.z0)
+              - (X.B.I.fmat (X.xu u)⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.zu u)) - X.z0))
+          ∈ mL X.B.I X.B.g := by
       have h := sub_mem (natCast_smul_mL X.B.I _ c1 _ hm2) (natCast_smul_mL X.B.I _ c2 _ hm1)
       convert h using 1
       rw [smul_sub, Nat.cast_mul, mul_smul, mul_comm (c1 : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F), mul_smul]
@@ -429,21 +476,29 @@ theorem kapX (_hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (u u' : D.what�
       natCast_not_mem p.1 _ X.B.g (Nat.Coprime.mul_left hc1 hc2) (Bg_mem X p)
     obtain ⟨hdi, hc0⟩ := inv_natCast_mem p.1 _ hc
     obtain ⟨k, hk⟩ := gAt_dvd X p.1
-    refine ⟨sc (E := X.B.I.E) p.1 (k : Fv X.B.I.F p.1) • sc (E := X.B.I.E) p.1 ((c1 * c2 : ℕ) : Fv X.B.I.F p.1)⁻¹ •
-      ((X.B.I.fmat (X.xu u)).map (rhoE X.B.I p.1) *ᵥ y0),
-      sc_smul_mem p.1 _ _ (natCast_mem_int p.1 k) _ (sc_smul_mem p.1 _ _ hdi _ hy1), ?_⟩
+    refine ⟨
+      sc (E := X.B.I.E) p.1 (k : Fv X.B.I.F p.1)
+        • sc (E := X.B.I.E) p.1 ((c1 * c2 : ℕ) : Fv X.B.I.F p.1)⁻¹
+        • ((X.B.I.fmat (X.xu u)).map (rhoE X.B.I p.1) *ᵥ y0),
+      sc_smul_mem p.1 _ _ (natCast_mem_int p.1 k) _ (sc_smul_mem p.1 _ _ hdi _ hy1),
+      ?_
+    ⟩
     rw [locF_last, locF_last, kap_smul_ratTup, ratTup_eq, ← rhoV_sub]
     simp only [F0, frameOf, Fin.snoc_last]
     rw [fmat_mul, glob_diff _ _ _ (fmat_mul_inv X.B.I (X.xu u)) _ _ X.z0]
-    have key : sc (E := X.B.I.E) p.1 ((c1 * c2 : ℕ) : Fv X.B.I.F p.1) •
-        rhoV X.B.I p.1 (X.B.I.fmat (X.xu u) *ᵥ
-          ((X.B.I.fmat (X.xu u')⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.zu u')) - X.z0) -
-            (X.B.I.fmat (X.xu u)⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.zu u)) - X.z0))) =
-        sc (E := X.B.I.E) p.1 (X.B.g : Fv X.B.I.F p.1) • ((X.B.I.fmat (X.xu u)).map (rhoE X.B.I p.1) *ᵥ y0) := by
+    have key
+        : sc (E := X.B.I.E) p.1 ((c1 * c2 : ℕ) : Fv X.B.I.F p.1) • rhoV X.B.I p.1
+            (X.B.I.fmat (X.xu u)
+              *ᵥ ((X.B.I.fmat (X.xu u')⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.zu u')) - X.z0)
+                - (X.B.I.fmat (X.xu u)⁻¹ *ᵥ incl X.B.I (crdOf X.B.I X.ιE X.bas (X.zu u)) - X.z0)))
+          = sc (E := X.B.I.E) p.1 (X.B.g : Fv X.B.I.F p.1)
+            • ((X.B.I.fmat (X.xu u)).map (rhoE X.B.I p.1) *ᵥ y0) := by
       rw [sc_natCast, ← map_natCast (rhoE X.B.I p.1), ← rhoV_smul, ← Matrix.mulVec_smul,
         ← map_mulVec_rhoV, hy0e, Matrix.mulVec_smul]
-    have hcc : sc (E := X.B.I.E) p.1 ((c1 * c2 : ℕ) : Fv X.B.I.F p.1)⁻¹ *
-        sc (E := X.B.I.E) p.1 ((c1 * c2 : ℕ) : Fv X.B.I.F p.1) = 1 := by
+    have hcc
+        : sc (E := X.B.I.E) p.1 ((c1 * c2 : ℕ) : Fv X.B.I.F p.1)⁻¹
+            * sc (E := X.B.I.E) p.1 ((c1 * c2 : ℕ) : Fv X.B.I.F p.1)
+          = 1 := by
       rw [← sc_mul, inv_mul_cancel₀ hc0, sc_one]
     rw [← one_smul (Fv X.B.I.F p.1 ⊗[X.B.I.F] X.B.I.E) (rhoV X.B.I p.1 _), ← hcc, mul_smul, key]
     simp only [smul_smul]

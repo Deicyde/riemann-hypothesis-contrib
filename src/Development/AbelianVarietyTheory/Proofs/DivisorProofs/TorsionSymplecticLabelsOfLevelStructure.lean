@@ -13,26 +13,48 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Abe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
 namespace GlobalTheory.MBLow
 
-theorem qLevel_of_torsion_labels : AllVC fun {V} _ _ _ {D} {A} {G} _ _ U {C} _ _ {N} ν => ∀ (g k : ℕ), 1 ≤ k → ∀ (ζ : Cˣ) (pt : (Fin (2 * g) → ZMod k) → (TFK (R := V) C ⟶ A.A)), IsPrimitiveRoot ζ k → (∀ a b, pt (a + b) = pt a * pt b) → Function.Injective pt → (∀ z : TFK (R := V) C ⟶ A.A, z ^ k = 1 → ∃ a, pt a = z) → (∀ i j, WeilIs A.A A.L k (pt (Pi.single i 1)) (pt (Pi.single j 1)) (unitOn (ζ ^ stdSymp g i j))) → ∃ (p : (Fin (2 * g) → ZMod k) → QkPt D.toPre C k) (q : (Fin (2 * g) → ZMod k) → N.QT k), QLevel N g k ζ q ∧ ∀ a, ν.QPt (p a) (q a) ∧ QkToAkU U.toUnifPre C k (p a) (pt a) := by
+theorem qLevel_of_torsion_labels
+    : AllVC fun {V} _ _ _ {D} {A} {G} _ _ U {C} _ _ {N} ν =>
+      ∀ (g k : ℕ),
+        1 ≤ k
+          → ∀ (ζ : Cˣ) (pt : (Fin (2 * g) → ZMod k) → (TFK (R := V) C ⟶ A.A)),
+            IsPrimitiveRoot ζ k → (∀ a b, pt (a + b) = pt a * pt b) → Function.Injective pt
+              → (∀ z : TFK (R := V) C ⟶ A.A, z ^ k = 1 → ∃ a, pt a = z)
+              → (∀ i j,
+                WeilIs A.A A.L k (pt (Pi.single i 1)) (pt (Pi.single j 1))
+                  (unitOn (ζ ^ stdSymp g i j)))
+              → ∃ (p : (Fin (2 * g) → ZMod k) → QkPt D.toPre C k)
+                  (q : (Fin (2 * g) → ZMod k) → N.QT k),
+                QLevel N g k ζ q
+                  ∧ ∀ a, ν.QPt (p a) (q a) ∧ QkToAkU U.toUnifPre C k (p a) (pt a) := by
   intro V _ _ _ _ hV D A G _ _ hG U C _ _ _ _ _ _ hC N ν hI
   intro g k hk ζ pt hζ hadd hinj hsurj hw
   obtain ⟨f, hf1, hf2, hf3, hf4, hf5⟩ := GlobalTheory.ZH.uTors_closed V hV A G D U C k hk
-  obtain ⟨-, -, hAdd, -, hQ⟩ := GlobalTheory.Ex.GtValues.points_correspond V D.toPre D.psi_even D.tau_bimult C N ν
-  have hWp := GlobalTheory.WeilValues.weil_eq_values GlobalTheory.Ex.GtValues.points_correspond
-    (GlobalTheory.Ex.brFam GlobalTheory.abelianSchemeLaws_all.1 GlobalTheory.abelianSchemeLaws_all.2) V D.toPre D.psi_even D.tau_bimult C N ν k hk
+  obtain ⟨-, -, hAdd, -, hQ⟩ :=
+    GlobalTheory.Ex.GtValues.points_correspond V D.toPre D.psi_even D.tau_bimult C N ν
+  have hWp :=
+    GlobalTheory.WeilValues.weil_eq_values GlobalTheory.Ex.GtValues.points_correspond
+      (GlobalTheory.Ex.brFam GlobalTheory.abelianSchemeLaws_all.1
+        GlobalTheory.abelianSchemeLaws_all.2)
+      V D.toPre D.psi_even D.tau_bimult C N ν k hk
   obtain ⟨hQ1, hQ2, hQ3⟩ := hQ k
 
-  have hmul : ∀ (p₁ p₂ p₃ : QkPt D.toPre C k) (q₁ q₂ : N.QT k), ν.QPt p₁ q₁ → ν.QPt p₂ q₂ → ν.QPt p₃ (q₁ * q₂) →
-      f p₃ = f p₁ * f p₂ := by
+  have hmul
+      : ∀ (p₁ p₂ p₃ : QkPt D.toPre C k) (q₁ q₂ : N.QT k),
+        ν.QPt p₁ q₁ → ν.QPt p₂ q₂ → ν.QPt p₃ (q₁ * q₂) → f p₃ = f p₁ * f p₂ := by
     intro p₁ p₂ p₃ q₁ q₂ h₁ h₂ h₃
     apply hf4
     refine ⟨p₃, ?_, ?_, ?_⟩
@@ -61,8 +83,9 @@ theorem qLevel_of_torsion_labels : AllVC fun {V} _ _ _ {D} {A} {G} _ _ U {C} _ _
   have hexq : ∀ a, ∃ q, ν.QPt (p a) q := fun a => (hQ1 (p a)).exists
   choose q hq using hexq
 
-  have hpow : ∀ (q' : N.QT k) (p' : QkPt D.toPre C k), ν.QPt p' q' → ∀ (n : ℕ) (pn : QkPt D.toPre C k),
-      ν.QPt pn (q' ^ n) → f pn = f p' ^ n := by
+  have hpow
+      : ∀ (q' : N.QT k) (p' : QkPt D.toPre C k),
+        ν.QPt p' q' → ∀ (n : ℕ) (pn : QkPt D.toPre C k), ν.QPt pn (q' ^ n) → f pn = f p' ^ n := by
     intro q' p' hp' n
     induction n with
     | zero =>

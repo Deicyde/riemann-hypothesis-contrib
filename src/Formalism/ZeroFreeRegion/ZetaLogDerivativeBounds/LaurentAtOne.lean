@@ -30,13 +30,13 @@ theorem laH_diffOn (y : ℝ) (hy : 0 < y) : DifferentiableOn ℂ (laHfun y) laU 
   have hz : DifferentiableAt ℂ riemannZeta₁ s := differentiable_riemannZeta₁ s
   have hc : DifferentiableAt ℂ (fun s : ℂ => (y : ℂ) ^ s) s :=
     differentiableAt_id.const_cpow (Or.inl hy0)
-  exact ((differentiableAt_const _).sub ((differentiableAt_id.sub_const 1).mul
-    (hd.div hz hZ))).mul (hc.div differentiableAt_id h0)
+  exact ((differentiableAt_const _).sub ((differentiableAt_id.sub_const 1).mul (hd.div hz hZ))).mul
+    (hc.div differentiableAt_id h0)
 
 theorem laH_one (y : ℝ) : laHfun y 1 = y := by simp [laHfun]
 
-theorem laH_deriv_one (y : ℝ) (hy : 0 < y) :
-    deriv (laHfun y) 1 = (y : ℂ) * Real.log y - (1 + Real.eulerMascheroniConstant) * y := by
+theorem laH_deriv_one (y : ℝ) (hy : 0 < y)
+    : deriv (laHfun y) 1 = (y : ℂ) * Real.log y - (1 + Real.eulerMascheroniConstant) * y := by
   have hy0 : (y : ℂ) ≠ 0 := by exact_mod_cast hy.ne'
   have hB : DifferentiableAt ℂ (fun s => deriv riemannZeta₁ s / riemannZeta₁ s) 1 :=
     (differentiable_riemannZeta₁.deriv 1).div (differentiable_riemannZeta₁ 1) (by simp)
@@ -70,8 +70,10 @@ theorem laurentExpansionAtOne : LaurentAtOne := by
     simp only [smul_eq_mul] at e1 e2
     rw [hdef, laH_deriv_one y hy] at e2
     rw [hdef, laH_one y] at e1
-    have hhw : laHfun y w =
-        (1 - (w - 1) * (deriv riemannZeta₁ w / riemannZeta₁ w)) * ((y : ℂ) ^ w / w) := rfl
+    have hhw
+        : laHfun y w
+          = (1 - (w - 1) * (deriv riemannZeta₁ w / riemannZeta₁ w)) * ((y : ℂ) ^ w / w) :=
+      rfl
     unfold Fy
     rw [hw]
     rw [hdef] at *
@@ -80,12 +82,15 @@ theorem laurentExpansionAtOne : LaurentAtOne := by
     generalize dslope (dslope (laHfun y) 1) 1 w = q at e2 ⊢
     generalize dslope (laHfun y) 1 w = D at e1 e2
     generalize laHfun y w = H at e1 hhw
-    have key : (1 - (w - 1) * B) * (P / w) =
-        y + (w - 1) * (((y : ℂ) * Real.log y - (1 + Real.eulerMascheroniConstant) * y)
-          + (w - 1) * q) := by
+    have key
+        : (1 - (w - 1) * B) * (P / w)
+          = y
+            + (w - 1)
+              * (((y : ℂ) * Real.log y - (1 + Real.eulerMascheroniConstant) * y)
+                + (w - 1) * q) := by
       rw [← hhw]; linear_combination -e1 - (w - 1) * e2
-    have lhs : -(-(w - 1)⁻¹ + B) * P / (w * (w - 1)) =
-        (1 - (w - 1) * B) * (P / w) / (w - 1) ^ 2 := by
+    have lhs
+        : -(-(w - 1)⁻¹ + B) * P / (w * (w - 1)) = (1 - (w - 1) * B) * (P / w) / (w - 1) ^ 2 := by
       field_simp
       ring
     rw [lhs, key]

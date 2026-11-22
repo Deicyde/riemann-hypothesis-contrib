@@ -10,8 +10,10 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set Filter MeasureTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Cartier GlobalTheory.Cartier.CartierDiv GlobalTheory.ProjVar GlobalTheory.ProjVar.Var GlobalTheory.CxPts Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Cartier GlobalTheory.Cartier.CartierDiv GlobalTheory.ProjVar
+  GlobalTheory.ProjVar.Var GlobalTheory.CxPts Formalism.BasicNotions
 
 namespace GlobalTheory.ProjVar.Var
 

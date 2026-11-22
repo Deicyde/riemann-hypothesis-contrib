@@ -12,35 +12,41 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory.PDiv.FrobKerPrim
 
-theorem mem_frobKerIdeal_of_cobOne (p : ℕ) [Fact p.Prime] (K H : Type) [Field K] [CharP K p]
-    [CommRing H] [HopfAlgebra K H] [IsCocomm K H] [Module.Finite K H] (b : H)
-    (_hb : counit (R := K) b = 0) (hd : dUnit (R := K) b = 0)
+theorem mem_frobKerIdeal_of_cobOne
+    (p : ℕ) [Fact p.Prime]
+    (K H : Type)
+    [Field K] [CharP K p] [CommRing H] [HopfAlgebra K H] [IsCocomm K H] [Module.Finite K H]
+    (b : H) (_hb : counit (R := K) b = 0) (hd : dUnit (R := K) b = 0)
     (hc : Algebra.TensorProduct.map (Ideal.Quotient.mkₐ K (frobKerIdeal p K H))
-      (Ideal.Quotient.mkₐ K (frobKerIdeal p K H)) (cobOne K H b) = 0) :
-    b ∈ frobKerIdeal p K H := by
-  have hadd {A : Type} [CommRing A] (h : (p : A) = 0) (x y : A) :
-      (x + y) ^ p = x ^ p + y ^ p := by
+        (Ideal.Quotient.mkₐ K (frobKerIdeal p K H)) (cobOne K H b)
+      = 0)
+    : b ∈ frobKerIdeal p K H := by
+  have hadd {A : Type} [CommRing A] (h : (p : A) = 0) (x y : A) : (x + y) ^ p = x ^ p + y ^ p := by
     rw [add_pow_prime_eq (Fact.out : p.Prime), h]; simp
   have hcast (A : Type) [CommRing A] [Algebra K A] : (p : A) = 0 := by
     rw [← map_natCast (algebraMap K A), CharP.cast_eq_zero, map_zero]
-  have hmk (x : H) : Ideal.Quotient.mkₐ K (frobKerIdeal p K H) x ^ p =
-      algebraMap K _ (counit (R := K) x) ^ p := by
-    have hx : x - algebraMap K H (counit (R := K) x) ∈ augIdeal K H := by
-      simp [RingHom.mem_ker]
-    have h0 : Ideal.Quotient.mkₐ K (frobKerIdeal p K H)
-        ((x - algebraMap K H (counit (R := K) x)) ^ p) = 0 :=
+  have hmk (x : H)
+      : Ideal.Quotient.mkₐ K (frobKerIdeal p K H) x ^ p
+        = algebraMap K _ (counit (R := K) x) ^ p := by
+    have hx : x - algebraMap K H (counit (R := K) x) ∈ augIdeal K H := by simp [RingHom.mem_ker]
+    have h0
+        : Ideal.Quotient.mkₐ K (frobKerIdeal p K H) ((x - algebraMap K H (counit (R := K) x)) ^ p)
+          = 0 :=
       Ideal.Quotient.eq_zero_iff_mem.2 (pow_mem_frobKerIdeal hx)
-    have e : x = (x - algebraMap K H (counit (R := K) x)) + algebraMap K H (counit (R := K) x) := by ring
+    have e : x = (x - algebraMap K H (counit (R := K) x)) + algebraMap K H (counit (R := K) x) := by
+      ring
     conv_lhs => rw [e, ← map_pow, hadd (hcast H), map_add, h0, zero_add, map_pow, AlgHom.commutes]
-  have hmap (t : H ⊗[K] H) :
-      Algebra.TensorProduct.map (Ideal.Quotient.mkₐ K (frobKerIdeal p K H))
-        (Ideal.Quotient.mkₐ K (frobKerIdeal p K H)) t ^ p =
-      (1 : H ⧸ frobKerIdeal p K H) ⊗ₜ[K] (Ideal.Quotient.mkₐ K (frobKerIdeal p K H)
-        (TensorProduct.lid K H (LinearMap.rTensor H (counit (R := K) (A := H)) t)) ^ p) := by
+  have hmap (t : H ⊗[K] H)
+      : Algebra.TensorProduct.map (Ideal.Quotient.mkₐ K (frobKerIdeal p K H))
+            (Ideal.Quotient.mkₐ K (frobKerIdeal p K H)) t
+          ^ p
+        = (1 : H ⧸ frobKerIdeal p K H) ⊗ₜ[K] (Ideal.Quotient.mkₐ K (frobKerIdeal p K H)
+            (TensorProduct.lid K H (LinearMap.rTensor H (counit (R := K) (A := H)) t)) ^ p) := by
     induction t with
     | add x y hx hy =>
       simp only [map_add (f := _)]
@@ -95,9 +101,10 @@ theorem mem_frobKerIdeal_of_cobOne (p : ℕ) [Fact p.Prime] (K H : Type) [Field 
   have hc' : cobOne K (H ⧸ J) (π b) = 0 := by
     rw [← pullTwo_cobOne]
     exact hc
-  have hd' : dUnit (R := K) (π b) = 0 := by
-    rw [← cotMap_d, hd, map_zero]
-  have h0 := GlobalTheory.T.hopf_height_one_primitive_eq_zero_of_zero_differential p K (H ⧸ J) hpow (π b) hc' hd'
+  have hd' : dUnit (R := K) (π b) = 0 := by rw [← cotMap_d, hd, map_zero]
+  have h0 :=
+    GlobalTheory.T.hopf_height_one_primitive_eq_zero_of_zero_differential p K (H ⧸ J) hpow (π b) hc'
+      hd'
   exact Ideal.Quotient.eq_zero_iff_mem.1 h0
 
 end GlobalTheory.PDiv.FrobKerPrim

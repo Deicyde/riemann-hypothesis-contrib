@@ -8,17 +8,19 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.PshShiftA
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.LeviChart
 
-theorem levi_nonneg_of_compat_fixedBase : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B : FinHolAtlas e X)
-    (th : LocPot X) (ph : X → ℝ) (U : Set X) (x₀ : X) (j : Fin B.n), A.Compatible B →
-    IsPotential A th → IsOpen U → A.SmoothOn U ph → IsPshOn A U (th + LocPot.ofFun ph) →
-    (B.chart j).source ⊆ th.U x₀ → ∀ y ∈ (B.chart j).target ∩ (B.chart j).symm ⁻¹' U,
-    ∀ w : Fin e → ℂ,
-    0 ≤ levi (fun z => th.φ x₀ ((B.chart j).symm z) + ph ((B.chart j).symm z)) y w := by
+theorem levi_nonneg_of_compat_fixedBase
+    : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A B : FinHolAtlas e X) (th : LocPot X) (ph : X → ℝ)
+        (U : Set X) (x₀ : X) (j : Fin B.n),
+      A.Compatible B → IsPotential A th → IsOpen U → A.SmoothOn U ph
+        → IsPshOn A U (th + LocPot.ofFun ph) → (B.chart j).source ⊆ th.U x₀
+        → ∀ y ∈ (B.chart j).target ∩ (B.chart j).symm ⁻¹' U, ∀ w : Fin e → ℂ,
+          0 ≤ levi (fun z => th.φ x₀ ((B.chart j).symm z) + ph ((B.chart j).symm z)) y w := by
   intro e X _ A B th ph U x₀ j hAB hth hU hph hpsh hsrc y hy w
   have hp : (B.chart j).symm y ∈ (B.chart j).source := (B.chart j).map_target hy.1
   obtain ⟨k, hk⟩ := A.cover ((B.chart j).symm y)
@@ -40,11 +42,14 @@ theorem levi_nonneg_of_compat_fixedBase : ∀ {e : ℕ} {X : Type} [TopologicalS
     ((hth.1 x₀ k).contDiffAt (hO1.mem_nhds hm1)).of_le h2
   have hC2 : ContDiffAt ℝ 2 (ph ∘ (A.chart k).symm) ((A.chart k ∘ (B.chart j).symm) y) :=
     ((hph k).contDiffAt (hO2.mem_nhds hm2)).of_le h2
-  have hC : ContDiffAt ℝ 2 (fun z => th.φ x₀ ((A.chart k).symm z) + ph ((A.chart k).symm z))
-      ((A.chart k ∘ (B.chart j).symm) y) := hC1.add hC2
-  have hev : (fun z => th.φ x₀ ((B.chart j).symm z) + ph ((B.chart j).symm z)) =ᶠ[𝓝 y]
-      ((fun z => th.φ x₀ ((A.chart k).symm z) + ph ((A.chart k).symm z)) ∘
-        (A.chart k ∘ (B.chart j).symm)) := by
+  have hC : ContDiffAt ℝ 2
+      (fun z => th.φ x₀ ((A.chart k).symm z) + ph ((A.chart k).symm z))
+      ((A.chart k ∘ (B.chart j).symm) y) :=
+    hC1.add hC2
+  have hev
+      : (fun z => th.φ x₀ ((B.chart j).symm z) + ph ((B.chart j).symm z)) =ᶠ[𝓝 y]
+        ((fun z => th.φ x₀ ((A.chart k).symm z) + ph ((A.chart k).symm z)) ∘
+          (A.chart k ∘ (B.chart j).symm)) := by
     have h1 : ∀ᶠ z in 𝓝 y, (B.chart j).symm z ∈ (A.chart k).source :=
       ((B.chart j).continuousAt_symm hy.1).eventually ((A.chart k).open_source.mem_nhds hk)
     filter_upwards [h1] with z hz

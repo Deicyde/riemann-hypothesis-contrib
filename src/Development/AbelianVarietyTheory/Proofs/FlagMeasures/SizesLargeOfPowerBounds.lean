@@ -9,11 +9,12 @@ open Formalism.MainNotions Formalism.BasicNotions Filter
 
 namespace GlobalTheory
 
-theorem sizes_large_of_power_bounds {D : D7} (L : SizeData₂ D) (h : SizesAt L) (M : ℝ)
-    (h1 : M ≤ L.sc.x ^ (1 / 4 : ℝ)) (h2 : M ≤ L.sc.x ^ L.sc.eps)
-    (h3 : 5 * |M| * Real.log L.sc.x ≤ L.sc.x ^ L.sc.eps) :
-    M ≤ (D.R.m : ℝ) ∧ M ≤ L.sc.L ∧ (D.R.k : ℝ) ^ M ≤ L.sc.b ∧ D.host.rdE ≤ L.sc.b ∧
-      (D.R.k : ℝ) * (D.R.m : ℝ) ^ 10 ≤ (D.s.Del : ℝ) := by
+theorem sizes_large_of_power_bounds
+    {D : D7} (L : SizeData₂ D) (h : SizesAt L)
+    (M : ℝ) (h1 : M ≤ L.sc.x ^ (1 / 4 : ℝ)) (h2 : M ≤ L.sc.x ^ L.sc.eps)
+    (h3 : 5 * |M| * Real.log L.sc.x ≤ L.sc.x ^ L.sc.eps)
+    : M ≤ (D.R.m : ℝ) ∧ M ≤ L.sc.L ∧ (D.R.k : ℝ) ^ M ≤ L.sc.b ∧ D.host.rdE ≤ L.sc.b
+      ∧ (D.R.k : ℝ) * (D.R.m : ℝ) ^ 10 ≤ (D.s.Del : ℝ) := by
   obtain ⟨-, hM, hK, -, hT, hC, hQ, -, -, -, -, -, -, -, -, -, hD, -⟩ := h
   have hx1 := L.sc.one_lt_alt
   have hx0 : 0 < L.sc.x := by linarith
@@ -37,10 +38,12 @@ theorem sizes_large_of_power_bounds {D : D7} (L : SizeData₂ D) (h : SizesAt L)
       refine hK.2.trans (Real.rpow_le_rpow_of_exponent_le hx1.le ?_)
       unfold szTh
       linarith
-    calc (D.R.k : ℝ) ^ M ≤ (D.R.k : ℝ) ^ |M| := Real.rpow_le_rpow_of_exponent_le hk1 (le_abs_self M)
+    calc
+      (D.R.k : ℝ) ^ M
+        ≤ (D.R.k : ℝ) ^ |M| := Real.rpow_le_rpow_of_exponent_le hk1 (le_abs_self M)
       _ ≤ (L.sc.x ^ (5 : ℝ)) ^ |M| := Real.rpow_le_rpow (by linarith) hk5 (abs_nonneg M)
       _ = Real.exp (5 * |M| * Real.log L.sc.x) := by
-          rw [← Real.rpow_mul hx0.le, Real.rpow_def_of_pos hx0, mul_comm]
+        rw [← Real.rpow_mul hx0.le, Real.rpow_def_of_pos hx0, mul_comm]
       _ ≤ L.sc.b := Real.exp_le_exp.mpr h3
   · have hr := hQ.2.2.2.2.2.2.2
     have hs : Real.sqrt ((D.host.q : ℝ) * D.host.d) ≤ (D.host.q : ℝ) * D.host.d := by
@@ -58,18 +61,23 @@ theorem sizes_large_of_power_bounds {D : D7} (L : SizeData₂ D) (h : SizesAt L)
     rcases le_total (szCond L) 1 with h | h
     · exact h.trans hb1
     · have ht : (1 : ℝ) ≤ (D.R.t : ℝ) ^ 150 := one_le_pow₀ hT.1
-      calc szCond L ≤ szCond L ^ 36 := le_self_pow₀ h (by norm_num)
+      calc
+        szCond L
+          ≤ szCond L ^ 36 := le_self_pow₀ h (by norm_num)
         _ ≤ szCond L ^ 36 * (D.R.t : ℝ) ^ 150 := le_mul_of_one_le_right (by positivity) ht
         _ ≤ Real.sqrt L.sc.b := hC
         _ ≤ L.sc.b := by
           rw [Real.sqrt_le_left (by linarith)]
           nlinarith
   · refine le_trans ?_ hD.1
-    have : (D.R.k : ℝ) ≤ (D.R.N D.R.m : ℝ) := by
-      exact_mod_cast Nat.le_add_right _ _
+    have : (D.R.k : ℝ) ≤ (D.R.N D.R.m : ℝ) := by exact_mod_cast Nat.le_add_right _ _
     gcongr
 
-theorem family_sizes_eventually_large : ∀ (eps : ℝ) (Fm : FamP eps) (M : ℝ), ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, Fm.x1 < x ∧ M ≤ ((Fm.D x i).R.m : ℝ) ∧ M ≤ (Fm.L x i).sc.L ∧ ((Fm.D x i).R.k : ℝ) ^ M ≤ (Fm.L x i).sc.b ∧ (Fm.D x i).host.rdE ≤ (Fm.L x i).sc.b ∧ ((Fm.D x i).R.k : ℝ) * ((Fm.D x i).R.m : ℝ) ^ 10 ≤ ((Fm.D x i).s.Del : ℝ) := by
+theorem family_sizes_eventually_large
+    : ∀ (eps : ℝ) (Fm : FamP eps) (M : ℝ), ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x,
+      Fm.x1 < x ∧ M ≤ ((Fm.D x i).R.m : ℝ) ∧ M ≤ (Fm.L x i).sc.L
+        ∧ ((Fm.D x i).R.k : ℝ) ^ M ≤ (Fm.L x i).sc.b ∧ (Fm.D x i).host.rdE ≤ (Fm.L x i).sc.b
+        ∧ ((Fm.D x i).R.k : ℝ) * ((Fm.D x i).R.m : ℝ) ^ 10 ≤ ((Fm.D x i).s.Del : ℝ) := by
   intro eps Fm M
   have he : 0 < eps := by
     obtain ⟨i⟩ := Fm.Ix_zero
@@ -86,7 +94,7 @@ theorem family_sizes_eventually_large : ∀ (eps : ℝ) (Fm : FamP eps) (M : ℝ
   obtain ⟨x0, hx0⟩ := eventually_atTop.mp (e1.and (e2.and (e3.and (eventually_gt_atTop Fm.x1))))
   refine ⟨x0, fun x hx i => ?_⟩
   obtain ⟨a1, a2, a3, a4⟩ := hx0 x hx
-  refine ⟨a4, sizes_large_of_power_bounds (Fm.L x i) (Fm.sizes x a4 i) M ?_ ?_ ?_⟩ <;>
-    simp only [Fm.L_x x i a4, Fm.L_eps x i] <;> assumption
+  refine ⟨a4, sizes_large_of_power_bounds (Fm.L x i) (Fm.sizes x a4 i) M ?_ ?_ ?_⟩
+    <;> simp only [Fm.L_x x i a4, Fm.L_eps x i] <;> assumption
 
 end GlobalTheory

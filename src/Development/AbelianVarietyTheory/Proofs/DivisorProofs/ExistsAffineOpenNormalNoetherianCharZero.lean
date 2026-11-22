@@ -8,20 +8,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GlueProjecti
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem exists_mem_mul_eq_zero_of_algebraMap_eq_zero {R S : Type*} [CommRing R] [CommRing S]
-    [Algebra R S] [IsNoetherianRing R] (M : Submonoid R) [IsLocalization M S] :
-    ∃ f ∈ M, ∀ a : R, algebraMap R S a = 0 → f * a = 0 := by
+theorem exists_mem_mul_eq_zero_of_algebraMap_eq_zero
+    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] [IsNoetherianRing R]
+    (M : Submonoid R) [IsLocalization M S]
+    : ∃ f ∈ M, ∀ a : R, algebraMap R S a = 0 → f * a = 0 := by
   classical
-  obtain ⟨s, hs⟩ := (IsNoetherian.noetherian (RingHom.ker (algebraMap R S)) :
-    (RingHom.ker (algebraMap R S)).FG)
+  obtain ⟨s, hs⟩ :=
+    (IsNoetherian.noetherian (RingHom.ker (algebraMap R S)) : (RingHom.ker (algebraMap R S)).FG)
   have hk : ∀ a ∈ s, ∃ m : M, (m : R) * a = 0 := by
     intro a ha
     have : a ∈ RingHom.ker (algebraMap R S) := hs ▸ Submodule.subset_span ha
@@ -31,26 +35,27 @@ theorem exists_mem_mul_eq_zero_of_algebraMap_eq_zero {R S : Type*} [CommRing R] 
   have key : ∀ a ∈ Submodule.span R (s : Set R), (∏ a ∈ s, (m a : R)) * a = 0 := by
     intro a ha
     induction ha using Submodule.span_induction with
-    | mem b hb =>
-        rw [← Finset.prod_erase_mul _ _ hb, _root_.mul_assoc, hm b hb, mul_zero]
+    | mem b hb => rw [← Finset.prod_erase_mul _ _ hb, _root_.mul_assoc, hm b hb, mul_zero]
     | zero => simp
     | add b c _ _ hb hc => rw [mul_add, hb, hc, add_zero]
     | smul r b _ hb => rw [smul_eq_mul, _root_.mul_left_comm, hb, mul_zero]
   intro a ha
   exact key a (hs ▸ ha)
 
-theorem exists_affineOpen_isIntegrallyClosed_charZero (X : Scheme.{0})
-    (hN : Geo.Tor.IsNormalScheme X) (hL : IsLocallyNoetherian X)
-    (h0 : ∀ x : X, CharZero (X.residueField x)) (x : X) :
-    ∃ U : X.affineOpens, x ∈ (U : X.Opens) ∧ IsDomain Γ(X, U) ∧ IsNoetherianRing Γ(X, U) ∧
-      IsIntegrallyClosed Γ(X, U) ∧ CharZero Γ(X, U) := by
+theorem exists_affineOpen_isIntegrallyClosed_charZero
+    (X : Scheme.{0}) (hN : Geo.Tor.IsNormalScheme X) (hL : IsLocallyNoetherian X)
+    (h0 : ∀ x : X, CharZero (X.residueField x)) (x : X)
+    : ∃ U : X.affineOpens,
+      x ∈ (U : X.Opens) ∧ IsDomain Γ(X, U) ∧ IsNoetherianRing Γ(X, U) ∧ IsIntegrallyClosed Γ(X, U)
+        ∧ CharZero Γ(X, U) := by
   obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
   haveI : IsNoetherianRing Γ(X, V) := IsLocallyNoetherian.component_noetherian ⟨V, hV⟩
   letI := X.presheaf.algebra_section_stalk (U := V) ⟨x, hxV⟩
   haveI := hV.isLocalization_stalk ⟨x, hxV⟩
-  obtain ⟨f, hfM, hf⟩ := exists_mem_mul_eq_zero_of_algebraMap_eq_zero (R := Γ(X, V))
-    (S := X.presheaf.stalk x) (hV.primeIdealOf ⟨x, hxV⟩).asIdeal.primeCompl
+  obtain ⟨f, hfM, hf⟩ :=
+    exists_mem_mul_eq_zero_of_algebraMap_eq_zero (R := Γ(X, V)) (S := X.presheaf.stalk x)
+      (hV.primeIdealOf ⟨x, hxV⟩).asIdeal.primeCompl
   have hU : IsAffineOpen (X.basicOpen f) := hV.basicOpen f
   have hxU : x ∈ X.basicOpen f := by
     rw [X.mem_basicOpen f x hxV]
@@ -60,11 +65,13 @@ theorem exists_affineOpen_isIntegrallyClosed_charZero (X : Scheme.{0})
     (X.presheaf.map (homOfLE (X.basicOpen_le f)).op).hom.toAlgebra
   haveI : IsLocalization.Away f Γ(X, X.basicOpen f) := hV.isLocalization_basicOpen f
   let g : Γ(X, X.basicOpen f) →+* X.presheaf.stalk x := (X.presheaf.germ _ x hxU).hom
-  have hcomp : ∀ a : Γ(X, V), g (algebraMap Γ(X, V) Γ(X, X.basicOpen f) a) =
-      algebraMap Γ(X, V) (X.presheaf.stalk x) a := fun a =>
-    X.presheaf.germ_res_apply (homOfLE (X.basicOpen_le f)) x hxU a
+  have hcomp
+      : ∀ a : Γ(X, V),
+        g (algebraMap Γ(X, V) Γ(X, X.basicOpen f) a) = algebraMap Γ(X, V) (X.presheaf.stalk x) a :=
+    fun a => X.presheaf.germ_res_apply (homOfLE (X.basicOpen_le f)) x hxU a
   have hinj : Function.Injective g := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro σ hσ
     obtain ⟨⟨r, m⟩, hrm⟩ := IsLocalization.surj (Submonoid.powers f) σ
     have hr : algebraMap Γ(X, V) (X.presheaf.stalk x) r = 0 := by

@@ -9,16 +9,20 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
 
 namespace GlobalTheory.CompanionTheory.CotLift
 
-theorem spMap_comp_spMap {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (g : A →+* B) (h : B →+* C) :
-    spMap h ≫ spMap g = spMap (h.comp g) := by
+theorem spMap_comp_spMap
+    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (g : A →+* B) (h : B →+* C)
+    : spMap h ≫ spMap g = spMap (h.comp g) := by
   rw [← Spec.map_comp]; rfl
 
-theorem spMap_inj {A B : Type} [CommRing A] [CommRing B] {f g : A →+* B} (h : spMap f = spMap g) : f = g := by
+theorem spMap_inj {A B : Type} [CommRing A] [CommRing B] {f g : A →+* B} (h : spMap f = spMap g)
+    : f = g := by
   have := Spec.map_injective h
   exact congrArg CommRingCat.Hom.hom this
 
@@ -47,19 +51,22 @@ def KerW.val (w : KerW α ε) : P := Subtype.val (p := fun x ↦ x ∈ RingHom.k
 
 theorem KerW.ext' {v w : KerW α ε} (h : v.val = w.val) : v = w := Subtype.ext h
 
-@[simp] theorem KerW.val_smul (r : R) (w : KerW α ε) : (r • w).val = α r * w.val := rfl
+@[simp]
+theorem KerW.val_smul (r : R) (w : KerW α ε) : (r • w).val = α r * w.val := rfl
 
 theorem KerW.eps_val (w : KerW α ε) : ε w.val = 0 := w.2
 
-def pr (h : ε.comp α = RingHom.id R) (a : P) : KerW α ε :=
-  ⟨a - α (ε a), by
+def pr (h : ε.comp α = RingHom.id R) (a : P) : KerW α ε := ⟨
+  a - α (ε a),
+  by
     have e : ε (α (ε a)) = ε a := congrArg (fun f ↦ f (ε a)) h
-    simp [RingHom.mem_ker, e]⟩
+    simp [RingHom.mem_ker, e]
+⟩
 
 theorem eps_alpha (h : ε.comp α = RingHom.id R) (r : R) : ε (α r) = r := congrArg (fun f ↦ f r) h
 
-def theta (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) :
-    P →+* TrivSqZeroExt R (KerW α ε) where
+def theta (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0)
+    : P →+* TrivSqZeroExt R (KerW α ε) where
   toFun a := TrivSqZeroExt.inl (ε a) + TrivSqZeroExt.inr (pr h a)
   map_one' := by
     apply TrivSqZeroExt.ext
@@ -89,31 +96,40 @@ def theta (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b 
     · simp
     · apply KerW.ext'
       simp
-      change a * b - α (ε (a * b)) =
-        α (ε a) * (b - α (ε b)) + α (ε b) * (a - α (ε a))
+      change a * b - α (ε (a * b)) = α (ε a) * (b - α (ε b)) + α (ε b) * (a - α (ε a))
       simp only [map_mul]
       linear_combination e
 
-@[simp] theorem theta_fst (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) (a : P) :
-    (theta h hsq a).fst = ε a := by simp [theta]
+@[simp]
+theorem theta_fst
+    (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) (a : P)
+    : (theta h hsq a).fst = ε a := by
+  simp [theta]
 
-@[simp] theorem theta_snd (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) (a : P) :
-    (theta h hsq a).snd = pr h a := by simp [theta]
+@[simp]
+theorem theta_snd
+    (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) (a : P)
+    : (theta h hsq a).snd = pr h a := by
+  simp [theta]
 
 end Ker
 
 section Main
 
-variable {R P B M : Type} [CommRing R] [CommRing P] [CommRing B] [Algebra R B] [AddCommGroup M] [Module B M]
-  [Module Bᵐᵒᵖ M] [IsCentralScalar B M] [Module R M] [IsScalarTower R B M] {α : R →+* P} {ε : P →+* R}
+variable
+  {R P B M : Type} [CommRing R] [CommRing P] [CommRing B] [Algebra R B] [AddCommGroup M]
+  [Module B M] [Module Bᵐᵒᵖ M] [IsCentralScalar B M] [Module R M] [IsScalarTower R B M]
+  {α : R →+* P} {ε : P →+* R}
 
 theorem pr_val_self (h : ε.comp α = RingHom.id R) (w : KerW α ε) : pr h w.val = w :=
   KerW.ext' (by
     change w.val - α (ε w.val) = w.val
     simp [KerW.eps_val])
 
-def uOf (φ : P →+* TrivSqZeroExt B M) (hα : φ.comp α = (TrivSqZeroExt.inlHom B M).comp (algebraMap R B))
-    (hf : ∀ a, (φ a).fst = algebraMap R B (ε a)) : KerW α ε →ₗ[R] M where
+def uOf
+    (φ : P →+* TrivSqZeroExt B M) (hα : φ.comp α = (TrivSqZeroExt.inlHom B M).comp (algebraMap R B))
+    (hf : ∀ a, (φ a).fst = algebraMap R B (ε a))
+    : KerW α ε →ₗ[R] M where
   toFun w := (φ w.val).snd
   map_add' v w := by
     change (φ (v.val + w.val)).snd = (φ v.val).snd + (φ w.val).snd
@@ -121,38 +137,66 @@ def uOf (φ : P →+* TrivSqZeroExt B M) (hα : φ.comp α = (TrivSqZeroExt.inlH
   map_smul' r w := by
     have e : φ (α r) = TrivSqZeroExt.inl (algebraMap R B r) := congrArg (fun f ↦ f r) hα
     have z : (φ w.val).fst = 0 := by rw [hf, KerW.eps_val, map_zero]
-    simp only [KerW.val_smul, map_mul, e, RingHom.id_apply, TrivSqZeroExt.snd_mul, TrivSqZeroExt.fst_inl,
-      TrivSqZeroExt.snd_inl, smul_zero, add_zero, algebraMap_smul]
+    simp only [KerW.val_smul, map_mul, e, RingHom.id_apply, TrivSqZeroExt.snd_mul,
+      TrivSqZeroExt.fst_inl, TrivSqZeroExt.snd_inl, smul_zero, add_zero, algebraMap_smul]
 
-theorem tsz_theta (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0)
+theorem tsz_theta
+    (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0)
     (φ : P →+* TrivSqZeroExt B M) (hα : φ.comp α = (TrivSqZeroExt.inlHom B M).comp (algebraMap R B))
-    (hf : ∀ a, (φ a).fst = algebraMap R B (ε a)) :
-    (tsz (uOf φ hα hf)).comp (theta h hsq) = φ := by
+    (hf : ∀ a, (φ a).fst = algebraMap R B (ε a))
+    : (tsz (uOf φ hα hf)).comp (theta h hsq) = φ := by
   refine RingHom.ext fun a ↦ ?_
   have e : φ (α (ε a)) = TrivSqZeroExt.inl (algebraMap R B (ε a)) := congrArg (fun f ↦ f (ε a)) hα
   have s : (uOf φ hα hf) (pr h a) = (φ a).snd := by
     change (φ (a - α (ε a))).snd = _
     simp [e]
   apply TrivSqZeroExt.ext
-  · change (TrivSqZeroExt.inl (algebraMap R B (theta h hsq a).fst) +
-      TrivSqZeroExt.inr ((uOf φ hα hf) (theta h hsq a).snd) : TrivSqZeroExt B M).fst = _
+  · change (TrivSqZeroExt.inl (algebraMap R B (theta h hsq a).fst)
+          + TrivSqZeroExt.inr ((uOf φ hα hf) (theta h hsq a).snd)
+        : TrivSqZeroExt B M).fst
+      = _
     simp [hf]
-  · change (TrivSqZeroExt.inl (algebraMap R B (theta h hsq a).fst) +
-      TrivSqZeroExt.inr ((uOf φ hα hf) (theta h hsq a).snd) : TrivSqZeroExt B M).snd = _
+  · change (TrivSqZeroExt.inl (algebraMap R B (theta h hsq a).fst)
+          + TrivSqZeroExt.inr ((uOf φ hα hf) (theta h hsq a).snd)
+        : TrivSqZeroExt B M).snd
+      = _
     simp [s]
 
-theorem snd_tsz_theta (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0)
-    (u : KerW α ε →ₗ[R] M) (w : KerW α ε) : ((tsz (B := B) u).comp (theta h hsq) w.val).snd = u w := by
-  change (TrivSqZeroExt.inl (algebraMap R B (theta h hsq w.val).fst) +
-    TrivSqZeroExt.inr (u (theta h hsq w.val).snd) : TrivSqZeroExt B M).snd = _
+theorem snd_tsz_theta
+    (h : ε.comp α = RingHom.id R) (hsq : ∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0)
+    (u : KerW α ε →ₗ[R] M) (w : KerW α ε)
+    : ((tsz (B := B) u).comp (theta h hsq) w.val).snd = u w := by
+  change (TrivSqZeroExt.inl (algebraMap R B (theta h hsq w.val).fst)
+        + TrivSqZeroExt.inr (u (theta h hsq w.val).snd)
+      : TrivSqZeroExt B M).snd
+    = _
   simp [pr_val_self]
 
 end Main
 
-theorem isCot_of_lifting : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R) (e : Sp R ⟶ X) (P : Type) [CommRing P] (α : R →+* P) (ε : P →+* R) (j : Sp P ⟶ X), ε.comp α = RingHom.id R → (∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) → j ≫ s = spMap α → spMap ε ≫ j = e → Mono j → (∀ (Q B : Type) [CommRing Q] [CommRing B] (q : Q →+* B) (ρ : R →+* B) (y : Sp Q ⟶ X), Function.Surjective q → (∀ a b : Q, q a = 0 → q b = 0 → a * b = 0) → spMap q ≫ y = spMap ρ ≫ e → ∃ φ : P →+* Q, spMap φ ≫ j = y) → ∃ (W : Type) (_ : AddCommGroup W) (_ : Module R W) (_ : Module Rᵐᵒᵖ W) (_ : IsCentralScalar R W) (y₀ : Sp (TrivSqZeroExt R W) ⟶ X), IsCot s e W y₀ := by
+theorem isCot_of_lifting
+    : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R) (e : Sp R ⟶ X) (P : Type)
+        [CommRing P] (α : R →+* P) (ε : P →+* R) (j : Sp P ⟶ X),
+      ε.comp α = RingHom.id R → (∀ a b : P, ε a = 0 → ε b = 0 → a * b = 0) → j ≫ s = spMap α
+        → spMap ε ≫ j = e → Mono j
+        → (∀ (Q B : Type) [CommRing Q] [CommRing B] (q : Q →+* B) (ρ : R →+* B) (y : Sp Q ⟶ X),
+          Function.Surjective q → (∀ a b : Q, q a = 0 → q b = 0 → a * b = 0)
+            → spMap q ≫ y = spMap ρ ≫ e
+            → ∃ φ : P →+* Q, spMap φ ≫ j = y)
+        → ∃ (W : Type) (_ : AddCommGroup W) (_ : Module R W) (_ : Module Rᵐᵒᵖ W)
+            (_ : IsCentralScalar R W) (y₀ : Sp (TrivSqZeroExt R W) ⟶ X),
+          IsCot s e W y₀ := by
   intro R _ X s e P _ α ε j h hsq hj hje hm hlift
   have := hm
-  refine ⟨KerW α ε, inferInstance, inferInstance, inferInstance, inferInstance, spMap (theta h hsq) ≫ j, ?_⟩
+  refine ⟨
+    KerW α ε,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    spMap (theta h hsq) ≫ j,
+    ?_
+  ⟩
   unfold IsCot
   refine ⟨?_, ?_, ?_⟩
   · have e1 : (theta h hsq).comp α = TrivSqZeroExt.inlHom R (KerW α ε) := by
@@ -166,14 +210,16 @@ theorem isCot_of_lifting : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X �
       RingHom.ext fun a ↦ theta_fst h hsq a
     rw [← Category.assoc, spMap_comp_spMap, e1, hje]
   · intro B _ _ M _ _ _ _ _ _ y hy1 hy2
-    obtain ⟨φ, hφ⟩ := hlift (TrivSqZeroExt B M) B (TrivSqZeroExt.fstHom B B M).toRingHom (algebraMap R B) y
-      (fun b ↦ ⟨TrivSqZeroExt.inl b, rfl⟩)
-      (fun a b ha hb ↦ by
-        have ha' : a.fst = 0 := ha
-        have hb' : b.fst = 0 := hb
-        apply TrivSqZeroExt.ext <;> simp [ha', hb']) hy2
-    have hα : φ.comp α = (TrivSqZeroExt.inlHom B M).comp (algebraMap R B) := spMap_inj (by
-      rw [← spMap_comp_spMap, ← hj, ← Category.assoc, hφ, hy1])
+    obtain ⟨φ, hφ⟩ :=
+      hlift (TrivSqZeroExt B M) B (TrivSqZeroExt.fstHom B B M).toRingHom (algebraMap R B) y
+        (fun b ↦ ⟨TrivSqZeroExt.inl b, rfl⟩)
+        (fun a b ha hb ↦ by
+          have ha' : a.fst = 0 := ha
+          have hb' : b.fst = 0 := hb
+          apply TrivSqZeroExt.ext <;> simp [ha', hb'])
+        hy2
+    have hα : φ.comp α = (TrivSqZeroExt.inlHom B M).comp (algebraMap R B) :=
+      spMap_inj (by rw [← spMap_comp_spMap, ← hj, ← Category.assoc, hφ, hy1])
     have hf : (TrivSqZeroExt.fstHom B B M).toRingHom.comp φ = (algebraMap R B).comp ε :=
       spMap_inj ((cancel_mono j).1 (by
         rw [← spMap_comp_spMap, Category.assoc, hφ, hy2, ← spMap_comp_spMap, Category.assoc, hje]))
@@ -182,9 +228,10 @@ theorem isCot_of_lifting : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X �
     · change y = spMap (tsz (uOf φ hα hf')) ≫ spMap (theta h hsq) ≫ j
       rw [← Category.assoc, spMap_comp_spMap, tsz_theta, hφ]
     · intro u' hu'
-      have e1 : (tsz u').comp (theta h hsq) = φ := spMap_inj ((cancel_mono j).1 (by
-        rw [← spMap_comp_spMap, Category.assoc, hφ]
-        exact hu'.symm))
+      have e1 : (tsz u').comp (theta h hsq) = φ :=
+        spMap_inj ((cancel_mono j).1 (by
+          rw [← spMap_comp_spMap, Category.assoc, hφ]
+          exact hu'.symm))
       refine LinearMap.ext fun w ↦ ?_
       rw [← snd_tsz_theta (B := B) h hsq u' w, e1]
       rfl

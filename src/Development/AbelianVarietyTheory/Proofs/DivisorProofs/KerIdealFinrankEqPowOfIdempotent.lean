@@ -8,14 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinrankKerne
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory
 
-theorem natSeq_pow_of_mul_eq {p h : ℕ} (hp : p.Prime) (a b : ℕ → ℕ)
-    (hab : ∀ n, a n * b n = p ^ (n * h))
-    (ha : ∀ n, a (n + 1) ≤ a 1 * a n) (hb : ∀ n, b (n + 1) ≤ b 1 * b n) :
-    ∃ s : ℕ, ∀ n, a n = p ^ (n * s) := by
+theorem natSeq_pow_of_mul_eq
+    {p h : ℕ} (hp : p.Prime)
+    (a b : ℕ → ℕ) (hab : ∀ n, a n * b n = p ^ (n * h)) (ha : ∀ n, a (n + 1) ≤ a 1 * a n)
+    (hb : ∀ n, b (n + 1) ≤ b 1 * b n)
+    : ∃ s : ℕ, ∀ n, a n = p ^ (n * s) := by
   have h1 : a 1 * b 1 = p ^ h := by simpa using hab 1
   obtain ⟨s, hs, hs'⟩ := (Nat.dvd_prime_pow hp).1 (Dvd.intro _ h1)
   obtain ⟨t, ht, ht'⟩ := (Nat.dvd_prime_pow hp).1 (Dvd.intro_left _ h1)
@@ -30,7 +32,9 @@ theorem natSeq_pow_of_mul_eq {p h : ℕ} (hp : p.Prime) (a b : ℕ → ℕ)
     induction n with
     | zero => simp [ha0]
     | succ n ih =>
-      calc a (n + 1) ≤ a 1 * a n := ha n
+      calc
+        a (n + 1)
+          ≤ a 1 * a n := ha n
         _ ≤ p ^ s * p ^ (n * s) := by rw [hs']; exact Nat.mul_le_mul_left _ ih
         _ = p ^ ((n + 1) * s) := by rw [← pow_add]; ring_nf
   have hble : ∀ n, b n ≤ p ^ (n * t) := by
@@ -38,7 +42,9 @@ theorem natSeq_pow_of_mul_eq {p h : ℕ} (hp : p.Prime) (a b : ℕ → ℕ)
     induction n with
     | zero => simp [hb0]
     | succ n ih =>
-      calc b (n + 1) ≤ b 1 * b n := hb n
+      calc
+        b (n + 1)
+          ≤ b 1 * b n := hb n
         _ ≤ p ^ t * p ^ (n * t) := by rw [ht']; exact Nat.mul_le_mul_left _ ih
         _ = p ^ ((n + 1) * t) := by rw [← pow_add]; ring_nf
   refine ⟨s, fun n => ?_⟩
@@ -46,19 +52,23 @@ theorem natSeq_pow_of_mul_eq {p h : ℕ} (hp : p.Prime) (a b : ℕ → ℕ)
   have hlt : a n < p ^ (n * s) := lt_of_le_of_ne (hale n) hne
   have hpos : 0 < p ^ (n * t) := pow_pos hp.pos _
   have key : a n * b n < p ^ (n * s) * p ^ (n * t) :=
-    calc a n * b n ≤ a n * p ^ (n * t) := Nat.mul_le_mul_left _ (hble n)
+    calc
+      a n * b n
+        ≤ a n * p ^ (n * t) := Nat.mul_le_mul_left _ (hble n)
       _ < p ^ (n * s) * p ^ (n * t) := Nat.mul_lt_mul_of_pos_right hlt hpos
   rw [hab n, ← pow_add, ← Nat.mul_add, hst] at key
   exact lt_irrefl _ key
 
-theorem kerIdeal_finrank_eq_pow_of_idempotent : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k]
-    (G : PDivGroup p k) (u v : G ⟶ G), u + v = 𝟙 G → u ≫ v = 0 → v ≫ u = 0 →
-    ∃ h₀ : ℕ, ∀ n : ℕ, Module.finrank k (G.A n ⧸ kerIdeal (u.app n)) = p ^ (n * h₀) := by
+theorem kerIdeal_finrank_eq_pow_of_idempotent
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] (G : PDivGroup p k) (u v : G ⟶ G),
+      u + v = 𝟙 G → u ≫ v = 0 → v ≫ u = 0
+        → ∃ h₀ : ℕ, ∀ n : ℕ, Module.finrank k (G.A n ⧸ kerIdeal (u.app n)) = p ^ (n * h₀) := by
   intro p _ k _ G u v huv h1 h2
   exact natSeq_pow_of_mul_eq (Fact.out : p.Prime)
     (fun n => Module.finrank k (G.A n ⧸ kerIdeal (u.app n)))
     (fun n => Module.finrank k (G.A n ⧸ kerIdeal (v.app n)))
     (GlobalTheory.T.finrank_kernelIdeal_mul_of_idempotents p k G u v huv h1 h2)
-    (GlobalTheory.T.finrank_kernelIdeal_succ_le_mul_levels p k G u) (GlobalTheory.T.finrank_kernelIdeal_succ_le_mul_levels p k G v)
+    (GlobalTheory.T.finrank_kernelIdeal_succ_le_mul_levels p k G u)
+    (GlobalTheory.T.finrank_kernelIdeal_succ_le_mul_levels p k G v)
 
 end GlobalTheory

@@ -9,11 +9,10 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.splitPrime_liesOver_span_iff {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
-    (P : Ideal (𝓞 E)) [hP : P.IsPrime] :
-    P.LiesOver (Ideal.span {(p : ℤ)}) ↔ ((p : ℕ) : 𝓞 E) ∈ P := by
+theorem _root_.GlobalTheory.splitPrime_liesOver_span_iff
+    {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) (P : Ideal (𝓞 E)) [hP : P.IsPrime]
+    : P.LiesOver (Ideal.span {(p : ℤ)}) ↔ ((p : ℕ) : 𝓞 E) ∈ P := by
   rw [Ideal.liesOver_iff]
   constructor
   · intro h
@@ -26,13 +25,14 @@ theorem _root_.GlobalTheory.splitPrime_liesOver_span_iff {E : Type} [Field E] [N
     rw [Ideal.span_le, Set.singleton_subset_iff]
     simpa [Ideal.under, Ideal.mem_comap] using h
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.unramified_degree_one_of_ncard_placesOver (E : Type) [Field E] [NumberField E] (p : ℕ)
+theorem _root_.GlobalTheory.unramified_degree_one_of_ncard_placesOver
+    (E : Type) [Field E] [NumberField E]
+    (p : ℕ)
     (hp : p.Prime) (h : (_root_.Formalism.BasicNotions.placesOver E p).ncard = Module.finrank ℚ E)
-    (v : HeightOneSpectrum (𝓞 E)) (hv : v ∈ _root_.Formalism.BasicNotions.placesOver E p) :
-    ((p : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2 ∧ v.asIdeal.ramificationIdx ℤ = 1 ∧
-      v.asIdeal.inertiaDeg ℤ = 1 := by
+    (v : HeightOneSpectrum (𝓞 E)) (hv : v ∈ _root_.Formalism.BasicNotions.placesOver E p)
+    : ((p : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2 ∧ v.asIdeal.ramificationIdx ℤ = 1
+      ∧ v.asIdeal.inertiaDeg ℤ = 1 := by
   set q : Ideal ℤ := Ideal.span {(p : ℤ)} with hq
   haveI hqmax : q.IsMaximal :=
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hp).irreducible
@@ -45,8 +45,10 @@ theorem _root_.GlobalTheory.unramified_degree_one_of_ncard_placesOver (E : Type)
   haveI : v.asIdeal.LiesOver q := (_root_.GlobalTheory.splitPrime_liesOver_span_iff hp v.asIdeal).2 hmemv
   have hcard : (IsDedekindDomain.primesOverFinset q (𝓞 E)).card = Module.finrank ℚ E := by
     rw [← h, ← Set.ncard_coe_finset, IsDedekindDomain.coe_primesOverFinset hqbot]
-    have himage : (fun w : HeightOneSpectrum (𝓞 E) => w.asIdeal) '' _root_.Formalism.BasicNotions.placesOver E p =
-        q.primesOver (𝓞 E) := by
+    have himage
+        : (fun w : HeightOneSpectrum (𝓞 E) => w.asIdeal)
+            '' _root_.Formalism.BasicNotions.placesOver E p
+          = q.primesOver (𝓞 E) := by
       ext P
       constructor
       · rintro ⟨w, hw, rfl⟩
@@ -55,7 +57,8 @@ theorem _root_.GlobalTheory.unramified_degree_one_of_ncard_placesOver (E : Type)
           exact hw
         exact ⟨w.isPrime, (_root_.GlobalTheory.splitPrime_liesOver_span_iff hp w.asIdeal).2 hw'⟩
       · rintro ⟨hPp, hPl⟩
-        have hPmem : ((p : ℕ) : 𝓞 E) ∈ P := (_root_.GlobalTheory.splitPrime_liesOver_span_iff hp P).1 hPl
+        have hPmem : ((p : ℕ) : 𝓞 E) ∈ P :=
+          (_root_.GlobalTheory.splitPrime_liesOver_span_iff hp P).1 hPl
         have hPbot : P ≠ ⊥ := by
           intro hb
           rw [hb, Ideal.mem_bot] at hPmem
@@ -66,8 +69,9 @@ theorem _root_.GlobalTheory.unramified_degree_one_of_ncard_placesOver (E : Type)
     rw [← himage, Set.ncard_image_of_injective _ (fun a b hab => HeightOneSpectrum.ext hab)]
   have hsum := Ideal.sum_ramification_inertia (𝓞 E) ℚ E (p := q) hqbot
   rw [← hcard, Finset.card_eq_sum_ones] at hsum
-  have hpos : ∀ P ∈ IsDedekindDomain.primesOverFinset q (𝓞 E),
-      1 ≤ q.ramificationIdx' P * q.inertiaDeg' P := by
+  have hpos
+      : ∀ P ∈ IsDedekindDomain.primesOverFinset q (𝓞 E),
+        1 ≤ q.ramificationIdx' P * q.inertiaDeg' P := by
     intro P hP
     rw [IsDedekindDomain.mem_primesOverFinset_iff hqbot] at hP
     obtain ⟨hPp, hPl⟩ := hP
@@ -90,8 +94,8 @@ theorem _root_.GlobalTheory.unramified_degree_one_of_ncard_placesOver (E : Type)
       simpa using hsq
     unfold Ideal.ramificationIdx' at he
     by_cases hb : BddAbove {n | Ideal.map (algebraMap ℤ (𝓞 E)) q ≤ v.asIdeal ^ n}
-    · have h2 := le_csSup hb (show 2 ∈ {n | Ideal.map (algebraMap ℤ (𝓞 E)) q ≤ v.asIdeal ^ n}
-        from hle)
+    · have h2 :=
+        le_csSup hb (show 2 ∈ {n | Ideal.map (algebraMap ℤ (𝓞 E)) q ≤ v.asIdeal ^ n} from hle)
       omega
     · rw [Nat.sSup_of_not_bddAbove hb] at he
       exact zero_ne_one he

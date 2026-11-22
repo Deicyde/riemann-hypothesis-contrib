@@ -8,18 +8,21 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₂
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.MainNotions.LatticeGluingRadicals
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt
+  Formalism.MainNotions.LatticeGluingRadicals
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Cyc
 
-variable {D : D7} {V : Type} [AddCommGroup V] [Module D.host.E V] [Module (𝓞 D.host.E) V]
-  [IsScalarTower (𝓞 D.host.E) D.host.E V] (h : V →ₗ⋆[D.host.E] V →ₗ[D.host.E] D.host.E)
-  (M : Submodule (𝓞 D.host.E) V) (T : ℕ) (w₁ : V) (hw₁ : w₁ ∈ Formalism.HermitianLatticesTheory.dual h M)
+variable
+  {D : D7} {V : Type} [AddCommGroup V] [Module D.host.E V] [Module (𝓞 D.host.E) V]
+  [IsScalarTower (𝓞 D.host.E) D.host.E V]
+  (h : V →ₗ⋆[D.host.E] V →ₗ[D.host.E] D.host.E) (M : Submodule (𝓞 D.host.E) V) (T : ℕ) (w₁ : V)
+  (hw₁ : w₁ ∈ Formalism.HermitianLatticesTheory.dual h M)
   (hgen : ∀ w ∈ Formalism.HermitianLatticesTheory.dual h M, ∃ a : 𝓞 D.host.E, w + a • w₁ ∈ M)
   (hann : ∀ a : 𝓞 D.host.E, a • w₁ ∈ M ↔ ((T : ℕ) : 𝓞 D.host.E) ∣ a)
-
 
 include hw₁ hgen in
 theorem discriminant_one_generator : DiscGen h M 1 := by
@@ -35,10 +38,10 @@ theorem discriminant_one_generator : DiscGen h M 1 := by
   rw [e]
   exact M.neg_mem ha
 
-
 include hw₁ hgen hann in
-theorem corank_one_mod_prime_over (p : Ideal (𝓞 D.host.F)) (hp : p.IsMaximal) (hTp : ((T : ℕ) : 𝓞 D.host.F) ∈ p) :
-    eP h M p = 1 := by
+theorem corank_one_mod_prime_over
+    (p : Ideal (𝓞 D.host.F)) (hp : p.IsMaximal) (hTp : ((T : ℕ) : 𝓞 D.host.F) ∈ p)
+    : eP h M p = 1 := by
   set P : Ideal (𝓞 D.host.E) := pE D.host.F D.host.E p with hP
   set Md := Formalism.HermitianLatticesTheory.dual h M with hMd
   set K : Submodule (𝓞 D.host.E) Md := (M ⊔ P • Md).comap Md.subtype with hK
@@ -95,7 +98,8 @@ theorem corank_one_mod_prime_over (p : Ideal (𝓞 D.host.F)) (hp : p.IsMaximal)
       exact Submodule.mem_sup_right (Submodule.smul_mem_smul ha hw₁)
   have hcard : Nat.card (Md ⧸ K) = Ideal.absNorm p ^ 2 := by
     rw [← Nat.card_congr (φ.quotKerEquivOfSurjective hsurj).toEquiv,
-      Nat.card_congr (Submodule.quotEquivOfEq _ _ hker).toEquiv, ← Formalism.MainNotions.BridgeLemma.absNorm_pE]
+      Nat.card_congr (Submodule.quotEquivOfEq _ _ hker).toEquiv,
+      ← Formalism.MainNotions.BridgeLemma.absNorm_pE]
     exact (Ideal.absNorm_eq_natCard P).symm
   have hq := Formalism.MainNotions.BridgeLemma.absNorm_ge_two p hp
   show Nat.log (Ideal.absNorm p ^ 2) (Nat.card (Md ⧸ K)) = 1
@@ -105,14 +109,22 @@ theorem corank_one_mod_prime_over (p : Ideal (𝓞 D.host.F)) (hp : p.IsMaximal)
 
 end Cyc
 
-theorem orthLattice_structure_of_det (D : D7) (u : D.what₂.Word)
+theorem orthLattice_structure_of_det
+    (D : D7) (u : D.what₂.Word)
     (hdet : ForPrimeFlagLattice D u fun F0 Λ =>
-      latDetH (D.sp.X 0).hT (L0X D Λ (lf D F0)) = ((Tu D u ^ D.R.f : ℕ) : ℝ)) : BaseLatticeStructure D u := by
+      latDetH (D.sp.X 0).hT (L0X D Λ (lf D F0)) = ((Tu D u ^ D.R.f : ℕ) : ℝ))
+    : BaseLatticeStructure D u := by
   intro hTp h3 hsp F0 he hz Λ hrow
   obtain ⟨hΛ, hu, hlift, hconv⟩ := hrow.2.1
-  obtain ⟨w₁, hw₁, hgen, hann⟩ := dual_orthLattice_quotient_cyclic F0 he hz Λ hΛ hu hlift.1 hconv.2 hTp.ne_zero
-  exact ⟨orthLattice_isLattice F0 he hz Λ hΛ hu, orthLattice_isIntegral_of_unimodular Λ (lf D F0) hu, hdet hTp h3 hsp F0 he hz Λ hrow,
-    discriminant_one_generator _ _ w₁ hw₁ hgen, fun p hp hTpp => corank_one_mod_prime_over _ _ (Tu D u) w₁ hw₁ hgen hann p hp hTpp⟩
+  obtain ⟨w₁, hw₁, hgen, hann⟩ :=
+    dual_orthLattice_quotient_cyclic F0 he hz Λ hΛ hu hlift.1 hconv.2 hTp.ne_zero
+  exact ⟨
+    orthLattice_isLattice F0 he hz Λ hΛ hu,
+    orthLattice_isIntegral_of_unimodular Λ (lf D F0) hu,
+    hdet hTp h3 hsp F0 he hz Λ hrow,
+    discriminant_one_generator _ _ w₁ hw₁ hgen,
+    fun p hp hTpp => corank_one_mod_prime_over _ _ (Tu D u) w₁ hw₁ hgen hann p hp hTpp
+  ⟩
 
 end Formalism.MainNotions.BridgeLemma₂
 

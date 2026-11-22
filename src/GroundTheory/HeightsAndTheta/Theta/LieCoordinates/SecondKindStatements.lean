@@ -22,24 +22,17 @@ abbrev MatProd {f : ℕ} (p q : Fin f → ℕ) : Type :=
 def lieProd {f : ℕ} (p q : Fin f → ℕ) : Submodule ℝ (MatProd p q) :=
   Submodule.pi Set.univ fun τ => indefiniteUnitaryLieAlgebra (p τ) (q τ)
 
-def hsInner {f : ℕ} {p q : Fin f → ℕ} (X X' : MatProd p q) : ℝ :=
-  ∑ τ, (trace (X τ * (X' τ)ᴴ)).re
+def hsInner {f : ℕ} {p q : Fin f → ℕ} (X X' : MatProd p q) : ℝ := ∑ τ, (trace (X τ * (X' τ)ᴴ)).re
 
 structure OrthoFrame where
-
   f : ℕ
-
   r : ℕ
   f_pos : 1 ≤ f
   r_pos : 1 ≤ r
-
   p : Fin f → ℕ
-
   q : Fin f → ℕ
   sig : ∀ τ, p τ + q τ = r
-
   place : Fin (f * r ^ 2) → Fin f
-
   E : Fin (f * r ^ 2) → MatProd p q
   span : Submodule.span ℝ (Set.range E) = lieProd p q
   orthonormal : ∀ k l, hsInner (E k) (E l) = if k = l then 1 else 0

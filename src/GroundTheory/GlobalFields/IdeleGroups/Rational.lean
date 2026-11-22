@@ -26,9 +26,10 @@ def realEquiv : InfiniteAdeleRing ℚ ≃+* ℝ :=
   (RingEquiv.piUnique fun w : InfinitePlace ℚ ↦ w.Completion).trans
     (InfinitePlace.Completion.ringEquivRealOfIsReal (isReal_infinitePlace default))
 
-theorem realEquiv_apply (x : InfiniteAdeleRing ℚ) :
-    realEquiv x = InfinitePlace.Completion.extensionEmbeddingOfIsReal
-      (isReal_infinitePlace default) (x default) :=
+theorem realEquiv_apply (x : InfiniteAdeleRing ℚ)
+    : realEquiv x
+      = InfinitePlace.Completion.extensionEmbeddingOfIsReal (isReal_infinitePlace default)
+        (x default) :=
   rfl
 
 theorem continuous_realEquiv : Continuous realEquiv :=
@@ -38,18 +39,16 @@ theorem continuous_realEquiv : Continuous realEquiv :=
 theorem continuous_realEquiv_symm : Continuous realEquiv.symm := by
   exact continuous_equiv_symm_of_eq realEquiv.toEquiv
     ((Homeomorph.piUnique fun w : InfinitePlace ℚ ↦ w.Completion).trans
-      (InfinitePlace.Completion.isometryEquivRealOfIsReal
-        (isReal_infinitePlace default)).toHomeomorph)
+      (InfinitePlace.Completion.isometryEquivRealOfIsReal (isReal_infinitePlace
+        default)).toHomeomorph)
     fun _ ↦ rfl
 
 def realUnitsEquiv : (InfiniteAdeleRing ℚ)ˣ ≃ₜ* ℝˣ :=
   unitsContinuousMulEquiv realEquiv.toMulEquiv continuous_realEquiv continuous_realEquiv_symm
 
-def realPart : IdeleGroup ℚ →* ℝˣ :=
-  realUnitsEquiv.toMulEquiv.toMonoidHom.comp (toInfinite ℚ)
+def realPart : IdeleGroup ℚ →* ℝˣ := realUnitsEquiv.toMulEquiv.toMonoidHom.comp (toInfinite ℚ)
 
-theorem coe_realPart (x : IdeleGroup ℚ) : (realPart x : ℝ) = realEquiv (x : 𝔸[ℚ]).1 :=
-  rfl
+theorem coe_realPart (x : IdeleGroup ℚ) : (realPart x : ℝ) = realEquiv (x : 𝔸[ℚ]).1 := rfl
 
 theorem continuous_realPart : Continuous realPart :=
   realUnitsEquiv.continuous.comp (continuous_toInfinite ℚ)
@@ -59,29 +58,30 @@ theorem realPart_diagonal (a : ℚˣ) : (realPart (diagonal ℚ a) : ℝ) = a :=
   rw [coe_realPart, coe_diagonal]
   exact eq_ratCast (realEquiv.toRingHom.comp (algebraMap ℚ (InfiniteAdeleRing ℚ))) a
 
-theorem realPart_ofIntegerUnits (a : (InfiniteAdeleRing ℚ)ˣ)
-    (u : Π v : HeightOneSpectrum (𝓞 ℚ), (v.adicCompletionIntegers ℚ)ˣ) :
-    realPart (ofIntegerUnits a u) = realUnitsEquiv a :=
+theorem realPart_ofIntegerUnits
+    (a : (InfiniteAdeleRing ℚ)ˣ) (u : Π v : HeightOneSpectrum (𝓞 ℚ), (v.adicCompletionIntegers ℚ)ˣ)
+    : realPart (ofIntegerUnits a u) = realUnitsEquiv a :=
   rfl
 
 def positiveSubgroup : Subgroup (IdeleGroup ℚ) :=
   standardOpenSubgroup ℚ ⊓ (Units.posSubgroup ℝ).comap realPart
 
-theorem mem_positiveSubgroup {x : IdeleGroup ℚ} :
-    x ∈ positiveSubgroup ↔ x ∈ standardOpenSubgroup ℚ ∧ 0 < (realPart x : ℝ) := by
+theorem mem_positiveSubgroup {x : IdeleGroup ℚ}
+    : x ∈ positiveSubgroup ↔ x ∈ standardOpenSubgroup ℚ ∧ 0 < (realPart x : ℝ) := by
   rw [positiveSubgroup, Subgroup.mem_inf, Subgroup.mem_comap, Units.mem_posSubgroup]
 
 theorem isOpen_positiveSubgroup : IsOpen (positiveSubgroup : Set (IdeleGroup ℚ)) := by
-  have h : (positiveSubgroup : Set (IdeleGroup ℚ)) =
-      (standardOpenSubgroup ℚ : Set (IdeleGroup ℚ)) ∩ {x | 0 < (realPart x : ℝ)} := by
+  have h
+      : (positiveSubgroup : Set (IdeleGroup ℚ))
+        = (standardOpenSubgroup ℚ : Set (IdeleGroup ℚ)) ∩ {x | 0 < (realPart x : ℝ)} := by
     ext x
     exact mem_positiveSubgroup
   rw [h]
   exact (isOpen_standardOpenSubgroup ℚ).inter
     (isOpen_lt continuous_const (Units.continuous_val.comp continuous_realPart))
 
-theorem diagonal_mem_standardOpenSubgroup_iff (a : ℚˣ) :
-    diagonal ℚ a ∈ standardOpenSubgroup ℚ ↔ (a : ℚ) = 1 ∨ (a : ℚ) = -1 := by
+theorem diagonal_mem_standardOpenSubgroup_iff (a : ℚˣ)
+    : diagonal ℚ a ∈ standardOpenSubgroup ℚ ↔ (a : ℚ) = 1 ∨ (a : ℚ) = -1 := by
   rw [← ker_toFractionalIdeal, MonoidHom.mem_ker, toFractionalIdeal_diagonal,
     toPrincipalIdeal_eq_iff, Units.val_one, ← FractionalIdeal.spanSingleton_one,
     FractionalIdeal.spanSingleton_eq_spanSingleton]
@@ -135,37 +135,46 @@ theorem positiveSubgroup_sup_diagonal_range : positiveSubgroup ⊔ (diagonal ℚ
       linarith
     refine Subgroup.mem_sup.2 ⟨_, hp, diagonal ℚ (-a), ⟨-a, rfl⟩, ?_⟩
     rw [mul_right_comm, ← map_mul, neg_one_mul, neg_neg]
-  · exact Subgroup.mem_sup.2 ⟨u, mem_positiveSubgroup.2 ⟨hu, hpos⟩, diagonal ℚ a, ⟨a, rfl⟩,
-      mul_comm _ _⟩
+  · exact Subgroup.mem_sup.2
+      ⟨u, mem_positiveSubgroup.2 ⟨hu, hpos⟩, diagonal ℚ a, ⟨a, rfl⟩, mul_comm _ _⟩
 
 def positiveSubgroupEquivIdeleClassGroup : positiveSubgroup ≃ₜ* IdeleClassGroup ℚ :=
   openSubgroupEquivQuotient _ _ isOpen_positiveSubgroup positiveSubgroup_inf_diagonal_range
     positiveSubgroup_sup_diagonal_range
 
 @[simp]
-theorem positiveSubgroupEquivIdeleClassGroup_apply (x : positiveSubgroup) :
-    positiveSubgroupEquivIdeleClassGroup x = IdeleClassGroup.mk ℚ x :=
+theorem positiveSubgroupEquivIdeleClassGroup_apply (x : positiveSubgroup)
+    : positiveSubgroupEquivIdeleClassGroup x = IdeleClassGroup.mk ℚ x :=
   rfl
 
-def positiveSubgroupEquiv : positiveSubgroup ≃ₜ* Units.posSubgroup ℝ ×
-    Π v : HeightOneSpectrum (𝓞 ℚ), (v.adicCompletionIntegers ℚ)ˣ where
-  toFun x := (⟨realPart x, (Units.mem_posSubgroup _).2 (mem_positiveSubgroup.1 x.2).2⟩,
-    (standardOpenSubgroupEquiv (K := ℚ) ⟨x, (mem_positiveSubgroup.1 x.2).1⟩).2)
-  invFun p := ⟨ofIntegerUnits (realUnitsEquiv.symm p.1) p.2, mem_positiveSubgroup.2
-    ⟨ofIntegerUnits_mem _ _, by
-      rw [realPart_ofIntegerUnits, ContinuousMulEquiv.apply_symm_apply]
-      exact (Units.mem_posSubgroup _).1 p.1.2⟩⟩
+def positiveSubgroupEquiv
+    : positiveSubgroup
+      ≃ₜ* Units.posSubgroup ℝ × Π v : HeightOneSpectrum (𝓞 ℚ), (v.adicCompletionIntegers ℚ)ˣ where
+  toFun x := (
+    ⟨realPart x, (Units.mem_posSubgroup _).2 (mem_positiveSubgroup.1 x.2).2⟩,
+    (standardOpenSubgroupEquiv (K := ℚ) ⟨x, (mem_positiveSubgroup.1 x.2).1⟩).2
+  )
+  invFun p := ⟨
+    ofIntegerUnits (realUnitsEquiv.symm p.1) p.2,
+    mem_positiveSubgroup.2 ⟨
+      ofIntegerUnits_mem _ _,
+      by
+        rw [realPart_ofIntegerUnits, ContinuousMulEquiv.apply_symm_apply]
+        exact (Units.mem_posSubgroup _).1 p.1.2
+    ⟩
+  ⟩
   left_inv x := by
-    have h : realUnitsEquiv.symm (realPart x) = toInfinite ℚ x :=
-      realUnitsEquiv.symm_apply_apply _
+    have h : realUnitsEquiv.symm (realPart x) = toInfinite ℚ x := realUnitsEquiv.symm_apply_apply _
     apply Subtype.ext
     change ofIntegerUnits (realUnitsEquiv.symm (realPart x)) _ = (x : IdeleGroup ℚ)
     rw [h]
     exact Units.ext (Prod.ext rfl (Subtype.ext (funext fun _ ↦ rfl)))
-  right_inv p := Prod.ext (Subtype.ext (realUnitsEquiv.apply_symm_apply _))
-    (funext fun _ ↦ Units.ext (Subtype.ext rfl))
-  map_mul' x y := Prod.ext (Subtype.ext (map_mul realPart (x : IdeleGroup ℚ) y))
-    (funext fun _ ↦ Units.ext (Subtype.ext rfl))
+  right_inv p :=
+    Prod.ext (Subtype.ext (realUnitsEquiv.apply_symm_apply _))
+      (funext fun _ ↦ Units.ext (Subtype.ext rfl))
+  map_mul' x y :=
+    Prod.ext (Subtype.ext (map_mul realPart (x : IdeleGroup ℚ) y))
+      (funext fun _ ↦ Units.ext (Subtype.ext rfl))
   continuous_toFun := by
     exact ((continuous_realPart.comp continuous_subtype_val).subtype_mk _).prodMk
       (continuous_snd.comp ((standardOpenSubgroupEquiv (K := ℚ)).continuous.comp
@@ -175,20 +184,23 @@ def positiveSubgroupEquiv : positiveSubgroup ≃ₜ* Units.posSubgroup ℝ ×
       ((realUnitsEquiv.symm.continuous.comp (continuous_subtype_val.comp continuous_fst)).prodMk
         continuous_snd))).subtype_mk _
 
-def integersRingEquiv :
-    (Π v : HeightOneSpectrum (𝓞 ℚ), v.adicCompletionIntegers ℚ) ≃+* Π p : Nat.Primes, ℤ_[p] :=
+def integersRingEquiv
+    : (Π v : HeightOneSpectrum (𝓞 ℚ), v.adicCompletionIntegers ℚ) ≃+* Π p : Nat.Primes, ℤ_[p] :=
   (RingEquiv.piCongrRight fun v ↦
       (Rat.HeightOneSpectrum.adicCompletionIntegers.padicIntEquiv v).toAlgEquiv.toRingEquiv).trans
     (RingEquiv.piCongrLeft (fun p : Nat.Primes ↦ ℤ_[p]) Rat.HeightOneSpectrum.primesEquiv)
 
-def integersHomeomorph :
-    (Π v : HeightOneSpectrum (𝓞 ℚ), v.adicCompletionIntegers ℚ) ≃ₜ Π p : Nat.Primes, ℤ_[p] :=
+def integersHomeomorph
+    : (Π v : HeightOneSpectrum (𝓞 ℚ), v.adicCompletionIntegers ℚ) ≃ₜ Π p : Nat.Primes, ℤ_[p] :=
   (Homeomorph.piCongrRight fun v ↦
       (Rat.HeightOneSpectrum.adicCompletionIntegers.padicIntEquiv v).toHomeomorph).trans
     (Homeomorph.piCongrLeft (Y := fun p : Nat.Primes ↦ ℤ_[p]) Rat.HeightOneSpectrum.primesEquiv)
 
-theorem integersRingEquiv_eq_integersHomeomorph (x : Π v : HeightOneSpectrum (𝓞 ℚ),
-    v.adicCompletionIntegers ℚ) : integersRingEquiv x = integersHomeomorph x :=
+theorem integersRingEquiv_eq_integersHomeomorph
+    (x
+      : Π v : HeightOneSpectrum (𝓞 ℚ),
+        v.adicCompletionIntegers ℚ)
+    : integersRingEquiv x = integersHomeomorph x :=
   rfl
 
 theorem continuous_integersRingEquiv : Continuous integersRingEquiv :=
@@ -198,18 +210,16 @@ theorem continuous_integersRingEquiv_symm : Continuous integersRingEquiv.symm :=
   exact continuous_equiv_symm_of_eq integersRingEquiv.toEquiv integersHomeomorph
     integersRingEquiv_eq_integersHomeomorph
 
-def integerUnitsEquiv :
-    (Π v : HeightOneSpectrum (𝓞 ℚ), (v.adicCompletionIntegers ℚ)ˣ) ≃ₜ*
-      (Π p : Nat.Primes, ℤ_[p])ˣ :=
-  ContinuousMulEquiv.piUnits.symm.trans
-    (unitsContinuousMulEquiv integersRingEquiv.toMulEquiv continuous_integersRingEquiv
-      continuous_integersRingEquiv_symm)
+def integerUnitsEquiv
+    : (Π v : HeightOneSpectrum (𝓞 ℚ), (v.adicCompletionIntegers ℚ)ˣ)
+      ≃ₜ* (Π p : Nat.Primes, ℤ_[p])ˣ :=
+  ContinuousMulEquiv.piUnits.symm.trans (unitsContinuousMulEquiv integersRingEquiv.toMulEquiv
+    continuous_integersRingEquiv continuous_integersRingEquiv_symm)
 
-def mulMap : ℚˣ × positiveSubgroup →* IdeleGroup ℚ :=
-  (diagonal ℚ).coprod positiveSubgroup.subtype
+def mulMap : ℚˣ × positiveSubgroup →* IdeleGroup ℚ := (diagonal ℚ).coprod positiveSubgroup.subtype
 
-theorem mulMap_apply (p : ℚˣ × positiveSubgroup) :
-    mulMap p = diagonal ℚ p.1 * (p.2 : IdeleGroup ℚ) :=
+theorem mulMap_apply (p : ℚˣ × positiveSubgroup)
+    : mulMap p = diagonal ℚ p.1 * (p.2 : IdeleGroup ℚ) :=
   rfl
 
 theorem mulMap_bijective : Function.Bijective mulMap := by
@@ -232,10 +242,12 @@ def ideleClassGroupEquiv : IdeleClassGroup ℚ ≃ₜ* Units.posSubgroup ℝ × 
   positiveSubgroupEquivIdeleClassGroup.symm.trans (positiveSubgroupEquiv.trans
     (continuousMulEquivProdCongr (ContinuousMulEquiv.refl _) integerUnitsEquiv))
 
-theorem ideleClassGroupEquiv_mk (x : positiveSubgroup) :
-    ideleClassGroupEquiv (IdeleClassGroup.mk ℚ x) =
-      (⟨realPart x, (Units.mem_posSubgroup _).2 (mem_positiveSubgroup.1 x.2).2⟩,
-        integerUnitsEquiv (positiveSubgroupEquiv x).2) := by
+theorem ideleClassGroupEquiv_mk (x : positiveSubgroup)
+    : ideleClassGroupEquiv (IdeleClassGroup.mk ℚ x)
+      = (
+        ⟨realPart x, (Units.mem_posSubgroup _).2 (mem_positiveSubgroup.1 x.2).2⟩,
+        integerUnitsEquiv (positiveSubgroupEquiv x).2
+      ) := by
   simp only [ideleClassGroupEquiv, ContinuousMulEquiv.trans_apply]
   rw [← positiveSubgroupEquivIdeleClassGroup_apply, ContinuousMulEquiv.symm_apply_apply]
   rfl

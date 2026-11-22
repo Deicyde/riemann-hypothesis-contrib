@@ -13,9 +13,10 @@ namespace PI.VolStabSW
 
 namespace ChLiftW
 
-theorem lift_normed {W : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W] (χ : W → ℂ)
-    (hc : Continuous χ) (hadd : ∀ x y, χ (x + y) = χ x * χ y) (h0 : χ 0 = 1) :
-    ∃ ℓ : W →+ ℂ, Continuous ℓ ∧ ∀ x, χ x = exp (ℓ x) := by
+theorem lift_normed
+    {W : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W]
+    (χ : W → ℂ) (hc : Continuous χ) (hadd : ∀ x y, χ (x + y) = χ x * χ y) (h0 : χ 0 = 1)
+    : ∃ ℓ : W →+ ℂ, Continuous ℓ ∧ ∀ x, χ x = exp (ℓ x) := by
   have hne : ∀ x, χ x ≠ 0 := by
     intro x h
     have h1 := hadd x (-x)
@@ -64,8 +65,10 @@ theorem lift_normed {W : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W] (χ :
       rw [Nat.cast_succ, add_smul, one_smul, hLadd _ _ h3 h2, ih h1]
       push_cast
       ring
-  have hkey : ∀ (a b : ℕ) (x : W), 0 < a → 0 < b → ‖x‖ ≤ a * δ → ‖x‖ ≤ b * δ →
-      (a : ℂ) * L ((a : ℝ)⁻¹ • x) = (b : ℂ) * L ((b : ℝ)⁻¹ • x) := by
+  have hkey
+      : ∀ (a b : ℕ) (x : W),
+        0 < a → 0 < b → ‖x‖ ≤ a * δ → ‖x‖ ≤ b * δ
+          → (a : ℂ) * L ((a : ℝ)⁻¹ • x) = (b : ℂ) * L ((b : ℝ)⁻¹ • x) := by
     intro a b x ha hb hxa hxb
     have ha' : (0 : ℝ) < a := Nat.cast_pos.2 ha
     have hb' : (0 : ℝ) < b := Nat.cast_pos.2 hb
@@ -153,35 +156,49 @@ theorem lift_normed {W : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W] (χ :
     · exact Complex.mem_slitPlane_iff.2 (Or.inl (hre _ (hsmall _ x0 hMpos hx0)))
   exact ⟨AddMonoidHom.mk' f fadd, fcont, fexp⟩
 
-theorem lift_homeo {X W : Type*} [AddCommGroup X] [TopologicalSpace X] [NormedAddCommGroup W]
-    [NormedSpace ℝ W] (e : X ≃ₜ W) (he : ∀ x y, e (x + y) = e x + e y) (χ : X → ℂ)
-    (hc : Continuous χ) (hadd : ∀ x y, χ (x + y) = χ x * χ y) (h0 : χ 0 = 1) :
-    ∃ ℓ : X →+ ℂ, Continuous ℓ ∧ ∀ x, χ x = exp (ℓ x) := by
+theorem lift_homeo
+    {X W : Type*} [AddCommGroup X] [TopologicalSpace X] [NormedAddCommGroup W] [NormedSpace ℝ W]
+    (e : X ≃ₜ W) (he : ∀ x y, e (x + y) = e x + e y)
+    (χ : X → ℂ) (hc : Continuous χ) (hadd : ∀ x y, χ (x + y) = χ x * χ y) (h0 : χ 0 = 1)
+    : ∃ ℓ : X →+ ℂ, Continuous ℓ ∧ ∀ x, χ x = exp (ℓ x) := by
   have he0 : e 0 = 0 := by simpa using he 0 0
   have hs0 : e.symm 0 = 0 := by rw [← he0, Homeomorph.symm_apply_apply]
   have hsadd : ∀ w w' : W, e.symm (w + w') = e.symm w + e.symm w' := by
     intro w w'
     apply e.injective
     rw [he, Homeomorph.apply_symm_apply, Homeomorph.apply_symm_apply, Homeomorph.apply_symm_apply]
-  obtain ⟨ℓ', hℓc, hℓ⟩ := lift_normed (fun w => χ (e.symm w)) (hc.comp e.symm.continuous)
-    (fun w w' => by simp only [hsadd, hadd]) (by simp only [hs0, h0])
-  refine ⟨AddMonoidHom.mk' (fun x => ℓ' (e x)) (fun x y => by simp only [he, map_add (f := _)]),
-    hℓc.comp e.continuous, fun x => ?_⟩
+  obtain ⟨ℓ', hℓc, hℓ⟩ :=
+    lift_normed
+      (fun w => χ (e.symm w))
+      (hc.comp e.symm.continuous)
+      (fun w w' => by simp only [hsadd, hadd])
+      (by simp only [hs0, h0])
+  refine ⟨
+    AddMonoidHom.mk' (fun x => ℓ' (e x)) (fun x y => by simp only [he, map_add (f := _)]),
+    hℓc.comp e.continuous,
+    fun x => ?_
+  ⟩
   have h1 := hℓ (e x)
   simp only [Homeomorph.symm_apply_apply] at h1
   exact h1
 
-theorem lift_place {F : Type} [Field F] (v : InfinitePlace F) (χ : v.Completion → ℂ)
-    (hc : Continuous χ) (hadd : ∀ x y, χ (x + y) = χ x * χ y) (h0 : χ 0 = 1) :
-    ∃ ℓ : v.Completion →+ ℂ, Continuous ℓ ∧ ∀ x, χ x = exp (ℓ x) := by
+theorem lift_place
+    {F : Type} [Field F]
+    (v : InfinitePlace F) (χ : v.Completion → ℂ)
+    (hc : Continuous χ) (hadd : ∀ x y, χ (x + y) = χ x * χ y) (h0 : χ 0 = 1)
+    : ∃ ℓ : v.Completion →+ ℂ, Continuous ℓ ∧ ∀ x, χ x = exp (ℓ x) := by
   rcases v.isReal_or_isComplex with hv | hv
-  · exact lift_homeo (NumberField.InfinitePlace.Completion.isometryEquivRealOfIsReal hv).toHomeomorph
-      (fun x y => map_add (NumberField.InfinitePlace.Completion.ringEquivRealOfIsReal hv) x y) χ hc hadd h0
-  · exact lift_homeo (NumberField.InfinitePlace.Completion.isometryEquivComplexOfIsComplex hv).toHomeomorph
-      (fun x y => map_add (NumberField.InfinitePlace.Completion.ringEquivComplexOfIsComplex hv) x y) χ hc hadd h0
+  · exact lift_homeo
+      (NumberField.InfinitePlace.Completion.isometryEquivRealOfIsReal hv).toHomeomorph
+      (fun x y => map_add (NumberField.InfinitePlace.Completion.ringEquivRealOfIsReal hv) x y)
+      χ hc hadd h0
+  · exact lift_homeo
+      (NumberField.InfinitePlace.Completion.isometryEquivComplexOfIsComplex hv).toHomeomorph
+      (fun x y => map_add (NumberField.InfinitePlace.Completion.ringEquivComplexOfIsComplex hv) x y)
+      χ hc hadd h0
 
-theorem addChar_sum {ι A : Type*} [AddCommMonoid A] (χ : AddChar A ℂ) (s : Finset ι) (f : ι → A) :
-    χ (∑ i ∈ s, f i) = ∏ i ∈ s, χ (f i) := by
+theorem addChar_sum {ι A : Type*} [AddCommMonoid A] (χ : AddChar A ℂ) (s : Finset ι) (f : ι → A)
+    : χ (∑ i ∈ s, f i) = ∏ i ∈ s, χ (f i) := by
   classical
   refine Finset.induction_on s (by simp [AddChar.map_zero_eq_one]) ?_
   intro a s ha ih
@@ -189,14 +206,13 @@ theorem addChar_sum {ι A : Type*} [AddCommMonoid A] (χ : AddChar A ℂ) (s : F
 
 end ChLiftW
 
-
 open Classical in
 def sgl {F : Type} [Field F] (v : InfinitePlace F) (t : v.Completion) : InfiniteAdeleRing F :=
   Pi.single v t
 
 open Classical in
-theorem sgl_add {F : Type} [Field F] (v : InfinitePlace F) (x y : v.Completion) :
-    sgl v (x + y) = sgl v x + sgl v y :=
+theorem sgl_add {F : Type} [Field F] (v : InfinitePlace F) (x y : v.Completion)
+    : sgl v (x + y) = sgl v x + sgl v y :=
   Pi.single_add v x y
 
 open Classical in
@@ -208,19 +224,23 @@ theorem continuous_sgl {F : Type} [Field F] (v : InfinitePlace F) : Continuous (
   continuous_single v
 
 open Classical in
-theorem sum_sgl {F : Type} [Field F] [NumberField F] (x : InfiniteAdeleRing F) :
-    ∑ v, sgl v (x v) = x := by
+theorem sum_sgl {F : Type} [Field F] [NumberField F] (x : InfiniteAdeleRing F)
+    : ∑ v, sgl v (x v) = x := by
   simp only [sgl]
   exact Finset.univ_sum_single x
 
 open ChLiftW in
 theorem chLift_holds : ChLift := by
   intro F _ _ χ hχ
-  have key : ∀ v : InfinitePlace F, ∃ ℓ : v.Completion →+ ℂ, Continuous ℓ ∧
-      ∀ t, χ (sgl v t) = exp (ℓ t) := by
+  have key
+      : ∀ v : InfinitePlace F, ∃ ℓ : v.Completion →+ ℂ,
+        Continuous ℓ ∧ ∀ t, χ (sgl v t) = exp (ℓ t) := by
     intro v
-    exact lift_place v (fun t => χ (sgl v t)) (hχ.comp (continuous_sgl v))
-      (fun x y => by simp only [sgl_add, AddChar.map_add_eq_mul]) (by simp only [sgl_zero, AddChar.map_zero_eq_one])
+    exact lift_place v
+      (fun t => χ (sgl v t))
+      (hχ.comp (continuous_sgl v))
+      (fun x y => by simp only [sgl_add, AddChar.map_add_eq_mul])
+      (by simp only [sgl_zero, AddChar.map_zero_eq_one])
   choose ℓ hℓc hℓ using key
   refine ⟨AddMonoidHom.mk' (fun x => ∑ v, ℓ v (x v)) (fun x y => ?_), ?_, fun x => ?_⟩
   · rw [← Finset.sum_add_distrib]

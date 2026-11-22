@@ -7,10 +7,14 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open IsDedekindDomain NumberField
@@ -20,10 +24,12 @@ namespace PositivityTheory.Rg.Rsw.L.LMajor
 
 variable {D : D7}
 
-theorem repr_map {F E R R' ι : Type} [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R] [CommRing R']
-    [Algebra F R'] (φ : R →ₐ[F] R') (b : Module.Basis ι F E) (z : R ⊗[F] E) (k : ι) :
-    (Algebra.TensorProduct.basis R' b).repr (Algebra.TensorProduct.map φ (AlgHom.id F E) z) k =
-      φ ((Algebra.TensorProduct.basis R b).repr z k) := by
+theorem repr_map
+    {F E R R' ι : Type}
+    [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R']
+    (φ : R →ₐ[F] R') (b : Module.Basis ι F E) (z : R ⊗[F] E) (k : ι)
+    : (Algebra.TensorProduct.basis R' b).repr (Algebra.TensorProduct.map φ (AlgHom.id F E) z) k
+      = φ ((Algebra.TensorProduct.basis R b).repr z k) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
@@ -31,8 +37,9 @@ theorem repr_map {F E R R' ι : Type} [Field F] [Field E] [Algebra F E] [CommRin
 
 set_option synthInstance.maxHeartbeats 200000 in
 set_option maxHeartbeats 800000 in
-theorem infPart_eq_of {e e' : AE D}
-    (h : ∀ w, compInf D.host.F D.host.E w e = compInf D.host.F D.host.E w e') : infPart D e = infPart D e' := by
+theorem infPart_eq_of
+    {e e' : AE D} (h : ∀ w, compInf D.host.F D.host.E w e = compInf D.host.F D.host.E w e')
+    : infPart D e = infPart D e' := by
   let b := Module.Basis.ofVectorSpace D.host.F D.host.E
   show Algebra.TensorProduct.map (fstA D.host.F) (AlgHom.id D.host.F D.host.E) e =
     Algebra.TensorProduct.map (fstA D.host.F) (AlgHom.id D.host.F D.host.E) e'
@@ -42,8 +49,10 @@ theorem infPart_eq_of {e e' : AE D}
   funext w
   have h1 := repr_map (evInf D.host.F w) b e k
   have h2 := repr_map (evInf D.host.F w) b e' k
-  have hw : Algebra.TensorProduct.map (evInf D.host.F w) (AlgHom.id D.host.F D.host.E) e =
-      Algebra.TensorProduct.map (evInf D.host.F w) (AlgHom.id D.host.F D.host.E) e' := h w
+  have hw
+      : Algebra.TensorProduct.map (evInf D.host.F w) (AlgHom.id D.host.F D.host.E) e
+        = Algebra.TensorProduct.map (evInf D.host.F w) (AlgHom.id D.host.F D.host.E) e' :=
+    h w
   rw [hw, h2] at h1
   exact h1.symm
 
@@ -52,20 +61,25 @@ theorem infPart_idem {S : Finset (Pl D)} {e : AE D} (he : IsIdem S e) : infPart 
 
 set_option synthInstance.maxHeartbeats 200000 in
 set_option maxHeartbeats 800000 in
-theorem cv_eq (v : Pl D) (a : AE D) :
-    cv D v a = Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV D.host.F v) (AlgHom.id D.host.F D.host.E)
-      (finPart D a) := by
+theorem cv_eq (v : Pl D) (a : AE D)
+    : cv D v a
+      = Algebra.TensorProduct.map
+        (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV D.host.F v)
+        (AlgHom.id D.host.F D.host.E) (finPart D a) := by
   induction a using TensorProduct.induction_on with
   | zero => rw [RingHom.map_zero, RingHom.map_zero, map_zero]
-  | add x y hx hy => rw [RingHom.map_add (f := _), hx, hy, RingHom.map_add (f := _), map_add (f := _)]
+  | add x y hx hy =>
+    rw [RingHom.map_add (f := _), hx, hy, RingHom.map_add (f := _), map_add (f := _)]
   | tmul x y =>
     show Algebra.TensorProduct.map (evFin D.host.F v) (AlgHom.id D.host.F D.host.E) (x ⊗ₜ[D.host.F] y) =
       Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV D.host.F v) (AlgHom.id D.host.F D.host.E)
         (Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id D.host.F D.host.E) (x ⊗ₜ[D.host.F] y))
-    rw [Algebra.TensorProduct.map_tmul, Algebra.TensorProduct.map_tmul, Algebra.TensorProduct.map_tmul]
+    rw [Algebra.TensorProduct.map_tmul, Algebra.TensorProduct.map_tmul,
+      Algebra.TensorProduct.map_tmul]
     rfl
 
-theorem cv_congr (v : Pl D) {a a' : AE D} (h : finPart D a = finPart D a') : cv D v a = cv D v a' := by
+theorem cv_congr (v : Pl D) {a a' : AE D} (h : finPart D a = finPart D a')
+    : cv D v a = cv D v a' := by
   rw [cv_eq, cv_eq, h]
 
 def afF (D : D7) : AF D.host.F := (0, 1)
@@ -91,8 +105,8 @@ theorem finPart_sF : finPart D (sF D) = 1 := by
   rw [Algebra.TensorProduct.map_tmul, sndA_afF]
   rfl
 
-theorem compAt_smul (θ : InfFam D) (τ : D.what₂.Tau) {m n : ℕ} (c : AE D) (x : Mx D m n) :
-    compAt θ τ (c • x) = θ τ (infPart D c) • compAt θ τ x := by
+theorem compAt_smul (θ : InfFam D) (τ : D.what₂.Tau) {m n : ℕ} (c : AE D) (x : Mx D m n)
+    : compAt θ τ (c • x) = θ τ (infPart D c) • compAt θ τ x := by
   ext i j
   simp [compAt, Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, map_mul]
 

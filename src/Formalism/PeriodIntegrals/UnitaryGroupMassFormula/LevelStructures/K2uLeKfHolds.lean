@@ -11,12 +11,13 @@ noncomputable section
 
 namespace MassDataLevelSSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField
-  IsDedekindDomain Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField IsDedekindDomain
+  Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
 
-theorem finHA_mem_Kf {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (x : X.B.I.Gf)
-    (hx : x ∈ X.B.I.Kset) :
-    finHA X hb x ∈ Kf X.B.I.cm.sig X.B.I.J (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) :=
+theorem finHA_mem_Kf
+    {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (x : X.B.I.Gf) (hx : x ∈ X.B.I.Kset)
+    : finHA X hb x ∈ Kf X.B.I.cm.sig X.B.I.J (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) :=
   (PI.MassDataKppVolLemmas.Bridge_mem_Kf_iff X.B.I hb x).2 hx
 
 theorem k2uLeKf_holds : ConjugateLevelLeMaximalCompact := by

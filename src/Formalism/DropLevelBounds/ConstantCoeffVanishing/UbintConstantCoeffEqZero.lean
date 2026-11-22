@@ -20,8 +20,9 @@ variable {C : Type} [Field C] {σ : Type}
 
 theorem ubint_mvExp_zero : mvExp (0 : MvPowerSeries σ C) = 1 := by
   ext m
-  change ∑ k ∈ Finset.range (m.degree + 1), coeff m ((0 : MvPowerSeries σ C) ^ k) / (k.factorial : C) =
-    coeff m 1
+  change
+    ∑ k ∈ Finset.range (m.degree + 1), coeff m ((0 : MvPowerSeries σ C) ^ k) / (k.factorial : C)
+      = coeff m 1
   rw [Finset.sum_eq_single 0]
   · simp
   · intro k _ hk
@@ -29,9 +30,10 @@ theorem ubint_mvExp_zero : mvExp (0 : MvPowerSeries σ C) = 1 := by
   · intro h
     simp at h
 
-theorem ubint_mvExp_sum [CharZero C] {ι : Type} (s : Finset ι) (f : ι → MvPowerSeries σ C)
-    (hf : ∀ i ∈ s, constantCoeff (f i) = 0) :
-    mvExp (∑ i ∈ s, f i) = ∏ i ∈ s, mvExp (f i) := by
+theorem ubint_mvExp_sum
+    [CharZero C]
+    {ι : Type} (s : Finset ι) (f : ι → MvPowerSeries σ C) (hf : ∀ i ∈ s, constantCoeff (f i) = 0)
+    : mvExp (∑ i ∈ s, f i) = ∏ i ∈ s, mvExp (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [ubint_mvExp_zero]
@@ -49,7 +51,6 @@ end UBIntLemmas
 section UBIntRows
 
 variable {C : Type} [Field C] {n0 : ℕ}
-
 
 end UBIntRows
 

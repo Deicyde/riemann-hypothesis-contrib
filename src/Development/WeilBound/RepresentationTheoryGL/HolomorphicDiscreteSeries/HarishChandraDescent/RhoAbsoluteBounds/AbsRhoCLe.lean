@@ -24,7 +24,8 @@ theorem abs_rhoC_le {n : ℕ} (ε : Fin n → Bool) (a : Fin n) : |rhoC ε a| �
   rw [abs_le]
   constructor <;> linarith
 
-theorem dot_root {n : ℕ} (x : Fin n → ℝ) {a b : Fin n} (hab : a ≠ b) : dot x (root a b) = x a - x b := by
+theorem dot_root {n : ℕ} (x : Fin n → ℝ) {a b : Fin n} (hab : a ≠ b)
+    : dot x (root a b) = x a - x b := by
   simp [dot, root, Pi.single_apply, mul_sub, Finset.sum_sub_distrib]
 
 end PositivityTheory.RgHe3.DropRoots

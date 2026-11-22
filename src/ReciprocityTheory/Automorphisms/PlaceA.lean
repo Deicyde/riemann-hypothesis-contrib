@@ -12,18 +12,21 @@ open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
 
 section Gen
 
-variable {R : Type*} [CommRing R] [IsDedekindDomain R] {K : Type*} [Field K] [Algebra R K]
-  [IsFractionRing R K] (v : HeightOneSpectrum R)
+variable
+  {R : Type*} [CommRing R] [IsDedekindDomain R]
+  {K : Type*} [Field K] [Algebra R K] [IsFractionRing R K]
+  (v : HeightOneSpectrum R)
 
-theorem adic_valued_algebraMap (k : K) :
-    Valued.v (algebraMap K (v.adicCompletion K) k) = v.valuation K k :=
+theorem adic_valued_algebraMap (k : K)
+    : Valued.v (algebraMap K (v.adicCompletion K) k) = v.valuation K k :=
   valuedAdicCompletion_eq_valuation' v k
 
-theorem adic_algebraMap_R (a : R) :
-    algebraMap R (v.adicCompletion K) a = algebraMap K (v.adicCompletion K) (algebraMap R K a) := rfl
+theorem adic_algebraMap_R (a : R)
+    : algebraMap R (v.adicCompletion K) a = algebraMap K (v.adicCompletion K) (algebraMap R K a) :=
+  rfl
 
-theorem adic_exists_approx (y : v.adicCompletion K) (hy : Valued.v y ≤ 1) :
-    ∃ a : R, Valued.v (y - algebraMap R (v.adicCompletion K) a) < 1 := by
+theorem adic_exists_approx (y : v.adicCompletion K) (hy : Valued.v y ≤ 1)
+    : ∃ a : R, Valued.v (y - algebraMap R (v.adicCompletion K) a) < 1 := by
   classical
   obtain ⟨k, hk⟩ : ∃ k : K, Valued.v (y - algebraMap K (v.adicCompletion K) k) < 1 := by
     have hn : {w : v.adicCompletion K | Valued.v (w - y) < 1} ∈ nhds y :=
@@ -51,13 +54,15 @@ theorem adic_exists_approx (y : v.adicCompletion K) (hy : Valued.v y ≤ 1) :
     have hmin : ∀ m < Nat.find hex, b ∈ v.asIdeal ^ m := fun m hm => by
       by_contra h'
       exact Nat.find_min hex hm h'
-    obtain ⟨n, hn⟩ : ∃ n, Nat.find hex = n + 1 := Nat.exists_eq_succ_of_ne_zero (by
-      intro h0
-      rw [h0, pow_zero] at hspec
-      exact hspec (by simp))
+    obtain ⟨n, hn⟩ : ∃ n, Nat.find hex = n + 1 :=
+      Nat.exists_eq_succ_of_ne_zero (by
+        intro h0
+        rw [h0, pow_zero] at hspec
+        exact hspec (by simp))
     rw [hn] at hspec
     have hbn : b ∈ v.asIdeal ^ n := hmin n (by omega)
-    have hvb : 0 < v.valuation K (algebraMap R K b) := zero_lt_iff.mpr ((Valuation.ne_zero_iff _).mpr hb0)
+    have hvb : 0 < v.valuation K (algebraMap R K b) :=
+      zero_lt_iff.mpr ((Valuation.ne_zero_iff _).mpr hb0)
     have hk1' := hk1
     rw [map_div₀, div_le_one₀ hvb, valuation_of_algebraMap, valuation_of_algebraMap] at hk1'
     have ha : a ∈ v.asIdeal ^ n := by
@@ -76,8 +81,9 @@ theorem adic_exists_approx (y : v.adicCompletion K) (hy : Valued.v y ≤ 1) :
     obtain ⟨y1, hy1, z, hz, hyz⟩ := Submodule.mem_sup.mp ha
     obtain ⟨r, rfl⟩ := Ideal.mem_span_singleton'.mp hy1
     refine ⟨r, ?_⟩
-    have hkz : algebraMap R K a / algebraMap R K b - algebraMap R K r =
-        algebraMap R K z / algebraMap R K b := by
+    have hkz
+        : algebraMap R K a / algebraMap R K b - algebraMap R K r
+          = algebraMap R K z / algebraMap R K b := by
       rw [← hyz, map_add (f := _), map_mul]
       field_simp
       ring
@@ -87,8 +93,9 @@ theorem adic_exists_approx (y : v.adicCompletion K) (hy : Valued.v y ≤ 1) :
       hspec ((intValuation_le_pow_iff_mem v b (n + 1)).mp h)
     exact lt_of_le_of_lt h1 (not_le.mp h2)
   refine ⟨c, ?_⟩
-  have e : y - algebraMap R (v.adicCompletion K) c =
-      (y - algebraMap K _ k) + algebraMap K _ (k - algebraMap R K c) := by
+  have e
+      : y - algebraMap R (v.adicCompletion K) c
+        = (y - algebraMap K _ k) + algebraMap K _ (k - algebraMap R K c) := by
     rw [adic_algebraMap_R, map_sub]
     ring
   rw [e]
@@ -96,8 +103,10 @@ theorem adic_exists_approx (y : v.adicCompletion K) (hy : Valued.v y ≤ 1) :
   rw [adic_valued_algebraMap]
   exact hc
 
-theorem adic_le_one_of_poly {x : v.adicCompletion K} (p : Polynomial ℤ) (hm : p.Monic)
-    (hp : p.eval₂ (Int.castRingHom _) x = 0) : Valued.v x ≤ 1 := by
+theorem adic_le_one_of_poly
+    {x : v.adicCompletion K}
+    (p : Polynomial ℤ) (hm : p.Monic) (hp : p.eval₂ (Int.castRingHom _) x = 0)
+    : Valued.v x ≤ 1 := by
   have hint : IsIntegral (Valued.v : Valuation (v.adicCompletion K) _).integer x := by
     refine ⟨p.map (Int.castRingHom _), hm.map _, ?_⟩
     rw [Polynomial.eval₂_map, RingHom.ext_int (RingHom.comp _ _) (Int.castRingHom _)]

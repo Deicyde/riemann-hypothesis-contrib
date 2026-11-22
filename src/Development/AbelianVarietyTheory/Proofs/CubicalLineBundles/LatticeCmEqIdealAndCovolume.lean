@@ -14,8 +14,8 @@ namespace CMLattice
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem exists_im_ne_zero (σ : K →+* ℂ) (hσ : ¬ ComplexEmbedding.IsReal σ) :
-    ∃ a : 𝓞 K, (σ (a : K)).im ≠ 0 := by
+theorem exists_im_ne_zero (σ : K →+* ℂ) (hσ : ¬ ComplexEmbedding.IsReal σ)
+    : ∃ a : 𝓞 K, (σ (a : K)).im ≠ 0 := by
   by_contra hcon
   push Not at hcon
   apply hσ
@@ -26,13 +26,13 @@ theorem exists_im_ne_zero (σ : K →+* ℂ) (hσ : ¬ ComplexEmbedding.IsReal �
     fun y => Complex.conj_eq_iff_im.2 (hcon y)
   rw [NumberField.ComplexEmbedding.conjugate_coe_eq, map_div₀, map_div₀, key, key]
 
-theorem ω₁_ne_zero (L : PeriodPair) : L.ω₁ ≠ 0 := by
-  simpa using L.indep.ne_zero 0
+theorem ω₁_ne_zero (L : PeriodPair) : L.ω₁ ≠ 0 := by simpa using L.indep.ne_zero 0
 
-theorem exists_ideal (σ : K →+* ℂ) (hσ : ¬ ComplexEmbedding.IsReal σ) (L : PeriodPair)
-    (hL : ∀ (a : 𝓞 K), ∀ z ∈ L.lattice, σ (a : K) * z ∈ L.lattice) :
-    ∃ (𝔞 : Ideal (𝓞 K)) (c : ℂ), 𝔞 ≠ ⊥ ∧ c ≠ 0 ∧
-      ∀ z, z ∈ L.lattice ↔ ∃ a ∈ 𝔞, z = c * σ (a : K) := by
+theorem exists_ideal
+    (σ : K →+* ℂ) (hσ : ¬ ComplexEmbedding.IsReal σ)
+    (L : PeriodPair) (hL : ∀ (a : 𝓞 K), ∀ z ∈ L.lattice, σ (a : K) * z ∈ L.lattice)
+    : ∃ (𝔞 : Ideal (𝓞 K)) (c : ℂ),
+      𝔞 ≠ ⊥ ∧ c ≠ 0 ∧ ∀ z, z ∈ L.lattice ↔ ∃ a ∈ 𝔞, z = c * σ (a : K) := by
   obtain ⟨a, ha⟩ := exists_im_ne_zero σ hσ
   have hω : L.ω₁ ≠ 0 := ω₁_ne_zero L
   obtain ⟨m, n, hmn⟩ := PeriodPair.mem_lattice.1 (hL a _ L.ω₁_mem_lattice)
@@ -59,24 +59,29 @@ theorem exists_ideal (σ : K →+* ℂ) (hσ : ¬ ComplexEmbedding.IsReal σ) (L
   have hv0 : v ≠ 0 := nonZeroDivisors.ne_zero hv
   have hV0 : (v : K) ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hv
   have hσV : σ (v : K) ≠ 0 := (map_ne_zero σ).2 hV0
-  have hu : (u : K) = (v : K) * t := by
-    rw [← htuv]; field_simp
-  let 𝔞 : Ideal (𝓞 K) :=
-    { carrier := {x | ∃ p q : ℤ, (x : K) = (v : K) * (p + q * t)}
-      add_mem' := by
-        rintro x y ⟨p, q, hx⟩ ⟨p', q', hy⟩
-        exact ⟨p + p', q + q', by
-          rw [RingOfIntegers.coe_eq_algebraMap, map_add (f := _), ← RingOfIntegers.coe_eq_algebraMap,
-            ← RingOfIntegers.coe_eq_algebraMap, hx, hy]
-          push_cast; ring⟩
-      zero_mem' := ⟨0, 0, by simp⟩
-      smul_mem' := by
-        rintro r x ⟨p, q, hx⟩
-        obtain ⟨p', q', h'⟩ := hstab r p q
-        refine ⟨p', q', ?_⟩
-        rw [smul_eq_mul, RingOfIntegers.coe_eq_algebraMap, map_mul, ← RingOfIntegers.coe_eq_algebraMap,
-          ← RingOfIntegers.coe_eq_algebraMap, hx, ← h']
-        ring }
+  have hu : (u : K) = (v : K) * t := by rw [← htuv]; field_simp
+  let 𝔞 : Ideal (𝓞 K) := {
+    carrier := {x | ∃ p q : ℤ, (x : K) = (v : K) * (p + q * t)}
+    add_mem' := by
+      rintro x y ⟨p, q, hx⟩ ⟨p', q', hy⟩
+      exact ⟨
+        p + p',
+        q + q',
+        by
+          rw [RingOfIntegers.coe_eq_algebraMap, map_add (f := _),
+            ← RingOfIntegers.coe_eq_algebraMap, ← RingOfIntegers.coe_eq_algebraMap, hx, hy]
+          push_cast
+          ring
+      ⟩
+    zero_mem' := ⟨0, 0, by simp⟩
+    smul_mem' := by
+      rintro r x ⟨p, q, hx⟩
+      obtain ⟨p', q', h'⟩ := hstab r p q
+      refine ⟨p', q', ?_⟩
+      rw [smul_eq_mul, RingOfIntegers.coe_eq_algebraMap, map_mul,
+        ← RingOfIntegers.coe_eq_algebraMap, ← RingOfIntegers.coe_eq_algebraMap, hx, ← h']
+      ring
+  }
   have hmem𝔞 : ∀ x : 𝓞 K, x ∈ 𝔞 ↔ ∃ p q : ℤ, (x : K) = (v : K) * (p + q * t) := fun x => Iff.rfl
   refine ⟨𝔞, L.ω₁ / σ (v : K), ?_, div_ne_zero hω hσV, ?_⟩
   · intro hbot
@@ -102,25 +107,28 @@ theorem exists_ideal (σ : K →+* ℂ) (hσ : ¬ ComplexEmbedding.IsReal σ) (L
       simp only [map_mul, map_add (f := _), map_intCast]
       field_simp
 
-theorem im_mul_conj_eq_det (σ : K →+* ℂ) (b : Basis (Fin 2) ℚ K) (v : Fin 2 → K) :
-    (σ (v 0) * starRingEnd ℂ (σ (v 1))).im =
-      (b.det v : ℚ) * (σ (b 0) * starRingEnd ℂ (σ (b 1))).im := by
+theorem im_mul_conj_eq_det (σ : K →+* ℂ) (b : Basis (Fin 2) ℚ K) (v : Fin 2 → K)
+    : (σ (v 0) * starRingEnd ℂ (σ (v 1))).im
+      = (b.det v : ℚ) * (σ (b 0) * starRingEnd ℂ (σ (b 1))).im := by
   have hv : ∀ j, σ (v j) = ∑ i, ((b.toMatrix v i j : ℚ) : ℂ) * σ (b i) := by
     intro j
     conv_lhs => rw [← b.sum_toMatrix_smul_self v j]
     simp [Rat.smul_def, map_mul, map_ratCast]
   rw [hv 0, hv 1, Basis.det_apply, Matrix.det_fin_two]
-  simp only [Fin.sum_univ_two, map_add (f := _), map_mul, map_ratCast, Complex.mul_im, Complex.mul_re,
-    Complex.add_re, Complex.add_im, Complex.conj_re, Complex.conj_im, Complex.ratCast_re,
-    Complex.ratCast_im]
+  simp only [Fin.sum_univ_two, map_add (f := _), map_mul, map_ratCast, Complex.mul_im,
+    Complex.mul_re, Complex.add_re, Complex.add_im, Complex.conj_re, Complex.conj_im,
+    Complex.ratCast_re, Complex.ratCast_im]
   push_cast
   ring
 
-theorem covol_eq (σ : K →+* ℂ) (b : Basis (Fin 2) ℤ (𝓞 K)) (L : PeriodPair)
-    (I : FractionalIdeal (𝓞 K)⁰ K) (c : ℂ) (hc : c ≠ 0)
-    (h : ∀ z, z ∈ L.lattice ↔ ∃ x ∈ I, z = c * σ x) :
-    |(L.ω₁ * starRingEnd ℂ L.ω₂).im| = ‖c‖ ^ 2 * (FractionalIdeal.absNorm I : ℚ) *
-      |(σ (b 0 : K) * starRingEnd ℂ (σ (b 1 : K))).im| := by
+theorem covol_eq
+    (σ : K →+* ℂ)
+    (b : Basis (Fin 2) ℤ (𝓞 K))
+    (L : PeriodPair) (I : FractionalIdeal (𝓞 K)⁰ K) (c : ℂ)
+    (hc : c ≠ 0) (h : ∀ z, z ∈ L.lattice ↔ ∃ x ∈ I, z = c * σ x)
+    : |(L.ω₁ * starRingEnd ℂ L.ω₂).im|
+      = ‖c‖ ^ 2 * (FractionalIdeal.absNorm I : ℚ)
+        * |(σ (b 0 : K) * starRingEnd ℂ (σ (b 1 : K))).im| := by
   obtain ⟨u0, hu0, e0⟩ := (h L.ω₁).1 L.ω₁_mem_lattice
   obtain ⟨u1, hu1, e1⟩ := (h L.ω₂).1 L.ω₂_mem_lattice
   let w : Fin 2 → (I : Submodule (𝓞 K) K) := ![⟨u0, hu0⟩, ⟨u1, hu1⟩]
@@ -160,20 +168,24 @@ theorem covol_eq (σ : K →+* ℂ) (b : Basis (Fin 2) ℤ (𝓞 K)) (L : Period
   rw [hcomp] at hdet
   have him := im_mul_conj_eq_det σ (b.localizationLocalization ℚ ℤ⁰ K) ![u0, u1]
   simp only [Basis.localizationLocalization_apply, Matrix.cons_val_zero, Matrix.cons_val_one] at him
-  have hsq : (c * σ u0 * starRingEnd ℂ (c * σ u1)).im = ‖c‖ ^ 2 * (σ u0 * starRingEnd ℂ (σ u1)).im := by
-    rw [map_mul, show c * σ u0 * (starRingEnd ℂ c * starRingEnd ℂ (σ u1)) =
-      (c * starRingEnd ℂ c) * (σ u0 * starRingEnd ℂ (σ u1)) by ring, Complex.mul_conj,
-      Complex.im_ofReal_mul, Complex.normSq_eq_norm_sq]
+  have hsq
+      : (c * σ u0 * starRingEnd ℂ (c * σ u1)).im = ‖c‖ ^ 2 * (σ u0 * starRingEnd ℂ (σ u1)).im := by
+    rw [map_mul,
+      show c * σ u0 * (starRingEnd ℂ c * starRingEnd ℂ (σ u1))
+          = (c * starRingEnd ℂ c) * (σ u0 * starRingEnd ℂ (σ u1)) by
+        ring,
+      Complex.mul_conj, Complex.im_ofReal_mul, Complex.normSq_eq_norm_sq]
   rw [e0, e1, hsq, abs_mul, abs_of_nonneg (by positivity), him, abs_mul, ← Rat.cast_abs, hdet]
   simp only [RingOfIntegers.coe_eq_algebraMap]
   ring
 
-theorem mem_iff (σ : K →+* ℂ) (L L' : PeriodPair) (𝔟 : Ideal (𝓞 K)) (β : ℂ) (h𝔟 : 𝔟 ≠ ⊥)
-    (hβ : β ≠ 0)
-    (h1 : ∀ x : K, (∀ b ∈ 𝔟, IsIntegral ℤ (x * (b : K))) → ∀ z ∈ L.lattice,
-      β * σ x * z ∈ L'.lattice)
-    (h2 : ∀ y ∈ 𝔟, ∀ z ∈ L'.lattice, β⁻¹ * σ (y : K) * z ∈ L.lattice) (z : ℂ) :
-    z ∈ L'.lattice ↔ ∀ y ∈ 𝔟, β⁻¹ * σ (y : K) * z ∈ L.lattice := by
+theorem mem_iff
+    (σ : K →+* ℂ) (L L' : PeriodPair) (𝔟 : Ideal (𝓞 K)) (β : ℂ)
+    (h𝔟 : 𝔟 ≠ ⊥) (hβ : β ≠ 0)
+    (h1
+      : ∀ x : K, (∀ b ∈ 𝔟, IsIntegral ℤ (x * (b : K))) → ∀ z ∈ L.lattice, β * σ x * z ∈ L'.lattice)
+    (h2 : ∀ y ∈ 𝔟, ∀ z ∈ L'.lattice, β⁻¹ * σ (y : K) * z ∈ L.lattice) (z : ℂ)
+    : z ∈ L'.lattice ↔ ∀ y ∈ 𝔟, β⁻¹ * σ (y : K) * z ∈ L.lattice := by
   constructor
   · intro hz y hy
     exact h2 y hy z hz
@@ -188,8 +200,10 @@ theorem mem_iff (σ : K →+* ℂ) (L L' : PeriodPair) (𝔟 : Ideal (𝓞 K)) (
         obtain ⟨y', hy', rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hy
         have hx' : ∀ b ∈ 𝔟, IsIntegral ℤ (x * (b : K)) := by
           intro b hb
-          obtain ⟨r, hr⟩ := (FractionalIdeal.mem_one_iff _).1 ((FractionalIdeal.mem_inv_iff hb0).1 hx _
-            ((FractionalIdeal.mem_coeIdeal _).2 ⟨b, hb, rfl⟩))
+          obtain ⟨r, hr⟩ :=
+            (FractionalIdeal.mem_one_iff _).1
+              ((FractionalIdeal.mem_inv_iff hb0).1 hx _
+                ((FractionalIdeal.mem_coeIdeal _).2 ⟨b, hb, rfl⟩))
           rw [RingOfIntegers.coe_eq_algebraMap, ← hr]
           exact RingOfIntegers.isIntegral_coe r
         have hmem := h1 x hx' _ (hz y' hy')
@@ -207,17 +221,25 @@ theorem mem_iff (σ : K →+* ℂ) (L L' : PeriodPair) (𝔟 : Ideal (𝓞 K)) (
 
 end CMLattice
 
-
 open CMLattice in
-theorem lattice_cm_eq_ideal_and_covolume :
-    ∀ (K : Type) [Field K] [NumberField K], Module.finrank ℚ K = 2 → ∀ (σ : K →+* ℂ), ¬ NumberField.ComplexEmbedding.IsReal σ →
-  ∀ (L L' : PeriodPair), (∀ (a : 𝓞 K), ∀ z ∈ L.lattice, σ (a : K) * z ∈ L.lattice) →
-  (∃ (𝔞 : Ideal (𝓞 K)) (c : ℂ), 𝔞 ≠ ⊥ ∧ c ≠ 0 ∧ ∀ z, z ∈ L.lattice ↔ ∃ a ∈ 𝔞, z = c * σ (a : K)) ∧
-  ∀ (𝔟 : Ideal (𝓞 K)) (β : ℂ), 𝔟 ≠ ⊥ → β ≠ 0 →
-    (∀ x : K, (∀ b ∈ 𝔟, IsIntegral ℤ (x * (b : K))) → ∀ z ∈ L.lattice, β * σ x * z ∈ L'.lattice) →
-    (∀ y ∈ 𝔟, ∀ z ∈ L'.lattice, β⁻¹ * σ (y : K) * z ∈ L.lattice) →
-    (∀ z, z ∈ L'.lattice ↔ ∀ y ∈ 𝔟, β⁻¹ * σ (y : K) * z ∈ L.lattice) ∧
-    |(L'.ω₁ * starRingEnd ℂ L'.ω₂).im| * Ideal.absNorm 𝔟 = ‖β‖ ^ 2 * |(L.ω₁ * starRingEnd ℂ L.ω₂).im| := by
+theorem lattice_cm_eq_ideal_and_covolume
+    : ∀ (K : Type) [Field K] [NumberField K],
+      Module.finrank ℚ K = 2
+        → ∀ (σ : K →+* ℂ),
+          ¬ NumberField.ComplexEmbedding.IsReal σ
+            → ∀ (L L' : PeriodPair),
+              (∀ (a : 𝓞 K), ∀ z ∈ L.lattice, σ (a : K) * z ∈ L.lattice)
+                → (∃ (𝔞 : Ideal (𝓞 K)) (c : ℂ),
+                    𝔞 ≠ ⊥ ∧ c ≠ 0 ∧ ∀ z, z ∈ L.lattice ↔ ∃ a ∈ 𝔞, z = c * σ (a : K))
+                  ∧ ∀ (𝔟 : Ideal (𝓞 K)) (β : ℂ),
+                    𝔟 ≠ ⊥ → β ≠ 0
+                      → (∀ x : K,
+                        (∀ b ∈ 𝔟, IsIntegral ℤ (x * (b : K)))
+                          → ∀ z ∈ L.lattice, β * σ x * z ∈ L'.lattice)
+                      → (∀ y ∈ 𝔟, ∀ z ∈ L'.lattice, β⁻¹ * σ (y : K) * z ∈ L.lattice)
+                      → (∀ z, z ∈ L'.lattice ↔ ∀ y ∈ 𝔟, β⁻¹ * σ (y : K) * z ∈ L.lattice)
+                        ∧ |(L'.ω₁ * starRingEnd ℂ L'.ω₂).im| * Ideal.absNorm 𝔟
+                          = ‖β‖ ^ 2 * |(L.ω₁ * starRingEnd ℂ L.ω₂).im| := by
   intro K _ _ hK σ hσ L L' hL
   refine ⟨exists_ideal σ hσ L hL, ?_⟩
   intro 𝔟 β h𝔟 hβ h1 h2
@@ -247,18 +269,23 @@ theorem lattice_cm_eq_ideal_and_covolume :
         exact (FractionalIdeal.mem_one_iff _).2 ⟨1, map_one _⟩
       have key : ∃ x ∈ Bb⁻¹ * A0, σ 1 * z = (β * c) * σ x := by
         refine FractionalIdeal.mul_induction_on
-          (C := fun w => ∃ x ∈ Bb⁻¹ * A0, σ w * z = (β * c) * σ x) h1mem ?_ ?_
+          (C := fun w => ∃ x ∈ Bb⁻¹ * A0, σ w * z = (β * c) * σ x)
+          h1mem ?_ ?_
         · intro x hx y hy
           obtain ⟨y', hy', rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hy
           obtain ⟨a, ha, hae⟩ := (hL1 _).1 ((hmem z).1 hz y' hy')
           refine ⟨x * a, FractionalIdeal.mul_mem_mul hx ha, ?_⟩
           rw [map_mul, map_mul]
-          calc σ x * σ (algebraMap (𝓞 K) K y') * z
-              = β * σ x * (β⁻¹ * σ (y' : K) * z) := by
-                rw [RingOfIntegers.coe_eq_algebraMap]; field_simp
+          calc
+            σ x * σ (algebraMap (𝓞 K) K y') * z = β * σ x * (β⁻¹ * σ (y' : K) * z) := by
+              rw [RingOfIntegers.coe_eq_algebraMap]; field_simp
             _ = β * c * (σ x * σ a) := by rw [hae]; ring
         · rintro x y ⟨x1, hx1, e1⟩ ⟨y1, hy1, e2⟩
-          exact ⟨x1 + y1, Submodule.add_mem (↑(Bb⁻¹ * A0) : Submodule (𝓞 K) K) hx1 hy1, by rw [map_add (f := _), add_mul, e1, e2, map_add (f := _)]; ring⟩
+          exact ⟨
+            x1 + y1,
+            Submodule.add_mem (↑(Bb⁻¹ * A0) : Submodule (𝓞 K) K) hx1 hy1,
+            by rw [map_add (f := _), add_mul, e1, e2, map_add (f := _)]; ring
+          ⟩
       simpa using key
     · rintro ⟨x, hx, rfl⟩
       rw [hmem]
@@ -271,8 +298,7 @@ theorem lattice_cm_eq_ideal_and_covolume :
         field_simp
   have hcL := covol_eq σ b L A0 c hc hL1
   have hcL' := covol_eq σ b L' (Bb⁻¹ * A0) (β * c) (mul_ne_zero hβ hc) hL2
-  have hN : (Ideal.absNorm 𝔟 : ℝ) ≠ 0 := by
-    exact_mod_cast (Ideal.absNorm_eq_zero_iff.not.2 h𝔟)
+  have hN : (Ideal.absNorm 𝔟 : ℝ) ≠ 0 := by exact_mod_cast (Ideal.absNorm_eq_zero_iff.not.2 h𝔟)
   rw [hcL, hcL', map_mul, map_inv₀, hA0, hBb, FractionalIdeal.coeIdeal_absNorm,
     FractionalIdeal.coeIdeal_absNorm, norm_mul]
   push_cast

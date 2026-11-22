@@ -8,17 +8,23 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EmbBar
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 open GlobalTheory.Doubling (absE)
 open GlobalTheory.CompanionTheory.GodementH
 
 namespace GlobalTheory.CompanionTheory.IntegerCount
 
-theorem card_bounded_conjugates_le :
-    ∀ (E : Type) [Field E] [NumberField E], ∃ C : ℝ, 0 < C ∧ ∀ R : ℝ, 1 ≤ R →
-    {β : 𝓞 E | ∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R}.Finite ∧
-    (Set.ncard {β : 𝓞 E | ∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R} : ℝ) ≤ C * R ^ Module.finrank ℚ E := by
+theorem card_bounded_conjugates_le
+    : ∀ (E : Type) [Field E] [NumberField E], ∃ C : ℝ,
+      0 < C
+        ∧ ∀ R : ℝ,
+          1 ≤ R
+            → {β : 𝓞 E | ∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R}.Finite
+              ∧ (Set.ncard {β : 𝓞 E | ∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R} : ℝ)
+                ≤ C * R ^ Module.finrank ℚ E := by
   intro E _ _
   classical
   let ι := Module.Free.ChooseBasisIndex ℤ (𝓞 E)
@@ -28,13 +34,14 @@ theorem card_bounded_conjugates_le :
   let L : ι → (((E →+* ℂ) → ℂ) →L[ℂ] ℂ) := fun i => LinearMap.toContinuousLinearMap (B.coord i)
   let C₀ : ℝ := ∑ i, ‖L i‖
   have hC₀ : 0 ≤ C₀ := Finset.sum_nonneg fun _ _ => norm_nonneg _
-  have hcoord : ∀ (β : 𝓞 E) (i : ι), L i (canonicalEmbedding E (β : E)) = ((b.repr β i : ℤ) : ℂ) := by
+  have hcoord
+      : ∀ (β : 𝓞 E) (i : ι), L i (canonicalEmbedding E (β : E)) = ((b.repr β i : ℤ) : ℂ) := by
     intro β i
     have hx : canonicalEmbedding E (β : E) = ∑ j, ((b.repr β j : ℤ) : ℂ) • B j := by
       have h0 : (β : E) = ∑ j, ((b.repr β j : ℤ) : E) * ((b j : 𝓞 E) : E) := by
         conv_lhs => rw [← b.sum_repr β]
         set_option synthInstance.maxHeartbeats 100000 in
-          simp [map_sum, zsmul_eq_mul]
+        simp [map_sum, zsmul_eq_mul]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [h0, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
@@ -44,8 +51,11 @@ theorem card_bounded_conjugates_le :
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hx, map_sum]
     simp [Module.Basis.coord_apply, Finsupp.single_apply]
-  have hbound : ∀ (R : ℝ), 1 ≤ R → ∀ β : 𝓞 E, (∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R) →
-      ∀ i, |((b.repr β i : ℤ) : ℝ)| ≤ C₀ * R := by
+  have hbound
+      : ∀ (R : ℝ),
+        1 ≤ R
+          → ∀ β : 𝓞 E,
+            (∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R) → ∀ i, |((b.repr β i : ℤ) : ℝ)| ≤ C₀ * R := by
     intro R hR β hβ i
     have hx : ‖canonicalEmbedding E (β : E)‖ ≤ R :=
       (pi_norm_le_iff_of_nonneg (by linarith)).2 fun τ => by simpa using hβ τ
@@ -87,17 +97,18 @@ theorem card_bounded_conjugates_le :
     have h1 : ((Finset.Icc (-N) N).card : ℤ) = 2 * N + 1 := by
       rw [Int.card_Icc]
       omega
-    have h2 : ((Finset.Icc (-N) N).card : ℝ) = 2 * (N : ℝ) + 1 := by
-      exact_mod_cast h1
+    have h2 : ((Finset.Icc (-N) N).card : ℝ) = 2 * (N : ℝ) + 1 := by exact_mod_cast h1
     simp only [box, Fintype.card_piFinset, Finset.prod_const, Finset.card_univ, hcard]
     push_cast
     rw [h2]
   have hNle : (N : ℝ) ≤ C₀ * R := Int.floor_le _
-  calc (S.ncard : ℝ) ≤ box.card := by exact_mod_cast hle
+  calc
+    (S.ncard : ℝ)
+      ≤ box.card := by exact_mod_cast hle
     _ = (2 * (N : ℝ) + 1) ^ Module.finrank ℚ E := hboxcard
     _ ≤ ((2 * C₀ + 1) * R) ^ Module.finrank ℚ E := by
-        have hN0' : (0 : ℝ) ≤ N := by exact_mod_cast hN0
-        exact pow_le_pow_left₀ (by positivity) (by nlinarith) _
+      have hN0' : (0 : ℝ) ≤ N := by exact_mod_cast hN0
+      exact pow_le_pow_left₀ (by positivity) (by nlinarith) _
     _ = (2 * C₀ + 1) ^ Module.finrank ℚ E * R ^ Module.finrank ℚ E := mul_pow _ _ _
 
 end GlobalTheory.CompanionTheory.IntegerCount

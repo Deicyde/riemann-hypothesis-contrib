@@ -15,14 +15,21 @@ namespace PositivityTheory.Rg.Rsw.L.LPosExt
 
 variable {X : Type} [TopologicalSpace X]
 
-def swAlg (A : Submodule ℂ (X → ℂ)) (hmul : ∀ f ∈ A, ∀ g ∈ A, f * g ∈ A) (hstar : ∀ f ∈ A, star f ∈ A)
-    (K : Set X) : StarSubalgebra ℂ C(K, ℂ) where
+def swAlg
+    (A : Submodule ℂ (X → ℂ)) (hmul : ∀ f ∈ A, ∀ g ∈ A, f * g ∈ A) (hstar : ∀ f ∈ A, star f ∈ A)
+    (K : Set X)
+    : StarSubalgebra ℂ C(K, ℂ) where
   carrier := {h | ∃ c : ℂ, ∃ a ∈ A, ∀ x : K, h x = c + a x}
   mul_mem' := by
     rintro h h' ⟨c, a, ha, hh⟩ ⟨c', a', ha', hh'⟩
-    refine ⟨c * c', c • a' + c' • a + a * a', A.add_mem (A.add_mem (A.smul_mem _ ha') (A.smul_mem _ ha))
-      (hmul _ ha _ ha'), fun x => ?_⟩
-    simp only [ContinuousMap.mul_apply, hh, hh', Pi.add_apply, Pi.smul_apply, Pi.mul_apply, smul_eq_mul]
+    refine ⟨
+      c * c',
+      c • a' + c' • a + a * a',
+      A.add_mem (A.add_mem (A.smul_mem _ ha') (A.smul_mem _ ha)) (hmul _ ha _ ha'),
+      fun x => ?_
+    ⟩
+    simp only [ContinuousMap.mul_apply, hh, hh', Pi.add_apply, Pi.smul_apply, Pi.mul_apply,
+      smul_eq_mul]
     ring
   one_mem' := ⟨1, 0, A.zero_mem, fun x => by simp⟩
   add_mem' := by
@@ -37,11 +44,14 @@ def swAlg (A : Submodule ℂ (X → ℂ)) (hmul : ∀ f ∈ A, ∀ g ∈ A, f * 
     refine ⟨conj c, star a, hstar a ha, fun x => ?_⟩
     simp [ContinuousMap.star_apply, hh, Pi.star_apply]
 
-theorem approx (A : Submodule ℂ (X → ℂ)) (hc : ∀ f ∈ A, Continuous f)
-    (hmul : ∀ f ∈ A, ∀ g ∈ A, f * g ∈ A) (hstar : ∀ f ∈ A, star f ∈ A)
-    (hsep : ∀ x y, x ≠ y → ∃ f ∈ A, f x ≠ f y) {K : Set X} (hK : IsCompact K) {b : X → ℂ} (hbA : b ∈ A)
-    (hbK : ∀ x ∉ K, b x = 0) {g : X → ℂ} (hg : Continuous g) (hgb : ∀ x, g x ≠ 0 → b x = 1)
-    {ε : ℝ} (hε : 0 < ε) : ∃ h ∈ A, ∀ x, ‖h x - g x‖ ≤ ε * ‖b x‖ := by
+theorem approx
+    (A : Submodule ℂ (X → ℂ)) (hc : ∀ f ∈ A, Continuous f) (hmul : ∀ f ∈ A, ∀ g ∈ A, f * g ∈ A)
+    (hstar : ∀ f ∈ A, star f ∈ A) (hsep : ∀ x y, x ≠ y → ∃ f ∈ A, f x ≠ f y)
+    {K : Set X} (hK : IsCompact K)
+    {b : X → ℂ} (hbA : b ∈ A) (hbK : ∀ x ∉ K, b x = 0)
+    {g : X → ℂ} (hg : Continuous g) (hgb : ∀ x, g x ≠ 0 → b x = 1)
+    {ε : ℝ} (hε : 0 < ε)
+    : ∃ h ∈ A, ∀ x, ‖h x - g x‖ ≤ ε * ‖b x‖ := by
   have : CompactSpace K := isCompact_iff_compactSpace.mp hK
   set S := swAlg A hmul hstar K
   have hS : S.SeparatesPoints := by

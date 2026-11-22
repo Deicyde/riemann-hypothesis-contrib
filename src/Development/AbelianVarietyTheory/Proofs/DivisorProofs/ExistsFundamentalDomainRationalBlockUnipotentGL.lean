@@ -10,18 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 @[expose] public section
 
 noncomputable section
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory
+  GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
 open Topology
 
 namespace GlobalTheory.CuspRep
 
-theorem discreteTopology_ratN (E : Type) [Field E] [NumberField E] (a s : ℕ) :
-    DiscreteTopology (ratN E a s) := by
+theorem discreteTopology_ratN (E : Type) [Field E] [NumberField E] (a s : ℕ)
+    : DiscreteTopology (ratN E a s) := by
   refine discreteTopology_of_isOpen_singleton_zero ?_
   have hU : IsOpen (Set.univ.pi fun _ : BlockIx a s => Formalism.IndefR.Eqv.G5.adlNbhd (F := E)) :=
     isOpen_set_pi Set.finite_univ fun _ _ => Formalism.IndefR.Eqv.G5.adl_isOpen_nbhd
-  have h : ({0} : Set (ratN E a s)) =
-      Subtype.val ⁻¹' (Set.univ.pi fun _ : BlockIx a s => Formalism.IndefR.Eqv.G5.adlNbhd (F := E)) := by
+  have h
+      : ({0} : Set (ratN E a s))
+        = Subtype.val
+          ⁻¹' (Set.univ.pi fun _ : BlockIx a s => Formalism.IndefR.Eqv.G5.adlNbhd (F := E)) := by
     ext ⟨x, q, hq⟩
     constructor
     · intro hx p _
@@ -32,13 +35,19 @@ theorem discreteTopology_ratN (E : Type) [Field E] [NumberField E] (a s : ℕ) :
       subst hq
       apply Subtype.ext
       funext p
-      have h0 : q p = 0 := Formalism.IndefR.Eqv.G5.adl_eq_zero_of_mem_nbhd (q p) (hx p (Set.mem_univ _))
+      have h0 : q p = 0 :=
+        Formalism.IndefR.Eqv.G5.adl_eq_zero_of_mem_nbhd (q p) (hx p (Set.mem_univ _))
       show algebraMap E (Ad E) (q p) = 0
       rw [h0, map_zero]
   rw [h]
   exact hU.preimage continuous_subtype_val
 
-theorem exists_isAddFundamentalDomain_ratN : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (s : ℕ) [MeasurableSpace (BlockIx a s → Ad E)] [BorelSpace (BlockIx a s → Ad E)] (μ : Measure (BlockIx a s → Ad E)) [μ.IsAddHaarMeasure], ∃ 𝓕 : Set (BlockIx a s → Ad E), IsAddFundamentalDomain (ratN E a s) 𝓕 μ ∧ μ 𝓕 ≠ 0 ∧ μ 𝓕 < ⊤ := by
+theorem exists_isAddFundamentalDomain_ratN
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (s : ℕ)
+        [MeasurableSpace (BlockIx a s → Ad E)] [BorelSpace (BlockIx a s → Ad E)]
+        (μ : Measure (BlockIx a s → Ad E)) [μ.IsAddHaarMeasure],
+      ∃ 𝓕 : Set (BlockIx a s → Ad E),
+        IsAddFundamentalDomain (ratN E a s) 𝓕 μ ∧ μ 𝓕 ≠ 0 ∧ μ 𝓕 < ⊤ := by
   intro E _ _ _ a s _ _ μ _
   haveI : SecondCountableTopology (Ad E) := GlobalTheory.AdelicUnitaryTop.secondCountable_adele E
   haveI := discreteTopology_ratN E a s

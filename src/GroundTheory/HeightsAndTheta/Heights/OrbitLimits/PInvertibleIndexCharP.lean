@@ -11,8 +11,9 @@ namespace GroundTheory.Heights₂.Heights.Targets
 
 open GroundTheory.Heights₂.Heights
 
-theorem InvertibleIndexCharP.finite_subring {Ω : Type} [Field Ω] (B : Subring Ω) (hp : ringChar Ω ≠ 0)
-    (hB : Module.Finite ℤ B) : Finite B := by
+theorem InvertibleIndexCharP.finite_subring
+    {Ω : Type} [Field Ω] (B : Subring Ω) (hp : ringChar Ω ≠ 0) (hB : Module.Finite ℤ B)
+    : Finite B := by
   apply Module.finite_of_fg_torsion
   intro x
   refine ⟨⟨(ringChar Ω : ℤ), mem_nonZeroDivisors_of_ne_zero (by exact_mod_cast hp)⟩, ?_⟩
@@ -42,7 +43,9 @@ theorem InvertibleIndexCharP.proof : InvertibleIndexCharP.Statement := by
       obtain ⟨b, c, hbm, hbc⟩ := hgen z hz
       obtain ⟨b', hb'⟩ := hunit b hbm
       refine ⟨((b' * c : B) : Ω), (b' * c).2, ?_⟩
-      calc f i * ((b' * c : B) : Ω) = b' * (c * f i) := by push_cast; ring
+      calc
+        f i * ((b' * c : B) : Ω)
+          = b' * (c * f i) := by push_cast; ring
         _ = b' * (b * z) := by rw [hbc]
         _ = z := by rw [← mul_assoc, hb', one_mul]
     · rintro ⟨y, hy, rfl⟩
@@ -55,8 +58,7 @@ theorem InvertibleIndexCharP.proof : InvertibleIndexCharP.Statement := by
       exact this
   set A := B.toAddSubgroup with hA
   have hAfin : Finite A := hfin
-  have hXfin' : (X : Set Ω).Finite := by
-    rw [hXeq]; exact (Set.toFinite (B : Set Ω)).image _
+  have hXfin' : (X : Set Ω).Finite := by rw [hXeq]; exact (Set.toFinite (B : Set Ω)).image _
   have hXfin : Finite X := hXfin'.to_subtype
 
   have hcard : Nat.card X = Nat.card A := by
@@ -64,13 +66,14 @@ theorem InvertibleIndexCharP.proof : InvertibleIndexCharP.Statement := by
     rw [← hXeq] at h
     exact h
   have hc : Nat.card (A.addSubgroupOf X) = Nat.card (X.addSubgroupOf A) :=
-    Nat.card_congr
-      { toFun := fun x => ⟨⟨x.1.1, AddSubgroup.mem_addSubgroupOf.1 x.2⟩,
-          AddSubgroup.mem_addSubgroupOf.2 x.1.2⟩
-        invFun := fun x => ⟨⟨x.1.1, AddSubgroup.mem_addSubgroupOf.1 x.2⟩,
-          AddSubgroup.mem_addSubgroupOf.2 x.1.2⟩
-        left_inv := fun _ => rfl
-        right_inv := fun _ => rfl }
+    Nat.card_congr {
+      toFun := fun x =>
+        ⟨⟨x.1.1, AddSubgroup.mem_addSubgroupOf.1 x.2⟩, AddSubgroup.mem_addSubgroupOf.2 x.1.2⟩
+      invFun := fun x =>
+        ⟨⟨x.1.1, AddSubgroup.mem_addSubgroupOf.1 x.2⟩, AddSubgroup.mem_addSubgroupOf.2 x.1.2⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl
+    }
   have k1 : Nat.card (A.addSubgroupOf X) * A.relIndex X = Nat.card X :=
     (A.addSubgroupOf X).card_mul_index
   have k2 : Nat.card (X.addSubgroupOf A) * X.relIndex A = Nat.card A :=

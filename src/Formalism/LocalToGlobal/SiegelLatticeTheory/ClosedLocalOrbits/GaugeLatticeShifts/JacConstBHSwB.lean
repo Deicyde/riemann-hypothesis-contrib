@@ -14,10 +14,12 @@ open scoped ENNReal
 
 namespace Formalism.L2.SG.Pf.BH.Sw
 
-open Formalism.QuantumDeterminants Formalism.L2.SG.Pf Formalism.L2.SG.Pf.BH Formalism.MainNotions.BridgeCSB
+open Formalism.QuantumDeterminants Formalism.L2.SG.Pf Formalism.L2.SG.Pf.BH
+  Formalism.MainNotions.BridgeCSB
 
-attribute [local instance] Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedSpace
-  Matrix.frobeniusNormedRing Matrix.frobeniusNormedAlgebra
+attribute [local instance]
+  Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedSpace Matrix.frobeniusNormedRing
+  Matrix.frobeniusNormedAlgebra
 
 def Mid (k r : ℕ) (i : Fin (2 * r + k + 1)) : Prop := r ≤ i.val ∧ i.val ≤ r + k
 
@@ -26,12 +28,14 @@ def uH (k r : ℕ) : Submodule ℝ (Mat k r) where
   add_mem' := by
     intro X Y hX hY
     simp only [Set.mem_ofPred_eq] at *
-    rw [adjH_add, show adjH X + adjH Y + (X + Y) = (adjH X + X) + (adjH Y + Y) by abel, hX, hY, add_zero]
+    rw [adjH_add, show adjH X + adjH Y + (X + Y) = (adjH X + X) + (adjH Y + Y) by abel, hX, hY,
+      add_zero]
   zero_mem' := by simp [adjH]
   smul_mem' := by
     intro c X hX
     simp only [Set.mem_ofPred_eq] at *
-    rw [← Complex.coe_smul, adjH_smul, Complex.star_def, Complex.conj_ofReal, ← smul_add, hX, smul_zero]
+    rw [← Complex.coe_smul, adjH_smul, Complex.star_def, Complex.conj_ofReal, ← smul_add, hX,
+      smul_zero]
 
 def uWb (k r : ℕ) : Submodule ℝ (Mat k r) where
   carrier := {X | adjH X + X = 0 ∧ ∀ i j, ¬ (Mid k r i ∧ Mid k r j) → X i j = 0}
@@ -46,16 +50,22 @@ def uWb (k r : ℕ) : Submodule ℝ (Mat k r) where
     simp [hX.2 i j h]
 
 def tv (k r : ℕ) (c : Fin r → ℂ) (i : Fin (2 * r + k + 1)) : ℂ :=
-  if h : i.val < r then c ⟨i.val, h⟩
-  else if h2 : i.val ≤ r + k then 1
-  else (star (c ⟨2 * r + k - i.val, by have := i.isLt; omega⟩))⁻¹
+  if h : i.val < r then
+    c ⟨i.val, h⟩
+  else if h2 : i.val ≤ r + k then
+    1
+  else
+    (star (c ⟨2 * r + k - i.val, by have := i.isLt; omega⟩))⁻¹
 
 def tM (k r : ℕ) (c : Fin r → ℂ) : Mat k r := Matrix.diagonal (tv k r c)
 
 def dv (k r : ℕ) (x : Fin r → ℂ) (i : Fin (2 * r + k + 1)) : ℂ :=
-  if h : i.val < r then x ⟨i.val, h⟩
-  else if h2 : i.val ≤ r + k then 0
-  else -star (x ⟨2 * r + k - i.val, by have := i.isLt; omega⟩)
+  if h : i.val < r then
+    x ⟨i.val, h⟩
+  else if h2 : i.val ≤ r + k then
+    0
+  else
+    - star (x ⟨2 * r + k - i.val, by have := i.isLt; omega⟩)
 
 def tD (k r : ℕ) (x : Fin r → ℂ) : Mat k r := Matrix.diagonal (dv k r x)
 
@@ -66,7 +76,11 @@ def LmL (k r : ℕ) : (Mat k r × (Fin r → ℂ) × Mat k r × Mat k r) →ₗ[
   toFun p := w0B k r * p.1 * w0B k r + tD k r p.2.1 + p.2.2.1 - p.2.2.2
   map_add' p q := by
     have : tD k r (p.2.1 + q.2.1) = tD k r p.2.1 + tD k r q.2.1 := by
-      unfold tD; rw [Matrix.diagonal_add]; congr 1; funext i; unfold dv
+      unfold tD
+      rw [Matrix.diagonal_add]
+      congr 1
+      funext i
+      unfold dv
       split_ifs <;> simp [star_add] <;> ring
     simp only [Prod.fst_add, Prod.snd_add, this, Matrix.mul_add, Matrix.add_mul]
     abel
@@ -74,10 +88,12 @@ def LmL (k r : ℕ) : (Mat k r × (Fin r → ℂ) × Mat k r × Mat k r) →ₗ[
     have : tD k r (c • p.2.1) = c • tD k r p.2.1 := by
       have hd : ∀ i, dv k r (c • p.2.1) i = (c : ℂ) * dv k r p.2.1 i := by
         intro i; unfold dv; split_ifs <;> simp [Complex.real_smul]
-      unfold tD; ext i j; simp only [Matrix.diagonal_apply, Matrix.smul_apply, hd]
+      unfold tD
+      ext i j
+      simp only [Matrix.diagonal_apply, Matrix.smul_apply, hd]
       split_ifs <;> simp [Complex.real_smul]
-    simp only [Prod.smul_fst, Prod.smul_snd, this, RingHom.id_apply, Matrix.mul_smul, Matrix.smul_mul, smul_add,
-      smul_sub]
+    simp only [Prod.smul_fst, Prod.smul_snd, this, RingHom.id_apply, Matrix.mul_smul,
+      Matrix.smul_mul, smul_add, smul_sub]
 
 def Lm (k r : ℕ) : (Mat k r × (Fin r → ℂ) × Mat k r × Mat k r) →L[ℝ] Mat k r :=
   LinearMap.toContinuousLinearMap (LmL k r)
@@ -87,10 +103,16 @@ def Vs (k r : ℕ) : Submodule ℝ (Mat k r × (Fin r → ℂ) × Mat k r × Mat
 
 def LieG : Prop := ∀ k r : ℕ, Formalism.MainNotions.S.lieE (UH (Hpk k r)) = (uH k r).map RL
 
-def LieWb : Prop := ∀ k r : ℕ, (∀ Z ∈ uWb k r, NormedSpace.exp Z ∈ Formalism.FourierDecayAlt.B2.UWb k r) ∧
-  Formalism.MainNotions.S.lieE (Formalism.FourierDecayAlt.B2.UWb k r) = (uWb k r).map RL
+def LieWb : Prop :=
+  ∀ k r : ℕ,
+    (∀ Z ∈ uWb k r, NormedSpace.exp Z ∈ Formalism.FourierDecayAlt.B2.UWb k r)
+      ∧ Formalism.MainNotions.S.lieE (Formalism.FourierDecayAlt.B2.UWb k r) = (uWb k r).map RL
 
-def LIso : Prop := ∀ k r : ℕ, (∀ v ∈ Vs k r, Lm k r v ∈ uH k r) ∧ (∀ Y ∈ uH k r, ∃ v ∈ Vs k r, Lm k r v = Y) ∧
-  ∀ v ∈ Vs k r, ‖RL (Lm k r v)‖ ^ 2 = ‖RL v.1‖ ^ 2 + 2 * ∑ a, ‖v.2.1 a‖ ^ 2 + ‖RL v.2.2.1‖ ^ 2 + ‖RL v.2.2.2‖ ^ 2
+def LIso : Prop :=
+  ∀ k r : ℕ,
+    (∀ v ∈ Vs k r, Lm k r v ∈ uH k r) ∧ (∀ Y ∈ uH k r, ∃ v ∈ Vs k r, Lm k r v = Y)
+      ∧ ∀ v ∈ Vs k r,
+        ‖RL (Lm k r v)‖ ^ 2
+          = ‖RL v.1‖ ^ 2 + 2 * ∑ a, ‖v.2.1 a‖ ^ 2 + ‖RL v.2.2.1‖ ^ 2 + ‖RL v.2.2.2‖ ^ 2
 
 end Formalism.L2.SG.Pf.BH.Sw

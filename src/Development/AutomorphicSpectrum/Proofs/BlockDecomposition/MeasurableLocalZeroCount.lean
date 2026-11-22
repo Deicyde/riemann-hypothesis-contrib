@@ -10,40 +10,53 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RandomSe
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.CompanionTheory.FSCrofton
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts
+  GlobalTheory.CompanionTheory.FSCrofton
 open scoped ENNReal
 
 namespace GlobalTheory.CompanionTheory.FSCrofton.Chart
 
-theorem measurableSet_of_isSigmaCompact {X : Type*} [TopologicalSpace X] [T2Space X]
-    [MeasurableSpace X] [OpensMeasurableSpace X] {A : Set X} (hA : IsSigmaCompact A) :
-    MeasurableSet A := by
+theorem measurableSet_of_isSigmaCompact
+    {X : Type*} [TopologicalSpace X] [T2Space X] [MeasurableSpace X] [OpensMeasurableSpace X]
+    {A : Set X} (hA : IsSigmaCompact A)
+    : MeasurableSet A := by
   obtain ⟨K, hK, rfl⟩ := hA
   exact MeasurableSet.iUnion fun n => (hK n).measurableSet
 
 variable {Y : Var ℂ} {L : LB Y.X}
 
-noncomputable def chartVal {n : ℕ} (b : Fin n → L.Sec) (c : AlgChart Y.str (RingHom.id ℂ) Y.dim)
-    (i : L.ι) (j : Fin n) (v : ReciprocityTheory.L2DbarEstimates.V Y.dim) : ℂ :=
+noncomputable def chartVal
+    {n : ℕ} (b : Fin n → L.Sec)
+    (c : AlgChart Y.str (RingHom.id ℂ) Y.dim) (i : L.ι) (j : Fin n)
+    (v : ReciprocityTheory.L2DbarEstimates.V Y.dim)
+    : ℂ :=
   secVal Y.str (RingHom.id ℂ) (b j) i (c.e.symm v)
 
-theorem encard_eq_zeroCnt {n : ℕ} (b : Fin n → L.Sec) (c : AlgChart Y.str (RingHom.id ℂ) Y.dim)
-    (i : L.ι) (A : Set (CxPts Y.str (RingHom.id ℂ))) (hAc : A ⊆ c.e.source)
-    (hAi : A ⊆ ptsIn Y.str (RingHom.id ℂ) (L.U i)) (C : Fin Y.dim → Fin n → ℂ) :
-    (({y : CxPts Y.str (RingHom.id ℂ) | y ∈ A ∧ ∀ (k : Fin Y.dim) (i' : L.ι),
-        y ∈ ptsIn Y.str (RingHom.id ℂ) (L.U i') →
-        ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i' y = 0}.encard : ℕ∞) : ℝ≥0∞) =
-      zeroCnt Y.dim (c.e '' A) (chartVal b c i) C := by
-  have hinj : Set.InjOn c.e {y : CxPts Y.str (RingHom.id ℂ) | y ∈ A ∧ ∀ (k : Fin Y.dim) (i' : L.ι),
+theorem encard_eq_zeroCnt
+    {n : ℕ} (b : Fin n → L.Sec)
+    (c : AlgChart Y.str (RingHom.id ℂ) Y.dim) (i : L.ι) (A : Set (CxPts Y.str (RingHom.id ℂ)))
+    (hAc : A ⊆ c.e.source) (hAi : A ⊆ ptsIn Y.str (RingHom.id ℂ) (L.U i))
+    (C : Fin Y.dim → Fin n → ℂ)
+    : (({y : CxPts Y.str (RingHom.id ℂ) | y ∈ A ∧ ∀ (k : Fin Y.dim) (i' : L.ι),
+          y ∈ ptsIn Y.str (RingHom.id ℂ) (L.U i') →
+          ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i' y = 0}.encard
+          : ℕ∞)
+        : ℝ≥0∞)
+      = zeroCnt Y.dim (c.e '' A) (chartVal b c i) C := by
+  have hinj : Set.InjOn c.e
+      {y : CxPts Y.str (RingHom.id ℂ) | y ∈ A ∧ ∀ (k : Fin Y.dim) (i' : L.ι),
         y ∈ ptsIn Y.str (RingHom.id ℂ) (L.U i') →
         ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i' y = 0} :=
     c.e.injOn.mono fun y hy => hAc hy.1
-  have himg : c.e '' {y : CxPts Y.str (RingHom.id ℂ) | y ∈ A ∧ ∀ (k : Fin Y.dim) (i' : L.ι),
-        y ∈ ptsIn Y.str (RingHom.id ℂ) (L.U i') →
-        ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i' y = 0} =
-      {z ∈ c.e '' A | ∀ k, ∑ j, C k j * chartVal b c i j z = 0} := by
+  have himg
+      : c.e
+          '' {y : CxPts Y.str (RingHom.id ℂ) | y ∈ A ∧ ∀ (k : Fin Y.dim) (i' : L.ι),
+            y ∈ ptsIn Y.str (RingHom.id ℂ) (L.U i') →
+            ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i' y = 0}
+        = {z ∈ c.e '' A | ∀ k, ∑ j, C k j * chartVal b c i j z = 0} := by
     ext v
     constructor
     · rintro ⟨y, ⟨hyA, hy⟩, rfl⟩
@@ -53,35 +66,43 @@ theorem encard_eq_zeroCnt {n : ℕ} (b : Fin n → L.Sec) (c : AlgChart Y.str (R
       refine ⟨y, ⟨hyA, fun k i' hi' => ?_⟩, rfl⟩
       have h0 : ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i y = 0 := by
         simpa only [chartVal, c.e.left_inv (hAc hyA)] using hy k
-      have e : ∀ j, secVal Y.str (RingHom.id ℂ) (b j) i' y =
-          gv Y.str (RingHom.id ℂ) L i' i y * secVal Y.str (RingHom.id ℂ) (b j) i y :=
-        fun j => (secVal_mem (b j)).1 i' i y hi' (hAi hyA)
+      have e
+          : ∀ j,
+            secVal Y.str (RingHom.id ℂ) (b j) i' y
+              = gv Y.str (RingHom.id ℂ) L i' i y * secVal Y.str (RingHom.id ℂ) (b j) i y := fun j =>
+        (secVal_mem (b j)).1 i' i y hi' (hAi hyA)
       simp only [e]
-      calc ∑ j, C k j * (gv Y.str (RingHom.id ℂ) L i' i y * secVal Y.str (RingHom.id ℂ) (b j) i y)
-          = gv Y.str (RingHom.id ℂ) L i' i y *
-              ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i y := by
-            rw [Finset.mul_sum]
-            exact Finset.sum_congr rfl fun j _ => by ring
+      calc
+        ∑ j, C k j * (gv Y.str (RingHom.id ℂ) L i' i y * secVal Y.str (RingHom.id ℂ) (b j) i y)
+            = gv Y.str (RingHom.id ℂ) L i' i y
+              * ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i y := by
+          rw [Finset.mul_sum]
+          exact Finset.sum_congr rfl fun j _ => by ring
         _ = 0 := by rw [h0, mul_zero]
   rw [zeroCnt, ← himg, hinj.encard_image]
 
-theorem fsBasis_φ_chart (hL : L.IsLB) {n : ℕ} (b : Fin n → L.Sec) (hb : ⨆ j, nonzeroLocus (b j) = ⊤)
-    (c : AlgChart Y.str (RingHom.id ℂ) Y.dim) (i : L.ι) (v : ReciprocityTheory.L2DbarEstimates.V Y.dim) :
-    (Weight.fsBasis Y.str (RingHom.id ℂ) hL b hb 1 (by simp)).φ i (c.e.symm v) =
-      Real.log (∑ j, ‖chartVal b c i j v‖ ^ 2) := by
+theorem fsBasis_φ_chart
+    (hL : L.IsLB)
+    {n : ℕ} (b : Fin n → L.Sec) (hb : ⨆ j, nonzeroLocus (b j) = ⊤)
+    (c : AlgChart Y.str (RingHom.id ℂ) Y.dim) (i : L.ι)
+    (v : ReciprocityTheory.L2DbarEstimates.V Y.dim)
+    : (Weight.fsBasis Y.str (RingHom.id ℂ) hL b hb 1 (by simp)).φ i (c.e.symm v)
+      = Real.log (∑ j, ‖chartVal b c i j v‖ ^ 2) := by
   rw [Weight.fsBasis_φ]
   simp only [Matrix.one_apply, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ,
     if_true]
   rfl
 
-theorem chernPart_eq_lintegral (hL : L.IsLB) {n : ℕ} (b : Fin n → L.Sec)
-    (hb : ⨆ j, nonzeroLocus (b j) = ⊤) (c : AlgChart Y.str (RingHom.id ℂ) Y.dim) (i : L.ι)
-    (A : Set (CxPts Y.str (RingHom.id ℂ))) (hAm : MeasurableSet A) (hAc : A ⊆ c.e.source)
-    (hAi : A ⊆ ptsIn Y.str (RingHom.id ℂ) (L.U i)) (hBm : MeasurableSet (c.e '' A)) :
-    (Weight.fsBasis Y.str (RingHom.id ℂ) hL b hb 1 (by simp)).chernPart Y.dim 1 A =
-      ∫⁻ z in c.e '' A, ENNReal.ofReal ((Y.dim.factorial : ℝ) / Real.pi ^ Y.dim *
-        (ReciprocityTheory.L2DbarEstimates.cHess Y.dim
-          (fun v => ((Real.log (∑ j, ‖chartVal b c i j v‖ ^ 2) : ℝ) : ℂ)) z).det.re) := by
+theorem chernPart_eq_lintegral
+    (hL : L.IsLB)
+    {n : ℕ} (b : Fin n → L.Sec) (hb : ⨆ j, nonzeroLocus (b j) = ⊤)
+    (c : AlgChart Y.str (RingHom.id ℂ) Y.dim) (i : L.ι) (A : Set (CxPts Y.str (RingHom.id ℂ)))
+    (hAm : MeasurableSet A) (hAc : A ⊆ c.e.source) (hAi : A ⊆ ptsIn Y.str (RingHom.id ℂ) (L.U i))
+    (hBm : MeasurableSet (c.e '' A))
+    : (Weight.fsBasis Y.str (RingHom.id ℂ) hL b hb 1 (by simp)).chernPart Y.dim 1 A
+      = ∫⁻ z in c.e '' A, ENNReal.ofReal ((Y.dim.factorial : ℝ) / Real.pi ^ Y.dim *
+          (ReciprocityTheory.L2DbarEstimates.cHess Y.dim
+            (fun v => ((Real.log (∑ j, ‖chartVal b c i j v‖ ^ 2) : ℝ) : ℂ)) z).det.re) := by
   haveI := CxPts.secondCountableTopology_of_isProjOver (σ := RingHom.id ℂ) Y.isProjOver
   have hC := Weight.isCInf_fsBasis (p := Y.str) (σ := RingHom.id ℂ) hL b hb 1 (by simp)
   rw [Weight.chernPart_apply hC 1 c hAm hAc]
@@ -93,7 +114,6 @@ theorem chernPart_eq_lintegral (hL : L.IsLB) {n : ℕ} (b : Fin n → L.Sec)
   simp only [fsBasis_φ_chart hL b hb c i, Units.val_one, Int.cast_one, one_mul]
 
 end GlobalTheory.CompanionTheory.FSCrofton.Chart
-
 
 open GlobalTheory.CompanionTheory.FSCrofton.Chart in
 theorem GlobalTheory.CompanionTheory.FSCrofton.crofton_chart : ∀ (Y : Var ℂ) (L : LB Y.X) (hL : L.IsLB) (n : ℕ) (b : Fin n → L.Sec) (hb : ⨆ j, nonzeroLocus (b j) = ⊤) (c : AlgChart Y.str (RingHom.id ℂ) Y.dim) (i : L.ι) (j₀ : Fin n) (A : Set (CxPts Y.str (RingHom.id ℂ))), A ⊆ c.e.source → A ⊆ ptsIn Y.str (RingHom.id ℂ) (L.U i) → (∀ y ∈ A, secVal Y.str (RingHom.id ℂ) (b j₀) i y ≠ 0) → IsSigmaCompact A → Measurable (fun C : Fin Y.dim → Fin n → ℂ => (({y : CxPts Y.str (RingHom.id ℂ) | y ∈ A ∧ ∀ (k : Fin Y.dim) (i' : L.ι), y ∈ ptsIn Y.str (RingHom.id ℂ) (L.U i') → ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i' y = 0}.encard : ℕ∞) : ℝ≥0∞)) ∧ ∫⁻ C : Fin Y.dim → Fin n → ℂ, gW Y.dim (Fin n) C * (({y : CxPts Y.str (RingHom.id ℂ) | y ∈ A ∧ ∀ (k : Fin Y.dim) (i' : L.ι), y ∈ ptsIn Y.str (RingHom.id ℂ) (L.U i') → ∑ j, C k j * secVal Y.str (RingHom.id ℂ) (b j) i' y = 0}.encard : ℕ∞) : ℝ≥0∞) = ENNReal.ofReal (Real.pi ^ (Y.dim * n)) * (Weight.fsBasis Y.str (RingHom.id ℂ) hL b hb 1 (by simp)).chernPart Y.dim 1 A := by

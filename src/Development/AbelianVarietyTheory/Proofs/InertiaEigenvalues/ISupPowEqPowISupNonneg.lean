@@ -17,9 +17,10 @@ namespace GlobalTheory.PMon.Gauss
 
 namespace Lead
 
-theorem mono_lt {a C ρ₁ ρ₂ ρ : ℝ} {n : ℕ} {e : ℤ} (h1 : 0 < ρ₁) (hl : ρ₁ < ρ) (hr : ρ < ρ₂) (ha : 0 < a)
-    (hne : (n : ℤ) ≠ e) (b1 : a * ρ₁ ^ n ≤ C * ρ₁ ^ e) (b2 : a * ρ₂ ^ n ≤ C * ρ₂ ^ e) :
-    a * ρ ^ n < C * ρ ^ e := by
+theorem mono_lt
+    {a C ρ₁ ρ₂ ρ : ℝ} {n : ℕ} {e : ℤ} (h1 : 0 < ρ₁) (hl : ρ₁ < ρ) (hr : ρ < ρ₂) (ha : 0 < a)
+    (hne : (n : ℤ) ≠ e) (b1 : a * ρ₁ ^ n ≤ C * ρ₁ ^ e) (b2 : a * ρ₂ ^ n ≤ C * ρ₂ ^ e)
+    : a * ρ ^ n < C * ρ ^ e := by
   have hρ : 0 < ρ := h1.trans hl
   have hρ2 : 0 < ρ₂ := hρ.trans hr
   set d : ℤ := (n : ℤ) - e with hd
@@ -43,38 +44,51 @@ theorem mono_lt {a C ρ₁ ρ₂ ρ : ℝ} {n : ℕ} {e : ℤ} (h1 : 0 < ρ₁) 
   · have c2 := red ρ₂ hρ2 b2
     exact lt_of_lt_of_le (mul_lt_mul_of_pos_left (zpow_lt_zpow_left₀ hpos hρ.le hr) ha) c2
 
-theorem iSup_lt {d : ℕ → ℝ} {ρ T : ℝ} (h0 : ∀ n, 0 ≤ d n) (h1 : ∀ n, d n ≤ 1) (hρ : 0 < ρ) (hρ1 : ρ < 1)
-    (hT : 0 < T) (h : ∀ n, d n * ρ ^ n < T) : (⨆ n, d n * ρ ^ n) < T := by
+theorem iSup_lt
+    {d : ℕ → ℝ} {ρ T : ℝ} (h0 : ∀ n, 0 ≤ d n) (h1 : ∀ n, d n ≤ 1) (hρ : 0 < ρ) (hρ1 : ρ < 1)
+    (hT : 0 < T) (h : ∀ n, d n * ρ ^ n < T)
+    : (⨆ n, d n * ρ ^ n) < T := by
   obtain ⟨M, hM⟩ := exists_pow_lt_of_lt_one hT hρ1
-  obtain ⟨i, -, hi⟩ := Finset.exists_max_image (Finset.range (M + 1)) (fun n => d n * ρ ^ n)
-    ⟨0, by simp⟩
+  obtain ⟨i, -, hi⟩ :=
+    Finset.exists_max_image (Finset.range (M + 1)) (fun n => d n * ρ ^ n) ⟨0, by simp⟩
   refine lt_of_le_of_lt (ciSup_le fun n => ?_ : (⨆ n, d n * ρ ^ n) ≤ max (d i * ρ ^ i) (ρ ^ M))
     (max_lt (h i) hM)
   by_cases hn : n < M + 1
   · exact le_max_of_le_left (hi n (Finset.mem_range.2 hn))
   · refine le_max_of_le_right ?_
-    calc d n * ρ ^ n ≤ 1 * ρ ^ n := by gcongr; exact h1 n
+    calc
+      d n * ρ ^ n
+        ≤ 1 * ρ ^ n := by gcongr; exact h1 n
       _ = ρ ^ n := one_mul _
       _ ≤ ρ ^ M := pow_le_pow_of_le_one hρ.le hρ1.le (by omega)
 
-theorem lead (c : ℕ → ℝ) (h0 : ∀ n, 0 ≤ c n) (h1 : ∀ n, c n ≤ 1) {ρ₁ ρ₂ C : ℝ} {e : ℤ} (hρ₁ : 0 < ρ₁)
-    (h12 : ρ₁ < ρ₂) (hρ₂ : ρ₂ < 1) (hC : 0 < C) (hs : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, (⨆ n, c n * ρ ^ n) = C * ρ ^ e) :
-    ∃ m : ℕ, (m : ℤ) = e ∧ c m = C ∧ ∀ ρ ∈ Set.Ioo ρ₁ ρ₂, ∀ d : ℕ → ℝ, (∀ n, 0 ≤ d n) → (∀ n, d n ≤ c n) →
-      d m = 0 → (⨆ n, d n * ρ ^ n) < C * ρ ^ e := by
+theorem lead
+    (c : ℕ → ℝ) (h0 : ∀ n, 0 ≤ c n) (h1 : ∀ n, c n ≤ 1)
+    {ρ₁ ρ₂ C : ℝ} {e : ℤ} (hρ₁ : 0 < ρ₁) (h12 : ρ₁ < ρ₂) (hρ₂ : ρ₂ < 1) (hC : 0 < C)
+    (hs : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, (⨆ n, c n * ρ ^ n) = C * ρ ^ e)
+    : ∃ m : ℕ,
+      (m : ℤ) = e ∧ c m = C
+        ∧ ∀ ρ ∈ Set.Ioo ρ₁ ρ₂, ∀ d : ℕ → ℝ,
+          (∀ n, 0 ≤ d n) → (∀ n, d n ≤ c n) → d m = 0 → (⨆ n, d n * ρ ^ n) < C * ρ ^ e := by
   have hb : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, ∀ n, c n * ρ ^ n ≤ C * ρ ^ e := by
     intro ρ hρ n
     rw [← hs ρ hρ]
     have hρ0 : 0 ≤ ρ := hρ₁.le.trans hρ.1
     have hρ1 : ρ ≤ 1 := hρ.2.trans hρ₂.le
     refine le_ciSup (f := fun n => c n * ρ ^ n) ⟨1, Set.forall_mem_range.2 fun n => ?_⟩ n
-    calc c n * ρ ^ n ≤ 1 * 1 := mul_le_mul (h1 n) (pow_le_one₀ hρ0 hρ1) (pow_nonneg hρ0 _) zero_le_one
+    calc
+      c n * ρ ^ n
+        ≤ 1 * 1 := mul_le_mul (h1 n) (pow_le_one₀ hρ0 hρ1) (pow_nonneg hρ0 _) zero_le_one
       _ = 1 := one_mul 1
-  have B : ∀ ρ ∈ Set.Ioo ρ₁ ρ₂, ∀ d : ℕ → ℝ, (∀ n, 0 ≤ d n) → (∀ n, d n ≤ c n) →
-      (∀ n : ℕ, (n : ℤ) = e → d n < C) → (⨆ n, d n * ρ ^ n) < C * ρ ^ e := by
+  have B
+      : ∀ ρ ∈ Set.Ioo ρ₁ ρ₂, ∀ d : ℕ → ℝ,
+        (∀ n, 0 ≤ d n) → (∀ n, d n ≤ c n) → (∀ n : ℕ, (n : ℤ) = e → d n < C)
+          → (⨆ n, d n * ρ ^ n) < C * ρ ^ e := by
     intro ρ hρ d hd0 hdc hde
     have hρ0 : 0 < ρ := hρ₁.trans hρ.1
     have hρ1 : ρ < 1 := hρ.2.trans hρ₂
-    refine iSup_lt hd0 (fun n => (hdc n).trans (h1 n)) hρ0 hρ1 (mul_pos hC (zpow_pos hρ0 e)) fun n => ?_
+    refine
+      iSup_lt hd0 (fun n => (hdc n).trans (h1 n)) hρ0 hρ1 (mul_pos hC (zpow_pos hρ0 e)) fun n => ?_
     by_cases hn : (n : ℤ) = e
     · rw [← hn, zpow_natCast]
       exact mul_lt_mul_of_pos_right (hde n hn) (pow_pos hρ0 n)
@@ -106,12 +120,17 @@ theorem lead (c : ℕ → ℝ) (h0 : ∀ n, 0 ≤ c n) (h1 : ∀ n, c n ≤ 1) {
 
 end Lead
 
-
 open GlobalTheory.GaussSlope in
-theorem lead_target : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (c ρ₁ ρ₂ : ℝ) (k : ℤ), (l : ℝ)⁻¹ ≤ ρ₁ → ρ₁ < ρ₂ →
-    ρ₂ < 1 → 0 < c → (∀ ρ ∈ Set.Icc ρ₁ ρ₂, gC l ρ x = c * ρ ^ k) → ∃ (y : Formalism.Per.Fl l) (j : ℕ), 0 ≤ k + j ∧
-    ‖(((y).untilt : Formalism.Per.OC l) : ℂ_[l])‖ = c ∧ ∀ ρ ∈ Set.Ioo ρ₁ ρ₂, gC l ρ ((l : Formalism.Per.Acris l) ^ j * x -
-    (l : Formalism.Per.Acris l) ^ (k + j).toNat * tc l y) < ρ ^ j * gC l ρ x := by
+theorem lead_target
+    : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (c ρ₁ ρ₂ : ℝ) (k : ℤ),
+      (l : ℝ)⁻¹ ≤ ρ₁ → ρ₁ < ρ₂ → ρ₂ < 1 → 0 < c → (∀ ρ ∈ Set.Icc ρ₁ ρ₂, gC l ρ x = c * ρ ^ k)
+        → ∃ (y : Formalism.Per.Fl l) (j : ℕ),
+          0 ≤ k + j ∧ ‖(((y).untilt : Formalism.Per.OC l) : ℂ_[l])‖ = c
+            ∧ ∀ ρ ∈ Set.Ioo ρ₁ ρ₂,
+              gC l ρ
+                  ((l : Formalism.Per.Acris l) ^ j * x
+                    - (l : Formalism.Per.Acris l) ^ (k + j).toNat * tc l y)
+                < ρ ^ j * gC l ρ x := by
   intro l _ x c ρ₁ ρ₂ k hl1 h12 h21 hc hx
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have hρ₁ : 0 < ρ₁ := lt_of_lt_of_le (by positivity) hl1
@@ -119,10 +138,11 @@ theorem lead_target : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (
     isGauss_gC_target l ρ (hl1.trans hρ.1) (hρ.2.trans_lt h21)
   have hGl : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, gC l ρ (l : Formalism.Per.Acris l) = ρ := by
     intro ρ hρ
-    rw [← map_natCast (algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l)) l, (hG ρ hρ).2.2.2.2, gA,
-      gauss_l l (hρ₁.le.trans hρ.1)]
-  have hpm : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, ∀ (n : ℕ) (w : Formalism.Per.Acris l),
-      gC l ρ ((l : Formalism.Per.Acris l) ^ n * w) = ρ ^ n * gC l ρ w := by
+    rw [← map_natCast (algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l)) l,
+      (hG ρ hρ).2.2.2.2, gA, gauss_l l (hρ₁.le.trans hρ.1)]
+  have hpm
+      : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, ∀ (n : ℕ) (w : Formalism.Per.Acris l),
+        gC l ρ ((l : Formalism.Per.Acris l) ^ n * w) = ρ ^ n * gC l ρ w := by
     intro ρ hρ n w
     rw [map_pow_mul _ (hG ρ hρ).2.2.2.1, hGl ρ hρ]
   have hkb : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, ρ₁ ^ k.toNat ≤ ρ ^ k := by
@@ -135,15 +155,21 @@ theorem lead_target : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (
       exact (one_le_inv₀ (pow_pos hρ0 _)).2 (pow_le_one₀ hρ0.le (hρ.2.trans h21.le))
   obtain ⟨r, hr⟩ := exists_pow_lt_of_lt_one (mul_pos hc (pow_pos hρ₁ k.toNat)) h21
   have hrb : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, ρ ^ r < c * ρ ^ k := fun ρ hρ =>
-    calc ρ ^ r ≤ ρ₂ ^ r := pow_le_pow_left₀ (hρ₁.le.trans hρ.1) hρ.2 r
+    calc
+      ρ ^ r
+        ≤ ρ₂ ^ r := pow_le_pow_left₀ (hρ₁.le.trans hρ.1) hρ.2 r
       _ < c * ρ₁ ^ k.toNat := hr
       _ ≤ c * ρ ^ k := mul_le_mul_of_nonneg_left (hkb ρ hρ) hc.le
   obtain ⟨s, z, hxz⟩ := (GlobalTheory.MemLoc.acris_basic l).2.2.1 x r
   obtain ⟨j, a, ha⟩ := exists_pow_mul_eq l s
-  have hjx : (l : Formalism.Per.Acris l) ^ j * x =
-      algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) a + (l : Formalism.Per.Acris l) ^ (j + r) * z := by
+  have hjx
+      : (l : Formalism.Per.Acris l) ^ j * x
+        = algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) a
+          + (l : Formalism.Per.Acris l) ^ (j + r) * z := by
     rw [hxz, mul_add, ha, pow_add, mul_assoc]
-  have hzb : ∀ ρ ∈ Set.Icc ρ₁ ρ₂, gC l ρ ((l : Formalism.Per.Acris l) ^ (j + r) * z) < ρ ^ j * (c * ρ ^ k) := by
+  have hzb
+      : ∀ ρ ∈ Set.Icc ρ₁ ρ₂,
+        gC l ρ ((l : Formalism.Per.Acris l) ^ (j + r) * z) < ρ ^ j * (c * ρ ^ k) := by
     intro ρ hρ
     have hρ0 : 0 < ρ := hρ₁.trans_le hρ.1
     rw [hpm ρ hρ, pow_add, mul_assoc]
@@ -154,15 +180,21 @@ theorem lead_target : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (
     intro ρ hρ
     have hρ0 : 0 < ρ := hρ₁.trans_le hρ.1
     obtain ⟨e1, e2, e3, e4, e5⟩ := hG ρ hρ
-    have h3 : algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) a =
-        (l : Formalism.Per.Acris l) ^ j * x + -((l : Formalism.Per.Acris l) ^ (j + r) * z) := by rw [hjx]; ring
-    have h4 : gC l ρ (algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) a) = ρ ^ j * (c * ρ ^ k) := by
-      rw [h3, add_eq_of_lt _ e2 e3 (by rw [e3, hpm ρ hρ j x, hx ρ hρ]; exact hzb ρ hρ), hpm ρ hρ, hx ρ hρ]
+    have h3
+        : algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) a
+          = (l : Formalism.Per.Acris l) ^ j * x + -((l : Formalism.Per.Acris l) ^ (j + r) * z) := by
+      rw [hjx]; ring
+    have h4
+        : gC l ρ (algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) a)
+          = ρ ^ j * (c * ρ ^ k) := by
+      rw [h3, add_eq_of_lt _ e2 e3 (by rw [e3, hpm ρ hρ j x, hx ρ hρ]; exact hzb ρ hρ), hpm ρ hρ,
+        hx ρ hρ]
     rw [e5, gA] at h4
     rw [h4, zpow_add₀ hρ0.ne', zpow_natCast]
     ring
   have hc1 : ∀ n, cc n ≤ 1 := fun n =>
-    Real.rpow_le_one (norm_nonneg _) ((GlobalTheory.RingBasics.mem_OC _).1 (Subtype.prop _)) (by positivity)
+    Real.rpow_le_one (norm_nonneg _) ((GlobalTheory.RingBasics.mem_OC _).1 (Subtype.prop _))
+      (by positivity)
   obtain ⟨m, hme, hcm, hlt⟩ := Lead.lead cc (fun n => by positivity) hc1 hρ₁ h12 h21 hc hAn
   have hmt : (k + j).toNat = m := by omega
   set y := (iterateFrobeniusEquiv (Formalism.Per.Fl l) l m).symm (a.coeff m) with hy
@@ -197,20 +229,27 @@ theorem lead_target : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) (
   have hρI : ρ ∈ Set.Icc ρ₁ ρ₂ := Set.Ioo_subset_Icc_self hρ
   have hρ0 : 0 < ρ := hρ₁.trans hρ.1
   obtain ⟨e1, e2, e3, e4, e5⟩ := hG ρ hρI
-  have hsplit : (l : Formalism.Per.Acris l) ^ j * x - (l : Formalism.Per.Acris l) ^ (k + j).toNat * tc l y
-      = algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) b + (l : Formalism.Per.Acris l) ^ (j + r) * z := by
+  have hsplit
+      : (l : Formalism.Per.Acris l) ^ j * x - (l : Formalism.Per.Acris l) ^ (k + j).toNat * tc l y
+        = algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) b
+          + (l : Formalism.Per.Acris l) ^ (j + r) * z := by
     rw [hjx, hmt, tc]
     conv_lhs => rw [hab]
     rw [map_add (f := _), map_mul, map_pow, map_natCast]
     ring
   let d : ℕ → ℝ := fun n => if n = m then 0 else cc n
-  have hbd : ∀ n, ‖(((b.coeff n).untilt : Formalism.Per.OC l) : ℂ_[l])‖ ^ ((1 : ℝ) / (l : ℝ) ^ n) = d n := by
+  have hbd
+      : ∀ n,
+        ‖(((b.coeff n).untilt : Formalism.Per.OC l) : ℂ_[l])‖ ^ ((1 : ℝ) / (l : ℝ) ^ n) = d n := by
     intro n
     by_cases hn : n = m
     · have : (1 : ℝ) / (l : ℝ) ^ n ≠ 0 := by positivity
-      simp only [d, hbc, if_pos hn, untilt_zero, ZeroMemClass.coe_zero, norm_zero, Real.zero_rpow this]
+      simp only [d, hbc, if_pos hn, untilt_zero, ZeroMemClass.coe_zero, norm_zero,
+        Real.zero_rpow this]
     · simp only [d, hbc, if_neg hn, hcc]
-  have hbn : gC l ρ (algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) b) < ρ ^ j * (c * ρ ^ k) := by
+  have hbn
+      : gC l ρ (algebraMap (Formalism.Per.Ainf l) (Formalism.Per.Acris l) b)
+        < ρ ^ j * (c * ρ ^ k) := by
     rw [e5, gA]
     simp_rw [hbd]
     refine lt_of_lt_of_le (hlt ρ hρ d (fun n => ?_) (fun n => ?_) (by simp [d])) (le_of_eq ?_)

@@ -10,26 +10,27 @@ namespace ReciprocityTheory.ChartRestriction.G.SA
 
 open Matrix
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι] {K : Type*} [CommRing K] {σ : K →+* K}
-  {J : Matrix ι ι K}
+variable
+  {ι : Type*} [Fintype ι] [DecidableEq ι] {K : Type*} [CommRing K] {σ : K →+* K} {J : Matrix ι ι K}
 
 section
-variable (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ) {e f : ι → K} (he : hf σ J e e = 0)
-  (hff : hf σ J f f = 0) (hef : hf σ J e f = 1)
+variable
+  (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ)
+  {e f : ι → K} (he : hf σ J e e = 0) (hff : hf σ J f f = 0) (hef : hf σ J e f = 1)
 include hσ hJ he hff hef
 
 theorem hf_ef_left (x y : K) : hf σ J (x • e + y • f) e = y ∧ hf σ J (x • e + y • f) f = x := by
   have hfe := hf_fe hσ hJ he hff hef
   simp [hf_add_left, hf_smul_left, he, hff, hef, hfe]
 
-theorem decomp (b : ι → K) :
-    hf σ J (b - hf σ J b f • e - hf σ J b e • f) e = 0 ∧
-      hf σ J (b - hf σ J b f • e - hf σ J b e • f) f = 0 := by
+theorem decomp (b : ι → K)
+    : hf σ J (b - hf σ J b f • e - hf σ J b e • f) e = 0
+      ∧ hf σ J (b - hf σ J b f • e - hf σ J b e • f) f = 0 := by
   have hfe := hf_fe hσ hJ he hff hef
   simp [hf_sub_left, hf_smul_left, he, hff, hef, hfe]
 
-theorem hf_decomp_self (x y : K) {w : ι → K} (hwe : hf σ J w e = 0) (hwf : hf σ J w f = 0) :
-    hf σ J (x • e + y • f + w) (x • e + y • f + w) = x * σ y + σ x * y + hf σ J w w := by
+theorem hf_decomp_self (x y : K) {w : ι → K} (hwe : hf σ J w e = 0) (hwf : hf σ J w f = 0)
+    : hf σ J (x • e + y • f + w) (x • e + y • f + w) = x * σ y + σ x * y + hf σ J w w := by
   have hfe := hf_fe hσ hJ he hff hef
   have hew : hf σ J e w = 0 := by rw [← hf_symm hσ hJ, hwe, map_zero]
   have hfw : hf σ J f w = 0 := by rw [← hf_symm hσ hJ, hwf, map_zero]
@@ -40,27 +41,37 @@ theorem hf_decomp_self (x y : K) {w : ι → K} (hwe : hf σ J w e = 0) (hwf : h
 end
 
 section
-variable (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ) {e f : ι → K} (he : hf σ J e e = 0)
-  (hff : hf σ J f f = 0) (hef : hf σ J e f = 1) {s : ℕ} {a : Fin s → ι → K}
-  (hae : ∀ j, hf σ J (a j) e = 0) (haf : ∀ j, hf σ J (a j) f = 0)
-  (hfix : ∀ x, σ x = x → x ≠ 0 → IsUnit x) {i2 : K} (h2i : 2 * i2 = 1) {δ : K} (hδ : IsUnit δ)
-  (hσδ : σ δ = -δ) [IsReduced K]
+variable
+  (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ)
+  {e f : ι → K} (he : hf σ J e e = 0) (hff : hf σ J f f = 0) (hef : hf σ J e f = 1)
+  {s : ℕ} {a : Fin s → ι → K} (hae : ∀ j, hf σ J (a j) e = 0) (haf : ∀ j, hf σ J (a j) f = 0)
+  (hfix : ∀ x, σ x = x → x ≠ 0 → IsUnit x)
+  {i2 : K} (h2i : 2 * i2 = 1)
+  {δ : K} (hδ : IsUnit δ) (hσδ : σ δ = -δ)
+  [IsReduced K]
 include hσ hJ he hff hef hae haf hfix h2i hδ hσδ
 
-theorem stage2 {b : ι → K} (hcop : IsCoprime (hf σ J b f) (hf σ J b e)) :
-    ∃ b', Reach σ J e f a b b' ∧ IsUnit (hf σ J b' e) := by
+theorem stage2 {b : ι → K} (hcop : IsCoprime (hf σ J b f) (hf σ J b e))
+    : ∃ b', Reach σ J e f a b b' ∧ IsUnit (hf σ J b' e) := by
   have hfe := hf_fe hσ hJ he hff hef
   have h2 : IsUnit (2 : K) := ⟨⟨2, i2, h2i, by rw [mul_comm]; exact h2i⟩, rfl⟩
   rcases gp hσ hfix h2 hδ hσδ hcop.symm with h | h | h
   · exact ⟨b, reach_refl hσ hJ he hff hef b, h⟩
   · refine ⟨_, reachableFixing_add_smul_second hσ hJ he hff hef hae haf hσδ b, ?_⟩
     simpa [hf_add_left, hf_smul_left, hfe] using h
-  · refine ⟨_, reachableFixing_add_smul_second hσ hJ he hff hef hae haf (c := -1 * δ) (by rw [map_mul, hσδ]; simp) b, ?_⟩
+  · refine ⟨
+      _,
+      reachableFixing_add_smul_second hσ hJ he hff hef hae haf (c := -1 * δ)
+        (by rw [map_mul, hσδ]; simp) b,
+      ?_
+    ⟩
     simpa [hf_add_left, hf_smul_left, hf_neg_left, neg_smul, hfe, mul_assoc] using h
 
-theorem stage4 {b : ι → K} (hform : b = hf σ J b f • e + hf σ J b e • f)
-    (hcop : IsCoprime (hf σ J b f) (hf σ J b e)) :
-    ∃ b', Reach σ J e f a b b' ∧ b' = hf σ J b' f • e + hf σ J b' e • f ∧ IsUnit (hf σ J b' f) := by
+theorem stage4
+    {b : ι → K}
+    (hform : b = hf σ J b f • e + hf σ J b e • f) (hcop : IsCoprime (hf σ J b f) (hf σ J b e))
+    : ∃ b',
+      Reach σ J e f a b b' ∧ b' = hf σ J b' f • e + hf σ J b' e • f ∧ IsUnit (hf σ J b' f) := by
   have h2 : IsUnit (2 : K) := ⟨⟨2, i2, h2i, by rw [mul_comm]; exact h2i⟩, rfl⟩
   set α := hf σ J b f
   set β := hf σ J b e
@@ -72,11 +83,18 @@ theorem stage4 {b : ι → K} (hform : b = hf σ J b f • e + hf σ J b e • f
     · rw [hb', (hval _ _).1, (hval _ _).2]
     · rw [hb', (hval _ _).2]; exact h
   · have hb' : b + (-1 * δ * β) • e = (α + -1 * δ * β) • e + β • f := by rw [hform]; module
-    refine ⟨_, reachableFixing_add_smul_first hσ hJ he hff hef hae haf (c := -1 * δ) (by rw [map_mul, hσδ]; simp) b, ?_, ?_⟩
+    refine ⟨
+      _,
+      reachableFixing_add_smul_first hσ hJ he hff hef hae haf (c := -1 * δ)
+        (by rw [map_mul, hσδ]; simp) b,
+      ?_,
+      ?_
+    ⟩
     · rw [mul_assoc, ← mul_assoc (-1) δ] at hb' ⊢
       rw [hb', (hval _ _).1, (hval _ _).2]
     · rw [mul_assoc, ← mul_assoc (-1) δ] at hb' ⊢
-      rw [hb', (hval _ _).2]; exact h
+      rw [hb', (hval _ _).2]
+      exact h
 
 theorem apply_half : σ i2 = i2 := by
   have h1 : 2 * σ i2 = 1 := by
@@ -84,8 +102,8 @@ theorem apply_half : σ i2 = i2 := by
     rwa [map_mul, map_ofNat, map_one] at this
   linear_combination i2 * h1 - σ i2 * h2i
 
-theorem stage5 {b : ι → K} (hform : b = hf σ J b f • e + hf σ J b e • f) (hα : IsUnit (hf σ J b f)) :
-    Reach σ J e f a b (e + (hf σ J b b * i2) • f) := by
+theorem stage5 {b : ι → K} (hform : b = hf σ J b f • e + hf σ J b e • f) (hα : IsUnit (hf σ J b f))
+    : Reach σ J e f a b (e + (hf σ J b b * i2) • f) := by
   have hfe := hf_fe hσ hJ he hff hef
   have hi2 := apply_half hσ hJ he hff hef hae haf hfix h2i hδ hσδ
   set α := hf σ J b f
@@ -104,7 +122,8 @@ theorem stage5 {b : ι → K} (hform : b = hf σ J b f • e + hf σ J b e • f
     have htor : tor σ J e f αi (σ α) *ᵥ b = e + (σ α * β) • f := by
       rw [tor_mulVec]
       conv_lhs => rw [hform]
-      simp only [hf_add_left, hf_smul_left, hef, hff, he, hfe, mul_one, mul_zero, add_zero, zero_add]
+      simp only [hf_add_left, hf_smul_left, hef, hff, he, hfe, mul_one, mul_zero, add_zero,
+        zero_add]
       ext i
       simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
       linear_combination e i * hαi
@@ -113,16 +132,16 @@ theorem stage5 {b : ι → K} (hform : b = hf σ J b f • e + hf σ J b e • f
     rw [map_sub, map_mul, map_mul, hσν, hi2, hσ]
     linear_combination ν * h2i + hν
   have r2 := reachableFixing_add_smul_second hσ hJ he hff hef hae haf hc (e + (σ α * β) • f)
-  have hb1f : hf σ J (e + (σ α * β) • f) f = 1 := by
-    simp [hf_add_left, hf_smul_left, hef, hff]
+  have hb1f : hf σ J (e + (σ α * β) • f) f = 1 := by simp [hf_add_left, hf_smul_left, hef, hff]
   rw [hb1f] at r2
   have heq : e + (σ α * β) • f + ((ν * i2 - σ α * β) * 1) • f = e + (ν * i2) • f := by
     ext i; simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]; ring
   rw [heq] at r2
   exact reach_trans hσ hJ he hff hef r1 r2
 
-theorem stage3 {b : ι → K} (hb : ∀ j, hf σ J b (a j) = 0) (hβ : IsUnit (hf σ J b e)) :
-    ∃ b', Reach σ J e f a b b' ∧ b' = hf σ J b' f • e + hf σ J b' e • f ∧ IsUnit (hf σ J b' e) := by
+theorem stage3 {b : ι → K} (hb : ∀ j, hf σ J b (a j) = 0) (hβ : IsUnit (hf σ J b e))
+    : ∃ b',
+      Reach σ J e f a b b' ∧ b' = hf σ J b' f • e + hf σ J b' e • f ∧ IsUnit (hf σ J b' e) := by
   have hi2 := apply_half hσ hJ he hff hef hae haf hfix h2i hδ hσδ
   obtain ⟨hwe, hwf⟩ := decomp hσ hJ he hff hef b
   set α := hf σ J b f
@@ -139,9 +158,11 @@ theorem stage3 {b : ι → K} (hb : ∀ j, hf σ J b (a j) = 0) (hβ : IsUnit (h
     have : σ (hf σ J u u) = hf σ J u u := hf_symm hσ hJ u u
     simp only [c, map_neg, map_mul, this, hi2]
     linear_combination (-hf σ J u u) * h2i
-  have r := reach_eich_e hσ hJ he hff hef hae haf (u := u) (c := c)
-    (by simp [u, hf_smul_left, hf_neg_left, hwe]) (by simp [u, hf_smul_left, hf_neg_left, hwf]) hc
-    (fun j => by simp [u, hf_smul_left, hf_neg_left, hwa]) b
+  have r :=
+    reach_eich_e hσ hJ he hff hef hae haf (u := u) (c := c)
+      (by simp [u, hf_smul_left, hf_neg_left, hwe]) (by simp [u, hf_smul_left, hf_neg_left, hwf]) hc
+      (fun j => by simp [u, hf_smul_left, hf_neg_left, hwa])
+      b
   have hb' : eich σ J e u c *ᵥ b = (α - hf σ J b u + c * β) • e + β • f := by
     rw [eich_mulVec]
     ext i
@@ -151,10 +172,11 @@ theorem stage3 {b : ι → K} (hb : ∀ j, hf σ J b (a j) = 0) (hβ : IsUnit (h
   have hval := hf_ef_left hσ hJ he hff hef (e := e) (f := f) (α - hf σ J b u + c * β) β
   exact ⟨_, r, by rw [hval.1, hval.2], by rw [hval.1]; exact hβ⟩
 
-theorem stage1 (hmax : ∀ m₀ m₁ m₂ : Ideal K, m₀.IsMaximal → m₁.IsMaximal → m₂.IsMaximal →
-      m₀ = m₁ ∨ m₀ = m₂ ∨ m₁ = m₂)
-    {b : ι → K} (hb : ∀ j, hf σ J b (a j) = 0) (hν : IsUnit (hf σ J b b)) :
-    ∃ b', Reach σ J e f a b b' ∧ IsCoprime (hf σ J b' f) (hf σ J b' e) := by
+theorem stage1
+    (hmax : ∀ m₀ m₁ m₂ : Ideal K,
+      m₀.IsMaximal → m₁.IsMaximal → m₂.IsMaximal → m₀ = m₁ ∨ m₀ = m₂ ∨ m₁ = m₂)
+    {b : ι → K} (hb : ∀ j, hf σ J b (a j) = 0) (hν : IsUnit (hf σ J b b))
+    : ∃ b', Reach σ J e f a b b' ∧ IsCoprime (hf σ J b' f) (hf σ J b' e) := by
   have h2 : IsUnit (2 : K) := ⟨⟨2, i2, h2i, by rw [mul_comm]; exact h2i⟩, rfl⟩
   have hi2 := apply_half hσ hJ he hff hef hae haf hfix h2i hδ hσδ
   have hfe := hf_fe hσ hJ he hff hef
@@ -180,16 +202,25 @@ theorem stage1 (hmax : ∀ m₀ m₁ m₂ : Ideal K, m₀.IsMaximal → m₁.IsM
     have h1 : hf σ J b w = α * hf σ J e w + β * hf σ J f w + hf σ J w w := by
       conv_lhs => rw [hbw]
       simp only [hf_add_left, hf_smul_left]
-    rw [h1, hew, hfw, hω]; ring
+    rw [h1, hew, hfw, hω]
+    ring
   set c := -(ω * i2)
   have hσω : σ ω = ω := by rw [hω]; exact hf_symm hσ hJ w w
-  have smove : ∀ sg : K, σ sg = sg → sg * sg = 1 →
-      Reach σ J e f a b (eich σ J e (sg • w) c *ᵥ b) ∧
-        hf σ J (eich σ J e (sg • w) c *ᵥ b) f = α - sg * ω + c * β ∧
-        hf σ J (eich σ J e (sg • w) c *ᵥ b) e = β := by
+  have smove
+      : ∀ sg : K,
+        σ sg = sg → sg * sg = 1
+          → Reach σ J e f a b (eich σ J e (sg • w) c *ᵥ b)
+            ∧ hf σ J (eich σ J e (sg • w) c *ᵥ b) f = α - sg * ω + c * β
+            ∧ hf σ J (eich σ J e (sg • w) c *ᵥ b) e = β := by
     intro sg hs1 hs2
-    refine ⟨reach_eich_e hσ hJ he hff hef hae haf (by simp [hf_smul_left, hwe])
-      (by simp [hf_smul_left, hwf]) ?_ (fun j => by simp [hf_smul_left, hwa]) b, ?_, ?_⟩
+    refine ⟨
+      reach_eich_e hσ hJ he hff hef hae haf (by simp [hf_smul_left, hwe])
+        (by simp [hf_smul_left, hwf]) ?_
+        (fun j => by simp [hf_smul_left, hwa])
+        b,
+      ?_,
+      ?_
+    ⟩
     · simp only [c, hf_smul_left, hf_smul_right, hs1, map_neg, map_mul, hσω, hi2, ← hω]
       linear_combination (-ω) * h2i + ω * hs2
     · rw [eich_mulVec]
@@ -201,10 +232,12 @@ theorem stage1 (hmax : ∀ m₀ m₁ m₂ : Ideal K, m₀.IsMaximal → m₁.IsM
   rcases stepA hmax h2 hν hdef hcop (c := c) with h | h
   · obtain ⟨r, h1, h3⟩ := smove 1 (map_one σ) (one_mul 1)
     refine ⟨_, r, ?_⟩
-    rw [h1, h3, one_mul]; exact h
+    rw [h1, h3, one_mul]
+    exact h
   · obtain ⟨r, h1, h3⟩ := smove (-1) (by rw [map_neg, map_one]) (by ring)
     refine ⟨_, r, ?_⟩
-    rw [h1, h3, show α - -1 * ω + c * β = α + ω + c * β by ring]; exact h
+    rw [h1, h3, show α - -1 * ω + c * β = α + ω + c * β by ring]
+    exact h
 
 end
 

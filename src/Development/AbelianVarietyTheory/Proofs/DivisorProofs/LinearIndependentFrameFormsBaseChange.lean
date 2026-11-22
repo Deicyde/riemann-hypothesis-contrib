@@ -13,12 +13,16 @@ open GlobalTheory.ExpFrame Formalism.CohomologicalDescent.DepthNonnegative
 
 namespace GlobalTheory.BaseChangeIndep
 
-theorem indep_pi {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] {L : Type} [Field L] (emb : O →+* L)
-    (hemb : Function.Injective emb) {M V : Type} [AddCommGroup M] [Module O M] [AddCommGroup V] [Module L V]
+theorem indep_pi
+    {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O]
+    {L : Type} [Field L]
+    (emb : O →+* L) (hemb : Function.Injective emb)
+    {M V : Type} [AddCommGroup M] [Module O M] [AddCommGroup V] [Module L V]
     (b : M →ₛₗ[emb] V) (hbinj : Function.Injective b)
     (hb : ∀ (n : ℕ) (x : Fin n → M), LinearIndependent O x → LinearIndependent L fun a => b (x a))
-    {T : Type} [Finite T] (n : ℕ) (y : Fin n → T → M) (hy : LinearIndependent O y) :
-    LinearIndependent L fun a t => b (y a t) := by
+    {T : Type} [Finite T]
+    (n : ℕ) (y : Fin n → T → M) (hy : LinearIndependent O y)
+    : LinearIndependent L fun a t => b (y a t) := by
   classical
   haveI : Fintype T := Fintype.ofFinite T
 
@@ -43,14 +47,14 @@ theorem indep_pi {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] {
     exact this
 
   let Y : Fin n → T × Fin k → O := fun a p => e.repr ⟨y a p.1, hmem a p.1⟩ p.2
-  let Φ : (T × Fin k → O) →ₗ[O] (T → M) :=
-    { toFun := fun Z t => ∑ i, Z (t, i) • ((e i : P) : M)
-      map_add' := by
-        intro Z Z'; funext t; simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := by
-        intro c Z; funext t; simp [smul_smul, Finset.smul_sum] }
+  let Φ : (T × Fin k → O) →ₗ[O] (T → M) := {
+    toFun := fun Z t => ∑ i, Z (t, i) • ((e i : P) : M)
+    map_add' := by intro Z Z'; funext t; simp [add_smul, Finset.sum_add_distrib]
+    map_smul' := by intro c Z; funext t; simp [smul_smul, Finset.smul_sum]
+  }
   have hΦ : ∀ a, Φ (Y a) = y a := by
-    intro a; funext t
+    intro a
+    funext t
     have h2 : ((∑ i, e.repr ⟨y a t, hmem a t⟩ i • e i : P) : M) = y a t := by rw [e.sum_repr]
     rw [Submodule.coe_sum] at h2
     simp only [Submodule.coe_smul] at h2
@@ -59,17 +63,17 @@ theorem indep_pi {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] {
   have hY : LinearIndependent O Y := by
     apply LinearIndependent.of_comp Φ
     have : (Φ ∘ Y) = y := funext hΦ
-    rw [this]; exact hy
+    rw [this]
+    exact hy
   letI : Algebra O L := emb.toAlgebra
   haveI : FaithfulSMul O L := (faithfulSMul_iff_algebraMap_injective O L).2 hemb
   have hY' : LinearIndependent L fun a => algebraMap O L ∘ Y a :=
     linearIndependent_algebraMap_comp_iff.2 hY
-  let Ψ : (T × Fin k → L) →ₗ[L] (T → V) :=
-    { toFun := fun Z t => ∑ i, Z (t, i) • b (e i : M)
-      map_add' := by
-        intro Z Z'; funext t; simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := by
-        intro c Z; funext t; simp [smul_smul, Finset.smul_sum] }
+  let Ψ : (T × Fin k → L) →ₗ[L] (T → V) := {
+    toFun := fun Z t => ∑ i, Z (t, i) • b (e i : M)
+    map_add' := by intro Z Z'; funext t; simp [add_smul, Finset.sum_add_distrib]
+    map_smul' := by intro c Z; funext t; simp [smul_smul, Finset.smul_sum]
+  }
   have hΨ : LinearMap.ker Ψ = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro Z hZ
@@ -92,25 +96,36 @@ end GlobalTheory.BaseChangeIndep
 
 namespace GlobalTheory.BaseChangeIndep
 
-theorem forms_indep : ∀ (l : ℕ) [Fact l.Prime] (ι : Type) [Fintype ι] [DecidableEq ι] (N : ℕ) (F : Frame l ι N) (mu : ι → ℕ → ℕ)
-    (jK : F.K →* alg F.O N mu) (b : NablaT F.O N mu →ₛₗ[F.emb] NablaT (PadicAlgCl l) N mu), Function.Injective b → F.Ok →
-    (∀ (n : ℕ) (x : Fin n → NablaT F.O N mu), LinearIndependent F.O x → LinearIndependent (PadicAlgCl l) fun a => b (x a)) →
-    ∀ (n : ℕ) (x : Fin n → Forms F.O (A := alg F.O N mu) F.Γ jK (NablaT F.O N mu)), LinearIndependent F.O x →
-      LinearIndependent (PadicAlgCl l) fun a => (fun g => b ((x a : F.G → NablaT F.O N mu) g)) := by
+theorem forms_indep
+    : ∀ (l : ℕ) [Fact l.Prime] (ι : Type) [Fintype ι] [DecidableEq ι] (N : ℕ) (F : Frame l ι N)
+        (mu : ι → ℕ → ℕ) (jK : F.K →* alg F.O N mu)
+        (b : NablaT F.O N mu →ₛₗ[F.emb] NablaT (PadicAlgCl l) N mu),
+      Function.Injective b → F.Ok
+        → (∀ (n : ℕ) (x : Fin n → NablaT F.O N mu),
+          LinearIndependent F.O x → LinearIndependent (PadicAlgCl l) fun a => b (x a))
+        → ∀ (n : ℕ) (x : Fin n → Forms F.O (A := alg F.O N mu) F.Γ jK (NablaT F.O N mu)),
+          LinearIndependent F.O x
+            → LinearIndependent (PadicAlgCl l)
+              fun a => (fun g => b ((x a : F.G → NablaT F.O N mu) g)) := by
   intro l _ ι _ _ N F mu jK b hbinj hOk hb n x hx
   obtain ⟨S, hS⟩ := hOk.classes
-  let R : Forms F.O (A := alg F.O N mu) F.Γ jK (NablaT F.O N mu) →ₗ[F.O] (S → NablaT F.O N mu) :=
-    { toFun := fun f s => (f : F.G → NablaT F.O N mu) s
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let R : Forms F.O (A := alg F.O N mu) F.Γ jK (NablaT F.O N mu) →ₗ[F.O] (S → NablaT F.O N mu) := {
+    toFun := fun f s => (f : F.G → NablaT F.O N mu) s
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hR : LinearMap.ker R = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro f hf0
     apply Subtype.ext
     funext g
     obtain ⟨γ, hγ, s, hs, κ, hκ, rfl⟩ := hS g
-    have hf : ∀ (γ : F.Γ) (g : F.G) (κ : F.K), (f : F.G → NablaT F.O N mu) ((γ : F.G) * g * κ) =
-        repOf F.O (A := alg F.O N mu) jK (NablaT F.O N mu) κ⁻¹ ((f : F.G → NablaT F.O N mu) g) := f.2
+    have hf
+        : ∀ (γ : F.Γ) (g : F.G) (κ : F.K),
+          (f : F.G → NablaT F.O N mu) ((γ : F.G) * g * κ)
+            = repOf F.O (A := alg F.O N mu) jK (NablaT F.O N mu) κ⁻¹
+              ((f : F.G → NablaT F.O N mu) g) :=
+      f.2
     have h0 : (f : F.G → NablaT F.O N mu) s = 0 := congrFun hf0 ⟨s, hs⟩
     have h1 := hf ⟨γ, hγ⟩ s ⟨κ, hκ⟩
     rw [h1, h0, map_zero]
@@ -118,10 +133,11 @@ theorem forms_indep : ∀ (l : ℕ) [Fact l.Prime] (ι : Type) [Fintype ι] [Dec
   have hx' : LinearIndependent F.O (R ∘ x) := hx.map' R hR
   have hOk1 := hOk.ring.1
   have key := indep_pi F.emb hOk1 b hbinj hb n (R ∘ x) hx'
-  let R' : (F.G → NablaT (PadicAlgCl l) N mu) →ₗ[PadicAlgCl l] (S → NablaT (PadicAlgCl l) N mu) :=
-    { toFun := fun f s => f s
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let R' : (F.G → NablaT (PadicAlgCl l) N mu) →ₗ[PadicAlgCl l] (S → NablaT (PadicAlgCl l) N mu) := {
+    toFun := fun f s => f s
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   apply LinearIndependent.of_comp R'
   exact key
 

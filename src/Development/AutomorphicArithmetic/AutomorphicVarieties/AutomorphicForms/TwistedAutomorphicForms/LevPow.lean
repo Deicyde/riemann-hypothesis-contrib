@@ -11,9 +11,13 @@ open GlobalTheory.Mem.Chr (unitIdl)
 
 namespace UpperTheory.V.Af.Tw
 
-private theorem loc (K : Type) [Field K] [NumberField K] {N : ℕ} (hN : N ≠ 0) (v : HeightOneSpectrum (𝓞 K)) :
-    ∃ M : ℕ, 0 < M ∧ ∀ x : v.adicCompletion K, Valued.v x = 1 → ∀ k : ℕ, M ∣ k →
-      Valued.v (x ^ k - 1) ≤ Valued.v (N : v.adicCompletion K) := by
+private theorem loc
+    (K : Type) [Field K] [NumberField K] {N : ℕ} (hN : N ≠ 0) (v : HeightOneSpectrum (𝓞 K))
+    : ∃ M : ℕ,
+      0 < M
+        ∧ ∀ x : v.adicCompletion K,
+          Valued.v x = 1
+            → ∀ k : ℕ, M ∣ k → Valued.v (x ^ k - 1) ≤ Valued.v (N : v.adicCompletion K) := by
   classical
   let I : Ideal (v.adicCompletionIntegers K) := Ideal.span {(N : v.adicCompletionIntegers K)}
   have hI : I ≠ ⊥ := by
@@ -40,19 +44,27 @@ private theorem loc (K : Type) [Field K] [NumberField K] {N : ℕ} (hN : N ≠ 0
   let u : (v.adicCompletionIntegers K)ˣ :=
     ⟨⟨x, hxR⟩, ⟨x⁻¹, hyR⟩, Subtype.ext (mul_inv_cancel₀ hx0), Subtype.ext (inv_mul_cancel₀ hx0)⟩
   obtain ⟨j, rfl⟩ := hk
-  have h1 : (Units.map (Ideal.Quotient.mk I).toMonoidHom u) ^ (Nat.card (v.adicCompletionIntegers K ⧸ I)ˣ * j) = 1 := by
+  have h1
+      : (Units.map (Ideal.Quotient.mk I).toMonoidHom u)
+          ^ (Nat.card (v.adicCompletionIntegers K ⧸ I)ˣ * j)
+        = 1 := by
     rw [pow_mul, pow_card_eq_one', one_pow]
-  have h2 : ((⟨x, hxR⟩ : v.adicCompletionIntegers K) ^ (Nat.card (v.adicCompletionIntegers K ⧸ I)ˣ * j) - 1) ∈ I := by
+  have h2
+      : ((⟨x, hxR⟩ : v.adicCompletionIntegers K) ^ (Nat.card (v.adicCompletionIntegers K ⧸ I)ˣ * j)
+          - 1)
+        ∈ I := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_pow, map_one, sub_eq_zero]
     have := congrArg Units.val h1
     simpa [u] using this
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 h2
-  have hy' : x ^ (Nat.card (v.adicCompletionIntegers K ⧸ I)ˣ * j) - 1 =
-      (y : v.adicCompletion K) * (N : v.adicCompletion K) := by
+  have hy'
+      : x ^ (Nat.card (v.adicCompletionIntegers K ⧸ I)ˣ * j) - 1
+        = (y : v.adicCompletion K) * (N : v.adicCompletion K) := by
     have := congrArg (fun r : v.adicCompletionIntegers K => (r : v.adicCompletion K)) hy
     simpa using this.symm
   rw [hy', map_mul]
-  have hyle : Valued.v (y : v.adicCompletion K) ≤ 1 := (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).1 y.2
+  have hyle : Valued.v (y : v.adicCompletion K) ≤ 1 :=
+    (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).1 y.2
   simpa using mul_le_mul' hyle (le_refl (Valued.v (N : v.adicCompletion K)))
 
 theorem levPow : LevPow := by

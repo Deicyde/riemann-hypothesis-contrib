@@ -4,18 +4,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-theorem UpperTheory.Gal.G3.pHopDeep :
-    PlInv.{u} → HopDeep.{u} := by
+theorem UpperTheory.Gal.G3.pHopDeep : PlInv.{u} → HopDeep.{u} := by
   classical
   intro hPl B G _ X R _ _ T hT j f hf
   have hfin := hf.2.2
-  have hpush : ∀ (n n' : X.ι), X.K n' ≤ X.K n → (∀ g, f g ≠ 0 → X.admitted n j g⁻¹) → ∀ x : T.H (X.q j),
-      X.pl T n' n 1 (∑ᶠ z : G ⧸ X.K j, f z.out • X.pl T n j z.out⁻¹ x) =
-        ∑ᶠ z : G ⧸ X.K j, f z.out • X.pl T n' j z.out⁻¹ x := by
+  have hpush
+      : ∀ (n n' : X.ι),
+        X.K n' ≤ X.K n → (∀ g, f g ≠ 0 → X.admitted n j g⁻¹)
+          → ∀ x : T.H (X.q j),
+            X.pl T n' n 1 (∑ᶠ z : G ⧸ X.K j, f z.out • X.pl T n j z.out⁻¹ x)
+              = ∑ᶠ z : G ⧸ X.K j, f z.out • X.pl T n' j z.out⁻¹ x := by
     intro n n' hn'n hadn x
     rw [map_finsum _ (hfin.subset ?_)]
     · refine finsum_congr fun z => ?_
@@ -44,5 +47,9 @@ theorem UpperTheory.Gal.G3.pHopDeep :
     have hnm : X.K n ≤ X.K m := fun u hu => by simpa using hS (m, 1) (by simp) u hu
     have hnm' : X.K n ≤ X.K m' := fun u hu => by simpa using hS (m', 1) (by simp) u hu
     apply (hPl X T hT n m' hnm').1
-    rw [hpush m' n hnm' hadm', X.pl_pl T (X.isAdmissibleIntegralBasisChange_one hnm') (X.isAdmissibleIntegralBasisChange_one hm'j), ← hpush m n hnm hadm, ← hA,
-      X.pl_pl T (X.isAdmissibleIntegralBasisChange_one hnm) (X.isAdmissibleIntegralBasisChange_one hmj)]
+    rw [hpush m' n hnm' hadm',
+      X.pl_pl T (X.isAdmissibleIntegralBasisChange_one hnm')
+        (X.isAdmissibleIntegralBasisChange_one hm'j),
+      ← hpush m n hnm hadm, ← hA,
+      X.pl_pl T (X.isAdmissibleIntegralBasisChange_one hnm)
+        (X.isAdmissibleIntegralBasisChange_one hmj)]

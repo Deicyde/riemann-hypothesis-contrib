@@ -9,8 +9,9 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR.UnitTest
 
-theorem isLocallyConstant_indicator_one {Z : Type} [TopologicalSpace Z] {W : Set Z} (hW : IsClopen W) :
-    IsLocallyConstant (W.indicator (1 : Z → ℂ)) := by
+theorem isLocallyConstant_indicator_one
+    {Z : Type} [TopologicalSpace Z] {W : Set Z} (hW : IsClopen W)
+    : IsLocallyConstant (W.indicator (1 : Z → ℂ)) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   by_cases hx : x ∈ W
@@ -19,8 +20,9 @@ theorem isLocallyConstant_indicator_one {Z : Type} [TopologicalSpace Z] {W : Set
   · filter_upwards [hW.isClosed.isOpen_compl.mem_nhds hx] with y hy
     simp [Set.indicator_of_notMem hy, Set.indicator_of_notMem hx]
 
-theorem unitG_isTest (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [LocallyCompactSpace F]
-    (r : ℕ) : IsTest (unitG r F) := by
+theorem unitG_isTest
+    (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [LocallyCompactSpace F] (r : ℕ)
+    : IsTest (unitG r F) := by
   haveI : ProperSpace F := ProperSpace.of_locallyCompactSpace F
   set B : Set F := Metric.closedBall 0 1 with hB
   have hBo : IsOpen B := IsUltrametricDist.isOpen_closedBall _ one_ne_zero
@@ -35,8 +37,9 @@ theorem unitG_isTest (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F
   have hAc : IsClosed A := isClosed_set_pi fun _ _ => hVc
   have hAk : IsCompact A := isCompact_univ_pi (X := fun _ : Fin r => Fin r → F) fun _ => hVk
   set S : Set (Gl r F) := A ×ˢ (V ×ˢ (V ×ˢ B)) with hS
-  have hSeq : {Y : Gl r F | (∀ i j, ‖Y.1 i j‖ ≤ 1) ∧ (∀ i, ‖Y.2.1 i‖ ≤ 1) ∧ (∀ i, ‖Y.2.2.1 i‖ ≤ 1) ∧ ‖Y.2.2.2‖ ≤ 1}
-      = S := by
+  have hSeq
+      : {Y : Gl r F | (∀ i j, ‖Y.1 i j‖ ≤ 1) ∧ (∀ i, ‖Y.2.1 i‖ ≤ 1) ∧ (∀ i, ‖Y.2.2.1 i‖ ≤ 1) ∧ ‖Y.2.2.2‖ ≤ 1}
+        = S := by
     ext Y
     rw [Set.mem_setOf_eq, hS, hA, hV, hB]
     constructor
@@ -57,7 +60,9 @@ theorem unitG_isTest (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F
   have hSk : IsCompact S := hAk.prod (hVk.prod (hVk.prod hBk))
   unfold unitG
   rw [hSeq]
-  exact ⟨isLocallyConstant_indicator_one ⟨hSc, hSo⟩,
-    HasCompactSupport.intro' hSk hSc fun x hx => Set.indicator_of_notMem hx _⟩
+  exact ⟨
+    isLocallyConstant_indicator_one ⟨hSc, hSo⟩,
+    HasCompactSupport.intro' hSk hSc fun x hx => Set.indicator_of_notMem hx _
+  ⟩
 
 end GlobalTheory.JR.UnitTest

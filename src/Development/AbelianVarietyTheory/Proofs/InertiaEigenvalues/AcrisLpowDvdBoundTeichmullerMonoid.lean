@@ -13,7 +13,9 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 noncomputable section
@@ -22,8 +24,8 @@ namespace GlobalTheory.AcrisMonBound
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
-theorem exists_pow_bound {ϖ : OCb l} (hϖ : ϖ.untilt = (l : Per.OC l)) {c : OCb l} (hc : c ≠ 0) :
-    ∃ K : ℕ, ∀ k : ℕ, ϖ ^ k ∣ c → k < K := by
+theorem exists_pow_bound {ϖ : OCb l} (hϖ : ϖ.untilt = (l : Per.OC l)) {c : OCb l} (hc : c ≠ 0)
+    : ∃ K : ℕ, ∀ k : ℕ, ϖ ^ k ∣ c → k < K := by
   set a := ‖((c.untilt : Per.OC l) : ℂ_[l])‖
   set b := ‖((l : ℕ) : ℂ_[l])‖
   have ha : 0 < a := by
@@ -49,7 +51,12 @@ end GlobalTheory.AcrisMonBound
 
 namespace GlobalTheory.AcrisMonBound
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (y : Ainf l), WittVector.constantCoeff y ≠ 0 → ∃ C : ℕ, ∀ (z : ℤ_[l]) (N : ℕ), z ≠ 0 → (l : Per.Acris l) ^ N ∣ ainfToAcris l y * algebraMap ℤ_[l] (Per.Acris l) z → N ≤ z.valuation + C := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (y : Ainf l),
+      WittVector.constantCoeff y ≠ 0
+        → ∃ C : ℕ, ∀ (z : ℤ_[l]) (N : ℕ),
+          z ≠ 0 → (l : Per.Acris l) ^ N ∣ ainfToAcris l y * algebraMap ℤ_[l] (Per.Acris l) z
+            → N ≤ z.valuation + C := by
   intro l hl y hy
   have hl2 : 2 ≤ l := hl.out.two_le
   obtain ⟨ϖ, hϖ⟩ := GlobalTheory.MemLoc.FundOnto.untilt_surjective l (l : Per.OC l)
@@ -61,8 +68,9 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (y : Ainf l), WittVector.constantCoe
   · omega
   obtain ⟨n', rfl⟩ := Nat.exists_eq_add_of_le hNv.le
   set y' := y * algebraMap ℤ_[l] (Ainf l) (u : ℤ_[l])
-  have hza : algebraMap ℤ_[l] (Per.Acris l) z =
-      (l : Per.Acris l) ^ v * algebraMap ℤ_[l] (Per.Acris l) (u : ℤ_[l]) := by
+  have hza
+      : algebraMap ℤ_[l] (Per.Acris l) z
+        = (l : Per.Acris l) ^ v * algebraMap ℤ_[l] (Per.Acris l) (u : ℤ_[l]) := by
     conv_lhs => rw [PadicInt.unitCoeff_spec hz]
     rw [map_mul, map_pow, map_natCast, mul_comm]
   have hy' : ainfToAcris l y' = ainfToAcris l y * algebraMap ℤ_[l] (Per.Acris l) (u : ℤ_[l]) := by
@@ -71,7 +79,8 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (y : Ainf l), WittVector.constantCoe
   have h2 : (l : Per.Acris l) ^ n' ∣ ainfToAcris l y' := by
     obtain ⟨w, hw⟩ := h
     refine ⟨w, ?_⟩
-    have h3 : ((l ^ v : ℕ) : Per.Acris l) * (ainfToAcris l y' - (l : Per.Acris l) ^ n' * w) = 0 := by
+    have h3
+        : ((l ^ v : ℕ) : Per.Acris l) * (ainfToAcris l y' - (l : Per.Acris l) ^ n' * w) = 0 := by
       rw [hza] at hw
       rw [hy']
       push_cast

@@ -5,7 +5,8 @@ public import Formalism.GaloisCohomology.LocalTateDualityK
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology
 
 namespace GlobalTheory
 
@@ -14,9 +15,22 @@ private lemma natCard_quotient_ker_of_surjective {G H : Type*} [AddGroup G] [Add
     (φ : G →+ H) (hφ : Function.Surjective φ) : Nat.card (G ⧸ φ.ker) = Nat.card H :=
   Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective φ hφ).toEquiv
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.natCard_coker_ker_mod_pow : ∀ (l : ℕ) [Fact l.Prime] (r : ℕ) (X P : Type) [AddCommGroup X] [Module ℤ_[l] X] [AddCommGroup P] [Module ℤ_[l] P] (f : X →ₗ[ℤ_[l]] P) (R : Type) [CommRing R] (X' P' : Type) [AddCommGroup X'] [Module R X'] [AddCommGroup P'] [Module R P'] (f' : X' →ₗ[R] P') (πX : X →+ X') (πP : P →+ P'), Function.Surjective πX → Function.Surjective πP → (∀ x, πX x = 0 ↔ ∃ y, (l : ℤ_[l]) ^ r • y = x) → (∀ x, πP x = 0 ↔ ∃ y, (l : ℤ_[l]) ^ r • y = x) → (∀ x, πP (f x) = f' (πX x)) → Nat.card ((P ⧸ LinearMap.range f) ⧸ LinearMap.range (LinearMap.lsmul ℤ_[l] (P ⧸ LinearMap.range f) ((l : ℤ_[l]) ^ r))) = Nat.card (P' ⧸ LinearMap.range f') ∧ ((∀ x p, f x = (l : ℤ_[l]) ^ r • p → ∃ x', f x = (l : ℤ_[l]) ^ r • f x') → Nat.card (LinearMap.ker f ⧸ (LinearMap.range (LinearMap.lsmul ℤ_[l] X ((l : ℤ_[l]) ^ r))).comap (LinearMap.ker f).subtype) = Nat.card (LinearMap.ker f')) := by
+theorem _root_.GlobalTheory.natCard_coker_ker_mod_pow
+    : ∀ (l : ℕ) [Fact l.Prime] (r : ℕ) (X P : Type) [AddCommGroup X] [Module ℤ_[l] X]
+        [AddCommGroup P] [Module ℤ_[l] P] (f : X →ₗ[ℤ_[l]] P) (R : Type) [CommRing R] (X' P' : Type)
+        [AddCommGroup X'] [Module R X'] [AddCommGroup P'] [Module R P'] (f' : X' →ₗ[R] P')
+        (πX : X →+ X') (πP : P →+ P'),
+      Function.Surjective πX → Function.Surjective πP
+        → (∀ x, πX x = 0 ↔ ∃ y, (l : ℤ_[l]) ^ r • y = x)
+        → (∀ x, πP x = 0 ↔ ∃ y, (l : ℤ_[l]) ^ r • y = x) → (∀ x, πP (f x) = f' (πX x))
+        → Nat.card
+              ((P ⧸ LinearMap.range f) ⧸ LinearMap.range (LinearMap.lsmul ℤ_[l] (P ⧸ LinearMap.range f) ((l : ℤ_[l]) ^ r)))
+            = Nat.card (P' ⧸ LinearMap.range f')
+          ∧ ((∀ x p, f x = (l : ℤ_[l]) ^ r • p → ∃ x', f x = (l : ℤ_[l]) ^ r • f x')
+            → Nat.card
+                (LinearMap.ker f ⧸ (LinearMap.range (LinearMap.lsmul ℤ_[l] X ((l : ℤ_[l]) ^ r))).comap (LinearMap.ker f).subtype)
+              = Nat.card (LinearMap.ker f')) := by
   intro l _ r X P _ _ _ _ f R _ X' P' _ _ _ _ f' πX πP hX hP hkX hkP hcomm
   set c : ℤ_[l] := (l : ℤ_[l]) ^ r with hc
   have hrange : ∀ p : P, πP p ∈ LinearMap.range f' ↔ ∃ x y, p = f x + c • y := by
@@ -31,8 +45,10 @@ theorem _root_.GlobalTheory.natCard_coker_ker_mod_pow : ∀ (l : ℕ) [Fact l.Pr
       refine ⟨πX x, ?_⟩
       rw [← hcomm, map_add (f := _), (hkP (c • y)).2 ⟨y, rfl⟩, add_zero]
   constructor
-  · let φ₁ : P →+ (P ⧸ LinearMap.range f) ⧸
-        LinearMap.range (LinearMap.lsmul ℤ_[l] (P ⧸ LinearMap.range f) c) :=
+  · let φ₁
+        : P
+          →+ (P ⧸ LinearMap.range f) ⧸
+            LinearMap.range (LinearMap.lsmul ℤ_[l] (P ⧸ LinearMap.range f) c) :=
       ((LinearMap.range (LinearMap.lsmul ℤ_[l] (P ⧸ LinearMap.range f) c)).mkQ.comp
         (LinearMap.range f).mkQ).toAddMonoidHom
     let φ₂ : P →+ P' ⧸ LinearMap.range f' := (LinearMap.range f').mkQ.toAddMonoidHom.comp πP
@@ -42,8 +58,7 @@ theorem _root_.GlobalTheory.natCard_coker_ker_mod_pow : ∀ (l : ℕ) [Fact l.Pr
     have hker : φ₁.ker = φ₂.ker := by
       ext p
       rw [AddMonoidHom.mem_ker, AddMonoidHom.mem_ker]
-      change Submodule.Quotient.mk (Submodule.Quotient.mk p) = 0 ↔
-        Submodule.Quotient.mk (πP p) = 0
+      change Submodule.Quotient.mk (Submodule.Quotient.mk p) = 0 ↔ Submodule.Quotient.mk (πP p) = 0
       rw [Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_eq_zero, hrange]
       constructor
       · rintro ⟨q, hq⟩
@@ -58,11 +73,12 @@ theorem _root_.GlobalTheory.natCard_coker_ker_mod_pow : ∀ (l : ℕ) [Fact l.Pr
     rw [← natCard_quotient_ker_of_surjective φ₁ hφ₁, ← natCard_quotient_ker_of_surjective φ₂ hφ₂,
       hker]
   · intro hdiv
-    let ψ : LinearMap.ker f →+ LinearMap.ker f' :=
-      { toFun := fun x => ⟨πX x, by
-          rw [LinearMap.mem_ker, ← hcomm, LinearMap.mem_ker.1 x.2, map_zero]⟩
-        map_zero' := by ext; simp
-        map_add' := fun x y => by ext; simp }
+    let ψ : LinearMap.ker f →+ LinearMap.ker f' := {
+      toFun := fun x =>
+        ⟨πX x, by rw [LinearMap.mem_ker, ← hcomm, LinearMap.mem_ker.1 x.2, map_zero]⟩
+      map_zero' := by ext; simp
+      map_add' := fun x y => by ext; simp
+    }
     have hψ : Function.Surjective ψ := by
       rintro ⟨x', hx'⟩
       obtain ⟨x, rfl⟩ := hX x'
@@ -73,8 +89,10 @@ theorem _root_.GlobalTheory.natCard_coker_ker_mod_pow : ∀ (l : ℕ) [Fact l.Pr
       ext
       change πX (x - c • x₁) = πX x
       rw [map_sub, (hkX (c • x₁)).2 ⟨x₁, rfl⟩, sub_zero]
-    have hker : ψ.ker = ((LinearMap.range (LinearMap.lsmul ℤ_[l] X c)).comap
-        (LinearMap.ker f).subtype).toAddSubgroup := by
+    have hker
+        : ψ.ker
+          = ((LinearMap.range (LinearMap.lsmul ℤ_[l] X c)).comap
+            (LinearMap.ker f).subtype).toAddSubgroup := by
       ext x
       rw [AddMonoidHom.mem_ker, Submodule.mem_toAddSubgroup, Submodule.mem_comap,
         LinearMap.mem_range]

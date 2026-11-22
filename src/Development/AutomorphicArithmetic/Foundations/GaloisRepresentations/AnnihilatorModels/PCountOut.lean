@@ -11,12 +11,13 @@ namespace UpperTheory.Gal.crystallineComparison
 
 theorem countOut_of : CountOut := by
   intro k H _ _ _ _ _ C hC E
-  obtain ⟨s0, hs0⟩ := Module.projective_lifting_property C.mkQ E.subtype (Submodule.mkQ_surjective C)
+  obtain ⟨s0, hs0⟩ :=
+    Module.projective_lifting_property C.mkQ E.subtype (Submodule.mkQ_surjective C)
   have hsec : ∀ (s : E →ₗ[k] H), C.mkQ ∘ₗ s = E.subtype → ∀ e : E, C.mkQ (s e) = e := by
     intro s hs e
     exact LinearMap.congr_fun hs e
   let S := {s : E →ₗ[k] H // C.mkQ ∘ₗ s = E.subtype}
-  have hF : ∀ s : S, ¬C ≤ LinearMap.range s.1 ∧ Submodule.map C.mkQ (LinearMap.range s.1) = E := by
+  have hF : ∀ s : S, ¬ C ≤ LinearMap.range s.1 ∧ Submodule.map C.mkQ (LinearMap.range s.1) = E := by
     intro s
     constructor
     · intro hle
@@ -32,8 +33,8 @@ theorem countOut_of : CountOut := by
       rw [← he, e0, map_zero]
       rfl
     · rw [← LinearMap.range_comp, s.2, Submodule.range_subtype]
-  let F : S → {D : Submodule k H // ¬C ≤ D ∧ Submodule.map C.mkQ D = E} :=
-    fun s => ⟨LinearMap.range s.1, hF s⟩
+  let F : S → {D : Submodule k H // ¬ C ≤ D ∧ Submodule.map C.mkQ D = E} := fun s =>
+    ⟨LinearMap.range s.1, hF s⟩
   have hFb : Function.Bijective F := by
     constructor
     · intro s t h
@@ -64,8 +65,7 @@ theorem countOut_of : CountOut := by
         intro d hd
         apply Subtype.ext
         exact hdisj d.1 d.2 ((Submodule.Quotient.mk_eq_zero C).1 hd)
-      have hr : LinearMap.range f = E := by
-        rw [LinearMap.range_comp, Submodule.range_subtype, hmap]
+      have hr : LinearMap.range f = E := by rw [LinearMap.range_comp, Submodule.range_subtype, hmap]
       let φ : D ≃ₗ[k] E := (LinearEquiv.ofInjective f hf).trans (LinearEquiv.ofEq _ _ hr)
       have hφ : ∀ d : D, ((φ d : E) : H ⧸ C) = C.mkQ d := fun d => rfl
       let s : E →ₗ[k] H := D.subtype ∘ₗ (φ.symm : E →ₗ[k] D)
@@ -77,15 +77,20 @@ theorem countOut_of : CountOut := by
         exact h1.symm
       refine ⟨⟨s, hs⟩, Subtype.ext ?_⟩
       show LinearMap.range s = D
-      rw [LinearMap.range_comp_of_range_eq_top _ (LinearEquiv.range φ.symm), Submodule.range_subtype]
-  let G : (E →ₗ[k] C) → S := fun g =>
-    ⟨s0 + C.subtype ∘ₗ g, by
+      rw [LinearMap.range_comp_of_range_eq_top _ (LinearEquiv.range φ.symm),
+        Submodule.range_subtype]
+  let G : (E →ₗ[k] C) → S := fun g => ⟨
+    s0 + C.subtype ∘ₗ g,
+    by
       apply LinearMap.ext
       intro e
       have h1 := LinearMap.congr_fun hs0 e
       have h2 : C.mkQ (g e : H) = 0 := (Submodule.Quotient.mk_eq_zero C).2 (g e).2
-      simp only [LinearMap.comp_apply, LinearMap.add_apply, map_add (f := _), Submodule.subtype_apply] at h1 ⊢
-      rw [h2, add_zero, h1]⟩
+      simp only [LinearMap.comp_apply, LinearMap.add_apply, map_add (f := _),
+          Submodule.subtype_apply]
+        at h1 ⊢
+      rw [h2, add_zero, h1]
+  ⟩
   have hGb : Function.Bijective G := by
     constructor
     · intro g g' h
@@ -110,8 +115,9 @@ theorem countOut_of : CountOut := by
     haveI : Fintype k := Fintype.ofFinite k
     haveI : Finite (E →ₗ[k] C) := Module.finite_of_finite k
     haveI : Fintype (E →ₗ[k] C) := Fintype.ofFinite _
-    rw [Nat.card_eq_fintype_card (α := E →ₗ[k] C), Nat.card_eq_fintype_card (α := k), Module.card_eq_pow_finrank (K := k) (V := E →ₗ[k] C),
-      Module.finrank_linearMap k k E C, hC, mul_one]
+    rw [Nat.card_eq_fintype_card (α := E →ₗ[k] C), Nat.card_eq_fintype_card (α := k),
+      Module.card_eq_pow_finrank (K := k) (V := E →ₗ[k] C), Module.finrank_linearMap k k E C, hC,
+      mul_one]
   rw [← Nat.card_eq_of_bijective F hFb, ← Nat.card_eq_of_bijective G hGb, hcard]
 
 end UpperTheory.Gal.crystallineComparison

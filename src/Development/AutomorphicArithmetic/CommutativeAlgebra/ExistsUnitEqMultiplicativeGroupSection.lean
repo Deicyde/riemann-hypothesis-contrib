@@ -9,13 +9,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleToSheaf
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 noncomputable section
 namespace UpperTheory
 open Polynomial
 
-private def evalX {A : Type} [CommRing A] (a : A) : ℤ[X] →+* A := Polynomial.eval₂RingHom (Int.castRingHom A) a
+private def evalX {A : Type} [CommRing A] (a : A) : ℤ[X] →+* A :=
+  Polynomial.eval₂RingHom (Int.castRingHom A) a
 
 private lemma evalX_X {A : Type} [CommRing A] (a : A) : evalX a X = a := by simp [evalX]
 
@@ -140,23 +142,26 @@ private lemma unitSec_inj {U : Scheme.{0}} (u v : (Γ(U, ⊤))ˣ) (h : unitSec u
 end UpperTheory
 
 open UpperTheory in
-theorem UpperTheory.exists_unit_eq_multiplicativeGroup_section :
-    ∀ (X : Scheme.{0}) (b : Sec Gm X), ∃ u : (Γ(X, ⊤))ˣ, unitSec u = b := by
+theorem UpperTheory.exists_unit_eq_multiplicativeGroup_section
+    : ∀ (X : Scheme.{0}) (b : Sec Gm X), ∃ u : (Γ(X, ⊤))ˣ, unitSec u = b := by
   intro X b
-  obtain ⟨S, hS, h⟩ := (GlobalTheory.T.etaleToSheafify_locally_bijective_and_lift ℤ (Scheme.Γ ⋙ unitsF)).1 X b
-  have h' : ∀ (V : Scheme.{0}) (g : V ⟶ X), S.arrows g →
-      ∃ v : (Γ(V, ⊤))ˣ, unitSec v = Sec.res g b := by
+  obtain ⟨S, hS, h⟩ :=
+    (GlobalTheory.T.etaleToSheafify_locally_bijective_and_lift ℤ (Scheme.Γ ⋙ unitsF)).1 X b
+  have h'
+      : ∀ (V : Scheme.{0}) (g : V ⟶ X), S.arrows g → ∃ v : (Γ(V, ⊤))ˣ, unitSec v = Sec.res g b := by
     intro V g hg
     obtain ⟨x, hx⟩ := h V g hg
     exact ⟨x.down.toMul, hx⟩
   choose v hv using h'
-  obtain ⟨u, hu⟩ := glueU S hS v (fun V W g k hg => by
-    apply unitSec_inj
-    rw [← res_unitSec, hv, hv]
-    change (Gm.obj.map k.op).hom ((Gm.obj.map g.op).hom b) = (Gm.obj.map (k ≫ g).op).hom b
-    rw [op_comp, Functor.map_comp]
-    rfl)
-  refine ⟨u, (GlobalTheory.T.etaleSheafSections_ext_and_glue ℤ Gm X).1 _ _ ⟨S, hS, fun V g hg => ?_⟩⟩
+  obtain ⟨u, hu⟩ :=
+    glueU S hS v (fun V W g k hg => by
+      apply unitSec_inj
+      rw [← res_unitSec, hv, hv]
+      change (Gm.obj.map k.op).hom ((Gm.obj.map g.op).hom b) = (Gm.obj.map (k ≫ g).op).hom b
+      rw [op_comp, Functor.map_comp]
+      rfl)
+  refine
+    ⟨u, (GlobalTheory.T.etaleSheafSections_ext_and_glue ℤ Gm X).1 _ _ ⟨S, hS, fun V g hg => ?_⟩⟩
   change Sec.res g (unitSec u) = Sec.res g b
   rw [res_unitSec, hu V g hg, hv]
 

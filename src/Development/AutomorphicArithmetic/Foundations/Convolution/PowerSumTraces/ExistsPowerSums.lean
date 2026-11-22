@@ -10,16 +10,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C
 
 section Abs
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
-  [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+  [BorelSpace G] [AddCommGroup V] [Module ℂ V]
 
-private theorem mem_orbit_iff (I : Subgroup G) (x g : G) :
-    (g : G ⧸ I) ∈ MulAction.orbit I (x : G ⧸ I) ↔ ∃ a ∈ I, ∃ b ∈ I, g = a * x * b := by
+private theorem mem_orbit_iff (I : Subgroup G) (x g : G)
+    : (g : G ⧸ I) ∈ MulAction.orbit I (x : G ⧸ I) ↔ ∃ a ∈ I, ∃ b ∈ I, g = a * x * b := by
   constructor
   · rintro ⟨a, ha⟩
     have ha' : (((a : G) * x : G) : G ⧸ I) = g := ha
@@ -29,18 +34,22 @@ private theorem mem_orbit_iff (I : Subgroup G) (x g : G) :
     change ((a * x : G) : G ⧸ I) = _
     exact (QuotientGroup.mk_mul_of_mem _ hb).symm
 
-private theorem hk_sum (ρ : Representation ℂ G V) (I : Subgroup G) (x : G)
-    (h : (MulAction.orbit I (x : G ⧸ I)).Finite) (v : UpperTheory.V.Hi.fixd ρ I) :
-    (UpperTheory.V.AlgebraTools.hk ρ I x v : V) = ∑ q ∈ Set.Finite.toFinset h, ρ q.out v := by
-  rw [UpperTheory.V.AlgebraTools.hk, (UpperTheory.V.AlgebraTools.hkApply ℂ G V ρ I I x h).1 v, UpperTheory.V.Hi.dc,
-    finsum_set_coe_eq_finsum_mem (f := fun q : G ⧸ I => ρ q.out), finsum_mem_eq_finite_toFinset_sum _ h,
-    LinearMap.sum_apply]
+private theorem hk_sum
+    (ρ : Representation ℂ G V)
+    (I : Subgroup G) (x : G) (h : (MulAction.orbit I (x : G ⧸ I)).Finite)
+    (v : UpperTheory.V.Hi.fixd ρ I)
+    : (UpperTheory.V.AlgebraTools.hk ρ I x v : V) = ∑ q ∈ Set.Finite.toFinset h, ρ q.out v := by
+  rw [UpperTheory.V.AlgebraTools.hk, (UpperTheory.V.AlgebraTools.hkApply ℂ G V ρ I I x h).1 v,
+    UpperTheory.V.Hi.dc, finsum_set_coe_eq_finsum_mem (f := fun q : G ⧸ I => ρ q.out),
+    finsum_mem_eq_finite_toFinset_sum _ h, LinearMap.sum_apply]
 
-private theorem hasTrace_hk (m : Measure G) [IsFiniteMeasureOnCompacts m] [m.IsMulLeftInvariant]
-    {ρ : Representation ℂ G V} (hρ : GlobalTheory.PRep.IsSmooth ρ) {I : Subgroup G} (hIo : IsOpen (I : Set G))
-    (hIc : IsCompact (I : Set G)) (hm : m I = 1) (x : G) (hx : UpperTheory.V.AlgebraTools.FinOrb I I x)
-    [FiniteDimensional ℂ (UpperTheory.V.Hi.fixd ρ I)] :
-    HasTrace m ρ (Set.indicator {g | ∃ a ∈ I, ∃ b ∈ I, g = a * x * b} 1)
+private theorem hasTrace_hk
+    (m : Measure G) [IsFiniteMeasureOnCompacts m] [m.IsMulLeftInvariant]
+    {ρ : Representation ℂ G V} (hρ : GlobalTheory.PRep.IsSmooth ρ)
+    {I : Subgroup G} (hIo : IsOpen (I : Set G)) (hIc : IsCompact (I : Set G)) (hm : m I = 1)
+    (x : G) (hx : UpperTheory.V.AlgebraTools.FinOrb I I x)
+    [FiniteDimensional ℂ (UpperTheory.V.Hi.fixd ρ I)]
+    : HasTrace m ρ (Set.indicator {g | ∃ a ∈ I, ∃ b ∈ I, g = a * x * b} 1)
       (LinearMap.trace ℂ _ (UpperTheory.V.AlgebraTools.hk ρ I x)) := by
   classical
   have hx' : (MulAction.orbit I (x : G ⧸ I)).Finite := hx
@@ -83,7 +92,8 @@ private theorem hasTrace_hk (m : Measure G) [IsFiniteMeasureOnCompacts m] [m.IsM
     · simp [h, hI a ha g h]
     · have : a * g ∉ D := fun h' => h (by simpa using hI _ (inv_mem ha) _ h')
       simp [h, this]
-  have hres : ∀ w : UpperTheory.V.Hi.fixd ρ I, A w = UpperTheory.V.AlgebraTools.hk ρ I x w := fun w => by
+  have hres
+      : ∀ w : UpperTheory.V.Hi.fixd ρ I, A w = UpperTheory.V.AlgebraTools.hk ρ I x w := fun w => by
     rw [hk_sum ρ I x hx', ← sub_eq_zero, ← Module.forall_dual_apply_eq_zero_iff ℂ]
     intro l
     set_option synthInstance.maxHeartbeats 100000 in
@@ -92,8 +102,10 @@ private theorem hasTrace_hk (m : Measure G) [IsFiniteMeasureOnCompacts m] [m.IsM
       rw [hU]
       exact Set.subset_biUnion_of_mem (u := C) hq
     conv_lhs => rw [hU]
-    rw [integral_biUnion_finset _ (fun q _ => (hCo q).measurableSet)
-      (fun p _ q _ hpq => Set.disjoint_left.2 fun g hp hq => hpq (((hC p g).1 hp).symm.trans ((hC q g).1 hq)))
+    rw [integral_biUnion_finset _
+      (fun q _ => (hCo q).measurableSet)
+      (fun p _ q _ hpq =>
+        Set.disjoint_left.2 fun g hp hq => hpq (((hC p g).1 hp).symm.trans ((hC q g).1 hq)))
       (fun q hq => (hA w l).1.mono_set (hsub q hq))]
     refine Finset.sum_congr rfl fun q _ => ?_
     have hconst : ∀ g ∈ C q, l (ρ g w) = l (ρ q.out w) := fun g hg => by
@@ -110,12 +122,15 @@ private theorem hasTrace_hk (m : Measure G) [IsFiniteMeasureOnCompacts m] [m.IsM
     exact hA v l
   haveI := Submodule.finiteDimensional_of_le hle
   let j := Submodule.inclusion hle
-  let s : UpperTheory.V.Hi.fixd ρ I →ₗ[ℂ] LinearMap.range A := A.rangeRestrict ∘ₗ (UpperTheory.V.Hi.fixd ρ I).subtype
+  let s : UpperTheory.V.Hi.fixd ρ I →ₗ[ℂ] LinearMap.range A :=
+    A.rangeRestrict ∘ₗ (UpperTheory.V.Hi.fixd ρ I).subtype
   have h1 : UpperTheory.V.AlgebraTools.hk ρ I x = j ∘ₗ s := by
     refine LinearMap.ext fun w => Subtype.ext ?_
     exact (hres w).symm
-  have h2 : A.restrict (p := LinearMap.range A) (q := LinearMap.range A)
-      (fun v _ => LinearMap.mem_range_self A v) = s ∘ₗ j := by
+  have h2
+      : A.restrict (p := LinearMap.range A) (q := LinearMap.range A)
+          (fun v _ => LinearMap.mem_range_self A v)
+        = s ∘ₗ j := by
     refine LinearMap.ext fun w => Subtype.ext ?_
     rfl
   rw [h1, h2]
@@ -125,13 +140,16 @@ end Abs
 
 section Eig
 
-private theorem exists_powerSums {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
-    (T : Module.End ℂ W) (hT : IsUnit T) :
-    ∃ Z : Multiset ℂ, 0 ∉ Z ∧ Z.card = Module.finrank ℂ W ∧
-      ∀ j : ℕ, LinearMap.trace ℂ W (T ^ j) = (Z.map (· ^ j)).sum := by
+private theorem exists_powerSums
+    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (T : Module.End ℂ W) (hT : IsUnit T)
+    : ∃ Z : Multiset ℂ,
+      0 ∉ Z ∧ Z.card = Module.finrank ℂ W
+        ∧ ∀ j : ℕ, LinearMap.trace ℂ W (T ^ j) = (Z.map (· ^ j)).sum := by
   obtain ⟨u, rfl⟩ := hT
   let R : Representation ℂ (Multiplicative ℤ) W := (Units.coeHom _).comp (zpowersHom _ u)
-  obtain ⟨E, -, hE⟩ := GlobalTheory.IwahoriTraceProof.exists_exponents (G := Multiplicative ℤ) _ W R rfl
+  obtain ⟨E, -, hE⟩ :=
+    GlobalTheory.IwahoriTraceProof.exists_exponents (G := Multiplicative ℤ) _ W R rfl
   have hR : ∀ j : ℕ, R (Multiplicative.ofAdd 1 ^ j) = (u : Module.End ℂ W) ^ j := fun j => by
     rw [map_pow]
     congr 1
@@ -155,24 +173,33 @@ end Eig
 
 section Loc
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
-private theorem dom_pow (a : Fin n → ℤ) (ha : Antitone a) (h0 : (GLnLocal.uniformizer F : F) ≠ 0) :
-    UpperTheory.V.AlgebraTools.Dom fun i => (Units.mk0 (GLnLocal.uniformizer F : F) h0) ^ a i := by
+private theorem dom_pow (a : Fin n → ℤ) (ha : Antitone a) (h0 : (GLnLocal.uniformizer F : F) ≠ 0)
+    : UpperTheory.V.AlgebraTools.Dom fun i =>
+      (Units.mk0 (GLnLocal.uniformizer F : F) h0) ^ a i := by
   intro i j hij
-  have hp : 0 < ValuativeRel.valuation F (GLnLocal.uniformizer F : F) := GLnLocal.valuation_uniformizer_pos F
+  have hp : 0 < ValuativeRel.valuation F (GLnLocal.uniformizer F : F) :=
+    GLnLocal.valuation_uniformizer_pos F
   simp only [Units.val_zpow_eq_zpow_val, map_zpow₀, Units.val_mk0]
   exact (zpow_le_zpow_iff_right_of_lt_one₀ hp (GLnLocal.valuation_uniformizer_lt_one F)).2 (ha hij)
 
-private theorem iw_local [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
-    (m : Measure (GL (Fin n) F)) [m.IsHaarMeasure] {I : Subgroup (GL (Fin n) F)}
-    (hI : UpperTheory.V.AlgebraTools.iwC F n ⊤ = I) (hm : m I = 1) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ (GL (Fin n) F) V) (hρ : GlobalTheory.PRep.IsSmooth ρ) (hIo : IsOpen (I : Set (GL (Fin n) F)))
-    (hIc : IsCompact (I : Set (GL (Fin n) F))) (ν : Fin n → ℤ) (hν : Antitone ν)
-    [FiniteDimensional ℂ (UpperTheory.V.Hi.fixd ρ I)] :
-    ∃ Z : Multiset ℂ, 0 ∉ Z ∧ Z.card = Module.finrank ℂ (UpperTheory.V.Hi.fixd ρ I) ∧
-      ∀ j : ℕ, HasTrace m ρ (Set.indicator {g | ∃ a ∈ I, ∃ b ∈ I, g = a * Cartan.diagPow F n (j • ν) * b} 1)
-        (Z.map (· ^ j)).sum := by
+private theorem iw_local
+    [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
+    (m : Measure (GL (Fin n) F)) [m.IsHaarMeasure]
+    {I : Subgroup (GL (Fin n) F)} (hI : UpperTheory.V.AlgebraTools.iwC F n ⊤ = I) (hm : m I = 1)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL (Fin n) F) V) (hρ : GlobalTheory.PRep.IsSmooth ρ)
+    (hIo : IsOpen (I : Set (GL (Fin n) F))) (hIc : IsCompact (I : Set (GL (Fin n) F)))
+    (ν : Fin n → ℤ) (hν : Antitone ν)
+    [FiniteDimensional ℂ (UpperTheory.V.Hi.fixd ρ I)]
+    : ∃ Z : Multiset ℂ,
+      0 ∉ Z ∧ Z.card = Module.finrank ℂ (UpperTheory.V.Hi.fixd ρ I)
+        ∧ ∀ j : ℕ,
+          HasTrace m ρ
+            (Set.indicator {g | ∃ a ∈ I, ∃ b ∈ I, g = a * Cartan.diagPow F n (j • ν) * b} 1)
+            (Z.map (· ^ j)).sum := by
   subst hI
   have h0 : (GLnLocal.uniformizer F : F) ≠ 0 := GLnLocal.uniformizer_ne_zero F
   let t : (Fin n → ℤ) → Fin n → Fˣ := fun a i => (Units.mk0 (GLnLocal.uniformizer F : F) h0) ^ a i
@@ -186,15 +213,23 @@ private theorem iw_local [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n
   obtain ⟨hmul, hunit, -⟩ := UpperTheory.V.AlgebraTools.domMul F n ⊤ ℂ V ρ
   have hq : IsUnit ((GlobalTheory.SplitWeil.resCard F : ℕ) : ℂ) :=
     (Nat.cast_ne_zero.2 (GlobalTheory.SplitWeil.one_lt_resCard F).ne_bot).isUnit
-  let T := UpperTheory.V.AlgebraTools.hk ρ (UpperTheory.V.AlgebraTools.iwC F n ⊤) (diagT F (Fin n) (t ν))
+  let T :=
+    UpperTheory.V.AlgebraTools.hk ρ (UpperTheory.V.AlgebraTools.iwC F n ⊤) (diagT F (Fin n) (t ν))
   have hdom : ∀ a, Antitone a → UpperTheory.V.AlgebraTools.Dom (t a) := fun a ha => dom_pow a ha h0
   have hTu : IsUnit T := hunit hq _ (hdom ν hν)
-  have hone : UpperTheory.V.AlgebraTools.hk ρ (UpperTheory.V.AlgebraTools.iwC F n ⊤) (diagT F (Fin n) (t 0)) = 1 := by
+  have hone
+      : UpperTheory.V.AlgebraTools.hk ρ (UpperTheory.V.AlgebraTools.iwC F n ⊤)
+          (diagT F (Fin n) (t 0))
+        = 1 := by
     have hd0 := hdom 0 (fun _ _ _ => le_rfl)
     have h1 := hmul _ _ hd0 hd0
     rw [← ht, add_zero] at h1
     exact (hunit hq _ hd0).mul_left_cancel (h1.trans (mul_one _).symm)
-  have hpow : ∀ j : ℕ, UpperTheory.V.AlgebraTools.hk ρ (UpperTheory.V.AlgebraTools.iwC F n ⊤) (diagT F (Fin n) (t (j • ν))) = T ^ j := by
+  have hpow
+      : ∀ j : ℕ,
+        UpperTheory.V.AlgebraTools.hk ρ (UpperTheory.V.AlgebraTools.iwC F n ⊤)
+            (diagT F (Fin n) (t (j • ν)))
+          = T ^ j := by
     intro j
     induction j with
     | zero => simpa using hone
@@ -204,15 +239,16 @@ private theorem iw_local [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n
       rw [pow_succ, ← ih, hmul _ _ (hdom _ hj) (hdom _ hν), ← ht, succ_nsmul]
   obtain ⟨Z, hZ0, hZc, hZ⟩ := exists_powerSums T hTu
   refine ⟨Z, hZ0, hZc, fun j => ?_⟩
-  have h := hasTrace_hk m hρ hIo hIc hm (diagT F (Fin n) (t (j • ν))) ((UpperTheory.V.AlgebraTools.heckePairIwC F n ⊤).1 _)
+  have h :=
+    hasTrace_hk m hρ hIo hIc hm (diagT F (Fin n) (t (j • ν)))
+      ((UpperTheory.V.AlgebraTools.heckePairIwC F n ⊤).1 _)
   rw [hpow, hZ, ← hdiag] at h
   exact h
 
 end Loc
 
-theorem UpperTheory.ConvolutionTheory.C.iwPow :
-    UpperTheory.ConvolutionTheory.C.IwPow := by
+theorem UpperTheory.ConvolutionTheory.C.iwPow : UpperTheory.ConvolutionTheory.C.IwPow := by
   intro K _ _ n w _ _ m _ hm σ ν hν hfd
   haveI : FiniteDimensional ℂ (UpperTheory.V.Hi.fixd σ.ρ (GlobalTheory.SmGL.iwahori (w.adicCompletion K) (Fin n))) := hfd
-  exact iw_local m (UpperTheory.V.AlgebraTools.memIwC _ n ⊤).2.1 hm σ.ρ σ.smooth (GLnLocal.isOpen_iwahori _ _)
-    (GLnLocal.isCompact_iwahori _ _) ν hν
+  exact iw_local m (UpperTheory.V.AlgebraTools.memIwC _ n ⊤).2.1 hm σ.ρ σ.smooth
+    (GLnLocal.isOpen_iwahori _ _) (GLnLocal.isCompact_iwahori _ _) ν hν

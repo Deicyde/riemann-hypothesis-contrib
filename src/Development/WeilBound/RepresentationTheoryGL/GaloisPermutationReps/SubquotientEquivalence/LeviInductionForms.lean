@@ -9,23 +9,28 @@ noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
 
 namespace PositivityTheory.Rg.DzCount
 
 namespace LeviInductionForms
 
-theorem pow_eq_pow_iff_mod {M : Type*} [CommMonoid M] {ζ : M} {N : ℕ} (h : IsPrimitiveRoot ζ N)
-    (hN : 0 < N) (a b : ℕ) : ζ ^ a = ζ ^ b ↔ a % N = b % N := by
+theorem pow_eq_pow_iff_mod
+    {M : Type*} [CommMonoid M] {ζ : M} {N : ℕ} (h : IsPrimitiveRoot ζ N) (hN : 0 < N) (a b : ℕ)
+    : ζ ^ a = ζ ^ b ↔ a % N = b % N := by
   have e : ∀ c, ζ ^ c = ζ ^ (c % N) := fun c => by
     conv_lhs => rw [← Nat.mod_add_div c N]
     rw [pow_add, pow_mul, h.pow_eq_one, one_pow, mul_one]
   rw [e a, e b]
   exact ⟨fun H => h.pow_inj (Nat.mod_lt _ hN) (Nat.mod_lt _ hN) H, fun H => by rw [H]⟩
 
-theorem natDegree_minpoly_eq {K F : Type*} [Field K] [Finite K] [Field F] [Algebra K F] (n : ℕ)
-    (hn : 0 < n) (w : F) (hw : IsIntegral K w) (h1 : w ^ (Nat.card K) ^ n = w)
-    (h2 : ∀ d, 0 < d → d < n → w ^ (Nat.card K) ^ d ≠ w) : (minpoly K w).natDegree = n := by
+theorem natDegree_minpoly_eq
+    {K F : Type*} [Field K] [Finite K] [Field F] [Algebra K F]
+    (n : ℕ) (hn : 0 < n)
+    (w : F) (hw : IsIntegral K w) (h1 : w ^ (Nat.card K) ^ n = w)
+    (h2 : ∀ d, 0 < d → d < n → w ^ (Nat.card K) ^ d ≠ w)
+    : (minpoly K w).natDegree = n := by
   have hirr := minpoly.irreducible hw
   have hdvd : minpoly K w ∣ (X ^ (Nat.card K) ^ n - X : K[X]) := by
     apply minpoly.dvd
@@ -40,10 +45,13 @@ theorem natDegree_minpoly_eq {K F : Type*} [Field K] [Finite K] [Field F] [Algeb
   by_contra hne
   exact h2 _ hpos (lt_of_le_of_ne (Nat.le_of_dvd hn hd) hne) hself
 
-theorem exists_eq_pow_of_aeval {K F : Type*} [Field K] [Fintype K] [Field F] [Algebra K F] (n : ℕ)
-    (hn : 0 < n) (w w' : F) (hw : IsIntegral K w) (h1 : w ^ (Nat.card K) ^ n = w)
+theorem exists_eq_pow_of_aeval
+    {K F : Type*} [Field K] [Fintype K] [Field F] [Algebra K F]
+    (n : ℕ) (hn : 0 < n)
+    (w w' : F) (hw : IsIntegral K w) (h1 : w ^ (Nat.card K) ^ n = w)
     (h2 : ∀ d, 0 < d → d < n → w ^ (Nat.card K) ^ d ≠ w)
-    (hP : Polynomial.aeval w' (minpoly K w) = 0) : ∃ i : ℕ, w' = w ^ (Nat.card K) ^ i := by
+    (hP : Polynomial.aeval w' (minpoly K w) = 0)
+    : ∃ i : ℕ, w' = w ^ (Nat.card K) ^ i := by
   classical
   have hq : Fintype.card K = Nat.card K := Nat.card_eq_fintype_card.symm
   have hφ : ∀ (i : ℕ) (x : F), (FiniteField.frobeniusAlgHom K F ^ i) x = x ^ (Nat.card K) ^ i := by
@@ -78,8 +86,7 @@ theorem exists_eq_pow_of_aeval {K F : Type*} [Field K] [Fintype K] [Field F] [Al
   by_contra hno
   push_neg at hno
   set S := (Finset.range n).image (fun i : ℕ => w ^ (Nat.card K) ^ i) with hS
-  have hcardS : S.card = n := by
-    rw [hS, Finset.card_image_of_injOn hinj, Finset.card_range]
+  have hcardS : S.card = n := by rw [hS, Finset.card_image_of_injOn hinj, Finset.card_range]
   have hw'S : w' ∉ S := by
     rw [hS, Finset.mem_image]
     rintro ⟨i, -, hi⟩
@@ -98,7 +105,8 @@ theorem exists_eq_pow_of_aeval {K F : Type*} [Field K] [Fintype K] [Field F] [Al
       exact hroot i
   have hcard := Polynomial.card_le_degree_of_subset_roots hsub
   rw [Finset.card_insert_of_notMem hw'S, hcardS, Polynomial.natDegree_map,
-    natDegree_minpoly_eq n hn w hw h1 h2] at hcard
+      natDegree_minpoly_eq n hn w hw h1 h2]
+    at hcard
   omega
 
 end LeviInductionForms
@@ -143,8 +151,8 @@ theorem st3a : St3a := by
     simp only [jOf, dif_pos hex]
     exact hex.choose_spec
   have hint : ∀ x : AlgebraicClosure K, IsIntegral K x := fun x => Algebra.IsIntegral.isIntegral x
-  have hper : ∀ (j m : ℕ), (ζ ^ j) ^ (Nat.card K) ^ m = ζ ^ j ↔
-      (ω ^ j) ^ (Nat.card K) ^ m = ω ^ j := by
+  have hper
+      : ∀ (j m : ℕ), (ζ ^ j) ^ (Nat.card K) ^ m = ζ ^ j ↔ (ω ^ j) ^ (Nat.card K) ^ m = ω ^ j := by
     intro j m
     rw [← pow_mul, ← pow_mul]
     exact htr _ _
@@ -156,8 +164,8 @@ theorem st3a : St3a := by
     obtain ⟨-, hz1, hz2⟩ := hz
     rw [← hzj] at hz1 hz2
     have hw1 : (ω ^ jOf z) ^ (Nat.card K) ^ n = ω ^ jOf z := (hper _ _).1 hz1
-    have hw2 : ∀ d, 0 < d → d < n → (ω ^ jOf z) ^ (Nat.card K) ^ d ≠ ω ^ jOf z :=
-      fun d hd hdn H => hz2 d hd hdn ((hper _ _).2 H)
+    have hw2 : ∀ d, 0 < d → d < n → (ω ^ jOf z) ^ (Nat.card K) ^ d ≠ ω ^ jOf z := fun d hd hdn H =>
+      hz2 d hd hdn ((hper _ _).2 H)
     have hw := hint (ω ^ jOf z)
     show (minpoly K (ω ^ jOf z)).Monic ∧ Irreducible (minpoly K (ω ^ jOf z)) ∧
       minpoly K (ω ^ jOf z) ≠ X ∧ (minpoly K (ω ^ jOf z)).natDegree = n
@@ -173,8 +181,8 @@ theorem st3a : St3a := by
     obtain ⟨-, hz1, hz2⟩ := hz
     rw [← hzj] at hz1 hz2
     have hw1 : (ω ^ jOf z) ^ (Nat.card K) ^ n = ω ^ jOf z := (hper _ _).1 hz1
-    have hw2 : ∀ d, 0 < d → d < n → (ω ^ jOf z) ^ (Nat.card K) ^ d ≠ ω ^ jOf z :=
-      fun d hd hdn H => hz2 d hd hdn ((hper _ _).2 H)
+    have hw2 : ∀ d, 0 < d → d < n → (ω ^ jOf z) ^ (Nat.card K) ^ d ≠ ω ^ jOf z := fun d hd hdn H =>
+      hz2 d hd hdn ((hper _ _).2 H)
     have hw := hint (ω ^ jOf z)
     have hP : Polynomial.aeval (ω ^ jOf z') (minpoly K (ω ^ jOf z)) = 0 := by
       have hlab' : minpoly K (ω ^ jOf z) = minpoly K (ω ^ jOf z') := hlab

@@ -16,11 +16,15 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.NotIsSpli
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.Indef Formalism.DivisionValues Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.Indef Formalism.DivisionValues Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open GlobalTheory.Doubling (io hgt flat zetaA ZetaConvA IsMaj dblSp Khat HasIwasawa degPS)
 open GlobalTheory.FinZeta (projV embV Kv Gv IsLocKer VacFin bddAut)
-open GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction (ofFr ipTh ptAt actSrc actTgt IsJoint UnitHighest kfin alS alT NodeGap)
+open GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction
+  (ofFr ipTh ptAt actSrc actTgt IsJoint UnitHighest kfin alS alT NodeGap)
 open GlobalTheory.AdelicScalar (l2)
 open scoped InnerProductSpace GlobalTheory.AdelicU GlobalTheory.Doubling
 
@@ -37,8 +41,6 @@ section Real
 variable {V : HSp D} {PS : D.what₂.Tau → SPar} (θ : InfFam D) (M : DSModel V PS)
 
 end Real
-
-
 
 end GlobalTheory.CompanionTheory.Ipf.Loc
 

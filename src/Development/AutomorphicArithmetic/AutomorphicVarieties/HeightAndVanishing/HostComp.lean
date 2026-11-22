@@ -7,25 +7,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem pow_eq_one_of {O : Type} [CommRing O] {N : ℕ} (χ : DirichletCharacter O N) (m : ℕ)
-    (H : ∀ u : (ZMod N)ˣ, χ.toUnitHom u ^ m = 1) : χ ^ m = 1 := by
+private theorem pow_eq_one_of
+    {O : Type} [CommRing O]
+    {N : ℕ} (χ : DirichletCharacter O N)
+    (m : ℕ) (H : ∀ u : (ZMod N)ˣ, χ.toUnitHom u ^ m = 1)
+    : χ ^ m = 1 := by
   refine MulChar.ext fun u => ?_
   have hu := congrArg Units.val (H u)
   rw [Units.val_pow_eq_pow_val, MulChar.coe_toUnitHom, Units.val_one] at hu
   rw [MulChar.pow_apply_coe, hu, MulChar.one_apply_coe]
 
-private theorem unitHom_pow_orderOf {O : Type} [CommRing O] {N : ℕ} (χ : DirichletCharacter O N) (u : (ZMod N)ˣ) :
-    χ.toUnitHom u ^ orderOf χ = 1 := by
+private theorem unitHom_pow_orderOf
+    {O : Type} [CommRing O] {N : ℕ} (χ : DirichletCharacter O N) (u : (ZMod N)ˣ)
+    : χ.toUnitHom u ^ orderOf χ = 1 := by
   apply Units.ext
   rw [Units.val_pow_eq_pow_val, MulChar.coe_toUnitHom, ← MulChar.pow_apply_coe, pow_orderOf_eq_one,
     MulChar.one_apply_coe, Units.val_one]
 
-theorem UpperTheory.V.HV.hostComp :
-    ∀ (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N), h.IsChar ψ →
-      orderOf ψ ∣ 2 ^ (h.ex + 1) * h.o ∧ 0 < orderOf ψ ∧ ∀ r, r.Prime → r ≠ 2 →
-        orderOf (comp r ψ) ∣ 2 * h.o ∧ (r ∣ h.q → orderOf (comp r ψ) ∣ h.o) ∧ (¬ r ∣ h.q → comp r ψ ^ 2 = 1) ∧ (¬ r ∣ h.N → comp r ψ = 1) := by
+theorem UpperTheory.V.HV.hostComp
+    : ∀ (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N),
+      h.IsChar ψ
+        → orderOf ψ ∣ 2 ^ (h.ex + 1) * h.o ∧ 0 < orderOf ψ
+          ∧ ∀ r,
+            r.Prime → r ≠ 2
+              → orderOf (comp r ψ) ∣ 2 * h.o ∧ (r ∣ h.q → orderOf (comp r ψ) ∣ h.o)
+                ∧ (¬ r ∣ h.q → comp r ψ ^ 2 = 1) ∧ (¬ r ∣ h.N → comp r ψ = 1) := by
   intro h O _ _ ψ hψ
   have hI := hostIndex h
   have ho : 0 < h.o := hI.2.2.2.1
@@ -34,8 +43,11 @@ theorem UpperTheory.V.HV.hostComp :
     pow_eq_one_of ψ _ (fun u => by
       rw [← map_pow]
       exact hmemK _ (hI.2.2.2.2.2.2.2.2.2 u))
-  refine ⟨orderOf_dvd_of_pow_eq_one hA,
-    Nat.pos_of_dvd_of_pos (orderOf_dvd_of_pow_eq_one hA) (Nat.mul_pos (pow_pos two_pos _) ho), ?_⟩
+  refine ⟨
+    orderOf_dvd_of_pow_eq_one hA,
+    Nat.pos_of_dvd_of_pos (orderOf_dvd_of_pow_eq_one hA) (Nat.mul_pos (pow_pos two_pos _) ho),
+    ?_
+  ⟩
   intro r hr hr2
   have facts := projFacts h.N r hr
   have hca := compAlg O h.N r hr
@@ -63,9 +75,11 @@ theorem UpperTheory.V.HV.hostComp :
   have dq : r ∣ h.q → comp r ψ ^ h.o = 1 := by
     intro hq
     have nq1 : ¬ r ∣ h.q1 := fun hd =>
-      hr.ne_one (Nat.Coprime.eq_one_of_dvd (Nat.Coprime.coprime_dvd_left (dvd_mul_of_dvd_left hd _) hcop) hq)
+      hr.ne_one (Nat.Coprime.eq_one_of_dvd
+        (Nat.Coprime.coprime_dvd_left (dvd_mul_of_dvd_left hd _) hcop) hq)
     have nd : ¬ r ∣ h.d := fun hd =>
-      hr.ne_one (Nat.Coprime.eq_one_of_dvd (Nat.Coprime.coprime_dvd_left (dvd_mul_of_dvd_right hd _) hcop) hq)
+      hr.ne_one (Nat.Coprime.eq_one_of_dvd
+        (Nat.Coprime.coprime_dvd_left (dvd_mul_of_dvd_right hd _) hcop) hq)
     refine pow_eq_one_of _ h.o (fun u => ?_)
     rw [cu, ← map_pow]
     apply hmemK

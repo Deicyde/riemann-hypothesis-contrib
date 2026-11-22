@@ -13,16 +13,16 @@ namespace GlobalTheory
 
 open PI.AlgValsFin.W ReciprocityTheory.Neutral.Bridge.HCFR Neutral.B1
 
-theorem isAlgebraic_embedding_apply {L : Type} [Field L] [NumberField L] (φ : L →+* ℂ) (x : L) :
-    IsAlgebraic ℚ (φ x) :=
+theorem isAlgebraic_embedding_apply {L : Type} [Field L] [NumberField L] (φ : L →+* ℂ) (x : L)
+    : IsAlgebraic ℚ (φ x) :=
   (Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x).algHom φ.toRatAlgHom
 
-theorem heckeChar_val_isAlgebraic : ∀ (L : Type) [Field L] [NumberField L] (χ : HChar L) (m : (L →+* ℂ) → ℤ),
-    (∀ k : Lˣ, ((χ.inf k : ℂˣ) : ℂ) = ∏ φ : L →+* ℂ, φ (k : L) ^ m φ) →
-    ∀ w : HeightOneSpectrum (𝓞 L), IsAlgebraic ℚ ((χ.val w : ℂˣ) : ℂ) := by
+theorem heckeChar_val_isAlgebraic
+    : ∀ (L : Type) [Field L] [NumberField L] (χ : HChar L) (m : (L →+* ℂ) → ℤ),
+      (∀ k : Lˣ, ((χ.inf k : ℂˣ) : ℂ) = ∏ φ : L →+* ℂ, φ (k : L) ^ m φ)
+        → ∀ w : HeightOneSpectrum (𝓞 L), IsAlgebraic ℚ ((χ.val w : ℂˣ) : ℂ) := by
   intro L _ _ χ m hm w
   classical
-
   obtain ⟨h, hpos, hk⟩ := (classPow : ClassPow L)
   obtain ⟨k, hk⟩ := hk w
   have hkw : ordF w k = (h : ℤ) := by rw [hk w, if_pos rfl]
@@ -54,10 +54,12 @@ theorem heckeChar_val_isAlgebraic : ∀ (L : Type) [Field L] [NumberField L] (χ
 
   set y : (w.adicCompletion L)ˣ := atFin w (unif w) ^ h * (atFin w k)⁻¹ with hy
   have hyv : Valued.v ((y : (w.adicCompletion L)ˣ) : w.adicCompletion L) = 1 := by
-    have h1 : Valued.v ((atFin w (unif w) : (w.adicCompletion L)ˣ) : w.adicCompletion L) =
-        WithZero.exp (-1) := unif_spec w
-    rw [hy, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_pow_eq_pow_val, map_mul, map_inv₀, map_pow, h1,
-      valued_atFin, hkw, ← WithZero.exp_nsmul, ← WithZero.exp_neg, ← WithZero.exp_add]
+    have h1
+        : Valued.v ((atFin w (unif w) : (w.adicCompletion L)ˣ) : w.adicCompletion L)
+          = WithZero.exp (-1) :=
+      unif_spec w
+    rw [hy, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_pow_eq_pow_val, map_mul, map_inv₀,
+      map_pow, h1, valued_atFin, hkw, ← WithZero.exp_nsmul, ← WithZero.exp_neg, ← WithZero.exp_add]
     simp
   have hyU : localIdele L w y ∈ UFin L := by
     refine ⟨rfl, fun v => ?_⟩

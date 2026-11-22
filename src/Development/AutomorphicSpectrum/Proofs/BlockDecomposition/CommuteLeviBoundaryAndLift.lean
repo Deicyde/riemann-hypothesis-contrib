@@ -19,8 +19,10 @@ open GlobalTheory.CompanionTheory.RgCOBlock (fa fb sz)
 
 variable {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
 
-theorem commute_ev (T : Module.End ℂ W) (E : Fin n → Fin n → Module.End ℂ W) (h : ∀ p q, Commute T (E p q))
-    (z : FreeAlgebra ℂ (Fin n × Fin n)) : Commute T (CompanionTheory.D.LK.ev E z) := by
+theorem commute_ev
+    (T : Module.End ℂ W) (E : Fin n → Fin n → Module.End ℂ W) (h : ∀ p q, Commute T (E p q))
+    (z : FreeAlgebra ℂ (Fin n × Fin n))
+    : Commute T (CompanionTheory.D.LK.ev E z) := by
   induction z using FreeAlgebra.induction with
   | grade0 r => rw [AlgHom.commutes]; exact (Algebra.commutes r T).symm
   | grade1 p => simpa [CompanionTheory.D.LK.ev] using h p.1 p.2

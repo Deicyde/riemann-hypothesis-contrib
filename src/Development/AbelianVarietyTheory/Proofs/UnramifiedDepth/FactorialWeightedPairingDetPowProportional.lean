@@ -24,16 +24,19 @@ variable {C : Type} [CommRing C] {n : ℕ}
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] {κ : Type} in
-private theorem pairing_eq_sum_factorial (F G : MvPolynomial κ C) :
-    _root_.GlobalTheory.DetPowPairing.pairing F G =
-      ∑ A ∈ F.support, AddMonoidAlgebra.coeff F A * (A.prod fun _ e => (e.factorial : C)) * AddMonoidAlgebra.coeff G A := by
-  rw [_root_.GlobalTheory.DetPowPairing.pairing, LinearMap.sum_apply]
-  simp only [LinearMap.smul_apply, lcoeff_apply, smul_eq_mul]
+private theorem pairing_eq_sum_factorial (F G : MvPolynomial κ C)
+    : _root_.GlobalTheory.DetPowPairing.pairing F G
+      = ∑ A ∈ F.support, AddMonoidAlgebra.coeff F A * (A.prod fun _ e => (e.factorial : C)) * AddMonoidAlgebra.coeff G A :=
+  by
+    rw [_root_.GlobalTheory.DetPowPairing.pairing, LinearMap.sum_apply]
+    simp only [LinearMap.smul_apply, lcoeff_apply, smul_eq_mul]
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] in
-private theorem exists_cayOp_pow_cayDet_pow (n k Y : ℕ) :
-    ∃ c : ℕ, (_root_.ReciprocityTheory.PGsh.cayOp n C ^ k) (_root_.ReciprocityTheory.PGsh.cayDet n C ^ Y) = c • _root_.ReciprocityTheory.PGsh.cayDet n C ^ (Y - k) := by
+private theorem exists_cayOp_pow_cayDet_pow (n k Y : ℕ)
+    : ∃ c : ℕ,
+      (_root_.ReciprocityTheory.PGsh.cayOp n C ^ k) (_root_.ReciprocityTheory.PGsh.cayDet n C ^ Y)
+        = c • _root_.ReciprocityTheory.PGsh.cayDet n C ^ (Y - k) := by
   induction k generalizing Y with
   | zero => exact ⟨1, by simp⟩
   | succ k ih =>
@@ -47,44 +50,47 @@ private theorem exists_cayOp_pow_cayDet_pow (n k Y : ℕ) :
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] {κ : Type} in
-private theorem pairing_eq_sum_of_support_subset (F G : MvPolynomial κ C)
-    (S : Finset (κ →₀ ℕ)) (hS : F.support ⊆ S) :
-    _root_.GlobalTheory.DetPowPairing.pairing F G =
-      ∑ A ∈ S, AddMonoidAlgebra.coeff F A * (A.prod fun _ e => (e.factorial : C)) * AddMonoidAlgebra.coeff G A := by
-  rw [pairing_eq_sum_factorial]
-  refine Finset.sum_subset hS fun A _ hA => ?_
-  have h : AddMonoidAlgebra.coeff F A = 0 := by simpa using hA
-  rw [h]; ring
+private theorem pairing_eq_sum_of_support_subset
+    (F G : MvPolynomial κ C) (S : Finset (κ →₀ ℕ)) (hS : F.support ⊆ S)
+    : _root_.GlobalTheory.DetPowPairing.pairing F G
+      = ∑ A ∈ S, AddMonoidAlgebra.coeff F A * (A.prod fun _ e => (e.factorial : C)) * AddMonoidAlgebra.coeff G A :=
+  by
+    rw [pairing_eq_sum_factorial]
+    refine Finset.sum_subset hS fun A _ hA => ?_
+    have h : AddMonoidAlgebra.coeff F A = 0 := by simpa using hA
+    rw [h]
+    ring
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] {κ : Type} in
-private theorem pairing_comm' (F G : MvPolynomial κ C) :
-    _root_.GlobalTheory.DetPowPairing.pairing F G = _root_.GlobalTheory.DetPowPairing.pairing G F := by
+private theorem pairing_comm' (F G : MvPolynomial κ C)
+    : _root_.GlobalTheory.DetPowPairing.pairing F G
+      = _root_.GlobalTheory.DetPowPairing.pairing G F := by
   classical
-  rw [pairing_eq_sum_of_support_subset F G (F.support ∪ G.support)
-      Finset.subset_union_left,
-    pairing_eq_sum_of_support_subset G F (F.support ∪ G.support)
-      Finset.subset_union_right]
+  rw [pairing_eq_sum_of_support_subset F G (F.support ∪ G.support) Finset.subset_union_left,
+    pairing_eq_sum_of_support_subset G F (F.support ∪ G.support) Finset.subset_union_right]
   exact Finset.sum_congr rfl fun _ _ => by ring
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] {κ : Type} in
-private theorem pairing_monomial_eq_coeff_mul_prod_factorial_mul (F : MvPolynomial κ C) (A : κ →₀ ℕ) (b : C) :
-    _root_.GlobalTheory.DetPowPairing.pairing F (monomial A b) =
-      AddMonoidAlgebra.coeff F A * (A.prod fun _ e => (e.factorial : C)) * b := by
+private theorem pairing_monomial_eq_coeff_mul_prod_factorial_mul
+    (F : MvPolynomial κ C) (A : κ →₀ ℕ) (b : C)
+    : _root_.GlobalTheory.DetPowPairing.pairing F (monomial A b)
+      = AddMonoidAlgebra.coeff F A * (A.prod fun _ e => (e.factorial : C)) * b := by
   classical
-  rw [pairing_eq_sum_of_support_subset F _ (insert A F.support)
-      (Finset.subset_insert _ _), Finset.sum_eq_single A]
+  rw [pairing_eq_sum_of_support_subset F _ (insert A F.support) (Finset.subset_insert _ _),
+    Finset.sum_eq_single A]
   · rw [coeff_monomial, if_pos rfl]
   · intro B _ hB
-    rw [coeff_monomial, if_neg (Ne.symm hB)]; ring
+    rw [coeff_monomial, if_neg (Ne.symm hB)]
+    ring
   · intro h; exact absurd (Finset.mem_insert_self _ _) h
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] {κ : Type} in
-private theorem prod_factorial_add_single_one_eq_succ_mul_prod_factorial (B : κ →₀ ℕ) (x : κ) :
-    ((B + Finsupp.single x 1).prod fun _ e => (e.factorial : C)) =
-      ((B x + 1 : ℕ) : C) * (B.prod fun _ e => (e.factorial : C)) := by
+private theorem prod_factorial_add_single_one_eq_succ_mul_prod_factorial (B : κ →₀ ℕ) (x : κ)
+    : ((B + Finsupp.single x 1).prod fun _ e => (e.factorial : C))
+      = ((B x + 1 : ℕ) : C) * (B.prod fun _ e => (e.factorial : C)) := by
   classical
   have h1 : (B + Finsupp.single x 1).support ⊆ insert x B.support := by
     intro y hy
@@ -98,8 +104,9 @@ private theorem prod_factorial_add_single_one_eq_succ_mul_prod_factorial (B : κ
     Finsupp.prod_of_support_subset B (Finset.subset_insert x B.support) _ (fun _ _ => by simp),
     ← Finset.mul_prod_erase _ _ (Finset.mem_insert_self x B.support),
     ← Finset.mul_prod_erase _ (fun y => ((B y).factorial : C)) (Finset.mem_insert_self x B.support)]
-  have h2 : ∏ y ∈ (insert x B.support).erase x, (((B + Finsupp.single x 1 : κ →₀ ℕ) y).factorial : C) =
-      ∏ y ∈ (insert x B.support).erase x, ((B y).factorial : C) := by
+  have h2
+      : ∏ y ∈ (insert x B.support).erase x, (((B + Finsupp.single x 1 : κ →₀ ℕ) y).factorial : C)
+        = ∏ y ∈ (insert x B.support).erase x, ((B y).factorial : C) := by
     refine Finset.prod_congr rfl fun y hy => ?_
     have hyx : y ≠ x := Finset.ne_of_mem_erase hy
     have hxy : x ≠ y := Ne.symm hyx
@@ -110,17 +117,18 @@ private theorem prod_factorial_add_single_one_eq_succ_mul_prod_factorial (B : κ
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] {κ : Type} in
-private theorem pairing_X_mul_eq_pairing_pderiv (x : κ) (F G : MvPolynomial κ C) :
-    _root_.GlobalTheory.DetPowPairing.pairing (X x * F) G =
-      _root_.GlobalTheory.DetPowPairing.pairing F (pderiv x G) := by
+private theorem pairing_X_mul_eq_pairing_pderiv (x : κ) (F G : MvPolynomial κ C)
+    : _root_.GlobalTheory.DetPowPairing.pairing (X x * F) G
+      = _root_.GlobalTheory.DetPowPairing.pairing F (pderiv x G) := by
   classical
   induction G using MvPolynomial.induction_on' with
   | monomial A b =>
-    rw [pairing_monomial_eq_coeff_mul_prod_factorial_mul, pderiv_monomial, pairing_monomial_eq_coeff_mul_prod_factorial_mul,
-      coeff_X_mul']
+    rw [pairing_monomial_eq_coeff_mul_prod_factorial_mul, pderiv_monomial,
+      pairing_monomial_eq_coeff_mul_prod_factorial_mul, coeff_X_mul']
     by_cases hx : A x = 0
     · have : x ∉ A.support := by simpa using hx
-      rw [if_neg this, hx]; simp
+      rw [if_neg this, hx]
+      simp
     · rw [if_pos (by simpa using hx)]
       have hA : A = (A - Finsupp.single x 1) + Finsupp.single x 1 := by
         ext y
@@ -128,21 +136,24 @@ private theorem pairing_X_mul_eq_pairing_pderiv (x : κ) (F G : MvPolynomial κ 
         · subst hy; simp; omega
         · simp [Finsupp.single_apply, hy]
       have hAx : (A - Finsupp.single x 1 : κ →₀ ℕ) x + 1 = A x := by simp; omega
-      have hf : (A.prod fun _ e => (e.factorial : C)) =
-          ((A x : ℕ) : C) * ((A - Finsupp.single x 1).prod fun _ e => (e.factorial : C)) := by
+      have hf
+          : (A.prod fun _ e => (e.factorial : C))
+            = ((A x : ℕ) : C) * ((A - Finsupp.single x 1).prod fun _ e => (e.factorial : C)) := by
         conv_lhs => rw [hA]
         rw [prod_factorial_add_single_one_eq_succ_mul_prod_factorial, hAx]
-      rw [hf]; ring
+      rw [hf]
+      ring
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), map_add (f := _), hp, hq]
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] {κ : Type} in
-private theorem pairing_list_prod_X_mul_eq_pairing_list_prod_pderiv {ι : Type} (g : ι → κ) (L : List ι)
-    (F G : MvPolynomial κ C) :
-    _root_.GlobalTheory.DetPowPairing.pairing ((L.map fun j => X (g j)).prod * F) G =
-      _root_.GlobalTheory.DetPowPairing.pairing F
-        ((L.map fun j => ((pderiv (g j) : Derivation C (MvPolynomial κ C) (MvPolynomial κ C)).toLinearMap :
-          Module.End C (MvPolynomial κ C))).prod G) := by
+private theorem pairing_list_prod_X_mul_eq_pairing_list_prod_pderiv
+    {ι : Type} (g : ι → κ) (L : List ι) (F G : MvPolynomial κ C)
+    : _root_.GlobalTheory.DetPowPairing.pairing ((L.map fun j => X (g j)).prod * F) G
+      = _root_.GlobalTheory.DetPowPairing.pairing F
+        ((L.map fun j =>
+          ((pderiv (g j) : Derivation C (MvPolynomial κ C) (MvPolynomial κ C)).toLinearMap
+            : Module.End C (MvPolynomial κ C))).prod G) := by
   induction L generalizing F with
   | nil => simp
   | cons a L ih =>
@@ -152,32 +163,32 @@ private theorem pairing_list_prod_X_mul_eq_pairing_list_prod_pderiv {ι : Type} 
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] in
-private theorem pairing_cayDet_mul' (n : ℕ) (F G : MvPolynomial (Fin n × Fin n) C) :
-    _root_.GlobalTheory.DetPowPairing.pairing (_root_.ReciprocityTheory.PGsh.cayDet n C * F) G =
-      _root_.GlobalTheory.DetPowPairing.pairing F (_root_.ReciprocityTheory.PGsh.cayOp n C G) := by
-  unfold _root_.ReciprocityTheory.PGsh.cayDet _root_.ReciprocityTheory.PGsh.cayOp _root_.ReciprocityTheory.PGsh.cayMono
+private theorem pairing_cayDet_mul' (n : ℕ) (F G : MvPolynomial (Fin n × Fin n) C)
+    : _root_.GlobalTheory.DetPowPairing.pairing (_root_.ReciprocityTheory.PGsh.cayDet n C * F) G
+      = _root_.GlobalTheory.DetPowPairing.pairing F
+        (_root_.ReciprocityTheory.PGsh.cayOp n C G) := by
+  unfold _root_.ReciprocityTheory.PGsh.cayDet _root_.ReciprocityTheory.PGsh.cayOp
+    _root_.ReciprocityTheory.PGsh.cayMono
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.det_apply, Finset.sum_mul, pairing_comm', map_sum,
-    LinearMap.sum_apply, map_sum]
+    rw [Matrix.det_apply, Finset.sum_mul, pairing_comm', map_sum, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun σ _ => ?_
-  rw [Units.smul_def, smul_mul_assoc, map_zsmul, LinearMap.smul_apply, map_zsmul,
-    pairing_comm']
+  rw [Units.smul_def, smul_mul_assoc, map_zsmul, LinearMap.smul_apply, map_zsmul, pairing_comm']
   congr 1
-  have hprod : ∏ i, Matrix.mvPolynomialX (Fin n) (Fin n) C (σ i) i =
-      ((List.finRange n).map fun j => X (σ j, j)).prod := by
+  have hprod
+      : ∏ i, Matrix.mvPolynomialX (Fin n) (Fin n) C (σ i) i
+        = ((List.finRange n).map fun j => X (σ j, j)).prod := by
     rw [Fin.prod_univ_def]; rfl
   rw [hprod, pairing_list_prod_X_mul_eq_pairing_list_prod_pderiv (fun j => (σ j, j))]
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] in
-private theorem pairing_cayDet_pow_mul (n k : ℕ) (F G : MvPolynomial (Fin n × Fin n) C) :
-    _root_.GlobalTheory.DetPowPairing.pairing (_root_.ReciprocityTheory.PGsh.cayDet n C ^ k * F) G =
-      _root_.GlobalTheory.DetPowPairing.pairing F ((_root_.ReciprocityTheory.PGsh.cayOp n C ^ k) G) := by
+private theorem pairing_cayDet_pow_mul (n k : ℕ) (F G : MvPolynomial (Fin n × Fin n) C)
+    : _root_.GlobalTheory.DetPowPairing.pairing (_root_.ReciprocityTheory.PGsh.cayDet n C ^ k * F) G
+      = _root_.GlobalTheory.DetPowPairing.pairing F
+        ((_root_.ReciprocityTheory.PGsh.cayOp n C ^ k) G) := by
   induction k generalizing F with
   | zero => simp
-  | succ k ih =>
-    rw [pow_succ, mul_assoc, ih, pairing_cayDet_mul', pow_succ', Module.End.mul_apply]
-
+  | succ k ih => rw [pow_succ, mul_assoc, ih, pairing_cayDet_mul', pow_succ', Module.End.mul_apply]
 
 open MvPolynomial in
 variable {C : Type} [CommRing C] {n : ℕ} in

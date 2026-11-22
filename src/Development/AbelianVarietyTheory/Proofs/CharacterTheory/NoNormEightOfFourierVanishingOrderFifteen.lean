@@ -10,9 +10,11 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory
 
-theorem no_norm_eight_of_fourier_vanishing_order_fifteen :
-    ∀ (ω : ℂ) (c : ℕ → ℤ), IsPrimitiveRoot ω 15 → ∑ k ∈ Finset.range 15, c k ^ 2 = 8 →
-      (∀ j : ℕ, j < 15 → ¬ 5 ∣ j → ∑ k ∈ Finset.range 15, (c k : ℂ) * ω ^ (j * k) = 0) → False := by
+theorem no_norm_eight_of_fourier_vanishing_order_fifteen
+    : ∀ (ω : ℂ) (c : ℕ → ℤ),
+      IsPrimitiveRoot ω 15 → ∑ k ∈ Finset.range 15, c k ^ 2 = 8
+        → (∀ j : ℕ, j < 15 → ¬ 5 ∣ j → ∑ k ∈ Finset.range 15, (c k : ℂ) * ω ^ (j * k) = 0)
+        → False := by
   intro ω c hω hs hF
   have hinj : Function.Injective (fun j : Fin 15 => ω ^ (j : ℕ)) := by
     intro a b hab
@@ -22,8 +24,8 @@ theorem no_norm_eight_of_fourier_vanishing_order_fifteen :
     intro j
     have h15 : (ω ^ (j : ℕ)) ^ 15 = 1 := by
       rw [← pow_mul, mul_comm, pow_mul, hω.pow_eq_one, one_pow]
-    have hprod : ((ω ^ (j : ℕ)) ^ 3 - 1) *
-        ∑ k ∈ Finset.range 15, (c k : ℂ) * (ω ^ (j : ℕ)) ^ k = 0 := by
+    have hprod
+        : ((ω ^ (j : ℕ)) ^ 3 - 1) * ∑ k ∈ Finset.range 15, (c k : ℂ) * (ω ^ (j : ℕ)) ^ k = 0 := by
       by_cases h5 : 5 ∣ (j : ℕ)
       · obtain ⟨m, hm⟩ := h5
         have : (ω ^ (j : ℕ)) ^ 3 = 1 := by
@@ -33,7 +35,8 @@ theorem no_norm_eight_of_fourier_vanishing_order_fifteen :
         simp only [pow_mul] at this
         rw [this, mul_zero]
     rw [Fin.sum_univ_eq_sum_range
-      (fun i => (ω ^ (j : ℕ)) ^ i * ((c ((i + 12) % 15) - c i : ℤ) : ℂ)) 15]
+      (fun i => (ω ^ (j : ℕ)) ^ i * ((c ((i + 12) % 15) - c i : ℤ) : ℂ))
+      15]
     generalize ω ^ (j : ℕ) = x at h15 hprod
     simp only [Finset.sum_range_succ, Finset.sum_range_zero] at hprod ⊢
     push_cast

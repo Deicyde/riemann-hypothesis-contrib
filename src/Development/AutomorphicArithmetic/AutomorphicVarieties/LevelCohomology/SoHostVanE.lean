@@ -10,9 +10,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
 
-theorem UpperTheory.V.X.So.hostVanE : ∀ CK : ℝ, LemmaK CK → GlobalTheory.Published.PoitouTateDuality → LocalFinitenessK → LocalTateDualityK → LocalFiniteness → LocalTateDuality → LocalEulerChar → UnitaryThreeInertia.HostVanE := by
+theorem UpperTheory.V.X.So.hostVanE
+    : ∀ CK : ℝ,
+      LemmaK CK → GlobalTheory.Published.PoitouTateDuality → LocalFinitenessK → LocalTateDualityK
+        → LocalFiniteness → LocalTateDuality → LocalEulerChar
+        → UnitaryThreeInertia.HostVanE := by
   intro CK hK hPT hLFK hLTDK hLF hLTD hLEC Ω _ _ _ l _ c N _ e ψ o₁ hD S A F hF
   apply So.vanEOf c.O _ _ _ F
   intro j hj s

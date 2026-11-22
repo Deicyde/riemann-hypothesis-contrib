@@ -8,20 +8,21 @@ namespace GlobalTheory.MulEqIntegerExists
 
 open NumberField
 
-theorem exists_mul_eq_integer {E : Type} [Field E] [NumberField E] (c : E) :
-    ∃ a b : RingOfIntegers E, b ≠ 0 ∧ (algebraMap (RingOfIntegers E) E b) * c
-      = algebraMap (RingOfIntegers E) E a := by
+theorem exists_mul_eq_integer {E : Type} [Field E] [NumberField E] (c : E)
+    : ∃ a b : RingOfIntegers E,
+      b ≠ 0 ∧ (algebraMap (RingOfIntegers E) E b) * c = algebraMap (RingOfIntegers E) E a := by
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := RingOfIntegers E) c
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   refine ⟨a, b, hb0, ?_⟩
-  have : algebraMap (RingOfIntegers E) E b ≠ 0 :=
-    fun h => hb0 (IsFractionRing.injective (RingOfIntegers E) E (by rw [h, map_zero]))
+  have : algebraMap (RingOfIntegers E) E b ≠ 0 := fun h =>
+    hb0 (IsFractionRing.injective (RingOfIntegers E) E (by rw [h, map_zero]))
   rw [mul_div_assoc', mul_div_cancel_left₀ _ this]
 
-theorem exists_smul_mem {E : Type} [Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (RingOfIntegers E) (Fin n → E))
-    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (y : Fin n → E) :
-    ∃ ν : RingOfIntegers E, ν ≠ 0 ∧ ν • y ∈ L := by
+theorem exists_smul_mem
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (RingOfIntegers E) (Fin n → E))
+    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (y : Fin n → E)
+    : ∃ ν : RingOfIntegers E, ν ≠ 0 ∧ ν • y ∈ L := by
   have hy : y ∈ Submodule.span E (L : Set (Fin n → E)) := by rw [hL]; trivial
   induction hy using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hx⟩
@@ -39,8 +40,8 @@ theorem exists_smul_mem {E : Type} [Field E] [NumberField E] {n : ℕ}
     obtain ⟨a, b, hb, hab⟩ := exists_mul_eq_integer c
     refine ⟨b * ν, mul_ne_zero hb hν, ?_⟩
     have h : (b * ν) • (c • x) = a • (ν • x) := by
-      rw [← algebraMap_smul E (b * ν), ← algebraMap_smul E a, ← algebraMap_smul E ν,
-        smul_smul, smul_smul, map_mul, ← hab]
+      rw [← algebraMap_smul E (b * ν), ← algebraMap_smul E a, ← algebraMap_smul E ν, smul_smul,
+        smul_smul, map_mul, ← hab]
       congr 1
       ring
     rw [h]

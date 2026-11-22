@@ -9,12 +9,19 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.PerfVB
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.PerfVB
 
 namespace GlobalTheory.CompanionTheory.PerfVB
 
-theorem form_mem_of_mem_smul_top {A N : Type} [CommRing A] [AddCommGroup N] [Module A N]
-    (J : Ideal A) (φ : N →ₗ[A] A) {n : N} (h : n ∈ J • (⊤ : Submodule A N)) : φ n ∈ J := by
+theorem form_mem_of_mem_smul_top
+    {A N : Type} [CommRing A] [AddCommGroup N] [Module A N]
+    (J : Ideal A)
+    (φ : N →ₗ[A] A)
+    {n : N} (h : n ∈ J • (⊤ : Submodule A N))
+    : φ n ∈ J := by
   refine Submodule.smul_induction_on h ?_ ?_
   · intro r hr n _
     rw [map_smul, smul_eq_mul]
@@ -23,23 +30,26 @@ theorem form_mem_of_mem_smul_top {A N : Type} [CommRing A] [AddCommGroup N] [Mod
     rw [map_add (f := _)]
     exact J.add_mem hx hy
 
-theorem exists_step_of_sup_span {A : Type} [CommRing A] (K I : Ideal A) (S : Finset A)
-    (hS : K ⊔ Ideal.span (S : Set A) = I) (hne : K ≠ I) :
-    ∃ (J : Ideal A) (t : A), K ≤ J ∧ J ≠ I ∧ J ⊔ Ideal.span {t} = I := by
+theorem exists_step_of_sup_span
+    {A : Type} [CommRing A]
+    (K I : Ideal A) (S : Finset A) (hS : K ⊔ Ideal.span (S : Set A) = I)
+    (hne : K ≠ I)
+    : ∃ (J : Ideal A) (t : A), K ≤ J ∧ J ≠ I ∧ J ⊔ Ideal.span {t} = I := by
   classical
   induction S using Finset.induction_on with
-  | empty =>
-    exact absurd (by simpa using hS) hne
+  | empty => exact absurd (by simpa using hS) hne
   | insert a S' _ ih =>
     by_cases h : K ⊔ Ideal.span (S' : Set A) = I
     · exact ih h
     · refine ⟨K ⊔ Ideal.span (S' : Set A), a, le_sup_left, h, ?_⟩
       rw [← hS, Finset.coe_insert, Ideal.span_insert, sup_assoc, sup_comm (Ideal.span {a})]
 
-theorem eq_zero_of_lift_of_mem_maximalIdeal_smul (A Q N : Type) [CommRing A] [IsLocalRing A]
-    [AddCommGroup Q] [Module A Q] [Module.Finite A Q] [AddCommGroup N] [Module A N]
-    [Module.Finite A N] [Module.Free A N] (b : Q →ₗ[A] N) (hL : Lift b)
-    (hb : ∀ q, b q ∈ (IsLocalRing.maximalIdeal A) • (⊤ : Submodule A N)) : b = 0 := by
+theorem eq_zero_of_lift_of_mem_maximalIdeal_smul
+    (A Q N : Type) [CommRing A] [IsLocalRing A] [AddCommGroup Q] [Module A Q] [Module.Finite A Q]
+    [AddCommGroup N] [Module A N] [Module.Finite A N] [Module.Free A N]
+    (b : Q →ₗ[A] N)
+    (hL : Lift b) (hb : ∀ q, b q ∈ (IsLocalRing.maximalIdeal A) • (⊤ : Submodule A N))
+    : b = 0 := by
   classical
   obtain ⟨S, hS⟩ := (Module.Finite.fg_top : (⊤ : Submodule A Q).FG)
   let v := Module.finBasis A N
@@ -54,7 +64,8 @@ theorem eq_zero_of_lift_of_mem_maximalIdeal_smul (A Q N : Type) [CommRing A] [Is
     | mem x hx =>
       intro i
       exact Ideal.subset_span ⟨(i, ⟨x, hx⟩), rfl⟩
-    | zero => intro i; simp
+    | zero =>
+      intro i; simp
     | add x y _ _ hx hy =>
       intro i
       rw [map_add (f := _), map_add (f := _)]
@@ -79,8 +90,8 @@ theorem eq_zero_of_lift_of_mem_maximalIdeal_smul (A Q N : Type) [CommRing A] [Is
       rw [IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top]
     have hne : m * I ≠ I := by
       intro h
-      exact hI (Submodule.eq_bot_of_le_smul_of_le_jacobson_bot m I hIfg
-        (by rw [smul_eq_mul, h]) hjac)
+      exact hI (Submodule.eq_bot_of_le_smul_of_le_jacobson_bot m I hIfg (by rw [smul_eq_mul, h])
+        hjac)
     obtain ⟨T, hT⟩ := hIfg
     have hsup : m * I ⊔ Ideal.span (T : Set A) = I := by
       have hT' : Ideal.span (T : Set A) = I := hT
@@ -94,16 +105,15 @@ theorem eq_zero_of_lift_of_mem_maximalIdeal_smul (A Q N : Type) [CommRing A] [Is
     have hJtop : J ≠ ⊤ := fun h ↦ by
       have : (1 : A) ∈ m := hIm (hJle (h ▸ Submodule.mem_top))
       exact (Ideal.ne_top_iff_one m).1 (IsLocalRing.maximalIdeal.isMaximal A).ne_top this
-    have hxt : ∀ x ∈ IsLocalRing.maximalIdeal A, x * t ∈ J :=
-      fun x hx ↦ hKJ (Ideal.mul_mem_mul hx htI)
+    have hxt : ∀ x ∈ IsLocalRing.maximalIdeal A, x * t ∈ J := fun x hx ↦
+      hKJ (Ideal.mul_mem_mul hx htI)
 
     have hstep : ∀ y ∈ I • (⊤ : Submodule A Q), b y ∈ J • (⊤ : Submodule A N) := by
       intro y hy
       refine Submodule.smul_induction_on hy ?_ ?_
       · intro r hr q _
         rw [map_smul]
-        have h1 : r • b q ∈ I • m • (⊤ : Submodule A N) :=
-          Submodule.smul_mem_smul hr (hb q)
+        have h1 : r • b q ∈ I • m • (⊤ : Submodule A N) := Submodule.smul_mem_smul hr (hb q)
         have h2 : I • m • (⊤ : Submodule A N) ≤ J • (⊤ : Submodule A N) := by
           rw [← Submodule.mul_smul, mul_comm]
           exact Submodule.smul_mono_left hKJ

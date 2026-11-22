@@ -9,16 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsRec
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso tw)
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open UpperTheory.Gal.TP.Sub
 
-theorem UpperTheory.Gal.TP.Sub.charAbove_holds :
-    GlobalTheory.Published.HeckeLAdicCharacter → GlobalTheory.Published.HeckeLAdicCharacterDeRham → GlobalTheory.Published.AlgebraicCharacterWD → PstOfDR → ContLeft → CharAbove := by
+theorem UpperTheory.Gal.TP.Sub.charAbove_holds
+    : GlobalTheory.Published.HeckeLAdicCharacter → GlobalTheory.Published.HeckeLAdicCharacterDeRham
+      → GlobalTheory.Published.AlgebraicCharacterWD → PstOfDR → ContLeft
+      → CharAbove := by
   intro H hD hW hP hC E Ω _ _ _ _ _ l _ ι art ha χ n μ h1 h2 h3 w hu P AI hT A h O _ _ _ Bw hj
   obtain ⟨a, ha'⟩ := GlobalTheory.localArtinExists_holds E Ω A w h
   have hξ := GlobalTheory.Published.ParamAboveModel.isComp_loc (w := w) χ
@@ -29,19 +34,33 @@ theorem UpperTheory.Gal.TP.Sub.charAbove_holds :
   have e := hW E Ω l P AI hT ι art ha χ n μ h1 h2 h3 w A h O Bw hj _ hξ a ha'
   have hun := (GlobalTheory.Published.CharCrysModel.isUnram_iff χ w).2 hu
   refine ⟨?_, d.1, d.2, fun g => ?_⟩
-  · rw [← GlobalTheory.PstLaws.unr_wdAt_iff Bw h hj P ι _ hr, e, GlobalTheory.LocLanglands.Test.unr_lpOfChar_iff ha' hξ.1]
+  · rw [← GlobalTheory.PstLaws.unr_wdAt_iff Bw h hj P ι _ hr, e,
+      GlobalTheory.LocLanglands.Test.unr_lpOfChar_iff ha' hξ.1]
     exact hun
-  · have hv : (χ.loc w (a g) : ℂ) = ((χ.val w : ℂˣ) : ℂ) ^ (-deg g) := by
+  · have hv : (χ.loc w (a g) : ℂ) = ((χ.val w : ℂˣ) : ℂ) ^ (- deg g) := by
       have ho : GlobalTheory.SmGL.ord (w.adicCompletion E) (atFin w (unif w)) = 1 := by
-        rw [GlobalTheory.SmGL.SphCompletion.ord_completion, show Valued.v ((atFin w (unif w) : (w.adicCompletion E)ˣ) : w.adicCompletion E) = _ from unif_spec w]
+        rw [GlobalTheory.SmGL.SphCompletion.ord_completion,
+          show Valued.v ((atFin w (unif w) : (w.adicCompletion E)ˣ) : w.adicCompletion E) = _ from
+            unif_spec w]
         simp
-      have h1 : ∀ x : (w.adicCompletion E)ˣ, χ.loc w x = χ.val w ^ GlobalTheory.SmGL.ord (w.adicCompletion E) x := fun x => by
-        have h0 : GlobalTheory.SmGL.ord (w.adicCompletion E) (x * (atFin w (unif w) ^ GlobalTheory.SmGL.ord (w.adicCompletion E) x)⁻¹) = 0 := by
-          have hz : ∀ (y : (w.adicCompletion E)ˣ), GlobalTheory.SmGL.unrChar (w.adicCompletion E) (Units.mk0 2 two_ne_zero) y =
-              (Units.mk0 (2:ℂ) two_ne_zero) ^ GlobalTheory.SmGL.ord _ y := fun _ => rfl
-          let φ : (w.adicCompletion E)ˣ →* Multiplicative ℤ := MonoidHom.mk' (fun y => Multiplicative.ofAdd (GlobalTheory.SmGL.ord _ y))
-            fun y z => by rw [GlobalTheory.SmGL.ord_mul, ofAdd_add]
-          have : φ (x * (atFin w (unif w) ^ GlobalTheory.SmGL.ord (w.adicCompletion E) x)⁻¹) = 1 := by
+      have h1
+          : ∀ x : (w.adicCompletion E)ˣ,
+            χ.loc w x = χ.val w ^ GlobalTheory.SmGL.ord (w.adicCompletion E) x := fun x => by
+        have h0
+            : GlobalTheory.SmGL.ord (w.adicCompletion E)
+                (x * (atFin w (unif w) ^ GlobalTheory.SmGL.ord (w.adicCompletion E) x)⁻¹)
+              = 0 := by
+          have hz
+              : ∀ (y : (w.adicCompletion E)ˣ),
+                GlobalTheory.SmGL.unrChar (w.adicCompletion E) (Units.mk0 2 two_ne_zero) y
+                  = (Units.mk0 (2 : ℂ) two_ne_zero) ^ GlobalTheory.SmGL.ord _ y := fun _ =>
+            rfl
+          let φ : (w.adicCompletion E)ˣ →* Multiplicative ℤ :=
+            MonoidHom.mk'
+              (fun y => Multiplicative.ofAdd (GlobalTheory.SmGL.ord _ y))
+              fun y z => by rw [GlobalTheory.SmGL.ord_mul, ofAdd_add]
+          have : φ (x * (atFin w (unif w) ^ GlobalTheory.SmGL.ord (w.adicCompletion E) x)⁻¹)
+              = 1 := by
             rw [map_mul, map_inv, map_zpow]
             simp [φ, ho, ← ofAdd_zsmul]
           exact this

@@ -12,15 +12,18 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory Filter Asymptotics
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  ReciprocityTheory.GeometryOfNumbersTheory Filter Asymptotics
 
 noncomputable section
 
 theorem chiP_zero_dim (n : ℕ) : chiP 0 n = 0 := by
   simp [chiP, monoNormSq, Finset.Nat.antidiagonalTuple_one]
 
-theorem HilbertSamuelProjective.proof (hR : ReductionToProjective.Statement) (hV : SecondVeronese.Statement)
-    (h0 : PointHeightFS.Statement) : HilbertSamuelProjective.Statement := by
+theorem HilbertSamuelProjective.proof
+    (hR : ReductionToProjective.Statement) (hV : SecondVeronese.Statement)
+    (h0 : PointHeightFS.Statement)
+    : HilbertSamuelProjective.Statement := by
   intro D I hI
   rcases Nat.eq_zero_or_pos D with rfl | hD
   · have hh := h0 I hI

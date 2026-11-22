@@ -11,16 +11,18 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.VirtualCha
 open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 namespace GlobalTheory.BI
 
-theorem finsupp_eq_single_of_sum_sq_eq_one {α : Type} (c : α →₀ ℤ)
-    (h : (c.sum fun _ m => m ^ 2) = 1) :
-    ∃ a, c.support = {a} ∧ (c a = 1 ∨ c a = -1) := by
+theorem finsupp_eq_single_of_sum_sq_eq_one
+    {α : Type} (c : α →₀ ℤ) (h : (c.sum fun _ m => m ^ 2) = 1)
+    : ∃ a, c.support = {a} ∧ (c a = 1 ∨ c a = -1) := by
   simp only [Finsupp.sum] at h
   have hge : ∀ b ∈ c.support, (1 : ℤ) ≤ c b ^ 2 := by
     intro b hb
     have hb' : c b ≠ 0 := Finsupp.mem_support_iff.mp hb
     rcases lt_or_gt_of_ne hb' with hlt | hgt <;> nlinarith
   have hle : (c.support.card : ℤ) ≤ 1 := by
-    calc (c.support.card : ℤ) = ∑ _b ∈ c.support, (1 : ℤ) := by simp
+    calc
+      (c.support.card : ℤ)
+        = ∑ _b ∈ c.support, (1 : ℤ) := by simp
       _ ≤ ∑ b ∈ c.support, c b ^ 2 := Finset.sum_le_sum hge
       _ = 1 := h
   have hne : c.support.Nonempty := by
@@ -42,8 +44,9 @@ theorem finsupp_eq_single_of_sum_sq_eq_one {α : Type} (c : α →₀ ℤ)
     norm_num at h
   omega
 
-private theorem exists_pos_nat_apply_one_of_isIrrChar {G : Type} [Group G] (χ : G → ℂ) (h : IsIrrChar ℂ ℂ χ) :
-    ∃ n : ℕ, 0 < n ∧ χ 1 = n := by
+private theorem exists_pos_nat_apply_one_of_isIrrChar
+    {G : Type} [Group G] (χ : G → ℂ) (h : IsIrrChar ℂ ℂ χ)
+    : ∃ n : ℕ, 0 < n ∧ χ 1 = n := by
   obtain ⟨n, ρ, hρ, hχ⟩ := h
   refine ⟨n, ?_, ?_⟩
   · have hs : IsSimpleModule (MonoidAlgebra ℂ G) ρ.asModule :=
@@ -58,7 +61,11 @@ private theorem exists_pos_nat_apply_one_of_isIrrChar {G : Type} [Group G] (χ :
   · rw [hχ, Representation.char_one]
     simp
 
-theorem irr_of_norm_one : ∀ (G : Type) [Group G] [Finite G] (φ : G → ℂ), φ ∈ Virt ℂ ℂ G → ∑ᶠ g, φ g * star (φ g) = (Nat.card G : ℂ) → (IsIrrChar ℂ ℂ φ ∨ IsIrrChar ℂ ℂ (-φ)) ∧ (IsChar ℂ ℂ φ → IsIrrChar ℂ ℂ φ ∧ ∃ n : ℕ, 0 < n ∧ φ 1 = n) := by
+theorem irr_of_norm_one
+    : ∀ (G : Type) [Group G] [Finite G] (φ : G → ℂ),
+      φ ∈ Virt ℂ ℂ G → ∑ᶠ g, φ g * star (φ g) = (Nat.card G : ℂ)
+        → (IsIrrChar ℂ ℂ φ ∨ IsIrrChar ℂ ℂ (-φ))
+          ∧ (IsChar ℂ ℂ φ → IsIrrChar ℂ ℂ φ ∧ ∃ n : ℕ, 0 < n ∧ φ 1 = n) := by
   intro G _ _ φ hφ hnorm
   obtain ⟨c, hirr, hsum, hsq⟩ := GlobalTheory.T.virtualCharacter_irreducible_expansion_normSq G φ hφ
   have hG : (Nat.card G : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
@@ -69,8 +76,7 @@ theorem irr_of_norm_one : ∀ (G : Type) [Group G] [Finite G] (φ : G → ℂ), 
     exact_mod_cast h1
   obtain ⟨χ, hsupp, hc⟩ := finsupp_eq_single_of_sum_sq_eq_one c h2
   have hχ : IsIrrChar ℂ ℂ χ := hirr χ (by rw [hsupp]; exact Finset.mem_singleton_self χ)
-  have hφχ : φ = c χ • χ := by
-    rw [hsum, Finsupp.sum, hsupp, Finset.sum_singleton]
+  have hφχ : φ = c χ • χ := by rw [hsum, Finsupp.sum, hsupp, Finset.sum_singleton]
   have key : φ = χ ∨ φ = -χ := by
     rcases hc with h | h
     · left

@@ -4,18 +4,24 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-private theorem exists_coords {K C V : Type} [Field K] [Ring C] [Algebra K C] [Algebra ℚ K] [Algebra ℚ C]
-    [IsScalarTower ℚ K C] [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V] [FiniteDimensional ℚ K]
-    [FiniteDimensional K C] (n : ℕ)
-    (rep : C →ₐ[ℚ] Module.End ℚ V) (hinj : Function.Injective rep) (hC : Module.finrank K C = n ^ 2)
-    (hdim : Module.finrank ℚ V = n * Module.finrank ℚ K) :
-    ∃ (kp : V ≃+ (Fin n → K)) (σ : C ≃ₐ[K] Matrix (Fin n) (Fin n) K), ∀ c w, kp (rep c w) = σ c *ᵥ kp w := by
+private theorem exists_coords
+    {K C V : Type} [Field K] [Ring C] [Algebra K C] [Algebra ℚ K] [Algebra ℚ C]
+    [IsScalarTower ℚ K C] [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V]
+    [FiniteDimensional ℚ K] [FiniteDimensional K C]
+    (n : ℕ)
+    (rep : C →ₐ[ℚ] Module.End ℚ V) (hinj : Function.Injective rep)
+    (hC : Module.finrank K C = n ^ 2) (hdim : Module.finrank ℚ V = n * Module.finrank ℚ K)
+    : ∃ (kp : V ≃+ (Fin n → K)) (σ : C ≃ₐ[K] Matrix (Fin n) (Fin n) K), ∀ c w,
+      kp (rep c w) = σ c *ᵥ kp w := by
   let f : K →+* Module.End ℚ V := (rep : C →+* Module.End ℚ V).comp (algebraMap K C)
   letI : Module K V := Module.compHom V f
   have hsm : ∀ (x : K) (w : V), x • w = rep (algebraMap K C x) w := fun _ _ => rfl
@@ -30,18 +36,23 @@ private theorem exists_coords {K C V : Type} [Field K] [Ring C] [Algebra K C] [A
     rw [hdim, mul_comm n] at h
     exact Nat.eq_of_mul_eq_mul_left hpos h
   let b : Module.Basis (Fin n) K V := Module.finBasisOfFinrankEq K V hfin
-  let r : C →ₐ[K] Module.End K V := AlgHom.ofLinearMap
-    { toFun := fun c =>
-        { toFun := rep c
+  let r : C →ₐ[K] Module.End K V :=
+    AlgHom.ofLinearMap
+      {
+        toFun := fun c => {
+          toFun := rep c
           map_add' := map_add _
           map_smul' := fun x w => by
             simp only [RingHom.id_apply, hsm]
-            rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul, Algebra.commutes] }
-      map_add' := fun c c' => by ext w; simp
-      map_smul' := fun x c => by
-        ext w
-        simp [hsm, Algebra.smul_def, Module.End.mul_apply] }
-    (by ext w; simp) (fun c c' => by ext w; simp [Module.End.mul_apply])
+            rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul,
+              Algebra.commutes]
+        }
+        map_add' := fun c c' => by ext w; simp
+        map_smul' := fun x c => by
+          ext w
+          simp [hsm, Algebra.smul_def, Module.End.mul_apply]
+      }
+      (by ext w; simp) (fun c c' => by ext w; simp [Module.End.mul_apply])
   have hr : ∀ c w, r c w = rep c w := fun _ _ => rfl
   let s : C →ₐ[K] Matrix (Fin n) (Fin n) K := (LinearMap.toMatrixAlgEquiv b).toAlgHom.comp r
   have hsinj : Function.Injective s := by
@@ -59,8 +70,7 @@ private theorem exists_coords {K C V : Type} [Field K] [Ring C] [Algebra K C] [A
   have h := LinearMap.toMatrix_mulVec_repr b b (r c) w
   exact h.symm
 
-theorem UpperTheory.Gal.W2.fMat_of :
-    UpperTheory.Gal.W2.FMat := by
+theorem UpperTheory.Gal.W2.fMat_of : UpperTheory.Gal.W2.FMat := by
   intro p _ D G L hm
   haveI := D.freeLa
   haveI := D.finLa

@@ -50,9 +50,11 @@ theorem ZUnitNorm_holds : ZUnitNorm := pZUnitNorm PadicUnitNorm_holds
 theorem ZSqFin_holds : ZSqFin := pZSqFin PadicSqFin_holds
 theorem AdFour_holds : AdFour := pAdFour LocFour_holds LocUnit_holds LocRoot_holds SplitRep_holds
 theorem UnitCls_holds : UnitCls := pUnitCls Scale_holds ZUnitNorm_holds ZSqFin_holds
-theorem FinCongr_holds : FinCongr := pFinCongr PadMap_holds LocRoot_holds TrivMat_holds CongrScale_holds SplitCongr_holds DefSign_holds
+theorem FinCongr_holds : FinCongr :=
+  pFinCongr PadMap_holds LocRoot_holds TrivMat_holds CongrScale_holds SplitCongr_holds DefSign_holds
 theorem NormTwo_holds : NormTwo := pNormTwo AdFour_holds
-theorem FinCls_holds : FinCls := pFinCls UnitCls_holds FinCongr_holds InfCongr_holds DefSign_holds RelOf_holds
+theorem FinCls_holds : FinCls :=
+  pFinCls UnitCls_holds FinCongr_holds InfCongr_holds DefSign_holds RelOf_holds
 theorem IsoEx_holds : IsoEx := pIsoEx NormTwo_holds BlockMat_holds
 
 end UpperTheory.Gal.G1

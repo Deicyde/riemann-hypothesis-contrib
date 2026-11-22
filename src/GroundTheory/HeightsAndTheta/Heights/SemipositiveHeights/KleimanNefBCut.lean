@@ -23,11 +23,17 @@ namespace GroundTheory.Heights₂.Heights.ForSecondHalf
 
 open GroundTheory.Heights₂.Heights.Kleiman
 
-theorem KleimanNefB.segreRealise (hNef : SectionsOverLocalization.NefEq.Statement) (hCh : SectionsOverLocalization.ModelChangeNef.Statement)
-    (hNM : SectionsOverLocalization.NumModel.Statement) : SectionsOverLocalization.SegreRealise.Statement :=
-  SectionsOverLocalization.SegreRealise.proof SectionsOverLocalization.SegreBase.proof SectionsOverLocalization.SegreTwist.proof SectionsOverLocalization.SegreDim.proof
-    (SectionsOverLocalization.SegreNef.proof SectionsOverLocalization.SegreDim.proof SectionsOverLocalization.SegreNum.proof) SectionsOverLocalization.SegreNum.proof
-    SectionsOverLocalization.BundleOfDeg.full SectionsOverLocalization.ModelDimEq.full (SectionsOverLocalization.ModelNefEq.proof hNef hCh)
+theorem KleimanNefB.segreRealise
+    (hNef : SectionsOverLocalization.NefEq.Statement)
+    (hCh : SectionsOverLocalization.ModelChangeNef.Statement)
+    (hNM : SectionsOverLocalization.NumModel.Statement)
+    : SectionsOverLocalization.SegreRealise.Statement :=
+  SectionsOverLocalization.SegreRealise.proof SectionsOverLocalization.SegreBase.proof
+    SectionsOverLocalization.SegreTwist.proof SectionsOverLocalization.SegreDim.proof
+    (SectionsOverLocalization.SegreNef.proof SectionsOverLocalization.SegreDim.proof
+      SectionsOverLocalization.SegreNum.proof)
+    SectionsOverLocalization.SegreNum.proof SectionsOverLocalization.BundleOfDeg.full
+    SectionsOverLocalization.ModelDimEq.full (SectionsOverLocalization.ModelNefEq.proof hNef hCh)
     (SectionsOverLocalization.ModelNumEq.proof hNM)
 
 end GroundTheory.Heights₂.Heights.ForSecondHalf

@@ -13,19 +13,25 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
-private theorem evT_sum {n : ℕ} (θ : Wt n) (c : FR n) :
-    evT θ c = ∑ μ ∈ c.coeff.support, cf c μ * evT θ (ex μ) := by
+private theorem evT_sum {n : ℕ} (θ : Wt n) (c : FR n)
+    : evT θ c = ∑ μ ∈ c.coeff.support, cf c μ * evT θ (ex μ) := by
   simp only [evT, ex, AddMonoidAlgebra.lift_single, one_smul]
   rw [AddMonoidAlgebra.lift_apply]
   simp only [Finsupp.sum, cf, smul_eq_mul]
 
-theorem UpperTheory.RealTr.chEv :
-    ∀ (n : ℕ) (N : Type) [NormedAddCommGroup N] [InnerProductSpace ℂ N] [FiniteDimensional ℂ N] (σ : UK n →* (N →ₗ[ℂ] N))
-      (F : Fin n → Fin n → Module.End ℂ N), UF F → IsDerivK σ F → ∀ B c, Cm F ⊤ B → IsCh F ⊤ B c → ∀ (θ : Wt n) (k : UK n),
-      k.1 = diagonal (fun a => Complex.exp (Complex.I * θ a)) → LinearMap.trace ℂ N (σ k * B) = evT θ c := by
+theorem UpperTheory.RealTr.chEv
+    : ∀ (n : ℕ) (N : Type) [NormedAddCommGroup N] [InnerProductSpace ℂ N] [FiniteDimensional ℂ N]
+        (σ : UK n →* (N →ₗ[ℂ] N)) (F : Fin n → Fin n → Module.End ℂ N),
+      UF F → IsDerivK σ F
+        → ∀ B c,
+          Cm F ⊤ B → IsCh F ⊤ B c
+            → ∀ (θ : Wt n) (k : UK n),
+              k.1 = diagonal (fun a => Complex.exp (Complex.I * θ a))
+                → LinearMap.trace ℂ N (σ k * B) = evT θ c := by
   intro n N _ _ _ σ F hF hσ B c hB hc θ k hk
   classical
   obtain ⟨s, hs0, hsup, hind⟩ := wtDec n N F hF ⊤ inferInstance (fun _ _ _ _ => Submodule.mem_top)
@@ -51,7 +57,8 @@ theorem UpperTheory.RealTr.chEv :
     apply DirectSum.isInternal_submodule_of_iSupIndep_of_iSup_eq_top
     · exact iSupIndep.comp hind Subtype.val_injective
     · rw [← hsup, iSup_subtype']
-  have hterm : ∀ μ, LinearMap.trace ℂ (W μ) ((σ k * B).restrict (hfW μ)) = evT θ (ex μ) * cf c μ := by
+  have hterm
+      : ∀ μ, LinearMap.trace ℂ (W μ) ((σ k * B).restrict (hfW μ)) = evT θ (ex μ) * cf c μ := by
     intro μ
     have hr : (σ k * B).restrict (hfW μ) = evT θ (ex μ) • B.restrict (hBW μ) := by
       ext v
@@ -66,23 +73,22 @@ theorem UpperTheory.RealTr.chEv :
     rw [hc μ, hs0 μ hμ]
     unfold trOn
     split_ifs with h
-    · have h0 : B.restrict h = 0 := by
-        ext x
+    · have h0 : B.restrict h = 0 := by ext x
       rw [h0, map_zero]
     · rfl
   rw [LinearMap.trace_eq_sum_trace_restrict hint (fun i => hfW i)]
   simp only [hterm]
   rw [Finset.sum_coe_sort s (fun μ => evT θ (ex μ) * cf c μ)]
-  calc ∑ μ ∈ s, evT θ (ex μ) * cf c μ
-        = ∑ μ ∈ s ∪ c.coeff.support, evT θ (ex μ) * cf c μ := by
-          apply Finset.sum_subset Finset.subset_union_left
-          intro μ _ hμ
-          rw [hz μ hμ, mul_zero]
+  calc
+    ∑ μ ∈ s, evT θ (ex μ) * cf c μ = ∑ μ ∈ s ∪ c.coeff.support, evT θ (ex μ) * cf c μ := by
+      apply Finset.sum_subset Finset.subset_union_left
+      intro μ _ hμ
+      rw [hz μ hμ, mul_zero]
     _ = ∑ μ ∈ s ∪ c.coeff.support, cf c μ * evT θ (ex μ) :=
-          Finset.sum_congr rfl (fun μ _ => mul_comm _ _)
+      Finset.sum_congr rfl (fun μ _ => mul_comm _ _)
     _ = ∑ μ ∈ c.coeff.support, cf c μ * evT θ (ex μ) := by
-          symm
-          apply Finset.sum_subset Finset.subset_union_right
-          intro μ _ hμ
-          rw [show cf c μ = 0 from Finsupp.notMem_support_iff.1 hμ, zero_mul]
+      symm
+      apply Finset.sum_subset Finset.subset_union_right
+      intro μ _ hμ
+      rw [show cf c μ = 0 from Finsupp.notMem_support_iff.1 hμ, zero_mul]
     _ = evT θ c := (evT_sum θ c).symm

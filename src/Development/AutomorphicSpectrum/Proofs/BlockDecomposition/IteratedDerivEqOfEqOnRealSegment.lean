@@ -8,11 +8,11 @@ open Filter Topology
 
 namespace GlobalTheory.CompanionTheory.ComplexAnalysis
 
-theorem iteratedDeriv_zero_eq_of_eq_on_real_points (f g : ℂ → ℂ) (ρ : ℝ) (hρ : 0 < ρ)
-    (hf : DifferentiableOn ℂ f (Metric.ball 0 ρ)) (hg : DifferentiableOn ℂ g (Metric.ball 0 ρ))
-    (h : ∀ s : ℝ, |s| < ρ → f s = g s) (r : ℕ) :
-    iteratedDeriv r f 0 = iteratedDeriv r g 0 := by
-
+theorem iteratedDeriv_zero_eq_of_eq_on_real_points
+    (f g : ℂ → ℂ) (ρ : ℝ) (hρ : 0 < ρ) (hf : DifferentiableOn ℂ f (Metric.ball 0 ρ))
+    (hg : DifferentiableOn ℂ g (Metric.ball 0 ρ)) (h : ∀ s : ℝ, |s| < ρ → f s = g s)
+    (r : ℕ)
+    : iteratedDeriv r f 0 = iteratedDeriv r g 0 := by
   have hU : IsOpen (Metric.ball (0 : ℂ) ρ) := Metric.isOpen_ball
   have h0 : (0 : ℂ) ∈ Metric.ball (0 : ℂ) ρ := Metric.mem_ball_self hρ
   have hreal : ∀ᶠ s : ℝ in 𝓝[≠] 0, f s = g s := by

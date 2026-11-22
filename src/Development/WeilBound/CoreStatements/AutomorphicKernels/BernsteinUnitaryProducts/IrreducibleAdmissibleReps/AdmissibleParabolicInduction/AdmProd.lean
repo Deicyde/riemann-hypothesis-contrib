@@ -18,15 +18,19 @@ namespace PositivityTheory.PfBern.Props1
 
 section Equiv
 
-variable {G V W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-  [Module ℂ W]
+variable
+  {G V W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+  [AddCommGroup W] [Module ℂ W]
 
-theorem isAdmissible_of_equiv {σ : Representation ℂ G V} {τ : Representation ℂ G W} (E : σ.Equiv τ)
-    (h : IsAdmissible τ) : IsAdmissible σ := by
+theorem isAdmissible_of_equiv
+    {σ : Representation ℂ G V} {τ : Representation ℂ G W} (E : σ.Equiv τ) (h : IsAdmissible τ)
+    : IsAdmissible σ := by
   let L : V →ₗ[ℂ] W := E.toIntertwiningMap.toLinearMap
   have hL : ∀ y, L y = E.toLinearEquiv y := fun _ => rfl
-  have hLi : Function.Injective L := fun a b hab => E.toLinearEquiv.injective (by rw [← hL, ← hL, hab])
-  have hcomm : ∀ g y, L (σ g y) = τ g (L y) := fun g y => LinearMap.congr_fun (E.isIntertwining' g) y
+  have hLi : Function.Injective L := fun a b hab =>
+    E.toLinearEquiv.injective (by rw [← hL, ← hL, hab])
+  have hcomm : ∀ g y, L (σ g y) = τ g (L y) := fun g y =>
+    LinearMap.congr_fun (E.isIntertwining' g) y
   refine ⟨fun v => ?_, fun K hKo hKc => ?_⟩
   · have : {g : G | σ g v = v} = {g : G | τ g (L v) = L v} := by
       ext g
@@ -35,25 +39,30 @@ theorem isAdmissible_of_equiv {σ : Representation ℂ G V} {τ : Representation
     rw [this]
     exact h.1 (L v)
   · have := h.2 K hKo hKc
-    let M : GlobalTheory.PRep.fixed σ K →ₗ[ℂ] GlobalTheory.PRep.fixed τ K :=
-      { toFun := fun v => ⟨L v.1, GlobalTheory.ContraRefl.mem_fix.2 fun g hg => by
-          rw [← hcomm, GlobalTheory.ContraRefl.mem_fix.1 v.2 g hg]⟩
-        map_add' := fun _ _ => Subtype.ext (map_add L _ _)
-        map_smul' := fun _ _ => Subtype.ext (map_smul L _ _) }
-    exact Module.Finite.of_injective M fun a b hab =>
-      Subtype.ext (hLi (congrArg Subtype.val hab))
+    let M : GlobalTheory.PRep.fixed σ K →ₗ[ℂ] GlobalTheory.PRep.fixed τ K := {
+      toFun := fun v => ⟨
+        L v.1,
+        GlobalTheory.ContraRefl.mem_fix.2 fun g hg => by
+          rw [← hcomm, GlobalTheory.ContraRefl.mem_fix.1 v.2 g hg]
+      ⟩
+      map_add' := fun _ _ => Subtype.ext (map_add L _ _)
+      map_smul' := fun _ _ => Subtype.ext (map_smul L _ _)
+    }
+    exact Module.Finite.of_injective M fun a b hab => Subtype.ext (hLi (congrArg Subtype.val hab))
 
 end Equiv
 
 section ParInd
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α]
-  [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
+  [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
   {W : Type} [AddCommGroup W] [Module ℂ W]
 
-theorem isAdmissible_parInd_of (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W)
-    (hρ : IsAdmissible ρ) : IsAdmissible (parInd e ρ) := by
+theorem isAdmissible_parInd_of
+    (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ (Levi k m) W) (hρ : IsAdmissible ρ)
+    : IsAdmissible (parInd e ρ) := by
   refine ⟨isSmooth_parInd e ρ, fun K hKo hKc => ?_⟩
   obtain ⟨R, hR⟩ := ParIndAdm.exists_finset_KO_cover K hKo
   let KM : Subgroup (Levi k m) := Subgroup.pi Set.univ fun a => KO k (m a)
@@ -74,10 +83,12 @@ theorem isAdmissible_parInd_of (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ 
     exact isSmoothChar_deltaHalf k (m := m)
   have hHc : ∀ r, IsCompact (H r : Set (Levi k m)) := fun r =>
     hKMc.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ (hHo r)) fun x hx => hx.1.2
-  have hfin : ∀ r, FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ (H r)) := fun r => hρ.2 _ (hHo r) (hHc r)
+  have hfin : ∀ r, FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ (H r)) := fun r =>
+    hρ.2 _ (hHo r) (hHc r)
 
-  have hval : ∀ (f : GlobalTheory.PRep.fixed (parInd e ρ) K) (r : GL n k),
-      f.1.1.1 r ∈ GlobalTheory.PRep.fixed ρ (H r) := by
+  have hval
+      : ∀ (f : GlobalTheory.PRep.fixed (parInd e ρ) K) (r : GL n k),
+        f.1.1.1 r ∈ GlobalTheory.PRep.fixed ρ (H r) := by
     intro f r
     refine GlobalTheory.ContraRefl.mem_fix.2 fun h hh => ?_
     have hK : r⁻¹ * leviEmb k e h * r ∈ K := by
@@ -93,16 +104,20 @@ theorem isAdmissible_parInd_of (e : (Σ a, m a) ≃ n) (ρ : Representation ℂ 
     rw [h4, hδ, Units.val_one, one_smul] at h2
     rw [← h2]
     exact h1
-  let L : GlobalTheory.PRep.fixed (parInd e ρ) K →ₗ[ℂ] ((r : R) → GlobalTheory.PRep.fixed ρ (H r.1)) :=
-    { toFun := fun f r => ⟨f.1.1.1 r.1, hval f r.1⟩
+  let L
+      : GlobalTheory.PRep.fixed (parInd e ρ) K →ₗ[ℂ] ((r : R) → GlobalTheory.PRep.fixed ρ (H r.1)) :=
+    {
+      toFun := fun f r => ⟨f.1.1.1 r.1, hval f r.1⟩
       map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+      map_smul' := fun _ _ => rfl
+    }
   refine Module.Finite.of_injective L fun f g hfg => ?_
   rw [← sub_eq_zero]
-  have h := ParIndAdm.eq_zero_of_fixed e ρ K R hR (f - g).1 (f - g).2 fun r hr => by
-    have := congrArg Subtype.val (congrFun hfg ⟨r, hr⟩)
-    show f.1.1.1 r - g.1.1.1 r = 0
-    rw [show f.1.1.1 r = g.1.1.1 r from this, sub_self]
+  have h :=
+    ParIndAdm.eq_zero_of_fixed e ρ K R hR (f - g).1 (f - g).2 fun r hr => by
+      have := congrArg Subtype.val (congrFun hfg ⟨r, hr⟩)
+      show f.1.1.1 r - g.1.1.1 r = 0
+      rw [show f.1.1.1 r = g.1.1.1 r from this, sub_self]
   exact Subtype.ext h
 
 end ParInd

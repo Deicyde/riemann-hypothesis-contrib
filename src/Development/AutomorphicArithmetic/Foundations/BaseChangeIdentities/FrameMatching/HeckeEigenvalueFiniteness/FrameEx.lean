@@ -17,7 +17,7 @@ open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.FX PositivityTheory.Rg.
 namespace UpperTheory.HeckeLevelFrameExistence
 
 theorem candFin : CandFin :=
-  CF.candFin_of Tw.FinStrict_holds StrictProd_holds Tw.StrictJoin_holds CandParts_holds LevOpen_holds
-    IsoInv_holds AdmProd_holds
+  CF.candFin_of Tw.FinStrict_holds StrictProd_holds Tw.StrictJoin_holds CandParts_holds
+    LevOpen_holds IsoInv_holds AdmProd_holds
 
 end UpperTheory.HeckeLevelFrameExistence

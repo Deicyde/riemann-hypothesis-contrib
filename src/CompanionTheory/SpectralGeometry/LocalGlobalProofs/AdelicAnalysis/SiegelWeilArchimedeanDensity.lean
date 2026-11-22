@@ -11,44 +11,53 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW
+  GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.BB.CountHyp
 
-theorem size_eq_sum {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
-    {M d : ℕ} (b : Module.Basis (Fin d) F E) (e : Ainf F ≃+* (InfinitePlace F → ℝ))
-    (he : ∀ y w, |e y w| = ‖y w‖) (X : Fin 1 → Fin M → Ainf F ⊗[F] E) :
-    sizeTup b X = ∑ w, ∑ p, |xw e b X w p| := by
+theorem size_eq_sum
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {M d : ℕ} (b : Module.Basis (Fin d) F E)
+    (e : Ainf F ≃+* (InfinitePlace F → ℝ)) (he : ∀ y w, |e y w| = ‖y w‖)
+    (X : Fin 1 → Fin M → Ainf F ⊗[F] E)
+    : sizeTup b X = ∑ w, ∑ p, |xw e b X w p| := by
   simp only [sizeTup, sizeInf, xw, cv, he, Fintype.sum_prod_type, Fin.sum_univ_one]
   symm
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_comm
 
-theorem size_le {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
-    {M d : ℕ} (b : Module.Basis (Fin d) F E) (e : Ainf F ≃+* (InfinitePlace F → ℝ))
-    (he : ∀ y w, |e y w| = ‖y w‖) (X : Fin 1 → Fin M → Ainf F ⊗[F] E) {R : ℝ} (hR : 0 < R)
-    (h : ∀ w, ‖xw e b X w‖ ≤ R) :
-    sizeTup b X ≤ ((M * d * Fintype.card (InfinitePlace F) + 1 : ℕ) : ℝ) * R := by
+theorem size_le
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {M d : ℕ} (b : Module.Basis (Fin d) F E)
+    (e : Ainf F ≃+* (InfinitePlace F → ℝ)) (he : ∀ y w, |e y w| = ‖y w‖)
+    (X : Fin 1 → Fin M → Ainf F ⊗[F] E)
+    {R : ℝ} (hR : 0 < R) (h : ∀ w, ‖xw e b X w‖ ≤ R)
+    : sizeTup b X ≤ ((M * d * Fintype.card (InfinitePlace F) + 1 : ℕ) : ℝ) * R := by
   rw [size_eq_sum b e he]
   have h1 : ∀ w, ∑ p, |xw e b X w p| ≤ ((M * d : ℕ) : ℝ) * R := by
     intro w
-    calc ∑ p, |xw e b X w p| ≤ ∑ _p : Fin M × Fin d, R :=
-          Finset.sum_le_sum fun p _ => (norm_le_pi_norm (xw e b X w) p).trans (h w)
+    calc
+      ∑ p, |xw e b X w p| ≤ ∑ _p : Fin M × Fin d, R :=
+        Finset.sum_le_sum fun p _ => (norm_le_pi_norm (xw e b X w) p).trans (h w)
       _ = ((M * d : ℕ) : ℝ) * R := by simp
-  calc ∑ w, ∑ p, |xw e b X w p| ≤ ∑ _w : InfinitePlace F, ((M * d : ℕ) : ℝ) * R :=
-        Finset.sum_le_sum fun w _ => h1 w
+  calc
+    ∑ w, ∑ p, |xw e b X w p|
+      ≤ ∑ _w : InfinitePlace F, ((M * d : ℕ) : ℝ) * R := Finset.sum_le_sum fun w _ => h1 w
     _ = ((M * d * Fintype.card (InfinitePlace F) : ℕ) : ℝ) * R := by
-        simp only [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-        push_cast
-        ring
+      simp only [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+      push_cast
+      ring
     _ ≤ _ := by
-        apply mul_le_mul_of_nonneg_right _ hR.le
-        push_cast
-        linarith
+      apply mul_le_mul_of_nonneg_right _ hR.le
+      push_cast
+      linarith
 
-theorem ofF_ne_zero_iff {F E : Type} [Field F] [Field E] [Algebra F E] {M d : ℕ}
-    (b : Module.Basis (Fin d) F E) (x : Fin M × Fin d → F) : ofF b x ≠ 0 ↔ x ≠ 0 := by
+theorem ofF_ne_zero_iff
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {M d : ℕ} (b : Module.Basis (Fin d) F E) (x : Fin M × Fin d → F)
+    : ofF b x ≠ 0 ↔ x ≠ 0 := by
   refine not_congr ⟨fun h => ?_, fun h => ?_⟩
   · funext ⟨i, k⟩
     have h1 : ∑ k, x (i, k) • b k = 0 := congrFun (congrFun h 0) i
@@ -57,8 +66,8 @@ theorem ofF_ne_zero_iff {F E : Type} [Field F] [Field E] [Algebra F E] {M d : �
     funext a i
     simp [ofF]
 
-theorem real_bound {C₀ c R : ℝ} (hc : 1 ≤ c) (hR : 0 < R) (a b : ℕ) :
-    C₀ * ((c * R) ^ a + (c * R) ^ b) ≤ (|C₀| * (c ^ a + c ^ b)) * (R ^ a + R ^ b) := by
+theorem real_bound {C₀ c R : ℝ} (hc : 1 ≤ c) (hR : 0 < R) (a b : ℕ)
+    : C₀ * ((c * R) ^ a + (c * R) ^ b) ≤ (|C₀| * (c ^ a + c ^ b)) * (R ^ a + R ^ b) := by
   have hc0 : 0 < c := by linarith
   have ha : 0 < c ^ a := by positivity
   have hb : 0 < c ^ b := by positivity

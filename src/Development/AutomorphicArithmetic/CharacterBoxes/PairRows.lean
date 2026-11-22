@@ -8,21 +8,27 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.TwistPrim
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.HC GlobalTheory.EX UpperTheory.Top
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.HC
+  GlobalTheory.EX UpperTheory.Top
 
-private theorem boxes_step (f q i : ℕ) [NeZero f] (ξ : DirichletCharacter ℂ f) (hξ : ξ.IsPrimitive)
-    (hq : q.Prime) (h2 : q ≠ 2) (hf : ¬ q ∣ f) (hi : i ≤ 1) :
-    ∃ (M : ℕ) (ψ : DirichletCharacter ℂ M), M = f * q ^ i ∧ ψ.IsPrimitive ∧
-      ∀ n : ℕ, ψ (n : ZMod M) = ξ (n : ZMod f) * QH.J q n ^ i := by
+private theorem boxes_step
+    (f q i : ℕ) [NeZero f]
+    (ξ : DirichletCharacter ℂ f) (hξ : ξ.IsPrimitive)
+    (hq : q.Prime) (h2 : q ≠ 2) (hf : ¬ q ∣ f) (hi : i ≤ 1)
+    : ∃ (M : ℕ) (ψ : DirichletCharacter ℂ M),
+      M = f * q ^ i ∧ ψ.IsPrimitive ∧ ∀ n : ℕ, ψ (n : ZMod M) = ξ (n : ZMod f) * QH.J q n ^ i := by
   interval_cases i
   · exact ⟨f, ξ, by simp, hξ, fun n => by simp⟩
   · obtain ⟨ψ, hψ, -, hn⟩ := QH.twist_prim f q ξ hξ hq h2 hf
     exact ⟨f * q, ψ, by simp, hψ, fun n => by simp [hn]⟩
 
-private theorem boxes_core {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) (h : PairGood M eps Y X q d)
-    (ρ : Formalism.HC.PChar) (hρ : ρ.IsReal) (h8 : ρ.N ∣ 8) (i j : Fin 2) (hij : i ≠ 0 ∨ j ≠ 0) (f : ℕ → ℂ)
-    (hf : ∀ a : ℕ, a % 2 = 1 → f a = tw ρ.val q d i j a) (Q : ℝ)
-    (hQ : Q = 8 * GlobalTheoryTheory.X1 Y eps * GlobalTheoryTheory.X2 Y eps ^ (j : ℕ)) : GoodAllFor Q f (8 * q * d) := by
+private theorem boxes_core
+    {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) (h : PairGood M eps Y X q d)
+    (ρ : Formalism.HC.PChar) (hρ : ρ.IsReal) (h8 : ρ.N ∣ 8)
+    (i j : Fin 2) (hij : i ≠ 0 ∨ j ≠ 0)
+    (f : ℕ → ℂ) (hf : ∀ a : ℕ, a % 2 = 1 → f a = tw ρ.val q d i j a)
+    (Q : ℝ) (hQ : Q = 8 * GlobalTheoryTheory.X1 Y eps * GlobalTheoryTheory.X2 Y eps ^ (j : ℕ))
+    : GoodAllFor Q f (8 * q * d) := by
   intro N _ χ hind
   obtain ⟨hprim, hval⟩ := hind
   have hi : (i : ℕ) ≤ 1 := by have := i.isLt; omega
@@ -45,7 +51,8 @@ private theorem boxes_core {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) (h
     rw [hM1]
     intro hdd
     rcases (Nat.Prime.dvd_mul hd).mp hdd with h1 | h1
-    · exact hd2 ((Nat.prime_dvd_prime_iff_eq hd Nat.prime_two).mp (hd.dvd_of_dvd_pow (dvd_trans h1 h8')))
+    · exact hd2 ((Nat.prime_dvd_prime_iff_eq hd Nat.prime_two).mp
+        (hd.dvd_of_dvd_pow (dvd_trans h1 h8')))
     · exact hqd ((Nat.prime_dvd_prime_iff_eq hd hq).mp (hd.dvd_of_dvd_pow h1)).symm
   obtain ⟨M2, ψ, hM2, hψ, hv2⟩ := boxes_step M1 d j ψ1 hψ1 hd hd2 hdM1 hj
   haveI : NeZero M2 := ⟨by rw [hM2]; exact mul_ne_zero (NeZero.ne _) (pow_ne_zero _ hd.ne_zero)⟩
@@ -73,11 +80,15 @@ private theorem boxes_core {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) (h
   have hχv : ∀ n : ℕ, χ n = tw ρ.val q d i j n := fun n => by rw [e]; exact hψv n
   have hqX : (q : ℝ) ≤ GlobalTheoryTheory.X1 Y eps := by
     unfold GlobalTheoryTheory.X1
-    calc (q : ℝ) = Real.exp (Real.log q) := (Real.exp_log (by exact_mod_cast hq.pos)).symm
+    calc
+      (q : ℝ)
+        = Real.exp (Real.log q) := (Real.exp_log (by exact_mod_cast hq.pos)).symm
       _ ≤ _ := Real.exp_le_exp.mpr hw.q_up
   have hdX : (d : ℝ) ≤ GlobalTheoryTheory.X2 Y eps := by
     unfold GlobalTheoryTheory.X2
-    calc (d : ℝ) = Real.exp (Real.log d) := (Real.exp_log (by exact_mod_cast hd.pos)).symm
+    calc
+      (d : ℝ)
+        = Real.exp (Real.log d) := (Real.exp_log (by exact_mod_cast hd.pos)).symm
       _ ≤ _ := Real.exp_le_exp.mpr hw.d_up
   have hX1 : 0 ≤ GlobalTheoryTheory.X1 Y eps := by unfold GlobalTheoryTheory.X1; positivity
   have hq1 : (1 : ℝ) ≤ q := by exact_mod_cast hq.one_lt.le
@@ -100,7 +111,8 @@ private theorem boxes_core {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) (h
       rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hi with h0 | h1
       · rw [h0, pow_zero]; linarith
       · rw [h1, pow_one]; exact hqX
-    have hdj : (d : ℝ) ^ (j : ℕ) ≤ GlobalTheoryTheory.X2 Y eps ^ (j : ℕ) := pow_le_pow_left₀ (by positivity) hdX _
+    have hdj : (d : ℝ) ^ (j : ℕ) ≤ GlobalTheoryTheory.X2 Y eps ^ (j : ℕ) :=
+      pow_le_pow_left₀ (by positivity) hdX _
     exact mul_le_mul (mul_le_mul hNr hqi (by positivity) (by norm_num)) hdj (by positivity)
       (mul_nonneg (by norm_num) hX1)
   · intro s hs hsQ
@@ -121,16 +133,19 @@ private theorem boxes_core {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) (h
     rw [hQ]
     unfold height GlobalTheoryTheory.X1 GlobalTheoryTheory.X2
     have hM1' : (1 : ℝ) ≤ M := by exact_mod_cast hM
-    have hpos : 0 ≤ 8 * Real.exp (Y ^ (eps / 5)) * Real.exp (Y ^ (eps / 5) * Real.log Y ^ 2) ^ (j : ℕ) := by
+    have hpos
+        : 0
+          ≤ 8 * Real.exp (Y ^ (eps / 5)) * Real.exp (Y ^ (eps / 5) * Real.log Y ^ 2) ^ (j : ℕ) := by
       positivity
     nlinarith
 
-private theorem boxes_kron_odd (D : ℤ) (a : ℕ) (ha : a % 2 = 1) : GlobalTheoryTheory.kronSym D a = jacobiSym D a := by
+private theorem boxes_kron_odd (D : ℤ) (a : ℕ) (ha : a % 2 = 1)
+    : GlobalTheoryTheory.kronSym D a = jacobiSym D a := by
   have h2 : ¬ 2 ∣ a := by omega
   simp [GlobalTheoryTheory.kronSym, Nat.factorization_eq_zero_of_not_dvd h2]
 
-private theorem boxes_kron_neg (q a : ℕ) (hq : q % 4 = 3) (ha : a % 2 = 1) :
-    GlobalTheoryTheory.kron (-(q : ℤ)) a = ((jacobiSym (a : ℤ) q : ℤ) : ℂ) := by
+private theorem boxes_kron_neg (q a : ℕ) (hq : q % 4 = 3) (ha : a % 2 = 1)
+    : GlobalTheoryTheory.kron (-(q : ℤ)) a = ((jacobiSym (a : ℤ) q : ℤ) : ℂ) := by
   have hao : Odd a := Nat.odd_iff.mpr ha
   have key : jacobiSym (-(q : ℤ)) a = jacobiSym (a : ℤ) q := by
     rw [jacobiSym.neg _ hao, ← jacobiSym.quadratic_reciprocity_if ha (by omega : q % 2 = 1)]
@@ -141,8 +156,9 @@ private theorem boxes_kron_neg (q a : ℕ) (hq : q % 4 = 3) (ha : a % 2 = 1) :
   rw [boxes_kron_odd _ _ ha, key]
 
 open DirichletCharacter in
-private theorem real_character_mod_eight : ∃ ρ : Formalism.HC.PChar, ρ.IsReal ∧ ρ.N ∣ 8 ∧
-    ∀ a : ℕ, a % 2 = 1 → GlobalTheoryTheory.chi8 a = ρ.val a := by
+private theorem real_character_mod_eight
+    : ∃ ρ : Formalism.HC.PChar,
+      ρ.IsReal ∧ ρ.N ∣ 8 ∧ ∀ a : ℕ, a % 2 = 1 → GlobalTheoryTheory.chi8 a = ρ.val a := by
   obtain ⟨χ, hχ⟩ : ∃ χ : DirichletCharacter ℂ 8, ∀ a : ZMod 8, χ a = ((ZMod.χ₈ a : ℤ) : ℂ) :=
     ⟨ZMod.χ₈.ringHomComp (Int.castRingHom ℂ), fun a => by simp⟩
   have hprim : χ.IsPrimitive := by
@@ -153,8 +169,9 @@ private theorem real_character_mod_eight : ∃ ρ : Formalism.HC.PChar, ρ.IsRea
     have h4 : DirichletCharacter.conductor χ ∣ 4 := by
       have hle : DirichletCharacter.conductor χ ≤ 8 := Nat.le_of_dvd (by norm_num) hd
       interval_cases h : DirichletCharacter.conductor χ <;> omega
-    obtain ⟨h4', χ₀, e⟩ := DirichletCharacter.FactorsThrough.mono
-      (hχ := DirichletCharacter.factorsThrough_conductor χ) (hd := h4) (hm := (by norm_num : 4 ∣ 8))
+    obtain ⟨h4', χ₀, e⟩ :=
+      DirichletCharacter.FactorsThrough.mono (hχ := DirichletCharacter.factorsThrough_conductor χ)
+        (hd := h4) (hm := (by norm_num : 4 ∣ 8))
     have h5 := DFunLike.congr_fun e ((5 : ℤ) : ZMod 8)
     have hcop : IsCoprime (5 : ℤ) ((8 : ℕ) : ℤ) := ⟨-3, 2, by norm_num⟩
     rw [DirichletCharacter.changeLevel_eq_cast_of_dvd' χ₀ h4' hcop] at h5
@@ -171,7 +188,9 @@ private theorem real_character_mod_eight : ∃ ρ : Formalism.HC.PChar, ρ.IsRea
     simp only [GlobalTheoryTheory.kron]
     rw [boxes_kron_odd _ _ ha, jacobiSym.at_two (Nat.odd_iff.mpr ha)]
 
-private theorem boxq_of_pair {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) (h : PairGood M eps Y X q d) : Boxq Y eps q d := by
+private theorem boxq_of_pair
+    {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) (h : PairGood M eps Y X q d)
+    : Boxq Y eps q d := by
   have hw := h.pair
   have hq4 : q % 4 = 3 := by have := hw.q_mod; omega
   have hd4 : d % 4 = 3 := by have := hw.d_mod; omega
@@ -218,7 +237,8 @@ private theorem boxq_of_pair {M : ℕ} {eps Y X : ℝ} {q d : ℕ} (hM : 0 < M) 
     simp only [tw, Fin.val_one, Fin.val_zero, pow_one, pow_zero]
     try ring
 
-private theorem qdRows_kron_odd {p d : ℕ} (hp : ¬ 2 ∣ p) (h : p ∣ d + 1) : GlobalTheoryTheory.kronSym (-(d : ℤ)) p = 1 := by
+private theorem qdRows_kron_odd {p d : ℕ} (hp : ¬ 2 ∣ p) (h : p ∣ d + 1)
+    : GlobalTheoryTheory.kronSym (-(d : ℤ)) p = 1 := by
   rw [boxes_kron_odd _ _ (by omega)]
   have hm : (-(d : ℤ)) % (p : ℤ) = 1 % (p : ℤ) := by
     apply Int.emod_eq_emod_iff_emod_sub_eq_zero.mpr
@@ -229,7 +249,8 @@ private theorem qdRows_kron_odd {p d : ℕ} (hp : ¬ 2 ∣ p) (h : p ∣ d + 1) 
     exact dvd_neg.mpr hd
   rw [jacobiSym.mod_left' hm, jacobiSym.one_left]
 
-private theorem qdRows_kron_two {d : ℕ} (h : d % 16 = 7) : GlobalTheoryTheory.kronSym (-(d : ℤ)) 2 = 1 := by
+private theorem qdRows_kron_two {d : ℕ} (h : d % 16 = 7)
+    : GlobalTheoryTheory.kronSym (-(d : ℤ)) 2 = 1 := by
   have hf : (2 : ℕ).factorization 2 = 1 := Nat.Prime.factorization_self Nat.prime_two
   simp only [GlobalTheoryTheory.kronSym, GlobalTheoryTheory.kron2, hf]
   have h1 : (-(d : ℤ)) % 2 ≠ 0 := by omega
@@ -237,17 +258,26 @@ private theorem qdRows_kron_two {d : ℕ} (h : d % 16 = 7) : GlobalTheoryTheory.
   have h3 : (d : ℤ) % 2 = 1 := by omega
   norm_num [h1, h2, h3, jacobiSym.one_right]
 
-private theorem qdRows_lo {z : ℝ} {n : ℕ} (hn : 0 < n) (h : z / 2 < Real.log n) : Real.sqrt (Real.exp z) < n := by
+private theorem qdRows_lo {z : ℝ} {n : ℕ} (hn : 0 < n) (h : z / 2 < Real.log n)
+    : Real.sqrt (Real.exp z) < n := by
   rw [← Real.exp_half]
-  calc Real.exp (z / 2) < Real.exp (Real.log n) := Real.exp_lt_exp.mpr h
+  calc
+    Real.exp (z / 2)
+      < Real.exp (Real.log n) := Real.exp_lt_exp.mpr h
     _ = n := Real.exp_log (by exact_mod_cast hn)
 
-private theorem qdRows_up {z : ℝ} {n : ℕ} (hn : 0 < n) (h : Real.log n ≤ z) : (n : ℝ) ≤ Real.exp z := by
-  calc (n : ℝ) = Real.exp (Real.log n) := (Real.exp_log (by exact_mod_cast hn)).symm
+private theorem qdRows_up {z : ℝ} {n : ℕ} (hn : 0 < n) (h : Real.log n ≤ z)
+    : (n : ℝ) ≤ Real.exp z := by
+  calc
+    (n : ℝ)
+      = Real.exp (Real.log n) := (Real.exp_log (by exact_mod_cast hn)).symm
     _ ≤ Real.exp z := Real.exp_le_exp.mpr h
 
-private theorem pairRow_of_pair {R : Ranks} (H : Host R) {eps Y : ℝ} (h : WinPair eps Y H.q H.d)
-    (hN : Real.log (H.QS * H.q * H.d) ≤ 2 * Y ^ (eps / 5) * Real.log Y ^ 2) : PairRow Y eps H := by
+private theorem pairRow_of_pair
+    {R : Ranks} (H : Host R)
+    {eps Y : ℝ} (h : WinPair eps Y H.q H.d)
+    (hN : Real.log (H.QS * H.q * H.d) ≤ 2 * Y ^ (eps / 5) * Real.log Y ^ 2)
+    : PairRow Y eps H := by
   have hq := h.q_prime
   have hd := h.d_prime
   have hqm := h.q_mod
@@ -262,12 +292,16 @@ private theorem pairRow_of_pair {R : Ranks} (H : Host R) {eps Y : ℝ} (h : WinP
     by_cases hp2 : p = 2
     · subst hp2
       exact qdRows_kron_two h.d_mod
-    · exact qdRows_kron_odd (fun h2 => hp2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hp).mp h2).symm)
+    · exact qdRows_kron_odd
+        (fun h2 => hp2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hp).mp h2).symm)
         (h.d_small p hp hp2 hpY)
 
-private theorem qdq_core {M : ℕ} {eps Y x : ℝ} {q d : ℕ} (he : 0 < eps) (hx : 1 ≤ x) (hY : Y ≤ x)
-    (h : PairGood M eps Y x q d) (i j : Fin 2) (hij : i ≠ 0 ∨ j ≠ 0) (f : ℕ → ℂ)
-    (hf : ∀ a : ℕ, a % 2 = 1 → f a = tw (fun _ => 1) q d i j a) : BoundsAtX x eps 4 f (8 * q * d) := by
+private theorem qdq_core
+    {M : ℕ} {eps Y x : ℝ} {q d : ℕ}
+    (he : 0 < eps) (hx : 1 ≤ x) (hY : Y ≤ x) (h : PairGood M eps Y x q d)
+    (i j : Fin 2) (hij : i ≠ 0 ∨ j ≠ 0)
+    (f : ℕ → ℂ) (hf : ∀ a : ℕ, a % 2 = 1 → f a = tw (fun _ => 1) q d i j a)
+    : BoundsAtX x eps 4 f (8 * q * d) := by
   intro N _ χ hind
   obtain ⟨hprim, hval⟩ := hind
   have hodd : ∀ a : ℕ, a.Coprime 2 → a % 2 = 1 := by
@@ -278,7 +312,8 @@ private theorem qdq_core {M : ℕ} {eps Y x : ℝ} {q d : ℕ} (he : 0 < eps) (h
       rw [ha] at h2g
       omega
     · exact Nat.odd_iff.mp ho
-  have hind' : An.Induces χ (tw (fun a => (1 : DirichletCharacter ℂ M) a) q d i j) (2 * M * q * d) := by
+  have hind'
+      : An.Induces χ (tw (fun a => (1 : DirichletCharacter ℂ M) a) q d i j) (2 * M * q * d) := by
     unfold An.Induces
     refine ⟨hprim, fun a ha => ?_⟩
     have h2 : a.Coprime 2 := Nat.Coprime.coprime_dvd_right ⟨M * q * d, by ring⟩ ha
@@ -300,8 +335,10 @@ private theorem qdq_core {M : ℕ} {eps Y x : ℝ} {q d : ℕ} (he : 0 < eps) (h
   refine le_trans hg ?_
   exact Real.rpow_le_rpow_of_exponent_le hx (by linarith)
 
-private theorem qdq_of_pair {M : ℕ} {eps Y x : ℝ} {q d : ℕ} (he : 0 < eps) (hx : 1 ≤ x) (hY : Y ≤ x)
-    (h : PairGood M eps Y x q d) : QDq x eps 4 q d := by
+private theorem qdq_of_pair
+    {M : ℕ} {eps Y x : ℝ} {q d : ℕ}
+    (he : 0 < eps) (hx : 1 ≤ x) (hY : Y ≤ x) (h : PairGood M eps Y x q d)
+    : QDq x eps 4 q d := by
   have hw := h.pair
   have hq4 : q % 4 = 3 := by have := hw.q_mod; omega
   have hd4 : d % 4 = 3 := by have := hw.d_mod; omega
@@ -324,21 +361,25 @@ private theorem qdq_of_pair {M : ℕ} {eps Y x : ℝ} {q d : ℕ} (he : 0 < eps)
     simp only [tw, Fin.val_one, Fin.val_zero, pow_one, pow_zero]
     try ring
 
-private theorem mul_le_exp_of_le_div_sq {eps C l : ℝ} (he : 0 < eps) (hC : 1 ≤ C) (hl : 41000 * C / eps ^ 2 ≤ l) :
-    820 * C * l ≤ Real.exp (l * (eps / 5)) := by
+private theorem mul_le_exp_of_le_div_sq
+    {eps C l : ℝ} (he : 0 < eps) (hC : 1 ≤ C) (hl : 41000 * C / eps ^ 2 ≤ l)
+    : 820 * C * l ≤ Real.exp (l * (eps / 5)) := by
   have hl0 : 0 < l := lt_of_lt_of_le (by positivity) hl
   have hy0 : 0 ≤ l * (eps / 5) := by positivity
   have hq := Real.quadratic_le_exp_of_nonneg hy0
-  have h1 : 41000 * C ≤ l * eps ^ 2 := by
-    rwa [div_le_iff₀ (by positivity)] at hl
+  have h1 : 41000 * C ≤ l * eps ^ 2 := by rwa [div_le_iff₀ (by positivity)] at hl
   have h2 : 41000 * C * l ≤ l * eps ^ 2 * l := mul_le_mul_of_nonneg_right h1 hl0.le
   have h3 : 820 * C * l ≤ (l * (eps / 5)) ^ 2 / 2 := by nlinarith
   linarith
 
-theorem UpperTheory.Top.pairRows :
-    ∀ eps C0 : ℝ, 0 < eps → eps < 1 / 52 → ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks) (H : Host R) (M : ℕ) (Y : ℝ), s.eps = eps → x0 ≤ s.x →
-      RankVal s R → HostConst s C0 H → 0 < M → PairWin s Y → PairGood M eps Y s.x H.q H.d →
-      PairRow Y eps H ∧ QDq s.x eps 4 H.q H.d ∧ Boxq Y eps H.q H.d ∧ (4 * R.t * R.r + 1 < H.q ∧ 4 * R.t * R.r + 1 < H.d) := by
+theorem UpperTheory.Top.pairRows
+    : ∀ eps C0 : ℝ,
+      0 < eps → eps < 1 / 52
+        → ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks) (H : Host R) (M : ℕ) (Y : ℝ),
+          s.eps = eps → x0 ≤ s.x → RankVal s R → HostConst s C0 H → 0 < M → PairWin s Y
+            → PairGood M eps Y s.x H.q H.d
+            → PairRow Y eps H ∧ QDq s.x eps 4 H.q H.d ∧ Boxq Y eps H.q H.d
+              ∧ (4 * R.t * R.r + 1 < H.q ∧ 4 * R.t * R.r + 1 < H.d) := by
   intro eps C0 he he1
   refine ⟨Real.exp (max C0 1 * max 2 (41000 * max C0 1 / eps ^ 2)), ?_⟩
   intro s R H M Y hs hx0 hRV hHC hM hPW hPG
@@ -376,12 +417,14 @@ theorem UpperTheory.Top.pairRows :
     le_trans hHC.2.2 (mul_le_mul_of_nonneg_left hRV.n_le' (by linarith))
   have hlogQS : Real.log H.QS ≤ 2 * C0 + 9 / 4 * Real.log s.x := by
     have h1 := Real.log_le_log hQS0 hQSle
-    rw [Real.log_mul (by linarith) (ne_of_gt (by positivity)), Real.log_mul (by norm_num) (ne_of_gt hxp),
-      Real.log_rpow (by linarith)] at h1
+    rw [Real.log_mul (by linarith) (ne_of_gt (by positivity)),
+        Real.log_mul (by norm_num) (ne_of_gt hxp), Real.log_rpow (by linarith)]
+      at h1
     have h2 := Real.log_le_sub_one_of_pos (by linarith : (0 : ℝ) < C0)
     have h3 : Real.log 2 < 1 := by have := Real.log_two_lt_d9; linarith
     linarith
-  rw [Real.log_mul (ne_of_gt (mul_pos hQS0 hq0)) (ne_of_gt hd0), Real.log_mul (ne_of_gt hQS0) (ne_of_gt hq0)]
+  rw [Real.log_mul (ne_of_gt (mul_pos hQS0 hq0)) (ne_of_gt hd0),
+    Real.log_mul (ne_of_gt hQS0) (ne_of_gt hq0)]
   have k1 : 820 * C0 * Real.log Y * (Real.log Y ^ 2 - 1) ≤ Y ^ (eps / 5) * (Real.log Y ^ 2 - 1) :=
     mul_le_mul_of_nonneg_right hT (by nlinarith)
   have k2 : 3 ≤ Real.log Y ^ 2 - 1 := by nlinarith

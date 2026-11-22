@@ -47,7 +47,6 @@ lemma linRoot_eq {ι : Type} [Fintype ι] {N : ℕ} (lam : ι → Fin N → ℝ)
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [smul_eq_C_mul, C_neg, neg_mul]
 
-
 set_option maxRecDepth 4000 in
 lemma coeff_pow {ι : Type} [Fintype ι] [DecidableEq ι] {N : ℕ} (lam : ι → Fin N → ℝ)
     (σ : ι → Equiv.Perm (Fin N)) :
@@ -172,18 +171,21 @@ theorem flagDegFormula_statement : FlagDegFormula := by
   intro ι _ _ N lam
   unfold flagDeg degFl weylProd
   simp only [coeff_pow]
-  have hV : ∀ τ, ∏ i : Fin N, ∏ k : Fin N,
-      (if i < k then (lam τ i - lam τ k) / ((k : ℝ) - (i : ℝ)) else 1) =
-        (∏ i : Fin N, ∏ k : Fin N, if i < k then lam τ i - lam τ k else 1) / (sfac N : ℝ) := by
+  have hV
+      : ∀ τ,
+        ∏ i : Fin N, ∏ k : Fin N,
+            (if i < k then (lam τ i - lam τ k) / ((k : ℝ) - (i : ℝ)) else 1)
+          = (∏ i : Fin N, ∏ k : Fin N, if i < k then lam τ i - lam τ k else 1) / (sfac N : ℝ) := by
     intro τ
     rw [← pairs_nat N, ← Finset.prod_div_distrib]
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [← Finset.prod_div_distrib]
     refine Finset.prod_congr rfl fun k _ => ?_
     split_ifs <;> simp
-  have hsum : ∑ σ : ι → Equiv.Perm (Fin N), (∏ τ, ((Equiv.Perm.sign (σ τ) : ℤ) : ℝ)) *
-        ∏ τ, ∏ i : Fin N, lam τ i ^ (N - 1 - ((σ τ i : Fin N) : ℕ)) =
-      ∏ τ, ∏ i : Fin N, ∏ k : Fin N, (if i < k then lam τ i - lam τ k else 1) := by
+  have hsum
+      : ∑ σ : ι → Equiv.Perm (Fin N), (∏ τ, ((Equiv.Perm.sign (σ τ) : ℤ) : ℝ)) *
+          ∏ τ, ∏ i : Fin N, lam τ i ^ (N - 1 - ((σ τ i : Fin N) : ℕ))
+        = ∏ τ, ∏ i : Fin N, ∏ k : Fin N, (if i < k then lam τ i - lam τ k else 1) := by
     rw [Finset.prod_congr rfl (fun τ _ => (vandermonde_sum (lam τ)).symm), Fintype.prod_sum]
     refine Finset.sum_congr rfl fun σ _ => ?_
     rw [Finset.prod_mul_distrib]

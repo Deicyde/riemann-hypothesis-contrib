@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchwartzVani
 @[expose] public section
 
 open scoped SchwartzMap Matrix TensorProduct Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ArchUniq
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ArchUniq
 
 noncomputable section
 
@@ -19,19 +21,22 @@ namespace GlobalTheory.ArchUniqStd
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
 
 def bil {P : V → V → ℝ} (h : IsPairing P) : LinearMap.BilinForm ℝ V :=
-  LinearMap.mk₂ ℝ P h.addL (fun c x y => by simpa [smul_eq_mul] using h.smulL c x y) h.addR
+  LinearMap.mk₂ ℝ P h.addL
+    (fun c x y => by simpa [smul_eq_mul] using h.smulL c x y)
+    h.addR
     (fun c x y => by simpa [smul_eq_mul] using h.smulR c x y)
 
 theorem bil_apply {P : V → V → ℝ} (h : IsPairing P) (x y : V) : bil h x y = P x y := rfl
 
-theorem exists_right [FiniteDimensional ℝ V] {P : V → V → ℝ} (h : IsPairing P) (L : V →L[ℝ] ℝ) :
-    ∃ b, ∀ y, P y b = L y := by
+theorem exists_right [FiniteDimensional ℝ V] {P : V → V → ℝ} (h : IsPairing P) (L : V →L[ℝ] ℝ)
+    : ∃ b, ∀ y, P y b = L y := by
   have hinj : Function.Injective (bil h).flip := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro b hb
     exact h.nondegR b fun x => by simpa [bil_apply] using LinearMap.congr_fun hb x
-  have hsurj := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
-    (Subspace.dual_finrank_eq (K := ℝ) (V := V)).symm).1 hinj
+  have hsurj :=
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq (K := ℝ)
+      (V := V)).symm).1 hinj
   obtain ⟨b, hb⟩ := hsurj (L : V →ₗ[ℝ] ℝ)
   exact ⟨b, fun y => by simpa [bil_apply] using LinearMap.congr_fun hb y⟩
 

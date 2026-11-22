@@ -4,38 +4,52 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CyclotomicI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.B1
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.B1
 
-private theorem ringEquiv_eq_frobenius_pow_of_algebraic_over_zmod {k : Type} [Field k] (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) k]
-    [Algebra.IsAlgebraic (ZMod p) k] (ψ : k ≃+* k) (y : k) : ∃ n : ℕ, ψ y = y ^ (p ^ n) := by
+private theorem ringEquiv_eq_frobenius_pow_of_algebraic_over_zmod
+    {k : Type} [Field k]
+    (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) k] [Algebra.IsAlgebraic (ZMod p) k]
+    (ψ : k ≃+* k) (y : k)
+    : ∃ n : ℕ, ψ y = y ^ (p ^ n) := by
   have hy : IsIntegral (ZMod p) y := (Algebra.IsAlgebraic.isAlgebraic y).isIntegral
   let L := IntermediateField.adjoin (ZMod p) ({y} : Set k)
   haveI : FiniteDimensional (ZMod p) L := IntermediateField.adjoin.finiteDimensional hy
   haveI : Finite L := Module.finite_of_finite (ZMod p)
   letI : Fintype L := Fintype.ofFinite L
   haveI : Normal (ZMod p) L := inferInstance
-  let ψ' : k ≃ₐ[ZMod p] k := AlgEquiv.ofRingEquiv (f := ψ) (fun x => by
-    have h := congrArg (fun g : ZMod p →+* k => g x)
-      (Subsingleton.elim (ψ.toRingHom.comp (algebraMap (ZMod p) k)) (algebraMap (ZMod p) k))
-    simpa using h)
-  obtain ⟨i, hi⟩ := (FiniteField.bijective_frobeniusAlgEquivOfAlgebraic_pow (ZMod p) L).2 (ψ'.restrictNormal L)
+  let ψ' : k ≃ₐ[ZMod p] k :=
+    AlgEquiv.ofRingEquiv (f := ψ) (fun x => by
+      have h :=
+        congrArg
+          (fun g : ZMod p →+* k => g x)
+          (Subsingleton.elim (ψ.toRingHom.comp (algebraMap (ZMod p) k)) (algebraMap (ZMod p) k))
+      simpa using h)
+  obtain ⟨i, hi⟩ :=
+    (FiniteField.bijective_frobeniusAlgEquivOfAlgebraic_pow (ZMod p) L).2 (ψ'.restrictNormal L)
   refine ⟨i.1, ?_⟩
   have hyL : y ∈ L := IntermediateField.mem_adjoin_simple_self _ _
   have h1 := AlgEquiv.restrictNormal_commutes ψ' L ⟨y, hyL⟩
   rw [← hi] at h1
-  simp only [AlgEquiv.coe_pow, FiniteField.coe_frobeniusAlgEquivOfAlgebraic_iterate, ZMod.card] at h1
+  simp only [AlgEquiv.coe_pow, FiniteField.coe_frobeniusAlgEquivOfAlgebraic_iterate, ZMod.card]
+    at h1
   simp at h1
   exact h1.symm
 
-private theorem ringEquiv_comm_of_algebraic_over_zmod {k : Type} [Field k] (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) k]
-    [Algebra.IsAlgebraic (ZMod p) k] (ψ χ : k ≃+* k) (y : k) : ψ (χ y) = χ (ψ y) := by
+private theorem ringEquiv_comm_of_algebraic_over_zmod
+    {k : Type} [Field k]
+    (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) k] [Algebra.IsAlgebraic (ZMod p) k]
+    (ψ χ : k ≃+* k) (y : k)
+    : ψ (χ y) = χ (ψ y) := by
   obtain ⟨a, ha⟩ := ringEquiv_eq_frobenius_pow_of_algebraic_over_zmod p ψ y
   obtain ⟨b, hb⟩ := ringEquiv_eq_frobenius_pow_of_algebraic_over_zmod p χ y
   rw [ha, hb, map_pow, map_pow, ha, hb, ← pow_mul, ← pow_mul, mul_comm]
 
-theorem UpperTheory.V.B1.decComm :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (p : ℕ) [Fact p.Prime] (B : ValuationSubring Ω), B.valuation (p : Ω) < 1 →
-    ⁅Dec (F := F) B, Dec (F := F) B⁆ ≤ Ine (F := F) B := by
+theorem UpperTheory.V.B1.decComm
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (p : ℕ)
+        [Fact p.Prime] (B : ValuationSubring Ω),
+      B.valuation (p : Ω) < 1 → ⁅Dec (F := F) B, Dec (F := F) B⁆ ≤ Ine (F := F) B := by
   intro F Ω _ _ _ _ _ p _ B hp
   rw [Subgroup.commutator_le]
   intro σ hσ τ hτ
@@ -96,7 +110,8 @@ theorem UpperTheory.V.B1.decComm :
       simpa [Polynomial.aeval_def] using hQx
     rw [e2, map_zero]
   have hcomm : ∀ (g h : D) (y : k), g • h • y = h • g • y := fun g h y =>
-    ringEquiv_comm_of_algebraic_over_zmod p (MulSemiringAction.toRingEquiv D k g) (MulSemiringAction.toRingEquiv D k h) y
+    ringEquiv_comm_of_algebraic_over_zmod p (MulSemiringAction.toRingEquiv D k g)
+      (MulSemiringAction.toRingEquiv D k h) y
   let g : D := ⟨σ, hσ⟩
   let h : D := ⟨τ, hτ⟩
   refine ⟨?_, ?_⟩
@@ -106,8 +121,8 @@ theorem UpperTheory.V.B1.decComm :
     have hxB : x ∈ B := (ValuationSubring.valuation_le_one_iff B x).1 hx
     let xb : B := ⟨x, hxB⟩
     have key : IsLocalRing.residue B ((g * h * g⁻¹ * h⁻¹) • xb) = IsLocalRing.residue B xb := by
-      rw [IsLocalRing.ResidueField.residue_smul, mul_smul, mul_smul, mul_smul,
-        hcomm g h, smul_inv_smul, smul_inv_smul]
+      rw [IsLocalRing.ResidueField.residue_smul, mul_smul, mul_smul, mul_smul, hcomm g h,
+        smul_inv_smul, smul_inv_smul]
     have hmem : (g * h * g⁻¹ * h⁻¹) • xb - xb ∈ IsLocalRing.maximalIdeal B := by
       rwa [← IsLocalRing.residue_eq_zero_iff, map_sub, sub_eq_zero]
     rw [ValuationSubring.valuation_lt_one_iff] at hmem

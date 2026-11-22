@@ -10,12 +10,13 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem index_double_prod (L T : Type) [AddCommGroup L] [AddCommGroup T] [Module.Free ℤ L]
-    [Module.Finite ℤ L] [Finite T] :
-    (nsmulAddMonoidHom (α := L × T) 2).range.index =
-      2 ^ Module.finrank ℤ (L × T) * Nat.card (nsmulAddMonoidHom (α := L × T) 2).ker := by
-  have h1 : (nsmulAddMonoidHom (α := L × T) 2).range =
-      ((nsmulAddMonoidHom (α := L) 2).range).prod (nsmulAddMonoidHom (α := T) 2).range := by
+theorem index_double_prod
+    (L T : Type) [AddCommGroup L] [AddCommGroup T] [Module.Free ℤ L] [Module.Finite ℤ L] [Finite T]
+    : (nsmulAddMonoidHom (α := L × T) 2).range.index
+      = 2 ^ Module.finrank ℤ (L × T) * Nat.card (nsmulAddMonoidHom (α := L × T) 2).ker := by
+  have h1
+      : (nsmulAddMonoidHom (α := L × T) 2).range
+        = ((nsmulAddMonoidHom (α := L) 2).range).prod (nsmulAddMonoidHom (α := T) 2).range := by
     ext ⟨x, y⟩
     simp only [AddMonoidHom.mem_range, AddSubgroup.mem_prod, nsmulAddMonoidHom_apply]
     constructor
@@ -23,11 +24,11 @@ theorem index_double_prod (L T : Type) [AddCommGroup L] [AddCommGroup T] [Module
       exact ⟨⟨a, congrArg Prod.fst h⟩, ⟨b, congrArg Prod.snd h⟩⟩
     · rintro ⟨⟨a, ha⟩, ⟨b, hb⟩⟩
       exact ⟨(a, b), Prod.ext ha hb⟩
-  have h2 : (nsmulAddMonoidHom (α := L × T) 2).ker =
-      (⊥ : AddSubgroup L).prod (nsmulAddMonoidHom (α := T) 2).ker := by
+  have h2
+      : (nsmulAddMonoidHom (α := L × T) 2).ker
+        = (⊥ : AddSubgroup L).prod (nsmulAddMonoidHom (α := T) 2).ker := by
     ext ⟨x, y⟩
-    have hx : 2 • x = 0 ↔ x = 0 := by
-      rw [← natCast_zsmul, smul_eq_zero]; simp
+    have hx : 2 • x = 0 ↔ x = 0 := by rw [← natCast_zsmul, smul_eq_zero]; simp
     simp [AddMonoidHom.mem_ker, AddSubgroup.mem_prod, hx]
   have h3 : Module.finrank ℤ (L × T) = Module.finrank ℤ L := by
     have hT : Module.rank ℤ T = 0 := by
@@ -36,14 +37,15 @@ theorem index_double_prod (L T : Type) [AddCommGroup L] [AddCommGroup T] [Module
       refine ⟨(Nat.card T : ℤ), by exact_mod_cast Nat.card_pos.ne', ?_⟩
       simp
     have hq := Submodule.rank_quotient_add_rank (LinearMap.ker (LinearMap.fst ℤ L T))
-    have e1 := (LinearMap.quotKerEquivOfSurjective (LinearMap.fst ℤ L T)
-      LinearMap.fst_surjective).rank_eq
+    have e1 :=
+      (LinearMap.quotKerEquivOfSurjective (LinearMap.fst ℤ L T) LinearMap.fst_surjective).rank_eq
     have e2 : Module.rank ℤ (LinearMap.ker (LinearMap.fst ℤ L T)) = 0 := by
       rw [LinearMap.ker_fst, rank_range_of_injective _ LinearMap.inr_injective, hT]
     unfold Module.finrank
     rw [← hq, e1, e2, add_zero]
-  have h4 : (nsmulAddMonoidHom (α := T) 2).range.index =
-      Nat.card (nsmulAddMonoidHom (α := T) 2).ker := by
+  have h4
+      : (nsmulAddMonoidHom (α := T) 2).range.index
+        = Nat.card (nsmulAddMonoidHom (α := T) 2).ker := by
     have a := AddSubgroup.card_mul_index (nsmulAddMonoidHom (α := T) 2).range
     have b := AddSubgroup.card_mul_index (nsmulAddMonoidHom (α := T) 2).ker
     rw [AddSubgroup.index_ker] at b
@@ -54,9 +56,9 @@ theorem index_double_prod (L T : Type) [AddCommGroup L] [AddCommGroup T] [Module
     Nat.card_congr (AddSubgroup.prodEquiv _ _).toEquiv, Nat.card_prod]
   simp
 
-theorem index_double_of_fg (M : Type) [AddCommGroup M] [AddGroup.FG M] :
-    (nsmulAddMonoidHom (α := M) 2).range.index =
-      2 ^ Module.finrank ℤ M * Nat.card (nsmulAddMonoidHom (α := M) 2).ker := by
+theorem index_double_of_fg (M : Type) [AddCommGroup M] [AddGroup.FG M]
+    : (nsmulAddMonoidHom (α := M) 2).range.index
+      = 2 ^ Module.finrank ℤ M * Nat.card (nsmulAddMonoidHom (α := M) 2).ker := by
   obtain ⟨n, ι, _, p, hp, e, ⟨f⟩⟩ := AddCommGroup.equiv_free_prod_directSum_zmod M
   haveI : ∀ i, NeZero (p i ^ e i) := fun i => ⟨pow_ne_zero _ (hp i).ne_zero⟩
   haveI : Finite (DirectSum ι fun i => ZMod (p i ^ e i)) :=
@@ -71,13 +73,14 @@ theorem index_double_of_fg (M : Type) [AddCommGroup M] [AddGroup.FG M] :
   change _ ↔ 2 • f a = 0
   rw [← map_nsmul, f.map_eq_zero_iff]
 
-theorem index_sqs_top_of_fg : ∀ (G : Type) [CommGroup G] [Group.FG G],
-    (sqs (⊤ : Subgroup G)).index =
-      2 ^ Module.finrank ℤ (Additive G) * Nat.card {a : G // a ^ 2 = 1} := by
+theorem index_sqs_top_of_fg
+    : ∀ (G : Type) [CommGroup G] [Group.FG G],
+      (sqs (⊤ : Subgroup G)).index
+        = 2 ^ Module.finrank ℤ (Additive G) * Nat.card {a : G // a ^ 2 = 1} := by
   intro G _ _
   have h := index_double_of_fg (Additive G)
-  have h1 : (sqs (⊤ : Subgroup G)).toAddSubgroup =
-      (nsmulAddMonoidHom (α := Additive G) 2).range := by
+  have h1
+      : (sqs (⊤ : Subgroup G)).toAddSubgroup = (nsmulAddMonoidHom (α := Additive G) 2).range := by
     ext x
     simp only [sqs, AddMonoidHom.mem_range, nsmulAddMonoidHom_apply]
     constructor

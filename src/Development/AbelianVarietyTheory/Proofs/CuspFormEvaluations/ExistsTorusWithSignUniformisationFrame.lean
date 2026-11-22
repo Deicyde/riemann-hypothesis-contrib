@@ -15,14 +15,19 @@ public import Development.AbelianVarietyTheory.Proofs.TorusSplitting.TorusAtExis
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh GlobalTheory.EtaAn
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj
+  Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh
+  GlobalTheory.EtaAn
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TorusSign
 
-theorem cmHostUnit_add_conj_eq_one {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) :
-    H.w0 + H.bar H.w0 = 1 := by
+theorem cmHostUnit_add_conj_eq_one {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
+    : H.w0 + H.bar H.w0 = 1 := by
   have hsq : (H.bar H.rt) ^ 2 = H.rt ^ 2 := by rw [← map_pow, H.rt_sq]; simp
   have hne : H.bar H.rt ≠ H.rt := by
     intro h
@@ -42,16 +47,24 @@ theorem cmHostUnit_add_conj_eq_one {E : Type} [Field E] [NumberField E] [IsCMFie
   have h2 : 2 * H.bar H.w0 = 1 - H.rt := by
     have := congrArg H.bar H.two_weight_eq_one_add_root
     rw [map_mul, map_add (f := _), map_one, hb, map_ofNat] at this
-    rw [this]; ring
-  have : (2 : 𝓞 E) * (H.w0 + H.bar H.w0) = 2 * 1 := by rw [mul_add, H.two_weight_eq_one_add_root, h2]; ring
+    rw [this]
+    ring
+  have : (2 : 𝓞 E) * (H.w0 + H.bar H.w0) = 2 * 1 := by
+    rw [mul_add, H.two_weight_eq_one_add_root, h2]; ring
   exact mul_left_cancel₀ two_ne_zero this
 
-theorem exists_torusAt_of_isom {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D : Datum H)
+theorem exists_torusAt_of_isom
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} (D : Datum H)
     {r : ℕ} (X : FD.Data E r) (φ : D.La ≃ₗ[𝓞 E] X.Λ)
-    (isom : ∀ a b, ((D.EF a b : ℤ) : ℚ) =
-      Algebra.trace ℚ E (-X.ξ0 * FD.herm X.Gm (φ a : Fin r → E) (φ b)))
-    (x : FD.Frame X.Ψ r) (hx : x ∈ X.dom) : ∃ A : I2.TorusAt X x, A.w0 = H.w0 := by
-  have key : ∀ a b, Algebra.trace ℚ E (X.ξ0 * FD.herm X.Gm (φ a : Fin r → E) (φ b)) = -((D.EF a b : ℤ) : ℚ) := by
+    (isom : ∀ a b,
+      ((D.EF a b : ℤ) : ℚ) = Algebra.trace ℚ E (-X.ξ0 * FD.herm X.Gm (φ a : Fin r → E) (φ b)))
+    (x : FD.Frame X.Ψ r) (hx : x ∈ X.dom)
+    : ∃ A : I2.TorusAt X x, A.w0 = H.w0 := by
+  have key
+      : ∀ a b,
+        Algebra.trace ℚ E (X.ξ0 * FD.herm X.Gm (φ a : Fin r → E) (φ b))
+          = -((D.EF a b : ℤ) : ℚ) := by
     intro a b
     rw [isom, neg_mul, map_neg, neg_neg]
   refine GlobalTheory.torusAtExists E r X ?_ H.w0 ?_ x hx
@@ -78,7 +91,12 @@ theorem exists_torusAt_of_isom {E : Type} [Field E] [NumberField E] [IsCMField E
     push_cast
     ring
 
-theorem exists_torusAt_w0_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r) (k : U.Comp) (x : (U.X k).dom) (W : UnfAt U k x), ∃ A : I2.TorusAt (U.X k) x.1, A.w0 = H.w0 := by
+theorem exists_torusAt_w0_eq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ)
+        (U : Unf Xo c σ r) (k : U.Comp) (x : (U.X k).dom) (W : UnfAt U k x),
+      ∃ A : I2.TorusAt (U.X k) x.1,
+        A.w0 = H.w0 := by
   intro E _ _ _ H Dw l Xo c σ r U k x W
   exact exists_torusAt_of_isom (W.F.Di (W.ik k)) (U.X k) (W.φ k) (W.isom k) x.1 x.2
 

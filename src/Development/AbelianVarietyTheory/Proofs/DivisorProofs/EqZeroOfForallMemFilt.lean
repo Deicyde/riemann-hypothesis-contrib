@@ -22,11 +22,15 @@ def filt {σ R : Type} [CommRing R] (I : Ideal R) (k : ℕ) : Ideal (MvPowerSeri
     have : p.2.degree ≤ α.degree := by rw [← h, map_add (f := _)]; omega
     exact Ideal.pow_le_pow_right (by omega) (hF p.2)
 
-theorem mem_filt {σ R : Type} [CommRing R] (I : Ideal R) (k : ℕ) (F : MvPowerSeries σ R) :
-    F ∈ filt I k ↔ ∀ α, MvPowerSeries.coeff α F ∈ I ^ (k - α.degree) := Iff.rfl
+theorem mem_filt {σ R : Type} [CommRing R] (I : Ideal R) (k : ℕ) (F : MvPowerSeries σ R)
+    : F ∈ filt I k ↔ ∀ α, MvPowerSeries.coeff α F ∈ I ^ (k - α.degree) :=
+  Iff.rfl
 
-theorem eq_zero_of_forall_mem_filt {σ R : Type} [CommRing R] (I : Ideal R) [IsHausdorff I R]
-    (F : MvPowerSeries σ R) (h : ∀ k, F ∈ filt I k) : F = 0 := by
+theorem eq_zero_of_forall_mem_filt
+    {σ R : Type} [CommRing R]
+    (I : Ideal R) [IsHausdorff I R]
+    (F : MvPowerSeries σ R) (h : ∀ k, F ∈ filt I k)
+    : F = 0 := by
   ext α
   rw [map_zero]
   refine IsHausdorff.haus (I := I) inferInstance _ fun m => ?_

@@ -15,20 +15,31 @@ open scoped ContDiff Classical
 
 namespace GlobalTheory.CyclotomicPrimes
 
-theorem summable_subset_union_finite {ι : Type} (f : ι → ℝ) (A B C : Set ι) (hB : B.Finite) (h : C ⊆ A ∪ B)
-    (hA : Summable fun x : A => f x) : Summable fun x : C => f x := by
+theorem summable_subset_union_finite
+    {ι : Type}
+    (f : ι → ℝ) (A B C : Set ι) (hB : B.Finite) (h : C ⊆ A ∪ B) (hA : Summable fun x : A => f x)
+    : Summable fun x : C => f x := by
   have h1 : Summable (f ∘ ((↑) : ↥(A ∪ B) → ι)) := by
     rw [← Set.union_sdiff_self]
-    exact (HasSum.add_disjoint Set.disjoint_sdiff_right hA.hasSum ((hB.subset Set.sdiff_subset).summable f).hasSum).summable
+    exact (HasSum.add_disjoint Set.disjoint_sdiff_right hA.hasSum
+      ((hB.subset Set.sdiff_subset).summable f).hasSum).summable
   exact h1.comp_injective (i := Set.inclusion h) (Set.inclusion_injective h)
 
-theorem exists_prime_absNorm_eq_of_irreducible_cyclotomic : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ), m.Prime → Irreducible (cyclotomic m K) → ∀ (τ : (ZMod m)ˣ) (S : Set (HeightOneSpectrum (𝓞 K))), S.Finite → ∃ P : HeightOneSpectrum (𝓞 K), P ∉ S ∧ (Ideal.absNorm P.asIdeal).Prime ∧ ((Ideal.absNorm P.asIdeal : ℕ) : ZMod m) = (τ : ZMod m) := by
+theorem exists_prime_absNorm_eq_of_irreducible_cyclotomic
+    : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ),
+      m.Prime → Irreducible (cyclotomic m K)
+        → ∀ (τ : (ZMod m)ˣ) (S : Set (HeightOneSpectrum (𝓞 K))),
+          S.Finite
+            → ∃ P : HeightOneSpectrum (𝓞 K),
+              P ∉ S ∧ (Ideal.absNorm P.asIdeal).Prime
+                ∧ ((Ideal.absNorm P.asIdeal : ℕ) : ZMod m) = (τ : ZMod m) := by
   classical
   intro K _ _ m hm hirr τ S hS
   have : Fact m.Prime := ⟨hm⟩
   let cl : HeightOneSpectrum (𝓞 K) → (ZMod m)ˣ := fun P =>
     if h : ((Ideal.absNorm P.asIdeal : ℕ) : ZMod m) = 0 then 1 else Units.mk0 _ h
-  have hcl : ∀ P, ¬ m ∣ Ideal.absNorm P.asIdeal → (cl P : ZMod m) = (Ideal.absNorm P.asIdeal : ℕ) := by
+  have hcl
+      : ∀ P, ¬ m ∣ Ideal.absNorm P.asIdeal → (cl P : ZMod m) = (Ideal.absNorm P.asIdeal : ℕ) := by
     intro P hP
     simp only [cl]
     rw [dite_eq_right (by rwa [ZMod.natCast_eq_zero_iff])]
@@ -36,22 +47,29 @@ theorem exists_prime_absNorm_eq_of_irreducible_cyclotomic : ∀ (K : Type) [Fiel
   by_contra hcon
   push Not at hcon
   obtain ⟨Z, hZ, hZ1, hZs⟩ := GlobalTheory.T.exists_entire_sub_one_mul_euler_exp_ne_zero_one K
-  refine GlobalTheory.Mem.RayPrimes.not_summable_class (fun P : HeightOneSpectrum (𝓞 K) => Ideal.absNorm P.asIdeal)
+  refine GlobalTheory.Mem.RayPrimes.not_summable_class
+    (fun P : HeightOneSpectrum (𝓞 K) => Ideal.absNorm P.asIdeal)
     GlobalTheory.Mem.RayPrimes.two_le_absNorm cl
-    (fun s hs => ((GlobalTheory.countable_ideal_and_summable_absNorm_rpow K).2 s hs).2) ?_ Z hZ.continuous hZ1 ?_ τ ?_
+    (fun s hs => ((GlobalTheory.countable_ideal_and_summable_absNorm_rpow K).2 s hs).2)
+    ?_ Z hZ.continuous hZ1 ?_ τ ?_
   · intro χ hχ
-    obtain ⟨P, u, hu, hχu⟩ := GlobalTheory.T.exists_prime_norm_cyclotomicChar_ne_one K m hm hirr χ hχ
+    obtain ⟨P, u, hu, hχu⟩ :=
+      GlobalTheory.T.exists_prime_norm_cyclotomicChar_ne_one K m hm hirr χ hχ
     have hP : ¬ m ∣ Ideal.absNorm P.asIdeal := by
       rw [← ZMod.natCast_eq_zero_iff, ← hu]; exact u.ne_zero
-    refine GlobalTheory.T.exists_continuous_normCharLFunction_ne_zero_one K m hm χ cl hcl ⟨P, hP, ?_⟩
+    refine GlobalTheory.T.exists_continuous_normCharLFunction_ne_zero_one K m hm χ cl hcl
+      ⟨P, hP, ?_⟩
     rwa [show cl P = u from Units.ext ((hcl P hP).trans hu.symm)]
   · intro s hs
     simpa using hZs s (by simpa using hs)
   · have hfin : (S ∪ {P : HeightOneSpectrum (𝓞 K) | Ideal.absNorm P.asIdeal ≤ m}).Finite :=
       hS.union ((Ring.HasFiniteQuotients.finite_absNorm_le (S := 𝓞 K) m).preimage
-        (f := fun P : HeightOneSpectrum (𝓞 K) => P.asIdeal) (fun a _ b _ h => HeightOneSpectrum.ext h))
-    refine summable_subset_union_finite (fun P : HeightOneSpectrum (𝓞 K) => ((Ideal.absNorm P.asIdeal : ℕ) : ℝ)⁻¹)
-      {P | ¬ (Ideal.absNorm P.asIdeal).Prime} _ {P | cl P = τ} hfin ?_ (GlobalTheory.T.summable_inv_absNorm_primes_of_not_prime_norm K)
+        (f := fun P : HeightOneSpectrum (𝓞 K) => P.asIdeal)
+        (fun a _ b _ h => HeightOneSpectrum.ext h))
+    refine summable_subset_union_finite
+      (fun P : HeightOneSpectrum (𝓞 K) => ((Ideal.absNorm P.asIdeal : ℕ) : ℝ)⁻¹)
+      {P | ¬ (Ideal.absNorm P.asIdeal).Prime} _ {P | cl P = τ} hfin ?_
+      (GlobalTheory.T.summable_inv_absNorm_primes_of_not_prime_norm K)
     intro P hP
     by_contra hn
     simp only [Set.mem_union, Set.mem_ofPred_eq, not_or, not_le, not_not] at hn hP

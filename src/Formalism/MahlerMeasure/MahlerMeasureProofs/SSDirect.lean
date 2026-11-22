@@ -221,14 +221,19 @@ lemma topcoeff (a : ι' → ι → ℕ) (ha : Function.Injective a) (P : ι' →
     exact hne' (ha (eq_of_le_sum hle (hmax L' hL')).symm)
   · intro h; exact absurd hL h
 
-theorem absDirect (V : ι' → Submodule K (MvPolynomial σ K)) (a : ι' → ι → ℕ) (ha : Function.Injective a)
-    (h1 : ∀ L, ∀ v ∈ V L, ∀ m ∈ v.support, sd sv m ≤ a L)
-    (h2 : ∀ L, ∀ v ∈ V L, (∀ m, sd sv m = a L → AddMonoidAlgebra.coeff v m = 0) → v = 0) : iSupIndep V := by
+theorem absDirect
+    (V : ι' → Submodule K (MvPolynomial σ K)) (a : ι' → ι → ℕ)
+    (ha : Function.Injective a) (h1 : ∀ L, ∀ v ∈ V L, ∀ m ∈ v.support, sd sv m ≤ a L)
+    (h2 : ∀ L, ∀ v ∈ V L, (∀ m, sd sv m = a L → AddMonoidAlgebra.coeff v m = 0) → v = 0)
+    : iSupIndep V := by
   classical
   rw [iSupIndep_iff_finsetSum_eq_zero_imp_eq_zero]
   intro s
-  refine Finset.strongInduction (p := fun s => ∀ (v : ι' → MvPolynomial σ K), (∀ i ∈ s, v i ∈ V i) →
-    ∑ i ∈ s, v i = 0 → ∀ i ∈ s, v i = 0) (fun s ih => ?_) s
+  refine Finset.strongInduction
+    (p := fun s =>
+      ∀ (v : ι' → MvPolynomial σ K), (∀ i ∈ s, v i ∈ V i) → ∑ i ∈ s, v i = 0 → ∀ i ∈ s, v i = 0)
+    (fun s ih => ?_)
+    s
   intro v hv hsum
   rcases s.eq_empty_or_nonempty with rfl | hne
   · simp
@@ -240,40 +245,44 @@ theorem absDirect (V : ι' → Submodule K (MvPolynomial σ K)) (a : ι' → ι 
     rw [hsum] at this
     simpa using this.symm
   have hrest : ∀ i ∈ s.erase L, v i = 0 :=
-    ih (s.erase L) (Finset.erase_ssubset hL) v (fun i hi => hv i (mem_of_mem_erase hi))
-      (by rw [← Finset.add_sum_erase s v hL, key, zero_add] at hsum; exact hsum)
+    ih (s.erase L) (Finset.erase_ssubset hL) v (fun i hi => hv i (mem_of_mem_erase hi)) (by
+      rw [← Finset.add_sum_erase s v hL, key, zero_add] at hsum; exact hsum)
   intro i hi
   by_cases hiL : i = L
   · subst hiL; exact key
   · exact hrest i (mem_erase.mpr ⟨hiL, hi⟩)
 
-theorem absSat (V : ι' → Submodule K (MvPolynomial σ K)) (a : ι' → ι → ℕ) (ha : Function.Injective a)
-    (C : AddSubgroup K) (T : AddSubgroup (MvPolynomial σ K))
+theorem absSat
+    (V : ι' → Submodule K (MvPolynomial σ K))
+    (a : ι' → ι → ℕ) (ha : Function.Injective a)
+    (C : AddSubgroup K)
+    (T : AddSubgroup (MvPolynomial σ K))
     (h1 : ∀ L, ∀ v ∈ V L, ∀ m ∈ v.support, sd sv m ≤ a L)
     (hT : ∀ f ∈ T, ∀ m, AddMonoidAlgebra.coeff f m ∈ C)
     (h2 : ∀ L, ∀ v ∈ V L, (∀ m, sd sv m = a L → AddMonoidAlgebra.coeff v m ∈ C) → v ∈ T)
-    (s : Finset ι') (v : ι' → MvPolynomial σ K) (hv : ∀ L ∈ s, v L ∈ V L)
-    (hC : ∀ m, AddMonoidAlgebra.coeff (∑ L ∈ s, v L) m ∈ C) : ∑ L ∈ s, v L ∈ T := by
+    (s : Finset ι') (v : ι' → MvPolynomial σ K)
+    (hv : ∀ L ∈ s, v L ∈ V L) (hC : ∀ m, AddMonoidAlgebra.coeff (∑ L ∈ s, v L) m ∈ C)
+    : ∑ L ∈ s, v L ∈ T := by
   classical
   induction s using Finset.strongInduction with
   | H s ih =>
-  rcases s.eq_empty_or_nonempty with rfl | hne
-  · simp
-  obtain ⟨L, hL, hmax⟩ := s.exists_max_image (fun L => ∑ k, a L k) hne
-  have key : v L ∈ T := by
-    apply h2 L (v L) (hv L hL)
-    intro m hm
-    rw [← topcoeff sv a ha (fun L v => v ∈ V L) h1 s v hv L hL hmax m hm]
-    exact hC m
-  have hsplit := Finset.add_sum_erase s v hL
-  have hrest : ∑ i ∈ s.erase L, v i ∈ T := by
-    apply ih (s.erase L) (Finset.erase_ssubset hL) (fun i hi => hv i (mem_of_mem_erase hi))
-    intro m
-    have : ∑ i ∈ s.erase L, v i = ∑ i ∈ s, v i - v L := by rw [← hsplit]; ring
-    rw [this, coeff_sub]
-    exact C.sub_mem (hC m) (hT _ key m)
-  rw [← hsplit]
-  exact T.add_mem key hrest
+    rcases s.eq_empty_or_nonempty with rfl | hne
+    · simp
+    obtain ⟨L, hL, hmax⟩ := s.exists_max_image (fun L => ∑ k, a L k) hne
+    have key : v L ∈ T := by
+      apply h2 L (v L) (hv L hL)
+      intro m hm
+      rw [← topcoeff sv a ha (fun L v => v ∈ V L) h1 s v hv L hL hmax m hm]
+      exact hC m
+    have hsplit := Finset.add_sum_erase s v hL
+    have hrest : ∑ i ∈ s.erase L, v i ∈ T := by
+      apply ih (s.erase L) (Finset.erase_ssubset hL) (fun i hi => hv i (mem_of_mem_erase hi))
+      intro m
+      have : ∑ i ∈ s.erase L, v i = ∑ i ∈ s, v i - v L := by rw [← hsplit]; ring
+      rw [this, coeff_sub]
+      exact C.sub_mem (hC m) (hT _ key m)
+    rw [← hsplit]
+    exact T.add_mem key hrest
 
 end Abs
 
@@ -286,8 +295,8 @@ open MvPolynomial Finset
 section Kap
 variable {σ τ K : Type} [Field K] [DecidableEq σ]
 
-noncomputable def kap (F : (τ →₀ ℕ) → (σ →₀ ℕ)) (hF : Function.Injective F) (Q : MvPolynomial σ K) :
-    MvPolynomial τ K :=
+noncomputable def kap (F : (τ →₀ ℕ) → (σ →₀ ℕ)) (hF : Function.Injective F) (Q : MvPolynomial σ K)
+    : MvPolynomial τ K :=
   ∑ n ∈ Q.support.preimage F hF.injOn, monomial n (AddMonoidAlgebra.coeff Q (F n))
 
 lemma coeff_kap (F : (τ →₀ ℕ) → (σ →₀ ℕ)) (hF : Function.Injective F) (Q : MvPolynomial σ K) (n : τ →₀ ℕ) :
@@ -362,35 +371,43 @@ end Kap
 section TSat
 variable {p : ℕ} [Fact p.Prime] {σ τ : Type} [DecidableEq σ] (e : τ → σ)
 
-def IsInt {υ : Type} (f : MvPolynomial υ ℚ_[p]) : Prop := ∀ m, AddMonoidAlgebra.coeff f m ∈ (algebraMap ℤ_[p] ℚ_[p]).range
+def IsInt {υ : Type} (f : MvPolynomial υ ℚ_[p]) : Prop :=
+  ∀ m, AddMonoidAlgebra.coeff f m ∈ (algebraMap ℤ_[p] ℚ_[p]).range
 
-theorem tensorSat (he : Function.Injective e) (Yq : Submodule ℚ_[p] (MvPolynomial τ ℚ_[p])) (YZs : Submodule ℤ_[p] (MvPolynomial τ ℚ_[p]))
+theorem tensorSat
+    (he : Function.Injective e)
+    (Yq : Submodule ℚ_[p] (MvPolynomial τ ℚ_[p])) (YZs : Submodule ℤ_[p] (MvPolynomial τ ℚ_[p]))
     (hYZ : ∀ y ∈ YZs, y ∈ Yq) (hYZ' : ∀ y ∈ Yq, IsInt y → y ∈ YZs)
-    (G : Set (MvPolynomial σ ℚ_[p])) (Mb : Finset (σ →₀ ℕ))
-    (hG1 : ∀ g ∈ G, g.support ⊆ Mb) (hG2 : ∀ μ ∈ Mb, monomial μ 1 ∈ G) (hG3 : ∀ μ ∈ Mb, ∀ x, μ (e x) = 0)
+    (G : Set (MvPolynomial σ ℚ_[p])) (Mb : Finset (σ →₀ ℕ)) (hG1 : ∀ g ∈ G, g.support ⊆ Mb)
+    (hG2 : ∀ μ ∈ Mb, monomial μ 1 ∈ G) (hG3 : ∀ μ ∈ Mb, ∀ x, μ (e x) = 0)
     (zm : σ →₀ ℕ) (Q : MvPolynomial σ ℚ_[p])
     (hQ : Q ∈ Submodule.span ℚ_[p] {x | ∃ y ∈ YZs, ∃ g ∈ G, x = monomial zm 1 * rename e y * g})
-    (hint : IsInt Q) :
-    Q ∈ Submodule.span ℤ_[p] {x | ∃ y ∈ YZs, ∃ g ∈ G, x = monomial zm 1 * rename e y * g} := by
+    (hint : IsInt Q)
+    : Q ∈ Submodule.span ℤ_[p] {x | ∃ y ∈ YZs, ∃ g ∈ G, x = monomial zm 1 * rename e y * g} := by
   classical
   set Bs := {x | ∃ y ∈ YZs, ∃ g ∈ G, x = monomial zm 1 * rename e y * g}
   have hGs : ∀ g ∈ G, ∀ w ∈ g.support, ∀ x, w (e x) = 0 := fun g hg w hw x => hG3 w (hG1 g hg hw) x
 
-  have hrec : ∀ Q ∈ Submodule.span ℚ_[p] Bs,
-      Q = ∑ μ ∈ Mb, monomial zm 1 * rename e (kap _ (F_inj e he zm μ) Q) * monomial μ 1 := by
+  have hrec
+      : ∀ Q ∈ Submodule.span ℚ_[p] Bs,
+        Q = ∑ μ ∈ Mb, monomial zm 1 * rename e (kap _ (F_inj e he zm μ) Q) * monomial μ 1 := by
     intro Q hQ
     induction hQ using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨y, hy, g, hg, rfl⟩ := hx
       have hgs : g = ∑ μ ∈ Mb, monomial μ (AddMonoidAlgebra.coeff g μ) := by
         conv_lhs => rw [g.as_sum]
-        exact Finset.sum_subset (hG1 g hg) (fun μ _ hμ => by rw [notMem_support_iff.mp hμ, monomial_zero])
+        exact Finset.sum_subset (hG1 g hg)
+          (fun μ _ hμ => by rw [notMem_support_iff.mp hμ, monomial_zero])
       conv_lhs => rw [hgs, Finset.mul_sum]
       refine Finset.sum_congr rfl (fun μ hμ => ?_)
       rw [kap_gen e he zm μ (hG3 μ hμ) y g (hGs g hg), map_smul, smul_eq_C_mul,
-        show monomial μ (AddMonoidAlgebra.coeff g μ) = C (AddMonoidAlgebra.coeff g μ) * monomial μ 1 by rw [C_mul_monomial, mul_one]]
+        show monomial μ (AddMonoidAlgebra.coeff g μ)
+            = C (AddMonoidAlgebra.coeff g μ) * monomial μ 1 by
+          rw [C_mul_monomial, mul_one]]
       ring
-    | zero => simp [kap_zero]
+    | zero =>
+      simp [kap_zero]
     | add x y _ _ hx hy =>
       simp only [kap_add, map_add (f := _), mul_add, add_mul, Finset.sum_add_distrib]
       exact congrArg₂ (· + ·) hx hy
@@ -411,7 +428,9 @@ theorem tensorSat (he : Function.Injective e) (Yq : Submodule ℚ_[p] (MvPolynom
   rw [hrec Q hQ]
   refine Submodule.sum_mem _ (fun μ hμ => Submodule.subset_span ⟨_, ?_, _, hG2 μ hμ, rfl⟩)
   apply hYZ' _ (hkY μ hμ Q hQ)
-  intro n; rw [coeff_kap]; exact hint _
+  intro n
+  rw [coeff_kap]
+  exact hint _
 
 end TSat
 
@@ -533,8 +552,8 @@ section Block
 variable [NeZero r] (D : BlockData N)
 
 noncomputable def zmS : BVar N r D.T.t →₀ ℕ :=
-  ∑ i, Finsupp.single (scalZ N r D.T.t (Fin.castSucc i)) (D.T.z i) +
-    Finsupp.single (scalZ N r D.T.t (Fin.last D.T.t)) D.zPlus
+  ∑ i, Finsupp.single (scalZ N r D.T.t (Fin.castSucc i)) (D.T.z i)
+    + Finsupp.single (scalZ N r D.T.t (Fin.last D.T.t)) D.zPlus
 
 lemma zmon_eq : ((∏ i, X (scalZ N r D.T.t (Fin.castSucc i)) ^ D.T.z i) *
     X (scalZ N r D.T.t (Fin.last D.T.t)) ^ D.zPlus : MvPolynomial (BVar N r D.T.t) ℚ_[p]) =
@@ -644,8 +663,8 @@ lemma Q_of_top (j : Fin D.T.t → ℕ) (jp : ℕ) (v : MvPolynomial (BVar N r D.
   · rw [← hc n]; apply htop; rw [sd_add, hs, sfree_span D j jp Q hQ n hn, add_zero]
   · rw [notMem_support_iff.mp hn]; exact hP0
 
-theorem ss_direct :
-    iSupIndep (fun ij : {ij : (Fin D.T.t → ℕ) × ℕ // D.LevelOK ij.1 ij.2} =>
+theorem ss_direct
+    : iSupIndep (fun ij : {ij : (Fin D.T.t → ℕ) × ℕ // D.LevelOK ij.1 ij.2} =>
       Submodule.span ℚ_[p] (D.gens p (r := r) ij.1.1 ij.1.2)) := by
   apply absDirect (scalS N r D.T.t) _ (fun ij => lv ij.1.1 ij.1.2)
   · intro a b h
@@ -749,36 +768,46 @@ lemma Q_sat (j : Fin D.T.t → ℕ) (jp : ℕ) (Q : MvPolynomial (BVar N r D.T.t
     simp [xiVar, chainEmb] at hc
     exact (Fin.castSucc_ne_last a) hc.1.symm
 
-theorem ss_sat (x : MvPolynomial (BVar N r D.T.t) ℚ_[p])
+theorem ss_sat
+    (x : MvPolynomial (BVar N r D.T.t) ℚ_[p])
     (hx : x ∈ Submodule.span ℚ_[p] (D.SSZ p (r := r) : Set (MvPolynomial (BVar N r D.T.t) ℚ_[p])))
-    (hi : x ∈ IntPol p (BVar N r D.T.t)) : x ∈ D.SSZ p (r := r) := by
+    (hi : x ∈ IntPol p (BVar N r D.T.t))
+    : x ∈ D.SSZ p (r := r) := by
   classical
   rw [BlockData.SSZ, Submodule.span_span_of_tower] at hx
-  have hU : (⋃ (j : Fin D.T.t → ℕ) (jp : ℕ) (_ : D.LevelOK j jp), D.gens p (r := r) j jp) =
-      ⋃ (ij : {ij : (Fin D.T.t → ℕ) × ℕ // D.LevelOK ij.1 ij.2}), D.gens p (r := r) ij.1.1 ij.1.2 := by
-    ext y
-    simp only [Set.mem_iUnion]
-    constructor
-    · rintro ⟨j, jp, h, hy⟩; exact ⟨⟨(j, jp), h⟩, hy⟩
-    · rintro ⟨⟨⟨j, jp⟩, h⟩, hy⟩; exact ⟨j, jp, h, hy⟩
+  have hU
+      : (⋃ (j : Fin D.T.t → ℕ) (jp : ℕ) (_ : D.LevelOK j jp), D.gens p (r := r) j jp)
+        = ⋃ (ij : {ij : (Fin D.T.t → ℕ) × ℕ // D.LevelOK ij.1 ij.2}), D.gens p (r := r) ij.1.1 ij.1.2 :=
+    by
+      ext y
+      simp only [Set.mem_iUnion]
+      constructor
+      · rintro ⟨j, jp, h, hy⟩; exact ⟨⟨(j, jp), h⟩, hy⟩
+      · rintro ⟨⟨⟨j, jp⟩, h⟩, hy⟩; exact ⟨j, jp, h, hy⟩
   rw [hU, Submodule.span_iUnion, Submodule.mem_iSup_iff_exists_finset] at hx
   obtain ⟨s, hs⟩ := hx
   rw [Submodule.mem_iSup_finset_iff_exists_sum] at hs
   obtain ⟨μ, hμ⟩ := hs
   rw [← hμ] at hi ⊢
-  have key := absSat (scalS N r D.T.t)
-    (fun ij : {ij : (Fin D.T.t → ℕ) × ℕ // D.LevelOK ij.1 ij.2} =>
-      Submodule.span ℚ_[p] (D.gens p (r := r) ij.1.1 ij.1.2)) (fun ij => lv ij.1.1 ij.1.2)
-    (fun a b h => by obtain ⟨h1, h2⟩ := lv_inj h; exact Subtype.ext (Prod.ext h1 h2))
-    (algebraMap ℤ_[p] ℚ_[p]).range.toAddSubgroup (D.SSZ p (r := r)).toAddSubgroup
-    (fun L v hv => by obtain ⟨_, _, _, _, _, h1, _⟩ := topV D _ _ v hv; exact h1)
-    (fun f hf m => (intPol_iff_isInt f).mp (SSZ_int D f hf) m)
-    (fun L v hv htop => by
-      obtain ⟨Q, hQ, rfl, hz⟩ := Q_of_top D _ _ v hv (fun c => c ∈ (algebraMap ℤ_[p] ℚ_[p]).range)
-        (Subring.zero_mem _) htop
-      exact pre_span_mem D _ _ L.2 Q (Q_sat D _ _ Q hQ hz))
-    s (fun i => (μ i : MvPolynomial (BVar N r D.T.t) ℚ_[p])) (fun L _ => (μ L).2)
-    (fun m => (intPol_iff_isInt _).mp hi m)
+  have key :=
+    absSat (scalS N r D.T.t)
+      (fun ij : {ij : (Fin D.T.t → ℕ) × ℕ // D.LevelOK ij.1 ij.2} =>
+        Submodule.span ℚ_[p] (D.gens p (r := r) ij.1.1 ij.1.2))
+      (fun ij => lv ij.1.1 ij.1.2)
+      (fun a b h => by obtain ⟨h1, h2⟩ := lv_inj h; exact Subtype.ext (Prod.ext h1 h2))
+      (algebraMap ℤ_[p] ℚ_[p]).range.toAddSubgroup (D.SSZ p (r := r)).toAddSubgroup
+      (fun L v hv => by obtain ⟨_, _, _, _, _, h1, _⟩ := topV D _ _ v hv; exact h1)
+      (fun f hf m => (intPol_iff_isInt f).mp (SSZ_int D f hf) m)
+      (fun L v hv htop => by
+        obtain ⟨Q, hQ, rfl, hz⟩ :=
+          Q_of_top D _ _ v hv
+            (fun c => c ∈ (algebraMap ℤ_[p] ℚ_[p]).range)
+            (Subring.zero_mem _) htop
+        exact pre_span_mem D _ _ L.2 Q (Q_sat D _ _ Q hQ hz))
+      s
+      (fun i => (μ i : MvPolynomial (BVar N r D.T.t) ℚ_[p]))
+      (fun L _ => (μ L).2)
+      (fun m => (intPol_iff_isInt _).mp hi m)
   exact key
 
 end Main

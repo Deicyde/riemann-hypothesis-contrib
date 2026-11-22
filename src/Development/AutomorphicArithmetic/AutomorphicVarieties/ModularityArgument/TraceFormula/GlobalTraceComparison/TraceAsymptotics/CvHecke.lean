@@ -9,9 +9,12 @@ namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 open GlobalTheory.BCT
 open scoped Pointwise
 
-private theorem cv_eq_sum {G : Type} [Group G] (K : Subgroup G) (f g : G → ℂ)
-    (hf : ∀ k ∈ K, ∀ x, f (x * k) = f x) (hg : ∀ k ∈ K, ∀ x, g (k * x) = g x) (y : G) :
-    cv K f g y = ∑ᶠ q : G ⧸ K, f q.out * g (q.out⁻¹ * y) := by
+private theorem cv_eq_sum
+    {G : Type} [Group G]
+    (K : Subgroup G) (f g : G → ℂ)
+    (hf : ∀ k ∈ K, ∀ x, f (x * k) = f x) (hg : ∀ k ∈ K, ∀ x, g (k * x) = g x)
+    (y : G)
+    : cv K f g y = ∑ᶠ q : G ⧸ K, f q.out * g (q.out⁻¹ * y) := by
   refine hintSph G K (fun z => f z * g (z⁻¹ * y)) ?_
   intro k hk x
   have e : (x * k)⁻¹ * y = k⁻¹ * (x⁻¹ * y) := by group
@@ -45,8 +48,10 @@ theorem cvHecke : CvHecke := by
       obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul K z
       have e : (z * (h : G))⁻¹ * x = (h : G)⁻¹ * (z⁻¹ * x) := by group
       rw [hh, hfr _ h.2, e, hgl _ (K.inv_mem h.2)]
-    have hterm : ∀ q : G ⧸ K, f q.out * g (q.out⁻¹ * (k * x)) =
-        (fun p : G ⧸ K => f p.out * g (p.out⁻¹ * x)) (MulAction.toPerm (k⁻¹ : G) q) := by
+    have hterm
+        : ∀ q : G ⧸ K,
+          f q.out * g (q.out⁻¹ * (k * x))
+            = (fun p : G ⧸ K => f p.out * g (p.out⁻¹ * x)) (MulAction.toPerm (k⁻¹ : G) q) := by
       intro q
       have e1 : MulAction.toPerm (k⁻¹ : G) q = ((k⁻¹ * q.out : G) : G ⧸ K) := by
         conv_lhs => rw [← QuotientGroup.out_eq' q]
@@ -55,7 +60,8 @@ theorem cvHecke : CvHecke := by
       simp only [e1]
       rw [hF, hfl _ (K.inv_mem hk), e2]
     rw [finsum_congr hterm]
-    exact finsum_comp_equiv (f := fun p : G ⧸ K => f p.out * g (p.out⁻¹ * x))
+    exact finsum_comp_equiv
+      (f := fun p : G ⧸ K => f p.out * g (p.out⁻¹ * x))
       (MulAction.toPerm (k⁻¹ : G) : Equiv.Perm (G ⧸ K))
   · rw [hcv, hcv]
     refine finsum_congr fun q => ?_

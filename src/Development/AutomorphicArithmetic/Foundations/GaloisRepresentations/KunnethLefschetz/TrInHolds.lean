@@ -32,7 +32,11 @@ public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.E
 namespace UpperTheory.Gal.KunnethLefschetz
 open GlobalTheory.EtC
 
-theorem trIn_holds : TrIn :=
-  ⟨TranscendenceTraces.wtNormal_holds, TranscendenceTraces.nmlLoc_holds, TranscendenceTraces.nwtDeg_holds, TranscendenceTraces.trDegQ_holds GlobalTheory.T.etaleCohomology_coefficientRing_invariance⟩
+theorem trIn_holds : TrIn := ⟨
+  TranscendenceTraces.wtNormal_holds,
+  TranscendenceTraces.nmlLoc_holds,
+  TranscendenceTraces.nwtDeg_holds,
+  TranscendenceTraces.trDegQ_holds GlobalTheory.T.etaleCohomology_coefficientRing_invariance
+⟩
 
 end UpperTheory.Gal.KunnethLefschetz

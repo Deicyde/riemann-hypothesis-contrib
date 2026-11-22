@@ -289,21 +289,27 @@ theorem perron_formula_character : PerronChi := by
   intro q _ χ y hy σ₀ hσ
   have hy0 : 0 < y := by linarith
   refine ⟨perron_integrand_integrable χ hy0 hσ, ?_⟩
-  have hinv := mellinInv_mellin_eq (-σ₀) (fun x : ℝ => Schi χ x) hy0
-    (mellin_convergent_chebyshev_character χ hσ) (perron_vertical_integrable χ hσ) (chebyshev_character_continuousAt χ y)
+  have hinv :=
+    mellinInv_mellin_eq (-σ₀)
+      (fun x : ℝ => Schi χ x)
+      hy0 (mellin_convergent_chebyshev_character χ hσ) (perron_vertical_integrable χ hσ)
+      (chebyshev_character_continuousAt χ y)
   rw [← hinv]
   unfold mellinInv
-  have key : ∀ t : ℝ, (y : ℂ) ^ (-(((-σ₀ : ℝ) : ℂ) + t * I)) •
-      mellin (fun x : ℝ => Schi χ x) (((-σ₀ : ℝ) : ℂ) + t * I) =
-      Fchi χ y ((σ₀ : ℂ) + ((-t : ℝ) : ℂ) * I) := by
+  have key
+      : ∀ t : ℝ,
+        (y : ℂ) ^ (-(((-σ₀ : ℝ) : ℂ) + t * I))
+            • mellin (fun x : ℝ => Schi χ x) (((-σ₀ : ℝ) : ℂ) + t * I)
+          = Fchi χ y ((σ₀ : ℂ) + ((-t : ℝ) : ℂ) * I) := by
     intro t
     have hw : ((-σ₀ : ℝ) : ℂ) + t * I = -((σ₀ : ℂ) + ((-t : ℝ) : ℂ) * I) := by push_cast; ring
     rw [hw, mellin_chebyshev_character χ (by simp [hσ]), neg_neg, smul_eq_mul]
     unfold Fchi
     ring
   rw [integral_congr_ae (Eventually.of_forall key)]
-  have h2 : ∫ t : ℝ, Fchi χ y ((σ₀ : ℂ) + ((-t : ℝ) : ℂ) * I) =
-      ∫ t : ℝ, Fchi χ y ((σ₀ : ℂ) + (t : ℂ) * I) :=
+  have h2
+      : ∫ t : ℝ, Fchi χ y ((σ₀ : ℂ) + ((-t : ℝ) : ℂ) * I)
+        = ∫ t : ℝ, Fchi χ y ((σ₀ : ℂ) + (t : ℂ) * I) :=
     integral_neg_eq_self (fun t : ℝ => Fchi χ y ((σ₀ : ℂ) + (t : ℂ) * I)) volume
   rw [h2, Complex.real_smul]
   push_cast

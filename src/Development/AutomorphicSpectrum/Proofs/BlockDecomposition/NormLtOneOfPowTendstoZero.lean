@@ -15,9 +15,10 @@ open MeasureTheory ValuativeRel
 noncomputable section
 namespace GlobalTheory.CompanionTheory.NabsContract
 
-theorem valuation_lt_one_of_tendsto_pow {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (t : kˣ)
-    (ht : Tendsto (fun n : ℕ => (t : k) ^ n) atTop (𝓝 0)) : valuation k (t : k) < 1 := by
+theorem valuation_lt_one_of_tendsto_pow
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (t : kˣ) (ht : Tendsto (fun n : ℕ => (t : k) ^ n) atTop (𝓝 0))
+    : valuation k (t : k) < 1 := by
   by_contra H
   rw [not_lt] at H
   have hs : {x : k | valuation k x < 1} ∈ 𝓝 (0 : k) :=
@@ -27,9 +28,10 @@ theorem valuation_lt_one_of_tendsto_pow {k : Type} [Field k] [ValuativeRel k] [T
   rw [map_pow] at hn'
   exact (not_lt.mpr (one_le_pow₀ H)) hn'
 
-theorem nabs_lt_one_of_tendsto_pow : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (t : kˣ),
-    Tendsto (fun n : ℕ => (t : k) ^ n) atTop (𝓝 0) → nabs k t < 1 := by
+theorem nabs_lt_one_of_tendsto_pow
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (t : kˣ),
+      Tendsto (fun n : ℕ => (t : k) ^ n) atTop (𝓝 0) → nabs k t < 1 := by
   intro k _ _ _ _ t ht
   have hv := GlobalTheory.CompanionTheory.NabsContract.valuation_lt_one_of_tendsto_pow t ht
   letI : MeasurableSpace k := borel k
@@ -58,7 +60,9 @@ theorem nabs_lt_one_of_tendsto_pow : ∀ (k : Type) [Field k] [ValuativeRel k] [
   have hdiff : 0 < ν (O \ B) :=
     (hO.sdiff (GlobalTheory.SplitWeil.isCompact_cball t).isClosed).measure_pos ν ⟨1, h1⟩
   rw [measure_sdiff hBO (GlobalTheory.SplitWeil.isOpen_cball t).measurableSet.nullMeasurableSet
-    hBfin, tsub_pos_iff_lt] at hdiff
+        hBfin,
+      tsub_pos_iff_lt]
+    at hdiff
   have hlt : ν.real B < ν.real O := (ENNReal.toReal_lt_toReal hBfin hOfin).mpr hdiff
   have hOpos : 0 < ν.real O :=
     ENNReal.toReal_pos (hO.measure_pos ν ⟨0, (Valuation.mem_integer_iff _ _).mpr (by simp)⟩).ne'

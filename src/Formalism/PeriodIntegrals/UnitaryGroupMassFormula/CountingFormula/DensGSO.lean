@@ -12,8 +12,8 @@ namespace PI.UnitaryGroupMassFormula.CntFormula
 open NumberField Formalism.MainNotions.S
 open Classical ValuativeRel
 
-theorem isIntegral_iff_mem_integer (F : Type) [Field F] [ValuativeRel F] (a : F) :
-    IsIntegral 𝒪[F] a ↔ a ∈ 𝒪[F] := by
+theorem isIntegral_iff_mem_integer (F : Type) [Field F] [ValuativeRel F] (a : F)
+    : IsIntegral 𝒪[F] a ↔ a ∈ 𝒪[F] := by
   constructor
   · intro h
     exact (Valuation.integer.integers _).mem_of_integral h
@@ -35,9 +35,12 @@ theorem integral_split_count : OSplit := by
   rw [key]
   constructor
   · intro h
-    exact ⟨(isIntegral_iff_mem_integer F _).1 (h.map (AlgHom.fst 𝒪[F] F F)),
-      (isIntegral_iff_mem_integer F _).1 (h.map (AlgHom.snd 𝒪[F] F F))⟩
+    exact ⟨
+      (isIntegral_iff_mem_integer F _).1 (h.map (AlgHom.fst 𝒪[F] F F)),
+      (isIntegral_iff_mem_integer F _).1 (h.map (AlgHom.snd 𝒪[F] F F))
+    ⟩
   · rintro ⟨h1, h2⟩
-    exact IsIntegral.pair ((isIntegral_iff_mem_integer F _).2 h1) ((isIntegral_iff_mem_integer F _).2 h2)
+    exact IsIntegral.pair ((isIntegral_iff_mem_integer F _).2 h1)
+      ((isIntegral_iff_mem_integer F _).2 h2)
 
 end PI.UnitaryGroupMassFormula.CntFormula

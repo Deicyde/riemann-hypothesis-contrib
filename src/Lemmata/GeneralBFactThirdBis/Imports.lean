@@ -8,15 +8,16 @@ universe u_1
 
 namespace Bl.general_b_fact_third_bis
 
-theorem goal1 :
-  ∀ {E : Type u_1} [inst : Field.{u_1} E] [NumberField.{u_1} E] (φ : RingHom.{u_1, 0} E Complex) {n : Nat}
-  (L : Submodule.{u_1, u_1} (NumberField.RingOfIntegers.{u_1} E) (Fin n → E)),
-  Submodule.FG.{u_1, u_1} L →
-    Eq.{u_1 + 1} (Submodule.span.{u_1, u_1} E (SetLike.coe.{u_1, u_1} L)) Top.top.{u_1} →
-      ∀ (M : Matrix.{0, 0, u_1} (Fin n) (Fin n) E),
-        (∀ (x : Fin n → E),
-            Membership.mem.{u_1, u_1} L x → Membership.mem.{u_1, u_1} L (Matrix.mulVec.{u_1, 0, 0} M x)) →
-          IsIntegral.{0, u_1} Int (Matrix.trace.{0, u_1} M) := by
+theorem goal1
+    : ∀ {E : Type u_1} [inst : Field.{u_1} E] [NumberField.{u_1} E] (φ : RingHom.{u_1, 0} E Complex)
+        {n : Nat} (L : Submodule.{u_1, u_1} (NumberField.RingOfIntegers.{u_1} E) (Fin n → E)),
+      Submodule.FG.{u_1, u_1} L
+        → Eq.{u_1 + 1} (Submodule.span.{u_1, u_1} E (SetLike.coe.{u_1, u_1} L)) Top.top.{u_1}
+        → ∀ (M : Matrix.{0, 0, u_1} (Fin n) (Fin n) E),
+          (∀ (x : Fin n → E),
+              Membership.mem.{u_1, u_1} L x
+                → Membership.mem.{u_1, u_1} L (Matrix.mulVec.{u_1, 0, 0} M x))
+            → IsIntegral.{0, u_1} Int (Matrix.trace.{0, u_1} M) := by
   intro E _ _ φ n L hL hspan M hM
   classical
   have hKfg : (L.restrictScalars ℤ).FG := hL.restrictScalars
@@ -25,8 +26,9 @@ theorem goal1 :
   have hg : ∀ x ∈ L.restrictScalars ℤ, g x ∈ L.restrictScalars ℤ := fun x hx => hM x hx
   let f : Module.End ℤ (L.restrictScalars ℤ) := g.restrict hg
   obtain ⟨p, hpm, hp0⟩ := LinearMap.exists_monic_and_aeval_eq_zero ℤ f
-  have hpow : ∀ (k : ℕ) (x : L.restrictScalars ℤ),
-      (((f ^ k) x : L.restrictScalars ℤ) : Fin n → E) = (M ^ k).mulVec (x : Fin n → E) := by
+  have hpow
+      : ∀ (k : ℕ) (x : L.restrictScalars ℤ),
+        (((f ^ k) x : L.restrictScalars ℤ) : Fin n → E) = (M ^ k).mulVec (x : Fin n → E) := by
     intro k
     induction k with
     | zero => intro x; simp
@@ -36,10 +38,14 @@ theorem goal1 :
       rfl
   have hzL : ∀ x ∈ L, (Polynomial.aeval M p).mulVec x = 0 := by
     intro x hx
-    have h := congrArg (fun h : Module.End ℤ (L.restrictScalars ℤ) =>
-      ((h ⟨x, hx⟩ : L.restrictScalars ℤ) : Fin n → E)) hp0
-    simp only [Polynomial.aeval_eq_sum_range, LinearMap.sum_apply, LinearMap.smul_apply, Submodule.coe_sum, Submodule.coe_smul, hpow, LinearMap.zero_apply,
-      Submodule.coe_zero] at h
+    have h :=
+      congrArg
+        (fun h : Module.End ℤ (L.restrictScalars ℤ) =>
+          ((h ⟨x, hx⟩ : L.restrictScalars ℤ) : Fin n → E))
+        hp0
+    simp only [Polynomial.aeval_eq_sum_range, LinearMap.sum_apply, LinearMap.smul_apply,
+        Submodule.coe_sum, Submodule.coe_smul, hpow, LinearMap.zero_apply, Submodule.coe_zero]
+      at h
     rw [Polynomial.aeval_eq_sum_range, Matrix.sum_mulVec]
     simpa only [Matrix.smul_mulVec] using h
   have hz : Polynomial.aeval M p = 0 := by
@@ -55,7 +61,7 @@ theorem goal1 :
     convert h2 using 2 <;> first | exact RingHom.ext_int _ _ | rfl
   have htr : (M.map φ).trace = φ M.trace := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.trace, map_sum]
+    simp [Matrix.trace, map_sum]
   have hint : IsIntegral ℤ (φ M.trace) := by
     rw [← htr, Matrix.trace_eq_sum_roots_charpoly]
     refine IsIntegral.multiset_sum fun r hr => ?_

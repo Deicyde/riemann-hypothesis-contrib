@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLogCut
 
 set_option autoImplicit false
 
-open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.GoodTop
+open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
+  GlobalTheory.GoodMetric GlobalTheory.GoodTop
 open ReciprocityTheory.L2DbarEstimates (V)
 open scoped ContDiff Matrix
 
@@ -194,36 +196,54 @@ private lemma fderiv_prod_logCutoff_coordVec {n : ℕ} (k : ℕ) (S : Finset (Fi
       exact hasDerivAt_const _ _
     exact h1.unique h2
 
-
 open MeasureTheory Filter Topology in
 open scoped ContDiff Matrix in
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.GoodTop.exists_logCutoff_hyperplanes {n : ℕ} (S : Finset (Fin n)) :
-    ∃ (C : ℝ) (χ : ℕ → _root_.ReciprocityTheory.L2DbarEstimates.V n → ℝ),
-    (∀ k, ContDiff ℝ ∞ (χ k)) ∧ (∀ k v, 0 ≤ χ k v ∧ χ k v ≤ 1) ∧
-    (∀ k v, (∃ a ∈ S, v a = 0) → χ k =ᶠ[𝓝 v] fun _ => 0) ∧
-    (∀ v : _root_.ReciprocityTheory.L2DbarEstimates.V n, (∀ a ∈ S, v a ≠ 0) → ∀ᶠ k in atTop, χ k =ᶠ[𝓝 v] fun _ => 1) ∧
-    ∀ k v b, ‖_root_.GlobalTheory.dbar (fun x => (χ k x : ℂ)) v (_root_.GlobalTheory.GoodMetric.coordVec b)‖ *
-      _root_.GlobalTheory.GoodMetric.poinWt S v b ≤ C := by
+theorem _root_.GlobalTheory.GoodTop.exists_logCutoff_hyperplanes {n : ℕ} (S : Finset (Fin n))
+    : ∃ (C : ℝ) (χ : ℕ → _root_.ReciprocityTheory.L2DbarEstimates.V n → ℝ),
+      (∀ k, ContDiff ℝ ∞ (χ k)) ∧ (∀ k v, 0 ≤ χ k v ∧ χ k v ≤ 1)
+        ∧ (∀ k v, (∃ a ∈ S, v a = 0) → χ k =ᶠ[𝓝 v] fun _ => 0)
+        ∧ (∀ v : _root_.ReciprocityTheory.L2DbarEstimates.V n,
+          (∀ a ∈ S, v a ≠ 0) → ∀ᶠ k in atTop, χ k =ᶠ[𝓝 v] fun _ => 1)
+        ∧ ∀ k v b,
+          ‖_root_.GlobalTheory.dbar (fun x => (χ k x : ℂ)) v (_root_.GlobalTheory.GoodMetric.coordVec b)‖
+              * _root_.GlobalTheory.GoodMetric.poinWt S v b
+            ≤ C := by
   obtain ⟨M, hM0, hM⟩ := exists_bound_fderiv_logCutoff_mul_norm_mul_log
-  have hproj : ∀ a : Fin n, ContDiff ℝ ∞ fun w : _root_.ReciprocityTheory.L2DbarEstimates.V n => w a := fun a =>
-    (EuclideanSpace.proj (𝕜 := ℂ) (ι := Fin n) a).contDiff.restrict_scalars ℝ
-  have hcont : ∀ a : Fin n, Continuous fun w : _root_.ReciprocityTheory.L2DbarEstimates.V n => w a := fun a => (hproj a).continuous
-  refine ⟨M, fun k v => ∏ a ∈ S, _root_.GlobalTheory.GoodTop.logCutoff k (v a), fun k => ?_, fun k v => ?_,
-    fun k v hv => ?_, fun v hv => ?_, fun k v b => ?_⟩
+  have hproj
+      : ∀ a : Fin n, ContDiff ℝ ∞ fun w : _root_.ReciprocityTheory.L2DbarEstimates.V n => w a :=
+    fun a => (EuclideanSpace.proj (𝕜 := ℂ) (ι := Fin n) a).contDiff.restrict_scalars ℝ
+  have hcont
+      : ∀ a : Fin n, Continuous fun w : _root_.ReciprocityTheory.L2DbarEstimates.V n => w a :=
+    fun a => (hproj a).continuous
+  refine ⟨
+    M,
+    fun k v => ∏ a ∈ S, _root_.GlobalTheory.GoodTop.logCutoff k (v a),
+    fun k => ?_,
+    fun k v => ?_,
+    fun k v hv => ?_,
+    fun v hv => ?_,
+    fun k v b => ?_
+  ⟩
   · exact contDiff_prod fun a _ => (_root_.GlobalTheory.GoodTop.contDiff_logCutoff k).comp (hproj a)
-  · exact ⟨Finset.prod_nonneg fun a _ => (logCutoff_mem_Icc k _).1,
-      Finset.prod_le_one₀ (fun a _ => (logCutoff_mem_Icc k _).1)
-        (fun a _ => (logCutoff_mem_Icc k _).2)⟩
+  · exact ⟨
+      Finset.prod_nonneg fun a _ => (logCutoff_mem_Icc k _).1,
+      Finset.prod_le_one₀
+        (fun a _ => (logCutoff_mem_Icc k _).1)
+        (fun a _ => (logCutoff_mem_Icc k _).2)
+    ⟩
   · obtain ⟨a, ha, h0⟩ := hv
-    have hopen : IsOpen {w : _root_.ReciprocityTheory.L2DbarEstimates.V n | ‖w a‖ < Real.exp (-2 * ((k : ℝ) + 1))} :=
+    have hopen : IsOpen
+        {w : _root_.ReciprocityTheory.L2DbarEstimates.V n | ‖w a‖ < Real.exp (-2 * ((k : ℝ) + 1))} :=
       isOpen_lt (hcont a).norm continuous_const
     filter_upwards [hopen.mem_nhds (by simp [h0, Real.exp_pos])] with w hw
     exact Finset.prod_eq_zero ha (logCutoff_eq_zero_of_norm_le_exp_neg_two_mul k (le_of_lt hw))
-  · have hone : ∀ a ∈ S, ∀ᶠ k : ℕ in atTop, ∀ᶠ w in 𝓝 v, _root_.GlobalTheory.GoodTop.logCutoff k (w a) = 1 := by
+  · have hone
+        : ∀ a ∈ S,
+          ∀ᶠ k : ℕ in atTop, ∀ᶠ w in 𝓝 v, _root_.GlobalTheory.GoodTop.logCutoff k (w a) = 1 := by
       intro a ha
       have hr : 0 < ‖v a‖ / 2 := by have := norm_pos_iff.mpr (hv a ha); positivity
-      obtain ⟨N, hN⟩ := exists_nat_gt (-Real.log (‖v a‖ / 2))
+      obtain ⟨N, hN⟩ := exists_nat_gt (- Real.log (‖v a‖ / 2))
       have hopen : IsOpen {w : _root_.ReciprocityTheory.L2DbarEstimates.V n | ‖v a‖ / 2 < ‖w a‖} :=
         isOpen_lt continuous_const (hcont a).norm
       have hvm : v ∈ {w : _root_.ReciprocityTheory.L2DbarEstimates.V n | ‖v a‖ / 2 < ‖w a‖} := by
@@ -243,8 +263,10 @@ theorem _root_.GlobalTheory.GoodTop.exists_logCutoff_hyperplanes {n : ℕ} (S : 
     exact Finset.prod_eq_one hw
   · set χk := fun w : _root_.ReciprocityTheory.L2DbarEstimates.V n => ∏ a ∈ S, _root_.GlobalTheory.GoodTop.logCutoff k (w a) with hχk
     have hd : DifferentiableAt ℝ χk v :=
-      ((contDiff_prod fun a _ => (_root_.GlobalTheory.GoodTop.contDiff_logCutoff k).comp (hproj a)).differentiable
-        (by simp)) v
+      ((contDiff_prod fun a _ =>
+            (_root_.GlobalTheory.GoodTop.contDiff_logCutoff k).comp (hproj a)).differentiable
+          (by simp))
+        v
     have hF : ∀ w, fderiv ℝ (fun x => (χk x : ℂ)) v w = ((fderiv ℝ χk v w : ℝ) : ℂ) := by
       intro w
       have hc := Complex.ofRealCLM.hasFDerivAt.comp v hd.hasFDerivAt
@@ -260,7 +282,8 @@ theorem _root_.GlobalTheory.GoodTop.exists_logCutoff_hyperplanes {n : ℕ} (S : 
     · set P := ∏ a ∈ S.erase b, _root_.GlobalTheory.GoodTop.logCutoff k (v a)
       have hP : |P| ≤ 1 := by
         rw [abs_of_nonneg (Finset.prod_nonneg fun a _ => (logCutoff_mem_Icc k _).1)]
-        exact Finset.prod_le_one₀ (fun a _ => (logCutoff_mem_Icc k _).1)
+        exact Finset.prod_le_one₀
+          (fun a _ => (logCutoff_mem_Icc k _).1)
           (fun a _ => (logCutoff_mem_Icc k _).2)
       have hw : 0 ≤ ‖v b‖ * |Real.log ‖v b‖| := by positivity
       have b1 := hM k (v b) 1
@@ -268,18 +291,21 @@ theorem _root_.GlobalTheory.GoodTop.exists_logCutoff_hyperplanes {n : ℕ} (S : 
       rw [norm_one, mul_one] at b1
       rw [Complex.norm_I, mul_one] at bI
       rw [Real.norm_eq_abs] at b1 bI
-      calc ‖(1 / 2 : ℂ) • (((P * fderiv ℝ (_root_.GlobalTheory.GoodTop.logCutoff k) (v b) 1 : ℝ) : ℂ) +
-            Complex.I • ((P * fderiv ℝ (_root_.GlobalTheory.GoodTop.logCutoff k) (v b) Complex.I : ℝ) : ℂ))‖ *
-            (‖v b‖ * |Real.log ‖v b‖|)
-          ≤ (1 / 2) * (|fderiv ℝ (_root_.GlobalTheory.GoodTop.logCutoff k) (v b) 1| +
-              |fderiv ℝ (_root_.GlobalTheory.GoodTop.logCutoff k) (v b) Complex.I|) * (‖v b‖ * |Real.log ‖v b‖|) := by
-            refine mul_le_mul_of_nonneg_right ?_ hw
-            rw [norm_smul, norm_div, norm_one, Complex.norm_two]
-            refine mul_le_mul_of_nonneg_left ((norm_add_le _ _).trans ?_) (by norm_num)
-            rw [norm_smul, Complex.norm_I, one_mul, Complex.norm_real, Complex.norm_real,
-              Real.norm_eq_abs, Real.norm_eq_abs, abs_mul, abs_mul]
-            exact add_le_add (mul_le_of_le_one_left (abs_nonneg _) hP)
-              (mul_le_of_le_one_left (abs_nonneg _) hP)
+      calc
+        ‖(1 / 2 : ℂ) • (((P * fderiv ℝ (_root_.GlobalTheory.GoodTop.logCutoff k) (v b) 1 : ℝ) : ℂ) +
+         Complex.I • ((P * fderiv ℝ (_root_.GlobalTheory.GoodTop.logCutoff k) (v b) Complex.I : ℝ) : ℂ))‖
+              * (‖v b‖ * |Real.log ‖v b‖|)
+            ≤ (1 / 2)
+              * (|fderiv ℝ (_root_.GlobalTheory.GoodTop.logCutoff k) (v b) 1|
+                + |fderiv ℝ (_root_.GlobalTheory.GoodTop.logCutoff k) (v b) Complex.I|)
+              * (‖v b‖ * |Real.log ‖v b‖|) := by
+          refine mul_le_mul_of_nonneg_right ?_ hw
+          rw [norm_smul, norm_div, norm_one, Complex.norm_two]
+          refine mul_le_mul_of_nonneg_left ((norm_add_le _ _).trans ?_) (by norm_num)
+          rw [norm_smul, Complex.norm_I, one_mul, Complex.norm_real, Complex.norm_real,
+            Real.norm_eq_abs, Real.norm_eq_abs, abs_mul, abs_mul]
+          exact add_le_add (mul_le_of_le_one_left (abs_nonneg _) hP)
+            (mul_le_of_le_one_left (abs_nonneg _) hP)
         _ ≤ M := by nlinarith
     · simpa using hM0
 

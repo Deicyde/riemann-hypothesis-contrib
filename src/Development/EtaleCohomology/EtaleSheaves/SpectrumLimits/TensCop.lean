@@ -15,8 +15,15 @@ open PiTensorProduct in
 theorem tensCop : TensCop := by
   intro A A' _ _ φ n
   letI : Algebra A A' := φ.toAlgebra
-  refine ⟨PiTensorProduct A (fun _ : Fin (n + 1) => A'), inferInstance, algebraMap A _, fun i => (singleAlgHom (A := fun _ => A') i).toRingHom,
-    fun i => ?_, ?_, ?_⟩
+  refine ⟨
+    PiTensorProduct A (fun _ : Fin (n + 1) => A'),
+    inferInstance,
+    algebraMap A _,
+    fun i => (singleAlgHom (A := fun _ => A') i).toRingHom,
+    fun i => ?_,
+    ?_,
+    ?_
+  ⟩
   · exact (singleAlgHom (A := fun _ => A') i).comp_algebraMap
   · rw [eq_top_iff]
     intro x _
@@ -57,7 +64,10 @@ theorem tensCop : TensCop := by
       exact hH i a
     · ext a
       exact H.commutes a
-    · have hc2 : ∀ r, h2 (algebraMap A (PiTensorProduct A (fun _ : Fin (n + 1) => A')) r) = algebraMap A R r := fun r => by
+    · have hc2
+          : ∀ r,
+            h2 (algebraMap A (PiTensorProduct A (fun _ : Fin (n + 1) => A')) r)
+              = algebraMap A R r := fun r => by
         change h2 (algebraMap A _ r) = c r
         rw [← RingHom.comp_apply, h2c]
       let H2 : (PiTensorProduct A (fun _ : Fin (n + 1) => A')) →ₐ[A] R := AlgHom.mk h2 hc2

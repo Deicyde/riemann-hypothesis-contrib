@@ -10,7 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.BlockGLSuppor
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+  GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
 open scoped ENNReal InnerProductSpace
 open scoped ComplexOrder
 
@@ -20,14 +23,21 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp.Dict.LatticeCoordinates
 
 open scoped TensorProduct nonZeroDivisors
 
-theorem exists_nat_eq_mul {E : Type} [Field E] [NumberField E] {a : 𝓞 E} (ha : a ≠ 0) :
-    ∃ (k : ℕ) (b : 𝓞 E), k ≠ 0 ∧ (k : 𝓞 E) = b * a := by
+theorem exists_nat_eq_mul {E : Type} [Field E] [NumberField E] {a : 𝓞 E} (ha : a ≠ 0)
+    : ∃ (k : ℕ) (b : 𝓞 E), k ≠ 0 ∧ (k : 𝓞 E) = b * a := by
   obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.1 (Ideal.absNorm_mem (Ideal.span {a}))
   refine ⟨Ideal.absNorm (Ideal.span {a}), b, ?_, hb.symm⟩
   rw [Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]
   exact ha
 
-theorem exists_embedding : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] [Module.Free ℤ Λ] [Module.Finite ℤ Λ], ∃ N : ℕ, Module.finrank ℚ E * N = Module.finrank ℤ Λ ∧ ∃ e : Λ →+ (Fin N → E), Function.Injective e ∧ (∀ (a : 𝓞 E) x, e (a • x) = (a : E) • e x) ∧ ∀ v : Fin N → E, ∃ (k : ℕ) (x : Λ), k ≠ 0 ∧ e x = k • v := by
+theorem exists_embedding
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Λ : Type) [AddCommGroup Λ]
+        [Module (𝓞 E) Λ] [Module.Free ℤ Λ] [Module.Finite ℤ Λ],
+      ∃ N : ℕ,
+        Module.finrank ℚ E * N = Module.finrank ℤ Λ
+          ∧ ∃ e : Λ →+ (Fin N → E),
+            Function.Injective e ∧ (∀ (a : 𝓞 E) x, e (a • x) = (a : E) • e x)
+              ∧ ∀ v : Fin N → E, ∃ (k : ℕ) (x : Λ), k ≠ 0 ∧ e x = k • v := by
   intro E _ _ _ Λ _ _ _ _
   let f : Λ →ₗ[𝓞 E] E ⊗[𝓞 E] Λ := TensorProduct.mk (𝓞 E) E Λ 1
   have hb : IsBaseChange E f := TensorProduct.isBaseChange _ _ _
@@ -51,8 +61,14 @@ theorem exists_embedding : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
       rw [this, smul_zero]
     exact (smul_eq_zero.1 hkx).resolve_left (by exact_mod_cast hk)
   let g := (Module.finBasis E (E ⊗[𝓞 E] Λ)).equivFun
-  refine ⟨Module.finrank E (E ⊗[𝓞 E] Λ), hrank,
-    AddMonoidHom.mk' (fun x => g (f x)) (fun x y => by simp only [map_add (f := _)]), ?_, ?_, ?_⟩
+  refine ⟨
+    Module.finrank E (E ⊗[𝓞 E] Λ),
+    hrank,
+    AddMonoidHom.mk' (fun x => g (f x)) (fun x y => by simp only [map_add (f := _)]),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · refine (injective_iff_map_eq_zero _).2 fun x hx => htors x ?_
     exact g.map_eq_zero_iff.1 hx
   · intro a x
@@ -65,6 +81,7 @@ theorem exists_embedding : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
     refine ⟨k, b • x, hk, ?_⟩
     change g (f (b • x)) = k • v
     have hs' : (s : 𝓞 E) • g.symm v = f x := hs
-    rw [map_smul, ← hs', ← mul_smul, ← hkb, Nat.cast_smul_eq_nsmul, map_nsmul, LinearEquiv.apply_symm_apply]
+    rw [map_smul, ← hs', ← mul_smul, ← hkb, Nat.cast_smul_eq_nsmul, map_nsmul,
+      LinearEquiv.apply_symm_apply]
 
 end GlobalTheory.CompanionTheory.Ar.Cusp.Dict.LatticeCoordinates

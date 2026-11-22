@@ -11,7 +11,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry DividedPowers
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.PDA
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.PDA
 
 namespace FubiniStudyChowHeightFormula₂.Adr
 
@@ -19,8 +20,11 @@ variable {R : Type} [CommRing R] {I : Ideal R} {X : Scheme.{0}} {κ : DividedPow
 
 section Push
 
-variable (S : Thick (dp0 R) s) {A : Type} [CommRing A] (a : S.B →+* A) {JA : Ideal A} (θ : DividedPowers JA)
-  (ha : IsDPMorphism S.δ θ a)
+variable
+  (S : Thick (dp0 R) s)
+  {A : Type} [CommRing A]
+  (a : S.B →+* A)
+  {JA : Ideal A} (θ : DividedPowers JA) (ha : IsDPMorphism S.δ θ a)
 
 include ha in
 theorem push_ker : RingHom.ker S.π ≤ RingHom.ker ((Ideal.Quotient.mk JA).comp a) := fun b hb ↦
@@ -57,10 +61,13 @@ def pushHom : S ⟶ push S a θ ha hn where
   dp := ha
   pt := rfl
 
-def pushDesc {V : Thick (dp0 R) s} (φ : S ⟶ V) (G : A →+* V.B) (hG : IsDPMorphism θ V.δ G)
-    (e : G.comp a = (φ.φ : S.B →+* V.B)) : push S a θ ha hn ⟶ V where
+def pushDesc
+    {V : Thick (dp0 R) s}
+    (φ : S ⟶ V) (G : A →+* V.B) (hG : IsDPMorphism θ V.δ G) (e : G.comp a = (φ.φ : S.B →+* V.B))
+    : push S a θ ha hn ⟶ V where
   φ := { G with commutes' := fun r ↦ (DFunLike.congr_fun e _).trans (φ.φ.commutes r) }
-  φ₀ := Ideal.Quotient.lift JA (V.π.comp G) fun _ hc ↦ (V.ker _).2 (hG.1 (Ideal.mem_map_of_mem _ hc))
+  φ₀ :=
+    Ideal.Quotient.lift JA (V.π.comp G) fun _ hc ↦ (V.ker _).2 (hG.1 (Ideal.mem_map_of_mem _ hc))
   comm := fun _ ↦ rfl
   dp := hG
   pt := by
@@ -74,10 +81,12 @@ def pushDesc {V : Thick (dp0 R) s} (φ : S ⟶ V) (G : A →+* V.B) (hG : IsDPMo
 
 end Push
 
-theorem exists_trunc (S : Thick (dp0 R) s) (hS : InN κ S) (n : ℕ) (hn : 1 ≤ n) :
-    ∃ (P : Thick (dp0 R) s) (i : S ⟶ P), InN κ P ∧ IsLev P.δ n ∧
-      ∀ (V : Thick (dp0 R) s), IsLev V.δ n → ∀ (φ : S ⟶ V), ∃! ψ : P ⟶ V, i ≫ ψ = φ := by
-  obtain ⟨A, _, a, JA, θ, ha, hlev, hext, hsurj, huniv⟩ := ring_trunc κ (algebraMap R S.B) S.δ hS n hn
+theorem exists_trunc (S : Thick (dp0 R) s) (hS : InN κ S) (n : ℕ) (hn : 1 ≤ n)
+    : ∃ (P : Thick (dp0 R) s) (i : S ⟶ P),
+      InN κ P ∧ IsLev P.δ n
+        ∧ ∀ (V : Thick (dp0 R) s), IsLev V.δ n → ∀ (φ : S ⟶ V), ∃! ψ : P ⟶ V, i ≫ ψ = φ := by
+  obtain ⟨A, _, a, JA, θ, ha, hlev, hext, hsurj, huniv⟩ :=
+    ring_trunc κ (algebraMap R S.B) S.δ hS n hn
   have hnil : IsNilDP θ := Fil.nil_of_lev hlev
   refine ⟨push S a θ ha hnil, pushHom S a θ ha hnil, hext, hlev, ?_⟩
   intro V hV φ
@@ -94,10 +103,11 @@ theorem exists_trunc (S : Thick (dp0 R) s) (hS : InN κ S) (n : ℕ) (hn : 1 ≤
     have h2 : G (a b) = φ.φ b := DFunLike.congr_fun hGa b
     exact h1.symm.trans h2.symm
 
-theorem exists_adj_one (S : Thick (dp0 R) s) (hS : InN κ S) (n : ℕ) (hn : 1 ≤ n) :
-    ∃ (P : Thick (dp0 R) s) (i : S ⟶ P) (y : P.B), InN κ P ∧ IsLev P.δ n ∧ y ∈ P.J ∧
-      ∀ (V : Thick (dp0 R) s), IsLev V.δ n → ∀ (φ : S ⟶ V) (z : V.B), z ∈ V.J →
-        ∃! ψ : P ⟶ V, i ≫ ψ = φ ∧ ψ.φ y = z := by
+theorem exists_adj_one (S : Thick (dp0 R) s) (hS : InN κ S) (n : ℕ) (hn : 1 ≤ n)
+    : ∃ (P : Thick (dp0 R) s) (i : S ⟶ P) (y : P.B),
+      InN κ P ∧ IsLev P.δ n ∧ y ∈ P.J
+        ∧ ∀ (V : Thick (dp0 R) s),
+          IsLev V.δ n → ∀ (φ : S ⟶ V) (z : V.B), z ∈ V.J → ∃! ψ : P ⟶ V, i ≫ ψ = φ ∧ ψ.φ y = z := by
   obtain ⟨A, _, a, JA, θ, y, ha, hlev, hext, hy, huniv⟩ := ring_adj κ (algebraMap R S.B) S.δ hS n hn
   have hnil : IsNilDP θ := Fil.nil_of_lev hlev
   refine ⟨push S a θ ha hnil, pushHom S a θ ha hnil, y, hext, hlev, hy, ?_⟩
@@ -118,10 +128,13 @@ theorem exists_adj_one (S : Thick (dp0 R) s) (hS : InN κ S) (n : ℕ) (hn : 1 �
     refine Thick.Hom.ext' (AlgHom.ext fun x ↦ ?_)
     exact DFunLike.congr_fun heq x
 
-theorem exists_adj' (S : Thick (dp0 R) s) (hS : InN κ S) (d n : ℕ) (hn : 1 ≤ n) :
-    ∃ (P : Thick (dp0 R) s) (i : S ⟶ P) (y : Fin d → P.B), InN κ P ∧ IsLev P.δ n ∧ (∀ k, y k ∈ P.J) ∧
-      ∀ (V : Thick (dp0 R) s), IsLev V.δ n → ∀ (φ : S ⟶ V) (z : Fin d → V.B), (∀ k, z k ∈ V.J) →
-        ∃! ψ : P ⟶ V, i ≫ ψ = φ ∧ ∀ k, ψ.φ (y k) = z k := by
+theorem exists_adj' (S : Thick (dp0 R) s) (hS : InN κ S) (d n : ℕ) (hn : 1 ≤ n)
+    : ∃ (P : Thick (dp0 R) s) (i : S ⟶ P) (y : Fin d → P.B),
+      InN κ P ∧ IsLev P.δ n ∧ (∀ k, y k ∈ P.J)
+        ∧ ∀ (V : Thick (dp0 R) s),
+          IsLev V.δ n
+            → ∀ (φ : S ⟶ V) (z : Fin d → V.B),
+              (∀ k, z k ∈ V.J) → ∃! ψ : P ⟶ V, i ≫ ψ = φ ∧ ∀ k, ψ.φ (y k) = z k := by
   induction d with
   | zero =>
     obtain ⟨P, i, hP, hlev, huniv⟩ := exists_trunc S hS n hn

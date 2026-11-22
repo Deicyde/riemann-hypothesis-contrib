@@ -11,11 +11,14 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FiniteOpenHo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
-theorem GlobalTheory.CompanionTheory.Ar.BT.btOrder_isHopfOrder_of_finOpenSub :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens), Γ.IsFinOpenSub U → IsHopfOrder (Γ.btOrder U) := by
+theorem GlobalTheory.CompanionTheory.Ar.BT.btOrder_isHopfOrder_of_finOpenSub
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T]
+        [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens),
+      Γ.IsFinOpenSub U → IsHopfOrder (Γ.btOrder U) := by
   intro R _ _ _ T _ _ Γ U hU
   obtain ⟨H, A, hH, hA, hAf⟩ := GlobalTheory.T.finite_open_hopf_order R T Γ U hU
   have key : Γ.btOrder U = indOrder H.subtype A := by

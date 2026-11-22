@@ -10,9 +10,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 open UpperTheory.V UpperTheory.V.PropA Formalism.GaloisCohomology
 
-theorem UpperTheory.V.PropA.torsFin :
-    ∀ (l : ℕ) [Fact l.Prime] (D : Type) [AddCommGroup D] [Module ℤ_[l] D], Module.Finite ℤ_[l] (D →ₗ[ℤ_[l]] QZ l) →
-      {φ : D | (l : ℤ_[l]) • φ = 0}.Finite := by
+theorem UpperTheory.V.PropA.torsFin
+    : ∀ (l : ℕ) [Fact l.Prime] (D : Type) [AddCommGroup D] [Module ℤ_[l] D],
+      Module.Finite ℤ_[l] (D →ₗ[ℤ_[l]] QZ l) → {φ : D | (l : ℤ_[l]) • φ = 0}.Finite := by
   intro l _ D _ _ hfin
   have hl : l.Prime := Fact.out
   obtain ⟨ι, hιinj, hιrange, -⟩ := UpperTheory.V.Kum.zmodToQZ l 1
@@ -81,8 +81,9 @@ theorem UpperTheory.V.PropA.torsFin :
   · intro φ hφ ψ hψ hfe
     have hφ' : (l : ℤ_[l]) • φ = 0 := hφ
     have hψ' : (l : ℤ_[l]) • ψ = 0 := hψ
-    have := hsep (φ - ψ) (by rw [smul_sub, hφ', hψ', sub_zero]) (fun g hg => by
-      have := congr_fun hfe ⟨g, hg⟩
-      simp only [f] at this
-      rw [map_sub, this, sub_self])
+    have :=
+      hsep (φ - ψ) (by rw [smul_sub, hφ', hψ', sub_zero]) (fun g hg => by
+        have := congr_fun hfe ⟨g, hg⟩
+        simp only [f] at this
+        rw [map_sub, this, sub_self])
     exact sub_eq_zero.mp this

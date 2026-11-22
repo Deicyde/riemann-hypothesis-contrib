@@ -32,14 +32,17 @@ theorem schatten_two_mul_le (a b : Mat n) : S2 (a * b) ≤ S2 a * S2 b := by
   have key : ∀ i j, ‖(a * b) i j‖ ^ 2 ≤ (∑ k, ‖a i k‖ ^ 2) * (∑ k, ‖b k j‖ ^ 2) := by
     intro i j
     rw [Matrix.mul_apply]
-    calc ‖∑ k, a i k * b k j‖ ^ 2 ≤ (∑ k, ‖a i k‖ * ‖b k j‖) ^ 2 := by
-          apply pow_le_pow_left₀ (norm_nonneg _)
-          exact (norm_sum_le _ _).trans (le_of_eq (by simp [norm_mul]))
+    calc
+      ‖∑ k, a i k * b k j‖ ^ 2 ≤ (∑ k, ‖a i k‖ * ‖b k j‖) ^ 2 := by
+        apply pow_le_pow_left₀ (norm_nonneg _)
+        exact (norm_sum_le _ _).trans (le_of_eq (by simp [norm_mul]))
       _ ≤ (∑ k, ‖a i k‖ ^ 2) * (∑ k, ‖b k j‖ ^ 2) := Finset.sum_mul_sq_le_sq_mul_sq _ _ _
-  calc ∑ i, ∑ j, ‖(a * b) i j‖ ^ 2 ≤ ∑ i, ∑ j, (∑ k, ‖a i k‖ ^ 2) * (∑ k, ‖b k j‖ ^ 2) :=
-        Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => key i j
+  calc
+    ∑ i, ∑ j, ‖(a * b) i j‖ ^ 2 ≤ ∑ i, ∑ j, (∑ k, ‖a i k‖ ^ 2) * (∑ k, ‖b k j‖ ^ 2) :=
+      Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => key i j
     _ = (∑ i, ∑ k, ‖a i k‖ ^ 2) * (∑ j, ∑ k, ‖b k j‖ ^ 2) := by rw [Finset.sum_mul_sum]
-    _ = (∑ i, ∑ j, ‖a i j‖ ^ 2) * (∑ i, ∑ j, ‖b i j‖ ^ 2) := by rw [Finset.sum_comm (f := fun j k => ‖b k j‖ ^ 2)]
+    _ = (∑ i, ∑ j, ‖a i j‖ ^ 2) * (∑ i, ∑ j, ‖b i j‖ ^ 2) := by
+      rw [Finset.sum_comm (f := fun j k => ‖b k j‖ ^ 2)]
 
 theorem lg_eq (y : Mat n) : lg y = Real.log (1 + S2 y + S2 y⁻¹) := by
   unfold lg S2
@@ -68,12 +71,13 @@ theorem lg_inv (a : Mat n) (ha : a ∈ GLs n) : lg a⁻¹ = lg a := by
 theorem lg_le_of_mul (u y : Mat n) (hy : y ∈ GLs n) : lg u ≤ lg (u * y) + lg y := by
   have hu : IsUnit y.det := isUnit_iff_ne_zero.mpr hy
   have e : u = u * y * y⁻¹ := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu, Matrix.mul_one]
-  calc lg u = lg (u * y * y⁻¹) := congrArg lg e
+  calc
+    lg u
+      = lg (u * y * y⁻¹) := congrArg lg e
     _ ≤ lg (u * y) + lg y⁻¹ := lg_mul_le _ _
     _ = lg (u * y) + lg y := by rw [lg_inv y hy]
 
-theorem isOpen_GLs : IsOpen (GLs n) :=
-  isOpen_ne_fun (continuous_id.matrix_det) continuous_const
+theorem isOpen_GLs : IsOpen (GLs n) := isOpen_ne_fun (continuous_id.matrix_det) continuous_const
 
 theorem lg_contOn : ContinuousOn lg (GLs n) := by
   intro y hy
@@ -87,7 +91,8 @@ theorem lg_contOn : ContinuousOn lg (GLs n) := by
     intro a _
     apply tendsto_finsetSum
     intro b _
-    have e1 : ContinuousAt (fun x : Mat n => x a b) y := (continuous_id.matrix_elem a b).continuousAt
+    have e1 : ContinuousAt (fun x : Mat n => x a b) y :=
+      (continuous_id.matrix_elem a b).continuousAt
     have e2 : ContinuousAt (fun x : Mat n => x⁻¹ a b) y :=
       ((continuous_id.matrix_elem a b).continuousAt).comp (f := fun x : Mat n => x⁻¹) hinv
     exact (e1.norm.pow 2).add (e2.norm.pow 2)

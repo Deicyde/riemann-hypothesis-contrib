@@ -5,9 +5,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Filter Topology Matrix
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
-open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1
+  PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
 open scoped ComplexConjugate Classical InnerProductSpace
 
 private lemma chi_add (ν ν' : Fin (2 + 2) → ℤ) (θ : Fin (2 + 2) → ℝ) :
@@ -29,13 +34,26 @@ private lemma weak (π : Equiv.Perm (Fin (2 + 2))) (ν μ : Fin (2 + 2) → ℤ)
   rw [← Equiv.sum_comp π, ← Equiv.sum_comp π (fun i => μ i * _)] at h1
   simpa only [Equiv.Perm.one_apply, Equiv.symm_apply_apply] using h1
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.expMul :
-    ∀ π ψ ψ' μ μ', OExp π ψ μ → OExp π ψ' μ' → OExp π (fun k => ψ k * ψ' k) (μ + μ') := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.expMul
+    : ∀ π ψ ψ' μ μ', OExp π ψ μ → OExp π ψ' μ' → OExp π (fun k => ψ k * ψ' k) (μ + μ') := by
   rintro π ψ ψ' μ μ' ⟨J, _, j₀, a, b, ν, hc, he, ha, hb, hν, hw, hg, hg'⟩
     ⟨J', _, j₀', a', b', ν', hc', he', ha', hb', hν', hw', hf, hf'⟩
-  refine ⟨J × J', inferInstance, (j₀, j₀'), fun j h => a j.1 h * a' j.2 h, fun j h => b j.1 h * b' j.2 h,
-    fun j => ν j.1 + ν' j.2, fun j => ⟨(hc j.1).1.mul (hc' j.2).1, (hc j.1).2.mul (hc' j.2).2⟩,
-    fun h k => ?_, ?_, ?_, ?_, fun j θ h => ?_, fun j w y hy => ?_, fun j hj => ?_⟩
+  refine ⟨
+    J × J',
+    inferInstance,
+    (j₀, j₀'),
+    fun j h => a j.1 h * a' j.2 h,
+    fun j h => b j.1 h * b' j.2 h,
+    fun j => ν j.1 + ν' j.2,
+    fun j => ⟨(hc j.1).1.mul (hc' j.2).1, (hc j.1).2.mul (hc' j.2).2⟩,
+    fun h k => ?_,
+    ?_,
+    ?_,
+    ?_,
+    fun j θ h => ?_,
+    fun j w y hy => ?_,
+    fun j hj => ?_
+  ⟩
   · simp only [he, he', Finset.sum_mul_sum, Fintype.sum_prod_type]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring

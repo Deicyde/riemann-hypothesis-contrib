@@ -6,17 +6,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem ker_open {l : ℕ} [Fact l.Prime] {Γ S : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
-    [CommRing S] (ε : Γ →* ℤ_[l]ˣ) (hε : Continuous ε) (φ : ℤ_[l] →+* S) (j : ℕ) (hφ : φ ((l : ℤ_[l]) ^ j) = 0) :
-    IsOpen ((pushCh φ ε).ker : Set Γ) := by
+private theorem ker_open
+    {l : ℕ} [Fact l.Prime]
+    {Γ S : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CommRing S]
+    (ε : Γ →* ℤ_[l]ˣ) (hε : Continuous ε)
+    (φ : ℤ_[l] →+* S) (j : ℕ) (hφ : φ ((l : ℤ_[l]) ^ j) = 0)
+    : IsOpen ((pushCh φ ε).ker : Set Γ) := by
   apply Subgroup.isOpen_of_mem_nhds (g := 1)
   have hc : Continuous fun g => ‖((ε g : ℤ_[l]ˣ) : ℤ_[l]) - 1‖ :=
     ((Units.continuous_val.comp hε).sub continuous_const).norm
-  have hp : (0 : ℝ) < (l : ℝ) ^ (-(j : ℤ)) := zpow_pos (by exact_mod_cast (Fact.out : l.Prime).pos) _
-  have ho : IsOpen {g | ‖((ε g : ℤ_[l]ˣ) : ℤ_[l]) - 1‖ < (l : ℝ) ^ (-(j : ℤ))} := isOpen_lt hc continuous_const
+  have hp : (0 : ℝ) < (l : ℝ) ^ (-(j : ℤ)) :=
+    zpow_pos (by exact_mod_cast (Fact.out : l.Prime).pos) _
+  have ho : IsOpen {g | ‖((ε g : ℤ_[l]ˣ) : ℤ_[l]) - 1‖ < (l : ℝ) ^ (-(j : ℤ))} :=
+    isOpen_lt hc continuous_const
   refine Filter.mem_of_superset (ho.mem_nhds (by simpa using hp)) fun g hg => ?_
   have h1 := (PadicInt.norm_le_pow_iff_mem_span_pow _ j).1 (le_of_lt hg)
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 h1
@@ -26,9 +32,10 @@ private theorem ker_open {l : ℕ} [Fact l.Prime] {Γ S : Type} [Group Γ] [Topo
     exact (sub_eq_zero.1 this.symm)
   exact Units.ext h2
 
-private theorem lam_comap {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H] (D : GDet n A G) (φ : H →* G)
-    (i : ℕ) (h : H) (a : A) :
-    (D.comap φ).lam i (MonoidAlgebra.single h a) = D.lam i (MonoidAlgebra.single (φ h) a) := by
+private theorem lam_comap
+    {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H]
+    (D : GDet n A G) (φ : H →* G) (i : ℕ) (h : H) (a : A)
+    : (D.comap φ).lam i (MonoidAlgebra.single h a) = D.lam i (MonoidAlgebra.single (φ h) a) := by
   have : (D.comap φ).chi (MonoidAlgebra.single h a) = D.chi (MonoidAlgebra.single (φ h) a) := by
     change D.D _ (MonoidAlgebra.mapDomainRingHom _ φ _) = D.D _ _
     congr 1
@@ -36,10 +43,12 @@ private theorem lam_comap {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group
     simp
   simp only [GDet.lam, this]
 
-private theorem lam_map {n : ℕ} {A B G : Type} [CommRing A] [CommRing B] [Group G] (D : GDet n A G) (f : A →+* B)
-    (i : ℕ) (h : G) (a : A) :
-    f (D.lam i (MonoidAlgebra.single h a)) = (D.map f).lam i (MonoidAlgebra.single h (f a)) := by
-  rw [← ((UpperTheory.V.CA.d_gmap D).2.2.1 f (MonoidAlgebra.single h a)).2 i, MonoidAlgebra.mapRingHom_single]
+private theorem lam_map
+    {n : ℕ} {A B G : Type} [CommRing A] [CommRing B] [Group G]
+    (D : GDet n A G) (f : A →+* B) (i : ℕ) (h : G) (a : A)
+    : f (D.lam i (MonoidAlgebra.single h a)) = (D.map f).lam i (MonoidAlgebra.single h (f a)) := by
+  rw [← ((UpperTheory.V.CA.d_gmap D).2.2.1 f (MonoidAlgebra.single h a)).2 i,
+    MonoidAlgebra.mapRingHom_single]
 
 theorem UpperTheory.V.Pa.Core.patched_lam_conj_twist_approx_annihilated :
     ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (Λ : Lim T) (n : ℕ) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (r : Resid G0.frame O n) (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (u : Pair r B) (J : Ideal B) (D : ℕ) (A : TWAut u J Unit D T) (W : RRObj Λ A) (m : RMaps W), Adapted T (r := r) → ∀ (i : ℕ) (g g' : Ph0 Λ), (g' : Λ.Ph) = Λ.ct * g * Λ.ct⁻¹ → ∀ j : ℕ, ∀ᶠ N in (Λ.U : Filter ℕ), ∃ a' : W.R, (W.t.D.lam i (MonoidAlgebra.single g'⁻¹ ((Λ.G.frame.eps O W.R (πo0 Λ g) ^ (1 - (n : ℤ)) : W.Rˣ) : W.R)) - W.t.D.lam i (MonoidAlgebra.single g 1)) - a' ∈ maximalIdeal W.R ^ j ∧ (m.ρ N a' = 0 ∨ ∀ x : (A.A N).M, (fEl (T.Nq N) (A.A N).U * m.ρ N a') ^ A.ex • x = 0) := by

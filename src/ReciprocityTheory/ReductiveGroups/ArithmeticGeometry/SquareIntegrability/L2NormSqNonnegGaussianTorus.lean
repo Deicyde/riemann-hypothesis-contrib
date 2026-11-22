@@ -11,8 +11,8 @@ open NumberField Complex
 
 noncomputable section
 
-theorem jof_Hf_smul_right {ι : Type} [Fintype ι] (x u : EuclideanSpace ℂ ι) (c : ℂ) :
-    Hf x (c • u) = (starRingEnd ℂ) c * Hf x u := by
+theorem jof_Hf_smul_right {ι : Type} [Fintype ι] (x u : EuclideanSpace ℂ ι) (c : ℂ)
+    : Hf x (c • u) = (starRingEnd ℂ) c * Hf x u := by
   simp only [Hf, PiLp.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by ring
 
@@ -21,8 +21,9 @@ theorem jof_Hf_conj {ι : Type} [Fintype ι] (v w : EuclideanSpace ℂ ι) : sta
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [Complex.star_def, mul_comm]
 
-theorem Hf_single {ι : Type} [Fintype ι] [DecidableEq ι] (j j' : ι) :
-    Hf (EuclideanSpace.single j (1 : ℂ)) (EuclideanSpace.single j' 1) = if j = j' then 1 else 0 := by
+theorem Hf_single {ι : Type} [Fintype ι] [DecidableEq ι] (j j' : ι)
+    : Hf (EuclideanSpace.single j (1 : ℂ)) (EuclideanSpace.single j' 1)
+      = if j = j' then 1 else 0 := by
   simp only [Hf, PiLp.single_apply]
   by_cases h : j = j'
   · subst h
@@ -34,11 +35,13 @@ theorem Hf_single {ι : Type} [Fintype ι] [DecidableEq ι] (j j' : ι) :
       simp [h]
     · simp [h1]
 
-theorem sum_fin_le {M : Type*} [AddCommMonoid M] {ρ N : ℕ} (h : ρ ≤ N) (f : Fin ρ → M) :
-    ∑ k : Fin N, (if h' : k.val < ρ then f ⟨k, h'⟩ else 0) = ∑ s, f s := by
-  have key : ∀ M, ∑ k : Fin M, (if h' : k.val < ρ then f ⟨k, h'⟩ else 0) =
-      ∑ k ∈ Finset.range M, (if h' : k < ρ then f ⟨k, h'⟩ else 0) :=
-    fun M => Fin.sum_univ_eq_sum_range (fun k => if h' : k < ρ then f ⟨k, h'⟩ else 0) M
+theorem sum_fin_le {M : Type*} [AddCommMonoid M] {ρ N : ℕ} (h : ρ ≤ N) (f : Fin ρ → M)
+    : ∑ k : Fin N, (if h' : k.val < ρ then f ⟨k, h'⟩ else 0) = ∑ s, f s := by
+  have key
+      : ∀ M,
+        ∑ k : Fin M, (if h' : k.val < ρ then f ⟨k, h'⟩ else 0)
+          = ∑ k ∈ Finset.range M, (if h' : k < ρ then f ⟨k, h'⟩ else 0) := fun M =>
+    Fin.sum_univ_eq_sum_range (fun k => if h' : k < ρ then f ⟨k, h'⟩ else 0) M
   rw [key N]
   have hρ : ∑ s, f s = ∑ k ∈ Finset.range ρ, (if h' : k < ρ then f ⟨k, h'⟩ else 0) := by
     rw [← key ρ]
@@ -52,7 +55,8 @@ theorem sum_fin_le {M : Type*} [AddCommMonoid M] {ρ N : ℕ} (h : ρ ≤ N) (f 
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem l2NormSq_nonneg_gaussianTorus (X : PT E) (q : ℕ) {n : ℕ} (F : (Fin n → Vsp X.dim) → ℂ) : 0 ≤ X.l2 q F := by
+theorem l2NormSq_nonneg_gaussianTorus (X : PT E) (q : ℕ) {n : ℕ} (F : (Fin n → Vsp X.dim) → ℂ)
+    : 0 ≤ X.l2 q F := by
   unfold PT.l2
   rw [MeasureTheory.setAverage_eq]
   exact smul_nonneg (inv_nonneg.mpr ENNReal.toReal_nonneg)
@@ -79,24 +83,33 @@ theorem inv_constant_nonneg {X : PT E} {DF : ℕ} (P : Par X DF) : 0 ≤ P.K6⁻
   positivity
 
 open Classical in
-theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
-    (ha : ColAbelStatement) [IsCMField E] (X : PT E) {DF : ℕ} (P : Par X DF)
-    (I : Submodule ℤ (Vsp X.dim)) (hI : IsSplit P I) (σ : E →+* ℂ) (i : ℕ) (hi : i ≤ X.dim σ)
-    (c : ℕ) (hcD : c ≤ DF) :
-    ∃ (y : Fin i → Vsp X.dim) (s : Fin i → (Fin 1 → Vsp X.dim) → ℂ) (μ : Fin i → ℂ),
-      (∀ b, s b ∈ X.Sec P.q 1) ∧
-      (∀ b (xs : Fin c → Vsp X.dim), (∀ k, InPart σ (xs k) ∧ ‖xs k‖ = 1) →
-        ‖d1 (s b) c xs - μ b * ∏ k, Hf (xs k) (y b)‖ ≤ P.eps1 * ‖μ b‖) ∧
-      (∀ b, P.K6⁻¹ * Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q)) * X.l2 P.q (s b) ≤
-        ‖μ b‖ ^ 2) ∧
-      (∀ b, ‖y b‖ ≤ 2) ∧
-      (2 : ℝ) ^ (-(X.r : ℝ) / 2) / 2 ≤
-        ‖(Matrix.of fun a b => Hf (EuclideanSpace.single (⟨σ, Fin.castLE hi a⟩ : Idx X.dim) (1 : ℂ))
-          (y b)).det‖ ∧
-      (∀ b, μ b ≠ 0) := by
+theorem block_data
+    (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement) (ha : ColAbelStatement)
+    [IsCMField E]
+    (X : PT E)
+    {DF : ℕ} (P : Par X DF)
+    (I : Submodule ℤ (Vsp X.dim)) (hI : IsSplit P I)
+    (σ : E →+* ℂ) (i : ℕ) (hi : i ≤ X.dim σ)
+    (c : ℕ) (hcD : c ≤ DF)
+    : ∃ (y : Fin i → Vsp X.dim) (s : Fin i → (Fin 1 → Vsp X.dim) → ℂ) (μ : Fin i → ℂ),
+      (∀ b, s b ∈ X.Sec P.q 1)
+        ∧ (∀ b (xs : Fin c → Vsp X.dim),
+          (∀ k, InPart σ (xs k) ∧ ‖xs k‖ = 1)
+            → ‖d1 (s b) c xs - μ b * ∏ k, Hf (xs k) (y b)‖ ≤ P.eps1 * ‖μ b‖)
+        ∧ (∀ b,
+          P.K6⁻¹ * Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q)) * X.l2 P.q (s b)
+            ≤ ‖μ b‖ ^ 2)
+        ∧ (∀ b, ‖y b‖ ≤ 2)
+        ∧ (2 : ℝ) ^ (-(X.r : ℝ) / 2) / 2
+          ≤ ‖(Matrix.of fun a b => Hf (EuclideanSpace.single (⟨σ, Fin.castLE hi a⟩ : Idx X.dim) (1 : ℂ))
+              (y b)).det‖
+        ∧ (∀ b, μ b ≠ 0) := by
   classical
-  obtain ⟨ρ, hρ⟩ : ∃ ρ, Module.finrank ℂ
-      (Submodule.span ℂ (I : Set (Vsp X.dim)) ⊓ VP σ : Submodule ℂ (Vsp X.dim)) = ρ := ⟨_, rfl⟩
+  obtain ⟨ρ, hρ⟩
+      : ∃ ρ,
+        Module.finrank ℂ (Submodule.span ℂ (I : Set (Vsp X.dim)) ⊓ VP σ : Submodule ℂ (Vsp X.dim))
+          = ρ :=
+    ⟨_, rfl⟩
   obtain ⟨w, xx, u, R, ε, hw, hon, hxu, -, hεb, hc4, hc5, hc6, hc7⟩ := hc E X DF P I hI σ ρ hρ
   obtain ⟨N, bb, hNr, hρN, hbw, hin, hperp, hpars⟩ := onb_data X I σ ρ hρ hI.stable w hw hon
   set e : Fin i → Vsp X.dim := fun a => EuclideanSpace.single (⟨σ, Fin.castLE hi a⟩ : Idx X.dim) (1 : ℂ)
@@ -120,7 +133,8 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
   let M : Matrix (Fin i) (Fin N) ℂ := Matrix.of fun a k => Hf (e a) (bb k)
   have hMM : M * M.conjTranspose = 1 := by
     ext a a'
-    simp only [M, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply, Matrix.one_apply, jof_Hf_conj]
+    simp only [M, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply, Matrix.one_apply,
+      jof_Hf_conj]
     rw [hpars (e a) (e a') (he_in a) (he_in a'), hee]
   obtain ⟨s1, -, hs1⟩ := hx.2.2.2.2.2.1 i N X.r M hMM hNr
   haveI : Nonempty (Fin i → Fin N) := ⟨s1⟩
@@ -141,18 +155,28 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
     by_contra h
     push Not at h
     nlinarith
-  have hT : ∀ t : Fin ρ, ∃ s' ∈ X.Sec P.q 1, ∃ ζ : ℂ, ‖ζ‖ = 1 ∧
-      (∀ xs : Fin c → Vsp X.dim, (∀ k, InPart σ (xs k) ∧ ‖xs k‖ = 1) →
-        ‖d1 s' c xs - ζ * (2 * Real.pi) ^ c * ∏ k, Hf (xs k) (u t)‖ ≤ P.eps1 * (2 * Real.pi * R t) ^ c) ∧
-      P.K6⁻¹ * Real.exp (-(2 * Real.pi * ‖u t‖ ^ 2 / P.q)) * X.l2 P.q s' ≤ (2 * Real.pi * R t) ^ (2 * c) :=
-    fun t => ht E X DF P I hI c hcD σ (xx t) (u t) (hxu t).1 (hxu t).2 (2 * Real.pi * R t) (hc5 t).2
+  have hT
+      : ∀ t : Fin ρ, ∃ s' ∈ X.Sec P.q 1, ∃ ζ : ℂ,
+        ‖ζ‖ = 1
+          ∧ (∀ xs : Fin c → Vsp X.dim,
+            (∀ k, InPart σ (xs k) ∧ ‖xs k‖ = 1)
+              → ‖d1 s' c xs - ζ * (2 * Real.pi) ^ c * ∏ k, Hf (xs k) (u t)‖
+                ≤ P.eps1 * (2 * Real.pi * R t) ^ c)
+          ∧ P.K6⁻¹ * Real.exp (-(2 * Real.pi * ‖u t‖ ^ 2 / P.q)) * X.l2 P.q s'
+            ≤ (2 * Real.pi * R t) ^ (2 * c) := fun t =>
+    ht E X DF P I hI c hcD σ (xx t) (u t) (hxu t).1 (hxu t).2 (2 * Real.pi * R t) (hc5 t).2
       (by have h1 := (hc5 t).1; have hp := Real.pi_pos; nlinarith) (hc6 t)
   choose sT hsT ζ hζ hζb hζl using hT
-  have hA : ∀ k : Fin N, ρ ≤ k.val → ∃ s' ∈ X.Sec P.q 1,
-      (∀ xs : Fin c → Vsp X.dim, (∀ k, InPart σ (xs k) ∧ ‖xs k‖ = 1) →
-        ‖d1 s' c xs - (c.factorial : ℂ) * ∏ k', Hf (xs k') (bb k)‖ ≤ P.eps1 * c.factorial) ∧
-      P.K6⁻¹ * X.l2 P.q s' ≤ (c.factorial : ℝ) ^ 2 :=
-    fun k hk => ha E X DF P I hI c hcD σ (bb k) (hin k) (hperp k hk).1 (hperp k hk).2
+  have hA
+      : ∀ k : Fin N,
+        ρ ≤ k.val
+          → ∃ s' ∈ X.Sec P.q 1,
+            (∀ xs : Fin c → Vsp X.dim,
+                (∀ k, InPart σ (xs k) ∧ ‖xs k‖ = 1)
+                  → ‖d1 s' c xs - (c.factorial : ℂ) * ∏ k', Hf (xs k') (bb k)‖
+                    ≤ P.eps1 * c.factorial)
+              ∧ P.K6⁻¹ * X.l2 P.q s' ≤ (c.factorial : ℝ) ^ 2 := fun k hk =>
+    ha E X DF P I hI c hcD σ (bb k) (hin k) (hperp k hk).1 (hperp k hk).2
   choose sA hsA hAb hAl using hA
   have hK6 := inv_constant_nonneg P
   have hexp1 : Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q)) ≤ 1 := by
@@ -161,8 +185,10 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
     have := ph_nonneg P
     have := Real.pi_pos
     positivity
-  have hexp : ∀ t, Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q)) ≤
-      Real.exp (-(2 * Real.pi * ‖u t‖ ^ 2 / P.q)) := by
+  have hexp
+      : ∀ t,
+        Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q))
+          ≤ Real.exp (-(2 * Real.pi * ‖u t‖ ^ 2 / P.q)) := by
     intro t
     rw [Real.exp_le_exp, neg_le_neg_iff]
     apply div_le_div_of_nonneg_right _ (Nat.cast_nonneg _)
@@ -174,8 +200,10 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
   let s : Fin i → (Fin 1 → Vsp X.dim) → ℂ := fun j =>
     if h : (s0 j).val < ρ then sT ⟨_, h⟩ else sA (s0 j) (not_lt.1 h)
   let μ : Fin i → ℂ := fun j =>
-    if h : (s0 j).val < ρ then ζ ⟨_, h⟩ * (((2 * Real.pi * R ⟨_, h⟩ : ℝ)) : ℂ) ^ c
-    else (c.factorial : ℂ)
+    if h : (s0 j).val < ρ then
+      ζ ⟨_, h⟩ * (((2 * Real.pi * R ⟨_, h⟩ : ℝ)) : ℂ) ^ c
+    else
+      (c.factorial : ℂ)
   have hnμ : ∀ t, ‖ζ t * (((2 * Real.pi * R t : ℝ)) : ℂ) ^ c‖ = (2 * Real.pi * R t) ^ c := by
     intro t
     have := hRpos t
@@ -190,15 +218,17 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
     by_cases h : (s0 j).val < ρ
     · simp only [s, μ, y, dif_pos h]
       have hR := hRpos ⟨_, h⟩
-      have e1 : ζ ⟨_, h⟩ * (((2 * Real.pi * R ⟨_, h⟩ : ℝ)) : ℂ) ^ c *
-          ∏ k, Hf (xs k) (((R ⟨_, h⟩ : ℂ))⁻¹ • u ⟨_, h⟩) =
-          ζ ⟨_, h⟩ * (2 * Real.pi) ^ c * ∏ k, Hf (xs k) (u ⟨_, h⟩) := by
+      have e1
+          : ζ ⟨_, h⟩ * (((2 * Real.pi * R ⟨_, h⟩ : ℝ)) : ℂ) ^ c
+              * ∏ k, Hf (xs k) (((R ⟨_, h⟩ : ℂ))⁻¹ • u ⟨_, h⟩)
+            = ζ ⟨_, h⟩ * (2 * Real.pi) ^ c * ∏ k, Hf (xs k) (u ⟨_, h⟩) := by
         simp only [jof_Hf_smul_right, Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ,
           Fintype.card_fin, map_inv₀, Complex.conj_ofReal]
         have hR' : (R ⟨_, h⟩ : ℂ) ≠ 0 := by exact_mod_cast hR.ne'
         push_cast
-        have key : (2 * (Real.pi : ℂ) * (R ⟨_, h⟩ : ℂ)) ^ c * (1 / (R ⟨_, h⟩ : ℂ)) ^ c =
-            (2 * Real.pi) ^ c := by
+        have key
+            : (2 * (Real.pi : ℂ) * (R ⟨_, h⟩ : ℂ)) ^ c * (1 / (R ⟨_, h⟩ : ℂ)) ^ c
+              = (2 * Real.pi) ^ c := by
           rw [← mul_pow]; congr 1; field_simp
         linear_combination (ζ ⟨_, h⟩ * ∏ x, Hf (xs x) (u ⟨_, h⟩)) * key
       rw [e1, hnμ]
@@ -211,31 +241,33 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
     · simp only [s, μ, dif_pos h]
       rw [hnμ]
       have hl := l2NormSq_nonneg_gaussianTorus X P.q (sT ⟨_, h⟩)
-      calc P.K6⁻¹ * Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q)) * X.l2 P.q (sT ⟨_, h⟩)
-          ≤ P.K6⁻¹ * Real.exp (-(2 * Real.pi * ‖u ⟨_, h⟩‖ ^ 2 / P.q)) * X.l2 P.q (sT ⟨_, h⟩) :=
-            mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left (hexp _) hK6) hl
+      calc
+        P.K6⁻¹ * Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q)) * X.l2 P.q (sT ⟨_, h⟩)
+            ≤ P.K6⁻¹ * Real.exp (-(2 * Real.pi * ‖u ⟨_, h⟩‖ ^ 2 / P.q)) * X.l2 P.q (sT ⟨_, h⟩) :=
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left (hexp _) hK6) hl
         _ ≤ (2 * Real.pi * R ⟨_, h⟩) ^ (2 * c) := hζl _
         _ = ((2 * Real.pi * R ⟨_, h⟩) ^ c) ^ 2 := by ring
     · simp only [s, μ, dif_neg h]
       rw [Complex.norm_natCast]
       have hl := l2NormSq_nonneg_gaussianTorus X P.q (sA (s0 j) (not_lt.1 h))
-      calc P.K6⁻¹ * Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q)) *
-            X.l2 P.q (sA (s0 j) (not_lt.1 h))
-          ≤ P.K6⁻¹ * X.l2 P.q (sA (s0 j) (not_lt.1 h)) :=
-            mul_le_mul_of_nonneg_right (mul_le_of_le_one_right hK6 hexp1) hl
+      calc
+        P.K6⁻¹ * Real.exp (-(2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q))
+              * X.l2 P.q (sA (s0 j) (not_lt.1 h))
+            ≤ P.K6⁻¹ * X.l2 P.q (sA (s0 j) (not_lt.1 h)) :=
+          mul_le_mul_of_nonneg_right (mul_le_of_le_one_right hK6 hexp1) hl
         _ ≤ (c.factorial : ℝ) ^ 2 := hAl _ _
   · intro j
     by_cases h : (s0 j).val < ρ
     · simp only [y, dif_pos h]
       have hR := hRpos ⟨_, h⟩
-      rw [norm_smul, norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hR, inv_mul_le_iff₀ hR]
+      rw [norm_smul, norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hR,
+        inv_mul_le_iff₀ hR]
       have := (hc5 ⟨_, h⟩).1
       linarith
     · simp only [y, dif_neg h]
       rw [(hperp _ (not_lt.1 h)).1]
       norm_num
-  ·
-    have hDP := hx.2.2.2.2.2.2.1
+  · have hDP := hx.2.2.2.2.2.2.1
     have hDN := hx.2.2.2.2.2.2.2.1
     let wv : Fin N → Fin i → ℂ := fun k a => Hf (e a) (bb k)
     let εc : Fin i → Fin N → ℂ := fun j k =>
@@ -259,14 +291,16 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
         simp only [wv]
         rw [← hws, ← h4, div_eq_inv_mul]
       · simp only [y, dif_neg h, εc, wv, zero_mul, Finset.sum_const_zero, add_zero]
-    have hmat : (Matrix.of fun a b => Hf (EuclideanSpace.single (⟨σ, Fin.castLE hi a⟩ : Idx X.dim) (1 : ℂ))
-        (y b)) = Matrix.of fun a j => (wv (s0 j) + ∑ k, εc j k • wv k) a := by
+    have hmat
+        : (Matrix.of fun a b =>
+            Hf (EuclideanSpace.single (⟨σ, Fin.castLE hi a⟩ : Idx X.dim) (1 : ℂ)) (y b))
+          = Matrix.of fun a j => (wv (s0 j) + ∑ k, εc j k • wv k) a := by
       ext a j
       simp only [Matrix.of_apply, Pi.add_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
       exact hentry a j
     have hold : (Matrix.of fun a j => wv (s0 j) a).det = (M.submatrix id s0).det := rfl
-    have hmax : ∀ σ' : Fin i → Fin N, ‖(Matrix.of fun a j => wv (σ' j) a).det‖ ≤ Δ :=
-      fun σ' => hs0 σ'
+    have hmax : ∀ σ' : Fin i → Fin N, ‖(Matrix.of fun a j => wv (σ' j) a).det‖ ≤ Δ := fun σ' =>
+      hs0 σ'
     have hpert := hDP ℂ i (Fin N) wv s0 εc Δ hmax
 
     set B : ℝ := Real.sqrt ρ / (30 * ρ ^ 2) with hB
@@ -285,25 +319,25 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
       · rw [if_neg h]
         simp [εc, dif_neg h]
     have hprod : ∏ j, (1 + ∑ k, ‖εc j k‖) ≤ (1 + B) ^ ρ := by
-      calc ∏ j, (1 + ∑ k, ‖εc j k‖)
-          ≤ ∏ j, (if (s0 j).val < ρ then 1 + B else 1) := by
-            refine Finset.prod_le_prod₀ (fun j _ => by positivity) fun j _ => ?_
-            have := hrow j
-            by_cases h : (s0 j).val < ρ
-            · simp only [h, if_true] at this ⊢; linarith
-            · simp only [h, if_false] at this ⊢; linarith
+      calc
+        ∏ j, (1 + ∑ k, ‖εc j k‖) ≤ ∏ j, (if (s0 j).val < ρ then 1 + B else 1) := by
+          refine Finset.prod_le_prod₀ (fun j _ => by positivity) fun j _ => ?_
+          have := hrow j
+          by_cases h : (s0 j).val < ρ
+          · simp only [h, if_true] at this ⊢; linarith
+          · simp only [h, if_false] at this ⊢; linarith
         _ = (1 + B) ^ (Finset.univ.filter fun j => (s0 j).val < ρ).card := by
-            rw [Finset.prod_ite, Finset.prod_const_one, mul_one, Finset.prod_const]
+          rw [Finset.prod_ite, Finset.prod_const_one, mul_one, Finset.prod_const]
         _ ≤ (1 + B) ^ ρ := by
-            apply pow_le_pow_right₀ (by linarith)
-            have : (Finset.univ.filter fun j => (s0 j).val < ρ).card ≤ (Finset.range ρ).card := by
-              apply Finset.card_le_card_of_injOn (fun j => (s0 j).val)
-              · intro j hj
-                simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at hj
-                simpa using hj
-              · intro j _ j' _ hjj
-                exact hinj (Fin.ext hjj)
-            simpa using this
+          apply pow_le_pow_right₀ (by linarith)
+          have : (Finset.univ.filter fun j => (s0 j).val < ρ).card ≤ (Finset.range ρ).card := by
+            apply Finset.card_le_card_of_injOn (fun j => (s0 j).val)
+            · intro j hj
+              simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at hj
+              simpa using hj
+            · intro j _ j' _ hjj
+              exact hinj (Fin.ext hjj)
+          simpa using this
     have hhalf : (1 + B) ^ ρ - 1 ≤ 1 / 2 := by
       rcases Nat.eq_zero_or_pos ρ with h0 | hpos
       · subst h0; norm_num
@@ -329,11 +363,13 @@ theorem block_data (hx : Ext.All) (hc : CharStatement) (ht : ColTorusStatement)
       nlinarith [hprod, hhalf]
     rw [hmat]
     have h2 : ‖(Matrix.of fun a j => wv (s0 j) a).det‖ = Δ := by rw [hold]
-    have h4 : Δ - ‖(Matrix.of fun a j => (wv (s0 j) + ∑ k, εc j k • wv k) a).det -
-        (Matrix.of fun a j => wv (s0 j) a).det‖ ≤
-        ‖(Matrix.of fun a j => (wv (s0 j) + ∑ k, εc j k • wv k) a).det‖ := by
-      have := norm_sub_norm_le (Matrix.of fun a j => wv (s0 j) a).det
-        (Matrix.of fun a j => (wv (s0 j) + ∑ k, εc j k • wv k) a).det
+    have h4
+        : Δ - ‖(Matrix.of fun a j => (wv (s0 j) + ∑ k, εc j k • wv k) a).det -
+            (Matrix.of fun a j => wv (s0 j) a).det‖
+          ≤ ‖(Matrix.of fun a j => (wv (s0 j) + ∑ k, εc j k • wv k) a).det‖ := by
+      have :=
+        norm_sub_norm_le (Matrix.of fun a j => wv (s0 j) a).det
+          (Matrix.of fun a j => (wv (s0 j) + ∑ k, εc j k • wv k) a).det
       rw [h2, norm_sub_rev] at this
       linarith
     linarith [hpert, hfac, h4, hΔr]

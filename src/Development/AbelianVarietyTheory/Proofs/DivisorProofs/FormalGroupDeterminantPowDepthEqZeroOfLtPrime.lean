@@ -12,28 +12,32 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MatrixVariab
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh GlobalTheory.FGDepth
+open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh
+  GlobalTheory.FGDepth
 
 namespace GlobalTheory.FGDepth
 
-theorem val_natCast_nonneg {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (n : ℕ) :
-    0 ≤ v (n : C) := by
+theorem val_natCast_nonneg {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (n : ℕ)
+    : 0 ≤ v (n : C) := by
   induction n with
   | zero => simp
   | succ n ih =>
     push_cast
     exact (le_min ih (le_of_eq (AddValuation.map_one v).symm)).trans (AddValuation.map_add v _ _)
 
-theorem val_intCast_nonneg {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (n : ℤ) :
-    0 ≤ v (n : C) := by
+theorem val_intCast_nonneg {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (n : ℤ)
+    : 0 ≤ v (n : C) := by
   obtain ⟨m, rfl | rfl⟩ := Int.eq_nat_or_neg n
   · rw [Int.cast_natCast]
     exact val_natCast_nonneg v m
   · rw [Int.cast_neg, AddValuation.map_neg, Int.cast_natCast]
     exact val_natCast_nonneg v m
 
-theorem val_natCast_eq_zero {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) (p : ℕ)
-    (hp : p.Prime) (hv : v (p : C) = 1) (n : ℕ) (hn : ¬ p ∣ n) : v (n : C) = 0 := by
+theorem val_natCast_eq_zero
+    {C : Type} [Field C]
+    (v : AddValuation C (WithTop ℝ)) (p : ℕ) (hp : p.Prime) (hv : v (p : C) = 1)
+    (n : ℕ) (hn : ¬ p ∣ n)
+    : v (n : C) = 0 := by
   have h0 := val_natCast_nonneg v n
   refine le_antisymm ?_ h0
   by_contra hlt
@@ -59,9 +63,14 @@ end GlobalTheory.FGDepth
 
 namespace GlobalTheory.FGDepth
 
-theorem detDepth_eq_zero_of_lt : ∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (p : ℕ), p.Prime → v (p : C) = 1 → ∀ (i d c : ℕ) (G : LogFGL v d) (u : Fin i → Fin d → C), IsSatFrame v u → c < p → detDepth G u c = 0 := by
+theorem detDepth_eq_zero_of_lt
+    : ∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (p : ℕ),
+      p.Prime → v (p : C) = 1
+        → ∀ (i d c : ℕ) (G : LogFGL v d) (u : Fin i → Fin d → C),
+          IsSatFrame v u → c < p → detDepth G u c = 0 := by
   intro C _ _ v p hp hv i d c G u hu hc
-  obtain ⟨hlo, hcont, -⟩ := GlobalTheory.T.formalGroupDeterminantPowDepth_bounds C v p hp hv i d c G u hu
+  obtain ⟨hlo, hcont, -⟩ :=
+    GlobalTheory.T.formalGroupDeterminantPowDepth_bounds C v p hp hv i d c G u hu
   obtain ⟨-, -, hone, hrow⟩ := GlobalTheory.T.matrixVariablesDeterminantPow_monomial_shape C i c
   set α₀ : (Σ _ : Fin i, Fin i) →₀ ℕ := ∑ a : Fin i, Finsupp.single ⟨a, a⟩ c with hα₀
   have hmem : α₀ ∈ (detPow C i c).support := by
@@ -80,7 +89,9 @@ theorem detDepth_eq_zero_of_lt : ∀ (C : Type) [Field C] [CharZero C] (v : AddV
     obtain ⟨b, a⟩ := x
     have hle : α₀ ⟨b, a⟩ ≤ c := by
       rw [← (hrow α₀ hmem).1 a]
-      exact Finset.single_le_sum (f := fun b' => α₀ ⟨b', a⟩) (fun _ _ => Nat.zero_le _)
+      exact Finset.single_le_sum
+        (f := fun b' => α₀ ⟨b', a⟩)
+        (fun _ _ => Nat.zero_le _)
         (Finset.mem_univ b)
     omega
   have hle : content v (detPow C i c) ≤ 0 := by

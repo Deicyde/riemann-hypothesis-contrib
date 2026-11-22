@@ -10,23 +10,28 @@ open scoped Pointwise ENNReal NNReal
 
 namespace GlobalTheory.QuadFibre
 
-theorem exists_map_div_eq_smul {K : Type} [NontriviallyNormedField K] [ProperSpace K]
-    [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [ν.IsAddHaarMeasure] {a : K} (ha : a ≠ 0) :
-    ∃ c : ℝ≥0, c ≠ 0 ∧ Measure.map (fun t : K => t / a) ν = c • ν := by
+theorem exists_map_div_eq_smul
+    {K : Type} [NontriviallyNormedField K] [ProperSpace K] [MeasurableSpace K] [BorelSpace K]
+    (ν : Measure K) [ν.IsAddHaarMeasure]
+    {a : K} (ha : a ≠ 0)
+    : ∃ c : ℝ≥0, c ≠ 0 ∧ Measure.map (fun t : K => t / a) ν = c • ν := by
   refine ⟨distribHaarChar K (Units.mk0 a ha), (distribHaarChar_pos).ne', ?_⟩
   ext S hS
   have hpre : (fun t : K => t / a) ⁻¹' S = (Units.mk0 a ha) • S := by
     ext t
-    rw [Set.mem_preimage, Set.mem_smul_set_iff_inv_smul_mem, Units.smul_def, Units.val_inv_eq_inv_val,
-      Units.val_mk0, smul_eq_mul, div_eq_inv_mul]
+    rw [Set.mem_preimage, Set.mem_smul_set_iff_inv_smul_mem, Units.smul_def,
+      Units.val_inv_eq_inv_val, Units.val_mk0, smul_eq_mul, div_eq_inv_mul]
   have hf : Measurable (fun t : K => t / a) := (continuous_id.div_const a).measurable
-  rw [Measure.map_apply hf hS, hpre, ← distribHaarChar_mul ν,
-    Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
+  rw [Measure.map_apply hf hS, hpre, ← distribHaarChar_mul ν, Measure.smul_apply, ENNReal.smul_def,
+    smul_eq_mul]
 
-theorem avg_div_eq {K : Type} [NontriviallyNormedField K] [ProperSpace K]
-    [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [ν.IsAddHaarMeasure] {a : K} (ha : a ≠ 0)
-    {U : Set K} (hU : MeasurableSet U) {g : K → ℝ≥0∞} (hg : Measurable g) :
-    (ν {r | r / a ∈ U})⁻¹ * ∫⁻ t, g (t / a) ∂ν = (ν U)⁻¹ * ∫⁻ u, g u ∂ν := by
+theorem avg_div_eq
+    {K : Type} [NontriviallyNormedField K] [ProperSpace K] [MeasurableSpace K] [BorelSpace K]
+    (ν : Measure K) [ν.IsAddHaarMeasure]
+    {a : K} (ha : a ≠ 0)
+    {U : Set K} (hU : MeasurableSet U)
+    {g : K → ℝ≥0∞} (hg : Measurable g)
+    : (ν {r | r / a ∈ U})⁻¹ * ∫⁻ t, g (t / a) ∂ν = (ν U)⁻¹ * ∫⁻ u, g u ∂ν := by
   obtain ⟨c, hc0, hc⟩ := exists_map_div_eq_smul ν ha
   have hf : Measurable (fun t : K => t / a) := (continuous_id.div_const a).measurable
   have hcU : ν {r | r / a ∈ U} = c * ν U := by
@@ -37,20 +42,23 @@ theorem avg_div_eq {K : Type} [NontriviallyNormedField K] [ProperSpace K]
   have hc0' : (c : ℝ≥0∞) ≠ 0 := by exact_mod_cast hc0
   have hcc : (c : ℝ≥0∞)⁻¹ * c = 1 := ENNReal.inv_mul_cancel hc0' ENNReal.coe_ne_top
   rw [hcU, hcI, ENNReal.mul_inv (Or.inl hc0') (Or.inl ENNReal.coe_ne_top)]
-  calc (c : ℝ≥0∞)⁻¹ * (ν U)⁻¹ * (c * ∫⁻ u, g u ∂ν)
+  calc
+    (c : ℝ≥0∞)⁻¹ * (ν U)⁻¹ * (c * ∫⁻ u, g u ∂ν)
       = (ν U)⁻¹ * (∫⁻ u, g u ∂ν) * ((c : ℝ≥0∞)⁻¹ * c) := by ring
     _ = (ν U)⁻¹ * ∫⁻ u, g u ∂ν := by rw [hcc, mul_one]
 
-theorem disintegration (K V : Type) [NontriviallyNormedField K] [IsUltrametricDist K]
-    [ProperSpace K] [MeasurableSpace K] [BorelSpace K] [AddCommGroup V] [Module K V]
-    [TopologicalSpace V] [IsTopologicalAddGroup V] [ContinuousSMul K V] [LocallyCompactSpace V]
+theorem disintegration
+    (K V : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [ProperSpace K]
+    [MeasurableSpace K] [BorelSpace K] [AddCommGroup V] [Module K V] [TopologicalSpace V]
+    [IsTopologicalAddGroup V] [ContinuousSMul K V] [LocallyCompactSpace V]
     [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
-    (μ : Measure V) [μ.IsAddHaarMeasure] (ν : Measure K) [ν.IsAddHaarMeasure] (q : V → K)
-    (hq : Continuous q) (hq2 : ∀ (c : K) (x : V), q (c • x) = c ^ 2 * q x)
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (ν : Measure K) [ν.IsAddHaarMeasure]
+    (q : V → K) (hq : Continuous q) (hq2 : ∀ (c : K) (x : V), q (c • x) = c ^ 2 * q x)
     (U : Set K) (s : K → K) (hU : IsSqrtOn U s)
-    (hμ : ∀ c : K, ‖c‖ = 1 → Measure.map (fun x : V => c • x) μ = μ)
-    (h0 : μ {x | q x = 0} = 0) (φ : V → ENNReal) (hφ : Measurable φ) :
-    ∫⁻ x, φ x ∂μ = ∫⁻ t, ∫⁻ x, φ x ∂(fibOf μ ν q U s t) ∂ν := by
+    (hμ : ∀ c : K, ‖c‖ = 1 → Measure.map (fun x : V => c • x) μ = μ) (h0 : μ {x | q x = 0} = 0)
+    (φ : V → ENNReal) (hφ : Measurable φ)
+    : ∫⁻ x, φ x ∂μ = ∫⁻ t, ∫⁻ x, φ x ∂(fibOf μ ν q U s t) ∂ν := by
   obtain ⟨hUo, hUc, h1U, hmulU, hinvU, hnormU, hs, hsq⟩ := hU
   have hUm : MeasurableSet U := hUo.measurableSet
   have hνU0 : ν U ≠ 0 := hUo.measure_ne_zero ν ⟨1, h1U⟩
@@ -103,42 +111,54 @@ theorem disintegration (K V : Type) [NontriviallyNormedField K] [IsUltrametricDi
       rw [hshift t t' ht']
     exact continuousAt_const.congr hev
 
-  have hGm : Measurable (fun p : K × V => (ν (p.1 • U))⁻¹ *
-      {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) p) := by
+  have hGm : Measurable (fun p : K × V =>
+      (ν (p.1 • U))⁻¹
+        * {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) p) := by
     refine (hmeas.comp measurable_fst).inv.mul (Measurable.indicator ?_ ?_)
     · exact hφ.comp ((hsm.comp (hdiv.comp (measurable_fst.prodMk (hqm.comp measurable_snd)))).smul
         measurable_snd)
     · exact (hdiv.comp (measurable_fst.prodMk (hqm.comp measurable_snd))) hUm
 
-  have hA : ∀ t : K, ∫⁻ x, φ x ∂(fibOf μ ν q U s t) = ∫⁻ x, (ν (t • U))⁻¹ *
-      {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x) ∂μ := by
-    intro t
-    by_cases ht : t = 0
-    · subst ht
-      rw [fibOf_zero, lintegral_zero_measure]
-      simp [h0U]
-    · have hfm : Measurable (fun x : V => s (t / q x) • x) :=
-        (hsm.comp (hdiv.comp (measurable_const.prodMk hqm))).smul measurable_id
-      have hSm : MeasurableSet (q ⁻¹' (t • U)) := hqm (hUo.smul₀ ht).measurableSet
-      rw [fibOf_ne μ ν q U s ht, lintegral_smul_measure, smul_eq_mul, lintegral_map hφ hfm,
-        ← lintegral_indicator hSm, ← lintegral_const_mul' _ _ (ENNReal.inv_ne_top.mpr (hpos t ht))]
-      refine lintegral_congr fun x => ?_
-      by_cases h : t / q x ∈ U
-      · rw [Set.indicator_of_mem (show x ∈ q ⁻¹' (t • U) from (hmem t ht (q x)).mpr h),
-          Set.indicator_of_mem (show (t, x) ∈ {p : K × V | p.1 / q p.2 ∈ U} from h)]
-      · rw [Set.indicator_of_notMem (show x ∉ q ⁻¹' (t • U) from fun h' => h ((hmem t ht (q x)).mp h')),
-          Set.indicator_of_notMem (show (t, x) ∉ {p : K × V | p.1 / q p.2 ∈ U} from h)]
+  have hA
+      : ∀ t : K,
+        ∫⁻ x, φ x ∂(fibOf μ ν q U s t)
+          = ∫⁻ x, (ν (t • U))⁻¹ *
+            {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x) ∂μ :=
+    by
+      intro t
+      by_cases ht : t = 0
+      · subst ht
+        rw [fibOf_zero, lintegral_zero_measure]
+        simp [h0U]
+      · have hfm : Measurable (fun x : V => s (t / q x) • x) :=
+          (hsm.comp (hdiv.comp (measurable_const.prodMk hqm))).smul measurable_id
+        have hSm : MeasurableSet (q ⁻¹' (t • U)) := hqm (hUo.smul₀ ht).measurableSet
+        rw [fibOf_ne μ ν q U s ht, lintegral_smul_measure, smul_eq_mul, lintegral_map hφ hfm,
+          ← lintegral_indicator hSm,
+          ← lintegral_const_mul' _ _ (ENNReal.inv_ne_top.mpr (hpos t ht))]
+        refine lintegral_congr fun x => ?_
+        by_cases h : t / q x ∈ U
+        · rw [Set.indicator_of_mem (show x ∈ q ⁻¹' (t • U) from (hmem t ht (q x)).mpr h),
+            Set.indicator_of_mem (show (t, x) ∈ {p : K × V | p.1 / q p.2 ∈ U} from h)]
+        · rw [Set.indicator_of_notMem (show x ∉ q ⁻¹' (t • U) from fun h' =>
+              h ((hmem t ht (q x)).mp h')),
+            Set.indicator_of_notMem (show (t, x) ∉ {p : K × V | p.1 / q p.2 ∈ U} from h)]
 
-  have hC : ∀ x : V, q x ≠ 0 → ∫⁻ t, (ν (t • U))⁻¹ *
-      {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x) ∂ν =
-      (ν U)⁻¹ * ∫⁻ u, U.indicator (fun u => φ (s u • x)) u ∂ν := by
+  have hC
+      : ∀ x : V,
+        q x ≠ 0
+          → ∫⁻ t, (ν (t • U))⁻¹ *
+              {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x) ∂ν
+            = (ν U)⁻¹ * ∫⁻ u, U.indicator (fun u => φ (s u • x)) u ∂ν := by
     intro x hx
     have hset : {r : K | r / q x ∈ U} = q x • U := by
       ext r
       rw [Set.mem_ofPred_eq, Set.mem_smul_set_iff_inv_smul_mem₀ hx, smul_eq_mul, div_eq_inv_mul]
-    have hpt : ∀ t : K, (ν (t • U))⁻¹ *
-        {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x) =
-        (ν {r : K | r / q x ∈ U})⁻¹ * U.indicator (fun u => φ (s u • x)) (t / q x) := by
+    have hpt
+        : ∀ t : K,
+          (ν (t • U))⁻¹
+              * {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x)
+            = (ν {r : K | r / q x ∈ U})⁻¹ * U.indicator (fun u => φ (s u • x)) (t / q x) := by
       intro t
       by_cases h : t / q x ∈ U
       · have ht' : t ∈ q x • U := by
@@ -162,15 +182,17 @@ theorem disintegration (K V : Type) [NontriviallyNormedField K] [IsUltrametricDi
       have h := congrArg norm (hsq u hu)
       rw [norm_pow, hnormU u hu] at h
       exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).mp h
-    calc ∫⁻ x, φ (s u • x) ∂μ = ∫⁻ x, φ x ∂(Measure.map (fun x : V => s u • x) μ) :=
-          (lintegral_map hφ (measurable_const_smul (s u))).symm
+    calc
+      ∫⁻ x, φ (s u • x) ∂μ = ∫⁻ x, φ x ∂(Measure.map (fun x : V => s u • x) μ) :=
+        (lintegral_map hφ (measurable_const_smul (s u))).symm
       _ = ∫⁻ x, φ x ∂μ := by rw [hμ _ hn]
   have hae : ∀ᵐ x ∂μ, q x ≠ 0 := by
     rw [ae_iff]
     simpa using h0
-  have hM2 : Measurable (Function.uncurry fun (u : K) (x : V) => U.indicator (fun u => φ (s u • x)) u) := by
-    have : (Function.uncurry fun (u : K) (x : V) => U.indicator (fun u => φ (s u • x)) u) =
-        (Prod.fst ⁻¹' U).indicator (fun p : K × V => φ (s p.1 • p.2)) := by
+  have hM2 : Measurable (Function.uncurry fun (u : K) (x : V) =>
+      U.indicator (fun u => φ (s u • x)) u) := by
+    have : (Function.uncurry fun (u : K) (x : V) => U.indicator (fun u => φ (s u • x)) u)
+        = (Prod.fst ⁻¹' U).indicator (fun p : K × V => φ (s p.1 • p.2)) := by
       funext p
       by_cases h : p.1 ∈ U
       · rw [Function.uncurry_apply_pair, Set.indicator_of_mem h,
@@ -179,28 +201,30 @@ theorem disintegration (K V : Type) [NontriviallyNormedField K] [IsUltrametricDi
           Set.indicator_of_notMem (show p ∉ Prod.fst ⁻¹' U from h)]
     rw [this]
     exact (hφ.comp ((hsm.comp measurable_fst).smul measurable_snd)).indicator (measurable_fst hUm)
-  calc ∫⁻ x, φ x ∂μ = (ν U)⁻¹ * (ν U * ∫⁻ x, φ x ∂μ) := by
-        rw [← mul_assoc, ENNReal.inv_mul_cancel hνU0 hνUt, one_mul]
+  calc
+    ∫⁻ x, φ x ∂μ = (ν U)⁻¹ * (ν U * ∫⁻ x, φ x ∂μ) := by
+      rw [← mul_assoc, ENNReal.inv_mul_cancel hνU0 hνUt, one_mul]
     _ = (ν U)⁻¹ * ∫⁻ u, U.indicator (fun _ => ∫⁻ x, φ x ∂μ) u ∂ν := by
-        rw [lintegral_indicator_const hUm, mul_comm (ν U)]
+      rw [lintegral_indicator_const hUm, mul_comm (ν U)]
     _ = (ν U)⁻¹ * ∫⁻ u, ∫⁻ x, U.indicator (fun u => φ (s u • x)) u ∂μ ∂ν := by
-        congr 1
-        refine lintegral_congr fun u => ?_
-        by_cases hu : u ∈ U
-        · simp [hu, hunit u hu]
-        · simp [hu]
+      congr 1
+      refine lintegral_congr fun u => ?_
+      by_cases hu : u ∈ U
+      · simp [hu, hunit u hu]
+      · simp [hu]
     _ = (ν U)⁻¹ * ∫⁻ x, ∫⁻ u, U.indicator (fun u => φ (s u • x)) u ∂ν ∂μ := by
-        rw [lintegral_lintegral_swap hM2.aemeasurable]
+      rw [lintegral_lintegral_swap hM2.aemeasurable]
     _ = ∫⁻ x, (ν U)⁻¹ * ∫⁻ u, U.indicator (fun u => φ (s u • x)) u ∂ν ∂μ := by
-        rw [lintegral_const_mul' _ _ (ENNReal.inv_ne_top.mpr hνU0)]
+      rw [lintegral_const_mul' _ _ (ENNReal.inv_ne_top.mpr hνU0)]
     _ = ∫⁻ x, ∫⁻ t, (ν (t • U))⁻¹ *
-          {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x) ∂ν ∂μ := by
+          {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x) ∂ν ∂μ :=
+      by
         refine lintegral_congr_ae ?_
         filter_upwards [hae] with x hx
         exact (hC x hx).symm
     _ = ∫⁻ t, ∫⁻ x, (ν (t • U))⁻¹ *
           {p : K × V | p.1 / q p.2 ∈ U}.indicator (fun p => φ (s (p.1 / q p.2) • p.2)) (t, x) ∂μ ∂ν :=
-        (lintegral_lintegral_swap hGm.aemeasurable).symm
+      (lintegral_lintegral_swap hGm.aemeasurable).symm
     _ = ∫⁻ t, ∫⁻ x, φ x ∂(fibOf μ ν q U s t) ∂ν := lintegral_congr fun t => (hA t).symm
 
 end GlobalTheory.QuadFibre

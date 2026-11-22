@@ -8,12 +8,13 @@ public import GroundTheory.AutomorphicForms.Measures
 
 open MeasureTheory ValuativeRel PositivityTheory.Rg.Tf.Loc
 
-theorem UpperTheory.V.Z.Tf.Orb.unitSB :
-    UpperTheory.V.Z.Tf.Orb.UnitSB := by
+theorem UpperTheory.V.Z.Tf.Orb.unitSB : UpperTheory.V.Z.Tf.Orb.UnitSB := by
   intro E _ _ _ _ n
   have := GroundTheory.LocalField.t2Space_of_isNonarchimedeanLocalField E
-  have ho : IsOpen (unitGL (n := Fin n) E : Set (GL (Fin n) E)) := GroundTheory.Automorphic.GLnLocal.isOpen_integralGL E n
-  have hc : IsCompact (unitGL (n := Fin n) E : Set (GL (Fin n) E)) := GroundTheory.Automorphic.GLnLocal.isCompact_integralGL E n
+  have ho : IsOpen (unitGL (n := Fin n) E : Set (GL (Fin n) E)) :=
+    GroundTheory.Automorphic.GLnLocal.isOpen_integralGL E n
+  have hc : IsCompact (unitGL (n := Fin n) E : Set (GL (Fin n) E)) :=
+    GroundTheory.Automorphic.GLnLocal.isCompact_integralGL E n
   refine ⟨ho, hc, ?_, ?_⟩
   · refine (IsLocallyConstant.iff_eventually_eq _).2 fun x => ?_
     by_cases hx : x ∈ (unitGL (n := Fin n) E : Set (GL (Fin n) E))

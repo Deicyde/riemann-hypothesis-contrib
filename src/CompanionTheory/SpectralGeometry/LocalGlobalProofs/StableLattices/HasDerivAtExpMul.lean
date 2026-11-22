@@ -160,7 +160,8 @@ theorem wtLink : CompanionTheory.D.DSIC.WtLink := by
       show σ (tor ((0 : ℝ) • θ)) = 1
       rw [zero_smul, tor_zero]
       exact h1
-    have hd : HasDerivAt (fun t => φ t (v : H))
+    have hd : HasDerivAt
+        (fun t => φ t (v : H))
         ((((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • (v : H)) 0 := by
       have := deriv_zero h θ v
       convert this using 1
@@ -178,17 +179,22 @@ theorem wtLink : CompanionTheory.D.DSIC.WtLink := by
     apply Subtype.ext
     rw [Submodule.coe_smul]
     let θ : Fin n → ℝ := Pi.single a 1
-    have hf : (fun t : ℝ => σ (tor (t • θ)) (v : H)) =
-        fun t : ℝ => Complex.exp ((t : ℂ) * ((μ a : ℂ) * Complex.I)) • (v : H) := by
+    have hf
+        : (fun t : ℝ => σ (tor (t • θ)) (v : H))
+          = fun t : ℝ => Complex.exp ((t : ℂ) * ((μ a : ℂ) * Complex.I)) • (v : H) := by
       funext t
       have ht := hK (t • θ) (tor_mem_K ε _)
-      rw [show tor (t • θ) = Matrix.diagonal (fun b => Complex.exp ((((t • θ) b : ℝ) : ℂ) * Complex.I)) from rfl, ht]
+      rw [show tor (t • θ)
+            = Matrix.diagonal (fun b => Complex.exp ((((t • θ) b : ℝ) : ℂ) * Complex.I)) from
+          rfl,
+        ht]
       congr 2
       simp [θ, Pi.single_apply]
       try (push_cast; ring)
     have d1 := deriv_zero h θ v
     rw [hf] at d1
-    have d2 : HasDerivAt (fun t : ℝ => Complex.exp ((t : ℂ) * ((μ a : ℂ) * Complex.I)) • (v : H))
+    have d2 : HasDerivAt
+        (fun t : ℝ => Complex.exp ((t : ℂ) * ((μ a : ℂ) * Complex.I)) • (v : H))
         (((μ a : ℂ) * Complex.I) • (v : H)) 0 := by
       have := (hasDerivAt_exp_mul ((μ a : ℂ) * Complex.I) 0).smul_const (v : H)
       simpa using this
@@ -201,14 +207,16 @@ theorem wtLink : CompanionTheory.D.DSIC.WtLink := by
       · intro ha
         exact absurd (Finset.mem_univ a) ha
     rw [hsum] at hu
-    calc (E a a v : H) = (-Complex.I * Complex.I) • (E a a v : H) := by
-          rw [show -Complex.I * Complex.I = 1 by rw [neg_mul, Complex.I_mul_I, neg_neg], one_smul]
+    calc
+      (E a a v : H) = (-Complex.I * Complex.I) • (E a a v : H) := by
+        rw [show -Complex.I * Complex.I = 1 by rw [neg_mul, Complex.I_mul_I, neg_neg], one_smul]
       _ = (-Complex.I) • (Complex.I • (E a a v : H)) := by rw [smul_smul]
       _ = (-Complex.I) • (((μ a : ℂ) * Complex.I) • (v : H)) := by rw [hu]
       _ = (μ a : ℂ) • (v : H) := by
-          rw [smul_smul]
-          congr 1
-          rw [show -Complex.I * ((μ a : ℂ) * Complex.I) = (μ a : ℂ) * -(Complex.I * Complex.I) by ring,
-            Complex.I_mul_I, neg_neg, mul_one]
+        rw [smul_smul]
+        congr 1
+        rw [show -Complex.I * ((μ a : ℂ) * Complex.I) = (μ a : ℂ) * -(Complex.I * Complex.I) by
+            ring,
+          Complex.I_mul_I, neg_neg, mul_one]
 
 end GlobalTheory.CompanionTheory.WtLinkPf

@@ -10,7 +10,8 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.ConjugateFieldNorm
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
 open scoped TensorProduct
 
 section Adelic
@@ -18,14 +19,15 @@ section Adelic
 variable (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] [Algebra F E]
 
-def cjF : E →ₐ[F] E :=
-  { (IsCMField.complexConj E : E →+* E) with
-    commutes' := fun x => by
-      have h : algebraMap F E x ∈ maximalRealSubfield E := by
-        rw [mem_maximalRealSubfield_iff]
-        intro φ
-        exact RingHom.congr_fun (IsTotallyReal.complexEmbedding_isReal (φ.comp (algebraMap F E))) x
-      exact (IsCMField.complexConj E).commutes ⟨_, h⟩ }
+def cjF : E →ₐ[F] E := {
+  (IsCMField.complexConj E : E →+* E) with
+  commutes' := fun x => by
+    have h : algebraMap F E x ∈ maximalRealSubfield E := by
+      rw [mem_maximalRealSubfield_iff]
+      intro φ
+      exact RingHom.congr_fun (IsTotallyReal.complexEmbedding_isReal (φ.comp (algebraMap F E))) x
+    exact (IsCMField.complexConj E).commutes ⟨_, h⟩
+}
 
 abbrev Af : Type := FiniteAdeleRing (𝓞 F) F
 
@@ -45,7 +47,8 @@ def HSpace.std (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) : HS
   Gm_herm a b := by by_cases h : a = b <;> simp [cc, Matrix.one_apply, h, eq_comm]
   Gm_det := by simp
   L := Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 E) E)
-  L_fg := Submodule.fg_pi fun _ => by rw [Submodule.one_eq_span]; exact Submodule.fg_span_singleton _
+  L_fg :=
+    Submodule.fg_pi fun _ => by rw [Submodule.one_eq_span]; exact Submodule.fg_span_singleton _
   L_span := by
     refine eq_top_iff.2 fun x _ => ?_
     rw [← Finset.univ_sum_single x]
@@ -69,10 +72,11 @@ def HSpace.std (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) : HS
       refine IsIntegral.sum _ fun a _ => ((hi _).1 (hx a trivial)).mul ?_
       exact ((hi _).1 (hy a trivial)).map (IsCMField.complexConj E : E →+* E).toIntAlgHom
     · intro h a _
-      have := h (Pi.single a 1) fun k _ => by
-        by_cases hk : k = a
-        · subst hk; simpa using Submodule.one_le.1 le_rfl
-        · simp [hk]
+      have :=
+        h (Pi.single a 1) fun k _ => by
+          by_cases hk : k = a
+          · subst hk; simpa using Submodule.one_le.1 le_rfl
+          · simp [hk]
       rw [hh, Finset.sum_eq_single a (fun b _ hb => by simp [hb, cc]) (by simp)] at this
       exact (hi _).2 (by simpa [cc] using this)
 
@@ -91,7 +95,8 @@ def UA (V : HSpace E r) : Subgroup (GL (Fin r) (A ⊗[F] E)) where
   mul_mem' := fun {g h} hg hh x y => by
     rw [Units.val_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hg, hh]
   inv_mem' := fun {g} hg x y => by
-    rw [← hg, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec, Matrix.one_mulVec]
+    rw [← hg, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec,
+      Matrix.one_mulVec]
 
 abbrev GA (V : HSpace E r) : Type := UA F (Ai F) V × UA F (Af F) V
 
@@ -99,11 +104,13 @@ def IsRat (V : HSpace E r) (γ : GL (Fin r) E) (g : GA F V) : Prop :=
   g.1.1.val = γ.val.map (incl F (Ai F)) ∧ g.2.1.val = γ.val.map (incl F (Af F))
 
 def latHat (L : Submodule (𝓞 E) (Fin r → E)) : AddSubgroup (Fin r → Af F ⊗[F] E) :=
-  AddSubgroup.closure {z | ∃ a : Af F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ ∃ x ∈ L, z = fun i => a ⊗ₜ[F] x i}
+  AddSubgroup.closure
+    {z | ∃ a : Af F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ ∃ x ∈ L, z = fun i => a ⊗ₜ[F] x i}
 
 def levelK (V : HSpace E r) (N : ℕ) : Subgroup (GA F V) where
-  carrier := {k | k.1 = 1 ∧ (∀ z, z ∈ latHat F V.L ↔ k.2.1.val.mulVec z ∈ latHat F V.L) ∧
-    ∀ z ∈ latHat F V.L, ∃ w ∈ latHat F V.L, k.2.1.val.mulVec z - z = N • w}
+  carrier :=
+    {k | k.1 = 1 ∧ (∀ z, z ∈ latHat F V.L ↔ k.2.1.val.mulVec z ∈ latHat F V.L) ∧
+      ∀ z ∈ latHat F V.L, ∃ w ∈ latHat F V.L, k.2.1.val.mulVec z - z = N • w}
   one_mem' := ⟨rfl, fun z => by simp, fun z _ => ⟨0, zero_mem _, by simp⟩⟩
   mul_mem' := by
     rintro g h ⟨g1, g2, g3⟩ ⟨h1, h2, h3⟩
@@ -125,10 +132,11 @@ def levelK (V : HSpace E r) (N : ℕ) : Subgroup (GA F V) where
     obtain ⟨w, hw, e1⟩ := g3 _ ((s z).1 hz)
     exact ⟨-w, neg_mem hw, by rw [smul_neg, ← e1, e]; abel⟩
 
-def latAt (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (V : HSpace E r) (g : UA F (Af F) V) :
-    Submodule (𝓞 E) (Fin r → E) :=
-  Submodule.span (𝓞 E) {v | ∃ a ∈ 𝔄, ∃ x : Fin r → E,
-    (∃ z ∈ latHat F V.L, (fun i => incl F (Af F) (x i)) = g.1.val.mulVec z) ∧ v = a • x}
+def latAt (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (V : HSpace E r) (g : UA F (Af F) V)
+    : Submodule (𝓞 E) (Fin r → E) :=
+  Submodule.span (𝓞 E)
+    {v | ∃ a ∈ 𝔄, ∃ x : Fin r → E,
+      (∃ z ∈ latHat F V.L, (fun i => incl F (Af F) (x i)) = g.1.val.mulVec z) ∧ v = a • x}
 
 end Adelic
 
@@ -157,17 +165,11 @@ structure CorePar (R : Nums E) : Type 1 where
   c : Coeff l
   Dw : R.J → Datum H
   Xo : ∀ j, Moduli (Dw j) l
-
   U : ∀ j (σ : c.F →+* ℂ), Unf (Xo j) c σ R.r
-
   V : R.J → HSpace E R.r
-
   dict : ∀ j (σ : c.F →+* ℂ), GoodEmb c σ → GA F (V j) → Σ k, Frame ((U j σ).X k).Ψ R.r
-
   mu : ∀ j (σ : c.F →+* ℂ), GoodEmb c σ → GA F (V j) → ℂ
-
   Kf : ∀ j, Subgroup (GA F (V j))
-
   pi : Fin 2 → 𝓞 E
 
 namespace CorePar

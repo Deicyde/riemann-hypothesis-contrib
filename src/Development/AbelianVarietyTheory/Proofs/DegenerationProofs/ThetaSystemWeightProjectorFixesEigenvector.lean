@@ -17,16 +17,24 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsG
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR GlobalTheory.UT
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
+  GlobalTheory.UT
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.TestFibre
 
 noncomputable section
 namespace GlobalTheory.TestFibre
 
-theorem proj_fixes_eigen : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (S : ThetaSys o Ω) (F : Type) [Field F] (y : o →+* F) (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N), S.IsoFree T → ∀ (b E : S.J → F), (∀ t : T, ∑ j, (∑ i, y (S.ρ t j i) * b i) * E j = y S.ζN ^ (c t).val * ∑ j, b j * E j) → ∑ i, b i * ∑ j, y (S.proj T c j i) * E j = ∑ j, b j * E j := by
+theorem proj_fixes_eigen
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (S : ThetaSys o Ω) (F : Type) [Field F]
+        (y : o →+* F) (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N),
+      S.IsoFree T
+        → ∀ (b E : S.J → F),
+          (∀ t : T, ∑ j, (∑ i, y (S.ρ t j i) * b i) * E j = y S.ζN ^ (c t).val * ∑ j, b j * E j)
+            → ∑ i, b i * ∑ j, y (S.proj T c j i) * E j = ∑ j, b j * E j := by
   intro o Ω _ _ _ S F _ y T c hT b E h
   have := Fintype.ofFinite T
   have h1 : ∀ t : T, y (GlobalGen.chi S (c t)) * y S.ζN ^ (c t).val = 1 := fun t => by
@@ -36,12 +44,14 @@ theorem proj_fixes_eigen : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o 
   have h3 : y (Ring.inverse (Nat.card T : o)) * (Fintype.card T : F) = 1 := by
     rw [← Nat.card_eq_fintype_card, ← map_natCast y, ← map_mul,
       Ring.inverse_mul_cancel _ (GlobalGen.isUnit_card hT), map_one]
-  have h4 : ∑ i, b i * ∑ j, y (S.proj T c j i) * E j =
-      y (Ring.inverse (Nat.card T : o)) * ∑ t : T, y (GlobalGen.chi S (c t)) *
-        ∑ j, (∑ i, y (S.ρ t j i) * b i) * E j := by
+  have h4
+      : ∑ i, b i * ∑ j, y (S.proj T c j i) * E j
+        = y (Ring.inverse (Nat.card T : o))
+          * ∑ t : T, y (GlobalGen.chi S (c t)) *
+            ∑ j, (∑ i, y (S.ρ t j i) * b i) * E j := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [GlobalGen.proj_eq, Matrix.smul_apply, Matrix.sum_apply, smul_eq_mul, map_mul, map_sum,
-      Finset.mul_sum, Finset.sum_mul]
+      simp only [GlobalGen.proj_eq, Matrix.smul_apply, Matrix.sum_apply, smul_eq_mul, map_mul,
+        map_sum, Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     conv_rhs => rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_

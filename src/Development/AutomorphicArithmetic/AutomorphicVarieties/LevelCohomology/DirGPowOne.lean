@@ -11,21 +11,38 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LevelCohomo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.X
 
-private theorem res_of_sub {O : Type} [CommRing O] [IsLocalRing O] {x y : O} (h : x - y ∈ maximalIdeal O) :
-    residue O x = residue O y := by
+private theorem res_of_sub
+    {O : Type} [CommRing O] [IsLocalRing O] {x y : O} (h : x - y ∈ maximalIdeal O)
+    : residue O x = residue O y := by
   exact Ideal.Quotient.eq.2 h
 
-private theorem dirG_pow_one {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {O : Type} [CommRing O] {N : ℕ} [NeZero N]
-    (χ : DirichletCharacter O N) (m : ℕ) (h : χ ^ m = 1) : Chr.dirG ℚ Ω χ ^ m = 1 := by
+private theorem dirG_pow_one
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    {O : Type} [CommRing O]
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter O N) (m : ℕ) (h : χ ^ m = 1)
+    : Chr.dirG ℚ Ω χ ^ m = 1 := by
   ext g
   simp only [MonoidHom.pow_apply, MonoidHom.one_apply, Units.val_pow_eq_pow_val, Units.val_one]
   show (χ (Chr.cls ℚ Ω N g : ZMod N)) ^ m = 1
   rw [← MulChar.pow_apply_coe, h, MulChar.one_apply_coe]
 
-theorem UpperTheory.V.X.dir :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) (N : ℕ) [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) (o₁ : ℕ), UnitaryThreeInertia.HostData l e ψ o₁ → ∀ q : ℕ, UnitaryThreeInertia.XData l ψ q → ∃ (d f n : ℕ) (_ : NeZero (f * 2 ^ n)) (φ : DirichletCharacter c.O f) (ξ : DirichletCharacter c.O (2 ^ n)), XData l d φ ξ ∧ ∀ g : G ℚ Ω, (redChar Ω (residue c.O) (prodX φ ξ) g : ResidueField c.O) = residue c.O (Chr.Psi l e (Chr.dirG ℚ Ω ψ) g : c.O) ^ 2 * ((UnitaryThreeInertia.eta4 Ω g : ℤ) : ResidueField c.O) := by
+theorem UpperTheory.V.X.dir
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l)
+        (N : ℕ) [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) (o₁ : ℕ),
+      UnitaryThreeInertia.HostData l e ψ o₁
+        → ∀ q : ℕ,
+          UnitaryThreeInertia.XData l ψ q
+            → ∃ (d f n : ℕ) (_ : NeZero (f * 2 ^ n)) (φ : DirichletCharacter c.O f)
+                (ξ : DirichletCharacter c.O (2 ^ n)),
+              XData l d φ ξ
+                ∧ ∀ g : G ℚ Ω,
+                  (redChar Ω (residue c.O) (prodX φ ξ) g : ResidueField c.O)
+                    = residue c.O (Chr.Psi l e (Chr.dirG ℚ Ω ψ) g : c.O) ^ 2
+                      * ((UnitaryThreeInertia.eta4 Ω g : ℤ) : ResidueField c.O) := by
   intro Ω _ _ _ l _ c N _ e ψ o₁ hHD q hX
   obtain ⟨ω, hω1, hωT⟩ := omDir Ω l c
   obtain ⟨d, f, n, φ, ξ, hXD, hdvd, hv⟩ := dirData l c N e ψ o₁ hHD q hX ω hω1
@@ -55,14 +72,17 @@ theorem UpperTheory.V.X.dir :
     simp
   have hωC := res_of_sub (hωT.2 g)
   rw [hωa] at hωC
-  have hψa' : ψ (a : ZMod N) = psi2 ψ (a : ZMod N) * th1 l ψ (a : ZMod N) * kap l ψ (a : ZMod N) := by
+  have hψa'
+      : ψ (a : ZMod N) = psi2 ψ (a : ZMod N) * th1 l ψ (a : ZMod N) * kap l ψ (a : ZMod N) := by
     conv_lhs => rw [hψdec]
     rfl
-  have hLHS : (redChar Ω (residue c.O) (prodX φ ξ) g : ResidueField c.O) =
-      residue c.O ((prodX φ ξ) (a : ZMod (f * 2 ^ n))) := by
+  have hLHS
+      : (redChar Ω (residue c.O) (prodX φ ξ) g : ResidueField c.O)
+        = residue c.O ((prodX φ ξ) (a : ZMod (f * 2 ^ n))) := by
     show residue c.O (Chr.dirG ℚ Ω (prodX φ ξ) g : c.O) = _
     rw [hprod]
-  have hP : (Chr.Psi l e (Chr.dirG ℚ Ω ψ) g : c.O) = (chiO ℚ Ω l c.O g : c.O) ^ e * ψ (a : ZMod N) := by
+  have hP
+      : (Chr.Psi l e (Chr.dirG ℚ Ω ψ) g : c.O) = (chiO ℚ Ω l c.O g : c.O) ^ e * ψ (a : ZMod N) := by
     simp only [Chr.Psi, zpow_natCast, MonoidHom.mul_apply, MonoidHom.pow_apply, Units.val_mul,
       Units.val_pow_eq_pow_val, hψa]
   have hE : ((UnitaryThreeInertia.eta4 Ω g : ℤ)) = ZMod.χ₄ (a : ZMod 4) := hη

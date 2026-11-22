@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Tor
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -19,10 +22,12 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.LogKS
 
-theorem isField_eq_basicOpen {Z : Scheme.{0}} {V : Z.Opens} (hV : IsAffineOpen V)
-    {d₁ d₂ : ∀ O : Z.Opens, Γ(Z, O) → Γ(Z, O)} (h₁ : IsField V d₁) (h₂ : IsField V d₂)
-    (h : ∀ a, d₁ V a = d₂ V a) (s : Γ(Z, V)) (g : Γ(Z, Z.basicOpen s)) :
-    d₁ (Z.basicOpen s) g = d₂ (Z.basicOpen s) g := by
+theorem isField_eq_basicOpen
+    {Z : Scheme.{0}} {V : Z.Opens} (hV : IsAffineOpen V)
+    {d₁ d₂ : ∀ O : Z.Opens, Γ(Z, O) → Γ(Z, O)}
+    (h₁ : IsField V d₁) (h₂ : IsField V d₂) (h : ∀ a, d₁ V a = d₂ V a)
+    (s : Γ(Z, V)) (g : Γ(Z, Z.basicOpen s))
+    : d₁ (Z.basicOpen s) g = d₂ (Z.basicOpen s) g := by
   have hle : Z.basicOpen s ≤ V := Z.basicOpen_le s
   haveI := hV.isLocalization_basicOpen s
   have halg : ∀ x, algebraMap Γ(Z, V) Γ(Z, Z.basicOpen s) x = resG Z hle x := fun _ => rfl
@@ -32,8 +37,7 @@ theorem isField_eq_basicOpen {Z : Scheme.{0}} {V : Z.Opens} (hV : IsAffineOpen V
     rw [h₁.2.2 V _ hle le_rfl, h₂.2.2 V _ hle le_rfl, h]
   obtain ⟨⟨a, m⟩, hm⟩ := IsLocalization.surj (Submonoid.powers s) g
   simp only [halg] at hm
-  have hu : IsUnit (resG Z hle (m : Γ(Z, V))) := by
-    rw [← halg]; exact IsLocalization.map_units _ m
+  have hu : IsUnit (resG Z hle (m : Γ(Z, V))) := by rw [← halg]; exact IsLocalization.map_units _ m
   have e₁ := congrArg (d₁ _) hm
   have e₂ := congrArg (d₂ _) hm
   rw [h₁.2.1 _ hle] at e₁
@@ -44,7 +48,12 @@ theorem isField_eq_basicOpen {Z : Scheme.{0}} {V : Z.Opens} (hV : IsAffineOpen V
     linear_combination e₁ - e₂
   exact sub_eq_zero.mp ((hu.mul_right_eq_zero).mp key)
 
-theorem isField_eq_of_affine : ∀ (Z : Scheme.{0}) (V : Z.Opens), IsAffineOpen V → ∀ (d₁ d₂ : ∀ O : Z.Opens, Γ(Z, O) → Γ(Z, O)), IsField V d₁ → IsField V d₂ → (∀ a, d₁ V a = d₂ V a) → ∀ O : Z.Opens, O ≤ V → ∀ f, d₁ O f = d₂ O f := by
+theorem isField_eq_of_affine
+    : ∀ (Z : Scheme.{0}) (V : Z.Opens),
+      IsAffineOpen V
+        → ∀ (d₁ d₂ : ∀ O : Z.Opens, Γ(Z, O) → Γ(Z, O)),
+          IsField V d₁ → IsField V d₂ → (∀ a, d₁ V a = d₂ V a)
+            → ∀ O : Z.Opens, O ≤ V → ∀ f, d₁ O f = d₂ O f := by
   intro Z V hV d₁ d₂ h₁ h₂ h O hO f
   refine TopCat.Presheaf.section_ext Z.sheaf O _ _ fun x hx => ?_
   obtain ⟨r, hrO, hxr⟩ := hV.exists_basicOpen_le ⟨x, hx⟩ (hO hx)

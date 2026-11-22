@@ -25,12 +25,14 @@ theorem coe_toG {n : ℕ} {M : Mt g n} (h : IsUnit M) : ((toG M : Gn g n) : Mt g
   rw [dite_eq_left h]
   exact IsUnit.unit_spec h
 
-theorem toG_mul {n : ℕ} {M N : Mt g n} (h : IsUnit M) (h' : IsUnit N) : toG (M * N) = toG M * toG N := by
+theorem toG_mul {n : ℕ} {M N : Mt g n} (h : IsUnit M) (h' : IsUnit N)
+    : toG (M * N) = toG M * toG N := by
   apply Units.ext
   rw [Units.val_mul, coe_toG (h.mul h'), coe_toG h, coe_toG h']
 
-theorem sum_conj {G : Type} [Group G] [Fintype G] (F F' : G → ℂ) (s x : G)
-    (h : ∀ z, F z = F' (s⁻¹ * z * s)) : ∑ y, F (y⁻¹ * x * y) = ∑ y, F' (y⁻¹ * x * y) := by
+theorem sum_conj
+    {G : Type} [Group G] [Fintype G] (F F' : G → ℂ) (s x : G) (h : ∀ z, F z = F' (s⁻¹ * z * s))
+    : ∑ y, F (y⁻¹ * x * y) = ∑ y, F' (y⁻¹ * x * y) := by
   simp_rw [h]
   exact Fintype.sum_equiv (Equiv.mulRight s) _ _ (fun y => by simp [mul_assoc])
 
@@ -96,32 +98,42 @@ private lemma conj_indicator_inPar_eq {a b : ℕ} (Φ : Gn g a → Gn g b → �
       exact (conj_lemma_2 _ _ _ _ hw).1
     rw [if_neg hz, if_neg hw]
 
-theorem hcT_conj {a b n : ℕ} (hn : n = a + b) (Φ : Gn g a → Gn g b → ℂ) (h₁ : Gn g a) (h₂ : Gn g b) :
-    hcT a b (fun u v => Φ (h₁⁻¹ * u * h₁) (h₂⁻¹ * v * h₂)) n = hcT a b Φ n := by
+theorem hcT_conj {a b n : ℕ} (hn : n = a + b) (Φ : Gn g a → Gn g b → ℂ) (h₁ : Gn g a) (h₂ : Gn g b)
+    : hcT a b (fun u v => Φ (h₁⁻¹ * u * h₁) (h₂⁻¹ * v * h₂)) n = hcT a b Φ n := by
   subst hn
   funext x
   obtain ⟨s, hsv, hinv⟩ := exists_blockDiagonal_unit_with_inv h₁ h₂
-  have key := sum_conj
-    (fun w : Gn g (a + b) => if InPar a (w : Mt g (a + b)) then
-      Φ (h₁⁻¹ * toG (tl a (w : Mt g (a + b))) * h₁) (h₂⁻¹ * toG (br a b (w : Mt g (a + b))) * h₂) else 0)
-    (fun w : Gn g (a + b) => if InPar a (w : Mt g (a + b)) then
-      Φ (toG (tl a (w : Mt g (a + b)))) (toG (br a b (w : Mt g (a + b)))) else 0) s x
-    (fun z => conj_indicator_inPar_eq Φ h₁ h₂ s z hsv hinv)
+  have key :=
+    sum_conj
+      (fun w : Gn g (a + b) =>
+        if InPar a (w : Mt g (a + b)) then
+          Φ (h₁⁻¹ * toG (tl a (w : Mt g (a + b))) * h₁)
+            (h₂⁻¹ * toG (br a b (w : Mt g (a + b))) * h₂)
+        else
+          0)
+      (fun w : Gn g (a + b) =>
+        if InPar a (w : Mt g (a + b)) then
+          Φ (toG (tl a (w : Mt g (a + b)))) (toG (br a b (w : Mt g (a + b))))
+        else
+          0)
+      s x
+      (fun z => conj_indicator_inPar_eq Φ h₁ h₂ s z hsv hinv)
   beta_reduce at key
   unfold hcT
   beta_reduce
   rw [key]
 
-theorem hcT_sum {a b n : ℕ} {ι : Type} [Fintype ι] (c : ℂ) (Φ : ι → Gn g a → Gn g b → ℂ) (x : Gn g n) :
-    hcT a b (fun u v => c * ∑ i, Φ i u v) n x = c * ∑ i, hcT a b (Φ i) n x := by
+theorem hcT_sum
+    {a b n : ℕ} {ι : Type} [Fintype ι] (c : ℂ) (Φ : ι → Gn g a → Gn g b → ℂ) (x : Gn g n)
+    : hcT a b (fun u v => c * ∑ i, Φ i u v) n x = c * ∑ i, hcT a b (Φ i) n x := by
   unfold hcT
   simp only [Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun y _ => ?_
   by_cases hP : InPar a ((y⁻¹ * x * y : Gn g n) : Mt g n)
-  · simp only [hP, ↓reduceIte, Finset.mul_sum]
+  · simp only [hP, ↓ reduceIte, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => by ring
-  · simp only [hP, ↓reduceIte, mul_zero, Finset.sum_const_zero]
+  · simp only [hP, ↓ reduceIte, mul_zero, Finset.sum_const_zero]
 
 def ext0 (a b : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (n : ℕ) (z : Gn g n) : ℂ :=
   if InPar a (z : Mt g n) then α (toG (tl a (z : Mt g n))) * β (toG (br a b (z : Mt g n))) else 0
@@ -129,27 +141,35 @@ def ext0 (a b : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (n : ℕ) (z : 
 def cP (g : ℕ) [Fact g.Prime] (a n : ℕ) : ℂ :=
   ((Finset.univ.filter fun p : Gn g n => InPar a (p : Mt g n)).card : ℂ)⁻¹
 
-theorem hc_eq (a b : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (n : ℕ) (x : Gn g n) :
-    hc a b α β n x = cP g a n * ∑ y : Gn g n, ext0 a b α β n (y⁻¹ * x * y) := rfl
+theorem hc_eq (a b : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (n : ℕ) (x : Gn g n)
+    : hc a b α β n x = cP g a n * ∑ y : Gn g n, ext0 a b α β n (y⁻¹ * x * y) :=
+  rfl
 
-theorem indicatorIdempotent_eq_add_sum {a b n : ℕ} (hn : n = a + b) :
-    cP g a n = ((Fintype.card (Gn g a) : ℂ) * (Fintype.card (Gn g b) : ℂ) * (g : ℂ) ^ (a * b))⁻¹ := by
+theorem indicatorIdempotent_eq_add_sum {a b n : ℕ} (hn : n = a + b)
+    : cP g a n
+      = ((Fintype.card (Gn g a) : ℂ) * (Fintype.card (Gn g b) : ℂ) * (g : ℂ) ^ (a * b))⁻¹ := by
   subst hn
   unfold cP
-  rw [(GlobalTheory.T.blockParabolic_unitriangular_subgroups_GLnPrimeField g a b (a + b) rfl).2.2.2.2.2, Nat.cast_mul, Nat.cast_mul, Nat.cast_pow]
+  rw [(GlobalTheory.T.blockParabolic_unitriangular_subgroups_GLnPrimeField g a b (a + b)
+      rfl).2.2.2.2.2,
+    Nat.cast_mul, Nat.cast_mul, Nat.cast_pow]
 
-theorem stage_left {m c n : ℕ} (hn : n = m + c) (k : ℂ) (φ F : Gn g m → ℂ) (γ : Gn g c → ℂ)
-    (hF : ∀ u, F u = k * ∑ h : Gn g m, φ (h⁻¹ * u * h)) (x : Gn g n) :
-    hc m c F γ n x = k * (Fintype.card (Gn g m) : ℂ) * hc m c φ γ n x := by
-  have e1 : (fun (u : Gn g m) (v : Gn g c) => F u * γ v) =
-      fun u v => k * ∑ h : Gn g m, φ (h⁻¹ * u * h) * γ v := by
+theorem stage_left
+    {m c n : ℕ} (hn : n = m + c)
+    (k : ℂ) (φ F : Gn g m → ℂ)
+    (γ : Gn g c → ℂ) (hF : ∀ u, F u = k * ∑ h : Gn g m, φ (h⁻¹ * u * h)) (x : Gn g n)
+    : hc m c F γ n x = k * (Fintype.card (Gn g m) : ℂ) * hc m c φ γ n x := by
+  have e1
+      : (fun (u : Gn g m) (v : Gn g c) => F u * γ v)
+        = fun u v => k * ∑ h : Gn g m, φ (h⁻¹ * u * h) * γ v := by
     funext u v
     simp only [hF, Finset.mul_sum, Finset.sum_mul]
     exact Finset.sum_congr rfl fun h _ => by ring
   have e2 := hcT_sum (a := m) (b := c) (n := n) k (fun h u v => φ (h⁻¹ * u * h) * γ v) x
   beta_reduce at e2
-  have e3 : ∀ h : Gn g m, hcT m c (fun u v => φ (h⁻¹ * u * h) * γ v) n x =
-      hcT m c (fun u v => φ u * γ v) n x := by
+  have e3
+      : ∀ h : Gn g m,
+        hcT m c (fun u v => φ (h⁻¹ * u * h) * γ v) n x = hcT m c (fun u v => φ u * γ v) n x := by
     intro h
     have := congrFun (hcT_conj hn (fun u v => φ u * γ v) h 1) x
     simp only [inv_one, one_mul, mul_one] at this
@@ -159,18 +179,22 @@ theorem stage_left {m c n : ℕ} (hn : n = m + c) (k : ℂ) (φ F : Gn g m → �
   simp only [e3, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
   ring
 
-theorem stage_right {a m n : ℕ} (hn : n = a + m) (k : ℂ) (φ F : Gn g m → ℂ) (α : Gn g a → ℂ)
-    (hF : ∀ u, F u = k * ∑ h : Gn g m, φ (h⁻¹ * u * h)) (x : Gn g n) :
-    hc a m α F n x = k * (Fintype.card (Gn g m) : ℂ) * hc a m α φ n x := by
-  have e1 : (fun (u : Gn g a) (v : Gn g m) => α u * F v) =
-      fun u v => k * ∑ h : Gn g m, α u * φ (h⁻¹ * v * h) := by
+theorem stage_right
+    {a m n : ℕ} (hn : n = a + m)
+    (k : ℂ) (φ F : Gn g m → ℂ)
+    (α : Gn g a → ℂ) (hF : ∀ u, F u = k * ∑ h : Gn g m, φ (h⁻¹ * u * h)) (x : Gn g n)
+    : hc a m α F n x = k * (Fintype.card (Gn g m) : ℂ) * hc a m α φ n x := by
+  have e1
+      : (fun (u : Gn g a) (v : Gn g m) => α u * F v)
+        = fun u v => k * ∑ h : Gn g m, α u * φ (h⁻¹ * v * h) := by
     funext u v
     simp only [hF, Finset.mul_sum]
     exact Finset.sum_congr rfl fun h _ => by ring
   have e2 := hcT_sum (a := a) (b := m) (n := n) k (fun h u v => α u * φ (h⁻¹ * v * h)) x
   beta_reduce at e2
-  have e3 : ∀ h : Gn g m, hcT a m (fun u v => α u * φ (h⁻¹ * v * h)) n x =
-      hcT a m (fun u v => α u * φ v) n x := by
+  have e3
+      : ∀ h : Gn g m,
+        hcT a m (fun u v => α u * φ (h⁻¹ * v * h)) n x = hcT a m (fun u v => α u * φ v) n x := by
     intro h
     have := congrFun (hcT_conj hn (fun u v => α u * φ v) 1 h) x
     simp only [inv_one, one_mul, mul_one] at this
@@ -180,18 +204,18 @@ theorem stage_right {a m n : ℕ} (hn : n = a + m) (k : ℂ) (φ F : Gn g m → 
   simp only [e3, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
   ring
 
-theorem entN_tl {m n : ℕ} (M : Mt g n) {i j : ℕ} (hi : i < m) (hj : j < m) :
-    entN (tl m M) i j = entN M i j := by
+theorem entN_tl {m n : ℕ} (M : Mt g n) {i j : ℕ} (hi : i < m) (hj : j < m)
+    : entN (tl m M) i j = entN M i j := by
   rw [entN, dite_eq_left ⟨hi, hj⟩]
   rfl
 
-theorem entN_br {a m n : ℕ} (M : Mt g n) {i j : ℕ} (hi : i < m) (hj : j < m) :
-    entN (br a m M) i j = entN M (a + i) (a + j) := by
+theorem entN_br {a m n : ℕ} (M : Mt g n) {i j : ℕ} (hi : i < m) (hj : j < m)
+    : entN (br a m M) i j = entN M (a + i) (a + j) := by
   rw [entN, dite_eq_left ⟨hi, hj⟩]
   rfl
 
-theorem inPar_iff {a n : ℕ} (M : Mt g n) :
-    InPar a M ↔ ∀ i j : ℕ, i < n → j < a → a ≤ i → entN M i j = 0 := by
+theorem inPar_iff {a n : ℕ} (M : Mt g n)
+    : InPar a M ↔ ∀ i j : ℕ, i < n → j < a → a ≤ i → entN M i j = 0 := by
   constructor
   · intro h i j hi hj hai
     have hjn : j < n := by omega
@@ -206,8 +230,8 @@ theorem inPar_iff {a n : ℕ} (M : Mt g n) :
     unfold entN at this
     rwa [dite_eq_left ⟨i.2, j.2⟩] at this
 
-theorem par_par {a b c n : ℕ} (hn : n = a + b + c) (M : Mt g n) :
-    (InPar (a + b) M ∧ InPar a (tl (a + b) M)) ↔ (InPar a M ∧ InPar b (br a (b + c) M)) := by
+theorem par_par {a b c n : ℕ} (hn : n = a + b + c) (M : Mt g n)
+    : (InPar (a + b) M ∧ InPar a (tl (a + b) M)) ↔ (InPar a M ∧ InPar b (br a (b + c) M)) := by
   rw [inPar_iff, inPar_iff, inPar_iff, inPar_iff]
   constructor
   · rintro ⟨h1, h2⟩
@@ -251,11 +275,15 @@ private lemma br_add_eq_br_br {a b c n : ℕ} (M : Mt g n) : br (a + b) c M = br
   show entN M (a + b + i) (a + b + j) = entN (br a (b + c) M) (b + i) (b + j)
   rw [entN_br (i := b + i) (j := b + j) M (by omega) (by omega), Nat.add_assoc, Nat.add_assoc]
 
-theorem blockParabolicProductExtendedByZero_assoc {a b c n : ℕ} (hn : n = a + b + c) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (γ : Gn g c → ℂ)
-    (z : Gn g n) :
-    ext0 (a + b) c (ext0 a b α β (a + b)) γ n z = ext0 a (b + c) α (ext0 b c β γ (b + c)) n z := by
-  obtain ⟨-, -, hu1, -, -, -⟩ := GlobalTheory.T.blockParabolic_unitriangular_subgroups_GLnPrimeField g (a + b) c n hn
-  obtain ⟨-, -, hu2, -, -, -⟩ := GlobalTheory.T.blockParabolic_unitriangular_subgroups_GLnPrimeField g a (b + c) n (by omega)
+theorem blockParabolicProductExtendedByZero_assoc
+    {a b c n : ℕ}
+    (hn : n = a + b + c) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (γ : Gn g c → ℂ) (z : Gn g n)
+    : ext0 (a + b) c (ext0 a b α β (a + b)) γ n z
+      = ext0 a (b + c) α (ext0 b c β γ (b + c)) n z := by
+  obtain ⟨-, -, hu1, -, -, -⟩ :=
+    GlobalTheory.T.blockParabolic_unitriangular_subgroups_GLnPrimeField g (a + b) c n hn
+  obtain ⟨-, -, hu2, -, -, -⟩ :=
+    GlobalTheory.T.blockParabolic_unitriangular_subgroups_GLnPrimeField g a (b + c) n (by omega)
   have hpp := par_par hn (z : Mt g n)
   unfold ext0
   by_cases hA : InPar (a + b) (z : Mt g n) <;> by_cases hB : InPar a (z : Mt g n)
@@ -276,18 +304,27 @@ theorem blockParabolicProductExtendedByZero_assoc {a b c n : ℕ} (hn : n = a + 
     ring
   · rw [if_neg hA, if_neg hB]
 
-theorem hc_assoc : ∀ (g : ℕ) [Fact g.Prime] (a b c n : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (γ : Gn g c → ℂ),
-    IsClass α → IsClass β → IsClass γ → n = a + b + c →
-      hc (a + b) c (hc a b α β (a + b)) γ n = hc a (b + c) α (hc b c β γ (b + c)) n := by
+theorem hc_assoc
+    : ∀ (g : ℕ) [Fact g.Prime] (a b c n : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (γ : Gn g c → ℂ),
+      IsClass α → IsClass β → IsClass γ → n = a + b + c
+        → hc (a + b) c (hc a b α β (a + b)) γ n = hc a (b + c) α (hc b c β γ (b + c)) n := by
   intro g _ a b c n α β γ _ _ _ hn
   funext x
-  have hL := stage_left (m := a + b) (c := c) (n := n) hn (cP g a (a + b)) (ext0 a b α β (a + b))
-    (hc a b α β (a + b)) γ (fun u => hc_eq a b α β (a + b) u) x
-  have hR := stage_right (a := a) (m := b + c) (n := n) (by omega) (cP g b (b + c)) (ext0 b c β γ (b + c))
-    (hc b c β γ (b + c)) α (fun u => hc_eq b c β γ (b + c) u) x
+  have hL :=
+    stage_left (m := a + b) (c := c) (n := n) hn (cP g a (a + b)) (ext0 a b α β (a + b))
+      (hc a b α β (a + b)) γ
+      (fun u => hc_eq a b α β (a + b) u)
+      x
+  have hR :=
+    stage_right (a := a) (m := b + c) (n := n) (by omega) (cP g b (b + c)) (ext0 b c β γ (b + c))
+      (hc b c β γ (b + c)) α
+      (fun u => hc_eq b c β γ (b + c) u)
+      x
   rw [hL, hR, hc_eq, hc_eq]
   simp only [blockParabolicProductExtendedByZero_assoc hn α β γ]
-  rw [indicatorIdempotent_eq_add_sum (a := a) (b := b) rfl, indicatorIdempotent_eq_add_sum (a := b) (b := c) rfl, indicatorIdempotent_eq_add_sum (a := a + b) (b := c) hn,
+  rw [indicatorIdempotent_eq_add_sum (a := a) (b := b) rfl,
+    indicatorIdempotent_eq_add_sum (a := b) (b := c) rfl,
+    indicatorIdempotent_eq_add_sum (a := a + b) (b := c) hn,
     indicatorIdempotent_eq_add_sum (a := a) (b := b + c) (by omega)]
   have h1 : (Fintype.card (Gn g a) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
   have h2 : (Fintype.card (Gn g b) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero

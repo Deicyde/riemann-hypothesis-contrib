@@ -14,8 +14,8 @@ namespace Formalism.MainNotions.Gaps.T0
 
 variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
 
-theorem phiC_nonneg (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (y : X.Pt la) :
-    0 ≤ X.phiC la y := by
+theorem phiC_nonneg (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (y : X.Pt la)
+    : 0 ≤ X.phiC la y := by
   unfold PJ.phiC
   split_ifs with h
   · refine mul_nonneg (Nat.cast_nonneg _) ?_
@@ -33,7 +33,9 @@ theorem phiC_nonneg (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (y : X
 
 namespace LocDat
 
-variable {X : PJ D B P j} {ka : WeightFamilies.Wt D j} {la : HeightOneSpectrum (𝓞 B.KO)} (L : LocDat X ka la)
+variable
+  {X : PJ D B P j} {ka : WeightFamilies.Wt D j} {la : HeightOneSpectrum (𝓞 B.KO)}
+  (L : LocDat X ka la)
 
 variable {L}
 

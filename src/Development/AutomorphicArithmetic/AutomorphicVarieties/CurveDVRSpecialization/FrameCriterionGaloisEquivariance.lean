@@ -5,11 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
 
 open scoped Pointwise in
-private theorem val_smul {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (g : G F Ω) (A : ValuationSubring Ω) (x : Ω) :
-    (g • A).valuation (g x) < 1 ↔ A.valuation x < 1 := by
+private theorem val_smul
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (g : G F Ω) (A : ValuationSubring Ω) (x : Ω)
+    : (g • A).valuation (g x) < 1 ↔ A.valuation x < 1 := by
   have key : ∀ y : Ω, g.toRingEquiv y ∈ g • A ↔ y ∈ A := by
     intro y
     constructor
@@ -23,24 +27,28 @@ private theorem val_smul {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Alg
   exact val_lt_one key x
 
 open scoped Pointwise in
-private theorem place_smul {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (g : G F Ω) {A : ValuationSubring Ω}
-    {v : W.Plc F} (h : IsPlaceOver A v) : IsPlaceOver (g • A) v := by
+private theorem place_smul
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (g : G F Ω)
+    {A : ValuationSubring Ω} {v : W.Plc F} (h : IsPlaceOver A v)
+    : IsPlaceOver (g • A) v := by
   intro x
   have hx : g ((algebraMap F Ω) (x : F)) = (algebraMap F Ω) (x : F) := g.commutes _
   rw [← hx, val_smul]
   exact h x
 
 open scoped Pointwise in
-theorem UpperTheory.frame_criterion_galois_equivariance :
-    UpperTheory.V.Pr.CrE := by
+theorem UpperTheory.frame_criterion_galois_equivariance : UpperTheory.V.Pr.CrE := by
   intro Ω _ _ _ l _ O _ _ η Ψ σ g₁ B M L _ _ _ _ _ Φ k hB
-  have hsm : ∀ (τ : G (W.Lp L) Ω) (X : ValuationSubring Ω),
-      τ • X = ((toUpl Ω L τ : upl Ω L) : Gal(Ω/ℚ)) • X := by
+  have hsm
+      : ∀ (τ : G (W.Lp L) Ω) (X : ValuationSubring Ω),
+        τ • X = ((toUpl Ω L τ : upl Ω L) : Gal(Ω/ℚ)) • X := by
     intro τ X
     ext y
     rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem,
       ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem]
-    have hinv : ((toUpl Ω L τ : upl Ω L) : Gal(Ω/ℚ))⁻¹ = ((toUpl Ω L τ⁻¹ : upl Ω L) : Gal(Ω/ℚ)) := by
+    have hinv
+        : ((toUpl Ω L τ : upl Ω L) : Gal(Ω/ℚ))⁻¹ = ((toUpl Ω L τ⁻¹ : upl Ω L) : Gal(Ω/ℚ)) := by
       rw [map_inv]
       rfl
     rw [hinv]

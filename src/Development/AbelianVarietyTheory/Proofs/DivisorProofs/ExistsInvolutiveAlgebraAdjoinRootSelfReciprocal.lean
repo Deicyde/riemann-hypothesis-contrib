@@ -24,12 +24,27 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT
 open scoped Classical
 
 namespace GlobalTheory.InvAlgConstr
 
-theorem exists_invAlg_adjoinRoot : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E), ¬ IsSplitAt w → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E), (∀ x, e (K.c x) = cj w (e x)) → ∀ (t : K.O), t ≠ 0 → ∀ Q : (w.adicCompletion E)[X], Q.Monic → IsCsr w Q → ∃ B : GlobalTheory.UnitLemma.InvAlg K, Algebra.adjoin K.E {(1 + algebraMap K.O B.A t * B.g)} = ⊤ ∧ aeval (1 + algebraMap K.O B.A t * B.g) (Q.map e.symm.toRingHom) = 0 ∧ Module.finrank K.E B.A = Q.natDegree ∧ (1 + algebraMap K.O B.A t * B.g) * B.σ (1 + algebraMap K.O B.A t * B.g) = 1 := by
+theorem exists_invAlg_adjoinRoot
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E),
+      ¬ IsSplitAt w
+        → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E),
+          (∀ x, e (K.c x) = cj w (e x))
+            → ∀ (t : K.O),
+              t ≠ 0
+                → ∀ Q : (w.adicCompletion E)[X],
+                  Q.Monic → IsCsr w Q
+                    → ∃ B : GlobalTheory.UnitLemma.InvAlg K,
+                      Algebra.adjoin K.E {(1 + algebraMap K.O B.A t * B.g)} = ⊤
+                        ∧ aeval (1 + algebraMap K.O B.A t * B.g) (Q.map e.symm.toRingHom) = 0
+                        ∧ Module.finrank K.E B.A = Q.natDegree
+                        ∧ (1 + algebraMap K.O B.A t * B.g) * B.σ (1 + algebraMap K.O B.A t * B.g)
+                          = 1 := by
   intro E _ _ _ w hw K e he t ht Q hQ hcsr
   set Q' : K.E[X] := Q.map e.symm.toRingHom with hQ'
   have hinj : Function.Injective (e.symm.toRingHom) := e.symm.injective
@@ -73,9 +88,12 @@ theorem exists_invAlg_adjoinRoot : ∀ (E : Type) [Field E] [NumberField E] [IsC
     rw [eval₂_mul, hev0, mul_zero, zero_mul]
   let σ0 : A →+* A := AdjoinRoot.lift ((algebraMap K.E A).comp K.c.toRingHom) v hev
   have hσr : σ0 r = v := AdjoinRoot.lift_root hev
-  have hσof : ∀ a, σ0 (algebraMap K.E A a) = algebraMap K.E A (K.c a) := fun a => AdjoinRoot.lift_of hev
+  have hσof : ∀ a, σ0 (algebraMap K.E A a) = algebraMap K.E A (K.c a) := fun a =>
+    AdjoinRoot.lift_of hev
   have hσv : σ0 v = r := by
-    calc σ0 v = σ0 v * (r * v) := by rw [hrv, mul_one]
+    calc
+      σ0 v
+        = σ0 v * (r * v) := by rw [hrv, mul_one]
       _ = σ0 (r * v) * r := by rw [map_mul σ0 r v, hσr]; ring
       _ = r := by rw [hrv, map_one, one_mul]
   have hcomp : σ0.comp σ0 = RingHom.id A := by
@@ -83,16 +101,28 @@ theorem exists_invAlg_adjoinRoot : ∀ (E : Type) [Field E] [NumberField E] [IsC
     apply Polynomial.ringHom_ext
     · intro a
       show σ0 (σ0 (algebraMap K.E A a)) = algebraMap K.E A a
-      rw [hσof, hσof]; simp [K.c_c]
+      rw [hσof, hσof]
+      simp [K.c_c]
     · show σ0 (σ0 r) = r
       rw [hσr, hσv]
   have hσσ : ∀ y, σ0 (σ0 y) = y := fun y => RingHom.congr_fun hcomp y
-  let σ : A ≃+* A :=
-    { toFun := σ0, invFun := σ0, left_inv := hσσ, right_inv := hσσ, map_mul' := map_mul σ0, map_add' := map_add σ0 }
+  let σ : A ≃+* A := {
+    toFun := σ0
+    invFun := σ0
+    left_inv := hσσ
+    right_inv := hσσ
+    map_mul' := map_mul σ0
+    map_add' := map_add σ0
+  }
   set tE : K.E := algebraMap K.O K.E t
   have htE : tE ≠ 0 := fun h => ht ((IsFractionRing.injective K.O K.E) (by rw [map_zero]; exact h))
-  let B : GlobalTheory.UnitLemma.InvAlg K :=
-    { A := A, σ := σ, σ_σ := hσσ, σ_alg := hσof, g := (r - 1) * algebraMap K.E A tE⁻¹ }
+  let B : GlobalTheory.UnitLemma.InvAlg K := {
+    A := A
+    σ := σ
+    σ_σ := hσσ
+    σ_alg := hσof
+    g := (r - 1) * algebraMap K.E A tE⁻¹
+  }
   have hu : (1 + algebraMap K.O B.A t * B.g) = r := by
     show (1 + algebraMap K.O A t * ((r - 1) * algebraMap K.E A tE⁻¹)) = r
     rw [IsScalarTower.algebraMap_apply K.O K.E A t]

@@ -8,14 +8,17 @@ noncomputable section
 
 namespace PIW.MassDataColumns
 
-open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge Formalism.L2.SG.TypedSets Formalism.L2.SG.Measures Formalism.L2.SG.Sub
+open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
+  Formalism.L2.SG.TypedSets Formalism.L2.SG.Measures Formalism.L2.SG.Sub
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory
 open scoped TensorProduct
 
 section Gen
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
 theorem isTopRing_tens : IsTopologicalRing (Af F ⊗[F] E) := by
   haveI : IsModuleTopology (Af F) (Af F ⊗[F] E) := ⟨rfl⟩
@@ -25,8 +28,9 @@ theorem isTopRing_tens : IsTopologicalRing (Af F ⊗[F] E) := by
   | exact IsModuleTopology.Module.isTopologicalRing (Af F) (Af F ⊗[F] E)
   | exact ModuleTopology.topologicalRing (Af F) (Af F ⊗[F] E)
 
-private theorem subgroup_isTopologicalGroup {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (S : Subgroup G) : IsTopologicalGroup S :=
+private theorem subgroup_isTopologicalGroup
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (S : Subgroup G)
+    : IsTopologicalGroup S :=
   inferInstance
 
 theorem isTopGroup_HA : IsTopologicalGroup (HA (Af F) σ J) := by
@@ -44,14 +48,18 @@ theorem sub_top_borel (H : Subgroup (HA (Af F) σ J)) : IsTopologicalGroup H ∧
 end Gen
 
 def OpenCompactStep : Prop :=
-  ∀ {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (_hK : X.LevelSubgroupCharacter) (u : D.what₂.Word),
-    X.MeasTie hb → X.LevelSubgroupNormalized →
-      IsOpen (unitaryLevelClosureSubgroup X hb u : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u))) ∧
-      IsCompact (KHg X u : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u)))
+  ∀ {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (_hK : X.LevelSubgroupCharacter)
+      (u : D.what₂.Word),
+    X.MeasTie hb → X.LevelSubgroupNormalized
+      → IsOpen
+          (unitaryLevelClosureSubgroup X hb u
+            : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u)))
+        ∧ IsCompact (KHg X u : Set (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u)))
 
 theorem idxTopStep_of (h : OpenCompactStep) : IdxTopStep := by
   intro D X hb hK u hm hl
-  obtain ⟨h1, h2⟩ := sub_top_borel X.B.I.cm.sig X.B.I.J (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u))
+  obtain ⟨h1, h2⟩ :=
+    sub_top_borel X.B.I.cm.sig X.B.I.J (Hsub (Af X.B.I.F) X.B.I.cm.sig X.B.I.J (frameOf X u))
   exact ⟨h1, h2, h X hb hK u hm hl⟩
 
 end PIW.MassDataColumns

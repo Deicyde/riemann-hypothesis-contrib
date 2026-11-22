@@ -21,29 +21,46 @@ open Formalism.UG GlobalTheory.Hk3.IntWitt
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem witt_mod_base : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L] (ϖ : L) (σ : L →+* L) (q : ℕ),
-    Formalism.UG.IsUnramInv ϖ σ q → Odd q → ∀ (n' : ℕ) (JT : GL (Fin n') L),
-    JT ∈ Formalism.UG.GLint (Fin n') (Formalism.UG.intL L) →
-    (∀ i j, σ ((JT : Matrix (Fin n') (Fin n') L) i j) = (JT : Matrix (Fin n') (Fin n') L) j i) →
-    ∀ (ι : Type) [Fintype ι] (z z' : ι → Fin n' → L), (∀ i r, z i r ∈ Formalism.UG.intL L) → (∀ i r, z' i r ∈ Formalism.UG.intL L) →
-    GlobalTheory.Hk3.IntWitt.IndepMod ϖ z → GlobalTheory.Hk3.IntWitt.IndepMod ϖ z' →
-    (∀ i j, GlobalTheory.Hk3.IntWitt.DvdPow ϖ 1 (Formalism.UG.hform σ (JT : Matrix (Fin n') (Fin n') L) (z' i) (z' j) - Formalism.UG.hform σ (JT : Matrix (Fin n') (Fin n') L) (z i) (z j))) →
-    ∃ h : Formalism.UG.UJ σ (JT : Matrix (Fin n') (Fin n') L), (h : GL (Fin n') L) ∈ Formalism.UG.GLint (Fin n') (Formalism.UG.intL L) ∧
-      ∀ i r, GlobalTheory.Hk3.IntWitt.DvdPow ϖ 1 ((((h : GL (Fin n') L) : Matrix (Fin n') (Fin n') L) *ᵥ z i) r - z' i r) := by
+theorem witt_mod_base
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L] (ϖ : L)
+        (σ : L →+* L) (q : ℕ),
+      Formalism.UG.IsUnramInv ϖ σ q → Odd q
+        → ∀ (n' : ℕ) (JT : GL (Fin n') L),
+          JT ∈ Formalism.UG.GLint (Fin n') (Formalism.UG.intL L)
+            → (∀ i j,
+              σ ((JT : Matrix (Fin n') (Fin n') L) i j) = (JT : Matrix (Fin n') (Fin n') L) j i)
+            → ∀ (ι : Type) [Fintype ι] (z z' : ι → Fin n' → L),
+              (∀ i r, z i r ∈ Formalism.UG.intL L) → (∀ i r, z' i r ∈ Formalism.UG.intL L)
+                → GlobalTheory.Hk3.IntWitt.IndepMod ϖ z → GlobalTheory.Hk3.IntWitt.IndepMod ϖ z'
+                → (∀ i j,
+                  GlobalTheory.Hk3.IntWitt.DvdPow ϖ 1
+                    (Formalism.UG.hform σ (JT : Matrix (Fin n') (Fin n') L) (z' i) (z' j)
+                      - Formalism.UG.hform σ (JT : Matrix (Fin n') (Fin n') L) (z i) (z j)))
+                → ∃ h : Formalism.UG.UJ σ (JT : Matrix (Fin n') (Fin n') L),
+                  (h : GL (Fin n') L) ∈ Formalism.UG.GLint (Fin n') (Formalism.UG.intL L)
+                    ∧ ∀ i r,
+                      GlobalTheory.Hk3.IntWitt.DvdPow ϖ 1
+                        ((((h : GL (Fin n') L) : Matrix (Fin n') (Fin n') L) *ᵥ z i) r
+                          - z' i r) := by
   intro L _ _ _ ϖ σ q hU hq n' JT hJ hJh ι _ z z' hz hz' hi hi' hgr
   classical
-  obtain ⟨g₀, hg₀i, hg₀u, hg₀z⟩ := GlobalTheory.T.hermitian_integral_vectors_pairing L ϖ σ q hU hq n' JT hJ hJh ι z z' hz hz' hi hi' hgr
+  obtain ⟨g₀, hg₀i, hg₀u, hg₀z⟩ :=
+    GlobalTheory.T.hermitian_integral_vectors_pairing L ϖ σ q hU hq n' JT hJ hJh ι z z' hz hz' hi
+      hi' hgr
   have hstep := GlobalTheory.T.unitaryGroup_newton_lift_step L ϖ σ q hU hq n' JT hJ hJh
   obtain ⟨hσσ, hσv, hσϖ, hϖv, -, -, -⟩ := hU
   set J : Matrix (Fin n') (Fin n') L := (JT : Matrix (Fin n') (Fin n') L) with hJdef
   have hJi : ∀ i j, J i j ∈ intL L := by
     obtain ⟨k0, hk0⟩ := hJ
-    intro i j; rw [hJdef, ← hk0]; exact ((k0 : Matrix (Fin n') (Fin n') (intL L)) i j).2
+    intro i j
+    rw [hJdef, ← hk0]
+    exact ((k0 : Matrix (Fin n') (Fin n') (intL L)) i j).2
 
   let P : ℕ → Matrix (Fin n') (Fin n') L → Prop := fun k g =>
     (∀ i j, g i j ∈ intL L) ∧ ∀ i j, DvdPow ϖ (k + 1) ((cT σ g * J * g - J) i j)
-  have hex : ∀ (k : ℕ) (g : Matrix (Fin n') (Fin n') L), ∃ g' : Matrix (Fin n') (Fin n') L,
-      P k g → P (k + 1) g' ∧ ∀ i j, DvdPow ϖ (k + 1) (g' i j - g i j) := by
+  have hex
+      : ∀ (k : ℕ) (g : Matrix (Fin n') (Fin n') L), ∃ g' : Matrix (Fin n') (Fin n') L,
+        P k g → P (k + 1) g' ∧ ∀ i j, DvdPow ϖ (k + 1) (g' i j - g i j) := by
     intro k g
     by_cases hP : P k g
     · obtain ⟨g', h1, h2, h3⟩ := hstep k g hP.1 hP.2
@@ -61,13 +78,17 @@ theorem witt_mod_base : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplica
   have hclose : ∀ k i j, DvdPow ϖ (k + 1) (f (k + 1) i j - f k i j) := by
     intro k i j; rw [hfs]; exact (hF k (f k) (hfP k)).2 i j
 
-  have hlim := fun i j => GlobalTheory.T.exists_limit_dvdUniformizerPow_cauchy L ϖ hϖv (fun k => f k i j) (fun k => hclose k i j)
+  have hlim := fun i j =>
+    GlobalTheory.T.exists_limit_dvdUniformizerPow_cauchy L ϖ hϖv
+      (fun k => f k i j)
+      (fun k => hclose k i j)
   choose b hb using hlim
   let h : Matrix (Fin n') (Fin n') L := Matrix.of b
   have hhk : ∀ k i j, DvdPow ϖ (k + 1) ((h - f k) i j) := fun k i j => hb i j k
   have hϖi : ϖ ∈ intL L := by
     show Valued.v ϖ ≤ 1
-    rw [hϖv]; exact WithZero.exp_le_exp.2 (by norm_num : (-1 : ℤ) ≤ 0)
+    rw [hϖv]
+    exact WithZero.exp_le_exp.2 (by norm_num : (-1 : ℤ) ≤ 0)
   have hhi : ∀ i j, h i j ∈ intL L := by
     intro i j
     have e : h i j = (h - f 0) i j + f 0 i j := by simp
@@ -77,8 +98,10 @@ theorem witt_mod_base : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplica
     ext i j
     have hz0 : (cT σ h * J * h - J) i j = 0 := by
       refine eq_zero_of_forall_dvdPow hϖv fun k => ?_
-      have e : cT σ h * J * h - J = (cT σ (h - f k) * J * h + cT σ (f k) * J * (h - f k)) +
-          (cT σ (f k) * J * f k - J) := by
+      have e
+          : cT σ h * J * h - J
+            = (cT σ (h - f k) * J * h + cT σ (f k) * J * (h - f k))
+              + (cT σ (f k) * J * f k - J) := by
         rw [cT_sub]; simp only [sub_mul, mul_sub, Matrix.mul_assoc]; abel
       rw [e, Matrix.add_apply, Matrix.add_apply]
       refine dvdPow_add (dvdPow_add ?_ ?_) ((hfP k).2 i j)

@@ -13,9 +13,9 @@ open MvPolynomial
 
 namespace GenericLinearTrdeg
 
-theorem coeff_X_pow_mul_linear_pow {R : Type*} [CommRing R] (e c : R) (a b D : ℕ) (h : a + b ≤ D) :
-    (Polynomial.X ^ a * (Polynomial.C e * Polynomial.X + Polynomial.C c) ^ b).coeff D =
-      if a + b = D then e ^ b else 0 := by
+theorem coeff_X_pow_mul_linear_pow {R : Type*} [CommRing R] (e c : R) (a b D : ℕ) (h : a + b ≤ D)
+    : (Polynomial.X ^ a * (Polynomial.C e * Polynomial.X + Polynomial.C c) ^ b).coeff D
+      = if a + b = D then e ^ b else 0 := by
   have hlin : (Polynomial.C e * Polynomial.X + Polynomial.C c).natDegree ≤ 1 :=
     Polynomial.natDegree_linear_le
   split_ifs with hD
@@ -24,16 +24,18 @@ theorem coeff_X_pow_mul_linear_pow {R : Type*} [CommRing R] (e c : R) (a b D : �
       Polynomial.coeff_pow_of_natDegree_le hlin]
     simp
   · apply Polynomial.coeff_eq_zero_of_natDegree_lt
-    calc _ ≤ a + b * 1 := by
-          refine (Polynomial.natDegree_mul_le).trans (add_le_add ?_ ?_)
-          · exact Polynomial.natDegree_X_pow_le a
-          · exact Polynomial.natDegree_pow_le_of_le b hlin
+    calc
+      _ ≤ a + b * 1 := by
+        refine (Polynomial.natDegree_mul_le).trans (add_le_add ?_ ?_)
+        · exact Polynomial.natDegree_X_pow_le a
+        · exact Polynomial.natDegree_pow_le_of_le b hlin
       _ < D := by omega
 
-theorem algebraicIndependent_pair_linear {R A : Type*} [CommRing R] [CommRing A] [IsDomain A]
-    [Algebra R A] {η r x : A} (hη : Transcendental R η)
-    (hx : Transcendental (Algebra.adjoin R ({η, r} : Set A)) x) :
-    AlgebraicIndependent R ![x, x * η + r] := by
+theorem algebraicIndependent_pair_linear
+    {R A : Type*} [CommRing R] [CommRing A] [IsDomain A] [Algebra R A]
+    {η r x : A}
+    (hη : Transcendental R η) (hx : Transcendental (Algebra.adjoin R ({η, r} : Set A)) x)
+    : AlgebraicIndependent R ![x, x * η + r] := by
   classical
   set B' := Algebra.adjoin R ({η, r} : Set A)
   let η' : B' := ⟨η, Algebra.subset_adjoin (by simp)⟩
@@ -45,8 +47,8 @@ theorem algebraicIndependent_pair_linear {R A : Type*} [CommRing R] [CommRing A]
   let f : Fin 2 → Polynomial B' := ![Polynomial.X, Polynomial.C η' * Polynomial.X + Polynomial.C r']
   let Q : Polynomial B' := MvPolynomial.aeval f p
   have hQ : Polynomial.aeval x Q = 0 := by
-    have : Polynomial.aeval x Q =
-        MvPolynomial.aeval (fun i => (Polynomial.aeval x).restrictScalars R (f i)) p := by
+    have : Polynomial.aeval x Q
+        = MvPolynomial.aeval (fun i => (Polynomial.aeval x).restrictScalars R (f i)) p := by
       rw [← MvPolynomial.comp_aeval]
       rfl
     have hf : (fun i => (Polynomial.aeval x).restrictScalars R (f i)) = ![x, x * η + r] := by
@@ -57,16 +59,19 @@ theorem algebraicIndependent_pair_linear {R A : Type*} [CommRing R] [CommRing A]
   have hdeg : ∀ μ ∈ p.support, μ 0 + μ 1 ≤ D := fun μ hμ => by
     have := MvPolynomial.le_totalDegree hμ
     rwa [Finsupp.sum_fintype _ _ (by simp), Fin.sum_univ_two] at this
-  have hcoeff : Q.coeff D = ∑ μ ∈ p.support,
-      algebraMap R B' (p.coeff μ) * (if μ 0 + μ 1 = D then η' ^ (μ 1) else 0) := by
+  have hcoeff
+      : Q.coeff D
+        = ∑ μ ∈ p.support,
+          algebraMap R B' (p.coeff μ) * (if μ 0 + μ 1 = D then η' ^ (μ 1) else 0) := by
     simp only [Q, MvPolynomial.aeval_def, MvPolynomial.eval₂_eq', Fin.prod_univ_two,
       Polynomial.finsetSum_coeff]
     refine Finset.sum_congr rfl fun μ hμ => ?_
     rw [Polynomial.algebraMap_apply, Polynomial.coeff_C_mul]
     congr 1
     exact coeff_X_pow_mul_linear_pow η' r' (μ 0) (μ 1) D (hdeg μ hμ)
-  let g : Polynomial R := ∑ μ ∈ p.support,
-    if μ 0 + μ 1 = D then Polynomial.C (p.coeff μ) * Polynomial.X ^ (μ 1) else 0
+  let g : Polynomial R :=
+    ∑ μ ∈ p.support,
+      if μ 0 + μ 1 = D then Polynomial.C (p.coeff μ) * Polynomial.X ^ (μ 1) else 0
   have hg : Polynomial.aeval η g = ((Q.coeff D : B') : A) := by
     rw [hcoeff]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -74,8 +79,9 @@ theorem algebraicIndependent_pair_linear {R A : Type*} [CommRing R] [CommRing A]
     refine Finset.sum_congr rfl fun μ _ => ?_
     split_ifs <;> simp [η']
   have hg0 : g ≠ 0 := by
-    obtain ⟨μ, hμ, hμD⟩ := Finset.exists_mem_eq_sup p.support
-      (MvPolynomial.support_nonempty.mpr hp0) (fun s => s.sum fun _ e => e)
+    obtain ⟨μ, hμ, hμD⟩ :=
+      Finset.exists_mem_eq_sup p.support (MvPolynomial.support_nonempty.mpr hp0)
+        (fun s => s.sum fun _ e => e)
     have hμD' : μ 0 + μ 1 = D := by
       rw [Finsupp.sum_fintype _ _ (by simp), Fin.sum_univ_two] at hμD
       exact hμD.symm
@@ -99,15 +105,18 @@ theorem algebraicIndependent_pair_linear {R A : Type*} [CommRing R] [CommRing A]
   have := transcendental_iff.mp hη g (by rw [hg, hQ0]; simp)
   exact hg0 this
 
-theorem transcendental_of_subset {A R₁ R₂ : Type*} [CommRing A] [CommRing R₁] [CommRing R₂]
-    [Algebra R₁ A] [Algebra R₂ A] (S₁ : Subalgebra R₁ A) (S₂ : Subalgebra R₂ A)
-    (h : (S₁ : Set A) ⊆ S₂) {x : A} (hx : Transcendental S₂ x) : Transcendental S₁ x := by
-  let f : S₁ →+* S₂ :=
-    { toFun := fun y => ⟨y, h y.2⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+theorem transcendental_of_subset
+    {A R₁ R₂ : Type*} [CommRing A] [CommRing R₁] [CommRing R₂] [Algebra R₁ A] [Algebra R₂ A]
+    (S₁ : Subalgebra R₁ A) (S₂ : Subalgebra R₂ A) (h : (S₁ : Set A) ⊆ S₂)
+    {x : A} (hx : Transcendental S₂ x)
+    : Transcendental S₁ x := by
+  let f : S₁ →+* S₂ := {
+    toFun := fun y => ⟨y, h y.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   let _ : Algebra S₁ S₂ := f.toAlgebra
   have : IsScalarTower S₁ S₂ A := .of_algebraMap_eq fun _ => rfl
   refine hx.restrictScalars ?_
@@ -116,9 +125,10 @@ theorem transcendental_of_subset {A R₁ R₂ : Type*} [CommRing A] [CommRing R�
   have hab' := congrArg Subtype.val hab
   exact hab'
 
-theorem adjoin_subset {A R : Type*} [CommRing A] [CommRing R] [Algebra R A] (T : Subring A)
-    (s : Set A) (h1 : ∀ c : R, algebraMap R A c ∈ T) (h2 : s ⊆ T) :
-    (Algebra.adjoin R s : Set A) ⊆ T := by
+theorem adjoin_subset
+    {A R : Type*} [CommRing A] [CommRing R] [Algebra R A]
+    (T : Subring A) (s : Set A) (h1 : ∀ c : R, algebraMap R A c ∈ T) (h2 : s ⊆ T)
+    : (Algebra.adjoin R s : Set A) ⊆ T := by
   intro y hy
   induction hy using Algebra.adjoin_induction with
   | mem a ha => exact h2 ha
@@ -126,10 +136,14 @@ theorem adjoin_subset {A R : Type*} [CommRing A] [CommRing R] [Algebra R A] (T :
   | add a b _ _ ha hb => exact T.add_mem ha hb
   | mul a b _ _ ha hb => exact T.mul_mem ha hb
 
-theorem algebraicIndependent_rows (F E : Type) [Field F] [Field E] [Algebra F E] (N k r : ℕ)
-    (η : Fin N → E) (hrk : r ≤ k) (j : Fin r → Fin N) (hind : AlgebraicIndependent F (η ∘ j)) :
-    AlgebraicIndependent F (Sum.elim (fun ij : Fin k × Fin N => (X ij : MvPolynomial (Fin k × Fin N) E))
-      (fun l : Fin r => ∑ m, X (Fin.castLE hrk l, m) * C (η m))) := by
+theorem algebraicIndependent_rows
+    (F E : Type) [Field F] [Field E] [Algebra F E]
+    (N k r : ℕ) (η : Fin N → E) (hrk : r ≤ k) (j : Fin r → Fin N)
+    (hind : AlgebraicIndependent F (η ∘ j))
+    : AlgebraicIndependent F
+      (Sum.elim
+        (fun ij : Fin k × Fin N => (X ij : MvPolynomial (Fin k × Fin N) E))
+        (fun l : Fin r => ∑ m, X (Fin.castLE hrk l, m) * C (η m))) := by
   classical
   let sf : Fin k → MvPolynomial (Fin k × Fin N) E := fun i => ∑ m, X (i, m) * C (η m)
   let g : ℕ → (Fin k × Fin N) ⊕ Fin r → MvPolynomial (Fin k × Fin N) E := fun i =>
@@ -139,8 +153,9 @@ theorem algebraicIndependent_rows (F E : Type) [Field F] [Field E] [Algebra F E]
     induction i with
     | zero =>
       intro _
-      have := AlgebraicIndependent.sumElim_comp (S := E) hind
-        (MvPolynomial.algebraicIndependent_X (Fin k × Fin N) E)
+      have :=
+        AlgebraicIndependent.sumElim_comp (S := E) hind
+          (MvPolynomial.algebraicIndependent_X (Fin k × Fin N) E)
       convert this using 1
       funext t
       rcases t with t | l
@@ -152,7 +167,7 @@ theorem algebraicIndependent_rows (F E : Type) [Field F] [Field E] [Algebra F E]
       let il : Fin r := ⟨i, by omega⟩
       let i' : Fin k := Fin.castLE hrk il
       let m0 : Fin N := j il
-      have hgt : ∀ t, t ≠ Sum.inr il → g (i+1) t = g i t := by
+      have hgt : ∀ t, t ≠ Sum.inr il → g (i + 1) t = g i t := by
         rintro (t | l) ht
         · rfl
         · have hl : (l : ℕ) ≠ i := fun h => ht (by rw [show l = il from Fin.ext h])
@@ -166,10 +181,10 @@ theorem algebraicIndependent_rows (F E : Type) [Field F] [Field E] [Algebra F E]
         convert h1 using 1
         funext t
         exact hgt t.1 t.2
-      · have himg : g (i+1) '' {Sum.inr il}ᶜ = g i '' {Sum.inr il}ᶜ :=
+      · have himg : g (i + 1) '' {Sum.inr il}ᶜ = g i '' {Sum.inr il}ᶜ :=
           Set.image_congr (fun t ht => hgt t ht)
         rw [himg]
-        have hval : g (i+1) (Sum.inr il) = sf i' := by simp [g, il, i']
+        have hval : g (i + 1) (Sum.inr il) = sf i' := by simp [g, il, i']
         rw [hval]
         let U : Set ((Fin k × Fin N) ⊕ Fin r) := {Sum.inr il, Sum.inl (i', m0)}ᶜ
         let B := Algebra.adjoin F (g i '' U)
@@ -180,11 +195,11 @@ theorem algebraicIndependent_rows (F E : Type) [Field F] [Field E] [Algebra F E]
         have hη : Transcendental B η0 := by
           have := IH.transcendental_adjoin (s := U) (i := Sum.inr il) (by simp [U])
           simpa [g, il] using this
-        let T : Subalgebra E (MvPolynomial (Fin k × Fin N) E) :=
-          Algebra.adjoin E (X '' {(i', m0)}ᶜ)
-        have hXT : ∀ ab, ab ≠ (i', m0) → (X ab : MvPolynomial (Fin k × Fin N) E) ∈ T :=
-          fun ab h => Algebra.subset_adjoin ⟨ab, h, rfl⟩
-        have hCT : ∀ e : E, (C e : MvPolynomial (Fin k × Fin N) E) ∈ T := fun e => T.algebraMap_mem e
+        let T : Subalgebra E (MvPolynomial (Fin k × Fin N) E) := Algebra.adjoin E (X '' {(i', m0)}ᶜ)
+        have hXT : ∀ ab, ab ≠ (i', m0) → (X ab : MvPolynomial (Fin k × Fin N) E) ∈ T := fun ab h =>
+          Algebra.subset_adjoin ⟨ab, h, rfl⟩
+        have hCT : ∀ e : E, (C e : MvPolynomial (Fin k × Fin N) E) ∈ T := fun e =>
+          T.algebraMap_mem e
         have hBT : (B : Set (MvPolynomial (Fin k × Fin N) E)) ⊆ T := by
           apply adjoin_subset T.toSubring
           · intro c
@@ -206,8 +221,8 @@ theorem algebraicIndependent_rows (F E : Type) [Field F] [Field E] [Algebra F E]
               · exact hCT _
         have hx : Transcendental (Algebra.adjoin B ({η0, rr} : Set _)) x := by
           refine transcendental_of_subset _ T ?_
-            ((MvPolynomial.algebraicIndependent_X _ E).transcendental_adjoin
-              (s := {(i', m0)}ᶜ) (i := (i', m0)) (by simp))
+            ((MvPolynomial.algebraicIndependent_X _ E).transcendental_adjoin (s := {(i', m0)}ᶜ)
+              (i := (i', m0)) (by simp))
           apply adjoin_subset T.toSubring
           · intro c
             exact hBT c.2
@@ -221,7 +236,8 @@ theorem algebraicIndependent_rows (F E : Type) [Field F] [Field E] [Algebra F E]
               exact T.mul_mem (hXT _ (by simpa using (Finset.ne_of_mem_erase hm))) (hCT _)
         have hOV := algebraicIndependent_pair_linear hη hx
         have htr := hOV.transcendental_adjoin (s := {0}) (i := 1) (by simp)
-        have htr' : Transcendental (Algebra.adjoin B (![x, x * η0 + rr] '' {0})) (x * η0 + rr) := htr
+        have htr' : Transcendental (Algebra.adjoin B (![x, x * η0 + rr] '' {0})) (x * η0 + rr) :=
+          htr
         rw [hsplit]
         refine transcendental_of_subset _ _ ?_ htr'
         apply adjoin_subset (Algebra.adjoin B (![x, x * η0 + rr] '' {0})).toSubring
@@ -244,9 +260,11 @@ theorem algebraicIndependent_rows (F E : Type) [Field F] [Field E] [Algebra F E]
   · rfl
   · simp [g, sf, l.2]
 
-theorem exists_indep {F E : Type} [Field F] [Field E] [Algebra F E] {N : ℕ} (η : Fin N → E) (d : ℕ)
-    (hd : Algebra.trdeg F (Algebra.adjoin F (Set.range η)) = d) :
-    ∃ j : Fin d → Fin N, AlgebraicIndependent F (η ∘ j) := by
+theorem exists_indep
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {N : ℕ} (η : Fin N → E)
+    (d : ℕ) (hd : Algebra.trdeg F (Algebra.adjoin F (Set.range η)) = d)
+    : ∃ j : Fin d → Fin N, AlgebraicIndependent F (η ∘ j) := by
   classical
   set D := Algebra.adjoin F (Set.range η)
   let ηD : Fin N → D := fun m => ⟨η m, Algebra.subset_adjoin ⟨m, rfl⟩⟩
@@ -255,8 +273,9 @@ theorem exists_indep {F E : Type} [Field F] [Field E] [Algebra F E] {N : ℕ} (�
     rw [← Algebra.adjoin_image, Algebra.map_top, Subalgebra.range_val, ← Set.range_comp]
     rfl
   have : Algebra.IsAlgebraic (Algebra.adjoin F (Set.range ηD)) D :=
-    ⟨fun y => isAlgebraic_algebraMap (R := Algebra.adjoin F (Set.range ηD))
-      (⟨y, by rw [htop]; trivial⟩ : Algebra.adjoin F (Set.range ηD))⟩
+    ⟨fun y =>
+      isAlgebraic_algebraMap (R := Algebra.adjoin F (Set.range ηD))
+        (⟨y, by rw [htop]; trivial⟩ : Algebra.adjoin F (Set.range ηD))⟩
   have : FaithfulSMul F D :=
     (faithfulSMul_iff_algebraMap_injective F D).mpr (algebraMap F D).injective
   obtain ⟨t, hts, hb⟩ := exists_isTranscendenceBasis_subset (R := F) (Set.range ηD)
@@ -287,18 +306,25 @@ theorem GenericLinearTrdeg.proof : GenericLinearTrdeg.Statement := by
   obtain ⟨j, hj⟩ := GenericLinearTrdeg.exists_indep η d hd
   have hrk : min k d ≤ k := min_le_left _ _
   have hrd : min k d ≤ d := min_le_right _ _
-  have hind := GenericLinearTrdeg.algebraicIndependent_rows F E N k (min k d) η hrk
-    (j ∘ Fin.castLE hrd) (hj.comp _ (Fin.castLE_injective hrd))
+  have hind :=
+    GenericLinearTrdeg.algebraicIndependent_rows F E N k (min k d) η hrk (j ∘ Fin.castLE hrd)
+      (hj.comp _ (Fin.castLE_injective hrd))
   have hlow : ((k * N + min k d : ℕ) : Cardinal) ≤ Algebra.trdeg F S := by
-    have hmem : ∀ t, Sum.elim (fun ij : Fin k × Fin N => (X ij : MvPolynomial (Fin k × Fin N) E))
-        (fun l : Fin (min k d) => ∑ m, X (Fin.castLE hrk l, m) * C (η m)) t ∈ S := by
+    have hmem
+        : ∀ t,
+          Sum.elim
+              (fun ij : Fin k × Fin N => (X ij : MvPolynomial (Fin k × Fin N) E))
+              (fun l : Fin (min k d) => ∑ m, X (Fin.castLE hrk l, m) * C (η m))
+              t
+            ∈ S := by
       rintro (ab | l)
       · exact Algebra.subset_adjoin (Or.inl ⟨ab, rfl⟩)
       · exact Algebra.subset_adjoin (Or.inr ⟨Fin.castLE hrk l, rfl⟩)
     let G' : (Fin k × Fin N) ⊕ Fin (min k d) → S := fun t => ⟨_, hmem t⟩
     have hG : AlgebraicIndependent F G' := AlgebraicIndependent.of_comp S.val hind
     have := hG.cardinalMk_le_trdeg
-    have hc : Cardinal.mk ((Fin k × Fin N) ⊕ Fin (min k d)) = ((k * N + min k d : ℕ) : Cardinal) := by
+    have hc
+        : Cardinal.mk ((Fin k × Fin N) ⊕ Fin (min k d)) = ((k * N + min k d : ℕ) : Cardinal) := by
       rw [Cardinal.mk_fintype]
       simp
     rwa [hc] at this
@@ -307,8 +333,9 @@ theorem GenericLinearTrdeg.proof : GenericLinearTrdeg.Statement := by
       Sum.elim (fun ij => X ij) (fun i => ∑ m, X (i, m) * C (η m))
     have hS : S = (MvPolynomial.aeval (R := F) G).range := by
       rw [← Algebra.adjoin_range_eq_range_aeval, Set.Sum.elim_range]
-    have h1 := trdeg_le_of_surjective (MvPolynomial.aeval (R := F) G).rangeRestrict
-      (AlgHom.rangeRestrict_surjective _)
+    have h1 :=
+      trdeg_le_of_surjective (MvPolynomial.aeval (R := F) G).rangeRestrict
+        (AlgHom.rangeRestrict_surjective _)
     rw [MvPolynomial.trdeg_of_isDomain, Cardinal.lift_id, Cardinal.mk_fintype] at h1
     rw [hS]
     convert h1 using 1

@@ -17,17 +17,20 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 variable {N : ℕ}
 
 def uToLieMat (x : UCo N) : Matrix (Fin N ⊕ Fin 0) (Fin N ⊕ Fin 0) ℂ :=
-  Matrix.reindex (Equiv.sumEmpty (Fin N) (Fin 0)).symm (Equiv.sumEmpty (Fin N) (Fin 0)).symm (skMat x)
+  Matrix.reindex (Equiv.sumEmpty (Fin N) (Fin 0)).symm (Equiv.sumEmpty (Fin N) (Fin 0)).symm
+    (skMat x)
 
-theorem uToLieMat_apply (x : UCo N) (i j : Fin N ⊕ Fin 0) :
-    uToLieMat x i j = skMat x (Equiv.sumEmpty (Fin N) (Fin 0) i) (Equiv.sumEmpty (Fin N) (Fin 0) j) := by
+theorem uToLieMat_apply (x : UCo N) (i j : Fin N ⊕ Fin 0)
+    : uToLieMat x i j
+      = skMat x (Equiv.sumEmpty (Fin N) (Fin 0) i) (Equiv.sumEmpty (Fin N) (Fin 0) j) := by
   rfl
 
 theorem uToLieMat_mem (x : UCo N) : uToLieMat x ∈ Formalism.BasicNotions.lieU N 0 := by
   rw [mem_lieU_zero_iff_om]
   ext i j
-  have h := congrFun (congrFun (skMat_conjTranspose_om x) (Equiv.sumEmpty (Fin N) (Fin 0) i))
-    (Equiv.sumEmpty (Fin N) (Fin 0) j)
+  have h :=
+    congrFun (congrFun (skMat_conjTranspose_om x) (Equiv.sumEmpty (Fin N) (Fin 0) i))
+      (Equiv.sumEmpty (Fin N) (Fin 0) j)
   simp only [Matrix.conjTranspose_apply, Matrix.neg_apply] at h ⊢
   rw [uToLieMat_apply, uToLieMat_apply]
   exact h
@@ -51,8 +54,11 @@ theorem uToLieLin_bij : Function.Bijective (uToLieLin (N := N)) := by
   constructor
   · intro x y hxy
     have hm : ∀ a b : Fin N, skMat x a b = skMat y a b := fun a b => by
-      have := congrArg (fun z : Formalism.BasicNotions.lieU N 0 =>
-        (z : Matrix (Fin N ⊕ Fin 0) (Fin N ⊕ Fin 0) ℂ) (Sum.inl a) (Sum.inl b)) hxy
+      have :=
+        congrArg
+          (fun z : Formalism.BasicNotions.lieU N 0 =>
+            (z : Matrix (Fin N ⊕ Fin 0) (Fin N ⊕ Fin 0) ℂ) (Sum.inl a) (Sum.inl b))
+          hxy
       simpa [uToLieLin, uToLie, uToLieMat_apply] using this
     refine Prod.ext (funext fun a => ?_) (funext fun l => ?_)
     · have h := hm a a
@@ -63,10 +69,11 @@ theorem uToLieLin_bij : Function.Bijective (uToLieLin (N := N)) := by
       rwa [skMat_low_om, skMat_low_om] at h
   · rintro ⟨X, hX⟩
     have hX' := (mem_lieU_zero_iff_om X).1 hX
-    have hent : ∀ i j, star (X j i) = -X i j := fun i j => by
+    have hent : ∀ i j, star (X j i) = - X i j := fun i j => by
       have := congrFun (congrFun hX' i) j
       simpa [Matrix.conjTranspose_apply] using this
-    refine ⟨((fun a => (X (Sum.inl a) (Sum.inl a)).im), fun l => X (Sum.inl l.1.1) (Sum.inl l.1.2)), ?_⟩
+    refine
+      ⟨((fun a => (X (Sum.inl a) (Sum.inl a)).im), fun l => X (Sum.inl l.1.1) (Sum.inl l.1.2)), ?_⟩
     apply Subtype.ext
     show uToLieMat _ = X
     ext i j
@@ -97,39 +104,48 @@ theorem uToLieE_coe : ⇑(uToLieE (N := N)) = uToLie := rfl
 def phiOmE : (UCo N × UCo N) ≃L[ℝ] ((Fin N ⊕ Fin 0) × (Fin N ⊕ Fin 0) → ℂ) :=
   (uToLieE.prodCongr uToLieE).trans complexifyLieEquiv
 
-theorem phiOmE_apply (x y : UCo N) (p : (Fin N ⊕ Fin 0) × (Fin N ⊕ Fin 0)) :
-    phiOmE (x, y) p = skMat x (Equiv.sumEmpty (Fin N) (Fin 0) p.1) (Equiv.sumEmpty (Fin N) (Fin 0) p.2) +
-      Complex.I * skMat y (Equiv.sumEmpty (Fin N) (Fin 0) p.1) (Equiv.sumEmpty (Fin N) (Fin 0) p.2) := by
+theorem phiOmE_apply (x y : UCo N) (p : (Fin N ⊕ Fin 0) × (Fin N ⊕ Fin 0))
+    : phiOmE (x, y) p
+      = skMat x (Equiv.sumEmpty (Fin N) (Fin 0) p.1) (Equiv.sumEmpty (Fin N) (Fin 0) p.2)
+        + Complex.I
+          * skMat y (Equiv.sumEmpty (Fin N) (Fin 0) p.1) (Equiv.sumEmpty (Fin N) (Fin 0) p.2) := by
   show complexifyLieEquiv (uToLieE x, uToLieE y) p = _
   rw [complexifyLieEquiv_coe, uToLieE_coe]
   simp [Formalism.BasicNotions.entries, uToLie, uToLieMat_apply]
 
-theorem phiOmE_haar : ((volume : Measure (UCo N × UCo N)).map (phiOmE (N := N))).IsAddHaarMeasure := by
+theorem phiOmE_haar
+    : ((volume : Measure (UCo N × UCo N)).map (phiOmE (N := N))).IsAddHaarMeasure := by
   exact phiOmE.isAddHaarMeasure_map volume
 theorem gaussEOm_phiOmE (x y : UCo N) : gaussEOm (phiOmE (x, y)) = gaussUOm x * gaussUOm y := by
-  have hsum : ∑ p : (Fin N ⊕ Fin 0) × (Fin N ⊕ Fin 0), Complex.normSq (phiOmE (x, y) p) =
-      ∑ a, (x.1 a ^ 2 + y.1 a ^ 2) + ∑ l : LoOm N, 2 * (Complex.normSq (x.2 l) + Complex.normSq (y.2 l)) := by
+  have hsum
+      : ∑ p : (Fin N ⊕ Fin 0) × (Fin N ⊕ Fin 0), Complex.normSq (phiOmE (x, y) p)
+        = ∑ a, (x.1 a ^ 2 + y.1 a ^ 2)
+          + ∑ l : LoOm N, 2 * (Complex.normSq (x.2 l) + Complex.normSq (y.2 l)) := by
     rw [← normSq_skMat_sum]
-    exact Fintype.sum_equiv ((Equiv.sumEmpty (Fin N) (Fin 0)).prodCongr (Equiv.sumEmpty (Fin N) (Fin 0))) _ _
+    exact Fintype.sum_equiv
+      ((Equiv.sumEmpty (Fin N) (Fin 0)).prodCongr (Equiv.sumEmpty (Fin N) (Fin 0))) _ _
       (fun p => by rw [phiOmE_apply]; rfl)
-  calc gaussEOm (phiOmE (x, y)) = Real.exp (-(∑ p, Complex.normSq (phiOmE (x, y) p))) := by
-        rw [gaussEOm, ← Real.exp_sum]
-        congr 1
-        simp [Finset.sum_neg_distrib]
+  calc
+    gaussEOm (phiOmE (x, y)) = Real.exp (-(∑ p, Complex.normSq (phiOmE (x, y) p))) := by
+      rw [gaussEOm, ← Real.exp_sum]
+      congr 1
+      simp [Finset.sum_neg_distrib]
     _ = gaussUOm x * gaussUOm y := by
-        rw [hsum]
-        simp only [gaussUOm, ← Real.exp_sum, ← Real.exp_add]
-        congr 1
-        simp only [Finset.sum_add_distrib, ← Finset.mul_sum, mul_add]
-        ring
+      rw [hsum]
+      simp only [gaussUOm, ← Real.exp_sum, ← Real.exp_add]
+      congr 1
+      simp only [Finset.sum_add_distrib, ← Finset.mul_sum, mul_add]
+      ring
 
-theorem integral_gaussEOm_phiOmE : ∫ Z, gaussEOm Z ∂((volume : Measure (UCo N × UCo N)).map (phiOmE (N := N))) =
-    (Real.sqrt Real.pi ^ N * (Real.pi / 2) ^ Fintype.card (LoOm N)) ^ 2 := by
+theorem integral_gaussEOm_phiOmE
+    : ∫ Z, gaussEOm Z ∂((volume : Measure (UCo N × UCo N)).map (phiOmE (N := N)))
+      = (Real.sqrt Real.pi ^ N * (Real.pi / 2) ^ Fintype.card (LoOm N)) ^ 2 := by
   rw [MeasureTheory.integral_map phiOmE.continuous.measurable.aemeasurable
     continuous_gaussEOm.aestronglyMeasurable]
   show ∫ z : UCo N × UCo N, gaussEOm (phiOmE (z.1, z.2)) = _
   simp_rw [gaussEOm_phiOmE]
-  rw [MeasureTheory.Measure.volume_eq_prod, MeasureTheory.integral_prod_mul (f := gaussUOm) (g := gaussUOm), integral_gaussUOm, sq]
+  rw [MeasureTheory.Measure.volume_eq_prod,
+    MeasureTheory.integral_prod_mul (f := gaussUOm) (g := gaussUOm), integral_gaussUOm, sq]
 
 theorem map_uToLie_haar : (Measure.map (uToLie (N := N)) volume).IsAddHaarMeasure := by
   rw [← uToLieE_coe]
@@ -169,11 +185,13 @@ private lemma vol_eq_lemma_2 :
   have hs := mul_right_cancel₀ hI2.ne' (hI.trans hk.symm)
   rw [h1, ← ENNReal.ofReal_coe_nnreal, hs]
 
-theorem isOmegaLeb_uToLie :
-    Formalism.BasicNotions.IsOmegaLeb (ENNReal.ofReal (2 ^ (N * (N - 1) / 2)) • Measure.map (uToLie (N := N)) volume) := by
+theorem isOmegaLeb_uToLie
+    : Formalism.BasicNotions.IsOmegaLeb
+      (ENNReal.ofReal (2 ^ (N * (N - 1) / 2)) • Measure.map (uToLie (N := N)) volume) := by
   refine ⟨?_, ?_⟩
   · haveI := map_uToLie_haar (N := N)
-    exact Measure.IsAddHaarMeasure.smul _ (ENNReal.ofReal_pos.2 (by positivity)).ne' ENNReal.ofReal_ne_top
+    exact Measure.IsAddHaarMeasure.smul _ (ENNReal.ofReal_pos.2 (by positivity)).ne'
+      ENNReal.ofReal_ne_top
   · rw [prod_map_lemma, ← ENNReal.ofReal_mul (by positivity), vol_eq_lemma_2]
 
 end ReciprocityTheory.ChartRestriction.DS

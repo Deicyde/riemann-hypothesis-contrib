@@ -10,9 +10,10 @@ noncomputable section
 
 namespace UpperTheory.Gal.crystallineComparison.Mod
 
-private theorem exists_algHom_ker (κ B : Type) [Field κ] [IsAlgClosed κ] [CommRing B] [Algebra κ B]
-    [Module.Finite κ B] (p : PrimeSpectrum B) :
-    ∃ ε : B →ₐ[κ] κ, RingHom.ker ε.toRingHom = p.asIdeal := by
+private theorem exists_algHom_ker
+    (κ B : Type) [Field κ] [IsAlgClosed κ] [CommRing B] [Algebra κ B] [Module.Finite κ B]
+    (p : PrimeSpectrum B)
+    : ∃ ε : B →ₐ[κ] κ, RingHom.ker ε.toRingHom = p.asIdeal := by
   haveI : IsArtinianRing B := IsArtinianRing.of_finite κ B
   haveI : p.asIdeal.IsMaximal := Ideal.isMaximal_of_isPrime p.asIdeal
   letI : Field (B ⧸ p.asIdeal) := Ideal.Quotient.field _
@@ -32,15 +33,17 @@ theorem ringHomog_of : RingHomog := by
       (Algebra.algHom κ B (Localization.AtPrime (RingHom.ker ε₀.toRingHom))).toLinearMap
       (IsArtinianRing.localization_surjective (RingHom.ker ε₀.toRingHom).primeCompl
         (Localization.AtPrime (RingHom.ker ε₀.toRingHom)))
-  have hm : ∀ p : PrimeSpectrum B,
-      Module.length (Localization.AtPrime p.asIdeal) (Localization.AtPrime p.asIdeal) =
-        (Module.finrank κ (Localization.AtPrime (RingHom.ker ε₀.toRingHom)) : ℕ∞) := by
+  have hm
+      : ∀ p : PrimeSpectrum B,
+        Module.length (Localization.AtPrime p.asIdeal) (Localization.AtPrime p.asIdeal)
+          = (Module.finrank κ (Localization.AtPrime (RingHom.ker ε₀.toRingHom)) : ℕ∞) := by
     intro p
     obtain ⟨ε, hε⟩ := exists_algHom_ker κ B p
     obtain ⟨τ, hτε⟩ := hτ ε
     rw [GlobalTheory.FinSchemeRank.finrank_eq_length_of_isLocalRing κ]
-    have hmap : p.asIdeal.primeCompl.map τ.toRingEquiv.toMonoidHom =
-        (RingHom.ker ε₀.toRingHom).primeCompl := by
+    have hmap
+        : p.asIdeal.primeCompl.map τ.toRingEquiv.toMonoidHom
+          = (RingHom.ker ε₀.toRingHom).primeCompl := by
       ext y
       simp only [Submonoid.mem_map, Ideal.mem_primeCompl_iff, ← hε, RingHom.mem_ker, ← hτε]
       constructor

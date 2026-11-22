@@ -7,17 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Ade
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory Matrix
-open GlobalTheory.FinPl GlobalTheory.MixPer GlobalTheory.MixModel GlobalTheory.Unf GlobalTheory.LatPair GlobalTheory.SplitWeil GlobalTheory.SeeSaw
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory Matrix
+open GlobalTheory.FinPl GlobalTheory.MixPer GlobalTheory.MixModel GlobalTheory.Unf
+  GlobalTheory.LatPair GlobalTheory.SplitWeil GlobalTheory.SeeSaw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.ContrComb
 
-theorem extL_mem_latO : ∀ (D : D7) (V₀ A L S : HSp D) (o : OrthDec V₀ A L) (P : Pl D → Prop) (LA : Lat A) (LS : Lat S) (M : Lat V₀), IsSelfDualC A LA → IsSelfDualC S LS → IsSelfDualC V₀ M → (∀ v, P v → ∃ LL, OrthAt o M LA LL v) → ∀ u ∈ latO A S (LA : Set _) (LS : Set _) P, (o.resS S).symm (u, 0) ∈ latO V₀ S (M : Set _) (LS : Set _) P := by
+theorem extL_mem_latO
+    : ∀ (D : D7) (V₀ A L S : HSp D) (o : OrthDec V₀ A L) (P : Pl D → Prop) (LA : Lat A) (LS : Lat S)
+        (M : Lat V₀),
+      IsSelfDualC A LA → IsSelfDualC S LS → IsSelfDualC V₀ M → (∀ v, P v → ∃ LL, OrthAt o M LA LL v)
+        → ∀ u ∈ latO A S (LA : Set _) (LS : Set _) P,
+          (o.resS S).symm (u, 0) ∈ latO V₀ S (M : Set _) (LS : Set _) P := by
   intro D V₀ A L S o P LA LS M hA hS hM hO u hu
   rw [GlobalTheory.T.mem_homLatticeCompletion_iff_supported_maps D A S LA LS hA hS P u] at hu
   obtain ⟨huP, huL⟩ := hu
-  rw [GlobalTheory.T.mem_homLatticeCompletion_iff_supported_maps D V₀ S M LS hM hS P, OrthDec.resS_symm_apply, Matrix.zero_mul, add_zero]
+  rw [GlobalTheory.T.mem_homLatticeCompletion_iff_supported_maps D V₀ S M LS hM hS P,
+    OrthDec.resS_symm_apply, Matrix.zero_mul, add_zero]
   have hloc := (GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D P).2
   refine ⟨fun i j => ?_, fun y hy => ?_⟩
   · rw [Matrix.mul_apply]

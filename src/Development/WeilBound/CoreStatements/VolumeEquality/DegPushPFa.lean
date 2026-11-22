@@ -9,19 +9,26 @@ noncomputable section
 
 namespace SheetDecomposition.PF
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4 GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ b, Fintype (ι b)] {K' : Type} [Fintype K'] {ι' : K' → Type}
-  [∀ b, Fintype (ι' b)]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ b, Fintype (ι b)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ b, Fintype (ι' b)]
 
-theorem ne_of_arith {Ω : Type} [Field Ω] {y : (Σ b, ι b) → Ω} {d : ℕ} (h : IsArithVar (mCoordIdeal y) d) (k : K) :
-    ∃ i, y ⟨k, i⟩ ≠ 0 := by
+theorem ne_of_arith
+    {Ω : Type} [Field Ω] {y : (Σ b, ι b) → Ω} {d : ℕ} (h : IsArithVar (mCoordIdeal y) d) (k : K)
+    : ∃ i, y ⟨k, i⟩ ≠ 0 := by
   obtain ⟨i, hi⟩ := h.2.1.2.2 k
   refine ⟨i, fun h0 => hi ?_⟩
   rw [mCoordIdeal, RingHom.mem_ker, mConeMap, aeval_X, h0, map_zero, zero_mul]
 
-theorem arith_of_isPt [Nonempty K] {Ω : Type} [Field Ω] [Algebra ℚ Ω] {y : (Σ b, ι b) → Ω} {d : ℕ} (h : IsPt ℚ y d) :
-    IsArithVar (mCoordIdeal y) (d + 1) := by
+theorem arith_of_isPt
+    [Nonempty K] {Ω : Type} [Field Ω] [Algebra ℚ Ω] {y : (Σ b, ι b) → Ω} {d : ℕ} (h : IsPt ℚ y d)
+    : IsArithVar (mCoordIdeal y) (d + 1) := by
   obtain ⟨h1, h2, h3⟩ := h
   have : CharZero Ω := algebraRat.charZero Ω
   obtain rfl : ‹Algebra ℚ Ω› = DivisionRing.toRatAlgebra := Subsingleton.elim _ _
@@ -33,9 +40,11 @@ theorem arith_of_isPt [Nonempty K] {Ω : Type} [Field Ω] [Algebra ℚ Ω] {y : 
     have : y ⟨k, i⟩ / y ⟨k, j⟩ = (y ⟨k, i⟩ / y ⟨k, c k⟩) / (y ⟨k, j⟩ / y ⟨k, c k⟩) := by
       rw [div_div_div_cancel_right₀ (hc k)]
     rw [SetLike.mem_coe, this]
-    exact div_mem (IntermediateField.subset_adjoin _ _ ⟨⟨k, i⟩, rfl⟩) (IntermediateField.subset_adjoin _ _ ⟨⟨k, j⟩, rfl⟩)
+    exact div_mem (IntermediateField.subset_adjoin _ _ ⟨⟨k, i⟩, rfl⟩)
+      (IntermediateField.subset_adjoin _ _ ⟨⟨k, j⟩, rfl⟩)
   have hA : Algebra.IsAlgebraic (Algebra.adjoin ℚ (fnField ℚ y : Set Ω)) Ω := by
-    have e : Algebra.adjoin ℚ (fnField ℚ y : Set Ω) = (fnField ℚ y).toSubalgebra := Algebra.adjoin_eq (fnField ℚ y).toSubalgebra
+    have e : Algebra.adjoin ℚ (fnField ℚ y : Set Ω) = (fnField ℚ y).toSubalgebra :=
+      Algebra.adjoin_eq (fnField ℚ y).toSubalgebra
     rw [e]
     exact inferInstanceAs (Algebra.IsAlgebraic (fnField ℚ y) Ω)
   obtain ⟨t, ht, hb⟩ := exists_isTranscendenceBasis_subset (R := ℚ) (fnField ℚ y : Set Ω)
@@ -43,18 +52,30 @@ theorem arith_of_isPt [Nonempty K] {Ω : Type} [Field Ω] [Algebra ℚ Ω] {y : 
   obtain ⟨e⟩ : Nonempty (Fin d ≃ t) := Cardinal.eq.1 (by simp [hc'])
   have hb' := hb.comp_equiv e
   have := hb'.isAlgebraic_field
-  exact CoordConeArithVar.proof IntDomainDim.full K ι Ω y c d _ inferInstance hc hb'.1 (fun i => hF (ht (e i).2))
+  exact CoordConeArithVar.proof IntDomainDim.full K ι Ω y c d _ inferInstance hc hb'.1
+    (fun i => hF (ht (e i).2))
     fun r _ => Algebra.IsAlgebraic.isAlgebraic r
 
-theorem mem_of_birational {Ω₁ Ω : Type} [Field Ω₁] [Field Ω] (i : Ω₁ →+* Ω) {y : (Σ b, ι b) → Ω₁} (hb : Birational y)
-    (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0) (F : Subfield Ω) (hF : ∀ k j j', i (y ⟨k, j⟩) / i (y ⟨k, j'⟩) ∈ F) (s : Ω₁) : i s ∈ F := by
+theorem mem_of_birational
+    {Ω₁ Ω : Type} [Field Ω₁] [Field Ω]
+    (i : Ω₁ →+* Ω)
+    {y : (Σ b, ι b) → Ω₁} (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0)
+    (F : Subfield Ω) (hF : ∀ k j j', i (y ⟨k, j⟩) / i (y ⟨k, j'⟩) ∈ F)
+    (s : Ω₁)
+    : i s ∈ F := by
   choose c hc using hne
-  have key : ∀ (g : MRing ι) (d : K → ℕ), IsMultiHomog g d → i (aeval y g / ∏ k, y ⟨k, c k⟩ ^ d k) ∈ F := by
+  have key
+      : ∀ (g : MRing ι) (d : K → ℕ),
+        IsMultiHomog g d → i (aeval y g / ∏ k, y ⟨k, c k⟩ ^ d k) ∈ F := by
     intro g d hg
-    have h1 : aeval y g / ∏ k, y ⟨k, c k⟩ ^ d k = aeval (fun p : Σ k, ι k => y p / y ⟨p.1, c p.1⟩) g := by
+    have h1
+        : aeval y g / ∏ k, y ⟨k, c k⟩ ^ d k
+          = aeval (fun p : Σ k, ι k => y p / y ⟨p.1, c p.1⟩) g := by
       have h := congrArg (eval fun k => (y ⟨k, c k⟩)⁻¹) (mConeMap_of_isMultiHomog y hg)
-      have h' : (eval fun k => (y ⟨k, c k⟩)⁻¹).comp (mConeMap y : MRing ι →+* MvPolynomial K Ω₁) =
-          ((aeval (fun p : Σ k, ι k => y p / y ⟨p.1, c p.1⟩) : MRing ι →ₐ[ℤ] Ω₁) : MRing ι →+* Ω₁) := by
+      have h'
+          : (eval fun k => (y ⟨k, c k⟩)⁻¹).comp (mConeMap y : MRing ι →+* MvPolynomial K Ω₁)
+            = ((aeval (fun p : Σ k, ι k => y p / y ⟨p.1, c p.1⟩) : MRing ι →ₐ[ℤ] Ω₁)
+              : MRing ι →+* Ω₁) := by
         refine ringHom_ext (fun c => by simp) fun p => ?_
         simp [mConeMap, div_eq_mul_inv]
       have h'' := DFunLike.congr_fun h' g
@@ -76,8 +97,10 @@ theorem mem_of_birational {Ω₁ Ω : Type} [Field Ω₁] [Field Ω] (i : Ω₁ 
 
 variable {Ω₁ : Type} [Field Ω₁] [Algebra ℚ Ω₁] {Ω : Type} [Field Ω] [Algebra ℚ Ω] [Algebra Ω₁ Ω]
 
-theorem fnField_join {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω) (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0) :
-    (fnField ℚ (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')).toSubfield = (fnField Ω₁ y').toSubfield := by
+theorem fnField_join
+    {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω) (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0)
+    : (fnField ℚ (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')).toSubfield
+      = (fnField Ω₁ y').toSubfield := by
   apply le_antisymm
   · rw [fnField, IntermediateField.adjoin_toSubfield, Subfield.closure_le]
     rintro _ (⟨q, rfl⟩ | ⟨⟨k | k, j⟩, ⟨k', j'⟩, e, rfl⟩)
@@ -93,15 +116,18 @@ theorem fnField_join {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω) (h
     · obtain rfl : k = k' := e
       exact IntermediateField.subset_adjoin _ _ ⟨⟨.inr k, j⟩, ⟨.inr k, j'⟩, rfl, rfl⟩
 
-theorem finrank_join {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω) (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0) :
-    Module.finrank (fnField ℚ (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')) Ω = Module.finrank (fnField Ω₁ y') Ω := by
+theorem finrank_join
+    {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω) (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0)
+    : Module.finrank (fnField ℚ (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')) Ω
+      = Module.finrank (fnField Ω₁ y') Ω := by
   show Module.finrank (fnField ℚ (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')).toSubfield Ω =
     Module.finrank (fnField Ω₁ y').toSubfield Ω
   rw [fnField_join y' hb hne]
 
-theorem isPt_join {y : (Σ b, ι b) → Ω₁} {y' : (Σ b, ι' b) → Ω} {n r : ℕ} (hb : Birational y)
-    (ha : IsArithVar (mCoordIdeal y) (n + 1)) (h : IsPt Ω₁ y' r) :
-    IsPt ℚ (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y') (n + r) := by
+theorem isPt_join
+    {y : (Σ b, ι b) → Ω₁} {y' : (Σ b, ι' b) → Ω} {n r : ℕ}
+    (hb : Birational y) (ha : IsArithVar (mCoordIdeal y) (n + 1)) (h : IsPt Ω₁ y' r)
+    : IsPt ℚ (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y') (n + r) := by
   have hne := ne_of_arith ha
   refine ⟨?_, ?_, ?_⟩
   · rintro (k | k)

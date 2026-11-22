@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.wtDegConst_of :
-    PtEx → WtDegConst := by
+theorem UpperTheory.Gal.TranscendenceTraces.wtDegConst_of : PtEx → WtDegConst := by
   intro _ Z S p _ _ w hw
   obtain ⟨ψ, hψ, hsum⟩ := hw (Sq.self p) (fun _ => 1) (IsLocallyConstant.const 1)
   have hψ' : IsLocallyConstant (fun s : S => ψ s) := hψ

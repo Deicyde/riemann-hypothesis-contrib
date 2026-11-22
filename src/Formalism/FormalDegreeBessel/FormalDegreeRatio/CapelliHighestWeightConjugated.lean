@@ -142,30 +142,37 @@ theorem conjugated_generator_gl_relation : EabHGl := by
     vector_complexified_derivative_commutator rdLinV rdBracketV rdSmoothV ε _ _ _ _ hsm hg']
   have hQPX : ∀ X : Matrix (Fin n) (Fin n) ℂ, Q * (P * X) = X := by
     intro X; rw [← Matrix.mul_assoc, hQP, Matrix.one_mul]
-  have hm : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 - Matrix.single c d 1 * Matrix.single a b 1 =
-      (if b = c then Matrix.single a d 1 else 0) - (if d = a then Matrix.single c b 1 else 0) := by
+  have hm
+      : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 - Matrix.single c d 1 * Matrix.single a b 1
+        = (if b = c then Matrix.single a d 1 else 0)
+          - (if d = a then Matrix.single c b 1 else 0) := by
     by_cases h1 : b = c <;> by_cases h2 : d = a
     · subst h1; subst h2; simp
     · subst h1; simp [h2]
     · subst h2; simp [h1]
     · simp [h1, h2]
-  have hm2 : P * Matrix.single a b (1 : ℂ) * Q * (P * Matrix.single c d 1 * Q) -
-      P * Matrix.single c d 1 * Q * (P * Matrix.single a b 1 * Q) =
-      P * (Matrix.single a b (1 : ℂ) * Matrix.single c d 1 -
-        Matrix.single c d 1 * Matrix.single a b 1) * Q := by
+  have hm2
+      : P * Matrix.single a b (1 : ℂ) * Q * (P * Matrix.single c d 1 * Q)
+          - P * Matrix.single c d 1 * Q * (P * Matrix.single a b 1 * Q)
+        = P
+          * (Matrix.single a b (1 : ℂ) * Matrix.single c d 1
+            - Matrix.single c d 1 * Matrix.single a b 1)
+          * Q := by
     simp only [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_assoc, hQPX]
   rw [hm2, hm, Matrix.mul_sub, Matrix.sub_mul, vector_complexified_derivative_sub rdLinV hsm hg']
-  split_ifs <;> simp only [Matrix.mul_zero, Matrix.zero_mul, vector_complexified_derivative_zero, sub_zero, zero_sub,
-    ioh_EabH_eq ε H P Q f _ _ hQP hPQ hH g]
+  split_ifs <;> simp only [Matrix.mul_zero, Matrix.zero_mul, vector_complexified_derivative_zero,
+    sub_zero, zero_sub, ioh_EabH_eq ε H P Q f _ _ hQP hPQ hH g]
 
 section Central
 
 variable {n : ℕ} {ε : Fin n → Bool} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-def IOHRepr (Eop : Fin n → Fin n → (Matrix (Fin n) (Fin n) ℂ → E) → (Matrix (Fin n) (Fin n) ℂ → E))
-    (Ealg : Fin n → Fin n → Module.End ℂ (ioS ε E)) : Prop :=
-  ∀ (a b : Fin n) (F : Matrix (Fin n) (Fin n) ℂ → E) (x : ioS ε E), IORep F x.1 →
-    IORep (Eop a b F) (Ealg a b x).1
+def IOHRepr
+    (Eop : Fin n → Fin n → (Matrix (Fin n) (Fin n) ℂ → E) → (Matrix (Fin n) (Fin n) ℂ → E))
+    (Ealg : Fin n → Fin n → Module.End ℂ (ioS ε E))
+    : Prop :=
+  ∀ (a b : Fin n) (F : Matrix (Fin n) (Fin n) ℂ → E) (x : ioS ε E),
+    IORep F x.1 → IORep (Eop a b F) (Ealg a b x).1
 
 lemma ioh_Tm_rep {Eop : Fin n → Fin n → (Matrix (Fin n) (Fin n) ℂ → E) → (Matrix (Fin n) (Fin n) ℂ → E)}
     {Ealg : Fin n → Fin n → Module.End ℂ (ioS ε E)} (hR : IOHRepr Eop Ealg)
@@ -215,7 +222,6 @@ lemma ioh_qminor_rep {Eop : Fin n → Fin n → (Matrix (Fin n) (Fin n) ℂ → 
   unfold qminorOp
   simp only [Finset.sum_apply, Pi.smul_apply, List.map_ofFn]
   rfl
-
 
 variable (ε E) in
 def iohE (P Q : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n) : Module.End ℂ (ioS ε E) :=

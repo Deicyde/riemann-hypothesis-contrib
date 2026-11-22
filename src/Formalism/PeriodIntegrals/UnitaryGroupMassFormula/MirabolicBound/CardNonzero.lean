@@ -14,8 +14,8 @@ noncomputable section
 
 open Classical
 
-theorem card_nonzero (F : Type) [Field F] [Fintype F] (m : ℕ) :
-    Fintype.card {r : Fin m → F // r ≠ 0} = Fintype.card F ^ m - 1 := by
+theorem card_nonzero (F : Type) [Field F] [Fintype F] (m : ℕ)
+    : Fintype.card {r : Fin m → F // r ≠ 0} = Fintype.card F ^ m - 1 := by
   rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, Fintype.card_fun, Fintype.card_fin]
 
 theorem stepOf : StepOf := by
@@ -38,8 +38,9 @@ theorem stepOf : StepOf := by
     rw [lastRow_mul (hpL q.2), hg]
   let f : R × Fin (D F (n + 1)) → Module.Dual ℂ V := fun q => ℓ ∘ₗ π (E F (n + 1) (A q))
 
-  have hf : ∀ (x : Fin (n + 1) → F) (r : R) (i : Fin (D F (n + 1))),
-      (π (col x)).dualMap (f (r, i)) = (fun (r : R) x => ψ₀ (r.1 ⬝ᵥ x)) r x • f (r, i) := by
+  have hf
+      : ∀ (x : Fin (n + 1) → F) (r : R) (i : Fin (D F (n + 1))),
+        (π (col x)).dualMap (f (r, i)) = (fun (r : R) x => ψ₀ (r.1 ⬝ᵥ x)) r x • f (r, i) := by
     intro x r i
     ext v
     show ℓ (π (E F (n + 1) (A (r, i))) (π (col x) v)) = ψ₀ (r.1 ⬝ᵥ x) * ℓ (π (E F (n + 1) (A (r, i))) v)
@@ -64,14 +65,22 @@ theorem stepOf : StepOf := by
     rfl
   have hN : ((Fintype.card F : ℂ) ^ (n + 1)) ≠ 0 :=
     pow_ne_zero _ (by exact_mod_cast Fintype.card_ne_zero)
-  have horth : ∀ r s : R, ∑ x : Fin (n + 1) → F, (fun (r : R) x => ψ₀ (r.1 ⬝ᵥ x)) r x *
-      (fun (s : R) x => ψ₀ (-(s.1 ⬝ᵥ x))) s x = if r = s then (Fintype.card F : ℂ) ^ (n + 1) else 0 := by
+  have horth
+      : ∀ r s : R,
+        ∑ x : Fin (n + 1) → F, (fun (r : R) x => ψ₀ (r.1 ⬝ᵥ x)) r x *
+            (fun (s : R) x => ψ₀ (-(s.1 ⬝ᵥ x))) s x
+          = if r = s then (Fintype.card F : ℂ) ^ (n + 1) else 0 := by
     intro r s
     rw [hO F (n + 1) ψ₀ hψ r.1 s.1]
     exact if_congr Subtype.val_inj rfl rfl
-  have hind := hS (Module.Dual ℂ V) (Fin (n + 1) → F) R (Fin (D F (n + 1)))
-    (fun x => (π (col x)).dualMap) (fun (r : R) x => ψ₀ (r.1 ⬝ᵥ x)) (fun (s : R) x => ψ₀ (-(s.1 ⬝ᵥ x)))
-    _ hN (fun r s => by convert horth r s) f hf hblock
+  have hind :=
+    hS (Module.Dual ℂ V) (Fin (n + 1) → F) R (Fin (D F (n + 1)))
+      (fun x => (π (col x)).dualMap)
+      (fun (r : R) x => ψ₀ (r.1 ⬝ᵥ x))
+      (fun (s : R) x => ψ₀ (-(s.1 ⬝ᵥ x)))
+      _ hN
+      (fun r s => by convert horth r s)
+      f hf hblock
   have hcard : Fintype.card (Fin (D F (n + 1 + 1))) = Fintype.card (R × Fin (D F (n + 1))) := by
     rw [Fintype.card_fin, Fintype.card_prod, card_nonzero, Fintype.card_fin, D, D,
       Finset.prod_Ico_succ_top (by omega : 1 ≤ n + 1), mul_comm]

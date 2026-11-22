@@ -29,7 +29,7 @@ theorem Sh_finite (R : ℝ) (hR : 0 ≤ R) : (Sh X R).Finite := by
 def Sz (T : ℝ) : Set ℤ := {n | ((n : ℝ)) ^ 2 ≤ T}
 
 theorem Sz_finite (T : ℝ) : (Sz T).Finite := by
-  refine (Set.finite_Icc (-⌈T⌉) ⌈T⌉).subset ?_
+  refine (Set.finite_Icc (- ⌈T⌉) ⌈T⌉).subset ?_
   intro n hn
   have hn' : ((n : ℝ)) ^ 2 ≤ T := hn
   have h1 : |n| ≤ n ^ 2 := by

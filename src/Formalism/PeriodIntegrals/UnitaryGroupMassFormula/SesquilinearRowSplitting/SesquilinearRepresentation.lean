@@ -27,14 +27,15 @@ theorem sesquilinearRepresentation : RepStep := by
   classical
   have hs : LinearIndepOn E id s := hli
   let b := Basis.extend hs
-  let f : hs.extend (Set.subset_univ s) → E :=
-    fun i => if hi : (i : V) ∈ s then ℓ ⟨i, hsΛ hi⟩ else 0
+  let f : hs.extend (Set.subset_univ s) → E := fun i =>
+    if hi : (i : V) ∈ s then ℓ ⟨i, hsΛ hi⟩ else 0
   let φ : V →ₗ[E] E := b.constr E f
   have hφb : ∀ v (hv : v ∈ s), φ v = ℓ ⟨v, hsΛ hv⟩ := by
     intro v hv
     let i : hs.extend (Set.subset_univ s) := ⟨v, Basis.subset_extend hs hv⟩
     calc
-      φ v = φ (b i) := congrArg φ (Basis.extend_apply_self hs i).symm
+      φ v
+        = φ (b i) := congrArg φ (Basis.extend_apply_self hs i).symm
       _ = _ := by simpa only [f, i, dite_eq_left hv] using b.constr_basis E f i
 
   have hind : ∀ y ∈ Submodule.span (𝓞 E) (s : Set V), ∃ hy : y ∈ Λ, ℓ ⟨y, hy⟩ = φ y := by
@@ -64,15 +65,13 @@ theorem sesquilinearRepresentation : RepStep := by
       rw [hxy, ← algebraMap_smul E (z : 𝓞 E), smul_smul, IsLocalization.mk'_spec', map_one,
         one_smul]
     obtain ⟨hyΛ, hℓφ⟩ := hind y hy
-    have h1 : ℓ ((z : 𝓞 E) • x) = algebraMap (𝓞 E) E z * ℓ x := by
-      rw [map_smul, Algebra.smul_def]
+    have h1 : ℓ ((z : 𝓞 E) • x) = algebraMap (𝓞 E) E z * ℓ x := by rw [map_smul, Algebra.smul_def]
     have h2 : φ ((z : 𝓞 E) • (x : V)) = algebraMap (𝓞 E) E z * φ x := by
       rw [← algebraMap_smul E (z : 𝓞 E) (x : V), map_smul, smul_eq_mul]
     have hzΛ : ((z : 𝓞 E) • x : Λ) = ⟨y, hyΛ⟩ := by
       ext
       exact hzx
-    have hne : algebraMap (𝓞 E) E z ≠ 0 :=
-      IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors z.2
+    have hne : algebraMap (𝓞 E) E z ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors z.2
     apply mul_left_cancel₀ hne
     rw [← h1, ← h2, hzΛ, hzx, hℓφ]
   obtain ⟨w, hw⟩ := hsurj φ

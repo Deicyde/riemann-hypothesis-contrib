@@ -10,18 +10,24 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FixedBy
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct GlobalTheory.HWL
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct GlobalTheory.HWL
 
 namespace GlobalTheory.HWL.EtMem
 
 section Lin
 
-variable {E S D M : Type} [CommRing E] [CommRing S] [AddCommGroup D] [Module E D] [AddCommGroup M] [Module S M]
+variable
+  {E S D M : Type}
+  [CommRing E] [CommRing S] [AddCommGroup D] [Module E D] [AddCommGroup M] [Module S M]
 
-theorem exists_basis [Nontrivial S] [Module.Free S M] [Module.Finite S M] {r : ℕ} (io : E → S) (j : D →+ M)
+theorem exists_basis
+    [Nontrivial S] [Module.Free S M] [Module.Finite S M]
+    {r : ℕ}
+    (io : E → S) (j : D →+ M)
     (hj : ∀ e x, j (e • x) = io e • j x) (hsp : Submodule.span S (Set.range j) = ⊤)
-    (b : Module.Basis (Fin r) E D) (hr : Module.finrank S M = r) :
-    ∃ e : Module.Basis (Fin r) S M, ∀ i, e i = j (b i) := by
+    (b : Module.Basis (Fin r) E D) (hr : Module.finrank S M = r)
+    : ∃ e : Module.Basis (Fin r) S M, ∀ i, e i = j (b i) := by
   have h : ⊤ ≤ Submodule.span S (Set.range fun i => j (b i)) := by
     rw [← hsp, Submodule.span_le]
     rintro _ ⟨x, rfl⟩
@@ -32,16 +38,20 @@ theorem exists_basis [Nontrivial S] [Module.Free S M] [Module.Finite S M] {r : �
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
   refine ⟨basisOfTopLeSpanOfCardEqFinrank _ h (by simp [hr]), fun i => by simp⟩
 
-theorem repr_semi {r : ℕ} (e : Module.Basis (Fin r) S M) (φ : S → S) (Φ : M →+ M)
-    (hΦ : ∀ c m, Φ (c • m) = φ c • Φ m) (m : M) (i : Fin r) :
-    e.repr (Φ m) i = ∑ k, e.repr (Φ (e k)) i * φ (e.repr m k) := by
+theorem repr_semi
+    {r : ℕ} (e : Module.Basis (Fin r) S M)
+    (φ : S → S) (Φ : M →+ M) (hΦ : ∀ c m, Φ (c • m) = φ c • Φ m)
+    (m : M) (i : Fin r)
+    : e.repr (Φ m) i = ∑ k, e.repr (Φ (e k)) i * φ (e.repr m k) := by
   set_option synthInstance.maxHeartbeats 100000 in
     conv_lhs => rw [← e.sum_repr m, map_sum, map_sum]
   simp [hΦ, Finsupp.finsetSum_apply, mul_comm]
 
-theorem isUnit_det {r : ℕ} (e : Module.Basis (Fin r) S M) (φ : S → S) (Φ : M →+ M)
-    (hΦ : ∀ c m, Φ (c • m) = φ c • Φ m) (hsp : Submodule.span S {m | Φ m = m} = ⊤) :
-    IsUnit (Matrix.of fun i k => e.repr (Φ (e k)) i).det := by
+theorem isUnit_det
+    {r : ℕ} (e : Module.Basis (Fin r) S M)
+    (φ : S → S) (Φ : M →+ M)
+    (hΦ : ∀ c m, Φ (c • m) = φ c • Φ m) (hsp : Submodule.span S {m | Φ m = m} = ⊤)
+    : IsUnit (Matrix.of fun i k => e.repr (Φ (e k)) i).det := by
   have h : ∀ m : M, ∃ w : Fin r → S, ∀ i, e.repr m i = ∑ k, e.repr (Φ (e k)) i * w k := by
     intro m
     have hm : m ∈ Submodule.span S {m | Φ m = m} := hsp ▸ Submodule.mem_top
@@ -49,7 +59,8 @@ theorem isUnit_det {r : ℕ} (e : Module.Basis (Fin r) S M) (φ : S → S) (Φ :
     | mem x hx =>
       refine ⟨fun k => φ (e.repr x k), fun i => ?_⟩
       rw [← repr_semi e φ Φ hΦ, show Φ x = x from hx]
-    | zero => exact ⟨0, fun i => by simp⟩
+    | zero =>
+      exact ⟨0, fun i => by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨u, hu⟩ := hx
       obtain ⟨w, hw⟩ := hy
@@ -70,22 +81,24 @@ section Ten
 
 variable {O S N : Type} [CommRing O] [CommRing S] [Algebra O S] [AddCommGroup N] [Module O N]
 
-theorem map_smul_semi (f : S →ₐ[O] S) (g : N →ₗ[O] N) (c : S) (m : S ⊗[O] N) :
-    TensorProduct.map f.toLinearMap g (c • m) = f c • TensorProduct.map f.toLinearMap g m := by
+theorem map_smul_semi (f : S →ₐ[O] S) (g : N →ₗ[O] N) (c : S) (m : S ⊗[O] N)
+    : TensorProduct.map f.toLinearMap g (c • m) = f c • TensorProduct.map f.toLinearMap g m := by
   induction m using TensorProduct.induction_on with
   | zero => simp
   | tmul a t => simp [TensorProduct.smul_tmul']
   | add x y hx hy => simp only [smul_add, map_add (f := _), hx, hy]
 
-theorem map_mulLeft (c : S) (m : S ⊗[O] N) :
-    TensorProduct.map (LinearMap.mulLeft O c) (LinearMap.id : N →ₗ[O] N) m = c • m := by
+theorem map_mulLeft (c : S) (m : S ⊗[O] N)
+    : TensorProduct.map (LinearMap.mulLeft O c) (LinearMap.id : N →ₗ[O] N) m = c • m := by
   induction m using TensorProduct.induction_on with
   | zero => simp
   | tmul a t => simp [TensorProduct.smul_tmul']
   | add x y hx hy => simp only [smul_add, map_add (f := _), hx, hy]
 
-theorem span_fixed (f : S →ₐ[O] S) :
-    Submodule.span S {m : S ⊗[O] N | TensorProduct.map f.toLinearMap (LinearMap.id : N →ₗ[O] N) m = m} = ⊤ := by
+theorem span_fixed (f : S →ₐ[O] S)
+    : Submodule.span S
+        {m : S ⊗[O] N | TensorProduct.map f.toLinearMap (LinearMap.id : N →ₗ[O] N) m = m}
+      = ⊤ := by
   rw [eq_top_iff]
   rintro m -
   induction m using TensorProduct.induction_on with
@@ -100,36 +113,43 @@ end Ten
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n s : ℕ}
-    {Γ : WGam PD LL O v n s} {R : WSer Γ}
-    {RA RW : Type} [CommRing RA] [CommRing RW] [Algebra O RA]
-    [Algebra O RW] {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
-    {I : WIo R RA RW inclR φR gR πA}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n s : ℕ} {Γ : WGam PD LL O v n s} {R : WSer Γ} {RA RW : Type}
+  [CommRing RA] [CommRing RW] [Algebra O RA] [Algebra O RW]
+  {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
+  {I : WIo R RA RW inclR φR gR πA}
 
-theorem res_eq_one (hO : Function.Injective (algebraMap O LL)) (g : G) (hg : (PD.χ g : Qp) = 1) :
-    Γ.resΓ g = 1 := by
+theorem res_eq_one (hO : Function.Injective (algebraMap O LL)) (g : G) (hg : (PD.χ g : Qp) = 1)
+    : Γ.resΓ g = 1 := by
   apply Γ.χΓ_inj
   rw [map_one Γ.χΓ]
   apply Units.ext
   apply hO
   rw [Γ.χΓ_res g, hg, Units.val_one, map_one, map_one]
 
-theorem mem_range (E : WEt I) (T : LocLat G Qp LL O) (H : G → Prop) (hH : ∀ g, H g → Γ.resΓ g = 1)
-    (hu : ∀ x : R.EE, IsUnit (I.ioE x) → IsUnit x) (q : ℕ) (x : Fin q → TW RW T)
-    (A : Matrix (Fin q) (Fin q) R.EE)
-    (hrat : ∀ (p : ℕ) (F : Matrix (Fin p) (Fin p) R.EE) (U : Matrix (Fin p) (Fin q) RW), IsUnit F →
-      (∀ i j g, H g → gR g (U i j) = U i j) → F.map I.ioE * U.map φR = U * A.map I.ioE →
-      ∀ i j, U i j ∈ Set.range I.ioE)
+theorem mem_range
+    (E : WEt I)
+    (T : LocLat G Qp LL O)
+    (H : G → Prop) (hH : ∀ g, H g → Γ.resΓ g = 1)
+    (hu : ∀ x : R.EE, IsUnit (I.ioE x) → IsUnit x)
+    (q : ℕ) (x : Fin q → TW RW T) (A : Matrix (Fin q) (Fin q) R.EE)
+    (hrat : ∀ (p : ℕ) (F : Matrix (Fin p) (Fin p) R.EE) (U : Matrix (Fin p) (Fin q) RW),
+      IsUnit F → (∀ i j g, H g → gR g (U i j) = U i j) → F.map I.ioE * U.map φR = U * A.map I.ioE
+        → ∀ i j, U i j ∈ Set.range I.ioE)
     (hx : ∀ g, H g → ∀ i, TWact (gR g) T g (x i) = x i)
-    (hφ : ∀ j, TWmap φR T (x j) = ∑ i, TensorProduct.map (LinearMap.mulLeft O (I.ioE (A i j) : RW))
-      (LinearMap.id : ↥T.L.T →ₗ[O] ↥T.L.T) (x i)) :
-    ∀ i, x i ∈ Set.range (E.jD T) := by
+    (hφ : ∀ j,
+      TWmap φR T (x j)
+        = ∑ i, TensorProduct.map (LinearMap.mulLeft O (I.ioE (A i j) : RW))
+          (LinearMap.id : ↥T.L.T →ₗ[O] ↥T.L.T) (x i))
+    : ∀ i, x i ∈ Set.range (E.jD T) := by
   intro i₀
   rcases subsingleton_or_nontrivial RW with hS | hS
   · haveI : Subsingleton (TW RW T) := Module.subsingleton RW _
@@ -153,8 +173,10 @@ theorem mem_range (E : WEt I) (T : LocLat G Qp LL O) (H : G → Prop) (hH : ∀ 
       conv_lhs => rw [← b.sum_repr d, map_sum]
     simp only [E.jD_smul, ← he']
     rw [e.repr_sum_self]
-  have hsφ : ∀ (c : RW) (m : TW RW T), (TWmap φR T).toAddMonoidHom (c • m) =
-      φR c • (TWmap φR T).toAddMonoidHom m := fun c m => map_smul_semi φR _ c m
+  have hsφ
+      : ∀ (c : RW) (m : TW RW T),
+        (TWmap φR T).toAddMonoidHom (c • m) = φR c • (TWmap φR T).toAddMonoidHom m := fun c m =>
+    map_smul_semi φR _ c m
   let F : Matrix (Fin (Module.finrank O ↥T.L.T)) (Fin (Module.finrank O ↥T.L.T)) R.EE :=
     Matrix.of fun i k => b.repr (E.φD T (b k)) i
   have hF : F.map I.ioE = Matrix.of fun i k => e.repr ((TWmap φR T).toAddMonoidHom (e k)) i := by
@@ -176,8 +198,11 @@ theorem mem_range (E : WEt I) (T : LocLat G Qp LL O) (H : G → Prop) (hH : ∀ 
     simp only [E.jD_smul, ← he', hu', Matrix.of_apply]
     exact e.sum_repr _
   · intro i j g hg
-    have hs : ∀ (c : RW) (m : TW RW T), (TWact (gR g) T g).toAddMonoidHom (c • m) =
-      gR g c • (TWact (gR g) T g).toAddMonoidHom m := fun c m => map_smul_semi (gR g) _ c m
+    have hs
+        : ∀ (c : RW) (m : TW RW T),
+          (TWact (gR g) T g).toAddMonoidHom (c • m)
+            = gR g c • (TWact (gR g) T g).toAddMonoidHom m := fun c m =>
+      map_smul_semi (gR g) _ c m
     have h1 := repr_semi e (gR g) (TWact (gR g) T g).toAddMonoidHom hs (x j) i
     have h2 : ∀ k, TWact (gR g) T g (e k) = e k := fun k => by
       rw [he', ← E.jD_act, hH g hg, E.γD_one]
@@ -191,25 +216,44 @@ theorem mem_range (E : WEt I) (T : LocLat G Qp LL O) (H : G → Prop) (hH : ∀ 
     simp only [Matrix.mul_apply, Matrix.of_apply, Matrix.map_apply]
     rw [← h1, LinearMap.toAddMonoidHom_coe, hφ]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_mulLeft, map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply, smul_eq_mul]
+      simp only [map_mulLeft, map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply,
+        smul_eq_mul]
     exact Finset.sum_congr rfl fun k _ => mul_comm _ _
 
 end Generic
 
-
 set_option maxHeartbeats 1000000 in
-theorem fixed_mem_range : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (s : ℕ) (LL : FinExt l), Good K s LL → ∀ (Γ : GamS P K s LL) (R : WSer Γ) (I : IoS AI R), IoW I → ∀ (E : WEt I) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (q : ℕ) (x : Fin q → TW (RW LL) T) (A : Matrix (Fin q) (Fin q) R.EE), IsUnit A → (∀ g : ↥(GK K), P.χQ (g : GQ l) = 1 → ∀ i, TWact (AI.gRW LL (g : GQ l)) T g (x i) = x i) → (∀ j, TWmap (φRW LL) T (x j) = ∑ i, TensorProduct.map (LinearMap.mulLeft ↥(OL LL) (I.ioE (A i j) : RW LL)) (LinearMap.id : ↥T.L.T →ₗ[↥(OL LL)] ↥T.L.T) (x i)) → ∀ i, x i ∈ Set.range (E.jD T) := by
+theorem fixed_mem_range
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (s : ℕ)
+        (LL : FinExt l),
+      Good K s LL
+        → ∀ (Γ : GamS P K s LL) (R : WSer Γ) (I : IoS AI R),
+          IoW I
+            → ∀ (E : WEt I) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (q : ℕ)
+                (x : Fin q → TW (RW LL) T) (A : Matrix (Fin q) (Fin q) R.EE),
+              IsUnit A
+                → (∀ g : ↥(GK K),
+                  P.χQ (g : GQ l) = 1 → ∀ i, TWact (AI.gRW LL (g : GQ l)) T g (x i) = x i)
+                → (∀ j,
+                  TWmap (φRW LL) T (x j)
+                    = ∑ i, TensorProduct.map (LinearMap.mulLeft ↥(OL LL) (I.ioE (A i j) : RW LL)) (LinearMap.id : ↥T.L.T →ₗ[↥(OL LL)] ↥T.L.T) (x i))
+                → ∀ i, x i ∈ Set.range (E.jD T) := by
   intro l _ P AI K s LL hG Γ R I hI E T q x A hA hx hφ
   have h1 : ∀ g : ↥(GK K), P.χQ (g : GQ l) = 1 → Γ.resΓ g = 1 := fun g hg =>
     res_eq_one Subtype.val_injective g ((P.PD_χ K g).trans (congrArg Units.val hg))
   set_option synthInstance.maxHeartbeats 200000 in
-  have h2 : ∀ (p : ℕ) (F : Matrix (Fin p) (Fin p) R.EE) (U : Matrix (Fin p) (Fin q) (RW LL)), IsUnit F →
-      (∀ i j (g : ↥(GK K)), P.χQ (g : GQ l) = 1 → AI.gRW LL (g : GQ l) (U i j) = U i j) →
-      F.map I.ioE * U.map (φRW LL) = U * A.map I.ioE → ∀ i j, U i j ∈ Set.range I.ioE :=
-    fun p F U hF hU hE => GlobalTheory.T.fixedByCyclotomicKernel_etalePhi_solution_mem_wach l P AI K s LL hG Γ R I hI p q F A 0 U hF hA
+  have h2
+      : ∀ (p : ℕ) (F : Matrix (Fin p) (Fin p) R.EE) (U : Matrix (Fin p) (Fin q) (RW LL)),
+        IsUnit F → (∀ i j (g : ↥(GK K)), P.χQ (g : GQ l) = 1 → AI.gRW LL (g : GQ l) (U i j) = U i j)
+          → F.map I.ioE * U.map (φRW LL) = U * A.map I.ioE
+          → ∀ i j, U i j ∈ Set.range I.ioE := fun p F U hF hU hE =>
+    GlobalTheory.T.fixedByCyclotomicKernel_etalePhi_solution_mem_wach l P AI K s LL hG Γ R I hI p q
+      F A 0 U hF hA
       (fun i j g hg h1 => hU i j ⟨g, hg⟩ h1)
       (by simpa only [Matrix.map_zero, map_zero, add_zero] using hE)
-  exact mem_range E T (fun g => P.χQ (g : GQ l) = 1) h1 (GlobalTheory.T.wachInclusion_injective_saturated_inter l P AI K s LL hG Γ R I hI).2.1 q x A
+  exact mem_range E T
+    (fun g => P.χQ (g : GQ l) = 1)
+    h1 (GlobalTheory.T.wachInclusion_injective_saturated_inter l P AI K s LL hG Γ R I hI).2.1 q x A
     h2 hx hφ
 
 end GlobalTheory.HWL.EtMem

@@ -13,9 +13,13 @@ public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.IsOp
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.UPoinc GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+  GlobalTheory.UPoinc GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.USep
@@ -24,7 +28,22 @@ noncomputable section
 
 namespace GlobalTheory.USep
 
-theorem exists_normalisation_pullback_cover : ∀ {o : CommRingCat.{0}} [Algebra.FiniteType ℤ o] {Z Z' M : Scheme.{0}} (z : Z ⟶ Spec o) [LocallyOfFiniteType z] (b : Z' ⟶ Z) [IsProper b] (J : Z.IdealSheafData), FinalTheorems.Blowup b J → ∀ [IsIntegral M] [GlobalTheory.IsNormalScheme M] (U : Z.Opens) (g' : M ⟶ U.toScheme) [IsFinite g'], (∃ m, (g' ≫ U.ι) m ∉ J.support) → ∃ (S₁ : Scheme.{0}) (_ : IsIntegral S₁) (p₁ : S₁ ⟶ M) (ν₁ : S₁ ⟶ (b ⁻¹ᵁ U).toScheme), ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme S₁ ∧ IsProper p₁ ∧ IsFinite ν₁ ∧ ν₁ ≫ (b ∣_ U) = p₁ ≫ g' ∧ FinalTheorems.EffCartier (J.comap (p₁ ≫ g' ≫ U.ι)) ∧ (∀ m, (g' ≫ U.ι) m ∉ J.support → m ∈ Set.range p₁) ∧ ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (a : Sp R ⟶ (b ⁻¹ᵁ U).toScheme) (β : Sp R ⟶ M), a ≫ (b ∣_ U) = β ≫ g' → (∀ w, (jK R ≫ β ≫ g' ≫ U.ι) w ∉ J.support) → ∃ ξ₁ : Sp R ⟶ S₁, ξ₁ ≫ ν₁ = a ∧ ξ₁ ≫ p₁ = β := by
+theorem exists_normalisation_pullback_cover
+    : ∀ {o : CommRingCat.{0}} [Algebra.FiniteType ℤ o] {Z Z' M : Scheme.{0}} (z : Z ⟶ Spec o)
+        [LocallyOfFiniteType z] (b : Z' ⟶ Z) [IsProper b] (J : Z.IdealSheafData),
+      FinalTheorems.Blowup b J
+        → ∀ [IsIntegral M] [GlobalTheory.IsNormalScheme M] (U : Z.Opens) (g' : M ⟶ U.toScheme)
+            [IsFinite g'],
+          (∃ m, (g' ≫ U.ι) m ∉ J.support)
+            → ∃ (S₁ : Scheme.{0}) (_ : IsIntegral S₁) (p₁ : S₁ ⟶ M) (ν₁ : S₁ ⟶ (b ⁻¹ᵁ U).toScheme),
+              ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme S₁ ∧ IsProper p₁
+                ∧ IsFinite ν₁ ∧ ν₁ ≫ (b ∣_ U) = p₁ ≫ g'
+                ∧ FinalTheorems.EffCartier (J.comap (p₁ ≫ g' ≫ U.ι))
+                ∧ (∀ m, (g' ≫ U.ι) m ∉ J.support → m ∈ Set.range p₁)
+                ∧ ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R]
+                    (a : Sp R ⟶ (b ⁻¹ᵁ U).toScheme) (β : Sp R ⟶ M),
+                  a ≫ (b ∣_ U) = β ≫ g' → (∀ w, (jK R ≫ β ≫ g' ≫ U.ι) w ∉ J.support)
+                    → ∃ ξ₁ : Sp R ⟶ S₁, ξ₁ ≫ ν₁ = a ∧ ξ₁ ≫ p₁ = β := by
   intro o _ Z Z' M z _ b _ J hB _ _ U g' _ hne
   haveI : IsNoetherianRing o := Algebra.FiniteType.isNoetherianRing ℤ o
   haveI : IsLocallyNoetherian Z := LocallyOfFiniteType.isLocallyNoetherian z
@@ -32,7 +51,9 @@ theorem exists_normalisation_pullback_cover : ∀ {o : CommRingCat.{0}} [Algebra
   haveI : IsLocallyNoetherian M := LocallyOfFiniteType.isLocallyNoetherian (g' ≫ U.ι ≫ z)
   let Vi : Z.Opens := J.support.compl
   haveI hbV : IsIso (b ∣_ Vi) := GlobalTheory.Principalise.isIso_restrict_of_blowup hB Vi (fun x hx => hx)
-  have monoV : ∀ {T : Scheme.{0}} (u v : T ⟶ Z'), u ≫ b = v ≫ b → Set.range (u ≫ b) ⊆ (Vi : Set Z) → u = v := by
+  have monoV
+      : ∀ {T : Scheme.{0}} (u v : T ⟶ Z'),
+        u ≫ b = v ≫ b → Set.range (u ≫ b) ⊆ (Vi : Set Z) → u = v := by
     intro T u v huv hr
     have hu : Set.range u ⊆ ((b ⁻¹ᵁ Vi : Z'.Opens) : Set Z') := by
       rintro _ ⟨w, rfl⟩
@@ -42,8 +63,7 @@ theorem exists_normalisation_pullback_cover : ∀ {o : CommRingCat.{0}} [Algebra
       have := hr ⟨w, rfl⟩
       rw [huv] at this
       exact this
-    have hm : Mono ((b ⁻¹ᵁ Vi).ι ≫ b) := by
-      rw [← morphismRestrict_ι]; infer_instance
+    have hm : Mono ((b ⁻¹ᵁ Vi).ι ≫ b) := by rw [← morphismRestrict_ι]; infer_instance
     rw [← Scheme.Opens.range_ι] at hu hv
     rw [← IsOpenImmersion.lift_fac _ u hu, ← IsOpenImmersion.lift_fac _ v hv]
     congr 1
@@ -52,8 +72,9 @@ theorem exists_normalisation_pullback_cover : ∀ {o : CommRingCat.{0}} [Algebra
     exact huv
   let bU := b ∣_ U
   have hbU : bU ≫ U.ι = (b ⁻¹ᵁ U).ι ≫ b := morphismRestrict_ι _ _
-  have monoU : ∀ {T : Scheme.{0}} (u v : T ⟶ (b ⁻¹ᵁ U).toScheme), u ≫ bU = v ≫ bU →
-      Set.range (u ≫ bU ≫ U.ι) ⊆ (Vi : Set Z) → u = v := by
+  have monoU
+      : ∀ {T : Scheme.{0}} (u v : T ⟶ (b ⁻¹ᵁ U).toScheme),
+        u ≫ bU = v ≫ bU → Set.range (u ≫ bU ≫ U.ι) ⊆ (Vi : Set Z) → u = v := by
     intro T u v huv hr
     rw [← cancel_mono (b ⁻¹ᵁ U).ι]
     apply monoV
@@ -98,7 +119,19 @@ theorem exists_normalisation_pullback_cover : ∀ {o : CommRingCat.{0}} [Algebra
     show j.toNormalization ≫ j.fromNormalization ≫ pullback.snd bU g' = V.ι
     rw [Scheme.Hom.toNormalization_fromNormalization_assoc, hjs]
   have hcomm : ν₁ ≫ bU = p₁ ≫ g' := by simp [ν₁, p₁, pullback.condition]
-  refine ⟨j.normalization, inferInstance, p₁, ν₁, GlobalTheory.IsNormalScheme.pred _, ?_, ?_, hcomm, ?_, ?_, ?_⟩
+  refine ⟨
+    j.normalization,
+    inferInstance,
+    p₁,
+    ν₁,
+    GlobalTheory.IsNormalScheme.pred _,
+    ?_,
+    ?_,
+    hcomm,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · show IsProper (j.fromNormalization ≫ pullback.snd bU g')
     infer_instance
   · show IsFinite (j.fromNormalization ≫ pullback.fst bU g')
@@ -107,7 +140,8 @@ theorem exists_normalisation_pullback_cover : ∀ {o : CommRingCat.{0}} [Algebra
     have hpe : p₁ ≫ g' ≫ U.ι = (ν₁ ≫ (b ⁻¹ᵁ U).ι) ≫ b := by
       rw [← Category.assoc, ← hcomm, Category.assoc, hbU]; simp only [Category.assoc]
     have hK : D.KeepsRegular (ν₁ ≫ (b ⁻¹ᵁ U).ι) := by
-      refine D.keepsRegular_of_dense _ (fun y => inferInstance) ((j.toNormalization.denseRange).mono ?_)
+      refine
+        D.keepsRegular_of_dense _ (fun y => inferInstance) ((j.toNormalization.denseRange).mono ?_)
       rintro _ ⟨x, rfl⟩
       show (ν₁ ≫ (b ⁻¹ᵁ U).ι) (j.toNormalization x) ∉ D.idealSheaf.support
       rw [hD, GlobalTheory.ProjBlowup.mem_support_comap]
@@ -147,9 +181,10 @@ theorem exists_normalisation_pullback_cover : ∀ {o : CommRingCat.{0}} [Algebra
           rintro _ ⟨w, rfl⟩
           exact hgen w
       · rw [Category.assoc, hjs, Category.assoc, pullback.lift_snd, hy]
-    obtain ⟨ξ, ⟨-, hξ⟩, -⟩ := GlobalTheory.existsUnique_lift_spec_of_isLocalization (R := R) (R' := FractionRing R)
-      (nonZeroDivisors R) le_rfl j.fromNormalization (y ≫ j.toNormalization) d
-      (by rw [Category.assoc, Scheme.Hom.toNormalization_fromNormalization, hyj])
+    obtain ⟨ξ, ⟨-, hξ⟩, -⟩ :=
+      GlobalTheory.existsUnique_lift_spec_of_isLocalization (R := R) (R' := FractionRing R)
+        (nonZeroDivisors R) le_rfl j.fromNormalization (y ≫ j.toNormalization) d
+        (by rw [Category.assoc, Scheme.Hom.toNormalization_fromNormalization, hyj])
     refine ⟨ξ, ?_, ?_⟩
     · show ξ ≫ j.fromNormalization ≫ pullback.fst bU g' = a
       rw [← Category.assoc, hξ, pullback.lift_fst]

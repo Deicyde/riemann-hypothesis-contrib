@@ -22,26 +22,32 @@ namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
 open Formalism.MainNotions.G Formalism.BasicNotions Finset
 
-attribute [local instance] Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
+attribute [local instance]
+  Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO
+  Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
   Formalism.MainNotions.G.GAtP.algOK
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem linD (X : Sys p) : LinD X :=
-  { Tt_add := Tt_add X
-    Tt_smul := Tt_smul X
-    yv_add := fun v F F' => (yvLin X v).map_add F F'
-    yv_smul := fun v a F => (yvLin X v).map_smul a F
-    yv_comm := fun v v' F =>
-      funext fun i => Formalism.MainNotions.G.LatticeSystems.ef_yv_comm X.G.P v v' (F i) }
+theorem linD (X : Sys p) : LinD X := {
+  Tt_add := Tt_add X
+  Tt_smul := Tt_smul X
+  yv_add := fun v F F' => (yvLin X v).map_add F F'
+  yv_smul := fun v a F => (yvLin X v).map_smul a F
+  yv_comm := fun v v' F =>
+    funext fun i => Formalism.MainNotions.G.LatticeSystems.ef_yv_comm X.G.P v v' (F i)
+}
 
 variable {X : Sys p}
 
-theorem vGe_of_eO_zero (he : X.eO = 0) {j : ℕ} {F : X.Fm j} {g g' : ℝ} (h : X.vGe j F g) : X.vGe j F g' := by
+theorem vGe_of_eO_zero (he : X.eO = 0) {j : ℕ} {F : X.Fm j} {g g' : ℝ} (h : X.vGe j F g)
+    : X.vGe j F g' := by
   unfold Sys.vGe Sys.vsc at h ⊢
   simpa [he] using h
 
-theorem low_term_bound_of_eO_eq_zero_of_aux0 (D : Formalism.BasicNotions.D7) (Y : Pend X) (he : X.eO = 0) (h0 : Conclusion0 D X) : LowTermBound D X Y := by
+theorem low_term_bound_of_eO_eq_zero_of_aux0
+    (D : Formalism.BasicNotions.D7) (Y : Pend X) (he : X.eO = 0) (h0 : Conclusion0 D X)
+    : LowTermBound D X Y := by
   intro Gn G0n PRn S VV _ _ _ _ F hFm
   have hPl : ∀ _ : X.Pl, False := fun v => by have := eO_pos X v; omega
   have hFint : F ∈ X.Int 0 := by
@@ -67,17 +73,14 @@ theorem low_term_bound_of_eO_eq_zero_of_aux0 (D : Formalism.BasicNotions.D7) (Y 
   exact vGe_of_eO_zero he ((vGe_zero_iff X).2 (key X.mm le_rfl))
 
 structure Rests (D : Formalism.BasicNotions.D7) (X : Sys p) (Y : Pend X) : Prop where
-
   S1 : Conclusion1 D X Y
-
   allPlacesExpansion : ExpansionsMultiply D X Y
-
   U2 : VolumeRatio₂ D X Y
-
   Ent : EntCondition X Y
 
-theorem prv_and_kernel_commutation_up_to_units_of_rests (D : Formalism.BasicNotions.D7) (Y : Pend X) (hA : admitted D X Y) (R : Rests D X Y) :
-    Conclusion₂ D X Y ∧ KernelCommutationUpToUnits D X := by
+theorem prv_and_kernel_commutation_up_to_units_of_rests
+    (D : Formalism.BasicNotions.D7) (Y : Pend X) (hA : admitted D X Y) (R : Rests D X Y)
+    : Conclusion₂ D X Y ∧ KernelCommutationUpToUnits D X := by
   have hF : FormB X Y := formB D X Y hA
   have hH : RestHecke X := heckeCondition_of_adm D X Y hA countLoc (restTmFQ X)
   obtain ⟨_, _, _, _, h3, h3b, _, _, _, _, _, h8, _⟩ := hA
@@ -88,19 +91,37 @@ theorem prv_and_kernel_commutation_up_to_units_of_rests (D : Formalism.BasicNoti
   have p5D : LowTermBound D X Y := by
     rcases Nat.eq_zero_or_pos X.eO with he | he
     · exact low_term_bound_of_eO_eq_zero_of_aux0 D Y he (form_valuation_of_bound D hF h3)
-    · exact lift_bound_of_integrality D (isFractionRing_of_pos_eO Y he) (pKf_ne Y) (linD X) hF R.Ent p4
-        (fun v F hFm => h8.2 v F hFm)
-  exact ⟨⟨form_valuation_of_bound D hF h3, R.S1, R.allPlacesExpansion, slopeEstimate_of_lemmaB_slopeLine D hF R.Ent R.U2, theorem_A_entries_of_corollary D R.Ent (restRat X) R.U2, R.U2, p2b, p3, p4,
-    ramifiedLattice_of_chain_estimates D R.U2 p5D, p5D⟩, pAlt⟩
+    · exact lift_bound_of_integrality D (isFractionRing_of_pos_eO Y he) (pKf_ne Y) (linD X) hF R.Ent
+        p4 (fun v F hFm => h8.2 v F hFm)
+  exact ⟨
+    ⟨
+      form_valuation_of_bound D hF h3,
+      R.S1,
+      R.allPlacesExpansion,
+      slopeEstimate_of_lemmaB_slopeLine D hF R.Ent R.U2,
+      theorem_A_entries_of_corollary D R.Ent (restRat X) R.U2,
+      R.U2,
+      p2b,
+      p3,
+      p4,
+      ramifiedLattice_of_chain_estimates D R.U2 p5D,
+      p5D
+    ⟩,
+    pAlt
+  ⟩
 
-theorem rests (D : Formalism.BasicNotions.D7) (Y : Pend X) (hA : admitted D X Y) : Rests D X Y :=
-  { S1 := theta_kernel_expansion D X Y hA
-    allPlacesExpansion := expansions_multiply D X Y hA
-    U2 := auxU_of_firstTheoremPlaceBound D (first_theorem_place_bound X Y D (restGc p) (eb_brJet X)) hA
-    Ent := restEnt_of X Y D (second_lemma_place_bound X Y D (restGc p) (eb_brJet X))
-      (hecke_place_bound X Y D (restGc p) (eb_brJet X)) hA }
+theorem rests (D : Formalism.BasicNotions.D7) (Y : Pend X) (hA : admitted D X Y) : Rests D X Y := {
+  S1 := theta_kernel_expansion D X Y hA
+  allPlacesExpansion := expansions_multiply D X Y hA
+  U2 :=
+    auxU_of_firstTheoremPlaceBound D (first_theorem_place_bound X Y D (restGc p) (eb_brJet X)) hA
+  Ent :=
+    restEnt_of X Y D (second_lemma_place_bound X Y D (restGc p) (eb_brJet X))
+      (hecke_place_bound X Y D (restGc p) (eb_brJet X)) hA
+}
 
-theorem packet_statements_hold (D : Formalism.BasicNotions.D7) (Y : Pend X) (hA : admitted D X Y) : Conclusion₂ D X Y :=
+theorem packet_statements_hold (D : Formalism.BasicNotions.D7) (Y : Pend X) (hA : admitted D X Y)
+    : Conclusion₂ D X Y :=
   (prv_and_kernel_commutation_up_to_units_of_rests D Y hA (rests D Y hA)).1
 
 theorem stmt_proved (D : Formalism.BasicNotions.D7) : Stmt D :=

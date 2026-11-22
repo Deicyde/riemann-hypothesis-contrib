@@ -14,7 +14,12 @@ set_option autoImplicit false
 
 namespace GlobalTheory.CechCmp
 
-theorem toCech_toPos : ∀ (I : Type) [Finite I] (X : Scheme.{0}) (R : Type) [CommRing R] (s : X ⟶ Sp R) (U : I → X.Opens) (hU : ∀ i, IsAffineOpen (U i)) (hinf : ∀ V W : X.Opens, IsAffineOpen V → IsAffineOpen W → IsAffineOpen (V ⊓ W)), ∀ c : GlobalTheory.KS.C1 U, IsCoc U c → toCech s U hU hinf (toPos s U hU hinf c) = c := by
+theorem toCech_toPos
+    : ∀ (I : Type) [Finite I] (X : Scheme.{0}) (R : Type) [CommRing R] (s : X ⟶ Sp R)
+        (U : I → X.Opens) (hU : ∀ i, IsAffineOpen (U i))
+        (hinf : ∀ V W : X.Opens, IsAffineOpen V → IsAffineOpen W → IsAffineOpen (V ⊓ W)),
+      ∀ c : GlobalTheory.KS.C1 U,
+        IsCoc U c → toCech s U hU hinf (toPos s U hU hinf c) = c := by
   intro I _ X R _ s U hU hinf c hc
   funext i j
   rw [toCech_apply, cv_toPos, cv_toPos]
@@ -38,7 +43,9 @@ theorem toCech_toPos : ∀ (I : Type) [Finite I] (X : Scheme.{0}) (R : Type) [Co
   simp only [GlobalTheory.KS.rsT_add] at h
   have e₁ : U i ⊓ U j ⊓ U k ≤ U j ⊓ U k := inf_le_inf_right _ inf_le_right
   have e₂ : U i ⊓ U j ⊓ U k ≤ U i ⊓ U k := inf_le_inf_right _ inf_le_left
-  rw [GlobalTheory.KS.rsT_rsT inf_le_left hle, GlobalTheory.KS.rsT_self, GlobalTheory.KS.rsT_rsT e₁ hle, GlobalTheory.KS.rsT_rsT e₂ hle] at h
+  rw [GlobalTheory.KS.rsT_rsT inf_le_left hle, GlobalTheory.KS.rsT_self,
+      GlobalTheory.KS.rsT_rsT e₁ hle, GlobalTheory.KS.rsT_rsT e₂ hle]
+    at h
   rw [← h]
   abel
 

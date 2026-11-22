@@ -7,10 +7,13 @@ public import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.Comp
 
 namespace PositivityTheory.Exh
 
-theorem standardCosocleGL_holds : GlobalTheory.Published.StandardCosocleGL := standardCosocleGL_of_seg PositivityTheory.RgGu.segmentRepresentation
+theorem standardCosocleGL_holds : GlobalTheory.Published.StandardCosocleGL :=
+  standardCosocleGL_of_seg PositivityTheory.RgGu.segmentRepresentation
 
-theorem langlandsExhaustionGL_holds : GlobalTheory.Published.LanglandsExhaustionGL := langlandsExhaustionGL_of_seg PositivityTheory.RgGu.segmentRepresentation
+theorem langlandsExhaustionGL_holds : GlobalTheory.Published.LanglandsExhaustionGL :=
+  langlandsExhaustionGL_of_seg PositivityTheory.RgGu.segmentRepresentation
 
-theorem langlandsMultisegments_holds : GlobalTheory.Published.LanglandsMultisegments := langlandsMultisegments_of_seg PositivityTheory.RgGu.segmentRepresentation
+theorem langlandsMultisegments_holds : GlobalTheory.Published.LanglandsMultisegments :=
+  langlandsMultisegments_of_seg PositivityTheory.RgGu.segmentRepresentation
 
 end PositivityTheory.Exh

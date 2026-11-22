@@ -8,7 +8,8 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
 
 noncomputable section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
 
 namespace UpperTheory.N
 
@@ -32,21 +33,29 @@ structure Cyc (N : ℕ) (K LL : FinExt l) : Prop where
 
 variable (P : LocPrime l)
 
-def LiftK : Prop := ∀ (N h : ℕ) (K LL : FinExt l), Cyc N K LL →
-  ∀ (T₁ T₂ : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (F : LatHom T₁.L T₂.L),
-    IsCrys (P.PD K) T₁.ρ → IsCrys (P.PD K) T₂.ρ → F.Onto →
-    (∀ τ, JumpsInV (P.PD K) T₁.ρ τ (Set.Icc (-(h : ℤ)) h)) → F.LiftF (P.PD K) (eL l N h)
-
+def LiftK : Prop :=
+  ∀ (N h : ℕ) (K LL : FinExt l),
+    Cyc N K LL
+      → ∀ (T₁ T₂ : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (F : LatHom T₁.L T₂.L),
+        IsCrys (P.PD K) T₁.ρ → IsCrys (P.PD K) T₂.ρ → F.Onto
+          → (∀ τ, JumpsInV (P.PD K) T₁.ρ τ (Set.Icc (-(h : ℤ)) h))
+          → F.LiftF (P.PD K) (eL l N h)
 
 set_option synthInstance.maxHeartbeats 400000 in
-def InvariantsKilledOverCyclotomic : Prop := ∀ (N h n : ℕ) (K LL : FinExt l), Cyc N K LL →
-  ∀ (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (U : Finset ℤ), U.card ≤ n → (∀ u ∈ U, -(h : ℤ) ≤ u ∧ u ≤ h) →
-    IsCrys (P.PD K) T.ρ → (∀ τ, JumpsInV (P.PD K) T.ρ τ (U : Set ℤ)) → (∀ τ, ¬ IsJumpV (P.PD K) T.ρ τ 0) →
-    ∀ x : T.V ⧸ T.L.T, (∀ g, actD T.L g x = x) → ((l : ↥(OL LL)) ^ c0L l N h n) • x = 0
+def InvariantsKilledOverCyclotomic : Prop :=
+  ∀ (N h n : ℕ) (K LL : FinExt l),
+    Cyc N K LL
+      → ∀ (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (U : Finset ℤ),
+        U.card ≤ n → (∀ u ∈ U, -(h : ℤ) ≤ u ∧ u ≤ h) → IsCrys (P.PD K) T.ρ
+          → (∀ τ, JumpsInV (P.PD K) T.ρ τ (U : Set ℤ)) → (∀ τ, ¬ IsJumpV (P.PD K) T.ρ τ 0)
+          → ∀ x : T.V ⧸ T.L.T, (∀ g, actD T.L g x = x) → ((l : ↥(OL LL)) ^ c0L l N h n) • x = 0
 
-def TBK : Prop := ∀ (N h n t : ℕ) (K LL : FinExt l), Cyc N K LL → t ≤ h →
-  ∀ (J : (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) → Set ℤ) (U : Finset ℤ), U.card ≤ n → (∀ u ∈ U, -(h : ℤ) ≤ u ∧ u ≤ h) →
-    (∀ τ, J τ ⊆ (U : Set ℤ)) → TBAt (P.PD K) (O := ↥(OL LL)) (IK K) J t (cBL l N h n t)
+def TBK : Prop :=
+  ∀ (N h n t : ℕ) (K LL : FinExt l),
+    Cyc N K LL → t ≤ h
+      → ∀ (J : (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) → Set ℤ) (U : Finset ℤ),
+        U.card ≤ n → (∀ u ∈ U, -(h : ℤ) ≤ u ∧ u ≤ h) → (∀ τ, J τ ⊆ (U : Set ℤ))
+          → TBAt (P.PD K) (O := ↥(OL LL)) (IK K) J t (cBL l N h n t)
 
 end UpperTheory.N
 

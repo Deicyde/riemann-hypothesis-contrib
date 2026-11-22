@@ -50,13 +50,14 @@ lemma map_mem_fixSub [hN : Δ.Normal] (g : G) {x : K} (hx : x ∈ fixSub ρ Δ) 
     _ = ρ g x := by rw [h]
 
 def restr [Δ.Normal] : G →* RingAut (fixSub ρ Δ) where
-  toFun g :=
-    { toFun := fun x => ⟨ρ g x, map_mem_fixSub ρ Δ g x.2⟩
-      invFun := fun x => ⟨ρ g⁻¹ x, map_mem_fixSub ρ Δ g⁻¹ x.2⟩
-      left_inv := fun x => Subtype.ext (rho_inv_apply_apply ρ g (x : K))
-      right_inv := fun x => Subtype.ext (rho_apply_inv_apply ρ g (x : K))
-      map_mul' := fun x y => Subtype.ext (map_mul (ρ g) (x : K) (y : K))
-      map_add' := fun x y => Subtype.ext (map_add (ρ g) (x : K) (y : K)) }
+  toFun g := {
+    toFun := fun x => ⟨ρ g x, map_mem_fixSub ρ Δ g x.2⟩
+    invFun := fun x => ⟨ρ g⁻¹ x, map_mem_fixSub ρ Δ g⁻¹ x.2⟩
+    left_inv := fun x => Subtype.ext (rho_inv_apply_apply ρ g (x : K))
+    right_inv := fun x => Subtype.ext (rho_apply_inv_apply ρ g (x : K))
+    map_mul' := fun x y => Subtype.ext (map_mul (ρ g) (x : K) (y : K))
+    map_add' := fun x y => Subtype.ext (map_add (ρ g) (x : K) (y : K))
+  }
   map_one' := by
     ext x
     simp
@@ -71,16 +72,18 @@ lemma le_ker_restr [Δ.Normal] : Δ ≤ (restr ρ Δ).ker := by
   ext x
   exact x.2 δ hδ
 
-theorem mem_closure_of_fixed (K G : Type) [Field K] [Group G] (ρ : G →* RingAut K)
-    (Δ : Subgroup G) (hN : Δ.Normal) (hfi : Δ.FiniteIndex) (Y : Set K) (f : K)
-    (hY : ∀ y ∈ Y, ∀ δ ∈ Δ, ρ δ y = y) (hf : ∀ δ ∈ Δ, ρ δ f = f)
-    (hfix : ∀ g : G, (∀ y ∈ Y, ρ g y = y) → ρ g f = f) :
-    f ∈ Subfield.closure ({x | ∀ g : G, ρ g x = x} ∪ Y) := by
+theorem mem_closure_of_fixed
+    (K G : Type) [Field K] [Group G]
+    (ρ : G →* RingAut K)
+    (Δ : Subgroup G) (hN : Δ.Normal) (hfi : Δ.FiniteIndex)
+    (Y : Set K) (f : K) (hY : ∀ y ∈ Y, ∀ δ ∈ Δ, ρ δ y = y) (hf : ∀ δ ∈ Δ, ρ δ f = f)
+    (hfix : ∀ g : G, (∀ y ∈ Y, ρ g y = y) → ρ g f = f)
+    : f ∈ Subfield.closure ({x | ∀ g : G, ρ g x = x} ∪ Y) := by
   let L := fixSub ρ Δ
   let act : G ⧸ Δ →* RingAut L := QuotientGroup.lift Δ (restr ρ Δ) (le_ker_restr ρ Δ)
   letI : MulSemiringAction (G ⧸ Δ) L := MulSemiringAction.compHom L act
-  have hsmul : ∀ (g : G) (x : L), (((QuotientGroup.mk g : G ⧸ Δ) • x : L) : K) = ρ g x :=
-    fun g x => rfl
+  have hsmul : ∀ (g : G) (x : L), (((QuotientGroup.mk g : G ⧸ Δ) • x : L) : K) = ρ g x := fun g x =>
+    rfl
   let F := FixedPoints.subfield (G ⧸ Δ) L
   let Y' : Set L := {y | (y : K) ∈ Y}
   let E : IntermediateField F L := IntermediateField.adjoin F Y'

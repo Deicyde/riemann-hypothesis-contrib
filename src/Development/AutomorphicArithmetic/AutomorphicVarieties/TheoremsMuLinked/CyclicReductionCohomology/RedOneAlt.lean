@@ -4,11 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuL
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th GlobalTheory.GalOfCusp
+open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV
+  UpperTheory.V.Th GlobalTheory.GalOfCusp
 
-private theorem cnt {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (Z B : AddSubgroup X) [Finite Z] (hB : B ≤ Z) (f : X →+ Y)
-    (hf : ∀ b ∈ B, f b = 0) (S : Set Y) (hS : ∀ s ∈ S, ∃ z ∈ Z, f z = s) :
-    S.Finite ∧ S.ncard * Nat.card B ≤ (Z : Set X).ncard := by
+private theorem cnt
+    {X Y : Type} [AddCommGroup X] [AddCommGroup Y]
+    (Z B : AddSubgroup X) [Finite Z]
+    (hB : B ≤ Z)
+    (f : X →+ Y) (hf : ∀ b ∈ B, f b = 0)
+    (S : Set Y) (hS : ∀ s ∈ S, ∃ z ∈ Z, f z = s)
+    : S.Finite ∧ S.ncard * Nat.card B ≤ (Z : Set X).ncard := by
   let g : Z →+ Y := f.comp Z.subtype
   haveI : Finite g.range := Finite.of_surjective _ g.rangeRestrict_surjective
   have hsub : S ⊆ (g.range : Set Y) := fun s hs => by
@@ -20,7 +26,8 @@ private theorem cnt {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (Z B : AddSub
     rw [← SetLike.coe_sort_coe, Nat.card_coe_set_eq]
     exact Set.ncard_le_ncard hsub hfin
   have h2 : Nat.card B ≤ Nat.card g.ker :=
-    Nat.card_le_card_of_injective (fun b : B => (⟨⟨b.1, hB b.2⟩, hf b.1 b.2⟩ : g.ker))
+    Nat.card_le_card_of_injective
+      (fun b : B => (⟨⟨b.1, hB b.2⟩, hf b.1 b.2⟩ : g.ker))
       fun a b e => Subtype.ext (congrArg (fun t : g.ker => t.1.1) e)
   have h3 : Nat.card Z = Nat.card g.range * Nat.card g.ker := by
     rw [AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup g.ker,
@@ -28,11 +35,14 @@ private theorem cnt {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (Z B : AddSub
   rw [← Nat.card_coe_set_eq (Z : Set X), SetLike.coe_sort_coe, h3]
   exact Nat.mul_le_mul h1 h2
 
-private theorem red_mul {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O) :
-    red m (A * B) = red m A * red m B := Matrix.map_mul
+private theorem red_mul
+    {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O)
+    : red m (A * B) = red m A * red m B :=
+  Matrix.map_mul
 
-private theorem red_one {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) :
-    red m (1 : Matrix (Fin n) (Fin n) O) = 1 := Matrix.map_one _ (map_zero _) (map_one _)
+private theorem red_one {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ)
+    : red m (1 : Matrix (Fin n) (Fin n) O) = 1 :=
+  Matrix.map_one _ (map_zero _) (map_one _)
 
 theorem UpperTheory.V.Th.selTr :
     ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (n : ℕ) (y : Pt G0.frame O n) (m : ℕ) (rep : Representation O G.Γ (Mm O n m)), IsAd0 h y m rep → LC rep → Finite (Zl rep) → (trFun h y m '' Sel h y m).Finite ∧ (trFun h y m '' Sel h y m).ncard * Nat.card (Bl rep) ≤ {z | z ∈ Zl rep ∧ (∀ v, z ∘ (G.η.ker.subtype.comp (G.φ v)) ∈ (Bl (rep.comp (G.η.ker.subtype.comp (G.φ v)) : Representation O (L.Gv v) _)).toAddSubgroup ⊔ Zbor y m v) ∧ ∀ u, ∀ g ∈ L.Ju u, z (G.φu u g) = 0}.ncard := by

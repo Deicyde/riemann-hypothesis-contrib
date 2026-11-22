@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.IntegralClosureLocal
 
-theorem mem_maximal_iff_not_inv_mem {K : Type} [Field K] (R : Subring K) [IsLocalRing R]
+theorem mem_maximal_iff_not_inv_mem
+    {K : Type} [Field K]
+    (R : Subring K) [IsLocalRing R]
     (P : Ideal (integralClosure R K).toSubring) (hP : P.IsMaximal)
-    (t : (integralClosure R K).toSubring) (htR : (t : K) ∈ R) :
-    t ∈ P ↔ ¬ ((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ R) := by
+    (t : (integralClosure R K).toSubring) (htR : (t : K) ∈ R)
+    : t ∈ P ↔ ¬((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ R) := by
   let f : R →+* (integralClosure R K).toSubring :=
     (algebraMap R K).codRestrict (integralClosure R K).toSubring
       (fun r => (integralClosure R K).algebraMap_mem r)
@@ -24,8 +26,8 @@ theorem mem_maximal_iff_not_inv_mem {K : Type} [Field K] (R : Subring K) [IsLoca
   have hm : (P.comap (algebraMap R (integralClosure R K).toSubring)).IsMaximal :=
     letI := hP
     Ideal.isMaximal_under_of_isIntegral_of_isMaximal P
-  have hmax : P.comap (algebraMap R (integralClosure R K).toSubring)
-      = IsLocalRing.maximalIdeal R := IsLocalRing.eq_maximalIdeal hm
+  have hmax : P.comap (algebraMap R (integralClosure R K).toSubring) = IsLocalRing.maximalIdeal R :=
+    IsLocalRing.eq_maximalIdeal hm
   have hrt : algebraMap R (integralClosure R K).toSubring ⟨t, htR⟩ = t := Subtype.ext rfl
   have h1 : t ∈ P ↔ (⟨t, htR⟩ : R) ∈ IsLocalRing.maximalIdeal R := by
     rw [← hmax, Ideal.mem_comap, hrt]

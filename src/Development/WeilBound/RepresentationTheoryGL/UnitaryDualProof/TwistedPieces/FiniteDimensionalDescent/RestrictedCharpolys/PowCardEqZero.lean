@@ -10,19 +10,26 @@ open Matrix Polynomial
 
 namespace PositivityTheory.RgUd.TP.Desc.Restr.PphiC
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc PositivityTheory.RgUd.TP.Desc.Restr PositivityTheory.RgUd.TP.Desc.Restr.PphiA
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc
+  PositivityTheory.RgUd.TP.Desc.Restr PositivityTheory.RgUd.TP.Desc.Restr.PphiA
   PositivityTheory.RgUd.TP.Desc.Restr.PphiB
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  {p c d : ℕ} [Fact p.Prime] [CharP k p] (B : FB k (p ^ c) d) {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {p c d : ℕ} [Fact p.Prime] [CharP k p]
+  (B : FB k (p ^ c) d)
+  {n : ℕ}
 
-def Z' (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) : Subalgebra k (Matrix (Fin (n * d)) (Fin (n * d)) k) :=
-  { toSubsemiring := Z.toSubsemiring.map (φ B)
-    algebraMap_mem' := fun a => ⟨algebraMap k _ (a ^ p ^ c), Z.algebraMap_mem _, φ_scal B a⟩ }
+def Z' (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+    : Subalgebra k (Matrix (Fin (n * d)) (Fin (n * d)) k) := {
+  toSubsemiring := Z.toSubsemiring.map (φ B)
+  algebraMap_mem' := fun a => ⟨algebraMap k _ (a ^ p ^ c), Z.algebraMap_mem _, φ_scal B a⟩
+}
 
 omit [ValuativeRel k] [IsNonarchimedeanLocalField k] in
-theorem coe_Z' (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) :
-    ((Z' B Z : Subalgebra k _) : Set (Matrix (Fin (n * d)) (Fin (n * d)) k)) = φ B '' (Z : Set (Matrix (Fin n) (Fin n) k)) :=
+theorem coe_Z' (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+    : ((Z' B Z : Subalgebra k _) : Set (Matrix (Fin (n * d)) (Fin (n * d)) k))
+      = φ B '' (Z : Set (Matrix (Fin n) (Fin n) k)) :=
   rfl
 
 omit [ValuativeRel k] [IsNonarchimedeanLocalField k] in
@@ -30,22 +37,23 @@ theorem eI_add (w w' : Fin (n * d) → k) : eI B (w + w') = eI B w + eI B w' := 
   funext i
   simp only [eI, Pi.add_apply, add_pow_char_pow, add_mul, Finset.sum_add_distrib]
 
-
 omit [ValuativeRel k] [IsNonarchimedeanLocalField k] in
-theorem φ_ψ_of_comm (y : Matrix (Fin (n * d)) (Fin (n * d)) k)
-    (hy : ∀ b : k, φ B (algebraMap k _ b) * y = y * φ B (algebraMap k _ b)) : φ B (ψ B y) = y := by
+theorem φ_ψ_of_comm
+    (y : Matrix (Fin (n * d)) (Fin (n * d)) k)
+    (hy : ∀ b : k, φ B (algebraMap k _ b) * y = y * φ B (algebraMap k _ b))
+    : φ B (ψ B y) = y := by
   have hsm : ∀ (b : k) (v : Fin n → k), b • v = algebraMap k (Matrix (Fin n) (Fin n) k) b *ᵥ v := by
     intro b v
     rw [Algebra.algebraMap_eq_smul_one, Matrix.smul_mulVec, Matrix.one_mulVec]
-  let L : (Fin n → k) →ₗ[k] (Fin n → k) :=
-    { toFun := fun v => eI B (y *ᵥ eF B v)
-      map_add' := fun v v' => by
-        simp only [eF_add, Matrix.mulVec_add, eI_add]
-      map_smul' := fun b v => by
-        simp only [RingHom.id_apply]
-        rw [hsm b v, hsm b (eI B (y *ᵥ eF B v)), ← φ_apply_mulVec B _ v, Matrix.mulVec_mulVec, ← hy b,
-          ← Matrix.mulVec_mulVec]
-        conv_lhs => rw [← eF_eI B (y *ᵥ eF B v), φ_apply_mulVec, eI_eF] }
+  let L : (Fin n → k) →ₗ[k] (Fin n → k) := {
+    toFun := fun v => eI B (y *ᵥ eF B v)
+    map_add' := fun v v' => by simp only [eF_add, Matrix.mulVec_add, eI_add]
+    map_smul' := fun b v => by
+      simp only [RingHom.id_apply]
+      rw [hsm b v, hsm b (eI B (y *ᵥ eF B v)), ← φ_apply_mulVec B _ v, Matrix.mulVec_mulVec, ← hy b,
+        ← Matrix.mulVec_mulVec]
+      conv_lhs => rw [← eF_eI B (y *ᵥ eF B v), φ_apply_mulVec, eI_eF]
+  }
   have hL : ψ B y = LinearMap.toMatrix' L := by
     ext i i'
     rw [LinearMap.toMatrix'_apply]
@@ -80,8 +88,8 @@ theorem cen (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) : Bz (Z' B Z) = φ B '
     rw [← map_mul, ← map_mul, hy' z hz]
 
 omit [ValuativeRel k] [IsNonarchimedeanLocalField k] in
-theorem gz (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (g' : GL (Fin (n * d)) k) :
-    g' ∈ Gz (Z' B Z) ↔ ∃ g ∈ Gz Z, φ B g.val = g'.val := by
+theorem gz (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (g' : GL (Fin (n * d)) k)
+    : g' ∈ Gz (Z' B Z) ↔ ∃ g ∈ Gz Z, φ B g.val = g'.val := by
   constructor
   · intro hg
     have hg' : ∀ a ∈ Z' B Z, a * g'.val = g'.val * a := hg
@@ -142,7 +150,8 @@ theorem pow_card_eq_zero (x : Matrix (Fin n) (Fin n) k) (hx : IsNilpotent x) : x
   exact h3
 
 omit [ValuativeRel k] [IsNonarchimedeanLocalField k] in
-theorem nil (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hn : n ≤ p ^ c) : NilBound (Z' B Z) (p ^ c) := by
+theorem nil (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hn : n ≤ p ^ c)
+    : NilBound (Z' B Z) (p ^ c) := by
   intro y hy hnil
   rw [cen] at hy
   obtain ⟨x, hx, rfl⟩ := hy

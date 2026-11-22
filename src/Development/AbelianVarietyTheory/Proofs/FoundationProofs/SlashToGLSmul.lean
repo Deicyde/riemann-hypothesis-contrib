@@ -14,9 +14,10 @@ namespace GlobalTheory.HeckeFamilyMatrices
 
 def wOld (N l : ℕ) (a b : ℤ) : Matrix (Fin 2) (Fin 2) ℤ := !![(l : ℤ), a; (N : ℤ) * l, (l : ℤ) * b]
 
-def gaOld (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) (j : ℕ) : SL(2, ℤ) :=
-  ⟨!![1, (j : ℤ) + a; (N : ℤ), (N : ℤ) * j + l * b], by
-    rw [Matrix.det_fin_two_of]; linear_combination h⟩
+def gaOld (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) (j : ℕ) : SL(2, ℤ) := ⟨
+  !![1, (j : ℤ) + a; (N : ℤ), (N : ℤ) * j + l * b],
+  by rw [Matrix.det_fin_two_of]; linear_combination h
+⟩
 
 def trOld (k : ℤ) (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) (G : ℍ → ℂ) : ℍ → ℂ :=
   G + ∑ j ∈ Finset.range l, G ∣[k] gaOld N l a b h j
@@ -24,8 +25,7 @@ def trOld (k : ℤ) (N l : ℕ) (a b : ℤ) (h : (l : ℤ) * b - N * a = 1) (G :
 def ChiInv (k : ℤ) (N M : ℕ) (χ : DirichletCharacter ℂ N) (G : ℍ → ℂ) : Prop :=
   ∀ γ : SL(2, ℤ), γ ∈ Gamma0 M → G ∣[k] γ = χ ((mat γ 1 1 : ℤ) : ZMod N) • G
 
-def CuspAll (k : ℤ) (G : ℍ → ℂ) : Prop :=
-  MDiff G ∧ ∀ c : OnePoint ℝ, IsCusp c 𝒮ℒ → c.IsZeroAt G k
+def CuspAll (k : ℤ) (G : ℍ → ℂ) : Prop := MDiff G ∧ ∀ c : OnePoint ℝ, IsCusp c 𝒮ℒ → c.IsZeroAt G k
 
 end GlobalTheory.HeckeFamilyMatrices
 

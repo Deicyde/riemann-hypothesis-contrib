@@ -30,24 +30,23 @@ instance : Nonempty FiniteSubfield := ⟨⟨⊥, inferInstance⟩⟩
 abbrev algebraOfLE {F E : FiniteSubfield} (h : F ≤ E) : Algebra F.1 E.1 :=
   (IntermediateField.inclusion (show F.1 ≤ E.1 from h)).toRingHom.toAlgebra
 
-def ideleClassMap {F E : FiniteSubfield} (h : F ≤ E) :
-    IdeleClassGroup F.1 →* IdeleClassGroup E.1 :=
+def ideleClassMap {F E : FiniteSubfield} (h : F ≤ E) : IdeleClassGroup F.1 →* IdeleClassGroup E.1 :=
   letI := algebraOfLE h
   GroundTheory.Global.ideleClassMap F.1 E.1
 
-theorem ideleClassMap_mk {F E : FiniteSubfield} (h : F ≤ E) (x : IdeleGroup F.1) :
-    ideleClassMap h (IdeleClassGroup.mk F.1 x) =
-      IdeleClassGroup.mk E.1 (@ideleEmbedding F.1 E.1 _ _ _ _ (algebraOfLE h) x) :=
+theorem ideleClassMap_mk {F E : FiniteSubfield} (h : F ≤ E) (x : IdeleGroup F.1)
+    : ideleClassMap h (IdeleClassGroup.mk F.1 x)
+      = IdeleClassGroup.mk E.1 (@ideleEmbedding F.1 E.1 _ _ _ _ (algebraOfLE h) x) :=
   rfl
 
-theorem ideleClassMap_injective {F E : FiniteSubfield} (h : F ≤ E) :
-    Function.Injective (ideleClassMap h) :=
+theorem ideleClassMap_injective {F E : FiniteSubfield} (h : F ≤ E)
+    : Function.Injective (ideleClassMap h) :=
   letI := algebraOfLE h
   GroundTheory.Global.ideleClassMap_injective
 
-theorem ideleClassMap_ideleClassMap {F E M : FiniteSubfield} (hFE : F ≤ E) (hEM : E ≤ M)
-    (c : IdeleClassGroup F.1) :
-    ideleClassMap hEM (ideleClassMap hFE c) = ideleClassMap (hFE.trans hEM) c := by
+theorem ideleClassMap_ideleClassMap
+    {F E M : FiniteSubfield} (hFE : F ≤ E) (hEM : E ≤ M) (c : IdeleClassGroup F.1)
+    : ideleClassMap hEM (ideleClassMap hFE c) = ideleClassMap (hFE.trans hEM) c := by
   let := algebraOfLE hFE
   let := algebraOfLE hEM
   let := algebraOfLE (hFE.trans hEM)
@@ -55,66 +54,82 @@ theorem ideleClassMap_ideleClassMap {F E M : FiniteSubfield} (hFE : F ≤ E) (hE
   exact GroundTheory.Global.ideleClassMap_ideleClassMap c
 
 @[simp]
-theorem ideleClassMap_self {F : FiniteSubfield} (h : F ≤ F) (c : IdeleClassGroup F.1) :
-    ideleClassMap h c = c :=
+theorem ideleClassMap_self {F : FiniteSubfield} (h : F ≤ F) (c : IdeleClassGroup F.1)
+    : ideleClassMap h c = c :=
   ideleClassMap_injective h (ideleClassMap_ideleClassMap h h c)
 
-instance directedSystem : DirectedSystem (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
-    (fun _ _ h ↦ ideleClassMap h) where
+instance directedSystem
+    : DirectedSystem
+      (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
+      (fun _ _ h ↦ ideleClassMap h) where
   map_self _ c := ideleClassMap_self _ c
   map_map _ _ _ hFE hEM c := ideleClassMap_ideleClassMap hFE hEM c
 
 end FiniteSubfield
 
 def IdeleClassLimit : Type :=
-  DirectLimit (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
+  DirectLimit
+    (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
     (fun _ _ h ↦ FiniteSubfield.ideleClassMap h)
 
 namespace IdeleClassLimit
 
 instance : CommGroup IdeleClassLimit :=
-  inferInstanceAs (CommGroup (DirectLimit (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
+  inferInstanceAs (CommGroup (DirectLimit
+    (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
     (fun _ _ h ↦ FiniteSubfield.ideleClassMap h)))
 
 def of (F : FiniteSubfield) : IdeleClassGroup F.1 →* IdeleClassLimit where
-  toFun c := (⟦⟨F, c⟩⟧ : DirectLimit (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
-    (fun _ _ h ↦ FiniteSubfield.ideleClassMap h))
+  toFun c :=
+    (⟦⟨F, c⟩⟧ : DirectLimit
+      (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
+      (fun _ _ h ↦ FiniteSubfield.ideleClassMap h))
   map_one' := (DirectLimit.one_def (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h) F).symm
   map_mul' x y := (DirectLimit.mul_def (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h) F x y).symm
 
 @[simp]
-theorem of_ideleClassMap {F E : FiniteSubfield} (h : F ≤ E) (c : IdeleClassGroup F.1) :
-    of E (FiniteSubfield.ideleClassMap h c) = of F c :=
+theorem of_ideleClassMap {F E : FiniteSubfield} (h : F ≤ E) (c : IdeleClassGroup F.1)
+    : of E (FiniteSubfield.ideleClassMap h c) = of F c :=
   show (⟦⟨E, FiniteSubfield.ideleClassMap h c⟩⟧ : DirectLimit
-    (fun F : FiniteSubfield ↦ IdeleClassGroup F.1) (fun _ _ h ↦ FiniteSubfield.ideleClassMap h)) =
-      ⟦⟨F, c⟩⟧ from DirectLimit.mk_apply (F := fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
-        (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h) F E c h
+        (fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
+        (fun _ _ h ↦ FiniteSubfield.ideleClassMap h))
+      = ⟦⟨F, c⟩⟧ from
+    DirectLimit.mk_apply
+      (F := fun F : FiniteSubfield ↦ IdeleClassGroup F.1)
+      (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h)
+      F E c h
 
 theorem of_injective (F : FiniteSubfield) : Function.Injective (of F) :=
-  DirectLimit.mk_injective (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h)
-    (fun _ _ h ↦ FiniteSubfield.ideleClassMap_injective h) F
+  DirectLimit.mk_injective
+    (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h)
+    (fun _ _ h ↦ FiniteSubfield.ideleClassMap_injective h)
+    F
 
-theorem exists_of (z : IdeleClassLimit) : ∃ (F : FiniteSubfield) (c : IdeleClassGroup F.1),
-    of F c = z := by
-  obtain ⟨F, c, rfl⟩ := DirectLimit.exists_eq_mk
-    (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h) z
+theorem exists_of (z : IdeleClassLimit)
+    : ∃ (F : FiniteSubfield) (c : IdeleClassGroup F.1), of F c = z := by
+  obtain ⟨F, c, rfl⟩ := DirectLimit.exists_eq_mk (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h) z
   exact ⟨F, c, rfl⟩
 
-theorem exists_of₂ (z w : IdeleClassLimit) : ∃ (F : FiniteSubfield) (c d : IdeleClassGroup F.1),
-    of F c = z ∧ of F d = w := by
-  obtain ⟨F, c, d, rfl, rfl⟩ := DirectLimit.exists_eq_mk₂
-    (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h) z w
+theorem exists_of₂ (z w : IdeleClassLimit)
+    : ∃ (F : FiniteSubfield) (c d : IdeleClassGroup F.1), of F c = z ∧ of F d = w := by
+  obtain ⟨F, c, d, rfl, rfl⟩ :=
+    DirectLimit.exists_eq_mk₂ (f := fun _ _ h ↦ FiniteSubfield.ideleClassMap h) z w
   exact ⟨F, c, d, rfl, rfl⟩
 
 section lift
 
-variable {G : Type*} [CommGroup G] (g : ∀ F : FiniteSubfield, IdeleClassGroup F.1 →* G)
+variable
+  {G : Type*} [CommGroup G]
+  (g : ∀ F : FiniteSubfield, IdeleClassGroup F.1 →* G)
   (compat : ∀ (F E : FiniteSubfield) (h : F ≤ E) (c : IdeleClassGroup F.1),
     g E (FiniteSubfield.ideleClassMap h c) = g F c)
 
 def lift : IdeleClassLimit →* G where
-  toFun := DirectLimit.lift (fun _ _ h ↦ FiniteSubfield.ideleClassMap h) (fun F c ↦ g F c)
-    fun F E h c ↦ (compat F E h c).symm
+  toFun :=
+    DirectLimit.lift
+      (fun _ _ h ↦ FiniteSubfield.ideleClassMap h)
+      (fun F c ↦ g F c)
+      fun F E h c ↦ (compat F E h c).symm
   map_one' := by
     obtain ⟨F⟩ := (inferInstance : Nonempty FiniteSubfield)
     have h1 : (1 : IdeleClassLimit) = of F 1 := (map_one _).symm

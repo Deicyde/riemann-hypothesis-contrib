@@ -35,14 +35,18 @@ noncomputable section
 open Finset Matrix
 
 namespace ReciprocityTheory.ChartRestriction.DS.G2
-theorem final_existsG_of (hS7 : ∀ m : ℕ, S7.PsiExistsStatement m) :
-    ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ), Formalism.QuantumDeterminants.IsHCParam lam →
-      ∀ h : ℝ, Formalism.QuantumDeterminants.GapAtLeast ε lam h →
-        max (2 * (n : ℝ))
-          (16 * (n : ℝ) * ((min (pOf ε) (qOf ε) : ℕ) : ℝ) +
-            8 * Real.sqrt (2 * ((min (pOf ε) (qOf ε) : ℕ) : ℝ))) < h →
-        ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
-          (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), Formalism.MainNotions.S.IsDS ε lam σ := by
+theorem final_existsG_of (hS7 : ∀ m : ℕ, S7.PsiExistsStatement m)
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ),
+      Formalism.QuantumDeterminants.IsHCParam lam
+        → ∀ h : ℝ,
+          Formalism.QuantumDeterminants.GapAtLeast ε lam h
+            → max (2 * (n : ℝ))
+                (16 * (n : ℝ) * ((min (pOf ε) (qOf ε) : ℕ) : ℝ)
+                  + 8 * Real.sqrt (2 * ((min (pOf ε) (qOf ε) : ℕ) : ℝ)))
+              < h
+            → ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
+                (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+              Formalism.MainNotions.S.IsDS ε lam σ := by
   intro n ε lam hlam h hh hbig
   have hl' := (mir_isHCParam_iff lam).1 hlam
   have hq0 : ((min (pOf ε) (qOf ε) : ℕ) : ℝ) = (S7.q0 ε : ℝ) := rfl

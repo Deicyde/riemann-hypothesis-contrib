@@ -8,15 +8,17 @@ public import Development.WeilBound.RepresentationTheoryGL.ResidualSpectrum.Expo
 noncomputable section
 
 open MeasureTheory Filter Topology
-open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.AutomorphicForm
 open scoped ENNReal
 
 namespace GlobalTheory.CompanionTheory.SlabGlue
 
 open PositivityTheory.Rg.Rs.An
 
-theorem tsum_pi_prod_ne_top : ∀ (m : ℕ) (f : Fin m → ℕ → ℝ≥0∞), (∀ j, ∑' k, f j k ≠ ⊤) →
-    ∑' s : Fin m → ℕ, ∏ j, f j (s j) ≠ ⊤ := by
+theorem tsum_pi_prod_ne_top
+    : ∀ (m : ℕ) (f : Fin m → ℕ → ℝ≥0∞),
+      (∀ j, ∑' k, f j k ≠ ⊤) → ∑' s : Fin m → ℕ, ∏ j, f j (s j) ≠ ⊤ := by
   intro m
   induction m with
   | zero =>
@@ -24,9 +26,11 @@ theorem tsum_pi_prod_ne_top : ∀ (m : ℕ) (f : Fin m → ℕ → ℝ≥0∞), 
     simp
   | succ m ih =>
     intro f hf
-    have e : ∑' s : Fin (m + 1) → ℕ, ∏ j, f j (s j)
-        = (∑' k, f 0 k) * ∑' s : Fin m → ℕ, ∏ j : Fin m, f j.succ (s j) := by
-      rw [← (Fin.consEquiv fun _ : Fin (m + 1) => ℕ).tsum_eq, ENNReal.tsum_prod', ← ENNReal.tsum_mul_right]
+    have e
+        : ∑' s : Fin (m + 1) → ℕ, ∏ j, f j (s j)
+          = (∑' k, f 0 k) * ∑' s : Fin m → ℕ, ∏ j : Fin m, f j.succ (s j) := by
+      rw [← (Fin.consEquiv fun _ : Fin (m + 1) => ℕ).tsum_eq, ENNReal.tsum_prod',
+        ← ENNReal.tsum_mul_right]
       refine tsum_congr fun k => ?_
       rw [← ENNReal.tsum_mul_left]
       refine tsum_congr fun s => ?_
@@ -34,8 +38,7 @@ theorem tsum_pi_prod_ne_top : ∀ (m : ℕ) (f : Fin m → ℕ → ℝ≥0∞), 
     rw [e]
     exact ENNReal.mul_ne_top (hf 0) (ih _ fun j => hf j.succ)
 
-theorem tsum_exp_ne_top {a : ℝ} (ha : a < 0) :
-    ∑' k : ℕ, ENNReal.ofReal (Real.exp (a * k)) ≠ ⊤ := by
+theorem tsum_exp_ne_top {a : ℝ} (ha : a < 0) : ∑' k : ℕ, ENNReal.ofReal (Real.exp (a * k)) ≠ ⊤ := by
   have h : Summable fun k : ℕ => Real.exp (a * k) := by
     have := Real.summable_exp_nat_mul_iff.2 ha
     simpa [mul_comm] using this
@@ -47,11 +50,11 @@ theorem sr_add {n : ℕ} (x y : Fin n → ℝ) (r : ℕ) : sr (x + y) r = sr x r
   · simp only [Pi.add_apply]; ring
   · simp
 
-def part (n : ℕ) (c : Fin (n - 1) → ℝ) : Fin n → ℝ :=
-  fun i => ∑ j : Fin (n - 1), if (i : ℕ) ≤ j then c j else 0
+def part (n : ℕ) (c : Fin (n - 1) → ℝ) : Fin n → ℝ := fun i =>
+  ∑ j : Fin (n - 1), if (i : ℕ) ≤ j then c j else 0
 
-theorem sr_part {n : ℕ} (c : Fin (n - 1) → ℝ) (j : Fin (n - 1)) :
-    sr (part n c) ((j : ℕ) + 1) = c j := by
+theorem sr_part {n : ℕ} (c : Fin (n - 1) → ℝ) (j : Fin (n - 1))
+    : sr (part n c) ((j : ℕ) + 1) = c j := by
   have hj := j.2
   unfold sr
   rw [dite_eq_left (by omega : 0 < (j : ℕ) + 1 ∧ (j : ℕ) + 1 < n)]
@@ -67,16 +70,17 @@ theorem sr_part {n : ℕ} (c : Fin (n - 1) → ℝ) (j : Fin (n - 1)) :
       simp [h1, h2]
   · simp
 
-theorem part_last {n : ℕ} (c : Fin (n - 1) → ℝ) (i : Fin n) (hi : (i : ℕ) + 1 = n) :
-    part n c i = 0 := by
+theorem part_last {n : ℕ} (c : Fin (n - 1) → ℝ) (i : Fin n) (hi : (i : ℕ) + 1 = n)
+    : part n c i = 0 := by
   unfold part
   refine Finset.sum_eq_zero fun j _ => ?_
   have := j.2
   rw [if_neg (by omega)]
 
-theorem y_bound {n : ℕ} (y : Fin n → ℝ) (hl : ∀ i : Fin n, (i : ℕ) + 1 = n → 0 ≤ y i ∧ y i ≤ 1)
-    (hd : ∀ j : Fin (n - 1), 0 ≤ sr y ((j : ℕ) + 1) ∧ sr y ((j : ℕ) + 1) ≤ 1) :
-    ∀ (d : ℕ) (i : Fin n), (i : ℕ) + 1 + d = n → 0 ≤ y i ∧ y i ≤ d + 1 := by
+theorem y_bound
+    {n : ℕ} (y : Fin n → ℝ) (hl : ∀ i : Fin n, (i : ℕ) + 1 = n → 0 ≤ y i ∧ y i ≤ 1)
+    (hd : ∀ j : Fin (n - 1), 0 ≤ sr y ((j : ℕ) + 1) ∧ sr y ((j : ℕ) + 1) ≤ 1)
+    : ∀ (d : ℕ) (i : Fin n), (i : ℕ) + 1 + d = n → 0 ≤ y i ∧ y i ≤ d + 1 := by
   intro d
   induction d with
   | zero =>
@@ -96,9 +100,10 @@ theorem y_bound {n : ℕ} (y : Fin n → ℝ) (hl : ∀ i : Fin n, (i : ℕ) + 1
     push_cast
     constructor <;> linarith
 
-theorem abs_y_le {n : ℕ} (y : Fin n → ℝ) (hl : ∀ i : Fin n, (i : ℕ) + 1 = n → 0 ≤ y i ∧ y i ≤ 1)
-    (hd : ∀ j : Fin (n - 1), 0 ≤ sr y ((j : ℕ) + 1) ∧ sr y ((j : ℕ) + 1) ≤ 1) (i : Fin n) :
-    |y i| ≤ n := by
+theorem abs_y_le
+    {n : ℕ} (y : Fin n → ℝ) (hl : ∀ i : Fin n, (i : ℕ) + 1 = n → 0 ≤ y i ∧ y i ≤ 1)
+    (hd : ∀ j : Fin (n - 1), 0 ≤ sr y ((j : ℕ) + 1) ∧ sr y ((j : ℕ) + 1) ≤ 1) (i : Fin n)
+    : |y i| ≤ n := by
   have hi := i.2
   obtain ⟨h1, h2⟩ := y_bound y hl hd (n - 1 - i) i (by omega)
   rw [abs_of_nonneg h1]
@@ -107,8 +112,7 @@ theorem abs_y_le {n : ℕ} (y : Fin n → ℝ) (hl : ∀ i : Fin n, (i : ℕ) + 
     exact_mod_cast this
   linarith
 
-theorem abs_sr_le {n : ℕ} (y : Fin n → ℝ) (hy : ∀ i, |y i| ≤ n) (r : ℕ) :
-    |sr y r| ≤ 2 * n := by
+theorem abs_sr_le {n : ℕ} (y : Fin n → ℝ) (hy : ∀ i, |y i| ≤ n) (r : ℕ) : |sr y r| ≤ 2 * n := by
   unfold sr
   split_ifs with h
   · have h1 := hy ⟨r - 1, by omega⟩
@@ -117,8 +121,9 @@ theorem abs_sr_le {n : ℕ} (y : Fin n → ℝ) (hy : ∀ i, |y i| ≤ n) (r : �
     linarith
   · simp
 
-theorem sum_range_sr {n : ℕ} (f : ℕ → ℝ) (x : Fin n → ℝ) :
-    ∑ r ∈ Finset.range n, f r * sr x r = ∑ j : Fin (n - 1), f ((j : ℕ) + 1) * sr x ((j : ℕ) + 1) := by
+theorem sum_range_sr {n : ℕ} (f : ℕ → ℝ) (x : Fin n → ℝ)
+    : ∑ r ∈ Finset.range n, f r * sr x r
+      = ∑ j : Fin (n - 1), f ((j : ℕ) + 1) * sr x ((j : ℕ) + 1) := by
   cases n with
   | zero => simp
   | succ m =>
@@ -126,9 +131,12 @@ theorem sum_range_sr {n : ℕ} (f : ℕ → ℝ) (x : Fin n → ℝ) :
     rw [Finset.sum_range_succ', h0, mul_zero, add_zero, Finset.sum_range]
     rfl
 
-theorem setLIntegral_le_of_bound {α : Type*} [MeasurableSpace α] (μ : Measure α) {f : α → ℝ≥0∞}
-    (hf : Measurable f) (A : Set α) (c : ℝ≥0∞) (h : ∀ g ∈ A, f g ≤ c) :
-    ∫⁻ g in A, f g ∂μ ≤ c * μ A := by
+theorem setLIntegral_le_of_bound
+    {α : Type*} [MeasurableSpace α]
+    (μ : Measure α)
+    {f : α → ℝ≥0∞} (hf : Measurable f)
+    (A : Set α) (c : ℝ≥0∞) (h : ∀ g ∈ A, f g ≤ c)
+    : ∫⁻ g in A, f g ∂μ ≤ c * μ A := by
   have hB : MeasurableSet {g | f g ≤ c} := measurableSet_le hf measurable_const
   have hae : ∀ᵐ g ∂(μ.restrict A), f g ≤ c := by
     rw [ae_iff, show {a | ¬ f a ≤ c} = {g | f g ≤ c}ᶜ from rfl, Measure.restrict_apply hB.compl]
@@ -139,14 +147,16 @@ theorem setLIntegral_le_of_bound {α : Type*} [MeasurableSpace α] (μ : Measure
       intro h1 h2
       exact h1 (h g h2)
     rw [this, measure_empty]
-  calc ∫⁻ g in A, f g ∂μ ≤ ∫⁻ _ in A, c ∂μ := lintegral_mono_ae hae
+  calc
+    ∫⁻ g in A, f g ∂μ
+      ≤ ∫⁻ _ in A, c ∂μ := lintegral_mono_ae hae
     _ = c * μ A := setLIntegral_const _ _
 
 theorem slabGlue : SlabGlue := by
   intro hBV K _ _ n μ _ φ κ hφ hB hκ ω hω hωB t₀
   obtain ⟨Cv, hCv⟩ := hBV K n μ ω hω hωB
-  obtain ⟨C, hC⟩ := hB ω hω hωB (|t₀| + 2 * n) (maxCompact (K := K) (n := n) : Set _)
-    isCompact_maxCompact
+  obtain ⟨C, hC⟩ :=
+    hB ω hω hωB (|t₀| + 2 * n) (maxCompact (K := K) (n := n) : Set _) isCompact_maxCompact
   let box : (Fin n → ℝ) → Set (AdelicGLn.AdelicGL K n) := fun x =>
     {g | ∃ b ∈ ω, ∃ y : Fin n → ℝ, (∀ i, |y i| ≤ n) ∧ ∃ k ∈ maxCompact (K := K) (n := n),
       g = b * tor K (x + y) * k}
@@ -182,8 +192,10 @@ theorem slabGlue : SlabGlue := by
         constructor <;> linarith
     · rw [add_sub_cancel]
 
-  have hbox : ∀ s, ∫⁻ g in box (X s), ‖φ g‖ₑ ^ 2 ∂μ ≤
-      ENNReal.ofReal D * ∏ j, ENNReal.ofReal (Real.exp (a j * s j)) := by
+  have hbox
+      : ∀ s,
+        ∫⁻ g in box (X s), ‖φ g‖ₑ ^ 2 ∂μ
+          ≤ ENNReal.ofReal D * ∏ j, ENNReal.ofReal (Real.exp (a j * s j)) := by
     intro s
     let S : ℝ := ∑ r ∈ Finset.range n, κ r * sr (X s) r
     let W : ℝ := max C 0 * Real.exp E * Real.exp S
@@ -215,34 +227,42 @@ theorem slabGlue : SlabGlue := by
         refine Finset.sum_le_sum fun r _ => ?_
         rw [sr_add, mul_add]
         have h3 : κ r * sr y r ≤ |κ r| * (2 * n) := by
-          calc κ r * sr y r ≤ |κ r * sr y r| := le_abs_self _
+          calc
+            κ r * sr y r
+              ≤ |κ r * sr y r| := le_abs_self _
             _ = |κ r| * |sr y r| := abs_mul _ _
             _ ≤ |κ r| * (2 * n) := mul_le_mul_of_nonneg_left (abs_sr_le y hy r) (abs_nonneg _)
         linarith
       have h3 : ‖φ (b * tor K (X s + y) * k)‖ ≤ W := by
-        calc _ ≤ C * Real.exp (∑ r ∈ Finset.range n, κ r * sr (X s + y) r) := h1
+        calc
+          _ ≤ C * Real.exp (∑ r ∈ Finset.range n, κ r * sr (X s + y) r) := h1
           _ ≤ max C 0 * Real.exp (∑ r ∈ Finset.range n, κ r * sr (X s + y) r) :=
-              mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.exp_pos _).le
+            mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.exp_pos _).le
           _ ≤ max C 0 * Real.exp (S + E) :=
-              mul_le_mul_of_nonneg_left (Real.exp_le_exp.2 h2) (le_max_right _ _)
+            mul_le_mul_of_nonneg_left (Real.exp_le_exp.2 h2) (le_max_right _ _)
           _ = W := by
-              show _ = max C 0 * Real.exp E * Real.exp S
-              rw [Real.exp_add]; ring
+            show _ = max C 0 * Real.exp E * Real.exp S
+            rw [Real.exp_add]
+            ring
       rw [← ofReal_norm_eq_enorm, ← ENNReal.ofReal_pow (norm_nonneg _)]
       exact ENNReal.ofReal_le_ofReal (pow_le_pow_left₀ (norm_nonneg _) h3 2)
     have hmeas : Measurable fun g => ‖φ g‖ₑ ^ 2 := (hφ.measurable.enorm).pow_const 2
-    have hexp : W ^ 2 * (Cv * Real.exp (-∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r))
-        = D * ∏ j, Real.exp (a j * s j) := by
-      have e1 : ∑ r ∈ Finset.range n, κ r * sr (X s) r
-          = ∑ j : Fin (n - 1), κ ((j : ℕ) + 1) * (-t₀ + s j) := by
+    have hexp
+        : W ^ 2 * (Cv * Real.exp (- ∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r))
+          = D * ∏ j, Real.exp (a j * s j) := by
+      have e1
+          : ∑ r ∈ Finset.range n, κ r * sr (X s) r
+            = ∑ j : Fin (n - 1), κ ((j : ℕ) + 1) * (-t₀ + s j) := by
         rw [sum_range_sr]
         exact Finset.sum_congr rfl fun j _ => by rw [hXs]
-      have e2 : ∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r
-          = ∑ j : Fin (n - 1), 2 * rho K n ((j : ℕ) + 1) * (-t₀ + s j) := by
+      have e2
+          : ∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r
+            = ∑ j : Fin (n - 1), 2 * rho K n ((j : ℕ) + 1) * (-t₀ + s j) := by
         rw [sum_range_sr (fun r => 2 * rho K n r)]
         exact Finset.sum_congr rfl fun j _ => by rw [hXs]
-      have e3 : 2 * S - ∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r
-          = -t₀ * ∑ j, a j + ∑ j, a j * s j := by
+      have e3
+          : 2 * S - ∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r
+            = -t₀ * ∑ j, a j + ∑ j, a j * s j := by
         show 2 * ∑ r ∈ Finset.range n, κ r * sr (X s) r - _ = _
         rw [e1, e2, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib,
           ← Finset.sum_add_distrib]
@@ -250,36 +270,41 @@ theorem slabGlue : SlabGlue := by
         show _ = -t₀ * (2 * (κ ((j : ℕ) + 1) - rho K n ((j : ℕ) + 1)))
           + (2 * (κ ((j : ℕ) + 1) - rho K n ((j : ℕ) + 1))) * s j
         ring
-      have e4 : Real.exp S ^ 2 * Real.exp (-∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r)
-          = Real.exp (-t₀ * ∑ j, a j) * ∏ j, Real.exp (a j * s j) := by
+      have e4
+          : Real.exp S ^ 2 * Real.exp (- ∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r)
+            = Real.exp (-t₀ * ∑ j, a j) * ∏ j, Real.exp (a j * s j) := by
         rw [← Real.exp_sum, ← Real.exp_add, ← e3, ← Real.exp_nat_mul, ← Real.exp_add]
         congr 1
       show (max C 0 * Real.exp E * Real.exp S) ^ 2 * _ = (max C 0 * Real.exp E) ^ 2 * Cv * Real.exp (-t₀ * ∑ j, a j) * _
-      calc _ = (max C 0 * Real.exp E) ^ 2 * Cv * (Real.exp S ^ 2 *
-              Real.exp (-∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r)) := by ring
+      calc
+        _ = (max C 0 * Real.exp E) ^ 2 * Cv
+            * (Real.exp S ^ 2 * Real.exp (- ∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r)) := by
+          ring
         _ = _ := by rw [e4]; ring
-    calc ∫⁻ g in box (X s), ‖φ g‖ₑ ^ 2 ∂μ
-        ≤ ENNReal.ofReal (W ^ 2) * μ (box (X s)) :=
-          setLIntegral_le_of_bound μ hmeas _ _ hnorm
+    calc
+      ∫⁻ g in box (X s), ‖φ g‖ₑ ^ 2 ∂μ
+        ≤ ENNReal.ofReal (W ^ 2) * μ (box (X s)) := setLIntegral_le_of_bound μ hmeas _ _ hnorm
       _ ≤ ENNReal.ofReal (W ^ 2) * ENNReal.ofReal
-            (Cv * Real.exp (-∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r)) := by
-          gcongr
-          exact hCv (X s)
+          (Cv * Real.exp (- ∑ r ∈ Finset.range n, 2 * rho K n r * sr (X s) r)) := by
+        gcongr
+        exact hCv (X s)
       _ = ENNReal.ofReal (D * ∏ j, Real.exp (a j * s j)) := by
-          rw [← ENNReal.ofReal_mul (by positivity), hexp]
+        rw [← ENNReal.ofReal_mul (by positivity), hexp]
       _ = _ := by
-          rw [ENNReal.ofReal_mul' (Finset.prod_nonneg fun j _ => (Real.exp_pos _).le),
-            ENNReal.ofReal_prod_of_nonneg fun j _ => (Real.exp_pos _).le]
+        rw [ENNReal.ofReal_mul' (Finset.prod_nonneg fun j _ => (Real.exp_pos _).le),
+          ENNReal.ofReal_prod_of_nonneg fun j _ => (Real.exp_pos _).le]
   have hsum : ∑' s : Fin (n - 1) → ℕ, ∏ j, ENNReal.ofReal (Real.exp (a j * s j)) ≠ ⊤ :=
-    tsum_pi_prod_ne_top (n - 1) (fun j k => ENNReal.ofReal (Real.exp (a j * k)))
+    tsum_pi_prod_ne_top (n - 1)
+      (fun j k => ENNReal.ofReal (Real.exp (a j * k)))
       fun j => tsum_exp_ne_top (ha j)
-  calc ∫⁻ g in slab ω t₀, ‖φ g‖ₑ ^ 2 ∂μ
+  calc
+    ∫⁻ g in slab ω t₀, ‖φ g‖ₑ ^ 2 ∂μ
       ≤ ∫⁻ g in ⋃ s, box (X s), ‖φ g‖ₑ ^ 2 ∂μ := lintegral_mono_set hcover
     _ ≤ ∑' s, ∫⁻ g in box (X s), ‖φ g‖ₑ ^ 2 ∂μ := lintegral_iUnion_le _ _
     _ ≤ ∑' s, ENNReal.ofReal D * ∏ j, ENNReal.ofReal (Real.exp (a j * s j)) :=
-        ENNReal.tsum_le_tsum hbox
+      ENNReal.tsum_le_tsum hbox
     _ = ENNReal.ofReal D * ∑' s : Fin (n - 1) → ℕ, ∏ j, ENNReal.ofReal (Real.exp (a j * s j)) :=
-        ENNReal.tsum_mul_left
+      ENNReal.tsum_mul_left
     _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top (lt_top_iff_ne_top.2 hsum)
 
 end GlobalTheory.CompanionTheory.SlabGlue

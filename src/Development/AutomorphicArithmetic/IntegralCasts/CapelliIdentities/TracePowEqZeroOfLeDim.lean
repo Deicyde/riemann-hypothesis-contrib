@@ -4,10 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qh19.trace_pow_eq_zero_of_le_dim.{u_1} :
-    ∀ {K : Type u_1}
-    [inst : Field K] (r : ℕ) (N : Matrix (Fin r) (Fin r) K),
-    (∀ (k : ℕ), (1 : ℕ) ≤ k → k ≤ r → (N ^ k).trace = (0 : K)) → ∀ (k : ℕ), (1 : ℕ) ≤ k → (N ^ k).trace = (0 : K) := by
+theorem UpperTheory.Reformulated.B.Qh19.trace_pow_eq_zero_of_le_dim.{u_1}
+    : ∀ {K : Type u_1} [inst : Field K] (r : ℕ) (N : Matrix (Fin r) (Fin r) K),
+      (∀ (k : ℕ), (1 : ℕ) ≤ k → k ≤ r → (N ^ k).trace = (0 : K))
+        → ∀ (k : ℕ), (1 : ℕ) ≤ k → (N ^ k).trace = (0 : K) := by
   intro K _ r N h k
   induction k using Nat.strong_induction_on with
   | _ k ih =>
@@ -24,7 +24,8 @@ theorem UpperTheory.Reformulated.B.Qh19.trace_pow_eq_zero_of_le_dim.{u_1} :
       rw [Polynomial.aeval_eq_sum_range, hd, Finset.sum_range_succ, hc, one_smul] at hCH
       have h2 := congrArg (fun A => Matrix.trace (N ^ (m + 1) * A)) hCH
       simp only [mul_add, Finset.mul_sum, Matrix.mul_smul, ← pow_add, mul_zero, Matrix.trace_zero,
-        Matrix.trace_add, Matrix.trace_sum, Matrix.trace_smul] at h2
+          Matrix.trace_add, Matrix.trace_sum, Matrix.trace_smul]
+        at h2
       rw [Finset.sum_eq_zero, zero_add] at h2
       · exact h2
       · intro i hi

@@ -27,18 +27,26 @@ theorem haarUniq2 : HaarUniq2Statement := by
   haveI := HaarSigmaFiniteUniqueness.sigmaFinite_comap (U := U) ν
   haveI := HaarSigmaFiniteUniqueness.isMulLeftInvariant_comap μ hμc' hμl
   haveI := HaarSigmaFiniteUniqueness.isMulLeftInvariant_comap ν hνc' hνl
-  have hμ0' : μ.comap (Subtype.val : HaarSigmaFiniteUniqueness.Aset U → Formalism.QuantumDeterminants.Mt k r) ≠ 0 := by
+  have hμ0'
+      : μ.comap
+          (Subtype.val : HaarSigmaFiniteUniqueness.Aset U → Formalism.QuantumDeterminants.Mt k r)
+        ≠ 0 := by
     intro h
     apply hμ0
     rw [← HaarSigmaFiniteUniqueness.map_comap_val μ hμc', h, Measure.map_zero]
-  have hν0' : ν.comap (Subtype.val : HaarSigmaFiniteUniqueness.Aset U → Formalism.QuantumDeterminants.Mt k r) ≠ 0 := by
+  have hν0'
+      : ν.comap
+          (Subtype.val : HaarSigmaFiniteUniqueness.Aset U → Formalism.QuantumDeterminants.Mt k r)
+        ≠ 0 := by
     intro h
     apply hν0
     rw [← HaarSigmaFiniteUniqueness.map_comap_val ν hνc', h, Measure.map_zero]
   obtain ⟨c, hc, hcE⟩ := HaarSigmaFiniteUniqueness.eq_smul_of_sigmaFinite _ _ hν0' hμ0'
   refine ⟨c, pos_iff_ne_zero.mpr hc, ?_⟩
-  have hval : AEMeasurable (Subtype.val : HaarSigmaFiniteUniqueness.Aset U → Formalism.QuantumDeterminants.Mt k r)
-      (μ.comap (Subtype.val : HaarSigmaFiniteUniqueness.Aset U → Formalism.QuantumDeterminants.Mt k r)) :=
+  have hval : AEMeasurable
+      (Subtype.val : HaarSigmaFiniteUniqueness.Aset U → Formalism.QuantumDeterminants.Mt k r)
+      (μ.comap
+        (Subtype.val : HaarSigmaFiniteUniqueness.Aset U → Formalism.QuantumDeterminants.Mt k r)) :=
     (HaarSigmaFiniteUniqueness.mEmb (U := U)).measurable.aemeasurable
   rw [← HaarSigmaFiniteUniqueness.map_comap_val ν hνc', hcE, Measure.map_smul _ hval,
     HaarSigmaFiniteUniqueness.map_comap_val μ hμc']

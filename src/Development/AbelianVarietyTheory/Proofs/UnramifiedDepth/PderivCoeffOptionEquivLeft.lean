@@ -19,7 +19,8 @@ set_option autoImplicit false
 noncomputable section
 
 open scoped BigOperators
-open MvPowerSeries Formalism.L2.FormalSeriesBounds ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB.LogPf
+open MvPowerSeries Formalism.L2.FormalSeriesBounds ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB.LogPf
 
 namespace GlobalTheory.CurveJet
 
@@ -28,18 +29,19 @@ variable {C : Type} [Field C] {dd m : ℕ}
 def inT (σ : Type) (f : PowerSeries C) : MvPowerSeries (Option σ) C :=
   MvPowerSeries.subst (fun _ : Unit => (X none : MvPowerSeries (Option σ) C)) f
 
-theorem inT_eq_rename (σ : Type) (f : PowerSeries C) :
-    inT σ f = rename (fun _ : Unit => (none : Option σ)) f := by
+theorem inT_eq_rename (σ : Type) (f : PowerSeries C)
+    : inT σ f = rename (fun _ : Unit => (none : Option σ)) f := by
   rw [inT, rename_eq_subst]
   rfl
 
-theorem constantCoeff_inT (σ : Type) {f : PowerSeries C} (hf : PowerSeries.constantCoeff f = 0) :
-    constantCoeff (inT σ f) = 0 := by
+theorem constantCoeff_inT (σ : Type) {f : PowerSeries C} (hf : PowerSeries.constantCoeff f = 0)
+    : constantCoeff (inT σ f) = 0 := by
   rw [inT_eq_rename, constantCoeff_rename]
   exact hf
 
-theorem optionEquivLeft_inT (σ : Type) (f : PowerSeries C) :
-    optionEquivLeft σ C (inT σ f) = PowerSeries.map (MvPowerSeries.C : C →+* MvPowerSeries σ C) f := by
+theorem optionEquivLeft_inT (σ : Type) (f : PowerSeries C)
+    : optionEquivLeft σ C (inT σ f)
+      = PowerSeries.map (MvPowerSeries.C : C →+* MvPowerSeries σ C) f := by
   classical
   ext n μ
   rw [coeff_coeff_optionEquivLeft, PowerSeries.coeff_map, coeff_C, inT_eq_rename]
@@ -60,8 +62,8 @@ theorem optionEquivLeft_inT (σ : Type) (f : PowerSeries C) :
     rw [hy, Finsupp.optionElim_apply_some] at h1
     simpa using h1
 
-theorem optionEquivLeft_rename_some {σ : Type} [Finite σ] (f : MvPowerSeries σ C) :
-    optionEquivLeft σ C (rename (some : σ → Option σ) f) = PowerSeries.C f := by
+theorem optionEquivLeft_rename_some {σ : Type} [Finite σ] (f : MvPowerSeries σ C)
+    : optionEquivLeft σ C (rename (some : σ → Option σ) f) = PowerSeries.C f := by
   ext n μ
   rw [coeff_coeff_optionEquivLeft, PowerSeries.coeff_C]
   split_ifs with hn
@@ -80,14 +82,15 @@ theorem optionEquivLeft_rename_some {σ : Type} [Finite σ] (f : MvPowerSeries �
     rw [hy, Finsupp.optionElim_apply_none] at h1
     exact h1
 
-theorem pderiv_coeff_optionEquivLeft {σ : Type} (f : MvPowerSeries (Option σ) C) (n : ℕ) (s : σ) :
-    pderiv s (PowerSeries.coeff n (optionEquivLeft σ C f)) =
-      PowerSeries.coeff n (optionEquivLeft σ C (pderiv (some s) f)) := by
+theorem pderiv_coeff_optionEquivLeft {σ : Type} (f : MvPowerSeries (Option σ) C) (n : ℕ) (s : σ)
+    : pderiv s (PowerSeries.coeff n (optionEquivLeft σ C f))
+      = PowerSeries.coeff n (optionEquivLeft σ C (pderiv (some s) f)) := by
   classical
   ext μ
   rw [coeff_pderiv, coeff_coeff_optionEquivLeft, coeff_coeff_optionEquivLeft, coeff_pderiv]
-  have key : Finsupp.optionElim n (μ + Finsupp.single s 1) =
-      Finsupp.optionElim n μ + Finsupp.single (some s) 1 := by
+  have key
+      : Finsupp.optionElim n (μ + Finsupp.single s 1)
+        = Finsupp.optionElim n μ + Finsupp.single (some s) 1 := by
     ext t
     cases t <;> simp [Finsupp.single_apply]
   rw [key, Finsupp.optionElim_apply_some]

@@ -7,8 +7,10 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -19,14 +21,16 @@ namespace HeightDropSingle
 
 open scoped NumberField.AdeleRing
 
-theorem euclid_drop {F : Type*} [NormedField F] {n : ℕ} (p : Fin (n + 1)) (z : Fin (n + 1) → F)
-    (hz : z p = 0) : euclidNorm z = euclidNorm (fun j => z (p.succAbove j)) := by
+theorem euclid_drop
+    {F : Type*} [NormedField F] {n : ℕ} (p : Fin (n + 1)) (z : Fin (n + 1) → F) (hz : z p = 0)
+    : euclidNorm z = euclidNorm (fun j => z (p.succAbove j)) := by
   simp only [euclidNorm]
   rw [Fin.sum_univ_succAbove _ p, hz]
   simp
 
-theorem sup_drop {F : Type*} [NormedField F] {n : ℕ} (p : Fin (n + 1)) (z : Fin (n + 1) → F)
-    (hz : z p = 0) : ‖z‖ = ‖fun j => z (p.succAbove j)‖ := by
+theorem sup_drop
+    {F : Type*} [NormedField F] {n : ℕ} (p : Fin (n + 1)) (z : Fin (n + 1) → F) (hz : z p = 0)
+    : ‖z‖ = ‖fun j => z (p.succAbove j)‖ := by
   apply le_antisymm
   · refine (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun i => ?_
     rcases Fin.eq_self_or_eq_succAbove p i with rfl | ⟨j, rfl⟩
@@ -34,9 +38,10 @@ theorem sup_drop {F : Type*} [NormedField F] {n : ℕ} (p : Fin (n + 1)) (z : Fi
     · exact norm_le_pi_norm (fun j => z (p.succAbove j)) j
   · exact (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun j => norm_le_pi_norm z _
 
-theorem adelicNorm_drop {K : Type*} [Field K] [NumberField K] {n : ℕ} (p : Fin (n + 1))
-    (y : Fin (n + 1) → 𝔸[K]) (hy : y p = 0) :
-    adelicNorm y = adelicNorm (fun j => y (p.succAbove j)) := by
+theorem adelicNorm_drop
+    {K : Type*} [Field K] [NumberField K]
+    {n : ℕ} (p : Fin (n + 1)) (y : Fin (n + 1) → 𝔸[K]) (hy : y p = 0)
+    : adelicNorm y = adelicNorm (fun j => y (p.succAbove j)) := by
   unfold adelicNorm
   congr 1
   · refine Finset.prod_congr rfl fun w _ => ?_
@@ -46,8 +51,10 @@ theorem adelicNorm_drop {K : Type*} [Field K] [NumberField K] {n : ℕ} (p : Fin
     rw [sup_drop p (finComp v y) (by show (y p).2 v = 0; rw [hy]; rfl)]
     rfl
 
-theorem height_single {K : Type*} [Field K] [NumberField K] {n : ℕ} (x : GL (Fin n) 𝔸[K]) (i : Fin n)
-    (hx : x.val i = Pi.single i 1) : Reduction.height x (Pi.single i (1 : K)) = 1 := by
+theorem height_single
+    {K : Type*} [Field K] [NumberField K]
+    {n : ℕ} (x : GL (Fin n) 𝔸[K]) (i : Fin n) (hx : x.val i = Pi.single i 1)
+    : Reduction.height x (Pi.single i (1 : K)) = 1 := by
   unfold Reduction.height
   have : ratVec (Pi.single i (1 : K)) ᵥ* (x : Matrix (Fin n) (Fin n) 𝔸[K]) = x.val i := by
     ext c
@@ -56,7 +63,8 @@ theorem height_single {K : Type*} [Field K] [NumberField K] {n : ℕ} (x : GL (F
 
 end HeightDropSingle
 
-theorem short_rows_embedding_of : D0 → MinkowskiBoundAlt → K1 → CornerEmbedding → ShortRowsEmbedding := by
+theorem short_rows_embedding_of
+    : D0 → MinkowskiBoundAlt → K1 → CornerEmbedding → ShortRowsEmbedding := by
   intro hD hG hK1 hK5e E _ _ _ m k hk hkm ι hι
   obtain ⟨n, rfl⟩ : ∃ n, m = n + 1 := ⟨m - 1, by omega⟩
   obtain ⟨C, hC⟩ := hG E n (by omega)
@@ -72,13 +80,14 @@ theorem short_rows_embedding_of : D0 → MinkowskiBoundAlt → K1 → CornerEmbe
       ext c
       rw [hx, Units.val_mul, Matrix.mul_apply, Finset.sum_eq_single (Fin.last n)]
       · rw [hu.2.1, one_mul, hι g]
-        have hk' : ¬ ((Fin.last n : ℕ) < k ∧ (c : ℕ) < k) := by simp; omega
+        have hk' : ¬((Fin.last n : ℕ) < k ∧ (c : ℕ) < k) := by simp; omega
         simp only [embM, Matrix.of_apply, dif_neg hk', Matrix.one_apply, Pi.single_apply, eq_comm]
       · intro j _ hj
         rw [hu.1 _ _ (lt_of_le_of_ne (Fin.le_last j) hj), zero_mul]
       · simp
     have hpos := hDk.1 g
-    refine (hK x (Pi.single (Fin.last n) 1) fun h => by simpa using congrFun h (Fin.last n)).trans (le_of_eq ?_)
+    refine (hK x (Pi.single (Fin.last n) 1) fun h => by simpa using congrFun h (Fin.last n)).trans
+      (le_of_eq ?_)
     unfold ht
     rw [HeightDropSingle.height_single x _ hrow, hDx, Real.rpow_neg hpos.le, one_div]
   · obtain ⟨x, hx⟩ : ∃ x, x = u * ι g := ⟨_, rfl⟩
@@ -89,12 +98,12 @@ theorem short_rows_embedding_of : D0 → MinkowskiBoundAlt → K1 → CornerEmbe
       intro i
       rw [hx, Units.val_mul, Matrix.mul_apply, Finset.sum_eq_single p]
       · rw [hι g]
-        have hk' : ¬ ((p : ℕ) < k ∧ (p : ℕ) < k) := by simp [p]
+        have hk' : ¬((p : ℕ) < k ∧ (p : ℕ) < k) := by simp [p]
         simp only [embM, Matrix.of_apply, dif_neg hk', Matrix.one_apply_eq, mul_one]
         exact hu.2.2 i p (by simp [p])
       · intro j _ hj
         rw [hι g]
-        have hk' : ¬ ((j : ℕ) < k ∧ (p : ℕ) < k) := by simp [p]
+        have hk' : ¬((j : ℕ) < k ∧ (p : ℕ) < k) := by simp [p]
         simp only [embM, Matrix.of_apply, dif_neg hk', Matrix.one_apply_ne hj, mul_zero]
       · simp
     set M' : Matrix (Fin n) (Fin n) (Ad E) := x.val.submatrix p.succAbove p.succAbove with hM'
@@ -104,16 +113,18 @@ theorem short_rows_embedding_of : D0 → MinkowskiBoundAlt → K1 → CornerEmbe
       · intro i _ hi
         rw [hcol, Matrix.one_apply_ne hi, mul_zero, zero_mul]
       · simp
-    have hunit : IsUnit M'.det := by
-      rw [hdet]; exact (Matrix.GeneralLinearGroup.det x).isUnit
+    have hunit : IsUnit M'.det := by rw [hdet]; exact (Matrix.GeneralLinearGroup.det x).isUnit
     let g' : GA E n := M'.nonsingInvUnit hunit
     have hDg' : Dt g' = Dt x := by
       have : GeneralLinearGroup.det g' = GeneralLinearGroup.det x := Units.ext hdet
-      unfold Dt; rw [this]
+      unfold Dt
+      rw [this]
     obtain ⟨ξ', hξ'0, hξ'⟩ := hC g'
     let ξ : Fin (n + 1) → E := p.insertNth 0 ξ'
     have hξ0 : ξ ≠ 0 := by
-      intro h; apply hξ'0; ext j
+      intro h
+      apply hξ'0
+      ext j
       simpa [ξ] using congrFun h (p.succAbove j)
     have hht : Reduction.height x ξ = Reduction.height g' ξ' := by
       unfold Reduction.height
@@ -135,8 +146,11 @@ theorem short_rows_embedding_of : D0 → MinkowskiBoundAlt → K1 → CornerEmbe
     have h1 : Reduction.height g' ξ' ≤ C * Dt g ^ ((n : ℝ)⁻¹) :=
       (div_le_iff₀ (Real.rpow_pos_of_pos hpos _)).1 hξ'
     rw [div_le_iff₀ (Real.rpow_pos_of_pos hpos _)]
-    calc Reduction.height g' ξ' ≤ C * Dt g ^ ((n : ℝ)⁻¹) := h1
-      _ = C * Dt g ^ ((((n + 1 : ℕ) : ℝ) - 1)⁻¹ - ((n + 1 : ℕ) : ℝ)⁻¹) * Dt g ^ (((n + 1 : ℕ) : ℝ)⁻¹) := by
+    calc
+      Reduction.height g' ξ'
+        ≤ C * Dt g ^ ((n : ℝ)⁻¹) := h1
+      _ = C * Dt g ^ ((((n + 1 : ℕ) : ℝ) - 1)⁻¹ - ((n + 1 : ℕ) : ℝ)⁻¹)
+          * Dt g ^ (((n + 1 : ℕ) : ℝ)⁻¹) := by
         rw [mul_assoc, ← Real.rpow_add hpos]
         congr 2
         push_cast

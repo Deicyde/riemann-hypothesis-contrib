@@ -17,11 +17,14 @@ open Classical
 
 section Gen
 
-variable {G U : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
-  [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure]
-  [TopologicalSpace U] [CompactSpace U] [T2Space U] [SecondCountableTopology U] [MeasurableSpace U] [BorelSpace U]
+variable
+  {G U : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
+  (μ : Measure G) [μ.IsHaarMeasure] [TopologicalSpace U] [CompactSpace U] [T2Space U]
+  [SecondCountableTopology U] [MeasurableSpace U] [BorelSpace U]
   (ν : Measure U) [IsFiniteMeasure ν]
-  (K : Subgroup G) (hK : IsCompact (K : Set G)) (ι : U → G) (hι : Continuous ι) (hιK : ∀ u, ι u ∈ K)
+  (K : Subgroup G) (hK : IsCompact (K : Set G))
+  (ι : U → G) (hι : Continuous ι) (hιK : ∀ u, ι u ∈ K)
 
 include hK in
 theorem integral_mul_mem (k : G) (hk : k ∈ K) (F : G → ℂ) : ∫ y, F (y * k) ∂μ = ∫ y, F y ∂μ := by
@@ -32,9 +35,11 @@ theorem integral_mul_mem (k : G) (hk : k ∈ K) (F : G → ℂ) : ∫ y, F (y * 
   rfl
 
 include hK hι hιK in
-theorem swap_right (c : G → U → ℂ) (hc : Continuous (Function.uncurry c)) (Kc : Set G) (hKc : IsCompact Kc)
-    (hcK : ∀ y u, y ∉ Kc → c y u = 0) (h : G → ℂ) (hh : Continuous h) :
-    ∫ y, (∫ u, c y u * h (y * ι u) ∂ν) ∂μ = ∫ y, (∫ u, c (y * (ι u)⁻¹) u ∂ν) * h y ∂μ := by
+theorem swap_right
+    (c : G → U → ℂ) (hc : Continuous (Function.uncurry c))
+    (Kc : Set G) (hKc : IsCompact Kc) (hcK : ∀ y u, y ∉ Kc → c y u = 0)
+    (h : G → ℂ) (hh : Continuous h)
+    : ∫ y, (∫ u, c y u * h (y * ι u) ∂ν) ∂μ = ∫ y, (∫ u, c (y * (ι u)⁻¹) u ∂ν) * h y ∂μ := by
   have hKK : IsCompact (Kc * (K : Set G)) := hKc.mul hK
   have i1 : Integrable (Function.uncurry fun y u => c y u * h (y * ι u)) (μ.prod ν) := by
     apply Continuous.integrable_of_hasCompactSupport
@@ -62,12 +67,17 @@ theorem swap_right (c : G → U → ℂ) (hc : Continuous (Function.uncurry c)) 
   rw [integral_mul_const]
 
 include hK hι hιK in
-theorem avg_cont_supp (c : G → U → ℂ) (hc : Continuous (Function.uncurry c)) (Kc : Set G) (hKc : IsCompact Kc)
-    (hcK : ∀ y u, y ∉ Kc → c y u = 0) :
-    Continuous (fun y => ∫ u, c (y * (ι u)⁻¹) u ∂ν) ∧ HasCompactSupport (fun y => ∫ u, c (y * (ι u)⁻¹) u ∂ν) := by
+theorem avg_cont_supp
+    (c : G → U → ℂ) (hc : Continuous (Function.uncurry c))
+    (Kc : Set G) (hKc : IsCompact Kc) (hcK : ∀ y u, y ∉ Kc → c y u = 0)
+    : Continuous (fun y => ∫ u, c (y * (ι u)⁻¹) u ∂ν)
+      ∧ HasCompactSupport (fun y => ∫ u, c (y * (ι u)⁻¹) u ∂ν) := by
   constructor
-  · have := continuous_parametric_integral_of_continuous (μ := ν) (f := fun y u => c (y * (ι u)⁻¹) u)
-      (hc.comp ((continuous_fst.mul (hι.comp continuous_snd).inv).prodMk continuous_snd)) isCompact_univ
+  · have :=
+      continuous_parametric_integral_of_continuous (μ := ν)
+        (f := fun y u => c (y * (ι u)⁻¹) u)
+        (hc.comp ((continuous_fst.mul (hι.comp continuous_snd).inv).prodMk continuous_snd))
+        isCompact_univ
     simpa [Measure.restrict_univ] using this
   · refine HasCompactSupport.intro (hKc.mul hK) fun y hy => ?_
     have : ∀ u, c (y * (ι u)⁻¹) u = 0 := fun u => hcK _ _ fun h1 => hy ⟨_, h1, ι u, hιK u, by simp⟩
@@ -75,8 +85,8 @@ theorem avg_cont_supp (c : G → U → ℂ) (hc : Continuous (Function.uncurry c
 
 end Gen
 
-theorem continuous_toUnitsU (N : ℕ) :
-    Continuous (fun u : Matrix.unitaryGroup (Fin N) ℂ => (Unitary.toUnits u : G N)) := by
+theorem continuous_toUnitsU (N : ℕ)
+    : Continuous (fun u : Matrix.unitaryGroup (Fin N) ℂ => (Unitary.toUnits u : G N)) := by
   rw [Units.continuous_iff]
   constructor
   · exact continuous_subtype_val
@@ -84,24 +94,28 @@ theorem continuous_toUnitsU (N : ℕ) :
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {N : ℕ}
 
-theorem continuous_along_infP (v : InfinitePlace E) (g : GA E N) (φ : GA E N → ℂ) (hs : φ ∈ Sm E N) :
-    Continuous fun t : G N => φ (g * infP N (Pi.mulSingle v t)) := by
+theorem continuous_along_infP (v : InfinitePlace E) (g : GA E N) (φ : GA E N → ℂ) (hs : φ ∈ Sm E N)
+    : Continuous fun t : G N => φ (g * infP N (Pi.mulSingle v t)) := by
   let Mt : (InfinitePlace E → G N) → GL (Fin N) (Cinf E) := fun y =>
     Units.map (Matrix.piRingEquiv (n := Fin N) (β := fun _ : InfinitePlace E => ℂ)).symm.toMonoidHom
       (MulEquiv.piUnits.symm y)
   have hM : Continuous Mt := by
-    refine Continuous.units_map _ ?_ |>.comp (ContinuousMulEquiv.piUnits (M := fun _ : InfinitePlace E =>
-      Matrix (Fin N) (Fin N) ℂ)).symm.continuous
-    exact continuous_pi fun i => continuous_pi fun j => continuous_pi fun v => (continuous_apply v).matrix_elem i j
+    refine Continuous.units_map _ ?_
+      |>.comp (ContinuousMulEquiv.piUnits
+        (M := fun _ : InfinitePlace E => Matrix (Fin N) (Fin N) ℂ)).symm.continuous
+    exact continuous_pi fun i =>
+      continuous_pi fun j => continuous_pi fun v => (continuous_apply v).matrix_elem i j
   have hL : Continuous fun x : Matrix (Fin N) (Fin N) (Cinf E) => (toL x : Lie E N) := continuous_id
-  have e : (fun t : G N => φ (g * infP N (Pi.mulSingle v t))) =
-      fun t => chart φ g (toL (Mt (Pi.mulSingle v t)).val) := by
+  have e
+      : (fun t : G N => φ (g * infP N (Pi.mulSingle v t)))
+        = fun t => chart φ g (toL (Mt (Pi.mulSingle v t)).val) := by
     funext t
     rw [chart_val]
     rfl
   rw [e]
   exact (hs g).continuousOn.comp_continuous
-    (hL.comp ((Units.continuous_val (M := Matrix (Fin N) (Fin N) (Cinf E))).comp (hM.comp (continuous_mulSingle (A := fun _ : InfinitePlace E => G N) v))))
+    (hL.comp ((Units.continuous_val (M := Matrix (Fin N) (Fin N) (Cinf E))).comp
+      (hM.comp (continuous_mulSingle (A := fun _ : InfinitePlace E => G N) v))))
     fun t => val_mem_invSet _
 
 end PositivityTheory.Rg.BcB.CG.ReproL

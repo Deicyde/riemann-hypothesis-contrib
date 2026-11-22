@@ -34,8 +34,8 @@ lemma one_mem_span (ρ : Γ →* GL (Fin N) C) (A : Subalgebra C (Mat C N)) :
     (1 : Mat C N) ∈ Submodule.span C (gens ρ A) :=
   Submodule.subset_span ⟨1, A.one_mem, 1, by rw [rone, one_mul]⟩
 
-noncomputable def RR (ρ : Γ →* GL (Fin N) C) (A : Subalgebra C (Mat C N)) (hN : Normd ρ A) :
-    Subalgebra C (Mat C N) :=
+noncomputable def RR (ρ : Γ →* GL (Fin N) C) (A : Subalgebra C (Mat C N)) (hN : Normd ρ A)
+    : Subalgebra C (Mat C N) :=
   (Submodule.span C (gens ρ A)).toSubalgebra (one_mem_span ρ A) (span_mul ρ A hN)
 
 lemma mem_RR {ρ : Γ →* GL (Fin N) C} {A : Subalgebra C (Mat C N)} {hN : Normd ρ A} {x : Mat C N} :
@@ -102,7 +102,8 @@ end LateralTheory.DivDb.BigCorner₂
 open LateralTheory.DivDb.BigCorner₂ in
 theorem LateralTheory.DivDb.BigCorner₂.BigCorner_of : LateralTheory.DivDb.BigCorner := by
   intro Γ C _ _ N n ρ A p hC hN hK hyp
-  refine ⟨RR ρ A hN, fun g => ?_, ⟨fun i => ?_, fun a ha i => ?_⟩, fun g a ha => ?_, fun W hW a ha => ?_⟩
+  refine
+    ⟨RR ρ A hN, fun g => ?_, ⟨fun i => ?_, fun a ha i => ?_⟩, fun g a ha => ?_, fun W hW a ha => ?_⟩
   · exact mem_RR.2 (Submodule.subset_span ⟨1, A.one_mem, g, (one_mul _).symm⟩)
   · exact mem_RR.2 (Submodule.subset_span ⟨p i, hC.1 i, 1, by rw [rone, mul_one]⟩)
   · exact corner_span ρ A p hC hN hyp i (mem_RR.1 ha)

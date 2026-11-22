@@ -59,12 +59,15 @@ theorem first_sigma_valuation_bound : TwoIntervalValuationSumBound := by
   intro ℓ _ h η S b a hab hbS
   have hℓ : ℓ.Prime := Fact.out
   have hℓ2 : 2 ≤ ℓ := hℓ.two_le
-  have step1 := sum_erase_union_le (padicValInt ℓ) (Finset.Icc (1 - (η : ℤ)) ((η : ℤ) + a))
-    (Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b))
-  have hI1 : (∑ j ∈ (Finset.Icc (1 - (η : ℤ)) ((η : ℤ) + a)).erase 0, padicValInt ℓ j) ≤
-      padicValNat ℓ (η - 1).factorial + padicValNat ℓ (η + a).factorial := by
-    have hsub : (Finset.Icc (1 - (η : ℤ)) ((η : ℤ) + a)).erase 0 ⊆
-        Finset.Icc (1 - (η : ℤ)) (-1) ∪ Finset.Icc 1 ((η : ℤ) + a) := by
+  have step1 :=
+    sum_erase_union_le (padicValInt ℓ) (Finset.Icc (1 - (η : ℤ)) ((η : ℤ) + a))
+      (Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b))
+  have hI1
+      : (∑ j ∈ (Finset.Icc (1 - (η : ℤ)) ((η : ℤ) + a)).erase 0, padicValInt ℓ j)
+        ≤ padicValNat ℓ (η - 1).factorial + padicValNat ℓ (η + a).factorial := by
+    have hsub
+        : (Finset.Icc (1 - (η : ℤ)) ((η : ℤ) + a)).erase 0
+          ⊆ Finset.Icc (1 - (η : ℤ)) (-1) ∪ Finset.Icc 1 ((η : ℤ) + a) := by
       intro j hj
       simp only [Finset.mem_erase, Finset.mem_Icc, Finset.mem_union] at hj ⊢
       omega
@@ -73,8 +76,9 @@ theorem first_sigma_valuation_bound : TwoIntervalValuationSumBound := by
       intro j h1 h2
       simp only [Finset.mem_Icc] at h1 h2
       omega
-    have hneg : (∑ j ∈ Finset.Icc (1 - (η : ℤ)) (-1), padicValInt ℓ j) =
-        ∑ n ∈ Finset.Icc 1 (η - 1), padicValNat ℓ n := by
+    have hneg
+        : (∑ j ∈ Finset.Icc (1 - (η : ℤ)) (-1), padicValInt ℓ j)
+          = ∑ n ∈ Finset.Icc 1 (η - 1), padicValNat ℓ n := by
       apply Finset.sum_nbij' (fun j : ℤ => ((-j).toNat : ℕ)) (fun n : ℕ => -(n : ℤ))
       · intro j hj
         simp only [Finset.mem_Icc] at hj ⊢
@@ -95,8 +99,9 @@ theorem first_sigma_valuation_bound : TwoIntervalValuationSumBound := by
         rw [padicValInt, Nat.padicValNat_def]
         congr 1
         omega
-    have hpos : (∑ j ∈ Finset.Icc 1 ((η : ℤ) + a), padicValInt ℓ j) =
-        ∑ n ∈ Finset.Icc 1 (η + a), padicValNat ℓ n := by
+    have hpos
+        : (∑ j ∈ Finset.Icc 1 ((η : ℤ) + a), padicValInt ℓ j)
+          = ∑ n ∈ Finset.Icc 1 (η + a), padicValNat ℓ n := by
       apply Finset.sum_nbij' (fun j : ℤ => (j.toNat : ℕ)) (fun n : ℕ => (n : ℤ))
       · intro j hj
         simp only [Finset.mem_Icc] at hj ⊢
@@ -117,13 +122,18 @@ theorem first_sigma_valuation_bound : TwoIntervalValuationSumBound := by
         rw [padicValInt, Nat.padicValNat_def]
         congr 1
         omega
-    calc _ ≤ ∑ j ∈ Finset.Icc (1 - (η : ℤ)) (-1) ∪ Finset.Icc 1 ((η : ℤ) + a), padicValInt ℓ j :=
-          Finset.sum_le_sum_of_subset hsub
-      _ = _ := by rw [Finset.sum_union hdisj, hneg, hpos, sum_Icc_one_padicValNat_eq_factorial, sum_Icc_one_padicValNat_eq_factorial]
-  have hI2 : (∑ j ∈ (Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b)).erase 0, padicValInt ℓ j) ≤
-      padicValNat ℓ (a + S).factorial + Nat.log ℓ (b - a - 1 + (a + S)) := by
-    have heq : (∑ j ∈ Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b), padicValInt ℓ j) =
-        ∑ n ∈ Finset.Icc (b - a - 1 + 1) (b - a - 1 + (a + S)), padicValNat ℓ n := by
+    calc
+      _ ≤ ∑ j ∈ Finset.Icc (1 - (η : ℤ)) (-1) ∪ Finset.Icc 1 ((η : ℤ) + a), padicValInt ℓ j :=
+        Finset.sum_le_sum_of_subset hsub
+      _ = _ := by
+        rw [Finset.sum_union hdisj, hneg, hpos, sum_Icc_one_padicValNat_eq_factorial,
+          sum_Icc_one_padicValNat_eq_factorial]
+  have hI2
+      : (∑ j ∈ (Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b)).erase 0, padicValInt ℓ j)
+        ≤ padicValNat ℓ (a + S).factorial + Nat.log ℓ (b - a - 1 + (a + S)) := by
+    have heq
+        : (∑ j ∈ Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b), padicValInt ℓ j)
+          = ∑ n ∈ Finset.Icc (b - a - 1 + 1) (b - a - 1 + (a + S)), padicValNat ℓ n := by
       apply Finset.sum_nbij' (fun j : ℤ => ((-j).toNat : ℕ)) (fun n : ℕ => -(n : ℤ))
       · intro j hj
         simp only [Finset.mem_Icc] at hj ⊢
@@ -146,14 +156,16 @@ theorem first_sigma_valuation_bound : TwoIntervalValuationSumBound := by
         omega
     have h1 := sum_Icc_padicValNat_add_factorial_eq ℓ (b - a - 1) (a + S)
     have h2 := padicValNat_factorial_add_le_add_log ℓ (b - a - 1) (a + S)
-    calc _ ≤ ∑ j ∈ Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b), padicValInt ℓ j :=
-          Finset.sum_le_sum_of_subset (Finset.erase_subset _ _)
+    calc
+      _ ≤ ∑ j ∈ Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b), padicValInt ℓ j :=
+        Finset.sum_le_sum_of_subset (Finset.erase_subset _ _)
       _ = _ := heq
       _ ≤ _ := by omega
-  have tot : (∑ j ∈ (Finset.Icc (1 - (η : ℤ)) ((η : ℤ) + a) ∪
-        Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b)).erase 0, padicValInt ℓ j) ≤
-      padicValNat ℓ (η - 1).factorial + padicValNat ℓ (η + a).factorial +
-        padicValNat ℓ (a + S).factorial + Nat.log ℓ (b - a - 1 + (a + S)) := by
+  have tot
+      : (∑ j ∈ (Finset.Icc (1 - (η : ℤ)) ((η : ℤ) + a) ∪
+          Finset.Icc (1 - ((b + S : ℕ) : ℤ)) ((a : ℤ) - b)).erase 0, padicValInt ℓ j)
+        ≤ padicValNat ℓ (η - 1).factorial + padicValNat ℓ (η + a).factorial
+          + padicValNat ℓ (a + S).factorial + Nat.log ℓ (b - a - 1 + (a + S)) := by
     omega
   have hℓR : (1 : ℝ) < ℓ := by exact_mod_cast (show 1 < ℓ by omega)
   have hpos : (0 : ℝ) < (ℓ : ℝ) - 1 := by linarith
@@ -165,8 +177,10 @@ theorem first_sigma_valuation_bound : TwoIntervalValuationSumBound := by
     have c := sub_one_mul_padicValNat_factorial_le' ℓ N
     have c' : ((ℓ - 1 : ℕ) : ℝ) * (padicValNat ℓ N.factorial : ℝ) ≤ (N : ℝ) := by exact_mod_cast c
     rwa [hsubℓ] at c'
-  have hsum : (padicValNat ℓ (η - 1).factorial : ℝ) + (padicValNat ℓ (η + a).factorial : ℝ) +
-      (padicValNat ℓ (a + S).factorial : ℝ) ≤ (2 * (a : ℝ) + 2 * (η : ℝ) + (S : ℝ)) / ((ℓ : ℝ) - 1) := by
+  have hsum
+      : (padicValNat ℓ (η - 1).factorial : ℝ) + (padicValNat ℓ (η + a).factorial : ℝ)
+          + (padicValNat ℓ (a + S).factorial : ℝ)
+        ≤ (2 * (a : ℝ) + 2 * (η : ℝ) + (S : ℝ)) / ((ℓ : ℝ) - 1) := by
     rw [le_div_iff₀ hpos]
     have e1 := r (η - 1)
     have e2 := r (η + a)
@@ -192,12 +206,13 @@ theorem first_sigma_valuation_bound : TwoIntervalValuationSumBound := by
       have hNh : b - a - 1 + (a + S) ≤ 2 * (h + η) := by omega
       have hNpos : (0 : ℝ) < ((b - a - 1 + (a + S) : ℕ) : ℝ) := by
         exact_mod_cast Nat.pos_of_ne_zero hN
-      have h1 : ((Nat.log ℓ (b - a - 1 + (a + S)) : ℕ) : ℝ) ≤
-          Real.logb ℓ ((b - a - 1 + (a + S) : ℕ) : ℝ) := by
+      have h1
+          : ((Nat.log ℓ (b - a - 1 + (a + S)) : ℕ) : ℝ)
+            ≤ Real.logb ℓ ((b - a - 1 + (a + S) : ℕ) : ℝ) := by
         rw [Real.le_logb_iff_rpow_le hℓR hNpos, Real.rpow_natCast]
         exact_mod_cast hpow
-      have h2 : Real.logb ℓ ((b - a - 1 + (a + S) : ℕ) : ℝ) ≤
-          Real.logb ℓ (2 * ((h + η : ℕ) : ℝ)) := by
+      have h2
+          : Real.logb ℓ ((b - a - 1 + (a + S) : ℕ) : ℝ) ≤ Real.logb ℓ (2 * ((h + η : ℕ) : ℝ)) := by
         apply Real.logb_le_logb_of_le hℓR hNpos
         exact_mod_cast hNh
       unfold lam

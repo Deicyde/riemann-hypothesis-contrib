@@ -18,9 +18,10 @@ open GenA GenB
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {c : L →+* L} {m : ℕ}
 
-theorem lev_sc_val (u : Lˣ) :
-    ((lev L c m (dg fun _ => u) : GL (Fin m ⊕ Fin m) L) : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) L) =
-      fromBlocks ((u : L) • 1) 0 0 (c ((u⁻¹ : Lˣ) : L) • 1) := by
+theorem lev_sc_val (u : Lˣ)
+    : ((lev L c m (dg fun _ => u) : GL (Fin m ⊕ Fin m) L)
+        : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) L)
+      = fromBlocks ((u : L) • 1) 0 0 (c ((u⁻¹ : Lˣ) : L) • 1) := by
   rw [lev_val, levM, ← map_inv, dg_val, dg_val]
   congr 1
   · ext i j; by_cases h : i = j <;> simp [h]
@@ -29,8 +30,12 @@ theorem lev_sc_val (u : Lˣ) :
     · simp [h]
     · simp [h]
 
-theorem lev_sc_int (hv : ∀ x, Valued.v (c x) = Valued.v x) {u : Lˣ} (hu : Valued.v (u : L) = 1) (i j) :
-    ((lev L c m (dg fun _ => u) : GL (Fin m ⊕ Fin m) L) : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) L) i j ∈ intL L := by
+theorem lev_sc_int
+    (hv : ∀ x, Valued.v (c x) = Valued.v x) {u : Lˣ} (hu : Valued.v (u : L) = 1) (i j)
+    : ((lev L c m (dg fun _ => u) : GL (Fin m ⊕ Fin m) L)
+          : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) L)
+        i j
+      ∈ intL L := by
   have h1 : (u : L) ∈ intL L := hu.le
   have h2 : c ((u⁻¹ : Lˣ) : L) ∈ intL L := by
     show Valued.v (c _) ≤ 1
@@ -48,8 +53,10 @@ theorem lev_sc_int (hv : ∀ x, Valued.v (c x) = Valued.v x) {u : Lˣ} (hu : Val
     · rw [mul_one]; exact h2
     · rw [mul_zero]; exact zero_mem _
 
-theorem lev_sc_mem (hc : ∀ x, c (c x) = x) (hv : ∀ x, Valued.v (c x) = Valued.v x) {u : Lˣ}
-    (hu : Valued.v (u : L) = 1) : lev L c m (dg fun _ => u) ∈ KPW L c m := by
+theorem lev_sc_mem
+    (hc : ∀ x, c (c x) = x) (hv : ∀ x, Valued.v (c x) = Valued.v x)
+    {u : Lˣ} (hu : Valued.v (u : L) = 1)
+    : lev L c m (dg fun _ => u) ∈ KPW L c m := by
   refine ⟨lev_mem hc _, (lev_mem hc _).1, mem_IntGL (lev_sc_int hv hu) ?_⟩
   rw [← map_inv, ← map_inv]
   exact lev_sc_int (u := u⁻¹) hv (by rw [Units.val_inv_eq_inv_val, map_inv₀, hu, inv_one])
@@ -58,8 +65,8 @@ theorem lev_sc_eq {x : Lˣ} (hx : c x = x) : lev L c m (dg fun _ => x) = zW L m 
   ext1
   rw [lev_sc_val, zW_val, Units.val_inv_eq_inv_val, map_inv₀, hx]
 
-theorem exists_unit {x : Lˣ} (hx : Valued.v (x : L) = WithZero.exp (-1 : ℤ)) (u : Lˣ) :
-    ∃ k : ℤ, Valued.v ((u * x ^ k : Lˣ) : L) = 1 := by
+theorem exists_unit {x : Lˣ} (hx : Valued.v (x : L) = WithZero.exp (-1 : ℤ)) (u : Lˣ)
+    : ∃ k : ℤ, Valued.v ((u * x ^ k : Lˣ) : L) = 1 := by
   have h0 : Valued.v (u : L) ≠ 0 := (Valuation.ne_zero_iff _).2 u.ne_zero
   refine ⟨WithZero.log (Valued.v (u : L)), ?_⟩
   rw [Units.val_mul, Units.val_zpow_eq_zpow_val, map_mul, map_zpow₀, hx, ← WithZero.exp_zsmul]
@@ -78,17 +85,16 @@ theorem gen : GenSt := by
   intro L _ _ ϖ c q h m χ hmul hpos hK hz a ha
   obtain ⟨hc, hv, hϖ, hvϖ, -⟩ := h
   have hvϖ' : Valued.v ϖ = WithZero.exp (-1 : ℤ) := hvϖ
-  have hlt : Valued.v ϖ < 1 := by
-    rw [hvϖ', ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
-  have h0 : ϖ ≠ 0 := fun e => by
-    rw [e, map_zero] at hvϖ'; exact WithZero.exp_ne_zero hvϖ'.symm
+  have hlt : Valued.v ϖ < 1 := by rw [hvϖ', ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
+  have h0 : ϖ ≠ 0 := fun e => by rw [e, map_zero] at hvϖ'; exact WithZero.exp_ne_zero hvϖ'.symm
   let x : Lˣ := Units.mk0 ϖ h0
   have hzx : χ (zW L m x) = 1 := hz x rfl
   have hzm : zW L m x ∈ PW L c m := by rw [← lev_sc_eq (c := c) (x := x) hϖ]; exact lev_mem hc _
-  let ψ : GL (Fin m) L →* ℝ :=
-    { toFun := fun t => χ (lev L c m t)
-      map_one' := by rw [map_one]; exact hK 1 (one_mem _)
-      map_mul' := fun s t => by rw [map_mul]; exact hmul _ (lev_mem hc _) _ (lev_mem hc _) }
+  let ψ : GL (Fin m) L →* ℝ := {
+    toFun := fun t => χ (lev L c m t)
+    map_one' := by rw [map_one]; exact hK 1 (one_mem _)
+    map_mul' := fun s t => by rw [map_mul]; exact hmul _ (lev_mem hc _) _ (lev_mem hc _)
+  }
   have hψ : ∀ t, ψ t = χ (lev L c m t) := fun _ => rfl
   have hsc : ∀ u : Lˣ, ψ (dg fun _ => u) = 1 := by
     let φ : Lˣ →* ℝ := (ψ.comp dg).comp (Pi.constMonoidHom (Fin m) Lˣ)
@@ -102,11 +108,12 @@ theorem gen : GenSt := by
     exact e1
   have hall := all_one ψ (fun t => hpos _ (lev_mem hc t)) h0 (one_add_ne hlt) hsc
   obtain ⟨t, X, hX, rfl⟩ := decomp hc ha
-  have hr : 1 + -(ϖ * ϖ) ≠ 0 := one_add_ne (by
-    rw [Valuation.map_neg, map_mul]; exact mul_lt_one_of_nonneg_of_lt_one_left zero_le hlt hlt.le)
-  have hs : ∀ r : L, c r = r → (r • X).map c = -(r • X)ᵀ := fun r hr => by
+  have hr : 1 + -(ϖ * ϖ) ≠ 0 :=
+    one_add_ne (by
+      rw [Valuation.map_neg, map_mul]; exact mul_lt_one_of_nonneg_of_lt_one_left zero_le hlt hlt.le)
+  have hs : ∀ r : L, c r = r → (r • X).map c = - (r • X)ᵀ := fun r hr => by
     ext i j
-    have : c (X i j) = -X j i := congrFun (congrFun hX i) j
+    have : c (X i j) = - X j i := congrFun (congrFun hX i) j
     simp [hr, this]
   set r := (1 + -(ϖ * ϖ))⁻¹ with hrd
   have hcr : c r = r := by simp [hrd, hϖ]

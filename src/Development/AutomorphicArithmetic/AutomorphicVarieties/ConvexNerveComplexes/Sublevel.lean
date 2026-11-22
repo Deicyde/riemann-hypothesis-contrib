@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.sublevel :
-    ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] {q : Y → E →L[ℝ] ℝ} {T : Set E}, Good q T → ∀ x ∈ posDual T, ∀ c : ℝ, IsCompact {h | h ∈ poly q ∧ x h ≤ c} := by
+theorem UpperTheory.V.ConeExtensionAcyclic.sublevel
+    : ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+        {q : Y → E →L[ℝ] ℝ} {T : Set E},
+      Good q T → ∀ x ∈ posDual T, ∀ c : ℝ, IsCompact {h | h ∈ poly q ∧ x h ≤ c} := by
   intro E Y _ _ _ q T hG x hx c
   haveI : ProperSpace E := FiniteDimensional.proper_real E
   have hpoly : IsClosed (poly q) := by
@@ -18,8 +20,7 @@ theorem UpperTheory.V.ConeExtensionAcyclic.sublevel :
     exact isClosed_iInter fun y => isClosed_le continuous_const (q y).continuous
   have hcl : IsClosed {h : E | h ∈ poly q ∧ x h ≤ c} :=
     hpoly.inter (isClosed_le x.continuous continuous_const)
-  have hK : IsCompact (Metric.sphere (0 : E) 1 ∩ T) :=
-    (isCompact_sphere 0 1).inter_right hG.closed
+  have hK : IsCompact (Metric.sphere (0 : E) 1 ∩ T) := (isCompact_sphere 0 1).inter_right hG.closed
   obtain ⟨m, hm0, hm⟩ : ∃ m : ℝ, 0 < m ∧ ∀ k ∈ Metric.sphere (0 : E) 1 ∩ T, m ≤ x k := by
     rcases (Metric.sphere (0 : E) 1 ∩ T).eq_empty_or_nonempty with he | hne
     · refine ⟨1, one_pos, ?_⟩

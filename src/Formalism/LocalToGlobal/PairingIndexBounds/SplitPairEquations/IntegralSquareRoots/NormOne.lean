@@ -49,24 +49,26 @@ theorem cay_inj (s : E) (hs : star s = -s) (hs0 : s ≠ 0) : Function.Injective 
     · exact h4
   exact_mod_cast sub_eq_zero.mp h3
 
-theorem exists_norm_one (s : E) (hs : star s = -s) (hs0 : s ≠ 0) (p : E[X]) (hp : p ≠ 0) :
-    ∃ z : E, star z * z = 1 ∧ z ≠ 1 ∧ p.eval z ≠ 0 := by
+theorem exists_norm_one (s : E) (hs : star s = -s) (hs0 : s ≠ 0) (p : E[X]) (hp : p ≠ 0)
+    : ∃ z : E, star z * z = 1 ∧ z ≠ 1 ∧ p.eval z ≠ 0 := by
   have hinf := Set.infinite_range_of_injective (cay_inj s hs hs0)
   obtain ⟨z, ⟨t, rfl⟩, hz⟩ := hinf.exists_notMem_finset (p.roots.toFinset ∪ {1})
   rw [Finset.mem_union, not_or, Multiset.mem_toFinset, Finset.mem_singleton, mem_roots hp] at hz
   exact ⟨_, cay_norm s hs t, hz.2, hz.1⟩
 
-theorem eval_charpolyRev' {n : ℕ} (M : Matrix (Fin n) (Fin n) E) (z : E) :
-    M.charpolyRev.eval z = (1 - z • M).det := by
+theorem eval_charpolyRev' {n : ℕ} (M : Matrix (Fin n) (Fin n) E) (z : E)
+    : M.charpolyRev.eval z = (1 - z • M).det := by
   rw [Matrix.charpolyRev, ← coe_evalRingHom, RingHom.map_det]
   congr 1
   ext i j
   simp [Matrix.one_apply, apply_ite]
   exact mul_comm _ _
 
-theorem split_unitary (s : E) (hs : star s = -s) (hs0 : s ≠ 0) {n : ℕ} (γ : Matrix.unitaryGroup (Fin n) E) :
-    ∃ γ₁ γ₂ : Matrix.unitaryGroup (Fin n) E, γ = γ₁ * γ₂ ∧
-      (1 - (γ₁ : Matrix (Fin n) (Fin n) E)).det ≠ 0 ∧ (1 - (γ₂ : Matrix (Fin n) (Fin n) E)).det ≠ 0 := by
+theorem split_unitary
+    (s : E) (hs : star s = -s) (hs0 : s ≠ 0) {n : ℕ} (γ : Matrix.unitaryGroup (Fin n) E)
+    : ∃ γ₁ γ₂ : Matrix.unitaryGroup (Fin n) E,
+      γ = γ₁ * γ₂ ∧ (1 - (γ₁ : Matrix (Fin n) (Fin n) E)).det ≠ 0
+        ∧ (1 - (γ₂ : Matrix (Fin n) (Fin n) E)).det ≠ 0 := by
   have hp : (γ : Matrix (Fin n) (Fin n) E).charpolyRev ≠ 0 := by
     intro h
     have := Matrix.eval_charpolyRev (M := (γ : Matrix (Fin n) (Fin n) E))
@@ -77,18 +79,21 @@ theorem split_unitary (s : E) (hs : star s = -s) (hs0 : s ≠ 0) {n : ℕ} (γ :
   have hu : (γ : Matrix (Fin n) (Fin n) E) * star (γ : Matrix (Fin n) (Fin n) E) = 1 :=
     Matrix.mem_unitaryGroup_iff.mp γ.2
   have m1 : z • (γ : Matrix (Fin n) (Fin n) E) ∈ Matrix.unitaryGroup (Fin n) E := by
-    rw [Matrix.mem_unitaryGroup_iff, star_smul, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hu, hz', one_smul]
+    rw [Matrix.mem_unitaryGroup_iff, star_smul, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hu,
+      hz', one_smul]
   have m2 : star z • (1 : Matrix (Fin n) (Fin n) E) ∈ Matrix.unitaryGroup (Fin n) E := by
-    rw [Matrix.mem_unitaryGroup_iff, star_smul, Matrix.smul_mul, Matrix.mul_smul, smul_smul, star_star, star_one,
-      Matrix.mul_one, hz, one_smul]
+    rw [Matrix.mem_unitaryGroup_iff, star_smul, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
+      star_star, star_one, Matrix.mul_one, hz, one_smul]
   refine ⟨⟨_, m1⟩, ⟨_, m2⟩, ?_, ?_, ?_⟩
   · apply Subtype.ext
     show (γ : Matrix (Fin n) (Fin n) E) = z • (γ : Matrix (Fin n) (Fin n) E) * star z • (1 : Matrix (Fin n) (Fin n) E)
     rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, Matrix.mul_one, hz', one_smul]
   · show (1 - z • (γ : Matrix (Fin n) (Fin n) E)).det ≠ 0
-    rw [← eval_charpolyRev']; exact hzp
+    rw [← eval_charpolyRev']
+    exact hzp
   · show (1 - star z • (1 : Matrix (Fin n) (Fin n) E)).det ≠ 0
-    have : (1 - star z • (1 : Matrix (Fin n) (Fin n) E)) = (1 - star z) • (1 : Matrix (Fin n) (Fin n) E) := by
+    have : (1 - star z • (1 : Matrix (Fin n) (Fin n) E))
+        = (1 - star z) • (1 : Matrix (Fin n) (Fin n) E) := by
       rw [sub_smul, one_smul]
     rw [this, Matrix.det_smul, Matrix.det_one, mul_one]
     refine pow_ne_zero _ (sub_ne_zero.mpr fun h => hz1 ?_)
@@ -110,11 +115,11 @@ theorem exists_skew (D : D7) : letI := D.host.cmStar; ∃ s : D.host.E, star s =
   have h := hno (x - star x) (by rw [star_sub, star_star]; ring)
   exact (sub_eq_zero.mp h).symm
 
-theorem split_host (D : D7) {n : ℕ} :
-    letI := D.host.cmStar
-    ∀ γ : Matrix.unitaryGroup (Fin n) D.host.E,
-    ∃ γ₁ γ₂ : Matrix.unitaryGroup (Fin n) D.host.E, γ = γ₁ * γ₂ ∧
-      (1 - (γ₁ : Matrix (Fin n) (Fin n) D.host.E)).det ≠ 0 ∧ (1 - (γ₂ : Matrix (Fin n) (Fin n) D.host.E)).det ≠ 0 := by
+theorem split_host (D : D7) {n : ℕ}
+    : letI := D.host.cmStar
+      ∀ γ : Matrix.unitaryGroup (Fin n) D.host.E, ∃ γ₁ γ₂ : Matrix.unitaryGroup (Fin n) D.host.E,
+        γ = γ₁ * γ₂ ∧ (1 - (γ₁ : Matrix (Fin n) (Fin n) D.host.E)).det ≠ 0
+          ∧ (1 - (γ₂ : Matrix (Fin n) (Fin n) D.host.E)).det ≠ 0 := by
   letI := D.host.cmStar
   intro γ
   obtain ⟨s, hs, hs0⟩ := exists_skew D

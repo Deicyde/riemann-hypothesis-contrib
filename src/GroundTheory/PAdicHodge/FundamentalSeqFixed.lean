@@ -21,25 +21,30 @@ local notation "𝒪" => normInteger ℂ_[p]
 
 section Residue
 
-theorem prod_range_X_sub_C_zmod :
-    ∏ a ∈ Finset.range p, (X - C ((a : ℕ) : ZMod p)) = X ^ p - X := by
+theorem prod_range_X_sub_C_zmod : ∏ a ∈ Finset.range p, (X - C ((a : ℕ) : ZMod p)) = X ^ p - X := by
   have hmon : (X ^ p - X : (ZMod p)[X]).Monic :=
     (monic_X_pow p).sub_of_left (by rw [degree_X, degree_X_pow]; exact_mod_cast hp.out.one_lt)
   have hr : (X ^ p - X : (ZMod p)[X]).roots = Finset.univ.val := by
     simpa [ZMod.card] using FiniteField.roots_X_pow_card_sub_X (ZMod p)
   have hdeg : (X ^ p - X : (ZMod p)[X]).natDegree = p :=
     Polynomial.natDegree_X_pow_sub_X (R := (ZMod p)) hp.out.one_lt
-  have h := prod_multiset_X_sub_C_of_monic_of_roots_card_eq hmon (by
-    rw [hr, hdeg, Finset.card_val, Finset.card_univ, ZMod.card])
+  have h :=
+    prod_multiset_X_sub_C_of_monic_of_roots_card_eq hmon
+      (by rw [hr, hdeg, Finset.card_val, Finset.card_univ, ZMod.card])
   rw [hr, ← Finset.prod_eq_multiset_prod] at h
   rw [← h]
-  refine Finset.prod_nbij' (fun a => (a : ZMod p)) (fun a => a.val) (fun a _ => Finset.mem_univ _)
-    (fun a _ => Finset.mem_range.2 (ZMod.val_lt a)) (fun a ha => ?_) (fun a _ => ZMod.natCast_zmod_val a)
+  refine Finset.prod_nbij'
+    (fun a => (a : ZMod p))
+    (fun a => a.val)
+    (fun a _ => Finset.mem_univ _)
+    (fun a _ => Finset.mem_range.2 (ZMod.val_lt a))
+    (fun a ha => ?_)
+    (fun a _ => ZMod.natCast_zmod_val a)
     (fun a _ => rfl)
   exact ZMod.val_cast_of_lt (Finset.mem_range.1 ha)
 
-theorem C_dvd_of_map_eq_zero {F : ℤ[X]} (h : F.map (Int.castRingHom (ZMod p)) = 0) :
-    C (p : ℤ) ∣ F := by
+theorem C_dvd_of_map_eq_zero {F : ℤ[X]} (h : F.map (Int.castRingHom (ZMod p)) = 0)
+    : C (p : ℤ) ∣ F := by
   rw [C_dvd_iff_dvd_coeff]
   intro i
   have h1 : (F.coeff i : ZMod p) = 0 := by
@@ -47,10 +52,11 @@ theorem C_dvd_of_map_eq_zero {F : ℤ[X]} (h : F.map (Int.castRingHom (ZMod p)) 
     simpa only [coeff_map, eq_intCast, coeff_zero] using this
   exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).1 h1
 
-theorem exists_prod_range_X_sub_C_eq :
-    ∃ G : ℤ[X], ∏ a ∈ Finset.range p, (X - C ((a : ℕ) : ℤ)) = X ^ p - X + C (p : ℤ) * G := by
-  have hmap : (∏ a ∈ Finset.range p, (X - C ((a : ℕ) : ℤ)) - (X ^ p - X)).map
-      (Int.castRingHom (ZMod p)) = 0 := by
+theorem exists_prod_range_X_sub_C_eq
+    : ∃ G : ℤ[X], ∏ a ∈ Finset.range p, (X - C ((a : ℕ) : ℤ)) = X ^ p - X + C (p : ℤ) * G := by
+  have hmap
+      : (∏ a ∈ Finset.range p, (X - C ((a : ℕ) : ℤ)) - (X ^ p - X)).map (Int.castRingHom (ZMod p))
+        = 0 := by
     rw [Polynomial.map_sub, Polynomial.map_prod, sub_eq_zero]
     have e1 : Polynomial.map (Int.castRingHom (ZMod p)) (X ^ p - X) = X ^ p - X := by simp
     rw [e1, ← prod_range_X_sub_C_zmod]
@@ -58,8 +64,8 @@ theorem exists_prod_range_X_sub_C_eq :
   obtain ⟨G, hG⟩ := C_dvd_of_map_eq_zero hmap
   exact ⟨G, by rw [← hG]; ring⟩
 
-theorem exists_prod_range_sub_eq (v : 𝒪) :
-    ∃ g : 𝒪, ∏ a ∈ Finset.range p, (v - (a : 𝒪)) = v ^ p - v + (p : 𝒪) * g := by
+theorem exists_prod_range_sub_eq (v : 𝒪)
+    : ∃ g : 𝒪, ∏ a ∈ Finset.range p, (v - (a : 𝒪)) = v ^ p - v + (p : 𝒪) * g := by
   obtain ⟨G, hG⟩ := exists_prod_range_X_sub_C_eq (p := p)
   refine ⟨aeval v G, ?_⟩
   have h := congrArg (aeval v) hG
@@ -94,17 +100,15 @@ theorem natCast_p_ne_zero' : (p : 𝒪) ≠ 0 := fun h => by
   simp only [SubringClass.coe_natCast, ZeroMemClass.coe_zero, Nat.cast_eq_zero] at this
   exact hp.out.ne_zero this
 
-
 set_option maxHeartbeats 1600000 in
-theorem exists_natCast_dvd_sub_of_dvd_pow_sub {v : 𝒪} (hv : (p : 𝒪) ∣ v ^ p - v) :
-    ∃ a : ℕ, a < p ∧ (p : 𝒪) ∣ v - a := by
+theorem exists_natCast_dvd_sub_of_dvd_pow_sub {v : 𝒪} (hv : (p : 𝒪) ∣ v ^ p - v)
+    : ∃ a : ℕ, a < p ∧ (p : 𝒪) ∣ v - a := by
   obtain ⟨g, hg⟩ := exists_prod_range_sub_eq v
   have hprod : (p : 𝒪) ∣ ∏ a ∈ Finset.range p, (v - (a : 𝒪)) := by
     rw [hg]
     exact dvd_add hv (dvd_mul_right _ _)
   rw [dvd_iff_norm_le natCast_p_ne_zero'] at hprod
-  have hnp : ‖((p : 𝒪) : ℂ_[p])‖ < 1 := by
-    simpa using norm_natCast_p_lt_one (p := p)
+  have hnp : ‖((p : 𝒪) : ℂ_[p])‖ < 1 := by simpa using norm_natCast_p_lt_one (p := p)
   simp only [SubmonoidClass.coe_finsetProd, norm_prod] at hprod
   have hle : ∀ a : ℕ, ‖((v - (a : 𝒪) : 𝒪) : ℂ_[p])‖ ≤ 1 := fun a => mem_normInteger.1 (v - a).2
   by_cases hex : ∃ a ∈ Finset.range p, ‖((v - (a : 𝒪) : 𝒪) : ℂ_[p])‖ < 1
@@ -114,12 +118,15 @@ theorem exists_natCast_dvd_sub_of_dvd_pow_sub {v : 𝒪} (hv : (p : 𝒪) ∣ v 
     rw [Finset.prod_eq_single_of_mem a ha] at hprod
     · exact hprod
     · intro b hb hba
-      have hab : ‖(((a : ℤ) - b : ℤ) : ℂ_[p])‖ = 1 := norm_intCast_eq_one (by omega)
-        (by have := Finset.mem_range.1 ha; have := Finset.mem_range.1 hb; omega)
-      have e : ((v - (b : 𝒪) : 𝒪) : ℂ_[p]) = ((v - (a : 𝒪) : 𝒪) : ℂ_[p]) +
-          (((a : ℤ) - b : ℤ) : ℂ_[p]) := by push_cast; ring
-      rw [e, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hab]; exact hlt.ne),
-        hab, max_eq_right hlt.le]
+      have hab : ‖(((a : ℤ) - b : ℤ) : ℂ_[p])‖ = 1 :=
+        norm_intCast_eq_one (by omega)
+          (by have := Finset.mem_range.1 ha; have := Finset.mem_range.1 hb; omega)
+      have e
+          : ((v - (b : 𝒪) : 𝒪) : ℂ_[p])
+            = ((v - (a : 𝒪) : 𝒪) : ℂ_[p]) + (((a : ℤ) - b : ℤ) : ℂ_[p]) := by
+        push_cast; ring
+      rw [e, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hab]; exact hlt.ne), hab,
+        max_eq_right hlt.le]
   · push Not at hex
     have h1 : ∏ a ∈ Finset.range p, ‖((v - (a : 𝒪) : 𝒪) : ℂ_[p])‖ = 1 :=
       Finset.prod_eq_one fun a ha => le_antisymm (hle a) (hex a ha)
@@ -130,11 +137,11 @@ end Residue
 
 section Approx
 
-
 set_option maxHeartbeats 1600000 in
-theorem exists_int_dvd_sub (m : ℕ) : ∀ v : 𝒪, (∃ c : ℕ → 𝒪, ∀ k : ℕ,
-    (p : 𝒪) ^ m ∣ v - ∑ i ∈ Finset.range m, (p : 𝒪) ^ i * c i ^ p ^ k) →
-    ∃ z : ℤ, (p : 𝒪) ^ m ∣ v - z := by
+theorem exists_int_dvd_sub (m : ℕ)
+    : ∀ v : 𝒪,
+      (∃ c : ℕ → 𝒪, ∀ k : ℕ, (p : 𝒪) ^ m ∣ v - ∑ i ∈ Finset.range m, (p : 𝒪) ^ i * c i ^ p ^ k)
+        → ∃ z : ℤ, (p : 𝒪) ^ m ∣ v - z := by
   induction m with
   | zero => intro v _; exact ⟨0, by simp⟩
   | succ m ih =>
@@ -181,8 +188,11 @@ theorem exists_int_dvd_sub (m : ℕ) : ∀ v : 𝒪, (∃ c : ℕ → 𝒪, ∀ 
         have h2 := (pow_dvd_pow (p : 𝒪) (by omega : m + 1 ≤ m + j + 1)).trans h1
         convert dvd_add h2 ihj using 1
         ring
-    have hk : ∀ j, (p : 𝒪) ^ (m + 1) ∣ (v - (a : 𝒪) ^ p ^ m) -
-        (p : 𝒪) * ∑ i ∈ Finset.range m, (p : 𝒪) ^ i * c (i + 1) ^ p ^ (m + j) := by
+    have hk
+        : ∀ j,
+          (p : 𝒪) ^ (m + 1)
+            ∣ (v - (a : 𝒪) ^ p ^ m)
+              - (p : 𝒪) * ∑ i ∈ Finset.range m, (p : 𝒪) ^ i * c (i + 1) ^ p ^ (m + j) := by
       intro j
       have h1 := hc (m + j)
       rw [Finset.sum_range_succ', pow_zero, one_mul] at h1
@@ -192,12 +202,14 @@ theorem exists_int_dvd_sub (m : ℕ) : ∀ v : 𝒪, (∃ c : ℕ → 𝒪, ∀ 
       simp only [Finset.mul_sum, ← mul_assoc, ← pow_succ']
       ring
     have hpz : (p : 𝒪) ∣ v - (a : 𝒪) ^ p ^ m := by
-      have h := dvd_add ((dvd_pow_self (p : 𝒪) m.succ_ne_zero).trans (hk 0))
-        (dvd_mul_right (p : 𝒪) (∑ i ∈ Finset.range m, (p : 𝒪) ^ i * c (i + 1) ^ p ^ (m + 0)))
+      have h :=
+        dvd_add ((dvd_pow_self (p : 𝒪) m.succ_ne_zero).trans (hk 0))
+          (dvd_mul_right (p : 𝒪) (∑ i ∈ Finset.range m, (p : 𝒪) ^ i * c (i + 1) ^ p ^ (m + 0)))
       rwa [sub_add_cancel] at h
     obtain ⟨v', hv'⟩ := hpz
-    have hv'c : ∀ k, (p : 𝒪) ^ m ∣
-        v' - ∑ i ∈ Finset.range m, (p : 𝒪) ^ i * (c (i + 1) ^ p ^ m) ^ p ^ k := by
+    have hv'c
+        : ∀ k,
+          (p : 𝒪) ^ m ∣ v' - ∑ i ∈ Finset.range m, (p : 𝒪) ^ i * (c (i + 1) ^ p ^ m) ^ p ^ k := by
       intro k
       have h := hk k
       rw [hv', ← mul_sub, pow_succ'] at h
@@ -219,26 +231,30 @@ theorem norm_algebraMap_padic (q : ℚ_[p]) : ‖algebraMap ℚ_[p] ℂ_[p] q‖
   exact PadicComplex.norm_extends' p q
 
 theorem isClosed_range_algebraMap_padic : IsClosed (Set.range (algebraMap ℚ_[p] ℂ_[p])) :=
-  (AddMonoidHomClass.isometry_of_norm _ norm_algebraMap_padic).isUniformInducing.isComplete_range.isClosed
-
+  (AddMonoidHomClass.isometry_of_norm _
+    norm_algebraMap_padic).isUniformInducing.isComplete_range.isClosed
 
 set_option maxHeartbeats 1600000 in
-theorem theta_mem_range_of_phi_eq {y : ACris ℂ_[p] p} (hy : phi ℂ_[p] p y = y) :
-    ∃ q : ℚ_[p], ((theta ℂ_[p] p y : 𝒪) : ℂ_[p]) = algebraMap ℚ_[p] ℂ_[p] q := by
-  have happrox : ∀ m : ℕ, ∃ z : ℤ,
-      ‖((theta ℂ_[p] p y : 𝒪) : ℂ_[p]) - (z : ℂ_[p])‖ ≤ ‖(p : ℂ_[p])‖ ^ m := by
+theorem theta_mem_range_of_phi_eq {y : ACris ℂ_[p] p} (hy : phi ℂ_[p] p y = y)
+    : ∃ q : ℚ_[p], ((theta ℂ_[p] p y : 𝒪) : ℂ_[p]) = algebraMap ℚ_[p] ℂ_[p] q := by
+  have happrox
+      : ∀ m : ℕ, ∃ z : ℤ, ‖((theta ℂ_[p] p y : 𝒪) : ℂ_[p]) - (z : ℂ_[p])‖ ≤ ‖(p : ℂ_[p])‖ ^ m := by
     intro m
     rcases Nat.eq_zero_or_pos m with rfl | hm
     · exact ⟨0, by simpa using mem_normInteger.1 (theta ℂ_[p] p y).2⟩
-    obtain ⟨c, hc⟩ := exists_theta_eq_sum_of_phi_iterate (N := 1) le_rfl
-      (by rw [Function.iterate_one]; exact hy) hm
-    obtain ⟨z, hz⟩ := exists_int_dvd_sub m (theta ℂ_[p] p y) ⟨c, fun k => by
-      obtain ⟨e, he⟩ := hc k
-      refine ⟨e, Subtype.ext ?_⟩
-      simp only [one_mul] at he
-      push_cast
-      rw [he]
-      ring⟩
+    obtain ⟨c, hc⟩ :=
+      exists_theta_eq_sum_of_phi_iterate (N := 1) le_rfl (by rw [Function.iterate_one]; exact hy) hm
+    obtain ⟨z, hz⟩ :=
+      exists_int_dvd_sub m (theta ℂ_[p] p y) ⟨
+        c,
+        fun k => by
+          obtain ⟨e, he⟩ := hc k
+          refine ⟨e, Subtype.ext ?_⟩
+          simp only [one_mul] at he
+          push_cast
+          rw [he]
+          ring
+      ⟩
     refine ⟨z, ?_⟩
     have h := (dvd_iff_norm_le (pow_ne_zero m natCast_p_ne_zero')).1 hz
     simpa using h
@@ -261,8 +277,10 @@ section Plus
 local notation "𝔭" => Ideal.span {(p : ACris ℂ_[p] p)}
 local notation "θdR" => IsPerfectoidField.thetaBDeRhamPlusField (K := ℂ_[p]) p
 
-theorem mem_pow_of_p_pow_mul_phi_eq {a : ACris ℂ_[p] p} {m : ℕ} (hm : 1 ≤ m)
-    (ha : (p : ACris ℂ_[p] p) ^ m * phi ℂ_[p] p a = a) (j : ℕ) : a ∈ 𝔭 ^ j := by
+theorem mem_pow_of_p_pow_mul_phi_eq
+    {a : ACris ℂ_[p] p} {m : ℕ} (hm : 1 ≤ m) (ha : (p : ACris ℂ_[p] p) ^ m * phi ℂ_[p] p a = a)
+    (j : ℕ)
+    : a ∈ 𝔭 ^ j := by
   induction j with
   | zero => simp
   | succ j ih =>
@@ -275,10 +293,11 @@ theorem mem_pow_of_p_pow_mul_phi_eq {a : ACris ℂ_[p] p} {m : ℕ} (hm : 1 ≤ 
     simp only [Nat.add_sub_cancel]
     ring
 
-
 set_option maxHeartbeats 1600000 in
-theorem eq_zero_of_p_pow_mul_phiPlus_eq {y : BCrisPlus ℂ_[p] p} {m : ℕ} (hm : 1 ≤ m)
-    (hy : (p : BCrisPlus ℂ_[p] p) ^ m * phiPlus ℂ_[p] p y = y) : y = 0 := by
+theorem eq_zero_of_p_pow_mul_phiPlus_eq
+    {y : BCrisPlus ℂ_[p] p} {m : ℕ}
+    (hm : 1 ≤ m) (hy : (p : BCrisPlus ℂ_[p] p) ^ m * phiPlus ℂ_[p] p y = y)
+    : y = 0 := by
   obtain ⟨⟨a, s⟩, hs⟩ := IsLocalization.surj (Submonoid.powers (p : ACris ℂ_[p] p)) y
   obtain ⟨k, hk⟩ := s.2
   simp only at hs
@@ -290,13 +309,15 @@ theorem eq_zero_of_p_pow_mul_phiPlus_eq {y : BCrisPlus ℂ_[p] p} {m : ℕ} (hm 
     rw [map_mul, map_pow, map_natCast, ← h1, ← hs]
     conv_rhs => rw [← hy]
     ring
-  have ha0 : a = 0 := IsHausdorff.haus' (I := 𝔭) a fun j => by
-    rw [SModEq.zero, smul_eq_mul, Ideal.mul_top]
-    exact mem_pow_of_p_pow_mul_phi_eq hm ha j
+  have ha0 : a = 0 :=
+    IsHausdorff.haus' (I := 𝔭) a fun j => by
+      rw [SModEq.zero, smul_eq_mul, Ideal.mul_top]
+      exact mem_pow_of_p_pow_mul_phi_eq hm ha j
   rw [ha0, map_zero] at hs
   exact (isUnit_p_bCrisPlus.pow k).mul_left_eq_zero.1 hs
 
-variable {ε : PreTilt (normInteger ℂ_[p]) p} (hε : PreTilt.untilt ε = 1)
+variable
+  {ε : PreTilt (normInteger ℂ_[p]) p} (hε : PreTilt.untilt ε = 1)
   (hζ : PreTilt.untilt ((_root_.frobeniusEquiv (PreTilt (normInteger ℂ_[p]) p) p).symm ε) ≠ 1)
 
 include hζ in
@@ -304,28 +325,28 @@ theorem iotaPlus_periodTPlus_ne_zero : iotaPlus ℂ_[p] p (periodTPlus hε) ≠ 
   rw [iotaPlus_periodTPlus]
   exact fontaineT_ne_zero hε hζ
 
-
 include hζ in
-theorem periodTPlus_mul_left_cancel {a b : BCrisPlus ℂ_[p] p}
-    (h : periodTPlus hε * a = periodTPlus hε * b) : a = b :=
-  iotaPlus_injective (K := ℂ_[p]) (p := p) (mul_left_cancel₀ (iotaPlus_periodTPlus_ne_zero hε hζ)
-    (by rw [← map_mul, ← map_mul, h]))
+theorem periodTPlus_mul_left_cancel
+    {a b : BCrisPlus ℂ_[p] p} (h : periodTPlus hε * a = periodTPlus hε * b)
+    : a = b :=
+  iotaPlus_injective (K := ℂ_[p]) (p := p)
+    (mul_left_cancel₀ (iotaPlus_periodTPlus_ne_zero hε hζ) (by rw [← map_mul, ← map_mul, h]))
 
 set_option maxHeartbeats 1600000 in
-theorem iterate_phiPlus_eq_pow_mul {y : BCrisPlus ℂ_[p] p} {n : ℕ}
-    (hy : phiPlus ℂ_[p] p y = (p : BCrisPlus ℂ_[p] p) ^ n * y) (k : ℕ) :
-    (phiPlus ℂ_[p] p)^[k] y = ((p : BCrisPlus ℂ_[p] p) ^ n) ^ k * y := by
+theorem iterate_phiPlus_eq_pow_mul
+    {y : BCrisPlus ℂ_[p] p} {n : ℕ} (hy : phiPlus ℂ_[p] p y = (p : BCrisPlus ℂ_[p] p) ^ n * y)
+    (k : ℕ)
+    : (phiPlus ℂ_[p] p)^[k] y = ((p : BCrisPlus ℂ_[p] p) ^ n) ^ k * y := by
   induction k with
   | zero => simp
   | succ k ih =>
     rw [Function.iterate_succ_apply', ih, map_mul, map_pow, map_pow, map_natCast, hy]
     ring
 
-
 include hε hζ in
 set_option maxHeartbeats 1600000 in
-theorem exists_eq_algebraMap_of_phiPlus_eq {y : BCrisPlus ℂ_[p] p}
-    (hy : phiPlus ℂ_[p] p y = y) : ∃ q : ℚ_[p], y = algebraMap ℚ_[p] (BCrisPlus ℂ_[p] p) q := by
+theorem exists_eq_algebraMap_of_phiPlus_eq {y : BCrisPlus ℂ_[p] p} (hy : phiPlus ℂ_[p] p y = y)
+    : ∃ q : ℚ_[p], y = algebraMap ℚ_[p] (BCrisPlus ℂ_[p] p) q := by
   obtain ⟨⟨a, s⟩, hs⟩ := IsLocalization.surj (Submonoid.powers (p : ACris ℂ_[p] p)) y
   obtain ⟨k, hk⟩ := s.2
   simp only at hs
@@ -362,13 +383,13 @@ theorem exists_eq_algebraMap_of_phiPlus_eq {y : BCrisPlus ℂ_[p] p}
   rw [h4, zero_mul] at hy''
   rw [← sub_eq_zero, ← hy'_def, ← hy'']
 
-
 include hζ in
 set_option maxHeartbeats 1600000 in
-theorem exists_eq_algebraMap_mul_pow_of_phiPlus_eq (n : ℕ) : ∀ {y : BCrisPlus ℂ_[p] p},
-    phiPlus ℂ_[p] p y = (p : BCrisPlus ℂ_[p] p) ^ n * y →
-    iotaPlus ℂ_[p] p y ∈ Ideal.span {fontaineT ε hε ^ n} →
-    ∃ q : ℚ_[p], y = algebraMap ℚ_[p] (BCrisPlus ℂ_[p] p) q * periodTPlus hε ^ n := by
+theorem exists_eq_algebraMap_mul_pow_of_phiPlus_eq (n : ℕ)
+    : ∀ {y : BCrisPlus ℂ_[p] p},
+      phiPlus ℂ_[p] p y = (p : BCrisPlus ℂ_[p] p) ^ n * y
+        → iotaPlus ℂ_[p] p y ∈ Ideal.span {fontaineT ε hε ^ n}
+        → ∃ q : ℚ_[p], y = algebraMap ℚ_[p] (BCrisPlus ℂ_[p] p) q * periodTPlus hε ^ n := by
   induction n with
   | zero =>
     intro y hy _
@@ -386,13 +407,17 @@ theorem exists_eq_algebraMap_mul_pow_of_phiPlus_eq (n : ℕ) : ∀ {y : BCrisPlu
       rw [iterate_phiPlus_eq_pow_mul hy k, map_mul, map_mul, hθ0, mul_zero]
     obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.1 (phiPlus_mem_span_periodT hε hζ hall)
     set y1 := Ring.inverse (p : BCrisPlus ℂ_[p] p) ^ (n + 1) * w with hy1_def
-    have hinv : Ring.inverse (p : BCrisPlus ℂ_[p] p) ^ (n + 1) * (p : BCrisPlus ℂ_[p] p) ^ (n + 1) =
-        1 := by
+    have hinv
+        : Ring.inverse (p : BCrisPlus ℂ_[p] p) ^ (n + 1) * (p : BCrisPlus ℂ_[p] p) ^ (n + 1)
+          = 1 := by
       rw [← mul_pow, Ring.inverse_mul_cancel _ isUnit_p_bCrisPlus, one_pow]
     have hyt : y = periodTPlus hε * y1 := by
-      calc y = Ring.inverse (p : BCrisPlus ℂ_[p] p) ^ (n + 1) * ((p : BCrisPlus ℂ_[p] p) ^ (n + 1) * y) := by
-            rw [← mul_assoc, hinv, one_mul]
-        _ = Ring.inverse (p : BCrisPlus ℂ_[p] p) ^ (n + 1) * (w * periodTPlus hε) := by rw [← hy, hw]
+      calc
+        y = Ring.inverse (p : BCrisPlus ℂ_[p] p) ^ (n + 1)
+            * ((p : BCrisPlus ℂ_[p] p) ^ (n + 1) * y) := by
+          rw [← mul_assoc, hinv, one_mul]
+        _ = Ring.inverse (p : BCrisPlus ℂ_[p] p) ^ (n + 1) * (w * periodTPlus hε) := by
+          rw [← hy, hw]
         _ = periodTPlus hε * y1 := by rw [hy1_def]; ring
     have hy1 : phiPlus ℂ_[p] p y1 = (p : BCrisPlus ℂ_[p] p) ^ n * y1 := by
       apply isUnit_p_bCrisPlus.mul_left_cancel

@@ -21,7 +21,6 @@ namespace EllipticTorus
 
 variable {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
 
-
 variable (K L) in
 def adeleCoordEquiv : 𝔸[L] ≃ₗ[𝔸[K]] (Fin (Module.finrank K L) → 𝔸[K]) :=
   (adeleBasis (Module.finBasis K L)).equivFun
@@ -34,7 +33,6 @@ theorem continuous_adeleCoordEquiv_symm : Continuous (adeleCoordEquiv K L).symm 
   have := isModuleTopology_adeleRing (K := K) (L := L)
   exact IsModuleTopology.continuous_of_linearMap (adeleCoordEquiv K L).symm.toLinearMap
 
-
 variable (K L) in
 def adeleCoordHomeomorph : 𝔸[L] ≃ₜ (Fin (Module.finrank K L) → 𝔸[K]) where
   toEquiv := (adeleCoordEquiv K L).toEquiv
@@ -44,25 +42,22 @@ def adeleCoordHomeomorph : 𝔸[L] ≃ₜ (Fin (Module.finrank K L) → 𝔸[K])
 def mulMatrixGL (x : (𝔸[L])ˣ) : GL (Fin (Module.finrank K L)) 𝔸[K] where
   val := (Algebra.leftMulMatrix (adeleBasis (Module.finBasis K L)) (x : 𝔸[L]))ᵀ
   inv := (Algebra.leftMulMatrix (adeleBasis (Module.finBasis K L)) ((x⁻¹ : (𝔸[L])ˣ) : 𝔸[L]))ᵀ
-  val_inv := by
-    rw [← Matrix.transpose_mul, ← map_mul, Units.inv_mul, map_one, Matrix.transpose_one]
-  inv_val := by
-    rw [← Matrix.transpose_mul, ← map_mul, Units.mul_inv, map_one, Matrix.transpose_one]
+  val_inv := by rw [← Matrix.transpose_mul, ← map_mul, Units.inv_mul, map_one, Matrix.transpose_one]
+  inv_val := by rw [← Matrix.transpose_mul, ← map_mul, Units.mul_inv, map_one, Matrix.transpose_one]
 
-theorem det_mulMatrixGL (x : (𝔸[L])ˣ) :
-    ((Matrix.GeneralLinearGroup.det (mulMatrixGL (K := K) x) : (𝔸[K])ˣ) : 𝔸[K]) =
-      Algebra.norm 𝔸[K] (x : 𝔸[L]) := by
-  rw [Matrix.GeneralLinearGroup.val_det_apply, Algebra.norm_eq_matrix_det
-    (adeleBasis (Module.finBasis K L))]
+theorem det_mulMatrixGL (x : (𝔸[L])ˣ)
+    : ((Matrix.GeneralLinearGroup.det (mulMatrixGL (K := K) x) : (𝔸[K])ˣ) : 𝔸[K])
+      = Algebra.norm 𝔸[K] (x : 𝔸[L]) := by
+  rw [Matrix.GeneralLinearGroup.val_det_apply,
+    Algebra.norm_eq_matrix_det (adeleBasis (Module.finBasis K L))]
   exact Matrix.det_transpose _
 
-theorem adeleCoordEquiv_mul (x : (𝔸[L])ˣ) (y : 𝔸[L]) :
-    adeleCoordEquiv K L ((x : 𝔸[L]) * y) =
-      adeleCoordEquiv K L y ᵥ* (mulMatrixGL (K := K) x : Matrix _ _ 𝔸[K]) := by
+theorem adeleCoordEquiv_mul (x : (𝔸[L])ˣ) (y : 𝔸[L])
+    : adeleCoordEquiv K L ((x : 𝔸[L]) * y)
+      = adeleCoordEquiv K L y ᵥ* (mulMatrixGL (K := K) x : Matrix _ _ 𝔸[K]) := by
   change _ = _ ᵥ* (Algebra.leftMulMatrix (adeleBasis (Module.finBasis K L)) (x : 𝔸[L]))ᵀ
-  rw [Matrix.vecMul_transpose, adeleCoordEquiv, Module.Basis.equivFun_apply, Module.Basis.equivFun_apply,
-    Algebra.leftMulMatrix_mulVec_repr]
-
+  rw [Matrix.vecMul_transpose, adeleCoordEquiv, Module.Basis.equivFun_apply,
+    Module.Basis.equivFun_apply, Algebra.leftMulMatrix_mulVec_repr]
 
 variable (K L) in
 def coordMeasure : Measure 𝔸[L] :=
@@ -76,27 +71,28 @@ instance isAddHaarMeasure_coordMeasure : (coordMeasure K L).IsAddHaarMeasure :=
     continuous_adeleCoordEquiv_symm (adeleCoordEquiv K L).symm.surjective
     (adeleCoordHomeomorph K L).symm.isClosedEmbedding.tendsto_cocompact
 
-theorem map_smul_coordMeasure (x : IdeleGroup L) :
-    (coordMeasure K L).map (fun y ↦ x • y) =
-      ENNReal.ofReal ((IdeleGroup.ideleModule K (ideleNorm K L x) : ℝ))⁻¹ • coordMeasure K L := by
+theorem map_smul_coordMeasure (x : IdeleGroup L)
+    : (coordMeasure K L).map (fun y ↦ x • y)
+      = ENNReal.ofReal ((IdeleGroup.ideleModule K (ideleNorm K L x) : ℝ))⁻¹ • coordMeasure K L := by
   have hdet : Matrix.GeneralLinearGroup.det (mulMatrixGL (K := K) x) = ideleNorm K L x :=
     Units.ext (det_mulMatrixGL x)
-  have hcomp : (fun y : 𝔸[L] ↦ x • y) ∘ (adeleCoordEquiv K L).symm =
-      (adeleCoordEquiv K L).symm ∘
-        (fun v ↦ v ᵥ* (mulMatrixGL (K := K) x : Matrix _ _ 𝔸[K])) := by
+  have hcomp
+      : (fun y : 𝔸[L] ↦ x • y) ∘ (adeleCoordEquiv K L).symm
+        = (adeleCoordEquiv K L).symm
+          ∘ (fun v ↦ v ᵥ* (mulMatrixGL (K := K) x : Matrix _ _ 𝔸[K])) := by
     funext v
     apply (adeleCoordEquiv K L).injective
     simp only [Function.comp_apply, LinearEquiv.apply_symm_apply]
     rw [Units.smul_def, smul_eq_mul, adeleCoordEquiv_mul, LinearEquiv.apply_symm_apply]
-  rw [coordMeasure, Measure.map_map (continuous_const_smul x).measurable
-      measurable_adeleCoordEquiv_symm, hcomp,
+  rw [coordMeasure,
+    Measure.map_map (continuous_const_smul x).measurable measurable_adeleCoordEquiv_symm, hcomp,
     ← Measure.map_map measurable_adeleCoordEquiv_symm
       (GJGlobal.Modulus.measurable_vecMul' (mulMatrixGL (K := K) x)),
     GJGlobal.Modulus.map_vecMul_adeleMeasurePi, Measure.map_smul, hdet]
   exact measurable_adeleCoordEquiv_symm.aemeasurable
 
-theorem ideleModule_ideleNorm (x : IdeleGroup L) :
-    IdeleGroup.ideleModule K (ideleNorm K L x) = IdeleGroup.ideleModule L x := by
+theorem ideleModule_ideleNorm (x : IdeleGroup L)
+    : IdeleGroup.ideleModule K (ideleNorm K L x) = IdeleGroup.ideleModule L x := by
   have hc := isAddLeftInvariant_eq_smul (coordMeasure K L) (adeleMeasure L)
   set c := (coordMeasure K L).addHaarScalarFactor (adeleMeasure L)
   have hc0 : (c : ℝ≥0∞) ≠ 0 := by
@@ -115,8 +111,9 @@ theorem ideleModule_ideleNorm (x : IdeleGroup L) :
   have hne : (c : ℝ≥0∞) * adeleMeasure L S ≠ 0 := mul_ne_zero hc0 hpos
   have hnt : (c : ℝ≥0∞) * adeleMeasure L S ≠ ⊤ := ENNReal.mul_ne_top ENNReal.coe_ne_top htop
   have h3 := (ENNReal.mul_left_inj hne hnt).1 h2
-  have h4 := (ENNReal.ofReal_eq_ofReal_iff (inv_nonneg.2 (IdeleGroup.ideleModule L x).2.le)
-    (inv_nonneg.2 (IdeleGroup.ideleModule K (ideleNorm K L x)).2.le)).1 h3
+  have h4 :=
+    (ENNReal.ofReal_eq_ofReal_iff (inv_nonneg.2 (IdeleGroup.ideleModule L x).2.le)
+      (inv_nonneg.2 (IdeleGroup.ideleModule K (ideleNorm K L x)).2.le)).1 h3
   exact Subtype.ext (inv_inj.1 h4).symm
 
 end EllipticTorus

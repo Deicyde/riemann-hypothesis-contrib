@@ -10,14 +10,19 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S NumberField
+  IsDedekindDomain
 
 section General
 
-private theorem absNorm_eq_prime_pow_of_natCast_mem (K : Type) [Field K] [NumberField K] {g : ℕ} (hg : g.Prime)
-    (P : Ideal (𝓞 K)) [hP : P.IsMaximal] (hgP : ((g : ℕ) : 𝓞 K) ∈ P) :
-    ∃ m, 0 < m ∧ Ideal.absNorm P = g ^ m := by
-  have h1 : (Ideal.absNorm P : ℤ) ∣ Algebra.norm ℤ ((g : ℕ) : 𝓞 K) := Ideal.absNorm_dvd_norm_of_mem hgP
+private theorem absNorm_eq_prime_pow_of_natCast_mem
+    (K : Type) [Field K] [NumberField K]
+    {g : ℕ} (hg : g.Prime)
+    (P : Ideal (𝓞 K)) [hP : P.IsMaximal]
+    (hgP : ((g : ℕ) : 𝓞 K) ∈ P)
+    : ∃ m, 0 < m ∧ Ideal.absNorm P = g ^ m := by
+  have h1 : (Ideal.absNorm P : ℤ) ∣ Algebra.norm ℤ ((g : ℕ) : 𝓞 K) :=
+    Ideal.absNorm_dvd_norm_of_mem hgP
   have h2 : Algebra.norm ℤ ((g : ℕ) : 𝓞 K) = (g : ℤ) ^ Module.finrank ℤ (𝓞 K) := by
     rw [← map_natCast (algebraMap ℤ (𝓞 K)), Algebra.norm_algebraMap]
   rw [h2] at h1
@@ -28,8 +33,10 @@ private theorem absNorm_eq_prime_pow_of_natCast_mem (K : Type) [Field K] [Number
   rw [pow_zero, Ideal.absNorm_eq_one_iff] at hm
   exact hP.ne_top hm
 
-theorem splitsCompl_down (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (g : ℕ)
-    (hg : g.Prime) (h : SplitsCompl E g) : SplitsCompl F g := by
+theorem splitsCompl_down
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (g : ℕ) (hg : g.Prime) (h : SplitsCompl E g)
+    : SplitsCompl F g := by
   intro P hP hgP
   obtain ⟨Q, hQ, hQl⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) P
   have hPQ : P = Q.comap (algebraMap (𝓞 F) (𝓞 E)) := hQl.over
@@ -76,8 +83,9 @@ theorem span_isMaximal {g : ℕ} (hg : g.Prime) : (Ideal.span {(g : ℤ)}).IsMax
   haveI := Fact.mk hg
   exact Int.ideal_span_isMaximal_of_prime g
 
-theorem card_primesOver {g : ℕ} (hg : g.Prime) (h : SplitsCompl K g) :
-    (IsDedekindDomain.primesOverFinset (Ideal.span {(g : ℤ)}) (𝓞 K)).card = Module.finrank ℚ K := by
+theorem card_primesOver {g : ℕ} (hg : g.Prime) (h : SplitsCompl K g)
+    : (IsDedekindDomain.primesOverFinset (Ideal.span {(g : ℤ)}) (𝓞 K)).card
+      = Module.finrank ℚ K := by
   classical
   haveI := span_isMaximal hg
   rw [← Ideal.sum_ramification_inertia (𝓞 K) ℚ K (span_ne_bot hg), Finset.card_eq_sum_ones]
@@ -110,8 +118,9 @@ theorem card_primesOver {g : ℕ} (hg : g.Prime) (h : SplitsCompl K g) :
     exact Nat.pow_right_injective hg.two_le h2
   rw [he, hf]
 
-theorem image_plOver {g : ℕ} (hg : g.Prime) :
-    HeightOneSpectrum.asIdeal '' plOver K g = (IsDedekindDomain.primesOverFinset (Ideal.span {(g : ℤ)}) (𝓞 K) : Set (Ideal (𝓞 K))) := by
+theorem image_plOver {g : ℕ} (hg : g.Prime)
+    : HeightOneSpectrum.asIdeal '' plOver K g
+      = (IsDedekindDomain.primesOverFinset (Ideal.span {(g : ℤ)}) (𝓞 K) : Set (Ideal (𝓞 K))) := by
   haveI := span_isMaximal hg
   ext P
   rw [IsDedekindDomain.coe_primesOverFinset (span_ne_bot hg)]
@@ -132,18 +141,20 @@ theorem image_plOver {g : ℕ} (hg : g.Prime) :
       exact hg.ne_zero hgP
     exact ⟨⟨P, hPp, hne⟩, hgP, rfl⟩
 
-theorem injOn_asIdeal (s : Set (HeightOneSpectrum (𝓞 K))) : Set.InjOn HeightOneSpectrum.asIdeal s := fun _ _ _ _ h => HeightOneSpectrum.ext h
+theorem injOn_asIdeal (s : Set (HeightOneSpectrum (𝓞 K))) : Set.InjOn HeightOneSpectrum.asIdeal s :=
+  fun _ _ _ _ h => HeightOneSpectrum.ext h
 
 theorem finite_plOver {g : ℕ} (hg : g.Prime) : (plOver K g).Finite := by
   have h := image_plOver K hg
   exact Set.Finite.of_finite_image (h ▸ Finset.finite_toSet _) (injOn_asIdeal K _)
 
-theorem ncard_plOver {g : ℕ} (hg : g.Prime) (h : SplitsCompl K g) : (plOver K g).ncard = Module.finrank ℚ K := by
+theorem ncard_plOver {g : ℕ} (hg : g.Prime) (h : SplitsCompl K g)
+    : (plOver K g).ncard = Module.finrank ℚ K := by
   rw [← (injOn_asIdeal K _).ncard_image, image_plOver K hg, Set.ncard_coe_finset,
     card_primesOver K hg h]
 
-theorem finprod_plOver {g : ℕ} (hg : g.Prime) (h : SplitsCompl K g) (φ : ℝ → ℝ) :
-    ∏ᶠ p ∈ plOver K g, φ (Ideal.absNorm p.asIdeal : ℝ) = φ g ^ Module.finrank ℚ K := by
+theorem finprod_plOver {g : ℕ} (hg : g.Prime) (h : SplitsCompl K g) (φ : ℝ → ℝ)
+    : ∏ᶠ p ∈ plOver K g, φ (Ideal.absNorm p.asIdeal : ℝ) = φ g ^ Module.finrank ℚ K := by
   have hfin := finite_plOver K hg
   have hc : ∀ p ∈ plOver K g, φ (Ideal.absNorm p.asIdeal : ℝ) = φ g := by
     intro p hp
@@ -151,8 +162,8 @@ theorem finprod_plOver {g : ℕ} (hg : g.Prime) (h : SplitsCompl K g) (φ : ℝ 
   rw [finprod_mem_congr rfl hc, finprod_mem_eq_finite_toFinset_prod _ hfin, Finset.prod_const,
     ← Set.ncard_eq_toFinset_card _ hfin, ncard_plOver K hg h]
 
-theorem disjoint_plOver {g g' : ℕ} (hg : g.Prime) (hg' : g'.Prime) (hne : g ≠ g') :
-    Disjoint (plOver K g) (plOver K g') := by
+theorem disjoint_plOver {g g' : ℕ} (hg : g.Prime) (hg' : g'.Prime) (hne : g ≠ g')
+    : Disjoint (plOver K g) (plOver K g') := by
   rw [Set.disjoint_left]
   intro p hp hp'
   obtain ⟨a, b, hab⟩ : IsCoprime (g : ℤ) (g' : ℤ) :=
@@ -176,18 +187,23 @@ theorem finrank_hostF_eq : Module.finrank ℚ D.host.F = D.R.f := by
 
 theorem typedPl_eq : typedPl D = plOver D.host.F (D.host.g 0) ∪ plOver D.host.F (D.host.g 1) := rfl
 
-theorem finprod_typedPl (h0 : SplitsE D (D.host.g 0)) (h1 : SplitsE D (D.host.g 1)) (φ : ℝ → ℝ) :
-    ∏ᶠ p ∈ typedPl D, φ (Ideal.absNorm p.asIdeal : ℝ) =
-      φ (D.host.g 0 : ℝ) ^ D.R.f * φ (D.host.g 1 : ℝ) ^ D.R.f := by
-  have hF0 : SplitsCompl D.host.F (D.host.g 0) := splitsCompl_down D.host.F D.host.E _ (D.host.g_prime 0) h0
-  have hF1 : SplitsCompl D.host.F (D.host.g 1) := splitsCompl_down D.host.F D.host.E _ (D.host.g_prime 1) h1
-  rw [typedPl_eq, finprod_mem_union (disjoint_plOver _ (D.host.g_prime 0) (D.host.g_prime 1) D.host.g_ne)
-    (finite_plOver _ (D.host.g_prime 0)) (finite_plOver _ (D.host.g_prime 1)),
-    finprod_plOver _ (D.host.g_prime 0) hF0, finprod_plOver _ (D.host.g_prime 1) hF1, finrank_hostF_eq]
+theorem finprod_typedPl (h0 : SplitsE D (D.host.g 0)) (h1 : SplitsE D (D.host.g 1)) (φ : ℝ → ℝ)
+    : ∏ᶠ p ∈ typedPl D, φ (Ideal.absNorm p.asIdeal : ℝ)
+      = φ (D.host.g 0 : ℝ) ^ D.R.f * φ (D.host.g 1 : ℝ) ^ D.R.f := by
+  have hF0 : SplitsCompl D.host.F (D.host.g 0) :=
+    splitsCompl_down D.host.F D.host.E _ (D.host.g_prime 0) h0
+  have hF1 : SplitsCompl D.host.F (D.host.g 1) :=
+    splitsCompl_down D.host.F D.host.E _ (D.host.g_prime 1) h1
+  rw [typedPl_eq,
+    finprod_mem_union (disjoint_plOver _ (D.host.g_prime 0) (D.host.g_prime 1) D.host.g_ne)
+      (finite_plOver _ (D.host.g_prime 0)) (finite_plOver _ (D.host.g_prime 1)),
+    finprod_plOver _ (D.host.g_prime 0) hF0, finprod_plOver _ (D.host.g_prime 1) hF1,
+    finrank_hostF_eq]
 
-theorem gaG_eq (h0 : SplitsE D (D.host.g 0)) (h1 : SplitsE D (D.host.g 1)) :
-    gaG D = (∏ i ∈ Finset.Icc 1 D.R.k, ((D.host.g 0 : ℝ) ^ i - 1)) ^ D.R.f *
-      (∏ i ∈ Finset.Icc 1 D.R.k, ((D.host.g 1 : ℝ) ^ i - 1)) ^ D.R.f := by
+theorem gaG_eq (h0 : SplitsE D (D.host.g 0)) (h1 : SplitsE D (D.host.g 1))
+    : gaG D
+      = (∏ i ∈ Finset.Icc 1 D.R.k, ((D.host.g 0 : ℝ) ^ i - 1)) ^ D.R.f
+        * (∏ i ∈ Finset.Icc 1 D.R.k, ((D.host.g 1 : ℝ) ^ i - 1)) ^ D.R.f := by
   unfold gaG
   exact finprod_typedPl D h0 h1 (fun x : ℝ => ∏ i ∈ Finset.Icc 1 D.R.k, (x ^ i - 1))
 

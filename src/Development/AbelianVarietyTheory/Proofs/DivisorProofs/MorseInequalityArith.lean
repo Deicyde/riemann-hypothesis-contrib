@@ -6,12 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem morse_inequality_arith (d : ℕ) (a b : ℤ) (h g : ℕ → ℕ) (C C' m₀ m₁ : ℕ)
-    (H1 : ∀ m : ℕ, m₀ ≤ m → |((d + 1).factorial : ℤ) * (h m : ℤ) - a * (m : ℤ) ^ (d + 1)| ≤
-      C * (((d + 1 : ℕ) : ℤ) * ((m : ℤ) + 1) ^ (d + 1 - 1)))
-    (H2 : ∀ m : ℕ, m₁ ≤ m → |(d.factorial : ℤ) * (g m : ℤ) - b * (m : ℤ) ^ d| ≤
-      C' * ((d : ℤ) * ((m : ℤ) + 1) ^ (d - 1)))
-    (hab : ((d : ℤ) + 1) * b < a) : ∃ m : ℕ, 1 ≤ m ∧ m * g m < h m := by
+theorem morse_inequality_arith
+    (d : ℕ) (a b : ℤ) (h g : ℕ → ℕ) (C C' m₀ m₁ : ℕ)
+    (H1 : ∀ m : ℕ,
+      m₀ ≤ m
+        → |((d + 1).factorial : ℤ) * (h m : ℤ) - a * (m : ℤ) ^ (d + 1)|
+          ≤ C * (((d + 1 : ℕ) : ℤ) * ((m : ℤ) + 1) ^ (d + 1 - 1)))
+    (H2 : ∀ m : ℕ,
+      m₁ ≤ m
+        → |(d.factorial : ℤ) * (g m : ℤ) - b * (m : ℤ) ^ d|
+          ≤ C' * ((d : ℤ) * ((m : ℤ) + 1) ^ (d - 1)))
+    (hab : ((d : ℤ) + 1) * b < a)
+    : ∃ m : ℕ, 1 ≤ m ∧ m * g m < h m := by
   obtain ⟨K, hK⟩ : ∃ K : ℕ, K = C * (d + 1) + (d + 1) * C' * d := ⟨_, rfl⟩
   obtain ⟨m, hm0, hm1, hmK⟩ : ∃ m : ℕ, m₀ ≤ m ∧ m₁ ≤ m ∧ K * 2 ^ d + 1 ≤ m :=
     ⟨m₀ + m₁ + (K * 2 ^ d + 1), by omega, by omega, by omega⟩
@@ -41,20 +47,22 @@ theorem morse_inequality_arith (d : ℕ) (a b : ℤ) (h g : ℕ → ℕ) (C C' m
   have hQ : 0 < M ^ d := by positivity
   have e1 : ((d : ℤ) + 1) * d.factorial * h m ≤ ((d : ℤ) + 1) * d.factorial * (M * g m) :=
     mul_le_mul_of_nonneg_left hcon' (by positivity)
-  have e2 : ((d : ℤ) + 1) * M * ((d.factorial : ℤ) * g m - b * M ^ d) ≤
-      ((d : ℤ) + 1) * M * (C' * ((d : ℤ) * (M + 1) ^ (d - 1))) :=
+  have e2
+      : ((d : ℤ) + 1) * M * ((d.factorial : ℤ) * g m - b * M ^ d)
+        ≤ ((d : ℤ) + 1) * M * (C' * ((d : ℤ) * (M + 1) ^ (d - 1))) :=
     mul_le_mul_of_nonneg_left h2 (by positivity)
-  have e3 : ((d : ℤ) + 1) * C' * (M * ((d : ℤ) * (M + 1) ^ (d - 1))) ≤
-      ((d : ℤ) + 1) * C' * (d * (M + 1) ^ d) :=
+  have e3
+      : ((d : ℤ) + 1) * C' * (M * ((d : ℤ) * (M + 1) ^ (d - 1)))
+        ≤ ((d : ℤ) + 1) * C' * (d * (M + 1) ^ d) :=
     mul_le_mul_of_nonneg_left hA (by positivity)
   have e4 : (K : ℤ) * (M + 1) ^ d ≤ K * (2 ^ d * M ^ d) :=
     mul_le_mul_of_nonneg_left hP (by positivity)
-  have e5 : ((K : ℤ) * 2 ^ d + 1) * M ^ d ≤ M * M ^ d :=
-    mul_le_mul_of_nonneg_right hMK hQ.le
+  have e5 : ((K : ℤ) * 2 ^ d + 1) * M ^ d ≤ M * M ^ d := mul_le_mul_of_nonneg_right hMK hQ.le
   have e6 : (((d : ℤ) + 1) * b + 1) * (M * M ^ d) ≤ a * (M * M ^ d) :=
     mul_le_mul_of_nonneg_right (by linarith) (by positivity)
-  have e7 : (K : ℤ) * (M + 1) ^ d =
-      C * ((d + 1) * (M + 1) ^ d) + ((d : ℤ) + 1) * C' * (d * (M + 1) ^ d) := by
+  have e7
+      : (K : ℤ) * (M + 1) ^ d
+        = C * ((d + 1) * (M + 1) ^ d) + ((d : ℤ) + 1) * C' * (d * (M + 1) ^ d) := by
     rw [hKz]; ring
   rw [pow_succ' M d] at h1
   linarith

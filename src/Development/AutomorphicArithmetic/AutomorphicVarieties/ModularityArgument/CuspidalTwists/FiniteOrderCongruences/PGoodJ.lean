@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Hecke
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N IsLocalRing Polynomial
-open UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N IsLocalRing Polynomial
+open UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement GlobalTheory.CuspRep GlobalTheory.HeckeGal
+  GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
 open UpperTheory.V.Cu
 open scoped Matrix
 
@@ -17,17 +20,23 @@ namespace UpperTheory.V.Cu2
 
 namespace GoodJ
 
-theorem isAlg_of_pos {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] {κ : HChar K}
-    {m : (K →+* ℂ) → ℤ} (hκ : IsAlgPos κ m) : κ.IsAlg m := fun k => hκ k fun φ => by
-  have h := IsTotallyComplex.complexEmbedding_not_isReal (Complex.ofRealHom.comp φ)
-  refine absurd ?_ h
-  rw [ComplexEmbedding.isReal_iff]
-  ext x
-  simp
+theorem isAlg_of_pos
+    {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    {κ : HChar K} {m : (K →+* ℂ) → ℤ} (hκ : IsAlgPos κ m)
+    : κ.IsAlg m := fun k =>
+  hκ k fun φ => by
+    have h := IsTotallyComplex.complexEmbedding_not_isReal (Complex.ofRealHom.comp φ)
+    refine absurd ?_ h
+    rw [ComplexEmbedding.isReal_iff]
+    ext x
+    simp
 
-theorem infChar_twist {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] {n : ℕ} (P : CuspSub K n)
-    {κ : HChar K} {m : (K →+* ℂ) → ℤ} (hκ : IsAlgPos κ m) (τ : K →+* ℂ) :
-    (CG.mk (P.twist κ)).infChar τ = ((CG.mk P).infChar τ).map (· + ((m τ : ℤ) : ℂ)) := by
+theorem infChar_twist
+    {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    {n : ℕ} (P : CuspSub K n)
+    {κ : HChar K} {m : (K →+* ℂ) → ℤ} (hκ : IsAlgPos κ m)
+    (τ : K →+* ℂ)
+    : (CG.mk (P.twist κ)).infChar τ = ((CG.mk P).infChar τ).map (· + ((m τ : ℤ) : ℂ)) := by
   have e := ((ParLaws.hasInfChar_infChar (CG.mk P) τ).twist κ).infChar_eq
   rw [CG.twist_mk] at e
   rw [e]
@@ -40,9 +49,10 @@ end GoodJ
 theorem goodJ : GoodJ := by
   intro K _ _ _ hK π hreg m hm
   classical
-  let S : Finset ℂ := Finset.univ.biUnion fun τ : K →+* ℂ =>
-    (((CG.mk π).infChar τ).toFinset ×ˢ ((CG.mk π).infChar (ComplexEmbedding.conjugate τ)).toFinset).image
-      fun p => p.1 - p.2
+  let S : Finset ℂ :=
+    Finset.univ.biUnion fun τ : K →+* ℂ =>
+      (((CG.mk π).infChar τ).toFinset
+        ×ˢ ((CG.mk π).infChar (ComplexEmbedding.conjugate τ)).toFinset).image fun p => p.1 - p.2
   have h2 : ∀ τ : K →+* ℂ, ((CG.mk π).infChar τ).toFinset.card ≤ 2 := fun τ =>
     (Multiset.toFinset_card_le _).trans (CG.card_infChar _ τ).le
   have hS : S.card ≤ 8 := by
@@ -68,20 +78,36 @@ theorem goodJ : GoodJ := by
   have eM' := GoodJ.infChar_twist π hY (ComplexEmbedding.conjugate e)
   rw [ha] at eM
   rw [ha'] at eM'
-  refine ⟨(CG.mk (π.twist Y)).infChar e, (CG.mk (π.twist Y)).infChar (ComplexEmbedding.conjugate e),
+  refine ⟨
+    (CG.mk (π.twist Y)).infChar e,
+    (CG.mk (π.twist Y)).infChar (ComplexEmbedding.conjugate e),
     ParLaws.hasInfChar_infChar (CG.mk (π.twist Y)) e,
-    ParLaws.hasInfChar_infChar (CG.mk (π.twist Y)) (ComplexEmbedding.conjugate e), ?_, ?_, ?_⟩
+    ParLaws.hasInfChar_infChar (CG.mk (π.twist Y)) (ComplexEmbedding.conjugate e),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro h0
     have h1 := CG.card_infChar (CG.mk (π.twist Y)) e
     rw [h0] at h1
     simp at h1
   · rw [Multiset.nodup_add, eM, eM']
-    refine ⟨(hreg e).1.map (add_left_injective _), (hreg _).1.map (add_left_injective _),
-      Multiset.disjoint_left.2 fun {z} hz hz' => ?_⟩
+    refine ⟨
+      (hreg e).1.map (add_left_injective _),
+      (hreg _).1.map (add_left_injective _),
+      Multiset.disjoint_left.2 fun {z} hz hz' => ?_
+    ⟩
     obtain ⟨x, hx, rfl⟩ := Multiset.mem_map.1 hz
     obtain ⟨x', hx', hxx⟩ := Multiset.mem_map.1 hz'
-    refine hzS (Finset.mem_biUnion.2 ⟨e, Finset.mem_univ _, Finset.mem_image.2
-      ⟨(x, x'), Finset.mem_product.2 ⟨Multiset.mem_toFinset.2 hx, Multiset.mem_toFinset.2 hx'⟩, ?_⟩⟩)
+    refine hzS (Finset.mem_biUnion.2 ⟨
+      e,
+      Finset.mem_univ _,
+      Finset.mem_image.2 ⟨
+        (x, x'),
+        Finset.mem_product.2 ⟨Multiset.mem_toFinset.2 hx, Multiset.mem_toFinset.2 hx'⟩,
+        ?_
+      ⟩
+    ⟩)
     push_cast at hxx ⊢
     linear_combination -hxx
   · intro z hz

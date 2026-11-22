@@ -20,8 +20,8 @@ def gramVol {e n : ℕ} (v : (Fin e → ℂ) → (Fin n → ℂ)) (y : Fin e →
 
 def ChartGramMA.Statement : Prop :=
   ∀ (e n : ℕ) (v : (Fin e → ℂ) → (Fin n → ℂ)) (y : Fin e → ℂ),
-    (∀ᶠ y' in 𝓝 y, DifferentiableAt ℂ v y') → v y ≠ 0 →
-      maDensity (fun _ y' => Real.log ‖WithLp.toLp 2 (v y')‖) y =
-        (e.factorial : ℝ) / Real.pi ^ e * gramVol v y / ‖WithLp.toLp 2 (v y)‖ ^ (2 * (e + 1))
+    (∀ᶠ y' in 𝓝 y, DifferentiableAt ℂ v y') → v y ≠ 0
+      → maDensity (fun _ y' => Real.log ‖WithLp.toLp 2 (v y')‖) y
+        = (e.factorial : ℝ) / Real.pi ^ e * gramVol v y / ‖WithLp.toLp 2 (v y)‖ ^ (2 * (e + 1))
 
 end GroundTheory.Heights₂.Heights

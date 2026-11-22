@@ -6,10 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.W
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.HV UpperTheory.V.W
 
-theorem UpperTheory.V.W.lamEx :
-    LocCFTAll → LamEx := by
+theorem UpperTheory.V.W.lamEx : LocCFTAll → LamEx := by
   intro h l hl L Ω _ _ _ _ _ _ s V c n r
   haveI : IsAdicComplete (maximalIdeal c.O) c.O := (UpperTheory.V.Base.dvrFacts l c.O).2.2.2.1
   haveI : IsLocalHom (algebraMap ℤ_[l] c.O) := (UpperTheory.V.Base.dvrFacts l c.O).2.2.1

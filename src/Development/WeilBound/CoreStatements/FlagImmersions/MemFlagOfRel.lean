@@ -11,15 +11,24 @@ noncomputable section
 
 namespace RootFieldNumerics.Rig
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GlobalTheory.CompanionTheory.Ar.HodgeExt
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+  GlobalTheory.CompanionTheory.Ar.HodgeExt
 
-theorem exists_rel {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {X : Scheme.{0}} {t : SAB H X}
-    {z : Sp ℂ ⟶ X} {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ] {R : RiemLat E g Λ} {A₀ : Type}
-    {x : A₀ → Fin g → ℂ} {v : A₀ → (epsAt z ⟶ t.G)} (h : FibreLatVec t z R x v) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (Mz : LieModel t.G z V) : ∃ Rel : Submodule ℂ ((Fin g → ℂ) × V), (∀ a s, v a = Mz.pt s → (x a, s) ∈ Rel) ∧
-      (∀ d, (d, 0) ∈ Rel → d = 0) ∧ ∀ s, (0, s) ∈ Rel → s = 0 := by
+theorem exists_rel
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} {X : Scheme.{0}} {t : SAB H X} {z : Sp ℂ ⟶ X} {g : ℕ} {Λ : Type}
+    [AddCommGroup Λ] [Module (𝓞 E) Λ]
+    {R : RiemLat E g Λ} {A₀ : Type} {x : A₀ → Fin g → ℂ} {v : A₀ → (epsAt z ⟶ t.G)}
+    (h : FibreLatVec t z R x v)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (Mz : LieModel t.G z V)
+    : ∃ Rel : Submodule ℂ ((Fin g → ℂ) × V),
+      (∀ a s, v a = Mz.pt s → (x a, s) ∈ Rel) ∧ (∀ d, (d, 0) ∈ Rel → d = 0)
+        ∧ ∀ s, (0, s) ∈ Rel → s = 0 := by
   obtain ⟨A, _, φ, u, χ, hp, -, -, -, -, hv⟩ := h
   have h1 : lft hp (1 : epsAt z ⟶ t.G) = 1 := by
     have := lft_mul hp (1 : epsAt z ⟶ t.G) 1
@@ -28,15 +37,28 @@ theorem exists_rel {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host 
   have h0 : u.IsDiff 0 (lft hp (Mz.pt 0)) := by
     rw [Mz.pt_zero, h1, Hom.one_def]
     exact GlobalTheory.ArchMetricCompare.isDiff_zero u
-  have hc : ∀ (c c' : ℂ) (p q : (Fin g → ℂ) × V), u.IsDiff p.1 (lft hp (Mz.pt p.2)) → u.IsDiff q.1 (lft hp (Mz.pt q.2)) →
-      u.IsDiff (c • p.1 + c' • q.1) (lft hp (Mz.pt (c • p.2 + c' • q.2))) := fun c c' p q a b => by
-    have := HodgePull.isDiff_comb Mz hp u ![p.2, q.2] ![p.1, q.1] (fun l => by fin_cases l; exacts [a, b]) 0 ![c, c']
+  have hc
+      : ∀ (c c' : ℂ) (p q : (Fin g → ℂ) × V),
+        u.IsDiff p.1 (lft hp (Mz.pt p.2)) → u.IsDiff q.1 (lft hp (Mz.pt q.2))
+          → u.IsDiff (c • p.1 + c' • q.1)
+            (lft hp (Mz.pt (c • p.2 + c' • q.2))) := fun c c' p q a b => by
+    have :=
+      HodgePull.isDiff_comb Mz hp u ![p.2, q.2] ![p.1, q.1]
+        (fun l => by fin_cases l; exacts [a, b])
+        0 ![c, c']
     simpa [Fin.sum_univ_two] using this
   have ht : ∀ s, IsTangent (lft hp (Mz.pt s)) := fun s => isTangent_lft hp (Mz.tan s)
-  refine ⟨{ carrier := {p | u.IsDiff p.1 (lft hp (Mz.pt p.2))}
-            add_mem' := fun {p q} a b => by simpa using hc 1 1 p q a b
-            zero_mem' := h0
-            smul_mem' := fun c p a => by simpa using hc c 0 p p a a }, fun a s e => ?_, fun d hd => ?_, fun s hs => ?_⟩
+  refine ⟨
+    {
+      carrier := {p | u.IsDiff p.1 (lft hp (Mz.pt p.2))}
+      add_mem' := fun {p q} a b => by simpa using hc 1 1 p q a b
+      zero_mem' := h0
+      smul_mem' := fun c p a => by simpa using hc c 0 p p a a
+    },
+    fun a s e => ?_,
+    fun d hd => ?_,
+    fun s hs => ?_
+  ⟩
   · obtain ⟨v', e', hd⟩ := hv a
     show u.IsDiff (x a) (lft hp (Mz.pt s))
     rw [← e, ← lft_unique hp e']
@@ -49,10 +71,14 @@ theorem exists_rel {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host 
 
 section Lin
 
-variable {W V : Type} [AddCommGroup W] [Module ℂ W] [AddCommGroup V] [Module ℂ V] {Rel : Submodule ℂ (W × V)} {m : ℕ}
+variable
+  {W V : Type} [AddCommGroup W] [Module ℂ W] [AddCommGroup V] [Module ℂ V]
+  {Rel : Submodule ℂ (W × V)} {m : ℕ}
 
-theorem indep_of_rel (h1 : ∀ d, (d, 0) ∈ Rel → d = 0) {x : Fin m → W} {ω : Fin m → V} (h : ∀ i, (x i, ω i) ∈ Rel)
-    (hx : LinearIndependent ℂ x) : LinearIndependent ℂ ω := by
+theorem indep_of_rel
+    (h1 : ∀ d, (d, 0) ∈ Rel → d = 0)
+    {x : Fin m → W} {ω : Fin m → V} (h : ∀ i, (x i, ω i) ∈ Rel) (hx : LinearIndependent ℂ x)
+    : LinearIndependent ℂ ω := by
   rw [Fintype.linearIndependent_iff] at hx ⊢
   intro c hc
   refine hx c (h1 _ ?_)
@@ -62,15 +88,19 @@ theorem indep_of_rel (h1 : ∀ d, (d, 0) ∈ Rel → d = 0) {x : Fin m → W} {�
   · simp [Prod.fst_sum]
   · simp [Prod.snd_sum, hc]
 
-theorem mem_flag_of_rel (h2 : ∀ s, (0, s) ∈ Rel → s = 0) {x : Fin m → W} {ω : Fin m → V} (h : ∀ i, (x i, ω i) ∈ Rel)
-    {k : ℕ} {d : W} {s : V} (hd : (d, s) ∈ Rel) (hm : d ∈ flagStep ℂ x k) : s ∈ flagStep ℂ ω k := by
+theorem mem_flag_of_rel
+    (h2 : ∀ s, (0, s) ∈ Rel → s = 0)
+    {x : Fin m → W} {ω : Fin m → V} (h : ∀ i, (x i, ω i) ∈ Rel)
+    {k : ℕ} {d : W} {s : V} (hd : (d, s) ∈ Rel) (hm : d ∈ flagStep ℂ x k)
+    : s ∈ flagStep ℂ ω k := by
   have key : ∀ d ∈ flagStep ℂ x k, ∃ s ∈ flagStep ℂ ω k, (d, s) ∈ Rel := by
     intro d hd
     induction hd using Submodule.span_induction with
     | mem _ hy =>
       obtain ⟨i, hi, rfl⟩ := hy
       exact ⟨ω i, Submodule.subset_span ⟨i, hi, rfl⟩, h i⟩
-    | zero => exact ⟨0, Submodule.zero_mem _, Rel.zero_mem⟩
+    | zero =>
+      exact ⟨0, Submodule.zero_mem _, Rel.zero_mem⟩
     | add a b _ _ ha hb =>
       obtain ⟨s, hs, ha⟩ := ha
       obtain ⟨s', hs', hb⟩ := hb
@@ -82,22 +112,31 @@ theorem mem_flag_of_rel (h2 : ∀ s, (0, s) ∈ Rel → s = 0) {x : Fin m → W}
   have e : s - s' = 0 := h2 _ (by simpa using Rel.sub_mem hd hr)
   rwa [sub_eq_zero.1 e]
 
-theorem flag_le_of_rel (h2 : ∀ s, (0, s) ∈ Rel → s = 0) {x x' : Fin m → W} {ω ω' : Fin m → V} (h : ∀ i, (x i, ω i) ∈ Rel)
-    (h' : ∀ i, (x' i, ω' i) ∈ Rel) {k : ℕ} (e : flagStep ℂ x k = flagStep ℂ x' k) : flagStep ℂ ω' k ≤ flagStep ℂ ω k := by
+theorem flag_le_of_rel
+    (h2 : ∀ s, (0, s) ∈ Rel → s = 0)
+    {x x' : Fin m → W} {ω ω' : Fin m → V} (h : ∀ i, (x i, ω i) ∈ Rel) (h' : ∀ i, (x' i, ω' i) ∈ Rel)
+    {k : ℕ} (e : flagStep ℂ x k = flagStep ℂ x' k)
+    : flagStep ℂ ω' k ≤ flagStep ℂ ω k := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨i, hi, rfl⟩
   exact mem_flag_of_rel h2 h (h' i) (e ▸ Submodule.subset_span ⟨i, hi, rfl⟩)
 
-theorem tri_unique {α ω : Fin m → V} (hα : LinearIndependent ℂ α) {u u' : Fin m → Fin m → ℂ} (h1 : ∀ k, u k k = 1)
-    (h0 : ∀ l k, l < k → u l k = 0) (h1' : ∀ k, u' k k = 1) (h0' : ∀ l k, l < k → u' l k = 0)
-    (hu : ∀ k : Fin m, ∑ l, u l k • α l ∈ flagStep ℂ ω (k + 1)) (hu' : ∀ k : Fin m, ∑ l, u' l k • α l ∈ flagStep ℂ ω (k + 1)) :
-    u = u' := by
+theorem tri_unique
+    {α ω : Fin m → V} (hα : LinearIndependent ℂ α)
+    {u u' : Fin m → Fin m → ℂ}
+    (h1 : ∀ k, u k k = 1) (h0 : ∀ l k, l < k → u l k = 0) (h1' : ∀ k, u' k k = 1)
+    (h0' : ∀ l k, l < k → u' l k = 0) (hu : ∀ k : Fin m, ∑ l, u l k • α l ∈ flagStep ℂ ω (k + 1))
+    (hu' : ∀ k : Fin m, ∑ l, u' l k • α l ∈ flagStep ℂ ω (k + 1))
+    : u = u' := by
   classical
   let ε : Fin m → V := fun k => ∑ l, u l k • α l
-  have hco : ∀ (t : Fin m → ℂ) (c : Fin m → ℂ), ∑ i, t i • ε i = ∑ l, c l • α l → ∀ l, ∑ i, t i * u l i = c l := by
+  have hco
+      : ∀ (t : Fin m → ℂ) (c : Fin m → ℂ),
+        ∑ i, t i • ε i = ∑ l, c l • α l → ∀ l, ∑ i, t i * u l i = c l := by
     intro t c e
     have e2 : ∑ l, ((∑ i, t i * u l i) - c l) • α l = 0 := by
-      simp only [sub_smul, Finset.sum_sub_distrib, ← e, ε, Finset.smul_sum, Finset.sum_smul, smul_smul]
+      simp only [sub_smul, Finset.sum_sub_distrib, ← e, ε, Finset.smul_sum, Finset.sum_smul,
+        smul_smul]
       rw [Finset.sum_comm, sub_self]
     exact fun l => sub_eq_zero.1 (Fintype.linearIndependent_iff.1 hα _ e2 l)
   have hlow : ∀ (t : Fin m → ℂ) (l : Fin m), (∀ i, i < l → t i = 0) → ∑ i, t i * u l i = t l := by
@@ -108,8 +147,10 @@ theorem tri_unique {α ω : Fin m → V} (hα : LinearIndependent ℂ α) {u u' 
       · rw [ht i h, zero_mul]
       · rw [h0 l i h, mul_zero]
     · simp
-  have hvan : ∀ (t c : Fin m → ℂ) (k : ℕ), (∀ l, ∑ i, t i * u l i = c l) → (∀ l : Fin m, (l : ℕ) < k → c l = 0) →
-      ∀ l : Fin m, (l : ℕ) < k → t l = 0 := by
+  have hvan
+      : ∀ (t c : Fin m → ℂ) (k : ℕ),
+        (∀ l, ∑ i, t i * u l i = c l) → (∀ l : Fin m, (l : ℕ) < k → c l = 0)
+          → ∀ l : Fin m, (l : ℕ) < k → t l = 0 := by
     intro t c k e hc l
     induction l using WellFoundedLT.induction with
     | ind l ih =>
@@ -129,7 +170,8 @@ theorem tri_unique {α ω : Fin m → V} (hα : LinearIndependent ℂ α) {u u' 
     refine Submodule.eq_of_le_of_finrank_le hle ?_
     unfold flagStep
     rw [Set.image_eq_range, Set.image_eq_range]
-    exact (finrank_range_le_card _).trans (finrank_span_eq_card (hε.comp _ Subtype.val_injective)).ge
+    exact (finrank_range_le_card _).trans
+      (finrank_span_eq_card (hε.comp _ Subtype.val_injective)).ge
   funext l k
   have hm := hu' k
   rw [← hfl] at hm

@@ -13,32 +13,47 @@ namespace PI.TwNormLat.W
 
 theorem twNormLat_main : PI.TwNormLat.TwNormLat := by
   intro E _ _ _ P N c kj j hp hq h hB
-  have Madd : ∀ u v : Fin (N + c) → E, h⁻¹ u ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 →
-      h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 → h⁻¹ (u + v) ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 :=
-    fun u v hu hv => by rw [map_add]; exact add_mem hu hv
-  have Msmul : ∀ (t : E) (v : Fin (N + c) → E), IntAt P t → h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 →
-      h⁻¹ (t • v) ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 := fun t v ht hv => by
-    rw [map_smul, mem_lam]; rw [mem_lam] at hv
-    intro l; rw [Pi.smul_apply, smul_eq_mul]; exact intAt_mul P ht (hv l)
-  have Mlam : ∀ v : Fin (N + c) → E, (∀ l, IntAt P (v l)) → h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 :=
-    fun v hv => (hB v ((mem_lam P N c v).2 hv)).1
-  have Mbd : ∀ v : Fin (N + c) → E, h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 →
-      ∀ l, IntAt P (qE P ^ j * v l) := fun v hv l => by
+  have Madd
+      : ∀ u v : Fin (N + c) → E,
+        h⁻¹ u ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
+          → h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
+          → h⁻¹ (u + v) ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 := fun u v hu hv => by
+    rw [map_add]; exact add_mem hu hv
+  have Msmul
+      : ∀ (t : E) (v : Fin (N + c) → E),
+        IntAt P t → h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
+          → h⁻¹ (t • v) ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 := fun t v ht hv => by
+    rw [map_smul, mem_lam]
+    rw [mem_lam] at hv
+    intro l
+    rw [Pi.smul_apply, smul_eq_mul]
+    exact intAt_mul P ht (hv l)
+  have Mlam
+      : ∀ v : Fin (N + c) → E,
+        (∀ l, IntAt P (v l)) → h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 := fun v hv =>
+    (hB v ((mem_lam P N c v).2 hv)).1
+  have Mbd
+      : ∀ v : Fin (N + c) → E,
+        h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
+          → ∀ l, IntAt P (qE P ^ j * v l) := fun v hv l => by
     have := (hB _ hv).2
     rw [LinearEquiv.coe_inv, LinearEquiv.apply_symm_apply, mem_lam] at this
     simpa [smul_eq_mul] using this l
   obtain ⟨K, b, hKj, hbM, hbl, hUT, hrep⟩ :=
-    herm P (fun v => h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0)
+    herm P
+      (fun v => h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0)
       (Madd := Madd) (Msmul := Msmul) (Mlam := Mlam) hp hq j Mbd
   have hq0 := qE_ne_zero P hp
   have hbd : ∀ l, b l l ≠ 0 := fun l => by rw [hbl]; exact inv_ne_zero (pow_ne_zero _ hq0)
   let d : Fin (N + c) → E := fun l => if l.1 < N then 1 else qE P ^ K l
-  let x1 : Fin (N + c) → E := if hN : N < N + c then d ⟨N, hN⟩ • b ⟨N, hN⟩ - Pi.single ⟨N, hN⟩ 1 else 0
+  let x1 : Fin (N + c) → E :=
+    if hN : N < N + c then d ⟨N, hN⟩ • b ⟨N, hN⟩ - Pi.single ⟨N, hN⟩ 1 else 0
   have hx1M : h⁻¹ x1 ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 := by
     by_cases hN : N < N + c
     · simp only [x1, dif_pos hN]
       rw [sub_eq_add_neg, ← neg_one_smul E (Pi.single _ _)]
-      refine Madd _ _ (Msmul _ _ ?_ (hbM _)) (Msmul _ _ (intAt_neg P (intAt_one P)) (Mlam _ fun k => ?_))
+      refine Madd _ _ (Msmul _ _ ?_ (hbM _))
+        (Msmul _ _ (intAt_neg P (intAt_one P)) (Mlam _ fun k => ?_))
       · simp only [d, lt_irrefl, if_false]; exact intAt_pow P (intAt_natCast P _) _
       · by_cases hk : k = ⟨N, hN⟩
         · rw [hk]; simpa using intAt_one P
@@ -55,7 +70,8 @@ theorem twNormLat_main : PI.TwNormLat.TwNormLat := by
       · have : l = ⟨N, hN⟩ := Fin.ext heq.symm
         rw [this, hbl]
         simp only [d, lt_irrefl, if_false, Pi.single_eq_same]
-        field_simp; ring
+        field_simp
+        ring
     · simp [x1, dif_neg hN]
   obtain ⟨ζ, hζ, hx1ζ⟩ := hrep x1 hx1M
   have hζZ : Zab N ζ := comb_reflect hUT hbd ζ N (by rw [← hx1ζ]; exact hx1Z)
@@ -69,11 +85,12 @@ theorem twNormLat_main : PI.TwNormLat.TwNormLat := by
   have hc1 : ∀ l : Fin (N + c), N ≤ l.1 → c' l l = 1 := by
     intro l hl
     by_cases h1 : l.1 = N
-    · simp only [c', if_pos h1, d, if_neg (not_lt.2 hl), Pi.sub_apply, Pi.smul_apply, smul_eq_mul, hbl, hx1Z l hl]
+    · simp only [c', if_pos h1, d, if_neg (not_lt.2 hl), Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
+        hbl, hx1Z l hl]
       field_simp
       try simp
-    · simp only [c', if_neg h1, d, if_neg (not_lt.2 hl), Pi.sub_apply, Pi.smul_apply, smul_eq_mul, hbl,
-        Pi.zero_apply, sub_zero]
+    · simp only [c', if_neg h1, d, if_neg (not_lt.2 hl), Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
+        hbl, Pi.zero_apply, sub_zero]
       field_simp
       try simp
   have hcd : ∀ l, c' l l ≠ 0 := by
@@ -81,8 +98,8 @@ theorem twNormLat_main : PI.TwNormLat.TwNormLat := by
     by_cases hl : N ≤ l.1
     · rw [hc1 l hl]; exact one_ne_zero
     · have h1 : l.1 ≠ N := by omega
-      simp only [c', if_neg h1, d, if_pos (not_le.1 hl), Pi.sub_apply, Pi.smul_apply, smul_eq_mul, hbl,
-        Pi.zero_apply, sub_zero, one_mul]
+      simp only [c', if_neg h1, d, if_pos (not_le.1 hl), Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
+        hbl, Pi.zero_apply, sub_zero, one_mul]
       exact inv_ne_zero (pow_ne_zero _ hq0)
   have hca : ∀ hN : N < N + c, c' ⟨N, hN⟩ = Pi.single ⟨N, hN⟩ 1 := by
     intro hN
@@ -90,7 +107,8 @@ theorem twNormLat_main : PI.TwNormLat.TwNormLat := by
     rw [if_pos rfl]
     simp only [x1, dif_pos hN]
     exact sub_sub_cancel _ _
-  have hr : (combE hcUT hcd)⁻¹ ∈ Loc.R1 E N c := combinationEquiv_inv_mem_unipotentFlagGroup hcUT hcd hc1 hca
+  have hr : (combE hcUT hcd)⁻¹ ∈ Loc.R1 E N c :=
+    combinationEquiv_inv_mem_unipotentFlagGroup hcUT hcd hc1 hca
   refine ⟨(combE hcUT hcd)⁻¹, hr, 1, Subgroup.one_mem _, ?_⟩
   have hinv : ∀ v, ((combE hcUT hcd)⁻¹ * h * 1)⁻¹ v = h⁻¹ (combE hcUT hcd v) := fun v => by
     rw [mul_one, mul_inv_rev, inv_inv]; rfl
@@ -126,8 +144,8 @@ theorem twNormLat_main : PI.TwNormLat.TwNormLat := by
   have hu2 : ∀ v (i : Fin c), u v (Fin.natAdd N i) = (qE P ^ (n i.1))⁻¹ * v (Fin.natAdd N i) := by
     intro v i
     simp only [u, d, n]
-    rw [if_neg (show ¬ (Fin.natAdd N i).1 < N by simp), hζZ _ (by simp), dif_pos i.2, zpow_neg, inv_inv,
-      zpow_natCast, mul_zero, sub_zero, mul_comm]
+    rw [if_neg (show ¬ (Fin.natAdd N i).1 < N by simp), hζZ _ (by simp), dif_pos i.2, zpow_neg,
+      inv_inv, zpow_natCast, mul_zero, sub_zero, mul_comm]
   have hU : ∀ v, (∀ l, IntAt P (u v l)) ↔ Crit P N c n z v := by
     intro v
     constructor
@@ -139,8 +157,10 @@ theorem twNormLat_main : PI.TwNormLat.TwNormLat := by
       rcases fin_split l with ⟨l', rfl⟩ | ⟨i, rfl⟩
       · rw [hu1]; exact H.1 l'
       · rw [hu2]; exact H.2 i
-  have hcrit : ∀ v, ((combE hcUT hcd)⁻¹ * h * 1)⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 ↔
-      Crit P N c n z v := by
+  have hcrit
+      : ∀ v,
+        ((combE hcUT hcd)⁻¹ * h * 1)⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
+          ↔ Crit P N c n z v := by
     intro v
     rw [hinv, hsv, ← hU]
     constructor
@@ -150,11 +170,14 @@ theorem twNormLat_main : PI.TwNormLat.TwNormLat := by
         apply comb_reflect hUT hbd _ 0
         have : ∑ l, (u v - w) l • b l = 0 := by
           simp only [Pi.sub_apply, sub_smul, Finset.sum_sub_distrib]; rw [hwe, sub_self]
-        rw [this]; intro _ _; rfl
+        rw [this]
+        intro _ _
+        rfl
       intro l
       have := hz0 l (Nat.zero_le _)
       rw [Pi.sub_apply, sub_eq_zero] at this
-      rw [this]; exact hw l
+      rw [this]
+      exact hw l
     · intro H
       exact comb_mem P _ (Madd := Madd) (Msmul := Msmul) (Mlam := Mlam) b hbM _ H
   have hn : ∀ i, -(j : ℤ) ≤ n i ∧ n i ≤ 0 := by

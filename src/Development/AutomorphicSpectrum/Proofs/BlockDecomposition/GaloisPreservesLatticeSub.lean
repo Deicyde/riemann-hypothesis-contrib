@@ -10,13 +10,19 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
+open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
 
 namespace GlobalTheory.CompanionTheory.LatGal
 
-theorem map_mem_sub_of_mul {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W) (l M : ℕ)
-    (g : B →+* B) (s : W → W) (hs : ∀ w, g (f w) = f (s w)) (u : W) (hu : s ξ = u * ξ) :
-    ∀ x ∈ sub f ξ l M, g x ∈ sub f ξ l M := by
+theorem map_mem_sub_of_mul
+    {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B]
+    (f : W →+* B)
+    (ξ : W)
+    (l M : ℕ)
+    (g : B →+* B) (s : W → W) (hs : ∀ w, g (f w) = f (s w))
+    (u : W) (hu : s ξ = u * ξ)
+    : ∀ x ∈ sub f ξ l M, g x ∈ sub f ξ l M := by
   have hle : sub f ξ l M ≤ (sub f ξ l M).comap g := by
     refine Subring.closure_le.2 ?_
     rintro z (⟨w, rfl⟩ | ⟨i, rfl⟩)
@@ -34,14 +40,16 @@ theorem map_mem_sub_of_mul {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B
       exact (sub f ξ l M).mul_mem ((sub f ξ l M).pow_mem h1 i) h2
   exact fun x hx => hle hx
 
-theorem gal_mem_sub : ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) (M k : ℕ)
-    (g : K.fixingSubgroup) (hT : Ideal.span {tBdR l ^ k} ≤ (Ideal.span {tBdR l ^ k}).comap (Lat.gP l g)),
-    ∀ x ∈ Lat.sub (Lat.fk l k) (xi0 l) l M,
-      Ideal.quotientMap _ (Lat.gP l g) hT x ∈ Lat.sub (Lat.fk l k) (xi0 l) l M := by
+theorem gal_mem_sub
+    : ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) (M k : ℕ)
+        (g : K.fixingSubgroup)
+        (hT : Ideal.span {tBdR l ^ k} ≤ (Ideal.span {tBdR l ^ k}).comap (Lat.gP l g)),
+      ∀ x ∈ Lat.sub (Lat.fk l k) (xi0 l) l M,
+        Ideal.quotientMap _ (Lat.gP l g) hT x ∈ Lat.sub (Lat.fk l k) (xi0 l) l M := by
   intro l _ K M k g hT
   have hmem : toBot g.1 • xi0 l ∈ RingHom.ker (theta0 l) :=
-    gal_smul_mem_ker_fontaineTheta (toBot g.1) (by
-      rw [ker_theta0]; exact Ideal.mem_span_singleton_self _)
+    gal_smul_mem_ker_fontaineTheta (toBot g.1)
+      (by rw [ker_theta0]; exact Ideal.mem_span_singleton_self _)
   rw [ker_theta0, Ideal.mem_span_singleton'] at hmem
   obtain ⟨u, hu⟩ := hmem
   refine map_mem_sub_of_mul (fk l k) (xi0 l) l M _ (fun w => toBot g.1 • w) (fun w => ?_) u hu.symm

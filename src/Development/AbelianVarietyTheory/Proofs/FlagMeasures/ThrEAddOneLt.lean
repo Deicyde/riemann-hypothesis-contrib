@@ -12,9 +12,11 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
 
 namespace GlobalTheory.DsigSize
 
-theorem thrE_add_one_lt {D : D7} {large₂ : SizeData₂ D} {C' Cl Cg cb Cu cT CT : ℝ} (hH : StandingHypotheses D large₂ C' Cl Cg cb Cu cT CT)
-    (hCL : 1 ≤ Cl * large₂.sc.L) :
-    Formalism.MainNotions.GapDS.thrE (epsSH D.R) + 1 < Cl * (D.R.r : ℝ) ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L := by
+theorem thrE_add_one_lt
+    {D : D7} {large₂ : SizeData₂ D} {C' Cl Cg cb Cu cT CT : ℝ}
+    (hH : StandingHypotheses D large₂ C' Cl Cg cb Cu cT CT) (hCL : 1 ≤ Cl * large₂.sc.L)
+    : Formalism.MainNotions.GapDS.thrE (epsSH D.R) + 1
+      < Cl * (D.R.r : ℝ) ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L := by
   have hn := Formalism.MainNotions.nS_cast D
   have h6 := Formalism.MainNotions.six_le_n D
   rw [← hn] at h6 ⊢
@@ -36,13 +38,12 @@ theorem thrE_add_one_lt {D : D7} {large₂ : SizeData₂ D} {C' Cl Cg cb Cu cT C
     _ ≤ n ^ 16 * n ^ 3 := mul_le_mul_of_nonneg_right hn16 (by positivity)
     _ = n ^ 19 := (pow_add n 16 3).symm
     _ ≤ n ^ 19 * (D.R.f : ℝ) ^ 5 := le_mul_of_one_le_right (by positivity) hf5
-    _ ≤ (Cl * large₂.sc.L) * (n ^ 19 * (D.R.f : ℝ) ^ 5) :=
-      le_mul_of_one_le_left (by positivity) hCL
+    _ ≤ (Cl * large₂.sc.L) * (n ^ 19 * (D.R.f : ℝ) ^ 5) := le_mul_of_one_le_left (by positivity) hCL
     _ = Cl * n ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L := by ac_rfl
 
 theorem dsigHC : Formalism.L2.SG.Pf.SzHypFD.DsigHC := by
   intro D large₂ C' Cl Cg cb Cu cT CT hT hH hCL τ
-  exact GlobalTheory.dsig_eq_fdegHC_of_gap D hT τ _ (Formalism.MainNotions.BridgeLemma.szh_hc hH τ) (Formalism.MainNotions.BridgeLemma.szh_gap hH τ)
-    (thrE_add_one_lt hH hCL)
+  exact GlobalTheory.dsig_eq_fdegHC_of_gap D hT τ _ (Formalism.MainNotions.BridgeLemma.szh_hc hH τ)
+    (Formalism.MainNotions.BridgeLemma.szh_gap hH τ) (thrE_add_one_lt hH hCL)
 
 end GlobalTheory.DsigSize

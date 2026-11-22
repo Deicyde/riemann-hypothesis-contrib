@@ -14,14 +14,16 @@ namespace GlobalTheory.UnitaryGroupChart
 
 open Filter
 
-theorem chart_general {E : Type} [NormedRing E] [NormedAlgebra ℝ E] [FiniteDimensional ℝ E]
+theorem chart_general
+    {E : Type} [NormedRing E] [NormedAlgebra ℝ E] [FiniteDimensional ℝ E]
     (σ : E →ₗ[ℝ] E) (hσ : ∀ a, σ (σ a) = a) (hm : ∀ a b, σ (a * b) = σ b * σ a) (h1 : σ 1 = 1)
-    {d e : ℕ} (Z : Fin d → E) (j : Fin e → Fin d) (hZσ : ∀ a, σ (Z a) = -Z a)
+    {d e : ℕ} (Z : Fin d → E) (j : Fin e → Fin d) (hZσ : ∀ a, σ (Z a) = - Z a)
     (hli : LinearIndependent ℝ (fun i => Z (j i)))
-    (hsp : ∀ X, σ X = -X → X ∈ Submodule.span ℝ (Set.range fun i => Z (j i))) :
-    ∃ s : E → (Fin d → ℝ), ContinuousAt s 1 ∧
-      ∀ᶠ g in 𝓝 (1 : E), σ g * g = 1 →
-        g = (List.ofFn fun a => NormedSpace.exp (s g a • Z a)).prod := by
+    (hsp : ∀ X, σ X = -X → X ∈ Submodule.span ℝ (Set.range fun i => Z (j i)))
+    : ∃ s : E → (Fin d → ℝ),
+      ContinuousAt s 1
+        ∧ ∀ᶠ g in 𝓝 (1 : E), σ g * g = 1 →
+            g = (List.ofFn fun a => NormedSpace.exp (s g a • Z a)).prod := by
   have : CompleteSpace E := FiniteDimensional.complete ℝ E
   let : NormedAlgebra ℚ E := NormedAlgebra.restrictScalars ℚ ℝ E
   have hexp : ∀ a, σ (NormedSpace.exp a) = NormedSpace.exp (σ a) := fun a => by
@@ -29,8 +31,9 @@ theorem chart_general {E : Type} [NormedRing E] [NormedAlgebra ℝ E] [FiniteDim
       induction m with
       | zero => simpa using h1
       | succ m ih => rw [pow_succ, hm, ih, pow_succ']
-    have h2 := (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) a).map σ.toAddMonoidHom
-      σ.continuous_of_finiteDimensional
+    have h2 :=
+      (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) a).map σ.toAddMonoidHom
+        σ.continuous_of_finiteDimensional
     refine h2.unique ?_
     convert NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) (σ a) using 1
     funext m
@@ -40,8 +43,8 @@ theorem chart_general {E : Type} [NormedRing E] [NormedAlgebra ℝ E] [FiniteDim
   let cC : (Fin e → ℝ) →L[ℝ] (Fin d → ℝ) := LinearMap.toContinuousLinearMap cL
   have hcC : ∀ t, cC t = cL t := fun _ => rfl
   have hsum : ∀ t : Fin e → ℝ, ∑ a, cL t a • Z a = ∑ i, t i • Z (j i) := fun t => by
-    simp only [cL, Fintype.linearCombination_apply, Finset.sum_apply, Pi.smul_apply, Pi.single_apply,
-      smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_smul]
+    simp only [cL, Fintype.linearCombination_apply, Finset.sum_apply, Pi.smul_apply,
+      Pi.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [ite_smul]
@@ -60,17 +63,21 @@ theorem chart_general {E : Type} [NormedRing E] [NormedAlgebra ℝ E] [FiniteDim
     simp [T, hcC]
   obtain ⟨h0, hD⟩ : Θ 0 = 1 ∧ HasStrictFDerivAt Θ T 0 :=
     GlobalTheory.UnitaryChart.hasStrictFDerivAt_ofFn_prod d
-      (fun a (t : Fin e → ℝ) => NormedSpace.exp (cL t a • Z a)) _ (fun a => by
+      (fun a (t : Fin e → ℝ) => NormedSpace.exp (cL t a • Z a))
+      _
+      (fun a => by
         refine ⟨by simp, ?_⟩
-        have hd : HasStrictFDerivAt (fun s : ℝ => NormedSpace.exp (s • Z a))
+        have hd : HasStrictFDerivAt
+            (fun s : ℝ => NormedSpace.exp (s • Z a))
             (ContinuousLinearMap.toSpanSingleton ℝ (Z a))
             (((ContinuousLinearMap.proj a).comp cC) 0) := by
           rw [map_zero]
           simpa using (hasStrictDerivAt_exp_smul_const (𝕂 := ℝ) (Z a) (0 : ℝ)).hasStrictFDerivAt
         exact hd.comp (0 : Fin e → ℝ) ((ContinuousLinearMap.proj a).comp cC).hasStrictFDerivAt)
-  obtain ⟨P, hP1, hP2, hP3⟩ := GlobalTheory.UnitaryChart.exists_skew_coord σ (fun i => Z (j i)) hσ hli
-    (fun i => hZσ (j i)) hsp
-  have hΨ : HasStrictFDerivAt (fun t => P (Θ t))
+  obtain ⟨P, hP1, hP2, hP3⟩ :=
+    GlobalTheory.UnitaryChart.exists_skew_coord σ (fun i => Z (j i)) hσ hli (fun i => hZσ (j i)) hsp
+  have hΨ : HasStrictFDerivAt
+      (fun t => P (Θ t))
       ((ContinuousLinearEquiv.refl ℝ (Fin e → ℝ) : (Fin e → ℝ) →L[ℝ] (Fin e → ℝ))) 0 := by
     refine (P.hasStrictFDerivAt.comp 0 hD).congr_fderiv ?_
     ext1 t
@@ -99,26 +106,30 @@ theorem chart_general {E : Type} [NormedRing E] [NormedAlgebra ℝ E] [FiniteDim
   refine ⟨fun g => cL (Ψ (P g)), cC.continuous.continuousAt.comp hcont, ?_⟩
   filter_upwards [hPt.eventually p3, hnear, ht.eventually hnear] with g q1 q2 q3 hg1
   haveI : IsArtinianRing E := IsArtinianRing.of_finite ℝ E
-  exact (GlobalTheory.UnitaryChart.eq_of_skew_eq (hU _).1 (mul_eq_one_comm.1 hg1) (hP3 _ _ q1) q3 q2).symm
+  exact (GlobalTheory.UnitaryChart.eq_of_skew_eq (hU _).1 (mul_eq_one_comm.1 hg1) (hP3 _ _ q1) q3
+    q2).symm
 
 section
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
-theorem chart_matrix (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ) (hH : Hᴴ = H) (hdet : IsUnit H.det)
+theorem chart_matrix
+    (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ) (hH : Hᴴ = H) (hdet : IsUnit H.det)
     (d e : ℕ) (Z : Fin d → Matrix (Fin n) (Fin n) ℂ) (j : Fin e → Fin d)
     (hZ : ∀ a, (Z a)ᴴ * H + H * Z a = 0) (hli : LinearIndependent ℝ (fun i => Z (j i)))
-    (hsp : ∀ X : Matrix (Fin n) (Fin n) ℂ, Xᴴ * H + H * X = 0 →
-      X ∈ Submodule.span ℝ (Set.range fun i => Z (j i))) :
-    ∃ s : Matrix (Fin n) (Fin n) ℂ → (Fin d → ℝ), ContinuousAt s 1 ∧
-      ∀ᶠ g in 𝓝 (1 : Matrix (Fin n) (Fin n) ℂ), gᴴ * H * g = H →
-        g = (List.ofFn fun a => NormedSpace.exp (s g a • Z a)).prod := by
+    (hsp : ∀ X : Matrix (Fin n) (Fin n) ℂ,
+      Xᴴ * H + H * X = 0 → X ∈ Submodule.span ℝ (Set.range fun i => Z (j i)))
+    : ∃ s : Matrix (Fin n) (Fin n) ℂ → (Fin d → ℝ),
+      ContinuousAt s 1
+        ∧ ∀ᶠ g in 𝓝 (1 : Matrix (Fin n) (Fin n) ℂ), gᴴ * H * g = H →
+            g = (List.ofFn fun a => NormedSpace.exp (s g a • Z a)).prod := by
   have hHi : H⁻¹ * H = 1 := Matrix.nonsing_inv_mul H hdet
   have hHi' : H * H⁻¹ = 1 := Matrix.mul_nonsing_inv H hdet
   have hHih : (H⁻¹)ᴴ = H⁻¹ := by rw [Matrix.conjTranspose_nonsing_inv, hH]
-  let σ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ :=
-    { toFun := fun x => H⁻¹ * xᴴ * H
-      map_add' := fun x y => by rw [conjTranspose_add, Matrix.mul_add, Matrix.add_mul]
-      map_smul' := fun c x => by simp [conjTranspose_smul] }
+  let σ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ := {
+    toFun := fun x => H⁻¹ * xᴴ * H
+    map_add' := fun x y => by rw [conjTranspose_add, Matrix.mul_add, Matrix.add_mul]
+    map_smul' := fun c x => by simp [conjTranspose_smul]
+  }
   have hs : ∀ x, σ x = H⁻¹ * xᴴ * H := fun _ => rfl
   have hσ : ∀ a, σ (σ a) = a := fun a => by
     simp only [hs, conjTranspose_mul, conjTranspose_conjTranspose, hH, hHih, Matrix.mul_assoc]
@@ -127,7 +138,7 @@ theorem chart_matrix (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ) (hH : Hᴴ = H) 
     simp only [hs, conjTranspose_mul, Matrix.mul_assoc]
     rw [← Matrix.mul_assoc H, hHi', Matrix.one_mul]
   have h1 : σ 1 = 1 := by simp [hs, hHi]
-  have hZσ : ∀ a, σ (Z a) = -Z a := fun a => by
+  have hZσ : ∀ a, σ (Z a) = - Z a := fun a => by
     rw [hs, Matrix.mul_assoc, eq_neg_of_add_eq_zero_left (hZ a), Matrix.mul_neg, ← Matrix.mul_assoc,
       hHi, Matrix.one_mul]
   have hsp' : ∀ X, σ X = -X → X ∈ Submodule.span ℝ (Set.range fun i => Z (j i)) := fun X hX => by
@@ -144,13 +155,18 @@ theorem chart_matrix (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ) (hH : Hᴴ = H) 
 
 end
 
-theorem unitary_chart : ∀ (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ), Hᴴ = H → IsUnit H.det →
-    ∀ (d e : ℕ) (Z : Fin d → Matrix (Fin n) (Fin n) ℂ) (j : Fin e → Fin d), Function.Injective j →
-      (∀ a, a ∉ Set.range j → Z a = 0) → (∀ a, (Z a)ᴴ * H + H * Z a = 0) →
-      LinearIndependent ℝ (fun i => Z (j i)) →
-      (∀ X : Matrix (Fin n) (Fin n) ℂ, Xᴴ * H + H * X = 0 → X ∈ Submodule.span ℝ (Set.range fun i => Z (j i))) →
-      ∃ V ∈ 𝓝 (1 : Matrix (Fin n) (Fin n) ℂ), ∃ s : Matrix (Fin n) (Fin n) ℂ → (Fin d → ℝ), ContinuousAt s 1 ∧
-        ∀ g ∈ V, gᴴ * H * g = H → g = (List.ofFn fun a => NormedSpace.exp (s g a • Z a)).prod := by
+theorem unitary_chart
+    : ∀ (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ),
+      Hᴴ = H → IsUnit H.det
+        → ∀ (d e : ℕ) (Z : Fin d → Matrix (Fin n) (Fin n) ℂ) (j : Fin e → Fin d),
+          Function.Injective j → (∀ a, a ∉ Set.range j → Z a = 0) → (∀ a, (Z a)ᴴ * H + H * Z a = 0)
+            → LinearIndependent ℝ (fun i => Z (j i))
+            → (∀ X : Matrix (Fin n) (Fin n) ℂ,
+              Xᴴ * H + H * X = 0 → X ∈ Submodule.span ℝ (Set.range fun i => Z (j i)))
+            → ∃ V ∈ 𝓝 (1 : Matrix (Fin n) (Fin n) ℂ), ∃ s : Matrix (Fin n) (Fin n) ℂ → (Fin d → ℝ),
+              ContinuousAt s 1
+                ∧ ∀ g ∈ V,
+                  gᴴ * H * g = H → g = (List.ofFn fun a => NormedSpace.exp (s g a • Z a)).prod := by
   intro n H hH hdet d e Z j _ _ hZ hli hsp
   obtain ⟨s, hs1, hs2⟩ := chart_matrix n H hH hdet d e Z j hZ hli hsp
   exact ⟨_, hs2, s, hs1, fun g hg => hg⟩

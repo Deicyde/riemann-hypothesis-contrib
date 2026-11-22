@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CardLeO
 
 @[expose] public section
 
-open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps GlobalTheory.Present GlobalTheory.RedFun Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps
+  GlobalTheory.Present GlobalTheory.RedFun Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc
 open scoped LaurentSeries PowerSeries TensorProduct
 
 namespace GlobalTheory
@@ -43,19 +45,25 @@ private lemma span_range_eval_embeddings_eq_whole (F D : Type) [Field F] [Fintyp
   ext d
   simpa using hall d
 
-theorem stable_le_span_invariants_of_semilinear_family :
-    ∀ (F M D : Type) [Field F] [AddCommGroup M] [Module F M] [Fintype D] (σ : D → (F →+* F)) (t : D → (M →+ M)) (V : Submodule F M), Function.Injective σ → (∀ d (c : F), ∀ y ∈ V, t d (c • y) = σ d c • t d y) → (∀ d, ∀ y ∈ V, t d y ∈ V) → (∀ d, ∀ y ∈ V, t d (∑ d', t d' y) = ∑ d', t d' y) → (∃ d, ∀ y ∈ V, t d y = y) → V ≤ Submodule.span F {y | y ∈ V ∧ ∀ d, t d y = y} := by
+theorem stable_le_span_invariants_of_semilinear_family
+    : ∀ (F M D : Type) [Field F] [AddCommGroup M] [Module F M] [Fintype D] (σ : D → (F →+* F))
+        (t : D → (M →+ M)) (V : Submodule F M),
+      Function.Injective σ → (∀ d (c : F), ∀ y ∈ V, t d (c • y) = σ d c • t d y)
+        → (∀ d, ∀ y ∈ V, t d y ∈ V) → (∀ d, ∀ y ∈ V, t d (∑ d', t d' y) = ∑ d', t d' y)
+        → (∃ d, ∀ y ∈ V, t d y = y)
+        → V ≤ Submodule.span F {y | y ∈ V ∧ ∀ d, t d y = y} := by
   classical
   rintro F M D _ _ _ _ σ t V hσ hsemi hV hinv ⟨d₀, hd₀⟩ y hy
   let W := Submodule.span F {y | y ∈ V ∧ ∀ d, t d y = y}
-  let Φ : (D → F) →ₗ[F] M :=
-    { toFun := fun w => ∑ d, w d • t d y
-      map_add' := by
-        intro a b
-        simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := by
-        intro c a
-        simp [Finset.smul_sum, smul_smul] }
+  let Φ : (D → F) →ₗ[F] M := {
+    toFun := fun w => ∑ d, w d • t d y
+    map_add' := by
+      intro a b
+      simp [add_smul, Finset.sum_add_distrib]
+    map_smul' := by
+      intro c a
+      simp [Finset.smul_sum, smul_smul]
+  }
   have hmem : ∀ c : F, (∑ d, σ d c • t d y) ∈ W := by
     intro c
     apply Submodule.subset_span

@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.One
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.StepData GlobalTheory.SymChain
 
 namespace GlobalTheory.SymChain
 
@@ -20,6 +21,10 @@ theorem atMostOne_holds : AtMostOne := by
   have hpat : S.Pattern t := GlobalTheory.T.symmetricLevelChain_pattern_iterated k s κ S t
   have hclass : S.OneClass t ν := GlobalTheory.T.symmetricChain_oneLatticeClass k ν hν s κ S t
   have hsupp : S.SupportOne t := GlobalTheory.T.symmetricChain_supportOne_of_pattern k s κ S t hpat
-  exact ⟨GlobalTheory.T.symData_oneIndex_of_oneClass_of_supportOne k ν hν s κ S t hclass hsupp, GlobalTheory.T.symmetricChain_projected_level_of_pattern k s κ S t hpat, GlobalTheory.T.symmetricChain_oneCoupling_coset_of_pattern k s κ S t hpat⟩
+  exact ⟨
+    GlobalTheory.T.symData_oneIndex_of_oneClass_of_supportOne k ν hν s κ S t hclass hsupp,
+    GlobalTheory.T.symmetricChain_projected_level_of_pattern k s κ S t hpat,
+    GlobalTheory.T.symmetricChain_oneCoupling_coset_of_pattern k s κ S t hpat
+  ⟩
 
 end GlobalTheory.SymChain

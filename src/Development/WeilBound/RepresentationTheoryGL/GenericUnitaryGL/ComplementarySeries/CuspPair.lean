@@ -17,30 +17,42 @@ namespace CuspPair
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem key {x y : IrrGL (k := k)} (hx : x.IsCusp) (hy : y.IsCusp) {N : ℕ} (hd : ∑ a, (![x, y] a).1 = N)
-    {V : Type} [AddCommGroup V] [Module ℂ V] (τ : Representation ℂ (GL (Fin N) k) V)
-    (hτ : IsSubquotient τ (prodIrr ![x, y] hd)) (u : Fin 2 → IrrGL (k := k)) (hu : ∑ a, (u a).1 = N)
-    (hpos : ∀ a, 0 < (u a).1) (hj : 1 ≤ jm u hu τ) : u = ![x, y] ∨ u = ![y, x] := by
+theorem key
+    {x y : IrrGL (k := k)} (hx : x.IsCusp) (hy : y.IsCusp)
+    {N : ℕ} (hd : ∑ a, (![x, y] a).1 = N)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (τ : Representation ℂ (GL (Fin N) k) V) (hτ : IsSubquotient τ (prodIrr ![x, y] hd))
+    (u : Fin 2 → IrrGL (k := k)) (hu : ∑ a, (u a).1 = N)
+    (hpos : ∀ a, 0 < (u a).1) (hj : 1 ≤ jm u hu τ)
+    : u = ![x, y] ∨ u = ![y, x] := by
   have hxc : ∀ a, (![x, y] a).IsCusp := Fin.forall_fin_two.2 ⟨hx, hy⟩
-  have hj' := GlobalTheory.CompanionTheory.JmMono.jm_le_of_isSubquotient u hu τ _ (isSmooth_prodIrr ![x, y] hd) hτ
-  obtain ⟨e, he⟩ := GlobalTheory.CompanionTheory.CuspPairSub.exists_equiv_of_jm_ne_zero ![x, y] u hd hu hxc hpos
-    (ENat.one_le_iff_ne_zero.1 (hj.trans hj'))
+  have hj' :=
+    GlobalTheory.CompanionTheory.JmMono.jm_le_of_isSubquotient u hu τ _
+      (isSmooth_prodIrr ![x, y] hd) hτ
+  obtain ⟨e, he⟩ :=
+    GlobalTheory.CompanionTheory.CuspPairSub.exists_equiv_of_jm_ne_zero ![x, y] u hd hu hxc hpos
+      (ENat.one_le_iff_ne_zero.1 (hj.trans hj'))
   have hee : e 0 ≠ e 1 := fun h => by simpa using e.injective h
   have k2 : ∀ a b : Fin 2, a ≠ b → (a = 0 ∧ b = 1) ∨ (a = 1 ∧ b = 0) := by decide
   rcases k2 _ _ hee with ⟨a, b⟩ | ⟨a, b⟩
-  · exact Or.inl (funext (Fin.forall_fin_two.2 ⟨(he 0).trans (by simp [a]), (he 1).trans (by simp [b])⟩))
-  · exact Or.inr (funext (Fin.forall_fin_two.2 ⟨(he 0).trans (by simp [a]), (he 1).trans (by simp [b])⟩))
+  · exact Or.inl (funext (Fin.forall_fin_two.2
+      ⟨(he 0).trans (by simp [a]), (he 1).trans (by simp [b])⟩))
+  · exact Or.inr (funext (Fin.forall_fin_two.2
+      ⟨(he 0).trans (by simp [a]), (he 1).trans (by simp [b])⟩))
 
 end CuspPair
 
-
 open CuspPair in
-theorem cuspPairIrr_of (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (h : GlobalTheory.BZSeg.NuPair k) : GlobalTheory.BZSeg.CuspPairIrr k := by
+theorem cuspPairIrr_of
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (h : GlobalTheory.BZSeg.NuPair k)
+    : GlobalTheory.BZSeg.CuspPairIrr k := by
   intro x y N hd hx hy h1 h2
   by_contra hred
   obtain ⟨ψ, hc, hψ⟩ := exists_continuous_addChar_ne_one k
-  obtain ⟨τ, hτ, hg⟩ := GlobalTheory.T.reducible_cuspidal_pair_nongeneric_subquotient k (PositivityTheory.rg.gu.whit.whitRankIrr k) ψ hc hψ x y N hd hx hy hred
+  obtain ⟨τ, hτ, hg⟩ :=
+    GlobalTheory.T.reducible_cuspidal_pair_nongeneric_subquotient k
+      (PositivityTheory.rg.gu.whit.whitRankIrr k) ψ hc hψ x y N hd hx hy hred
   have hng : ¬ IsGeneric τ.ρ := fun hG => hg ((isGeneric_iff_isGenericFor hc hψ τ.ρ).1 hG)
   obtain ⟨α, β, β', hd1, hd2, hα, hβ, hββ, j1, j2⟩ := h N τ.V τ.ρ τ.smooth τ.irr hng
   have hp1 : ∀ a, 0 < (![α, β] a).1 := Fin.forall_fin_two.2 ⟨hα, hβ⟩

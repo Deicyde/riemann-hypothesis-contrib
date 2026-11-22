@@ -26,17 +26,18 @@ variable {R : Ranks} (H : Host R)
 
 def embOm : H.E →+* AlgC :=
   H.φ₀.codRestrict (algebraicClosure ℚ ℂ).toSubfield (fun x =>
-    mem_algC_of_isIntegral ((Algebra.IsIntegral.isIntegral (R := ℚ) x).map
-      ((H.φ₀.toRatAlgHom))))
+    mem_algC_of_isIntegral ((Algebra.IsIntegral.isIntegral (R := ℚ) x).map ((H.φ₀.toRatAlgHom))))
 
 instance algOm : Algebra H.E AlgC := (embOm H).toAlgebra
 
-instance : IsScalarTower ℚ H.E AlgC := IsScalarTower.of_algebraMap_eq (fun x => by
-  exact (RingHom.ext_rat (algebraMap ℚ AlgC) ((algebraMap H.E AlgC).comp (algebraMap ℚ H.E)) ▸ rfl))
+instance : IsScalarTower ℚ H.E AlgC :=
+  IsScalarTower.of_algebraMap_eq (fun x => by
+    exact (RingHom.ext_rat (algebraMap ℚ AlgC) ((algebraMap H.E AlgC).comp (algebraMap ℚ H.E))
+      ▸ rfl))
 
 instance isAlgClosure_om : IsAlgClosure H.E AlgC :=
-  IsAlgClosure.mk inferInstance ⟨fun x =>
-    (algebraicClosure.isAlgebraic ℚ ℂ |>.isAlgebraic x).tower_top H.E⟩
+  IsAlgClosure.mk inferInstance
+    ⟨fun x => (algebraicClosure.isAlgebraic ℚ ℂ |>.isAlgebraic x).tower_top H.E⟩
 
 def toyLocalData (p : ℕ) [Fact p.Prime] : Formalism.GaloisCohomology.LData H.E AlgC p :=
   Classical.choice (Formalism.GaloisCohomology.ldata_nonempty p)
@@ -45,7 +46,8 @@ def shaExample (p e : ℕ) : ℚ :=
   if h : p.Prime then
     haveI : Fact p.Prime := ⟨h⟩
     ((Formalism.GaloisCohomology.shaLen (toyLocalData H p) (e : ℤ)).toNat : ℚ)
-  else 0
+  else
+    0
 
 theorem shaExample_nonneg (p e : ℕ) : 0 ≤ shaExample H p e := by
   unfold shaExample; split_ifs <;> positivity
@@ -60,11 +62,13 @@ theorem exists_genU (k : Fin 2) : ∃ ω : (ZMod (H.g k))ˣ, orderOf ω = H.g k 
 def genU (k : Fin 2) : (ZMod (H.g k))ˣ := (exists_genU H k).choose
 
 structure NHyp (what₂ : Rows.Data R) : Prop where
-  hsha : ∀ (p : ℕ) [Fact p.Prime] (e : ℕ), 0 < e → e < R.t →
-    what₂.shaLen p e = ((Formalism.GaloisCohomology.shaLen (toyLocalData H p) (e : ℤ)).toNat : ℚ)
+  hsha
+    : ∀ (p : ℕ) [Fact p.Prime] (e : ℕ),
+      0 < e → e < R.t
+        → what₂.shaLen p e
+          = ((Formalism.GaloisCohomology.shaLen (toyLocalData H p) (e : ℤ)).toNat : ℚ)
   hcard : what₂.restRowsFiniteGroupCard = exampleClassGroupCard H
   hg : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E
-
 
 set_option synthInstance.maxHeartbeats 400000 in
 def ndToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NData R H what₂ where
@@ -150,10 +154,10 @@ def ndToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NData R H what₂ where
   SQ_split i := i.elim
   restN_tameGenerator_generates i := i.elim
 
-theorem conj_mem_algC {x : ℂ} (hx : x ∈ algebraicClosure ℚ ℂ) :
-    starRingEnd ℂ x ∈ algebraicClosure ℚ ℂ :=
-  mem_algebraicClosure_iff.2
-    (((mem_algebraicClosure_iff.1 hx).isIntegral.map (starRingEnd ℂ).toRatAlgHom).isAlgebraic)
+theorem conj_mem_algC {x : ℂ} (hx : x ∈ algebraicClosure ℚ ℂ)
+    : starRingEnd ℂ x ∈ algebraicClosure ℚ ℂ :=
+  mem_algebraicClosure_iff.2 (((mem_algebraicClosure_iff.1 hx).isIntegral.map
+    (starRingEnd ℂ).toRatAlgHom).isAlgebraic)
 
 def conjAlgC : AlgC ≃+* AlgC where
   toFun x := ⟨starRingEnd ℂ x, conj_mem_algC x.2⟩
@@ -172,11 +176,11 @@ theorem isCMConjOm_conjAlgC : IsCMConjOm H.E AlgC conjAlgC := by
   change starRingEnd ℂ (H.φ₀ x) = H.φ₀ (H.conj x)
   rw [baseEmbedding_conj]
 
-
 set_option synthInstance.maxHeartbeats 400000 in
-def ntwToy {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
-    (LL0 : IntermediateField ℚ what₂.LL) (h : NHyp H what₂) :
-    NTw R H what₂ LL0 (ndToy H what₂ h) where
+def ntwToy
+    {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
+    (LL0 : IntermediateField ℚ what₂.LL) (h : NHyp H what₂)
+    : NTw R H what₂ LL0 (ndToy H what₂ h) where
   cc := conjAlgC
   cc_cm := isCMConjOm_conjAlgC H
   Tw := Empty
@@ -294,15 +298,13 @@ def ntwToy {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL
   res_art i := i.elim
   th i := i.elim
 
-
-
-
 open Ideal in
 open scoped Pointwise in
-theorem exists_halfPlaces (p : ℕ) (hp : p.Prime)
-    (h : (placesOver H.E p).ncard = Module.finrank ℚ H.E) :
-    ∃ pl : Fin R.f → PlE H, (∀ v, pl v ∈ placesOver H.E p) ∧ Function.Injective pl ∧
-      ∀ v v', ¬ IsConjPl H (pl v) (pl v') := by
+theorem exists_halfPlaces
+    (p : ℕ) (hp : p.Prime) (h : (placesOver H.E p).ncard = Module.finrank ℚ H.E)
+    : ∃ pl : Fin R.f → PlE H,
+      (∀ v, pl v ∈ placesOver H.E p) ∧ Function.Injective pl
+        ∧ ∀ v v', ¬ IsConjPl H (pl v) (pl v') := by
   classical
   have := H.hostE_isGalois
   have : IsGaloisGroup Gal(H.E/ℚ) ℤ (𝓞 H.E) := IsGaloisGroup.of_isFractionRing _ _ _ ℚ H.E
@@ -310,23 +312,29 @@ theorem exists_halfPlaces (p : ℕ) (hp : p.Prime)
   have hpI : (span {(p : ℤ)}).IsPrime := (span_singleton_prime hpZ.ne_zero).2 hpZ
   have hpM : (span {(p : ℤ)}).IsMaximal :=
     hpI.isMaximal (by rw [Ne, span_singleton_eq_bot]; exact hpZ.ne_zero)
-  have hlo : ∀ w ∈ placesOver H.E p, w.asIdeal.LiesOver (span {(p : ℤ)}) := fun w hw => ⟨by
-    have := w.isPrime
-    refine hpM.eq_of_le (Ideal.IsPrime.under ℤ w.asIdeal).ne_top ?_
-    rw [span_le, Set.singleton_subset_iff]
-    change algebraMap ℤ (𝓞 H.E) p ∈ w.asIdeal
-    have hw' : ((p : ℕ) : 𝓞 H.E) ∈ w.asIdeal := hw
-    simpa using hw'⟩
+  have hlo : ∀ w ∈ placesOver H.E p, w.asIdeal.LiesOver (span {(p : ℤ)}) := fun w hw =>
+    ⟨by
+      have := w.isPrime
+      refine hpM.eq_of_le (Ideal.IsPrime.under ℤ w.asIdeal).ne_top ?_
+      rw [span_le, Set.singleton_subset_iff]
+      change algebraMap ℤ (𝓞 H.E) p ∈ w.asIdeal
+      have hw' : ((p : ℕ) : 𝓞 H.E) ∈ w.asIdeal := hw
+      simpa using hw'⟩
   have hpos : 0 < Module.finrank ℚ H.E := Module.finrank_pos
   obtain ⟨w0, hw0⟩ : (placesOver H.E p).Nonempty := Set.nonempty_of_ncard_ne_zero (by omega)
   have hw0p := w0.isPrime
   have hmem : ∀ σ : Gal(H.E/ℚ), ((p : ℕ) : 𝓞 H.E) ∈ σ • w0.asIdeal := fun σ => by
     have := Ideal.smul_mem_pointwise_smul σ _ _ (show ((p : ℕ) : 𝓞 H.E) ∈ w0.asIdeal from hw0)
-    rwa [show σ • ((p : ℕ) : 𝓞 H.E) = p from map_natCast (MulSemiringAction.toRingHom _ _ σ) p] at this
-  let act : Gal(H.E/ℚ) → PlE H := fun σ => ⟨σ • w0.asIdeal, inferInstance, fun hb => by
-    have := hmem σ
-    rw [hb, Ideal.mem_bot] at this
-    exact hp.ne_zero (by exact_mod_cast this)⟩
+    rwa [show σ • ((p : ℕ) : 𝓞 H.E) = p from map_natCast (MulSemiringAction.toRingHom _ _ σ) p] at
+      this
+  let act : Gal(H.E/ℚ) → PlE H := fun σ => ⟨
+    σ • w0.asIdeal,
+    inferInstance,
+    fun hb => by
+      have := hmem σ
+      rw [hb, Ideal.mem_bot] at this
+      exact hp.ne_zero (by exact_mod_cast this)
+  ⟩
   have himg : act '' Set.univ = placesOver H.E p := by
     ext w
     constructor
@@ -335,7 +343,8 @@ theorem exists_halfPlaces (p : ℕ) (hp : p.Prime)
       have := w.isPrime
       have := hlo w hw
       have := hlo w0 hw0
-      obtain ⟨σ, hσ⟩ := exists_smul_eq_of_isGaloisGroup (span {(p : ℤ)}) w0.asIdeal w.asIdeal Gal(H.E/ℚ)
+      obtain ⟨σ, hσ⟩ :=
+        exists_smul_eq_of_isGaloisGroup (span {(p : ℤ)}) w0.asIdeal w.asIdeal Gal(H.E/ℚ)
       exact ⟨σ, trivial, HeightOneSpectrum.ext hσ⟩
   have hinj : Function.Injective act := by
     rw [← Set.injOn_univ]
@@ -367,27 +376,26 @@ theorem exists_halfPlaces (p : ℕ) (hp : p.Prime)
 def qPow (w : PlE H) (s : ℝ) : ℂˣ :=
   Units.mk0 (((normV w : ℕ) : ℂ) ^ ((s : ℝ) : ℂ)) (by
     have : Finite (𝓞 H.E ⧸ w.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ w.ne_bot
-    have h0 : ((normV w : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.card_pos (α := 𝓞 H.E ⧸ w.asIdeal)).ne'
+    have h0 : ((normV w : ℕ) : ℂ) ≠ 0 :=
+      Nat.cast_ne_zero.mpr (Nat.card_pos (α := 𝓞 H.E ⧸ w.asIdeal)).ne'
     simp [Complex.cpow_eq_zero_iff, h0])
 
 theorem qPow_add (w : PlE H) (s t : ℝ) : qPow H w s * qPow H w t = qPow H w (s + t) := by
   have : Finite (𝓞 H.E ⧸ w.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ w.ne_bot
-  have h0 : ((normV w : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.card_pos (α := 𝓞 H.E ⧸ w.asIdeal)).ne'
+  have h0 : ((normV w : ℕ) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (Nat.card_pos (α := 𝓞 H.E ⧸ w.asIdeal)).ne'
   ext
   simp [qPow, Complex.cpow_add _ _ h0]
 
 theorem qPow_zero (w : PlE H) : qPow H w 0 = 1 := by ext; simp [qPow]
 
-
 open Classical in
 def toU (z : ℂ) : ℂˣ := if h : z = 0 then 1 else Units.mk0 z h
 
-theorem toU_val (u : ℂˣ) : toU (u : ℂ) = u := by
-  unfold toU; rw [dite_eq_right u.ne_zero]; ext; rfl
+theorem toU_val (u : ℂˣ) : toU (u : ℂ) = u := by unfold toU; rw [dite_eq_right u.ne_zero]; ext; rfl
 
 theorem val_toU {z : ℂ} (h : z ≠ 0) : ((toU z : ℂˣ) : ℂ) = z := by
   unfold toU; rw [dite_eq_right h]; rfl
-
 
 open Polynomial in
 set_option synthInstance.maxHeartbeats 400000 in
@@ -417,10 +425,14 @@ def nautToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NAut (ndToy H what₂
   lpDim_zero _ := rfl
   lpDim_sum a b := Multiset.card_add a b
   lpDim_tw a s := Multiset.card_map _ _
-  lpUnr_spec _ m hm := ⟨trivial, by
-    rw [Multiset.map_map]
-    exact (Multiset.map_congr rfl (fun z hz => val_toU (fun h0 => hm (h0 ▸ hz)))).trans (Multiset.map_id' m),
-    Multiset.card_map _ _⟩
+  lpUnr_spec _ m hm := ⟨
+    trivial,
+    by
+      rw [Multiset.map_map]
+      exact (Multiset.map_congr rfl (fun z hz => val_toU (fun h0 => hm (h0 ▸ hz)))).trans
+        (Multiset.map_id' m),
+    Multiset.card_map _ _
+  ⟩
   unr_sum _ _ := ⟨fun _ => ⟨trivial, trivial⟩, fun _ => trivial⟩
   monomial_sum_iff _ _ := ⟨fun _ => ⟨trivial, trivial⟩, fun _ => trivial⟩
   frobEig_sum a b _ _ := Multiset.map_add _ a b
@@ -429,7 +441,8 @@ def nautToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NAut (ndToy H what₂
   frobEig_tw a s _ := by rw [Multiset.map_map, Multiset.map_map]; rfl
   frobEig_char a χ c _ _ _ hχ := by
     obtain ⟨u, rfl, rfl⟩ := Multiset.map_eq_singleton.mp hχ
-    rw [Multiset.map_map, Multiset.map_map, Multiset.prod_singleton]; rfl
+    rw [Multiset.map_map, Multiset.map_map, Multiset.prod_singleton]
+    rfl
   lpZero_unr _ := trivial
   frobEig_zero _ := rfl
   lpSum_zero a := add_zero a
@@ -455,20 +468,26 @@ def nautToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NAut (ndToy H what₂
   inertiaCharpoly_add _ _ _ _ := (one_mul 1).symm
   CG a := {f : PlE H → Multiset ℂˣ // ∀ w, Multiset.card (f w) = a}
   csd := fun π => ∀ w w', IsConjPl H w w' → π.1 w' = (π.1 w).map (·⁻¹)
-  csd_unr := fun π w w' h hc _ => ⟨trivial, by
-    rw [h w w' hc, Multiset.map_map, Multiset.map_map]
-    exact Multiset.map_congr rfl (fun u _ => Units.val_inv_eq_inv_val u)⟩
+  csd_unr := fun π w w' h hc _ => ⟨
+    trivial,
+    by
+      rw [h w w' hc, Multiset.map_map, Multiset.map_map]
+      exact Multiset.map_congr rfl (fun u _ => Units.val_inv_eq_inv_val u)
+  ⟩
   csd_tw := fun π χ hχ hπ w w' hc => by
     show (π.1 w').map (· * (χ.1 w').prod) = ((π.1 w).map (· * (χ.1 w).prod)).map (·⁻¹)
     rw [hπ w w' hc, hχ w w' hc, Multiset.prod_map_inv', Multiset.map_map, Multiset.map_map]
     exact Multiset.map_congr rfl (fun u _ => (mul_inv u _).symm)
-  ralg := fun {a} _ => ∀ _ : H.E →+* ℂ, (Multiset.replicate a (0 : ℂ)).Nodup ∧
-    ∀ z ∈ Multiset.replicate a (0 : ℂ), ∃ n : ℤ, z = (n : ℂ) + ((a : ℂ) - 1) / 2
+  ralg := fun {a} _ =>
+    ∀ _ : H.E →+* ℂ,
+      (Multiset.replicate a (0 : ℂ)).Nodup
+        ∧ ∀ z ∈ Multiset.replicate a (0 : ℂ), ∃ n : ℤ, z = (n : ℂ) + ((a : ℂ) - 1) / 2
   ralg_def := fun _ => Iff.rfl
   locG := fun π w => π.1 w
   locG_dim := fun π w => π.2 w
   locG_unr_ae := fun _ => Filter.Eventually.of_forall fun _ => trivial
-  tw := fun π χ => ⟨fun w => (π.1 w).map (· * (χ.1 w).prod), fun w => (Multiset.card_map _ _).trans (π.2 w)⟩
+  tw := fun π χ =>
+    ⟨fun w => (π.1 w).map (· * (χ.1 w).prod), fun w => (Multiset.card_map _ _).trans (π.2 w)⟩
   locG_tw := fun _ _ _ => rfl
   infG := fun {a} _ _ => Multiset.replicate a 0
   infG_tw := fun _ _ _ s hs => by
@@ -482,8 +501,10 @@ def nautToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NAut (ndToy H what₂
   etaT_inert _ _ := by simp
   etaTinv_def _ := ⟨trivial, by simp⟩
   etaT_split _ _ _ _ a b ha hb := by
-    simp only [Multiset.map_singleton, Multiset.singleton_inj, Units.val_neg, Units.val_one] at ha hb
-    rw [← ha, ← hb]; norm_num
+    simp only [Multiset.map_singleton, Multiset.singleton_inj, Units.val_neg, Units.val_one]
+      at ha hb
+    rw [← ha, ← hb]
+    norm_num
   muC_csd i := i.elim
   lab_loc i := i.elim
   wdOf_dim i := i.elim
@@ -524,17 +545,19 @@ def nautToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NAut (ndToy H what₂
   locAutHodgeTateWeightsLevelZero i := i.elim
   kFbar i := i.elim
 
-theorem shaExample_eq (p : ℕ) [hp : Fact p.Prime] (e : ℕ) :
-    shaExample H p e = ((Formalism.GaloisCohomology.shaLen (toyLocalData H p) (e : ℤ)).toNat : ℚ) := by
+theorem shaExample_eq (p : ℕ) [hp : Fact p.Prime] (e : ℕ)
+    : shaExample H p e
+      = ((Formalism.GaloisCohomology.shaLen (toyLocalData H p) (e : ℤ)).toNat : ℚ) := by
   unfold shaExample
   rw [dite_eq_left hp.out]
 
-
 open Ideal Polynomial in
-theorem placesOver_ncard_of_frob (p : ℕ) [hp : Fact p.Prime] (hpN : ¬ p ∣ H.condN)
+theorem placesOver_ncard_of_frob
+    (p : ℕ) [hp : Fact p.Prime]
+    (hpN : ¬ p ∣ H.condN)
     (hF : ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] (σ : H.E ≃ₐ[ℚ] H.E),
-      IsArithFrobAt ℤ σ P → H.galE σ = 1) :
-    (placesOver H.E p).ncard = Module.finrank ℚ H.E := by
+      IsArithFrobAt ℤ σ P → H.galE σ = 1)
+    : (placesOver H.E p).ncard = Module.finrank ℚ H.E := by
   classical
   have := H.hostE_isGalois
   have : IsGaloisGroup Gal(H.E/ℚ) ℤ (𝓞 H.E) := IsGaloisGroup.of_isFractionRing _ _ _ ℚ H.E
@@ -549,7 +572,8 @@ theorem placesOver_ncard_of_frob (p : ℕ) [hp : Fact p.Prime] (hpN : ¬ p ∣ H
   have hg1 : H.galE σF = 1 := hF P σF hσF
   have hσ1 : σF = 1 := (H.galE_eq_one_iff σF).1 hg1
   subst hσ1
-  have hunder : P.under ℤ = span {(p : ℤ)} := (Ideal.LiesOver.over (P := P) (p := span {(p : ℤ)})).symm
+  have hunder : P.under ℤ = span {(p : ℤ)} :=
+    (Ideal.LiesOver.over (P := P) (p := span {(p : ℤ)})).symm
   have hcardZ : Nat.card (ℤ ⧸ span {(p : ℤ)}) = p := by
     rw [Nat.card_congr (Int.quotientSpanNatEquivZMod p).toEquiv, Nat.card_zmod]
   have hfrob : ∀ x : 𝓞 H.E, x - x ^ p ∈ P := by
@@ -561,7 +585,8 @@ theorem placesOver_ncard_of_frob (p : ℕ) [hp : Fact p.Prime] (hpN : ¬ p ∣ H
   have hne0 : ∀ I : Ideal (𝓞 H.E), I.LiesOver (span {(p : ℤ)}) → I ≠ ⊥ := by
     rintro I hI rfl
     have h0 : span {(p : ℤ)} = ⊥ := by
-      rw [hI.over]; exact Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective ℤ (𝓞 H.E))
+      rw [hI.over]
+      exact Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective ℤ (𝓞 H.E))
     exact hpZ.ne_zero (span_singleton_eq_bot.1 h0)
   have hP0 : P ≠ ⊥ := hne0 P hPl
   have hPM : P.IsMaximal := hPp.isMaximal hP0
@@ -576,9 +601,11 @@ theorem placesOver_ncard_of_frob (p : ℕ) [hp : Fact p.Prime] (hpN : ¬ p ∣ H
       Ideal.Quotient.eq_zero_iff_mem, ← neg_mem_iff, neg_sub]
     exact hfrob x
   have hle : Fintype.card (𝓞 H.E ⧸ P) ≤ p := by
-    calc Fintype.card (𝓞 H.E ⧸ P) = (Finset.univ : Finset (𝓞 H.E ⧸ P)).card := rfl
+    calc
+      Fintype.card (𝓞 H.E ⧸ P)
+        = (Finset.univ : Finset (𝓞 H.E ⧸ P)).card := rfl
       _ ≤ (X ^ p - X : (𝓞 H.E ⧸ P)[X]).roots.toFinset.card :=
-          Finset.card_le_card (fun y _ => Multiset.mem_toFinset.2 (hroot y))
+        Finset.card_le_card (fun y _ => Multiset.mem_toFinset.2 (hroot y))
       _ ≤ (X ^ p - X : (𝓞 H.E ⧸ P)[X]).roots.card := Multiset.toFinset_card_le _
       _ ≤ (X ^ p - X : (𝓞 H.E ⧸ P)[X]).natDegree := card_roots' _
       _ = p := Polynomial.natDegree_X_pow_sub_X hp.out.one_lt
@@ -600,13 +627,15 @@ theorem placesOver_ncard_of_frob (p : ℕ) [hp : Fact p.Prime] (hpN : ¬ p ∣ H
       ext σ
       rw [AddSubgroup.mem_inertia, Subgroup.mem_bot]
       exact hin σ
-    rw [this]; exact Subgroup.card_bot
+    rw [this]
+    exact Subgroup.card_bot
   have key := ncard_primesOver_mul_card_inertia_mul_finrank (G := Gal(H.E/ℚ)) (span {(p : ℤ)}) P
   rw [hinert, hf, mul_one, mul_one, IsGalois.card_aut_eq_finrank] at key
 
   rw [← key]
-  have himg : (fun v : HeightOneSpectrum (𝓞 H.E) => v.asIdeal) '' placesOver H.E p =
-      (span {(p : ℤ)}).primesOver (𝓞 H.E) := by
+  have himg
+      : (fun v : HeightOneSpectrum (𝓞 H.E) => v.asIdeal) '' placesOver H.E p
+        = (span {(p : ℤ)}).primesOver (𝓞 H.E) := by
     ext I
     constructor
     · rintro ⟨v, hv, rfl⟩
@@ -624,19 +653,20 @@ theorem placesOver_ncard_of_frob (p : ℕ) [hp : Fact p.Prime] (hpN : ¬ p ∣ H
       simpa using this
   rw [← himg, Set.ncard_image_of_injective _ (fun v w h => HeightOneSpectrum.ext h)]
 
-theorem placesOver_ncard_of_art (p : ℕ) [hp : Fact p.Prime] (hpN : p.Coprime H.condN)
-    (hart : H.art (ZMod.unitOfCoprime p hpN) = 1) :
-    (placesOver H.E p).ncard = Module.finrank ℚ H.E := by
+theorem placesOver_ncard_of_art
+    (p : ℕ) [hp : Fact p.Prime]
+    (hpN : p.Coprime H.condN) (hart : H.art (ZMod.unitOfCoprime p hpN) = 1)
+    : (placesOver H.E p).ncard = Module.finrank ℚ H.E := by
   refine placesOver_ncard_of_frob H p ((Nat.Prime.coprime_iff_not_dvd hp.out).1 hpN) ?_
   intro P _ _ σ hσ
   rw [(H.frob_iff p hpN P σ).1 hσ, hart]
 
-theorem placesOver_ncard_of_split (p : ℕ) [hp : Fact p.Prime] (hpm : p % H.condN = 1) :
-    (placesOver H.E p).ncard = Module.finrank ℚ H.E := by
-  have h1 : 1 < H.condN := lt_of_lt_of_le (by norm_num)
-    (Nat.le_of_dvd (Nat.pos_of_ne_zero H.condN_ne_zero) H.sixteen_dvd_condN)
-  have hmod : p ≡ 1 [MOD H.condN] := by
-    unfold Nat.ModEq; rw [hpm, Nat.mod_eq_of_lt h1]
+theorem placesOver_ncard_of_split (p : ℕ) [hp : Fact p.Prime] (hpm : p % H.condN = 1)
+    : (placesOver H.E p).ncard = Module.finrank ℚ H.E := by
+  have h1 : 1 < H.condN :=
+    lt_of_lt_of_le (by norm_num)
+      (Nat.le_of_dvd (Nat.pos_of_ne_zero H.condN_ne_zero) H.sixteen_dvd_condN)
+  have hmod : p ≡ 1 [MOD H.condN] := by unfold Nat.ModEq; rw [hpm, Nat.mod_eq_of_lt h1]
   have hpN : p.Coprime H.condN := Nat.coprime_of_mul_modEq_one 1 (by simpa using hmod)
   refine placesOver_ncard_of_art H p hpN ?_
   have : ZMod.unitOfCoprime p hpN = 1 := by
@@ -646,12 +676,11 @@ theorem placesOver_ncard_of_split (p : ℕ) [hp : Fact p.Prime] (hpm : p % H.con
     exact hmod
   rw [this, map_one]
 
-theorem g_split_of (hg : ∀ k, H.g k % H.condN = 1) :
-    ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E := by
+theorem g_split_of (hg : ∀ k, H.g k % H.condN = 1)
+    : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E := by
   intro k
   have : Fact (H.g k).Prime := ⟨H.g_prime k⟩
   exact placesOver_ncard_of_split H (H.g k) (hg k)
-
 
 set_option synthInstance.maxHeartbeats 400000 in
 def nbcToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NBC (nautToy H what₂ h) where
@@ -673,11 +702,11 @@ def nbcToy (what₂ : Rows.Data R) (h : NHyp H what₂) : NBC (nautToy H what₂
   embAV_sph i := i.elim
   embAV_inf i := i.elim
 
-
 set_option synthInstance.maxHeartbeats 400000 in
-def nexpToy {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
-    (LL0 : IntermediateField ℚ what₂.LL) (h : NHyp H what₂) :
-    NExp R H what₂ LL0 (ndToy H what₂ h) (ntwToy H LL0 h) where
+def nexpToy
+    {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
+    (LL0 : IntermediateField ℚ what₂.LL) (h : NHyp H what₂)
+    : NExp R H what₂ LL0 (ndToy H what₂ h) (ntwToy H LL0 h) where
   Fm i := i.elim
   eLL0 _ := 0
   eAlg_def i := i.elim
@@ -725,17 +754,23 @@ def nexpToy {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.L
   thP i := i.elim
   hkF i := i.elim
 
-theorem example_Z_compatibility (what₂ : Rows.Data R) (h : NHyp H what₂) :
-    ∀ i x, x ∈ (ndToy H what₂ h).Z i ↔ x ∈ Formalism.MainNotions.N.ZN (ndToy H what₂ h) (nautToy H what₂ h) i :=
-  fun i => i.elim
+theorem example_Z_compatibility (what₂ : Rows.Data R) (h : NHyp H what₂)
+    : ∀ i x,
+      x ∈ (ndToy H what₂ h).Z i
+        ↔ x ∈ Formalism.MainNotions.N.ZN (ndToy H what₂ h) (nautToy H what₂ h) i := fun i =>
+  i.elim
 
-theorem example_goodZ_compatibility (what₂ : Rows.Data R) (h : NHyp H what₂) :
-    ∀ i x, x ∈ (ndToy H what₂ h).Zgood i ↔
-      x ∈ Formalism.MainNotions.N.ZgoodN (ndToy H what₂ h) (nautToy H what₂ h) i :=
-  fun i => i.elim
+theorem example_goodZ_compatibility (what₂ : Rows.Data R) (h : NHyp H what₂)
+    : ∀ i x,
+      x ∈ (ndToy H what₂ h).Zgood i
+        ↔ x ∈ Formalism.MainNotions.N.ZgoodN (ndToy H what₂ h) (nautToy H what₂ h) i := fun i =>
+  i.elim
 
-theorem example_etaJ_compatibility (what₂ : Rows.Data R) (h : NHyp H what₂) (hη : ∀ j w, what₂.etaJ j w = 0) :
-    ∀ j w, 1 ≤ j → j ≤ R.m → what₂.etaJ j w = ∑ i ∈ (ndToy H what₂ h).locs j w, (ndToy H what₂ h).etaLoc i := by
+theorem example_etaJ_compatibility
+    (what₂ : Rows.Data R) (h : NHyp H what₂) (hη : ∀ j w, what₂.etaJ j w = 0)
+    : ∀ j w,
+      1 ≤ j → j ≤ R.m
+        → what₂.etaJ j w = ∑ i ∈ (ndToy H what₂ h).locs j w, (ndToy H what₂ h).etaLoc i := by
   intro j w _ _
   rw [hη]
   rfl

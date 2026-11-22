@@ -10,8 +10,8 @@ open scoped BigOperators
 
 variable {B : Type*} [CommMonoid B] {I : Type*} [Fintype I] {n : ℕ} [NeZero n]
 
-theorem pow_val_add {x : B} (hx : x ^ n = 1) (a b : ZMod n) :
-    x ^ (a + b).val = x ^ a.val * x ^ b.val := by
+theorem pow_val_add {x : B} (hx : x ^ n = 1) (a b : ZMod n)
+    : x ^ (a + b).val = x ^ a.val * x ^ b.val := by
   rw [ZMod.val_add, ← pow_add, ← pow_eq_pow_mod _ hx]
 
 def rootChar (u : I → B) (hu : ∀ q, u q ^ n = 1) : Multiplicative (I → ZMod n) →* B where

@@ -117,15 +117,19 @@ private lemma flip_core {X Z : Type} [MeasurableSpace X] [MeasurableSpace Z] (ν
   simp_rw [hin]
   exact integral_div 2 m
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.flip_pf :
-    Flip := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.flip_pf : Flip := by
   intro X Z _ _ ν _ μ _ l l' F m d hl hl' hF hFc hm hd hb hh
   have hmeas : Measurable (fun x => F (l x) x) := hF.comp (hl.prodMk measurable_id)
-  refine ⟨hd.mono' hmeas.aestronglyMeasurable (Eventually.of_forall fun x => hb (l x) x (by simp)), ?_⟩
-  let φ : ℕ → ContDiffBump (0 : ℝ) := fun k =>
-    ⟨1 / (2 * ((k : ℝ) + 1)), 1 / ((k : ℝ) + 1), by positivity, by
+  refine
+    ⟨hd.mono' hmeas.aestronglyMeasurable (Eventually.of_forall fun x => hb (l x) x (by simp)), ?_⟩
+  let φ : ℕ → ContDiffBump (0 : ℝ) := fun k => ⟨
+    1 / (2 * ((k : ℝ) + 1)),
+    1 / ((k : ℝ) + 1),
+    by positivity,
+    by
       have : (0 : ℝ) < (k : ℝ) + 1 := by positivity
-      exact one_div_lt_one_div_of_lt this (by linarith)⟩
+      exact one_div_lt_one_div_of_lt this (by linarith)
+  ⟩
   have hφ : Tendsto (fun k => (φ k).rOut) atTop (𝓝 0) := tendsto_one_div_add_atTop_nhds_zero_nat
   let β : ℕ → ℝ → ℝ := fun k => (φ k).normed volume
   have hr : ∀ k t, β k t ≠ 0 → |t| ≤ 1 := by
@@ -138,21 +142,30 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.flip_pf :
       have : (0 : ℝ) ≤ k := by positivity
       linarith
     linarith
-  have hcore := fun k => flip_core ν μ l l' F m d hl hl' hF hm hd hb hh (β k)
-    (φ k).continuous_normed (φ k).hasCompactSupport_normed (fun t => (φ k).nonneg_normed t)
-    (φ k).integral_normed (hr k)
-  have hlim : Tendsto (fun k => ∫ x, (∫ s : ℝ, F s x * (β k (l x - s) : ℂ)) ∂ν) atTop
-      (𝓝 (∫ x, F (l x) x ∂ν)) := by
-    refine tendsto_integral_of_dominated_convergence d (fun k => (hcore k).1.aestronglyMeasurable) hd
-      (fun k => Eventually.of_forall (hcore k).2.1) (Eventually.of_forall fun x => ?_)
-    have := ContDiffBump.convolution_tendsto_right_of_continuous (μ := (volume : Measure ℝ))
-      (g := fun s => F s x) hφ (hFc x) (l x)
+  have hcore := fun k =>
+    flip_core ν μ l l' F m d hl hl' hF hm hd hb hh (β k) (φ k).continuous_normed
+      (φ k).hasCompactSupport_normed
+      (fun t => (φ k).nonneg_normed t)
+      (φ k).integral_normed (hr k)
+  have hlim : Tendsto
+      (fun k => ∫ x, (∫ s : ℝ, F s x * (β k (l x - s) : ℂ)) ∂ν)
+      atTop (𝓝 (∫ x, F (l x) x ∂ν)) := by
+    refine tendsto_integral_of_dominated_convergence d
+      (fun k => (hcore k).1.aestronglyMeasurable)
+      hd
+      (fun k => Eventually.of_forall (hcore k).2.1)
+      (Eventually.of_forall fun x => ?_)
+    have :=
+      ContDiffBump.convolution_tendsto_right_of_continuous (μ := (volume : Measure ℝ))
+        (g := fun s => F s x)
+        hφ (hFc x) (l x)
     refine this.congr fun k => ?_
     rw [convolution_eq_swap]
     refine integral_congr_ae (Eventually.of_forall fun s => ?_)
     simp [β, mul_comm]
-  have hconst : Tendsto (fun k => ∫ x, (∫ s : ℝ, F s x * (β k (l x - s) : ℂ)) ∂ν) atTop
-      (𝓝 ((∫ z, m z ∂μ) / 2)) := by
+  have hconst : Tendsto
+      (fun k => ∫ x, (∫ s : ℝ, F s x * (β k (l x - s) : ℂ)) ∂ν)
+      atTop (𝓝 ((∫ z, m z ∂μ) / 2)) := by
     simp_rw [fun k => (hcore k).2.2]
     exact tendsto_const_nhds
   exact tendsto_nhds_unique hlim hconst

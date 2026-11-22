@@ -9,7 +9,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.L2.DIV GlobalTheory.FieldBC
+open NumberField MvPolynomial ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+  Formalism.L2.DIV GlobalTheory.FieldBC
 
 set_option autoImplicit false
 
@@ -24,7 +26,8 @@ variable {K K' : Type} [Field K] [Field K'] (j : K →+* K') {σ τ : Type}
 def cf (φ : K' →+ K) (P : MvPolynomial σ K') : MvPolynomial σ K :=
   ∑ m ∈ P.support, monomial m (φ (P.coeff m))
 
-theorem coeff_cf (φ : K' →+ K) (P : MvPolynomial σ K') (m : σ →₀ ℕ) : (cf φ P).coeff m = φ (P.coeff m) := by
+theorem coeff_cf (φ : K' →+ K) (P : MvPolynomial σ K') (m : σ →₀ ℕ)
+    : (cf φ P).coeff m = φ (P.coeff m) := by
   classical
   simp only [cf, coeff_sum, coeff_monomial, Finset.sum_ite_eq', mem_support_iff]
   split_ifs with h
@@ -34,20 +37,23 @@ theorem coeff_cf (φ : K' →+ K) (P : MvPolynomial σ K') (m : σ →₀ ℕ) :
 theorem cf_add (φ : K' →+ K) (P Q : MvPolynomial σ K') : cf φ (P + Q) = cf φ P + cf φ Q := by
   ext m; simp [coeff_cf]
 
-theorem cf_zero (φ : K' →+ K) : cf φ (0 : MvPolynomial σ K') = 0 := by
-  ext m; simp [coeff_cf]
+theorem cf_zero (φ : K' →+ K) : cf φ (0 : MvPolynomial σ K') = 0 := by ext m; simp [coeff_cf]
 
-theorem cf_smul_map {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x) (x : K') (Q : MvPolynomial σ K) :
-    cf φ (x • map j Q) = φ x • Q := by
+theorem cf_smul_map
+    {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x) (x : K') (Q : MvPolynomial σ K)
+    : cf φ (x • map j Q) = φ x • Q := by
   ext m
   rw [coeff_cf, coeff_smul, coeff_smul, coeff_map, smul_eq_mul, smul_eq_mul, mul_comm, hφ, mul_comm]
 
 theorem map_smul' (a : K) (Q : MvPolynomial σ K) : map j (a • Q) = j a • map j Q := by
   rw [smul_eq_C_mul, smul_eq_C_mul, map_mul, map_C]
 
-theorem cf_comm {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x)
+theorem cf_comm
+    {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x)
     (T : MvPolynomial σ K →ₗ[K] MvPolynomial τ K) (T' : MvPolynomial σ K' →ₗ[K'] MvPolynomial τ K')
-    (h : ∀ Q, T' (map j Q) = map j (T Q)) (P : MvPolynomial σ K') : cf φ (T' P) = T (cf φ P) := by
+    (h : ∀ Q, T' (map j Q) = map j (T Q))
+    (P : MvPolynomial σ K')
+    : cf φ (T' P) = T (cf φ P) := by
   induction P using MvPolynomial.induction_on' with
   | monomial m x =>
     have e : (monomial m x : MvPolynomial σ K') = x • map j (monomial m 1) := by
@@ -55,13 +61,16 @@ theorem cf_comm {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x)
     rw [e, map_smul, h, cf_smul_map j hφ, cf_smul_map j hφ, map_smul]
   | add p q hp hq => rw [map_add (f := _), cf_add, cf_add, map_add (f := _), hp, hq]
 
-theorem eq_sum_cf {I : Type} [Fintype I] (e : I → K') (φ : I → K' →+ K) (h : ∀ x, ∑ i, e i * j (φ i x) = x)
-    (P : MvPolynomial σ K') : P = ∑ i, e i • map j (cf (φ i) P) := by
+theorem eq_sum_cf
+    {I : Type} [Fintype I]
+    (e : I → K') (φ : I → K' →+ K) (h : ∀ x, ∑ i, e i * j (φ i x) = x)
+    (P : MvPolynomial σ K')
+    : P = ∑ i, e i • map j (cf (φ i) P) := by
   ext m
   simp only [coeff_sum, coeff_smul, coeff_map, coeff_cf, smul_eq_mul, h]
 
-theorem exists_ext (T : MvPolynomial σ K →ₗ[K] MvPolynomial τ K) :
-    ∃ T' : MvPolynomial σ K' →ₗ[K'] MvPolynomial τ K', ∀ Q, T' (map j Q) = map j (T Q) := by
+theorem exists_ext (T : MvPolynomial σ K →ₗ[K] MvPolynomial τ K)
+    : ∃ T' : MvPolynomial σ K' →ₗ[K'] MvPolynomial τ K', ∀ Q, T' (map j Q) = map j (T Q) := by
   refine ⟨(basisMonomials σ K').constr K' fun m => map j (T (monomial m 1)), fun Q => ?_⟩
   induction Q using MvPolynomial.induction_on' with
   | monomial m x =>
@@ -71,8 +80,12 @@ theorem exists_ext (T : MvPolynomial σ K →ₗ[K] MvPolynomial τ K) :
     rw [e, map_smul', map_smul, map_smul, map_smul', e', Module.Basis.constr_basis]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
 
-theorem cf_mem_VV {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x) {ι : Type} [Fintype ι] {n : ℕ}
-    (lam : ι → DomWeight n) {F : Pol K' ι n} (hF : F ∈ VV K' lam) : cf φ F ∈ VV K lam := by
+theorem cf_mem_VV
+    {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x)
+    {ι : Type} [Fintype ι]
+    {n : ℕ} (lam : ι → DomWeight n)
+    {F : Pol K' ι n} (hF : F ∈ VV K' lam)
+    : cf φ F ∈ VV K lam := by
   rw [← (bVVfun_spec K' lam).2] at hF
   have key : ∀ x : K', cf φ (x • F) ∈ VV K lam := by
     induction hF using Submodule.span_induction with
@@ -87,9 +100,11 @@ theorem cf_mem_VV {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x) {ι 
     | smul a y _ hy => intro x; rw [smul_smul]; exact hy _
   simpa using key 1
 
-theorem cf_mem_HHa {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x) {T : Type} {r : T → ℕ} {n : ℕ}
-    {cc : T → T} {isX : T → Prop} {a : T → ℕ → ℕ} {P : MvPolynomial (Letter T r n) K'}
-    (hP : P ∈ HHa r n K' cc isX a) : cf φ P ∈ HHa r n K cc isX a := by
+theorem cf_mem_HHa
+    {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x)
+    {T : Type} {r : T → ℕ} {n : ℕ} {cc : T → T} {isX : T → Prop} {a : T → ℕ → ℕ}
+    {P : MvPolynomial (Letter T r n) K'} (hP : P ∈ HHa r n K' cc isX a)
+    : cf φ P ∈ HHa r n K cc isX a := by
   obtain ⟨hh, hi, hd⟩ := hP
   refine ⟨?_, ?_, ?_⟩
   · simp only [harmK, Submodule.mem_iInf, LinearMap.mem_ker] at hh ⊢
@@ -97,9 +112,12 @@ theorem cf_mem_HHa {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x) {T 
     rw [← cf_comm j hφ _ (lap r n K' 1 t (cc t) i i'), hh t ht i i', cf_zero]
     intro Q
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [lap, Matrix.one_apply, ite_smul, Finset.sum_ite_eq, LinearMap.sum_apply, pderiv_map, map_sum]
+    simp [lap, Matrix.one_apply, ite_smul, Finset.sum_ite_eq, LinearMap.sum_apply, pderiv_map,
+      map_sum]
   · intro s i i' hlt t
-    have := cf_comm j hφ (rowShift r n K s i i' t).toLinearMap (rowShift r n K' s i i' (j t)).toLinearMap ?_ P
+    have :=
+      cf_comm j hφ (rowShift r n K s i i' t).toLinearMap (rowShift r n K' s i i' (j t)).toLinearMap
+        ?_ P
     · rw [AlgHom.toLinearMap_apply, AlgHom.toLinearMap_apply, hi s i i' hlt] at this
       exact this.symm
     · intro Q
@@ -118,10 +136,12 @@ theorem cf_mem_HHa {φ : K' →+ K} (hφ : ∀ a x, φ (j a * x) = a * φ x) {T 
     intro h0
     exact hm (by rw [coeff_cf, h0, map_zero])
 
-theorem polyAction_map {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → DomWeight n) (g : ι → GL (Fin n) K)
-    (g' : ι → GL (Fin n) K')
-    (h : ∀ t, (g' t : Matrix (Fin n) (Fin n) K') = (g t : Matrix (Fin n) (Fin n) K).map j) (F : Pol K ι n) :
-    actP lam g' (map j F) = map j (actP lam g F) := by
+theorem polyAction_map
+    {ι : Type} [Fintype ι]
+    {n : ℕ} (lam : ι → DomWeight n) (g : ι → GL (Fin n) K) (g' : ι → GL (Fin n) K')
+    (h : ∀ t, (g' t : Matrix (Fin n) (Fin n) K') = (g t : Matrix (Fin n) (Fin n) K).map j)
+    (F : Pol K ι n)
+    : actP lam g' (map j F) = map j (actP lam g F) := by
   have h1 : detTwK lam g' = j (detTwK lam g) := by
     simp only [detTwK, detPow, map_prod, Units.val_zpow_eq_zpow_val, map_zpow₀,
       Matrix.GeneralLinearGroup.val_det_apply, h, RingHom.map_det, RingHom.mapMatrix_apply]
@@ -141,32 +161,45 @@ section Int
 
 variable {K K' : Type} [Field K] [Field K'] [NumberField K] [NumberField K'] (j : K →+* K')
 
-theorem map_smul_alg {R k O L σ : Type} [CommRing R] [CommRing k] [Algebra R k] [CommRing O] [CommRing L] [Algebra O L]
-    (φ : k →+* L) (ψ : R →+* O) (h : ∀ r, algebraMap O L (ψ r) = φ (algebraMap R k r)) (a : R) (y : MvPolynomial σ k) :
-    map φ (a • y) = ψ a • map φ y := by
-  rw [← algebraMap_smul k a y, ← algebraMap_smul L (ψ a), smul_eq_C_mul, smul_eq_C_mul, map_mul, map_C, h]
+theorem map_smul_alg
+    {R k O L σ : Type}
+    [CommRing R] [CommRing k] [Algebra R k] [CommRing O] [CommRing L] [Algebra O L]
+    (φ : k →+* L) (ψ : R →+* O) (h : ∀ r, algebraMap O L (ψ r) = φ (algebraMap R k r))
+    (a : R) (y : MvPolynomial σ k)
+    : map φ (a • y) = ψ a • map φ y := by
+  rw [← algebraMap_smul k a y, ← algebraMap_smul L (ψ a), smul_eq_C_mul, smul_eq_C_mul, map_mul,
+    map_C, h]
 
-theorem map_mem_nabStd {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → DomWeight n) {F : Pol K ι n}
-    (hF : F ∈ nabStd K lam) : map j F ∈ nabStd K' lam := by
+theorem map_mem_nabStd
+    {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → DomWeight n) {F : Pol K ι n} (hF : F ∈ nabStd K lam)
+    : map j F ∈ nabStd K' lam := by
   unfold nabStd Formalism.GradedWeylDivisibility.tensorLat at hF
   induction hF using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨f, hf, rfl⟩ := hx
-    refine Submodule.subset_span ⟨fun s => map j (f s), fun s => ?_, GlobalTheory.Proof.TensorMapDescent.map_ten j f⟩
+    refine Submodule.subset_span
+      ⟨fun s => map j (f s), fun s => ?_, GlobalTheory.Proof.TensorMapDescent.map_ten j f⟩
     obtain ⟨G, hG, e⟩ := hf s
-    refine ⟨map (RingOfIntegers.mapRingHom j) G, Formalism.GradedWeylDivisibility.dualWeylMap _ _ _ n n _ _ hG, ?_⟩
+    refine ⟨
+      map (RingOfIntegers.mapRingHom j) G,
+      Formalism.GradedWeylDivisibility.dualWeylMap _ _ _ n n _ _ hG,
+      ?_
+    ⟩
     beta_reduce
     rw [← e, GlobalTheory.NabStab.toK_apply, GlobalTheory.NabStab.toK_apply, map_map, map_map]
     rfl
-  | zero => rw [map_zero]; exact zero_mem _
-  | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
+  | zero =>
+    rw [map_zero]; exact zero_mem _
+  | add x y _ _ hx hy =>
+    rw [map_add]; exact add_mem hx hy
   | smul a x _ hx =>
     rw [map_smul_alg j (RingOfIntegers.mapRingHom j) (fun _ => rfl)]
     exact Submodule.smul_mem _ _ hx
 
-theorem exists_coords : ∃ (N : ℕ) (e : Fin N → 𝓞 K') (φ : Fin N → K' →+ K),
-    (∀ i a x, φ i (j a * x) = a * φ i x) ∧ (∀ x, ∑ i, (e i : K') * j (φ i x) = x) ∧
-      ∀ i x, IsIntegral ℤ x → IsIntegral ℤ (φ i x) := by
+theorem exists_coords
+    : ∃ (N : ℕ) (e : Fin N → 𝓞 K') (φ : Fin N → K' →+ K),
+      (∀ i a x, φ i (j a * x) = a * φ i x) ∧ (∀ x, ∑ i, (e i : K') * j (φ i x) = x)
+        ∧ ∀ i x, IsIntegral ℤ x → IsIntegral ℤ (φ i x) := by
   classical
   let _ : Algebra K K' := j.toAlgebra
   have : Module.FinitePresentation (𝓞 K) (𝓞 K') := Module.finitePresentation_of_finite _ _
@@ -176,17 +209,26 @@ theorem exists_coords : ∃ (N : ℕ) (e : Fin N → 𝓞 K') (φ : Fin N → K'
   have : FiniteDimensional K K' := Module.Finite.of_restrictScalars_finite ℚ K K'
   have hl : IsLocalization (Algebra.algebraMapSubmonoid (𝓞 K') (nonZeroDivisors (𝓞 K))) K' :=
     IsIntegralClosure.isLocalization (𝓞 K) K K' (𝓞 K')
-  have hm : IsLocalizedModule (nonZeroDivisors (𝓞 K)) (IsScalarTower.toAlgHom (𝓞 K) (𝓞 K') K').toLinearMap :=
+  have hm : IsLocalizedModule (nonZeroDivisors (𝓞 K))
+      (IsScalarTower.toAlgHom (𝓞 K) (𝓞 K') K').toLinearMap :=
     isLocalizedModule_iff_isLocalization.2 hl
   let φ : Fin N → K' →ₗ[K] K := fun i =>
-    IsLocalizedModule.mapExtendScalars (nonZeroDivisors (𝓞 K)) (IsScalarTower.toAlgHom (𝓞 K) (𝓞 K') K').toLinearMap
-      (Algebra.linearMap (𝓞 K) K) K (LinearMap.proj i ∘ₗ g)
+    IsLocalizedModule.mapExtendScalars (nonZeroDivisors (𝓞 K))
+      (IsScalarTower.toAlgHom (𝓞 K) (𝓞 K') K').toLinearMap (Algebra.linearMap (𝓞 K) K) K
+      (LinearMap.proj i ∘ₗ g)
   have hφ : ∀ i (y : 𝓞 K'), φ i (y : K') = (g y i : K) := fun i y =>
     IsLocalizedModule.mapExtendScalars_apply_apply (nonZeroDivisors (𝓞 K))
-      (IsScalarTower.toAlgHom (𝓞 K) (𝓞 K') K').toLinearMap (Algebra.linearMap (𝓞 K) K) K _ _ |>.trans
-      (IsLocalizedModule.map_apply _ _ _ _ y)
+        (IsScalarTower.toAlgHom (𝓞 K) (𝓞 K') K').toLinearMap (Algebra.linearMap (𝓞 K) K) K _ _
+      |>.trans (IsLocalizedModule.map_apply _ _ _ _ y)
   have hs : ∀ i a x, φ i (j a * x) = a * φ i x := fun i a x => (φ i).map_smul a x
-  refine ⟨N, fun i => f (Pi.single i 1), fun i => (φ i).toAddMonoidHom, hs, fun x => ?_, fun i x hx => ?_⟩
+  refine ⟨
+    N,
+    fun i => f (Pi.single i 1),
+    fun i => (φ i).toAddMonoidHom,
+    hs,
+    fun x => ?_,
+    fun i x hx => ?_
+  ⟩
   · have h0 : ∀ y : 𝓞 K', ∑ i, ((f (Pi.single i 1) : 𝓞 K') : K') * j (φ i y) = y := by
       intro y
       have h1 : y = ∑ i, g y i • f (Pi.single i 1) := by
@@ -197,9 +239,11 @@ theorem exists_coords : ∃ (N : ℕ) (e : Fin N → 𝓞 K') (φ : Fin N → K'
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [hφ, map_sum, Algebra.smul_def, map_mul]
       refine Finset.sum_congr rfl fun i _ => ?_
-      rw [mul_comm]; rfl
-    obtain ⟨⟨y, s⟩, hy⟩ := IsLocalizedModule.surj (nonZeroDivisors (𝓞 K))
-      (IsScalarTower.toAlgHom (𝓞 K) (𝓞 K') K').toLinearMap x
+      rw [mul_comm]
+      rfl
+    obtain ⟨⟨y, s⟩, hy⟩ :=
+      IsLocalizedModule.surj (nonZeroDivisors (𝓞 K))
+        (IsScalarTower.toAlgHom (𝓞 K) (𝓞 K') K').toLinearMap x
     have hy' : j ((s : 𝓞 K) : K) * x = (y : K') := by
       rw [← show _ = (y : K') from hy, Submonoid.smul_def, Algebra.smul_def]; rfl
     have hs0 : j ((s : 𝓞 K) : K) ≠ 0 := by
@@ -220,14 +264,20 @@ end Int
 
 section Main
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {c c' : Coeff l} (hle : c.F ≤ c'.F) {n : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {c c' : Coeff l} (hle : c.F ≤ c'.F)
+  {n : ℕ}
 
-theorem gaStar_map (ga : Matrix (Fin n) (Fin n) E) (P : MvPolynomial (LtN Dw n) c.F) :
-    Formalism.L2.Pj.gaStar c' ga (map (incF c c' hle) P) = map (incF c c' hle) (Formalism.L2.Pj.gaStar c ga P) := by
+theorem gaStar_map (ga : Matrix (Fin n) (Fin n) E) (P : MvPolynomial (LtN Dw n) c.F)
+    : Formalism.L2.Pj.gaStar c' ga (map (incF c c' hle) P)
+      = map (incF c c' hle) (Formalism.L2.Pj.gaStar c ga P) := by
   induction P using MvPolynomial.induction_on with
-  | C x => rw [map_C, Formalism.L2.Pj.gaStar, Formalism.L2.Pj.gaStar, aeval_C, aeval_C, algebraMap_eq, algebraMap_eq, map_C]
-  | add p q hp hq => simp only [map_add (f := _), hp, hq]
+  | C x =>
+    rw [map_C, Formalism.L2.Pj.gaStar, Formalism.L2.Pj.gaStar, aeval_C, aeval_C, algebraMap_eq,
+      algebraMap_eq, map_C]
+  | add p q hp hq =>
+    simp only [map_add (f := _), hp, hq]
   | mul_X p v hp =>
     simp only [map_mul, hp, map_X]
     congr 1
@@ -235,9 +285,12 @@ theorem gaStar_map (ga : Matrix (Fin n) (Fin n) E) (P : MvPolynomial (LtN Dw n) 
       simp only [Formalism.L2.Pj.gaStar, aeval_X, letB, map_sum, map_mul, map_C, map_X]
     rfl
 
-theorem pG_map (a : (E →+* ℂ) × ℕ → ℕ) :
-    pG (Dw := Dw) c' a n = map (incF c c' hle) (pG (Dw := Dw) c a n) := by
-  have h : ∀ s i hi col, minorPolynomial (Dw := Dw) (n := n) c' s i hi col = map (incF c c' hle) (minorPolynomial c s i hi col) := by
+theorem pG_map (a : (E →+* ℂ) × ℕ → ℕ)
+    : pG (Dw := Dw) c' a n = map (incF c c' hle) (pG (Dw := Dw) c a n) := by
+  have h
+      : ∀ s i hi col,
+        minorPolynomial (Dw := Dw) (n := n) c' s i hi col
+          = map (incF c c' hle) (minorPolynomial c s i hi col) := by
     intro s i hi col
     unfold minorPolynomial
     rw [RingHom.map_det]
@@ -253,11 +306,15 @@ theorem pG_map (a : (E →+* ℂ) × ℕ → ℕ) :
   · exact h _ _ _ _
   · rw [map_zero]
 
-theorem rhoM_map {Ix : Type} [Fintype Ix] (pl : Ix → (E →+* ℂ)) (lam : Ix → DomWeight n)
-    (ga : Matrix (Fin n) (Fin n) E) (v : VVc c lam) (v' : VVc c' lam)
-    (h : (v' : Pol c'.F Ix n) = map (incF c c' hle) (v : Pol c.F Ix n)) :
-    (rhoM c' (fun t => embF c' (pl t)) lam ga v' : Pol c'.F Ix n) =
-      map (incF c c' hle) (rhoM c (fun t => embF c (pl t)) lam ga v : Pol c.F Ix n) := by
+theorem rhoM_map
+    {Ix : Type} [Fintype Ix]
+    (pl : Ix → (E →+* ℂ))
+    (lam : Ix → DomWeight n)
+    (ga : Matrix (Fin n) (Fin n) E)
+    (v : VVc c lam) (v' : VVc c' lam)
+    (h : (v' : Pol c'.F Ix n) = map (incF c c' hle) (v : Pol c.F Ix n))
+    : (rhoM c' (fun t => embF c' (pl t)) lam ga v' : Pol c'.F Ix n)
+      = map (incF c c' hle) (rhoM c (fun t => embF c (pl t)) lam ga v : Pol c.F Ix n) := by
   unfold rhoM
   split_ifs with hg
   · show actP lam _ (v' : Pol c'.F Ix n) = map _ (actP lam _ (v : Pol c.F Ix n))
@@ -268,13 +325,22 @@ theorem rhoM_map {Ix : Type} [Fintype Ix] (pl : Ix → (E →+* ℂ)) (lam : Ix 
 
 end Main
 
-theorem exists_ioLFRec_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (c c' : Coeff l) (hle : c.F ≤ c'.F) (n : ℕ) (Ix : Type) [Fintype Ix] (pl : Ix → (E →+* ℂ)) (lam : Ix → DomWeight n) (a : (E →+* ℂ) × ℕ → ℕ) (io : VVc c lam →ₗ[c.F] MvPolynomial (LtN Dw n) c.F) (hw : VVc c lam), IoLFRec c (fun t => embF c (pl t)) lam a io hw → ∃ (io' : VVc c' lam →ₗ[c'.F] MvPolynomial (LtN Dw n) c'.F) (hw' : VVc c' lam), IoLFRec c' (fun t => embF c' (pl t)) lam a io' hw' ∧ IoOver hle lam io io' := by
+theorem exists_ioLFRec_over
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (c c' : Coeff l) (hle : c.F ≤ c'.F) (n : ℕ) (Ix : Type) [Fintype Ix] (pl : Ix → (E →+* ℂ))
+        (lam : Ix → DomWeight n) (a : (E →+* ℂ) × ℕ → ℕ)
+        (io : VVc c lam →ₗ[c.F] MvPolynomial (LtN Dw n) c.F) (hw : VVc c lam),
+      IoLFRec c (fun t => embF c (pl t)) lam a io hw
+        → ∃ (io' : VVc c' lam →ₗ[c'.F] MvPolynomial (LtN Dw n) c'.F) (hw' : VVc c' lam),
+          IoLFRec c' (fun t => embF c' (pl t)) lam a io' hw' ∧ IoOver hle lam io io' := by
   intro E _ _ _ H Dw l c c' hle n Ix _ pl lam a io hw ⟨hok, cga, h1, h2, h3, h4, _, _, h7, h8⟩
   obtain ⟨p, hp⟩ := LinearMap.exists_extend io
   obtain ⟨p', hp'⟩ := exists_ext (incF c c' hle) p
   obtain ⟨N, e, φ, hφ, hsum, hint⟩ := exists_coords (incF c c' hle)
   have hpv : ∀ v : VVc c lam, p v = io v := fun v => LinearMap.congr_fun hp v
-  let up : VVc c lam → VVc c' lam := fun v => ⟨_, GlobalTheory.Proof.TensorMapDescent.map_mem_VV (incF c c' hle) lam _ v.2⟩
+  let up : VVc c lam → VVc c' lam := fun v =>
+    ⟨_, GlobalTheory.Proof.TensorMapDescent.map_mem_VV (incF c c' hle) lam _ v.2⟩
   let io' : VVc c' lam →ₗ[c'.F] MvPolynomial (LtN Dw n) c'.F := p' ∘ₗ (VV c'.F lam).subtype
   have hov : IoOver hle lam io io' := by
     intro v v' h
@@ -285,9 +351,14 @@ theorem exists_ioLFRec_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
     intro i
     obtain ⟨F, hF, h⟩ := GlobalTheory.Proof.TensorMapDescent.bVVfun_desc (incF c c' hle) lam i
     exact ⟨⟨F, hF⟩, Subtype.ext ((bVV_coe _ _ _).trans h)⟩
-  have hHa : ∀ P ∈ HHa Dw.mult n c.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)),
-      map (incF c c' hle) P ∈ HHa Dw.mult n c'.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)) :=
-    fun P hP => ⟨PullbackSections.harmK_map _ hP.1, PullbackSections.rowInv_map _ hP.2.1, PullbackSections.rowDeg_map _ hP.2.2⟩
+  have hHa
+      : ∀ P ∈ HHa Dw.mult n c.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)),
+        map (incF c c' hle) P ∈ HHa Dw.mult n c'.F ComplexEmbedding.conjugate (InPsi H)
+          (fun τ i => a (τ, i)) := fun P hP => ⟨
+    PullbackSections.harmK_map _ hP.1,
+    PullbackSections.rowInv_map _ hP.2.1,
+    PullbackSections.rowDeg_map _ hP.2.2
+  ⟩
   have hok' : hwOK c' lam (up hw) := by
     show map (incF c c' hle) (hw : Pol c.F Ix n) = _
     rw [show (hw : Pol c.F Ix n) = _ from hok, GlobalTheory.Proof.TensorMapDescent.map_ten]
@@ -329,8 +400,10 @@ theorem exists_ioLFRec_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
         exact Submodule.subset_span (cf_mem_HHa (incF c c' hle) (hφ i) hP)
       exact ⟨up v, by rw [hup, hv]⟩
   · intro ga hga v
-    have : io' ∘ₗ rhoM c' (fun t => embF c' (pl t)) lam ga =
-        incF c c' hle (cga ga) • ((Formalism.L2.Pj.gaStar c' (ga.map (IsCMField.complexConj E))).toLinearMap ∘ₗ io') := by
+    have : io' ∘ₗ rhoM c' (fun t => embF c' (pl t)) lam ga
+        = incF c c' hle (cga ga)
+          • ((Formalism.L2.Pj.gaStar c' (ga.map (IsCMField.complexConj E))).toLinearMap
+            ∘ₗ io') := by
       refine (bVV c'.F lam).ext fun i => ?_
       obtain ⟨u, hu⟩ := hbas i
       rw [hu]
@@ -346,13 +419,14 @@ theorem exists_ioLFRec_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
   · rw [hup, h7, ← pG_map]
   · intro P hP
     have h9 : ∀ i, ∃ v ∈ nab0M c (fun t => embF c (pl t)) lam, io v = cf (φ i) P := fun i =>
-      h8 ⟨cf_mem_HHa (incF c c' hle) (hφ i) hP.1, fun m => by rw [coeff_cf]; exact hint i _ (hP.2 m)⟩
+      h8
+        ⟨cf_mem_HHa (incF c c' hle) (hφ i) hP.1, fun m => by rw [coeff_cf]; exact hint i _ (hP.2 m)⟩
     choose v hv hv' using h9
     set_option synthInstance.maxHeartbeats 100000 in
-      refine ⟨∑ i, (e i : c'.F) • up (v i), ?_, ?_⟩
-      · refine Submodule.sum_mem _ fun i _ => ?_
-        exact Submodule.smul_mem _ (e i) ((m1 (up (v i))).2 (map_mem_nabStd _ lam ((n1 _).1 (hv i))))
-      · rw [eq_sum_cf (incF c c' hle) _ φ hsum P, map_sum]
-        simp only [map_smul, hup, hv']
+    refine ⟨∑ i, (e i : c'.F) • up (v i), ?_, ?_⟩
+    · refine Submodule.sum_mem _ fun i _ => ?_
+      exact Submodule.smul_mem _ (e i) ((m1 (up (v i))).2 (map_mem_nabStd _ lam ((n1 _).1 (hv i))))
+    · rw [eq_sum_cf (incF c c' hle) _ φ hsum P, map_sum]
+      simp only [map_smul, hup, hv']
 
 end GlobalTheory.IoExtend

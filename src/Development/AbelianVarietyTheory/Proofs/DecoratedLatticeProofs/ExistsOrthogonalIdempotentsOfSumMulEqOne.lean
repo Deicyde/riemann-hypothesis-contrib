@@ -10,26 +10,28 @@ namespace GlobalTheory.AdeleIdempotents
 
 open IsDedekindDomain NumberField
 
-def finiteComponent (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) :
-    AdeleRing (𝓞 F) F →+* v.adicCompletion F where
+def finiteComponent (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : AdeleRing (𝓞 F) F →+* v.adicCompletion F where
   toFun x := x.2 v
   map_one' := rfl
   map_mul' _ _ := rfl
   map_zero' := rfl
   map_add' _ _ := rfl
 
-def infiniteComponent (F : Type) [Field F] [NumberField F] (w : InfinitePlace F) :
-    AdeleRing (𝓞 F) F →+* w.Completion where
+def infiniteComponent (F : Type) [Field F] [NumberField F] (w : InfinitePlace F)
+    : AdeleRing (𝓞 F) F →+* w.Completion where
   toFun x := x.1 w
   map_one' := rfl
   map_mul' _ _ := rfl
   map_zero' := rfl
   map_add' _ _ := rfl
 
-theorem exists_orthogonal_idempotents_of_sum_mul_eq_one (F : Type) [Field F] [NumberField F]
-    (ι : Type) [Fintype ι] (f s : ι → AdeleRing (𝓞 F) F) (h : ∑ i, s i * f i = 1) :
-    ∃ e t : ι → AdeleRing (𝓞 F) F, ∑ i, e i = 1 ∧ (∀ i j, i ≠ j → e i * e j = 0) ∧
-      ∀ i, t i * f i = e i := by
+theorem exists_orthogonal_idempotents_of_sum_mul_eq_one
+    (F : Type) [Field F] [NumberField F]
+    (ι : Type) [Fintype ι]
+    (f s : ι → AdeleRing (𝓞 F) F) (h : ∑ i, s i * f i = 1)
+    : ∃ e t : ι → AdeleRing (𝓞 F) F,
+      ∑ i, e i = 1 ∧ (∀ i j, i ≠ j → e i * e j = 0) ∧ ∀ i, t i * f i = e i := by
   classical
   have hinf : ∀ w : InfinitePlace F, ∃ i, (s i).1 w * (f i).1 w ≠ 0 := by
     intro w
@@ -51,8 +53,8 @@ theorem exists_orthogonal_idempotents_of_sum_mul_eq_one (F : Type) [Field F] [Nu
       exact this
     by_contra hc
     push_neg at hc
-    have := Valuation.map_sum_lt (Valued.v) (s := Finset.univ) (g := 1) one_ne_zero
-      (fun i _ => hc i)
+    have :=
+      Valuation.map_sum_lt (Valued.v) (s := Finset.univ) (g := 1) one_ne_zero (fun i _ => hc i)
     rw [h1, map_one] at this
     exact lt_irrefl _ this
   choose a ha using hinf
@@ -62,27 +64,44 @@ theorem exists_orthogonal_idempotents_of_sum_mul_eq_one (F : Type) [Field F] [Nu
     have := hb v
     rw [h0, mul_zero, map_zero] at this
     exact absurd this (by simp)
-  refine ⟨fun i => (fun w => if a w = i then 1 else 0,
-      ⟨fun v => if b v = i then 1 else 0, Filter.Eventually.of_forall fun v => by
-        dsimp only
-        split_ifs
-        · exact one_mem _
-        · exact zero_mem _⟩),
-    fun i => (fun w => if a w = i then ((f i).1 w)⁻¹ else 0,
-      ⟨fun v => if b v = i then ((f i).2 v)⁻¹ else 0, (s i).2.2.mono fun v hv => by
-        dsimp only
-        split_ifs with hbi
-        · subst hbi
-          have hv' : Valued.v ((s (b v)).2 v) ≤ 1 := hv
-          change Valued.v ((f (b v)).2 v)⁻¹ ≤ 1
-          refine le_trans ?_ hv'
-          calc Valued.v ((f (b v)).2 v)⁻¹ = Valued.v ((f (b v)).2 v)⁻¹ * 1 := (mul_one _).symm
-            _ ≤ Valued.v ((f (b v)).2 v)⁻¹ * Valued.v ((s (b v)).2 v * (f (b v)).2 v) :=
-              mul_le_mul' le_rfl (hb v)
-            _ = Valued.v ((s (b v)).2 v) := by
-              rw [← map_mul, mul_comm ((s (b v)).2 v), ← mul_assoc, inv_mul_cancel₀ (hfv v),
-                one_mul]
-        · exact zero_mem _⟩), ?_, ?_, ?_⟩
+  refine ⟨
+    fun i => (
+      fun w => if a w = i then 1 else 0,
+      ⟨
+        fun v => if b v = i then 1 else 0,
+        Filter.Eventually.of_forall fun v => by
+          dsimp only
+          split_ifs
+          · exact one_mem _
+          · exact zero_mem _
+      ⟩
+    ),
+    fun i => (
+      fun w => if a w = i then ((f i).1 w)⁻¹ else 0,
+      ⟨
+        fun v => if b v = i then ((f i).2 v)⁻¹ else 0,
+        (s i).2.2.mono fun v hv => by
+          dsimp only
+          split_ifs with hbi
+          · subst hbi
+            have hv' : Valued.v ((s (b v)).2 v) ≤ 1 := hv
+            change Valued.v ((f (b v)).2 v)⁻¹ ≤ 1
+            refine le_trans ?_ hv'
+            calc
+              Valued.v ((f (b v)).2 v)⁻¹
+                = Valued.v ((f (b v)).2 v)⁻¹ * 1 := (mul_one _).symm
+              _ ≤ Valued.v ((f (b v)).2 v)⁻¹ * Valued.v ((s (b v)).2 v * (f (b v)).2 v) :=
+                mul_le_mul' le_rfl (hb v)
+              _ = Valued.v ((s (b v)).2 v) := by
+                rw [← map_mul, mul_comm ((s (b v)).2 v), ← mul_assoc, inv_mul_cancel₀ (hfv v),
+                  one_mul]
+          · exact zero_mem _
+      ⟩
+    ),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · refine Prod.ext (funext fun w => ?_) (FiniteAdeleRing.ext _ fun v => ?_)
     · refine (map_sum (infiniteComponent F w) _ _).trans ?_
       change ∑ i, (if a w = i then (1 : w.Completion) else 0) = 1

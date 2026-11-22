@@ -4,13 +4,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Differentiab
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization GlobalTheory.WeightTwoSum
+open NumberField IsDedekindDomain GlobalTheory.CMVal
+  GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates
+  GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization GlobalTheory.WeightTwoSum
 open scoped ContDiff nonZeroDivisors
 
 namespace GlobalTheory.CMTypeRealEmb
 
-theorem comp_isReal {E : Type} [Field E] [NumberField E] [IsCMField E] (φ : E →+* ℂ) :
-    ComplexEmbedding.IsReal (φ.comp (algebraMap (maximalRealSubfield E) E)) := by
+theorem comp_isReal {E : Type} [Field E] [NumberField E] [IsCMField E] (φ : E →+* ℂ)
+    : ComplexEmbedding.IsReal (φ.comp (algebraMap (maximalRealSubfield E) E)) := by
   rw [ComplexEmbedding.isReal_iff]
   ext a
   simp only [ComplexEmbedding.conjugate_coe_eq, RingHom.coe_comp, Function.comp_apply]
@@ -18,16 +20,17 @@ theorem comp_isReal {E : Type} [Field E] [NumberField E] [IsCMField E] (φ : E �
   congr 1
   exact IsCMField.complexConj_apply_eq_self E a
 
-theorem exists_equiv (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Type) [Fintype I]
-    (φ : I → E →+* ℂ) (hφ : IsCMType φ) :
-    ∃ e : I ≃ Emb (maximalRealSubfield E), ∀ (i : I) (a : maximalRealSubfield E),
+theorem exists_equiv
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (I : Type) [Fintype I]
+    (φ : I → E →+* ℂ) (hφ : IsCMType φ)
+    : ∃ e : I ≃ Emb (maximalRealSubfield E), ∀ (i : I) (a : maximalRealSubfield E),
       φ i (a : E) = ((e i a : ℝ) : ℂ) := by
   set F := maximalRealSubfield E
   let ψ : I → F →+* ℂ := fun i => (φ i).comp (algebraMap F E)
   have hre : ∀ i, ComplexEmbedding.IsReal (ψ i) := fun i => comp_isReal (φ i)
   let e : I → Emb F := fun i => (hre i).embedding
-  have he : ∀ i a, ((e i a : ℝ) : ℂ) = φ i (a : E) := fun i a =>
-    (hre i).coe_embedding_apply a
+  have he : ∀ i a, ((e i a : ℝ) : ℂ) = φ i (a : E) := fun i a => (hre i).coe_embedding_apply a
   have hplace : ∀ i, (InfinitePlace.mk (φ i)).comap (algebraMap F E) = InfinitePlace.mk (ψ i) :=
     fun i => InfinitePlace.comap_mk _ _
   refine ⟨Equiv.ofBijective e ⟨?_, ?_⟩, fun i a => (he i a).symm⟩

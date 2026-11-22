@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsEmbeddi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 open GlobalTheory.ZM.NearBuild
@@ -25,11 +27,13 @@ open GlobalTheory.ZM.NearBuild
 noncomputable section
 namespace GlobalTheory.ZM.GoodFibre
 
-theorem spMap_id (R : Type) [CommRing R] : spMap (RingHom.id R) = 𝟙 (Sp R) := by
-  simp [spMap, Sp]
+theorem spMap_id (R : Type) [CommRing R] : spMap (RingHom.id R) = 𝟙 (Sp R) := by simp [spMap, Sp]
 
-theorem exists_retraction {K R' : Type} [Field K] [CommRing R'] (φ : K →+* R') (hφ : IsOpenImmersion (spMap φ))
-    (p : Sp K) (hp : p ∈ Set.range (spMap φ)) : ∃ ψ : R' →+* K, ψ.comp φ = RingHom.id K := by
+theorem exists_retraction
+    {K R' : Type} [Field K] [CommRing R']
+    (φ : K →+* R') (hφ : IsOpenImmersion (spMap φ))
+    (p : Sp K) (hp : p ∈ Set.range (spMap φ))
+    : ∃ ψ : R' →+* K, ψ.comp φ = RingHom.id K := by
   have hsurj : Function.Surjective (spMap φ) := by
     intro q
     obtain ⟨r, hr⟩ := hp
@@ -45,29 +49,47 @@ theorem exists_retraction {K R' : Type} [Field K] [CommRing R'] (φ : K →+* R'
   ext a
   exact congrArg (fun f => f.hom a) this
 
-theorem secCoord_of_local {X : Scheme.{0}} {M : LB X} (hM : M.IsLB) {I : Type} {th : I → M.Sec} {K R' : Type} [Field K]
-    [CommRing R'] {y : Sp K ⟶ X} {v : I → K} (φ : K →+* R') (hφ : IsOpenImmersion (spMap φ)) (p : Sp K)
-    (hp : p ∈ Set.range (spMap φ)) (h : SecCoord M th (spMap φ ≫ y) (fun i => φ (v i))) : SecCoord M th y v := by
+theorem secCoord_of_local
+    {X : Scheme.{0}} {M : LB X} (hM : M.IsLB)
+    {I : Type} {th : I → M.Sec} {K R' : Type} [Field K] [CommRing R']
+    {y : Sp K ⟶ X} {v : I → K}
+    (φ : K →+* R') (hφ : IsOpenImmersion (spMap φ))
+    (p : Sp K) (hp : p ∈ Set.range (spMap φ))
+    (h : SecCoord M th (spMap φ ≫ y) (fun i => φ (v i)))
+    : SecCoord M th y v := by
   obtain ⟨ψ, hψ⟩ := exists_retraction φ hφ p hp
   have h' := GlobalTheory.ZM.Coord.baseChange h ψ
   have e1 : spMap ψ ≫ spMap φ ≫ y = y := by
     rw [← Category.assoc, GlobalTheory.ZM.spMap_comp_ringHom_comp, hψ, spMap_id, Category.id_comp]
-  have e2 : (fun i => ψ (φ (v i))) = v :=
-    funext fun i => congrArg (fun f : K →+* K => f (v i)) hψ
+  have e2 : (fun i => ψ (φ (v i))) = v := funext fun i => congrArg (fun f : K →+* K => f (v i)) hψ
   rw [e1, e2] at h'
   exact h'
 
-theorem span_theta (l1 : Out.Laws) (l2 : Out.Laws2) {o : Type} [CommRing o] {g N' : ℕ} {J : Type} {b : TBase o (N' ^ 2)}
-    {K : Type} [Field K] {s : Sp K ⟶ Sp o} (t : TObj g (N' ^ 2) J b s) (n : ℕ) (v : Ix g (N' ^ 2) → K)
-    (h2 : 2 ≤ n) (hn : n ∣ N') (hth : t.HasTh (𝟙 _) v) : Ideal.span (Set.range v) = ⊤ := by
+theorem span_theta
+    (l1 : Out.Laws) (l2 : Out.Laws2)
+    {o : Type} [CommRing o]
+    {g N' : ℕ} {J : Type} {b : TBase o (N' ^ 2)} {K : Type} [Field K]
+    {s : Sp K ⟶ Sp o} (t : TObj g (N' ^ 2) J b s)
+    (n : ℕ) (v : Ix g (N' ^ 2) → K) (h2 : 2 ≤ n) (hn : n ∣ N') (hth : t.HasTh (𝟙 _) v)
+    : Ideal.span (Set.range v) = ⊤ := by
   by_contra hne
   obtain ⟨q, hq, hle⟩ := Ideal.exists_le_maximal _ hne
-  have hc := GlobalTheory.coset_of_hasTh l1 l2 o g N' J b (Sp K) s t n K (𝟙 _) v q h2 hn hth hq.isPrime
+  have hc :=
+    GlobalTheory.coset_of_hasTh l1 l2 o g N' J b (Sp K) s t n K (𝟙 _) v q h2 hn hth hq.isPrime
   unfold Coset at hc
   obtain ⟨c, hc⟩ := hc 0
   exact hc (hle (Ideal.subset_span ⟨_, rfl⟩))
 
-theorem exists_fibData : Out.Laws → Out.Laws2 → ∀ (g : ℕ) (J : Type) [Finite J] (Mat : J → Matrix (Fin (2 * g)) (Fin (2 * g)) ℤ) (κ n : ℕ), n.Prime → Odd n → ∃ j₀ : ℕ, ∀ j ≥ j₀, ∀ (o : Type) [CommRing o] (b : TBase o ((n ^ j) ^ 2)) (R : Type) [CommRing R] (β : o →+* R) (v : Ix g ((n ^ j) ^ 2) → R), ∃ (p : Ix g ((n ^ j) ^ 2) → Ix g ((n ^ j) ^ 2) → R) (Hh : Type) (_ : Finite Hh) (hh : Hh → Ix g ((n ^ j) ^ 2)) (Q : Polynomial ℚ) (d : ℕ), FibData b Mat κ β v (n ^ 2) p hh Q d := by
+theorem exists_fibData
+    : Out.Laws → Out.Laws2
+      → ∀ (g : ℕ) (J : Type) [Finite J] (Mat : J → Matrix (Fin (2 * g)) (Fin (2 * g)) ℤ) (κ n : ℕ),
+        n.Prime → Odd n
+          → ∃ j₀ : ℕ, ∀ j ≥ j₀,
+            ∀ (o : Type) [CommRing o] (b : TBase o ((n ^ j) ^ 2)) (R : Type) [CommRing R]
+                (β : o →+* R) (v : Ix g ((n ^ j) ^ 2) → R),
+              ∃ (p : Ix g ((n ^ j) ^ 2) → Ix g ((n ^ j) ^ 2) → R) (Hh : Type) (_ : Finite Hh)
+                  (hh : Hh → Ix g ((n ^ j) ^ 2)) (Q : Polynomial ℚ) (d : ℕ),
+                FibData b Mat κ β v (n ^ 2) p hh Q d := by
   intro l1 l2 g J _ Mat κ n hn hodd
   obtain ⟨j₁, hj₁⟩ := GlobalTheory.cutBy_embedded_abelian l1 l2 g J Mat κ n hn hodd
   refine ⟨max j₁ 4, fun j hj o _ b R _ β v => ?_⟩
@@ -86,22 +108,33 @@ theorem exists_fibData : Out.Laws → Out.Laws2 → ∀ (g : ℕ) (J : Type) [Fi
   obtain ⟨hs, -, hth⟩ := hgood
   rw [GlobalTheory.ZM.spMap_comp_ringHom_comp] at hs
   subst hs
-  obtain ⟨σ, hemb, hproj⟩ := GlobalTheory.T.exists_embeddingSections_over_field l1 l2 o g (n ^ j) J b K _ t (n ^ 2) (fun a => x (v a)) hdvd2 htwo hth
-  have hLB := (GlobalTheory.T.thetaSections_veryAmple_periodic l1 l2 o g (n ^ j) J b K (x.comp β) t (n ^ 2) σ hoddN hdvd htwo hemb).2.1
+  obtain ⟨σ, hemb, hproj⟩ :=
+    GlobalTheory.T.exists_embeddingSections_over_field l1 l2 o g (n ^ j) J b K _ t (n ^ 2)
+      (fun a => x (v a))
+      hdvd2 htwo hth
+  have hLB :=
+    (GlobalTheory.T.thetaSections_veryAmple_periodic l1 l2 o g (n ^ j) J b K (x.comp β) t (n ^ 2) σ
+      hoddN hdvd htwo hemb).2.1
   have hspan : Ideal.span (Set.range fun a => x (v a)) = ⊤ :=
     span_theta l1 l2 t n (fun a => x (v a)) hn.two_le (dvd_pow_self n (by omega)) hth
-  have hsec : ∀ h, SecCoord _ σ (lift (𝟙 (Over.mk (𝟙 (Sp K)))) (t.lab h ^ n ^ j)).left
-      (fun a => x (β (b.ζ ^ e a h : oˣ) * v (idx a h))) := by
+  have hsec
+      : ∀ h,
+        SecCoord _ σ (lift (𝟙 (Over.mk (𝟙 (Sp K)))) (t.lab h ^ n ^ j)).left
+          (fun a => x (β (b.ζ ^ e a h : oˣ) * v (idx a h))) := by
     intro h
-    have hy : ((Over.homMk (𝟙 (Sp K)) (by simp) : Over.mk (𝟙 (Sp K)) ⟶ Out.baseOver (Sp K)) ≫ t.lab h)
-        = t.lab h := by
+    have hy
+        : ((Over.homMk (𝟙 (Sp K)) (by simp) : Over.mk (𝟙 (Sp K)) ⟶ Out.baseOver (Sp K)) ≫ t.lab h)
+          = t.lab h := by
       ext
       simp
-    obtain ⟨R', _, φ, hφ, hp, hc⟩ := hto o J b (Sp K) _ t K (x.comp β) (𝟙 _) (fun a => x (v a)) σ
-      (Category.id_comp _) hth hspan hemb h _ (by rw [hy]) (IsLocalRing.closedPoint K)
+    obtain ⟨R', _, φ, hφ, hp, hc⟩ :=
+      hto o J b (Sp K) _ t K (x.comp β) (𝟙 _)
+        (fun a => x (v a))
+        σ (Category.id_comp _) hth hspan hemb h _ (by rw [hy]) (IsLocalRing.closedPoint K)
     have key := secCoord_of_local hLB φ hφ _ hp hc
-    have hv : (fun a => x (β (b.ζ ^ e a h : oˣ) * v (idx a h)))
-        = (fun a => (x.comp β) (b.ζ ^ e a h : oˣ) * x (v (idx a h))) := by
+    have hv
+        : (fun a => x (β (b.ζ ^ e a h : oˣ) * v (idx a h)))
+          = (fun a => (x.comp β) (b.ζ ^ e a h : oˣ) * x (v (idx a h))) := by
       funext a
       simp
     rw [hv]

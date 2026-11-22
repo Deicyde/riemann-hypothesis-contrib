@@ -6,7 +6,10 @@ public import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.Star
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Matrix GlobalTheory.FockCompare GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Matrix GlobalTheory.FockCompare
+  GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
 open scoped TensorProduct ContDiff ComplexOrder
 
 namespace GlobalTheory.FockCompare.CartanRel
@@ -17,11 +20,14 @@ theorem J_mul_J (p q : ℕ) : Formalism.UG.Jpq p q * Formalism.UG.Jpq p q = 1 :=
 theorem J_conjTranspose (p q : ℕ) : (Formalism.UG.Jpq p q)ᴴ = Formalism.UG.Jpq p q := by
   simp [Formalism.UG.Jpq, Matrix.fromBlocks_conjTranspose]
 
-theorem isKC_iff {p q : ℕ} (b : Mat p q) : IsKC b ↔ b * Formalism.UG.Jpq p q = Formalism.UG.Jpq p q * b := by
-  have hJ : Formalism.UG.Jpq p q = Matrix.diagonal (Sum.elim (fun _ => (1 : ℂ)) (fun _ => (-1 : ℂ))) := by
+theorem isKC_iff {p q : ℕ} (b : Mat p q)
+    : IsKC b ↔ b * Formalism.UG.Jpq p q = Formalism.UG.Jpq p q * b := by
+  have hJ
+      : Formalism.UG.Jpq p q
+        = Matrix.diagonal (Sum.elim (fun _ => (1 : ℂ)) (fun _ => (-1 : ℂ))) := by
     ext i j
-    rcases i with i | i <;> rcases j with j | j <;>
-      simp [Formalism.UG.Jpq, Matrix.diagonal_apply, Matrix.one_apply]
+    rcases i with i | i <;> rcases j with j | j
+      <;> simp [Formalism.UG.Jpq, Matrix.diagonal_apply, Matrix.one_apply]
     split_ifs <;> simp
   rw [hJ]
   constructor
@@ -44,7 +50,14 @@ theorem isKC_iff {p q : ℕ} (b : Mat p q) : IsKC b ↔ b * Formalism.UG.Jpq p q
       linear_combination (1 / 2 : ℂ) * e
     · simp [sameBlock] at hij
 
-theorem cartan_rel : ∀ (n p q : ℕ), p + q = n → ∀ (A : Matrix (Fin p ⊕ Fin q) (Fin n) ℂ) (G t : Matrix (Fin n) (Fin n) ℂ), G.det ≠ 0 → Aᴴ * Formalism.UG.Jpq p q * A = G → Formalism.UG.Jpq p q * A = A * t → IsCart G t ∧ ∀ g : Matrix (Fin n) (Fin n) ℂ, (∃ b : Mat p q, IsKC b ∧ b * A = A * g) ↔ Commute g t := by
+theorem cartan_rel
+    : ∀ (n p q : ℕ),
+      p + q = n
+        → ∀ (A : Matrix (Fin p ⊕ Fin q) (Fin n) ℂ) (G t : Matrix (Fin n) (Fin n) ℂ),
+          G.det ≠ 0 → Aᴴ * Formalism.UG.Jpq p q * A = G → Formalism.UG.Jpq p q * A = A * t
+            → IsCart G t
+              ∧ ∀ g : Matrix (Fin n) (Fin n) ℂ,
+                (∃ b : Mat p q, IsKC b ∧ b * A = A * g) ↔ Commute g t := by
   intro n p q hn A G t hG hA ht
   have hJ := J_mul_J p q
   have hJc := J_conjTranspose p q
@@ -58,8 +71,7 @@ theorem cartan_rel : ∀ (n p q : ℕ), p + q = n → ∀ (A : Matrix (Fin p ⊕
     have := congrArg (B * ·) h
     simpa only [← Matrix.mul_assoc, hBA, Matrix.one_mul] using this
   have hJJ : J * (J * A) = A := by rw [← Matrix.mul_assoc, hJ, Matrix.one_mul]
-  have hGt : G * t = Aᴴ * A := by
-    rw [← hA, Matrix.mul_assoc, ← ht, Matrix.mul_assoc, hJJ]
+  have hGt : G * t = Aᴴ * A := by rw [← hA, Matrix.mul_assoc, ← ht, Matrix.mul_assoc, hJJ]
   refine ⟨⟨?_, ?_, ?_⟩, fun g => ⟨?_, ?_⟩⟩
   · apply cancel
     rw [← Matrix.mul_assoc, ← ht, Matrix.mul_assoc, ← ht, hJJ, Matrix.mul_one]
@@ -73,18 +85,22 @@ theorem cartan_rel : ∀ (n p q : ℕ), p + q = n → ∀ (A : Matrix (Fin p ⊕
   · rintro ⟨b, hb, hbA⟩
     rw [isKC_iff, hJdef] at hb
     apply cancel
-    calc A * (g * t) = b * (J * A) := by rw [← Matrix.mul_assoc, ← hbA, Matrix.mul_assoc, ← ht]
+    calc
+      A * (g * t)
+        = b * (J * A) := by rw [← Matrix.mul_assoc, ← hbA, Matrix.mul_assoc, ← ht]
       _ = J * (A * g) := by rw [← Matrix.mul_assoc, hb, Matrix.mul_assoc, hbA]
       _ = A * (t * g) := by rw [← Matrix.mul_assoc, ht, Matrix.mul_assoc]
   · intro h
     refine ⟨A * g * B, ?_, ?_⟩
     · rw [isKC_iff, hJdef]
       have hBJ : B * J = t * B := by
-        calc B * J = B * (J * A) * B := by
-              rw [Matrix.mul_assoc, Matrix.mul_assoc, hAB, Matrix.mul_one]
+        calc
+          B * J
+            = B * (J * A) * B := by rw [Matrix.mul_assoc, Matrix.mul_assoc, hAB, Matrix.mul_one]
           _ = t * B := by rw [ht, ← Matrix.mul_assoc, hBA, Matrix.one_mul]
-      calc A * g * B * J = A * (g * t) * B := by
-            rw [Matrix.mul_assoc, hBJ]; simp only [Matrix.mul_assoc]
+      calc
+        A * g * B * J
+          = A * (g * t) * B := by rw [Matrix.mul_assoc, hBJ]; simp only [Matrix.mul_assoc]
         _ = A * t * (g * B) := by rw [h.eq]; simp only [Matrix.mul_assoc]
         _ = J * (A * g * B) := by rw [← ht]; simp only [Matrix.mul_assoc]
     · rw [Matrix.mul_assoc, hBA, Matrix.mul_one]

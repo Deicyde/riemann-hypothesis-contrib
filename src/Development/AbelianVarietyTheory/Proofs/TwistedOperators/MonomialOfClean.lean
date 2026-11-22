@@ -5,16 +5,19 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.EvAtParab
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.CuspidalSupportClasses GlobalTheory.TypeDim ValuativeRel
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.CuspidalSupportClasses GlobalTheory.TypeDim ValuativeRel
 open scoped TensorProduct
 
 namespace GlobalTheory.TypeDim.IwahoriBruhat
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-theorem exists_unipLevel (A : Matrix (Fin n) (Fin n) k) (h1 : ∀ i j, valuation k (A i j) ≤ 1)
-    (h2 : ∀ i j, j < i → valuation k (A i j) < 1) (h3 : ∀ i, A i i = 1) :
-    ∃ u : unipLevel k n, (incl k n u).val = A := by
+theorem exists_unipLevel
+    (A : Matrix (Fin n) (Fin n) k) (h1 : ∀ i j, valuation k (A i j) ≤ 1)
+    (h2 : ∀ i j, j < i → valuation k (A i j) < 1) (h3 : ∀ i, A i i = 1)
+    : ∃ u : unipLevel k n, (incl k n u).val = A := by
   let B : Matrix (Fin n) (Fin n) 𝒪[k] := fun i j => ⟨A i j, h1 i j⟩
   have hres0 : ∀ x : 𝒪[k], IsLocalRing.residue 𝒪[k] x = 0 ↔ valuation k (x : k) < 1 := by
     intro x
@@ -48,8 +51,9 @@ theorem exists_ne_zero (g : GL (Fin n) k) (i : Fin n) : ∃ j, g.val i j ≠ 0 :
 def Clean (g : Matrix (Fin n) (Fin n) k) (i : Fin n) : Prop :=
   ∃ j, (∀ j', j' ≠ j → g i j' = 0) ∧ ∀ i', i' ≠ i → g i' j = 0
 
-theorem monomial_of_clean (g : GL (Fin n) k) (h : ∀ i, Clean g.val i) :
-    ∃ (w : Equiv.Perm (Fin n)) (c : Fin n → kˣ), g = GlobalTheory.Parabolic.permGL (k := k) w * diagT k (Fin n) c := by
+theorem monomial_of_clean (g : GL (Fin n) k) (h : ∀ i, Clean g.val i)
+    : ∃ (w : Equiv.Perm (Fin n)) (c : Fin n → kˣ),
+      g = GlobalTheory.Parabolic.permGL (k := k) w * diagT k (Fin n) c := by
   choose p hrow hcol using h
   have hp : ∀ i, g.val i (p i) ≠ 0 := by
     intro i hz
@@ -64,11 +68,17 @@ theorem monomial_of_clean (g : GL (Fin n) k) (h : ∀ i, Clean g.val i) :
     exact hp i' (by rw [← hii']; exact hcol i i' (Ne.symm hne))
   let e : Fin n ≃ Fin n := Equiv.ofBijective p (Finite.injective_iff_bijective.mp hinj)
   have he : ∀ b, p (e.symm b) = b := fun b => e.apply_symm_apply b
-  refine ⟨e.symm, fun b => Units.mk0 (g.val (e.symm b) b) (by
-    have := hp (e.symm b)
-    rwa [he b] at this), ?_⟩
+  refine ⟨
+    e.symm,
+    fun b =>
+      Units.mk0 (g.val (e.symm b) b) (by
+        have := hp (e.symm b)
+        rwa [he b] at this),
+    ?_
+  ⟩
   ext a b
-  rw [Units.val_mul, GlobalTheory.SmGL.val_diagT, Matrix.mul_diagonal, GlobalTheory.Parabolic.permGL_apply]
+  rw [Units.val_mul, GlobalTheory.SmGL.val_diagT, Matrix.mul_diagonal,
+    GlobalTheory.Parabolic.permGL_apply]
   by_cases hab : a = e.symm b
   · rw [if_pos hab, one_mul, Units.val_mk0, hab]
   · rw [if_neg hab, zero_mul]
@@ -100,9 +110,10 @@ private lemma mul_one_add_row_apply (H : Matrix (Fin n) (Fin n) k) (y : Fin n �
   · intro h
     exact absurd (Finset.mem_univ j₀) h
 
-theorem step (g : GL (Fin n) k) (S : Finset (Fin n)) (hS : ∀ i ∈ S, Clean g.val i) (hne : (Sᶜ).Nonempty) :
-    ∃ (u u' : unipLevel k n) (i₀ : Fin n), i₀ ∉ S ∧
-      ∀ i ∈ insert i₀ S, Clean (incl k n u * g * incl k n u').val i := by
+theorem step
+    (g : GL (Fin n) k) (S : Finset (Fin n)) (hS : ∀ i ∈ S, Clean g.val i) (hne : (Sᶜ).Nonempty)
+    : ∃ (u u' : unipLevel k n) (i₀ : Fin n),
+      i₀ ∉ S ∧ ∀ i ∈ insert i₀ S, Clean (incl k n u * g * incl k n u').val i := by
   classical
   set G : Matrix (Fin n) (Fin n) k := g.val with hG
   set D : Finset (Fin n) := Finset.univ.filter (fun j => ∀ i ∈ S, G i j = 0) with hD
@@ -147,14 +158,15 @@ theorem step (g : GL (Fin n) k) (S : Finset (Fin n)) (hS : ∀ i ∈ S, Clean g.
   obtain ⟨⟨hi₀, hj'D⟩, hj'M⟩ := hq'T
   have hD' : (D.filter (fun j => valuation k (G i₀ j) = M)).Nonempty :=
     ⟨j', Finset.mem_filter.2 ⟨hj'D, hj'M⟩⟩
-  obtain ⟨j₀, hj₀', hj₀min⟩ := (D.filter (fun j => valuation k (G i₀ j) = M)).exists_min_image id hD'
+  obtain ⟨j₀, hj₀', hj₀min⟩ :=
+    (D.filter (fun j => valuation k (G i₀ j) = M)).exists_min_image id hD'
   rw [Finset.mem_filter] at hj₀'
   obtain ⟨hj₀, hpiv⟩ := hj₀'
   have hlow : ∀ i, i ∉ S → i₀ < i → valuation k (G i j₀) < M := by
     intro i hi hlt
     refine lt_of_le_of_ne (hmax i hi j₀ hj₀) (fun heq => ?_)
-    have h1 := hq'max (i, j₀)
-      (Finset.mem_filter.2 ⟨Finset.mem_product.2 ⟨Finset.mem_compl.2 hi, hj₀⟩, heq⟩)
+    have h1 :=
+      hq'max (i, j₀) (Finset.mem_filter.2 ⟨Finset.mem_product.2 ⟨Finset.mem_compl.2 hi, hj₀⟩, heq⟩)
     exact absurd hlt (not_lt.2 h1)
   have hleft : ∀ j ∈ D, j < j₀ → valuation k (G i₀ j) < M := by
     intro j hj hlt
@@ -318,9 +330,12 @@ theorem step (g : GL (Fin n) k) (S : Finset (Fin n)) (hS : ∀ i ∈ S, Clean g.
     · rw [hF, hy0 c (Or.inl hcD), mul_zero, add_zero, hH, hcol i' hi', hcol i₀ (Ne.symm hii₀),
         mul_zero, add_zero]
 
-theorem aux (m : ℕ) : ∀ (g : GL (Fin n) k) (S : Finset (Fin n)), (∀ i ∈ S, Clean g.val i) → (Sᶜ).card = m →
-    ∃ (j j' : unipLevel k n) (w : Equiv.Perm (Fin n)) (c : Fin n → kˣ),
-      g = incl k n j * (GlobalTheory.Parabolic.permGL (k := k) w * diagT k (Fin n) c) * incl k n j' := by
+theorem aux (m : ℕ)
+    : ∀ (g : GL (Fin n) k) (S : Finset (Fin n)),
+      (∀ i ∈ S, Clean g.val i) → (Sᶜ).card = m
+        → ∃ (j j' : unipLevel k n) (w : Equiv.Perm (Fin n)) (c : Fin n → kˣ),
+          g = incl k n j * (GlobalTheory.Parabolic.permGL (k := k) w * diagT k (Fin n) c)
+            * incl k n j' := by
   induction m with
   | zero =>
     intro g S hS hc
@@ -348,9 +363,12 @@ theorem aux (m : ℕ) : ∀ (g : GL (Fin n) k) (S : Finset (Fin n)), (∀ i ∈ 
     simp only [Subgroup.coe_mul, Subgroup.coe_inv, map_mul, map_inv]
     group
 
-theorem iwahori_bruhat : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (n : ℕ) (g : GL (Fin n) k), ∃ (j j' : unipLevel k n) (w : Equiv.Perm (Fin n)) (c : Fin n → kˣ),
-      g = incl k n j * (GlobalTheory.Parabolic.permGL (k := k) w * diagT k (Fin n) c) * incl k n j' := by
+theorem iwahori_bruhat
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (g : GL (Fin n) k),
+      ∃ (j j' : unipLevel k n) (w : Equiv.Perm (Fin n)) (c : Fin n → kˣ),
+        g = incl k n j * (GlobalTheory.Parabolic.permGL (k := k) w * diagT k (Fin n) c)
+          * incl k n j' := by
   intro k _ _ _ _ n g
   exact aux n g ∅ (by simp) (by simp)
 

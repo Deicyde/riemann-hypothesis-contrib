@@ -8,19 +8,21 @@ open MeasureTheory
 
 namespace GlobalTheory.CompanionTheory.BigCell
 
-theorem prod_coordinate_bumps :
-    ∀ (G A ι : Type) [AddCommGroup G] [TopologicalSpace G] [AddCommGroup A] [TopologicalSpace A]
-      [T2Space A] [Fintype ι] (e : G ≃ₜ+ (ι → A)) (ρ : ℕ → A → ℝ),
-      (∀ k, Continuous (ρ k) ∧ HasCompactSupport (ρ k) ∧ ∀ y, 0 ≤ ρ k y) →
-      Filter.Tendsto (fun k => tsupport (ρ k)) Filter.atTop (nhds (0 : A)).smallSets →
-      (∀ k, Continuous (fun T : G => ∏ i, ρ k (e T i)) ∧
-        HasCompactSupport (fun T : G => ∏ i, ρ k (e T i)) ∧
-        ∀ T : G, 0 ≤ ∏ i, ρ k (e T i)) ∧
-      Filter.Tendsto (fun k => tsupport (fun T : G => ∏ i, ρ k (e T i))) Filter.atTop
-        (nhds (0 : G)).smallSets := by
+theorem prod_coordinate_bumps
+    : ∀ (G A ι : Type) [AddCommGroup G] [TopologicalSpace G] [AddCommGroup A] [TopologicalSpace A]
+        [T2Space A] [Fintype ι] (e : G ≃ₜ+ (ι → A)) (ρ : ℕ → A → ℝ),
+      (∀ k, Continuous (ρ k) ∧ HasCompactSupport (ρ k) ∧ ∀ y, 0 ≤ ρ k y)
+        → Filter.Tendsto (fun k => tsupport (ρ k)) Filter.atTop (nhds (0 : A)).smallSets
+        → (∀ k,
+            Continuous (fun T : G => ∏ i, ρ k (e T i))
+              ∧ HasCompactSupport (fun T : G => ∏ i, ρ k (e T i)) ∧ ∀ T : G, 0 ≤ ∏ i, ρ k (e T i))
+          ∧ Filter.Tendsto
+            (fun k => tsupport (fun T : G => ∏ i, ρ k (e T i)))
+            Filter.atTop (nhds (0 : G)).smallSets := by
   intro G A ι _ _ _ _ _ _ e ρ hρ hlim
-  have hsub : ∀ k, tsupport (fun T : G => ∏ i, ρ k (e T i)) ⊆
-      e ⁻¹' (Set.univ.pi fun _ => tsupport (ρ k)) := by
+  have hsub
+      : ∀ k,
+        tsupport (fun T : G => ∏ i, ρ k (e T i)) ⊆ e ⁻¹' (Set.univ.pi fun _ => tsupport (ρ k)) := by
     intro k
     apply closure_minimal
     · intro T hT
@@ -31,7 +33,8 @@ theorem prod_coordinate_bumps :
       exact (Finset.prod_ne_zero_iff.mp hT) i (Finset.mem_univ i)
     · exact (isClosed_set_pi fun i _ => isClosed_tsupport (ρ k)).preimage (map_continuous e)
   refine ⟨fun k => ⟨?_, ?_, fun T => Finset.prod_nonneg fun i _ => (hρ k).2.2 _⟩, ?_⟩
-  · exact continuous_finsetProd _ fun i _ => (hρ k).1.comp ((continuous_apply i).comp (map_continuous e))
+  · exact continuous_finsetProd _ fun i _ =>
+      (hρ k).1.comp ((continuous_apply i).comp (map_continuous e))
   · have hS : IsCompact (e ⁻¹' (Set.univ.pi fun _ => tsupport (ρ k))) :=
       (Homeomorph.isCompact_preimage (e : G ≃ₜ (ι → A))).mpr (isCompact_univ_pi fun _ => (hρ k).2.1)
     exact IsCompact.of_isClosed_subset hS (isClosed_tsupport _) (hsub k)

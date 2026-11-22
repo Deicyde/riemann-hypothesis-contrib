@@ -118,20 +118,37 @@ end LatOnly
 
 theorem lattice_only : LatticeOnly := by
   intro L L' h
-  refine ⟨LatOnly.wZeta_eq h, LatOnly.wSigma_eq h, LatOnly.wEta_eq h, LatOnly.area_eq h,
-    LatOnly.quasiPeriodConst_eq h, LatOnly.sgStar_eq h, LatOnly.wp_eq h, ?_, ?_⟩
+  refine ⟨
+    LatOnly.wZeta_eq h,
+    LatOnly.wSigma_eq h,
+    LatOnly.wEta_eq h,
+    LatOnly.area_eq h,
+    LatOnly.quasiPeriodConst_eq h,
+    LatOnly.sgStar_eq h,
+    LatOnly.wp_eq h,
+    ?_,
+    ?_
+  ⟩
   · first
-      | simp only [PeriodPair.g₂, LatOnly.G_eq h]
-      | (unfold PeriodPair.g₂
-         rw [LatOnly.G_eq h])
-      | (unfold PeriodPair.g₂
-         done)
+    | simp only [PeriodPair.g₂, LatOnly.G_eq h]
+    | (
+        unfold PeriodPair.g₂
+        rw [LatOnly.G_eq h]
+      )
+    | (
+        unfold PeriodPair.g₂
+        done
+      )
   · first
-      | simp only [PeriodPair.g₃, LatOnly.G_eq h]
-      | (unfold PeriodPair.g₃
-         rw [LatOnly.G_eq h])
-      | (unfold PeriodPair.g₃
-         done)
+    | simp only [PeriodPair.g₃, LatOnly.G_eq h]
+    | (
+        unfold PeriodPair.g₃
+        rw [LatOnly.G_eq h]
+      )
+    | (
+        unfold PeriodPair.g₃
+        done
+      )
 
 namespace Homog
 
@@ -341,18 +358,36 @@ end Homog
 
 theorem homogeneity_thm : Homogeneity := by
   intro L c hc
-  refine ⟨Homog.mem_scale L c hc, Homog.wZeta_scale L c hc, Homog.wSigma_scale L c hc,
-    Homog.wp_scale L c hc, Homog.wEta_scale L c hc, Homog.area_scale L c hc, Homog.quasiPeriodConst_scale L c hc,
-    Homog.sgStar_scale L c hc, Homog.normalizedTheta_scale L c hc, ?_, ?_⟩
+  refine ⟨
+    Homog.mem_scale L c hc,
+    Homog.wZeta_scale L c hc,
+    Homog.wSigma_scale L c hc,
+    Homog.wp_scale L c hc,
+    Homog.wEta_scale L c hc,
+    Homog.area_scale L c hc,
+    Homog.quasiPeriodConst_scale L c hc,
+    Homog.sgStar_scale L c hc,
+    Homog.normalizedTheta_scale L c hc,
+    ?_,
+    ?_
+  ⟩
   · first
-      | (simp only [PeriodPair.g₂, Homog.G_scale L c hc]
-         ring)
-      | (unfold PeriodPair.g₂
-         done)
+    | (
+        simp only [PeriodPair.g₂, Homog.G_scale L c hc]
+        ring
+      )
+    | (
+        unfold PeriodPair.g₂
+        done
+      )
   · first
-      | (simp only [PeriodPair.g₃, Homog.G_scale L c hc]
-         ring)
-      | (unfold PeriodPair.g₃
-         done)
+    | (
+        simp only [PeriodPair.g₃, Homog.G_scale L c hc]
+        ring
+      )
+    | (
+        unfold PeriodPair.g₃
+        done
+      )
 
 end Formalism.L2.Th1.F

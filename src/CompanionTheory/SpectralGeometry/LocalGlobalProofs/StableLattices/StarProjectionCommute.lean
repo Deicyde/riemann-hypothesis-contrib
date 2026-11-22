@@ -13,28 +13,38 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.CyclicScalar
 
-theorem inner_map_map {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖) (g : G) (x y : H) :
-    ⟪σ g x, σ g y⟫_ℂ = ⟪x, y⟫_ℂ :=
+theorem inner_map_map
+    {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
+    (g : G) (x y : H)
+    : ⟪σ g x, σ g y⟫_ℂ = ⟪x, y⟫_ℂ :=
   (LinearIsometry.mk (σ g).toLinearMap (hσ g)).inner_map_map x y
 
-theorem map_inv_map {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : G →* (H →L[ℂ] H)) (g : G) (x : H) : σ g (σ g⁻¹ x) = x := by
+theorem map_inv_map
+    {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : G →* (H →L[ℂ] H)) (g : G) (x : H)
+    : σ g (σ g⁻¹ x) = x := by
   have h : σ g * σ g⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel, map_one]
   exact DFunLike.congr_fun h x
 
-theorem orthogonal_stable {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖) (U : Submodule ℂ H)
-    (hU : ∀ g, ∀ v ∈ U, σ g v ∈ U) (g : G) (v : H) (hv : v ∈ Uᗮ) : σ g v ∈ Uᗮ := by
+theorem orthogonal_stable
+    {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
+    (U : Submodule ℂ H) (hU : ∀ g, ∀ v ∈ U, σ g v ∈ U)
+    (g : G)
+    (v : H) (hv : v ∈ Uᗮ)
+    : σ g v ∈ Uᗮ := by
   rw [Submodule.mem_orthogonal] at hv ⊢
   intro u hu
   rw [← map_inv_map σ g u, inner_map_map σ hσ]
   exact hv _ (hU _ _ hu)
 
-theorem starProjection_commute {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖) (U : Submodule ℂ H)
-    [U.HasOrthogonalProjection] (hU : ∀ g, ∀ v ∈ U, σ g v ∈ U) (g : G) :
-    U.starProjection * σ g = σ g * U.starProjection := by
+theorem starProjection_commute
+    {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
+    (U : Submodule ℂ H) [U.HasOrthogonalProjection]
+    (hU : ∀ g, ∀ v ∈ U, σ g v ∈ U) (g : G)
+    : U.starProjection * σ g = σ g * U.starProjection := by
   ext v
   simp only [ContinuousLinearMap.mul_apply]
   have h1 : U.starProjection v ∈ U := Submodule.starProjection_apply_mem U v
@@ -44,10 +54,15 @@ theorem starProjection_commute {G H : Type} [Group G] [NormedAddCommGroup H] [In
   rw [h3, map_add (f := _), Submodule.starProjection_eq_self_iff.2 (hU g _ h1),
     (Submodule.starProjection_apply_eq_zero_iff U).2 (orthogonal_stable σ hσ U hU g _ h2), add_zero]
 
-theorem exists_isIrredSubrep : ∀ (G H : Type) [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : G →* (H →L[ℂ] H)),
-    (∀ g v, ‖σ g v‖ = ‖v‖) → ∀ (Q : Submodule ℂ H) (ξ : H), IsClosed (Q : Set H) → ξ ∈ Q → ξ ≠ 0 →
-    (∀ T : H →L[ℂ] H, (∀ g, T * σ g = σ g * T) → ∀ v ∈ Q, T v ∈ Q) →
-    (∀ g, ∃ c : ℂ, σ g ξ - c • ξ ∈ Qᗮ) → ∃ W, IsIrredSubrep σ W := by
+theorem exists_isIrredSubrep
+    : ∀ (G H : Type) [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        (σ : G →* (H →L[ℂ] H)),
+      (∀ g v, ‖σ g v‖ = ‖v‖)
+        → ∀ (Q : Submodule ℂ H) (ξ : H),
+          IsClosed (Q : Set H) → ξ ∈ Q → ξ ≠ 0
+            → (∀ T : H →L[ℂ] H, (∀ g, T * σ g = σ g * T) → ∀ v ∈ Q, T v ∈ Q)
+            → (∀ g, ∃ c : ℂ, σ g ξ - c • ξ ∈ Qᗮ)
+            → ∃ W, IsIrredSubrep σ W := by
   intro G H _ _ _ _ σ hσ Q ξ hQ hξQ hξ hcomm hscal
   haveI : CompleteSpace Q := hQ.completeSpace_coe
 
@@ -65,21 +80,24 @@ theorem exists_isIrredSubrep : ∀ (G H : Type) [Group G] [NormedAddCommGroup H]
     S.le_topologicalClosure (Submodule.subset_span ⟨g, rfl⟩)
   have hξW : ξ ∈ S.topologicalClosure := by simpa using horbit 1
 
-  have hmin : ∀ A : Submodule ℂ H, IsClosed (A : Set H) → (∀ g, σ g ξ ∈ A) → S.topologicalClosure ≤ A := by
+  have hmin
+      : ∀ A : Submodule ℂ H,
+        IsClosed (A : Set H) → (∀ g, σ g ξ ∈ A) → S.topologicalClosure ≤ A := by
     intro A hA h
     refine Submodule.topologicalClosure_minimal _ (Submodule.span_le.2 ?_) hA
     rintro _ ⟨g, rfl⟩
     exact h g
 
   have hline : ∀ w ∈ S.topologicalClosure, Q.starProjection w ∈ (ℂ ∙ ξ) := by
-    have hclosed : IsClosed (((ℂ ∙ ξ).comap (Q.starProjection : H →ₗ[ℂ] H) : Submodule ℂ H) : Set H) :=
+    have hclosed
+        : IsClosed (((ℂ ∙ ξ).comap (Q.starProjection : H →ₗ[ℂ] H) : Submodule ℂ H) : Set H) :=
       (Submodule.closed_of_finiteDimensional (ℂ ∙ ξ)).preimage Q.starProjection.continuous
     refine fun w hw => hmin _ hclosed (fun g => ?_) hw
     obtain ⟨c, hc⟩ := hscal g
     have e : σ g ξ = c • ξ + (σ g ξ - c • ξ) := by abel
     change Q.starProjection (σ g ξ) ∈ (ℂ ∙ ξ)
-    rw [e, map_add (f := _), (Submodule.starProjection_apply_eq_zero_iff Q).2 hc, add_zero, map_smul,
-      Submodule.starProjection_eq_self_iff.2 hξQ]
+    rw [e, map_add (f := _), (Submodule.starProjection_apply_eq_zero_iff Q).2 hc, add_zero,
+      map_smul, Submodule.starProjection_eq_self_iff.2 hξQ]
     exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self ξ)
   refine ⟨S.topologicalClosure, hW, fun h => hξ (by simpa [h] using hξW), fun U hUW hU => ?_⟩
   haveI : CompleteSpace U := hU.1.completeSpace_coe
@@ -112,7 +130,8 @@ theorem exists_isIrredSubrep : ∀ (G H : Type) [Group G] [NormedAddCommGroup H]
   · right
     have hξU : ξ ∈ U := by
       rw [one_smul] at hc
-      rw [hc]; exact hPU
+      rw [hc]
+      exact hPU
     exact le_antisymm hUW (hmin _ hU.1 fun g => hU.2 g ξ hξU)
 
 end GlobalTheory.CompanionTheory.CyclicScalar

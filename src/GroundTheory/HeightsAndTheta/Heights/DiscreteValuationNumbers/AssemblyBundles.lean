@@ -65,12 +65,14 @@ theorem AvoidingFormExists.full : AvoidingFormExists.Statement.{u} := AvoidingFo
 theorem HorizontalAvoidingForm.full : HorizontalAvoidingForm.Statement.{u} :=
   HorizontalAvoidingForm.proof
 
-theorem LeftSideAdditiveInDegree.full : LeftSideAdditiveInDegree.Statement.{u} := LeftSideAdditiveInDegree.proof
+theorem LeftSideAdditiveInDegree.full : LeftSideAdditiveInDegree.Statement.{u} :=
+  LeftSideAdditiveInDegree.proof
 
 theorem RightSideMultiplicativeInForm.full : RightSideMultiplicativeInForm.Statement.{u} :=
   RightSideMultiplicativeInForm.proof DivCycleMul.full DivCycleFiniteSupport.full
 
-theorem CommonFactorRemoval.full : CommonFactorRemoval.Statement.{u} := CommonFactorRemoval.proof DivCycleMul.full
+theorem CommonFactorRemoval.full : CommonFactorRemoval.Statement.{u} :=
+  CommonFactorRemoval.proof DivCycleMul.full
 
 theorem AdditivityInDivisor.full : AdditivityInDivisor.Statement.{u} :=
   AdditivityInDivisor.proof DivCycleMul.full DivCycleFiniteSupport.full IntNumAddFirst.full
@@ -81,68 +83,78 @@ theorem TautologicalCase.full : TautologicalCase.Statement.{u} :=
   TautologicalCase.proof IntNumAddFirst.full MinimalPrimeMultiHomog.full SupSpanMultiHomog.full
     SpecialQuotDim.full SpecialIdealCorresp.full SpecialIdealMultiHomog.full DimStrictDrop.full
 
-theorem FlagBundlePullbackVanish.of_open (hdim : FlagBundleDim.Statement) :
-    FlagBundlePullbackVanish.Statement :=
+theorem FlagBundlePullbackVanish.of_open (hdim : FlagBundleDim.Statement)
+    : FlagBundlePullbackVanish.Statement :=
   FlagBundlePullbackVanish.proof FieldNumbers.ProjectionFormulaContracted.full hdim
 
-theorem FlagBundleCut.of_open (hdim : FlagBundleDim.Statement)
-    (hforms : FlagBundleSectionForms.Statement) (hdiv : FlagBundleSectionDiv.Statement) :
-    FlagBundleCut.Statement :=
+theorem FlagBundleCut.of_open
+    (hdim : FlagBundleDim.Statement) (hforms : FlagBundleSectionForms.Statement)
+    (hdiv : FlagBundleSectionDiv.Statement)
+    : FlagBundleCut.Statement :=
   FlagBundleCut.proof hdim hforms hdiv FieldNumbers.CutRational.full
 
-theorem FlagBundleLineBase.of_open (hdim : FlagBundleDim.Statement)
-    (hsec : FlagLineSection.Statement) (hdeg : FlagLineDegree.Statement)
-    (hloc : FieldNumbers.DivPushForwardLocal.Statement.{0}) : FlagBundleLineBase.Statement :=
+theorem FlagBundleLineBase.of_open
+    (hdim : FlagBundleDim.Statement) (hsec : FlagLineSection.Statement)
+    (hdeg : FlagLineDegree.Statement) (hloc : FieldNumbers.DivPushForwardLocal.Statement.{0})
+    : FlagBundleLineBase.Statement :=
   FlagBundleLineBase.proof hdim hsec hdeg
-    (FieldNumbers.ProjectionFormulaDegree.of_divPushForward
-      (FieldNumbers.DivPushForward.proof FieldNumbers.ContractRelDimLe.proof hloc))
+    (FieldNumbers.ProjectionFormulaDegree.of_divPushForward (FieldNumbers.DivPushForward.proof
+      FieldNumbers.ContractRelDimLe.proof hloc))
 
-theorem NumericalSegre.of_open (hdim : FlagBundleDim.Statement)
-    (hforms : FlagBundleSectionForms.Statement) (hdiv : FlagBundleSectionDiv.Statement)
-    (hsec : FlagLineSection.Statement) (hdeg : FlagLineDegree.Statement)
-    (hloc : FieldNumbers.DivPushForwardLocal.Statement.{0}) : NumericalSegre.Statement :=
+theorem NumericalSegre.of_open
+    (hdim : FlagBundleDim.Statement) (hforms : FlagBundleSectionForms.Statement)
+    (hdiv : FlagBundleSectionDiv.Statement) (hsec : FlagLineSection.Statement)
+    (hdeg : FlagLineDegree.Statement) (hloc : FieldNumbers.DivPushForwardLocal.Statement.{0})
+    : NumericalSegre.Statement :=
   NumericalSegre.proof FieldNumbers.IntNumAdd.full hdim (FlagBundleCut.of_open hdim hforms hdiv)
     (FlagBundlePullbackVanish.of_open hdim) (FlagBundleLineBase.of_open hdim hsec hdeg hloc)
 
-theorem LocalCoefficient.of_open (hl : LeftTermSupport.Statement.{u})
-    (hr : RightTermSupport.Statement.{u}) (hring : LocalCoeffRing.Statement.{u}) :
-    LocalCoefficient.Statement.{u} :=
+theorem LocalCoefficient.of_open
+    (hl : LeftTermSupport.Statement.{u}) (hr : RightTermSupport.Statement.{u})
+    (hring : LocalCoeffRing.Statement.{u})
+    : LocalCoefficient.Statement.{u} :=
   LocalCoefficient.proof hl hr hring
 
-theorem NoCommonComponentCase.of_open (hl : LeftTermSupport.Statement.{u})
-    (hr : RightTermSupport.Statement.{u}) (hring : LocalCoeffRing.Statement.{u}) :
-    NoCommonComponentCase.Statement.{u} :=
-  NoCommonComponentCase.proof LeftExpansion.full RightExpansion.full (LocalCoefficient.of_open hl hr hring)
-    IntNumVanish.full
+theorem NoCommonComponentCase.of_open
+    (hl : LeftTermSupport.Statement.{u}) (hr : RightTermSupport.Statement.{u})
+    (hring : LocalCoeffRing.Statement.{u})
+    : NoCommonComponentCase.Statement.{u} :=
+  NoCommonComponentCase.proof LeftExpansion.full RightExpansion.full
+    (LocalCoefficient.of_open hl hr hring) IntNumVanish.full
 
 theorem BlowUpModel.of_open (hrees : ReesAlgebraDim.Statement.{u}) : BlowUpModel.Statement.{u} :=
   BlowUpModel.proof hrees
 
-theorem BlowUpDecomposition.of_open (hrees : ReesAlgebraDim.Statement.{u})
-    (hst : BlowUpStrictTransform.Statement.{u}) : BlowUpDecomposition.Statement.{u} :=
+theorem BlowUpDecomposition.of_open
+    (hrees : ReesAlgebraDim.Statement.{u}) (hst : BlowUpStrictTransform.Statement.{u})
+    : BlowUpDecomposition.Statement.{u} :=
   BlowUpDecomposition.proof (BlowUpModel.of_open hrees) hst
 
-theorem BlowUpInvariance.of_open (hvert : BlowUpVerticalPush.Statement.{u})
-    (hdiv : BlowUpDivisorPush.Statement.{u}) (hhor : BlowUpHorizontalCorresp.Statement.{u})
-    (hcomp : HorizontalComponentModel.Statement.{u}) : BlowUpInvariance.Statement.{u} :=
+theorem BlowUpInvariance.of_open
+    (hvert : BlowUpVerticalPush.Statement.{u}) (hdiv : BlowUpDivisorPush.Statement.{u})
+    (hhor : BlowUpHorizontalCorresp.Statement.{u}) (hcomp : HorizontalComponentModel.Statement.{u})
+    : BlowUpInvariance.Statement.{u} :=
   BlowUpInvariance.proof hvert hdiv hhor hcomp DivCycleFiniteSupport.full
 
-theorem BlowUpReduction.of_open (hrees : ReesAlgebraDim.Statement.{u})
-    (hst : BlowUpStrictTransform.Statement.{u}) (hvert : BlowUpVerticalPush.Statement.{u})
-    (hdiv : BlowUpDivisorPush.Statement.{u}) (hhor : BlowUpHorizontalCorresp.Statement.{u})
-    (hcomp : HorizontalComponentModel.Statement.{u}) : BlowUpReduction.Statement.{u} :=
-  BlowUpReduction.proof (BlowUpDecomposition.of_open hrees hst)
-    (BlowUpInvariance.of_open hvert hdiv hhor hcomp) CommonFactorRemoval.full AdditivityInDivisor.full
-    RightSideMultiplicativeInForm.full LeftSideAdditiveInDegree.full TautologicalCase.full
-
-theorem CommonFactorInduction.of_open (hrees : ReesAlgebraDim.Statement.{u})
-    (hst : BlowUpStrictTransform.Statement.{u}) (hdrop : BlowUpExcessDecreases.Statement.{u})
+theorem BlowUpReduction.of_open
+    (hrees : ReesAlgebraDim.Statement.{u}) (hst : BlowUpStrictTransform.Statement.{u})
     (hvert : BlowUpVerticalPush.Statement.{u}) (hdiv : BlowUpDivisorPush.Statement.{u})
-    (hhor : BlowUpHorizontalCorresp.Statement.{u}) (hcomp : HorizontalComponentModel.Statement.{u}) :
-    CommonFactorInduction.Statement.{u} :=
-  CommonFactorInduction.proof ExcessPositive.full AvoidingFormExists.full HorizontalAvoidingForm.full
-    (BlowUpDecomposition.of_open hrees hst) hdrop
-    (BlowUpReduction.of_open hrees hst hvert hdiv hhor hcomp) LeftSideAdditiveInDegree.full RightSideMultiplicativeInForm.full
-    DivCycleMul.full
+    (hhor : BlowUpHorizontalCorresp.Statement.{u}) (hcomp : HorizontalComponentModel.Statement.{u})
+    : BlowUpReduction.Statement.{u} :=
+  BlowUpReduction.proof (BlowUpDecomposition.of_open hrees hst)
+    (BlowUpInvariance.of_open hvert hdiv hhor hcomp) CommonFactorRemoval.full
+    AdditivityInDivisor.full RightSideMultiplicativeInForm.full LeftSideAdditiveInDegree.full
+    TautologicalCase.full
+
+theorem CommonFactorInduction.of_open
+    (hrees : ReesAlgebraDim.Statement.{u}) (hst : BlowUpStrictTransform.Statement.{u})
+    (hdrop : BlowUpExcessDecreases.Statement.{u}) (hvert : BlowUpVerticalPush.Statement.{u})
+    (hdiv : BlowUpDivisorPush.Statement.{u}) (hhor : BlowUpHorizontalCorresp.Statement.{u})
+    (hcomp : HorizontalComponentModel.Statement.{u})
+    : CommonFactorInduction.Statement.{u} :=
+  CommonFactorInduction.proof ExcessPositive.full AvoidingFormExists.full
+    HorizontalAvoidingForm.full (BlowUpDecomposition.of_open hrees hst) hdrop
+    (BlowUpReduction.of_open hrees hst hvert hdiv hhor hcomp) LeftSideAdditiveInDegree.full
+    RightSideMultiplicativeInForm.full DivCycleMul.full
 
 end GroundTheory.Heights₂.Heights.NumbersDVR

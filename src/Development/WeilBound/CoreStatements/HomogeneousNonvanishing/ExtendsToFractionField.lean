@@ -8,7 +8,10 @@ open AlgebraicGeometry CategoryTheory
 
 namespace PositivityTheory.UnitarySelfGeneration
 
-theorem extends_to_fraction_field : ∀ (O F L : Type) [CommRing O] [Field F] [CommRing L] (β : O →+* F) (θ : O →+* L), Subfield.closure (Set.range β) = ⊤ → (∀ b, β b ≠ 0 → IsUnit (θ b)) → (∀ a, β a = 0 → θ a = 0) → ∃ χ : F →+* L, χ.comp β = θ := by
+theorem extends_to_fraction_field
+    : ∀ (O F L : Type) [CommRing O] [Field F] [CommRing L] (β : O →+* F) (θ : O →+* L),
+      Subfield.closure (Set.range β) = ⊤ → (∀ b, β b ≠ 0 → IsUnit (θ b)) → (∀ a, β a = 0 → θ a = 0)
+        → ∃ χ : F →+* L, χ.comp β = θ := by
   intro O F L _ _ _ β θ hcl hu hz
   classical
   set R : Subring F := β.range with hR
@@ -47,8 +50,11 @@ theorem extends_to_fraction_field : ∀ (O F L : Type) [CommRing O] [Field F] [C
     obtain ⟨y, hy⟩ := RingHom.mem_fieldRange.mp hx
     exact ⟨y, hy⟩
   let e : FractionRing R ≃+* F := RingEquiv.ofBijective ι ⟨ι.injective, hsurj⟩
-  refine ⟨(IsLocalization.lift (M := nonZeroDivisors R) (S := FractionRing R) hunit).comp
-    e.symm.toRingHom, ?_⟩
+  refine ⟨
+    (IsLocalization.lift (M := nonZeroDivisors R) (S := FractionRing R) hunit).comp
+      e.symm.toRingHom,
+    ?_
+  ⟩
   ext o
   have he : e.symm (β o) = algebraMap R (FractionRing R) ⟨β o, o, rfl⟩ := by
     rw [RingEquiv.symm_apply_eq]

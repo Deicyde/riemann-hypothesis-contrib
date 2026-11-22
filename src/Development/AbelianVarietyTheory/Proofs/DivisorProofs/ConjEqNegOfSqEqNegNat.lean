@@ -11,8 +11,8 @@ namespace GlobalTheory.ConjugateNegativeSquare
 
 open NumberField
 
-theorem conj_eq_neg_of_sq_eq_neg_nat (z : ℂ) (d : ℕ) (h : z ^ 2 = -(d : ℂ)) :
-    (starRingEnd ℂ) z = -z := by
+theorem conj_eq_neg_of_sq_eq_neg_nat (z : ℂ) (d : ℕ) (h : z ^ 2 = -(d : ℂ))
+    : (starRingEnd ℂ) z = -z := by
   have hre : z.re * z.re - z.im * z.im = -(d : ℝ) := by
     have := congrArg Complex.re h
     simpa [pow_two] using this
@@ -32,12 +32,14 @@ theorem conj_eq_neg_of_sq_eq_neg_nat (z : ℂ) (d : ℕ) (h : z ^ 2 = -(d : ℂ)
   · simp [h0]
   · simp
 
-theorem conjugate_rt {E : Type} [Field E] [NumberField E] [IsCMField E]
-    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (σ : E →+* ℂ) :
-    (ComplexEmbedding.conjugate σ : E → ℂ) (↑(ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host.rt H) : E) =
-      -(σ : E → ℂ) (↑(ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host.rt H) : E) := by
+theorem conjugate_rt
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (σ : E →+* ℂ)
+    : (ComplexEmbedding.conjugate σ : E → ℂ)
+        (↑(ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host.rt H) : E)
+      = - (σ : E → ℂ) (↑(ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host.rt H) : E) := by
   obtain ⟨d, _, _, rt, hrt, _, _, _, _, _, _, _⟩ := H
-  change ComplexEmbedding.conjugate σ (rt : E) = -σ (rt : E)
+  change ComplexEmbedding.conjugate σ (rt : E) = - σ (rt : E)
   rw [ComplexEmbedding.conjugate_coe_eq]
   apply conj_eq_neg_of_sq_eq_neg_nat _ d
   have h1 : (rt : E) ^ 2 = -(d : E) := by

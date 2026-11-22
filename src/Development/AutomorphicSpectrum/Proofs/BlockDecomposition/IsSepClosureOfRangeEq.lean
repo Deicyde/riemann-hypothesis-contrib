@@ -15,14 +15,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Chevall
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge
 open scoped Classical
 open ValuativeRel GroundTheory.LocalField GroundTheory.LocalField.FormalGroup
 open scoped GroundTheory.PAdicHodge.CyclNorms
 
-theorem GlobalTheory.CompanionTheory.LTHodge.isSepClosure_Om_of_range : ∀ {l : ℕ} [Fact l.Prime] {F : Type} [Field F] [Algebra F (Om l)] (K : FinExt l),
-    Set.range (algebraMap F (Om l)) = (K.1 : Set (Om l)) → IsSepClosure F (Om l) := by
+theorem GlobalTheory.CompanionTheory.LTHodge.isSepClosure_Om_of_range
+    : ∀ {l : ℕ} [Fact l.Prime] {F : Type} [Field F] [Algebra F (Om l)] (K : FinExt l),
+      Set.range (algebraMap F (Om l)) = (K.1 : Set (Om l)) → IsSepClosure F (Om l) := by
   intro l _ F _ _ K hK
   have hmem : ∀ q : ℚ_[l], algebraMap ℚ_[l] (Om l) q ∈ (algebraMap F (Om l)).fieldRange := by
     intro q
@@ -33,7 +37,8 @@ theorem GlobalTheory.CompanionTheory.LTHodge.isSepClosure_Om_of_range : ∀ {l :
     exact ⟨y, hy⟩
   let e := (algebraMap F (Om l)).rangeRestrictFieldEquiv
   let φ : ℚ_[l] →+* F :=
-    e.symm.toRingHom.comp ((algebraMap ℚ_[l] (Om l)).codRestrict (algebraMap F (Om l)).fieldRange hmem)
+    e.symm.toRingHom.comp ((algebraMap ℚ_[l] (Om l)).codRestrict (algebraMap F (Om l)).fieldRange
+      hmem)
   have hφ : ∀ q, algebraMap F (Om l) (φ q) = algebraMap ℚ_[l] (Om l) q := by
     intro q
     have h := congrArg Subtype.val (e.apply_symm_apply ⟨algebraMap ℚ_[l] (Om l) q, hmem q⟩)

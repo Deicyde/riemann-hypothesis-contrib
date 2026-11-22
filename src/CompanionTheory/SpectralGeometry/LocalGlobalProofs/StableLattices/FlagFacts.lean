@@ -36,7 +36,8 @@ theorem pM_idem (h : A * A * A = A) : pM A * pM A = pM A := by
 theorem pM_mul_qM (h : A * A * A = A) : pM A * qM A = 0 := by
   have h4 := A4 h
   unfold pM qM
-  simp only [smul_mul_assoc, mul_smul_comm, smul_smul, sub_mul, mul_add, add_mul, mul_sub, ← mul_assoc, h4, h]
+  simp only [smul_mul_assoc, mul_smul_comm, smul_smul, sub_mul, mul_add, add_mul, mul_sub,
+    ← mul_assoc, h4, h]
   module
 
 theorem J_mul_pM (h : IsGrad ε A) : Formalism.REAL.Jm ε * pM A = qM A * Formalism.REAL.Jm ε := by
@@ -79,13 +80,14 @@ theorem one_le_rk (h : IsGrad ε A) : 1 ≤ rk A := by
     have hJJ := Formalism.REAL.Jm_mul_self ε
     have : qM A = Formalism.REAL.Jm ε * pM A * Formalism.REAL.Jm ε := by
       rw [J_mul_pM h, mul_assoc, hJJ, mul_one]
-    rw [this, hP]; simp
+    rw [this, hP]
+    simp
   apply hA
   have : A = qM A - pM A := by unfold pM qM; module
   rw [this, hP, hQ, sub_zero]
 
-theorem isotropic (h : IsGrad ε A) {x y : Fin n → ℂ} (hx : x ∈ Vm A) (hy : y ∈ Vm A) :
-    star x ⬝ᵥ (Formalism.REAL.Jm ε *ᵥ y) = 0 := by
+theorem isotropic (h : IsGrad ε A) {x y : Fin n → ℂ} (hx : x ∈ Vm A) (hy : y ∈ Vm A)
+    : star x ⬝ᵥ (Formalism.REAL.Jm ε *ᵥ y) = 0 := by
   obtain ⟨-, hH, h3, -⟩ := id h
   obtain ⟨u, rfl⟩ := hx
   obtain ⟨v, rfl⟩ := hy

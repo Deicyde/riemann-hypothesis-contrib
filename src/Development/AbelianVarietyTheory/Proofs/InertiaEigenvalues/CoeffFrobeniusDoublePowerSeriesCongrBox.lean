@@ -5,14 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffOf
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
 open scoped Formalism.Per
 
 namespace GlobalTheory.CrysPrism
 
-theorem exists_eq_of_coeff_box_eq_zero {R : Type} [CommRing R] (i n : ℕ) (D : R⟦X⟧⟦X⟧)
-    (h : ∀ i' ≤ i, ∀ n' ≤ n, coeff n' (coeff i' D) = 0) :
-    ∃ A B : R⟦X⟧⟦X⟧, D = X ^ (i + 1) * A + C (X ^ (n + 1)) * B := by
+theorem exists_eq_of_coeff_box_eq_zero
+    {R : Type} [CommRing R]
+    (i n : ℕ) (D : R⟦X⟧⟦X⟧) (h : ∀ i' ≤ i, ∀ n' ≤ n, coeff n' (coeff i' D) = 0)
+    : ∃ A B : R⟦X⟧⟦X⟧, D = X ^ (i + 1) * A + C (X ^ (n + 1)) * B := by
   classical
   obtain ⟨B, hlow⟩ : ∃ B : R⟦X⟧⟦X⟧, ∀ k ≤ i, X ^ (n + 1) * coeff k B = coeff k D := by
     refine ⟨mk fun k => mk fun m => coeff (m + (n + 1)) (coeff k D), fun k hk => ?_⟩
@@ -28,10 +31,16 @@ theorem exists_eq_of_coeff_box_eq_zero {R : Type} [CommRing R] (i n : ℕ) (D : 
   obtain ⟨A, hA⟩ := hdvd
   exact ⟨A, B, by rw [← hA]; ring⟩
 
-theorem coeff_frob2_congr_box : ∀ (l : ℕ) [Fact l.Prime] (K : Type) [NormedField K] (φ₂ : K⟦X⟧⟦X⟧ →+* K⟦X⟧⟦X⟧), (∀ f : K⟦X⟧, φ₂ (C f) = C (frob K l f)) → φ₂ X = (C X + X) ^ l - C (X ^ l) → ∀ (i n : ℕ) (G H : K⟦X⟧⟦X⟧), (∀ i' ≤ i, ∀ n' ≤ n, coeff n' (coeff i' G) = coeff n' (coeff i' H)) → coeff n (coeff i (φ₂ G)) = coeff n (coeff i (φ₂ H)) := by
+theorem coeff_frob2_congr_box
+    : ∀ (l : ℕ) [Fact l.Prime] (K : Type) [NormedField K] (φ₂ : K⟦X⟧⟦X⟧ →+* K⟦X⟧⟦X⟧),
+      (∀ f : K⟦X⟧, φ₂ (C f) = C (frob K l f)) → φ₂ X = (C X + X) ^ l - C (X ^ l)
+        → ∀ (i n : ℕ) (G H : K⟦X⟧⟦X⟧),
+          (∀ i' ≤ i, ∀ n' ≤ n, coeff n' (coeff i' G) = coeff n' (coeff i' H))
+            → coeff n (coeff i (φ₂ G)) = coeff n (coeff i (φ₂ H)) := by
   intro l _ K _ φ₂ hC hX i n G H h
-  obtain ⟨A, B, hAB⟩ := exists_eq_of_coeff_box_eq_zero i n (G - H) (fun i' hi' n' hn' => by
-    rw [map_sub, map_sub, h i' hi' n' hn', sub_self])
+  obtain ⟨A, B, hAB⟩ :=
+    exists_eq_of_coeff_box_eq_zero i n (G - H)
+      (fun i' hi' n' hn' => by rw [map_sub, map_sub, h i' hi' n' hn', sub_self])
   obtain ⟨c, hc⟩ : (X : K⟦X⟧⟦X⟧) ∣ φ₂ X := by
     rw [hX, map_pow]
     have hd := sub_dvd_pow_sub_pow (C X + X : K⟦X⟧⟦X⟧) (C X) l
@@ -44,8 +53,8 @@ theorem coeff_frob2_congr_box : ∀ (l : ℕ) [Fact l.Prime] (K : Type) [NormedF
     rw [map_mul, hC, map_pow, frob_X, ← pow_mul]
   have hz : coeff n (coeff i (φ₂ (G - H))) = 0 := by
     rw [hAB, map_add (f := _), e1, e2, map_add (f := _), map_add (f := _), coeff_X_pow_mul',
-      if_neg (show ¬ (i + 1 ≤ i) by omega), map_zero, zero_add, coeff_C_mul, coeff_X_pow_mul',
-      if_neg (show ¬ (l * (n + 1) ≤ n) by nlinarith)]
+      if_neg (show ¬(i + 1 ≤ i) by omega), map_zero, zero_add, coeff_C_mul, coeff_X_pow_mul',
+      if_neg (show ¬(l * (n + 1) ≤ n) by nlinarith)]
   rwa [map_sub, map_sub, map_sub, sub_eq_zero] at hz
 
 end GlobalTheory.CrysPrism

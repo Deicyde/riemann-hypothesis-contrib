@@ -8,8 +8,8 @@ namespace Formalism.FourierDecayAlt.P.RecText
 
 open Finset Real
 
-theorem geo (a : ℝ) (ha0 : 0 ≤ a) (ha1 : a ≤ 1/2) :
-    ∀ i, 1 ≤ i → ∑ t ∈ Icc 2 i, a ^ (t - 1) ≤ 2 * a - 2 * a ^ i := by
+theorem geo (a : ℝ) (ha0 : 0 ≤ a) (ha1 : a ≤ 1 / 2)
+    : ∀ i, 1 ≤ i → ∑ t ∈ Icc 2 i, a ^ (t - 1) ≤ 2 * a - 2 * a ^ i := by
   intro i hi
   induction i, hi using Nat.le_induction with
   | base => simp
@@ -26,11 +26,11 @@ theorem recT : Formalism.FourierDecayAlt.RecursionText := by
   set Q : ℕ → ℝ := fun k => ∏ j ∈ Icc 1 k, √(1 + e j) with hQdef
   have hQsucc : ∀ k, Q (k + 1) = Q k * √(1 + e (k + 1)) := by
     intro k; simp only [hQdef]; rw [Finset.prod_Icc_succ_top (by omega)]
-  have hsq1 : ∀ j, 1 ≤ √(1 + e j) := fun j => by
-    rw [Real.one_le_sqrt]; linarith [he j]
+  have hsq1 : ∀ j, 1 ≤ √(1 + e j) := fun j => by rw [Real.one_le_sqrt]; linarith [he j]
   have hQ0 : Q 0 = 1 := by simp [hQdef]
   have hQ1 : ∀ k, 1 ≤ Q k := by
-    intro k; induction k with
+    intro k
+    induction k with
     | zero => rw [hQ0]
     | succ k ih => rw [hQsucc]; nlinarith [hsq1 (k + 1)]
   have hQmono : Monotone Q := by
@@ -50,7 +50,7 @@ theorem recT : Formalism.FourierDecayAlt.RecursionText := by
         rw [hk] at hrec'
         set M := lam ^ k * Q (k + 1) * σ 0 with hM
         have hM0 : 0 ≤ M := by
-          have := pow_nonneg (by linarith : (0:ℝ) ≤ lam) k
+          have := pow_nonneg (by linarith : (0 : ℝ) ≤ lam) k
           have := hQ1 (k + 1)
           positivity
         have hk' := ih k (by omega) (by omega)
@@ -59,8 +59,9 @@ theorem recT : Formalism.FourierDecayAlt.RecursionText := by
           have : √(1 + e (k + 1)) * σ k ≤ √(1 + e (k + 1)) * (lam ^ k * Q k * σ 0) :=
             mul_le_mul_of_nonneg_left hk' (Real.sqrt_nonneg _)
           nlinarith
-        have h2 : ∑ t ∈ Icc 2 (k + 1), a ^ (t - 1) * σ (k + 1 - t) ≤
-            ∑ t ∈ Icc 2 (k + 1), a ^ (t - 1) * M := by
+        have h2
+            : ∑ t ∈ Icc 2 (k + 1), a ^ (t - 1) * σ (k + 1 - t)
+              ≤ ∑ t ∈ Icc 2 (k + 1), a ^ (t - 1) * M := by
           apply Finset.sum_le_sum
           intro t ht
           rw [Finset.mem_Icc] at ht
@@ -83,19 +84,26 @@ theorem recT : Formalism.FourierDecayAlt.RecursionText := by
           linarith
         have : lam ^ (k + 1) * Q (k + 1) * σ 0 = lam * M := by rw [hM]; ring
         rw [this]
-        calc σ (k + 1) ≤ (1 + ε) * M + 2 * a * M := by linarith
+        calc
+          σ (k + 1)
+            ≤ (1 + ε) * M + 2 * a * M := by linarith
           _ = lam * M := by rw [hlam]; ring
   have hfin := main (r + 1) le_rfl
   have hQsq : Q (r + 1) ^ 2 = ∏ i ∈ Icc 1 (r + 1), (1 + e i) := by
-    simp only [hQdef]; rw [← Finset.prod_pow]
+    simp only [hQdef]
+    rw [← Finset.prod_pow]
     refine Finset.prod_congr rfl fun j _ => ?_
-    rw [Real.sq_sqrt]; linarith [he j]
+    rw [Real.sq_sqrt]
+    linarith [he j]
   have hP : 0 ≤ ∏ i ∈ Icc 1 (r + 1), (1 + e i) := by rw [← hQsq]; positivity
   have hsr := hσ (r + 1)
-  have step1 : σ (r + 1) ^ 2 ≤ (lam ^ (r + 1)) ^ 2 * (∏ i ∈ Icc 1 (r + 1), (1 + e i)) * σ 0 ^ 2 := by
+  have step1
+      : σ (r + 1) ^ 2 ≤ (lam ^ (r + 1)) ^ 2 * (∏ i ∈ Icc 1 (r + 1), (1 + e i)) * σ 0 ^ 2 := by
     rw [← hQsq]
     have := pow_le_pow_left₀ hsr hfin 2
-    calc σ (r + 1) ^ 2 ≤ (lam ^ (r + 1) * Q (r + 1) * σ 0) ^ 2 := this
+    calc
+      σ (r + 1) ^ 2
+        ≤ (lam ^ (r + 1) * Q (r + 1) * σ 0) ^ 2 := this
       _ = _ := by ring
   set x := ((r : ℝ) + 1) * a with hxdef
   have hx0 : 0 ≤ x := by positivity
@@ -112,8 +120,9 @@ theorem recT : Formalism.FourierDecayAlt.RecursionText := by
     nlinarith
   have step3 : Real.exp (6 * x) ≤ 1 + Real.exp 9 * x := by
     have ht0 : 0 ≤ 2 / 3 * x := by positivity
-    have hc := convexOn_exp.2 (Set.mem_univ (0:ℝ)) (Set.mem_univ (9:ℝ))
-      (by linarith : (0:ℝ) ≤ 1 - 2 / 3 * x) ht0 (by ring)
+    have hc :=
+      convexOn_exp.2 (Set.mem_univ (0 : ℝ)) (Set.mem_univ (9 : ℝ))
+        (by linarith : (0 : ℝ) ≤ 1 - 2 / 3 * x) ht0 (by ring)
     simp only [smul_eq_mul, mul_zero, zero_add, Real.exp_zero, mul_one] at hc
     have : 6 * x = 2 / 3 * x * 9 := by ring
     rw [this]
@@ -127,4 +136,5 @@ theorem recT : Formalism.FourierDecayAlt.RecursionText := by
 
 end Formalism.FourierDecayAlt.P.RecText
 
-theorem Formalism.FourierDecayAlt.P.coarseBound : Formalism.FourierDecayAlt.RecursionText := Formalism.FourierDecayAlt.P.RecText.recT
+theorem Formalism.FourierDecayAlt.P.coarseBound : Formalism.FourierDecayAlt.RecursionText :=
+  Formalism.FourierDecayAlt.P.RecText.recT

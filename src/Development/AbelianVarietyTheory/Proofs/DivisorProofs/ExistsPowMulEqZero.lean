@@ -7,13 +7,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDatNeZ
 
 namespace GlobalTheory.CocycleCoboundaryNumerator
 
-theorem exists_numerator (R : Type) [CommRing R] (D : Type) [CommRing D] [Algebra R D] (u v : D)
-    (f : (E : Type) → [CommRing E] → [Algebra R E] → (D →ₐ[R] E) → E)
+theorem exists_numerator
+    (R : Type) [CommRing R]
+    (D : Type) [CommRing D] [Algebra R D]
+    (u v : D) (f : (E : Type) → [CommRing E] → [Algebra R E] → (D →ₐ[R] E) → E)
     (hf : ∀ (E : Type) [CommRing E] [Algebra R E] (E' : Type) [CommRing E'] [Algebra R E']
-      (ψ : D →ₐ[R] E) (θ : E →ₐ[R] E'), IsUnit (ψ u) → IsUnit (ψ v) →
-        f E' (θ.comp ψ) = θ (f E ψ)) :
-    ∃ N₀ : ℕ, ∀ N, N₀ ≤ N → ∃ c : D, ∀ (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
-      IsUnit (ψ u) → IsUnit (ψ v) → f E ψ * (ψ u * ψ v) ^ N = ψ c := by
+        (ψ : D →ₐ[R] E) (θ : E →ₐ[R] E'),
+      IsUnit (ψ u) → IsUnit (ψ v) → f E' (θ.comp ψ) = θ (f E ψ))
+    : ∃ N₀ : ℕ, ∀ N,
+      N₀ ≤ N
+        → ∃ c : D, ∀ (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
+          IsUnit (ψ u) → IsUnit (ψ v) → f E ψ * (ψ u * ψ v) ^ N = ψ c := by
   classical
   let L := Localization.Away (u * v)
   let ψ₀ : D →ₐ[R] L := IsScalarTower.toAlgHom R D L
@@ -36,10 +40,11 @@ theorem exists_numerator (R : Type) [CommRing R] (D : Type) [CommRing D] [Algebr
   simp only [map_pow, map_mul]
   ring
 
-theorem exists_pow_mul_eq_zero (R : Type) [CommRing R] (D : Type) [CommRing D] [Algebra R D]
-    (u x : D)
-    (h : ∀ (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E), IsUnit (ψ u) → ψ x = 0) :
-    ∃ M₀ : ℕ, ∀ M, M₀ ≤ M → u ^ M * x = 0 := by
+theorem exists_pow_mul_eq_zero
+    (R : Type) [CommRing R]
+    (D : Type) [CommRing D] [Algebra R D]
+    (u x : D) (h : ∀ (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E), IsUnit (ψ u) → ψ x = 0)
+    : ∃ M₀ : ℕ, ∀ M, M₀ ≤ M → u ^ M * x = 0 := by
   let L := Localization.Away u
   have h0 : algebraMap D L x = 0 :=
     h L (IsScalarTower.toAlgHom R D L) (IsLocalization.Away.algebraMap_isUnit u)
@@ -49,42 +54,49 @@ theorem exists_pow_mul_eq_zero (R : Type) [CommRing R] (D : Type) [CommRing D] [
   have hm' : u ^ m * x = 0 := hm
   rw [pow_add, mul_comm (u ^ m), mul_assoc, hm', mul_zero]
 
-theorem map_inverse_of_isUnit {E E' : Type} [CommRing E] [CommRing E'] (θ : E →+* E') {x : E}
-    (hx : IsUnit x) : Ring.inverse (θ x) = θ (Ring.inverse x) := by
+theorem map_inverse_of_isUnit
+    {E E' : Type} [CommRing E] [CommRing E'] (θ : E →+* E') {x : E} (hx : IsUnit x)
+    : Ring.inverse (θ x) = θ (Ring.inverse x) := by
   obtain ⟨w, rfl⟩ := hx
   have hw : θ (w : E) = ((Units.map θ.toMonoidHom w : E'ˣ) : E') := rfl
   rw [Ring.inverse_unit, hw, Ring.inverse_unit]
   rfl
 
-theorem cocycle_is_coboundary (R : Type) [CommRing R] (D : Type) [CommRing D] [Algebra R D]
+theorem cocycle_is_coboundary
+    (R : Type) [CommRing R]
+    (D : Type) [CommRing D] [Algebra R D]
     (n : ℕ) (s : Fin n → D) (hs : Ideal.span (Set.range s) = ⊤)
     (d : Fin n → Fin n → (E : Type) → [CommRing E] → [Algebra R E] → (D →ₐ[R] E) → E)
     (hnat : ∀ (a b : Fin n) (E : Type) [CommRing E] [Algebra R E] (E' : Type) [CommRing E']
-      [Algebra R E'] (ψ : D →ₐ[R] E) (θ : E →ₐ[R] E'), IsUnit (ψ (s a)) → IsUnit (ψ (s b)) →
-        d a b E' (AlgHom.comp θ ψ) = θ (d a b E ψ))
+        [Algebra R E'] (ψ : D →ₐ[R] E) (θ : E →ₐ[R] E'),
+      IsUnit (ψ (s a)) → IsUnit (ψ (s b)) → d a b E' (AlgHom.comp θ ψ) = θ (d a b E ψ))
     (hcoc : ∀ (a b c : Fin n) (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
-      IsUnit (ψ (s a)) → IsUnit (ψ (s b)) → IsUnit (ψ (s c)) →
-        d a b E ψ + d b c E ψ = d a c E ψ) :
-    ∃ (e : Fin n → (E : Type) → [CommRing E] → [Algebra R E] → (D →ₐ[R] E) → E),
-      (∀ (a : Fin n) (E : Type) [CommRing E] [Algebra R E] (E' : Type) [CommRing E']
-        [Algebra R E'] (ψ : D →ₐ[R] E) (θ : E →ₐ[R] E'), IsUnit (ψ (s a)) →
-          e a E' (AlgHom.comp θ ψ) = θ (e a E ψ)) ∧
-      ∀ (a b : Fin n) (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
-        IsUnit (ψ (s a)) → IsUnit (ψ (s b)) → d a b E ψ = e b E ψ - e a E ψ := by
+      IsUnit (ψ (s a)) → IsUnit (ψ (s b)) → IsUnit (ψ (s c)) → d a b E ψ + d b c E ψ = d a c E ψ)
+    : ∃ (e : Fin n → (E : Type) → [CommRing E] → [Algebra R E] → (D →ₐ[R] E) → E),
+      (∀ (a : Fin n) (E : Type) [CommRing E] [Algebra R E] (E' : Type) [CommRing E'] [Algebra R E']
+            (ψ : D →ₐ[R] E) (θ : E →ₐ[R] E'),
+          IsUnit (ψ (s a)) → e a E' (AlgHom.comp θ ψ) = θ (e a E ψ))
+        ∧ ∀ (a b : Fin n) (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
+          IsUnit (ψ (s a)) → IsUnit (ψ (s b)) → d a b E ψ = e b E ψ - e a E ψ := by
   classical
-
-  have h1 : ∀ a b : Fin n, ∃ N₀ : ℕ, ∀ N, N₀ ≤ N → ∃ c : D, ∀ (E : Type) [CommRing E]
-      [Algebra R E] (ψ : D →ₐ[R] E), IsUnit (ψ (s a)) → IsUnit (ψ (s b)) →
-        d a b E ψ * (ψ (s a) * ψ (s b)) ^ N = ψ c := fun a b =>
+  have h1
+      : ∀ a b : Fin n, ∃ N₀ : ℕ, ∀ N,
+        N₀ ≤ N
+          → ∃ c : D, ∀ (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
+            IsUnit (ψ (s a)) → IsUnit (ψ (s b))
+              → d a b E ψ * (ψ (s a) * ψ (s b)) ^ N = ψ c := fun a b =>
     exists_numerator R D (s a) (s b) (d a b) (fun E _ _ E' _ _ ψ θ ha hb => hnat a b E E' ψ θ ha hb)
   choose N₀ hN₀ using h1
-  obtain ⟨N, hN⟩ : ∃ N, ∀ a b, N₀ a b ≤ N :=
-    ⟨Finset.univ.sup (fun p : Fin n × Fin n => N₀ p.1 p.2), fun a b =>
-      Finset.le_sup (f := fun p : Fin n × Fin n => N₀ p.1 p.2) (Finset.mem_univ (a, b))⟩
+  obtain ⟨N, hN⟩ : ∃ N, ∀ a b, N₀ a b ≤ N := ⟨
+    Finset.univ.sup (fun p : Fin n × Fin n => N₀ p.1 p.2),
+    fun a b => Finset.le_sup (f := fun p : Fin n × Fin n => N₀ p.1 p.2) (Finset.mem_univ (a, b))
+  ⟩
   choose c hc using fun a b => hN₀ a b N (hN a b)
 
-  have h2 : ∀ a b k : Fin n, ∃ M₀ : ℕ, ∀ M, M₀ ≤ M → (s a * s b * s k) ^ M *
-      (s k ^ N * c a b - s a ^ N * c k b + s b ^ N * c k a) = 0 := by
+  have h2
+      : ∀ a b k : Fin n, ∃ M₀ : ℕ, ∀ M,
+        M₀ ≤ M
+          → (s a * s b * s k) ^ M * (s k ^ N * c a b - s a ^ N * c k b + s b ^ N * c k a) = 0 := by
     intro a b k
     apply exists_pow_mul_eq_zero R D
     intro E _ _ ψ hu
@@ -97,17 +109,20 @@ theorem cocycle_is_coboundary (R : Type) [CommRing R] (D : Type) [CommRing D] [A
     rw [← hc a b E ψ ha hb, ← hc k b E ψ hk hb, ← hc k a E ψ hk ha]
     linear_combination (ψ (s a) * ψ (s b) * ψ (s k)) ^ N * e4
   choose M₀ hM₀ using h2
-  obtain ⟨M, hM⟩ : ∃ M, ∀ a b k, M₀ a b k ≤ M :=
-    ⟨Finset.univ.sup (fun p : Fin n × Fin n × Fin n => M₀ p.1 p.2.1 p.2.2), fun a b k =>
-      Finset.le_sup (f := fun p : Fin n × Fin n × Fin n => M₀ p.1 p.2.1 p.2.2)
-        (Finset.mem_univ (a, b, k))⟩
+  obtain ⟨M, hM⟩ : ∃ M, ∀ a b k, M₀ a b k ≤ M := ⟨
+    Finset.univ.sup (fun p : Fin n × Fin n × Fin n => M₀ p.1 p.2.1 p.2.2),
+    fun a b k =>
+      Finset.le_sup
+        (f := fun p : Fin n × Fin n × Fin n => M₀ p.1 p.2.1 p.2.2)
+        (Finset.mem_univ (a, b, k))
+  ⟩
 
-  obtain ⟨K, c', hc', hy⟩ : ∃ (K : ℕ) (c' : Fin n → Fin n → D),
-      (∀ (a b : Fin n) (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
-        IsUnit (ψ (s a)) → IsUnit (ψ (s b)) → d a b E ψ * (ψ (s a) * ψ (s b)) ^ K = ψ (c' a b)) ∧
-      ∀ a b k, s k ^ K * c' a b = s a ^ K * c' k b - s b ^ K * c' k a := by
-    refine ⟨N + M, fun a b => c a b * (s a * s b) ^ M, fun a b E _ _ ψ ha hb => ?_,
-      fun a b k => ?_⟩
+  obtain ⟨K, c', hc', hy⟩
+      : ∃ (K : ℕ) (c' : Fin n → Fin n → D),
+        (∀ (a b : Fin n) (E : Type) [CommRing E] [Algebra R E] (ψ : D →ₐ[R] E),
+            IsUnit (ψ (s a)) → IsUnit (ψ (s b)) → d a b E ψ * (ψ (s a) * ψ (s b)) ^ K = ψ (c' a b))
+          ∧ ∀ a b k, s k ^ K * c' a b = s a ^ K * c' k b - s b ^ K * c' k a := by
+    refine ⟨N + M, fun a b => c a b * (s a * s b) ^ M, fun a b E _ _ ψ ha hb => ?_, fun a b k => ?_⟩
     · rw [map_mul, ← hc a b E ψ ha hb, map_pow, map_mul, pow_add]
       ring
     · linear_combination hM₀ a b k M (hM a b k)
@@ -137,7 +152,7 @@ theorem cocycle_is_coboundary (R : Type) [CommRing R] (D : Type) [CommRing D] [A
     have hsum : ∑ k, ψ (g k) * ψ (s k) ^ K = 1 := by
       have h := congrArg ψ hg
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_sum, smul_eq_mul, map_mul, map_pow, map_one] using h
+      simpa only [map_sum, smul_eq_mul, map_mul, map_pow, map_one] using h
     have hd : d a b E ψ = ∑ k, ψ (g k) * ψ (s k) ^ K * d a b E ψ := by
       rw [← Finset.sum_mul, hsum, one_mul]
     rw [hd, ← Finset.sum_sub_distrib]

@@ -14,5 +14,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeilQuotientHaar
 
 theorem quotient_product_compact : PI.QuotProdK.QuotProdK :=
   QPK.quotProdK_of QPK.weil_quotient_global_assumptions QPK.haar_measure_uniqueness
-    (QPK.locPack_of QPK.haar_measure_existence QPK.conjugation_invariant_measure QPK.siegel_measure_definition QPK.bruhat_decomposition'
-      QPK.local_weil_representation)
+    (QPK.locPack_of QPK.haar_measure_existence QPK.conjugation_invariant_measure
+      QPK.siegel_measure_definition QPK.bruhat_decomposition' QPK.local_weil_representation)

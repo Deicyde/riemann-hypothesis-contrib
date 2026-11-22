@@ -4,32 +4,41 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem closed_zero {Γ K : Type} [TopologicalSpace Γ] [Field K] {f : Γ → PowerSeries K}
-    (hf : AdicCont (Ideal.span {(PowerSeries.X : PowerSeries K)}) f) : IsClosed {g | f g = 0} := by
-  have hset : {g | f g = 0} = ⋂ N : ℕ,
-      {g | Ideal.Quotient.mk ((Ideal.span {(PowerSeries.X : PowerSeries K)}) ^ N) (f g) = 0} := by
-    ext g
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Ideal.Quotient.eq_zero_iff_mem,
-      Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-    constructor
-    · intro h N
-      rw [h]
-      exact dvd_zero _
-    · intro h
-      ext n
-      have := (PowerSeries.X_pow_dvd_iff).1 (h (n + 1)) n (Nat.lt_succ_self n)
-      simpa using this
+private theorem closed_zero
+    {Γ K : Type} [TopologicalSpace Γ] [Field K]
+    {f : Γ → PowerSeries K} (hf : AdicCont (Ideal.span {(PowerSeries.X : PowerSeries K)}) f)
+    : IsClosed {g | f g = 0} := by
+  have hset
+      : {g | f g = 0}
+        = ⋂ N : ℕ,
+          {g | Ideal.Quotient.mk ((Ideal.span {(PowerSeries.X : PowerSeries K)}) ^ N) (f g) = 0} :=
+    by
+      ext g
+      simp only [Set.mem_setOf_eq, Set.mem_iInter, Ideal.Quotient.eq_zero_iff_mem,
+        Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+      constructor
+      · intro h N
+        rw [h]
+        exact dvd_zero _
+      · intro h
+        ext n
+        have := (PowerSeries.X_pow_dvd_iff).1 (h (n + 1)) n (Nat.lt_succ_self n)
+        simpa using this
   rw [hset]
   exact isClosed_iInter fun N => (hf N).isClosed_fiber 0
 
-theorem UpperTheory.V.Pa.coc_ker :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ) (x : NP G0.frame n) (s : Set G.G₀) (z : G.G₀ → Matrix (Fin n) (Fin n) x.A), h.p.ker ≤ (Subgroup.normalClosure (Subtype.val '' s)).topologicalClosure → (∀ a ∈ s, h.p₀ a = 1 ∧ z a = 0) → z ∈ SelM h x x.A → ∃ y : G0.G₀ → Matrix (Fin n) (Fin n) x.A, ∀ g, y (h.p₀ g) = z g := by
+theorem UpperTheory.V.Pa.coc_ker
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ)
+        (x : NP G0.frame n) (s : Set G.G₀) (z : G.G₀ → Matrix (Fin n) (Fin n) x.A),
+      h.p.ker ≤ (Subgroup.normalClosure (Subtype.val '' s)).topologicalClosure
+        → (∀ a ∈ s, h.p₀ a = 1 ∧ z a = 0) → z ∈ SelM h x x.A
+        → ∃ y : G0.G₀ → Matrix (Fin n) (Fin n) x.A, ∀ g, y (h.p₀ g) = z g := by
   intro l _ L G G0 h n x s z hker hs hz
   obtain ⟨-, hcont, hcoc, hconj, -, -⟩ := hz
-  have coc : ∀ g k : G.G₀,
-      z (g * k) = z g + x.ρX x.A (h.p₀ g) * z k * x.ρX x.A (h.p₀ g⁻¹) := hcoc
+  have coc : ∀ g k : G.G₀, z (g * k) = z g + x.ρX x.A (h.p₀ g) * z k * x.ρX x.A (h.p₀ g⁻¹) := hcoc
   have hρ1 : ∀ g : G.G₀, h.p₀ g = 1 → x.ρX x.A (h.p₀ g) = 1 := by
     intro g hg
     rw [hg]
@@ -42,19 +51,20 @@ theorem UpperTheory.V.Pa.coc_ker :
     intro g k hk
     rw [coc, hk]
     simp
-  let H : Subgroup G.G₀ :=
-    { carrier := {k | h.p₀ k = 1 ∧ z k = 0}
-      one_mem' := ⟨map_one _, hz1⟩
-      mul_mem' := by
-        rintro a b ⟨ha, za⟩ ⟨hb, zb⟩
-        refine ⟨by rw [map_mul, ha, hb, one_mul], ?_⟩
-        rw [hR a b zb, za]
-      inv_mem' := by
-        rintro a ⟨ha, za⟩
-        refine ⟨by rw [map_inv, ha, inv_one], ?_⟩
-        have e := hR a⁻¹ a za
-        rw [inv_mul_cancel, hz1] at e
-        exact e.symm }
+  let H : Subgroup G.G₀ := {
+    carrier := {k | h.p₀ k = 1 ∧ z k = 0}
+    one_mem' := ⟨map_one _, hz1⟩
+    mul_mem' := by
+      rintro a b ⟨ha, za⟩ ⟨hb, zb⟩
+      refine ⟨by rw [map_mul, ha, hb, one_mul], ?_⟩
+      rw [hR a b zb, za]
+    inv_mem' := by
+      rintro a ⟨ha, za⟩
+      refine ⟨by rw [map_inv, ha, inv_one], ?_⟩
+      have e := hR a⁻¹ a za
+      rw [inv_mul_cancel, hz1] at e
+      exact e.symm
+  }
   have hHconj : ∀ g k : G.G₀, k ∈ H → g * k * g⁻¹ ∈ H := by
     rintro g k ⟨hk1, hk2⟩
     refine ⟨by rw [map_mul, map_mul, hk1, mul_one, map_inv, mul_inv_cancel], ?_⟩
@@ -76,7 +86,8 @@ theorem UpperTheory.V.Pa.coc_ker :
     intro m hm γ
     obtain ⟨k, hk, rfl⟩ := Subgroup.mem_map.1 hm
     rcases Int.units_eq_one_or (G.η γ) with hγ | hγ
-    · have e : γ * (k : G.Γ) * γ⁻¹ = (((⟨γ, hγ⟩ : G.G₀) * k * (⟨γ, hγ⟩ : G.G₀)⁻¹ : G.G₀) : G.Γ) := rfl
+    · have e : γ * (k : G.Γ) * γ⁻¹ = (((⟨γ, hγ⟩ : G.G₀) * k * (⟨γ, hγ⟩ : G.G₀)⁻¹ : G.G₀) : G.Γ) :=
+        rfl
       exact Subgroup.mem_map.2 ⟨_, hHconj _ _ hk, e.symm⟩
     · have hg : G.c⁻¹ * γ ∈ G.η.ker := by
         rw [MonoidHom.mem_ker, map_mul, map_inv, G.η_c, hγ]
@@ -119,5 +130,7 @@ theorem UpperTheory.V.Pa.coc_ker :
     have e2 := hR g _ hk.2
     rw [mul_inv_cancel_left] at e2
     exact e2.symm
-  exact ⟨fun g0 => z (Classical.choose (h.p₀_surj g0)),
-    fun g => hfac _ _ (Classical.choose_spec (h.p₀_surj (h.p₀ g)))⟩
+  exact ⟨
+    fun g0 => z (Classical.choose (h.p₀_surj g0)),
+    fun g => hfac _ _ (Classical.choose_spec (h.p₀_surj (h.p₀ g)))
+  ⟩

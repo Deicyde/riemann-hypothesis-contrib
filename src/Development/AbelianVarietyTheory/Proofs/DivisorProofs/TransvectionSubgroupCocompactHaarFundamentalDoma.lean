@@ -11,7 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -19,21 +23,35 @@ namespace GlobalTheory.TransvMeasure
 
 section General
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
 
-theorem exists_fundamentalDomain_subset [SecondCountableTopology G] (Γ : Subgroup G) [DiscreteTopology Γ] {K : Set G}
-    (hK : IsClosed K) (hcov : ∀ x : G, ∃ γ ∈ Γ, γ * x ∈ K) (μ : Measure G) :
-    ∃ S ⊆ K, IsFundamentalDomain Γ S μ := by
+theorem exists_fundamentalDomain_subset
+    [SecondCountableTopology G]
+    (Γ : Subgroup G) [DiscreteTopology Γ]
+    {K : Set G} (hK : IsClosed K) (hcov : ∀ x : G, ∃ γ ∈ Γ, γ * x ∈ K)
+    (μ : Measure G)
+    : ∃ S ⊆ K, IsFundamentalDomain Γ S μ := by
   classical
   have := GlobalTheory.countable_of_discrete_subgroup Γ
   obtain ⟨D, hD, hu, -⟩ := GlobalTheory.exists_isFundamentalDomain_subgroup Γ
   obtain ⟨c, hc⟩ := exists_injective_nat Γ
-  let S : Set G := K ∩ ⋃ g : Γ, ((fun y => g • y) ⁻¹' D ∩ ⋂ h : Γ, ⋂ _ : c h < c g, ((fun y => (h⁻¹ * g) • y) ⁻¹' K)ᶜ)
-  have hS : ∀ y, y ∈ S ↔ y ∈ K ∧ ∃ g : Γ, g • y ∈ D ∧ ∀ h : Γ, c h < c g → (h⁻¹ * g) • y ∉ K := fun y => by
-    simp only [S, Set.mem_inter_iff, Set.mem_iUnion, Set.mem_iInter, Set.mem_preimage, Set.mem_compl_iff]
-  refine ⟨S, Set.inter_subset_left, IsFundamentalDomain.mk' (MeasurableSet.nullMeasurableSet ?_) fun x => ?_⟩
-  · exact hK.measurableSet.inter <| MeasurableSet.iUnion fun g => (measurable_const_smul g hD).inter <|
-      MeasurableSet.iInter fun h => MeasurableSet.iInter fun _ => (measurable_const_smul _ hK.measurableSet).compl
+  let S : Set G :=
+    K ∩ ⋃ g : Γ, ((fun y => g • y) ⁻¹' D ∩ ⋂ h : Γ, ⋂ _ : c h < c g, ((fun y => (h⁻¹ * g) • y) ⁻¹' K)ᶜ)
+  have hS
+      : ∀ y,
+        y ∈ S ↔ y ∈ K ∧ ∃ g : Γ, g • y ∈ D ∧ ∀ h : Γ, c h < c g → (h⁻¹ * g) • y ∉ K := fun y => by
+    simp only [S, Set.mem_inter_iff, Set.mem_iUnion, Set.mem_iInter, Set.mem_preimage,
+      Set.mem_compl_iff]
+  refine ⟨
+    S,
+    Set.inter_subset_left,
+    IsFundamentalDomain.mk' (MeasurableSet.nullMeasurableSet ?_) fun x => ?_
+  ⟩
+  · exact hK.measurableSet.inter <| MeasurableSet.iUnion fun g =>
+      (measurable_const_smul g hD).inter <| MeasurableSet.iInter fun h =>
+        MeasurableSet.iInter fun _ => (measurable_const_smul _ hK.measurableSet).compl
   · obtain ⟨d, hd, hdu⟩ := hu x
     have hex : ∃ n, ∃ g : Γ, c g = n ∧ (g⁻¹ * d) • x ∈ K := by
       obtain ⟨γ, hγ, h⟩ := hcov x
@@ -56,11 +74,13 @@ theorem exists_fundamentalDomain_subset [SecondCountableTopology G] (Γ : Subgro
         rw [smul_smul, mul_assoc, e]
         exact hgK
 
-
 open Pointwise in
-theorem measure_ne_top_of_cocompact (Γ : Subgroup G) [Countable Γ] {K : Set G} (hK : IsCompact K)
-    (hcov : ∀ x : G, ∃ γ ∈ Γ, γ * x ∈ K) (μ : Measure G) [μ.IsHaarMeasure] {F : Set G}
-    (hF : IsFundamentalDomain Γ F μ) : μ F ≠ ⊤ := by
+theorem measure_ne_top_of_cocompact
+    (Γ : Subgroup G) [Countable Γ]
+    {K : Set G} (hK : IsCompact K) (hcov : ∀ x : G, ∃ γ ∈ Γ, γ * x ∈ K)
+    (μ : Measure G) [μ.IsHaarMeasure]
+    {F : Set G} (hF : IsFundamentalDomain Γ F μ)
+    : μ F ≠ ⊤ := by
   have hsub : F ⊆ ⋃ γ : Γ, ((γ • K) ∩ F) := by
     intro g hg
     obtain ⟨γ, hγ, hk⟩ := hcov g
@@ -68,15 +88,20 @@ theorem measure_ne_top_of_cocompact (Γ : Subgroup G) [Countable Γ] {K : Set G}
     rw [Set.mem_inv_smul_set_iff]
     exact hk
   refine ne_of_lt ?_
-  calc μ F ≤ μ (⋃ γ : Γ, ((γ • K) ∩ F)) := measure_mono hsub
+  calc
+    μ F
+      ≤ μ (⋃ γ : Γ, ((γ • K) ∩ F)) := measure_mono hsub
     _ ≤ ∑' γ : Γ, μ ((γ • K) ∩ F) := measure_iUnion_le _
     _ = μ K := (hF.measure_eq_tsum K).symm
     _ < ⊤ := hK.measure_lt_top
 
 end General
 
-theorem exists_sub_mem_of_isOpen (F : Type) [Field F] [NumberField F] (W : AddSubgroup (AF F))
-    (hW : IsOpen (W : Set (AF F))) (a : AF F) : ∃ x : F, a - algebraMap F (AF F) x ∈ W := by
+theorem exists_sub_mem_of_isOpen
+    (F : Type) [Field F] [NumberField F]
+    (W : AddSubgroup (AF F)) (hW : IsOpen (W : Set (AF F)))
+    (a : AF F)
+    : ∃ x : F, a - algebraMap F (AF F) x ∈ W := by
   obtain ⟨K, hK, hx⟩ := GlobalTheory.AdeleCocompact.exists_compact_adele F
   let H : AddSubgroup (AF F) := (algebraMap F (AF F)).toAddMonoidHom.range ⊔ W
   have hH : IsOpen (H : Set (AF F)) := AddSubgroup.isOpen_mono le_sup_right hW
@@ -99,44 +124,67 @@ theorem exists_sub_mem_of_isOpen (F : Type) [Field F] [NumberField F] (W : AddSu
   rw [← e]
   simpa using hw
 
-theorem map_proj {R A n : Type} [CommRing R] [CommRing A] [DecidableEq n] (f : R →+* A) (ε : R) (M : Matrix n n R) :
-    (f ε = 0 → (1 + ε • (M - 1)).map f = 1) ∧ (f ε = 1 → (1 + ε • (M - 1)).map f = M.map f) := by
+theorem map_proj
+    {R A n : Type} [CommRing R] [CommRing A] [DecidableEq n]
+    (f : R →+* A) (ε : R) (M : Matrix n n R)
+    : (f ε = 0 → (1 + ε • (M - 1)).map f = 1) ∧ (f ε = 1 → (1 + ε • (M - 1)).map f = M.map f) := by
   constructor <;> intro h <;> ext i j <;> by_cases hij : i = j <;> simp [h, Matrix.one_apply, hij]
 
-theorem continuous_proj {X R n : Type} [TopologicalSpace X] [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
-    [DecidableEq n] (ε : R) {M : X → Matrix n n R} (h : Continuous M) : Continuous fun x => 1 + ε • (M x - 1) :=
+theorem continuous_proj
+    {X R n : Type}
+    [TopologicalSpace X] [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [DecidableEq n]
+    (ε : R)
+    {M : X → Matrix n n R} (h : Continuous M)
+    : Continuous fun x => 1 + ε • (M x - 1) :=
   continuous_const.add ((h.sub continuous_const).const_smul ε)
 
-theorem proj_smul {R n : Type} [CommRing R] [DecidableEq n] (ε a : R) {M M' N : Matrix n n R}
-    (h : M' = 1 + ε • (M - 1)) (ha : M - 1 = a • N) : M' - 1 = (ε * a) • N := by
+theorem proj_smul
+    {R n : Type} [CommRing R] [DecidableEq n]
+    (ε a : R)
+    {M M' N : Matrix n n R} (h : M' = 1 + ε • (M - 1)) (ha : M - 1 = a • N)
+    : M' - 1 = (ε * a) • N := by
   rw [h, ha, add_sub_cancel_left, smul_smul]
 
 variable {D : D7}
 
-theorem exists_finite_projection_mat (V : HSp D) : ∃ (p : GA D V →* GA D V) (ε : AE D), (∀ g, infHom V (p g) = 1) ∧
-    (∀ g, finHom V (p g) = finHom V g) ∧ ∀ g, (matHom V (p g)).1 = 1 + ε • ((matHom V g).1 - 1) := by
+theorem exists_finite_projection_mat (V : HSp D)
+    : ∃ (p : GA D V →* GA D V) (ε : AE D),
+      (∀ g, infHom V (p g) = 1) ∧ (∀ g, finHom V (p g) = finHom V g)
+        ∧ ∀ g, (matHom V (p g)).1 = 1 + ε • ((matHom V g).1 - 1) := by
   choose q h1 h2 using fun g : GA D V =>
     GlobalTheory.UnitarySplit.ga_glue V 1 _ (one_mem _) (GlobalTheory.UnitarySplit.finHom_mem V g)
   obtain ⟨ε, e1, e2⟩ := GlobalTheory.UnitarySplit.parts_surj D 0 1
-  refine ⟨MonoidHom.mk' q fun a b => GlobalTheory.UnitarySplit.ga_ext V
-    (by rw [map_mul, h1, h1, h1, mul_one]) (by rw [h2, map_mul, map_mul, h2, h2]), ε, h1, h2, fun g => ?_⟩
-  refine GlobalTheory.UnitarySplit.mat_ext (infPart D) (finPart D) (GlobalTheory.UnitarySplit.parts_inj D) ?_ ?_
+  refine ⟨
+    MonoidHom.mk' q fun a b =>
+      GlobalTheory.UnitarySplit.ga_ext V (by rw [map_mul, h1, h1, h1, mul_one])
+        (by rw [h2, map_mul, map_mul, h2, h2]),
+    ε,
+    h1,
+    h2,
+    fun g => ?_
+  ⟩
+  refine GlobalTheory.UnitarySplit.mat_ext (infPart D) (finPart D)
+    (GlobalTheory.UnitarySplit.parts_inj D) ?_ ?_
   · exact (congrArg Units.val (h1 g)).trans ((map_proj (infPart D) ε _).1 e1).symm
   · exact (congrArg Units.val (h2 g)).trans ((map_proj (finPart D) ε _).2 e2).symm
 
-theorem exists_finite_projection (V : HSp D) : ∃ p : GA D V →* GA D V, Continuous p ∧ (∀ g, p g ∈ GfC V) ∧
-    (∀ g, g * (p g)⁻¹ ∈ GinfC V) ∧ ∀ ξ, ∀ g ∈ ZI V ξ, p g ∈ ZI V ξ := by
+theorem exists_finite_projection (V : HSp D)
+    : ∃ p : GA D V →* GA D V,
+      Continuous p ∧ (∀ g, p g ∈ GfC V) ∧ (∀ g, g * (p g)⁻¹ ∈ GinfC V)
+        ∧ ∀ ξ, ∀ g ∈ ZI V ξ, p g ∈ ZI V ξ := by
   obtain ⟨p, ε, h1, h2, hm⟩ := exists_finite_projection_mat V
   have : IsModuleTopology (AF D.host.F) (AE D) := ⟨rfl⟩
   have : IsTopologicalRing (AE D) := IsModuleTopology.isTopologicalRing (AF D.host.F) _
   have i0 := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.topGroupHA D.sp.cm.sig V.gram
   have hc : Continuous fun h : GA D V => (matHom V h).1 :=
-    Units.continuous_val.comp (continuous_subtype_val (p := (· ∈ HR (AF D.host.F) D.sp.cm.sig V.gram)))
+    Units.continuous_val.comp (continuous_subtype_val
+      (p := (· ∈ HR (AF D.host.F) D.sp.cm.sig V.gram)))
   have hc' : Continuous fun g : GA D V => (matHom V (p g)).1 :=
     (continuous_proj (R := AE D) ε hc).congr fun g => (hm g).symm
   refine ⟨p, ?_, h1, fun g => ?_, fun ξ g hg => ?_⟩
   · have h3 : Continuous fun g : GA D V => matHom V (p g) := by
-      refine Units.continuous_iff.2 ⟨hc', (hc'.comp (continuous_inv (G := GA D V))).congr fun g => ?_⟩
+      refine Units.continuous_iff.2
+        ⟨hc', (hc'.comp (continuous_inv (G := GA D V))).congr fun g => ?_⟩
       rw [Function.comp_apply, map_inv, map_inv]
     exact continuous_induced_rng.2 h3
   · change finHom V (g * (p g)⁻¹) = 1
@@ -147,13 +195,31 @@ theorem exists_finite_projection (V : HSp D) : ∃ p : GA D V →* GA D V, Conti
       exact Subgroup.subset_closure ⟨ε * a, proj_smul ε a (hm g) ha⟩
     exact this hg
 
-theorem transvection_measure : ∀ (D : D7) (θ : InfFam D) (V : HSp D), IsInfFam θ → ∀ ξ, IsoVec V ξ → (∃ (μ : Measure (ZI V ξ)) (𝓕 : Set (ZI V ξ)), μ.IsHaarMeasure ∧ IsFundamentalDomain ((GQ V).subgroupOf (ZI V ξ)) 𝓕 μ ∧ IsCompact (closure 𝓕)) ∧ (∀ (μ : Measure (ZI V ξ)) (𝓕 : Set (ZI V ξ)), μ.IsHaarMeasure → IsFundamentalDomain ((GQ V).subgroupOf (ZI V ξ)) 𝓕 μ → μ 𝓕 ≠ 0 ∧ μ 𝓕 ≠ ⊤) ∧ ∀ U : Subgroup (GA D V), IsOpen (U : Set (GA D V)) → ∀ z ∈ ZI V ξ, ∃ γ ∈ ZI V ξ, γ ∈ GQ V ∧ ∃ u ∈ ZI V ξ, u ∈ GinfC V ∧ ∃ k ∈ ZI V ξ, k ∈ GfC V ∧ k ∈ U ∧ z = γ * u * k := by
+theorem transvection_measure
+    : ∀ (D : D7) (θ : InfFam D) (V : HSp D),
+      IsInfFam θ
+        → ∀ ξ,
+          IsoVec V ξ
+            → (∃ (μ : Measure (ZI V ξ)) (𝓕 : Set (ZI V ξ)),
+                μ.IsHaarMeasure ∧ IsFundamentalDomain ((GQ V).subgroupOf (ZI V ξ)) 𝓕 μ
+                  ∧ IsCompact (closure 𝓕))
+              ∧ (∀ (μ : Measure (ZI V ξ)) (𝓕 : Set (ZI V ξ)),
+                μ.IsHaarMeasure → IsFundamentalDomain ((GQ V).subgroupOf (ZI V ξ)) 𝓕 μ
+                  → μ 𝓕 ≠ 0 ∧ μ 𝓕 ≠ ⊤)
+              ∧ ∀ U : Subgroup (GA D V),
+                IsOpen (U : Set (GA D V))
+                  → ∀ z ∈ ZI V ξ, ∃ γ ∈ ZI V ξ,
+                    γ ∈ GQ V
+                      ∧ ∃ u ∈ ZI V ξ,
+                        u ∈ GinfC V ∧ ∃ k ∈ ZI V ξ, k ∈ GfC V ∧ k ∈ U ∧ z = γ * u * k := by
   intro D θ V hθ ξ hξ
   obtain ⟨⟨e, he⟩, -⟩ := GlobalTheory.T.adelicTransvectionSubgroup_eq_adeles_closed D θ V hθ ξ hξ
   have i0 := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.topGroupHA D.sp.cm.sig V.gram
   have i4 := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.borelHA D.sp.cm.sig V.gram
-  obtain ⟨-, i2, i3⟩ := GlobalTheory.AdelicUnitaryTop.lcsc_adelicUnitary D.host.F D.host.E D.sp.cm.sig V.rank V.gram
-  have : LocallyCompactSpace (Multiplicative (AF D.host.F)) := GlobalTheory.AdelicUnitaryTop.locallyCompact_adele _
+  obtain ⟨-, i2, i3⟩ :=
+    GlobalTheory.AdelicUnitaryTop.lcsc_adelicUnitary D.host.F D.host.E D.sp.cm.sig V.rank V.gram
+  have : LocallyCompactSpace (Multiplicative (AF D.host.F)) :=
+    GlobalTheory.AdelicUnitaryTop.locallyCompact_adele _
   have : LocallyCompactSpace (ZI V ξ) := e.toHomeomorph.symm.isClosedEmbedding.locallyCompactSpace
   have : BorelSpace (ZI V ξ) := Subtype.borelSpace _
   have : SecondCountableTopology (ZI V ξ) := TopologicalSpace.Subtype.secondCountableTopology _
@@ -162,7 +228,8 @@ theorem transvection_measure : ∀ (D : D7) (θ : InfFam D) (V : HSp D), IsInfFa
     refine discreteTopology_of_isOpen_singleton_one ?_
     rw [isOpen_singleton_iff_nhds_eq_pure]
     refine le_antisymm (Filter.le_pure_iff.2 ?_) (pure_le_nhds _)
-    have hc : ContinuousAt (fun x : (GQ V).subgroupOf (ZI V ξ) => Multiplicative.toAdd (e.symm x)) 1 :=
+    have hc
+        : ContinuousAt (fun x : (GQ V).subgroupOf (ZI V ξ) => Multiplicative.toAdd (e.symm x)) 1 :=
       (continuous_toAdd.comp (e.symm.continuous.comp continuous_subtype_val)).continuousAt
     refine Filter.mem_of_superset (hc.preimage_mem_nhds (by simpa using hU)) ?_
     rintro ⟨z, hz⟩ hy
@@ -179,7 +246,9 @@ theorem transvection_measure : ∀ (D : D7) (θ : InfFam D) (V : HSp D), IsInfFa
   obtain ⟨K, hK, hKx⟩ := GlobalTheory.AdeleCocompact.exists_compact_adele D.host.F
   have hK' : IsCompact ((fun a => e (Multiplicative.ofAdd a)) '' K) :=
     hK.image (e.continuous.comp continuous_ofAdd)
-  have hcov : ∀ z : ZI V ξ, ∃ γ ∈ (GQ V).subgroupOf (ZI V ξ), γ * z ∈ (fun a => e (Multiplicative.ofAdd a)) '' K := by
+  have hcov
+      : ∀ z : ZI V ξ, ∃ γ ∈ (GQ V).subgroupOf (ZI V ξ),
+        γ * z ∈ (fun a => e (Multiplicative.ofAdd a)) '' K := by
     intro z
     obtain ⟨a, rfl⟩ := e.surjective z
     obtain ⟨x, hx⟩ := hKx a.toAdd
@@ -187,21 +256,38 @@ theorem transvection_measure : ∀ (D : D7) (θ : InfFam D) (V : HSp D), IsInfFa
     beta_reduce
     rw [← map_mul, map_neg, sub_eq_neg_add]
     rfl
-  refine ⟨?_, fun μ 𝓕 hμ h𝓕 => ⟨h𝓕.measure_ne_zero (NeZero.ne μ), measure_ne_top_of_cocompact _ hK' hcov μ h𝓕⟩,
-    fun U hU z hz => ?_⟩
+  refine ⟨
+    ?_,
+    fun μ 𝓕 hμ h𝓕 =>
+      ⟨h𝓕.measure_ne_zero (NeZero.ne μ), measure_ne_top_of_cocompact _ hK' hcov μ h𝓕⟩,
+    fun U hU z hz => ?_
+  ⟩
   · obtain ⟨S, hS, h⟩ := exists_fundamentalDomain_subset _ hK'.isClosed hcov Measure.haar
     exact ⟨Measure.haar, S, inferInstance, h, hK'.closure_of_subset hS⟩
   · obtain ⟨p, hp, h1, h2, h3⟩ := exists_finite_projection V
-    let f : Multiplicative (AF D.host.F) →* GA D V := p.comp ((ZI V ξ).subtype.comp e.toMulEquiv.toMonoidHom)
+    let f : Multiplicative (AF D.host.F) →* GA D V :=
+      p.comp ((ZI V ξ).subtype.comp e.toMulEquiv.toMonoidHom)
     have hf : Continuous f := hp.comp (continuous_subtype_val.comp e.continuous)
     obtain ⟨a, ha⟩ := e.surjective ⟨z, hz⟩
-    obtain ⟨x, hx⟩ := exists_sub_mem_of_isOpen D.host.F (Subgroup.toAddSubgroup' (U.comap f))
-      (hU.preimage (hf.comp continuous_ofAdd)) a.toAdd
+    obtain ⟨x, hx⟩ :=
+      exists_sub_mem_of_isOpen D.host.F (Subgroup.toAddSubgroup' (U.comap f))
+        (hU.preimage (hf.comp continuous_ofAdd)) a.toAdd
     set k : ZI V ξ := e (Multiplicative.ofAdd (a.toAdd - algebraMap _ _ x)) with hk
     have hkU : p k ∈ U := hx
-    refine ⟨e (Multiplicative.ofAdd (algebraMap _ _ x)), SetLike.coe_mem _, (he _).2 ⟨x, rfl⟩,
-      k * (p k)⁻¹, mul_mem k.2 (inv_mem (h3 ξ _ k.2)), h2 _, p k, h3 ξ _ k.2, h1 _, hkU, ?_⟩
-    rw [mul_assoc, inv_mul_cancel_right, hk, ← Subgroup.coe_mul, ← map_mul, ← ofAdd_add, add_sub_cancel,
-      ofAdd_toAdd, ha]
+    refine ⟨
+      e (Multiplicative.ofAdd (algebraMap _ _ x)),
+      SetLike.coe_mem _,
+      (he _).2 ⟨x, rfl⟩,
+      k * (p k)⁻¹,
+      mul_mem k.2 (inv_mem (h3 ξ _ k.2)),
+      h2 _,
+      p k,
+      h3 ξ _ k.2,
+      h1 _,
+      hkU,
+      ?_
+    ⟩
+    rw [mul_assoc, inv_mul_cancel_right, hk, ← Subgroup.coe_mul, ← map_mul, ← ofAdd_add,
+      add_sub_cancel, ofAdd_toAdd, ha]
 
 end GlobalTheory.TransvMeasure

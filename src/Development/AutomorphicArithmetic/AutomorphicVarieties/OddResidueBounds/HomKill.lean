@@ -8,10 +8,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueB
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
 
-theorem UpperTheory.V.Odd.homKill :
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (N : ℕ) [NeZero N] (ρ : (ZMod N)ˣ →* (E ≃ₐ[ℚ] E)), IsCycAct Ω N ρ → 2 < N → ∀ a : ℕ, Odd a → a.Coprime N → ∀ (R X : Type) [CommRing R] [AddCommGroup X] [Module R X] (N' : ℕ), ∀ φ ∈ XDual N' (fixMu E Ω N) R X, ∀ σ : (ZMod N)ˣ → Ω ≃+* Ω, (∀ b, CycLift N b (σ b)) → ∀ (u : fixMu E Ω N) (w : (ZMod N)ˣ → fixMu E Ω N), (∀ b y, u.1 (σ b y) = σ b ((w b).1 y)) → ∑ b : (ZMod N)ˣ, Eone N a b • φ (w b) = 0 := by
+theorem UpperTheory.V.Odd.homKill
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (N : ℕ)
+        [NeZero N] (ρ : (ZMod N)ˣ →* (E ≃ₐ[ℚ] E)),
+      IsCycAct Ω N ρ → 2 < N
+        → ∀ a : ℕ,
+          Odd a → a.Coprime N
+            → ∀ (R X : Type) [CommRing R] [AddCommGroup X] [Module R X] (N' : ℕ),
+              ∀ φ ∈ XDual N' (fixMu E Ω N) R X, ∀ σ : (ZMod N)ˣ → Ω ≃+* Ω,
+                (∀ b, CycLift N b (σ b))
+                  → ∀ (u : fixMu E Ω N) (w : (ZMod N)ˣ → fixMu E Ω N),
+                    (∀ b y, u.1 (σ b y) = σ b ((w b).1 y))
+                      → ∑ b : (ZMod N)ˣ, Eone N a b • φ (w b) = 0 := by
   intro E Ω _ _ _ _ _ N _ ρ hρ hN2 a ha hcop R X _ _ _ N' φ hφ σ hσ u w huw
   obtain ⟨K, hKnf, hKcyc, hKgal, hKlift⟩ := fixField E Ω N ρ hρ
   have hU : fixMu E Ω N ≤ galOf E K Ω := le_of_eq hKgal.symm
@@ -23,8 +35,10 @@ theorem UpperTheory.V.Odd.homKill :
   have hTC : IsTotallyComplex K := IsCyclotomicExtension.Rat.isTotallyComplex K hN2
   rw [← pullOnto E Ω K (fixMu E Ω N) hU 1 R X one_ne_zero (le_of_eq hKgal) (Or.inl hTC)] at hφ1
   obtain ⟨ψ, hψ, rfl⟩ := hφ1
-  have hart : ∀ b, Additive.ofMul (artU K hU (w b)) =
-      Stick.clRep K ((Stick.sg N K) b)⁻¹ (Additive.ofMul (artU K hU u)) := by
+  have hart
+      : ∀ b,
+        Additive.ofMul (artU K hU (w b))
+          = Stick.clRep K ((Stick.sg N K) b)⁻¹ (Additive.ofMul (artU K hU u)) := by
     intro b
     have hl := hKlift b (σ b) (hσ b)
     have hg : toGal K hU (w b) = conjGal hl (toGal K hU u) := by
@@ -42,13 +56,17 @@ theorem UpperTheory.V.Odd.homKill :
   let ψ' : Additive (ClassGroup (𝓞 K)) →+ X :=
     AddMonoidHom.mk' (fun c => ψ (Additive.toMul c)) (fun c d => hψ.1 _ _)
   have hsum := clKill N K a ha hcop (Additive.ofMul (artU K hU u))
-  have key : ∀ b, (clPull K hU R X ψ) (w b) = ψ' (Stick.clRep K ((Stick.sg N K) b)⁻¹ (Additive.ofMul (artU K hU u))) := by
+  have key
+      : ∀ b,
+        (clPull K hU R X ψ) (w b)
+          = ψ' (Stick.clRep K ((Stick.sg N K) b)⁻¹ (Additive.ofMul (artU K hU u))) := by
     intro b
     rw [← hart b]
     rfl
-  calc _ = ∑ b : (ZMod N)ˣ, Eone N a ↑b • ψ' (Stick.clRep K ((Stick.sg N K) b)⁻¹ (Additive.ofMul (artU K hU u))) :=
-        Finset.sum_congr rfl (fun b _ => by rw [key b])
+  calc
+    _ = ∑ b : (ZMod N)ˣ, Eone N a ↑b • ψ' (Stick.clRep K ((Stick.sg N K) b)⁻¹ (Additive.ofMul (artU K hU u))) :=
+      Finset.sum_congr rfl (fun b _ => by rw [key b])
     _ = 0 := by
       simp_rw [← map_zsmul ψ']
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum, hsum, map_zero]
+      rw [← map_sum, hsum, map_zero]

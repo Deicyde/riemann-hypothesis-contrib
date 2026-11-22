@@ -8,8 +8,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj Complex Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  Complex Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped BigOperators Real
 
 namespace GlobalTheory
@@ -24,8 +26,64 @@ theorem valAt'_zero_fn {X : Scheme.{0}} (x : Sp ℂ ⟶ X) (U : X.Opens) : valAt
   · simp [valAt]
   · rfl
 
-theorem isAH_of_polarisation :
-    (∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X), (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U ↔ x (default : PrimeSpectrum ℂ) ∈ U) ∧ (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U → ∃ e : Γ(X, U) →+* ℂ, ∀ f, valAt' x U f = e f) ∧ (∀ (U V : X.Opens) (h : V ≤ U) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ V → valAt' x V (resG X h f) = valAt' x U f) ∧ (∀ (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens) (f : Γ(Y, U)), valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f) ∧ (∀ (U : X.Opens) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ X.basicOpen f ↔ valAt' x U f ≠ 0) ∧ (∀ (p : X ⟶ Sp ℂ), x ≫ p = 𝟙 _ → ∀ (U : X.Opens) (a : ℂ), ⊤ ≤ x ⁻¹ᵁ U → valAt' x U (constFn p U a) = a)) → (∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)), DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → ∀ (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (Ef : LinearMap.BilinForm ℤ Λ) (θ : (Fin g → ℂ) → ℂ), Hm.IsHermitian → (∀ l, ‖χ l‖ = 1) → (∀ l m : Λ, (Ef l m : ℝ) = ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin g → ℂ))).im) → Function.Injective Ef → Differentiable ℂ θ → θ ≠ 0 → (∀ (l : Λ) z, θ (z + l) = (χ l * cexp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))) + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))))) * θ z) → ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re) → (∀ (P : Out.PolAV (Sp ℂ)) (n : ℕ), 1 ≤ n → ∃ s : Fin (n ^ P.g) → (lbPow P.L n).Sec, ∀ a : Fin (n ^ P.g) → ℂ, (∀ j, ∑ i, constFn P.A.hom _ (a i) * (s i).f j = 0) → a = 0) → (∀ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ) (Ef : LinearMap.BilinForm ℤ u.Λ), (Hm.IsHermitian ∧ (∀ l, ‖χ l‖ = 1) ∧ (∀ l m : u.Λ, (Ef l m : ℝ) = ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin P.g → ℂ))).im) ∧ ∀ (l : u.Λ) i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.L.U i → u.fr i z = (χ l * cexp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ))) + Real.pi / 2 * ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ))))) * u.fr i (z + l)) → ∀ n : ℕ, (∀ s, ∃! θ, u.IsThetaFn Hm χ n θ ∧ u.IsFnPow n s θ) ∧ ∀ θ s s', u.IsFnPow n s θ → u.IsFnPow n s' θ → s = s') → (∀ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ) (Ef : LinearMap.BilinForm ℤ u.Λ), (Hm.IsHermitian ∧ (∀ l, ‖χ l‖ = 1) ∧ (∀ l m : u.Λ, (Ef l m : ℝ) = ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin P.g → ℂ))).im) ∧ ∀ (l : u.Λ) i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.L.U i → u.fr i z = (χ l * cexp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ))) + Real.pi / 2 * ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ))))) * u.fr i (z + l)) → Function.Bijective Ef → u.IsAH Hm χ) := by
+theorem isAH_of_polarisation
+    : (∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X),
+        (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U ↔ x (default : PrimeSpectrum ℂ) ∈ U)
+          ∧ (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U → ∃ e : Γ(X, U) →+* ℂ, ∀ f, valAt' x U f = e f)
+          ∧ (∀ (U V : X.Opens) (h : V ≤ U) (f : Γ(X, U)),
+            ⊤ ≤ x ⁻¹ᵁ V → valAt' x V (resG X h f) = valAt' x U f)
+          ∧ (∀ (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens) (f : Γ(Y, U)),
+            valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f)
+          ∧ (∀ (U : X.Opens) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ X.basicOpen f ↔ valAt' x U f ≠ 0)
+          ∧ (∀ (p : X ⟶ Sp ℂ),
+            x ≫ p = 𝟙 _ → ∀ (U : X.Opens) (a : ℂ), ⊤ ≤ x ⁻¹ᵁ U → valAt' x U (constFn p U a) = a))
+      → (∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)),
+        DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
+          → ∀ (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (Ef : LinearMap.BilinForm ℤ Λ)
+              (θ : (Fin g → ℂ) → ℂ),
+            Hm.IsHermitian → (∀ l, ‖χ l‖ = 1)
+              → (∀ l m : Λ, (Ef l m : ℝ) = ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin g → ℂ))).im)
+              → Function.Injective Ef → Differentiable ℂ θ → θ ≠ 0
+              → (∀ (l : Λ) z,
+                θ (z + l)
+                  = (χ l * cexp
+                      (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))
+                        + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))))
+                    * θ z)
+              → ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re)
+      → (∀ (P : Out.PolAV (Sp ℂ)) (n : ℕ),
+        1 ≤ n
+          → ∃ s : Fin (n ^ P.g) → (lbPow P.L n).Sec, ∀ a : Fin (n ^ P.g) → ℂ,
+            (∀ j, ∑ i, constFn P.A.hom _ (a i) * (s i).f j = 0) → a = 0)
+      → (∀ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ)
+          (χ : u.Λ → ℂ) (Ef : LinearMap.BilinForm ℤ u.Λ),
+        (Hm.IsHermitian ∧ (∀ l, ‖χ l‖ = 1)
+            ∧ (∀ l m : u.Λ,
+              (Ef l m : ℝ) = ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin P.g → ℂ))).im)
+            ∧ ∀ (l : u.Λ) i z,
+              ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.L.U i
+                → u.fr i z
+                  = (χ l * cexp
+                      (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ)))
+                        + Real.pi / 2 * ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ)))))
+                    * u.fr i (z + l))
+          → ∀ n : ℕ,
+            (∀ s, ∃! θ, u.IsThetaFn Hm χ n θ ∧ u.IsFnPow n s θ)
+              ∧ ∀ θ s s', u.IsFnPow n s θ → u.IsFnPow n s' θ → s = s')
+      → (∀ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ)
+          (χ : u.Λ → ℂ) (Ef : LinearMap.BilinForm ℤ u.Λ),
+        (Hm.IsHermitian ∧ (∀ l, ‖χ l‖ = 1)
+            ∧ (∀ l m : u.Λ,
+              (Ef l m : ℝ) = ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin P.g → ℂ))).im)
+            ∧ ∀ (l : u.Λ) i z,
+              ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.L.U i
+                → u.fr i z
+                  = (χ l * cexp
+                      (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ)))
+                        + Real.pi / 2 * ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ)))))
+                    * u.fr i (z + l))
+          → Function.Bijective Ef
+          → u.IsAH Hm χ) := by
   intro _ hpos hsec hthe P u Hm χ Ef hAH hbij
   obtain ⟨hH, hχ, hE, hfr⟩ := hAH
   refine ⟨hH, ?_, hχ, hfr⟩
@@ -48,7 +106,8 @@ theorem isAH_of_polarisation :
       exact valAt'_zero_fn _ _
     have hs0 : s i0 = thetaZeroSec (lbPow P.L 1) := hcorr.2 0 _ _ hfn hz
     have hall : ∀ i, s i = thetaZeroSec (lbPow P.L 1) := fun i => by rw [hone i i0, hs0]
-    have h1 := hs (fun _ => 1) (fun j => Finset.sum_eq_zero (fun i _ => by rw [hall i]; exact mul_zero _))
+    have h1 :=
+      hs (fun _ => 1) (fun j => Finset.sum_eq_zero (fun i _ => by rw [hall i]; exact mul_zero _))
     exact absurd (congrFun h1 i0) (by simp)
 
   exact hpos P.g u.Λ u.discrete u.full Hm χ Ef θ hH hχ hE hbij.1 hθ.1 hθne

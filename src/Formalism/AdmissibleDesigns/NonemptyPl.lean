@@ -62,14 +62,18 @@ open Formalism.BasicNotions Classical
 
 namespace Formalism.MainNotions.N.K
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module Formalism.MainNotions Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module
+  Formalism.MainNotions Formalism.MainNotions.N
 
 variable {D : D7} (i : D.nd.Loc) (dc : TruncatedSeriesCountingIdentities.Decl D i)
 
 theorem nonempty_pl : Nonempty (HeightOneSpectrum (𝓞 D.host.E)) := by
   obtain ⟨M, hM⟩ := Ideal.exists_maximal (𝓞 D.host.E)
-  exact ⟨⟨M, hM.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hM
-    (NumberField.RingOfIntegers.not_isField _)⟩⟩
+  exact ⟨⟨
+    M,
+    hM.isPrime,
+    Ring.ne_bot_of_isMaximal_of_not_isField hM (NumberField.RingOfIntegers.not_isField _)
+  ⟩⟩
 
 def plSet : Finset (HeightOneSpectrum (𝓞 D.host.E)) := dc.row ∪ dc.col ∪ D.nd.Q i
 
@@ -77,17 +81,23 @@ def idx (v : HeightOneSpectrum (𝓞 D.host.E)) : ℕ :=
   if h : v ∈ plSet i dc then ((plSet i dc).equivFin ⟨v, h⟩ : ℕ) else (plSet i dc).card
 
 def plOf (n : ℕ) : HeightOneSpectrum (𝓞 D.host.E) :=
-  if h : n < (plSet i dc).card then ((plSet i dc).equivFin.symm ⟨n, h⟩ : HeightOneSpectrum (𝓞 D.host.E))
-  else Classical.choice nonempty_pl
+  if h : n < (plSet i dc).card then
+    ((plSet i dc).equivFin.symm ⟨n, h⟩ : HeightOneSpectrum (𝓞 D.host.E))
+  else
+    Classical.choice nonempty_pl
 
-theorem plOf_idx {v : HeightOneSpectrum (𝓞 D.host.E)} (h : v ∈ plSet i dc) : plOf i dc (idx i dc v) = v := by
+theorem plOf_idx {v : HeightOneSpectrum (𝓞 D.host.E)} (h : v ∈ plSet i dc)
+    : plOf i dc (idx i dc v) = v := by
   unfold plOf idx
   rw [dite_eq_left h, dite_eq_left ((plSet i dc).equivFin ⟨v, h⟩).isLt]
   simp
 
-theorem idx_inj {v w : HeightOneSpectrum (𝓞 D.host.E)} (hv : v ∈ plSet i dc) (hw : w ∈ plSet i dc)
-    (h : idx i dc v = idx i dc w) : v = w := by
-  calc v = plOf i dc (idx i dc v) := (plOf_idx i dc hv).symm
+theorem idx_inj
+    {v w : HeightOneSpectrum (𝓞 D.host.E)}
+    (hv : v ∈ plSet i dc) (hw : w ∈ plSet i dc) (h : idx i dc v = idx i dc w)
+    : v = w := by
+  calc
+    v = plOf i dc (idx i dc v) := (plOf_idx i dc hv).symm
     _ = plOf i dc (idx i dc w) := by rw [h]
     _ = w := plOf_idx i dc hw
 

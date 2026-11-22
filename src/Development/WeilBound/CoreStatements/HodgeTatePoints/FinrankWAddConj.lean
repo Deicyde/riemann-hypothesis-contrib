@@ -14,11 +14,15 @@ namespace PositivityTheory.HtPt.Gb
 
 open Module NumberField GlobalTheory.CompanionTheory.Ar.HT
 
-theorem eigQuot_lattice {C : Type} [Field C] {v : Valuation C NNReal} {O : Type} [CommRing O]
-    [Algebra O C] (hv : v.Integers O) {E : Type} [Field E] [NumberField E]
+theorem eigQuot_lattice
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    {E : Type} [Field E] [NumberField E]
     {Ω : Type} [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
-    (ρ : 𝓞 E →+* Module.End C Ω) (σ : E →+* C) (X : Submodule O Ω) (hX : X.IsLattice C) :
-    (latIn (eigQuot ρ σ X) (eigSp ρ σ)).IsLattice C := by
+    (ρ : 𝓞 E →+* Module.End C Ω) (σ : E →+* C)
+    (X : Submodule O Ω) (hX : X.IsLattice C)
+    : (latIn (eigQuot ρ σ X) (eigSp ρ σ)).IsLattice C := by
   let f : Ω →ₗ[O] eigSp ρ σ :=
     ((eigProj ρ σ).codRestrict (eigSp ρ σ) (LatBasic.eigProj_mem ρ σ)).restrictScalars O
   have hmap : latIn (eigQuot ρ σ X) (eigSp ρ σ) = X.map f := by
@@ -33,10 +37,21 @@ theorem eigQuot_lattice {C : Type} [Field C] {v : Valuation C NNReal} {O : Type}
   rw [hmap]
   exact Submodule.IsLattice.of_fg C (hX.fg.map f)
 
-theorem pt_om_block : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] (hv : v.Integers O) [IsAlgClosed C] [CharZero C] (E : Type) [Field E] [NumberField E] (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (κ : O) (N : ℕ) (V : Type) [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V] (Ω : Type) [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω] (P : HTPoint C O c κ N V Ω) (σ : E →+* C), P.omHT σ ≤ P.omRec σ ∧ (∀ x ∈ P.omRec σ, κ • x ∈ P.omHT σ) ∧ (latIn (P.omHT σ) (P.Ωsp σ)).IsLattice C ∧ (latIn (P.omRec σ) (P.Ωsp σ)).IsLattice C := by
+theorem pt_om_block
+    : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C]
+        (hv : v.Integers O) [IsAlgClosed C] [CharZero C] (E : Type) [Field E] [NumberField E]
+        (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (κ : O) (N : ℕ) (V : Type) [AddCommGroup V]
+        [Module C V] [Module O V] [IsScalarTower O C V] (Ω : Type) [AddCommGroup Ω] [Module C Ω]
+        [Module O Ω] [IsScalarTower O C Ω] (P : HTPoint C O c κ N V Ω) (σ : E →+* C),
+      P.omHT σ ≤ P.omRec σ ∧ (∀ x ∈ P.omRec σ, κ • x ∈ P.omHT σ)
+        ∧ (latIn (P.omHT σ) (P.Ωsp σ)).IsLattice C ∧ (latIn (P.omRec σ) (P.Ωsp σ)).IsLattice C := by
   intro C _ v O _ _ hv _ _ E _ _ c hc κ N V _ _ _ _ Ω _ _ _ _ P σ
-  refine ⟨Submodule.map_mono ?_, ?_, eigQuot_lattice hv _ _ _ (PtBasic.om'_lattice P),
-    eigQuot_lattice hv _ _ _ P.om_lat.toIsLattice⟩
+  refine ⟨
+    Submodule.map_mono ?_,
+    ?_,
+    eigQuot_lattice hv _ _ _ (PtBasic.om'_lattice P),
+    eigQuot_lattice hv _ _ _ P.om_lat.toIsLattice
+  ⟩
   · rintro _ ⟨x, hx, rfl⟩
     exact P.ht_mem x hx
   · rintro _ ⟨y, hy, rfl⟩
@@ -45,14 +60,15 @@ theorem pt_om_block : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Typ
 
 section
 
-variable {C O : Type} [Field C] [CommRing O] [Algebra O C] {E : Type} [Field E] [NumberField E]
-  {c : E ≃+* E} {κ : O} {N : ℕ}
-  {V Ω : Type} [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
-  [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
+variable
+  {C O : Type} [Field C] [CommRing O] [Algebra O C]
+  {E : Type} [Field E] [NumberField E]
+  {c : E ≃+* E} {κ : O} {N : ℕ} {V Ω : Type} [AddCommGroup V] [Module C V] [Module O V]
+  [IsScalarTower O C V] [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
   (P : HTPoint C O c κ N V Ω)
 
-theorem e_eigProj (hc : ∀ x, c (c x) = x) (σ : E →+* C) {x : V} (hx : x ∈ eigSp P.ρ σ) (y : V) :
-    P.e x (eigProj P.ρ (σ.comp c.toRingHom) y) = P.e x y := by
+theorem e_eigProj (hc : ∀ x, c (c x) = x) (σ : E →+* C) {x : V} (hx : x ∈ eigSp P.ρ σ) (y : V)
+    : P.e x (eigProj P.ρ (σ.comp c.toRingHom) y) = P.e x y := by
   have h : ∀ a : 𝓞 E, P.e x (P.ρ a y) = σ (c (a : E)) * P.e x y := by
     intro a
     have h1 := P.adj (RingOfIntegers.mapRingEquiv c a) x y
@@ -61,24 +77,25 @@ theorem e_eigProj (hc : ∀ x, c (c x) = x) (σ : E →+* C) {x : V} (hx : x ∈
     rw [h2, LatBasic.mem_eigSp.1 hx, map_smul, LinearMap.smul_apply, smul_eq_mul] at h1
     exact h1.symm
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, h, smul_eq_mul,
-    ← mul_assoc]
+    simp only [eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, h,
+      smul_eq_mul, ← mul_assoc]
   rw [← Finset.sum_mul]
-  have : ∑ k, (σ.comp c.toRingHom) (dualInt E k) * σ (c ((RingOfIntegers.basis E k : 𝓞 E) : E)) = 1 := by
+  have : ∑ k, (σ.comp c.toRingHom) (dualInt E k) * σ (c ((RingOfIntegers.basis E k : 𝓞 E) : E))
+      = 1 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← map_one (σ.comp c.toRingHom), ← LatBasic.sum_dualInt_mul, map_sum]
     simp
   rw [this, one_mul]
 
-theorem finrank_eigSp [CharZero C] {v : Valuation C NNReal} (hv : v.Integers O) (σ : E →+* C) :
-    finrank C (eigSp P.ρ σ) = N := by
+theorem finrank_eigSp [CharZero C] {v : Valuation C NNReal} (hv : v.Integers O) (σ : E →+* C)
+    : finrank C (eigSp P.ρ σ) = N := by
   obtain ⟨h1, d, -, -, h2⟩ := exists_diff_generator C v O hv E σ
-  obtain ⟨-, -, h3, h4⟩ := SubDiffQuot.eigSub_eq_different_smul_eigQuot O C V E P.ρ P.T N P.t σ d
-    hv.hom_inj h1 h2 P.free
+  obtain ⟨-, -, h3, h4⟩ :=
+    SubDiffQuot.eigSub_eq_different_smul_eigQuot O C V E P.ρ P.T N P.t σ d hv.hom_inj h1 h2 P.free
   rw [← h4, finrank_span_eq_card h3, Fintype.card_fin]
 
-theorem finrank_W_add_Ω [CharZero C] {v : Valuation C NNReal} (hv : v.Integers O) (σ : E →+* C) :
-    finrank C (P.Wsp σ) + finrank C (P.Ωsp σ) = N := by
+theorem finrank_W_add_Ω [CharZero C] {v : Valuation C NNReal} (hv : v.Integers O) (σ : E →+* C)
+    : finrank C (P.Wsp σ) + finrank C (P.Ωsp σ) = N := by
   haveI := PtBasic.finite_V P
   let f := P.ht ∘ₗ (eigSp P.ρ σ).subtype
   have h := f.finrank_range_add_finrank_ker
@@ -100,9 +117,9 @@ theorem finrank_W_add_Ω [CharZero C] {v : Valuation C NNReal} (hv : v.Integers 
   rw [hr, hk, finrank_eigSp P hv] at h
   omega
 
-theorem finrank_W_add_conj [CharZero C] {v : Valuation C NNReal} (hv : v.Integers O)
-    (hc : ∀ x, c (c x) = x) (σ : E →+* C) :
-    finrank C (P.Wsp σ) + finrank C (P.Wsp (σ.comp c.toRingHom)) = N := by
+theorem finrank_W_add_conj
+    [CharZero C] {v : Valuation C NNReal} (hv : v.Integers O) (hc : ∀ x, c (c x) = x) (σ : E →+* C)
+    : finrank C (P.Wsp σ) + finrank C (P.Wsp (σ.comp c.toRingHom)) = N := by
   haveI := PtBasic.finite_V P
   set τ := σ.comp c.toRingHom
   let B : eigSp P.ρ σ →ₗ[C] Module.Dual C (eigSp P.ρ τ) :=
@@ -110,9 +127,10 @@ theorem finrank_W_add_conj [CharZero C] {v : Valuation C NNReal} (hv : v.Integer
   have hinj : Function.Injective B := by
     rw [← LinearMap.ker_eq_bot, eq_bot_iff]
     intro x hx
-    have : (x : V) = 0 := P.nondeg _ fun y => by
-      rw [PtBasic.e_skew, ← e_eigProj P hc σ x.2, neg_eq_zero]
-      exact congrArg (fun φ => φ ⟨_, LatBasic.eigProj_mem P.ρ τ y⟩) (LinearMap.mem_ker.1 hx)
+    have : (x : V) = 0 :=
+      P.nondeg _ fun y => by
+        rw [PtBasic.e_skew, ← e_eigProj P hc σ x.2, neg_eq_zero]
+        exact congrArg (fun φ => φ ⟨_, LatBasic.eigProj_mem P.ρ τ y⟩) (LinearMap.mem_ker.1 hx)
     exact Subtype.ext this
   have hsurj : Function.Surjective B :=
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by
@@ -131,7 +149,8 @@ theorem finrank_W_add_conj [CharZero C] {v : Valuation C NNReal} (hv : v.Integer
     rw [PtBasic.ht_eigProj, hy, map_zero]
   have e1 : finrank C W₁ = finrank C W₂.dualAnnihilator := by
     rw [← (LinearEquiv.ofBijective B ⟨hinj, hsurj⟩).finrank_map_eq W₁, hW]
-    exact congrArg (fun U : Submodule C (Module.Dual C (eigSp P.ρ τ)) => finrank C U)
+    exact congrArg
+      (fun U : Submodule C (Module.Dual C (eigSp P.ρ τ)) => finrank C U)
       (Submodule.map_comap_eq_of_surjective hsurj _)
   have e2 := Subspace.finrank_add_finrank_dualAnnihilator_eq W₂
   have e3 : ∀ s : E →+* C, finrank C (P.W.comap (eigSp P.ρ s).subtype) = finrank C (P.Wsp s) := by
@@ -141,9 +160,9 @@ theorem finrank_W_add_conj [CharZero C] {v : Valuation C NNReal} (hv : v.Integer
   rw [← e1, finrank_eigSp P hv, e3, e3] at e2
   omega
 
-theorem finrank_Ω_add_Ω [CharZero C] {v : Valuation C NNReal} (hv : v.Integers O)
-    (hc : ∀ x, c (c x) = x) (σ : E →+* C) :
-    finrank C (P.Ωsp σ) + finrank C (P.Ωsp (σ.comp c.toRingHom)) = N := by
+theorem finrank_Ω_add_Ω
+    [CharZero C] {v : Valuation C NNReal} (hv : v.Integers O) (hc : ∀ x, c (c x) = x) (σ : E →+* C)
+    : finrank C (P.Ωsp σ) + finrank C (P.Ωsp (σ.comp c.toRingHom)) = N := by
   have h1 := finrank_W_add_Ω P hv σ
   have h2 := finrank_W_add_Ω P hv (σ.comp c.toRingHom)
   have h3 := finrank_W_add_conj P hv hc σ

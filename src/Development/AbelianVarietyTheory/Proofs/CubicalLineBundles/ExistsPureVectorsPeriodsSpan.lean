@@ -7,16 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsSym
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
 namespace GlobalTheory.CM
 
-theorem span_pure_periods_eq_top {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {g : ℕ}
-    {ty : Fin g → (E →+* ℂ)} {Pe : D.La →+ (Fin g → ℂ)} (hP : IsPeriod D ty Pe) {p q : ℕ} (Z : CMLat hP p q) :
-    Submodule.span ℂ {v : Fin g → ℂ | ∃ (ε : ℤˣ) (a : PureType.lat hP (((ε : ℤ) : ℂ) * H.rt0)), Pe a = v} = ⊤ := by
+theorem span_pure_periods_eq_top
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} {D : Datum H} {g : ℕ} {ty : Fin g → (E →+* ℂ)} {Pe : D.La →+ (Fin g → ℂ)}
+    (hP : IsPeriod D ty Pe)
+    {p q : ℕ} (Z : CMLat hP p q)
+    : Submodule.span ℂ
+        {v : Fin g → ℂ | ∃ (ε : ℤˣ) (a : PureType.lat hP (((ε : ℤ) : ℂ) * H.rt0)), Pe a = v}
+      = ⊤ := by
   set W := Submodule.span ℂ {v : Fin g → ℂ | ∃ (ε : ℤˣ) (a : PureType.lat hP (((ε : ℤ) : ℂ) * H.rt0)), Pe a = v}
   obtain ⟨n, hn, h⟩ := Z.span
   have key : ∀ a, Pe a ∈ W := by
@@ -36,14 +43,21 @@ theorem span_pure_periods_eq_top {E : Type} [Field E] [NumberField E] [IsCMField
   rw [hP.2.2.2.1] at h3
   exact eq_top_iff.2 fun v _ => h3 Submodule.mem_top
 
-theorem exists_pure_vectors_periods_span :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (Pe : D.La →+ (Fin g → ℂ)) (hP : IsPeriod D ty Pe) (p q : ℕ) (Z : CMLat hP p q), ∃ (ε : Fin (Module.finrank ℚ E / 2 * (D.p + D.q)) → ℤˣ) (a : ∀ i, PureType.lat hP (((ε i : ℤ) : ℂ) * H.rt0)), ∀ z : Fin g → ℂ, ∃ c : Fin (Module.finrank ℚ E / 2 * (D.p + D.q)) → ℂ, z = ∑ i, c i • Pe (a i) := by
+theorem exists_pure_vectors_periods_span
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (g : ℕ)
+        (ty : Fin g → (E →+* ℂ)) (Pe : D.La →+ (Fin g → ℂ)) (hP : IsPeriod D ty Pe) (p q : ℕ)
+        (Z : CMLat hP p q),
+      ∃ (ε : Fin (Module.finrank ℚ E / 2 * (D.p + D.q)) → ℤˣ)
+          (a : ∀ i, PureType.lat hP (((ε i : ℤ) : ℂ) * H.rt0)),
+        ∀ z : Fin g → ℂ, ∃ c : Fin (Module.finrank ℚ E / 2 * (D.p + D.q)) → ℂ,
+          z = ∑ i, c i • Pe (a i) := by
   intro E _ _ _ H D g ty Pe hP p q Z
   have h1 := (FibreExp.free_finite_finrank_of_isPeriod hP).2.2
   rw [datum_finrank_int D] at h1
   have hs := span_pure_periods_eq_top hP Z
-  have h2 := Submodule.exists_fun_fin_finrank_span_eq ℂ
-    {v : Fin g → ℂ | ∃ (ε : ℤˣ) (a : PureType.lat hP (((ε : ℤ) : ℂ) * H.rt0)), Pe a = v}
+  have h2 :=
+    Submodule.exists_fun_fin_finrank_span_eq ℂ
+      {v : Fin g → ℂ | ∃ (ε : ℤˣ) (a : PureType.lat hP (((ε : ℤ) : ℂ) * H.rt0)), Pe a = v}
   rw [hs, finrank_top, Module.finrank_fin_fun] at h2
   have hg : Module.finrank ℚ E / 2 * (D.p + D.q) = g := by omega
   rw [hg]

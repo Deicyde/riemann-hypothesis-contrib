@@ -7,28 +7,34 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open TensorProduct Module Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations UpperTheory.Gal.crystallineComparison
+open TensorProduct Module Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+  UpperTheory.Gal.crystallineComparison
 
 namespace UpperTheory.Ru.crystallineComparison
 
 section
-variable {F G B : Type} [Field F] [Group G] [AddCommGroup B] [Module F B]
-  {I : Type} [Fintype I] {V : I → Type} [∀ i, AddCommGroup (V i)] [∀ i, Module F (V i)]
+variable
+  {F G B : Type} [Field F] [Group G] [AddCommGroup B] [Module F B]
+  {I : Type} [Fintype I]
+  {V : I → Type} [∀ i, AddCommGroup (V i)] [∀ i, Module F (V i)]
 
-private def prI (B : Type) [AddCommGroup B] [Module F B] (i : I) : (∀ i, V i) ⊗[F] B →ₗ[F] V i ⊗[F] B :=
+private def prI (B : Type) [AddCommGroup B] [Module F B] (i : I)
+    : (∀ i, V i) ⊗[F] B →ₗ[F] V i ⊗[F] B :=
   AlgebraTensorModule.map (LinearMap.proj i) LinearMap.id
 
-private theorem prI_map (i : I) (a : (∀ i, V i) →ₗ[F] (∀ i, V i)) (b : V i →ₗ[F] V i) (c : B →ₗ[F] B)
-    (h : ∀ x, a x i = b (x i)) (x : (∀ i, V i) ⊗[F] B) :
-    prI B i (AlgebraTensorModule.map a c x) = AlgebraTensorModule.map b c (prI B i x) := by
+private theorem prI_map
+    (i : I) (a : (∀ i, V i) →ₗ[F] (∀ i, V i)) (b : V i →ₗ[F] V i)
+    (c : B →ₗ[F] B) (h : ∀ x, a x i = b (x i)) (x : (∀ i, V i) ⊗[F] B)
+    : prI B i (AlgebraTensorModule.map a c x) = AlgebraTensorModule.map b c (prI B i x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v y => simp [prI, h]
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-
 open Classical in
-private def inI (B : Type) [AddCommGroup B] [Module F B] (i : I) : V i ⊗[F] B →ₗ[F] (∀ i, V i) ⊗[F] B :=
+private def inI (B : Type) [AddCommGroup B] [Module F B] (i : I)
+    : V i ⊗[F] B →ₗ[F] (∀ i, V i) ⊗[F] B :=
   AlgebraTensorModule.map (LinearMap.single F V i) LinearMap.id
 
 private theorem sum_inI_prI (x : (∀ i, V i) ⊗[F] B) : ∑ i, inI B i (prI B i x) = x := by
@@ -36,7 +42,8 @@ private theorem sum_inI_prI (x : (∀ i, V i) ⊗[F] B) : ∑ i, inI B i (prI B 
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v y =>
-    simp only [prI, inI, AlgebraTensorModule.map_tmul, LinearMap.proj_apply, LinearMap.id_apply, LinearMap.coe_single]
+    simp only [prI, inI, AlgebraTensorModule.map_tmul, LinearMap.proj_apply, LinearMap.id_apply,
+      LinearMap.coe_single]
     rw [← TensorProduct.sum_tmul, Finset.univ_sum_single]
   | add x y hx hy => simp only [map_add (f := _), Finset.sum_add_distrib, hx, hy]
 
@@ -59,8 +66,8 @@ private theorem ext_prI {x y : (∀ i, V i) ⊗[F] B} (h : ∀ i, prI B i x = pr
 
 variable (σ : G → End F B) (ρ : ∀ i, Representation F G (V i)) (ρ' : Representation F G (∀ i, V i))
 
-private theorem mem_Dinv_pi (hρ : ∀ g x i, ρ' g x i = ρ i g (x i)) (x : (∀ i, V i) ⊗[F] B) :
-    x ∈ Dinv σ ρ' ↔ ∀ i, prI B i x ∈ Dinv σ (ρ i) := by
+private theorem mem_Dinv_pi (hρ : ∀ g x i, ρ' g x i = ρ i g (x i)) (x : (∀ i, V i) ⊗[F] B)
+    : x ∈ Dinv σ ρ' ↔ ∀ i, prI B i x ∈ Dinv σ (ρ i) := by
   simp only [mem_Dinv]
   constructor
   · intro h i g
@@ -71,8 +78,9 @@ private theorem mem_Dinv_pi (hρ : ∀ g x i, ρ' g x i = ρ i g (x i)) (x : (�
 
 private def dinvPi (hρ : ∀ g x i, ρ' g x i = ρ i g (x i)) : Dinv σ ρ' ≃ₗ[F] ∀ i, Dinv σ (ρ i) :=
   LinearEquiv.ofBijective
-    (LinearMap.pi fun i => ((prI B i).comp (Dinv σ ρ').subtype).codRestrict (Dinv σ (ρ i))
-      fun x => (mem_Dinv_pi σ ρ ρ' hρ x).1 x.2 i)
+    (LinearMap.pi fun i =>
+      ((prI B i).comp (Dinv σ ρ').subtype).codRestrict (Dinv σ (ρ i)) fun x =>
+        (mem_Dinv_pi σ ρ ρ' hρ x).1 x.2 i)
     (by
       constructor
       · intro x y h
@@ -82,14 +90,17 @@ private def dinvPi (hρ : ∀ g x i, ρ' g x i = ρ i g (x i)) : Dinv σ ρ' ≃
         have hc : ∀ i, prI B i (∑ j, inI B j (y j : V j ⊗[F] B)) = y i := by
           intro i
           set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum, Finset.sum_eq_single i (fun j _ h => prI_inI_ne h _) (by simp), prI_inI_same]
+          rw [map_sum, Finset.sum_eq_single i (fun j _ h => prI_inI_ne h _) (by simp), prI_inI_same]
         refine ⟨⟨∑ j, inI B j (y j : V j ⊗[F] B), (mem_Dinv_pi σ ρ ρ' hρ _).2 fun i => ?_⟩, ?_⟩
         · rw [hc]; exact (y i).2
         · funext i
           exact Subtype.ext (hc i))
 
-private theorem adm_pi_rep_of_forall_adm_of_pos [∀ i, Module.Finite F (V i)] (hρ : ∀ g x i, ρ' g x i = ρ i g (x i)) {e : ℕ} (he : 0 < e)
-    (h : ∀ i, admitted σ e (ρ i)) : admitted σ e ρ' := by
+private theorem adm_pi_rep_of_forall_adm_of_pos
+    [∀ i, Module.Finite F (V i)]
+    (hρ : ∀ g x i, ρ' g x i = ρ i g (x i))
+    {e : ℕ} (he : 0 < e) (h : ∀ i, admitted σ e (ρ i))
+    : admitted σ e ρ' := by
   have hfin : ∀ i, Module.Finite F (Dinv σ (ρ i)) := by
     intro i
     by_cases h0 : finrank F (V i) = 0
@@ -106,12 +117,15 @@ private theorem adm_pi_rep_of_forall_adm_of_pos [∀ i, Module.Finite F (V i)] (
       infer_instance
     · exact Module.finite_of_finrank_pos (by rw [h i]; exact Nat.mul_pos he (Nat.pos_of_ne_zero h0))
   unfold admitted at *
-  rw [(dinvPi σ ρ ρ' hρ).finrank_eq, Module.finrank_pi_fintype, Module.finrank_pi_fintype, Finset.mul_sum]
+  rw [(dinvPi σ ρ ρ' hρ).finrank_eq, Module.finrank_pi_fintype, Module.finrank_pi_fintype,
+    Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => h i
 
-private theorem annD_pi (ψ : End F B) (q n : ℕ) (T : ∀ i, ℕ → End F (V i)) (T' : ℕ → End F (∀ i, V i))
+private theorem annD_pi
+    (ψ : End F B) (q n : ℕ) (T : ∀ i, ℕ → End F (V i)) (T' : ℕ → End F (∀ i, V i))
     (hρ : ∀ g x i, ρ' g x i = ρ i g (x i)) (hT : ∀ j x i, T' j x i = T i j (x i))
-    (h : ∀ i, AnnD σ ψ q n (ρ i) (T i)) : AnnD σ ψ q n ρ' T' := by
+    (h : ∀ i, AnnD σ ψ q n (ρ i) (T i))
+    : AnnD σ ψ q n ρ' T' := by
   intro x hx
   refine ext_prI fun i => ?_
   have := h i _ ((mem_Dinv_pi σ ρ ρ' hρ x).1 hx i)
@@ -124,11 +138,13 @@ end
 
 end UpperTheory.Ru.crystallineComparison
 
-theorem UpperTheory.Ru.crystallineComparison.annPi :
-    UpperTheory.Ru.crystallineComparison.AnnPi := by
+theorem UpperTheory.Ru.crystallineComparison.annPi
+    : UpperTheory.Ru.crystallineComparison.AnnPi := by
   intro l _ P K I _ V _ _ _ ρ f q n T ρ' T' hρ hT
   refine ⟨fun h => ?_, fun h => annD_pi _ ρ ρ' _ q n T T' hρ hT h⟩
   have he : 0 < finrank ℚ_[l] ↥(K0 K) := by
     have := (P.PD K).finK₀
     exact Module.finrank_pos
-  exact adm_pi_rep_of_forall_adm_of_pos (fun g => (((P.PD K).actB g).toAlgHom.toLinearMap).restrictScalars ℚ_[l]) ρ ρ' hρ he h
+  exact adm_pi_rep_of_forall_adm_of_pos
+    (fun g => (((P.PD K).actB g).toAlgHom.toLinearMap).restrictScalars ℚ_[l])
+    ρ ρ' hρ he h

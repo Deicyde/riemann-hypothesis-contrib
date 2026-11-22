@@ -4,11 +4,16 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C
 
-theorem UpperTheory.norm_trace_comp_le_mul_traceNorm :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (ι : Type) (b : HilbertBasis ι ℂ H) (T D : H →L[ℂ] H) (c : ℝ), 0 ≤ c → IsTraceClass T → (∀ i, ∃ d : ℂ, ‖d‖ ≤ c ∧ T (D (b i)) = d • T (b i)) → ‖trace (D ∘L T)‖ ≤ c * (traceNorm T).toReal := by
+theorem UpperTheory.norm_trace_comp_le_mul_traceNorm
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (ι : Type)
+        (b : HilbertBasis ι ℂ H) (T D : H →L[ℂ] H) (c : ℝ),
+      0 ≤ c → IsTraceClass T → (∀ i, ∃ d : ℂ, ‖d‖ ≤ c ∧ T (D (b i)) = d • T (b i))
+        → ‖trace (D ∘L T)‖ ≤ c * (traceNorm T).toReal := by
   intro H _ _ _ ι b T D c hc hT hd
   have hs := hT.summable_norm_inner b
   have h1 := (hT.comp_right D).hasSum_trace b

@@ -13,8 +13,7 @@ open Polynomial Cardinal
 
 section Schur
 
-variable {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module ℂ V]
-  {ρ : Representation ℂ G V}
+variable {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V}
 
 theorem exists_ne_zero_of_isIrreducible [ρ.IsIrreducible] : ∃ v : V, v ≠ 0 := by
   by_contra h
@@ -25,13 +24,15 @@ theorem exists_ne_zero_of_isIrreducible [ρ.IsIrreducible] : ∃ v : V, v ≠ 0 
   ext v
   simp [h v]
 
-theorem injective_of_ne_zero [ρ.IsIrreducible] {f : Representation.IntertwiningMap ρ ρ}
-    (hf : f ≠ 0) : Function.Injective f :=
+theorem injective_of_ne_zero [ρ.IsIrreducible] {f : Representation.IntertwiningMap ρ ρ} (hf : f ≠ 0)
+    : Function.Injective f :=
   ((Representation.IsIrreducible.bijective_or_eq_zero f).resolve_right hf).1
 
-theorem exists_eq_algebraMap_of_aeval_eq_zero [ρ.IsIrreducible]
-    (φ : Representation.IntertwiningMap ρ ρ) {p : ℂ[X]} (hp : p ≠ 0) (hφ : aeval φ p = 0) :
-    ∃ c : ℂ, φ = algebraMap ℂ (Representation.IntertwiningMap ρ ρ) c := by
+theorem exists_eq_algebraMap_of_aeval_eq_zero
+    [ρ.IsIrreducible]
+    (φ : Representation.IntertwiningMap ρ ρ)
+    {p : ℂ[X]} (hp : p ≠ 0) (hφ : aeval φ p = 0)
+    : ∃ c : ℂ, φ = algebraMap ℂ (Representation.IntertwiningMap ρ ρ) c := by
   obtain ⟨v, hv⟩ := exists_ne_zero_of_isIrreducible (ρ := ρ)
   induction hn : p.natDegree generalizing p with
   | zero =>
@@ -64,34 +65,34 @@ theorem exists_eq_algebraMap_of_aeval_eq_zero [ρ.IsIrreducible]
       rw [← hpq, map_mul, map_sub, aeval_X, aeval_C] at hφ
       refine DFunLike.ext _ _ fun w => hinj ?_
       have h1 := congrArg (fun f : Representation.IntertwiningMap ρ ρ => f w) hφ
-      change (φ - algebraMap ℂ (Representation.IntertwiningMap ρ ρ) r) ((aeval φ q) w) =
-        (φ - algebraMap ℂ (Representation.IntertwiningMap ρ ρ) r) 0
+      change (φ - algebraMap ℂ (Representation.IntertwiningMap ρ ρ) r) ((aeval φ q) w)
+        = (φ - algebraMap ℂ (Representation.IntertwiningMap ρ ρ) r) 0
       rw [map_zero]
       exact h1
 
-theorem algebraMap_intertwiningMap_bijective_of_rank_le_aleph0 [ρ.IsIrreducible]
-    (hV : Module.rank ℂ V ≤ ℵ₀) :
-    Function.Bijective (algebraMap ℂ (Representation.IntertwiningMap ρ ρ)) := by
+theorem algebraMap_intertwiningMap_bijective_of_rank_le_aleph0
+    [ρ.IsIrreducible] (hV : Module.rank ℂ V ≤ ℵ₀)
+    : Function.Bijective (algebraMap ℂ (Representation.IntertwiningMap ρ ρ)) := by
   obtain ⟨v, hv⟩ := exists_ne_zero_of_isIrreducible (ρ := ρ)
   constructor
   · intro a b hab
-    have h1 : a • v = b • v :=
-      congrArg (fun f : Representation.IntertwiningMap ρ ρ => f v) hab
+    have h1 : a • v = b • v := congrArg (fun f : Representation.IntertwiningMap ρ ρ => f v) hab
     exact smul_left_injective ℂ hv h1
   · intro φ
     by_contra hne
     push Not at hne
-    have hsub : ∀ c : ℂ, φ - algebraMap ℂ (Representation.IntertwiningMap ρ ρ) c ≠ 0 :=
-      fun c h => hne c (sub_eq_zero.1 h).symm
+    have hsub : ∀ c : ℂ, φ - algebraMap ℂ (Representation.IntertwiningMap ρ ρ) c ≠ 0 := fun c h =>
+      hne c (sub_eq_zero.1 h).symm
     have htr : ∀ p : ℂ[X], p ≠ 0 → aeval φ p ≠ 0 := fun p hp h => by
       obtain ⟨c, hc⟩ := exists_eq_algebraMap_of_aeval_eq_zero φ hp h
       exact hne c hc.symm
-    have hsurj : ∀ c : ℂ,
-        Function.Surjective (φ - algebraMap ℂ (Representation.IntertwiningMap ρ ρ) c) :=
+    have hsurj
+        : ∀ c : ℂ, Function.Surjective (φ - algebraMap ℂ (Representation.IntertwiningMap ρ ρ) c) :=
       fun c => ((Representation.IsIrreducible.bijective_or_eq_zero _).resolve_right (hsub c)).2
     choose w hw using fun c => hsurj c v
-    have sum_apply : ∀ (s : Finset ℂ) (f : ℂ → Representation.IntertwiningMap ρ ρ) (x : V),
-        (∑ j ∈ s, f j) x = ∑ j ∈ s, f j x := by
+    have sum_apply
+        : ∀ (s : Finset ℂ) (f : ℂ → Representation.IntertwiningMap ρ ρ) (x : V),
+          (∑ j ∈ s, f j) x = ∑ j ∈ s, f j x := by
       intro s f x
       have h1 := congrFun (map_sum (Representation.IntertwiningMap.coeFnAddMonoidHom ρ ρ) f s) x
       rw [Finset.sum_apply] at h1
@@ -99,8 +100,9 @@ theorem algebraMap_intertwiningMap_bijective_of_rank_le_aleph0 [ρ.IsIrreducible
     have hli : LinearIndependent ℂ w := by
       rw [linearIndependent_iff']
       intro s a hsum i hi
-      have key : ∀ j ∈ s, aeval φ (∏ k ∈ s, (X - C k)) (w j) =
-          aeval φ (∏ k ∈ s.erase j, (X - C k)) v := by
+      have key
+          : ∀ j ∈ s,
+            aeval φ (∏ k ∈ s, (X - C k)) (w j) = aeval φ (∏ k ∈ s.erase j, (X - C k)) v := by
         intro j hj
         rw [← Finset.prod_erase_mul _ _ hj, map_mul]
         change (aeval φ (∏ k ∈ s.erase j, (X - C k))) ((aeval φ (X - C j)) (w j)) = _
@@ -127,8 +129,10 @@ theorem algebraMap_intertwiningMap_bijective_of_rank_le_aleph0 [ρ.IsIrreducible
         rw [eval_sub, eval_X, eval_C]
         exact sub_ne_zero.2 (Finset.ne_of_mem_erase hk).symm
       · intro j _ hji
-        rw [eval_smul, eval_prod, Finset.prod_eq_zero (i := i) (Finset.mem_erase.2 ⟨Ne.symm hji, hi⟩)
-          (by rw [eval_sub, eval_X, eval_C, sub_self]), smul_zero]
+        rw [eval_smul, eval_prod,
+          Finset.prod_eq_zero (i := i) (Finset.mem_erase.2 ⟨Ne.symm hji, hi⟩)
+            (by rw [eval_sub, eval_X, eval_C, sub_self]),
+          smul_zero]
       · intro h
         exact absurd hi h
     have h1 := hli.cardinal_lift_le_rank
@@ -140,26 +144,31 @@ end Schur
 
 section Smooth
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [TopologicalSpace.SeparableSpace G] {V : Type*} [AddCommGroup V] [Module ℂ V]
+variable
+  {G : Type*}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [TopologicalSpace.SeparableSpace G]
+  {V : Type*} [AddCommGroup V] [Module ℂ V]
   {ρ : Representation ℂ G V}
 
-theorem rank_le_aleph0_of_isSmooth (hρ : IsSmooth ρ) [ρ.IsIrreducible] :
-    Module.rank ℂ V ≤ ℵ₀ := by
+theorem rank_le_aleph0_of_isSmooth (hρ : IsSmooth ρ) [ρ.IsIrreducible] : Module.rank ℂ V ≤ ℵ₀ := by
   obtain ⟨v, hv⟩ := exists_ne_zero_of_isIrreducible (ρ := ρ)
   obtain ⟨D, hDc, hDd⟩ := TopologicalSpace.exists_countable_dense G
-  have hstable : ∀ g : G, Submodule.span ℂ (Set.range fun h : G => ρ h v) ≤
-      (Submodule.span ℂ (Set.range fun h : G => ρ h v)).comap (ρ g) := by
+  have hstable
+      : ∀ g : G,
+        Submodule.span ℂ (Set.range fun h : G => ρ h v)
+          ≤ (Submodule.span ℂ (Set.range fun h : G => ρ h v)).comap (ρ g) := by
     intro g
     refine Submodule.span_le.2 ?_
     rintro _ ⟨h, rfl⟩
     exact Submodule.subset_span ⟨g * h, by simp [map_mul, Module.End.mul_apply]⟩
   let W : Subrepresentation ρ :=
     ⟨Submodule.span ℂ (Set.range fun h : G => ρ h v), fun g _ hx => hstable g hx⟩
-  have hW : W = ⊤ := (eq_bot_or_eq_top W).resolve_left fun h => hv (by
-    have hvW : v ∈ W.toSubmodule := Submodule.subset_span ⟨1, by simp⟩
-    rw [h] at hvW
-    exact (Submodule.mem_bot ℂ).1 hvW)
+  have hW : W = ⊤ :=
+    (eq_bot_or_eq_top W).resolve_left fun h =>
+      hv (by
+        have hvW : v ∈ W.toSubmodule := Submodule.subset_span ⟨1, by simp⟩
+        rw [h] at hvW
+        exact (Submodule.mem_bot ℂ).1 hvW)
   have hspan : Submodule.span ℂ (Set.range fun h : G => ρ h v) = ⊤ :=
     congrArg Subrepresentation.toSubmodule hW
   have hsub : Set.range (fun h : G => ρ h v) ⊆ Set.range (fun d : D => ρ (d : G) v) := by
@@ -177,19 +186,23 @@ theorem rank_le_aleph0_of_isSmooth (hρ : IsSmooth ρ) [ρ.IsIrreducible] :
     exact Submodule.span_mono hsub
   have : Countable D := hDc.to_subtype
   have : Countable (Set.range fun d : D => ρ (d : G) v) := (Set.countable_range _).to_subtype
-  calc Module.rank ℂ V = Module.rank ℂ (⊤ : Submodule ℂ V) := (rank_top ℂ V).symm
+  calc
+    Module.rank ℂ V
+      = Module.rank ℂ (⊤ : Submodule ℂ V) := (rank_top ℂ V).symm
     _ = Module.rank ℂ (Submodule.span ℂ (Set.range fun d : D => ρ (d : G) v)) := by rw [htop]
     _ ≤ #(Set.range fun d : D => ρ (d : G) v) := rank_span_le _
     _ ≤ ℵ₀ := Cardinal.mk_le_aleph0
 
-theorem algebraMap_intertwiningMap_bijective_of_isSmooth (hρ : IsSmooth ρ) [ρ.IsIrreducible] :
-    Function.Bijective (algebraMap ℂ (Representation.IntertwiningMap ρ ρ)) :=
+theorem algebraMap_intertwiningMap_bijective_of_isSmooth (hρ : IsSmooth ρ) [ρ.IsIrreducible]
+    : Function.Bijective (algebraMap ℂ (Representation.IntertwiningMap ρ ρ)) :=
   algebraMap_intertwiningMap_bijective_of_rank_le_aleph0 (rank_le_aleph0_of_isSmooth hρ)
 
-theorem exists_central_character (hρ : IsSmooth ρ) [ρ.IsIrreducible] {z : G}
-    (hz : z ∈ Submonoid.center G) : ∃ c : ℂ, ∀ v : V, ρ z v = c • v := by
-  obtain ⟨c, hc⟩ := (algebraMap_intertwiningMap_bijective_of_isSmooth hρ).2
-    (Representation.IntertwiningMap.centralMul ρ z hz)
+theorem exists_central_character
+    (hρ : IsSmooth ρ) [ρ.IsIrreducible] {z : G} (hz : z ∈ Submonoid.center G)
+    : ∃ c : ℂ, ∀ v : V, ρ z v = c • v := by
+  obtain ⟨c, hc⟩ :=
+    (algebraMap_intertwiningMap_bijective_of_isSmooth hρ).2
+      (Representation.IntertwiningMap.centralMul ρ z hz)
   exact ⟨c, fun v => (congrArg (fun f : Representation.IntertwiningMap ρ ρ => f v) hc).symm⟩
 
 end Smooth

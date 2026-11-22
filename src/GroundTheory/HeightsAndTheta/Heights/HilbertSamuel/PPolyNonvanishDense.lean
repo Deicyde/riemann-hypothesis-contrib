@@ -19,8 +19,10 @@ theorem PolyNonvanishDense.proof : PolyNonvanishDense.Statement := by
   rw [Set.not_nonempty_iff_eq_empty] at hne
   obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.mp hU y₀ hy₀
   have hzero : map (algebraMap ℚ ℂ) D = 0 := by
-    refine funext_set (fun j => Metric.ball (y₀ j) ε)
-      (fun j => infinite_of_mem_nhds (y₀ j) (Metric.ball_mem_nhds _ hε)) fun y hy => ?_
+    refine funext_set
+      (fun j => Metric.ball (y₀ j) ε)
+      (fun j => infinite_of_mem_nhds (y₀ j) (Metric.ball_mem_nhds _ hε))
+      fun y hy => ?_
     rw [← ball_pi y₀ hε] at hy
     have hyU := hball hy
     rw [map_zero, eval_map, ← aeval_def]

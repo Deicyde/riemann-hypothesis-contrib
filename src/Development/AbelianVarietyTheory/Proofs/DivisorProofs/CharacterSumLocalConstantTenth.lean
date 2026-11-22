@@ -11,22 +11,32 @@ public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds GlobalTheory.ColNorms
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds
+  GlobalTheory.ColNorms
 open scoped ComplexOrder
 
 namespace GlobalTheory.ChainClassNumbers
 
-theorem card_orbits_le_principal {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
-    {ST SG : Finset (HeightOneSpectrum (𝓞 E))} {G' D' : Type} [Group G'] [MulAction G' D']
+theorem card_orbits_le_principal
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))} {G' D' : Type} [Group G'] [MulAction G' D']
     (p : D' → DecoSet (E := E) (n := n) (ST := ST) (SG := SG)) (hp : Function.Injective p)
-    (h : ∀ (g : UF E n) (x : D'), ∃ g' : G', p (g' • x) = (g, (1 : GLG (E := E) (n := n) (SG := SG))) • p x)
-    [Finite (MulAction.orbitRel.Quotient ((⊤ : Subgroup (UF E n)).prod (⊥ : Subgroup (GLG (E := E) (n := n) (SG := SG)))) (DecoSet (E := E) (n := n) (ST := ST) (SG := SG)))] :
-    Nat.card (MulAction.orbitRel.Quotient G' D') ≤
-      Nat.card (MulAction.orbitRel.Quotient ((⊤ : Subgroup (UF E n)).prod (⊥ : Subgroup (GLG (E := E) (n := n) (SG := SG)))) (DecoSet (E := E) (n := n) (ST := ST) (SG := SG))) := by
+    (h : ∀ (g : UF E n) (x : D'), ∃ g' : G',
+      p (g' • x) = (g, (1 : GLG (E := E) (n := n) (SG := SG))) • p x)
+    [Finite (MulAction.orbitRel.Quotient
+      ((⊤ : Subgroup (UF E n)).prod (⊥ : Subgroup (GLG (E := E) (n := n) (SG := SG))))
+      (DecoSet (E := E) (n := n) (ST := ST) (SG := SG)))]
+    : Nat.card (MulAction.orbitRel.Quotient G' D')
+      ≤ Nat.card (MulAction.orbitRel.Quotient
+        ((⊤ : Subgroup (UF E n)).prod (⊥ : Subgroup (GLG (E := E) (n := n) (SG := SG))))
+        (DecoSet (E := E) (n := n) (ST := ST) (SG := SG))) := by
   refine Nat.card_le_card_of_injective
     (fun c : MulAction.orbitRel.Quotient G' D' =>
-      (Quotient.mk (MulAction.orbitRel _ _) (p (Quotient.out c)) :
-        MulAction.orbitRel.Quotient ((⊤ : Subgroup (UF E n)).prod (⊥ : Subgroup (GLG (E := E) (n := n) (SG := SG)))) (DecoSet (E := E) (n := n) (ST := ST) (SG := SG)))) ?_
+      (Quotient.mk (MulAction.orbitRel _ _) (p (Quotient.out c)) : MulAction.orbitRel.Quotient
+        ((⊤ : Subgroup (UF E n)).prod (⊥ : Subgroup (GLG (E := E) (n := n) (SG := SG))))
+        (DecoSet (E := E) (n := n) (ST := ST) (SG := SG))))
+    ?_
   intro c c' hcc
   obtain ⟨⟨⟨g, k⟩, hgk⟩, hg⟩ := Quotient.exact hcc
   have hk : k = 1 := (Subgroup.mem_prod.1 hgk).2

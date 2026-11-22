@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.None
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ
 
@@ -22,7 +23,6 @@ def cond (ψ : 𝒪[k]ˣ →* ℂˣ) : ℕ :=
 abbrev res (μ : kˣ →* ℂˣ) : 𝒪[k]ˣ →* ℂˣ := μ.comp (unitIncl k)
 
 def cc {s : ℕ} (μ : Fin s → kˣ →* ℂˣ) (a b : Fin s) : ℕ := cond (res (μ a / μ b))
-
 
 variable (k) in
 structure Grp (n : ℕ) where

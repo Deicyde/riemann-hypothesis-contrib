@@ -15,8 +15,12 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions Classical
 
 section Pieces
 
-variable {R : Ranks} (host : Host R) {LL : Type} [Field LL] [NumberField LL] (embLL : LL →+* ℂ)
-  {Tau : Type} [Fintype Tau] (eTau : Tau ≃ R.Psi)
+variable
+  {R : Ranks} (host : Host R)
+  {LL : Type} [Field LL] [NumberField LL]
+  (embLL : LL →+* ℂ)
+  {Tau : Type} [Fintype Tau]
+  (eTau : Tau ≃ R.Psi)
 
 def lamOfH (cc : Ideal (𝓞 host.K)) (δ : ℂ) : AddSubgroup ℂ :=
   AddSubgroup.closure {w | ∃ c ∈ cc, w = δ * host.φ₀ (((c : host.K) : host.E))}
@@ -24,8 +28,9 @@ def lamOfH (cc : Ideal (𝓞 host.K)) (δ : ℂ) : AddSubgroup ℂ :=
 def embTH (τ : Tau) : host.E →+* ℂ := host.emb (eTau τ : R.GG)
 
 def mmMH (M : IntermediateField ℚ ℂ) [NumberField M] : Submodule (𝓞 M) (Tau → M) :=
-  Submodule.span (𝓞 M) {v | ∃ a ∈ (host.AA0 : Submodule (𝓞 host.E) host.E),
-    v = fun τ => TaylorLogMetric.liftM M (embTH host eTau τ a)}
+  Submodule.span (𝓞 M)
+    {v | ∃ a ∈ (host.AA0 : Submodule (𝓞 host.E) host.E),
+      v = fun τ => TaylorLogMetric.liftM M (embTH host eTau τ a)}
 
 def ellTH (M : IntermediateField ℚ ℂ) [NumberField M] (τ : Tau) : Submodule (𝓞 M) M :=
   (mmMH host eTau M).comap (LinearMap.single (𝓞 M) (fun _ : Tau => (M : Type)) τ)

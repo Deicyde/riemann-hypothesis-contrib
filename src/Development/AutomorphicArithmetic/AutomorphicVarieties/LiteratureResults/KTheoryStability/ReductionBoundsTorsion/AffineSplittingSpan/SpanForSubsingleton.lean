@@ -25,7 +25,8 @@ theorem altsum (n : ℕ) : ∑ i : Fin n, (-1 : ℝ) ^ (i : ℕ) = if Even n the
 
 theorem spanFor_subsingleton (G : Type) [Group G] [Subsingleton G] : SpanFor G := by
   intro q c hc hd
-  obtain ⟨v, hv⟩ : ∃ v, ∀ y, c y = v := ⟨c (fun _ => 1), fun y => congrArg c (Subsingleton.elim _ _)⟩
+  obtain ⟨v, hv⟩ : ∃ v, ∀ y, c y = v :=
+    ⟨c (fun _ => 1), fun y => congrArg c (Subsingleton.elim _ _)⟩
   rcases Nat.even_or_odd q with hq | hq
   · have h3 : ¬ Even (q + 1 + 2) := by
       rw [Nat.not_even_iff_odd]
@@ -43,21 +44,31 @@ theorem spanFor_subsingleton (G : Type) [Group G] [Subsingleton G] : SpanFor G :
       exact ⟨r + 1, by ring⟩
     refine ⟨0, Fin.elim0, Fin.elim0, fun _ => v, fun _ _ _ => rfl, ?_⟩
     funext y
-    simp only [dc, hv, Finset.univ_eq_empty, Finset.sum_empty, Pi.add_apply, Pi.zero_apply, zero_add]
+    simp only [dc, hv, Finset.univ_eq_empty, Finset.sum_empty, Pi.add_apply, Pi.zero_apply,
+      zero_add]
     rw [← Finset.sum_mul, altsum, if_neg h2, one_mul]
 
-theorem spanFor_equiv {A B : Type} [Group A] [Group B] (e : A ≃* B) (hB : SpanFor B) : SpanFor A := by
+theorem spanFor_equiv {A B : Type} [Group A] [Group B] (e : A ≃* B) (hB : SpanFor B)
+    : SpanFor A := by
   intro q c hc hd
-  obtain ⟨k, a, α, f, hf, hcf⟩ := hB q (fun z => c (fun j => e.symm (z j)))
-    (fun g _ y => by
-      simp only [map_mul]
-      exact hc _ trivial _)
-    (by
-      funext z
-      have := congrFun hd (fun j => e.symm (z j))
-      simpa [dc] using this)
-  refine ⟨k, a, fun i j => (α i j).comp (MulEquiv.toAdditive e).toAddMonoidHom, fun y => f (fun j => e (y j)),
-    fun g _ y => ?_, ?_⟩
+  obtain ⟨k, a, α, f, hf, hcf⟩ :=
+    hB q
+      (fun z => c (fun j => e.symm (z j)))
+      (fun g _ y => by
+        simp only [map_mul]
+        exact hc _ trivial _)
+      (by
+        funext z
+        have := congrFun hd (fun j => e.symm (z j))
+        simpa [dc] using this)
+  refine ⟨
+    k,
+    a,
+    fun i j => (α i j).comp (MulEquiv.toAdditive e).toAddMonoidHom,
+    fun y => f (fun j => e (y j)),
+    fun g _ y => ?_,
+    ?_
+  ⟩
   · simp only [map_mul]
     exact hf _ trivial _
   · funext y
@@ -67,19 +78,27 @@ theorem spanFor_equiv {A B : Type} [Group A] [Group B] (e : A ≃* B) (hB : Span
     simp [Finset.sum_apply, cupH, dc]
 
 def zdata (N : ℕ) : WData (Multiplicative (Fin N → ℤ)) (Multiplicative (Fin (N + 1) → ℤ)) where
-  ι := { toFun := fun g => Multiplicative.ofAdd (Fin.cons 0 (Multiplicative.toAdd g))
-         map_one' := by
-           apply Multiplicative.toAdd.injective; funext i
-           refine Fin.cases ?_ (fun j => ?_) i <;> simp
-         map_mul' := fun g h => by
-           apply Multiplicative.toAdd.injective; funext i
-           refine Fin.cases ?_ (fun j => ?_) i <;> simp }
-  ρ := { toFun := fun p => Multiplicative.ofAdd (Fin.tail (Multiplicative.toAdd p))
-         map_one' := rfl
-         map_mul' := fun _ _ => rfl }
-  ℓ := { toFun := fun x => (Multiplicative.toAdd (Additive.toMul x)) 0
-         map_zero' := rfl
-         map_add' := fun _ _ => rfl }
+  ι := {
+    toFun := fun g => Multiplicative.ofAdd (Fin.cons 0 (Multiplicative.toAdd g))
+    map_one' := by
+      apply Multiplicative.toAdd.injective
+      funext i
+      refine Fin.cases ?_ (fun j => ?_) i <;> simp
+    map_mul' := fun g h => by
+      apply Multiplicative.toAdd.injective
+      funext i
+      refine Fin.cases ?_ (fun j => ?_) i <;> simp
+  }
+  ρ := {
+    toFun := fun p => Multiplicative.ofAdd (Fin.tail (Multiplicative.toAdd p))
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
+  ℓ := {
+    toFun := fun x => (Multiplicative.toAdd (Additive.toMul x)) 0
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   t := Multiplicative.ofAdd (Fin.cons 1 0)
   ρι := fun _ => rfl
   ρt := rfl
@@ -87,7 +106,8 @@ def zdata (N : ℕ) : WData (Multiplicative (Fin N → ℤ)) (Multiplicative (Fi
   ℓt := by simp
   tc := fun z => mul_comm _ _
   dec := fun p => by
-    apply Multiplicative.toAdd.injective; funext i
+    apply Multiplicative.toAdd.injective
+    funext i
     refine Fin.cases ?_ (fun j => ?_) i
     · simp
     · simp

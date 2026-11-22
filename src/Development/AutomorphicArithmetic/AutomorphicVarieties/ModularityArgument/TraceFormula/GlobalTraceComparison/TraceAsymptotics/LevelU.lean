@@ -7,25 +7,30 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8
 open scoped Classical
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
-private theorem UL_top {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E)
-    (hw : IsSplitAt w) : UL n w = ⊤ := by
+private theorem UL_top
+    {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E) (hw : IsSplitAt w)
+    : UL n w = ⊤ := by
   simp [UL, hw]
 
-private theorem val_closed {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E)
-    (hw : IsSplitAt w) : IsClosedEmbedding (Subtype.val : UL n w → GLw n w) := by
+private theorem val_closed
+    {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E) (hw : IsSplitAt w)
+    : IsClosedEmbedding (Subtype.val : UL n w → GLw n w) := by
   apply IsClosed.isClosedEmbedding_subtypeVal
   rw [UL_top n w hw]
   exact isClosed_univ
 
-private theorem hecke_restrict {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E)
-    (hw : IsSplitAt w) (K' : Subgroup (GLw n w)) (f : GLw n w → ℂ) (h : IsHecke K' f) :
-    IsHecke (K'.subgroupOf (UL n w)) fun x : UL n w => f x.1 := by
+private theorem hecke_restrict
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (n : ℕ) (w : Pl E)
+    (hw : IsSplitAt w) (K' : Subgroup (GLw n w)) (f : GLw n w → ℂ) (h : IsHecke K' f)
+    : IsHecke (K'.subgroupOf (UL n w)) fun x : UL n w => f x.1 := by
   refine ⟨h.1.comp_isClosedEmbedding (val_closed n w hw), fun k hk x => ?_⟩
   have hk' : (k : GLw n w) ∈ K' := Subgroup.mem_subgroupOf.mp hk
   exact ⟨(h.2 _ hk' _).1, (h.2 _ hk' _).2⟩

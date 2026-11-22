@@ -12,9 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NadelVanishi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
 open GlobalTheory.AllWt (Psi wtOf cuspOn latOn normOn petOn GoodOn GoodW bergOn framesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
@@ -24,12 +27,24 @@ open GlobalTheory.TopForm
 
 namespace GlobalTheory.Discrepancy.DivOver
 
-theorem sum_ord_sub_one_le_formOrd_dOn : ∀ {k : Type} [Field k] [PerfectField k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k}
-    [LocallyOfFiniteType p] {n : ℕ}, topologicalKrullDim X = n → ∀ (E : DivOver p) {U : X.Opens} {y : X}
-    (hy : y ∈ U), E.Through y → ∀ (z : Fin n → Γ(X, U)), formOf U (gen_mem hy) (dOn p z) ≠ 0 →
-    ∀ {J : Type} [Fintype J] (e : J → Fin n), Function.Injective e → ∀ (u : J → X.functionFieldˣ),
-    (∀ j, (u j : X.functionField) = fnOf U (gen_mem hy) (z (e j))) →
-    ∑ j, E.ord (u j) - 1 ≤ (fun ω => @dite ℤ (∃ a, E.IsFormOrd ω a) (Classical.propDecidable _) (fun h => h.choose) (fun _ => 0)) (formOf U (gen_mem hy) (dOn p z)) := by
+theorem sum_ord_sub_one_le_formOrd_dOn
+    : ∀ {k : Type} [Field k] [PerfectField k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k}
+        [LocallyOfFiniteType p] {n : ℕ},
+      topologicalKrullDim X = n
+        → ∀ (E : DivOver p) {U : X.Opens} {y : X} (hy : y ∈ U),
+          E.Through y
+            → ∀ (z : Fin n → Γ(X, U)),
+              formOf U (gen_mem hy) (dOn p z) ≠ 0
+                → ∀ {J : Type} [Fintype J] (e : J → Fin n),
+                  Function.Injective e
+                    → ∀ (u : J → X.functionFieldˣ),
+                      (∀ j, (u j : X.functionField) = fnOf U (gen_mem hy) (z (e j)))
+                        → ∑ j, E.ord (u j) - 1
+                          ≤ (fun ω =>
+                              @dite ℤ (∃ a, E.IsFormOrd ω a) (Classical.propDecidable _)
+                                (fun h => h.choose)
+                                (fun _ => 0))
+                            (formOf U (gen_mem hy) (dOn p z)) := by
   intro k _ _ X _ p _ n hn E U y hy hE z hz0 J _ e he u hu
   classical
   letI := (Cartier.constFn p).toAlgebra
@@ -52,8 +67,10 @@ theorem sum_ord_sub_one_le_formOrd_dOn : ∀ {k : Type} [Field k] [PerfectField 
     change x (e j) ≠ 0
     rw [hxe j]
     exact (u j).ne_zero
-  obtain ⟨γ, hγ⟩ := GlobalTheory.smul_dlogWedge_mem_regForms k t ht0 S x
-    (fun i hi => exists_eq_unit_mul_zpow ht (hxS i hi)) (fun i _ => ⟨⟨x i, hxV i⟩, rfl⟩)
+  obtain ⟨γ, hγ⟩ :=
+    GlobalTheory.smul_dlogWedge_mem_regForms k t ht0 S x
+      (fun i hi => exists_eq_unit_mul_zpow ht (hxS i hi))
+      (fun i _ => ⟨⟨x i, hxV i⟩, rfl⟩)
   obtain ⟨ω, hω⟩ := E.exists_isFreeGen hn
   obtain ⟨a, rfl⟩ := hω.2 γ
   have hbr : ∀ θ, GlobalTheory.formMap k E.ring X.functionField n θ = E.toRat n θ := fun _ => rfl
@@ -63,16 +80,20 @@ theorem sum_ord_sub_one_le_formOrd_dOn : ∀ {k : Type} [Field k] [PerfectField 
   have hPne : (∏ i ∈ S, x i) ≠ 0 := Finset.prod_ne_zero_iff.2 hxS
   have h2 : dWedge k x = (∏ i ∈ S, x i) • dlogWedge k S x := by
     rw [GlobalTheory.dlogWedge_eq_smul, smul_smul, mul_inv_cancel₀ hPne, one_smul]
-  have h3 : (algebraMap E.ring X.functionField t) • dlogWedge k S x =
-      (algebraMap E.ring X.functionField a) • E.toRat n ω := by
-    calc (algebraMap E.ring X.functionField t) • dlogWedge k S x = t • dlogWedge k S x :=
-          algebraMap_smul _ t _
+  have h3
+      : (algebraMap E.ring X.functionField t) • dlogWedge k S x
+        = (algebraMap E.ring X.functionField a) • E.toRat n ω := by
+    calc
+      (algebraMap E.ring X.functionField t) • dlogWedge k S x
+        = t • dlogWedge k S x := algebraMap_smul _ t _
       _ = GlobalTheory.formMap k E.ring X.functionField n (a • ω) := hγ.symm
       _ = a • E.toRat n ω := by rw [map_smul, hbr]
       _ = (algebraMap E.ring X.functionField a) • E.toRat n ω := (algebraMap_smul _ a _).symm
-  have key : formOf U (gen_mem hy) (dOn p z) =
-      ((∏ i ∈ S, x i) * (algebraMap E.ring X.functionField t)⁻¹ *
-        algebraMap E.ring X.functionField a) • E.toRat n ω := by
+  have key
+      : formOf U (gen_mem hy) (dOn p z)
+        = ((∏ i ∈ S, x i) * (algebraMap E.ring X.functionField t)⁻¹
+            * algebraMap E.ring X.functionField a)
+          • E.toRat n ω := by
     rw [hη, h2, mul_assoc, mul_smul, mul_smul, ← h3, inv_smul_smul₀ ht0]
   have ha0 : algebraMap E.ring X.functionField a ≠ 0 := by
     intro h

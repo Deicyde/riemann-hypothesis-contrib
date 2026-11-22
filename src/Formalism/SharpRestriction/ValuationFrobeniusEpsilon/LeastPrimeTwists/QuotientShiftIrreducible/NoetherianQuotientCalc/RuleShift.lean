@@ -10,17 +10,18 @@ namespace Formalism.MainNotions.V.Pf.V2.Calc
 
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 
-theorem GMod.quot_shift (F : GMod B R k) (s : R) (d : Deg k) :
-    (F.shift d).quot s = (F.quot s).shift d := rfl
+theorem GMod.quot_shift (F : GMod B R k) (s : R) (d : Deg k)
+    : (F.shift d).quot s = (F.quot s).shift d :=
+  rfl
 
-theorem GMod.ann_shift (F : GMod B R k) (s : R) (d d' : Deg k) :
-    (F.shift d).ann s d' = (F.ann s d').shift d := by
+theorem GMod.ann_shift (F : GMod B R k) (s : R) (d d' : Deg k)
+    : (F.shift d).ann s d' = (F.ann s d').shift d := by
   have h : ∀ m : Deg k, m - d' - d = m - d - d' := fun m => sub_right_comm m d' d
   unfold GMod.ann GMod.shift GMod.sub
   simp only [h]
 
-theorem chi_shift (ts : List (Deg k × R)) : ∀ (F : GMod B R k) (d m : Deg k),
-    chi ts (F.shift d) m = chi ts F (m - d) := by
+theorem chi_shift (ts : List (Deg k × R))
+    : ∀ (F : GMod B R k) (d m : Deg k), chi ts (F.shift d) m = chi ts F (m - d) := by
   induction ts with
   | nil => intro F d m; rfl
   | cons p ts ih =>

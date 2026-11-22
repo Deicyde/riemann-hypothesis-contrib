@@ -36,51 +36,58 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SncComponent
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic GlobalTheory.ChartGlue GlobalTheory.Mix
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic
+  GlobalTheory.ChartGlue GlobalTheory.Mix
 
 namespace GlobalTheory.SncGenericPoints
 
-theorem mem_vanishingIdeal_closure {X : Scheme.{0}} (x : X) (U : X.affineOpens) (hx : x ∈ U.1)
-    (s : Γ(X, U.1)) (hs : ¬ IsUnit (X.presheaf.germ U.1 x hx s)) :
-    s ∈ (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})).ideal U := by
+theorem mem_vanishingIdeal_closure
+    {X : Scheme.{0}} (x : X) (U : X.affineOpens) (hx : x ∈ U.1) (s : Γ(X, U.1))
+    (hs : ¬ IsUnit (X.presheaf.germ U.1 x hx s))
+    : s ∈ (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})).ideal U := by
   rw [Scheme.IdealSheafData.vanishingIdeal_ideal, PrimeSpectrum.mem_vanishingIdeal]
   intro q hq
   by_contra hsq
-  have hp : q ∈ U.2.fromSpec ⁻¹ᵁ X.basicOpen s := by
-    rw [U.2.fromSpec_preimage_basicOpen]; exact hsq
+  have hp : q ∈ U.2.fromSpec ⁻¹ᵁ X.basicOpen s := by rw [U.2.fromSpec_preimage_basicOpen]; exact hsq
   have hq' : U.2.fromSpec q ∈ closure ({x} : Set X) := hq
   have hsp : x ⤳ U.2.fromSpec q := specializes_iff_mem_closure.2 hq'
   have hxs : x ∈ X.basicOpen s := hsp.mem_open (X.basicOpen s).isOpen hp
   exact hs ((X.mem_basicOpen s x hx).1 hxs)
 
-theorem maximalIdeal_le_stalkId {X : Scheme.{0}} (x : X) :
-    IsLocalRing.maximalIdeal (X.presheaf.stalk x) ≤
-      FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})) x := by
+theorem maximalIdeal_le_stalkId {X : Scheme.{0}} (x : X)
+    : IsLocalRing.maximalIdeal (X.presheaf.stalk x)
+      ≤ FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})) x := by
   intro a ha
   obtain ⟨V, hxV, f, rfl⟩ := X.presheaf.exists_germ_eq a
-  obtain ⟨_, ⟨W, hW, rfl⟩, hxW, hWV⟩ :=
-    X.isBasis_affineOpens.exists_subset_of_mem_open hxV V.isOpen
+  obtain ⟨_, ⟨W, hW, rfl⟩, hxW, hWV⟩ := X.isBasis_affineOpens.exists_subset_of_mem_open hxV V.isOpen
   have hle : W ≤ V := hWV
-  have e : X.presheaf.germ W x hxW (X.presheaf.map (homOfLE hle).op f) = X.presheaf.germ V x hxV f :=
+  have e
+      : X.presheaf.germ W x hxW (X.presheaf.map (homOfLE hle).op f) = X.presheaf.germ V x hxV f :=
     X.presheaf.germ_res_apply (homOfLE hle) x hxW f
   rw [← e] at ha ⊢
   generalize X.presheaf.map (homOfLE hle).op f = g at ha ⊢
   have hu : ¬ IsUnit (X.presheaf.germ W x hxW g) :=
     mem_nonunits_iff.1 ((IsLocalRing.mem_maximalIdeal _).1 ha)
   have hm := mem_vanishingIdeal_closure x ⟨W, hW⟩ hxW g hu
-  have h1 : Ideal.map (X.presheaf.germ W x hxW).hom
-      ((Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})).ideal ⟨W, hW⟩) ≤
-      FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})) x :=
-    le_iSup₂_of_le (f := fun (U : X.affineOpens) (hx : x ∈ U.1) =>
-      Ideal.map (X.presheaf.germ U.1 x hx).hom
-        ((Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})).ideal U)) ⟨W, hW⟩ hxW le_rfl
+  have h1
+      : Ideal.map (X.presheaf.germ W x hxW).hom
+          ((Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})).ideal ⟨W, hW⟩)
+        ≤ FinalTheorems.stalkId (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})) x :=
+    le_iSup₂_of_le
+      (f := fun (U : X.affineOpens) (hx : x ∈ U.1) =>
+        Ideal.map (X.presheaf.germ U.1 x hx).hom
+          ((Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {x})).ideal U))
+      ⟨W, hW⟩ hxW le_rfl
   exact h1 (Ideal.mem_map_of_mem _ hm)
 
-theorem coheight_eq_one_of_lSncAt {X : Scheme.{0}} {r : ℕ} (z : Fin r → X) (a : Fin r)
-    (h : FinalTheorems.LSncAt X (fun a => (Closeds.closure {z a})) (z a)) : Order.coheight (z a) = 1 := by
+theorem coheight_eq_one_of_lSncAt
+    {X : Scheme.{0}} {r : ℕ} (z : Fin r → X) (a : Fin r)
+    (h : FinalTheorems.LSncAt X (fun a => (Closeds.closure {z a})) (z a))
+    : Order.coheight (z a) = 1 := by
   obtain ⟨hreg, n, t, e, ht, hI⟩ := h
   have ha : z a ∈ (Closeds.closure {z a} : Closeds X) := subset_closure (Set.mem_singleton _)
   have hn : 1 ≤ n := (e ⟨a, ha⟩).pos
@@ -88,8 +95,9 @@ theorem coheight_eq_one_of_lSncAt {X : Scheme.{0}} {r : ℕ} (z : Fin r → X) (
     refine le_antisymm ((maximalIdeal_le_stalkId (z a)).trans (hI ⟨a, ha⟩).le) ?_
     rw [← ht.1]
     exact Ideal.span_mono (Set.singleton_subset_iff.2 ⟨_, rfl⟩)
-  have hmin : IsLocalRing.maximalIdeal (X.presheaf.stalk (z a)) ∈
-      (Ideal.span {t (e ⟨a, ha⟩)}).minimalPrimes := by
+  have hmin
+      : IsLocalRing.maximalIdeal (X.presheaf.stalk (z a))
+        ∈ (Ideal.span {t (e ⟨a, ha⟩)}).minimalPrimes := by
     rw [← hm, Ideal.minimalPrimes_eq_subsingleton_self]
     rfl
   have hle := Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ _ hmin
@@ -102,7 +110,16 @@ theorem coheight_eq_one_of_lSncAt {X : Scheme.{0}} {r : ℕ} (z : Fin r → X) (
   rw [← h4]
   exact_mod_cast hn
 
-theorem exists_genericPoints : ∀ (F : Type) [Field F] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp F) (D : ℕ), IsProjOver p → SmoothOfRelativeDimension D p → ∀ T : Closeds X, FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal T) → ∃ (r : ℕ) (z : Fin r → X), Function.Injective z ∧ (∀ a, Order.coheight (z a) = 1) ∧ (T : Set X) = ⋃ a, closure {z a} ∧ (∀ w : X, w ∈ T → Order.coheight w = 1 → ∃ a, w = z a) ∧ ∀ x : X, FinalTheorems.LSncAt X (fun a => (Closeds.closure {z a})) x := by
+theorem exists_genericPoints
+    : ∀ (F : Type) [Field F] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp F) (D : ℕ),
+      IsProjOver p → SmoothOfRelativeDimension D p
+        → ∀ T : Closeds X,
+          FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal T)
+            → ∃ (r : ℕ) (z : Fin r → X),
+              Function.Injective z ∧ (∀ a, Order.coheight (z a) = 1)
+                ∧ (T : Set X) = ⋃ a, closure {z a}
+                ∧ (∀ w : X, w ∈ T → Order.coheight w = 1 → ∃ a, w = z a)
+                ∧ ∀ x : X, FinalTheorems.LSncAt X (fun a => (Closeds.closure {z a})) x := by
   intro F _ X _ p D hp hs T hT
   haveI : QuasiCompact p := by
     obtain ⟨N, i, hi, rfl⟩ := hp
@@ -122,8 +139,7 @@ theorem exists_genericPoints : ∀ (F : Type) [Field F] (X : Scheme.{0}) [IsInte
   have hL' : ∀ x : X, FinalTheorems.LSncAt X (fun a => (Closeds.closure {z a})) x := by
     rw [hCz]; exact hL
   have hco : ∀ a, Order.coheight (z a) = 1 := fun a => coheight_eq_one_of_lSncAt z a (hL' _)
-  have hU : (T : Set X) = ⋃ a, closure {z a} := by
-    rw [← hC.2.1]; simp only [hz]
+  have hU : (T : Set X) = ⋃ a, closure {z a} := by rw [← hC.2.1]; simp only [hz]
   refine ⟨m, z, fun a b hab => hC.2.2 a b ?_, hco, hU, fun w hw hw1 => ?_, hL'⟩
   · rw [← hz, ← hz, hab]
   · have hw' : w ∈ (T : Set X) := hw
@@ -132,8 +148,7 @@ theorem exists_genericPoints : ∀ (F : Type) [Field F] (X : Scheme.{0}) [IsInte
     have hsp : z a ⤳ w := specializes_iff_mem_closure.2 ha
     refine ⟨a, ?_⟩
     by_contra hne
-    have hlt : w < z a := lt_of_le_not_ge hsp fun h =>
-      hne ((show w ⤳ z a from h).antisymm hsp).eq
+    have hlt : w < z a := lt_of_le_not_ge hsp fun h => hne ((show w ⤳ z a from h).antisymm hsp).eq
     have := Order.coheight_strictAnti hlt (by rw [hco a]; exact ENat.natCast_lt_top 1)
     rw [hco a, hw1] at this
     exact lt_irrefl _ this

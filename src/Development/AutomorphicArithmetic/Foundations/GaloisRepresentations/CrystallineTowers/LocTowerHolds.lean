@@ -26,7 +26,8 @@ theorem pieceIn_holds : PieceIn := pieceInS G3.vInv_holds hopEx_holds
 
 theorem matIn_holds : MatIn := matInS G3.vFin_holds pieceIn_holds negVan
 
-theorem crysStep_of (h : CrystallineSemistableComparison.SmoothModelCrystalline) : UpperTheory.Gal.Int.Geo.CrysStep :=
+theorem crysStep_of (h : CrystallineSemistableComparison.SmoothModelCrystalline)
+    : UpperTheory.Gal.Int.Geo.CrysStep :=
   crysStep h niceBc locTower_holds bcCover intMap goodOf matIn_holds subAdm grCrys
 
 end UpperTheory.Gal.Seam

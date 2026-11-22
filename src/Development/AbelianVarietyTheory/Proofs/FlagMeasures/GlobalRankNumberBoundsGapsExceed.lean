@@ -9,19 +9,30 @@ open GlobalTheory.Diag.PG
 
 namespace GlobalTheory.Diag.PG
 
-theorem gaps_exceed :
-    ∀ eps CD : ℝ, 0 < eps → eps < 1 / 52 → 3 ≤ CD → ∀ C : ℝ, 0 < C → ∃ x0 : ℝ, ∀ x, x0 ≤ x →
-      ∀ m f k lrd Del : ℝ, RankNums x eps CD m f k lrd Del → ∀ r : ℝ, k ≤ r → r ≤ 2 * k →
-      C * k * m ^ 4 + r * m ^ 10 < 4 * Del ∧ C * k * m ^ 4 + r * m ^ 10 < Real.sqrt (bx x eps) ∧
-      C * k * m ^ 4 + r * m ^ 10 < x ^ (eps / 100) * r ^ 19 * f ^ 5 * x ^ eps ∧
-      C * r ^ 19 * f ^ 5 * x ^ eps ≤ x ^ (eps / 100) * r ^ 19 * f ^ 5 * x ^ eps := by
+theorem gaps_exceed
+    : ∀ eps CD : ℝ,
+      0 < eps → eps < 1 / 52 → 3 ≤ CD
+        → ∀ C : ℝ,
+          0 < C
+            → ∃ x0 : ℝ, ∀ x,
+              x0 ≤ x
+                → ∀ m f k lrd Del : ℝ,
+                  RankNums x eps CD m f k lrd Del
+                    → ∀ r : ℝ,
+                      k ≤ r → r ≤ 2 * k
+                        → C * k * m ^ 4 + r * m ^ 10 < 4 * Del
+                          ∧ C * k * m ^ 4 + r * m ^ 10 < Real.sqrt (bx x eps)
+                          ∧ C * k * m ^ 4 + r * m ^ 10 < x ^ (eps / 100) * r ^ 19 * f ^ 5 * x ^ eps
+                          ∧ C * r ^ 19 * f ^ 5 * x ^ eps
+                            ≤ x ^ (eps / 100) * r ^ 19 * f ^ 5 * x ^ eps := by
   intro eps CD heps _heps' hCD C hC
   refine ⟨max (max 1 (C + 2)) (max (C ^ (100 / eps)) ((16 : ℝ) ^ (2 / eps))), ?_⟩
   intro x hx m f k lrd Del h r hkr hrk
   have hx1 : 1 ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hx
   have hxC : C + 2 ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx
   have hxC' : C ^ (100 / eps) ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hx
-  have hx16 : (16 : ℝ) ^ (2 / eps) ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx
+  have hx16 : (16 : ℝ) ^ (2 / eps) ≤ x :=
+    le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx
   have hx0 : 0 ≤ x := by linarith
   have hm1 : 1 ≤ m := le_trans (Real.one_le_rpow hx1 (by norm_num)) h.m_lo
   have hm4 : x ≤ m ^ 4 := by
@@ -50,8 +61,7 @@ theorem gaps_exceed :
     have h1 : C * k * m ^ 4 ≤ C * k * f ^ 3 := by
       have : m ^ 4 ≤ f ^ 3 := le_trans h.mf hf3
       gcongr
-    have h2 : r * m ^ 10 ≤ (2 * k) * f ^ 3 := by
-      gcongr
+    have h2 : r * m ^ 10 ≤ (2 * k) * f ^ 3 := by gcongr
     nlinarith
   have hSpos : 0 < C * k * m ^ 4 + r * m ^ 10 := by positivity
 
@@ -97,10 +107,12 @@ theorem gaps_exceed :
       gcongr
     have e2 : (4 * Real.exp t) ^ 2 = Real.exp (Real.log 16 + 2 * t) := by
       rw [Real.exp_add, Real.exp_log (by norm_num)]
-      rw [show 2 * t = t + t by ring, Real.exp_add]; ring
+      rw [show 2 * t = t + t by ring, Real.exp_add]
+      ring
     have e3 : Real.log 16 + 2 * t ≤ x ^ eps := by
       have : Real.log 16 ≤ 16 - 1 := Real.log_le_sub_one_of_pos (by norm_num)
-      rw [hxe]; nlinarith
+      rw [hxe]
+      nlinarith
     have e4 : Real.exp (Real.log 16 + 2 * t) ≤ bx x eps := by
       unfold bx; exact Real.exp_le_exp.mpr e3
     linarith
@@ -120,14 +132,18 @@ theorem gaps_exceed :
         have : x < x ^ 2 := by nlinarith
         linarith
       have := mul_lt_mul_of_pos_right hC18 hp
-      calc (C + 2) * r * f ^ 5 = (C + 2) * (r * f ^ 5) := by ring
+      calc
+        (C + 2) * r * f ^ 5
+          = (C + 2) * (r * f ^ 5) := by ring
         _ < r ^ 18 * (r * f ^ 5) := this
     have e3 : r ^ 18 * (r * f ^ 5) = r ^ 19 * f ^ 5 := by ring
     have e4 : r ^ 19 * f ^ 5 ≤ x ^ (eps / 100) * r ^ 19 * f ^ 5 * x ^ eps := by
       have hp : 0 ≤ r ^ 19 * f ^ 5 := by positivity
       have h1 : 1 ≤ x ^ (eps / 100) * x ^ eps := one_le_mul_of_one_le_of_one_le hL' hL
       have := mul_le_mul_of_nonneg_right h1 hp
-      calc r ^ 19 * f ^ 5 = 1 * (r ^ 19 * f ^ 5) := by ring
+      calc
+        r ^ 19 * f ^ 5
+          = 1 * (r ^ 19 * f ^ 5) := by ring
         _ ≤ (x ^ (eps / 100) * x ^ eps) * (r ^ 19 * f ^ 5) := this
         _ = x ^ (eps / 100) * r ^ 19 * f ^ 5 * x ^ eps := by ring
     linarith
@@ -143,7 +159,9 @@ theorem gaps_exceed :
       linarith
     have hp : 0 ≤ r ^ 19 * f ^ 5 * x ^ eps := by positivity
     have := mul_le_mul_of_nonneg_right hCx hp
-    calc C * r ^ 19 * f ^ 5 * x ^ eps = C * (r ^ 19 * f ^ 5 * x ^ eps) := by ring
+    calc
+      C * r ^ 19 * f ^ 5 * x ^ eps
+        = C * (r ^ 19 * f ^ 5 * x ^ eps) := by ring
       _ ≤ x ^ (eps / 100) * (r ^ 19 * f ^ 5 * x ^ eps) := this
       _ = x ^ (eps / 100) * r ^ 19 * f ^ 5 * x ^ eps := by ring
   exact ⟨hc1, hc2, hc3, hc4⟩

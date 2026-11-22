@@ -14,10 +14,13 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
-theorem VerticalDegree.proof (h₁ : FibreDimensionZero.Statement) (h₂ : ChartRankAdjoin.Statement)
-    (h₃ : VerticalDegreeAfterAdjoining.Statement) : VerticalDegree.Statement := by
+theorem VerticalDegree.proof
+    (h₁ : FibreDimensionZero.Statement) (h₂ : ChartRankAdjoin.Statement)
+    (h₃ : VerticalDegreeAfterAdjoining.Statement)
+    : VerticalDegree.Statement := by
   intro K _ ι _ K' _ ι' _ κ v p _ W' n i' hv hp hW hV hch G' J' hJ
   have hfib := h₁ K ι K' ι' κ v p W' n hv hp hW hV G'
   have hz : ∀ k : FibreBlock κ, G'.x' ⟨k.1, i' k.1⟩ ≠ 0 := by
@@ -34,7 +37,9 @@ theorem VerticalDegree.proof (h₁ : FibreDimensionZero.Statement) (h₂ : Chart
     exact hk
   rw [hJ.1 _ Fin.elim0 _ hfib hj, h₃ K ι K' ι' κ v p W' n i' hv hp hW hV hch G']
   congr 1
-  exact (h₂ (FibreBlock κ) (fibreIdx ι' κ) G'.Φ G'.Φ' (fun q => G'.x' ⟨q.1.1, q.2⟩) (fun k => i' k.1) hz
-    hfib.1.2.1).symm
+  exact (h₂ (FibreBlock κ) (fibreIdx ι' κ) G'.Φ G'.Φ'
+    (fun q => G'.x' ⟨q.1.1, q.2⟩)
+    (fun k => i' k.1)
+    hz hfib.1.2.1).symm
 
 end GroundTheory.Heights₂.Heights.Inter

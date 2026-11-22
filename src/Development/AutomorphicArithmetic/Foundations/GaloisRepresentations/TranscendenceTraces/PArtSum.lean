@@ -5,10 +5,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private theorem length_local (Ω R : Type) [Field Ω] [IsAlgClosed Ω] [CommRing R] [Algebra Ω R]
-    [Module.Finite Ω R] [IsLocalRing R] : Module.length R R = Module.finrank Ω R := by
+private theorem length_local
+    (Ω R : Type)
+    [Field Ω] [IsAlgClosed Ω] [CommRing R] [Algebra Ω R] [Module.Finite Ω R] [IsLocalRing R]
+    : Module.length R R = Module.finrank Ω R := by
   have h1 := IsLocalRing.length_restrictScalars Ω R R
   have h2 : Module.length (IsLocalRing.ResidueField Ω) (IsLocalRing.ResidueField R) = 1 := by
     rw [← Module.length_eq_of_surjective (S := Ω) (M := IsLocalRing.ResidueField R)
@@ -27,11 +30,11 @@ theorem UpperTheory.Gal.TranscendenceTraces.artSum_of : ArtSum := by
   classical
   haveI : IsArtinianRing B := IsArtinianRing.of_finite Ω B
   haveI : Fintype (PrimeSpectrum B) := Fintype.ofFinite _
-  have hbij := PrimeSpectrum.discreteTopology_iff_toPiLocalization_bijective.mp
-    (inferInstance : DiscreteTopology (PrimeSpectrum B))
+  have hbij :=
+    PrimeSpectrum.discreteTopology_iff_toPiLocalization_bijective.mp
+      (inferInstance : DiscreteTopology (PrimeSpectrum B))
   let e : B ≃ₗ[Ω] PrimeSpectrum.PiLocalization B :=
-    LinearEquiv.ofBijective
-      ((PrimeSpectrum.toPiLocalization B).restrictScalars Ω).toLinearMap hbij
+    LinearEquiv.ofBijective ((PrimeSpectrum.toPiLocalization B).restrictScalars Ω).toLinearMap hbij
   haveI : Module.Finite Ω (PrimeSpectrum.PiLocalization B) := Module.Finite.equiv e
   haveI : ∀ P : PrimeSpectrum B, Module.Finite Ω (Localization.AtPrime P.asIdeal) := fun P =>
     Module.Finite.of_surjective

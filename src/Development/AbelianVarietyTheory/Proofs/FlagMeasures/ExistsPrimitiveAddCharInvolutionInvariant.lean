@@ -10,10 +10,12 @@ open scoped Classical
 
 namespace GlobalTheory.GramCount
 
-theorem exists_isPrimitive_invol_invariant {B : Type} [CommRing B] [Fintype B] (c : B →+* B)
-    (hc : ∀ u, c (c u) = u) (ω : B) (hω : IsUnit (ω - c ω))
-    (hfix : ∀ t, c t = t → t ≠ 0 → IsUnit t) :
-    ∃ χ : AddChar B ℂ, χ.IsPrimitive ∧ ∀ u, χ (c u) = χ u := by
+theorem exists_isPrimitive_invol_invariant
+    {B : Type} [CommRing B] [Fintype B]
+    (c : B →+* B) (hc : ∀ u, c (c u) = u)
+    (ω : B) (hω : IsUnit (ω - c ω))
+    (hfix : ∀ t, c t = t → t ≠ 0 → IsUnit t)
+    : ∃ χ : AddChar B ℂ, χ.IsPrimitive ∧ ∀ u, χ (c u) = χ u := by
   rcases subsingleton_or_nontrivial B with hB | hB
   · refine ⟨1, fun a ha => absurd (Subsingleton.elim a 0) ha, fun u => by simp⟩
   obtain ⟨ψ, hψ⟩ := (AddChar.exists_apply_ne_zero (a := (1 : B))).2 one_ne_zero
@@ -31,8 +33,7 @@ theorem exists_isPrimitive_invol_invariant {B : Type} [CommRing B] [Fintype B] (
       have h3 : a * (ω - c ω) = 0 := by linear_combination h2 - c ω * h1
       exact ha ((hω.mul_left_eq_zero).1 h3)
     obtain ⟨u, hu⟩ := hex
-    have hs : c (a * u + c (a * u)) = a * u + c (a * u) := by
-      rw [map_add (f := _), hc, add_comm]
+    have hs : c (a * u + c (a * u)) = a * u + c (a * u) := by rw [map_add (f := _), hc, add_comm]
     obtain ⟨s', hs'⟩ := (hfix _ hs hu).exists_right_inv
     have hcs : c s' = s' := by
       have h4 := congrArg c hs'

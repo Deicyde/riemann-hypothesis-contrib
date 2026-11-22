@@ -7,9 +7,13 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsMonoFa
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 open GlobalTheory
@@ -17,7 +21,13 @@ open Classical
 
 namespace GlobalTheory.UPoinc
 
-theorem exists_lift_finite_through_point : ∀ (X Z : Scheme.{0}) (f : X ⟶ Z), IsFinite f → ∀ (p : ℕ) [Fact p.Prime] (Y : Sp (OO p) ⟶ Z) (w : X), f w = (gPt p ≫ Y) (IsLocalRing.closedPoint (PadicAlgCl p)) → ∃ y : Sp (OO p) ⟶ X, y ≫ f = Y ∧ (gPt p ≫ y) (IsLocalRing.closedPoint (PadicAlgCl p)) = w := by
+theorem exists_lift_finite_through_point
+    : ∀ (X Z : Scheme.{0}) (f : X ⟶ Z),
+      IsFinite f
+        → ∀ (p : ℕ) [Fact p.Prime] (Y : Sp (OO p) ⟶ Z) (w : X),
+          f w = (gPt p ≫ Y) (IsLocalRing.closedPoint (PadicAlgCl p))
+            → ∃ y : Sp (OO p) ⟶ X,
+              y ≫ f = Y ∧ (gPt p ≫ y) (IsLocalRing.closedPoint (PadicAlgCl p)) = w := by
   intro X Z f hf p _ Y w hw
 
   set x : Sp (PadicAlgCl p) ⟶ Z := gPt p ≫ Y with hxdef
@@ -34,12 +44,12 @@ theorem exists_lift_finite_through_point : ∀ (X Z : Scheme.{0}) (f : X ⟶ Z),
   haveI : Algebra.IsAlgebraic (Z.residueField (f w)) (X.residueField w) := inferInstance
   let ψ : X.residueField w →ₐ[Z.residueField (f w)] PadicAlgCl p := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   set y0 : Sp (PadicAlgCl p) ⟶ X := Spec.map (CommRingCat.ofHom ψ.toRingHom) ≫ X.fromSpecResidueField w with hy0
   have hy0f : y0 ≫ f = gPt p ≫ Y := by
-    rw [← hxdef, ← hzφ, hy0, Category.assoc, ← Scheme.Hom.SpecMap_residueFieldMap_fromSpecResidueField, ← Spec.map_comp_assoc]
+    rw [← hxdef, ← hzφ, hy0, Category.assoc,
+      ← Scheme.Hom.SpecMap_residueFieldMap_fromSpecResidueField, ← Spec.map_comp_assoc]
     congr 2
     ext a
     exact ψ.commutes a
@@ -48,9 +58,10 @@ theorem exists_lift_finite_through_point : ∀ (X Z : Scheme.{0}) (f : X ⟶ Z),
 
   haveI : IsProper f := inferInstance
   have hE : ValuativeCriterion.Existence f :=
-    (UniversallyClosed.eq_valuativeCriterion ▸ (inferInstance : UniversallyClosed f) :
-      (ValuativeCriterion.Existence ⊓ @QuasiCompact) f).1
-  obtain ⟨⟨l, hl1, hl2⟩⟩ := (hE { R := OO p, K := PadicAlgCl p, i₁ := y0, i₂ := Y, commSq := ⟨hy0f⟩ }).exists_lift
+    (UniversallyClosed.eq_valuativeCriterion ▸ (inferInstance : UniversallyClosed f)
+      : (ValuativeCriterion.Existence ⊓ @QuasiCompact) f).1
+  obtain ⟨⟨l, hl1, hl2⟩⟩ :=
+    (hE { R := OO p, K := PadicAlgCl p, i₁ := y0, i₂ := Y, commSq := ⟨hy0f⟩ }).exists_lift
   refine ⟨l, hl2, ?_⟩
   have : gPt p ≫ l = y0 := hl1
   rw [this, hy0w]

@@ -5,45 +5,51 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GaloisAutMem
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.LieDisc
+open NumberField Matrix GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.LieDisc
 
 noncomputable section
 
 namespace GlobalTheory.LieDisc
 
-theorem exists_integral_add_cc_eq_one : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
-    Unr E → ∃ t : E, IsIntegral ℤ t ∧ t + cc t = 1 := by
+theorem exists_integral_add_cc_eq_one
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E → ∃ t : E, IsIntegral ℤ t ∧ t + cc t = 1 := by
   intro E _ _ _ hE
   have : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E) := hE
   let σ := IsCMField.ringOfIntegersComplexConj E
-  let I : Ideal (𝓞 (maximalRealSubfield E)) :=
-    { carrier := {a | ∃ t : 𝓞 E, algebraMap _ (𝓞 E) a = t + σ t}
-      add_mem' := by
-        rintro a b ⟨s, hs⟩ ⟨t, ht⟩
-        exact ⟨s + t, by rw [map_add (f := _), hs, ht, map_add (f := _)]; ring⟩
-      zero_mem' := ⟨0, by simp⟩
-      smul_mem' := by
-        rintro c a ⟨t, ht⟩
-        refine ⟨algebraMap _ (𝓞 E) c * t, ?_⟩
-        rw [smul_eq_mul, map_mul, ht, map_mul, AlgEquiv.commutes]
-        ring }
+  let I : Ideal (𝓞 (maximalRealSubfield E)) := {
+    carrier := {a | ∃ t : 𝓞 E, algebraMap _ (𝓞 E) a = t + σ t}
+    add_mem' := by
+      rintro a b ⟨s, hs⟩ ⟨t, ht⟩
+      exact ⟨s + t, by rw [map_add (f := _), hs, ht, map_add (f := _)]; ring⟩
+    zero_mem' := ⟨0, by simp⟩
+    smul_mem' := by
+      rintro c a ⟨t, ht⟩
+      refine ⟨algebraMap _ (𝓞 E) c * t, ?_⟩
+      rw [smul_eq_mul, map_mul, ht, map_mul, AlgEquiv.commutes]
+      ring
+  }
   have hI : I = ⊤ := by
     by_contra hI
     obtain ⟨m, hm, hIm⟩ := Ideal.exists_le_maximal _ hI
-    obtain ⟨P, hP, hPm⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 E) m
-      (by rw [(RingHom.injective_iff_ker_eq_bot _).1
-        (FaithfulSMul.algebraMap_injective (𝓞 (maximalRealSubfield E)) (𝓞 E))]; exact bot_le)
+    obtain ⟨P, hP, hPm⟩ :=
+      Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 E) m (by
+        rw [(RingHom.injective_iff_ker_eq_bot _).1
+          (FaithfulSMul.algebraMap_injective (𝓞 (maximalRealSubfield E)) (𝓞 E))]
+        exact bot_le)
     have htr : ∀ t : 𝓞 E, t + σ t ∈ P := by
       intro t
       have hco : ((t + σ t : 𝓞 E) : E) = (t : E) + IsCMField.complexConj E t := by
         rw [← IsCMField.coe_ringOfIntegersComplexConj]
         rfl
-      have hfix := (IsCMField.complexConj_eq_self_iff E ((t : E) + IsCMField.complexConj E t)).1 (by
-        rw [map_add (f := _), IsCMField.complexConj_apply_apply, add_comm])
+      have hfix :=
+        (IsCMField.complexConj_eq_self_iff E ((t : E) + IsCMField.complexConj E t)).1
+          (by rw [map_add (f := _), IsCMField.complexConj_apply_apply, add_comm])
       have hi : IsIntegral ℤ (⟨_, hfix⟩ : maximalRealSubfield E) := by
         have h0 : IsIntegral ℤ ((t + σ t : 𝓞 E) : E) := (t + σ t).isIntegral_coe
         rw [hco] at h0
-        exact (isIntegral_algebraMap_iff ).1 h0
+        exact (isIntegral_algebraMap_iff).1 h0
       let a : 𝓞 (maximalRealSubfield E) := ⟨_, hi⟩
       have hA : algebraMap _ (𝓞 E) a = t + σ t := by
         apply RingOfIntegers.ext

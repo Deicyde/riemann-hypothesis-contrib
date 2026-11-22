@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsReducedIsNo
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.HodgeCoh GlobalTheory.CechDR KaehlerDifferential GlobalTheory.W1
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+  GlobalTheory.HodgeCoh GlobalTheory.CechDR KaehlerDifferential GlobalTheory.W1
 
 set_option autoImplicit false
 
@@ -17,11 +18,12 @@ namespace GlobalTheory.SmoothComponents
 
 open Topology TopologicalSpace
 
-theorem irreducibleComponent_eq_closure (Z : Scheme.{0})
-    (hdom : ∀ x : Z, IsDomain (Z.presheaf.stalk x)) {C : Set Z} (hC : C ∈ irreducibleComponents Z)
-    {x : Z} (hx : x ∈ C) :
-    haveI := hdom x
-    C = closure {Z.fromSpecStalk x (genericPoint (Spec (Z.presheaf.stalk x)))} := by
+theorem irreducibleComponent_eq_closure
+    (Z : Scheme.{0}) (hdom : ∀ x : Z, IsDomain (Z.presheaf.stalk x))
+    {C : Set Z} (hC : C ∈ irreducibleComponents Z)
+    {x : Z} (hx : x ∈ C)
+    : haveI := hdom x
+      C = closure {Z.fromSpecStalk x (genericPoint (Spec (Z.presheaf.stalk x)))} := by
   haveI := hdom x
   set ξ := Z.fromSpecStalk x (genericPoint (Spec (Z.presheaf.stalk x)))
   have hCc : IsClosed C := isClosed_of_mem_irreducibleComponents C hC
@@ -47,9 +49,10 @@ namespace GlobalTheory.SmoothComponents
 
 open Topology TopologicalSpace
 
-theorem main : ∀ (Z : Scheme.{0}) (s : Z ⟶ Sp ℂ) (d : ℕ) [SmoothOfRelativeDimension d s]
-    [CompactSpace Z], ∃ (J : Type) (_ : Fintype J) (V : J → Z.Opens),
-      (∀ i j, i ≠ j → V i ⊓ V j = ⊥) ∧ iSup V = ⊤ ∧ ∀ j, IsIntegral (V j).toScheme := by
+theorem main
+    : ∀ (Z : Scheme.{0}) (s : Z ⟶ Sp ℂ) (d : ℕ) [SmoothOfRelativeDimension d s] [CompactSpace Z],
+      ∃ (J : Type) (_ : Fintype J) (V : J → Z.Opens),
+        (∀ i j, i ≠ j → V i ⊓ V j = ⊥) ∧ iSup V = ⊤ ∧ ∀ j, IsIntegral (V j).toScheme := by
   intro Z s d _ _
   have hs : Smooth s := SmoothOfRelativeDimension.smooth d s
   obtain ⟨hred, -, hln⟩ :=
@@ -59,16 +62,18 @@ theorem main : ∀ (Z : Scheme.{0}) (s : Z ⟶ Sp ℂ) (d : ℕ) [SmoothOfRelati
       (isDomain_and_isIntegrallyClosed_stalk_Sp ℂ) x).1
   haveI : IsNoetherian Z := ⟨⟩
   have hfin : (irreducibleComponents Z).Finite := finite_irreducibleComponents_of_isNoetherian
-  have disj : ∀ C ∈ irreducibleComponents Z, ∀ D ∈ irreducibleComponents Z, C ≠ D →
-      Disjoint C D := by
+  have disj
+      : ∀ C ∈ irreducibleComponents Z, ∀ D ∈ irreducibleComponents Z, C ≠ D → Disjoint C D := by
     intro C hC D hD hne
     rw [Set.disjoint_left]
     intro x hxC hxD
     exact hne ((irreducibleComponent_eq_closure Z hdom hC hxC).trans
       (irreducibleComponent_eq_closure Z hdom hD hxD).symm)
-  have cover : ∀ x : Z, ∃ C ∈ irreducibleComponents Z, x ∈ C := fun x ↦
-    ⟨irreducibleComponent x, irreducibleComponent_mem_irreducibleComponents x,
-      mem_irreducibleComponent⟩
+  have cover : ∀ x : Z, ∃ C ∈ irreducibleComponents Z, x ∈ C := fun x ↦ ⟨
+    irreducibleComponent x,
+    irreducibleComponent_mem_irreducibleComponents x,
+    mem_irreducibleComponent
+  ⟩
   have hopen : ∀ C ∈ irreducibleComponents Z, IsOpen C := by
     intro C hC
     have hc : Cᶜ = ⋃ D ∈ irreducibleComponents Z \ {C}, D := by
@@ -82,7 +87,8 @@ theorem main : ∀ (Z : Scheme.{0}) (s : Z ⟶ Sp ℂ) (d : ℕ) [SmoothOfRelati
       · rintro ⟨D, ⟨hD, hne⟩, hxD⟩ hxC
         exact Set.disjoint_left.mp (disj D hD C hC hne) hxD hxC
     rw [← isClosed_compl_iff, hc]
-    exact (hfin.subset Set.diff_subset).isClosed_biUnion fun D hD ↦ isClosed_of_mem_irreducibleComponents D hD.1
+    exact (hfin.subset Set.diff_subset).isClosed_biUnion fun D hD ↦
+      isClosed_of_mem_irreducibleComponents D hD.1
   letI : Fintype (irreducibleComponents Z) := hfin.fintype
   refine ⟨irreducibleComponents Z, inferInstance, fun C ↦ ⟨C.1, hopen C.1 C.2⟩, ?_, ?_, ?_⟩
   · intro i j hij

@@ -13,9 +13,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Matrix UpperTheory.V.Weyl
 
-theorem UpperTheory.V.Weyl.scalar :
-    ∀ (n : ℕ) (Ξ : Pre n) (ν : Fin n → ℕ) (v : Fin Ξ.d → ℂ), v ≠ 0 → Ξ.IsTop ν v →
-      ∃ Ξ' : Pre n, 0 < Ξ'.d ∧ Ξ'.d ≤ Ξ.d ∧ Ξ'.HasWt fun k => (ν k : ℂ) := by
+theorem UpperTheory.V.Weyl.scalar
+    : ∀ (n : ℕ) (Ξ : Pre n) (ν : Fin n → ℕ) (v : Fin Ξ.d → ℂ),
+      v ≠ 0 → Ξ.IsTop ν v → ∃ Ξ' : Pre n, 0 < Ξ'.d ∧ Ξ'.d ≤ Ξ.d ∧ Ξ'.HasWt fun k => (ν k : ℂ) := by
   intro n Ξ ν v hv htop
   let S : Submodule ℂ (Fin Ξ.d → ℂ) :=
     Submodule.span ℂ (Set.range fun y : Matrix (Fin n) (Fin n) ℂ => Ξ.mat y *ᵥ v)
@@ -26,7 +26,8 @@ theorem UpperTheory.V.Weyl.scalar :
       obtain ⟨z, rfl⟩ := hx
       rw [Matrix.mulVec_mulVec, ← map_mul]
       exact Submodule.subset_span ⟨y * z, rfl⟩
-    | zero => simp
+    | zero =>
+      simp
     | add x z _ _ hx hz =>
       rw [Matrix.mulVec_add]
       exact S.add_mem hx hz
@@ -40,8 +41,7 @@ theorem UpperTheory.V.Weyl.scalar :
   obtain ⟨hdiag, hup⟩ := topLie n Ξ ν v htop
   refine ⟨Ξ', ?_, ?_, fun u => ?_⟩
   · rw [hd]
-    exact Module.finrank_pos_iff_exists_ne_zero.mpr
-      ⟨⟨v, hvS⟩, fun h => hv (congrArg Subtype.val h)⟩
+    exact Module.finrank_pos_iff_exists_ne_zero.mpr ⟨⟨v, hvS⟩, fun h => hv (congrArg Subtype.val h)⟩
   · rw [hd]
     simpa using Submodule.finrank_le S
   · set c : ℂ := ∏ k : Fin n, (u - ((k : ℕ) : ℂ) + (ν k : ℂ)) with hc
@@ -63,6 +63,8 @@ theorem UpperTheory.V.Weyl.scalar :
       refine Matrix.toLin'.injective (LinearMap.ext fun w => ?_)
       simp only [Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, hQS _ (hA w), Matrix.smul_mulVec]
     show Formalism.REAL.qdet Ξ'.E u = c • 1
-    calc Formalism.REAL.qdet Ξ'.E u = (B * A) * Formalism.REAL.qdet Ξ'.E u := by rw [hBA, Matrix.one_mul]
+    calc
+      Formalism.REAL.qdet Ξ'.E u
+        = (B * A) * Formalism.REAL.qdet Ξ'.E u := by rw [hBA, Matrix.one_mul]
       _ = B * (Formalism.REAL.qdet Ξ.E u * A) := by rw [Matrix.mul_assoc, hR]
       _ = c • 1 := by rw [hcA, Matrix.mul_smul, hBA]

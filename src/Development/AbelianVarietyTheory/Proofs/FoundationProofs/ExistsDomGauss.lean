@@ -13,18 +13,24 @@ open Matrix GlobalTheory.KZ GlobalTheory.KZ.ES
 
 namespace GlobalTheory.KZ.ES
 
-theorem exists_dom_gauss : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
-    ∀ V : ValuationSubring Ω, ∃ W : ValuationSubring X.K, Dom X V W ∧ Gauss X.jK V W := by
+theorem exists_dom_gauss
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
+      ∀ V : ValuationSubring Ω, ∃ W : ValuationSubring X.K,
+        Dom X V W ∧ Gauss X.jK V W := by
   intro Ω _ _ _ ε X V
   classical
   open GaussDom in
   haveI : (RingHom.ker (redA V X.exp)).IsPrime := RingHom.ker_isPrime _
   obtain ⟨W, hA, hinv, hlt⟩ :=
-    ReciprocityTheory.ChartRestriction.G.AR.Up.NOrd.exists_val_of_prime (GaussDom.intA V X.exp) (RingHom.ker (GaussDom.redA V X.exp))
-  have hker : ∀ x : GaussDom.intA V X.exp, x ∈ RingHom.ker (GaussDom.redA V X.exp) ↔
-      ∀ r, (X.exp x).coeff r ∈ V.nonunits :=
-    fun x => (RingHom.mem_ker).trans (GaussDom.redA_eq_zero V X.exp x)
-  have hone : ∀ x : GaussDom.intA V X.exp, x ∉ RingHom.ker (GaussDom.redA V X.exp) → W.valuation (x : X.K) = 1 := by
+    ReciprocityTheory.ChartRestriction.G.AR.Up.NOrd.exists_val_of_prime (GaussDom.intA V X.exp)
+      (RingHom.ker (GaussDom.redA V X.exp))
+  have hker
+      : ∀ x : GaussDom.intA V X.exp,
+        x ∈ RingHom.ker (GaussDom.redA V X.exp) ↔ ∀ r, (X.exp x).coeff r ∈ V.nonunits := fun x =>
+    (RingHom.mem_ker).trans (GaussDom.redA_eq_zero V X.exp x)
+  have hone
+      : ∀ x : GaussDom.intA V X.exp,
+        x ∉ RingHom.ker (GaussDom.redA V X.exp) → W.valuation (x : X.K) = 1 := by
     intro x hx
     have hx0 : (x : X.K) ≠ 0 := by
       intro h0
@@ -48,8 +54,8 @@ theorem exists_dom_gauss : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
     exact hA ⟨f, (GaussDom.mem_intA V X.exp f).2 hf⟩
   · intro f hf
     have hfi : f ∈ GaussDom.intA V X.exp :=
-      (GaussDom.mem_intA V X.exp f).2 (fun r => V.valuation_le_one_iff _ |>.1 (le_of_lt
-        ((ValuationSubring.mem_nonunits_iff _).1 (hf r))))
+      (GaussDom.mem_intA V X.exp f).2 (fun r =>
+        V.valuation_le_one_iff _ |>.1 (le_of_lt ((ValuationSubring.mem_nonunits_iff _).1 (hf r))))
     exact hlt ⟨f, hfi⟩ ((hker _).2 hf)
   · rintro f ⟨hf, r, hr⟩
     apply hone ⟨f, (GaussDom.mem_intA V X.exp f).2 hf⟩
@@ -83,8 +89,10 @@ theorem exists_dom_gauss : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
       have h4 := (W.valuation_le_one_iff _).2 ha
       have h5 : W.valuation (algebraMap Ω X.K a) * W.valuation (algebraMap Ω X.K a⁻¹) = 1 := by
         rw [← map_mul, ← map_mul, mul_inv_cancel₀ ha0, map_one, map_one]
-      have h6 : W.valuation (algebraMap Ω X.K a) * W.valuation (algebraMap Ω X.K a⁻¹) ≤
-          1 * W.valuation (algebraMap Ω X.K a⁻¹) := by gcongr
+      have h6
+          : W.valuation (algebraMap Ω X.K a) * W.valuation (algebraMap Ω X.K a⁻¹)
+            ≤ 1 * W.valuation (algebraMap Ω X.K a⁻¹) := by
+        gcongr
       rw [h5, one_mul] at h6
       exact absurd (lt_of_le_of_lt h6 h3) (lt_irrefl 1)
     · intro ha
@@ -96,16 +104,18 @@ theorem exists_dom_gauss : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
     let ι : V →+* GaussDom.intA V X.exp :=
       ((algebraMap Ω X.K).comp V.subtype).codRestrict (GaussDom.intA V X.exp)
         (fun v => GaussDom.const_mem V X.exp v v.2)
-    have hx : Polynomial.aeval X.jK P = (GaussDom.intA V X.exp).subtype (P'.eval₂ ι ⟨X.jK, hjA⟩) := by
+    have hx
+        : Polynomial.aeval X.jK P = (GaussDom.intA V X.exp).subtype (P'.eval₂ ι ⟨X.jK, hjA⟩) := by
       rw [Polynomial.hom_eval₂, ← hP', Polynomial.aeval_def, Polynomial.eval₂_map]
       rfl
     rw [hx]
     apply hone
     intro hk
     rw [RingHom.mem_ker, Polynomial.hom_eval₂] at hk
-    have hc : (GaussDom.redA V X.exp).comp ι =
-        (algebraMap (IsLocalRing.ResidueField V) (HahnSeries ℚ (IsLocalRing.ResidueField V))).comp
-          (IsLocalRing.residue V) := by
+    have hc
+        : (GaussDom.redA V X.exp).comp ι
+          = (algebraMap (IsLocalRing.ResidueField V)
+            (HahnSeries ℚ (IsLocalRing.ResidueField V))).comp (IsLocalRing.residue V) := by
       apply RingHom.ext
       intro v
       exact GaussDom.redA_const V X.exp v
@@ -114,7 +124,8 @@ theorem exists_dom_gauss : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
     have hJ : J.orderTop = ((-1 : ℚ) : WithTop ℚ) := by
       apply HahnSeries.orderTop_eq_of_le
       · rw [HahnSeries.mem_support, hJdef, GaussDom.redA_coeff]
-        have h1 : (⟨(X.exp X.jK).coeff (-1), (GaussDom.mem_intA V X.exp X.jK).1 hjA (-1)⟩ : V) = 1 :=
+        have h1
+            : (⟨(X.exp X.jK).coeff (-1), (GaussDom.mem_intA V X.exp X.jK).1 hjA (-1)⟩ : V) = 1 :=
           Subtype.ext hj1
         rw [h1, map_one]
         exact one_ne_zero

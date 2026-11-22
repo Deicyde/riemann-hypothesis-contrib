@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.UnimodularLatticeLemma
 
-theorem main {L : Type} [Field L] [IsAlgClosed L] {ι V : Type} [AddCommGroup V] [Module L V]
-    [FiniteDimensional L V] [Nontrivial V] (f : ι → Module.End L V)
-    (hc : ∀ (a b : ι), f a * f b = f b * f a) :
-    ∃ (v : V), v ≠ (0 : V) ∧ ∀ (b : ι), ∃ (μ : L), (f b : V → V) v = μ • v := by
+theorem main
+    {L : Type} [Field L] [IsAlgClosed L]
+    {ι V : Type} [AddCommGroup V] [Module L V] [FiniteDimensional L V] [Nontrivial V]
+    (f : ι → Module.End L V) (hc : ∀ (a b : ι), f a * f b = f b * f a)
+    : ∃ (v : V), v ≠ (0 : V) ∧ ∀ (b : ι), ∃ (μ : L), (f b : V → V) v = μ • v := by
   classical
   let S : Set (Submodule L V) := {W | W ≠ ⊥ ∧ ∀ b, ∀ x ∈ W, f b x ∈ W}
   have hS : (⊤ : Submodule L V) ∈ S := ⟨top_ne_bot, fun _ _ _ => Submodule.mem_top⟩

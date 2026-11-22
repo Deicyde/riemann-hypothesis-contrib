@@ -8,7 +8,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -19,8 +20,10 @@ open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction
 
 section BoxG
 
-variable {R : Type} [CommRing R] [IsDomain R] {j : ℕ}
-  {G G' : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] [GrpObj G'] [IsCommMonObj G']
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {j : ℕ} {G G' : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G] [GrpObj G'] [IsCommMonObj G']
   {LG : LB G.left} {LG' : LB G'.left}
 
 lemma unit_cancel {S : Type*} [CommRing S] (a b : Sˣ) (X Y : S) (h1 : X = ((a⁻¹ : Sˣ) : S) * Y) (h2 : a = b) :
@@ -28,58 +31,86 @@ lemma unit_cancel {S : Type*} [CommRing S] (a b : Sˣ) (X Y : S) (h1 : X = ((a�
   subst h2
   rw [h1, ← _root_.mul_assoc, Units.mul_inv, _root_.one_mul]
 
-def boxSecG (pG : IsPowGrp G' G j) (w : LB.Iso LG' (boxLB LG pG.pr)) (hw : w.IsGen) (hLG : LG.IsLB)
-    (hLG' : LG'.IsLB) (k : ℕ) (σ : Fin j → H0 LG k) : H0 LG' k :=
+def boxSecG
+    (pG : IsPowGrp G' G j) (w : LB.Iso LG' (boxLB LG pG.pr)) (hw : w.IsGen)
+    (hLG : LG.IsLB) (hLG' : LG'.IsLB)
+    (k : ℕ) (σ : Fin j → H0 LG k)
+    : H0 LG' k :=
   secOfIso (u := LB.linCombIso w (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))
     (boxSec LG (fun i => (pG.pr i).left) (k : ℤ) σ) (linCombIso_isGen w hw _ _)
     (linComb_isLB LG' hLG' _ _) (linComb_isLB _ (linComb_isLB LG hLG _ _) _ _)
 
 set_option maxHeartbeats 1000000 in
-theorem isBoxSecG_boxSecG (pG : IsPowGrp G' G j) (w : LB.Iso LG' (boxLB LG pG.pr)) (hw : w.IsGen)
-    (hLG : LG.IsLB) (hLG' : LG'.IsLB) (k : ℕ) (σ : Fin j → H0 LG k) :
-    IsBoxSecG pG w k (boxSecG pG w hw hLG hLG' k σ) σ := by
+theorem isBoxSecG_boxSecG
+    (pG : IsPowGrp G' G j) (w : LB.Iso LG' (boxLB LG pG.pr)) (hw : w.IsGen)
+    (hLG : LG.IsLB) (hLG' : LG'.IsLB)
+    (k : ℕ) (σ : Fin j → H0 LG k)
+    : IsBoxSecG pG w k (boxSecG pG w hw hLG hLG' k σ) σ := by
   intro jN jL
   set V := (LB.div (boxLB LG pG.pr) LG').U (jN, jL) with hVdef
-  have hVab : V ≤ LB.wchart LG' (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => jL) ⊓
-      LB.wchart (boxLB LG pG.pr) (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => jN) :=
-    fun _ hy => ⟨Set.mem_iInter.2 fun _ => hy.2, Set.mem_iInter.2 fun _ => hy.1⟩
-  have hspec := congrArg (rs hVab) (secOfIso_spec (u := LB.linCombIso w (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))
-    (boxSec LG (fun i => (pG.pr i).left) (k : ℤ) σ) (linCombIso_isGen w hw _ _)
-    (linComb_isLB LG' hLG' _ _) (linComb_isLB _ (linComb_isLB LG hLG _ _) _ _) (fun _ => jL) (fun _ => jN))
+  have hVab
+      : V
+        ≤ LB.wchart LG' (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => jL)
+          ⊓ LB.wchart (boxLB LG pG.pr) (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => jN) := fun _ hy =>
+    ⟨Set.mem_iInter.2 fun _ => hy.2, Set.mem_iInter.2 fun _ => hy.1⟩
+  have hspec :=
+    congrArg (rs hVab)
+      (secOfIso_spec (u := LB.linCombIso w (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))
+        (boxSec LG (fun i => (pG.pr i).left) (k : ℤ) σ) (linCombIso_isGen w hw _ _)
+        (linComb_isLB LG' hLG' _ _) (linComb_isLB _ (linComb_isLB LG hLG _ _) _ _)
+        (fun _ => jL)
+        (fun _ => jN))
   erw [rs_rs] at hspec
-  have hspec2 := hspec.trans (isoCand_rs (LB.linCombIso w (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))
-    (boxSec LG (fun i => (pG.pr i).left) (k : ℤ) σ) (fun _ => jL) (fun _ => jN) hVab)
-  have hVd : V ≤ (LB.div (LB.LinComb (boxLB LG pG.pr) (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))
-      (LB.LinComb LG' (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))).U ((fun _ => jN), (fun _ => jL)) :=
-    fun _ hy => ⟨Set.mem_iInter.2 fun _ => hy.1, Set.mem_iInter.2 fun _ => hy.2⟩
-  have hu : res hVd ((LB.linCombIso w (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ))).s ((fun _ => jN), (fun _ => jL))) =
-      w.s (jN, jL) ^ k := by
+  have hspec2 :=
+    hspec.trans (isoCand_rs (LB.linCombIso w (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))
+      (boxSec LG (fun i => (pG.pr i).left) (k : ℤ) σ)
+      (fun _ => jL)
+      (fun _ => jN)
+      hVab)
+  have hVd
+      : V
+        ≤ (LB.div (LB.LinComb (boxLB LG pG.pr) (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))
+            (LB.LinComb LG' (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ)))).U
+          ((fun _ => jN), (fun _ => jL)) := fun _ hy =>
+    ⟨Set.mem_iInter.2 fun _ => hy.1, Set.mem_iInter.2 fun _ => hy.2⟩
+  have hu
+      : res hVd
+          ((LB.linCombIso w (fun _ : Fin 1 => 𝟙 G'.left) (fun _ => (k : ℤ))).s
+            ((fun _ => jN), (fun _ => jL)))
+        = w.s (jN, jL) ^ k := by
     erw [linCombIso_res, Fin.prod_univ_one]
     show tu (LB.div (boxLB LG pG.pr) LG').U w.s V (𝟙 G'.left) (jN, jL) ^ (k : ℤ) = _
-    rw [tu_def (U := (LB.div (boxLB LG pG.pr) LG').U) (u := w.s) (ψ := 𝟙 G'.left) (p := (jN, jL)) (V := V)
-      (fun _ hy => hy), zpow_natCast]
+    rw [tu_def (U := (LB.div (boxLB LG pG.pr) LG').U) (u := w.s) (ψ := 𝟙 G'.left) (p := (jN, jL))
+        (V := V) (fun _ hy => hy),
+      zpow_natCast]
     congr 1
     ext
     simp only [res, pullU, Units.coe_map, MonoidHom.coe_coe, Scheme.Hom.id_app]
     show (G'.left.presheaf.map (homOfLE _).op).hom ((w.s (jN, jL)).val) = (w.s (jN, jL)).val
-    rw [show (homOfLE (le_refl V)).op = 𝟙 _ from Subsingleton.elim _ _, CategoryTheory.Functor.map_id]
+    rw [show (homOfLE (le_refl V)).op = 𝟙 _ from Subsingleton.elim _ _,
+      CategoryTheory.Functor.map_id]
     rfl
   have key := unit_cancel _ _ _ _ hspec2 hu
   refine key.trans ?_
   simp only [boxSec, boxSecF]
-  refine (map_prod ((G'.left.presheaf.map (homOfLE _).op).hom) _ _).trans (Finset.prod_congr rfl fun i _ => ?_)
+  refine (map_prod ((G'.left.presheaf.map (homOfLE _).op).hom) _ _).trans
+    (Finset.prod_congr rfl fun i _ => ?_)
   exact rs_rs _ _ _
 
 end BoxG
 
 section BoxGen
 
-variable {X X' Y Y' : Scheme.{0}} (L : LB X) {j : ℕ} (pr : Fin j → (X' ⟶ X)) {K : Type} [Fintype K]
-  (φ' : K → (Y' ⟶ X')) (ε : K → ℤ) (p : Fin j → (Y' ⟶ Y)) (φ : Fin j → K → (Y ⟶ X))
-  (hφ : ∀ i a, φ' a ≫ pr i = p i ≫ φ i a)
+variable
+  {X X' Y Y' : Scheme.{0}} (L : LB X)
+  {j : ℕ} (pr : Fin j → (X' ⟶ X))
+  {K : Type} [Fintype K]
+  (φ' : K → (Y' ⟶ X'))
+  (ε : K → ℤ)
+  (p : Fin j → (Y' ⟶ Y)) (φ : Fin j → K → (Y ⟶ X)) (hφ : ∀ i a, φ' a ≫ pr i = p i ≫ φ i a)
 
-def boxSecGenF (σ : ∀ i, LB.Sec (LB.LinComb L (φ i) ε)) (jN : K → (Fin j → L.ι)) :
-    Γ(Y', LB.wchart (LB.LinComb L pr (fun _ => 1)) φ' jN) :=
+def boxSecGenF (σ : ∀ i, LB.Sec (LB.LinComb L (φ i) ε)) (jN : K → (Fin j → L.ι))
+    : Γ(Y', LB.wchart (LB.LinComb L pr (fun _ => 1)) φ' jN) :=
   ∏ i, rs (box_le_of_comp L pr φ' (φ i) (p i) i (hφ i) jN) (((p i).app _).hom ((σ i).f (fun a => jN a i)))
 
 set_option maxHeartbeats 1000000 in
@@ -151,8 +182,8 @@ lemma boxSecGenF_compat (σ : ∀ i, LB.Sec (LB.LinComb L (φ i) ε)) (jN jN' : 
   · erw [hg, Units.coe_prod]
   · exact (map_prod ((Y'.presheaf.map (homOfLE _).op).hom) _ _).symm
 
-def boxSecGen (σ : ∀ i, LB.Sec (LB.LinComb L (φ i) ε)) :
-    LB.Sec (LB.LinComb (LB.LinComb L pr (fun _ => 1)) φ' ε) where
+def boxSecGen (σ : ∀ i, LB.Sec (LB.LinComb L (φ i) ε))
+    : LB.Sec (LB.LinComb (LB.LinComb L pr (fun _ => 1)) φ' ε) where
   f jN := boxSecGenF L pr φ' ε p φ hφ σ jN
   compat jN jN' := boxSecGenF_compat L pr φ' ε p φ hφ σ jN jN'
 

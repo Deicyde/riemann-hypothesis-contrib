@@ -10,13 +10,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Filter Topology Matrix
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
-open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1
+  PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
 open scoped ComplexConjugate Classical InnerProductSpace
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.ext4 :
-    ∀ (μ : Measure U4), Haar4 μ → μ.IsOpenPosMeasure → ∀ n q n' q', ∃ e, Ext μ e n q n' q' 1 ∧ Ext μ e n' q' n q w4 := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.ext4
+    : ∀ (μ : Measure U4),
+      Haar4 μ → μ.IsOpenPosMeasure
+        → ∀ n q n' q', ∃ e, Ext μ e n q n' q' 1 ∧ Ext μ e n' q' n q w4 := by
   intro μ hμ hpos n q n' q'
   obtain ⟨ψ, hψ⟩ := coefEx n q n' q'
   obtain ⟨hc, -, hidem, hfix⟩ := coefIdem μ ψ n q n' q' hμ hpos hψ
@@ -39,9 +46,11 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.ext4 :
     simpa only [mul_one] using hF Φ hΦ hR g
   · intro Φ hΦ hR h1 h2 h0
     exact hI Φ hΦ hR h1 h2 (by simpa only [mul_one] using h0)
-  · refine ⟨_, hcc (((KT.normSqInt n q : ℝ) : ℂ)⁻¹ * ((KT.normSqInt n' q' : ℝ) : ℂ)⁻¹) 1, hsc _ 1, ?_⟩
+  · refine
+      ⟨_, hcc (((KT.normSqInt n q : ℝ) : ℂ)⁻¹ * ((KT.normSqInt n' q' : ℝ) : ℂ)⁻¹) 1, hsc _ 1, ?_⟩
     intro a b
-    simp only [mul_one, one_mul, hψ.res, T, map_mul, map_inv₀, Complex.conj_ofReal, Complex.conj_conj]
+    simp only [mul_one, one_mul, hψ.res, T, map_mul, map_inv₀, Complex.conj_ofReal,
+      Complex.conj_conj]
     ring
   · intro Φ hΦ hR g
     obtain ⟨h1, h2⟩ := hF Φ hΦ hR (g * w4)
@@ -73,9 +82,9 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.ext4 :
     funext k
     have h := congrFun key (w4 * k)
     simpa only [← mul_assoc, hww, one_mul, Pi.zero_apply] using h
-  · refine ⟨_, hcc (((KT.normSqInt n q : ℝ) : ℂ)⁻¹ * ((KT.normSqInt n' q' : ℝ) : ℂ)⁻¹) w4, hsc _ w4, ?_⟩
+  · refine
+      ⟨_, hcc (((KT.normSqInt n q : ℝ) : ℂ)⁻¹ * ((KT.normSqInt n' q' : ℝ) : ℂ)⁻¹) w4, hsc _ w4, ?_⟩
     intro a b
-    have e : w4 * (bd a b * w4) = bd b a := by
-      rw [← mul_assoc, hwb, mul_assoc, hww, mul_one]
+    have e : w4 * (bd a b * w4) = bd b a := by rw [← mul_assoc, hwb, mul_assoc, hww, mul_one]
     simp only [e, hψ.res, T, map_mul, map_inv₀, Complex.conj_ofReal, Complex.conj_conj]
     ring

@@ -19,18 +19,24 @@ open Formalism.L2.SG.GGMirabolic
 
 variable {F : Type} [Field F] [Fintype F] {k : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem pi_sgn_mul (π : Representation ℂ (GL (Fin k) F) V) (x : GL (Fin k) F) (v : V) :
-    π (sgn k) (π x v) = π (sgn k * x * sgn k) (π (sgn k) v) := by
+theorem pi_sgn_mul (π : Representation ℂ (GL (Fin k) F) V) (x : GL (Fin k) F) (v : V)
+    : π (sgn k) (π x v) = π (sgn k * x * sgn k) (π (sgn k) v) := by
   rw [← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul, mul_assoc (sgn k * x),
     sgn_mul_self, mul_one]
 
-theorem pi_sgn_sgn (π : Representation ℂ (GL (Fin k) F) V) (v : V) : π (sgn k) (π (sgn k) v) = v := by
+theorem pi_sgn_sgn (π : Representation ℂ (GL (Fin k) F) V) (v : V)
+    : π (sgn k) (π (sgn k) v) = v := by
   rw [← Module.End.mul_apply, ← map_mul, sgn_mul_self, map_one, Module.End.one_apply]
 
-theorem whit_sgn_projQ (ψ₀ : AddChar F ℂ) (π : Representation ℂ (GL (Fin k) F) V) (ℓ : Module.Dual ℂ V)
-    (hℓ : IsWhit ψ₀ π ℓ) (v : V) : ℓ (π (sgn k) (projQ ψ₀ π v)) = ℓ (π (sgn k) v) := by
-  have hterm : ∀ x : GL (Fin k) F, psiNat ψ₀ x * ℓ (π (sgn k) (π x v)) =
-      (if IsUni k x then (1 : ℂ) else 0) * ℓ (π (sgn k) v) := by
+theorem whit_sgn_projQ
+    (ψ₀ : AddChar F ℂ) (π : Representation ℂ (GL (Fin k) F) V) (ℓ : Module.Dual ℂ V)
+    (hℓ : IsWhit ψ₀ π ℓ)
+    (v : V)
+    : ℓ (π (sgn k) (projQ ψ₀ π v)) = ℓ (π (sgn k) v) := by
+  have hterm
+      : ∀ x : GL (Fin k) F,
+        psiNat ψ₀ x * ℓ (π (sgn k) (π x v))
+          = (if IsUni k x then (1 : ℂ) else 0) * ℓ (π (sgn k) v) := by
     intro x
     rw [pi_sgn_mul]
     by_cases hx : IsUni k x
@@ -44,8 +50,9 @@ theorem whit_sgn_projQ (ψ₀ : AddChar F ℂ) (π : Representation ℂ (GL (Fin
   simp_rw [hterm]
   rw [← Finset.sum_mul, sum_boole_uni, ← mul_assoc, inv_mul_cancel₀ (cardU_ne_zero F k), one_mul]
 
-theorem isWhit_of_dual (ψ₀ : AddChar F ℂ) (π : Representation ℂ (GL (Fin k) F) V) (f : Module.Dual ℂ V) :
-    IsWhit ψ₀ π (f ∘ₗ (projQ ψ₀ π ∘ₗ π (sgn k))) := by
+theorem isWhit_of_dual
+    (ψ₀ : AddChar F ℂ) (π : Representation ℂ (GL (Fin k) F) V) (f : Module.Dual ℂ V)
+    : IsWhit ψ₀ π (f ∘ₗ (projQ ψ₀ π ∘ₗ π (sgn k))) := by
   intro u hu v
   have hq := LinearMap.congr_fun (projQ_comp_pi ψ₀ π (isUni_sgn_conj hu)) (π (sgn k) v)
   simp only [LinearMap.comp_apply] at hq ⊢
@@ -89,7 +96,8 @@ theorem intertwiner_rank_le_one : RankLeOne := by
   · obtain ⟨ℓ₁, ⟨f₁, rfl⟩, hne⟩ := h
     have hle : LinearMap.range T.dualMap ≤ Submodule.span ℂ {T.dualMap f₁} := by
       rintro _ ⟨f₂, rfl⟩
-      obtain ⟨c, hc⟩ := hm F k ψ₀ hψ V π hirr _ _ (isWhit_of_dual ψ₀ π f₁) (isWhit_of_dual ψ₀ π f₂) hne
+      obtain ⟨c, hc⟩ :=
+        hm F k ψ₀ hψ V π hirr _ _ (isWhit_of_dual ψ₀ π f₁) (isWhit_of_dual ψ₀ π f₂) hne
       rw [Submodule.mem_span_singleton]
       exact ⟨c, hc.symm⟩
     exact (Submodule.finrank_mono hle).trans (finrank_span_singleton hne).le

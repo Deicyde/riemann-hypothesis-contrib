@@ -15,31 +15,42 @@ namespace GroundTheory.Heights₂.Heights
 
 open Filter Topology
 open scoped ContDiff
-open ReciprocityTheory.ChartRestriction.G.Geo (MRing HermLine IsSmoothHerm IsArithVar ptsIntegral pot segre isOpen_blockNonzero)
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (MRing HermLine IsSmoothHerm IsArithVar ptsIntegral pot segre isOpen_blockNonzero)
 
-def expLine {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    (v : ((Σ k, ι k) → ℂ) → ℝ) (hv : IsDegZeroSmooth v) : HermLine ι :=
-  HermLine.ofWeight (fun z => -v z) fun c z hc => by rw [hv.2 c z hc]
+def expLine
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    (v : ((Σ k, ι k) → ℂ) → ℝ) (hv : IsDegZeroSmooth v)
+    : HermLine ι :=
+  HermLine.ofWeight (fun z => - v z) fun c z hc => by rw [hv.2 c z hc]
 
-theorem pot_cons_expLine {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {n : ℕ}
-    (v : ((Σ k, ι k) → ℂ) → ℝ) (hv : IsDegZeroSmooth v) (L : Fin n → HermLine ι) :
-    pot (Fin.cons (expLine v hv) L : Fin (n + 1) → HermLine ι) = Fin.cons v (pot L) := by
+theorem pot_cons_expLine
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    {n : ℕ}
+    (v : ((Σ k, ι k) → ℂ) → ℝ) (hv : IsDegZeroSmooth v)
+    (L : Fin n → HermLine ι)
+    : pot (Fin.cons (expLine v hv) L : Fin (n + 1) → HermLine ι) = Fin.cons v (pot L) := by
   funext j z
   refine Fin.cases ?_ (fun j => ?_) j
   · simp [pot, expLine, HermLine.ofWeight]
   · simp [pot]
 
-theorem isSmoothHerm_cons_expLine {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {n : ℕ}
-    (v : ((Σ k, ι k) → ℂ) → ℝ) (hv : IsDegZeroSmooth v) (L : Fin n → HermLine ι)
-    (hL : ∀ j, IsSmoothHerm (L j)) :
-    ∀ j, IsSmoothHerm ((Fin.cons (expLine v hv) L : Fin (n + 1) → HermLine ι) j) := by
+theorem isSmoothHerm_cons_expLine
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    {n : ℕ}
+    (v : ((Σ k, ι k) → ℂ) → ℝ) (hv : IsDegZeroSmooth v)
+    (L : Fin n → HermLine ι) (hL : ∀ j, IsSmoothHerm (L j))
+    : ∀ j, IsSmoothHerm ((Fin.cons (expLine v hv) L : Fin (n + 1) → HermLine ι) j) := by
   intro j
   refine Fin.cases ?_ (fun j => ?_) j
   · exact Real.contDiff_exp.comp_contDiffOn hv.1.neg.neg
   · simpa using hL j
 
-theorem SegreChart.proof (hDim : SegreChartDim.Statement) (hInt : SegreChartIntegral.Statement) :
-    SegreChart.Statement := by
+theorem SegreChart.proof (hDim : SegreChartDim.Statement) (hInt : SegreChartIntegral.Statement)
+    : SegreChart.Statement := by
   classical
   intro K _ _ ι _ P n L u v i δ hP hL hu hv hδ hsupp
   let σ := (Fintype.equivFin ((k : K) → ι k)).symm
@@ -53,8 +64,10 @@ theorem SegreChart.proof (hDim : SegreChartDim.Statement) (hInt : SegreChartInte
 
   let Ω := lam ⁻¹' {z | ∀ k, ∃ j, z ⟨k, j⟩ ≠ 0}
   have hΩ : IsOpen Ω := isOpen_blockNonzero.preimage hlam.continuous
-  have hsm : ∀ f : ((Σ k, ι k) → ℂ) → ℝ, ContDiffOn ℝ ∞ f {z | ∀ k, ∃ j, z ⟨k, j⟩ ≠ 0} →
-      ContDiffOn ℝ ∞ (f ∘ lam) Ω := fun f hf => hf.comp hlam.contDiffOn fun _ hx => hx
+  have hsm
+      : ∀ f : ((Σ k, ι k) → ℂ) → ℝ,
+        ContDiffOn ℝ ∞ f {z | ∀ k, ∃ j, z ⟨k, j⟩ ≠ 0} → ContDiffOn ℝ ∞ (f ∘ lam) Ω := fun f hf =>
+    hf.comp hlam.contDiffOn fun _ hx => hx
   have hpot : ∀ j, ContDiffOn ℝ ∞ (pot L j) {z | ∀ k, ∃ j, z ⟨k, j⟩ ≠ 0} := fun j =>
     (hL j).log fun z hz => ((L j).pos z hz).ne'
 
@@ -66,28 +79,43 @@ theorem SegreChart.proof (hDim : SegreChartDim.Statement) (hInt : SegreChartInte
     · have hle : ‖fun a => segre z (σ a)‖ ≤ ‖segre z‖ :=
         (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun a => norm_le_pi_norm (segre z) (σ a)
       have hcont : Continuous fun y => segre (lam y) :=
-        continuous_pi fun i' => continuous_finsetProd _ fun k _ =>
-          (continuous_apply (⟨k, i' k⟩ : Σ k, ι k)).comp hlam.continuous
+        continuous_pi fun i' =>
+          continuous_finsetProd _ fun k _ =>
+            (continuous_apply (⟨k, i' k⟩ : Σ k, ι k)).comp hlam.continuous
       have hO : IsOpen {y | ‖segre (lam y) i‖ < δ * ‖segre (lam y)‖} :=
         isOpen_lt ((continuous_apply i).comp hcont).norm (continuous_const.mul hcont.norm)
-      have hx : ‖segre (lam fun a => segre z (σ a)) i‖ < δ * ‖segre (lam fun a => segre z (σ a))‖ := by
+      have hx
+          : ‖segre (lam fun a => segre z (σ a)) i‖ < δ * ‖segre (lam fun a => segre z (σ a))‖ := by
         rw [segre_chartLift σ i z hzi, hzi, norm_one]
         have h1 : 1 / δ < ‖segre z‖ := by linarith
-        calc (1 : ℝ) = δ * (1 / δ) := by field_simp
+        calc
+          (1 : ℝ)
+            = δ * (1 / δ) := by field_simp
           _ < δ * ‖segre z‖ := mul_lt_mul_of_pos_left h1 hδ
       filter_upwards [hO.mem_nhds hx] with y hy
       simp [U, hsupp _ hy]
   have hJ : ∀ J ∈ segreChartComponents P σ i, ComplexSets.zeroSet J ⊆ Ω := fun J hJ x hx =>
     chartLift_blockNonzero σ i (chart_coord_eq_one hJ hx)
-  refine ⟨Fintype.card ((k : K) → ι k), segreChartComponents P σ i, U, V, Φ,
-    fun J hJs => ⟨(mem_segreChartComponents.1 hJs).1.1,
+  refine ⟨
+    Fintype.card ((k : K) → ι k),
+    segreChartComponents P σ i,
+    U,
+    V,
+    Φ,
+    fun J hJs => ⟨
+      (mem_segreChartComponents.1 hJs).1.1,
       hDim K ι P (n + 1) _ σ i hP J hJs,
       ⟨Ω, hΩ, hJ J hJs, (χ.contDiff.contDiffOn).mul (hsm u hu.1)⟩,
-      ⟨Ω, hΩ, hJ J hJs, hsm v hv.1⟩, fun j => ⟨Ω, hΩ, hJ J hJs, hsm _ (hpot j)⟩⟩,
-    χ.hasCompactSupport.mul_right, ?_, ?_⟩
+      ⟨Ω, hΩ, hJ J hJs, hsm v hv.1⟩,
+      fun j => ⟨Ω, hΩ, hJ J hJs, hsm _ (hpot j)⟩
+    ⟩,
+    χ.hasCompactSupport.mul_right,
+    ?_,
+    ?_
+  ⟩
   · rw [← pot_cons_expLine v hv L]
-    refine hInt K ι P n _ σ i _ u δ U _ hP (isSmoothHerm_cons_expLine v hv L hL) hu hδ (Or.inl hsupp)
-      fun x hx => ⟨key x hx, fun j => EventuallyEq.of_eq ?_⟩
+    refine hInt K ι P n _ σ i _ u δ U _ hP (isSmoothHerm_cons_expLine v hv L hL) hu hδ
+      (Or.inl hsupp) fun x hx => ⟨key x hx, fun j => EventuallyEq.of_eq ?_⟩
     refine Fin.cases ?_ (fun j => ?_) j
     · funext y; simp [V, lam, pot, expLine, HermLine.ofWeight]
     · rfl

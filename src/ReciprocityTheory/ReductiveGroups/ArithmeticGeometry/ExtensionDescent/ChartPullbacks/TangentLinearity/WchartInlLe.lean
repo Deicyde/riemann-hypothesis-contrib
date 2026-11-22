@@ -61,14 +61,19 @@ lemma appLE_pullGen {T X : Scheme.{0}} (f : T ⟶ Z) (φ : K → (Y ⟶ X)) (ε 
 
 end SlopeTestRemainingChoices
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {O : Type} [Ring O] [StarRing O]
-  {D : DegData R I} [Module O D.toPre.X] {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (U : UnifPre I D A G)
-  (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O) (χ : D.toPre.X)
-  (hO : ∀ a : O, (Over.pullback (thick R I e)).map (ιG.act a) ≫ (U.gt e).q =
-      (U.gt e).q ≫ (Over.pullback (thick R I e)).map (ιD.onB.act a))
-  (u : LB.Gen (LB.LinComb D.toPre.P.L
-    (rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a)) rosatiε))
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {O : Type} [Ring O] [StarRing O]
+  {D : DegData R I} [Module O D.toPre.X]
+  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
+  (U : UnifPre I D A G) (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O)
+  (χ : D.toPre.X)
+  (hO : ∀ a : O,
+    (Over.pullback (thick R I e)).map (ιG.act a) ≫ (U.gt e).q
+      = (U.gt e).q ≫ (Over.pullback (thick R I e)).map (ιD.onB.act a))
+  (u : LB.Gen (LB.LinComb D.toPre.P.L (rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a))
+    rosatiε))
 
 private lemma q_act_lemma :
     (Over.map (thick R I e)).map (WeightPf.act (U.gt e)) ≫ (Over.map (thick R I e)).map (U.gt e).q =
@@ -110,15 +115,16 @@ lemma act_lift_xc :
        simp only [xc, ← Category.assoc, unit_act_lemma])
     | simp [xc, pG_act_lemma, unit_act_lemma]
 
-theorem hA_act (k : Fin 4 ⊕ Fin 6) :
-    (WeightPf.act (U.gt e)).left ≫ φA U ιD e a χ k =
-      (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left ≫ φA U ιD e a χ k := by
+theorem hA_act (k : Fin 4 ⊕ Fin 6)
+    : (WeightPf.act (U.gt e)).left ≫ φA U ιD e a χ k
+      = (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left ≫ φA U ιD e a χ k := by
   rcases k with k | k
   · simp only [φA, Sum.elim_inl]
     fin_cases k
     · exact left_act_lemma (U := U) (e := e)
         (padd D.toPre.P.A (U.gt e).pG (toUnit _ ≫ D.toPre.c (star a • χ)))
-        (by simp only [padd, ← Category.assoc, comp_lift, pG_act_lemma, q_act_lemma, unit_act_lemma])
+        (by
+          simp only [padd, ← Category.assoc, comp_lift, pG_act_lemma, q_act_lemma, unit_act_lemma])
     · exact left_act_lemma (U := U) (e := e) (toUnit _ ≫ D.toPre.c (star a • χ))
         (by simp only [← Category.assoc, unit_act_lemma])
     · exact left_act_lemma (U := U) (e := e) (U.gt e).pG (pG_act_lemma U e)
@@ -190,62 +196,76 @@ private lemma snd_cancel_lemma {Z₀ : Scheme.{0}} (x y : (thickObj R I e G).lef
     (𝟙 (thickObj R I e G))).left ≫ ·) h
   simpa only [← Category.assoc, ← Over.comp_left, lift_snd, Over.id_left, Category.id_comp] using h2
 
-theorem lhs_act (jA : Fin 4 ⊕ Fin 6 → D.toPre.P.L.ι) (cA : LB.Coh D.toPre.P.L (φA U ιD e a χ) jA)
+theorem lhs_act
+    (jA : Fin 4 ⊕ Fin 6 → D.toPre.P.L.ι) (cA : LB.Coh D.toPre.P.L (φA U ιD e a χ) jA)
     (W' : (WeightPf.Te D.toPre I e ⊗ thickObj R I e G).left.Opens)
-    (hs : W' ≤ (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left ⁻¹ᵁ
-      LB.wchart D.toPre.P.L (φA U ιD e a χ) jA)
-    (ha : W' ≤ (WeightPf.act (U.gt e)).left ⁻¹ᵁ LB.wchart D.toPre.P.L (φA U ιD e a χ) jA) :
-    ((WeightPf.act (U.gt e)).left.appLE _ W' ha).hom ((lhs U ιD e a χ u).s jA).val =
-      ((WeightPf.Te D.toPre I e ⊗ thickObj R I e G).left.presheaf.map (homOfLE le_top).op).hom
-        (Semi.TorusInj.chiP D.toPre.X (thickObj R I e G) (star a • χ)) *
-      ((snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left.appLE _ W' hs).hom
-        ((lhs U ιD e a χ u).s jA).val := by
+    (hs : W'
+      ≤ (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left
+        ⁻¹ᵁ LB.wchart D.toPre.P.L (φA U ιD e a χ) jA)
+    (ha : W' ≤ (WeightPf.act (U.gt e)).left ⁻¹ᵁ LB.wchart D.toPre.P.L (φA U ιD e a χ) jA)
+    : ((WeightPf.act (U.gt e)).left.appLE _ W' ha).hom ((lhs U ιD e a χ u).s jA).val
+      = ((WeightPf.Te D.toPre I e ⊗ thickObj R I e G).left.presheaf.map (homOfLE le_top).op).hom
+          (Semi.TorusInj.chiP D.toPre.X (thickObj R I e G) (star a • χ))
+        * ((snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left.appLE _ W' hs).hom
+          ((lhs U ιD e a χ u).s jA).val := by
   simp only [lhs]
   rw [appLE_mulGen, appLE_mulGen, ← _root_.mul_assoc]
   congr 1
-  · have hact : ∀ k : Fin 4, (WeightPf.act (U.gt e)).left ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k =
-        (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left ≫
-          D.toPre.Oφ (U.gt e).pG (star a • χ) k :=
-      fun k => hA_act (U := U) (ιD := ιD) (e := e) (a := a) (χ := χ) (Sum.inl k)
-    have key : ∀ k₁ k₂ : Fin 4,
-        (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left ≫
-            D.toPre.Oφ (U.gt e).pG (star a • χ) k₁ =
-          (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left ≫
-            D.toPre.Oφ (U.gt e).pG (star a • χ) k₂ →
-        jA (Sum.inl k₁) = jA (Sum.inl k₂) :=
-      fun k₁ k₂ h => cA (Sum.inl k₁) (Sum.inl k₂) (snd_cancel_lemma (e := e) _ _ h)
-    have E := (U.gt e).t_weight (star a • χ) (jA ∘ Sum.inl)
-      (Sum.elim (fun x => x.elim) (jA ∘ Sum.inl))
-      (fun k₁ k₂ h => key k₁ k₂ ((hact k₁).symm.trans (h.trans (hact k₂))))
-      (by
-        rintro (k₁ | k₁) (k₂ | k₂) h <;>
-          first | exact k₁.elim | exact k₂.elim | exact key k₁ k₂ h)
-      (by
-        rintro k (k' | k') h <;>
-          first | exact k'.elim | exact key k k' ((hact k).symm.trans h))
-    have h1 : W' ≤ (WeightPf.act (U.gt e)).left ⁻¹ᵁ
-        LB.wchart D.toPre.P.L (D.toPre.Oφ (U.gt e).pG (star a • χ)) (jA ∘ Sum.inl) :=
+  · have hact
+        : ∀ k : Fin 4,
+          (WeightPf.act (U.gt e)).left ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k
+            = (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left
+              ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k := fun k =>
+      hA_act (U := U) (ιD := ιD) (e := e) (a := a) (χ := χ) (Sum.inl k)
+    have key
+        : ∀ k₁ k₂ : Fin 4,
+          (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left
+                ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k₁
+              = (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left
+                ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k₂
+            → jA (Sum.inl k₁) = jA (Sum.inl k₂) := fun k₁ k₂ h =>
+      cA (Sum.inl k₁) (Sum.inl k₂) (snd_cancel_lemma (e := e) _ _ h)
+    have E :=
+      (U.gt e).t_weight (star a • χ) (jA ∘ Sum.inl) (Sum.elim (fun x => x.elim) (jA ∘ Sum.inl))
+        (fun k₁ k₂ h => key k₁ k₂ ((hact k₁).symm.trans (h.trans (hact k₂))))
+        (by
+          rintro (k₁ | k₁) (k₂ | k₂) h
+            <;> first | exact k₁.elim | exact k₂.elim | exact key k₁ k₂ h)
+        (by rintro k (k' | k') h <;> first | exact k'.elim | exact key k k' ((hact k).symm.trans h))
+    have h1
+        : W'
+          ≤ (WeightPf.act (U.gt e)).left
+            ⁻¹ᵁ LB.wchart D.toPre.P.L (D.toPre.Oφ (U.gt e).pG (star a • χ)) (jA ∘ Sum.inl) :=
       fun _ hz => wchart_inl_le D.toPre.P.L _ _ jA (ha hz)
-    have h2 : W' ≤ (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left ⁻¹ᵁ
-        LB.wchart D.toPre.P.L (D.toPre.Oφ (U.gt e).pG (star a • χ)) (jA ∘ Sum.inl) :=
+    have h2
+        : W'
+          ≤ (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left
+            ⁻¹ᵁ LB.wchart D.toPre.P.L (D.toPre.Oφ (U.gt e).pG (star a • χ)) (jA ∘ Sum.inl) :=
       fun _ hz => wchart_inl_le D.toPre.P.L _ _ jA (hs hz)
-    have hWa : W' ≤ LB.wchart D.toPre.P.L
-        (fun k => (WeightPf.act (U.gt e)).left ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k)
-        (jA ∘ Sum.inl) :=
-      fun _ hz => Set.mem_iInter.2 fun k => Set.mem_iInter.1 (h1 hz) k
-    have hWb : W' ≤ LB.wchart D.toPre.P.L
-        (Sum.elim (PEmpty.elim : PEmpty → _) (fun k => (snd (WeightPf.Te D.toPre I e)
-          (thickObj R I e G)).left ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k))
-        (Sum.elim (fun x => x.elim) (jA ∘ Sum.inl)) := by
+    have hWa
+        : W'
+          ≤ LB.wchart D.toPre.P.L
+            (fun k => (WeightPf.act (U.gt e)).left ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k)
+            (jA ∘ Sum.inl) := fun _ hz =>
+      Set.mem_iInter.2 fun k => Set.mem_iInter.1 (h1 hz) k
+    have hWb
+        : W'
+          ≤ LB.wchart D.toPre.P.L
+            (Sum.elim (PEmpty.elim : PEmpty → _) (fun k =>
+              (snd (WeightPf.Te D.toPre I e) (thickObj R I e G)).left
+                ≫ D.toPre.Oφ (U.gt e).pG (star a • χ) k))
+            (Sum.elim (fun x => x.elim) (jA ∘ Sum.inl)) := by
       intro z hz
       refine Set.mem_iInter.2 ?_
       rintro (k | k)
       · exact k.elim
       · exact Set.mem_iInter.1 (h2 hz) k
     have E' := corr_val_lemma _ _ _ _ E hWa hWb (le_inf hWa hWb)
-    exact (pullGen_val_lemma ..).symm.trans (E'.trans ((mulGen_val_lemma ..).trans
-      (congrArg₂ (· * ·) (charGen_val_lemma ..) (pullGen_val_lemma ..))))
-  · exact (appLE_pullGen ..).trans ((appLE_congr_lemma (act_lift_xc (U := U) (e := e) (χ := χ)) ..).trans
-      (appLE_pullGen ..).symm)
+    exact (pullGen_val_lemma ..).symm.trans
+      (E'.trans ((mulGen_val_lemma ..).trans
+        (congrArg₂ (· * ·) (charGen_val_lemma ..) (pullGen_val_lemma ..))))
+  · exact (appLE_pullGen ..).trans
+      ((appLE_congr_lemma (act_lift_xc (U := U) (e := e) (χ := χ)) ..).trans
+        (appLE_pullGen ..).symm)
 
 end ReciprocityTheory.ChartRestriction.G.Out.TLinPf

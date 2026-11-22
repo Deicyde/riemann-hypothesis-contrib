@@ -10,8 +10,8 @@ noncomputable section
 
 namespace PI.VolSemiDirect.W
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory
-  IsDedekindDomain.HeightOneSpectrum
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory IsDedekindDomain.HeightOneSpectrum
 open scoped TensorProduct Matrix
 
 section Adele
@@ -70,8 +70,9 @@ section Tens
 
 variable (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] [Module.Finite F E]
 
-theorem exists_nbhd_tens : ∃ U : Set (AF F ⊗[F] E), IsOpen U ∧ (0 : AF F ⊗[F] E) ∈ U ∧
-    ∀ e : E, inclR (F := F) (AF F) e ∈ U → e = 0 := by
+theorem exists_nbhd_tens
+    : ∃ U : Set (AF F ⊗[F] E),
+      IsOpen U ∧ (0 : AF F ⊗[F] E) ∈ U ∧ ∀ e : E, inclR (F := F) (AF F) e ∈ U → e = 0 := by
   haveI : IsModuleTopology (AF F) (AF F ⊗[F] E) := ⟨rfl⟩
   let b := Module.finBasis F E
   let B := Algebra.TensorProduct.basis (AF F) b
@@ -117,34 +118,41 @@ theorem discHA_of (hT : TensTop) : DiscHA := by
     rw [discreteTopology_iff_isOpen_singleton]
     intro x
     obtain ⟨γ, -, hγ⟩ := Subgroup.mem_map.1 (Subgroup.mem_subgroupOf.1 x.2)
-    let V : Set (HR (AF F) σ J) := {g | ∀ i j,
-      ((g : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j -
-        ((x.1 : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j ∈ U}
+    let V : Set (HR (AF F) σ J) :=
+      {g | ∀ i j,
+        ((g : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j -
+          ((x.1 : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j ∈ U}
     have hVo : IsOpen V := by
       have hc : Continuous fun g : HR (AF F) σ J =>
           ((g : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) :=
         Units.continuous_val.comp continuous_subtype_val
-      have : V = ⋂ i, ⋂ j, (fun g : HR (AF F) σ J =>
-          ((g : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j -
-            ((x.1 : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j) ⁻¹' U := by
-        ext g
-        simp [V]
+      have : V
+          = ⋂ i, ⋂ j, (fun g : HR (AF F) σ J =>
+            ((g : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j -
+              ((x.1 : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j) ⁻¹' U :=
+        by
+          ext g
+          simp [V]
       rw [this]
-      exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-        hUo.preimage (((continuous_apply j).comp ((continuous_apply i).comp hc)).sub
-          continuous_const)
+      exact isOpen_iInter_of_finite fun i =>
+        isOpen_iInter_of_finite fun j =>
+          hUo.preimage (((continuous_apply j).comp ((continuous_apply i).comp hc)).sub
+            continuous_const)
     rw [isOpen_induced_iff]
     refine ⟨V, hVo, Set.ext fun y => ?_⟩
     simp only [Set.mem_preimage, Set.mem_singleton_iff]
     constructor
     · intro hy
       obtain ⟨δ, -, hδ⟩ := Subgroup.mem_map.1 (Subgroup.mem_subgroupOf.1 y.2)
-      have hent : ∀ i j, (δ : Matrix (Fin M) (Fin M) E) i j = (γ : Matrix (Fin M) (Fin M) E) i j := by
+      have hent
+          : ∀ i j, (δ : Matrix (Fin M) (Fin M) E) i j = (γ : Matrix (Fin M) (Fin M) E) i j := by
         intro i j
         have h := hy i j
         rw [← hδ, ← hγ] at h
-        have h' : inclR (F := F) (AF F) ((δ : Matrix (Fin M) (Fin M) E) i j -
-            (γ : Matrix (Fin M) (Fin M) E) i j) ∈ U := by
+        have h'
+            : inclR (F := F) (AF F)
+                ((δ : Matrix (Fin M) (Fin M) E) i j - (γ : Matrix (Fin M) (Fin M) E) i j)
+              ∈ U := by
           rw [map_sub]
           exact h
         exact sub_eq_zero.1 (hUe _ h')

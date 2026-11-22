@@ -15,7 +15,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
+  UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
 section SlopeTestRemainingChoices
 
@@ -25,8 +26,10 @@ private theorem algClosure (K : IntermediateField ℚ Ω) : IsAlgClosure K Ω :=
   rw [isAlgClosure_iff]
   exact ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) K⟩
 
-private theorem exists_prim {k : Type} [Field k] {N : ℕ} (hN : 1 ≤ N) (φ : G ℚ Ω →* kˣ) (hφ : Af.KillsMu N φ) :
-    ∃ (M : ℕ) (_ : NeZero M) (χ : DirichletCharacter k M), χ.IsPrimitive ∧ φ = Chr.dirG ℚ Ω χ := by
+private theorem exists_prim
+    {k : Type} [Field k] {N : ℕ} (hN : 1 ≤ N) (φ : G ℚ Ω →* kˣ) (hφ : Af.KillsMu N φ)
+    : ∃ (M : ℕ) (_ : NeZero M) (χ : DirichletCharacter k M),
+      χ.IsPrimitive ∧ φ = Chr.dirG ℚ Ω χ := by
   haveI : NeZero N := ⟨by omega⟩
   unfold Af.KillsMu at hφ
   have hsurj := (Chr.clsOnto Ω N).1
@@ -43,16 +46,21 @@ private theorem exists_prim {k : Type} [Field k] {N : ℕ} (hN : 1 ≤ N) (φ : 
     ⟨MulChar.ofUnitHom ψ, by simp [MulChar.toUnitHom_eq, MulChar.ofUnitHom_eq]⟩
   haveI : NeZero χ.conductor := ⟨χ.conductor_ne_zero⟩
   refine ⟨χ.conductor, inferInstance, χ.primitiveCharacter, χ.primitiveCharacter_isPrimitive, ?_⟩
-  have h2 : χ.toUnitHom =
-      χ.primitiveCharacter.toUnitHom.comp (ZMod.unitsMap χ.conductor_dvd_level) := by
+  have h2
+      : χ.toUnitHom
+        = χ.primitiveCharacter.toUnitHom.comp (ZMod.unitsMap χ.conductor_dvd_level) := by
     conv_lhs => rw [← χ.changeLevel_primitiveCharacter]
     rw [DirichletCharacter.changeLevel_toUnitHom]
   have h3 := (Chr.clsFacts ℚ Ω N).2.1 χ.conductor χ.conductor_dvd_level
   unfold Chr.dirG
   rw [← hψ, ← hχ, h2, MonoidHom.comp_assoc, h3]
 
-private theorem ramified {k : Type} [Field k] {M : ℕ} [NeZero M] {χ : DirichletCharacter k M} (hχ : χ.IsPrimitive)
-    {A : ValuationSubring Ω} (hA : A.valuation (M : Ω) < 1) : ¬ Ine (F := ℚ) A ≤ (Chr.dirG ℚ Ω χ).ker := by
+private theorem ramified
+    {k : Type} [Field k]
+    {M : ℕ} [NeZero M]
+    {χ : DirichletCharacter k M} (hχ : χ.IsPrimitive)
+    {A : ValuationSubring Ω} (hA : A.valuation (M : Ω) < 1)
+    : ¬ Ine (F := ℚ) A ≤ (Chr.dirG ℚ Ω χ).ker := by
   intro hle
   have hM0 : M ≠ 0 := NeZero.ne M
   obtain ⟨p, hp, hpA⟩ := ((Chr.placesQ Ω).2.1 A M hM0).1 hA
@@ -80,34 +88,47 @@ private theorem ramified {k : Type} [Field k] {M : ℕ} [NeZero M] {χ : Dirichl
 
 private theorem exists_cc : ∃ σ : G ℚ Ω, IsCC σ := by
   obtain ⟨σ, hσ⟩ := exists_isConjOm (E := ℚ) (Ω := Ω)
-  refine ⟨AlgEquiv.ofRingEquiv (f := σ) (fun x => by
-    rw [eq_ratCast (algebraMap ℚ Ω) x]
-    exact map_ratCast σ x), ?_⟩
+  refine ⟨
+    AlgEquiv.ofRingEquiv (f := σ) (fun x => by
+      rw [eq_ratCast (algebraMap ℚ Ω) x]
+      exact map_ratCast σ x),
+    ?_
+  ⟩
   unfold IsCC
   unfold IsConjOm at hσ
   obtain ⟨j, hj⟩ := hσ
   exact ⟨j, fun x => hj x⟩
 
-private theorem exists_hom {R : Type} [CommRing R] {M : ℕ} [NeZero M]
-    (h : ∀ p ∈ M.primeFactors, ∀ n : ℕ, Nonempty (R →+* ZMod (p ^ n))) : Nonempty (R →+* ZMod M) := by
+private theorem exists_hom
+    {R : Type} [CommRing R]
+    {M : ℕ} [NeZero M]
+    (h : ∀ p ∈ M.primeFactors, ∀ n : ℕ, Nonempty (R →+* ZMod (p ^ n)))
+    : Nonempty (R →+* ZMod M) := by
   classical
   have hM : M ≠ 0 := NeZero.ne M
   exact ⟨((ZMod.equivPi M hM).symm : _ →+* ZMod M).comp
     (Pi.ringHom fun p : M.primeFactors => (h p p.2 (M.factorization p)).some)⟩
 
-private theorem unit_of_coprime {R : Type} [CommRing R] {M : ℕ} (φ : R →+* ZMod M) {a : R}
-    (h : IsCoprime (Ideal.span {a}) (Ideal.span {(M : R)})) : IsUnit (φ a) := by
+private theorem unit_of_coprime
+    {R : Type} [CommRing R]
+    {M : ℕ} (φ : R →+* ZMod M)
+    {a : R} (h : IsCoprime (Ideal.span {a}) (Ideal.span {(M : R)}))
+    : IsUnit (φ a) := by
   have h1 : (1 : R) ∈ Ideal.span {a} ⊔ Ideal.span {(M : R)} := by
     rw [Ideal.isCoprime_iff_sup_eq.mp h]
     exact Submodule.mem_top
   rw [← Ideal.span_insert, Ideal.mem_span_pair] at h1
   obtain ⟨x, z, hxz⟩ := h1
   have h2 := congrArg φ hxz
-  simp only [map_add (f := _), map_mul, map_natCast, ZMod.natCast_self, mul_zero, add_zero, map_one] at h2
+  simp only [map_add (f := _), map_mul, map_natCast, ZMod.natCast_self, mul_zero, add_zero, map_one]
+    at h2
   exact isUnit_iff_exists_inv'.mpr ⟨_, h2⟩
 
-private theorem coprime_of_not_mem {R : Type} [CommRing R] [IsDedekindDomain R] (w : HeightOneSpectrum R) {a : R}
-    (h : a ∉ w.asIdeal) : IsCoprime w.asIdeal (Ideal.span {a}) := by
+private theorem coprime_of_not_mem
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    (w : HeightOneSpectrum R)
+    {a : R} (h : a ∉ w.asIdeal)
+    : IsCoprime w.asIdeal (Ideal.span {a}) := by
   rw [Ideal.isCoprime_iff_sup_eq]
   have hmax : w.asIdeal.IsMaximal := w.isPrime.isMaximal w.ne_bot
   by_contra hne
@@ -116,16 +137,24 @@ private theorem coprime_of_not_mem {R : Type} [CommRing R] [IsDedekindDomain R] 
   rw [heq]
   exact Ideal.mem_sup_right (Ideal.mem_span_singleton_self a)
 
-private theorem cls_frob {M q : ℕ} [NeZero M] {A : ValuationSubring Ω} (hA : ¬ A.valuation (M : Ω) < 1) {σ : G ℚ Ω}
-    (h : IsFrob (F := ℚ) A q σ) (hq : IsUnit (q : ZMod M)) : ((Chr.cls ℚ Ω M σ : (ZMod M)ˣ) : ZMod M) = q := by
+private theorem cls_frob
+    {M q : ℕ} [NeZero M]
+    {A : ValuationSubring Ω} (hA : ¬ A.valuation (M : Ω) < 1)
+    {σ : G ℚ Ω} (h : IsFrob (F := ℚ) A q σ)
+    (hq : IsUnit (q : ZMod M))
+    : ((Chr.cls ℚ Ω M σ : (ZMod M)ˣ) : ZMod M) = q := by
   have h1 := (ML.placeBasic Ω).2.2.2.2.2.2.1 A q M σ h hA
-  have h2 := (Chr.clsFacts ℚ Ω M).2.2.1 σ hq.unit fun ζ hζ => by
-    rw [h1 ζ hζ, hq.unit_spec, ZMod.val_natCast, ← pow_eq_pow_mod q hζ]
+  have h2 :=
+    (Chr.clsFacts ℚ Ω M).2.2.1 σ hq.unit fun ζ hζ => by
+      rw [h1 ζ hζ, hq.unit_spec, ZMod.val_natCast, ← pow_eq_pow_mod q hζ]
   rw [h2, hq.unit_spec]
 
-private theorem primeTo {Γ C : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [CommGroup C]
-    (κ : Γ →* C) (hκ : IsOpen (κ.ker : Set Γ)) {l m : ℕ} (hl : l.Prime) (hm : l.Coprime m) :
-    ∃ j m' : ℕ, l.Coprime m' ∧ (κ ^ j) ^ m' = 1 ∧ j ≡ 1 [MOD m] := by
+private theorem primeTo
+    {Γ C : Type}
+    [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [CommGroup C]
+    (κ : Γ →* C) (hκ : IsOpen (κ.ker : Set Γ))
+    {l m : ℕ} (hl : l.Prime) (hm : l.Coprime m)
+    : ∃ j m' : ℕ, l.Coprime m' ∧ (κ ^ j) ^ m' = 1 ∧ j ≡ 1 [MOD m] := by
   haveI : Finite (Γ ⧸ κ.ker) := Subgroup.quotient_finite_of_isOpen _ hκ
   have hn : κ.ker.index ≠ 0 := Subgroup.index_ne_zero_of_finite
   obtain ⟨a, n', hn', hnn⟩ := Nat.exists_eq_pow_mul_and_not_dvd hn l hl.ne_one
@@ -142,8 +171,23 @@ private theorem primeTo {Γ C : Type} [Group Γ] [TopologicalSpace Γ] [IsTopolo
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.Ws.Tw.kap0 :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (K : IntermediateField ℚ Ω) [NumberField K] [_root_.NumberField.IsTotallyComplex K], Module.finrank ℚ K = 2 → (∀ A : ValuationSubring Ω, A.valuation (2 : Ω) < 1 → Dec (F := ℚ) A ≤ K.fixingSubgroup) → ∀ (η : G ℚ Ω →* (PadicAlgCl l)ˣ) (N m : ℕ), 1 ≤ N → Af.KillsMu N η → l.Coprime m → η ^ m = 1 → (∀ c, IsCC c → η c = 1) → (∀ A : ValuationSubring Ω, Ine (F := ℚ) A ≤ η.ker ∨ Dec (F := ℚ) A ≤ K.fixingSubgroup) → ∃ (κ : G K Ω →* (PadicAlgCl l)ˣ) (m' : ℕ), IsOpen (κ.ker : Set (G K Ω)) ∧ l.Coprime m' ∧ κ ^ m' = 1 ∧ (∀ c ∉ K.fixingSubgroup, ∀ s s' : G K Ω, resQ K s' = c * resQ K s * c⁻¹ → κ s * κ s' = η (resQ K s)) ∧ ∀ A : ValuationSubring Ω, Ine (F := ℚ) A ≤ η.ker → Ine (F := K) A ≤ κ.ker := by
+theorem UpperTheory.V.Ws.Tw.kap0
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime],
+      l ≠ 2
+        → ∀ (K : IntermediateField ℚ Ω) [NumberField K] [_root_.NumberField.IsTotallyComplex K],
+          Module.finrank ℚ K = 2
+            → (∀ A : ValuationSubring Ω,
+              A.valuation (2 : Ω) < 1 → Dec (F := ℚ) A ≤ K.fixingSubgroup)
+            → ∀ (η : G ℚ Ω →* (PadicAlgCl l)ˣ) (N m : ℕ),
+              1 ≤ N → Af.KillsMu N η → l.Coprime m → η ^ m = 1 → (∀ c, IsCC c → η c = 1)
+                → (∀ A : ValuationSubring Ω,
+                  Ine (F := ℚ) A ≤ η.ker ∨ Dec (F := ℚ) A ≤ K.fixingSubgroup)
+                → ∃ (κ : G K Ω →* (PadicAlgCl l)ˣ) (m' : ℕ),
+                  IsOpen (κ.ker : Set (G K Ω)) ∧ l.Coprime m' ∧ κ ^ m' = 1
+                    ∧ (∀ c ∉ K.fixingSubgroup, ∀ s s' : G K Ω,
+                      resQ K s' = c * resQ K s * c⁻¹ → κ s * κ s' = η (resQ K s))
+                    ∧ ∀ A : ValuationSubring Ω,
+                      Ine (F := ℚ) A ≤ η.ker → Ine (F := K) A ≤ κ.ker := by
   intro Ω _ _ _ l _ hl2 K _ _ h2 h2split η N m hN hη hm hηm hcc hram
   classical
   haveI : IsAlgClosure K Ω := algClosure K
@@ -176,54 +220,61 @@ theorem UpperTheory.V.Ws.Tw.kap0 :
   have hχm1 : χ (-1) = 1 := by
     obtain ⟨c0, hc0⟩ := exists_cc (Ω := Ω)
     have h1 := hcc c0 hc0
-    have h2' : Chr.cls ℚ Ω M c0 = -1 := (Chr.clsFacts ℚ Ω M).2.2.2.1 c0 (by
-      unfold IsConjOm
-      unfold IsCC at hc0
-      exact hc0)
+    have h2' : Chr.cls ℚ Ω M c0 = -1 :=
+      (Chr.clsFacts ℚ Ω M).2.2.2.1 c0 (by
+        unfold IsConjOm
+        unfold IsCC at hc0
+        exact hc0)
     unfold Chr.dirG at h1
     rw [MonoidHom.comp_apply, h2'] at h1
     have h3 := congrArg Units.val h1
     rw [MulChar.coe_toUnitHom] at h3
     simpa using h3
-  obtain ⟨f, hfmul, hfg⟩ := Tw.extIdeal K 𝔪 h𝔪 (PadicAlgCl l) g (by
-    intro a b _ _ hca hcb
-    have hua := unit_of_coprime ρ hca
-    have hub := unit_of_coprime ρ hcb
-    have hab : IsUnit (ρ (a * b)) := by rw [map_mul]; exact hua.mul hub
-    apply Units.ext
-    rw [Units.val_mul, hg _ hab, hg _ hua, hg _ hub, map_mul, map_mul]) (by
-    intro u
-    rcases hun h2split u with h | h
-    · rw [h, Units.val_one]
-      have h1 : IsUnit (ρ 1) := by rw [map_one]; exact isUnit_one
+  obtain ⟨f, hfmul, hfg⟩ :=
+    Tw.extIdeal K 𝔪 h𝔪 (PadicAlgCl l) g
+      (by
+        intro a b _ _ hca hcb
+        have hua := unit_of_coprime ρ hca
+        have hub := unit_of_coprime ρ hcb
+        have hab : IsUnit (ρ (a * b)) := by rw [map_mul]; exact hua.mul hub
+        apply Units.ext
+        rw [Units.val_mul, hg _ hab, hg _ hua, hg _ hub, map_mul, map_mul])
+      (by
+        intro u
+        rcases hun h2split u with h | h
+        · rw [h, Units.val_one]
+          have h1 : IsUnit (ρ 1) := by rw [map_one]; exact isUnit_one
+          apply Units.ext
+          rw [hg _ h1, map_one, MulChar.map_one, Units.val_one]
+        · rw [h, Units.val_neg, Units.val_one]
+          have h1 : IsUnit (ρ (-1)) := by rw [map_neg, map_one]; exact isUnit_one.neg
+          apply Units.ext
+          rw [hg _ h1, map_neg, map_one, hχm1, Units.val_one])
+  obtain ⟨κ0, hκopen, hκ⟩ :=
+    Tw.rayChar K Ω 𝔪 h𝔪 (PadicAlgCl l)ˣ f hfmul (by
+      intro a ha0 ha1
+      have hcop : IsCoprime (Ideal.span {a}) 𝔪 := by
+        rw [Ideal.isCoprime_iff_sup_eq, Ideal.eq_top_iff_one]
+        have h1 : (1 : 𝓞 K) = a - (a - 1) := by ring
+        rw [h1]
+        exact Ideal.sub_mem _ (Ideal.mem_sup_left (Ideal.mem_span_singleton_self a))
+          (Ideal.mem_sup_right ha1)
+      rw [hfg a ha0 hcop]
+      have hρa : ρ a = 1 := by
+        have h1 := hρM _ ha1
+        rwa [map_sub, map_one, sub_eq_zero] at h1
       apply Units.ext
-      rw [hg _ h1, map_one, MulChar.map_one, Units.val_one]
-    · rw [h, Units.val_neg, Units.val_one]
-      have h1 : IsUnit (ρ (-1)) := by rw [map_neg, map_one]; exact isUnit_one.neg
-      apply Units.ext
-      rw [hg _ h1, map_neg, map_one, hχm1, Units.val_one])
-  obtain ⟨κ0, hκopen, hκ⟩ := Tw.rayChar K Ω 𝔪 h𝔪 (PadicAlgCl l)ˣ f hfmul (by
-    intro a ha0 ha1
-    have hcop : IsCoprime (Ideal.span {a}) 𝔪 := by
-      rw [Ideal.isCoprime_iff_sup_eq, Ideal.eq_top_iff_one]
-      have h1 : (1 : 𝓞 K) = a - (a - 1) := by ring
-      rw [h1]
-      exact Ideal.sub_mem _ (Ideal.mem_sup_left (Ideal.mem_span_singleton_self a))
-        (Ideal.mem_sup_right ha1)
-    rw [hfg a ha0 hcop]
-    have hρa : ρ a = 1 := by
-      have h1 := hρM _ ha1
-      rwa [map_sub, map_one, sub_eq_zero] at h1
-    apply Units.ext
-    rw [hg a (by rw [hρa]; exact isUnit_one), hρa, MulChar.map_one, Units.val_one])
-  have key : ∀ c ∉ K.fixingSubgroup, ∀ s s' : G K Ω, resQ K s' = c * resQ K s * c⁻¹ →
-      κ0 s * κ0 s' = Chr.dirG ℚ Ω χ (resQ K s) := by
+      rw [hg a (by rw [hρa]; exact isUnit_one), hρa, MulChar.map_one, Units.val_one])
+  have key
+      : ∀ c ∉ K.fixingSubgroup, ∀ s s' : G K Ω,
+        resQ K s' = c * resQ K s * c⁻¹ → κ0 s * κ0 s' = Chr.dirG ℚ Ω χ (resQ K s) := by
     intro c hc
     have hci : c⁻¹ ∉ K.fixingSubgroup := fun h => hc (by simpa using K.fixingSubgroup.inv_mem h)
     let τK : K ≃+* K := IsFractionRing.ringEquivOfRingEquiv (K := K) (L := K) τ
     have hlift : IsLift τK (c⁻¹).toRingEquiv := by
-      have hext : ((c⁻¹).toRingEquiv.toRingHom.comp (algebraMap K Ω)) =
-          (algebraMap K Ω).comp τK.toRingHom := by
+      have hext
+          : ((c⁻¹).toRingEquiv.toRingHom.comp (algebraMap K Ω))
+            = (algebraMap K Ω).comp τK.toRingHom := by
         apply IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 K))
         ext x
         simp only [RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom]
@@ -236,10 +287,13 @@ theorem UpperTheory.V.Ws.Tw.kap0 :
     have hCg : ∀ s, resQ K (Cg s) = c * resQ K s * c⁻¹ := fun s => by
       ext x
       rfl
-    have hFx : ∀ x, (κ0 * κ0.comp Cg * ((Chr.dirG ℚ Ω χ).comp (resQ K))⁻¹) x =
-        κ0 x * κ0 (Cg x) * (Chr.dirG ℚ Ω χ (resQ K x))⁻¹ := fun x => rfl
-    have hFopen : IsOpen ((κ0 * κ0.comp Cg * ((Chr.dirG ℚ Ω χ).comp (resQ K))⁻¹).ker :
-        Set (G K Ω)) := by
+    have hFx
+        : ∀ x,
+          (κ0 * κ0.comp Cg * ((Chr.dirG ℚ Ω χ).comp (resQ K))⁻¹) x
+            = κ0 x * κ0 (Cg x) * (Chr.dirG ℚ Ω χ (resQ K x))⁻¹ := fun x =>
+      rfl
+    have hFopen
+        : IsOpen ((κ0 * κ0.comp Cg * ((Chr.dirG ℚ Ω χ).comp (resQ K))⁻¹).ker : Set (G K Ω)) := by
       apply Subgroup.isOpen_mono (H₁ := κ0.ker ⊓ κ0.ker.comap Cg ⊓ (Chr.cls K Ω M).ker)
       · intro x hx
         obtain ⟨⟨h1, h2⟩, h3⟩ := hx
@@ -260,8 +314,9 @@ theorem UpperTheory.V.Ws.Tw.kap0 :
         exact (hκopen.inter (hκopen.preimage (continuous_conjGal hlift))).inter
           (Chr.clsFacts K Ω M).1
     have hclosed := Subgroup.isClosed_of_isOpen _ hFopen
-    have hsub : {σ | ∃ w A, ¬w.asIdeal ∣ 𝔪 ∧ IsPlaceOver A w ∧ IsFrob A (normV w) σ} ⊆
-        ((κ0 * κ0.comp Cg * ((Chr.dirG ℚ Ω χ).comp (resQ K))⁻¹).ker : Set (G K Ω)) := by
+    have hsub
+        : {σ | ∃ w A, ¬w.asIdeal ∣ 𝔪 ∧ IsPlaceOver A w ∧ IsFrob A (normV w) σ}
+          ⊆ ((κ0 * κ0.comp Cg * ((Chr.dirG ℚ Ω χ).comp (resQ K))⁻¹).ker : Set (G K Ω)) := by
       rintro σ ⟨w, A, hw, hA, hfr⟩
       have hwM : (M : 𝓞 K) ∉ w.asIdeal := fun h => hw (Ideal.dvd_span_singleton.mpr h)
       obtain ⟨w', A', hw', hA', hfr'⟩ := hτf c hc σ (Cg σ) (hCg σ) w A hA hfr
@@ -277,8 +332,7 @@ theorem UpperTheory.V.Ws.Tw.kap0 :
       have hκw' := (hκ w' hw'd A' hA').2 (Cg σ) hfr'
       have hcw : IsCoprime w.asIdeal 𝔪 := coprime_of_not_mem w hwM
       have hcw' : IsCoprime w'.asIdeal 𝔪 := coprime_of_not_mem w' hw'M
-      have hprod : w.asIdeal * w'.asIdeal =
-          Ideal.span {((Ideal.absNorm w.asIdeal : ℕ) : 𝓞 K)} := by
+      have hprod : w.asIdeal * w'.asIdeal = Ideal.span {((Ideal.absNorm w.asIdeal : ℕ) : 𝓞 K)} := by
         rw [hw']
         exact hτn w.asIdeal
       have hcq : IsCoprime (Ideal.span {((Ideal.absNorm w.asIdeal : ℕ) : 𝓞 K)}) 𝔪 := by
@@ -293,8 +347,7 @@ theorem UpperTheory.V.Ws.Tw.kap0 :
       have hfq : f w.asIdeal * f w'.asIdeal = g ((Ideal.absNorm w.asIdeal : ℕ) : 𝓞 K) := by
         rw [← hfmul _ _ w.ne_bot w'.ne_bot hcw hcw', hprod, hfg _ hq0 hcq]
       have huq : IsUnit (ρ ((Ideal.absNorm w.asIdeal : ℕ) : 𝓞 K)) := unit_of_coprime ρ hcq
-      have hqM : IsUnit ((Ideal.absNorm w.asIdeal : ℕ) : ZMod M) := by
-        rwa [map_natCast] at huq
+      have hqM : IsUnit ((Ideal.absNorm w.asIdeal : ℕ) : ZMod M) := by rwa [map_natCast] at huq
       have hnorm : normV w = Ideal.absNorm w.asIdeal := by
         unfold normV
         rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]

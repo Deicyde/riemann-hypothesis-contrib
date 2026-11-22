@@ -5,14 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Multiplicity
 
 @[expose] public section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.TypeSum GlobalTheory.LowTypeDetermined
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob
+  GlobalTheory.TypeSum GlobalTheory.LowTypeDetermined
 
 namespace PositivityTheory.CW
 
 namespace ExistsFunctional
 
-theorem exists_functional {E : Type} [AddCommGroup E] [Module ℂ E] (q : Seminorm ℂ E) {x₀ : E} (hx : q x₀ ≠ 0) :
-    ∃ φ : Module.Dual ℂ E, φ x₀ ≠ 0 ∧ ∀ x, ‖φ x‖ ≤ q x := by
+theorem exists_functional
+    {E : Type} [AddCommGroup E] [Module ℂ E] (q : Seminorm ℂ E) {x₀ : E} (hx : q x₀ ≠ 0)
+    : ∃ φ : Module.Dual ℂ E, φ x₀ ≠ 0 ∧ ∀ x, ‖φ x‖ ≤ q x := by
   have h0 : x₀ ≠ 0 := by
     rintro rfl
     exact hx (map_zero q)
@@ -21,8 +23,8 @@ theorem exists_functional {E : Type} [AddCommGroup E] [Module ℂ E] (q : Semino
   have hfe : ∀ t : ℂ, f (e t) = t * q x₀ := by
     intro t
     simp [f, mul_comm]
-  obtain ⟨g, hg, hgp⟩ := Module.Dual.exists_extension_of_le_seminorm (Submodule.span ℂ {x₀}) f
-    (p := q) (by
+  obtain ⟨g, hg, hgp⟩ :=
+    Module.Dual.exists_extension_of_le_seminorm (Submodule.span ℂ {x₀}) f (p := q) (by
       intro y
       obtain ⟨t, rfl⟩ := e.surjective y
       rw [hfe, norm_mul, Complex.norm_real, Real.norm_of_nonneg (apply_nonneg q x₀)]
@@ -31,8 +33,7 @@ theorem exists_functional {E : Type} [AddCommGroup E] [Module ℂ E] (q : Semino
   refine ⟨g, ?_, hgp⟩
   have h1 := hg (e 1)
   rw [hfe, one_mul] at h1
-  have : ((e 1 : Submodule.span ℂ {x₀}) : E) = x₀ := by
-    rw [LinearEquiv.toSpanNonzeroSingleton_one]
+  have : ((e 1 : Submodule.span ℂ {x₀}) : E) = x₀ := by rw [LinearEquiv.toSpanNonzeroSingleton_one]
   rw [this] at h1
   rw [h1]
   exact_mod_cast hx
@@ -47,16 +48,21 @@ theorem e1b : faceMap_comp_succAbove_castSucc := by
   obtain ⟨φ, hφ0, hφ⟩ := ExistsFunctional.exists_functional (p i) hp
   let ℓ : H →ₗ[ℂ] ℂ := φ ∘ₗ T
   have hlie : ((GlobalTheory.LowTypeDetermined.lie (Jm ε) : Set (Mx n))) = lieSet ε := rfl
-  have hsm : ∀ w, Sm ε σ w →
-      w ∈ GlobalTheory.LowTypeDetermined.smooth (Jm ε) (fun g => σ (1 * g * (1 : Mx n)⁻¹)) := by
+  have hsm
+      : ∀ w,
+        Sm ε σ w
+          → w
+            ∈ GlobalTheory.LowTypeDetermined.smooth (Jm ε) (fun g => σ (1 * g * (1 : Mx n)⁻¹)) := by
     intro w hw
     change SmoothVec ((GlobalTheory.LowTypeDetermined.lie (Jm ε) : Set (Mx n)))
-      (fun g => σ (1 * g * (1 : Mx n)⁻¹)) w
+      (fun g => σ (1 * g * (1 : Mx n)⁻¹))
+      w
     simp only [inv_one, mul_one, one_mul]
     rw [hlie]
     exact hw
-  have key := GlobalTheory.LowTypeDetermined.eq_zero_of_translates (G := Jm ε) (P := 1) hU hI isUnit_one
-    (by simp) (ℓ := ℓ) ?_ (hsm u hu) hu0 ?_ (hsm w₀ hw₀)
+  have key :=
+    GlobalTheory.LowTypeDetermined.eq_zero_of_translates (G := Jm ε) (P := 1) hU hI isUnit_one
+      (by simp) (ℓ := ℓ) ?_ (hsm u hu) hu0 ?_ (hsm w₀ hw₀)
   · exact hφ0 key
   · obtain ⟨S, C, hS, hb⟩ := hT.2 i
     refine ⟨S, C, ?_, ?_⟩

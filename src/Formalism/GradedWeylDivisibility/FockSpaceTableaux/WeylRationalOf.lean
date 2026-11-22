@@ -12,28 +12,29 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-private theorem rowGen_map_intCast {r n : ℕ} (a b : Fin r) (f : MvPolynomial (Fin r × Fin n) ℤ) :
-    rowGen ℚ a b (map (Int.castRingHom ℚ) f) =
-      Polynomial.map (map (Int.castRingHom ℚ)) (rowGen ℤ a b f) := by
+private theorem rowGen_map_intCast {r n : ℕ} (a b : Fin r) (f : MvPolynomial (Fin r × Fin n) ℤ)
+    : rowGen ℚ a b (map (Int.castRingHom ℚ) f)
+      = Polynomial.map (map (Int.castRingHom ℚ)) (rowGen ℤ a b f) := by
   induction f using MvPolynomial.induction_on
-  next c =>
-    simp [rowGen]
+  next c => simp [rowGen]
   next p q hp hq =>
-    rw [_root_.map_add (f := _), _root_.map_add (f := _), _root_.map_add (f := _), hp, hq, Polynomial.map_add (f := _)]
+    rw [_root_.map_add (f := _), _root_.map_add (f := _), _root_.map_add (f := _), hp, hq,
+      Polynomial.map_add (f := _)]
   next p v hp =>
     rw [_root_.map_mul, map_X, _root_.map_mul, _root_.map_mul, Polynomial.map_mul, hp]
     congr 1
     simp only [rowGen, aeval_X]
     split_ifs <;> simp
 
-private theorem rowDiv_map_intCast {r n : ℕ} (a b : Fin r) (k : ℕ) (f : MvPolynomial (Fin r × Fin n) ℤ) :
-    rowDiv ℚ a b k (map (Int.castRingHom ℚ) f) = map (Int.castRingHom ℚ) (rowDiv ℤ a b k f) := by
+private theorem rowDiv_map_intCast
+    {r n : ℕ} (a b : Fin r) (k : ℕ) (f : MvPolynomial (Fin r × Fin n) ℤ)
+    : rowDiv ℚ a b k (map (Int.castRingHom ℚ) f) = map (Int.castRingHom ℚ) (rowDiv ℤ a b k f) := by
   unfold rowDiv
   rw [rowGen_map_intCast, Polynomial.coeff_map]
 
-private theorem map_intCast_applyWord {r n : ℕ} (w : List (Fin r × Fin r × ℕ))
-    (f : MvPolynomial (Fin r × Fin n) ℤ) :
-    map (Int.castRingHom ℚ) (applyWord ℤ w f) = applyWord ℚ w (map (Int.castRingHom ℚ) f) := by
+private theorem map_intCast_applyWord
+    {r n : ℕ} (w : List (Fin r × Fin r × ℕ)) (f : MvPolynomial (Fin r × Fin n) ℤ)
+    : map (Int.castRingHom ℚ) (applyWord ℤ w f) = applyWord ℚ w (map (Int.castRingHom ℚ) f) := by
   induction w with
   | nil => rfl
   | cons x w ih =>
@@ -41,8 +42,8 @@ private theorem map_intCast_applyWord {r n : ℕ} (w : List (Fin r × Fin r × �
       rowDiv ℚ x.1 x.2.1 x.2.2 (applyWord ℚ w (map (Int.castRingHom ℚ) f))
     rw [← rowDiv_map_intCast, ih]
 
-private theorem map_intCast_hw {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
-    map (Int.castRingHom ℚ) (hw ℤ hn ν) = hw ℚ hn ν := by
+private theorem map_intCast_hw {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    : map (Int.castRingHom ℚ) (hw ℤ hn ν) = hw ℚ hn ν := by
   unfold hw
   rw [_root_.map_prod]
   refine Finset.prod_congr rfl (fun s _ => ?_)
@@ -54,9 +55,10 @@ private theorem map_intCast_hw {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
   ext p q
   simp [RingHom.mapMatrix_apply]
 
-theorem lclosedeq_weyl_denom {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
-    (F : MvPolynomial (Fin r × Fin n) ℚ) (hF : F ∈ weyl ℚ r n hn ν) :
-    ∃ c : ℤ, c ≠ 0 ∧ ∃ u ∈ weyl ℤ r n hn ν, map (Int.castRingHom ℚ) u = (c : ℚ) • F := by
+theorem lclosedeq_weyl_denom
+    {r n : ℕ}
+    (hn : n ≤ r) (ν : Fin n → ℕ) (F : MvPolynomial (Fin r × Fin n) ℚ) (hF : F ∈ weyl ℚ r n hn ν)
+    : ∃ c : ℤ, c ≠ 0 ∧ ∃ u ∈ weyl ℤ r n hn ν, map (Int.castRingHom ℚ) u = (c : ℚ) • F := by
   unfold weyl at hF
   induction hF using Submodule.span_induction with
   | mem x hx =>
@@ -64,45 +66,57 @@ theorem lclosedeq_weyl_denom {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
     refine ⟨1, one_ne_zero, applyWord ℤ w (hw ℤ hn ν), Submodule.subset_span ⟨w, rfl⟩, ?_⟩
     rw [map_intCast_applyWord, map_intCast_hw]
     simp
-  | zero => exact ⟨1, one_ne_zero, 0, Submodule.zero_mem _, by simp⟩
+  | zero =>
+    exact ⟨1, one_ne_zero, 0, Submodule.zero_mem _, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨c, hc, u, hu, hu'⟩ := hx
     obtain ⟨d, hd, v, hv, hv'⟩ := hy
-    refine ⟨c * d, mul_ne_zero hc hd, d • u + c • v,
-      Submodule.add_mem _ (Submodule.smul_mem _ _ hu) (Submodule.smul_mem _ _ hv), ?_⟩
+    refine ⟨
+      c * d,
+      mul_ne_zero hc hd,
+      d • u + c • v,
+      Submodule.add_mem _ (Submodule.smul_mem _ _ hu) (Submodule.smul_mem _ _ hv),
+      ?_
+    ⟩
     rw [_root_.map_add (f := _), MvPolynomial.smul_eq_C_mul u d, MvPolynomial.smul_eq_C_mul v c,
       _root_.map_mul, _root_.map_mul, map_C, map_C, hu', hv']
     simp only [MvPolynomial.smul_eq_C_mul, eq_intCast, Int.cast_mul, MvPolynomial.C_mul]
     ring
   | smul q x _ hx =>
     obtain ⟨c, hc, u, hu, hu'⟩ := hx
-    refine ⟨(q.den : ℤ) * c, mul_ne_zero (by exact_mod_cast q.den_nz) hc, q.num • u,
-      Submodule.smul_mem _ _ hu, ?_⟩
+    refine ⟨
+      (q.den : ℤ) * c,
+      mul_ne_zero (by exact_mod_cast q.den_nz) hc,
+      q.num • u,
+      Submodule.smul_mem _ _ hu,
+      ?_
+    ⟩
     rw [MvPolynomial.smul_eq_C_mul u q.num, _root_.map_mul, map_C, hu']
     have hq : q * (q.den : ℚ) = (q.num : ℚ) := Rat.mul_den_eq_num q
     simp only [MvPolynomial.smul_eq_C_mul, eq_intCast, Int.cast_mul, Int.cast_natCast,
       MvPolynomial.C_mul, ← hq]
     ring
 
-private theorem colAddGen_map_intCast {r n : ℕ} (l j : Fin n) (f : MvPolynomial (Fin r × Fin n) ℤ) :
-    colAddGen ℚ (r := r) l j (map (Int.castRingHom ℚ) f) =
-      map (Int.castRingHom ℚ) (colAddGen ℤ (r := r) l j f) := by
+private theorem colAddGen_map_intCast {r n : ℕ} (l j : Fin n) (f : MvPolynomial (Fin r × Fin n) ℤ)
+    : colAddGen ℚ (r := r) l j (map (Int.castRingHom ℚ) f)
+      = map (Int.castRingHom ℚ) (colAddGen ℤ (r := r) l j f) := by
   induction f using MvPolynomial.induction_on
-  next c =>
-    simp [colAddGen]
+  next c => simp [colAddGen]
   next p q hp hq =>
-    rw [_root_.map_add (f := _), _root_.map_add (f := _), _root_.map_add (f := _), hp, hq, _root_.map_add (f := _)]
+    rw [_root_.map_add (f := _), _root_.map_add (f := _), _root_.map_add (f := _), hp, hq,
+      _root_.map_add (f := _)]
   next p v hp =>
     rw [_root_.map_mul, map_X, _root_.map_mul, _root_.map_mul, _root_.map_mul, hp]
     congr 1
     simp only [colAddGen, aeval_X]
     split_ifs <;> simp
 
-private theorem map_intCast_mem_dualWeyl {r n : ℕ} (ν : Fin n → ℕ) (f : MvPolynomial (Fin r × Fin n) ℤ)
-    (hf : f ∈ dualWeyl ℤ r n ν) : map (Int.castRingHom ℚ) f ∈ dualWeyl ℚ r n ν := by
+private theorem map_intCast_mem_dualWeyl
+    {r n : ℕ} (ν : Fin n → ℕ) (f : MvPolynomial (Fin r × Fin n) ℤ) (hf : f ∈ dualWeyl ℤ r n ν)
+    : map (Int.castRingHom ℚ) f ∈ dualWeyl ℚ r n ν := by
   simp only [dualWeyl, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker,
-    LinearMap.sub_apply, AlgHom.toLinearMap_apply, sub_eq_zero,
-    mem_weightedHomogeneousSubmodule] at hf ⊢
+      LinearMap.sub_apply, AlgHom.toLinearMap_apply, sub_eq_zero, mem_weightedHomogeneousSubmodule]
+    at hf ⊢
   obtain ⟨h1, h2⟩ := hf
   refine ⟨?_, ?_⟩
   · intro d hd

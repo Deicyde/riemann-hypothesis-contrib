@@ -12,14 +12,21 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem moves_top_of_coprime_order : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ), p.Prime →
-    ∀ F : Subfield L, ApproxRoot p v F → 0 < v (p : L) → v (p : L) < 1 →
-    ∀ (G : Type) [Group G] [MulSemiringAction G L], (∀ (g : G) (x : L), v (g • x) = v x) →
-    ∀ σ : G, (∀ x ∈ F, σ • x = x) → ∀ l : ℕ, Nat.Coprime l p → σ ^ l = 1 →
-    (∃ y : L, σ • y ≠ y) → Moves v ⊤ σ := by
+theorem moves_top_of_coprime_order
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ),
+      p.Prime
+        → ∀ F : Subfield L,
+          ApproxRoot p v F → 0 < v (p : L) → v (p : L) < 1
+            → ∀ (G : Type) [Group G] [MulSemiringAction G L],
+              (∀ (g : G) (x : L), v (g • x) = v x)
+                → ∀ σ : G,
+                  (∀ x ∈ F, σ • x = x)
+                    → ∀ l : ℕ,
+                      Nat.Coprime l p → σ ^ l = 1 → (∃ y : L, σ • y ≠ y) → Moves v ⊤ σ := by
   intro L _ v p hp F hF hp0 hp1 G _ _ hv σ hσF l hl hσl ⟨y, hy⟩ r hr
   obtain ⟨d, hdF, _hd0, hrx, hx1⟩ :=
-    GlobalTheory.T.exists_pth_power_scale_thin_shell L v p hp F hF hp0 hp1 r hr (σ • y - y) (sub_ne_zero.mpr hy)
+    GlobalTheory.T.exists_pth_power_scale_thin_shell L v p hp F hF hp0 hp1 r hr (σ • y - y)
+      (sub_ne_zero.mpr hy)
   set x := (σ • y - y) * d ^ p with hxdef
   refine ⟨x, Subfield.mem_top x, hx1, ?_⟩
   by_contra hle
@@ -45,7 +52,8 @@ theorem moves_top_of_coprime_order : ∀ (L : Type) [Field L] (v : Valuation L �
         rw [smul_sub, pow_succ', mul_smul]; ring
       rw [e]
       refine le_trans (Valuation.map_add _ _ _) (max_le ?_ hle)
-      rw [hv]; exact ih
+      rw [hv]
+      exact ih
   have hlx : (l : L) * x = ∑ j ∈ Finset.range l, (x - (σ ^ j) • x) := by
     rw [Finset.sum_sub_distrib, hsum, sub_zero, Finset.sum_const, Finset.card_range, nsmul_eq_mul]
   have h1 : v ((l : L) * x) ≤ r := by

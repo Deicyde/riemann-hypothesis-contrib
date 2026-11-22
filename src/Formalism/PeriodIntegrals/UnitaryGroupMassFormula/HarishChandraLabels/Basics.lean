@@ -17,15 +17,16 @@ variable {Γ : Type} [Group Γ]
 
 abbrev basicsLin {σ τ : FDRep ℂ Γ} (f : σ ⟶ τ) : σ →ₗ[ℂ] τ := f.hom.hom.hom
 
-theorem basics_lin_comm {σ τ : FDRep ℂ Γ} (f : σ ⟶ τ) (g : Γ) :
-    basicsLin f ∘ₗ σ.ρ g = τ.ρ g ∘ₗ basicsLin f := by
+theorem basics_lin_comm {σ τ : FDRep ℂ Γ} (f : σ ⟶ τ) (g : Γ)
+    : basicsLin f ∘ₗ σ.ρ g = τ.ρ g ∘ₗ basicsLin f := by
   first
   | exact congrArg (fun x => x.hom.hom) (f.comm g)
   | exact congrArg (fun x => x.hom) (f.comm g)
   | (have h := f.comm g; exact (FGModuleCat.hom_ext_iff.1 h))
 
-theorem basics_lin_comp {σ τ υ : FDRep ℂ Γ} (f : σ ⟶ τ) (h : τ ⟶ υ) :
-    basicsLin (f ≫ h) = basicsLin h ∘ₗ basicsLin f := rfl
+theorem basics_lin_comp {σ τ υ : FDRep ℂ Γ} (f : σ ⟶ τ) (h : τ ⟶ υ)
+    : basicsLin (f ≫ h) = basicsLin h ∘ₗ basicsLin f :=
+  rfl
 
 theorem basics_lin_id (σ : FDRep ℂ Γ) : basicsLin (𝟙 σ) = LinearMap.id := rfl
 
@@ -43,8 +44,10 @@ def basicsMk {σ τ : FDRep ℂ Γ} (φ : σ →ₗ[ℂ] τ) (hφ : ∀ g, φ �
     apply FGModuleCat.hom_ext
     exact hφ g
 
-def basicsRes {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ Γ V) (W : Submodule ℂ V)
-    (hW : ∀ g, ∀ v ∈ W, ρ g v ∈ W) : Representation ℂ Γ W where
+def basicsRes
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ Γ V) (W : Submodule ℂ V) (hW : ∀ g, ∀ v ∈ W, ρ g v ∈ W)
+    : Representation ℂ Γ W where
   toFun g := (ρ g).restrict (hW g)
   map_one' := by
     refine LinearMap.ext fun v => Subtype.ext ?_
@@ -53,17 +56,18 @@ def basicsRes {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation �
     refine LinearMap.ext fun v => Subtype.ext ?_
     simp [LinearMap.restrict_apply, Module.End.mul_apply]
 
-def basicsIncl (τ : FDRep ℂ Γ) (W : Submodule ℂ τ) (hW : ∀ g, ∀ v ∈ W, τ.ρ g v ∈ W) :
-    FDRep.of (basicsRes τ.ρ W hW) ⟶ τ :=
+def basicsIncl (τ : FDRep ℂ Γ) (W : Submodule ℂ τ) (hW : ∀ g, ∀ v ∈ W, τ.ρ g v ∈ W)
+    : FDRep.of (basicsRes τ.ρ W hW) ⟶ τ :=
   basicsMk W.subtype (fun _ => LinearMap.ext fun _ => rfl)
 
-theorem basics_mono_of_inj {σ τ : FDRep ℂ Γ} (f : σ ⟶ τ) (hf : Function.Injective (basicsLin f)) :
-    Mono f := by
+theorem basics_mono_of_inj {σ τ : FDRep ℂ Γ} (f : σ ⟶ τ) (hf : Function.Injective (basicsLin f))
+    : Mono f := by
   refine ⟨fun {Z} a b hab => basics_hom_ext (LinearMap.ext fun x => hf ?_)⟩
   have := congrArg (fun k => basicsLin k x) hab
   exact this
 
-theorem basics_inj_of_mono {σ τ : FDRep ℂ Γ} (f : σ ⟶ τ) [Mono f] : Function.Injective (basicsLin f) := by
+theorem basics_inj_of_mono {σ τ : FDRep ℂ Γ} (f : σ ⟶ τ) [Mono f]
+    : Function.Injective (basicsLin f) := by
   have hW : ∀ g, ∀ v ∈ LinearMap.ker (basicsLin f), σ.ρ g v ∈ LinearMap.ker (basicsLin f) := by
     intro g v hv
     rw [LinearMap.mem_ker] at hv ⊢
@@ -88,18 +92,24 @@ theorem simple_irreducible : SimpleIrr := by
   have iso_of_bij : ∀ {σ : FDRep ℂ Γ} (f : σ ⟶ τ), Function.Bijective (basicsLin f) → IsIso f := by
     intro σ f hf
     let e := LinearEquiv.ofBijective (basicsLin f) hf
-    let g : τ ⟶ σ := basicsMk e.symm.toLinearMap (fun x => by
-      apply LinearMap.ext; intro v
-      apply e.injective
-      have h1 := congrArg (fun k => k (e.symm v)) (basics_lin_comm f x)
-      simp only [LinearMap.comp_apply] at h1
-      have h2 : basicsLin f (e.symm v) = v := e.apply_symm_apply v
-      rw [h2] at h1
-      simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]
-      exact h1.symm)
-    exact ⟨⟨g, basics_hom_ext (LinearMap.ext fun v => e.symm_apply_apply v),
-      basics_hom_ext (LinearMap.ext fun v => e.apply_symm_apply v)⟩⟩
-  have surj_of_iso : ∀ {σ : FDRep ℂ Γ} (f : σ ⟶ τ) [IsIso f], Function.Surjective (basicsLin f) := by
+    let g : τ ⟶ σ :=
+      basicsMk e.symm.toLinearMap (fun x => by
+        apply LinearMap.ext
+        intro v
+        apply e.injective
+        have h1 := congrArg (fun k => k (e.symm v)) (basics_lin_comm f x)
+        simp only [LinearMap.comp_apply] at h1
+        have h2 : basicsLin f (e.symm v) = v := e.apply_symm_apply v
+        rw [h2] at h1
+        simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]
+        exact h1.symm)
+    exact ⟨⟨
+      g,
+      basics_hom_ext (LinearMap.ext fun v => e.symm_apply_apply v),
+      basics_hom_ext (LinearMap.ext fun v => e.apply_symm_apply v)
+    ⟩⟩
+  have surj_of_iso
+      : ∀ {σ : FDRep ℂ Γ} (f : σ ⟶ τ) [IsIso f], Function.Surjective (basicsLin f) := by
     intro σ f _ v
     refine ⟨basicsLin (inv f) v, ?_⟩
     have := congrArg (fun k => basicsLin k v) (IsIso.inv_hom_id f)
@@ -134,7 +144,8 @@ theorem simple_irreducible : SimpleIrr := by
       obtain ⟨b, hb⟩ := surj_of_iso f w
       rw [← ha, ← hb, h0]
       rfl
-    · have hR : ∀ g, ∀ v ∈ LinearMap.range (basicsLin f), τ.ρ g v ∈ LinearMap.range (basicsLin f) := by
+    · have hR
+          : ∀ g, ∀ v ∈ LinearMap.range (basicsLin f), τ.ρ g v ∈ LinearMap.range (basicsLin f) := by
         rintro g _ ⟨u, rfl⟩
         refine ⟨Y.ρ g u, ?_⟩
         have := congrArg (fun k => k u) (basics_lin_comm f g)

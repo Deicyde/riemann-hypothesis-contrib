@@ -6,5 +6,4 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WittUnramified.W
 
 @[expose] public section
 
-theorem witt_unramified : PI.WittUnram :=
-  PI.WittUnramWork.wittUnram_main
+theorem witt_unramified : PI.WittUnram := PI.WittUnramWork.wittUnram_main

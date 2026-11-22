@@ -13,8 +13,10 @@ theorem measure_eq_zero_of_finite_inter_lines
     [MeasurableSpace K] [BorelSpace K] [AddCommGroup V] [Module K V] [TopologicalSpace V]
     [IsTopologicalAddGroup V] [ContinuousSMul K V] [LocallyCompactSpace V]
     [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
-    (μ : Measure V) [μ.IsAddHaarMeasure] (Z : Set V) (hZ : MeasurableSet Z) (y : V)
-    (h : ∀ x : V, {t : K | x + t • y ∈ Z}.Finite) : μ Z = 0 := by
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (Z : Set V) (hZ : MeasurableSet Z)
+    (y : V) (h : ∀ x : V, {t : K | x + t • y ∈ Z}.Finite)
+    : μ Z = 0 := by
   let ν : Measure K := Measure.addHaar
   have hc : Continuous (fun p : V × K => p.1 + p.2 • y) := by fun_prop
   have hS : MeasurableSet {p : V × K | p.1 + p.2 • y ∈ Z} := hc.measurable hZ

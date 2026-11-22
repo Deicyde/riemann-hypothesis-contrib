@@ -51,34 +51,48 @@ theorem idIsoL_isGen {L : LB X} (hL : L.IsLB) : (idIsoL L).IsGen := by
 
 end IdIso
 
-variable {S S' : Scheme.{0}} {G' : Over S'} {G : Over S} [GrpObj G'] [IsCommMonObj G'] [GrpObj G]
-  [IsCommMonObj G] (m : CubeMap G' G)
+variable
+  {S S' : Scheme.{0}} {G' : Over S'} {G : Over S}
+  [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G]
+  (m : CubeMap G' G)
 
-theorem thetaPull_eq (L : LB G.left) (t : LB.Gen (Theta G L)) :
-    m.thetaPull L t = GeneratorPullback.pullAlong L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
-      (fun I => m.psum_comm I.down) t := rfl
+theorem thetaPull_eq (L : LB G.left) (t : LB.Gen (Theta G L))
+    : m.thetaPull L t
+      = GeneratorPullback.pullAlong L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+        (fun I => m.psum_comm I.down)
+        t :=
+  rfl
 
-theorem hψ2_of {Z W : Scheme.{0}} {a : Z ⟶ (G3 G').left} {h2 : Z ⟶ W} {b : W ⟶ (G3 G).left}
-    (hab : a ≫ m.F3 = h2 ≫ b) (k : thK) :
-    (a ≫ thφ G' (x3 G') k) ≫ m.F = h2 ≫ (b ≫ thφ G (x3 G) k) := by
+theorem hψ2_of
+    {Z W : Scheme.{0}} {a : Z ⟶ (G3 G').left} {h2 : Z ⟶ W} {b : W ⟶ (G3 G).left}
+    (hab : a ≫ m.F3 = h2 ≫ b)
+    (k : thK)
+    : (a ≫ thφ G' (x3 G') k) ≫ m.F = h2 ≫ (b ≫ thφ G (x3 G) k) := by
   have hp := m.psum_comm k.down
   simp only [thφ] at hp ⊢
   rw [Category.assoc, hp, ← Category.assoc, hab, Category.assoc]
 
-abbrev tP (L : RigLB G) (c : CubicalStr G L) : LB.Gen (LB.LinComb (L.L.pull m.F) (thφ G' (x3 G')) thε) :=
-  GeneratorPullback.pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G')) (fun I => m.psum_comm I.down) c.t
-
+abbrev tP (L : RigLB G) (c : CubicalStr G L)
+    : LB.Gen (LB.LinComb (L.L.pull m.F) (thφ G' (x3 G')) thε) :=
+  GeneratorPullback.pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+    (fun I => m.psum_comm I.down)
+    c.t
 
 set_option maxHeartbeats 800000 in
-def cubical (L : RigLB G) (c : CubicalStr G L) (hL : (L.L.pull m.F).IsLB)
-    (hr : (m.rigPull L.L L.rig).IsGen) : CubicalStr G' (m.rigLB L hL hr) where
+def cubical
+    (L : RigLB G) (c : CubicalStr G L) (hL : (L.L.pull m.F).IsLB) (hr : (m.rigPull L.L L.rig).IsGen)
+    : CubicalStr G' (m.rigLB L hL hr) where
   t := tP m L c
-  isGen := LBxP.isGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
-    (fun I => m.psum_comm I.down) c.t c.isGen
+  isGen :=
+    LBxP.isGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+      (fun I => m.psum_comm I.down)
+      c.t c.isGen
   face := fun i => by
-    refine LBxP.corr_of_eq (LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
-      (fun I => m.psum_comm I.down) c.t (faceMap G' i).left (pullbackMapSquare m) (faceMap G i).left
-      (face_comm m i) (fun k => hψ2_of m (face_comm m i) k))
+    refine LBxP.corr_of_eq
+      (LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+        (fun I => m.psum_comm I.down)
+        c.t (faceMap G' i).left (pullbackMapSquare m) (faceMap G i).left (face_comm m i)
+        (fun k => hψ2_of m (face_comm m i) k))
       (LBxP.oneGen_pullAlong L.L m.F (pullbackMapSquare m) (fun k => k.elim)).symm ?_
     exact corr_pullAlong_sameSum L.L L.isLB m.F (pullbackMapSquare m) _ _ _ _ _ _ _ _ _ _
       (LB.isGen_pullGen (L := L.L) _ _ _ c.isGen _) (LB.isGen_oneGen (L := L.L)) (c.face i)
@@ -87,68 +101,100 @@ def cubical (L : RigLB G) (c : CubicalStr G L) (hL : (L.L.pull m.F).IsLB)
     show LB.Gen.Corr (L.L.pull m.F) (thφ G' (x3 G')) thε
       (fun k => (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left ≫ thφ G' (x3 G') k) thε (tP m L c)
       (LB.pullGen (L.L.pull m.F) (thφ G' (x3 G')) thε (tP m L c) (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left)
-    refine LBxP.corr_of_eq rfl (LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε
-      (thφ G' (x3 G')) (fun I => m.psum_comm I.down) c.t (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left m.F3 (lift (x3 G 1) (lift (x3 G 0) (x3 G 2))).left (swap_first_two_comm m)
-      (fun k => hψ2_of m (swap_first_two_comm m) k)) ?_
+    refine LBxP.corr_of_eq rfl
+      (LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+        (fun I => m.psum_comm I.down)
+        c.t (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left m.F3
+        (lift (x3 G 1) (lift (x3 G 0) (x3 G 2))).left (swap_first_two_comm m)
+        (fun k => hψ2_of m (swap_first_two_comm m) k))
+      ?_
     exact corr_pullAlong_sameSum L.L L.isLB m.F m.F3 (thφ G (x3 G)) thε
-      (fun k => (lift (x3 G 1) (lift (x3 G 0) (x3 G 2))).left ≫ thφ G (x3 G) k) thε (thφ G' (x3 G'))
-      (fun k => (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left ≫ thφ G' (x3 G') k) (fun I => m.psum_comm I.down)
-      (fun k => hψ2_of m (swap_first_two_comm m) k) c.t
-      (LB.pullGen L.L (thφ G (x3 G)) thε c.t (lift (x3 G 1) (lift (x3 G 0) (x3 G 2))).left) c.isGen
-      (LB.isGen_pullGen (L := L.L) _ _ _ c.isGen _) c.cubeSymmetric_swap_first (swap_first_two_same_sum G')
+      (fun k => (lift (x3 G 1) (lift (x3 G 0) (x3 G 2))).left ≫ thφ G (x3 G) k)
+      thε (thφ G' (x3 G'))
+      (fun k => (lift (x3 G' 1) (lift (x3 G' 0) (x3 G' 2))).left ≫ thφ G' (x3 G') k)
+      (fun I => m.psum_comm I.down)
+      (fun k => hψ2_of m (swap_first_two_comm m) k)
+      c.t (LB.pullGen L.L (thφ G (x3 G)) thε c.t (lift (x3 G 1) (lift (x3 G 0) (x3 G 2))).left)
+      c.isGen (LB.isGen_pullGen (L := L.L) _ _ _ c.isGen _) c.cubeSymmetric_swap_first
+      (swap_first_two_same_sum G')
   cubeSymmetric_swap_last := by
     show LB.Gen.Corr (L.L.pull m.F) (thφ G' (x3 G')) thε
       (fun k => (lift (x3 G' 0) (lift (x3 G' 2) (x3 G' 1))).left ≫ thφ G' (x3 G') k) thε (tP m L c)
       (LB.pullGen (L.L.pull m.F) (thφ G' (x3 G')) thε (tP m L c) (lift (x3 G' 0) (lift (x3 G' 2) (x3 G' 1))).left)
-    refine LBxP.corr_of_eq rfl (LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε
-      (thφ G' (x3 G')) (fun I => m.psum_comm I.down) c.t (lift (x3 G' 0) (lift (x3 G' 2) (x3 G' 1))).left m.F3 (lift (x3 G 0) (lift (x3 G 2) (x3 G 1))).left (swap_last_two_comm m)
-      (fun k => hψ2_of m (swap_last_two_comm m) k)) ?_
+    refine LBxP.corr_of_eq rfl
+      (LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+        (fun I => m.psum_comm I.down)
+        c.t (lift (x3 G' 0) (lift (x3 G' 2) (x3 G' 1))).left m.F3
+        (lift (x3 G 0) (lift (x3 G 2) (x3 G 1))).left (swap_last_two_comm m)
+        (fun k => hψ2_of m (swap_last_two_comm m) k))
+      ?_
     exact corr_pullAlong_sameSum L.L L.isLB m.F m.F3 (thφ G (x3 G)) thε
-      (fun k => (lift (x3 G 0) (lift (x3 G 2) (x3 G 1))).left ≫ thφ G (x3 G) k) thε (thφ G' (x3 G'))
-      (fun k => (lift (x3 G' 0) (lift (x3 G' 2) (x3 G' 1))).left ≫ thφ G' (x3 G') k) (fun I => m.psum_comm I.down)
-      (fun k => hψ2_of m (swap_last_two_comm m) k) c.t
-      (LB.pullGen L.L (thφ G (x3 G)) thε c.t (lift (x3 G 0) (lift (x3 G 2) (x3 G 1))).left) c.isGen
-      (LB.isGen_pullGen (L := L.L) _ _ _ c.isGen _) c.cubeSymmetric_swap_last (swap_last_two_same_sum G')
+      (fun k => (lift (x3 G 0) (lift (x3 G 2) (x3 G 1))).left ≫ thφ G (x3 G) k)
+      thε (thφ G' (x3 G'))
+      (fun k => (lift (x3 G' 0) (lift (x3 G' 2) (x3 G' 1))).left ≫ thφ G' (x3 G') k)
+      (fun I => m.psum_comm I.down)
+      (fun k => hψ2_of m (swap_last_two_comm m) k)
+      c.t (LB.pullGen L.L (thφ G (x3 G)) thε c.t (lift (x3 G 0) (lift (x3 G 2) (x3 G 1))).left)
+      c.isGen (LB.isGen_pullGen (L := L.L) _ _ _ c.isGen _) c.cubeSymmetric_swap_last
+      (swap_last_two_same_sum G')
   cocycle := by
-    have e1 := LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
-      (fun I => m.psum_comm I.down) c.t
-      (lift (padd G' (x4 G' 0) (x4 G' 1)) (lift (x4 G' 2) (x4 G' 3))).left (pullbackMapFourth m)
-      (lift (padd G (x4 G 0) (x4 G 1)) (lift (x4 G 2) (x4 G 3))).left (cube_sum_face_comm m 0 1 2 3)
-      (fun k => hψ2_of m (cube_sum_face_comm m 0 1 2 3) k)
-    have e2 := LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
-      (fun I => m.psum_comm I.down) c.t
-      (lift (x4 G' 0) (lift (x4 G' 1) (x4 G' 3))).left (pullbackMapFourth m)
-      (lift (x4 G 0) (lift (x4 G 1) (x4 G 3))).left (cube_face_comm m 0 1 3)
-      (fun k => hψ2_of m (cube_face_comm m 0 1 3) k)
-    have e3 := LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
-      (fun I => m.psum_comm I.down) c.t
-      (lift (x4 G' 0) (lift (padd G' (x4 G' 1) (x4 G' 2)) (x4 G' 3))).left (pullbackMapFourth m)
-      (lift (x4 G 0) (lift (padd G (x4 G 1) (x4 G 2)) (x4 G 3))).left (c4p'_comm m 0 1 2 3)
-      (fun k => hψ2_of m (c4p'_comm m 0 1 2 3) k)
-    have e4 := LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
-      (fun I => m.psum_comm I.down) c.t
-      (lift (x4 G' 1) (lift (x4 G' 2) (x4 G' 3))).left (pullbackMapFourth m)
-      (lift (x4 G 1) (lift (x4 G 2) (x4 G 3))).left (cube_face_comm m 1 2 3)
-      (fun k => hψ2_of m (cube_face_comm m 1 2 3) k)
-    have hS1 : ∀ k, Sum.elim
-        (fun k => (lift (padd G' (x4 G' 0) (x4 G' 1)) (lift (x4 G' 2) (x4 G' 3))).left ≫
-          thφ G' (x3 G') k)
-        (fun k => (lift (x4 G' 0) (lift (x4 G' 1) (x4 G' 3))).left ≫ thφ G' (x3 G') k) k ≫ m.F =
-        pullbackMapFourth m ≫ Sum.elim
-        (fun k => (lift (padd G (x4 G 0) (x4 G 1)) (lift (x4 G 2) (x4 G 3))).left ≫
-          thφ G (x3 G) k)
-        (fun k => (lift (x4 G 0) (lift (x4 G 1) (x4 G 3))).left ≫ thφ G (x3 G) k) k := by
+    have e1 :=
+      LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+        (fun I => m.psum_comm I.down)
+        c.t (lift (padd G' (x4 G' 0) (x4 G' 1)) (lift (x4 G' 2) (x4 G' 3))).left
+        (pullbackMapFourth m) (lift (padd G (x4 G 0) (x4 G 1)) (lift (x4 G 2) (x4 G 3))).left
+        (cube_sum_face_comm m 0 1 2 3)
+        (fun k => hψ2_of m (cube_sum_face_comm m 0 1 2 3) k)
+    have e2 :=
+      LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+        (fun I => m.psum_comm I.down)
+        c.t (lift (x4 G' 0) (lift (x4 G' 1) (x4 G' 3))).left (pullbackMapFourth m)
+        (lift (x4 G 0) (lift (x4 G 1) (x4 G 3))).left (cube_face_comm m 0 1 3)
+        (fun k => hψ2_of m (cube_face_comm m 0 1 3) k)
+    have e3 :=
+      LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+        (fun I => m.psum_comm I.down)
+        c.t (lift (x4 G' 0) (lift (padd G' (x4 G' 1) (x4 G' 2)) (x4 G' 3))).left
+        (pullbackMapFourth m) (lift (x4 G 0) (lift (padd G (x4 G 1) (x4 G 2)) (x4 G 3))).left
+        (c4p'_comm m 0 1 2 3)
+        (fun k => hψ2_of m (c4p'_comm m 0 1 2 3) k)
+    have e4 :=
+      LBxP.pullGen_pullAlong L.L m.F m.F3 (thφ G (x3 G)) thε (thφ G' (x3 G'))
+        (fun I => m.psum_comm I.down)
+        c.t (lift (x4 G' 1) (lift (x4 G' 2) (x4 G' 3))).left (pullbackMapFourth m)
+        (lift (x4 G 1) (lift (x4 G 2) (x4 G 3))).left (cube_face_comm m 1 2 3)
+        (fun k => hψ2_of m (cube_face_comm m 1 2 3) k)
+    have hS1
+        : ∀ k,
+          Sum.elim
+                (fun k =>
+                  (lift (padd G' (x4 G' 0) (x4 G' 1)) (lift (x4 G' 2) (x4 G' 3))).left
+                    ≫ thφ G' (x3 G') k)
+                (fun k => (lift (x4 G' 0) (lift (x4 G' 1) (x4 G' 3))).left ≫ thφ G' (x3 G') k)
+                k
+              ≫ m.F
+            = pullbackMapFourth m ≫ Sum.elim
+              (fun k =>
+                (lift (padd G (x4 G 0) (x4 G 1)) (lift (x4 G 2) (x4 G 3))).left ≫ thφ G (x3 G) k)
+              (fun k => (lift (x4 G 0) (lift (x4 G 1) (x4 G 3))).left ≫ thφ G (x3 G) k)
+              k := by
       rintro (k | k)
       · exact hψ2_of m (cube_sum_face_comm m 0 1 2 3) k
       · exact hψ2_of m (cube_face_comm m 0 1 3) k
-    have hS2 : ∀ k, Sum.elim
-        (fun k => (lift (x4 G' 0) (lift (padd G' (x4 G' 1) (x4 G' 2)) (x4 G' 3))).left ≫
-          thφ G' (x3 G') k)
-        (fun k => (lift (x4 G' 1) (lift (x4 G' 2) (x4 G' 3))).left ≫ thφ G' (x3 G') k) k ≫ m.F =
-        pullbackMapFourth m ≫ Sum.elim
-        (fun k => (lift (x4 G 0) (lift (padd G (x4 G 1) (x4 G 2)) (x4 G 3))).left ≫
-          thφ G (x3 G) k)
-        (fun k => (lift (x4 G 1) (lift (x4 G 2) (x4 G 3))).left ≫ thφ G (x3 G) k) k := by
+    have hS2
+        : ∀ k,
+          Sum.elim
+                (fun k =>
+                  (lift (x4 G' 0) (lift (padd G' (x4 G' 1) (x4 G' 2)) (x4 G' 3))).left
+                    ≫ thφ G' (x3 G') k)
+                (fun k => (lift (x4 G' 1) (lift (x4 G' 2) (x4 G' 3))).left ≫ thφ G' (x3 G') k)
+                k
+              ≫ m.F
+            = pullbackMapFourth m ≫ Sum.elim
+              (fun k =>
+                (lift (x4 G 0) (lift (padd G (x4 G 1) (x4 G 2)) (x4 G 3))).left ≫ thφ G (x3 G) k)
+              (fun k => (lift (x4 G 1) (lift (x4 G 2) (x4 G 3))).left ≫ thφ G (x3 G) k)
+              k := by
       rintro (k | k)
       · exact hψ2_of m (c4p'_comm m 0 1 2 3) k
       · exact hψ2_of m (cube_face_comm m 1 2 3) k
@@ -156,7 +202,8 @@ def cubical (L : RigLB G) (c : CubicalStr G L) (hL : (L.L.pull m.F).IsLB)
       ((congrArg₂ (LB.mulGen (L.L.pull m.F) _ _ _ _) e1 e2).trans
         (LBxP.mulGen_pullAlong L.L m.F (pullbackMapFourth m) _ _ _ _ _ _ _ _ hS1 _ _).symm)
       ((congrArg₂ (LB.mulGen (L.L.pull m.F) _ _ _ _) e3 e4).trans
-        (LBxP.mulGen_pullAlong L.L m.F (pullbackMapFourth m) _ _ _ _ _ _ _ _ hS2 _ _).symm) ?_
+        (LBxP.mulGen_pullAlong L.L m.F (pullbackMapFourth m) _ _ _ _ _ _ _ _ hS2 _ _).symm)
+      ?_
     exact corr_pullAlong_sameSum L.L L.isLB m.F (pullbackMapFourth m) _ _ _ _ _ _ hS1 hS2 _ _
       (LB.isGen_mulGen (L := L.L) _ _ _ _ _ _ (LB.isGen_pullGen (L := L.L) _ _ _ c.isGen _)
         (LB.isGen_pullGen (L := L.L) _ _ _ c.isGen _))
@@ -174,8 +221,12 @@ theorem cubePull : CubePullSt := by
   intro S S' G G' _ _ _ _ m L c
   have hL : (L.L.pull m.F).IsLB := LB.isLB_pull L.isLB m.F
   have hr : (m.rigPull L.L L.rig).IsGen :=
-    LBxP.isGen_pullAlong L.L m.F m.e (fun _ : PUnit => eSec G) (fun _ => 1) (fun _ => eSec G')
-      (fun _ => m.e_comm) L.rig L.rigGen
+    LBxP.isGen_pullAlong L.L m.F m.e
+      (fun _ : PUnit => eSec G)
+      (fun _ => 1)
+      (fun _ => eSec G')
+      (fun _ => m.e_comm)
+      L.rig L.rigGen
   refine ⟨hL, hr, ⟨cubical m L c hL hr, ?_⟩, sym_pull m L hL hr⟩
   refine ⟨idIsoL _, idIsoL_isGen hL, fun p => hr p.1 p.2, ?_⟩
   rw [thetaPull_eq]

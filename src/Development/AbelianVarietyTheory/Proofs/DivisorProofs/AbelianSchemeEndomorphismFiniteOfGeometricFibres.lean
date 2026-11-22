@@ -6,17 +6,22 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Mul
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped NumberField CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AbEnd
 
-theorem isFinite_of_isFinite_geomFibres :
-    ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A], IsAbelianScheme A → ∀ (φ : A ⟶ A),
-    (∀ (k : Type) [Field k] [IsAlgClosed k] (t : Sp k ⟶ S), IsFinite ((Over.pullback t).map φ).left) →
-    IsFinite φ.left := by
+theorem isFinite_of_isFinite_geomFibres
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ (φ : A ⟶ A),
+          (∀ (k : Type) [Field k] [IsAlgClosed k] (t : Sp k ⟶ S),
+              IsFinite ((Over.pullback t).map φ).left)
+            → IsFinite φ.left := by
   intro S A _ hA φ hgeo
   haveI : IsProper A.hom := hA.proper
   haveI : IsProper (φ.left ≫ A.hom) := by rw [Over.w φ]; infer_instance

@@ -20,7 +20,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.JfJqSmoothOf
 noncomputable section
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
@@ -169,7 +170,8 @@ lemma sum_split_Es {M : Type*} [AddCommMonoid M] (f : Fin (2 * r + k + 1) → M)
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
@@ -254,7 +256,8 @@ namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.LU
 
 variable {r : ℕ}
 
-def rs (b a : Fin r) : Fin (b.val + 1) → Fin r := fun i => if h : i.val < b.val then ⟨i.val, by omega⟩ else a
+def rs (b a : Fin r) : Fin (b.val + 1) → Fin r := fun i =>
+  if h : i.val < b.val then ⟨i.val, by omega⟩ else a
 
 def cs (b : Fin r) : Fin (b.val + 1) → Fin r := fun i => ⟨i.val, by omega⟩
 
@@ -265,9 +268,11 @@ def ld (Y : Matrix (Fin r) (Fin r) ℂ) (b : Fin r) : ℂ := mn Y b b
 def ell (Y : Matrix (Fin r) (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ :=
   Matrix.of fun a b => if b ≤ a then mn Y a b / ld Y b else 0
 
-def IsLU (L : Matrix (Fin r) (Fin r) ℂ) : Prop := (∀ i j : Fin r, i < j → L i j = 0) ∧ ∀ i, L i i = 1
+def IsLU (L : Matrix (Fin r) (Fin r) ℂ) : Prop :=
+  (∀ i j : Fin r, i < j → L i j = 0) ∧ ∀ i, L i i = 1
 
-def IsUU (U : Matrix (Fin r) (Fin r) ℂ) : Prop := (∀ i j : Fin r, j < i → U i j = 0) ∧ ∀ i, U i i = 1
+def IsUU (U : Matrix (Fin r) (Fin r) ℂ) : Prop :=
+  (∀ i j : Fin r, j < i → U i j = 0) ∧ ∀ i, U i i = 1
 
 lemma rs_self (b : Fin r) : rs b b = cs b := by
   funext i
@@ -546,7 +551,8 @@ lemma norm_mul_entry {m n p : Type*} [Fintype n] (A : Matrix m n ℂ) (B' : Matr
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.LU
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
@@ -583,7 +589,8 @@ lemma Zm_ent (y : Mat k r) (a b : Fin r) : ‖Zm y a b‖ ≤ gN y := ent_le y _
 
 def lowerFactorEntryConstant (r : ℕ) (Γ δ : ℝ) : ℝ := 1 + (r.factorial : ℝ) * Γ ^ r / δ
 
-def cL (r : ℕ) (Γ δ : ℝ) : ℝ := (r : ℝ) * (((r.factorial : ℝ) / δ) * ((r.factorial : ℝ) * lowerFactorEntryConstant r Γ δ ^ r))
+def cL (r : ℕ) (Γ δ : ℝ) : ℝ :=
+  (r : ℝ) * (((r.factorial : ℝ) / δ) * ((r.factorial : ℝ) * lowerFactorEntryConstant r Γ δ ^ r))
 
 lemma lower_factor_constant_ge_one (r : ℕ) {Γ δ : ℝ} (hΓ : 1 ≤ Γ) (hδ : 0 < δ) : 1 ≤ lowerFactorEntryConstant r Γ δ := by
   unfold lowerFactorEntryConstant; have : 0 ≤ (r.factorial : ℝ) * Γ ^ r / δ := by positivity
@@ -624,7 +631,8 @@ lemma U_bd (L Y U : Matrix (Fin r) (Fin r) ℂ) (hL : IsLU L) (hU : IsUU U) {Γ 
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
@@ -737,7 +745,8 @@ end main
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
@@ -953,7 +962,8 @@ end main
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
@@ -1044,7 +1054,8 @@ lemma det_eq_Dmin (z z' : Fin (2 * r + k + 1) → ℂ) (g : Mat k r) :
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
@@ -1068,13 +1079,17 @@ lemma continuous_ld (b : Fin r) : Continuous (fun g : Mat k r => ld (Zm g) b) :=
 
 lemma continuous_detZ : Continuous (fun g : Mat k r => (Zm g).det) := continuous_Zm.matrix_det
 
-theorem orbit (z z' : Fin (2 * r + k + 1) → ℂ) (K : Set (Mat k r)) (hK : IsCompact K)
-    (hKO : K ⊆ Om k r z z') :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ g ∈ K, ∀ n ∈ Nset k r, ∀ n' ∈ Nset k r,
-      gN n ≤ C * gN (n⁻¹ * g * n') ^ (2 * r + 1) ∧ gN n' ≤ C * gN (n⁻¹ * g * n') ^ (2 * r + 1) := by
+theorem orbit
+    (z z' : Fin (2 * r + k + 1) → ℂ) (K : Set (Mat k r)) (hK : IsCompact K) (hKO : K ⊆ Om k r z z')
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ g ∈ K, ∀ n ∈ Nset k r, ∀ n' ∈ Nset k r,
+          gN n ≤ C * gN (n⁻¹ * g * n') ^ (2 * r + 1)
+            ∧ gN n' ≤ C * gN (n⁻¹ * g * n') ^ (2 * r + 1) := by
   obtain ⟨M, hM⟩ := (hK.image_of_continuousOn continuous_gN.continuousOn).bddAbove
   have hΓ : 1 ≤ max 1 M := le_max_left _ _
-  have hDne : ∀ g ∈ K, ∀ l : Fin (r + 2), l.val ≤ r → Dmin k r z z' g l ≠ 0 := fun g hg => (hKO hg).2.1
+  have hDne : ∀ g ∈ K, ∀ l : Fin (r + 2), l.val ≤ r → Dmin k r z z' g l ≠ 0 := fun g hg =>
+    (hKO hg).2.1
 
   obtain ⟨δ1, hδ1, hδ1K⟩ : ∃ δ1 : ℝ, 0 < δ1 ∧ ∀ g ∈ K, ∀ b : Fin r, δ1 ≤ ‖ld (Zm g) b‖ := by
     have hS : IsCompact (K ×ˢ (Set.univ : Set (Fin r))) := hK.prod isCompact_univ
@@ -1096,12 +1111,16 @@ theorem orbit (z z' : Fin (2 * r + k + 1) → ℂ) (K : Set (Mat k r)) (hK : IsC
       exact hDne g0 hg0 _ (by show r ≤ r; exact le_rfl)
     · exact ⟨1, one_pos, fun g hg => absurd ⟨g, hg⟩ hne⟩
   have hδ : 0 < min δ1 δ2 := lt_min hδ1 hδ2
-  refine ⟨((2 * r + k + 1 : ℕ) : ℝ) * c13 k r (max 1 M) (min δ1 δ2),
-    by have := orbit_constant_thirteen_nonneg (k := k) (r := r) hΓ hδ; positivity, ?_⟩
+  refine ⟨
+    ((2 * r + k + 1 : ℕ) : ℝ) * c13 k r (max 1 M) (min δ1 δ2),
+    by have := orbit_constant_thirteen_nonneg (k := k) (r := r) hΓ hδ; positivity,
+    ?_
+  ⟩
   intro g hg n hn n' hn'
   have hgM : gN g ≤ max 1 M := (hM (Set.mem_image_of_mem _ hg)).trans (le_max_right _ _)
   exact both_bd hΓ hδ (hKO hg).1 hgM
-    (fun b => (min_le_left _ _).trans (hδ1K g hg b)) ((min_le_right _ _).trans (hδ2K g hg)) hn hn'
+    (fun b => (min_le_left _ _).trans (hδ1K g hg b))
+    ((min_le_right _ _).trans (hδ2K g hg)) hn hn'
 
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.Orb
 
@@ -1110,7 +1129,8 @@ open scoped ENNReal NNReal
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.NInt
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.B2x6
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.B2x6
 
 section pointwise
 
@@ -1222,7 +1242,8 @@ lemma finrank_hpar (k r' : ℕ) : Module.finrank ℝ (HPar k r') = 2 * (2 * r' +
   ring
 
 instance haar_hpar (k r' : ℕ) : (volume : Measure (HPar k r')).IsAddHaarMeasure := by
-  have : (volume : Measure (Fin (2 * r' + k + 1) → ℂ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _
+  have : (volume : Measure (Fin (2 * r' + k + 1) → ℂ)).IsAddHaarMeasure :=
+    Measure.pi.isAddHaarMeasure _
   exact Measure.prod.instIsAddHaarMeasure _ _
 
 lemma lint_heis_fin (k r' : ℕ) {c : ℝ} (hc : ((2 * (2 * r' + k + 1) + 1 : ℕ) : ℝ) < c) :
@@ -1290,9 +1311,10 @@ lemma base (k : ℕ) (μ : Measure (Mt k 0)) (hμ : IsHaarOn (Nset k 0) μ) (a :
         μ ((({1} : Set (Mat k 0))ᶜ : Set (Mat k 0)) : Set (Mt k 0)) := measure_univ_le_add_compl _
     _ < ⊤ := by rw [hc, add_zero]; exact h1
 
-theorem lint_gN_fin (k r : ℕ) (μ : Measure (Mt k r)) (hμ : IsHaarOn (Nset k r) μ) (a : ℝ)
-    (ha : r = 0 ∨ (r : ℝ) * (4 * (r : ℝ) + 2 * (k : ℝ) - 1) < a) :
-    ∫⁻ x, ENNReal.ofReal (gN (Matrix.of x : Mat k r) ^ (-a)) ∂μ < ⊤ := by
+theorem lint_gN_fin
+    (k r : ℕ) (μ : Measure (Mt k r)) (hμ : IsHaarOn (Nset k r) μ)
+    (a : ℝ) (ha : r = 0 ∨ (r : ℝ) * (4 * (r : ℝ) + 2 * (k : ℝ) - 1) < a)
+    : ∫⁻ x, ENNReal.ofReal (gN (Matrix.of x : Mat k r) ^ (-a)) ∂μ < ⊤ := by
   revert μ a
   induction r with
   | zero => intro μ hμ a _; exact base k μ hμ a
@@ -1309,9 +1331,12 @@ theorem lint_gN_fin (k r : ℕ) (μ : Measure (Mt k r)) (hμ : IsHaarOn (Nset k 
     have ha0 : 0 < a := by nlinarith
     obtain ⟨μ', hμ'⟩ := unipotent_haar_exists k r'
     have := sigmaFinite_haar hμ'
-    obtain ⟨c, hc⟩ := haar_measure_unique_up_to_scalar k (1 + r') (Nset k (1 + r')) _ μ (unipotent_radical_closed k (1 + r'))
-      (unipotent_haar_recursion k r' μ' hμ') hμ.conc hμ.left hμ.finite_compact
-    have hf : Measurable (fun x : Mt k (1 + r') => ENNReal.ofReal (gN (Matrix.of x : Mat k (1 + r')) ^ (-a))) :=
+    obtain ⟨c, hc⟩ :=
+      haar_measure_unique_up_to_scalar k (1 + r') (Nset k (1 + r')) _ μ
+        (unipotent_radical_closed k (1 + r')) (unipotent_haar_recursion k r' μ' hμ') hμ.conc hμ.left
+        hμ.finite_compact
+    have hf : Measurable (fun x : Mt k (1 + r') =>
+        ENNReal.ofReal (gN (Matrix.of x : Mat k (1 + r')) ^ (-a))) :=
       ENNReal.measurable_ofReal.comp ((gN_cont k (1 + r')).measurable.pow_const _)
     have hM : Measurable (mulM : Mt k (1 + r') × Mt k (1 + r') → Mt k (1 + r')) :=
       Formalism.FourierDecayAlt.P.B2x1.mulM_cont.measurable
@@ -1319,9 +1344,12 @@ theorem lint_gN_fin (k r : ℕ) (μ : Measure (Mt k r)) (hμ : IsHaarOn (Nset k 
     rw [ENNReal.smul_def, smul_eq_mul]
     refine ENNReal.mul_lt_top ENNReal.coe_lt_top ?_
     rw [lintegral_map hf hM, Formalism.FourierDecayAlt.P.B2x5.μHeis_eq,
-      Measure.map_prod_map _ _ (Formalism.FourierDecayAlt.P.B2x5.measurable_heisT k r') (levM_meas k r'),
-      lintegral_map (f := fun p : Mt k (1 + r') × Mt k (1 + r') =>
-        ENNReal.ofReal (gN (Matrix.of (mulM p) : Mat k (1 + r')) ^ (-a))) (hf.comp hM)
+      Measure.map_prod_map _ _ (Formalism.FourierDecayAlt.P.B2x5.measurable_heisT k r')
+        (levM_meas k r'),
+      lintegral_map
+        (f := fun p : Mt k (1 + r') × Mt k (1 + r') =>
+          ENNReal.ofReal (gN (Matrix.of (mulM p) : Mat k (1 + r')) ^ (-a)))
+        (hf.comp hM)
         ((Formalism.FourierDecayAlt.P.B2x5.measurable_heisT k r').prodMap (levM_meas k r'))]
     set θ : ℝ := 1 / (1 + (r' : ℝ)) with hθ
     have h1r : (0 : ℝ) < 1 + r' := by linarith
@@ -1329,35 +1357,47 @@ theorem lint_gN_fin (k r : ℕ) (μ : Measure (Mt k r)) (hμ : IsHaarOn (Nset k 
     have hθ1 : θ ≤ 1 := by rw [hθ, div_le_one h1r]; linarith
     have hae : ∀ᵐ q ∂((volume : Measure (HPar k r')).prod μ'), Matrix.of q.2 ∈ Nset k r' := by
       rw [ae_iff]
-      refine measure_mono_null (t := (Set.univ : Set (HPar k r')) ×ˢ ((Nset k r')ᶜ : Set (Mt k r'))) ?_ ?_
+      refine measure_mono_null (t := (Set.univ : Set (HPar k r')) ×ˢ ((Nset k r')ᶜ : Set (Mt k r')))
+        ?_ ?_
       · intro q hq; exact ⟨trivial, hq⟩
       · rw [Measure.prod_prod, hμ'.conc, mul_zero]
-    have key : ∀ᵐ q ∂((volume : Measure (HPar k r')).prod μ'),
-        ENNReal.ofReal (gN (Matrix.of (mulM (Prod.map (Formalism.FourierDecayAlt.P.B2x5.heisT k r') (levM k r') q)) :
-          Mat k (1 + r')) ^ (-a)) ≤
-        ENNReal.ofReal (((1 + ‖q.1‖) / 2) ^ (-(θ * a))) *
-          ENNReal.ofReal (gN (Matrix.of q.2 : Mat k r') ^ (-((1 - θ) * a))) := by
+    have key
+        : ∀ᵐ q ∂((volume : Measure (HPar k r')).prod μ'),
+          ENNReal.ofReal (gN (Matrix.of (mulM (Prod.map (Formalism.FourierDecayAlt.P.B2x5.heisT k r') (levM k r') q)) :
+            Mat k (1 + r')) ^ (-a)) ≤
+          ENNReal.ofReal (((1 + ‖q.1‖) / 2) ^ (-(θ * a))) *
+            ENNReal.ofReal (gN (Matrix.of q.2 : Mat k r') ^ (-((1 - θ) * a))) := by
       filter_upwards [hae] with q hq
-      have e : ENNReal.ofReal (gN (Matrix.of (mulM (Prod.map (Formalism.FourierDecayAlt.P.B2x5.heisT k r') (levM k r') q)) :
-          Mat k (1 + r')) ^ (-a)) =
-          ENNReal.ofReal (gN (heis0 k r' q.1 * ιLev k 1 r' (Matrix.of q.2)) ^ (-a)) := rfl
+      have e
+          : ENNReal.ofReal
+              (gN
+                  (Matrix.of (mulM (Prod.map (Formalism.FourierDecayAlt.P.B2x5.heisT k r')
+                      (levM k r') q))
+                    : Mat k (1 + r'))
+                ^ (-a))
+            = ENNReal.ofReal (gN (heis0 k r' q.1 * ιLev k 1 r' (Matrix.of q.2)) ^ (-a)) :=
+        rfl
       rw [e, ← ENNReal.ofReal_mul (Real.rpow_nonneg (by positivity) _)]
       apply ENNReal.ofReal_le_ofReal
-      have hB : 1 ≤ gN (Matrix.of q.2 : Mat k r') := Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hq.1
-      apply rpow_split (by positivity) (by linarith) _ (le_trans' (gN_mid_le q.1 _) le_rfl) ha0.le hθ0 hθ1
+      have hB : 1 ≤ gN (Matrix.of q.2 : Mat k r') :=
+        Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hq.1
+      apply rpow_split (by positivity) (by linarith) _ (le_trans' (gN_mid_le q.1 _) le_rfl) ha0.le
+        hθ0 hθ1
       have := gN_heis_le q.1 (Matrix.of q.2 : Mat k r')
       linarith
     have hF1 : Measurable (fun x : HPar k r' => ENNReal.ofReal (((1 + ‖x‖) / 2) ^ (-(θ * a)))) := by
       apply ENNReal.measurable_ofReal.comp
       exact ((measurable_const.add measurable_norm).div_const _).pow_const _
-    have hF2 : Measurable (fun x : Mt k r' => ENNReal.ofReal (gN (Matrix.of x : Mat k r') ^ (-((1 - θ) * a)))) :=
+    have hF2 : Measurable (fun x : Mt k r' =>
+        ENNReal.ofReal (gN (Matrix.of x : Mat k r') ^ (-((1 - θ) * a)))) :=
       ENNReal.measurable_ofReal.comp ((gN_cont k r').measurable.pow_const _)
-    calc _ ≤ ∫⁻ q, ENNReal.ofReal (((1 + ‖q.1‖) / 2) ^ (-(θ * a))) *
+    calc
+      _ ≤ ∫⁻ q, ENNReal.ofReal (((1 + ‖q.1‖) / 2) ^ (-(θ * a))) *
           ENNReal.ofReal (gN (Matrix.of q.2 : Mat k r') ^ (-((1 - θ) * a))) ∂((volume : Measure (HPar k r')).prod μ') :=
-          lintegral_mono_ae key
-      _ = (∫⁻ x : HPar k r', ENNReal.ofReal (((1 + ‖x‖) / 2) ^ (-(θ * a)))) *
-          ∫⁻ x, ENNReal.ofReal (gN (Matrix.of x : Mat k r') ^ (-((1 - θ) * a))) ∂μ' :=
-          lintegral_prod_mul hF1.aemeasurable hF2.aemeasurable
+        lintegral_mono_ae key
+      _ = (∫⁻ x : HPar k r', ENNReal.ofReal (((1 + ‖x‖) / 2) ^ (-(θ * a))))
+          * ∫⁻ x, ENNReal.ofReal (gN (Matrix.of x : Mat k r') ^ (-((1 - θ) * a))) ∂μ' :=
+        lintegral_prod_mul hF1.aemeasurable hF2.aemeasurable
       _ < ⊤ := by
         refine ENNReal.mul_lt_top (lint_heis_fin k r' ?_) (ih μ' hμ' _ ?_)
         · push_cast
@@ -1366,8 +1406,7 @@ theorem lint_gN_fin (k r : ℕ) (μ : Measure (Mt k r)) (hμ : IsHaarOn (Nset k 
         · rcases Nat.eq_zero_or_pos r' with h0 | hpos
           · exact Or.inl h0
           · right
-            have e1 : (1 - θ) * a = (r' : ℝ) * (a / (1 + r')) := by
-              rw [hθ]; field_simp; ring
+            have e1 : (1 - θ) * a = (r' : ℝ) * (a / (1 + r')) := by rw [hθ]; field_simp; ring
             rw [e1]
             have hrpos : (0 : ℝ) < r' := by exact_mod_cast hpos
             apply mul_lt_mul_of_pos_left _ hrpos
@@ -1379,7 +1418,8 @@ end main
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.NInt
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Asm
 
@@ -1488,7 +1528,8 @@ lemma haar_finite {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.Asm
 
 open Matrix MeasureTheory Filter Topology
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 namespace Formalism.FourierDecayAlt.P.WeakDominationMajorants.Asm
 
@@ -1515,7 +1556,8 @@ theorem nnMaj : Formalism.FourierDecayAlt.P.JFxDs2.NNMaj := by
   have hThr' : 9 * ((r : ℝ) + 1) * NN ^ 2 < A1 := by
     have h9 : (0 : ℝ) < 9 * ((r : ℝ) + 1) := by positivity
     have := (lt_div_iff₀ h9).1 hThr
-    rw [hNN]; linarith
+    rw [hNN]
+    linarith
   have hA1pos : 0 < A1 := lt_of_le_of_lt (by positivity) hThr'
   set β := A1 / (6 * (r : ℝ) + 1) with hβ_def
   have hβ0 : 0 ≤ β := div_nonneg hA1pos.le (by positivity)
@@ -1537,14 +1579,17 @@ theorem nnMaj : Formalism.FourierDecayAlt.P.JFxDs2.NNMaj := by
 
   set f : Mt k r → ℝ := fun x => gN (Matrix.of x : Mat k r) ^ (-β) with hf_def
   refine ⟨fun p => Λ1 ^ m * (C4 ^ β) ^ 2 * (f p.1.2 * f p.2.2), ?_, ?_⟩
-  ·
-    have : SigmaFinite D.μN := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite D.haarN
-    have : IsFiniteMeasure D.μW := haar_finite D.haarW (Formalism.FourierDecayAlt.P.weyl_subgroup_compact k r D.z D.z_mem D.T_pos)
+  · have : SigmaFinite D.μN := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite D.haarN
+    have : IsFiniteMeasure D.μW :=
+      haar_finite D.haarW
+        (Formalism.FourierDecayAlt.P.weyl_subgroup_compact k r D.z D.z_mem D.T_pos)
     have : IsFiniteMeasure D.μW' :=
-      haar_finite D.haarW' (Formalism.FourierDecayAlt.P.weyl_subgroup_compact k r D.z' D.z'_mem D.T'_pos)
+      haar_finite D.haarW'
+        (Formalism.FourierDecayAlt.P.weyl_subgroup_compact k r D.z' D.z'_mem D.T'_pos)
     have hfi : Integrable f D.μN := by
       refine ⟨((NInt.gN_cont k r).measurable.pow_const (-β)).aestronglyMeasurable, ?_⟩
-      rw [hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall fun x => Real.rpow_nonneg (Orb.gN_nonneg _) _)]
+      rw [hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall fun x =>
+        Real.rpow_nonneg (Orb.gN_nonneg _) _)]
       exact NInt.lint_gN_fin k r D.μN D.haarN β hthr
     have h1 : Integrable (fun q : Mt k r × Mt k r => (1 : ℝ) * f q.2) (D.μW.prod D.μN) :=
       (integrable_const (1 : ℝ)).mul_prod hfi
@@ -1563,87 +1608,135 @@ theorem nnMaj : Formalism.FourierDecayAlt.P.JFxDs2.NNMaj := by
     have hgG : g ∈ GV k r := (hKO hg).1
     have hx : sgs p g ∈ GV k r := by
       simp only [sgs]
-      exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul
-        (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv hh) (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv (Orb.n_mem_G hn))) hgG) (Orb.n_mem_G hn')) hh'
+      exact Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul
+        (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul
+          (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul
+            (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul
+              (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv hh)
+              (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv (Orb.n_mem_G hn)))
+            hgG)
+          (Orb.n_mem_G hn'))
+        hh'
     set X := gN (sgs p g) with hX_def
     have hX1 : 1 ≤ X := Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hx
 
-    have hY : (Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2 = Matrix.of p.1.1 * sgs p g * (Matrix.of p.2.1)⁻¹ := by
-      have hs : sgs p g = (Matrix.of p.1.1)⁻¹ * ((Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2) * Matrix.of p.2.1 := by
+    have hY
+        : (Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2
+          = Matrix.of p.1.1 * sgs p g * (Matrix.of p.2.1)⁻¹ := by
+      have hs
+          : sgs p g
+            = (Matrix.of p.1.1)⁻¹ * ((Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2)
+              * Matrix.of p.2.1 := by
         simp only [sgs, Matrix.mul_assoc]
-      rw [hs, Matrix.mul_assoc (Matrix.of p.1.1)⁻¹, Matrix.mul_nonsing_inv_cancel_left _ _ (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_unit hh),
-        Matrix.mul_nonsing_inv_cancel_right _ _ (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_unit hh')]
+      rw [hs, Matrix.mul_assoc (Matrix.of p.1.1)⁻¹,
+        Matrix.mul_nonsing_inv_cancel_left _ _
+          (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_unit hh),
+        Matrix.mul_nonsing_inv_cancel_right _ _
+          (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_unit hh')]
     have hgh : gN (Matrix.of p.1.1) ≤ c := (hW _ hp.1).trans (le_max_left _ _)
     have hgh' : gN (Matrix.of p.2.1) ≤ c := (hW' _ hp.2.2.1).trans (le_max_right _ _)
     have hYb : gN ((Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2) ≤ c ^ 2 * X := by
       rw [hY]
-      have e1 := Formalism.FourierDecayAlt.P.B6.gN_mul_le (Matrix.of p.1.1 * sgs p g) (Matrix.of p.2.1)⁻¹
+      have e1 :=
+        Formalism.FourierDecayAlt.P.B6.gN_mul_le (Matrix.of p.1.1 * sgs p g) (Matrix.of p.2.1)⁻¹
       have e2 := Formalism.FourierDecayAlt.P.B6.gN_mul_le (Matrix.of p.1.1) (sgs p g)
       rw [Orb.gN_inv hh'] at e1
-      have := Orb.gN_nonneg (sgs p g); have := Orb.gN_nonneg (Matrix.of p.1.1)
-      calc _ ≤ gN (Matrix.of p.1.1 * sgs p g) * gN (Matrix.of p.2.1) := e1
+      have := Orb.gN_nonneg (sgs p g)
+      have := Orb.gN_nonneg (Matrix.of p.1.1)
+      calc
+        _ ≤ gN (Matrix.of p.1.1 * sgs p g) * gN (Matrix.of p.2.1) := e1
         _ ≤ (c * X) * c := by
-            have e3 : gN (Matrix.of p.1.1 * sgs p g) ≤ c * X :=
-              e2.trans (mul_le_mul_of_nonneg_right hgh (Orb.gN_nonneg _))
-            exact mul_le_mul e3 hgh' (Orb.gN_nonneg _) (by positivity)
+          have e3 : gN (Matrix.of p.1.1 * sgs p g) ≤ c * X :=
+            e2.trans (mul_le_mul_of_nonneg_right hgh (Orb.gN_nonneg _))
+          exact mul_le_mul e3 hgh' (Orb.gN_nonneg _) (by positivity)
         _ = c ^ 2 * X := by ring
-    have hYX : gN ((Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2) ^ (3 * r) ≤ c ^ (6 * r) * X ^ (3 * r) := by
-      calc _ ≤ (c ^ 2 * X) ^ (3 * r) := pow_le_pow_left₀ (Orb.gN_nonneg _) hYb _
+    have hYX
+        : gN ((Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2) ^ (3 * r) ≤ c ^ (6 * r) * X ^ (3 * r) := by
+      calc
+        _ ≤ (c ^ 2 * X) ^ (3 * r) := pow_le_pow_left₀ (Orb.gN_nonneg _) hYb _
         _ = c ^ (6 * r) * X ^ (3 * r) := by rw [mul_pow, ← pow_mul]; ring_nf
     obtain ⟨hb1, hb2⟩ := horb g hg _ hn _ hn'
     have hXr : 0 ≤ X ^ (3 * r) := by positivity
     have hG1 : gN (Matrix.of p.1.2) ≤ C4 * X ^ (3 * r) := by
       refine hb1.trans ?_
-      calc C3 * _ ≤ C3 * (c ^ (6 * r) * X ^ (3 * r)) := mul_le_mul_of_nonneg_left hYX hC3
+      calc
+        C3 * _
+          ≤ C3 * (c ^ (6 * r) * X ^ (3 * r)) := mul_le_mul_of_nonneg_left hYX hC3
         _ = (C3 * c ^ (6 * r)) * X ^ (3 * r) := by ring
         _ ≤ C4 * X ^ (3 * r) := mul_le_mul_of_nonneg_right (le_max_right _ _) hXr
     have hG2 : gN (Matrix.of p.2.2) ≤ C4 * X ^ (3 * r) := by
       refine hb2.trans ?_
-      calc C3 * _ ≤ C3 * (c ^ (6 * r) * X ^ (3 * r)) := mul_le_mul_of_nonneg_left hYX hC3
+      calc
+        C3 * _
+          ≤ C3 * (c ^ (6 * r) * X ^ (3 * r)) := mul_le_mul_of_nonneg_left hYX hC3
         _ = (C3 * c ^ (6 * r)) * X ^ (3 * r) := by ring
         _ ≤ C4 * X ^ (3 * r) := mul_le_mul_of_nonneg_right (le_max_right _ _) hXr
 
-    have hlet : ∀ s h : Mat k r, s = Matrix.of p.1.2 * Matrix.of p.1.1 ∨ s = Matrix.of p.2.2 * Matrix.of p.2.1 →
-        s ∈ GV k r → ∀ Y : Mat k r, unitLie k r Y → ‖s⁻¹ * Y * s‖ ≤ Λ1 * X ^ (6 * r) := by
+    have hlet
+        : ∀ s h : Mat k r,
+          s = Matrix.of p.1.2 * Matrix.of p.1.1 ∨ s = Matrix.of p.2.2 * Matrix.of p.2.1 → s ∈ GV k r
+            → ∀ Y : Mat k r, unitLie k r Y → ‖s⁻¹ * Y * s‖ ≤ Λ1 * X ^ (6 * r) := by
       intro s _ hs hsG Y hYu
       have hsb : gN s ≤ C4 * X ^ (3 * r) * c := by
         rcases hs with rfl | rfl
-        · exact (Formalism.FourierDecayAlt.P.B6.gN_mul_le _ _).trans (mul_le_mul hG1 hgh (Orb.gN_nonneg _) (by positivity))
-        · exact (Formalism.FourierDecayAlt.P.B6.gN_mul_le _ _).trans (mul_le_mul hG2 hgh' (Orb.gN_nonneg _) (by positivity))
+        · exact (Formalism.FourierDecayAlt.P.B6.gN_mul_le _ _).trans
+            (mul_le_mul hG1 hgh (Orb.gN_nonneg _) (by positivity))
+        · exact (Formalism.FourierDecayAlt.P.B6.gN_mul_le _ _).trans
+            (mul_le_mul hG2 hgh' (Orb.gN_nonneg _) (by positivity))
       refine (ad_bd hsG hYu).trans ?_
-      calc NN * gN s ^ 2 ≤ NN * (C4 * X ^ (3 * r) * c) ^ 2 := by
-            gcongr; exact Orb.gN_nonneg _
+      calc
+        NN * gN s ^ 2
+          ≤ NN * (C4 * X ^ (3 * r) * c) ^ 2 := by gcongr; exact Orb.gN_nonneg _
         _ = (NN * c ^ 2 * C4 ^ 2) * X ^ (6 * r) := by ring_nf
         _ ≤ Λ1 * X ^ (6 * r) := mul_le_mul_of_nonneg_right (le_max_right _ _) (by positivity)
     have hΛX : 1 ≤ Λ1 * X ^ (6 * r) := one_le_mul_of_one_le_of_one_le hΛ1 (one_le_pow₀ hX1)
     have hPu : (u.map fun Y => ‖AdL p Y‖).prod ≤ (Λ1 * X ^ (6 * r)) ^ u.length := by
-      have := list_prod_le (u.map fun Y => ‖AdL p Y‖) (Λ1 * X ^ (6 * r)) (by
-        intro y hy
-        obtain ⟨Y, hYu, rfl⟩ := List.mem_map.1 hy
-        exact ⟨norm_nonneg _, hlet _ (Matrix.of p.1.1) (Or.inl rfl) (Formalism.FourierDecayAlt.P.JFxDs2.sL_mem hp) Y (hu Y hYu)⟩)
+      have :=
+        list_prod_le (u.map fun Y => ‖AdL p Y‖) (Λ1 * X ^ (6 * r)) (by
+          intro y hy
+          obtain ⟨Y, hYu, rfl⟩ := List.mem_map.1 hy
+          exact ⟨
+            norm_nonneg _,
+            hlet _ (Matrix.of p.1.1) (Or.inl rfl) (Formalism.FourierDecayAlt.P.JFxDs2.sL_mem hp) Y
+              (hu Y hYu)
+          ⟩)
       simpa using this
     have hPv : (v.map fun Y => ‖AdR p Y‖).prod ≤ (Λ1 * X ^ (6 * r)) ^ v.length := by
-      have := list_prod_le (v.map fun Y => ‖AdR p Y‖) (Λ1 * X ^ (6 * r)) (by
-        intro y hy
-        obtain ⟨Y, hYv, rfl⟩ := List.mem_map.1 hy
-        exact ⟨norm_nonneg _, hlet _ (Matrix.of p.2.1) (Or.inr rfl) (Formalism.FourierDecayAlt.P.JFxDs2.sR_mem hp) Y (hv Y hYv)⟩)
+      have :=
+        list_prod_le (v.map fun Y => ‖AdR p Y‖) (Λ1 * X ^ (6 * r)) (by
+          intro y hy
+          obtain ⟨Y, hYv, rfl⟩ := List.mem_map.1 hy
+          exact ⟨
+            norm_nonneg _,
+            hlet _ (Matrix.of p.2.1) (Or.inr rfl) (Formalism.FourierDecayAlt.P.JFxDs2.sR_mem hp) Y
+              (hv Y hYv)
+          ⟩)
       simpa using this
-    have hP : (u.map fun Y => ‖AdL p Y‖).prod * (v.map fun Y => ‖AdR p Y‖).prod ≤ (Λ1 * X ^ (6 * r)) ^ m := by
-      have hu0 : 0 ≤ (u.map fun Y => ‖AdL p Y‖).prod := List.prod_nonneg fun y hy => by
-        obtain ⟨Y, _, rfl⟩ := List.mem_map.1 hy; exact norm_nonneg _
-      calc _ ≤ (Λ1 * X ^ (6 * r)) ^ u.length * (Λ1 * X ^ (6 * r)) ^ v.length :=
-            mul_le_mul hPu hPv (List.prod_nonneg fun y hy => by
-              obtain ⟨Y, _, rfl⟩ := List.mem_map.1 hy; exact norm_nonneg _) (by positivity)
+    have hP
+        : (u.map fun Y => ‖AdL p Y‖).prod * (v.map fun Y => ‖AdR p Y‖).prod
+          ≤ (Λ1 * X ^ (6 * r)) ^ m := by
+      have hu0 : 0 ≤ (u.map fun Y => ‖AdL p Y‖).prod :=
+        List.prod_nonneg fun y hy => by obtain ⟨Y, _, rfl⟩ := List.mem_map.1 hy; exact norm_nonneg _
+      calc
+        _ ≤ (Λ1 * X ^ (6 * r)) ^ u.length * (Λ1 * X ^ (6 * r)) ^ v.length :=
+          mul_le_mul hPu hPv
+            (List.prod_nonneg fun y hy => by
+              obtain ⟨Y, _, rfl⟩ := List.mem_map.1 hy; exact norm_nonneg _)
+            (by positivity)
         _ = (Λ1 * X ^ (6 * r)) ^ (u.length + v.length) := by rw [pow_add]
         _ ≤ (Λ1 * X ^ (6 * r)) ^ m := pow_le_pow_right₀ hΛX hl
     exact real_step X (gN (Matrix.of p.1.2)) (gN (Matrix.of p.2.2)) C4 Λ1 A A1 β _ m r hX1 hC4
-      (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one (Orb.n_mem_G hn)) (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one (Orb.n_mem_G hn')) hG1 hG2 hβ0 hβA
+      (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one (Orb.n_mem_G hn))
+      (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one (Orb.n_mem_G hn')) hG1 hG2 hβ0 hβA
       hA1_def hΛ1 hP
 
 end Formalism.FourierDecayAlt.P.WeakDominationMajorants.Asm
 
 theorem Formalism.FourierDecayAlt.P.bessel_integral_domain : Formalism.FourierDecayAlt.JF.JDom :=
-  Formalism.FourierDecayAlt.P.jf_jDom_of_nnMaj Formalism.FourierDecayAlt.P.WeakDominationMajorants.Asm.nnMaj
+  Formalism.FourierDecayAlt.P.jf_jDom_of_nnMaj
+    Formalism.FourierDecayAlt.P.WeakDominationMajorants.Asm.nnMaj
 
-theorem Formalism.FourierDecayAlt.P.bessel_integral_converges : Formalism.FourierDecayAlt.JF.JConv :=
-  Formalism.FourierDecayAlt.P.jf_jConv_of_nnMaj Formalism.FourierDecayAlt.P.WeakDominationMajorants.Asm.nnMaj
+theorem Formalism.FourierDecayAlt.P.bessel_integral_converges
+    : Formalism.FourierDecayAlt.JF.JConv :=
+  Formalism.FourierDecayAlt.P.jf_jConv_of_nnMaj
+    Formalism.FourierDecayAlt.P.WeakDominationMajorants.Asm.nnMaj

@@ -9,15 +9,22 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TsumMeas
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.FJE
 
-theorem countable_mat_cosets : ∀ (D : D7) (a b : ℕ), Countable (Matrix (Fin a) (Fin b) D.host.E) ∧ Countable (GlobalTheory.Eis.Cosets (P D b) (GF D b)) := by
+theorem countable_mat_cosets
+    : ∀ (D : D7) (a b : ℕ),
+      Countable (Matrix (Fin a) (Fin b) D.host.E)
+        ∧ Countable (GlobalTheory.Eis.Cosets (P D b) (GF D b)) := by
   intro D a b
   have hE : Countable D.host.E := (Module.finBasis ℚ D.host.E).equivFun.injective.countable
   refine ⟨inferInstanceAs (Countable (Fin a → Fin b → D.host.E)), ?_⟩

@@ -15,17 +15,18 @@ open MeasureTheory Topology Filter Set Formalism.MainNotions.GlobalTheoryTheory.
 
 section Core
 
-variable {V X Y : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V]
-  [MeasurableSpace V] [BorelSpace V] [AddCommGroup X] [TopologicalSpace X]
-  [IsTopologicalAddGroup X] [T2Space X] [LocallyCompactSpace X] [SecondCountableTopology X]
-  [MeasurableSpace X] [BorelSpace X]
+variable
+  {V X Y : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+  [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+  [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [T2Space X]
+  [LocallyCompactSpace X] [SecondCountableTopology X] [MeasurableSpace X] [BorelSpace X]
 
-private theorem isFibreFamily_restrict_of_eqOn_open (μ : Measure V) (ν : Measure X) (f : V → Y) (ι : X → Y)
-    (G G' : V → X) (hfG : ∀ x, f x = ι (G x)) (U : Set V) (B : Set X) (fib : X → Measure V)
-    (hfib : IsFibreFamily μ f ι U ν B fib) (Q : Set V) (hQo : IsOpen Q)
-    (hGG' : ∀ x ∈ Q, G' x = G x) :
-    IsFibreFamily μ (fun x => ι (G' x)) ι (U ∩ Q) ν B (fun b => (fib b).restrict Q) := by
+private theorem isFibreFamily_restrict_of_eqOn_open
+    (μ : Measure V) (ν : Measure X)
+    (f : V → Y) (ι : X → Y) (G G' : V → X) (hfG : ∀ x, f x = ι (G x))
+    (U : Set V) (B : Set X) (fib : X → Measure V) (hfib : IsFibreFamily μ f ι U ν B fib)
+    (Q : Set V) (hQo : IsOpen Q) (hGG' : ∀ x ∈ Q, G' x = G x)
+    : IsFibreFamily μ (fun x => ι (G' x)) ι (U ∩ Q) ν B (fun b => (fib b).restrict Q) := by
   obtain ⟨h1, h2, h3⟩ := hfib
   have hQm : MeasurableSet Q := hQo.measurableSet
   refine ⟨?_, ?_, ?_⟩
@@ -47,23 +48,29 @@ private theorem isFibreFamily_restrict_of_eqOn_open (μ : Measure V) (ν : Measu
     obtain ⟨hi, hc⟩ := h3 φ hφc hφs (hφt.trans Set.inter_subset_left)
     have hz : ∀ x, x ∉ Q → φ x = 0 := fun x hx => by
       first
-        | exact image_eq_zero_of_notMem_tsupport (fun h => hx (hφt h).2)
-        | exact image_eq_zero_of_nmem_tsupport (fun h => hx (hφt h).2)
+      | exact image_eq_zero_of_notMem_tsupport (fun h => hx (hφt h).2)
+      | exact image_eq_zero_of_nmem_tsupport (fun h => hx (hφt h).2)
     refine ⟨fun b hb => (hi b hb).restrict, ?_⟩
     have heq : (fun b => ∫ v, φ v ∂(fib b).restrict Q) = fun b => ∫ v, φ v ∂(fib b) :=
       funext fun b => setIntegral_eq_integral_of_forall_compl_eq_zero hz
     rw [heq]
     exact hc
 
-theorem fib_of_ratio_gen (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
-    (f : V → Y) (ι : X → Y) (hι : Function.Injective ι) (G : V → X) (hGc : Continuous G)
-    (hfG : ∀ x, f x = ι (G x)) (U : Set V) (B : Set X) (fib : X → Measure V)
-    (hfib : IsFibreFamily μ f ι U ν B fib) (T : X) (hB : B ∈ 𝓝 T) (Nb : Set X) (hNb : Nb ∈ 𝓝 T)
-    (Q : Set V) (hNbU : ∀ x ∈ Q, G x ∈ Nb → x ∈ U) (hQo : IsOpen Q) (hQcl : IsClosed Q)
-    (hQc : IsCompact Q) (H : ℕ → AddSubgroup X) (hHo : ∀ n, IsOpen (H n : Set X))
-    (hHc : ∀ n, IsCompact (H n : Set X)) (hHb : ∀ N' ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N')
-    (κ : ℝ) (hratio : ∀ n, μ.real (Q ∩ G ⁻¹' {z | z - T ∈ H n}) = κ * ν.real (H n)) :
-    ∫ x, Q.indicator (1 : V → ℂ) x ∂(fib T) = (κ : ℂ) := by
+theorem fib_of_ratio_gen
+    (μ : Measure V)
+    (ν : Measure X) [ν.IsAddHaarMeasure]
+    (f : V → Y)
+    (ι : X → Y) (hι : Function.Injective ι)
+    (G : V → X) (hGc : Continuous G) (hfG : ∀ x, f x = ι (G x))
+    (U : Set V) (B : Set X) (fib : X → Measure V) (hfib : IsFibreFamily μ f ι U ν B fib)
+    (T : X) (hB : B ∈ 𝓝 T)
+    (Nb : Set X) (hNb : Nb ∈ 𝓝 T)
+    (Q : Set V)
+    (hNbU : ∀ x ∈ Q, G x ∈ Nb → x ∈ U) (hQo : IsOpen Q) (hQcl : IsClosed Q) (hQc : IsCompact Q)
+    (H : ℕ → AddSubgroup X) (hHo : ∀ n, IsOpen (H n : Set X)) (hHc : ∀ n, IsCompact (H n : Set X))
+    (hHb : ∀ N' ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N')
+    (κ : ℝ) (hratio : ∀ n, μ.real (Q ∩ G ⁻¹' {z | z - T ∈ H n}) = κ * ν.real (H n))
+    : ∫ x, Q.indicator (1 : V → ℂ) x ∂(fib T) = (κ : ℂ) := by
   classical
   have hQm : MeasurableSet Q := hQo.measurableSet
   by_cases hX : ∃ T' : X, T' ≠ T
@@ -95,10 +102,17 @@ theorem fib_of_ratio_gen (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
           exact ⟨hx, by simpa only [Set.mem_preimage, hGG' x hx] using h⟩
       rw [hs]
       exact hratio n
-    have key := fib_of_ratio μ ν (fun x => ι (G' x)) ι hι G' hG'c (fun x => rfl) (U ∩ Q) B
-      (fun b => (fib b).restrict Q) (isFibreFamily_restrict_of_eqOn_open μ ν f ι G G' hfG U B fib hfib Q hQo hGG') T hB
-      (Nb ∩ {T'}ᶜ) hNb' hNbU' Q hQo hQcl hQc H hHo hHc hHb κ hratio'
-    have hI : ∫ x in Q, Q.indicator (1 : V → ℂ) x ∂(fib T) = ∫ x, Q.indicator (1 : V → ℂ) x ∂(fib T) :=
+    have key :=
+      fib_of_ratio μ ν
+        (fun x => ι (G' x))
+        ι hι G' hG'c
+        (fun x => rfl)
+        (U ∩ Q) B
+        (fun b => (fib b).restrict Q)
+        (isFibreFamily_restrict_of_eqOn_open μ ν f ι G G' hfG U B fib hfib Q hQo hGG') T hB
+        (Nb ∩ {T'}ᶜ) hNb' hNbU' Q hQo hQcl hQc H hHo hHc hHb κ hratio'
+    have hI
+        : ∫ x in Q, Q.indicator (1 : V → ℂ) x ∂(fib T) = ∫ x, Q.indicator (1 : V → ℂ) x ∂(fib T) :=
       setIntegral_eq_integral_of_forall_compl_eq_zero (fun x hx => by simp [hx])
     rw [← hI]
     exact key
@@ -120,9 +134,10 @@ theorem fib_of_ratio_gen (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
       intro _
       rw [hall (G x), sub_self]
       exact (H 0).zero_mem
-    have hH0 : ((H 0 : AddSubgroup X) : Set X) = Set.univ := Set.eq_univ_of_forall fun z => by
-      rw [hall z, ← hall 0]
-      exact (H 0).zero_mem
+    have hH0 : ((H 0 : AddSubgroup X) : Set X) = Set.univ :=
+      Set.eq_univ_of_forall fun z => by
+        rw [hall z, ← hall 0]
+        exact (H 0).zero_mem
     rw [hset, hH0] at hr
     have hν1 : ν Set.univ ≠ 0 := isOpen_univ.measure_ne_zero ν ⟨T, Set.mem_univ _⟩
     have hν2 : ν Set.univ ≠ ⊤ := (isCompact_univ.measure_lt_top).ne
@@ -144,11 +159,12 @@ end Core
 
 end FibGenW
 
-open MeasureTheory Topology Filter Set Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes FibGenW
+open MeasureTheory Topology Filter Set Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  FibGenW
 
 theorem fibLatGen_holds : FibLatGen := by
-  intro V X Y _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ μ ν hμ hν f ι hι G hGc hfG U B fib hfib T hB
-    L hLo hLc Λ H hΛL hΛo hΛc hΛa hHo hHc hHb Q hQL hQcos hQo hQcl Nb hNb hNbU hyp
+  intro V X Y _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ μ ν hμ hν f ι hι G hGc hfG U B fib hfib T hB L hLo hLc
+    Λ H hΛL hΛo hΛc hΛa hHo hHc hHb Q hQL hQcos hQo hQcl Nb hNb hNbU hyp
   have := hμ
   have := hν
   have hLcl : IsClosed (L : Set V) := AddSubgroup.isClosed_of_isOpen _ hLo
@@ -158,7 +174,8 @@ theorem fibLatGen_holds : FibLatGen := by
   have hPcl : ∀ n, IsClosed (Pn n) := fun n => hQcl.inter ((hScl n).preimage hGc)
   have hPo : ∀ n, IsOpen (Pn n) := fun n =>
     hQo.inter (((hHo n).preimage (continuous_id.sub continuous_const)).preimage hGc)
-  have hPc : ∀ n, IsCompact (Pn n) := fun n => hLc.of_isClosed_subset (hPcl n) (inter_subset_left.trans hQL)
+  have hPc : ∀ n, IsCompact (Pn n) := fun n =>
+    hLc.of_isClosed_subset (hPcl n) (inter_subset_left.trans hQL)
   have hν0 : 0 < ν.real (H 0) := by
     rw [measureReal_def]
     exact ENNReal.toReal_pos ((hHo 0).measure_pos ν ⟨0, (H 0).zero_mem⟩).ne'
@@ -206,8 +223,8 @@ theorem fibLatGen_holds : FibLatGen := by
         · rintro ⟨_, _, hx, _⟩
           exact hx
       have hdisj : PairwiseDisjoint (↑Tf : Set (V ⧸ Λ 0)) (fun p => Pn n ∩ q ⁻¹' {p}) :=
-        fun p _ p' _ hne => ((disjoint_singleton.2 hne).preimage q).mono inter_subset_right
-          inter_subset_right
+        fun p _ p' _ hne =>
+          ((disjoint_singleton.2 hne).preimage q).mono inter_subset_right inter_subset_right
       have hmeas : ∀ p ∈ Tf, MeasurableSet (Pn n ∩ q ⁻¹' {p}) := fun p _ =>
         (hPo n).measurableSet.inter
           ((isOpen_discrete ({p} : Set (V ⧸ Λ 0))).preimage hq).measurableSet
@@ -231,28 +248,33 @@ theorem fibLatGen_holds : FibLatGen := by
       conv_lhs => rw [hdec]
       rw [measure_biUnion_finset hdisj hmeas, Finset.sum_mul, Finset.sum_congr rfl hval,
         Finset.sum_const, nsmul_eq_mul]
-    have hreal : ∀ n, μ.real (Pn n) * ν.real (H 0) = (Tf.card : ℝ) * (μ.real (Λ 0 : Set V) * ν.real (H n)) := by
+    have hreal
+        : ∀ n,
+          μ.real (Pn n) * ν.real (H 0) = (Tf.card : ℝ) * (μ.real (Λ 0 : Set V) * ν.real (H n)) := by
       intro n
       have e' := congrArg ENNReal.toReal (hcount n)
       simp only [ENNReal.toReal_mul, ENNReal.toReal_natCast, ← measureReal_def] at e'
       exact e'
-    have hratio : ∀ n, μ.real (Q ∩ G ⁻¹' {z | z - T ∈ H n}) =
-        μ.real (Pn 0) / ν.real (H 0) * ν.real (H n) := by
+    have hratio
+        : ∀ n,
+          μ.real (Q ∩ G ⁻¹' {z | z - T ∈ H n}) = μ.real (Pn 0) / ν.real (H 0) * ν.real (H n) := by
       intro n
       have h0 := hreal 0
       have hn := hreal n
       show μ.real (Pn n) = _
       have e0 : μ.real (Pn 0) = (Tf.card : ℝ) * μ.real (Λ 0 : Set V) := by
-        have h' : μ.real (Pn 0) * ν.real (H 0) =
-            ((Tf.card : ℝ) * μ.real (Λ 0 : Set V)) * ν.real (H 0) := by
+        have h'
+            : μ.real (Pn 0) * ν.real (H 0)
+              = ((Tf.card : ℝ) * μ.real (Λ 0 : Set V)) * ν.real (H 0) := by
           rw [h0]
           ring
         exact mul_right_cancel₀ hν0.ne' h'
       rw [e0]
       field_simp
       linarith
-    rw [fib_of_ratio_gen μ ν f ι hι G hGc hfG U B fib hfib T hB Nb hNb _ hNbU hQo hQcl (hLc.of_isClosed_subset hQcl hQL) H hHo hHc
-      hHb _ hratio, ENNReal.toReal_div, measureReal_def, measureReal_def]
+    rw [fib_of_ratio_gen μ ν f ι hι G hGc hfG U B fib hfib T hB Nb hNb _ hNbU hQo hQcl
+        (hLc.of_isClosed_subset hQcl hQL) H hHo hHc hHb _ hratio,
+      ENNReal.toReal_div, measureReal_def, measureReal_def]
   · have hP0 : Pn 0 = ∅ := not_nonempty_iff_eq_empty.1 hne
     have hP0' : Q ∩ G ⁻¹' {z | z - T ∈ H 0} = ∅ := hP0
     rw [hP0', measure_empty, ENNReal.zero_div, ENNReal.toReal_zero, Complex.ofReal_zero]
@@ -267,10 +289,13 @@ theorem fibLatGen_holds : FibLatGen := by
       have hxT : G x = T := hx.1
       by_cases hxL : x ∈ Q
       · exfalso
-        have : x ∈ Pn 0 := ⟨hxL, by
-          show G x - T ∈ H 0
-          rw [hxT, sub_self]
-          exact (H 0).zero_mem⟩
+        have : x ∈ Pn 0 := ⟨
+          hxL,
+          by
+            show G x - T ∈ H 0
+            rw [hxT, sub_self]
+            exact (H 0).zero_mem
+        ⟩
         rw [hP0] at this
         exact this
       · exact indicator_of_notMem hxL _

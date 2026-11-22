@@ -8,9 +8,12 @@ universe u_1 u_2
 
 namespace GlobalTheory.ValuationPowSubPow
 
-theorem valuation_pow_sub_pow_le {K : Type u_1} {Γ : Type u_2} [Field K]
-    [LinearOrderedCommGroupWithZero Γ] (w : Valuation K Γ) {a b : K}
-    (ha : w a ≤ 1) (hb : w b ≤ 1) (m : ℕ) : w (a ^ m - b ^ m) ≤ w (a - b) := by
+theorem valuation_pow_sub_pow_le
+    {K : Type u_1} {Γ : Type u_2} [Field K] [LinearOrderedCommGroupWithZero Γ]
+    (w : Valuation K Γ)
+    {a b : K} (ha : w a ≤ 1) (hb : w b ≤ 1)
+    (m : ℕ)
+    : w (a ^ m - b ^ m) ≤ w (a - b) := by
   induction m with
   | zero => simp
   | succ n ih =>

@@ -5,7 +5,11 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+  GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi
+  UpperTheory.V.Hi.CaseU
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterminantRing Pair)
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
@@ -14,7 +18,8 @@ set_option synthInstance.maxHeartbeats 200000
 
 namespace UpperTheory.V.Hi.Up
 
-private theorem int_iff {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l) : IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ 1 := by
+private theorem int_iff {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l)
+    : IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ 1 := by
   have hi : IsIntegral ℚ_[l] x := Algebra.IsIntegral.isIntegral x
   have h0 : ‖x‖ = spectralValue (minpoly ℚ_[l] x) := rfl
   rw [h0, spectralValue_le_one_iff (minpoly.monic hi)]
@@ -37,12 +42,14 @@ section Pt
 
 variable {R : Type} [CommRing R] [Algebra c.O R]
 
-theorem pt_lt [IsLocalRing R] (y : R →ₐ[c.O] Qbar l) (a : R) (ha : a ∈ maximalIdeal R) : ‖y a‖ < 1 :=
+theorem pt_lt [IsLocalRing R] (y : R →ₐ[c.O] Qbar l) (a : R) (ha : a ∈ maximalIdeal R)
+    : ‖y a‖ < 1 :=
   _root_.UpperTheory.Reformulated.B.Gs4b.pt_lt y a ha
 
 variable [Alg.IsCO c.O R] (y : R →ₐ[c.O] Qbar l)
 
-theorem pt_res (b : R) (a : c.O) (h : Alg.res c.O R b = residue c.O a) : ‖y b - algebraMap c.O (Qbar l) a‖ < 1 := by
+theorem pt_res (b : R) (a : c.O) (h : Alg.res c.O R b = residue c.O a)
+    : ‖y b - algebraMap c.O (Qbar l) a‖ < 1 := by
   rw [← y.commutes, ← map_sub]
   refine pt_lt y _ ((Alg.res_eq_zero_iff c.O R _).1 ?_)
   rw [map_sub, h, AlgHom.commutes]
@@ -50,22 +57,27 @@ theorem pt_res (b : R) (a : c.O) (h : Alg.res c.O R b = residue c.O a) : ‖y b 
 
 theorem pt_le (b : R) : ‖y b‖ ≤ 1 := by
   obtain ⟨a, ha⟩ := Alg.IsCO.res_surj (O := c.O) b
-  have h := IsUltrametricDist.norm_add_le_max (y (b - algebraMap c.O R a)) (algebraMap c.O (Qbar l) a)
+  have h :=
+    IsUltrametricDist.norm_add_le_max (y (b - algebraMap c.O R a)) (algebraMap c.O (Qbar l) a)
   rw [← y.commutes, ← map_add (f := _), sub_add_cancel, y.commutes] at h
   exact h.trans (max_le (pt_lt y _ ha).le (coef_le a))
 
 theorem pt_unit (b : Rˣ) : ‖y b‖ = 1 := by
-  have h : ‖y b‖ * ‖y (b⁻¹ : Rˣ)‖ = 1 := by rw [← norm_mul, ← map_mul, Units.mul_inv, map_one, norm_one]
+  have h : ‖y b‖ * ‖y (b⁻¹ : Rˣ)‖ = 1 := by
+    rw [← norm_mul, ← map_mul, Units.mul_inv, map_one, norm_one]
   refine le_antisymm (pt_le y _) ?_
   nlinarith [pt_le y (b⁻¹ : Rˣ), norm_nonneg (y b), norm_nonneg (y (b⁻¹ : Rˣ))]
 
 theorem pt_small (ε : ℝ) (hε : 0 < ε) : ∃ N : ℕ, ∀ b ∈ maximalIdeal R ^ N, ‖y b‖ < ε := by
-  have key : ∀ (I : Ideal R) (S : Set R) (t : ℝ), 0 ≤ t → (∀ b ∈ S, ‖y b‖ ≤ t) → ∀ b ∈ Ideal.span S, ‖y b‖ ≤ t := by
+  have key
+      : ∀ (I : Ideal R) (S : Set R) (t : ℝ),
+        0 ≤ t → (∀ b ∈ S, ‖y b‖ ≤ t) → ∀ b ∈ Ideal.span S, ‖y b‖ ≤ t := by
     intro I S t ht hS b hb
     induction hb using Submodule.span_induction with
     | mem z hz => exact hS z hz
     | zero => simpa using ht
-    | add a b _ _ ha hb => rw [map_add (f := _)]; exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ha hb)
+    | add a b _ _ ha hb =>
+      rw [map_add (f := _)]; exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ha hb)
     | smul a b _ hb =>
       rw [smul_eq_mul, map_mul, norm_mul]
       exact (mul_le_of_le_one_left (norm_nonneg _) (pt_le y a)).trans hb
@@ -91,16 +103,19 @@ theorem pt_small (ε : ℝ) (hε : 0 < ε) : ∃ N : ℕ, ∀ b ∈ maximalIdeal
   obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one hε t1
   exact ⟨N, fun b hb => (hp N b hb).trans_lt hN⟩
 
-theorem pt_cont {Γ : Type} [TopologicalSpace Γ] {f : Γ → R} (hf : Alg.AdicCont (maximalIdeal R) f) :
-    Continuous fun g => y (f g) := by
+theorem pt_cont {Γ : Type} [TopologicalSpace Γ] {f : Γ → R} (hf : Alg.AdicCont (maximalIdeal R) f)
+    : Continuous fun g => y (f g) := by
   refine continuous_iff_continuousAt.2 fun g => Metric.continuousAt_iff'.2 fun ε hε => ?_
   obtain ⟨N, hN⟩ := pt_small y ε hε
   filter_upwards [(hf N).eventually_eq g] with g' hg'
   rw [dist_eq_norm, ← map_sub]
   exact hN _ (Ideal.Quotient.eq.1 hg')
 
-theorem pt_ext (x : R →ₐ[c.O] Qbar l) (S : Set R)
-    (hS : ∀ (N : ℕ) (b : R), ∃ z ∈ Algebra.adjoin c.O S, b - z ∈ maximalIdeal R ^ N) (h : ∀ z ∈ S, x z = y z) : x = y := by
+theorem pt_ext
+    (x : R →ₐ[c.O] Qbar l) (S : Set R)
+    (hS : ∀ (N : ℕ) (b : R), ∃ z ∈ Algebra.adjoin c.O S, b - z ∈ maximalIdeal R ^ N)
+    (h : ∀ z ∈ S, x z = y z)
+    : x = y := by
   refine AlgHom.ext fun b => eq_of_forall_dist_le fun ε hε => ?_
   obtain ⟨N, hN⟩ := pt_small x ε hε
   obtain ⟨M, hM⟩ := pt_small y ε hε

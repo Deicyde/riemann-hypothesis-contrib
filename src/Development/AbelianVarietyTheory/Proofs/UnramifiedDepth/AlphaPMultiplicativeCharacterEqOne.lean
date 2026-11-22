@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CubWeilOfI
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (PS ev pt addOf)
 open ReciprocityTheory.PGsh.Be2 (nEval)
 open GlobalTheory.UU (CubWeil)
@@ -17,8 +19,11 @@ open scoped CategoryTheory.Obj
 namespace GlobalTheory.AlphaChar
 open Polynomial
 
-theorem poly_eq_one {Ω : Type} [Field Ω] (p : ℕ) [CharP Ω p] (w : Polynomial Ω) (c : Ω)
-    (hd : w.degree < p) (h0 : w.coeff 0 = 1) (h : derivative w = C c * w) : w = 1 := by
+theorem poly_eq_one
+    {Ω : Type} [Field Ω]
+    (p : ℕ) [CharP Ω p]
+    (w : Polynomial Ω) (c : Ω) (hd : w.degree < p) (h0 : w.coeff 0 = 1) (h : derivative w = C c * w)
+    : w = 1 := by
   have hw : w ≠ 0 := by rintro rfl; simp at h0
   have hc : c = 0 := by
     by_contra hc
@@ -42,7 +47,14 @@ theorem poly_eq_one {Ω : Type} [Field Ω] (p : ℕ) [CharP Ω p] (w : Polynomia
     · apply coeff_eq_zero_of_degree_lt
       exact lt_of_lt_of_le hd (by exact_mod_cast (not_lt.1 hn))
 
-theorem char_eq_one : ∀ (Ω : Type) [Field Ω] (p : ℕ) [Fact p.Prime] [CharP Ω p] (u : ∀ (A : Type) [CommRing A] [Algebra Ω A], A → Aˣ), (∀ (A B : Type) [CommRing A] [Algebra Ω A] [CommRing B] [Algebra Ω B] (f : A →ₐ[Ω] B) (a : A), a ^ p = 0 → u B (f a) = Units.map (f : A →* B) (u A a)) → (∀ (A : Type) [CommRing A] [Algebra Ω A] (a a' : A), a ^ p = 0 → a' ^ p = 0 → u A (a + a') = u A a * u A a') → ∀ (A : Type) [CommRing A] [Algebra Ω A] (a : A), a ^ p = 0 → u A a = 1 := by
+theorem char_eq_one
+    : ∀ (Ω : Type) [Field Ω] (p : ℕ) [Fact p.Prime] [CharP Ω p]
+        (u : ∀ (A : Type) [CommRing A] [Algebra Ω A], A → Aˣ),
+      (∀ (A B : Type) [CommRing A] [Algebra Ω A] [CommRing B] [Algebra Ω B] (f : A →ₐ[Ω] B) (a : A),
+          a ^ p = 0 → u B (f a) = Units.map (f : A →* B) (u A a))
+        → (∀ (A : Type) [CommRing A] [Algebra Ω A] (a a' : A),
+          a ^ p = 0 → a' ^ p = 0 → u A (a + a') = u A a * u A a')
+        → ∀ (A : Type) [CommRing A] [Algebra Ω A] (a : A), a ^ p = 0 → u A a = 1 := by
   intro Ω _ p hp _ u hnat hadd
   have hp2 : 2 ≤ p := hp.out.two_le
   have hp0 : p ≠ 0 := by omega
@@ -61,13 +73,14 @@ theorem char_eq_one : ∀ (Ω : Type) [Field Ω] (p : ℕ) [Fact p.Prime] [CharP
     rw [← hw0, AdjoinRoot.aeval_eq, AdjoinRoot.mk_eq_mk]
     have := modByMonic_add_div w0 (X ^ p)
     exact ⟨-(w0 /ₘ X ^ p), by simp only [w]; linear_combination this⟩
-  have key : ∀ (A : Type) [CommRing A] [Algebra Ω A] (a : A), a ^ p = 0 →
-      (u A a : A) = aeval a w := by
+  have key
+      : ∀ (A : Type) [CommRing A] [Algebra Ω A] (a : A), a ^ p = 0 → (u A a : A) = aeval a w := by
     intro A _ _ a ha
-    let f : R →ₐ[Ω] A := Ideal.Quotient.liftₐ (Ideal.span {(X ^ p : Polynomial Ω)}) (aeval a) (by
-      intro q hq
-      obtain ⟨r, rfl⟩ := Ideal.mem_span_singleton.1 hq
-      simp [ha])
+    let f : R →ₐ[Ω] A :=
+      Ideal.Quotient.liftₐ (Ideal.span {(X ^ p : Polynomial Ω)}) (aeval a) (by
+        intro q hq
+        obtain ⟨r, rfl⟩ := Ideal.mem_span_singleton.1 hq
+        simp [ha])
     have hf : f t = a := by
       change aeval a (X : Polynomial Ω) = a
       simp
@@ -80,7 +93,8 @@ theorem char_eq_one : ∀ (Ω : Type) [Field Ω] (p : ℕ) [Fact p.Prime] [CharP
     rw [add_zero, left_eq_mul] at h1
     have h2 := key Ω 0 (zero_pow hp0)
     rw [h1] at h2
-    rw [coeff_zero_eq_aeval_zero, ← h2]; rfl
+    rw [coeff_zero_eq_aeval_zero, ← h2]
+    rfl
   have hder : derivative w = C ((derivative w).coeff 0) * w := by
     let D := DualNumber R
     let e : D := DualNumber.eps
@@ -88,38 +102,41 @@ theorem char_eq_one : ∀ (Ω : Type) [Field Ω] (p : ℕ) [Fact p.Prime] [CharP
     have he : e ^ 2 = 0 := by rw [pow_two]; exact DualNumber.eps_mul_eps
     have hep : e ^ p = 0 := pow_eq_zero_of_le hp2 he
     have hs : (j t) ^ p = 0 := by rw [← map_pow, ht, map_zero]
-    have hpD : (p : D) = 0 := by
-      rw [← map_natCast (algebraMap Ω D), CharP.cast_eq_zero, map_zero]
+    have hpD : (p : D) = 0 := by rw [← map_natCast (algebraMap Ω D), CharP.cast_eq_zero, map_zero]
     have hse : (j t + e) ^ p = 0 := by
       obtain ⟨r, hr⟩ := exists_add_pow_prime_eq hp.out (j t) e
-      rw [hr, hs, hep, hpD]; simp
+      rw [hr, hs, hep, hpD]
+      simp
     have h1 := congrArg Units.val (hadd D (j t) e hs hep)
-    rw [Units.val_mul, key D _ hse, key D _ hs, key D _ hep,
-      aeval_add_of_sq_eq_zero _ _ _ he] at h1
+    rw [Units.val_mul, key D _ hse, key D _ hs, key D _ hep, aeval_add_of_sq_eq_zero _ _ _ he] at h1
     have h2 : aeval e w = 1 + algebraMap Ω D ((derivative w).coeff 0) * e := by
       have := aeval_add_of_sq_eq_zero w 0 e he
       rw [zero_add] at this
       rw [this, ← coeff_zero_eq_aeval_zero', ← coeff_zero_eq_aeval_zero', h0, map_one]
     rw [h2, aeval_algHom_apply, aeval_algHom_apply, ← j.commutes, mul_add, _root_.mul_one,
-      add_right_inj, ← _root_.mul_assoc, ← map_mul] at h1
+        add_right_inj, ← _root_.mul_assoc, ← map_mul]
+      at h1
     have hsnd : ∀ x : R, TrivSqZeroExt.snd (j x * e) = x := by
       intro x
       change TrivSqZeroExt.snd ((TrivSqZeroExt.inl x : DualNumber R) * DualNumber.eps) = x
-      rw [DualNumber.snd_mul]; simp
+      rw [DualNumber.snd_mul]
+      simp
     have h3 := congrArg TrivSqZeroExt.snd h1
     rw [hsnd, hsnd] at h3
     have h4 : aeval t (derivative w - C ((derivative w).coeff 0) * w) = 0 := by
       rw [map_sub, map_mul, aeval_C, h3]; ring
     rw [AdjoinRoot.aeval_eq, AdjoinRoot.mk_eq_zero] at h4
-    have h5 := eq_zero_of_dvd_of_degree_lt h4 (by
-      rw [degree_X_pow]
-      refine lt_of_le_of_lt (degree_sub_le _ _) (max_lt ?_ ?_)
-      · exact lt_of_le_of_lt degree_derivative_le hwd
-      · rw [← smul_eq_C_mul]; exact lt_of_le_of_lt (degree_smul_le _ _) hwd)
+    have h5 :=
+      eq_zero_of_dvd_of_degree_lt h4 (by
+        rw [degree_X_pow]
+        refine lt_of_le_of_lt (degree_sub_le _ _) (max_lt ?_ ?_)
+        · exact lt_of_le_of_lt degree_derivative_le hwd
+        · rw [← smul_eq_C_mul]; exact lt_of_le_of_lt (degree_smul_le _ _) hwd)
     exact sub_eq_zero.1 h5
   have hone := poly_eq_one p w _ hwd h0 hder
   intro A _ _ a ha
   ext
-  rw [key A a ha, hone]; simp
+  rw [key A a ha, hone]
+  simp
 
 end GlobalTheory.AlphaChar

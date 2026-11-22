@@ -7,20 +7,26 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.LocalSmoothExtension
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo (IsTrans TIso)
 
-private theorem pt_ext {G : GDatum} {R : Type} [CommRing R] [Algebra ℚ R] {b : GBase G R} {N : ℕ}
-    {S S₁ T : Scheme.{0}} {s : S ⟶ Sp R} {s₁ : S₁ ⟶ Sp R} {f : S₁ ⟶ S} {o : GObj b N s} {o₁ : GObj b N s₁}
-    (m : GObjMap o₁ o f) {t : T ⟶ S₁} (x y : Over.mk t ⟶ o₁.A) (h : x.left ≫ m.φ = y.left ≫ m.φ) : x = y := by
+private theorem pt_ext
+    {G : GDatum} {R : Type} [CommRing R] [Algebra ℚ R]
+    {b : GBase G R} {N : ℕ} {S S₁ T : Scheme.{0}} {s : S ⟶ Sp R} {s₁ : S₁ ⟶ Sp R} {f : S₁ ⟶ S}
+    {o : GObj b N s} {o₁ : GObj b N s₁} (m : GObjMap o₁ o f)
+    {t : T ⟶ S₁} (x y : Over.mk t ⟶ o₁.A) (h : x.left ≫ m.φ = y.left ≫ m.φ)
+    : x = y := by
   letI := o.grp
   letI := o₁.grp
   apply GlobalTheory.SiegelPull.push_injective m.cart (Over.mk t)
   exact Over.OverMorphism.ext h
 
-theorem UpperTheory.Gal.LocalSmoothExtension.transPull_of :
-    HomEx → PolPull → TatePull → TransPull := by
+theorem UpperTheory.Gal.LocalSmoothExtension.transPull_of
+    : HomEx → PolPull → TatePull → TransPull := by
   intro hHom hPol hTate p _ D G L R _ _ b N N' S S₁ s s₁ f hfs o' o'' o₁' o₁'' m' m'' h ψ hT
   obtain ⟨hψ, hact, ⟨ψ', d, hψ', hact', hc1, hc2, hd⟩, hpolc, hgeo⟩ := hT
   obtain ⟨c, hcp, hpol, hrest⟩ := hpolc
@@ -34,8 +40,15 @@ theorem UpperTheory.Gal.LocalSmoothExtension.transPull_of :
   have hu₂ := (hHom D.toG R b N N S S₁ s s₁ f o'' o'' o₁'' o₁'' m'' m'').2.1
   obtain ⟨ψ₁, hψ₁, hcomm⟩ := hlift ψ hψ
   obtain ⟨ψ₁', hψ₁', hcomm'⟩ := hlift' ψ' hψ'
-  refine ⟨ψ₁, hcomm, hψ₁, ?_, ⟨ψ₁', d, hψ₁', ?_, ?_, ?_, hd⟩,
-    ⟨c, hcp, hPol D.toG R b N N' S S₁ s s₁ f o' o'' o₁' o₁'' m' m'' ψ ψ₁ hcomm c hpol, hrest⟩, ?_⟩
+  refine ⟨
+    ψ₁,
+    hcomm,
+    hψ₁,
+    ?_,
+    ⟨ψ₁', d, hψ₁', ?_, ?_, ?_, hd⟩,
+    ⟨c, hcp, hPol D.toG R b N N' S S₁ s s₁ f o' o'' o₁' o₁'' m' m'' ψ ψ₁ hcomm c hpol, hrest⟩,
+    ?_
+  ⟩
   · intro e
     apply huniq
     simp only [Over.comp_left, Category.assoc, reassoc_of% hcomm, hcomm, reassoc_of% (m'.act e),

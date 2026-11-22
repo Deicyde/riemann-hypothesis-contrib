@@ -9,16 +9,21 @@ open GlobalTheory.Poinc
 open GlobalTheory
 open Classical
 
-theorem GlobalTheory.UPoinc.dvd_det_sub_one_of_congMod_three_le (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (L N : ℕ) (hL : 3 ≤ L)
-    (γ : X ≃ₗ[ℤ] X) (hγ : ∀ x, CongMod L (γ x) x) : (N : ℤ) ∣ LinearMap.det (γ : X →ₗ[ℤ] X) - 1 := by
+theorem GlobalTheory.UPoinc.dvd_det_sub_one_of_congMod_three_le
+    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (L N : ℕ) (hL : 3 ≤ L)
+    (γ : X ≃ₗ[ℤ] X) (hγ : ∀ x, CongMod L (γ x) x)
+    : (N : ℤ) ∣ LinearMap.det (γ : X →ₗ[ℤ] X) - 1 := by
   set b := Module.Free.chooseBasis ℤ X
   have hdet : LinearMap.det (γ : X →ₗ[ℤ] X) = (LinearMap.toMatrix b b (γ : X →ₗ[ℤ] X)).det :=
     (LinearMap.det_toMatrix b _).symm
-  have hmap : (Int.castRingHom (ZMod L)).mapMatrix (LinearMap.toMatrix b b (γ : X →ₗ[ℤ] X)) = 1 := by
+  have hmap
+      : (Int.castRingHom (ZMod L)).mapMatrix (LinearMap.toMatrix b b (γ : X →ₗ[ℤ] X)) = 1 := by
     ext i j
     obtain ⟨w, hw⟩ := hγ (b j)
-    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, LinearMap.toMatrix_apply, LinearEquiv.coe_coe, hw,
-      map_add, map_nsmul, Module.Basis.repr_self, Finsupp.add_apply, Finsupp.smul_apply, Matrix.one_apply]
+    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, LinearMap.toMatrix_apply,
+      LinearEquiv.coe_coe, hw, map_add, map_nsmul, Module.Basis.repr_self, Finsupp.add_apply,
+      Finsupp.smul_apply, Matrix.one_apply]
     rw [Finsupp.single_apply, nsmul_eq_mul, ZMod.natCast_self, zero_mul, add_zero]
     by_cases h : j = i
     · subst h; simp
@@ -38,7 +43,8 @@ theorem GlobalTheory.UPoinc.dvd_det_sub_one_of_congMod_three_le (X : Type) [AddC
     rw [h] at hdvd
     have h2 : (L : ℤ) ∣ 2 := by
       have : (2 : ℤ) = -(-1 - 1) := by norm_num
-      rw [this]; exact (dvd_neg).2 hdvd
+      rw [this]
+      exact (dvd_neg).2 hdvd
     have : L ∣ 2 := by exact_mod_cast h2
     have := Nat.le_of_dvd (by norm_num) this
     omega

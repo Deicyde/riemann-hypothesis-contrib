@@ -10,9 +10,11 @@ namespace LevelStatements.Lv
 
 open PowerSeries IsLocalRing
 
-theorem expRescale_coeff (S : Type) [CommRing S] [Algebra ℚ S] (E : PowerSeries S)
-    (h0 : constantCoeff E = 1) (hd : PowerSeries.derivative E = E) (n : ℕ) :
-    coeff n E = algebraMap ℚ S (1 / (n.factorial : ℚ)) := by
+theorem expRescale_coeff
+    (S : Type) [CommRing S] [Algebra ℚ S]
+    (E : PowerSeries S) (h0 : constantCoeff E = 1) (hd : PowerSeries.derivative E = E)
+    (n : ℕ)
+    : coeff n E = algebraMap ℚ S (1 / (n.factorial : ℚ)) := by
   induction n with
   | zero => simp [h0]
   | succ n ih =>
@@ -20,8 +22,10 @@ theorem expRescale_coeff (S : Type) [CommRing S] [Algebra ℚ S] (E : PowerSerie
     rw [PowerSeries.coeff_derivative, ih] at h
     have hn : ((n : S) + 1) = algebraMap ℚ S ((n : ℚ) + 1) := by simp
     rw [hn] at h
-    have hu : coeff (n + 1) E =
-        coeff (n + 1) E * algebraMap ℚ S ((n : ℚ) + 1) * algebraMap ℚ S (1 / ((n : ℚ) + 1)) := by
+    have hu
+        : coeff (n + 1) E
+          = coeff (n + 1) E * algebraMap ℚ S ((n : ℚ) + 1)
+            * algebraMap ℚ S (1 / ((n : ℚ) + 1)) := by
       rw [mul_assoc, ← map_mul, mul_one_div_cancel (by positivity), map_one, mul_one]
     rw [hu, h, ← map_mul, Nat.factorial_succ]
     congr 1

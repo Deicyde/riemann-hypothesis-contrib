@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSE
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5
 open scoped ComplexConjugate
 
 section PairSub
@@ -30,36 +31,57 @@ theorem radial_wave_radial : RDWaveRad := by
   have hL' := hL
   obtain ⟨hp, hpb, hc, hci, hcb, hcbi, hz, hzi, hzb, hzbi, hG, hGi, -⟩ := hL
   obtain ⟨hWave, hWc, hWci, hWp⟩ := waveSiteAll Wp Wq P z z' π π' X L hL' ⟨0, hr⟩ s Wv Wv' hW hW'
-  have hW1 : ∀ (Φ : RadSp P.k P.r z z' π π') c g, (Wv Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g =
-      fsv s (c ⟨0, hr⟩) • (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g := hW
-  have hW2 : ∀ (Φ : RadSp P.k P.r z z' π π') c g, (Wv' Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g =
-      fsv (-s) (c ⟨0, hr⟩) • (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g := hW'
-  have hop : ∀ (l : Fin P.r) i (Φ : RadSp P.k P.r z z' π π'),
-      (X.op l i Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) = crd (opL l i) (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) :=
+  have hW1
+      : ∀ (Φ : RadSp P.k P.r z z' π π') c g,
+        (Wv Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g
+          = fsv s (c ⟨0, hr⟩) • (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g :=
+    hW
+  have hW2
+      : ∀ (Φ : RadSp P.k P.r z z' π π') c g,
+        (Wv' Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g
+          = fsv (-s) (c ⟨0, hr⟩) • (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g :=
+    hW'
+  have hop
+      : ∀ (l : Fin P.r) i (Φ : RadSp P.k P.r z z' π π'),
+        (X.op l i Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) = crd (opL l i) (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) :=
     fun l i Φ => X.op_apply l i Φ
-  have hcomm : ∀ (W : Module.End ℂ (RadSp P.k P.r z z' π π')) (u : ℂ → ℂ),
-      (∀ (Φ : RadSp P.k P.r z z' π π') c g, (W Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g =
-        u (c ⟨0, hr⟩) • (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g) →
-      ∀ i : Fin 6, (i = 1 ∨ i = 2 ∨ i = 4 ∨ i = 5) → Commute W (X.op ⟨0, hr⟩ i) := by
+  have hcomm
+      : ∀ (W : Module.End ℂ (RadSp P.k P.r z z' π π')) (u : ℂ → ℂ),
+        (∀ (Φ : RadSp P.k P.r z z' π π') c g,
+            (W Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g
+              = u (c ⟨0, hr⟩) • (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g)
+          → ∀ i : Fin 6, (i = 1 ∨ i = 2 ∨ i = 4 ∨ i = 5) → Commute W (X.op ⟨0, hr⟩ i) := by
     intro W u hWu i hi
     show W * X.op ⟨0, hr⟩ i = X.op ⟨0, hr⟩ i * W
-    apply LinearMap.ext; intro Φ; apply Subtype.ext; funext c g
+    apply LinearMap.ext
+    intro Φ
+    apply Subtype.ext
+    funext c g
     simp only [Module.End.mul_apply, hWu, hop, crd]
-    rcases hi with rfl | rfl | rfl | rfl <;>
-      simp only [opL, cOp, ciOp, cbOp, cbiOp] <;> exact smul_comm _ _ _
-  have hoth : ∀ (t : ℂ) (W : Module.End ℂ (RadSp P.k P.r z z' π π')),
-      (∀ (Φ : RadSp P.k P.r z z' π π') c g, (W Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g =
-        fsv t (c ⟨0, hr⟩) • (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g) →
-      ∀ l : Fin P.r, l ≠ ⟨0, hr⟩ → ∀ i : Fin 6, Commute W (X.op l i) :=
-    fun t W hWt l hl i => mulOp_comm_op X W t ⟨0, hr⟩ hWt hl i
+    rcases hi with rfl | rfl | rfl | rfl <;> simp only [opL, cOp, ciOp, cbOp, cbiOp]
+      <;> exact smul_comm _ _ _
+  have hoth
+      : ∀ (t : ℂ) (W : Module.End ℂ (RadSp P.k P.r z z' π π')),
+        (∀ (Φ : RadSp P.k P.r z z' π π') c g,
+            (W Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g
+              = fsv t (c ⟨0, hr⟩) • (Φ : Fn P.k P.r (Wq →L[ℂ] Wp)) c g)
+          → ∀ l : Fin P.r, l ≠ ⟨0, hr⟩ → ∀ i : Fin 6, Commute W (X.op l i) := fun t W hWt l hl i =>
+    mulOp_comm_op X W t ⟨0, hr⟩ hWt hl i
   refine ⟨hWave, hWc, hWci, ?_, ?_, hWp, ?_, ?_, ?_, ?_⟩
-  · rw [hcb]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hcomm Wv _ hW1 4 (by decide)) (hcomm Wv' _ hW2 1 (by decide))
-  · rw [hcbi]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hcomm Wv _ hW1 5 (by decide)) (hcomm Wv' _ hW2 2 (by decide))
+  · rw [hcb]
+    exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hcomm Wv _ hW1 4 (by decide))
+      (hcomm Wv' _ hW2 1 (by decide))
+  · rw [hcbi]
+    exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hcomm Wv _ hW1 5 (by decide))
+      (hcomm Wv' _ hW2 2 (by decide))
   · rw [hpb, hcb]
     refine pr_ext ?_ ?_
-    · change X.op ⟨0, hr⟩ 3 * Wv = Wv * X.op ⟨0, hr⟩ 3 -
-        algebraMap ℂ _ (starRingEnd ℂ s) * Wv * X.op ⟨0, hr⟩ 4
-      apply LinearMap.ext; intro Φ; apply Subtype.ext; funext c g
+    · change X.op ⟨0, hr⟩ 3 * Wv
+        = Wv * X.op ⟨0, hr⟩ 3 - algebraMap ℂ _ (starRingEnd ℂ s) * Wv * X.op ⟨0, hr⟩ 4
+      apply LinearMap.ext
+      intro Φ
+      apply Subtype.ext
+      funext c g
       obtain ⟨hd, h0⟩ := radSp_regular Φ g c
       simp only [Module.End.mul_apply, LinearMap.sub_apply, Module.algebraMap_end_apply,
         Submodule.coe_sub, Submodule.coe_smul, Pi.sub_apply, Pi.smul_apply, hop, crd, hW1, opL]
@@ -68,25 +90,41 @@ theorem radial_wave_radial : RDWaveRad := by
       rw [e]
       simp only [cbOp, map_neg]
       module
-    · change Wv' * (-X.op ⟨0, hr⟩ 0) = (-X.op ⟨0, hr⟩ 0) * Wv' -
-        X.op ⟨0, hr⟩ 1 * Wv' * algebraMap ℂ _ (starRingEnd ℂ (starRingEnd ℂ s))
-      apply LinearMap.ext; intro Φ; apply Subtype.ext; funext c g
+    · change Wv' * (- X.op ⟨0, hr⟩ 0)
+        = (- X.op ⟨0, hr⟩ 0) * Wv'
+          - X.op ⟨0, hr⟩ 1 * Wv' * algebraMap ℂ _ (starRingEnd ℂ (starRingEnd ℂ s))
+      apply LinearMap.ext
+      intro Φ
+      apply Subtype.ext
+      funext c g
       obtain ⟨hd, h0⟩ := radSp_regular Φ g c
-      simp only [Module.End.mul_apply, LinearMap.sub_apply, LinearMap.neg_apply, Module.algebraMap_end_apply,
-        Submodule.coe_sub, Submodule.coe_neg, Submodule.coe_smul, Pi.sub_apply, Pi.neg_apply, Pi.smul_apply, hop,
-        crd, hW2, opL]
+      simp only [Module.End.mul_apply, LinearMap.sub_apply, LinearMap.neg_apply,
+        Module.algebraMap_end_apply, Submodule.coe_sub, Submodule.coe_neg, Submodule.coe_smul,
+        Pi.sub_apply, Pi.neg_apply, Pi.smul_apply, hop, crd, hW2, opL]
       rw [pOp_fsv_smul (-s) ⟨0, hr⟩ _ c hd h0]
       simp only [cOp, Complex.conj_conj]
       module
   · intro l hl x hx
     simp only [coordOps, Set.mem_insert_iff, Set.mem_singleton_iff] at hx
     rcases hx with rfl | rfl | rfl | rfl | rfl | rfl
-    · rw [hp l]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 0) (hoth (-s) Wv' hW2 l hl 3).neg_right
-    · rw [hpb l]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 3) (hoth (-s) Wv' hW2 l hl 0).neg_right
-    · rw [hc l]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 1) (hoth (-s) Wv' hW2 l hl 4)
-    · rw [hci l]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 2) (hoth (-s) Wv' hW2 l hl 5)
-    · rw [hcb l]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 4) (hoth (-s) Wv' hW2 l hl 1)
-    · rw [hcbi l]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 5) (hoth (-s) Wv' hW2 l hl 2)
+    · rw [hp l]
+      exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 0)
+        (hoth (-s) Wv' hW2 l hl 3).neg_right
+    · rw [hpb l]
+      exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 3)
+        (hoth (-s) Wv' hW2 l hl 0).neg_right
+    · rw [hc l]
+      exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 1)
+        (hoth (-s) Wv' hW2 l hl 4)
+    · rw [hci l]
+      exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 2)
+        (hoth (-s) Wv' hW2 l hl 5)
+    · rw [hcb l]
+      exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 4)
+        (hoth (-s) Wv' hW2 l hl 1)
+    · rw [hcbi l]
+      exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hoth s Wv hW1 l hl 5)
+        (hoth (-s) Wv' hW2 l hl 2)
   · have hf : ∀ j : Fin 6, Commute Wv (X.fn j) ∧ Commute Wv' (X.fn j) := fun j =>
       ⟨TwistedTransfer.mulOp_comm_fn X Wv _ hW j, TwistedTransfer.mulOp_comm_fn X Wv' _ hW' j⟩
     intro x hx
@@ -100,7 +138,8 @@ theorem radial_wave_radial : RDWaveRad := by
     · rw [hGi]; exact Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (hf 5).1 (hf 5).2
   · intro Y a b
     rw [hQ Y, Matrix.smul_apply, Formalism.FourierDecayAlt.P.NFx3.QQ_apply]
-    exact (Formalism.FourierDecayAlt.P.NFx3.mkPair_commute (comm_xt_of_fsv_smul_endomorphism X Wv s ⟨0, hr⟩ hW1 Y a b)
+    exact (Formalism.FourierDecayAlt.P.NFx3.mkPair_commute
+      (comm_xt_of_fsv_smul_endomorphism X Wv s ⟨0, hr⟩ hW1 Y a b)
       (comm_xt_of_fsv_smul_endomorphism X Wv' (-s) ⟨0, hr⟩ hW2 (star Y) b a)).smul_right _
 
 end Formalism.FourierDecayAlt.P.CutSE

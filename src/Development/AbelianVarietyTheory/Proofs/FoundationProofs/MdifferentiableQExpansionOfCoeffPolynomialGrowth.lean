@@ -7,7 +7,8 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
@@ -59,8 +60,11 @@ theorem qs_mdifferentiable : ∀ a : ℕ → ℂ, PolyB a → MDifferentiable �
     nlinarith
   have hD : DifferentiableOn ℂ (fun w : ℂ => ∑' n : ℕ, a n * cexp (2 * π * Complex.I * n * w)) U :=
     Complex.differentiableOn_tsum_of_summable_norm (summable_poly_mul_geometric C A hr0 hr1)
-      (fun n => (by fun_prop : Differentiable ℂ fun w : ℂ => a n * cexp (2 * π * Complex.I * n * w)).differentiableOn)
-      hU (fun n w hw => qs_term_bound a C A hC y0 n w hw)
+      (fun n =>
+        (by fun_prop
+          : Differentiable ℂ fun w : ℂ => a n * cexp (2 * π * Complex.I * n * w)).differentiableOn)
+      hU
+      (fun n w hw => qs_term_bound a C A hC y0 n w hw)
   have hDz := (hD z hzU).differentiableAt (hU.mem_nhds hzU)
   apply DifferentiableAt.differentiableWithinAt
   apply hDz.congr_of_eventuallyEq

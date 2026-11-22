@@ -19,15 +19,16 @@ namespace FiltrationStepHilb
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-variable {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-  [∀ k, Fintype (ι k)]
+variable
+  {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem finiteDimensional_piece (n : K → ℕ) :
-    FiniteDimensional F (weightedHomogeneousSubmodule F (blockWeight ι) n) := by
+theorem finiteDimensional_piece (n : K → ℕ)
+    : FiniteDimensional F (weightedHomogeneousSubmodule F (blockWeight ι) n) := by
   rw [weightedHomogeneousSubmodule_eq_finsupp_supported]
   have hfin : {d : (Σ k, ι k) →₀ ℕ | Finsupp.weight (blockWeight ι) d = n}.Finite := by
-    refine (Finsupp.finite_of_nat_weight_eq (fun _ => (1 : ℕ)) (fun _ => one_ne_zero)
-      (∑ k, n k)).subset ?_
+    refine
+      (Finsupp.finite_of_nat_weight_eq (fun _ => (1 : ℕ)) (fun _ => one_ne_zero) (∑ k, n k)).subset
+        ?_
     intro d hd
     simp only [Set.mem_ofPred_eq] at hd ⊢
     rw [← hd]
@@ -38,39 +39,44 @@ theorem finiteDimensional_piece (n : K → ℕ) :
   have := hfin.to_subtype
   exact Module.Finite.of_basis (basisRestrictSupport F {d | Finsupp.weight (blockWeight ι) d = n})
 
-
 open Classical in
-theorem component_mul {f : MRing ι F} {s : K → ℕ} (hf : IsMultiHomog f s) (c : MRing ι F)
-    (n : K → ℕ) :
-    weightedHomogeneousComponent (blockWeight ι) n (f * c) =
-      if s ≤ n then f * weightedHomogeneousComponent (blockWeight ι) (n - s) c else 0 := by
-  have h := DirectSum.coe_decompose_mul_of_left_mem
-    (𝒜 := weightedHomogeneousSubmodule F (blockWeight ι)) (b := c) n hf
+theorem component_mul
+    {f : MRing ι F} {s : K → ℕ} (hf : IsMultiHomog f s) (c : MRing ι F) (n : K → ℕ)
+    : weightedHomogeneousComponent (blockWeight ι) n (f * c)
+      = if s ≤ n then f * weightedHomogeneousComponent (blockWeight ι) (n - s) c else 0 := by
+  have h :=
+    DirectSum.coe_decompose_mul_of_left_mem (𝒜 := weightedHomogeneousSubmodule F (blockWeight ι))
+      (b := c) n hf
   rw [← weightedDecomposition.decompose'_apply, ← weightedDecomposition.decompose'_apply]
   exact h
 
-
 open Classical in
-theorem mem_sup_span {L : Ideal (MRing ι F)} {f : MRing ι F} {s : K → ℕ}
-    (hL : IsMultiHomogIdeal L) (hf : IsMultiHomog f s) {n : K → ℕ} {x : MRing ι F}
-    (hx : x ∈ weightedHomogeneousSubmodule F (blockWeight ι) n) (hx' : x ∈ L ⊔ Ideal.span {f}) :
-    ∃ c : MRing ι F, x - (if s ≤ n then f * weightedHomogeneousComponent (blockWeight ι) (n - s) c
-      else 0) ∈ L := by
+theorem mem_sup_span
+    {L : Ideal (MRing ι F)} {f : MRing ι F} {s : K → ℕ}
+    (hL : IsMultiHomogIdeal L) (hf : IsMultiHomog f s)
+    {n : K → ℕ} {x : MRing ι F}
+    (hx : x ∈ weightedHomogeneousSubmodule F (blockWeight ι) n) (hx' : x ∈ L ⊔ Ideal.span {f})
+    : ∃ c : MRing ι F,
+      x - (if s ≤ n then
+             f * weightedHomogeneousComponent (blockWeight ι) (n - s) c
+           else
+             0)
+        ∈ L := by
   obtain ⟨l, hl, y, hy, rfl⟩ := Submodule.mem_sup.mp hx'
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hy
   refine ⟨c, ?_⟩
-  have hx2 := weightedHomogeneousComponent_eq_self
-    ((mem_weightedHomogeneousSubmodule _ _ _ _).mp hx)
+  have hx2 :=
+    weightedHomogeneousComponent_eq_self ((mem_weightedHomogeneousSubmodule _ _ _ _).mp hx)
   rw [← hx2, map_add (f := _), mul_comm c f, component_mul hf, add_sub_cancel_right]
   exact hL l hl n
 
-
 open Classical in
-theorem finrank_step (L : Ideal (MRing ι F)) (f : MRing ι F) (s : K → ℕ)
-    (hL : IsMultiHomogIdeal L) (hf : IsMultiHomog f s) (n : K → ℕ) :
-    Module.finrank F (gradedPiece L n) =
-      Module.finrank F (gradedPiece (L ⊔ Ideal.span {f}) n) +
-        if s ≤ n then Module.finrank F (gradedPiece (L.colon {f}) (n - s)) else 0 := by
+theorem finrank_step
+    (L : Ideal (MRing ι F)) (f : MRing ι F) (s : K → ℕ)
+    (hL : IsMultiHomogIdeal L) (hf : IsMultiHomog f s) (n : K → ℕ)
+    : Module.finrank F (gradedPiece L n)
+      = Module.finrank F (gradedPiece (L ⊔ Ideal.span {f}) n)
+        + if s ≤ n then Module.finrank F (gradedPiece (L.colon {f}) (n - s)) else 0 := by
   have : ∀ d : K → ℕ, FiniteDimensional F (weightedHomogeneousSubmodule F (blockWeight ι) d) :=
     fun d => finiteDimensional_piece d
   have : FiniteDimensional F (gradedPiece L n) := by unfold gradedPiece; infer_instance
@@ -81,9 +87,16 @@ theorem finrank_step (L : Ideal (MRing ι F)) (f : MRing ι F) (s : K → ℕ)
     unfold gradedPiece
     rw [← Submodule.map_comp]
     rfl
-  have hker_mem : ∀ a : gradedPiece L n, g a = 0 → ∃ c : MRing ι F,
-      (a : MRing ι F ⧸ L) = Ideal.Quotient.mk L
-        (if s ≤ n then f * weightedHomogeneousComponent (blockWeight ι) (n - s) c else 0) := by
+  have hker_mem
+      : ∀ a : gradedPiece L n,
+        g a = 0
+          → ∃ c : MRing ι F,
+            (a : MRing ι F ⧸ L)
+              = Ideal.Quotient.mk L
+                (if s ≤ n then
+                   f * weightedHomogeneousComponent (blockWeight ι) (n - s) c
+                 else
+                   0) := by
     rintro ⟨a, ha⟩ hga
     obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.mp ha
     have hx0 : Ideal.Quotient.mk (L ⊔ Ideal.span {f}) x = 0 := hga
@@ -93,13 +106,16 @@ theorem finrank_step (L : Ideal (MRing ι F)) (f : MRing ι F) (s : K → ℕ)
   rw [hrange] at h1
   by_cases hsn : s ≤ n
   · let T := weightedHomogeneousSubmodule F (blockWeight ι) (n - s)
-    have hmem : ∀ y : T, ((Ideal.Quotient.mkₐ F L).toLinearMap ∘ₗ LinearMap.mulLeft F f ∘ₗ
-        T.subtype) y ∈ gradedPiece L n := fun y => by
+    have hmem
+        : ∀ y : T,
+          ((Ideal.Quotient.mkₐ F L).toLinearMap ∘ₗ LinearMap.mulLeft F f ∘ₗ T.subtype) y
+            ∈ gradedPiece L n := fun y => by
       refine Submodule.mem_map_of_mem ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr ?_)
       have := IsWeightedHomogeneous.mul hf y.2
       rwa [add_tsub_cancel_of_le hsn] at this
-    let μ := LinearMap.codRestrict (gradedPiece L n) ((Ideal.Quotient.mkₐ F L).toLinearMap ∘ₗ
-      LinearMap.mulLeft F f ∘ₗ T.subtype) hmem
+    let μ :=
+      LinearMap.codRestrict (gradedPiece L n)
+        ((Ideal.Quotient.mkₐ F L).toLinearMap ∘ₗ LinearMap.mulLeft F f ∘ₗ T.subtype) hmem
     let ν := (Ideal.Quotient.mkₐ F (L.colon {f})).toLinearMap.domRestrict T
     have hν : LinearMap.range ν = gradedPiece (L.colon {f}) (n - s) :=
       LinearMap.range_domRestrict _ _
@@ -107,8 +123,8 @@ theorem finrank_step (L : Ideal (MRing ι F)) (f : MRing ι F) (s : K → ℕ)
       ext y
       simp only [LinearMap.mem_ker]
       rw [← Subtype.coe_inj]
-      change Ideal.Quotient.mk L (f * (y : MRing ι F)) = 0 ↔
-        Ideal.Quotient.mk (L.colon {f}) (y : MRing ι F) = 0
+      change Ideal.Quotient.mk L (f * (y : MRing ι F)) = 0
+        ↔ Ideal.Quotient.mk (L.colon {f}) (y : MRing ι F) = 0
       rw [Ideal.Quotient.eq_zero_iff_mem, Ideal.Quotient.eq_zero_iff_mem,
         Submodule.mem_colon_singleton, smul_eq_mul, mul_comm]
     have hμg : LinearMap.range μ = LinearMap.ker g := by
@@ -175,10 +191,11 @@ theorem FiltrationStepHilb.proof : FiltrationStepHilb.Statement.{u} := by
       rfl
     · rw [if_neg (fun h => hsn (hms.mp h)), key, if_neg hsn]
       simp
-  · have hm' : ¬ ∀ k, 0 ≤ (m - fun k => (s k : ℤ)) k := fun h => hm fun k => by
-      have h1 := h k
-      simp only [Pi.sub_apply] at h1
-      omega
+  · have hm' : ¬ ∀ k, 0 ≤ (m - fun k => (s k : ℤ)) k := fun h =>
+      hm fun k => by
+        have h1 := h k
+        simp only [Pi.sub_apply] at h1
+        omega
     unfold hilbFn
     simp only [if_neg hm, if_neg hm']
     simp

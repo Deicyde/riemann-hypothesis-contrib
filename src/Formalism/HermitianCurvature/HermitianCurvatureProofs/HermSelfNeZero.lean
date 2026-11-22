@@ -12,29 +12,33 @@ noncomputable section
 
 variable {k r : ℕ}
 
-theorem herm_self_ne_zero {z : Fin (2 * r + k + 1) → ℂ} (hT : 0 < Tz k r z) : herm (Hpk k r) z z ≠ 0 := by
+theorem herm_self_ne_zero {z : Fin (2 * r + k + 1) → ℂ} (hT : 0 < Tz k r z)
+    : herm (Hpk k r) z z ≠ 0 := by
   intro h
   rw [Tz, h] at hT
   simp at hT
 
-theorem herm_proj_zero (x z : Fin (2 * r + k + 1) → ℂ) (hc : herm (Hpk k r) z z ≠ 0) :
-    herm (Hpk k r) (x - (herm (Hpk k r) x z / herm (Hpk k r) z z) • z) z = 0 := by
+theorem herm_proj_zero (x z : Fin (2 * r + k + 1) → ℂ) (hc : herm (Hpk k r) z z ≠ 0)
+    : herm (Hpk k r) (x - (herm (Hpk k r) x z / herm (Hpk k r) z z) • z) z = 0 := by
   rw [herm_sub_left, herm_smul_left]
   field_simp
   ring
 
-theorem coreW {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z) (ξ : B.Mat k r)
-    (h1 : ∀ u, inWb k r u → inWb k r (ξ *ᵥ u))
-    (h2 : ∀ u v, inWb k r u → inWb k r v → herm (Hpk k r) (ξ *ᵥ u) v = -herm (Hpk k r) u (ξ *ᵥ v))
-    (h3 : ∀ u v, inWb k r u → inWb k r v → herm (Hpk k r) u z = 0 → herm (Hpk k r) v z = 0 →
-      herm (Hpk k r) (ξ *ᵥ u) v = 0)
-    (N : ℕ) (h4 : ∀ u, inWb k r u → (ξ ^ N) *ᵥ u = 0) :
-    ∀ u, inWb k r u → ξ *ᵥ u = 0 := by
+theorem coreW
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z)
+    (ξ : B.Mat k r) (h1 : ∀ u, inWb k r u → inWb k r (ξ *ᵥ u))
+    (h2 : ∀ u v, inWb k r u → inWb k r v → herm (Hpk k r) (ξ *ᵥ u) v = - herm (Hpk k r) u (ξ *ᵥ v))
+    (h3 : ∀ u v,
+      inWb k r u → inWb k r v → herm (Hpk k r) u z = 0 → herm (Hpk k r) v z = 0
+        → herm (Hpk k r) (ξ *ᵥ u) v = 0)
+    (N : ℕ) (h4 : ∀ u, inWb k r u → (ξ ^ N) *ᵥ u = 0)
+    : ∀ u, inWb k r u → ξ *ᵥ u = 0 := by
   set c := herm (Hpk k r) z z with hcdef
   have hc0 : c ≠ 0 := herm_self_ne_zero hT
 
-  have stepA : ∀ w, inWb k r w → herm (Hpk k r) w z = 0 →
-      ξ *ᵥ w = (herm (Hpk k r) (ξ *ᵥ w) z / c) • z := by
+  have stepA
+      : ∀ w,
+        inWb k r w → herm (Hpk k r) w z = 0 → ξ *ᵥ w = (herm (Hpk k r) (ξ *ᵥ w) z / c) • z := by
     intro w hw hwz
     set y := ξ *ᵥ w - (herm (Hpk k r) (ξ *ᵥ w) z / c) • z with hydef
     have hy : inWb k r y := inWb_sub (h1 w hw) (inWb_smul _ hz)
@@ -42,10 +46,11 @@ theorem coreW {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k
     have hyy : herm (Hpk k r) y y = 0 := by
       have e1 : herm (Hpk k r) (ξ *ᵥ w) y = 0 := h3 w y hw hy hwz hyz
       have e2 : herm (Hpk k r) z y = 0 := by rw [herm_swap, hyz, star_zero]
-      calc herm (Hpk k r) y y
-          = herm (Hpk k r) (ξ *ᵥ w) y - (herm (Hpk k r) (ξ *ᵥ w) z / c) * herm (Hpk k r) z y := by
-            conv_lhs => rw [hydef]
-            rw [herm_sub_left, herm_smul_left]
+      calc
+        herm (Hpk k r) y y
+            = herm (Hpk k r) (ξ *ᵥ w) y - (herm (Hpk k r) (ξ *ᵥ w) z / c) * herm (Hpk k r) z y := by
+          conv_lhs => rw [hydef]
+          rw [herm_sub_left, herm_smul_left]
         _ = 0 := by rw [e1, e2]; ring
     have : y = 0 := wb_definite hz hT hy hyz (by rw [hyy]; simp)
     exact sub_eq_zero.1 this
@@ -55,8 +60,8 @@ theorem coreW {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k
   have hbz : herm (Hpk k r) b z = 0 := herm_proj_zero _ _ hc0
   have hξz : ξ *ᵥ z = μ • z + b := by rw [hbdef]; abel
 
-  have stepB : ∀ w, inWb k r w → herm (Hpk k r) w z = 0 →
-      ξ *ᵥ w = (-(herm (Hpk k r) w b) / c) • z := by
+  have stepB
+      : ∀ w, inWb k r w → herm (Hpk k r) w z = 0 → ξ *ᵥ w = (-(herm (Hpk k r) w b) / c) • z := by
     intro w hw hwz
     rw [stepA w hw hwz, h2 w z hw hz, hξz, herm_add_right, herm_smul_right, hwz]
     congr 1
@@ -71,8 +76,8 @@ theorem coreW {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k
       exact hb0 (wb_definite hz hT hb hbz (by rw [h]; simp))
     set l := -(herm (Hpk k r) b b) / c with hl
     have hl0 : l ≠ 0 := div_ne_zero (neg_ne_zero.2 hbb) hc0
-    let f : ℕ → ℂ × ℂ := fun m => Nat.rec (motive := fun _ => ℂ × ℂ) (1, 0)
-      (fun _ pq => (μ * pq.1 + l * pq.2, pq.1)) m
+    let f : ℕ → ℂ × ℂ := fun m =>
+      Nat.rec (motive := fun _ => ℂ × ℂ) (1, 0) (fun _ pq => (μ * pq.1 + l * pq.2, pq.1)) m
     have hf0 : f 0 = (1, 0) := rfl
     have hfs : ∀ m, f (m + 1) = (μ * (f m).1 + l * (f m).2, (f m).1) := fun m => rfl
     have hpow : ∀ m, (ξ ^ m) *ᵥ z = (f m).1 • z + (f m).2 • b := by

@@ -15,21 +15,26 @@ noncomputable section
 
 universe u v
 
-theorem SerreTail.proof (hFin : SerreFinite.Statement.{u, v}) (hOnto : SerreOnto.Statement.{u, v}) :
-    SerreTail.Statement.{u, v} := by
+theorem SerreTail.proof (hFin : SerreFinite.Statement.{u, v}) (hOnto : SerreOnto.Statement.{u, v})
+    : SerreTail.Statement.{u, v} := by
   classical
   intro S _ _ N M _ _ _ _ 𝓜 hM c₁
 
-  have hfg : ∀ c : ℤ, ∃ s : Finset (Cech.Cochain (locSys S N M) 0),
-      Submodule.span S (s : Set _) = Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0 := by
+  have hfg
+      : ∀ c : ℤ, ∃ s : Finset (Cech.Cochain (locSys S N M) 0),
+        Submodule.span S (s : Set _) = Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0 := by
     intro c
-    have h0 : (Cech.bdryDeg (locSys S N M) (degLoc 𝓜 c) locResS 0).comap
-        (Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0).subtype = ⊥ := by
+    have h0
+        : (Cech.bdryDeg (locSys S N M) (degLoc 𝓜 c) locResS 0).comap
+            (Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0).subtype
+          = ⊥ := by
       change Submodule.comap _ ⊥ = ⊥
       rw [Submodule.comap_bot, Submodule.ker_subtype]
-    have hf : Module.Finite S (Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0 ⧸
-        (Cech.bdryDeg (locSys S N M) (degLoc 𝓜 c) locResS 0).comap
-          (Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0).subtype) := hFin S N M 𝓜 hM 0 c
+    have hf : Module.Finite S
+        (Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0 ⧸
+          (Cech.bdryDeg (locSys S N M) (degLoc 𝓜 c) locResS 0).comap
+            (Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0).subtype) :=
+      hFin S N M 𝓜 hM 0 c
     have hf' : Module.Finite S (Cech.cocyDeg (locSys S N M) (degLoc 𝓜 c) locResS 0) :=
       Module.Finite.equiv (Submodule.quotEquivOfEqBot _ h0)
     obtain ⟨s, hs⟩ := Module.Finite.iff_fg.mp hf'
@@ -68,8 +73,8 @@ theorem SerreTail.proof (hFin : SerreFinite.Statement.{u, v}) (hOnto : SerreOnto
   have hspan : Submodule.span (Poly S N) (H0tail 𝓜 c₁ : Set (Cech.Cochain (locSys S N M) 0)) ≤ B :=
     Submodule.span_le.mpr hA
   have : IsNoetherian (Poly S N) B := isNoetherian_of_fg_of_noetherian B hB
-  obtain ⟨t, ht, hteq⟩ := (Submodule.fg_span_iff_fg_span_finset_subset _).mp
-    (Submodule.FG.of_le_of_isNoetherian hspan)
+  obtain ⟨t, ht, hteq⟩ :=
+    (Submodule.fg_span_iff_fg_span_finset_subset _).mp (Submodule.FG.of_le_of_isNoetherian hspan)
   refine ⟨t, fun z hz => ht hz, fun z hz => ?_⟩
   change z ∈ Submodule.span (Poly S N) (t : Set _)
   rw [← hteq]

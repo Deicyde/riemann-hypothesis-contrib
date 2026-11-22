@@ -13,8 +13,9 @@ noncomputable section
 
 namespace Formalism.HN
 
-theorem twist_finrank_eq (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] :
-    (Module.finrank ℚ K : ℝ) = 2 * (nPl K : ℝ) := by
+theorem twist_finrank_eq
+    (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    : (Module.finrank ℚ K : ℝ) = 2 * (nPl K : ℝ) := by
   have key : Module.finrank ℚ K = 2 * nPl K := by
     have h1 := NumberField.InfinitePlace.card_add_two_mul_card_eq_rank K
     haveI : IsEmpty {w : InfinitePlace K // w.IsReal} := by
@@ -37,7 +38,8 @@ theorem twist_of (h1 : RescaleCovol) (h2 : PlLat) (h3 : ShiftInvariance.{0, 0, 0
   have hX' : ∀ v, IsUnit (((c v : ℂ)) • X v).det := by
     intro v
     rw [Matrix.det_smul]
-    exact ((isUnit_iff_ne_zero.mpr (by exact_mod_cast (hc v).ne' : ((c v : ℂ)) ≠ 0)).pow _).mul (hX v)
+    exact ((isUnit_iff_ne_zero.mpr (by exact_mod_cast (hc v).ne' : ((c v : ℂ)) ≠ 0)).pow _).mul
+      (hX v)
   have hfg : ∀ N : Submodule (𝓞 K) V, N ≤ L → N.FG := by
     intro N hN
     haveI := isNoetherian_of_fg_of_noetherian L hL
@@ -50,10 +52,15 @@ theorem twist_of (h1 : RescaleCovol) (h2 : PlLat) (h3 : ShiftInvariance.{0, 0, 0
   have hfr := twist_finrank_eq K
   have hP : 0 < ∏ v, c v := Finset.prod_pos fun v _ => hc v
   have hlogP : Real.log (∏ v, c v) = ∑ v, Real.log (c v) := Real.log_prod fun v _ => (hc v).ne'
-  have hkey : ∀ N : Submodule (𝓞 K) V, N ≤ L →
-      rk (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v)) N = rk (Formalism.HermitianLatticesTheory.realize b X) N ∧
-      deg (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v)) N = deg (Formalism.HermitianLatticesTheory.realize b X) N +
-        (1 / (nPl K : ℝ)) * (∑ v, Real.log (c v)) * (rk (Formalism.HermitianLatticesTheory.realize b X) N : ℝ) := by
+  have hkey
+      : ∀ N : Submodule (𝓞 K) V,
+        N ≤ L
+          → rk (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v)) N
+              = rk (Formalism.HermitianLatticesTheory.realize b X) N
+            ∧ deg (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v)) N
+              = deg (Formalism.HermitianLatticesTheory.realize b X) N
+                + (1 / (nPl K : ℝ)) * (∑ v, Real.log (c v))
+                  * (rk (Formalism.HermitianLatticesTheory.realize b X) N : ℝ) := by
     intro N hN
     have hNfg := hfg N hN
     obtain ⟨hlat, hrk, -⟩ := h2 K V ι b X hX N hNfg
@@ -70,9 +77,10 @@ theorem twist_of (h1 : RescaleCovol) (h2 : PlLat) (h3 : ShiftInvariance.{0, 0, 0
     ring
   obtain ⟨hlatL, hrkL, -⟩ := h2 K V ι b X hX L hL
   obtain ⟨hlatL₂, -, -⟩ := h2 K V ι b (fun v => ((c v : ℂ)) • X v) hX' L hL
-  obtain ⟨-, hmu, hstep, -⟩ := h3 (𝓞 K) V _ _ (Formalism.HermitianLatticesTheory.realize b X)
-    (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v)) L ((1 / (nPl K : ℝ)) * ∑ v, Real.log (c v))
-    hlatL hlatL₂ hkey
+  obtain ⟨-, hmu, hstep, -⟩ :=
+    h3 (𝓞 K) V _ _ (Formalism.HermitianLatticesTheory.realize b X)
+      (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v)) L
+      ((1 / (nPl K : ℝ)) * ∑ v, Real.log (c v)) hlatL hlatL₂ hkey
   have hrkpos : L ≠ ⊥ → (rk (Formalism.HermitianLatticesTheory.realize b X) L : ℝ) ≠ 0 := by
     intro hne
     rw [hrkL]
@@ -91,11 +99,16 @@ theorem twist_of (h1 : RescaleCovol) (h2 : PlLat) (h3 : ShiftInvariance.{0, 0, 0
       have hx0 : x = 0 := by simpa [h0] using hx'
       simp [hx0]
     exact_mod_cast (Nat.mul_pos h1' h2').ne'
-  have hslope : L ≠ ⊥ → slope (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v)) L =
-      slope (Formalism.HermitianLatticesTheory.realize b X) L + (1 / (nPl K : ℝ)) * ∑ v, Real.log (c v) := by
+  have hslope
+      : L ≠ ⊥
+        → slope (Formalism.HermitianLatticesTheory.realize b (fun v => ((c v : ℂ)) • X v)) L
+          = slope (Formalism.HermitianLatticesTheory.realize b X) L
+            + (1 / (nPl K : ℝ)) * ∑ v, Real.log (c v) := by
     intro hne
-    have hs : ∀ ρ' : V →+ EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2),
-        slope ρ' L = deg ρ' L / (rk ρ' L : ℝ) := fun _ => rfl
+    have hs
+        : ∀ ρ' : V →+ EuclideanSpace ℝ (InfinitePlace K × ι × Fin 2),
+          slope ρ' L = deg ρ' L / (rk ρ' L : ℝ) := fun _ =>
+      rfl
     rw [hs, hs, (hkey L le_rfl).1, (hkey L le_rfl).2, add_div, mul_div_assoc, div_self (hrkpos hne),
       mul_one]
   refine ⟨hslope, hmu, fun hne => ?_, fun θ => hstep θ⟩

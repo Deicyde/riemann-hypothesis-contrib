@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -23,11 +24,14 @@ theorem GenericFibre.proof : GenericFibre.Statement := by
   have hchar : ∀ m : ℤ, (C m : MvPolynomial (Ix κ) ℤ) ∈ coordIdeal ℤ x → m = 0 := by
     intro m hm
     have h1 : m ∈ (coordIdeal ℤ x).comap (C : ℤ →+* MRing (GlobalTheory κ)) := hm
-    rw [show (coordIdeal ℤ x).comap (C : ℤ →+* MRing (GlobalTheory κ)) = ⊥ from hhor, Ideal.mem_bot] at h1
+    rw [show (coordIdeal ℤ x).comap (C : ℤ →+* MRing (GlobalTheory κ)) = ⊥ from hhor, Ideal.mem_bot]
+      at h1
     exact h1
   obtain ⟨hqp, hcomap, hform⟩ := ReciprocityTheory.AnForm.R.extQ_spec (coordIdeal ℤ x) hchar
-  have hq : ReciprocityTheory.AnForm.R.extQ (coordIdeal ℤ x) =
-      (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) := rfl
+  have hq
+      : ReciprocityTheory.AnForm.R.extQ (coordIdeal ℤ x)
+        = (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) :=
+    rfl
   rw [← hq]
   refine ⟨⟨hqp, ?_, ?_⟩, ?_⟩
   · rw [GroundTheory.Heights₂.Heights.Bridge.isMultiHomogIdeal_iff]
@@ -43,7 +47,8 @@ theorem GenericFibre.proof : GenericFibre.Statement := by
     exact hX
   · rw [hdim] at hform
     simp only [Fintype.card_unit] at hform
-    refine GroundTheory.Heights₂.Heights.ObjectsChow.GenericFibreDim.eq_natCast_of_add_one_eq (D + 1) _ ?_
+    refine GroundTheory.Heights₂.Heights.ObjectsChow.GenericFibreDim.eq_natCast_of_add_one_eq
+      (D + 1) _ ?_
     rw [hform]
     push_cast
     rfl

@@ -7,28 +7,42 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace PositivityTheory.Rg.Sw.Glob
 
 def LeviTau : Prop :=
-  ∀ D n V ψ χ θ μ ω H l s ν τ ε fr ι, Cx D n V ψ χ θ μ ω H l s ν τ ε fr ι →
-    ∀ (y : GR n) (a : Matrix (Fin n) (Fin n) ℂ), IsUnit a.det → mR y = mM a → ∃ (C : ℂ) (A : Mx D n n),
-      compAt θ τ A = a ∧ (∀ τ', τ' ≠ τ → compAt θ τ' A = 1) ∧ A.map (finPart D) = 1 ∧
-      ∀ (Φ : schwartzA θ V.rank n) (x : Mx D V.rank n), (ω (ι y) Φ).1 x = C * Φ.1 (HMul.hMul x A : Mx D V.rank n)
+  ∀ D n V ψ χ θ μ ω H l s ν τ ε fr ι,
+    Cx D n V ψ χ θ μ ω H l s ν τ ε fr ι
+      → ∀ (y : GR n) (a : Matrix (Fin n) (Fin n) ℂ),
+        IsUnit a.det → mR y = mM a
+          → ∃ (C : ℂ) (A : Mx D n n),
+            compAt θ τ A = a ∧ (∀ τ', τ' ≠ τ → compAt θ τ' A = 1) ∧ A.map (finPart D) = 1
+              ∧ ∀ (Φ : schwartzA θ V.rank n) (x : Mx D V.rank n),
+                (ω (ι y) Φ).1 x = C * Φ.1 (HMul.hMul x A : Mx D V.rank n)
 
-theorem opGen_of' (hU : UnipTau) (hLv : LeviTau) (hW : WEx) (hS : SchOps) (hF : FTfact) : OpGen := by
+theorem opGen_of' (hU : UnipTau) (hLv : LeviTau) (hW : WEx) (hS : SchOps) (hF : FTfact)
+    : OpGen := by
   intro D n V ψ χ θ μ ω H l s ν τ ε fr ι hC y hy
   obtain ⟨hadd, hcmul, hrmul, hphase, f₁, hf₁, hf₁0⟩ := hS V.rank n
-  have unip : ∀ (b : Matrix (Fin n) (Fin n) ℂ) (y' : GR n), bᴴ = b → mR y' = nU b →
-      ∀ (Ψ' : Mx D V.rank n → ℂ) (hΨ' : AwayCls θ τ fr Ψ') (f : (Fin V.rank → Fin n → ℂ) → ℂ) (hf : IsSch f),
-      (ω (ι y') ⟨tens θ τ fr f Ψ', hΨ'.2 f hf⟩).1 =
-        tens θ τ fr (fun u => Complex.exp (Complex.I * (tLoc l τ : ℂ) * (b * gramX ε u).trace) * f u) Ψ' := by
+  have unip
+      : ∀ (b : Matrix (Fin n) (Fin n) ℂ) (y' : GR n),
+        bᴴ = b → mR y' = nU b
+          → ∀ (Ψ' : Mx D V.rank n → ℂ) (hΨ' : AwayCls θ τ fr Ψ') (f : (Fin V.rank → Fin n → ℂ) → ℂ)
+              (hf : IsSch f),
+            (ω (ι y') ⟨tens θ τ fr f Ψ', hΨ'.2 f hf⟩).1
+              = tens θ τ fr
+                (fun u => Complex.exp (Complex.I * (tLoc l τ : ℂ) * (b * gramX ε u).trace) * f u)
+                Ψ' := by
     intro b y' hb hy' Ψ' hΨ' f hf
     funext x
     rw [hU D n V ψ χ θ μ ω H l s ν τ ε fr ι hC y' b hb hy']
@@ -36,32 +50,52 @@ theorem opGen_of' (hU : UnipTau) (hLv : LeviTau) (hW : WEx) (hS : SchOps) (hF : 
     simp only [tens]
     ring
   rcases hy with ⟨b, hb, hyb⟩ | ⟨c, hc, hyc⟩ | ⟨a, ha, hya⟩
-  · exact ⟨fun f u => Complex.exp (Complex.I * (tLoc l τ : ℂ) * (b * gramX ε u).trace) * f u,
-      fun f hf => hphase ε (tLoc l τ) b f hb hf, fun Ψ hΨ f hf => unip b y hb hyb Ψ hΨ f hf⟩
+  · exact ⟨
+      fun f u => Complex.exp (Complex.I * (tLoc l τ : ℂ) * (b * gramX ε u).trace) * f u,
+      fun f hf => hphase ε (tLoc l τ) b f hb hf,
+      fun Ψ hΨ f hf => unip b y hb hyb Ψ hΨ f hf
+    ⟩
   · obtain ⟨w, hw⟩ := hW D n
     have hcn : (-c)ᴴ = -c := by rw [Matrix.conjTranspose_neg, hc]
     obtain ⟨yn, hyn⟩ := OG.exists_nU n (-c) hcn
     have hconj := OG.iota_conj hC.hθ hC.hι w hw y yn c hyc hyn
     have hy' : ι y = w * ι yn * w⁻¹ := by rw [hconj]; group
     obtain ⟨κ, Aop, A'op, hκ, hFT⟩ := hF D n V ψ χ θ μ ω H l s ν τ ε fr ι hC w hw
-    have hsch : ∀ f, IsSch f → IsSch (fun u => κ * ftLoc ε (tLoc l τ) f u) ∧
-        IsSch (fun u => κ⁻¹ * ftLoc ε (-tLoc l τ) f u) := fun f hf =>
+    have hsch
+        : ∀ f,
+          IsSch f
+            → IsSch (fun u => κ * ftLoc ε (tLoc l τ) f u)
+              ∧ IsSch (fun u => κ⁻¹ * ftLoc ε (- tLoc l τ) f u) := fun f hf =>
       ⟨((hFT 0 (OG.awayCls_zero τ fr)).2.2 f hf).1, ((hFT 0 (OG.awayCls_zero τ fr)).2.2 f hf).2.1⟩
-    have step : ∀ (Ψ : Mx D V.rank n → ℂ) (hΨ : AwayCls θ τ fr Ψ) (f : (Fin V.rank → Fin n → ℂ) → ℂ) (hf : IsSch f),
-        (ω (ι y) ⟨tens θ τ fr f Ψ, hΨ.2 f hf⟩).1 = tens θ τ fr (fun u => κ * ftLoc ε (tLoc l τ)
-          (fun u' => Complex.exp (Complex.I * (tLoc l τ : ℂ) * ((-c) * gramX ε u').trace) *
-            (κ⁻¹ * ftLoc ε (-tLoc l τ) f u')) u) (Aop (A'op Ψ)) ∧
-        tens θ τ fr f Ψ = tens θ τ fr (fun u => κ * ftLoc ε (tLoc l τ)
-          (fun u' => κ⁻¹ * ftLoc ε (-tLoc l τ) f u') u) (Aop (A'op Ψ)) := by
+    have step
+        : ∀ (Ψ : Mx D V.rank n → ℂ) (hΨ : AwayCls θ τ fr Ψ) (f : (Fin V.rank → Fin n → ℂ) → ℂ)
+            (hf : IsSch f),
+          (ω (ι y) ⟨tens θ τ fr f Ψ, hΨ.2 f hf⟩).1
+              = tens θ τ fr
+                (fun u =>
+                  κ * ftLoc ε (tLoc l τ)
+                    (fun u' =>
+                      Complex.exp (Complex.I * (tLoc l τ : ℂ) * ((-c) * gramX ε u').trace)
+                        * (κ⁻¹ * ftLoc ε (- tLoc l τ) f u'))
+                    u)
+                (Aop (A'op Ψ))
+            ∧ tens θ τ fr f Ψ
+              = tens θ τ fr
+                (fun u => κ * ftLoc ε (tLoc l τ) (fun u' => κ⁻¹ * ftLoc ε (- tLoc l τ) f u') u)
+                (Aop (A'op Ψ)) := by
       intro Ψ hΨ f hf
       obtain ⟨-, hA', hfs⟩ := hFT Ψ hΨ
       obtain ⟨-, s2, -, e2⟩ := hfs f hf
       obtain ⟨-, -, hfs'⟩ := hFT (A'op Ψ) hA'
       have sP := hphase ε (tLoc l τ) (-c) _ hcn s2
-      have e1 : ω w⁻¹ ⟨tens θ τ fr f Ψ, hΨ.2 f hf⟩ =
-          ⟨tens θ τ fr (fun u => κ⁻¹ * ftLoc ε (-tLoc l τ) f u) (A'op Ψ), hA'.2 _ s2⟩ := Subtype.ext e2
-      have e4 : ω (ι yn) ⟨tens θ τ fr (fun u => κ⁻¹ * ftLoc ε (-tLoc l τ) f u) (A'op Ψ), hA'.2 _ s2⟩ =
-          ⟨_, hA'.2 _ sP⟩ := Subtype.ext (unip (-c) yn hcn hyn (A'op Ψ) hA' _ s2)
+      have e1
+          : ω w⁻¹ ⟨tens θ τ fr f Ψ, hΨ.2 f hf⟩
+            = ⟨tens θ τ fr (fun u => κ⁻¹ * ftLoc ε (- tLoc l τ) f u) (A'op Ψ), hA'.2 _ s2⟩ :=
+        Subtype.ext e2
+      have e4
+          : ω (ι yn) ⟨tens θ τ fr (fun u => κ⁻¹ * ftLoc ε (- tLoc l τ) f u) (A'op Ψ), hA'.2 _ s2⟩
+            = ⟨_, hA'.2 _ sP⟩ :=
+        Subtype.ext (unip (-c) yn hcn hyn (A'op Ψ) hA' _ s2)
       obtain ⟨-, -, e5, -⟩ := hfs' _ sP
       obtain ⟨-, -, e6, -⟩ := hfs' _ s2
       constructor
@@ -71,9 +105,17 @@ theorem opGen_of' (hU : UnipTau) (hLv : LeviTau) (hW : WEx) (hS : SchOps) (hF : 
           rw [← mul_apply_eq_comp, ← map_mul, mul_inv_cancel, map_one, one_apply_eq_self]
         rw [e1] at hid
         rw [← e6, hid]
-    refine ⟨fun g u => (κ * ftLoc ε (tLoc l τ) (fun u' => κ⁻¹ * ftLoc ε (-tLoc l τ) f₁ u') 0)⁻¹ *
-        (κ * ftLoc ε (tLoc l τ) (fun u' => Complex.exp (Complex.I * (tLoc l τ : ℂ) * ((-c) * gramX ε u').trace) *
-          (κ⁻¹ * ftLoc ε (-tLoc l τ) g u')) u), fun g hg => ?_, fun Ψ hΨ f hf => ?_⟩
+    refine ⟨
+      fun g u =>
+        (κ * ftLoc ε (tLoc l τ) (fun u' => κ⁻¹ * ftLoc ε (- tLoc l τ) f₁ u') 0)⁻¹
+          * (κ * ftLoc ε (tLoc l τ)
+            (fun u' =>
+              Complex.exp (Complex.I * (tLoc l τ : ℂ) * ((-c) * gramX ε u').trace)
+                * (κ⁻¹ * ftLoc ε (- tLoc l τ) g u'))
+            u),
+      fun g hg => ?_,
+      fun Ψ hΨ f hf => ?_
+    ⟩
     · exact hcmul _ _ (hsch _ (hphase ε (tLoc l τ) (-c) _ hcn (hsch g hg).2)).1
     · set c₀ := κ * ftLoc ε (tLoc l τ) (fun u' => κ⁻¹ * ftLoc ε (-tLoc l τ) f₁ u') 0 with hc₀
       have hAA : AwayCls θ τ fr (Aop (A'op Ψ)) := (hFT (A'op Ψ) (hFT Ψ hΨ).2.1).1

@@ -15,9 +15,9 @@ noncomputable section
 
 def ConeTrdeg.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
-    (y : (Σ k, ι k) → Ω), Geo.Birational y → (∀ k, ∃ i, y ⟨k, i⟩ ≠ 0) →
-      Geo.IsHorizontal (Geo.mCoordIdeal y) →
-        Algebra.trdeg ℤ (Geo.MRing ι ⧸ Geo.mCoordIdeal y) = Algebra.trdeg ℤ Ω + Fintype.card K
+      (y : (Σ k, ι k) → Ω),
+    Geo.Birational y → (∀ k, ∃ i, y ⟨k, i⟩ ≠ 0) → Geo.IsHorizontal (Geo.mCoordIdeal y)
+      → Algebra.trdeg ℤ (Geo.MRing ι ⧸ Geo.mCoordIdeal y) = Algebra.trdeg ℤ Ω + Fintype.card K
 
 section Examples
 

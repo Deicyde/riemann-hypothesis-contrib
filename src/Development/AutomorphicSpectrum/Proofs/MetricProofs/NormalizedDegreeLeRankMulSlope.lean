@@ -5,7 +5,8 @@ public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsOrthFu
 
 @[expose] public section
 
-open GroundTheory.Heights₂.Heights NumberField TensorProduct ComplexAt GlobalTheory.CompanionTheory.Ar Matrix
+open GroundTheory.Heights₂.Heights NumberField TensorProduct ComplexAt
+  GlobalTheory.CompanionTheory.Ar Matrix
 open scoped BigOperators ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.Ar.DegSlope
@@ -44,12 +45,14 @@ private lemma degreeWith_bot {K : Type} [Field K] [NumberField K] (E : Hermitian
   rw [hcard]
   simp [hdet]
 
-theorem normDegree_le_rank_mul_of_slopeMax_le : ∀ (K : Type) [Field K] [NumberField K] (E : HermitianBundle.{0} K) (μ : ℝ), E.slopeMax ≤ (μ : EReal) → ∀ F : Submodule (𝓞 K) E.carrier, E.normDegree F ≤ E.rank F * μ := by
+theorem normDegree_le_rank_mul_of_slopeMax_le
+    : ∀ (K : Type) [Field K] [NumberField K] (E : HermitianBundle.{0} K) (μ : ℝ),
+      E.slopeMax ≤ (μ : EReal)
+        → ∀ F : Submodule (𝓞 K) E.carrier, E.normDegree F ≤ E.rank F * μ := by
   intro K _ _ E μ hμ F
   by_cases hF : F = ⊥
   · subst hF
-    have hr : E.rank ⊥ = 0 := by
-      simp [HermitianBundle.rank]
+    have hr : E.rank ⊥ = 0 := by simp [HermitianBundle.rank]
     rw [hr, Nat.cast_zero, zero_mul]
     unfold HermitianBundle.normDegree HermitianBundle.degree
     rw [degreeWith_bot, zero_div]

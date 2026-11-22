@@ -13,7 +13,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open MvPolynomial ReciprocityTheory.MultiplicativeHeights GlobalTheory.HSChoice GlobalTheory.PencilDisc
+open MvPolynomial ReciprocityTheory.MultiplicativeHeights GlobalTheory.HSChoice
+  GlobalTheory.PencilDisc
 
 namespace GlobalTheory.PencilDisc.GenericLine
 
@@ -23,7 +24,7 @@ abbrev Idx := (Fin D × Fin N) ⊕ (Fin N ⊕ Fin N)
 
 def shiftFun (c : F) : Option (Idx D N) → MvPolynomial (Option (Idx D N)) F
   | some (Sum.inr (Sum.inl j)) =>
-      X (some (Sum.inr (Sum.inl j))) + C c * (X (some (Sum.inr (Sum.inr j))) * X none)
+    X (some (Sum.inr (Sum.inl j))) + C c * (X (some (Sum.inr (Sum.inr j))) * X none)
   | o => X o
 
 def shift (c : F) : MvPolynomial (Option (Idx D N)) F →ₐ[F] MvPolynomial (Option (Idx D N)) F :=
@@ -38,35 +39,49 @@ theorem shift_comp (c : F) : (shift F D N c).comp (shift F D N (-c)) = AlgHom.id
   · simp [shift, shiftFun]
 
 def theta : MvPolynomial (Option (Idx D N)) F ≃ₐ[F] MvPolynomial (Option (Idx D N)) F :=
-  AlgEquiv.ofAlgHom (shift F D N 1) (shift F D N (-1))
-    (by simpa using shift_comp F D N 1) (by simpa using shift_comp F D N (-1))
+  AlgEquiv.ofAlgHom (shift F D N 1) (shift F D N (-1)) (by simpa using shift_comp F D N 1)
+    (by simpa using shift_comp F D N (-1))
 
 def place : Fin (D + 1) × Fin N → Option (Idx D N) := fun p =>
-  Fin.lastCases (motive := fun _ => Option (Idx D N)) (some (Sum.inr (Sum.inl p.2)))
-    (fun i => some (Sum.inl (i, p.2))) p.1
+  Fin.lastCases
+    (motive := fun _ => Option (Idx D N))
+    (some (Sum.inr (Sum.inl p.2)))
+    (fun i => some (Sum.inl (i, p.2)))
+    p.1
 
 theorem place_injective : Function.Injective (place D N) := by
   rintro ⟨a, b⟩ ⟨a', b'⟩ h
   induction a using Fin.lastCases <;> induction a' using Fin.lastCases <;> simp_all [place]
 
-theorem line_eq (f : MvPolynomial (Fin (D + 1) × Fin N) F) :
-    GlobalTheory.PencilDisc.line (fun i j => (X (Sum.inl (i, j)) : MvPolynomial (Idx D N) F))
-      (fun j => X (Sum.inr (Sum.inl j))) (fun j => X (Sum.inr (Sum.inr j))) f =
-    optionEquivLeft F (Idx D N) (theta F D N (rename (place D N) f)) := by
-  have key : (aeval (join (fun i j => (Polynomial.C (X (Sum.inl (i, j)) : MvPolynomial (Idx D N) F)))
-      (fun j => Polynomial.C (X (Sum.inr (Sum.inl j))) + Polynomial.C (X (Sum.inr (Sum.inr j))) * Polynomial.X)) :
-      MvPolynomial (Fin (D + 1) × Fin N) F →ₐ[F] Polynomial (MvPolynomial (Idx D N) F)) =
-      ((optionEquivLeft F (Idx D N)).toAlgHom.comp ((theta F D N).toAlgHom.comp (rename (place D N)))) := by
+theorem line_eq (f : MvPolynomial (Fin (D + 1) × Fin N) F)
+    : GlobalTheory.PencilDisc.line
+        (fun i j => (X (Sum.inl (i, j)) : MvPolynomial (Idx D N) F))
+        (fun j => X (Sum.inr (Sum.inl j)))
+        (fun j => X (Sum.inr (Sum.inr j)))
+        f
+      = optionEquivLeft F (Idx D N) (theta F D N (rename (place D N) f)) := by
+  have key
+      : (aeval (join
+            (fun i j => (Polynomial.C (X (Sum.inl (i, j)) : MvPolynomial (Idx D N) F)))
+            (fun j =>
+              Polynomial.C (X (Sum.inr (Sum.inl j)))
+                + Polynomial.C (X (Sum.inr (Sum.inr j))) * Polynomial.X))
+          : MvPolynomial (Fin (D + 1) × Fin N) F →ₐ[F] Polynomial (MvPolynomial (Idx D N) F))
+        = ((optionEquivLeft F (Idx D N)).toAlgHom.comp
+          ((theta F D N).toAlgHom.comp (rename (place D N)))) := by
     apply MvPolynomial.algHom_ext
     rintro ⟨i, j⟩
-    induction i using Fin.lastCases <;> simp [join, place, theta, shift, shiftFun, AlgEquiv.ofAlgHom_apply]
+    induction i using Fin.lastCases
+      <;> simp [join, place, theta, shift, shiftFun, AlgEquiv.ofAlgHom_apply]
   exact congrArg (fun φ => φ f) key
 
 end GlobalTheory.PencilDisc.GenericLine
 
-private theorem irreducible_rename_of_injective' {σ τ K : Type} [Field K] (g : σ → τ)
-    (hg : Function.Injective g) (f : MvPolynomial σ K) (hf : Irreducible f) :
-    Irreducible (rename g f) := by
+private theorem irreducible_rename_of_injective'
+    {σ τ K : Type} [Field K]
+    (g : σ → τ) (hg : Function.Injective g)
+    (f : MvPolynomial σ K) (hf : Irreducible f)
+    : Irreducible (rename g f) := by
   classical
   have hk : ∀ p : MvPolynomial σ K, killCompl hg (rename g p) = p := killCompl_rename_app hg
   have hf0 : rename g f ≠ 0 := by
@@ -104,12 +119,14 @@ private theorem irreducible_rename_of_injective' {σ τ K : Type} [Field K] (g :
     · exact Or.inl (h.map _)
     · exact Or.inr (h.map _)
 
-
 open GlobalTheory.PencilDisc.GenericLine in
-theorem GlobalTheory.PencilDisc.irreducible_line_generic (F : Type) [Field F] (D N : ℕ)
-    (f : MvPolynomial (Fin (D + 1) × Fin N) F) (hf : Irreducible f) :
-    Irreducible (GlobalTheory.PencilDisc.line
-      (fun i j => (MvPolynomial.X (Sum.inl (i, j)) : MvPolynomial ((Fin D × Fin N) ⊕ (Fin N ⊕ Fin N)) F))
-      (fun j => MvPolynomial.X (Sum.inr (Sum.inl j))) (fun j => MvPolynomial.X (Sum.inr (Sum.inr j))) f) := by
+theorem GlobalTheory.PencilDisc.irreducible_line_generic
+    (F : Type) [Field F] (D N : ℕ) (f : MvPolynomial (Fin (D + 1) × Fin N) F) (hf : Irreducible f)
+    : Irreducible (GlobalTheory.PencilDisc.line
+      (fun i j =>
+        (MvPolynomial.X (Sum.inl (i, j)) : MvPolynomial ((Fin D × Fin N) ⊕ (Fin N ⊕ Fin N)) F))
+      (fun j => MvPolynomial.X (Sum.inr (Sum.inl j)))
+      (fun j => MvPolynomial.X (Sum.inr (Sum.inr j)))
+      f) := by
   rw [line_eq F D N f, MulEquiv.irreducible_iff, MulEquiv.irreducible_iff]
   exact irreducible_rename_of_injective' (place D N) (place_injective D N) f hf

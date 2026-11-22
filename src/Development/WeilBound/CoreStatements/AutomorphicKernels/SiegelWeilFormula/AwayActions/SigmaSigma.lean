@@ -12,11 +12,13 @@ public import Development.WeilBound.ThetaLifts.LatticeBasics.ConstIdele
 noncomputable section
 
 open scoped TensorProduct Matrix
-open NumberField Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 
 namespace PositivityTheory.SiegelWeilFormula.KAway
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem cA_inclR (e : E) : cA σ (inclR (F := F) (AF F) e) = inclR (F := F) (AF F) (σ e) := by
   unfold cA inclR
@@ -42,7 +44,8 @@ theorem sigma_sigma' (hcm : IsCMExt F E σ) (a : E) : σ (σ a) = a := by
   apply τ.injective
   rw [hcm.2.2.2 τ, hcm.2.2.2 τ, star_star]
 
-private theorem isPair_and_isPair_of_isTriple (hcm : IsCMExt F E σ) : ∃ δ : E, δ ≠ 0 ∧ σ δ = -δ := by
+private theorem isPair_and_isPair_of_isTriple (hcm : IsCMExt F E σ)
+    : ∃ δ : E, δ ≠ 0 ∧ σ δ = -δ := by
   have hσσ := isHecke_div_and_resEtaPow_div hcm
   unfold IsCMExt at hcm
   obtain ⟨-, hE, -, h⟩ := hcm
@@ -65,8 +68,8 @@ private theorem isPair_and_isPair_of_isTriple (hcm : IsCMExt F E σ) : ∃ δ : 
   rw [hfix] at hx
   exact hx.symm
 
-private theorem exists_trace_zero_generator_of_isCMExt (hcm : IsCMExt F E σ) :
-    ∃ δ : E, δ ≠ 0 ∧ σ δ = -δ ∧ ∀ e : E, ∃ s t : F, e = algebraMap F E s + t • δ := by
+private theorem exists_trace_zero_generator_of_isCMExt (hcm : IsCMExt F E σ)
+    : ∃ δ : E, δ ≠ 0 ∧ σ δ = -δ ∧ ∀ e : E, ∃ s t : F, e = algebraMap F E s + t • δ := by
   obtain ⟨δ, hδ0, hδ⟩ := isPair_and_isPair_of_isTriple hcm
   have hrank : Module.finrank F E = 2 := by
     unfold IsCMExt at hcm
@@ -117,10 +120,12 @@ theorem sigma_fix (hcm : IsCMExt F E σ) (e : E) : σ e = e ↔ e ∈ (algebraMa
     exact σ.commutes f
 
 theorem exists_delta (hcm : IsCMExt F E σ) : ∃ δ : E, δ ≠ 0 ∧ σ δ = -δ := by
-  obtain ⟨δ, h1, h2⟩ := Formalism.IndefR.Fin.U1.exists_delta σ (sigma_sigma' hcm) (sigma_fix hcm) hcm.2.2.1
+  obtain ⟨δ, h1, h2⟩ :=
+    Formalism.IndefR.Fin.U1.exists_delta σ (sigma_sigma' hcm) (sigma_fix hcm) hcm.2.2.1
   exact ⟨δ, h2, h1⟩
 
-theorem nrm_exists (hcm : IsCMExt F E σ) (z : AE F E) : ∃ a : AF F, algebraMap (AF F) (AE F E) a = z * cA σ z := by
+theorem nrm_exists (hcm : IsCMExt F E σ) (z : AE F E)
+    : ∃ a : AF F, algebraMap (AF F) (AE F E) a = z * cA σ z := by
   obtain ⟨δ, hδ0, hδ, hdec⟩ := exists_trace_zero_generator_of_isCMExt hcm
   have hfixδ : σ (δ * δ) = δ * δ := by rw [map_mul, hδ, neg_mul_neg]
   obtain ⟨d, hd⟩ := (sigma_fix hcm (δ * δ)).1 hfixδ
@@ -140,11 +145,12 @@ theorem nrm_exists (hcm : IsCMExt F E σ) (z : AE F E) : ∃ a : AF F, algebraMa
   refine ⟨x * x - algebraMap F (AF F) d * (y * y), ?_⟩
   unfold cA
   rw [Algebra.TensorProduct.algebraMap_apply]
-  simp only [map_add (f := _), Algebra.TensorProduct.map_tmul, AlgHom.id_apply, map_one, hδ, add_mul, mul_add,
-    Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul, TensorProduct.tmul_neg, mul_neg]
+  simp only [map_add (f := _), Algebra.TensorProduct.map_tmul, AlgHom.id_apply, map_one, hδ,
+    add_mul, mul_add, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul, TensorProduct.tmul_neg,
+    mul_neg]
   rw [Algebra.algebraMap_self, RingHom.id_apply, ← hd, Algebra.algebraMap_eq_smul_one (A := E) d,
-    TensorProduct.tmul_smul, TensorProduct.smul_tmul', Algebra.smul_def, mul_comm y x, sub_eq_add_neg,
-    TensorProduct.add_tmul, TensorProduct.neg_tmul]
+    TensorProduct.tmul_smul, TensorProduct.smul_tmul', Algebra.smul_def, mul_comm y x,
+    sub_eq_add_neg, TensorProduct.add_tmul, TensorProduct.neg_tmul]
   abel
 
 end PositivityTheory.SiegelWeilFormula.KAway

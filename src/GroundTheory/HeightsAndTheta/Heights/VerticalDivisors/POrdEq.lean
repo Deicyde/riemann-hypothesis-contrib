@@ -13,22 +13,27 @@ open MvPolynomial NumberField IsDedekindDomain
 
 noncomputable section
 
-theorem specComps_finite {K : Type*} [Field K] [NumberField K] {n : ℕ}
-    (I : Ideal (MvPolynomial (Fin n) K)) (v : HeightOneSpectrum (𝓞 K)) : (specComps I v).Finite :=
+theorem specComps_finite
+    {K : Type*} [Field K] [NumberField K]
+    {n : ℕ} (I : Ideal (MvPolynomial (Fin n) K))
+    (v : HeightOneSpectrum (𝓞 K))
+    : (specComps I v).Finite :=
   (Ideal.finite_minimalPrimes_of_isNoetherianRing _ _).subset fun _ hW => hW.1
 
-theorem vertComps_finite' {K : Type*} [Field K] [NumberField K] {n : ℕ}
-    (I : Ideal (MvPolynomial (Fin n) K)) (u : Fin n → 𝓞 K) (v : HeightOneSpectrum (𝓞 K)) :
-    (vertComps I u v).Finite :=
+theorem vertComps_finite'
+    {K : Type*} [Field K] [NumberField K]
+    {n : ℕ} (I : Ideal (MvPolynomial (Fin n) K)) (u : Fin n → 𝓞 K)
+    (v : HeightOneSpectrum (𝓞 K))
+    : (vertComps I u v).Finite :=
   (Ideal.finite_minimalPrimes_of_isNoetherianRing _ _).subset fun _ hW => hW.1.1
 
-
 open Classical in
-theorem OrdEq.proof (hni : NormIdentity.Statement) (hnl : NormLength.Statement)
-    (hld : LengthDecomp.Statement) (hmax : SpecMax.Statement) (hlen : SpecLength.Statement)
-    (hres : SpecResidue.Statement) (hvs : VertSpec.Statement) (hinj : SecBLinInj.Statement)
-    (hfin : SecBFinite.Statement) (htf : SecBTorsionFree.Statement) (hdvr : ParDVRIsDVR.Statement) :
-    OrdEq.Statement := by
+theorem OrdEq.proof
+    (hni : NormIdentity.Statement) (hnl : NormLength.Statement) (hld : LengthDecomp.Statement)
+    (hmax : SpecMax.Statement) (hlen : SpecLength.Statement) (hres : SpecResidue.Statement)
+    (hvs : VertSpec.Statement) (hinj : SecBLinInj.Statement) (hfin : SecBFinite.Statement)
+    (htf : SecBTorsionFree.Statement) (hdvr : ParDVRIsDVR.Statement)
+    : OrdEq.Statement := by
   intro K _ _ n e I g u v hI hf hu hprim
   have := hdvr K e n v
   set f := g.map (algebraMap (𝓞 K) K)
@@ -64,9 +69,10 @@ theorem OrdEq.proof (hni : NormIdentity.Statement) (hnl : NormLength.Statement)
       rw [← (hW 𝔫₁).2, ← (hW 𝔫₂).2, h]
     · refine ⟨⟨secIdealOf e I v W', hmax1 W' hW'⟩, Set.mem_univ _, ?_⟩
       exact (hWu _ W' ⟨hW', rfl⟩).symm
-  rw [← finsum_mem_univ, finsum_mem_eq_of_bijOn W hbij (g := G) fun 𝔫 _ => by
-    rw [hlen K n e I f u v hI hf hu 𝔫 (W 𝔫) (hW 𝔫).1 (hW 𝔫).2, ← (hW 𝔫).2,
-      hres K n e I f v hI hf (W 𝔫) (hW 𝔫).1]]
+  rw [← finsum_mem_univ,
+    finsum_mem_eq_of_bijOn W hbij (g := G) fun 𝔫 _ => by
+      rw [hlen K n e I f u v hI hf hu 𝔫 (W 𝔫) (hW 𝔫).1 (hW 𝔫).2, ← (hW 𝔫).2,
+        hres K n e I f v hI hf (W 𝔫) (hW 𝔫).1]]
 
   have hs := specComps_finite I v
   have hv := vertComps_finite' I u v

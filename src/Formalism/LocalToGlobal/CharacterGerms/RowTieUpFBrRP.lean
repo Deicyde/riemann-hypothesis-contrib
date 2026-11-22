@@ -22,8 +22,7 @@ variable {C : Type} [Field C] (V : VF C)
 
 def bb : NNReal := ((V.l : ℕ) : NNReal)⁻¹
 
-theorem bb_pos : 0 < bb V := by
-  simp [bb, V.l_prime.pos]
+theorem bb_pos : 0 < bb V := by simp [bb, V.l_prime.pos]
 
 theorem bb_lt : bb V < 1 := by
   have h : (1 : NNReal) < ((V.l : ℕ) : NNReal) := by exact_mod_cast V.l_prime.one_lt
@@ -42,7 +41,8 @@ def vmFun (x : C) : NNReal := if x = 0 then 0 else bb V ^ ((V.v x).untopD 0)
 
 variable {V}
 
-theorem vmFun_of {x : C} (hx : x ≠ 0) {t : ℝ} (ht : V.v x = (t : WithTop ℝ)) : vmFun V x = bb V ^ t := by
+theorem vmFun_of {x : C} (hx : x ≠ 0) {t : ℝ} (ht : V.v x = (t : WithTop ℝ))
+    : vmFun V x = bb V ^ t := by
   simp [vmFun, hx, ht]
 
 variable (V)
@@ -50,8 +50,7 @@ variable (V)
 def vmOf : Valuation C NNReal where
   toFun := vmFun V
   map_zero' := by simp [vmFun]
-  map_one' := by
-    rw [vmFun_of one_ne_zero (t := 0) (by rw [V.v.map_one]; rfl), NNReal.rpow_zero]
+  map_one' := by rw [vmFun_of one_ne_zero (t := 0) (by rw [V.v.map_one]; rfl), NNReal.rpow_zero]
   map_mul' := by
     intro x y
     by_cases hx : x = 0
@@ -60,8 +59,9 @@ def vmOf : Valuation C NNReal where
     · simp [vmFun, hy]
     obtain ⟨t, ht⟩ := exists_real (V := V) hx
     obtain ⟨s, hs⟩ := exists_real (V := V) hy
-    rw [vmFun_of hx ht, vmFun_of hy hs, vmFun_of (mul_ne_zero hx hy) (t := t + s)
-      (by rw [V.v.map_mul, ht, hs]; rfl), NNReal.rpow_add (bb_pos V).ne']
+    rw [vmFun_of hx ht, vmFun_of hy hs,
+      vmFun_of (mul_ne_zero hx hy) (t := t + s) (by rw [V.v.map_mul, ht, hs]; rfl),
+      NNReal.rpow_add (bb_pos V).ne']
   map_add_le_max' := by
     intro x y
     by_cases hxy : x + y = 0
@@ -76,13 +76,16 @@ def vmOf : Valuation C NNReal where
     rw [vmFun_of hx ht, vmFun_of hy hs, vmFun_of hxy hr]
     rcases V.v.map_add' x y with h | h
     · rw [ht, hr] at h
-      exact le_max_of_le_left (NNReal.rpow_le_rpow_of_exponent_ge (bb_pos V) (bb_lt V).le (WithTop.coe_le_coe.mp h))
+      exact le_max_of_le_left (NNReal.rpow_le_rpow_of_exponent_ge (bb_pos V) (bb_lt V).le
+        (WithTop.coe_le_coe.mp h))
     · rw [hs, hr] at h
-      exact le_max_of_le_right (NNReal.rpow_le_rpow_of_exponent_ge (bb_pos V) (bb_lt V).le (WithTop.coe_le_coe.mp h))
+      exact le_max_of_le_right (NNReal.rpow_le_rpow_of_exponent_ge (bb_pos V) (bb_lt V).le
+        (WithTop.coe_le_coe.mp h))
 
 variable {V}
 
-theorem vmOf_of {x : C} (hx : x ≠ 0) {t : ℝ} (ht : V.v x = (t : WithTop ℝ)) : vmOf V x = bb V ^ t := by
+theorem vmOf_of {x : C} (hx : x ≠ 0) {t : ℝ} (ht : V.v x = (t : WithTop ℝ))
+    : vmOf V x = bb V ^ t := by
   show vmFun V x = _
   exact vmFun_of hx ht
 
@@ -122,7 +125,9 @@ theorem integers_vmOf : (vmOf V).Integers V.RR := by
     rw [ht]
     refine WithTop.coe_le_coe.mpr ?_
     by_contra hneg
-    exact absurd hr (not_le.mpr (NNReal.one_lt_rpow_of_pos_of_lt_one_of_neg (bb_pos V) (bb_lt V) (not_le.mp hneg)))
+    exact absurd hr
+      (not_le.mpr (NNReal.one_lt_rpow_of_pos_of_lt_one_of_neg (bb_pos V) (bb_lt V)
+        (not_le.mp hneg)))
 
 theorem not_isUnit_of_mm {x : V.RR} (hx : V.MM (x : C)) : ¬ IsUnit x := by
   intro hu
@@ -134,7 +139,8 @@ theorem not_isUnit_of_mm {x : V.RR} (hx : V.MM (x : C)) : ¬ IsUnit x := by
   rw [AddValuation.map_mul, AddValuation.map_one] at h2
   have hy0 : (0 : WithTop ℝ) ≤ V.v (y : C) := y.2
   have hx0 : (0 : WithTop ℝ) < V.v (x : C) := hx
-  have h3 : (0 : WithTop ℝ) < V.v (x : C) + V.v (y : C) := lt_of_lt_of_le hx0 (le_add_of_nonneg_right hy0)
+  have h3 : (0 : WithTop ℝ) < V.v (x : C) + V.v (y : C) :=
+    lt_of_lt_of_le hx0 (le_add_of_nonneg_right hy0)
   rw [h2] at h3
   exact lt_irrefl _ h3
 
@@ -142,8 +148,8 @@ theorem v_l_pow (n : ℕ) : V.v ((V.l : C) ^ n) = ((n : ℝ) : WithTop ℝ) := b
   rw [AddValuation.map_pow, V.v_l]
   simp
 
-theorem mem_pow_iff (n : ℕ) (x : V.RR) :
-    x ∈ (Ideal.span {((V.l : ℕ) : V.RR)} ^ n • ⊤ : Submodule V.RR V.RR) ↔ V.Ge n (x : C) := by
+theorem mem_pow_iff (n : ℕ) (x : V.RR)
+    : x ∈ (Ideal.span {((V.l : ℕ) : V.RR)} ^ n • ⊤ : Submodule V.RR V.RR) ↔ V.Ge n (x : C) := by
   have hl : (V.l : C) ≠ 0 := by
     intro h
     have h1 := V.v_l
@@ -159,15 +165,16 @@ theorem mem_pow_iff (n : ℕ) (x : V.RR) :
     have hy : (0 : WithTop ℝ) ≤ V.v (y : C) := y.2
     exact le_add_of_nonneg_right hy
   · intro hx
-    have hxy : (x : C) = (V.l : C) ^ n * ((x : C) / (V.l : C) ^ n) := by
-      field_simp
+    have hxy : (x : C) = (V.l : C) ^ n * ((x : C) / (V.l : C) ^ n) := by field_simp
     have h2 : V.v (x : C) = ((n : ℝ) : WithTop ℝ) + V.v ((x : C) / (V.l : C) ^ n) := by
       conv_lhs => rw [hxy]
       rw [AddValuation.map_mul, v_l_pow]
-    have h3 : ((n : ℝ) : WithTop ℝ) + 0 ≤ ((n : ℝ) : WithTop ℝ) + V.v ((x : C) / (V.l : C) ^ n) := by
+    have h3
+        : ((n : ℝ) : WithTop ℝ) + 0 ≤ ((n : ℝ) : WithTop ℝ) + V.v ((x : C) / (V.l : C) ^ n) := by
       rw [add_zero, ← h2]
       exact hx
-    have hy : V.Ge 0 ((x : C) / (V.l : C) ^ n) := (WithTop.add_le_add_iff_left WithTop.coe_ne_top).mp h3
+    have hy : V.Ge 0 ((x : C) / (V.l : C) ^ n) :=
+      (WithTop.add_le_add_iff_left WithTop.coe_ne_top).mp h3
     refine ⟨⟨(x : C) / (V.l : C) ^ n, hy⟩, ?_⟩
     apply Subtype.ext
     show (x : C) = ((((V.l : ℕ) : V.RR) ^ n : V.RR) : C) * ((x : C) / (V.l : C) ^ n)
@@ -189,19 +196,22 @@ theorem hausdorff_RR : IsHausdorff (Ideal.span {((V.l : ℕ) : V.RR)}) V.RR wher
     exact absurd (WithTop.coe_le_coe.mp h1) (not_le.mpr hn)
 
 theorem precomplete_RR
-    (hc : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n)) :
-    IsPrecomplete (Ideal.span {((V.l : ℕ) : V.RR)}) V.RR where
+    (hc : ∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
+    : IsPrecomplete (Ideal.span {((V.l : ℕ) : V.RR)}) V.RR where
   prec' := by
     intro f hf
-    obtain ⟨x, hx⟩ := hc (fun n => (f n : C)) (fun n => by
-      have h1 := hf (Nat.le_succ n)
-      rw [SModEq.sub_mem, mem_pow_iff] at h1
-      have h2 := h1.neg
-      have e : -(((f n - f (n + 1) : V.RR)) : C) = (f (n + 1) : C) - (f n : C) := by
-        push_cast
-        ring
-      rw [e] at h2
-      exact h2)
+    obtain ⟨x, hx⟩ :=
+      hc
+        (fun n => (f n : C))
+        (fun n => by
+          have h1 := hf (Nat.le_succ n)
+          rw [SModEq.sub_mem, mem_pow_iff] at h1
+          have h2 := h1.neg
+          have e : -(((f n - f (n + 1) : V.RR)) : C) = (f (n + 1) : C) - (f n : C) := by
+            push_cast
+            ring
+          rw [e] at h2
+          exact h2)
     have hx0 : V.Ge 0 x := by
       have h1 : V.Ge 0 (x - (f 0 : C)) := by simpa using hx 0
       have h2 : V.Ge 0 ((f 0 : V.RR) : C) := (f 0).2
@@ -224,15 +234,17 @@ variable (l : ℕ) [Fact l.Prime] (S : Type) [CommRing S]
 
 theorem ringChar_dvd_pow (n : ℕ) : ringChar (S ⧸ Ideal.span {(l : S)} ^ n) ∣ l ^ n := by
   apply ringChar.dvd
-  have h := Ideal.Quotient.eq_zero_iff_mem.mpr
-    (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self (l : S)) n : (l : S) ^ n ∈ Ideal.span {(l : S)} ^ n)
+  have h :=
+    Ideal.Quotient.eq_zero_iff_mem.mpr
+      (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self (l : S)) n
+        : (l : S) ^ n ∈ Ideal.span {(l : S)} ^ n)
   simpa using h
 
 def zlStep (n : ℕ) : ℤ_[l] →+* S ⧸ Ideal.span {(l : S)} ^ n :=
   (ZMod.castHom (ringChar_dvd_pow l S n) (S ⧸ Ideal.span {(l : S)} ^ n)).comp (PadicInt.toZModPow n)
 
-theorem zlStep_compat {m n : ℕ} (hle : m ≤ n) :
-    (Ideal.Quotient.factorPow (Ideal.span {(l : S)}) hle).comp (zlStep l S n) = zlStep l S m := by
+theorem zlStep_compat {m n : ℕ} (hle : m ≤ n)
+    : (Ideal.Quotient.factorPow (Ideal.span {(l : S)}) hle).comp (zlStep l S n) = zlStep l S m := by
   unfold zlStep
   rw [← PadicInt.zmod_cast_comp_toZModPow m n hle, ← RingHom.comp_assoc, ← RingHom.comp_assoc]
   congr 1
@@ -270,8 +282,7 @@ theorem ringPkSt_holds : RingPkSt := by
       exact le_antisymm (not_lt.mp h2) h1
     have hinv : V.Ge 0 ((x : C)⁻¹) := by
       show ((0 : ℝ) : WithTop ℝ) ≤ V.v ((x : C)⁻¹)
-      have h3 : V.v ((x : C) * (x : C)⁻¹) = 0 := by
-        rw [mul_inv_cancel₀ hx0, AddValuation.map_one]
+      have h3 : V.v ((x : C) * (x : C)⁻¹) = 0 := by rw [mul_inv_cancel₀ hx0, AddValuation.map_one]
       rw [AddValuation.map_mul, hv0, zero_add] at h3
       rw [h3]
       rfl
@@ -279,32 +290,36 @@ theorem ringPkSt_holds : RingPkSt := by
     apply Subtype.ext
     show (x : C) * (x : C)⁻¹ = 1
     exact mul_inv_cancel₀ hx0
-  have hloc : IsLocalRing V.RR := IsLocalRing.of_nonunits_add (fun a b ha hb => by
-    have ha' : V.MM (a : C) := by
-      by_contra h
-      exact (mem_nonunits_iff.mp ha) (hunit a h)
-    have hb' : V.MM (b : C) := by
-      by_contra h
-      exact (mem_nonunits_iff.mp hb) (hunit b h)
-    exact mem_nonunits_iff.mpr (not_isUnit_of_mm (V := V) (x := a + b)
-      (lt_of_lt_of_le (lt_min ha' hb') (V.v.map_add _ _))))
+  have hloc : IsLocalRing V.RR :=
+    IsLocalRing.of_nonunits_add (fun a b ha hb => by
+      have ha' : V.MM (a : C) := by
+        by_contra h
+        exact (mem_nonunits_iff.mp ha) (hunit a h)
+      have hb' : V.MM (b : C) := by
+        by_contra h
+        exact (mem_nonunits_iff.mp hb) (hunit b h)
+      exact mem_nonunits_iff.mpr (not_isUnit_of_mm (V := V) (x := a + b)
+        (lt_of_lt_of_le (lt_min ha' hb') (V.v.map_add _ _))))
   haveI hcpl : IsAdicComplete (Ideal.span {((V.l : ℕ) : V.RR)}) V.RR :=
     { haus' := (hausdorff_RR (V := V)).haus', prec' := (precomplete_RR (V := V) hc).prec' }
   haveI := hloc
-  exact ⟨{ vm := vmOf V
-           tie := valTie_vmOf
-           int := integers_vmOf
-           pos := by
-             rw [vmOf_l]
-             exact_mod_cast bb_pos V
-           lt := by
-             rw [vmOf_l]
-             exact_mod_cast bb_lt V
-           nonunit := not_isUnit_of_mm (V := V) hvl
-           cpl := hcpl
-           loc := hloc
-           alg := (zlHom V.l V.RR).toAlgebra
-           mm := fun x hx => (IsLocalRing.mem_maximalIdeal x).mpr (mem_nonunits_iff.mpr (not_isUnit_of_mm hx)) }⟩
+  exact ⟨{
+    vm := vmOf V
+    tie := valTie_vmOf
+    int := integers_vmOf
+    pos := by
+      rw [vmOf_l]
+      exact_mod_cast bb_pos V
+    lt := by
+      rw [vmOf_l]
+      exact_mod_cast bb_lt V
+    nonunit := not_isUnit_of_mm (V := V) hvl
+    cpl := hcpl
+    loc := hloc
+    alg := (zlHom V.l V.RR).toAlgebra
+    mm := fun x hx =>
+      (IsLocalRing.mem_maximalIdeal x).mpr (mem_nonunits_iff.mpr (not_isUnit_of_mm hx))
+  }⟩
 
 end UpFBr
 

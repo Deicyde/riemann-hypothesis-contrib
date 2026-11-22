@@ -8,16 +8,20 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.LogDR
 
 set_option autoImplicit false
 
 namespace GlobalTheory.LogDR
 
-theorem smul_mem_spanForms_of_mul_mem {K : Type} [Field K] {M M' : Set K} {H : Set Ω[K⁄ℤ]} {a : ℕ} (g : K)
-    (hg : ∀ c ∈ M, g * c ∈ M') {η : abelian₂ K} (hη : η ∈ spanForms M H a) :
-    g • η ∈ spanForms M' H a := by
+theorem smul_mem_spanForms_of_mul_mem
+    {K : Type} [Field K]
+    {M M' : Set K} {H : Set Ω[K⁄ℤ]} {a : ℕ}
+    (g : K) (hg : ∀ c ∈ M, g * c ∈ M')
+    {η : abelian₂ K} (hη : η ∈ spanForms M H a)
+    : g • η ∈ spanForms M' H a := by
   induction hη using AddSubgroup.closure_induction with
   | mem x hx =>
     obtain ⟨c, hc, v, hv, rfl⟩ := hx
@@ -27,9 +31,14 @@ theorem smul_mem_spanForms_of_mul_mem {K : Type} [Field K] {M M' : Set K} {H : S
   | add x y _ _ hx hy => rw [smul_add]; exact add_mem hx hy
   | neg x _ hx => rw [smul_neg]; exact neg_mem hx
 
-theorem mem_logAt_add_iff {X : Scheme.{0}} [IsIntegral X] (Z : Set X) (G D : CartierDiv X) (a : ℕ)
-    (y : X) (g : X.functionFieldˣ) (η : abelian₂ X.functionField) (hD : D.IsEqn y g) :
-    η ∈ logAt Z (G + D) a y ↔ (g : X.functionField) • η ∈ logAt Z G a y := by
+theorem mem_logAt_add_iff
+    {X : Scheme.{0}} [IsIntegral X]
+    (Z : Set X)
+    (G D : CartierDiv X)
+    (a : ℕ)
+    (y : X) (g : X.functionFieldˣ)
+    (η : abelian₂ X.functionField) (hD : D.IsEqn y g)
+    : η ∈ logAt Z (G + D) a y ↔ (g : X.functionField) • η ∈ logAt Z G a y := by
   obtain ⟨e, hG⟩ := G.exists_isEqn y
   have hGD := hG.add hD
   constructor
@@ -42,8 +51,10 @@ theorem mem_logAt_add_iff {X : Scheme.{0}} [IsIntegral X] (Z : Set X) (G D : Car
     convert hc using 1
     ring
   · intro h
-    have h' := smul_mem_spanForms_of_mul_mem (M' := {c | (G + D).RegularAt y c}) (g : X.functionField)⁻¹
-      (fun c hc => ?_) h
+    have h' :=
+      smul_mem_spanForms_of_mul_mem (M' := {c | (G + D).RegularAt y c}) (g : X.functionField)⁻¹
+        (fun c hc => ?_)
+        h
     · rwa [inv_smul_smul₀ g.ne_zero] at h'
     · change (G + D).RegularAt y _
       change G.RegularAt y c at hc
@@ -52,9 +63,10 @@ theorem mem_logAt_add_iff {X : Scheme.{0}} [IsIntegral X] (Z : Set X) (G D : Car
       convert hc using 1
       field_simp
 
-theorem logtwist : ∀ (X : Scheme.{0}) [IsIntegral X] (Z : Set X) (G D : CartierDiv X) (a : ℕ) (y : X)
-    (g : X.functionFieldˣ) (η : abelian₂ X.functionField), D.IsEqn y g →
-    (η ∈ logAt Z (G + D) a y ↔ (g : X.functionField) • η ∈ logAt Z G a y) :=
+theorem logtwist
+    : ∀ (X : Scheme.{0}) [IsIntegral X] (Z : Set X) (G D : CartierDiv X) (a : ℕ) (y : X)
+        (g : X.functionFieldˣ) (η : abelian₂ X.functionField),
+      D.IsEqn y g → (η ∈ logAt Z (G + D) a y ↔ (g : X.functionField) • η ∈ logAt Z G a y) :=
   fun X _ Z G D a y g η hD => mem_logAt_add_iff Z G D a y g η hD
 
 end GlobalTheory.LogDR

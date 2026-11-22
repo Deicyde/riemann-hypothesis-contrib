@@ -36,10 +36,12 @@ private lemma not_mem_of_mem_hcompl {p : Ideal (𝓞 K)} (hp : p.IsPrime) {s : �
     Submonoid.closure_le.mpr (fun x hx => hx)
   exact hle hs
 
-theorem num_mem_both {p : Ideal (𝓞 K)} (hp : p.IsPrime) {a : K} (ha : a ∈ locRing p) (hst : star a = a)
-    (hna : ¬ IsUnitIn (locRing p) a) :
-    ∃ a₁ : 𝓞 K, ∃ s₁ ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p,
-      a = algebraMap (𝓞 K) K a₁ / algebraMap (𝓞 K) K s₁ ∧ a₁ ∈ p ∧ a₁ ∈ Formalism.HermitianLatticesTheory.conjIdeal (K := K) p := by
+theorem num_mem_both
+    {p : Ideal (𝓞 K)} (hp : p.IsPrime)
+    {a : K} (ha : a ∈ locRing p) (hst : star a = a) (hna : ¬ IsUnitIn (locRing p) a)
+    : ∃ a₁ : 𝓞 K, ∃ s₁ ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p,
+      a = algebraMap (𝓞 K) K a₁ / algebraMap (𝓞 K) K s₁ ∧ a₁ ∈ p
+        ∧ a₁ ∈ Formalism.HermitianLatticesTheory.conjIdeal (K := K) p := by
   have hinj := IsFractionRing.injective (𝓞 K) K
   have hloc : a ∈ Formalism.HermitianLatticesTheory.locR (K := K) p := ha
   obtain ⟨s, hs, hsa⟩ := (Formalism.HermitianLatticesTheory.locDual_mem_locR (K := K) p a).mp hloc
@@ -94,8 +96,9 @@ theorem num_mem_both {p : Ideal (𝓞 K)} (hp : p.IsPrime) {a : K} (ha : a ∈ l
   · rw [mem_conjIdeal_iff, hc]
     exact hp1
 
-theorem exists_trace_notMem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {p : Ideal (𝓞 K)} (hp : p.IsMaximal) :
-    ∃ l : 𝓞 K, l + conjO K l ∉ p := by
+theorem exists_trace_notMem
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
+    : ∃ l : 𝓞 K, l + conjO K l ∉ p := by
   obtain ⟨θ, hθ⟩ := exists_sub_conjO_notMem hK hp
   by_cases h2 : (2 : 𝓞 K) ∈ p
   · refine ⟨θ, fun h => hθ ?_⟩
@@ -130,23 +133,32 @@ theorem pair_unit_local : PairUnitLoc := by
     rw [Formalism.HermitianLatticesTheory.locDual_mem_locR]
     exact ⟨1, one_mem _, Submodule.mem_one.mpr ⟨r, by rw [map_one, one_mul]⟩⟩
   refine ⟨1, (locRing p).one_mem, algebraMap (𝓞 K) K l, hAmem l, ?_⟩
-  have hv : h ((1 : K) • w + algebraMap (𝓞 K) K l • y) ((1 : K) • w + algebraMap (𝓞 K) K l • y) =
-      h w w + algebraMap (𝓞 K) K (l + conjO K l) + algebraMap (𝓞 K) K (conjO K l * l) * h y y := by
+  have hv
+      : h ((1 : K) • w + algebraMap (𝓞 K) K l • y) ((1 : K) • w + algebraMap (𝓞 K) K l • y)
+        = h w w + algebraMap (𝓞 K) K (l + conjO K l)
+          + algebraMap (𝓞 K) K (conjO K l * l) * h y y := by
     simp only [one_smul, map_add (f := _), map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply,
       smul_eq_mul, starRingEnd_apply, RingHom.id_apply, map_smul, hyw, hwy, map_mul,
       algebraMap_conjO, star_one]
     ring
   rw [hv]
   by_contra hnu
-  have hvmem : h w w + algebraMap (𝓞 K) K (l + conjO K l) + algebraMap (𝓞 K) K (conjO K l * l) * h y y ∈ locRing p :=
+  have hvmem
+      : h w w + algebraMap (𝓞 K) K (l + conjO K l) + algebraMap (𝓞 K) K (conjO K l * l) * h y y
+        ∈ locRing p :=
     add_mem (add_mem ha (hAmem _)) (mul_mem (hAmem _) hb)
-  have hvs : star (h w w + algebraMap (𝓞 K) K (l + conjO K l) + algebraMap (𝓞 K) K (conjO K l * l) * h y y) =
-      h w w + algebraMap (𝓞 K) K (l + conjO K l) + algebraMap (𝓞 K) K (conjO K l * l) * h y y := by
-    rw [star_add, star_add, star_mul, hsa, hsb, ← algebraMap_conjO, ← algebraMap_conjO,
-      map_add, map_mul, Formalism.HermitianLattices.Ext.L3.conjO_conjO]
+  have hvs
+      : star
+          (h w w + algebraMap (𝓞 K) K (l + conjO K l) + algebraMap (𝓞 K) K (conjO K l * l) * h y y)
+        = h w w + algebraMap (𝓞 K) K (l + conjO K l)
+          + algebraMap (𝓞 K) K (conjO K l * l) * h y y := by
+    rw [star_add, star_add, star_mul, hsa, hsb, ← algebraMap_conjO, ← algebraMap_conjO, map_add,
+      map_mul, Formalism.HermitianLattices.Ext.L3.conjO_conjO]
     ring
   obtain ⟨n, t, ht, hve, hn, -⟩ := num_mem_both hpp hvmem hvs hnu
-  have hnz : ∀ {u : 𝓞 K}, u ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p → algebraMap (𝓞 K) K u ≠ 0 := by
+  have hnz
+      : ∀ {u : 𝓞 K},
+        u ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) p → algebraMap (𝓞 K) K u ≠ 0 := by
     intro u hu h0
     apply (not_mem_of_mem_hcompl hpp hu).1
     have : u = 0 := hinj (by rw [h0, map_zero])
@@ -155,9 +167,14 @@ theorem pair_unit_local : PairUnitLoc := by
   have ht0 := hnz ht
   have h10 := hnz hs₁
   have h20 := hnz hs₂
-  have key : n * (s₁ * s₂) = (a₁ * s₂ + (l + conjO K l) * (s₁ * s₂) + conjO K l * l * b₁ * s₁) * t := by
+  have key
+      : n * (s₁ * s₂) = (a₁ * s₂ + (l + conjO K l) * (s₁ * s₂) + conjO K l * l * b₁ * s₁) * t := by
     apply hinj
-    have e1 : algebraMap (𝓞 K) K n = (h w w + algebraMap (𝓞 K) K (l + conjO K l) + algebraMap (𝓞 K) K (conjO K l * l) * h y y) * algebraMap (𝓞 K) K t := by
+    have e1
+        : algebraMap (𝓞 K) K n
+          = (h w w + algebraMap (𝓞 K) K (l + conjO K l)
+              + algebraMap (𝓞 K) K (conjO K l * l) * h y y)
+            * algebraMap (𝓞 K) K t := by
       rw [hve, div_mul_cancel₀ _ ht0]
     simp only [map_mul, map_add (f := _)]
     rw [e1, hae, hbe]
@@ -171,9 +188,11 @@ theorem pair_unit_local : PairUnitLoc := by
     · exact h1
     · exact absurd h1 (not_mem_of_mem_hcompl hpp ht).1
   have hT : (l + conjO K l) * (s₁ * s₂) ∈ p := by
-    have e : (l + conjO K l) * (s₁ * s₂) =
-        (a₁ * s₂ + (l + conjO K l) * (s₁ * s₂) + conjO K l * l * b₁ * s₁) - a₁ * s₂ -
-          conjO K l * l * b₁ * s₁ := by ring
+    have e
+        : (l + conjO K l) * (s₁ * s₂)
+          = (a₁ * s₂ + (l + conjO K l) * (s₁ * s₂) + conjO K l * l * b₁ * s₁) - a₁ * s₂
+            - conjO K l * l * b₁ * s₁ := by
+      ring
     rw [e]
     refine p.sub_mem (p.sub_mem hN (p.mul_mem_right _ ha₁)) ?_
     have e2 : conjO K l * l * b₁ * s₁ = (conjO K l * l) * (b₁ * s₁) := by ring

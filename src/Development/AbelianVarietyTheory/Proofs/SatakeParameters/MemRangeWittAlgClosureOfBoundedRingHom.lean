@@ -22,8 +22,8 @@ theorem coprime_pow_sub_one {n : ℕ} (hn : 0 < n) : Nat.Coprime (p ^ n - 1) p :
   rw [show p ^ n - (p ^ n - 1) = 1 by omega] at h3
   exact hp.out.one_lt.ne' (Nat.dvd_one.1 h3)
 
-theorem mem_range_of_pow_eq {n : ℕ} (hn : 0 < n) {τ : ℂ_[p]} (hτ : τ ^ (p ^ n) = τ) :
-    τ ∈ Set.range (Formalism.L2.G.Pend.wToC p) := by
+theorem mem_range_of_pow_eq {n : ℕ} (hn : 0 < n) {τ : ℂ_[p]} (hτ : τ ^ (p ^ n) = τ)
+    : τ ∈ Set.range (Formalism.L2.G.Pend.wToC p) := by
   by_cases h0 : τ = 0
   · exact ⟨0, by rw [h0, map_zero]⟩
   have hq : 2 ≤ p ^ n := le_trans hp.out.two_le (Nat.le_self_pow hn.ne' p)
@@ -33,9 +33,12 @@ theorem mem_range_of_pow_eq {n : ℕ} (hn : 0 < n) {τ : ℂ_[p]} (hτ : τ ^ (p
     exact mul_right_cancel₀ h0 this
   exact Formalism.L2.G.Pend.root_mem_range p (by omega) (coprime_pow_sub_one hn) h1
 
-theorem exists_lim {n : ℕ} (hn : 0 < n) (a : ℂ_[p])
-    (ha : ∀ M : ℕ, ‖a ^ ((p ^ n) ^ (M + 1)) - a ^ ((p ^ n) ^ M)‖ ≤ ((p : ℝ)⁻¹) ^ (M + 1)) :
-    ∃ τ ∈ Set.range (Formalism.L2.G.Pend.wToC p), ∀ N : ℕ, ‖a ^ ((p ^ n) ^ N) - τ‖ ≤ ((p : ℝ)⁻¹) ^ (N + 1) := by
+theorem exists_lim
+    {n : ℕ} (hn : 0 < n)
+    (a : ℂ_[p])
+    (ha : ∀ M : ℕ, ‖a ^ ((p ^ n) ^ (M + 1)) - a ^ ((p ^ n) ^ M)‖ ≤ ((p : ℝ)⁻¹) ^ (M + 1))
+    : ∃ τ ∈ Set.range (Formalism.L2.G.Pend.wToC p), ∀ N : ℕ,
+      ‖a ^ ((p ^ n) ^ N) - τ‖ ≤ ((p : ℝ)⁻¹) ^ (N + 1) := by
   set r : ℝ := (p : ℝ)⁻¹ with hr
   have hr0 : 0 ≤ r := Formalism.L2.G.Pend.r_nonneg p
   have hr1 : r < 1 := Formalism.L2.G.Pend.r_lt_one p
@@ -58,9 +61,11 @@ theorem exists_lim {n : ℕ} (hn : 0 < n) (a : ℂ_[p])
     intro N
     have hmem : τ ∈ Metric.closedBall (u N) (r ^ (N + 1)) :=
       Metric.isClosed_closedBall.mem_of_tendsto hτ
-        (eventually_atTop.2 ⟨N, fun M hM => by rw [Metric.mem_closedBall, dist_eq_norm]; exact hball N M hM⟩)
+        (eventually_atTop.2
+          ⟨N, fun M hM => by rw [Metric.mem_closedBall, dist_eq_norm]; exact hball N M hM⟩)
     rw [Metric.mem_closedBall, dist_eq_norm] at hmem
-    rw [norm_sub_rev]; exact hmem
+    rw [norm_sub_rev]
+    exact hmem
   have hsucc : ∀ M, u (M + 1) = u M ^ (p ^ n) := by
     intro M
     show a ^ ((p ^ n) ^ (M + 1)) = (a ^ ((p ^ n) ^ M)) ^ (p ^ n)
@@ -75,19 +80,21 @@ section Ring
 
 variable {W : Type} [CommRing W] {n : ℕ}
 
-theorem dvd_pow_iter (hW : ∀ x : W, (p : W) ∣ x ^ (p ^ n) - x) (N : ℕ) (x : W) :
-    (p : W) ∣ x ^ ((p ^ n) ^ N) - x := by
+theorem dvd_pow_iter (hW : ∀ x : W, (p : W) ∣ x ^ (p ^ n) - x) (N : ℕ) (x : W)
+    : (p : W) ∣ x ^ ((p ^ n) ^ N) - x := by
   induction N with
   | zero => rw [pow_zero, pow_one, sub_self]; exact dvd_zero _
   | succ N ih =>
     have e : x ^ ((p ^ n) ^ (N + 1)) = (x ^ ((p ^ n) ^ N)) ^ (p ^ n) := by
       rw [← pow_mul x ((p ^ n) ^ N) (p ^ n), ← pow_succ]
-    rw [e, show (x ^ ((p ^ n) ^ N)) ^ (p ^ n) - x =
-      ((x ^ ((p ^ n) ^ N)) ^ (p ^ n) - x ^ ((p ^ n) ^ N)) + (x ^ ((p ^ n) ^ N) - x) by ring]
+    rw [e,
+      show (x ^ ((p ^ n) ^ N)) ^ (p ^ n) - x
+          = ((x ^ ((p ^ n) ^ N)) ^ (p ^ n) - x ^ ((p ^ n) ^ N)) + (x ^ ((p ^ n) ^ N) - x) by
+        ring]
     exact dvd_add (hW _) ih
 
-theorem dvd_pow_iter_succ (hn : 0 < n) (hW : ∀ x : W, (p : W) ∣ x ^ (p ^ n) - x) (M : ℕ) (x : W) :
-    (p : W) ^ (M + 1) ∣ x ^ ((p ^ n) ^ (M + 1)) - x ^ ((p ^ n) ^ M) := by
+theorem dvd_pow_iter_succ (hn : 0 < n) (hW : ∀ x : W, (p : W) ∣ x ^ (p ^ n) - x) (M : ℕ) (x : W)
+    : (p : W) ^ (M + 1) ∣ x ^ ((p ^ n) ^ (M + 1)) - x ^ ((p ^ n) ^ M) := by
   have h := dvd_sub_pow_of_dvd_sub (hW x) (n * M)
   have e1 : (x ^ (p ^ n)) ^ (p ^ (n * M)) = x ^ ((p ^ n) ^ (M + 1)) := by
     rw [← pow_mul, pow_succ, ← pow_mul, mul_comm]
@@ -95,8 +102,8 @@ theorem dvd_pow_iter_succ (hn : 0 < n) (hW : ∀ x : W, (p : W) ∣ x ^ (p ^ n) 
   rw [e1, e2] at h
   exact (pow_dvd_pow _ (by have := Nat.le_mul_of_pos_left M hn; omega)).trans h
 
-theorem norm_map_pow_mul (φ : W →+* ℂ_[p]) (hφ : ∀ x, ‖φ x‖ ≤ 1) (k : ℕ) (c : W) :
-    ‖φ ((p : W) ^ k * c)‖ ≤ ((p : ℝ)⁻¹) ^ k := by
+theorem norm_map_pow_mul (φ : W →+* ℂ_[p]) (hφ : ∀ x, ‖φ x‖ ≤ 1) (k : ℕ) (c : W)
+    : ‖φ ((p : W) ^ k * c)‖ ≤ ((p : ℝ)⁻¹) ^ k := by
   rw [map_mul, map_pow, map_natCast, norm_mul, norm_pow, Formalism.L2.G.Pend.norm_p_C]
   exact mul_le_of_le_one_right (pow_nonneg (Formalism.L2.G.Pend.r_nonneg p) k) (hφ c)
 
@@ -106,9 +113,11 @@ end GlobalTheory.TeichImage
 
 namespace GlobalTheory
 
-theorem mem_range_wToC_of_pow_congr : ∀ (p : ℕ) [Fact p.Prime] (n : ℕ) (W : Type) [CommRing W], 0 < n →
-    (∀ x : W, (p : W) ∣ x ^ (p ^ n) - x) → IsAdicComplete (Ideal.span {(p : W)}) W →
-    ∀ φ : W →+* ℂ_[p], (∀ x, ‖φ x‖ ≤ 1) → ∀ x, φ x ∈ Set.range (Formalism.L2.G.Pend.wToC p) := by
+theorem mem_range_wToC_of_pow_congr
+    : ∀ (p : ℕ) [Fact p.Prime] (n : ℕ) (W : Type) [CommRing W],
+      0 < n → (∀ x : W, (p : W) ∣ x ^ (p ^ n) - x) → IsAdicComplete (Ideal.span {(p : W)}) W
+        → ∀ φ : W →+* ℂ_[p],
+          (∀ x, ‖φ x‖ ≤ 1) → ∀ x, φ x ∈ Set.range (Formalism.L2.G.Pend.wToC p) := by
   intro p _ n W _ hn hW _ φ hφ x
   have hr0 : 0 ≤ ((p : ℝ)⁻¹) := Formalism.L2.G.Pend.r_nonneg p
   have key : ∀ k : ℕ, ∀ x : W, ∃ w, ‖φ x - Formalism.L2.G.Pend.wToC p w‖ ≤ ((p : ℝ)⁻¹) ^ k := by
@@ -117,18 +126,22 @@ theorem mem_range_wToC_of_pow_congr : ∀ (p : ℕ) [Fact p.Prime] (n : ℕ) (W 
     | zero => intro x; exact ⟨0, by rw [map_zero, sub_zero, pow_zero]; exact hφ x⟩
     | succ k ih =>
       intro x
-      obtain ⟨τ, ⟨wτ, hwτ⟩, hτ⟩ := TeichImage.exists_lim hn (φ x) (fun M => by
-        obtain ⟨c, hc⟩ := TeichImage.dvd_pow_iter_succ hn hW M x
-        rw [← map_pow, ← map_pow, ← map_sub, hc]
-        exact TeichImage.norm_map_pow_mul φ hφ (M + 1) c)
+      obtain ⟨τ, ⟨wτ, hwτ⟩, hτ⟩ :=
+        TeichImage.exists_lim hn (φ x) (fun M => by
+          obtain ⟨c, hc⟩ := TeichImage.dvd_pow_iter_succ hn hW M x
+          rw [← map_pow, ← map_pow, ← map_sub, hc]
+          exact TeichImage.norm_map_pow_mul φ hφ (M + 1) c)
       obtain ⟨c, hc⟩ := TeichImage.dvd_pow_iter hW k x
       obtain ⟨w₁, hw₁⟩ := ih (-c)
       refine ⟨wτ + (p : Formalism.L2.G.Pend.WW p) * w₁, ?_⟩
       have hx : x = x ^ ((p ^ n) ^ k) + (p : W) * (-c) := by linear_combination -hc
-      have e : φ x - Formalism.L2.G.Pend.wToC p (wτ + (p : Formalism.L2.G.Pend.WW p) * w₁) =
-          (φ x ^ ((p ^ n) ^ k) - τ) + (p : ℂ_[p]) * (φ (-c) - Formalism.L2.G.Pend.wToC p w₁) := by
+      have e
+          : φ x - Formalism.L2.G.Pend.wToC p (wτ + (p : Formalism.L2.G.Pend.WW p) * w₁)
+            = (φ x ^ ((p ^ n) ^ k) - τ)
+              + (p : ℂ_[p]) * (φ (-c) - Formalism.L2.G.Pend.wToC p w₁) := by
         conv_lhs => rw [hx]
-        rw [map_add (f := _), map_add (f := _), map_mul, map_mul, map_pow, map_natCast, map_natCast, hwτ]
+        rw [map_add (f := _), map_add (f := _), map_mul, map_mul, map_pow, map_natCast, map_natCast,
+          hwτ]
         ring
       rw [e]
       refine Formalism.L2.G.Pend.nadd p ((hτ k)) ?_

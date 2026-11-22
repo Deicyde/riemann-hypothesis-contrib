@@ -9,9 +9,11 @@ open Matrix GlobalTheory.RealBessel GlobalTheory.BesselMapOne Formalism.L2.Theta
 
 namespace UpperTheory.Lit.Bur.UnipRadConj
 
-theorem conj_mem_unipRad : ∀ {n r : ℕ} {J G Q Qi : Matrix (Fin n) (Fin n) ℂ} {e e' : Matrix (Fin n) (Fin r) ℂ}
-    (h1 : Q * Qi = 1) (h2 : Qi * Q = 1) (hg : Qᴴ * J * Q = G) (he : Q * e' = e)
-    {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ unipRad G e'), Q * u * Qi ∈ unipRad J e := by
+theorem conj_mem_unipRad
+    : ∀ {n r : ℕ} {J G Q Qi : Matrix (Fin n) (Fin n) ℂ} {e e' : Matrix (Fin n) (Fin r) ℂ}
+        (h1 : Q * Qi = 1) (h2 : Qi * Q = 1) (hg : Qᴴ * J * Q = G) (he : Q * e' = e)
+        {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ unipRad G e'),
+      Q * u * Qi ∈ unipRad J e := by
   intro n r J G Q Qi e e' h1 h2 hg he u hu
   obtain ⟨hu1, hu2, hu3⟩ := hu
   have hu1' : uᴴ * G * u = G := hu1
@@ -24,11 +26,12 @@ theorem conj_mem_unipRad : ∀ {n r : ℕ} {J G Q Qi : Matrix (Fin n) (Fin n) �
     simp [Matrix.mulVec, dotProduct, Matrix.mul_apply]
   refine ⟨?_, ?_, ?_⟩
   · show (Q * u * Qi)ᴴ * J * (Q * u * Qi) = J
-    calc (Q * u * Qi)ᴴ * J * (Q * u * Qi) = Qiᴴ * (uᴴ * (Qᴴ * J * Q) * u) * Qi := by
-          rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
+    calc
+      (Q * u * Qi)ᴴ * J * (Q * u * Qi) = Qiᴴ * (uᴴ * (Qᴴ * J * Q) * u) * Qi := by
+        rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
       _ = Qiᴴ * G * Qi := by rw [hg, hu1']
       _ = (Q * Qi)ᴴ * J * (Q * Qi) := by
-          rw [← hg, Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
+        rw [← hg, Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
       _ = J := by rw [h1]; simp
   · intro i
     obtain ⟨a, ha0, ha⟩ := hu2 i
@@ -49,5 +52,12 @@ end UpperTheory.Lit.Bur.UnipRadConj
 
 open Matrix GlobalTheory.RealBessel GlobalTheory.BesselMapOne Formalism.L2.Theta GlobalTheory.SmVec
 set_option maxHeartbeats 1000000 in
-theorem _root_.UpperTheory.Lit.Bur.isometry_conj_maps_unipotentRadical : ∀ {n r : ℕ} {J G Q Qi : Matrix (Fin n) (Fin n) ℂ} {e e' : Matrix (Fin n) (Fin r) ℂ} (h1 : Q * Qi = 1) (h2 : Qi * Q = 1) (hg : Qᴴ * J * Q = G) (he : Q * e' = e) {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ unipRad G e'), Q * u * Qi ∈ unipRad J e := by
-  first | exact @UpperTheory.Lit.Bur.UnipRadConj.conj_mem_unipRad | exact UpperTheory.Lit.Bur.UnipRadConj.conj_mem_unipRad | (intros; apply UpperTheory.Lit.Bur.UnipRadConj.conj_mem_unipRad <;> assumption)
+theorem _root_.UpperTheory.Lit.Bur.isometry_conj_maps_unipotentRadical
+    : ∀ {n r : ℕ} {J G Q Qi : Matrix (Fin n) (Fin n) ℂ} {e e' : Matrix (Fin n) (Fin r) ℂ}
+        (h1 : Q * Qi = 1) (h2 : Qi * Q = 1) (hg : Qᴴ * J * Q = G) (he : Q * e' = e)
+        {u : Matrix (Fin n) (Fin n) ℂ} (hu : u ∈ unipRad G e'),
+      Q * u * Qi ∈ unipRad J e := by
+  first
+  | exact @UpperTheory.Lit.Bur.UnipRadConj.conj_mem_unipRad
+  | exact UpperTheory.Lit.Bur.UnipRadConj.conj_mem_unipRad
+  | (intros; apply UpperTheory.Lit.Bur.UnipRadConj.conj_mem_unipRad <;> assumption)

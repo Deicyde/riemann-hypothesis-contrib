@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.RhoCompactTwi
 
 @[expose] public section
 
-open MeasureTheory Set Filter Matrix Polynomial GlobalTheory.Orb GlobalTheory.OpTrace GlobalTheory.HCChar
+open MeasureTheory Set Filter Matrix Polynomial GlobalTheory.Orb GlobalTheory.OpTrace
+  GlobalTheory.HCChar
 open Formalism.REAL (UJ KG muK Jm)
 open Formalism.QuantumDeterminants (IsHCParam IsCRepOn)
 open Formalism.MainNotions.S (IsURepOn IsIrredOn IsDS UJset)

@@ -12,18 +12,22 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsEigenCom
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 open GlobalTheory.CompanionTheory.Ar.RiemannLimit GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.EigIndep
 
-theorem eq_zero_of_sum_mem_span : ∀ (E : Type) [Field E] [NumberField E] (V : Type) [AddCommGroup V] [Module ℂ V]
-    (ρ : 𝓞 E →+* Module.End ℂ V) (s₀ : 𝓞 E →+* ℂ) (I₀ : AddSubgroup V) (r k : ℕ) (v : Fin r → V) (q : Fin k → V),
-    IsOFamily ρ I₀ v → (∀ (c : 𝓞 E), ∀ x ∈ I₀, ρ c x ∈ I₀) → (∀ c, q c ∈ eigSp ρ s₀) →
-    LinearIndependent ℂ (Fin.append (fun a => eigComp ρ s₀ (v a)) q) →
-    ∀ l : Fin k → ℂ, ∑ c, l c • q c ∈ Submodule.span ℂ (I₀ : Set V) → l = 0 := by
+theorem eq_zero_of_sum_mem_span
+    : ∀ (E : Type) [Field E] [NumberField E] (V : Type) [AddCommGroup V] [Module ℂ V]
+        (ρ : 𝓞 E →+* Module.End ℂ V) (s₀ : 𝓞 E →+* ℂ) (I₀ : AddSubgroup V) (r k : ℕ) (v : Fin r → V)
+        (q : Fin k → V),
+      IsOFamily ρ I₀ v → (∀ (c : 𝓞 E), ∀ x ∈ I₀, ρ c x ∈ I₀) → (∀ c, q c ∈ eigSp ρ s₀)
+        → LinearIndependent ℂ (Fin.append (fun a => eigComp ρ s₀ (v a)) q)
+        → ∀ l : Fin k → ℂ, ∑ c, l c • q c ∈ Submodule.span ℂ (I₀ : Set V) → l = 0 := by
   intro E _ _ V _ _ ρ s₀ I₀ r k v q hF _ hq hli l hl
   obtain ⟨c, hc⟩ := EigCoef.eigComp_eq_combination E s₀
   obtain ⟨h1, h2, h3⟩ := hc V ρ
@@ -50,7 +54,8 @@ theorem eq_zero_of_sum_mem_span : ∀ (E : Type) [Field E] [NumberField E] (V : 
       obtain ⟨a, i, rfl⟩ := hy
       rw [hact, hπ]
       exact W.smul_mem _ (Submodule.subset_span ⟨i, rfl⟩)
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [map_add (f := _)]
       exact W.add_mem hx hy
@@ -65,17 +70,19 @@ theorem eq_zero_of_sum_mem_span : ∀ (E : Type) [Field E] [NumberField E] (V : 
     have hN' : (((oSpan ρ v).relIndex I₀ : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hN
     exact (W.smul_mem_iff hN').1 hm
   have hS : Submodule.span ℂ (I₀ : Set V) ≤ W.comap π := Submodule.span_le.2 hI
-  have hxe : ∑ c, l c • q c ∈ eigSp ρ s₀ := Submodule.sum_mem _ fun c _ => Submodule.smul_mem _ _ (hq c)
+  have hxe : ∑ c, l c • q c ∈ eigSp ρ s₀ :=
+    Submodule.sum_mem _ fun c _ => Submodule.smul_mem _ _ (hq c)
   have hW : ∑ c, l c • q c ∈ W := by
     have h := hS hl
     rw [Submodule.mem_comap, hπ, h3 _ hxe] at h
     exact h
   obtain ⟨m, hm⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 hW
-  have hz := Fintype.linearIndependent_iff.1 hli (Fin.append (-m) l) (by
-    rw [Fin.sum_univ_add]
-    simp only [Fin.append_left, Fin.append_right, Pi.neg_apply, neg_smul, Finset.sum_neg_distrib]
-    rw [hm]
-    simp)
+  have hz :=
+    Fintype.linearIndependent_iff.1 hli (Fin.append (-m) l) (by
+      rw [Fin.sum_univ_add]
+      simp only [Fin.append_left, Fin.append_right, Pi.neg_apply, neg_smul, Finset.sum_neg_distrib]
+      rw [hm]
+      simp)
   funext j
   have := hz (Fin.natAdd r j)
   simpa using this

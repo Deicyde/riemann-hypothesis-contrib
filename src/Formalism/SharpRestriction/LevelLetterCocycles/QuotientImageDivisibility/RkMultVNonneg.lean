@@ -23,43 +23,64 @@ def boxH {n : ℕ} (d : ℕ) (b : ZMod n → ℕ) (S η : ℕ) (i : ZMod n) : �
 
 section Out
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
 
 variable [NeZero n] (W : LocWach PD LL O v n)
 
-theorem rk_eta_lt {d : ℕ} {T₁ T₂ : LocLat G Qp LL O} {F : LatHom T₁.L T₂.L} {b : ZMod n → ℕ}
-    {S η m : ℕ} (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) (i : ZMod n) : η < b i := by
+theorem rk_eta_lt
+    {d : ℕ} {T₁ T₂ : LocLat G Qp LL O} {F : LatHom T₁.L T₂.L} {b : ZMod n → ℕ} {S η m : ℕ}
+    (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m)
+    (i : ZMod n)
+    : η < b i := by
   obtain ⟨-, hp, -, -, -, -, -, -, hA, -⟩ := hS
   have h1 := hA i
   have hp' : (1 : ℝ) < (PD.p : ℝ) := by exact_mod_cast (show 1 < PD.p by omega)
-  have hl : 0 ≤ Formalism.MainNotions.RamifiedCoefficientChains.lam PD.p (Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η) := by
+  have hl
+      : 0
+        ≤ Formalism.MainNotions.RamifiedCoefficientChains.lam PD.p
+          (Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η) := by
     unfold Formalism.MainNotions.RamifiedCoefficientChains.lam
-    rcases Nat.eq_zero_or_pos (Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η) with h | h
+    rcases Nat.eq_zero_or_pos (Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η) with
+      h | h
     · rw [h]
       simp
-    · have hx : (1 : ℝ) ≤ 2 * ((Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η : ℕ) : ℝ) := by
-        have : (1 : ℝ) ≤ ((Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η : ℕ) : ℝ) := by exact_mod_cast h
+    · have hx
+          : (1 : ℝ)
+            ≤ 2 * ((Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η : ℕ) : ℝ) := by
+        have : (1 : ℝ)
+            ≤ ((Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η : ℕ) : ℝ) := by
+          exact_mod_cast h
         linarith
       have := Real.logb_nonneg hp' hx
       linarith
-  have hf : 0 ≤ ((Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η : ℕ) : ℝ) * (2 * (PD.p : ℝ) - 1) / ((PD.p : ℝ) - 1) ^ 2 := by
+  have hf
+      : 0
+        ≤ ((Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η : ℕ) : ℝ)
+          * (2 * (PD.p : ℝ) - 1) / ((PD.p : ℝ) - 1) ^ 2 := by
     apply div_nonneg _ (sq_nonneg _)
     apply mul_nonneg (Nat.cast_nonneg _)
     linarith
-  have haR : 3 ≤ Formalism.MainNotions.RamifiedCoefficientChains.aR PD.p (Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η) := by
+  have haR
+      : 3
+        ≤ Formalism.MainNotions.RamifiedCoefficientChains.aR PD.p
+          (Formalism.MainNotions.RamifiedCoefficientChains.hpar n b S + η) := by
     unfold Formalism.MainNotions.RamifiedCoefficientChains.aR
     linarith
   have : (η : ℝ) < (b i : ℝ) := by linarith
   exact_mod_cast this
 
-theorem rk_win_box (d : ℕ) (b : ZMod n → ℕ) (S η : ℕ) (i : ZMod n) (hη : η < b i) :
-    Formalism.MainNotions.RamifiedCoefficientChains.JumpWinS d b S η i ⊆ Set.Icc (-(boxM d b S η i : ℤ)) (boxH d b S η i : ℤ) := by
+theorem rk_win_box (d : ℕ) (b : ZMod n → ℕ) (S η : ℕ) (i : ZMod n) (hη : η < b i)
+    : Formalism.MainNotions.RamifiedCoefficientChains.JumpWinS d b S η i
+      ⊆ Set.Icc (-(boxM d b S η i : ℤ)) (boxH d b S η i : ℤ) := by
   intro a ha
   unfold Formalism.MainNotions.RamifiedCoefficientChains.JumpWinS at ha
   unfold boxM boxH
@@ -73,29 +94,37 @@ theorem rk_win_box (d : ℕ) (b : ZMod n → ℕ) (S η : ℕ) (i : ZMod n) (hη
 
 variable {d : ℕ} {T₁ T₂ : LocLat G Qp LL O} {F : LatHom T₁.L T₂.L} {b : ZMod n → ℕ} {S η m : ℕ}
 
-theorem rk_jumpsLet₁ (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) :
-    Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T₁ (boxM d b S η) (boxH d b S η) := by
+theorem rk_jumpsLet₁
+    (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m)
+    : Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T₁ (boxM d b S η) (boxH d b S η) := by
   have hS' := hS
   obtain ⟨-, -, -, -, -, -, hJ, -, -, -⟩ := hS'
   intro τ i hτ a ha
   exact rk_win_box d b S η i (rk_eta_lt W hS i) (hJ i τ hτ a ha)
 
-theorem rk_jumps₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL) (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
-    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL) (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) (i : ZMod n)
-    (τ : K →ₐ[Qp] LL) (hτ : Formalism.MainNotions.LiftingTheory.Over W τ i) :
-    JumpsInV PD T₂.ρ τ (Formalism.MainNotions.RamifiedCoefficientChains.JumpWinS d b S η i) := by
+theorem rk_jumps₂
+    (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL)
+    (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
+    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
+    (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m)
+    (i : ZMod n) (τ : K →ₐ[Qp] LL) (hτ : Formalism.MainNotions.LiftingTheory.Over W τ i)
+    : JumpsInV PD T₂.ρ τ (Formalism.MainNotions.RamifiedCoefficientChains.JumpWinS d b S η i) := by
   obtain ⟨h1, h2, hon⟩ := hS.2.2.2.2.2.1
   intro a ha
   exact hS.2.2.2.2.2.2.1 i τ hτ a (rk_jump_of W hS.1.1 hE hC hQ F h1 h2 hon τ i hτ a ha)
 
-theorem rk_jumpsLet₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL) (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
-    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL) (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) :
-    Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T₂ (boxM d b S η) (boxH d b S η) := by
+theorem rk_jumpsLet₂
+    (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL)
+    (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
+    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
+    (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m)
+    : Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T₂ (boxM d b S η) (boxH d b S η) := by
   intro τ i hτ a ha
   exact rk_win_box d b S η i (rk_eta_lt W hS i) (rk_jumps₂ W hE hC hQ hS i τ hτ a ha)
 
-theorem rk_fd_letter₂ (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) (i : ZMod n) :
-    FiniteDimensional LL ↥(DcrisL PD T₂.ρ (W.emb i)) := by
+theorem rk_fd_letter₂
+    (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) (i : ZMod n)
+    : FiniteDimensional LL ↥(DcrisL PD T₂.ρ (W.emb i)) := by
   have hS' := hS
   obtain ⟨-, -, -, -, -, ⟨-, hC2, -⟩, -, -, -, -⟩ := hS'
   haveI := T₂.fdim
@@ -113,8 +142,9 @@ theorem rk_fd_letter₂ (hS : Formalism.MainNotions.RamifiedCoefficientChains.Se
     rw [hC2]
     exact Nat.mul_pos Module.finrank_pos h0
 
-theorem rk_multV_nonneg (T : LocLat G Qp LL O) (τ : K →ₐ[Qp] LL) [FiniteDimensional LL ↥(DdRE PD T.ρ τ)]
-    (a : ℤ) : 0 ≤ multV PD T.ρ τ a := by
+theorem rk_multV_nonneg
+    (T : LocLat G Qp LL O) (τ : K →ₐ[Qp] LL) [FiniteDimensional LL ↥(DdRE PD T.ρ τ)] (a : ℤ)
+    : 0 ≤ multV PD T.ρ τ a := by
   have hle : FildR PD T.ρ τ (a + 1) ≤ FildR PD T.ρ τ a := by
     unfold Formalism.WeaklyAdmissibleFiltrations.FildR
     refine inf_le_inf_left _ ?_
@@ -138,11 +168,15 @@ theorem rk_multV_nonneg (T : LocLat G Qp LL O) (τ : K →ₐ[Qp] LL) [FiniteDim
   unfold Formalism.WeaklyAdmissibleFiltrations.multV
   omega
 
-theorem rk_corank₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL) (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
-    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL) (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) (i : ZMod n)
-    (hi : (i.val + d) % 2 = 1) :
-    (finrank LL ↥(DcrisL PD T₂.ρ (W.emb i)) : ℤ) -
-      finrank LL ↥(FilCris PD T₂.ρ (b i : ℤ) ⊓ DcrisL PD T₂.ρ (W.emb i)) ≤ m := by
+theorem rk_corank₂
+    (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL)
+    (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
+    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
+    (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m)
+    (i : ZMod n) (hi : (i.val + d) % 2 = 1)
+    : (finrank LL ↥(DcrisL PD T₂.ρ (W.emb i)) : ℤ)
+        - finrank LL ↥(FilCris PD T₂.ρ (b i : ℤ) ⊓ DcrisL PD T₂.ρ (W.emb i))
+      ≤ m := by
   classical
   have hK := hS.1.1
   have h2 := hS.2.2.2.2.2.1.2.1
@@ -152,8 +186,10 @@ theorem rk_corank₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.Dcris
   obtain ⟨-, hτ'⟩ := hQ hK T₂.V T₂.ρ h2
   obtain ⟨hfd, -, hF⟩ := hτ' τ
   haveI := hfd
-  have hrk : ∀ a : ℤ, finrank LL ↥(FilCris PD T₂.ρ a ⊓ DcrisL PD T₂.ρ (W.emb i)) =
-      finrank LL ↥(FildR PD T₂.ρ τ a) := fun a => by
+  have hrk
+      : ∀ a : ℤ,
+        finrank LL ↥(FilCris PD T₂.ρ a ⊓ DcrisL PD T₂.ρ (W.emb i))
+          = finrank LL ↥(FildR PD T₂.ρ τ a) := fun a => by
     rw [hF a, hτ]
     exact LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ (rk_ιV_inj PD) _)
   have hD : finrank LL ↥(DcrisL PD T₂.ρ (W.emb i)) = finrank LL ↥(DdRE PD T₂.ρ τ) := by
@@ -164,28 +200,35 @@ theorem rk_corank₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.Dcris
   have htel := rk_sum_multV PD T₂.ρ τ (min lo (min (-(η : ℤ)) (b i : ℤ))) (b i : ℤ) hlo'
   rw [hlo _ (min_le_left _ _)] at htel
   rw [hD, hrk, ← htel]
-  have hodd : ¬ ((i.val + d) % 2 = 0) := by omega
-  calc ∑ a ∈ Finset.Ico (min lo (min (-(η : ℤ)) (b i : ℤ))) (b i : ℤ), multV PD T₂.ρ τ a
-      = ∑ a ∈ (Finset.Ico (min lo (min (-(η : ℤ)) (b i : ℤ))) (b i : ℤ)).filter
-          (fun a => a ∈ Finset.Icc (-(η : ℤ)) η), multV PD T₂.ρ τ a := by
-        symm
-        apply Finset.sum_subset (Finset.filter_subset _ _)
-        intro a ha hna
-        apply rk_multV_of_not_jump
-        intro hj
-        have hw := hwin a hj
-        simp only [Formalism.MainNotions.RamifiedCoefficientChains.JumpWinS, hodd, if_false, Set.mem_union, Set.mem_Icc] at hw
-        simp only [Finset.mem_filter, Finset.mem_Ico, Finset.mem_Icc, not_and] at ha hna
-        omega
+  have hodd : ¬((i.val + d) % 2 = 0) := by omega
+  calc
+    ∑ a ∈ Finset.Ico (min lo (min (-(η : ℤ)) (b i : ℤ))) (b i : ℤ), multV PD T₂.ρ τ a
+        = ∑ a ∈ (Finset.Ico (min lo (min (-(η : ℤ)) (b i : ℤ))) (b i : ℤ)).filter
+            (fun a => a ∈ Finset.Icc (-(η : ℤ)) η), multV PD T₂.ρ τ a := by
+      symm
+      apply Finset.sum_subset (Finset.filter_subset _ _)
+      intro a ha hna
+      apply rk_multV_of_not_jump
+      intro hj
+      have hw := hwin a hj
+      simp only [Formalism.MainNotions.RamifiedCoefficientChains.JumpWinS, hodd, if_false,
+          Set.mem_union, Set.mem_Icc]
+        at hw
+      simp only [Finset.mem_filter, Finset.mem_Ico, Finset.mem_Icc, not_and] at ha hna
+      omega
     _ ≤ ∑ a ∈ Finset.Icc (-(η : ℤ)) η, multV PD T₂.ρ τ a :=
-        Finset.sum_le_sum_of_subset_of_nonneg (fun a ha => (Finset.mem_filter.1 ha).2)
-          (fun a _ _ => rk_multV_nonneg T₂ τ a)
+      Finset.sum_le_sum_of_subset_of_nonneg
+        (fun a ha => (Finset.mem_filter.1 ha).2)
+        (fun a _ _ => rk_multV_nonneg T₂ τ a)
     _ ≤ m := hsum
 
-theorem rk_corankQ₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL) (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
-    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL) (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) (i : ZMod n)
-    (hi : (i.val + d) % 2 = 1) :
-    finrank LL ↥((DcrisL PD T₂.ρ (W.emb i)).map (FilCris PD T₂.ρ (b i : ℤ)).mkQ) ≤ m := by
+theorem rk_corankQ₂
+    (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL)
+    (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
+    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
+    (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m)
+    (i : ZMod n) (hi : (i.val + d) % 2 = 1)
+    : finrank LL ↥((DcrisL PD T₂.ρ (W.emb i)).map (FilCris PD T₂.ρ (b i : ℤ)).mkQ) ≤ m := by
   have h := rk_corank₂ W hE hC hQ hS i hi
   haveI := rk_fd_letter₂ W hS i
   set D := DcrisL PD T₂.ρ (W.emb i) with hD
@@ -200,18 +243,23 @@ theorem rk_corankQ₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.Dcri
   rw [hr, hk] at hrn
   omega
 
-theorem rk_corank_zero₂ (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL) (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
-    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL) (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) (hm : m = 0)
-    (i : ZMod n) (hi : (i.val + d) % 2 = 1) :
-    DcrisL PD T₂.ρ (W.emb i) ≤ FilCris PD T₂.ρ (b i : ℤ) := by
+theorem rk_corank_zero₂
+    (hE : Formalism.MainNotions.RamifiedCoefficientChains.DcrisExactStrict PD LL)
+    (hC : Formalism.MainNotions.RamifiedCoefficientChains.CrysSubQuot PD LL)
+    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
+    (hS : Formalism.MainNotions.RamifiedCoefficientChains.SetCS W d T₁ T₂ F b S η m) (hm : m = 0)
+    (i : ZMod n) (hi : (i.val + d) % 2 = 1)
+    : DcrisL PD T₂.ρ (W.emb i) ≤ FilCris PD T₂.ρ (b i : ℤ) := by
   have h := rk_corankQ₂ W hE hC hQ hS i hi
   subst hm
   haveI := rk_fd_letter₂ W hS i
   have hbot : (DcrisL PD T₂.ρ (W.emb i)).map (FilCris PD T₂.ρ (b i : ℤ)).mkQ = ⊥ :=
     Submodule.finrank_eq_zero.mp (by omega)
   intro x hx
-  have hmem : (FilCris PD T₂.ρ (b i : ℤ)).mkQ x ∈
-      (DcrisL PD T₂.ρ (W.emb i)).map (FilCris PD T₂.ρ (b i : ℤ)).mkQ := Submodule.mem_map_of_mem hx
+  have hmem
+      : (FilCris PD T₂.ρ (b i : ℤ)).mkQ x
+        ∈ (DcrisL PD T₂.ρ (W.emb i)).map (FilCris PD T₂.ρ (b i : ℤ)).mkQ :=
+    Submodule.mem_map_of_mem hx
   rw [hbot] at hmem
   exact (Submodule.Quotient.mk_eq_zero _).mp ((Submodule.mem_bot LL).mp hmem)
 

@@ -8,7 +8,9 @@ public import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.RatHerm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain Formalism.L2 Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.L2.Indef Formalism.IndefR.Cx GlobalTheory.BigTop GlobalTheory.BigTop.Fun
+open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain Formalism.L2
+  Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.L2.Indef Formalism.IndefR.Cx
+  GlobalTheory.BigTop GlobalTheory.BigTop.Fun
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -18,21 +20,28 @@ namespace GlobalTheory.BigTop.Fun
 open Formalism.L2.DIV Formalism.IndefR.Cx Formalism.IndefR.Cx.CxData
 open scoped InnerProductSpace Matrix
 
-theorem iC_cpt_eq_theta_toR {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A)
-    {fc : DefSub A → DefFace Bs} (cr : Crd A fc) (b : Bool) (t : Bs.Tup) (z : Fin ((lv (fc X.zs) b).dQ t) → K) :
-    X.iC cr b t (cpt Bs.v0.embedding z) = X.Θ t (X.jR t (cr.toR X.zs b t z)) := by
+theorem iC_cpt_eq_theta_toR
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A)
+    {fc : DefSub A → DefFace Bs} (cr : Crd A fc)
+    (b : Bool) (t : Bs.Tup) (z : Fin ((lv (fc X.zs) b).dQ t) → K)
+    : X.iC cr b t (cpt Bs.v0.embedding z) = X.Θ t (X.jR t (cr.toR X.zs b t z)) := by
   conv_rhs => rw [pi_eq_sum_univ z]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, LinearMap.map_smulₛₗ, iC, lin, Fintype.linearCombination_apply, cpt]
+    simp only [map_sum, map_smul, LinearMap.map_smulₛₗ, iC, lin, Fintype.linearCombination_apply,
+      cpt]
   refine Finset.sum_congr rfl fun i _ => ?_
   congr 4
   ext j
   simp [Pi.single_apply, eq_comm]
 
-theorem theta_jR_eq_zero_of_perp {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A)
-    (cv : CrdV A) (hJ : X.JIsoR cv) (hZ : X.RatZ) (t : Bs.Tup) (x : A.FR t) (hx : ∀ w ∈ X.Z t, cv.hR t w x = 0) :
-    X.Θ t (X.jR t x) = 0 := by
-  have hperp : ∀ m ∈ Submodule.span ℂ ((X.jR t) '' (X.Z t : Set (A.FR t))), ⟪m, X.jR t x⟫_ℂ = 0 := by
+theorem theta_jR_eq_zero_of_perp
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A) (cv : CrdV A) (hJ : X.JIsoR cv) (hZ : X.RatZ)
+    (t : Bs.Tup) (x : A.FR t) (hx : ∀ w ∈ X.Z t, cv.hR t w x = 0)
+    : X.Θ t (X.jR t x) = 0 := by
+  have hperp
+      : ∀ m ∈ Submodule.span ℂ ((X.jR t) '' (X.Z t : Set (A.FR t))), ⟪m, X.jR t x⟫_ℂ = 0 := by
     intro m hm
     induction hm using Submodule.span_induction with
     | mem m hm =>
@@ -47,9 +56,13 @@ theorem theta_jR_eq_zero_of_perp {K : Type} [Field K] [NumberField K] [StarRing 
   rw [hZ.1 t]
   exact LinearMap.mem_range_self _ _
 
-theorem sub_zE_Pq_mem_U {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 : Type}
-    (B : BlockDat K G Pl0) (ℓ : Lvl K G) (Z : Submodule K B.S.Forms) (hs : Function.Surjective (B.Pq ℓ Z).mulVec)
-    (y : Fin (B.nV ℓ) → K) : y - (B.zE ℓ Z).mulVec ((B.Pq ℓ Z).mulVec y) ∈ B.U ℓ Z := by
+theorem sub_zE_Pq_mem_U
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {G : Type} [Group G] [Fintype G]
+    {Pl0 : Type} (B : BlockDat K G Pl0)
+    (ℓ : Lvl K G) (Z : Submodule K B.S.Forms) (hs : Function.Surjective (B.Pq ℓ Z).mulVec)
+    (y : Fin (B.nV ℓ) → K)
+    : y - (B.zE ℓ Z).mulVec ((B.Pq ℓ Z).mulVec y) ∈ B.U ℓ Z := by
   set E := B.zE ℓ Z with hE
   set H := B.HV ℓ with hH
   have hdet : IsUnit (Eᴴ * H * E).det := by
@@ -75,21 +88,32 @@ theorem sub_zE_Pq_mem_U {K : Type} [Field K] [NumberField K] [StarRing K] {G : T
     have : z ∈ LinearMap.range (subE (B.Z0 ℓ Z)).mulVecLin := by rw [h]; exact hz
     obtain ⟨c, hc⟩ := this
     exact ⟨c, hc⟩
-  rw [Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec]
+  rw [Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot, Matrix.star_mulVec,
+    ← Matrix.dotProduct_mulVec]
   have : Eᴴ *ᵥ (H *ᵥ (y - E *ᵥ (B.Pq ℓ Z *ᵥ y))) = (Eᴴ * H * (1 - E * B.Pq ℓ Z)) *ᵥ y := by
-    simp only [Matrix.mulVec_sub, Matrix.mul_sub, Matrix.sub_mulVec, Matrix.mulVec_mulVec, Matrix.mul_one, Matrix.mul_assoc]
+    simp only [Matrix.mulVec_sub, Matrix.mul_sub, Matrix.sub_mulVec, Matrix.mulVec_mulVec,
+      Matrix.mul_one, Matrix.mul_assoc]
   rw [this]
   show star c ⬝ᵥ (Eᴴ * H * (1 - E * ((Eᴴ * H * E)⁻¹ * (Eᴴ * H)))) *ᵥ y = 0
   rw [hO, Matrix.zero_mulVec, dotProduct_zero]
 
-theorem csum_goodPart_perp_eq_zero {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 : Type}
-    (B : BlockDat K G Pl0) (s : ℕ) (hB : B.Ok s) (v0 : InfinitePlace K) (hv : Formalism.DivisionValues.IsConjAt v0) (ℓ : Lvl K G)
-    (hX : ∀ χ ∈ ℓ.X, IsAbsIrrChar χ) (Z : Submodule K B.S.Forms) (hZ : ∀ g, Z ≤ Z.comap (B.r g))
-    (u : Fin (B.nV ℓ) → K) (hu : u ∈ B.U ℓ Z) (w : B.S.Forms) (hw : w ∈ Z) :
-    B.S.csum (w : B.S.Cl → B.S.V) ((B.S.basis.equivFun.symm ((B.vE ℓ).mulVec u) : B.S.Forms) : B.S.Cl → B.S.V) = 0 := by
+theorem csum_goodPart_perp_eq_zero
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {G : Type} [Group G] [Fintype G]
+    {Pl0 : Type} (B : BlockDat K G Pl0)
+    (s : ℕ) (hB : B.Ok s)
+    (v0 : InfinitePlace K) (hv : Formalism.DivisionValues.IsConjAt v0)
+    (ℓ : Lvl K G) (hX : ∀ χ ∈ ℓ.X, IsAbsIrrChar χ)
+    (Z : Submodule K B.S.Forms) (hZ : ∀ g, Z ≤ Z.comap (B.r g))
+    (u : Fin (B.nV ℓ) → K) (hu : u ∈ B.U ℓ Z)
+    (w : B.S.Forms) (hw : w ∈ Z)
+    : B.S.csum (w : B.S.Cl → B.S.V)
+        ((B.S.basis.equivFun.symm ((B.vE ℓ).mulVec u) : B.S.Forms) : B.S.Cl → B.S.V)
+      = 0 := by
   classical
   have hpe := good_at_spec K v0 hv G ℓ.X hX ℓ.P ℓ.ψ
-  obtain ⟨hO, hEP⟩ := orthogonal_projection_spec K v0 hv B.S (hB.hpos v0) G B.r hB.act _ hpe.idem hpe.selfAdj
+  obtain ⟨hO, hEP⟩ :=
+    orthogonal_projection_spec K v0 hv B.S (hB.hpos v0) G B.r hB.act _ hpe.idem hpe.selfAdj
   have hadj := group_action_matrix_adjoint K B.S G B.r hB.act (goodAt ℓ.X ℓ.P ℓ.ψ)
   rw [hpe.selfAdj] at hadj
   have hE : B.vE ℓ = B.S.cutE B.r (goodAt ℓ.X ℓ.P ℓ.ψ) := rfl
@@ -97,14 +121,20 @@ theorem csum_goodPart_perp_eq_zero {K : Type} [Field K] [NumberField K] [StarRin
   set E := B.vE ℓ with hEdef
   set x := B.S.basis.equivFun w with hx
   have hw' : (w : B.S.Cl → B.S.V) = B.S.I x := by simp [CSD.I, x]
-  have hv' : ((B.S.basis.equivFun.symm (E.mulVec u) : B.S.Forms) : B.S.Cl → B.S.V) = B.S.I (E.mulVec u) := rfl
+  have hv'
+      : ((B.S.basis.equivFun.symm (E.mulVec u) : B.S.Forms) : B.S.Cl → B.S.V)
+        = B.S.I (E.mulVec u) :=
+    rfl
   rw [hw', hv', CSD.csum_sum, ← Formalism.DivisionValues.RationalHermitianForm.hform_apply]
   have hGE : Gm *ᵥ (E *ᵥ u) = E *ᵥ u := by
     have hO1 : B.S.cutPr B.r (goodAt ℓ.X ℓ.P ℓ.ψ) * E = 1 := hO.1
     rw [← hEP, Matrix.mulVec_mulVec, ← hE, Matrix.mul_assoc, hO1, Matrix.mul_one]
   rw [← hGE]
-  have hmove : Formalism.DivisionValues.hform B.S.H x (Gm *ᵥ (E *ᵥ u)) = Formalism.DivisionValues.hform B.S.H (Gm *ᵥ x) (E *ᵥ u) := by
-    rw [Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot, Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot, Matrix.mulVec_mulVec, ← hadj,
+  have hmove
+      : Formalism.DivisionValues.hform B.S.H x (Gm *ᵥ (E *ᵥ u))
+        = Formalism.DivisionValues.hform B.S.H (Gm *ᵥ x) (E *ᵥ u) := by
+    rw [Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot,
+      Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot, Matrix.mulVec_mulVec, ← hadj,
       ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, Matrix.star_mulVec]
   set z' := B.S.cutPr B.r (goodAt ℓ.X ℓ.P ℓ.ψ) *ᵥ x with hz'def
   have hGx : Gm *ᵥ x = E *ᵥ z' := by rw [← hEP, ← Matrix.mulVec_mulVec, hE]
@@ -116,19 +146,20 @@ theorem csum_goodPart_perp_eq_zero {K : Type} [Field K] [NumberField K] [StarRin
       simp only [CSD.gaOp, LinearMap.sum_apply, LinearMap.smul_apply]
       exact Submodule.sum_mem _ fun t _ => Submodule.smul_mem _ _ (hZ t hw)
     set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [CSD.gaOp, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hGm,
+    · simp only [CSD.gaOp, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hGm,
         CSD.gaMat, Matrix.sum_mulVec, Matrix.smul_mulVec]
-        refine Finset.sum_congr rfl fun t _ => ?_
-        congr 1
-        show B.S.basis.equivFun (B.r t w) = (LinearMap.toMatrix B.S.basis B.S.basis (B.r t)) *ᵥ (B.S.basis.equivFun w)
-        rw [Module.Basis.equivFun_apply, Module.Basis.equivFun_apply, LinearMap.toMatrix_mulVec_repr]
+      refine Finset.sum_congr rfl fun t _ => ?_
+      congr 1
+      show B.S.basis.equivFun (B.r t w) = (LinearMap.toMatrix B.S.basis B.S.basis (B.r t)) *ᵥ (B.S.basis.equivFun w)
+      rw [Module.Basis.equivFun_apply, Module.Basis.equivFun_apply, LinearMap.toMatrix_mulVec_repr]
   rw [hmove, hGx, ← Formalism.L2.DIV.hform_cut]
   have hP : (Nat.card ℓ.P : K) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   have hH : Eᴴ * B.S.H * E = (Nat.card ℓ.P : K) • B.HV ℓ := by
-    simp only [hEdef, BlockDat.HV, BlockDat.vE, CSD.goodPartHermitianForm, CSD.cutH, CSD.V0E, smul_smul, mul_inv_cancel₀ hP, one_smul]
-  rw [hH, Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot, Matrix.smul_mulVec, dotProduct_smul, ← Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot,
-    hu z' hz', smul_zero]
-
+    simp only [hEdef, BlockDat.HV, BlockDat.vE, CSD.goodPartHermitianForm, CSD.cutH, CSD.V0E,
+      smul_smul, mul_inv_cancel₀ hP, one_smul]
+  rw [hH, Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot, Matrix.smul_mulVec,
+    dotProduct_smul, ← Formalism.DivisionValues.RationalHermitianForm.hform_eq_dot, hu z' hz',
+    smul_zero]
 
 end GlobalTheory.BigTop.Fun
 

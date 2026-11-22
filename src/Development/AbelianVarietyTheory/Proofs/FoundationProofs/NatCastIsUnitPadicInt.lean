@@ -9,12 +9,14 @@ namespace GlobalTheory.PadicInversePower
 
 open Formalism.ConjugateSelfDual
 
-theorem natCast_isUnit_padicInt (l : ℕ) [Fact (Nat.Prime l)] (n : ℕ) (h : ¬ l ∣ n) : IsUnit (n : ℤ_[l]) := by
+theorem natCast_isUnit_padicInt (l : ℕ) [Fact (Nat.Prime l)] (n : ℕ) (h : ¬ l ∣ n)
+    : IsUnit (n : ℤ_[l]) := by
   rw [PadicInt.isUnit_iff, PadicInt.norm_natCast_eq_one_iff]
   exact (Nat.Prime.coprime_iff_not_dvd Fact.out).mpr h
 
-theorem inv_pow_mem (l : ℕ) [Fact (Nat.Prime l)] (c : UpperTheory.V.HV.Coef l) (e r : ℕ) (x : (ZMod (l ^ r))ˣ) :
-    (((x : ZMod (l ^ r)).val : Qbar l) ^ e)⁻¹ ∈ c.O := by
+theorem inv_pow_mem
+    (l : ℕ) [Fact (Nat.Prime l)] (c : UpperTheory.V.HV.Coef l) (e r : ℕ) (x : (ZMod (l ^ r))ˣ)
+    : (((x : ZMod (l ^ r)).val : Qbar l) ^ e)⁻¹ ∈ c.O := by
   rcases Nat.eq_zero_or_pos r with rfl | hr
   · have h0 : (x : ZMod (l ^ 0)).val = 0 := by
       haveI : NeZero (l ^ 0) := ⟨by simp⟩

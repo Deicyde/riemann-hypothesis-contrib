@@ -8,15 +8,20 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem eigencharacters_finite_of_commuting_annihilated :
-    ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (T : Finset (Module.End ℂ V))
-      (p : Module.End ℂ V → Polynomial ℂ), (∀ s ∈ T, ∀ t ∈ T, Commute s t) →
-      (∀ t ∈ T, p t ≠ 0) → ∃ X' : Set (Module.End ℂ V → ℂ), X'.Finite ∧ ∀ ψ : V,
-        (∀ t ∈ T, Polynomial.aeval t (p t) ψ = 0) → ∀ (χ' : Module.End ℂ V → ℂ) (u : V),
-        u ∈ Submodule.span ℂ ((fun z : Module.End ℂ V => z ψ) ''
-          (Algebra.adjoin ℂ (T : Set (Module.End ℂ V)) : Set (Module.End ℂ V))) → u ≠ 0 →
-        (∀ z ∈ Algebra.adjoin ℂ (T : Set (Module.End ℂ V)), z u = χ' z • u) →
-        ∃ χ ∈ X', ∀ z ∈ Algebra.adjoin ℂ (T : Set (Module.End ℂ V)), χ' z = χ z := by
+theorem eigencharacters_finite_of_commuting_annihilated
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (T : Finset (Module.End ℂ V))
+        (p : Module.End ℂ V → Polynomial ℂ),
+      (∀ s ∈ T, ∀ t ∈ T, Commute s t) → (∀ t ∈ T, p t ≠ 0)
+        → ∃ X' : Set (Module.End ℂ V → ℂ),
+          X'.Finite
+            ∧ ∀ ψ : V,
+              (∀ t ∈ T, Polynomial.aeval t (p t) ψ = 0)
+                → ∀ (χ' : Module.End ℂ V → ℂ) (u : V),
+                  u ∈ Submodule.span ℂ
+                      ((fun z : Module.End ℂ V => z ψ)
+                        '' (Algebra.adjoin ℂ (T : Set (Module.End ℂ V)) : Set (Module.End ℂ V)))
+                    → u ≠ 0 → (∀ z ∈ Algebra.adjoin ℂ (T : Set (Module.End ℂ V)), z u = χ' z • u)
+                    → ∃ χ ∈ X', ∀ z ∈ Algebra.adjoin ℂ (T : Set (Module.End ℂ V)), χ' z = χ z := by
   intro V _ _ T p hcomm hp
   classical
   set A := Algebra.adjoin ℂ (T : Set (Module.End ℂ V)) with hA
@@ -27,10 +32,11 @@ theorem eigencharacters_finite_of_commuting_annihilated :
   have hdet : ∀ χ₁ ∈ X', ∀ χ₂ ∈ X', (∀ t ∈ T, χ₁ t = χ₂ t) → χ₁ = χ₂ := by
     rintro χ₁ ⟨h₁0, ⟨u₁, hu₁, he₁⟩, -⟩ χ₂ ⟨h₂0, ⟨u₂, hu₂, he₂⟩, -⟩ hT
 
-    have key : ∀ (χ : Module.End ℂ V → ℂ) (u : V), u ≠ 0 → (∀ z ∈ A, z u = χ z • u) →
-        (∀ r : ℂ, χ (algebraMap ℂ _ r) = r) ∧
-        (∀ x ∈ A, ∀ y ∈ A, χ (x + y) = χ x + χ y) ∧
-        (∀ x ∈ A, ∀ y ∈ A, χ (x * y) = χ x * χ y) := by
+    have key
+        : ∀ (χ : Module.End ℂ V → ℂ) (u : V),
+          u ≠ 0 → (∀ z ∈ A, z u = χ z • u)
+            → (∀ r : ℂ, χ (algebraMap ℂ _ r) = r) ∧ (∀ x ∈ A, ∀ y ∈ A, χ (x + y) = χ x + χ y)
+              ∧ (∀ x ∈ A, ∀ y ∈ A, χ (x * y) = χ x * χ y) := by
       intro χ u hu he
       have inj := smul_left_injective ℂ hu
       refine ⟨fun r => ?_, fun x hx y hy => ?_, fun x hx y hy => ?_⟩
@@ -43,8 +49,8 @@ theorem eigencharacters_finite_of_commuting_annihilated :
         rw [← he _ (add_mem hx hy), LinearMap.add_apply, he x hx, he y hy, add_smul]
       · apply inj
         simp only
-        rw [← he _ (mul_mem hx hy), Module.End.mul_apply, he y hy, map_smul, he x hx,
-          smul_smul, mul_comm]
+        rw [← he _ (mul_mem hx hy), Module.End.mul_apply, he y hy, map_smul, he x hx, smul_smul,
+          mul_comm]
     obtain ⟨m₁, a₁, p₁⟩ := key χ₁ u₁ hu₁ he₁
     obtain ⟨m₂, a₂, p₂⟩ := key χ₂ u₂ hu₂ he₂
     funext z
@@ -56,10 +62,10 @@ theorem eigencharacters_finite_of_commuting_annihilated :
       | mul x y hx hy ihx ihy => rw [p₁ x hx y hy, p₂ x hx y hy, ihx, ihy]
     · rw [h₁0 z hz, h₂0 z hz]
   refine ⟨X', ?_, ?_⟩
-  ·
-    let f : (Module.End ℂ V → ℂ) → (T → ℂ) := fun χ t => χ t
+  · let f : (Module.End ℂ V → ℂ) → (T → ℂ) := fun χ t => χ t
     apply Set.Finite.of_finite_image (f := f)
-    · apply (Set.Finite.pi (t := fun t : T => ((p t).roots.toFinset : Set ℂ))
+    · apply (Set.Finite.pi
+        (t := fun t : T => ((p t).roots.toFinset : Set ℂ))
         (fun t => Finset.finite_toSet _)).subset
       rintro _ ⟨χ, ⟨-, -, hroot⟩, rfl⟩
       simp only [Set.mem_pi, Set.mem_univ, Finset.mem_coe, Multiset.mem_toFinset, true_implies]
@@ -69,9 +75,15 @@ theorem eigencharacters_finite_of_commuting_annihilated :
     · intro χ₁ h₁ χ₂ h₂ hf
       exact hdet χ₁ h₁ χ₂ h₂ fun t ht => congrFun hf ⟨t, ht⟩
   · intro ψ hψ χ' u hu hu0 he
-    refine ⟨fun z => if z ∈ A then χ' z else 0, ⟨fun z hz => if_neg hz,
-      ⟨u, hu0, fun z hz => by simp only [if_pos hz]; exact he z hz⟩, fun t ht => ?_⟩,
-      fun z hz => (if_pos hz).symm⟩
+    refine ⟨
+      fun z => if z ∈ A then χ' z else 0,
+      ⟨
+        fun z hz => if_neg hz,
+        ⟨u, hu0, fun z hz => by simp only [if_pos hz]; exact he z hz⟩,
+        fun t ht => ?_
+      ⟩,
+      fun z hz => (if_pos hz).symm
+    ⟩
     have htA : t ∈ A := Algebra.subset_adjoin ht
     simp only [if_pos htA]
 

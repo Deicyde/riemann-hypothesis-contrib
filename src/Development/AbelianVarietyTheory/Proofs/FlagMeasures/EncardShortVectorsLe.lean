@@ -13,31 +13,34 @@ open scoped ENNReal Classical
 
 namespace GlobalTheory.Mass
 
-theorem trace_cast_eq_sum_re {K : Type} [Field K] [NumberField K] (z : K) :
-    ((Algebra.trace ℚ K z : ℚ) : ℝ) = ∑ τ : K →ₐ[ℚ] ℂ, (τ z).re := by
+theorem trace_cast_eq_sum_re {K : Type} [Field K] [NumberField K] (z : K)
+    : ((Algebra.trace ℚ K z : ℚ) : ℝ) = ∑ τ : K →ₐ[ℚ] ℂ, (τ z).re := by
   have key := trace_eq_sum_embeddings (K := ℚ) (L := K) ℂ (x := z)
   have hre := congrArg Complex.re key
   rw [Complex.re_sum] at hre
   rw [← hre]
   simp
 
-theorem card_algHom_eq_two_mul_fDeg {K : Type} [Field K] [NumberField K] (hK : IsTotallyComplex K) :
-    Module.finrank ℚ K = 2 * fDeg K := by
+theorem card_algHom_eq_two_mul_fDeg {K : Type} [Field K] [NumberField K] (hK : IsTotallyComplex K)
+    : Module.finrank ℚ K = 2 * fDeg K := by
   have := hK
   unfold Formalism.HermitianLatticesTheory.fDeg
   rw [IsTotallyComplex.finrank, InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces,
     IsTotallyComplex.nrRealPlaces_eq_zero, zero_add]
 
-theorem finrank_le_trace_of_integral {K : Type} [Field K] [NumberField K] (z : 𝓞 K)
-    (hre : ∀ τ : K →ₐ[ℚ] ℂ, (τ (z : K)).im = 0) (hpos : ∀ τ : K →ₐ[ℚ] ℂ, 0 < (τ (z : K)).re) :
-    (Module.finrank ℚ K : ℝ) ≤ ∑ τ : K →ₐ[ℚ] ℂ, (τ (z : K)).re := by
+theorem finrank_le_trace_of_integral
+    {K : Type} [Field K] [NumberField K]
+    (z : 𝓞 K)
+    (hre : ∀ τ : K →ₐ[ℚ] ℂ, (τ (z : K)).im = 0) (hpos : ∀ τ : K →ₐ[ℚ] ℂ, 0 < (τ (z : K)).re)
+    : (Module.finrank ℚ K : ℝ) ≤ ∑ τ : K →ₐ[ℚ] ℂ, (τ (z : K)).re := by
   classical
   have hprod : ((∏ τ : K →ₐ[ℚ] ℂ, (τ (z : K)).re : ℝ) : ℂ) = ∏ τ : K →ₐ[ℚ] ℂ, τ (z : K) := by
     rw [Complex.ofReal_prod]
     refine Finset.prod_congr rfl fun τ _ => ?_
     exact Complex.ext (by simp) (by simp [hre τ])
   have hnorm := Algebra.norm_eq_prod_embeddings (K := ℚ) (E := ℂ) (z : K)
-  have h2 : ((((Algebra.norm ℤ z : ℤ) : ℚ) : ℝ) : ℂ) = ((∏ τ : K →ₐ[ℚ] ℂ, (τ (z : K)).re : ℝ) : ℂ) := by
+  have h2
+      : ((((Algebra.norm ℤ z : ℤ) : ℚ) : ℝ) : ℂ) = ((∏ τ : K →ₐ[ℚ] ℂ, (τ (z : K)).re : ℝ) : ℂ) := by
     rw [hprod, ← hnorm, Algebra.coe_norm_int]
     simp
   have hN : (((Algebra.norm ℤ z : ℤ) : ℚ) : ℝ) = ∏ τ : K →ₐ[ℚ] ℂ, (τ (z : K)).re :=
@@ -48,14 +51,18 @@ theorem finrank_le_trace_of_integral {K : Type} [Field K] [NumberField K] (z : �
     have h3 : (0 : ℤ) < Algebra.norm ℤ z := by exact_mod_cast hP
     have h4 : (1 : ℤ) ≤ Algebra.norm ℤ z := h3
     exact_mod_cast h4
-  have hL := Formalism.HermitianLatticeCounting.Final.LatticeSumBounds.traceLower (K →ₐ[ℚ] ℂ) (fun τ => (τ (z : K)).re)
-    (fun τ => (hpos τ).le) hN1
+  have hL :=
+    Formalism.HermitianLatticeCounting.Final.LatticeSumBounds.traceLower (K →ₐ[ℚ] ℂ)
+      (fun τ => (τ (z : K)).re)
+      (fun τ => (hpos τ).le)
+      hN1
   simpa only [AlgHom.card] using hL
 
-theorem finrank_le_of_span_range {K V E : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] [AddCommGroup E] [Module ℝ E] (ι : V →+ E)
-    (hs : Submodule.span ℝ (Set.range ι) = ⊤) :
-    Module.finrank ℝ E ≤ Module.finrank ℚ K * Module.finrank K V := by
+theorem finrank_le_of_span_range
+    {K V E : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    [AddCommGroup E] [Module ℝ E]
+    (ι : V →+ E) (hs : Submodule.span ℝ (Set.range ι) = ⊤)
+    : Module.finrank ℝ E ≤ Module.finrank ℚ K * Module.finrank K V := by
   classical
   let bV := Module.finBasis K V
   let bK := Module.finBasis ℚ K
@@ -78,7 +85,16 @@ theorem finrank_le_of_span_range {K V E : Type} [Field K] [NumberField K] [AddCo
   rw [Set.finrank, hEq, finrank_top] at hc
   simpa [Fintype.card_prod] using hc
 
-theorem encard_shortVectors_le : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K), IsCMUnram K → h.IsSymm → PD h → ∀ L : Submodule (𝓞 K) V, IsIntLat h L → ∀ B : ℝ, 0 ≤ B → (({x : V | x ∈ L ∧ ∀ τ : K →+* ℂ, (τ (h x x)).re ≤ B}.encard : ℕ∞) : ℝ≥0∞) ≤ ENNReal.ofReal ((1 + 2 * Real.sqrt B) ^ (2 * Module.finrank K V * fDeg K)) := by
+theorem encard_shortVectors_le
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
+      IsCMUnram K → h.IsSymm → PD h
+        → ∀ L : Submodule (𝓞 K) V,
+          IsIntLat h L
+            → ∀ B : ℝ,
+              0 ≤ B
+                → (({x : V | x ∈ L ∧ ∀ τ : K →+* ℂ, (τ (h x x)).re ≤ B}.encard : ℕ∞) : ℝ≥0∞)
+                  ≤ ENNReal.ofReal ((1 + 2 * Real.sqrt B) ^ (2 * Module.finrank K V * fDeg K)) := by
   intro K V _ _ _ _ _ _ _ _ h hK hs hPD L hL B hB
   classical
   have hK' := hK
@@ -100,8 +116,7 @@ theorem encard_shortVectors_le : ∀ (K V : Type) [Field K] [NumberField K] [Sta
     rw [e2] at e1
     exact Complex.conj_eq_iff_im.mp e1.symm
   have hcard : Fintype.card (K →ₐ[ℚ] ℂ) = Module.finrank ℚ K := by simp
-  have hne : Nonempty (K →ₐ[ℚ] ℂ) :=
-    Fintype.card_pos_iff.mp (hcard ▸ Module.finrank_pos)
+  have hne : Nonempty (K →ₐ[ℚ] ℂ) := Fintype.card_pos_iff.mp (hcard ▸ Module.finrank_pos)
 
   have htr_pos : ∀ x : V, x ≠ 0 → 0 < Algebra.trace ℚ K (h x x) := by
     intro x hx
@@ -124,14 +139,16 @@ theorem encard_shortVectors_le : ∀ (K V : Type) [Field K] [NumberField K] [Sta
     · rw [hr']; exact hreal x τ.toRingHom
     · rw [hr']; exact hPD' τ.toRingHom x hx0
 
-  have hshort : ∀ x : V, (∀ τ : K →+* ℂ, (τ (h x x)).re ≤ B) →
-      ‖ι x‖ ^ 2 ≤ (Module.finrank ℚ K : ℝ) * B := by
+  have hshort
+      : ∀ x : V,
+        (∀ τ : K →+* ℂ, (τ (h x x)).re ≤ B) → ‖ι x‖ ^ 2 ≤ (Module.finrank ℚ K : ℝ) * B := by
     intro x hx
     rw [hnorm]
-    calc ∑ τ : K →ₐ[ℚ] ℂ, (τ (h x x)).re ≤ ∑ _τ : K →ₐ[ℚ] ℂ, B :=
-          Finset.sum_le_sum fun τ _ => hx τ.toRingHom
+    calc
+      ∑ τ : K →ₐ[ℚ] ℂ, (τ (h x x)).re
+        ≤ ∑ _τ : K →ₐ[ℚ] ℂ, B := Finset.sum_le_sum fun τ _ => hx τ.toRingHom
       _ = (Module.finrank ℚ K : ℝ) * B := by
-          rw [Finset.sum_const, Finset.card_univ, hcard, nsmul_eq_mul]
+        rw [Finset.sum_const, Finset.card_univ, hcard, nsmul_eq_mul]
 
   have hinj : Function.Injective ι := by
     intro a b hab
@@ -148,8 +165,10 @@ theorem encard_shortVectors_le : ∀ (K V : Type) [Field K] [NumberField K] [Sta
 
   set E := EuclideanSpace ℝ (Fin N)
   set Es : Submodule ℝ E := Submodule.span ℝ (Set.range ι) with hEs
-  let ι' : V →+ Es := AddMonoidHom.mk' (fun x => ⟨ι x, Submodule.subset_span ⟨x, rfl⟩⟩)
-    (fun a b => Subtype.ext (map_add ι a b))
+  let ι' : V →+ Es :=
+    AddMonoidHom.mk'
+      (fun x => ⟨ι x, Submodule.subset_span ⟨x, rfl⟩⟩)
+      (fun a b => Subtype.ext (map_add ι a b))
   have hι' : ∀ x, ((ι' x : Es) : E) = ι x := fun x => rfl
   have hspan : Submodule.span ℝ (Set.range ι') = ⊤ := by
     have e : Set.range ι' = ((↑) : Es → E) ⁻¹' (Set.range ι) := by
@@ -164,12 +183,13 @@ theorem encard_shortVectors_le : ∀ (K V : Type) [Field K] [NumberField K] [Sta
   have hdim : Module.finrank ℝ Es ≤ 2 * Module.finrank K V * fDeg K := by
     have h1 := finrank_le_of_span_range (K := K) (V := V) ι' hspan
     rw [card_algHom_eq_two_mul_fDeg hTC] at h1
-    calc Module.finrank ℝ Es ≤ 2 * fDeg K * Module.finrank K V := h1
+    calc
+      Module.finrank ℝ Es
+        ≤ 2 * fDeg K * Module.finrank K V := h1
       _ = 2 * Module.finrank K V * fDeg K := by ring
 
   set D : ℝ := (Module.finrank ℚ K : ℝ) with hD
-  have hD0 : 0 < D := by
-    rw [hD]; exact_mod_cast Module.finrank_pos
+  have hD0 : 0 < D := by rw [hD]; exact_mod_cast Module.finrank_pos
   set Λ : AddSubgroup Es := L.toAddSubgroup.map ι'
   have hl0 : 0 < Real.sqrt D := Real.sqrt_pos.mpr hD0
   have hmin : ∀ y ∈ Λ, y ≠ 0 → Real.sqrt D ≤ ‖y‖ := by
@@ -180,10 +200,13 @@ theorem encard_shortVectors_le : ∀ (K V : Type) [Field K] [NumberField K] [Sta
       exact hy0 (map_zero ι')
     have e : ‖ι' x‖ = ‖ι x‖ := rfl
     rw [e]
-    calc Real.sqrt D ≤ Real.sqrt (‖ι x‖ ^ 2) := Real.sqrt_le_sqrt (hlong x hx hx0)
+    calc
+      Real.sqrt D
+        ≤ Real.sqrt (‖ι x‖ ^ 2) := Real.sqrt_le_sqrt (hlong x hx hx0)
       _ = ‖ι x‖ := Real.sqrt_sq (norm_nonneg _)
-  obtain ⟨hfin, hcount⟩ := Formalism.HermitianLatticeCounting.Final.LatticeSumBounds.packing Es Λ (Real.sqrt D) (Real.sqrt (D * B))
-    hl0 (Real.sqrt_nonneg _) hmin
+  obtain ⟨hfin, hcount⟩ :=
+    Formalism.HermitianLatticeCounting.Final.LatticeSumBounds.packing Es Λ (Real.sqrt D)
+      (Real.sqrt (D * B)) hl0 (Real.sqrt_nonneg _) hmin
   have hratio : 2 * Real.sqrt (D * B) / Real.sqrt D = 2 * Real.sqrt B := by
     rw [Real.sqrt_mul hD0.le, mul_div_assoc, mul_div_cancel_left₀ _ hl0.ne']
   rw [hratio] at hcount
@@ -206,12 +229,12 @@ theorem encard_shortVectors_le : ∀ (K V : Type) [Field K] [NumberField K] [Sta
     rw [← hι' a, ← hι' b, hab]
   have hle := Set.encard_le_encard_of_injOn hmaps hinj'
   rw [← hfin.cast_ncard_eq] at hle
-  calc ((({x | x ∈ L ∧ ∀ τ : K →+* ℂ, (τ (h x x)).re ≤ B}.encard : ℕ∞) : ℝ≥0∞))
-      ≤ (((({y : Es | y ∈ Λ ∧ ‖y‖ ≤ Real.sqrt (D * B)}.ncard : ℕ) : ℕ∞)) : ℝ≥0∞) := by
-        exact_mod_cast hle
-    _ = ENNReal.ofReal (({y : Es | y ∈ Λ ∧ ‖y‖ ≤ Real.sqrt (D * B)}.ncard : ℝ)) := by
-        simp
+  calc
+    ((({x | x ∈ L ∧ ∀ τ : K →+* ℂ, (τ (h x x)).re ≤ B}.encard : ℕ∞) : ℝ≥0∞))
+        ≤ (((({y : Es | y ∈ Λ ∧ ‖y‖ ≤ Real.sqrt (D * B)}.ncard : ℕ) : ℕ∞)) : ℝ≥0∞) := by
+      exact_mod_cast hle
+    _ = ENNReal.ofReal (({y : Es | y ∈ Λ ∧ ‖y‖ ≤ Real.sqrt (D * B)}.ncard : ℝ)) := by simp
     _ ≤ ENNReal.ofReal ((1 + 2 * Real.sqrt B) ^ (2 * Module.finrank K V * fDeg K)) :=
-        ENNReal.ofReal_le_ofReal (hcount.trans hpow)
+      ENNReal.ofReal_le_ofReal (hcount.trans hpow)
 
 end GlobalTheory.Mass

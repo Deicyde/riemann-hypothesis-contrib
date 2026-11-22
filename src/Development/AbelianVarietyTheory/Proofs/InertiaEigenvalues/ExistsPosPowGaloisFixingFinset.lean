@@ -5,20 +5,25 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 
 namespace GlobalTheory.PowFix
 
-theorem exists_pos_pow_apply_eq {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
-    (σ : Ω ≃ₐ[E] Ω) (x : Ω) (hx : IsIntegral E x) : ∃ k : ℕ, 0 < k ∧ (σ ^ k) x = x := by
+theorem exists_pos_pow_apply_eq
+    {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω] (σ : Ω ≃ₐ[E] Ω) (x : Ω) (hx : IsIntegral E x)
+    : ∃ k : ℕ, 0 < k ∧ (σ ^ k) x = x := by
   classical
   have hfin : ((minpoly E x).rootSet Ω).Finite := Polynomial.rootSet_finite _ _
   haveI := hfin.to_subtype
-  let f : ℕ → (minpoly E x).rootSet Ω := fun n => ⟨(σ ^ n) x, by
-    rw [Polynomial.mem_rootSet]
-    refine ⟨minpoly.ne_zero hx, ?_⟩
-    rw [show ((σ ^ n) x) = ((σ ^ n : Ω ≃ₐ[E] Ω) : Ω →ₐ[E] Ω) x from rfl,
-      Polynomial.aeval_algHom_apply, minpoly.aeval, map_zero]⟩
+  let f : ℕ → (minpoly E x).rootSet Ω := fun n => ⟨
+    (σ ^ n) x,
+    by
+      rw [Polynomial.mem_rootSet]
+      refine ⟨minpoly.ne_zero hx, ?_⟩
+      rw [show ((σ ^ n) x) = ((σ ^ n : Ω ≃ₐ[E] Ω) : Ω →ₐ[E] Ω) x from rfl,
+        Polynomial.aeval_algHom_apply, minpoly.aeval, map_zero]
+  ⟩
   obtain ⟨a, b, hab, h⟩ := Finite.exists_ne_map_eq_of_infinite f
   have h' : (σ ^ a) x = (σ ^ b) x := congrArg Subtype.val h
   have key : ∀ a b : ℕ, a < b → (σ ^ a) x = (σ ^ b) x → ∃ k : ℕ, 0 < k ∧ (σ ^ k) x = x := by
@@ -31,14 +36,18 @@ theorem exists_pos_pow_apply_eq {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω
   · exact key a b hlt h'
   · exact key b a hlt h'.symm
 
-theorem pow_apply_eq_of_apply_eq {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
-    (τ : Ω ≃ₐ[E] Ω) (x : Ω) (h : τ x = x) (j : ℕ) : (τ ^ j) x = x := by
+theorem pow_apply_eq_of_apply_eq
+    {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω] (τ : Ω ≃ₐ[E] Ω) (x : Ω) (h : τ x = x) (j : ℕ)
+    : (τ ^ j) x = x := by
   induction j with
   | zero => rfl
   | succ j ih => rw [pow_succ, AlgEquiv.mul_apply, h, ih]
 
-theorem exists_pos_pow_fix : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (σ : G E Ω) (s : Finset Ω), ∃ m : ℕ, 0 < m ∧ ∀ x ∈ s, (σ ^ m) x = x := by
+theorem exists_pos_pow_fix
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (σ : G E Ω) (s : Finset Ω),
+      ∃ m : ℕ,
+        0 < m ∧ ∀ x ∈ s, (σ ^ m) x = x := by
   intro E Ω _ _ _ _ _ σ s
   classical
   have hint : ∀ x : Ω, IsIntegral E x := fun x =>

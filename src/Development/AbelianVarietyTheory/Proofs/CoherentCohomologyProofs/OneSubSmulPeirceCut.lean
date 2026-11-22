@@ -16,8 +16,8 @@ def peirceCut (e : R) (he : IsIdempotentElem e) : A →* A where
     have h2 : e * (1 - e) = 0 := by rw [mul_sub, mul_one, h1, sub_self]
     have h3 : (1 - e) * e = 0 := by rw [mul_comm, h2]
     have h4 : (1 - e) * (1 - e) = 1 - e := he.one_sub
-    simp only [add_mul, mul_add, smul_mul_smul_comm, h1, h2, h3, h4, zero_smul, add_zero,
-      zero_add, mul_one]
+    simp only [add_mul, mul_add, smul_mul_smul_comm, h1, h2, h3, h4, zero_smul, add_zero, zero_add,
+      mul_one]
 
 variable {A}
 

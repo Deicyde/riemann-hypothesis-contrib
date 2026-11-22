@@ -14,8 +14,8 @@ open Polynomial
 
 universe u
 
-theorem ReesAlgebraDim.proof (h₁ : DimensionInequality.Statement.{u, u}) :
-    ReesAlgebraDim.Statement.{u} := by
+theorem ReesAlgebraDim.proof (h₁ : DimensionInequality.Statement.{u, u})
+    : ReesAlgebraDim.Statement.{u} := by
   intro A _ _ _ I hI n hn
   obtain ⟨a, haI, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
   have hinj : Function.Injective (algebraMap A (reesAlgebra I)) := by
@@ -27,17 +27,19 @@ theorem ReesAlgebraDim.proof (h₁ : DimensionInequality.Statement.{u, u}) :
     intro P hP
     have key := h₁ A (reesAlgebra I) hinj P
     have htd : Algebra.trdeg A (reesAlgebra I) ≤ 1 := by
-      calc Algebra.trdeg A (reesAlgebra I) ≤ Algebra.trdeg A A[X] :=
-            trdeg_le_of_injective (reesAlgebra I).val Subtype.val_injective
+      calc
+        Algebra.trdeg A (reesAlgebra I)
+          ≤ Algebra.trdeg A A[X] := trdeg_le_of_injective (reesAlgebra I).val Subtype.val_injective
         _ = 1 := Polynomial.trdeg_of_isDomain
     have hp : (P.under A).height ≤ n := by
       have := Ideal.height_le_ringKrullDim_of_ne_top (inferInstance : (P.under A).IsPrime).ne_top
       rw [hn] at this
       exact_mod_cast this
     have hc : Cardinal.ofENat P.height ≤ Cardinal.ofENat ((n + 1 : ℕ) : ℕ∞) := by
-      calc Cardinal.ofENat P.height
-          ≤ Cardinal.ofENat P.height + Algebra.trdeg (A ⧸ P.under A) (reesAlgebra I ⧸ P) :=
-            le_self_add
+      calc
+        Cardinal.ofENat P.height
+            ≤ Cardinal.ofENat P.height + Algebra.trdeg (A ⧸ P.under A) (reesAlgebra I ⧸ P) :=
+          le_self_add
         _ ≤ Cardinal.ofENat (P.under A).height + Algebra.trdeg A (reesAlgebra I) := key
         _ ≤ Cardinal.ofENat (n : ℕ∞) + 1 := by gcongr
         _ = Cardinal.ofENat ((n + 1 : ℕ) : ℕ∞) := by simp
@@ -51,7 +53,7 @@ theorem ReesAlgebraDim.proof (h₁ : DimensionInequality.Statement.{u, u}) :
       have := congrArg (fun s : reesAlgebra I => (s : A[X])) h
       simp [r] at this
       exact ha0 this
-    have h := ringKrullDim_succ_le_of_surjective f hf (mem_nonZeroDivisors_of_ne_zero hr0)
-      (by simp [f, r])
+    have h :=
+      ringKrullDim_succ_le_of_surjective f hf (mem_nonZeroDivisors_of_ne_zero hr0) (by simp [f, r])
     rw [hn] at h
     exact_mod_cast h

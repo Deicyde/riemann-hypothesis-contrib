@@ -10,8 +10,9 @@ open GlobalTheory.QFam
 
 namespace GlobalTheory.QFam
 
-theorem hasQ_mul_spread : ∀ (N M : ℕ) (f : ℍ → ℂ) (a : ℕ → ℂ), 0 < N → 0 < M → HasQ N f a →
-    HasQ (N * M) f (spread M a) := by
+theorem hasQ_mul_spread
+    : ∀ (N M : ℕ) (f : ℍ → ℂ) (a : ℕ → ℂ),
+      0 < N → 0 < M → HasQ N f a → HasQ (N * M) f (spread M a) := by
   intro N M f a hN hM h τ
   have hN' : (N : ℂ) ≠ 0 := by exact_mod_cast hN.ne'
   have hM' : (M : ℂ) ≠ 0 := by exact_mod_cast hM.ne'

@@ -13,12 +13,17 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open scoped Classical
 
-theorem UpperTheory.ConvolutionTheory.R2.Ff.derX :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (O : Fo.Ops F) (W : Weil D) (M : Meas F) (π : TR.CuspSub F 2), DerX O W M π := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.derX
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (O : Fo.Ops F)
+        (W : Weil D) (M : Meas F) (π : TR.CuspSub F 2),
+      DerX O W M π := by
   intro F E _ _ _ _ _ _ _ D O W M π f hf φ hφ Y s hY h
   obtain ⟨ω, -, hω⟩ := UpperTheory.ConvolutionTheory.R2.cen F π
   obtain ⟨z, c, hc, hz⟩ := UpperTheory.ConvolutionTheory.R2.Ff.cenExp F E D s
@@ -27,15 +32,18 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.derX :
   have hfx : ∀ t x, f.1 (x * TR.infGL F 2 (c t)) = χ t * f.1 x := by
     intro t x
     rw [← (hz t).2, ← UpperTheory.ConvolutionTheory.R2.scalar_comm, hω f hf]
-  have hfun : ∀ t, lift W M f.1 φ (h * infGL E 2 (ex (Y + zE s) t)) =
-      χ t * lift W M f.1 φ (h * infGL E 2 (ex Y t)) := by
+  have hfun
+      : ∀ t,
+        lift W M f.1 φ (h * infGL E 2 (ex (Y + zE s) t))
+          = χ t * lift W M f.1 φ (h * infGL E 2 (ex Y t)) := by
     intro t
     rw [(UpperTheory.ConvolutionTheory.R2.Ff.exPar E Y).2.2.2.2 s t, map_mul, (hz t).1, ← mul_assoc,
       ← UpperTheory.ConvolutionTheory.R2.scalar_comm, mul_assoc]
     exact (UpperTheory.ConvolutionTheory.R2.equiv F E D W M π f hf φ).2 ω (hω f hf) (z t) _
   have hlin := (UpperTheory.ConvolutionTheory.R2.Ff.lin F E D W M π).2.2.2
   have hG := UpperTheory.ConvolutionTheory.R2.Ff.derL F E D O W M π f hf φ hφ Y hY h
-  have hD : HasDerivAt (fun t => χ t * lift W M f.1 φ h)
+  have hD : HasDerivAt
+      (fun t => χ t * lift W M f.1 φ h)
       (lift W M (TR.lie F 2 (zF (trI F s)) f).1 φ h) 0 := by
     have h0 := UpperTheory.ConvolutionTheory.R2.Ff.derF F E D W M π f hf φ hφ c _ hc h
     refine h0.congr_of_eventuallyEq (Filter.Eventually.of_forall fun t => ?_)

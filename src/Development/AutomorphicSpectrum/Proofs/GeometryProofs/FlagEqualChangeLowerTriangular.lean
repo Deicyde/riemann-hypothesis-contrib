@@ -6,7 +6,10 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsFrameVec
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Filter Topology
-open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
+  Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
 open AlgebraicGeometry CategoryTheory
 open scoped Matrix
@@ -16,7 +19,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Rec.FinRd.Roots.FlagTri
 
-theorem independent_and_triangular : ∀ (Ω : Type) [Field Ω] (L : Type) [AddCommGroup L] [Module Ω L] (r : ℕ) (b b₀ : Fin r → L) (Tm : Matrix (Fin r) (Fin r) Ω), LinearIndependent Ω b → (∀ i : ℕ, flagStep Ω b i = flagStep Ω b₀ i) → (∀ i, b i = ∑ j, Tm i j • b₀ j) → LinearIndependent Ω b₀ ∧ ∀ i j, i < j → Tm i j = 0 := by
+theorem independent_and_triangular
+    : ∀ (Ω : Type) [Field Ω] (L : Type) [AddCommGroup L] [Module Ω L] (r : ℕ) (b b₀ : Fin r → L)
+        (Tm : Matrix (Fin r) (Fin r) Ω),
+      LinearIndependent Ω b → (∀ i : ℕ, flagStep Ω b i = flagStep Ω b₀ i)
+        → (∀ i, b i = ∑ j, Tm i j • b₀ j)
+        → LinearIndependent Ω b₀ ∧ ∀ i j, i < j → Tm i j = 0 := by
   intro Ω _ L _ _ r b b₀ Tm hb hflag hT
   have hspan : Submodule.span Ω (Set.range b₀) = Submodule.span Ω (Set.range b) := by
     have h := hflag r
@@ -50,7 +58,8 @@ theorem independent_and_triangular : ∀ (Ω : Type) [Field Ω] (L : Type) [AddC
     · simp
     · intro k
       simp
-  have h0 : c j - Tm i j = 0 := (Fintype.linearIndependent_iff.mp hb₀) (fun k => c k - Tm i k) hsum j
+  have h0 : c j - Tm i j = 0 :=
+    (Fintype.linearIndependent_iff.mp hb₀) (fun k => c k - Tm i k) hsum j
   have hcj : c j = 0 := by
     by_contra hne
     have hsupp := (Finsupp.mem_supported Ω c).mp hc

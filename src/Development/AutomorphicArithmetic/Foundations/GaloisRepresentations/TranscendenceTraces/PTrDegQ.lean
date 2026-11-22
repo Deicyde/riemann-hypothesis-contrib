@@ -5,12 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private theorem trHl_pullHl (hHl : TrHl) (hDeg : TrDeg) (l : ℕ) [Fact l.Prime] (n i : ℤ) {Z S : Scheme.{0}} (p : Z ⟶ S)
-    [IsFinite p] (w : Wt Z) (d : ℤ) (hw : IsWt p w) (hl : IsUnit (l : Γ(S, ⊤))) (hd : w.push p = Wt.const S d)
-    (x : Hl l (sch.obj S) n i) :
-    trHl l p w n i (pullHl l (sch.map p) n i x) = d • x := by
+private theorem trHl_pullHl
+    (hHl : TrHl) (hDeg : TrDeg)
+    (l : ℕ) [Fact l.Prime]
+    (n i : ℤ)
+    {Z S : Scheme.{0}} (p : Z ⟶ S) [IsFinite p]
+    (w : Wt Z) (d : ℤ)
+    (hw : IsWt p w) (hl : IsUnit (l : Γ(S, ⊤))) (hd : w.push p = Wt.const S d)
+    (x : Hl l (sch.obj S) n i)
+    : trHl l p w n i (pullHl l (sch.map p) n i x) = d • x := by
   apply Subtype.ext
   funext k
   have hk : IsUnit ((↑(l ^ k) : ℕ) : Γ(S, ⊤)) := by
@@ -20,8 +26,7 @@ private theorem trHl_pullHl (hHl : TrHl) (hDeg : TrDeg) (l : ℕ) [Fact l.Prime]
   rw [hHl l n i p w hw hl _ k]
   exact hDeg (l ^ k) n i p w d hw hk hd (x.1 k)
 
-theorem UpperTheory.Gal.TranscendenceTraces.trDegQ_of :
-    TrHl → TrDeg → TrDegQ := by
+theorem UpperTheory.Gal.TranscendenceTraces.trDegQ_of : TrHl → TrDeg → TrDegQ := by
   intro hHl hDeg l _ n i Z S p _ w d hw hl hd
   apply LinearMap.ext
   intro z

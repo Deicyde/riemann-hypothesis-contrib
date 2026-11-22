@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.WeightExponen
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues
+  Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff)
 open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF (AvFSt HTFSt UpFSt)
 open GlobalTheory.RunDepth GlobalTheory.CharDepth
@@ -22,11 +25,13 @@ theorem vd2_nonneg_of_D7 (D : D7) : 0 ≤ vd2 D := by
   unfold vd2
   exact Real.logb_nonneg (by norm_num) (by exact_mod_cast D.host.QS_pos)
 
-theorem sizes_two_arith (T f q m v A S C b Sc η : ℝ) (hf : 0 ≤ f) (hq : 0 ≤ q) (hqm : q ≤ m) (hv : 0 ≤ v)
-    (hC : 1 ≤ C) (hb : 0 ≤ b) (hSc : 0 ≤ Sc) (hη : 0 ≤ η) (hA : T * A = 2 * b + Sc) (hS : T * S ≤ f * η) :
-    T * (f * q * (1 + v / 2) * A + q * S) ≤ C * m * (2 + v) * (2 * f * b + f * (Sc + η)) := by
+theorem sizes_two_arith
+    (T f q m v A S C b Sc η : ℝ) (hf : 0 ≤ f) (hq : 0 ≤ q) (hqm : q ≤ m) (hv : 0 ≤ v) (hC : 1 ≤ C)
+    (hb : 0 ≤ b) (hSc : 0 ≤ Sc) (hη : 0 ≤ η) (hA : T * A = 2 * b + Sc) (hS : T * S ≤ f * η)
+    : T * (f * q * (1 + v / 2) * A + q * S) ≤ C * m * (2 + v) * (2 * f * b + f * (Sc + η)) := by
   have hm : 0 ≤ m := hq.trans hqm
-  have e1 : T * (f * q * (1 + v / 2) * A + q * S) = q * (f * (1 + v / 2) * (2 * b + Sc) + T * S) := by
+  have e1
+      : T * (f * q * (1 + v / 2) * A + q * S) = q * (f * (1 + v / 2) * (2 * b + Sc) + T * S) := by
     rw [← hA]; ring
   have h1 : f * (1 + v / 2) * (2 * b + Sc) + T * S ≤ (2 + v) * (2 * f * b + f * (Sc + η)) := by
     have p1 : 0 ≤ f * (1 + v / 2) * (2 * b + Sc) := by positivity
@@ -34,18 +39,37 @@ theorem sizes_two_arith (T f q m v A S C b Sc η : ℝ) (hf : 0 ≤ f) (hq : 0 �
     nlinarith
   have h0 : 0 ≤ (2 + v) * (2 * f * b + f * (Sc + η)) := by positivity
   rw [e1]
-  calc q * (f * (1 + v / 2) * (2 * b + Sc) + T * S) ≤ q * ((2 + v) * (2 * f * b + f * (Sc + η))) :=
-        mul_le_mul_of_nonneg_left h1 hq
+  calc
+    q * (f * (1 + v / 2) * (2 * b + Sc) + T * S)
+      ≤ q * ((2 + v) * (2 * f * b + f * (Sc + η))) := mul_le_mul_of_nonneg_left h1 hq
     _ ≤ m * ((2 + v) * (2 * f * b + f * (Sc + η))) := mul_le_mul_of_nonneg_right hqm h0
-    _ ≤ C * (m * ((2 + v) * (2 * f * b + f * (Sc + η)))) := le_mul_of_one_le_left (mul_nonneg hm h0) hC
+    _ ≤ C * (m * ((2 + v) * (2 * f * b + f * (Sc + η)))) :=
+      le_mul_of_one_le_left (mul_nonneg hm h0) hC
     _ = _ := by ring
 
-theorem sizes_bound_two : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm) (hK : DV.KapDef D) (Q : Par D), Q.Pins → 3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b → ∀ C : ℝ, 1 ≤ C → ∀ j, InR D j → ∃ Ap : ℝ, 0 ≤ Ap ∧ (∀ τ, InPsi Q.H τ → (wtA (lR Tp hK j) (τ, 0) : ℝ) ≤ Ap) ∧ (open Classical in (Tp.TO : ℝ) * ((D.R.f : ℝ) * (Q.Dw j).q * (1 + vd2 D / 2) * Ap + (Q.Dw j).q * ∑ τ ∈ Finset.univ.filter (fun τ => ¬ InPsi Q.H τ), (wtA (lR Tp hK j) (τ, 0) : ℝ)) ≤ C * D.R.m * (2 + vd2 D) * (2 * (D.R.f : ℝ) * L.sc.b + (D.R.f : ℝ) * (L.Sc + L.etaSz))) := by
+theorem sizes_bound_two
+    : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm)
+        (hK : DV.KapDef D) (Q : Par D),
+      Q.Pins → 3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b
+        → ∀ C : ℝ,
+          1 ≤ C
+            → ∀ j,
+              InR D j
+                → ∃ Ap : ℝ,
+                  0 ≤ Ap ∧ (∀ τ, InPsi Q.H τ → (wtA (lR Tp hK j) (τ, 0) : ℝ) ≤ Ap)
+                    ∧ (open Classical in
+                      (Tp.TO : ℝ)
+                          * ((D.R.f : ℝ) * (Q.Dw j).q * (1 + vd2 D / 2) * Ap
+                            + (Q.Dw j).q
+                              * ∑ τ ∈ Finset.univ.filter (fun τ => ¬ InPsi Q.H τ), (wtA (lR Tp hK j) (τ, 0) : ℝ))
+                        ≤ C * D.R.m * (2 + vd2 D)
+                          * (2 * (D.R.f : ℝ) * L.sc.b + (D.R.f : ℝ) * (L.Sc + L.etaSz))) := by
   classical
   intro D L Pm Tp hK Q hQ hx hkb C hC j hj
   obtain ⟨hSe, hw⟩ := GlobalTheory.T.cloudSizes_between_zero_and_twice_b D L Pm hx hkb
   obtain ⟨hw1, -, -⟩ := hw j hj
-  obtain ⟨-, -, hP, hN, hwt⟩ := GlobalTheory.T.weightExponents_embeddings_degree D Q hQ j hj (lR Tp hK j)
+  obtain ⟨-, -, hP, hN, hwt⟩ :=
+    GlobalTheory.T.weightExponents_embeddings_degree D Q hQ j hj (lR Tp hK j)
   have hT : (0 : ℝ) < (Tp.TO : ℝ) := by exact_mod_cast TO_pos Tp
   have hb : 0 ≤ L.sc.b := (Real.exp_pos _).le
   have hSc := L.Sc_pos.le
@@ -69,7 +93,8 @@ theorem sizes_bound_two : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice
     unfold Formalism.L2.Pj.ext0
     split_ifs with h
     · have h1 : (Tp.TO : ℝ) * ((lR Tp hK j).aM t ⟨0, h⟩ : ℝ) ≤ ((kaR Tp hK j).aM t ⟨0, h⟩ : ℝ) := by
-        exact_mod_cast (GlobalTheory.T.mul_rows_scaledWeight_le_kappaRows D L Pm Tp hK j t).2.1 ⟨0, h⟩
+        exact_mod_cast (GlobalTheory.T.mul_rows_scaledWeight_le_kappaRows D L Pm Tp hK j t).2.1
+          ⟨0, h⟩
       exact h1.trans ((GlobalTheory.T.kappaRows_entries_le_sizes D L Pm Tp hK j hj t).2.2 _)
     · simpa using hη
   refine ⟨(2 * L.sc.b + L.Sc) / Tp.TO, by positivity, ?_, ?_⟩
@@ -80,8 +105,8 @@ theorem sizes_bound_two : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice
   · have hq : (Q.Dw j).q ≤ D.R.m := by
       rw [(hQ.2.2.2 j hj).2.1]
       exact Nat.sub_le _ _
-    refine sizes_two_arith _ _ _ _ _ _ _ _ _ _ _ (Nat.cast_nonneg _) (Nat.cast_nonneg _) (by exact_mod_cast hq)
-      (vd2_nonneg_of_D7 D) hC hb hSc hη (by field_simp) ?_
+    refine sizes_two_arith _ _ _ _ _ _ _ _ _ _ _ (Nat.cast_nonneg _) (Nat.cast_nonneg _)
+      (by exact_mod_cast hq) (vd2_nonneg_of_D7 D) hC hb hSc hη (by field_simp) ?_
     rw [Finset.mul_sum]
     have hcard : (Finset.univ.filter (fun τ => ¬ InPsi Q.H τ)).card ≤ D.R.f := by
       rw [← (GlobalTheory.T.realPlaceLabel_bijective_card_eq_f D).2, ← Finset.card_univ]

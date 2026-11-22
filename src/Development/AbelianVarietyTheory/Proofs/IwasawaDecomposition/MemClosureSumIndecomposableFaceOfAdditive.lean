@@ -5,17 +5,22 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MarkV
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.Mark
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.Mark
 
 namespace GlobalTheory.PolFan.Mark
 
-theorem mem_closure_isIndec (O : Type) [CommRing O] (bar : O → O) (ψ lab : InvFun O) (X : Type) [AddCommGroup X]
-    [Module O X] [Module.Finite O X] (β : LinearMap.BilinForm ℤ X)
-    (hadd : ∀ x y, InFace bar ψ lab β x → InFace bar ψ lab β y →
-      InFace bar ψ lab β (x + y) ∧ ψ.evalZ (x + y) = ψ.evalZ x + ψ.evalZ y)
+theorem mem_closure_isIndec
+    (O : Type) [CommRing O]
+    (bar : O → O) (ψ lab : InvFun O)
+    (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X]
+    (β : LinearMap.BilinForm ℤ X)
+    (hadd : ∀ x y,
+      InFace bar ψ lab β x → InFace bar ψ lab β y
+        → InFace bar ψ lab β (x + y) ∧ ψ.evalZ (x + y) = ψ.evalZ x + ψ.evalZ y)
     (hint : ∀ x, InFace bar ψ lab β x → ∃ n : ℤ, ψ.evalZ x = n)
-    (hpos : ∀ x, InFace bar ψ lab β x → x ≠ 0 → 0 < ψ.evalZ x) :
-    ∀ x, InFace bar ψ lab β x → x ∈ AddSubmonoid.closure {y | IsIndec bar ψ lab β y} := by
+    (hpos : ∀ x, InFace bar ψ lab β x → x ≠ 0 → 0 < ψ.evalZ x)
+    : ∀ x, InFace bar ψ lab β x → x ∈ AddSubmonoid.closure {y | IsIndec bar ψ lab β y} := by
   have hone : ∀ x, InFace bar ψ lab β x → x ≠ 0 → 1 ≤ ψ.evalZ x := by
     intro x hx h0
     obtain ⟨n, hn⟩ := hint x hx
@@ -23,8 +28,10 @@ theorem mem_closure_isIndec (O : Type) [CommRing O] (bar : O → O) (ψ lab : In
     rw [hn] at hp ⊢
     have : (0 : ℤ) < n := by exact_mod_cast hp
     exact_mod_cast this
-  have key : ∀ N : ℕ, ∀ x, InFace bar ψ lab β x → x ≠ 0 → ψ.evalZ x < N →
-      x ∈ AddSubmonoid.closure {y | IsIndec bar ψ lab β y} := by
+  have key
+      : ∀ N : ℕ, ∀ x,
+        InFace bar ψ lab β x → x ≠ 0 → ψ.evalZ x < N
+          → x ∈ AddSubmonoid.closure {y | IsIndec bar ψ lab β y} := by
     intro N
     induction N with
     | zero =>

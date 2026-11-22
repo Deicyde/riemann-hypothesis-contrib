@@ -11,38 +11,48 @@ open scoped Classical
 
 namespace GlobalTheory.Shin.BlocksTwist
 
-theorem toG_map {F : Type} [Field F] (t : F →+* F) {m : ℕ} (M : Matrix (Fin m) (Fin m) F) (h : IsUnit M) :
-    toG (M.map t) = gal t m (toG M) := by
+theorem toG_map
+    {F : Type} [Field F] (t : F →+* F) {m : ℕ} (M : Matrix (Fin m) (Fin m) F) (h : IsUnit M)
+    : toG (M.map t) = gal t m (toG M) := by
   have h' : IsUnit (M.map t) := by simpa using h.map (t.mapMatrix)
   unfold toG
   rw [dite_eq_left h', dite_eq_left h]
   ext i j
   simp [gal]
 
-theorem coe_gal {F : Type} [Field F] (t : F →+* F) (n : ℕ) (p : GL (Fin n) F) :
-    ((gal t n p : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = (p : Matrix (Fin n) (Fin n) F).map t := by
+theorem coe_gal {F : Type} [Field F] (t : F →+* F) (n : ℕ) (p : GL (Fin n) F)
+    : ((gal t n p : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
+      = (p : Matrix (Fin n) (Fin n) F).map t := by
   simp [gal]
 
-theorem ent_map {F : Type} [Field F] (t : F →+* F) {n : ℕ} (M : Matrix (Fin n) (Fin n) F) (i j : ℕ) :
-    ent (M.map t) i j = t (ent M i j) := by
+theorem ent_map {F : Type} [Field F] (t : F →+* F) {n : ℕ} (M : Matrix (Fin n) (Fin n) F) (i j : ℕ)
+    : ent (M.map t) i j = t (ent M i j) := by
   unfold ent
   split_ifs <;> simp
 
-theorem tl_map {F : Type} [Field F] (t : F →+* F) (a : ℕ) {n : ℕ} (M : Matrix (Fin n) (Fin n) F) :
-    tl a (M.map t) = (tl a M).map t := by
+theorem tl_map {F : Type} [Field F] (t : F →+* F) (a : ℕ) {n : ℕ} (M : Matrix (Fin n) (Fin n) F)
+    : tl a (M.map t) = (tl a M).map t := by
   ext i j; simp [tl, ent_map]
 
-theorem br_map {F : Type} [Field F] (t : F →+* F) (a b : ℕ) {n : ℕ} (M : Matrix (Fin n) (Fin n) F) :
-    br a b (M.map t) = (br a b M).map t := by
+theorem br_map {F : Type} [Field F] (t : F →+* F) (a b : ℕ) {n : ℕ} (M : Matrix (Fin n) (Fin n) F)
+    : br a b (M.map t) = (br a b M).map t := by
   ext i j; simp [br, ent_map]
 
-theorem inPar_gal {F : Type} [Field F] (t : F →+* F) (a : ℕ) {n : ℕ} (p : GL (Fin n) F) (hp : InPar a p) :
-    InPar a (gal t n p) := by
+theorem inPar_gal
+    {F : Type} [Field F] (t : F →+* F) (a : ℕ) {n : ℕ} (p : GL (Fin n) F) (hp : InPar a p)
+    : InPar a (gal t n p) := by
   intro i j hj hi
   rw [coe_gal]
   simp [hp i j hj hi]
 
-theorem blocks_twist : ∀ (F : Type) [Field F] (t : F →+* F) (a b n : ℕ), n = a + b → ∀ (p x : GL (Fin n) F), InPar a p → InPar a x → tlG a (p⁻¹ * x * gal t n p) = (tlG a p)⁻¹ * tlG a x * gal t a (tlG a p) ∧ brG a b (p⁻¹ * x * gal t n p) = (brG a b p)⁻¹ * brG a b x * gal t b (brG a b p) := by
+theorem blocks_twist
+    : ∀ (F : Type) [Field F] (t : F →+* F) (a b n : ℕ),
+      n = a + b
+        → ∀ (p x : GL (Fin n) F),
+          InPar a p → InPar a x
+            → tlG a (p⁻¹ * x * gal t n p) = (tlG a p)⁻¹ * tlG a x * gal t a (tlG a p)
+              ∧ brG a b (p⁻¹ * x * gal t n p)
+                = (brG a b p)⁻¹ * brG a b x * gal t b (brG a b p) := by
   intro F _ t a b n hn p x hp hx
   obtain ⟨H, π, hH, -, hπ, -, -⟩ := BlockPar.block_par F a b n hn
   let p' : H := ⟨p, (hH p).2 hp⟩

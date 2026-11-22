@@ -25,15 +25,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulMat
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT
 open scoped Classical
 
 noncomputable section
 
 namespace GlobalTheory.TwLatCoset
 
-variable {E : Type} [Field E] [NumberField E] {w : Pl E} {K : GlobalTheory.UnitLemma.UQ}
-  (e : K.E ≃+* w.adicCompletion E) {B : GlobalTheory.UnitLemma.InvAlg K} {m : ℕ} (b : Module.Basis (Fin m) K.E B.A)
+variable
+  {E : Type} [Field E] [NumberField E]
+  {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} (e : K.E ≃+* w.adicCompletion E)
+  {B : GlobalTheory.UnitLemma.InvAlg K} {m : ℕ} (b : Module.Basis (Fin m) K.E B.A)
 
 def vec (y : Fin m → w.adicCompletion E) : B.A := ∑ i, e.symm (y i) • b i
 
@@ -151,13 +154,22 @@ lemma mem_lat (hI : ∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) �
     rw [hsum]
     exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
 
-theorem lat_coset : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ (w : Pl E), ¬ IsSplitAt w →
-    ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E), (∀ x, e (K.c x) = cj w (e x)) →
-    (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1) →
-    (∀ x, GlobalTheory.UnitLemma.val K.O x = ordL (e x)) → ∀ (B : GlobalTheory.UnitLemma.InvAlg K) (m : ℕ)
-    (b : Module.Basis (Fin m) K.E B.A),
-    (∀ g g' : GLw m w, GlobalTheory.TwLat.lat e b g = GlobalTheory.TwLat.lat e b g' ↔ g⁻¹ * g' ∈ GlobalTheory.LFun.KGL w (n := m)) ∧
-      ∀ g : GLw m w, GlobalTheory.UnitLemma.IsLat K.O K.E (GlobalTheory.TwLat.lat e b g) := by
+theorem lat_coset
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ (w : Pl E),
+          ¬ IsSplitAt w
+            → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E),
+              (∀ x, e (K.c x) = cj w (e x))
+                → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1)
+                → (∀ x, GlobalTheory.UnitLemma.val K.O x = ordL (e x))
+                → ∀ (B : GlobalTheory.UnitLemma.InvAlg K) (m : ℕ)
+                    (b : Module.Basis (Fin m) K.E B.A),
+                  (∀ g g' : GLw m w,
+                      GlobalTheory.TwLat.lat e b g = GlobalTheory.TwLat.lat e b g'
+                        ↔ g⁻¹ * g' ∈ GlobalTheory.LFun.KGL w (n := m))
+                    ∧ ∀ g : GLw m w,
+                      GlobalTheory.UnitLemma.IsLat K.O K.E (GlobalTheory.TwLat.lat e b g) := by
   intro E _ _ _ _ w _ K e _ hI _ B m b
   refine ⟨fun g g' => ?_, fun g => ?_⟩
   · show _ ↔ g⁻¹ * g' ∈ GLint (Fin m) (Ov E w)
@@ -174,11 +186,13 @@ theorem lat_coset : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr 
   · refine ⟨Submodule.fg_span (Set.finite_range _), ?_⟩
     rw [eq_top_iff]
     intro a _
-    have hsum : a = ∑ j, e.symm (((↑g⁻¹ : Matrix (Fin m) (Fin m) (w.adicCompletion E)) *ᵥ crd e b a) j) •
-        vec e b (fun i => (↑g : Matrix (Fin m) (Fin m) (w.adicCompletion E)) i j) := by
+    have hsum
+        : a
+          = ∑ j, e.symm (((↑g⁻¹ : Matrix (Fin m) (Fin m) (w.adicCompletion E)) *ᵥ crd e b a) j) •
+            vec e b (fun i => (↑g : Matrix (Fin m) (Fin m) (w.adicCompletion E)) i j) := by
       rw [sum_cols, gl_vec', vec_crd]
     rw [hsum]
-    exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _
-      (Submodule.subset_span (Submodule.subset_span ⟨j, rfl⟩))
+    exact Submodule.sum_mem _ fun j _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span (Submodule.subset_span ⟨j, rfl⟩))
 
 end GlobalTheory.TwLatCoset

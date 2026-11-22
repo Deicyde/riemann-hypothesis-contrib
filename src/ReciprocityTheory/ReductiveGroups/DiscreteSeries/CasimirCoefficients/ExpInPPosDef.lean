@@ -89,14 +89,16 @@ lemma kexp_sq (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hH : Xᴴ = X) :
   rw [Matrix.conjTranspose_mul, ← Matrix.exp_conjTranspose, hH, mul_assoc, ← mul_assoc (toMK k)ᴴ,
     (toMK_facts k).1, one_mul, ← Matrix.exp_add_of_commute _ _ (Commute.refl _)]
 
-theorem polar_exists {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) :
-    ∃ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ), inP ε X ∧ g = toMK k * NormedSpace.exp X := by
+theorem polar_exists {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
+    : ∃ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ), inP ε X ∧ g = toMK k * NormedSpace.exp X := by
   obtain ⟨k, hk, Y, hY, hgk⟩ := polar_UJ (ε := ε) (g := g) hg
   obtain ⟨u, hu⟩ := exists_toMK hk
   exact ⟨u, Y, hY, by rw [hu]; exact hgk⟩
 
-theorem polar_unique {k k' : KG ε} {X X' : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) (hX' : inP ε X')
-    (h : toMK k * NormedSpace.exp X = toMK k' * NormedSpace.exp X') : k = k' ∧ X = X' := by
+theorem polar_unique
+    {k k' : KG ε} {X X' : Matrix (Fin n) (Fin n) ℂ}
+    (hX : inP ε X) (hX' : inP ε X') (h : toMK k * NormedSpace.exp X = toMK k' * NormedSpace.exp X')
+    : k = k' ∧ X = X' := by
   have hH := isHermitian_of_mem_noncompactPart' hX
   have hH' := isHermitian_of_mem_noncompactPart' hX'
   have hXX : X + X = X' + X' := by
@@ -111,7 +113,8 @@ theorem polar_unique {k k' : KG ε} {X X' : Matrix (Fin n) (Fin n) ℂ} (hX : in
     exact this
   exact Subtype.ext (Subtype.ext (Units.ext hm))
 
-theorem inUJ_kexp (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) : inUJ ε (toMK k * NormedSpace.exp X) := by
+theorem inUJ_kexp (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X)
+    : inUJ ε (toMK k * NormedSpace.exp X) := by
   have hJ := Jm_mul_self_eq_one' (ε := ε)
   have hJinv : (Jm ε)⁻¹ = Jm ε := Matrix.inv_eq_left_inv hJ
   have hJu : IsUnit (Jm ε) := ⟨⟨Jm ε, Jm ε, hJ, hJ⟩, rfl⟩
@@ -122,23 +125,22 @@ theorem inUJ_kexp (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) :
   have hf := toMK_facts k
   unfold inUJ
   rw [Matrix.conjTranspose_mul, ← Matrix.exp_conjTranspose, isHermitian_of_mem_noncompactPart' hX]
-  calc NormedSpace.exp X * (toMK k)ᴴ * Jm ε * (toMK k * NormedSpace.exp X)
-      = NormedSpace.exp X * ((toMK k)ᴴ * (Jm ε * toMK k)) * NormedSpace.exp X := by
-        simp only [mul_assoc]
-    _ = NormedSpace.exp X * ((toMK k)ᴴ * (toMK k * Jm ε)) * NormedSpace.exp X := by
-        rw [← hf.2.2]
-    _ = NormedSpace.exp X * Jm ε * NormedSpace.exp X := by
-        rw [← mul_assoc (toMK k)ᴴ, hf.1, one_mul]
+  calc
+    NormedSpace.exp X * (toMK k)ᴴ * Jm ε * (toMK k * NormedSpace.exp X)
+        = NormedSpace.exp X * ((toMK k)ᴴ * (Jm ε * toMK k)) * NormedSpace.exp X := by
+      simp only [mul_assoc]
+    _ = NormedSpace.exp X * ((toMK k)ᴴ * (toMK k * Jm ε)) * NormedSpace.exp X := by rw [← hf.2.2]
+    _ = NormedSpace.exp X * Jm ε * NormedSpace.exp X := by rw [← mul_assoc (toMK k)ᴴ, hf.1, one_mul]
     _ = Jm ε * (Jm ε * NormedSpace.exp X * Jm ε) * NormedSpace.exp X := by
-        simp only [← mul_assoc, hJ, one_mul]
+      simp only [← mul_assoc, hJ, one_mul]
     _ = Jm ε * NormedSpace.exp (-X) * NormedSpace.exp X := by rw [hconj]
     _ = Jm ε := by
-        rw [mul_assoc, ← Matrix.exp_add_of_commute _ _ ((Commute.refl X).neg_left), neg_add_cancel,
-          NormedSpace.exp_zero, mul_one]
+      rw [mul_assoc, ← Matrix.exp_add_of_commute _ _ ((Commute.refl X).neg_left), neg_add_cancel,
+        NormedSpace.exp_zero, mul_one]
 
-theorem inP_conj (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) :
-    inP ε (toMK k * X * toMK k⁻¹) ∧
-      NormedSpace.exp (toMK k * X * toMK k⁻¹) = toMK k * NormedSpace.exp X * toMK k⁻¹ := by
+theorem inP_conj (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X)
+    : inP ε (toMK k * X * toMK k⁻¹)
+      ∧ NormedSpace.exp (toMK k * X * toMK k⁻¹) = toMK k * NormedSpace.exp X * toMK k⁻¹ := by
   have hf := toMK_facts k
   have hinv : (toMK k)⁻¹ = (toMK k)ᴴ := Matrix.inv_eq_right_inv hf.2.1
   have hu : IsUnit (toMK k) := ⟨⟨toMK k, (toMK k)ᴴ, hf.2.1, hf.1⟩, rfl⟩
@@ -147,13 +149,14 @@ theorem inP_conj (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) :
     simp only [Matrix.conjTranspose_mul, Jm_conjTranspose_eq_self'] at h
     exact h.symm
   have h2 : toMK k * X * (toMK k)ᴴ * Jm ε = -(Jm ε * (toMK k * X * (toMK k)ᴴ)) := by
-    calc toMK k * X * (toMK k)ᴴ * Jm ε = toMK k * (X * Jm ε) * (toMK k)ᴴ := by
-          rw [mul_assoc _ (toMK k)ᴴ, hcJ]
-          simp only [mul_assoc]
+    calc
+      toMK k * X * (toMK k)ᴴ * Jm ε = toMK k * (X * Jm ε) * (toMK k)ᴴ := by
+        rw [mul_assoc _ (toMK k)ᴴ, hcJ]
+        simp only [mul_assoc]
       _ = toMK k * (-(Jm ε * X)) * (toMK k)ᴴ := by rw [hX.2]
       _ = -(Jm ε * (toMK k * X * (toMK k)ᴴ)) := by
-          rw [mul_neg, neg_mul, ← mul_assoc (toMK k) (Jm ε) X, hf.2.2]
-          simp only [mul_assoc]
+        rw [mul_neg, neg_mul, ← mul_assoc (toMK k) (Jm ε) X, hf.2.2]
+        simp only [mul_assoc]
   rw [toMK_inv]
   refine ⟨⟨?_, h2⟩, ?_⟩
   · unfold inG
@@ -162,14 +165,17 @@ theorem inP_conj (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) :
   · have h := Matrix.exp_conj (toMK k) X hu
     rwa [hinv] at h
 
-theorem exp_noncompactPart_posDef {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) : (NormedSpace.exp X).PosDef := by
+theorem exp_noncompactPart_posDef {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X)
+    : (NormedSpace.exp X).PosDef := by
   have hH : Xᴴ = X := isHermitian_of_mem_noncompactPart' hX
   have hYH : ((1 / 2 : ℂ) • X)ᴴ = (1 / 2 : ℂ) • X := by
     rw [Matrix.conjTranspose_smul, hH]
     norm_num
-  have hsplit : NormedSpace.exp X =
-      (NormedSpace.exp ((1 / 2 : ℂ) • X))ᴴ * NormedSpace.exp ((1 / 2 : ℂ) • X) := by
-    rw [← Matrix.exp_conjTranspose, hYH, ← Matrix.exp_add_of_commute _ _ (Commute.refl _), ← add_smul]
+  have hsplit
+      : NormedSpace.exp X
+        = (NormedSpace.exp ((1 / 2 : ℂ) • X))ᴴ * NormedSpace.exp ((1 / 2 : ℂ) • X) := by
+    rw [← Matrix.exp_conjTranspose, hYH, ← Matrix.exp_add_of_commute _ _ (Commute.refl _),
+      ← add_smul]
     norm_num
   rw [hsplit]
   apply Matrix.PosDef.conjTranspose_mul_self

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CechDeltaCup
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section
@@ -18,12 +19,12 @@ private theorem lex_cases (t : β ⊕ₗ κ) : (∃ i, t = inlE i) ∨ ∃ l, t 
   · exact Or.inl ⟨i, rfl⟩
   · exact Or.inr ⟨l, rfl⟩
 
-private theorem mem_uni_l (b : Finset β) (L : Finset κ) (i : β) :
-    (inlE i : β ⊕ₗ κ) ∈ uni b L ↔ i ∈ b := by
+private theorem mem_uni_l (b : Finset β) (L : Finset κ) (i : β)
+    : (inlE i : β ⊕ₗ κ) ∈ uni b L ↔ i ∈ b := by
   simp [uni, inlE]
 
-private theorem mem_uni_r (b : Finset β) (L : Finset κ) (l : κ) :
-    (inrE l : β ⊕ₗ κ) ∈ uni b L ↔ l ∈ L := by
+private theorem mem_uni_r (b : Finset β) (L : Finset κ) (l : κ)
+    : (inrE l : β ⊕ₗ κ) ∈ uni b L ↔ l ∈ L := by
   simp [uni, inrE]
 
 private theorem mem_lft (s : Finset (β ⊕ₗ κ)) (i : β) : i ∈ lft s ↔ (inlE i : β ⊕ₗ κ) ∈ s := by
@@ -49,34 +50,34 @@ private theorem l_lt_r (i : β) (l : κ) : (inlE i : β ⊕ₗ κ) < inrE l := S
 private theorem card_uni (b : Finset β) (L : Finset κ) : (uni b L).card = b.card + L.card := by
   simp [uni]
 
-private theorem sum_uni {M : Type} [AddCommMonoid M] (b : Finset β) (L : Finset κ) (f : β ⊕ₗ κ → M) :
-    ∑ t ∈ uni b L, f t = ∑ i ∈ b, f (inlE i) + ∑ l ∈ L, f (inrE l) := by
+private theorem sum_uni {M : Type} [AddCommMonoid M] (b : Finset β) (L : Finset κ) (f : β ⊕ₗ κ → M)
+    : ∑ t ∈ uni b L, f t = ∑ i ∈ b, f (inlE i) + ∑ l ∈ L, f (inrE l) := by
   simp only [uni, Finset.sum_map, Finset.sum_disjSum]
   rfl
 
-private theorem filter_le_l (I : Finset β) (J : Finset κ) (i : β) :
-    (uni I J).filter (· ≤ (inlE i : β ⊕ₗ κ)) = uni (I.filter (· ≤ i)) (∅ : Finset κ) := by
+private theorem filter_le_l (I : Finset β) (J : Finset κ) (i : β)
+    : (uni I J).filter (· ≤ (inlE i : β ⊕ₗ κ)) = uni (I.filter (· ≤ i)) (∅ : Finset κ) := by
   ext t
   rcases lex_cases t with ⟨j, rfl⟩ | ⟨l, rfl⟩
   · simp [mem_uni_l]
   · simp [mem_uni_r, not_le.2 (l_lt_r i l)]
 
-private theorem filter_ge_l (I : Finset β) (J : Finset κ) (i : β) :
-    (uni I J).filter ((inlE i : β ⊕ₗ κ) ≤ ·) = uni (I.filter (i ≤ ·)) J := by
+private theorem filter_ge_l (I : Finset β) (J : Finset κ) (i : β)
+    : (uni I J).filter ((inlE i : β ⊕ₗ κ) ≤ ·) = uni (I.filter (i ≤ ·)) J := by
   ext t
   rcases lex_cases t with ⟨j, rfl⟩ | ⟨l, rfl⟩
   · simp [mem_uni_l]
   · simp [mem_uni_r, (l_lt_r i l).le]
 
-private theorem filter_le_r (I : Finset β) (J : Finset κ) (l : κ) :
-    (uni I J).filter (· ≤ (inrE l : β ⊕ₗ κ)) = uni I (J.filter (· ≤ l)) := by
+private theorem filter_le_r (I : Finset β) (J : Finset κ) (l : κ)
+    : (uni I J).filter (· ≤ (inrE l : β ⊕ₗ κ)) = uni I (J.filter (· ≤ l)) := by
   ext t
   rcases lex_cases t with ⟨j, rfl⟩ | ⟨m, rfl⟩
   · simp [mem_uni_l, (l_lt_r j l).le]
   · simp [mem_uni_r]
 
-private theorem filter_ge_r (I : Finset β) (J : Finset κ) (l : κ) :
-    (uni I J).filter ((inrE l : β ⊕ₗ κ) ≤ ·) = uni (∅ : Finset β) (J.filter (l ≤ ·)) := by
+private theorem filter_ge_r (I : Finset β) (J : Finset κ) (l : κ)
+    : (uni I J).filter ((inrE l : β ⊕ₗ κ) ≤ ·) = uni (∅ : Finset β) (J.filter (l ≤ ·)) := by
   ext t
   rcases lex_cases t with ⟨j, rfl⟩ | ⟨m, rfl⟩
   · simp [mem_uni_l, not_le.2 (l_lt_r j l)]
@@ -86,13 +87,13 @@ private theorem uni_empty : uni (∅ : Finset β) (∅ : Finset κ) = ∅ := by
   ext t
   rcases lex_cases t with ⟨i, rfl⟩ | ⟨l, rfl⟩ <;> simp [mem_uni_l, mem_uni_r]
 
-private def ext0 {X : Type} [Zero X] (x : Finset β → X) : Finset (β ⊕ₗ κ) → X :=
-  fun s => if rgt s = ∅ then x (lft s) else 0
+private def ext0 {X : Type} [Zero X] (x : Finset β → X) : Finset (β ⊕ₗ κ) → X := fun s =>
+  if rgt s = ∅ then x (lft s) else 0
 
 end
 
-private theorem card_split {β : Type} [LinearOrder β] (I : Finset β) {i : β} (hi : i ∈ I) :
-    (I.filter (· ≤ i)).card + (I.filter (i ≤ ·)).card = I.card + 1 := by
+private theorem card_split {β : Type} [LinearOrder β] (I : Finset β) {i : β} (hi : i ∈ I)
+    : (I.filter (· ≤ i)).card + (I.filter (i ≤ ·)).card = I.card + 1 := by
   have h1 : I.filter (· ≤ i) ∪ I.filter (i ≤ ·) = I := by
     ext x
     simp only [Finset.mem_union, Finset.mem_filter]
@@ -112,13 +113,17 @@ private theorem card_split {β : Type} [LinearOrder β] (I : Finset β) {i : β}
       exact ⟨⟨hi, le_rfl⟩, hi, le_rfl⟩
   rw [← Finset.card_union_add_card_inter, h1, h2, Finset.card_singleton]
 
-private theorem wd_one {σ X : Type} [LinearOrder σ] [AddCommGroup X] [Module ℂ X] (c : Finset σ → X) (t : Finset σ) :
-    wd (fun _ : σ => (1 : Module.End ℂ X)) c t = GlobalTheory.DI.delta c t := by
+private theorem wd_one
+    {σ X : Type} [LinearOrder σ] [AddCommGroup X] [Module ℂ X] (c : Finset σ → X) (t : Finset σ)
+    : wd (fun _ : σ => (1 : Module.End ℂ X)) c t = GlobalTheory.DI.delta c t := by
   simp [wd, GlobalTheory.DI.delta, LinearMap.pi_apply, LinearMap.sum_apply, LinearMap.smul_apply]
 
-private theorem cech_val {σ X : Type} [LinearOrder σ] [AddCommGroup X] [Module ℂ X] (F : Finset σ → Submodule ℂ X)
-    (n : ℕ) {a : Finset σ → X} (h : a ∈ (cech F).Z n) (s : Finset σ) :
-    a s = 0 ∨ (s.Nonempty ∧ s.card = n + 1 ∧ a s ∈ F s) := by
+private theorem cech_val
+    {σ X : Type} [LinearOrder σ] [AddCommGroup X] [Module ℂ X]
+    (F : Finset σ → Submodule ℂ X) (n : ℕ)
+    {a : Finset σ → X} (h : a ∈ (cech F).Z n)
+    (s : Finset σ)
+    : a s = 0 ∨ (s.Nonempty ∧ s.card = n + 1 ∧ a s ∈ F s) := by
   have h1 := (Submodule.mem_pi.1 (Submodule.mem_inf.1 h).1) s (Set.mem_univ _)
   split_ifs at h1 with hc
   · right
@@ -126,44 +131,57 @@ private theorem cech_val {σ X : Type} [LinearOrder σ] [AddCommGroup X] [Module
   · left
     exact (Submodule.mem_bot _).1 h1
 
-private theorem cech_delta {σ X : Type} [LinearOrder σ] [AddCommGroup X] [Module ℂ X] (F : Finset σ → Submodule ℂ X)
-    (n : ℕ) {a : Finset σ → X} (h : a ∈ (cech F).Z n) : GlobalTheory.DI.delta a = 0 :=
+private theorem cech_delta
+    {σ X : Type} [LinearOrder σ] [AddCommGroup X] [Module ℂ X]
+    (F : Finset σ → Submodule ℂ X) (n : ℕ)
+    {a : Finset σ → X} (h : a ∈ (cech F).Z n)
+    : GlobalTheory.DI.delta a = 0 :=
   LinearMap.mem_ker.1 (Submodule.mem_inf.1 h).2
 
-private theorem delta_cupE {σ E E' E'' : Type} [LinearOrder σ] [AddCommGroup E] [Module ℂ E] [AddCommGroup E'] [Module ℂ E']
-    [AddCommGroup E''] [Module ℂ E''] (μ : E →ₗ[ℂ] E' →ₗ[ℂ] E'') (a : Finset σ → E) (b : Finset σ → E')
-    (ha : a ∅ = 0) (hb : b ∅ = 0) (hd : GlobalTheory.DI.delta b = 0) (u : Finset σ) :
-    GlobalTheory.DI.delta (cupE μ a b) u = cupE μ (GlobalTheory.DI.delta a) b u := by
-  let Φ : E × E'' →+ (Finset σ → E × E'') :=
-    { toFun := fun x t => ((0 : E), μ x.1 (b t))
-      map_zero' := by
-        funext t
-        simp
-      map_add' := by
-        intro x y
-        funext t
-        refine Prod.ext ?_ ?_ <;> simp }
+private theorem delta_cupE
+    {σ E E' E'' : Type} [LinearOrder σ] [AddCommGroup E] [Module ℂ E] [AddCommGroup E']
+    [Module ℂ E'] [AddCommGroup E''] [Module ℂ E'']
+    (μ : E →ₗ[ℂ] E' →ₗ[ℂ] E'')
+    (a : Finset σ → E) (b : Finset σ → E')
+    (ha : a ∅ = 0) (hb : b ∅ = 0) (hd : GlobalTheory.DI.delta b = 0) (u : Finset σ)
+    : GlobalTheory.DI.delta (cupE μ a b) u = cupE μ (GlobalTheory.DI.delta a) b u := by
+  let Φ : E × E'' →+ (Finset σ → E × E'') := {
+    toFun := fun x t => ((0 : E), μ x.1 (b t))
+    map_zero' := by
+      funext t
+      simp
+    map_add' := by
+      intro x y
+      funext t
+      refine Prod.ext ?_ ?_ <;> simp
+  }
   let c : Finset σ → E × E'' := fun t => (a t, 0)
-  have key := GlobalTheory.DI.delta_cup_eq Φ c
-    (fun x => by
-      show ((0 : E), μ x.1 (b ∅)) = 0
-      simp [hb])
-    (by
-      show (a ∅, (0 : E'')) = 0
-      simp [ha]) u
-  have hsnd : ∀ (f : Finset σ → E × E'') (t : Finset σ),
-      (GlobalTheory.DI.delta f t).2 = GlobalTheory.DI.delta (fun s => (f s).2) t := by
+  have key :=
+    GlobalTheory.DI.delta_cup_eq Φ c
+      (fun x => by
+        show ((0 : E), μ x.1 (b ∅)) = 0
+        simp [hb])
+      (by
+        show (a ∅, (0 : E'')) = 0
+        simp [ha])
+      u
+  have hsnd
+      : ∀ (f : Finset σ → E × E'') (t : Finset σ),
+        (GlobalTheory.DI.delta f t).2 = GlobalTheory.DI.delta (fun s => (f s).2) t := by
     intro f t
     simp [GlobalTheory.DI.delta, Prod.snd_sum]
-  have hfst : ∀ (f : Finset σ → E × E'') (t : Finset σ),
-      (GlobalTheory.DI.delta f t).1 = GlobalTheory.DI.delta (fun s => (f s).1) t := by
+  have hfst
+      : ∀ (f : Finset σ → E × E'') (t : Finset σ),
+        (GlobalTheory.DI.delta f t).1 = GlobalTheory.DI.delta (fun s => (f s).1) t := by
     intro f t
     simp [GlobalTheory.DI.delta, Prod.fst_sum]
   have h1 : (fun t => (GlobalTheory.DI.cup Φ c t).2) = cupE μ a b := by
     funext t
     simp only [GlobalTheory.DI.cup, cupE, Prod.snd_sum]
     rfl
-  have h3 : (GlobalTheory.DI.cup Φ (GlobalTheory.DI.delta c) u).2 = cupE μ (GlobalTheory.DI.delta a) b u := by
+  have h3
+      : (GlobalTheory.DI.cup Φ (GlobalTheory.DI.delta c) u).2
+        = cupE μ (GlobalTheory.DI.delta a) b u := by
     simp only [GlobalTheory.DI.cup, cupE, Prod.snd_sum]
     refine Finset.sum_congr rfl (fun j _ => ?_)
     show μ (GlobalTheory.DI.delta c _).1 _ = _
@@ -173,26 +191,35 @@ private theorem delta_cupE {σ E E' E'' : Type} [LinearOrder σ] [AddCommGroup E
     show GlobalTheory.DI.delta (fun s => μ x.1 (b s)) t = 0
     have : GlobalTheory.DI.delta (fun s => μ x.1 (b s)) t = μ x.1 (GlobalTheory.DI.delta b t) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [GlobalTheory.DI.delta, map_sum, map_zsmul]
+      simp [GlobalTheory.DI.delta, map_sum, map_zsmul]
     rw [this, hd]
     simp
-  have h4 : ∀ j ∈ u, ((-1 : ℤ) ^ (u.filter (· < j)).card •
-      GlobalTheory.DI.delta (Φ (c (u.filter (· ≤ j)))) (u.filter (j ≤ ·))).2 = 0 := by
+  have h4
+      : ∀ j ∈ u,
+        ((-1 : ℤ) ^ (u.filter (· < j)).card
+            • GlobalTheory.DI.delta (Φ (c (u.filter (· ≤ j)))) (u.filter (j ≤ ·))).2
+          = 0 := by
     intro j _
     rw [Prod.smul_snd, hsnd, h5, smul_zero]
-  calc GlobalTheory.DI.delta (cupE μ a b) u = (GlobalTheory.DI.delta (GlobalTheory.DI.cup Φ c) u).2 := by
-        rw [hsnd, h1]
-    _ = _ := by
-        rw [key, Prod.snd_add, h3, Prod.snd_sum, Finset.sum_eq_zero h4, add_zero]
+  calc
+    GlobalTheory.DI.delta (cupE μ a b) u
+      = (GlobalTheory.DI.delta (GlobalTheory.DI.cup Φ c) u).2 := by rw [hsnd, h1]
+    _ = _ := by rw [key, Prod.snd_add, h3, Prod.snd_sum, Finset.sum_eq_zero h4, add_zero]
 
 section
 variable {β κ : Type} [LinearOrder β] [LinearOrder κ]
 
-private theorem delta_ext (hU : WdUni) {X : Type} [AddCommGroup X] [Module ℂ X] (x : Finset β → X)
-    (hx : GlobalTheory.DI.delta x = 0) (I : Finset β) (J : Finset κ) :
-    GlobalTheory.DI.delta (ext0 (κ := κ) x) (uni I J) = ((-1 : ℤ) ^ I.card) • edge1 (κ := κ) x (uni I J) := by
-  have hs : ∀ (y : X) (L : Finset κ),
-      GlobalTheory.DI.delta (fun L' : Finset κ => if L' = ∅ then y else 0) L = if L.card = 1 then y else 0 := by
+private theorem delta_ext
+    (hU : WdUni)
+    {X : Type} [AddCommGroup X] [Module ℂ X]
+    (x : Finset β → X) (hx : GlobalTheory.DI.delta x = 0)
+    (I : Finset β) (J : Finset κ)
+    : GlobalTheory.DI.delta (ext0 (κ := κ) x) (uni I J)
+      = ((-1 : ℤ) ^ I.card) • edge1 (κ := κ) x (uni I J) := by
+  have hs
+      : ∀ (y : X) (L : Finset κ),
+        GlobalTheory.DI.delta (fun L' : Finset κ => if L' = ∅ then y else 0) L
+          = if L.card = 1 then y else 0 := by
     intro y L
     by_cases h : L.card = 1
     · obtain ⟨l, rfl⟩ := Finset.card_eq_one.1 h
@@ -226,12 +253,15 @@ private theorem delta_ext (hU : WdUni) {X : Type} [AddCommGroup X] [Module ℂ X
   rw [e3, zero_add]
   simp [edge1, lft_uni, rgt_uni]
 
-variable {E E' E'' : Type} [AddCommGroup E] [Module ℂ E] [AddCommGroup E'] [Module ℂ E']
-  [AddCommGroup E''] [Module ℂ E''] (μ : E →ₗ[ℂ] E' →ₗ[ℂ] E'')
+variable
+  {E E' E'' : Type}
+  [AddCommGroup E] [Module ℂ E] [AddCommGroup E'] [Module ℂ E'] [AddCommGroup E''] [Module ℂ E'']
+  (μ : E →ₗ[ℂ] E' →ₗ[ℂ] E'')
 
-private theorem cup_ext_uni (a : Finset β → E) (c : Finset (β ⊕ₗ κ) → E') (I : Finset β) (J : Finset κ) :
-    cupE μ (ext0 a) c (uni I J) =
-      ∑ i ∈ I, μ (a (I.filter (· ≤ i))) (c (uni (I.filter (i ≤ ·)) J)) := by
+private theorem cup_ext_uni
+    (a : Finset β → E) (c : Finset (β ⊕ₗ κ) → E') (I : Finset β) (J : Finset κ)
+    : cupE μ (ext0 a) c (uni I J)
+      = ∑ i ∈ I, μ (a (I.filter (· ≤ i))) (c (uni (I.filter (i ≤ ·)) J)) := by
   simp only [cupE]
   rw [sum_uni]
   beta_reduce
@@ -245,10 +275,12 @@ private theorem cup_ext_uni (a : Finset β → E) (c : Finset (β ⊕ₗ κ) →
       simp at hm
     simp only [filter_le_r, ext0, rgt_uni, if_neg hne, map_zero, LinearMap.zero_apply]
 
-private theorem cup_edge (q : ℕ) (a : Finset β → E) (ha : ∀ I : Finset β, I.card ≠ q + 1 → a I = 0)
-    (c : Finset (β ⊕ₗ κ) → E') (hc : c ∅ = 0) (I : Finset β) (J : Finset κ) :
-    cupE μ (fun v => ((-1 : ℤ) ^ (lft v).card) • edge1 (κ := κ) a v) c (uni I J) =
-      ((-1 : ℤ) ^ (q + 1)) • join μ a (fun J => c (uni ∅ J)) (uni I J) := by
+private theorem cup_edge
+    (q : ℕ) (a : Finset β → E) (ha : ∀ I : Finset β, I.card ≠ q + 1 → a I = 0)
+    (c : Finset (β ⊕ₗ κ) → E') (hc : c ∅ = 0)
+    (I : Finset β) (J : Finset κ)
+    : cupE μ (fun v => ((-1 : ℤ) ^ (lft v).card) • edge1 (κ := κ) a v) c (uni I J)
+      = ((-1 : ℤ) ^ (q + 1)) • join μ a (fun J => c (uni ∅ J)) (uni I J) := by
   simp only [cupE]
   rw [sum_uni]
   beta_reduce
@@ -275,16 +307,20 @@ private theorem cup_edge (q : ℕ) (a : Finset β → E) (ha : ∀ I : Finset β
         · rw [ha I hI]
           simp
       · have h2 : 1 < (J.filter (· ≤ l)).card :=
-          Finset.one_lt_card.2 ⟨J.min' hJ, Finset.mem_filter.2 ⟨J.min'_mem hJ, J.min'_le l hl⟩,
-            l, Finset.mem_filter.2 ⟨hl, le_rfl⟩, Ne.symm hne⟩
+          Finset.one_lt_card.2 ⟨
+            J.min' hJ,
+            Finset.mem_filter.2 ⟨J.min'_mem hJ, J.min'_le l hl⟩,
+            l,
+            Finset.mem_filter.2 ⟨hl, le_rfl⟩,
+            Ne.symm hne
+          ⟩
         simp only [filter_le_r, edge1, lft_uni, rgt_uni, if_neg h2.ne', smul_zero, map_zero,
           LinearMap.zero_apply]
   · simp [filter_le_l, edge1, rgt_uni]
 
 end
 
-theorem UpperTheory.Gal.productCup_of_system.lCupRel_of :
-    WdUni → LCupRel := by
+theorem UpperTheory.Gal.productCup_of_system.lCupRel_of : WdUni → LCupRel := by
   intro hU ι _ _ E E' E'' _ _ _ _ _ _ μ A G H q p hH a ha γ hγ
   have ha0 : a ∅ = 0 := by
     rcases cech_val A q ha ∅ with h | ⟨h, _⟩
@@ -301,7 +337,8 @@ theorem UpperTheory.Gal.productCup_of_system.lCupRel_of :
     rcases cech_val A q ha I with h | ⟨_, h, _⟩
     · exact h
     · exact absurd h hI
-  have hempty : ∀ f : Finset ι → E', GlobalTheory.DI.delta f ∅ = 0 := fun f => by simp [GlobalTheory.DI.delta]
+  have hempty : ∀ f : Finset ι → E', GlobalTheory.DI.delta f ∅ = 0 := fun f => by
+    simp [GlobalTheory.DI.delta]
   set wL : Finset ι → E' := fun I => γ (uni I ∅) with hwL
   set w : Finset ι → E'' := cupE μ a wL with hw
   have hdwL : GlobalTheory.DI.delta wL = 0 := by
@@ -317,8 +354,10 @@ theorem UpperTheory.Gal.productCup_of_system.lCupRel_of :
       rw [uni_empty, hγ0]
     rw [hw, delta_cupE μ a wL ha0 hwL0 hdwL u, hda]
     simp [cupE]
-  have hcard : ∀ (I J : Finset ι) (i : ι), i ∈ I → I.card + J.card ≠ q + p + 1 →
-      μ (a (I.filter (· ≤ i))) (γ (uni (I.filter (i ≤ ·)) J)) = 0 := by
+  have hcard
+      : ∀ (I J : Finset ι) (i : ι),
+        i ∈ I → I.card + J.card ≠ q + p + 1
+          → μ (a (I.filter (· ≤ i))) (γ (uni (I.filter (i ≤ ·)) J)) = 0 := by
     intro I J i hi hne
     rcases cech_val A q ha (I.filter (· ≤ i)) with h0 | ⟨_, h1, _⟩
     · rw [h0]
@@ -342,16 +381,22 @@ theorem UpperTheory.Gal.productCup_of_system.lCupRel_of :
     rw [← uni_empty (β := ι) (κ := ι)]
     show (if rgt (uni (∅ : Finset ι) (∅ : Finset ι)) = ∅ then a (lft (uni ∅ ∅)) else 0) = 0
     rw [rgt_uni, lft_uni, if_pos rfl, ha0]
-  have hdext_a : GlobalTheory.DI.delta (ext0 (κ := ι) a) =
-      fun v => ((-1 : ℤ) ^ (lft v).card) • edge1 (κ := ι) a v := by
+  have hdext_a
+      : GlobalTheory.DI.delta (ext0 (κ := ι) a)
+        = fun v => ((-1 : ℤ) ^ (lft v).card) • edge1 (κ := ι) a v := by
     funext v
     rw [← uni_lft_rgt v, delta_ext hU a hda, lft_uni]
-  have hsub : ∀ (f g : Finset (ι ⊕ₗ ι) → E'') t,
-      GlobalTheory.DI.delta (f - g) t = GlobalTheory.DI.delta f t - GlobalTheory.DI.delta g t := by
+  have hsub
+      : ∀ (f g : Finset (ι ⊕ₗ ι) → E'') t,
+        GlobalTheory.DI.delta (f - g) t
+          = GlobalTheory.DI.delta f t - GlobalTheory.DI.delta g t := by
     intro f g t
     simp [GlobalTheory.DI.delta, Finset.sum_sub_distrib, smul_sub]
-  have hdY : ∀ v, GlobalTheory.DI.delta (cupE μ (ext0 (κ := ι) a) γ - ext0 (κ := ι) w) v =
-      (-1 : ℤ) ^ (q + 1) • ((join μ a fun J => γ (uni ∅ J)) - (-1 : ℤ) ^ p • edge1 (κ := ι) w) v := by
+  have hdY
+      : ∀ v,
+        GlobalTheory.DI.delta (cupE μ (ext0 (κ := ι) a) γ - ext0 (κ := ι) w) v
+          = (-1 : ℤ) ^ (q + 1)
+            • ((join μ a fun J => γ (uni ∅ J)) - (-1 : ℤ) ^ p • edge1 (κ := ι) w) v := by
     intro v
     obtain ⟨I, J, rfl⟩ : ∃ I J, v = uni I J := ⟨lft v, rgt v, (uni_lft_rgt v).symm⟩
     rw [hsub, delta_cupE μ _ γ hext_a hγ0 hdγ, hdext_a, cup_edge μ q a haq γ hγ0 I J,
@@ -367,15 +412,18 @@ theorem UpperTheory.Gal.productCup_of_system.lCupRel_of :
       exact (Finset.mem_filter.1 ht).1
     · rw [mem_uni_r] at ht ⊢
       exact ht
-  have hYmem : ∀ s : Finset (ι ⊕ₗ ι), (cupE μ (ext0 (κ := ι) a) γ - ext0 (κ := ι) w) s ∈
-      (if (s.card : ℤ) = (q : ℤ) + p + 2 - 1 then mixF H s else ⊥) := by
+  have hYmem
+      : ∀ s : Finset (ι ⊕ₗ ι),
+        (cupE μ (ext0 (κ := ι) a) γ - ext0 (κ := ι) w) s
+          ∈ (if (s.card : ℤ) = (q : ℤ) + p + 2 - 1 then mixF H s else ⊥) := by
     intro s
     obtain ⟨I, J, rfl⟩ : ∃ I J, s = uni I J := ⟨lft s, rgt s, (uni_lft_rgt s).symm⟩
     rw [Pi.sub_apply, cup_ext_uni]
     rcases J.eq_empty_or_nonempty with hJ | hJ
     · subst hJ
-      have e : ext0 (κ := ι) w (uni I ∅) =
-          ∑ i ∈ I, μ (a (I.filter (· ≤ i))) (γ (uni (I.filter (i ≤ ·)) ∅)) := by
+      have e
+          : ext0 (κ := ι) w (uni I ∅)
+            = ∑ i ∈ I, μ (a (I.filter (· ≤ i))) (γ (uni (I.filter (i ≤ ·)) ∅)) := by
         show (if rgt (uni I (∅ : Finset ι)) = ∅ then w (lft (uni I ∅)) else 0) = _
         rw [rgt_uni, lft_uni, if_pos rfl, hw]
         rfl
@@ -399,14 +447,19 @@ theorem UpperTheory.Gal.productCup_of_system.lCupRel_of :
           · rw [h0, map_zero]
             exact Submodule.zero_mem _
           exact hH I J _ _ hJ hne hne' (Finset.filter_subset _ _) (hsubuni I J i) _ hmem _ hmem'
-      · rw [Finset.sum_eq_zero (fun i hi => hcard I J i hi (fun h => hc (by
-          rw [card_uni]
-          push_cast
-          omega)))]
+      · rw [Finset.sum_eq_zero (fun i hi =>
+          hcard I J i hi (fun h =>
+            hc (by
+              rw [card_uni]
+              push_cast
+              omega)))]
         exact Submodule.zero_mem _
   refine ⟨?_, ?_⟩
-  · refine Submodule.mem_map.2 ⟨(-1 : ℤ) ^ (q + 1) • (cupE μ (ext0 (κ := ι) a) γ - ext0 (κ := ι) w),
-      zsmul_mem (Submodule.mem_pi.2 (fun s _ => hYmem s)) _, ?_⟩
+  · refine Submodule.mem_map.2 ⟨
+      (-1 : ℤ) ^ (q + 1) • (cupE μ (ext0 (κ := ι) a) γ - ext0 (κ := ι) w),
+      zsmul_mem (Submodule.mem_pi.2 (fun s _ => hYmem s)) _,
+      ?_
+    ⟩
     show wd (fun _ => (1 : Module.End ℂ E''))
       ((-1 : ℤ) ^ (q + 1) • (cupE μ (ext0 (κ := ι) a) γ - ext0 (κ := ι) w)) = _
     rw [map_zsmul]

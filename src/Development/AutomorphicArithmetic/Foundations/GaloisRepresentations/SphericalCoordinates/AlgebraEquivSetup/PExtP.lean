@@ -8,13 +8,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open Formalism.UG GlobalTheory.LKDef.HeckeTraceForms UpperTheory.Gal.W2.Seed
 open scoped Classical
 
-theorem UpperTheory.Gal.W2.Seed.pExtP :
-    ExtP := by
+theorem UpperTheory.Gal.W2.Seed.pExtP : ExtP := by
   intro Γ X X₂ V _ _ _ _ _ ι K K₂ ξ φ h1 h2
   let F : X × X₂ → V := fun p =>
     if h : ∃ γ : Γ, (ι γ).2⁻¹ * p.2 ∈ K₂ then ξ h.choose (φ ((ι h.choose).1⁻¹ * p.1)) else 0
-  have key : ∀ (γ : Γ) (g : X) (g₂ : X₂), (ι γ).2⁻¹ * g₂ ∈ K₂ →
-      F (g, g₂) = ξ γ (φ ((ι γ).1⁻¹ * g)) := by
+  have key
+      : ∀ (γ : Γ) (g : X) (g₂ : X₂), (ι γ).2⁻¹ * g₂ ∈ K₂ → F (g, g₂) = ξ γ (φ ((ι γ).1⁻¹ * g)) := by
     intro γ g g₂ hγ
     have h : ∃ γ : Γ, (ι γ).2⁻¹ * g₂ ∈ K₂ := ⟨γ, hγ⟩
     dsimp only [F]
@@ -42,8 +41,7 @@ theorem UpperTheory.Gal.W2.Seed.pExtP :
       rw [e]
       by_cases h : ∃ δ : Γ, (ι δ).2⁻¹ * g₂ ∈ K₂
       · obtain ⟨δ, hδ⟩ := h
-        have hs : (ι (γ * δ)).2⁻¹ * ((ι γ).2 * g₂) ∈ K₂ := by
-          simpa [map_mul, mul_assoc] using hδ
+        have hs : (ι (γ * δ)).2⁻¹ * ((ι γ).2 * g₂) ∈ K₂ := by simpa [map_mul, mul_assoc] using hδ
         rw [key δ g g₂ hδ, key (γ * δ) _ _ hs, ← Module.End.mul_apply, ← map_mul]
         congr 2
         simp [mul_assoc]

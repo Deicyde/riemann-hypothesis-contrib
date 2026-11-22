@@ -10,43 +10,48 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.RamifiedPrimeC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal
+  Formalism.ConjugateSelfDual
 
 namespace GlobalTheory.CompanionTheory.HermiteMinkowski
 
-noncomputable def bound {F : Type} [Field F] [NumberField F]
-    (S : Finset (HeightOneSpectrum (𝓞 F))) : ℕ :=
+noncomputable def bound {F : Type} [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F)))
+    : ℕ :=
   (discr F).natAbs * ∏ v ∈ S, v.asIdeal.absNorm
 
-theorem bound_ne_zero {F : Type} [Field F] [NumberField F]
-    (S : Finset (HeightOneSpectrum (𝓞 F))) : bound S ≠ 0 := by
+theorem bound_ne_zero {F : Type} [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F)))
+    : bound S ≠ 0 := by
   refine mul_ne_zero (Int.natAbs_ne_zero.mpr (discr_ne_zero F)) ?_
   refine Finset.prod_ne_zero_iff.mpr fun v _ => ?_
   rw [Ne, Ideal.absNorm_eq_zero_iff]
   exact v.ne_bot
 
-theorem natAbs_discr_dvd {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (S : Finset (HeightOneSpectrum (𝓞 F)))
-    (hE : ∀ v ∉ S, Algebra.IsUnramifiedIn (𝓞 E) v.asIdeal) :
-    (discr E).natAbs ∣ bound S ^ (Module.finrank ℚ E * Module.finrank ℚ E) := by
-  have hdvd := GlobalTheory.T.different_dvd_ramified_prime_power E (bound S) (bound_ne_zero S) fun P hP hP0 hPd => by
-    haveI := hP
-    exact GlobalTheory.T.ramified_prime_contains_discriminant F E S hE P hP0 hPd
+theorem natAbs_discr_dvd
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (S : Finset (HeightOneSpectrum (𝓞 F))) (hE : ∀ v ∉ S, Algebra.IsUnramifiedIn (𝓞 E) v.asIdeal)
+    : (discr E).natAbs ∣ bound S ^ (Module.finrank ℚ E * Module.finrank ℚ E) := by
+  have hdvd :=
+    GlobalTheory.T.different_dvd_ramified_prime_power E (bound S) (bound_ne_zero S)
+      fun P hP hP0 hPd => by
+        haveI := hP
+        exact GlobalTheory.T.ramified_prime_contains_discriminant F E S hE P hP0 hPd
   have h := map_dvd Ideal.absNorm hdvd
   rw [absNorm_differentIdeal E (𝓞 E)] at h
-  have hr : ((bound S : 𝓞 E)) ^ (Module.finrank ℚ E) =
-      algebraMap ℤ (𝓞 E) (((bound S : ℕ) : ℤ) ^ (Module.finrank ℚ E)) := by
+  have hr
+      : ((bound S : 𝓞 E)) ^ (Module.finrank ℚ E)
+        = algebraMap ℤ (𝓞 E) (((bound S : ℕ) : ℤ) ^ (Module.finrank ℚ E)) := by
     simp
   rw [Ideal.absNorm_span_singleton, hr, Algebra.norm_algebraMap, RingOfIntegers.rank,
-    Int.natAbs_pow, Int.natAbs_pow, Int.natAbs_natCast, ← pow_mul] at h
+      Int.natAbs_pow, Int.natAbs_pow, Int.natAbs_natCast, ← pow_mul]
+    at h
   exact h
 
 end GlobalTheory.CompanionTheory.HermiteMinkowski
 
 open GlobalTheory.CompanionTheory.HermiteMinkowski in
-theorem GlobalTheory.CompanionTheory.HermiteMinkowski.finite_unramified_bounded_degree :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-      (S : Finset (HeightOneSpectrum (𝓞 F))) (N : ℕ),
+theorem GlobalTheory.CompanionTheory.HermiteMinkowski.finite_unramified_bounded_degree
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (S : Finset (HeightOneSpectrum (𝓞 F))) (N : ℕ),
       {E : IntermediateField F Ω | FiniteDimensional F E ∧
         IsUnramifiedOutside (S : Set (HeightOneSpectrum (𝓞 F))) E ∧
         Module.finrank F E ≤ N}.Finite := by

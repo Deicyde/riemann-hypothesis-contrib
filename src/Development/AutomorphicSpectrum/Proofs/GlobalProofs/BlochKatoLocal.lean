@@ -20,26 +20,41 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Finrank
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.BK
 
-
 open PositivityTheory.LocalTateOrthogonality.Bk in
-theorem card1Lower : ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l), TateFiniteness (Lp.PD K) → FinZQ (Lp.PD K) → ∀ (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ (A : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ), ∀ ϖ : O, Irreducible ϖ → ∀ (r : ℕ) (hI : StableSub LA (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T)), Nat.card (O ⧸ Ideal.span {ϖ}) ^ (r * finrank O (LatticeCohomology LA)) ≤ Nat.card (QuotientCohomology LA _ hI) := by
+theorem card1Lower
+    : ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l),
+      TateFiniteness (Lp.PD K) → FinZQ (Lp.PD K)
+        → ∀ (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O]
+            [Algebra O LL],
+          GoodO (Qp := ℚ_[l]) LL O
+            → ∀ (A : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ), ∀ ϖ : O,
+              Irreducible ϖ
+                → ∀ (r : ℕ) (hI : StableSub LA (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T)),
+                  Nat.card (O ⧸ Ideal.span {ϖ}) ^ (r * finrank O (LatticeCohomology LA))
+                    ≤ Nat.card (QuotientCohomology LA _ hI) := by
   intro l _ Lp K hfin hZ LL _ _ _ O _ _ hO A LA ϖ hϖ r hI
   obtain ⟨⟨hD, hV, hF⟩, -⟩ := id hO
   obtain ⟨-, hB, -⟩ := latTop l Lp K LL O hO A LA ϖ hϖ
   have hW : (fun x => ϖ ^ r • x) '' (LA.T : Set A.V) ∈ nhds (0 : A.V) := hB.mem_of_mem trivial
   have := hfin LL O hO A LA
   have := hZ LL O hO A LA ϖ hϖ r hI
-  have : Finite (QuotientCohomology LA _ hI) := Finite.of_surjective _ (Submodule.Quotient.mk_surjective _)
+  have : Finite (QuotientCohomology LA _ hI) :=
+    Finite.of_surjective _ (Submodule.Quotient.mk_surjective _)
   rw [pow_mul, ← GlobalTheory.CompanionTheory.GrowthOfInvariants.card_quot_pow ϖ hϖ.ne_zero r]
-  refine card_pow_le (ϖ ^ r) (fun c : ↥(latticeCocycles LA) => (Submodule.Quotient.mk c : LatticeCohomology LA))
+  refine card_pow_le (ϖ ^ r)
+    (fun c : ↥(latticeCocycles LA) => (Submodule.Quotient.mk c : LatticeCohomology LA))
     (Submodule.Quotient.mk_surjective _)
-    (fun c => (Submodule.Quotient.mk ⟨redT LA _ c, redT_mem A LA hW hI c⟩ : QuotientCohomology LA _ hI)) ?_
+    (fun c =>
+      (Submodule.Quotient.mk ⟨redT LA _ c, redT_mem A LA hW hI c⟩ : QuotientCohomology LA _ hI))
+    ?_
   intro x y h
   rw [← Submodule.Quotient.mk_sub]
   refine exists_div_class A LA (pow_ne_zero r hϖ.ne_zero) hI _ ?_
@@ -49,7 +64,23 @@ theorem card1Lower : ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt 
 
 open PositivityTheory.LocalTateOrthogonality.Bk in
 set_option maxHeartbeats 2000000 in
-theorem pairOL : ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l), ∀ (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ (A A' : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (LA' : Lattice (O := O) A'.ρ) (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL), IsDualLat1 (Lp.PD K) LA LA' P → ∀ ϖ : O, Irreducible ϖ → ∀ r : ℕ, ∃ B : (↥LA.T ⧸ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T)) →ₗ[O] (↥LA'.T ⧸ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA'.T)) →ₗ[O] (O ⧸ Ideal.span {ϖ ^ r}), (∀ (x : ↥LA.T) (y : ↥LA'.T) (p : O), P x y = algebraMap O LL p → B (Submodule.Quotient.mk x) (Submodule.Quotient.mk y) = Ideal.Quotient.mk _ p) ∧ (∀ x, (∀ y, B x y = 0) → x = 0) ∧ (∀ y, (∀ x, B x y = 0) → y = 0) := by
+theorem pairOL
+    : ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l),
+      ∀ (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O]
+          [Algebra O LL],
+        GoodO (Qp := ℚ_[l]) LL O
+          → ∀ (A A' : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ)
+              (LA' : Lattice (O := O) A'.ρ) (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL),
+            IsDualLat1 (Lp.PD K) LA LA' P
+              → ∀ ϖ : O,
+                Irreducible ϖ
+                  → ∀ r : ℕ,
+                    ∃ B : (↥LA.T ⧸ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T)) →ₗ[O] (↥LA'.T ⧸ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA'.T)) →ₗ[O] (O ⧸ Ideal.span {ϖ ^ r}),
+                      (∀ (x : ↥LA.T) (y : ↥LA'.T) (p : O),
+                          P x y = algebraMap O LL p
+                            → B (Submodule.Quotient.mk x) (Submodule.Quotient.mk y)
+                              = Ideal.Quotient.mk _ p)
+                        ∧ (∀ x, (∀ y, B x y = 0) → x = 0) ∧ (∀ y, (∀ x, B x y = 0) → y = 0) := by
   intro l _ Lp K LL _ _ _ O _ _ hG A A' LA LA' P hd ϖ hϖ r
   have hG0 : ∃ hO : IsDomain O, @IsDiscreteValuationRing O _ hO ∧ IsFractionRing O LL := hG.1
   have hO : IsDomain O := hG0.choose
@@ -58,38 +89,53 @@ theorem pairOL : ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l), 
   have h2 : ∀ x, x ∈ LA.T ↔ ∀ y ∈ LA'.T, ∃ a : O, P.flip y x = algebraMap O LL a :=
     ((latTop l Lp K LL O hG A LA ϖ hϖ).2.2.2.2 A' LA' P hd).2
   simp only [LinearMap.flip_apply] at h2
-  exact GlobalTheory.CompanionTheory.LocDual.Q.pairing_exists LL O A.V A'.V LA.T LA'.T P ϖ hϖ.ne_zero r h1 h2
-
+  exact GlobalTheory.CompanionTheory.LocDual.Q.pairing_exists LL O A.V A'.V LA.T LA'.T P ϖ
+    hϖ.ne_zero r h1 h2
 
 open PositivityTheory.LocalTateOrthogonality.Bk PositivityTheory.LocalTateOrthogonality.Bk.Eul in
-theorem chiTie (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) (n : ℕ) (g : ↥(GK K)) :
-    ∃ u : ℤ_[l], (u : ℚ_[l]) = (((Lp.PD K).χ g : ℚ_[l]ˣ) : ℚ_[l]) ∧
-      PadicInt.toZModPow n u = (Formalism.GaloisCohomology.cycK l K.1 n (K.1.fixingSubgroupEquiv g) : ZMod (l ^ n)) := by
+theorem chiTie (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) (n : ℕ) (g : ↥(GK K))
+    : ∃ u : ℤ_[l],
+      (u : ℚ_[l]) = (((Lp.PD K).χ g : ℚ_[l]ˣ) : ℚ_[l])
+        ∧ PadicInt.toZModPow n u
+          = (Formalism.GaloisCohomology.cycK l K.1 n (K.1.fixingSubgroupEquiv g)
+            : ZMod (l ^ n)) := by
   have hcyc : GlobalTheory.Cyc.IsCyc Lp.χQ := Lp.χQ_cyc
-  let χZ : Formalism.GaloisCohomology.GK l K.1 →* ℤ_[l]ˣ := (cyclotomicCharacter (PadicAlgCl l) l).comp
+  let χZ : Formalism.GaloisCohomology.GK l K.1 →* ℤ_[l]ˣ :=
+    (cyclotomicCharacter (PadicAlgCl l) l).comp
       (MulSemiringAction.toRingAut (Formalism.GaloisCohomology.GK l K.1) (PadicAlgCl l))
-  have hχZ : ∀ g, ((χZ g : ℤ_[l]) : ℚ_[l]) =
-      (Lp.χQ (K.1.fixingSubgroupEquiv.symm g : GQ l) : ℚ_[l]) := fun g => by
+  have hχZ
+      : ∀ g,
+        ((χZ g : ℤ_[l]) : ℚ_[l])
+          = (Lp.χQ (K.1.fixingSubgroupEquiv.symm g : GQ l) : ℚ_[l]) := fun g => by
     rw [GlobalTheory.Cyc.TwistLift.isCyc_unique hcyc (GlobalTheory.Cyc.isCyc_cycChar l)]; rfl
   refine ⟨(χZ (K.1.fixingSubgroupEquiv g) : ℤ_[l]), ?_, rfl⟩
   have h1 := hχZ (K.1.fixingSubgroupEquiv g)
-  rw [show K.1.fixingSubgroupEquiv.symm (K.1.fixingSubgroupEquiv g) = g from K.1.fixingSubgroupEquiv.symm_apply_apply g, ← Lp.PD_χ K g] at h1
+  rw [show K.1.fixingSubgroupEquiv.symm (K.1.fixingSubgroupEquiv g) = g from
+        K.1.fixingSubgroupEquiv.symm_apply_apply g,
+      ← Lp.PD_χ K g]
+    at h1
   exact h1
 
-
 open PositivityTheory.LocalTateOrthogonality.Bk PositivityTheory.LocalTateOrthogonality.Bk.Eul in
-theorem equivB (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL]
-    [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL] (ι : ℤ_[l] →+* O)
-    (hι : ∀ a, algebraMap O LL (ι a) = algebraMap ℚ_[l] LL a) (A A' : GRep ↥(GK K) ℚ_[l] LL O)
-    (LA : Lattice (O := O) A.ρ) (LA' : Lattice (O := O) A'.ρ) (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL)
-    (hd : IsDualLat1 (Lp.PD K) LA LA' P) (J : Ideal O) (I : Submodule O ↥LA.T)
-    (I' : Submodule O ↥LA'.T) (hI : StableSub LA I) (hI' : StableSub LA' I')
+theorem equivB
+    (l : ℕ) [Fact l.Prime]
+    (Lp : LocPrime l)
+    (K : FinExt l)
+    (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+    (O : Type) [CommRing O] [Algebra O LL]
+    (ι : ℤ_[l] →+* O) (hι : ∀ a, algebraMap O LL (ι a) = algebraMap ℚ_[l] LL a)
+    (A A' : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (LA' : Lattice (O := O) A'.ρ)
+    (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL) (hd : IsDualLat1 (Lp.PD K) LA LA' P)
+    (J : Ideal O)
+    (I : Submodule O ↥LA.T) (I' : Submodule O ↥LA'.T) (hI : StableSub LA I) (hI' : StableSub LA' I')
     (B : (↥LA.T ⧸ I) →ₗ[O] (↥LA'.T ⧸ I') →ₗ[O] (O ⧸ J))
-    (hB : ∀ (x : ↥LA.T) (y : ↥LA'.T) (p : O), P x y = algebraMap O LL p →
-      B (Submodule.Quotient.mk x) (Submodule.Quotient.mk y) = Ideal.Quotient.mk _ p)
-    (g : ↥(GK K)) (x : ↥LA.T ⧸ I) (y : ↥LA'.T ⧸ I') (u : ℤ_[l])
-    (hu : (u : ℚ_[l]) = (((Lp.PD K).χ g : ℚ_[l]ˣ) : ℚ_[l])) :
-    B (actQ LA I hI g x) (actQ LA' I' hI' g y) = Ideal.Quotient.mk _ (ι u) * B x y := by
+    (hB : ∀ (x : ↥LA.T) (y : ↥LA'.T) (p : O),
+      P x y = algebraMap O LL p
+        → B (Submodule.Quotient.mk x) (Submodule.Quotient.mk y) = Ideal.Quotient.mk _ p)
+    (g : ↥(GK K))
+    (x : ↥LA.T ⧸ I) (y : ↥LA'.T ⧸ I')
+    (u : ℤ_[l]) (hu : (u : ℚ_[l]) = (((Lp.PD K).χ g : ℚ_[l]ˣ) : ℚ_[l]))
+    : B (actQ LA I hI g x) (actQ LA' I' hI' g y) = Ideal.Quotient.mk _ (ι u) * B x y := by
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective I x
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective I' y
   obtain ⟨p, hp⟩ := (hd.2 y).1 y.2 x x.2
@@ -100,12 +146,33 @@ theorem equivB (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) (LL : T
   rw [hB x y p hp, ← map_mul]
   exact hB _ _ _ h1
 
-
 open PositivityTheory.LocalTateOrthogonality.Bk PositivityTheory.LocalTateOrthogonality.Bk.Eul in
 set_option maxHeartbeats 4000000 in
-theorem eulerQuot : Formalism.GaloisCohomology.LocalTateDualityK → Formalism.GaloisCohomology.LocalEulerCharK → ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l), ∀ (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ (A A' : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (LA' : Lattice (O := O) A'.ρ) (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL), IsDualLat1 (Lp.PD K) LA LA' P → ∀ ϖ : O, Irreducible ϖ → ∀ (r : ℕ) (hI : StableSub LA (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T)), ∀ hI' : StableSub LA' (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA'.T), Nat.card (QuotientCohomology LA _ hI) = Nat.card {x : ↥LA.T ⧸ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T) // ∀ g, actQ LA _ hI g x = x} * Nat.card {x : ↥LA'.T ⧸ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA'.T) // ∀ g, actQ LA' _ hI' g x = x} * Nat.card (O ⧸ Ideal.span {ϖ}) ^ (r * finrank LL A.V * finrank ℚ_[l] ↥K.1) := by
+theorem eulerQuot
+    : Formalism.GaloisCohomology.LocalTateDualityK → Formalism.GaloisCohomology.LocalEulerCharK
+      → ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l),
+        ∀ (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O]
+            [Algebra O LL],
+          GoodO (Qp := ℚ_[l]) LL O
+            → ∀ (A A' : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ)
+                (LA' : Lattice (O := O) A'.ρ) (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL),
+              IsDualLat1 (Lp.PD K) LA LA' P
+                → ∀ ϖ : O,
+                  Irreducible ϖ
+                    → ∀ (r : ℕ) (hI : StableSub LA (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T)),
+                      ∀ hI' : StableSub LA' (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA'.T),
+                        Nat.card (QuotientCohomology LA _ hI)
+                          = Nat.card
+                              {x : ↥LA.T ⧸ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA.T)
+                                // ∀ g, actQ LA _ hI g x = x}
+                            * Nat.card
+                              {x : ↥LA'.T ⧸ (Ideal.span {ϖ ^ r} • ⊤ : Submodule O ↥LA'.T)
+                                // ∀ g, actQ LA' _ hI' g x = x}
+                            * Nat.card (O ⧸ Ideal.span {ϖ})
+                              ^ (r * finrank LL A.V * finrank ℚ_[l] ↥K.1) := by
   intro hT hE l _ Lp K LL _ _ _ O _ _ hO A A' LA LA' P hd ϖ hϖ r hI hI'
-  obtain ⟨-, hqf, -, ⟨-, hl, -⟩, -, -⟩ := GlobalTheory.T.goodO_adic_complete_compact_basis l LL O hO ϖ hϖ
+  obtain ⟨-, hqf, -, ⟨-, hl, -⟩, -, -⟩ :=
+    GlobalTheory.T.goodO_adic_complete_compact_basis l LL O hO ϖ hϖ
   obtain ⟨ι, hι⟩ := GlobalTheory.TateTop.exists_ringHom hO
   obtain ⟨⟨hdom, hdvr, hfr⟩, -⟩ := id hO
   have := hdom
@@ -124,12 +191,17 @@ theorem eulerQuot : Formalism.GaloisCohomology.LocalTateDualityK → Formalism.G
     exact Ideal.mul_mem_right _ _ h1
   obtain ⟨hW, hcW⟩ := cardQ l K LL O hO A LA ϖ hϖ r
   obtain ⟨hW', -⟩ := cardQ l K LL O hO A' LA' ϖ hϖ r
-  obtain ⟨ψ₀, hψ, -⟩ := GlobalTheory.T.exists_perfect_character_quotient O ϖ hϖ r (l ^ (r + 1)) hpos hfinO hN
+  obtain ⟨ψ₀, hψ, -⟩ :=
+    GlobalTheory.T.exists_perfect_character_quotient O ϖ hϖ r (l ^ (r + 1)) hpos hfinO hN
   obtain ⟨B, hB, hBl, hBr⟩ := pairOL l Lp K LL O hO A A' LA LA' P hd ϖ hϖ r
   obtain ⟨Pb, hPb, hL, hR⟩ := exists_pair _ _ B ψ₀ hψ hBl hBr
   have hlc := actLoc l Lp K LL O hO A LA ϖ hϖ r hI
-  have heq : ∀ g x y, Pb ((actQ LA _ hI g).toAddMonoidHom x) ((actQ LA' _ hI' g).toAddMonoidHom y) =
-      (Formalism.GaloisCohomology.cycK l K.1 (r + 1) (K.1.fixingSubgroupEquiv g) : ZMod (l ^ (r + 1))) * Pb x y := by
+  have heq
+      : ∀ g x y,
+        Pb ((actQ LA _ hI g).toAddMonoidHom x) ((actQ LA' _ hI' g).toAddMonoidHom y)
+          = (Formalism.GaloisCohomology.cycK l K.1 (r + 1) (K.1.fixingSubgroupEquiv g)
+              : ZMod (l ^ (r + 1)))
+            * Pb x y := by
     intro g x y
     obtain ⟨u, hu, hu'⟩ := chiTie l Lp K (r + 1) g
     obtain ⟨b, hb⟩ := Ideal.Quotient.mk_surjective (B x y)
@@ -138,22 +210,32 @@ theorem eulerQuot : Formalism.GaloisCohomology.LocalTateDualityK → Formalism.G
     have e3 := psi_unit ι _ (r + 1) hN ψ₀ u b
     rw [hu', hb, ← hPb, ← e1, ← hPb] at e3
     exact e3
-  have hZ := cocycles hT hE l K (r + 1) (Nat.succ_pos r) _
-    (fun g => (actQ LA _ hI g).toAddMonoidHom) (actQ_one' LA _ hI) (fun g h m => actQ_mul' LA _ hI g h m)
-    hlc (quot_killed _ _ hN) _
-    (fun g => (actQ LA' _ hI' g).toAddMonoidHom) (actQ_one' LA' _ hI') (fun g h m => actQ_mul' LA' _ hI' g h m)
-    Pb hL hR heq
+  have hZ :=
+    cocycles hT hE l K (r + 1) (Nat.succ_pos r) _
+      (fun g => (actQ LA _ hI g).toAddMonoidHom)
+      (actQ_one' LA _ hI)
+      (fun g h m => actQ_mul' LA _ hI g h m)
+      hlc (quot_killed _ _ hN) _
+      (fun g => (actQ LA' _ hI' g).toAddMonoidHom)
+      (actQ_one' LA' _ hI')
+      (fun g h m => actQ_mul' LA' _ hI' g h m)
+      Pb hL hR heq
   have hC := h1count l K LL O A LA _ hI hW hlc
   exact final_count _ _ _ _ _ _ _ _ Nat.card_pos hcW hC hZ
 
-
 open PositivityTheory.LocalTateOrthogonality.Bk in
-theorem eulerLe (hT : Formalism.GaloisCohomology.LocalTateDualityK) (hE : Formalism.GaloisCohomology.LocalEulerCharK) (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
-    (O : Type) [CommRing O] [Algebra O LL] (hG : GoodO (Qp := ℚ_[l]) LL O)
+theorem eulerLe
+    (hT : Formalism.GaloisCohomology.LocalTateDualityK)
+    (hE : Formalism.GaloisCohomology.LocalEulerCharK)
+    (l : ℕ) [Fact l.Prime]
+    (Lp : LocPrime l) (K : FinExt l)
+    (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+    (O : Type) [CommRing O] [Algebra O LL]
+    (hG : GoodO (Qp := ℚ_[l]) LL O)
     (A A' : GRep ↥(GK K) ℚ_[l] LL O) (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL)
-    (hP : IsDual1 (Lp.PD K) A.ρ A'.ρ P) :
-    finrank LL (H1V A.ρ) ≤
-      finrank LL ↥(H0V A.ρ) + finrank LL ↥(H0V A'.ρ) + finrank ℚ_[l] ↥K.1 * finrank LL A.V := by
+    (hP : IsDual1 (Lp.PD K) A.ρ A'.ρ P)
+    : finrank LL (H1V A.ρ)
+      ≤ finrank LL ↥(H0V A.ρ) + finrank LL ↥(H0V A'.ρ) + finrank ℚ_[l] ↥K.1 * finrank LL A.V := by
   have hZ := finZQ hT hE l Lp K
   obtain ⟨-, hLat⟩ := dualLat l Lp K
   obtain ⟨LA, LA', hd, -⟩ := hLat LL O hG A A' P hP
@@ -172,8 +254,9 @@ theorem eulerLe (hT : Formalism.GaloisCohomology.LocalTateDualityK) (hE : Formal
   obtain ⟨C', h0'⟩ := H0_torsion_growth_bound l Lp K hfin LL O hG A' LA' ϖ hϖ
   have h1 := card1Lower l Lp K hfin hZ LL O hG A LA ϖ hϖ
   have hE' := eulerQuot hT hE l Lp K LL O hG A A' LA LA' P hd ϖ hϖ
-  have key : finrank O (LatticeCohomology LA) ≤ finrank LL ↥(H0V A.ρ) + finrank LL ↥(H0V A'.ρ) +
-      finrank LL A.V * finrank ℚ_[l] ↥K.1 :=
+  have key
+      : finrank O (LatticeCohomology LA)
+        ≤ finrank LL ↥(H0V A.ρ) + finrank LL ↥(H0V A'.ρ) + finrank LL A.V * finrank ℚ_[l] ↥K.1 :=
     growth_le (C := C) (C' := C') hq fun r =>
       have hI := stable_pow LA ϖ r
       have hI' := stable_pow LA' ϖ r
@@ -181,43 +264,58 @@ theorem eulerLe (hT : Formalism.GaloisCohomology.LocalTateDualityK) (hE : Formal
   rw [hr, Nat.mul_comm (finrank ℚ_[l] ↥K.1)]
   exact key
 
-
 open PositivityTheory.LocalTateOrthogonality.Bk ExactAnn in
 open ExactAnn in
-theorem dualLOf (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) (hZ : FinZQ (Lp.PD K))
-    (hTop : TopLine (Lp.PD K)) (hNd : NondegL (Lp.PD K)) : DualL (Lp.PD K) := by
+theorem dualLOf
+    (l : ℕ) [Fact l.Prime]
+    (Lp : LocPrime l) (K : FinExt l)
+    (hZ : FinZQ (Lp.PD K)) (hTop : TopLine (Lp.PD K)) (hNd : NondegL (Lp.PD K))
+    : DualL (Lp.PD K) := by
   intro LL _ _ _ O _ _ hO A A' P hP S S' hBS hSZ hBS' hSZ' horth hdim
   obtain ⟨-, hF⟩ := cupFlip l Lp K LL O hO A A' P hP
   have hnd := hNd LL O hO A A' P hP
   obtain ⟨LA, LA', -⟩ := (dualLat l Lp K).2 LL O hO A A' P hP
-  have hE1 : Module.Finite LL (H1V A.ρ) := ((finrank_H1_rational_eq_lattice l Lp K hZ).2 LL O hO A LA).1
-  have hE2 : Module.Finite LL (H1V A'.ρ) := ((finrank_H1_rational_eq_lattice l Lp K hZ).2 LL O hO A' LA').1
-  by_cases hall : ∀ a ∈ continuousCocycles A.ρ, ∀ b ∈ continuousCocycles A'.ρ, CobL (Lp.PD K) (cupL A'.ρ P a b)
-  · exact ⟨fun a ha _ => hBS (hnd.1 a ha fun b hb => hall a ha b hb),
-      fun b hb _ => hBS' (hnd.2 b hb fun a ha => hall a ha b hb)⟩
+  have hE1 : Module.Finite LL (H1V A.ρ) :=
+    ((finrank_H1_rational_eq_lattice l Lp K hZ).2 LL O hO A LA).1
+  have hE2 : Module.Finite LL (H1V A'.ρ) :=
+    ((finrank_H1_rational_eq_lattice l Lp K hZ).2 LL O hO A' LA').1
+  by_cases hall
+    : ∀ a ∈ continuousCocycles A.ρ, ∀ b ∈ continuousCocycles A'.ρ, CobL (Lp.PD K) (cupL A'.ρ P a b)
+  · exact ⟨
+      fun a ha _ => hBS (hnd.1 a ha fun b hb => hall a ha b hb),
+      fun b hb _ => hBS' (hnd.2 b hb fun a ha => hall a ha b hb)
+    ⟩
   push Not at hall
   obtain ⟨a0, ha0, b0, hb0, hz0⟩ := hall
   have : IsTopologicalRing LL := hO.2.2.2.1
-  obtain ⟨Φ, hΦ⟩ := exists_pairing (continuousCocycles A.ρ) (continuousCocycles A'.ρ) (cocSub (Lp.PD K) LL)
-    (cobSub (Lp.PD K) LL) (cupBil A'.ρ P)
-    (fun a ha b hb => ⟨(hF a ha b hb).1, (hF a ha b hb).2.1⟩) (cupL A'.ρ P a0 b0) hz0
-    (fun z hz => hTop LL O hO _ z (hF a0 ha0 b0 hb0).1 hz.1 (hF a0 ha0 b0 hb0).2.1 hz.2 hz0)
-  have res := ann_of_pairing (continuousCocycles A.ρ) (B1 A.ρ) S (continuousCocycles A'.ρ) (B1 A'.ρ) S' Φ
-    (fun a ha b => (hΦ a b).2 ((hF a a.2 b b.2).2.2.2 (Or.inl ha)))
-    (fun b hb a => (hΦ a b).2 ((hF a a.2 b b.2).2.2.2 (Or.inr hb)))
-    (fun a h => hnd.1 a a.2 fun b hb => (hΦ a ⟨b, hb⟩).1 (h _))
-    (fun b h => hnd.2 b b.2 fun a ha => (hΦ ⟨a, ha⟩ b).1 (h _))
-    hBS hSZ hBS' hSZ'
-    (fun a b ha hb => (hΦ a b).2 (horth a ha b hb)) hdim
-  exact ⟨fun a ha h => res.1 ⟨a, ha⟩ fun b hb => (hΦ _ _).2 (h b hb),
-    fun b hb h => res.2 ⟨b, hb⟩ fun a ha => (hΦ _ _).2 (h a ha)⟩
-
+  obtain ⟨Φ, hΦ⟩ :=
+    exists_pairing (continuousCocycles A.ρ) (continuousCocycles A'.ρ) (cocSub (Lp.PD K) LL)
+      (cobSub (Lp.PD K) LL) (cupBil A'.ρ P)
+      (fun a ha b hb => ⟨(hF a ha b hb).1, (hF a ha b hb).2.1⟩)
+      (cupL A'.ρ P a0 b0) hz0
+      (fun z hz => hTop LL O hO _ z (hF a0 ha0 b0 hb0).1 hz.1 (hF a0 ha0 b0 hb0).2.1 hz.2 hz0)
+  have res :=
+    ann_of_pairing (continuousCocycles A.ρ) (B1 A.ρ) S (continuousCocycles A'.ρ) (B1 A'.ρ) S' Φ
+      (fun a ha b => (hΦ a b).2 ((hF a a.2 b b.2).2.2.2 (Or.inl ha)))
+      (fun b hb a => (hΦ a b).2 ((hF a a.2 b b.2).2.2.2 (Or.inr hb)))
+      (fun a h => hnd.1 a a.2 fun b hb => (hΦ a ⟨b, hb⟩).1 (h _))
+      (fun b h => hnd.2 b b.2 fun a ha => (hΦ ⟨a, ha⟩ b).1 (h _))
+      hBS hSZ hBS' hSZ'
+      (fun a b ha hb => (hΦ a b).2 (horth a ha b hb))
+      hdim
+  exact ⟨
+    fun a ha h => res.1 ⟨a, ha⟩ fun b hb => (hΦ _ _).2 (h b hb),
+    fun b hb h => res.2 ⟨b, hb⟩ fun a ha => (hΦ _ _).2 (h a ha)
+  ⟩
 
 open PositivityTheory.LocalTateOrthogonality.Bk in
-theorem formsL (hT : Formalism.GaloisCohomology.LocalTateDualityK) (hE : Formalism.GaloisCohomology.LocalEulerCharK) (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) :
-    FinZQ (Lp.PD K) ∧ TopInj (Lp.PD K) ∧ DualQ (Lp.PD K) ∧
-      DualD (Lp.PD K) ∧ CobLO (Lp.PD K) ∧ TopLine (Lp.PD K) ∧
-      NondegL (Lp.PD K) ∧ DualL (Lp.PD K) := by
+theorem formsL
+    (hT : Formalism.GaloisCohomology.LocalTateDualityK)
+    (hE : Formalism.GaloisCohomology.LocalEulerCharK)
+    (l : ℕ) [Fact l.Prime]
+    (Lp : LocPrime l) (K : FinExt l)
+    : FinZQ (Lp.PD K) ∧ TopInj (Lp.PD K) ∧ DualQ (Lp.PD K) ∧ DualD (Lp.PD K) ∧ CobLO (Lp.PD K)
+      ∧ TopLine (Lp.PD K) ∧ NondegL (Lp.PD K) ∧ DualL (Lp.PD K) := by
   have hFin : FinZQ (Lp.PD K) := finZQ hT hE l Lp K
   have hTop : TopInj (Lp.PD K) := topInj hT l Lp K
   have hQ : DualQ (Lp.PD K) := dualQ hT l Lp K hTop
@@ -228,19 +326,24 @@ theorem formsL (hT : Formalism.GaloisCohomology.LocalTateDualityK) (hE : Formali
   have hNd : NondegL (Lp.PD K) := nondegLL l Lp K hD hCob
   exact ⟨hFin, hTop, hQ, hD, hCob, hLine, hNd, dualLOf l Lp K hFin hLine hNd⟩
 
-
 open PositivityTheory.LocalTateOrthogonality.Bk in
-theorem bkAL (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (AI : LocAinf l Lp) (T : LocTied l Lp AI) (K : FinExt l)
-    (hL : DualL (Lp.PD K))
+theorem bkAL
+    (l : ℕ) [Fact l.Prime]
+    (Lp : LocPrime l) (AI : LocAinf l Lp) (T : LocTied l Lp AI)
+    (K : FinExt l) (hL : DualL (Lp.PD K))
     (hEu : ∀ (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O]
-      [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O →
-      ∀ (A A' : GRep ↥(GK K) ℚ_[l] LL O) (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL),
-        IsDual1 (Lp.PD K) A.ρ A'.ρ P →
-        finrank LL (H1V A.ρ) ≤
-          finrank LL ↥(H0V A.ρ) + finrank LL ↥(H0V A'.ρ) + finrank ℚ_[l] ↥K.1 * finrank LL A.V)
-    (hdim : LocalSituation.bkADim (Lp.PD K)) : bkACore (Lp.PD K) := by
+        [Algebra O LL],
+      GoodO (Qp := ℚ_[l]) LL O
+        → ∀ (A A' : GRep ↥(GK K) ℚ_[l] LL O) (P : A.V →ₗ[LL] A'.V →ₗ[LL] LL),
+          IsDual1 (Lp.PD K) A.ρ A'.ρ P
+            → finrank LL (H1V A.ρ)
+              ≤ finrank LL ↥(H0V A.ρ) + finrank LL ↥(H0V A'.ρ)
+                + finrank ℚ_[l] ↥K.1 * finrank LL A.V)
+    (hdim : LocalSituation.bkADim (Lp.PD K))
+    : bkACore (Lp.PD K) := by
   intro LL _ _ _ O _ _ hO A A' m hdR hm
-  have ho := PositivityTheory.LocalTateOrthogonality.Orth.orthL_tied l Lp AI T K LL O hO A A' m hm hdR
+  have ho :=
+    PositivityTheory.LocalTateOrthogonality.Orth.orthL_tied l Lp AI T K LL O hO A A' m hm hdR
   haveI := hO.2.1
   have hdR' := (GlobalTheory.TateDualFil.tateDual l Lp AI T K LL A.ρ A'.ρ m hdR hm).1
   have e1 := hdim LL O hO A hdR
@@ -250,17 +353,26 @@ theorem bkAL (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (AI : LocAinf l Lp) (T :
   have e6 := hm.2.2.2
   unfold IsDR at hdR hdR'
   rw [← e6] at hdR'
-  have hc : finrank LL (H1V A.ρ) ≤
-      finrank LL (FiniteCohomology (Lp.PD K) A.ρ) + finrank LL (FiniteCohomology (Lp.PD K) A'.ρ) := by
+  have hc
+      : finrank LL (H1V A.ρ)
+        ≤ finrank LL (FiniteCohomology (Lp.PD K) A.ρ)
+          + finrank LL (FiniteCohomology (Lp.PD K) A'.ρ) := by
     omega
-  obtain ⟨h1, h2⟩ := hL LL O hO A A' m hm (finiteCocycles (Lp.PD K) A.ρ) (finiteCocycles (Lp.PD K) A'.ρ)
-    (B1_le_Z1f _ A) (fun _ h => h.1) (B1_le_Z1f _ A') (fun _ h => h.1) ho hc
+  obtain ⟨h1, h2⟩ :=
+    hL LL O hO A A' m hm (finiteCocycles (Lp.PD K) A.ρ) (finiteCocycles (Lp.PD K) A'.ρ)
+      (B1_le_Z1f _ A)
+      (fun _ h => h.1)
+      (B1_le_Z1f _ A')
+      (fun _ h => h.1)
+      ho hc
   exact ⟨fun a ha => ⟨ho a, h1 a ha⟩, fun b hb => ⟨fun h a ha => ho a ha b h, h2 b hb⟩⟩
 
-
 open PositivityTheory.LocalTateOrthogonality.Bk in
-theorem bkBL (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) (hD : DualD (Lp.PD K))
-    (hC : CobLO (Lp.PD K)) (hA : bkACore (Lp.PD K)) : bkBCore (Lp.PD K) := by
+theorem bkBL
+    (l : ℕ) [Fact l.Prime]
+    (Lp : LocPrime l) (K : FinExt l)
+    (hD : DualD (Lp.PD K)) (hC : CobLO (Lp.PD K)) (hA : bkACore (Lp.PD K))
+    : bkBCore (Lp.PD K) := by
   intro LL _ _ _ O _ _ hO L1 hL1 A A' LA LA' m hdR hm
   obtain ⟨hA1, -⟩ := hA LL O hO A A' m hdR hm.1
   have := hO.2.2.2.1
@@ -269,24 +381,30 @@ theorem bkBL (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l) (hD : Dua
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hTo : IsOpen (LA'.T : Set A'.V) := (latTop l Lp K LL O hO A' LA' ϖ hϖ).1
   obtain ⟨-, hF⟩ := cupFlip l Lp K LL O hO A A' m hm.1
-  have h1 : ∀ d ∈ latticeFiniteCocycles (Lp.PD K) LA, ∀ s ∈ HfD (Lp.PD K) LA',
-      CobO (Lp.PD K) L1 (cupLD LA' m d s) := fun d hd s hs => by
+  have h1
+      : ∀ d ∈ latticeFiniteCocycles (Lp.PD K) LA, ∀ s ∈ HfD (Lp.PD K) LA',
+        CobO (Lp.PD K) L1 (cupLD LA' m d s) := fun d hd s hs => by
     obtain ⟨b, hb, rfl⟩ := exists_of_mem_HfD hs
     rw [cobO_cup_iff hL1 hm d fun g => hd.1.2 g trivial]
     exact cobO_of_cobL hO' ((hA1 d hd.1.1).1 hd.2 b hb)
-  have h2 : ∀ d ∈ latticeCocycles LA, (∀ s ∈ HfD (Lp.PD K) LA', CobO (Lp.PD K) L1 (cupLD LA' m d s)) →
-      d ∈ latticeFiniteCocycles (Lp.PD K) LA := fun d hd H => by
+  have h2
+      : ∀ d ∈ latticeCocycles LA,
+        (∀ s ∈ HfD (Lp.PD K) LA', CobO (Lp.PD K) L1 (cupLD LA' m d s))
+          → d ∈ latticeFiniteCocycles (Lp.PD K) LA := fun d hd H => by
     refine ⟨hd, (hA1 d hd.1).2 fun b hb => ?_⟩
     refine (hC LL O hO L1 hL1 _ (hF d hd.1 b hb.1).1).2 fun u => ?_
-    have h3 := (cobO_cup_iff hL1 hm d (fun g => hd.2 g trivial) (u • b)).1
-      (H _ (Submodule.mem_sup_left ⟨u • b, (finiteCocycles (Lp.PD K) A'.ρ).smul_mem u hb, rfl⟩))
+    have h3 :=
+      (cobO_cup_iff hL1 hm d (fun g => hd.2 g trivial) (u • b)).1
+        (H _ (Submodule.mem_sup_left ⟨u • b, (finiteCocycles (Lp.PD K) A'.ρ).smul_mem u hb, rfl⟩))
     convert h3 using 1
     funext p
     simp [cupL]
-  refine ⟨fun s hs => ⟨fun h d hd => h1 d hd s h, fun H => ?_⟩,
-    fun d hd => ⟨fun h s _ hs => h1 d h s hs, fun H => h2 d hd fun s hs => H s (hfD_le hTo hs) hs⟩⟩
-  exact hD LL O hO L1 hL1 A A' LA LA' m hm _ le_sup_right (hfD_le hTo) s hs
-    fun d hd H' => H d (h2 d hd H')
+  refine ⟨
+    fun s hs => ⟨fun h d hd => h1 d hd s h, fun H => ?_⟩,
+    fun d hd => ⟨fun h s _ hs => h1 d h s hs, fun H => h2 d hd fun s hs => H s (hfD_le hTo hs) hs⟩
+  ⟩
+  exact hD LL O hO L1 hL1 A A' LA LA' m hm _ le_sup_right (hfD_le hTo) s hs fun d hd H' =>
+    H d (h2 d hd H')
 
 theorem blochKatoLocal : GlobalTheory.Published.BlochKatoLocal := by
   intro l _ Lp AI T K
@@ -296,12 +414,15 @@ theorem blochKatoLocal : GlobalTheory.Published.BlochKatoLocal := by
   have hdim := GlobalTheory.CompanionTheory.BKDim.bkADim_of_tied l Lp AI T K
   have hA := bkAL l Lp AI T K hL (eulerLe hT hE l Lp K) hdim
   have hB := bkBL l Lp K hD hC hA
-  refine ⟨?_, GlobalTheory.Published.BlochKato.rationalDuality_of_allCoefficients hA,
-    GlobalTheory.Published.BlochKato.integralDuality_of_allCoefficients hB⟩
+  refine ⟨
+    ?_,
+    GlobalTheory.Published.BlochKato.rationalDuality_of_allCoefficients hA,
+    GlobalTheory.Published.BlochKato.integralDuality_of_allCoefficients hB
+  ⟩
   intro V _ _ _ _ _ _ _ ρ hc hdR
   letI : Module ℤ_[l] V := Module.compHom V (algebraMap ℤ_[l] ℚ_[l])
   haveI : IsScalarTower ℤ_[l] ℚ_[l] V := IsScalarTower.of_algebraMap_smul fun _ _ => rfl
-  exact GlobalTheory.T.finrank_H1f_de_rham l Lp AI T K ℚ_[l] ℤ_[l] GlobalTheory.Published.BlochKato.goodO_padicInt
-    { V := V, ρ := ρ, cont := hc } hdR
+  exact GlobalTheory.T.finrank_H1f_de_rham l Lp AI T K ℚ_[l] ℤ_[l]
+    GlobalTheory.Published.BlochKato.goodO_padicInt { V := V, ρ := ρ, cont := hc } hdR
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.BK

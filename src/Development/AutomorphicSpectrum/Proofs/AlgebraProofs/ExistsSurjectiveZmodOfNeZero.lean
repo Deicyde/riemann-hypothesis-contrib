@@ -9,9 +9,9 @@ open scoped BigOperators ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.QuotPrime
 
-theorem exists_surjective_zmod_of_ne_top (X : Type*) [AddCommGroup X] [Module.Finite ℤ X]
-    (Y : AddSubgroup X) (hY : Y ≠ ⊤) :
-    ∃ (l : ℕ) (_ : l.Prime) (ψ : X →+ ZMod l), Function.Surjective ψ ∧ ∀ y ∈ Y, ψ y = 0 := by
+theorem exists_surjective_zmod_of_ne_top
+    (X : Type*) [AddCommGroup X] [Module.Finite ℤ X] (Y : AddSubgroup X) (hY : Y ≠ ⊤)
+    : ∃ (l : ℕ) (_ : l.Prime) (ψ : X →+ ZMod l), Function.Surjective ψ ∧ ∀ y ∈ Y, ψ y = 0 := by
   have hY' : Y.toIntSubmodule ≠ ⊤ := by
     intro h
     apply hY
@@ -28,19 +28,25 @@ theorem exists_surjective_zmod_of_ne_top (X : Type*) [AddCommGroup X] [Module.Fi
     have h : (⊥ : Ideal ℤ).IsMaximal := by simpa using hI
     exact Int.not_isField (Ring.isField_iff_maximal_bot.2 h)
   have hp : Prime p := (Ideal.span_singleton_prime hp0).1 hI.isPrime
-  refine ⟨p.natAbs, Int.prime_iff_natAbs_prime.1 hp,
-    ((Int.quotientSpanEquivZMod p).toAddEquiv.toAddMonoidHom.comp
-      e.toAddEquiv.toAddMonoidHom).comp M.mkQ.toAddMonoidHom, ?_, ?_⟩
+  refine ⟨
+    p.natAbs,
+    Int.prime_iff_natAbs_prime.1 hp,
+    ((Int.quotientSpanEquivZMod p).toAddEquiv.toAddMonoidHom.comp e.toAddEquiv.toAddMonoidHom).comp
+      M.mkQ.toAddMonoidHom,
+    ?_,
+    ?_
+  ⟩
   · exact ((Int.quotientSpanEquivZMod p).surjective.comp e.surjective).comp M.mkQ_surjective
   · intro y hy
     have h0 : M.mkQ y = 0 := (Submodule.Quotient.mk_eq_zero M).2 (hYM hy)
     change (Int.quotientSpanEquivZMod p) (e (M.mkQ y)) = 0
     rw [h0, map_zero, map_zero]
 
-theorem exists_surjective_zmod_of_ne_zero :
-    ∀ (k X : Type) [Field k] [AddCommGroup X] [Module.Finite ℤ X] (Y : AddSubgroup X)
-      (δ : X →+ k), δ ≠ 0 → (∀ y ∈ Y, δ y = 0) →
-      ∃ (l : ℕ) (_ : l.Prime) (ψ : X →+ ZMod l), Function.Surjective ψ ∧ ∀ y ∈ Y, ψ y = 0 := by
+theorem exists_surjective_zmod_of_ne_zero
+    : ∀ (k X : Type) [Field k] [AddCommGroup X] [Module.Finite ℤ X] (Y : AddSubgroup X)
+        (δ : X →+ k),
+      δ ≠ 0 → (∀ y ∈ Y, δ y = 0)
+        → ∃ (l : ℕ) (_ : l.Prime) (ψ : X →+ ZMod l), Function.Surjective ψ ∧ ∀ y ∈ Y, ψ y = 0 := by
   intro k X _ _ _ Y δ hδ hY
   refine exists_surjective_zmod_of_ne_top X Y ?_
   rintro rfl

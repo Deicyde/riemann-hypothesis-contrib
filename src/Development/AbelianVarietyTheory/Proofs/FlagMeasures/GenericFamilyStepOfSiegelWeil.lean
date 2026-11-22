@@ -19,10 +19,15 @@ open GlobalTheory.SnFam
 
 namespace GlobalTheory.SnFamTop
 
-theorem stepFamG_of_SWXS (hSW : PI.VolStabS.MassDataS.SWXS) :
-    Formalism.L2.SG.Pf.MainEqFam.StepFamG :=
+theorem stepFamG_of_SWXS (hSW : PI.VolStabS.MassDataS.SWXS)
+    : Formalism.L2.SG.Pf.MainEqFam.StepFamG :=
   GlobalTheory.T.genericRow_familyStep_of_leaves
     (fun D h => GlobalTheory.localMass_le_genericMass_nine _ _ h)
-    GlobalTheory.T.differentLocalIdentity_familiesLemmaH GlobalTheory.T.genericScalarClassTerms_formFamily GlobalTheory.T.familyRowWeightSumUnfoldingIdentity (GlobalTheory.T.familyGenericMassPositiveBounded_proof hSW) GlobalTheory.T.familyGroupSumFactorsRowWeightAmplitude_proof GlobalTheory.T.familyLocalObjectsExistAtTerms_proof
+    GlobalTheory.T.differentLocalIdentity_familiesLemmaH
+    GlobalTheory.T.genericScalarClassTerms_formFamily
+    GlobalTheory.T.familyRowWeightSumUnfoldingIdentity
+    (GlobalTheory.T.familyGenericMassPositiveBounded_proof hSW)
+    GlobalTheory.T.familyGroupSumFactorsRowWeightAmplitude_proof
+    GlobalTheory.T.familyLocalObjectsExistAtTerms_proof
 
 end GlobalTheory.SnFamTop

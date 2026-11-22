@@ -7,15 +7,19 @@ public import Mathlib
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.NOrd
 
-theorem exists_val_of_prime {Kf : Type*} [Field Kf] (A : Subring Kf) (P : Ideal A) [P.IsPrime] :
-    ∃ V : ValuationSubring Kf, (∀ a : A, (a : Kf) ∈ V) ∧ (∀ a : A, a ∉ P → (a : Kf)⁻¹ ∈ V) ∧
-      ∀ a : A, a ∈ P → V.valuation (a : Kf) < 1 := by
+theorem exists_val_of_prime {Kf : Type*} [Field Kf] (A : Subring Kf) (P : Ideal A) [P.IsPrime]
+    : ∃ V : ValuationSubring Kf,
+      (∀ a : A, (a : Kf) ∈ V) ∧ (∀ a : A, a ∉ P → (a : Kf)⁻¹ ∈ V)
+        ∧ ∀ a : A, a ∈ P → V.valuation (a : Kf) < 1 := by
   obtain ⟨B, hB⟩ := (LocalSubring.ofPrime A P).exists_le_valuationSubring
   obtain ⟨hle, hloc⟩ := LocalSubring.le_def.1 hB
   let e := LocalSubring.ofPrimeEquiv A P
   let f : Localization.AtPrime P →+* B.toLocalSubring.toSubring :=
-    (Subring.inclusion hle).comp (e : Localization.AtPrime P →+* (LocalSubring.ofPrime A P).toSubring)
-  have hf : ∀ a : A, ((f (algebraMap A (Localization.AtPrime P) a) : B.toLocalSubring.toSubring) : Kf) = a := by
+    (Subring.inclusion hle).comp
+      (e : Localization.AtPrime P →+* (LocalSubring.ofPrime A P).toSubring)
+  have hf
+      : ∀ a : A,
+        ((f (algebraMap A (Localization.AtPrime P) a) : B.toLocalSubring.toSubring) : Kf) = a := by
     intro a
     show ((e (algebraMap A (Localization.AtPrime P) a) : (LocalSubring.ofPrime A P).toSubring) : Kf) = a
     rw [AlgEquiv.commutes]
@@ -31,7 +35,9 @@ theorem exists_val_of_prime {Kf : Type*} [Field Kf] (A : Subring Kf) (P : Ideal 
     obtain ⟨u, hu'⟩ := hu.map f
     have h1 : ((u⁻¹ : (B.toLocalSubring.toSubring)ˣ) : B.toLocalSubring.toSubring) * (u : _) = 1 :=
       u.inv_mul
-    have h2 : (((u⁻¹ : (B.toLocalSubring.toSubring)ˣ) : B.toLocalSubring.toSubring) : Kf) * (a : Kf) = 1 := by
+    have h2
+        : (((u⁻¹ : (B.toLocalSubring.toSubring)ˣ) : B.toLocalSubring.toSubring) : Kf) * (a : Kf)
+          = 1 := by
       rw [← hf a, ← hu']
       exact congrArg Subtype.val h1
     rw [← eq_inv_of_mul_eq_one_left h2]
@@ -44,11 +50,17 @@ theorem exists_val_of_prime {Kf : Type*} [Field Kf] (A : Subring Kf) (P : Ideal 
       have h' : IsUnit (e (algebraMap A (Localization.AtPrime P) a)) := hloc.map_nonunit _ h
       have h'' := h'.map (e.symm : (LocalSubring.ofPrime A P).toSubring →+* Localization.AtPrime P)
       first
-      | (convert h'' using 1
-         exact (e.symm_apply_apply _).symm)
-      | (rwa [show (e.symm : (LocalSubring.ofPrime A P).toSubring →+* Localization.AtPrime P)
-            (e (algebraMap A (Localization.AtPrime P) a)) = algebraMap A (Localization.AtPrime P) a from
-            e.symm_apply_apply _] at h'')
+      | (
+          convert h'' using 1
+          exact (e.symm_apply_apply _).symm
+        )
+      | (
+          rwa [show (e.symm : (LocalSubring.ofPrime A P).toSubring →+* Localization.AtPrime P) (e
+                  (algebraMap A (Localization.AtPrime P) a))
+                = algebraMap A (Localization.AtPrime P) a from
+              e.symm_apply_apply _]
+            at h''
+        )
     by_contra hge
     push_neg at hge
     have hv1 : B.valuation (a : Kf) = 1 := le_antisymm ((B.valuation_le_one_iff _).2 (hmem a)) hge

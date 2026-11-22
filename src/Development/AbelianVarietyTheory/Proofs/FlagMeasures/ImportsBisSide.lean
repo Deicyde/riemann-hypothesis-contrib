@@ -6,11 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.IntSmulMemSubmodule
 
-theorem exists_int_smul_mem {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E)) (hL : Submodule.IsFullLattice E L)
-    (w : Fin n → E) : ∃ (N : ℤ), N ≠ (0 : ℤ) ∧ N • w ∈ L := by
-  have hw : w ∈ Submodule.span E (L : Set (Fin n → E)) := by
-    rw [hL.span_eq_top]; trivial
+theorem exists_int_smul_mem
+    {E : Type} [inst : Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E))
+    (hL : Submodule.IsFullLattice E L) (w : Fin n → E)
+    : ∃ (N : ℤ), N ≠ (0 : ℤ) ∧ N • w ∈ L := by
+  have hw : w ∈ Submodule.span E (L : Set (Fin n → E)) := by rw [hL.span_eq_top]; trivial
   induction hw using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hx⟩
   | zero => exact ⟨1, one_ne_zero, by rw [one_smul]; exact L.zero_mem⟩

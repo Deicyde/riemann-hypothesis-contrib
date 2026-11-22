@@ -6,13 +6,17 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct
 
 namespace GlobalTheory
 
-theorem eq_of_pow_pred_eq_of_sub_one_mem {R : Type*} [CommRing R] [IsDomain R] (I : Ideal R)
-    (hI : I ≠ ⊤) (l : ℕ) (hl : 0 < l) (hlI : (l : R) ∈ I) (a b : R)
-    (hab : a ^ (l - 1) = b ^ (l - 1)) (ha : a - 1 ∈ I) (hb : b - 1 ∈ I) : a = b := by
+theorem eq_of_pow_pred_eq_of_sub_one_mem
+    {R : Type*} [CommRing R] [IsDomain R]
+    (I : Ideal R) (hI : I ≠ ⊤)
+    (l : ℕ) (hl : 0 < l) (hlI : (l : R) ∈ I)
+    (a b : R) (hab : a ^ (l - 1) = b ^ (l - 1)) (ha : a - 1 ∈ I) (hb : b - 1 ∈ I)
+    : a = b := by
   by_contra hne
   have h := geom_sum₂_mul a b (l - 1)
   rw [hab, sub_self] at h
@@ -26,7 +30,8 @@ theorem eq_of_pow_pred_eq_of_sub_one_mem {R : Type*} [CommRing R] [IsDomain R] (
   have h2 := congrArg (Ideal.Quotient.mk I) hs
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_mul, map_pow, ha', hb', one_pow, mul_one, Finset.sum_const,
-    Finset.card_range, nsmul_eq_mul, map_zero] at h2
+        Finset.card_range, nsmul_eq_mul, map_zero]
+      at h2
   rw [Nat.cast_sub hl, hl', Nat.cast_one, zero_sub, neg_eq_zero] at h2
   apply hI
   rw [Ideal.eq_top_iff_one, ← Ideal.Quotient.eq_zero_iff_mem, map_one]
@@ -42,14 +47,17 @@ def posValIdeal {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l) : Idea
   smul_mem' := by
     intro c x hx
     simp only [Set.mem_ofPred_eq, smul_eq_mul, (algebraMap ↥(OL LL) ↥LL.1).map_mul,
-      AddValuation.map_mul] at hx ⊢
+        AddValuation.map_mul]
+      at hx ⊢
     have hc : 0 ≤ P.v LL (algebraMap ↥(OL LL) ↥LL.1 c) := (P.v_O LL _).2 c.2
     exact lt_of_lt_of_le hx (le_add_of_nonneg_left hc)
 
-theorem oneUnit_eq_of_pow_pred_eq_of_pos {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l)
-    (a b : ↥(OL LL)) (hab : a ^ (l - 1) = b ^ (l - 1))
-    (ha : 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 a - 1))
-    (hb : 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 b - 1)) : a = b := by
+theorem oneUnit_eq_of_pow_pred_eq_of_pos
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l) (LL : FinExt l) (a b : ↥(OL LL))
+    (hab : a ^ (l - 1) = b ^ (l - 1)) (ha : 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 a - 1))
+    (hb : 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 b - 1))
+    : a = b := by
   refine eq_of_pow_pred_eq_of_sub_one_mem (posValIdeal P LL) ?_ l (Fact.out : l.Prime).pos ?_ a b
     hab ?_ ?_
   · rw [Ne, Ideal.eq_top_iff_one]
@@ -63,18 +71,21 @@ theorem oneUnit_eq_of_pow_pred_eq_of_pos {l : ℕ} [Fact l.Prime] (P : LocPrime 
   · change 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 (b - 1))
     rwa [map_sub, map_one]
 
-theorem units_eq_of_pow_pred_eq_of_pos {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l)
-    (u w : (↥(OL LL))ˣ) (h : u ^ (l - 1) = w ^ (l - 1))
-    (hu : 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 (u : ↥(OL LL)) - 1))
-    (hw : 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 (w : ↥(OL LL)) - 1)) : u = w := by
+theorem units_eq_of_pow_pred_eq_of_pos
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l) (LL : FinExt l) (u w : (↥(OL LL))ˣ)
+    (h : u ^ (l - 1) = w ^ (l - 1)) (hu : 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 (u : ↥(OL LL)) - 1))
+    (hw : 0 < P.v LL (algebraMap ↥(OL LL) ↥LL.1 (w : ↥(OL LL)) - 1))
+    : u = w := by
   apply Units.ext
   refine oneUnit_eq_of_pow_pred_eq_of_pos P LL _ _ ?_ hu hw
   rw [← Units.val_pow_eq_pow_val, ← Units.val_pow_eq_pow_val, h]
 
-theorem units_eq_of_pow_pred_eq_of_val_one : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l)
-    (LL : FinExt l) (u w : (↥(OL LL))ˣ), u ^ (l - 1) = w ^ (l - 1) →
-    P.v LL (algebraMap ↥(OL LL) ↥LL.1 ((u : ↥(OL LL)) - 1)) = 1 →
-    P.v LL (algebraMap ↥(OL LL) ↥LL.1 (w : ↥(OL LL)) - 1) = 1 → u = w := by
+theorem units_eq_of_pow_pred_eq_of_val_one
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (LL : FinExt l) (u w : (↥(OL LL))ˣ),
+      u ^ (l - 1) = w ^ (l - 1) → P.v LL (algebraMap ↥(OL LL) ↥LL.1 ((u : ↥(OL LL)) - 1)) = 1
+        → P.v LL (algebraMap ↥(OL LL) ↥LL.1 (w : ↥(OL LL)) - 1) = 1
+        → u = w := by
   intro l _ P LL u w h hu hw
   rw [map_sub, map_one] at hu
   refine units_eq_of_pow_pred_eq_of_pos P LL u w h ?_ ?_

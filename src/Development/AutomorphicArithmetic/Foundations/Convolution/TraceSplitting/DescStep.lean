@@ -14,26 +14,38 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Global GroundTheory.Global.SemiLocal
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.T Formalism.BasicNotions GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.CBC
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.T
+  Formalism.BasicNotions GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.CBC
 
-private theorem occ_basic {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
-    (V : Submodule ℂ (LL μ)) (hV : IsSummand μ V) (w : Pl K) :
-    (∃ σ, Occurs μ V w σ) ∧ (∀ σ σ', Occurs μ V w σ → Occurs μ V w σ' → Nonempty (σ.ρ.Equiv σ'.ρ)) := by
+private theorem occ_basic
+    {K : Type} [Field K] [NumberField K]
+    {n : ℕ} (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
+    (V : Submodule ℂ (LL μ)) (hV : IsSummand μ V)
+    (w : Pl K)
+    : (∃ σ, Occurs μ V w σ)
+      ∧ (∀ σ σ', Occurs μ V w σ → Occurs μ V w σ' → Nonempty (σ.ρ.Equiv σ'.ρ)) := by
   letI : MeasurableSpace (Gw n w) := borel _
   haveI : BorelSpace (Gw n w) := ⟨rfl⟩
   have h := occursBasics K n μ V w Measure.haar hV
   exact ⟨h.1, h.2.1⟩
 
-private theorem loc_iff {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {n : ℕ} (μ : Measure (normOneGL (K := E) (n := n)))
-    [μ.IsHaarMeasure] (π : CuspSub E n) (V : Submodule ℂ (LL μ)) (h : Dp.Carries μ π V) (w : Pl E) (σ : SmIrr (Gw n w)) :
-    (Cusp.cx π).locComp w σ ↔ Occurs μ V w σ :=
+private theorem loc_iff
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {n : ℕ} (μ : Measure (normOneGL (K := E) (n := n))) [μ.IsHaarMeasure]
+    (π : CuspSub E n) (V : Submodule ℂ (LL μ)) (h : Dp.Carries μ π V)
+    (w : Pl E) (σ : SmIrr (Gw n w))
+    : (Cusp.cx π).locComp w σ ↔ Occurs μ V w σ :=
   (Dp.locIff E n μ π V h w σ).trans (occursIff E n μ V h.summand w σ).symm
 
-private theorem locIso_congr {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
-    {v : Pl F} (w : PlacesOver E v) {τ τ₁ : SmIrr (Gw n v)} {τ' τ₁' : SmIrr (Gw n w.1)} (a : τ₁.ρ.Equiv τ.ρ)
-    (b : τ'.ρ.Equiv τ₁'.ρ) (h : LocIso w τ τ') : LocIso w τ₁ τ₁' := by
+private theorem locIso_congr
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {n : ℕ} {v : Pl F} (w : PlacesOver E v)
+    {τ τ₁ : SmIrr (Gw n v)} {τ' τ₁' : SmIrr (Gw n w.1)}
+    (a : τ₁.ρ.Equiv τ.ρ) (b : τ'.ρ.Equiv τ₁'.ρ) (h : LocIso w τ τ')
+    : LocIso w τ₁ τ₁' := by
   obtain ⟨e, he⟩ := h
   refine ⟨a.toLinearEquiv.trans (e.trans b.toLinearEquiv), fun g x => ?_⟩
   have ha : a.toLinearEquiv (τ₁.ρ g x) = τ.ρ g (a.toLinearEquiv x) :=
@@ -43,8 +55,9 @@ private theorem locIso_congr {F E : Type} [Field F] [NumberField F] [Field E] [N
   simp only [LinearEquiv.trans_apply]
   rw [ha, he, hb]
 
-theorem UpperTheory.ConvolutionTheory.T.descStep :
-    UpperTheory.ConvolutionTheory.T.CoreDesc → UpperTheory.ConvolutionTheory.T.LiftAll → UpperTheory.ConvolutionTheory.T.DescStep := by
+theorem UpperTheory.ConvolutionTheory.T.descStep
+    : UpperTheory.ConvolutionTheory.T.CoreDesc → UpperTheory.ConvolutionTheory.T.LiftAll
+      → UpperTheory.ConvolutionTheory.T.DescStep := by
   intro hD hL F E _ _ _ _ _ _ _ _ σ hσ hp n hn P hP v w hv
   let μE : Measure (normOneGL (K := E) (n := n)) := Measure.haar
   let μF : Measure (normOneGL (K := F) (n := n)) := Measure.haar
@@ -68,9 +81,10 @@ theorem UpperTheory.ConvolutionTheory.T.descStep :
   obtain ⟨π, hπ, -⟩ := Dp.exCusp F n μF V₀ hV₀
   obtain ⟨-, huF⟩ := occ_basic μF V₀ hV₀ v
   have hl := hlift π _ (hcl π _ V₀ V Λ₀ t₀ Λ t hπ hV hAt₀ hΛ hΛ₀ ht₀)
-  have hl2 := hloc π (P.twist χ') v w (hv w) fun τ₁ τ₁' h₁ h₁' => by
-    obtain ⟨a⟩ := huF τ₁ τ ((loc_iff μF π V₀ hπ v τ₁).1 h₁) hτ
-    obtain ⟨b⟩ := huE τ' τ₁' hτ' ((loc_iff μE _ V hV w.1 τ₁').1 h₁')
-    exact locIso_congr w a b hiso
+  have hl2 :=
+    hloc π (P.twist χ') v w (hv w) fun τ₁ τ₁' h₁ h₁' => by
+      obtain ⟨a⟩ := huF τ₁ τ ((loc_iff μF π V₀ hπ v τ₁).1 h₁) hτ
+      obtain ⟨b⟩ := huE τ' τ₁' hτ' ((loc_iff μE _ V hV w.1 τ₁').1 h₁')
+      exact locIso_congr w a b hiso
   rw [hPP] at hl hl2
   exact ⟨π.twist χ⁻¹, hl, hl2⟩

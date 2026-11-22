@@ -19,7 +19,8 @@ theorem nonzero : NonZero := by
     filter_upwards [h1] with x hx
     have : (F x : S → ℂ) =ᵐ[ν] 0 := by
       filter_upwards [(hf.2 x).symm, hx, Lp.coeFn_zero ℂ 2 ν] with s h1 h2 h3
-      rw [h1, h2]; rfl
+      rw [h1, h2]
+      rfl
     simpa using (Lp.eq_zero_iff_ae_eq_zero).2 this
   exact (Continuous.ae_eq_iff_eq X.μ hF continuous_const).1 h2
 

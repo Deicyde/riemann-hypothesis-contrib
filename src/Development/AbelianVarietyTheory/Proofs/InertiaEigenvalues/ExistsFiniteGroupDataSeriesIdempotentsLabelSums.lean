@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Coef
 
 @[expose] public section
 
-open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.L2 NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module Polynomial GlobalTheory.Pass GlobalTheory.PendOf
+open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.L2 NumberField
+  IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module Polynomial
+  GlobalTheory.Pass GlobalTheory.PendOf
 
 noncomputable section
 
@@ -16,8 +19,8 @@ section Alg
 variable {A : Type} [Ring A] [Algebra ℂ A]
 
 def IsDecomp (S : Finset A) : Prop :=
-  (∀ e ∈ S, e * e = e) ∧ (∀ e ∈ S, ∀ z : A, e * z = z * e) ∧ (∀ e ∈ S, e ≠ 0) ∧
-    (∀ e ∈ S, ∀ f ∈ S, e ≠ f → e * f = 0) ∧ ∑ e ∈ S, e = 1
+  (∀ e ∈ S, e * e = e) ∧ (∀ e ∈ S, ∀ z : A, e * z = z * e) ∧ (∀ e ∈ S, e ≠ 0)
+    ∧ (∀ e ∈ S, ∀ f ∈ S, e ≠ f → e * f = 0) ∧ ∑ e ∈ S, e = 1
 
 def IsPrim (S : Finset A) : Prop :=
   ∀ t ∈ S, ∀ x : A, x * x = x → (∀ z, x * z = z * x) → x * t = x → x = 0 ∨ x = t
@@ -34,14 +37,18 @@ theorem linInd {S : Finset A} (h : IsDecomp S) : LinearIndependent ℂ (fun x : 
   rw [hs, zero_mul] at h1
   exact (smul_eq_zero.1 h1.symm).resolve_right (h.2.2.1 _ i.2)
 
-theorem card_le [Module.Finite ℂ A] {S : Finset A} (h : IsDecomp S) : S.card ≤ Module.finrank ℂ A := by
+theorem card_le [Module.Finite ℂ A] {S : Finset A} (h : IsDecomp S)
+    : S.card ≤ Module.finrank ℂ A := by
   have := (linInd h).fintype_card_le_finrank
   simpa using this
 
-theorem refine_decomp [DecidableEq A] {S : Finset A} (h : IsDecomp S) {t : A} (ht : t ∈ S) {x : A}
-    (hx : x * x = x) (hc : ∀ z, x * z = z * x) (hxt : x * t = x) (h0 : x ≠ 0) (ht' : x ≠ t) :
-    IsDecomp (insert x (insert (t - x) (S.erase t))) ∧
-      (insert x (insert (t - x) (S.erase t))).card = S.card + 1 := by
+theorem refine_decomp
+    [DecidableEq A]
+    {S : Finset A} (h : IsDecomp S)
+    {t : A} (ht : t ∈ S)
+    {x : A} (hx : x * x = x) (hc : ∀ z, x * z = z * x) (hxt : x * t = x) (h0 : x ≠ 0) (ht' : x ≠ t)
+    : IsDecomp (insert x (insert (t - x) (S.erase t)))
+      ∧ (insert x (insert (t - x) (S.erase t))).card = S.card + 1 := by
   obtain ⟨hI, hC, hN, hO, hS⟩ := h
   have htx : t * x = x := by rw [← hc t, hxt]
   have hxs : ∀ s ∈ S.erase t, x * s = 0 := by
@@ -59,8 +66,7 @@ theorem refine_decomp [DecidableEq A] {S : Finset A} (h : IsDecomp S) {t : A} (h
     rw [mul_sub, hO s hs' t ht hst, hsx s hs, sub_zero]
   have hxtx : x * (t - x) = 0 := by rw [mul_sub, hxt, hx, sub_self]
   have htxx : (t - x) * x = 0 := by rw [sub_mul, htx, hx, sub_self]
-  have htt : (t - x) * (t - x) = t - x := by
-    rw [mul_sub, htxx, sub_zero, sub_mul, hI t ht, hxt]
+  have htt : (t - x) * (t - x) = t - x := by rw [mul_sub, htxx, sub_zero, sub_mul, hI t ht, hxt]
   have htx0 : t - x ≠ 0 := fun h => ht' (sub_eq_zero.1 h).symm
   have hnot : ∀ y, y * y = y → y ≠ 0 → (∀ s ∈ S.erase t, y * s = 0) → y ∉ S.erase t := by
     intro y hy hy0 hys hmem
@@ -69,7 +75,9 @@ theorem refine_decomp [DecidableEq A] {S : Finset A} (h : IsDecomp S) {t : A} (h
   have hm2 : x ∉ insert (t - x) (S.erase t) := by
     rw [Finset.mem_insert, not_or]
     refine ⟨fun e => h0 ?_, hnot _ hx h0 hxs⟩
-    rw [← hx]; nth_rewrite 2 [e]; exact hxtx
+    rw [← hx]
+    nth_rewrite 2 [e]
+    exact hxtx
   refine ⟨⟨?_, ?_, ?_, ?_, ?_⟩, ?_⟩
   · intro e he
     rw [Finset.mem_insert, Finset.mem_insert] at he
@@ -112,9 +120,9 @@ theorem exists_prim [Module.Finite ℂ A] [Nontrivial A] : ∃ S : Finset A, IsD
   classical
   let P : ℕ → Prop := fun n => ∃ S : Finset A, IsDecomp S ∧ S.card = n
   have h1 : P 1 := ⟨{1}, ⟨by simp, by simp, by simp, by simp, by simp⟩, by simp⟩
-  have hb : ∀ n, P n → n ≤ Module.finrank ℂ A := by
-    rintro n ⟨S, hS, rfl⟩; exact card_le hS
-  obtain ⟨S, hS, hc⟩ := Nat.findGreatest_spec (P := P) (m := 1) (n := Module.finrank ℂ A) (hb 1 h1) h1
+  have hb : ∀ n, P n → n ≤ Module.finrank ℂ A := by rintro n ⟨S, hS, rfl⟩; exact card_le hS
+  obtain ⟨S, hS, hc⟩ :=
+    Nat.findGreatest_spec (P := P) (m := 1) (n := Module.finrank ℂ A) (hb 1 h1) h1
   refine ⟨S, hS, ?_⟩
   intro t ht x hx hc' hxt
   by_contra hne
@@ -123,10 +131,12 @@ theorem exists_prim [Module.Finite ℂ A] [Nontrivial A] : ∃ S : Finset A, IsD
   have := Nat.le_findGreatest (P := P) (hb _ ⟨_, h2, rfl⟩) ⟨_, h2, rfl⟩
   omega
 
-theorem lab_unique {ι : Type} {S : Finset A} (hS : IsDecomp S) (hP : IsPrim S) (e : ι → A)
+theorem lab_unique
+    {ι : Type} {S : Finset A} (hS : IsDecomp S) (hP : IsPrim S) (e : ι → A)
     (he_idem : ∀ i, e i * e i = e i) (he_c : ∀ i z, e i * z = z * e i)
-    (he_o : ∀ i j, i ≠ j → e i * e j = 0) (T : Finset ι) (hT : ∑ i ∈ T, e i = 1) {t : A} (ht : t ∈ S) :
-    ∃ i ∈ T, e i * t = t ∧ ∀ j, j ≠ i → e j * t = 0 := by
+    (he_o : ∀ i j, i ≠ j → e i * e j = 0) (T : Finset ι) (hT : ∑ i ∈ T, e i = 1)
+    {t : A} (ht : t ∈ S)
+    : ∃ i ∈ T, e i * t = t ∧ ∀ j, j ≠ i → e j * t = 0 := by
   have key : ∀ j, e j * t = 0 ∨ e j * t = t := by
     intro j
     refine hP t ht _ ?_ ?_ ?_
@@ -158,16 +168,15 @@ theorem decS_spec (a : ℕ) : IsDecomp (decS g a) ∧ IsPrim (decS g a) :=
   (exists_prim (A := GA g a)).choose_spec
 
 def LabQ (a : ℕ) (x : GA g a) (f : (ZMod g)[X]) : Prop :=
-  (f.Monic ∧ f.natDegree = a ∧ f.coeff 0 ≠ 0) ∧
-    ∀ h : a = r, e f * cast (congrArg (GA g) h) x = cast (congrArg (GA g) h) x
-
+  (f.Monic ∧ f.natDegree = a ∧ f.coeff 0 ≠ 0)
+    ∧ ∀ h : a = r, e f * cast (congrArg (GA g) h) x = cast (congrArg (GA g) h) x
 
 open Classical in
 def labF (a : ℕ) (x : GA g a) : (ZMod g)[X] :=
   if h : ∃ f, LabQ g r e a x f then h.choose else (X - C 1) ^ a
 
-theorem labF_spec (a : ℕ) (x : GA g a) :
-    (labF g r e a x).Monic ∧ (labF g r e a x).natDegree = a ∧ (labF g r e a x).coeff 0 ≠ 0 := by
+theorem labF_spec (a : ℕ) (x : GA g a)
+    : (labF g r e a x).Monic ∧ (labF g r e a x).natDegree = a ∧ (labF g r e a x).coeff 0 ≠ 0 := by
   unfold labF
   split_ifs with h
   · exact h.choose_spec.1
@@ -183,8 +192,7 @@ def lzE : PairedCharacterCondition.LzData g where
   idem_central τ z := (decS_spec g _).1.2.1 _ τ.2 z
   idem_ne τ := (decS_spec g _).1.2.2.1 _ τ.2
   idem_orth τ σ h := (decS_spec g _).1.2.2.2.1 _ τ.2 _ σ.2 (fun e => h (Subtype.ext e))
-  idem_sum a := by
-    rw [Finset.sum_coe_sort (decS g a) (fun x => x)]; exact (decS_spec g a).1.2.2.2.2
+  idem_sum a := by rw [Finset.sum_coe_sort (decS g a) (fun x => x)]; exact (decS_spec g a).1.2.2.2.2
   idem_prim τ x hx hc hxt := (decS_spec g _).2 _ τ.2 x hx hc hxt
   lab τ := labF g r e _ τ.1
   lab_spec τ := labF_spec g r e _ τ.1
@@ -195,18 +203,21 @@ def lzE : PairedCharacterCondition.LzData g where
   hc _ _ := ∅
 
 open Classical in
-theorem lzE_ser (hidem : ∀ f, e f * e f = e f) (hcen : ∀ f a, e f * a = a * e f)
+theorem lzE_ser
+    (hidem : ∀ f, e f * e f = e f) (hcen : ∀ f a, e f * a = a * e f)
     (horth : ∀ f f', f ≠ f' → e f * e f' = 0)
-    (hsum : ∃ S : Finset (ZMod g)[X], (∀ f, f ∈ S ↔ f.Monic ∧ f.natDegree = r ∧ f.coeff 0 ≠ 0) ∧
-      ∑ f ∈ S, e f = 1) (f : (ZMod g)[X]) :
-    e f = ∑ τ : (lzE g r e).Irr r, if (lzE g r e).lab τ = f then (lzE g r e).idem τ else 0 := by
+    (hsum : ∃ S : Finset (ZMod g)[X],
+      (∀ f, f ∈ S ↔ f.Monic ∧ f.natDegree = r ∧ f.coeff 0 ≠ 0) ∧ ∑ f ∈ S, e f = 1)
+    (f : (ZMod g)[X])
+    : e f = ∑ τ : (lzE g r e).Irr r, if (lzE g r e).lab τ = f then (lzE g r e).idem τ else 0 := by
   obtain ⟨T, hTm, hT⟩ := hsum
   have hmain : ∀ t ∈ decS g r, ∀ f, e f * t = if labF g r e r t = f then t else 0 := by
     intro t ht f
     obtain ⟨i, hi, hit, hj⟩ :=
       lab_unique (decS_spec g r).1 (decS_spec g r).2 e hidem hcen horth T hT ht
     have hlab : labF g r e r t = i := by
-      have hex : ∃ f, LabQ g r e r t f := ⟨i, (hTm i).1 hi, fun h => by simp only [cast_eq]; exact hit⟩
+      have hex : ∃ f, LabQ g r e r t f :=
+        ⟨i, (hTm i).1 hi, fun h => by simp only [cast_eq]; exact hit⟩
       have hs := hex.choose_spec.2 rfl
       simp only [cast_eq] at hs
       unfold labF
@@ -218,17 +229,23 @@ theorem lzE_ser (hidem : ∀ f, e f * e f = e f) (hcen : ∀ f a, e f * a = a * 
     · subst hif; exact hit
     · exact hj f (Ne.symm hif)
   show e f = ∑ τ : ↥(decS g r), if labF g r e r τ.1 = f then τ.1 else 0
-  calc e f = e f * ∑ τ : ↥(decS g r), τ.1 := by
-        rw [Finset.sum_coe_sort (decS g r) (fun x => x), (decS_spec g r).1.2.2.2.2, mul_one]
+  calc
+    e f = e f * ∑ τ : ↥(decS g r), τ.1 := by
+      rw [Finset.sum_coe_sort (decS g r) (fun x => x), (decS_spec g r).1.2.2.2.2, mul_one]
     _ = ∑ τ : ↥(decS g r), e f * τ.1 := Finset.mul_sum _ _ _
     _ = _ := Finset.sum_congr rfl fun τ _ => hmain τ.1 τ.2 f
 
 end Lz
 
-theorem exists_lz_serEq : ∀ D : D7, ∃ lz : ∀ k : Fin 2, PairedCharacterCondition.LzData (D.host.g k), SerEq D lz := by
+theorem exists_lz_serEq
+    : ∀ D : D7, ∃ lz : ∀ k : Fin 2, PairedCharacterCondition.LzData (D.host.g k), SerEq D lz := by
   intro D
-  refine ⟨fun k => haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩;
-    lzE (D.host.g k) D.R.r (D.ntypes.eSer k), ?_⟩
+  refine ⟨
+    fun k =>
+      haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+      lzE (D.host.g k) D.R.r (D.ntypes.eSer k),
+    ?_
+  ⟩
   intro k f
   haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
   exact lzE_ser _ _ _ (D.ntypes.eSer_idem k) (D.ntypes.eSer_central k) (D.ntypes.eSer_orth k)

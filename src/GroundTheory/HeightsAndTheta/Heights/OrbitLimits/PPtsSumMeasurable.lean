@@ -32,8 +32,7 @@ theorem PtsSumMeasurable.proof : PtsSumMeasurable.Statement := by
 
   set σ : ℕ → (Fin e → ℂ) → ((k : K) → ι k) → ℂ := fun m =>
     (B m).piecewise (fun y => segre (γ m y)) 0 with hσdef
-  have hσB : ∀ m, ∀ y ∈ B m, σ m y = segre (γ m y) := fun m y hy =>
-    Set.piecewise_eq_of_mem _ _ _ hy
+  have hσB : ∀ m, ∀ y ∈ B m, σ m y = segre (γ m y) := fun m y hy => Set.piecewise_eq_of_mem _ _ _ hy
   have hσm : ∀ m, Measurable (σ m) := fun m =>
     (hseg.comp_continuousOn (hγc m)).measurable_piecewise continuousOn_const (hBo m).measurableSet
 
@@ -50,8 +49,9 @@ theorem PtsSumMeasurable.proof : PtsSumMeasurable.Statement := by
     Real.log (a m y / b m y) * maDensity (fun j y' => pot L j (γ m y')) y with hddef
   have hdm : ∀ m, Measurable (dens m) := fun m =>
     (Real.measurable_log.comp ((ham m).div (hbm m))).mul (PtsSumMeasurable.measurable_maDensity _)
-  have hdens : ∀ m, ∀ y ∈ B m,
-      dens m y = logNorm A s (γ m y) * maDensity (fun j y' => pot L j (γ m y')) y := by
+  have hdens
+      : ∀ m, ∀ y ∈ B m,
+        dens m y = logNorm A s (γ m y) * maDensity (fun j y' => pot L j (γ m y')) y := by
     intro m y hy
     simp only [hddef, hadef, hbdef, Set.piecewise_eq_of_mem _ _ _ hy, logNorm]
 
@@ -71,12 +71,15 @@ theorem PtsSumMeasurable.proof : PtsSumMeasurable.Statement := by
       · intro h i hi hb
         exact (h i hi).resolve_left (not_not.mpr hb)
     rw [this]
-    exact (hBo m).measurableSet.inter (Finset.measurableSet_biInter _ fun m' _ =>
-      ((hBo m').measurableSet.inter (measurableSet_eq_fun (hσm m') (hσm m))).compl)
+    exact (hBo m).measurableSet.inter
+      (Finset.measurableSet_biInter _ fun m' _ =>
+        ((hBo m').measurableSet.inter (measurableSet_eq_fun (hσm m') (hσm m))).compl)
   set f : ℕ → (Fin e → ℂ) → ℝ := fun m => (S m).indicator (dens m) with hfdef
   have hfm : ∀ m, Measurable (f m) := fun m => (hdm m).indicator (hSm m)
-  refine aestronglyMeasurable_of_tendsto_ae atTop (f := fun N y => ∑ m ∈ Finset.range N, f m y)
-    (fun N => (Finset.measurable_sum _ fun m _ => hfm m).aestronglyMeasurable) ?_
+  refine aestronglyMeasurable_of_tendsto_ae atTop
+    (f := fun N y => ∑ m ∈ Finset.range N, f m y)
+    (fun N => (Finset.measurable_sum _ fun m _ => hfm m).aestronglyMeasurable)
+    ?_
   filter_upwards [hind] with y hy
 
   have hterm : ∀ m, y ∈ S m → f m y = sheetDensity P Ψ (pot L) (logNorm A s) y (σ m y) := by
@@ -104,9 +107,11 @@ theorem PtsSumMeasurable.proof : PtsSumMeasurable.Statement := by
       · rw [hfdef]
         simp only
         rw [Set.indicator_of_notMem hm]
-  have hev : ∀ w ∈ (hfin y).toFinset, ∀ᶠ N in atTop,
-      sheetDensity P Ψ (pot L) (logNorm A s) y w =
-        ∑ m ∈ Finset.range N, if σ m y = w then f m y else 0 := by
+  have hev
+      : ∀ w ∈ (hfin y).toFinset,
+        ∀ᶠ N in atTop,
+          sheetDensity P Ψ (pot L) (logNorm A s) y w =
+            ∑ m ∈ Finset.range N, if σ m y = w then f m y else 0 := by
     intro w _
     by_cases hex : ∃ γ', IsSheet P Ψ y w γ'
     · obtain ⟨γ', hγ'⟩ := hex
@@ -144,8 +149,9 @@ theorem PtsSumMeasurable.proof : PtsSumMeasurable.Statement := by
           simp only
           rw [Set.indicator_of_notMem hmS]
       · rfl
-  have hsum : ∑ᶠ w ∈ fibre P Ψ y, sheetDensity P Ψ (pot L) (logNorm A s) y w =
-      ∑ w ∈ (hfin y).toFinset, sheetDensity P Ψ (pot L) (logNorm A s) y w :=
+  have hsum
+      : ∑ᶠ w ∈ fibre P Ψ y, sheetDensity P Ψ (pot L) (logNorm A s) y w
+        = ∑ w ∈ (hfin y).toFinset, sheetDensity P Ψ (pot L) (logNorm A s) y w :=
     finsum_mem_eq_finite_toFinset_sum _ (hfin y)
   refine tendsto_const_nhds.congr' ?_
   filter_upwards [(eventually_all_finset _).2 hev] with N hN

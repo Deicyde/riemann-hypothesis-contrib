@@ -18,36 +18,33 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
+open Classical in
+def killBlocks (S : Set K) : MRing ι →ₐ[ℤ] MRing ι := aeval fun p => if p.1 ∈ S then 0 else X p
 
 open Classical in
-def killBlocks (S : Set K) : MRing ι →ₐ[ℤ] MRing ι :=
-  aeval fun p => if p.1 ∈ S then 0 else X p
-
-
-open Classical in
-theorem killBlocks_X (S : Set K) (p : Σ k, ι k) :
-    killBlocks S (X p : MRing ι) = if p.1 ∈ S then 0 else X p := by
+theorem killBlocks_X (S : Set K) (p : Σ k, ι k)
+    : killBlocks S (X p : MRing ι) = if p.1 ∈ S then 0 else X p := by
   rw [killBlocks, aeval_X]
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem killBlocks_monomial_of_forall (S : Set K) (m : (Σ k, ι k) →₀ ℕ) (c : ℤ)
-    (h : ∀ p ∈ m.support, p.1 ∉ S) : killBlocks S (monomial m c : MRing ι) = monomial m c := by
+theorem killBlocks_monomial_of_forall
+    (S : Set K) (m : (Σ k, ι k) →₀ ℕ) (c : ℤ) (h : ∀ p ∈ m.support, p.1 ∉ S)
+    : killBlocks S (monomial m c : MRing ι) = monomial m c := by
   rw [killBlocks, aeval_monomial, monomial_eq, algebraMap_eq]
   congr 1
   refine Finsupp.prod_congr fun p hp => ?_
   rw [if_neg (h p hp)]
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem killBlocks_monomial_of_mem (S : Set K) (m : (Σ k, ι k) →₀ ℕ) (c : ℤ) (p : Σ k, ι k)
-    (hp : p ∈ m.support) (hS : p.1 ∈ S) : killBlocks S (monomial m c : MRing ι) = 0 := by
+theorem killBlocks_monomial_of_mem
+    (S : Set K) (m : (Σ k, ι k) →₀ ℕ) (c : ℤ) (p : Σ k, ι k) (hp : p ∈ m.support) (hS : p.1 ∈ S)
+    : killBlocks S (monomial m c : MRing ι) = 0 := by
   rw [killBlocks, aeval_monomial, Finsupp.prod]
   refine mul_eq_zero_of_right _ (Finset.prod_eq_zero hp ?_)
   rw [if_pos hS, zero_pow (Finsupp.mem_support_iff.mp hp)]
 
-theorem killBlocks_of_isMultiHomog (S : Set K) {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) :
-    killBlocks S f = f ∨ killBlocks S f = 0 := by
+theorem killBlocks_of_isMultiHomog (S : Set K) {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    : killBlocks S f = f ∨ killBlocks S f = 0 := by
   by_cases ha : ∀ k ∈ S, a k = 0
   · left
     set_option synthInstance.maxHeartbeats 100000 in
@@ -73,8 +70,8 @@ theorem killBlocks_of_isMultiHomog (S : Set K) {f : MRing ι} {a : K → ℕ} (h
       omega
     exact killBlocks_monomial_of_mem S m _ ⟨k, i⟩ (Finsupp.mem_support_iff.mpr hi) hkS
 
-theorem le_comap_killBlocks {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) (S : Set K) :
-    P ≤ P.comap (killBlocks S) := by
+theorem le_comap_killBlocks {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) (S : Set K)
+    : P ≤ P.comap (killBlocks S) := by
   obtain ⟨T, hT, rfl⟩ := hP
   refine Ideal.span_le.mpr fun f hf => ?_
   obtain ⟨a, ha⟩ := hT f hf
@@ -83,18 +80,18 @@ theorem le_comap_killBlocks {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) (S
   · exact Ideal.subset_span hf
   · exact Ideal.zero_mem _
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem killBlocks_comp {S S' : Set K} (h : S ⊆ S') :
-    (killBlocks S').comp (killBlocks S) = (killBlocks S' : MRing ι →ₐ[ℤ] MRing ι) := by
+theorem killBlocks_comp {S S' : Set K} (h : S ⊆ S')
+    : (killBlocks S').comp (killBlocks S) = (killBlocks S' : MRing ι →ₐ[ℤ] MRing ι) := by
   refine MvPolynomial.algHom_ext fun p => ?_
   simp only [AlgHom.comp_apply, killBlocks, aeval_X]
   by_cases hp : p.1 ∈ S
   · simp [hp, h hp]
   · simp [hp, killBlocks, aeval_X]
 
-theorem comap_killBlocks_mono {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) {S S' : Set K}
-    (h : S ⊆ S') : P.comap (killBlocks S) ≤ P.comap (killBlocks S') := by
+theorem comap_killBlocks_mono
+    {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) {S S' : Set K} (h : S ⊆ S')
+    : P.comap (killBlocks S) ≤ P.comap (killBlocks S') := by
   intro f hf
   rw [Ideal.mem_comap] at hf ⊢
   have e : killBlocks S' f = killBlocks S' (killBlocks S f) := by
@@ -168,8 +165,8 @@ theorem arithVarZero : ReciprocityTheory.ChartRestriction.G.AI.I2.ArithVarZeroSt
       exact hstep n h
     · rw [if_neg (by omega), h]
       exact hstep2
-  let g : Fin (m + 2) → PrimeSpectrum.zeroLocus (R := MRing ι) (P : Set (MRing ι)) :=
-    fun j => ⟨⟨T j, hTp j⟩, hPT j⟩
+  let g : Fin (m + 2) → PrimeSpectrum.zeroLocus (R := MRing ι) (P : Set (MRing ι)) := fun j =>
+    ⟨⟨T j, hTp j⟩, hPT j⟩
   have hg : StrictMono g := by
     refine Fin.strictMono_iff_lt_succ.mpr fun i => ?_
     exact hTlt i (Nat.lt_succ_iff.mp i.isLt)

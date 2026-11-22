@@ -7,7 +7,9 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix ComplexConjugate
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.StdUnn
 

@@ -12,12 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.RingOfI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj GlobalTheory.Mem GlobalTheory.FinalJoin GlobalTheory.FinalJoin2 GlobalTheory.FieldSize
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  GlobalTheory.Mem GlobalTheory.FinalJoin GlobalTheory.FinalJoin2 GlobalTheory.FieldSize
 open scoped IntermediateField
 
 namespace GlobalTheory.FieldSize
 
-theorem exists_hostK : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R), ∃ (K : IntermediateField ℚ ℂ) (_ : NumberField K) (_ : IsTotallyComplex K), Module.finrank ℚ K = 2 ∧ discr K = -(H.d : ℤ) ∧ discr K < -4 ∧ K ≤ H.φ₀.toRatAlgHom.fieldRange ∧ (∀ z : ℂ, (∃ s : ℤ × ℤ, z = s.1 + s.2 * ((1 + H.φ₀ H.sqrtMinusD) / 2)) ↔ ∃ a : 𝓞 K, ((a : K) : ℂ) = z) ∧ Module.finrank ℚ H.E = 2 * R.f := by
+theorem exists_hostK
+    : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R),
+      ∃ (K : IntermediateField ℚ ℂ) (_ : NumberField K) (_ : IsTotallyComplex K),
+        Module.finrank ℚ K = 2 ∧ discr K = -(H.d : ℤ) ∧ discr K < -4
+          ∧ K ≤ H.φ₀.toRatAlgHom.fieldRange
+          ∧ (∀ z : ℂ,
+            (∃ s : ℤ × ℤ, z = s.1 + s.2 * ((1 + H.φ₀ H.sqrtMinusD) / 2))
+              ↔ ∃ a : 𝓞 K, ((a : K) : ℂ) = z)
+          ∧ Module.finrank ℚ H.E = 2 * R.f := by
   intro R H
   obtain ⟨-, hd, -, hd16, -⟩ := H.hyp
   have hb : (H.φ₀ H.sqrtMinusD) ^ 2 = -(H.d : ℂ) := by
@@ -28,9 +37,10 @@ theorem exists_hostK : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R), ∃ 
   have hfd : FiniteDimensional ℚ σ.fieldRange := e.toLinearEquiv.finiteDimensional
   have hNF : NumberField σ.fieldRange := NumberField.mk
   have h2 : Module.finrank ℚ σ.fieldRange = 2 :=
-    e.toLinearEquiv.finrank_eq.symm.trans
-      (Formalism.FrobeniusOrbits.SplitK.finrank_K hd.pos (H.sqd_sq))
-  let r : σ.fieldRange := ⟨H.φ₀ H.sqrtMinusD, ⟨Formalism.FrobeniusOrbits.SplitK.bK H.sqrtMinusD, rfl⟩⟩
+    e.toLinearEquiv.finrank_eq.symm.trans (Formalism.FrobeniusOrbits.SplitK.finrank_K hd.pos
+      (H.sqd_sq))
+  let r : σ.fieldRange :=
+    ⟨H.φ₀ H.sqrtMinusD, ⟨Formalism.FrobeniusOrbits.SplitK.bK H.sqrtMinusD, rfl⟩⟩
   have hr : r ^ 2 = -(H.d : σ.fieldRange) := by
     apply Subtype.ext
     simpa [r] using hb
@@ -44,7 +54,8 @@ theorem exists_hostK : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R), ∃ 
     have h1 : ψ r ^ 2 = -(H.d : ℝ) := by rw [← map_pow, hr, map_neg, map_natCast]
     have h3 : (0 : ℝ) < H.d := by exact_mod_cast hd.pos
     nlinarith [sq_nonneg (ψ r)]
-  obtain ⟨x, -, hx, -, hgen, -⟩ := ringOfIntegers_sqrt_neg_three_mod_four H.d hd.squarefree h4 σ.fieldRange h2 r hr
+  obtain ⟨x, -, hx, -, hgen, -⟩ :=
+    ringOfIntegers_sqrt_neg_three_mod_four H.d hd.squarefree h4 σ.fieldRange h2 r hr
   have hx' : ((x : σ.fieldRange) : ℂ) = (1 + H.φ₀ H.sqrtMinusD) / 2 := by
     have := congrArg (fun y : σ.fieldRange => (y : ℂ)) hx
     simp only [r] at this
@@ -52,8 +63,10 @@ theorem exists_hostK : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R), ∃ 
     have e2 : ((2 : σ.fieldRange) : ℂ) = 2 := rfl
     rw [e2] at this
     linear_combination this / 2
-  have hc : ∀ m n : ℤ, ((((m : 𝓞 σ.fieldRange) + n * x : 𝓞 σ.fieldRange) : σ.fieldRange) : ℂ) =
-      m + n * ((1 + H.φ₀ H.sqrtMinusD) / 2) := fun m n => by
+  have hc
+      : ∀ m n : ℤ,
+        ((((m : 𝓞 σ.fieldRange) + n * x : 𝓞 σ.fieldRange) : σ.fieldRange) : ℂ)
+          = m + n * ((1 + H.φ₀ H.sqrtMinusD) / 2) := fun m n => by
     rw [← hx']
     simp
   refine ⟨σ.fieldRange, hNF, hTC, h2, hD, by omega, ?_, fun z => ⟨?_, ?_⟩, ?_⟩

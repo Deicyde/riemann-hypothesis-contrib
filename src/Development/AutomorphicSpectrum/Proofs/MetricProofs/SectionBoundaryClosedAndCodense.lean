@@ -13,9 +13,13 @@ open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.Bdry
 
-theorem bdry_isClosed_dense_compl (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X)
-    (s : X → X → ℂ) (nb : ℕ) (m : Fin nb → ℕ) (W : Fin nb → Set X)
-    (hs : IsSection A L s) (hn : IsSNC A L s m W) : IsClosed (bdry s) ∧ Dense (bdry s)ᶜ := by
+theorem bdry_isClosed_dense_compl
+    (e : ℕ)
+    (X : Type) [TopologicalSpace X]
+    (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ)
+    (nb : ℕ) (m : Fin nb → ℕ) (W : Fin nb → Set X)
+    (hs : IsSection A L s) (hn : IsSNC A L s m W)
+    : IsClosed (bdry s) ∧ Dense (bdry s)ᶜ := by
   have key := GlobalTheory.T.snc_boundary_coordinate_chart e X A L s nb m W hs hn
   constructor
   · rw [← isOpen_compl_iff, isOpen_iff_mem_nhds]
@@ -26,8 +30,7 @@ theorem bdry_isClosed_dense_compl (e : ℕ) (X : Type) [TopologicalSpace X] (A :
       have : {z : Fin e → ℂ | ∀ i ∈ S, z i ≠ 0} = ⋂ i ∈ S, {z : Fin e → ℂ | z i ≠ 0} := by
         ext z; simp
       rw [this]
-      exact isOpen_biInter_finset fun i _ =>
-        isOpen_ne_fun (continuous_apply i) continuous_const
+      exact isOpen_biInter_finset fun i _ => isOpen_ne_fun (continuous_apply i) continuous_const
     have hmem : y ∈ ψ.source ∩ ψ ⁻¹' {z : Fin e → ℂ | ∀ i ∈ S, z i ≠ 0} := by
       refine ⟨hyψ, fun i hi h0 => hy ((hS y hyψ).2 ⟨i, hi, h0⟩)⟩
     refine Filter.mem_of_superset (hopen.mem_nhds hmem) ?_

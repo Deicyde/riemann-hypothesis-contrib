@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ActualAdjoin
 @[expose] public section
 
 open Matrix
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q
 open scoped ContDiff
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR.CP

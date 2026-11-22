@@ -5,8 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open UpperTheory.V.Af.CohB in
-theorem UpperTheory.absolute_bound_of_partial_bound_of_orbit_bound :
-    UpperTheory.V.Af.CohB.PartBound → UpperTheory.V.Af.CohB.OrbBound → UpperTheory.V.Af.CohB.AbsBound := by
+theorem UpperTheory.absolute_bound_of_partial_bound_of_orbit_bound
+    : UpperTheory.V.Af.CohB.PartBound → UpperTheory.V.Af.CohB.OrbBound
+      → UpperTheory.V.Af.CohB.AbsBound := by
   intro hP hO Γ Y _ _ hT hB
   obtain ⟨T, hT⟩ := hT
   choose cf hcf using fun t : ↥T => hO Γ Y t.1 (hB t.1)
@@ -32,7 +33,14 @@ theorem UpperTheory.absolute_bound_of_partial_bound_of_orbit_bound :
     simp only at hh ⊢
     rw [hh]
     exact congrArg Subtype.val hx
-  refine hcf t ↥(UpperTheory.V.Af.CohB.part cl hcl t) (fun x => p x.1) (fun γ x => hp γ x.1) hsurj D
-    (le_trans (Cardinal.mk_le_of_injective
-      (f := fun z : {x : ↥(UpperTheory.V.Af.CohB.part cl hcl t) // p x.1 = t.1} => (⟨z.1.1, z.2⟩ : {x // p x = t.1}))
-      (fun a b hab => Subtype.ext (Subtype.ext (by simpa using congrArg Subtype.val hab)))) (hD t.1)) d ξ
+  refine hcf t ↥(UpperTheory.V.Af.CohB.part cl hcl t)
+    (fun x => p x.1)
+    (fun γ x => hp γ x.1)
+    hsurj D
+    (le_trans
+      (Cardinal.mk_le_of_injective
+        (f := fun z : {x : ↥(UpperTheory.V.Af.CohB.part cl hcl t) // p x.1 = t.1} =>
+          (⟨z.1.1, z.2⟩ : {x // p x = t.1}))
+        (fun a b hab => Subtype.ext (Subtype.ext (by simpa using congrArg Subtype.val hab))))
+      (hD t.1))
+    d ξ

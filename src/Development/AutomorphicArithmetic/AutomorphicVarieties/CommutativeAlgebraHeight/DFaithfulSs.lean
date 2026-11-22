@@ -17,9 +17,11 @@ public import Mathlib.FieldTheory.IsAlgClosed.Basic
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-private theorem fss_scalar {k E M : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E] [AddCommGroup M]
-    [Module k M] [Module E M] [IsScalarTower k E M] [IsSimpleModule E M]
-    (h : ∀ x : E, ∃ p : k[X], p.Monic ∧ aeval x p = 0) (φ : Module.End E M) : ∃ c : k, ∀ v, φ v = c • v := by
+private theorem fss_scalar
+    {k E M : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E] [AddCommGroup M] [Module k M]
+    [Module E M] [IsScalarTower k E M] [IsSimpleModule E M]
+    (h : ∀ x : E, ∃ p : k[X], p.Monic ∧ aeval x p = 0) (φ : Module.End E M)
+    : ∃ c : k, ∀ v, φ v = c • v := by
   haveI := IsSimpleModule.nontrivial E M
   obtain ⟨v, hv⟩ := exists_ne (0 : M)
   obtain ⟨r, hr⟩ := IsSimpleModule.toSpanSingleton_surjective E hv (φ v)
@@ -41,15 +43,19 @@ private theorem fss_scalar {k E M : Type} [Field k] [IsAlgClosed k] [Ring E] [Al
       · exact fun h0 => ih (hb.1 (h0.trans (map_zero ψ).symm))
       · obtain ⟨w, hw⟩ := hne a
         have := LinearMap.congr_fun hb w
-        simp only [ψ, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, LinearMap.zero_apply] at this
+        simp only [ψ, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
+            LinearMap.zero_apply]
+          at this
         exact absurd (sub_eq_zero.1 this) hw
   have := key p.roots
   rw [← (IsAlgClosed.splits p).eq_prod_roots_of_monic hp, hp0, zero_smul] at this
   exact this rfl
 
-private theorem fss_fin {n : ℕ} {k E M : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E] [AddCommGroup M]
+private theorem fss_fin
+    {n : ℕ} {k E M : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E] [AddCommGroup M]
     [Module k M] [Module E M] [IsScalarTower k E M] [IsSimpleModule E M]
-    (h : ∀ x : E, ∃ p : k[X], p.Monic ∧ p.natDegree ≤ n ∧ aeval x p = 0) : Module.Finite k M := by
+    (h : ∀ x : E, ∃ p : k[X], p.Monic ∧ p.natDegree ≤ n ∧ aeval x p = 0)
+    : Module.Finite k M := by
   classical
   let b := Module.Basis.ofVectorSpace k M
   rcases finite_or_infinite (Module.Basis.ofVectorSpaceIndex k M) with hf | hf
@@ -60,12 +66,13 @@ private theorem fss_fin {n : ℕ} {k E M : Type} [Field k] [IsAlgClosed k] [Ring
   have hfe : ∀ i, f (b (e i)) = b (e (i + 1)) := fun i => by
     simp only [f, Module.Basis.constr_basis]
     rw [Function.leftInverse_invFun e.injective i]
-  let F : Module.End (Module.End E M) M :=
-    { toFun := f
-      map_add' := f.map_add
-      map_smul' := fun φ v => by
-        obtain ⟨c, hc⟩ := fss_scalar (k := k) (fun x => (h x).imp fun p hp => ⟨hp.1, hp.2.2⟩) φ
-        simp [hc] }
+  let F : Module.End (Module.End E M) M := {
+    toFun := f
+    map_add' := f.map_add
+    map_smul' := fun φ v => by
+      obtain ⟨c, hc⟩ := fss_scalar (k := k) (fun x => (h x).imp fun p hp => ⟨hp.1, hp.2.2⟩) φ
+      simp [hc]
+  }
   obtain ⟨r, hr⟩ := jacobson_density F ((Finset.range n).image fun i => b (e i))
   have hr' : ∀ i ≤ n, r ^ i • b (e 0) = b (e i) := by
     intro i hi
@@ -81,34 +88,43 @@ private theorem fss_fin {n : ℕ} {k E M : Type} [Field k] [IsAlgClosed k] [Ring
     rw [← this]
     refine Finset.sum_congr rfl fun i hi => ?_
     rw [hr' i (by have := Finset.mem_range.1 hi; omega)]
-  have h2 := linearIndependent_iff'.1 (b.linearIndependent.comp e e.injective) _ _ h1 p.natDegree (by simp)
+  have h2 :=
+    linearIndependent_iff'.1 (b.linearIndependent.comp e e.injective) _ _ h1 p.natDegree (by simp)
   rw [hp.coeff_natDegree] at h2
   exact one_ne_zero h2
 
-private theorem fss_count {n : ℕ} {k E : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E]
-    (h : ∀ x : E, ∃ p : k[X], p.Monic ∧ p.natDegree ≤ n ∧ aeval x p = 0) (m : ℕ → Ideal E)
-    (hm : ∀ i, IsCoatom (m i)) (hinj : Function.Injective fun i => Module.annihilator E (E ⧸ m i)) : False := by
+private theorem fss_count
+    {n : ℕ} {k E : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E]
+    (h : ∀ x : E, ∃ p : k[X], p.Monic ∧ p.natDegree ≤ n ∧ aeval x p = 0)
+    (m : ℕ → Ideal E)
+    (hm : ∀ i, IsCoatom (m i)) (hinj : Function.Injective fun i => Module.annihilator E (E ⧸ m i))
+    : False := by
   classical
   haveI : ∀ i, IsSimpleModule E (E ⧸ m i) := fun i => isSimpleModule_iff_isCoatom.2 (hm i)
   let a : ℕ ↪ k := Infinite.natEmbedding k
   let M := ∀ i : Fin (n + 1), E ⧸ m i
-  have hz : ∀ (φ : Module.End E M) (i j : Fin (n + 1)) (x : E ⧸ m i), i ≠ j → φ (Pi.single i x) j = 0 := by
+  have hz
+      : ∀ (φ : Module.End E M) (i j : Fin (n + 1)) (x : E ⧸ m i),
+        i ≠ j → φ (Pi.single i x) j = 0 := by
     intro φ i j x hij
-    rcases LinearMap.bijective_or_eq_zero ((LinearMap.proj j).comp (φ.comp
-      (LinearMap.single E (fun i : Fin (n + 1) => E ⧸ m i) i))) with hb | hb
+    rcases LinearMap.bijective_or_eq_zero ((LinearMap.proj j).comp
+        (φ.comp (LinearMap.single E (fun i : Fin (n + 1) => E ⧸ m i) i)))
+      with hb | hb
     · exact absurd (Fin.ext (hinj (LinearEquiv.ofBijective _ hb).annihilator_eq)) hij
     · exact LinearMap.congr_fun hb x
-  let F : Module.End (Module.End E M) M :=
-    { toFun := fun v j => algebraMap k E (a j) • v j
-      map_add' := fun v w => funext fun j => smul_add _ _ _
-      map_smul' := fun φ v => funext fun j => by
+  let F : Module.End (Module.End E M) M := {
+    toFun := fun v j => algebraMap k E (a j) • v j
+    map_add' := fun v w => funext fun j => smul_add _ _ _
+    map_smul' := fun φ v =>
+      funext fun j => by
         have h1 : ∀ w : M, φ w j = φ (Pi.single j (w j)) j := fun w => by
           set_option synthInstance.maxHeartbeats 100000 in
             conv_lhs => rw [← Finset.univ_sum_single w, map_sum, Finset.sum_apply]
           exact Finset.sum_eq_single j (fun i _ hi => hz φ i j _ hi) (by simp)
         change algebraMap k E (a j) • φ v j = φ (fun j => algebraMap k E (a j) • v j) j
         rw [h1 v, h1 (fun j => algebraMap k E (a j) • v j), Pi.single_smul, map_smul]
-        rfl }
+        rfl
+  }
   obtain ⟨r, hr⟩ := jacobson_density F {fun i => Submodule.Quotient.mk 1}
   replace hr := hr _ (Finset.mem_singleton_self _)
   obtain ⟨p, hp, hpn, hp0⟩ := h r
@@ -128,14 +144,17 @@ private theorem fss_count {n : ℕ} {k E : Type} [Field k] [IsAlgClosed k] [Ring
     rw [hp0, zero_smul] at h3
     refine (smul_eq_zero.1 h3.symm).resolve_right fun h0 => (hm j).1 ?_
     exact (Ideal.eq_top_iff_one _).2 ((Submodule.Quotient.mk_eq_zero _).1 h0)
-  refine hp.ne_zero (eq_zero_of_natDegree_lt_card_of_eval_eq_zero p (f := fun j : Fin (n + 1) => a j)
-    (fun i j hij => Fin.ext (a.injective hij)) hroot ?_)
+  refine hp.ne_zero (eq_zero_of_natDegree_lt_card_of_eval_eq_zero p
+    (f := fun j : Fin (n + 1) => a j)
+    (fun i j hij => Fin.ext (a.injective hij))
+    hroot ?_)
   simp only [Fintype.card_fin]
   omega
 
-private theorem fss_alg {n : ℕ} {k E : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E]
-    (h : ∀ x : E, ∃ p : k[X], p.Monic ∧ p.natDegree ≤ n ∧ aeval x p = 0) (hj : Ring.jacobson E = ⊥) :
-    Module.Finite k E := by
+private theorem fss_alg
+    {n : ℕ} {k E : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E]
+    (h : ∀ x : E, ∃ p : k[X], p.Monic ∧ p.natDegree ≤ n ∧ aeval x p = 0) (hj : Ring.jacobson E = ⊥)
+    : Module.Finite k E := by
   let S : Set (Ideal E) := {P | ∃ m : Ideal E, IsCoatom m ∧ Module.annihilator E (E ⧸ m) = P}
   have hS : ∀ P : S, ∃ m : Ideal E, IsCoatom m ∧ Module.annihilator E (E ⧸ m) = P := fun P => P.2
   choose m hm hm' using hS
@@ -160,8 +179,9 @@ private theorem fss_alg {n : ℕ} {k E : Type} [Field k] [IsAlgClosed k] [Ring E
   rw [← Submodule.Quotient.mk_smul, smul_eq_mul, mul_one] at h2
   exact (Submodule.Quotient.mk_eq_zero _).1 h2
 
-theorem UpperTheory.V.CA.d_faithful_ss :
-    ∀ {n : ℕ} {k E : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E] (D : Det n k E), D.ker = ⊥ → Module.Finite k E ∧ IsSemisimpleRing E := by
+theorem UpperTheory.V.CA.d_faithful_ss
+    : ∀ {n : ℕ} {k E : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E] (D : Det n k E),
+      D.ker = ⊥ → Module.Finite k E ∧ IsSemisimpleRing E := by
   intro n k E _ _ _ _ D hD
   have hCH : D.IsCH := le_bot_iff.1 (hD ▸ d_ch_ker D)
   have hj : Ring.jacobson E = ⊥ := by

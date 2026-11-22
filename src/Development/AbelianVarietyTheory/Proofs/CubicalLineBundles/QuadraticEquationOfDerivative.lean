@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.CurveHo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory
 open scoped CategoryTheory.Obj UpperHalfPlane
 
@@ -18,8 +20,8 @@ namespace GlobalTheory.LieMultiple
 
 variable {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj G]
 
-theorem isLieComb_natCast_pow {v : epsR R ⟶ G} (hv : IsTangent v) (n : ℕ) :
-    IsLieComb ![(n : R)] ![v] (v ^ n) := by
+theorem isLieComb_natCast_pow {v : epsR R ⟶ G} (hv : IsTangent v) (n : ℕ)
+    : IsLieComb ![(n : R)] ![v] (v ^ n) := by
   induction n with
   | zero =>
     rw [Nat.cast_zero, pow_zero]
@@ -38,7 +40,16 @@ theorem isMonHom_id_pow [IsCommMonObj G] (n : ℕ) : IsMonHom ((𝟙 G) ^ n) := 
     rw [pow_succ]
     exact inferInstanceAs (IsMonHom (lift ((𝟙 G) ^ n) (𝟙 G) ≫ μ[G]))
 
-theorem quadratic_equation_of_derivative : ThetaUnifAV → Out.PolBaseChangeSt → ∀ (k : Type) [Field k] (s : k →+* ℂ) (P : Out.PolAV (Sp k)) (v : epsR k ⟶ P.A) (W : P.A ⟶ P.A) (w : k) (n : ℕ), IsTangent v → (∀ (R' : Type) [CommRing R'] (f' : k →+* R') (P' : Out.PolAV (Sp R')) (φ' : P'.A.left ⟶ P.A.left) (v' : epsR R' ⟶ P'.A), IsPolFibre f' P P' φ' → IsVecOver f' φ' v v' → IsLieBasis ![v']) → IsMonHom W → IsLieComb ![w] ![v] (v ≫ W) → w * w + n = w → (W ≫ W) * (𝟙 P.A) ^ n = W := by
+theorem quadratic_equation_of_derivative
+    : ThetaUnifAV → Out.PolBaseChangeSt
+      → ∀ (k : Type) [Field k] (s : k →+* ℂ) (P : Out.PolAV (Sp k)) (v : epsR k ⟶ P.A)
+          (W : P.A ⟶ P.A) (w : k) (n : ℕ),
+        IsTangent v
+          → (∀ (R' : Type) [CommRing R'] (f' : k →+* R') (P' : Out.PolAV (Sp R'))
+              (φ' : P'.A.left ⟶ P.A.left) (v' : epsR R' ⟶ P'.A),
+            IsPolFibre f' P P' φ' → IsVecOver f' φ' v v' → IsLieBasis ![v'])
+          → IsMonHom W → IsLieComb ![w] ![v] (v ≫ W) → w * w + n = w
+          → (W ≫ W) * (𝟙 P.A) ^ n = W := by
   intro hT hB k _ s P v W w n hv hb hW hw heq
   have hc := P.isAb.comm
   have h1 := isMonHom_id_pow (G := P.A) n

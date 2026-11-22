@@ -11,11 +11,14 @@ open DividedPowers GlobalTheory.Cris GlobalTheory.PDA
 
 namespace GlobalTheory.PDA
 
-theorem PDPoly.isDPMorphism_of_isStd :
-    ∀ (B : Type) [CommRing B] (J : Ideal B) (δ : DividedPowers J) (Q : PDPoly B) (η : DividedPowers (Q.ext J)),
-      Q.IsStd δ η → ∀ (C : Type) [CommRing C] (J'' : Ideal C) (δ'' : DividedPowers J'') (F : Q.P →+* C) (c : C),
-        c ∈ J'' → IsDPMorphism δ δ'' (F.comp (algebraMap B Q.P)) → (∀ n, F (Q.e n) = δ''.dpow n c) →
-          IsDPMorphism η δ'' F := by
+theorem PDPoly.isDPMorphism_of_isStd
+    : ∀ (B : Type) [CommRing B] (J : Ideal B) (δ : DividedPowers J) (Q : PDPoly B)
+        (η : DividedPowers (Q.ext J)),
+      Q.IsStd δ η
+        → ∀ (C : Type) [CommRing C] (J'' : Ideal C) (δ'' : DividedPowers J'') (F : Q.P →+* C)
+            (c : C),
+          c ∈ J'' → IsDPMorphism δ δ'' (F.comp (algebraMap B Q.P)) → (∀ n, F (Q.e n) = δ''.dpow n c)
+            → IsDPMorphism η δ'' F := by
   intro B _ J δ Q η hQ C _ J'' δ'' F c hc hF he
   have hS : Q.ext J = Ideal.span (algebraMap B Q.P '' J ∪ Set.range fun n : ℕ ↦ Q.e (n + 1)) := by
     rw [Ideal.span_union, ← Ideal.map_span, Ideal.span_eq]; rfl

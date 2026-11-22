@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsLv
 @[expose] public section
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.UAut GlobalTheory.EisLine GlobalTheory.SphEis
+open NumberField MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+  GlobalTheory.SiegelSet GlobalTheory.UAut GlobalTheory.EisLine GlobalTheory.SphEis
 open GlobalTheory.ResLine (IsHt SemiLat)
 open GlobalTheory.Doubling (absE npow)
 open Formalism.UG (cT bc)
@@ -14,12 +16,21 @@ open scoped Pointwise
 
 namespace GlobalTheory.Packing
 
-theorem mem_smul_smul_iff {G : Type} [Group G] (Λ : Subgroup G) (γ : Λ) (t x : G) (U : Set G) :
-    x ∈ γ • (t • U) ↔ t⁻¹ * ((γ : G)⁻¹ * x) ∈ U := by
+theorem mem_smul_smul_iff {G : Type} [Group G] (Λ : Subgroup G) (γ : Λ) (t x : G) (U : Set G)
+    : x ∈ γ • (t • U) ↔ t⁻¹ * ((γ : G)⁻¹ * x) ∈ U := by
   rw [Set.mem_smul_set_iff_inv_smul_mem, Set.mem_smul_set_iff_inv_smul_mem]
   simp [Subgroup.smul_def, smul_eq_mul]
 
-theorem packing_count : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (Γ Λ : Subgroup G) [Countable Λ] (μ : Measure G) (D U : Set G), Λ ≤ Γ → (∀ K : Set G, IsCompact K → (K ∩ Γ).Finite) → μ.IsHaarMeasure → IsFundamentalDomain Λ D μ → IsCompact U → ∃ k : ℕ, ∀ (T : Finset G) (S : Set G), (∀ t ∈ T, t ∈ Γ) → (∀ t ∈ T, ∀ t' ∈ T, t' * t⁻¹ ∈ Λ → t = t') → MeasurableSet S → (∀ γ ∈ Λ, ∀ x ∈ S, γ * x ∈ S) → (∀ t ∈ T, ∀ u ∈ U, t * u ∈ S) → T.card * μ U ≤ k * μ (S ∩ D) := by
+theorem packing_count
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
+        (Γ Λ : Subgroup G) [Countable Λ] (μ : Measure G) (D U : Set G),
+      Λ ≤ Γ → (∀ K : Set G, IsCompact K → (K ∩ Γ).Finite) → μ.IsHaarMeasure
+        → IsFundamentalDomain Λ D μ → IsCompact U
+        → ∃ k : ℕ, ∀ (T : Finset G) (S : Set G),
+          (∀ t ∈ T, t ∈ Γ) → (∀ t ∈ T, ∀ t' ∈ T, t' * t⁻¹ ∈ Λ → t = t') → MeasurableSet S
+            → (∀ γ ∈ Λ, ∀ x ∈ S, γ * x ∈ S) → (∀ t ∈ T, ∀ u ∈ U, t * u ∈ S)
+            → T.card * μ U ≤ k * μ (S ∩ D) := by
   intro G _ _ _ _ _ _ _ _ Γ Λ _ μ D U hΛΓ hdisc hHaar hD hU
   have hUc : IsCompact (U * U⁻¹) := hU.mul hU.inv
   have hfin : (U * U⁻¹ ∩ (Γ : Set G)).Finite := hdisc _ hUc
@@ -48,26 +59,30 @@ theorem packing_count : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopolog
     constructor
     · rintro ⟨h1, h2⟩; exact ⟨h1, hsubS γ t ht h1, h2⟩
     · rintro ⟨h1, _, h2⟩; exact ⟨h1, h2⟩
-  have hpt : ∀ x : G, ∑ t ∈ T, ∑' γ : Λ, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x
-      ≤ (hfin.toFinset.card : ℝ≥0∞) := by
+  have hpt
+      : ∀ x : G,
+        ∑ t ∈ T, ∑' γ : Λ, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x
+          ≤ (hfin.toFinset.card : ℝ≥0∞) := by
     intro x
     classical
-    have hswap : ∑ t ∈ T, ∑' γ : Λ, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x
-        = ∑' γ : Λ, ∑ t ∈ T, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x := by
+    have hswap
+        : ∑ t ∈ T, ∑' γ : Λ, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x
+          = ∑' γ : Λ, ∑ t ∈ T, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x := by
       first
       | exact (Summable.tsum_finsetSum fun _ _ => ENNReal.summable).symm
       | exact (tsum_sum fun _ _ => ENNReal.summable).symm
       | exact (ENNReal.tsum_finsetSum _ _).symm
     rw [hswap, ENNReal.tsum_eq_iSup_sum]
     refine iSup_le fun s => ?_
-    have hbool : ∑ γ ∈ s, ∑ t ∈ T, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x
-        = (((s ×ˢ T).filter (fun p : Λ × G => x ∈ p.1 • (p.2 • U))).card : ℝ≥0∞) := by
+    have hbool
+        : ∑ γ ∈ s, ∑ t ∈ T, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x
+          = (((s ×ˢ T).filter (fun p : Λ × G => x ∈ p.1 • (p.2 • U))).card : ℝ≥0∞) := by
       rw [Finset.card_filter, Finset.sum_product]
       push_cast
       simp only [Set.indicator_apply, Pi.one_apply]
     rw [hbool]
-    have hcard : ((s ×ˢ T).filter (fun p : Λ × G => x ∈ p.1 • (p.2 • U))).card
-        ≤ hfin.toFinset.card := by
+    have hcard
+        : ((s ×ˢ T).filter (fun p : Λ × G => x ∈ p.1 • (p.2 • U))).card ≤ hfin.toFinset.card := by
       set P := (s ×ˢ T).filter (fun p : Λ × G => x ∈ p.1 • (p.2 • U)) with hPdef
       have memP : ∀ p : Λ × G, p ∈ P → p.2 ∈ T ∧ x ∈ p.1 • (p.2 • U) := by
         intro p hp
@@ -78,7 +93,8 @@ theorem packing_count : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopolog
       obtain ⟨ht₀, hx₀⟩ := memP p₀ h₀
       rw [mem_smul_smul_iff] at hx₀
       refine Finset.card_le_card_of_injOn
-        (fun p : Λ × G => (p₀.2⁻¹ * (p₀.1 : G)⁻¹) * ((p.1 : G) * p.2)) ?_ ?_
+        (fun p : Λ × G => (p₀.2⁻¹ * (p₀.1 : G)⁻¹) * ((p.1 : G) * p.2))
+        ?_ ?_
       · intro p hp
         have hp' : p ∈ P := by first | exact Finset.mem_coe.1 hp | exact hp
         obtain ⟨ht, hx⟩ := memP p hp'
@@ -100,11 +116,12 @@ theorem packing_count : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopolog
         have e : q.2 * p.2⁻¹ = (q.1 : G)⁻¹ * p.1 := by
           rw [mul_inv_eq_iff_eq_mul, mul_assoc, h1, ← mul_assoc, inv_mul_cancel, one_mul]
         have htt : p.2 = q.2 := hTdist _ hpT _ hqT (e ▸ Λ.mul_mem (Λ.inv_mem q.1.2) p.1.2)
-        have hg : (p.1 : G) = q.1 := by
-          rw [htt] at h1; exact mul_right_cancel h1
+        have hg : (p.1 : G) = q.1 := by rw [htt] at h1; exact mul_right_cancel h1
         exact Prod.ext (Subtype.ext hg) htt
     exact_mod_cast hcard
-  calc (T.card : ℝ≥0∞) * μ U = ∑ t ∈ T, μ U := by rw [Finset.sum_const, nsmul_eq_mul]
+  calc
+    (T.card : ℝ≥0∞) * μ U
+      = ∑ t ∈ T, μ U := by rw [Finset.sum_const, nsmul_eq_mul]
     _ = ∑ t ∈ T, ∑' γ : Λ, ∫⁻ x, (γ • (t • U)).indicator 1 x ∂ν := Finset.sum_congr rfl key
     _ = ∫⁻ x, ∑ t ∈ T, ∑' γ : Λ, (γ • (t • U)).indicator (1 : G → ℝ≥0∞) x ∂ν := by
       rw [lintegral_finsetSum']

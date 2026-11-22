@@ -32,7 +32,8 @@ theorem sCls : SCls := by
     unfold clsK
     rw [dite_eq_left hf, Units.mk0_val]
     unfold liftK
-    exact Classical.epsilon_spec (p := fun b => (AdicCompletion.eval (idl l) (X.Kl l) n) b = X.cls l n f)
+    exact Classical.epsilon_spec
+      (p := fun b => (AdicCompletion.eval (idl l) (X.Kl l) n) b = X.cls l n f)
       (AdicCompletion.eval_surjective (idl l) (X.Kl l) n (X.cls l n f))
   · intro f f' a a' ha ha'
     refine ⟨?_, ?_⟩

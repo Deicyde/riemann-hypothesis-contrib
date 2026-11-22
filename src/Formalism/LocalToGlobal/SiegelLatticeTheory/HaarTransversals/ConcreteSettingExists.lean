@@ -15,7 +15,8 @@ namespace Formalism.L2.SG.ConcreteSettingExists
 open MeasureTheory Formalism.BasicNotions Formalism.L2.SG.HidaSetting
 
 def GapHyp (D : D7) : Prop :=
-  1801 ≤ D.R.r ∧ ∀ (τ : D.what₂.Tau) (j : Fin D.R.m) (h : j.1 + 1 < D.R.m),
-    16 * (D.R.r : ℚ) ^ 19 ≤ (D.hc τ).b ⟨j.1 + 1, h⟩ - (D.hc τ).b j
+  1801 ≤ D.R.r
+    ∧ ∀ (τ : D.what₂.Tau) (j : Fin D.R.m) (h : j.1 + 1 < D.R.m),
+      16 * (D.R.r : ℚ) ^ 19 ≤ (D.hc τ).b ⟨j.1 + 1, h⟩ - (D.hc τ).b j
 
 end Formalism.L2.SG.ConcreteSettingExists

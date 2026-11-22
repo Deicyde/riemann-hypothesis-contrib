@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Counterexamples.TwistSurvey.ConjM
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory IsDedekindDomain NumberField
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilGramSignature
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.GalLift
@@ -15,8 +18,10 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.GalLift
 
-theorem overK_of_sqrt {D : D7} (σ : D.what₂.LL →+* ℂ)
-    (h : σ (D.embE D.host.sqrtMinusD) = D.what₂.embLL (D.embE D.host.sqrtMinusD)) : OverK σ := by
+theorem overK_of_sqrt
+    {D : D7} (σ : D.what₂.LL →+* ℂ)
+    (h : σ (D.embE D.host.sqrtMinusD) = D.what₂.embLL (D.embE D.host.sqrtMinusD))
+    : OverK σ := by
   intro x hx
   have hx' : x ∈ IntermediateField.adjoin ℚ {D.host.sqrtMinusD} := hx
   clear hx
@@ -30,10 +35,10 @@ theorem overK_of_sqrt {D : D7} (σ : D.what₂.LL →+* ℂ)
 theorem embLL_embE (D : D7) (x : D.host.E) : D.what₂.embLL (D.embE x) = D.host.φ₀ x :=
   RingHom.congr_fun D.embE_φ₀ x
 
-theorem sqrtMinusD_sq (D : D7) : D.host.sqrtMinusD ^ 2 = -(D.host.d : D.host.E) :=
-  D.host.sqd_sq
+theorem sqrtMinusD_sq (D : D7) : D.host.sqrtMinusD ^ 2 = -(D.host.d : D.host.E) := D.host.sqd_sq
 
-theorem overK_conj {D : D7} (σ : D.what₂.LL →+* ℂ) (h : ¬ OverK σ) : OverK ((starRingEnd ℂ).comp σ) := by
+theorem overK_conj {D : D7} (σ : D.what₂.LL →+* ℂ) (h : ¬ OverK σ)
+    : OverK ((starRingEnd ℂ).comp σ) := by
   apply overK_of_sqrt
   have h0 : D.host.φ₀ D.host.sqrtMinusD = Complex.I * (Real.sqrt D.host.d : ℂ) := D.host.φ₀_mem
   have h1 : σ (D.embE D.host.sqrtMinusD) ^ 2 = D.what₂.embLL (D.embE D.host.sqrtMinusD) ^ 2 := by
@@ -42,8 +47,8 @@ theorem overK_conj {D : D7} (σ : D.what₂.LL →+* ℂ) (h : ¬ OverK σ) : Ov
   · exact absurd (overK_of_sqrt σ h2) h
   · rw [RingHom.comp_apply, h2, embLL_embE, h0]; simp
 
-theorem exists_psi_of_overK {D : D7} (σ : D.what₂.LL →+* ℂ) (h : OverK σ) :
-    ∃ g ∈ D.R.Psi, ∀ τ, labE σ τ = D.host.emb (g * (D.eTau τ).1) := by
+theorem exists_psi_of_overK {D : D7} (σ : D.what₂.LL →+* ℂ) (h : OverK σ)
+    : ∃ g ∈ D.R.Psi, ∀ τ, labE σ τ = D.host.emb (g * (D.eTau τ).1) := by
   obtain ⟨g0, h0⟩ := (factEmb D.R D.host).1.2 (σ.comp D.embE)
   refine ⟨g0, ((factEmb D.R D.host).2 _).1 ?_, fun τ => ?_⟩
   · have h1 := h D.host.sqrtMinusD (IntermediateField.mem_adjoin_simple_self ℚ _)
@@ -52,9 +57,10 @@ theorem exists_psi_of_overK {D : D7} (σ : D.what₂.LL →+* ℂ) (h : OverK σ
     exact h1.trans ((embLL_embE D _).trans h2)
   · rw [ConjReading.emb_mul, h0]; rfl
 
-theorem labels_overK : ∀ {D : D7} (σ : D.what₂.LL →+* ℂ),
-    (OverK σ → Function.Bijective (lab (D := D) σ) ∧ ∀ ρ, labE σ (lab σ ρ) = tauE D ρ) ∧
-      (¬ OverK σ → OverK ((starRingEnd ℂ).comp σ)) := by
+theorem labels_overK
+    : ∀ {D : D7} (σ : D.what₂.LL →+* ℂ),
+      (OverK σ → Function.Bijective (lab (D := D) σ) ∧ ∀ ρ, labE σ (lab σ ρ) = tauE D ρ)
+        ∧ (¬ OverK σ → OverK ((starRingEnd ℂ).comp σ)) := by
   intro D σ
   refine ⟨fun h => ?_, overK_conj σ⟩
   obtain ⟨g, hg, key⟩ := exists_psi_of_overK σ h
@@ -62,7 +68,9 @@ theorem labels_overK : ∀ {D : D7} (σ : D.what₂.LL →+* ℂ),
   have main : ∀ ρ, labE σ (lab σ ρ) = tauE D ρ := by
     intro ρ
     have hs : labE σ (lab σ ρ) = tauE D ρ ∨ labE σ (lab σ ρ) = (starRingEnd ℂ).comp (tauE D ρ) := by
-      unfold lab; rw [dite_eq_left (ConjReading.lab_exists σ ρ)]; exact (ConjReading.lab_exists σ ρ).choose_spec
+      unfold lab
+      rw [dite_eq_left (ConjReading.lab_exists σ ρ)]
+      exact (ConjReading.lab_exists σ ρ).choose_spec
     refine hs.resolve_right fun h' => ?_
     rw [key] at h'
     exact ConjReading.conj_not_mem D ρ _ h' (Subgroup.mul_mem _ hg (D.eTau _).2)

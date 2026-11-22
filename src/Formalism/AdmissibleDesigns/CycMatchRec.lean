@@ -13,17 +13,21 @@ open Formalism.BasicNotions Formalism.BasicNotions.Loc Classical
 
 namespace Formalism.MainNotions.N.KBKa
 
-open Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain Formalism.MainNotions.N.KHf
+open Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain
+  Formalism.MainNotions.N.KHf
 
 section Cyc
 
-variable {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-  [IsAlgClosure E Ω] {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [Algebra ℤ_[l] O]
-  [TopologicalSpace O] (Bw : LocBridge l E Ω Gw O) (P : LocPrime l)
+variable
+  {l : ℕ} [Fact l.Prime]
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+  {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+  (Bw : LocBridge l E Ω Gw O) (P : LocPrime l)
 
-theorem cycZ_eq_χQ (g : ↥(GK Bw.Kw)) :
-    ((ReciprocityTheory.Gal.cycZ (F := E) (Ω := Ω) l ((Br.ι Bw g : Gw) : Ω ≃ₐ[E] Ω) : ℤ_[l]) : ℚ_[l]) =
-      ((P.χQ (g : GQ l) : ℚ_[l]ˣ) : ℚ_[l]) := by
+theorem cycZ_eq_χQ (g : ↥(GK Bw.Kw))
+    : ((ReciprocityTheory.Gal.cycZ (F := E) (Ω := Ω) l ((Br.ι Bw g : Gw) : Ω ≃ₐ[E] Ω) : ℤ_[l])
+        : ℚ_[l])
+      = ((P.χQ (g : GQ l) : ℚ_[l]ˣ) : ℚ_[l]) := by
   set x : ℚ_[l] := ((ReciprocityTheory.Gal.cycZ (F := E) (Ω := Ω) l ((Br.ι Bw g : Gw) : Ω ≃ₐ[E] Ω) : ℤ_[l]) : ℚ_[l])
     with hx
   set x' : ℚ_[l] := ((P.χQ (g : GQ l) : ℚ_[l]ˣ) : ℚ_[l]) with hx'
@@ -34,8 +38,9 @@ theorem cycZ_eq_χQ (g : ↥(GK Bw.Kw)) :
     haveI : NeZero ((l ^ m : ℕ) : Ω) := ⟨by exact_mod_cast pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
     obtain ⟨ζ', hζ'⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (l ^ m)
     have hζ : IsPrimitiveRoot (Bw.j ζ') (l ^ m) := hζ'.map_of_injective Bw.j.injective
-    obtain ⟨a, ha, hxa⟩ := Formalism.AdicCompletionExports.isCycG_cycZ l E Ω ℤ_[l] (RingHom.id _)
-      ((Br.ι Bw g : Gw) : Ω ≃ₐ[E] Ω) m ζ' hζ'.pow_eq_one
+    obtain ⟨a, ha, hxa⟩ :=
+      Formalism.AdicCompletionExports.isCycG_cycZ l E Ω ℤ_[l] (RingHom.id _)
+        ((Br.ι Bw g : Gw) : Ω ≃ₐ[E] Ω) m ζ' hζ'.pow_eq_one
     obtain ⟨a', hxa', ha'⟩ := P.χQ_cyc (g : GQ l) m (Bw.j ζ') hζ.pow_eq_one
     have hg : (g : GQ l) (Bw.j ζ') = Bw.j ζ' ^ a := by
       have h0 := Bw.e_comm (Br.ι Bw g) ζ'
@@ -48,8 +53,11 @@ theorem cycZ_eq_χQ (g : ↥(GK Bw.Kw)) :
         isOfFinOrder_iff_pow_eq_one.2 ⟨l ^ m, pow_pos (Fact.out : l.Prime).pos m, hζ.pow_eq_one⟩
       rwa [hf.pow_eq_pow_iff_modEq, ← hζ.eq_orderOf] at h0
     have hxa2 : ‖x - (a : ℚ_[l])‖ ≤ (l : ℝ) ^ (-(m : ℤ)) := by
-      change ((ReciprocityTheory.Gal.cycZ (F := E) (Ω := Ω) l ((Br.ι Bw g : Gw) : Ω ≃ₐ[E] Ω) : ℤ_[l]) - (a : ℤ_[l]))
-        ∈ Ideal.span {(l : ℤ_[l]) ^ m} at hxa
+      change ((ReciprocityTheory.Gal.cycZ (F := E) (Ω := Ω) l ((Br.ι Bw g : Gw) : Ω ≃ₐ[E] Ω)
+              : ℤ_[l])
+            - (a : ℤ_[l]))
+          ∈ Ideal.span {(l : ℤ_[l]) ^ m}
+        at hxa
       have h0 := (PadicInt.norm_le_pow_iff_mem_span_pow _ m).2 hxa
       rw [PadicInt.norm_def, PadicInt.coe_sub, PadicInt.coe_natCast] at h0
       exact h0
@@ -59,8 +67,8 @@ theorem cycZ_eq_χQ (g : ↥(GK Bw.Kw)) :
       simpa using h4
     have h4 : x - x' = (x - a) + ((a - a') + -(x' - a')) := by ring
     rw [h4]
-    exact (Padic.nonarchimedean _ _).trans (max_le hxa2 ((Padic.nonarchimedean _ _).trans
-      (max_le h2 (by rwa [norm_neg]))))
+    exact (Padic.nonarchimedean _ _).trans
+      (max_le hxa2 ((Padic.nonarchimedean _ _).trans (max_le h2 (by rwa [norm_neg]))))
   have hlim : Filter.Tendsto (fun m : ℕ => (l : ℝ) ^ (-(m : ℤ))) Filter.atTop (nhds 0) := by
     have h5 : ∀ m : ℕ, (l : ℝ) ^ (-(m : ℤ)) = ((l : ℝ)⁻¹) ^ m := fun m => by
       rw [zpow_neg, zpow_natCast, inv_pow]
@@ -73,64 +81,70 @@ end Cyc
 
 section TopPi
 
-variable {O : Type} [CommRing O] [IsDomain O] [TopologicalSpace (FractionRing O)]
-  {LL : Type} [Field LL] [TopologicalSpace LL] [IsTopologicalRing LL] (e : FractionRing O ≃+* LL)
+variable
+  {O : Type} [CommRing O] [IsDomain O] [TopologicalSpace (FractionRing O)]
+  {LL : Type} [Field LL] [TopologicalSpace LL] [IsTopologicalRing LL]
+  (e : FractionRing O ≃+* LL)
   (n : Type) [Fintype n]
 
 end TopPi
 
 section RecC
 
-variable {D : D7} (i : D.nd.Loc) (dc : TruncatedSeriesCountingIdentities.Decl D i)
+variable
+  {D : D7} (i : D.nd.Loc) (dc : TruncatedSeriesCountingIdentities.Decl D i)
   [TopologicalSpace (FractionRing (D.nd.O i))] [IsTopologicalAddGroup (FractionRing (D.nd.O i))]
   [ContinuousSMul (D.nd.O i) (FractionRing (D.nd.O i))] [IsDiscreteValuationRing (D.nd.O i)]
-  {VT VT' : Type}
-  [AddCommGroup VT] [Module (D.nd.O i) VT] [TopologicalSpace VT] [IsTopologicalAddGroup VT]
-  [ContinuousSMul (D.nd.O i) VT] [Module (FractionRing (D.nd.O i)) VT]
-  [IsScalarTower (D.nd.O i) (FractionRing (D.nd.O i)) VT]
-  [AddCommGroup VT'] [Module (D.nd.O i) VT'] [TopologicalSpace VT'] [IsTopologicalAddGroup VT']
-  [ContinuousSMul (D.nd.O i) VT'] [Module (FractionRing (D.nd.O i)) VT']
-  [IsScalarTower (D.nd.O i) (FractionRing (D.nd.O i)) VT']
+  {VT VT' : Type} [AddCommGroup VT] [Module (D.nd.O i) VT] [TopologicalSpace VT]
+  [IsTopologicalAddGroup VT] [ContinuousSMul (D.nd.O i) VT] [Module (FractionRing (D.nd.O i)) VT]
+  [IsScalarTower (D.nd.O i) (FractionRing (D.nd.O i)) VT] [AddCommGroup VT'] [Module (D.nd.O i) VT']
+  [TopologicalSpace VT'] [IsTopologicalAddGroup VT'] [ContinuousSMul (D.nd.O i) VT']
+  [Module (FractionRing (D.nd.O i)) VT'] [IsScalarTower (D.nd.O i) (FractionRing (D.nd.O i)) VT']
 
-theorem cycMatch_rec {w : ℕ} (hn : K.plOf i dc w ∈ placesOver D.host.E (D.nd.l i))
+theorem cycMatch_rec
+    {w : ℕ} (hn : K.plOf i dc w ∈ placesOver D.host.E (D.nd.l i))
     (Dw : Formalism.RepresentationBoundsCohomology.LOC.LatData (D.nd.O i) ↥(Γn i dc w) VT VT')
-    (hε : ∀ g : ↥(Γn i dc w), Dw.ε g = epsU D.nd i (g : GE D.nd)) :
-    CycMatch Dw (eK (D.nbr i _ hn)) (Br.iota D.nbr i _ hn) (Br.PD D.loc D.nbr i _ hn) := by
+    (hε : ∀ g : ↥(Γn i dc w), Dw.ε g = epsU D.nd i (g : GE D.nd))
+    : CycMatch Dw (eK (D.nbr i _ hn)) (Br.iota D.nbr i _ hn) (Br.PD D.loc D.nbr i _ hn) := by
   intro g
   rw [hε]
   have hP := cycZ_eq_χQ (D.nbr i _ hn) (D.loc (D.nd.l i)) g
   have hχ := (D.loc (D.nd.l i)).PD_χ (D.nbr i _ hn).Kw g
-  simp only [eK, RingEquiv.ofBijective_apply, Br.toLLK, IsFractionRing.lift_algebraMap, LocBridge.toLL,
-    RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingHom.coe_coe, epsU, Glob.epsO, MonoidHom.comp_apply,
-    Units.coe_map, MonoidHom.coe_coe, cycLL, Br.PD, RingHom.toMonoidHom_eq_coe, RingHom.coe_monoidHom_mk, MonoidHom.coe_mk, OneHom.coe_mk,
+  simp only [eK, RingEquiv.ofBijective_apply, Br.toLLK, IsFractionRing.lift_algebraMap,
+    LocBridge.toLL, RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingHom.coe_coe, epsU,
+    Glob.epsO, MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe, cycLL, Br.PD,
+    RingHom.toMonoidHom_eq_coe, RingHom.coe_monoidHom_mk, MonoidHom.coe_mk, OneHom.coe_mk,
     LocBridge.eO_alg]
   rw [← IsScalarTower.algebraMap_apply, hχ, ← hP]
-  first
-  | exact IsScalarTower.algebraMap_apply ℤ_[D.nd.l i] ℚ_[D.nd.l i] _ _
-  | rfl
+  first | exact IsScalarTower.algebraMap_apply ℤ_[D.nd.l i] ℚ_[D.nd.l i] _ _ | rfl
 
 end RecC
 
 section RecD
 
-variable {D : D7} (i : D.nd.Loc) (dc : TruncatedSeriesCountingIdentities.Decl D i)
+variable
+  {D : D7} (i : D.nd.Loc) (dc : TruncatedSeriesCountingIdentities.Decl D i)
   [TopologicalSpace (FractionRing (D.nd.O i))] [IsTopologicalAddGroup (FractionRing (D.nd.O i))]
   [ContinuousSMul (D.nd.O i) (FractionRing (D.nd.O i))] [IsDiscreteValuationRing (D.nd.O i)]
-  (VT VT' : ℕ → Type)
-  [∀ w, AddCommGroup (VT w)] [∀ w, Module (D.nd.O i) (VT w)] [∀ w, TopologicalSpace (VT w)]
-  [∀ w, IsTopologicalAddGroup (VT w)] [∀ w, ContinuousSMul (D.nd.O i) (VT w)]
-  [∀ w, Module (FractionRing (D.nd.O i)) (VT w)] [∀ w, IsScalarTower (D.nd.O i) (FractionRing (D.nd.O i)) (VT w)]
-  [∀ w, AddCommGroup (VT' w)] [∀ w, Module (D.nd.O i) (VT' w)] [∀ w, TopologicalSpace (VT' w)]
+  (VT VT' : ℕ → Type) [∀ w, AddCommGroup (VT w)] [∀ w, Module (D.nd.O i) (VT w)]
+  [∀ w, TopologicalSpace (VT w)] [∀ w, IsTopologicalAddGroup (VT w)]
+  [∀ w, ContinuousSMul (D.nd.O i) (VT w)] [∀ w, Module (FractionRing (D.nd.O i)) (VT w)]
+  [∀ w, IsScalarTower (D.nd.O i) (FractionRing (D.nd.O i)) (VT w)] [∀ w, AddCommGroup (VT' w)]
+  [∀ w, Module (D.nd.O i) (VT' w)] [∀ w, TopologicalSpace (VT' w)]
   [∀ w, IsTopologicalAddGroup (VT' w)] [∀ w, ContinuousSMul (D.nd.O i) (VT' w)]
-  [∀ w, Module (FractionRing (D.nd.O i)) (VT' w)] [∀ w, IsScalarTower (D.nd.O i) (FractionRing (D.nd.O i)) (VT' w)]
-  (Dat : ∀ w, Formalism.RepresentationBoundsCohomology.LOC.LatData (D.nd.O i) ↥(Γn i dc w) (VT w) (VT' w))
+  [∀ w, Module (FractionRing (D.nd.O i)) (VT' w)]
+  [∀ w, IsScalarTower (D.nd.O i) (FractionRing (D.nd.O i)) (VT' w)]
+  (Dat : ∀ w,
+    Formalism.RepresentationBoundsCohomology.LOC.LatData (D.nd.O i) ↥(Γn i dc w) (VT w) (VT' w))
 
-theorem rowIn_of {w : ℕ} (hε : ∀ g : ↥(Γn i dc w), (Dat w).ε g = epsU D.nd i (g : GE D.nd))
+theorem rowIn_of
+    {w : ℕ} (hε : ∀ g : ↥(Γn i dc w), (Dat w).ε g = epsU D.nd i (g : GE D.nd))
     (ht : ∀ hn : K.plOf i dc w ∈ placesOver D.host.E (D.nd.l i),
-      HomeoK (eK (D.nbr i _ hn)) ∧ TopMatch (eK (D.nbr i _ hn)) (VT w) ∧ TopMatch (eK (D.nbr i _ hn)) (VT' w))
+      HomeoK (eK (D.nbr i _ hn)) ∧ TopMatch (eK (D.nbr i _ hn)) (VT w)
+        ∧ TopMatch (eK (D.nbr i _ hn)) (VT' w))
     (hdr : ∀ hn : K.plOf i dc w ∈ placesOver D.host.E (D.nd.l i),
-      IsDR (Br.PD D.loc D.nbr i _ hn) (repL (eK (D.nbr i _ hn)) (Dat w).ρT (Br.iota D.nbr i _ hn))) :
-    RowIn i dc VT VT' Dat w := by
+      IsDR (Br.PD D.loc D.nbr i _ hn) (repL (eK (D.nbr i _ hn)) (Dat w).ρT (Br.iota D.nbr i _ hn)))
+    : RowIn i dc VT VT' Dat w := by
   intro hn
   obtain ⟨h1, h2, h3⟩ := ht hn
   exact ⟨h1, h2, h3, cycMatch_rec i dc hn (Dat w) hε, hdr hn⟩

@@ -19,40 +19,48 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Global.IdeleGroup
 
 variable {k : Type} [Field k] [NumberField k] {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem toIdele_mul_self {ω : HeckeCharacter k} (hω : ω * ω = 1) (x : IdeleGroup k) :
-    ω.toIdele x * ω.toIdele x = 1 := by
+theorem toIdele_mul_self {ω : HeckeCharacter k} (hω : ω * ω = 1) (x : IdeleGroup k)
+    : ω.toIdele x * ω.toIdele x = 1 := by
   have h := congrArg (fun f : HeckeCharacter k => f (IdeleClassGroup.mk k x)) hω
   simpa [HeckeCharacter.toIdele_apply] using h
 
-theorem tensor_eq (φ : 𝓢(ι → mixedSpace k, ℂ)) (g : (ι → FiniteAdeleRing (𝓞 k) k) → ℂ)
-    (x : ι → 𝔸[k]) :
-    GJMatrix.schwartzBruhatTensorPi φ g x = rd φ (fun j => (x j).1) * g (fun j => (x j).2) := rfl
+theorem tensor_eq
+    (φ : 𝓢(ι → mixedSpace k, ℂ)) (g : (ι → FiniteAdeleRing (𝓞 k) k) → ℂ) (x : ι → 𝔸[k])
+    : GJMatrix.schwartzBruhatTensorPi φ g x = rd φ (fun j => (x j).1) * g (fun j => (x j).2) :=
+  rfl
 
-theorem norm_inv_units (a : (InfiniteAdeleRing k)ˣ) (ha : ∀ w, ‖(a : InfiniteAdeleRing k) w‖ = 1)
-    (w : InfinitePlace k) : ‖((a⁻¹ : (InfiniteAdeleRing k)ˣ) : InfiniteAdeleRing k) w‖ = 1 := by
-  have h : (a : InfiniteAdeleRing k) w * ((a⁻¹ : (InfiniteAdeleRing k)ˣ) : InfiniteAdeleRing k) w = 1 :=
+theorem norm_inv_units
+    (a : (InfiniteAdeleRing k)ˣ) (ha : ∀ w, ‖(a : InfiniteAdeleRing k) w‖ = 1) (w : InfinitePlace k)
+    : ‖((a⁻¹ : (InfiniteAdeleRing k)ˣ) : InfiniteAdeleRing k) w‖ = 1 := by
+  have h
+      : (a : InfiniteAdeleRing k) w * ((a⁻¹ : (InfiniteAdeleRing k)ˣ) : InfiniteAdeleRing k) w
+        = 1 :=
     congrFun (Units.mul_inv a) w
   have h2 := congrArg norm h
   rw [norm_mul, ha w, one_mul, norm_one] at h2
   exact h2
 
-theorem line_inv {ω : HeckeCharacter k} (hω : ω * ω = 1) (φ₁ : 𝓢(Unit → mixedSpace k, ℂ))
-    (g₁ : (Unit → FiniteAdeleRing (𝓞 k) k) → ℂ)
-    (hφ : ∀ a : (InfiniteAdeleRing k)ˣ, (∀ w, ‖(a : InfiniteAdeleRing k) w‖ = 1) →
-      rd φ₁ (fun _ => (a : InfiniteAdeleRing k)) = ω.toIdele (ofInfinite a))
-    (hg : ∀ u ∈ finiteIntegralUnits k, g₁ (fun _ => (u : FiniteAdeleRing (𝓞 k) k)) =
-      ω.toIdele (ofFinite u))
+theorem line_inv
+    {ω : HeckeCharacter k} (hω : ω * ω = 1)
+    (φ₁ : 𝓢(Unit → mixedSpace k, ℂ)) (g₁ : (Unit → FiniteAdeleRing (𝓞 k) k) → ℂ)
+    (hφ : ∀ a : (InfiniteAdeleRing k)ˣ,
+      (∀ w, ‖(a : InfiniteAdeleRing k) w‖ = 1)
+        → rd φ₁ (fun _ => (a : InfiniteAdeleRing k)) = ω.toIdele (ofInfinite a))
+    (hg : ∀ u ∈ finiteIntegralUnits k,
+      g₁ (fun _ => (u : FiniteAdeleRing (𝓞 k) k)) = ω.toIdele (ofFinite u))
     (a : (InfiniteAdeleRing k)ˣ) (u : (FiniteAdeleRing (𝓞 k) k)ˣ)
-    (ha : ∀ w, ‖(a : InfiniteAdeleRing k) w‖ = 1) (hu : u ∈ finiteIntegralUnits k) :
-    GJMatrix.schwartzBruhatTensorPi φ₁ g₁
-        (fun _ => (((ofInfinite a * ofFinite u)⁻¹ : IdeleGroup k) : 𝔸[k])) =
-      ω.toIdele (ofInfinite a * ofFinite u) := by
-  have h1 : (((ofInfinite a * ofFinite u)⁻¹ : IdeleGroup k) : 𝔸[k]).1 =
-      ((a⁻¹ : (InfiniteAdeleRing k)ˣ) : InfiniteAdeleRing k) := by
+    (ha : ∀ w, ‖(a : InfiniteAdeleRing k) w‖ = 1) (hu : u ∈ finiteIntegralUnits k)
+    : GJMatrix.schwartzBruhatTensorPi φ₁ g₁
+        (fun _ => (((ofInfinite a * ofFinite u)⁻¹ : IdeleGroup k) : 𝔸[k]))
+      = ω.toIdele (ofInfinite a * ofFinite u) := by
+  have h1
+      : (((ofInfinite a * ofFinite u)⁻¹ : IdeleGroup k) : 𝔸[k]).1
+        = ((a⁻¹ : (InfiniteAdeleRing k)ˣ) : InfiniteAdeleRing k) := by
     have : toInfinite k (ofInfinite a * ofFinite u)⁻¹ = a⁻¹ := by simp
     exact congrArg Units.val this
-  have h2 : (((ofInfinite a * ofFinite u)⁻¹ : IdeleGroup k) : 𝔸[k]).2 =
-      ((u⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) := by
+  have h2
+      : (((ofInfinite a * ofFinite u)⁻¹ : IdeleGroup k) : 𝔸[k]).2
+        = ((u⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) := by
     have : toFinite k (ofInfinite a * ofFinite u)⁻¹ = u⁻¹ := by simp
     exact congrArg Units.val this
   rw [tensor_eq]
@@ -62,10 +70,13 @@ theorem line_inv {ω : HeckeCharacter k} (hω : ω * ω = 1) (φ₁ : 𝓢(Unit 
   have h3 := toIdele_mul_self hω (ofInfinite a * ofFinite u)
   rw [inv_eq_of_mul_eq_one_left h3]
 
-theorem near_one_nhds (hCol : ColLaw) (hTop : InMTop) (i₀ : ι) (M₀ : ℕ) (hM : M₀ ≠ 0)
-    (U : Set ((adStd k).kGL ι)) (hU : U ∈ 𝓝 (1 : (adStd k).kGL ι)) :
-    U ∩ {u : (adStd k).kGL ι | InM M₀ ((col i₀ u.1 i₀).2 - 1) ∧
-      ∀ w, ‖(col i₀ u.1 i₀).1 w - 1‖ < 1} ∈ 𝓝 (1 : (adStd k).kGL ι) := by
+theorem near_one_nhds
+    (hCol : ColLaw) (hTop : InMTop) (i₀ : ι)
+    (M₀ : ℕ) (hM : M₀ ≠ 0)
+    (U : Set ((adStd k).kGL ι)) (hU : U ∈ 𝓝 (1 : (adStd k).kGL ι))
+    : U ∩ {u : (adStd k).kGL ι | InM M₀ ((col i₀ u.1 i₀).2 - 1) ∧
+        ∀ w, ‖(col i₀ u.1 i₀).1 w - 1‖ < 1}
+      ∈ 𝓝 (1 : (adStd k).kGL ι) := by
   obtain ⟨-, hc, h1, -⟩ := hCol k ι i₀
   have hcc : Continuous fun u : (adStd k).kGL ι => col i₀ u.1 i₀ :=
     (continuous_apply i₀).comp (hc.comp continuous_subtype_val)
@@ -74,23 +85,30 @@ theorem near_one_nhds (hCol : ColLaw) (hTop : InMTop) (i₀ : ι) (M₀ : ℕ) (
       ((hTop k).1 M₀ hM).1.preimage ((continuous_snd.comp hcc).sub continuous_const)
     have o2 : IsOpen {u : (adStd k).kGL ι | ∀ w, ‖(col i₀ u.1 i₀).1 w - 1‖ < 1} := by
       simp only [Set.setOf_forall]
-      exact isOpen_iInter_of_finite fun w => isOpen_lt
-        ((((continuous_apply w).comp (continuous_fst.comp hcc)).sub continuous_const).norm)
-        continuous_const
+      exact isOpen_iInter_of_finite fun w =>
+        isOpen_lt
+          ((((continuous_apply w).comp (continuous_fst.comp hcc)).sub continuous_const).norm)
+          continuous_const
     exact o1.inter o2
   · have e : col i₀ ((1 : (adStd k).kGL ι) : GL ι 𝔸[k]) i₀ = 1 := by
       have : col (k := k) i₀ ((1 : (adStd k).kGL ι) : GL ι 𝔸[k]) = Pi.single i₀ 1 := h1
-      rw [this]; simp
+      rw [this]
+      simp
     refine ⟨?_, fun w => ?_⟩
     · rw [e]
-      exact ⟨0, (OH k).zero_mem, by
-        show (1 : FiniteAdeleRing (𝓞 k) k) - 1 = _
-        simp⟩
+      exact ⟨
+        0,
+        (OH k).zero_mem,
+        by
+          show (1 : FiniteAdeleRing (𝓞 k) k) - 1 = _
+          simp
+      ⟩
     · rw [e]
       simp
 
-theorem asm : ColLaw → InMTop → Supp → ArchFun → FinFun → ZSplit → ZInf → ZFinPos → ZFinLim →
-    StdGood → TestFun := by
+theorem asm
+    : ColLaw → InMTop → Supp → ArchFun → FinFun → ZSplit → ZInf → ZFinPos → ZFinLim → StdGood
+      → TestFun := by
   intro hCol hTop hSupp hArch hFin hZS hZI hZP hZL hStd k _ _ ι _ _ i₀ ω hω U hU
   obtain ⟨M₀, hM₀, hfin⟩ := hFin k ω
   have hU' := near_one_nhds hCol hTop i₀ M₀ hM₀ U hU
@@ -100,10 +118,11 @@ theorem asm : ColLaw → InMTop → Supp → ArchFun → FinFun → ZSplit → Z
   obtain ⟨hcolK, hcc, hcol1, hcolP⟩ := hCol k ι i₀
   have hΨ := GJMatrix.schwartzBruhatTensorPi_mem φ hg
   have hΨ₁ := GJMatrix.schwartzBruhatTensorPi_mem φ₁ hg₁
-  have hfac : ∀ (t : 𝔸[k]) (κ : (adStd k).kGL ι),
-      GJMatrix.schwartzBruhatTensorPi φ g (t • col i₀ κ.1) =
-        GJMatrix.schwartzBruhatTensorPi φ₁ g₁ (fun _ => t) *
-          GJMatrix.schwartzBruhatTensorPi φ g (col i₀ κ.1) := by
+  have hfac
+      : ∀ (t : 𝔸[k]) (κ : (adStd k).kGL ι),
+        GJMatrix.schwartzBruhatTensorPi φ g (t • col i₀ κ.1)
+          = GJMatrix.schwartzBruhatTensorPi φ₁ g₁ (fun _ => t)
+            * GJMatrix.schwartzBruhatTensorPi φ g (col i₀ κ.1) := by
     intro t κ
     obtain ⟨hu, hp⟩ := hcolK κ.1 κ.2
     have a1 := (hφV _ hu).1 t.1
@@ -113,25 +132,38 @@ theorem asm : ColLaw → InMTop → Supp → ArchFun → FinFun → ZSplit → Z
     have e2 : (fun j => ((t • col i₀ κ.1) j).2) = t.2 • (fun j => (col i₀ κ.1 j).2) := rfl
     rw [e1, e2, a1, a2]
     ring
-  have hequiv : ∀ p κ : (adStd k).kGL ι, p.1 ∈ stab 𝔸[k] {i₀} →
-      GJMatrix.schwartzBruhatTensorPi φ g (col i₀ (p * κ).1) =
-        ω.toIdele (bdet {i₀} p.1) * GJMatrix.schwartzBruhatTensorPi φ g (col i₀ κ.1) := by
+  have hequiv
+      : ∀ p κ : (adStd k).kGL ι,
+        p.1 ∈ stab 𝔸[k] {i₀}
+          → GJMatrix.schwartzBruhatTensorPi φ g (col i₀ (p * κ).1)
+            = ω.toIdele (bdet {i₀} p.1) * GJMatrix.schwartzBruhatTensorPi φ g (col i₀ κ.1) := by
     intro p κ hp
     obtain ⟨hc, a, u, hb, ha, hu⟩ := hcolP p.1 p.2 hp
     have e : col i₀ (p * κ).1 = (((bdet {i₀} p.1)⁻¹ : 𝔸[k]ˣ) : 𝔸[k]) • col i₀ κ.1 := hc κ.1
     rw [e, hfac, hb, line_inv hω φ₁ g₁ hφ₁u hg₁u a u ha hu]
   have hone : rd φ₁ (fun _ => (1 : InfiniteAdeleRing k)) ≠ 0 := by
-    have h := hφ₁u 1 (fun w => by
-      rw [Units.val_one]
-      exact norm_one (α := w.Completion))
+    have h :=
+      hφ₁u 1 (fun w => by
+        rw [Units.val_one]
+        exact norm_one (α := w.Completion))
     rw [Units.val_one] at h
     rw [h]
     simp
   have hunit : ∀ x : ℝ, 1 < x → zInf φ₁ ω x ≠ 0 := hZI k φ₁ ω hφ₁p hone
-  refine ⟨GJMatrix.schwartzBruhatTensorPi φ g, GJMatrix.schwartzBruhatTensorPi φ₁ g₁,
-    fun κ => GJMatrix.schwartzBruhatTensorPi φ g (col i₀ κ.1), hΨ, hΨ₁,
+  refine ⟨
+    GJMatrix.schwartzBruhatTensorPi φ g,
+    GJMatrix.schwartzBruhatTensorPi φ₁ g₁,
+    fun κ => GJMatrix.schwartzBruhatTensorPi φ g (col i₀ κ.1),
+    hΨ,
+    hΨ₁,
     (GJMatrix.continuous_of_mem_schwartzBruhatPi hΨ).comp (hcc.comp continuous_subtype_val),
-    ?_, fun t κ => hfac t κ, ?_, fun p κ hp => hequiv p κ hp, ?_, ?_⟩
+    ?_,
+    fun t κ => hfac t κ,
+    ?_,
+    fun p κ hp => hequiv p κ hp,
+    ?_,
+    ?_
+  ⟩
   · have e : col (k := k) i₀ ((1 : (adStd k).kGL ι) : GL ι 𝔸[k]) = Pi.single i₀ 1 := hcol1
     show GJMatrix.schwartzBruhatTensorPi φ g (col i₀ ((1 : (adStd k).kGL ι) : GL ι 𝔸[k])) = 1
     rw [e, tensor_eq]
@@ -169,8 +201,10 @@ theorem asm : ColLaw → InMTop → Supp → ArchFun → FinFun → ZSplit → Z
     rw [h2, h1]
   · have hcard : 1 ≤ Fintype.card ι := Fintype.card_pos_iff.2 ⟨i₀⟩
     have hcard' : (1 : ℝ) ≤ Fintype.card ι := by exact_mod_cast hcard
-    obtain ⟨x, hx, hz⟩ := hZL k g₁ ω hg₁ hg₁b (fun u hu => by
-      rw [hg₁u u hu, ← Circle.coe_mul, toIdele_mul_self hω, Circle.coe_one]) ((Fintype.card ι : ℝ) + 1)
+    obtain ⟨x, hx, hz⟩ :=
+      hZL k g₁ ω hg₁ hg₁b
+        (fun u hu => by rw [hg₁u u hu, ← Circle.coe_mul, toIdele_mul_self hω, Circle.coe_one])
+        ((Fintype.card ι : ℝ) + 1)
     refine ⟨x, by simpa using hx, ?_⟩
     rw [hZS k φ₁ g₁ ω x hg₁]
     exact mul_ne_zero (hunit x (by linarith)) hz

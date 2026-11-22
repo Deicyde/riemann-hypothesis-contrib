@@ -4,30 +4,36 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Ra9.exists_semi :
-    ∀ {A K : Type} [inst : CommRing A]
-    [inst_1 : Field K] (M : Type) [inst_2 : AddCommGroup M] [inst_3 : _root_.Module A M] [inst_4 : Algebra A K]
-    [Module.Free A M] {C W : Type} [inst_6 : Field C] [inst_7 : AddCommGroup W] [inst_8 : _root_.Module C W] (ι : K ≃+* C)
-    (sp : M →+ W),
-    (∀ (a : A) (m : M), (sp : M → W) (a • m) = (ι : K → C) ((Algebra.algebraMap A K : A → K) a) • (sp : M → W) m) →
-      (∀ (κ : Type) (b : Module.Basis κ A M), LinearIndependent C fun (i : κ) ↦ (sp : M → W) ((b : κ → M) i)) →
-        ∃ (Ψ : TensorProduct A K M →+ W),
-          (∀ (k : K) (m : M), (Ψ : TensorProduct A K M → W) (k ⊗ₜ[A] m) = (ι : K → C) k • (sp : M → W) m) ∧
-            (∀ (k : K) (v : TensorProduct A K M),
-                (Ψ : TensorProduct A K M → W) (k • v) = (ι : K → C) k • (Ψ : TensorProduct A K M → W) v) ∧
-              Function.Injective (⇑Ψ : TensorProduct A K M → W) ∧
-                ∀ (w : W),
-                  w ∈ Submodule.span C (Set.range (⇑sp : M → W)) ↔
-                    ∃ (v : TensorProduct A K M), (Ψ : TensorProduct A K M → W) v = w := by
+theorem UpperTheory.Reformulated.B.Ra9.exists_semi
+    : ∀ {A K : Type} [inst : CommRing A] [inst_1 : Field K] (M : Type) [inst_2 : AddCommGroup M]
+        [inst_3 : _root_.Module A M] [inst_4 : Algebra A K] [Module.Free A M] {C W : Type}
+        [inst_6 : Field C] [inst_7 : AddCommGroup W] [inst_8 : _root_.Module C W] (ι : K ≃+* C)
+        (sp : M →+ W),
+      (∀ (a : A) (m : M),
+          (sp : M → W) (a • m) = (ι : K → C) ((Algebra.algebraMap A K : A → K) a) • (sp : M → W) m)
+        → (∀ (κ : Type) (b : Module.Basis κ A M),
+          LinearIndependent C fun (i : κ) ↦ (sp : M → W) ((b : κ → M) i))
+        → ∃ (Ψ : TensorProduct A K M →+ W),
+          (∀ (k : K) (m : M),
+              (Ψ : TensorProduct A K M → W) (k ⊗ₜ[A] m) = (ι : K → C) k • (sp : M → W) m)
+            ∧ (∀ (k : K) (v : TensorProduct A K M),
+              (Ψ : TensorProduct A K M → W) (k • v)
+                = (ι : K → C) k • (Ψ : TensorProduct A K M → W) v)
+            ∧ Function.Injective (⇑Ψ : TensorProduct A K M → W)
+            ∧ ∀ (w : W),
+              w ∈ Submodule.span C (Set.range (⇑sp : M → W))
+                ↔ ∃ (v : TensorProduct A K M), (Ψ : TensorProduct A K M → W) v = w := by
   intro A K _ _ M _ _ _ _ C W _ _ _ ι sp hsp hli
   classical
-  let f : K →+ M →+ W :=
-    { toFun := fun k =>
-        { toFun := fun m => ι k • sp m
-          map_zero' := by simp
-          map_add' := by intro x y; simp [smul_add] }
-      map_zero' := by ext m; simp
-      map_add' := by intro x y; ext m; simp [add_smul] }
+  let f : K →+ M →+ W := {
+    toFun := fun k => {
+      toFun := fun m => ι k • sp m
+      map_zero' := by simp
+      map_add' := by intro x y; simp [smul_add]
+    }
+    map_zero' := by ext m; simp
+    map_add' := by intro x y; ext m; simp [add_smul]
+  }
   have hfa : ∀ (k : K) (m : M), f k m = ι k • sp m := fun _ _ => rfl
   have hf : ∀ (r : A) (k : K) (m : M), f (r • k) m = f k (r • m) := by
     intro r k m
@@ -47,8 +53,11 @@ theorem UpperTheory.Reformulated.B.Ra9.exists_semi :
     intro v hv
     let b := Module.Free.chooseBasis A M
     let bK := Algebra.TensorProduct.basis K b
-    have hsum : Ψ v = Finsupp.linearCombination C (fun i => sp (b i))
-        ((bK.repr v).mapRange ι (map_zero ι)) := by
+    have hsum
+        : Ψ v
+          = Finsupp.linearCombination C
+            (fun i => sp (b i))
+            ((bK.repr v).mapRange ι (map_zero ι)) := by
       rw [Finsupp.linearCombination_apply, Finsupp.sum_mapRange_index (by simp)]
       conv_lhs => rw [← bK.linearCombination_repr v]
       set_option synthInstance.maxHeartbeats 100000 in
@@ -69,7 +78,8 @@ theorem UpperTheory.Reformulated.B.Ra9.exists_semi :
       | mem x hx =>
         obtain ⟨m, rfl⟩ := hx
         exact ⟨1 ⊗ₜ[A] m, by rw [hΨ, map_one, one_smul]⟩
-      | zero => exact ⟨0, map_zero Ψ⟩
+      | zero =>
+        exact ⟨0, map_zero Ψ⟩
       | add x y _ _ hx hy =>
         obtain ⟨a, rfl⟩ := hx
         obtain ⟨c, rfl⟩ := hy

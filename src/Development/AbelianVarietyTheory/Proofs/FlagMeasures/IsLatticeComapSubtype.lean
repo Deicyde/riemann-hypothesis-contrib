@@ -8,10 +8,12 @@ namespace GlobalTheory.SmulMemComapLattice
 
 open NumberField
 
-theorem exists_smul_mem {R K V : Type} [CommRing R] [IsDomain R] [Field K] [Algebra R K]
-    [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
-    (L : Submodule R V) (hL : Submodule.span K (L : Set V) = ⊤) (v : V) :
-    ∃ a : R, a ≠ 0 ∧ a • v ∈ L := by
+theorem exists_smul_mem
+    {R K V : Type} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+    (L : Submodule R V) (hL : Submodule.span K (L : Set V) = ⊤)
+    (v : V)
+    : ∃ a : R, a ≠ 0 ∧ a • v ∈ L := by
   have hv : v ∈ Submodule.span K (L : Set V) := hL ▸ Submodule.mem_top
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
@@ -28,21 +30,22 @@ theorem exists_smul_mem {R K V : Type} [CommRing R] [IsDomain R] [Field K] [Alge
     obtain ⟨a, ha, hax⟩ := hx
     obtain ⟨p, q, hq, rfl⟩ := IsFractionRing.div_surjective (A := R) c
     have hq0 : q ≠ 0 := nonZeroDivisors.ne_zero hq
-    have hqK : algebraMap R K q ≠ 0 := by
-      simpa using hq0
+    have hqK : algebraMap R K q ≠ 0 := by simpa using hq0
     refine ⟨q * a, mul_ne_zero hq0 ha, ?_⟩
     have : (q * a) • (algebraMap R K p / algebraMap R K q) • x = p • a • x := by
-      rw [← algebraMap_smul K (q * a), ← algebraMap_smul K p, ← algebraMap_smul K a x,
-        smul_smul, smul_smul, map_mul]
+      rw [← algebraMap_smul K (q * a), ← algebraMap_smul K p, ← algebraMap_smul K a x, smul_smul,
+        smul_smul, map_mul]
       congr 1
       field_simp
     rw [this]
     exact L.smul_mem _ hax
 
-theorem isLattice_comap_subtype {K V : Type} [Field K] [NumberField K] [AddCommGroup V]
-    [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-    (Λ : Submodule (𝓞 K) V) (hΛ : Submodule.IsFullLattice K Λ) (W : Submodule K V) :
-    Submodule.IsLattice K (Submodule.comap (LinearMap.restrictScalars (𝓞 K) W.subtype) Λ) := by
+theorem isLattice_comap_subtype
+    {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    (Λ : Submodule (𝓞 K) V) (hΛ : Submodule.IsFullLattice K Λ)
+    (W : Submodule K V)
+    : Submodule.IsLattice K (Submodule.comap (LinearMap.restrictScalars (𝓞 K) W.subtype) Λ) := by
   refine ⟨?_, ?_⟩
   · have hinj : Function.Injective (LinearMap.restrictScalars (𝓞 K) W.subtype) :=
       W.injective_subtype

@@ -16,8 +16,11 @@ section SpacesG
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
 
-variable (s : ℕ) (hstar : ∀ x : E, IsIntegral ℤ x → IsIntegral ℤ (star x))
-  (cm : CMData F E) (T : ℕ) (hT : T.Prime) (pz : E) (hpz : star pz * pz = T)
+variable
+  (s : ℕ) (hstar : ∀ x : E, IsIntegral ℤ x → IsIntegral ℤ (star x))
+  (cm : CMData F E)
+  (T : ℕ) (hT : T.Prime)
+  (pz : E) (hpz : star pz * pz = T)
   (hy : ∃ y : E ⊗[F] FiniteAdeleRing (𝓞 F) F,
     Formalism.UG.sigR cm.sig (FiniteAdeleRing (𝓞 F) F) y * y = -1)
 
@@ -25,9 +28,14 @@ end SpacesG
 
 section RowsG
 
-variable {R : Ranks} (LL : Type) [Field LL] [NumberField LL] (embLL : LL →+* ℂ) (P : Rows.Places LL)
-  (Tau : Type) [Fintype Tau] (hTau : Fintype.card Tau = R.f) (Dst : ℝ)
-  (sha : ℕ → ℕ → ℚ) (hsha : ∀ l e, 0 ≤ sha l e) (cg : ℕ) (hcg : 0 < cg)
+variable
+  {R : Ranks}
+  (LL : Type) [Field LL] [NumberField LL]
+  (embLL : LL →+* ℂ) (P : Rows.Places LL)
+  (Tau : Type) [Fintype Tau]
+  (hTau : Fintype.card Tau = R.f) (Dst : ℝ)
+  (sha : ℕ → ℕ → ℚ) (hsha : ∀ l e, 0 ≤ sha l e)
+  (cg : ℕ) (hcg : 0 < cg)
 
 abbrev rowsG : Rows.Data R where
   LL := LL
@@ -112,8 +120,8 @@ theorem N_even (R : Ranks) (j : ℕ) : ∃ a : ℕ, R.N j = 2 * a := by
   obtain ⟨b, hb⟩ := R.t_odd
   exact ⟨a + j * (b + 1), by unfold Ranks.N; rw [ha, hb]; ring⟩
 
-theorem sInt (R : Ranks) (hc : HCParam R) (i : Fin R.m) :
-    (∃ a : ℤ, sExp R (hc.e i) (i.1 + 1) = a) ∧ (∃ a : ℤ, sExp' R (hc.e i) (i.1 + 1) = a) := by
+theorem sInt (R : Ranks) (hc : HCParam R) (i : Fin R.m)
+    : (∃ a : ℤ, sExp R (hc.e i) (i.1 + 1) = a) ∧ (∃ a : ℤ, sExp' R (hc.e i) (i.1 + 1) = a) := by
   obtain ⟨z, hz⟩ := hc.e_int i
   obtain ⟨a, ha⟩ := N_even R i.1
   obtain ⟨b, hb⟩ := N_even R (i.1 + 1)
@@ -135,18 +143,21 @@ variable {s : ℕ}
 
 variable (H : Host (Rt s))
 
-variable (hc : HCParam (Rt s))
+variable
+  (hc : HCParam (Rt s))
   (hgap : ∀ (l : ℕ) (h : l + 1 < (Rt s).k - 1), hc.v ⟨l, by omega⟩ - hc.v ⟨l + 1, h⟩ = 4 * 1)
   (hlet : ∀ (l : ℕ) (h : l < (Rt s).k - 2), hc.u ⟨l + 1, by omega⟩ = hc.v ⟨l, by omega⟩ - 1 / 2)
 
-variable (T : ℕ) [hT : Fact T.Prime] (Ts : ℝ) (hTs : 0 < Ts) (Gam : ℝ) (hG : 1 < Gam)
+variable
+  (T : ℕ) [hT : Fact T.Prime]
+  (Ts : ℝ) (hTs : 0 < Ts)
+  (Gam : ℝ) (hG : 1 < Gam)
   (hw1 : Ts ≤ T) (hw2 : (T : ℝ) ≤ (1 + 1 / 64) * Ts)
   (hg : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E) (ht : THyp H)
   (hlev : T ∈ H.levelPrimes) (hpde : T ≠ H.pde ∧ T ≠ H.pde')
   (pz : 𝓞 H.E) (hK : (pz : H.E) ∈ H.K) (hpz : (pz : H.E) * H.conj (pz : H.E) = (T : H.E))
   (hcong : (pz - 1) ∈ Ideal.span {((H.QS * H.q * H.d * (H.g 0 * H.g 1) ^ 2 : ℕ) : 𝓞 H.E)})
   (G : LocalGap H)
-
 
 end Record
 

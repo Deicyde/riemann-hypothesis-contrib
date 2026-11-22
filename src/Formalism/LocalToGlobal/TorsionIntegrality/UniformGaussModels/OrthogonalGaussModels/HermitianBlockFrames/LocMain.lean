@@ -29,16 +29,22 @@ theorem local_core' : LocCore := by
   have hE : Mbᵀ * bd4 H₀ * M = 1 := by
     have h1 := congrArg (fun X => X.map σ) hGram
     simp only [Matrix.map_mul, transpose_map, blockDiag_map', hMσ, hMbσ] at h1
-    have h1' : ((c : MaximalUnramifiedExtension l) • (1 : Matrix (Fin 4 × n) (Fin 4 × n) (MaximalUnramifiedExtension l))).map σ = (c : MaximalUnramifiedExtension l) • 1 := by
+    have h1'
+        : ((c : MaximalUnramifiedExtension l)
+            • (1 : Matrix (Fin 4 × n) (Fin 4 × n) (MaximalUnramifiedExtension l))).map σ
+          = (c : MaximalUnramifiedExtension l) • 1 := by
       refine Matrix.ext fun x y => ?_
       simp only [Matrix.map_apply, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul]
       split_ifs <;> simp
     rw [h1'] at h1
-    rw [hH₀, bd4_smul, Matrix.mul_smul, Matrix.smul_mul, h1, smul_smul, inv_mul_cancel₀ hc0, one_smul]
+    rw [hH₀, bd4_smul, Matrix.mul_smul, Matrix.smul_mul, h1, smul_smul, inv_mul_cancel₀ hc0,
+      one_smul]
   have hE2 : Mbᵀ * bd4 (H₀.map σ)ᵀ * M = 1 := by
     have h1 := congrArg (fun X => (X.map σ)ᵀ) hE
-    simp only [Matrix.map_mul, transpose_map, blockDiag_map', hMσ, hMbσ, transpose_mul, transpose_transpose,
-      Matrix.map_one σ (map_zero σ) (map_one σ), transpose_one, bd4_transpose] at h1
+    simp only [Matrix.map_mul, transpose_map, blockDiag_map', hMσ, hMbσ, transpose_mul,
+        transpose_transpose, Matrix.map_one σ (map_zero σ) (map_one σ), transpose_one,
+        bd4_transpose]
+      at h1
     simpa [Matrix.mul_assoc] using h1
 
   set Z : Matrix n (Fin 4 × n) (MaximalUnramifiedExtension l) := what₂ M 0 with hZ
@@ -54,18 +60,23 @@ theorem local_core' : LocCore := by
     simp only [Matrix.one_apply, Prod.mk.injEq, true_and] at this
     rw [Matrix.one_apply]
     simpa [Matrix.mul_apply, hZ, hZb', what₂] using this
-  obtain ⟨Γ, hΓ⟩ : ∃ Γ : Matrix (Fin 4 × n) (Fin 4 × n) (MaximalUnramifiedExtension l), Γ = Zbᵀ * H₀ * Z := ⟨_, rfl⟩
+  obtain ⟨Γ, hΓ⟩
+      : ∃ Γ : Matrix (Fin 4 × n) (Fin 4 × n) (MaximalUnramifiedExtension l), Γ = Zbᵀ * H₀ * Z :=
+    ⟨_, rfl⟩
 
   choose U₁ U₂ hUint hUeq using hmv
   set U : Fin 4 → Matrix (Fin 4 × n) (Fin 4 × n) (MaximalUnramifiedExtension l) := fun b => lmat δ (U₁ b) (U₂ b) with hU
-  have hUO : ∀ b x y, U b x y ∈ S.O := fun b x y => lmat_mem (dK := dK) (hδ := hδ) (U₁ b) (U₂ b) (hUint b) x y
+  have hUO : ∀ b x y, U b x y ∈ S.O := fun b x y =>
+    lmat_mem (dK := dK) (hδ := hδ) (U₁ b) (U₂ b) (hUint b) x y
   have hZc : ∀ b, what₂ M b = Z * U b := by
-    intro b; refine Matrix.ext fun i w => ?_
+    intro b
+    refine Matrix.ext fun i w => ?_
     have := congrFun (congrFun (hUeq b) (0, i)) w
     rw [blockShift_mul_apply, if_pos rfl] at this
     exact this
   have hrowsN : ∀ b, what₂ (M * U 0) b = if b = 0 then Z else 0 := by
-    intro b; refine Matrix.ext fun i w => ?_
+    intro b
+    refine Matrix.ext fun i w => ?_
     have := congrFun (congrFun (hUeq 0) (b, i)) w
     rw [blockShift_mul_apply] at this
     rw [what₂, ← this]
@@ -73,8 +84,9 @@ theorem local_core' : LocCore := by
   have hΓU : Γ = ((U 0).map σ)ᵀ * U 0 := by
     have hN : ((M * U 0).map σ)ᵀ * bd4 H₀ * (M * U 0) = ((U 0).map σ)ᵀ * U 0 := by
       rw [Matrix.map_mul, hMσ, transpose_mul]
-      calc ((U 0).map σ)ᵀ * Mbᵀ * bd4 H₀ * (M * U 0) = ((U 0).map σ)ᵀ * (Mbᵀ * bd4 H₀ * M) * U 0 := by
-            simp only [Matrix.mul_assoc]
+      calc
+        ((U 0).map σ)ᵀ * Mbᵀ * bd4 H₀ * (M * U 0)
+          = ((U 0).map σ)ᵀ * (Mbᵀ * bd4 H₀ * M) * U 0 := by simp only [Matrix.mul_assoc]
         _ = _ := by rw [hE, Matrix.mul_one]
     rw [← hN, transpose_mul_blockDiag_mul, Fin.sum_univ_four]
     have hr : ∀ b, what₂ ((M * U 0).map σ) b = (what₂ (M * U 0) b).map σ := fun b => rfl
@@ -95,7 +107,9 @@ theorem local_core' : LocCore := by
     rw [h]
     ring
   have hidem : Γ * Γ = Γ := by
-    calc Γ * Γ = Zbᵀ * H₀ * (Z * (Zbᵀ * H₀)) * Z := by simp only [hΓ, Matrix.mul_assoc]
+    calc
+      Γ * Γ
+        = Zbᵀ * H₀ * (Z * (Zbᵀ * H₀)) * Z := by simp only [hΓ, Matrix.mul_assoc]
       _ = Γ := by rw [hZZ, Matrix.mul_one, hΓ]
   have hΓUM : S.UM Γ := by
     intro x hx hNU
@@ -123,20 +137,25 @@ theorem local_core' : LocCore := by
     refine Matrix.ext fun w w' => ?_
     rw [Matrix.mul_apply, Matrix.sum_apply]
     refine Finset.sum_congr rfl fun c _ => ?_
-    simp only [vecMulVec_apply, Matrix.mul_apply, mulVec, dotProduct, vecMul, JSetup.cv, hSσ, transpose_apply,
-      Matrix.map_apply, hA, Matrix.of_apply]
+    simp only [vecMulVec_apply, Matrix.mul_apply, mulVec, dotProduct, vecMul, JSetup.cv, hSσ,
+      transpose_apply, Matrix.map_apply, hA, Matrix.of_apply]
   obtain ⟨V, hV⟩ : ∃ V : Matrix n (Fin k) (MaximalUnramifiedExtension l), V = Z * A := ⟨_, rfl⟩
-  obtain ⟨Ti₀, hTi₀⟩ : ∃ Ti₀ : Matrix (Fin k) n (MaximalUnramifiedExtension l), Ti₀ = (V.map σ)ᵀ * H₀ := ⟨_, rfl⟩
+  obtain ⟨Ti₀, hTi₀⟩
+      : ∃ Ti₀ : Matrix (Fin k) n (MaximalUnramifiedExtension l), Ti₀ = (V.map σ)ᵀ * H₀ :=
+    ⟨_, rfl⟩
   have hVσ : V.map σ = Zb * A.map σ := by rw [hV, Matrix.map_mul, hZb]
   have hTZ : Ti₀ * Z = (A.map σ)ᵀ * Γ := by
     rw [hTi₀, hVσ, transpose_mul, hΓ]; simp only [Matrix.mul_assoc]
-  have hTV : Ti₀ * V = 1 := by
-    rw [hV, ← Matrix.mul_assoc, hTZ, hAo]
+  have hTV : Ti₀ * V = 1 := by rw [hV, ← Matrix.mul_assoc, hTZ, hAo]
   have hZΓ : Z * Γ = Z := by
-    calc Z * Γ = Z * (Zbᵀ * H₀) * Z := by simp only [hΓ, Matrix.mul_assoc]
+    calc
+      Z * Γ
+        = Z * (Zbᵀ * H₀) * Z := by simp only [hΓ, Matrix.mul_assoc]
       _ = Z := by rw [hZZ, Matrix.one_mul]
   have hGZ : Zbᵀ * H₀ = Γ * (Zbᵀ * H₀) := by
-    calc Zbᵀ * H₀ = Zbᵀ * H₀ * (Z * (Zbᵀ * H₀)) := by rw [hZZ, Matrix.mul_one]
+    calc
+      Zbᵀ * H₀
+        = Zbᵀ * H₀ * (Z * (Zbᵀ * H₀)) := by rw [hZZ, Matrix.mul_one]
       _ = Γ * (Zbᵀ * H₀) := by simp only [hΓ, Matrix.mul_assoc]
   have hTi₀' : Ti₀ = (A.map σ)ᵀ * (Zbᵀ * H₀) := by rw [hTi₀, hVσ, transpose_mul, Matrix.mul_assoc]
   have hVT : V * Ti₀ = 1 := by
@@ -144,7 +163,9 @@ theorem local_core' : LocCore := by
     have s2 : Z * A * ((A.map σ)ᵀ * (Zbᵀ * H₀)) = Z * Γ * A * ((A.map σ)ᵀ * (Γ * (Zbᵀ * H₀))) :=
       (congrArg (fun X => Z * A * ((A.map σ)ᵀ * X)) hGZ).trans
         (congrArg (fun X => X * A * ((A.map σ)ᵀ * (Γ * (Zbᵀ * H₀)))) hZΓ.symm)
-    have s3 : Z * Γ * A * ((A.map σ)ᵀ * (Γ * (Zbᵀ * H₀))) = Z * (Γ * A * ((A.map σ)ᵀ * Γ)) * (Zbᵀ * H₀) := by
+    have s3
+        : Z * Γ * A * ((A.map σ)ᵀ * (Γ * (Zbᵀ * H₀)))
+          = Z * (Γ * A * ((A.map σ)ᵀ * Γ)) * (Zbᵀ * H₀) := by
       simp only [Matrix.mul_assoc]
     have s4 : Z * (Γ * A * ((A.map σ)ᵀ * Γ)) * (Zbᵀ * H₀) = 1 := by rw [hAs, hZΓ, hZZ]
     exact s1.trans (s2.trans (s3.trans s4))
@@ -161,10 +182,11 @@ theorem local_core' : LocCore := by
     simp only [hT, hTi, submatrix_apply, id_eq]
     exact Equiv.sum_comp e.symm (fun c => V i c * Ti₀ c j)
 
-  have hAσσ : (A.map σ).map σ = A := Matrix.ext fun w c => by
-    have h := S.hσσ _ (hAO w c)
-    rw [hSσ] at h
-    simpa using h
+  have hAσσ : (A.map σ).map σ = A :=
+    Matrix.ext fun w c => by
+      have h := S.hσσ _ (hAO w c)
+      rw [hSσ] at h
+      simpa using h
   have hVσσ : (V.map σ).map σ = V := by rw [hVσ, Matrix.map_mul, hZbσ, hAσσ, hV]
   have hTi₀σ : (Ti₀.map σ)ᵀ * Ti₀ = (H₀.map σ)ᵀ := by
     have h1 : (Ti₀.map σ)ᵀ = (H₀.map σ)ᵀ * V := by
@@ -177,8 +199,9 @@ theorem local_core' : LocCore := by
     exact Equiv.sum_comp e.symm (fun c => σ (Ti₀ c i) * Ti₀ c j)
   have hU1 : ((bd4 Ti * M).map σ)ᵀ * (bd4 Ti * M) = 1 := by
     rw [Matrix.map_mul, blockDiag_map', hMσ, transpose_mul, bd4_transpose]
-    calc Mbᵀ * bd4 (Ti.map σ)ᵀ * (bd4 Ti * M) = Mbᵀ * (bd4 (Ti.map σ)ᵀ * bd4 Ti) * M := by
-          simp only [Matrix.mul_assoc]
+    calc
+      Mbᵀ * bd4 (Ti.map σ)ᵀ * (bd4 Ti * M)
+        = Mbᵀ * (bd4 (Ti.map σ)ᵀ * bd4 Ti) * M := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [blockDiag_mul', hTiσ]; exact hE2
 
   have hγ : ∀ b i w, (bd4 Ti * M) (b, i) w = ((A.map σ)ᵀ * Γ * U b) (e.symm i) w := by

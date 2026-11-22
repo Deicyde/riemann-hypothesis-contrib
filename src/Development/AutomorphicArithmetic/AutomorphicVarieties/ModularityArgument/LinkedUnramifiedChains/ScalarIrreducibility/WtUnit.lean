@@ -22,18 +22,20 @@ theorem norm_le_one_of_near {u : Qbar l} {r : ℝ} (hr : r ≤ 1) (h : ‖u - 1�
   rw [e]
   exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (h.trans hr) (by simp))
 
-theorem near_mul {u v : Qbar l} {r : ℝ} (hr : r ≤ 1) (hu : ‖u - 1‖ ≤ r) (hv : ‖v - 1‖ ≤ r) :
-    ‖u * v - 1‖ ≤ r := by
+theorem near_mul {u v : Qbar l} {r : ℝ} (hr : r ≤ 1) (hu : ‖u - 1‖ ≤ r) (hv : ‖v - 1‖ ≤ r)
+    : ‖u * v - 1‖ ≤ r := by
   have e : u * v - 1 = (u - 1) * v + (v - 1) := by ring
   rw [e]
   refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ hv)
   rw [norm_mul]
-  calc ‖u - 1‖ * ‖v‖ ≤ ‖u - 1‖ * 1 := by
-        gcongr
-        exact norm_le_one_of_near hr hv
+  calc
+    ‖u - 1‖ * ‖v‖ ≤ ‖u - 1‖ * 1 := by
+      gcongr
+      exact norm_le_one_of_near hr hv
     _ ≤ r := by simpa using hu
 
-theorem near_pow {u : Qbar l} {r : ℝ} (hr : r ≤ 1) (hu : ‖u - 1‖ ≤ r) (n : ℕ) : ‖u ^ n - 1‖ ≤ r := by
+theorem near_pow {u : Qbar l} {r : ℝ} (hr : r ≤ 1) (hu : ‖u - 1‖ ≤ r) (n : ℕ)
+    : ‖u ^ n - 1‖ ≤ r := by
   induction n with
   | zero => simpa using (norm_nonneg _).trans hu
   | succ n ih => rw [pow_succ]; exact near_mul hr ih hu
@@ -49,8 +51,9 @@ theorem ball_le : ((l : ℝ)⁻¹) ^ 2 ≤ 1 := by
   have h1 : (l : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ (by linarith)
   exact ball_lt.le.trans h1.le
 
-theorem eq_one_of_pow_eq_one {u : Qbar l} (hu : ‖u - 1‖ ≤ ((l : ℝ)⁻¹) ^ 2) {n : ℕ} (hn : 0 < n)
-    (h : u ^ n = 1) : u = 1 := by
+theorem eq_one_of_pow_eq_one
+    {u : Qbar l} (hu : ‖u - 1‖ ≤ ((l : ℝ)⁻¹) ^ 2) {n : ℕ} (hn : 0 < n) (h : u ^ n = 1)
+    : u = 1 := by
   by_contra hne
   have hfin : IsOfFinOrder u := isOfFinOrder_iff_pow_eq_one.2 ⟨n, hn, h⟩
   have ho : orderOf u ≠ 0 := hfin.orderOf_pos.ne'
@@ -68,12 +71,12 @@ theorem eq_one_of_pow_eq_one {u : Qbar l} (hu : ‖u - 1‖ ≤ ((l : ℝ)⁻¹)
     have := geom_sum_mul v p
     rw [hvp, sub_self] at this
     exact (mul_eq_zero.1 this).resolve_right (sub_ne_zero.2 hv1)
-  have hd : (p : Qbar l) = -∑ i ∈ Finset.range p, (v ^ i - 1) := by
+  have hd : (p : Qbar l) = - ∑ i ∈ Finset.range p, (v ^ i - 1) := by
     simp [Finset.sum_sub_distrib, hS]
   have hn1 : ‖(p : Qbar l)‖ ≤ ((l : ℝ)⁻¹) ^ 2 := by
     rw [hd, norm_neg]
-    exact IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity)
-      fun i _ => near_pow ball_le hnear i
+    exact IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity) fun i _ =>
+      near_pow ball_le hnear i
   have hn2 : (l : ℝ)⁻¹ ≤ ‖(p : Qbar l)‖ := by
     have e : (p : Qbar l) = algebraMap ℚ_[l] (Qbar l) (p : ℚ_[l]) := by simp
     rw [e, norm_algebraMap']
@@ -87,8 +90,8 @@ theorem eq_one_of_pow_eq_one {u : Qbar l} (hu : ‖u - 1‖ ≤ ((l : ℝ)⁻¹)
       exact (inv_lt_one_of_one_lt₀ (by linarith)).le
   linarith [ball_lt (l := l)]
 
-theorem norm_int_le_one {F : Type} [Field F] [NumberField F] (c : F →+* Qbar l) (x : 𝓞 F) :
-    ‖c x‖ ≤ 1 := by
+theorem norm_int_le_one {F : Type} [Field F] [NumberField F] (c : F →+* Qbar l) (x : 𝓞 F)
+    : ‖c x‖ ≤ 1 := by
   have h1 : IsIntegral ℤ (c x) := (RingOfIntegers.isIntegral_coe x).map c.toIntAlgHom
   have h : IsIntegral ℤ_[l] (c x) := h1.tower_top
   have hi : IsIntegral ℚ_[l] (c x) := Algebra.IsIntegral.isIntegral _
@@ -109,27 +112,28 @@ theorem emb_val_lt (j : Emb l w) {y : w.adicCompletion F} (hy : Valued.v y < 1) 
   rw [map_zero] at h2
   exact tendsto_pow_atTop_nhds_zero_iff_norm_lt_one.1 (h2.congr fun m => map_pow _ _ _)
 
-theorem emb_lt (j : Emb l w) {x : 𝓞 F} (hx : x ∈ w.asIdeal) :
-    ‖j.1 (algebraMap F (w.adicCompletion F) (x : F))‖ < 1 := by
+theorem emb_lt (j : Emb l w) {x : 𝓞 F} (hx : x ∈ w.asIdeal)
+    : ‖j.1 (algebraMap F (w.adicCompletion F) (x : F))‖ < 1 := by
   refine emb_val_lt j ?_
   rw [show algebraMap F (w.adicCompletion F) (x : F) = ((x : F) : w.adicCompletion F) from rfl,
     HeightOneSpectrum.valuedAdicCompletion_eq_valuation']
   exact (w.valuation_lt_one_iff_mem x).2 hx
 
-theorem emb_lt_iff (j : Emb l w) (x : 𝓞 F) :
-    ‖j.1 (algebraMap F (w.adicCompletion F) (x : F))‖ < 1 ↔ x ∈ w.asIdeal := by
+theorem emb_lt_iff (j : Emb l w) (x : 𝓞 F)
+    : ‖j.1 (algebraMap F (w.adicCompletion F) (x : F))‖ < 1 ↔ x ∈ w.asIdeal := by
   refine ⟨fun h => ?_, emb_lt j⟩
   by_contra hx
   obtain ⟨y, i, hi, e⟩ := w.isMaximal.exists_inv hx
   let c : F →+* Qbar l := j.1.comp (algebraMap F (w.adicCompletion F))
   have h1 : ‖c ((y : F) * (x : F))‖ < 1 := by
     rw [map_mul, norm_mul]
-    calc ‖c y‖ * ‖c x‖ ≤ 1 * ‖c x‖ := by
-          gcongr
-          exact norm_int_le_one c y
+    calc
+      ‖c y‖ * ‖c x‖ ≤ 1 * ‖c x‖ := by
+        gcongr
+        exact norm_int_le_one c y
       _ < 1 := by
-          rw [one_mul]
-          exact h
+        rw [one_mul]
+        exact h
   have h2 : ‖c (i : F)‖ < 1 := emb_lt j hi
   have e' : c ((y : F) * (x : F)) + c (i : F) = 1 := by
     rw [← map_add (f := _), ← map_one c]
@@ -151,7 +155,8 @@ theorem emb_val_eq (j : Emb l w) {y : w.adicCompletion F} (hy : ‖j.1 y‖ = 1)
     rw [map_inv₀, norm_inv, hy, inv_one] at h2
     exact absurd h2 (lt_irrefl _)
 
-theorem liesOver (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal) : w.asIdeal.LiesOver (Ideal.span {(l : ℤ)}) := by
+theorem liesOver (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal)
+    : w.asIdeal.LiesOver (Ideal.span {(l : ℤ)}) := by
   haveI := w.isMaximal
   have hp : (Ideal.span {(l : ℤ)}).IsMaximal := by
     refine PrincipalIdealRing.isMaximal_of_irreducible ?_
@@ -160,10 +165,12 @@ theorem liesOver (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal) : w.asIdeal.LiesOver 
   rw [Ideal.span_singleton_le_iff_mem, Ideal.mem_comap]
   simpa using hl
 
-theorem norm_data (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal) :
-    ∃ φ : ℚ_[l] →+* w.adicCompletion F, (∀ (τ : Emb l w) (c : ℚ_[l]), τ.1 (φ c) = algebraMap ℚ_[l] (Qbar l) c) ∧
-      Nonempty (Emb l w) ∧ Finite (Emb l w) ∧
-      ∀ z : w.adicCompletion F, ∃ c : ℚ_[l], ∏ᶠ τ : Emb l w, τ.1 z = algebraMap ℚ_[l] (Qbar l) c := by
+theorem norm_data (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal)
+    : ∃ φ : ℚ_[l] →+* w.adicCompletion F,
+      (∀ (τ : Emb l w) (c : ℚ_[l]), τ.1 (φ c) = algebraMap ℚ_[l] (Qbar l) c) ∧ Nonempty (Emb l w)
+        ∧ Finite (Emb l w)
+        ∧ ∀ z : w.adicCompletion F, ∃ c : ℚ_[l],
+          ∏ᶠ τ : Emb l w, τ.1 z = algebraMap ℚ_[l] (Qbar l) c := by
   haveI := liesOver hl
   obtain ⟨-, φ, -, hφ, -⟩ := KStar.Ram.existsUnique_padic_hom w l
   letI : Algebra ℚ_[l] (w.adicCompletion F) := φ.toAlgebra
@@ -171,19 +178,24 @@ theorem norm_data (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal) :
   haveI : FiniteDimensional ℚ_[l] (w.adicCompletion F) := (KStar.Ram.finrank_compl w l).1
   haveI : CharZero (w.adicCompletion F) := φ.charZero_iff φ.injective |>.1 inferInstance
   have hcomp : ∀ (τ : Emb l w) (c : ℚ_[l]), τ.1 (φ c) = algebraMap ℚ_[l] (Qbar l) c := fun τ c => by
-    have := (Padic.denseRange_ratCast l).equalizer (g := fun x => τ.1 (φ x)) (h := algebraMap ℚ_[l] (Qbar l))
-      (τ.2.comp hφ) (continuous_algebraMap _ _) (by
-        funext q
-        simp only [Function.comp_apply, map_ratCast])
+    have :=
+      (Padic.denseRange_ratCast l).equalizer
+        (g := fun x => τ.1 (φ x))
+        (h := algebraMap ℚ_[l] (Qbar l)) (τ.2.comp hφ) (continuous_algebraMap _ _)
+        (by
+          funext q
+          simp only [Function.comp_apply, map_ratCast])
     exact congrFun this c
   have hc : ∀ σ : w.adicCompletion F →ₐ[ℚ_[l]] Qbar l, Continuous σ := fun σ =>
     LinearMap.continuous_of_finiteDimensional σ.toLinearMap
-  let e : (w.adicCompletion F →ₐ[ℚ_[l]] Qbar l) ≃ Emb l w :=
-    { toFun := fun σ => ⟨σ, hc σ⟩
-      invFun := fun τ => { τ.1 with commutes' := hcomp τ }
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
-  refine ⟨φ, hcomp, ⟨e (IsAlgClosed.lift)⟩, Finite.of_equiv _ e, fun z => ⟨Algebra.norm ℚ_[l] z, ?_⟩⟩
+  let e : (w.adicCompletion F →ₐ[ℚ_[l]] Qbar l) ≃ Emb l w := {
+    toFun := fun σ => ⟨σ, hc σ⟩
+    invFun := fun τ => { τ.1 with commutes' := hcomp τ }
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
+  refine
+    ⟨φ, hcomp, ⟨e (IsAlgClosed.lift)⟩, Finite.of_equiv _ e, fun z => ⟨Algebra.norm ℚ_[l] z, ?_⟩⟩
   rw [Algebra.norm_eq_prod_embeddings ℚ_[l] (Qbar l) z, ← finprod_eq_prod_of_fintype,
     ← finprod_comp_equiv e]
   rfl
@@ -207,20 +219,27 @@ theorem norm_eq_one_of_near {u : Qbar l} (h : ‖u - 1‖ ≤ ((l : ℝ)⁻¹) ^
     · exact absurd h4 (not_le.2 h1)
   exact le_antisymm (norm_le_one_of_near ball_le h) h3
 
-theorem exists_unit (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal) (x : 𝓞 F) (τ₁ τ₂ : Emb l w)
-    (hne : τ₁.1 (algebraMap F (w.adicCompletion F) (x : F)) ≠ τ₂.1 (algebraMap F (w.adicCompletion F) (x : F))) :
-    ∃ y : (w.adicCompletion F)ˣ, Valued.v (y : w.adicCompletion F) = 1 ∧
-      ∏ᶠ τ : Emb l w, τ.1 (y : w.adicCompletion F) = 1 ∧
-      ∀ (τ : Emb l w) (m : ℕ), 0 < m → τ.1 (y : w.adicCompletion F) ^ m ≠ 1 := by
+theorem exists_unit
+    (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal)
+    (x : 𝓞 F) (τ₁ τ₂ : Emb l w)
+    (hne : τ₁.1 (algebraMap F (w.adicCompletion F) (x : F))
+      ≠ τ₂.1 (algebraMap F (w.adicCompletion F) (x : F)))
+    : ∃ y : (w.adicCompletion F)ˣ,
+      Valued.v (y : w.adicCompletion F) = 1 ∧ ∏ᶠ τ : Emb l w, τ.1 (y : w.adicCompletion F) = 1
+        ∧ ∀ (τ : Emb l w) (m : ℕ), 0 < m → τ.1 (y : w.adicCompletion F) ^ m ≠ 1 := by
   obtain ⟨φ, hφ, ⟨τ₀⟩, hfin, hN⟩ := norm_data hl
   haveI := hfin
   letI := Fintype.ofFinite (Emb l w)
-  obtain ⟨z, hze⟩ : ∃ z : w.adicCompletion F, z = 1 + (l : w.adicCompletion F) ^ 2 * algebraMap F _ (x : F) := ⟨_, rfl⟩
+  obtain ⟨z, hze⟩
+      : ∃ z : w.adicCompletion F, z = 1 + (l : w.adicCompletion F) ^ 2 * algebraMap F _ (x : F) :=
+    ⟨_, rfl⟩
   have hlnorm : ‖((l : ℕ) : Qbar l)‖ = (l : ℝ)⁻¹ := by
     have e : ((l : ℕ) : Qbar l) = algebraMap ℚ_[l] (Qbar l) ((l : ℕ) : ℚ_[l]) := by simp
     rw [e, norm_algebraMap', Padic.norm_p]
   have hz : ∀ τ : Emb l w, ‖τ.1 z - 1‖ ≤ ((l : ℝ)⁻¹) ^ 2 := fun τ => by
-    have e : τ.1 z - 1 = ((l : ℕ) : Qbar l) ^ 2 * (τ.1.comp (algebraMap F (w.adicCompletion F))) (x : F) := by
+    have e
+        : τ.1 z - 1
+          = ((l : ℕ) : Qbar l) ^ 2 * (τ.1.comp (algebraMap F (w.adicCompletion F))) (x : F) := by
       rw [hze]
       simp
     rw [e, norm_mul, norm_pow, hlnorm]
@@ -242,7 +261,9 @@ theorem exists_unit (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal) (x : 𝓞 F) (τ�
   have hdpos : 0 < d := by
     rw [hd]
     exact Fintype.card_pos_iff.2 ⟨τ₀⟩
-  have hy : ∀ τ : Emb l w, τ.1 (z ^ d * (φ c)⁻¹) = τ.1 z ^ d * (algebraMap ℚ_[l] (Qbar l) c)⁻¹ := fun τ => by
+  have hy
+      : ∀ τ : Emb l w,
+        τ.1 (z ^ d * (φ c)⁻¹) = τ.1 z ^ d * (algebraMap ℚ_[l] (Qbar l) c)⁻¹ := fun τ => by
     rw [map_mul, map_pow, map_inv₀, hφ]
   have hy0 : z ^ d * (φ c)⁻¹ ≠ 0 := mul_ne_zero (pow_ne_zero _ hz0) (inv_ne_zero hφ0)
   refine ⟨Units.mk0 _ hy0, ?_, ?_, fun τ m hm e => ?_⟩
@@ -251,8 +272,8 @@ theorem exists_unit (hl : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal) (x : 𝓞 F) (τ�
     simp
   · rw [Units.val_mk0, finprod_eq_prod_of_fintype]
     simp only [hy]
-    rw [Finset.prod_mul_distrib, Finset.prod_pow, ← hc, Finset.prod_const, Finset.card_univ, ← hd, ← mul_pow,
-      mul_inv_cancel₀ (by rw [hc]; exact hc0), one_pow]
+    rw [Finset.prod_mul_distrib, Finset.prod_pow, ← hc, Finset.prod_const, Finset.card_univ, ← hd,
+      ← mul_pow, mul_inv_cancel₀ (by rw [hc]; exact hc0), one_pow]
   · have hy1 : (z ^ d * (φ c)⁻¹) ^ m = 1 := τ.1.injective (by rw [map_pow, map_one]; simpa using e)
     rw [mul_pow, inv_pow, mul_inv_eq_one₀ (pow_ne_zero _ hφ0), ← pow_mul] at hy1
     have h1 : ∀ τ : Emb l w, τ.1 z ^ (d * m) = algebraMap ℚ_[l] (Qbar l) c ^ m := fun τ => by
@@ -281,16 +302,21 @@ end Unit
 
 section Sep
 
-variable {L Ω : Type} [Field L] [NumberField L] [Field Ω] [CharZero Ω] [Algebra L Ω] {l : ℕ} [Fact l.Prime]
+variable
+  {L Ω : Type} [Field L] [NumberField L] [Field Ω] [CharZero Ω] [Algebra L Ω] {l : ℕ} [Fact l.Prime]
 
-theorem exists_sep [Normal ℚ L] {A : ValuationSubring Ω} {w : Plc L} (h : IsPlaceOver A w)
-    (hl : ((l : ℕ) : 𝓞 L) ∈ w.asIdeal) (g : G ℚ Ω) (hg : g ∈ Dec (F := ℚ) A) (x : L)
-    (hx : g (algebraMap L Ω x) ≠ algebraMap L Ω x) :
-    ∃ (b : 𝓞 L) (τ₁ τ₂ : Emb l w), τ₁.1 (algebraMap L (w.adicCompletion L) (b : L)) ≠
-      τ₂.1 (algebraMap L (w.adicCompletion L) (b : L)) := by
+theorem exists_sep
+    [Normal ℚ L]
+    {A : ValuationSubring Ω} {w : Plc L} (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 L) ∈ w.asIdeal)
+    (g : G ℚ Ω) (hg : g ∈ Dec (F := ℚ) A)
+    (x : L) (hx : g (algebraMap L Ω x) ≠ algebraMap L Ω x)
+    : ∃ (b : 𝓞 L) (τ₁ τ₂ : Emb l w),
+      τ₁.1 (algebraMap L (w.adicCompletion L) (b : L))
+        ≠ τ₂.1 (algebraMap L (w.adicCompletion L) (b : L)) := by
   obtain ⟨-, -, ⟨τ₀⟩, -, -⟩ := norm_data hl
   let g' : L ≃ₐ[ℚ] L := g.restrictNormal L
-  have hg' : ∀ y : L, algebraMap L Ω (g' y) = g (algebraMap L Ω y) := fun y => g.restrictNormal_commutes L y
+  have hg' : ∀ y : L, algebraMap L Ω (g' y) = g (algebraMap L Ω y) := fun y =>
+    g.restrictNormal_commutes L y
   obtain ⟨b, hb⟩ : ∃ b : 𝓞 L, g' (b : L) ≠ (b : L) := by
     by_contra hcon
     push_neg at hcon

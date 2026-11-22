@@ -116,30 +116,42 @@ private lemma inner_eq_polarization (w w' : H) :
   simp only [Complex.I_sq, Complex.I_pow_three]
   ring
 
-
 open MeasureTheory in
 open scoped InnerProductSpace in
-theorem _root_.GlobalTheory.polarised_schur_relations :
-    ∀ (G : Type) [Group G] [MeasurableSpace G] (μ : Measure G) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : G →* (H →L[ℂ] H)) (d : ℝ), (∀ x y : H, AEStronglyMeasurable (fun g => ⟪y, σ g x⟫_ℂ) μ) → (∀ x y : H, Integrable (fun g => ‖⟪y, σ g x⟫_ℂ‖ ^ 2) μ ∧ ∫ g, ‖⟪y, σ g x⟫_ℂ‖ ^ 2 ∂μ = ‖x‖ ^ 2 * ‖y‖ ^ 2 / d) → ∀ v w v' w' : H, Integrable (fun g => ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ) μ ∧ ∫ g, ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ) := by
+theorem _root_.GlobalTheory.polarised_schur_relations
+    : ∀ (G : Type) [Group G] [MeasurableSpace G] (μ : Measure G) (H : Type) [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H] [CompleteSpace H] (σ : G →* (H →L[ℂ] H)) (d : ℝ),
+      (∀ x y : H, AEStronglyMeasurable (fun g => ⟪y, σ g x⟫_ℂ) μ)
+        → (∀ x y : H,
+          Integrable (fun g => ‖⟪y, σ g x⟫_ℂ‖ ^ 2) μ
+            ∧ ∫ g, ‖⟪y, σ g x⟫_ℂ‖ ^ 2 ∂μ = ‖x‖ ^ 2 * ‖y‖ ^ 2 / d)
+        → ∀ v w v' w' : H,
+          Integrable (fun g => ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ) μ
+            ∧ ∫ g, ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ) := by
   intro G _ _ μ H _ _ _ σ d hmeas hsq v w v' w'
   have hint := integrable_matrixCoeff_mul_star hmeas (fun x y => (hsq x y).1)
   have hone := integral_matrixCoeff_mul_star_same_left hmeas hsq
   refine ⟨hint v w v' w', ?_⟩
-  have hpt : ∀ g, ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ =
-      (1 / 4 : ℂ) * (⟪w + w', σ g v⟫_ℂ * star ⟪w + w', σ g v'⟫_ℂ
-        - ⟪w - w', σ g v⟫_ℂ * star ⟪w - w', σ g v'⟫_ℂ
-        - Complex.I * (⟪w + Complex.I • w', σ g v⟫_ℂ * star ⟪w + Complex.I • w', σ g v'⟫_ℂ)
-        + Complex.I * (⟪w - Complex.I • w', σ g v⟫_ℂ * star ⟪w - Complex.I • w', σ g v'⟫_ℂ)) := by
+  have hpt
+      : ∀ g,
+        ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ
+          = (1 / 4 : ℂ)
+            * (⟪w + w', σ g v⟫_ℂ * star ⟪w + w', σ g v'⟫_ℂ
+              - ⟪w - w', σ g v⟫_ℂ * star ⟪w - w', σ g v'⟫_ℂ
+              - Complex.I * (⟪w + Complex.I • w', σ g v⟫_ℂ * star ⟪w + Complex.I • w', σ g v'⟫_ℂ)
+              + Complex.I
+                * (⟪w - Complex.I • w', σ g v⟫_ℂ * star ⟪w - Complex.I • w', σ g v'⟫_ℂ)) := by
     intro g
-    rw [Complex.star_def, mul_conj_eq_polarization_four ⟪w, σ g v⟫_ℂ ⟪w', σ g v⟫_ℂ
-      ⟪w, σ g v'⟫_ℂ ⟪w', σ g v'⟫_ℂ]
+    rw [Complex.star_def,
+      mul_conj_eq_polarization_four ⟪w, σ g v⟫_ℂ ⟪w', σ g v⟫_ℂ ⟪w, σ g v'⟫_ℂ ⟪w', σ g v'⟫_ℂ]
     simp only [inner_add_left, inner_sub_left, inner_smul_left, Complex.conj_I, Complex.star_def,
       neg_mul, ← sub_eq_add_neg, sub_neg_eq_add]
-  rw [integral_congr_ae (Filter.Eventually.of_forall hpt), integral_const_mul,
-    integral_add, integral_sub, integral_sub, integral_const_mul, integral_const_mul,
-    hone, hone, hone, hone, inner_eq_polarization w w']
+  rw [integral_congr_ae (Filter.Eventually.of_forall hpt), integral_const_mul, integral_add,
+    integral_sub, integral_sub, integral_const_mul, integral_const_mul, hone, hone, hone, hone,
+    inner_eq_polarization w w']
   · ring
-  all_goals first
+  all_goals
+    first
     | exact hint _ _ _ _
     | exact (hint _ _ _ _).const_mul _
     | exact (hint _ _ _ _).sub (hint _ _ _ _)

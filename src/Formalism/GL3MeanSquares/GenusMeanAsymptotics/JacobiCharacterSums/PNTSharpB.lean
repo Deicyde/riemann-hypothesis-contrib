@@ -107,23 +107,24 @@ lemma sharp_term {N : ℕ} (χ : DirichletCharacter ℂ N) {y u : ℝ} (hy : 1 �
     _ = Λ n := by ring
     _ ≤ Real.log u := hΛ
 
-theorem sharp_arith {N : ℕ} (χ : DirichletCharacter ℂ N) {y u : ℝ} (hy : 1 ≤ y) (hu : y < u) :
-    ‖((y * u / (u - y) : ℝ) : ℂ) * (Formalism.ZeroFreeDirichlet.Schi χ u / (u : ℂ) - Formalism.ZeroFreeDirichlet.Schi χ y / (y : ℂ)) - psiChi χ y‖ ≤
-      (u - y + 1) * Real.log u := by
+theorem sharp_arith {N : ℕ} (χ : DirichletCharacter ℂ N) {y u : ℝ} (hy : 1 ≤ y) (hu : y < u)
+    : ‖((y * u / (u - y) : ℝ) : ℂ) * (Formalism.ZeroFreeDirichlet.Schi χ u / (u : ℂ) - Formalism.ZeroFreeDirichlet.Schi χ y / (y : ℂ)) - psiChi χ y‖
+      ≤ (u - y + 1) * Real.log u := by
   rw [sharp_identity χ hy hu]
   have hu1 : 1 ≤ u := by linarith
   have hlog : 0 ≤ Real.log u := Real.log_nonneg hu1
-  calc _ ≤ ∑ n ∈ Ioc ⌊y⌋₊ ⌊u⌋₊, ‖((Λ n : ℝ) : ℂ) * χ (n : ZMod N) *
-          ((y * u / (u - y) * (1 / n - 1 / u) : ℝ) : ℂ)‖ := norm_sum_le _ _
+  calc
+    _ ≤ ∑ n ∈ Ioc ⌊y⌋₊ ⌊u⌋₊, ‖((Λ n : ℝ) : ℂ) * χ (n : ZMod N) *
+        ((y * u / (u - y) * (1 / n - 1 / u) : ℝ) : ℂ)‖ :=
+      norm_sum_le _ _
     _ ≤ ∑ _n ∈ Ioc ⌊y⌋₊ ⌊u⌋₊, Real.log u := Finset.sum_le_sum (fun n hn => sharp_term χ hy hu hn)
-    _ = ((⌊u⌋₊ - ⌊y⌋₊ : ℕ) : ℝ) * Real.log u := by
-        rw [Finset.sum_const, Nat.card_Ioc, nsmul_eq_mul]
+    _ = ((⌊u⌋₊ - ⌊y⌋₊ : ℕ) : ℝ) * Real.log u := by rw [Finset.sum_const, Nat.card_Ioc, nsmul_eq_mul]
     _ ≤ (u - y + 1) * Real.log u := by
-        apply mul_le_mul_of_nonneg_right _ hlog
-        have h1 : (⌊u⌋₊ : ℝ) ≤ u := Nat.floor_le (by linarith)
-        have h2 : y < ⌊y⌋₊ + 1 := Nat.lt_floor_add_one y
-        have h3 : ⌊y⌋₊ ≤ ⌊u⌋₊ := Nat.floor_mono hu.le
-        rw [Nat.cast_sub h3]
-        linarith
+      apply mul_le_mul_of_nonneg_right _ hlog
+      have h1 : (⌊u⌋₊ : ℝ) ≤ u := Nat.floor_le (by linarith)
+      have h2 : y < ⌊y⌋₊ + 1 := Nat.lt_floor_add_one y
+      have h3 : ⌊y⌋₊ ≤ ⌊u⌋₊ := Nat.floor_mono hu.le
+      rw [Nat.cast_sub h3]
+      linarith
 
 end Formalism.HermitianLattices.Ext.PrimesInProgressions

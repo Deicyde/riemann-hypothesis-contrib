@@ -10,10 +10,11 @@ namespace GlobalTheory.CompanionTheory.Ar.Crv.Chain
 
 open GlobalTheory.CompanionTheory.Ar.Crv
 
-theorem abel_bound (ν v : ℕ → ℝ) (P : ℝ) (n : ℕ) (hn : 1 ≤ n)
-    (hν : ∀ i, 1 ≤ i → i < n → ν (i + 1) ≤ ν i) (hv : ∀ i, i ≤ n → v i ≤ P) :
-    ∑ i ∈ Finset.range n, ν (i + 1) * (v (i + 1) - v i) ≤
-      ν n * v n - ν 1 * v 0 + P * (ν 1 - ν n) := by
+theorem abel_bound
+    (ν v : ℕ → ℝ) (P : ℝ) (n : ℕ)
+    (hn : 1 ≤ n) (hν : ∀ i, 1 ≤ i → i < n → ν (i + 1) ≤ ν i) (hv : ∀ i, i ≤ n → v i ≤ P)
+    : ∑ i ∈ Finset.range n, ν (i + 1) * (v (i + 1) - v i)
+      ≤ ν n * v n - ν 1 * v 0 + P * (ν 1 - ν n) := by
   induction n, hn using Nat.le_induction with
   | base => simp; linarith
   | succ n hn ih =>
@@ -23,7 +24,12 @@ theorem abel_bound (ν v : ℕ → ℝ) (P : ℝ) (n : ℕ) (hn : 1 ≤ n)
     have h3 := hv n (by omega)
     nlinarith [mul_nonneg (sub_nonneg.2 h2) (sub_nonneg.2 h3)]
 
-theorem lmuNum_nonneg : ∀ (T : Type) [Fintype T] (p j q : ℕ) (μ w l : T → ℕ → ℝ) (P e : ℝ), 2 < p → 1 ≤ j → 1 ≤ q → GapCond p j q μ → (∀ τ, w τ 0 = 0) → (∀ τ, l τ 0 = 0) → (∀ τ i, i ≤ j → w τ i ≤ P) → (∀ τ i, i ≤ q → l τ i ≤ P) → (∀ τ, w τ j = l τ q) → e = -2 * ∑ τ, w τ j → ((p : ℝ) - 2) * P ≤ e → 0 ≤ e → 0 ≤ lmuNum j q μ w l := by
+theorem lmuNum_nonneg
+    : ∀ (T : Type) [Fintype T] (p j q : ℕ) (μ w l : T → ℕ → ℝ) (P e : ℝ),
+      2 < p → 1 ≤ j → 1 ≤ q → GapCond p j q μ → (∀ τ, w τ 0 = 0) → (∀ τ, l τ 0 = 0)
+        → (∀ τ i, i ≤ j → w τ i ≤ P) → (∀ τ i, i ≤ q → l τ i ≤ P) → (∀ τ, w τ j = l τ q)
+        → e = -2 * ∑ τ, w τ j → ((p : ℝ) - 2) * P ≤ e → 0 ≤ e
+        → 0 ≤ lmuNum j q μ w l := by
   intro T _ p j q μ w l P e hp hj hq hgap hw0 hl0 hw hl hwl he hPe he0
   obtain ⟨hdom, M, g, hM, hg, hpg⟩ := hgap
   rcases isEmpty_or_nonempty T with hT | ⟨⟨τ₀⟩⟩
@@ -39,17 +45,26 @@ theorem lmuNum_nonneg : ∀ (T : Type) [Fintype T] (p j q : ℕ) (μ w l : T →
     by_contra h
     push Not at h
     nlinarith [mul_pos hp' (neg_pos.2 h)]
-  have key : ∀ τ, (∑ i ∈ Finset.range j, μ τ (i + 1) * (w τ (i + 1) - w τ i)) +
-      ∑ m ∈ Finset.range q, μ τ (j + m + 1) * (l τ (q - m - 1) - l τ (q - m)) ≤
-      g * w τ j + 2 * M * P := by
+  have key
+      : ∀ τ,
+        (∑ i ∈ Finset.range j, μ τ (i + 1) * (w τ (i + 1) - w τ i))
+            + ∑ m ∈ Finset.range q, μ τ (j + m + 1) * (l τ (q - m - 1) - l τ (q - m))
+          ≤ g * w τ j + 2 * M * P := by
     intro τ
     have hA := abel_bound (μ τ) (w τ) P j hj (fun i h h' => hdom τ i h (by omega)) (hw τ)
-    have hB := abel_bound (fun i => μ τ (j + i)) (fun m => l τ (q - m)) P q hq
-      (fun i h h' => hdom τ (j + i) (by omega) (by omega)) (fun i _ => hl τ _ (by omega))
+    have hB :=
+      abel_bound
+        (fun i => μ τ (j + i))
+        (fun m => l τ (q - m))
+        P q hq
+        (fun i h h' => hdom τ (j + i) (by omega) (by omega))
+        (fun i _ => hl τ _ (by omega))
     simp only [Nat.sub_self, Nat.sub_zero, hl0, ← hwl τ] at hB
     rw [hw0] at hA
-    have e1 : ∑ m ∈ Finset.range q, μ τ (j + m + 1) * (l τ (q - m - 1) - l τ (q - m)) =
-        ∑ m ∈ Finset.range q, μ τ (j + (m + 1)) * (l τ (q - (m + 1)) - l τ (q - m)) := rfl
+    have e1
+        : ∑ m ∈ Finset.range q, μ τ (j + m + 1) * (l τ (q - m - 1) - l τ (q - m))
+          = ∑ m ∈ Finset.range q, μ τ (j + (m + 1)) * (l τ (q - (m + 1)) - l τ (q - m)) :=
+      rfl
     rw [e1]
     have h1 := abs_le.1 (hM τ 1 le_rfl (by omega))
     have h2 := abs_le.1 (hM τ (j + q) (by omega) le_rfl)

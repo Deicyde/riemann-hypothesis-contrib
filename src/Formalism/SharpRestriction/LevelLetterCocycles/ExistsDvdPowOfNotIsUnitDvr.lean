@@ -8,21 +8,27 @@ noncomputable section
 
 namespace Formalism.MainNotions.UnusedSlot80.InvW
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80 Formalism.MainNotions.N.Ln03
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80
+  Formalism.MainNotions.N.Ln03
 
 section LevRatPf
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
-theorem exists_dvd_pow_of_not_isUnit_dvr [IsDomain O] [IsDiscreteValuationRing O] (p : O) (hp0 : p ≠ 0) (hpu : ¬ IsUnit p)
-    {y : O} (hy : y ≠ 0) : ∃ (κ : ℕ) (z : O), p ^ κ = y * z := by
+theorem exists_dvd_pow_of_not_isUnit_dvr
+    [IsDomain O] [IsDiscreteValuationRing O]
+    (p : O) (hp0 : p ≠ 0) (hpu : ¬ IsUnit p)
+    {y : O} (hy : y ≠ 0)
+    : ∃ (κ : ℕ) (z : O), p ^ κ = y * z := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨m, u, hyu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hy hϖ
   obtain ⟨e, u', hpe⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hp0 hϖ
@@ -40,10 +46,15 @@ theorem exists_dvd_pow_of_not_isUnit_dvr [IsDomain O] [IsDiscreteValuationRing O
 
 variable [IsDomain O] [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
 
-theorem levRatPf_ev (W : LocWach PD LL O v n) (hR : ToolsR.RingP W) (hT : Formalism.MainNotions.WachCoordinates.ToolsAlg W)
-    (hpu : ¬ IsUnit ((PD.p : ℕ) : O)) (a : ZMod n) (s : ℕ) (hB : LevBasics W a s) (g : LetA O n) :
-    ∃ r : Polynomial O, r.degree < ((PD.p - 1) * PD.p ^ s : ℕ) ∧
-      ∀ ζ : Rs hB.F PD.p s, hB.ev ζ g = Polynomial.aeval ((ζ : hB.F) - 1) r := by
+theorem levRatPf_ev
+    (W : LocWach PD LL O v n)
+    (hR : ToolsR.RingP W) (hT : Formalism.MainNotions.WachCoordinates.ToolsAlg W)
+    (hpu : ¬ IsUnit ((PD.p : ℕ) : O))
+    (a : ZMod n) (s : ℕ) (hB : LevBasics W a s)
+    (g : LetA O n)
+    : ∃ r : Polynomial O,
+      r.degree < ((PD.p - 1) * PD.p ^ s : ℕ)
+        ∧ ∀ ζ : Rs hB.F PD.p s, hB.ev ζ g = Polynomial.aeval ((ζ : hB.F) - 1) r := by
   obtain ⟨H, r, hdeg, heq⟩ := wdiv_ps W hR hT hpu a s (g a)
   refine ⟨r, hdeg, fun ζ => ?_⟩
   set wH : LetA O n := Pi.single a H with hwH
@@ -52,7 +63,8 @@ theorem levRatPf_ev (W : LocWach PD LL O v n) (hR : ToolsR.RingP W) (hT : Formal
     show (r : PowerSeries O) = Pi.evalAlgHom O (fun _ : ZMod n => PowerSeries O) i (Polynomial.aeval letπ r)
     rw [← Polynomial.aeval_algHom_apply]
     exact (aeval_X_coe r).symm
-  have key : (letE a : LetA O n) * g = ps W s * wH + letE a * Polynomial.aeval (letπ : LetA O n) r := by
+  have key
+      : (letE a : LetA O n) * g = ps W s * wH + letE a * Polynomial.aeval (letπ : LetA O n) r := by
     rw [← hRr]
     funext i
     by_cases hi : i = a
@@ -60,18 +72,25 @@ theorem levRatPf_ev (W : LocWach PD LL O v n) (hR : ToolsR.RingP W) (hT : Formal
       simp only [Pi.mul_apply, Pi.add_apply, hwH, letE, Pi.single_eq_same, one_mul, heq]
     · simp [Pi.mul_apply, Pi.add_apply, hwH, letE, Pi.single_eq_of_ne hi]
   have h1 := congrArg (hB.ev ζ) key
-  rw [map_mul, hB.ev_letE, one_mul, map_add (f := _), map_mul, hB.ev_ps, zero_mul, zero_add, map_mul,
-    hB.ev_letE, one_mul, ev_aeval hB] at h1
+  rw [map_mul, hB.ev_letE, one_mul, map_add (f := _), map_mul, hB.ev_ps, zero_mul, zero_add,
+      map_mul, hB.ev_letE, one_mul, ev_aeval hB]
+    at h1
   exact h1
 
-theorem levRat_of [IsDiscreteValuationRing O] (W : LocWach PD LL O v n) (hR : ToolsR.RingP W)
-    (hT : Formalism.MainNotions.WachCoordinates.ToolsAlg W) (hpu : ¬ IsUnit ((PD.p : ℕ) : O)) (a : ZMod n) (s : ℕ)
-    (hB : LevBasics W a s) : LevRat W a s hB.F hB.ev := by
+theorem levRat_of
+    [IsDiscreteValuationRing O]
+    (W : LocWach PD LL O v n)
+    (hR : ToolsR.RingP W) (hT : Formalism.MainNotions.WachCoordinates.ToolsAlg W)
+    (hpu : ¬ IsUnit ((PD.p : ℕ) : O))
+    (a : ZMod n) (s : ℕ) (hB : LevBasics W a s)
+    : LevRat W a s hB.F hB.ev := by
   intro g _ d _ hd c hc
   obtain ⟨rg, hgdeg, hg⟩ := levRatPf_ev W hR hT hpu a s hB g
   obtain ⟨rd, hddeg, hdv⟩ := levRatPf_ev W hR hT hpu a s hB d
-  have hN : ∀ r : Polynomial O, r.degree < ((PD.p - 1) * PD.p ^ s : ℕ) →
-      (r.map (algebraMap O hB.F)).natDegree < (PD.p - 1) * PD.p ^ s := by
+  have hN
+      : ∀ r : Polynomial O,
+        r.degree < ((PD.p - 1) * PD.p ^ s : ℕ)
+          → (r.map (algebraMap O hB.F)).natDegree < (PD.p - 1) * PD.p ^ s := by
     intro r hr
     have hNpos : 0 < (PD.p - 1) * PD.p ^ s :=
       Nat.mul_pos (by have := PD.hp.two_le; omega) (pow_pos PD.hp.pos _)
@@ -86,7 +105,8 @@ theorem levRat_of [IsDiscreteValuationRing O] (W : LocWach PD LL O v n) (hR : To
       exact lt_of_le_of_lt (Polynomial.natDegree_C_mul_le _ _) (hN rd hddeg)
     · intro ζ
       rw [hRdef, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_map,
-        Polynomial.eval_map, ← Polynomial.aeval_def, ← Polynomial.aeval_def, ← hg ζ, ← hdv ζ, hc ζ, sub_self]
+        Polynomial.eval_map, ← Polynomial.aeval_def, ← Polynomial.aeval_def, ← hg ζ, ← hdv ζ, hc ζ,
+        sub_self]
   have hne : Nonempty (Rs hB.F PD.p s) := by
     rw [← Fintype.card_pos_iff, card_Rs hB]
     exact Nat.mul_pos (by have := PD.hp.two_le; omega) (pow_pos PD.hp.pos _)
@@ -102,7 +122,8 @@ theorem levRat_of [IsDiscreteValuationRing O] (W : LocWach PD LL O v n) (hR : To
   have hck : algebraMap O hB.F (rg.coeff k) = c * algebraMap O hB.F (rd.coeff k) := by
     have := congrArg (fun P : Polynomial hB.F => P.coeff k) hR0
     simp only [hRdef, Polynomial.coeff_sub, Polynomial.coeff_C_mul, Polynomial.coeff_map,
-      Polynomial.coeff_zero] at this
+        Polynomial.coeff_zero]
+      at this
     exact sub_eq_zero.1 this
   have hp0 : ((PD.p : ℕ) : O) ≠ 0 := by
     intro h

@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 
 private lemma kun_lof {k : Type} [Field k] (l : ℕ) [Fact l.Prime] {X : Scheme.{0}} (p : X ⟶ S k)
@@ -14,8 +15,7 @@ private lemma kun_lof {k : Type} [Field k] (l : ℕ) [Fact l.Prime] {X : Scheme.
       ext2 l p h u v := by
   simp [kun, DirectSum.toModule_lof, TensorProduct.lift.tmul, LinearMap.compl₁₂_apply]
 
-theorem UpperTheory.Gal.KunnethLefschetz.kunL_holds :
-    UpperTheory.Gal.KunnethLefschetz.KunL := by
+theorem UpperTheory.Gal.KunnethLefschetz.kunL_holds : UpperTheory.Gal.KunnethLefschetz.KunL := by
   intro l _ k _ d X p hb
   refine ⟨fun n => ?_, fun lam m n h => ?_⟩
   · rw [eq_top_iff]
@@ -36,17 +36,26 @@ theorem UpperTheory.Gal.KunnethLefschetz.kunL_holds :
       rw [map_add (f := _)]
       exact Submodule.add_mem _ hx hy
   · let e := LinearEquiv.ofBijective (kun l p p n) (hb n)
-    have he : ∀ a (ha : a + (n - a) = n) (u : V l X a) (v : V l X (n - a)),
-        e.symm (ext2 l p ha u v) = DirectSum.lof ℚ_[l] ℤ (fun i => V l X i ⊗[ℚ_[l]] V l X (n - i)) a (u ⊗ₜ v) := by
+    have he
+        : ∀ a (ha : a + (n - a) = n) (u : V l X a) (v : V l X (n - a)),
+          e.symm (ext2 l p ha u v)
+            = DirectSum.lof ℚ_[l] ℤ (fun i => V l X i ⊗[ℚ_[l]] V l X (n - i)) a (u ⊗ₜ v) := by
       intro a ha u v
       rw [LinearEquiv.symm_apply_eq, LinearEquiv.ofBijective_apply, kun_lof]
-    refine ⟨(DirectSum.toModule ℚ_[l] ℤ (V l X m) (fun i =>
-        if hi : i = 2 * (d : ℤ) then
-          TensorProduct.lift ((LinearMap.lsmul ℚ_[l] (V l X m)).compl₁₂
-            (Eq.rec (motive := fun j _ => V l X j →ₗ[ℚ_[l]] ℚ_[l]) lam hi.symm)
-            (Eq.rec (motive := fun j _ => V l X j →ₗ[ℚ_[l]] V l X m) LinearMap.id
-              (show m = n - i by omega)))
-        else 0)) ∘ₗ e.symm.toLinearMap, ?_, ?_⟩
+    refine ⟨
+      (DirectSum.toModule ℚ_[l] ℤ (V l X m) (fun i =>
+          if hi : i = 2 * (d : ℤ) then
+            TensorProduct.lift ((LinearMap.lsmul ℚ_[l] (V l X m)).compl₁₂
+              (Eq.rec (motive := fun j _ => V l X j →ₗ[ℚ_[l]] ℚ_[l]) lam hi.symm)
+              (Eq.rec
+                (motive := fun j _ => V l X j →ₗ[ℚ_[l]] V l X m)
+                LinearMap.id (show m = n - i by omega)))
+          else
+            0))
+        ∘ₗ e.symm.toLinearMap,
+      ?_,
+      ?_
+    ⟩
     · intro u v
       obtain rfl : m = n - 2 * (d : ℤ) := by omega
       simp only [LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply, he,

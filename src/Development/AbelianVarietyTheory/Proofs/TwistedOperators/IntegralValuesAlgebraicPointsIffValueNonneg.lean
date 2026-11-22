@@ -7,10 +7,14 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.BddG
 @[expose] public section
 
 open NumberField Matrix Complex IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level Host
 open GlobalTheory.SW hiding Level IsSB
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.IndefR.FWT Formalism.L2.Pj
 open Formalism.IndefR.NX (ExpSet CoefLat)
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
@@ -20,7 +24,11 @@ open GlobalTheory.Tow
 
 namespace GlobalTheory.TowVal
 
-theorem bddAll_one_iff_valSet_nonneg : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Geo.Tor.Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l), ∀ (la : HeightOneSpectrum (𝓞 c.F)) (f : Rul Xo c), GlobalTheory.GoodPts.BddAll Xo c la 1 f ↔ ∀ v ∈ valSet Xo c (algCls Xo c) la, 0 ≤ v f := by
+theorem bddAll_one_iff_valSet_nonneg
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Geo.Tor.Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l),
+      ∀ (la : HeightOneSpectrum (𝓞 c.F)) (f : Rul Xo c),
+        GlobalTheory.GoodPts.BddAll Xo c la 1 f ↔ ∀ v ∈ valSet Xo c (algCls Xo c) la, 0 ≤ v f := by
   intro E _ _ _ H Dw l Xo c la f
   constructor
   · rintro h _ ⟨⟨q, T, io, e, ho, y, hy, eta, heta, rfl⟩, rfl⟩

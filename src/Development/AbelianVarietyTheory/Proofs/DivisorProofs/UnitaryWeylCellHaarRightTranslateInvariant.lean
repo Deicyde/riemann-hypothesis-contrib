@@ -8,20 +8,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryWeylC
 
 @[expose] public section
 
-open MeasureTheory GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.SatakeBound GlobalTheory.WeylCell Formalism.UG GlobalTheory.WeylCell.WeylUnipotentShell
+open MeasureTheory GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.SatakeBound
+  GlobalTheory.WeylCell Formalism.UG GlobalTheory.WeylCell.WeylUnipotentShell
 
 namespace GlobalTheory.WeylCell.WeylUnipotentShell
 
-theorem cellU_haar_rightInv : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L] (ϖ : L)
-    (σ : L →+* L) (q : ℕ), IsUnramInv ϖ σ q →
-    ∀ (n : ℕ) (k : Fin (n / 2)), ¬ k.val + 1 < n / 2 → ¬ Even n →
-    ∀ y : GU σ n, y ∈ KU σ n → IsWeylRep (simpleU k) (y : GL (Fin n) L) →
-    ∀ [MeasurableSpace (cellU y)] [BorelSpace (cellU y)] (μ : Measure (cellU y)) [μ.IsHaarMeasure],
-      μ ((KU σ n).subgroupOf (cellU y)) = 1 →
-    ∀ p : cellU y,
-      (∀ F : GU σ n → ℂ, ∫ u : cellU y, F ((u * p : cellU y) : GU σ n) ∂μ = ∫ u : cellU y, F (u : GU σ n) ∂μ) ∧
-      (∀ F : GU σ n → ENNReal,
-        ∫⁻ u : cellU y, F ((u * p : cellU y) : GU σ n) ∂μ = ∫⁻ u : cellU y, F (u : GU σ n) ∂μ) := by
+theorem cellU_haar_rightInv
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L] (ϖ : L)
+        (σ : L →+* L) (q : ℕ),
+      IsUnramInv ϖ σ q
+        → ∀ (n : ℕ) (k : Fin (n / 2)),
+          ¬ k.val + 1 < n / 2 → ¬ Even n
+            → ∀ y : GU σ n,
+              y ∈ KU σ n → IsWeylRep (simpleU k) (y : GL (Fin n) L)
+                → ∀ [MeasurableSpace (cellU y)] [BorelSpace (cellU y)] (μ : Measure (cellU y))
+                    [μ.IsHaarMeasure],
+                  μ ((KU σ n).subgroupOf (cellU y)) = 1
+                    → ∀ p : cellU y,
+                      (∀ F : GU σ n → ℂ,
+                          ∫ u : cellU y, F ((u * p : cellU y) : GU σ n) ∂μ
+                            = ∫ u : cellU y, F (u : GU σ n) ∂μ)
+                        ∧ (∀ F : GU σ n → ENNReal,
+                          ∫⁻ u : cellU y, F ((u * p : cellU y) : GU σ n) ∂μ
+                            = ∫⁻ u : cellU y, F (u : GU σ n) ∂μ) := by
   intro L _ _ _ ϖ σ q hU n k hk hn y hy hw _ _ μ _ _ p
   have hS := GlobalTheory.T.unitaryWeylCellShell_isOpenCompactSubgroup L ϖ σ q hU n k hk hn y hy hw
   haveI : LocallyCompactSpace (cellU y) :=
@@ -54,10 +63,12 @@ theorem cellU_haar_rightInv : ∀ (L : Type) [Field L] [Valued L (WithZero (Mult
       simpa using hmul _ _ h (hinv p hp)
     · intro h; exact hmul _ _ h hp
   have hνμ : ν = μ := by
-    have := GlobalTheory.T.haarMeasure_unique_sigmaCompact_normalised_compactOpen (cellU y) μ ν (fun i : ℕ => shellU k y (i : ℤ))
-      (fun i => ⟨(hS.1 i).2.1, (hS.1 i).1.measurableSet⟩)
-      (Set.eq_univ_of_forall fun u => Set.mem_iUnion.2 ⟨_, mem_shellU_depth k y u⟩)
-      _ 1 ho hc ⟨1, h1⟩ hνS
+    have :=
+      GlobalTheory.T.haarMeasure_unique_sigmaCompact_normalised_compactOpen (cellU y) μ ν
+        (fun i : ℕ => shellU k y (i : ℤ))
+        (fun i => ⟨(hS.1 i).2.1, (hS.1 i).1.measurableSet⟩)
+        (Set.eq_univ_of_forall fun u => Set.mem_iUnion.2 ⟨_, mem_shellU_depth k y u⟩) _ 1 ho hc
+        ⟨1, h1⟩ hνS
     rwa [one_smul] at this
   have hmp : MeasurePreserving e μ μ := ⟨e.measurable, hνμ⟩
   refine ⟨fun F => ?_, fun F => ?_⟩

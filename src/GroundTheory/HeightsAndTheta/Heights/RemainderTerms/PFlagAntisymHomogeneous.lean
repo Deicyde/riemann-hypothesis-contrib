@@ -15,8 +15,9 @@ open MvPolynomial
 
 theorem FlagAntisymHomogeneous.proof : FlagAntisymHomogeneous.Statement := by
   intro f N H d hH
-  have hmem : ∀ w : Fin f → Equiv.Perm (Fin N),
-      blockSign f N w • blockPermute f N w H ∈ homogeneousSubmodule (Fin f × Fin N) ℚ d := by
+  have hmem
+      : ∀ w : Fin f → Equiv.Perm (Fin N),
+        blockSign f N w • blockPermute f N w H ∈ homogeneousSubmodule (Fin f × Fin N) ℚ d := by
     intro w
     refine Submodule.smul_mem _ _ ?_
     rw [mem_homogeneousSubmodule]

@@ -12,28 +12,35 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachWei
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
 namespace GlobalTheory.NL.WachModulePoleQuotient
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
 
-theorem mem_N_iff_of_points (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) {ι : Type} [Fintype ι]
+theorem mem_N_iff_of_points
+    (W : LocWach PD LL O v n)
+    (T : LocLat G Qp LL O)
+    {ι : Type} [Fintype ι]
     (nb : Module.Basis ι (LetA O n) ↥(W.N T)) (P : ZMod n → LL → Prop) (Φ : ZMod n → LL → Prop)
     (k : ℕ) (x : W.DD T) (hx : W.Q ^ k • x ∈ W.N T)
     (hkey : ∀ i ζ, P i ζ → (Φ i ζ ↔ ∀ j, nb.repr ⟨W.Q ^ k • x, hx⟩ j ∈ van W i ζ k))
     (hQ : ∀ i ζ, P i ζ → ∃ w : PowerSeries LL, W.lev i ζ W.Q = PowerSeries.X * w)
     (hdiv : ∀ a : LetA O n, (∀ i ζ, P i ζ → a ∈ van W i ζ k) → W.Q ^ k ∣ a)
-    (hunit : IsUnit (algebraMap (LetA O n) W.EE W.Q)) :
-    x ∈ W.N T ↔ ∀ i ζ, P i ζ → Φ i ζ := by
+    (hunit : IsUnit (algebraMap (LetA O n) W.EE W.Q))
+    : x ∈ W.N T ↔ ∀ i ζ, P i ζ → Φ i ζ := by
   constructor
   · intro hxN i ζ hζ
     rw [hkey i ζ hζ]
@@ -58,8 +65,7 @@ theorem mem_N_iff_of_points (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) {ι
       rw [map_pow]
       exact hunit.pow k
     obtain ⟨u, hu'⟩ := hu
-    have h1 : ∀ y : W.DD T, W.Q ^ k • y = (u : W.EE) • y := fun y => by
-      rw [hu', algebraMap_smul]
+    have h1 : ∀ y : W.DD T, W.Q ^ k • y = (u : W.EE) • y := fun y => by rw [hu', algebraMap_smul]
     rw [h1, h1] at hz
     have hx' : x = (z : W.DD T) := by
       have := congrArg (fun y => ((u⁻¹ : W.EEˣ) : W.EE) • y) hz
@@ -70,10 +76,21 @@ theorem mem_N_iff_of_points (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) {ι
 
 end Generic
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
-theorem mem_N_iff_expansion : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (Cm : CmpOf D.loc D.locA HW F) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; let C := Cm l; ∀ T : Lt K LL, IsCrys ((D.loc l).PD K) T.ρ → ∀ (k : ℕ) (x : W.DD T) (hx : W.Q ^ k • x ∈ W.N T), x ∈ W.N T ↔ ∀ (i : Let K) (ζ : ↥LL.1), IsPrimitiveRoot ζ (l ^ s) → ∃ f ∈ Lat C h T i ζ, ∀ j : ℤ, ex C h T i ζ ⟨W.Q ^ k • x, hx⟩ j = f (j - k) := by
+theorem mem_N_iff_expansion
+    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
+        (Cm : CmpOf D.loc D.locA HW F) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l)
+        (h : Good K s LL),
+      let W := (HW l).W K s LL h
+      let C := Cm l
+      ∀ T : Lt K LL,
+        IsCrys ((D.loc l).PD K) T.ρ
+          → ∀ (k : ℕ) (x : W.DD T) (hx : W.Q ^ k • x ∈ W.N T),
+            x ∈ W.N T
+              ↔ ∀ (i : Let K) (ζ : ↥LL.1),
+                IsPrimitiveRoot ζ (l ^ s)
+                  → ∃ f ∈ Lat C h T i ζ, ∀ j : ℤ, ex C h T i ζ ⟨W.Q ^ k • x, hx⟩ j = f (j - k) := by
   intro D HW F Cm l _ K s LL h W C T hT k x hx
   obtain ⟨nb⟩ := GlobalTheory.NL.N_basis D HW F l K s LL h T hT
   refine mem_N_iff_of_points W T nb (fun i ζ => IsPrimitiveRoot ζ (l ^ s)) _ k x hx ?_ ?_ ?_ ?_
@@ -81,7 +98,8 @@ theorem mem_N_iff_expansion : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.l
     exact ((GlobalTheory.NL.LevInj.expansion_basis D HW F Cm l K s LL h T hT i ζ ⟨s, hζ⟩
       (GlobalTheory.NL.FullLevel.full_lat D HW F Cm l K s LL h T hT i ζ hζ)).2 _ nb).2.2 _ k
   · intro i ζ hζ
-    obtain ⟨⟨w, _, hw⟩, -⟩ := (GlobalTheory.NL.lev_at_root_of_unity D HW l K s LL h i ζ ⟨s, hζ⟩).2.2.2.1 hζ
+    obtain ⟨⟨w, _, hw⟩, -⟩ :=
+      (GlobalTheory.NL.lev_at_root_of_unity D HW l K s LL h i ζ ⟨s, hζ⟩).2.2.2.1 hζ
     exact ⟨w, hw⟩
   · exact (GlobalTheory.NL.WDiv.weierstrass_dense D HW l K s LL h).1 k
   · have h0 := ((GlobalTheory.NL.IoXQ.main D HW F l K s LL h).2.2.2.2.2.2 0).2

@@ -49,11 +49,9 @@ theorem RegSection.full : RegSection.Statement :=
     (BdMetric.proof ChartCont.proof
       (BdTransition.proof RegYoDense.proof BdEqHolo.proof
         (BdDivides.proof (CoordDivDivisible.proof HyperplaneDivisible.proof)))
-      (BdCocycle.proof RegYoDense.proof BdEqHolo.proof)
-      (LogNormHolo.proof ChartCont.proof)
+      (BdCocycle.proof RegYoDense.proof BdEqHolo.proof) (LogNormHolo.proof ChartCont.proof)
       (BdWeight.proof BdPartition.proof IndicatorSmooth.proof NormSqSmooth.proof))
-    (BdSectionProps.proof BdEqHolo.proof)
-    (BdNormCont.proof ChartCont.proof BdEqHolo.proof)
+    (BdSectionProps.proof BdEqHolo.proof) (BdNormCont.proof ChartCont.proof BdEqHolo.proof)
     (BdComparison.proof ChartCont.proof BddOnInner.proof)
 
 theorem TailShift.full : TailShift.Statement := TailShift.proof

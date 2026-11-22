@@ -8,10 +8,11 @@ namespace GlobalTheory
 
 open Filter Topology
 
-theorem locallyConstant_compactSupport_invariant_openAddSubgroup :
-    ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
-      [NonarchimedeanAddGroup X] (g : X → ℂ), IsLocallyConstant g → HasCompactSupport g →
-      ∃ H : OpenAddSubgroup X, ∀ z, ∀ a ∈ H, g (z + a) = g z := by
+theorem locallyConstant_compactSupport_invariant_openAddSubgroup
+    : ∀ {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
+        [NonarchimedeanAddGroup X] (g : X → ℂ),
+      IsLocallyConstant g → HasCompactSupport g
+        → ∃ H : OpenAddSubgroup X, ∀ z, ∀ a ∈ H, g (z + a) = g z := by
   intro X _ _ _ _ g hg hc
   have key : ∀ z : X, ∃ V : OpenAddSubgroup X, ∀ h ∈ V, g (z + h) = g z := by
     intro z
@@ -27,9 +28,11 @@ theorem locallyConstant_compactSupport_invariant_openAddSubgroup :
     have := hH j (y - j) h
     have e : j + (y - j) = y := by abel
     rwa [e] at this
-  obtain ⟨t, ht⟩ := hc.isCompact.elim_finite_subcover (fun z : X => {y : X | y - z ∈ H z})
-    (fun z => (H z).isOpen.preimage (continuous_id.sub continuous_const))
-    (fun y _ => Set.mem_iUnion.2 ⟨y, by simp⟩)
+  obtain ⟨t, ht⟩ :=
+    hc.isCompact.elim_finite_subcover
+      (fun z : X => {y : X | y - z ∈ H z})
+      (fun z => (H z).isOpen.preimage (continuous_id.sub continuous_const))
+      (fun y _ => Set.mem_iUnion.2 ⟨y, by simp⟩)
   refine ⟨t.inf H, fun z a ha => ?_⟩
   have hle : ∀ j ∈ t, a ∈ H j := fun j hj => Finset.inf_le (f := H) hj ha
   by_cases hz : z ∈ tsupport g

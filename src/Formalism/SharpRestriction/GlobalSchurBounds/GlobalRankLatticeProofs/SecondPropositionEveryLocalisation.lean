@@ -12,15 +12,14 @@ noncomputable section
 
 namespace Formalism.MainNotions.UnusedSlot33
 
-open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.TwoAdicCyclotomicDecomposition
+open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.TwoAdicCyclotomicDecomposition
 
 namespace SlopeTestRemainingChoices
 
-theorem ord_five (e : ℕ) : orderOf (hcl e (u5 (e + 2))) = 2 ^ e :=
-  (hostGroup e).2.2.2.2.2.2.2.1
+theorem ord_five (e : ℕ) : orderOf (hcl e (u5 (e + 2))) = 2 ^ e := (hostGroup e).2.2.2.2.2.2.2.1
 
-theorem card_HGrp (e : ℕ) : Nat.card (HGrp e) = 2 ^ e :=
-  (hostGroup e).2.2.2.2.2.2.1
+theorem card_HGrp (e : ℕ) : Nat.card (HGrp e) = 2 ^ e := (hostGroup e).2.2.2.2.2.2.1
 
 theorem iotaH_add (e : ℕ) (i j : ZMod (2 ^ e)) : iotaH e (i + j) = iotaH e i * iotaH e j := by
   unfold iotaH
@@ -32,8 +31,8 @@ theorem iotaH_add (e : ℕ) (i j : ZMod (2 ^ e)) : iotaH e (i + j) = iotaH e i *
 theorem iotaH_injective (e : ℕ) : Function.Injective (iotaH e) := by
   intro i j hij
   unfold iotaH at hij
-  rw [pow_inj_mod, ord_five e, Nat.mod_eq_of_lt (ZMod.val_lt i),
-    Nat.mod_eq_of_lt (ZMod.val_lt j)] at hij
+  rw [pow_inj_mod, ord_five e, Nat.mod_eq_of_lt (ZMod.val_lt i), Nat.mod_eq_of_lt (ZMod.val_lt j)]
+    at hij
   exact ZMod.val_injective _ hij
 
 theorem iotaH_bijective (e : ℕ) : Function.Bijective (iotaH e) := by
@@ -58,16 +57,13 @@ section Emb
 
 variable (D : D7)
 
-theorem galE_sigmaOf (g : D.R.GG) :
-    D.host.galE (D.host.sigmaOf g) = g :=
+theorem galE_sigmaOf (g : D.R.GG) : D.host.galE (D.host.sigmaOf g) = g :=
   D.host.gal.apply_symm_apply g
 
-theorem sigmaOf_galE (σ : D.host.E ≃ₐ[ℚ] D.host.E) :
-    D.host.sigmaOf (D.host.galE σ) = σ :=
+theorem sigmaOf_galE (σ : D.host.E ≃ₐ[ℚ] D.host.E) : D.host.sigmaOf (D.host.galE σ) = σ :=
   D.host.gal.symm_apply_apply σ
 
-theorem mem_PhiEmb_iff (φ : D.host.E →+* ℂ) :
-    φ ∈ PhiEmb D ↔ φ ∈ D.host.cmType := by
+theorem mem_PhiEmb_iff (φ : D.host.E →+* ℂ) : φ ∈ PhiEmb D ↔ φ ∈ D.host.cmType := by
   have hCM := D.host.der.cmType
   have hEmb := D.host.toHostRaw.hostEmb D.host.φ₀
   obtain ⟨σ, rfl⟩ := hEmb.2 φ
@@ -83,8 +79,8 @@ theorem mem_PhiEmb_iff (φ : D.host.E →+* ℂ) :
     show D.host.φ₀.comp (D.host.sigmaOf _ : D.host.E →+* D.host.E) = _
     rw [sigmaOf_galE]
 
-theorem sigmaOf_fix_K (g : D.R.GG) (hg : g ∈ D.R.Psi) (x : D.host.E) (hx : x ∈ D.host.K) :
-    D.host.sigmaOf g x = x := by
+theorem sigmaOf_fix_K (g : D.R.GG) (hg : g ∈ D.R.Psi) (x : D.host.E) (hx : x ∈ D.host.K)
+    : D.host.sigmaOf g x = x := by
   set σ := D.host.sigmaOf g
   have hb : σ (D.host.sqd) = D.host.sqd := by
     refine (D.host.galE_mem_Psi_iff σ).1 ?_
@@ -94,8 +90,9 @@ theorem sigmaOf_fix_K (g : D.R.GG) (hg : g ∈ D.R.Psi) (x : D.host.E) (hx : x �
   have hx' : x ∈ Algebra.adjoin ℚ {D.host.sqd} := by
     rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint]
     exact hx
-  have hle : Algebra.adjoin ℚ {D.host.sqd} ≤
-      AlgHom.equalizer (σ : D.host.E →ₐ[ℚ] D.host.E) (AlgHom.id ℚ D.host.E) := by
+  have hle
+      : Algebra.adjoin ℚ {D.host.sqd}
+        ≤ AlgHom.equalizer (σ : D.host.E →ₐ[ℚ] D.host.E) (AlgHom.id ℚ D.host.E) := by
     rw [Algebra.adjoin_le_iff]
     intro y hy
     rw [Set.mem_singleton_iff] at hy
@@ -121,20 +118,20 @@ theorem second_proposition_every_localisation (D : D7) : Conclusion2 D := by
   · intro τ hτ
     exact D.R.toFrame.hostPartner τ hτ
   · intro h t
-    refine ⟨?_, ?_, ?_, ?_⟩ <;>
-    · simp only [rho, gOf, HC.Frame.tau1, HC.Frame.tau2, HC.Frame.cc, sgc0, Prod.mk_mul_mk, one_mul,
-        HC.Frame.iota_add]
-      refine Prod.ext ?_ (mul_comm _ _)
-      dsimp only
-      decide
+    refine ⟨?_, ?_, ?_, ?_⟩
+      <;> · simp only [rho, gOf, HC.Frame.tau1, HC.Frame.tau2, HC.Frame.cc, sgc0, Prod.mk_mul_mk,
+              one_mul, HC.Frame.iota_add]
+            refine Prod.ext ?_ (mul_comm _ _)
+            dsimp only
+            decide
   · intro χ
     have hf : ((D.R.f : ℕ) : ℂ) = (2 * D.R.ord : ℂ) := by
       simp only [Ranks.f, Ranks.n]; push_cast; ring
     rw [hf]
     exact D.R.toFrame.hostCharSum.1 χ
   · rintro ⟨⟨a, b⟩, h⟩
-    rcases Int.units_eq_one_or a with rfl | rfl <;> rcases Int.units_eq_one_or b with rfl | rfl <;>
-      simp [sgc0, c0, HC.Frame.chD, HC.Frame.chQ] <;> norm_num
+    rcases Int.units_eq_one_or a with rfl | rfl <;> rcases Int.units_eq_one_or b with rfl | rfl
+      <;> simp [sgc0, c0, HC.Frame.chD, HC.Frame.chQ] <;> norm_num
 
 end Formalism.MainNotions.UnusedSlot33
 

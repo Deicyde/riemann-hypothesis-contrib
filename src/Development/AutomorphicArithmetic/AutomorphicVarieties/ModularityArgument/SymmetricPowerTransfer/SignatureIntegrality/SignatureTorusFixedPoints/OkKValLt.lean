@@ -8,19 +8,27 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
-private theorem okK_val_lt (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (t : kˣ)
-    (ht : valuation k (t : k) < valuation k (unif k : k) ^ 2) : valuation k (t : k) < 1 := by
+private theorem okK_val_lt
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (t : kˣ) (ht : valuation k (t : k) < valuation k (unif k : k) ^ 2)
+    : valuation k (t : k) < 1 := by
   have hw : valuation k (unif k : k) < 1 := by
     rw [GlAx.unif_spec]
     exact uniformizer_lt_one
   exact ht.trans (pow_lt_one₀ zero_le' hw two_ne_zero)
 
-private theorem okK_conj {k : Type} [Field k] (g₀ : GL (Fin 2) k) (a b : kˣ) :
-    ((g₀ * diagT k (Fin 2) ![a, b] * g₀⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k).trace = (a : k) + b ∧
-    ((g₀ * diagT k (Fin 2) ![a, b] * g₀⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k).det = (a : k) * b := by
-  have hinv : ((g₀⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) * (g₀ : Matrix (Fin 2) (Fin 2) k) = 1 := by
+private theorem okK_conj {k : Type} [Field k] (g₀ : GL (Fin 2) k) (a b : kˣ)
+    : ((g₀ * diagT k (Fin 2) ![a, b] * g₀⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k).trace
+        = (a : k) + b
+      ∧ ((g₀ * diagT k (Fin 2) ![a, b] * g₀⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k).det
+        = (a : k) * b := by
+  have hinv
+      : ((g₀⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) * (g₀ : Matrix (Fin 2) (Fin 2) k)
+        = 1 := by
     rw [← Matrix.GeneralLinearGroup.coe_mul, inv_mul_cancel, Matrix.GeneralLinearGroup.coe_one]
   simp only [Matrix.GeneralLinearGroup.coe_mul, val_diagT]
   constructor
@@ -30,8 +38,7 @@ private theorem okK_conj {k : Type} [Field k] (g₀ : GL (Fin 2) k) (a b : kˣ) 
       Matrix.det_one, one_mul]
     simp [Matrix.det_diagonal, Fin.prod_univ_two]
 
-theorem UpperTheory.V.Z.Sym.Sig.okK :
-    UpperTheory.V.Z.Sym.Sig.OkK := by
+theorem UpperTheory.V.Z.Sym.Sig.okK : UpperTheory.V.Z.Sym.Sig.OkK := by
   intro k _ _ _ _ O _ _ hO h2 Δ s hs hs0 V Ry hR χ hχ t ht S
   have htv : valuation k (t : k) < 1 := okK_val_lt k t ht
   have hSD : SDom (![t, 1] : Fin 2 → kˣ) := by
@@ -59,20 +66,23 @@ theorem UpperTheory.V.Z.Sym.Sig.okK :
     rw [hfK, hfK, map_mul, (hIsScal z s').mp hz, hmul]
     ring
   · have hcj : Subgroup.comap (eD hs) (V.ZJ 2) = ZD Δ ⊔ S.J2 := hcomap V
-    have hright : ∀ (g w : GL (Fin 2) k), w ∈ V.ZJ 2 →
-        (V.fZ χ ![t, 1] (g * w) ≠ 0 ↔ V.fZ χ ![t, 1] g ≠ 0) := by
+    have hright
+        : ∀ (g w : GL (Fin 2) k),
+          w ∈ V.ZJ 2 → (V.fZ χ ![t, 1] (g * w) ≠ 0 ↔ V.fZ χ ![t, 1] g ≠ 0) := by
       intro g w hw
       obtain ⟨z, j, hj, rfl⟩ := (hZJ w).mp hw
-      have hc : g * GeneralLinearGroup.scalar (Fin 2) z = GeneralLinearGroup.scalar (Fin 2) z * g := by
+      have hc
+          : g * GeneralLinearGroup.scalar (Fin 2) z = GeneralLinearGroup.scalar (Fin 2) z * g := by
         apply Units.ext
         simp only [Units.val_mul, GeneralLinearGroup.coe_scalar]
-        exact (scalar_commute (z : k) (fun r => Commute.all _ r) (g : Matrix (Fin 2) (Fin 2) k)).eq.symm
+        exact
+          (scalar_commute (z : k) (fun r => Commute.all _ r) (g : Matrix (Fin 2) (Fin 2) k)).eq.symm
       have e := hJJ 1 (Subgroup.one_mem _) j hj g
       rw [one_mul] at e
       rw [← mul_assoc, hc, mul_assoc, hmul, e]
       exact ⟨fun h => right_ne_zero_of_mul h, fun h => mul_ne_zero (Units.ne_zero _) h⟩
-    let φ : (DX Δ ⧸ (ZD Δ ⊔ S.J2)) → (GL (Fin 2) k ⧸ V.ZJ 2) :=
-      fun x => (QuotientGroup.mk (eD hs x.out))
+    let φ : (DX Δ ⧸ (ZD Δ ⊔ S.J2)) → (GL (Fin 2) k ⧸ V.ZJ 2) := fun x =>
+      (QuotientGroup.mk (eD hs x.out))
     have hφ : ∀ x x', φ x = φ x' → x = x' := by
       intro x x' he
       have hm := QuotientGroup.eq.mp he

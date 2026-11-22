@@ -6,11 +6,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.gr_I :
-    ∀ {B E F : Type} [CommRing B] [IsLocalRing B] [Ring E] [Algebra B E] [Field F] [Algebra B F] {n : ℕ} (T : TrInv B E) (r : E →ₐ[B] Matrix (Fin n) (Fin n) F) (U : T.Units (Fin n) (oB n n)), 1 ≤ n → (∀ y, r (T.st y) = (r y)ᵀ) → (∀ i, r (U.x i) = single (oB n n i) i 1) → Nonempty (GrAlg T n n r U.ep) := by
+theorem UpperTheory.V.Pa.gr_I
+    : ∀ {B E F : Type} [CommRing B] [IsLocalRing B] [Ring E] [Algebra B E] [Field F] [Algebra B F]
+        {n : ℕ} (T : TrInv B E) (r : E →ₐ[B] Matrix (Fin n) (Fin n) F)
+        (U : T.Units (Fin n) (oB n n)),
+      1 ≤ n → (∀ y, r (T.st y) = (r y)ᵀ) → (∀ i, r (U.x i) = single (oB n n i) i 1)
+        → Nonempty (GrAlg T n n r U.ep) := by
   intro B E F _ _ _ _ _ _ n T r U hn hr hx
   have ho : ∀ i : Fin n, oB n n i = ⟨0, by omega⟩ := fun i => Fin.ext (by simp [oB, i.isLt])
   obtain ⟨φ, hφ, hst, -⟩ := units_one_block T (oB n n) U ⟨0, by omega⟩ ho
@@ -22,10 +27,12 @@ theorem UpperTheory.V.Pa.gr_I :
     · subst h
       rw [mul_assoc, (U.coi.idem i').eq, U.x_mem]
     · rw [mul_assoc, U.coi.ortho h, mul_zero]
-  have hone : (1 : Submodule B B) = ⊤ :=
-    eq_top_iff.2 fun x _ => Submodule.mem_one.2 ⟨x, rfl⟩
-  refine ⟨@GrAlg.mk B E F _ _ _ _ _ _ T n n r U.ep B _ _ inferInstance (fun a b h => h) ⊥
-    ?_ ?_ (fun _ => rfl) φ.toAlgHom φ.injective ?_ hst ?_ ?_⟩
+  have hone : (1 : Submodule B B) = ⊤ := eq_top_iff.2 fun x _ => Submodule.mem_one.2 ⟨x, rfl⟩
+  refine ⟨@GrAlg.mk B E F _ _ _ _ _ _ T n n r U.ep B _ _ inferInstance
+    (fun a b h => h)
+    ⊥ ?_ ?_
+    (fun _ => rfl)
+    φ.toAlgHom φ.injective ?_ hst ?_ ?_⟩
   · rw [hone]
     exact isCompl_top_bot
   · intro y hy z hz

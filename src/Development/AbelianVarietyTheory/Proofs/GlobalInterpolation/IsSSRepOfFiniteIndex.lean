@@ -11,8 +11,12 @@ noncomputable section
 
 namespace GlobalTheory.FiniteIndexSemisimple
 
-theorem isSSRep_of_finiteIndex {Γ k : Type} [Group Γ] [Field k] [CharZero k] {n : ℕ} (r : Γ →* GL (Fin n) k)
-    (N : Subgroup Γ) [N.FiniteIndex] (h : IsSSRep (r.comp N.subtype)) : IsSSRep r := by
+theorem isSSRep_of_finiteIndex
+    {Γ k : Type} [Group Γ] [Field k] [CharZero k]
+    {n : ℕ} (r : Γ →* GL (Fin n) k)
+    (N : Subgroup Γ) [N.FiniteIndex]
+    (h : IsSSRep (r.comp N.subtype))
+    : IsSSRep r := by
   classical
   intro W hW
   obtain ⟨W', hW', hc⟩ := h W (fun g v hv => hW g v hv)
@@ -31,13 +35,15 @@ theorem isSSRep_of_finiteIndex {Γ k : Type} [Group Γ] [Field k] [CharZero k] {
     exact e
   have hpN : ∀ m ∈ N, ∀ v, p (ρ m v) = ρ m (p v) := by
     intro m hm v
-    obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp (hc.sup_eq_top ▸ Submodule.mem_top : v ∈ W ⊔ W')
+    obtain ⟨a, ha, b, hb, rfl⟩ :=
+      Submodule.mem_sup.mp (hc.sup_eq_top ▸ Submodule.mem_top : v ∈ W ⊔ W')
     have hb' : ρ m b ∈ W' := hW' ⟨m, hm⟩ b hb
-    rw [show p (a + b) = a by rw [map_add (f := _), hpl a ha, hpr b hb, add_zero], map_add (f := _), map_add (f := _), hpl _ (hWρ m a ha),
-      hpr _ hb', add_zero]
+    rw [show p (a + b) = a by rw [map_add (f := _), hpl a ha, hpr b hb, add_zero], map_add (f := _),
+      map_add (f := _), hpl _ (hWρ m a ha), hpr _ hb', add_zero]
   let T : Γ → (Fin n → k) →ₗ[k] (Fin n → k) := fun g => ρ g ∘ₗ p ∘ₗ ρ g⁻¹
   have hTN : ∀ g, ∀ m ∈ N, T (g * m) = T g := by
-    intro g m hm; refine LinearMap.ext fun v => ?_
+    intro g m hm
+    refine LinearMap.ext fun v => ?_
     simp only [T, LinearMap.comp_apply]
     rw [mul_inv_rev, ← hρ m⁻¹ g⁻¹ v, hpN _ (inv_mem hm), hρ (g * m), mul_inv_cancel_right]
   have hTc : ∀ h g v, ρ h (T g v) = T (h * g) (ρ h v) := by
@@ -56,13 +62,15 @@ theorem isSSRep_of_finiteIndex {Γ k : Type} [Group Γ] [Field k] [CharZero k] {
     have e1 : ((h * q.out : Γ) : Γ ⧸ N) = h • q := by
       conv_rhs => rw [← QuotientGroup.out_eq' q]
       rfl
-    have hm : (h * q.out)⁻¹ * (h • q).out ∈ N := QuotientGroup.eq.mp (e1.trans (QuotientGroup.out_eq' _).symm)
+    have hm : (h * q.out)⁻¹ * (h • q).out ∈ N :=
+      QuotientGroup.eq.mp (e1.trans (QuotientGroup.out_eq' _).symm)
     rw [← hTN (h * q.out) _ hm, mul_inv_cancel_left]
   have hS : ∀ h v, ρ h (S v) = S (ρ h v) := by
     intro h v
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [S, LinearMap.sum_apply, map_sum, hTc h]
-    rw [← Equiv.sum_comp (MulAction.toPerm h : Equiv.Perm (Γ ⧸ N)) (fun q => T (Quotient.out q) (ρ h v))]
+    rw [← Equiv.sum_comp (MulAction.toPerm h : Equiv.Perm (Γ ⧸ N))
+      (fun q => T (Quotient.out q) (ρ h v))]
     refine Finset.sum_congr rfl fun q _ => ?_
     simp only [MulAction.toPerm_apply]
     rw [hout]
@@ -74,14 +82,17 @@ theorem isSSRep_of_finiteIndex {Γ k : Type} [Group Γ] [Field k] [CharZero k] {
     exact W.smul_mem _ (W.sum_mem fun q _ => hTW _ _)
   have hPfix : ∀ w ∈ W, P w = w := fun w hw => by
     simp only [P, S, LinearMap.smul_apply, LinearMap.sum_apply]
-    rw [Finset.sum_congr rfl fun q _ => hTfix q.out w hw, Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul k,
-      smul_smul, inv_mul_cancel₀ hc0, one_smul]
+    rw [Finset.sum_congr rfl fun q _ => hTfix q.out w hw, Finset.sum_const, Finset.card_univ,
+      ← Nat.cast_smul_eq_nsmul k, smul_smul, inv_mul_cancel₀ hc0, one_smul]
   have hP : ∀ h v, ρ h (P v) = P (ρ h v) := fun h v => by
     simp only [P, LinearMap.smul_apply, map_smul, hS]
   refine ⟨LinearMap.ker P, fun g v hv => ?_, ?_⟩
   · show P (ρ g v) = 0
     rw [← hP, LinearMap.mem_ker.mp hv, map_zero]
-  · refine ⟨Submodule.disjoint_def.mpr fun v hv hv' => ?_, codisjoint_iff.mpr (eq_top_iff.mpr fun v _ => ?_)⟩
+  · refine ⟨
+      Submodule.disjoint_def.mpr fun v hv hv' => ?_,
+      codisjoint_iff.mpr (eq_top_iff.mpr fun v _ => ?_)
+    ⟩
     · rw [← hPfix v hv]; exact hv'
     · have : v = P v + (v - P v) := by abel
       rw [this]

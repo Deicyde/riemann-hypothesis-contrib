@@ -21,13 +21,15 @@ variable {n : ℕ}
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-def negL (a b : Fin n) (F : Matrix (Fin n) (Fin n) ℂ → E) : Matrix (Fin n) (Fin n) ℂ → E :=
-  fun z => -Lhol (Matrix.single a b 1) F z
+def negL (a b : Fin n) (F : Matrix (Fin n) (Fin n) ℂ → E) : Matrix (Fin n) (Fin n) ℂ → E := fun z =>
+  - Lhol (Matrix.single a b 1) F z
 
 def PsiCapelliStatement (n : ℕ) : Prop :=
-  ∀ (ε : Fin n → Bool) (lam : Fin n → ℝ) (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ), IsMu lam μ →
-    ∀ (Y : ℂ) (g : Matrix (Fin n) (Fin n) ℂ), inUJ ε g →
-      Formalism.QuantumDeterminants.capelli ε (Y + ((n : ℂ) - 1) / 2) (PsiM T μ) g =
-        Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) Y • PsiM T μ g
+  ∀ (ε : Fin n → Bool) (lam : Fin n → ℝ) (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ),
+    IsMu lam μ
+      → ∀ (Y : ℂ) (g : Matrix (Fin n) (Fin n) ℂ),
+        inUJ ε g
+          → Formalism.QuantumDeterminants.capelli ε (Y + ((n : ℂ) - 1) / 2) (PsiM T μ) g
+            = Formalism.QuantumDeterminants.capP (fun s => (lam s : ℂ)) Y • PsiM T μ g
 
 end ReciprocityTheory.ChartRestriction.DS.S7
