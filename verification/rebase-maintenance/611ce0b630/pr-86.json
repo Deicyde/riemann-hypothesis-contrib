@@ -1,0 +1,39 @@
+{
+  "number": 86,
+  "title": "Report vm.max_map_count at job start, fix the AWS template, clarify doctor output",
+  "original_head": "9422ada52f367cf8b1da05ce8df9ca0b7ff727a0",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "ci/job-start-map-count-preflight",
+  "maintainer_can_modify": false,
+  "old_merge_base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "automatic_resolution_count": 0,
+  "rebased_head": "f5ef2451745e25458d1bb0e8314a163020a0bc28",
+  "diff_check": true,
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "5 files changed, 192 insertions(+), 8 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-86-611ce0b630-45055415926-tree-restack",
+  "status": "rebased",
+  "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
+  "previous_prepared_head": "1a6ca690c10f78fd96ec5c3b1d0190bb656b321e",
+  "author_and_message_metadata_unchanged": true,
+  "restack_commit_count": 4,
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 4,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  }
+}

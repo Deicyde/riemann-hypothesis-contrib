@@ -1,0 +1,42 @@
+{
+  "number": 54,
+  "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+  "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+  "original_repo": "by-eureka/riemann-hypothesis",
+  "original_branch": "eureka/upstream-proof-refactors",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+  "automatic_resolution_count": 1,
+  "rebased_head": "f1e5d644924dfd1b668a00f68fbfc091957166aa",
+  "diff_check": true,
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "133 files changed, 1416 insertions(+), 4738 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-54-611ce0b630-45055415926-tree-restack",
+  "status": "rebased",
+  "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
+  "note": "Retained main\u2019s local zeta reduction because RhOfRight was pruned; kept other proof shortenings.",
+  "repair_parent": "0d1cefd21d834298efd7b91c06ebfcc40674372b",
+  "previous_prepared_head": "28dc0642588e031da797a6474efa94ced4b49e4e",
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 149,
+  "diff_check_output": "",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "restack_commit_count": 149
+}

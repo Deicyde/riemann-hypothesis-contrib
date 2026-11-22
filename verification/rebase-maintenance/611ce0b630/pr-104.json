@@ -1,0 +1,40 @@
+{
+  "number": 104,
+  "title": "Speed up the slowest proofs (stacked on #79)",
+  "status": "rebased",
+  "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
+  "original_head": "2ea000c90de863f15260573296e84ca49b578d1f",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-speedups",
+  "rebased_head": "08f4842adbee1ce8f3f7cb2089f3915c980c2d38",
+  "prepared_branch": "maintenance/rebased-pr-104-611ce0b630-45055415926-tree-restack",
+  "ready_to_publish": true,
+  "changes": "57940 files changed, 111973 insertions(+), 110114 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 8,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "c951cb58f1c800f84f3dcc21a71188d8bb0af327",
+  "restack_commit_count": 2,
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 2,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  }
+}

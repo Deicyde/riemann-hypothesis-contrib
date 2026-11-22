@@ -1,0 +1,39 @@
+{
+  "number": 87,
+  "title": "Shorten checked proofs across 816 Lean modules",
+  "original_head": "dbbf5d8bdf07025202ee4954437d41481ae69847",
+  "original_repo": "graohene10-spec/riemann-hypothesis",
+  "original_branch": "proof-shortening/verified-disjoint-20261122",
+  "maintainer_can_modify": true,
+  "old_merge_base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "automatic_resolution_count": 0,
+  "rebased_head": "36ab4482cd80ba7bf99f3839af5f4c94eb86f9f2",
+  "diff_check": true,
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "816 files changed, 4509 insertions(+), 9560 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-87-611ce0b630-45055415926-tree-restack",
+  "status": "rebased",
+  "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
+  "previous_prepared_head": "df33ee94514f4a3bc7d5f46d923ea5787740bc7c",
+  "author_and_message_metadata_unchanged": true,
+  "restack_commit_count": 1,
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 1,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  }
+}

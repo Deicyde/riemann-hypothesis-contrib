@@ -1,0 +1,43 @@
+{
+  "number": 97,
+  "title": "Run the Lean auto-formatter over `src/` (stacked on #66)",
+  "status": "rebased",
+  "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
+  "original_head": "c97a0fa101f9e2d70e163df2de9c2e3f79edcd79",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "format/port-4.36-lean-formatter",
+  "initial_head": "c44cd7f33a4ba6671fd3a43fcdc3c94ff93890af",
+  "rebased_head": "885e54de662d0df57587901f55fded759f717fc9",
+  "prepared_branch": "maintenance/rebased-pr-97-611ce0b630-45055415926-tree-restack",
+  "ready_to_publish": false,
+  "published_head": "c97a0fa101f9e2d70e163df2de9c2e3f79edcd79",
+  "changes": "147369 files changed, 7886813 insertions(+), 4124033 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 49,
+  "note": "Published to the original PR branch with a checked head and an original-head backup.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "applied_before_restack": true,
+  "previous_prepared_head": "b8639cd323956c6d79725075f2a610f41ed036d4",
+  "restack_commit_count": 1,
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 1,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  }
+}

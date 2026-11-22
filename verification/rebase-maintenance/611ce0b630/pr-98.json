@@ -1,0 +1,39 @@
+{
+  "number": 98,
+  "title": "Minimize and privatize imports (stacked on #79)",
+  "original_head": "86692ef803d35b2ad0ea1ec0ebddadd3f860b33c",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-imports",
+  "maintainer_can_modify": true,
+  "old_merge_base": "507a75d91d131d627b380df4e32f6e9fb21dd067",
+  "automatic_resolution_count": 17,
+  "rebased_head": "0b9df676dae5329f7aca9055d5440560df416de5",
+  "diff_check": true,
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "149261 files changed, 6327681 insertions(+), 700097 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-98-611ce0b630-45055415926-tree-restack",
+  "status": "rebased",
+  "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
+  "previous_prepared_head": "c5e04197a1ee128f8a751070fd1f20dc0d0c9a8e",
+  "author_and_message_metadata_unchanged": true,
+  "restack_commit_count": 4,
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 4,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  }
+}

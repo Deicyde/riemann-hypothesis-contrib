@@ -1,0 +1,38 @@
+{
+  "number": 78,
+  "title": "Add `docs/references.bib`, docstring citations and a cross-reference tag for five statements",
+  "original_head": "fd9ef1ba16d58f3748c89b6741a7b4c1f444a877",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "literature/first-references",
+  "maintainer_can_modify": false,
+  "old_merge_base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "automatic_resolution_count": 0,
+  "rebased_head": "e372233646002492115f22ca03cf2ec8efdcf332",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "7 files changed, 147 insertions(+)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-78-611ce0b630-45055415926-tree-restack",
+  "status": "rebased",
+  "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
+  "previous_prepared_head": "9567be19d52aebde6d5aee243315b80fbddfd7f3",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "restack_commit_count": 4
+}
