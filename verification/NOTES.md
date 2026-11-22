@@ -15,7 +15,8 @@ The first commit of this repository, `40e56bab`, is the archive's `lean/` direct
 published. Later commits add `src/Challenge.lean`, `comparator.json`, `export-targets.txt`, the
 README, this folder, the CI workflow and, since
 [#7](https://github.com/leanprover-community/riemann-hypothesis/pull/7), the build cache in
-`scripts/`.
+`scripts/`. The second Comparator setup, in `formal-conjectures/`, is described
+[below](#formal-conjectures).
 
 Merged pull requests have since changed the submission's own files under `src/`, mainly by
 deleting files the proof does not use and by shortening proofs.
@@ -107,6 +108,142 @@ The statements were read by hand:
   the hypotheses exclude.
 - Every `1 / 2` is compared with `s.re`, so it is real division.
 - Dedekind zeta functions and other L-functions are not covered.
+
+## formal-conjectures
+
+The five statements above were written for this repository, after the announcement. The second
+Comparator setup, in [`formal-conjectures/`](../formal-conjectures/), judges the proof against
+statements written elsewhere and earlier:
+[`FormalConjectures/Millennium/RiemannHypothesis.lean`](https://github.com/google-deepmind/formal-conjectures/blob/d8d031d4998c78575159ccab9a7a9e95ce043883/FormalConjectures/Millennium/RiemannHypothesis.lean)
+in google-deepmind/formal-conjectures, at commit `d8d031d4` (2026-11-19). It follows
+[issue #34](https://github.com/leanprover-community/riemann-hypothesis/issues/34), which proved
+the equivalence used here against that commit.
+
+**The statements.**
+
+- `RiemannHypothesis.riemannHypothesis` is Mathlib's `RiemannHypothesis`, as our
+  `riemannHypothesis` is.
+- `GRH.generalized_riemann_hypothesis` says: for every modulus q ≥ 1, every primitive character
+  χ mod q and every s in ℂ, if L(χ, s) = 0 and s is not in `GRH.trivialZeros χ`, then
+  Re s = 1/2. The trivial zeros are −2(n+1) for q = 1, −2n−1 for odd χ, and −2n for even χ with
+  q ≠ 1, n ranging over ℕ.
+- On its face that is more than `PrimitiveDirichletLZerosOnLine`, which speaks only of
+  0 < Re s < 1: none of our three Dirichlet statements says anything about zeros with
+  Re s ≤ 0. The bridge below shows that nothing is lost.
+- The statement of the theorem has had the same text since it was added on 2025-11-06, and
+  `trivialZeros` since 2025-11-07. We compared every commit that has touched the file.
+
+**Credit.** These statements are the work of the formal-conjectures authors, and what is copied
+from them here is under their Apache 2.0 license.
+
+| Date | Who | What, with the formal-conjectures pull request |
+|---|---|---|
+| 2025-11-06 | Salvatore Mercuri | wrote `GRH.trivialZeros`, `GRH.generalized_riemann_hypothesis`, the test that GRH for the character mod 1 is Mathlib's `RiemannHypothesis`, and the `Decidable` instances for odd and even characters ([#1176](https://github.com/google-deepmind/formal-conjectures/pull/1176)) |
+| 2025-11-07 | Salvatore Mercuri | corrected the sign in the odd case of `trivialZeros` ([#1184](https://github.com/google-deepmind/formal-conjectures/pull/1184)) |
+| 2026-01-15 | mirefek | corrected the docstring of `trivialZeros` ([#1677](https://github.com/google-deepmind/formal-conjectures/pull/1677)) |
+| 2026-03-01 | franzhusch | added `riemannHypothesis`, stated with Mathlib's `RiemannHypothesis` ([#2378](https://github.com/google-deepmind/formal-conjectures/pull/2378)) |
+| 2026-04-24 | Moritz Firsching | put it in the namespace `RiemannHypothesis` ([#3827](https://github.com/google-deepmind/formal-conjectures/pull/3827)) |
+
+Between and after these, Yaël Dillies, Moritz Firsching, Robert Joseph, Felix Pernegger and
+Sylvester Kaczmarek moved, restructured or extended the two files the declarations are in.
+
+**The pin.** Commit `d8d031d4` has this project's `lean-toolchain`, and its manifest pins
+Mathlib at `0df444a360ea`, as ours does. Comparator needs the challenge and the solution to be
+built against the same Mathlib ([Limits](#limits)). CI compares both pins on every push.
+
+**The challenge** is exported from a clean clone of formal-conjectures. This repository supplies
+the list of names to export and nothing else. Building that one module compiles 271 others from
+formal-conjectures' `FormalConjecturesForMathlib` and `FormalConjecturesUtil` libraries, so the
+clean machine runs that repository's code as well as Mathlib's.
+
+**What the solution has to copy.** Comparator compares, by name, every constant that the
+challenge's statements use. For `GRH.generalized_riemann_hypothesis` that is about 53,000
+constants, and three of them are not in Mathlib:
+
+| Constant | Where formal-conjectures defines it |
+|---|---|
+| `GRH.trivialZeros` | the challenge file |
+| `DirichletCharacter.instDecidablePredOddOfDecidableEq_formalConjecturesForMathlib` | `FormalConjecturesForMathlib/NumberTheory/DirichletCharacter/Basic.lean`; the `if χ.Odd` in `trivialZeros` uses it |
+| the same name with `._proof_1` | generated by Lean for the `by rfl` in that instance |
+
+[`FormalConjecturesStatement.lean`](../formal-conjectures/FormalConjecturesStatement.lean)
+repeats the first two with their upstream text. Two things in it are not obvious:
+
+- The instance has no name upstream. The name Lean generates for it there ends in
+  `_formalConjecturesForMathlib`, so the copy writes that name out.
+- The file is a `module`, as the upstream files are. In a `module`, Lean states `_proof_1` as
+  `ψ (-1) = -1 ↔ ψ.Odd`. In an ordinary file it states it as `ψ (-1) = -1 ↔ ψ (-1) = -1`. A first
+  version of the copy was an ordinary file, and `lake comparator` rejected it:
+  `Const does not match between challenge and target '…_formalConjecturesForMathlib._proof_1'`.
+
+**Where the statement is written.** The solution must also state the theorem as the challenge
+does. Its statement is written once, in the signature of
+`FormalConjecturesBridge.generalized_riemann_hypothesis_of_primitive`, and
+`FormalConjecturesSolution.lean` takes it from there with `type_of%`.
+
+- It is not written in `FormalConjecturesSolution.lean`, because that file imports the
+  submission. Lean would elaborate the statement with every instance of the submission in
+  scope, and one of those could be chosen in place of Mathlib's. Comparator would reject that,
+  but only after the build. `Statements.lean` is safe from this for the same reason the bridge
+  is: no proof of the submission is imported.
+- It is not a definition that the solution unfolds, either. The `2` in `1 / 2` carries a proof
+  of `Nat.AtLeastTwo 2`. In the body of a definition Lean moves that proof into a constant of
+  its own, and in the statement of a theorem it leaves it in place. `lake comparator` rejected
+  that version too:
+  `Challenge and solution theorem statement do not match: 'GRH.generalized_riemann_hypothesis'`.
+
+Nobody has to trust the copies. Comparator rejects a solution in which the statement or any of
+the three constants differs from the challenge.
+
+**The bridge.**
+[`FormalConjecturesBridge.lean`](../formal-conjectures/FormalConjecturesBridge.lean) proves
+`PrimitiveDirichletLZerosOnLine ↔` formal-conjectures' GRH. It imports `Statements.lean` and
+Mathlib, and none of the submission's proofs.
+
+- Re s ≥ 1: `DirichletCharacter.LFunction_ne_zero_of_one_le_re`, and `riemannZeta_one_ne_zero`
+  for q = 1 and s = 1.
+- 0 < Re s < 1: the submission's statement.
+- Re s ≤ 0: χ⁻¹ is primitive too. The functional equation and L(χ⁻¹, 1 − s) ≠ 0 give
+  Λ(χ, s) ≠ 0, so L(χ, s) = 0 only at a pole of the Gamma factor, and those are the trivial
+  zeros. The root number is not needed.
+- The converse holds because the trivial zeros are integers ≤ 0.
+
+[`FormalConjecturesSolution.lean`](../formal-conjectures/FormalConjecturesSolution.lean) then
+proves the two theorems, under formal-conjectures' names, by applying the bridge to
+`LFunction_eq_zero_re_of_isPrimitive` and by `riemannHypothesis`, both from `Main.lean`.
+
+**Not a Lake library.** The three files are in no library of `lakefile.toml` and not under
+`src/`. The build cache is selected by the Git tree of `src/` and the bytes of `lakefile.toml`
+([CACHE.md](CACHE.md)), so a change to either leaves `lake exe cache get` without a match until
+CI has rebuilt, and the CI build accepts no library outside `src/`. The README compiles the
+files with `lake env lean` after the build, into `.lake/formal-conjectures/`.
+
+**Cost.** The export of `FormalConjecturesSolution` contains the whole proof, as the export of
+`Main` does, plus the bridge. Making it and judging it cost what steps 3 and 4 of the README
+cost.
+
+**Rehearsal.** The real run needs the built submission. Without it, steps 1b, 3b and 4b of the
+README were run with a placeholder `Main.lean`, which states `riemannHypothesis` and
+`LFunction_eq_zero_re_of_isPrimitive` and proves them by `sorry`. Lean `v4.33.1` and the
+exporter of [Tools](#tools) made the exports and Lean `v4.36.0` judged them, on macOS, which
+has no bubblewrap, so with `--inadvisably-no-sandbox`.
+
+| Config | Verdict |
+|---|---|
+| `comparator.json` | rejected, with `Illegal axiom detected: 'sorryAx'` and nothing else |
+| the same, with `sorryAx` permitted | Lean paranoid, nanoda and Lean's kernel accept: `Your solution is okay!` |
+
+So the statement and the three constants match formal-conjectures', and the kernels accept the
+bridge. `#print axioms` on the bridge's theorems gives `propext`, `Classical.choice` and
+`Quot.sound`. The challenge export is 350,866,107 bytes and 6,495,773 lines, with the sha256
+in the README; the placeholder's solution export is 422,418,402 bytes. An accepting run took
+9 minutes and 0.9 GB of memory on a busy laptop. The `formal-conjectures` job in CI repeats the
+rehearsal on every push.
+
+The rehearsal does not compile `FormalConjecturesSolution.lean` against the real `Main.lean`.
+That needs the two theorems named above, which `Main.lean` has, and no declaration in the
+submission under a name the three files use. A text search of the 164,464 `.lean` files at
+commit `f1f6d654` finds no `GRH` or `RiemannHypothesis` namespace and none of the other names.
 
 ## Dependencies
 
