@@ -69,7 +69,7 @@ theorem locTr2' (Kf : FiniteSubfield) [NumberField Kf.1]
       inv hinv d.ιs ⟨v.1, Finset.mem_coe.2 v.2⟩ (Av v) (hAv v) (d.ev v) (d.hιs v) (d.hev_cont v).1
       (cocycles2Map ((charRep μ).comp (locFam S Av v)) (muLoc Kf.1 l r (Av v)) LinearMap.id continuous_id
         (locFam_apply_eq S Av μ hμ v) W) x h
-  exact transfer_cup_degree_two_zero (d.ev v) hc1 (ρ.comp (locFam S Av v)) ((twDual μ ρ).comp (locFam S Av v))
+  have h := transfer_cup_degree_two_zero (d.ev v) hc1 (ρ.comp (locFam S Av v)) ((twDual μ ρ).comp (locFam S Av v))
     ((charRep μ).comp (locFam S Av v)) evalPair continuous_of_discreteTopology
     (fun g x y => evalPair_equiv μ ρ (locFam S Av v g) x y)
     (Rep.res (gsFinFamily (S : Set (HeightOneSpectrum (𝓞 Kf.1))) d.ιs ⟨v.1, Finset.mem_coe.2 v.2⟩).toMonoidHom d.A) (Rep.res (gsFinFamily (S : Set (HeightOneSpectrum (𝓞 Kf.1))) d.ιs ⟨v.1, Finset.mem_coe.2 v.2⟩).toMonoidHom (dualRep (gsRoots (S : Set (HeightOneSpectrum (𝓞 Kf.1))) (l ^ r)) d.A))
@@ -79,6 +79,11 @@ theorem locTr2' (Kf : FiniteSubfield) [NumberField Kf.1]
         rootsOfUnity (l ^ r) (maxUnramifiedOutside Kf.1 (AlgebraicClosure ℚ) (S : Set (HeightOneSpectrum (𝓞 Kf.1))))) :
         (maxUnramifiedOutside Kf.1 (AlgebraicClosure ℚ) (S : Set (HeightOneSpectrum (𝓞 Kf.1))))ˣ) :
         maxUnramifiedOutside Kf.1 (AlgebraicClosure ℚ) (S : Set (HeightOneSpectrum (𝓞 Kf.1)))) : AlgebraicClosure ℚ) = ζ ^ c.val)
-    hbμ E hE E' hE' _ _ hJ z b
+    hbμ E hE E' hE' ((zmodToQZ (l ^ r)).comp (invAt S Av μ hμ inv v).toAddMonoidHom)
+    (gsLocalInvRootsQZ (S : Set (HeightOneSpectrum (𝓞 Kf.1))) d.ιs (l ^ r)
+      ⟨v.1, Finset.mem_coe.2 v.2⟩) hJ z b
+  simp only [cup20]
+  simp only [AddMonoidHom.comp_apply, LinearMap.toAddMonoidHom_coe] at h
+  with_reducible assumption
 
 end PositivityTheory.Lit1.PTN

@@ -19,6 +19,10 @@ variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type} {A3 : FamIn
 theorem prim_updS (R : RealDat3 D A3 Ks) (F : Face3 D A3) (lam : type_of% R.lam3) (h : PrimRows3 R F)
     (h1 : ∀ i t p v, 0 < lam i t p v) (h2 : (R.updS R.kap lam).PThmB) (h3 : (R.updS R.kap lam).PThmA)
     (h4 : ((R.updS R.kap lam).toCx3 F).GalD F.cr false) : PrimRows3 (R.updS R.kap lam) F := by
+  -- Reduce projections of the updated records before checking the row proofs.
+  obtain ⟨R₂, _, _, _, _⟩ := R
+  cases R₂
+  dsimp only [RealDat3.updS, RealDat.upd6] at h2 h3 h4 ⊢
   obtain ⟨⟨hE, hR⟩, ⟨hW, hL⟩⟩ := h.hecke
   exact
   { heckeR := h.heckeR
@@ -51,11 +55,14 @@ theorem pins_updS (R : RealDat3 D A3 Ks) (F : Face3 D A3) (cG : G0 R.Pg D.R.r �
     (Dc : ∀ Zs : DefSub A3.fam3.amb3, DefCols (A3.side3 F.P1 F.ψ1 Zs)) (Sp : ∀ Zs, SPer (Dc Zs))
     (Zsc : DefSub A3.fam3.amb3 → IndefScale A3.fam3.base3) (e : type_of% R.err0) (hP : Pins R F cG)
     (hs : (R.updS R.kap lam).IsScal (reFace F Dc Sp Zsc)) : Pins ((R.updS R.kap lam).withErr e) (reFace F Dc Sp Zsc) cG := by
+  let R' := R.updS R.kap lam
+  let F' := reFace F Dc Sp Zsc
   have h := hP.char
-  have hC : (R.updS R.kap lam).WeakCharacterisation (reFace F Dc Sp Zsc) :=
+  have hC : R'.WeakCharacterisation F' :=
     ⟨h.base, ⟨h.inert.tie, h.inert.onto, h.inert.hR, h.inert.hL, h.inert.SF⟩, h.fullY, h.fullX, h.fullP, hs,
       ⟨h.tup.mu_off, h.tup.mu_used, h.tup.mu_ne, h.tup.mu_conj, h.tup.mu_on⟩, h.phase, h.allPl⟩
-  exact ⟨RealDat3.weak_characterisation_with_error hC e, reFace_keep (R.updS R.kap lam) F cG Dc Sp Zsc e hP.keep, hP.phs, hP.trSem⟩
+  exact ⟨RealDat3.weak_characterisation_with_error (R := R') (F := F') hC e,
+    reFace_keep R' F cG Dc Sp Zsc e hP.keep, hP.phs, hP.trSem⟩
 
 
 

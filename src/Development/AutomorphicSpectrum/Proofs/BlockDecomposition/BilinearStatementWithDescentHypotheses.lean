@@ -397,7 +397,7 @@ theorem base_surj : Function.Surjective (algebraMap R ((OAff s).obj (topAff s)))
   have e : s.appLE ⊤ ⊤ le_top = s.appTop := by
     simp only [Scheme.Hom.appLE]
     exact (congrArg _ ((X.presheaf.map_id _))).trans (Category.comp_id _)
-  haveI : IsIso s.appTop := inferInstanceAs (IsIso (Scheme.Hom.app _ ⊤))
+  haveI : IsIso s.appTop := inferInstanceAs (IsIso (s.app ⊤))
   have h : IsIso (secMap s ⊤) := by
     have h1 : IsIso (s.appLE ⊤ ⊤ le_top) := by
       rw [e]
@@ -457,13 +457,25 @@ theorem PH_id (c : HH1 Y.hom) : PH (𝟙 Y) c = c :=
 instance : IsIso (𝟙_ (Over (Sp R))).hom := inferInstanceAs (IsIso (𝟙 (Sp R)))
 
 theorem PO_one {A : Over (Sp R)} [GrpObj A] (c : HO1 A.hom) : PO (1 : Y ⟶ A) c = 0 := by
-  rw [Hom.one_def, PO_comp, base_first_cohomology_zero _ (PO η[A] c), map_zero]
+  calc
+    PO (1 : Y ⟶ A) c = PO (toUnit Y ≫ η[A]) c := congrArg (fun f : Y ⟶ A ↦ PO f c) Hom.one_def
+    _ = PO (toUnit Y) (PO η[A] c) := PO_comp _ _ c
+    _ = PO (toUnit Y) 0 := congrArg (PO (toUnit Y)) (base_first_cohomology_zero _ (PO η[A] c))
+    _ = 0 := (PO (toUnit Y)).map_zero
 
 theorem PF_one {A : Over (Sp R)} [GrpObj A] (c : GlobForm A.hom) : PF (1 : Y ⟶ A) c = 0 := by
-  rw [Hom.one_def, PF_comp, base_form _ (PF η[A] c), map_zero]
+  calc
+    PF (1 : Y ⟶ A) c = PF (toUnit Y ≫ η[A]) c := congrArg (fun f : Y ⟶ A ↦ PF f c) Hom.one_def
+    _ = PF (toUnit Y) (PF η[A] c) := PF_comp _ _ c
+    _ = PF (toUnit Y) 0 := congrArg (PF (toUnit Y)) (base_form _ (PF η[A] c))
+    _ = 0 := (PF (toUnit Y)).map_zero
 
 theorem PH_one {A : Over (Sp R)} [GrpObj A] (c : HH1 A.hom) : PH (1 : Y ⟶ A) c = 0 := by
-  rw [Hom.one_def, PH_comp, base_hyp _ (PH η[A] c), map_zero]
+  calc
+    PH (1 : Y ⟶ A) c = PH (toUnit Y ≫ η[A]) c := congrArg (fun f : Y ⟶ A ↦ PH f c) Hom.one_def
+    _ = PH (toUnit Y) (PH η[A] c) := PH_comp _ _ c
+    _ = PH (toUnit Y) 0 := congrArg (PH (toUnit Y)) (base_hyp _ (PH η[A] c))
+    _ = 0 := (PH (toUnit Y)).map_zero
 
 end Over
 
@@ -547,39 +559,68 @@ theorem hyp_primitive (sA : Stein (OAff A.hom))
 
 variable {A}
 
+private theorem restrict_sum {M N : Type} [AddCommMonoid M] [AddCommMonoid N]
+    [Module R M] [Module R N] (r : M →ₗ[R] N) {x y : M} {x' y' : N}
+    (hx : x' = r x) (hy : y' = r y) : x' + y' = r (x + y) :=
+  (congrArg₂ (· + ·) hx hy).trans (r.map_add x y).symm
+
+private theorem bi_of_restriction {C D E J : Type} [Category.{0} C] [Category.{0} D] [Category.{0} E]
+    {F : C ⥤ CommAlgCat.{0} R} {F' : D ⥤ CommAlgCat.{0} R} (G : E ⥤ D)
+    (pull : J → CoefMap (RingHom.id R) F (G ⋙ F'))
+    (o : J → H1 F →ₗ[R] H1 F') (ω : J → Glob1 F →ₗ[R] Glob1 F') (h : J → Hyp1 F →ₗ[R] Hyp1 F')
+    (m p q : J) (sG : Stein (G ⋙ F')) (pG : Par (G ⋙ F'))
+    (rO : Function.Bijective (CoefMap.restrict F' G).pull1)
+    (rF : Function.Bijective (pullGlob1 (CoefMap.restrict F' G)))
+    (eO : ∀ i x, (pull i).pull1 x = (CoefMap.restrict F' G).pull1 (o i x))
+    (eF : ∀ i x, pullGlob1 (pull i) x = pullGlob1 (CoefMap.restrict F' G) (ω i x))
+    (eH : ∀ i x, pullHyp1 (pull i) x = pullHyp1 (CoefMap.restrict F' G) (h i x))
+    (hO : Function.Bijective fun x : H1 F × H1 F ↦ o p x.1 + o q x.2)
+    (hF : Function.Bijective fun x : Glob1 F × Glob1 F ↦ ω p x.1 + ω q x.2)
+    (mO : ∀ c, o m c = o p c + o q c) (mF : ∀ c, ω m c = ω p c + ω q c)
+    (mH : ∀ c, h m c = h p c + h q c) : Bi F := by
+  let r := CoefMap.restrict F' G
+  refine ⟨E, inferInstance, G ⋙ F', pull m, pull p, pull q, sG, pG, ?_, ?_, fun c ↦ ?_, fun c ↦ ?_, fun c ↦ ?_⟩
+  · have eq := funext fun x : H1 F × H1 F ↦ restrict_sum r.pull1 (eO p x.1) (eO q x.2)
+    exact eq.symm ▸ rO.comp hO
+  · have eq := funext fun x : Glob1 F × Glob1 F ↦ restrict_sum (pullGlob1 r) (eF p x.1) (eF q x.2)
+    exact eq.symm ▸ rF.comp hF
+  · exact (eO m c).trans ((congrArg r.pull1 (mO c)).trans (restrict_sum r.pull1 (eO p c) (eO q c)).symm)
+  · exact (eF m c).trans ((congrArg (pullGlob1 r) (mF c)).trans
+      (restrict_sum (pullGlob1 r) (eF p c) (eF q c)).symm)
+  · exact (eH m c).trans ((congrArg (pullHyp1 r) (mH c)).trans
+      (restrict_sum (pullHyp1 r) (eH p c) (eH q c)).symm)
+
 theorem bi_of_fam {Y : Over (Sp R)} {J : Type} [Finite J] (f : J → (Y ⟶ A)) (m p q : J)
     (sY : Stein (OAff Y.hom)) (pY : Par (OAff Y.hom))
     (hO : Function.Bijective fun x : HO1 A.hom × HO1 A.hom ↦ PO (f p) x.1 + PO (f q) x.2)
     (hF : Function.Bijective fun x : GlobForm A.hom × GlobForm A.hom ↦ PF (f p) x.1 + PF (f q) x.2)
     (mO : ∀ c, PO (f m) c = PO (f p) c + PO (f q) c) (mF : ∀ c, PF (f m) c = PF (f p) c + PF (f q) c)
     (mH : ∀ c, PH (f m) c = PH (f p) c + PH (f q) c) : Bi (OAff A.hom) := by
-  let φ : J → (Y.left ⟶ A.left) := fun i ↦ (f i).left
-  have h : ∀ i, φ i ≫ A.hom = Y.hom ≫ spMap (RingHom.id R) := fun i ↦ wOver (f i)
-  have hb : Bas Y.hom (famFst φ) := bas_fam φ Y.hom
-  have eO : ∀ i x, (famPull h i).pull1 x =
-      (CoefMap.restrict (OAff Y.hom) (famFst φ)).pull1 (PO (f i) x) := famPull_pull1 h
-  have eF : ∀ i x, pullGlob1 (famPull h i) x =
-      pullGlob1 (CoefMap.restrict (OAff Y.hom) (famFst φ)) (PF (f i) x) := famPull_glob h
-  have eH : ∀ i x, pullHyp1 (famPull h i) x =
-      pullHyp1 (CoefMap.restrict (OAff Y.hom) (famFst φ)) (PH (f i) x) := famPull_hyp h
-  refine ⟨(Fam φ)ᵒᵖ, inferInstance, famFst φ ⋙ OAff Y.hom, famPull h m, famPull h p, famPull h q,
-    hb.stein sY, hb.par pY, ?_, ?_, fun c ↦ ?_, fun c ↦ ?_, fun c ↦ ?_⟩
-  · convert hb.pull1.comp hO using 1
-    funext x
-    simp only [Function.comp_apply, map_add (f := _), eO]
-  · convert hb.glob.comp hF using 1
-    funext x
-    simp only [Function.comp_apply, map_add (f := _), eF]
-  · rw [eO, eO, eO, ← map_add (f := _), mO]
-  · rw [eF, eF, eF, ← map_add (f := _), mF]
-  · rw [eH, eH, eH, ← map_add (f := _), mH]
+  have h (i : J) := wOver (f i)
+  have hb := bas_fam (fun i ↦ (f i).left) Y.hom
+  exact bi_of_restriction (famFst fun i ↦ (f i).left) (famPull (φ := fun i ↦ (f i).left) h)
+    (fun i ↦ PO (f i)) (fun i ↦ PF (f i)) (fun i ↦ PH (f i)) m p q
+    (hb.stein sY) (hb.par pY) hb.pull1 hb.glob
+    (famPull_pull1 (φ := fun i ↦ (f i).left) h) (famPull_glob (φ := fun i ↦ (f i).left) h)
+    (famPull_hyp (φ := fun i ↦ (f i).left) h) hO hF mO mF mH
+
+-- Reduce the vector entries while the predicate is abstract, before unfolding any pullback maps.
+private theorem of_fin_three {M : Type} (P : M → M → M → Prop)
+    (h : ∀ f : Fin 3 → M, P (f 0) (f 1) (f 2)) (m p q : M) : P m p q :=
+  h ![m, p, q]
 
 theorem bi_of_pull {Y : Over (Sp R)} (m p q : Y ⟶ A) (sY : Stein (OAff Y.hom)) (pY : Par (OAff Y.hom))
     (hO : Function.Bijective fun x : HO1 A.hom × HO1 A.hom ↦ PO p x.1 + PO q x.2)
     (hF : Function.Bijective fun x : GlobForm A.hom × GlobForm A.hom ↦ PF p x.1 + PF q x.2)
     (mO : ∀ c, PO m c = PO p c + PO q c) (mF : ∀ c, PF m c = PF p c + PF q c)
-    (mH : ∀ c, PH m c = PH p c + PH q c) : Bi (OAff A.hom) :=
-  bi_of_fam ![m, p, q] 0 1 2 sY pY hO hF mO mF mH
+    (mH : ∀ c, PH m c = PH p c + PH q c) : Bi (OAff A.hom) := by
+  let P (m p q : Y ⟶ A) : Prop :=
+    Function.Bijective (fun x : HO1 A.hom × HO1 A.hom ↦ PO p x.1 + PO q x.2) →
+    Function.Bijective (fun x : GlobForm A.hom × GlobForm A.hom ↦ PF p x.1 + PF q x.2) →
+    (∀ c, PO m c = PO p c + PO q c) → (∀ c, PF m c = PF p c + PF q c) →
+    (∀ c, PH m c = PH p c + PH q c) → Bi (OAff A.hom)
+  have h (f : Fin 3 → (Y ⟶ A)) : P (f 0) (f 1) (f 2) := bi_of_fam f 0 1 2 sY pY
+  exact of_fin_three P h m p q hO hF mO mF mH
 
 end Main
 

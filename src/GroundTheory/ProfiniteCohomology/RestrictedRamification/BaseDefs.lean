@@ -182,9 +182,19 @@ theorem gsLocalInvRootsQZ_cohomologyMapAlong (v : S) (x : cohomology (gsRoots S 
   refine congrArg (brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
     (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))) ?_
   refine (AddMonoidHom.comp_apply _ _ _).trans ?_
-  exact cohomologyMap_uliftInt_cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _)
+  have hres : gsLocalRes S (ιs v) 2 =
+      cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _)
+        (embUnitsMorZ S (ιs v)) 2 := rfl
+  have hmap := cohomologyMap_uliftInt_cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom
+    (continuous_toMonoidHom _)
     (rootsOfUnityToSUnits S (maxUnramifiedOutside K.1 ℚ̄ S) n) (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S))
     (rootsLocalMorZ S ιs n v) (embUnitsMorZ S (ιs v)) (fun _ => rfl) 2 x
+  let y := cohomologyULiftIntAddEquiv (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) 2
+    ((cohomologyMap (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) 2).hom
+      ((cohomologyMap (rootsOfUnityToSUnits S (maxUnramifiedOutside K.1 ℚ̄ S) n) 2).hom x))
+  have happly := congrArg (fun f => ModuleCat.Hom.hom f y) hres.symm
+  simp only [LinearMap.toAddMonoidHom_coe, AddEquiv.coe_toAddMonoidHom]
+  with_reducible exact hmap.trans happly
 
 
 omit [Fintype S] [NeZero n] in
@@ -321,9 +331,11 @@ theorem gsCompactInv_localToCompact (hn : Odd n ∨ IsTotallyComplex K.1)
     (h3 : Subsingleton (cohomology (gsRoots S n) 3))
     (ξ : ∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2) :
     gsCompactInv S ιs n hn h3 ((localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom ξ) =
-      gsSumInvRoots S ιs n ξ :=
-  descendAlong_apply (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom
+      gsSumInvRoots S ιs n ξ := by
+  delta gsCompactInv
+  have h := descendAlong_apply (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom
     (localToCompact_two_surjective S ιs n h3) (gsSumInvRoots S ιs n) (ker_localToCompact_le S ιs n hn) ξ
+  with_reducible exact h
 
 end
 

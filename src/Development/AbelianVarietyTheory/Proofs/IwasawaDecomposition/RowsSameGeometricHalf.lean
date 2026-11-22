@@ -53,13 +53,27 @@ variable (R v₀) in
 theorem norm_iff (ρ : Setup o.L.D.ntw) (i : o.L.D.ntw.Tw) (j : Fin o.L.D.R.m) (b : Bool) (ν : ℂ) :
     @IsNorm (Late.D bb) G _ _ Pl0 I0 T (famInThreeCoefficientChange bb A3) Ks _ _ (alg bb iK) (real3 bb R) ((v₀)) ((j))
       ((rho V' S' ρ).B ((i)) ((j)) b) ν ↔ IsNorm R v₀ (ρ.B i j b) ν := by
-  constructor
-  · rintro ⟨h0, c, ⟨g, c0R, c0L, hF, u, hu, hh⟩, hn⟩
-    exact ⟨h0, c, ⟨(by with_unfolding_all exact (g :)), (by with_unfolding_all exact (c0R :)), (by with_unfolding_all exact (c0L :)),
-      (by with_unfolding_all exact (famTie_imp (a := bb) o.L _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hF :)), (by with_unfolding_all exact (u :)), (by with_unfolding_all exact (hu :)), (by with_unfolding_all exact (hh :))⟩, (by with_unfolding_all exact (hn :))⟩
-  · rintro ⟨h0, c, ⟨g, c0R, c0L, hF, u, hu, hh⟩, hn⟩
-    exact ⟨h0, c, ⟨(by with_unfolding_all exact (g :)), (by with_unfolding_all exact (c0R :)), (by with_unfolding_all exact (c0L :)),
-      (by with_unfolding_all exact (famTie_imp (a := o.L) bb _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hF :)), (by with_unfolding_all exact (u :)), (by with_unfolding_all exact (hu :)), (by with_unfolding_all exact (hh :))⟩, (by with_unfolding_all exact (hn :))⟩
+  constructor <;> rintro ⟨h0, c, ⟨g, c0R, c0L, hF, u, hu, hh⟩, hn⟩ <;>
+    refine ⟨h0, c, ⟨(by with_unfolding_all exact g), (by with_unfolding_all exact c0R),
+      (by with_unfolding_all exact c0L), ?_, (by with_unfolding_all exact u),
+      (by with_unfolding_all exact hu), (by with_unfolding_all exact hh)⟩,
+      (by with_unfolding_all exact hn)⟩
+  have hTie := famTie_imp (a := bb) o.L G _ _ Pl0 T _ _ _ _ _ _ _ _ _ _ _ _ _ g c0R c0L hF
+  on_goal 2 =>
+    have hTie := famTie_imp (a := o.L) bb G _ _ Pl0 T _ _ _ _ _ _ _ _ _ _ _ _ _ g c0R c0L hF
+  -- Both proof terms are fully elaborated. The kernel compares the dependent
+  -- level data directly, avoiding the elaborator's repeated unfolding.
+  all_goals
+    run_tac
+      Lean.Elab.Tactic.closeMainGoalUsing `norm_iff fun target _ => do
+        let proof ← Lean.Meta.getLocalDeclFromUserName `hTie
+        let actual ← Lean.instantiateMVars proof.type
+        let target ← Lean.instantiateMVars target
+        let context ← Lean.instantiateLCtxMVars (← Lean.getLCtx)
+        match Lean.Kernel.isDefEq (← Lean.getEnv) context actual target with
+        | .ok true => pure proof.toExpr
+        | .ok false => throwError "famTie_imp has type{actual}\nbut the goal is{target}"
+        | .error error => throwError (error.toMessageData (← Lean.getOptions))
 
 variable (YS v₀) in
 theorem rat_iff {ρ : Setup o.L.D.ntw} (hρ : ρ.Good) (i : o.L.D.ntw.Tw) (j : Fin o.L.D.R.m) (b : Bool) (ν : ℂ) :

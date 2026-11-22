@@ -208,21 +208,52 @@ def cupExt (X : Scheme.{0}) {i j n : ℕ} (h : i + j = n) (a : HS R (coef R) i X
     ((a.mapExactFunctor (tensorRight (coef R))).comp (Abelian.Ext.mk₀ (coefMul R)) (add_zero i))
     (show j + i = n by omega)) (zero_add n)
 
+private theorem extComp_isLinear {S D : Type*} [CommRing S] [Category* D] [Abelian D]
+    [HasExt.{1} D] [Linear S D] {A B C M N : D} {i j n : ℕ} (h : j + i = n)
+    (f : Abelian.Ext A B i →ₗ[S] Abelian.Ext M N i)
+    (g : Abelian.Ext A B j →ₗ[S] Abelian.Ext C M j)
+    (d : Abelian.Ext A C 0) (m : Abelian.Ext N B 0)
+    (product : Abelian.Ext A B i → Abelian.Ext A B j → Abelian.Ext A B n)
+    (hprod : product = fun a b => d.comp ((g b).comp ((f a).comp m (add_zero i)) h) (zero_add n)) :
+    (∀ b, IsLinearMap S (fun a => product a b)) ∧
+      (∀ a, IsLinearMap S (product a)) := by
+  subst product
+  let precomp := d.precompOfLinear S B (zero_add n)
+  constructor
+  · intro b
+    exact (precomp.comp (((g b).precompOfLinear S B h).comp
+      ((m.postcompOfLinear S M (add_zero i)).comp f))).isLinear
+  · intro a
+    exact (precomp.comp ((((f a).comp m (add_zero i)).postcompOfLinear S C h).comp g)).isLinear
+
+private theorem cupExt_isLinear (X : Scheme.{0}) {i j n : ℕ} (h : i + j = n) :
+    (∀ b : HS R (coef R) j X,
+      IsLinearMap (ULift.{1} R) (fun a : HS R (coef R) i X => cupExt R X h a b)) ∧
+    (∀ a : HS R (coef R) i X,
+      IsLinearMap (ULift.{1} R) (fun b : HS R (coef R) j X => cupExt R X h a b)) := by
+  let A := (freeOn R).obj X
+  let B := coef R
+  exact extComp_isLinear ((Nat.add_comm j i).trans h)
+    ((tensorRight B).mapExtLinearMap (ULift.{1} R) A B i)
+    ((tensorLeft A).mapExtLinearMap (ULift.{1} R) A B j)
+    (Abelian.Ext.mk₀ (freeDiag R X)) (Abelian.Ext.mk₀ (coefMul R))
+    (cupExt R X h) rfl
+
 theorem cupExt_add_left (X : Scheme.{0}) {i j n : ℕ} (h : i + j = n) (a a' : HS R (coef R) i X)
     (b : HS R (coef R) j X) : cupExt R X h (a + a') b = cupExt R X h a b + cupExt R X h a' b := by
-  simp only [cupExt, Abelian.Ext.mapExactFunctor_add, Abelian.Ext.add_comp, Abelian.Ext.comp_add]
+  exact ((cupExt_isLinear R X h).1 b).map_add a a'
 
 theorem cupExt_add_right (X : Scheme.{0}) {i j n : ℕ} (h : i + j = n) (a : HS R (coef R) i X)
     (b b' : HS R (coef R) j X) : cupExt R X h a (b + b') = cupExt R X h a b + cupExt R X h a b' := by
-  simp only [cupExt, Abelian.Ext.mapExactFunctor_add, Abelian.Ext.add_comp, Abelian.Ext.comp_add]
+  exact ((cupExt_isLinear R X h).2 a).map_add b b'
 
 theorem cupExt_smul_left (X : Scheme.{0}) {i j n : ℕ} (h : i + j = n) (r : ULift.{1} R) (a : HS R (coef R) i X)
     (b : HS R (coef R) j X) : cupExt R X h (r • a) b = r • cupExt R X h a b := by
-  simp only [cupExt, Functor.mapExactFunctor_smul, Abelian.Ext.smul_comp, Abelian.Ext.comp_smul]
+  exact ((cupExt_isLinear R X h).1 b).map_smul r a
 
 theorem cupExt_smul_right (X : Scheme.{0}) {i j n : ℕ} (h : i + j = n) (r : ULift.{1} R) (a : HS R (coef R) i X)
     (b : HS R (coef R) j X) : cupExt R X h a (r • b) = r • cupExt R X h a b := by
-  simp only [cupExt, Functor.mapExactFunctor_smul, Abelian.Ext.smul_comp, Abelian.Ext.comp_smul]
+  exact ((cupExt_isLinear R X h).2 a).map_smul r b
 
 def cupN (X : Scheme.{0}) (i j n : ℕ) (h : i + j = n) : H R i X →ₗ[R] H R j X →ₗ[R] H R n X :=
   LinearMap.mk₂ R (fun a b => cupExt R X h a b)
@@ -247,13 +278,22 @@ variable [FlatCoef R]
 
 def ofPre {X : Scheme.{0}} (γ : freePre R X ⟶ coefPre R) : H R 0 X := Abelian.Ext.mk₀ ((presheafToSheaf _ _).map γ)
 
+private theorem ext_tensor_mk₀ {D : Type*} [Category* D] [Abelian D] [HasExt.{1} D]
+    [MonoidalCategory D] {A B : D} [(tensorLeft A).Additive] [(tensorRight B).Additive]
+    [PreservesFiniteLimits (tensorLeft A)] [PreservesFiniteLimits (tensorRight B)]
+    [PreservesFiniteColimits (tensorLeft A)] [PreservesFiniteColimits (tensorRight B)]
+    (d : A ⟶ A ⊗ A) (g g' : A ⟶ B) (m : B ⊗ B ⟶ B) :
+    (Abelian.Ext.mk₀ d).comp (((Abelian.Ext.mk₀ g').mapExactFunctor (tensorLeft A)).comp
+      (((Abelian.Ext.mk₀ g).mapExactFunctor (tensorRight B)).comp (Abelian.Ext.mk₀ m) (add_zero 0))
+      (zero_add 0)) (zero_add 0) = Abelian.Ext.mk₀ (d ≫ (g ⊗ₘ g') ≫ m) := by
+  simp only [Abelian.Ext.mapExactFunctor_mk₀, Abelian.Ext.mk₀_comp_mk₀]
+  exact congrArg (fun f => Abelian.Ext.mk₀ (d ≫ f))
+    (MonoidalCategory.tensorHom_def'_assoc g g' m).symm
+
 theorem cupExt_mk₀ (X : Scheme.{0}) (g g' : (freeOn R).obj X ⟶ coef R) :
     cupExt R X (rfl : 0 + 0 = 0) (Abelian.Ext.mk₀ g) (Abelian.Ext.mk₀ g') =
       Abelian.Ext.mk₀ (freeDiag R X ≫ (g ⊗ₘ g') ≫ coefMul R) := by
-  simp only [cupExt, Abelian.Ext.mapExactFunctor_mk₀, Abelian.Ext.mk₀_comp_mk₀]
-  congr 1
-  rw [MonoidalCategory.tensorHom_def' (C := Shv R) g g', Category.assoc]
-  rfl
+  exact ext_tensor_mk₀ (freeDiag R X) g g' (coefMul R)
 
 theorem cupN_ofPre (X : Scheme.{0}) (γ γ' : freePre R X ⟶ coefPre R) :
     cupN R X 0 0 0 rfl (ofPre R γ) (ofPre R γ') = ofPre R (freeDiagPre R X ≫ (γ ⊗ₘ γ') ≫ coefMulPre R) := by
@@ -287,15 +327,10 @@ theorem homEquiv_map_ofPre {X : Scheme.{0}} (γ : freePre R X ⟶ coefPre R) :
   exact ((sheafificationAdjunction _ _).unit.naturality γ).symm
 
 theorem exists_ofPre {X : Scheme.{0}} (x : H R 0 X) : ∃ γ : freePre R X ⟶ coefPre R, ofPre R γ = x := by
-  obtain ⟨g, rfl⟩ := (Abelian.Ext.mk₀_bijective ((freeOn R).obj X) (coef R)).surjective x
-  let adj := sheafificationAdjunction Scheme.proetaleTopology.{0} (ModuleCat.{1} (ULift.{1} R))
-  refine ⟨adj.homEquiv _ _ g ≫ (isoSheafify _ (H0.sh R)).inv, ?_⟩
-  refine congrArg Abelian.Ext.mk₀ ((adj.homEquiv _ _).injective ?_)
-  erw [homEquiv_map_ofPre]
-  have hi : (isoSheafify _ (H0.sh R)).inv ≫ toSheafify Scheme.proetaleTopology.{0} (coefPre R) = 𝟙 _ := by
-    rw [← isoSheafify_hom _ (H0.sh R)]
-    exact Iso.inv_hom_id _
-  exact (Category.assoc _ _ _).trans ((congrArg (adj.homEquiv _ _ g ≫ ·) hi).trans (Category.comp_id _))
+  let e := H0.yonedaAdd R X (coefPre R)
+  let v : (coefPre R).obj (op X) := ULift.up (H0.e R X x)
+  refine ⟨e.symm v, (H0.e R X).injective ?_⟩
+  exact (e_ofPre R X (e.symm v)).trans (congrArg ULift.down (e.apply_symm_apply v))
 
 theorem e_cupN (X : Scheme.{0}) (x y : H R 0 X) :
     H0.e R X (cupN R X 0 0 0 rfl x y) = H0.e R X x * H0.e R X y := by

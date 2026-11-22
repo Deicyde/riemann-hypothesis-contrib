@@ -140,30 +140,17 @@ theorem setupL_good {ρ : GlobalTheory.SeriesTie.Setup (Dof x).ntw} (h : ρ.Good
     latS := (by with_unfolding_all exact (h.latS :))
     latT := (by with_unfolding_all exact (h.latT :))
     Pg := (by with_unfolding_all exact (h.Pg :))
-    delta := fun i j b => (by with_unfolding_all exact (congrArg (twL L) (h.delta i j b) : _))
+    delta := fun i j b => by
+      have hd := congrArg (twL L) (h.delta i j b)
+      -- Let the kernel compare the transported twists in this equality.
+      run_tac Lean.Elab.Tactic.closeMainGoalUsing `exact fun _ _ =>
+        Lean.Elab.Tactic.elabTerm (Lean.mkIdent `hd) none
     weil := fun i j b t ht => by
-      delta GlobalTheory.ExportSeries.Base.IsWeil
-      have hw := h.weil i j b (twB L t) (twB_good L ht)
-      have th := thetaFun_L_iff L (ρ.B i j b).F
-      refine ⟨(by with_unfolding_all exact hw.std), (by with_unfolding_all exact hw.hecS),
-        (by with_unfolding_all exact hw.hecT), (by with_unfolding_all exact hw.resS),
-        (by with_unfolding_all exact hw.resT), ?_, ?_, ?_, ?_, ?_, ?_⟩
-      · intro p f hf
-        exact (th _).2 (hw.om_pres p f ((th _).1 hf))
-      · intro g h w f hf
-        exact hw.om_heis g h w f ((th _).1 hf)
-      · intro g hg g' hg' f hf
-        exact hw.om_aut g hg g' hg' f ((th _).1 hf)
-      · intro f hf w
-        exact hw.om_cont f ((th _).1 hf) w
-      · intro μ F hμ hF p f hf
-        exact hw.om_unit μ F hμ hF p f ((th _).1 hf)
-      · intro e he g h hg hh a b ha hb
-        obtain ⟨r, hr, hsplit⟩ := hw.om_split e he g h hg hh a b ha hb
-        refine ⟨r, hr, fun ℓ hℓ f hf => ?_⟩
-        apply hsplit ℓ ?_ f ((th _).1 hf)
-        intro u hu f' hf'
-        exact hℓ u hu f' ((th _).2 hf')
+      let t₀ := twB L t
+      have hw := GlobalTheory.Mem.R3.Tr.weilDatum_imp (a := x.o.Z) (oL x L).Z
+        _ _ _ _ _ _ (h.weil i j b t₀ (twB_good L ht))
+      run_tac Lean.Elab.Tactic.closeMainGoalUsing `exact fun _ _ =>
+        Lean.Elab.Tactic.elabTerm (Lean.mkIdent `hw) none
     classes := fun i j b t ht hA =>
       have h' := h.classes ((by with_unfolding_all exact (i :))) ((by with_unfolding_all exact (j :))) b (twB L t) (twB_good L ht) ⟨(by with_unfolding_all exact ((placesOK_B L hA.1) :)), (by with_unfolding_all exact (hA.2 :))⟩
       ⟨(by with_unfolding_all exact (h'.fin :)), (by with_unfolding_all exact (h'.reps :)), (by with_unfolding_all exact (h'.stab :))⟩ }
@@ -176,16 +163,22 @@ theorem theta_eq (ρ : Setup (Dof x).ntw) :
   delta GlobalTheory.SeriesTie.Setup.theta GlobalTheory.ExportSeries.Base.theta GlobalTheory.ExportSeries.Base.vecBase GlobalTheory.ExportSeries.Base.vecAt
     GlobalTheory.ExportSeries.Frame.vec GlobalTheory.ExportSeries.Frame.placeMap
   rewrite [GlobalTheory.Mem.R3.Tr.placeModel_eq x.o.Z (oL x L).Z]
-  with_unfolding_all exact Eq.refl (ρ.theta i j b h P)
+  have hθ := Eq.refl (ρ.theta i j b h P)
+  -- After rewriting the place model, the kernel checks the remaining conversions.
+  run_tac Lean.Elab.Tactic.closeMainGoalUsing `exact fun _ _ =>
+    Lean.Elab.Tactic.elabTerm (Lean.mkIdent `hθ) none
 
 
 open GlobalTheory.SeriesTie in
 theorem isDatum_eq (ρ : Setup (Dof x).ntw) :
     (setupL L ρ).IsDatum = fun i j b s h P => (by exact ρ.IsDatum i j b s h P) := by
   funext i j b s h P
-  refine propext ⟨fun d => ?_, fun d => ?_⟩
-  · exact (by with_unfolding_all exact ((⟨(d.split), (d.off), (d.fin), (d.supp), (d.mem)⟩ : ρ.IsDatum ((i)) ((j)) b ((s)) ((h)) ((P))) : _))
-  · exact ⟨(by with_unfolding_all exact (d.split :)), (by with_unfolding_all exact (d.off :)), (by with_unfolding_all exact (d.fin :)), (by with_unfolding_all exact (d.supp :)), (by with_unfolding_all exact (d.mem :))⟩
+  refine propext ⟨fun d => ?_, fun d => ?_⟩ <;>
+    refine ⟨(by with_unfolding_all exact d.split), (by with_unfolding_all exact d.off),
+      (by with_unfolding_all exact d.fin), (by with_unfolding_all exact d.supp), ?_⟩
+  all_goals
+    run_tac Lean.Elab.Tactic.closeMainGoalUsing `exact fun _ _ =>
+      Lean.Elab.Tactic.elabTerm (Lean.mkIdent `d.mem) none
 
 end GlobalTheory.HeightCounting.Fin3
 

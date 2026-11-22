@@ -187,6 +187,16 @@ instance finiteDimensional_global (j : ℕ) : FiniteDimensional F (G.global j) :
 theorem finrank_global (j : ℕ) : Module.finrank F (G.global j) = lbH0 F (G.adj j) :=
   (LinearMap.finrank_range_of_inj (G.restr_injective _)).trans (H0.finrank_top _ _)
 
+private theorem finrank_global_pos_of_hasNonzeroSec (j : ℕ) (h : HasNonzeroSec (G.adj j)) :
+    0 < Module.finrank F (G.global j) := by
+  obtain ⟨s, hs⟩ := h
+  let ofSec := H0.ofSec (B := G.adj j) G.str ⊤
+  let res : H0 G.str (G.adj j) ⊤ →ₗ[F] G.Sec j := H0.restr le_top
+  refine Module.finrank_pos_iff_exists_ne_zero.2 ⟨res.rangeRestrict (ofSec s), fun h => hs ?_⟩
+  have hz : res (ofSec s) = 0 := congrArg (fun x : G.global j => x.val) h
+  have hr : ofSec s = 0 := G.restr_injective (G.adj j) (hz.trans (map_zero res).symm)
+  exact H0.bijective_ofSec_top.1 (hr.trans (map_zero ofSec).symm)
+
 def mulW (j : ℕ) : (Fin G.N → F) →ₗ[F] G.Sec j →ₗ[F] G.Sec (j + 1) :=
   (oneChart (isLB_tens G.K.isLB G.isLBA) G.isLB (Nat.cast_succ j).symm).mul ∘ₗ
     Fintype.linearCombination F fun k => H0.ofSec G.str G.U (G.b k)
@@ -468,6 +478,10 @@ theorem Geo.shortFamily_globalData {F : Type} [Field F] [NumberField F] (G : Geo
     (Module.finBasis F (G.global j)).linearIndependent.comp _ (Fin.cast_injective e),
     fun i σ => (nrm_ofBasis _ σ _).le⟩
 
+private theorem Geo.d_pos_globalData {F : Type} [Field F] [NumberField F] (G : Geo F) {T : ℕ}
+    (hT : G.D + 1 ≤ T) (h : 0 < Module.finrank F (G.global T)) : 0 < (G.globalData T hT).d :=
+  h.trans_eq (G.globalData T hT).d_eq_finrank.symm
+
 namespace Proj
 
 open ProjSpace
@@ -557,22 +571,29 @@ theorem cls_adj {Y : Scheme.{0}} {K L : LB Y} (hK : K.IsLB) (hL : L.IsLB) (M j :
     cls_lbPow hL]
   module
 
+omit [NumberField F] in
+private theorem hasNonzeroSec_jacobian (M : ℕ) [SmoothOfRelativeDimension M (PSpace.str F M)]
+    (K : CanonLB (PSpace.str F M) M) : HasNonzeroSec (K.adj (O1 F M) (M + 1)) := by
+  let s := K.jacSec (coord F M)
+  obtain ⟨c, hc⟩ := exists_chart (K.isLB_adj (O1_isLB F M) (M + 1)) (projSys.gen F M)
+  have hu := (isUnit_jacSec_coord F M K c).map (ger (projSys.gen F M) hc)
+  exact ⟨s, sec_ne_zero_of_mem ((isUnit_ger_iff s hc).1 hu)⟩
+
 theorem finrank_global_pos (j : ℕ) : 0 < Module.finrank F ((geo F hM).global j) := by
-  have hO := O1_isLB F M
   let G := geo F hM
-  obtain ⟨c, hc⟩ := exists_chart (G.K.isLB_adj hO (M + 1)) (projSys.gen F M)
-  have h₁ : HasNonzeroSec (G.K.adj (O1 F M) (M + 1)) := ⟨G.K.jacSec (coord F M), sec_ne_zero_of_mem
-    ((isUnit_ger_iff _ hc).1 ((@isUnit_jacSec_coord F _ M G.smooth G.K c).map _))⟩
-  obtain ⟨s, hs⟩ := HasNonzeroSec.of_cls_eq_add (X := G.Y) h₁ (hasNonzeroSec_pow F M (j + 1)) (G.isLB_adj j)
-    (G.K.isLB_adj hO _) (isLB_lbPow hO _) (cls_adj G.K.isLB hO M j _ _ _)
-  refine Module.finrank_pos_iff_exists_ne_zero.2 ⟨⟨_, H0.ofSec _ ⊤ s, rfl⟩, fun h => hs ?_⟩
-  exact H0.bijective_ofSec_top.1 ((G.restr_injective _ ((congrArg Subtype.val h).trans (map_zero _).symm)).trans
-    (map_zero _).symm)
+  have h₁ : HasNonzeroSec (G.K.adj G.L (M + 1)) :=
+    @hasNonzeroSec_jacobian F _ M G.smooth G.K
+  have h₂ : HasNonzeroSec (lbPow G.L (j + 1)) := hasNonzeroSec_pow F M (j + 1)
+  have hA := G.K.isLB_adj G.isLB (M + 1)
+  have hB := isLB_lbPow G.isLB (j + 1)
+  have hN := G.isLB_adj j
+  have hc : cls (G.adj j) hN = cls _ hA + cls _ hB := cls_adj G.K.isLB G.isLB M j hN hA hB
+  exact G.finrank_global_pos_of_hasNonzeroSec j (h₁.of_cls_eq_add h₂ hN hA hB hc)
 
 def data (T : ℕ) (hT : M + 1 ≤ T) : Data F := (geo F hM).globalData T hT
 
 theorem d_pos (T : ℕ) (hT : M + 1 ≤ T) : 0 < (data F hM T hT).d :=
-  (finrank_global_pos F hM T).trans_eq (data F hM T hT).d_eq_finrank.symm
+  (geo F hM).d_pos_globalData hT (finrank_global_pos F hM T)
 
 end Proj
 

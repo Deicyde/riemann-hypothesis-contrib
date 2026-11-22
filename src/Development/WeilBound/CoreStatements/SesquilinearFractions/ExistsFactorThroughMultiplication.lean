@@ -97,21 +97,22 @@ theorem isogeny_points_kernel_descent {K : Type} [Field K] [NumberField K] (σ :
   intro y hy
   obtain ⟨E, hE⟩ := LamF.exists_mulEquiv_points_of_isGrpPullback _ _ _ A.A Q.A φ hφ (Over.mk (spMap σ))
   obtain ⟨E', hE'⟩ := LamF.exists_mulEquiv_points_of_isGrpPullback _ _ _ B.A Q'.A φ' hφ' (Over.mk (spMap σ))
-  let e : Over.mk (spMap (σ.comp (algebraMap (𝓞 K) K))) ⟶ Over.mk ((Over.mk (spMap σ)).hom ≫ spMap (algebraMap (𝓞 K) K)) :=
-    Over.homMk (𝟙 _) ((Category.id_comp _).trans (spMap_comp_integers σ).symm)
-  let e' : Over.mk ((Over.mk (spMap σ)).hom ≫ spMap (algebraMap (𝓞 K) K)) ⟶ Over.mk (spMap (σ.comp (algebraMap (𝓞 K) K))) :=
-    Over.homMk (𝟙 _) ((Category.id_comp _).trans (spMap_comp_integers σ))
-  have hee : e' ≫ e = 𝟙 _ := Over.OverMorphism.ext (Category.id_comp _)
-  have hz : (e ≫ E y) ^ n = 1 := by
-    rw [← MonObj.comp_pow, ← map_pow, hy, map_one, MonObj.comp_one]
-  have h₂ : E y ≫ f = 1 := by
-    have h₁ := congrArg (fun q => e' ≫ q) (hker _ hz)
-    rw [← Category.assoc, ← Category.assoc, hee, Category.id_comp, MonObj.comp_one] at h₁
-    exact h₁
-  have h₃ : E' (y ≫ f₀) = E y ≫ f := by
+  have hker' : ∀ x : Over.mk (spMap σ ≫ spMap (algebraMap (𝓞 K) K)) ⟶ A.A,
+      x ^ n = 1 → x ≫ f = 1 :=
+    Eq.mp (congrArg (fun t : Sp ℂ ⟶ Sp (𝓞 K) =>
+      ∀ x : Over.mk t ⟶ A.A, x ^ n = 1 → x ≫ f = 1) (spMap_comp_integers σ)) hker
+  have hnE : (E y) ^ n = 1 :=
+    (map_pow E y n).symm.trans ((congrArg (fun x => E x) hy).trans (map_one E))
+  have hEf : E y ≫ f = 1 := hker' (E y) hnE
+  have hcomp : E' (y ≫ f₀) = E y ≫ f := by
     apply Over.OverMorphism.ext
-    rw [hE', Over.comp_left, Over.comp_left, hE, Category.assoc, Category.assoc, hf₀]
-  exact E'.injective (by rw [h₃, h₂, map_one])
+    calc
+      (E' (y ≫ f₀)).left = (y ≫ f₀).left ≫ φ' := hE' _
+      _ = y.left ≫ (f₀.left ≫ φ') := Category.assoc _ _ _
+      _ = y.left ≫ (φ ≫ f.left) := congrArg (y.left ≫ ·) hf₀
+      _ = (y.left ≫ φ) ≫ f.left := (Category.assoc _ _ _).symm
+      _ = (E y ≫ f).left := congrArg (· ≫ f.left) (hE y).symm
+  exact E'.injective (hcomp.trans (hEf.trans (map_one E').symm))
 
 theorem exists_nth_root_homomorphism : ∀ (K : Type) [Field K] [NumberField K] (σ : K →+* ℂ) (n : ℕ) (A B : Out.PolAV (Sp (𝓞 K))) (f : A.A ⟶ B.A), IsMonHom f → 0 < n → (∀ x : Over.mk (spMap (σ.comp (algebraMap (𝓞 K) K))) ⟶ A.A, x ^ n = 1 → x ≫ f = 1) → ∃ f' : A.A ⟶ B.A, IsMonHom f' ∧ f' ^ n = f := by
   intro K _ _ σ n A B f hf hn hker

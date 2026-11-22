@@ -199,6 +199,28 @@ theorem finite_quo (T : LocLat G Qp LL O) (q : LetA O n)
   simp only [Submodule.mem_comap, Submodule.subtype_apply, Submodule.coe_smul_of_tower]
   exact x.2
 
+private theorem free_finite_of_Q [IsDomain O] [IsDiscreteValuationRing O]
+    [IsAdicComplete (IsLocalRing.maximalIdeal O) O] {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O]
+    (hp : PD.p = l) (hl : ¬ IsUnit (l : O)) (T : LocLat G Qp LL O)
+    (hsat : wachSaturated W T) (s : ℕ) (hs : 1 ≤ s) (y : ℕ)
+    (hQ : ∀ i, W.Q i = GlobalTheory.Cyc.QQ l O s) :
+    Module.Free O (quo W T (invN W T (W.Q ^ y)) (W.N T)) ∧
+      Module.Finite O (quo W T (invN W T (W.Q ^ y)) (W.N T)) := by
+  have := PD.finK₀
+  have hn : NeZero (Module.finrank Qp K₀) := ⟨Module.finrank_pos.ne'⟩
+  have : NeZero n := W.n_eq.symm ▸ hn
+  have hQy : W.Q ^ y = fun _ => GlobalTheory.Cyc.QQ l O s ^ y := by
+    funext i
+    rw [Pi.pow_apply, hQ]
+  have hunit : IsUnit (algebraMap (LetA O n) W.EE (W.Q ^ y)) := by
+    rw [map_pow]
+    exact (GlobalTheory.NL.IoXQ.isUnit_Q W).pow y
+  obtain ⟨Fs, hFs⟩ := div_letters n (GlobalTheory.Cyc.QQ l O s ^ y) (QQ_pow_map_ne hl s hs y)
+  have hfin := finite_quo W T (W.Q ^ y) hunit Fs (by rw [hQy]; exact hFs)
+  have hnonunit : ¬ IsUnit (PD.p : O) := hp.symm ▸ hl
+  have := torsionFree_quo W hnonunit T hsat (invN W T (W.Q ^ y))
+  exact ⟨Module.free_of_finite_type_torsion_free', hfin⟩
+
 end Generic
 
 
@@ -207,30 +229,12 @@ set_option synthInstance.maxHeartbeats 4000000 in
 theorem quo_free_finite : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; ∀ T : Lt K LL, IsCrys ((D.loc l).PD K) T.ρ → ∀ y : ℕ, Module.Free ↥(OL LL) (quo W T (invN W T (W.Q ^ y)) (W.N T)) ∧ Module.Finite ↥(OL LL) (quo W T (invN W T (W.Q ^ y)) (W.N T)) := by
   intro D HW F l _ K s LL h W T hT y
   obtain ⟨hdvr, hcomp, hl⟩ := GlobalTheory.FinExtIntegers.dvr_complete LL
-  have := hdvr
-  have := ((D.loc l).PD K).finK₀
-  have : NeZero (Module.finrank ℚ_[l] ↥(K0 K)) := ⟨Module.finrank_pos.ne'⟩
   have hQ : ∀ i, W.Q i = GlobalTheory.Cyc.QQ l ↥(OL LL) s := by
-    obtain ⟨_, _, _, _, _, hQ, _⟩ := GlobalTheory.NL.CycRing.rings_cyclotomic D HW l K s LL h
-    exact hQ
-  have hQy : W.Q ^ y = fun _ => GlobalTheory.Cyc.QQ l ↥(OL LL) s ^ y := by
-    funext i
-    rw [Pi.pow_apply, hQ]
-  have hunit : IsUnit (algebraMap (AA K LL) W.EE (W.Q ^ y)) := by
-    have := ((GlobalTheory.NL.IoXQ.main D HW F l K s LL h).2.2.2.2.2.2 0).2
-    rw [pow_zero, AlgHom.one_apply] at this
-    rw [map_pow]
-    exact this.pow y
-  have hp : ¬ IsUnit ((((D.loc l).PD K).p : ℕ) : ↥(OL LL)) := by
-    rw [(D.loc l).PD_p K]
-    exact hl
-  have hsat := (GlobalTheory.NL.Isog.saturated_and_isogeny_invariant D HW F l K s LL h).1 T hT
-  have := hcomp
-  obtain ⟨Fs, hFs⟩ := div_letters (Module.finrank ℚ_[l] ↥(K0 K)) (GlobalTheory.Cyc.QQ l ↥(OL LL) s ^ y)
-    (QQ_pow_map_ne hl s h.1 y)
-  have hfin : Module.Finite ↥(OL LL) (quo W T (invN W T (W.Q ^ y)) (W.N T)) :=
-    finite_quo W T (W.Q ^ y) hunit Fs (by rw [hQy]; exact hFs)
-  have := torsionFree_quo W hp T hsat (invN W T (W.Q ^ y))
-  exact ⟨Module.free_of_finite_type_torsion_free', hfin⟩
+    obtain ⟨_, hχ⟩ := GlobalTheory.NL.CycRing.rings_cyclotomic D HW l K s LL h
+    exact hχ.2.2.2.2.1
+  have hsat : wachSaturated W T :=
+    (GlobalTheory.NL.Isog.saturated_and_isogeny_invariant D HW F l K s LL h).1 T hT
+  clear_value W
+  exact free_finite_of_Q W ((D.loc l).PD_p K) hl T hsat s h.1 y hQ
 
 end GlobalTheory.NL.QuoFree

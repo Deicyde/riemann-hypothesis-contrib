@@ -34,12 +34,17 @@ theorem UpperTheory.Lit.Full.socle :
     obtain ⟨S, hS⟩ := exists_isAtom (prodIrr ![y, z] hd)
       ((hBZ k).2.2.1 _ _ _ _ _ _ hsρ (hasFiniteLength_of_isIrreducible hρ))
     let ι : S.toRepresentation.IntertwiningMap (prodIrr ![y, z] hd) := ⟨S.toSubmodule.subtype, fun _ => rfl⟩
+    have hι : Function.Injective ι := Subtype.val_injective
     have hSs : IsSmooth S.toRepresentation :=
-      (IsSubquotient.of_injective ι Subtype.val_injective).isSmooth (isSmooth_prodIrr _ hd)
+      (IsSubquotient.of_injective ι hι).isSmooth (isSmooth_prodIrr _ hd)
     have hSi := GlobalTheory.ClassFin.isIrreducible_toRepresentation_of_isAtom S hS
-    let φ := (IrrGL.equivOf S.toRepresentation hSs hSi).symm
-    exact ⟨IrrGL.of S.toRepresentation hSs hSi, hd, ι.comp φ.toIntertwiningMap,
-      Subtype.val_injective.comp φ.toLinearEquiv.injective⟩
+    let τ := IrrGL.of S.toRepresentation hSs hSi
+    let φ : τ.rep.Equiv S.toRepresentation := (IrrGL.equivOf S.toRepresentation hSs hSi).symm
+    let f : τ.rep.IntertwiningMap (prodIrr ![y, z] hd) := ι.comp φ.toIntertwiningMap
+    have hf : Function.Injective f.toLinearMap.toFun := by
+      change Function.Injective (fun v => ι (φ.toLinearEquiv v))
+      exact hι.comp φ.toLinearEquiv.injective
+    exact ⟨τ, hd, f, hf⟩
   · obtain ⟨n, c⟩ := x
     obtain ⟨n', c'⟩ := x'
     obtain ⟨h1, f, hf⟩ := hx
