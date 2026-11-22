@@ -1,10 +1,11 @@
 module
 
 public import Mathlib.RingTheory.PowerSeries.Substitution
-public import Mathlib.RingTheory.PowerSeries.Order
-public import Mathlib.RingTheory.PowerSeries.NoZeroDivisors
 public import Mathlib.RingTheory.AdicCompletion.Basic
-public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
+import Mathlib.RingTheory.PowerSeries.NoZeroDivisors
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 

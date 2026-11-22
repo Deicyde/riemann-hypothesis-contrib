@@ -1,16 +1,16 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.GenericFiberGluing.SemistableCompleteSplit
-public import Mathlib.RingTheory.AdjoinRoot
-public import Mathlib.RingTheory.DiscreteValuationRing.TFAE
-public import Mathlib.RingTheory.AdicCompletion.Noetherian
-public import Mathlib.RingTheory.Ideal.GoingUp
-public import Mathlib.FieldTheory.Minpoly.Field
-public import Mathlib.FieldTheory.Tower
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 public import Mathlib.Algebra.Polynomial.Eval.Irreducible
-public import Mathlib.RingTheory.Polynomial.UniqueFactorization
-public import Mathlib.Algebra.Polynomial.Lifts
-public import Mathlib.RingTheory.LocalRing.ResidueField.Basic
+import Mathlib.Basic.NNReal.Defs
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+public import Mathlib.RingTheory.DiscreteValuationRing.TFAE
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 

@@ -1,80 +1,52 @@
 module
 
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAreaFormulaInj
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAreaMultiplicityWeight
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsMahler
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StChartSectionLength
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PBallAverageLinear
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PBallVolume
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PChartPointSeparable
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PChowFormCycleSmul
-public import Mathlib
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.Statements
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.SpecFirstDetFormNeZero
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.IsMultiHomogOfIsChowForm
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PIntChowFormExists
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsMahler
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.Statements
-public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.PMaximalIdealHeightFG
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PFormsThroughPoint
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PFsLogAverage
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PFsLogPointOf
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PGenericFibreDim
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PGraphAreaFibre
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PIncidenceZeroLocus
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StSimpleRootBranch
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PSectionLengthSum
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PTangentJacComp
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PThroughPointIncIdeal
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PTrdegBaseAlgebraic
 public import GroundTheory.HeightsAndTheta.Heights.LocalFiniteness.UniformIntegrabilityProportionalityHolds
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.Assembly
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PSimpleRootBranch
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PChartCutoffEnergy
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PChartEnergyIntegrable
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PChartIbpCutoff
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PChartMassInvariant
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PCurveCharts
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PDualGeomDegStandard
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PDualStdGenDeg
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PGaussFourierSelf
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PGaussLatticeCoords
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PGaussLatticeIsLattice
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PGaussPoissonBound
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PGaussShellSum
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PGrassGeomDegChart
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PHermFormCompare
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.POneBlockPointDeg
-public import GroundTheory.HeightsAndTheta.Heights.KernelsRest
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Statements
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Inhabitants
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PThetaInnerMean
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PThetaSummandNorm
-public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.SgnSingleton
-public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.CellMeetsBaseCell
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Imports
-public import GroundTheory.HeightsAndTheta.Heights.StrongApproximation.PAETopologicalRing
-public import GroundTheory.HeightsAndTheta.Heights.StrongApproximation.PSAOpenHolds
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PChartConeComponent
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PChartSectionLength
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCurveClosedPointChart
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCurveIndexLinear
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCurveRingFinite
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCurveVertPointInj
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCurveVertPointNagata
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PGoodChartModel
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PGoodChartZeroSet
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterDivPushA
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.ContDiffFubiniStudyRatioCompChart0
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.IntegrableOnTargetOfTsupport
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.KerEqBotOfCoord
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.IsPotentialOfFun
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterBridgeH
-public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.LintegralImageEqLintegralNormSqDetMul
-public import ReciprocityTheory.AnalyticForms.AnalyticCharts.MaDensCompEqZeroOfRankLt
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.LocDens
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.Pullback
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.Stokes
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.ContDiffAtOfIsPotential
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterRedF
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

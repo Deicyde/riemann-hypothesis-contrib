@@ -2,6 +2,7 @@ module
 
 public import Mathlib.RingTheory.PowerSeries.WeierstrassPreparation
 public import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.EqZeroOfForallMemCoeffFiltration
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 

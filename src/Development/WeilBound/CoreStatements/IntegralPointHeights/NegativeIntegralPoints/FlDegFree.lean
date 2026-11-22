@@ -1,37 +1,79 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.RefLinked
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterSt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterNamed
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.Exists
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GenFibreExists
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IsChainFirst
+public import Development.AutomorphicSpectrum.Statements.MetricStatements.AgreementIffGuarded
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FieldIntersectionLinearDegreeOneStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FlagChainArithVarietyStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FlagChainUnitLogIntegralStatement
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FlagDegreeWeightFormula
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.GenericFibreLinearEquationsStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IsBlockMapDrop
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.LogIntegralMultilinearStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagHeightPolynomialWeightFormStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagVarietyBoundaryDimensionDropStatement
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsPeriodOn
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverDegreeOneRealisationStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagVarietyArithmeticStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagVarietyModelBaseMetricStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.RhoCoeffGapDeltaOneStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.RhoFactorialProductEqStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.SymmetricFormPolynomialCoeffStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.WeightGapDeltaEqAntisymmetricStatement
+public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.WeightMapInjectiveStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAnalyticDataUniformisedStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverDegreeOneRealisationStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagHeightPolynomialWeightFormStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagVarietyArithmeticStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagVarietyBoundaryDimensionDropStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagVarietyModelBaseMetricStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RealisationPotentialDegreeCompatibilityStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SamePotBlock
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.UniformisedDegreePolynomialAntisymmetricStatement
 public import Development.WeilBound.CoreStatements.PluriharmonicCharts.XCFlAn
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ExistsUnique
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SamePotBlock
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PLiftGraphFactor
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IsChainFirst
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IsBlockMapDrop
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FlagChainArithVarietyStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.GenericFibreLinearEquationsStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FieldIntersectionLinearDegreeOneStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FlagChainUnitLogIntegralStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.SymmetricFormPolynomialCoeffStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.WeightMapInjectiveStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.WeightGapDeltaEqAntisymmetricStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.RhoCoeffGapDeltaOneStatement
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.RhoFactorialProductEqStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Presheaf
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsPeriodOn
 
 @[expose] public section
 

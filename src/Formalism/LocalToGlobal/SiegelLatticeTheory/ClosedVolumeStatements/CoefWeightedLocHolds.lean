@@ -1,35 +1,65 @@
 module
 
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScPsiExists
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.SettingBlocks
 public import Formalism.PeriodIntegrals.ScPsiExists
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScGapBig
-public import Formalism.PeriodIntegrals.ScGapBig
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScMuExists
-public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
-public import Formalism.LocalRingCardinality.IntCastDvdOfDvdIntegers
 public import Formalism.PeriodIntegrals.ScMuExists
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScRefExists
-public import Formalism.PeriodIntegrals.ScRefExists
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScXuExists
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScPiFrame
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScPiBuild
 public import Formalism.SharpRestriction.CuspSpanNormBounds.DiscreteSeriesWeylDimension
 public import Formalism.PeriodIntegrals.ScPiExists
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.InstExists
+public import Formalism.PeriodIntegrals.ScXuExists
+public import Formalism.SharpRestriction.CuspSpanNormBounds.BridgeLitG
+public import Formalism.LocalRingCardinality.IntCastDvdOfDvdIntegers
+public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.BesselDiscreteSeries.BesselNVGapPf
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.BunExists
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.ScWlocExists
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.SplitPrimeCounts.LsSetresInt
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.SplitPrimeCounts.LsSetresSplit
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScMuExists
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScPiBuild
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScPiFrame
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScPsiExists
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScRefExists
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.ScXuExists
 public import Formalism.SharpRestriction.CuspSpanNormBounds.BridgeHW
 public import Formalism.SharpRestriction.CuspSpanNormBounds.HCFiniteKMultiplicityGapped
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.BunExists
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LatExists
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.MultiplicityGExists
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.MExistsCut
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.MeasWCore
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.MeasInfXfer
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.BesselDiscreteSeries.BesselNVGapPf
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.ScWlocExists
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.HCReprodM
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.SplitPrimeCounts.LsSetresSplit
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.SplitPrimeCounts.LsSetresInt
 
 @[expose] public section
 
