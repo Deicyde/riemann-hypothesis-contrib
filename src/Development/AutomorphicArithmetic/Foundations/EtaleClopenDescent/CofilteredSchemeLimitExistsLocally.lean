@@ -93,14 +93,14 @@ private lemma isPullback_limMap {V U : (D.obj j₀).Opens} (h : V ≤ U) [HasLim
       rw [hV j, ← Category.assoc]
       exact h2
 
-private def coverOpen (U : (D.obj j₀).directedAffineCover.I₀) : (D.obj j₀).Opens := U.1
+private abbrev coverOpen (U : (D.obj j₀).directedAffineCover.I₀) : (D.obj j₀).Opens := U.1
 
 private lemma coverOpen_le {U V : (D.obj j₀).directedAffineCover.I₀} (f : U ⟶ V) :
     coverOpen D j₀ U ≤ coverOpen D j₀ V := leOfHom f
 
 section Glue
 
-variable [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ (coverOpen D j₀ U))]
+variable [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ U.1)]
 
 private def P : (D.obj j₀).directedAffineCover.I₀ ⥤ Scheme.{0} where
   obj U := limit (opensDiagram D j₀ (coverOpen D j₀ U))
@@ -218,7 +218,7 @@ variable (s : Cone (Over.forget j₀ ⋙ D))
 
 private abbrev sT : s.pt ⟶ D.obj j₀ := s.π.app (T j₀)
 
-omit [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ (coverOpen D j₀ U))] in
+omit [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ U.1)] in
 private lemma s_w (j : Over j₀) : s.π.app j ≫ D.map j.hom = sT D j₀ s :=
   s.w (Over.homMk j.hom : j ⟶ T j₀)
 
@@ -229,7 +229,7 @@ private def leg (U : (D.obj j₀).Opens) (j : Over j₀) :
     (pullback.condition.symm.trans
       ((Category.assoc _ _ _).trans (congrArg (pullback.fst _ _ ≫ ·) (s_w D j₀ s j))).symm)
 
-omit [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ (coverOpen D j₀ U))] in
+omit [∀ U : (D.obj j₀).directedAffineCover.I₀, HasLimit (opensDiagram D j₀ U.1)] in
 private lemma leg_ι (U : (D.obj j₀).Opens) (j : Over j₀) :
     leg D j₀ s U j ≫ (opensDiagramι D j₀ U).app j = pullback.fst _ _ ≫ s.π.app j := by
   dsimp only [leg, opensDiagramι]
@@ -274,7 +274,6 @@ private lemma glLift_glπ (j : Over j₀) : glLift D j₀ s ≫ glπ D j₀ j = 
   refine Scheme.Cover.hom_ext ((D.obj j₀).directedAffineCover.pullback₁ (sT D j₀ s)) _ _
     fun U => ?_
   rw [glLift, Scheme.Cover.ι_glueMorphisms_assoc, locLift_glπ]
-  rfl
 
 end Lift
 
@@ -292,7 +291,7 @@ end UpperTheory.Cb.GluingProjections
 theorem UpperTheory.Cb.cofiltered_scheme_limit_exists_locally :
     LateralTheory.E.BuildCut.LimInt → LateralTheory.E.t_E2Cut.Cont → LateralTheory.E.t_E2Cut.MV → LateralTheory.E.HasLimPf.Loc := by
   intro _ _ _ J _ _ D j₀ _ hlim
-  have : ∀ U : (D.obj j₀).directedAffineCover.I₀,
-      HasLimit (opensDiagram D j₀ (UpperTheory.Cb.GluingProjections.coverOpen D j₀ U)) :=
+  letI : ∀ U : (D.obj j₀).directedAffineCover.I₀,
+      HasLimit (opensDiagram D j₀ U.1) :=
     fun U => hlim U.1 U.2
   exact ⟨⟨⟨UpperTheory.Cb.GluingProjections.glCone D j₀, UpperTheory.Cb.GluingProjections.isLimitGlCone D j₀⟩⟩⟩
