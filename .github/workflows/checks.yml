@@ -1,6 +1,7 @@
 name: checks
 
-# Challenge build on hosted runners; full builds use the external runner pool.
+# Challenge build and formal-conjectures rehearsal on hosted runners; full builds use the
+# external runner pool.
 # The original-submission provenance comparison is available by manual dispatch.
 
 on:
@@ -65,3 +66,121 @@ jobs:
         run: lake exe mathlib/cache get
       - name: Build only the Challenge module
         run: lake build Challenge
+
+  # The second Comparator setup, formal-conjectures/. See the README and the notes.
+  formal-conjectures:
+    name: formal-conjectures challenge at the pinned commit, and a rehearsal of the judge
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      LEAN_ABORT_ON_PANIC: "1"   # as Comparator sets it for builds and exports
+      MATHLIB_CACHE_GET_URL: https://cache.mathlib.org/mathlib4   # Mathlib's current cache server
+      FC_REV: d8d031d4998c78575159ccab9a7a9e95ce043883
+    steps:
+      # Of the submission's source, only Statements.lean, which the bridge imports.
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /README.md
+            /lean-toolchain
+            /lake-manifest.json
+            /formal-conjectures/
+            /src/Statements.lean
+          sparse-checkout-cone-mode: false
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
+          sh "$RUNNER_TEMP/elan-init.sh" -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Check out formal-conjectures at the pinned commit
+        run: |
+          git init --quiet "$RUNNER_TEMP/fc"
+          cd "$RUNNER_TEMP/fc"
+          git fetch --quiet --depth 1 https://github.com/google-deepmind/formal-conjectures "$FC_REV"
+          git checkout --quiet FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$FC_REV"
+      - name: The pin is the one the README and the copied statement name
+        run: |
+          grep -q "git checkout $FC_REV" README.md
+          grep -q "$FC_REV" formal-conjectures/FormalConjecturesStatement.lean
+      - name: formal-conjectures uses this project's Lean and this project's Mathlib
+        run: |
+          cmp lean-toolchain "$RUNNER_TEMP/fc/lean-toolchain"
+          mathlib() { python3 -c 'import json, sys; print(next(p["rev"] for p in json.load(open(sys.argv[1]))["packages"] if p["name"] == "mathlib"))' "$1"; }
+          mathlib lake-manifest.json
+          test "$(mathlib lake-manifest.json)" = "$(mathlib "$RUNNER_TEMP/fc/lake-manifest.json")"
+      - name: Build the challenge module
+        working-directory: ${{ runner.temp }}/fc
+        run: |
+          lake exe cache get
+          lake build FormalConjectures.Millennium.RiemannHypothesis
+      - name: Build the exporter (lean4export v4.33.0 with this project's Lean)
+        run: |
+          git clone --quiet --depth 1 --branch v4.33.0 https://github.com/leanprover/lean4export "$RUNNER_TEMP/lean4export"
+          cp lean-toolchain "$RUNNER_TEMP/lean4export/lean-toolchain"
+          cd "$RUNNER_TEMP/lean4export" && git rev-parse HEAD && lake build lean4export
+
+      # Step 1b of the README.
+      - name: Export the challenge
+        working-directory: ${{ runner.temp }}/fc
+        run: |
+          lake env "$RUNNER_TEMP/lean4export/.lake/build/bin/lean4export" FormalConjectures.Millennium.RiemannHypothesis \
+            -- $(cat "$GITHUB_WORKSPACE/formal-conjectures/export-targets.txt") > "$RUNNER_TEMP/fc-challenge.export"
+          cd "$RUNNER_TEMP"
+          sha256sum fc-challenge.export | tee fc-challenge.export.sha256
+          {
+            echo "### formal-conjectures challenge export"
+            echo "- sha256: \`$(cut -d' ' -f1 fc-challenge.export.sha256)\`"
+            echo "- size: $(wc -c < fc-challenge.export) bytes, $(wc -l < fc-challenge.export) lines"
+            echo "- formal-conjectures commit: \`$FC_REV\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # The README quotes this checksum; fail if the export ever changes.
+          echo "75aa4a26e43ba9ea2998ba28ebdec4d72c43b43944e6c333963c4cfeda08c2c1  fc-challenge.export" | sha256sum -c
+
+      # Steps 3b and 4b, rehearsed: `Main.lean` is replaced by a placeholder that assumes the
+      # two theorems the solution uses. The files are compiled with the Mathlib checked above.
+      - name: Compile the three files against a placeholder Main, and export
+        working-directory: ${{ runner.temp }}/fc
+        run: |
+          out="$RUNNER_TEMP/rehearsal"
+          mkdir "$out"
+          printf '%s\n' 'import Statements' \
+            'theorem riemannHypothesis : RiemannHypothesis := sorry' \
+            'theorem LFunction_eq_zero_re_of_isPrimitive : PrimitiveDirichletLZerosOnLine := sorry' > "$RUNNER_TEMP/Main.lean"
+          compile() { LEAN_PATH="$out" lake env lean "${@:3}" --root="$1" -o "$out/$2.olean" "$1/$2.lean"; }
+          compile "$GITHUB_WORKSPACE/src" Statements
+          compile "$RUNNER_TEMP" Main
+          for m in FormalConjecturesStatement FormalConjecturesBridge FormalConjecturesSolution; do
+            compile "$GITHUB_WORKSPACE/formal-conjectures" "$m" -DwarningAsError=true
+          done
+          LEAN_PATH="$out" lake env "$RUNNER_TEMP/lean4export/.lake/build/bin/lean4export" FormalConjecturesSolution \
+            -- $(cat "$GITHUB_WORKSPACE/formal-conjectures/export-targets.txt") > "$RUNNER_TEMP/fc-rehearsal.export"
+      # Not a verdict on the proof. Both exports were made above from files we trust, so the
+      # judge runs without its sandbox.
+      - name: Judge the rehearsal with Lean v4.36.0
+        run: |
+          mkdir "$RUNNER_TEMP/judge"
+          cd "$RUNNER_TEMP/judge"
+          echo leanprover/lean4:v4.36.0 > lean-toolchain
+          # `lake comparator` looks for the checkers bundled with Lean on PATH.
+          PATH="$(lean --print-prefix)/bin:$PATH"
+          judge() {
+            lake comparator --inadvisably-no-sandbox --config "$1" \
+              --challenge-from-export "$RUNNER_TEMP/fc-challenge.export" \
+              --solution-from-export "$RUNNER_TEMP/fc-rehearsal.export"
+          }
+
+          # With the real config the placeholder's `sorry` must be the one thing rejected:
+          # the statements already match formal-conjectures'.
+          if judge "$GITHUB_WORKSPACE/formal-conjectures/comparator.json" > real.log 2>&1; then
+            cat real.log
+            echo "comparator.json accepted a solution that uses sorry"
+            exit 1
+          fi
+          cat real.log
+          grep -q "Illegal axiom detected: 'sorryAx'" real.log
+
+          # With `sorryAx` permitted as well, every kernel must accept the bridge.
+          python3 -c 'import json, sys; c = json.load(open(sys.argv[1])); c["permitted_axioms"].append("sorryAx"); json.dump(c, sys.stdout)' \
+            "$GITHUB_WORKSPACE/formal-conjectures/comparator.json" > rehearsal.json
+          judge rehearsal.json
