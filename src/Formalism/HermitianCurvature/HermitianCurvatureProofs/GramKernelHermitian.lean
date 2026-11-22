@@ -49,8 +49,7 @@ theorem small_mul {C : Set K} (hC : IsCompact C) {W : Set K} (hW : W ∈ 𝓝 (0
   obtain ⟨u, v, hu, -, hsu, htv, huv⟩ :=
     generalized_tube_lemma (isCompact_singleton (x := (0 : K))) hC hn (by
       rintro ⟨a, b⟩ ⟨ha, -⟩
-      have ha' : a = 0 := ha
-      simp [ha', h0])
+      simpa [show a = 0 from ha] using h0)
   exact ⟨u, hu.mem_nhds (hsu rfl), fun a ha c hc => hW'W (huv (Set.mk_mem_prod ha (htv hc)))⟩
 
 theorem small_add {Om : Set K} (hC : IsCompact Om) (hO : IsOpen Om) :
@@ -59,8 +58,7 @@ theorem small_add {Om : Set K} (hC : IsCompact Om) (hO : IsOpen Om) :
   obtain ⟨u, v, -, hv, hsu, htv, huv⟩ :=
     generalized_tube_lemma hC (isCompact_singleton (x := (0 : K))) hn (by
       rintro ⟨a, b⟩ ⟨ha, hb⟩
-      have hb' : b = 0 := hb
-      simpa [hb'] using ha)
+      simpa [show b = 0 from hb] using ha)
   exact ⟨v, hv.mem_nhds (htv rfl), fun z hz w hw => huv (Set.mk_mem_prod (hsu hz) hw)⟩
 
 theorem small_scale {Om : Set K} (hC : IsCompact Om) (hO : IsOpen Om) :
@@ -68,17 +66,14 @@ theorem small_scale {Om : Set K} (hC : IsCompact Om) (hO : IsOpen Om) :
   obtain ⟨W, hW, h1⟩ := small_add hC hO
   obtain ⟨E, hE, h2⟩ := small_mul hC hW
   refine ⟨E, hE, fun z hz κ hκ => ?_⟩
-  have := h1 z hz _ (h2 _ hκ z hz)
-  have e : z + (κ - 1) * z = κ * z := by ring
-  rwa [e] at this
+  convert h1 z hz ((κ - 1) * z) (h2 (κ - 1) hκ z hz) using 1
+  ring
 
 def I (R : Subring K) (a : K) : Set K := {x | ∃ r ∈ R, x = a * r}
 
 theorem I_compact {R : Subring K} (hc : IsCompact (R : Set K)) (a : K) : IsCompact (I R a) := by
   have : I R a = (fun r => a * r) '' (R : Set K) := by
-    ext x; constructor
-    · rintro ⟨r, hr, rfl⟩; exact ⟨r, hr, rfl⟩
-    · rintro ⟨r, hr, rfl⟩; exact ⟨r, hr, rfl⟩
+    ext x; simp [I, eq_comm]
   rw [this]
   exact hc.image (continuous_const.mul continuous_id)
 
@@ -86,14 +81,11 @@ theorem I_nhds {R : Subring K} (ho : IsOpen (R : Set K)) (a : Kˣ) : I R (a : K)
   have : I R (a : K) = (fun x => ((a⁻¹ : Kˣ) : K) * x) ⁻¹' (R : Set K) := by
     ext x; constructor
     · rintro ⟨r, hr, rfl⟩
-      show ((a⁻¹ : Kˣ) : K) * ((a : K) * r) ∈ R
       simpa using hr
     · intro hx
       exact ⟨_, hx, by simp⟩
   rw [this]
-  refine (ho.preimage (continuous_const.mul continuous_id)).mem_nhds ?_
-  show ((a⁻¹ : Kˣ) : K) * 0 ∈ R
-  simp
+  exact (ho.preimage (continuous_const.mul continuous_id)).mem_nhds (by simp)
 
 theorem inter_zero {R : Subring K} [T2Space K] [IsReduced K] (hc : IsCompact (R : Set K))
     (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K)) (ϖ : K) (hu : ∀ x : K, ∃ m : ℕ, ϖ ^ m * x ∈ R)
@@ -180,9 +172,7 @@ theorem Adic.approx (h : Adic R ϖ) (f : K → K) (hf : Continuous f) (b : K)
     obtain ⟨n, hn⟩ := h.basis _ hW
     obtain ⟨r, hr, e, he, hre⟩ := ha n
     exact ⟨f r, by rw [hre]; exact hn e he, r, hr, rfl⟩
-  rw [hcl.closure_eq] at hb
-  obtain ⟨r, hr, e⟩ := hb
-  exact ⟨r, hr, e⟩
+  simpa [hcl.closure_eq] using hb
 
 theorem Adic.unit_one (h : Adic R ϖ) (j : K) (hj : j ∈ I R (ϖ : K)) : ∃ v ∈ R, (1 + j) * v = 1 := by
   obtain ⟨r, hr, rfl⟩ := hj
@@ -257,7 +247,6 @@ theorem Adic.root (h : Adic R ϖ) (s : ℕ) {c : K} (hc : c ∈ I R (ϖ : K)) {b
       refine ⟨r, hr, (s : K) ^ 2 * ((ϖ : K) * c' ^ (n + 1)) * e,
         R.mul_mem (R.mul_mem (R.pow_mem (natCast_mem R s) 2)
           (R.mul_mem h.mem (R.pow_mem hc' _))) he, ?_⟩
-      show (1 + (s : K) * c * r) ^ s = _
       rw [hre, hcc]; ring)
   exact ⟨_, ⟨r, hr, rfl⟩, e⟩
 
@@ -324,8 +313,7 @@ theorem Adic.inv_bounded (h : Adic R ϖ) {Om : Set K} (hC : IsCompact Om) (hU : 
       have i1 : (u : K) * ((u⁻¹ : Kˣ) : K) = 1 := by simp
       have : z' = ((u⁻¹ : Kˣ) : K) * v := by
         linear_combination ((u⁻¹ : Kˣ) : K) * v * e - z' * v * i1 - z' * ev
-      rw [this, ← mul_assoc]
-      exact R.mul_mem hM hv
+      simpa [this, mul_assoc] using R.mul_mem hM hv
 
 end Top
 
@@ -368,8 +356,7 @@ theorem shiftSmall : ShiftSmall := by
   have : (t₁ : K) = (ϖ : K) ^ n * (r * v) := by
     push_cast at e'
     linear_combination (-(t₁ : K)) * e + v * h1 + v * e'
-  rw [this]
-  exact hn' _ (R.mul_mem hr hv)
+  simpa [this] using hn' _ (R.mul_mem hr hv)
 
 theorem rootCorr : RootCorr := by
   intro K _ _ _ R ψ hD hn m Sg E hE

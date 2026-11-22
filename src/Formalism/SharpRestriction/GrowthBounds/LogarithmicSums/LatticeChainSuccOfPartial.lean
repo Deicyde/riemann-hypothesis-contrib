@@ -17,8 +17,7 @@ theorem mul_bound {s B c R : ℝ} (hs : s ≤ B) (hc : 0 ≤ c) (hBc : B * c ≤
   le_trans (mul_le_mul_of_nonneg_right hs hc) hBc
 
 theorem rpow_neg_le_inv (s : Scale) (u : ℝ) (hu : u ≤ -1) : s.x ^ u ≤ 1 / s.x := by
-  have h := Real.rpow_le_rpow_of_exponent_le s.one_lt_alt.le hu
-  rwa [Real.rpow_neg_one, ← one_div] at h
+  simpa [Real.rpow_neg_one, one_div] using Real.rpow_le_rpow_of_exponent_le s.one_lt_alt.le hu
 
 theorem rpow_le_inv_of_le_neg_two (s : Scale) (h : 120 ≤ s.x) (u : ℝ) (hu : u ≤ -2) : s.x ^ u ≤ 1 / s.x / 120 := by
   have h1 := Real.rpow_le_rpow_of_exponent_le s.one_lt_alt.le hu

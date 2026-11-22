@@ -216,8 +216,7 @@ theorem hpk_mul_apply (A : Mx k r) (i j : Fin (2 * r + k + 1)) :
   · rw [hpk_row, if_pos rfl]
   · intro m _ hm
     rw [hpk_row, if_neg hm, zero_mul]
-  · intro h
-    exact absurd (Finset.mem_univ _) h
+  · simp
 
 theorem tau_tau (i : Fin (2 * r + k + 1)) : tau k r (tau k r i) = i := by
   unfold tau
@@ -243,29 +242,25 @@ theorem hpk_sq : Hpk k r * Hpk k r = 1 := by
 
 theorem isUnit_of_uh {g : Mx k r} (hg : g ∈ UH (Hpk k r)) : IsUnit g.det := by
   apply Matrix.isUnit_det_of_left_inverse (B := Hpk k r * gᴴ * Hpk k r)
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   calc Hpk k r * gᴴ * Hpk k r * g = Hpk k r * (gᴴ * Hpk k r * g) := by
         simp only [Matrix.mul_assoc]
-    _ = 1 := by rw [hg', hpk_sq]
+    _ = 1 := by rw [hg, hpk_sq]
 
 theorem uh_one : (1 : Mx k r) ∈ UH (Hpk k r) := by
   show (1 : Mx k r)ᴴ * Hpk k r * 1 = Hpk k r
   rw [conjTranspose_one, Matrix.one_mul, Matrix.mul_one]
 
 theorem uh_mul {g h : Mx k r} (hg : g ∈ UH (Hpk k r)) (hh : h ∈ UH (Hpk k r)) : g * h ∈ UH (Hpk k r) := by
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
-  have hh' : hᴴ * Hpk k r * h = Hpk k r := hh
   show (g * h)ᴴ * Hpk k r * (g * h) = Hpk k r
   rw [conjTranspose_mul]
   calc hᴴ * gᴴ * Hpk k r * (g * h) = hᴴ * (gᴴ * Hpk k r * g) * h := by
         simp only [Matrix.mul_assoc]
-    _ = Hpk k r := by rw [hg', hh']
+    _ = Hpk k r := by rw [hg, hh]
 
 theorem uh_inv {g : Mx k r} (hg : g ∈ UH (Hpk k r)) : g⁻¹ ∈ UH (Hpk k r) := by
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   have hu := isUnit_of_uh hg
   show (g⁻¹)ᴴ * Hpk k r * g⁻¹ = Hpk k r
-  calc (g⁻¹)ᴴ * Hpk k r * g⁻¹ = (g⁻¹)ᴴ * (gᴴ * Hpk k r * g) * g⁻¹ := by rw [hg']
+  calc (g⁻¹)ᴴ * Hpk k r * g⁻¹ = (g⁻¹)ᴴ * (gᴴ * Hpk k r * g) * g⁻¹ := by rw [hg]
     _ = (g * g⁻¹)ᴴ * Hpk k r * (g * g⁻¹) := by
         rw [conjTranspose_mul]; simp only [Matrix.mul_assoc]
     _ = Hpk k r := by
@@ -316,8 +311,7 @@ theorem col_mul {g h : Mx k r} (hg : col k r g) (hh : col k r h) : col k r (g * 
         subst e
         omega
       rw [hg i m (by omega) (by omega), if_neg hne, zero_mul]
-  · intro hj'
-    exact absurd (Finset.mem_univ j) hj'
+  · simp
 
 theorem col_of_left_inv {g g' : Mx k r} (hg : col k r g) (hm : g' * g = 1) : col k r g' := by
   have key : ∀ n : ℕ, ∀ i j : Fin (2 * r + k + 1), j.val < n → j.val ≤ r + k →

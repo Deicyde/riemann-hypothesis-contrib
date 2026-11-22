@@ -77,8 +77,7 @@ theorem _root_.GlobalTheory.Published.exists_isIdealLattice [IsTotallyComplex K]
   have hs := sign_discr K
   rw [hc, pow_one, Int.sign_eq_neg_one_iff_neg] at hs
   have hd : discr K = -((-discr K).toNat : ℤ) := by omega
-  obtain ⟨L, hL⟩ := _root_.GlobalTheory.QuadraticZeta.exists_periodPair h2 hd (algebraMap K ℂ) 𝔞
-  exact ⟨L, hL⟩
+  exact _root_.GlobalTheory.QuadraticZeta.exists_periodPair h2 hd (algebraMap K ℂ) 𝔞
 
 
 
@@ -90,11 +89,10 @@ theorem _root_.GlobalTheory.Published.ComplexMultiplicationJSt.finrank_eq
     (h2 : Module.finrank ℚ K = 2) {H : IntermediateField K ℂ} (hH : _root_.GlobalTheory.Published.IsHilbertClassField H) :
     Module.finrank K H = classNumber K := by
   obtain ⟨H₀, art, hH₀, -, -, -⟩ := h K h2
-  obtain rfl : H = H₀ := le_antisymm (hH₀.2 H hH.1) (hH.2 H₀ hH₀.1)
+  obtain rfl := hH.unique hH₀
   haveI := hH.1.1
   haveI := hH.1.2.1
-  rw [← IsGalois.card_aut_eq_finrank, ← Nat.card_congr art.toEquiv, classNumber,
-    Nat.card_eq_fintype_card]
+  rw [← IsGalois.card_aut_eq_finrank, ← Nat.card_congr art.toEquiv, classNumber, Nat.card_eq_fintype_card]
 
 
 end Lemmas
