@@ -174,14 +174,16 @@ def main():
         j = by_name[name]
         marker = runtime_records / (name.replace('.', '/') + '.json')
         marker.parent.mkdir(parents=True, exist_ok=True)
-        setup = Path(request['setup'])
-        work = setup.parent
+        packed_setup = Path(request['setup'])
+        work = packed_setup.parent
         if marker.exists():
             saved = json.loads(marker.read_text())
             if saved['input'] != request['input'] or saved['c_sha256'] != sha(Path(j['c'])):
                 raise ValueError('runtime checkpoint changed')
             shutil.rmtree(work)
         else:
+            setup = work / 'setup.json'
+            run(['zstd', '-q', '-d', '-f', packed_setup, '-o', setup], project)
             old = Path(j['olean']).with_suffix('')
             fresh = work / 'fresh'
             log_path = marker.with_suffix('.log')
