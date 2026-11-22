@@ -1,0 +1,36 @@
+{
+  "number": 90,
+  "title": "Golf proofs in si  x ThetaBesselIsometries / BesselWaveGrids files (\u2212344 lines)",
+  "original_head": "a1c037e1653e86efb7d7afeb50114a4510c9b6b9",
+  "original_repo": "josephbebel/riemann-hypothesis",
+  "original_branch": "golf/theta-bessel-proof-golf",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 2,
+  "automatic_resolutions": [
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    }
+  ],
+  "rebased_head": "88228f7f2961944bbafb4d65e9d226114e63f200",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "6 files changed, 182 insertions(+), 526 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-90-e5ae821a00-45040489916-reviewed",
+  "status": "rebased"
+}

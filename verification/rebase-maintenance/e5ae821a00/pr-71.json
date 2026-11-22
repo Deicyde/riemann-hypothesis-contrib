@@ -1,0 +1,44 @@
+{
+  "number": 71,
+  "title": "chore: remove 66 backward.* options across 4 kernel-used scheme files",
+  "original_head": "ea66ac29ea75dea35b778299e34bc702798170ba",
+  "original_repo": "thekeunpie-hash/riemann-hypothesis",
+  "original_branch": "cleanup/remove-backward-options",
+  "maintainer_can_modify": true,
+  "old_merge_base": "f1f6d65420dbbf36d6cfdac1af8d79511a855a5b",
+  "automatic_resolution_count": 4,
+  "automatic_resolutions": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AbelianSchemeLawProofs/CoequifiberedDiagramMap.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsEtaleNeighbourhoodFinitePieceIsolatedPoint.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/RelObjIsoHomSubtype.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/Foundations/EtaleClopenDescent/CofilteredSchemeLimitExistsLocally.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    }
+  ],
+  "rebased_head": "6cc11f21ad6be2ed74ca8d6a31332b2e91ca08a4",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "4 files changed, 434 insertions(+), 258 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-71-e5ae821a00-45040489916-reviewed",
+  "status": "rebased"
+}

@@ -1,0 +1,52 @@
+{
+  "number": 74,
+  "title": "Give four duplicated theorems a single defining module",
+  "original_head": "06f38a132b762aafb0cc2b01aa0608128a346a64",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "fix/canonical-ahslim-theorems",
+  "maintainer_can_modify": true,
+  "old_merge_base": "09201d6a839516534e62aa598ff5ed82724105ac",
+  "automatic_resolution_count": 6,
+  "automatic_resolutions": [
+    {
+      "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CapelliComplements/GeneralBFactAlt.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/ExistsPrimeFiltrationOfIsMultiHomogIdeal.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/IsHomogeneousGrL.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterDivSupp.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterPCProof.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/WithBotEqOfAddOne.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    }
+  ],
+  "rebased_head": "503bd3689d8d27c49d0cc82a5d2c2ba1b5ca5450",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "6 files changed, 36 insertions(+), 46 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-74-e5ae821a00-45040489916-reviewed",
+  "status": "rebased"
+}

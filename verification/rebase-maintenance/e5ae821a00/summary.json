@@ -1,0 +1,215 @@
+{
+  "base": "e5ae821a00834f8043e987947f8151cc769bafe2",
+  "run": "45040489916-reviewed",
+  "results": [
+    {
+      "number": 92,
+      "title": "Reuse the existing CovNFormula proof",
+      "original_head": "bb1ffc43837cba8e5fad630e6688d45dd818a3ea",
+      "original_repo": "graohene10-spec/riemann-hypothesis",
+      "original_branch": "covn-formula-share-proof",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 1,
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CovolumeUnipotentIntegralNormalisedHaar.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        }
+      ],
+      "rebased_head": "bcb083a51640ce02cb089c83f3bf1668a9301ee7",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "1 file changed, 4 insertions(+), 32 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-92-e5ae821a00-45040489916-reviewed",
+      "status": "rebased"
+    },
+    {
+      "number": 82,
+      "title": "Share stabilizer filtration and Hensel counts (414 fewer Lean lines)",
+      "original_head": "d4fa3841d45d222ce2c4a7f7c73d96a78cf04c55",
+      "original_repo": "YinkaiYu/riemann-hypothesis",
+      "original_branch": "refactor/share-stabilizer-counts",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 4,
+      "automatic_resolutions": [
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        }
+      ],
+      "rebased_head": "7701d0fa7600cd6a77b172b160ca495f09669cc0",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "2 files changed, 20 insertions(+), 434 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-82-e5ae821a00-45040489916-reviewed",
+      "status": "rebased"
+    },
+    {
+      "number": 71,
+      "title": "chore: remove 66 backward.* options across 4 kernel-used scheme files",
+      "original_head": "ea66ac29ea75dea35b778299e34bc702798170ba",
+      "original_repo": "thekeunpie-hash/riemann-hypothesis",
+      "original_branch": "cleanup/remove-backward-options",
+      "maintainer_can_modify": true,
+      "old_merge_base": "f1f6d65420dbbf36d6cfdac1af8d79511a855a5b",
+      "automatic_resolution_count": 4,
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AbelianSchemeLawProofs/CoequifiberedDiagramMap.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsEtaleNeighbourhoodFinitePieceIsolatedPoint.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/RelObjIsoHomSubtype.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/Foundations/EtaleClopenDescent/CofilteredSchemeLimitExistsLocally.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        }
+      ],
+      "rebased_head": "6cc11f21ad6be2ed74ca8d6a31332b2e91ca08a4",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "4 files changed, 434 insertions(+), 258 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-71-e5ae821a00-45040489916-reviewed",
+      "status": "rebased"
+    },
+    {
+      "number": 74,
+      "title": "Give four duplicated theorems a single defining module",
+      "original_head": "06f38a132b762aafb0cc2b01aa0608128a346a64",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "fix/canonical-ahslim-theorems",
+      "maintainer_can_modify": true,
+      "old_merge_base": "09201d6a839516534e62aa598ff5ed82724105ac",
+      "automatic_resolution_count": 6,
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CapelliComplements/GeneralBFactAlt.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/ExistsPrimeFiltrationOfIsMultiHomogIdeal.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/IsHomogeneousGrL.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterDivSupp.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterPCProof.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/WithBotEqOfAddOne.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        }
+      ],
+      "rebased_head": "503bd3689d8d27c49d0cc82a5d2c2ba1b5ca5450",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "6 files changed, 36 insertions(+), 46 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-74-e5ae821a00-45040489916-reviewed",
+      "status": "rebased"
+    },
+    {
+      "number": 90,
+      "title": "Golf proofs in si  x ThetaBesselIsometries / BesselWaveGrids files (\u2212344 lines)",
+      "original_head": "a1c037e1653e86efb7d7afeb50114a4510c9b6b9",
+      "original_repo": "josephbebel/riemann-hypothesis",
+      "original_branch": "golf/theta-bessel-proof-golf",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 2,
+      "automatic_resolutions": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+          "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+        }
+      ],
+      "rebased_head": "88228f7f2961944bbafb4d65e9d226114e63f200",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "6 files changed, 182 insertions(+), 526 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-90-e5ae821a00-45040489916-reviewed",
+      "status": "rebased"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}

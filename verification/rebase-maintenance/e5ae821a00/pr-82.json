@@ -1,0 +1,44 @@
+{
+  "number": 82,
+  "title": "Share stabilizer filtration and Hensel counts (414 fewer Lean lines)",
+  "original_head": "d4fa3841d45d222ce2c4a7f7c73d96a78cf04c55",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/share-stabilizer-counts",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 4,
+  "automatic_resolutions": [
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    },
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    }
+  ],
+  "rebased_head": "7701d0fa7600cd6a77b172b160ca495f09669cc0",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "2 files changed, 20 insertions(+), 434 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-82-e5ae821a00-45040489916-reviewed",
+  "status": "rebased"
+}
