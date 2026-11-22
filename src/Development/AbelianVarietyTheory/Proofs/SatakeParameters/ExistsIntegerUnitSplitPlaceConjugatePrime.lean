@@ -10,16 +10,6 @@ open NumberField IsDedekindDomain Polynomial
 
 noncomputable section
 
--- Some compiled versions of `Unitary` omit this structure.
-run_cmd do
-  let name := `ReciprocityTheory.Aut.SplitPlace
-  unless (← Lean.getEnv).contains name do
-    Lean.Elab.Command.elabCommand (← `(
-      structure $(Lean.mkIdent name) (L : Type*) [Field L] [NumberField L]
-        [IsCMField L] where
-        v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))
-        i : L →ₐ[maximalRealSubfield L] v.adicCompletion (maximalRealSubfield L)))
-
 namespace GlobalTheory.SplitSep
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L]
