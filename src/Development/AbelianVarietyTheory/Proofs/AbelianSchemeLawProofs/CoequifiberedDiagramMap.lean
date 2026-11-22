@@ -138,7 +138,8 @@ def quot : Scheme := (glueData f g a ha p hp).glued
 
 def cover : (quot f g a ha p hp).OpenCover := (glueData f g a ha p hp).cover
 
-private lemma isOpenImmersion_cover (U : Y.affineOpens) :
+
+lemma isOpenImmersion_cover (U : Y.affineOpens) :
     IsOpenImmersion ((cover f g a ha p hp).f U) :=
   (cover f g a ha p hp).map_prop U
 
