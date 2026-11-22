@@ -1,0 +1,38 @@
+{
+  "number": 9,
+  "title": "remove redundant imports and heartbeat overrides",
+  "status": "rebased",
+  "base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "original_head": "c2de7b111cf3d61b59454121ff418cba6a5a0763",
+  "original_repo": "deancureton/riemann-hypothesis",
+  "original_branch": "cleanup/redundant-imports",
+  "rebased_head": "333d70da5f0a92b27d0e14cc17d904bd5024e2e5",
+  "prepared_branch": "maintenance/rebased-pr-9-c259b55f5b-45051429944-tree-restack",
+  "ready_to_publish": true,
+  "changes": "14627 files changed, 17 insertions(+), 14781 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "automatic_resolution_count": 20378,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044493411-manual-imports/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "7c7e512a9b317be67977a0b744c4463d1c3965f8",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "restack_commit_count": 1
+}

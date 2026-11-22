@@ -1,0 +1,533 @@
+{
+  "number": 54,
+  "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+  "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+  "original_repo": "by-eureka/riemann-hypothesis",
+  "original_branch": "eureka/upstream-proof-refactors",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+  "automatic_resolution_count": 111,
+  "rebased_head": "d4c52842a47c82b9436bbf3f294caad818d48112",
+  "diff_check": true,
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "133 files changed, 1422 insertions(+), 4750 deletions(-)",
+  "imports": {
+    "modules": 149097,
+    "missing_count": 30913,
+    "missing": [
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/UnitarySiegelSets/SiegelSetUnitaryHolds.lean",
+        "line": "6",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsSmoothModerateOfIsAutFunSm"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeries\u2082.DSExist"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean",
+        "line": "6",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeries\u2082.Zuckerman"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean",
+        "line": "7",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeries\u2082.Poulsen"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/PlaceSeparation/ArtinKer.lean",
+        "line": "4",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\u2082.ExistsUniqueHcharOfFiniteOrder"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/PlaceSeparation/IsOpenQuotientMapArt0.lean",
+        "line": "4",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\u2082.ExistsUniqueHcharOfFiniteOrder"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/ExhaustionOfSteps.lean",
+        "line": "4",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\u2082.LanglandsExhaustionGL"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/ExhaustionOfSteps.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\u2082.ExhUnipRadOne"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/ExhaustionOfThree.lean",
+        "line": "8",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\u2082.LanglandsMultisegments"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/IrreducibleAdmissibleGL.lean",
+        "line": "6",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\u2082.ExhUnipRadOne"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/JuxtDefs.lean",
+        "line": "6",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/SquareIntegrableSegments/SegmentReordering/CsOrderfree.lean",
+        "line": "6",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/SquareIntegrableSegments/SegmentReordering/CsReorderord.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/BernsteinZelevinsky/TopAdm.lean",
+        "line": "3",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/DiscreteSeriesSU/GapInv.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\u2082.DiscreteSeriesUpqUniqueOfClassification"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/ObstructionLifting/H1StructureDimLe.lean",
+        "line": "4",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsCrystalPairing"
+      },
+      {
+        "path": "src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/ObstructionLifting/H1StructureDimLe.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.AbelianHodgeDeRham"
+      },
+      {
+        "path": "src/CompanionTheory/HarishChandraModules/KFiniteAnalyticVectors/HaarBumpFunctions/PoulsenSmoothVectorsDense.lean",
+        "line": "8",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeries\u2082.Poulsen"
+      },
+      {
+        "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/CoverExistsOf.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\u2082.DsExistsOfDiscreteSeriesExists"
+      },
+      {
+        "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/CoverExistsOf.lean",
+        "line": "6",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\u2082.ExistsOfIsDSPar"
+      },
+      {
+        "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/DsExhaust.lean",
+        "line": "35",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\u2082.HasDRepIffHasDerivAt"
+      },
+      {
+        "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/DsExhaust.lean",
+        "line": "45",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeriesUnitary\u2082.DiscreteSeriesClassificationIff"
+      },
+      {
+        "path": "src/CompanionTheory/RealGroups/FormalDegrees/ArchimedeanFormalDegrees/NormIndOfSteps.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\u2082.FormalDegreeCompactDualIff"
+      },
+      {
+        "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/PiTensorTwist.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\u2082.LanglandsExhaustionGL"
+      },
+      {
+        "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/PiTensorTwist.lean",
+        "line": "6",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\u2082.LanglandsMultisegments"
+      },
+      {
+        "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/SomeRed.lean",
+        "line": "7",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\u2082.IsComplementaryProductOfIsCuspidal"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeModelBaseChangeSubalgebra.lean",
+        "line": "8",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeSpreadsOut.lean",
+        "line": "7",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeSpreadsOutFiniteTypeSubringImports.lean",
+        "line": "8",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ExistsFgSmoothOfRelativeDimension.lean",
+        "line": "8",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ExistsModelAbelianLb.lean",
+        "line": "7",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ImportsExtra.lean",
+        "line": "7",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ImportsFurther.lean",
+        "line": "7",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/LineBundleSpreadsOut.lean",
+        "line": "7",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/LineBundleSpreadsOutStatement.lean",
+        "line": "8",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibres.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibres.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibres.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPoints.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPoints.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPoints.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean",
+        "line": "4",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsCrystalPairing"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.AbelianHodgeDeRham"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean",
+        "line": "7",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.BijectiveCechDeRhamComparisonDegreeOne"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean",
+        "line": "8",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.PoincareDeRhamDuality"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean",
+        "line": "9",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBase.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBase.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBase.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclic.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclic.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclic.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncation.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncation.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncation.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ContragredientProductIrreducibleImports.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CuspidalTwistInjectiveImports.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/DualClassInvolutiveImports.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ExistsNoethModel.lean",
+        "line": "12",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.CubeTheorem"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSections.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSections.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSections.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSet.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSet.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSet.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChange.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChange.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChange.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChange.lean",
+        "line": "16",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChange.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChange.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChangeStatement.lean",
+        "line": "17",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.KawamataViehweg"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChangeStatement.lean",
+        "line": "18",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.ExistsAlgClosedBaseChange"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChangeStatement.lean",
+        "line": "19",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IsLogCanonicalMultipleCanonical"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/GelfandKazhdanContragredientImports.lean",
+        "line": "6",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      },
+      {
+        "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/JacquetMultiplicityPosImports.lean",
+        "line": "5",
+        "module": "Development.AbelianVarietyTheory.PublishedTheorems.Divisors\u2082.IrreducibleAdmissibleGL"
+      }
+    ],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/repaired-pr-54-8f32827748-45048636006",
+  "status": "error",
+  "base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "note": "Retained main\u2019s local zeta reduction because RhOfRight was pruned; kept other proof shortenings.",
+  "repair_parent": "0d1cefd21d834298efd7b91c06ebfcc40674372b",
+  "diff_check_output": "",
+  "error": "Revalidation failed: {\"diff_check\": true, \"diff_check_output\": \"\", \"imports\": {\"modules\": 149097, \"missing_count\": 30913, \"missing\": [{\"path\": \"src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/UnitarySiegelSets/SiegelSetUnitaryHolds.lean\", \"line\": \"6\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsSmoothModerateOfIsAutFunSm\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeries\\u2082.DSExist\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean\", \"line\": \"6\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeries\\u2082.Zuckerman\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean\", \"line\": \"7\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeries\\u2082.Poulsen\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/PlaceSeparation/ArtinKer.lean\", \"line\": \"4\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\\u2082.ExistsUniqueHcharOfFiniteOrder\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/PlaceSeparation/IsOpenQuotientMapArt0.lean\", \"line\": \"4\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\\u2082.ExistsUniqueHcharOfFiniteOrder\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/ExhaustionOfSteps.lean\", \"line\": \"4\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\\u2082.LanglandsExhaustionGL\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/ExhaustionOfSteps.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\\u2082.ExhUnipRadOne\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/ExhaustionOfThree.lean\", \"line\": \"8\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\\u2082.LanglandsMultisegments\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/IrreducibleAdmissibleGL.lean\", \"line\": \"6\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\\u2082.ExhUnipRadOne\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/JuxtDefs.lean\", \"line\": \"6\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/SquareIntegrableSegments/SegmentReordering/CsOrderfree.lean\", \"line\": \"6\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/SquareIntegrableSegments/SegmentReordering/CsReorderord.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/BernsteinZelevinsky/TopAdm.lean\", \"line\": \"3\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/DiscreteSeriesSU/GapInv.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\\u2082.DiscreteSeriesUpqUniqueOfClassification\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/ObstructionLifting/H1StructureDimLe.lean\", \"line\": \"4\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsCrystalPairing\"}, {\"path\": \"src/CompanionTheory/AutomorphicTheory/TemperedLocalSpectra/ObstructionLifting/H1StructureDimLe.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.AbelianHodgeDeRham\"}, {\"path\": \"src/CompanionTheory/HarishChandraModules/KFiniteAnalyticVectors/HaarBumpFunctions/PoulsenSmoothVectorsDense.lean\", \"line\": \"8\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeries\\u2082.Poulsen\"}, {\"path\": \"src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/CoverExistsOf.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\\u2082.DsExistsOfDiscreteSeriesExists\"}, {\"path\": \"src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/CoverExistsOf.lean\", \"line\": \"6\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\\u2082.ExistsOfIsDSPar\"}, {\"path\": \"src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/DsExhaust.lean\", \"line\": \"35\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\\u2082.HasDRepIffHasDerivAt\"}, {\"path\": \"src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/DsExhaust.lean\", \"line\": \"45\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeriesUnitary\\u2082.DiscreteSeriesClassificationIff\"}, {\"path\": \"src/CompanionTheory/RealGroups/FormalDegrees/ArchimedeanFormalDegrees/NormIndOfSteps.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms\\u2082.FormalDegreeCompactDualIff\"}, {\"path\": \"src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/PiTensorTwist.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\\u2082.LanglandsExhaustionGL\"}, {\"path\": \"src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/PiTensorTwist.lean\", \"line\": \"6\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\\u2082.LanglandsMultisegments\"}, {\"path\": \"src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/SomeRed.lean\", \"line\": \"7\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology\\u2082.IsComplementaryProductOfIsCuspidal\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeModelBaseChangeSubalgebra.lean\", \"line\": \"8\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeSpreadsOut.lean\", \"line\": \"7\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeSpreadsOutFiniteTypeSubringImports.lean\", \"line\": \"8\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ExistsFgSmoothOfRelativeDimension.lean\", \"line\": \"8\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ExistsModelAbelianLb.lean\", \"line\": \"7\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ImportsExtra.lean\", \"line\": \"7\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ImportsFurther.lean\", \"line\": \"7\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/LineBundleSpreadsOut.lean\", \"line\": \"7\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/LineBundleSpreadsOutStatement.lean\", \"line\": \"8\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibres.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibres.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibres.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPoints.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPoints.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPoints.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean\", \"line\": \"4\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsCrystalPairing\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.AbelianHodgeDeRham\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean\", \"line\": \"7\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.BijectiveCechDeRhamComparisonDegreeOne\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean\", \"line\": \"8\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.PoincareDeRhamDuality\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AppTopCompApply.lean\", \"line\": \"9\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBase.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBase.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBase.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclic.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclic.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclic.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncation.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncation.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncation.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ContragredientProductIrreducibleImports.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CuspidalTwistInjectiveImports.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/DualClassInvolutiveImports.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ExistsNoethModel.lean\", \"line\": \"12\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.CubeTheorem\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSections.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSections.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSections.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSet.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSet.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSet.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChange.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChange.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChange.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChange.lean\", \"line\": \"16\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChange.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChange.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChangeStatement.lean\", \"line\": \"17\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.KawamataViehweg\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChangeStatement.lean\", \"line\": \"18\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.ExistsAlgClosedBaseChange\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChangeStatement.lean\", \"line\": \"19\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IsLogCanonicalMultipleCanonical\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/GelfandKazhdanContragredientImports.lean\", \"line\": \"6\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}, {\"path\": \"src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/JacquetMultiplicityPosImports.lean\", \"line\": \"5\", \"module\": \"Development.AbelianVarietyTheory.PublishedTheorems.Divisors\\u2082.IrreducibleAdmissibleGL\"}], \"acyclic\": true, \"cycle_sample\": []}}"
+}

@@ -1,0 +1,36 @@
+{
+  "number": 90,
+  "title": "Golf proofs in si  x ThetaBesselIsometries / BesselWaveGrids files (\u2212344 lines)",
+  "status": "rebased",
+  "base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "original_head": "a1c037e1653e86efb7d7afeb50114a4510c9b6b9",
+  "original_repo": "josephbebel/riemann-hypothesis",
+  "original_branch": "golf/theta-bessel-proof-golf",
+  "rebased_head": "42c8a505e5757ac3b7d22a8c6742ea363f01d936",
+  "prepared_branch": "maintenance/rebased-pr-90-c259b55f5b-45051429944-tree-restack",
+  "ready_to_publish": true,
+  "changes": "6 files changed, 182 insertions(+), 526 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 2,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "486e34e64cf26907dd7ddf61842c9af531b3c3a8",
+  "restack_commit_count": 6
+}

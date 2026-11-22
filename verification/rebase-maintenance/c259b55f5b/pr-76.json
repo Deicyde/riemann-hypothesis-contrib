@@ -1,0 +1,36 @@
+{
+  "number": 76,
+  "title": "Share the threshold argument in combined_weight_of_nested_sets",
+  "status": "rebased",
+  "base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "original_head": "eb093d18e4d11bc5811c32beb1b2adb358ed9859",
+  "original_repo": "xsoc1/riemann-hypothesis",
+  "original_branch": "refactor/polbridge-shared-threshold",
+  "rebased_head": "7a716c91a144c15aa3e2ecfe453d53a3003f441d",
+  "prepared_branch": "maintenance/rebased-pr-76-c259b55f5b-45051429944-tree-restack",
+  "ready_to_publish": true,
+  "changes": "1 file changed, 12 insertions(+), 16 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "64cec5bb33c75f00f3d91bd0c6c1275ae4920bfd",
+  "restack_commit_count": 1
+}

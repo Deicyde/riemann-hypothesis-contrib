@@ -1,0 +1,36 @@
+{
+  "number": 79,
+  "title": "Remove heartbeat overrides",
+  "status": "rebased",
+  "base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "original_head": "90d23d60feda4ba5c41c6c7f8835c1de67bee799",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-heartbeats",
+  "rebased_head": "42d9f80017ca1caadfc824059087378ceed1c0fb",
+  "prepared_branch": "maintenance/rebased-pr-79-c259b55f5b-45051429944-tree-restack",
+  "ready_to_publish": true,
+  "changes": "57880 files changed, 103810 insertions(+), 103811 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "8c58d907c9d28a29a080d861bd51f6cfb72eb96b",
+  "restack_commit_count": 1
+}

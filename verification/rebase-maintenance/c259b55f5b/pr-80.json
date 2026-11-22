@@ -1,0 +1,39 @@
+{
+  "number": 80,
+  "title": "Remove stub-check guards from the 4.36 port (stacked on #66)",
+  "status": "rebased",
+  "base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "original_head": "2bab9a1e9bc8ee243c8c239de2174d9e9ed21d13",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "cleanup/port-4.36-stub-guards",
+  "initial_head": "942cc4de41b2922bafbf871b184ff8edd2dd80b5",
+  "rebased_head": "59057b1de27671658ab87022f0899613f91ae3b4",
+  "prepared_branch": "maintenance/rebased-pr-80-c259b55f5b-45051429944-tree-restack",
+  "ready_to_publish": false,
+  "published_head": "2bab9a1e9bc8ee243c8c239de2174d9e9ed21d13",
+  "changes": "20 files changed, 1 insertion(+), 514 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Published to the original PR branch with a checked head and an original-head backup.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "applied_before_restack": true,
+  "previous_prepared_head": "12bd6d312b897fc014e9b20bae81e0520e1c55bf",
+  "restack_commit_count": 1
+}
