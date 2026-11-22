@@ -1,0 +1,567 @@
+{
+  "base": "e5ae821a00834f8043e987947f8151cc769bafe2",
+  "run": "45042129234-remaining",
+  "results": [
+    {
+      "number": 98,
+      "title": "Minimize and privatize imports (stacked on #79)",
+      "original_head": "e2d63d253904023ae299743da96a19ea8cd73fce",
+      "original_repo": "Vilin97/rh-lc",
+      "original_branch": "port-lean-4.36-imports",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 1,
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AutomorphicFormsFiniteGL.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        }
+      ],
+      "rebased_head": "9625ad69ac0593b90ed0dfdb9a1ed5b21051ddee",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "149303 files changed, 6330828 insertions(+), 700590 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-98-e5ae821a00-45042129234-remaining",
+      "status": "rebased"
+    },
+    {
+      "number": 94,
+      "title": "Reuse the quadratic Hasse norm theorem for the negative-one norm equation",
+      "original_head": "ae11f0f2b01356117a3acb5a4fb888c322bc7b8e",
+      "original_repo": "hhh2210/riemann-hypothesis",
+      "original_branch": "reuse-quadratic-hasse-norm",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "automatic_resolution_count": 1,
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/NormIndexQuadratic.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        }
+      ],
+      "rebased_head": "001c202621aeda60ea72e28e59fe55bf758ada49",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "1 file changed, 34 insertions(+), 1703 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-94-e5ae821a00-45042129234-remaining",
+      "status": "rebased"
+    },
+    {
+      "number": 88,
+      "title": "Add a formal-conjectures Comparator setup and gather the setups in comparator/",
+      "original_head": "e5956bd05e3f5481a4c5e694e1009d7bb1bd6407",
+      "original_repo": "leanprover-community/riemann-hypothesis",
+      "original_branch": "comparator/formal-conjectures",
+      "maintainer_can_modify": false,
+      "old_merge_base": "e5ae821a00834f8043e987947f8151cc769bafe2",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "status": "conflict",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "README.md",
+          "stages": {
+            "1": "0dcc78956d30bc7380bef582a7e0863253c3e11b",
+            "2": "15480f53618623a8ac4faa9ae5a6eb3478c25653",
+            "3": "d080ef0ef0c86a5992ac5294c4833ee37ca085bf"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "c018a709ff1c290dcedd636de32fce34cc7587d4",
+      "log_tail": "Auto-merging README.md\nCONFLICT (content): Merge conflict in README.md\nAuto-merging verification/NOTES.md\nRebasing (1/10)\nerror: could not apply c018a709ff... Add a Comparator setup whose challenge is formal-conjectures' RH and GRH\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply c018a709ff... # Add a Comparator setup whose challenge is formal-conjectures' RH and GRH\n",
+      "checkpoint_head": "e5ae821a00834f8043e987947f8151cc769bafe2"
+    },
+    {
+      "number": 75,
+      "title": "Share analytic proofs across zeta and Dirichlet L-functions (630 fewer Lean lines)",
+      "original_head": "4938a86c3e68095277b498f3b92e2bd4d2fda3ec",
+      "original_repo": "YinkaiYu/riemann-hypothesis",
+      "original_branch": "refactor/zero-free-region-normalized-log",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 12,
+      "automatic_resolutions": [
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ExistsLocalZeroExpansionOfBound.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ZetaNegReal.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LandauLocalOf.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ThreeFourOne.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZetaGrowth.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/MellinRemainder.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/SizeWindowBrackets/ChainSlopeWindows/ChiEightNoRealZeroHypothesis.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/DzDifferentiableOn.lean",
+          "reason": "retain-PR-deletion"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+          "reason": "three-way-replay-through-module-header"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/NormCpowSubLePoint.lean",
+          "reason": "retain-PR-deletion"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/RiemannZetaOneEqOneSubOfRePos.lean",
+          "reason": "retain-PR-deletion"
+        }
+      ],
+      "rebased_head": "92157860707cef8db3b5e6f7937af22fc5014043",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "13 files changed, 489 insertions(+), 920 deletions(-)",
+      "imports": {
+        "modules": 149394,
+        "missing_count": 3,
+        "missing": [
+          {
+            "path": "src/Formalism/LocalToGlobal/Divisibility/SmallTies.lean",
+            "line": "73",
+            "module": "Formalism.ZeroFreeRegion.ZetaLogDerivativeBounds.DzDifferentiableOn"
+          },
+          {
+            "path": "src/Formalism/LocalToGlobal/GlobalTheory/FamColC.lean",
+            "line": "52",
+            "module": "Formalism.ZeroFreeRegion.ZetaLogDerivativeBounds.DzDifferentiableOn"
+          },
+          {
+            "path": "src/Formalism/LocalToGlobal/GlobalTheory/GL5/PacketStatementOfIndependence.lean",
+            "line": "78",
+            "module": "Formalism.ZeroFreeRegion.ZetaLogDerivativeBounds.DzDifferentiableOn"
+          }
+        ]
+      },
+      "prepared_branch": "maintenance/rebased-pr-75-e5ae821a00-45042129234-remaining",
+      "status": "rebased"
+    },
+    {
+      "number": 95,
+      "title": "Simplify proofs in GammaFactorNonvanishing and ZeroFreeRegion (\u2212824 lines)",
+      "original_head": "018e327c93d07383f5542b97741ca17548db2a7e",
+      "original_repo": "Osgood001/riemann-hypothesis",
+      "original_branch": "simplify-zero-free-region-and-gamma-reductions",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "automatic_resolution_count": 4,
+      "automatic_resolutions": [
+        {
+          "path": "src/Formalism/GammaFactorNonvanishing/CritLine.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/GammaFactorNonvanishing/RhOfRight.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LandauLocalOf.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZetaGrowth.lean",
+          "reason": "three-way-replay-through-module-header"
+        }
+      ],
+      "rebased_head": "cdea36571682d418decb5ad6fd3c64345c2f73b8",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "26 files changed, 590 insertions(+), 1370 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-95-e5ae821a00-45042129234-remaining",
+      "status": "rebased"
+    },
+    {
+      "number": 91,
+      "title": "Combine reviewed proof cleanups on Lean 4.36",
+      "original_head": "d4663eed405af528c67a3b1213021373cf8c0a5c",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "cleanup/reviewed-on-4.36",
+      "maintainer_can_modify": true,
+      "old_merge_base": "14f383e5edeae10b9991d9b8aec26b58aabc57eb",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "c13afbe7095bc59deb73921ea2a262333fd45a05",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "132 files changed, 2451 insertions(+), 12142 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-91-e5ae821a00-45042129234-remaining",
+      "status": "rebased"
+    },
+    {
+      "number": 33,
+      "title": "replace deprecated proof lemmas",
+      "original_head": "ede9888a861a06898e0d6c8632a396a763e496db",
+      "original_repo": "deancureton/riemann-hypothesis",
+      "original_branch": "cleanup/deprecated-proof-lemmas",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7da4577eb40dd74b09218d111114ca43bc2ad226",
+      "automatic_resolution_count": 31,
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DecoratedLatticeProofs/SeeSawLastTwoStepsTransportLinearRelations.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "continuous_finset_sum": "continuous_finsetSum",
+            "continuous_mul_right": "continuous_mul_const",
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DecoratedLatticeProofs/TrueGeometryLatticeForward.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "Set.mem_setOf_eq": "Set.mem_ofPred_eq"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ArchimedeanSumSizeBoundLargeDataFromFactors.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "Matrix.toEuclideanLin_apply": "Matrix.toLpLin_apply"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/BottomTriangleNonzeroConstantFirst.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "Set.mem_setOf_eq": "Set.mem_ofPred_eq"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/PartialLFunctionEqNormalizingFactorDefiniteBotto.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "Differentiable.fun_finset_prod": "Differentiable.fun_finsetProd"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/AdjointPairingUnfoldingDownwardLift.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/SatakeParameters/SystemWeightsEqShiftedCharacterExponents.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "Fin.coe_cast": "Fin.val_cast"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/LatticeFamilyAdoptionSecond.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "AddSubmonoidClass.coe_finset_sum": "AddSubmonoidClass.coe_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/PureTensorOperatorSplitOneRealPlace.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "ContinuousLinearMap.mul_apply": "mul_apply_eq_comp"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RealThetaIntertwinerAdjointIsRealThetaIntertwine.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "ContinuousMultilinearMap.smul_apply": "_root_.smul_apply",
+            "continuous_finset_prod": "continuous_finsetProd"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/LiteratureResults/KTheoryStability/ReductionBoundsTorsion/ArithmeticGapBounds/PUnfoldB.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum",
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ExistsCommonLevelSobolevBoundWeilCompact.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "continuous_finset_sum": "continuous_finsetSum",
+            "Set.mem_setOf_eq": "Set.mem_ofPred_eq",
+            "tendsto_finset_sum": "tendsto_finsetSum",
+            "ContinuousLinearMap.sum_apply": "sum_apply",
+            "ContinuousLinearMap.smul_apply": "smul_apply",
+            "Seminorm.smul_apply": "smul_apply"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/GraphRelationExtendsFromFockVectorsToKFinite.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ThetaFunApproxByFockVectorsOfCartanInvolutions.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/DownwardFormApproximationOfDecay.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SmoothOfThetaLiftFiniteSum.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "continuous_finset_sum": "continuous_finsetSum",
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftApproxOfApproxData.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftsDenseInCuspForms.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDescentApproximation.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDownwardApproxCusp.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperArrowApprox.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperCuspLiftApproxCusp.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistedFormDownwardGrowthBound.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+            "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+          }
+        },
+        {
+          "path": "src/Development/WeilBound/RepresentationTheoryGL/ArchimedeanBaseChange/ArchimedeanBaseChangeProof/SatakeExponents/SphericalEmbeddings/ValuationDetKO.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "MonoidHom.finset_prod_apply": "MonoidHom.finsetProd_apply",
+            "Set.mem_setOf_eq": "Set.mem_ofPred_eq"
+          }
+        },
+        {
+          "path": "src/Development/WeilBound/RepresentationTheoryGL/UnitaryDualProof/HermitianForms/UnitaryLattices/LatticeIndexLifts/MeasurableSpaceSecondLift.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "continuous_add_left": "continuous_const_add"
+          }
+        },
+        {
+          "path": "src/Formalism/SharpRestriction/CuspSpanNormBounds/OscillatoryIntegralBounds.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "Fin.coe_castSucc": "Fin.val_castSucc",
+            "continuous_finset_prod": "continuous_finsetProd",
+            "Finsupp.support_single_ne_zero": "Finsupp.support_single",
+            "continuous_finset_sum": "continuous_finsetSum",
+            "tendsto_finset_prod": "tendsto_finsetProd",
+            "Set.mem_setOf_eq": "Set.mem_ofPred_eq",
+            "Matrix.det_of_upperTriangular": "Matrix.det_of_isUpperTriangular"
+          }
+        },
+        {
+          "path": "src/Formalism/SharpRestriction/Divisibility/GeneratorPowers/PhiCMinI.lean",
+          "reason": "replay-only-deprecated-identifier-renames",
+          "identifier_changes": {
+            "Real.finset_prod_rpow": "Real.finsetProd_rpow"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSquareCommutativityProjection.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/FlipBoundOfHyp.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/PrincipalSeriesIrreducibleUnram.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/HodgeBundleWeights/ValuationMultiplicityOfConsecutiveRun.lean",
+          "reason": "retain-main-pruning"
+        }
+      ],
+      "rebased_head": "d69785d5fbf55dab4548d842b072ca4bacbbc358",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "75 files changed, 113 insertions(+), 113 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-33-e5ae821a00-45042129234-remaining",
+      "status": "rebased"
+    },
+    {
+      "number": 54,
+      "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+      "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+      "original_repo": "by-eureka/riemann-hypothesis",
+      "original_branch": "eureka/upstream-proof-refactors",
+      "maintainer_can_modify": true,
+      "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "automatic_resolution_count": 3,
+      "automatic_resolutions": [
+        {
+          "path": "src/Formalism/GammaFactorNonvanishing/RhOfRight.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Formalism/GammaFactorNonvanishing/CritLine.lean",
+          "reason": "retain-main-pruning"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/FourierUniquenessOfOpenSubgroup.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        }
+      ],
+      "status": "conflict",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/WeilBound/CoreStatements/HodgeTatePoints/HtatLieB.lean",
+          "stages": {
+            "1": "7072562f8feed19dd38814653f71fbaa8f038535",
+            "2": "8fbcedd8499911c64a2747a0baa9387e0d6644a6",
+            "3": "95c792e6b0ef72d659c84f0ac674dbd4b1b0bb1b"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "bafdde49d22a8ff6c2d1ca60c9599b954d4ee357",
+      "log_tail": "[detached HEAD 04e74ba9d1] Shorten the finite-quotient argument for Fourier uniqueness\n Author: DebarghaG <maildebargha@gmail.com>\n 1 file changed, 29 insertions(+), 52 deletions(-)\nAuto-merging src/Development/WeilBound/CoreStatements/HodgeTatePoints/HtatLieB.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/HodgeTatePoints/HtatLieB.lean\nRebasing (9/174)\nRebasing (10/174)\nerror: could not apply bafdde49d2... Reuse the smooth Lie-chart theorem and remove 46 duplicate proof lines\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply bafdde49d2... # Reuse the smooth Lie-chart theorem and remove 46 duplicate proof lines\n",
+      "checkpoint_head": "8e94a725487f7fb2986a5ad89c0a5a8556512358",
+      "checkpoint_branch": "maintenance/checkpoint-pr-54-e5ae821a00-45042129234-remaining"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}

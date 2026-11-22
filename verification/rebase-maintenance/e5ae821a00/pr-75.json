@@ -1,0 +1,92 @@
+{
+  "number": 75,
+  "title": "Share analytic proofs across zeta and Dirichlet L-functions (630 fewer Lean lines)",
+  "original_head": "4938a86c3e68095277b498f3b92e2bd4d2fda3ec",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/zero-free-region-normalized-log",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 12,
+  "automatic_resolutions": [
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ExistsLocalZeroExpansionOfBound.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ZetaNegReal.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LandauLocalOf.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ThreeFourOne.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZetaGrowth.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/MellinRemainder.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Formalism/SizeWindowBrackets/ChainSlopeWindows/ChiEightNoRealZeroHypothesis.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/DzDifferentiableOn.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/NormCpowSubLePoint.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/RiemannZetaOneEqOneSubOfRePos.lean",
+      "reason": "retain-PR-deletion"
+    }
+  ],
+  "rebased_head": "92157860707cef8db3b5e6f7937af22fc5014043",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "13 files changed, 489 insertions(+), 920 deletions(-)",
+  "imports": {
+    "modules": 149394,
+    "missing_count": 3,
+    "missing": [
+      {
+        "path": "src/Formalism/LocalToGlobal/Divisibility/SmallTies.lean",
+        "line": "73",
+        "module": "Formalism.ZeroFreeRegion.ZetaLogDerivativeBounds.DzDifferentiableOn"
+      },
+      {
+        "path": "src/Formalism/LocalToGlobal/GlobalTheory/FamColC.lean",
+        "line": "52",
+        "module": "Formalism.ZeroFreeRegion.ZetaLogDerivativeBounds.DzDifferentiableOn"
+      },
+      {
+        "path": "src/Formalism/LocalToGlobal/GlobalTheory/GL5/PacketStatementOfIndependence.lean",
+        "line": "78",
+        "module": "Formalism.ZeroFreeRegion.ZetaLogDerivativeBounds.DzDifferentiableOn"
+      }
+    ]
+  },
+  "prepared_branch": "maintenance/rebased-pr-75-e5ae821a00-45042129234-remaining",
+  "status": "rebased"
+}

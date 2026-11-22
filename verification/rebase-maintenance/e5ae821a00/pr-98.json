@@ -1,0 +1,32 @@
+{
+  "number": 98,
+  "title": "Minimize and privatize imports (stacked on #79)",
+  "original_head": "e2d63d253904023ae299743da96a19ea8cd73fce",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-imports",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 1,
+  "automatic_resolutions": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AutomorphicFormsFiniteGL.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    }
+  ],
+  "rebased_head": "9625ad69ac0593b90ed0dfdb9a1ed5b21051ddee",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "149303 files changed, 6330828 insertions(+), 700590 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-98-e5ae821a00-45042129234-remaining",
+  "status": "rebased"
+}
