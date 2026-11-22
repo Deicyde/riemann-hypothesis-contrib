@@ -1,0 +1,40 @@
+{
+  "number": 54,
+  "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+  "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+  "original_repo": "by-eureka/riemann-hypothesis",
+  "original_branch": "eureka/upstream-proof-refactors",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+  "automatic_resolution_count": 2,
+  "automatic_resolutions": [
+    {
+      "path": "src/Formalism/GammaFactorNonvanishing/RhOfRight.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Formalism/GammaFactorNonvanishing/CritLine.lean",
+      "reason": "retain-main-pruning"
+    }
+  ],
+  "status": "conflict",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/FourierUniquenessOfOpenSubgroup.lean",
+      "stages": {
+        "1": "a039a005cdec7ff0b26d83aa29cc3656daa97d59",
+        "2": "9794850df4835deb187af8fc8df504f6e31987c1",
+        "3": "8eb727f73829396f0b6b0ccb07e044334e6fb5a9"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "0572b62e140b70670778acfac8f6d4e547c41ab6",
+  "log_tail": "Auto-merging src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/FourierUniquenessOfOpenSubgroup.lean\nCONFLICT (content): Merge conflict in src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/FourierUniquenessOfOpenSubgroup.lean\nRebasing (4/174)\nRebasing (5/174)\nRebasing (6/174)\nRebasing (7/174)\nRebasing (8/174)\nerror: could not apply 0572b62e14... Shorten the finite-quotient argument for Fourier uniqueness\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply 0572b62e14... # Shorten the finite-quotient argument for Fourier uniqueness\n",
+  "checkpoint_head": "86494105879e193e1c5c56a7dcb35c574cdb1bee",
+  "checkpoint_branch": "maintenance/checkpoint-pr-54-e5ae821a00-45039889610-small-one"
+}

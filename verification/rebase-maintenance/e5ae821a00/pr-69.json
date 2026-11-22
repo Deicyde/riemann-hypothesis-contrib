@@ -1,0 +1,27 @@
+{
+  "number": 69,
+  "title": "cleanup/seed ancestor cache",
+  "original_head": "53052797a29d749b004442a8fa8d77a04d67ffef",
+  "original_repo": "deancureton/riemann-hypothesis",
+  "original_branch": "cleanup/seed-ancestor-cache",
+  "maintainer_can_modify": true,
+  "old_merge_base": "f28a764e76a18f68680446bf09682c24d1a8b5c4",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "99220af8f3291a73c7c07276d2bb1669403d60e5",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "4 files changed, 165 insertions(+), 29 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-69-e5ae821a00-45039889610-small-one",
+  "status": "rebased"
+}

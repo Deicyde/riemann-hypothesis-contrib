@@ -1,0 +1,27 @@
+{
+  "number": 76,
+  "title": "Share the threshold argument in combined_weight_of_nested_sets",
+  "original_head": "eb093d18e4d11bc5811c32beb1b2adb358ed9859",
+  "original_repo": "xsoc1/riemann-hypothesis",
+  "original_branch": "refactor/polbridge-shared-threshold",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "7b79e1875b9c0f739d697829fcc928329e108f18",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "1 file changed, 12 insertions(+), 16 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-76-e5ae821a00-45039889610-small-one",
+  "status": "rebased"
+}

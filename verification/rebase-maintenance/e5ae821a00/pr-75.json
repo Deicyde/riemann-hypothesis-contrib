@@ -1,0 +1,88 @@
+{
+  "number": 75,
+  "title": "Share analytic proofs across zeta and Dirichlet L-functions (630 fewer Lean lines)",
+  "original_head": "4938a86c3e68095277b498f3b92e2bd4d2fda3ec",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/zero-free-region-normalized-log",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 6,
+  "automatic_resolutions": [
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Formalism/SizeWindowBrackets/ChainSlopeWindows/ChiEightNoRealZeroHypothesis.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/DzDifferentiableOn.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/NormCpowSubLePoint.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/RiemannZetaOneEqOneSubOfRePos.lean",
+      "reason": "retain-PR-deletion"
+    }
+  ],
+  "status": "conflict",
+  "conflict_count": 5,
+  "stage_types": {
+    "1,2,3": 5
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ExistsLocalZeroExpansionOfBound.lean",
+      "stages": {
+        "1": "a95faae8258fd82450a38db69439d2b9a7f71055",
+        "2": "05e7035ce553623d1ccfa6c8204f91e0a2607c23",
+        "3": "53587f0a2bbba15d522431fd9b18abab32a9086d"
+      }
+    },
+    {
+      "path": "src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ZetaNegReal.lean",
+      "stages": {
+        "1": "3efe150ee85449df88d4b587ebd816dec8b1f6eb",
+        "2": "04bbad537c020478150bab0aa9a6a70cf68cf6c5",
+        "3": "8c1a38f1dc9a51fc1b4d084da96ab4787dce54f5"
+      }
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LandauLocalOf.lean",
+      "stages": {
+        "1": "ecfeeffeac83b3cba86dfffc4203d47900635836",
+        "2": "66ed8c585638d21032a85ed401d799db1ec228bb",
+        "3": "fa27abd42d358d1d3daf7472f5413dedd35d1511"
+      }
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ThreeFourOne.lean",
+      "stages": {
+        "1": "a1241ec502bda21cd23deb10fd5e076613faa497",
+        "2": "2276419b5878eb0b81085947c70559818751628a",
+        "3": "9e6951bfa7ce401a24e61775600b022ff690c4a8"
+      }
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZetaGrowth.lean",
+      "stages": {
+        "1": "76e0bbd075fd8ea6acf5edff73196e01416e726c",
+        "2": "3331bab8a57fbced5909e14266ea2a7671fe7277",
+        "3": "bf71cf69a57b08f4beaa41142e7a8cd5bf8a051d"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "4938a86c3e68095277b498f3b92e2bd4d2fda3ec",
+  "log_tail": "[detached HEAD e0eecbaa05] Use a normalized primitive for the zero-free disk logarithm\n Author: Yin-Kai Yu (\u4f59\u836b\u94e0) <yuyinkai@iphy.ac.cn>\n 1 file changed, 14 insertions(+), 30 deletions(-)\nAuto-merging src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ExistsLocalZeroExpansionOfBound.lean\nCONFLICT (content): Merge conflict in src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ExistsLocalZeroExpansionOfBound.lean\nAuto-merging src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ZetaNegReal.lean\nCONFLICT (content): Merge conflict in src/Formalism/LandauZeroFreeBounds/ExceptionalZeroBounds/ZetaNegReal.lean\nCONFLICT (modify/delete): src/Formalism/SizeWindowBrackets/ChainSlopeWindows/ChiEightNoRealZeroHypothesis.lean deleted in HEAD and modified in 4938a86c3e (Share the Mellin remainder and local zero expansion across zeta and Dirichlet L-functions).  Version 4938a86c3e (Share the Mellin remainder and local zero expansion across zeta and Dirichlet L-functions) of src/Formalism/SizeWindowBrackets/ChainSlopeWindows/ChiEightNoRealZeroHypothesis.lean left in tree.\nCONFLICT (modify/delete): src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/DzDifferentiableOn.lean deleted in 4938a86c3e (Share the Mellin remainder and local zero expansion across zeta and Dirichlet L-functions) and modified in HEAD.  Version HEAD of src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/DzDifferentiableOn.lean left in tree.\nAuto-merging src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LandauLocalOf.lean\nCONFLICT (content): Merge conflict in src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LandauLocalOf.lean\nAuto-merging src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean\nCONFLICT (content): Merge conflict in src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean\nCONFLICT (modify/delete): src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/NormCpowSubLePoint.lean deleted in 4938a86c3e (Share the Mellin remainder and local zero expansion across zeta and Dirichlet L-functions) and modified in HEAD.  Version HEAD of src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/NormCpowSubLePoint.lean left in tree.\nCONFLICT (modify/delete): src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/RiemannZetaOneEqOneSubOfRePos.lean deleted in 4938a86c3e (Share the Mellin remainder and local zero expansion across zeta and Dirichlet L-functions) and modified in HEAD.  Version HEAD of src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/RiemannZetaOneEqOneSubOfRePos.lean left in tree.\nAuto-merging src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ThreeFourOne.lean\nCONFLICT (content): Merge conflict in src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ThreeFourOne.lean\nAuto-merging src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZeroFactor.lean\nAuto-merging src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZeroFreeOf.lean\nAuto-merging src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZetaGrowth.lean\nCONFLICT (content): Merge conflict in src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/ZetaGrowth.lean\nRebasing (2/2)\nerror: could not apply 4938a86c3e... Share the Mellin remainder and local zero expansion across zeta and Dirichlet L-functions\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply 4938a86c3e... # Share the Mellin remainder and local zero expansion across zeta and Dirichlet L-functions\n",
+  "checkpoint_head": "e0eecbaa055a075cb5991e78f3b0a0976f502896",
+  "checkpoint_branch": "maintenance/checkpoint-pr-75-e5ae821a00-45039889610-small-one"
+}

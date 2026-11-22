@@ -1,0 +1,255 @@
+{
+  "number": 33,
+  "title": "replace deprecated proof lemmas",
+  "original_head": "ede9888a861a06898e0d6c8632a396a763e496db",
+  "original_repo": "deancureton/riemann-hypothesis",
+  "original_branch": "cleanup/deprecated-proof-lemmas",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7da4577eb40dd74b09218d111114ca43bc2ad226",
+  "automatic_resolution_count": 4,
+  "automatic_resolutions": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSquareCommutativityProjection.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/FlipBoundOfHyp.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/PrincipalSeriesIrreducibleUnram.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/HodgeBundleWeights/ValuationMultiplicityOfConsecutiveRun.lean",
+      "reason": "retain-main-pruning"
+    }
+  ],
+  "status": "conflict",
+  "conflict_count": 27,
+  "stage_types": {
+    "1,2,3": 27
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DecoratedLatticeProofs/SeeSawLastTwoStepsTransportLinearRelations.lean",
+      "stages": {
+        "1": "0517d26c1442c584b34ee5231da55ac7eac36803",
+        "2": "c87fd8b3206b819ec4ba5aa590b13c7e6ed05c14",
+        "3": "93f4e9674db7a23c286e9047c9f367e27ab209e8"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DecoratedLatticeProofs/TrueGeometryLatticeForward.lean",
+      "stages": {
+        "1": "fc07b7a2845a53369e478946e00a36e0a3c1adbc",
+        "2": "f075489c4c903862310441a8a121c86472e1b791",
+        "3": "ace276be5ba43af251bbaadcc918cd39b0036ea5"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ArchimedeanSumSizeBoundLargeDataFromFactors.lean",
+      "stages": {
+        "1": "93f9465aab46d342098d584e0b8bb66029771b0d",
+        "2": "407d2bfea285911754813591112f32b2f29a7650",
+        "3": "a6237dc440e03a0049bd24f234b09ff1b07803be"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/BottomTriangleNonzeroConstantFirst.lean",
+      "stages": {
+        "1": "99f6740d014d5aca3109faa26eafa4d0e6cb5246",
+        "2": "e71ae892f0094e35425aec138143b1e7f864748b",
+        "3": "814205d180958f3e37aad5fcf24d7e04bb3013de"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/PartialLFunctionEqNormalizingFactorDefiniteBotto.lean",
+      "stages": {
+        "1": "2ba66f037728163c8784109568961c45c5ed2dff",
+        "2": "a05946b77eae12013de38293ec5122627a319e80",
+        "3": "77be8de6e653b85a8ebb57adc390516ffcaac507"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/AdjointPairingUnfoldingDownwardLift.lean",
+      "stages": {
+        "1": "497232aff69a6d472e6f152c2bbf54aeefce8176",
+        "2": "ac049f7e044267e64875555d8d32813d7290f351",
+        "3": "feb59569af1b726df13b8c8bdca1fafa4bfd6b2d"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/SatakeParameters/SystemWeightsEqShiftedCharacterExponents.lean",
+      "stages": {
+        "1": "50273dc942f967a94e03dd86490dc546d63a212c",
+        "2": "9872c9af82a86b565f7ece7e8645174bfe8451ca",
+        "3": "212ac4fed98af1927ab5dee1bd21d559d9501731"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/LatticeFamilyAdoptionSecond.lean",
+      "stages": {
+        "1": "a416ccc879957ef3a5c1436517f7e50e25b3eedb",
+        "2": "691a042ddf355e9aba79b3ed4c4c90a8034d4b6a",
+        "3": "a9bf09edb30efa18195eef5755f20765acdcf3aa"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/PureTensorOperatorSplitOneRealPlace.lean",
+      "stages": {
+        "1": "e79a342fe60a80a86ad1142ee5fc390e7e94c9bc",
+        "2": "df17f9ec6cdba03dda07b60d7ccd982182d8f8bb",
+        "3": "05d0914f61618fc008235fff92a409abc4cc4cf7"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RealThetaIntertwinerAdjointIsRealThetaIntertwine.lean",
+      "stages": {
+        "1": "f265eeb8818cdcaea221bf7a2e85b258c1e59fd3",
+        "2": "352350cfef36740187d3397af43534a8231653bc",
+        "3": "e1e3fabc0ae233ddace608219d20dde5f00761d6"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/LiteratureResults/KTheoryStability/ReductionBoundsTorsion/ArithmeticGapBounds/PUnfoldB.lean",
+      "stages": {
+        "1": "e342c547fac35096a894450be32e4eaac7982d2c",
+        "2": "eddee44f35427cec22ac9410e95059d7030a9165",
+        "3": "84997f3f5feb8f0a7b3579ee357634e2eced0b4c"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ExistsCommonLevelSobolevBoundWeilCompact.lean",
+      "stages": {
+        "1": "01df9566d5e5515914bb6a95b85ef30c964fa8bc",
+        "2": "066d1d545a88a1e60cdbba2a64618e8641e287b3",
+        "3": "766dfda5d18fa21825d1a8319f50de6e40f1259f"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/GraphRelationExtendsFromFockVectorsToKFinite.lean",
+      "stages": {
+        "1": "275b035008402cffbf680721ba49cdd119504e53",
+        "2": "6e36cda0af0bfe6e389f85d66241ef0a52b4c3f5",
+        "3": "99744ffe92934dca269f024a63e854c0169e6615"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ThetaFunApproxByFockVectorsOfCartanInvolutions.lean",
+      "stages": {
+        "1": "a517fc498398c19f152ce461e60c94d9bca0720d",
+        "2": "289c3c29a7e3f65cb39004fdc970e3132bfc3ec7",
+        "3": "4520a6cf17c25473620cd03e8736b4a59224bed2"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/DownwardFormApproximationOfDecay.lean",
+      "stages": {
+        "1": "7487df834c086dd7005b8b1a9caf5beec45e79b5",
+        "2": "af74224cbbb80b16e0c4f6c2e286827083d1c199",
+        "3": "9adbfc8b02036441e04285377dec99baefa288a9"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SmoothOfThetaLiftFiniteSum.lean",
+      "stages": {
+        "1": "1f7a805dd548b8dcde9453fe05269c182d33cc34",
+        "2": "ba80efb2a65d189ec551650d1618ac31612b4bc5",
+        "3": "db90f13e3940b4ae1495aec55db29d5fe5cf8a87"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftApproxOfApproxData.lean",
+      "stages": {
+        "1": "de1c69befd68ac45ffeee40f2bb5a8eaf74169e4",
+        "2": "ebffac5555126d496c75a753f444117212ea15ad",
+        "3": "99c606e830afdbd30802376cd3f92a170012201c"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftsDenseInCuspForms.lean",
+      "stages": {
+        "1": "c413ddd46091641b86009d2c0da3a3109fe13210",
+        "2": "72a41cd891e62f4b1c39cd401d4f806acfa5817f",
+        "3": "641b4902ba2abb8d89f10b22e5caf25eb660d54b"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDescentApproximation.lean",
+      "stages": {
+        "1": "ea7f78b4dd7a9d55b478ed0225005e8a05a99011",
+        "2": "80b67cfd3003f895f20105157f06d22c91c6c658",
+        "3": "a43bcac9b709d1c1b102f7476af216df369edc58"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDownwardApproxCusp.lean",
+      "stages": {
+        "1": "8c6367c0523d59e608e4d1cbbdcfc6c2bfb95d3f",
+        "2": "c091093dfa136fbbba3e74e18d3a85293d0751f3",
+        "3": "c83057a16fcd8ffcc33f409b6f094a246eed5052"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperArrowApprox.lean",
+      "stages": {
+        "1": "1efb4ff6a7476d862b137870255ead8db390de15",
+        "2": "9d64ec5db374dc57d9aa4ef99dea420e7b2baf95",
+        "3": "5ccf267ebe068e906ac9fea4f7d6b2151d3447fa"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperCuspLiftApproxCusp.lean",
+      "stages": {
+        "1": "021cb1a192e5e11dd82c640d5ddbc11d2e0ca28a",
+        "2": "4b5f8424f73b8f7c4b3534304a7f0ffe4f049929",
+        "3": "2a4d945c0a1b30cda8b6b904ea714c0c050036f4"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistedFormDownwardGrowthBound.lean",
+      "stages": {
+        "1": "890d33b24cfae5b85a7d8827901bc4283771efab",
+        "2": "7ea0bd1f6a6f0464e3810de80c8c26a6ed228e96",
+        "3": "fd89dc12b65c838d476703e58de25cdb4bae86dd"
+      }
+    },
+    {
+      "path": "src/Development/WeilBound/RepresentationTheoryGL/ArchimedeanBaseChange/ArchimedeanBaseChangeProof/SatakeExponents/SphericalEmbeddings/ValuationDetKO.lean",
+      "stages": {
+        "1": "3eccc26c2eee242fdfb7d428e4614b0a41a2023f",
+        "2": "62e4c83dbc3aee9605d1179f9684d5f4e23286f1",
+        "3": "fed8646acaf808e9fc6f2b063f411d454be4eb0c"
+      }
+    },
+    {
+      "path": "src/Development/WeilBound/RepresentationTheoryGL/UnitaryDualProof/HermitianForms/UnitaryLattices/LatticeIndexLifts/MeasurableSpaceSecondLift.lean",
+      "stages": {
+        "1": "bd97bd66ff6e92cd6953f733ff118521de470368",
+        "2": "310cfa05eb028906f482b74121a4c4ea30f9f8b5",
+        "3": "683e399f08f9f971d1c300c1d95462a464127418"
+      }
+    },
+    {
+      "path": "src/Formalism/SharpRestriction/CuspSpanNormBounds/OscillatoryIntegralBounds.lean",
+      "stages": {
+        "1": "7337cb9b8a8e501c82aace9e1bc77595e1ed678e",
+        "2": "982b4ad39645a38e08a7fd0328984c564d6ae976",
+        "3": "f492aff63fe33bee55ee65d4e36ef9b3735b91f5"
+      }
+    },
+    {
+      "path": "src/Formalism/SharpRestriction/Divisibility/GeneratorPowers/PhiCMinI.lean",
+      "stages": {
+        "1": "0d7c74b32a540369876339b1959f17a7e300c57c",
+        "2": "30a3e6a2c52ce252c07daa35716e1438dd7008e1",
+        "3": "27b3f20f7fabdd3f53c0424c20c065779dce89b9"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "2750becc27c5c8338d8f5ed3c07a732ba36c9e57",
+  "log_tail": "nitePlaceGluing/ExistsBad.lean\nAuto-merging src/Development/AutomorphicArithmetic/Foundations/GaloisRepresentations/ClosedPhiFunctoriality/TieRep.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/BesselModels/ContIrredCompactUnitaryGroupRepIsUnitarizable.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ExistsCommonLevelSobolevBoundWeilCompact.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ExistsCommonLevelSobolevBoundWeilCompact.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/GraphRelationExtendsFromFockVectorsToKFinite.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/GraphRelationExtendsFromFockVectorsToKFinite.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ThetaFunApproxByFockVectorsOfCartanInvolutions.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ThetaFunApproxByFockVectorsOfCartanInvolutions.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/HodgeBundleWeights/ExistsSimpleLogPoleAlongBoundary.lean\nCONFLICT (modify/delete): src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/HodgeBundleWeights/ValuationMultiplicityOfConsecutiveRun.lean deleted in HEAD and modified in 2750becc27 (replace deprecated proof lemmas).  Version 2750becc27 (replace deprecated proof lemmas) of src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/HodgeBundleWeights/ValuationMultiplicityOfConsecutiveRun.lean left in tree.\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/AdelicIntertwinerEqScalar.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ArchimedeanComponentDiscreteSeries.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ArchimedeanWeilRepresentationContinuous.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/BottomClassSumIntegralNeg.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/BottomClassSumSmallStageEq.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/CuspFormGKIsotypicDecomposition.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/DefiniteUnitaryCuspidalDecomposition.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/DownwardFormApproximationOfDecay.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/DownwardFormApproximationOfDecay.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/HasDerivAtThetaIntegralInterchange.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/HasDerivAtThetaSumAlongLineYDirection.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/LiftedGrowthBoundedByDecayIntegral.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/MetaplecticScalarDerivativeNonempty.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/MovedVacuumIsVacuumIntegral.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/PlacewiseDecompositionTranslationInvariant.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/PolarizationPairDerivation.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/RealLiftCharacterTraceHasDerivAt.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/RealWeilRepresentationSchurScalar.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/RestrictedTensorSphericalUniquenessOffFinite.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SmoothOfThetaLiftFiniteSum.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SmoothOfThetaLiftFiniteSum.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SphericalVectorFixedAtAlmostAllPlaces.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SplitLeftScalarFactorEqOne.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SplitPlaceWeilScalarTrivial.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SplitVacuumHeckeEigenvalueEqOne.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SplitVprimeStabilizerFixesVacuum.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftApproxOfApproxData.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftApproxOfApproxData.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftsDenseInCuspForms.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftsDenseInCuspForms.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TripleProductLieDerivLeftPureTensor.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDescentApproximation.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDescentApproximation.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDownwardApproxCusp.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDownwardApproxCusp.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistIntegralEqBottomClassSum.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperArrowApprox.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperArrowApprox.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperCuspLiftApproxCusp.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperCuspLiftApproxCusp.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistedFormDownwardGrowthBound.lean\nCONFLICT (content): Merge conflict in src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistedFormDownwardGrowthBound.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistedIterateEventuallyLarge.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistedUpwardThetaLiftIsCuspidal.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/VacuumFixedBySplitSphericalLeft.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/ThirdPlaceSeries/DepthZeroTameAlt.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/ThirdPlaceSeries/LatticeFamilyAdoptionSecondAltAlt.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/ThirdPlaceSeries/PlaceLabelOfConjugatePlace.lean\nAuto-merging src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/ThirdPlaceSeries/ValuationMultiplicityOfConsecutiveRun.lean\nAuto-merging src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/EigenLinePAdicFrame.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PluriharmonicCharts/XCFmExistsFlagsChgbasis.lean\nAuto-merging src/Development/WeilBound/CoreStatements/ThetaDilations/SdTransport.lean\nAuto-merging src/Development/WeilBound/CoreStatements/TorusUniformisation/ChowMahlerFamilies/IntegralOverPlaceDensity.lean\nAuto-merging src/Development/WeilBound/RepresentationTheoryGL/ArchimedeanBaseChange/ArchimedeanBaseChangeProof/SatakeExponents/SphericalEmbeddings/ValuationDetKO.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/RepresentationTheoryGL/ArchimedeanBaseChange/ArchimedeanBaseChangeProof/SatakeExponents/SphericalEmbeddings/ValuationDetKO.lean\nAuto-merging src/Development/WeilBound/RepresentationTheoryGL/UnitaryDualProof/HermitianForms/SelfAdjointForms/Stabilizers/VmvMulVecApply.lean\nAuto-merging src/Development/WeilBound/RepresentationTheoryGL/UnitaryDualProof/HermitianForms/UnitaryLattices/LatticeIndexLifts/MeasurableSpaceSecondLift.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/RepresentationTheoryGL/UnitaryDualProof/HermitianForms/UnitaryLattices/LatticeIndexLifts/MeasurableSpaceSecondLift.lean\nAuto-merging src/Development/WeilBound/RepresentationTheoryGL/UnitaryDualProof/TwistedPieces/FiniteDimensionalDescent/RestrictedCharpolys/FiniteCharpoly.lean\nAuto-merging src/Formalism/HermitianCurvature/HermitianCurvatureProofs/CutGCoreGTConnReal.lean\nAuto-merging src/Formalism/LocalToGlobal/CharacterGerms/RowTieUpFBrEF.lean\nAuto-merging src/Formalism/LogFactorialBounds/LogFactorialProofs/PrimeSum.lean\nAuto-merging src/Formalism/MahlerMeasure/MahlerMeasureProofs/GamInt.lean\nAuto-merging src/Formalism/MahlerMeasure/MahlerMeasureProofs/WeightSpaceDimensionMonotone.lean\nAuto-merging src/Formalism/SharpRestriction/CuspSpanNormBounds/OscillatoryIntegralBounds.lean\nCONFLICT (content): Merge conflict in src/Formalism/SharpRestriction/CuspSpanNormBounds/OscillatoryIntegralBounds.lean\nAuto-merging src/Formalism/SharpRestriction/Divisibility/GeneratorPowers/PhiCMinI.lean\nCONFLICT (content): Merge conflict in src/Formalism/SharpRestriction/Divisibility/GeneratorPowers/PhiCMinI.lean\nAuto-merging src/Formalism/SharpRestriction/GrowthBounds/SegmentDegree/CardFinRange.lean\nAuto-merging src/Formalism/SharpRestriction/LevelLetterCocycles/EndomorphismIndexBound.lean\nAuto-merging src/Formalism/SharpRestriction/RamificationFrobenius/TotientGaloisClasses/InertiaGaloisSymmetry/CycGrp.lean\nRebasing (1/1)\nerror: could not apply 2750becc27... replace deprecated proof lemmas\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply 2750becc27... # replace deprecated proof lemmas\n",
+  "checkpoint_head": "e5ae821a00834f8043e987947f8151cc769bafe2"
+}

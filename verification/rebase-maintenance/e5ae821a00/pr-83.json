@@ -1,0 +1,32 @@
+{
+  "number": 83,
+  "title": "Zero-free region: replace the 34-file assembly with a self-contained 2,368-token proof (-89.1% normalized tokens)",
+  "original_head": "92e1668af9185779557a28ce4983f28e5d12b41f",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/zero-free-region-single-file",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 1,
+  "automatic_resolutions": [
+    {
+      "path": "src/Formalism/ZeroFreeRegion/FinalZFR.lean",
+      "reason": "three-way-replay-through-module-header"
+    }
+  ],
+  "rebased_head": "87845b0e9857216e0e06cd7da765603e22265709",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "2 files changed, 197 insertions(+), 3 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-83-e5ae821a00-45039889610-small-one",
+  "status": "rebased"
+}

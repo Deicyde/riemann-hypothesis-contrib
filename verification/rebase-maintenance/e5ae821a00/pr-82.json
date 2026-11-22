@@ -1,0 +1,40 @@
+{
+  "number": 82,
+  "title": "Share stabilizer filtration and Hensel counts (414 fewer Lean lines)",
+  "original_head": "d4fa3841d45d222ce2c4a7f7c73d96a78cf04c55",
+  "original_repo": "YinkaiYu/riemann-hypothesis",
+  "original_branch": "refactor/share-stabilizer-counts",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 2,
+  "automatic_resolutions": [
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean",
+      "reason": "three-way-replay-through-module-header"
+    }
+  ],
+  "status": "conflict",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+      "stages": {
+        "1": "46b88b6d6ea8c0fc84a3e07a5e7ee3f2701f48dd",
+        "2": "639dcba594f2e9c3895d0aed550cbd89cfa17f6c",
+        "3": "50129899ac6ad614888e00cbc23d75de4753dfce"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "d4fa3841d45d222ce2c4a7f7c73d96a78cf04c55",
+  "log_tail": "[detached HEAD f79b1f2c39] Share the filtration and Hensel count proofs for orbit volumes\n Author: Yin-Kai Yu (\u4f59\u836b\u94e0) <yuyinkai@iphy.ac.cn>\n 2 files changed, 8 insertions(+), 355 deletions(-)\nAuto-merging src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean\nCONFLICT (content): Merge conflict in src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean\nAuto-merging src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean\nRebasing (2/2)\nerror: could not apply d4fa3841d4... Share the filtration and Hensel count proofs for orbit volumes\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply d4fa3841d4... # Share the filtration and Hensel count proofs for orbit volumes\n",
+  "checkpoint_head": "f79b1f2c39d001e1de2d4814b87257d71c2d7240",
+  "checkpoint_branch": "maintenance/checkpoint-pr-82-e5ae821a00-45039889610-small-one"
+}
