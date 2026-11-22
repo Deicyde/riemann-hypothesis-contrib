@@ -13,6 +13,16 @@ open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibl
 
 namespace GlobalTheory.Published
 
+/-- A form of the classification of lattices in crystalline Galois representations by prismatic
+`F`-crystals, for a finite extension of `ℚ_[l]`, stated as essential surjectivity and full
+faithfulness.
+
+Proposed reference:
+[B. Bhatt and P. Scholze, *Prismatic F-crystals and crystalline Galois representations*
+(Theorem 5.6, stated in the introduction as Theorem 1.2)][bhatt_scholze2023], which allows any
+complete discretely valued field of mixed characteristic with perfect residue field. The encoding
+of prismatic `F`-crystals used here should be compared with Definition 4.1 of that paper.
+This reference is a reader's proposal and has not been checked by a mathematician. -/
 def BhattScholzeIntegral : Prop :=
   ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (P₀ : Obj l ↥(OL K)) (e : P₀.A ≃+* Ainf l), IsAinf K P₀ e →
     (∀ (P : LocPrime l) (AI : LocAinf l P), IsStd P AI →

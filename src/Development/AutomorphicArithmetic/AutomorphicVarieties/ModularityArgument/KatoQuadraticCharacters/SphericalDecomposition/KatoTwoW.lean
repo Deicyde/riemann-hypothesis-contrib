@@ -11,6 +11,16 @@ open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.
 
 namespace UpperTheory.V.Z.Kato.WeilSphericalRecords
 
+/-- Under the hypotheses `Used` and `WitAQ`, and for a newform `f` of weight `2 * e + 1` attached
+to the twist of `W` by the `-e`-th power of the cyclotomic character, the Bloch–Kato Selmer groups
+of `W` and of its twist by `θ` vanish, in the sense of `Af.BlochKatoSelmerVanishes`.
+
+Proposed reference:
+[K. Kato, *p-adic Hodge theory and values of zeta functions of modular forms*
+(Theorem 14.2 (1))][kato2004], which proves that the corresponding Selmer groups are finite, for
+any newform and any abelian field. This statement is read as a consequence of that theorem after
+standard steps, not as a literal case of it.
+This reference is a reader's proposal and has not been checked by a mathematician. -/
 def KatoTwoW : Prop :=
   ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω]
     (e N : ℕ) (θ ψ : G ℚ Ω →* (Qbar l)ˣ) (W : G ℚ Ω →* GL (Fin 2) (Qbar l)), Used l Ω K e N θ ψ W →
