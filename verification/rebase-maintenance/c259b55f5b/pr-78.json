@@ -1,0 +1,10 @@
+{
+  "number": 78,
+  "title": "Add `docs/references.bib`, docstring citations and a cross-reference tag for five statements",
+  "original_head": "25f9d796ce67aa7c80a937df1074216005e21b06",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "literature/first-references",
+  "maintainer_can_modify": false,
+  "status": "branch-advanced",
+  "observed_head": "fd9ef1ba16d58f3748c89b6741a7b4c1f444a877"
+}
