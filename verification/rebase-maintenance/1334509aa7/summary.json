@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-45",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/SchurLimitBounds/SchurOrthogonality/URepBasic.lean",
+          "stages": {
+            "1": "a629e7b4f957c2592f466c3c3e9c727d11bcff89",
+            "2": "ca51460f3f5699275058e49606ba39b32c86efb1",
+            "3": "acdda5021e093a968268f7e77c127576312cf126"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "66bc277346817c3661510a40b056b43a814d1281",
+      "checkpoint_head": "c13f812995cd0d1a7f66c9732dc6418f33c0f13a"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
