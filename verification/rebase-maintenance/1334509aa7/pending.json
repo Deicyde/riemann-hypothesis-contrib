@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/SharpRestriction/GrowthBounds/HermitianTensor/GrowthOfBasic.lean",
+      "stages": {
+        "1": "73c4f3a402c2e80163030edc763153add348e1e9",
+        "2": "dacb8b3cb0316fae5a6afd913afcc11fb27663dc",
+        "3": "9e46086f470a34c7136e463910a27609f4f9b671"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "26dceebeca3c8a5b784978878ce48a68f6239086",
+  "checkpoint_head": "98620843c7c768a55526ee3df05ef9b1c8e2ca7e"
+}
