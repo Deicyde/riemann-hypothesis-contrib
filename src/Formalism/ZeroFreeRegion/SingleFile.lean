@@ -139,8 +139,7 @@ lemma good : 1 < s.re → riemannZeta₁ s ≠ 0 ∧ deriv riemannZeta₁ s / ri
   grind [deriv_riemannZeta_eq_neg_inv_sub_sq_mul_add,riemannZeta_eq_inv_sub_mul]
 
 theorem _root_.Formalism.ZF.zeroFreeRegion_compressed :
-    ∃ c : ℝ, 0 < c ∧ ∀ s : ℂ, s ≠ 1 →
-      1 - c / Real.log (|s.im| + 2) ≤ s.re → riemannZeta s ≠ 0 := by
+    ∃ c, 0 < c ∧ ∀ s, s ≠ 1 → 1-c/(|s.im|+2).log ≤ s.re → riemannZeta s ≠ 0 := by
   refine ⟨1/2^20,by positivity,fun s hn hs hz => ?_⟩
   let R := |s.im|+2
   have hL := log_two_gt_d9.trans_le (log_le_log zero_lt_two (by simp [R]:2≤R))
@@ -192,6 +191,3 @@ theorem _root_.Formalism.ZF.zeroFreeRegion_compressed :
     split_ifs <;> simp_all [exp_re,mul_re,mul_im,log_re,log_im,mul_comm (Real.log _),mul_assoc,Real.cos_two_mul]
     linear_combination (2*Λ n*Real.exp _) * sq_nonneg (1+Real.cos _)) (((S 0).mul_left 3).add ((S s.im).mul_left 4) |>.add (S (2*s.im)))
   linarith [log_le_self hpos.le,log_two_lt_d9]
-
-
-#print axioms Formalism.ZF.zeroFreeRegion_compressed
