@@ -32,8 +32,8 @@ theorem b_fg : (Submodule.span (v.adicCompletionIntegers F)
         have := congrArg (fun y : 𝓞 E => (y : E)) (b.sum_repr x)
         simpa using this.symm
       simp only
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hx, map_sum]
+
+      rw [hx, map_sum]
       refine Submodule.sum_mem _ fun i _ => ?_
       rw [map_zsmul]
       exact zsmul_mem (Submodule.subset_span (Set.mem_range_self i)) _

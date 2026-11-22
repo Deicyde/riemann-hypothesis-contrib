@@ -55,8 +55,8 @@ theorem cq_map_cj {X : Formalism.L2.SG.LsDatumB.MatP D p} (hX : Cq Z p g X) : Cq
 
 theorem map_cj_mul (A B : Formalism.L2.SG.LsDatumB.MatP D p) : (A * B).map (Z.M p).L.cj = A.map (Z.M p).L.cj * B.map (Z.M p).L.cj := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mul_apply, map_sum, map_mul]
+
+  simp [Matrix.mul_apply, map_sum, map_mul]
 
 theorem map_cj_one : (1 : Formalism.L2.SG.LsDatumB.MatP D p).map (Z.M p).L.cj = 1 := by
   ext i j

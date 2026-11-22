@@ -29,8 +29,8 @@ theorem T2 {O M : Type} [CommRing O] [AddCommGroup M] [Module O M] {S S' : Submo
   have := (Submodule.Quotient.mk_eq_zero _).1 hz
   exact this
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem main : StepLocDual := by
   intro D hLOC hBK hFont hPot i r hr Xs w hw hdeg n e hPF hLF k M hSub
   unfold LocBoundP

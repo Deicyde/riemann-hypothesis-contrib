@@ -45,8 +45,8 @@ open Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalis
 open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies GlobalTheory.OnCmp
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 4000000
+
+
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -206,8 +206,8 @@ theorem liftKer_of_ne : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : 
     rw [← hS t, Finset.sum_apply]
     rfl
   have hvac : Tm (halfInd eQ (lattice₂ R i)) = fg := by simpa using hTm.vac
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h1, h2, map_sum, ← Finset.sum_coe_sort Y]
+
+  rw [h1, h2, map_sum, ← Finset.sum_coe_sort Y]
   refine Finset.sum_congr rfl fun q _ => ?_
   rw [map_smul, hTm.trans _ (GlobalTheory.isSBHalf_halfInd eQ (lattice₂ R i)) _ (hY q.1 q.2), hvac]
 

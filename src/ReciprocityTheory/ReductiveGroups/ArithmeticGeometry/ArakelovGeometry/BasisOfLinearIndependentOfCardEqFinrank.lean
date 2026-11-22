@@ -304,8 +304,8 @@ theorem eq_zero_of_trace [Fintype κ] (x : κ → Ω) (e : Fin (D + 1) → κ) (
   have key : ∀ n, Algebra.traceForm (fnField (x ∘ e))
       (IntermediateField.extendScalars (fnField_comp_le' x e)) t n = 0 := by
     intro n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Algebra.traceForm_apply, ← B.sum_repr n, Finset.mul_sum, map_sum]
+
+    rw [Algebra.traceForm_apply, ← B.sum_repr n, Finset.mul_sum, map_sum]
     refine Finset.sum_eq_zero fun j _ => ?_
     rw [mul_smul_comm, map_smul, hB j, h0 j, smul_zero]
   first
@@ -359,9 +359,9 @@ theorem chartGen_indep (x : κ → Ω) (e : Fin (D + 1) → κ) (hfree : coordId
       coneMap ℤ (x ∘ e) F = Polynomial.C (MvPolynomial.aeval (x ∘ e) F) * Polynomial.X ^ n := by
     intro F n hF
     unfold coneMap
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [MvPolynomial.aeval_def, MvPolynomial.aeval_def, MvPolynomial.eval₂_eq',
-      MvPolynomial.eval₂_eq', map_sum, Finset.sum_mul]
+
+    rw [MvPolynomial.aeval_def, MvPolynomial.aeval_def, MvPolynomial.eval₂_eq',
+    MvPolynomial.eval₂_eq', map_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun d hd => ?_
     have h1 := hF (MvPolynomial.mem_support_iff.1 hd)
     have hdeg : ∑ i, d i = n := by
@@ -409,9 +409,9 @@ theorem chartGen_indep (x : κ → Ω) (e : Fin (D + 1) → κ) (hfree : coordId
     field_simp
     try ring
   have hHy : MvPolynomial.aeval (x ∘ e) H = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hH, map_sum, Finset.sum_congr rfl hterm, ← Finset.mul_sum, ← map_sum,
-      MvPolynomial.sum_homogeneousComponent, hQ, MvPolynomial.aeval_rename]
+
+    rw [hH, map_sum, Finset.sum_congr rfl hterm, ← Finset.mul_sum, ← map_sum,
+    MvPolynomial.sum_homogeneousComponent, hQ, MvPolynomial.aeval_rename]
     have h3 : MvPolynomial.aeval ((fun i => (x ∘ e) i / x (e l)) ∘ Subtype.val) P = 0 := hPΩ
     rw [h3, mul_zero]
   have hH0 : H = 0 := by
@@ -433,11 +433,11 @@ theorem chartGen_indep (x : κ → Ω) (e : Fin (D + 1) → κ) (hfree : coordId
   have hQ0 : Q = 0 := by
     have h4 := congrArg (MvPolynomial.aeval fun k => if k = l then (1 : MvPolynomial (Fin (D + 1)) ℤ)
       else MvPolynomial.X k) hH0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hH, map_sum, map_zero] at h4
+
+    rw [hH, map_sum, map_zero] at h4
     simp only [map_mul, map_pow, MvPolynomial.aeval_X, ↓reduceIte, one_pow, mul_one] at h4
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, MvPolynomial.sum_homogeneousComponent, hQ, ← AlgHom.comp_apply, hψ] at h4
+
+    rw [← map_sum, MvPolynomial.sum_homogeneousComponent, hQ, ← AlgHom.comp_apply, hψ] at h4
     rw [hQ]
     exact h4
   rw [hQ] at hQ0

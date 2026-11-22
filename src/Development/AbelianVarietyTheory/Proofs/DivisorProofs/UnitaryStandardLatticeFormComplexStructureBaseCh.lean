@@ -38,10 +38,10 @@ theorem form_cx_baseChange_pos (S : Matrix (Fin r) (Fin r) ℤ) (hS : (S.map (In
   have key : (form ρ g S).baseChange ℝ ((cx ρ g).baseChange ℝ x) x =
       ∑ q, ∑ p, c p * c q * (((if p.2 = q.2 then S p.1 q.1 else 0 : ℤ)) : ℝ) := by
     conv_lhs => rw [hx']
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, hb,
-      Algebra.TensorProduct.basis_apply, LinearMap.baseChange_tmul, LinearMap.BilinForm.baseChange_tmul,
-      form_cx_basis, mul_one, zsmul_eq_mul, Finset.mul_sum]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, hb,
+    Algebra.TensorProduct.basis_apply, LinearMap.baseChange_tmul, LinearMap.BilinForm.baseChange_tmul,
+    form_cx_basis, mul_one, zsmul_eq_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
     ring
   set v : (Fin g ⊕ Fin g) → Fin r → ℝ := fun α i => c (i, α) with hv

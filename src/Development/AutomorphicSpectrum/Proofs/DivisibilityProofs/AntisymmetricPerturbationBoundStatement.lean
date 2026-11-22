@@ -12,7 +12,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeome
 @[expose] public section
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.antisymmetric_perturbation_bound :
     ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (R : RP Ψ N →ₗ[ℝ] ℝ)
       (v ε : ℝ) (Pl l : MvPolynomial (Ψ × Fin N) ℝ),

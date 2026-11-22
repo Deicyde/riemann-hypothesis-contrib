@@ -149,8 +149,8 @@ private theorem iterate_derivation_sum {B S : Type*} [CommRing B] [CommRing S] [
   | zero => simp
   | succ m ih =>
       simp only [Function.iterate_succ_apply']
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [ih, map_sum]
+
+      rw [ih, map_sum]
 
 private theorem sum_choose_succ_mul_eq {S : Type*} [CommRing S] (u v : ℕ → S) (n : ℕ) :
     (∑ i ∈ Finset.range (n + 1), ((n.choose i : ℕ) : S) * (u (i + 1) * v (n - i)))
@@ -212,8 +212,8 @@ private theorem iterate_derivation_mul {B S : Type*} [CommRing B] [CommRing S] [
         rw [derivation_natCast_mul, D.leibniz, e1, e2]
         simp only [smul_eq_mul]
         ring
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Function.iterate_succ_apply', ih, map_sum]
+
+      rw [Function.iterate_succ_apply', ih, map_sum]
       refine Eq.trans (Finset.sum_congr rfl hstep) ?_
       rw [Finset.sum_add_distrib]
       exact sum_choose_succ_mul_eq (fun i => (⇑D)^[i] x) (fun i => (⇑D)^[i] y) n

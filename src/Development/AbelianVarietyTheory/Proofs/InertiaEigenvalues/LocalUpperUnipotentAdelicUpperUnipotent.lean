@@ -35,12 +35,12 @@ theorem locTri_adelic : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberF
     rw [hoff i j (ne_of_gt h), hlow i j h, map_zero, map_zero]
   · intro j
     exact cornerGL_apply_diag_loctri _ _ (cornerGL_apply_diag_loctri _ _ (hdiag j))
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [map_sum, map_sum]
-      refine Finset.sum_congr rfl fun p hp => ?_
-      have hp' : (p.2 : ℕ) = p.1 + 1 := (Finset.mem_filter.mp hp).2
-      have hne : p.1 ≠ p.2 := by
-        intro h; rw [h] at hp'; omega
-      exact hoff p.1 p.2 hne
+
+  · rw [map_sum, map_sum]
+    refine Finset.sum_congr rfl fun p hp => ?_
+    have hp' : (p.2 : ℕ) = p.1 + 1 := (Finset.mem_filter.mp hp).2
+    have hne : p.1 ≠ p.2 := by
+      intro h; rw [h] at hp'; omega
+    exact hoff p.1 p.2 hne
 
 end GlobalTheory.CuspRep

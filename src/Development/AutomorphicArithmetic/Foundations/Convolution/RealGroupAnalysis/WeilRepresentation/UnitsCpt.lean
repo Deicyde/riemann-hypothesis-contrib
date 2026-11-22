@@ -156,7 +156,7 @@ private theorem arith {C H M τ s s₀ h : ℝ} {e N d r : ℕ} (hs₀ : 0 < s�
 
 end SlopeTestRemainingChoices
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.ConvolutionTheory.R2.decay :
     ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], St.Decay F := by
   intro F _ _ _ π f hf

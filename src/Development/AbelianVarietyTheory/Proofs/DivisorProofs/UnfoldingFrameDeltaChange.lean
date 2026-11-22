@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.SecBCA
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 200000
+
 
 noncomputable section
 

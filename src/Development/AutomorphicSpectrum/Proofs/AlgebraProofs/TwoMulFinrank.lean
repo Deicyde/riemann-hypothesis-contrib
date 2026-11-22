@@ -56,8 +56,8 @@ theorem rho_t_mem (a : 𝓞 E) (i : Fin N) : P.ρ a (P.t i) ∈ P.T := by
     rw [hT]
     exact Submodule.subset_span ⟨(i, k), rfl⟩
   rw [← (RingOfIntegers.basis E).sum_repr a]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply]
+
+  simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply]
   exact Submodule.sum_mem _ fun k _ => zsmul_mem (hmem k) _
 
 theorem T_stable (a : 𝓞 E) : ∀ x ∈ P.T, P.ρ a x ∈ P.T := by
@@ -74,8 +74,8 @@ theorem T_stable (a : 𝓞 E) : ∀ x ∈ P.T, P.ρ a x ∈ P.T := by
 
 theorem ht_eigProj (σ : E →+* C) (x : V) :
     P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, P.ht_lin]
+
+  simp only [eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, P.ht_lin]
 
 theorem om'_lattice : P.om'.IsLattice C := by
   have : P.om.IsFullLattice C := P.om_lat

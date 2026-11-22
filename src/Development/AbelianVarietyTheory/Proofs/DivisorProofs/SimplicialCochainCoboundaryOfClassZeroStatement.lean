@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AlternatingS
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC GlobalTheory.CechOne
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.simplicialCochain_coboundary_of_class_zero :
     ∀ (R : Type) [CommRing R] (F : Shv R) (E : Spc)
       (s : (free R).obj (E.obj (op ⦋1⦌)) ⟶ F),

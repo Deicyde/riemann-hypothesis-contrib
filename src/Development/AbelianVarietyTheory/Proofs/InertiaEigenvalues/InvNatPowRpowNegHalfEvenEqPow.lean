@@ -17,8 +17,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Modulus
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix GlobalTheory.ExportSeries
 open Formalism.L2.NTheta (IsIdemAt IsHeckeElt)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 noncomputable section
 
 namespace GlobalTheory.DistRel
@@ -313,10 +313,10 @@ theorem unram_at {χ : (AE D)ˣ →* Circle} {Q S' : Finset (Pl D.host.E)} (hχ 
     ring
   refine hχ y hinf (key _ h1 h2) (key _ h1' h3) ?_
   have h0 : idemAt P * (idem Q + cA D (idem Q)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mul_add, idem, map_sum, Finset.mul_sum, Finset.mul_sum,
-      Finset.sum_eq_zero fun j hj => hS.mul_eq_zero hP (hQ hj) fun e => hn (e ▸ hj),
-      Finset.sum_eq_zero fun j hj => hS.mul_conj hP (hQ hj), add_zero]
+
+    rw [mul_add, idem, map_sum, Finset.mul_sum, Finset.mul_sum,
+    Finset.sum_eq_zero fun j hj => hS.mul_eq_zero hP (hQ hj) fun e => hn (e ▸ hj),
+    Finset.sum_eq_zero fun j hj => hS.mul_conj hP (hQ hj), add_zero]
   linear_combination (idem Q + cA D (idem Q)) * h1 + ((y : AE D) - 1) * h0
 
 theorem mu_unram (B : Base S T) (hB : B.Good) {Q : Finset (Pl D.host.E)} (hQ : B.admitted Q) {P : Pl D.host.E} (hP : P ∈ Q)
@@ -415,12 +415,12 @@ theorem vec_rel (B : Base S T) (hB : B.Good) (hbT : Lev.IsBaseFrame T B.F.βT B.
     simp [Finset.sum_apply, Pi.smul_apply, Φ1, ω1]
   have hv : B.vecAt Q (fun PP y => if PP.1 = P then ((prim y : ℚ) : ℂ) else φ PP.1 y) =
       Tm (B.F.datumFn B.G (B.de.Q ∪ Q) (B.locFn Q fun PP y => if PP.1 = P then ((prim y : ℚ) : ℂ) else φ PP.1 y)) := rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hv, hfun, map_add (f := _), map_sum, hv1]
+
+  rw [hv, hfun, map_add (f := _), map_sum, hv1]
   congr 1
   refine Finset.sum_congr rfl fun k hk => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_smul, map_sum, Finset.smul_sum, Finset.smul_sum]
+
+  rw [map_smul, map_sum, Finset.smul_sum, Finset.smul_sum]
   refine Finset.sum_congr rfl fun γ hγ => ?_
   rw [hlaw k hk γ hγ, smul_smul]
   congr 1

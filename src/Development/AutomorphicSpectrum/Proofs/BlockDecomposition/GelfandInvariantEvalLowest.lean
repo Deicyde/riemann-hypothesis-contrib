@@ -45,9 +45,9 @@ theorem pow_dualFam (E : Fin n → Fin n → Module.End ℂ V) (m : ℕ) (a b : 
     · subst h; simp
     · simp [Matrix.one_apply, h, Ne.symm h]
   | succ m ih =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [pow_succ', pow_succ, Matrix.mul_apply, Matrix.mul_apply, LinearMap.sum_apply, LinearMap.sum_apply,
-      LinearMap.sum_apply, map_sum]
+
+    rw [pow_succ', pow_succ, Matrix.mul_apply, Matrix.mul_apply, LinearMap.sum_apply, LinearMap.sum_apply,
+    LinearMap.sum_apply, map_sum]
     refine Finset.sum_congr rfl fun c _ => ?_
     simp only [Module.End.mul_apply, Matrix.of_apply, dualFam_apply, ih]
 
@@ -79,8 +79,8 @@ theorem ev_gelA : ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductS
       simp only [Formalism.REAL.lsh]
       ring
     rw [GlobalTheory.Dec.gelfVal, this]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hval, ← h2, gelA, LinearMap.sum_apply, map_sum]
+
+  rw [hval, ← h2, gelA, LinearMap.sum_apply, map_sum]
   exact Finset.sum_congr rfl fun a _ => by rw [epow_eq_pow]
 
 end GlobalTheory.CompanionTheory.EvGel

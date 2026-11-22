@@ -8,7 +8,7 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.AbelContinuati
 @[expose] public section
 
 open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.partial_zeta_meromorphic_from_twists : ∀ (G : Type) [Fintype G] (D T T' : G → ℂ → ℂ) (l l' : ℕ) (τ τ' : Equiv.Perm G), l.Prime → l'.Prime → l ≠ l' →
   (∀ c, Differentiable ℂ (T c)) → (∀ c, Differentiable ℂ (T' c)) →
   (∀ c s, 1 < s.re → (l : ℂ) ^ (1 - s) * D (τ c) s - D c s = T c s) →

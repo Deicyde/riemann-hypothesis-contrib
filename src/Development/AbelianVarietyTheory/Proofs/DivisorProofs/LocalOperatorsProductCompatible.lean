@@ -53,8 +53,8 @@ theorem ev_surjOn_SB : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fin
     rw [h1]; exact h2
   have hid : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure f₀ (Function.update Φ₁ v χ) =
       ∑ i, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.pure (ei (f i)) fun w => ev w (φ i w) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← heΨ, hsum, map_sum]
+
+    rw [← heΨ, hsum, map_sum]
     exact Finset.sum_congr rfl fun i _ => he (f i) (φ i) (hSB i) (hvac i)
   obtain ⟨r₀, hr₀, hr₀t⟩ := GlobalTheory.PureFactor.exists_rest_factor v f₀ Φ₁ hΦstd
   choose r hr hrt using fun i => GlobalTheory.PureFactor.exists_rest_factor v (ei (f i)) (fun w => ev w (φ i w)) (hvac' i)
@@ -99,8 +99,8 @@ theorem ev_surjOn_SB : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fin
     simp only [← hrt', tens, hev, hr₀ x₀ z hz] at h
     rw [h]
     exact Finset.sum_congr rfl fun i _ => by rw [hr i x₀ z hz]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_apply]
+
+  rw [map_sum, Finset.sum_apply]
   apply mul_right_cancel₀ hx₀
   rw [key, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => ?_

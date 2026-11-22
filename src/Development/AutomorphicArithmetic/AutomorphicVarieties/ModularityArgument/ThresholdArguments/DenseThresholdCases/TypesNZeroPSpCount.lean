@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 noncomputable section
@@ -27,7 +27,7 @@ namespace UpperTheory.TNZ.Grp
 open P_spCount
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 open scoped Classical in
-set_option maxHeartbeats 800000 in
+
 theorem step_spCount_alt {n : ℕ} (G : Grp k n) : G.Step_spCount_alt := by
   intro hL c hc hres
   have hE : G.etaSp (jacU G.e (prinSeries c)) =

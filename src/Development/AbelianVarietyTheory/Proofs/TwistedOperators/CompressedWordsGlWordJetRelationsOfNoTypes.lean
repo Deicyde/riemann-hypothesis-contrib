@@ -68,7 +68,7 @@ theorem modJet_jetRel (V W : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ
   · have h := theta_vminus hg h0 hG
     rw [LinearMap.mem_ker, thetaA_one_onePositionArrayOfIsometry] at h
     simp only [modJet_apply, ew_append, ew, mul_one, Module.End.mul_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← inner_sum, ← map_sum, h, map_zero, inner_zero_right]
+
+    rw [← inner_sum, ← map_sum, h, map_zero, inner_zero_right]
 
 end GlobalTheory.SphJet.ModRel

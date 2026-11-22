@@ -83,7 +83,7 @@ private theorem fld_lemma_3 (O K A : Type) [CommRing O] [IsDomain O] [IsDiscrete
   exact hinj (congrArg Subtype.val hab)
 
 
-set_option maxHeartbeats 800000 in
+
 private theorem dvr_lemma_4 (Cr Dr : Type) [CommRing Cr] [CommRing Dr] [IsDomain Dr] [IsDedekindDomain Dr]
     (hD : ¬IsField Dr) (φ : Cr →+* Dr) (hφ : Function.Surjective φ) (e : Cr) (he1 : φ e = 1)
     (he0 : ∀ c, φ c = 0 → e * c = 0) (Pm : Ideal Cr) [Pm.IsMaximal] (heP : e ∉ Pm) :
@@ -188,7 +188,7 @@ private theorem fin_lemma_5 (O K A : Type) [CommRing O] [IsDomain O] [IsDiscrete
   exact Module.Finite.of_injective ψ hψ
 
 
-set_option maxHeartbeats 800000 in
+
 private theorem pt_lemma_6 (O K A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
     [Algebra O K] [IsFractionRing O K] [CharZero K] [CommRing A] [Algebra K A] [Algebra O A]
     [IsScalarTower O K A] [FiniteDimensional K A] [IsReduced A] (ζ : Pts O A) : IsDVRAt ζ := by
@@ -226,8 +226,8 @@ private theorem pt_lemma_6 (O K A : Type) [CommRing O] [IsDomain O] [IsDiscreteV
     rw [← sub_eq_zero]
     apply inj_lemma K A
     intro M
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_sum, map_one, Finset.sum_eq_single M]
+
+    rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_sum, map_one, Finset.sum_eq_single M]
     · rw [hE1, sub_self]
     · intro J _ hJ
       exact hE0 J M (Ne.symm hJ)

@@ -57,9 +57,9 @@ theorem exists_isFieldDec_one (R : Type) [CommRing R] [IsArtinianRing R] [IsRedu
       rw [hsing, ← map_mul, ← Pi.single_mul, hb]
   · intro m n hmn
     rw [hsing, AlgEquiv.apply_symm_apply, Pi.single_eq_of_ne hmn, Pi.single_zero, map_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [← map_sum, Finset.univ_sum_single]
-      exact map_one φ.symm
+
+  · rw [← map_sum, Finset.univ_sum_single]
+    exact map_one φ.symm
 
 theorem isFieldDec_sigma {A : Type} [CommRing A] {P : Type} [Fintype P] {u : P → A}
     (horth : ∀ p q, p ≠ q → u p * u q = 0) {ι : P → Type} [∀ p, Fintype (ι p)] {f : ∀ p, ι p → A}
@@ -103,8 +103,8 @@ theorem isFieldDec_section (hcs : ∀ y, c (s y) = y) (hmul : ∀ y z, s y * z =
     rw [hmul, hss, hy]
   · intro i j hij
     rw [hss, hg.orth i j hij, map_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [← map_sum, hg.sum]
+
+  · rw [← map_sum, hg.sum]
 
 theorem nonDiscreteAt_section [TopologicalSpace A] [Field k] [TopologicalSpace k] [(𝓝[≠] (0 : k)).NeBot] [Algebra k R]
     [TopologicalSpace R] [ContinuousSMul k R] (hs : Continuous s) (hcs : ∀ y, c (s y) = y)

@@ -69,15 +69,15 @@ theorem inv_entry_smul_eigen_split : ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCo
       (fun a _ => inCC_inv_entry_smul a j (hcc (v t a) m))
     refine ⟨b, Formalism.FourierDecayAlt.P.JCx2.mn_ccle_congr (fun g hg => ?_) hb⟩
     beta_reduce
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_apply]
+
+    rw [map_sum, Finset.sum_apply]
     exact Finset.sum_congr rfl fun a _ => (hx _ _ g hg).symm
   · rw [← hqC _ _ g hg, hv2, map_smul, Pi.smul_apply]
     congr 1
     push_cast
     refine Finset.prod_congr rfl fun s _ => ?_
     split_ifs <;> push_cast <;> ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [← hw g hg, ← hx i _ g hg, hv1, map_sum, Finset.sum_apply]
+
+  · rw [← hw g hg, ← hx i _ g hg, hv1, map_sum, Finset.sum_apply]
 
 end GlobalTheory

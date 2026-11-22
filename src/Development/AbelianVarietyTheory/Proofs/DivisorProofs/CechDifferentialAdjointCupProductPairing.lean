@@ -96,8 +96,8 @@ theorem cech_adj (k : Type) [Field k] (d : ℕ) (E : Type) [AddCommGroup E] [Mod
     have L3 : β (deltaL k _ E a (Finset.univ.filter (· ≤ j))) (b (Finset.univ.filter (j ≤ ·))) =
         GlobalTheory.cubeSign (Finset.univ.filter (· ≤ j)) j •
           β (a ((Finset.univ.filter (· ≤ j)).erase j)) (b (Finset.univ.filter (j ≤ ·))) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [deltaL_apply, map_sum, LinearMap.sum_apply]
+
+      rw [deltaL_apply, map_sum, LinearMap.sum_apply]
       refine (Finset.sum_eq_single j (fun i hi hij => ?_) (by simp)).trans ?_
       · rw [map_zsmul, LinearMap.smul_apply]
         have hi' : i < j := lt_of_le_of_ne (by simpa using hi) hij
@@ -111,8 +111,8 @@ theorem cech_adj (k : Type) [Field k] (d : ℕ) (E : Type) [AddCommGroup E] [Mod
       · rw [map_zsmul, LinearMap.smul_apply]
     have L4 : β (a (Finset.univ.filter (· ≤ j'))) (deltaL k _ E' b (Finset.univ.filter (j' ≤ ·))) =
         β (a (Finset.univ.filter (· ≤ j'))) (b ((Finset.univ.filter (j' ≤ ·)).erase j')) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [deltaL_apply, map_sum]
+
+      rw [deltaL_apply, map_sum]
       refine (Finset.sum_eq_single j' (fun i hi hij => ?_) (by simp)).trans ?_
       · rw [map_zsmul]
         have hi' : j' < i := lt_of_le_of_ne (by simpa using hi) (Ne.symm hij)

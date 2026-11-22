@@ -23,8 +23,8 @@ theorem lie_mem_finVec : ∀ (E : Type) [Field E] [NumberField E] [_root_.Number
     exact Submodule.finiteDimensional_iSup _
   have key : ∀ (Z : Lie E N) (ψ : Sm E N), ψ ∈ S → lie E N Z ψ ∈ T := by
     intro Z ψ hψ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr Z, map_sum, LinearMap.sum_apply]
+
+    rw [← b.sum_repr Z, map_sum, LinearMap.sum_apply]
     refine Submodule.sum_mem _ fun s _ => ?_
     rw [map_smul, LinearMap.smul_apply]
     have h1 : lie E N (b s) ψ ∈ T :=

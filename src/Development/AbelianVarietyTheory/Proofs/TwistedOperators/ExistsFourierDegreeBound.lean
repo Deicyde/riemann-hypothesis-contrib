@@ -67,8 +67,8 @@ theorem substMat_mul (θ : InfFam D) (V : HSp D) (m : ℕ) (d : D.what₂.Tau �
   rw [e2]
   conv_lhs => rw [eq_sum_mon (d := d) (GlobalTheory.CompactHowe.substF _ _ (monomial k.1 1))
     (fun k'' h => (GlobalTheory.T.mapDomain_fst_eq_of_coeff_matrixFamilyBilateralSubstitution_ne_zero _ _ _ _ h).trans k.2)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, coeff_sum]
+
+  rw [map_sum, coeff_sum]
   refine Finset.sum_congr rfl fun k'' _ => ?_
   rw [map_smul, coeff_smul, smul_eq_mul, mul_comm]
 

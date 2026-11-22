@@ -75,9 +75,9 @@ theorem multiDiff_eq_shiftAct {ι : Type*} [Fintype ι] (g : ι → G) (φ : G �
   classical
   ext x
   simp only [diffElt, sub_eq_add_neg]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [prod_one_add, powerset_univ, map_sum, LinearMap.sum_apply, Finset.sum_apply,
-    multiDiff_apply]
+
+  rw [prod_one_add, powerset_univ, map_sum, LinearMap.sum_apply, Finset.sum_apply,
+  multiDiff_apply]
   refine sum_congr rfl fun S _ ↦ ?_
   rw [prod_neg, ← of'_sum]
   have : (-1 : AddMonoidAlgebra ℤ G) ^ S.card * AddMonoidAlgebra.of' ℤ G (∑ i ∈ S, g i) =
@@ -308,8 +308,8 @@ theorem diffElt_sub_sum_mem {ι : Type*} (s : Finset ι) (g : ι → G) (x : G) 
       exact Ideal.mul_mem_mul (diffElt_mem a) (diffElt_mem b)
   have hf : ∀ g, Ideal.Quotient.mk _ (diffElt g) = f g := fun _ ↦ rfl
   rw [← Ideal.Quotient.eq]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_sum, hf]
+
+  simp only [map_sub, map_sum, hf]
 
 theorem DiffVanish.multiDiff_form_diag {d : ℕ} {φ : G → M} (h : DiffVanish (d + 1) φ)
     (g : Fin d → G) (x : G) :
@@ -324,10 +324,10 @@ theorem DiffVanish.multiDiff_form_diag {d : ℕ} {φ : G → M} (h : DiffVanish 
     simp
   have := multiDiff_pow (fun i ↦ diffElt (g i)) (diffElt x)
   rw [multiDiff_apply] at this
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [multiDiff_apply, h.form_apply _ 0, multiDiff_eq_shiftAct, ← Pi.smul_apply,
-    ← LinearMap.smul_apply, ← map_nsmul, nsmul_eq_mul, ← this, map_sum, LinearMap.sum_apply,
-    Finset.sum_apply]
+
+  rw [multiDiff_apply, h.form_apply _ 0, multiDiff_eq_shiftAct, ← Pi.smul_apply,
+  ← LinearMap.smul_apply, ← map_nsmul, nsmul_eq_mul, ← this, map_sum, LinearMap.sum_apply,
+  Finset.sum_apply]
   refine sum_congr rfl fun S _ ↦ ?_
   rw [e, map_zsmul, LinearMap.smul_apply, Pi.smul_apply]
 
@@ -364,8 +364,8 @@ theorem DiffVanish.eval_diffTopPoly {d : ℕ} {φ : G → K} (h : DiffVanish (d 
     [Fintype ι] [DecidableEq ι] (g : ι → G) (x : G) (n : ι → ℤ) :
     MvPolynomial.eval (fun i ↦ (n i : K)) (diffTopPoly d g φ x) =
       (d.factorial : K)⁻¹ * h.form fun _ ↦ ∑ i, n i • g i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [MultilinearMap.map_sum, mul_sum, diffTopPoly, map_sum]
+
+  rw [MultilinearMap.map_sum, mul_sum, diffTopPoly, map_sum]
   refine sum_congr rfl fun a _ ↦ ?_
   rw [MultilinearMap.map_smul_univ, ← h.form_apply]
   simp [Function.comp_def]

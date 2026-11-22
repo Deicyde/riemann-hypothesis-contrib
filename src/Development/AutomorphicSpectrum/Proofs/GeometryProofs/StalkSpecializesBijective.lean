@@ -387,13 +387,13 @@ theorem genericFlag_pull (fn : Ω₀ →+* Ω) (fn' : Ω₀' →+* Ω') (ψ : Ω
   · exact hj.2 _ _ (hb σ)
   · simp [hd1]
   · simp [hup σ l k hlk]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [show (fun k => ∑ l, ((u σ).map i) l k • (j.comp j₀) (c σ l)) =
-        fun k => j (∑ l, u σ l k • j₀ (c σ l)) by
-      funext k
-      rw [map_sum]
-      exact Finset.sum_congr rfl fun l _ => (hjs _ _).symm]
-      exact flagStep_map_eq hj.1 (hfl σ) s
+
+  · rw [show (fun k => ∑ l, ((u σ).map i) l k • (j.comp j₀) (c σ l)) =
+      fun k => j (∑ l, u σ l k • j₀ (c σ l)) by
+    funext k
+    rw [map_sum]
+    exact Finset.sum_congr rfl fun l _ => (hjs _ _).symm]
+    exact flagStep_map_eq hj.1 (hfl σ) s
   · exact hai.ringHom_of_comp_eq ψ i ψ.surjective i.injective hc
   · exact Nat.mul_pos Module.finrank_pos hd0
   · have := finrank_adjoin_pull fn fn' ψ i hc (fun q : Σ σ, Fin (r σ) × Fin (r σ) => u q.1 q.2.1 q.2.2)

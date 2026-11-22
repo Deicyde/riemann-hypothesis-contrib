@@ -174,8 +174,8 @@ theorem res_one_apply {R k : Type} [CommRing R] [CommRing k] (S : Subring R) (re
     have : (⟨(1 : Matrix (Fin m) (Fin m) R) a b, hd⟩ : S) = 0 := Subtype.ext (by show (1 : Matrix (Fin m) (Fin m) R) a b = (0 : R); exact Matrix.one_apply_ne hab')
     rw [this, map_zero, Matrix.one_apply_ne hij, ZMod.val_zero, Nat.cast_zero]
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 4000000 in
+
+
 theorem core0 (D : D7) (t : Formalism.L2.Theta.GA D (D.sp.Y 0)) (PY : RowPsi (Yc D 0) D.R.r)
     (hF : D.host.F = maximalRealSubfield D.host.E) (hStd : StdPsi hF PY)
     (hn : (Formalism.L2.SG.InstExistsPf.instOf D).n = D.R.r)

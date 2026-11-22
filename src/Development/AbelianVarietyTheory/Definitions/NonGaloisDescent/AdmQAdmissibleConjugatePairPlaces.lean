@@ -19,8 +19,8 @@ open GlobalTheory.UnivChar (IsUnivChar withUnivChar)
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SeriesTie
 

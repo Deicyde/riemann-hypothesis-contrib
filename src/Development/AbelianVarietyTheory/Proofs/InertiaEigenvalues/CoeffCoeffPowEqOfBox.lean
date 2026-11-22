@@ -18,8 +18,8 @@ theorem coeff_coeff_pow_eq_of_box :
   induction m generalizing i n with
   | zero => simp
   | succ k ih =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [pow_succ, pow_succ, PowerSeries.coeff_mul, PowerSeries.coeff_mul, map_sum, map_sum]
+
+    rw [pow_succ, pow_succ, PowerSeries.coeff_mul, PowerSeries.coeff_mul, map_sum, map_sum]
     refine Finset.sum_congr rfl ?_
     rintro ⟨p, q⟩ hpq
     rw [Finset.HasAntidiagonal.mem_antidiagonal] at hpq

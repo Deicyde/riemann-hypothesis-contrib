@@ -10,7 +10,7 @@ namespace Formalism.FourierDecayAlt.P
 
 open C2x5 C2x7
 
-set_option maxHeartbeats 400000 in
+
 theorem c2_section_decomp_of_pieces : C2.SectionDecompOfParts := by
   intro _ hC1iii hURI hUp _ hUM _ hTM k r z z' γ hstd hpos hmono s hs
   have hz := hstd.2.1

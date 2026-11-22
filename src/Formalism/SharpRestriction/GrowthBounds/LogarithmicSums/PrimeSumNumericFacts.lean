@@ -27,7 +27,7 @@ structure NumG5' (D : D7) (L : SizeData₂ D) (K : Consts) (C bo : ℝ) : Prop w
 
 theorem zz_arith (z : ℝ) (h : 1 ≤ z) : z * (1 + z) ≤ 2 * (z * z) := by nlinarith
 
-set_option maxHeartbeats 8000000 in
+
 theorem prime_sum_facts_eventually (eps : ℝ) (K : Consts) (hK : K.Nonneg) (C : ℝ) (hC : 0 ≤ C) :
     ∀ᶠ x : ℝ in atTop, ∀ (D : D7) (L : SizeData₂ D), L.sc.x = x → L.sc.eps = eps → Formalism.MainNotions.SizesAt L →
       ParameterChoice' D L → adm5 D L K (eps / 48) → NumG5' D L K C (L.sc.b ^ (x ^ (-(eps / 2)))) := by

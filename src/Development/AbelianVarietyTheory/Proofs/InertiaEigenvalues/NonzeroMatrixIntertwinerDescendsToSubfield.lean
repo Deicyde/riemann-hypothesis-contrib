@@ -15,8 +15,8 @@ open Formalism.AUTREP (GAf)
 open GlobalTheory.FormInner (frameEquiv)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory
 
@@ -46,8 +46,8 @@ theorem matrix_intertwiner_descends : ∀ (K : Type) [Field K] (e : K →+* ℂ)
     simpa using this
   · ext i j
     have key := congrArg (fun M => ℓ (M i j)) (hXc γ)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, h1, h2] at key ⊢
+
+    simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, h1, h2] at key ⊢
     exact key
 
 end GlobalTheory

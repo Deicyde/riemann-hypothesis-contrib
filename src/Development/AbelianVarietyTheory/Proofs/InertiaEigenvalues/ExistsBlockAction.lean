@@ -50,8 +50,8 @@ theorem actsAs_sum
   unfold ActsAs at h ⊢
   intro u
   rw [map_sum_toFr, map_sum_toFr]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_smul_toFr, sum_mulVec_eq, smul_mulVec_eq', map_sum, map_smul, h]
+
+  simp only [map_smul_toFr, sum_mulVec_eq, smul_mulVec_eq', map_sum, map_smul, h]
   refine Prod.ext ?_ ?_
   · simp [Prod.fst_sum]
   · funext j

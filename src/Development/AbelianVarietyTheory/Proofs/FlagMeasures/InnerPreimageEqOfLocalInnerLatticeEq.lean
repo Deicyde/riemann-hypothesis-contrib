@@ -34,8 +34,8 @@ theorem bcP_endP (p : PlF D) (Q : (VS D).V →ₗ[D.host.E] (VS D).V) (x : (VS D
     endP p Q (baseChange₂ D p x) = baseChange₂ D p (Q x) := by
   rw [endP, Fintype.linearCombination_apply]
   conv_rhs => rw [← (VS D).frame.sum_repr x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum]
+
+  rw [map_sum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, baseChange_smul₂]
   rfl
@@ -144,7 +144,7 @@ theorem X_iso {T : D.host.E} (G : LFlag (D.sp.Y 0) D.R.rS T) {x : (VS D).V} (hx 
   · intro a c _ _ ha hc; simp [ha, hc]
   · intro c a _ ha; simp [ha]
 
-set_option maxHeartbeats 1000000 in
+
 theorem lsub_le (Z : LocDat D) {T : D.host.E} (G : LFlag (D.sp.Y 0) D.R.rS T)
     (f : ∀ p : PlF D, Fin (D.R.rS + 1) → Vp D p)
     (hf : ∀ p, f p = fun a => frFac Z.δ p a • baseChange₂ D p (frame G a)) (Λ₁ Λ₂ : LV D)

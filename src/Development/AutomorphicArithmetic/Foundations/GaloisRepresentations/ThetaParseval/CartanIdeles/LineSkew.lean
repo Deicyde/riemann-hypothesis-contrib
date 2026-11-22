@@ -68,8 +68,8 @@ theorem lineSkew : LineSkew := by
     constructor
     · intro hy x hx o
       rw [hmem] at hx
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hform, Finset.mul_sum, map_sum]
+
+      rw [hform, Finset.mul_sum, map_sum]
       exact IsIntegral.sum _ (fun i _ => (hl.dual (y i)).1 (hy i) (x i) (hx i) o)
     · intro h i
       rw [hl.dual]

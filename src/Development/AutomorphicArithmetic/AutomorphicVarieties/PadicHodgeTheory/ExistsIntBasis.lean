@@ -71,8 +71,8 @@ private theorem exists_int_basis {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [
   have h1 : ρ g (b.extendOfIsFullLattice ℚ_[l] j) =
       ∑ k, ((b.repr ⟨_, hst g _ (b j).2⟩ k : ℤ_[l]) : ℚ_[l]) • b.extendOfIsFullLattice ℚ_[l] k := by
     have := congrArg Λ.subtype (b.sum_repr ⟨_, hst g _ (b j).2⟩)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at this
+
+    rw [map_sum] at this
     convert this.symm using 1
     · rw [Basis.extendOfIsFullLattice_apply]; rfl
     · apply Finset.sum_congr rfl

@@ -36,7 +36,7 @@ theorem actLoc (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l)
 
 
 open GlobalTheory.CompanionTheory.LocDual.Q in
-set_option maxHeartbeats 1000000 in
+
 theorem dualQ : Formalism.GaloisCohomology.LocalTateDualityK → ∀ (l : ℕ) [Fact l.Prime] (Lp : LocPrime l) (K : FinExt l),
     TopInj (Lp.PD K) → DualQ (Lp.PD K) := by
   intro hT l _ Lp K hTop LL _ _ _ O _ _ hG L1 hL1 A A' LA LA' P hdual ϖ hϖ r hI hI'

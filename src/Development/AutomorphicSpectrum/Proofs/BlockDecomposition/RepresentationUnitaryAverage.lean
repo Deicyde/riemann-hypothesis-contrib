@@ -135,8 +135,8 @@ lemma end_coeff_continuous {M : Type} [AddCommGroup M] [Module ℂ M]
           simp only [c, LinearMap.comp_apply, LinearEquiv.coe_coe]
           rw [← h1]
       _ = _ := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [h2, map_sum]
+
+          rw [h2, map_sum]
           simp [LinearMap.single_apply]
   simp only [key]
   refine continuous_finsetSum _ fun i _ => ?_

@@ -17,7 +17,7 @@ open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace PositivityTheory.Rg.Sw.Glob.UnipH
 
@@ -82,9 +82,9 @@ theorem theta_half (θ : InfFam D) (_hθ : IsInfFam θ) (ρ : D.what₂.Tau) :
 theorem gramX_eq {m n : ℕ} (ε : Fin m → Bool) (u : Matrix (Fin m) (Fin n) ℂ) :
     gramX ε u = uᴴ * Matrix.diagonal (sgn ε) * u := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gramX, evX, Qp, Qb, map_sub, map_sum, map_mul, MvPolynomial.eval_X, Matrix.mul_apply,
-    Matrix.diagonal_apply, Matrix.conjTranspose_apply, ite_true, Bool.false_eq_true, ite_false]
+
+  simp only [gramX, evX, Qp, Qb, map_sub, map_sum, map_mul, MvPolynomial.eval_X, Matrix.mul_apply,
+  Matrix.diagonal_apply, Matrix.conjTranspose_apply, ite_true, Bool.false_eq_true, ite_false]
   rw [Finset.sum_filter, Finset.sum_filter, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [Finset.sum_eq_single a (fun k _ hk => by simp [hk]) (by simp)]
@@ -148,8 +148,8 @@ theorem psi_unip {θ : InfFam D} (hθ : IsInfFam θ) {ψ : AddChar (AF D.host.F)
       change star T = T
       have hg : (gramX ε (fr⁻¹ * compAt θ τ x))ᴴ = gramX ε (fr⁻¹ * compAt θ τ x) := by
         ext i j
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
+
+        simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
       rw [hTdef, ← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul, hg, hb, Matrix.trace_mul_comm]
     rw [hr]
     congr 1

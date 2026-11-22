@@ -46,8 +46,8 @@ theorem rowE_diag_monomial {R : Type} [CommRing R] {r n : ℕ} (a : Fin r) (μ :
     · simp [h]
     · rw [add_comm, tsub_add_cancel_of_le (Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr h))]
   simp_rw [hterm]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← Finset.mul_sum, smul_monomial, smul_eq_mul, mul_comm]
+
+  rw [← map_sum, ← Finset.mul_sum, smul_monomial, smul_eq_mul, mul_comm]
   congr 2
   rw [← hd, weight_rowW_eq_sum]
   push_cast
@@ -94,8 +94,8 @@ theorem rowE_rowWeight : ∀ (R : Type) [CommRing R] (r n : ℕ) (μ : Fin r →
   refine ⟨fun a => ?_, fun a b _ => ⟨fun hb => ?_, fun μ' hμ => ?_⟩⟩
   · conv_lhs => rw [f.as_sum]
     conv_rhs => rw [f.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.smul_sum]
+
+    rw [map_sum, Finset.smul_sum]
     exact Finset.sum_congr rfl fun d hd => rowE_diag_monomial a μ d _ (hmon d hd)
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [f.as_sum, map_sum]

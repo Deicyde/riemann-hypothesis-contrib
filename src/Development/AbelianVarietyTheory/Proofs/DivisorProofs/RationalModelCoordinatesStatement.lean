@@ -11,7 +11,7 @@ open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNo
 open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.MixedLagr
 open GlobalTheory.Doubling (absE)
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.rational_model_coordinates : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
     (n d : ℕ) (X : Spc F E n) (W : Spc F E d) (M : Model σ X W),
     (∀ x : Matrix (Fin n) (Fin d) E, ∃ y z : Fin n × Fin d → F,

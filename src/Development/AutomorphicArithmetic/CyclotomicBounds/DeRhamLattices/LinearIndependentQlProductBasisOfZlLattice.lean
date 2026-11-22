@@ -11,8 +11,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
-set_option maxHeartbeats 2000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 private theorem exists_sum_tmul {R O B σ : Type} [CommRing R] [AddCommGroup O] [Module R O]
     [AddCommGroup B] [Module R B] [Fintype σ] (ω : Module.Basis σ R O) (x : O ⊗[R] B) :
@@ -30,8 +30,8 @@ private theorem abstract_indep {R K O B V C σ κ : Type} [CommRing R] [Field K]
   have h : ∑ p : σ × κ, w p ⊗ₜ[K] f (y p.2 p.1) = 0 := by
     rw [← hd, Fintype.sum_prod_type_right]
     refine Finset.sum_congr rfl fun k _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hy k, map_sum]
+
+    rw [hy k, map_sum]
     have hsum (S : Finset σ) :
         (∑ s ∈ S, act (ω s ⊗ₜ[R] y k s)) (e k) =
           ∑ s ∈ S, act (ω s ⊗ₜ[R] y k s) (e k) := by

@@ -237,8 +237,8 @@ theorem logF_map : PowerSeries.map (k0ToC p) (Formalism.MainNotions.FormalGroupS
   ext n
   rw [PowerSeries.coeff_map]
   unfold Formalism.MainNotions.FormalGroupSystem.logF Formalism.MainNotions.GL3Theta.logF
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [PowerSeries.coeff_mk, PowerSeries.coeff_mk, map_sum]
+
+  rw [PowerSeries.coeff_mk, PowerSeries.coeff_mk, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   split_ifs <;> simp
 

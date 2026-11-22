@@ -22,7 +22,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaKernelT
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 200000
+
 
 noncomputable section
 
@@ -167,7 +167,7 @@ theorem dict_mem (hT : LawsJ T) (O : OMDat T.toCore R i Tp tup) (g : GA D (Wc D 
   exact hd.2.2.2.1 _
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem atDict_indep (hT : LawsJ T) (O : OMDat T.toCore R i Tp tup) (κ : WeightFamilies.Wt D ((i : ℕ) + 1)) (m : ℕ)
     (b : Fin m → Rul (T.Q.Xo ((i : ℕ) + 1)) O.c') (hb : ∀ j, b j ∈ GlobalTheory.OneMapAll.cuspOver O κ)
     (hli : LinearIndependent O.c'.F b) : LinearIndependent ℂ fun j => atDict O (rdU (unfO O) (b j)) := by
@@ -183,8 +183,8 @@ theorem atDict_indep (hT : LawsJ T) (O : OMDat T.toCore R i Tp tup) (κ : Weight
     Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (((mem_cusp _ _ _ _ _ _).1 (hb j)).2 _ (goodEmbedding_baseEmbedding_coreData O))
   have hEq := eqv_holSub (unfO O).X _ hmem
   have hz : atDict O (∑ j, w j • rdU (unfO O) (b j)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hw, map_sum]
+
+    rw [← hw, map_sum]
     exact Finset.sum_congr rfl fun j _ => map_smul _ _ _
   funext k x
   by_cases hx : x ∈ ((unfO O).X k).dom
@@ -202,7 +202,7 @@ theorem atDict_indep (hT : LawsJ T) (O : OMDat T.toCore R i Tp tup) (κ : Weight
     rw [this, mul_zero]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem rdU_mem_span_raw (hT : LawsJ T) (O : OMDat T.toCore R i Tp tup) (κ : WeightFamilies.Wt D ((i : ℕ) + 1))
     (hn : κ.n = (Vc D i).rank) (hsz : 8 * D.R.f * D.R.r + 4 ≤ (Vc D i).rank) [StarRing (𝓞 D.host.E)]
     (nab : NabV (T.Q.Xo ((i : ℕ) + 1)) O.c') (hnab : IsNab _ O.c' nab) {bad : ℕ} (hb : 0 < bad)

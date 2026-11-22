@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.XiEntr
 @[expose] public section
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.Ker Formalism.L2.DIV GlobalTheory.TwU GlobalTheory.TwV
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.muCharacter_det_level_eq_local_tame_product : UnderTie (fun {D L hT Gi Gl Kc Y cX ex t u μ St} A dtU a =>
     MuLaw t u μ dtU → ∀ i, i < D.R.m → ∀ j (hj : j ≤ D.R.m) (β : (St j hj).Ch) (κ : ((St j hj).K β).lev.U) (e : SB t μ → t.X.E),
       (∀ P : SB t μ, IntAtA (F := D.host.F) (seamP t.seam P.1)

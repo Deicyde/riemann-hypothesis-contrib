@@ -121,8 +121,8 @@ section Pure2
 variable {n : ℕ}
 
 theorem hJ_conj (ε : Fin n → Bool) (x y : Fin n → ℂ) : hJ ε x y = conj (hJ ε y x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hJ_eq_lemma, hJ_eq_lemma, map_sum]
+
+  rw [hJ_eq_lemma, hJ_eq_lemma, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   split_ifs <;> simp <;> ring
 
@@ -212,9 +212,9 @@ theorem phi_hform (I : AutInst) (v : InfinitePlace I.F) (x y : Fin I.n → I.E) 
   have hPu : IsUnit (I.P v).det := (Matrix.isUnit_iff_isUnit_det _).1 (I.P_unit v)
   have hL : I.φ v (Formalism.UG.hform (starRingEnd I.E) I.J x y) =
       star (fun i => I.φ v (x i)) ⬝ᵥ (I.J.map (I.φ v) *ᵥ fun i => I.φ v (y i)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Formalism.UG.hform, map_sum, map_mul, dotProduct, mulVec, Finset.mul_sum, Pi.star_apply,
-      Matrix.map_apply]
+
+    simp only [Formalism.UG.hform, map_sum, map_mul, dotProduct, mulVec, Finset.mul_sum, Pi.star_apply,
+    Matrix.map_apply]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     rw [starRingEnd_apply, I.cm.cmUnram.2.1, RCLike.star_def]
     ring
@@ -250,13 +250,13 @@ theorem hJ_crd (v : InfinitePlace X.B.I.F) (p q : (VS D).V) :
     hJ (X.B.I.ε v) (rv X.B.I v (X.crd p)) (rv X.B.I v (X.crd q)) = embS D (X.pl v) ((VS D).hT p q) := by
   rw [← phi_hform, X.φ_eq]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Formalism.UG.hform, map_sum, map_mul, HidaSetting.crd, crdOf, starRingEnd_apply, X.ιE_conj,
-    RingEquiv.apply_symm_apply, X.J_eq]
+
+  simp only [Formalism.UG.hform, map_sum, map_mul, HidaSetting.crd, crdOf, starRingEnd_apply, X.ιE_conj,
+  RingEquiv.apply_symm_apply, X.J_eq]
   conv_rhs => rw [← X.bas.sum_repr p, ← X.bas.sum_repr q]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum,
-    RingHom.id_apply, starRingEnd_apply]
+
+  simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum,
+  RingHom.id_apply, starRingEnd_apply]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have hc : D.host.conj ((X.bas.repr p) i) = star ((X.bas.repr p) i) := host_conj_eq_star D _

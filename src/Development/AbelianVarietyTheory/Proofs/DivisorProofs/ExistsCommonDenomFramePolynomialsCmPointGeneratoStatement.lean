@@ -40,8 +40,8 @@ open scoped TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.GeometryOfNumbersTheory TopologicalSpace Limits
 open GlobalTheory.HSApp
 open GlobalTheory.LamT (CMPt)
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000 in
+
+
 theorem _root_.GlobalTheory.T.exists_commonDenom_framePolynomials_cmPoint_generator : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
     (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)] (z : CMPt Xo c) (f : ℕ) (La : ℝ), z.Good f La →
     ∀ (e : Formalism.L2.Pj.Ix Dw → ℤ) (k : (E →+* ℂ) → ℕ),

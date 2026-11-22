@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockMap
 
 open scoped Matrix
 open Formalism.BasicNotions.TH
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.indefiniteUnitaryCharacter_maximalCompact_det_pow : ∀ (R S : ℕ) (χ : Mat R S → ℂ),
     (∀ g h : Mat R S, gᴴ * Jm R S * g = Jm R S → hᴴ * Jm R S * h = Jm R S → χ (g * h) = χ g * χ h) →
     ContinuousOn χ {g : Mat R S | gᴴ * Jm R S * g = Jm R S} →

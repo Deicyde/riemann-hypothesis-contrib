@@ -32,8 +32,8 @@ theorem latS_decomp {m k : ℕ} (b : Fin m → 𝓞 E) (hb : Submodule.span ℤ 
     have : (fun l => inclE (F := F) R ((∑ i, a i • g i) l)) =
         ∑ i, (⟨inclE (F := F) R (algebraMap (𝓞 E) E (a i)), inclE_mem_tensInt (F := F) (R := R) (S₂ := S₂) (a i)⟩ : S) • G i := by
       funext l
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_apply, Finset.sum_apply, map_sum]
+
+      rw [Finset.sum_apply, Finset.sum_apply, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [Pi.smul_apply, Pi.smul_apply, Subring.smul_def, smul_eq_mul, Algebra.smul_def, map_mul]
     show (fun l => inclE (F := F) R ((∑ i, a i • g i) l)) ∈ Submodule.span S (Set.range G)
@@ -86,11 +86,11 @@ theorem adelic_local_lattice : AdLocLat := by
     refine Formalism.UG.P.afsplit_inj _ fun v => ?_
     rw [map_sub, sub_eq_zero]
     refine (hxr v l).trans ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul]
     rfl

@@ -26,8 +26,8 @@ theorem isFinPt_mul : ∀ {D : D7} (V : HSp D) {n : ℕ} (g g' : GA D V) (x x' :
   obtain ⟨hg', e', h'⟩ := hx'
   subst e
   refine ⟨mul_mem hg hg', rfl, fun i j => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_mul, Units.val_mul, Subgroup.coe_mul, Matrix.mul_apply, map_sum, Fin.cast_eq_self]
+
+  simp only [map_mul, Units.val_mul, Subgroup.coe_mul, Matrix.mul_apply, map_sum, Fin.cast_eq_self]
   refine Finset.sum_congr rfl fun k _ => ?_
   have a := h i k
   have b := h' k j

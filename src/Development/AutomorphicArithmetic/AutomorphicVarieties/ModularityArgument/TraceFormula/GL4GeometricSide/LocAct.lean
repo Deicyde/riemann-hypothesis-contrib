@@ -139,8 +139,8 @@ private theorem ker_val (hk : IsMult μ M k val T') (hc : ∀ j, Continuous (c j
   have hI := fun j => integrable_k M μ hk (hs j).continuousOn
   simp only [sum_apply, smul_apply, mul_apply_eq_comp]
   rw [← h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [act, one_mul, map_sum, map_smul]
+
+  simp only [act, one_mul, map_sum, map_smul]
   rw [integral_finsetSum (f := fun j (y : PositivityTheory.RgTw.G n) => F j y.val • k y.val (B j e)) _
     fun j _ => (hI j).apply_continuousLinearMap (B j e)]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -161,8 +161,8 @@ private theorem abs_act (hν : ν Set.univ = 1) (hk : IsMult μ M k val T') (T :
     rw [map_smul, smul_eq_mul, mul_comm]
     rfl
   simp only [h2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h1, map_smul, map_sum, smul_eq_mul]
+
+  rw [h1, map_smul, map_sum, smul_eq_mul]
   congr 1
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_smul, smul_eq_mul, mul_comm, ← (trR M T).integral_comp_comm (integrable_c ν M hc j)]
@@ -207,8 +207,8 @@ theorem UpperTheory.V.Z.GSp4Splitting.locAct :
   have hev : ∀ x ∈ S, (D.i x).1.1 = ∑ j, ⟪((b j : S) : D.U), x⟫_ℂ • (D.i (b j : S)).1.1 := by
     intro x hx
     conv_lhs => rw [hexp x hx]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Submodule.coe_sum, Submodule.coe_smul]
+
+    simp only [map_sum, map_smul, Submodule.coe_sum, Submodule.coe_smul]
   have heig := (bridge E n π.V w (infOf lam)).2 hch
   have h := abs_act ν M μC (c := fun j κ => ⟪((b j : S) : D.U), D.σ w κ u⟫_ℂ)
     (F := fun j => along w g (D.i (b j : S)).1.1) (F0 := along w g (D.i u).1.1) hν hk T (fun j => hK.cont _ _) (infOf lam)

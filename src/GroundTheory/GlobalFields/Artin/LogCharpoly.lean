@@ -19,8 +19,8 @@ def matrixGeomSeries (M : Matrix n n R) : Matrix n n (PowerSeries R) :=
 
 theorem coeff_map_C_mul_matrixGeomSeries (M : Matrix n n R) (k : ℕ) (i j : n) :
     PowerSeries.coeff k ((M.map PowerSeries.C * matrixGeomSeries M) i j) = (M ^ (k + 1)) i j := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [pow_succ', Matrix.mul_apply, Matrix.mul_apply, map_sum]
+
+  rw [pow_succ', Matrix.mul_apply, Matrix.mul_apply, map_sum]
   refine Finset.sum_congr rfl fun l _ => ?_
   simp [matrixGeomSeries, PowerSeries.coeff_C_mul]
 
@@ -38,11 +38,11 @@ theorem trace_matrixGeomSeries_mul (M : Matrix n n R) :
     (matrixGeomSeries M * M.map PowerSeries.C).trace =
       PowerSeries.mk fun k => (M ^ (k + 1)).trace := by
   ext k
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [PowerSeries.coeff_mk, pow_succ, Matrix.trace, Matrix.trace, map_sum]
+
+  rw [PowerSeries.coeff_mk, pow_succ, Matrix.trace, Matrix.trace, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.diag_apply, Matrix.diag_apply, Matrix.mul_apply, Matrix.mul_apply, map_sum]
+
+  rw [Matrix.diag_apply, Matrix.diag_apply, Matrix.mul_apply, Matrix.mul_apply, map_sum]
   refine Finset.sum_congr rfl fun l _ => ?_
   simp [matrixGeomSeries, PowerSeries.coeff_mul_C]
 

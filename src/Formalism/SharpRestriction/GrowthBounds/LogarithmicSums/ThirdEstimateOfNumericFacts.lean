@@ -224,7 +224,7 @@ theorem theta_power_bounds (x k θ Xpp : ℝ) (hx : 16 ≤ x) (hk4 : x ^ 4 ≤ k
     calc 16 * x * θ ≤ (x ^ 16)⁻¹ * 16 := by rw [← h2]; exact h1
       _ ≤ _ := mul_le_mul_of_nonneg_left hX (by positivity)
 
-set_option maxHeartbeats 8000000 in
+
 theorem numT_ev (eps : ℝ) (C : ℝ) (hC : 0 ≤ C) :
     ∀ᶠ x : ℝ in atTop, ∀ (D : D7) (L : SizeData₂ D), L.sc.x = x → L.sc.eps = eps → Formalism.MainNotions.SizesAt L →
       ParameterChoice' D L → NumT D L C := by

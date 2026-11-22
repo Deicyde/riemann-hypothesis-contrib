@@ -331,7 +331,7 @@ private theorem pe_ine {k : Type} [Field k] [Algebra (ResidueField O) k] [CharP 
 
 end Tw
 
-set_option maxHeartbeats 16000000 in
+
 theorem UpperTheory.V.Pr.pointEx_of_le {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     [IsCoef l O] [Algebra ℤ_[l] O] {F : Frame l (ResidueField O)} {n : ℕ} (T : Pr.Setup F n)
     (Φ : T.B.B →ₐ[O] T.S.B) (hΦ : T.IsPhi Φ) (x : Ideal T.S.A) (L : T.S.Loc x) (p : Ideal L.R) (hp : p.IsPrime)

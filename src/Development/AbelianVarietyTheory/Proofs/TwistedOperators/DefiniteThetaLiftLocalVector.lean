@@ -19,8 +19,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open scoped TensorProduct ComplexOrder nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.AdjVecLocal
 
@@ -369,8 +369,8 @@ theorem prod_redFun (s : Finset (Formalism.L2.DIV.Pl D.host.E)) (es : Formalism.
       by_contra h
       push_neg at h
       refine hi fun i j => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← frMapAdj_half S T βS βT hx i j, map_sum, Finset.sum_mul]
+
+      rw [← frMapAdj_half S T βS βT hx i j, map_sum, Finset.sum_mul]
       exact sum_mem fun PP hPP => h PP hPP i j
     obtain ⟨PP, hPP, h⟩ := this
     refine Finset.prod_eq_zero hPP ?_

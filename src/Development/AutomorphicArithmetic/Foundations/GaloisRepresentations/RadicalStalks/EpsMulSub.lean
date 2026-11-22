@@ -215,9 +215,9 @@ theorem UpperTheory.Gal.Ord.lie :
         have ht := hw j c
         rw [← HL.ker_toLie (OActN.toF D o.act), LinearMap.mem_ker, map_sub, map_smul, hLc', sub_eq_zero] at ht
         exact ht
-      set_option synthInstance.maxHeartbeats 100000 in
-        · rw [← HL.ker_toLie (OActN.toF D o.act), LinearMap.mem_ker, map_sub, map_sum, sub_eq_zero] at hs
-          exact hs
+
+      · rw [← HL.ker_toLie (OActN.toF D o.act), LinearMap.mem_ker, map_sub, map_sum, sub_eq_zero] at hs
+        exact hs
     obtain ⟨w, hw, hs⟩ := lie_rho_decomp _ hvr
     refine ⟨-(e • (D.ω • v - ρ • v)), ?_, w, hw, ?_⟩
     · rw [smul_neg, smul_comm D.ω e, smul_sub, smul_comm D.ω ρ]
@@ -247,12 +247,12 @@ theorem UpperTheory.Gal.Ord.lie :
         rw [sub_smul, ← e4, ← e5, sub_self]
       exact (smul_eq_zero.mp e6).resolve_left (GlobalTheory.HTLieRho.two_rho_sub_ne_zero b β)
     have hsum : HL.toLie (OActN.toF D o.act) h = HL.toLie (OActN.toF D o.act) (hu' + ∑ j, hs j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hdec, map_add (f := _), map_sum]
+
+      rw [hdec, map_add (f := _), map_sum]
       simp only [hhs]
     have hLε : HL.toLie (OActN.toF D o.act) (hom o π.ε h) = wv i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hLc, hsum, ← hLc, map_add (f := _), map_sum, map_add (f := _), map_sum, hu0, zero_add]
+
+      rw [hLc, hsum, ← hLc, map_add (f := _), map_sum, map_add (f := _), map_sum, hu0, zero_add]
       have e9 : ∀ j, HL.toLie (OActN.toF D o.act) (hom o π.ε (hs j)) = β (b.t j π.ε) • wv j := by
         intro j
         rw [hLc, hhs j]

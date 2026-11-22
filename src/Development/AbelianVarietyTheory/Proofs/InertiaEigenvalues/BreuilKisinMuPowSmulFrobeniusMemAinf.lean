@@ -116,8 +116,8 @@ theorem GlobalTheory.BKGal.LiftStep.mu_pow_smul_mem : ∀ (l : ℕ) [Fact l.Prim
       rw [map_mul, map_mul, map_pow]
       rfl
     · funext i
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [w, map_mul, map_sum]
+
+      simp only [w, map_mul, map_sum]
       rfl
   have hint := GlobalTheory.T.frobenius_integrality_coeffTensorAinf_vector l O ι Y w z heq
   choose c hc using hint

@@ -381,8 +381,8 @@ def biproductSectionsEquiv {ι : Type} [Fintype ι] (F : ι → X.Modules) [HasB
   right_inv s := by
     classical
     ext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.toFun_eq_coe, LinearMap.pi_apply, appLinear_apply, map_sum, app_app]
+
+    simp only [LinearMap.toFun_eq_coe, LinearMap.pi_apply, appLinear_apply, map_sum, app_app]
     rw [Finset.sum_eq_single i (fun j _ hj ↦ by rw [biproduct.ι_π_ne F hj]; rfl) (by simp),
       biproduct.ι_π_self]
     rfl

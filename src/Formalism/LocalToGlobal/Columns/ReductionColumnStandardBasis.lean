@@ -148,8 +148,8 @@ theorem cq_r_apply {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} {g : 
     (hg : ∀ x, r (Loc.inX k n c x) = Loc.inX k n c (g x)) (z : Fin (n + c) → k) :
     r z = Loc.inX k n c (g (fun j => z (Fin.castAdd c j))) + ∑ i : Fin c, z (Fin.natAdd n i) • r (Loc.eN k (n + c) (n + i.1)) := by
   conv_lhs => rw [cq_decomp z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), hg, map_sum]
+
+  rw [map_add (f := _), hg, map_sum]
   simp only [map_smul]
 
 theorem reduction_entry_lower_block {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} {g : (Fin n → k) ≃ₗ[k] (Fin n → k)}
@@ -257,7 +257,7 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] {P : HeightOneSpectru
 def cqLev (n l : ℕ) : ℕ := if l < n then 0 else l - n + 1
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem finite_sum_target_equality (hq : ((q : ℕ) : 𝓞 E) ∈ P.asIdeal) (hu : ((q : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) (hp : q.Prime)
     (hcard : Nat.card (𝓞 E ⧸ P.asIdeal) = q) {K : Type} [Field K] {n' n c : ℕ} (psi : E → K) {D a b e A B : ℕ}
     (hadd : ∀ x y : E, IntAt P ((q : E) ^ D * x) → IntAt P ((q : E) ^ D * y) → psi (x + y) = psi x * psi y)

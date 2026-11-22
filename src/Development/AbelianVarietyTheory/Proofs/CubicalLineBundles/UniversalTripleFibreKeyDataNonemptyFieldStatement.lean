@@ -17,6 +17,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped ComplexOrder
 open GlobalTheory GlobalTheory.CM GlobalTheory.Frames GlobalTheory.LamT
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.universalTripleFibreKeyData_nonempty_field : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (K : Type) [Field K] (x : Sp K ⟶ Xo.X), 1 ≤ Dw.p + Dw.q → Nonempty (FibKey Xo K x) := by
   first | exact @GlobalTheory.LamT.nonempty_fibKey | exact GlobalTheory.LamT.nonempty_fibKey | (intros; apply GlobalTheory.LamT.nonempty_fibKey <;> assumption)

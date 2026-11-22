@@ -37,8 +37,8 @@ theorem BlockGraphImage.proof : BlockGraphImage.Statement := by
 
   have hcone : ∀ q, mConeMap y (blockForms k₀ M q) = C (x q) * X k₀ := by
     intro q
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [blockForms, map_sum, map_mul, mConeMap, aeval_X, aeval_C, hB.1 q, Finset.sum_mul]
+
+    simp only [blockForms, map_sum, map_mul, mConeMap, aeval_X, aeval_C, hB.1 q, Finset.sum_mul]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [mul_assoc]
   let G : MRing (GlobalTheory κ) →+* MvPolynomial Unit (MvPolynomial K Ω) :=

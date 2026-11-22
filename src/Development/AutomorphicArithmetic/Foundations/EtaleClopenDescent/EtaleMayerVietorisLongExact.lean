@@ -45,7 +45,7 @@ private theorem cpull_inr_desc {K L M : Cx R} (c : K ⟶ M) (e : L ⟶ M) (I : C
 
 end UpperTheory.Cb.EtaleMayerVietoris
 
-set_option maxHeartbeats 800000 in
+
 open UpperTheory.Cb.EtaleMayerVietoris in
 theorem UpperTheory.Cb.etale_mayer_vietoris_long_exact :
     LateralTheory.E.MayerVietorisSequence.LES := by

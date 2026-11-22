@@ -180,13 +180,13 @@ theorem stepDuF_of (hL : StepLiftG) : StepDuF := by
     funext i
     rcases i with a | a
     · have := congrArg (ph1 g) (hm a)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, map_add (f := _), splitFirstProj_conj] at this
+
+      simp only [map_sum, map_mul, map_add (f := _), splitFirstProj_conj] at this
       simpa [uV, Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.fromBlocks_transpose, ringSecondProj_apply,
         map_add] using this
     · have := congrArg (ph2 g) (hm a)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, map_add (f := _), ph2_cj_eq_ph1] at this
+
+      simp only [map_sum, map_mul, map_add (f := _), ph2_cj_eq_ph1] at this
       simpa [uV, Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.fromBlocks_transpose, ringFirstProj_apply,
         map_add] using this
   have hA := stepA_mat hs T T' Zh₁ Zh₂ Z₁ Z₂ hZ₁ hZ₂ P Q hPQ hPe hQe

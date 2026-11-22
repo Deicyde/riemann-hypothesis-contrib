@@ -27,7 +27,7 @@ open GlobalTheory.Chamber GlobalTheory.TruncKer GlobalTheory.Cusp
 open Matrix
 open scoped Pointwise
 open GlobalTheory.SiegelSet GlobalTheory.CompanionTheory.RegInt
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mem_parabolic_of_flag_preserving : ∀ (D : D7) (V : HSp D) (r : ℕ) (X Y : Matrix (Fin V.rank) (Fin r) D.host.E)
     (hW : IsWittFrame D.sp.cm.sig V.gram X Y) (j : Fin r) (δ : GF V),
     (∀ l : Fin r, l ≤ j → ∃ b : Fin r → D.host.E, δ.1.1 *ᵥ (fun a => X a l) = X *ᵥ b ∧ ∀ m : Fin r, j < m → b m = 0) →

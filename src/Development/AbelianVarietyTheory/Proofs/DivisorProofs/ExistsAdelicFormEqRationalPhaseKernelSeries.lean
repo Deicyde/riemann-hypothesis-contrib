@@ -19,8 +19,8 @@ open Formalism.IndefR.FWT Formalism.IndefR.Datum GlobalTheory.BigTop GlobalTheor
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries GlobalTheory.ConjTwist GlobalTheory.FlatVecSum GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels
 open GlobalTheory.BigOn.Exp.SerBase
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.KerPhase
@@ -296,8 +296,8 @@ theorem exists_adForm_eq_phase_smul : GlobalTheory.Published.CuspRapidDecay → 
   refine ⟨(YS.fi j).e (∑ k, c k • Subtype.val (x k)), ?_⟩
   rw [e, one_smul, show (fun τ => (u τ : (Rl.MW j (sg0 D A3.A)).sm τ)) = v₀ j _ from funext hu]
   change evW YS v₀ j (∑ k, c k • Subtype.val (x k)) = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_congr rfl fun k _ => by rw [evW_smul, ← hc k]; rfl
 
 end GlobalTheory.KerPhase

@@ -9,8 +9,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.FrLin
 open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict GlobalTheory.St GlobalTheory.St.G
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.St.G
 

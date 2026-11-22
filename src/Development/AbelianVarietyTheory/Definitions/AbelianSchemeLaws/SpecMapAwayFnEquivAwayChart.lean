@@ -35,18 +35,18 @@ theorem coeff_eq_zero_of_simple_pole {R B C κ : Type*} [CommRing R] [CommRing B
         lt_of_le_of_ne (hmax k hk) fun e => ha (hd e ▸ hk)
       have key : ρ (c a) * v a + ∑ k ∈ s, ρ (c k) * (z ^ (d a - d k) * v k) = z ^ (d a - 1) * b := by
         apply hι
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_mul ι (z ^ _), ← h, map_pow, ← mul_assoc, ← pow_succ, Nat.sub_add_cancel (by omega),
-          Finset.sum_insert ha, mul_add, map_add, map_sum, Finset.mul_sum, map_mul, ← hv]
+
+        rw [map_mul ι (z ^ _), ← h, map_pow, ← mul_assoc, ← pow_succ, Nat.sub_add_cancel (by omega),
+        Finset.sum_insert ha, mul_add, map_add, map_sum, Finset.mul_sum, map_mul, ← hv]
         refine congrArg₂ (· + ·) (by ring) (Finset.sum_congr rfl fun k hk => ?_)
         obtain ⟨m, hm⟩ := Nat.exists_eq_add_of_le (hlt k hk).le
         rw [map_mul, map_mul, map_pow, ← hv, hm, Nat.add_sub_cancel_left]
         ring
       have hca : c a = 0 := by
         have := congrArg ε key
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_add (f := _), map_sum, map_mul, map_mul, map_pow, hz, zero_pow (by omega), zero_mul, hρ, hε,
-          mul_one, Finset.sum_eq_zero, add_zero] at this
+
+        rw [map_add (f := _), map_sum, map_mul, map_mul, map_pow, hz, zero_pow (by omega), zero_mul, hρ, hε,
+        mul_one, Finset.sum_eq_zero, add_zero] at this
         · exact this
         · intro k hk
           have := hlt k hk

@@ -131,8 +131,8 @@ theorem exists_greatest_proper_invariant_submodule_of_side {La : Ix r s → ℚ}
   refine ⟨K, hne, hst, fun N h1 h2 => le_sSup (s := {N : Submodule ℂ M | (∀ W, ∀ x ∈ N, act W x ∈ N) ∧ N ≠ ⊤}) ⟨h1, h2⟩,
     fun β hβ x hx => ?_⟩
   have cas : ∀ u v, β (casK (units act) u) v = β u (casK (units act) v) := fun u v => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [casK, LinearMap.sum_apply, map_sum]
+
+    simp only [casK, LinearMap.sum_apply, map_sum]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
     split_ifs with hab
     · simp only [Module.End.mul_apply, units, hβ, epsB, if_pos hab, if_pos (sameBlock_symm' hab), one_mul]
@@ -145,8 +145,8 @@ theorem exists_greatest_proper_invariant_submodule_of_side {La : Ix r s → ℚ}
       rw [map_sub, LinearMap.sub_apply, cas, hv, map_smul, LinearMap.map_smulₛₗ]
       simp
     · rw [matrix_eq_sum_single W]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, LinearMap.sum_apply]
+
+      simp only [map_sum, LinearMap.sum_apply]
       refine Finset.sum_eq_zero fun a _ => Finset.sum_eq_zero fun b _ => ?_
       have e : single a b (W a b) = W a b • (Eab a b : Mat r s) := by simp [Eab]
       have h1 := hβ b a x z

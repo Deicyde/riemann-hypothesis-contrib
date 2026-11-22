@@ -201,7 +201,7 @@ theorem sep_ext {O : Type} [CommRing O] [IsDomain O] {F : Type} [Field F] (f : O
   rw [← hκ, ← Polynomial.map_map, Polynomial.separable_map]
   exact h
 
-set_option maxHeartbeats 1000000 in
+
 theorem stageC : StatStageC := by
   intro O O' _ _ _ _ _ _ _ _ _ e he X _ T d _ _ G _ r π t bl χ₁ ε hP hA eB e₁ hI g₀ s hsm hes hse hsπ
     hsep hspl

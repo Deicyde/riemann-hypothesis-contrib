@@ -39,8 +39,8 @@ omit [_root_.NumberField.IsTotallyComplex E] in
 theorem pFin_vecMul (x : Fin a → Ad E) (m : GA E a) :
     (fun i => pFin E ((x ᵥ* m.val) i)) = (fun i => pFin E (x i)) ᵥ* m.val.map (pFin E) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [vecMul, dotProduct, map_sum]
+
+  simp [vecMul, dotProduct, map_sum]
 
 theorem norm_vecMul_infGL_le (y : GL (Fin a) (Cinf E)) (x : Fin a → Ad E) :
     ‖fun i => pInf E ((x ᵥ* (infGL E a y).val) i)‖ ≤ (a * height y) * ‖fun i => pInf E (x i)‖ := by
@@ -54,8 +54,8 @@ theorem norm_vecMul_infGL_le (y : GL (Fin a) (Cinf E)) (x : Fin a → Ad E) :
     unfold height; linarith [norm_nonneg (toL (y⁻¹).val)]
   have h1 := one_le_height y
   refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun i => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [vecMul, dotProduct, map_sum, map_mul]
+
+  simp only [vecMul, dotProduct, map_sum, map_mul]
   refine (norm_sum_le _ _).trans ((Finset.sum_le_card_nsmul _ _ (height y * ‖fun i => pInf E (x i)‖)
     fun j _ => ?_).trans ?_)
   · rw [mul_comm (height y)]

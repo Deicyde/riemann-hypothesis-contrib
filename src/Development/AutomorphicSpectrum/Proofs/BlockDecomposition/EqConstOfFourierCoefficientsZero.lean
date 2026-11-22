@@ -84,7 +84,7 @@ theorem const_of_coefficients (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Se
 end Abstract
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem const_of_coeff : ∀ {D : D7} {p : ℕ} {lp : Measure (hermA D p)} {𝓖p : Set (hermA D p)}, IsCovolOneH lp 𝓖p →
     ∀ {ψ : AddChar (AF D.host.F) ℂ}, IsCharAF D.host.F ψ → ∀ φ : hermA D p → ℂ, Continuous φ → IsPer φ →
     (∀ a : HermE D p, a.1 ≠ 0 → ∫ y in 𝓖p, φ y * chn ψ a y ∂lp = 0) → ∀ y, φ y = φ 0 := by

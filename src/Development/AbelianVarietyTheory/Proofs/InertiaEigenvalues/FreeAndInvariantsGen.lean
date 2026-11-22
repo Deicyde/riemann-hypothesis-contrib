@@ -257,7 +257,7 @@ theorem exists_eisenstein (ξ : (↥(OL LL))⟦X⟧)
   rwa [hj, he] at h1
 
 
-set_option maxHeartbeats 800000 in
+
 theorem trace_param (h1 : Module.finrank ↥(K0 K) ↥K.1 = 1) :
     (H.W K 1 LL h).DelF.card = l - 1 ∧
     Associated (H.W K 1 LL h).π₀₁ (X ^ (H.W K 1 LL h).DelF.card) ∧

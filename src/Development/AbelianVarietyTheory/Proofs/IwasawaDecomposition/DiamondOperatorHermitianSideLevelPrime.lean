@@ -85,8 +85,8 @@ theorem lat_eq_of_move (S : StepLevel F E σ J T f bad) (L L' : Submodule (𝓞 
         ext j
         simp [Finset.sum_apply, Pi.single_apply]
       conv_lhs => rw [hy]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smul, smul_eq_mul, mul_comm]
     have key : ∀ u ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ, ∑ i, ι (c i) * u i = 0 := by
@@ -95,8 +95,8 @@ theorem lat_eq_of_move (S : StepLevel F E σ J T f bad) (L L' : Submodule (𝓞 
       | mem u hu =>
         obtain ⟨y, hy, rfl⟩ := hu
         change ∑ i, ι (c i) * ι (y i) = 0
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [← map_mul, ← map_sum]
+
+        simp only [← map_mul, ← map_sum]
         rw [← hfc, hf y hy, map_zero]
       | zero => simp
       | add u w _ _ hu hw =>
@@ -111,8 +111,8 @@ theorem lat_eq_of_move (S : StepLevel F E σ J T f bad) (L L' : Submodule (𝓞 
           ring
         rw [h, hu, mul_zero]
     have h1 := key _ hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← map_mul, ← map_sum] at h1
+
+    simp only [← map_mul, ← map_sum] at h1
     rw [← hfc] at h1
     haveI : Nontrivial (FiniteAdeleRing (𝓞 F) F) := by
       obtain ⟨M, hM⟩ := Ideal.exists_maximal (𝓞 F)
@@ -259,8 +259,8 @@ section Steps
 variable {D : D7} {u : D.what₂.Word} {Ch : ℕ → Type} {chOf : ∀ i, (D.mem u).C.cls i → Ch i}
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem move_end (T : FormsTiedSym D u Ch chOf) (i : ℕ) (hi : i ≤ D.R.m) (h : i = 0 ∨ i = D.R.m)
     (v : (D.mem u).A.vT) (a : ((D.mem u).A.Fv v)ˣ) (c : (D.mem u).C.cls i) (k : ℤ)
     (hk : (k : (D.mem u).A.Fv v) = a)
@@ -290,8 +290,8 @@ theorem move_end (T : FormsTiedSym D u Ch chOf) (i : ℕ) (hi : i ≤ D.R.m) (h 
     exact e1.trans (e3.trans (congrArg (fun t => (k : (D.mem u).A.Fv v) * t) e2.symm))
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem move_mid (T : FormsTiedSym D u Ch chOf) (i : ℕ) (h1 : 1 ≤ i) (h2 : i + 1 ≤ D.R.m)
     (v : (D.mem u).A.vT) (a : ((D.mem u).A.Fv v)ˣ) (c : (D.mem u).C.cls i) (k : ℤ)
     (hk : (k : (D.mem u).A.Fv v) = a)
@@ -325,7 +325,7 @@ theorem move_mid (T : FormsTiedSym D u Ch chOf) (i : ℕ) (h1 : 1 ≤ i) (h2 : i
     exact e1.trans (e3.trans (congrArg (fun t => (k : (D.mem u).A.Fv v) * t) e2.symm))
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem dilCl_of_crd (A : AtTTied u) (P : ∀ i hi, LvTied u A i hi) (i : ℕ) (hi : i ≤ D.R.m)
     (v : (D.mem u).A.vT) (a : ((D.mem u).A.Fv v)ˣ) (c : (D.mem u).C.cls i)
     (γ : UJ (sigD D : D.host.E →+* D.host.E) (gramN D i hi))
@@ -348,7 +348,7 @@ theorem dilCl_of_crd (A : AtTTied u) (P : ∀ i hi, LvTied u A i hi) (i : ℕ) (
 end Steps
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem diamond_on_hermitian_side : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z)) (F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u)), (∀ u, I.StdF l Z u (F u) ∧ I.StdLvC l Z u (F u)) → CarH H F → ∀ u i v (a : (((I.rec7 l Z).mem u).A.Fv v)ˣ) (c : ((I.rec7 l Z).mem u).C.cls i), ∃ γ, i ≤ (I.rec7 l Z).R.m → DilCl (F u).atT (F u).lv i v a c γ ∧ AdOf H u i c (((I.rec7 l Z).fm u).dil i v a c) γ v := by
   intro B X I hOk hP l Z H F hF hC u i v a c
   by_cases hi : i ≤ (I.rec7 l Z).R.m

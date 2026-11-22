@@ -99,9 +99,9 @@ theorem exists_diag (B : E →ₗ[ℝ] E →ₗ[ℝ] ℂ) (hB : ∀ v, v ≠ 0 �
   have hexp : ∀ x : Fin (Module.finrank ℝ E) → ℝ, B (e.equivFun.symm x) (e.equivFun.symm x) =
       ∑ i, ∑ j, ((x i * x j : ℝ) : ℂ) * B (e i) (e j) := by
     intro x
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Module.Basis.equivFun_symm_apply, map_sum, map_smul, LinearMap.sum_apply,
-      LinearMap.smul_apply, Complex.real_smul, Finset.mul_sum]
+
+    simp only [Module.Basis.equivFun_symm_apply, map_sum, map_smul, LinearMap.sum_apply,
+    LinearMap.smul_apply, Complex.real_smul, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     push_cast

@@ -236,7 +236,7 @@ private theorem rowStep {W : Type} [AddCommGroup W] [Module ℂ W] (τ : Represe
   rw [hyv] at eq4
   exact eq4
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 private theorem exists_mem_Kc_rows_unitriangular (p : GL (Fin n) k) (i : Fin n)
     (hp : ∀ a, i < a → (∀ j, j < a → (p : Matrix (Fin n) (Fin n) k) a j = 0) ∧ (p : Matrix (Fin n) (Fin n) k) a a = 1)
     (hd : ∀ j, j ≤ i → valuation k ((p : Matrix (Fin n) (Fin n) k) i j - (1 : Matrix (Fin n) (Fin n) k) i j) < 1) :

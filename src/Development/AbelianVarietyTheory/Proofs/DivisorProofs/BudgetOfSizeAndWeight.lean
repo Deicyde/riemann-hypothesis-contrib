@@ -15,7 +15,7 @@ public import Development.AutomorphicArithmetic.PrimeDiscriminants.BadCount
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.CovHt
 
@@ -151,7 +151,7 @@ theorem pp_bounds {PP A : ℝ} (h : HostNum D L PP A 1) : (D.R.f : ℝ) ^ 2 * (D
   gcongr <;> first | assumption | norm_num
 
 
-set_option maxHeartbeats 800000 in
+
 theorem sizes {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) (h0 : ℤ) (S eta : ℝ) (hS : 0 ≤ S) (he : 0 ≤ eta)
     (hP : PP * (S + eta) ≤ 100 * L.sc.w'' D.R.n)
     (hh : PP * lenT p i PP * D.R.r * (D.R.f : ℝ) ^ 2 * (D.R.m : ℝ) ^ 2 * D.R.k * dimFlag (dat p i) ≤ h0)

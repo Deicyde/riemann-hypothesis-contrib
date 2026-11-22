@@ -79,8 +79,8 @@ theorem cEq_of {V : VF C} (X : RawChart C d I κ) (H : ∀ g, X.CartHyp V g) (hS
     X.sg1 (X.u g c) (X.u (1 - g) k) • (MvPowerSeries.X c : MvPowerSeries (I g) C) else 0 with hsig0
   set L := toLeafL (fun g => RawChart.cart (H g)) g a a' with hL
   have hsig : L (upG g sig0) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsig0, upG_eq, map_sum, map_sum]
+
+    rw [hsig0, upG_eq, map_sum, map_sum]
     refine Finset.sum_eq_zero fun c _ => ?_
     split_ifs with hc
     · rw [map_smul, map_smul, ← upG_eq, upG_X]
@@ -180,8 +180,8 @@ theorem sumAt_of {V : VF C} (X : RawChart C d I κ) (hA : AddM V X)
       MvPowerSeries.X x := by
     intro x
     ext μ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, MvPowerSeries.coeff_X]
+
+    rw [map_sum, MvPowerSeries.coeff_X]
     simp only [hc]
     rw [Finset.sum_comm]
     exact ht.2 x μ
@@ -189,8 +189,8 @@ theorem sumAt_of {V : VF C} (X : RawChart C d I κ) (hA : AddM V X)
       -S.ze t q := by
     intro q
     ext μ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_neg]
+
+    rw [map_sum, map_neg]
     simp only [hc]
     rw [Finset.sum_comm]
     show _ = -(-(∑ s ∈ Finset.Icc 1 μ.degree, ∑ c : I g, S.be c s q * MvPowerSeries.coeff μ (t c ^ (V.l ^ s))))
@@ -232,8 +232,8 @@ theorem sumAt_of {V : VF C} (X : RawChart C d I κ) (hA : AddM V X)
   have hpush : ∀ f : MvPowerSeries (κ) C, MvPowerSeries.subst t (∑ c, MvPowerSeries.subst (γt c) f) =
       ∑ c, MvPowerSeries.subst (fun _ : Unit => t c) (alongCv (γ c) f) := by
     intro f
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← MvPowerSeries.coe_substAlgHom htS, map_sum, MvPowerSeries.coe_substAlgHom]
+
+    rw [← MvPowerSeries.coe_substAlgHom htS, map_sum, MvPowerSeries.coe_substAlgHom]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [key1, key2]
   have hlgZ : ∀ i, MvPowerSeries.subst (fun j => MvPowerSeries.subst t (Γ j)) (X.lg i) =
@@ -276,8 +276,8 @@ theorem sumAt_of {V : VF C} (X : RawChart C d I κ) (hA : AddM V X)
             X.sg1 (X.u g c') v • tyS V.l (fun s => S.cur c s (Sum.inl c')) else 0 := by
         rw [h2 c q]
         ring
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [e, ← MvPowerSeries.coe_substAlgHom (hasSubst_unit (ht0 c)), map_add (f := _), map_sub, map_sum]
+
+      rw [e, ← MvPowerSeries.coe_substAlgHom (hasSubst_unit (ht0 c)), map_add (f := _), map_sub, map_sum]
       congr 1
       refine Finset.sum_congr rfl fun c' _ => ?_
       split_ifs
@@ -306,8 +306,8 @@ theorem sumAt_of {V : VF C} (X : RawChart C d I κ) (hA : AddM V X)
         MvPowerSeries.subst t (MvPowerSeries.subst Γ (X.sg v)) -
           ∑ c, MvPowerSeries.subst (fun _ : Unit => t c) (alongCv (γ c) (X.sg v)) +
           ∑ c, MvPowerSeries.subst (fun _ : Unit => t c) (lam c q) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hpush, ← MvPowerSeries.coe_substAlgHom htS, map_add (f := _), map_sub, map_sum, map_sum]
+
+      rw [← hpush, ← MvPowerSeries.coe_substAlgHom htS, map_add (f := _), map_sub, map_sum, map_sum]
       simp only [MvPowerSeries.coe_substAlgHom, key2]
     rw [hexp, hsum, hsplit, hAll]
     ring

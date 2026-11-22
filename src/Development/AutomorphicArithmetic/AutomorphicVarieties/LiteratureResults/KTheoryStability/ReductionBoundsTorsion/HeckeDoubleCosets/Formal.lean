@@ -104,8 +104,8 @@ theorem bd_cmap {G H : Type} [Group G] [Group H] (f : G →* H) (m : ℕ) (z : C
   have key : (bd H m).comp (cmap f (m + 1)) = (cmap f m).comp (bd G m) := by
     apply Finsupp.lhom_ext
     intro g r
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [bd, cmap, Finsupp.mapDomain_single, map_sum, Finsupp.mapDomain_add, Finsupp.mapDomain_smul, hc]
+
+    simp [bd, cmap, Finsupp.mapDomain_single, map_sum, Finsupp.mapDomain_add, Finsupp.mapDomain_smul, hc]
     rw [Finsupp.mapDomain_finsetSum]
     simp only [Finsupp.mapDomain_single, hc]
   exact LinearMap.congr_fun key z

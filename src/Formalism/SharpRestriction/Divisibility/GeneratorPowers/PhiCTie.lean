@@ -54,9 +54,9 @@ theorem evB_coordT (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (x y : Y) : evB b B (co
           simp only [coordT, Int.cast_mul]
     _ = B x y := by
       conv_rhs => rw [← hx, ← hy]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul,
-        Finset.mul_sum]
+
+      simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul,
+      Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       ring
@@ -147,19 +147,19 @@ theorem phiCTie_holds : PhiCTieStatement := by
       Submodule.mkQ_apply, Module.Basis.coord_apply, smul_eq_mul]
     rw [← evB_coordT b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) x y, ← hψ]
     conv_lhs => rw [← eb.sum_repr (Submodule.Quotient.mk (coordT b x y))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_zsmul, zsmul_eq_mul, mul_comm]
   calc l β = l (∑ k, ψ (eb k) • βk k) := congrArg l hβ
     _ = ∑ k, ψ (eb k) * (z k : ℝ) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_smul, hz, smul_eq_mul]
     _ = evB b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) n := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hψ, hn, map_sum]
+
+      rw [← hψ, hn, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_zsmul, zsmul_eq_mul, mul_comm]
 

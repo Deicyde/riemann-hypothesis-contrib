@@ -25,8 +25,8 @@ theorem th_trPair (σ : E →ₐ[F] E) (hCM : IsCMExt F E σ) (θ : Ainf F ⊗[F
     θ (algebraMap (Ainf F) (Ainf F ⊗[F] E) (trPair (Ainf F) S G)) = (((S.map θ * G.map θ).trace.re : ℝ) : ℂ) := by
   rw [trPair, map_mul, map_mul, th_half, trace_add σ hCM, map_add (f := _), hc]
   have e : θ (∑ a, ∑ c, S a c * G c a) = (S.map θ * G.map θ).trace := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.trace, Matrix.mul_apply, map_sum, map_mul]
+
+    simp [Matrix.trace, Matrix.mul_apply, map_sum, map_mul]
   rw [e, Complex.star_def, Complex.add_conj]
   push_cast
   ring
@@ -66,10 +66,10 @@ theorem map_isHerm (σ : E →ₐ[F] E) (θ : Ainf F ⊗[F] E →+* ℂ)
 theorem gramX_eq {m n : ℕ} (ε : Fin m → Bool) (x : Matrix (Fin m) (Fin n) ℂ) :
     gramX ε x = xᴴ * Matrix.diagonal (sgn ε) * x := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gramX, Qp, Qb, evX, map_sub, map_sum, map_mul, MvPolynomial.eval_X, Matrix.mul_apply,
-    Matrix.conjTranspose_apply, Matrix.diagonal_apply, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
-    if_true, sgn]
+
+  simp only [gramX, Qp, Qb, evX, map_sub, map_sum, map_mul, MvPolynomial.eval_X, Matrix.mul_apply,
+  Matrix.conjTranspose_apply, Matrix.diagonal_apply, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
+  if_true, sgn]
   simp only [Finset.sum_filter, if_true, Bool.false_eq_true, if_false]
   rw [← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_

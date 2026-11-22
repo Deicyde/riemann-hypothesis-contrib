@@ -98,10 +98,10 @@ theorem exists_cobound_of_norm [DiscreteTopology G] {t : G → ℚ} {m : (Fin 2 
   rw [LowDeg.dn_one_apply]
   simp only [Matrix.cons_val_zero]
   have hv : v = ![v 0, v 1] := by funext i; fin_cases i <;> rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Equiv.sum_comp (Equiv.mulLeft (v 1)) (fun ρ => m ![v 0, ρ] • M.rho (v 0 * ρ) y),
-    ← Equiv.sum_comp (Equiv.mulLeft (v 0 * v 1)) (fun ρ => M.rho ρ y), map_sum, Finset.smul_sum,
-    ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
+
+  rw [← Equiv.sum_comp (Equiv.mulLeft (v 1)) (fun ρ => m ![v 0, ρ] • M.rho (v 0 * ρ) y),
+  ← Equiv.sum_comp (Equiv.mulLeft (v 0 * v 1)) (fun ρ => M.rho ρ y), map_sum, Finset.smul_sum,
+  ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun ρ _ => ?_
   simp only [Equiv.coe_mulLeft]
   rw [map_zsmul, ← Module.End.mul_apply, ← map_mul, ← mul_assoc, ← sub_smul, ← add_smul, defect_cocycle hm, ← hv]

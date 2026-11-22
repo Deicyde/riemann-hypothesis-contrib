@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 @[expose] public section
 
 open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.pderiv_subst_chain_rule :
     ∀ {R σ τ : Type} [CommRing R] [Fintype σ] [Fintype τ] (a : σ → MvPowerSeries τ R),
       (∀ s, constantCoeff (a s) = 0) → ∀ (f : MvPowerSeries σ R) (k : τ),

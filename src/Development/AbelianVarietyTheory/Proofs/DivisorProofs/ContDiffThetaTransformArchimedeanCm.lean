@@ -104,7 +104,7 @@ theorem darboux_real_coordsF {F E : Type} [Field F] [NumberField F] [Field E] [N
     exact Prod.ext rfl (hsnd t i).2
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem contDiff_thetaTr_realF : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
     B.IsGood σ → IsStdCharF (fun w : InfinitePlace F => (B.emb w).1) B.ψ (-1) →
     ∀ (nS nT : ℕ) (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E),
@@ -238,12 +238,12 @@ theorem contDiff_thetaTr_realF : ∀ (F E : Type) [Field F] [NumberField F] [Fie
           refine Prod.ext ?_ ?_
           · apply eM.injective
             rw [hφdef, hφdef, hφpair, hm]
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp only [dotProduct, map_add (f := _), map_mul, map_sum, hφx, hφP, hφQ, hφa, hφb, hφ2, Finset.sum_add_distrib]
+
+            simp only [dotProduct, map_add (f := _), map_mul, map_sum, hφx, hφP, hφQ, hφa, hφb, hφ2, Finset.sum_add_distrib]
           · rw [hφfdef, hφfdef, hφfpair]
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp only [dotProduct, map_add (f := _), map_mul, map_sum, hφfP, hφfQ, mul_zero, zero_mul, Finset.sum_const_zero,
-              add_zero]
+
+            simp only [dotProduct, map_add (f := _), map_mul, map_sum, hφfP, hφfQ, mul_zero, zero_mul, Finset.sum_const_zero,
+            add_zero]
         rw [← hY, hX]
         simp only [dotProduct_add, add_dotProduct]
         ring

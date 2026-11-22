@@ -95,7 +95,7 @@ theorem cz_diff (hH : HolParam) (p q : ℕ) (e : ℤ) (A B : GR n) {ψ : (Fin n 
   rw [heq]
   exact differentiableOn_univ.1 h
 
-set_option maxHeartbeats 800000 in
+
 theorem locOp : LV → Iwa → Mult → HolParam → LocOp := by
   intro hLV hIwa hMult hHol n p q e hgood _ _ μ _ _
   let ι : KR n →* M2 n := (Units.coeHom (M2 n)).comp ((GR n).subtype.comp (KR n).subtype)

@@ -90,7 +90,7 @@ theorem latO_le_left (S T : HSp D) (N M : Lat S) (LT : Set (Fin T.rank → D.hos
   exact h2
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem latV_le_of_local (S : HSp D) (N M : Lat S) (hN : Submodule.IsLattice D.host.E N)
     (hM : Submodule.IsFullLattice D.host.E M) (P : Pl D → Prop)
     (h : ∀ p, P p → latV S N (· = p) ≤ latV S M (· = p)) : latV S N P ≤ latV S M P := by
@@ -113,8 +113,8 @@ theorem latV_le_of_local (S : HSp D) (N M : Lat S) (hN : Submodule.IsLattice D.h
     have e : indQ D B = ∑ v ∈ B, indQ D {v} := by simp only [indQ, Finset.sum_singleton]
     rw [← Finset.mul_sum, ← e, ← mul_add, add_sub_cancel, mul_one]
   show Ψ α ∈ latV S M P
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsplit, map_add (f := _), map_sum]
+
+  rw [hsplit, map_add (f := _), map_sum]
   refine add_mem (AddSubgroup.sum_mem _ fun v _ => ?_) ?_
   · by_cases hv : P v
     · have h1 : Ψ (α * indQ D {v}) ∈ latV S N (· = v) := by

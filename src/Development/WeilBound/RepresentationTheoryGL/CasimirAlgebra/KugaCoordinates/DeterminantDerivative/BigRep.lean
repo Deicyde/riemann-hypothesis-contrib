@@ -104,9 +104,9 @@ theorem bigM_one (lab : Q → (E →+* ℂ)) (s : ℤ) : bigM (a := a) lab s 1 =
 theorem bigM_mul (lab : Q → (E →+* ℂ)) (s : ℤ) (y z : GL (Fin a) (Cinf E)) :
     bigM lab s (y * z) = bigM lab s y * bigM lab s z := by
   ext I J
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [bigM, Matrix.of_apply, Matrix.mul_apply, Units.val_mul, Matrix.det_mul, map_mul,
-    Finset.prod_mul_distrib, mul_zpow, map_sum]
+
+  simp only [bigM, Matrix.of_apply, Matrix.mul_apply, Units.val_mul, Matrix.det_mul, map_mul,
+  Finset.prod_mul_distrib, mul_zpow, map_sum]
   rw [Finset.prod_univ_sum, Fintype.piFinset_univ, Finset.mul_sum]
   refine Finset.sum_congr rfl fun K _ => ?_
   rw [Finset.prod_mul_distrib]; ring
@@ -165,8 +165,8 @@ theorem bigD_star (lab : Q → (E →+* ℂ)) (s : ℤ) (X : Matrix (Fin a) (Fin
   have hs : ∀ z : ℂ, star z = starRingEnd ℂ z := fun _ => rfl
   ext I J
   simp only [bigD, Matrix.of_apply, Matrix.conjTranspose_apply, Matrix.of_symm_apply, Matrix.star_apply, coord_star']
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hs, map_sub, map_sum]
+
+  rw [hs, map_sub, map_sum]
   congr 1
   · refine Finset.sum_congr rfl fun p _ => ?_
     by_cases h : ∀ r, r ≠ p → I r = J r

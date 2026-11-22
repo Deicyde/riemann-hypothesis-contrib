@@ -101,17 +101,17 @@ theorem subD_colSub_bSc (τ : ι) (x : K) (Q : Pol K ι a) :
     rw [AlgHom.comp_apply, AlgHom.comp_apply, colSub_bSc_X, map_mul]
     simp only [subD, aeval_X, aeval_C, algebraMap_eq]
     by_cases hb : v.2.2.1 < b
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [dif_pos hb, map_sum, map_mul, aeval_X, scU, Sum.elim_inl, Sum.elim_inr, C_1, one_mul, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun β _ => by simp only [mul_assoc, mul_comm, mul_left_comm]
+
+    · simp only [dif_pos hb, map_sum, map_mul, aeval_X, scU, Sum.elim_inl, Sum.elim_inr, C_1, one_mul, Finset.mul_sum]
+      exact Finset.sum_congr rfl fun β _ => by simp only [mul_assoc, mul_comm, mul_left_comm]
     · simp only [dif_neg hb, mul_zero, map_zero]
   exact AlgHom.congr_fun e Q
 
 theorem jetLin_congr (J J' : (DVar ι a b →₀ ℕ) → K) (R : MvPolynomial ((ι × Fin b × Fin b) ⊕ DVar ι a b) K)
     (h : ∀ s ∈ R.support, J (s.comapDomain Sum.inr Sum.inr_injective.injOn) = J' (s.comapDomain Sum.inr Sum.inr_injective.injOn)) :
     jetLin J R = jetLin J' R := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [R.as_sum, map_sum, map_sum]
+
+  rw [R.as_sum, map_sum, map_sum]
   refine Finset.sum_congr rfl fun s hs => ?_
   rw [jetLin_monomial, jetLin_monomial, h s hs]
 

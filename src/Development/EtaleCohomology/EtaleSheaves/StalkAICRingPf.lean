@@ -32,9 +32,9 @@ theorem aic_loc {R S : Type} [CommRing R] [CommRing S] [Algebra R S] (M : Submon
   have key : β ^ n * p.eval (hu.unit⁻¹ * algebraMap R S c) = algebraMap R S (q.eval c) := by
     conv_lhs => rw [hp.as_sum]
     rw [← hnd, ← Fin.sum_univ_eq_sum_range]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hq, eval_add, eval_pow, eval_X, eval_finsetSum, eval_mul, eval_C, map_add (f := _), map_pow, map_sum, map_mul, mul_add,
-      Finset.mul_sum]
+
+    simp only [hq, eval_add, eval_pow, eval_X, eval_finsetSum, eval_mul, eval_C, map_add (f := _), map_pow, map_sum, map_mul, mul_add,
+    Finset.mul_sum]
     congr 1
     · rw [← mul_pow, ← mul_assoc, hu.mul_val_inv, one_mul]
     · refine Finset.sum_congr rfl fun i _ => ?_

@@ -142,8 +142,8 @@ theorem exists_complexify {K : Type} [Field K] {E : Type} [AddCommGroup E] [Modu
     intro z i
     have e : j z = ∑ i, φ (b.repr z i) • b' i := by
       conv_lhs => rw [← b.sum_repr z]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [LinearMap.map_smulₛₗ, hb']
     rw [e, b'.repr_sum_self]
@@ -162,7 +162,7 @@ section Gen
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R}
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem isRoot_of_eig (B : LocBase0 H what₂) (j : ℕ) (w : what₂.places.Pl) (v : HeightOneSpectrum (𝓞 H.E)) (k : ℕ)
     [Module.Finite what₂.LL (what₂.MtL (what₂.muTw w) j)] (μ : FractionRing (B.Oc j w))
     (hμ : (B.hK j w v k).maxGenEigenspace μ ≠ ⊥) :
@@ -207,7 +207,7 @@ theorem finite_MtL {R : Ranks} (what₂ : Rows.Data R) (μ : what₂.Tup) (j : �
 variable {D : D7}
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem root_int (M : MtFam D) (C : NChoice D) (hR : HeckeLift0 (mt0 M) C.Q) (hP : HeckeStdPlain) (hG : GenHyp M C.Q)
     (hsp : ∀ v : PlE D.host, IsSplitPl D.host v → ∃ (s : SplitPlace D.host.E) (ϖ : s.v.adicCompletion (maximalRealSubfield D.host.E)),
       IsConjPl D.host v s.w ∧ IsUnif D.host.E s.v ϖ)
@@ -270,7 +270,7 @@ end GlobalTheory.HeckeStdBase
 namespace GlobalTheory.HeckeStdBase
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem heckeStd0_base : ∀ (D : D7) (M : MtFam D) (C : NChoice D) (hR : HeckeLift0 (mt0 M) C.Q) (X : CoefIn D.what₂)
     (hS : SplitK (mt0 M) C.Q hR X), HeckeStdPlain → GenHyp M C.Q →
     (∀ v : PlE D.host, IsSplitPl D.host v → ∃ (s : SplitPlace D.host.E) (ϖ : s.v.adicCompletion (maximalRealSubfield D.host.E)),

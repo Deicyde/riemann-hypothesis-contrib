@@ -214,7 +214,7 @@ variable {K Ksep : Type} [Field K] [ValuativeRel K] [TopologicalSpace K]
   {l : ℕ} [Fact l.Prime] {U V : OpenSubgroup Gal(Ksep/K)}
 
 
-set_option maxHeartbeats 400000 in
+
 theorem finrank_cohomology_alternating_sum_coprime (hl : (l : K) ≠ 0) (h : V ≤ U)
     [((V : Subgroup Gal(Ksep/K)).subgroupOf (U : Subgroup Gal(Ksep/K))).Normal]
     (hcop : Nat.Coprime ((V : Subgroup Gal(Ksep/K)).relIndex U) l)
@@ -360,7 +360,7 @@ theorem finrank_cohomology_alternating_sum_coprime (hl : (l : K) ≠ 0) (h : V �
   linarith
 
 
-set_option maxHeartbeats 400000 in
+
 omit [ValuativeRel Ksep] [TopologicalSpace Ksep] [IsValuativeTopology Ksep]
   [ValuativeExtension K Ksep] in
 theorem finite_cohomology_coprime (hl : (l : K) ≠ 0) (h : V ≤ U)

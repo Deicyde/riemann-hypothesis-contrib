@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.NotCoboun
 @[expose] public section
 
 open GlobalTheory.K5
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_pow_div_prime_zpow_integralClosure_unit : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
   ∀ x : Ω, x ≠ 0 → ∃ (a : ℤ) (b : ℕ), 0 < b ∧ IsInt (p := p) (x ^ b / (p : Ω) ^ a) ∧
     IsInt (p := p) ((p : Ω) ^ a / x ^ b) := by

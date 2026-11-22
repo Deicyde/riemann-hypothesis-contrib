@@ -14,8 +14,8 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 namespace GlobalTheory.ExportSeries.TupleChars
 
@@ -25,10 +25,10 @@ open GlobalTheory.StepLaw (ResAt UnrOff)
 
 theorem idemSum_mul_idemAt {P Q : Finset (Pl D.host.E)} (h : SplitSet P) (hQ : Q ⊆ P) {PP : Pl D.host.E}
     (hPP : PP ∈ P) (hn : PP ∉ Q) : (idem Q + cA D (idem Q)) * idemAt PP = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [idem, map_sum, add_mul, Finset.sum_mul, Finset.sum_mul,
-    Finset.sum_eq_zero fun i hi => h.mul_eq_zero (hQ hi) hPP (by rintro rfl; exact hn hi),
-    Finset.sum_eq_zero fun i hi => by rw [mul_comm]; exact h.mul_conj hPP (hQ hi), add_zero]
+
+  rw [idem, map_sum, add_mul, Finset.sum_mul, Finset.sum_mul,
+  Finset.sum_eq_zero fun i hi => h.mul_eq_zero (hQ hi) hPP (by rintro rfl; exact hn hi),
+  Finset.sum_eq_zero fun i hi => by rw [mul_comm]; exact h.mul_conj hPP (hQ hi), add_zero]
 
 theorem idemSum_mul_of_off {P Q : Finset (Pl D.host.E)} (h : SplitSet P) (hQ : Q ⊆ P) {PP : Pl D.host.E}
     (hPP : PP ∈ P) (hn : PP ∉ Q) {e : AE D} (he : IsIdemAt e PP) {x : AE D} (hx : e * (x - 1) = x - 1) :
@@ -89,8 +89,8 @@ theorem unrOff_of_unram {χ : (AE D)ˣ →* Circle} {P Q : Finset (Pl D.host.E)}
   intro v ε hε hv x h1 h2 h3
   refine hχ x (infPart_eq_one hε h1) h2 h3 ?_
   have k : (idem Q + cA D (idem Q)) * algebraMap (AF D.host.F) (AE D) ε = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [idem, map_sum, ← Finset.sum_add_distrib, Finset.sum_mul]
+
+    rw [idem, map_sum, ← Finset.sum_add_distrib, Finset.sum_mul]
     refine Finset.sum_eq_zero fun PP hPP => ?_
     obtain ⟨-, -, v', ε', hε', he⟩ := (h.isIdemAt hPP).1
     have hu := GlobalTheory.IdemUnder.under_eq_of_isIdemAt D _ PP v' ε' (h.isIdemAt hPP) hε' he

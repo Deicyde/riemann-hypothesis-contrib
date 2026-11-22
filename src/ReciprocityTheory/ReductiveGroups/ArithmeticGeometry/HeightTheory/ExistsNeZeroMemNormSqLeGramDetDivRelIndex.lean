@@ -85,8 +85,8 @@ theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex {E : Type*} [NormedA
       · show ((∑ i, c i • wV i : V) : E) ∈ S
         rw [hS, Submodule.mem_toAddSubgroup, Submodule.mem_span_range_iff_exists_fun ℤ]
         exact ⟨c, by simp [wV]⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        · simp [χ, hb, map_sum]
+
+      · simp [χ, hb, map_sum]
     · rintro ⟨v, hv, rfl⟩
       have hv' : (v : E) ∈ span ℤ (Set.range w) := hv
       obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).mp hv'

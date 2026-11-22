@@ -90,8 +90,8 @@ theorem exists_germs {R : Type} [CommRing R] {x : Sp R ⟶ X} {F : Type} [AddCom
   have hy : c = jq y := pt_left_inj M (hv.2.trans (hjq y).symm)
   refine ⟨fun k => Bq.repr y k, ?_⟩
   rw [hy]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [← Bq.sum_repr y, map_sum]
+
+  conv_lhs => rw [← Bq.sum_repr y, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [jq.map_smulₛₗ, hBq, hcomp]
 
@@ -176,8 +176,8 @@ theorem lieLat_germs_eq_sections : ∀ (X : Scheme.{0}) (G : Over X) [GrpObj G] 
   have hjβ : ∀ u, j (β u) = j₀ u := fun u => LieVB.pt_left_inj M (by
     rw [hj, hβ, ← Category.assoc, LieVB.spMap_dual_comp, hφρ, hj₀])
   have hjc : j (∑ k, (ρ (r (i, k)) * w) • β (b₀ k)) = c i := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hs i, map_sum]
+
+    rw [hs i, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [j.map_smulₛₗ, hjβ]
     congr 1

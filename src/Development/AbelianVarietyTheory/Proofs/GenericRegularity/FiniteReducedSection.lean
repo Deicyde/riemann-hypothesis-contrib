@@ -31,7 +31,7 @@ theorem finite_reduced_of_eq {K Ω Kl K' : Type} [Field K] [Field Ω] [Algebra K
   exact this
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem tv_indep {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : PJ D B P j)
     (la : HeightOneSpectrum (𝓞 B.KO)) (N : ℕ) [Algebra B.KO (Kp X la N)]
     [IsScalarTower B.KO (X.Kl la) (Kp X la N)] :
@@ -62,8 +62,8 @@ theorem rzMap_sec_eq (i : Fin (WeightFamilies.dimY D j + 1)) :
     rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w i) =
       ∑ k, @algebraMap (Op X la N) (Kp X la N) _ _ _ (Tv X la N (i, k)) ⊗ₜ[X.Kl la]
         ((1 : X.Kl la) ⊗ₜ[B.KO] gF (X.inc wL (w k))) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Formalism.MainNotions.Gaps.EtaleWeightGaps.sec, map_sum]
+
+  rw [Formalism.MainNotions.Gaps.EtaleWeightGaps.sec, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, rzMap_emb, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
 
@@ -102,8 +102,8 @@ variable {D : D7} {T : Top D} (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFr
   (hT : GenFromTest (T.Q.Xo j) T.Q.c hG)
 
 
-set_option maxHeartbeats 8000000 in
-set_option synthInstance.maxHeartbeats 1000000 in
+
+
 theorem finite_reduced_section (hfg : FnFG (T.Q.Xo j) T.Q.c) (htr : FnTrdeg (T.Q.Xo j) T.Q.c (WeightFamilies.dimY D j)) :
     ∀ ka wL wF G S g0 la, CurveHyp h j hj hG ka wL wF G S g0 → ∀ Z,
       FiniteDimensional (Kp (recPlus h j hj) la G.N)

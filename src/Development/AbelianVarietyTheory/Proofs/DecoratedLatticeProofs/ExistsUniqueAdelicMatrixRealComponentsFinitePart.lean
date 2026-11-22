@@ -52,8 +52,8 @@ theorem exists_unique_of_comp_finPart : ∀ (D : D7) (θ : InfFam D), IsInfFam �
   · rintro y ⟨hy1, hy2⟩
     apply key
     · intro τ
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hy1, hC, map_add (f := _), map_sum, ← hC]
+
+      rw [hy1, hC, map_add (f := _), map_sum, ← hC]
       simp_rw [← hC, (hL _ _).2.2 1 τ]
       rw [Finset.sum_eq_single τ (fun b _ hb => if_neg (Ne.symm hb)) (by simp), if_pos rfl, Complex.ofReal_one, one_smul]
       abel

@@ -53,8 +53,8 @@ theorem UpperTheory.constantTerm_levi_rational_left_invariant :
     obtain ⟨y, rfl⟩ := AddMonoidHom.mem_range.mp hX
     refine AddMonoidHom.mem_range.mpr ⟨fun p => ∑ q, d p q * y q, ?_⟩
     funext p
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [AddMonoidHom.compLeft_apply, map_sum, map_mul]
+
+    simp [AddMonoidHom.compLeft_apply, map_sum, map_mul]
   have hcont : ∀ d : UPos (r + s) r → UPos (r + s) r → K,
       Continuous (fun (X : UPos (r + s) r → AdeleRing (𝓞 K) K) p =>
         ∑ q, algebraMap K (AdeleRing (𝓞 K) K) (d p q) * X q) := by

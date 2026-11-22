@@ -31,9 +31,9 @@ theorem isThEmpty_of_isThOf {i : X.Tw} {ι : ℂ →+* Kbar X i} {lam : X.abelia
       IsToricSum φ s κ 𝔣 χ z := by
     rw [hc]; exact fun _ hz => hz
   refine ⟨u, ∑ q, T q, hu, key _ t, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_congr rfl fun δ _ => hδ δ, ← Finset.mul_sum, ← map_sum,
-    ← Finset.sum_fiberwise Finset.univ (fun q => π q⁻¹)]
+
+  rw [map_sum, Finset.sum_congr rfl fun δ _ => hδ δ, ← Finset.mul_sum, ← map_sum,
+  ← Finset.sum_fiberwise Finset.univ (fun q => π q⁻¹)]
   congr 2
   refine Finset.sum_congr rfl fun δ _ => ?_
   rw [show {q | π q⁻¹ = δ} = ↑(Finset.univ.filter fun q => π q⁻¹ = δ) by ext; simp, finsum_mem_coe_finset]

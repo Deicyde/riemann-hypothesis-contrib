@@ -202,8 +202,8 @@ theorem transfer {K R V W : Type} [Field K] [AddCommGroup R] [Module K R] [AddCo
   have hex : ∀ y ∈ M, ∃ a : _ → K, y = ∑ l, a l • (b l : R) := fun y hy =>
     ⟨b.repr ⟨y, hy⟩, by
       have := congrArg M.subtype (b.sum_repr ⟨y, hy⟩).symm
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at this
+
+      rw [map_sum] at this
       exact this⟩
   choose a ha using fun i => hex (h i) (Submodule.subset_span ⟨Sum.inl i, rfl⟩)
   choose a' ha' using fun j => hex (h' j) (Submodule.subset_span ⟨Sum.inr j, rfl⟩)
@@ -211,8 +211,8 @@ theorem transfer {K R V W : Type} [Field K] [AddCommGroup R] [Module K R] [AddCo
       (t : L → Fin (Module.finrank K M) → K),
       ∑ i, d i • p (∑ l, t i l • (b l : R)) = ∑ l, (∑ i, d i * s (t i l)) • p (b l) := by
     intro L Z _ _ _ s p d t
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smulₛₗ, Finset.smul_sum, Finset.sum_smul, mul_smul]
+
+    simp only [map_sum, map_smulₛₗ, Finset.smul_sum, Finset.sum_smul, mul_smul]
     exact Finset.sum_comm
   have e1 : ∑ i, c i • ρ₀ (h i) = _ := (Finset.sum_congr rfl fun i _ => by rw [ha i]).trans (ex ρ₀ c a)
   have e2 : ∑ i, c' i • ρ₀ (h' i) = _ := (Finset.sum_congr rfl fun i _ => by rw [ha' i]).trans (ex ρ₀ c' a')
@@ -224,8 +224,8 @@ theorem transfer {K R V W : Type} [Field K] [AddCommGroup R] [Module K R] [AddCo
   rw [e3, e4]
   refine Finset.sum_congr rfl fun l _ => ?_
   have := congrArg α (congrFun e5 l)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, hα] at this
+
+  simp only [map_sum, map_mul, hα] at this
   rw [this]
 
 theorem ratio_eigen {I J : Type} [Fintype I] [Fintype J] [DecidableEq I] (D : I → J → ℂ) (D' : J → I → ℂ)
@@ -391,7 +391,7 @@ theorem mul_detU_mem (hf : 1 < Module.finrank ℚ E / 2) {σ : c.F →+* ℂ} (U
     rw [hP.2 k x hx, zero_mul]
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem mem_cusp_of_span (hf : 1 < Module.finrank ℚ E / 2) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r)
     (hU : ∀ σ, GoodEmb c σ → IsUnf (U σ))
     (hχ : ∀ σ, GoodEmb c σ → ∀ a n, Dom a n → ∀ k, ∀ γ ∈ ((U σ).X k).Γ, ((U σ).X k).χ (laU (U σ) a n k) γ = 1)

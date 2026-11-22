@@ -22,7 +22,7 @@ noncomputable section
 
 namespace GlobalTheory.Mem.R3.BrgRead
 
-set_option maxHeartbeats 1000000
+
 
 theorem embLL_labLL_eq {D : D7} (τ : D.what₂.Tau) (x : D.host.E) : D.what₂.embLL (labLL D τ x) = tauE D τ x :=
   DFunLike.congr_fun D.embE_φ₀ (D.host.sigmaOf (D.eTau τ).1 x)

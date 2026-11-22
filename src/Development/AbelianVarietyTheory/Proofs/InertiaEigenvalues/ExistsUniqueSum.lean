@@ -112,8 +112,8 @@ theorem exists_sum (h : σ X = w * X ^ s) (hs : 0 < s) (hw : IsUnit w) (b : R⟦
       linear_combination (X ^ s * mk fun i => coeff (i + s) b) * hv
     rw [h1]
     ext n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), coeff_X_pow_mul', map_sum]
+
+    rw [map_add (f := _), coeff_X_pow_mul', map_sum]
     simp only [coeff_mul_C, coeff_X_pow, coeff_mk]
     split_ifs with hn
     · rw [Nat.sub_add_cancel hn, Finset.sum_eq_zero, add_zero]

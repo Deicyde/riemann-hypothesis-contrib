@@ -15,6 +15,6 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 attribute [local instance] Over.cartesianMonoidalCategory
 open Formalism.MainNotions.ModuliIntegralCharts.H1.BoxTuple Formalism.MainNotions.ModuliIntegralCharts.H1.BidegreeTwoJet GlobalTheory GlobalTheory.PowGerm
 open ReciprocityTheory.ChartRestriction.G.TB (colM dAct)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.universal_statement : UnivSt := by
   first | exact @GlobalTheory.PowGerm.univSt_holds | exact GlobalTheory.PowGerm.univSt_holds | (intros; apply GlobalTheory.PowGerm.univSt_holds <;> assumption)
