@@ -122,8 +122,8 @@ theorem length_sol_le [IsPrincipalIdealRing O] {M Γ : Type} [Ring M] [Algebra O
       have h1 : a * ∑ q, (θ q : M) * y (γ q) = F (fun q => ⟨a, ha⟩ * θ q) := by
         rw [hF, Finset.mul_sum]
         simp [mul_assoc]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h1, ← hF, hφ, hφ, hG, hG, map_sum, ← hψ ⟨a, ha⟩]
+
+      rw [h1, ← hF, hφ, hφ, hG, hG, map_sum, ← hψ ⟨a, ha⟩]
       refine Finset.sum_congr rfl fun q _ => ?_
       rw [map_mul, ← matHom_apply, map_mul]
       rfl
@@ -311,9 +311,9 @@ theorem det_generic_eq_zero (hinj : Function.Injective (algebraMap O K)) {ι G N
     have h1 : ∀ k, ∑ q, ∑ j, algebraMap O K (a k p q i j) * v q j = 0 := fun k => by
       simpa [Finset.sum_apply, Matrix.mulVec, dotProduct] using congrFun (h k p) i
     calc _ = ∑ k, (X k : MvPolynomial N K) * C (∑ q, ∑ j, algebraMap O K (a k p q i j) * v q j) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp only [Matrix.mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
-            map_sum, map_mul, map_X, map_C, Finset.sum_mul, Finset.mul_sum, mul_assoc]
+
+          simp only [Matrix.mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
+          map_sum, map_mul, map_X, map_C, Finset.sum_mul, Finset.mul_sum, mul_assoc]
           rw [Finset.sum_comm]
           simp only [Fintype.sum_prod_type]
       _ = 0 := by simp [h1]
@@ -432,16 +432,16 @@ theorem main : ∀ (D : D7) (i : D.nd.Loc) (r : D.nd.X i → (GE D.nd →* GL (F
         apply hs
         obtain ⟨t, ht⟩ := hγ 1 (fun _ => 1) (fun _ => s) (fun _ => A.one_mem)
         rw [Fin.sum_univ_one, one_mul] at ht
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [ht, Finset.sum_apply, ← RingHom.mapMatrix_apply, map_sum, Matrix.sum_mulVec]
+
+        rw [ht, Finset.sum_apply, ← RingHom.mapMatrix_apply, map_sum, Matrix.sum_mulVec]
         refine Finset.sum_eq_zero fun q _ => ?_
         rw [Pi.mul_apply, map_mul, ← Matrix.mulVec_mulVec, RingHom.mapMatrix_apply _ (yg D.nd r S (γ q) x'),
           show ((yg D.nd r S (γ q) x').map (toK D.nd i)).mulVec η = 0 from congrFun h0 q, Matrix.mulVec_zero]
       · intro k p
         have h3 := congrArg (fun z => ((toK D.nd i).mapMatrix z).mulVec η) (hθ k p x' hx)
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Finset.sum_apply, map_sum, Matrix.sum_mulVec, Pi.mul_apply, map_mul, map_zero,
-          Matrix.zero_mulVec, ← Matrix.mulVec_mulVec] at h3
+
+        simp only [Finset.sum_apply, map_sum, Matrix.sum_mulVec, Pi.mul_apply, map_mul, map_zero,
+        Matrix.zero_mulVec, ← Matrix.mulVec_mulVec] at h3
         exact h3)
     rw [det_generic_blocks hinj P Q hPQ hQP (fun k p q => (θ k p q : S.X' → MatN D.nd i) S.π')
       (fun k p q => S.ψρ (θ k p q)) (fun c k p q => S.ψχ c (θ k p q))

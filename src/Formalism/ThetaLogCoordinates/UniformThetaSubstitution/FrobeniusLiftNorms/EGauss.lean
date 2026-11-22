@@ -30,16 +30,16 @@ lemma map_sPos (p : ℕ) (s : ZMod (2 * ν)) (ab : Fin r0 × Fin r1) :
   ext n
   rw [MvPowerSeries.coeff_map]
   change φ (∑ l ∈ range (n.degree + 1), _) = ∑ l ∈ range (n.degree + 1), _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun l _ => ?_
   split_ifs <;> simp
 
 lemma map_hhS [NeZero ν] (p : ℕ) (u : ZMod (2 * ν) → F) :
     MvPowerSeries.map φ (hhS (r0 := r0) (r1 := r1) p u) = hhS p (fun s => φ (u s)) := by
   unfold hhS
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_pow, MvPowerSeries.map_C, map_sPos]
+
+  simp only [map_sum, map_mul, map_pow, MvPowerSeries.map_C, map_sPos]
 
 lemma inClass_map {ι : Type} (hφ : ∀ z, ‖φ z‖ = ‖z‖) (pp : F) (hh G : MvPowerSeries ι F)
     (h : InClass pp hh G) :

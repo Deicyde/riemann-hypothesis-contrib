@@ -34,9 +34,9 @@ theorem Lin_linForm (b b' : Fin n) (v w : Fin d → k) :
   unfold Lin
   by_cases h : b = b'
   · subst h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [MvPowerSeries.pderiv_X, MvPowerSeries.pderiv_C, Derivation.leibniz, Finset.mul_sum,
-      map_sum, Pi.single_apply, Prod.ext_iff]
+
+    simp [MvPowerSeries.pderiv_X, MvPowerSeries.pderiv_C, Derivation.leibniz, Finset.mul_sum,
+    map_sum, Pi.single_apply, Prod.ext_iff]
   · simp [MvPowerSeries.pderiv_X, MvPowerSeries.pderiv_C, Derivation.leibniz, Pi.single_apply,
       Prod.ext_iff, h]
 

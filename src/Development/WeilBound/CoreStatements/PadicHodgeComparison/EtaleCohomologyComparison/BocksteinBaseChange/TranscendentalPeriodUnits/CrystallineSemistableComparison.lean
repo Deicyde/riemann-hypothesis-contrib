@@ -25,7 +25,7 @@ theorem fix_of_σD {x : BdR l} (h : ∀ g : K.fixingSubgroup, σD g.1 x = x) (σ
   rw [e2, MulEquiv.apply_symm_apply] at e
   exact e
 
-set_option maxHeartbeats 1600000 in
+
 theorem bcr_frac [FiniteDimensional ℚ_[l] K] (x : BdR l) (hx : x ∈ Bcr l) (y : BdR l) (hy : y ∈ Bcr l) (w : BdR l)
     (hwy : w * y = x) (hy0 : y ≠ 0) (hw : ∀ g : K.fixingSubgroup, σD g.1 w = w) : w ∈ Bcr l := by
   rw [bcr_eq] at hx hy ⊢
@@ -47,7 +47,7 @@ theorem all_of_σD {P : BdR l → Prop} {x : BdR l} (h : ∀ g : K.fixingSubgrou
   rw [e2, MulEquiv.apply_symm_apply] at e
   exact e
 
-set_option maxHeartbeats 1600000 in
+
 theorem galB_eigen (b : ACris.BCris (untilt_epsilon (p := l)))
     (he : ∀ σ : Gal(PadicAlgCl l/K), ∃ z : ℚ_[l], σ • ιB b = qQ l z * ιB b) (σ : Gal(PadicAlgCl l/K)) :
     ∃ q : ℚ_[l], ACris.galB (untilt_epsilon (p := l)) σ b =
@@ -58,7 +58,7 @@ theorem galB_eigen (b : ACris.BCris (untilt_epsilon (p := l)))
     ((ACris.iotaB_galB _ _ σ b).trans hz).trans ((map_mul ιB _ b).trans (congrArg (· * ιB b) (iotaB_padic z))).symm
   exact ⟨z, ACris.iotaB_injective (untilt_epsilon (p := l)) untilt_frobeniusEquiv_symm_epsilon_ne_one hz'⟩
 
-set_option maxHeartbeats 1600000 in
+
 theorem bcr_eig [FiniteDimensional ℚ_[l] K] (x : BdR l) (hx : x ∈ Bcr l) (hx0 : x ≠ 0)
     (he : ∀ g : K.fixingSubgroup, ∃ z : ℚ_[l], σD g.1 x = qQ l z * x) : ∃ y ∈ Bcr l, x * y = 1 := by
   rw [bcr_eq] at hx

@@ -60,8 +60,8 @@ theorem exists_small_lattices (v : Pl F) :
         simp only [smul_mul_smul_comm]
       simp only [c]
       rw [e1]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, map_smul, smul_eq_mul]
+
+      simp [map_sum, map_smul, smul_eq_mul]
     rw [e]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (hr0 n).le fun i _ =>
       IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (hr0 n).le fun j _ => ?_

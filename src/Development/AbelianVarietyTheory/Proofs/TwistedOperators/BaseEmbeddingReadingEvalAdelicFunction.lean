@@ -345,7 +345,7 @@ theorem readsCusp_of_shift {i : Fin D.R.m} (hβ : IsSDFrame (Wc D i) (R.βW i) (
   exact mul_left_cancel₀ hc h1
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem readsCusp_of_clauses {i : Fin D.R.m} (hβ : IsSDFrame (Wc D i) (R.βW i) (R.ΛW i) 1) (hSb : R.fam_Sb)
     (hinf : R.models_inf) (hHW : R.models_HW) (hgW : R.models_gW) (hHV : R.models_HV) (hjV : R.models_jV)
     (hmem : R.thP_thF_mem) (fw : FWTie T R κ v₀) (hV₁ : T.V ((i : ℕ) + 1) (res T (sg0 D A)) = Wc D i)

@@ -24,7 +24,7 @@ variable {D : D7}
 theorem idx_top {j m : ℕ} (h : j + 2 * 0 + 2 = m) : m - 1 = j + 1 := by omega
 
 
-set_option maxHeartbeats 1000000 in
+
 structure Geo (D : D7) where
 
   vol : ∀ j, Vol (Yc D j)
@@ -111,7 +111,7 @@ def volLev (t : T) (j : ℕ) : ℝ :=
 def cIOf (t : T) (j : ℕ) : ℂ := (Nat.card P.H : ℂ) * (g.κ (j + 1) : ℂ) * (volLev R g t j : ℂ)
 
 
-set_option maxHeartbeats 1000000 in
+
 structure RowCh (t : T) where
   vP : ∀ j, WO (Yc D j) (Yc D (j + 1)) → ℂ
   vT : ∀ j, j + 2 * 0 + 2 = D.R.m → WO (Yc D (j + 1)) D.sp.X' → ℂ

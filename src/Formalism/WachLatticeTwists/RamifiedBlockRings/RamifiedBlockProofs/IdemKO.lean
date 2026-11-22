@@ -50,8 +50,8 @@ theorem idemKO : StatIdemKO := by
   have hmap : ∀ i j, algebraMap O (FractionRing O) (e i j) = eK i j := fun i j => rfl
   have htr : ∑ i, e i i = 1 := by
     apply inj
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_one]
+
+    rw [map_sum, map_one]
     simp only [hmap, hfact]
     rw [← hsum]
     exact Finset.sum_congr rfl fun i _ => mul_comm _ _

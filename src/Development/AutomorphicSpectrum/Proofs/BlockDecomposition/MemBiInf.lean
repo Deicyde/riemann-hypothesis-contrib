@@ -253,7 +253,7 @@ end Top
 section Glue
 variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)}
 
-set_option maxHeartbeats 1000000 in
+
 theorem glue (h : OL l O) (U : Cov q) (s m : ℕ) (hQ : ∀ (𝒱 : Set X.Opens) T, TO q l s 𝒱 T → Good (l := l) T m)
     (hP : ∀ (𝒱 : Set X.Opens) T, St (⊤ : ObjectProperty (Thick (Lm h q m))) 𝒱 ((GF h (TO q l s 𝒱) m (hQ 𝒱)).obj T))
     (hloc : ∀ S : Finset U.ι, S.Nonempty → ∀ j, Function.Bijective

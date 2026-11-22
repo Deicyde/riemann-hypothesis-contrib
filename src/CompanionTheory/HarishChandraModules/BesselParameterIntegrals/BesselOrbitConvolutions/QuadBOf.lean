@@ -16,7 +16,7 @@ open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData
 
 namespace G
 
-set_option maxHeartbeats 800000 in
+
 theorem quadB_of (hNI : NormInv) (hGS : GrowthS) (hGG : GrowthG) (hDD : CompanionTheory.D.Upq.BesselFunctionalConstruction.DecDD) (hIn : CompanionTheory.D.Upq.BesselFunctionalConstruction.Inputs) {k r : ℕ}
     {Wp Wq : Type}
     [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp] [FiniteDimensional ℂ Wp]

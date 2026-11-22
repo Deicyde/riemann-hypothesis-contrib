@@ -11,7 +11,7 @@ public import Formalism.FrobeniusOrbits.HostCorollaries
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 

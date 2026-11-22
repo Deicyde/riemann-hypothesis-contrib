@@ -125,8 +125,8 @@ theorem exists_coboundary
   have hθN : ∀ g, ∀ n ∈ N, ρ (g * n) θ = ρ g θ := fun g n hn => by
     rw [map_mul, RingAut.mul_apply, hn θ hθm]
   have htg : ∀ g, ρ g t = t := fun g => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ht, map_sum, ← hsum (fun g => ρ g θ) hθN g]
+
+    rw [ht, map_sum, ← hsum (fun g => ρ g θ) hθN g]
     simp only [map_mul, RingAut.mul_apply]
   have htq : t ^ p ^ m = t := by
     rw [ht, sum_pow_char_pow]
@@ -142,8 +142,8 @@ theorem exists_coboundary
   have h3 : ρ g (∑ x : G ⧸ N, e x.out * ρ x.out θ) =
       ∑ x : G ⧸ N, e x.out * ρ x.out θ - e g * t := by
     conv_rhs => rw [← h2, ← htg g, ht]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
+
+    rw [map_sum, map_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun x _ => ?_
     simp only [he, map_mul, RingAut.mul_apply]
     ring
@@ -469,8 +469,8 @@ theorem unramified_mem_Z1f : ∀ (D : Formalism.BasicNotions.D7) (l : ℕ) [Fact
       (fun g h => by rw [hadd, map_add (f := _)]; rfl) (fun g hg => by rw [hI g hg, map_zero])
   choose b hb using hex
   refine ⟨∑ i, v i ⊗ₜ[ℚ_[l]] b i, fun g => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ← Finset.sum_sub_distrib]
+
+  rw [map_sum, ← Finset.sum_sub_distrib]
   conv_lhs => rw [← v.sum_repr (c g), TensorProduct.sum_tmul]
   refine Finset.sum_congr rfl fun i _ => ?_
   have h1 : actVB ((D.loc l).PD K) (1 : Representation ↥LL.1 ↥(GK K) ↥LL.1) g (v i ⊗ₜ[ℚ_[l]] b i) =

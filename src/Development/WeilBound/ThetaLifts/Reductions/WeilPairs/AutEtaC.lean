@@ -84,7 +84,7 @@ theorem eta_real {B : Base F E} {η : (AEF F E)ˣ →* Circle} (h3 : HasExp B.em
     ring
   rw [zpow_one, hpi]
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_half_character_eta_product {σ : E →ₐ[F] E} {B : Base F E} (hB : B.IsGood σ) {η : (AEF F E)ˣ →* Circle}
     (h1 : IsHeckeCharF η) (h2 : ResEtaF η 1) (h3 : HasExp B.emb η (fun _ => 1)) (h4 : UnramInert σ η)
     {lam : ℕ →* ℂ} (hlam : GoodNorm (sgOF σ) lam)

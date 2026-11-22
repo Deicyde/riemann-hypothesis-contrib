@@ -54,8 +54,8 @@ theorem rtr_comm {δ δ' : Hfin X u} (h : δ * δ' = δ' * δ) (T : X.Vpi u →�
   exact congrArg (T ξ) e
 
 
-set_option maxHeartbeats 3000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem exists_rtr_dia {F : Formalism.L2.Forms.Forms0 D u} (Tr : Transport X u F) (hK : X.LevelSubgroupCharacter) (hL : LevelMatch X Tr hK)
     (v : (D.mem u).A.vT) (a : ((D.mem u).A.Fv v)ˣ) :
     ∃ δ : Hfin X u, ∀ T ∈ Cu X u hK, rtr X δ T ∈ Cu X u hK ∧
@@ -120,16 +120,16 @@ theorem ram_rtr {F : Formalism.L2.Forms.Forms0 D u} (Tr : Transport X u F) (hK :
   choose d hd using exists_rtr_dia Tr hK hL v
   have hsum : ∀ P ∈ Cu X u hK, (D.mem u).A.Nm v (dictA X Tr P) = dictA X Tr (∑ a, rtr X (d a) P) := by
     intro P hP
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Formalism.BasicNotions.ColumnsAtT.Nm, LinearMap.sum_apply]
+
+    rw [map_sum, Formalism.BasicNotions.ColumnsAtT.Nm, LinearMap.sum_apply]
     exact Finset.sum_congr rfl fun a _ => (hd a P hP).2.symm
   have hmem : ∑ a, rtr X (d a) T.1 ∈ Cu X u hK := Submodule.sum_mem _ fun a _ => (hd a T.1 T.2).1
   have hz : (⟨_, hmem⟩ : Cu X u hK) = 0 :=
     hB.1 (((hsum T.1 T.2).symm.trans h0).trans (map_zero (colDictL X Tr hK)).symm)
   have hz' : ∑ a, rtr X (d a) T.1 = 0 := congrArg Subtype.val hz
   have e : ∑ a, rtr X (d a) S.1 = rtr X δ (∑ a, rtr X (d a) T.1) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, hS]
+
+    rw [map_sum, hS]
     exact Finset.sum_congr rfl fun a _ => rtr_comm (hδ (d a)) T.1
   show (D.mem u).A.Nm v (dictA X Tr S.1) = 0
   rw [hsum S.1 S.2, e, hz', map_zero, map_zero]

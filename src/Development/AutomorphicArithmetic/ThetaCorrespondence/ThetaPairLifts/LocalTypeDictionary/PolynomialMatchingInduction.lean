@@ -126,20 +126,20 @@ theorem polynomial_matching_on_succ : _root_.GlobalTheory.FunPr.ThetaLocalInputs
     · subst hw; simp only [φN', Function.update_self]; exact (hloc' _ ((hφ' j).2.1 w)).1
     · simp only [φN', Function.update_of_ne hw]; exact (hφ' j).2.1 w
   · simp only [φN', Function.update_of_ne (hvT w hw)]; exact (hφ' j).2.2 w hw
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [hΦ, map_sum]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      exact pure_update v (om (1, h)) (f i) (φ i) (hφ i).2.1 (evc G.M (φ i) (hφ i).2.2 hT.geo.hM)
-        (hloc _ ((hφ i).2.1 v)).2
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [hΦ', map_sum]
-      refine Finset.sum_congr rfl fun j _ => ?_
-      exact pure_update v (om' (1, h)) (f' j) (φ' j) (hφ' j).2.1 (evc G.M' (φ' j) (hφ' j).2.2 hT.geo.hM')
-        (hloc' _ ((hφ' j).2.1 v)).2
+
+  · rw [hΦ, map_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    exact pure_update v (om (1, h)) (f i) (φ i) (hφ i).2.1 (evc G.M (φ i) (hφ i).2.2 hT.geo.hM)
+      (hloc _ ((hφ i).2.1 v)).2
+
+  · rw [hΦ', map_sum]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    exact pure_update v (om' (1, h)) (f' j) (φ' j) (hφ' j).2.1 (evc G.M' (φ' j) (hφ' j).2.2 hT.geo.hM')
+      (hloc' _ ((hφ' j).2.1 v)).2
   · have key := congrArg (LinearMap.lTensor R.Pi (PiTensorProduct.map
       (Function.update (fun u : T => (LinearMap.id : Rf.Pi u.1 →ₗ[ℂ] Rf.Pi u.1)) ⟨v, hv⟩ A))) hsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.lTensor_tmul, PiTensorProduct.map_tprod] at key
+
+    simp only [map_sum, LinearMap.lTensor_tmul, PiTensorProduct.map_tprod] at key
     have e1 : ∀ i, (fun u : T => Function.update (fun u : T => (LinearMap.id : Rf.Pi u.1 →ₗ[ℂ] Rf.Pi u.1)) ⟨v, hv⟩ A u
         (Rf.p u (φ i u))) = fun u : T => Rf.p u (φN i u) := by
       intro i; funext u
@@ -168,7 +168,7 @@ open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.I
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.polynomial_matching_induction : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
     (B : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base F E) (a a' : ℕ) (G : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Geo σ a a') (X : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chars F E)
     (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V G.W) (om' : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V' G.W) (R : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.RealMaps F a a')

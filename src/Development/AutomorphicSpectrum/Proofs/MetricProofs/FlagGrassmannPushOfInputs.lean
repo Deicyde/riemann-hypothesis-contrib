@@ -101,8 +101,8 @@ theorem pts_fsHerm_sum (hI : IsIntersectionFamily I) (hP : IsArithVar P (n + 1))
       ∑ r : Fin n → α, (∏ i, (ℓ i (r i) : ℝ)) *
         ptsIntegral P (pot fun i => fsHerm ι (x (r i))) (fun _ => 1) := by
   refine mul_left_cancel₀ log_two_ne ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← snocMultilin_apply hI hP, MultilinearMap.map_sum, Finset.mul_sum]
+
+  rw [← snocMultilin_apply hI hP, MultilinearMap.map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun r _ => ?_
   rw [MultilinearMap.map_smul_univ _ (fun i => ℓ i (r i)) (fun i => x (r i)), snocMultilin_apply hI hP]
   simp only [RingHom.id_apply, zsmul_eq_mul, Int.cast_prod]

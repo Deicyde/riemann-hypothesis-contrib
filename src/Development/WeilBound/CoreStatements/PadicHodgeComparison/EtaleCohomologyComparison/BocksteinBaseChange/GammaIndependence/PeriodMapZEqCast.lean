@@ -8,8 +8,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-set_option maxHeartbeats 1000000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 noncomputable section
 
@@ -294,8 +294,8 @@ theorem cC_inj (hE : EtSide G) (κ : PMap G D) (hInj : ComparisonInjectiveStrict
     have h := hz ((Module.finBasis C.K₀ (I.D M n)).coord s)
     calc ∑ i, C.ι (z i) * (C.ι (cC hF hC Fm hL E M n (b i) ((Module.finBasis C.K₀ (I.D M n)).coord s)) * w s (f φ))
         = C.ι (∑ i, z i * cC hF hC Fm hL E M n (b i) ((Module.finBasis C.K₀ (I.D M n)).coord s)) * w s (f φ) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum, Finset.sum_mul]
+
+          rw [map_sum, Finset.sum_mul]
           exact Finset.sum_congr rfl fun i _ => by rw [map_mul]; ring
       _ = 0 := by rw [h, map_zero, zero_mul])
   funext i

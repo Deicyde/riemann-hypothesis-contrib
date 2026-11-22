@@ -12,7 +12,7 @@ public import Development.WeilBound.CoreStatements.PluriharmonicCharts.XFibStere
 
 open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.CompanionTheory.Relay.sphere_measure_stereographic_integral :
     let n : ℂ → Fin 3 → ℝ := fun a i =>
       (![2 * a.re, 2 * a.im, 1 - ‖a‖ ^ 2] : Fin 3 → ℝ) i / (1 + ‖a‖ ^ 2)

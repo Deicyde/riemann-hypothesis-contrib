@@ -120,7 +120,7 @@ theorem inv_exists_plus (b : Per6.Bcris l) : ∃ (n : ℕ) (y : ACris.BCrisPlus 
   obtain ⟨m, n, y, h⟩ := bcris_surj b
   exact ⟨n, inv_away_range (invPlusD l) (cD l) invPlusD_algebraMap (inv_map_frac (ιCD_fac l) h)⟩
 
-set_option maxHeartbeats 1600000 in
+
 theorem inv_exists_iotaB {ε : PreTilt (normInteger ℂ_[l]) l} (hε : PreTilt.untilt ε = 1)
     (hζ : PreTilt.untilt ((_root_.frobeniusEquiv (PreTilt (normInteger ℂ_[l]) l) l).symm ε) ≠ 1)
     {n : ℕ} {y : ACris.BCrisPlus ℂ_[l] l} {z : Per6.BdR l}
@@ -129,7 +129,7 @@ theorem inv_exists_iotaB {ε : PreTilt (normInteger ℂ_[l]) l} (hε : PreTilt.u
   inv_away_range (ACris.iotaB hε hζ) (invPlusD l) (ACris.iotaB_algebraMap hε hζ)
     (h.trans (congrArg (· ^ n * z) (invPlusD_algebraMap (ACris.periodT hε)).symm))
 
-set_option maxHeartbeats 1600000 in
+
 theorem inv_mem_Kur {b : Per6.Bcris l} {c : Om l} (h : oD l c = ιCD l b) : c ∈ MaximalUnramifiedExtension l := by
   obtain ⟨n, y, hy⟩ := inv_exists_plus b
   rw [← h] at hy

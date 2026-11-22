@@ -48,7 +48,7 @@ public import Formalism.SharpRestriction.ParamsHeightRankConstant
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section

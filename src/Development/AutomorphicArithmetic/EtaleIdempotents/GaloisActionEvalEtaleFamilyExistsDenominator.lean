@@ -35,15 +35,15 @@ private theorem rel_of_inv {F A C V T ι : Type*} [Field F] [CommRing A] [CommRi
       (c (Sum.elim (fun k => σA (a k)) (fun k => -(u ^ r * a k)) k) * Ring.inverse (c t) ^ r) = 0 := by
   have hL : TensorProduct.map act σ.toLinearMap (∑ k, toV (v k) ⊗ₜ[F] (c (a k) * Ring.inverse (c t) ^ r)) =
       ∑ k, toV (actT (v k)) ⊗ₜ[F] (c (σA (a k)) * σ (Ring.inverse (c t)) ^ r) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, TensorProduct.map_tmul]
+
+    simp only [map_sum, TensorProduct.map_tmul]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [hact]
     simp [hσ]
   rw [hL] at h
   have h1 := congrArg (LinearMap.lTensor V (LinearMap.mulLeft F (c u ^ r))) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.lTensor_tmul, LinearMap.mulLeft_apply] at h1
+
+  simp only [map_sum, LinearMap.lTensor_tmul, LinearMap.mulLeft_apply] at h1
   have hs := sig_inv c σ σA hσ t u ht hg r
   rw [Fintype.sum_sum_type]
   simp only [Sum.elim_inl, Sum.elim_inr]
@@ -65,13 +65,13 @@ private theorem ev_of_rel {A N T ι : Type*} [CommRing A] [AddCommGroup N] [Modu
     s • G (∑ k, a k • E (v k)) = (s * u) • ∑ k, a k • E (v k) := by
   have hsplit : ∑ k, (Sum.elim (fun k => σA (a k)) (fun k => -(u * a k)) k) • E (Sum.elim (fun k => actT (v k)) v k) =
       G (∑ k, a k • E (v k)) - u • ∑ k, a k • E (v k) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Fintype.sum_sum_type, sub_eq_add_neg, Finset.smul_sum, ← Finset.sum_neg_distrib, map_sum]
+
+    rw [Fintype.sum_sum_type, sub_eq_add_neg, Finset.smul_sum, ← Finset.sum_neg_distrib, map_sum]
     simp only [Sum.elim_inl, Sum.elim_inr, neg_smul, mul_smul, map_smulₛₗ, hG]
   rw [hsplit, smul_sub, sub_eq_zero, ← mul_smul] at h
   exact h
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.galoisAction_evalEtaleFamily_exists_denominator :
     ∀ {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (B₀ : PB l K) (e : E.EtFam l K), e.Good → ∀ (M : Model l K) (j r : ℕ) {ι : Type} [Fintype ι] (v : ι → M.T j) (c : ι → Acris l)
         (g : K.fixingSubgroup) (χ : ℤ_[l]ˣ), galA g (tA l) = zA l χ * tA l → IsInv B₀ M j (vec B₀ M j r v c) →

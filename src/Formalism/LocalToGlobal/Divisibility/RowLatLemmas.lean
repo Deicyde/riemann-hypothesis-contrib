@@ -223,8 +223,8 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K)
 theorem gaMat_eq_toMatrix (a : MonoidAlgebra K G) :
     S.gaMat r a = LinearMap.toMatrix S.basis S.basis (S.gaOp r a) := by
   unfold CSD.gaMat CSD.gaOp CSD.actMat
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [map_smul]
 
 theorem gaMat_mulVec_equivFun (a : MonoidAlgebra K G) (φ : S.Forms) :
@@ -411,8 +411,8 @@ theorem part_top {v0 : InfinitePlace K} (hv0 : IsConjAt v0) {s : ℕ} (h : B.Ok 
   choose yy hyy using key
   have hsum : y = ∑ i, yy i := by
     apply B.toF_injective ℓ Z
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_congr rfl fun i _ => hyy i]
+
+    rw [map_sum, Finset.sum_congr rfl fun i _ => hyy i]
     exact (sum_eigProj h.comm h.split _ hex h1).symm
   rw [hsum]
   refine Submodule.sum_mem _ fun i _ => Submodule.mem_iSup_of_mem i ?_
@@ -700,8 +700,8 @@ theorem sum_partPr (t : Bs.Tup) (hi : iSupIndep (Df.Qp t)) (ht : (⨆ p, Df.Qp t
     intro p
     unfold partPr
     rw [dif_pos (hc p)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [hp, ← map_sum]
+
+  simp_rw [hp, ← map_sum]
   rw [← LinearMap.toMatrix'_id]
   congr 1
   apply LinearMap.ext

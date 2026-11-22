@@ -180,8 +180,8 @@ theorem val_coboundary_first_level (R : Type) [CommRing R] (F : Shv R) (t : (fre
       simp
   change valHom R F _ (P1 A B) (cobd t) = _
   unfold cobd
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Fin.sum_univ_two]
+
+  rw [map_sum, Fin.sum_univ_two]
   simp only [map_zsmul]
   simp only [valHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
   rw [val_map, val_map, e, e, val_nat, val_nat]
@@ -220,8 +220,8 @@ theorem val_coboundary_second_level (R : Type) [CommRing R] (F : Shv R) (s : (fr
         simp [Algebra.TensorProduct.one_def]
   change valHom R F _ (P2 A B) (cobd s) = _
   unfold cobd
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Fin.sum_univ_three]
+
+  rw [map_sum, Fin.sum_univ_three]
   simp only [map_zsmul]
   simp only [valHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
   rw [val_map, val_map, val_map, e, e, e, val_nat, val_nat, val_nat]

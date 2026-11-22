@@ -15,7 +15,7 @@ open UpperTheory.V.Z.Desc.V0
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.V.Z.Desc.V0.InertiaSectionNorm
 

@@ -95,8 +95,8 @@ theorem descent : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' 
     refine ⟨bk.evW X ^ M * q - z i + ∑ j, yR i j * inclW l (a j), ?_⟩
     have e1 : inclW l (bk.ev (ξ i) - ∑ j, bk.ev (r i j) * a j) =
         bk.evW (ξ i) - ∑ j, bk.evW (r i j) * inclW l (a j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [BK.evW, map_sub, map_sum, map_mul]
+
+      simp [BK.evW, map_sub, map_sum, map_mul]
     rw [e1, hs]
     linear_combination (-1 : WCb l) * hxe i + bk.evW X ^ M * hq
   choose b' hb' using hb
@@ -104,16 +104,16 @@ theorem descent : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d d' 
 
   have hci : ξ i - ∑ j, r i j * c (a j) = (l : bk.S) ^ n * c (b' i) := by
     have := congrArg c (hb' i)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum, hcev] at this
+
+    rw [map_sub, map_sum, hcev] at this
     have e2 : ((l : ℕ) : Ainf l) ^ n * b' i = bk.ev ((l : bk.S) ^ n) * b' i := by
       rw [map_pow, map_natCast]
     rw [e2] at this
     simp only [hc] at this
     exact this
   have hci' := congrArg bk.evW hci
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, map_sum, map_mul, map_pow, map_natCast] at hci'
+
+  rw [map_sub, map_sum, map_mul, map_pow, map_natCast] at hci'
   simp only [map_mul] at hci'
   have hU := (isUnit_evW_X bk).pow M
   rw [← hU.dvd_mul_left]

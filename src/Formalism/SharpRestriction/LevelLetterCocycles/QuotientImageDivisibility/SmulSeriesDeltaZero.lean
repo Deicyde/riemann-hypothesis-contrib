@@ -56,8 +56,8 @@ theorem trunc_s_Δ [IsDomain O] {j M X σ y : ℕ} {r s : LetA O n} (hr : Formal
     exact ⟨k, hk, by rw [inv_pow, hgk, inv_one]⟩
   have hπ₁ : W.γ₀ δ W.π₀₁ = W.π₀₁ := by
     unfold Formalism.BasicNotions.LocWach.π₀₁
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sub, map_one, map_natCast, map_sum]
+
+    rw [map_add (f := _), map_sub, map_one, map_natCast, map_sum]
     congr 1
     refine Finset.sum_nbij' (δ * ·) (δ⁻¹ * ·) ?_ ?_ ?_ ?_ ?_
     · intro a ha
@@ -76,8 +76,8 @@ theorem trunc_s_Δ [IsDomain O] {j M X σ y : ℕ} {r s : LetA O n} (hr : Formal
     exact hπ₁
   have hr' : W.γA δ r = r := by
     obtain ⟨⟨a, rfl⟩, -⟩ := hr
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, map_pow, AlgHom.commutes, hπ]
+
+    simp only [map_sum, map_mul, map_pow, AlgHom.commutes, hπ]
   have hp0 : ((PD.p : ℕ) : O) ≠ 0 := by
     intro h
     have h1 := W.v_l

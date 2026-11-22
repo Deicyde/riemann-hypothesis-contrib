@@ -26,8 +26,8 @@ private def eD : (V →L[ℂ] ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (Module.f
     ext v
     have h := (stdOrthonormalBasis ℂ V).sum_repr' v
     conv_rhs => rw [← h]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [sum_apply, map_sum, mul_comm]
+
+    simp [sum_apply, map_sum, mul_comm]
   right_inv y := by
     ext j
     simp [sum_apply, OrthonormalBasis.inner_eq_ite]

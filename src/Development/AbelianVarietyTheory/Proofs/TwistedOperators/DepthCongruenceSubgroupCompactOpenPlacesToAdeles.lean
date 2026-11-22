@@ -47,8 +47,8 @@ theorem mem_GinfC_of_off (V : HSp D) (S : GlobalTheory.FinPl.Pl D → Prop) {g :
   exact GlobalTheory.FinPl.OffInh.mem_GinfC_of_all (fun _ => trivial) h3
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem mem_lev_of_inK {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (X : Node)
     (hΛ : Submodule.IsFullLattice D.host.E (G.Λ X)) {κ : GA D (G.V X)}
     (hκ : InK (G.V X) (G.Λ X) (fun v => v ∉ G.pl.S0) κ) : κ ∈ lev G X := by

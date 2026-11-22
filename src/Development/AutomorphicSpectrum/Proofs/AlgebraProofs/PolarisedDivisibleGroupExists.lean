@@ -267,15 +267,15 @@ theorem baseChange_perfect {R W : Type} [CommRing R] [AddCommGroup W] [Module.Fr
     refine bR.ext_elem fun k => ?_
     have h1 := LinearMap.congr_fun hx (1 ⊗ₜ d k)
     rw [← bR.sum_repr x] at h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, hbR,
-      LinearMap.BilinForm.baseChange_tmul, hs (b _), hdb] at h1
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, hbR,
+    LinearMap.BilinForm.baseChange_tmul, hs (b _), hdb] at h1
     simpa [Finset.sum_ite_eq] using h1
   · intro f
     refine ⟨∑ i, f (1 ⊗ₜ b i) • ((1 : R) ⊗ₜ[ℤ] d i), bR.ext fun k => ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, hbR,
-      LinearMap.BilinForm.baseChange_tmul, hdb]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, hbR,
+    LinearMap.BilinForm.baseChange_tmul, hdb]
     simp [Finset.sum_ite_eq]
 
 theorem span_gen {R W T : Type} [CommRing R] [AddCommGroup W] [AddCommGroup T] [Module R T]

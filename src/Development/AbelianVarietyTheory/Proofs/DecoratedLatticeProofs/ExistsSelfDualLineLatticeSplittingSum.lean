@@ -67,8 +67,8 @@ theorem rat_mulVec_sec (q : GlobalTheory.FinPl.SplitPt D k) {m n : ℕ} (M : Mat
     ((rat M : Mx D m n) *ᵥ fun i => q.sec (b i)) = fun i => q.sec ((M.map ((ofSplit q).π.comp (incA D)) *ᵥ b) i) := by
   funext i
   simp only [Matrix.mulVec, dotProduct, Matrix.map_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum q.sec]
+
+  rw [map_sum q.sec]
   exact Finset.sum_congr rfl fun j _ => GlobalTheory.SplitInt.mul_sec q _ _
 
 end

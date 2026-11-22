@@ -21,6 +21,6 @@ open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.Published GlobalTheory.ContraPair
 open GlobalTheory.CuspRep.InfType GlobalTheory.CuspRep.AlgExpo
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.ideleMapOfAlgebra_maximalRealSubfield_injective : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Function.Injective (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.ideleMap (maximalRealSubfield E) E) := by
   first | exact @GlobalTheory.IdeleMapInjective.ideleMap_injective | exact GlobalTheory.IdeleMapInjective.ideleMap_injective | (intros; apply GlobalTheory.IdeleMapInjective.ideleMap_injective <;> assumption)

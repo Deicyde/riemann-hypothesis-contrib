@@ -103,7 +103,7 @@ theorem idem_mul_iff {L : Type} [Field L] [NumberField L] [IsCMField L] (v : Hei
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem suppF_iff {D : D7} (hF : D.host.F = maximalRealSubfield D.host.E) {V : Formalism.BasicNotions.TH.HSp D} {n : ℕ}
     (PV : Formalism.IndefR.principalLevelFrame.RowPsi V n) (hV : GlobalTheory.NJoin.StdFrame hF PV) {Pp : HeightOneSpectrum (𝓞 D.host.E)}
     {e f : Formalism.L2.Theta.AE D} (hP : Formalism.IndefR.Mult.IsPrimeIdem Pp e f)
@@ -216,13 +216,13 @@ theorem sum_read_abs {G H W W' : Type} [Group G] [Group H] [AddCommGroup W] [Mod
   apply eW.injective
   have hr : ∀ z, eW (Φ (ψ z)) = F (b * z) := fun z => by rw [hreal, inv_mul_cancel_left]
   have e2 := h₀.sum_eq h₁ (one_mem _) (fun γ => F (b * x * γ)) (fun z l hl => by rw [← mul_assoc, hfix l hl])
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_smul, hr, ← hc, ← e2]
+
+  rw [map_sum, map_smul, hr, ← hc, ← e2]
   refine Finset.sum_congr rfl fun γ _ => ?_
   rw [← map_mul, hr, one_mul, mul_assoc]
 
 
-set_option maxHeartbeats 800000 in
+
 theorem eigen_of_fin {D : D7} {cf : CharFrame D} {nch : NChoice D} {tp : TupTied D cf nch} (X : GlobalTheory.NJoin.RealAt D cf nch tp)
     (j : Fin D.R.m) (t : X.T) (h : DIV.Pl D.host.E → (List ℤ →₀ ℂ) → Module.End ℂ (X.R.HV j t).H)
     (hh : GlobalTheory.Hk3.IsOpsV X.R j t h) (Pp : DIV.Pl D.host.E) (hG : GlobalTheory.Hk3.Good X.R t Pp) (d : List ℤ)
@@ -246,7 +246,7 @@ theorem eigen_of_fin {D : D7} {cf : CharFrame D} {nch : NChoice D} {tp : TupTied
   exact X.hinj j t (congrArg (X.R.cV j).ext key)
 
 
-set_option maxHeartbeats 800000 in
+
 theorem transport_succ {D : D7} {cf : CharFrame D} {nch : NChoice D} {tp : TupTied D cf nch} (X : GlobalTheory.NJoin.RealAt D cf nch tp)
     {M : MtFam D} {rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r} (A : GlobalTheory.NJoin.Agree X M rep) {μ : D.what₂.Tup}
     (hμ : Formalism.IndefR.RecTie.Used0 D μ) (j : Fin D.R.m) (k : ℕ) (hk : j.1 + 1 = k) (k1 : 1 ≤ k) (k2 : k ≤ D.R.m)

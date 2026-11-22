@@ -51,8 +51,8 @@ theorem mmap_sum_smul {S S' F : Type} [CommRing S] [CommRing S'] [FunLike F S S'
     (N : ℕ) (a : ℕ → S) (X : ℕ → Matrix (Fin d) (Fin d) S) :
     (∑ k ∈ Finset.range N, a k • X k).map f = ∑ k ∈ Finset.range N, f (a k) • (X k).map f := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.sum_apply, map_sum]
+
+  simp [Matrix.sum_apply, map_sum]
 
 theorem pow_eq_zero_field {k : Type} [Field k] (x : Matrix (Fin d) (Fin d) k) (hx : IsNilpotent x) : x ^ d = 0 := by
   have h := Matrix.isNilpotent_charpoly_sub_pow_of_isNilpotent hx

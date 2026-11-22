@@ -37,7 +37,7 @@ open NumberField
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl
 open GlobalTheory.CompanionTheory.SW.Core GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Dec
 
-set_option maxHeartbeats 1000000 in
+
 theorem finite_bound : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
     IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J →
     ∀ (n : ℕ) (ψ : AddChar (AF F) ℂ), IsCharAF F ψ →

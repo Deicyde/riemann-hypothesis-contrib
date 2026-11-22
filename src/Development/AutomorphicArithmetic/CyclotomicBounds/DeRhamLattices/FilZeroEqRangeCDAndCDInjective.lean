@@ -9,8 +9,8 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingIface
 
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
-set_option maxHeartbeats 2000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 private theorem mem_FilD_zero (l : ℕ) [Fact l.Prime] (x : Per.BdR l) :
     x ∈ Per.FilD l 0 ↔ ∃ y : Per.BdRp l, algebraMap (Per.BdRp l) (Per.BdR l) y = x :=

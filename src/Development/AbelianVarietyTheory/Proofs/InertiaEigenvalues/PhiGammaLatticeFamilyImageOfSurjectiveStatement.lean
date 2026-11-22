@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Powe
 
 open GlobalTheory.PhiGam
 open scoped LaurentSeries PowerSeries
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.phiGammaLatticeFamily_image_of_surjective :
     ∀ {k : Type} [Field k] {l : ℕ} [Fact l.Prime] [CharP k l] (R : RingPG k l)
       {n : ℕ} [NeZero n]

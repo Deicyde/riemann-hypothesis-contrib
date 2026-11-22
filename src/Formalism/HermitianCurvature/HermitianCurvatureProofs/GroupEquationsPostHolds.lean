@@ -197,8 +197,8 @@ theorem gp_qmF (ℓ : E →L[ℂ] ℂ) (EopE : Fin m → Fin m → (B.Mat k r �
     {t : ℕ} (a b : Fin t → Fin m) (u : ℂ) (f : B.Mat k r → E) (hf : ContDiff ℝ (t : WithTop ℕ∞) f) :
     (fun g => ℓ (Q.qmF EopE a b u f g)) = Q.qmF EopC a b u (fun g => ℓ (f g)) := by
   funext g
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Q.qmF, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul]
+
+  simp only [Q.qmF, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul]
   refine Finset.sum_congr rfl fun σ _ => ?_
   congr 1
   rw [gp_ofFn EopE a b u σ, gp_ofFn EopC a b u σ]
@@ -212,8 +212,8 @@ theorem gp_qmFrev (ℓ : E →L[ℂ] ℂ) (EopE : Fin m → Fin m → (B.Mat k r
     {t : ℕ} (a b : Fin t → Fin m) (u : ℂ) (f : B.Mat k r → E) (hf : ContDiff ℝ (t : WithTop ℕ∞) f) :
     (fun g => ℓ (Q.qmFrev EopE a b u f g)) = Q.qmFrev EopC a b u (fun g => ℓ (f g)) := by
   funext g
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Q.qmFrev, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul]
+
+  simp only [Q.qmFrev, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul]
   refine Finset.sum_congr rfl fun σ _ => ?_
   congr 1
   rw [gp_ofFn EopE a b u σ, gp_ofFn EopC a b u σ]

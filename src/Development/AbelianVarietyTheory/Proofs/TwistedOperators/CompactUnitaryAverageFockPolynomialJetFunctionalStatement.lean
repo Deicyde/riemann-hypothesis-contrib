@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MvZ
 
 open Formalism.BasicNotions Formalism.L2.DIV MeasureTheory
 open scoped Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.compactUnitaryAverage_fockPolynomial_jetFunctional : ∀ (ι : Type) [Fintype ι] (a b : ℕ), a ≤ b → 0 < a → ∀ (lam : ι → DomWeight a) (lam' : ι → DomWeight b)
     (nn : ι → ℕ), Formalism.L2.Ker.JetInVV ℂ lam lam' nn → ∀ (K : Type) [Group K] [TopologicalSpace K] [IsTopologicalGroup K]
     [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [IsProbabilityMeasure ν] [ν.IsMulLeftInvariant]

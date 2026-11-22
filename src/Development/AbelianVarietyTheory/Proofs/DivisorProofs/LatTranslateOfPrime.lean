@@ -30,8 +30,8 @@ open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eEx
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.BigOn.Exp.TupLe
 
@@ -153,8 +153,8 @@ theorem eq_smul_of_read (hF : Faithful rd) {x y : L ⊗[D.ntw.O i] D.nexp.Fm i (
   obtain ⟨c', rfl⟩ := exists_coord e he y
   have hl := Fintype.linearIndependent_iff.1 (hF _ _ (Module.finBasis (FractionRing (D.ntw.O i))
     (D.nexp.Fm i ((j : ℕ) + 1) b)).linearIndependent) (fun a => e (c a) - u * e (c' a)) (by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, rdL_tmul, Finset.smul_sum, smul_smul] at h
+
+      simp only [map_sum, rdL_tmul, Finset.smul_sum, smul_smul] at h
       simp only [sub_smul, Finset.sum_sub_distrib, h, sub_self])
   by_cases h0 : ∀ a, c' a = 0
   · left
@@ -231,8 +231,8 @@ theorem le_of_comb {ρ : Setup D.ntw} (hρ : ρ.Good) {ν : ℂ} {rd : Can p w j
     obtain ⟨n, bb, hbK, -, -, -, hsp⟩ := hK
     have hx : x ∈ Submodule.span D.what₂.LL (Set.range bb) := hsp ▸ Submodule.mem_top
     obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun D.what₂.LL).1 hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, map_sum, Finset.smul_sum]
+
+    rw [map_sum, map_sum, map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smulₛₗ, map_smulₛₗ, h1, evW_smul, smul_comm ν⁻¹]
     congr 1

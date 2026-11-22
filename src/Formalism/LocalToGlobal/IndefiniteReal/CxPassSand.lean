@@ -78,8 +78,8 @@ theorem aniso {v0 : InfinitePlace K} (hv0 : IsConjAt v0) {H : Matrix (Fin n) (Fi
     simpa using hi
   have key : star (fun i => v0.embedding (x i)) ⬝ᵥ (H.map v0.embedding) *ᵥ (fun i => v0.embedding (x i)) =
       v0.embedding (star x ⬝ᵥ H *ᵥ x) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, Matrix.mulVec, Matrix.map_apply, map_sum, map_mul, Pi.star_apply, hs]
+
+    simp only [dotProduct, Matrix.mulVec, Matrix.map_apply, map_sum, map_mul, Pi.star_apply, hs]
   have hpos := hH.dotProduct_mulVec_pos hy
   rw [key, hx, map_zero] at hpos
   exact lt_irrefl _ hpos
@@ -364,8 +364,8 @@ theorem avg_toF [Fintype P] : ∀ f ∈ B.Mt (Lvl.full X), ∃ f' ∈ B.Mt ⟨X,
     have h3 := isPr_Phi B hv0 hOk ⟨X, P, ψ⟩ hX Z fb
     rw [hfb] at h3
     have h4 := h2.unique hH h3
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [toF_eq B ⟨X, P, ψ⟩ Z fb, ← h4, Matrix.sum_mulVec, map_sum]
+
+    rw [toF_eq B ⟨X, P, ψ⟩ Z fb, ← h4, Matrix.sum_mulVec, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [toF_eq, equivFun_symm_act, Matrix.smul_mulVec, map_smul]
 
@@ -406,8 +406,8 @@ end Glue
 theorem cpt_sum_smul {K : Type} [Field K] (σ : K →+* ℂ) {n : ℕ} {ι : Type} (s : Finset ι) (c : ι → K)
     (x : ι → Fin n → K) : cpt σ (∑ i ∈ s, c i • x i) = ∑ i ∈ s, σ (c i) • cpt σ (x i) := by
   funext j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [cpt, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
+
+  simp only [cpt, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
 
 end Sand
 

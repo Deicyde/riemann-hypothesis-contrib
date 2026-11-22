@@ -36,8 +36,8 @@ theorem φA_tm_root (e : Per.Fl l) :
 
 theorem φA_xi (e : Per.Fl l) :
     Per.φA l (xi e) = ∑ i ∈ Finset.range l, Per.tm e ^ i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [xi, map_sum]
+
+  rw [xi, map_sum]
   simp only [map_pow, φA_tm_root]
 
 theorem φA_mu (e : Per.Fl l) : Per.φA l (mu e) = mu e * Per.φA l (xi e) := by

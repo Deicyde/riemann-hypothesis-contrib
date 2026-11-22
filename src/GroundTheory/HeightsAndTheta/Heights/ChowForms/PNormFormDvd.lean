@@ -23,10 +23,10 @@ theorem NormFormDvd.proof (h₁ : NormFormEmbeddings.Statement) (h₂ : LinearFo
   have hev : ∀ σ, eval (fun m => algebraMap K (AlgebraicClosure K) (t m)) (θ σ) = 1 := by
     intro σ
     have h := congrArg σ ht
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_one, Algebra.smul_def, map_mul, AlgHom.commutes] at h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [hθ, map_sum, mul_comm] using h
+
+    simp only [map_sum, map_one, Algebra.smul_def, map_mul, AlgHom.commutes] at h
+
+    simpa [hθ, map_sum, mul_comm] using h
 
   have hcoord : ∀ σ m, eval (Pi.single m 1) (θ σ) = σ (η m) := by
     intro σ m
@@ -47,8 +47,8 @@ theorem NormFormDvd.proof (h₁ : NormFormEmbeddings.Statement) (h₂ : LinearFo
     rw [map_map, AlgHom.comp_algebraMap, map_mul] at h
     rw [h]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [hθ, map_sum]
+
+    simp [hθ, map_sum]
   have hinj : ∀ a b, θ a ∣ θ b → a = b := by
     intro a b hab
     obtain ⟨u, hu⟩ := (hprime a).associated_of_dvd (hprime b) hab

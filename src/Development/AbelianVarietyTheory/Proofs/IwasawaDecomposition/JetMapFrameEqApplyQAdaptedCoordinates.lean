@@ -18,7 +18,7 @@ attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Ho
 open Classical
 
 set_option autoImplicit false
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 
@@ -75,8 +75,8 @@ theorem fpair_sum_left {ι : Type} (s : Finset ι) (Q : ι → MvPolynomial σ K
 
 theorem fpair_sum_right {ι : Type} (s : Finset ι) (Q : MvPolynomial σ K) (F : ι → MvPowerSeries σ K) :
     fpair Q (∑ i ∈ s, F i) = ∑ i ∈ s, fpair Q (F i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [fpair, map_sum, Finset.mul_sum]
+
+  simp only [fpair, map_sum, Finset.mul_sum]
   exact Finset.sum_comm
 
 theorem fpair_mul_C_right (Q : MvPolynomial σ K) (F : MvPowerSeries σ K) (r : K) :
@@ -123,8 +123,8 @@ def linS (c : σ → κ → K) (k : σ) : MvPowerSeries κ K :=
   ∑ j : κ, algebraMap K (MvPowerSeries κ K) (c k j) * MvPowerSeries.X j
 
 theorem constantCoeff_linS (c : σ → κ → K) (k : σ) : MvPowerSeries.constantCoeff (linS c k) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [linS, map_sum]
+
+  simp [linS, map_sum]
 
 theorem hasSubst_linS (c : σ → κ → K) : MvPowerSeries.HasSubst (linS c) :=
   MvPowerSeries.hasSubst_of_constantCoeff_zero (constantCoeff_linS c)
@@ -132,8 +132,8 @@ theorem hasSubst_linS (c : σ → κ → K) : MvPowerSeries.HasSubst (linS c) :=
 theorem pderiv_linS (c : σ → κ → K) (k : σ) (j : κ) :
     MvPowerSeries.pderiv (R := K) j (linS c k) = MvPowerSeries.C (c k j) := by
   unfold linS
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single j]
+
+  rw [map_sum, Finset.sum_eq_single j]
   · rw [Derivation.leibniz, MvPowerSeries.pderiv_X_self, Derivation.map_algebraMap, smul_zero, add_zero, smul_eq_mul,
       mul_one, MvPowerSeries.c_eq_algebraMap]
   · intro i _ hi
@@ -267,9 +267,9 @@ theorem jetMap_frame_eq_applyQ : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (N0 N1 : 
   have ht : (t : ℕ) < N1 := lt_of_lt_of_le t.2 hN
   have he : tauPl D ((Equiv.ofBijective (tauPl D) (tauPl_bij D)).symm τ) = τ :=
     (Equiv.ofBijective (tauPl D) (tauPl_bij D)).apply_symm_apply τ
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dif_pos ht, map_sum, map_mul, MvPolynomial.aeval_X, MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq,
-    Sum.elim_inl, Sum.elim_inr, he, GL3Columns.colsOf]
+
+  simp only [dif_pos ht, map_sum, map_mul, MvPolynomial.aeval_X, MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq,
+  Sum.elim_inl, Sum.elim_inr, he, GL3Columns.colsOf]
   have hC : ∀ (c : Prop) [Decidable c] (x : ℂ_[p]) (k : D.what₂.Tau × Fin N1 × Fin N0),
       MvPolynomial.C (if c then x else 0) * MvPolynomial.X k = if c then MvPolynomial.C x * MvPolynomial.X k else 0 := by
     intros c _ x k
@@ -291,8 +291,8 @@ theorem jetMap_frame_eq_applyQ : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (N0 N1 : 
       intro b a
       simp only [map_mul]
       ring
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [e1, ← Finset.sum_mul, ← map_sum]
+
+    simp only [e1, ← Finset.sum_mul, ← map_sum]
     congr 2
     rw [Matrix.mul_apply, ← hBB α']
     simp only [Finset.mul_sum, Finset.sum_mul]

@@ -112,7 +112,7 @@ open GlobalTheory.Mem.R3.Tr
 open scoped TensorProduct InnerProductSpace ComplexOrder
 attribute [local instance] Formalism.IndefR.principalLevelFrame.instCMHostI
 namespace GlobalTheory.Mem.R3.Rw.Bare
-set_option maxHeartbeats 4000000 in
+
 theorem bare_form_saturated : _root_.GlobalTheory.Mem.Top.Bl.HypAAlt → _root_.GlobalTheory.Mem.Top.Bl.MultiplicityCoverHypotheses → DatExt0 → StepW Start fun K B f T w => ∃ (P : Pre2 K w) (x : St P), (T = TwDat.untw B T.pl → ∀ v v', GlobalTheory.TwistChoice.OverOne (w.D P.Z₀) v v' → v ∈ P.Wt → v' ∈ P.Wt) ∧ IsEmpty x.o.N.nd.Loc ∧ ∀ j v, x.o.η j v = 0 := by
   intro hA hH hE
   have holdsW : WeightCaseCondition := _root_.GlobalTheory.T.w_of_weight_residue_char hH.h1 hH.h3 hH.multW
@@ -160,7 +160,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Cx Formalism.IndefR.RecTie
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_bare_form_of_saturation : _root_.GlobalTheory.Mem.Top.Bl.HypAAlt → _root_.GlobalTheory.Mem.Top.Bl.MultiplicityCoverHypotheses → DatExt0 → StepW Start fun K B f T w => ∃ (P : Pre2 K w) (x : St P), (T = TwDat.untw B T.pl → ∀ v v', GlobalTheory.TwistChoice.OverOne (w.D P.Z₀) v v' → v ∈ P.Wt → v' ∈ P.Wt) ∧ IsEmpty x.o.N.nd.Loc ∧ ∀ j v, x.o.η j v = 0 := by
   first | exact @_root_.GlobalTheory.Mem.R3.Rw.Bare.bare_form_saturated | exact _root_.GlobalTheory.Mem.R3.Rw.Bare.bare_form_saturated | (intros; apply _root_.GlobalTheory.Mem.R3.Rw.Bare.bare_form_saturated <;> assumption)
 end

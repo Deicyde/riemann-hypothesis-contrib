@@ -18,8 +18,8 @@ open Formalism.L2.NTheta (IsIdemAt)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.HeisRatRead
 
@@ -48,8 +48,8 @@ theorem actO_inf (S T : HSp D) (h : GA D T) {w : WO S T} (hw : w.map (infPart D)
   ext i j
   rw [Matrix.map_apply, Matrix.zero_apply]
   unfold actO
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, map_sum, map_mul, hw', mul_zero, zero_mul, Finset.sum_const_zero]
+
+  simp only [Matrix.mul_apply, map_sum, map_mul, hw', mul_zero, zero_mul, Finset.sum_const_zero]
 
 theorem actO_add (S T : HSp D) (h : GA D T) (u v : WO S T) :
     actO S T 1 h (u + v) = actO S T 1 h u + actO S T 1 h v := by

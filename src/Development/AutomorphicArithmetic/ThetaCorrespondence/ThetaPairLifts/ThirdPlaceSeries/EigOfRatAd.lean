@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsRecTLocRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -31,11 +31,11 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
   GlobalTheory.HeightCounting GlobalTheory.EigRows
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar Formalism.IndefR.principalLevelFrame.instCMHostI GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 400000
+
 variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type}
   [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat3 D A3 Ks} {F : Face3 D A3} {X0 : BaseLevelRowSide D}
   {Sb Sb' : Finset (PlE D.host)}
-set_option maxHeartbeats 1000000 in
+
 theorem eigTrue_of_read (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (Y : R3.Read (A3 := A3) R.toRealDat F.lv2 X0) (hlev : R.toLevCh.Is A3.A.μ0)
     (W : GlobalTheory.RowTie.WDTie D.nd D.naut) (Rw : RowSide D) {sat : D.what₂.FT → PlE D.host → Multiset ℂ}
     (hrow : _root_.GlobalTheory.HeightCounting.RepresentationParametersHold hL D (typeR Y) (fun σ w => W.e w (Rw.locR σ w)) sat)

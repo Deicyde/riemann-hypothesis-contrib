@@ -66,9 +66,9 @@ theorem finite_of_killed {R A M : Type*} [CommRing R] [CommRing A] [Algebra R A]
 theorem coe_poly_eq_sum {O : Type} [CommRing O] (D : ℕ) (r : Polynomial O) (hr : r.degree < D) :
     (r : PowerSeries O) = ∑ k ∈ Finset.range D, r.coeff k • (PowerSeries.X : PowerSeries O) ^ k := by
   ext m
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Polynomial.coeff_coe, map_sum, PowerSeries.coeff_smul, PowerSeries.coeff_X_pow, smul_eq_mul,
-    mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_range]
+
+  simp only [Polynomial.coeff_coe, map_sum, PowerSeries.coeff_smul, PowerSeries.coeff_X_pow, smul_eq_mul,
+  mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_range]
   split_ifs with hm
   · rfl
   · exact Polynomial.coeff_eq_zero_of_degree_lt (lt_of_lt_of_le hr (by exact_mod_cast not_lt.1 hm))

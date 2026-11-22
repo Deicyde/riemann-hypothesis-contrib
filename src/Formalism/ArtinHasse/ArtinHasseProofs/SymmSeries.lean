@@ -78,8 +78,8 @@ lemma coeff_prod_one_sub (i : ℕ) :
     rw [Finset.prod_neg, Finset.prod_mul_distrib, Finset.prod_const, ← map_prod, map_mul, map_pow,
       map_neg, map_one]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h1, map_sum]
+
+  rw [h1, map_sum]
   simp_rw [PowerSeries.coeff_C_mul_X_pow]
   rw [← Finset.sum_filter]
   have hf : ((univ : Finset σ).powerset.filter fun t => i = t.card) = (univ : Finset σ).powersetCard i := by

@@ -55,12 +55,12 @@ theorem exists_primitive (t : F ⊗[K] A) (ht : t ≠ 0) :
       apply IsFractionRing.injective O F
       rw [hg i₀ hi₀, div_self hc, map_one]
     have h2 := congrArg (fun z => bk.repr z i₀) h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Algebra.TensorProduct.map_tmul, IsScalarTower.coe_toAlgHom',
-      AlgHom.id_apply, map_zero, Finsupp.coe_zero, Pi.zero_apply, bk,
-      Algebra.TensorProduct.basis_repr_tmul, Module.Basis.repr_self, Finsupp.coe_finsetSum,
-      Finset.sum_apply, Finsupp.coe_smul, Pi.smul_apply, Finsupp.mapRange_apply,
-      Finsupp.single_apply] at h2
+
+    simp only [map_sum, Algebra.TensorProduct.map_tmul, IsScalarTower.coe_toAlgHom',
+    AlgHom.id_apply, map_zero, Finsupp.coe_zero, Pi.zero_apply, bk,
+    Algebra.TensorProduct.basis_repr_tmul, Module.Basis.repr_self, Finsupp.coe_finsetSum,
+    Finset.sum_apply, Finsupp.coe_smul, Pi.smul_apply, Finsupp.mapRange_apply,
+    Finsupp.single_apply] at h2
     rw [Finset.sum_eq_single i₀] at h2
     · simp [h1] at h2
     · intro j _ hj

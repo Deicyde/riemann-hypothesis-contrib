@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DeformMul
 @[expose] public section
 
 open Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.deform_multiple_zeros_linear_family : ∀ (k J I : Type) [Field k] [CharZero k] [Fintype J] [Fintype I] (N : ℕ) (ξ : J → PowerSeries k) (s : I → J → PowerSeries k) (y₀ : J → k), 1 ≤ N →
  ∑ j, y₀ j * PowerSeries.constantCoeff (ξ j) = 0 →
  (∀ i, ∀ l < N, ∑ j, y₀ j * PowerSeries.coeff l (s i j) = 0) → (∀ i, ∑ j, y₀ j * PowerSeries.coeff N (s i j) ≠ 0) →

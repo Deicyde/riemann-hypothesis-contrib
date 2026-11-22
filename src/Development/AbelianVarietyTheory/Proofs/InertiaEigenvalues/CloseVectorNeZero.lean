@@ -204,8 +204,8 @@ theorem _root_.GlobalTheory.PhiGam.Close.key {l : ℕ} (hl : 0 < l)
   have f_sum : ∀ c : Module.Free.ChooseBasisIndex k⟦X⟧ N → k⸨X⸩,
       f (∑ i, c i • e i) = ∑ i, R.φ (c i) • f (e i) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [hf']
   have fespan : ⊤ ≤ Submodule.span k⸨X⸩ (Set.range (fun i => f (e i))) := by
     rw [← het]

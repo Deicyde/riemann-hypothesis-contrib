@@ -22,7 +22,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsRecTLocRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section
@@ -32,7 +32,7 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 open Formalism.L2.Host
 namespace GlobalTheory.LocCompTy
 open GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin GlobalTheory.PendOf
-set_option maxHeartbeats 2000000 in
+
 theorem localGlobal_compatible_at_place_alt (hPr : _root_.GlobalTheory.NRows.ThetaLocalInputsAlt) (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D)
     (hCen : GlobalTheory.HeightCounting.Up.CenLoc D P.M) (i : D.nd.Loc) (k : Fin 2) (v : D.nd.PlG k) (w : PlE D.host)
     (hw : w = D.naut.plGw k v) (e : ℚ_[D.host.g k] ≃+* w.adicCompletion D.host.E) (he : Continuous e)
@@ -129,8 +129,8 @@ theorem localGlobal_compatible_at_place_alt (hPr : _root_.GlobalTheory.NRows.The
   have hu := (hpar φ F).1
   change φ.1 ((P.M.loc i).real (D.ntypes.onMt (D.nd.mu i) (D.nd.j i) (Formalism.MainNotions.ArithmeticCylinders.atPlace D k v a) F)) =
     actTop (σ.ρ.comp (Matrix.GeneralLinearGroup.map e.toRingHom)) D.R.r D.R.t a (φ.1 ((P.M.loc i).real F))
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e1, map_sum, actTop, LinearMap.sum_apply]
+
+  rw [e1, map_sum, actTop, LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun h _ => ?_
   rw [map_smul, φ.2 _ (hxs h).1 _ hF, LinearMap.smul_apply, MonoidHom.comp_apply]
   congr 1
@@ -144,7 +144,7 @@ end
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.TypeRec GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.SerSys
 attribute [local instance] GlobalTheory.TypeRec.factG
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.locComp_of_isRc_of_classMap_of_cenLoc : _root_.GlobalTheory.NRows.ThetaLocalInputsAlt → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (I : Ident D) (rc : GlobalTheory.SerSys.Corr D), _root_.GlobalTheory.TypeRec.IsSeriesCorrespondence hL P.T I rc → (∀ k v, _root_.GlobalTheory.SerSys.IsClassMapD D.naut.lpDim (rc k v)) → GlobalTheory.HeightCounting.Up.CenLoc D P.M → _root_.GlobalTheory.SerSys.LocalCompatibility D rc := by
   first | exact @_root_.GlobalTheory.LocCompTy.locComp_of_isRc_classMapD_cenLoc | exact _root_.GlobalTheory.LocCompTy.locComp_of_isRc_classMapD_cenLoc | (intros; apply _root_.GlobalTheory.LocCompTy.locComp_of_isRc_classMapD_cenLoc <;> assumption)
 end

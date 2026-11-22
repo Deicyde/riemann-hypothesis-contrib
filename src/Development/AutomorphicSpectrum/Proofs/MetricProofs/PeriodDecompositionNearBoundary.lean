@@ -35,8 +35,8 @@ theorem contAt_act {E : Type} [Field E] [NumberField E] [IsCMField E] {n a g : �
   have e : (fun z => L.B z c' (t z)) = fun z => ∑ i, t z i • L.B z c' (Pi.single i 1) := by
     funext z
     conv_lhs => rw [pi_eq_sum_univ' (t z)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul]
+
+    simp only [map_sum, map_smul]
   rw [e]
   refine tendsto_finsetSum _ fun i _ => ?_
   have h1 : ContinuousAt (fun z => L.B z c' (Pi.single i 1)) 0 :=

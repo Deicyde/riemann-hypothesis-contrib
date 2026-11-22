@@ -32,7 +32,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped ComplexConjugate TensorProduct
 open Matrix
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.halfPoint_mem_sum_translate_of_annihilator : All fun {D} _ _ _ {G} W _ => ∀ i, i < D.R.m → ∀ e : AE D, IsIdemSum e G.pl.W0 →
     ∀ g : GA D (G.V (.core i)), ∀ Z : WO (G.pS (.core i)) (G.pT (.core i)), IsHalf e Z →
     (∀ y : WO (G.pS (.core i)) (G.pT (.core i)), IsHalf (cA D e) y →

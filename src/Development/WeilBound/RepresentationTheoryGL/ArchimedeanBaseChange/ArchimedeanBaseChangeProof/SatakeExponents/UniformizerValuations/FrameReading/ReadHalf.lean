@@ -15,7 +15,7 @@ open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.R
 open PositivityTheory.Rg.BcN.F2 PositivityTheory.Rg.Bc.ArchbcB.B
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace PositivityTheory.Rg.BcB.F
 
@@ -39,7 +39,7 @@ theorem chi_pin (gen : Γ → Prod' H d) (a₀ : Γ) (v : EuclideanSpace ℂ (Fi
 end Pin
 
 
-set_option maxHeartbeats 2000000 in
+
 def BlockCand : Prop := ∀ (hR : Rd.ReadLimit) (hD : DiagAlg) (E : Type) [Field E] [NumberField E] [IsCMField E], GlobalTheory.BCT.Unr E →
   ∀ n : ℕ, 1 ≤ n → ∀ (π : Submodule ℂ (UA E n → ℂ)), IsAutRepU π → ∀ (S T : Finset (Pl E)) (F₀ : Frame0 hR π S)
     (F : RunFrame F₀ T) (h : F.Struct),
@@ -57,7 +57,7 @@ theorem gRead_mono {ι : Type} [Fintype ι] [Nonempty ι] {H : ι → Type} [∀
     (v : EuclideanSpace ℂ (Fin d)) {P Q : Prop} (hPQ : P → Q) (h : GRead gen β m v P) : GRead gen β m v Q :=
   fun s χ h1 h2 h3 => hPQ (h s χ h1 h2 h3)
 
-set_option maxHeartbeats 2000000 in
+
 theorem frameRead_of (h1 : BlockCand) (h2 : CandTOut) : FrameRead := by
   intro hR hD E _ _ _ hE n hn π hπ S T F₀ F h
   refine gRead_mono _ _ _ _ ?_ (h1 hR hD E hE n hn π hπ S T F₀ F h)

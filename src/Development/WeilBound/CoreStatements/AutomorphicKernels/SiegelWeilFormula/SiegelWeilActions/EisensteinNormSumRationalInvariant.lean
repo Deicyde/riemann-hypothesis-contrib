@@ -194,10 +194,10 @@ theorem sM_rat {b : Fin L.n → AE F E} (hb : b ∈ L.ratV) : sM R L b ∈ rat2 
   rw [inFrame_sM']
   ext r c
   rcases r with i | i <;> rcases c with j | j <;>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [bMat, incM, Matrix.map_apply, sB, Matrix.sum_apply, Matrix.add_apply, Matrix.single_apply, Matrix.one_apply,
-      map_sum, apply_ite (inclR (F := F) (E := E) (AF F)), GlobalTheory.ThK.incV, hc, eA, map_neg, map_mul,
-      map_intCast]
+
+    simp [bMat, incM, Matrix.map_apply, sB, Matrix.sum_apply, Matrix.add_apply, Matrix.single_apply, Matrix.one_apply,
+    map_sum, apply_ite (inclR (F := F) (E := E) (AF F)), GlobalTheory.ThK.incV, hc, eA, map_neg, map_mul,
+    map_intCast]
 
 theorem cM_rat (h : Hyp L nb uM nb' w₁ cM δ) {c : (Fin L.n → AE F E) × AF F} (hu : c.1 ∈ L.ratV)
     (ha : c.2 ∈ (algebraMap F (AF F)).range) : cM c ∈ rat2 σ d.Y := by
@@ -212,10 +212,10 @@ theorem cM_rat (h : Hyp L nb uM nb' w₁ cM δ) {c : (Fin L.n → AE F E) × AF 
   rw [inFrame_cM h]
   ext r c
   rcases r with i | i <;> rcases c with j | j <;>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [uA, aB, incM, Matrix.map_apply, Matrix.sum_apply, Matrix.add_apply, Matrix.single_apply, Matrix.one_apply,
-      Matrix.transpose_apply, map_sum, apply_ite (inclR (F := F) (E := E) (AF F)), apply_ite (cA σ), apply_ite (⇑σ), GlobalTheory.ThK.incV,
-      hc, map_neg, inclR_smul]
+
+    simp [uA, aB, incM, Matrix.map_apply, Matrix.sum_apply, Matrix.add_apply, Matrix.single_apply, Matrix.one_apply,
+    Matrix.transpose_apply, map_sum, apply_ite (inclR (F := F) (E := E) (AF F)), apply_ite (cA σ), apply_ite (⇑σ), GlobalTheory.ThK.incV,
+    hc, map_neg, inclR_smul]
 
 theorem eisenstein_rational_invariant {s₁ : ℂ} {f : d.G → ℂ} (hf : IsSec d.K d.χ s₁ f) (z : ℂ) {r : d.G} (hr : r ∈ rat2 σ d.Y)
     (hx : ∀ k, inFrame d.b r k (Sum.inl L.i₀) = (1 : Matrix (Fin d.n ⊕ Fin d.n) (Fin d.n ⊕ Fin d.n) (AE F E)) k (Sum.inl L.i₀))

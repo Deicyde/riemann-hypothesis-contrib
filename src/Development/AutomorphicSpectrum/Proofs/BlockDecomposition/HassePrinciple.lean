@@ -37,9 +37,9 @@ theorem hasse : Hasse := by
     rw [hΦ, hc] at h1
     let w : Fin 2 → ℂ := fun i => Φ (Y 0 i)
     have key : Φ (hR (Ainf F) σ J (Y 0) (Y 0)) = star w ⬝ᵥ (J.map τ *ᵥ w) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hR, hform, JR, map_sum, map_mul, hΦσ, Matrix.map_apply, hΦ, dotProduct, Matrix.mulVec,
-        Pi.star_apply, Finset.mul_sum, w, mul_assoc]
+
+      simp only [hR, hform, JR, map_sum, map_mul, hΦσ, Matrix.map_apply, hΦ, dotProduct, Matrix.mulVec,
+      Pi.star_apply, Finset.mul_sum, w, mul_assoc]
     have h2 := hw w
     rw [← key, h1, Complex.ofReal_re] at h2
     exact absurd (mul_self_pos.2 hc0) (not_lt.2 h2)

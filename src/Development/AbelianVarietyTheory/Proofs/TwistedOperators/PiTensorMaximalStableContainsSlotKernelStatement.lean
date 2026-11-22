@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SimpleOve
 
 open scoped TensorProduct
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.piTensor_maximalStable_contains_positionKernel : ∀ {ι : Type} [DecidableEq ι] {M₀ : Type} [AddCommGroup M₀] [Module ℂ M₀]
     {M : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)]
     (Op₀ : Set (Module.End ℂ M₀)) (Op : ∀ i, Set (Module.End ℂ (M i))) (i : ι)

@@ -64,10 +64,10 @@ def avgK (K : Type) [Field K] {G : Type} [Group G] [Fintype G] (g : G) : MonoidA
 theorem avgK_coeff {K : Type} [Field K] {G H : Type} [Group G] [Fintype G] [Group H] [Fintype H] (σ : K →+* ℂ) (e : G ≃* H)
     (g y : G) : σ ((avgK K g).coeff y) = (avgC (e g)).coeff (e y) := by
   simp only [avgK, avgC, MonoidAlgebra.of_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [MonoidAlgebra.coeff_smul, MonoidAlgebra.coeff_sum, MonoidAlgebra.coeff_single,
-    Finsupp.smul_apply, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.single_apply, smul_eq_mul, map_mul, map_inv₀,
-    map_natCast, map_sum, apply_ite, map_one, map_zero]
+
+  simp only [MonoidAlgebra.coeff_smul, MonoidAlgebra.coeff_sum, MonoidAlgebra.coeff_single,
+  Finsupp.smul_apply, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.single_apply, smul_eq_mul, map_mul, map_inv₀,
+  map_natCast, map_sum, apply_ite, map_one, map_zero]
   rw [Fintype.card_congr e.toEquiv]
   congr 1
   refine Fintype.sum_equiv e.toEquiv _ _ fun h => ?_
@@ -90,8 +90,8 @@ theorem lin_center {G W : Type} [Group G] [Fintype G] [AddCommGroup W] [Module �
     simp only [SetLike.val_smul]
     exact center_eq_sum _ z.2
   conv_lhs => rw [hz]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [map_smul, h, Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun g₀ _ => ?_
@@ -174,7 +174,7 @@ def FrameAt (k : Fin D.R.m) (P : principalLevelFrame.RowPsi (Vc D k) D.R.nV) (s 
       Lev.levChi (Vc D k) (R.βV k) (Lev.flagL (R.datVt k s)) (P.ψ (L ((R.eG.trans cG) (c * g * c⁻¹)))) = 1)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem cenLoc_of (M : MtFam D) (ad : MtAd Y M) (h1 : CenRat Y cG) (h2 : ActRead Y)
     (h3 : ∀ (i : D.nd.Loc) (s : T) (k : Fin D.R.m), Y.tup s = D.nd.mu i → FrameAt Y cG k (ad.PV k) s) : CenLoc D M := by
   intro i
@@ -223,8 +223,8 @@ theorem cenLoc_of (M : MtFam D) (ad : MtAd Y M) (h1 : CenRat Y cG) (h2 : ActRead
       rfl
     exact LinearMap.congr_fun hF x
   apply (ad.eW _ hμ k).injective
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ad.read, map_sum]
+
+  rw [ad.read, map_sum]
   let Φ : ↥(Subalgebra.center ℂ (MonoidAlgebra ℂ (G0g D.nd))) →ₗ[ℂ] (R.cV k).W :=
     { toFun := fun z' => adForm Y (Y.tup s) hμ k (D.ntypes.cenMt (Y.tup s) ((k : ℕ) + 1) z' x) ((ad.PV k).ψ g)
       map_add' := fun y y' => by simp only [map_add (f := _), LinearMap.add_apply, Pi.add_apply]

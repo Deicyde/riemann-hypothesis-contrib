@@ -16,6 +16,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.LatPair GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.unitIdealCompletionAtPlace_eq_integralAdelesAtPlace : ∀ (D : D7) (v : Pl D) (a : AE D), a ∈ idV (1 : FI D) v ↔ a ∈ intAt D (· = v) := by
   first | exact @GlobalTheory.SeeSaw.idV_one_eq_intAt | exact GlobalTheory.SeeSaw.idV_one_eq_intAt | (intros; apply GlobalTheory.SeeSaw.idV_one_eq_intAt <;> assumption)

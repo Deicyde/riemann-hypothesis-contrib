@@ -69,8 +69,8 @@ theorem jSub_stable {ι : Type*} (σ : O →+* Module.End k H) (χ : ι → C �
   | mem z hz =>
     obtain ⟨r, lam, c, y, hy, hc, rfl⟩ := hz
     refine Submodule.subset_span ⟨r, lam, c, σ a y, hX a y hy, hc, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [map_smul, ← mul_apply_eq_comp, ← mul_apply_eq_comp, ← map_mul, ← map_mul, Algebra.commutes]
   | zero => simp

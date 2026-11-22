@@ -84,9 +84,9 @@ theorem bd_supp (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End ℂ V)
 
 theorem lift_adL (φ : V →ₗ[ℂ] W) (p q : Fin n) (x : Cn n V) :
     lift n φ (adL p q x) = adL p q (lift n φ x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [adL, LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply, map_sum, map_smul, lift_cre,
-    lift_ann]
+
+  simp only [adL, LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply, map_sum, map_smul, lift_cre,
+  lift_ann]
 
 theorem lift_lF (φ : V →ₗ[ℂ] W) (E : Fin n → Fin n → Module.End ℂ V) (F : Fin n → Fin n → Module.End ℂ W)
     (h : ∀ a b x, φ (E a b x) = F a b (φ x)) (p q : Fin n) (x : Cn n V) :
@@ -116,8 +116,8 @@ theorem bd_lift_comm (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End �
     (hT : ∀ i : Pos n, inU lev i → Commute (E i.1.1 i.1.2) T) {x : Cn n V} (hx : SuppIn (inU lev) x) :
     bd (allT n) E (lift n T x) = lift n T (bd (allT n) E x) := by
   funext A
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [lift_apply, bd_apply, bd_apply, map_add (f := _), map_sum, map_sum]
+
+  rw [lift_apply, bd_apply, bd_apply, map_add (f := _), map_sum, map_sum]
   congr 1
   · refine Finset.sum_congr rfl fun i _ => ?_
     rw [if_pos rfl, if_pos rfl]
@@ -132,11 +132,11 @@ theorem bd_lift_comm (lev : Fin n → ℕ) (E : Fin n → Fin n → Module.End �
         rw [show ann i (lift n T x) A = T (ann i x A) from congrFun (lift_ann T i x).symm A, e, map_zero]
       rw [e, e', map_zero, map_zero]
   · refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     split_ifs
     · rw [← lift_ann, ← lift_ann, ← lift_cre]; rfl

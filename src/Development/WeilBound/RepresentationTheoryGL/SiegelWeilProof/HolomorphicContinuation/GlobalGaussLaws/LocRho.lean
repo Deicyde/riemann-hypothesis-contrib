@@ -15,8 +15,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace PositivityTheory.Rg.Sw.Glob
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 8000000
+
+
 
 open RhoH in
 theorem lIrho : LIrho := by

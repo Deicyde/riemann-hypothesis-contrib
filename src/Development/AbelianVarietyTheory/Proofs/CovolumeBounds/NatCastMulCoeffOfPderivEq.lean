@@ -27,8 +27,8 @@ theorem subst_neg' {a : σ → MvPowerSeries τ S} (ha : HasSubst a) (f : MvPowe
 
 theorem subst_sum' {κ : Type*} {a : σ → MvPowerSeries τ S} (ha : HasSubst a) (s : Finset κ)
     (f : κ → MvPowerSeries σ R) : subst a (∑ k ∈ s, f k) = ∑ k ∈ s, subst a (f k) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← substAlgHom_apply ha, map_sum]
+
+  rw [← substAlgHom_apply ha, map_sum]
   simp only [substAlgHom_apply]
 
 theorem subst_C' {a : σ → MvPowerSeries τ S} (ha : HasSubst a) (r : R) :

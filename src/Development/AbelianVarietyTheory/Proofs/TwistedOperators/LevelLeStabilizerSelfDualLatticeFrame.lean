@@ -19,8 +19,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.AdelicScalar
 open Formalism.L2.DIV (kP Pl LevelP)
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 noncomputable section
 
 namespace GlobalTheory.LevelInLatStab

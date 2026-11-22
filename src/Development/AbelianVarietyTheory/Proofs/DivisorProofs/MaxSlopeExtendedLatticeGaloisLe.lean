@@ -109,12 +109,12 @@ theorem exists_dual : ∃ (n : ℕ) (a : Fin n → 𝓞 K') (f : Fin n → K' �
   refine ⟨n, fun i => p (Pi.single i 1), f, fun i r => ⟨_, hf i r⟩, fun r => ?_⟩
   have h1 : r = ∑ i, s r i • p (Pi.single i 1) := by
     conv_lhs => rw [← LinearMap.id_apply (R := 𝓞 K) r, ← hps, LinearMap.comp_apply, pi_eq_sum_univ' (s r)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum]
+
+    simp [map_sum]
   conv_rhs => rw [h1]
   simp only [hf]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [RingOfIntegers.coe_eq_algebraMap, map_sum]
+
+  rw [RingOfIntegers.coe_eq_algebraMap, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Algebra.smul_def, map_mul, mul_comm]
   rfl
@@ -127,8 +127,8 @@ variable {K K' V V' : Type} [Field K] [Field K'] [Algebra K K'] [AddCommGroup V]
   [AddCommGroup V'] [Module K' V'] {n : ℕ} (b : Basis (Fin n) K V) (ι : V →ₛₗ[algebraMap K K'] V')
 
 theorem map_eq_sum (v : V) : ι v = ∑ k, algebraMap K K' (b.repr v k) • ι (b k) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [← b.sum_repr v, map_sum]
+
+  conv_lhs => rw [← b.sum_repr v, map_sum]
   simp only [map_smulₛₗ]
 
 theorem exists_coord (h : LinearIndependent K' fun k => ι (b k)) :
@@ -153,8 +153,8 @@ theorem tw_apply (φ : K' →ₗ[K] K') (x : V') : tw b ι c φ x = ∑ k, φ (c
 
 theorem map_dn (f : K' →ₗ[K] K) (x : V') : ι (dn b c f x) = tw b ι c (Algebra.linearMap K K' ∘ₗ f) x := by
   show ι (∑ k, f (c x k) • b k) = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, tw_apply]
+
+  rw [map_sum, tw_apply]
   simp only [map_smulₛₗ]
   rfl
 
@@ -277,8 +277,8 @@ theorem cnorm_cols (hG' : IsGram b' X' N') (φ : V →ₛₗ[algebraMap K K'] V'
     Formalism.HermitianLatticesTheory.cnorm (cols b' X' w (fun k => φ (e k)) *ᵥ fun k => w.embedding (algebraMap K K' (x k))) =
       N (w.embedding.comp (algebraMap K K')) (∑ k, x k • e k) := by
   have h := ht w.embedding (∑ k, x k • e k)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← (hG' w).2, map_sum] at h
+
+  rw [← (hG' w).2, map_sum] at h
   simp only [map_smulₛₗ] at h
   rw [normAt_sum] at h
   exact h
@@ -404,8 +404,8 @@ theorem slope_sq_span_le {K K' V V' : Type} [Field K] [NumberField K] [_root_.Nu
       refine le_antisymm (Submodule.span_le.2 ?_) (Submodule.span_mono ?_)
       · rintro _ ⟨x, hx, rfl⟩
         obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 (hsp ▸ Submodule.subset_span hx)
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         exact Submodule.sum_mem _ fun k _ => by
           rw [map_smulₛₗ]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
       · rintro _ ⟨k, rfl⟩; exact ⟨e k, heL k, rfl⟩

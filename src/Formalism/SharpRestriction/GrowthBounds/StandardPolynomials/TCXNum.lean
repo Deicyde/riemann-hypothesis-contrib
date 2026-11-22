@@ -5,7 +5,7 @@ public import Formalism.SharpRestriction.GrowthBounds.CoarseMultiplicity.PolyUpp
 
 @[expose] public section
 
-set_option maxHeartbeats 4000000
+
 
 noncomputable section
 

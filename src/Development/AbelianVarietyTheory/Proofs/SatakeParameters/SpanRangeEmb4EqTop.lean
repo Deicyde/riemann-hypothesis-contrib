@@ -303,8 +303,8 @@ theorem isoK_hermitian_sum_eq_emb4_hermitian_sum (γ : IsoK D) (x y : Fin 4 → 
   calc ∑ w, D.host.φ₀ ((γ.g x w : D.host.K) : D.host.E) * conj (D.host.φ₀ ((γ.g y w : D.host.K) : D.host.E))
       = D.host.φ₀ (∑ w, algebraMap D.host.K D.host.E (γ.g x w)
           * D.host.conj (algebraMap D.host.K D.host.E (γ.g y w))) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]; refine Finset.sum_congr rfl fun w _ => ?_
+
+        rw [map_sum]; refine Finset.sum_congr rfl fun w _ => ?_
         rw [map_mul, CU.emb_conj]; rfl
     _ = D.host.φ₀ (algebraMap D.host.K D.host.E
           (∑ a, Algebra.trace D.host.K D.host.E (x a * D.host.conj (y a)))) := by rw [γ.isom]
@@ -429,8 +429,8 @@ theorem denom (E K : Type*) [Field E] [NumberField E] [Field K] [NumberField K] 
   have hx : (x : E) = ∑ j, (bs.repr x j) • ((bs j : 𝓞 E) : E) := by
     conv_lhs => rw [← bs.sum_repr x]
     simp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hx, map_sum, Finset.mul_sum]
+
+  rw [hx, map_sum, Finset.mul_sum]
   refine IsIntegral.sum _ fun j _ => ?_
   rw [map_zsmul, mul_smul_comm]
   exact (h _ (Finset.mem_image.2 ⟨(i, j), Finset.mem_univ _, rfl⟩)).zsmul _
@@ -642,8 +642,8 @@ theorem up : ∃ N : ℕ, 0 < N ∧
       have e : ((m * k : ℕ) : D.host.K) * B.γ₀.g y v
           = ∑ a, (m : D.host.K) * f (a, v) ((k : D.host.E) * y a) := by
         conv_lhs => rw [hy']
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, Finset.sum_apply, Finset.mul_sum]
+
+        rw [map_sum, Finset.sum_apply, Finset.mul_sum]
         refine Finset.sum_congr rfl fun a _ => ?_
         show ((m * k : ℕ) : D.host.K) * B.γ₀.g (Pi.single a (y a)) v
           = (m : D.host.K) * B.γ₀.g (Pi.single a ((k : D.host.E) * y a)) v

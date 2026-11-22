@@ -326,7 +326,7 @@ private theorem pa_part {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Alge
     exact finsum_induction (p := fun φ : Module.End ℂ (Fin H.m → H.X.Fn ℂ d) => φ F ∈ Y.Y) (zero_mem _)
       (fun _ _ => add_mem) fun q => h1 _ F hF
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Hi.partAct0 :
     GlobalTheory.Mem.LiteralAutomorphy.LitN → ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (n : ℕ) (c : Coef l) (H : HSet L Ω l n c), H.Ax →
     ∀ (A : Type) [CommRing A] [Algebra c.O A] [Alg.IsCO c.O A] (θ : H.X.I.T →* Aˣ), H.IsWt θ →

@@ -60,8 +60,8 @@ theorem bnd_linear (T : MvPolynomial σ ℚ_[p] →ₗ[ℚ_[p]] MvPolynomial σ 
 
   have e : T u = ∑ v ∈ u.support, u.coeff v • T (monomial v 1) := by
     conv_lhs => rw [u.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun v _ => ?_
     rw [← map_smul, MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
   rw [e]
@@ -249,7 +249,7 @@ end
 open MvPolynomial Finset
 
 
-set_option maxHeartbeats 800000 in
+
 theorem phi_integrality : PhiInt := by
 
   intro p hp σ r w e hw he hwe hr o n z u hu

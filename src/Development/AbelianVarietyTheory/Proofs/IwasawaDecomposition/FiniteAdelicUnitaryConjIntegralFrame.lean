@@ -16,7 +16,7 @@ open GlobalTheory.Mem.R3.LiftBrg
 
 noncomputable section
 
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.Mem.R3.LiftBrg.FrameEquiv
 

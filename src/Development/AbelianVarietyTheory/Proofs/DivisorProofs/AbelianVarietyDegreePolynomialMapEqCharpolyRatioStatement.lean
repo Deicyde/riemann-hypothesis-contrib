@@ -11,7 +11,7 @@ open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.abelianVariety_degreePolynomial_map_eq_charpoly_rationalTate :
     ∀ (K : Type) [Field K] (l : ℕ) [Fact l.Prime], (l : K) ≠ 0 →
       ∀ (A : AbVar K) [Module.Finite ℚ_[l] (Vl l A)] (f : End A) (P : Polynomial ℚ),
@@ -36,8 +36,8 @@ theorem _root_.GlobalTheory.T.abelianVariety_degreePolynomial_map_eq_charpoly_ra
       rw [hΦe m]
       have hz (k : ℤ) (g : End A) : (k • g).asHom = k • g.asHom :=
         map_zsmul (End.addEquiv (X := A)) k g
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [δ, map_sum, map_zsmul, End.sum_asHom, hz]
+
+      simp only [δ, map_sum, map_zsmul, End.sum_asHom, hz]
     have hPn : ∀ n : ℤ, P.eval (n : ℚ) = δ (Polynomial.C n - Polynomial.X) := by
       intro n
       rw [hP n]

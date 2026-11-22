@@ -44,8 +44,8 @@ theorem frame_expand {σ : E →+* K} {m j k : ℕ}
   refine ⟨bW.repr w, x' - ∑ b, bW.repr w b • x'' b, ?_⟩
   have hiw : i w = ∑ b, bW.repr w b • i (bW b) := by
     conv_lhs => rw [← bW.sum_repr w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul]
   have hcolL : ∀ b, i (bW b) = (fun l => g l (Sum.inl b)) - ((p : A) ^ m) • x'' b := fun b => by
     rw [hx'' b]

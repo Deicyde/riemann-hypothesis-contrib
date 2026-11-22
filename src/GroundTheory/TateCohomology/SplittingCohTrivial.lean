@@ -120,17 +120,17 @@ noncomputable def subgroupNormElt : MonoidAlgebra ℤ G :=
 omit [Fintype G] in
 theorem ρ_subgroupNormElt (s : S) :
     (Rep.leftRegular ℤ G).ρ (s : G) (subgroupNormElt S) = subgroupNormElt S := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [subgroupNormElt, map_sum, Representation.ofMulAction_single, smul_eq_mul]
+
+  simp only [subgroupNormElt, map_sum, Representation.ofMulAction_single, smul_eq_mul]
   exact Fintype.sum_equiv (Equiv.mulLeft s) _ _ (fun t => rfl)
 
 
 omit [Fintype G] in
 theorem augmentation_subgroupNormElt :
     augmentation ℤ G (subgroupNormElt S) = (Fintype.card S : ℤ) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [subgroupNormElt, map_sum,
-    Finset.sum_congr rfl (fun (x : S) _ => augmentation_single (k := ℤ) (x : G) (1 : ℤ))]
+
+  rw [subgroupNormElt, map_sum,
+  Finset.sum_congr rfl (fun (x : S) _ => augmentation_single (k := ℤ) (x : G) (1 : ℤ))]
   simp
 
 theorem card_smul_augClass : (Fintype.card S : ℤ) • augClass S = 0 := by

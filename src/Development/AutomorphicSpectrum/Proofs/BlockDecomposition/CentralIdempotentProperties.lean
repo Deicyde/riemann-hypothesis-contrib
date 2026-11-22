@@ -66,8 +66,8 @@ theorem zIdemFacts : ReciprocityTheory.Ty.Fin.St.ZIdemFacts := by
       · subst hi
         rw [if_pos ⟨e.symm⟩, if_pos rfl]
       · rw [if_neg (fun ⟨f⟩ => hi (hinj _ _ ⟨f ≪≫ e⟩)), if_neg hi]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_one, Finset.sum_congr rfl fun i _ => hact i]
+
+    rw [map_sum, map_one, Finset.sum_congr rfl fun i _ => hact i]
     simp
 
 end GlobalTheory.CompanionTheory.TyFin

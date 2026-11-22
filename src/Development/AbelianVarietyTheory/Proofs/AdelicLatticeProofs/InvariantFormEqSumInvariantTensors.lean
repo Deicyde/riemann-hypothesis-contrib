@@ -65,14 +65,14 @@ theorem invariant_form_eq_sum_invariant_tensors : ∀ (ι : Type) [Fintype ι] [
     rintro _ ⟨g, hg, rfl⟩
     exact (hinv Γ F).1 hF g hg
   have hF' : F = ∑ b, p b (R₁ (l b)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hRF, hl, map_sum]
+
+    rw [← hRF, hl, map_sum]
     exact Finset.sum_congr rfl fun b _ => hb b _
   refine ⟨fun b => R₁ (l b), fun b g hg => hfix _ g hg, fun y => ?_⟩
   rw [hF']
   simp only [← hpev]
   unfold evC
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
 
 end GlobalTheory.ClassFin

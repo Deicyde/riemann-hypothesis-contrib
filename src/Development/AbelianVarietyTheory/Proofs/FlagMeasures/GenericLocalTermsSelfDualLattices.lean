@@ -164,14 +164,14 @@ theorem generic_terms : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSp
         obtain ⟨α, hα⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 hx'
         have hxα : x = ∑ i, α i • c.grp n0 (S.f i) := by
           have := congrArg (c.grp n0) hα
-          set_option synthInstance.maxHeartbeats 100000 in
-            simpa [map_sum, map_smul] using this.symm
+
+          simpa [map_sum, map_smul] using this.symm
         obtain ⟨y, rfl⟩ := c.e.surjective x
         have hy : y ∈ Λ := (CoordTerm.mem_lat c Λ y).1 hx
         have hyα : y = ∑ i, α i • t.f i := by
           apply c.e.injective
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [hxα, map_sum]
+
+          rw [hxα, map_sum]
           simp only [map_smul, hNf]
           rfl
         have hyE : y ∈ Submodule.span E (Set.range (H.MMfam t)) := by
@@ -203,14 +203,14 @@ theorem generic_terms : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSp
         obtain ⟨α, hα⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 hx'
         have hxα : x = ∑ i, α i • c.grp n0' (S.f' i) := by
           have := congrArg (c.grp n0') hα
-          set_option synthInstance.maxHeartbeats 100000 in
-            simpa [map_sum, map_smul] using this.symm
+
+          simpa [map_sum, map_smul] using this.symm
         obtain ⟨y, rfl⟩ := c.e.surjective x
         have hy : y ∈ Λ := (CoordTerm.mem_lat c Λ y).1 hx
         have hyα : y = ∑ i, α i • t.f' i := by
           apply c.e.injective
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [hxα, map_sum]
+
+          rw [hxα, map_sum]
           simp only [map_smul, hNf']
           rfl
         have hyE : y ∈ Submodule.span E (Set.range (H.MMfam t)) := by

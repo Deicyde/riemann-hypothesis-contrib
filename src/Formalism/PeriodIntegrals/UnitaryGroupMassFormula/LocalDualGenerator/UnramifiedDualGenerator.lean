@@ -125,10 +125,10 @@ theorem trace_eq (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible
     (x : 𝒪[K]) : Algebra.trace ℚ_[l] K (x : K) =
       ((∑ i, coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) := by
   rw [Algebra.trace_eq_matrix_trace (B K l hcont huni), Matrix.trace]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show ((∑ i, coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) =
-      ∑ i, ((coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) from
-    map_sum PadicInt.Coe.ringHom _ _]
+
+  rw [show ((∑ i, coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) =
+    ∑ i, ((coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) from
+  map_sum PadicInt.Coe.ringHom _ _]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [Matrix.diag, Algebra.leftMulMatrix_eq_repr_mul, B_apply]
   have e : (x : K) * (blift K l i : K) = ((x * blift K l i : 𝒪[K]) : K) := rfl
@@ -137,8 +137,8 @@ theorem trace_eq (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible
 theorem toZMod_trace (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
     (x : 𝒪[K]) : PadicInt.toZMod (∑ i, coef K l hcont huni (x * blift K l i) i) =
       Algebra.trace (ZMod l) 𝓀[K] (residue 𝒪[K] x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Algebra.trace_eq_matrix_trace (bb K l), Matrix.trace, map_sum]
+
+  rw [Algebra.trace_eq_matrix_trace (bb K l), Matrix.trace, map_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [Matrix.diag, Algebra.leftMulMatrix_eq_repr_mul, ← res_blift K l i, ← map_mul, res_coef]
 

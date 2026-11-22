@@ -18,9 +18,9 @@ private theorem split_set_boundary_comp_face_sum (R : Type) [CommRing R] (n p : 
   apply Finsupp.lhom_ext
   intro l a
   have hlen : l.1.length = p + 1 := l.2.2
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_zsmul,
-    Finsupp.lmapDomain_apply, Finsupp.mapDomain_single]
+
+  simp only [LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_zsmul,
+  Finsupp.lmapDomain_apply, Finsupp.mapDomain_single]
   unfold bd
   rw [Finsupp.linearCombination_single, hlen, Finset.smul_sum]
   rw [← Fin.sum_univ_eq_sum_range (fun i => a • ((-1 : ℤ) ^ i • Finsupp.single (l.1.eraseIdx i) (1 : ℤ)))]

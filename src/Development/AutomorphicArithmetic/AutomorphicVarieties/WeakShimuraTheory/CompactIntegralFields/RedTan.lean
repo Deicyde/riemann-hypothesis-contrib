@@ -55,7 +55,7 @@ private theorem rel_ps {k : Type} [Field k] (b : k) {Z : M4 k} (hZ : Z ∈ sp4 k
   refine ⟨by linear_combination h1, by linear_combination h2 - b * s1 + 2 * b * h1, by linear_combination h3 - b * s2⟩
 
 set_option synthInstance.maxSize 4000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
 private theorem keyB : ∀ S ∈ redTypes, (-wAl ∈ S ∨ (wBe ∈ S ∧ -wTh ∈ S)) → ∃ i₀ j₀ : Fin 4, wt i₀ j₀ ∈ oddRoots ∧
       ((i₀ = 1 ∧ j₀ = 2 ∨ wt 1 2 ∉ S) ∨ wt 1 0 ∉ S ∨ wt 3 0 ∉ S) ∧
       (((i₀ = 0 ∧ j₀ = 1 ∨ wt 0 1 ∉ S) ∧ (i₀ = 0 ∧ j₀ = 3 ∨ wt 0 3 ∉ S)) ∨

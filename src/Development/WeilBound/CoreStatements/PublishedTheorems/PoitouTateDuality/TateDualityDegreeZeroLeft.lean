@@ -15,7 +15,7 @@ namespace PositivityTheory.Lit1.PTN
 
 attribute [local instance 2000] Rep.hV2
 
-set_option maxHeartbeats 2000000 in
+
 theorem tate_duality_degree_zero_left (Kf : FiniteSubfield) [NumberField Kf.1]
     [IsAlgClosure Kf.1 (AlgebraicClosure ℚ)] (S : Finset (HeightOneSpectrum (𝓞 Kf.1))) {l r : ℕ}
     [Fact l.Prime] (ζ : AlgebraicClosure ℚ) (Av : S → ValuationSubring (AlgebraicClosure ℚ))

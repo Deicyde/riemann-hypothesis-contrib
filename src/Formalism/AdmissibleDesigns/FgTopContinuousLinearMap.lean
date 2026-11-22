@@ -100,8 +100,8 @@ theorem matK_mulVec_alg (A : Matrix n n O) (y : n → O) :
     matK A *ᵥ (fun a => algebraMap O (FractionRing O) (y a)) =
       fun a => algebraMap O (FractionRing O) ((A *ᵥ y) a) := by
   funext a
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [matK, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
+
+  simp only [matK, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
 
 variable {Γ : Type} [Group Γ]
 
@@ -233,8 +233,8 @@ def vMap : (n → O) →ₗ[O] dualLat (pairStd (O := O) (n := n)) latT where
     intro x hx
     obtain ⟨z, rfl⟩ := (mem_latT x).1 hx
     refine Submodule.mem_one.2 ⟨∑ a, z a * y a, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [pairStd_apply, dotProduct, map_sum, map_mul]⟩
+
+    simp [pairStd_apply, dotProduct, map_sum, map_mul]⟩
   map_add' y y' := Subtype.ext (funext fun a => by simp)
   map_smul' c y := Subtype.ext (funext fun a => by simp [Algebra.smul_def])
 
@@ -293,8 +293,8 @@ theorem gamStd_eq (t : n → O) (m : n → KO O) :
   rw [uStd_mk, gamStd_apply]
   simp only [pairKO, Submodule.liftQ_apply, LinearMap.compr₂_apply, LinearMap.compl₂_apply,
     Submodule.subtype_apply, pairStd_apply, dotProduct, vStd_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [← map_smul, Algebra.smul_def, mul_comm]
 

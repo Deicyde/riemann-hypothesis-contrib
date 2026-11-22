@@ -93,9 +93,9 @@ theorem goodProjW_eq_sum (j : ℕ) (eC : G0g D.nd → ↥D.LL0)
 theorem inForms_goodProjector (j : ℕ) (hst : RhoStab S j) (hχ : ChiInLL0 S j) (eC : G0g D.nd → ↥D.LL0)
     (s : Finset (G0g D.nd)) (hs : ∀ g, g ∉ s → eC g = 0) (z : ↥D.LL0 ⊗[S.Ks] FmK S j) :
     inWL S j (goodProjectorBaseChangeForms S j hst hχ eC z) = goodProjW S j eC (inWL S j z) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [goodProjector_eq_sum S j hst hχ eC s hs, goodProjW_eq_sum S j eC s hs, LinearMap.sum_apply, map_sum,
-    LinearMap.sum_apply]
+
+  rw [goodProjector_eq_sum S j hst hχ eC s hs, goodProjW_eq_sum S j eC s hs, LinearMap.sum_apply, map_sum,
+  LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [LinearMap.smul_apply, inWL_smul, LinearMap.smul_apply]
   have h := inWL_opK S j ((S.A j).ρ (S.eG.symm g)) (fun x hx => hst (S.eG.symm g) x hx) z
@@ -119,8 +119,8 @@ end GlobalTheory.GoodSS.Heart
 namespace GlobalTheory.GoodSS.Heart
 
 
-set_option maxHeartbeats 1600000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem hL_separable_good : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
     {A3 : Formalism.L2.DIV.FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
     [Algebra Ks D.what₂.LL] (Rl : Formalism.IndefR.Links.RealDat3 D A3 Ks) (F : Formalism.IndefR.Links.Face3 D A3)

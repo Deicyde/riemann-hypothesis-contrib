@@ -646,7 +646,7 @@ theorem conj_triv {U : Submodule D.host.E (VS D).V} {l φ : (VS D).V ≃ₗ[D.ho
     exact hφ.2 _ hx
 
 
-set_option maxHeartbeats 400000 in
+
 theorem pair_step (hK : IotaKer) {s₁ s₂ t₁ t₂ : TT Y u u'} (h1 : s₁.toTerm = t₁.toTerm) (h2 : s₂.toTerm = t₂.toTerm)
     (hr : rowOf Y.TR (Y.cs u) (Y.cs u') s₁ = rowOf Y.TR (Y.cs u) (Y.cs u') s₂)
     (hr' : rowOf Y.TR (Y.cs u) (Y.cs u') t₁ = rowOf Y.TR (Y.cs u) (Y.cs u') t₂) :

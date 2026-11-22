@@ -32,8 +32,8 @@ theorem mvPowerSeries_algHom_kill_high_order :
     fun i α => rfl
   have hsum : f = ∑ i, fi i := by
     ext α
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [hcoeff]
     by_cases h : ∃ j, M ≤ α j
     · simp only [dif_pos h]
@@ -55,8 +55,8 @@ theorem mvPowerSeries_algHom_kill_high_order :
     · exact absurd (h'.symm ▸ h.choose_spec) (not_le.mpr hα)
     · rfl
     · rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, map_sum]
+
+  rw [hsum, map_sum]
   refine Finset.sum_eq_zero fun i _ => ?_
   obtain ⟨g, hg⟩ := hdvd i
   rw [hg, map_mul, map_pow, hM i, zero_mul]

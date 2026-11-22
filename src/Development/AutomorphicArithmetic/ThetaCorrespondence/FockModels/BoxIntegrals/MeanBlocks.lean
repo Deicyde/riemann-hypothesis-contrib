@@ -129,8 +129,8 @@ end GlobalTheory.CompanionTheory.PcFc.MeanBlocks
 
 open scoped Pointwise in
 open GlobalTheory.CompanionTheory.PcFc.MeanBlocks in
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem GlobalTheory.CompanionTheory.PcFc.mean_blocks : ∀ {D : D7} {n ρ p : ℕ} (hn : ρ + p = n) (m : Meas D ρ p) {lam : Measure (hermA D n)} {𝓖 : Set (hermA D n)}, IsCovolOneH lam 𝓖 → ∀ {lp : Measure (hermA D p)} {𝓖p : Set (hermA D p)}, IsCovolOneH lp 𝓖p → ∀ Φ : hermA D n → ℂ, Continuous Φ → IsPer Φ → ∫ b in 𝓖, Φ b ∂lam = ∫ y in 𝓖p, ∫ x in m.𝓕, ∫ z in m.𝓖, Φ (bT hn z x y) ∂m.lz ∂m.μ ∂lp := by
   intro D n ρ p hn m lam 𝓖 hl lp 𝓖p hp Φ hΦ hper
   obtain ⟨hl1, hl2, hl3⟩ := hl

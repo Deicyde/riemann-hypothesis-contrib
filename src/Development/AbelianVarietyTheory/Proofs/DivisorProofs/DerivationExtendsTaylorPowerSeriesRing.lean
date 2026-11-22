@@ -32,8 +32,8 @@ theorem add_sum_apply {σ R ι : Type} [CommRing R] [Fintype ι] (E : Derivation
     (F : MvPowerSeries σ R) : (E + ∑ j, G j • P j) F = E F + ∑ j, G j * P j F := by
   rw [Derivation.add_apply]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Derivation.coeFnAddMonoidHom_apply, map_sum, Finset.sum_apply]
+
+  rw [← Derivation.coeFnAddMonoidHom_apply, map_sum, Finset.sum_apply]
   change ∑ j, (G j • P j) F = ∑ j, G j * P j F
   simp [Derivation.smul_apply, smul_eq_mul]
 

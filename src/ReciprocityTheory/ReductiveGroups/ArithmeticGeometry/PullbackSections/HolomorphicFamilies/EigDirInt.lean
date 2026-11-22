@@ -18,7 +18,7 @@ attribute [local instance] Over.cartesianMonoidalCategory
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)]
 
-set_option maxHeartbeats 1000000 in
+
 open ReciprocityTheory.ChartRestriction.G.Chart (tcoord tan_ext prodPts prodPts_tan) in
 theorem eigDir_int (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C : IntegralChartA3 Xo c T io y)
     (ℓ : Lt1 Dw) (a : 𝓞 E) (z : T.V) (hz : algebraMap T.V T.Fr z = io (embK c ℓ.1 a)) :

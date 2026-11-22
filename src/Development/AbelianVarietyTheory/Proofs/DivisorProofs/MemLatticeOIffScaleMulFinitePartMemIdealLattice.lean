@@ -32,7 +32,7 @@ namespace GlobalTheory.SplitLatDict
 open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 section SlopeTestRemainingChoices
 
@@ -282,7 +282,7 @@ theorem fwd {cc : Ideal (𝓞 D.host.K)} {r : D.host.E} (hc : cc ≠ ⊥) (hr : 
     exact inc_r_mem_IhE hc hr hsj _ hat
   exact hle hu
 
-set_option maxHeartbeats 400000 in
+
 theorem bwd {cc : Ideal (𝓞 D.host.K)} {r : D.host.E} (hc : cc ≠ ⊥) (hr : IsScale D cc r)
     (S T : HSp D) (hG : S.gram = 1) (u : WO S T) (hinf : u.map (infPart D) = 0)
     (h : ∀ i j, Formalism.MainNotions.StandardLatticesGL3.inc D r * finQ D (u i j) ∈ Formalism.MainNotions.StandardLatticesGL3.IhE D cc) :

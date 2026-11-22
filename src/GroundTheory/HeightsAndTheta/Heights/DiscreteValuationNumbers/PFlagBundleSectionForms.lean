@@ -41,9 +41,9 @@ theorem FlagBundleSectionForms.proof : FlagBundleSectionForms.Statement := by
           simp [truncCoord, this]
       · simp
     rw [← h1, hψ]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [projCoord, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-      map_sum, map_mul, Finset.mul_sum]
+
+    simp only [projCoord, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+    map_sum, map_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun j _ => ?_
     simp only [chartPow, Pi.neg_apply]

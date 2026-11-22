@@ -67,9 +67,9 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.specSum :
     refine LinearMap.ext fun w => ?_
     rw [LinearMap.sum_apply]
     change N (a (Y (Z (s w)))) = ∑ x ∈ sp, ((x : ℂ) * y x) • N (eigP a x (Z (s w)))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [specSum_op a Y y sp ha hc hsp hY, map_sum]
+
+    rw [specSum_op a Y y sp ha hc hsp hY, map_sum]
     simp only [map_smul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [key, map_sum]
+
+  rw [key, map_sum]
   simp only [map_smul, smul_eq_mul]

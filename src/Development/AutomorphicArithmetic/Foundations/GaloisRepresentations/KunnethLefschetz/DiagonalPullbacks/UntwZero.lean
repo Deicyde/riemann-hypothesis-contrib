@@ -102,7 +102,7 @@ theorem Steps.core (H : Steps) (hI : In) (hQ : QDiag) (l : ℕ) [Fact l.Prime] (
   exact H.clear hI l hR d p₁ p₂ π hlX v
     (H.sq hQ l k hl hR d p p₁ p₂ Δ hP h₁ h₂ hp hpr π _ _ _ hpb hi hr U hU _ h0 hPB)
 
-set_option maxHeartbeats 1000000 in
+
 theorem Steps.diagEt2 (H : Steps) (hI : In) (hQ : QDiag) : DiagEt2 := by
   intro l _ K _ M d hd hM hs T r v hv
   obtain ⟨D', τ, L, x, hBC, hL, hx, hvx⟩ := hv

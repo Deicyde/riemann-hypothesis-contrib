@@ -143,8 +143,8 @@ theorem exists_dualBasis (A : Submodule (𝓞 E) V) (hA : A.FG) :
     have h2 : h x = ∑ i, h x i • (Pi.single i 1 : Fin n → 𝓞 E) := by
       funext j; simp [Finset.sum_apply, Pi.single_apply]
     conv_lhs => rw [h1, h2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Submodule.coe_sum]
+
+    rw [map_sum, Submodule.coe_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, Submodule.coe_smul, hσ i x, ← algebraMap_smul E (h x i),
       RingOfIntegers.coe_eq_algebraMap]

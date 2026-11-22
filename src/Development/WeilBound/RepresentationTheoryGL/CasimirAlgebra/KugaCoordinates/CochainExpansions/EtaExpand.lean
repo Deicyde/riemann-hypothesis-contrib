@@ -169,11 +169,11 @@ theorem mm_equiv [_root_.NumberField.IsTotallyComplex E] (lab : Fin q → (E →
     _ = _ := by
         rw [Fintype.sum_prod_type]
         refine Finset.sum_congr rfl fun J1 _ => ?_
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [mm_apply, map_sum, Finset.smul_sum, Fintype.sum_prod_type]
+
+        rw [mm_apply, map_sum, Finset.smul_sum, Fintype.sum_prod_type]
         refine Finset.sum_congr rfl fun B' _ => ?_
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, Finset.smul_sum]
+
+        rw [map_sum, Finset.smul_sum]
         refine Finset.sum_congr rfl fun A' _ => ?_
         rw [map_smul, smul_smul]
 
@@ -182,8 +182,8 @@ theorem om_cochain [_root_.NumberField.IsTotallyComplex E] (lab : Fin q → (E �
     (h2 : ∀ γ, actT (lab3 (barE E) lab tl) (kap E a) ρ γ η = η) :
     IsCochain (actT lab (kap E a) ρ) (om tl η) := by
   intro k X
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [om, MultilinearMap.alternatization_apply, MultilinearMap.alternatization_apply, map_sum]
+
+  rw [om, MultilinearMap.alternatization_apply, MultilinearMap.alternatization_apply, map_sum]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [Units.smul_def, Units.smul_def, map_zsmul, MultilinearMap.domDomCongr_apply, MultilinearMap.domDomCongr_apply]
   congr 1

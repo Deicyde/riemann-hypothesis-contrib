@@ -17,8 +17,8 @@ open GlobalTheory.GoodPos
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.MiTop.Scale
 

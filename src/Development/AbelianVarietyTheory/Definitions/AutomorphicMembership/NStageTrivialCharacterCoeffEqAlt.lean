@@ -54,7 +54,7 @@ def NLay0.ZOk (L : NLay0 R H what₂ LL0) : Prop :=
 def ndZ (N : NData R H what₂) (Z Zg : ∀ i, Finset (N.X i)) : NData R H what₂ := { N with Z := Z, Zgood := Zg }
 
 
-set_option maxHeartbeats 2000000 in
+
 def NLay0.setZ (L : NLay0 R H what₂ LL0) (Z Zg : ∀ i, Finset (L.nd.X i)) : NLay0 R H what₂ LL0 :=
   { loc := L.loc, locA := L.locA, locT := L.locT, nd := ndZ L.nd Z Zg, ntw := { L.ntw with }, naut := { L.naut with }
     nbc := { L.nbc with }, nexp := { L.nexp with }, ntypes := { L.ntypes with }, nStage_trivialCharacter_compat := L.nStage_trivialCharacter_compat, nStage_trivialCharacter_coeff_eq := L.nStage_trivialCharacter_coeff_eq
@@ -68,7 +68,7 @@ def NLay0.fixZ (L : NLay0 R H what₂ LL0) : NLay0 R H what₂ LL0 :=
     (fun i => Finset.univ.filter fun x => x ∈ Formalism.MainNotions.N.ZgoodN L.nd L.naut i)
 
 
-set_option maxHeartbeats 2000000 in
+
 def NLay0.reEta (L : NLay0 R H what₂ LL0) (η : ℕ → what₂.places.Pl → ℚ) (hη : ∀ j w, 0 ≤ η j w) :
     @NLay0 R H (rowsEta what₂ η hη) ‹NumberField what₂.LL› ‹StarRing what₂.LL› LL0 :=
   letI : NumberField (rowsEta what₂ η hη).LL := ‹NumberField what₂.LL›
@@ -95,14 +95,14 @@ theorem NLay0.zOk_fixZ (L : NLay0 R H what₂ LL0) : L.fixZ.ZOk := by
   · exact ((@Finset.mem_filter _ _ (fun _ => Classical.propDecidable _) _ _).trans (and_iff_right (Finset.mem_univ _)))
   · exact ((@Finset.mem_filter _ _ (fun _ => Classical.propDecidable _) _ _).trans (and_iff_right (Finset.mem_univ _)))
 
-set_option maxHeartbeats 1000000 in
+
 theorem NLay0.ZOk.reEta {L : NLay0 R H what₂ LL0} (h : L.ZOk) (η : ℕ → what₂.places.Pl → ℚ) (hη : ∀ j w, 0 ≤ η j w) :
     @NLay0.ZOk R H (rowsEta what₂ η hη) ‹NumberField what₂.LL› ‹StarRing what₂.LL› LL0 (L.reEta η hη) := h
 
 def NLay0.EtaOk (L : NLay0 R H what₂ LL0) : Prop :=
   ∀ j w, 1 ≤ j → j ≤ R.m → what₂.etaJ j w = ∑ i ∈ L.nd.locs j w, L.nd.etaLoc i
 
-set_option maxHeartbeats 1000000 in
+
 theorem NLay0.etaOk_reEta (L : NLay0 R H what₂ LL0) :
     @NLay0.EtaOk R H (rowsEta what₂ L.eta L.eta_nonneg) ‹NumberField what₂.LL› ‹StarRing what₂.LL› LL0
       (L.reEta L.eta L.eta_nonneg) := fun _ _ h1 h2 => if_pos ⟨h1, h2⟩
@@ -112,7 +112,7 @@ end
 abbrev Lay0 (D : D7) : Type _ := NLay0 D.R D.host D.what₂ D.LL0
 
 
-set_option maxHeartbeats 1000000 in
+
 def setRaw (D : D7) (η : ℕ → D.what₂.places.Pl → ℚ) (hη : ∀ j w, 0 ≤ η j w)
     (P : @NLay0 D.R D.host (rowsEta D.what₂ η hη) D.nfLL D.starLL D.LL0)
     (hZ : @NLay0.ZOk D.R D.host (rowsEta D.what₂ η hη) D.nfLL D.starLL D.LL0 P)

@@ -13,6 +13,6 @@ open GlobalTheory.FinPl (latV Moves MonoAt OrthAt PrimAt idAt intAt grpAt colMul
 open GlobalTheory.SeeSaw (idV dI FI)
 open ValuativeRel
 open GlobalTheory.Core.Mi.LatMatch
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.rowLineIdeal_eq_inverseDifferent_pow : ∀ (D : D7) (i : Fin D.R.rS), aaD D i = dI D ^ (D.R.rS - i.1) := by
   first | exact @GlobalTheory.Core.Mi.LatMatch.DiffInv.aaD_eq_dI_pow | exact GlobalTheory.Core.Mi.LatMatch.DiffInv.aaD_eq_dI_pow | (intros; apply GlobalTheory.Core.Mi.LatMatch.DiffInv.aaD_eq_dI_pow <;> assumption)

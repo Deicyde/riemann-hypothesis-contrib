@@ -237,7 +237,7 @@ private theorem abs_ratio_perturbation_bound_of_estimates (s Zh FinalFormK Ah Ak
     _ = (160 * K + 40) * C1 * δ / s * Q * (s ^ 2 * FinalFormK * Zh) := by
         field_simp
 
-set_option maxHeartbeats 1600000 in
+
 theorem pf_GTLip : GTLip := by
   unfold GTLip Basic Count TLip
   intro hB hC L _ _ N hN

@@ -45,9 +45,9 @@ theorem hT_eq (S : HSpace E) (x y : S.V) :
     S.hT x y = star (S.frame.equivFun x) ⬝ᵥ S.gram *ᵥ S.frame.equivFun y := by
   rw [← sum_eq_dot]
   conv_lhs => rw [← S.frame.sum_repr x, ← S.frame.sum_repr y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-    starRingEnd_apply, Finset.mul_sum]
+
+  simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
+  starRingEnd_apply, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   simp only [RingHom.id_apply, Module.Basis.equivFun_apply, HSpace.gram]

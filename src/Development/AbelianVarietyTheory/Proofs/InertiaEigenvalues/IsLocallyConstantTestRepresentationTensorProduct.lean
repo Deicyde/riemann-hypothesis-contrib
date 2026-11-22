@@ -157,12 +157,12 @@ theorem tensorRep_eq {G H : Type} [Group G] [Group H] {W₁ : G → (X → ℂ) 
     intro u; funext v; rw [hf (u, v)]; simp [Finset.sum_apply, smul_eq_mul]
   have h2 : (fun u => W₂ gh.2 (fun v => f (u, v)) p.2) = ∑ j ∈ s, W₂ gh.2 (B j) p.2 • A j := by
     funext u
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1 u, map_sum hW₂ gh.2 s _ _ hB, Finset.sum_apply, Finset.sum_apply]
+
+    rw [h1 u, map_sum hW₂ gh.2 s _ _ hB, Finset.sum_apply, Finset.sum_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
     simp [smul_eq_mul, mul_comm]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [tensorRep_apply, h2, map_sum hW₁ gh.1 s _ _ hA, Finset.sum_apply]
+
+  rw [tensorRep_apply, h2, map_sum hW₁ gh.1 s _ _ hA, Finset.sum_apply]
   refine Finset.sum_congr rfl fun j _ => ?_
   simp [smul_eq_mul, mul_comm]
 
@@ -184,8 +184,8 @@ theorem isTestRep_tensorRep {G H X Y : Type} [Group G] [Group H] [TopologicalSpa
       funext u
       have h1 : (fun v => f (u, v)) = ∑ φ ∈ s, a φ u • φ := by
         funext v; rw [hfs (u, v)]; simp [Finset.sum_apply, smul_eq_mul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h1, map_sum hW₂ h s (fun φ => a φ u) (fun φ => φ) hb, Finset.sum_apply, Finset.sum_apply]
+
+      rw [h1, map_sum hW₂ h s (fun φ => a φ u) (fun φ => φ) hb, Finset.sum_apply, Finset.sum_apply]
       refine Finset.sum_congr rfl fun φ _ => ?_
       simp [smul_eq_mul, mul_comm]
     rw [e]

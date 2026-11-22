@@ -116,8 +116,8 @@ theorem heis_translate_cauchy_riemann : ∀ (D : D7) (θ : InfFam D) (σ : (D.wh
         rw [ContinuousLinearMap.map_add (f := _), LinearMap.map_add (f := _), Complex.ofReal_add]
         ring }
   have hL : L z + Complex.I * L (jO S T A.cart B.cart z) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.univ_sum_single z, map_sum, map_sum, map_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+
+    rw [← Finset.univ_sum_single z, map_sum, map_sum, map_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_eq_zero fun τ _ => ?_
     have h1 := congrFun (hf.2 τ (z τ)) (y + iotaW σ T S w)
     have h2 : Formalism.IndefR.Datum.dRho (heisO ψ S T) θ τ (z τ) f (y + iotaW σ T S w) +

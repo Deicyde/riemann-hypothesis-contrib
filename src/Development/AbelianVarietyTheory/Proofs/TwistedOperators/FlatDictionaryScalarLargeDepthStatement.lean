@@ -13,6 +13,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.FlatPlace GlobalTheory.LocMod GlobalTheory.SplitWeil
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.flatDictionaryScalar_largeDepth : Big fun ch => ScalP ch := by
   first | exact @GlobalTheory.FlatScal.scal | exact GlobalTheory.FlatScal.scal | (intros; apply GlobalTheory.FlatScal.scal <;> assumption)

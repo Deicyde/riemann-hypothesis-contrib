@@ -81,13 +81,13 @@ theorem UpperTheory.algMod_bot_compact_casimir_of_types :
       UniversalEnvelopingAlgebra.ι ℝ (X i))) φ = ∑ i, c i • uAction (UniversalEnvelopingAlgebra.ι ℝ (X i))
         (uAction (UniversalEnvelopingAlgebra.ι ℝ (X i)) φ) := by
     intro φ
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, map_mul, LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply]
+
+    simp only [map_sum, map_smul, map_mul, LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply]
   have hinter : ∀ g φ, (∑ i, c i • (Di i * Di i)) (slc g φ) = slc g (uAction (∑ i, c i •
       (UniversalEnvelopingAlgebra.ι ℝ (X i) * UniversalEnvelopingAlgebra.ι ℝ (X i))) φ) := by
     intro g φ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, map_sum]
+
+    rw [e1, map_sum]
     simp only [LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply]
     exact Finset.sum_congr rfl fun i _ => hDi i g φ
   have hstab : ∀ φ ∈ (⨅ g, V.comap (slc g)), uAction (∑ i, c i •
@@ -95,8 +95,8 @@ theorem UpperTheory.algMod_bot_compact_casimir_of_types :
     intro φ hφ
     simp only [Submodule.mem_iInf, Submodule.mem_comap] at hφ ⊢
     intro g
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, map_sum]
+
+    rw [e1, map_sum]
     refine V.sum_mem fun i _ => ?_
     rw [LinearMap.map_smul_of_tower]
     rcases hc i with h0 | hX

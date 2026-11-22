@@ -199,8 +199,8 @@ theorem wdetLen : WdetLenStatement := by
   have hTs : ∑ a, εT a = 1 := by
     rw [Fin.sum_univ_succ]
     simp only [hεT, Fin.cons_zero, Fin.cons_succ]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum ι (fun i => H.ρ (e i)) Finset.univ, ← map_add (f := _), add_comm, hsT, map_one]
+
+    rw [← map_sum ι (fun i => H.ρ (e i)) Finset.univ, ← map_add (f := _), add_comm, hsT, map_one]
   have hLs : ∑ a, εL a = 1 := by
     rw [Fin.sum_univ_succ]
     simp only [hεL, Fin.cons_zero, Fin.cons_succ]

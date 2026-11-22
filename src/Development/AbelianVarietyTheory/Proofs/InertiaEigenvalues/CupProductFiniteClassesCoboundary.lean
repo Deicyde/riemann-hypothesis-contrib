@@ -193,7 +193,7 @@ def charGRep (χ : G →* LLˣ) (hχ : Continuous fun g => ((χ g : LLˣ) : LL))
 end Char
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem cob_of_cont (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (hT : LocTied l P AI)
     (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
     (O : Type) [CommRing O] [Algebra O LL] (hO : GoodO (Qp := ℚ_[l]) LL O)
@@ -279,8 +279,8 @@ theorem cob_of_cont (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P)
       rw [TensorProduct.smul_tmul']
       rfl
     rw [← hf g]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [F, eb, map_sum, pairT_smul_right, map_neg]
+
+    simp only [F, eb, map_sum, pairT_smul_right, map_neg]
     abel
   have hcont : Continuous f :=
     GlobalTheory.FundCont.contCore_tied l P AI hT K LL O hO

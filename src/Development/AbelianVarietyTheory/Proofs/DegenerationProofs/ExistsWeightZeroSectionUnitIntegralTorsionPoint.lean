@@ -70,16 +70,16 @@ theorem value_nonneg_all : LL → TwistBCSpanStatement → TWM.VRatioGtStatement
 theorem comb_of_fixed {K M J : Type} [CommSemiring K] [AddCommMonoid M] [Module K M] [Fintype J] (f : M ≃ₗ[K] M)
     {c : K} {σ : M} {b : J → K} {s : J → M} {r : J → J → K} (h : c • σ = ∑ j, b j • s j) (fix : f σ = σ)
     (hs : ∀ i, f (s i) = ∑ j, r j i • s j) : c • σ = ∑ i, b i • ∑ j, r j i • s j := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← fix, ← map_smul, h, map_sum]
+
+  rw [← fix, ← map_smul, h, map_sum]
   simp only [map_smul, hs]
 
 theorem comb_comb {F K M I J : Type} [CommSemiring F] [CommSemiring K] [AddCommMonoid M] [Module K M] [Fintype I]
     [Fintype J] (κ : F →+* K) {σ : M} {a : I → F} {t : I → M} {s : J → M} {r : I → J → F}
     (h : σ = ∑ i, κ (a i) • t i) (ht : ∀ i, t i = ∑ j, κ (r i j) • s j) : σ = ∑ j, κ (∑ i, a i * r i j) • s j := by
   rw [h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ht, Finset.smul_sum, map_sum, Finset.sum_smul, map_mul, mul_smul]
+
+  simp only [ht, Finset.smul_sum, map_sum, Finset.sum_smul, map_mul, mul_smul]
   exact Finset.sum_comm
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {S : ThetaSys o Ω}
@@ -167,7 +167,7 @@ theorem exists_rep (hU : UTorsSt) (l : u.Lab) (g : u.Geom) {a : S.Gam} (ha : a �
   exact add_neg_cancel _
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem main : Laws → Laws2 → UTorsSt → ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω) (ρ : S.Real) (p : ℕ) [Fact p.Prime] (y₀ : S.R →+* PadicAlgCl p) (u : ρ.UTest p y₀) (l : u.Lab), (∀ a : o, ‖y₀ (algebraMap o S.R a)‖ ≤ 1) → (∀ h ∈ l.yy.ker, ∃ i, ‖∑ j, y₀ (algebraMap o S.R (S.proj _ (l.wt 0) j i)) * y₀ ⟨S.ev h j, S.ev_mem h j⟩‖ = S.delta y₀) := by
   intro hL hL2 hU o Ω _ _ _ _ S ρ p _ y₀ u l hy h hh
   have hTB := GlobalTheory.twistBaseChange

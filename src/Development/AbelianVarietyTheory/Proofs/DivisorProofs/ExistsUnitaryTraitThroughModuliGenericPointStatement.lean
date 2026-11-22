@@ -14,6 +14,6 @@ open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 open GlobalTheory
 open Classical
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_unitaryTrait_through_moduliGenericPoint : UTraitExtSt := by
   first | exact @GlobalTheory.UTraitExt.uTraitExtSt | exact GlobalTheory.UTraitExt.uTraitExtSt | (intros; apply GlobalTheory.UTraitExt.uTraitExtSt <;> assumption)

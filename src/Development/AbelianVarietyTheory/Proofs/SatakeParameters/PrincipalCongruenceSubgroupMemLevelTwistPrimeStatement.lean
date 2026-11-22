@@ -14,7 +14,7 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemIntegr
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.Ker Formalism.L2.DIV GlobalTheory.TwU GlobalTheory.TwV
 open scoped TensorProduct
 open GlobalTheory.TopStep
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.principal_congruence_subgroup_mem_level_twist_prime : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
     {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ} {mu : Tup X.F X.E X.K S}
     {cst : LocCst X (rowSG Pr sel mu)} {L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))} {G : ChGlob X R.m} {m2 : ℕ},

@@ -19,8 +19,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7}
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem le_dual_chart {T : ℕ} {bad : Set (HeightOneSpectrum (𝓞 D.host.F))} {i : ℕ} {hi : i ≤ D.R.m} {cl : Type}
     {stab : cl → Type} [∀ c, Group (stab c)] {lat : cl → Submodule (𝓞 D.host.E) (Fin (D.R.N i) → D.host.E)}
     (K : LevelChart D T bad i hi stab lat) (c : cl) :
@@ -73,7 +73,7 @@ structure LatIn (S : StepIn M i hi G) (w : D.what₂.places.Pl) (β : S.Ch) : Pr
     D.what₂.embLL r = ((S.K β).lev.chi κ : ℂ)
 
 
-set_option maxHeartbeats 8000000 in
+
 theorem valIntN_of (S : StepIn M i hi G) (e : D.what₂.LL →+* G.Kf) (w : D.what₂.places.Pl)
     (H : ∀ β, S.Core e β) (hS : BlockRationalityField) (hfrac : IsFractionRing G.O G.Kf)
     (hR0 : ∀ x, x ∈ intW D.what₂.places w ↔ e x ∈ Set.range (algebraMap G.O G.Kf))

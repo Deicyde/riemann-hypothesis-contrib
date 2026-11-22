@@ -9,7 +9,7 @@ public import Formalism.LocalToGlobal.Columns.HeckeInertComm
 open NumberField IsDedekindDomain Formalism.L2.Col Formalism.HermitianLatticesTheory
 open Classical
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_local_unitary_exchange_unimodular_lattices_inert : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} (P : HeightOneSpectrum (𝓞 E)),
   conjPrime₂ P = P → (∃ x : 𝓞 E, cO E x - x ∉ P.asIdeal) →
   ∀ (X Z : Submodule (𝓞 E) (Sp E n)), Submodule.IsLattice E X → Submodule.IsLattice E Z →

@@ -38,8 +38,8 @@ theorem exists_invariant_of_subgroup {G F Ω V : Type} [Group G] [Field F] [Fiel
   let T : F → V := fun c => ∑ q : G ⧸ H, A q.out (ι c • y)
   have hTinv : ∀ c g, A g (T c) = T c := by
     intro c g
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [T, map_sum, ← hA]
+
+    simp only [T, map_sum, ← hA]
     refine Fintype.sum_equiv (MulAction.toPerm g) _ _ (fun q => ?_)
     apply key _ (hfix c)
     rw [MulAction.toPerm_apply, QuotientGroup.out_eq']
@@ -75,8 +75,8 @@ theorem exists_invariant_of_subgroup {G F Ω V : Type} [Group G] [Field F] [Fiel
     intro c
     have hz := (Submodule.Quotient.mk_eq_zero N₁).mpr (hT1 c)
     simp only [T, hAs] at hz
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Submodule.mkQ_apply, map_sum] at hz
+
+    rw [← Submodule.mkQ_apply, map_sum] at hz
     simpa [χ, w] using hz
   have hw : ∀ q, w q = 0 := by
     intro q
@@ -85,8 +85,8 @@ theorem exists_invariant_of_subgroup {G F Ω V : Type} [Group G] [Field F] [Fiel
     have hsum : ∑ q', φ (w q') • (χ q' : F → Ω) = 0 := by
       funext c
       have hcq := congrArg φ (hrel c)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, smul_eq_mul, map_zero] at hcq
+
+      simp only [map_sum, map_smul, smul_eq_mul, map_zero] at hcq
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
       rw [← hcq]
       exact Finset.sum_congr rfl (fun q' _ => mul_comm _ _)
@@ -170,8 +170,8 @@ theorem jump_descends (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K E : FinExt l)
       (w : Fin d → P.R.BdR), (fun i => f ((N.map am).mulVec w i)) = (N.map am).mulVec (fun i => f (w i)) := by
     intro f N w
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul, am, AlgEquiv.commutes]
+
+    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul, am, AlgEquiv.commutes]
   have hA : ∀ g h v, A (g * h) v = A g (A h v) := by
     intro g h v
     rw [hAapp, hAapp, hAapp, hcomm, Matrix.mulVec_mulVec, ← Matrix.map_mul,

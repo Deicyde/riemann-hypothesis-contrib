@@ -156,8 +156,8 @@ private theorem cv_eq (x : InfinitePlace L × Fin 2 → ℂ) :
     cv lam hj x = ∑ κ : InfinitePlace L → Fin (j + 1), eval x (A (InfinitePlace L) j κ) •
       PiTensorProduct.tprod ℂ fun v => mon (lam v) (hj v) (κ v) := by
   simp only [cv, D]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [MultilinearMap.map_sum]
+
+  rw [MultilinearMap.map_sum]
   refine Finset.sum_congr rfl fun κ _ => ?_
   rw [MultilinearMap.map_smul_univ, eval_A]
   simp only [RingHom.id_apply]
@@ -199,11 +199,11 @@ theorem UpperTheory.V.Z.Sym.Al.infVec :
   let φ : UA L 2 → Wt.VD (InfinitePlace L) j := fun g => ∑ κ, T (c κ) g • a κ
   have key : ∀ g x, MvPolynomial.eval x (φ g).1 = T (cv lam hj x) g := by
     intro g x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [cv_eq, map_sum, Finset.sum_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [φ, Submodule.coe_sum, Submodule.coe_smul, map_sum, MvPolynomial.smul_eval, map_smul, Pi.smul_apply,
-      smul_eq_mul, a]
+
+    rw [cv_eq, map_sum, Finset.sum_apply]
+
+    simp only [φ, Submodule.coe_sum, Submodule.coe_smul, map_sum, MvPolynomial.smul_eval, map_smul, Pi.smul_apply,
+    smul_eq_mul, a]
     exact Finset.sum_congr rfl fun κ _ => mul_comm _ _
   refine ⟨fun v => -((lam v).w 1 + (j : ℤ)), φ, fun h0 => ?_, fun f => ?_, fun γ hγ g => ?_, fun u hu g => ?_,
     fun u hu g => ?_⟩
@@ -235,8 +235,8 @@ theorem UpperTheory.V.Z.Sym.Al.infVec :
       exact hle hw
   · have : f ∘ φ = ∑ κ, f (a κ) • T (c κ) := by
       funext g
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Function.comp, φ, map_sum, map_smul, smul_eq_mul, Finset.sum_apply, Pi.smul_apply]
+
+      simp only [Function.comp, φ, map_sum, map_smul, smul_eq_mul, Finset.sum_apply, Pi.smul_apply]
       exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
     rw [this]
     exact π.sum_mem fun κ _ => π.smul_mem _ (hTπ _)

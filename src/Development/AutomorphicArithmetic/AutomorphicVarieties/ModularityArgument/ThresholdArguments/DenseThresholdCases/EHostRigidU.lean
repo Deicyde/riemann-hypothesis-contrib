@@ -16,8 +16,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing UpperTheory.V.Pr.IsCD.complete
@@ -70,9 +70,9 @@ private theorem cocycle_coboundary_of_finite_index {k G W : Type} [Field k] [Cha
     intro g
     have e1 : ∑ q, F (g • q) = S := Equiv.sum_comp (MulAction.toPerm g) F
     refine e1.symm.trans ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hF, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, ← map_sum,
-      Nat.cast_smul_eq_nsmul, ← hS]
+
+    simp only [hF, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, ← map_sum,
+    Nat.cast_smul_eq_nsmul, ← hS]
   have hn : (Fintype.card (G ⧸ H) : k) ≠ 0 := Nat.cast_ne_zero.2 Fintype.card_ne_zero
   refine ⟨x - (Fintype.card (G ⧸ H) : k)⁻¹ • S, fun g => ?_⟩
   have e : f' g = (Fintype.card (G ⧸ H) : k)⁻¹ • (S - a g S) := by

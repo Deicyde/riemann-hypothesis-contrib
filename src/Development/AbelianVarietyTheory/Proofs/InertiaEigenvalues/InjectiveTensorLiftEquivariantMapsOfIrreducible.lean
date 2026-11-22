@@ -32,8 +32,8 @@ private theorem eq_zero_of_sum_intertwining_apply_eq_zero {H X Y : Type} [Group 
       intro g w hw
       rw [LinearMap.mem_ker, hΦ] at hw ⊢
       simp_rw [hφ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum, hw, map_zero]
+
+      rw [← map_sum, hw, map_zero]
     let p : S →ₗ[ℂ] Y := (LinearMap.proj (Fin.last m)).comp S.subtype
     have hp : Function.Injective p := by
       rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -119,8 +119,8 @@ theorem _root_.GlobalTheory.SmGL.EvalInj.lift_subtype_injective :
       (Submodule.ker_subtype _)
   have hsum : ∑ i, φ i (y i) = 0 := by
     rw [ht₀] at ht
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, φ] using ht
+
+    simpa [map_sum, φ] using ht
   have hy0 := eq_zero_of_sum_intertwining_apply_eq_zero τ ρ hρ hschur _ φ hli
     (fun i g v => hM _ (b i : M).2 g v) y hsum
   rw [ht₀, hy0]

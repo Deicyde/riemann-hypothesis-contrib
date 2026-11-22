@@ -36,8 +36,8 @@ private theorem orth {L F : Type} [Field L] [NumberField L] [Field F] [NumberFie
     (fun ρ => if ρ = σ then algebraMap L F b else 0) (by
       funext x
       have h1 := congrArg σ (h x)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_mul, map_sum, AlgEquiv.commutes] at h1
+
+      simp only [map_mul, map_sum, AlgEquiv.commutes] at h1
       simp only [trace_eq_sum_automorphisms, map_mul, Finset.sum_mul] at h1
       rw [Finset.sum_comm] at h1
       simp only [Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul, ite_mul, zero_mul,
@@ -61,19 +61,19 @@ theorem UpperTheory.V.ZK.Cl.cSplit :
       intro σ τ
       apply RingOfIntegers.ext
       have := orth (fun i => (e i : F)) (fun i => (f i : F)) (b : L) h σ τ
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul]
+
+      simp only [map_sum, map_mul]
       refine this.trans ?_
       split_ifs
       · rfl
       · simp
     refine ⟨∑ i, algebraMap (𝓞 L) (𝓞 F)
       (s (∑ τ, (r (algebraMap (𝓞 L) (𝓞 F) b))⁻¹ * v τ * r (actO τ (f i)))) * e i, fun σ => ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hσ, hs', Finset.sum_mul]
+
+    simp only [map_sum, map_mul, hσ, hs', Finset.sum_mul]
     rw [Finset.sum_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [mul_assoc, ← Finset.mul_sum, ← map_mul, ← map_sum, ho]
+
+    simp only [mul_assoc, ← Finset.mul_sum, ← map_mul, ← map_sum, ho]
     simp only [apply_ite r, map_zero, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     field_simp
   · let c : Fin n → 𝓞 L := fun i => ⟨Algebra.trace L F (a * f i),
@@ -82,13 +82,13 @@ theorem UpperTheory.V.ZK.Cl.cSplit :
       intro i
       apply RingOfIntegers.ext
       have := trace_eq_sum_automorphisms (K := L) ((a : F) * f i)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul] at this ⊢
+
+      simp only [map_sum, map_mul] at this ⊢
       exact this
     have hba : algebraMap (𝓞 L) (𝓞 F) b * a = ∑ i, algebraMap (𝓞 L) (𝓞 F) (c i) * e i := by
       apply RingOfIntegers.ext
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul]
+
+      simp only [map_sum, map_mul]
       exact h a
     obtain ⟨b', hb'⟩ := hr (r (algebraMap (𝓞 L) (𝓞 F) b))⁻¹
     have h1 : a = algebraMap (𝓞 L) (𝓞 F) (1 - b' * b) * a +

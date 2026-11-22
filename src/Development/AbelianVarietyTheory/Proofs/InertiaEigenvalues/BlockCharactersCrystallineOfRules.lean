@@ -231,9 +231,9 @@ theorem finrank_coordInv {LL : Type} [Field LL] [Algebra Qp LL]
         conv_lhs => rw [← e.sum_repr v]
         have : ∀ j, ρ g (e.repr v j • e j) = e.repr v j • ρ g (e j) := fun j =>
           (ρ g).map_smul_of_tower _ _
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, this, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-          smul_eq_mul, hA, mul_comm]
+
+        simp only [map_sum, this, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+        smul_eq_mul, hA, mul_comm]
       rw [h1, hΦ, h2, Finset.sum_smul]
       change _ = ∑ j, algebraMap Qp B (A g i j) * PD.actB g (Φ (v ⊗ₜ b) j)
       refine Finset.sum_congr rfl fun j _ => ?_

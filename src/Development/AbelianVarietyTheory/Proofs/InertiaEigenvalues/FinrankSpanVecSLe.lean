@@ -48,11 +48,11 @@ theorem finrank_span_vecS_le (W : Submodule K (Fin a → Fin n → K)) :
     rintro _ ⟨w, hw, rfl⟩
     have h : w = ∑ i, b.repr ⟨w, hw⟩ i • (b i : Fin a → Fin n → K) := by
       have := congrArg W.subtype (b.sum_repr ⟨w, hw⟩)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at this
+
+      rw [map_sum] at this
       exact this.symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h, map_sum]
+
+    rw [h, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -103,8 +103,8 @@ theorem isCompl_span_vecS {W W' : Submodule K (Fin a → Fin n → K)} (h : IsCo
 end VecGen
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem isSummandTw_XG : ∀ (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
     (hw : w ∈ placesOver D.host.E (D.nd.l i)) (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)))
     (Xs : Set (D.nd.X i)) (hr : GoodR D.nd i r) {a : ℕ} (x : Fin a → ↥Xs)

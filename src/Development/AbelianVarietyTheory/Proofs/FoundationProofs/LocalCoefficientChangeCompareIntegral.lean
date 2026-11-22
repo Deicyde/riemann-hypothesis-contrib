@@ -88,7 +88,7 @@ theorem exists_coordLL (hz : ∀ z : ℤ_[l], f (algebraMap ℤ_[l] O₀ z) = al
   change q (r • Br.toLLK B x) = r • q (Br.toLLK B x)
   rw [Algebra.smul_def, Algebra.smul_def, ← φ.commutes, ← hy, hφ, ← map_mul, hq, hq, hp, map_mul]
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem phi_coordQ {k : ℕ} (q : ↥B.LL.1 →ₗ[ℚ_[l]] ↥B₀.LL.1)
     (hq : ∀ x, q (Br.toLLK B x) = Br.toLLK B₀ (p x)) (x : KOG O k) (w : Fin k → Br.LLw B)
     (h : Br.phi B k x = Submodule.Quotient.mk w) :
@@ -124,11 +124,11 @@ theorem coordLL_mulVec {k : ℕ} (q : ↥B.LL.1 →ₗ[ℚ_[l]] ↥B₀.LL.1)
     intro i
     rw [Br.toLLK_alg]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, map_sum, h1, h2, ← hx, ← map_mul, hq, hp]
+
+  simp only [Matrix.mulVec, dotProduct, map_sum, h1, h2, ← hx, ← map_mul, hq, hp]
 
 include hp in
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem coordQ_mem_HfD (hz : ∀ z : ℤ_[l], f (algebraMap ℤ_[l] O₀ z) = algebraMap ℤ_[l] O z)
     (P : LocPrime l) (σ : GQ l)
     (hσ : ∀ g : ↥Gw, ((B.e g : ↥(GK B.Kw)) : GQ l) = σ * ((B₀.e g : ↥(GK B₀.Kw)) : GQ l) * σ⁻¹)
@@ -193,7 +193,7 @@ theorem exists_coords {O₀ O : Type} [CommRing O₀] [IsDomain O₀] [IsDiscret
     exact (SelmerLevel.fracComp b).sum_p x
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem bkG_le_extCond (l : ℕ) [Fact l.Prime] (P : LocPrime l) (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω]
     (Gw : Subgroup (Ω ≃ₐ[E] Ω)) (O₀ O : Type) [CommRing O₀] [IsDomain O₀] [IsDiscreteValuationRing O₀]
     [Algebra ℤ_[l] O₀] [Module.Finite ℤ_[l] O₀] [TopologicalSpace O₀] [CommRing O] [IsDomain O]
@@ -218,8 +218,8 @@ theorem bkG_le_extCond (l : ℕ) [Fact l.Prime] (P : LocPrime l) (E Ω : Type) [
       rw [Finset.sum_apply]
       exact (hs (x j)).symm
     simp only [Pi.smul_apply, ← hx]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [this, map_sum]
+
+    conv_lhs => rw [this, map_sum]
     rfl
   change (c : ↥Gw → KOG O k) ∈ Submodule.span O _
   rw [hsum]

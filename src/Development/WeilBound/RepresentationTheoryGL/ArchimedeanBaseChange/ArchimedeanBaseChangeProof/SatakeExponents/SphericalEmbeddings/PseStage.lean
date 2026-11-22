@@ -16,7 +16,7 @@ open PositivityTheory.Rg.BcB.N3 PositivityTheory.Rg.BcB.N3.Pse
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem main {r t : ℕ} (A : Fin r → ℂˣ) (a b : ℂˣ) (B : Fin t → ℂˣ)
     (T : (iP (k := k) ![a, b]).IntertwiningMap (iP (k := k) ![b, a])) (hT : KInj k T) :
     ∃ T' : (iP (k := k) (Fin.append A (Fin.append ![a, b] B))).IntertwiningMap
@@ -27,7 +27,7 @@ theorem main {r t : ℕ} (A : Fin r → ℂˣ) (a b : ℂˣ) (B : Fin t → ℂ�
   obtain ⟨Eo'⟩ := iP_append (k := k) r (2 + t) A (Fin.append ![b, a] B)
   exact mainGen _ _ Ei Ei' Eo Eo' T hT
 
-set_option maxHeartbeats 2000000 in
+
 variable (k) in
 theorem stageLift : StageLift k := by
   intro n η i j hij ⟨T, hT⟩

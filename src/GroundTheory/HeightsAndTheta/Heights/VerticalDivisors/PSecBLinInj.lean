@@ -26,8 +26,8 @@ theorem map_secLin {R S : Type*} [CommRing R] [CommRing S] {n e : ℕ}
     (hc : ∀ j, ψ (secCoord Q y j) = secCoord Q' y' j)
     (hr : ∀ r : R, ψ (algebraMap R _ r) = algebraMap S _ (c r)) (w : Fin n → R) :
     ψ (secLin Q y w) = secLin Q' y' (fun j => c (w j)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [secLin, linForm, map_sum, map_mul]
+
+  simp only [secLin, linForm, map_sum, map_mul]
   refine Finset.sum_congr rfl fun j _ => ?_
   have h1 : (Ideal.Quotient.mk (secIdeal Q y) (C (w j))) = algebraMap R (SecAlg Q y) (w j) := rfl
   have h2 : (Ideal.Quotient.mk (secIdeal Q' y') (C (c (w j)))) = algebraMap S (SecAlg Q' y') (c (w j)) :=

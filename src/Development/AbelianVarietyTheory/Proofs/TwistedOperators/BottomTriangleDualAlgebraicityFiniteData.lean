@@ -66,7 +66,7 @@ theorem isWeilDatumO_fixSig (h : IsWeilDatumO ψ S T χS χT om) : IsWeilDatumO 
     (isThetaFunO_of_fixSig hf)⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_cong_fix_vac (hW : IsWeilDatumO ψ S T χS χT om)
     (hcS : ∀ τ, IsCartanInv (gramAt D S τ) (sS τ)) (hcT : ∀ τ, IsCartanInv (gramAt D T τ) (sT τ))
     (hsdS : IsSelfDualC S ΛS) (hsdT : IsSelfDualC T ΛT) {f₀ : WO S T → ℂ}
@@ -149,7 +149,7 @@ theorem exists_cong_fix_vac (hW : IsWeilDatumO ψ S T χS χT om)
   exact ⟨_, Nat.mul_pos n₁.factorial_pos n.factorial_pos, hn⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem eventually_fix (hW : IsWeilDatumO ψ S T χS χT om)
     (hcS : ∀ τ, IsCartanInv (gramAt D S τ) (sS τ)) (hcT : ∀ τ, IsCartanInv (gramAt D T τ) (sT τ))
     (hsdS : IsSelfDualC S ΛS) (hsdT : IsSelfDualC T ΛT) {f₀ : WO S T → ℂ}
@@ -484,8 +484,8 @@ theorem real_right (hX : IsBottomTri W i j X) (t : T) {γ r : GA D WW} (hγ : γ
     unfold Tri.ker' thetaKO
     have hm : ((g, x * r) : GA D A' × GA D WW) = (g, x) * (1, r) := by simp
     rw [hm, map_mul, Module.End.mul_apply, hmain]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [(C • Q).as_sum, map_sum, map_sum, Finset.sum_apply]
+
+    conv_lhs => rw [(C • Q).as_sum, map_sum, map_sum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun k' _ => ?_
     rw [show MvPolynomial.monomial k' ((C • Q).coeff k') = (C • Q).coeff k' • MvPolynomial.monomial k' (1 : ℂ) by
       rw [MvPolynomial.smul_monomial, smul_eq_mul, mul_one], map_smul, map_smul, Pi.smul_apply, smul_eq_mul]

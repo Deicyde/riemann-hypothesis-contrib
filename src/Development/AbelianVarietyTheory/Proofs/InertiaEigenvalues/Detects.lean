@@ -140,8 +140,8 @@ theorem detects : ∀ (D : D7) (Γ : Type) [Group Γ] [Fintype Γ] (Pl0 I0 T1 : 
     rw [Fintype.linearIndependent_iff]
     intro cf hcf s
     have h1 : ((cuspOf YS fw j (∑ t : r.support, (eKs YS).symm (cf t) • bV t) : Cu T0 κ j) : T0.R ((j : ℕ) + 1)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hcf, map_sum]
+
+      rw [← hcf, map_sum]
       simp only [cuspOf_smul, RingEquiv.apply_symm_apply]
       push_cast
       rfl

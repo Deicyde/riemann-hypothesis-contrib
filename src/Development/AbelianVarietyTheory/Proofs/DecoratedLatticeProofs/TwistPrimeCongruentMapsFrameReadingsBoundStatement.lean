@@ -12,7 +12,7 @@ open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTh
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.L2.Ker
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.twist_prime_congruent_maps_frame_readings_bound : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X) (u : B.Word) (a : I.ι) (i : ℕ) (P : Formalism.L2.Col.rowSG (B.primes X) I.sel (I.tup a)),
     P.1 ∈ I.Q a → Disjoint (B.primes X).vGs (I.Q a) →
     ∀ (p q : PtAt B.R I.sel (I.tup a) (I.cst a) u i) (p' q' : PtAt B.R I.sel (I.tup a) (I.cst a) u (i + 1))

@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvUAbsU
 @[expose] public section
 
 open MeasureTheory GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.SatakeBound GlobalTheory.WeylCell Formalism.UG
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mem_weylCellUnitaryGroup_longSimpleReflection_iff : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (σ : L →+* L) (n : ℕ)
     (k : Fin (n / 2)), ¬ k.val + 1 < n / 2 → Even n → ∀ (y : GU σ n),
     IsWeylRep (simpleU k) (y : GL (Fin n) L) → ∀ (u : GU σ n),

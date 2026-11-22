@@ -135,8 +135,8 @@ theorem exists_pow_dvd [IsDomain R] (e : Tilt p R) (he : PreTilt.untilt e = 1) :
       (span {(p : Acris p R)}).radical := by
     have : (∑ i ∈ Finset.range p, w ^ i) = p + ∑ i ∈ Finset.range p, (w ^ i - 1) := by
       simp [Finset.sum_sub_distrib]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [this, map_add (f := _), map_natCast, map_sum]
+
+    rw [this, map_add (f := _), map_natCast, map_sum]
     refine add_mem p_mem (Ideal.sum_mem _ fun i _ => ?_)
     obtain ⟨c, hc⟩ := sub_one_dvd_pow_sub_one w i
     rw [hc, map_mul]
@@ -734,8 +734,8 @@ theorem logTeich_dvd [IsDomain R] {ε : tateModule p R} (hε : IsPrimitive ε) :
   obtain ⟨l, d, hd, hl, hlog⟩ := exists_log_eq (Ainf.teich p ε.1)
     (by rw [Ainf.theta_teich]; exact ε.2)
   have h' := congrArg (Acris.frob p R) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_pow, map_mul, map_natCast, Acris.frob_algebraMap, Ainf.frob_teich] at h'
+
+  simp only [map_sum, map_pow, map_mul, map_natCast, Acris.frob_algebraMap, Ainf.frob_teich] at h'
   set U := algebraMap (Ainf p R) (Acris p R) (Ainf.teich p ε.1) with hU
   have h1 := mul_geom_sum U p
   have h2 := mul_geom_sum (U ^ p) p
@@ -927,8 +927,8 @@ theorem dvd_log (u : Ainf p R) (hu : Ainf.theta p R u = 1) :
   rw [← sub_add_cancel (algebraMap (Acris p R) (Bcris p R) (Acris.log u hu))
     (algebraMap (Acris p R) (Bcris p R) (∑ k ∈ Finset.range N, (-1) ^ k * term u hu k))]
   refine dvd_add h ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.dvd_sum fun k _ => ?_
   rw [map_mul]
   refine Dvd.dvd.mul_left ?_ _

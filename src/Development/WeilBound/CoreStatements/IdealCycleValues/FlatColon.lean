@@ -147,9 +147,9 @@ theorem ram_colon {O O' σ : Type} [CommRing O] [CommRing O'] [IsDomain O'] [Alg
   refine Ideal.add_mem _ (Ideal.mem_sup_right ?_) (Ideal.mem_sup_left hw)
   refine Ideal.sum_mem _ fun i hi => ?_
   have h1 := hkill i _ hg
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← C_pow, ← smul_eq_C_mul, map_smul, map_add (f := _), hkill i w hw, add_zero, Finsupp.sum, map_sum,
-    Finset.sum_eq_single i] at h1
+
+  rw [← C_pow, ← smul_eq_C_mul, map_smul, map_add (f := _), hkill i w hw, add_zero, Finsupp.sum, map_sum,
+  Finset.sum_eq_single i] at h1
   · rw [map_smul, hΛ, hlam, hB] at h1
     have h2 : Ideal.Quotient.mk m' (ϖ' ^ k * c i) = 0 := by
       rw [← h1]

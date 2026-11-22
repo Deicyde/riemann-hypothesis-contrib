@@ -138,8 +138,8 @@ theorem cls_cubeLB {T : Over S} (x : Fin n → (T ⟶ G)) {L : LB G.left} (hL : 
 
 theorem pull_cubeCls {T T' : Over S} (ρ : T' ⟶ T) (x : Fin n → (T ⟶ G)) (c : Pic G.left)
     (y : Fin n → (T' ⟶ G)) (h : ∀ i, y i = ρ ≫ x i) : cubeCls y c = pull ρ.left (cubeCls x c) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [cubeCls, cubeCls, map_sum]
+
+  rw [cubeCls, cubeCls, map_sum]
   refine Finset.sum_congr rfl fun I _ => ?_
   rw [map_zsmul, ← pull_comp, PrimNorm.psum_pre ρ x y h]
 

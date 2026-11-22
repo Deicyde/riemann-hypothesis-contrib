@@ -53,8 +53,8 @@ theorem avg_apply (f : UA E a → ℂ) :
 
 theorem avg_comm {c : UA E a} (hc : ∀ k ∈ K, Commute c k) (f : UA E a → ℂ) :
     avg K K' (RU E a c f) = RU E a c (avg K K' f) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [avg_apply, avg_apply, map_sum]
+
+  rw [avg_apply, avg_apply, map_sum]
   refine Finset.sum_congr rfl fun q _ => ?_
   rw [← rU_mul, ← rU_mul, (hc _ (Quotient.out q).2).eq]
 
@@ -155,8 +155,8 @@ theorem mend (U : Submodule ℂ (UA E a → ℂ)) (hU : IsAutRepU U) (w : Height
   haveI : Finite (K ⧸ K') := Subgroup.quotient_finite_of_isOpen K' hK'o
   letI : Fintype (K ⧸ K') := Fintype.ofFinite _
   have hA : avg K K' φw = c.sum fun g b => b • RU E a ((r g)⁻¹ * g) (avg K K' (RU E a (r g) φ)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hc, Finsupp.sum, Finsupp.sum, map_sum]
+
+    rw [← hc, Finsupp.sum, Finsupp.sum, map_sum]
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [map_smul, hsplit g, avg_comm K K' (fun k hk => hd g k (hKw hk))]
   by_cases h0 : ∀ g ∈ c.support, avg K K' (RU E a (r g) φ) = 0

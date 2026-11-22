@@ -97,11 +97,11 @@ theorem wsum_clm (L : E →L[ℂ] E) (u : ℂ) (c : Fin r → Fin (2 * r + k + 1
 theorem aa_clm (L : E →L[ℂ] E) (u : ℂ) (f : Mat k r → E) (g : Mat k r) (hg : g ∈ GV k r)
     (hf : Loc (r : ℕ∞) f g) (hLf : Loc (r : ℕ∞) (fun x => L (f x)) g) :
     C3.AAop k r r le_rfl u (fun x => L (f x)) g = L (C3.AAop k r r le_rfl u f g) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [aa_expand u _ g hg hLf, aa_expand u f g hg hf, map_sum]
+
+  rw [aa_expand u _ g hg hLf, aa_expand u f g hg hf, map_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_smul, map_sum]
+
+  rw [map_smul, map_sum]
   congr 1
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [map_smul, wsum_clm L u c σ f g hg hf]

@@ -135,8 +135,8 @@ theorem mConeMap_homog (y : (Σ k, ι k) → Ω) {g : MRing ι} {d : K → ℕ} 
   classical
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, map_sum, Finset.sum_mul]
+
+  rw [map_sum, map_sum, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun m hm => ?_
   have hdeg := hg m hm
   simp only [mConeMap, aeval_monomial, map_mul]
@@ -345,9 +345,9 @@ theorem exists_val_ne {y : (Σ k, ι k) → Ω} {A : HermLine ι} {m N : ℕ} {v
           rw [Finset.prod_mul_distrib]
           ring
   have hΦy : aeval y Φ = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hΦ, map_sub, map_sum, aeval_chartMon, Finset.sum_congr rfl fun j _ => hterm j, ← Finset.sum_mul, hsum',
-      one_mul, sub_self]
+
+    rw [hΦ, map_sub, map_sum, aeval_chartMon, Finset.sum_congr rfl fun j _ => hterm j, ← Finset.sum_mul, hsum',
+    one_mul, sub_self]
   have hΦz := vanish hx hΦh hΦy
   have hgz : ∀ j, eval x (map (Int.castRingHom ℂ) (g j)) = 0 := fun j => by
     have hrep : IsRep y A.a m (v j) (g j) (chartMon c (Nj j)) :=
@@ -356,9 +356,9 @@ theorem exists_val_ne {y : (Σ k, ι k) → Ω} {A : HermLine ι} {m N : ℕ} {v
         linarith, by rw [hgv j, aeval_chartMon]⟩
     rw [val_spec (hv j) hx hrep, hall j]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hΦ, map_sub, map_sum, map_mul, hgz, mul_zero, zero_mul, Finset.sum_const_zero, sub_zero,
-    eval_chartMon] at hΦz
+
+  simp only [hΦ, map_sub, map_sum, map_mul, hgz, mul_zero, zero_mul, Finset.sum_const_zero, sub_zero,
+  eval_chartMon] at hΦz
   exact (Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (hc k)) hΦz
 
 def oldIdx (N : ℕ) (p : Σ k, ι k) : Σ k, addIdx ι N k := ⟨some p.1, p.2⟩

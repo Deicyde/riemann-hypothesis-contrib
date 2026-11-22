@@ -62,7 +62,7 @@ theorem btT_eq_piecewise (s : ℕ) (h : C.LPt) :
 
 end place
 
-set_option maxHeartbeats 1000000 in
+
 theorem field_measurability : FieldMeas := by
   intro P Wp Wq _ _ _ _ _ _ I _ p nn F w c Fi L hV b s hb hs hbs h hh
   rw [btT_eq_piecewise]

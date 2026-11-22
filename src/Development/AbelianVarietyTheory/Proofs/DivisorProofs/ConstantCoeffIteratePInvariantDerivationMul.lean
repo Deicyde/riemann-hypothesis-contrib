@@ -48,9 +48,9 @@ theorem _root_.GlobalTheory.LawDer.constantCoeff_iterate_invDer_mul : ∀ (p : �
       ∃ r : R, constantCoeff ((_root_.GlobalTheory.LawDer.invDer μ u)^[p] (F * G)) = p * r := by
   intro p hp R _ d μ hμ hid u F G hF hG
   have hlin := _root_.GlobalTheory.LawDer.Linear.invDer_linear R d μ hμ u
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [iterate_mul_eq_sum_antidiagonal_choose _ hlin.1
-    (_root_.GlobalTheory.LawDer.invDer_mul R d μ hμ hid u), map_sum]
+
+  rw [iterate_mul_eq_sum_antidiagonal_choose _ hlin.1
+  (_root_.GlobalTheory.LawDer.invDer_mul R d μ hμ hid u), map_sum]
   refine Finset.dvd_sum fun ij hij => ?_
   rw [Finset.HasAntidiagonal.mem_antidiagonal] at hij
   rw [map_nsmul, map_mul, nsmul_eq_mul]

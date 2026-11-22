@@ -74,8 +74,8 @@ theorem detect [IsFractionRing O LL] (hP4 : LevelMapHodgeFiltration W) (hSat : S
       have hk := h ζ k
       change ιV PD (LL := LL) (V := T.V) (Lb.levB T c ζ ⟨C.t c y, hy⟩ k) ∈
         FilLev W T c s ((e : ℤ) - k) at hk
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hLb, hyN, map_sum, Finset.sum_apply] at hk
+
+      rw [← hLb, hyN, map_sum, Finset.sum_apply] at hk
       show ((ιV PD (LL := LL) (V := T.V)).comp (DcrisL PD T.ρ (W.emb c)).subtype)
         (∑ j, ∑ᶠ i : ℕ, PowerSeries.coeff i (W.lev c ζ ((baseIdOf hR).d (a j))) •
           (⟨Lb.levB T c ζ ⟨C.t c (b j), hb j⟩ (k - i), Lb.mem T c ζ _ (k - i)⟩ : Dc W T c)) ∈
@@ -84,8 +84,8 @@ theorem detect [IsFractionRing O LL] (hP4 : LevelMapHodgeFiltration W) (hSat : S
           (∑ᶠ i : ℕ, PowerSeries.coeff i (W.lev c ζ ((baseIdOf hR).d (a j))) •
             (⟨Lb.levB T c ζ ⟨C.t c (b j), hb j⟩ (k - i), Lb.mem T c ζ _ (k - i)⟩ : Dc W T c)) =
           W.levN T c ζ ((baseIdOf hR).d (a j) • (⟨C.t c (b j), hb j⟩ : ↥(W.N T))) k by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, Finset.sum_congr rfl fun j _ => heq j]
+
+        rw [map_sum, Finset.sum_congr rfl fun j _ => heq j]
         exact hk
       intro j
       rw [W.levN_smul]

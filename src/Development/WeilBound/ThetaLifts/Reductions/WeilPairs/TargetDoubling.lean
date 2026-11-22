@@ -93,7 +93,7 @@ theorem swapHom_fst {A α G M : Type} [CommRing A] [Fintype α] [DecidableEq α]
     Sw.swapHom hle om (Subgroup.inclusion hge g, 1) = om (1, g) := rfl
 
 open Formalism.IndefR.DatumF Sw in
-set_option maxHeartbeats 400000 in
+
 theorem dblS_of_dblT (H : TargetDoubling) : SourceDoubling := by
   intro F E _ _ _ _ _ σ B hB nS nT JS JT hS hT ξ₀ hξ hσξ hL χS χT cS cT rS rT ω hω JA JB ξ hA hBm κ _ co hrat om hom
   have lS := invT_mul hS

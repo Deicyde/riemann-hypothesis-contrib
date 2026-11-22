@@ -66,7 +66,7 @@ lemma scale {n : ℕ} (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End 
 
 end SecondMomentAlgebra
 
-set_option maxHeartbeats 800000 in
+
 theorem second_moment_of_columns : A0 → A1 → FiltrationAdjointStable → CasimirIsRealScalar → A5 → A6 → ColumnOperatorMoments → A8 := by
   intro h0 h1 h1s h3c h5 h6 h8a n ε V _ _ E hM
   obtain ⟨-, -, hZc, hcas⟩ := h0 n ε V E hM

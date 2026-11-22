@@ -164,7 +164,7 @@ def herrZ1Δ {O D ι : Type} [CommRing O] [AddCommGroup D] [Module O D] (γ φ :
   herrCocycles γ φ ⊓ ⨅ d ∈ S, LinearMap.ker (LinearMap.prodMap (δ d) (δ d) - LinearMap.id)
 
 
-set_option maxHeartbeats 1000000 in
+
 structure LocWach (PD : PeriodData G Qp K₀ K B BdR) (LL O : Type) [Field LL] [Algebra Qp LL]
     [CommRing O] [Algebra O LL] [TopologicalSpace LL] (v : AddValuation LL (WithTop ℚ)) (n : ℕ) where
 
@@ -967,11 +967,11 @@ theorem isUnit_inclW_ξ : IsUnit (inclW l AI.ξ) := by
   rw [inclW, WittVector.map_coeff]
   have h0 : AI.ξ.coeff 0 = ∑ i ∈ Finset.range l, AI.ε1 ^ i := by
     have := congrArg (fun x => WittVector.constantCoeff x) (show AI.ξ = AI.ξ from rfl)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ξ, map_sum, map_pow] at this ⊢
+
+    simp only [ξ, map_sum, map_pow] at this ⊢
     change WittVector.constantCoeff (∑ i ∈ Finset.range l, (WittVector.teichmuller l AI.ε1) ^ i) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_pow, WittVector.teichmuller_coeff_zero]
+
+    simp [map_sum, map_pow, WittVector.teichmuller_coeff_zero]
   rw [h0]
   intro hz
   have hz' : ∑ i ∈ Finset.range l, AI.ε1 ^ i = 0 :=

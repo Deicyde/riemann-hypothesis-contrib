@@ -41,8 +41,8 @@ theorem sum_toAcr_teichmuller (A : PAlg l) {ι : Type} [Fintype ι] {e : ι → 
   have hE : IsIdempotentElem (∑ a, (WittVector.teichmuller l (e a) : A.W)) := hO.isIdempotentElem_sum
   have hu : IsIdempotentElem (1 - ∑ a, (WittVector.teichmuller l (e a) : A.W)) := hE.one_sub
   have hc : (1 - ∑ a, (WittVector.teichmuller l (e a) : A.W)).coeff 0 = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← WittVector.constantCoeff_apply, map_sub, map_one, map_sum]
+
+    rw [← WittVector.constantCoeff_apply, map_sub, map_one, map_sum]
     simp only [WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero]
     rw [he.complete, sub_self]
   obtain ⟨c, hc'⟩ := Ideal.mem_span_singleton'.1 ((A.mem_span_l_iff _).2 hc)
@@ -50,8 +50,8 @@ theorem sum_toAcr_teichmuller (A : PAlg l) {ι : Type} [Fintype ι] {e : ι → 
   have h0 : A.toAcr n (1 - ∑ a, (WittVector.teichmuller l (e a) : A.W)) = 0 := by
     rw [← ht.pow_succ_eq n, ← hc', map_mul, map_natCast, mul_pow, pow_succ (l : A.Acr n) n, A.pow_l_acr n,
       zero_mul, mul_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, map_one, map_sum, sub_eq_zero] at h0
+
+  rw [map_sub, map_one, map_sum, sub_eq_zero] at h0
   exact h0.symm
 
 theorem lcNat : LcIdem → LcSpec → LcNat := by
@@ -67,8 +67,8 @@ theorem lcNat : LcIdem → LcSpec → LcNat := by
       change algebraMap B.U B.Ug (B.sharp (φ (e a))) ∈ p.asIdeal
       rw [← this]
       exact hm)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, h2, map_sum]
+
+    rw [h1, h2, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [map_mul, PAlg.PdOk.acr_toAcr, WittVector.map_teichmuller, map_natCast]
     rfl
@@ -82,8 +82,8 @@ theorem lcNat : LcIdem → LcSpec → LcNat := by
       rw [hL (e a) (c a) (he.idem a) (fun p hp => by
         change c (f p) = c a
         rw [(hcut a p).1 hp]), natCast_val_castHom l n (A.pow_l_acr n) a]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum, ← one_mul (lcA A n (f.map c)), ← sum_toAcr_teichmuller A he n, Finset.sum_mul]
+
+    rw [h1, map_sum, ← one_mul (lcA A n (f.map c)), ← sum_toAcr_teichmuller A he n, Finset.sum_mul]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [hT a, map_mul, map_natCast]
     rfl

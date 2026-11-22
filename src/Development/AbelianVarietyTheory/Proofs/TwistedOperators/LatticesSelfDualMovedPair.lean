@@ -32,7 +32,7 @@ open GlobalTheory.MovedDict Formalism.L2.Ker GlobalTheory.SignedHC
 open scoped TensorProduct
 open GlobalTheory.MovedDict Formalism.L2.Ker GlobalTheory.SignedHC
 
-set_option maxHeartbeats 800000
+
 
 namespace GlobalTheory.MovedSD
 

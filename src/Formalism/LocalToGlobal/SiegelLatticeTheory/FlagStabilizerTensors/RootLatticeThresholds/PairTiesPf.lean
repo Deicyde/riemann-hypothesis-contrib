@@ -504,7 +504,7 @@ end Rec
 
 
 open Formalism.L2.SG.TermTieOf in
-set_option maxHeartbeats 800000 in
+
 theorem pairTies_of (hι : IotaRowC) : Formalism.L2.SG.TermTieOf.PairTiesAll := by
   intro D X Y hF W hI
   have hlf : ∀ u, lf D (FlagOfWord W u) = Formalism.L2.SG.Saturated.mapL (W.δ u) (W.isom u) (lf D (X.Fu u)) := fun u => rfl

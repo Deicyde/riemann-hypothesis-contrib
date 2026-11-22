@@ -14,7 +14,7 @@ open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ
 open ReciprocityTheory.ChartRestriction.G.Geo (mcPts IsMultiHomog SameOrbit segre fibre IsGoodProj IsSheet HermLine IsSmoothHerm sheetDensity maDensity ptsIntegral ptsIntegralAt pot)
 open ReciprocityTheory.ChartRestriction.G.AI.I2 (IsRatSectionOn logNormRat)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.projection_regular_on_nonvanishing_chart : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (X : Scheme.{0}) [IsIntegral X] (i : X ⟶ MP ℤ m n) [IsClosedImmersion i] (D : ℕ)
     (Ψ : GlobalTheory.CompanionTheory.MixZ.ArchEq.LinProj n D) (N : Pol n) (a : Fin (m + 1) → ℕ), IsMultiHomog N a →
     ∀ (c : GlobalTheory.AlgChart (i ≫ mpStr ℤ m n) σ₀ D) (y : GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀) (z : (Σ k, Bk n k) → ℂ),

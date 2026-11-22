@@ -26,8 +26,8 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.ThreeLayers
 

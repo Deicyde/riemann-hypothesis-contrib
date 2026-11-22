@@ -18,8 +18,8 @@ private theorem exists_forall_algHom_pi_eq_apply_of_finite {K P : Type} [Field K
     have h1 : (1 : P → K) = ∑ p, Pi.single p 1 := by
       simpa using (Finset.univ_sum_single (1 : P → K)).symm
     have h2 : ψ 1 = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h1, map_sum]
+
+      rw [h1, map_sum]
       simp [h]
     simp at h2
   obtain ⟨p, hp⟩ := hex

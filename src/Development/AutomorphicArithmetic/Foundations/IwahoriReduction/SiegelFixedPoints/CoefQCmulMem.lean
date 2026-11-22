@@ -156,7 +156,7 @@ end UpperTheory.Kd.L.One
 open UpperTheory.Kd.L.One
 
 attribute [local instance] algMdl in
-set_option maxHeartbeats 2000000 in
+
 theorem UpperTheory.Kd.L.one :
     ∀ (l : ℕ) [Fact l.Prime], ∃ cc : ℕ, ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] [CharZero Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (N : ℕ) [NeZero N] (c d : ℕ) (gm : (ZMod l)ˣ → SL(2, ℤ)), Par l N c d gm → ∀ (A : ValuationSubring Ω), ((l : ℕ) : Ω) ∈ A.nonunits → ∀ (x : ZMod N) (m n : ℕ), 1 ≤ m → 1 ≤ n → ∀ g ∈ CongruenceSubgroup.Gamma0 N, ¬ (l : ℤ) ∣ en g 0 0 → ¬ (l : ℤ) ∣ en g 1 0 → (∀ r, EE ε l (m + n) N x c d g r ∈ A) ∧ ∃ ξ : ℚ → Ω, (∀ r, ξ r ∈ A) ∧ ∀ s ∈ fixMu Ω (topMu l n m N), Stab A s → ∀ t : ZMod (l ^ n), s (zt ε l (m + n + n)) = zt ε l n ^ t.val * zt ε l (m + n + n) → ∀ φ : HahnSeries ℚ Ω, IsDl X A l n ((topMu l n m N) : ℚ) (X.sl (ofSL g) (wkMu X l n m N x c d s)) φ → ∀ r : ℚ, CgA A l n ((l : Ω) ^ cc * φ.coeff r) (s (ξ r) - ξ r + (l : Ω) ^ cc * ((N : Ω) ^ 3 * EE ε l (m + n) N x c d g r * (t.val : Ω))) := by
   intro l _

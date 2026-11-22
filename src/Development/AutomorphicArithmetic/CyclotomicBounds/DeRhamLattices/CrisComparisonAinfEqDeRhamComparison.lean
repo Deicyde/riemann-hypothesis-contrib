@@ -8,8 +8,8 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.CrisIncl
 
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
-set_option maxHeartbeats 2000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 theorem _root_.UpperTheory.KN.crisComparison_ainf_eq_deRhamComparison :
     ∀ (l : ℕ) [Fact l.Prime] (Pl : LocPrime l) (AI : LocAinf l Pl) (Td : LocTied l Pl AI) (w : Ainf l), GlobalTheory.BKGal.JumpDR.cB Td (acrisToBcris l (ainfToAcris l w)) = GlobalTheory.BKGal.JumpDR.cD Td (ainfToBdRp l w) := by

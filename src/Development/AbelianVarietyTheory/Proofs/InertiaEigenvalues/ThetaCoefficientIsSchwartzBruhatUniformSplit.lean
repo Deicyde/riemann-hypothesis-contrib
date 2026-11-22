@@ -23,7 +23,7 @@ open GlobalTheory.DownLift.SplitCoef
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace GlobalTheory.DownLift.SplitCoef
 
