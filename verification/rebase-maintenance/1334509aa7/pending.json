@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/MemSpanHeisenbergTranslatesOfVacuum.lean",
+      "stages": {
+        "1": "3647394f96a740808aa3ba02356b414efc68b83a",
+        "2": "a93a58be655b8bd82476d69ca3a0c37d06a8cd7d",
+        "3": "b86f84b13f167c5117a220cd2e5014bec6b9bbe2"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "f8dd4040a9617614691f3e50f88aa2e7f2a4e3f1",
+  "checkpoint_head": "d6057c03224a45c2c0a05865d0ad0df04ce1435e"
+}
