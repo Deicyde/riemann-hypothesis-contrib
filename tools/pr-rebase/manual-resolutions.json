@@ -501,6 +501,17 @@
             "resolution": "resolutions/54-inertia-characteristic-polynomial.lean"
           }
         ]
+      },
+      {
+        "commit": "bc9b3241f4630c698427c8895460dd35601af9f9",
+        "files": [
+          {
+            "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/GaussianHessianIntegral.lean",
+            "ours": "731373c54d4d7299f859e5decf1bf044ee69547e",
+            "resolution": "resolutions/54-retain-gaussian-integral.lean"
+          }
+        ],
+        "note": "Both proposed G8 shared Gaussian helpers were pruned from main. Keep the surviving local one-dimensional proof and do not resurrect the pruned Hessian declarations."
       }
     ]
   }
