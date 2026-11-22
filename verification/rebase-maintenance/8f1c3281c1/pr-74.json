@@ -1,0 +1,38 @@
+{
+  "number": 74,
+  "title": "Give four duplicated theorems a single defining module",
+  "status": "empty-after-rebase",
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "original_head": "f31ab6435355e24214ff0e86e24a59394322892e",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "fix/canonical-ahslim-theorems",
+  "initial_head": "06f38a132b762aafb0cc2b01aa0608128a346a64",
+  "rebased_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "prepared_branch": "maintenance/rebased-pr-74-8f1c3281c1-45052873081-owned",
+  "ready_to_publish": false,
+  "published_head": "f31ab6435355e24214ff0e86e24a59394322892e",
+  "changes": "",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Published to the original PR branch with a checked head and an original-head backup.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "applied_before_restack": true,
+  "previous_prepared_head": "f31ab6435355e24214ff0e86e24a59394322892e",
+  "restack_commit_count": 1,
+  "automatic_resolutions": [],
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 0
+}

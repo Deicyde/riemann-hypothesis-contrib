@@ -1,0 +1,443 @@
+{
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "run": "45052873081-owned",
+  "results": [
+    {
+      "number": 74,
+      "title": "Give four duplicated theorems a single defining module",
+      "status": "empty-after-rebase",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "f31ab6435355e24214ff0e86e24a59394322892e",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "fix/canonical-ahslim-theorems",
+      "initial_head": "06f38a132b762aafb0cc2b01aa0608128a346a64",
+      "rebased_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "prepared_branch": "maintenance/rebased-pr-74-8f1c3281c1-45052873081-owned",
+      "ready_to_publish": false,
+      "published_head": "f31ab6435355e24214ff0e86e24a59394322892e",
+      "changes": "",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Published to the original PR branch with a checked head and an original-head backup.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "applied_before_restack": true,
+      "previous_prepared_head": "f31ab6435355e24214ff0e86e24a59394322892e",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 0
+    },
+    {
+      "number": 80,
+      "title": "Remove stub-check guards from the 4.36 port (stacked on #66)",
+      "status": "empty-after-rebase",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "59057b1de27671658ab87022f0899613f91ae3b4",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "cleanup/port-4.36-stub-guards",
+      "initial_head": "942cc4de41b2922bafbf871b184ff8edd2dd80b5",
+      "rebased_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "prepared_branch": "maintenance/rebased-pr-80-8f1c3281c1-45052873081-owned",
+      "ready_to_publish": false,
+      "published_head": "59057b1de27671658ab87022f0899613f91ae3b4",
+      "changes": "",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Published to the original PR branch with a checked head and an original-head backup.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "applied_before_restack": true,
+      "previous_prepared_head": "59057b1de27671658ab87022f0899613f91ae3b4",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 0
+    },
+    {
+      "number": 81,
+      "title": "Remove debugging output from the 4.36 port (stacked on #66)",
+      "status": "empty-after-rebase",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "6f3d67880dcd8dde6b76f6ec6d8a0b7fd2114145",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "cleanup/port-4.36-debug-output",
+      "initial_head": "0620a66560485fd220ed3e0fd8a15743fa5decaa",
+      "rebased_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "prepared_branch": "maintenance/rebased-pr-81-8f1c3281c1-45052873081-owned",
+      "ready_to_publish": false,
+      "published_head": "6f3d67880dcd8dde6b76f6ec6d8a0b7fd2114145",
+      "changes": "",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Published to the original PR branch with a checked head and an original-head backup.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "applied_before_restack": true,
+      "previous_prepared_head": "6f3d67880dcd8dde6b76f6ec6d8a0b7fd2114145",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 0
+    },
+    {
+      "number": 91,
+      "title": "Combine reviewed proof cleanups on Lean 4.36",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "68fc637250dd1538cdda48bdb41dc99b46e939c7",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "cleanup/reviewed-on-4.36",
+      "initial_head": "d4663eed405af528c67a3b1213021373cf8c0a5c",
+      "rebased_head": "5f6bd3054e0dfbc308b91995b2f77be1f0ec3dc7",
+      "prepared_branch": "maintenance/rebased-pr-91-8f1c3281c1-45052873081-owned",
+      "ready_to_publish": false,
+      "published_head": "68fc637250dd1538cdda48bdb41dc99b46e939c7",
+      "changes": "79 files changed, 1390 insertions(+), 8336 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Published to the original PR branch with a checked head and an original-head backup.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "applied_before_restack": true,
+      "previous_prepared_head": "68fc637250dd1538cdda48bdb41dc99b46e939c7",
+      "restack_commit_count": 19,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 4
+    },
+    {
+      "number": 97,
+      "title": "Run the Lean auto-formatter over `src/` (stacked on #66)",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "c97a0fa101f9e2d70e163df2de9c2e3f79edcd79",
+      "original_repo": "Deicyde/riemann-hypothesis-contrib",
+      "original_branch": "format/port-4.36-lean-formatter",
+      "initial_head": "c44cd7f33a4ba6671fd3a43fcdc3c94ff93890af",
+      "rebased_head": "b8639cd323956c6d79725075f2a610f41ed036d4",
+      "prepared_branch": "maintenance/rebased-pr-97-8f1c3281c1-45052873081-owned",
+      "ready_to_publish": false,
+      "published_head": "c97a0fa101f9e2d70e163df2de9c2e3f79edcd79",
+      "changes": "147369 files changed, 7886813 insertions(+), 4124033 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 49,
+      "note": "Published to the original PR branch with a checked head and an original-head backup.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "applied_before_restack": true,
+      "previous_prepared_head": "c97a0fa101f9e2d70e163df2de9c2e3f79edcd79",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/FamilyThroughDiscreteSeries.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "ef80fb3a9b06cc179a189885e4cf7030bec88e49"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WeightedUniformRotatedOfExpansion.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "81905433374cb0e791926821580147660e619bad"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreePairing.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "ea6e12a7444d37fce32557246e6e55176952a80d"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "49d41585f994f4a92a0ca09150e7703324b8b7ff"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "f85ca6d53f7385532924fa62cca53dd8f6a19b4f"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyBound.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "af3b85d4f4da5520d5036d55eb595bc4fefac1d7"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/AbelianSchemeLawProofs/CoequifiberedDiagramMap.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "819fdd4036e1556832631536fe033eda3b8b02da"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ExistsAutomorphismPermutationMaxOrderMembers.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "7e0b674d0a0718ad7a445487c171a002c6704c62"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ExistsGrpObjOfStrictBirationalLaw.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "9bfa98a9d9d485561a0f86b749607a1e8b5adebe"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ExistsStrictModelOfBirational.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "dca74ad951d1cdc0201a813b17e7951ae5ad634a"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ExistsUnionTranslates.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "b7de752b3aca3c44dedfbc088d8620c63f08e39d"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ExistsWeakNeronModelBirationalGroupLaw.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "d09e2166c1ce1be1c254f89c86a2324e0d1408b7"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModels.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "e613eeca21f76195c2af8687feec94a7ebca578a"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "092c944407f4399b743964f1cd8aedb2beebefe3"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelGroupLawDefinedAtTranslate.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "23770d4ad1603147c4e1f3677d3fb65949dc7dc3"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculus.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "abcd2212533882891ec4320b93477a441828abe2"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "521637452f81b8747eaec6edd345469d1400001f"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeron.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "e980e29949fae7e26f7fa0128438a91359a8da0d"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "142ce053f7945a9bf7d786ef758515e352ba8399"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/StrictModelTranslatesTwistCompatible.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "50b4a417d39388d285bfcd79ddfe452d8930d133"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/TranslationBySection.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "2cd37b3b173f012f7a14c5c5b6f14f535dc74df1"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselian.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "6dcb1eb57fc52e7560b38d5965d12fd8fdb0f1cb"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "1d56d1f2115f0bf092a27a0776a5eb182805e65d"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsEtaleNeighbourhoodFinitePieceIsolatedPoint.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "8dce47cffb67ab2af5ee4c3ff1f97f984a51f8aa"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/RelObjIsoHomSubtype.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "fec1fc48ef152e83fa19e8b43023b4f4e69849c4"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CovolumeUnipotentIntegralNormalisedHaar.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "8f9b9dcb5f3c99fa9f0f98cdb5fe6febf58895ab"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/IsPtOfMulJ0Decoration.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "19838a6ae1e53dfcb10181e78cd03fdf0338099c"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/SatakeParameters/ExistsIntegerUnitSplitPlaceConjugatePrime.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "0e490095f7660fa5681947cec447d5cd61aefcb8"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "f68694555586640e3f2b62ad83a72690c8ba170f"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/ClaimStrip.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "5527ddf26c002dce6ad79e44bdc0a498488da2ab"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/Imprimitive.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "7abd1f5055ccf51bf99ebb9a117e7434ec61ca28"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/Foundations/EtaleClopenDescent/CofilteredSchemeLimitExistsLocally.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "057ef2470dc0f3d94f8a659ced3511a57e46a429"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/AntidiagonalTranspose.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "58cfa6461a134c51c57448c633e708e2996d99ca"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CapelliComplements/GeneralBFactAlt.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "29e5f4e8090c4bb107c263661415765d40f14be0"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CoboundaryOfGenerator.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "84b0554c1f7096a3e09581bbab167d26e88dc59b"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/FgZ1T.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "169d6ed8c8909b30e8b4061e7b7a3cb3eb9b14a4"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/NormalizedMatrixSpan.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "7a79f7cfd89470f020586a023d20b88b97785e0c"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/SmoothQuot.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "52d1bbe723ae2ed92a55d4401f4eff7926d18828"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/ThetaInvolution.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "a0ca908136000d61cbcb320c2e60ea7f9c846c81"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/TwistedKernelFixed.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "880d9ad86ef8016905bab74af44f7d54de4bccf0"
+        },
+        {
+          "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "b9edf3e2c5955f8ddf8a2323ce8c40ecc6f11ce4"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "c144b03d41a23f4f857fa4c705f4b2845e92a702"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "d7beb1b6ac660de16c0aa66ba32db726cee74f33"
+        },
+        {
+          "path": "src/Formalism/SharpRestriction/GrowthBounds/PolBridge.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "74b54e80ae1fd15d9b3b6815e6050c20100b0c57"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "43c115082034e9d342d7d46016b5e8bc84835321"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/ExistsPrimeFiltrationOfIsMultiHomogIdeal.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "3d8e8df2a22dc5dcc48608a5191f1f2af4d3abe4"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterDivSupp.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "923da77928a45af705d2b804472c3b72a25bf838"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterPCProof.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "05a83d39c456aedeafe7d127336b5f9cd95b7ba1"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/CasimirCoefficients/IsClosedKset.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "95ca17ff644b69091d8c97ce37958a3509af9c33"
+        }
+      ],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 1
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
