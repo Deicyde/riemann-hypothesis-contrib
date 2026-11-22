@@ -1,54 +1,81 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsRingHomPowPrimePow
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PfFacts
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WpPf
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PerfectTensorProduct
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsPQ
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PqLift
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PerfectTensorGeneratedLift
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PqBaseChangePolynomial
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnitTZpow
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EqCOfToLaurentEqInvert
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MulEqZeroOfCPowMemSpan
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsConstOfRhoEq
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LaurentEqToLaurentSubInvert
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmulSmulMemRange
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProdLeftEqRTensor
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsFgTmulEqZero
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OneTmulMemRangeIff
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CovOfAlgHom
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GoodBaseChange
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CancelLTensor
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FrobeniusPowerSolutionLift
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PerfectFrobeniusRootSolution
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsRetraction
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsKill
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DirectedSystemTrR
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SolvAtStage
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AicValOfIsColim
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TorsQuot
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompletionComplete
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsComplNonZeroDivisor
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PfOfIsCompl
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsComplExistsUnique
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.WittExactSequences.IsCompl
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ComplVal
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsEvalEqProdOfNatDegreeEq
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MulProdCongr
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HenselPolynomialRefinement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemPowSmulTopIff
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsIsWP
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.BijectiveAlgebraMapZero
+public import Mathlib.Algebra.Polynomial.Laurent
+public import Mathlib.RingTheory.TensorProduct.Maps
+public import Mathlib.RingTheory.Valuation.ValuationRing
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AicValOfIsColim
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AltAlt
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WpHomotopy
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LeftCommLTensorNatural
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TensorPunitEqZero
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmulEqZeroOfLTensorSubtypeEqZero
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.BijectiveAlgebraMapZero
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CancelLTensor
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CofaceRel
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ComplVal
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompletionComplete
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CovOfAlgHom
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DirectedSystemTrR
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsConstOfRhoEq
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsIsWP
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsKill
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsPQ
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsRetraction
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsComplExistsUnique
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsComplNonZeroDivisor
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LaurentEqToLaurentSubInvert
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemPowSmulTopIff
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MulEqZeroOfCPowMemSpan
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OneTmulMemRangeIff
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PfFacts
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PfOfIsCompl
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PqBaseChangePolynomial
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PqLift
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProdLeftEqRTensor
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmulMemRangeLTensorOfLTensorEqZero
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SolvAtStage
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TensorPunitEqZero
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TmulEqZeroOfMemSpan
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CofaceRel
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TorsQuot
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnitTZpow
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WpHomotopy
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WpPf
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

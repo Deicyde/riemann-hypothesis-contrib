@@ -1,8 +1,16 @@
 module
 
 public import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.MemPairOfMemSingle
-public import Mathlib.NumberTheory.Padics.PadicVal.Basic
-public import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+public import Mathlib.RingTheory.Ideal.BigOperators
+import Mathlib.RingTheory.LocalRing.ResidueField.Basic
+import Mathlib.RingTheory.PowerSeries.NoZeroDivisors
+import Mathlib.Tactic.Continuity.Init
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
