@@ -6,7 +6,6 @@ public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExi
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.BridgeExpK
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.InfCharDataA
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.AnalyticVectors.Unitary
-public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.HloweqTransfer
 
 @[expose] public section
 
@@ -22,7 +21,7 @@ theorem hloweq_transfer {n : ℕ} {ε : Fin n → Bool} {Λ : Fin n → ℝ} (A 
     (hAK : ∀ k ∈ Kset ε, ∀ x, A (rreg ε k x) = rreg ε k (A x)) {S : Submodule ℂ (L2 ε)}
     (hinj : ∀ w ∈ S, A w = 0 → w = 0) (hS : Formalism.MainNotions.S.IsKTypeOf ε (rreg ε) Λ S) :
     Formalism.MainNotions.S.IsKTypeOf ε (rreg ε) Λ (S.map A) :=
-  _root_.UpperTheory.Reformulated.B.Re4.hloweq_transfer A hAK hinj hS
+  kType_map_of_inj hS A hAK hinj
 
 theorem hloweq_brIdx {n : ℕ} (c : Fin n → Fin n → ℕ) :
     brIdxSum (∑ a, ∑ b, (c a b : ℝ) • Formalism.REAL.root a b) =

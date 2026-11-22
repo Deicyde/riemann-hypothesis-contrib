@@ -1,9 +1,7 @@
 module
 
-public import CompanionTheory.RealGroups.FormalDegrees.ArchimedeanFormalDegrees.NormIndOfSteps
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormInductionOfEstimates
-public import CompanionTheory.RealGroups.FormalDegrees.ArchimedeanFormalDegrees.FormalDegreeFormula.CoefPow
+public import CompanionTheory.RealGroups.FormalDegrees.ArchimedeanFormalDegrees.SignDefiniteness.ExplicitFunctionSquareIntegrable
+import Development.WeilBound.RepresentationTheoryGL.FormalDegree.FormalDegreeHilbert.ExplicitFunctionSquareIntegrable
 
 @[expose] public section
 
@@ -11,7 +9,7 @@ namespace CompanionTheory.RgFd
 
 open CompanionTheory.RgDs
 
-theorem psiNorm : PsiNorm := psiNorm_of (normInd_of_steps coefPow GlobalTheory.CompanionTheory.RgFdNorm.norm_induction_of_estimates)
+theorem psiNorm : PsiNorm := PositivityTheory.RgFd.psiNorm
 
 theorem explicit_function_square_integrable : ExplicitFunctionSquareIntegrable := square_integrable_of_norm psiNorm
 
