@@ -263,6 +263,35 @@ That needs the two theorems named above, which `Main.lean` has, and no declarati
 submission under a name the three files use. A text search of the 164,464 `.lean` files at
 commit `f1f6d654` finds no `GRH` or `RiemannHypothesis` namespace and none of the other names.
 
+**On a real build.** ishaan2006 ran these steps against a build of the published archive, and
+reported the results on the pull request ([first](https://github.com/leanprover-community/riemann-hypothesis/pull/88#issuecomment-7078205608),
+[second](https://github.com/leanprover-community/riemann-hypothesis/pull/88#issuecomment-7079766889),
+[script](https://github.com/ishaan2006/rh-lean-reproduction/blob/83b8c511b39f7b646fa4443a9d68b54369fa0b4a/scripts/12_formal_conjectures.sh)).
+The measurements are theirs, not ours. They used the three Lean files as they were at commit
+`c018a709`. The current ones are byte-identical, apart from a path in the module docstring of
+`FormalConjecturesSolution.lean`.
+
+- All three files compile against the real `Main.lean`, with warnings as errors. `#print axioms`
+  gives `propext`, `Classical.choice` and `Quot.sound` for both theorems.
+- Step 1b on Linux (Debian 13, x86_64) gives a challenge export of 350,866,107 bytes with the
+  sha256 in the README, as on macOS and in CI.
+- Step 3b gives a solution export of 61,570,614,651 bytes, sha256
+  `17719b54c91e0f5c3f89a1741fd074b5b86f15f26ac57b443ef965f4ccd72f70`, in 5,712 s.
+- `con-leche --compare` on the two exports exits 0, in 182 s on 94 cores:
+
+  ```
+  con-leche: accepted 51688 declarations, 2 axioms justified by the solution fc-solution.export (1468413 declarations accepted) (--verified)
+  con-leche: theorem RiemannHypothesis.riemannHypothesis justified by the solution
+  con-leche: theorem GRH.generalized_riemann_hypothesis justified by the solution
+  ```
+
+  This is con-leche's `compare` branch at `274f0138`, built with Lean `v4.36.0`. The con-leche
+  bundled with Lean `v4.36.0` cannot check this project ([Checkers](#checkers)).
+- `lake comparator` has not been run on this export, so Lean's kernel, Lean paranoid and nanoda
+  have not judged it.
+- On 94 cores, `lake exe cache get` in the formal-conjectures clone failed with
+  `No file descriptors available (os error 24)`. `ulimit -n 65536` beforehand fixed it.
+
 ## Dependencies
 
 Each pin in `lake-manifest.json` was compared with its repository on GitHub.
