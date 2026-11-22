@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-12",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/HomogeneousIdeals/IsAdicCompleteComapConstantCoeff.lean",
+          "stages": {
+            "1": "059eb7881e82c76b6023bc4600629aefbf3b2f1c",
+            "2": "92f504c08be410e66ddbe40a6d9750652bf67ce7",
+            "3": "cf6983dc42c227504c9df089eeea784b3b35db85"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "6e25e8c3dc0f0acfea936738b6e90f42b256d9db",
+      "checkpoint_head": "d764864bad1820c23b16fd6fd7075442fc1efa90"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
