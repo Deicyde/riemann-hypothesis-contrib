@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-19",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AutomorphicArithmetic/DivisorFrames/ExistsNsmulMemSumImageLatticeOfSurjectiveMod.lean",
+          "stages": {
+            "1": "68d43bfbba01ef17d4f336f0380d02ae1730569c",
+            "2": "e8b8838b58adce77c9dee7137c902e4d69f69e26",
+            "3": "98567bb56405be0dfb28e284e04a6d5b942b9748"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "3da981d3bc33c51533267331c8b2f35e7b4191b3",
+      "checkpoint_head": "e70458afbae47611bcceb276b2e5433bcc97f86d"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
