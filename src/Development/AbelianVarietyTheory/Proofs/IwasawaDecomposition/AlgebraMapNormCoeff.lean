@@ -1,5 +1,6 @@
 module
 
+public import Mathlib.RingTheory.TensorProduct.Finite
 public import Mathlib.LinearAlgebra.Charpoly.Basic
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield

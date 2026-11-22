@@ -2,7 +2,7 @@ module
 
 public import GroundTheory.PAdicHodge.AInfGalois
 public import GroundTheory.PAdicHodge.BdRAlg
-import GroundTheory.PAdicHodge.TiltAlgClosed
+public import GroundTheory.PAdicHodge.TiltAlgClosed
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic

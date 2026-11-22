@@ -1,5 +1,7 @@
 module
 
+public import Mathlib.Analysis.Matrix.MeasurableSpace
+public import Formalism.DoubleCosetMeasures.StatementZ
 public import Development.AbelianVarietyTheory.Definitions.Divisors.RankEqCardIffExistsFrameMatrixFirstColumnBlock
 public import Development.AbelianVarietyTheory.Definitions.Divisors.OmAUnipFourierInv
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsTranslatesEqPrimFrameLat
@@ -12,7 +14,6 @@ public import Development.AutomorphicArithmetic.DivisorFrames.HaarVolSelfEqOneOf
 public import Development.AutomorphicArithmetic.DivisorFrames.IntegralMemAddSubgroupOfRamifiedTwistedInvariant
 public import Development.AutomorphicArithmetic.DivisorFrames.IsIntegralUnitCharOfConductorLe
 public import Development.AutomorphicArithmetic.DivisorFrames.NuDetMulSliceBBlockAction
-import Formalism.DoubleCosetMeasures.StatementZ
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic

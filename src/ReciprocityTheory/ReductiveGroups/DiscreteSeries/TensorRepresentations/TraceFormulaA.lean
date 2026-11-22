@@ -52,6 +52,7 @@ import ReciprocityTheory.ReductiveGroups.DiscreteSeries.RigidityTheorems.ClosGen
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.RigidityTheorems.MultOneA
 import ReciprocityTheory.ReductiveGroups.DiscreteSeries.RigidityTheorems.RorthFunctionalEqZero
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.MeasurePreservingMulRight
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.CoefEmbed
 
 @[expose] public section
 
