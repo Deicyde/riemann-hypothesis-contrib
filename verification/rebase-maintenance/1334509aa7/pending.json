@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/PeriodIntegrals/HermitianGenusExtension/SemilocalHermitianLattices/ExistsNormOneOfPair.lean",
+      "stages": {
+        "1": "d64f1acff315550ee62eaa702f315325d8cf4f6c",
+        "2": "106425d766ca4a4f5d057bf8c61a543034d508da",
+        "3": "d8b6e01a41eabaff20c291fbcdfa900b3378f78f"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "eee9059f8124a6d48588a2ba1d1cd51f4c9ed319",
+  "checkpoint_head": "260134d6b08c6ddf99a9fe255a1bbb71dfbcd0a4"
+}
