@@ -1,5 +1,6 @@
 module
 
+public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.GenericExistsUniqueOActOfIsGrpPullback
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SubsetSpanBy
 public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsUniqueFactorCompletedStalkOfMap
 public import Mathlib.RingTheory.AdicCompletion.LocalRing

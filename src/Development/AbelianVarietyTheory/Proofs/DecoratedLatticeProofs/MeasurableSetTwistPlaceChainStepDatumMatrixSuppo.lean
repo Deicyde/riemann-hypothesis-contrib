@@ -1,5 +1,6 @@
 module
 
+public import Mathlib.Analysis.Matrix.MeasurableSpace
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.PhiQEqZeroOfNotMem
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNonarchimedeanLocalField
 import Mathlib.Algebra.Order.Floor.Extended

@@ -1,5 +1,7 @@
 module
 
+public import Mathlib.Analysis.Matrix.MeasurableSpace
+public import Formalism.DoubleCosetMeasures.StatementZ
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsLocIsoRefl
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsNotRelZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SquareStanding

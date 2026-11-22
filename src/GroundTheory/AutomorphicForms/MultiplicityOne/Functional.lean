@@ -41,6 +41,7 @@ import Mathlib.Tactic.TypeStar
 import GroundTheory.AutomorphicForms.CuspidalDiscreteness.Counting
 import GroundTheory.AutomorphicForms.QuotientMeasure
 public import GroundTheory.AutomorphicForms.ReductionMahler
+public import GroundTheory.AutomorphicForms.CuspidalDiscreteness.CuspFormsDecay
 
 @[expose] public section
 

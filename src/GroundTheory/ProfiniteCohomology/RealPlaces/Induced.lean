@@ -6,7 +6,7 @@ public import GroundTheory.ProfiniteCohomology.MackeyFormula.CompactSupport
 public import GroundTheory.ProfiniteCohomology.Shapiro
 import GroundTheory.ProfiniteCohomology.CoinducedModules.Acyclic
 import GroundTheory.ProfiniteCohomology.MackeyFormula
-import GroundTheory.ProfiniteCohomology.PoincarePairs.IsDiscreteRepResHomCoindRes
+public import GroundTheory.ProfiniteCohomology.PoincarePairs.IsDiscreteRepResHomCoindRes
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic

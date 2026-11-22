@@ -43,6 +43,7 @@ import Mathlib.Topology.Sheaves.Init
 import Development.AbelianVarietyTheory.Definitions.Foundations.MeasurePreservingRmulQuotMeas
 public import Development.WeilBound.RepresentationTheoryGL.StandardBasisDerivatives.ArchimedeanBasisDerivatives.StBasDeriv
 public import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
+public import Development.AbelianVarietyTheory.Definitions.Foundations.ContinuousOfMemCcSmooth
 
 @[expose] public section
 

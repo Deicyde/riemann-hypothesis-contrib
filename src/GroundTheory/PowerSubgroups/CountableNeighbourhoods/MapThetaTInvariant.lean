@@ -49,6 +49,7 @@ import Mathlib.Topology.Separation.CompletelyRegular
 import Mathlib.Topology.Sheaves.Init
 import Std.Tactic.BVDecide.Normalize.Prop
 public import Mathlib.MeasureTheory.Measure.Haar.Unique
+public import Mathlib
 
 @[expose] public section
 

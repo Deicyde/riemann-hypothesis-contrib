@@ -47,6 +47,7 @@ import Formalism.LocalRingCardinality.SpanPowerMembership.HasStrictFDerivAtExpZe
 import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
 import Formalism.SharpRestriction.CuspSpanNormBounds.Point
 public import Formalism.SharpRestriction.Divisibility.PlaceRankTwoOne
+public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
 
 @[expose] public section
 

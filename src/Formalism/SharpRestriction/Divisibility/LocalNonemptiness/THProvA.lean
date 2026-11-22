@@ -44,6 +44,7 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Algebra.Group.Units
 import Mathlib.Topology.Sheaves.Init
+public import Mathlib
 
 @[expose] public section
 

@@ -1,5 +1,6 @@
 module
 
+public import Formalism.DoubleCosetMeasures.StatementZ
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsNotRelZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHasLocalSmall
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemGlLatCongOfSmul

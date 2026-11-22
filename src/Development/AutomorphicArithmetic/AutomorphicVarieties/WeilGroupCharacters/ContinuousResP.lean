@@ -45,6 +45,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Compactness.Paracompact
 import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.TrivialOnInertiaOfUnr
+public import GroundTheory.ProfiniteCohomology.RealPlaces.GSDefs
 
 @[expose] public section
 

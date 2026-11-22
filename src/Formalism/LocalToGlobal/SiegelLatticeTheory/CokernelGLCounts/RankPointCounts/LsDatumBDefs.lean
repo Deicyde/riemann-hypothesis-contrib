@@ -38,6 +38,7 @@ import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 import Mathlib.Topology.Sheaves.Init
 import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DataCut
+public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
 
 @[expose] public section
 
