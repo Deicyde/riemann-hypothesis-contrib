@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AutomorphicSpectrum/Proofs/MembershipProofs/DenseHasCompactSupport.lean",
+      "stages": {
+        "1": "80cd44e9d6a14704bc75fbc882dffda52fa1e6b9",
+        "2": "bf41988195fe01b276bd4ab89170dcf6a28e81ab",
+        "3": "5bef0059e06a8d69571f6be2195373b5ddb227b2"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "925fa65e8f63d3234006bb7ee1d7f707f48d0e70",
+  "checkpoint_head": "b29d38cd65c6266fefc5cbf3ebe9f0eccd43239e"
+}
