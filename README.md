@@ -93,8 +93,9 @@ What to know before running it:
   `v4.36.0`. The exporter is [lean4export](https://github.com/leanprover/lean4export) at tag
   `v4.33.0`, built with Lean `v4.33.1`.
 - **Challenge first.** Compiling the submission runs its code, so the challenge is exported
-  where none of that code has been compiled. CI does step 1 on every push and checks that the
-  export has sha256 `bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9`.
+  where none of that code has been compiled. CI does step 1 whenever a file it reads changes,
+  and checks that the export has sha256
+  `bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9`.
 - **Not `lake exe cache get`.** In this repository that command also downloads prebuilt files
   for the submission itself, and `lake build Main` then compiles nothing. Steps 1 and 2 use
   `lake exe mathlib/cache get`, which fetches Mathlib only.
@@ -154,7 +155,7 @@ lake comparator --config "$CLEAN/comparator/formal-conjectures.json" \
 
 - **Nothing is retyped in the challenge.** It is exported from formal-conjectures at a pinned
   commit, which uses the same Lean and the same Mathlib commit as this project. CI checks both
-  and does step 1b on every push. The sha256 of `fc-challenge.export` is
+  and does step 1b whenever a file it reads changes. The sha256 of `fc-challenge.export` is
   `75aa4a26e43ba9ea2998ba28ebdec4d72c43b43944e6c333963c4cfeda08c2c1`.
 - **The solution copies the statement.** Comparator wants the solution to state the theorem,
   and to define everything the statement uses, as the challenge does and under the same names.

@@ -159,7 +159,8 @@ Sylvester Kaczmarek moved, restructured or extended the two files the declaratio
 
 **The pin.** Commit `d8d031d4` has this project's `lean-toolchain`, and its manifest pins
 Mathlib at `0df444a360ea`, as ours does. Comparator needs the challenge and the solution to be
-built against the same Mathlib ([Limits](#limits)). CI compares both pins on every push.
+built against the same Mathlib ([Limits](#limits)). CI compares both pins whenever it runs the
+rehearsal below.
 
 **The challenge** is exported from a clean clone of formal-conjectures. This repository supplies
 the list of names to export and nothing else. Building that one module compiles 271 others from
@@ -227,7 +228,8 @@ proves the two theorems, under formal-conjectures' names, by applying the bridge
 know about the other. The README compiles the files with `lake env lean`, into
 `.lake/comparator/`. So the `[leanOptions]` of the lakefile do not apply to them. For
 `Challenge.lean` that changes nothing: compiled this way, its export has the sha256 it had as a
-library, the one in the README, and CI checks that on every push.
+library, the one in the README, and CI checks that whenever a file the export depends on
+changes.
 
 **Cost.** The export of `FormalConjecturesSolution` contains the whole proof, as the export of
 `Main` does, plus the bridge. Making it and judging it cost what steps 3 and 4 of the README
@@ -248,8 +250,13 @@ So the statement and the three constants match formal-conjectures', and the kern
 bridge. `#print axioms` on the bridge's theorems gives `propext`, `Classical.choice` and
 `Quot.sound`. The challenge export is 350,866,107 bytes and 6,495,773 lines, with the sha256
 in the README; the placeholder's solution export is 422,418,402 bytes. An accepting run took
-9 minutes and 0.9 GB of memory on a busy laptop. The `formal-conjectures` job in CI repeats the
-rehearsal on every push.
+9 minutes and 0.9 GB of memory on a busy laptop.
+
+The `formal-conjectures` job in CI repeats the rehearsal, and the `challenge` job makes the
+original challenge export and checks its sha256. Both run when something they read changes:
+`comparator/`, `src/Statements.lean`, `lakefile.toml`, the two pins in `lake-manifest.json`
+and `lean-toolchain`, or the workflow itself. No other change can alter their result, so
+pull requests that touch only the proof, the scripts or the documentation do not run them.
 
 The rehearsal does not compile `FormalConjecturesSolution.lean` against the real `Main.lean`.
 That needs the two theorems named above, which `Main.lean` has, and no declaration in the
@@ -389,8 +396,8 @@ on one thread.
   - The challenge export given to the judge is made in a new folder, created after the
     container has exited, from a fresh clone and a fresh download of Mathlib's official cache.
     A build that altered the compiled Mathlib in its own folder cannot change what the
-    challenge means. CI makes the export again on every push and checks its sha256, as a
-    second, independent copy.
+    challenge means. CI makes the export again whenever a file it depends on changes, and
+    checks its sha256, as a second, independent copy.
   - The exporter and the other tools in the work directory are rebuilt after the build.
   - Every compiled dependency file in the build folder is compared with a clean official copy.
     A first comparison during the build found all 121,742 files identical.

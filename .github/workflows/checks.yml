@@ -4,9 +4,27 @@ name: checks
 # external runner pool.
 # The original-submission provenance comparison is available by manual dispatch.
 
+# The two challenge jobs read only the files listed under `paths`, so they run when one of those
+# changes: on pull requests, on main, and by manual dispatch. Other changes cannot alter their
+# result. Keep the two lists the same.
 on:
   push:
+    branches: [main]
+    paths:
+      - comparator/**
+      - src/Statements.lean
+      - lakefile.toml
+      - lake-manifest.json
+      - lean-toolchain
+      - .github/workflows/checks.yml
   pull_request:
+    paths:
+      - comparator/**
+      - src/Statements.lean
+      - lakefile.toml
+      - lake-manifest.json
+      - lean-toolchain
+      - .github/workflows/checks.yml
   workflow_dispatch:
 
 permissions:
