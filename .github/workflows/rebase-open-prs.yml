@@ -1,0 +1,34 @@
+name: Rebase old RH pull requests
+on:
+  push:
+    branches: [maintenance/rebase-open-prs]
+    paths:
+      - tools/pr-rebase/**
+      - .github/workflows/rebase-open-prs.yml
+permissions:
+  contents: write
+concurrency:
+  group: rebase-old-rh-prs
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout: |
+            tools/pr-rebase
+      - name: Rebase pinned PRs without executing their code
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/pr-rebase/rebase_open_prs.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rebase-reports
+          path: ${{ runner.temp }}/rh-rebase-*/results/
+          if-no-files-found: warn
