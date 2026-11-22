@@ -7,6 +7,7 @@ Conflicts remain explicit; no blanket ours/theirs conflict policy is used.
 """
 import base64
 import collections
+import difflib
 import json
 import os
 import re
@@ -81,53 +82,71 @@ def resolve_module_conflicts(number):
             mode, sha, stage = meta.split()
             entries[path][stage] = sha
     resolved = []
-    for path, stages in entries.items():
-        if not path.endswith('.lean') or number in (44, 63, 85):
-            continue
-        if set(stages) == {'1', '3'}:
-            # The port pruned this module. Do not resurrect edits to the old dead file.
-            git('rm', '--force', '--ignore-unmatch', '--', path)
-            resolved.append({'path': path, 'reason': 'retain-main-pruning'})
-            continue
-        if set(stages) == {'1', '2'}:
-            # Preserve this PR's intentional file deletion; validate imports after replay.
-            git('rm', '--force', '--', path)
-            resolved.append({'path': path, 'reason': 'retain-PR-deletion'})
-            continue
-        if set(stages) != {'1', '2', '3'}:
-            continue
-        blobs = {stage: git('cat-file', 'blob', sha).stdout for stage, sha in stages.items()}
-        ours = blobs['2']
-        if not ours.startswith('module\n') or '@[expose] public section' not in ours:
-            continue
-        if any(re.match(r'^import\s', line) for line in ours.splitlines()):
-            continue  # A privately imported module requires a separate visibility review.
-        def normalize(source):
-            source = re.sub(r'\Amodule\n', '', source)
-            source = re.sub(r'^public import ', 'import ', source, flags=re.M)
-            source = re.sub(r'^@\[expose\] public section\n', '', source, flags=re.M)
-            return source.lstrip('\n')
-        temporary = ROOT / 'merge-inputs'
-        temporary.mkdir(exist_ok=True)
-        paths = []
-        for stage in ['2', '1', '3']:
-            f = temporary / stage
-            f.write_text(normalize(blobs[stage]))
-            paths.append(str(f))
-        merged = subprocess.run(['git', 'merge-file', '-p', *paths],
-                                capture_output=True, text=True)
-        if merged.returncode:
-            continue
-        lines = merged.stdout.splitlines(keepends=True)
-        imports = [i for i, line in enumerate(lines) if re.match(r'^import\s', line)]
-        if not imports:
-            continue
-        for i in imports:
-            lines[i] = 'public ' + lines[i]
-        lines.insert(imports[-1] + 1, '\n@[expose] public section\n')
-        (REPO / path).write_text('module\n\n' + ''.join(lines))
-        git('add', '--', path)
-        resolved.append({'path': path, 'reason': 'three-way-replay-through-module-header'})
+    with subprocess.Popen(['git', '-C', str(REPO), 'cat-file', '--batch'],
+                          stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                          stderr=subprocess.DEVNULL, env=ENV) as reader:
+        def read_blob(sha):
+            reader.stdin.write((sha + '\n').encode())
+            reader.stdin.flush()
+            header = reader.stdout.readline().split()
+            if len(header) != 3 or header[1] != b'blob':
+                raise RuntimeError('Could not read conflict blob ' + sha)
+            source = reader.stdout.read(int(header[2]))
+            if reader.stdout.read(1) != b'\n':
+                raise RuntimeError('Malformed blob stream')
+            return source.decode('utf-8')
+        for path, stages in entries.items():
+            if not path.endswith('.lean') or number in (44, 63, 85):
+                continue
+            if set(stages) == {'1', '3'}:
+                # The port pruned this module. Do not resurrect edits to the old dead file.
+                (REPO / path).unlink(missing_ok=True)
+                resolved.append({'path': path, 'reason': 'retain-main-pruning'})
+                continue
+            if set(stages) == {'1', '2'}:
+                # Preserve this PR's intentional file deletion; validate imports after replay.
+                (REPO / path).unlink(missing_ok=True)
+                resolved.append({'path': path, 'reason': 'retain-PR-deletion'})
+                continue
+            if set(stages) != {'1', '2', '3'}:
+                continue
+            blobs = {stage: read_blob(sha) for stage, sha in stages.items()}
+            ours = blobs['2']
+            if not ours.startswith('module\n') or '@[expose] public section' not in ours:
+                continue
+            if any(re.match(r'^import\s', line) for line in ours.splitlines()):
+                continue  # A privately imported module requires a separate visibility review.
+            def normalize(source):
+                source = re.sub(r'\Amodule\n', '', source)
+                source = re.sub(r'^public import ', 'import ', source, flags=re.M)
+                source = re.sub(r'^@\[expose\] public section\n', '', source, flags=re.M)
+                return source.lstrip('\n')
+            temporary = ROOT / 'merge-inputs'
+            temporary.mkdir(exist_ok=True)
+            paths = []
+            for stage in ['2', '1', '3']:
+                f = temporary / stage
+                f.write_text(normalize(blobs[stage]))
+                paths.append(str(f))
+            merged = subprocess.run(['git', 'merge-file', '-p', *paths],
+                                    capture_output=True, text=True)
+            if merged.returncode:
+                continue
+            lines = merged.stdout.splitlines(keepends=True)
+            imports = [i for i, line in enumerate(lines) if re.match(r'^import\s', line)]
+            if not imports:
+                continue
+            for i in imports:
+                lines[i] = 'public ' + lines[i]
+            lines.insert(imports[-1] + 1, '\n@[expose] public section\n')
+            (REPO / path).write_text('module\n\n' + ''.join(lines))
+            resolved.append({'path': path, 'reason': 'three-way-replay-through-module-header'})
+        reader.stdin.close()
+        reader.wait()
+    if resolved:
+        pathspec = ROOT / 'resolved-paths.nul'
+        pathspec.write_bytes(('\0'.join(x['path'] for x in resolved) + '\0').encode())
+        git('add', '-A', '--pathspec-from-file=' + str(pathspec), '--pathspec-file-nul')
     return resolved
 
 
@@ -173,15 +192,79 @@ def resolve_manual_ports(number):
     unmerged = set(git('diff', '--name-only', '--diff-filter=U').stdout.splitlines())
     resolved = []
     for f in entry['files']:
-        if f['path'] not in unmerged:
+        if f['path'] not in unmerged and not f.get('added'):
             continue
-        ours = git('rev-parse', ':2:' + f['path'], check=False)
+        ours = git('rev-parse', (':' if f.get('added') else ':2:') + f['path'], check=False)
         if ours.returncode or ours.stdout.strip() != f['ours']:
             continue
         (REPO / f['path']).write_text((HERE / f['resolution']).read_text())
         git('add', '--', f['path'])
         resolved.append({'path': f['path'], 'reason': 'manually-reviewed-Lean-4.36-API-adaptation'})
     return resolved
+
+
+def resolve_deprecated_identifiers(number):
+    if number != 33:
+        return []
+    result = []
+    names = git('diff', '--name-only', '--diff-filter=U').stdout.splitlines()
+    token = r"[\w']+(?:\.[\w']+)*|[^\s]"
+    identifier = r"[^\W\d][\w']*(?:\.[^\W\d][\w']*)*"
+    for path in names:
+        blobs = [git('show', ':' + stage + ':' + path, check=False) for stage in ['1','2','3']]
+        if any(b.returncode for b in blobs):
+            continue
+        base, ours, theirs = (b.stdout for b in blobs)
+        oldlines, newlines = base.splitlines(), theirs.splitlines()
+        changes = {}
+        valid = True
+        for tag, a, b, c, d in difflib.SequenceMatcher(None, oldlines, newlines, autojunk=False).get_opcodes():
+            if tag == 'equal':
+                continue
+            if tag != 'replace' or b-a != d-c:
+                if any(line.strip() for line in oldlines[a:b] + newlines[c:d]):
+                    valid = False
+                continue
+            for left, right in zip(oldlines[a:b], newlines[c:d]):
+                x, y = re.findall(token, left), re.findall(token, right)
+                for kind, i, j, k, l in difflib.SequenceMatcher(None, x, y, autojunk=False).get_opcodes():
+                    if kind == 'equal':
+                        continue
+                    if kind != 'replace' or j-i != l-k:
+                        valid = False
+                        continue
+                    for old, new in zip(x[i:j], y[k:l]):
+                        if not re.fullmatch(identifier, old) or not re.fullmatch(identifier, new):
+                            valid = False
+                            continue
+                        if old in changes and changes[old] != new:
+                            valid = False
+                        changes[old] = new
+        if not valid or not changes:
+            continue
+        def replace(match):
+            name = match[0]
+            if name in changes:
+                return changes[name]
+            if name.startswith('_root_.') and name[7:] in changes:
+                return '_root_.' + changes[name[7:]]
+            for old, new in changes.items():
+                if '.' not in old and name.endswith('.' + old):
+                    prefix = name[:-(len(old)+1)]
+                    if '.' not in new:
+                        return prefix + '.' + new
+                    if prefix == new.rsplit('.', 1)[0]:
+                        return new
+            return name
+        source = re.sub(r"[\w']+(?:\.[\w']+)*", replace, ours)
+        (REPO / path).write_text(source.rstrip() + '\n')
+        result.append({'path': path, 'reason': 'replay-only-deprecated-identifier-renames',
+                       'identifier_changes': changes})
+    if result:
+        pathspec = ROOT / 'identifier-paths.nul'
+        pathspec.write_bytes(('\0'.join(x['path'] for x in result) + '\0').encode())
+        git('add', '-A', '--pathspec-from-file=' + str(pathspec), '--pathspec-file-nul')
+    return result
 
 
 def import_check():
@@ -238,6 +321,9 @@ def finish_report(results, run_tag):
 
 def main():
     global BASE, TAG
+    if os.environ.get('PR_BATCH') in SNAPSHOT.get('skip_batches', []):
+        print('Batch already completed in the first pass', flush=True)
+        return
     ROOT.mkdir(parents=True, exist_ok=True)
     OUT.mkdir(parents=True, exist_ok=True)
     run_tag = os.environ.get('GITHUB_RUN_ID', str(int(time.time()))) + '-' + os.environ.get('PR_BATCH', 'all')
@@ -266,8 +352,11 @@ def main():
         'performance': [79,98,104],
         'reviewed': [71,74,82,90,92],
         'manual': [94,95],
+        'remaining': [33,54,75,88,91,94,95,98],
     }
     selected = set(batches.get(os.environ.get('PR_BATCH'), [p['n'] for p in SNAPSHOT['prs']]))
+    if 'only' in SNAPSHOT:
+        selected &= set(SNAPSHOT['only'])
     prs = sorted([p for p in SNAPSHOT['prs'] if p['n'] in selected], key=lambda p: (p['files'] > 1000, p['files'], p['n']))
     print('BASE ' + BASE + ' PRS ' + ','.join(str(p['n']) for p in prs), flush=True)
     specs = ['refs/pull/' + str(p['n']) + '/head:refs/remotes/pr/' + str(p['n']) for p in prs]
@@ -306,6 +395,7 @@ def main():
                         if not replay.returncode:
                             break
                         changes = resolve_manual_ports(number)
+                        changes += resolve_deprecated_identifiers(number)
                         changes += resolve_reviewed_ports(number)
                         changes += resolve_module_conflicts(number)
                         resolutions.extend(changes)

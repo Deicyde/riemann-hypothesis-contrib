@@ -83,4 +83,3 @@ theorem UpperTheory.Reformulated.B.NormIndexQuadratic.glob_neg_one :
   · simp only [map_mul]
     refine mul_right_cancel₀ hr0 ?_
     linear_combination (-1 / 4) * hpq + (1 / 4) * hconj
-

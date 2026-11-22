@@ -100,4 +100,3 @@ theorem localZeroExpansionOfFactorization : LandauLocalOf := by
   exact (hlogb z (by rw [mem_closedBall] at hz ⊢; linarith)).trans_eq (by rw [div_div_eq_mul_div]; ring)
 
 end Formalism.ZF
-
