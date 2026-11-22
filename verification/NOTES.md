@@ -17,17 +17,11 @@ README, this folder, the CI workflow and, since
 [#7](https://github.com/leanprover-community/riemann-hypothesis/pull/7), the build cache in
 `scripts/`.
 
-Three merged pull requests have since changed the submission's own files under `src/`:
-
-| Pull request | Change |
-|---|---|
-| [#8](https://github.com/leanprover-community/riemann-hypothesis/pull/8) | narrows the imports of `Main.lean` and `Statements.lean`, removes 6 modules |
-| [#45](https://github.com/leanprover-community/riemann-hypothesis/pull/45) | removes 10,718 modules that `Main` no longer imports, edits the imports of 11 |
-| [#57](https://github.com/leanprover-community/riemann-hypothesis/pull/57) | shortens proof terms in 5 modules |
-
-Together they remove 10,724 of the 175,187 original files and edit 18, which leaves 164,464
-`.lean` files with `Challenge.lean`. The five statements in `Statements.lean` are unchanged;
-only its import line differs. `git diff --name-status 40e56bab HEAD -- src` lists every change.
+Merged pull requests have since changed the submission's own files under `src/`, mainly by
+deleting files the proof does not use and by shortening proofs.
+`git diff --name-status 40e56bab HEAD -- src` lists every change in the tree you have, and
+`git diff 40e56bab HEAD -- src/Statements.lean` shows what has changed in the file that states
+the five theorems.
 
 The manual `mirror` job in CI downloads the archive again, compares it with commit `40e56bab`
 byte for byte, and prints that list. The sections below on size, the static scan and the build
