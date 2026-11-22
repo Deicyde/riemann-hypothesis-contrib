@@ -1,0 +1,32 @@
+name: Finish comparator workflow rebase
+on:
+  push:
+    branches: [maintenance/finish-comparator-rebase]
+    paths:
+      - tools/pr-rebase/**
+      - .github/workflows/finish-comparator-rebase.yml
+permissions:
+  contents: write
+jobs:
+  remaining:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout: |
+            tools/pr-rebase
+      - name: Replay explicit resolutions and refreshed heads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BATCH: docs
+        run: python3 tools/pr-rebase/rebase_open_prs.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: restack-rebase-reports
+          path: ${{ runner.temp }}/rh-rebase-*/results/
+          if-no-files-found: warn

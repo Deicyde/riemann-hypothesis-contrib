@@ -56,7 +56,13 @@ def publish_ref(sha, branch):
             # Each run has distinct branch names, so existing refs must match exactly.
             raise RuntimeError('Preparation ref already exists with another head: ' + branch)
         return
-    git('push', OWN, sha + ':refs/heads/' + branch)
+    pushed = git('push', OWN, sha + ':refs/heads/' + branch, check=False)
+    if pushed.returncode:
+        if branch.startswith('maintenance/checkpoint-') and 'without `workflows` permission' in pushed.stderr:
+            print('CHECKPOINT not published: workflow permission; conflict report remains available',flush=True)
+            return False
+        raise RuntimeError('git push: '+pushed.stderr[-4000:])
+    return True
 
 
 def conflict_details():

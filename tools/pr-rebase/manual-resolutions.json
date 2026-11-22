@@ -21,6 +21,18 @@
           }
         ]
       }
+    ],
+    "88": [
+      {
+        "commit": "c018a709ff1c290dcedd636de32fce34cc7587d4",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "ffbeeaaa86179e657b72bcb202a216ef535419c3",
+            "resolution": "resolutions/88-current-readme.md"
+          }
+        ]
+      }
     ]
   }
 }
