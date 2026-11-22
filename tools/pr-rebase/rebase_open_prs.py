@@ -306,9 +306,10 @@ def resolve_manual_ports(number):
     unmerged = set(git('diff', '--name-only', '--diff-filter=U').stdout.splitlines())
     resolved = []
     for f in entry['files']:
-        if f['path'] not in unmerged and not f.get('added'):
+        if f['path'] not in unmerged and not (f.get('added') or f.get('restore_main')):
             continue
-        ours = git('rev-parse', (':' if f.get('added') else ':2:') + f['path'], check=False)
+        prefix = BASE + ':' if f.get('restore_main') else (':' if f.get('added') else ':2:')
+        ours = git('rev-parse', prefix + f['path'], check=False)
         if ours.returncode or ours.stdout.strip() != f['ours']:
             continue
         (REPO / f['path']).write_text((HERE / f['resolution']).read_text())
