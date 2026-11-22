@@ -1,0 +1,22 @@
+{
+  "number": 88,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "README.md",
+      "stages": {
+        "1": "0dcc78956d30bc7380bef582a7e0863253c3e11b",
+        "2": "ffbeeaaa86179e657b72bcb202a216ef535419c3",
+        "3": "d080ef0ef0c86a5992ac5294c4833ee37ca085bf"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "c018a709ff1c290dcedd636de32fce34cc7587d4",
+  "checkpoint_head": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+  "checkpoint_branch": "maintenance/checkpoint-pr-88-fbf2468e1c-45054683016-docs-pr-88-pending-0"
+}
