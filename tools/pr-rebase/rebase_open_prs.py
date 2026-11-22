@@ -7,6 +7,7 @@ Conflicts remain explicit; no blanket ours/theirs conflict policy is used.
 """
 import base64
 import collections
+import difflib
 import json
 import os
 import re
@@ -72,6 +73,98 @@ def conflict_details():
             'conflict_list_truncated': len(entries) > 200}
 
 
+def replay_line_deletions(base, ours, theirs):
+    """Carry unambiguous declaration-deletion ranges through the compiler port."""
+    b, o, t = base.splitlines(keepends=True), ours.splitlines(keepends=True), theirs.splitlines(keepends=True)
+    mask = [False] * len(b)
+    for tag, a, z, _, _ in difflib.SequenceMatcher(None, b, t, autojunk=len(b)>3000).get_opcodes():
+        if tag == 'delete':
+            mask[a:z] = [True] * (z-a)
+    if not any(mask):
+        return None
+    prefix = [0]
+    for remove in mask:
+        prefix.append(prefix[-1] + int(remove))
+    out = []
+    for tag, a, z, c, d in difflib.SequenceMatcher(None, b, o, autojunk=len(b)>3000).get_opcodes():
+        if tag == 'equal':
+            out.extend(o[c+i-a] for i in range(a,z) if not mask[i])
+        elif tag == 'delete':
+            continue
+        elif tag == 'insert':
+            if not (0<a<len(mask) and mask[a-1] and mask[a]):
+                out.extend(o[c:d])
+        else:
+            removed = prefix[z] - prefix[a]
+            if removed == z-a:
+                continue
+            if removed:
+                return None  # A retained declaration overlaps a port rewrite: review separately.
+            out.extend(o[c:d])
+    return ''.join(line for i,line in enumerate(b) if not mask[i]), ''.join(out)
+
+
+def replay_generated_cleanup(number, base, ours, theirs):
+    """Replay restricted cleanup operations without restoring pre-port proof bodies."""
+    b, t = base.splitlines(True), theirs.splitlines(True)
+    edits = [(b[a:z],t[c:d]) for kind,a,z,c,d in
+             difflib.SequenceMatcher(None,b,t,autojunk=False).get_opcodes() if kind!='equal']
+    if number in (4,9):
+        old_imports, new_imports, removed_options = set(), [], set()
+        for old,new in edits:
+            for lines,is_old in ((old,True),(new,False)):
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    m = re.fullmatch(r'import\s+([\w.]+)\s*\n?',line)
+                    if m:
+                        if is_old: old_imports.add(m[1])
+                        else: new_imports.append(m[1])
+                    elif number==9 and is_old and re.fullmatch(r'set_option (?:synthInstance\.)?maxHeartbeats \d+(?: in)?\s*\n?',line):
+                        removed_options.add(line.strip())
+                    else:
+                        return None
+        if number==9 and new_imports:
+            return None
+        retained=set(new_imports)
+        lines=[]
+        for line in ours.splitlines(True):
+            m=re.fullmatch(r'import\s+([\w.]+)\s*\n?',line)
+            if m and m[1] in old_imports-retained:
+                continue
+            if line.strip() in removed_options:
+                continue
+            lines.append(line)
+        existing={m[1] for line in lines if (m:=re.fullmatch(r'import\s+([\w.]+)\s*\n?',line))}
+        additions=list(dict.fromkeys(m for m in new_imports if m not in existing))
+        if any(not (REPO/'src'/Path(*m.split('.'))).with_suffix('.lean').exists()
+               for m in additions if m!='Mathlib' and not m.startswith('Mathlib.')):
+            return None
+        last=max((i for i,line in enumerate(lines) if line.startswith('import ')),default=-1)
+        if last<0: return None
+        lines[last+1:last+1]=['import '+m+'\n' for m in additions]
+        return ''.join(lines)
+    if number==10:
+        out=ours
+        for old,new in edits:
+            if len(old)!=1 or len(new)!=1:
+                return None
+            pattern=r'(\s*)first \| exact @([\w.\'₀-₉]+) \| exact \2 \| \(intros; apply \2 <;> assumption\)\s*'
+            m=re.fullmatch(pattern,old[0])
+            if m and new[0].strip()=='exact @'+m[2]:
+                out=out.replace(old[0],new[0])
+            else:
+                def simp_names(line):
+                    m=re.fullmatch(r'\s*simp(?: \[([\w.\', ]+)\])?\s*',line)
+                    return None if not m else [s.strip() for s in (m[1] or '').split(',') if s.strip()]
+                before,after=simp_names(old[0]),simp_names(new[0])
+                if before is None or after is None or not set(after)<set(before):
+                    return None
+                out=out.replace(old[0],new[0])
+        return out
+    return None
+
+
 def resolve_module_conflicts(number):
     """Replay edits through the known module-header conversion, preserving proof edits."""
     entries = collections.defaultdict(dict)
@@ -81,6 +174,9 @@ def resolve_module_conflicts(number):
             mode, sha, stage = meta.split()
             entries[path][stage] = sha
     resolved = []
+    pruning = (number in (55,58,61,67) and
+               git('rev-parse', 'REBASE_HEAD', check=False).stdout.strip()
+               == 'a7016a34bb7e84e8f031c2179bd71cb9c20f2517')
     with subprocess.Popen(['git', '-C', str(REPO), 'cat-file', '--batch'],
                           stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                           stderr=subprocess.DEVNULL, env=ENV) as reader:
@@ -119,13 +215,28 @@ def resolve_module_conflicts(number):
                 source = re.sub(r'\Amodule\n', '', source)
                 source = re.sub(r'^public import ', 'import ', source, flags=re.M)
                 source = re.sub(r'^@\[expose\] public section\n', '', source, flags=re.M)
+                source = re.sub(r'^(import[^\n]*\n)(?:[ \t]*\n)+', r'\1\n', source, flags=re.M)
                 return source.lstrip('\n')
             temporary = ROOT / 'merge-inputs'
             temporary.mkdir(exist_ok=True)
             paths = []
+            normalized = {stage: normalize(blobs[stage]) for stage in ['2','1','3']}
+            cleanup = replay_generated_cleanup(number, normalized['1'],normalized['2'],normalized['3'])
+            if cleanup is not None:
+                lines=cleanup.splitlines(True)
+                imports=[i for i,line in enumerate(lines) if line.startswith('import ')]
+                if imports:
+                    for i in imports: lines[i]='public '+lines[i]
+                    lines.insert(imports[-1]+1,'\n@[expose] public section\n')
+                    (REPO/path).write_text(('module\n\n'+''.join(lines)).rstrip()+'\n')
+                    resolved.append({'path':path,'reason':'replay-restricted-cleanup-preserving-main-proof-repairs'})
+                    continue
+            deletion_replay = replay_line_deletions(normalized['1'], normalized['2'], normalized['3']) if pruning else None
+            if deletion_replay:
+                normalized['1'], normalized['2'] = deletion_replay
             for stage in ['2', '1', '3']:
                 f = temporary / stage
-                f.write_text(normalize(blobs[stage]))
+                f.write_text(normalized[stage])
                 paths.append(str(f))
             merged = subprocess.run(['git', 'merge-file', '-p', *paths],
                                     capture_output=True, text=True)
@@ -139,7 +250,8 @@ def resolve_module_conflicts(number):
                 lines[i] = 'public ' + lines[i]
             lines.insert(imports[-1] + 1, '\n@[expose] public section\n')
             (REPO / path).write_text('module\n\n' + ''.join(lines))
-            resolved.append({'path': path, 'reason': 'three-way-replay-through-module-header'})
+            resolved.append({'path': path, 'reason': 'replay-deletion-ranges-through-port' if deletion_replay
+                             else 'three-way-replay-through-module-header'})
         reader.stdin.close()
         reader.wait()
     if resolved:
@@ -186,14 +298,17 @@ def resolve_manual_ports(number):
     if not config.exists():
         return []
     entry = json.loads(config.read_text())['prs'].get(str(number))
-    if not entry or value('rev-parse', 'REBASE_HEAD') != entry['commit']:
+    entries = entry if isinstance(entry, list) else [entry]
+    applying = value('rev-parse', 'REBASE_HEAD')
+    entry = next((e for e in entries if e and e['commit'] == applying), None)
+    if not entry:
         return []
     unmerged = set(git('diff', '--name-only', '--diff-filter=U').stdout.splitlines())
     resolved = []
     for f in entry['files']:
-        if f['path'] not in unmerged:
+        if f['path'] not in unmerged and not f.get('added'):
             continue
-        ours = git('rev-parse', ':2:' + f['path'], check=False)
+        ours = git('rev-parse', (':' if f.get('added') else ':2:') + f['path'], check=False)
         if ours.returncode or ours.stdout.strip() != f['ours']:
             continue
         (REPO / f['path']).write_text((HERE / f['resolution']).read_text())
@@ -202,11 +317,76 @@ def resolve_manual_ports(number):
     return resolved
 
 
+def resolve_deprecated_identifiers(number):
+    if number != 33:
+        return []
+    result = []
+    names = git('diff', '--name-only', '--diff-filter=U').stdout.splitlines()
+    token = r"[\w']+(?:\.[\w']+)*|[^\s]"
+    identifier = r"[^\W\d][\w']*(?:\.[^\W\d][\w']*)*"
+    for path in names:
+        blobs = [git('show', ':' + stage + ':' + path, check=False) for stage in ['1','2','3']]
+        if any(b.returncode for b in blobs):
+            continue
+        base, ours, theirs = (b.stdout for b in blobs)
+        oldlines, newlines = base.splitlines(), theirs.splitlines()
+        changes = {}
+        valid = True
+        for tag, a, b, c, d in difflib.SequenceMatcher(None, oldlines, newlines, autojunk=False).get_opcodes():
+            if tag == 'equal':
+                continue
+            if tag != 'replace' or b-a != d-c:
+                if any(line.strip() for line in oldlines[a:b] + newlines[c:d]):
+                    valid = False
+                continue
+            for left, right in zip(oldlines[a:b], newlines[c:d]):
+                x, y = re.findall(token, left), re.findall(token, right)
+                for kind, i, j, k, l in difflib.SequenceMatcher(None, x, y, autojunk=False).get_opcodes():
+                    if kind == 'equal':
+                        continue
+                    if kind != 'replace' or j-i != l-k:
+                        valid = False
+                        continue
+                    for old, new in zip(x[i:j], y[k:l]):
+                        if not re.fullmatch(identifier, old) or not re.fullmatch(identifier, new):
+                            valid = False
+                            continue
+                        if old in changes and changes[old] != new:
+                            valid = False
+                        changes[old] = new
+        if not valid or not changes:
+            continue
+        def replace(match):
+            name = match[0]
+            if name in changes:
+                return changes[name]
+            if name.startswith('_root_.') and name[7:] in changes:
+                return '_root_.' + changes[name[7:]]
+            for old, new in changes.items():
+                if '.' not in old and name.endswith('.' + old):
+                    prefix = name[:-(len(old)+1)]
+                    if '.' not in new:
+                        return prefix + '.' + new
+                    if prefix == new.rsplit('.', 1)[0]:
+                        return new
+            return name
+        source = re.sub(r"[\w']+(?:\.[\w']+)*", replace, ours)
+        (REPO / path).write_text(source.rstrip() + '\n')
+        result.append({'path': path, 'reason': 'replay-only-deprecated-identifier-renames',
+                       'identifier_changes': changes})
+    if result:
+        pathspec = ROOT / 'identifier-paths.nul'
+        pathspec.write_bytes(('\0'.join(x['path'] for x in result) + '\0').encode())
+        git('add', '-A', '--pathspec-from-file=' + str(pathspec), '--pathspec-file-nul')
+    return result
+
+
 def import_check():
     names = value('ls-tree', '-r', '--name-only', 'HEAD', '--', 'src').splitlines()
     modules = {p[4:-5].replace('/', '.') for p in names if p.endswith('.lean')}
     roots = {p.split('.')[0] for p in modules} | {'BuildAid', 'CompanionTheory', 'Development', 'Formalism', 'GroundTheory', 'Lemmata', 'PositivityTheory', 'ReciprocityTheory', 'Supplements'}
     missing = []
+    edges = {m:set() for m in modules}
     proc = subprocess.Popen(['git', '-C', str(REPO), 'grep', '-n', '-E',
                              '^([[:space:]]*(public|meta))*[[:space:]]*import[[:space:]]',
                              'HEAD', '--', 'src'], stdout=subprocess.PIPE,
@@ -221,10 +401,31 @@ def import_check():
             for name in match[1].split('--')[0].split():
                 if name.split('.')[0] in roots and name not in modules:
                     missing.append({'path': path, 'line': number, 'module': name})
+                if name in modules:
+                    module = path[4:-5].replace('/', '.')
+                    if module in edges: edges[module].add(name)
     proc.wait()
     if proc.returncode not in (0, 1):
         raise RuntimeError('Import scan failed')
-    return {'modules': len(modules), 'missing_count': len(missing), 'missing': missing[:100]}
+    reverse = collections.defaultdict(list)
+    counts = {m:len(deps) for m,deps in edges.items()}
+    for module,deps in edges.items():
+        for dependency in deps: reverse[dependency].append(module)
+    queue=collections.deque(m for m,n in counts.items() if not n)
+    while queue:
+        for dependent in reverse[queue.popleft()]:
+            counts[dependent]-=1
+            if not counts[dependent]: queue.append(dependent)
+    remaining={m for m,n in counts.items() if n}
+    cycle=[]
+    if remaining:
+        current=next(iter(remaining)); seen={}; chain=[]
+        while current not in seen:
+            seen[current]=len(chain);chain.append(current)
+            current=next(d for d in edges[current] if d in remaining)
+        cycle=chain[seen[current]:]+[current]
+    return {'modules': len(modules), 'missing_count': len(missing), 'missing': missing[:100],
+            'acyclic': not remaining, 'cycle_sample': cycle[:30]}
 
 
 def finish_report(results, run_tag):
@@ -282,11 +483,16 @@ def main():
         'small-one': [33,54,69,71,75,76,78,82,83],
         'small-two': [62,84,85,86,87,88,90,92,94,95],
         'imports': [4,9,10],
+        'imports-4': [4],
+        'imports-9': [9],
+        'imports-10': [10],
         'pruning': [55,58,61,67],
         'structural': [44,63],
         'performance': [79,98,104],
         'reviewed': [71,74,82,90,92],
         'manual': [94,95],
+        'remaining': [33,54,75,88,91,94,95,98],
+        'pruning-replay': [55,58,61,67],
     }
     selected = set(batches.get(os.environ.get('PR_BATCH'), [p['n'] for p in SNAPSHOT['prs']]))
     if 'only' in SNAPSHOT:
@@ -329,6 +535,7 @@ def main():
                         if not replay.returncode:
                             break
                         changes = resolve_manual_ports(number)
+                        changes += resolve_deprecated_identifiers(number)
                         changes += resolve_reviewed_ports(number)
                         changes += resolve_module_conflicts(number)
                         resolutions.extend(changes)

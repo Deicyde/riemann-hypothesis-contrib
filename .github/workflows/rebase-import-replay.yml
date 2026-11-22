@@ -1,0 +1,36 @@
+name: Replay import and generated cleanup operations on current source
+on:
+  push:
+    branches: [maintenance/rebase-import-replay]
+    paths:
+      - tools/pr-rebase/**
+      - .github/workflows/rebase-import-replay.yml
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    strategy:
+      fail-fast: false
+      matrix:
+        batch: [imports-4, imports-9, imports-10]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout: |
+            tools/pr-rebase
+      - name: Replay restricted cleanup operations and check import cycles
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BATCH: ${{ matrix.batch }}
+        run: python3 tools/pr-rebase/rebase_open_prs.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.batch }}-rebase-reports
+          path: ${{ runner.temp }}/rh-rebase-*/results/
+          if-no-files-found: warn
