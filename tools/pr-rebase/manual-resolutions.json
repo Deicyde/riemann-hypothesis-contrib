@@ -47,6 +47,16 @@
             "resolution": "resolutions/88-comparator-layout-readme.md"
           }
         ]
+      },
+      {
+        "commit": "bdaedd6bba4ffb3434a85770328c9d1e09c2fb8c",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "ca57fd7d8060522e82aba634295fbf156d2df70c",
+            "resolution": "resolutions/88-moved-main-config-readme.md"
+          }
+        ]
       }
     ]
   }
