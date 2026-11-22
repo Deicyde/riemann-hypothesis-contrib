@@ -1,35 +1,54 @@
 module
 
-public import Mathlib
-public import Formalism.HermitianLattices.HermitianLatticesProofs.DualBasic
+public import Formalism.HermitianLattices.GenusCovolBound
+import Formalism.HermitianLattices.HermitianLatticesProofs.AutFinite
+import Formalism.HermitianLattices.HermitianLatticesProofs.ClassSetFinite
+import Formalism.HermitianLattices.HermitianLatticesProofs.FinIntermediate
+import Formalism.HermitianLattices.HermitianLatticesProofs.GenusBasic
+import Formalism.HermitianLattices.HermitianLatticesProofs.GenusCovol
 public import Formalism.HermitianLattices.HermitianLatticesProofs.IsomAct
-public import Formalism.HermitianLattices.HermitianLatticesProofs.LocBasic
-public import Formalism.HermitianLattices.StatementTheta
-public import Formalism.LatticeTheta.ThetaShiftInversion
-public import Formalism.HermitianLattices.HermitianLatticesProofs.ThetaSummable
-public import Formalism.HermitianLattices.StatementLat
-public import Formalism.HermitianLattices.HermitianLatticesProofs.LocDual
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusBasic
-public import Formalism.HermitianLattices.HermitianLatticesProofs.DualLattice
-public import Formalism.HermitianLattices.HermitianLatticesProofs.IndexBasic
-public import Formalism.HermitianLattices.HermitianLatticesProofs.FinIntermediate
+import Formalism.HermitianLattices.HermitianLatticesProofs.IsomOfTrace
 public import Formalism.HermitianLattices.HermitianLatticesProofs.ShortVectors
-public import Formalism.HermitianLattices.HermitianLatticesProofs.IsomOfTrace
-public import Formalism.HermitianLattices.HermitianLatticesProofs.DualOrthSum
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusScale
 public import Formalism.HermitianLattices.HermitianLatticesProofs.TraceReal
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusCovolBound
-public import Formalism.HermitianLattices.HermitianLatticesProofs.ClassSetAssembly
-public import Formalism.HermitianLattices.HermitianLatticesProofs.MajLattice
-public import Formalism.HermitianLattices.HermitianLatticesProofs.AutFinite
-public import Formalism.HermitianLattices.HermitianLatticesProofs.MajDual
-public import Formalism.HermitianLattices.StatementMaj
-public import Formalism.HermitianLattices.HermitianLatticesProofs.MajBasic
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusCovol
-public import Formalism.HermitianLattices.HermitianLatticesProofs.NeighbourConstruct
-public import Formalism.HermitianLattices.HermitianLatticesProofs.ClassSetFinite
-public import Formalism.HermitianLattices.DiscrFinite
-public import Formalism.HermitianLattices.HermitianLatticesProofs.UnimodUnramUnique
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

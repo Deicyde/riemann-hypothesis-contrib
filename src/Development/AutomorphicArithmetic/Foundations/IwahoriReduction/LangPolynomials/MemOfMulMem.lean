@@ -1,24 +1,60 @@
 module
 
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.NormOfDvd
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.FrobEx
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.DvdOfNormLe
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.ToBasis
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.ContOf
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.ExistsTau
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.IwOpsRedUn
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.SerMulPow
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.RepUniq
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.RepAdd
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.RepSmul
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.IsUnitNat
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.RepFrob
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.Period
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.PConj
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.DivEqZeroOfCg
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.HtvExpand
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.NormSubLeOne
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.FixedIntegersIsUnitOfNotMemPrimeSpan
 public import Development.AbelianVarietyTheory.Definitions.Foundations.ExistsEqSubOfMemCob
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.ContOf
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.DivEqZeroOfCg
+import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.DvdOfNormLe
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.ExistsTau
+import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.FrobEx
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.HtvExpand
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.IsUnitNat
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.IwOpsRedUn
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.NormOfDvd
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.NormSubLeOne
+import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.PConj
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.Period
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.RepAdd
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.RepFrob
+import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.RepSmul
+import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.RepUniq
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.SerMulPow
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.ToBasis
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
