@@ -64,8 +64,30 @@ jobs:
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Fetch Mathlib's official build cache
         run: lake exe mathlib/cache get
-      - name: Build only the Challenge module
-        run: lake build Challenge
+      # Step 1 of the README. The challenge is in no Lake library; it is compiled directly.
+      - name: Compile only the challenge
+        run: |
+          mkdir -p .lake/comparator
+          lake env lean --root=comparator -o .lake/comparator/Challenge.olean comparator/Challenge.lean
+      - name: Build the exporter (lean4export v4.33.0 with this project's Lean)
+        run: |
+          git clone --quiet --depth 1 --branch v4.33.0 https://github.com/leanprover/lean4export "$RUNNER_TEMP/lean4export"
+          cp lean-toolchain "$RUNNER_TEMP/lean4export/lean-toolchain"
+          cd "$RUNNER_TEMP/lean4export" && git rev-parse HEAD && lake build lean4export
+      - name: Export the challenge
+        run: |
+          LEAN_PATH="$PWD/.lake/comparator" lake env "$RUNNER_TEMP/lean4export/.lake/build/bin/lean4export" Challenge \
+            -- $(cat comparator/main-export-targets.txt) > "$RUNNER_TEMP/challenge.export"
+          cd "$RUNNER_TEMP"
+          sha256sum challenge.export | tee challenge.export.sha256
+          {
+            echo "### Challenge export"
+            echo "- sha256: \`$(cut -d' ' -f1 challenge.export.sha256)\`"
+            echo "- size: $(wc -c < challenge.export) bytes, $(wc -l < challenge.export) lines"
+            echo "- commit: \`$GITHUB_SHA\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # The README quotes this checksum; fail if the export ever changes.
+          echo "bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9  challenge.export" | sha256sum -c
 
   # The second Comparator setup, comparator/formal-conjectures.json. See the README and the notes.
   formal-conjectures:

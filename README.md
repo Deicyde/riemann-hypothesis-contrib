@@ -17,7 +17,7 @@ This repository also adds Comparator files and cache infrastructure:
 
 | File | What it is |
 |---|---|
-| [`src/Challenge.lean`](src/Challenge.lean) | the five theorems, stated in a file that imports only Mathlib |
+| [`comparator/Challenge.lean`](comparator/Challenge.lean) | the five theorems, stated in a file that imports only Mathlib |
 | [`comparator/main.json`](comparator/main.json) | the Comparator config |
 | [`comparator/main-export-targets.txt`](comparator/main-export-targets.txt) | the declarations to export |
 | [`comparator/formal-conjectures.json`](comparator/formal-conjectures.json) | a [second Comparator setup](#checking-it-against-formal-conjectures), whose challenge is formal-conjectures' own statement of RH and GRH |
@@ -69,8 +69,10 @@ export MATHLIB_CACHE_GET_URL=https://cache.mathlib.org/mathlib4   # Mathlib's cu
 # 1. Export the challenge. Clean clone at $CLEAN, Lean v4.33.1.
 cd "$CLEAN"
 lake exe mathlib/cache get
-lake build Challenge
-lake env lean4export Challenge -- $(cat comparator/main-export-targets.txt) > challenge.export
+mkdir -p .lake/comparator
+lake env lean --root=comparator -o .lake/comparator/Challenge.olean comparator/Challenge.lean
+LEAN_PATH="$PWD/.lake/comparator" lake env lean4export Challenge -- \
+  $(cat comparator/main-export-targets.txt) > challenge.export
 
 # 2. Build the solution. Second clone, inside a sandbox with no network. Takes hours.
 lake exe mathlib/cache get      # before entering the sandbox
@@ -91,17 +93,16 @@ What to know before running it:
   `v4.36.0`. The exporter is [lean4export](https://github.com/leanprover/lean4export) at tag
   `v4.33.0`, built with Lean `v4.33.1`.
 - **Challenge first.** Compiling the submission runs its code, so the challenge is exported
-  where none of that code has been compiled. CI does step 1 on every push and publishes the
-  result as the `challenge-export` artifact. Its sha256 is
-  `bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9`.
+  where none of that code has been compiled. CI does step 1 on every push and checks that the
+  export has sha256 `bd484ac9886a96f26b1d9a7a59ebd45b7a70d102c015d4f31f9302bbdd6ab2b9`.
 - **Not `lake exe cache get`.** In this repository that command also downloads prebuilt files
   for the submission itself, and `lake build Main` then compiles nothing. Steps 1 and 2 use
   `lake exe mathlib/cache get`, which fetches Mathlib only.
 - **Cost.** Hours on a large machine, about 100 GB of disk, and a lot of memory for step 4.
-- **Moved files.** `comparator/main.json` and `comparator/main-export-targets.txt` were
-  `comparator.json` and `export-targets.txt` at the root until
-  [#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88). Their contents are
-  unchanged, so the exports are too.
+- **Moved files.** Until [#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88)
+  the three files of this setup were `src/Challenge.lean`, a library in `lakefile.toml`, and
+  `comparator.json` and `export-targets.txt` at the root. Their contents are unchanged, and so
+  is the challenge export. `lakefile.toml` now describes only the submission and the cache.
 
 The [notes](verification/NOTES.md) have the details: where the source came from, the Lean
 version and its known kernel fixes, the tools, the sandboxes, the test of these steps, and the
@@ -161,8 +162,9 @@ lake comparator --config "$CLEAN/comparator/formal-conjectures.json" \
   from formal-conjectures, and `FormalConjecturesBridge.lean` repeats the GRH statement.
   Neither imports the submission's proofs, so nothing there can change how Lean reads them.
   Comparator rejects a copy that differs.
-- **Not a Lake library.** `lakefile.toml` and `src/` are inputs to the build cache, so the three
-  files stay out of both and are compiled by hand.
+- **No Lake library.** Like `Challenge.lean`, the three files are in no library of
+  `lakefile.toml`, which describes only the submission and the cache. They are compiled
+  directly.
 - **Cost.** Step 3b takes minutes, but `fc-solution.export` contains the whole proof again, so
   exporting and judging it cost what steps 3 and 4 do.
 
