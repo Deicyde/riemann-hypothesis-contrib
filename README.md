@@ -21,7 +21,7 @@ This repository also adds Comparator files and cache infrastructure:
 | [`comparator.json`](comparator.json) | the Comparator config |
 | [`export-targets.txt`](export-targets.txt) | the declarations to export |
 | [`verification/`](verification/NOTES.md) | our notes, and the results once there are some |
-| [`literature/`](literature/README.md) | which published results the proof's statements correspond to (a reader's proposals) |
+| [`docs/references.bib`](docs/references.bib) | the works cited in docstrings under `src/` |
 | [`scripts/`](scripts/) | public Lake cache configuration and reproducible bootstrap/publishing tools |
 
 ## Using the build cache
