@@ -6,7 +6,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerOrbitV
 
 @[expose] public section
 
-
 noncomputable section
 
 namespace PI.VolStabSW
