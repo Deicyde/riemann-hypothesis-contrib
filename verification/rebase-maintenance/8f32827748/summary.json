@@ -1,0 +1,29 @@
+{
+  "base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "run": "45048636006-remaining-pending-85",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/FiniteQuotientOfCompleteNakayama.lean",
+          "stages": {
+            "1": "4f30ed72539e2f634cf6504741cbf3cacdee49a3",
+            "2": "df14be4f1333516b713855974b8193d9239d6263",
+            "3": "613d38d12cfe8316164aa7024b108b85ee7d50be"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "036dfd8d9ea1498dea97165e771d23bdbc66a24d",
+      "checkpoint_head": "1c523d18761b7111aba7cb50158a780753c97436",
+      "checkpoint_branch": "maintenance/checkpoint-pr-54-8f32827748-45048636006-remaining-pending-85"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
