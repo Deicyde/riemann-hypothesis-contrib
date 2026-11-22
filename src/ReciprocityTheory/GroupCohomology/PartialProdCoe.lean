@@ -246,4 +246,3 @@ end
 end CohomologyFunctoriality₂
 
 end ReciprocityTheory.Coh
-

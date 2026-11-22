@@ -927,4 +927,3 @@ end Main
 end Formalism.FourierDecayAlt.P.InverseBoundedFixedPoint
 
 theorem Formalism.FourierDecayAlt.P.morseLemma : Formalism.FourierDecayAlt.A6.MorseLemma := Formalism.FourierDecayAlt.P.InverseBoundedFixedPoint.morse
-

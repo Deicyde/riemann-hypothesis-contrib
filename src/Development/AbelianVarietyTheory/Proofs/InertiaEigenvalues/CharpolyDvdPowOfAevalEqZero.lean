@@ -77,4 +77,3 @@ theorem eq_zero_of_trace_mul {K : UQ} (B : InvAlg K) (hsep : B.P.Separable) (a :
   rw [map_pow, hm, map_zero]
 
 end GlobalTheory.UnitLemma.Centraliser
-
