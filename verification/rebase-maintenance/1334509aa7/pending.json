@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/WeightedL2BoundedMul.lean",
+      "stages": {
+        "1": "7460c0303c2d75089d2515aee63950398921ced3",
+        "2": "360064443d8cc27b56884d49b8f8ffd8d034bb1f",
+        "3": "9a91453de04497a319478f95ecef66714f2102e5"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "8ef8e87396d32a2d0519f67ab0d7f32f85ce3fb8",
+  "checkpoint_head": "c230524b8dc00c0b2bc674d1eeab2d8b7367fb7e"
+}
