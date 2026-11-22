@@ -10,7 +10,7 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticDat
 
 open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
 open Formalism.L2.Pj Formalism.L2.Pj.QAt Formalism.MainNotions Formalism.BasicNotions Formalism.L2.LamCM GlobalTheory.ArcCM
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.cmArcDatumFamily_functional_bounded_linear_on_cuspForms :
     Known → ∀ (D : D7) (T : Core D) (h : LawsCore T) (j : ℕ)
     (ka : WeightFamilies.Wt D j) (CR Tt cc : ℝ) (large₂ : SizeData₂ D),

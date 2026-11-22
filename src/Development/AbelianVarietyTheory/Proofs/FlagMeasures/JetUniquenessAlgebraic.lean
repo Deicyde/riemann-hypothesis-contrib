@@ -127,8 +127,8 @@ private lemma sum_jmW_slotE_eq_sum_sub (E : Fin n → Fin n → Module.End ℂ V
 theorem jm_theta_equiv (E : Fin n → Fin n → Module.End ℂ V) (hE : GlRel E) {j : ℕ} (c d : Fin n)
     (F : Arr V n j) : thetaA E j (arrE E j c d F) = E c d (thetaA E j F) := by
   rw [jm_thetaA_apply, jm_thetaA_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [jm_arrE_apply, map_add (f := _), map_sum, Finset.sum_add_distrib]
+
+  simp only [jm_arrE_apply, map_add (f := _), map_sum, Finset.sum_add_distrib]
   rw [Finset.sum_comm]
   simp only [sum_jmW_slotE_eq_sum_sub]
   rw [Finset.sum_comm, ← Finset.sum_add_distrib]
@@ -206,8 +206,8 @@ theorem mapArr_arrE (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (
     {j : ℕ} (F : Arr V n j) (hF : F ∈ arrV0 ε E u j) (c d : Fin n) (hcd : ε c = ε d) :
     mapArr ι n j (arrE E j c d F) = arrE E' j c d (mapArr ι n j F) := by
   refine PiLp.ext (fun α => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mapArr_apply, jm_arrE_apply, map_add (f := _), map_sum]
+
+  simp only [mapArr_apply, jm_arrE_apply, map_add (f := _), map_sum]
   rw [hι c d hcd _ (val_mem ε E u F hF α)]
   congr 1
   refine Finset.sum_congr rfl (fun i _ => ?_)
@@ -231,11 +231,11 @@ theorem theta_slices {j : ℕ} (F : Arr V n (j + 1)) :
   simp only [mapArr_apply]
   rw [← (Fin.consEquiv fun _ => Fin n × Fin n).sum_comp, Fintype.sum_prod_type, Finset.sum_comm]
   refine Finset.sum_congr rfl (fun α' _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Fintype.sum_prod_type]
+
+  rw [map_sum, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl (fun a _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl (fun b _ => ?_)
   rw [at1_sliceLin]
   simp [jmW, List.ofFn_succ, jm_ew_append, ew, Fin.consEquiv]

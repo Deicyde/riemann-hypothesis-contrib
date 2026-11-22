@@ -64,11 +64,11 @@ theorem isProjPrime_map {W : Ideal (MvPolynomial (Fin m) (𝓞 K))} (hW : IsProj
     rw [e]
     exact Ideal.mem_map_of_mem _ (hW.isHomog g hg d)
   · intro a b _ hb d
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [smul_eq_mul, ← b.sum_homogeneousComponent, ← a.sum_homogeneousComponent, Finset.sum_mul_sum, map_sum]
+
+    rw [smul_eq_mul, ← b.sum_homogeneousComponent, ← a.sum_homogeneousComponent, Finset.sum_mul_sum, map_sum]
     refine Ideal.sum_mem _ fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Ideal.sum_mem _ fun j _ => ?_
     rw [homogeneousComponent_of_mem ((homogeneousComponent_isHomogeneous i a).mul
       (homogeneousComponent_isHomogeneous j b))]

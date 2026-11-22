@@ -136,7 +136,7 @@ def liftHom (T : Thick (smFun Z q)) (hT : ⊤ ≤ CosieveSiteLaws.ptZ q T ⁻¹�
     (DPMorphism.id T.δ).isDPMorphism (fun _ h => h) ((ptMap_id q T.J _ _).trans (liftT_y π U q T hT))
 
 
-set_option maxHeartbeats 2000000 in
+
 def liftInv (T : Thick (smFun Z q)) (hT : ⊤ ≤ CosieveSiteLaws.ptZ q T ⁻¹ᵁ U) :
     T ⟶ (smS π rfl).G.obj (liftT π U q T hT) :=
   mkH (γ := dividedPowersBot K) (p := 0) (X := Z) (q := q) (κ := Ideal.Quotient.mk ⊥)
@@ -150,12 +150,12 @@ def liftInv (T : Thick (smFun Z q)) (hT : ⊤ ≤ CosieveSiteLaws.ptZ q T ⁻¹�
 theorem liftHom_φ (T : Thick (smFun Z q)) (hT : ⊤ ≤ CosieveSiteLaws.ptZ q T ⁻¹ᵁ U) (x : T.B) :
     (liftHom π U q T hT).φ x = x := rfl
 
-set_option maxHeartbeats 2000000 in
+
 theorem liftInv_φ (T : Thick (smFun Z q)) (hT : ⊤ ≤ CosieveSiteLaws.ptZ q T ⁻¹ᵁ U) (x : T.B) :
     (liftInv π U q T hT).φ x = x := rfl
 
 
-set_option maxHeartbeats 2000000 in
+
 def liftIso (T : Thick (smFun Z q)) (hT : ⊤ ≤ CosieveSiteLaws.ptZ q T ⁻¹ᵁ U) :
     (smS π rfl).G.obj (liftT π U q T hT) ≅ T where
   hom := liftHom π U q T hT

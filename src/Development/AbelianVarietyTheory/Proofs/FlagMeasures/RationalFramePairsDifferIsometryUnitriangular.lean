@@ -50,8 +50,8 @@ theorem tri_map {E W : Type} [Field E] [AddCommGroup W] [Module E W] {n : ℕ} {
   have hc' : ∀ b, g b = ∑ a, A a b • f a := hc
   refine ⟨A, hA, fun b => ?_⟩
   show γ (g b) = ∑ a, A a b • γ (f a)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hc' b, map_sum]
+
+  rw [hc' b, map_sum]
   simp [map_smul]
 
 theorem exists_isom_of_gram (hW : PI.WittExtension) {K V : Type} [Field K] [StarRing K] [CharZero K]

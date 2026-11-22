@@ -30,8 +30,8 @@ theorem lm_comp (B : InfinitePlace L → Matrix (Fin N) (Fin N) ℂ) (γ : Gm L 
     rw [← Matrix.mulVec_mulVec]
     congr 1
     ext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
+
+    simp [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
   have hinv : ∀ y : Fin N → 𝓞 L, ((γ⁻¹ : Gm L N) : Matrix (Fin N) (Fin N) (𝓞 L)) *ᵥ
       ((γ : Matrix (Fin N) (Fin N) (𝓞 L)) *ᵥ y) = y := by
     intro y

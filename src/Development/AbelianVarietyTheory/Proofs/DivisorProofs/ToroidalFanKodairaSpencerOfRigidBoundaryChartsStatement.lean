@@ -17,6 +17,6 @@ open GlobalTheory.LogKS (IsField)
 open GlobalTheory.RayEv (Ray)
 open GlobalTheory.Toroidal GlobalTheory.LogKS GlobalTheory.RigChart GlobalTheory.Heat
 attribute [local instance] Over.cartesianMonoidalCategory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.toroidalFanKodairaSpencer_of_rigidBoundaryCharts : GlobalTheory.RigChart.RigidForFan → GlobalTheory.Published.ToroidalForFanKS := by
   first | exact @GlobalTheory.RigChart.toroidalForFanKS_of_rigidForFan | exact GlobalTheory.RigChart.toroidalForFanKS_of_rigidForFan | (intros; apply GlobalTheory.RigChart.toroidalForFanKS_of_rigidForFan <;> assumption)

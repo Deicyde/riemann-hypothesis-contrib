@@ -99,8 +99,8 @@ theorem ev_OE_latO {k : ℕ} (bs : Module.Basis (Fin k) F E) : ∀ᶠ v : Height
     have hz' : z ∈ (OE E v : Set (v.adicCompletion F ⊗[F] E)) := hz
     rw [OE_eq_image] at hz'
     obtain ⟨c, hc, rfl⟩ := hz'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     change (Finsupp.applyAddHom j) (∑ i, B.repr (c i ⊗ₜ[F] ((RingOfIntegers.basis E) i : E))) ∈ _
     rw [map_sum]
     refine sum_mem fun i _ => ?_

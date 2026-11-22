@@ -13,7 +13,7 @@ open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.Ar.GR
 open GlobalTheory.CompanionTheory.Ar.GR.SubGrp (exists_eq_spMap exists_sp_iso exists_grpObj_of_mono) in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finite_flat_subgroup_scheme :
     ∀ (R : Type) [CommRing R] (A : Over (Spec (CommRingCat.of R))) [GrpObj A]
       (B : Type) [CommRing B] [Algebra R B] (h : sp (R₀ := R) B ⟶ A),

@@ -18,8 +18,8 @@ open GlobalTheory.FormInner (frameEquiv)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.MtRead
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
-set_option maxHeartbeats 1000000 in
+
+
+
 theorem _root_.GlobalTheory.T.exists_standard_frameKeepsMatrices : ∀ (D : D7) (hF : D.host.F = maximalRealSubfield D.host.E) (j : Fin D.R.m), FWT.VStd D j → ∃ P : principalLevelFrame.RowPsi (Vc D j) D.R.nV, IdFrame hF P ∧ GlobalTheory.Mem.R3.StdFrame hF P := by
   first | exact @GlobalTheory.MtRead.IdFrameStd.exists_idFrame | exact GlobalTheory.MtRead.IdFrameStd.exists_idFrame | (intros; apply GlobalTheory.MtRead.IdFrameStd.exists_idFrame <;> assumption)

@@ -69,8 +69,8 @@ theorem kern_of (SPAN : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Alg
       rw [map_mul, map_pow, hcfix j _ (hτi i), hτpow]
       ring
     rw [hzc]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [map_sum, h1]
+
+    simp_rw [map_sum, h1]
     rw [Finset.sum_comm]
     simp_rw [← Finset.mul_sum]
     rw [Finset.sum_eq_single 0]

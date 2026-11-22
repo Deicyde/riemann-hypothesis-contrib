@@ -286,8 +286,8 @@ include hHd
 
 theorem herm_prod (hH : IsHerm H) : IsHerm H' := by
   intro x y
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hHd, hHd, map_sum]
+
+  rw [hHd, hHd, map_sum]
   exact Finset.sum_congr rfl fun i _ => hH _ _
 
 theorem altE_prod (x y : M' → ℂ) : altE H' x y = ∑ i, altE H (sl e i x) (sl e i y) := by

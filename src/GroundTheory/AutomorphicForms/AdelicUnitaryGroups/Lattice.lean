@@ -28,11 +28,11 @@ theorem repr_mul (z w : R ⊗[K] E) (m : κ) :
         (Algebra.TensorProduct.basis R b).repr w l * algebraMap K R (b.repr (b k * b l) m) := by
   set B := Algebra.TensorProduct.basis R b
   conv_lhs => rw [← B.sum_repr z, ← B.sum_repr w]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_mul, Finset.mul_sum, smul_mul_smul_comm, B,
-    Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul, map_sum,
-    map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul,
-    repr_one_tmul]
+
+  simp only [Finset.sum_mul, Finset.mul_sum, smul_mul_smul_comm, B,
+  Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul, map_sum,
+  map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul,
+  repr_one_tmul]
   exact Finset.sum_comm
 
 

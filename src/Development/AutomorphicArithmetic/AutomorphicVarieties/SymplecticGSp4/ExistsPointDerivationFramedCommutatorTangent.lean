@@ -165,7 +165,7 @@ private theorem dm_lift {Γ : Type} [Group Γ] [TopologicalSpace Γ] {rbar : Γ 
 
 end Dual
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.exists_pointDerivation_framed_commutator_tangent :
     ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ (L : LocBase D) (F : Fr D L), ∀ Y ∈ sp4 c.O, ∀ A : D.T → M4 c.O, (∀ v, A v ∈ sp4 c.O) → A ⟨l, D.residueChar_mem_levelPrimes⟩ = 0 → ∃ δ ∈ PtDer (F.W.origin F.org) c.O, (∀ g a b, δ (F.r.hom g a b) = (Y * D.r0 g - D.r0 g * Y) a b) ∧ ∀ v a b, δ (F.α v a b) = A v a b := by
   intro Ω _ _ _ l _ c D hD L F Y hY A hA hAl

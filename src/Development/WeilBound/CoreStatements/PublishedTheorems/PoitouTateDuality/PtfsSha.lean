@@ -141,7 +141,7 @@ theorem perfectQZ_of_found {X Y : Type} [AddCommGroup X] [AddCommGroup Y]
 
 end FoundSide
 
-set_option maxHeartbeats 1000000 in
+
 theorem shaCmpFS_of_dict (h : ShaDictFS) : ShaCmpFS := by
   intro K _ _ l _ r hl hr ζ hζ inv hinv S hS Av hAv μ hμ M _ _ _ _ _ ρ hρ
   have : NeZero (l ^ r) := ⟨pow_ne_zero r (Fact.out : l.Prime).ne_zero⟩

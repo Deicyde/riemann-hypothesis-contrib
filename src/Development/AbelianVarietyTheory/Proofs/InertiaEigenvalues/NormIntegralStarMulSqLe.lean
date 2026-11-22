@@ -144,7 +144,7 @@ theorem exists_ip {F : Face D A} (hL : Laws R F) (hLP : LevProd R i) {γ : GA D 
     simp only [heckeOn_single_apply]
     rw [div_mul_eq_mul_div, eq_div_iff hn, mul_comm, h2]
 
-set_option maxHeartbeats 1600000 in
+
 theorem transLaws_of {F : Face D A} (hL : Laws R F) (hLP : LevProd R i) : TransLaws R i := by
   classical
   have hHW := hL.models.HW i (sg0 D A)

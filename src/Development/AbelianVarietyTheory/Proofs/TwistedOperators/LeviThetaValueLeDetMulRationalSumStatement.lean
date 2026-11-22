@@ -23,7 +23,7 @@ open GlobalTheory.SquareComm
 open scoped Pointwise
 open Formalism.IndefR.Datum
 open GlobalTheory.Grid
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.leviThetaValue_le_det_mul_rational_sum : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S S₀ T : HSp D) (r : ℕ) (d : GlobalTheory.MixModel.HypDec S S₀ r)
     (χS χT : (Formalism.L2.Theta.AE D)ˣ →* Circle) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
     IsWeilDatumO ψ S T χS χT om →

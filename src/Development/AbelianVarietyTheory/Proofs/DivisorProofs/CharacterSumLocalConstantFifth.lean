@@ -163,9 +163,9 @@ theorem unfolding_smallHomFunction_levelPrime_bounded (hq : (Formalism.L2.Col.qO
       rw [map_mul, norm_mul, (pow_eq_one_iff_of_nonneg (norm_nonneg _) hq.ne_zero).1 h2, mul_one]
       exact hΦ.2.2 σ y
     unfold Loc.E1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_mul, norm_mul, map_pow, map_inv₀, map_pow, map_natCast, norm_pow, norm_inv, norm_pow, Complex.norm_natCast,
-      map_sum]
+
+    rw [hsum, map_mul, norm_mul, map_pow, map_inv₀, map_pow, map_natCast, norm_pow, norm_inv, norm_pow, Complex.norm_natCast,
+    map_sum]
     have hb : ‖∑ t ∈ Fintype.piFinset fun _ : Loc.FC n' (c + 1) n c => V,
         σ (Φ (Loc.xx1 x t) * psi (-Loc.chArg (Loc.xx1 x t)))‖ ≤ ((q : ℝ) ^ (B + (c + 1))) ^ F := by
       refine (norm_sum_le _ _).trans ((Finset.sum_le_card_nsmul _ _ 1 fun t _ => hterm _).trans ?_)

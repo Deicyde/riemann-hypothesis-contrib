@@ -75,9 +75,9 @@ theorem pderiv_glAct (LL : M.Letters N) (J : ℕ) (a : Fin N) (c c' d' : Fin r)
         · have hne : (i, d') ≠ (a, c) := fun h' => hai (congrArg Prod.fst h').symm
           simp [hai, hne]
     · simp [hi]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hg, hg, map_sum, Finset.sum_congr rfl (fun i _ => key i), Finset.sum_add_distrib,
-    Finset.sum_ite_eq]
+
+  rw [hg, hg, map_sum, Finset.sum_congr rfl (fun i _ => key i), Finset.sum_add_distrib,
+  Finset.sum_ite_eq]
   simp
 
 theorem pderiv_keep {σ : Type} (v : σ) (Q Q' : Set (σ →₀ ℕ))
@@ -85,8 +85,8 @@ theorem pderiv_keep {σ : Type} (v : σ) (Q Q' : Set (σ →₀ ℕ))
     ∀ x ∈ restrictSupport ℚ_[p] Q, pderiv v x ∈ restrictSupport ℚ_[p] Q' := by
   intro x hx
   have hx' := (mem_restrictSupport_iff ℚ_[p]).mp hx
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [x.as_sum, map_sum]
+
+  rw [x.as_sum, map_sum]
   refine Submodule.sum_mem _ fun m hm => ?_
   rw [pderiv_monomial]
   by_cases hmv : m v = 0
@@ -217,9 +217,9 @@ theorem tieF_ycond (LL : M.Letters N) (J : ℕ) (Mt : WithTop ℤ) (W E : Fin N)
       rw [pderiv_glAct LL J E c0 c d y, map_add (f := _), pderiv_glAct LL J W c0 c d (pderiv (E, c0) y)]
       simp only [hE, hW, hvW, hvE, if_true, Bool.false_eq_true, if_false]
       split_ifs <;> simp [map_neg]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ht, ht, map_sum, Finset.sum_congr rfl (fun c0 _ => step c0), Finset.sum_add_distrib,
-      Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.sum_ite_eq']
+
+    rw [ht, ht, map_sum, Finset.sum_congr rfl (fun c0 _ => step c0), Finset.sum_add_distrib,
+    Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.sum_ite_eq']
     simp only [Finset.mem_univ, if_true, add_assoc, add_neg_cancel, add_zero]
   · intro z hz
     rw [ht]

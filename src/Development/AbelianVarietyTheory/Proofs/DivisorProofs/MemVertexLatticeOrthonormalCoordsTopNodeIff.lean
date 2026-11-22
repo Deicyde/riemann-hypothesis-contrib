@@ -95,7 +95,7 @@ private theorem vec_map {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R'
 end GlobalTheory.TopLatSplit
 
 open GlobalTheory.TopLatSplit in
-set_option maxHeartbeats 800000 in
+
 theorem _root_.GlobalTheory.T.mem_vertexLatticeOrthonormalCoords_topNode_iff : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil} (S : GridChoice W Set.univ)
     (y : FinPt G (.grid D.R.m D.R.m)) (v : Fin (G.V (.top D.R.m)).rank → D.host.E),
     v ∈ GlobalTheory.SumSize.latAt S (.top D.R.m) (finEmb G.sp.topDec y) ↔

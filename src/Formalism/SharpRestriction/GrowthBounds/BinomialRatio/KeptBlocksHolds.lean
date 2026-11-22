@@ -4,7 +4,7 @@ public import Formalism.SharpRestriction.GrowthBounds.BinomialRatio.KeptBlocksOf
 
 @[expose] public section
 
-set_option maxHeartbeats 4000000
+
 
 noncomputable section
 
@@ -12,7 +12,7 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G
 
-set_option maxHeartbeats 4000000 in
+
 theorem pairS_at {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
     (hstd : ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X) :
     PairSAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc := by

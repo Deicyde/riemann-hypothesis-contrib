@@ -76,8 +76,8 @@ theorem cj_hf_self {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
     {Hm : Matrix (Fin n) (Fin n) E} (h : IsHerm L Hm) (u : Fin n → E) :
     L.cj (hf L Hm u u) = hf L Hm u u := by
   have h1 : ∀ i j, L.cj (Hm i j) = Hm j i := fun i j => congrFun (congrFun h j) i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hf, map_sum, map_mul, L.cj_cj, h1]
+
+  simp only [hf, map_sum, map_mul, L.cj_cj, h1]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 

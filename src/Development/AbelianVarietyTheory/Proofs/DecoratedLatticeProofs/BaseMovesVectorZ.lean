@@ -184,8 +184,8 @@ theorem map_inv_mulVec {R k n : Type} [CommRing R] [CommRing k] [Fintype n] [Dec
   have e : col = (A⁻¹).val *ᵥ (A.val *ᵥ col) := by rw [mulVec_mulVec, Units.inv_mul, one_mulVec]
   conv_rhs => rw [e]
   generalize A.val *ᵥ col = w at h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mulVec, dotProduct, map_sum, map_mul, h, Finset.mul_sum]
+
+  simp only [mulVec, dotProduct, map_sum, map_mul, h, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by ring
 
 def elem {K : Type} [CommRing K] {r : ℕ} (a b : Fin r) (h : a ≠ b) (y : K) : GL (Fin r) K :=

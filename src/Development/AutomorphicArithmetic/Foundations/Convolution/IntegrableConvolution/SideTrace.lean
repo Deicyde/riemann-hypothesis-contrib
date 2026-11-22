@@ -258,7 +258,7 @@ private theorem oinf_congr {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : 
 
 end UpperTheory.ConvolutionTheory.L1.SideTr
 
-set_option maxHeartbeats 1600000 in
+
 open UpperTheory.ConvolutionTheory.L1.SideTr in
 theorem UpperTheory.ConvolutionTheory.L1.sideTrace :
     UpperTheory.ConvolutionTheory.L1.SideTrace := by

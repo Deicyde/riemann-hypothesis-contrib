@@ -20,8 +20,8 @@ open Formalism.DworkPowerSeriesWeights (JetsIntegral)
 theorem GramSeries_proof : GramSeries := by
   intro K _ n m _ _ c A
   rw [linSub_sqSum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [sq, Finset.sum_mul, Finset.mul_sum, map_sum, map_mul]
+
+  simp only [sq, Finset.sum_mul, Finset.mul_sum, map_sum, map_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [Finset.sum_comm]
@@ -42,17 +42,17 @@ theorem linSub_linSub {n m p : Type} [Finite n] [Fintype m] [Fintype p] (A : n �
   rw [MvPowerSeries.subst_comp_subst_apply (hasSubst_lin A) (hasSubst_lin B)]
   congr 1
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← linSub, ← linSubHom_apply, map_sum]
+
+  rw [← linSub, ← linSubHom_apply, map_sum]
   simp only [map_mul, linSubHom_apply, linSub_X]
   have hc : ∀ w, linSubHom B (MvPowerSeries.C (A i w)) = MvPowerSeries.C (A i w) := fun w => by
     rw [linSubHom_apply, linSub_C]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hc, Finset.mul_sum, map_sum, map_mul]
+
+  simp only [hc, Finset.mul_sum, map_sum, map_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun x _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_mul, map_sum, map_mul]
+
+  simp only [Finset.sum_mul, map_sum, map_mul]
   refine Finset.sum_congr rfl fun w _ => ?_
   simp only [linSub_C]
   ring
@@ -225,8 +225,8 @@ def quadForm {m : Type} [Fintype m] (q : m → m → K) : MvPowerSeries m K :=
 theorem cc_quadForm {m : Type} [Fintype m] (q : m → m → K) :
     MvPowerSeries.constantCoeff (quadForm q) = 0 := by
   unfold quadForm
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, map_mul]
+
+  simp [map_sum, map_mul]
 
 theorem jetsIn_quadForm {R : Subring K} {m : Type} [Fintype m] {q : m → m → K}
     (hq : ∀ x y, q x y ∈ R) : JetsIn R (quadForm q) := by
@@ -234,8 +234,8 @@ theorem jetsIn_quadForm {R : Subring K} {m : Type} [Fintype m] {q : m → m → 
   refine R.mul_mem (natCast_mem R _) ?_
   classical
   unfold quadForm
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum]
+
+  simp only [map_sum]
   refine R.sum_mem fun x _ => R.sum_mem fun y _ => ?_
   rw [mul_assoc, MvPowerSeries.coeff_C_mul, MvPowerSeries.X_def, MvPowerSeries.X_def,
     MvPowerSeries.monomial_mul_monomial, MvPowerSeries.coeff_monomial]
@@ -263,8 +263,8 @@ theorem gramFrameComposition_mvExp_fact {ι : Type} [Finite ι] {f : MvPowerSeri
     refine Finset.induction_on s (by simp [h0]) ?_
     intro a s ha ih
     rw [Finset.prod_insert ha, Finset.sum_insert ha, ih, hadd _ _ (hcc a) ?_]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun k _ => hcc k
   exact key Finset.univ
 
@@ -289,8 +289,8 @@ theorem ShapeLin_proof : ShapeLin := by
     rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, h,
       MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hccβ]
   have hccbe : MvPowerSeries.constantCoeff (∑ a : Fin 4, inBlock a (betaPair H N0 N1 u)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun a _ => hccB a
   have hccs : ∀ {ι : Type} (r : K) (f : MvPowerSeries ι K), MvPowerSeries.constantCoeff f = 0 →
       MvPowerSeries.constantCoeff (r • f) = 0 := fun r f hf => by

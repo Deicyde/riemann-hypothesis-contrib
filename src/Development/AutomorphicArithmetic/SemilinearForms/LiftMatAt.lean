@@ -44,15 +44,15 @@ theorem forms_of_semilinear_at (φ : K →+* K') (e : G ≃* G') (B : BlockDat K
   have hC : ∀ x, C *ᵥ x = B'.S.basis.equivFun (bv.equivFun.symm x) := by
     intro x
     ext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, hCe, Basis.equivFun_symm_apply, hbv, map_sum, map_smul,
-      Basis.equivFun_apply, Finset.sum_apply, Pi.smul_apply,
-      smul_eq_mul, mul_comm]
+
+    simp only [Matrix.mulVec, dotProduct, hCe, Basis.equivFun_symm_apply, hbv, map_sum, map_smul,
+    Basis.equivFun_apply, Finset.sum_apply, Pi.smul_apply,
+    smul_eq_mul, mul_comm]
   have hL : ∀ f, L f = bv.equivFun.symm (fun k => φ (B.S.basis.equivFun f k)) := by
     intro f
     conv_lhs => rw [← B.S.basis.sum_equivFun f]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Basis.equivFun_symm_apply]
+
+    rw [map_sum, Basis.equivFun_symm_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [hsm, hbv]
   have hψ : ∀ x : Fin B.S.dim → K, C *ᵥ (fun k => φ (x k)) =

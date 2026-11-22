@@ -68,8 +68,8 @@ theorem exists_mult (T : Tower p Ω) (N j : ℕ) (hj0 : 0 < j) (hjN : j < p ^ N)
   refine ⟨∑ i ∈ Finset.range e, (T.ζ N ^ j) ^ i, ?_, ?_, ?_⟩
   · exact IsIntegral.sum _ fun i _ => ((isInt_zeta T N).pow j).pow i
   · intro g hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_pow, ggeo_zeta T N hg]
+
+    simp only [map_sum, map_pow, ggeo_zeta T N hg]
   · rw [geom_sum_mul, he]
 
 end GlobalTheory.K5.Decomp
@@ -100,13 +100,13 @@ theorem GlobalTheory.K5.Decomp.decomp : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 �
   · intro g hg
     have hg1 := (Subgroup.mem_inf.1 hg).1
     have hg2 : g (T.qq N) = T.qq N := (Subgroup.mem_inf.1 hg).2
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, map_pow, hsg _ g hg1, hc _ g hg1, hg2]
+
+    simp only [map_sum, map_mul, map_pow, hsg _ g hg1, hc _ g hg1, hg2]
   · obtain ⟨M, hM⟩ : ∃ M, p ^ N = M + 1 := ⟨p ^ N - 1, by omega⟩
     have key : ∀ i < M, s (i + 1) * (T.ζ N ^ (i + 1) - 1) = T.ζ 1 - 1 := fun i hi =>
       hse (i + 1) (Nat.succ_pos i) (by omega)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, map_pow, hsg _ τ hτ, hc _ τ hτ, hτq N]
+
+    simp only [map_sum, map_mul, map_pow, hsg _ τ hτ, hc _ τ hτ, hτq N]
     rw [hM, Finset.sum_range_succ', Finset.sum_range_succ', Finset.sum_range_succ']
     have : ∀ i ∈ Finset.range M, s (i + 1) * c (i + 1) * (T.ζ N * T.qq N) ^ (i + 1) =
         s (i + 1) * c (i + 1) * T.qq N ^ (i + 1) + (T.ζ 1 - 1) * (c (i + 1) * T.qq N ^ (i + 1)) := by

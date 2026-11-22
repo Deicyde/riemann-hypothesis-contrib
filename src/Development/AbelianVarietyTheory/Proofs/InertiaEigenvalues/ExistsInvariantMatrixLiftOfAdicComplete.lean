@@ -60,8 +60,8 @@ theorem average_step (σ : G → A →+* A) (hσ : ∀ g h a, σ (g * h) a = σ 
       (∑ x, X x).map f = ∑ x, (X x).map f := by
     intro f X
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.sum_apply, map_sum]
+
+    simp [Matrix.sum_apply, map_sum]
 
   refine ⟨∑ x : G ⧸ N, M x.out * U.map (σ x.out), ?_, ?_, ?_⟩
   · intro i j

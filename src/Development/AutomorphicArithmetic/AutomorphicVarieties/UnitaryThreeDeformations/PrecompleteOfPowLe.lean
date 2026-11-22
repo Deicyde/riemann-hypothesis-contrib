@@ -77,8 +77,8 @@ private theorem exists_sum_X_mul (p : MvPowerSeries σ O) (hp : MvPowerSeries.co
       if h : n ≠ 0 then (if c n h = i then MvPowerSeries.coeff n p else 0) else 0 := fun _ _ => rfl
   have hs : p = ∑ i, q i := by
     ext n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [hq]
     by_cases h : n ≠ 0
     · simp [dif_pos h]
@@ -120,17 +120,17 @@ private theorem map_lin (φ : MvPowerSeries σ O →ₐ[O] A)
       MvPowerSeries.constantCoeff r • φ (MvPowerSeries.X i) := fun i r => by
     obtain ⟨s, hs⟩ := h0 r
     conv_lhs => rw [hs]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_mul, map_add (f := _), map_sum, AlgHom.commutes, mul_add, Finset.mul_sum, ← mul_assoc, hφ, zero_mul,
-      Finset.sum_const_zero, add_zero, Algebra.smul_def]
+
+    simp only [map_mul, map_add (f := _), map_sum, AlgHom.commutes, mul_add, Finset.mul_sum, ← mul_assoc, hφ, zero_mul,
+    Finset.sum_const_zero, add_zero, Algebra.smul_def]
     exact mul_comm _ _
   obtain ⟨r, hr⟩ := h0 p
   have h2 : ∀ j, MvPowerSeries.coeff (Finsupp.single j 1) p = MvPowerSeries.constantCoeff (r j) := fun j => by
     conv_lhs => rw [hr]
     simp [coeff_X_mul, MvPowerSeries.algebraMap_apply, MvPowerSeries.coeff_C]
   conv_lhs => rw [hr]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, AlgHom.commutes, h1, h2]
+
+  simp only [map_add (f := _), map_sum, AlgHom.commutes, h1, h2]
 
 end PS
 

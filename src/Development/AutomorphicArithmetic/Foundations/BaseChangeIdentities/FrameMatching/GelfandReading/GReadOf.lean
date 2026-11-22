@@ -36,8 +36,8 @@ theorem gRead_of {ι : Type} [Fintype ι] [Nonempty ι] {H : ι → Type} [∀ s
   · exact (h2 _ _ _).trans
       (R3.chi_pin gen a₀ v hv ha s _ χ heig ⟨gen x, StarAlgebra.subset_adjoin ℂ _ ⟨x, rfl⟩⟩ (c x) (hc x))
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 1000000 in
+
+
 theorem chiTr : BC.ChiTr := fun _ _ _ _ _ _ _ _ _ _ G Q h1 hQ =>
   gRead_of (H := G.H) G.gen G.βop G.m G.v G.v_ne G.a₀ (fun x => G.c x G.i₀) (fun x => (G.vblk x).1) h1 Q hQ
 

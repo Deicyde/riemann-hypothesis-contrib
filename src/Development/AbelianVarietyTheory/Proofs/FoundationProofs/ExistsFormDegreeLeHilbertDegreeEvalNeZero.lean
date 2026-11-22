@@ -109,8 +109,8 @@ theorem isIntegral_of_projection {σ R A : Type*} [Fintype σ] [CommRing R] [Alg
     rw [← hdeg d hd]
     exact (prod_pow_natDegree_coeff' Finset.univ v d hv).1
   have hQ2 : Q.coeff m = algebraMap k R (eval c g) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hQe, Polynomial.finsetSum_coeff, eval_eq', map_sum]
+
+    rw [hQe, Polynomial.finsetSum_coeff, eval_eq', map_sum]
     refine Finset.sum_congr rfl fun d hd => ?_
     rw [Polynomial.coeff_C_mul, ← hdeg d hd, (prod_pow_natDegree_coeff' Finset.univ v d hv).2]
     simp [hv1]
@@ -268,8 +268,8 @@ theorem exists_monic_minimal {R A : Type*} [CommRing R] [IsDomain R] [IsIntegral
   have hq0 : (q : Polynomial R) = 0 := by
     by_contra h0
     have h1 := minpoly.IsIntegrallyClosed.degree_le_of_ne_zero (s := t) h0 (by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hq, map_sum, ← ha]
+
+      rw [hq, map_sum, ← ha]
       simp only [Polynomial.aeval_monomial]
       rfl)
     have h2 := Polynomial.mem_degreeLT.1 q.2

@@ -124,8 +124,8 @@ theorem key (hball : BallSt) (hnf : NfSt) (hcore : CoreSt) {j : ℕ} (hj : j < r
     rw [Submodule.coe_sum]
     simp only [Submodule.coe_smul]
     exact hsum
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hΨeq, map_sum]
+
+  rw [hΨeq, map_sum]
   apply Finset.sum_eq_zero
   intro x hx
   rw [map_smul, hpiece x hx, smul_zero]

@@ -74,8 +74,8 @@ theorem dblRow_exact : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ)
   set T := x.support.image Prod.snd with hT
   have h1 : hbd V W x = ∑ w ∈ T, incl w (bd V (proj w x)) := by
     conv_lhs => rw [decomp x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [hbd_incl]
     rfl
   have hbd0 : ∀ w ∈ T, bd V (proj w x) = 0 := by

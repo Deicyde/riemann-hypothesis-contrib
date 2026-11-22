@@ -27,7 +27,7 @@ open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Fam
 
-set_option maxHeartbeats 1000000
+
 
 noncomputable section
 

@@ -136,7 +136,7 @@ private theorem comp_blockEntries_eq (g : M2 n) (j : ℕ) (T : Matrix (blkA (n :
   rw [h, conjL_apply]
   simp only [ContinuousLinearMap.zero_apply, block_part_linear_apply, block_part_embedding_first, block_part_embedding_second]
 
-set_option maxHeartbeats 800000 in
+
 theorem topComp_of (hA : IterAffine) (hB : DetDBlock) : TopComp := by
   intro n j F Ω hΩ hG hF hinv hhyp g hg
   have hgΩ : g ∈ Ω := hG hg

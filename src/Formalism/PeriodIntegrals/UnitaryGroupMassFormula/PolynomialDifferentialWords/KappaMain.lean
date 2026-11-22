@@ -23,8 +23,8 @@ theorem symbolMapInjective : KappaInj := by
     exact mul_left_cancel₀ (invFact_ne_zero g) h1
   apply LinearMap.ext
   intro F
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [eq_sum_mono F, map_sum, map_sum]
+
+  rw [eq_sum_mono F, map_sum, map_sum]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [map_smul, map_smul, hmono g]
 
@@ -52,8 +52,8 @@ theorem symbolMapBihomogeneous : KappaBihom := by
 
 theorem symbolMapMulLeft : KappaLeft := by
   intro K _ _ k d a b A
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [kappa_apply, kappa_apply, map_sum, Finset.mul_sum]
+
+  rw [kappa_apply, kappa_apply, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [mul_apply_eq_comp, Ed_val, Derivation.map_smul, mul_smul_comm]
   congr 1

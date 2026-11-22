@@ -270,8 +270,8 @@ theorem lie_descends : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Da
     rfl
   have hw : ∀ i, j ≫ w i = E (w₃ i) := fun i => by
     have h1 : P (Θ (e i) m) = m₃ i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hP, hPm, map_sum]
+
+      rw [hP, hPm, map_sum]
       simp only [he _ _ i _ _ (eig₃ _), Finset.sum_ite_eq, Finset.mem_univ, if_true]
     exact congrArg (fun z : TM A₀ (x'' ≫ π) => (Additive.toMul z).1) h1
   refine ⟨w, fun i c => ?_, ?_⟩

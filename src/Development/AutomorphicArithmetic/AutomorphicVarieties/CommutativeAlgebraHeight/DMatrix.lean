@@ -144,8 +144,8 @@ theorem UpperTheory.V.CA.d_matrix :
       change D.D T (matrixEquivTensor _ k T (M.map f)) = f (D.D S (matrixEquivTensor _ k S M))
       rw [← D.nat]
       congr 1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [matrixEquivTensor_apply, map_sum])
+
+      simp [matrixEquivTensor_apply, map_sum])
     (fun S _ _ b M => by
       change D.D S (matrixEquivTensor _ k S (b • M)) = b ^ n * D.D S (matrixEquivTensor _ k S M)
       rw [← D.homog]

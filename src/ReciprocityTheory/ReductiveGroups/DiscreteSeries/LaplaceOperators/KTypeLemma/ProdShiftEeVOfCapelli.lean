@@ -53,8 +53,8 @@ theorem IsPolyN.map {F : ℂ → X} {N : ℕ} (hF : IsPolyN F N) (L : X →ₗ[�
   obtain ⟨c, hc⟩ := hF
   refine ⟨fun k => L (c k), fun x => ?_⟩
   beta_reduce
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hc, map_sum]
+
+  rw [hc, map_sum]
   exact Finset.sum_congr rfl fun k _ => map_smul L _ _
 
 theorem isPolyN_sum {ι : Type*} (s : Finset ι) {F : ι → ℂ → X} {N : ℕ}
@@ -126,8 +126,8 @@ theorem poly_coeff_eq_zero {N : ℕ} (v : ℕ → X) (h : ∀ x : ℂ, ∑ k ∈
     apply Polynomial.funext
     intro x
     have h1 := congrArg φ (h x)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at h1
+
+    rw [map_sum, map_zero] at h1
     simp only [map_smul, smul_eq_mul] at h1
     rw [Polynomial.eval_zero, Polynomial.eval_finsetSum, ← h1]
     exact Finset.sum_congr rfl fun j _ => by
@@ -209,9 +209,9 @@ theorem adjVec_key (E : Fin (m + 1) → Fin (m + 1) → Module.End ℂ M) (hE : 
     · intro h
       exact absurd (mem_univ b) h
   rw [← hsum, ← Finset.sum_congr rfl (fun c _ => hx c)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Pi.add_apply, Pi.smul_apply, eeV_apply', adjVec, LinearMap.sum_apply, LinearMap.smul_apply,
-    capEntry_mul_apply, map_sum, map_smul, smul_add, sum_add_distrib, smul_sum]
+
+  simp only [Pi.add_apply, Pi.smul_apply, eeV_apply', adjVec, LinearMap.sum_apply, LinearMap.smul_apply,
+  capEntry_mul_apply, map_sum, map_smul, smul_add, sum_add_distrib, smul_sum]
   rw [Finset.sum_comm]
   congr 1
   refine sum_congr rfl fun c _ => ?_
@@ -291,8 +291,8 @@ theorem prodShift_eeV_of_capelli (E : Fin (m + 1) → Fin (m + 1) → Module.End
       funext b
       rw [hC ω (f b) (hf b)]
       rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h2, hg, map_sum] at h1
+
+    rw [h2, hg, map_sum] at h1
     simp only [map_smul] at h1
     rw [sum_shift, shiftPoly_eval, Finset.sum_smul, ← sub_eq_zero, ← Finset.sum_sub_distrib] at h1
     refine Eq.trans (Finset.sum_congr rfl fun k _ => ?_) h1

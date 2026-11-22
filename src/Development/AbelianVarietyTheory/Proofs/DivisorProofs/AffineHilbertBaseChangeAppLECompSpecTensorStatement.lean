@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KappaApplyEq
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry Opposite
 open scoped TensorProduct
 open GlobalTheory.HilbAff in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.affineHilbertBaseChange_appLE_comp_specTensor :
     ∀ (A B C : Type) [CommRing A] [CommRing B] [Algebra A B] [CommRing C] [Algebra A C]
       (Z : Scheme.{0}) (h : Z ⟶ Spec (CommRingCat.of C)) (U : Z.Opens),

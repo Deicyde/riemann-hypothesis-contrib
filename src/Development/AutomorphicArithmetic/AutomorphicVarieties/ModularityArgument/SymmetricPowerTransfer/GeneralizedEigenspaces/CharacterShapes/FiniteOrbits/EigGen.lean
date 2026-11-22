@@ -159,7 +159,7 @@ set_option allowUnsafeReducibility true in
 attribute [local irreducible] DX KD RP SA
 
 open UpperTheory.V.Z.Sym.So.OS in
-set_option maxHeartbeats 2000000 in
+
 theorem UpperTheory.V.Z.Sym.So.outS :
     UpperTheory.V.Z.Sym.So.OutS := by
   intro L _ _ _ B hB T S VL A hA hF S₁ hS₁ hiw m U hm hU hFull n e a b hab ι hι y hy hlev ψ hψ hSF

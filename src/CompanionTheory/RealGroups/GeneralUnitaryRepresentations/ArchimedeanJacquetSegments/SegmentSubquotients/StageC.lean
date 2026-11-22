@@ -125,7 +125,7 @@ variable {r t : ℕ} {U U' W W' Y Y' : Type} [AddCommGroup U] [Module ℂ U] [Ad
   [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W'] [AddCommGroup Y] [Module ℂ Y] [AddCommGroup Y']
   [Module ℂ Y']
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem embR (σ : Representation ℂ (GL (Fin r) k) U) (ρ : Representation ℂ (GL (Fin t) k) W)
     (ρ' : Representation ℂ (GL (Fin t) k) W') (P : Representation ℂ (GL (Fin (r + t)) k) Y)
     (P' : Representation ℂ (GL (Fin (r + t)) k) Y') (h : Emb ρ ρ') (e : Nonempty ((prod₂ σ ρ).Equiv P))
@@ -134,7 +134,7 @@ theorem embR (σ : Representation ℂ (GL (Fin r) k) U) (ρ : Representation ℂ
   have h3 : Emb (prod₂ σ ρ) (prod₂ σ ρ') := prod₂_map_injective_right r t σ ρ ρ' f hf
   exact ((Emb.of' e).trans h3).trans (Emb.of e')
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem embL (σ : Representation ℂ (GL (Fin r) k) U) (σ' : Representation ℂ (GL (Fin r) k) U')
     (ρ : Representation ℂ (GL (Fin t) k) W) (P : Representation ℂ (GL (Fin (r + t)) k) Y)
     (P' : Representation ℂ (GL (Fin (r + t)) k) Y') (h : Emb σ σ') (e : Nonempty ((prod₂ σ ρ).Equiv P))
@@ -145,7 +145,7 @@ theorem embL (σ : Representation ℂ (GL (Fin r) k) U) (σ' : Representation �
 
 end Two
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem emb_right {p q q' r t : ℕ} (A : Fin p → IrrGL (k := k)) (y : Fin q → IrrGL (k := k)) (y' : Fin q' → IrrGL (k := k))
     (hA : ∑ a, (A a).1 = r) (hy : ∑ a, (y a).1 = t) (hy' : ∑ a, (y' a).1 = t) (h : Emb (prodIrr y hy) (prodIrr y' hy'))
     (h1 : ∑ a, (Fin.append A y a).1 = r + t) (h2 : ∑ a, (Fin.append A y' a).1 = r + t) :
@@ -153,7 +153,7 @@ theorem emb_right {p q q' r t : ℕ} (A : Fin p → IrrGL (k := k)) (y : Fin q �
   embR (prodIrr A hA) (prodIrr y hy) (prodIrr y' hy') _ _ h (GlobalTheory.T.product_irreducible_append_equiv k p q r t A y hA hy h1)
     (GlobalTheory.T.product_irreducible_append_equiv k p q' r t A y' hA hy' h2)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem emb_left {p p' q r t : ℕ} (y : Fin p → IrrGL (k := k)) (y' : Fin p' → IrrGL (k := k)) (B : Fin q → IrrGL (k := k))
     (hy : ∑ a, (y a).1 = r) (hy' : ∑ a, (y' a).1 = r) (hB : ∑ a, (B a).1 = t) (h : Emb (prodIrr y hy) (prodIrr y' hy'))
     (h1 : ∑ a, (Fin.append y B a).1 = r + t) (h2 : ∑ a, (Fin.append y' B a).1 = r + t) :
@@ -161,7 +161,7 @@ theorem emb_left {p p' q r t : ℕ} (y : Fin p → IrrGL (k := k)) (y' : Fin p' 
   embL (prodIrr y hy) (prodIrr y' hy') (prodIrr B hB) _ _ h (GlobalTheory.T.product_irreducible_append_equiv k p q r t y B hy hB h1)
     (GlobalTheory.T.product_irreducible_append_equiv k p' q r t y' B hy' hB h2)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem comb {n c N : ℕ} (xx : Fin n → IrrGL (k := k)) (hdx : ∑ a, (xx a).1 = N) (iz : Fin n) (z : IrrGL (k := k)) (hz : xx iz = z)
     (pr : Fin 2 → IrrGL (k := k)) (hs : ∑ j, (pr j).1 = z.1) (d : ℕ) (hsd : ∀ j, (pr j).1 = d) (hsc : ∀ j, (pr j).IsCusp)
     (hu : Nonempty ((jac (stdBlocks (fun j => (pr j).1) hs) z.rep).Equiv (piTensor fun j => (pr j).rep)))
@@ -179,7 +179,7 @@ theorem comb {n c N : ℕ} (xx : Fin n → IrrGL (k := k)) (hdx : ∑ a, (xx a).
     (s' iz) (hrow iz) y hyc (key iz)
   exact ⟨f, hf⟩
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem classMain {i q N : ℕ} (t : Fin (i + 2 + q) → IrrGL (k := k)) (ht : ∑ a, (t a).1 = N) (pr : Fin 2 → IrrGL (k := k))
     (hpr : ∀ j, pr j = t (Fin.castAdd q (Fin.natAdd i j))) (z : IrrGL (k := k)) (hs : ∑ j, (pr j).1 = z.1)
     (he : Emb z.rep (prodIrr pr hs)) :
@@ -209,8 +209,8 @@ theorem classMain {i q N : ℕ} (t : Fin (i + 2 + q) → IrrGL (k := k)) (ht : �
   refine ⟨_, _, h3, Fin.castAdd q (Fin.natAdd i (0 : Fin 1)), by rw [Fin.append_left, Fin.append_right], ?_⟩
   exact emb_left _ _ B h1 h2 rfl (emb_right A _ pr rfl hzs hs e0 h1 h2) h3 ht
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem exists_alt_ter {d : ℕ} (σ : IrrRep (GL (Fin d) k)) {U : Type} [AddCommGroup U] [Module ℂ U]
     (τ : Representation ℂ (GL (Fin (2 * d)) k) U) (hsS : IsSmooth τ) (hiS : τ.IsIrreducible)
     (hs : ∑ j, (tcl σ 2 j).1 = 2 * d) (a2 : Emb τ (prodIrr (tcl σ 2) hs))
@@ -227,8 +227,8 @@ theorem exists_alt_ter {d : ℕ} (σ : IrrRep (GL (Fin d) k)) {U : Type} [AddCom
   exact ⟨IrrGL.of τ hsS hiS, hs, a1.trans a2,
     ⟨(SrMult.jacEquivOf (stdBlocks (fun j => (tcl σ 2 j).1) hs) (IrrGL.equivOf τ hsS hiS).symm).trans a3.some⟩⟩
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem exists_unit_one_add_generator (h2 : CompanionTheory.Pf1.SegRepC.SegTwo) {d : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ) :
     ∃ (z : IrrGL (k := k)) (hs : ∑ j, (tcl σ 2 j).1 = z.1), Emb z.rep (prodIrr (tcl σ 2) hs) ∧
       Nonempty ((jac (stdBlocks (fun j => (tcl σ 2 j).1) hs) z.rep).Equiv (piTensor fun j => (tcl σ 2 j).rep)) := by
@@ -237,8 +237,8 @@ theorem exists_unit_one_add_generator (h2 : CompanionTheory.Pf1.SegRepC.SegTwo) 
   exact exists_alt_ter σ S.toRepresentation (GlobalTheory.CompanionTheory.JacExp.isSmooth_sub (isSmooth_parInd _ _) S) hiS hs
     ((Emb.sub S).trans (Emb.of (consec_equiv σ 2 hs))) eS
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem one_le_jm {d l : ℕ} (σ : IrrRep (GL (Fin d) k)) {U X : Type} [AddCommGroup U] [Module ℂ U] [AddCommGroup X]
     [Module ℂ X] (τ : Representation ℂ (GL (Fin (l * d)) k) U) (π : Representation ℂ (Levi k fun _ : Fin l => Fin d) X)
     (hsub : IsSubquotient π (jac (consecBlocks l d) τ)) (w : Equiv.Perm (Fin l))
@@ -255,8 +255,8 @@ theorem one_le_jm {d l : ℕ} (σ : IrrRep (GL (Fin d) k)) {U X : Type} [AddComm
 end StageC
 
 open StageC in
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem stageP : StageP := by
   intro k _ _ _ _ _ h2 d l hd _ σ hσ i hi
   obtain ⟨q, rfl⟩ : ∃ q, l = i + 2 + q := ⟨l - (i + 2), by omega⟩

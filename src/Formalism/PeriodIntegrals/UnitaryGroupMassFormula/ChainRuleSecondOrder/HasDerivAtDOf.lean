@@ -320,8 +320,8 @@ theorem D_letter {b : Bool} {N : ℕ} {e : Fin N → B.Mat k r} {c : Fin N → �
     (hX : B.inLie k r X) (hXe : X = ∑ i, c i • e i) :
     D b X f g = ∑ i, c i • D b (e i) f g := by
   obtain ⟨U, f', hU, hgU, hd, hfe⟩ := ss_rep hf hg
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [D_eq_fderiv hU hgU hg hfe hd hX, hXe, vel_sum, map_sum]
+
+  rw [D_eq_fderiv hU hgU hg hfe hd hX, hXe, vel_sum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, D_eq_fderiv hU hgU hg hfe hd (he i)]
 

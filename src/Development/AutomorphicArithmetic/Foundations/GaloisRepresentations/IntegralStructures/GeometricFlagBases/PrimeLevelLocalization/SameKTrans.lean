@@ -86,7 +86,7 @@ theorem pr_of_sameK {x : E} {w w' : Plc E} (h : SameK x w w') : pr w = pr w' :=
 
 end
 
-set_option maxHeartbeats 1000000 in
+
 theorem master (h : All) {E : Type} [Field E] [NumberField E] [IsCMField E] {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {a : ℕ}
     (ha : Odd a) {d : ℕ} (hd : FieldOK E l d) {x : E} (hx : x ^ 2 = -(d : E)) {w₀ : Plc E} (h0 : ((l : ℕ) : 𝓞 E) ∈ w₀.asIdeal)
     {U : Submodule ℂ (UA E a → ℂ)} (hU : IsAutRepU U) (hTy : GlobalTheory.CongW.TyEll E l a w₀ U) (H C : Finset (Plc E))
@@ -177,8 +177,8 @@ theorem master (h : All) {E : Type} [Field E] [NumberField E] [IsCMField E] {l :
       refine ⟨fun h0 => ?_, ?_⟩
       · rw [h0, map_zero] at e0; exact zero_ne_one e0
       · rw [e0, ← e1]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp [crystallineComparison.heckePol, Polynomial.map_sum]
+
+        simp [crystallineComparison.heckePol, Polynomial.map_sum]
   refine ⟨{ p := p, D := S.D, G := S.G, L := S.L, sc := hsc, e := RingEquiv.refl E, n_eq := rfl, N := N, J := J, g := g, θ := θ,
             κ := V.κ, m := mOf x V.W V.jz, alg := V.kap.alg, lam := V.lam, anti := hanti, f := f, fn := hf,
             spec := by simpa only [θ, RingEquiv.apply_symm_apply] using hsp, cong := ?_ }, fun v hv => ?_, fun w hw B hB => ?_⟩

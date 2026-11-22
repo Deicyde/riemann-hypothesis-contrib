@@ -36,8 +36,8 @@ theorem exists_equiv_latticeCoords (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)
 theorem realLinear_eq_sum_single {n : ℕ} (L : (Fin n → ℝ) →L[ℝ] ℂ) (u : Fin n → ℝ) :
     L u = ∑ k, (u k : ℂ) * L (Pi.single k 1) := by
   conv_lhs => rw [← Finset.univ_sum_single u]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   have : (Pi.single k (u k) : Fin n → ℝ) = u k • (Pi.single k 1 : Fin n → ℝ) := by
     rw [← Pi.single_smul]; simp
@@ -73,8 +73,8 @@ theorem dbar_symbol_elliptic {n g : ℕ} (T : (Fin n → ℝ) ≃L[ℝ] (Fin g �
       by_cases hc : c = a
       · subst hc; simp
       · simp [hc]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hz, map_sum, sum_dotProduct]
+
+    rw [hz, map_sum, sum_dotProduct]
     refine Finset.sum_eq_zero fun a _ => ?_
     rw [map_add (f := _), map_smul, map_smul, add_dotProduct, smul_dotProduct, smul_dotProduct, h1, h2]
     simp

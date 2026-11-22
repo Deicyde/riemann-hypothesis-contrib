@@ -82,10 +82,10 @@ private theorem eq_zero_of_forall_nsmul_mem_hat [FiniteDimensional F E] {m : ℕ
       (δ * B.repr (w i) ℓ) v ∈ v.adicCompletionIntegers F := by
     intro w hw i ℓ
     obtain ⟨a, ha, rfl⟩ := exists_integral_comb_of_mem_hat he hw
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [comb_apply_eq_sum_tmul, Finset.sum_apply, map_sum, Finsupp.coe_finsetSum,
-      Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply,
-      smul_eq_mul, Finset.mul_sum]
+
+    simp only [comb_apply_eq_sum_tmul, Finset.sum_apply, map_sum, Finsupp.coe_finsetSum,
+    Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply,
+    smul_eq_mul, Finset.mul_sum]
     refine Finset.sum_induction _ (fun y : FiniteAdeleRing (𝓞 F) F =>
       ∀ v, y v ∈ v.adicCompletionIntegers F) (fun x y hx hy v => add_mem (hx v) (hy v))
       (fun v => zero_mem _) fun k _ => ?_

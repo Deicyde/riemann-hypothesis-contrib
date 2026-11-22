@@ -16,8 +16,8 @@ theorem UpperTheory.V.Weyl.rtrDeg :
     refine (MvPolynomial.totalDegree_mul _ _).trans ?_
     rw [MvPolynomial.totalDegree_X, MvPolynomial.totalDegree_C]
   conv_lhs => rw [MvPolynomial.as_sum f]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [rtr, map_sum, MvPolynomial.aeval_monomial]
+
+  simp only [rtr, map_sum, MvPolynomial.aeval_monomial]
   refine (MvPolynomial.totalDegree_finsetSum _ _).trans (Finset.sup_le fun s hs => ?_)
   refine (MvPolynomial.totalDegree_mul _ _).trans ?_
   rw [MvPolynomial.algebraMap_eq, MvPolynomial.totalDegree_C, zero_add]

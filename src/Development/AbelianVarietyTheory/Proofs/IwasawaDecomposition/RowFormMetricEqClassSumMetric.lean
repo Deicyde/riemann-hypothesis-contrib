@@ -21,7 +21,7 @@ noncomputable section
 
 namespace GlobalTheory.Mem.Df
 
-set_option maxHeartbeats 1000000
+
 
 theorem card_stabilizer_eq_of_smul {G α : Type*} [Group G] [MulAction G α] (g : G) (x : α) :
     Nat.card (MulAction.stabilizer G (g • x)) = Nat.card (MulAction.stabilizer G x) :=

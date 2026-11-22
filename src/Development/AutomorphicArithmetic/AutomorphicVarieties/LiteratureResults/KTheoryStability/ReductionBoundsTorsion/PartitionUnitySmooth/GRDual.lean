@@ -120,7 +120,7 @@ private theorem fin_num {A s m G P X Q : ℝ} (hA0 : 0 < A) (hsp : 0 < s) (hmp :
 
 attribute [local irreducible] lam ret term
 
-set_option maxHeartbeats 600000 in
+
 theorem pf_GRDual : GRDual := by
   classical
   intro hB hTr hE hTL L _ _ hC N hN μ hμ
@@ -244,14 +244,14 @@ theorem pf_GRDual : GRDual := by
     exact hk1.le
   have hsum : evR z (∑ᶠ k : ℤ, rho ((4 : ℝ) ^ k * μ h) • term ((4 : ℝ) ^ k) h) ≤ 32 * s / m := by
     by_cases hfin : (Function.support fun k : ℤ => rho ((4 : ℝ) ^ k * μ h) • term ((4 : ℝ) ^ k) h).Finite
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [finsum_eq_sum _ hfin, map_sum]
-        refine (Finset.sum_le_sum fun k _ => hterm k).trans ?_
-        rw [← Finset.mul_sum]
-        calc _ ≤ 4 * s * (2 * (4 / m)) :=
-              mul_le_mul_of_nonneg_left ((geo _ k0).trans (mul_le_mul_of_nonneg_left hinv (by norm_num)))
-                (mul_nonneg (by norm_num) hs0)
-          _ = _ := by ring
+
+    · rw [finsum_eq_sum _ hfin, map_sum]
+      refine (Finset.sum_le_sum fun k _ => hterm k).trans ?_
+      rw [← Finset.mul_sum]
+      calc _ ≤ 4 * s * (2 * (4 / m)) :=
+            mul_le_mul_of_nonneg_left ((geo _ k0).trans (mul_le_mul_of_nonneg_left hinv (by norm_num)))
+              (mul_nonneg (by norm_num) hs0)
+        _ = _ := by ring
     · rw [finsum_of_infinite_support hfin, map_zero]; exact div_nonneg (mul_nonneg (by norm_num) hs0) hm0
   have hμm : μ h * m ≤ 12 * C1 * |C2| := by
     have b1 : μ h ≤ |C2| * lamD h := (hcmp h hh).2.trans (mul_le_mul_of_nonneg_right (le_abs_self _) hD.le)

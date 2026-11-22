@@ -9,7 +9,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBo
 @[expose] public section
 
 open ReciprocityTheory.PGsh
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.det_frobenius_sub_pow_support_bounds : (∀ (l i E n₀ s : ℕ), l.Prime → 1 ≤ i → ∀ ψ : MvPolynomial ((Fin n₀ × Fin n₀) ⊕ (Fin n₀ × Fin n₀)) ℤ,
     ψ = (Matrix.of fun b c : Fin n₀ => (MvPolynomial.X (Sum.inl (b, c)) ^ (l ^ i) - MvPolynomial.C ((l : ℤ) ^ E) * MvPolynomial.X (Sum.inr (b, c)) : MvPolynomial ((Fin n₀ × Fin n₀) ⊕ (Fin n₀ × Fin n₀)) ℤ)).det -
       MvPolynomial.rename Sum.inl (cayDet n₀ ℤ) ^ (l ^ i) →

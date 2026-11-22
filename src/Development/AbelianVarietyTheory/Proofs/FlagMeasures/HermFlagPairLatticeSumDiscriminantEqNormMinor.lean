@@ -369,10 +369,10 @@ theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommG
   have dP : P.det = Dl N.F N.F' l hl := by
     have e : P = M * (Zhat N.F N.F').submatrix (Fin.castLE hl) (Fin.castLE hl) * M'.conjTranspose := by
       ext a b
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hP, c1, c2, Matrix.of_apply, Matrix.mul_apply, Zhat,
-        Matrix.submatrix_apply, Matrix.conjTranspose_apply, map_sum, LinearMap.sum_apply, map_smul,
-        LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
+
+      simp only [hP, c1, c2, Matrix.of_apply, Matrix.mul_apply, Zhat,
+      Matrix.submatrix_apply, Matrix.conjTranspose_apply, map_sum, LinearMap.sum_apply, map_smul,
+      LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
       exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
     rw [e, Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, d1, d2, star_one, one_mul, mul_one, Dl]
   have eG : (Matrix.of fun p q => H.B (Sum.elim y y' p) (Sum.elim y' y q)) =

@@ -231,8 +231,8 @@ theorem exists_phi : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶
       apply Subtype.ext
       rw [Submodule.coe_sum]
       exact h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h3, map_sum]
+
+    rw [h3, map_sum]
     exact Finset.sum_congr rfl fun l _ => hevs _ _ _ (hρ l)
   have hval : ∀ (x : B.carrier) (e : Li) (v : epsAt (spMap (algebraMap (𝓞 L) L) ≫ z) ⟶ G),
       M.ValAt _ e v → (v.left ≫ (𝟙 G.left) = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L)) ≫ (MB.pt x).left) →

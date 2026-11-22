@@ -169,8 +169,8 @@ theorem trace_rat (β a : HermE D r) :
   have h : (HMul.hMul (β.1.map (incA D)) (a.1.map (incA D)) : Mx D r r) = (β.1 * a.1).map (incA D) := by
     rw [Matrix.map_mul]
   rw [h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.trace, Matrix.diag, Matrix.map_apply, map_sum]
+
+  simp only [Matrix.trace, Matrix.diag, Matrix.map_apply, map_sum]
 
 theorem chi_path {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D}
     (hσ : GlobalTheory.FockCompare.Chart θ σ) {α : D.host.F}
@@ -186,7 +186,7 @@ theorem chi_path {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} {σ : (D.what�
   rw [e, AddChar.map_neg_eq_inv, hph, Complex.exp_neg]
   rfl
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem W_mult {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) {θ : InfFam D} (hθ : IsInfFam θ)
     {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ) {α : D.host.F}
     (hph : ∀ (t : AE D) (s : ℝ), ψ (halfTr (rs σ s * t)) =
@@ -228,7 +228,7 @@ theorem W_mult {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) {θ
     (hasDeriv_Jt hψ V μ (GlobalTheory.T.integrable_of_mem_schwartzA D θ hθ _ _ μ φ hφ) hMc.measurable
       (GlobalTheory.T.integrable_of_mem_schwartzA D θ hθ _ _ μ _ hMφ) (path hσ a) hc)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem W_int {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) {θ : InfFam D}
     {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ) {α : D.host.F}
     (hph : ∀ (t : AE D) (s : ℝ), ψ (halfTr (rs σ s * t)) =

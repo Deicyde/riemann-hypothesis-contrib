@@ -73,7 +73,7 @@ private theorem half_add {e : AE D} {u : WO S T} (hue : IsHalf e u) (t : WO S T)
   rw [GlobalTheory.PlaceModel.isHalf_iff, GlobalTheory.PlaceModel.isHalf_iff]
   exact add_mem_cancel_right ((GlobalTheory.PlaceModel.isHalf_iff S T).1 hue)
 
-set_option maxHeartbeats 800000 in
+
 private theorem sb_cosInd (hc : D.host.ccK = ⊤) (hS : S.gram = 1) {e : AE D} {𝔪 : Ideal (𝓞 D.host.E)} (h : GoodMod e 𝔪) :
     IsSBHalf e (latO S T (stdL D S.rank : Set (Fin S.rank → D.host.E))
       (stdL D T.rank : Set (Fin T.rank → D.host.E)) fun _ => True) (cosInd e 𝔪 rfl rfl 0) := by
@@ -124,7 +124,7 @@ private theorem sb_cosInd (hc : D.host.ccK = ⊤) (hS : S.gram = 1) {e : AE D} {
     exact mem_of_inId hc hS mem_stdL FractionalIdeal.coeIdeal_le_one h0 ht2
 
 
-set_option maxHeartbeats 1600000 in
+
 private theorem fix_deep (hc : D.host.ccK = ⊤) (hs : Setup ψ θ S T ⊤ δ 1) {v : WO S T → ℂ}
     (hv : IsLatVac (heisO ψ S T) (latO S T (stdL D S.rank : Set (Fin S.rank → D.host.E))
       (stdL D T.rank : Set (Fin T.rank → D.host.E)) fun _ => True) v)
@@ -174,12 +174,12 @@ private theorem fix_deep (hc : D.host.ccK = ⊤) (hs : Setup ψ θ S T ⊤ δ 1)
   rw [one_smul] at hvac
   have hT : ∑ q, heisO ψ S T (cA D e • finTens 1 (-z q)) v =
       (Fintype.card (B ⧸ A.addSubgroupOf B) : ℂ) • Tm (cosInd e 𝔪 rfl rfl 0) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_smul, show (Fintype.card (B ⧸ A.addSubgroupOf B) : ℂ) • cosInd e 𝔪 rfl rfl 0 =
-      ∑ q, fun t => ψ (symplO S T t (cA D e • finTens 1 (-z q))) * halfInd e
-        (latO S T (stdL D S.rank : Set (Fin S.rank → D.host.E))
-          (stdL D T.rank : Set (Fin T.rank → D.host.E)) fun _ => True) t from
-      funext fun t => by rw [Finset.sum_apply]; exact (sum_char hc hs h A B hA hB z hz hz' t).symm, map_sum]
+
+    rw [← map_smul, show (Fintype.card (B ⧸ A.addSubgroupOf B) : ℂ) • cosInd e 𝔪 rfl rfl 0 =
+    ∑ q, fun t => ψ (symplO S T t (cA D e • finTens 1 (-z q))) * halfInd e
+      (latO S T (stdL D S.rank : Set (Fin S.rank → D.host.E))
+        (stdL D T.rank : Set (Fin T.rank → D.host.E)) fun _ => True) t from
+    funext fun t => by rw [Finset.sum_apply]; exact (sum_char hc hs h A B hA hB z hz hz' t).symm, map_sum]
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [hTm.modul _ hSB _ fun i j => by rw [Matrix.smul_apply, smul_eq_mul, ← mul_assoc, hee], hvac]
   have hq : ∀ q, GlobalTheory.PlaceModel.heisL S T ψ (2 • (n • l)) (heisO ψ S T (cA D e • finTens 1 (-z q)) v) =
@@ -198,14 +198,14 @@ private theorem fix_deep (hc : D.host.ccK = ⊤) (hs : Setup ψ θ S T ⊤ δ 1)
     rw [h4, h5, one_smul] at h3
     exact h3
   have h6 := congrArg (GlobalTheory.PlaceModel.heisL S T ψ (2 • (n • l))) hT
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_smul, Finset.sum_congr rfl fun q _ => hq q, hT] at h6
+
+  rw [map_sum, map_smul, Finset.sum_congr rfl fun q _ => hq q, hT] at h6
   exact (smul_right_injective _ (Nat.cast_ne_zero.2 Fintype.card_ne_zero) h6).symm
 
 end GlobalTheory.CosRead
 
 open GlobalTheory.CosRead GlobalTheory.LatVac GlobalTheory.IopRead in
-set_option maxHeartbeats 1600000 in
+
 theorem _root_.GlobalTheory.T.cosetIndicator_reads_as_translate_curveTheta : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) {a d : ℕ} (hS : S.rank = a) (hT : T.rank = d) (δ : ℂ),
   D.host.ccK = ⊤ → Setup ψ θ S T ⊤ δ 1 → ∀ v : WO S T → ℂ, IsVacO ψ θ S T (fun _ => 1) (fun _ => 1) (stdL D S.rank : Set (Fin S.rank → D.host.E)) (stdL D T.rank : Set (Fin T.rank → D.host.E)) v →
   ∀ G ∈ Th D (tor0 D ⊤ δ) (stdL D a) (stdL D d), Reads ψ θ hS hT ⊤ δ 1 G v → ∀ (e : AE D) (𝔪 : Ideal (𝓞 D.host.E)), GoodMod e 𝔪 →

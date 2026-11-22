@@ -6,7 +6,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open scoped TensorProduct Matrix
@@ -18,7 +18,7 @@ namespace PositivityTheory.ThKW.LeviParabolicGL
 variable {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
 variable {n : ℕ}
 end PositivityTheory.ThKW.LeviParabolicGL
-set_option maxHeartbeats 800000 in
+
 open PositivityTheory.ThKW.LeviParabolicGL in
 theorem PositivityTheory.ThKW.PhaseFourierInjectivity.levi_k : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
     _root_.UpperTheory.TP.W.GoodK σ B → ∀ (nT : ℕ) (JT : Matrix (Fin nT) (Fin nT) E), IsHermND σ JT →

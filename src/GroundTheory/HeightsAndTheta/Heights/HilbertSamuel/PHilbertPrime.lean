@@ -104,8 +104,8 @@ theorem multilinear_abs_le {n : ℕ} (f : MultilinearMap ℤ (fun _ : Fin n => K
     exact pi_eq_sum_univ (m i)
   have hexp : f m = ∑ r : Fin n → K, (∏ i, m i (r i)) * f (fun i => E (r i)) := by
     conv_lhs => rw [hm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [MultilinearMap.map_sum]
+
+    rw [MultilinearMap.map_sum]
     refine Finset.sum_congr rfl (fun r _ => ?_)
     simp only [MultilinearMap.map_smul_univ, RingHom.id_apply, smul_eq_mul]
   rw [hexp, Finset.sum_mul]

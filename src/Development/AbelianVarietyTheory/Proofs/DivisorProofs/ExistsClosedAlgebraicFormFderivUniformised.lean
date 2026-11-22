@@ -25,8 +25,8 @@ theorem clm_eq_sum_single_smul_proj {g : ℕ} (f : (Fin g → ℂ) →L[ℂ] ℂ
     f = ∑ a, f (Pi.single a 1) • (ContinuousLinearMap.proj a : (Fin g → ℂ) →L[ℂ] ℂ) := by
   refine ContinuousLinearMap.ext fun v ↦ ?_
   conv_lhs => rw [pi_eq_sum_univ' v]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, mul_comm]
+
+  simp [map_sum, mul_comm]
 
 theorem fderiv_partial_symm {g : ℕ} {s : Set (Fin g → ℂ)} (hs : IsOpen s) {h : (Fin g → ℂ) → ℂ}
     (hh : DifferentiableOn ℂ h s) {k : Fin g → (Fin g → ℂ) → ℂ} (hk : ∀ a, DifferentiableOn ℂ (k a) s)
@@ -73,8 +73,8 @@ theorem exists_closed_form_fderiv_eq (A : Over (Sp ℂ)) [GrpObj A] (g : ℕ) (L
   · rw [clm_eq_sum_single_smul_proj (fderiv ℂ h z), clm_eq_sum_single_smul_proj (evForm u.ex U.1 z _)]
     refine Finset.sum_congr rfl fun a _ ↦ ?_
     have h1 : (d a).liftKaehlerDifferential (∑ c, k c • ω c) = k a := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, hdual]
+
+      simp [map_sum, hdual]
     rw [hev a _ z hz, h1, hk a z hz]
 
 end GlobalTheory.CechPer

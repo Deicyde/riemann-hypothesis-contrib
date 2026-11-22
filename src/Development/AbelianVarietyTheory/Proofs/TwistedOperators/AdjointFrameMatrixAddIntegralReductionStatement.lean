@@ -19,7 +19,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.Ade
 open Formalism.L2.DIV (kP Pl LevelP)
 open Classical
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.adjointFrameMatrix_add_integral_reduction : ∀ {D : D7} (S T : HSp D) (βS : GL (Fin S.rank) (Formalism.IndefR.Datum.EAf D)) (βT : GL (Fin T.rank) (Formalism.IndefR.Datum.EAf D)) (x y : WO S T),
   IsIntM (frMapAdj S T βS βT x) → IsIntM (frMapAdj S T βS βT y) →
   IsIntM (frMapAdj S T βS βT (x + y)) ∧

@@ -39,8 +39,8 @@ theorem isMultiHomog_specFirst {R : Type*} [CommSemiring R] {k n δ : ℕ}
     {f : MvPolynomial (Fin (k + 1) × Fin n) R} (u : Fin n → R) (hf : IsMultiHomog δ f) :
     IsMultiHomog δ (specFirst f u) := by
   unfold IsMultiHomog specFirst
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [f.as_sum, map_sum]
+
+  rw [f.as_sum, map_sum]
   refine IsWeightedHomogeneous.sum _ _ _ fun d hd => ?_
   rw [bind₁_monomial]
   have hdeg : (fun _ : Fin k => δ) =

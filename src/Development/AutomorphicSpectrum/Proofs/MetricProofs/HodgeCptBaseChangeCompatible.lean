@@ -105,16 +105,16 @@ theorem flat_ker {R R' : Type} [CommRing R] [CommRing R'] (φ : R →+* R') (hφ
     have h2 : f (Pi.single k 1) = ∑ r, A k r • (Pi.single r 1 : Ix → R) := by
       funext t
       simp [f, Matrix.mulVec_single_one, Finset.sum_apply, Pi.single_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h2, map_sum] at h1
+
+    rw [h2, map_sum] at h1
     simpa [Matrix.mulVec, dotProduct, Finsupp.finsetSum_apply] using h1
   · have h1 := congrArg (fun g => g (Pi.single k 1)) hxy
     simp only [LinearMap.comp_apply] at h1
     have h2 : X (Pi.single k 1) = x k := by simp [X, Fintype.linearCombination_apply, Pi.single_apply]
     rw [← h2, h1]
     conv_lhs => rw [← Finsupp.sum_single (a (Pi.single k 1))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finsupp.sum_fintype _ _ (by simp), map_sum]
+
+    rw [Finsupp.sum_fintype _ _ (by simp), map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [← mul_one (a (Pi.single k 1) l), ← smul_eq_mul, ← Finsupp.smul_single, map_smul, Algebra.smul_def, mul_comm]
     rfl
@@ -158,8 +158,8 @@ theorem span_image_frame (hj : IsExtOver i j) (hsp : Submodule.span Ω' (Set.ran
   rintro _ ⟨e, rfl⟩
   have he : e ∈ Submodule.span Ω (Set.range b) := hbs ▸ Submodule.mem_top
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun Ω).1 he
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [SetLike.mem_coe, map_sum, hj.1]
+
+  simp only [SetLike.mem_coe, map_sum, hj.1]
   exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
 
 theorem coef_zero (hj : IsExtOver i j) (hb : LinearIndependent Ω b) (f : V →ₗ[Ω] V) (f' : V' →ₗ[Ω'] V')
@@ -167,20 +167,20 @@ theorem coef_zero (hj : IsExtOver i j) (hb : LinearIndependent Ω b) (f : V →�
     (h0 : f' (∑ l, c l • j (b l)) = 0) (k : Fin r) : ∑ l, c l * i (C l k) = 0 := by
   have hli : LinearIndependent Ω' fun k => j (b k) := hj.2 r b hb
   have hjf : ∀ l, f' (j (b l)) = ∑ k, i (C l k) • j (b k) := fun l => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hf, hC, map_sum]
+
+    rw [hf, hC, map_sum]
     exact Finset.sum_congr rfl fun k _ => hj.1 _ _
   have h1 : ∑ k, (∑ l, c l * i (C l k)) • j (b k) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← h0, map_sum]
+
+    rw [← h0, map_sum]
     simp only [map_smul, hjf, Finset.sum_smul, Finset.smul_sum, smul_smul]
     exact Finset.sum_comm
   exact Fintype.linearIndependent_iff.1 hli _ h1 k
 
 theorem comb_ker (f : V →ₗ[Ω] V) (C : Fin r → Fin r → Ω) (hC : ∀ l, f (b l) = ∑ k, C l k • b k) (y : Fin r → Ω)
     (h0 : ∀ q, ∑ k, C k q * y k = 0) : f (∑ k, y k • b k) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [map_smul, hC, Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   simp only [← Finset.sum_smul]
@@ -213,8 +213,8 @@ theorem flat_lat (hφ : φ.Flat) (hφi : ∀ a, (φ a : Ω') = i a) (hj : IsExtO
       rintro _ ⟨e, he, rfl⟩
       have he' : e ∈ Submodule.span R (Set.range b) := hL ▸ he
       obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun R).1 he'
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [SetLike.mem_coe, map_sum]
+
+      simp only [SetLike.mem_coe, map_sum]
       refine Submodule.sum_mem _ fun k _ => ?_
       have : j (c k • b k) = (⟨i (c k), hR _ (c k).2⟩ : R') • j (b k) := hj.1 (c k : Ω) (b k)
       rw [this]
@@ -249,8 +249,8 @@ theorem flat_lat (hφ : φ.Flat) (hφi : ∀ a, (φ a : Ω') = i a) (hj : IsExtO
         simpa using this
     have hsum : e' = ∑ n, cc n • j (Ee n) := by
       have hjE : ∀ n, j (Ee n) = ∑ k, i (y n k) • j (b k) := fun n => by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Ee, map_sum]
+
+        simp only [Ee, map_sum]
         exact Finset.sum_congr rfl fun k _ => hj.1 _ _
       show e' = ∑ n, (cc n : Ω') • j (Ee n)
       simp only [hjE, Finset.smul_sum, smul_smul]
@@ -299,8 +299,8 @@ theorem flat_dual (hφ : φ.Flat) (hφi : ∀ a, (φ a : Ω') = i a) (hj : IsExt
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun Ω').1 (hjs ▸ Submodule.mem_top : e' ∈ _)
     replace hc := hc.symm
     have hev : ∀ w, jd w e' = ∑ l, c l * i (w (b l)) := fun w => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hc, map_sum]
+
+      rw [hc, map_sum]
       simp [hjd]
     have hCe : ∀ t l, ∃ C : Fin r → R, f t (b l) = ∑ k, (C k : Ω) • b k := fun t l => by
       obtain ⟨C, hC⟩ := (Submodule.mem_span_range_iff_exists_fun R).1 (hfL t l)
@@ -352,8 +352,8 @@ theorem flat_dual (hφ : φ.Flat) (hφi : ∀ a, (φ a : Ω') = i a) (hj : IsExt
       have h3 := congrArg Subtype.val (hy2 n a)
       simp only [AddSubmonoidClass.coe_finsetSum, Subring.coe_mul, Subring.coe_zero, Subring.coe_add, Subring.coe_neg,
         Subring.coe_natCast] at h3
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Ee, map_smul, map_sum, smul_eq_mul]
+
+      simp only [Ee, map_smul, map_sum, smul_eq_mul]
       have h4 : ∑ k, (y n k : Ω) * g a (b k) = (N : Ω) * v n a := by
         have e1 : ∑ k, (y n k : Ω) * g a (b k) = ∑ k, g a (b k) * (y n k : Ω) :=
           Finset.sum_congr rfl fun _ _ => mul_comm _ _
@@ -382,8 +382,8 @@ theorem flat_dual (hφ : φ.Flat) (hφi : ∀ a, (φ a : Ω') = i a) (hj : IsExt
       have hN' : (N : Ω') ≠ 0 := fun e => hN (i.injective (by simpa using e))
       have hjE : ∀ n, j (Ee n) = (N : Ω')⁻¹ • ∑ k, i (y n k) • j (b k) := fun n => by
         simp only [Ee]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hj.1, map_sum, map_inv₀, map_natCast]
+
+        rw [hj.1, map_sum, map_inv₀, map_natCast]
         congr 1
         exact Finset.sum_congr rfl fun k _ => hj.1 _ _
       show e' = ∑ n, (cc n : Ω') • j (Ee n)
@@ -474,7 +474,7 @@ theorem exists_flat_regAt {X Z : Scheme.{0}} {Ω Ω' : Type} [Field Ω] [Field �
     exact h1
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem hodgeCpt_pull_smooth : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ) (Ω Ω' : Type) [Field Ω] [Field Ω'] (i : Ω →+* Ω') (K K' : Type) [Fintype K] [Fintype K'] (J : K → Type) (J' : K' → Type) [∀ k, Fintype (J k)] [∀ k, Fintype (J' k)] (y : (Σ k, J k) → Ω) (y' : (Σ k, J' k) → Ω') (A : HodgeCpt Y S y) (Z : Scheme.{0}) (ξ' : Spec (CommRingCat.of Ω') ⟶ Z) (h : Z ⟶ A.X), (∀ q : Z, genPt ξ' ⤳ q) → CoordTie ℤ ξ' (seg y') → ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z → GlobalTheory.CompanionTheory.Ar.Dominates ξ' A.ξ h i → Smooth h → ∃ (A' : HodgeCpt Y S y') (e : A'.X ≅ Z) (j : A.Li →+ A'.Li), A'.ξ ≫ e.hom = ξ' ∧ HodgeOver A' A (e.hom ≫ h) i j ∧ A'.R = A.R ∧ Submodule.span Ω' (Set.range j) = ⊤ ∧ ∀ s, A'.V s = (A.V s).pull A'.ξ (e.hom ≫ h) j := by
   intro E _ _ _ H D l Xo c Y S Ω Ω' _ _ i K K' _ _ J J' _ _ y y' A Z ξ' h hall htie hnorm hdom hsmh
   haveI : CharZero Ω := charZero_of_injective_ringHom A.cst.injective

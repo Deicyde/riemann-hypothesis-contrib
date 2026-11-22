@@ -5,7 +5,7 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.DualModuleFi
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.dual_module_finite_projective : ∀ (R P : Type) [CommRing R] (f : R) [AddCommGroup P] [Module R P]
   [Module (Localization.Away f) P] [IsScalarTower R (Localization.Away f) P] [Module.Finite (Localization.Away f) P]
   [Module.Projective (Localization.Away f) P],

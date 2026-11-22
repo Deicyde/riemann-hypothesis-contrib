@@ -20,7 +20,7 @@ open Classical
 
 variable {D : D7} {n m : ℕ}
 
-set_option maxHeartbeats 800000 in
+
 theorem ww_act {ψ : AddChar (AF D.host.F) ℂ} {χ : (AE D)ˣ →* Circle} {θ : InfFam D} {V : HSp D}
     {μ : Measure (Mx D V.rank n)} {ω : G D n →* Module.End ℂ (schwartzA θ V.rank n)} (hω : IsWeilSch ψ χ θ V μ ω)
     (w : G D n) (hw : mat w = blk4 0 1 (-1) 0) :
@@ -34,7 +34,7 @@ theorem ww_act {ψ : AddChar (AF D.host.F) ℂ} {χ : (AE D)ˣ →* Circle} {θ 
   rw [Units.val_neg, Units.val_one]
   exact congrArg _ ((Matrix.mul_neg x 1).trans (by rw [Matrix.mul_one]))
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem compAt_neg (θ : InfFam D) (τ : D.what₂.Tau) (x : Mx D m n) : compAt θ τ (-x) = -compAt θ τ x := by
   ext i j; simp only [compAt, Matrix.map_apply, Matrix.neg_apply, RingHom.map_neg]
 

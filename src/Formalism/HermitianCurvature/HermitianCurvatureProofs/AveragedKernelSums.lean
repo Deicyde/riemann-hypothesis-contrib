@@ -5,7 +5,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FirstKernelP
 
 @[expose] public section
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 

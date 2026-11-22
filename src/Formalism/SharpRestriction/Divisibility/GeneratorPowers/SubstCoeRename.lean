@@ -59,7 +59,7 @@ theorem val_pe_pair (C : ChartAt Xo c y) (m : ℕ) (P3 : Fin 3 → Fin C.d → M
 
 end Pair
 
-set_option maxHeartbeats 1000000 in
+
 theorem phOneVal_holds : ExpGJ.PhOneValSt := by
   intro E _ _ _ H Dw l Xo c _ S _ _ _ y C φ hφ hx m u0 u1 u2 z J hJ
   have hφ0 : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0 := hφ.const

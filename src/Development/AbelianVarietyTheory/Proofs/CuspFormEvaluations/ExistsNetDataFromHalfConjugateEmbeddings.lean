@@ -17,8 +17,8 @@ theorem linearIndependent_conj_coords {ι κ : Type*} [Fintype ι] (v : ι → �
   have h1 : ∑ i, conj (c i) • v i = 0 := by
     funext y
     have := congrArg conj (congrFun hc y)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [Finset.sum_apply, map_sum] using this
+
+    simpa [Finset.sum_apply, map_sum] using this
   simpa using h (fun i => conj (c i)) h1 i
 
 theorem exists_netData_of_readings_on_half :

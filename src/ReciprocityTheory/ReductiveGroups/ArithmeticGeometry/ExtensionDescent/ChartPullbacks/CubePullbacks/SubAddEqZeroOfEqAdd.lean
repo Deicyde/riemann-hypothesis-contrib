@@ -173,7 +173,7 @@ lemma pt1 (y : (𝟙_ (Over S')).left) :
 lemma pt2 (y : (𝟙_ (Over S')).left) :
     m.F.base ((eSec G').base y) = (eSec G).base (m.e.base y) := base_eq m.e_comm y
 
-set_option maxHeartbeats 800000 in
+
 lemma sym_maps (L : RigLB G) (he : eSec G ≫ (GrpObj.inv (X := G)).left = 𝟙 _ ≫ eSec G)
     (w₀ : LB.Iso L.L (L.L.pull (GrpObj.inv (X := G)).left))
     (hm : LB.Gen.Maps (LB.linCombIso w₀ (K := PUnit) (fun _ => eSec G) (fun _ => 1)) L.rig

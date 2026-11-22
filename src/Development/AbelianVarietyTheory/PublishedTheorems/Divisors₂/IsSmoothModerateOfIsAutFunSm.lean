@@ -169,8 +169,8 @@ theorem exists_isWittFrame (h : IsCMExt F E σ) (hJ : IsHermND σ J) :
     simp only [B, toLinearMapₛₗ₂'_apply, smul_eq_mul, RingHom.id_apply, RingHom.coe_coe]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   have hs : ∀ u v, B u v = (σ : E →+* E) (B v u) := fun u v => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hB, map_sum, map_mul, RingHom.coe_coe, sigma_sigma h, hJ.1]
+
+    simp only [hB, map_sum, map_mul, RingHom.coe_coe, sigma_sigma h, hJ.1]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   let P : ℕ → Prop := fun r => ∃ x y : Fin r → Fin n → E, (∀ i j, B (x i) (x j) = 0) ∧ (∀ i j, B (y i) (y j) = 0) ∧

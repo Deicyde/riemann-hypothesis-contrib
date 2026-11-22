@@ -127,8 +127,8 @@ theorem eig_val : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRi
     induction hv using Submodule.iSup_induction' with
     | mem t x hx =>
       have h1 : e s x = algebraMap k K (if t = s then 1 else 0) • x := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← hc t, hes, LinearMap.sum_apply, map_sum, Finset.sum_smul]
+
+        rw [← hc t, hes, LinearMap.sum_apply, map_sum, Finset.sum_smul]
         refine Finset.sum_congr rfl fun j _ => ?_
         rw [LinearMap.smul_apply, mem_eig.1 (hU t hx) (a j), map_mul, mul_smul]
       rw [h1]

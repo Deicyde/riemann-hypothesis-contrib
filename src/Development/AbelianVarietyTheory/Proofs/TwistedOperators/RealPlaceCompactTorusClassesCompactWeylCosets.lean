@@ -334,9 +334,9 @@ theorem infEmb_hform (hc : IsCMExt F E σ) (u v : Fin r → w.Completion ⊗[F] 
     infEmb τ (Formalism.UG.hform (sigR w.Completion σ) (JR w.Completion J) u v) =
       star (infEmb τ ∘ u) ⬝ᵥ (J.map τ.1 *ᵥ (infEmb τ ∘ v)) := by
   unfold Formalism.UG.hform
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, dotProduct, Matrix.mulVec, Function.comp_apply, Pi.star_apply, Finset.mul_sum,
-    Matrix.map_apply]
+
+  simp only [map_sum, map_mul, dotProduct, Matrix.mulVec, Function.comp_apply, Pi.star_apply, Finset.mul_sum,
+  Matrix.map_apply]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have hJ : infEmb τ (JR w.Completion J i j) = τ.1 (J i j) := by
     rw [JR, Matrix.map_apply, inclR]
@@ -464,15 +464,15 @@ theorem exists_matrix (hc : IsCMExt F E σ) (h1 : ∀ y i, Ψ (sigR w.Completion
     have hy : y = ∑ j, e j • Ψ.symm (Pi.single j 1) := by
       apply Ψ.injective
       funext i
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_apply]
+
+      rw [map_sum, Finset.sum_apply]
       simp only [Algebra.smul_def, map_mul, Pi.mul_apply, h2, he, RingEquiv.apply_symm_apply, Pi.single_apply,
         mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     funext i
     conv_lhs => rw [hy]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Function.comp_apply, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_mul, he,
-      Matrix.mulVec, dotProduct, Matrix.of_apply]
+
+    simp only [Function.comp_apply, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_mul, he,
+    Matrix.mulVec, dotProduct, Matrix.of_apply]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   refine ⟨N, ?_, ?_⟩
   · have key : ∀ a b : Fin r → ℂ, a ⬝ᵥ ((Nᴴ * J.map τ.1 * N) *ᵥ b) = a ⬝ᵥ (Matrix.diagonal (Ψ x) *ᵥ b) := by
@@ -499,8 +499,8 @@ theorem exists_matrix (hc : IsCMExt F E σ) (h1 : ∀ y i, Ψ (sigR w.Completion
         infEmb τ ∘ (mulMat φ (1 ⊗ₜ[F] alpha P) *ᵥ φ y) := by
       rw [← hg]
       funext i
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+      simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
     rw [hm, mulMat_mulVec, hN, map_mul]
     congr 1
     funext i

@@ -199,11 +199,11 @@ theorem swp_hermA (c : E ≃ₐ[F] E) (σ : E →ₐ[F] E) (hσ : ∀ x, σ x = 
       Formalism.UG.hform (Formalism.UG.sigR σ (Formalism.L2.Herm.Af F)) (J.map (Formalism.UG.inclE (F := F) (Formalism.L2.Herm.Af F)))
         (fun i => Formalism.UG.inclE (F := F) (Formalism.L2.Herm.Af F) (x i)) (fun i => swp F E (y i)) := by
   unfold Formalism.UG.hform GlobalTheory.AdLat.hermA
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_comm, map_sum (swp F E)]
+
+  rw [Finset.sum_comm, map_sum (swp F E)]
   refine Finset.sum_congr rfl fun a _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum (swp F E)]
+
+  rw [map_sum (swp F E)]
   refine Finset.sum_congr rfl fun b _ => ?_
   have e1 : swp F E (GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c (GlobalTheory.AdLat.fv F x a)) =
       Formalism.UG.sigR σ (Formalism.L2.Herm.Af F) (Formalism.UG.inclE (F := F) (Formalism.L2.Herm.Af F) (x a)) := by
@@ -461,7 +461,7 @@ theorem exists_matrix_lift {R T : Type} [CommRing R] [CommRing T] {n : ℕ} (ψ 
   exact (Matrix.isUnits_det_units k).ne_zero
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_local_lift {V : HSp D} {β : GL (Fin V.rank) (Lev.EAf D)}
     {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} {N : ℕ} (hB : IsBaseFrame V β Λ N)
     {P : Pl D.host.E} {e : Formalism.L2.Theta.AE D} (he : IsIdemAt e P) (k : GL (Fin V.rank) (kP P)) :

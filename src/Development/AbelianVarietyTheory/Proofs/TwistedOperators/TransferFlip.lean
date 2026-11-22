@@ -92,7 +92,7 @@ theorem stage_heq {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [Is
 
 abbrev gOf {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} (_ : Frames G) : GridData L sc := G
 
-set_option maxHeartbeats 1000000 in
+
 theorem sameD_of_cosZero (hz : CosZero) : SameD := by
   intro D T T' L L' sc G G' B B' ι hY hY' hC hPg hxi hQ hv0 hw hchi hVs hβ Φ'
   have hm : 0 < D.R.m := by have := D.R.two_le_m; omega
@@ -165,7 +165,7 @@ abbrev dOf {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (_ : GridData L sc)
 
 abbrev lOf {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (_ : GridData L sc) : LevCh D T := L
 
-set_option maxHeartbeats 4000000 in
+
 theorem trFlip_of_same (hsame : SameD) : TrFlip := by
   intro X X' T T' L L' sc G G' W W' S S' μ₀ μ₀' ι hA Φ'
   obtain ⟨hl, hg, hw, hs⟩ := hA

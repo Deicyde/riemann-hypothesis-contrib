@@ -63,7 +63,7 @@ theorem smul_comb {E : Type*} [AddCommGroup E] [Module ℂ E] (X : E) (r i c : �
 variable (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_contRep_of_zkFinite (v : CuspL2 μ)
     (hs : (isExpLieAlgebra K n).IsSmoothVector (archRepT μ) v)
     (hK : FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun k :

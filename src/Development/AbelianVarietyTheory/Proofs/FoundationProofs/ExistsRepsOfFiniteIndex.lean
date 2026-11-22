@@ -95,8 +95,8 @@ theorem finCong_mono {V : HSp D} {M N : ℕ} (hd : M ∣ N) {k : GA D V} (hk : G
 theorem idem_eq_sum (e : Af D.host.F) (he : e * e = e) (S : Finset (HeightOneSpectrum (𝓞 D.host.F)))
     (hS : ∀ v, v ∈ S ↔ evalV D.host.F v e ≠ 0) : e = ∑ v ∈ S, singleV D.host.F v 1 := by
   refine af_ext _ fun w => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   by_cases hw : w ∈ S
   · rw [Finset.sum_eq_single w (fun v _ hv => evalV_singleV_ne _ v _ hv.symm) (fun h => absurd hw h),
       evalV_singleV_same]
@@ -123,9 +123,9 @@ theorem splitOffBad_of_suppSplit (V : HSp D) (N : ℕ) (h : GA D V) (hh : h ∈ 
     Subtype.ext (HeightOneSpectrum.ext (by rw [← hco, ← hco, hvw]))
   have hsum : ∑ v, ev v + cA D (∑ v, ev v) = fj D e₀ := by
     refine Eq.trans ?_ (congrArg (fj D) (idem_eq_sum e₀ h1 h2.toFinset (fun v => h2.mem_toFinset))).symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, ← Finset.sum_add_distrib,
-      ← Finset.sum_coe_sort h2.toFinset]
+
+    rw [map_sum, map_sum, ← Finset.sum_add_distrib,
+    ← Finset.sum_coe_sort h2.toFinset]
     exact Finset.sum_congr rfl fun v _ => (hsp v).2.2
   refine ⟨hh, ∑ v, ev v, Finset.univ.image Pv, ⟨⟨Function.extend Pv ev 0, ?_, ?_⟩, ?_⟩, ?_, ?_⟩
   · intro PP hPP

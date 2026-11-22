@@ -54,7 +54,7 @@ variable {K : FiniteSubfield} (S : Set (HeightOneSpectrum (𝓞 K.1)))
   (ιs : ∀ v : S, ℚ̄ →ₐ[K.1] AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_two_nsmul_finLocal (v : HeightOneSpectrum (𝓞 K.1))
     (a : cohomology (galUnits.{0} (v.adicCompletion K.1) (AlgebraicClosure (v.adicCompletion K.1))) 2) :
     ∃ u, 2 • u = a := by
@@ -82,21 +82,21 @@ def unitsLocalToCompact (n : ℕ) : UnitsLoc S n →+ unitsTateCohomology S ιr 
   (tateLocalToCompact (gsFinFamily S ιs) (gsRealFamily S ιr) (galSUnitsMax K.1 ℚ̄ S) (finUnits S)
     (finUnitsMor S ιs) realUnits (realUnitsMor S ιr) n).hom.toAddMonoidHom
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_unitsLocalToCompact_eq (n : ℕ) (x : unitsTateCohomology S ιr ιs (n + 1))
     (hx : unitsToGlobal S ιr ιs (n + 1) x = 0) : ∃ t, unitsLocalToCompact S ιr ιs n t = x :=
   (ShortComplex.moduleCat_exact_iff _).1 (tateCompactCohomology_exact_compact
     (gsFinFamily S ιs) (gsRealFamily S ιr) (galSUnitsMax K.1 ℚ̄ S) (finUnits S) (finUnitsMor S ιs)
     realUnits (realUnitsMor S ιr) n) x hx
 
-set_option maxHeartbeats 1000000 in
+
 theorem unitsLocalToCompact_unitsGlobalToLocal (n : ℕ) (g : cohomology (galSUnitsMax K.1 ℚ̄ S) (n + 1)) :
     unitsLocalToCompact S ιr ιs (n + 1) (unitsGlobalToLocal S ιr ιs (n + 1) g) = 0 :=
   hom_apply_hom_apply_of_comp_eq (tateGlobalToLocal_tateLocalToCompact (gsFinFamily S ιs)
     (gsRealFamily S ιr) (galSUnitsMax K.1 ℚ̄ S) (finUnits S) (finUnitsMor S ιs) realUnits
     (realUnitsMor S ιr) n) g
 
-set_option maxHeartbeats 1000000 in
+
 theorem unitsLocalToCompact_two_unitsGlobalToLocal (g : cohomology (galSUnitsMax K.1 ℚ̄ S) 2) :
     unitsLocalToCompact S ιr ιs 2 (unitsGlobalToLocal S ιr ιs 2 g) = 0 :=
   unitsLocalToCompact_unitsGlobalToLocal S ιr ιs 1 g
@@ -112,7 +112,7 @@ section Div
 variable (h2S : ∀ v : HeightOneSpectrum (𝓞 K.1), ((2 : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
 
 
-set_option maxHeartbeats 8000000 in
+
 include h2S in
 theorem exists_realUnitsRes_two_eq
     (t : ∀ w : {v : InfinitePlace K.1 // v.IsReal}, cohomology (realUnits w) 2) :
@@ -150,8 +150,8 @@ theorem exists_realUnitsRes_two_eq
           hv (by rw [Sum.inr_injective h]; exact hv₀S)), add_zero]
     · change sumPlaceInv K ((∑ w, DirectSum.of (localGaloisCohomology K 2) (.inl w.1)
         (realLocalEquiv w 2 (t w))) + DirectSum.of (localGaloisCohomology K 2) (.inr v₀) c) = 0
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), map_sum, sumPlaceInv_of, hc]
+
+      rw [map_add (f := _), map_sum, sumPlaceInv_of, hc]
       simp only [sumPlaceInv_of]
       exact add_neg_cancel s
   let g₀ := (sUnitsH2PrimaryEquiv K S 2 Nat.prime_two h2S ι).symm ⟨T, hT⟩
@@ -174,7 +174,7 @@ theorem exists_realUnitsRes_two_eq
     exact absurd (Finset.mem_univ w) h
 
 
-set_option maxHeartbeats 1000000 in
+
 include h2S in
 theorem exists_eq_two_nsmul_add_unitsGlobalToLocal (t : UnitsLoc S 2) :
     ∃ (t' : UnitsLoc S 2) (g : cohomology (galSUnitsMax K.1 ℚ̄ S) 2),
@@ -190,7 +190,7 @@ theorem exists_eq_two_nsmul_add_unitsGlobalToLocal (t : UnitsLoc S 2) :
     rw [smul_zero, zero_add, unitsGlobalToLocal_snd, hg w]
 
 
-set_option maxHeartbeats 1000000 in
+
 include h2S in
 theorem exists_two_nsmul_unitsTate_three (z : unitsTateCohomology S ιr ιs (2 + 1)) : ∃ z', 2 • z' = z := by
   obtain ⟨N, hN⟩ := isOfFinAddOrder_iff_nsmul_eq_zero.1
@@ -213,7 +213,7 @@ theorem exists_two_nsmul_unitsTate_three (z : unitsTateCohomology S ιr ιs (2 +
   rw [add_smul, one_smul, add_sub_cancel_left]
 
 
-set_option maxHeartbeats 1000000 in
+
 include h2S in
 theorem exists_two_nsmul_unitsTate_of_four_le {m : ℕ} (hm : 3 ≤ m + 1)
     (x : unitsTateCohomology S ιr ιs (m + 1 + 1)) : ∃ x', 2 • x' = x := by

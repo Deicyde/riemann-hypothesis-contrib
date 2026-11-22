@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.For
 @[expose] public section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out PositivityTheory.FormalThickening
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.formal_morphism_existence : GEClosed → IsoOfThick →
   ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R), IsAdicComplete I R →
     ∀ (X Z : Over (Spec (CommRingCat.of R))), IsProper X.hom →

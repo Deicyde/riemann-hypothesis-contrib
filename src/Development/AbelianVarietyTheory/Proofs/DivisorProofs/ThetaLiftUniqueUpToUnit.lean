@@ -304,9 +304,9 @@ theorem exists_isometry {K X ι : Type} [Field K] [AddCommGroup X] [Module K X] 
   refine ⟨Φ, h1, fun x => ?_, fun h x => ?_⟩
   · have : ⟪Φ x, Φ x⟫_ℂ = ⟪x, x⟫_ℂ := by
       rw [← b1.sum_repr x]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [b1, Module.Basis.mk_apply, map_sum, map_smul, hb, sum_inner, inner_sum, inner_smul_left,
-        inner_smul_right, hp]
+
+      simp only [b1, Module.Basis.mk_apply, map_sum, map_smul, hb, sum_inner, inner_sum, inner_smul_left,
+      inner_smul_right, hp]
     rw [@norm_eq_sqrt_re_inner ℂ, this, ← @norm_eq_sqrt_re_inner ℂ]
   · have hrat : ∀ γ ∈ GQ V, Φ (c.ρ γ x) = c'.ρ γ (Φ x) := fun γ hγ => by
       obtain ⟨r, r1, r2⟩ := hr γ hγ

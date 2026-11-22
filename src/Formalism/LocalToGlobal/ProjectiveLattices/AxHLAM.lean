@@ -64,7 +64,7 @@ theorem valC_smul (h : GenFrEx Xo c) (a : 𝓞 c.F) (u : (E →+* ℂ) × ℕ �
 
 end Ev
 
-set_option maxHeartbeats 1000000 in
+
 theorem coe_smul_cusp {D : D7} {Tc : Core D} (hL : LawsCore Tc) (j : ℕ) (ka : WeightFamilies.Wt D j)
     (a : 𝓞 Tc.Q.c.F) (F : (recB hL).Cusp j ka) :
     ((a • F : (recB hL).Cusp j ka) : Tc.R j) = ((a : Tc.Q.c.F) • (F : Tc.R j)) := by

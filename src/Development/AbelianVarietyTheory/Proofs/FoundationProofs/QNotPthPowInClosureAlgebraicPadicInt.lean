@@ -95,8 +95,8 @@ theorem q_not_pow : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra
   obtain ⟨n, a, f, g, ha, hli, hg, hrep⟩ := repr p Ω h b hb
   set φ := algebraMap (O0 p) Ω with hφ
   have hEsum := congrArg E hrep
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Derivation.leibniz, map_sum] at hEsum
+
+  rw [Derivation.leibniz, map_sum] at hEsum
   simp only [Derivation.leibniz, hEa _ (ha _), smul_zero, zero_add, smul_eq_mul, hE, mul_zero] at hEsum
   let c : Fin n → O0 p := fun i => g * f i + (p : O0 p) * D g * f i - (p : O0 p) * g * D (f i)
 

@@ -11,8 +11,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHomogeneou
 
 open NumberField IsDedekindDomain MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.FlatTw GlobalTheory.IndefiniteRowSideFullHecke.ComponentMassSum
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 noncomputable section
 
@@ -93,8 +93,8 @@ theorem lint_sqN_sum [Fintype (Comp Xo c)] (μ : Measure (AutQ V))
       sqN U V dict la (∑ Z, f Z) q = sqN U V dict la (f Z) q := by
     intro Z q hq
     have e : rdU U (∑ Z', f Z') (dict q.out).1 (dict q.out).2 = rdU U (f Z) (dict q.out).1 (dict q.out).2 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_apply, Finset.sum_apply, Finset.sum_eq_single Z]
+
+      rw [map_sum, Finset.sum_apply, Finset.sum_apply, Finset.sum_eq_single Z]
       · intro Z' _ hZ'
         exact rdU_eq_zero U (hf Z') fun h => Set.disjoint_left.1 (framesOn_disjoint U hZ') h hq
       · intro h; exact absurd (Finset.mem_univ Z) h
@@ -105,8 +105,8 @@ theorem lint_sqN_sum [Fintype (Comp Xo c)] (μ : Measure (AutQ V))
     simp only [Set.mem_iUnion, not_exists] at hn
     apply hq
     have e : rdU U (∑ Z', f Z') (dict q.out).1 (dict q.out).2 = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_apply, Finset.sum_apply]
+
+      rw [map_sum, Finset.sum_apply, Finset.sum_apply]
       exact Finset.sum_eq_zero fun Z _ => rdU_eq_zero U (hf Z) (hn Z)
     have h0 : ptN la (rdU U (∑ Z', f Z')) (dict q.out) = 0 := by
       simp only [ptN, Data.pnorm, e, norm_zero, zero_mul]

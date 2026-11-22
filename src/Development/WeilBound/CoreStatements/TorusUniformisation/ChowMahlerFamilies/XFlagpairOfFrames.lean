@@ -23,8 +23,8 @@ variable {Ω : Type*} [Field Ω] {V : Type*} [AddCommGroup V] [Module Ω V] {N :
 theorem repr_expand (w w' : Module.Basis (Fin N) Ω V) (v : V) (j : Fin N) :
     w.repr v j = ∑ l, w'.repr v l * w.repr (w' l) j := by
   have hv := congrArg (fun u => w.repr u j) (w'.sum_repr v)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa only [map_sum, map_smul, Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul] using hv.symm
+
+  simpa only [map_sum, map_smul, Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul] using hv.symm
 
 theorem step_le (w w' : Module.Basis (Fin N) Ω V)
     (h : ∀ i j : Fin N, i < j → w.repr (w' i) j = 0) (i : Fin N) (v : V)

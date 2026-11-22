@@ -118,8 +118,8 @@ theorem Gom_orth (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T
     unfold GDl
     rw [dite_eq_left le_rfl]
     unfold Gom
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply]
+
+    rw [map_sum, LinearMap.sum_apply]
     simp only [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, star_star]
     change (∑ a, (GZ u v).adjugate (Fin.last _) a * GZ u v a b) = _
     rw [key]

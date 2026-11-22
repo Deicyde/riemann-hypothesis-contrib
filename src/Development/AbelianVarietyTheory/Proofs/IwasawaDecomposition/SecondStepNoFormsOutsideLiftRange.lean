@@ -16,8 +16,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Form
 open Formalism.MainNotions.IntegralHeckeForms (TwOK HkIdx)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 noncomputable section
 
 namespace GlobalTheory.HeightCounting.CutOff
@@ -370,7 +370,7 @@ theorem hkEmbC (Bs : SideB D cf Rw low Pq S hL eig θ) (i : D.ntw.Tw) (j : ℕ) 
   Subtype.ext (Bs.hk_emb i j b k P x.1 a1 a2 a3 a4 a5)
 
 
-set_option maxHeartbeats 4000000 in
+
 def cutSideB (Bs : SideB D cf Rw low Pq S hL eig θ) :
     SideB (cutN D).toD7 ((cutN D).cf cf) ((cutN D).row Rw) low Pq ((cutN D).rat S) hL eig θ :=
   { Bs with

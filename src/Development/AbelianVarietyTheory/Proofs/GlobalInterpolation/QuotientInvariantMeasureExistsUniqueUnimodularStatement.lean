@@ -8,6 +8,6 @@ public import Development.AbelianVarietyTheory.BlockTheory.GlobalSignature.Invar
 
 open MeasureTheory GlobalTheory.IndefiniteRowSideFullHecke.InvariantRadonFibre
 open scoped ENNReal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.quotientInvariantMeasure_exists_unique_unimodular : InvariantMeasureClause := by
   first | exact @GlobalTheory.Proof.quotientInvariantMeasure_exists_unique_unimodular.invariantMeasureClause | exact GlobalTheory.Proof.quotientInvariantMeasure_exists_unique_unimodular.invariantMeasureClause | (intros; apply GlobalTheory.Proof.quotientInvariantMeasure_exists_unique_unimodular.invariantMeasureClause <;> assumption)

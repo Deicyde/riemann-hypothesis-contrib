@@ -386,7 +386,7 @@ theorem valued_lt_of_intAtA {P : HeightOneSpectrum (𝓞 X.E)} {z : AfE X.F X.E}
   exact (HeightOneSpectrum.valuation_lt_one_iff_mem _ _).2 hqP
 
 
-set_option maxHeartbeats 800000 in
+
 theorem normOne_idele_eq_hilbert90_part_at_primes (hs : s.Ok) {S : Finset (HeightOneSpectrum (𝓞 X.E))} (hS : ∀ P ∈ S, conjPrime₂ P ∉ S) {y : (AfE X.F X.E)ˣ}
     (hy : Units.map ι.toRingHom.toMonoidHom y ∈ U1 (sigD D)) {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ S)
     {v : HeightOneSpectrum (𝓞 D.host.F)} (hv : IsOver v (seamP s P)) :
@@ -417,7 +417,7 @@ end GlobalTheory.LevMuDet
 
 
 open GlobalTheory.LevMuDet GlobalTheory.Mem.Col2 GlobalTheory.Mem.ReadEx GlobalTheory.Mem.LocTriv Formalism.L2.Forms in
-set_option maxHeartbeats 1000000 in
+
 theorem GlobalTheory.LevMuDet.muOf_det_lev : UnderTie (fun {D L hT Gi Gl Kc Y cX ex t u μ St} A dtU a =>
     MuLaw t u μ dtU → ∀ i, i < D.R.m → ∀ j (hj : j ≤ D.R.m) (β : (St j hj).Ch) (κ : ((St j hj).K β).lev.U) (e : SB t μ → t.X.E),
       (∀ P : SB t μ, IntAtA (F := D.host.F) (seamP t.seam P.1)

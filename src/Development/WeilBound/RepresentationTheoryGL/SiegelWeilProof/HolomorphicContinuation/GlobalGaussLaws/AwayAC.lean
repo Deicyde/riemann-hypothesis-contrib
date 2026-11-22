@@ -14,8 +14,8 @@ open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 100000
-set_option maxHeartbeats 1000000
+
+
 
 namespace PositivityTheory.Rg.Sw.Glob.AW
 

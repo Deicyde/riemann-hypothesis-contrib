@@ -290,7 +290,7 @@ theorem exOf_weightOf (a : (E →+* ℂ) × ℕ → ℤ) (m : ℤ) : exOf Dw (we
 variable (Xo : Moduli Dw l) (c : Coeff l)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 def secZ (e : Ix Dw → ℤ) : Submodule c.F (Rul Xo c) where
   carrier := {f | IsNatural (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) f ∧
     ∀ (p : TRing c.F) (t : Ix Dw → (p.R)ˣ) (y y' : FrPt Xo c p.R), FrBor t y y' →

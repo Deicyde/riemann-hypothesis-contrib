@@ -50,10 +50,10 @@ private theorem trdeg_le_of_dim {B A : Type} [CommRing B] [CommRing A] [Algebra 
 
 private theorem exists_field_injective_ringHom_of_isDomain (D : Type) [CommRing D] [IsDomain D] :
     ∃ (K : Type) (_ : Field K) (j : D →+* K), Function.Injective j := by
-  set_option synthInstance.maxHeartbeats 400000 in
+
   exact ⟨FractionRing D, inferInstance, algebraMap D _, IsFractionRing.injective D (FractionRing D)⟩
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Fr.fib_dim :
     ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x), ¬ S.u.triP ≤ x → ringKrullDim (L.R ⧸ S.mB.map L.b) ≤ (2 * C₀ : ℕ) := by
   intro l _ O _ _ _ _ F C₀ n hF hn S x L hx

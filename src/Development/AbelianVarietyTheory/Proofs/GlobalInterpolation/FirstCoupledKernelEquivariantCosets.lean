@@ -235,7 +235,7 @@ theorem xiCpl1_law {u : Pr.Word} {al : L.β m2} {b : L.β (m2 + 1)} (hX : X.Ok) 
     mul_assoc]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem firstCoupledKernel_equivariant_cosets {u : Pr.Word} {T : ChTh W sel mu u m2} (b : L.β (m2 + 1))
     (hX : X.Ok) (hPr : Pr.Ok) (hsel : IsSel X sel) (hS : Pr.T u ∈ S ∧ ∀ i, Pr.g i ∈ S) (hL : L.Ok Ch sel mu cst G m2)
     (hT : ChTh.Ok (Ch := Ch) cst T) (al : L.β m2) (g : FrmG (L.levG m2 al) (L.levQ m2 al))

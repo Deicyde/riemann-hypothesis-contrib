@@ -56,8 +56,8 @@ theorem polyAct_map (f : V →ₗ[PowerSeries O] V') (γ : V →+ V) (γ' : V' �
     | zero => intro v; rfl
     | succ k ih => intro v; rw [Function.iterate_succ_apply, Function.iterate_succ_apply, ih, hf]
   unfold polyAct
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Polynomial.sum_def, Polynomial.sum_def, map_sum]
+
+  rw [Polynomial.sum_def, Polynomial.sum_def, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, hit]
 
@@ -75,9 +75,9 @@ theorem polyAct_shift (γ : V →+ V) (U : Submodule (PowerSeries O) V) (hU : �
       rw [this]
       exact U.add_mem (hU _ ih) hw
   unfold polyAct
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Polynomial.eval_eq_sum, Polynomial.sum_def, Polynomial.sum_def, map_sum, Finset.sum_smul,
-    ← Finset.sum_sub_distrib]
+
+  rw [Polynomial.eval_eq_sum, Polynomial.sum_def, Polynomial.sum_def, map_sum, Finset.sum_smul,
+  ← Finset.sum_sub_distrib]
   refine U.sum_mem fun k _ => ?_
   rw [one_pow, mul_one, ← smul_sub]
   exact U.smul_mem _ (hit k)

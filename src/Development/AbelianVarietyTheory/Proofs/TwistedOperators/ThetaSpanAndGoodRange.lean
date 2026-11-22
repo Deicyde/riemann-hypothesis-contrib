@@ -60,7 +60,7 @@ theorem fvec_om_fin {S T : HSp D} (C : Ctx S T) {om : GA D S × GA D T →* Modu
   rw [h2.2 Q, show (fun τ => compAt C.θ τ (Formalism.L2.Theta.mt S k)) = fun _ => 1 from funext fun τ => compAt_fin C.θ hk τ]
   rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem span_std {S T : HSp D} (C : Ctx S T) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)) (hom : IsWeak C.ψ S T om)
     (hc : ContT C.ψ om) (hsig : T.SigOK) (hsz : 4 * (Module.finrank ℚ D.host.E * T.rank) + 4 ≤ S.rank) (hn : T.rank ≤ S.rank)
     (B₀ : C.Bas) (hB₀ : C.IsB B₀) (BS : D.what₂.Tau → Matrix (Fin S.rank) (Fin S.rank) ℂ) (hBS : ∀ τ, (BS τ)ᴴ * BS τ = 1)
@@ -158,7 +158,7 @@ theorem isB_onb {S T : HSp D} (C : Ctx S T) {Sp : D.what₂.Tau → SPar} (M : D
     rw [Matrix.nonsing_inv_nonsing_inv _ (hu τ), hJ]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem span_any {S T : HSp D} (ψ : AddChar (AF D.host.F) ℂ) (hψ : IsStdChar D ψ (-1)) (θ : InfFam D) (hθ : IsInfFam θ)
     (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)) (hom : IsWeak ψ S T om) (hc : ContT ψ om)
     (b : Module.Basis (Fin S.rank) D.host.E S.V) (hb : StdFrame.OrthFrame (reS S b)) (hev : Even S.rank) (p₀ q₀ : ℕ)
@@ -257,7 +257,7 @@ variable {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : Formalism.L2.DIV.
   {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem value_mem_span (hP : GlobalTheory.Published.CuspRapidDecay) (hsz : GlobalTheory.IndefiniteRowSideFullHecke.ThetaTranslateSize.SizeOK D) (hL : R.toLevCh.Is A.μ0)
     (hM : R.IsModels) (hT : R.IsThP) (i : Fin D.R.m) (t : T0) (u : ∀ ρ, lowT (R.MW i (sg0 D A)) ρ) (w₀ : (R.cV i).W)
     (hu : IsExtVec (R.MW i (sg0 D A)) (fun ρ => u ρ)) (hΔ : R.ioP i (PiTensorProduct.tprod ℂ u) w₀ = RealDat.Delta i)
@@ -319,7 +319,7 @@ def evAtVec {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S) (v : M.Ve
   map_smul' _ _ := rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem range_thF (hP : GlobalTheory.Published.CuspRapidDecay) (hsz : GlobalTheory.IndefiniteRowSideFullHecke.ThetaTranslateSize.SizeOK D) (hL : R.toLevCh.Is A.μ0) (hF : R.IsFam)
     (hM : R.IsModels) (hT : R.IsThP) (i : Fin D.R.m) (t : T0) : LinearMap.range (R.thF i t) = R.Wall i (sg0 D A) := by
   refine le_antisymm (by rintro _ ⟨x, rfl⟩; exact hT.thF_mem i t x) fun T hTm => ?_
@@ -346,7 +346,7 @@ theorem span_translates {X H Y Γ : Type} [Group Γ] [AddCommGroup X] [Module �
     rw [hx, ← hy, ← htr, map_one, Module.End.one_apply]
 
 
-set_option maxHeartbeats 1000000 in
+
 open GlobalTheory.IndefiniteRowSideFullHecke.ThetaTranslateSize in
 theorem spanAt (hP : GlobalTheory.Published.CuspRapidDecay) (hsz : SizeOK D) (hL : R.toLevCh.Is A.μ0) (hF : R.IsFam)
     (hM : R.IsModels) (hT : R.IsThP) (i : Fin D.R.m) (t : T0) : SpanAt R i t :=
@@ -354,7 +354,7 @@ theorem spanAt (hP : GlobalTheory.Published.CuspRapidDecay) (hsz : SizeOK D) (hL
     (R.gW i (sg0 D A)) (transl R i) (hM.gW i (sg0 D A))
 
 
-set_option maxHeartbeats 1000000 in
+
 open GlobalTheory.IndefiniteRowSideFullHecke.ThetaTranslateSize in
 theorem goodRangeAt (hP : GlobalTheory.Published.CuspRapidDecay) (hsz : SizeOK D) (hL : R.toLevCh.Is A.μ0) (hG : R.grp_record) (hF : R.IsFam)
     (hM : R.IsModels) (hT : R.IsThP) (i : Fin D.R.m) (t : T0) : GoodRangeAt R i t := by

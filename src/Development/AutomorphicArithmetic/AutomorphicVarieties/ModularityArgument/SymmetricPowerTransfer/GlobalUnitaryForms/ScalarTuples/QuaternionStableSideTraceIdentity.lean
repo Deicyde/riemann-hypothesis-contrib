@@ -41,7 +41,7 @@ private theorem sum_sub {α : Type} (p : α → Prop) (f : α → ℂ) (c : ℂ)
   simp_rw [h2]
   rw [← smul_finsum, smul_eq_mul]
 
-set_option maxHeartbeats 1600000 in
+
 theorem split_side_identity_unitary : QuaternionStableSideTraceIdentity := by
   intro F _ _ Δ D hD x₀ hx₀
   obtain ⟨-, ⟨ι, hι⟩, -⟩ := iotaEx F Δ

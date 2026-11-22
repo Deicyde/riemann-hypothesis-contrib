@@ -83,8 +83,8 @@ theorem congr_lin (RC : Subalgebra o C) (p : ℕ) {I : Type} [Fintype I] {n : �
   have h4 : (((∑ j, Matrix.vecMul l Pm j * a j) - ∑ k, l k * b k : RC) : C)
       = algebraMap RC C (∑ j, Matrix.vecMul l Pm j * a j) - ∑ k, (l k : C) * (b k : C) := by
     change algebraMap RC C ((∑ j, Matrix.vecMul l Pm j * a j) - ∑ k, l k * b k) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum (algebraMap RC C) (fun k => l k * b k)]
+
+    rw [map_sub, map_sum (algebraMap RC C) (fun k => l k * b k)]
     simp only [map_mul]
     rfl
   rwa [h4] at h3
@@ -96,8 +96,8 @@ theorem dot_eq (RC : Subalgebra o C) {I : Type} [Fintype I] {n : ℕ}
   have h : ∀ k, ((Matrix.vecMul l J k : RC) : C) = ∑ j, (l j : C) * algebraMap RC C (J j k) := by
     intro k
     change algebraMap RC C (∑ j, l j * J j k) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_mul]
     rfl
   simp only [h, Matrix.mulVec, dotProduct, Matrix.map_apply, Finset.sum_mul, Finset.mul_sum,

@@ -22,7 +22,7 @@ theorem diag_mul_diag_apply {K : Type*} [CommRing K] {n : ℕ} (a b : Fin n → 
     (i j : Fin n) : (Matrix.diagonal a * X * Matrix.diagonal b) i j = a i * X i j * b j := by
   simp [Matrix.diagonal_mul, Matrix.mul_diagonal]
 
-set_option maxHeartbeats 800000 in
+
 theorem close_at {p : PlF D} (hA : Agree δ M p) (h : ProdE.StP M δ u u' w p) (c : (D.s.atP p).Fp) (hc0 : c ≠ 0)
     (hc : c ∈ 𝒪[(D.s.atP p).Fp]) :
     ∃ τ : ProdE.MP p, (∀ i j, i < j → τ i j = 0) ∧ (∀ i, τ i i = 1) ∧

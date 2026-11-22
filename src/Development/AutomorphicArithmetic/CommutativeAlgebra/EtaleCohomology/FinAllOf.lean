@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 set_option backward.isDefEq.respectTransparency false
 
 open CrystallineSemistableComparison UpperTheory.Ru.crystallineComparison

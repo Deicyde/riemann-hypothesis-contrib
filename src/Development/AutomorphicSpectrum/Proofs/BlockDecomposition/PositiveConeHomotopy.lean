@@ -88,15 +88,15 @@ theorem key_alg {W : Type*} [Ring W] [Algebra ℂ W] (tr : W →ₗ[ℂ] ℂ) (h
     rw [h, map_neg]
   have hsum : ∑ i, L2 i * e i = -∑ i, e i * L1 i := eq_neg_of_add_eq_zero_right hch
   have h3 : ∑ i, tr (Γ * Sv * (J * (L2 i * e i))) = -∑ i, tr (Γ * Sv * (J * (e i * L1 i))) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, ← map_sum, ← map_neg, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum, hsum]
+
+    rw [← map_sum, ← map_sum, ← map_neg, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum, hsum]
     simp only [mul_neg]
   have h4 : tr (Γ * Sv * ∑ i, x i • L1 i) =
       ∑ i, tr (Γ * Sv * (e i * J * L1 i)) + ∑ i, tr (Γ * Sv * (J * (e i * L1 i))) := by
     rw [← Finset.sum_add_distrib]
     simp only [← map_add (f := _)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum]
+
+    rw [← map_sum]
     congr 1
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -106,8 +106,8 @@ theorem key_alg {W : Type*} [Ring W] [Algebra ℂ W] (tr : W →ₗ[ℂ] ℂ) (h
     rw [← mul_assoc J, ← add_mul, h]
     simp
   have h5 : tr (Γ * (∑ i, e i * Sv * c i) * k) = ∑ i, tr (Γ * e i * Sv * c i * k) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum]
+
+    rw [← map_sum]
     congr 1
     simp only [Finset.mul_sum, Finset.sum_mul, mul_assoc]
   rw [h5, h4, Finset.sum_add_distrib]
@@ -201,8 +201,8 @@ theorem clm_fst_eq {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (L : (
     ext j
     · simp [Prod.fst_sum, Finset.sum_apply, Pi.single_apply]
     · simp [Prod.snd_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum]
+
+  rw [h, map_sum]
   simp only [map_smul]
 
 end Analytic

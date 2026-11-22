@@ -15,8 +15,8 @@ open Formalism.IndefR.Links (PolF)
 open Classical
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 noncomputable section
 
@@ -74,8 +74,8 @@ theorem idem_mul_mem {R : Finset (Pl D.host.E)} (hR : PlacesOK ∅ R) {a : D.hos
   rw [e1]
   apply toEAf_mem_of_finPart
   unfold idem
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_mul, map_sum]
+
+  rw [Finset.sum_mul, map_sum]
   refine sum_mem fun PP hPP => ?_
   obtain ⟨P, -, hRP, e, ⟨es, hes, -⟩, -⟩ := hR.split
   have hex : ∃ e, Formalism.L2.NTheta.IsIdemAt e PP := ⟨es PP, hes PP (hRP hPP)⟩
@@ -99,10 +99,10 @@ theorem row_frame_mem {S : HSp D} {Λ : Submodule (𝓞 D.host.E) (Fin S.rank �
       obtain ⟨l, hl, rfl⟩ := hy
       obtain ⟨b, hb⟩ := (hS.2 l).1 hl s hs
       have e1 : ∑ j, v j * Formalism.UG.inclE (Formalism.L2.Herm.Af D.host.F) (l j) = eToEAf D (b : D.host.E) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hb, map_sum]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [hv, map_sum, Finset.sum_mul]
+
+        rw [hb, map_sum]
+
+        simp only [hv, map_sum, Finset.sum_mul]
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
         change eToEAf D _ * eToEAf D _ = _

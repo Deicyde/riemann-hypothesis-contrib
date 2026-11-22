@@ -104,8 +104,8 @@ theorem IsAdicSum.map {S : Type*} [CommRing S] {J : Ideal S} (f : R →+* S) (hf
     {a : ℕ → R} {s : R} (hs : IsAdicSum I a s) : IsAdicSum J (fun n => f (a n)) (f s) := fun k => by
   obtain ⟨N, hN⟩ := hs k
   refine ⟨N, fun M hM => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← map_sub]
+
+  rw [← map_sum, ← map_sub]
   exact (Ideal.pow_right_mono hf k).trans (Ideal.le_comap_pow f k) (hN M hM)
 
 theorem IsAdicSum.mem {J : Ideal R} {k : ℕ} (hJ : I ^ k ≤ J) {a : ℕ → R} {s : R}
@@ -235,9 +235,9 @@ theorem xi_sub_pow_mem (ε : 𝒪♭) :
   haveI := IsPerfectoidField.isDomain_preTilt (K := K) p
   rw [mem_span_p_iff_coeff_zero_eq_zero, ← WittVector.constantCoeff_apply,
     AInf.frobeniusEquiv_symm_mu, AInf.xi]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_sum, map_pow, map_one, WittVector.constantCoeff_apply,
-    teichmuller_coeff_zero]
+
+  simp only [map_sub, map_sum, map_pow, map_one, WittVector.constantCoeff_apply,
+  teichmuller_coeff_zero]
   set e := (_root_.frobeniusEquiv 𝒪♭ p).symm ε
   have h1 := geom_sum_mul e p
   have h2 : (e - 1) ^ p = e ^ p - 1 := by rw [sub_pow_char, one_pow]
@@ -315,7 +315,7 @@ theorem logTermZero_pred_eq {x : AInf K p} (hx : x ∈ RingHom.ker θ) {c : ACri
         rw [hcc]; ring
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem log_pow_mem {x : AInf K p} (hx : x ∈ RingHom.ker θ) {c : ACrisZero K p}
     (hc : (algebraMap (AInf K p) (ACrisZero K p) x) ^ (p - 1) = (p : ACrisZero K p) * c) :
     log hx ^ (p - 1) ∈ 𝔭 := by

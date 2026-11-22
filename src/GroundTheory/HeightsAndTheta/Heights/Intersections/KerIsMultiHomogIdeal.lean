@@ -76,7 +76,7 @@ theorem ker_isMultiHomogIdeal [DecidableEq K] {E : Type*} [Field E] (ψ : MRing 
 end RegularityValuationCentre
 
 
-set_option maxHeartbeats 400000 in
+
 open regularityEmbedding_holds in
 theorem RegularityValuationCentre.proof : RegularityValuationCentre.Statement := by
   intro K _ ι _ P hP Γ _ v n hn

@@ -7,8 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteIntegr
 
 open IsLocalRing
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.NormFin
 

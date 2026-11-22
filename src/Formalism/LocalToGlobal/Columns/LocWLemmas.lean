@@ -243,8 +243,8 @@ theorem lidx_local (w : HeightOneSpectrum (𝓞 K)) {ι : Type} [Fintype ι] [De
       rw [Submodule.coe_sum] at this
       exact this.symm
     show f x ∈ S
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum]
+
+    rw [h1, map_sum]
     refine Submodule.sum_mem _ fun j _ => ?_
     rw [LinearMap.map_smul_of_tower]
     exact S.smul_mem _ (hfb j)

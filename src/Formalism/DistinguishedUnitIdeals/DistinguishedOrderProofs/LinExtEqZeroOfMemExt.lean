@@ -233,13 +233,13 @@ theorem linExt_apply (g : (Fin r → O) →ₗ[O] O) (u : Fin r → PowerSeries 
 
 theorem linExt_cst (g : (Fin r → O) →ₗ[O] O) (v : Fin r → O) : linExt g (cst v) = C (g v) := by
   rw [linExt_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [cst, ← map_mul, ← map_sum]
+
+  simp_rw [cst, ← map_mul, ← map_sum]
   congr 1
   have key : ∀ i, v i * g (Pi.single i 1) = g (v i • Pi.single i 1) := fun i => by
     rw [LinearMap.map_smul, smul_eq_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [key, ← map_sum]
+
+  simp_rw [key, ← map_sum]
   congr 1
   ext j
   simp [Finset.sum_apply, Pi.single_apply]
@@ -359,9 +359,9 @@ theorem exists_const_decomp (ϖ : O) (hϖ : Irreducible ϖ) (F C : Submodule O (
       exact h1.symm
     refine ⟨t, ?_⟩
     rw [e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Module.Basis.equivFun_self, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
-      Pi.single_apply]
+
+    simp only [map_sum, map_smul, Module.Basis.equivFun_self, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
+    Pi.single_apply]
   let Φ : _ → (Fin r → O) →ₗ[O] O := fun j =>
     LinearMap.proj j ∘ₗ snf.bM.equivFun.toLinearMap ∘ₗ F.mkQ
   have hΦ : ∀ j v, Φ j v = snf.bM.equivFun (F.mkQ v) j := fun j v => rfl
@@ -505,7 +505,7 @@ end Main
 
 section Proof
 
-set_option maxHeartbeats 4000000 in
+
 theorem descent_estimate_up_down : MUD := by
   intro O _ _ _ ϖ hϖ ℓ ell r p H b kind V hℓ hPS hsat hub s₀ s₁ h01 h1ell hk1 hk0 hthin c α β
     hαβ hnot y

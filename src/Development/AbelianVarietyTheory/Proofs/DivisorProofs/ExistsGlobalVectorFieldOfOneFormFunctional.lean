@@ -20,15 +20,15 @@ theorem exists_vectorField_of_functional : ∀ (R : Type) [CommRing R] (C : Type
   obtain ⟨c, hc, hsum⟩ := GlobalTheory.T.globalOneFormFrame_coordinates_constant R C F h0 n Φ
   refine ⟨fun T ↦ ∑ i, algebraMap R (F.obj T) (l (Φ.w i)) • Φ.δ i T, ?_, ?_⟩
   · intro T T' φ ω
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, map_sum, map_mul,
-      AlgHom.commutes, Φ.nat]
+
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, map_sum, map_mul,
+    AlgHom.commutes, Φ.nat]
   · intro w T
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, hc, ← map_mul, ← map_sum]
+
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, hc, ← map_mul, ← map_sum]
     have hw : l w = l (∑ i, c i w • Φ.w i) := congrArg l (hsum w)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hw, map_sum]
+
+    rw [hw, map_sum]
     simp [mul_comm]
 
 end GlobalTheory.AbCoh

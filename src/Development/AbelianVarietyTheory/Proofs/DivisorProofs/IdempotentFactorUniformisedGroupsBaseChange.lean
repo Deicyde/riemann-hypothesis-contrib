@@ -363,7 +363,7 @@ theorem tau_lam {D : DegPre R} {D₁ : DegPre R'} (hD : IsPullDeg φ D D₁) (h�
   abel
 
 
-set_option maxHeartbeats 800000 in
+
 theorem factor_pull {D D' : DegPre R} {D₁ D₁' : DegPre R'} (hφ : Function.Injective φ) (hD : IsPullDeg φ D D₁)
     (hD' : IsPullDeg φ D' D₁') (F : Factor D D') [m : Module F.O D₁'.X] (o₁ : D₁'.OAct F.O)
     (hx : ∀ (a : F.O) (y : D₁'.X), hD'.xe (a • y) = a • hD'.xe y)

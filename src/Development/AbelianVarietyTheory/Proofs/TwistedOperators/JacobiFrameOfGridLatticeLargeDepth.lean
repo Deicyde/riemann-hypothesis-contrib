@@ -50,7 +50,7 @@ end NormalJac
 
 
 open NormalJac in
-set_option maxHeartbeats 1600000 in
+
 theorem big_jacP : Big fun ch => JacP ch := by
   refine ⟨0, fun ε CF _ => ⟨0, fun D large₂ hε hx Γ _ _ Pl0 T A Ks _ _ _ R F s ch hch hsc => ?_⟩⟩
   clear hε hx hsc hch s

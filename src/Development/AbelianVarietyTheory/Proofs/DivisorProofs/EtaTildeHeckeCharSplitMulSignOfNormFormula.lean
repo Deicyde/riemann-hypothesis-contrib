@@ -381,7 +381,7 @@ theorem inertChar_real {η : (AE D)ˣ →* Circle} (hη : IsEtaTilde D η) {ε :
   linear_combination -e
 
 
-set_option maxHeartbeats 800000 in
+
 theorem lam_int {η : (AE D)ˣ →* Circle} (hη : IsEtaTilde D η) {lam : ℕ →* ℂ}
     (hlam : GlobalTheory.FinWeil.GoodNorm (GlobalTheory.FinWeil.sgO D) lam)
     (hlam' : ∀ n : ℕ, n ≠ 0 → (∀ q : ℕ, q.Prime → Formalism.MainNotions.StandardLatticesGL3.InertQ D q → ¬ q ∣ n) → lam n = (Real.sqrt n : ℂ))

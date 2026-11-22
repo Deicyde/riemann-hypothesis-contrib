@@ -16,7 +16,7 @@ namespace RootFieldNumerics.RF
 
 open Loc
 
-set_option maxHeartbeats 1600000 in
+
 theorem localCmp_of : PointEx → ValuePhi → IntFrames → FibSandwich → LocalCmp := by
   intro hPt hVal hInt hFib E _ _ _ H D l Xo c _ Y U Z S Ω _ K _ J _ y 𝔐 Fl τ i j a b a' b' d₁ d₂ φ F' _ _ ι ψ p κ' π m k
     t hgp hT hφ hgen hrep ha' hb' hd₁ hd₂ ea eb ha0 hb0 hψ hπ hm hord hfin

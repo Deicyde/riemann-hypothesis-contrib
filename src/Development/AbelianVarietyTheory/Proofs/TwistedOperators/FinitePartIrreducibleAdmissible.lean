@@ -157,7 +157,7 @@ noncomputable abbrev valMap (hU : IsSubrep π ⊤) : smoothPart (finPartDS M hU)
 theorem valMap_injective (hU : IsSubrep π ⊤) : Function.Injective (valMap (M := M) hU) := fun a b e =>
   Subtype.ext (Subtype.ext e)
 
-set_option maxHeartbeats 1000000 in
+
 theorem irreducible [CompleteSpace H] (hπ : IsIrrUnitary π) (hD : HasDSComp M π) (hU : IsSubrep π ⊤)
     (hadm : IsAdmissible (finPartDSSm M hU)) : (finPartDSSm M hU).IsIrreducible := by
   classical
@@ -242,8 +242,8 @@ theorem irreducible [CompleteSpace H] (hπ : IsIrrUnitary π) (hD : HasDSComp M 
       (by rw [hEhd]; exact ⟨_, hmem, rfl⟩)
     have hterm : ∀ g ∈ s, ⟪ev (finPartDSSm M hU g n), ev (Φ - n0)⟫_ℂ = ⟪ev n, ev (Φ - n0)⟫_ℂ := fun g hg => by
       rw [hev]; exact hinv g (hsK g hg) _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, sum_inner, Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul] at h1
+
+    rw [map_sum, sum_inner, Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul] at h1
     exact (mul_eq_zero.1 h1).resolve_left (Nat.cast_ne_zero.2 (Finset.card_ne_zero.2 hsne))
   have hzero : ∀ y', valMap hU (Φ - n0) y' = 0 := by
     intro y'

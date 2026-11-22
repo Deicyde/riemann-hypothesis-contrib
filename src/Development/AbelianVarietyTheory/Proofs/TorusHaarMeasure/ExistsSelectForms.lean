@@ -49,9 +49,9 @@ theorem wJac_mulVec {n N : ℕ} (w : Fin N → V n → ℂ) (x : V n)
     ext i
     simp [bas, Pi.single_apply]
   conv_rhs => rw [hξ]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [wJac, Matrix.mulVec, dotProduct, wd_of_differentiableAt (hw k), map_sum, map_smul,
-    smul_eq_mul]
+
+  simp only [wJac, Matrix.mulVec, dotProduct, wd_of_differentiableAt (hw k), map_sum, map_smul,
+  smul_eq_mul]
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
 theorem main : ∀ (n N : ℕ) (w : Fin N → V n → ℂ) (U : Set (V n)), IsOpen U → (0 : V n) ∈ U →

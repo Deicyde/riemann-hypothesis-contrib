@@ -104,8 +104,8 @@ theorem tower_nef_generic_dominant : PB.NefPol → PB.Inputs → ∀ II : Inters
   · obtain ⟨d, hd, h1, h0⟩ := key W hW hPW
     have hS : ∀ τ i, ∑ k ∈ Finset.Iic i, (-(d (M.xdeg (τ, k)) : ℝ)) = d (tie.Re.ref (some (τ, i))).a := by
       intro τ i
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [tie.fund_deg, map_neg, map_sum]
+
+      rw [tie.fund_deg, map_neg, map_sum]
       simp
       rfl
     rw [Fintype.sum_option, Fintype.sum_prod_type]

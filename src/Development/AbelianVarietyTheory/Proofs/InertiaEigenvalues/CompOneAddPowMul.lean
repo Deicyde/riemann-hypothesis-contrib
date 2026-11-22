@@ -84,8 +84,8 @@ theorem comp_pow_mul {i j : ℕ} (hi : i < l) (hj : j < l) (a : k⸨X⸩) :
 theorem comp_one_add_pow_mul {i j : ℕ} (hi : i < l) (hj : j < l) (a : k⸨X⸩) :
     comp l hl i ((1 + (HahnSeries.single (1 : ℤ) (1 : k) : k⸨X⸩)) ^ j * φ a)
       = (j.choose i) • a := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [add_comm, add_pow, Finset.sum_mul, map_sum]
+
+  rw [add_comm, add_pow, Finset.sum_mul, map_sum]
   have : ∀ m ∈ Finset.range (j + 1),
       comp l hl i ((HahnSeries.single (1 : ℤ) (1 : k) : k⸨X⸩) ^ m * 1 ^ (j - m) *
         (j.choose m : k⸨X⸩) * φ a) = if m = i then (j.choose i) • a else 0 := by

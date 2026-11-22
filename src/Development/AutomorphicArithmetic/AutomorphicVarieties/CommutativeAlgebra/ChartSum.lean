@@ -153,8 +153,8 @@ private theorem cs_lin [Fintype σ] (g : MvPowerSeries σ O) (h0 : constantCoeff
     ((2 : ℕ) : ℕ∞) ≤ (g - ∑ s, coeff (Finsupp.single s 1) g • X s).order := by
   classical
   refine MvPowerSeries.nat_le_order (fun d hd => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sub, map_sum, coeff_smul, coeff_X, smul_eq_mul, mul_ite, mul_one, mul_zero]
+
+  simp only [map_sub, map_sum, coeff_smul, coeff_X, smul_eq_mul, mul_ite, mul_one, mul_zero]
   rcases (Nat.lt_succ_iff.mp hd).lt_or_eq with hlt | h1
   · have hd0 : d = 0 := (Finsupp.degree_eq_zero_iff d).mp (by omega)
     subst hd0
@@ -179,7 +179,7 @@ private theorem cs_sat [IsDomain O] {A A' : Type} [CommRing A] [Algebra O A] [Co
 
 end
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Alg.chart_sum :
     ∀ (O X : Type) [CommRing O] [IsDomain O] [AddCommGroup X] (T : Type) [Fintype T] (B : T → Type) [∀ v, CommRing (B v)] [∀ v, Algebra O (B v)] (WB : ∀ v, WPres O X (B v)) (hB : ∀ v, (WB v).HasOrigin)
       (τ : T → Type) [∀ v, Fintype (τ v)] (wt : ∀ v, τ v → X) (φ : ∀ v, B v →ₐ[O] MvPowerSeries (τ v) (FractionRing O)), (∀ v, IsChart (WB v).part ((WB v).origin (hB v)) (wt v) (φ v)) →
@@ -314,8 +314,8 @@ theorem UpperTheory.V.Alg.chart_sum :
       ∑ s, coeff (Finsupp.single (e ⟨v, s⟩) 1) g • MvPowerSeries.X s
     have hℓsum : ℓ = ∑ v, MvPowerSeries.rename (fun s => e ⟨v, s⟩) (ℓv v) := by
       rw [hℓ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [ℓv, map_sum, map_smul, rename_X]
+
+      simp only [ℓv, map_sum, map_smul, rename_X]
       rw [← Fintype.sum_sigma (fun p : Σ v, (WB v).σ =>
         coeff (Finsupp.single (e p) 1) g • MvPowerSeries.X (e p))]
       exact (Fintype.sum_equiv e _ _ (fun _ => rfl)).symm
@@ -355,8 +355,8 @@ theorem UpperTheory.V.Alg.chart_sum :
       have hc1 : ∀ k, coeff (Finsupp.single k 1) (φ v ((WB v).π (ℓv v))) = 0 := by
         intro k
         have h1 := hΦl ⟨v, k⟩
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hℓsum, map_sum, map_sum, Finset.sum_eq_single v] at h1
+
+        rw [hℓsum, map_sum, map_sum, Finset.sum_eq_single v] at h1
         · rw [hca, cs_coeff_same] at h1
           exact h1
         · intro v' _ hv'
@@ -368,8 +368,8 @@ theorem UpperTheory.V.Alg.chart_sum :
       have hfin := cs_sat ((WB v).origin (hB v)) (W.origin hO) iv hiv hsat
       rwa [hivπ] at hfin
     have hl : W.π ℓ ∈ satSq (W.origin hO) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hℓsum, map_sum]
+
+      rw [hℓsum, map_sum]
       exact Submodule.sum_mem _ (fun v _ => hv v)
     rw [show g = ℓ + (g - ℓ) by ring, map_add (f := _)]
     exact Submodule.add_mem _ hl hq

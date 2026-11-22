@@ -17,7 +17,7 @@ open GlobalTheory.LogPole
 open scoped Classical
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

@@ -45,7 +45,7 @@ theorem levFn_isOfFinOrder (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) (
     exact isOfFinOrder_hom_of_finite _ _
 end
 
-set_option maxHeartbeats 1600000 in
+
 theorem levLamRoot : LevLamRoot := by
   intro D S T B t k
   have h : IsOfFinOrder (B.levLam t k) := by

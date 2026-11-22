@@ -76,8 +76,8 @@ def colSumL {S : Type} [CommRing S] [Algebra c.F S] {n : ℕ} (v : Fin n → (Lt
 theorem colSumL_apply {S : Type} [CommRing S] [Algebra c.F S] {n : ℕ} (v : Fin n → (Lt1 Dw →₀ ℕ) → S)
     (P : MvPolynomial (LtN Dw n) c.F) : colSumL c v P = colSum c v P := by
   conv_lhs => rw [P.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, colSum]
+
+  rw [map_sum, colSum]
   refine Finset.sum_congr rfl fun m _ => ?_
   have : (MvPolynomial.monomial m (P.coeff m) : MvPolynomial (LtN Dw n) c.F) =
       P.coeff m • MvPolynomial.basisMonomials (LtN Dw n) c.F m := by

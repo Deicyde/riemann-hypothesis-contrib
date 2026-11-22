@@ -70,7 +70,7 @@ theorem hasSesq_of {G V V₁ V₂ : Type} [Group G] [TopologicalSpace G] [IsTopo
 
 end HermB
 
-set_option maxHeartbeats 2000000 in
+
 open HermB in
 theorem herm_ofB (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
     (h1 : ConjProd k) (h2 : ConjDual k) : Herm k := by

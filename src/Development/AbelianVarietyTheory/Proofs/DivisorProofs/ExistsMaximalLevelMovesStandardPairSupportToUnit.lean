@@ -133,7 +133,7 @@ private theorem core (hσ : ∀ x, σ (σ x) = x) (O : Subring R) (hO : ∀ x �
 
 end Abstract
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 variable {D : D7}
 

@@ -66,8 +66,8 @@ theorem aeval_subst {F : Type} [Field F] [Algebra Ω F] (x : Fin N → Ω) (j0 :
     have hr := hrel i'
     rw [Fintype.sum_eq_add_sum_subtype_ne _ k] at hr
     have hx' : algebraMap Ω F (x k) ≠ 0 := (map_ne_zero _).2 hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_neg, map_sum, map_mul, aeval_C, aeval_X, map_div₀]
+
+    simp only [map_neg, map_sum, map_mul, aeval_C, aeval_X, map_div₀]
     apply mul_right_cancel₀ hx'
     rw [neg_mul, Finset.sum_mul, eq_comm, ← add_eq_zero_iff_eq_neg, ← hr]
     congr 1
@@ -82,7 +82,7 @@ variable {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K)) 
   {D N : ℕ}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem free_indep (htr : Algebra.trdeg K Ω = D) (x : Fin N → Ω) (j0 : Fin N) (hx : x j0 ≠ 0)
     {F : Type} [Field F] [Algebra Ω F] (w : AddValuation F (WithTop ℤ)) (u : Fin (D + 1) × Fin N → F)
     (hu : ∀ p, u p ∈ vRing w)
@@ -101,7 +101,7 @@ theorem free_indep (htr : Algebra.trdeg K Ω = D) (x : Fin N → Ω) (j0 : Fin N
     (card_free j0) (aeval_subst x j0 hx u hrel) (ValuationResidueLemmas.indep_u (K := K) (Ω := Ω) w la (fun p => ⟨u p, hu p⟩) h0 h1)).2.2
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem gauss_one (htr : Algebra.trdeg K Ω = D) (x : Fin N → Ω) (j0 : Fin N) (hx : x j0 ≠ 0)
     {F : Type} [Field F] (w : AddValuation F (WithTop ℤ)) (ι : Ω →+* F) (u : Fin (D + 1) × Fin N → F)
     (h0 : ∀ P : MvPolynomial (Fin (D + 1) × Fin N) (𝓞 K),

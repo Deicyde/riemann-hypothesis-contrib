@@ -93,8 +93,8 @@ theorem finEquiv_symm_eq_sum {ι : Type*} [Fintype ι] [DecidableEq ι] (b : Mod
     (t : FiniteAdeleRing (𝓞 E) E) :
     (finEquiv F E).symm t = ∑ i, finiteCoord b i t ⊗ₜ b i := by
   change (Algebra.TensorProduct.comm F (Af F) E).symm ((finiteTensorEquiv F E).symm t) = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [finiteTensorEquiv_symm_apply b, map_sum]
+
+  rw [finiteTensorEquiv_symm_apply b, map_sum]
   rfl
 
 theorem algebraMap_mem_integralFiniteAdeles (x : 𝓞 E) :

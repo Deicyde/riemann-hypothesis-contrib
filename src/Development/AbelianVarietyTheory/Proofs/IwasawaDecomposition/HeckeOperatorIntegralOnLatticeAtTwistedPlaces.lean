@@ -12,8 +12,8 @@ open Formalism.L2.Fam.NPC Formalism.L2.Fam.NPC.BaseC GlobalTheory.HeckeLocN
 
 namespace GlobalTheory.HeckeLocN
 
-set_option maxHeartbeats 2000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 theorem exists_preimage_comb {K L V W : Type} [Field K] [Field L] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module L W]
     (σ : K →+* L) (f : V →ₛₗ[σ] W) (hf : Function.Injective f) (S : Finset W) (hS : ∀ y ∈ S, y ∈ Set.range f)
@@ -21,8 +21,8 @@ theorem exists_preimage_comb {K L V W : Type} [Field K] [Field L] [AddCommGroup 
     ∃ F : Finset V, (↑F ⊆ {x : V | f x ∈ S}) ∧ x = ∑ y ∈ F, c (f y) • y := by
   classical
   refine ⟨S.preimage f hf.injOn, fun y hy => by simpa using hy, hf ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hx, map_sum]
+
+  rw [hx, map_sum]
   simp only [LinearMap.map_smulₛₗ]
   exact (Finset.sum_preimage f S hf.injOn (fun g => σ (c g) • g) (fun g hg hn => absurd (hS g hg) hn)).symm
 

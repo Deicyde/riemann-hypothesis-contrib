@@ -34,9 +34,9 @@ theorem trace_nondeg (l : κ → mixedSpace F) (h : ∀ y, Algebra.trace ℝ (mi
   refine (latticeBasis F).ext_elem fun j => ?_
   have := h (Pi.single i (mixedEmbedding F ((integralBasis F).traceDual j)))
   rw [dotProduct_single, ← (latticeBasis F).sum_repr (l i)] at this
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_mul, smul_mul_assoc, map_sum, map_smul, latticeBasis_apply, ← map_mul, trace_emb,
-    Module.Basis.trace_mul_traceDual] at this
+
+  simp only [Finset.sum_mul, smul_mul_assoc, map_sum, map_smul, latticeBasis_apply, ← map_mul, trace_emb,
+  Module.Basis.trace_mul_traceDual] at this
   simpa [apply_ite] using this
 
 theorem dual_one [IsTotallyReal F] {ψ : AddChar (AF F) ℂ} (hψ : IsCharAF F ψ) : ∃ C : Set (Af F), IsCompact C ∧
@@ -125,8 +125,8 @@ theorem pureA_spl (f : (κ → mixedSpace F) → ℂ) (φ : (κ → Af F) → �
 theorem spl_dot (p q : (κ → mixedSpace F) × (κ → Af F)) :
     spl F κ p ⬝ᵥ spl F κ q = re F (p.1 ⬝ᵥ q.1) + fi F (p.2 ⬝ᵥ q.2) := by
   simp only [dotProduct]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, ← Finset.sum_add_distrib]
+
+  rw [map_sum, map_sum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => ?_
   show (re F (p.1 i) + fi F (p.2 i)) * (re F (q.1 i) + fi F (q.2 i)) =
     re F (p.1 i * q.1 i) + fi F (p.2 i * q.2 i)
@@ -204,8 +204,8 @@ theorem lin_cont (m : ((κ → AF F) × (κ → AF F)) →ₗ[AF F] Ten F E n d)
         ∑ i, x.2 i • ((0 : κ → AF F), (Pi.single i 1 : κ → AF F)) := by
       ext j <;> simp [Prod.fst_sum, Prod.snd_sum, Finset.sum_apply, Pi.single_apply]
     conv_lhs => rw [hx]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_smul]
+
+    simp only [map_add (f := _), map_sum, map_smul]
   have hc : Continuous fun x : (κ → AF F) × (κ → AF F) =>
       (∑ i, x.1 i • m (Pi.single i 1, 0) + ∑ i, x.2 i • m (0, Pi.single i 1) : Matrix (Fin n) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) := by
     fun_prop

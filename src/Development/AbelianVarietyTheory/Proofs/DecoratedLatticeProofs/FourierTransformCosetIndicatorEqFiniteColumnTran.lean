@@ -70,11 +70,11 @@ theorem hat_coset_eq_ftY : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Ch
   have hsum : η' y' = ∑ i, y' i * η' (Pi.single i 1) := by
     have : y' = ∑ i, y' i • Pi.single i (1 : X.E) := by ext j; simp [Pi.single_apply]
     conv_lhs => rw [this]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_smul]
+
+    simp [map_sum, map_smul]
   have hdot : (fun a => ι (η' (Pi.single (e' a) 1))) ⬝ᵥ (fun a => ι (y' (e' a))) = ι (η' y') := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum, dotProduct]
+
+    rw [hsum, map_sum, dotProduct]
     exact Fintype.sum_equiv e' _ _ (fun a => by simp [mul_comm])
   have hϖ : (W.ϖ : k) = ι (qOf P.1 : X.E) := hA.compl.unif
   have hcM : ((W.ϖ ^ cst.M : kˣ) : k) = ι ((qOf P.1 : X.E) ^ cst.M) := by
@@ -101,8 +101,8 @@ theorem hat_coset_eq_ftY : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Ch
           refine Finset.sum_congr rfl fun i _ => ?_
           simp only [epsSg, Int.cast_neg, Int.cast_one]
           ring
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [this, map_neg, map_mul, map_sum]
+
+        rw [this, map_neg, map_mul, map_sum]
         exact neg_mem (mul_mem (hqi _) (sum_mem fun i _ => by
           rw [map_mul]; exact mul_mem ((hint _).2 (hy' i)) ((hint _).2 (hη i))))
       have h1 := hA.psi _ hi

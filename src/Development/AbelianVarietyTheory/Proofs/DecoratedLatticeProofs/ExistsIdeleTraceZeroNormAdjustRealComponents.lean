@@ -127,7 +127,7 @@ private theorem scal_pos (D : D7) (μ : D.host.E) (hμ : μ ≠ 0) (w : Infinite
         change star (μ * star μ) = μ * star μ; rw [star_mul, star_star])⟩ with hn
   letI : Algebra D.host.F ℂ := w.embedding.toAlgebra
   let φ : D.host.E →ₐ[D.host.F] ℂ := by
-    set_option synthInstance.maxHeartbeats 400000 in exact IsAlgClosed.lift
+    exact IsAlgClosed.lift
   have h1 : φ (algebraMap D.host.F D.host.E n) = w.embedding n := φ.commutes n
   have h2 : (algebraMap D.host.F D.host.E n) = μ * star μ := rfl
   have h3 : φ (star μ) = starRingEnd ℂ (φ μ) :=
