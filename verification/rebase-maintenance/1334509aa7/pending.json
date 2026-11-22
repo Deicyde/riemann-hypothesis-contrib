@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/FrobFormTrunc.lean",
+      "stages": {
+        "1": "6143bca5d36c28f84e8634661e70504147d568b1",
+        "2": "e50655a01c642382f5cda39800730fb5468a9cd0",
+        "3": "b285f2f1e3f018d377f2f9b56b36d172bf6ab01c"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "31d9ab3744f54c7829ab05235c430b36671240c8",
+  "checkpoint_head": "be6e065dfbef3afe1bd411f5b238bf836ccab865"
+}
