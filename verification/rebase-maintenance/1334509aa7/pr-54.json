@@ -1,0 +1,68 @@
+{
+  "number": 54,
+  "title": "Golf the Riemann hypothesis proof one theorem at a time (3,361 fewer Lean lines)",
+  "original_head": "49d5c0357d6d23bead82db4562fe07ad31544370",
+  "original_repo": "by-eureka/riemann-hypothesis",
+  "original_branch": "eureka/upstream-proof-refactors",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+  "automatic_resolution_count": 9,
+  "automatic_resolutions": [
+    {
+      "path": "src/Formalism/GammaFactorNonvanishing/RhOfRight.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Formalism/GammaFactorNonvanishing/CritLine.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/FourierUniquenessOfOpenSubgroup.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Development/WeilBound/CoreStatements/HodgeTatePoints/HtatLieB.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/WeilStabilizerVolume/TopoPolish.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/TopoPolish.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/DiscreteSubgroupCountableAndExistsStrictFundamen.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TorusHaarMeasure/ExistsStrictMeasurableFundamentalSetOfDiscrete.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/KerLeSpanImageKerOfSemilinear.lean",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    }
+  ],
+  "status": "conflict",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/QuadraticUnramifiedIffInertOrSplit.lean",
+      "stages": {
+        "1": "18e076fb96757ce528710218b882163a93ec5662",
+        "2": "5ed38f132028383a29127beff5989109dace112f",
+        "3": "5745dbaa700cb0c845d84e48a078c71c470113e3"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "cf9e976d4dbc16e16db24b3f26ef66a16ff77d24",
+  "log_tail": "[detached HEAD 38883f2a90] Use the kernel complement directly in the semilinear span proof\n Author: DebarghaG <maildebargha@gmail.com>\n 1 file changed, 12 insertions(+), 19 deletions(-)\nAuto-merging src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/QuadraticUnramifiedIffInertOrSplit.lean\nCONFLICT (content): Merge conflict in src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/QuadraticUnramifiedIffInertOrSplit.lean\nRebasing (20/174)\nRebasing (21/174)\nRebasing (22/174)\nRebasing (23/174)\nerror: could not apply cf9e976d4d... Shorten the ramification and inertia bounds for a quadratic extension\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply cf9e976d4d... # Shorten the ramification and inertia bounds for a quadratic extension\n",
+  "checkpoint_head": "b06b0c8aac551c2bf62f76a3c4b2debc0b1ce96c",
+  "checkpoint_branch": "maintenance/checkpoint-pr-54-1334509aa7-45044514813-remaining"
+}
