@@ -1,0 +1,27 @@
+{
+  "number": 79,
+  "title": "Remove heartbeat overrides",
+  "original_head": "90d23d60feda4ba5c41c6c7f8835c1de67bee799",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-heartbeats",
+  "maintainer_can_modify": true,
+  "old_merge_base": "507a75d91d131d627b380df4e32f6e9fb21dd067",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "a0260d239e298539847b7b30a54971d222278601",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "57880 files changed, 103810 insertions(+), 103811 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-79-e5ae821a00-45039889610-performance",
+  "status": "rebased"
+}

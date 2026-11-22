@@ -1,0 +1,92 @@
+{
+  "base": "e5ae821a00834f8043e987947f8151cc769bafe2",
+  "run": "45039889610-performance",
+  "results": [
+    {
+      "number": 98,
+      "title": "Minimize and privatize imports (stacked on #79)",
+      "original_head": "e2d63d253904023ae299743da96a19ea8cd73fce",
+      "original_repo": "Vilin97/rh-lc",
+      "original_branch": "port-lean-4.36-imports",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "status": "conflict",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AutomorphicFormsFiniteGL.lean",
+          "stages": {
+            "1": "4c49e023e9c174b15cf1aaa879f0f6e575c6e1a3",
+            "2": "eafcd7675d646b6e10affb48243499ced14ad0d1",
+            "3": "d634d88163c494b5538492e62fbe6216890b79c7"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "e2d63d253904023ae299743da96a19ea8cd73fce",
+      "log_tail": "Auto-merging src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AutomorphicFormsFiniteGL.lean\nCONFLICT (content): Merge conflict in src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AutomorphicFormsFiniteGL.lean\nRebasing (1/2)\nRebasing (2/2)\nerror: could not apply e2d63d2539... Minimize Lean imports with visibility repairs\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply e2d63d2539... # Minimize Lean imports with visibility repairs\n",
+      "checkpoint_head": "a97f71b11a6c4ffa9bf835d8602827f49738ec10",
+      "checkpoint_branch": "maintenance/checkpoint-pr-98-e5ae821a00-45039889610-performance"
+    },
+    {
+      "number": 79,
+      "title": "Remove heartbeat overrides",
+      "original_head": "90d23d60feda4ba5c41c6c7f8835c1de67bee799",
+      "original_repo": "Vilin97/rh-lc",
+      "original_branch": "port-lean-4.36-heartbeats",
+      "maintainer_can_modify": true,
+      "old_merge_base": "507a75d91d131d627b380df4e32f6e9fb21dd067",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "a0260d239e298539847b7b30a54971d222278601",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "57880 files changed, 103810 insertions(+), 103811 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-79-e5ae821a00-45039889610-performance",
+      "status": "rebased"
+    },
+    {
+      "number": 104,
+      "title": "Speed up the slowest proofs (stacked on #79)",
+      "original_head": "2ea000c90de863f15260573296e84ca49b578d1f",
+      "original_repo": "Vilin97/rh-lc",
+      "original_branch": "port-lean-4.36-speedups",
+      "maintainer_can_modify": true,
+      "old_merge_base": "507a75d91d131d627b380df4e32f6e9fb21dd067",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "a22731d5c58dc3d85a128be5e28c75cc4bde5eca",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "57948 files changed, 111983 insertions(+), 110124 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-104-e5ae821a00-45039889610-performance",
+      "status": "rebased"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
