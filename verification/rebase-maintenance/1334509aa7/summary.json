@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-10",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/FoundationProofs/MvPowerSeriesThreeEqZeroOfSubstLines.lean",
+          "stages": {
+            "1": "dbcf93994024efb41e722172d203cdcdf3ea7f18",
+            "2": "0b7401dfda736da417a3a666d63d9e760a0c0ef6",
+            "3": "e6984770bcc21831cfe58273a4b203d77c4d449f"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "10d5e223e6602060d781f7dae00405a1ea836e1e",
+      "checkpoint_head": "30b52507148d0ea12401d4b99ab023651c6825b7"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
