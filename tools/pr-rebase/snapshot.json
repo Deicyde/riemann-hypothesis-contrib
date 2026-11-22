@@ -1,0 +1,22 @@
+{
+  "base": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+  "prs": [
+    {
+      "n": 88,
+      "title": "Add a formal-conjectures Comparator setup and gather the setups in comparator/",
+      "head": "24e73b1ff2c9c965e39c68c32e50bdaf13a7db7a",
+      "branch": "comparator/formal-conjectures",
+      "repo": "leanprover-community/riemann-hypothesis",
+      "base": "7cce738ba719a32964ca3822d0994f4c6952c7ae",
+      "mergeable": true,
+      "state": "clean",
+      "files": 12,
+      "commits": 9,
+      "add": 759,
+      "del": 24,
+      "can_modify": false,
+      "draft": false
+    }
+  ],
+  "manual_review_feed": "maintenance/rebase-docs-after115-feed"
+}
