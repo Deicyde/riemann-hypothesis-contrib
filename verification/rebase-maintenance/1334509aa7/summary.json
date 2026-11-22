@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-84",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/PosNear.lean",
+          "stages": {
+            "1": "a9f1ce61e97f432339ec0efd5b315330333d0eeb",
+            "2": "600a115fe46bf0a1546006d1599c3909506a81be",
+            "3": "b0d2e9f4a2363e277edfeb5b04d525e591a446fd"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "e495e5db1e9e12202b72399859bf36f083e06aae",
+      "checkpoint_head": "bef44b873905ecbeda04a739e2aa38a6df7f4240"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
