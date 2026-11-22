@@ -1,0 +1,20 @@
+name = "splitCacheImport"
+
+[[lean_lib]]
+name = "SplitImport"
+roots = ["SplitData"]
+
+[[lean_exe]]
+name = "normalize-split"
+root = "NormalizeSplit"
+
+[[lean_exe]]
+name = "index-split"
+root = "IndexSplit"
+supportInterpreter = true
+moreLinkArgs = ["-lLake"]
+
+[[lean_exe]]
+name = "compile-runtime"
+root = "CompileRuntime"
+supportInterpreter = true
