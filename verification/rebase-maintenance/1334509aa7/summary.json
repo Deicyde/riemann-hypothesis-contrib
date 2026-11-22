@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-57",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/LemmaEprimeFromSteps.lean",
+          "stages": {
+            "1": "a6585243af9821cdad5b83b1a539508c79eee5b2",
+            "2": "c8bf6c332a8df9af01365cd88ae775ed779bb761",
+            "3": "f3945b84d66c4ac2626a00a1e48993a5d5244a8c"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "a06cfb57278e0007ee14d77163601128b319b445",
+      "checkpoint_head": "65186d19dbde2bd4d6f397c31c710623673f3b42"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
