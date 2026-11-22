@@ -114,7 +114,7 @@ only after this comparison and retains the normalized archived proof files.
 This runtime compatibility check involves source elaboration; it is not a
 metadata-only conversion of those 17,321 modules.
 
-The eight-module fixture checks private definitions, an IO initializer, ordinary,
+The nine-module fixture checks private definitions, an IO initializer, ordinary,
 meta, transitive and `import all` imports; it also rejects a private-name mismatch.
 It runs a native consumer, restores a packed cache from an empty build directory
 with `--no-build`, and checks source/option invalidation:
@@ -145,12 +145,17 @@ independently because their imported OLeans already exist. A mismatch stops the
 import. The controller does not publish, activate a baseline, or run a full source
 build. Its final acceptance command is stock `lake --rehash --no-build build`.
 
-The wider attempt uses jack's `rh436-reuse-full.service` on ffmain, a separate
+The wider attempt uses jack's `rh436-reuse-full-v2.service` on ffmain, a separate
 checkout at `/home/jack/rh436-cache-import/project-import`, 16 runtime workers,
 a 16-CPU quota and a 128 GiB memory limit. Its live status is
-`/home/jack/rh436-cache-import/reuse-records/full/import-state.json`, with the
+`/home/jack/rh436-cache-import/reuse-records/full-v2/import-state.json`, with the
 normalization journal, importer provenance and per-module runtime receipts beside
-it. The log is `/home/jack/rh436-cache-import/reuse-full.log`.
+it. The log is `/home/jack/rh436-cache-import/reuse-full-v2.log`.
+It resumes 46,592 normalization checkpoints after verifying their output hashes;
+the old provenance is retained in the handoff record. Setup planning uses stock
+dependency jobs, accepts archived IR without requiring C, and compresses temporary
+setup files. The real 128-module preview produced all 49 runtime setups in 12 MiB,
+compared with 262 MiB before compression.
 Keep `rh436-volunteer-fs.service` alive while using its temporary filesystem.
 This attempt has no automatic publication/finalizer step.
 
