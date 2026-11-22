@@ -113,8 +113,8 @@ theorem lvData_localizesConst_of_crystalline [IsDomain O] {T : LocLat G Qp LL O}
       rw [hzeq]
       abel
     have hF := congrArg (comparisonOnLetter C i) key
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sum] at hF
+
+    rw [map_add (f := _), map_sum] at hF
     have hC : ∀ k, comparisonOnLetter C i (PowerSeries.C (a k) • (⟨e k, he k⟩ : ↥((latOf C).N i))) =
         algebraMap O LL (a k) • W.cmp T ⟨C.t i (e k), he k⟩ := by
       intro k
@@ -151,9 +151,9 @@ theorem lvData_localizesConst_of_crystalline [IsDomain O] {T : LocLat G Qp LL O}
       (Lb.levB T (c - (ell : ZMod n)) 1 ⟨C.t (c - (ell : ZMod n)) x, hx⟩ 0) = _
     have hlet : ((letE (c - (ell : ZMod n)) : LetA O n) • (⟨C.t (c - (ell : ZMod n)) x, hx⟩ : ↥(W.N T))) =
         ⟨C.t (c - (ell : ZMod n)) x, hx⟩ := Subtype.ext (C.t_letter _ x)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mul_zero, zpow_zero, one_smul, ← cmp_eq, hlet,
-      comparison_of_reduction C (c - (ell : ZMod n)) hp9 e he x hx a hred, ← Module.End.coe_pow, map_sum]
+
+    rw [mul_zero, zpow_zero, one_smul, ← cmp_eq, hlet,
+    comparison_of_reduction C (c - (ell : ZMod n)) hp9 e he x hx a hred, ← Module.End.coe_pow, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, Submodule.coe_smul, hlam, lambda_coe_eq_frobenius_pow C c ell e k (he k)]
   have aux : ∀ A Bv : LvT hR uZ ιZ T c Hy.delta ell,

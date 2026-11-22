@@ -48,9 +48,9 @@ theorem bochner_ineq (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε
       = RCLike.re (inner ℂ (factorCasimir ε k P) P) + RCLike.re (inner ℂ (casimirK ε (mAct E k) P) P)
         + 2 * ∑ i, RCLike.re (inner ℂ (crossOp ε E k i P) P) := by
     rw [ReciprocityTheory.ChartRestriction.DS.casimirK_bAct]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [two_nsmul, LinearMap.add_apply, LinearMap.sum_apply,
-      inner_add_left, sum_inner, map_add, map_sum]
+
+    simp only [two_nsmul, LinearMap.add_apply, LinearMap.sum_apply,
+    inner_add_left, sum_inner, map_add, map_sum]
     ring
   have h1 : 0 ≤ RCLike.re (inner ℂ (factorCasimir ε k P) P) :=
     ReciprocityTheory.ChartRestriction.DS.factorCasimir_nonneg k P

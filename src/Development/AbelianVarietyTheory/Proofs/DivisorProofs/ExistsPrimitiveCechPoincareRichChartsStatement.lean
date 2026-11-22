@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.FstTszeSec
 @[expose] public section
 
 open CategoryTheory GlobalTheory.CatCoh GlobalTheory.AnPer GlobalTheory.AnPer.Charts TopologicalSpace
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_primitive_cech_poincare_rich_charts :
     ∀ {I : Type} [Fintype I] {g : ℕ} {Λ : Type} [AddCommGroup Λ]
       {F : Fam I g Λ} (K : Charts F), K.Rich → K.Based →
@@ -60,8 +60,8 @@ theorem _root_.GlobalTheory.T.exists_primitive_cech_poincare_rich_charts :
         ext j
         · simp [Prod.fst_sum]
         · simp [Prod.snd_sum, Finset.sum_apply, Pi.single_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hv, map_sum]
+
+      rw [hv, map_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [map_smul, smul_eq_mul, (hG q hq).2.2.2.2.2.2.2.2.1 k a y hy hyB]
     set H : P × (Fin g → ℂ) → K → P × (Fin g → ℂ) → ℂ :=

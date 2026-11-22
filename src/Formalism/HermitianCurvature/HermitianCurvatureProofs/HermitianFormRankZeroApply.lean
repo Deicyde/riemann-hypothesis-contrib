@@ -237,8 +237,8 @@ lemma cstr_iff {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (c : Fin (
     · simp only [extC, Fin.lastCases_last, lastRow]
       rw [eq_div_iff hl']
       have := congrArg conj ha
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Pi.zero_apply, map_add (f := _), map_sum, map_mul, Complex.conj_conj, map_zero] at this
+
+      simp only [Pi.zero_apply, map_add (f := _), map_sum, map_mul, Complex.conj_conj, map_zero] at this
       linear_combination this
     · simp [extC]
   · intro h
@@ -248,8 +248,8 @@ lemma cstr_iff {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (c : Fin (
       conv_lhs => rw [h]
       simp [extC]
     rw [hl2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [lastRow, map_div₀, map_neg, map_sum, map_mul, Complex.conj_conj, Pi.zero_apply]
+
+    simp only [lastRow, map_div₀, map_neg, map_sum, map_mul, Complex.conj_conj, Pi.zero_apply]
     field_simp
     ring
 

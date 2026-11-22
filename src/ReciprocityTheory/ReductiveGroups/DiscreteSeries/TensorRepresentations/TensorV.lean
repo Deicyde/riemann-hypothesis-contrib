@@ -116,8 +116,8 @@ theorem casimir_tensVd {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep 
 theorem eeV_comm {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (a b : Fin n) :
     tensV E a b * eeV E = eeV E * tensV E a b := by
   refine LinearMap.ext fun f => funext fun x => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Module.End.mul_apply, tensV_coord, eeV_coord, map_sum, map_add (f := _), isGlRep_apply_swap hE a b]
+
+  simp only [Module.End.mul_apply, tensV_coord, eeV_coord, map_sum, map_add (f := _), isGlRep_apply_swap hE a b]
   simp only [apply_ite (E _ _), map_zero, Finset.sum_add_distrib, Finset.sum_sub_distrib,
     Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true]
   by_cases h : x = a
@@ -127,8 +127,8 @@ theorem eeV_comm {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (a 
 theorem eeVd_comm {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (a b : Fin n) :
     tensVd E a b * eeVd E = eeVd E * tensVd E a b := by
   refine LinearMap.ext fun f => funext fun x => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Module.End.mul_apply, tensVd_coord, eeVd_coord, map_sum, map_neg, map_sub, isGlRep_apply_swap hE a b]
+
+  simp only [Module.End.mul_apply, tensVd_coord, eeVd_coord, map_sum, map_neg, map_sub, isGlRep_apply_swap hE a b]
   simp only [apply_ite (E _ _), map_zero, Finset.sum_add_distrib, Finset.sum_sub_distrib,
     Finset.sum_ite_eq', Finset.mem_univ, if_true]
   by_cases h : x = b

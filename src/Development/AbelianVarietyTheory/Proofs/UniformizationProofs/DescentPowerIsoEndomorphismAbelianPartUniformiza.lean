@@ -193,7 +193,7 @@ variable (b : K → (D.toPre.P.A ⟶ D.toPre.P.A))
     (U.gt e).q ≫ (Over.pullback (thick R I e)).map (b k))
 
 
-set_option maxHeartbeats 800000 in
+
 include hβ nβ hq in
 theorem exists_level (hG : GlobalFnsSt) (hS : IsSemiAbelian G) [IsAdicComplete I R] (e : ℕ) :
     ∃ s : LB.Gen (LB.LinComb D.toPre.P.L (fun k => (fstG I e D.toPre.P.A).left ≫ (b k).left) ε), s.IsGen ∧

@@ -53,7 +53,7 @@ theorem mem_of_oToS {I : Ideal (𝓞 D.host.E)} (hI : I ≠ ⊥) {b : 𝓞 D.hos
   exact Ideal.Quotient.eq_zero_iff_mem.1 (cmpS_inj I hI h1)
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_near_idem {e : AE D} {𝔪 : Ideal (𝓞 D.host.E)} (h : GoodMod e 𝔪) {N : ℕ} (hN : 0 < N)
     (hNm : (N : 𝓞 D.host.E) ∈ 𝔪) :
     ∃ (μ : 𝓞 D.host.E) (s : AE D), finPart D s ∈ intAE D ∧
@@ -219,7 +219,7 @@ theorem mul_mem_idGrp {I : Ideal (𝓞 D.host.E)} {c : EAf D} (hc : c ∈ Formal
   ⟨⟨c, hc⟩ * oToS D.host.F D.host.E b, Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ hb), rfl⟩
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem inId_of_mem (hc : D.host.ccK = ⊤) (hS : S.gram = 1) {e : AE D} {𝔪 : Ideal (𝓞 D.host.E)} (h : GoodMod e 𝔪)
     {u : WO S T} (hu : u ∈ latO S T (stdL D S.rank : Set (Fin S.rank → D.host.E))
       (skewLat D 𝔪 T.rank : Set (Fin T.rank → D.host.E)) fun _ => True) (i : Fin T.rank) (j : Fin S.rank) :
@@ -244,9 +244,9 @@ theorem inId_of_mem (hc : D.host.ccK = ⊤) (hS : S.gram = 1) {e : AE D} {𝔪 :
       mul_div_cancel₀ _ hn0] at h2
     obtain ⟨m, hm, hme⟩ := (FractionalIdeal.mem_coeIdeal _).1 h2
     have hme' : (m : D.host.E) = (β : D.host.E) * M i j := hme
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [he, Finset.sum_mul, show toEAf D (∑ P ∈ SS, es P * finTens α M i j) = ∑ P ∈ SS, toEAf D (es P * finTens α M i j) from
-      map_sum (toEAf D).toAddMonoidHom _ SS]
+
+    rw [he, Finset.sum_mul, show toEAf D (∑ P ∈ SS, es P * finTens α M i j) = ∑ P ∈ SS, toEAf D (es P * finTens α M i j) from
+    map_sum (toEAf D).toAddMonoidHom _ SS]
     refine sum_mem fun P hP => ?_
     have hβ0 : β ≠ 0 := fun hh => hβP P hP (hh ▸ zero_mem _)
     have hβ0' : (β : D.host.E) ≠ 0 := fun hh => hβ0 (RingOfIntegers.ext hh)
@@ -270,7 +270,7 @@ theorem inId_of_mem (hc : D.host.ccK = ⊤) (hS : S.gram = 1) {e : AE D} {𝔪 :
   · intro x hx; rw [Matrix.neg_apply, mul_neg, RingHom.map_neg]; exact neg_mem hx
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem mem_of_inId (hc : D.host.ccK = ⊤) (hS : S.gram = 1) {I : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E}
     {LT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)} (hLT : ∀ x, x ∈ LT ↔ ∀ i, x i ∈ I)
     {𝔪 : Ideal (𝓞 D.host.E)} (hI : (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) ≤ I) {u : WO S T}

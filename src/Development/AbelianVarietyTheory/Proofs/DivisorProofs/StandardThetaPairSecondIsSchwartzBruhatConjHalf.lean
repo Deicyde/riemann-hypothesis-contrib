@@ -41,7 +41,7 @@ private theorem rightBlock_shift {k d a : ℕ} {Y Y' W : Matrix (Fin k) (Fin d) 
   · exact h _ _
   · rw [mul_zero, add_zero]
 
-set_option maxHeartbeats 1000000 in
+
 private theorem stdSnd_shift {ν : (AE D)ˣ →* Circle} {e : AE D} {S : Finset (Pl D.host.E)} (he : IsIdemSum e S)
     {I : Ideal (𝓞 D.host.E)} {n₀ n c : ℕ} (hn₀ : ((n₀ : ℕ) : 𝓞 D.host.E) ∈ I)
     (hl : ∀ x, Formalism.L2.Pj.FinUnit x → (∃ y ∈ intAE D, finPart D (x : AE D) - 1 = n • y) → ν x = 1)
@@ -93,7 +93,7 @@ private theorem inv_aux {R : Type} [CommRing R] (k : ℕ) {x x' : R} (h : x' * x
   simp only [nsmul_eq_mul]
   linear_combination (-(k : R) * y) * h
 
-set_option maxHeartbeats 1000000 in
+
 private theorem dualCoord_up (A WW : HSp D) (βA : GL (Fin A.rank) (EAf D)) (βW : GL (Fin WW.rank) (EAf D)) :
     ∃ k : ℕ, 0 < k ∧ ∀ x : WO A WW, IsIntM (x.map (toEAf D)) → IsIntM (k • dualCoord A WW βA βW x) := by
   obtain ⟨k, hk, h⟩ := GlobalTheory.PlaceVec.frMapAdj_up A WW βA βW
@@ -103,7 +103,7 @@ private theorem dualCoord_up (A WW : HSp D) (βA : GL (Fin A.rank) (EAf D)) (βW
   rw [mul_nsmul_mul_eq_nsmul_mul_nsmul]
   exact mul_mem hx (h x hi i j)
 
-set_option maxHeartbeats 1000000 in
+
 private theorem dualCoord_down (A WW : HSp D) (βA : GL (Fin A.rank) (EAf D)) (βW : GL (Fin WW.rank) (EAf D)) :
     ∃ k : ℕ, 0 < k ∧ ∀ x : WO A WW, IsIntM (dualCoord A WW βA βW x) → IsIntM ((k • x).map (toEAf D)) := by
   obtain ⟨k, hk, h⟩ := GlobalTheory.PlaceVec.frMapAdj_down A WW βA βW
@@ -121,7 +121,7 @@ private theorem dualCoord_down (A WW : HSp D) (βA : GL (Fin A.rank) (EAf D)) (�
   exact mul_mem hx (hi i j)
 
 
-set_option maxHeartbeats 1000000 in
+
 private theorem stdSnd_isSB {ν : (AE D)ˣ →* Circle} (hν : Continuous ν) {e : AE D} {S : Finset (Pl D.host.E)}
     (he : IsIdemSum e S) {I : Ideal (𝓞 D.host.E)} (hI : I ≠ ⊥) (a : ℕ) (A WW : HSp D) (βA : GL (Fin A.rank) (EAf D))
     (βW : GL (Fin WW.rank) (EAf D)) (Λ : AddSubgroup (WO A WW))
@@ -153,7 +153,7 @@ private theorem stdSnd_isSB {ν : (AE D)ˣ →* Circle} (hν : Continuous ν) {e
     rw [show (n₀ * (n * c)) * (K * M) = ((n₀ * (n * c)) * M) * K by ring, mul_smul]
     exact nsmul_mem (hC t h.1 h.2) _
 
-set_option maxHeartbeats 1000000 in
+
 private theorem main (ν : (AE D)ˣ →* Circle) (hν : Continuous ν) (e : AE D) (S : Finset (Pl D.host.E))
     (he : IsIdemSum e S) (I : Ideal (𝓞 D.host.E)) (hI : I ≠ ⊥) (a : ℕ) (A WW : HSp D)
     (ΛA : Submodule (𝓞 D.host.E) (Fin A.rank → D.host.E)) (ΛW : Submodule (𝓞 D.host.E) (Fin WW.rank → D.host.E))

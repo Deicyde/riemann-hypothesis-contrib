@@ -96,17 +96,17 @@ theorem dvd_map_of_pow_smul_eq {R S ι : Type} [CommRing R] [CommRing S] [Fintyp
     (hx : ∀ i j, x ∣ f (B' i j)) (i j : ι) : x ∣ f (B i j) := by
   have h1 := congrArg f (congrFun (congrFun h i) j)
   rw [Matrix.smul_apply, smul_eq_mul, map_mul, map_pow] at h1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← (hQ.pow m).dvd_mul_left, h1, Matrix.mul_apply, map_sum]
+
+  rw [← (hQ.pow m).dvd_mul_left, h1, Matrix.mul_apply, map_sum]
   refine Finset.dvd_sum fun k _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_mul, Matrix.mul_apply, map_sum]
+
+  rw [map_mul, Matrix.mul_apply, map_sum]
   refine Dvd.dvd.mul_right (Finset.dvd_sum fun k' _ => ?_) _
   rw [map_mul]
   exact (hx _ _).mul_left _
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem X_pow_dvd_entry : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; ∀ (r a m m' : ℕ) (B G G₁ Pm P₁ P₁' : Matrix (Fin r) (Fin r) (AA K LL)), (∀ i j, (G - 1) i j ∈ Ideal.span {(letπ : AA K LL)}) → (∀ i j, (G₁ - 1) i j ∈ Ideal.span {(letπ : AA K LL)}) → (W.X ^ a) • (G * B.map (W.γA W.gam)) = (W.γA W.gam W.X ^ a) • (B * G₁) → P₁ * P₁' = (W.Q ^ m') • (1 : Matrix (Fin r) (Fin r) (AA K LL)) → Pm * B.map W.φA = (W.Q ^ m) • (B * P₁) → ∀ i j, W.X ^ a ∣ B i j := by
   intro D HW l hl K s LL h W r a m m' B G G₁ Pm P₁ P₁' hG hG₁ hγ hP hφ
   obtain ⟨Lγ, Lφ⟩ : LevLaws W := GlobalTheory.NL.Expansion.levLaws D HW l K s LL h
@@ -159,9 +159,9 @@ theorem X_pow_dvd_entry : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) 
       (hone G hG) (hone G₁ hG₁) ?_
     ext1 p q
     have h1 := congrArg (W.lev i 1) (congrFun (congrFun hγ p) q)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.map_apply, map_mul, map_pow, map_sum,
-      hγ1] at h1
+
+    simp only [Matrix.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.map_apply, map_mul, map_pow, map_sum,
+    hγ1] at h1
     simp only [Matrix.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.map_apply, ← hX]
     exact h1
   have hB := pow_smul_eq W.Q m m' B (B.map W.φA) Pm P₁ P₁' hP hφ

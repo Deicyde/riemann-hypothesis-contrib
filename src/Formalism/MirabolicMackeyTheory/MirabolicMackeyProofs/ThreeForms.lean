@@ -184,8 +184,8 @@ theorem split_of_snf (N NB : Submodule O Z) (a : O) (ha : a ≠ 0)
   have hexp : ∀ (x : Z) (hx : x ∈ N), x = ∑ j, (snf.bM.repr ⟨x, hx⟩ j) • v j := by
     intro x hx
     have := congrArg (N.subtype) (snf.bM.sum_repr ⟨x, hx⟩)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at this
+
+    rw [map_sum] at this
     simpa using this.symm
   have haK : algebraMap O K a ≠ 0 := by
     rw [Ne, FaithfulSMul.algebraMap_eq_zero_iff]

@@ -37,8 +37,8 @@ theorem comm_left (A : Submodule ℂ (Matrix Ω Ω ℂ)) (T : Matrix Ω Ω ℂ)
   let Z : Ω → Ω → Matrix Ω Ω ℂ := fun j k => Matrix.of fun x c => S (single c j 1) x k
   have hZr : ∀ (a : Matrix Ω Ω ℂ) (j k x c : Ω), (Z j k * a) x c = S (a * single c j 1) x k := by
     intro a j k x c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [key, map_sum, Matrix.sum_apply]
+
+    rw [key, map_sum, Matrix.sum_apply]
     simp only [Z, Matrix.mul_apply, of_apply, map_smul, Matrix.smul_apply, smul_eq_mul]
     exact Finset.sum_congr rfl fun b _ => mul_comm _ _
   have hZl : ∀ (a : Matrix Ω Ω ℂ) (j k x c : Ω), (a * Z j k) x c = (a * S (single c j 1)) x k := by
@@ -51,8 +51,8 @@ theorem comm_left (A : Submodule ℂ (Matrix Ω Ω ℂ)) (T : Matrix Ω Ω ℂ)
     ext x k
     rw [← hZr, ← hZl, hZ]
   rw [matrix_eq_sum_single y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.mul_sum, map_sum]
+
+  simp only [Finset.mul_sum, map_sum]
   refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun j _ => ?_
   have : single c j (y c j) = y c j • single c j (1 : ℂ) := by
     rw [smul_single, smul_eq_mul, mul_one]

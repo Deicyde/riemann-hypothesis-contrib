@@ -159,7 +159,7 @@ structure Facts (D : D7) (L : SizeData₂ D) (K : Consts) (C31 bo : ℝ) : Prop 
       40 * C31 * Real.log L.sc.x * (K.DI * (L.sc.x ^ (Scale.A / 2)) ^ 2 *
         ((N1 L.sc : ℝ) ^ 5 + (D.R.k : ℝ) ^ 3) * Real.logb p L.sc.a) + 3 ≤ bo
 
-set_option maxHeartbeats 8000000 in
+
 theorem facts_ev (eps : ℝ) (K : Consts) (hK : K.Nonneg) (C31 : ℝ) (hC31 : 0 < C31) :
     ∀ᶠ x : ℝ in atTop, ∀ (D : D7) (L : SizeData₂ D), L.sc.x = x → L.sc.eps = eps → Formalism.MainNotions.SizesAt L →
       ParameterChoice' D L → adm5 D L K (eps / 48) → Facts D L K C31 (L.sc.b ^ (x ^ (-(eps / 2)))) := by

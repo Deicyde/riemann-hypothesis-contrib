@@ -34,8 +34,8 @@ private theorem adjugate_last_col_sum_and_det_of_coset (Z Z' P Q : Matrix (Fin (
     simp [hPl']
   refine ⟨?_, ?_⟩
   · rw [hZ, Matrix.adjugate_mul_distrib, Matrix.adjugate_mul_distrib]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hv, map_sum, map_smul, Finset.smul_sum, smul_smul]
+
+    simp only [hv, map_sum, map_smul, Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [← Finset.sum_smul, ← hW c, Matrix.mul_apply]
@@ -60,8 +60,8 @@ theorem omp_coset (F : FlagG S r T) (F0 : FlagG S r T') (σ γ1 s' : S.V ≃ₗ[
   have hv1 : ∀ b, (mapFlag (σ * γ1 * s') hγ2 F0).fvec b =
       σ (∑ c, M c b • (mapFlag γ1 hγ1 F0).fvec c) := by
     intro b
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [fvec_mapFlag, LinearEquiv.mul_apply, LinearEquiv.mul_apply, hM' b, map_sum]
+
+    rw [fvec_mapFlag, LinearEquiv.mul_apply, LinearEquiv.mul_apply, hM' b, map_sum]
     simp only [fvec_mapFlag, map_smul]
   have hv2 : ∀ b, F.fvec b = σ (∑ c, N c b • F.fvec c) := by
     intro b
@@ -71,20 +71,20 @@ theorem omp_coset (F : FlagG S r T) (F0 : FlagG S r T') (σ γ1 s' : S.V ≃ₗ[
     have e1 : Zhat F (mapFlag (σ * γ1 * s') hγ2 F0) a b =
         S.hT (F.fvec a) ((mapFlag (σ * γ1 * s') hγ2 F0).fvec b) := rfl
     rw [e1, hv1 b, hv2 a, hs]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul,
-      smul_eq_mul, Matrix.mul_apply, Matrix.conjTranspose_apply, Zhat, brS, starRingEnd_apply,
-      Finset.sum_mul, Finset.mul_sum]
+
+    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul,
+    smul_eq_mul, Matrix.mul_apply, Matrix.conjTranspose_apply, Zhat, brS, starRingEnd_apply,
+    Finset.sum_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   have hZ2 : Zhat (mapFlag (σ * γ1 * s') hγ2 F0) F = Mᴴ * Zhat (mapFlag γ1 hγ1 F0) F * N := by
     ext a b
     have e1 : Zhat (mapFlag (σ * γ1 * s') hγ2 F0) F a b =
         S.hT ((mapFlag (σ * γ1 * s') hγ2 F0).fvec a) (F.fvec b) := rfl
     rw [e1, hv1 a, hv2 b, hs]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul,
-      smul_eq_mul, Matrix.mul_apply, Matrix.conjTranspose_apply, Zhat, brS, starRingEnd_apply,
-      Finset.sum_mul, Finset.mul_sum]
+
+    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul,
+    smul_eq_mul, Matrix.mul_apply, Matrix.conjTranspose_apply, Zhat, brS, starRingEnd_apply,
+    Finset.sum_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   obtain ⟨h1, h2⟩ := adjugate_last_col_sum_and_det_of_coset _ _ _ _ _ _ (σ : S.V →ₗ[E] S.V) hZ1 hv1 hMd
     (by simp [Matrix.det_conjTranspose, hNd])

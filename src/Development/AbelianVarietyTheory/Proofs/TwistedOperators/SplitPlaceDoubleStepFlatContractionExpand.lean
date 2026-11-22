@@ -82,8 +82,8 @@ theorem contr_flat_expand : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [
     rw [Submodule.coe_sum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, hPr]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hΞs, map_sum]
+
+  rw [hΞs, map_sum]
   refine Finset.sum_congr rfl fun i hi => ?_
   rw [map_smul]
   congr 1

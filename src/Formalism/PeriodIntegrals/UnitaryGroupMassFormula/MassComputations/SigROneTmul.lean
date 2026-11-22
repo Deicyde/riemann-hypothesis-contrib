@@ -71,8 +71,8 @@ theorem hA_incl (v w : Fin I.n → I.E) :
     hA I (incl I v) (incl I w) =
       Formalism.UG.inclE (F := I.F) (Af I.F) (Formalism.UG.hform (starRingEnd I.E) I.J v w) := by
   unfold hA Formalism.UG.hform incl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.map_apply, sigR_inclE, map_sum, map_mul, starRingEnd_apply]
+
+  simp only [Matrix.map_apply, sigR_inclE, map_sum, map_mul, starRingEnd_apply]
 
 theorem inclE_int {e : I.E} (he : e ∈ (algebraMap (𝓞 I.E) I.E).range) :
     Formalism.UG.inclE (F := I.F) (Af I.F) e ∈ IntAf I.F I.E :=

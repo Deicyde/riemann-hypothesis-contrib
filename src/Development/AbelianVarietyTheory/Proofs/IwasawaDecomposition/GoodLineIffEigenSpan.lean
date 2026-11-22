@@ -25,7 +25,7 @@ variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
   {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem mem_goodL_iff_iotaR (R : RealDat3 D A3 Ks) (F : Face3 D A3) (cG : G0 R.Pg D.R.r ≃* G0g D.nd)
     (kKs : Ks →+* ↥D.LL0) (hk : ∀ x : Ks, ((kKs x : ↥D.LL0) : D.what₂.LL) = algebraMap Ks D.what₂.LL x)
     (θ : ∀ kk : Fin 2, Multiplicative (ZMod (D.host.g kk)) →* (↥D.LL0)ˣ)
@@ -78,8 +78,8 @@ theorem mem_goodL_iff_iotaR (R : RealDat3 D A3 Ks) (F : Face3 D A3) (cG : G0 R.P
       ∑ g : G, sg0 D A3.A ((idemOf A3.A.X).coeff g) •
         postOn _ (Links.actL (Wc D (idxOf D j)) (R.βW (idxOf D j)) (R.datWp (idxOf D j) R.triv) (R.eG g))
           ((R.HW (idxOf D j) (sg0 D A3.A)).e ((R.FW (idxOf D j)).j (sg0 D A3.A) v)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum]
+
+    rw [map_sum, map_sum]
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [map_smulₛₗ, map_smul]
     exact congrArg _ (hact g v)

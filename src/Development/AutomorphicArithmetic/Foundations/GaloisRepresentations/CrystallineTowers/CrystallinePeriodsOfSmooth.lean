@@ -47,9 +47,9 @@ theorem isAdmP_of_isAdm (T : LocTied6 l P AI) {d : ℕ} {G : Subgroup (PadicAlgC
   · ext i j
     apply T.eD.injective
     have := congrFun (congrFun (hσ σ) i) j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, map_mul, UpperTheory.Lit.Drps.eD_alg T, T.actD,
-      RingEquiv.apply_symm_apply] at this ⊢
+
+    simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, map_mul, UpperTheory.Lit.Drps.eD_alg T, T.actD,
+    RingEquiv.apply_symm_apply] at this ⊢
     exact this
 
 end UpperTheory.Gal.Seam

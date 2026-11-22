@@ -11,7 +11,7 @@ open CategoryTheory Limits AlgebraicGeometry TopologicalSpace
 
 namespace CrystallineSemistableComparison
 
-set_option maxHeartbeats 800000 in
+
 theorem isStrictlySemistable_comp_openImmersion {O : Type} [CommRing O] (ϖ : O) {X Y : Scheme.{0}}
     (p : X ⟶ Spec (CommRingCat.of O)) (h : GlobalTheory.Et.IsStrictlySemistable ϖ p) (f : Y ⟶ X) [IsOpenImmersion f] :
     GlobalTheory.Et.IsStrictlySemistable ϖ (f ≫ p) := by

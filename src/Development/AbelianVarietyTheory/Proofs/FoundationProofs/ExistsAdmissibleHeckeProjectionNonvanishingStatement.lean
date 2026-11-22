@@ -14,7 +14,7 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.OpLDOneSu
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.CyclotomicQExpansion GlobalTheory.KummerEisensteinGalois GlobalTheory.K4
 open scoped TensorProduct MatrixGroups Matrix
 open GlobalTheory.LambdaValuationPowers
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_admissible_hecke_projection_nonvanishing : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (A : ValuationSubring Ω) (N l : ℕ)
   [Fact l.Prime] (e : ℕ) (S : Finset Pl) (W : R2 Ω l) (ψ : ZMod l → Qbar l) (ι : Qbar l ≃+* ℂ) (gN : Newform (2 * e + 1))
   (j : Ω →+* Qbar l),

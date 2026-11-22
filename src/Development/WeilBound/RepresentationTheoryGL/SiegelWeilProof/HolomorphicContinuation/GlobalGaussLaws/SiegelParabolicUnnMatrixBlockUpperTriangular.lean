@@ -43,7 +43,7 @@ theorem JJ_sq : (blk4 0 1 (-1) 0 : Mx D (n + n) (n + n)) * blk4 0 1 (-1) 0 = -1 
     rw [Matrix.fromBlocks_neg]; simp, Matrix.submatrix_neg]
   rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem rel2 (g : G D n) : mat g * blk4 0 1 (-1) 0 * adj (mat g) = blk4 0 1 (-1) 0 := by
   have hMN : mat g * mat g⁻¹ = 1 := by
     rw [show mat g * mat g⁻¹ = mat (g * g⁻¹) from rfl, mul_inv_cancel]; rfl
@@ -69,7 +69,7 @@ theorem rel2 (g : G D n) : mat g * blk4 0 1 (-1) 0 * adj (mat g) = blk4 0 1 (-1)
     _ = -((M * J * adj M * J) * J) := by rw [mul_assoc (M * J * adj M) J J]
     _ = J := by rw [h5, neg_mul, one_mul, neg_neg]
 
-set_option maxHeartbeats 1000000 in
+
 theorem blockRels (g : G D n) :
     adj (bB (mat g)) * blkDm (mat g) = adj (blkDm (mat g)) * bB (mat g) ∧
     adj (bA (mat g)) * blkDm (mat g) - adj (bC (mat g)) * bB (mat g) = 1 ∧
@@ -98,7 +98,7 @@ namespace PositivityTheory.Rg.Sw.Glob
 
 open GlobalTheory.StdUnn GlobalTheory.StdUnn.Model GlobalTheory.MixModel
 
-set_option maxHeartbeats 2000000 in
+
 theorem unitD : UnitD := by
   intro D n g hD
   obtain ⟨r1, r2, r3, r4⟩ := GlobalGaussBlockRelations.blockRels g

@@ -13,8 +13,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open IsDedekindDomain NumberField MeasureTheory Matrix
 open scoped TensorProduct nonZeroDivisors
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.FunObj.LocTensor
 
@@ -170,8 +170,8 @@ theorem locM_add {a b : ℕ} (β : GL (Fin a) (Formalism.IndefR.Lev.EAf D)) (β'
 theorem cpt_idemSum {e : AE D} {P : Finset (Pl D.host.E)} (he : IsIdemSum e P) {Q : Pl D.host.E} (hQ : Q ∉ P) :
     cpt Q (toEAf D e) = 0 := by
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum]
+
+  rw [map_sum, map_sum]
   exact Finset.sum_eq_zero fun P' hP => (cpt_of_isIdemAt (hes P' hP)).2 Q fun h => hQ (h ▸ hP)
 
 private theorem selfDual_isFullLattice {D : D7} : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),

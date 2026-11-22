@@ -118,8 +118,8 @@ end Local
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil} {U : Set T}
 
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem inBasis_mem_glLatCong (G : GridData L sc) {V : HSp D} {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)}
     {β x : GL (Fin V.rank) (Lev.EAf D)} (hβ : IsFrame β Λ) (hx : x ∈ congLev D.sp.cm V.gram Λ G.modul) {n : ℕ} (h : n = V.rank)
     (w : Pl D.host.E) : inBasis h β w x ∈ glLatCong (unifAt w ^ cosExp G w) (SplitFlip.stdLat (Kw w) _) := by
@@ -171,7 +171,7 @@ theorem mu_one_unramAt {μ₀ : T} (hL : L.Is μ₀) (G : GridData L sc) (t : T)
 
 
 open GlobalTheory.RowVacScalar in
-set_option maxHeartbeats 1000000 in
+
 theorem om_first_vac (S : GridChoice W U) {μ₀ : T} (hL : L.Is μ₀) (t : T) (k : FinPt G (.top 0))
     (hk : finG (G.V (.top 0)) k ∈ G.Kplus) :
     W.om (.top t 0) (G.toPair (.top t 0 : Pair T) ((S.N.u (.top 0))⁻¹ * k * S.N.u (.top 0)).1 1) (S.Z.vac (.top t 0)) =
@@ -427,7 +427,7 @@ theorem first_mem_stdLat_iff (S : GridChoice W U) (t : T) (k : FinPt G (.top 0))
     exact GlobalTheory.LocalLatStab.actO_mem _ _ _ _ _ g⁻¹ 1 (fun y hy => (h4 y).1 hy) h1 _ hx
 
 
-set_option maxHeartbeats 800000 in
+
 theorem product_invariant : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil} {U : Set T}
     (S : GridChoice W U) {t : T}, t ∈ U → ∀ {Φ : G.Datum} {β : CosFam G t} {τ : PureDat G t →₀ ℂ} {μ₀ : T},
     L.Is μ₀ → (Nat.Coprime D.host.pde (D.host.QS * D.host.q) ∧ Nat.Coprime D.host.pde' (D.host.QS * D.host.q)) → (∀ P ∈ L.Q t, ((Ideal.absNorm D.host.ccK : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal) → t ∈ U → β ∈ S.supp t Φ → S.IsExpansion t Φ β τ →

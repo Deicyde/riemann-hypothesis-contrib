@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 open NumberField
 open scoped ContDiff
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.contDiffOn_invSet_of_smooth_along_prod_exp : ∀ (E : Type) [Field E] [NumberField E] (d : ℕ) (f : GlobalTheory.CuspRep.Lie E d → ℂ)
     (S : Set (Matrix (Fin d) (Fin d) (GlobalTheory.CuspRep.Cinf E))), Submodule.span ℝ S = ⊤ →
     (∀ (k : ℕ) (X : Fin k → Matrix (Fin d) (Fin d) (GlobalTheory.CuspRep.Cinf E)), (∀ i, X i ∈ S) →

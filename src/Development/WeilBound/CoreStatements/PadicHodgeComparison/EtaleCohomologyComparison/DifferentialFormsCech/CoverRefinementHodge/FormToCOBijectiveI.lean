@@ -50,7 +50,7 @@ def isoI (hG : type_of% (@CrystallineSemistableComparison.Om.Glob.glob_iso _)) (
   ((Classical.choose (hG K) q U a j).trans (bridgeI hB hS q U a j)).trans (lerayI hA q U a j)
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem isoI_nat (hG : type_of% (@CrystallineSemistableComparison.Om.Glob.glob_iso _)) (hB : type_of% (@CrystallineSemistableComparison.Om.Cech.formToCO_bijective _))
     (hS : type_of% (@CrystallineSemistableComparison.Om.Cech.formToCO_smul _)) (hA : type_of% (@CrystallineSemistableComparison.Om.Cech.cechOmAdd_smul _))
     (hP : type_of% (@CrystallineSemistableComparison.Om.Cech.cechOm_pull _)) (hC : type_of% (@CrystallineSemistableComparison.Om.Cech.formCoch_pull _))
@@ -77,8 +77,8 @@ theorem isoI_nat (hG : type_of% (@CrystallineSemistableComparison.Om.Glob.glob_i
       { toFun := fun f => f (τ ∘ i), map_zero' := rfl, map_add' := fun _ _ => rfl }
     change evU (Cos.d (formCos q U.U a) j c') =
       formRes q (hτ' (j + 1) i) a (formPull hu (Pb.capO W.U (τ ∘ i)) a (evW (Cos.d (formCos p W.U a) j c)))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Cos.d_apply, Cos.d_apply, map_sum, map_sum, map_sum, map_sum]
+
+    rw [Cos.d_apply, Cos.d_apply, map_sum, map_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_zsmul, map_zsmul, map_zsmul, map_zsmul]
     congr 1

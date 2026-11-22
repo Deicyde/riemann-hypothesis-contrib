@@ -131,8 +131,8 @@ theorem twisted_moments : ∀ (q : ℕ) [Fact q.Prime] (S : ℂ_[q]⟦X⟧) (ζ 
   have := hasSum_coeff_iter hζ hS k 0
   rw [coeff_zero_eq_constantCoeff] at this
   convert this using 3 with m
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [fwdDiff_iter_eq_sum_shift, sS_pow_eq, DT_iter_sum, map_sum]
+
+  rw [fwdDiff_iter_eq_sum_shift, sS_pow_eq, DT_iter_sum, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   have e : (0 : ℤ_[q]) + j • (1 : ℤ_[q]) = (j : ℤ_[q]) := by simp
   rw [e]

@@ -13,13 +13,13 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
 noncomputable section
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 2000000
+
 namespace GlobalTheory.HeightCounting.UpPin
 theorem steps_pin_alt : ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists, ∀ cDep : ℝ, (_root_.GlobalTheory.HeightCounting.Up.SettingsFormsExistList' hL cDep → _root_.GlobalTheory.HeightCounting.Up.FirstIntermediateLevelExists hL) ∧ (_root_.GlobalTheory.HeightCounting.Up.SeriesExistList' hL cDep → _root_.GlobalTheory.HeightCounting.Up.SecondIntermediateLevelExists hL) ∧
     (_root_.GlobalTheory.HeightCounting.Up.ModuliPointsExistList' hL cDep → _root_.GlobalTheory.HeightCounting.Up.ThirdIntermediateLevelExists hL) ∧ (StepW Start HasBare → _root_.GlobalTheory.HeightCounting.Up.SameGaloisLevelExists hL → SMt → _root_.GlobalTheory.HeightCounting.Up.RationalityStatementThirdPlaceSeries hL → _root_.GlobalTheory.HeightCounting.Up.CuspStatement' hL → _root_.GlobalTheory.HeightCounting.Up.SettingsFormsExistList' hL cDep → _root_.GlobalTheory.HeightCounting.Up.SeriesExistList' hL cDep →

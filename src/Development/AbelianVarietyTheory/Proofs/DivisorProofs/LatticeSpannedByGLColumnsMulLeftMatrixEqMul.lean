@@ -39,8 +39,8 @@ theorem col_eq {E : Type} [Field E] [NumberField E] {w : Pl E} {K : GlobalTheory
   have hij : ∀ i, e.symm (h.val i j) = ∑ k, M i k * e.symm (g.val k j) := by
     intro i
     rw [hh]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mul_apply, GlobalTheory.TwLat.mulMat, map_sum, map_mul, hM]
+
+    simp [Matrix.mul_apply, GlobalTheory.TwLat.mulMat, map_sum, map_mul, hM]
   have hab : ∀ k, a * b k = ∑ i, M i k • b i := by
     intro k
     simp only [hM, LinearMap.toMatrix_apply, LinearMap.mulLeft_apply]

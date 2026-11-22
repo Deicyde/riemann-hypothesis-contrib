@@ -55,10 +55,10 @@ private theorem smoothOp_eq_levOp (m : Measure G) [m.IsHaarMeasure] {U : Subgrou
     intro h0
     exact hq (by rw [h0, zero_smul]))]
   refine GlobalTheory.OpTrace.eq_of_forall_dual fun l => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hρ.map_smoothOp hlc hf.1 l v,
-    GlobalTheory.HaarSum.integral_eq_sum_cosets m U hUo hUc.measure_ne_top (fun g => f g • l (ρ g v)) ?_ hs.toFinset ?_,
-    map_smul, map_sum]
+
+  rw [hρ.map_smoothOp hlc hf.1 l v,
+  GlobalTheory.HaarSum.integral_eq_sum_cosets m U hUo hUc.measure_ne_top (fun g => f g • l (ρ g v)) ?_ hs.toFinset ?_,
+  map_smul, map_sum]
   · simp
   · intro x s hs'
     rw [(hf.2 s hs' x).2, map_mul, Module.End.mul_apply, (mem_fixed.1 hv) s hs']

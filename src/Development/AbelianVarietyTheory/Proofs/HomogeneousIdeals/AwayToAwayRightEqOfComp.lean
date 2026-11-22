@@ -153,8 +153,8 @@ theorem expBij_of_unitInChart (hv : ∀ i, IsTangent (v i)) (hS : UnitInChart G 
       intro d l
       simp only [Finset.mul_sum, ← mul_assoc, ← map_mul]
       rw [Finset.sum_comm]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← Finset.sum_mul, ← map_sum]
+
+      simp only [← Finset.sum_mul, ← map_sum]
       have : ∀ k, ∑ i, a i l * (χ (β i)).snd k = (Pi.single k 1 : Fin n → S) l :=
         fun k => congrFun (hδ k) l
       simp [this, Pi.single_apply, apply_ite]
@@ -172,9 +172,9 @@ theorem expBij_of_unitInChart (hv : ∀ i, IsTangent (v i)) (hS : UnitInChart G 
     have := hτ A φ (α.comp u) (fun b b' => mul_eq_zero_of_sq hJ (hφ b) (hφ b')) b
     rw [AlgHom.comp_apply, vecTo_apply, hχu', ← sub_eq_iff_eq_add']
     refine this.trans ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [AlgHom.comp_apply, ha, map_sum, map_mul, c, Finset.mul_sum, Finset.sum_mul,
-      mul_assoc]
+
+    simp only [AlgHom.comp_apply, ha, map_sum, map_mul, c, Finset.mul_sum, Finset.sum_mul,
+    mul_assoc]
     exact Finset.sum_comm
 
 theorem awayToAwayRight_eq_of_comp (f g : A)

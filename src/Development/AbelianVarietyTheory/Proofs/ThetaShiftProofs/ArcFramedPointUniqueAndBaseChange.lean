@@ -13,7 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ModelCha
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

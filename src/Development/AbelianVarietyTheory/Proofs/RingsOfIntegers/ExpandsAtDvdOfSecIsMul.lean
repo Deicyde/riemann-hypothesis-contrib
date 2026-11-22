@@ -63,9 +63,9 @@ theorem dvd_of_sum {S : Scheme.{0}} (X : Type) [AddCommGroup X] (Y : Over S) {V 
       (∑ χ ∈ s, ((splitTorus S X ⊗ Y).left.presheaf.map (homOfLE le_top).op).hom (TorusInj.chiP X Y χ) *
       ((snd (splitTorus S X) Y).left.app V).hom (h χ)) :=
     map_dvd (Scheme.ΓSpecIso (TorusInj.GA (X := X) (V := V))).hom.hom H
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, TorusInj.ev_chi, TorusInj.ev_snd, AddMonoidAlgebra.single_mul_single,
-    add_zero, _root_.one_mul] at H'
+
+  simp only [map_sum, map_mul, TorusInj.ev_chi, TorusInj.ev_snd, AddMonoidAlgebra.single_mul_single,
+  add_zero, _root_.one_mul] at H'
   obtain ⟨g, hg⟩ := H'
   have hc := congrArg (fun f => f.coeff χ₀) hg
   rw [TorusInj.coeff_sum_single X s _ χ₀ hχ₀] at hc

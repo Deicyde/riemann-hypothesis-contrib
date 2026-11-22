@@ -89,8 +89,8 @@ theorem glue_field_points (R : Type) [CommRing R]
     (b.sum fun k r => π r * π (α k))
   have hb' : (b.sum fun k r => π r * π (g k)) = 1 := by
     have := congrArg π hb
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [Finsupp.sum, map_sum, smul_eq_mul] using this
+
+    simpa [Finsupp.sum, map_sum, smul_eq_mul] using this
   have hglue : ∀ l, IsNilpotent (g l * c0 - α l) := by
     intro l
     rw [← mem_nilradical, ← Ideal.Quotient.eq]

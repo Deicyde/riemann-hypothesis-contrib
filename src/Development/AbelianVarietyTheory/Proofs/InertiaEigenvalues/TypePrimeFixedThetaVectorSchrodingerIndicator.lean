@@ -22,7 +22,7 @@ open GlobalTheory.DownLift.GenFinite
 open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (FinPl idem SplitProj IsIdemOf IsProjAt adjCo grpCo frCo)
 open GlobalTheory.DownLift.GenSplit
 
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 

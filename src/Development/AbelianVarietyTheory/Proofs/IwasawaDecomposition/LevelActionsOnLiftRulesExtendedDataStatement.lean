@@ -132,7 +132,7 @@ private theorem geo_facts {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Ty
 
 end GlobalTheory.Mem.R3.ActExt
 
-set_option maxHeartbeats 2000000 in
+
 theorem _root_.GlobalTheory.T.levelActions_on_liftRules_extendedData : StepW Pinned fun K B' f' T' w' => ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T), Enl0 B B' →
   HEq f' f → Pinned K B f T w → HEq w'.px w.px → ∀ (Z : w.Lt) (hX : B.fields.Ok) (Wt : Set B.places.Pl)
     (z : Dat (w.st Z) w.I hX T Wt), GrpTrue Z.N f → GrpAt (w.st Z) w.I → Fine z → HoldsL z.R z.F →

@@ -45,8 +45,8 @@ theorem isNil_frobenius_chart : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C
       ∀ i, ¬IsUnit (F.θ (T w i)) := by
     intro w hw i
     show ¬IsUnit (F.θ (∑ l, M i l * F.σ (w l)))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     apply nu_sum
     intro l _
     rw [hM, blk, Matrix.mul_diagonal]

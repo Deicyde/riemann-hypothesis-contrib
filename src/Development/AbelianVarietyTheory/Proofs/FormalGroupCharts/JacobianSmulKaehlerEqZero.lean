@@ -60,8 +60,8 @@ theorem derivation_apply_eq_sum [IsNoetherianRing Q] {M : Type*} [AddCommGroup M
           ∑ i, φ (X i) • (D (φ (k i)) - ∑ j, φ (pderiv (R := T) j (k i)) • D (φ (X j))) := by
         generalize constantCoeff g = c at hg
         subst hg
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_add (f := _), hC, zero_add, pderiv_C, map_sum, Finset.sum_smul]
+
+        simp only [map_add (f := _), hC, zero_add, pderiv_C, map_sum, Finset.sum_smul]
         rw [Finset.sum_comm, ← Finset.sum_sub_distrib]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [h1, map_mul, Derivation.leibniz, smul_sub]

@@ -54,7 +54,7 @@ private theorem sum_fst (M : List (ℕ × ℕ)) : ∑ a : Fin M.length, (M.get a
 end UpperTheory.Gal.InertialTypesAlt.TypesOfLabels
 
 open UpperTheory.Gal.InertialTypesAlt.TypesOfLabels in
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem UpperTheory.Gal.InertialTypesAlt.typeOfLbl :
     MeetsIff → FrobL → JDEq → TypeOfLbl := by
   intro hMI hFL hJD k _ _ _ _ θ N V _ _ π b hb hL

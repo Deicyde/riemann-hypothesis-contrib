@@ -74,8 +74,8 @@ theorem leviV_normSq_comp {g : V n → ℂ} {x : V n} (hg : ContDiffAt ℂ 2 g x
       mul_zero, add_zero]
   unfold leviV
   simp_rw [hterm]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Complex.mul_conj, map_sum, Finset.sum_mul_sum]
+
+  rw [← Complex.mul_conj, map_sum, Finset.sum_mul_sum]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => ?_
   rw [map_mul]
   ring

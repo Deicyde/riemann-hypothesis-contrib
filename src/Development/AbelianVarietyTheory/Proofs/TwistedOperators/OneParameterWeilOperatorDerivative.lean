@@ -213,15 +213,15 @@ theorem rho_tens {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (co : GlobalTheory.W
   have hzat : At (evI F) z := by
     refine at_of_snd ?_
     show finHom z = 0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hz, dotProduct, map_add (f := _), map_mul, map_sum]
+
+    simp only [hz, dotProduct, map_add (f := _), map_mul, map_sum]
     have h0 : ∀ i, finHom (archLift q i) = 0 := fun _ => rfl
     simp [h0]
   have hev : evI F z = (∑ i, evI F (y i) * q i) +
       algebraMap ℝ (mixedEmbedding.mixedSpace F) (1 / 2) * ∑ i, p i * q i := by
     rw [← evIHom_apply, hz]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, map_add (f := _), map_mul, map_sum, evIHom_apply, evI_invTwo]
+
+    simp only [dotProduct, map_add (f := _), map_mul, map_sum, evIHom_apply, evI_invTwo]
     have h1 : ∀ i, evI F (archLift q i) = q i := fun i => congrFun (archPart_archLift q) i
     have h2 : ∀ i, evI F (archLift p i) = p i := fun i => congrFun (archPart_archLift p) i
     simp only [h1, h2]

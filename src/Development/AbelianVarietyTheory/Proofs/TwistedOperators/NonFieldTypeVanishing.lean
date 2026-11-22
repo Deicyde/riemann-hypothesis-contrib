@@ -72,7 +72,7 @@ instance discreteTopology_subgroupOf_cent (γ : GA D V) : DiscreteTopology ((GQ 
     ((continuous_subtype_val.comp continuous_subtype_val).subtype_mk _)
     (fun s t h => Subtype.ext (Subtype.ext (by have h' := congrArg Subtype.val h; exact h')))
 
-set_option maxHeartbeats 4000000 in
+
 theorem zeroClause {T : TypeDataG V} (hH : HypH (k := fun v : T.S => ResF v.1) T.τ)
     {μa : ∀ w, Measure (GArch D.sp.cm.sig V.gram w)} {μf : ∀ v, Measure (GLoc D.sp.cm.sig V.gram v)}
     {μ : Measure (GA D V)} {fa : ∀ w, GArch D.sp.cm.sig V.gram w → ℂ} {ff : ∀ v, GLoc D.sp.cm.sig V.gram v → ℂ}

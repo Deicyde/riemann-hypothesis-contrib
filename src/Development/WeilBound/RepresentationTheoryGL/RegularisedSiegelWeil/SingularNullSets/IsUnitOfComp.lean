@@ -15,8 +15,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open IsDedekindDomain NumberField
 open GlobalTheory.RegSch (ikS projS Lvl)
 
-set_option maxHeartbeats 1000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 namespace PositivityTheory.Rg.Rsw.L.LGenK
 
@@ -121,8 +121,8 @@ theorem crd_int_ev (k : Fin (Module.finrank D.host.F D.host.E)) :
       conv_lhs => rw [← B.sum_repr o]
       push_cast
       rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ho, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_sum]
+
+    rw [ho, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_sum]
     refine sum_mem fun j _ => ?_
     rw [map_zsmul, Finsupp.smul_apply, map_zsmul]
     exact zsmul_mem (hv j) _

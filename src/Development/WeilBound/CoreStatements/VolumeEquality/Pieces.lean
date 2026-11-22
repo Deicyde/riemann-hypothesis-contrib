@@ -129,7 +129,7 @@ structure Sheets (FF : Fin B.np → Set (Fin Dc.n → ℂ)) (d : Fin B.np → �
 open Classical in
 def nSheets (U : Y.X.Opens) (k : Fin B.np) : ℕ := if ∃ t ∈ GlobalTheory.CompanionTheory.Ar.Cusp.ballDom (B.F k).q, ⊤ ≤ B.pt k t ⁻¹ᵁ U then Or.deg else 0
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_sheets (h1 : HolNull) (h2 : ChartMeets) (h3 : RootBranches) (h4 : CoverRoots) (h5 : LocInj)
     (FF : Fin B.np → Set (Fin Dc.n → ℂ)) (hF : ∀ k, (B.F k).IsFundSet (B.Γ k) (FF k)) :
     ∃ U : Y.X.Opens, genPt Or.𝔐.ξ₀ ∈ U ∧ (∀ p : Sp ℂ ⟶ Y.X, ⊤ ≤ p ⁻¹ᵁ U → genPt Or.𝔐.ξ₀ ⤳ centre p) ∧

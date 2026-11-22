@@ -38,7 +38,7 @@ variable (e : ℕ) {f g : G ⟶ G} [IsMonHom f] [IsMonHom g] {a b : D.toPre.P.A 
 include hf hg
 
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_gen_invariant [ConnectedSpace (thickObj R I e G).left]
     (sj : Function.Surjective (G ⊗ G ⊗ G).hom.appTop.hom)
     (u : LB.Gen (LB.LinComb U.LG.L (rosatiφ G f g) rosatiε)) (hu : u.IsGen)

@@ -23,7 +23,7 @@ open MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.ShFam.Hor.Lo
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
-set_option maxHeartbeats 1000000
+
 
 noncomputable section
 

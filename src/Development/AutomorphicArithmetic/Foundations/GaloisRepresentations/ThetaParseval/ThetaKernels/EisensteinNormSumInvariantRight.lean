@@ -14,7 +14,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -251,8 +251,8 @@ theorem heis'_k (h : _root_.PositivityTheory.SiegelWeilFormula.Act.C5.Hyp_k L nb
       rw [Algebra.TensorProduct.map_tmul, AlgHom.id_apply]
     have e : y (fun i => inclR (F := F) (AF F) (x0 i)) (fun i => inclR (F := F) (AF F) (xb i)) =
         inclR (F := F) (AF F) (∑ l, xb l * σ (x0 l) - ∑ k, x0 k * (((R.ε : ℤ) : E) * σ (xb k))) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [y, _root_.PositivityTheory.SiegelWeilFormula.Act.C5.eA_k, map_sub, map_sum, map_mul, cA_inclR]
+
+      simp only [y, _root_.PositivityTheory.SiegelWeilFormula.Act.C5.eA_k, map_sub, map_sum, map_mul, cA_inclR]
     show ellA δ (y _ _) ∈ _
     rw [e]
     exact _root_.PositivityTheory.SiegelWeilFormula.Act.C5.ellA_inclR_k h _
@@ -274,8 +274,8 @@ theorem heis'_k (h : _root_.PositivityTheory.SiegelWeilFormula.Act.C5.Hyp_k L nb
       have hZ : ellA δ (y u₀ b) • inclR (F := F) (AF F) δ = y u₀ b := by
         refine _root_.PositivityTheory.SiegelWeilFormula.Act.C5.eig_k (R := R) h _ ?_
         have he := _root_.PositivityTheory.SiegelWeilFormula.Act.C5.eps_mul_k R
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [y, _root_.PositivityTheory.SiegelWeilFormula.Act.C5.eA_eq_k, map_sub, map_sum, map_mul, map_intCast, _root_.PositivityTheory.SiegelWeilFormula.Act.C5.cc_k d, mul_sub, Finset.mul_sum]
+
+        simp only [y, _root_.PositivityTheory.SiegelWeilFormula.Act.C5.eA_eq_k, map_sub, map_sum, map_mul, map_intCast, _root_.PositivityTheory.SiegelWeilFormula.Act.C5.cc_k d, mul_sub, Finset.mul_sum]
         simp only [← Finset.sum_sub_distrib]
         refine Finset.sum_congr rfl fun l _ => ?_
         linear_combination (-(u₀ l * cA σ (b l))) * he

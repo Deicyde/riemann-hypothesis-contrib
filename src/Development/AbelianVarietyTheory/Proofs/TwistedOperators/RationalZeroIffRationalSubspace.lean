@@ -39,8 +39,8 @@ theorem IsForm.linInd (h : IsForm j) {ι : Type} [Fintype ι] {v : ι → X} (hv
   funext i
   simp only [Function.comp, Fintype.linearCombination_apply]
   conv_lhs => rw [← b.sum_equivFun (v i)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smulₛₗ]; rfl
 

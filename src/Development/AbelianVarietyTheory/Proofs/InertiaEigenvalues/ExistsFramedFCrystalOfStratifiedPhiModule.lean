@@ -132,8 +132,8 @@ theorem eq_sum_of_coord {B : Obj l ↥(OL K)} {N : Type} [AddCommGroup N] [Modul
   let w : N →ₗ[B.A] (Fin d → B.A) := V.v (Hom.id B) f
   have he' : ∀ j, w (e j) = Pi.single j 1 := he
   change _ = w _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum]
+
+  rw [h, map_sum]
   simp only [map_smul, he']
   exact (sum_single c).symm
 

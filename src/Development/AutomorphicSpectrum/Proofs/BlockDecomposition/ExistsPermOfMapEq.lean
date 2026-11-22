@@ -176,8 +176,8 @@ theorem bk_val (τ : Fin n → ℝ) (k : ℕ) (a : Fin n) :
     have h3 : A a a = (τ a : ℂ) + ((a : ℕ) : ℂ) := by
       simp [hA, Formalism.REAL.Amat, hd]
     rw [Finset.sum_eq_zero h1, Finset.sum_congr rfl h2, h3, Finset.sum_neg_distrib]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [bk_succ, map_sum, sub_eq_add_neg, add_comm]
+
+    simp [bk_succ, map_sum, sub_eq_add_neg, add_comm]
 
 end HC
 
@@ -188,8 +188,8 @@ theorem trHC (n m : ℕ) : ∃ b : FreeAlgebra ℂ (Fin n),
   refine ⟨∑ a, bk n m a, fun V _ _ E hE x => ?_, fun τ => ?_⟩
   · have e : etr E m x - evd (fun c => E c c) (∑ a, bk n m a) x =
         ∑ a, (Formalism.REAL.epow E m a a x - evd (fun c => E c c) (bk n m a) x) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [etr, map_sum, LinearMap.sum_apply, Finset.sum_sub_distrib]
+
+      simp [etr, map_sum, LinearMap.sum_apply, Finset.sum_sub_distrib]
     rw [e]
     exact Submodule.sum_mem (nSub E) fun a _ => diag_mem hE m a x
   · set_option synthInstance.maxHeartbeats 100000 in
@@ -307,8 +307,8 @@ theorem map_epow {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B] 
   | succ k ih => simp only [Formalism.REAL.epow, map_sum, map_mul, ih]
 
 theorem evK_etr (E : Fin n → Fin n → Module.End ℂ V) (m : ℕ) : evK (allT n) E (etr (xl n) m) = etr E m := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [etr, map_sum, map_epow]
+
+  simp only [etr, map_sum, map_epow]
   refine Finset.sum_congr rfl fun a _ => ?_
   congr 1
   funext p q

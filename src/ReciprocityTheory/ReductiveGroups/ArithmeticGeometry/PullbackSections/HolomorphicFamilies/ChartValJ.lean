@@ -31,7 +31,7 @@ section Main
 
 variable {R k : Type} [CommRing R] [Field k] [Algebra ℚ k] [Algebra R k]
 
-set_option maxHeartbeats 1000000 in
+
 theorem chartValJ (hRQ : IsRQ (R := R) k) (J : Submodule R k) (hJ1 : (1 : k) ∈ J)
     {d : ℕ} {O : Type} [CommRing O] [StarRing O] (B : FB R d O) (h : PS k 2 d) (hg : B.IsCanonGauge k h)
     (w0 : O) (hw0 : w0 + star w0 = 1) (m : ℕ)

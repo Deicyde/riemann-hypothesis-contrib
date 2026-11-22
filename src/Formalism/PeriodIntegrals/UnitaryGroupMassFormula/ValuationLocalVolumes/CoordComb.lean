@@ -39,8 +39,8 @@ theorem coord_comb {K : Type} [CommRing K] (π : OR (E := E) v →+* K) {a : ℕ
     apply Subtype.ext
     simp only [AddSubmonoidClass.coe_finsetSum, Subring.coe_mul, cf_coe]
     rw [Orb.hR_sum_right σ J v]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e1, map_sum]
+
+  rw [e1, map_sum]
   simp only [map_mul, phi_apply]
 
 

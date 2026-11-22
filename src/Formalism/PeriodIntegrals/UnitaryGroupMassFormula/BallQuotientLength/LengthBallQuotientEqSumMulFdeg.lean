@@ -235,7 +235,7 @@ theorem length_zero_of_le {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
   exact h (a - b).2
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem length_residue (hfin : Module.Finite O ↥(As O A)) (ζ : Pts O A) :
     Module.length O (↥(As O A) ⧸ ζ.asIdeal) = (fdeg ζ : ℕ∞) := by
   classical

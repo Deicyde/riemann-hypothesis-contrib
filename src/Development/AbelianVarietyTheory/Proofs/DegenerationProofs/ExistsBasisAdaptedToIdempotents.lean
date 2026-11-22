@@ -51,9 +51,9 @@ theorem _root_.GlobalTheory.ZH.exists_basis_adapted_to_idempotents :
     intro g hg p
     obtain ⟨d, t⟩ := p
     have h1 := congrArg (Matrix.mulVecLin (E d)) hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, map_zero, Matrix.mulVecLin_apply, W, w,
-      mulVec_column_of_orthogonal_idempotents E hE, Fintype.sum_sigma, smul_ite, smul_zero] at h1
+
+    simp only [map_sum, map_smul, map_zero, Matrix.mulVecLin_apply, W, w,
+    mulVec_column_of_orthogonal_idempotents E hE, Fintype.sum_sigma, smul_ite, smul_zero] at h1
     rw [Finset.sum_eq_single d (fun c _ hc => by simp [Ne.symm hc]) (by simp)] at h1
     simp only [if_pos rfl] at h1
     exact Fintype.linearIndependent_iff.mp (hli d) (fun t => g ⟨d, t⟩) h1 t
@@ -96,8 +96,8 @@ theorem _root_.GlobalTheory.ZH.exists_basis_adapted_to_idempotents :
         _ = (e c).mulVec (Matrix.vecMul (Matrix.vecMul (fun j => e c j s) M⁻¹) M) := by rw [← h3]
         _ = _ := by
           rw [Matrix.vecMul_eq_sum]
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp only [← Matrix.mulVecLin_apply, map_sum, map_smul]
+
+          simp only [← Matrix.mulVecLin_apply, map_sum, map_smul]
     rw [h4]
     refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ ?_
     have h5 : (e c).mulVec (M i) = if c = (σ i).1 then M i else 0 :=

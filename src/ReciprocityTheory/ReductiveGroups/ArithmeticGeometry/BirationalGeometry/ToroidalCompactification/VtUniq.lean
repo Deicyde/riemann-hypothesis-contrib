@@ -294,7 +294,7 @@ theorem prod_pm (N : ℕ) {T : Over S} (a b : T ⟶ A) {U : Type} [CommGroup U] 
   norm_cast
 
 include c in
-set_option maxHeartbeats 1600000 in
+
 theorem vtOver_unique (hG : GlobalFnsSt) (hA : IsAbelianScheme A) (hsym : L.IsSymmetric) {N : ℕ} (hN : Odd N) (f g : A ⟶ A)
     [IsMonHom f] [IsMonHom g] (hr : RosatiAdj A L.L f g) {T : Over S} (ok : (T ⟶ A) → Prop)
     (hf : ∀ x, ok x → x ≫ f = 1) (hg : ∀ x, ok x → x ≫ g = x) (hk : ∀ x, ok x → x ^ (N ^ 2) = 1)

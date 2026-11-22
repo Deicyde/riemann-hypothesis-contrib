@@ -36,9 +36,9 @@ theorem map_pair {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] (b : B
     (φ : K →+* ℂ) (x y : V) (hx : ∀ i, b.repr x i ∈ cmMax K) :
     φ (p x y) = star (fun i => φ (b.repr x i)) ⬝ᵥ (Matrix.of fun i j => p (b i) (b j)).map φ *ᵥ fun i => φ (b.repr y i) := by
   conv_lhs => rw [← b.sum_repr x, ← b.sum_repr y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, map_mul, dotProduct,
-    Matrix.mulVec, Matrix.map_apply, Matrix.of_apply, Finset.mul_sum, RingHom.id_apply, Pi.star_apply]
+
+  simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, map_mul, dotProduct,
+  Matrix.mulVec, Matrix.map_apply, Matrix.of_apply, Finset.mul_sum, RingHom.id_apply, Pi.star_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [starRingEnd_apply, hx i φ, starRingEnd_apply]
@@ -52,9 +52,9 @@ theorem coAt_sum (x : S.Forms) :
     coAt S v (x : S.Cl → S.V) = ∑ i, v.embedding (S.basis.repr x i) • coAt S v (S.basis i : S.Cl → S.V) := by
   funext c k
   conv_lhs => rw [← S.basis.sum_repr x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coAt, AddSubmonoidClass.coe_finsetSum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, map_sum,
-    map_smul, smul_eq_mul]
+
+  simp only [coAt, AddSubmonoidClass.coe_finsetSum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, map_sum,
+  map_smul, smul_eq_mul]
   simp
 
 theorem coAt_indep : LinearIndependent ℂ fun i => fun p : S.Cl × S.ιV => coAt S v (S.basis i : S.Cl → S.V) p.1 p.2 := by
@@ -72,8 +72,8 @@ theorem coAt_indep : LinearIndependent ℂ fun i => fun p : S.Cl × S.ιV => coA
 theorem H_map (hb : S.HasRatBasis) : S.H.map v.embedding = Matrix.of fun i j =>
     wForm S.wt (S.gramV.map v.embedding) (coAt S v (S.basis i : S.Cl → S.V)) (coAt S v (S.basis j : S.Cl → S.V)) := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.map_apply, CSD.H, Matrix.of_apply, CSD.csum, wForm, map_sum, map_mul, map_inv₀, map_natCast]
+
+  simp only [Matrix.map_apply, CSD.H, Matrix.of_apply, CSD.csum, wForm, map_sum, map_mul, map_inv₀, map_natCast]
   exact Finset.sum_congr rfl fun c _ => congrArg _ (map_pair S.bV S.pair v.embedding _ _ (S.basis_rat hb i c))
 
 theorem H_posDef (hb : S.HasRatBasis) (hG : (S.gramV.map v.embedding).PosDef) : (S.H.map v.embedding).PosDef := by
@@ -129,8 +129,8 @@ theorem pairAt_rho (g : T.G) (x : T.V) : T.pairAt v (T.ρ g x) (T.ρ g x) = T.pa
   have e2 : (∑ i, v.embedding (T.bV.repr x i) • u i) = fun _ i => v.embedding (T.bV.repr (T.ρ g x) i) := by
     funext c k
     conv_rhs => rw [← T.bV.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [u, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, smul_eq_mul]
+
+    simp only [u, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, smul_eq_mul]
     simp
   rw [e1, e2] at h1
   rw [pairAt_eq, pairAt_eq, h1]

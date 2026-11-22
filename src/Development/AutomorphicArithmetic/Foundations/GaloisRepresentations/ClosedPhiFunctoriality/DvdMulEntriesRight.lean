@@ -34,8 +34,8 @@ private theorem map_intertwine {S T : Type} [CommRing S] [CommRing T] (f : S →
       ext i j; simp [hf]
     rw [e']
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mul_apply, map_sum]
+
+    simp [Matrix.mul_apply, map_sum]
   rw [e, Matrix.map_apply]
   exact map_dvd f (h i j)
 

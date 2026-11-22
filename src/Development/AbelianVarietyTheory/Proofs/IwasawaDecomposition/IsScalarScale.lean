@@ -12,8 +12,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta Formalism.L
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SerVec
 

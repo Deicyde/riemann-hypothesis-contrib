@@ -10,8 +10,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open UpperTheory.GalN.V UpperTheory.V.Z.Win.Birth
@@ -72,7 +72,7 @@ private theorem val_of_mem {F Ω : Type} [Field F] [NumberField F] [Field Ω] [A
     {v : HeightOneSpectrum (𝓞 F)} (hA : IsPlaceOver A v) (p : ℕ) : A.valuation (p : Ω) < 1 ↔ ((p : ℕ) : 𝓞 F) ∈ v.asIdeal := by
   rw [← hA]
   simp
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.indAutLP_of_upQuad_upSol_indAutCs (H : _root_.UpperTheory.V.Af.HypothesesH') : UpQuadI → UpSolI → IndAutCs → IndAutLP := by
   intro hQ hS hI Ω _ _ _ l _ c D T k₀ _ _ φ ι k t r α β R δ h hrw
   have hKL : T.K ≤ T.L := T.hL ▸ le_sup_right

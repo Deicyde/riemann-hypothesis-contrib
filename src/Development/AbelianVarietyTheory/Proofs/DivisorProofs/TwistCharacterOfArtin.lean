@@ -22,8 +22,8 @@ namespace GlobalTheory.TwistChr
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance 10000] GlobalTheory.GalChar.isTorsionFree_field
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 theorem hecke_eq_of_frob {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
     {art : Ideles E →* Gab E Ω} (ha : IsGlobalArtin art) (r : G E Ω →* ℂˣ) (hr : IsOpen (r.ker : Set (G E Ω))) (χ : HChar E)

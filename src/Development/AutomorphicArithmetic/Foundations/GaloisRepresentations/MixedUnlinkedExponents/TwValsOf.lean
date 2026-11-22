@@ -13,7 +13,7 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL
 open UpperTheory.Gal.GamX
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Gal.GamX.twValsOf :
     UpperTheory.Gal.GamX.TwValsOf := by
   intro hNV K L _ _ _ _ _ v d f e hf hne he hA hB c hc θ hθ

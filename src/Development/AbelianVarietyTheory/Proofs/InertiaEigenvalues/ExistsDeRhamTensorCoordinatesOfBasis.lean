@@ -26,8 +26,8 @@ theorem exists_tensor_coord_of_basis {k V M : Type} [Field k] [AddCommGroup V] [
   refine ⟨Φ, h, fun z => ?_⟩
   apply Φ.injective
   funext j
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_apply]
+
+  rw [map_sum, Finset.sum_apply]
   simp only [h, Module.Basis.repr_self]
   rw [Finset.sum_eq_single j]
   · simp
@@ -59,8 +59,8 @@ theorem exists_coord_tensor_dR : ∀ {G : Type} [Group G] {Qp K₀ K : Type} [Fi
       rfl
     funext i
     conv_lhs => rw [hz z]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, Finset.sum_apply]
+
+    rw [map_sum, map_sum, Finset.sum_apply]
     simp only [hact, h, Matrix.mulVec, dotProduct, Matrix.of_apply, Algebra.smul_def]
 
 end GlobalTheory

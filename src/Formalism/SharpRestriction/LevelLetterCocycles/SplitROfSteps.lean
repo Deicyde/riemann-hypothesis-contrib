@@ -62,7 +62,7 @@ variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp]
     [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem split_local (W : LocWach PD LL O v n) (T Tp : LocLat G Qp LL O) (ι : LatHom T.L Tp.L)
     (π : LatHom Tp.L W.one.L) (κ : G → T.V) (hκ : κ ∈ latticeCocycles T.L) (e : W.DD W.one)
     (π' Eπ : LetA O n) (h' M ρ σ : ℕ) (u : Oˣ)
@@ -180,12 +180,12 @@ theorem split_local (W : LocWach PD LL O v n) (T Tp : LocLat G Qp LL O) (ι : La
   set X : W.DD Tp := ∑ c, xs c with hX
   have hXΔ : ∀ δ ∈ W.DelF, W.γD Tp δ X = X := by
     intro δ hδ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hX, map_sum]
+
+    rw [hX, map_sum]
     exact Finset.sum_congr rfl fun c _ => ((mem_LamPS W Tp Eπ h' c _).1 (hxsLam c)).2.1 δ hδ
   have hXπ : W.map π X = ((PD.p : ℕ) : O) ^ (ρ + σ) • e := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hX, map_sum]
+
+    rw [hX, map_sum]
     simp only [hxs, W.map_φ, hxbπ, map_smul, hyφ]
     rw [← Finset.smul_sum, ← Finset.sum_smul, Formalism.MainNotions.LiftingTheory.liftb_sum_letE, one_smul]
   have hshiftT : ∀ f : ZMod n → W.DD T, ∑ c, f (c - 1) = ∑ c, f c :=
@@ -197,28 +197,28 @@ theorem split_local (W : LocWach PD LL O v n) (T Tp : LocLat G Qp LL O) (ι : La
   set Z : W.DD T := ∑ c, W.φD T (kk (c - 1)) with hZ
   have hXs : X = ∑ c, W.φD Tp (xb c) := hshiftP (fun c => W.φD Tp (xb c))
   have hYι : W.map ι (W.φD T Wsum) = W.φD Tp X - X := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [W.map_φ, hWsum, map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hwι, Finset.sum_sub_distrib, map_sub, map_sum]
+
+    rw [W.map_φ, hWsum, map_sum]
+
+    simp only [hwι, Finset.sum_sub_distrib, map_sub, map_sum]
     have e1 : W.φD Tp X = ∑ c, W.φD Tp (xs c) := by rw [hX, map_sum]
     rw [e1, hXs]
   have hZι : W.map ι Z = W.γD Tp W.gamK X - X := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hZ, map_sum, hX, map_sum, ← Finset.sum_sub_distrib]
+
+    rw [hZ, map_sum, hX, map_sum, ← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [W.map_φ, ← hxbγ, map_sub, W.φγ_comm]
   have hWΔ : ∀ δ ∈ W.DelF, W.γD T δ Wsum = Wsum := by
     intro δ hδ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hWsum, map_sum]
+
+    rw [hWsum, map_sum]
     exact Finset.sum_congr rfl fun c _ => hwΔ c δ hδ
   have hYΔ : ∀ δ ∈ W.DelF, W.γD T δ (W.φD T Wsum) = W.φD T Wsum := by
     intro δ hδ; rw [← W.φγ_comm, hWΔ δ hδ]
   have hZΔ : ∀ δ ∈ W.DelF, W.γD T δ Z = Z := by
     intro δ hδ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hZ, map_sum]
+
+    rw [hZ, map_sum]
     exact Finset.sum_congr rfl fun c _ => by rw [← W.φγ_comm, hPiΔ (hkkM (c - 1)) δ hδ]
   have hYZc : W.γD T W.gamK (W.φD T Wsum) - W.φD T Wsum = W.φD T Z - Z := by
     apply hKL.1
@@ -229,14 +229,14 @@ theorem split_local (W : LocWach PD LL O v n) (T Tp : LocLat G Qp LL O) (ι : La
   have hclK := hu X (((PD.p : ℕ) : O) ^ (ρ + σ)) hXΔ hXπ _ Z hYZ hYι hZι
   have hZM : Z ∈ PiNS W T π' M := Submodule.sum_mem _ fun c _ => hFP.1 _ (hkkM (c - 1))
   have hγW : W.γD T W.gamK Wsum - Wsum = ∑ c, (W.γD T W.gamK (w c) - w c) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hWsum, map_sum, Finset.sum_sub_distrib]
+
+    rw [hWsum, map_sum, Finset.sum_sub_distrib]
   have hZcM : Zc + (W.γD T W.gamK Wsum - Wsum) ∈ PiNS W T π' M := by
     refine Submodule.add_mem _ (Submodule.sum_mem _ fun c _ => (hzz c).1) ?_
     rw [hγW]; exact Submodule.sum_mem _ fun c _ => hγwM c
   have h1Z : W.φD T Zc - Zc = W.γD T W.gamK Wsum - Wsum := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hZc, map_sum, ← Finset.sum_sub_distrib, hγW]
+
+    rw [hZc, map_sum, ← Finset.sum_sub_distrib, hγW]
     exact Finset.sum_congr rfl fun c _ => (hzz c).2
   have hYM : W.γD T W.gamK (W.φD T Wsum) - W.φD T Wsum ∈ PiNS W T π' M := by
     rw [hYZc]; exact Submodule.sub_mem _ (hFP.1 _ hZM) hZM
@@ -264,8 +264,8 @@ theorem split_local (W : LocWach PD LL O v n) (T Tp : LocLat G Qp LL O) (ι : La
       Submodule.mkQ ((latticeCoboundaries T.L).comap (latticeCocycles T.L).subtype) (∑ c, κc c) := by
     have hsum0 : W.clK T ⟨(W.φD T Wsum, Z), hYZ⟩ =
         W.clK T (∑ c, (⟨(w c, zz c), hcoc c⟩ : ↥(herrZ1Δ (W.γD T W.gamK) (W.φD T) W.DelF (W.γD T))) + (⟨_, hcob⟩ : ↥(herrZ1Δ (W.γD T W.gamK) (W.φD T) W.DelF (W.γD T)))) := congrArg (W.clK T) hdecomp
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum0, map_add (f := _), map_sum, hcob0, add_zero, map_sum]
+
+    rw [hsum0, map_add (f := _), map_sum, hcob0, add_zero, map_sum]
     exact Finset.sum_congr rfl fun c _ => (hκc c).symm
   have key : Submodule.mkQ ((latticeCoboundaries T.L).comap (latticeCocycles T.L).subtype)
       ((((PD.p : ℕ) : O) ^ (ρ + σ)) • (⟨κ, hκ⟩ : ↥(latticeCocycles T.L))) =
@@ -360,7 +360,7 @@ def extOfR (D : D7) (HW : HWOf D.loc) : Prop :=
         ∀ τ, JumpsInV ((D.loc l).PD K) Tp.ρ τ (Set.Icc (-(h' : ℤ)) h')
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem splitR_of_steps (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
     (h2 : adm2 D HW F) (h2e : HerrClassMapsLocal D HW F) (hE : extOfR D HW) (hW : wKillR D HW)
     (hK : kerLamR D HW) (hN : ninLamR D HW) (hGr : gradNR D HW) (hF : frobPiNR D HW)

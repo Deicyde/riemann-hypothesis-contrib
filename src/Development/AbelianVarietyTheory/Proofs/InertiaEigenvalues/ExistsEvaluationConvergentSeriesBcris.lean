@@ -26,8 +26,8 @@ section Letters
 variable {O N : Type} [CommRing O] [CommRing N] {n : ℕ} [NeZero n] (f : LetA O n →+* N)
 
 theorem sum_letE : ∑ i, f (letE i) = 1 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← map_one f]
+
+  rw [← map_sum, ← map_one f]
   exact congrArg f (Finset.univ_sum_single (1 : LetA O n))
 
 theorem sum_letE_mul (x y : ZMod n → N) :
@@ -50,8 +50,8 @@ theorem sum_letE_mul (x y : ZMod n → N) :
 
 theorem sum_letE_const (a : LetA O n) : ∑ i, f (letE i) * f (fun _ => a i) = f a := by
   simp only [← map_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum]
+
+  rw [← map_sum]
   congr 1
   ext1 j
   simp [letE, Pi.single_apply]

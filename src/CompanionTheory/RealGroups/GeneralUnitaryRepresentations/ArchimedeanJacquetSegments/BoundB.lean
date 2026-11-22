@@ -135,8 +135,8 @@ theorem avL_apply (π : Representation ℂ G V) (K : Subgroup G) (H : Subgroup K
 theorem avL_fixed (π : Representation ℂ G V) (K : Subgroup G) (H : Subgroup K) [Fintype (K ⧸ H)] {x : V}
     (hx : ∀ h ∈ H, π ((h : K) : G) x = x) (κ : G) (hκ : κ ∈ K) : π κ (avL π K H x) = avL π K H x := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [avL_apply, map_sum]
+
+  rw [avL_apply, map_sum]
   let κ' : K := ⟨κ, hκ⟩
   have key : ∀ q : K ⧸ H, π κ (π ((q.out : K) : G) x) = π (((κ' • q).out : K) : G) x := by
     intro q
@@ -182,8 +182,8 @@ theorem ineq (π : Representation ℂ G X) (B : X →ₗ[ℂ] X →ₗ⋆[ℂ] �
     rw [map_sub, LinearMap.sub_apply]
   have hsub2 : ∀ x y z : X, B x (y - z) = B x y - B x z := fun x y z => map_sub _ _ _
   have hpair : B (avL π K H (π Z v)) (lam • v) = (Fintype.card (K ⧸ H) : ℂ) * B (π Z v) (lam • v) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [avL_apply, map_sum, LinearMap.sum_apply]
+
+    rw [avL_apply, map_sum, LinearMap.sum_apply]
     have : ∀ q : K ⧸ H, B (π ((q.out : K) : G) (π Z v)) (lam • v) = B (π Z v) (lam • v) := by
       intro q
       have h1 := hB3 ((q.out : K) : G) (π Z v) (lam • v)
@@ -276,7 +276,7 @@ theorem modulus_scalar_block (d : ℕ) (t : kˣ) :
   simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, map_one, h1, _root_.one_zpow, mul_one,
     Matrix.GeneralLinearGroup.det_scalar, Fintype.card_fin, hn, h0, zpow_natCast, ← pow_mul]
 
-set_option maxHeartbeats 1000000 in
+
 theorem bound_main : Bound k := by
   intro d W _ _ _ τ hτ hadm hunit t c ht hc
   classical
@@ -342,8 +342,8 @@ theorem bound_main : Bound k := by
       show (Fintype.card (K ⧸ H) : ℂ)⁻¹ • avL (parInd (blk2 d) τ) K H
         (parInd (blk2 d) τ (Zt d t) (v : IndSp (blk2 d) τ)) = _
       rw [avL_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_smul, map_sum]
+
+    rw [h1, map_smul, map_sum]
     have hterm : ∀ q : K ⧸ H, ev (parInd (blk2 d) τ ((q.out : K) : GL (Fin (d + d)) k)
         (parInd (blk2 d) τ (Zt d t) (v : IndSp (blk2 d) τ))) = lam • ev v := by
       intro q

@@ -9,9 +9,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 open CategoryTheory Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct
 
-set_option maxHeartbeats 1000000 in
+
 set_option backward.isDefEq.respectTransparency false in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.irreducibleSpace_pullback_affine_open_of_isDomain_tensor : ∀ {F : Type} [Field F] {X : Scheme.{0}} (g : X ⟶ Sp F) (V : X.Opens), IsAffineOpen V →
     ∀ (k : Type) [Field k] (f : F →+* k),
     (letI : Algebra F Γ(X, V) :=

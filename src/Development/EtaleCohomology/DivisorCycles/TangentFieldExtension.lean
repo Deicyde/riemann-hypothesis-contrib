@@ -21,10 +21,10 @@ theorem ev_DX (Y x : Mat C N) (f : MP C N) : ev x (DX Y f) = dAt f x (Y * x) := 
     rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul]
     simp only [ev, map_add (f := _), map_mul] at hf ⊢
     rw [hf]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [DX, MvPolynomial.mkDerivation_X, map_sum, map_mul, MvPolynomial.eval_C, MvPolynomial.eval_X,
-      dAt, ev, Derivation.leibniz, smul_eq_mul, map_add, map_mul, MvPolynomial.pderiv_X, add_mul,
-      Finset.sum_add_distrib, Matrix.mul_apply]
+
+    simp only [DX, MvPolynomial.mkDerivation_X, map_sum, map_mul, MvPolynomial.eval_C, MvPolynomial.eval_X,
+    dAt, ev, Derivation.leibniz, smul_eq_mul, map_add, map_mul, MvPolynomial.pderiv_X, add_mul,
+    Finset.sum_add_distrib, Matrix.mul_apply]
     congr 1
     · simp [Pi.single_apply, apply_ite (MvPolynomial.eval _)]
     · rw [Finset.mul_sum]; simp only [mul_assoc]

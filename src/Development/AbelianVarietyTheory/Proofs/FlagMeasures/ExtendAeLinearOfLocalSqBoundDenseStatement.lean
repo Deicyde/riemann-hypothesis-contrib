@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExtendAeLinea
 @[expose] public section
 
 open MeasureTheory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.extend_ae_linear_of_local_sq_bound_dense : ∀ {X : Type} [MeasurableSpace X] (μ : Measure X) (K : ℕ → Set X),
     (∀ n, MeasurableSet (K n)) → ⋃ n, K n = Set.univ →
     ∀ {H : Type} [NormedAddCommGroup H] [NormedSpace ℂ H]

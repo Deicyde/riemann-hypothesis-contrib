@@ -22,7 +22,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 open GroundTheory.Heights₂.Heights TensorProduct
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Sl
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.theta_function_canonical_form : ∀ (g : ℕ) (τ h Hm : Matrix (Fin g) (Fin g) ℂ) (a c : Fin g → ℝ) (Λ : Submodule ℤ (Fin g → ℂ))
     (θ : (Fin g → ℂ) → ℂ) (κ : ℂ) (b : ℝ),
     τ.IsSymm → (τ.map Complex.im).PosDef → IsUnit h.det →

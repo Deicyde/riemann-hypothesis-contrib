@@ -182,7 +182,7 @@ theorem levPt_levRep {S : Type} [CommRing S] (x0 : Sp S ⟶ Xo.X) (a : Dw.La) :
   unfold levPt
   rw [he]
 
-set_option maxHeartbeats 1000000 in
+
 theorem roots {N : ℕ} (hN : 0 < N) {mk : Dw.La →ₗ[𝓞 E] (Fin r → E)} (hm : IsMark l L mk) (hA : A.Marked mk)
     (hM : l.M ∣ N) {Y : Fin r → E} {q : LevQ Dw l}
     (h1 : ∃ a ∈ Mfr l • (⊤ : Submodule (𝓞 E) Dw.La), Submodule.Quotient.mk a = q ∧ Y - ((l.M : E)⁻¹) • mk a ∈ L)

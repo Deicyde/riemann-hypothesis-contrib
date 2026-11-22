@@ -15,8 +15,8 @@ namespace GlobalTheory.TopLevelInv
 
 section ColCoord
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 variable {D : D7}
 
@@ -66,8 +66,8 @@ theorem loc_finE_u_colCoord {T : Type} {L : LevCh D T} {sc : Consts} {G : GridDa
       intro PP hPP
       refine cpt_sg_eq_zero ((cpt_of_isIdemAt (hes PP hPP)).2 _ fun e => hoff PP hPP q hq ?_)
       rw [← e]; exact (natCast_mem_cP w q).2 hqw
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), toEAf_cA, map_sum]
+
+    simp only [map_add (f := _), toEAf_cA, map_sum]
     rw [Finset.sum_eq_zero hA, Finset.sum_eq_zero hB, add_zero]
   apply Units.ext
   refine Matrix.ext fun i j => ?_
@@ -97,8 +97,8 @@ theorem conj_inv_inv_colCoord {Γ : Type} [Group Γ] (b f : Γ) : (b⁻¹ * f⁻
 theorem conj_inv_colCoord {Γ : Type} [Group Γ] (b f : Γ) : b⁻¹ * f⁻¹ * b = (b⁻¹ * f * b)⁻¹ := by group
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1600000 in
+
+
 theorem colAt_movedPt_conj : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil} {U : Set T} (S : GridChoice W U) {t : T}, t ∈ U → ∀ (j : ℕ) (hj : j + 1 < D.R.m) (k : FinPt G (.top (j + 1))), ∀ w ∈ locPl G t,
     ∀ x : ∀ j' : Fin D.R.m, WO (G.pS (.top t j' : Pair T)) (G.pT (.top t j' : Pair T)),
       S.colAt t w (movedPt t j hj ((S.N.u (.top (j + 1)))⁻¹ * k * S.N.u (.top (j + 1))) x) = colMove j (kapAt S t j hj k w) (S.colAt t w x) := by

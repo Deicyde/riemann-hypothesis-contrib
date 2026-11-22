@@ -59,7 +59,7 @@ variable (D : D7) (sc : Scale)
   (hPos : ∀ u w hg, (packC D Lc I ψ u w hg).posOK (iK u w hg) (lam u w hg))
 
 
-set_option maxHeartbeats 32000000 in
+
 include hK hPos in
 theorem comparison_statements (hJ : ∀ u, Joint0 H0.lev0 u (T u))
     (h0 : ∀ u, LevelZeroCharacterRational (D := recC D sc 1 Lc I ψ hd) T u)

@@ -218,7 +218,7 @@ variable [Fintype S] (n ℓ k : ℕ) [NeZero n] (hℓ : ℓ.Prime) (hnk : n = �
   (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
 
 
-set_option maxHeartbeats 1600000 in
+
 omit [Fintype S] in
 include hℓ hnk hS in
 theorem exists_gsUnitsData_cup_bock (t : sInvariantSubgroup (F := K.1) ℚ̄ S)

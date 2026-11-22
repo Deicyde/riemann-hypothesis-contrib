@@ -19,7 +19,7 @@ theorem subsingleton_tmul {O N M : Type} [CommRing O] [AddCommGroup N] [Module O
   | tmul n x => rw [Subsingleton.elim x 0, TensorProduct.tmul_zero]
   | add a b ha hb => rw [ha, hb, add_zero]
 
-set_option maxHeartbeats 1000000 in
+
 theorem main : ∀ {O A G : Type} [CommRing O] [CommRing A] [Algebra O A] [CommRing G] [Algebra O G] [Module.Flat O G]
     {I : Ideal A} (γ : DividedPowers I) (m : ℕ) (S : GrSplit O γ m) (u v : ℕ)
     {M : Fin m → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module O (M i)] {M' : Type} [AddCommGroup M']

@@ -311,7 +311,7 @@ theorem swap_datum {Tau : Type} [Fintype Tau] {tauE : Tau → (E →+* ℂ)} {χ
     rw [e1] at this
     exact this
 
-set_option maxHeartbeats 400000 in
+
 theorem swap_transport {ξ ξ' : AF F ⊗[F] E} {JA : Matrix (Fin nT) (Fin nT) E} {JB JB' : Matrix (Fin nS) (Fin nS) E}
     (hle : GlobalTheory.WeilM.UG (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) JB') ≤ GlobalTheory.WeilM.UG (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) JB)) {κ : Type} [Fintype κ]
     (co : GlobalTheory.WeilM.Darboux (GlobalTheory.WeilM.symp (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) ξ ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) JA) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) JB)) κ)

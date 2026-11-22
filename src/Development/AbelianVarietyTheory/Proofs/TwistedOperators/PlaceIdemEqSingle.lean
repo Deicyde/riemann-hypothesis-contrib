@@ -60,7 +60,7 @@ theorem finPart_algebraMap (x : AF D.host.F) :
   rw [Algebra.TensorProduct.algebraMap_apply, Algebra.TensorProduct.map_tmul]
   rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_idem_half : ∀ (D : D7), ∃ e : AE D, e * e = e ∧ e * cA D e = 0 ∧ finPart D e ∈ intAE D ∧
     finPart D (cA D e) ∈ intAE D ∧ ∃ h : AE D, finPart D h ∈ intAE D ∧ 2 * h = 1 - e - cA D e := by
   intro D
@@ -91,8 +91,8 @@ theorem exists_idem_half : ∀ (D : D7), ∃ e : AE D, e * e = e ∧ e * cA D e 
     rw [Finset.sum_eq_single v (fun w hw hwv => cross _ _ v w (Ne.symm hwv) (absE v hv) (absE w hw))
       (fun h => absurd hv h), hEE v hv]
   have hec : (∑ v ∈ P, E v) * cA D (∑ v ∈ P, E v) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_mul_sum]
+
+    rw [map_sum, Finset.sum_mul_sum]
     refine Finset.sum_eq_zero fun v hv => ?_
     rw [Finset.sum_eq_single v (fun w hw hwv => cross _ _ v w (Ne.symm hwv) (absE v hv) (absC w hw))
       (fun h => absurd hv h), hEc v hv]

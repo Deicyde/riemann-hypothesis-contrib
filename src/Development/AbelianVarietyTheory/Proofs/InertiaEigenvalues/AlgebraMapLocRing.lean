@@ -79,8 +79,8 @@ theorem simple_zero (i : ZMod n) (ζ : LL) (hζ : QRoot W i ζ) :
   have h1 : W.lev i ζ W.Q * ((PowerSeries.C ζ * E) ^ (PD.p ^ (W.s - 1)) - 1) =
       E ^ (PD.p ^ W.s) - 1 := by
     rw [GlobalTheory.WachHeightTest.Q_eq]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_pow, map_add (f := _), map_one, hlev]
+
+    simp only [map_sum, map_pow, map_add (f := _), map_one, hlev]
     rw [geom_sum_mul, ← pow_mul, ← pow_succ, ← hs, mul_pow, ← map_pow, hp.pow_eq_one, map_one,
       one_mul]
   have h2 : PowerSeries.X ^ 2 ∣ E ^ (PD.p ^ W.s) - 1 := by

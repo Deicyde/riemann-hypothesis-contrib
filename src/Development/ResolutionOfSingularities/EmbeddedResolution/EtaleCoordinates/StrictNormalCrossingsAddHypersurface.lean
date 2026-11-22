@@ -543,8 +543,8 @@ theorem exists_etaleChart_update_coord {X : Scheme.{u}} {k : Type u} [Field k]
           (∑ i ∈ S, a i * c.coord i) =
         (∑ i ∈ S, a i * D (c.coord i)) +
           ∑ i ∈ S, c.coord i * D (a i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, ← Finset.sum_add_distrib]
+
+      rw [map_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
       simp only [Derivation.leibniz, smul_eq_mul]
     rw [h1, Finset.sum_eq_single_of_mem j hjS h3, hDself, mul_one]
@@ -667,9 +667,9 @@ theorem hasStrictNormalCrossingsWith_cons_of_le {X : Scheme.{u}} {k : Type u} [F
         (X.presheaf.map (homOfLE hVU).op).hom (c.coord i)) := by
     funext i
     by_cases hij : i = j
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [Function.update_apply, if_pos hij, hij, hc2j, map_sum]
-        exact Finset.sum_congr rfl fun t _ => map_mul _ _ _
+
+    · rw [Function.update_apply, if_pos hij, hij, hc2j, map_sum]
+      exact Finset.sum_congr rfl fun t _ => map_mul _ _ _
     · rw [Function.update_apply, if_neg hij]
       exact hc2ne i hij
   have hupd : Ideal.span (c2.coord '' (S : Set (Fin m)))

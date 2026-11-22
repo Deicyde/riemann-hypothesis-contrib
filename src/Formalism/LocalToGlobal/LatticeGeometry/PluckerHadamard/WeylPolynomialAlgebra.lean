@@ -258,8 +258,8 @@ theorem weyl_coeff (j : ℕ) (ν : Ψ → Fin N → ℝ) (n k : ℕ) (hD : Forma
     Polynomial.C ((D.choose m : ℝ) * degFlL Ψ N (μ ^ m * L ^ (D - m))) * Polynomial.X ^ (D - m) with hPLdef
   have hPL : ∀ ε : ℝ, PL.eval ε = degFlL Ψ N ((μ + C ε * L) ^ D) := by
     intro ε
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [add_pow, map_sum, hPLdef, Polynomial.eval_finsetSum]
+
+    rw [add_pow, map_sum, hPLdef, Polynomial.eval_finsetSum]
     refine Finset.sum_congr rfl (fun m _ => ?_)
     have e : μ ^ m * (C ε * L) ^ (D - m) * ((D.choose m : ℕ) : Pol Ψ N) =
         C (ε ^ (D - m) * (D.choose m : ℝ)) * (μ ^ m * L ^ (D - m)) := by

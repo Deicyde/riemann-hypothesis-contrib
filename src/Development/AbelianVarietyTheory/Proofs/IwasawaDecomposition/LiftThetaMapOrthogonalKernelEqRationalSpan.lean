@@ -31,8 +31,8 @@ variable {K : Type} [Field K] {σ : K →+* ℂ}
 theorem semi_expand {W : Type} [AddCommGroup W] [Module ℂ W] {m : ℕ} (f : (Fin m → K) →ₛₗ[σ] W) (v : Fin m → K) :
     f v = ∑ l, σ (v l) • f (Pi.single l 1) := by
   conv_lhs => rw [← Finset.univ_sum_single v]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [← map_smulₛₗ]
   congr 1
@@ -104,8 +104,8 @@ theorem orth_ker_eq_span [NumberField K] [StarRing K] {V W : Type} [NormedAddCom
       exact Submodule.sum_mem _ fun l _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨l, rfl⟩)
     obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 (hsub hy)
     have hc : (Θ.map σ) *ᵥ c = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at h0
+
+      rw [map_sum] at h0
       simp only [map_smul, hθ, hPZ] at h0
       have e : ∀ k, jW (Θ *ᵥ Pi.single k 1) = ∑ l, σ (Θ l k) • jW (Pi.single l 1) := fun k => by
         rw [semi_expand jW]
@@ -142,7 +142,7 @@ theorem orth_ker_eq_span [NumberField K] [StarRing K] {V W : Type} [NormedAddCom
   rw [hb0, add_zero]; exact ha
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem orth_ker_thetaP : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type) (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat3 D A3 Ks) (F : Face3 D A3) (cG : G0 R.Pg D.R.r ≃* G0g D.nd) (X0 : BaseLevelRowSide D) (Y : Read (A3 := A3) R.toRealDat F.lv2 X0) (Z : ReadL R F X0 Y), Pins R F cG → Holds R F → ∀ (i : Fin D.R.m) (t : T), (LinearMap.ker (D.what₂.thetaP (Y.tup t) ((i : ℕ) + 1)))ᗮ = Submodule.span ℂ (Set.range fun a => D.what₂.jMt (Y.tup t) ((i : ℕ) + 1) (Y.eMt i t (lZ0 D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t *ᵥ a))) := by
   intro D G _ _ Pl0 I0 T A3 Ks _ _ _ R F cG X0 Y Z hP hH i t
   have hR : ComplexDataConditionsBaseLevel A3 F.P0 F.ψ0 F.P1 F.ψ1 F.Dc F.Sp F.Zsc (R.toCx3 F) 1 (U2.eigensystemChoice A3 (R.toCx3 F) F.P0 F.ψ0 F.P1 F.ψ1 hH.prim.hecke.2.choose) hH.prim.hecke.1.choose hH.prim.hecke.2.choose (R.gEx F) (R.gWx F) := by

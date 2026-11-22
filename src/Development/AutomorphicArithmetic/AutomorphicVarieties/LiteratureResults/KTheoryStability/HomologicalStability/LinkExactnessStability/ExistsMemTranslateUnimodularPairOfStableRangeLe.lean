@@ -14,8 +14,8 @@ theorem finsupp_coord_ideal_eq_top {R : Type} [CommRing R] (u : ℕ →₀ R) (g
     (hg : g u = 1) (K : Ideal R) (hK : ∀ i, u i ∈ K) : K = ⊤ := by
   rw [Ideal.eq_top_iff_one, ← hg]
   rw [show g u = g (u.sum Finsupp.single) by rw [Finsupp.sum_single]]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finsupp.sum, map_sum]
+
+  rw [Finsupp.sum, map_sum]
   refine Ideal.sum_mem _ fun i _ => ?_
   rw [← Finsupp.smul_single_one, map_smul, smul_eq_mul]
   exact Ideal.mul_mem_right _ _ (hK i)
@@ -34,8 +34,8 @@ private theorem linearMap_apply_mem_span_range_coeffs {R : Type} [CommRing R] (w
     (g : (ℕ →₀ R) →ₗ[R] R) : g w ∈ Ideal.span (Set.range fun i => w i) := by
   have e : g w = ∑ i ∈ w.support, w i * g (Finsupp.single i 1) := by
     conv_lhs => rw [← Finsupp.sum_single w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finsupp.sum, map_sum]
+
+    rw [Finsupp.sum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← Finsupp.smul_single_one, map_smul, smul_eq_mul]
   rw [e]
@@ -107,8 +107,8 @@ theorem unimodular_partner_aff : ∀ (R : Type) [CommRing R] (s : ℕ), StableRa
     intro m hm
     simp [x, hy0 m hm]
   have hφx : φ x = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [x, map_add (f := _), hφj, zero_add, y, map_sum]
+
+    simp only [x, map_add (f := _), hφj, zero_add, y, map_sum]
     exact Finset.sum_eq_zero fun i _ => hφs _ _ i.isLt
   let v' : ℕ →₀ R := v - v j • x
   have hv'i : ∀ i : Fin n, v' i = v i + v j * (t i * a j) := by

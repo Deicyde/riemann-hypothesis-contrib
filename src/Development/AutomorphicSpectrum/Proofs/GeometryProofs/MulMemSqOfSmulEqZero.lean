@@ -177,9 +177,9 @@ theorem isBaseChange_of_sandwich [Fintype W] (L : Submodule R (W → Ω)) (c : R
       intro a
       rw [hgs]
       exact smul_comm _ _ _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl fun a _ => h3 a, ← Finset.smul_sum, ← map_sum, hsum, hgs, smul_smul,
-      inv_mul_cancel₀ hc, one_smul]
+
+    rw [Finset.sum_congr rfl fun a _ => h3 a, ← Finset.smul_sum, ← map_sum, hsum, hgs, smul_smul,
+    inv_mul_cancel₀ hc, one_smul]
   · apply LinearMap.ext
     intro h
     have h3 : ∀ a, g'' ((c : Ω) • (Pi.single a (1 : Ω) : W → Ω)) = g (bas a) := fun a =>
@@ -189,8 +189,8 @@ theorem isBaseChange_of_sandwich [Fintype W] (L : Submodule R (W → Ω)) (c : R
       ext x
       simp [Finset.sum_apply, Pi.single_apply, inv_mul_cancel_right₀ hc]
     conv_lhs => rw [h4]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [map_smul, h3, mul_smul]
 

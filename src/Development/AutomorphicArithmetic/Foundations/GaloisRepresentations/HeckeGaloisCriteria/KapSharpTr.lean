@@ -13,7 +13,7 @@ open Formalism.BasicNotions Formalism.MainNotions NumberField
 
 variable {D : D7} (Λ : CutD D)
 
-set_option maxHeartbeats 1600000
+
 
 @[reducible] def sideTr {EE : Type} [NormedAddCommGroup EE] [InnerProductSpace ℂ EE] [FiniteDimensional ℂ EE] (S : RowSide D EE) :
     RowSide (cut D Λ) EE := { S with }

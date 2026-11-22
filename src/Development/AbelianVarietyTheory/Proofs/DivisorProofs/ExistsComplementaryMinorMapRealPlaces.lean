@@ -190,9 +190,9 @@ theorem exists_star (n : ι → ℕ) (h : a + a' = a + a') :
     Fintype.linearCombination ℂ (fun T => (((sgn h T : ℤˣ) : ℤ) : ℂ) • GlobalTheory.MinorFrame.prodMinors (cTup h T))
   have key : ∀ c N, (∀ τ, (N τ).det ≠ 0) → eval (xPt N) (A c) = lam n N * eval (yPt N) (B c) := by
     intro c N hN
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [A, B, Fintype.linearCombination_apply, map_sum, smul_eq_C_mul, eval_mul, eval_C, Finset.mul_sum,
-      eval_xPt_prodMinors h N hN]
+
+    simp only [A, B, Fintype.linearCombination_apply, map_sum, smul_eq_C_mul, eval_mul, eval_C, Finset.mul_sum,
+    eval_xPt_prodMinors h N hN]
     refine Finset.sum_congr rfl fun T _ => ?_
     ring
   have hlam : ∀ N : ι → Matrix (Fin (a + a')) (Fin (a + a')) ℂ, (∀ τ, (N τ).det ≠ 0) → lam n N ≠ 0 := by

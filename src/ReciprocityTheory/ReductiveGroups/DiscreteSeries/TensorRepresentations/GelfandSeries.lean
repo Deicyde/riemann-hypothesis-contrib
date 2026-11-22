@@ -78,8 +78,8 @@ theorem gelfandSeries_eq (l : Fin n → ℂ) :
   ring
 
 theorem sum_gx_eq_gval (l : Fin n → ℂ) (k : ℕ) : ∑ r, gx l k r = gval l k := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [gval, gelfandSeries_eq, PowerSeries.coeff_succ_X_mul, map_sum]
+
+  rw [gval, gelfandSeries_eq, PowerSeries.coeff_succ_X_mul, map_sum]
   simp [gxSeries]
 
 end ReciprocityTheory.ChartRestriction.DS

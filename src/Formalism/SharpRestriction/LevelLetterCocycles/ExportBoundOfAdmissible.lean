@@ -348,7 +348,7 @@ theorem lA_lt_lStar : lA L < lStar L := by
       mul_le_mul_of_nonneg_right h1C hU18.le, mul_le_mul_of_nonneg_right hm2 hb0]
   exact lt_of_le_of_lt hA hlow
 
-set_option maxHeartbeats 1000000 in
+
 theorem exc_pt {l : ℕ} (hl : lStar L < l) :
     bbB L C + lenB L C l ≤ 1000 * (C + 1) ^ 2 * Ub L C ^ 9 := by
   have hls := seven_lt_lStar L P
@@ -892,7 +892,7 @@ section Point
 variable {C : ℝ} (hC : 0 < C) (P : ParameterChoice' D L) (hPar : ParametersPolynomiallyBounded L C P) (hL : Large L.sc.x L.sc.eps C)
 include hC P hPar hL
 
-set_option maxHeartbeats 1000000 in
+
 open Classical in
 theorem point_bound (tb : Tab L) (hA : AdmT L tb C P) (S : Finset ℕ) (hS : ∀ l ∈ S, l.Prime) :
     6 + UpperTheory.KStar.nuBudget D + Real.log (Formalism.MainNotions.N.hE D.host : ℝ) + Real.log (D.what₂.restRowsFiniteGroupCard : ℝ) +

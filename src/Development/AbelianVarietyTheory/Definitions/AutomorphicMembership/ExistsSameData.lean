@@ -11,8 +11,8 @@ noncomputable section
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Rows NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 2000000
+
+
 
 namespace GlobalTheory.TwInputs.Move
 
@@ -1106,8 +1106,8 @@ open Formalism.L2.Host (embLL0 CharFrame)
 open GlobalTheory.TwSys GlobalTheory.TwAll GlobalTheory.SupLaw GlobalTheory.LiftLeaf
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

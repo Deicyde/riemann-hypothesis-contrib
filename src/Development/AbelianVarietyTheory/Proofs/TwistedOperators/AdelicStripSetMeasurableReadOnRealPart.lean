@@ -197,7 +197,7 @@ theorem unit_mix {ρ : ℕ} (m' : Matrix (Fin ρ) (Fin ρ) (AE D)) (hlo : ∀ i 
   refine ⟨((Matrix.isUnit_iff_isUnit_det v).2 hvdet).unit, ?_, hv⟩
   exact (GlobalTheory.UniIndexPrime.mem_uniSub _).2 ⟨hvlo, hvd⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem mem_Rgrp_of (W : HSp D) {ρ : ℕ} {X : Mx D W.rank ρ} {Y : Mx D ρ W.rank} {q : GA D W} (hq : q ∈ GinfC W)
     (u : GL (Fin ρ) (AE D)) (hu : u ∈ UX D ρ) (hQ : eInf D • (mt W q ⬝ X ⬝ u.1) ∈ Qset X Y) : q ∈ Rgrp W X := by
   obtain ⟨w, hw⟩ : ∃ w, w = eInf D • (mt W q ⬝ X ⬝ u.1) := ⟨_, rfl⟩

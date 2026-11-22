@@ -32,7 +32,7 @@ def ThSpan (M : Model F E) (r : ℕ) : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module E V] (H : HermSp M V) (t : Term V M r), H.IsGeneric t →
     Submodule.span E (ThL H t : Set V) = H.W0 t.f t.f'
 
-set_option maxHeartbeats 800000 in
+
 theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) (hE : GlueEta M r) (hV : GlueConv M r)
     (hP : GenOfPrim M r n) (hG : GramMM M r n) (hFG : ThFG M r) (hS : ThSpan M r) : GlueBack M r n := by
   intro V _ _ H hn t₁ f₂ f₂' φ φ' hT hDl hMM θ hθ

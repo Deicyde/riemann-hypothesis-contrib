@@ -13,7 +13,7 @@ open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Fo
   Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.NGCut Formalism.L2.SG.TermOp
 
 set_option linter.dupNamespace false
-set_option maxHeartbeats 1600000
+
 
 namespace Formalism.L2.SG.NGCut.NormalVectorPairings
 

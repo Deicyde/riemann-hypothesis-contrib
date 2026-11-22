@@ -76,8 +76,8 @@ theorem UpperTheory.beS_constantCoeff_eq_zero_and_wtGe :
         rwa [MvPowerSeries.coeff_zero_eq_constantCoeff_apply]
       have := ((hbe r hr).2.2.1 0 h').1
       simp [degE] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_eq_zero fun b _ => ?_
     exact MvPowerSeries.constantCoeff_subst_eq_zero
       (MvPowerSeries.hasSubst_of_constantCoeff_zero (hX0 r b)) (hX0 r b) hbe0

@@ -12,8 +12,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open Formalism.IndefR.Links (PolF)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.TwistDetStab
 
@@ -51,8 +51,8 @@ theorem idem_mul_idem_of_disjoint {Q s s' : Finset (Pl D.host.E)} (h : SplitSet 
 
 theorem idem_mul_conj {Q s s' : Finset (Pl D.host.E)} (h : SplitSet Q) (hs : s ⊆ Q) (hs' : s' ⊆ Q) :
     idem s * cA D (idem s') = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [idem, idem, map_sum, Finset.sum_mul_sum]
+
+  rw [idem, idem, map_sum, Finset.sum_mul_sum]
   exact Finset.sum_eq_zero fun i hi => Finset.sum_eq_zero fun j hj => h.mul_conj (hs hi) (hs' hj)
 
 theorem val_mul (d e₁ e₂ : AE D) (h : e₁ * e₂ = 0) :
@@ -106,8 +106,8 @@ theorem detChar_eq_prod_res : ∀ {D : D7} {V : HSp D} {A : Type} [CommGroup A] 
     refine ht.unram _ ?_ (GlobalTheory.PlaceDatum.finPart_mem_of_toEAf (GlobalTheory.StabDet.toEAf_detAt_mem hst _ heR))
       (GlobalTheory.PlaceDatum.finPart_mem_of_toEAf (GlobalTheory.StabDet.toEAf_detAt_inv_mem hst _ heR)) ?_
     · have hinf : infPart D (idem (Q' \ t.Q)) = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [idem, map_sum]
+
+        rw [idem, map_sum]
         exact Finset.sum_eq_zero fun P hP => infPart_idemAt P _ (hQ'.isIdemAt (hR hP))
       show infPart D (idem (Q' \ t.Q) * (mt V κ).det + (1 - idem (Q' \ t.Q))) = 1
       rw [map_add (f := _), map_mul, map_sub, map_one, hinf]

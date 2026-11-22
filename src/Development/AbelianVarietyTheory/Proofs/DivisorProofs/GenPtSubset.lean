@@ -119,7 +119,7 @@ abbrev sympPt (Γ : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.G
     (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.incM D.host.F Γ.W.J) u u'
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem symp_eq (e : Num G i j) (Γ : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.Geo G i j) (hW : Γ.V.J = (1 : D.host.E) • (spW G i j).gram)
     (hWW : Γ.W.J = skewGram (spV G i j) (spV₁ G i j) e) (x x' : Pt G i j) :
     sympPt Γ x x' = symplO _ _ (mapV e x) (mapV e x') + symplO _ _ (mapW e x) (mapW e x') := by

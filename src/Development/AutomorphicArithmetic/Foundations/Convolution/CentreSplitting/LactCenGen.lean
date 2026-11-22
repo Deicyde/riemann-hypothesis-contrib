@@ -28,7 +28,7 @@ theorem rUC_tmul {K : Type} [Field K] [NumberField K] {n : ℕ} (c : ℂ) (p : U
   rw [h]
   rfl
 
-set_option maxHeartbeats 800000 in
+
 theorem lactCen_of_gen (K : Type) [Field K] [NumberField K] (n : ℕ)
     (hG : Subgroup.closure (Set.range (isExpLieAlgebra K n).expG) = ⊤) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
     (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] (β : TI K n) (hβ : SmoothT β) :

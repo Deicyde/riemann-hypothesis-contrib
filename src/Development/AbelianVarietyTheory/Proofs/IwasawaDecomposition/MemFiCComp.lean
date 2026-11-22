@@ -47,7 +47,7 @@ def clsOfChart (β : Ch) (hβ : ∀ c, chOf c = β)
   stabI_range c := K.stabI_range ⟨c, hβ c⟩
 
 
-set_option maxHeartbeats 4000000 in
+
 def valOfG [Subsingleton Ch] (eV : (D.mem u).A.vT ≃ PlT D u)
     (K : ∀ β : Ch, LevelChart D (D.mem u).A.T (badG D) i hi (fun c : {c // chOf c = β} => (D.mem u).C.stab i c.1)
       (fun c => clsCrd D u i hi c.1)) (β : Ch) (hβ : ∀ c, chOf c = β)
@@ -82,7 +82,7 @@ def valOfG [Subsingleton Ch] (eV : (D.mem u).A.vT ≃ PlT D u)
   dilT v a k hk c δ hδ g hg := hD.dilT v a k hk β ⟨c, hβ c⟩ δ hδ g hg
 
 
-set_option maxHeartbeats 4000000 in
+
 def lvOfG (A : AtTTied u) (L : LevelCompatibleLattices (D.fm u) (D.mem u).A.T A.res i hi (fun c => clsCrd D u i hi c)) :
     LvTied u A i hi where
   pr := L.pr
@@ -100,12 +100,12 @@ variable (A : AtTTied u) (L : LevelCompatibleLattices (D.fm u) (D.mem u).A.T A.r
   (K : ∀ β : Ch, LevelChart D (D.mem u).A.T (badG D) i hi (fun c : {c // chOf c = β} => (D.mem u).C.stab i c.1)
       (fun c => clsCrd D u i hi c.1)) (β : Ch) (hβ : ∀ c, chOf c = β)
 
-set_option maxHeartbeats 4000000 in
+
 theorem fvOfG (fMe : ∀ β v, (K β).lev.fM (A.eV v).1 (A.eV v).2 ≃+ (D.mem u).A.Fv v) (h : FvTieG L A.eV K fMe) :
     FvTie (lvOfG A L) (clsOfChart β hβ (K β)) (fMe β) :=
   fun v c z hz => h v β ⟨c, hβ c⟩ z hz
 
-set_option maxHeartbeats 4000000 in
+
 theorem upOfG (eY : (D.mem u).C.Y i ≃ Fr D i hi) (W : ValTied u A.eV i hi (clsOfChart β hβ (K β))) (hY : W.eY = eY)
     (h : UpNatTieG L eY A.eV K) : UpNatTie (lvOfG A L) (clsOfChart β hβ (K β)) W := by
   intro v c z hz
@@ -114,7 +114,7 @@ theorem upOfG (eY : (D.mem u).C.Y i ≃ Fr D i hi) (W : ValTied u A.eV i hi (cls
   rw [hY] at hs
   exact h6 g s s' hs
 
-set_option maxHeartbeats 4000000 in
+
 theorem dnOfG (eY : (D.mem u).C.Y i ≃ Fr D i hi) (W : ValTied u A.eV i hi (clsOfChart β hβ (K β))) (hY : W.eY = eY)
     (h : DnNatTieG L eY A.eV K) : DnNatTie (lvOfG A L) (clsOfChart β hβ (K β)) W := by
   intro v c g hg
@@ -129,14 +129,14 @@ section Gen2
 
 variable {D : D7} {u : D.what₂.Word} {i : ℕ} {hi : i ≤ D.R.m}
 
-set_option maxHeartbeats 4000000 in
+
 theorem normOfG {eV : (D.mem u).A.vT ≃ PlT D u} {K : ClsTied u i hi} (eY : (D.mem u).C.Y i ≃ Fr D i hi)
     (W : ValTied u eV i hi K) (hY : W.eY = eY) (h : NormTieG (D.fm u) eY) : NormTie W := by
   intro s x Pc hPc o ho
   rw [hY] at hPc
   exact h s x Pc hPc o ho
 
-set_option maxHeartbeats 4000000 in
+
 theorem bwOfG (A : AtTTied u) {K : ClsTied u i hi} (eY : (D.mem u).C.Y i ≃ Fr D i hi)
     (W : ValTied u A.eV i hi K) (hY : W.eY = eY)
     (h : BwTieG (D.fm u) (D.mem u).A.T A.res eY (fun c => clsCrd D u i hi c)) : BwTie A W := by
@@ -147,7 +147,7 @@ theorem bwOfG (A : AtTTied u) {K : ClsTied u i hi} (eY : (D.mem u).C.Y i ≃ Fr 
 end Gen2
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem readsK_one {B : Base} {X : PreX B.toPre} (I : TC B X) (l : I.Laws) (Z : TC.Later B (I.cols l)) {u : B.Word} {a : I.ι}
     {i : ℕ} {hi : i ≤ B.R.m} {bad : Set (HeightOneSpectrum (𝓞 B.host.F))} {Ch : Type} {chOf : (I.stp u a i).Cl → Ch}
     {K : ∀ β : Ch, LevelChart (I.rec7 l Z) (B.T u) bad i hi (fun c : {c // chOf c = β} => (I.chain l u a).stab i c.1)

@@ -32,8 +32,8 @@ theorem weightZeroProj_weight (G₁ : GlW K U n) (G₂ : GlW K V n) (S : Finset 
   ext x
   have hd : dl c c = 0 := sub_self _
   change G₂.E c c (pr0 G₁ G₂ S φ x) - pr0 G₁ G₂ S φ (G₁.E c c x) = 0
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [scalar_projection_apply, scalar_projection_apply, map_sum, sub_eq_zero]
+
+  rw [scalar_projection_apply, scalar_projection_apply, map_sum, sub_eq_zero]
   refine Finset.sum_congr rfl fun ν _ => ?_
   rw [G₂.diag, G₁.shift, hd, sub_zero, G₁.diag, map_smul, map_smul]
 
@@ -60,8 +60,8 @@ theorem comp_comm2 (G₁ : GlW K U n) (G₂ : GlW K V n) (θ : U →ₗ[K] V)
   have hx : ∑ ν ∈ insert μ S, G₁.comp ν x = x :=
     G₁.sum_comp x _ (fun ν hν => hS ν (fun h => hν (Finset.mem_insert_of_mem h)))
   conv_rhs => rw [← hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, Finset.sum_eq_single μ]
+
+  rw [map_sum, map_sum, Finset.sum_eq_single μ]
   · exact (hw μ).symm
   · intro ν _ hne
     rw [← hw ν, G₂.idem, if_neg (Ne.symm hne)]
@@ -72,8 +72,8 @@ theorem weightZeroProj_comp (G₁ : GlW K U n) (G₂ : GlW K V n) (S : Finset (F
     (hθ : ∀ μ x, θ (G₁.comp μ x) = G₂.comp μ (θ x)) (φ : U →ₗ[K] U) :
     pr0 G₁ G₂ S (θ ∘ₗ φ) = θ ∘ₗ pr0 G₁ G₁ S φ := by
   ext x
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.comp_apply, scalar_projection_apply, map_sum, hθ]
+
+  simp only [LinearMap.comp_apply, scalar_projection_apply, map_sum, hθ]
 
 theorem weightZeroProj_trace (G₁ : GlW K U n) (S : Finset (Fin n → ℤ)) (hS : ∀ x, ∀ μ ∉ S, G₁.comp μ x = 0) (φ : U →ₗ[K] U) :
     LinearMap.trace K U (pr0 G₁ G₁ S φ) = LinearMap.trace K U φ := by
@@ -88,15 +88,15 @@ theorem weightZeroProj_trace (G₁ : GlW K U n) (S : Finset (Fin n → ℤ)) (hS
   have hp : pr0 G₁ G₁ S φ = ∑ ν ∈ S, G₁.comp ν * (φ * G₁.comp ν) := by
     ext x
     simp [scalar_projection_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hp, map_sum]
+
+  rw [hp, map_sum]
   calc ∑ ν ∈ S, LinearMap.trace K U (G₁.comp ν * (φ * G₁.comp ν))
       = ∑ ν ∈ S, LinearMap.trace K U (φ * G₁.comp ν) := by
         refine Finset.sum_congr rfl fun ν _ => ?_
         rw [LinearMap.trace_mul_comm, mul_assoc, hidem ν]
     _ = LinearMap.trace K U φ := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← map_sum, ← Finset.mul_sum, hsum, mul_one]
+
+        rw [← map_sum, ← Finset.mul_sum, hsum, mul_one]
 
 def Psi (G₁ : GlW K U n) (G₂ : GlW K V n) (S : Finset (Fin n → ℤ)) (l : ℕ) : Module.End K (U →ₗ[K] V) :=
   InvOp (homAct G₁.E G₂.E) l (List.finRange n) * pr0 G₁ G₂ S
@@ -169,8 +169,8 @@ theorem QQ_id (hNat : InvNat) (G₁ : GlW K U n) (G₂ : GlW K V n) (S : Finset 
     rw [smul_smul, hc, map_smul]
   rw [QQ_apply, Finset.smul_sum]
   simp_rw [key, hsc]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, b.sum_repr]
+
+  rw [← map_sum, b.sum_repr]
 
 end gen
 

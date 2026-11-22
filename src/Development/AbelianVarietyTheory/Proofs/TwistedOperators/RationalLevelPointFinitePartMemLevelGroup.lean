@@ -59,8 +59,8 @@ theorem mem_of_loc (L : Submodule (𝓞 E) (Fin n → E)) (𝔪 : Ideal (𝓞 E)
   choose ind hind1 hind0 using (exists_ind (F := F))
   set e₁ : FiniteAdeleRing (𝓞 F) F := ∑ v ∈ P, ind v with he₁
   have hev : ∀ w, evalV F w e₁ = if w ∈ P then 1 else 0 := fun w => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [he₁, map_sum]
+
+    rw [he₁, map_sum]
     split_ifs with hw
     · rw [Finset.sum_eq_single w (fun b _ hb => hind0 b w (Ne.symm hb)) (fun h => absurd hw h), hind1]
     · exact Finset.sum_eq_zero fun b hb => hind0 b w (fun h => hw (h ▸ hb))
@@ -131,7 +131,7 @@ theorem toAf_mem {k : ℕ} {L : Lt D.host.E k} {u : Fin k → D.host.E} (hu : u 
 end GlobalTheory.Ker.LevMove.Rat
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem GlobalTheory.Ker.LevMove.levK_of_rat_moves : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (Lv : SW.Level C.X) (γ : GL (Fin T.rank) D.host.E) (κ : Lv.J), Lv.Red (fun i => (γ : Matrix (Fin T.rank) (Fin T.rank) D.host.E) *ᵥ Lv.β i) κ → ∀ (a f g₁ g₂ : GA D T) (L : Lt D.host.E T.rank), a ∈ GinfC T → f ∈ GfC T → IsRatOf T γ (a * f) → g₁ ∈ GfC T → g₂ ∈ GfC T → TrivAt T (C.under Lv) g₁ → TrivAt T (C.under Lv) g₂ → L.FG → Submodule.span D.host.E (L : Set (Fin T.rank → D.host.E)) = ⊤ → (mapL γ L).FG → IsMov (fmt T g₁) C.X.Λ L → IsMov (fmt T g₂) C.X.Λ (mapL γ L) → C.LevK Lv (g₂⁻¹ * f * g₁) κ := by
   intro D S T C Lv γ κ hred a f g₁ g₂ L ha hf hrat h1 h2 t1 t2 hLfg hLs hMfg m1 m2
   set G : Matrix (Fin T.rank) (Fin T.rank) (AfE D) :=

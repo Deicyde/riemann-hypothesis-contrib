@@ -39,9 +39,9 @@ theorem bform_nrm (d : GL (Fin n) E) (x v : Fin n → E) :
     rw [Matrix.mulVec_mulVec, nrm, ← Units.val_mul, inv_mul_cancel_left, thetaR_val]
   simp only [bform]
   rw [h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, conj_conj, Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.map_apply,
-    Finset.mul_sum]
+
+  simp only [map_sum, map_mul, conj_conj, Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.map_apply,
+  Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring

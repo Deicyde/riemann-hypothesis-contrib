@@ -117,7 +117,7 @@ def galS (σ : Gal(PadicAlgCl p/K)) (m : ℕ) : acrisQ ℂ_[p] p m →+* acrisQ 
     rw [RingHom.comp_apply, Subring.subtype_apply, ← hys, galQuot_mk]
     exact ⟨ACris.galAway σ y, galAway_mem σ hy, rfl⟩
 
-set_option maxHeartbeats 2000000 in
+
 theorem iotaM_gal_smul (σ : Gal(PadicAlgCl p/K)) (m : ℕ) :
     (embedding₂ ℂ_[p] p m).comp (galCris σ) = (galS σ m).comp (embedding₂ ℂ_[p] p m) := by
   refine ringHom_ext fun y => ?_
@@ -182,8 +182,8 @@ theorem iota_periodT {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) :
   rw [← IsPerfectoidField.ker_evalB, RingHom.mem_ker, map_sub, sub_eq_zero] at h1
   rw [h1, ← IsPerfectoidField.evalB_toBDeRhamPlus]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_Ico_eq_sum_range, Nat.add_sub_cancel]
+
+  rw [map_sum, Finset.sum_Ico_eq_sum_range, Nat.add_sub_cancel]
   refine Finset.sum_congr rfl fun n _ => ?_
   rw [logTermZero]
   simp only [Subalgebra.coe_mul, Subalgebra.coe_pow, Subalgebra.coe_neg, Subalgebra.coe_one,

@@ -392,8 +392,8 @@ theorem isPtOf_mul (hQ : Q = ∅) {g k : GL (Fin n) (AfE F E)} {p : DecoF E n ST
       rw [Matrix.sub_mulVec, Matrix.one_mulVec, Pi.sub_apply, add_sub_cancel]
     rw [e, map_add (f := _), add_sub_right_comm]
     refine Valuation.map_add_lt _ hv ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Valuation.map_sum_lt _ one_ne_zero fun j _ => ?_
     rw [map_mul, map_mul]
     exact mul_lt_one_of_lt_of_le (h3 P i j) (DetSpec.val_le_of_mem_hatL P hint j)
@@ -432,7 +432,7 @@ open Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Gl
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem reads_gLevH {B : Base} {X : PreX B.toPre} (I : TC B X) (hPr : (B.primes X).Ok) (u : B.Word)
     (G : GLoc B.host.F B.host.E B.sp.cm.sig B.host.g) (i : ℕ) {Ch : Type} (chOf : (I.stp u I.mu0 i).Cl → Ch)
     {J : Matrix (Fin (B.R.N i)) (Fin (B.R.N i)) B.host.E} (hJ : J = 1) {T f : ℕ} {bad : Set (HeightOneSpectrum (𝓞 B.host.F))}
@@ -479,7 +479,7 @@ theorem reads_gLevH {B : Base} {X : PreX B.toPre} (I : TC B X) (hPr : (B.primes 
   exact this
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem chart_gLevH {B : Base} {X : PreX B.toPre} (I : TC B X) (hI : I.Ok) (hP : TC.Pins B X) (l : I.Laws) (Z : TC.Later B (I.cols l))
     (u : B.Word) (G : GLoc (I.rec7 l Z).host.F (I.rec7 l Z).host.E (sigD (I.rec7 l Z)) (I.rec7 l Z).host.g) (i : ℕ) (hi : i ≤ B.R.m)
     (Ch : Type) (chOf : (I.stp u I.mu0 i).Cl → Ch)

@@ -21,6 +21,6 @@ attribute [local instance] Over.cartesianMonoidalCategory
 attribute [local instance] algPadicInt algPadicField towerPadic factPadic GlobalTheory.PadicComplexHost.isAdicComplete
 open GlobalTheory.FlatModel
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.locallyOfFiniteType_of_isProjOver : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Sp R), IsProjOver s → LocallyOfFiniteType s := by
   first | exact @GlobalTheory.isProjOver_locallyOfFiniteType | exact GlobalTheory.isProjOver_locallyOfFiniteType | (intros; apply GlobalTheory.isProjOver_locallyOfFiniteType <;> assumption)

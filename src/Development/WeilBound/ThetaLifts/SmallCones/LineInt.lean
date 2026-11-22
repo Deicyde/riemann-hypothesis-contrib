@@ -51,9 +51,9 @@ theorem exists_so {B : Base F E} {M : Model σ X W} (hM : M.IsGood B.ψ) {ι : T
     ext y
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, pureA_pt]
   have h2 := congrArg Subtype.val (LinearMap.congr_fun hq ⟨_, h1⟩)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.comp_apply, Submodule.subtype_apply, map_sum, map_smul, LinearMap.id_apply, Submodule.coe_sum,
-    Submodule.coe_smul] at h2
+
+  simp only [LinearMap.comp_apply, Submodule.subtype_apply, map_sum, map_smul, LinearMap.id_apply, Submodule.coe_sum,
+  Submodule.coe_smul] at h2
   have h3 := congrFun h2 fun i => (w i).2
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at h3 ⊢
   exact h3.symm
@@ -71,8 +71,8 @@ theorem dom_int {M : Model σ X W} {om : Rep σ X W} (hom : ∀ x, ∀ Φ ∈ sc
   · refine (mul_le_mul_left (lintegral_mono (g := fun x => ∑ i, ENNReal.ofReal (p i (g i l) * (ht h : ℝ) ^ k i) * G i x)
       fun x => ?_) _).trans (le_of_eq ?_)
     · refine le_trans (le_of_eq ?_) ((enorm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => hb i (g i l) x h))
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [theta, ← hl₀ _ (hom _ _ (Submodule.sum_mem _ fun i _ => pureA_mem _ (h1 i))), map_sum, map_sum]
+
+      rw [theta, ← hl₀ _ (hom _ _ (Submodule.sum_mem _ fun i _ => pureA_mem _ (h1 i))), map_sum, map_sum]
       congr 1
       exact Finset.sum_congr rfl fun i _ => hl₀ _ (hom _ _ (pureA_mem _ (h1 i)))
     · rw [lintegral_finsetSum _ fun i _ => (hG i).const_mul _, Finset.sum_mul]
@@ -115,13 +115,13 @@ theorem lineInt_of (hS : Slice) (hI : SchInt) (hT : TateAbs) : LineInt := by
   choose T hT using fun i => hl₁ _ (h1 i)
   have e1 : (fun l : (AE F E)ˣ => l₁ (e (M.co.rho B.ψ (τ l.1 • incM F v₀) Ψ)) * (ν l : ℂ) * ((absE F E l : ℝ) : ℂ) ^ z) =
       fun l => ∑ i, T i (c l • g i l) := funext fun l => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h3, map_sum, mul_assoc, Finset.sum_mul]
+
+    rw [h3, map_sum, mul_assoc, Finset.sum_mul]
     exact Finset.sum_congr rfl fun i _ => by rw [hT, map_smul, smul_eq_mul, mul_comm]
   rw [e1]
   refine ⟨integrable_finsetSum _ fun i _ => (hf i (T i)).1, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [integral_finsetSum _ fun i _ => (hf i (T i)).1, map_sum]
+
+  rw [integral_finsetSum _ fun i _ => (hf i (T i)).1, map_sum]
   exact Finset.sum_congr rfl fun i _ => by rw [hT, (hf i (T i)).2]
 
 end PositivityTheory.ThKCT

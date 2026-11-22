@@ -38,8 +38,8 @@ theorem topPart_holds : TopPart := by
               refine Finset.sum_congr rfl fun t _ => ?_
               simp only [ext2, F, map_smul, LinearMap.comp_apply, LinearMap.flip_apply]
           _ = F (∑ t, a.repr u t • a t) := by
-              set_option synthInstance.maxHeartbeats 100000 in
-                rw [map_sum]
+
+              rw [map_sum]
               simp only [map_smul]
           _ = ext2 l p h' u v := by
               rw [a.sum_repr]
@@ -48,8 +48,8 @@ theorem topPart_holds : TopPart := by
       · rw [hΛ.1 u v, ← Finset.sum_smul]
         congr 1
         conv_rhs => rw [← a.sum_repr u]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         simp only [map_smul, hlam, smul_eq_mul, mul_one]
       · rw [hsum, sub_self]
         exact Submodule.zero_mem _

@@ -17,7 +17,7 @@ open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.
 open scoped Classical
 open GlobalTheory.CompanionTheory.FinActS
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.position_level_subgroups_exist : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ} {S : Set (Pl E)} {φ₁ φ₂ : ∀ w : Pl E, LF a b w} (h₁ : IsTestP φ₁) (h₂ : IsTestP φ₂),
     ∃ L : ∀ i : Slot S, Subgroup (GLw a i.pl × GLw b i.pl),
       (∀ i, IsOpen (L i : Set (GLw a i.pl × GLw b i.pl))) ∧ (∀ᶠ i in cofinite, L i = K2 a b i.pl) ∧

@@ -6,7 +6,7 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.CurveInstSt
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

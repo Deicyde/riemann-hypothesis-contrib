@@ -8,9 +8,9 @@ noncomputable section
 
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 400000
+
 set_option maxSynthPendingDepth 3
-set_option maxHeartbeats 1000000
+
 
 namespace PositivityTheory.Rg.BcB.F.ChiPin
 

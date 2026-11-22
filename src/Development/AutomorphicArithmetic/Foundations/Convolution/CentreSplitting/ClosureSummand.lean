@@ -12,7 +12,7 @@ open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalS
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
-set_option maxHeartbeats 1600000 in
+
 theorem UpperTheory.ConvolutionTheory.Dp.closureSummand :
     UpperTheory.ConvolutionTheory.Dp.ClosureSummand := by
   intro K _ _ n μ _ U hU hs h0 hirr

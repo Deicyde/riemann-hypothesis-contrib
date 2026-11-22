@@ -76,9 +76,9 @@ theorem schr_slice (co : Darboux B κ) (ψ : AddChar (AF F) ℂ) {v : HeightOneS
       simp only [hz', hz, Finset.sum_const_zero, add_zero]
     rw [← hl _ hat]
     refine congrArg (fun z => ψ (liftV v z)) ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, map_add (f := _), map_sum, map_mul, Pi.add_apply, hy, zero_add,
-      GlobalTheory.LatVac.evFin_liftV]
+
+    simp only [dotProduct, map_add (f := _), map_sum, map_mul, Pi.add_apply, hy, zero_add,
+    GlobalTheory.LatVac.evFin_liftV]
     have hi : evFin F v (⅟(2 : AF F)) = ⅟(2 : Fv F v) := by
       refine (invOf_eq_right_inv ?_).symm
       have hh : evFin F v (2 * ⅟(2 : AF F)) = 1 := by rw [mul_invOf_self, map_one]
@@ -184,13 +184,13 @@ theorem pure_vac_inj {ψ} (hG : Γ.M.IsGood ψ) {f f' : SInf D.host.F (Ix G i j)
     refine finprod_induction (· ≠ (0 : ℂ)) one_ne_zero (fun _ _ => mul_ne_zero) fun v => ?_
     by_cases hv : v ∈ hS.toFinset
     · have : (fun k => evalV D.host.F v (y k)) = ξ v := funext fun k => by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, Finset.sum_eq_single_of_mem v hv fun v' _ h => evalV_singleFin_ne h.symm _, evalV_singleFin_self]
+
+        rw [map_sum, Finset.sum_eq_single_of_mem v hv fun v' _ h => evalV_singleFin_ne h.symm _, evalV_singleFin_self]
       rw [this]
       exact hξ v
     · have : (fun k => evalV D.host.F v (y k)) = 0 := funext fun k => by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         exact Finset.sum_eq_zero fun v' h => evalV_singleFin_ne (fun e : v = v' => hv (e ▸ h)) _
       rw [this, of_not_not (mt hS.mem_toFinset.2 hv), Set.indicator_of_mem (by exact fun _ => zero_mem _)]
       exact one_ne_zero
@@ -261,7 +261,7 @@ theorem mem_of_sum_smul {m n : ℕ} {ι : Type} {P : Finset ι} {a : ι → AE D
   exact sum_mem h
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_gauss_datum : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T} (hL : L.Is μ₀) (W : G.Weil) (B : Frames G) (ρ : RealMatch W) (t : T) (i j : Fin D.R.m) (M : Vol G) (hst : SquareStanding G t)
     (e : Num G i j) (Bs : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base D.host.F D.host.E) (Γ : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.Geo G i j) (X : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chars D.host.F D.host.E)
     (om : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep D.sp.cm.sig Γ.V Γ.W) (om' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep D.sp.cm.sig Γ.V' Γ.W) (h : IsTripleOf W M t i j e Bs Γ X), IsTriple Bs Γ X om om' → IsTied t i j e Bs Γ X → ∀ n Φ τ τ',

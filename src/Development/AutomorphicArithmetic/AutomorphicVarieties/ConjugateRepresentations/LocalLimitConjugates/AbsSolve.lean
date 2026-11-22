@@ -10,7 +10,7 @@ open Filter Topology
 
 namespace UpperTheory.V.Cj.H
 
-set_option maxHeartbeats 400000 in
+
 theorem absSolve : AbsSolve := by
   intro I J L c cn hcn hlim
   classical

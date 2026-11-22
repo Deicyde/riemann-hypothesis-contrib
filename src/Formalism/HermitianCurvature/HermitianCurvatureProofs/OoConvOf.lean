@@ -56,7 +56,7 @@ theorem gN_Y_eq (hNI : NormInv) {P Q γ : Mx k r} (hP : P ∈ Formalism.QuantumD
       Matrix.nonsing_inv_nonsing_inv _ (hU _ hP), mul_assoc]
   rw [← ((hNI k r).2 _ hx).1, hxinv]
 
-set_option maxHeartbeats 1000000 in
+
 theorem ooConv_of (hSch : SchurH) (hNIs : NormIdSm) (hNI : NormInv) (hGG : GrowthG) (hDD : DecDD)
     (hBC : BeConv) : More.OOConv := by
   intro hIn k r Wp Wq _ _ _ _ _ _ _ _ D ε lam h H _ _ _ σ w0 u u' νq νq' hS1 hS2 l l' hbe hbe' γ hγ

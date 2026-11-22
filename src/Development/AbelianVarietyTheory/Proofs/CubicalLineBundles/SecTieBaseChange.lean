@@ -17,7 +17,7 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ScaledBas
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

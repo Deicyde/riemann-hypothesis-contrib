@@ -34,9 +34,9 @@ theorem lsub_one [DecidableEq σ] : lsub (1 : Matrix σ σ ℂ) = AlgHom.id ℂ 
 
 theorem lsub_mul (M N : Matrix σ σ ℂ) : lsub (M * N) = (lsub M).comp (lsub N) := by
   refine algHom_ext fun v => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [AlgHom.comp_apply, lsub_X, map_sum, map_mul, algHom_C, algebraMap_eq, Matrix.mul_apply,
-    Finset.sum_mul, Finset.mul_sum]
+
+  simp only [AlgHom.comp_apply, lsub_X, map_sum, map_mul, algHom_C, algebraMap_eq, Matrix.mul_apply,
+  Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun w _ => Finset.sum_congr rfl fun x _ => ?_
   ring
@@ -56,8 +56,8 @@ theorem pderiv_lsub [DecidableEq σ] (M : Matrix σ σ ℂ) (s : σ) (g : MvPoly
   | add p q hp hq => simp only [map_add (f := _), hp, hq, mul_add, Finset.sum_add_distrib]
   | mul_X p k hp =>
     have hX : pderiv s (lsub M (X k)) = C (M s k) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [lsub_X, map_sum, Finset.sum_eq_single s]
+
+      rw [lsub_X, map_sum, Finset.sum_eq_single s]
       · simp [pderiv_X]
       · intro b _ hb
         rw [Derivation.leibniz, pderiv_C, pderiv_X_of_ne hb]
@@ -87,11 +87,11 @@ theorem fockL_lsub_adj (M : Matrix σ σ ℂ) (F F' : MvPolynomial σ ℂ) :
       rw [map_mul, lsub_X, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [smul_eq_C_mul]; ring
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, map_sum, LinearMap.sum_apply]
+
+    rw [e1, map_sum, LinearMap.sum_apply]
     simp_rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, fockL_X_pderiv, hp]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mul_comm p, fockL_X_pderiv, pderiv_lsub, map_sum]
+
+    rw [mul_comm p, fockL_X_pderiv, pderiv_lsub, map_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [← smul_eq_C_mul, map_smul, Matrix.conjTranspose_apply, starRingEnd_apply]
 

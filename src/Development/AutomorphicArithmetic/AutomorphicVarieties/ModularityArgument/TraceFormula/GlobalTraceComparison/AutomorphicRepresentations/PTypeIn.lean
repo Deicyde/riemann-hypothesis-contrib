@@ -219,9 +219,9 @@ theorem typeIn_pf : PiAdm → DetZero → EvalBasis → CvIn → FormEx → Orth
       intro l
       have e : (fun γ => l (R γ z)) = ∑ b, l (zb b) • LinearMap.funLeft ℂ ℂ Prod.snd (w b) := by
         funext γ
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [hexp γ, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
-          LinearMap.funLeft_apply]
+
+        simp only [hexp γ, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
+        LinearMap.funLeft_apply]
         exact Finset.sum_congr rfl fun b _ => mul_comm _ _
       rw [e]
       exact Submodule.sum_mem _ fun b _ => Submodule.smul_mem _ _ ⟨w b, hw b, rfl⟩)

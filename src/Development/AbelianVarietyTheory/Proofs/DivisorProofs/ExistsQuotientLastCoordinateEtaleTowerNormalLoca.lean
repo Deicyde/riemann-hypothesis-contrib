@@ -18,8 +18,8 @@ namespace GlobalTheory.FieldPair
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
 open scoped TensorProduct in
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1600000 in
+
+
 open MvPolynomial in
 private lemma ne_zero_of_eval₂Hom_formallyEtale {A T : Type} [CommRing A] [CommRing T] [Nontrivial T]
     {n : ℕ} (ι : A →+* T) (τ : Fin n → T) (h : (MvPolynomial.eval₂Hom ι τ).FormallyEtale) (i : Fin n) :
@@ -62,8 +62,8 @@ private lemma ne_zero_of_eval₂Hom_formallyEtale {A T : Type} [CommRing A] [Com
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
 open scoped TensorProduct in
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1600000 in
+
+
 open MvPolynomial in
 private lemma formallyEtale_quotient_last {A T : Type} [CommRing A] [CommRing T] {n : ℕ}
     (ι : A →+* T) (τ : Fin (n + 1) → T) (h : (MvPolynomial.eval₂Hom ι τ).FormallyEtale) :
@@ -146,8 +146,8 @@ private lemma formallyEtale_quotient_last {A T : Type} [CommRing A] [CommRing T]
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
 open scoped TensorProduct in
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1600000 in
+
+
 private lemma isDomain_of_formallyEtale_of_isLocalRing {A B : Type} [CommRing A] [IsDomain A]
     [IsIntegrallyClosed A] [IsNoetherianRing A] [CommRing B] [IsLocalRing B] [Algebra A B]
     [Algebra.EssFiniteType A B] [Algebra.FormallyEtale A B] : IsDomain B := by
@@ -196,8 +196,8 @@ private lemma isDomain_of_formallyEtale_of_isLocalRing {A B : Type} [CommRing A]
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
 open scoped TensorProduct in
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1600000 in
+
+
 theorem _root_.GlobalTheory.FieldPair.IsEtTower.exists_quotient_last :
     ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K)
     (T : Subring L) (ι : R →+* T) (ψ : T →+* R) (τ : Fin (r + 1) → T)

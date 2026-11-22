@@ -16,8 +16,8 @@ open Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalis
 open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies GlobalTheory.OnCmp
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

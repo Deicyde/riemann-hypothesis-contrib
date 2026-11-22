@@ -44,7 +44,7 @@ theorem mem_HfD_gen {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K�
     exact (h g).symm
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 omit [IsDomain O] in
 theorem mem_HfD_iff (B : LocBridge l E Ω Gw O) {k : ℕ} (M : ↥Gw →* Matrix (Fin k) (Fin k) O)
     (w : ↥(GK B.Kw) → (Fin k → Br.LLw B) ⧸ stdG (Br.Ow B) (Br.LLw B) k) :
@@ -78,11 +78,11 @@ theorem vecS_mulVec (B : LocBridge l E Ω Gw O) {k : ℕ} (M : ↥Gw →* Matrix
   funext i
   change Br.toLLK B (∑ j, algebraMap O (FractionRing O) (M (Br.ι B g) i j) * u j) =
     ∑ j, Br.locM B M g i j * Br.toLLK B (u j)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, locM_apply]
+
+  simp only [map_sum, map_mul, locM_apply]
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem phi_mem_of_mem_bkG (B : LocBridge l E Ω Gw O) {k : ℕ} (M : ↥Gw →* Matrix (Fin k) (Fin k) O)
     (c : ↥(Z1 (WKG M))) (hc : Submodule.Quotient.mk c ∈ Br.bkG B P (WKG M) M) :
     Br.Phi B (WKG M) c ∈ HfD (P.PD B.Kw) (Br.lat B M) := by
@@ -102,7 +102,7 @@ theorem phi_mem_of_mem_bkG (B : LocBridge l E Ω Gw O) {k : ℕ} (M : ↥Gw →*
   exact Submodule.sub_mem _ h₁ hB
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem push_mem (B₀ : LocBridge l E Ω Gw O₀) (B : LocBridge l E Ω Gw O) (σ : GQ l)
     (hσ : ∀ g : ↥Gw, ((B.e g : ↥(GK B.Kw)) : GQ l) = σ * ((B₀.e g : ↥(GK B₀.Kw)) : GQ l) * σ⁻¹)
     (f : O₀ →+* O) (hf : Function.Injective f)
@@ -123,8 +123,8 @@ theorem push_mem (B₀ : LocBridge l E Ω Gw O₀) (B : LocBridge l E Ω Gw O) (
     intro g v
     funext i
     change φ (∑ j, Br.locM B₀ M₀ (θ g) i j * v j) = ∑ j, Br.locM B (mapM f M₀) g i j * φ (v j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, locM_apply, hφ, fracMap_alg, hθι]
+
+    simp only [map_sum, map_mul, locM_apply, hφ, fracMap_alg, hθι]
     rfl
   refine (mem_HfD_iff P B _ _).2 ⟨_, crystallineCocycle_transport_conjugation P B₀.Kw B.Kw B₀.LL B.LL θ hθ σ hσ' _ _ φ.toLinearMap hp z hzf,
     fun j => φ (m j), fun g => ?_⟩

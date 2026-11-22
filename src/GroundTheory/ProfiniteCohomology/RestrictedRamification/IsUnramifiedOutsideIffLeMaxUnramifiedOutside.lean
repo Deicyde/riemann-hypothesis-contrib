@@ -86,8 +86,8 @@ theorem isUnramifiedOutside_iff_le_maxUnramifiedOutside {E : IntermediateField F
     intro x hx
     have hx' : x = ∑ i, b.repr ⟨x, hx⟩ i • (b i : Ω) := by
       have := congrArg E.val (b.sum_repr ⟨x, hx⟩)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at this
+
+      rw [map_sum] at this
       simp only [map_smul] at this
       exact this.symm
     rw [hx']

@@ -80,7 +80,7 @@ private theorem isUnitDet_mul {e : AE D} {S : Finset (Formalism.L2.DIV.Pl D.host
   · rw [_root_.mul_inv_rev, Units.val_mul, map_mul]
     exact mul_mem hy.2.2 hx.2.2
 
-set_option maxHeartbeats 1000000 in
+
 private theorem isUnitDet_div {e : AE D} {S : Finset (Formalism.L2.DIV.Pl D.host.E)} (he : IsIdemSum e S) {k : ℕ}
     {L κ : Matrix (Fin k) (Fin k) (Lev.EAf D)} (hκ : IsIntM κ) {z y : (AE D)ˣ} (hz : IsUnitDet e (L * κ) z)
     (hy : IsUnitDet e κ y) : IsUnitDet e L (z * y⁻¹) := by
@@ -141,8 +141,8 @@ private theorem st_int {n : ℕ} {β k : GL (Fin n) (Lev.EAf D)} (h : k ∈ Form
 end UpperTheory.standardActionStabilizer
 
 open UpperTheory.standardActionStabilizer in
-set_option synthInstance.maxHeartbeats 100000 in
-set_option maxHeartbeats 4000000 in
+
+
 theorem UpperTheory.stdFst_actO_of_mem_stabilizer :
     ∀ (D : D7) (S T : HSp D) (βS : GL (Fin S.rank) (Lev.EAf D)) (βT : GL (Fin T.rank) (Lev.EAf D)) (ν : (AE D)ˣ →* Circle) (e : AE D) (Z : Finset (Formalism.L2.DIV.Pl D.host.E)) (I : Ideal (𝓞 D.host.E)),
       IsIdemSum e Z → ∀ g : GA D S, Lev.finE S g ∈ Formalism.L2.DIV.St βS → ∀ y : (AE D)ˣ,

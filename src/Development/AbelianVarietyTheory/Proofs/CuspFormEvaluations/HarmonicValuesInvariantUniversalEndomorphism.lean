@@ -419,7 +419,7 @@ theorem corr_of_val₂ {Y : Scheme.{0}} {K K' : Type} [Fintype K] [Fintype K'] {
     obtain ⟨J', hJ'⟩ := DegPull.exists_good' t'.PP.isLB y
     exact h _ _ y J J' hJ hJ'
 
-set_option maxHeartbeats 800000 in
+
 theorem isFrame_push (hG : GlobalFnsSt) (hA : IsAbelianScheme t'.G) (hw : w.IsGen)
     (hcub : LB.Gen.Maps (LB.linCombIso w (thφ t'.G (x3 t'.G)) thε) t'.cub.t (ν.cm.thetaPull t.PP.L t.cub.t))
     (hc : IsChartG t' x0' d F act tg uvec x') (hx : ∀ m, (x' m).left ≫ ν.φ = (x m).left) (he : FrRel w e' e)
@@ -676,7 +676,7 @@ theorem const_ad {d : ℕ} (B : Germ.FB S d (𝓞 E)) (a : 𝓞 E) : MvPowerSeri
   exact e.symm
 
 
-set_option maxHeartbeats 400000 in
+
 theorem exists_chart_push (hG : GlobalFnsSt) {ρ : Xo.X ⟶ Xo.X} (ν : SABMap Xo.univ.t Xo.univ.t ρ) {y y' : FrPt Xo c S}
     {pm : Gx y.x ⟶ Gx y'.x} {w : LB.Iso Xo.univ.t.PP.L (Xo.univ.t.PP.L.pull ν.cm.F)} (h0 : y'.x = y.x ≫ ρ)
     (p₁ : pm ≫ (fst (Over.mk y'.x) Xo.univ.t.G).left = (fst (Over.mk y.x) Xo.univ.t.G).left)

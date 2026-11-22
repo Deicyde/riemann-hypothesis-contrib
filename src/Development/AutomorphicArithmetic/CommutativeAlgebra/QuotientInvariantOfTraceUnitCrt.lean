@@ -15,7 +15,7 @@ private theorem isIntAf_one' {p : ℕ} [Fact p.Prime] : IsIntAf (1 : AfP p) := f
 private theorem inAf_mem' {p : ℕ} [Fact p.Prime] {D : Datum p} (y : D.La) : inAf D y ∈ LaHat D :=
   AddSubgroup.subset_closure ⟨1, y, isIntAf_one', rfl⟩
 
-set_option maxHeartbeats 200000 in
+
 theorem UpperTheory.quotient_invariant_of_trace_unit_crt :
     NumEx → QComp → QIso → ClsEx → TrEta → TrUnit → CongCRT → BaseInv := by
   intro hNumEx hQComp hQIso hClsEx hTrEta hTrUnit hCRT p _ D G L E _ _ gb w q _ r 𝔴 𝔫 S k T K₀ hLev N' N t c a hN't hNum C' C u hu W

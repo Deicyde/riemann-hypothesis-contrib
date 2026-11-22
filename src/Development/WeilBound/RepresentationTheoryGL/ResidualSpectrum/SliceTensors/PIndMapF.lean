@@ -71,10 +71,10 @@ theorem res_lie {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} 
       lieD_of_expansion F.2 G C b₁ b₂ hC h₁ h₂ m (eF m) X (fun j => G' j m) (fun j => hd₁ j m)]
     simp [Finset.sum_apply]
   funext m
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [res_apply, mul_one, eq1, map_sum,
-    lieD_of_expansion (ind_mem_Sm H hF hK) (fun j => tensOp f₁ f₂ (G j)) C b₁ b₂ hC h₁ h₂ m (e H m) X
-      (fun j => tensOp f₁ f₂ (G' j) m) (fun j => hd₂ j m)]
+
+  rw [res_apply, mul_one, eq1, map_sum,
+  lieD_of_expansion (ind_mem_Sm H hF hK) (fun j => tensOp f₁ f₂ (G j)) C b₁ b₂ hC h₁ h₂ m (e H m) X
+    (fun j => tensOp f₁ f₂ (G' j) m) (fun j => hd₂ j m)]
   simp [Finset.sum_apply]
 
 theorem ind_lie {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {f₁ : Sm E r →ₗ[ℂ] Sm E r}

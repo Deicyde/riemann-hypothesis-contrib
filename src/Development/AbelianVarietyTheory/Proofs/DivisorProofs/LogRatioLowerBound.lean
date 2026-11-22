@@ -49,7 +49,7 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicUni
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

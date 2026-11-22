@@ -85,8 +85,8 @@ lemma form_add {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] (p : �
     {ι : Type} [Fintype ι] (l : ι → R) (x y : ι → ZMod p) :
     algebraMap R C (∑ i, l i * (((x + y) i).val : R)) - algebraMap R C (∑ i, l i * ((x i).val : R))
       - algebraMap R C (∑ i, l i * ((y i).val : R)) ∈ pInt (C := C) R p := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, ← Finset.sum_sub_distrib]
+
+  simp only [map_sum, ← Finset.sum_sub_distrib]
   refine Submodule.sum_mem _ fun i _ => ?_
   have h := Nat.mod_add_div ((x i).val + (y i).val) p
   rw [← ZMod.val_add] at h

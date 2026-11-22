@@ -23,8 +23,8 @@ theorem aeval_smul_of_isHomogeneous {F K : Type*} [Field F] [Field K] [Algebra F
   classical
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, Finset.mul_sum]
+
+  rw [map_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
   have hdeg : ∑ j ∈ m.support, m j = d := by
     have := hg (mem_support_iff.mp hm)

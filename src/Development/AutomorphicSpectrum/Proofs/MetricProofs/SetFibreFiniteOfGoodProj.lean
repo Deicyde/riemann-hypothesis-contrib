@@ -171,8 +171,8 @@ private lemma exists_segre_poly_lemma_6 [DecidableEq K] [∀ k, DecidableEq (ι 
     · intro _
       rfl
   · conv_lhs => rw [b.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, eval_monomial]
+
+    simp only [map_sum, eval_monomial]
     refine Finset.sum_congr rfl (fun m hm => ?_)
     rw [(hμ m hm).2 z]
 
@@ -229,10 +229,10 @@ theorem segre_rel [DecidableEq K] [∀ k, DecidableEq (ι k)] {Q : Ideal (MRingO
         psiPoly Ψ j = segMono ι i ^ (n + 1) := by
     have h := congrArg
       (GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)) hqt
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sum, GradedAlgebra.proj_apply (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)
-        (segMono ι i ^ (n + 1)),
-      DirectSum.decompose_of_mem_same _ hsN] at h
+
+    rw [map_add (f := _), map_sum, GradedAlgebra.proj_apply (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)
+      (segMono ι i ^ (n + 1)),
+    DirectSum.decompose_of_mem_same _ hsN] at h
     rw [← h]
     congr 1
     refine Finset.sum_congr rfl (fun j _ => ?_)
@@ -249,8 +249,8 @@ theorem segre_rel [DecidableEq K] [∀ k, DecidableEq (ι k)] {Q : Ideal (MRingO
     exact hQh _ hq
   refine ⟨n + 1, Nat.succ_pos n, G, fun j => by simpa using hGdeg j, fun z hz => ?_⟩
   have hk := congrArg (MvPolynomial.eval z) key
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, map_pow, eval_segMono, hz.2 _ hqQ, zero_add] at hk
+
+  rw [map_add (f := _), map_sum, map_pow, eval_segMono, hz.2 _ hqQ, zero_add] at hk
   rw [← hk]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [map_mul, eval_psiPoly, hGev j z, mul_comm]
@@ -306,9 +306,9 @@ private lemma finite_zeros_lemma_9 {V : Type} [Fintype V] [DecidableEq V] (r : V
         have hXr : Ideal.Quotient.mkₐ ℂ I (X v ^ r v) = Ideal.Quotient.mkₐ ℂ I (H v) := by
           rw [Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq]
           exact Ideal.subset_span ⟨v, rfl⟩
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← hαβ, monomial_add_single, map_mul, hXr, ← map_mul, (H v).as_sum, Finset.mul_sum,
-          map_sum]
+
+        rw [← hαβ, monomial_add_single, map_mul, hXr, ← map_mul, (H v).as_sum, Finset.mul_sum,
+        map_sum]
         refine M.sum_mem (fun γ hγ => ?_)
         have e1 : monomial β (1 : ℂ) * monomial γ (AddMonoidAlgebra.coeff (H v) γ) =
             AddMonoidAlgebra.coeff (H v) γ • monomial (β + γ) (1 : ℂ) := by
@@ -323,8 +323,8 @@ private lemma finite_zeros_lemma_9 {V : Type} [Fintype V] [DecidableEq V] (r : V
   have htop : M = ⊤ := by
     refine eq_top_iff.2 (fun x _ => ?_)
     obtain ⟨p, rfl⟩ := Ideal.Quotient.mkₐ_surjective ℂ I x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [p.as_sum, map_sum]
+
+    rw [p.as_sum, map_sum]
     refine M.sum_mem (fun α _ => ?_)
     have e1 : monomial α (AddMonoidAlgebra.coeff p α) = AddMonoidAlgebra.coeff p α • monomial α (1 : ℂ) := by
       rw [smul_monomial, smul_eq_mul, mul_one]
@@ -370,8 +370,8 @@ theorem setFibre_finite_of_multiHomog {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMul
       ∑ j, C ((Fin.cons 1 y : Fin (e + 1) → ℂ) j) * G v j) = 0} := by
     rintro w ⟨z, hz, rfl, hw⟩
     intro v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_pow, eval_X, map_sum, hGrel v z hz, hw, sub_eq_zero]
+
+    rw [map_sub, map_pow, eval_X, map_sum, hGrel v z hz, hw, sub_eq_zero]
     refine Finset.sum_congr rfl (fun j _ => ?_)
     rw [map_mul, eval_C]
   refine (finite_zeros_lemma_9 r _ (fun v => ?_)).subset hsub

@@ -74,8 +74,8 @@ theorem liftΔ [FiniteDimensional Qp LL] (W : LocWach PD LL O v n) (hcase : Form
   · have hγ₂ : ∀ δ ∈ W.DelF, W.γD T₂ δ (W.map F x₁) = lA W ^ rr • y₂ := by
       intro δ hδ
       rw [hx₁F', TypesA.lA_pow_smul, map_nsmul, hy₂'.2 δ hδ]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hn₁, ← algebraMap_smul W.EE, map_smul, map_sum]
+
+    rw [hn₁, ← algebraMap_smul W.EE, map_smul, map_sum]
     simp only [W.map_γ]
     rw [Finset.sum_congr rfl hγ₂, Finset.sum_const, algebraMap_smul, ← Nat.cast_smul_eq_nsmul O, smul_smul]
     have : ((u⁻¹ : Oˣ) : O) * (W.DelF.card : O) = 1 := by
@@ -193,8 +193,8 @@ theorem crisMap_dvO (W : LocWach PD LL O v n) {T₁ T₂ : LocLat G Qp LL O} (F 
     (c₁ : Fin d₁ → O) (k₀ : Fin d) (P : O) (hSig : ∀ j, ∑ m, c₁ m * μ m j = if j = k₀ then P else 0) :
     Formalism.MainNotions.TruncatedSeriesCountingBounds.crisMap B F.f (dvO W T₁ e b₁ c₁) = algebraMap O LL P • dv W T₂ e b (Pi.single k₀ 1) := by
   unfold dvO
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [dv_eq_sum_single, map_sum]
+
+  rw [dv_eq_sum_single, map_sum]
   simp only [map_smul, hμ]
   unfold dvO
   rw [← dv_sum W T₂ e b Finset.univ (fun m => algebraMap O LL (c₁ m)) (fun m k => algebraMap O LL (μ m k)),

@@ -122,8 +122,8 @@ theorem idem_mul_eq_zero (hL : L.Is μ₀) {t : T} {ε : AE D} (hε : IsIdemSum 
     constructor
     · linear_combination atPl w 1 * h4 - x * h1 - x * h2
     · linear_combination cA D (atPl w 1) * h4 - x * h5 - x * h2
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [(hsum ε hε).1, map_sum, Finset.sum_mul, Finset.sum_mul]
+
+  rw [(hsum ε hε).1, map_sum, Finset.sum_mul, Finset.sum_mul]
   exact ⟨Finset.sum_eq_zero fun w hw => (key w hw).1, Finset.sum_eq_zero fun w hw => (key w hw).2⟩
 
 theorem fock_locVec (W : G.Weil) {p : Pair T} {ε : AE D} {f₀ φ f : WO (G.pS p) (G.pT p) → ℂ} (h₀ : W.IsVac p f₀)
@@ -218,7 +218,7 @@ theorem exists_bases (hL : L.Is μ₀) (h : IsTripleOf W M t i j e Bs Γ X) (hT 
     exact hb₂ v
 
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_vac (hL : L.Is μ₀) (h : IsTripleOf W M t i j e Bs Γ X) (hT : IsTriple Bs Γ X om om') (v : Pl D.host.F) :
     (latSmall G i j).IsLattice D.host.E ∧ (latSkew e).IsLattice D.host.E ∧
     (∀ z : PtS G i j, At (evFin D.host.F v) z →

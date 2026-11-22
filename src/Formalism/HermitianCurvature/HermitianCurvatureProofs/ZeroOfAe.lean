@@ -13,7 +13,7 @@ open scoped InnerProductSpace ENNReal
 
 noncomputable section
 
-set_option maxHeartbeats 1600000
+
 
 namespace Formalism.FourierDecayAlt.P
 

@@ -48,8 +48,8 @@ theorem Herm4.linInd (H : Herm4 c h) {ι : Type} [Fintype ι] [DecidableEq ι] (
   rw [linearIndependent_iff']
   intro s g hg i hi
   have h1 : H.hl (v i) (∑ j ∈ s, g j • v j) = 0 := by rw [hg, map_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum] at h1
+
+  rw [map_sum] at h1
   simp only [map_smul, smul_eq_mul] at h1
   rw [Finset.sum_eq_single i] at h1
   · exact (mul_eq_zero.mp h1).resolve_right (H.pos (v i) (hv0 i)).1

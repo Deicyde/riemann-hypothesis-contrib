@@ -76,7 +76,7 @@ theorem span_range_coe_basis' {E : Type*} [AddCommGroup E] (L : Submodule ℤ E)
   have h1 : (Set.range fun i => (b i : E)) = L.subtype '' Set.range b := Set.range_comp L.subtype b
   rw [h1, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
 
-set_option maxHeartbeats 800000 in
+
 theorem degree_quotient : DegQuot := by
   intro E _ _ _ L N hL hsat
   classical
@@ -152,9 +152,9 @@ theorem degree_quotient : DegQuot := by
         rw [map_zsmul, hPW _ (hNW _ (bN i).2), smul_zero]
       have h2 : ∀ j, P (g (Sum.inr j) • ℓ j) = g (Sum.inr j) • (eQ j : E) := fun j => by
         rw [map_zsmul, hℓP]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), map_sum, map_sum, map_zero, Finset.sum_congr rfl (fun i _ => h1 i),
-        Finset.sum_const_zero, zero_add, Finset.sum_congr rfl (fun j _ => h2 j)] at h
+
+      rw [map_add (f := _), map_sum, map_sum, map_zero, Finset.sum_congr rfl (fun i _ => h1 i),
+      Finset.sum_const_zero, zero_add, Finset.sum_congr rfl (fun j _ => h2 j)] at h
       exact h
     have hQz : ∀ j, g (Sum.inr j) = 0 := by
       have h : ∑ j, g (Sum.inr j) • eQ j = 0 := by
@@ -222,8 +222,8 @@ theorem degree_quotient : DegQuot := by
     intro a ha
     have hmem : ∑ j, a j • ℓ j ∈ W := by
       have h1 : P (∑ j, a j • ℓ j) = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         simp only [map_smul, hℓP]
         exact ha
       have h := hPsub (∑ j, a j • ℓ j)

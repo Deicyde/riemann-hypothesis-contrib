@@ -161,7 +161,7 @@ private theorem smul_tw_map_adjoint_apply_of_unit_modulus {s : Bool} {E F : Type
   rw [phase_cancel hc]
   exact tw_map_adjoint_apply_of_eigen f l e he
 
-set_option maxHeartbeats 1000000 in
+
 theorem thmAop_of (hph : R.phase) (h : R.PThmA) (b : Bool) : (R.toCx3 F).ThmAop b := by
   intro j t p w hw
   have hw1 : Tw.out (s := twAt D.what₂.embLL A3.A.v0) w ∈ R.Wp3 j p := (Submodule.mem_inf.mp hw).1
@@ -170,7 +170,7 @@ theorem thmAop_of (hph : R.phase) (h : R.PThmA) (b : Bool) : (R.toCx3 F).ThmAop 
   refine smul_tw_map_adjoint_apply_of_unit_modulus hc (R.thG j t) (R.lam3 j t p A3.A.v0) w ?_
   exact h j t p _ hw1
 
-set_option maxHeartbeats 1000000 in
+
 theorem thmBop_of (h : R.PThmB) (b : Bool) : (R.toCx3 F).ThmBop b := by
   intro t p e he
   have he1 : Tw.out (s := twAt D.what₂.embLL A3.A.v0) (E := R.HE.H) e ∈ R.EEp3 p := he.1

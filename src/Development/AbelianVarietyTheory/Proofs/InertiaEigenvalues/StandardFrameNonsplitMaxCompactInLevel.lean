@@ -23,7 +23,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeR
 open scoped TensorProduct
 
 noncomputable section
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.NonSplitLevel
 

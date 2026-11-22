@@ -252,8 +252,8 @@ theorem mem_NΔl_iff (hr : ∀ a, (∃ b, J b = a) ↔ ∀ δ ∈ W.DelF, W.γ�
       rw [mul_comm, letE, mul_single, mul_one]
     have hc : ∀ k, ∃ c, J c = a k i := fun k => (hr _).2 fun δ hδ => by
       have h1 := hΔ δ hδ
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hxa, map_sum] at h1
+
+      rw [hxa, map_sum] at h1
       simp only [γD_smulA, γA_single, (hb _).2 δ hδ] at h1
       simpa using congrFun (congrFun (coord_unique W T b _ _ h1) k) i
     choose c hc using hc
@@ -327,8 +327,8 @@ theorem exists_matrix (ζ : LL) {r' : ℕ} (e : ↥(W.N T) →+ (Fin r' → LL�
   have h1 : ∀ a : Fin r → LetA O n, e (∑ k, a k • b k) = M.mulVec fun k => W.lev i ζ (a k) := by
     intro a
     funext u
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [M, map_sum, he, Matrix.mulVec, dotProduct, mul_comm]
+
+    simp [M, map_sum, he, Matrix.mulVec, dotProduct, mul_comm]
   refine ⟨M, fun hs => ?_, fun c => ?_⟩
   · have : Submodule.span LL⟦X⟧ (Set.range e) ≤ LinearMap.range M.mulVecLin := by
       rw [Submodule.span_le]

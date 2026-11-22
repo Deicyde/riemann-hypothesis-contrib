@@ -43,8 +43,8 @@ theorem normEx_of : MatRep → DetSplit → NormEx := by
     simp only [Matrix.smul_apply, Matrix.map_apply, Matrix.diagonal_apply, Matrix.one_apply]
     split_ifs with h
     · subst h
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [form, ψ, map_sum, mul_comm]
+
+      simp [form, ψ, map_sum, mul_comm]
     · simp
   have hs : ∀ (c : Polynomial (MvPolynomial ι R)) (A : Matrix (Fin m) (Fin m) (Polynomial (MvPolynomial ι R))),
       F.mapMatrix (c • A) = F c • F.mapMatrix A := by
@@ -56,8 +56,8 @@ theorem normEx_of : MatRep → DetSplit → NormEx := by
   change F _ = _
   rw [RingHom.map_det]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, map_add (f := _), map_sub, map_one, map_sum]
+
+  rw [map_sub, map_add (f := _), map_sub, map_one, map_sum]
   simp only [hs, RingHom.mapMatrix_apply, hmap, h1, Matrix.mul_one]
   rw [hd, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, Matrix.mul_sum,
     Matrix.sum_mul]

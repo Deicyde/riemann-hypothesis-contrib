@@ -121,8 +121,8 @@ theorem isHeis_of (hσ : ∀ x, σ (σ x) = x) (hv : ∀ x, Valued.v (σ x) = Va
     congr 1; ring
   · intro x
     have : σ (∑ i, ∑ j, x i j * σ (x i.rev j.rev)) = ∑ i, ∑ j, x i j * σ (x i.rev j.rev) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, hσ]
+
+      simp only [map_sum, map_mul, hσ]
       rw [← Equiv.sum_comp Fin.revPerm]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [← Equiv.sum_comp Fin.revPerm]
