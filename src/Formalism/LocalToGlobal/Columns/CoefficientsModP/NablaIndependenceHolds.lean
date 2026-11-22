@@ -510,10 +510,7 @@ theorem nb_at_comm {lam : ι → DomWeight n} {T : Submodule (𝓞 K) (Pol K ι 
   refine ⟨c * d ^ nbN lam, mul_ne_zero hc0 (pow_ne_zero _ hd0), fun w x hx => ?_, fun w x hx => ?_⟩
   · have hBasis : ∀ τ, ∃ B : GL (Fin n) K, IsBasisAt w (M τ) B := by
       intro τ
-      -- The dependency stubs can still expose the earlier IsLattice signature.
-      first
-      | exact latticeBasisExists_holds K n (M τ) (hM τ) w
-      | exact latticeBasisExists_holds K n (M τ) (hM τ).toIsLattice w
+      exact latticeBasisExists_holds K n (M τ) (hM τ) w
     choose B hB using hBasis
     have h1 := localization_mono w.asIdeal hc2 ((nb_mem_at lam T M w x).1 hx B hB)
     have h2 := nb_scale w lam d B (fun τ => (nb_entries w (M τ) (B τ) (hB τ) d (hd τ).1 (hd τ).2).1)
