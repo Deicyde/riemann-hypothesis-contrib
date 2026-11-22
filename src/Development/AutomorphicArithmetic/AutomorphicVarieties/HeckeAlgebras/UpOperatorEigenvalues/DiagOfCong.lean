@@ -10,7 +10,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.V.Hi.Up
 
@@ -36,8 +36,8 @@ private theorem cong_roots {K : Type} [NormedField K] [IsUltrametricDist K] {N :
     rw [a.2, b.2, sub_self, mul_eq_zero] at h1
     refine Subtype.ext (sub_eq_zero.1 (h1.resolve_left fun h2 => ?_))
     have h3 := congrArg (residue O) h2
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, map_pow, hab, map_zero] at h3
+
+    simp only [map_sum, map_mul, map_pow, hab, map_zero] at h3
     rw [geom_sum₂_self, mul_eq_zero] at h3
     rcases h3 with h3 | h3
     · rw [← map_natCast (residue O), hm] at h3

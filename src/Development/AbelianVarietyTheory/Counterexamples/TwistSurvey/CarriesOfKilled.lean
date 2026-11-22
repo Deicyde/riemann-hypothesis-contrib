@@ -45,7 +45,7 @@ theorem scal_of_one {M C : Type} [AddCommGroup M] [Module ℂ M] (f : M → M) (
     rw [(Submodule.mem_bot ℂ).1 (hle hx), h0, smul_zero]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem iff_of_pin (R : RealDat3 D A3 Ks) (h : R.eigenvalue_at_base_of_scalar) :
     R.PThmA ↔ ∀ i t p, ∃ l : ℝ, ∀ x ∈ R.Wp3 i p, R.thG i t (LinearMap.adjoint (R.thG i t) x) = (l : ℂ) • x := by
   constructor
@@ -67,7 +67,7 @@ theorem ex_of_aForm {A : FamIn D.what₂.LL G Pl0 T D.R.m} {R : RealDat D A Ks} 
 theorem scalC_of_aForm (R : RealDat3 D A3 Ks) (hA : GlobalTheory.LiftRows.AForm R.toRealDat R.SF) : ScalC R :=
   fun i t c hn => ex_of_aForm hA i t c hn
 
-set_option maxHeartbeats 1000000 in
+
 theorem of_scalC (R : RealDat3 D A3 Ks) (hA : ScalC R) (h : R.eigenvalue_at_base_of_scalar) (h1 : OnePart R) : R.PThmA :=
   (iff_of_pin R h).2 fun i t p =>
     scal_of_one (fun x => R.thG i t (LinearMap.adjoint (R.thG i t) x)) (by simp only [map_zero]) (R.Wc' i) (R.Carries p)

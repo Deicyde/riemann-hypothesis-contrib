@@ -246,7 +246,7 @@ end Local
 variable {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {σ : ℕ}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_qstep (hψ : IsStdChar D ψ (-1)) (S : Dbl2 ψ σ) {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
     [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (ν : Measure k) (hν : IsUnitVol ν)
     (q : GlobalTheory.FinPl.SplitPt D k) (ψk : AddChar k Circle) (hk : (ofSplit q).IsChar ψ ψk) (hc : HasConductor ψk 1)

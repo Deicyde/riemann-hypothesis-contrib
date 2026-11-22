@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Impo
 
 open Formalism.Per GlobalTheory.PSer
 open scoped Formalism.Per
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.sum_mul_untiltFrobeniusDoubleSeries_eq_zero : ∀ (l : ℕ) [Fact l.Prime] (h : ℕ) (μ : Fin h → ℂ_[l]) (i : ℕ) (y : ℕ → Fin h → Fl l) (ρ : ℝ),
     1 ≤ h → ρ < 1 → (∀ k j, ‖sh (y k j)‖ ≤ ρ) →
     HasSum (fun k : ℕ => (l : ℂ_[l]) ^ k * ∑ j, μ j * lam h i (y k j)) 0 →

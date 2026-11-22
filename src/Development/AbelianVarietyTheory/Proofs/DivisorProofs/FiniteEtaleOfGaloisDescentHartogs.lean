@@ -103,8 +103,8 @@ theorem descent_finiteEtale : ∀ (A R C O : Type) [CommRing A] [IsDomain A] [Is
     obtain ⟨m'', hm''⟩ := GlobalTheory.T.galoisElement_dvd_of_formallyUnramified R C (Localization.AtPrime Q) G act b n x y hxy σQ hinj h
     have hcomp : (IsScalarTower.toAlgHom R O (Localization.AtPrime Q)).toLinearMap.rTensor C
         (galElt act σ x y h) = galElt act σQ x y h := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [galElt, map_sum, σQ]
+
+      simp [galElt, map_sum, σQ]
     obtain ⟨s, hs, m', hm'⟩ := GlobalTheory.T.exists_smul_dvd_of_localization_atPrime_tensor' R C O Q b _ ⟨m'', hcomp.trans hm''⟩
     exact ⟨s, hs, m', hm'⟩
   have key : ∀ h, ∃ m, galMap act σ m = Pi.single h 1 := by
@@ -124,8 +124,8 @@ theorem descent_finiteEtale : ∀ (A R C O : Type) [CommRing A] [IsDomain A] [Is
     intro v
     choose m hm using key
     refine ⟨∑ h, v h • m h, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul, hm]
     funext g
     simp [Finset.sum_apply, Pi.single_apply]

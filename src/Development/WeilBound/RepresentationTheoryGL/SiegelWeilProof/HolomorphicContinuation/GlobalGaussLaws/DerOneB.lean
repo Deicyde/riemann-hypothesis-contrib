@@ -148,7 +148,7 @@ namespace PositivityTheory.Rg.Sw.Glob
 
 open DerOneBH
 
-set_option maxHeartbeats 1000000 in
+
 theorem derivOne_of (hW : GlobalTheory.Published.WeilThetaConvergence) (hC : DerOneH.CurveSt) : DerivOne := by
   intro D n V ψ χ θ μ ω H l s ν τ ε fr ι hx X hX Θ Θ' hΘ'
   obtain ⟨h0, -, hΦ⟩ := hC D n V θ τ s ε fr X hx.hθ hx.hs hx.hfr hX

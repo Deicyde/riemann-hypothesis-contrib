@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Exists
 
 open NumberField IsDedekindDomain NumberField.mixedEmbedding Complex Classical
 open scoped TensorProduct ContDiff nonZeroDivisors
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_infiniteAdele_tensor_equiv_mixedSpace :
     ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
       (σ : E →ₐ[F] E), IsTotallyReal F → IsTotallyComplex E → Module.finrank F E = 2 →

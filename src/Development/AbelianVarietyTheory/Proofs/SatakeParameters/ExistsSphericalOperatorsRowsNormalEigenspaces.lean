@@ -152,8 +152,8 @@ theorem exists_ops (J : Subgroup (GA D V)) (χ : GA D V → ℂ) (SF : Finset (H
     ext x
     apply hi
     rw [hh P c hP, postOn_hk]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finsupp.sum, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hh P _ hP]
+
+    simp only [Finsupp.sum, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hh P _ hP]
   have hzero : ∀ P, ok P → ∀ d, ¬ IsLab V P d → h P (Finsupp.single d 1) = 0 := by
     intro P hP d hd
     ext x
@@ -391,8 +391,8 @@ theorem exists_opsE : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Typ
         rw [mult_lev hU1 v k ((lev P hP).1 k hk).1 g, hχ, one_mul]
       rw [postOn_apply]
       conv_rhs => rw [← hU2 v]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [RealDat.e0, gaL, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul]
+
+      simp only [RealDat.e0, gaL, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul]
       refine Finset.sum_congr rfl fun g _ => ?_
       congr 1
       exact (lev P hP).2.2.1 c _ _ hfix)

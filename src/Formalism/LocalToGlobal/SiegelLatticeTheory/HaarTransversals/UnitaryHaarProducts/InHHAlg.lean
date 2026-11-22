@@ -171,16 +171,16 @@ theorem sigA_inclE (e : X.B.I.E) :
 theorem hA_incl (x y : Fin X.B.I.n → X.B.I.E) :
     hA X.B.I (incl X.B.I x) (incl X.B.I y) =
       Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F) (Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J x y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hA, Formalism.UG.hform, incl, Matrix.map_apply, map_sum, map_mul, sigA_inclE]
+
+  simp only [hA, Formalism.UG.hform, incl, Matrix.map_apply, map_sum, map_mul, sigA_inclE]
 
 theorem hform_crd (v w : (VS D).V) :
     X.ιE (Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J (X.crd v) (X.crd w)) = (VS D).hT v w := by
   conv_rhs => rw [← X.bas.sum_repr v, ← X.bas.sum_repr w]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-    Formalism.UG.hform, map_mul, HidaSetting.crd, crdOf, starRingEnd_apply, X.ιE_conj, RingEquiv.apply_symm_apply,
-    X.J_eq, Finset.mul_sum]
+
+  simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+  Formalism.UG.hform, map_mul, HidaSetting.crd, crdOf, starRingEnd_apply, X.ιE_conj, RingEquiv.apply_symm_apply,
+  X.J_eq, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   simp only [← Formalism.BasicNotions.bridge_star_holds D.R D.host, RingHom.id_apply]

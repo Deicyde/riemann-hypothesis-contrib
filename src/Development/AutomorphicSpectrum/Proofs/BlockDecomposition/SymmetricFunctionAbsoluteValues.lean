@@ -13,8 +13,8 @@ theorem evalAt_esymmL_eq_sum_prod {n : ℕ} (z : Fin n → ℂˣ) (r : ℕ) :
     evalAt z (esymmL n r) =
       ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, ∏ i ∈ S, (z i : ℂ) := by
   unfold esymmL
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun S _ => ?_
   simp only [evalAt, monomial, AddMonoidAlgebra.lift_single, one_smul, pointHom, monomialChar,
     MonoidHom.coe_mk, OneHom.coe_mk, toAdd_ofAdd, lamS]
@@ -55,8 +55,8 @@ theorem mul_prod_one_add_conj_eq {n : ℕ} (z : Fin n → ℂˣ)
   refine Finset.sum_congr rfl fun r hr => ?_
   have hrn : r ≤ n := Nat.lt_succ_iff.1 (Finset.mem_range.1 hr)
   have key := h r hrn
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_prod] at key
+
+  simp only [map_sum, map_prod] at key
   rw [Nat.add_sub_cancel, Nat.sub_sub_self hrn, ← key]
   ring
 

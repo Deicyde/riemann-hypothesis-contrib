@@ -81,12 +81,12 @@ theorem exists_acris (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI) :
           (algebraMap (Per.Ainf l) (Per.Acris0 l) (mu AI.ε)) ^ (k + 1) := by
       apply Subtype.val_injective
       rw [← Subalgebra.val_apply, ← Subalgebra.val_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_mul, map_sum, map_pow, map_neg, map_one, map_natCast, AlgHom.commutes]
+
+      simp only [map_mul, map_sum, map_pow, map_neg, map_one, map_natCast, AlgHom.commutes]
       exact hs
     have h2 := congrArg (algebraMap (Per.Acris0 l) (Per.Acris l)) hs'
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_mul, map_sum, map_pow, map_neg, map_one, map_natCast, alg_alg] at h2
+
+    simp only [map_mul, map_sum, map_pow, map_neg, map_one, map_natCast, alg_alg] at h2
     exact h2
   · obtain ⟨j, hj, -, hb⟩ := GlobalTheory.CrisIncl.exists_restrict l _ T.incl
     obtain ⟨N, hN⟩ := hb m

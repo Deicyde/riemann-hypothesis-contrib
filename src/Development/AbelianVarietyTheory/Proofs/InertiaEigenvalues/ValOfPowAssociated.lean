@@ -149,8 +149,8 @@ theorem roots_eq_nrm [IsLocalRing O] [IsAdicComplete (IsLocalRing.maximalIdeal O
       have h5 : lvl l O 0 = ∑ i ∈ Finset.range l, ((1 + X) ^ i - C ζ ^ i) := by
         rw [Finset.sum_sub_distrib]
         simp only [← map_pow]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← map_sum, hζ.geom_sum_eq_zero (Fact.out : l.Prime).one_lt]
+
+        rw [← map_sum, hζ.geom_sum_eq_zero (Fact.out : l.Prime).one_lt]
         simp [lvl]
       rw [h5]
       refine Finset.dvd_sum fun i _ => ?_
@@ -251,7 +251,7 @@ theorem card_ne_zero : (H.W K 1 LL h).DelF.card ≠ 0 := fun h0 => by
   rw [h0] at hc; omega
 
 
-set_option maxHeartbeats 800000 in
+
 theorem norm_ring (χ : (H.W K 1 LL h).Gam →* ℤ_[l]ˣ)
     (hχ : ∀ g, algebraMap ℤ_[l] ↥(OL LL) (χ g : ℤ_[l]) = ((H.W K 1 LL h).χΓ g : ↥(OL LL)))
     (hk : ∀ x, red l x = 1 → ∃ g, χ g = x) :
@@ -297,7 +297,7 @@ theorem norm_ring (χ : (H.W K 1 LL h).Gam →* ℤ_[l]ˣ)
     exact sub_self _
 
 
-set_option maxHeartbeats 800000 in
+
 theorem trace_ring (h1 : Module.finrank ↥(K0 K) ↥K.1 = 1) :
     Formalism.MainNotions.DeltaInvariantLattices.wachRingRelations (H.W K 1 LL h) 1 (l - 1) (H.W K 1 LL h).π₀
       (fun _ => Polynomial.X + Polynomial.C ((l : ℕ) : ↥(OL LL))) := by

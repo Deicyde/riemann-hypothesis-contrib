@@ -87,8 +87,8 @@ theorem exists_next_unit (hS : IsHermSemilocal S)
     exact hsm _ (hcS i hi) _ (hxM i hi)
   have hyo : ∀ j ∈ s, h (x j) y = 0 := by
     intro j hj
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hy, map_sub, map_sum]
+
+    rw [hy, map_sub, map_sum]
     simp only [map_smul, smul_eq_mul]
     rw [Finset.sum_eq_single j]
     · have hne : h (x j) (x j) ≠ 0 := ((hunit _).mp (hxu j hj)).1
@@ -99,8 +99,8 @@ theorem exists_next_unit (hS : IsHermSemilocal S)
     · intro hjs
       exact absurd hj hjs
   have hyw : h y w = 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hy, map_sub, map_sum, LinearMap.sub_apply]
+
+    rw [hy, map_sub, map_sum, LinearMap.sub_apply]
     first
       | rw [LinearMap.sum_apply]
       | rw [LinearMap.coe_fn_sum, Finset.sum_apply]
@@ -194,8 +194,8 @@ theorem exists_orth_unit_frame [FiniteDimensional K V] (hS : IsHermSemilocal S)
         (fun h0 => hu (by rw [sub_eq_zero.mp h0]; exact hsW))
         (by
           intro j hj
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sub, map_sum, Finset.sum_eq_single j]
+
+          rw [map_sub, map_sum, Finset.sum_eq_single j]
           · rw [map_smul, smul_eq_mul,
               inv_mul_cancel_right₀ (hxu j (Finset.mem_range.mp hj)).1, sub_self]
           · intro i hi hij

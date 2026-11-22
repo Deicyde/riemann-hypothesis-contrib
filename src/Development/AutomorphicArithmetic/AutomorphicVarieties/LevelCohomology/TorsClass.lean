@@ -97,7 +97,7 @@ private theorem tors_class {R Γ M : Type} [CommRing R] [Group Γ] [TopologicalS
     exact hbound g
   rw [← Submodule.Quotient.mk_smul, hzero, Submodule.Quotient.mk_zero]
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.V.X.zOne :
     ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O], l ≠ 2 → ∀ e : ℕ, 1 ≤ e → l - 1 ∣ e → Chr.V l e (1 : G ℚ Ω →* Oˣ) = 0 := by
   intro Ω _ _ _ l _ O _ _ _ _ _ hl e he1 he

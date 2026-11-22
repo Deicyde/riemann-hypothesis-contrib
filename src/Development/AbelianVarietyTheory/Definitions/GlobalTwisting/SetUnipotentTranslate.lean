@@ -298,7 +298,7 @@ theorem NP_tr (Y : G.LatInst D) (u : D.what₂.Word) (w : D.what₂.places.Pl)
 end Local
 
 
-set_option maxHeartbeats 800000 in
+
 theorem bk_tr (i : D.ntw.Tw) (s : D.ntw.Sig i) (k : ℕ) (ψ : BlochKatoReduction.Gen.GE D.nd →* (D.ntw.Ok i k)ˣ) :
     BlochKatoReduction.Gen.bk (BlochKatoReduction.bk0 (setDiv D N h)) i s k ψ = BlochKatoReduction.Gen.bk (BlochKatoReduction.bk0 D) i s k ψ := rfl
 

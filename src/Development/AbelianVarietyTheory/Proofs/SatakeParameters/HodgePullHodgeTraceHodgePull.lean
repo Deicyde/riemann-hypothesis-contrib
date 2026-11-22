@@ -104,8 +104,8 @@ theorem hodgePull_hodgeTrace (j : ℕ)
   have e5 : cohOn.map k (∑ r ∈ R, liftPull (hσ r) (hσs r) j) ⊤ q =
       ∑ r ∈ R, cohOn.map k (liftPull (hσ r) (hσs r) j) ⊤ q :=
     map_sum (cohOn.mapAddHom k _ _ ⊤ q) _ _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [H, ← e2, e5, LinearMap.sum_apply, map_sum] at e4
+
+  rw [H, ← e2, e5, LinearMap.sum_apply, map_sum] at e4
   rw [e1]
   refine e4.trans (Finset.sum_congr rfl fun r _ ↦ (e2 _).trans ?_)
   have h : (σ r ≫ c) ≫ s = sW := by rw [hσ, hπ]

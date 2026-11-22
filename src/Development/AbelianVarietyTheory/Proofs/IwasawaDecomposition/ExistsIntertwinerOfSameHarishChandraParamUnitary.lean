@@ -193,8 +193,8 @@ theorem _root_.GlobalTheory.UnitaryHighestWeightUnique.exists_equiv_of_isHCTypeU
     intro v; simp [A₂, LinearMap.sum_apply]
   have hTA : ∀ v, T.toLinearMap (A₁ v) = A₂ (T.toLinearMap v) := by
     intro v
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [hA₁, hA₂, map_sum, map_smul, hT]
+
+    simp [hA₁, hA₂, map_sum, map_smul, hT]
   have key := _root_.GlobalTheory.UnitaryHighestWeightUnique.intertwine_group
     (fun t : ℝ => π₁ (NormedSpace.exp ((t : ℂ) • Y))) A₁
     (fun v => _root_.GlobalTheory.UnitaryHighestWeight.group_zero hπ₁ Y v)

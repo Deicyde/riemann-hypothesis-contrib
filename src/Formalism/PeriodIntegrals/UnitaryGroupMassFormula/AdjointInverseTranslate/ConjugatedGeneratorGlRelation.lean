@@ -226,9 +226,9 @@ theorem eab_h_right : EabHRight := by
   simp only [ana_EcH_ext hH hU hgU hgs hF hfF]
   change anaPhi hH (fderiv ℝ F (g * s)) (g * s) (s⁻¹ * Matrix.single a b 1 * s) =
     ∑ c, ∑ d, (s⁻¹ c a * s b d) • anaPhi hH (fderiv ℝ F (g * s)) (g * s) (Matrix.single c d 1)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ana_conj_single, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul]
+
+  rw [ana_conj_single, map_sum]
+
+  simp only [map_sum, map_smul]
 
 end AAInvW

@@ -84,8 +84,8 @@ theorem span_image_inf {n : ℕ} (X : Submodule (𝓞 K) (Fin n → K)) (V : Sub
           have h0 := (hℓV x).1 hx r
           rw [hℓ] at h0
           have := congrArg φ h0
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum, map_zero] at this
+
+          rw [map_sum, map_zero] at this
           rw [← this]
           refine Finset.sum_congr rfl fun k _ => ?_
           rw [map_mul]
@@ -128,9 +128,9 @@ theorem span_image_inf {n : ℕ} (X : Submodule (𝓞 K) (Fin n → K)) (V : Sub
     obtain ⟨N, a, yv, hr, ha⟩ := GlobalTheory.Proof.IdempotentLatticeSequence.flat_system (fun i r => b (i, r)) r0 (fun r => by
       apply RingOfIntegers.ext
       have h1 : ((∑ i, b (i, r) • r0 i : 𝓞 K') : K') = ∑ i, φ (b (i, r) : K) * (r0 i : K') := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [show ((∑ i, b (i, r) • r0 i : 𝓞 K') : K') = ∑ i, ((b (i, r) • r0 i : 𝓞 K') : K') from
-          map_sum (algebraMap (𝓞 K') K') _ _]
+
+        rw [show ((∑ i, b (i, r) • r0 i : 𝓞 K') : K') = ∑ i, ((b (i, r) • r0 i : 𝓞 K') : K') from
+        map_sum (algebraMap (𝓞 K') K') _ _]
         rfl
       rw [h1]
       simp only [hb', map_mul]
@@ -140,8 +140,8 @@ theorem span_image_inf {n : ℕ} (X : Submodule (𝓞 K) (Fin n → K)) (V : Sub
       change _ = (0 : K')
       rw [← mul_zero (φ ((d : 𝓞 K) : K)), ← h2, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hℓ, map_sum]
+
+      rw [hℓ, map_sum]
       simp only [map_mul, Finset.mul_sum, Finset.sum_mul]
       exact Finset.sum_congr rfl fun k _ => by ring)
     let u : Fin N → Fin n → K := fun l => ∑ i, a i l • x i
@@ -151,25 +151,25 @@ theorem span_image_inf {n : ℕ} (X : Submodule (𝓞 K) (Fin n → K)) (V : Sub
       rw [hℓV]
       intro r
       have h1 := congrArg (fun z : 𝓞 K => (z : K)) (ha l r)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, hb', map_zero] at h1
+
+      simp only [map_sum, map_mul, hb', map_zero] at h1
       apply mul_left_cancel₀ hd0
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [mul_zero, ← h1, map_sum, Finset.mul_sum]
+
+      rw [mul_zero, ← h1, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [LinearMap.map_smul_of_tower, Algebra.smul_def]
       ring
     have hyu : y = ∑ l, yv l • Φ (u l) := by
       funext k
       rw [hy, Finset.sum_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Pi.smul_apply, hΦ, u, Finset.sum_apply, map_sum, Algebra.smul_def]
+
+      simp only [Pi.smul_apply, hΦ, u, Finset.sum_apply, map_sum, Algebra.smul_def]
       have h2 : ∀ i, ((r0 i : 𝓞 K') : K') = ∑ l, φ (a i l : K) * (yv l : K') := by
         intro i
         rw [hr i]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [show ((∑ l, a i l • yv l : 𝓞 K') : K') = ∑ l, ((a i l • yv l : 𝓞 K') : K') from
-          map_sum (algebraMap (𝓞 K') K') _ _]
+
+        rw [show ((∑ l, a i l • yv l : 𝓞 K') : K') = ∑ l, ((a i l • yv l : 𝓞 K') : K') from
+        map_sum (algebraMap (𝓞 K') K') _ _]
         rfl
       simp only [h2, Finset.sum_mul, Finset.mul_sum]
       rw [Finset.sum_comm]

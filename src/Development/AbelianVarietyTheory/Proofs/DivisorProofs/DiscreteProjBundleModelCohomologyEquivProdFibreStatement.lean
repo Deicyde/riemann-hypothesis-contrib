@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CotDComp
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
 open GlobalTheory.EtC.CupSpec GlobalTheory.EtC.DiscCoch in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.discrete_projBundleModel_cohomology_equiv_prod_fibre :
     ∀ (R : Type) [CommRing R] (q N : ℕ) (I : Cx R) (F : PSh) (n : ℤ),
       ∃ e : CohomologyClass ((chains R).obj (disc.obj F)) (Jcx R q N I) n ≃+
@@ -99,8 +99,8 @@ theorem _root_.GlobalTheory.T.discrete_projBundleModel_cohomology_equiv_prod_fib
     rw [ev_def, δ_v n m hm α _ t ht s (-(p : ℤ)) (by omega) (by omega), Preadditive.comp_add, Units.smul_def,
       Preadditive.comp_zsmul, ← Category.assoc _ (((chains R).obj E).d _ _), chains_d, Category.assoc, Preadditive.sum_comp]
     refine (map_add (mapHom _ _ (freeGen R _ U x)) _ _).trans ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_zsmul, map_sum, Units.smul_def]
+
+    rw [map_zsmul, map_sum, Units.smul_def]
     refine congrArg₂ (· + ·) rfl (congrArg _ (Finset.sum_congr rfl fun i _ => ?_))
     rw [Preadditive.zsmul_comp, map_zsmul]
     congr 1

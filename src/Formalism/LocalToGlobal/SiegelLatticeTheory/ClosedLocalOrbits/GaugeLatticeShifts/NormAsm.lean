@@ -57,8 +57,8 @@ theorem pairSum_gam (U : Set I) (p : I → ℂ) (h0 : ∀ x, x ∉ U → p x = 0
     simp
   rw [hsw]
   unfold gamOf
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_mul, map_inv₀, map_natCast, map_sum]
+
+  rw [map_mul, map_inv₀, map_natCast, map_sum]
   field_simp
 
 private lemma orbit_lemma_2 {C : Type*} [Fintype C] (A U : Set I) (s : C → I)
@@ -185,7 +185,7 @@ theorem card_ne_zero_of_bij {C : Type*} (A U : Set I) (s : C → I)
   exact ⟨by exact_mod_cast (Nat.card_pos (α := A)).ne', by exact_mod_cast (Nat.card_pos (α := U)).ne'⟩
 
 
-set_option maxHeartbeats 800000 in
+
 theorem normExp_abs {τ Rw H K Q1 Q2 R R' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
     [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K] [Fintype Q1] [Fintype Q2] [Fintype R]
     [Fintype R'] (X : Formalism.FourierDecayAlt.PB.Terms τ Rw I H (PiLp 2 (fun _ : Q1 × Q2 => K))) (S : Set τ)

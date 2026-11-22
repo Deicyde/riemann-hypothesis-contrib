@@ -11,7 +11,7 @@ open Formalism.BasicNotions Formalism.L2.Indef Formalism.L2.DIV Formalism.IndefR
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 800000
+
 
 namespace GlobalTheory.Mem.SJ.Place
 

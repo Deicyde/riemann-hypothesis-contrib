@@ -123,8 +123,8 @@ theorem mem_mul_of_mem {n : ℕ} {S : Subring (Lev.EAf D)} (X Y : Matrix (Fin n)
   rw [Matrix.mul_apply]
   exact Subring.sum_mem _ fun k _ => Subring.mul_mem _ (hX i k) (hY k j)
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 800000 in
+
+
 theorem exists_den (D : D7) (V : HSp D) (Λ : Lat V) (hΛ : IsSelfDualC V Λ) (c : GA D V) :
     ∃ (C : ℝ) (A : ℕ), ∀ g : GA D V, ∃ m : ℕ, 0 < m ∧ (m : ℝ) ≤ C * height V g ^ A ∧
       ∀ γ : GA D V, Lev.finE V (c * γ * g) ∈ congLev D.sp.cm V.gram Λ ⊤ →

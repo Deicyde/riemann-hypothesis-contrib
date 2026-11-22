@@ -82,8 +82,8 @@ theorem coef_intG {T' : D.host.E} (G : LFlag (D.sp.Y 0) D.R.rS T') {Λ : Submodu
   set m := ∑ a, c a • frame G a with hm
   have hbm : baseChange₂ D p m = ∑ a, ((D.s.atP p).ιE (c a) *
       ((((isUnit_sF' Zd p a).unit⁻¹ : ((D.s.atP p).Ep)ˣ)) : (D.s.atP p).Ep)) • locF' Zd p G a := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hm, map_sum]
+
+    rw [hm, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [Formalism.L2.SG.Pf.LocalDenominators.baseChange_smul₂, bcP_frameG Zd p G, smul_smul]
   have hspan : baseChange₂ D p m ∈ Submodule.span (D.s.atP p).Ep (Set.range (locF' Zd p G)) := by
@@ -133,8 +133,8 @@ theorem exists_yG {T' : D.host.E} (G : LFlag (D.sp.Y 0) D.R.rS T') {Λ : Submodu
   have hint : ∀ m ∈ Λ, m ∈ U → IsIntegral ℤ ((VS D).hT m v) := fun m hm hmU => by
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun D.host.E).1 hmU
     have hρm : ρ m = c (Fin.last D.R.rS) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hc, map_sum, Fin.sum_univ_castSucc]
+
+      rw [← hc, map_sum, Fin.sum_univ_castSucc]
       simp only [map_smul, smul_eq_mul, hρe, mul_zero, Finset.sum_const_zero, zero_add, hρl, mul_one]
     rw [BwdNA.hsw (VS D) v m, hv, hρm]
     exact BwdNA.isInt_star (coef_intG Zd G hprim c (by rw [hc]; exact hm))

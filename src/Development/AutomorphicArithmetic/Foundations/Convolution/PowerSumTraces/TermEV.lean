@@ -232,7 +232,7 @@ end Loc
 end UpperTheory.ConvolutionTheory.C.TraceVanishing
 
 open UpperTheory.ConvolutionTheory.C.TraceVanishing in
-set_option maxHeartbeats 3200000 in
+
 theorem UpperTheory.ConvolutionTheory.C.termEV :
     UpperTheory.ConvolutionTheory.C.TermEV := by
   classical

@@ -14,8 +14,8 @@ open Formalism.L2.Host (embLL0)
 open Formalism.IndefR.RecTie (Used0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 open GlobalTheory.PlaceRead
 open GlobalTheory.HeightCounting.Up (PrN)
 
@@ -61,8 +61,8 @@ theorem injective_of_indep {W : Type} [AddCommGroup W] [Module E W] {ε : E →+
   refine (injective_iff_map_eq_zero φ).2 fun y hy => ?_
   have hy' : y ∈ Submodule.span E (Set.range u) := hu ▸ Submodule.mem_top
   obtain ⟨l, rfl⟩ := Finsupp.mem_span_range_iff_exists_finsupp.1 hy'
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finsupp.sum, map_sum] at hy
+
+  rw [Finsupp.sum, map_sum] at hy
   simp only [map_smulₛₗ] at hy
   have h := linearIndependent_iff'.1 hi _ _ hy
   refine Finset.sum_eq_zero fun i hi' => ?_
@@ -74,8 +74,8 @@ theorem indep_fieldRange {e : K →+* ℂ} (g : V →ₛₗ[e] A) (hg : Function
   refine linearIndependent_iff'.2 fun t c h i hi => ?_
   choose d hd using fun i => RingHom.mem_fieldRange.1 (c i).2
   have h1 : g (∑ i ∈ t, d i • v i) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← h]
+
+    rw [map_sum, ← h]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smulₛₗ, hd]
     rfl

@@ -241,18 +241,18 @@ theorem norm_card : ‖(Nat.card (TameGal K l e a) : K)‖ = 1 := by
 
 theorem avg_mem_inv (v : Vec K a ι) : Δ.avg v ∈ Δ.inv := fun g => by
   let _ := Fintype.ofFinite (TameGal K l e a)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [avg, LinearMap.smul_apply, LinearMap.sum_apply, map_smul, map_sum,
-    ← Module.End.mul_apply, ← map_mul]
+
+  simp only [avg, LinearMap.smul_apply, LinearMap.sum_apply, map_smul, map_sum,
+  ← Module.End.mul_apply, ← map_mul]
   exact congrArg _ (Fintype.sum_equiv (Equiv.mulLeft g) _ _ fun _ => rfl)
 
 theorem map_avg {V : Type} [AddCommGroup V] [Module K V] (f : Vec K a ι →ₗ[K] V) {v : Vec K a ι}
     (h : ∀ g, f (Δ.act g v) = f v) : f (Δ.avg v) = f v := by
   let _ := Fintype.ofFinite (TameGal K l e a)
   have h0 : (Nat.card (TameGal K l e a) : K) ≠ 0 := norm_ne_zero_iff.1 (by rw [norm_card]; simp)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [avg, LinearMap.smul_apply, LinearMap.sum_apply, map_smul, map_sum, h, Finset.sum_const,
-    Finset.card_univ, ← Nat.card_eq_fintype_card, ← Nat.cast_smul_eq_nsmul K, inv_smul_smul₀ h0]
+
+  simp only [avg, LinearMap.smul_apply, LinearMap.sum_apply, map_smul, map_sum, h, Finset.sum_const,
+  Finset.card_univ, ← Nat.card_eq_fintype_card, ← Nat.cast_smul_eq_nsmul K, inv_smul_smul₀ h0]
 
 theorem avg_mem (W : Submodule O (Vec K a ι)) {v : Vec K a ι} (h : ∀ g, Δ.act g v ∈ W) :
     Δ.avg v ∈ W := by

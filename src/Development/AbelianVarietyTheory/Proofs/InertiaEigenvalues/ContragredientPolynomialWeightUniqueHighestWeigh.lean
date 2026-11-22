@@ -23,8 +23,8 @@ open Formalism.AUTREP (GAf)
 open GlobalTheory.FormInner (frameEquiv)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 noncomputable section
 
 namespace GlobalTheory.MtContraHw
@@ -111,8 +111,8 @@ theorem omegaV_mapVV (f : Module.Dual K W) (x : VV K lam) :
     omegaV e lam T f (mapVV e lam x) = e (f (T.symm x)) := by
   conv_lhs => rw [← (bVV K lam).sum_repr x]
   conv_rhs => rw [← (bVV K lam).sum_repr x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ, ← bC_apply, LinearMap.map_smul, omegaV_bC, smul_eq_mul, map_mul, RingHom.id_apply, LinearEquiv.map_smul, LinearMap.map_smul]
+
+  simp only [map_sum, LinearMap.map_smulₛₗ, ← bC_apply, LinearMap.map_smul, omegaV_bC, smul_eq_mul, map_mul, RingHom.id_apply, LinearEquiv.map_smul, LinearMap.map_smul]
 
 end Omega
 end GlobalTheory.MtContraHw
@@ -146,9 +146,9 @@ theorem coordK_ker : LinearMap.ker (coordK lam T) = ⊥ := by
   simpa using this
 
 theorem coordC_omegaV (f : Module.Dual K W) : coordC e lam (omegaV e lam T f) = mapVV e lam (coordK lam T f) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coordC, coordK, LinearMap.comp_apply, LinearEquiv.coe_coe, Module.Basis.equivFun_symm_apply,
-    LinearMap.pi_apply, Module.Dual.eval_apply, map_sum, LinearMap.map_smulₛₗ, omegaV_bC, bC_apply, omegaV_mapVV]
+
+  simp only [coordC, coordK, LinearMap.comp_apply, LinearEquiv.coe_coe, Module.Basis.equivFun_symm_apply,
+  LinearMap.pi_apply, Module.Dual.eval_apply, map_sum, LinearMap.map_smulₛₗ, omegaV_bC, bC_apply, omegaV_mapVV]
 
 theorem omegaV_li (κ : Type) (v : κ → Module.Dual K W) (hv : LinearIndependent K v) :
     LinearIndependent ℂ fun x => omegaV e lam T (v x) := by

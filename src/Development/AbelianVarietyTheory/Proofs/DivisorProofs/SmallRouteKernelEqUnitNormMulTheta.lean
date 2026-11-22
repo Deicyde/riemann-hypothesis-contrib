@@ -35,8 +35,8 @@ theorem end_finsupp_sum_apply {α β : Type} (A : Module.End ℂ (β → ℂ)) (
     funext x
     simp only [Finsupp.sum, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
   rw [e]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finsupp.sum, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+
+  simp only [Finsupp.sum, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
 
 theorem isHecke_div {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
     {χ χ' : (AF F ⊗[F] E)ˣ →* Circle} (h : GlobalTheory.LFun.IsHecke F E χ) (h' : GlobalTheory.LFun.IsHecke F E χ') :
@@ -82,7 +82,7 @@ theorem data_theta_small {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : 
     GlobalTheory.Chain.InnerSteps.theta_pureTensorO W.ψ_std W.θ_is _ _ _ _ t2 _⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem seesaw_swapped {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T} (hL : L.Is μ₀)
     (W : G.Weil) (t : T) (i j : Fin D.R.m) (S' T' : HSp D) (e₁ : Fin T'.rank ≃ Fin (spW₁ G i j).rank)
     (e₂ : Fin S'.rank ≃ Fin (GlobalTheory.Doubling.hsum (spV G i j) (spV₁ G i j)).rank)
@@ -110,7 +110,7 @@ theorem seesaw_swapped {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : Gr
   rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem kerSmall_eq_theta : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T} (hL : L.Is μ₀) (W : G.Weil) (B : Frames G)
     (ρ : RealMatch W) (t : T) (i j : Fin D.R.m) (M : Vol G) (hM : M.Is t) (Θ : TotT G (routeBig t i j))
     (Θ' : TotT G (routeSmall t i j)) (hΘ : IsMatched B t ρ i j Θ Θ') (g₁ : GA D (G.V (.grid (i + 1) j)))

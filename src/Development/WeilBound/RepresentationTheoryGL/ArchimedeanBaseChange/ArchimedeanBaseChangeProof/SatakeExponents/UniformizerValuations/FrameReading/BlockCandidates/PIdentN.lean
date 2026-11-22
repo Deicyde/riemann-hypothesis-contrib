@@ -13,7 +13,7 @@ open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.R
 open PositivityTheory.RgTw (Mat G)
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace PositivityTheory.Rg.BcB.F.BC
 
@@ -58,7 +58,7 @@ theorem val_tD (v : InfinitePlace E) (s : Bool) (m : ℕ) (side : Bool)
 
 end
 
-set_option maxHeartbeats 2000000 in
+
 theorem identOf' : IdentOf := by
   intro hG hR E _ _ _ n π S T F₀ F i χ hχ O
   have h0 := O.eigArch (.inl ()) (F.t₀ i) rfl rfl

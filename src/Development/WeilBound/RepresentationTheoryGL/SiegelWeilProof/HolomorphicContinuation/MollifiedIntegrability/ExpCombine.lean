@@ -23,7 +23,7 @@ theorem exp_combine (t : ℝ) (y q β : E n) :
   push_cast
   ring
 
-set_option maxHeartbeats 1000000 in
+
 theorem step_a (Ψ : X → ℂ) (qq : X → E n) (hΨ : Integrable Ψ μ) (hqq : Measurable qq) (t ε : ℝ) (hε : 0 < ε)
     (β : E n) :
     ∫ y, (∫ x, Ψ x * Complex.exp (Complex.I * t * ip y (qq x)) ∂μ) * gam ε y *

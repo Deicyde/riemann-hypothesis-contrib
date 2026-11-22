@@ -135,8 +135,8 @@ theorem leftV_id (z : VCx X.Tau a b) : leftV A LinearMap.id z = z := by
 theorem leftV_emb (f : Sp X.E b →ₗ[X.E] Sp X.E b) (x : HomE X.E a b) : leftV A f (emb A x) = emb A (f ∘ₗ x) := by
   funext τ i j
   rw [leftV_apply, emb_apply, LinearMap.comp_apply, ← LinearMap.toMatrix'_mulVec f]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [emb_apply, Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.mul_sum, LinearMap.toMatrix'_apply]
+
+  simp only [emb_apply, Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.mul_sum, LinearMap.toMatrix'_apply]
   exact Finset.sum_congr rfl fun k _ => by ring
 
 
@@ -157,9 +157,9 @@ theorem hv_leftE (hconj : ∀ τ x, X.embC A.σ₀ τ (star x) = starRingEnd ℂ
     rw [hv_apply, hv_apply]
     congr 1
     refine Finset.sum_congr rfl fun τ _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [leftV_apply, LinearEquiv.coe_coe, GlobalTheory.Mem.Col2.JetEx.VacEqPf.symm_single, hconj, map_sum, map_mul, Complex.conj_conj,
-      Finset.sum_mul, Finset.mul_sum]
+
+    simp only [leftV_apply, LinearEquiv.coe_coe, GlobalTheory.Mem.Col2.JetEx.VacEqPf.symm_single, hconj, map_sum, map_mul, Complex.conj_conj,
+    Finset.sum_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     conv_rhs => rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_

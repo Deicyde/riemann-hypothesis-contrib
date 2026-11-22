@@ -106,8 +106,8 @@ theorem intC_add {x y : E ⊗[F] Af F} (hx : IntC b x) (hy : IntC b y) : IntC b 
 theorem intC_sum {κ : Type*} (s : Finset κ) {f : κ → E ⊗[F] Af F} (hf : ∀ i ∈ s, IntC b (f i)) :
     IntC b (∑ i ∈ s, f i) := by
   intro k
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_apply]
+
+  rw [map_sum, Finset.sum_apply]
   exact ohat_sum s fun i hi => hf i hi k
 
 theorem smul_eq_algebraMap_mul (c : F) (a : Af F) : c • a = algebraMap F (Af F) c * a :=

@@ -17,7 +17,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
-set_option maxHeartbeats 2000000
+
 
 namespace GlobalTheory.Mem.Col2.LowerTie
 

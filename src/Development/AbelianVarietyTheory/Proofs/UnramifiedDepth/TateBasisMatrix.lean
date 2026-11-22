@@ -173,14 +173,14 @@ theorem tate_basis_matrix :
         (fun n k => ∑ l, ((PadicInt.toZModPow (n + 1) (c f l k)).val : ℤ) *
           ((PadicInt.toZModPow (n + 1) (c g j l)).val : ℤ)) (fun n k => ?_) (fun n => ?_) k
       · simp [Matrix.mul_apply, hr]
-      set_option synthInstance.maxHeartbeats 100000 in
-        · rw [← hc, AddMonoid.End.coe_mul, Function.comp_apply, hc g j n, map_sum]
-          simp only [Finset.sum_smul]
-          rw [Finset.sum_comm]
-          refine Finset.sum_congr rfl fun l _ => ?_
-          rw [map_nsmul, hc f l n, Finset.smul_sum]
-          refine Finset.sum_congr rfl fun k _ => ?_
-          rw [mul_comm, mul_smul, natCast_zsmul, natCast_zsmul]
+
+      · rw [← hc, AddMonoid.End.coe_mul, Function.comp_apply, hc g j n, map_sum]
+        simp only [Finset.sum_smul]
+        rw [Finset.sum_comm]
+        refine Finset.sum_congr rfl fun l _ => ?_
+        rw [map_nsmul, hc f l n, Finset.smul_sum]
+        refine Finset.sum_congr rfl fun k _ => ?_
+        rw [mul_comm, mul_smul, natCast_zsmul, natCast_zsmul]
     · apply Matrix.ext
       intro k j
       refine tateMat_unique h1 h2 h3 (c 0 j) (fun _ => 0)

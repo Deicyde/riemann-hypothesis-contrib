@@ -39,8 +39,8 @@ def qdetPoly {n : ℕ} (E : Fin n → Fin n → A) : A[X] :=
 
 theorem evAt_qdetPoly {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) : evAt u (qdetPoly E) = qdet E u := by
   unfold qdet qminor qdetPoly
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [map_mul, map_intCast, map_list_prod, List.map_ofFn]
   simp [Function.comp_def, evAt_tmPoly]
@@ -60,8 +60,8 @@ theorem cont {M : Type*} [AddCommGroup M] [Module ℂ M] (p : (Module.End ℂ M)
       rw [← map_pow, RingHom.id_apply, ← Algebra.commutes, ← Algebra.smul_def]
       rfl
     rw [e1, hr]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [eval_finsetSum, map_sum, eval_monomial, mul_comm]
+
+    simp [eval_finsetSum, map_sum, eval_monomial, mul_comm]
   have hz : r = 0 := by
     refine eq_zero_of_infinite_isRoot r ?_
     refine Set.Infinite.mono (s := {b}ᶜ) ?_ (Set.finite_singleton b).infinite_compl

@@ -24,7 +24,7 @@ open GlobalTheory.ExportSeries (Base Twist Weight PairRep GLR detChar detFam foc
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
-set_option synthInstance.maxHeartbeats 400000
+
 
 open scoped ComplexOrder Topology
 noncomputable section
@@ -78,7 +78,7 @@ theorem isOpen_comap_St (V : HSp D) (β : GL (Fin V.rank) (Lev.EAf D)) :
   exact hh.1
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem isOpen_map_levelGroup (V : HSp D) {N : ℕ} (hN : 0 < N) :
     IsOpen (((GlobalTheory.Member.PrincLevel.levelGroup V N).map (finHom V).rangeRestrict : Subgroup (Bridge.Gf V)) :
       Set (Bridge.Gf V)) := by

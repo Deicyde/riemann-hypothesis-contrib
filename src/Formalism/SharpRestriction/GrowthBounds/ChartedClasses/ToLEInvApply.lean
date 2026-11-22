@@ -31,8 +31,8 @@ theorem bc_mulVec (γ : GL (Fin N) E) (x : Fin N → E) :
       Matrix (Fin N) (Fin N) (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) *ᵥ (fun a => inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (x a)) =
       fun a => inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (((γ : Matrix (Fin N) (Fin N) E) *ᵥ x) a) := by
   funext a
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [bc, Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+  simp [bc, Matrix.mulVec, dotProduct, map_sum, map_mul]
 
 theorem latAd_rat (γ : GL (Fin N) E) (y : GL (Fin N) (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) (Lb : Submodule (𝓞 E) (Fin N → E)) :
     latAd (bc (inclE (F := F) (FiniteAdeleRing (𝓞 F) F)) γ * y) Lb = mvL γ (latAd y Lb) := by
@@ -77,8 +77,8 @@ private lemma hform_eq_lemma (σ : E →+* E) (J : Matrix (Fin N) (Fin N) E) (x 
 private lemma ringHom_mulVec_eq_map_mulVec (σ : E →+* E) (M : Matrix (Fin N) (Fin N) E) (x : Fin N → E) :
     (fun i => σ ((M *ᵥ x) i)) = (M.map σ) *ᵥ (fun i => σ (x i)) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+  simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
 
 private lemma hform_mulVec_eq_of_cT_mul_mul_eq' (σ : E →+* E) (J : Matrix (Fin N) (Fin N) E) (M : Matrix (Fin N) (Fin N) E)
     (hM : cT σ M * J * M = J) (x y : Fin N → E) :

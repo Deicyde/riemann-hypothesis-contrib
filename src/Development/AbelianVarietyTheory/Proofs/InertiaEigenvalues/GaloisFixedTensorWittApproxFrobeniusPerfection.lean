@@ -128,7 +128,7 @@ private theorem coeff_step_lemma_4 {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI
   simp only [map_add (f := _), map_mul, map_pow, map_sub, map_one] at h
   linear_combination h
 
-set_option maxHeartbeats 1000000 in
+
 private theorem nearPi_sum_lemma_5 {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI : LocAinf l P)
     (LL : FinExt l) (s N k : ℕ) (y : RW LL) (u v : Fin (Module.finrank ℤ_[l] ↥(OL LL)) → OCb l)
     (r : Fin (Module.finrank ℤ_[l] ↥(OL LL)) → WittVector l (Cb l))
@@ -160,8 +160,8 @@ private theorem nearPi_sum_lemma_5 {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI
       ∑ i, basisO LL i ⊗ₜ[ℤ_[l]] (inclW l (piW AI s) ^ k * inclW l (WittVector.teichmuller l (v i))) := by
     change inclR LL ((1 : ↥(OL LL)) ⊗ₜ[ℤ_[l]] piW AI s) ^ k *
       inclR LL (∑ i, basisO LL i ⊗ₜ[ℤ_[l]] WittVector.teichmuller l (v i)) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [hR]
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -211,7 +211,7 @@ private theorem crd_map_lemma_6 {Z O W : Type} [CommRing Z] [CommRing O] [Algebr
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem fixSub_approx_perfection (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P)
     (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) (W : Wach P K LL)
     (E : EtSit P AI K s LL h W) :

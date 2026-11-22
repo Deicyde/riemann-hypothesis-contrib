@@ -16,7 +16,7 @@ open scoped Formalism.Per NNReal
 namespace GlobalTheory.BSP
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem l_dvd_of_galois_sections : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (En : Env bk (ainfObj K) (bk.ev bk.E) (bk.ev X)) (κ : Type) [Fintype κ] (x : κ → En.Q.A) (c : κ → κ → En.Q.A) (h : ℕ), (∀ j, En.inl.f (bk.ev bk.E) ^ h * x j = ∑ i, En.Q.D.φ (x i) * c i j) → (∀ (g : ↥(GK K)) (s : Hom En.Q (ainfObj K)), s.comp En.inl = Hom.id _ → s.comp En.inr = (ainfHom K g).comp bk.ι → ∀ j, ((l : ℕ) : (ainfObj K).A) ∣ s.f (x j)) → ∀ j, ((l : ℕ) : En.Q.A) ∣ x j := by
   intro l _ K bk En κ _ x c h hx hs
   obtain ⟨-, -, -, -, -, -, hA7⟩ := GlobalTheory.T.ainf_divisibility_breuilKisin_facts l K bk
@@ -48,8 +48,8 @@ theorem l_dvd_of_galois_sections : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (
   have heq : ∀ j, π (En.inl.f (bk.ev X)) ^ (bk.Ep.natDegree * h) * π (x j) =
       ∑ i, π (x i) ^ l * π (c i j) := fun j => by
     have := congrArg π (hx j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_mul π, map_pow π, hE, ← pow_mul, map_sum π] at this
+
+    rw [map_mul π, map_pow π, hE, ← pow_mul, map_sum π] at this
     rw [this]
     exact Finset.sum_congr rfl fun i _ => by rw [map_mul π, hφ]
   have hpts : ∀ (O : Type) [CommRing O] [IsDomain O] [ValuationRing O] [CharP O l] [PerfectRing O l]

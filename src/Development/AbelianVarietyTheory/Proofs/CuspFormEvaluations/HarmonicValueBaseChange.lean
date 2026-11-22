@@ -21,7 +21,7 @@ attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.HarmonicValueBaseChange
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem sum_map_of_harmA (hC : ChartIndepSt2) {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
     {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} [StarRing (𝓞 E)] (nab : NabV Xo c)
     (hnab : IsNab Xo c nab) {S S' : Type} [CommRing S] [Algebra c.F S] [Algebra ℚ S]
@@ -71,8 +71,8 @@ theorem sum_map_of_harmA (hC : ChartIndepSt2) {E : Type} [Field E] [NumberField 
       C2.B.nabVal S' C2.h H.w0 k (f2 b) C2.uvec (MvPolynomial.monomial α 1) :=
     fun b α => hval2 k (F' b) (f2 b) (hf2 b) α
   simp only [e1, e2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← hCI, map_sum]
+
+  rw [← hCI, map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [map_mul, map_prod, AlgHom.commutes]
   congr 1

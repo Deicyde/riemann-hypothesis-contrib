@@ -114,13 +114,13 @@ instance isMulRightInvariant_splitHaar : (splitHaar (K := K) hn μ).IsMulRightIn
     map_mul_right_eq_self]
 
 theorem isMulRightInvariant_haar (hn : 0 < n) : ν.IsMulRightInvariant := by
-  set_option synthInstance.maxHeartbeats 200000 in
-    set μ₀ : Measure (normOneGL (K := K) (n := n)) := Measure.haar
-    have h := eq_centralHaarConst_smul hn μ₀ ν
-    have : ((centralHaarConst hn μ₀ ν) • splitHaar (K := K) hn μ₀).IsMulRightInvariant :=
-      inferInstance
-    rw [h]
-    exact this
+
+  set μ₀ : Measure (normOneGL (K := K) (n := n)) := Measure.haar
+  have h := eq_centralHaarConst_smul hn μ₀ ν
+  have : ((centralHaarConst hn μ₀ ν) • splitHaar (K := K) hn μ₀).IsMulRightInvariant :=
+    inferInstance
+  rw [h]
+  exact this
 
 theorem isInvInvariant_haar (hn : 0 < n) : ν.IsInvInvariant := by
   have := isMulRightInvariant_haar ν hn

@@ -37,9 +37,9 @@ theorem topPair_change_matrix : ∀ {k A : Type} [CommRing k] [CommRing A] (α :
     rw [mul_comm, ← Matrix.det_mul]
     congr 1
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.of_apply, Matrix.mul_apply, hD j, map_sum, map_smul,
-      LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul]
+
+    simp only [Matrix.of_apply, Matrix.mul_apply, hD j, map_sum, map_smul,
+    LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul]
     refine Finset.sum_congr rfl fun l _ => ?_
     ring
   show (exteriorPower.alternatingMapLinearEquiv _ : _ →ₗ[A] A) η = L.det * (exteriorPower.alternatingMapLinearEquiv _ : _ →ₗ[A] A) η

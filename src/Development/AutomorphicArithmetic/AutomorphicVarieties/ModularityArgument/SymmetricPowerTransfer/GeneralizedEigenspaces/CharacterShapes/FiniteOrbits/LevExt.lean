@@ -61,7 +61,7 @@ private theorem lev_mem {n : ℕ} {U : Subgroup (UA L n)} {S : Finset (Plc L)} {
 
 end Br
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.V.Z.Sym.So.levExt :
     UpperTheory.V.Z.Sym.So.LevExt := by
   intro L _ _ _ B hB T S VL A hA hF A₀ hA₀ hE S₁ h1 _ U y hy hU g hg

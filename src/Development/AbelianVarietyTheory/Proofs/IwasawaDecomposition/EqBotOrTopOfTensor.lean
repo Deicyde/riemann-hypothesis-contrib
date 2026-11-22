@@ -42,8 +42,8 @@ theorem eq_bot_or_top_of_tensor {K ι : Type} [Field K] [Fintype ι] {V κ G : �
     have : Φ (fun τ => ρ τ (g τ)) = L x := by
       rw [hΦ]
       conv_rhs => rw [← B.sum_repr x]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, hB, hL]
+
+      simp only [map_sum, map_smul, hB, hL]
     simpa [this] using hLU x hx
   have hmem : ∀ T, Φ T ∈ U := fun T => by
     simpa using congrArg (fun m => m T) h0

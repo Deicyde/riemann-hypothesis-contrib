@@ -83,7 +83,7 @@ theorem rank_eq (hQ : StdPsi hF Q) (w : HeightOneSpectrum (𝓞 D.host.E)) : n =
   exact le_antisymm (b.trans (Matrix.rank_le_width _)) (a.trans (Matrix.rank_le_width _))
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem sphEig_eq_satEig (hQ : StdPsi hF Q) (π : NG.FinTyp D.host.E n) (s : SplitPlace D.host.E)
     (hs : Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E) (s.w.under (𝓞 D.host.F)))
     (τ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion D.host.E))) (hτ : IsLocS π.S s τ) {α : Fin n → ℂˣ}
@@ -189,7 +189,7 @@ open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar Formalism.IndefR.principalLevelFrame.instCMHostI GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 def Low (D : D7) (Sb : Finset (PlE D.host)) : Prop :=
   ∀ P : PlE D.host, ((2 * (D.host.g 0 * D.host.g 1) : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal → P ∈ Sb
@@ -268,7 +268,7 @@ theorem satEig_eq (Rk : Ranks) (q : ℕ) (B : Multiset ℂˣ) {k : ℕ} (hk : k 
 
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_rat (Y : R3.Read (A3 := A3) R.toRealDat F.lv2 X0) (hlev : R.toLevCh.Is A3.A.μ0) (hU : R.toRealDat.LUnif)
     (hW : R.toRealDat.models_HW) {eig : ℕ → D.what₂.FT → ℕ → PlE D.host → ↥D.LL0} (he : EigAd Y Sb eig) (hsub : Sb ⊆ Sb')
     (hlow : Low D Sb') (i : Fin D.R.m) {σ : D.what₂.FT} (hne : D.what₂.isot (i.1 + 1) σ ≠ ⊥) (hgood : D.nd.goodRow σ)
@@ -351,7 +351,7 @@ theorem exists_rat (Y : R3.Read (A3 := A3) R.toRealDat F.lv2 X0) (hlev : R.toLev
 variable {cG : G0 R.Pg D.R.r ≃* G0g D.nd} {θ : ∀ kk : Fin 2, Multiplicative (ZMod (D.host.g kk)) →* (↥D.LL0)ˣ}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_goodL (Y : R3.Read (A3 := A3) R.toRealDat F.lv2 X0) (hlev : R.toLevCh.Is A3.A.μ0) (hU : R.toRealDat.LUnif)
     (hW : R.toRealDat.models_HW)
     (hidem : ∀ g, D.what₂.embLL ((idemOf A3.A.X).coeff g) = D.ntypes.e0.coeff ((R.eG.trans cG) g))
@@ -375,8 +375,8 @@ theorem exists_goodL (Y : R3.Read (A3 := A3) R.toRealDat F.lv2 X0) (hlev : R.toL
     Module.End.mem_eigenspace_iff.2 ?_⟩, fun h => hx0 (by rw [h, map_zero]), fun k P hk hs hP => ?_⟩
   · rw [one_smul, ← finsum_comp_equiv (R.eG.trans cG).toEquiv, finsum_eq_sum_of_fintype, LinearMap.sum_apply]
     apply fi.e.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← h1]
+
+    rw [map_sum, ← h1]
     refine Finset.sum_congr rfl fun g _ => ?_
     have hc : ((D.nexp.eLL0 ((R.eG.trans cG) g) : ↥D.LL0) : D.what₂.LL) = (idemOf A3.A.X).coeff g :=
       D.what₂.embLL.injective ((D.nStage_trivialCharacter_coeff_eq _).trans (hidem g).symm)

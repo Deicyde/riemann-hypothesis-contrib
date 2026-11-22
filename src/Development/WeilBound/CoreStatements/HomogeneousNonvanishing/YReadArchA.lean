@@ -158,7 +158,7 @@ variable {SS : Finset ℕ} {RM : Top.RootModel (CMType H) (Dw.p + Dw.q)}
   {Sys : PB.AnSys (Top.dimFl (CMType H) (Dw.p + Dw.q)) (Option (RootIx Dw))} {Fx : FixedData Y Sys}
   {Or : RootOrigin Y SS RM Fx}
 
-set_option maxHeartbeats 400000 in
+
 theorem pt_frame (Fr : Small.GenFrame Or) (F : Type) [Field F] [Algebra c.F F] (zC : Sp F ⟶ Or.𝔐.X) (q : TRing c.F)
     (φ : letI := Small.cstAlg Or; q.R →ₐ[c.F] RM.Ω) (yq : FrPt Xo c q.R)
     (hφ : letI := Small.cstAlg Or; FrMap φ yq Fr.y₀) (ψ : q.R →ₐ[c.F] F) (y : FrPt Xo c F)

@@ -8,7 +8,7 @@ public import Formalism.HermitianLattices.StatementLat
 @[expose] public section
 
 open NumberField IsDedekindDomain
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.hermitianDualLattice_baseChange : ∀ (K K' : Type) [Field K] [NumberField K] [StarRing K] [Field K'] [NumberField K'] [StarRing K'] (φ : K →+* K') (d d' : ℕ)
   (G : Matrix (Fin d') (Fin d) K'), Function.Bijective G.mulVec → ∀ (H : Matrix (Fin d) (Fin d) K) (H' : Matrix (Fin d') (Fin d') K'),
   (∀ x y : Fin d → K, Formalism.DivisionValues.hform H' (Matrix.mulVec G fun k => φ (x k)) (Matrix.mulVec G fun k => φ (y k)) = φ (Formalism.DivisionValues.hform H x y)) →

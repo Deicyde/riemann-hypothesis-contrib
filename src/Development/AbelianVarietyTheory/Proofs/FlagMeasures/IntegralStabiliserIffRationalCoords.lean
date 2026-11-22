@@ -61,8 +61,8 @@ theorem loc_act {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
       A.bc p (∑ a, l a • w a) = ∑ a, (A.loc p).ιE (l a) • A.bc p (w a) := by
     intro l w
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Places.bc, Finset.sum_apply, map_sum, smul_eq_mul, map_mul]
+
+    simp [Places.bc, Finset.sum_apply, map_sum, smul_eq_mul, map_mul]
   rw [hvl b, map_smul, hE, hM b, hbc, Finset.smul_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [← hv a, smul_smul, smul_smul]
@@ -75,7 +75,7 @@ end GlobalTheory.HL.StabIntCoord
 namespace GlobalTheory.HL.StabIntCoord
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem integralStabiliser_iff_rational_coords_alt : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word), Formalism.MainNotions.S.Cnt.Stand D u u' → 4 * D.R.rS + 7 ≤ D.R.k → ∀ (w : Point D.host.E (D.R.rS + 1)) (F00 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E)) (F'0 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (FP : ∀ p : PlF D, LocNG.FPair (locH (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) p) D.R.rS), ZhatOM (ZhatL F00 F'0) = ptMat w → Gval F00 F'0 ≠ 0 → (∀ p, AtBase (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) p F00 F'0 (Tu D u) (Tu D u') (FP p) ∧ (FP p).RelG (LocNG.theta (Y.M p))) → ∀ (G : GFrames (placesOf (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D)) D.R.rS D.R.k) (c : GCoord (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) F00 F'0 FP G), ∀ x ∈ G.St, ∀ B : Formalism.L2.SG.PairVal.MatR D, (∀ b, x (G.f' b) = ∑ a, B a b • G.f' a) → (x ∈ G.K0 ↔ ∀ a b : Fin (D.R.rS + 1), a < b → B a b ∈ ((ddS D ^ (-((b : ℤ) - (a : ℤ))) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))) := by
   intro D X Y u u' _ _ w F00 F'0 FP _ _ _ G c x hx B hB
   obtain ⟨s, s', hs, hs', hsf, hsf'⟩ := GlobalTheory.T.globalFrameStabilizer_acts_unitriangular _ _ _ G x hx

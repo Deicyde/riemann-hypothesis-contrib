@@ -43,8 +43,8 @@ theorem char_of_red {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [
   let t : k := ∑ a, ∑ b, if GlobalTheory.chainEdge κ (e a) (e b) then X a b else 0
   have hw : w - z ∈ I := by
     rw [← Ideal.Quotient.eq, hz, edgeSum, ← e.sum_comp]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [w, map_sum]
+
+    simp only [w, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [← e.sum_comp]
     refine Finset.sum_congr rfl fun b _ => ?_
@@ -52,8 +52,8 @@ theorem char_of_red {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [
     · exact hl a b
     · exact map_zero _
   have htw : valuation k (t - π w) < 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [t, w, map_sum, ← Finset.sum_sub_distrib]
+
+    simp only [t, w, map_sum, ← Finset.sum_sub_distrib]
     refine (valuation k).map_sum_lt one_ne_zero fun a _ => (valuation k).map_sum_lt one_ne_zero fun b _ => ?_
     split_ifs
     · exact h1 a b

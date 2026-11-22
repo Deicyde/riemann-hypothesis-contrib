@@ -125,7 +125,7 @@ theorem unswap_det {V : HSp D} {β : GL (Fin V.rank) (Lev.EAf D)} {u : GA D V} {
   rw [← det_frGL β y, hy, ← h2, unswap_swap]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_root_value {T0 : Type} {L : LevCh D T0} {μ0 : T0} (hL : L.Is μ0) (t : T0) {V : HSp D}
     {u : GA D V} (hu : u ∈ GfC V)
     (U : Formalism.L2.Herm.intAf D.host.F D.host.E) (hU : unswap D U = (finHom V u).1.det) {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} (l : Level H)
@@ -257,7 +257,7 @@ theorem latGHat_one_eq {V : HSp D} {ι : Dw.La →ₗ[𝓞 D.host.E] (Fin V.rank
   rw [(GlobalTheory.T.adelicElementLattice_full_and_completion D V 1).2.2.2.2.1, ← hι.2, LinearMap.coe_range]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem factor_det_eq {V : HSp D} {ι : Dw.La →ₗ[𝓞 D.host.E] (Fin V.rank → D.host.E)} (hι : LatEmb V ι)
     {I J : Ideal (𝓞 D.host.E)} (hIJ : IsCoprime I J) {M : ℕ} (hM : (M : 𝓞 D.host.E) ∈ I)
     (e : (Dw.La ⧸ (I • ⊤ : Submodule (𝓞 D.host.E) Dw.La)) ≃ₗ[𝓞 D.host.E] (Fin V.rank → 𝓞 D.host.E ⧸ I))
@@ -281,8 +281,8 @@ theorem factor_det_eq {V : HSp D} {ι : Dw.La →ₗ[𝓞 D.host.E] (Fin V.rank 
       rw [← latGHat_one_eq hι]
       exact h _ (hv₁ j))
   have hdet := hδ a fun j => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hv₂, ← hk, (Submodule.Quotient.eq _).2 (ha₁ j), ← Submodule.mkQ_apply, map_sum]
+
+    rw [← hv₂, ← hk, (Submodule.Quotient.eq _).2 (ha₁ j), ← Submodule.mkQ_apply, map_sum]
     simp only [map_smul, Submodule.mkQ_apply, hv₂]
   rw [hdet, Ideal.Quotient.factor_mk]
   exact (resS_eq_of_sub_mem P hP U _ (by rw [hU]; exact ha₂)).symm
@@ -308,7 +308,7 @@ variable {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.L
   {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem datum_move {l₂ : Level H} {ι : Dw.La →ₗ[𝓞 D.host.E] (Fin (Wc D i).rank → D.host.E)} (hι : LatEmb (Wc D i) ι)
     {K' : Type} [Field K'] {σ' : K' →+* ℂ} {φ : (Fin (Vc D i).rank → LevQc Dw l₂) → K'}
     (hφ : PhiIs R i σ' t ι (Mfr l₂ • ⊤) φ) (hPg : ∀ P ∈ R.Pg, l.Mb ≤ P.asIdeal) (hQ : ∀ P ∈ R.Q t, l₂.Mb ≤ P.asIdeal)
@@ -340,7 +340,7 @@ theorem datum_move {l₂ : Level H} {ι : Dw.La →ₗ[𝓞 D.host.E] (Fin (Wc D
   rw [(he x).2, (he fun b => f (x b)).2, h1, h2, h3, mul_left_comm]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_char {μ0 : T0} (hL : R.toLevCh.Is μ0) (d : DeltaDat Xo c (Vc D i).rank) (hd : d.IsLev)
     {ι : Dw.La →ₗ[𝓞 D.host.E] (Fin (Wc D i).rank → D.host.E)} (hι : GlobalTheory.Member.IotaOK Dw (Wc D i) ι)
     (hr : Dw.p + Dw.q = (Wc D i).rank) (hpq : 1 ≤ Dw.p + Dw.q) (hh : HalfIs R t l.Mb d.I)
@@ -425,7 +425,7 @@ theorem xi_laws {μ0 : T0} (hL : R.toLevCh.Is μ0) {xi : (Af D.host.F ⊗[D.host
   exact ⟨fun γ hγ => (e γ).trans (h3 γ hγ), n, hn, fun g => by rw [e, h4]⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem psiTie_of_values (V : HSp D) {n r : ℕ} (d : DeltaDat Xo c n) (hr : V.rank = r)
     (ι : Dw.La →ₗ[𝓞 D.host.E] (Fin V.rank → D.host.E)) (hι : GlobalTheory.Member.IotaOK Dw V ι) (hpq : 1 ≤ Dw.p + Dw.q)
     (x₀ : (D.host.E →+* ℂ) → Matrix (Fin r) (Fin r) ℂ)

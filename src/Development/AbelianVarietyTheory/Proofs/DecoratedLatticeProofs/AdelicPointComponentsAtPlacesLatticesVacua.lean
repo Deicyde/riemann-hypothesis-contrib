@@ -12,8 +12,8 @@ open IsDedekindDomain NumberField
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.FinPlLoc
 
@@ -508,14 +508,14 @@ theorem part_lat (P : Pl D → Prop) (S : HSp D) (L : Lat S) (y : Fin S.rank →
         simp only [infPart_pair, Finset.sum_const_zero, sub_zero]
         exact infPart_of_idAt (hid i)
       · intro w
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sub, map_sum]
+
+        rw [map_sub, map_sum]
         simp only [compAt_pair, hβ]
         by_cases hw : P w
         · have h1 : compAt D w (y i) = compAt D w ((idem D (· = w) • y) i) := by
             rw [Pi.smul_apply, smul_eq_mul, map_mul, compAt_idem, if_pos rfl, one_mul]
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [h1, hBy w hw, map_sum]
+
+          rw [h1, hBy w hw, map_sum]
           simp only [compAt_pair, if_pos hw, sub_self]
         · rw [compAt_of_idAt (hid i) hw]
           simp only [if_neg hw, TensorProduct.zero_tmul, Finset.sum_const_zero, sub_zero]

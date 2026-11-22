@@ -75,7 +75,7 @@ theorem hl_sub (hA9 : A9) (l : ℕ) [Fact l.Prime] (E : Spc) (m j : ℤ) (hm : m
   funext k
   exact ((hA9 (ZMod (l ^ k)) (tw (l ^ k) j)).1 E m hm).elim _ _
 
-set_option maxHeartbeats 800000 in
+
 theorem limRatAssemble : LimRatAssemble := by
   intro hA9 l _ X Y S pX pY n i M r c hnM hB e Φ hΦ hbij
   let T := fun a : ℤ => HQ l (sch.obj X) a i ⊗[ℚ_[l]] HQ l (sch.obj Y) (n - a) 0
@@ -117,8 +117,8 @@ theorem limRatAssemble : LimRatAssemble := by
       rw [LinearMap.liftBaseChange_tmul, map_smul, LinearMap.baseChange_tmul]
       change q • κ₀ (∑ a : Fin (M + 1), ∑ s : Fin (r a), _) = _
       rw [hΦ y, TensorProduct.tmul_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, hκ₀, TensorProduct.tmul_sum, Finset.smul_sum]
+
+      simp only [map_sum, hκ₀, TensorProduct.tmul_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun s _ => ?_
       rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
   have hsurj : Function.Surjective ψ := by

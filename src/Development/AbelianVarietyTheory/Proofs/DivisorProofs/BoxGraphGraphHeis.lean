@@ -19,8 +19,8 @@ noncomputable section
 
 namespace GlobalTheory.BigDat.GraphHeis
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 variable {D : D7}
 
@@ -109,8 +109,8 @@ namespace GlobalTheory.BigDat
 
 open GlobalTheory.BigDat.GraphHeis
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {i j : ℕ}
 
@@ -165,7 +165,7 @@ def modulPair (Γ : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.G
 end GlobalTheory.BigDat
 
 
-set_option maxHeartbeats 1600000 in
+
 open GlobalTheory.BigDat.GraphHeis in
 theorem GlobalTheory.BigDat.boxGraph_graph_heis : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T}, L.Is μ₀ → ∀ (W : G.Weil) (i j : Fin D.R.m) (e : Num G i j) (Γ : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.Geo G i j),
     Γ.V.J = (1 : D.host.E) • (spW G i j).gram → Γ.W.J = skewGram (spV G i j) (spV₁ G i j) e → ∀ (ε : AE D) (P : Finset (Pl D.host.E)), IsIdemSum ε P →

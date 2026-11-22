@@ -56,7 +56,7 @@ theorem map_unitMix_of_zero {R S : Type*} [CommRing R] [CommRing S] (φ : R →+
     φ (e * x + (1 - e)) = 1 := by
   rw [map_add (f := _), map_mul, map_sub, map_one, h]; ring
 
-set_option maxHeartbeats 1000000 in
+
 theorem detAt_cutPart_parts {P : Finset (Pl D.host.E)} {e : AE D} (he : IsIdemSum e P) (V : HSp D) (g : GA D V) :
     infPart D (GlobalTheory.VecInv.detAt e (GlobalTheory.PlaceModelSum.isOrthSum_of_isIdemSum he).idem V (cutPart (e + cA D e) V g) : AE D) = 1 ∧
     (∀ Q ∈ P, GlobalTheory.StdFrames.cpt Q (toEAf D (GlobalTheory.VecInv.detAt e (GlobalTheory.PlaceModelSum.isOrthSum_of_isIdemSum he).idem V

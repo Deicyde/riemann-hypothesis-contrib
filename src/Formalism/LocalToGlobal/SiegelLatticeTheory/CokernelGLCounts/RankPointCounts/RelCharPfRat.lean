@@ -123,9 +123,9 @@ theorem crd_linOfMat (A : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E) (y : (VS D
   unfold Formalism.L2.SG.HidaSetting.HidaSetting.crd
   unfold crdOf
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← Module.Basis.equivFun_apply, linOfMat, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
-    LinearEquiv.apply_symm_apply, Matrix.toLin'_apply, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
+
+  simp only [← Module.Basis.equivFun_apply, linOfMat, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
+  LinearEquiv.apply_symm_apply, Matrix.toLin'_apply, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
   simp
 
 theorem lieN_of_coord (w : D.what₂.Word) (W : Matrix (Kap X) (Kap X) X.B.I.E) (Z : (VS D).V →ₗ[D.host.E] (VS D).V)

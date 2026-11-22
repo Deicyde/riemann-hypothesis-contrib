@@ -18,7 +18,7 @@ namespace Formalism.MainStatements.RankOne
 
 variable {k r : ℕ}
 
-set_option maxHeartbeats 1600000 in
+
 theorem gap_arith (hk : 1 ≤ k) {C : ℝ} (hC : 100 ≤ C) :
     ThreeDimData.GapOK k r (C * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
       (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)) ∧

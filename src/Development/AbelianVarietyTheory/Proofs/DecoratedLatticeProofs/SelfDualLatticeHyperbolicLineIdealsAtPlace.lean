@@ -51,9 +51,9 @@ theorem mulVec_colMul {k m n : ℕ} (P : Mx D k m) (x : Mx D m n) (i : Fin n) (b
 theorem hermAt_colMul (S : HSp D) {n : ℕ} (x : Mx D S.rank n) (i : Fin n) (a : AE D) (y : Fin S.rank → AE D) :
     hermAt S (colMul x i a) y = cA D (((adj x * gA S) *ᵥ y) i) * a := by
   have hG : ∀ k l, cA D (gA S k l) = gA S l k := fun k l => congrFun (congrFun (adj_gA S) l) k
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hermAt, colMul, Matrix.mulVec, dotProduct, Matrix.mul_apply, adj, Matrix.transpose_apply,
-    Matrix.map_apply, map_sum, map_mul, GlobalTheory.RamLine.cA_cA', hG, Finset.sum_mul]
+
+  simp only [hermAt, colMul, Matrix.mulVec, dotProduct, Matrix.mul_apply, adj, Matrix.transpose_apply,
+  Matrix.map_apply, map_sum, map_mul, GlobalTheory.RamLine.cA_cA', hG, Finset.sum_mul]
   refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
   ring
 
@@ -247,7 +247,7 @@ theorem mul_eq_of_unit {A : Type} [CommRing A] {ε a α β : A} (t : A) (ha : ε
 theorem mul_rearr {A : Type} [CommRing A] (m K ε x : A) : m * K * ε * x = m * (K * x * ε) := by ring
 
 
-set_option maxHeartbeats 800000 in
+
 theorem ideals_at_place : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ) (L : Lat S) (L₀ : Lat S₀) (v : Pl D) (ε : AE D) (hεε : ε * ε = ε) (hεc : cA D ε = ε) (hεI : ε ∈ intAt D (· = v)) (hε : ∀ a, a ∈ idAt D (· = v) ↔ ε * a = a), IsSDAt S v (latV S L (· = v)) → MonoAt d L L₀ v → ∃ α β : Fin ρ → AE D, (∀ i, α i ∈ idAt D (· = v)) ∧ (∀ i, β i ∈ idAt D (· = v)) ∧ (∀ i, α i * β i = ε) ∧ (∀ i, ∀ a ∈ idAt D (· = v), colMul d.jX i a ∈ latV S L (· = v) ↔ a * β i ∈ intAt D (· = v)) ∧ (∀ i, ∀ a ∈ idAt D (· = v), colMul d.jY i a ∈ latV S L (· = v) ↔ a * cA D (α i) ∈ intAt D (· = v)) := by
   intro D S S₀ ρ d L L₀ v ε hεε hεc hεI hε hSD hMono
   unfold MonoAt at hMono

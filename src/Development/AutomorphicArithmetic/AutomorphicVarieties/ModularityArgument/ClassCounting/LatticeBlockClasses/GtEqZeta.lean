@@ -82,9 +82,9 @@ theorem UpperTheory.V.ZK.Cl.cGtEq :
       ordP P (if x = 1 then β else 1) := by
     intro x P
     have e := congrArg (Finsupp.linearCombination ℤ fun y => if B y = x then 𝔡 (actP (T y) P) else 0) hη
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finsupp.linearCombination_mapDomain, map_sum, Finsupp.linearCombination_apply,
-      Finsupp.sum_fintype _ _ (by simp)] at e
+
+    rw [Finsupp.linearCombination_mapDomain, map_sum, Finsupp.linearCombination_apply,
+    Finsupp.sum_fintype _ _ (by simp)] at e
     simp only [Finsupp.linearCombination_single, hT, hB, smul_eq_mul, Function.comp, mul_ite, mul_zero] at e
     rw [← Finset.sum_filter] at e
     rw [← Finset.sum_subtype (Finset.univ.filter fun j => B (χ j) = x) (by simp) (fun j => 𝔠 j P)]

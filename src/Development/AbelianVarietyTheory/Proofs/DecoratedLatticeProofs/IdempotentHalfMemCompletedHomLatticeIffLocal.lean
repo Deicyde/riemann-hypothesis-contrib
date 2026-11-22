@@ -125,15 +125,15 @@ theorem coefA_rat (e : AE D) (b : D.host.E) (s : Fin S.rank → D.host.E) (t : F
     (x : Formalism.L2.Col.HomE D.host.E S.rank T.rank) :
     coefA S T b s t ((LinearMap.toMatrix' x).map fun r => e * incA D r) = e * incA D (b * form T t (x s)) := by
   rw [coefA_apply, form_apply, ← LinearMap.toMatrix'_mulVec x s]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, Finset.mul_sum, map_sum]
+
+  simp only [Matrix.mulVec, dotProduct, Finset.mul_sum, map_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun m _ => ?_
   rw [Matrix.map_apply, mul_left_comm, ← RingHom.map_mul]
   congr 2
   ring
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem mem_localization_of_component (hc : D.host.ccK = ⊤) (hN : IsSelfDualC S N) (hN' : IsSelfDualC T N') {e e' : AE D}
     {P : HeightOneSpectrum (𝓞 D.host.E)} (he : Formalism.L2.NTheta.IsIdemAt e' P) (hee : e' * e = e')
     {x : Formalism.L2.Col.HomE D.host.E S.rank T.rank}
@@ -144,8 +144,8 @@ theorem mem_localization_of_component (hc : D.host.ccK = ⊤) (hN : IsSelfDualC 
   obtain ⟨m, t, t', ht, htt⟩ := GlobalTheory.LatVacDual.dualFamily D T N' hN'
   have hxe : x = ∑ k, ∑ i, form T (t' i) (x (s k)) • (form S (s' k)).smulRight (t i) := by
     refine LinearMap.ext fun v => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [expand hss v, map_sum]
+
+    conv_lhs => rw [expand hss v, map_sum]
     rw [LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     conv_lhs => rw [map_smul, expand htt (x (s k)), Finset.smul_sum]

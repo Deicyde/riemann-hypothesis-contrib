@@ -137,8 +137,8 @@ theorem UpperTheory.ConvolutionTheory.R2.G.expInt :
     simp
   have hsum : hat (W.Om k φ).1 v = ∑ i, c i k * hat (b i).1 v := by
     have h1 := (hbd k hp).2
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hH, h1, map_sum]
+
+    rw [← hH, h1, map_sum]
     simp [Finset.sum_apply, hH]
   have hη : ‖((W.η.1 a : ℂˣ) : ℂ)‖ = 1 := by
     have h1 : ((W.η.1 a : ℂˣ) : ℂ) ^ 2 = 1 := by

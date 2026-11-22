@@ -36,7 +36,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RowEx MeasureTheory
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace GlobalTheory.StdFstFix
 
@@ -69,7 +69,7 @@ end GlobalTheory.StdFstFix
 namespace GlobalTheory.StdFstFix
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem stdFst_fixed : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil} {i j : Fin D.R.m}
     {A A' WW : HSp D} {X : Tri T A A' WW}, IsBottomTri W i j X → ∀ t : T,
     ∃ U : Subgroup (GA D A), IsOpen (U : Set (GA D A)) ∧ GinfC A ≤ U ∧ ∀ k ∈ U, k ∈ GfC A →

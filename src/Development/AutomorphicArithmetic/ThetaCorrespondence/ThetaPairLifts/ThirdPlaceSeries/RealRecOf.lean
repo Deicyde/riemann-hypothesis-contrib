@@ -13,7 +13,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -26,7 +26,7 @@ variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotio
 variable {ex : Extra D L hT Gi Gl K Yd cX}
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 4000000 in
+
 structure RealInAlt (x : TwIn ex) (Rc : _root_.Formalism.L2.RecTAlt ex) (S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc) : Type 1 where
   psiPin : x.R.ψ = Rc.T.theta.W.ψ
   hin : ∀ u, Formalism.L2.SG.PoincareInHH.PoincareSetting.InHH S.X u S.Y.hK
@@ -61,7 +61,7 @@ structure RealInAlt (x : TwIn ex) (Rc : _root_.Formalism.L2.RecTAlt ex) (S : _ro
   host : HostHyp D
   vpos : ∀ i, (Vc D i).IsPosDef
 variable {x : TwIn ex} {Rc : _root_.Formalism.L2.RecTAlt ex} {S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc}
-set_option maxHeartbeats 4000000 in
+
 def realisationOfInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S) : _root_.Formalism.IndefR.IndefiniteRealisation Rc (divisionPairOfAdelicFormsFaceColumnsData x) x.F.Dc x.F.Sp x.F.Zsc S x.core.Q.c.F where
   Rl := x.R
   sEE := x.sEE
@@ -106,7 +106,7 @@ def realisationOfInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S) : _root
   host := y.host
   err_eq := (x.err)
   vpos := y.vpos
-set_option maxHeartbeats 4000000 in
+
 def boundedRealisationOfInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S) : _root_.Formalism.IndefR.RealTBAlt Rc (divisionPairOfAdelicFormsFaceColumnsData x) x.F.Dc x.F.Sp x.F.Zsc S where
   T := x.core
   Q := _root_.GlobalTheory.Mem.R3.realisationOfInput y
@@ -127,7 +127,7 @@ def boundedRealisationOfInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S) 
     exact (h)
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
-set_option maxHeartbeats 4000000 in
+
 structure RecursiveInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S) : Type 1 where
   E : EigIdx D Yd
   labPi : E.Pi → x.A3.A.fam.base.Ix
@@ -139,7 +139,7 @@ structure RecursiveInput (y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S) : Typ
     (twPOf (divisionPairOfAdelicFormsFaceColumnsData x) x.Y.tupT x.Y.tupTie)
   mjRead : Formalism.IndefR.RecTie.MjRead x.R.toRealDat x.F.lv2 x.Y.tupT x.Y.hm x.Y.hTop x.Y.hinj x.Y.IL
     (fun i => (x.A3.indefDown (s0Of x.R x.F)).dW i) (fun i v => x.Z.jW i v) ((indefiniteDownJoin (realisationOfInput y)))
-set_option maxHeartbeats 4000000 in
+
 def realisationRecursionOfInput {y : _root_.GlobalTheory.Mem.R3.RealInAlt x Rc S} (r : _root_.GlobalTheory.Mem.R3.RecursiveInput y) : _root_.Formalism.IndefR.IndefiniteRealisationRecursion (_root_.GlobalTheory.Mem.R3.realisationOfInput y) where
   tupT := x.Y.tupT
   hm := x.Y.hm

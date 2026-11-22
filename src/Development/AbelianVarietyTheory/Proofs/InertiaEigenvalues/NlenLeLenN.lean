@@ -48,8 +48,8 @@ theorem toPi_WKG {Γ : Type} [Group Γ] (M : Γ →* Matrix (Fin k) (Fin k) O) (
   obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   change Submodule.mkQ _ (∑ j, algebraMap O (FractionRing O) (M g a j) * v j) =
     ∑ j, M g a j • Submodule.mkQ _ (v j)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, ← Algebra.smul_def, map_smul]
+
+  simp only [map_sum, ← Algebra.smul_def, map_smul]
 
 theorem push_WKG {O' : Type} [CommRing O'] [IsDomain O'] (f : O →+* O') (hf : Function.Injective f)
     {Γ Γ' : Type} [Group Γ] [Group Γ']
@@ -93,7 +93,7 @@ variable {l : ℕ} [Fact l.Prime] (P : LocPrime l) {E Ω : Type} [Field E] [Fiel
   {O : Type} [CommRing O] [IsDomain O] [Algebra ℤ_[l] O] [TopologicalSpace O] (B : LocBridge l E Ω Gw O)
 
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem exists_lift {k : ℕ} (M : ↥Gw →* Matrix (Fin k) (Fin k) O) (hM : ∀ a b, Continuous fun g => M g a b)
     (c : ↥(Z1 (WKG M))) (hc : Submodule.Quotient.mk c ∈ Br.bkG B P (WKG M) M) :
     ∃ z ∈ finiteCocycles (P.PD B.Kw) (matRep (Br.locM B M)), ∃ y : ↥Gw → Fin k → FractionRing O,
@@ -191,8 +191,8 @@ theorem rep_eq (v : PlE D.host) (hv : v ∈ placesOver D.host.E (D.ntw.l i)) :
     Matrix (Fin D.R.r) (Fin D.R.r) (D.ntw.O0 i)) a b
   simp [latT, twistM, Gen.chiS]
 
-set_option maxHeartbeats 800000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem cond_le (v : PlE D.host) (hv : v ∈ placesOver D.host.E (D.ntw.l i))
     (hψ : ∀ σ ∈ Dec (F := D.host.E) (D.nd.plOm.1 v), ψ σ = 1)
     (x : H1 ((WKG (latTpsi D.ntw i s (toOk D.ntw i k) ψ)).comp (Dec (F := D.host.E) (D.nd.plOm.1 v)).subtype))

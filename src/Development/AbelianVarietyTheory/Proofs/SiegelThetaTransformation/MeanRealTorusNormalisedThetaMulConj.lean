@@ -169,10 +169,10 @@ theorem expo_shift (x₁ x₂ : Frame X.Ψ r) (h : ∀ τ, (aLin X x₁ x₂ τ)
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   have e2 : ((τ.1 X.κ0 / 2) • (w τ k ᵥ* X.Gm.map τ.1)) ⬝ᵥ (fun a => conj (τ.1 (x k a))) =
       conj (τ.1 (-(X.κ0 / 2)) * hermC τ.1 X.Gm (embR X x τ k) (w τ k)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hermC, embR, vecMul, dotProduct, Pi.smul_apply, smul_eq_mul, Finset.mul_sum,
-      Finset.sum_mul, map_neg, map_div₀, map_ofNat, map_apply, map_sum, map_mul, conj_conj,
-      DblPer.conj_Gm, DblPer.conj_kappa]
+
+    simp only [hermC, embR, vecMul, dotProduct, Pi.smul_apply, smul_eq_mul, Finset.mul_sum,
+    Finset.sum_mul, map_neg, map_div₀, map_ofNat, map_apply, map_sum, map_mul, conj_conj,
+    DblPer.conj_Gm, DblPer.conj_kappa]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   rw [e1, e2]
   ring

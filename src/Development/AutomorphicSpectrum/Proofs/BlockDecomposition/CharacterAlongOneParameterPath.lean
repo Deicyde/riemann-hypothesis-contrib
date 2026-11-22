@@ -13,8 +13,8 @@ open GlobalTheory.CompanionTheory.WSum
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.WSum

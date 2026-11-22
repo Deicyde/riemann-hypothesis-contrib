@@ -30,7 +30,7 @@ theorem cong_entry {N : ℕ} {κ : Formalism.AUTREP.GAf D.host.E n} (hκ : NG.Co
   rw [h1, h2]
   exact e
 
-set_option maxHeartbeats 2000000 in
+
 theorem redFn_eq_one_of_cong {N : ℕ} {PP : Pl D.host.E} (hN : ((N : ℕ) : 𝓞 D.host.E) ∈ PP.asIdeal)
     {κ : Formalism.AUTREP.GAf D.host.E n} (hκ : NG.Cong D.host.E n N κ) :
     redFn (1 : GL (Fin n) (EAf D)) PP (km D n κ) = 1 := by

@@ -45,8 +45,8 @@ theorem lin_cont {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O
   have h : ∀ y : X → Matrix (Fin n) (Fin n) O,
       φ y = ∑ x, ∑ p, ∑ q, y x p q • φ (Pi.single x (Matrix.single p q 1)) := by
     intro y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← map_smul, ← map_sum]
+
+    simp only [← map_smul, ← map_sum]
     apply congrArg φ
     funext x
     simp only [Finset.sum_apply]

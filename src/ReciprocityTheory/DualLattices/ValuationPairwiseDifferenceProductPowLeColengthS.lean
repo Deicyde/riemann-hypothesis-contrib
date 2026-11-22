@@ -91,8 +91,8 @@ theorem eval_det_gen {K : Type} [CommRing K] {ι σ : Type} [Fintype ι] [Decida
   rw [RingHom.map_det]
   congr 1
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum]
+
+  simp [map_sum]
 
 theorem exists_generic [IsAlgClosed C] {ι σ T : Type} [Fintype ι] [DecidableEq ι] [Fintype σ]
     [Fintype T] (Q : T → Matrix ι σ C) (hQ : ∀ t i r, v (Q t i r) ≤ 1)
@@ -135,8 +135,8 @@ theorem exists_generic [IsAlgClosed C] {ι σ T : Type} [Fintype ι] [DecidableE
       calc ∑ r, IsLocalRing.residue v.valuationSubring (QO t i r) *
             IsLocalRing.residue v.valuationSubring (dO r j)
           = IsLocalRing.residue v.valuationSubring (∑ r, QO t i r * dO r j) := by
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp [map_sum, map_mul]
+
+            simp [map_sum, map_mul]
         _ = (1 : Matrix ι ι (IsLocalRing.ResidueField v.valuationSubring)) i j := by
             rw [hO]
             by_cases hij' : i = j
@@ -160,9 +160,9 @@ theorem exists_generic [IsAlgClosed C] {ι σ T : Type} [Fintype ι] [DecidableE
     rw [RingHom.map_det]
     congr 1
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.mul_apply, Matrix.of_apply, map_sum,
-      map_mul]
+
+    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.mul_apply, Matrix.of_apply, map_sum,
+    map_mul]
     rfl
   rw [hcoe]
   apply v_eq_one_of_residue_ne_zero
@@ -174,9 +174,9 @@ theorem exists_generic [IsAlgClosed C] {ι σ T : Type} [Fintype ι] [DecidableE
   have hmat : (IsLocalRing.residue v.valuationSubring).mapMatrix (QO t * cO) =
       Matrix.of fun i j => ∑ r, Qk t i r * z (r, j) := by
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.mul_apply, Matrix.of_apply,
-      map_sum, map_mul]
+
+    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.mul_apply, Matrix.of_apply,
+    map_sum, map_mul]
     refine Finset.sum_congr rfl fun r _ => ?_
     rw [← hy (r, j)]
   rw [hmat]

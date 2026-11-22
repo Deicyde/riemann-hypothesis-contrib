@@ -57,8 +57,8 @@ def expT (f : MvPowerSeries σ K) (N : ℕ) : MvPowerSeries σ K :=
 
 theorem coeff_expT (f : MvPowerSeries σ K) (N : ℕ) (α : σ →₀ ℕ) :
     coeff α (expT f N) = ∑ n ∈ range N, coeff α (f ^ n) / (n.factorial : K) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [expT, map_sum, map_smul, smul_eq_mul]
+
+  simp only [expT, map_sum, map_smul, smul_eq_mul]
   refine Finset.sum_congr rfl fun n _ => ?_
   rw [div_eq_inv_mul]
 
@@ -84,8 +84,8 @@ private theorem coeff_expT_add_eq_coeff_expT_mul_expT [CharZero K] {f g : MvPowe
   have lhs : coeff α (expT (f + g) N) = ∑ n ∈ range N, ∑ m ∈ range (n + 1), F m (n - m) := by
     rw [coeff_expT]
     refine Finset.sum_congr rfl fun n _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [add_pow, map_sum, Finset.sum_div]
+
+    rw [add_pow, map_sum, Finset.sum_div]
     refine Finset.sum_congr rfl fun m hm => ?_
     have hmn : m ≤ n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hm)
     have hc : ((n.choose m : ℕ) : K) * (m.factorial : K) * ((n - m).factorial : K) =
@@ -100,11 +100,11 @@ private theorem coeff_expT_add_eq_coeff_expT_mul_expT [CharZero K] {f g : MvPowe
     field_simp
   have rhs : coeff α (expT f N * expT g N) = ∑ i ∈ range N, ∑ j ∈ range N, F i j := by
     simp only [expT]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_mul_sum, map_sum]
+
+    rw [Finset.sum_mul_sum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [smul_mul_smul_comm, map_smul, smul_eq_mul]
     show _ = coeff α (f ^ i * g ^ j) / ((i.factorial : K) * (j.factorial : K))

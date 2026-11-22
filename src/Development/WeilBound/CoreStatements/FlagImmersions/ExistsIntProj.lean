@@ -32,17 +32,17 @@ private theorem exists_trace_dual_integral_projector {E : Type} [Field E] [Numbe
     have h1 := congr_fun (congr_fun hA j) l
     rw [Matrix.mul_apply] at h1
     simp only [Algebra.traceMatrix_apply, Algebra.traceForm_apply] at h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hz, Finset.sum_mul, map_sum]
+
+    rw [hz, Finset.sum_mul, map_sum]
     simp only [smul_mul_assoc, map_zsmul, smul_eq_mul]
     rw [h1]
     simp [Matrix.one_apply]
   have hF : ∀ j y, Algebra.trace ℤ (𝓞 E) (z j * y) = d * B.repr y j := by
     intro j y
     conv_lhs => rw [← B.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.mul_sum, mul_smul_comm, map_sum, map_zsmul, hF0, smul_eq_mul, mul_ite, mul_zero,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true]
+
+    simp only [Finset.mul_sum, mul_smul_comm, map_sum, map_zsmul, hF0, smul_eq_mul, mul_ite, mul_zero,
+    Finset.sum_ite_eq, Finset.mem_univ, if_true]
     ring
   have hN : ∀ x x' : 𝓞 E, (∀ y, Algebra.trace ℤ (𝓞 E) (x * y) = Algebra.trace ℤ (𝓞 E) (x' * y)) → x = x' := by
     intro x x' h
@@ -53,12 +53,12 @@ private theorem exists_trace_dual_integral_projector {E : Type} [Field E] [Numbe
     exact mul_left_cancel₀ hd h2
   refine ⟨z, fun a j => hN _ _ fun y => ?_, hN _ _ fun y => ?_⟩
   · rw [mul_comm a, _root_.mul_assoc, hF, Finset.sum_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [smul_mul_assoc, map_sum, map_zsmul, hF, smul_eq_mul]
+
+    simp only [smul_mul_assoc, map_sum, map_zsmul, hF, smul_eq_mul]
     conv_lhs => rw [← B.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.mul_sum, mul_smul_comm, map_sum, map_zsmul, Finset.sum_apply',
-      Finsupp.smul_apply, smul_eq_mul]
+
+    simp only [Finset.mul_sum, mul_smul_comm, map_sum, map_zsmul, Finset.sum_apply',
+    Finsupp.smul_apply, smul_eq_mul]
     refine Finset.sum_congr rfl fun k _ => ?_
     ring
   · set_option synthInstance.maxHeartbeats 100000 in
@@ -84,21 +84,21 @@ private theorem exists_eigSp_projector_sum_mem_and_discr_smul (E : Type) [Field 
   · rw [mem_eigSp]
     intro a
     calc ρ a (∑ k, χ (z k) • ρ (B k) w) = ∑ k, χ (z k) • ρ (a * B k) w := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp [map_sum, map_smul, map_mul, Module.End.mul_apply]
+
+          simp [map_sum, map_smul, map_mul, Module.End.mul_apply]
       _ = ∑ k, χ (z k) • ∑ j, ((B.repr (a * B k) j : ℤ) : K) • ρ (B j) w := by
           refine Finset.sum_congr rfl fun k _ => ?_
           conv_lhs => rw [hB a k]
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp [map_sum, Int.cast_smul_eq_zsmul]
+
+          simp [map_sum, Int.cast_smul_eq_zsmul]
       _ = ∑ j, ∑ k, (((B.repr (a * B k) j : ℤ) : K) * χ (z k)) • ρ (B j) w := by
           simp only [Finset.smul_sum, smul_smul]
           rw [Finset.sum_comm]
           simp only [mul_comm]
       _ = ∑ j, χ (a * z j) • ρ (B j) w := by
           refine Finset.sum_congr rfl fun j _ => ?_
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [hza a j, map_sum, Finset.sum_smul]
+
+          rw [hza a j, map_sum, Finset.sum_smul]
           simp only [map_zsmul, zsmul_eq_mul, map_mul, map_intCast]
       _ = χ a • ∑ k, χ (z k) • ρ (B k) w := by
           simp [Finset.smul_sum, smul_smul, map_mul]
@@ -107,8 +107,8 @@ private theorem exists_eigSp_projector_sum_mem_and_discr_smul (E : Type) [Field 
     simp only [hw, smul_smul]
     rw [← Finset.sum_smul]
     simp only [← map_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, hzd, map_intCast]
+
+    rw [← map_sum, hzd, map_intCast]
 
 section Val
 

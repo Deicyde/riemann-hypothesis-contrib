@@ -47,9 +47,9 @@ theorem repr_eq_trace (a : 𝓞 E) (k) :
     (((RingOfIntegers.basis E).repr a k : ℤ) : ℚ) = Algebra.trace ℚ E (dualInt E k * (a : E)) := by
   classical
   conv_rhs => rw [← (RingOfIntegers.basis E).sum_repr a]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, RingOfIntegers.coe_eq_algebraMap, Finset.mul_sum, map_zsmul, mul_smul_comm,
-    ← integralBasis_apply, trace_dualInt]
+
+  simp only [map_sum, RingOfIntegers.coe_eq_algebraMap, Finset.mul_sum, map_zsmul, mul_smul_comm,
+  ← integralBasis_apply, trace_dualInt]
   simp
 
 end Eigen

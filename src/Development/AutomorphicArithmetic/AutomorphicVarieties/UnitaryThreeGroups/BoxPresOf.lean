@@ -63,7 +63,7 @@ private theorem lc_desc {X Y Z : Type} [TopologicalSpace X] [TopologicalSpace Y]
     (hq : Topology.IsQuotientMap π) {f : Y → Z} (h : IsLocallyConstant fun x => f (π x)) : IsLocallyConstant f :=
   fun s => hq.isOpen_preimage.1 (h s)
 
-set_option maxHeartbeats 800000 in
+
 private theorem aux (hI : CohInp) (hP : LemmaP) {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ)
     [hl : Fact l.Prime] (hl2 : l ≠ 2) {O : Type} [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
     [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField O)] [CharP (ResidueField O) l] (h2 : IsUnit (2 : O))

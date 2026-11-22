@@ -49,9 +49,9 @@ theorem level_comb_sub_mem {g n k : ℕ} (hk : (k : ℂ) ≠ 0) {La : Type} [Add
   have hk0 : k ≠ 0 := by rintro rfl; simp at hk
   haveI : NeZero k := ⟨hk0⟩
   refine ⟨∑ i, (m i / k) • lam i + y, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_add (f := _), map_sum, map_sum, map_nsmul, smul_add, Finset.smul_sum, ← add_assoc,
-    ← Finset.sum_add_distrib]
+
+  rw [map_add (f := _), map_add (f := _), map_sum, map_sum, map_nsmul, smul_add, Finset.smul_sum, ← add_assoc,
+  ← Finset.sum_add_distrib]
   congr 1
   · refine Finset.sum_congr rfl fun i _ => ?_
     have h1 : (((m i : ZMod k).val : ℤ) : ℂ) = ((m i % k : ℤ) : ℂ) := by rw [ZMod.val_intCast]

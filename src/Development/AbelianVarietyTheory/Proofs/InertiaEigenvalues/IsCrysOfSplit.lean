@@ -34,8 +34,8 @@ theorem finrank_coordInv_of_split (A : G → Matrix (Fin n) (Fin n) Qp) (W : Mat
     have h1 : (fun i => PD.actB g (W.mulVec y i)) =
         (W.map (PD.actB g)).mulVec fun i => PD.actB g (y i) := by
       funext i
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [Matrix.mulVec, dotProduct, map_sum]
+
+      simp [Matrix.mulVec, dotProduct, map_sum]
     change ((A g).map (algebraMap Qp B)).mulVec _ = _
     rw [h1, Matrix.mulVec_mulVec, hW]
   have hinj : Function.Injective W.mulVec :=

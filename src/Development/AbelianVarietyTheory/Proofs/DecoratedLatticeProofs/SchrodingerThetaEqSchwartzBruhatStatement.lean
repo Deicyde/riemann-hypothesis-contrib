@@ -16,6 +16,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.IP GlobalTheory.Core.Rk.SWLaw
 open GlobalTheory.Core.Rk.SW
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.schrodingerTheta_eq_schwartzBruhat : ∀ D : D7, SchSchwartz D := by
   first | exact @GlobalTheory.SchSchwartzAll.schSchwartz | exact GlobalTheory.SchSchwartzAll.schSchwartz | (intros; apply GlobalTheory.SchSchwartzAll.schSchwartz <;> assumption)

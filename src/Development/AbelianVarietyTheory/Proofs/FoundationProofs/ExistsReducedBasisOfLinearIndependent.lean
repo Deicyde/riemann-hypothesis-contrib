@@ -166,10 +166,10 @@ theorem polar_equivFun (q : QuadraticMap ℤ X ℝ) (b : Basis (Fin d) ℤ X) (x
     ReciprocityTheory.ReducedBases.polar (Matrix.of fun i j => QuadraticMap.polar q (b i) (b j))
       (b.equivFun x) (b.equivFun y) = QuadraticMap.polar q x y := by
   conv_rhs => rw [← b.sum_repr x, ← b.sum_repr y, ← QuadraticMap.polarBilin_apply_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
-    QuadraticMap.polarBilin_apply_apply, ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, mulVec, of_apply,
-    mul_sum, Basis.equivFun_apply, zsmul_eq_mul]
+
+  simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
+  QuadraticMap.polarBilin_apply_apply, ReciprocityTheory.ReducedBases.polar, toReal, dotProduct, mulVec, of_apply,
+  mul_sum, Basis.equivFun_apply, zsmul_eq_mul]
   rw [sum_comm]
   exact sum_congr rfl fun i _ => sum_congr rfl fun j _ => by ring
 

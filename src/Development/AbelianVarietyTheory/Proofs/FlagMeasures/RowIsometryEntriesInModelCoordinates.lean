@@ -62,10 +62,10 @@ theorem _root_.GlobalTheory.SnMass.VolN.rowE_entries : ∀ (F E : Type) [Field F
       w.embedding = 1 + vecMulVec (v + w.embedding t • x) (star x ᵥ* J.map w.embedding) -
         vecMulVec x (star v ᵥ* J.map w.embedding) := by
     ext p q
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [_root_.GlobalTheory.SnMass.VolN.rowE, vecMulVec_apply, vecMul, dotProduct, map_sum, hconj,
-      one_apply, x, v]
-      exact Matrix.one_apply.symm
+
+    simp [_root_.GlobalTheory.SnMass.VolN.rowE, vecMulVec_apply, vecMul, dotProduct, map_sum, hconj,
+    one_apply, x, v]
+    exact Matrix.one_apply.symm
   unfold _root_.GlobalTheory.SnMass.VolN.gM
   rw [hmap, Matrix.mul_sub, Matrix.mul_add, Matrix.sub_mul, Matrix.add_mul, Matrix.mul_one, hinv,
     mul_vecMulVec_mul_flag_measures, mul_vecMulVec_mul_flag_measures, hrow, hrow, mulVec_add, mulVec_smul, hAx]

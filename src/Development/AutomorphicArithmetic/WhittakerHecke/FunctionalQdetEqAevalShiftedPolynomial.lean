@@ -44,9 +44,9 @@ theorem UpperTheory.functional_qdet_eq_aeval_shifted_polynomial :
     have e : (∑ m ∈ Q.support, Polynomial.monomial m (l ((Q.coeff m : A) * a))) = q * Polynomial.C (l a) := by
       refine Polynomial.funext fun c => ?_
       have := h (v + c) a
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← GlobalTheory.CuspRep.qdet_shift, ← hev _ (fun a => (Algebra.commutes c _).symm), Polynomial.eval₂_eq_sum, Polynomial.sum,
-        Finset.sum_mul, map_sum] at this
+
+      rw [← GlobalTheory.CuspRep.qdet_shift, ← hev _ (fun a => (Algebra.commutes c _).symm), Polynomial.eval₂_eq_sum, Polynomial.sum,
+      Finset.sum_mul, map_sum] at this
       rw [Polynomial.eval_mul, Polynomial.eval_C, hq, Polynomial.eval_comp, Polynomial.eval_add, Polynomial.eval_X,
         Polynomial.eval_C, add_comm c v, ← this, Polynomial.eval_finsetSum]
       refine Finset.sum_congr rfl fun m _ => ?_
@@ -61,9 +61,9 @@ theorem UpperTheory.functional_qdet_eq_aeval_shifted_polynomial :
     · rw [Polynomial.notMem_support_iff.1 hk]
       simp
   let N := max Q.natDegree q.natDegree + 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← h1, Polynomial.eval₂_eq_sum_range' _ (show Q.natDegree < N from Nat.lt_succ_of_le (le_max_left _ _)),
-    Polynomial.aeval_eq_sum_range' (show q.natDegree < N from Nat.lt_succ_of_le (le_max_right _ _)), map_sum, map_sum]
+
+  rw [← h1, Polynomial.eval₂_eq_sum_range' _ (show Q.natDegree < N from Nat.lt_succ_of_le (le_max_left _ _)),
+  Polynomial.aeval_eq_sum_range' (show q.natDegree < N from Nat.lt_succ_of_le (le_max_right _ _)), map_sum, map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [map_smul, smul_eq_mul]
   exact h2 _ m

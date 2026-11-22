@@ -37,7 +37,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCmElli
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

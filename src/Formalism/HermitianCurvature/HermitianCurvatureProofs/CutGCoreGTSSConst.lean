@@ -180,7 +180,7 @@ theorem sum_delta {ι : Type} [Fintype ι] [DecidableEq ι] (f : ι → ℂ) (a 
     ∑ σ, f σ * (if σ = a then c else 0) = f a * c := by
   simp [mul_ite, Finset.sum_ite_eq']
 
-set_option maxHeartbeats 1000000 in
+
 theorem second_shift_constant : GTSSConst := by
   intro Wp Wq _ _ _ _ _ _ P Bs X d hH e he hk hn s t hst hSL l hl ρ' ρ0
   classical

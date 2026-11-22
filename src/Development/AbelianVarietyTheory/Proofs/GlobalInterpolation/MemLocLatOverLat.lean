@@ -106,7 +106,7 @@ theorem approx_one {Λ Λ' : Submodule (𝓞 E) (Fin k → E)} (hfin : Module.Fi
     exact neg_mem (nsmul_mem_locLat w h z hz)
 
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem mem_of_count {Λ Λ' : Submodule (𝓞 E) (Fin k → E)} (hfin : Module.Finite (𝓞 E) Λ') {T f : ℕ}
     (hT : T ≠ 0) (hf : f ≠ 0) (h : ∀ x ∈ Λ', T • x ∈ Λ)
     (hidx : Λ.toAddSubgroup.relIndex Λ'.toAddSubgroup = T ^ (2 * f))
@@ -232,8 +232,8 @@ theorem hform_add_left {A : Type} [CommRing A] (τ : A →+* A) (J : Matrix (Fin
 theorem hform_loc (J : Matrix (Fin k) (Fin k) E) (x y : Fin k → E) :
     hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F))) (loc v x) (loc v y) =
       inclE (F := F) (v.adicCompletion F) (hform (σ : E →+* E) J x y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hform, map_sum, map_mul]
+
+  simp only [hform, map_sum, map_mul]
   rfl
 
 end Split
@@ -246,8 +246,8 @@ variable {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberFie
     {clsLat : ∀ i, C.cls i → Submodule (𝓞 E) (sp.X i).V}
 
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem localAtT (L : ColLevel R F E sp gp C A clsLat) (N : Submodule (𝓞 E) (Fin R.k → E))
     (v : HeightOneSpectrum (𝓞 F)) (hv : (A.T : 𝓞 F) ∈ v.asIdeal)
     {s : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F}
@@ -438,8 +438,8 @@ theorem finite_dualLb (L : ColLevel R F E sp gp C A clsLat) : Module.Finite (�
   exact nsmul_right_injective A.T_prime.ne_zero h'
 
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem exists_local (L : ColLevel R F E sp gp C A clsLat)
     (v : HeightOneSpectrum (𝓞 F)) (hv : (A.T : 𝓞 F) ∈ v.asIdeal) :
     ∃ s : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F,
@@ -578,8 +578,8 @@ theorem locLat_dual_le (L : ColLevel R F E sp gp C A clsLat) (v : HeightOneSpect
   fun y hy => mem_of_nsmul_mem hv _ (nsmul_mem_locLat v (nsmul_mem L) y hy)
 
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem exists_overLattice (L : ColLevel R F E sp gp C A clsLat)
     (hpl : Nat.card {v : HeightOneSpectrum (𝓞 F) // (A.T : 𝓞 F) ∈ v.asIdeal} = R.f) :
     ∃ N : Submodule (𝓞 E) (Fin R.k → E), IsOverLattice L N ∧

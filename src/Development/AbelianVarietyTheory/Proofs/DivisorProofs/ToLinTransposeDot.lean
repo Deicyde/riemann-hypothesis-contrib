@@ -31,8 +31,8 @@ theorem dot_single {O : Type} [CommRing O] {h : ℕ} (g : (Fin h → O) →ₗ[O
     ext j
     simp [Finset.sum_apply, Pi.single_apply]
   conv_rhs => rw [hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, dotProduct, mul_comm]
+
+  simp [map_sum, dotProduct, mul_comm]
 
 theorem toLin'_transpose_dot {A O : Type} [CommRing A] [CommRing O] (θ : A →+* O) {h : ℕ}
     (X : Matrix (Fin h) (Fin h) A) (a b : Fin h → O) :
@@ -85,8 +85,8 @@ theorem hasDatum_dual : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
   have hexp : ∀ t, t = ∑ i, e t i • E i := by
     intro t
     apply e.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     ext j
     simp [E, Finset.sum_apply, Pi.single_apply]
   let L : G.dual.Tate →ₗ[ℤ_[p]] (Fin G.height → ℤ_[p]) :=
@@ -98,8 +98,8 @@ theorem hasDatum_dual : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
     · refine (injective_iff_map_eq_zero L).2 fun χ hχ => hflip.1 ?_
       rw [map_zero]
       refine LinearMap.ext fun t => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [LinearMap.flip_apply, LinearMap.zero_apply, hexp t, map_sum, LinearMap.sum_apply]
+
+      rw [LinearMap.flip_apply, LinearMap.zero_apply, hexp t, map_sum, LinearMap.sum_apply]
       refine Finset.sum_eq_zero fun i _ => ?_
       rw [map_smul, LinearMap.smul_apply, ← epsPairing_smul hε, ← hL, hχ]
       simp
@@ -123,8 +123,8 @@ theorem hasDatum_dual : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlg
       fun _ => rfl
     rw [hs]
     conv_lhs => rw [hexp t]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum]
+
+    rw [map_sum, map_sum]
     simp only [map_smul, ← hs, hj, Pi.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero,
       Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
 

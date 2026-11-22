@@ -55,8 +55,8 @@ theorem frobenius_span_decomposition (W : LocWach PD LL O v n) [IsAdicComplete (
     choose t ht he using fun k : Fin PD.p =>
       kl2_dec_lemma W T S (a * (letπ : LetA O n) ^ (k : ℕ)) (s k) (hs k)
     refine ⟨fun j => ∑ k, t k j, fun j => S.sum_mem fun k _ => ht k j, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.smul_sum, ← mul_smul, he, map_sum]
+
+    simp only [Finset.smul_sum, ← mul_smul, he, map_sum]
     rw [Finset.sum_comm]
 
 theorem frobenius_span_exact_lift (W : LocWach PD LL O v n) [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
@@ -69,8 +69,8 @@ theorem frobenius_span_exact_lift (W : LocWach PD LL O v n) [IsAdicComplete (Ide
   obtain ⟨s, hs, rfl⟩ := frobenius_span_decomposition W Tp (W.Nl Tp i) z hz
   have hπs : ∀ k, W.map π (s k) = 0 := by
     refine Formalism.MainNotions.LiftingTheory.phii_DD W T'' c'' (fun k => W.map π (s k)) ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← h0, map_sum]
+
+    rw [← h0, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Formalism.MainNotions.LiftingTheory.wmap_map_smul, W.map_φ]
   choose y hy using fun k => hex (s k) (hπs k)

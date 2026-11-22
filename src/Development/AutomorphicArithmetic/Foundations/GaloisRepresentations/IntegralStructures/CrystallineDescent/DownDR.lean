@@ -34,7 +34,7 @@ open UpperTheory.V.Af (FrobEig algSat RepIso)
 open UpperTheory.V.Af.Bc (res)
 open UpperTheory.Gal.Int.Core
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.Gal.Int.Core.downDR_holds :
     SphDown .dR := by
   intro E Ω _ _ _ _ _ _ l _ ι a π Q P hP r w B hB hdec hS

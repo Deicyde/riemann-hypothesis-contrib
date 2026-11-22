@@ -40,10 +40,10 @@ theorem der_pow_mul (D : Derivation ℂ R R) (k : ℕ) (P Q : R) :
   induction k with
   | zero => simp
   | succ k ih =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [pow_succ', Module.End.mul_apply, ih,
-      Finset.sum_antidiagonal_choose_succ_mul (fun i j => (D.toLinearMap ^ i) P * (D.toLinearMap ^ j) Q) k,
-      map_sum, ← Finset.sum_add_distrib]
+
+    rw [pow_succ', Module.End.mul_apply, ih,
+    Finset.sum_antidiagonal_choose_succ_mul (fun i j => (D.toLinearMap ^ i) P * (D.toLinearMap ^ j) Q) k,
+    map_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun p hp => ?_
     have hc : k.choose p.2 = k.choose p.1 :=
       (Nat.choose_symm_of_eq_add (Finset.HasAntidiagonal.mem_antidiagonal.1 hp).symm).symm
@@ -122,8 +122,8 @@ theorem Good.mul {D : Derivation ℂ R R} {P Q u v : R} (hP : Good D P u) (hQ : 
           exact Finset.sum_congr rfl fun i _ => by simp [Module.Basis.coord_apply]
     have key : ∀ (a y : R), y ∈ N₂ → l (a * y) = ∑ i, l (a * b i) * b.coord i (π y) := fun a y hy => by
       conv_lhs => rw [dec y hy]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.mul_sum, map_sum]
+
+      rw [Finset.mul_sum, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [mul_smul_comm, map_smul, smul_eq_mul, mul_comm]
     have S := fun i => hasSum_cauchy (h₁ (l ∘ₗ LinearMap.mulRight ℂ (b i : R))) (h₂ (b.coord i ∘ₗ π))
@@ -131,8 +131,8 @@ theorem Good.mul {D : Derivation ℂ R R} {P Q u v : R} (hP : Good D P u) (hQ : 
     simp only [LinearMap.comp_apply, LinearMap.mulRight_apply] at T
     rw [key u v hv]
     convert T using 2 with k
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [der_pow_mul, map_sum, Finset.mul_sum, Finset.sum_comm]
+
+    rw [der_pow_mul, map_sum, Finset.mul_sum, Finset.sum_comm]
     refine Finset.sum_congr rfl fun p hp => ?_
     obtain rfl : p.1 + p.2 = k := Finset.HasAntidiagonal.mem_antidiagonal.1 hp
     rw [← nsmul_eq_mul, map_nsmul, nsmul_eq_mul, key _ _ (pow_mem m₂ s₂ _), ← mul_assoc, fact_choose, Finset.mul_sum]
@@ -165,8 +165,8 @@ theorem isExp_shift {V : Type} [AddCommGroup V] [Module ℂ V] {L U : Module.End
     simp [mul_comm]
   rw [e]
   convert T using 2 with k
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hc.add_pow', LinearMap.sum_apply, map_sum, Finset.mul_sum]
+
+  rw [hc.add_pow', LinearMap.sum_apply, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun p hp => ?_
   obtain rfl : p.1 + p.2 = k := Finset.HasAntidiagonal.mem_antidiagonal.1 hp
   have : (s • (1 : Module.End ℂ V)) ^ p.2 = s ^ p.2 • 1 := by rw [smul_pow, one_pow]
@@ -195,8 +195,8 @@ theorem good_lin (D : Derivation ℂ R R) {τ : Type} [Fintype τ] [DecidableEq 
     | zero => intro c; simp [Matrix.one_apply, ite_smul]
     | succ k ih =>
       intro c
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [pow_succ, Module.End.mul_apply, show D.toLinearMap (v c) = _ from hD c, map_sum]
+
+      rw [pow_succ, Module.End.mul_apply, show D.toLinearMap (v c) = _ from hD c, map_sum]
       simp only [map_smul, ih, pow_succ, Matrix.mul_apply, Finset.smul_sum, Finset.sum_smul, smul_smul]
       rw [Finset.sum_comm]
       exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun e _ => by rw [mul_comm]
@@ -213,13 +213,13 @@ theorem good_lin (D : Derivation ℂ R R) {τ : Type} [Fintype τ] [DecidableEq 
     have e1 : (fun n : ℕ => ((n.factorial : ℂ))⁻¹ * l ((D.toLinearMap ^ n) (v c))) =
         fun n : ℕ => ∑ a, ((n.factorial : ℂ))⁻¹ * (Y ^ n) a c * l (v a) := by
       funext n
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hp, map_sum, Finset.mul_sum]
+
+      rw [hp, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [map_smul, smul_eq_mul, mul_assoc]
     have e2 : l (∑ a, NormedSpace.exp Y a c • v a) = ∑ a, NormedSpace.exp Y a c * l (v a) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun a _ => by rw [map_smul, smul_eq_mul]
     rw [e1, e2]
     exact T

@@ -5,7 +5,7 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AbstractC
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mem_iSup_irreducible_of_fixed_projector : ∀ {E : Type} [AddCommGroup E] [Module ℂ E] (P : Submodule ℂ E → Prop),
     (∀ s : Set (Submodule ℂ E), (∀ A ∈ s, P A) → P (sInf s)) →
     ∀ (N : Submodule ℂ E), P N → ∀ (b : E →ₗ⋆[ℂ] E →ₗ[ℂ] ℂ), (∀ x ∈ N, x ≠ 0 → 0 < (b x x).re) →

@@ -131,7 +131,7 @@ theorem overAll_chain (α : ∀ i, Frame (p i) S n') (β : ∀ i, Frame (p i) T 
     obtain ⟨hi, hl'⟩ := List.nodup_cons.1 hl
     exact ⟨chainOp ψ S T e l f, ih hl' f hf, hE i _ (chainOp_vac e hpres l f hf i hi)⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem pres_of_allComb (hAC : AllComb D) {I : List ι} {P : Pl D → Prop} (hP : Places p I P)
     (hψ : IsStdChar D ψ (-1)) (α : ∀ i, Frame (p i) S n') (β : ∀ i, Frame (p i) T n) {LS : Lat S} {LT : Lat T}
     (hS : IsSelfDualC S LS) (hT : IsSelfDualC T LT) (e : ι → WO S T →₀ ℂ) (he : ∀ i, CombAt (· = (p i).v) (e i)) :
@@ -209,7 +209,7 @@ end GlobalTheory.FinPl.ExtAllPf
 namespace GlobalTheory.FinPl.ExtAllPf
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem ext_all : ∀ D : D7, GlobalTheory.FinPl.ExtAll D := by
   intro D k _ _ _ _ ι p I P hP n n' _ _ _ _ ψ hψ S A L T o ζ hζ α α₀ β hsum LA LS LT ΛA ΛT hA hS hT hlat
   have hAC := GlobalTheory.T.dataAsCombinationsAtSplitPlaces_proof D

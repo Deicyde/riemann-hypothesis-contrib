@@ -378,7 +378,7 @@ theorem core {R : Type*} [CommRing R] (ϖ A B T N K C Dd : R) (hpr : Prime ϖ) (
 
 variable {D : D7} (p : PlF D)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem prime_of_irr (ϖ : 𝒪[(D.s.atP p).Fp]) (h : Irreducible ϖ) : Prime ϖ := by
   haveI := (D.s.atP p).lf
   first

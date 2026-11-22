@@ -544,7 +544,7 @@ def vK {F : Type} [Field F] [Algebra (FractionRing R) F] {X : Scheme.{0}} {M : L
     {ψ : K → ((TK R).left ⟶ X)} {ε : K → ℤ} (t : LB.Gen (LB.LinComb M ψ ε)) (y : Sp F) (J : (Sp F ⟶ X) → M.ι) :
     ((Sp F).presheaf.stalk y)ˣ := val t (𝟙 _ ≫ jFK (R := R) F) y J
 
-set_option maxHeartbeats 2000000 in
+
 theorem qkPullExists (hG : GlobalFnsSt) : QkPullExistsSt := by
   intro R R' _ _ _ _ φ D D' hD F _ _ _ hF k p'
   have gp := pull_grp hD

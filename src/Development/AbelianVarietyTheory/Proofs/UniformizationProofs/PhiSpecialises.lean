@@ -369,7 +369,7 @@ theorem line_comm {b : T ⟶ D.P.A} {b' : TF (R := R') F ⟶ D'.P.A} (hb : b'.le
   · exact gt_comm hD hT hb 0 3
   · exact hb
 
-set_option maxHeartbeats 1000000 in
+
 include hT hΘ₁ hΘ₂ in
 theorem special_fibre (hG : GlobalFnsSt) {k : ℕ} (y : D.X) (gp : GtPt D T) (p : QkPt D' F k)
     (hy : p.y = hD.xe.symm y) (hb : p.g.b.left ≫ (hD.e.hom.left ≫ pullback.fst D.P.A.hom (specOf φ)) = h ≫ gp.b.left)

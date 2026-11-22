@@ -66,11 +66,11 @@ theorem exists_expansion {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (
       simp only [res_apply, cf, map_one, mul_one]
       rfl
     rw [h1, e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, map_smul]
+
+    simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, map_smul]
   rw [er]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+
+  simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
 
 theorem ind_mem_Sm {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {f₁ : Sm E r →ₗ[ℂ] Sm E r}
     {f₂ : Sm E s →ₗ[ℂ] Sm E s} (H : Good U₁ U₂ f₁ f₂) {F : Sm E (r + s)} (hF : F ∈ indSub U₁ U₂)

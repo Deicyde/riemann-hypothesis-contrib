@@ -40,14 +40,14 @@ noncomputable section
 namespace GlobalTheory.MovedHomLat
 open Matrix
 variable {D : D7}
-set_option synthInstance.maxHeartbeats 400000
+
 
 theorem bridge (V : HSp D) (k : GA D V) (s : Fin V.rank → D.host.E) :
     (fun i => Formalism.IndefR.Datum.toEAf D ((mt V k *ᵥ fun j => incA D (s j)) i)) =
       (Formalism.IndefR.Lev.finE V k).1 *ᵥ (fun j => Formalism.IndefR.Datum.eToEAf D (s j)) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+  simp only [Matrix.mulVec, dotProduct, map_sum, map_mul]
   rfl
 
 theorem fwd (V : HSp D) (k : GA D V) (C : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E))
@@ -98,7 +98,7 @@ theorem colLat_span {n : ℕ} (B : GL (Fin n) D.host.E) :
   exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hcol j)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem globLat_mul_iff {n : ℕ} (a b : GL (Fin n) (Formalism.IndefR.Lev.EAf D)) (Λ C : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
     (hb : ∀ v, v ∈ Formalism.L2.Herm.hatL (F := D.host.F) C ↔ b.1 *ᵥ v ∈ Formalism.L2.Herm.hatL (F := D.host.F) Λ) (y : Fin n → D.host.E) :
     y ∈ Formalism.UG.CS.globLat a Λ ↔ y ∈ Formalism.UG.CS.globLat (a * b) C := by

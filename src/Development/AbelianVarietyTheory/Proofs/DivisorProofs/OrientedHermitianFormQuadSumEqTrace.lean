@@ -95,8 +95,8 @@ theorem gram_det_ne (V : HSp D) : V.gram.det ≠ 0 := by
   have hx : ∀ y, V.hT y (∑ j, v j • V.frame j) = 0 := by
     intro y
     rw [← V.frame.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, RingHom.id_apply, smul_eq_mul]
+
+    simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, RingHom.id_apply, smul_eq_mul]
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_eq_zero fun i _ => ?_
@@ -158,8 +158,8 @@ theorem trace_second (hc : ∀ z, c (c z) = z) (ξ : A) (hξ : c ξ = -ξ) (g : 
   have e2 : (-pi) * (-(Z' * pᵀ))ᵀ * g * (-(Z.map c * p)) = -((pi * p) * (Z'ᵀ * g * Z.map c * p)) := by
     simp only [transpose_neg, transpose_mul, transpose_transpose, Matrix.neg_mul, Matrix.mul_neg, neg_neg, Matrix.mul_assoc]
   have ct : ∀ {k : ℕ} (M : Matrix (Fin k) (Fin k) A), c M.trace = (M.map c).trace := fun M => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.trace, map_sum]
+
+    simp [Matrix.trace, map_sum]
   rw [e2, hpi, Matrix.one_mul, trace_neg, mul_neg, map_neg, map_mul, hξ, ct, Matrix.map_mul, Matrix.map_mul,
     Matrix.map_mul, transpose_map, cc, hg', hp', neg_mul, neg_neg]
   congr 1
@@ -184,7 +184,7 @@ theorem incM_neg_one_smul {m n : ℕ} (M : Matrix (Fin m) (Fin n) D.host.E) :
     incM ((-1 : D.host.E) • M) = -incM M := by
   rw [incM_smul, map_neg, map_one, neg_one_smul]
 
-set_option maxHeartbeats 1000000 in
+
 theorem symp_eq (t : T) (e : Num G i j) (Γ : Geo G i j) (hW₁ : Γ.V'.J = (-1 : D.host.E) • (spW₁ G i j).gram)
     (hWW : Γ.W.J = skewGram (spV G i j) (spV₁ G i j) e)
     (x x' : Matrix (Fin (spW₁ G i j).rank) (Fin ((spW G i j).rank + (spW₁ G i j).rank)) (AE D)) :

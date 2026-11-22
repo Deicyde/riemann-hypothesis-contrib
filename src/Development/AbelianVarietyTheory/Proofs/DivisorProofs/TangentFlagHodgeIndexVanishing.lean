@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsTan
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -57,7 +57,7 @@ theorem exists_mem_Fil_corr (P : AbelianDeRham) {T : Type} [CommRing T] [Algebra
     exact z _ (p1 c)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_isFilLift_dir (P : AbelianDeRham) {ι : Type} [Fintype ι] {C : Over (Sp (TrivSqZeroExt R (ι → R)))}
     [GrpObj C] {g : ℕ} (hC : IsAbelianScheme C) (gC : SmoothOfRelativeDimension g C.hom) {A : Over (Sp R)} [GrpObj A]
     {φ₀ : A.left ⟶ C.left} (h₀ : IsGrpPullback A C (spMap (TrivSqZeroExt.fstHom R R (ι → R)).toRingHom) φ₀)
@@ -200,8 +200,8 @@ theorem IsKS.row (P : AbelianDeRham) {Φ : Finset (E →+* ℂ)} {y : FrPt Xo c 
     refine LinearMap.ext fun h => ?_
     obtain ⟨a, ha⟩ := exists_sub_mem_Fil hρ hL hvs (kb := kb) (fun k => hl₂ k.1 k.2) h
     have := iso f hf _ ha
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum] at this
+
+    rw [map_sub, map_sum] at this
     simpa [h0] using this
   open GlobalTheory.CatCoh GlobalTheory.Published.AbelianDeRham in
   have tanValBC {R R' : Type} [CommRing R] [CommRing R'] {σ : R →+* R'} {A : Over (Sp R)} {B : Over (Sp R')} {φ : B.left ⟶ A.left}

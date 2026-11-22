@@ -39,8 +39,8 @@ variable {σ J}
 
 theorem hE_conj (hσ : ∀ a, σ (σ a) = a) (hJ : ∀ i j, σ (J j i) = J i j) (x y : Fin M → E) :
     σ (hE σ J x y) = hE σ J y x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hE_eq_sum, map_sum, map_mul, hσ]
+
+  simp only [hE_eq_sum, map_sum, map_mul, hσ]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [hJ i j]

@@ -103,9 +103,9 @@ theorem par (U : AffOp X) : IsBaseChange (Sec s U.unop.1) (evForm s U) := by
       rfl
     | add t t' ht ht' => rw [map_add (f := _), back_add, ht, ht']
   · conv_rhs => rw [fr.sum U x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [back, map_sum, TensorProduct.lift.tmul, LinearMap.restrictScalars_apply, LinearMap.flip_apply,
-        Algebra.linearMap_apply, Module.algebraMap_end_apply, LinearMap.smul_apply]
+
+    simp only [back, map_sum, TensorProduct.lift.tmul, LinearMap.restrictScalars_apply, LinearMap.flip_apply,
+      Algebra.linearMap_apply, Module.algebraMap_end_apply, LinearMap.smul_apply]
     rfl
 
 end GlobalTheory.FormsOnAb

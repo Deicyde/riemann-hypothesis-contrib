@@ -21,10 +21,10 @@ theorem cone_cycle_isBoundary : ∀ (V : Type) (F G : Set (List V)) (x : V), (�
       Finsupp.single l 1 - cone (bd V (Finsupp.single l 1)) := by
     intro l
     rw [hcone]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [bd, Finsupp.linearCombination_single, one_smul, List.length_cons,
-      Finset.sum_range_succ', List.eraseIdx_cons_succ, List.eraseIdx_cons_zero, pow_zero,
-      map_sum, map_zsmul, hcone, pow_succ, mul_neg_one, neg_smul, Finset.sum_neg_distrib]
+
+    simp only [bd, Finsupp.linearCombination_single, one_smul, List.length_cons,
+    Finset.sum_range_succ', List.eraseIdx_cons_succ, List.eraseIdx_cons_zero, pow_zero,
+    map_sum, map_zsmul, hcone, pow_succ, mul_neg_one, neg_smul, Finset.sum_neg_distrib]
     abel
   have key : ∀ d : List V →₀ ℤ, bd V (cone d) = d - cone (bd V d) := by
     intro d

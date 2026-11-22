@@ -24,7 +24,7 @@ def actH {N : ℕ} (g : GL (Fin N) k) : Sp k N ≃ₜ Sp k N where
   continuous_toFun := Continuous.actc continuous_const continuous_id
   continuous_invFun := Continuous.actc continuous_const continuous_id
 
-set_option maxHeartbeats 1000000 in
+
 theorem transfer_of : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → DoubleTransfer) → OrbHom k → OrbClosed k → Transfer k := by
   intro hDT hOH hOC hFr p _ _ hU N q Z hZ χ D τ x₀ hx₀ hV ξ hsupp hinv f hf
   haveI : T2Space k := t2k

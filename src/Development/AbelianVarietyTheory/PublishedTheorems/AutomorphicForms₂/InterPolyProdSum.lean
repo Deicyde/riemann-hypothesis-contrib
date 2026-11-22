@@ -62,8 +62,8 @@ theorem interPoly_prod_sum [Fintype κ] (a : Fin Y.dim → κ → ℤ) :
   let form := Y.diffVanish_chi.form
   have hform (d : Fin Y.dim → Y.Dv) : form d = Y.inter d :=
     (Y.diffVanish_chi.form_apply d 0).trans (Y.inter_eq_multiDiff d).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Fintype.prod_sum, map_sum, ← hform, MultilinearMap.map_sum, Int.cast_sum]
+
+  rw [Fintype.prod_sum, map_sum, ← hform, MultilinearMap.map_sum, Int.cast_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
   rw [hform]
   have e1 : (∏ i, C (a i (p i) : ℝ) * MvPolynomial.X (p i) : MvPolynomial κ ℝ) =

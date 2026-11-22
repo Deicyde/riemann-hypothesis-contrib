@@ -56,8 +56,8 @@ theorem mem_span_isAdW_of_kills {n : ℕ} {A : Type} [AddCommGroup A] [Module �
       rw [h2])
     (by
       have h3 := congrArg (fun u => φ u t) (sum_wtPart x)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, LinearMap.sum_apply] at h3
+
+      simp only [map_sum, LinearMap.sum_apply] at h3
       rw [h3, hx])
   rw [← sum_wtPart x]
   exact Submodule.sum_mem _ fun w hw => Submodule.subset_span ⟨w, isAdW_wtPart x w, hz w hw⟩

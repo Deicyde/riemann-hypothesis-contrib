@@ -159,8 +159,8 @@ theorem sig_sig (A : Places F E sig) (y : E) : sig (sig y) = y := by
 
 theorem hq_swap (A : Places F E sig) {N : ℕ} (Hm : Matrix (Fin N) (Fin N) E)
     (hH : ∀ i j, sig (Hm j i) = Hm i j) (x y : Fin N → E) : sig (hq sig Hm x y) = hq sig Hm y x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hq, map_sum, map_mul, sig_sig A]
+
+  simp only [hq, map_sum, map_mul, sig_sig A]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [hH]
@@ -199,8 +199,8 @@ theorem bc_piQ (A : Places F E sig) (p : HeightOneSpectrum (𝓞 F)) {N r : ℕ}
       hf (A.L p) (Hm.map (A.loc p).ιE) (A.bc p x) (A.bc p y) :=
     fun x y => ((GlobalTheory.HL.RatExt.rational_extend A N p).2.2.2.2.1 Hm x y).symm
   funext j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [piQ, piL, Places.bc, map_sub, map_sum, map_add (f := _), map_mul, h5]
+
+  simp only [piQ, piL, Places.bc, map_sub, map_sum, map_add (f := _), map_mul, h5]
 
 end Global
 

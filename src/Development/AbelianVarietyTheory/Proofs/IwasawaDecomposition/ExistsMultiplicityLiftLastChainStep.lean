@@ -42,9 +42,9 @@ theorem subst_subst (a a' : ι → Matrix (Fin n) (Fin n) ℂ) (b b' : ι → Ma
     subst a b (subst a' b' P) = subst (fun τ => a' τ * a τ) (fun τ => b τ * b' τ) P := by
   refine DFunLike.congr_fun (?_ : (subst a b).comp (subst a' b') = _) P
   refine MvPolynomial.algHom_ext fun v => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [subst, AlgHom.comp_apply, MvPolynomial.aeval_X, map_sum, map_smul, Finset.smul_sum, smul_smul,
-    Matrix.mul_apply, Finset.sum_mul, Finset.mul_sum, Finset.sum_smul]
+
+  simp only [subst, AlgHom.comp_apply, MvPolynomial.aeval_X, map_sum, map_smul, Finset.smul_sum, smul_smul,
+  Matrix.mul_apply, Finset.sum_mul, Finset.mul_sum, Finset.sum_smul]
   calc _ = ∑ i, ∑ c, ∑ i', ∑ c', (b v.1 i' i * b' v.1 i v.2.1 * (a' v.1 v.2.2 c * a v.1 c c')) •
         (MvPolynomial.X (v.1, i', c') : Pol ι m n) := by
         refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun i' _ =>
@@ -245,7 +245,7 @@ theorem exists_trilinear {G H S P Ds : Type} [MeasurableSpace H] [AddCommGroup S
 variable {D : D7}
 
 
-set_option maxHeartbeats 800000 in
+
 theorem ioExists_definite {V W : HSp D} {S S' : D.what₂.Tau → SPar} (M : DSModel V S) (M' : DSModel W S')
     {θ : InfFam D} {ψ : AddChar (AF D.host.F) ℂ} {χS χT : (AE D)ˣ →* Circle}
     {ω : GA D V × GA D W →* Module.End ℂ (WO V W → ℂ)} {f : WO V W → ℂ}

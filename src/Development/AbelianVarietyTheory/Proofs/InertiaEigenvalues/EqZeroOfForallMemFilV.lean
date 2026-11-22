@@ -205,12 +205,12 @@ theorem idem_repr (τ : K →ₐ[Qp] LL) : ∃ (n : ℕ) (a : Fin n → LL) (c :
   obtain ⟨n, a, c, h⟩ := TensorProduct.exists_sum_tmul_eq (exists_idem τ).choose
   refine ⟨n, a, c, ?_, ?_⟩
   · rw [idem, h]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum]
+
+    simp [map_sum]
   · have := (exists_idem τ).choose_spec.1
     rw [h] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum] using this
+
+    simpa [map_sum] using this
 
 theorem tmul_mul_idem (τ : K →ₐ[Qp] LL) (c : K) :
     ((1 : LL) ⊗ₜ[Qp] algebraMap K F c) * idem F τ = τ c • idem F τ := by
@@ -229,8 +229,8 @@ theorem mulR_sm_idem (τ : K →ₐ[Qp] LL) (c : K) (x : V ⊗[Qp] F) :
 theorem sm_idem_of_eigen (τ : K →ₐ[Qp] LL) (x : V ⊗[Qp] F)
     (hx : ∀ c : K, mulR Qp F LL V (algebraMap K F c) x = τ c • x) : sm Qp F LL V (idem F τ) x = x := by
   obtain ⟨n, a, c, h, h1⟩ := idem_repr F τ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum, LinearMap.sum_apply]
+
+  rw [h, map_sum, LinearMap.sum_apply]
   simp only [sm_tmul_left, hx, smul_smul, ← Finset.sum_smul, h1, one_smul]
 
 theorem sm_idem_idem (τ : K →ₐ[Qp] LL) (x : V ⊗[Qp] F) :
@@ -483,17 +483,17 @@ theorem dual_family (ρ : Representation LL G V) (ρ' : Representation LL G V') 
     intro x
     have h1 : ∀ i, bil Qp F β x (d' i) = e * ∑ a, ext Qp F (v.coord a) x * r a i := by
       intro i
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hd', bil_sm_right, sm_self, map_sum]
+
+      rw [hd', bil_sm_right, sm_self, map_sum]
       simp only [bil_sm_right, sm_self, hv, mul_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [h1, sm_mul, map_sum, LinearMap.sum_apply]
+
+    simp only [h1, sm_mul, map_sum, LinearMap.sum_apply]
     rw [Finset.sum_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [eq_sum_basis v x, ← he, sm_mul, map_sum, map_sum]
+
+    conv_lhs => rw [eq_sum_basis v x, ← he, sm_mul, map_sum, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [sm_comm e (ext Qp F (v.coord a) x), hr, map_sum, map_sum]
+
+    rw [sm_comm e (ext Qp F (v.coord a) x), hr, map_sum, map_sum]
   have hed' : ∀ i, sm Qp F LL V' e (d' i) = d' i := fun i => by rw [hd', ← sm_mul, he]
   have hδ : ∀ i j, bil Qp F β (d j) (d' i) = if j = i then e else 0 := by
     intro i j
@@ -508,8 +508,8 @@ theorem dual_family (ρ : Representation LL G V) (ρ' : Representation LL G V') 
     intro z hz h
     have : ∀ a, ext Qp F (w.coord a) z = 0 := by
       intro a
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hw, ← hz, bil_sm_right, ← bil_sm_left, hr, map_sum, LinearMap.sum_apply]
+
+      rw [← hw, ← hz, bil_sm_right, ← bil_sm_left, hr, map_sum, LinearMap.sum_apply]
       simp [bil_sm_left, h]
     rw [eq_sum_basis w z]
     simp [this]
@@ -556,8 +556,8 @@ theorem idem_mem_FilV (τ : K →ₐ[Qp] LL) : idem F τ ∈ FilV PD (LL := LL) 
 
 theorem actR_idem (τ : K →ₐ[Qp] LL) (g : G) : actR PD LL g (idem F τ) = idem F τ := by
   obtain ⟨n, a, c, h, -⟩ := idem_repr F τ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum]
+
+  rw [h, map_sum]
   simp
 
 theorem sm_idem_mem_FilV (τ : K →ₐ[Qp] LL) {a : ℤ} {x : V ⊗[Qp] F}

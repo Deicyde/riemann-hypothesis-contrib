@@ -223,8 +223,8 @@ theorem gfacts_of (F : LFlag (D.sp.Y 0) D.R.rS T) (F' F'' : LFlag (D.sp.Y 0) D.R
       intro i
       have := congrFun hc i
       simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, brS, Pi.zero_apply] at this
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hu, map_sum, LinearMap.sum_apply]
+
+      rw [hu, map_sum, LinearMap.sum_apply]
       simp only [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, star_star]
       rw [← this]
       exact Finset.sum_congr rfl fun k _ => mul_comm _ _

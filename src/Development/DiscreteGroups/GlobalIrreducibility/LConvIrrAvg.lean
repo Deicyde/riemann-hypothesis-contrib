@@ -63,9 +63,9 @@ theorem avg_exists [TopologicalSpace G] [IsTopologicalGroup G] (hsm : IsSmooth �
       rw [e, norm_pi]
     have hsum : iota B hB x - iota B hB ((O.card : ℂ)⁻¹ • ∑ m ∈ O, m) =
         (O.card : ℂ)⁻¹ • ∑ m ∈ O, (iota B hB x - iota B hB m) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_sub_distrib, Finset.sum_const, smul_sub, map_smul, map_sum,
-        ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hcardC, one_smul]
+
+      rw [Finset.sum_sub_distrib, Finset.sum_const, smul_sub, map_smul, map_sum,
+      ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hcardC, one_smul]
     rw [dist_eq_norm, dist_eq_norm, hsum, norm_smul]
     calc ‖((O.card : ℂ))⁻¹‖ * ‖∑ m ∈ O, (iota B hB x - iota B hB m)‖
         ≤ ‖((O.card : ℂ))⁻¹‖ * ∑ m ∈ O, ‖iota B hB x - iota B hB m‖ := by gcongr; exact norm_sum_le _ _

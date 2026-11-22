@@ -16,7 +16,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComp
 @[expose] public section
 
 open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
-set_option synthInstance.maxHeartbeats 400000
+
 open ReciprocityTheory.Def (Z1 B1 H1)
 open TensorProduct
 
@@ -74,8 +74,8 @@ theorem mk_mem_H1fX_iff_inHfX {G : Type} [Group G] [TopologicalSpace G] {Qp K₀
     let xx : Fin S.card → X := fun j => (e.symm j).1.2
     have key : (tensAmb L χ X ∘ₗ (latticeFiniteCohomology PD (twLattice L χ⁻¹)).subtype.rTensor X)
         (∑ p ∈ S, p.1 ⊗ₜ[O] p.2) = Submodule.Quotient.mk (∑ j, tensCoc L χ X (cc j) (xx j)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, ← Finset.sum_coe_sort S, ← e.symm.sum_comp]
+
+      rw [map_sum, ← Finset.sum_coe_sort S, ← e.symm.sum_comp]
       refine Eq.trans ?_ (map_sum (Submodule.mkQ _) _ _).symm
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [LinearMap.comp_apply, LinearMap.rTensor_tmul, Submodule.subtype_apply, ← hrepmk, tensAmb_tmul]
@@ -97,14 +97,14 @@ theorem mk_mem_H1fX_iff_inHfX {G : Type} [Group G] [TopologicalSpace G] {Qp K₀
     let cc : Fin k → ↥(latticeCocycles (twLattice L χ⁻¹)) := fun j => ⟨fun g => (c j g : V), (hc j).1⟩
     refine ⟨∑ j, (⟨Submodule.Quotient.mk (cc j), Submodule.mem_map_of_mem (hc j)⟩ :
       ↥(latticeFiniteCohomology PD (twLattice L χ⁻¹))) ⊗ₜ[O] x j, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     have h1 : ∀ j, (tensAmb L χ X ∘ₗ (latticeFiniteCohomology PD (twLattice L χ⁻¹)).subtype.rTensor X)
         ((⟨Submodule.Quotient.mk (cc j), Submodule.mem_map_of_mem (hc j)⟩ :
           ↥(latticeFiniteCohomology PD (twLattice L χ⁻¹))) ⊗ₜ[O] x j) = Submodule.mkQ _ (tensCoc L χ X (cc j) (x j)) := fun j => rfl
     simp only [h1]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, Submodule.mkQ_apply]
+
+    rw [← map_sum, Submodule.mkQ_apply]
     refine (Submodule.Quotient.eq _).mpr ?_
     refine Submodule.mem_map.mpr ⟨-m, Submodule.mem_top, ?_⟩
     funext g

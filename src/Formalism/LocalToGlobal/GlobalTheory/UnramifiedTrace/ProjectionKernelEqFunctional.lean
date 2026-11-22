@@ -65,7 +65,7 @@ theorem ld_locP (T : Forms0 D u) (v : (D.mem u).A.vT) (c : (D.mem u).C.cls 0)
       ((Submodule.span_singleton_le_iff_mem _ _).2 z3.2))
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem ptz_val (T : Forms0 D u) {v : (D.mem u).A.vT} {c : (D.mem u).C.cls 0}
     {g : Module.Dual ((D.mem u).A.Fv v) ((D.fm u).lk 0 v c)}
     {γ : UJ (sigD D : D.host.E →+* D.host.E) (gramN D 0 (Nat.zero_le _))}
@@ -94,8 +94,8 @@ def PtLatF (T : Forms0 D u) : Prop :=
       Formalism.HermitianLatticesTheory.localization₂ (T.atT.Pv v) (clsCrd D u 0 (Nat.zero_le _) c ⊔
         Submodule.span (𝓞 D.host.E) {(((D.mem u).A.T : ℕ) : D.host.E)⁻¹ • w3})
 
-set_option maxHeartbeats 16000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem valDia_of_lat (T : Forms0 D u) (hL : PtLatF T) : ValDia T := by
   intro v c
   refine ⟨Equiv.inv _, ?_⟩

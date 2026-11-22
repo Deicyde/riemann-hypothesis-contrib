@@ -39,7 +39,7 @@ end
 
 section
 open GlobalTheory.SumSize GlobalTheory.RowClaim
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finDatK_of_theta_inputs : _root_.GlobalTheory.FunPr.ThetaLocalInputs → FinDatK := by
   first | exact @_root_.GlobalTheory.FunDat.finDatK_alt | exact _root_.GlobalTheory.FunDat.finDatK_alt | (intros; apply _root_.GlobalTheory.FunDat.finDatK_alt <;> assumption)
 end

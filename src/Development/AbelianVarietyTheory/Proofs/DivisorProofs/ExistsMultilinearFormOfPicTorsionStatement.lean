@@ -44,7 +44,7 @@ private theorem tensorPow_equiv (c : Pic B) (n : ℕ) :
       (PiTensorProduct.subsingletonEquiv (R := B) (s := fun _ : Fin 1 => Pic.AsModule c) 0).symm ≪≫ₗ
       PiTensorProduct.tmulEquiv B (Pic.AsModule c) ≪≫ₗ PiTensorProduct.reindex B _ finSumFinEquiv⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_multilinear_form_of_pic_torsion :
     ∀ (B : Type) [CommRing B] (q : ℕ) (c : CommRing.Pic B), c ^ q = 1 →
       ∃ φ : (Π _ : Fin q, CommRing.Pic.AsModule c) →ₘₗ[B] B,

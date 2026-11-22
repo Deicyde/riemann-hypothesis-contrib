@@ -188,7 +188,7 @@ structure Half1 (Lf : ∀ {M : Model l K} (r : ℕ) {j : ℕ}, M.T j → Fam M r
     ∃ x, IsFirstChernClassInFamily D x ∧ Lf 1 v x
 
 
-set_option maxHeartbeats 1000000 in
+
 structure Half2 (γ : ∀ {M : Model l K} {r j : ℕ}, Fam M r j → ∀ a, Module.Dual K (Hdg M.q a j) →+ ℂ_[l]) : Prop where
   add : ∀ {M : Model l K}, M.Sm → ∀ {r j : ℕ} (x y : Fam M r j), Comp x → Comp y → ∀ a, γ (x + y) a = γ x a + γ y a
   lin : ∀ {M : Model l K}, M.Sm → ∀ {r j : ℕ} (c : Acris l) (x : Fam M r j), Comp x → ∀ a φ, γ (c • x) a φ = θA l c * γ x a φ

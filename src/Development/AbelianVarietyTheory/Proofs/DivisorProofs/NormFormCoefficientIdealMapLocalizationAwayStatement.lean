@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FamIdeal
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.normFormCoefficientIdeal_map_localizationAway : ∀ (A K L B A' B' : Type) [CommRing A] [CommRing B] [CommRing A'] [CommRing B'] [Field K] [Field L]
     [Algebra K L] [FiniteDimensional K L] [Algebra A K] [Algebra B L] [Algebra A' K] [Algebra B' L]
     [Algebra A A'] [Algebra B B'] [Algebra A B] (f : A) [IsLocalization.Away f A']
