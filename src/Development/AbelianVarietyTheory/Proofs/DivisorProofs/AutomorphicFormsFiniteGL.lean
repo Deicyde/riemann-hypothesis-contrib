@@ -1,12 +1,8 @@
-import Mathlib
-import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsSpanFormsNeBot
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandraFinitenessAutomorphicGLOfEigenStatement
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandraFinitenessTotallyComplexGLProof
-import Development.AbelianVarietyTheory.Definitions.Divisors.CentralNilGL
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.TemperedLocalComponents.FormsFiniteGL
 
 namespace GlobalTheory
 
 theorem automorphicFormsFiniteGL : GlobalTheory.Published.AutomorphicFormsFiniteGL :=
-  GlobalTheory.T.harishChandra_finiteness_automorphic_GL_of_eigen _root_.GlobalTheory.HCFGL.coreFiniteGL
+  UpperTheory.V.Af.formsFiniteGL
 
 end GlobalTheory
