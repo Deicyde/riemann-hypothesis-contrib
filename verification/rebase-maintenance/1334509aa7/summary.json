@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-78",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Formalism/SatakeDualWeyl/AdelicIwasawaHecke/Levelaf.lean",
+          "stages": {
+            "1": "a82305067315c15f9bd280d1167ce411cf54a34a",
+            "2": "a2e5396df9915818694d44be8d94693a4e83830f",
+            "3": "ea8a7eec1036c7df357d0f58f7dad6e620e910d7"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "3d9738845ce2bf26fae1abe569fdde999ec9e76c",
+      "checkpoint_head": "9b561c1f50ce8957ccf2a7ac4d98757181510c3f"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
