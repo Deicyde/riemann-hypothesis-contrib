@@ -163,6 +163,27 @@ def resolve_reviewed_ports(number):
     return resolved
 
 
+def resolve_manual_ports(number):
+    config = HERE / 'manual-resolutions.json'
+    if not config.exists():
+        return []
+    entry = json.loads(config.read_text())['prs'].get(str(number))
+    if not entry or value('rev-parse', 'REBASE_HEAD') != entry['commit']:
+        return []
+    unmerged = set(git('diff', '--name-only', '--diff-filter=U').stdout.splitlines())
+    resolved = []
+    for f in entry['files']:
+        if f['path'] not in unmerged:
+            continue
+        ours = git('rev-parse', ':2:' + f['path'], check=False)
+        if ours.returncode or ours.stdout.strip() != f['ours']:
+            continue
+        (REPO / f['path']).write_text((HERE / f['resolution']).read_text())
+        git('add', '--', f['path'])
+        resolved.append({'path': f['path'], 'reason': 'manually-reviewed-Lean-4.36-API-adaptation'})
+    return resolved
+
+
 def import_check():
     names = value('ls-tree', '-r', '--name-only', 'HEAD', '--', 'src').splitlines()
     modules = {p[4:-5].replace('/', '.') for p in names if p.endswith('.lean')}
@@ -244,6 +265,7 @@ def main():
         'structural': [44,63],
         'performance': [79,98,104],
         'reviewed': [71,74,82,90,92],
+        'manual': [94,95],
     }
     selected = set(batches.get(os.environ.get('PR_BATCH'), [p['n'] for p in SNAPSHOT['prs']]))
     prs = sorted([p for p in SNAPSHOT['prs'] if p['n'] in selected], key=lambda p: (p['files'] > 1000, p['files'], p['n']))
@@ -283,7 +305,8 @@ def main():
                     for _ in range(500):
                         if not replay.returncode:
                             break
-                        changes = resolve_reviewed_ports(number)
+                        changes = resolve_manual_ports(number)
+                        changes += resolve_reviewed_ports(number)
                         changes += resolve_module_conflicts(number)
                         resolutions.extend(changes)
                         if not changes or git('ls-files', '-u').stdout:
