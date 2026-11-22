@@ -512,6 +512,66 @@
           }
         ],
         "note": "Both proposed G8 shared Gaussian helpers were pruned from main. Keep the surviving local one-dimensional proof and do not resurrect the pruned Hessian declarations."
+      },
+      {
+        "commit": "c7cbfe9e07c75a1b3dd7bd1b5f29373f60deeb1f",
+        "note": "Reviewed each pruning-compatibility revert against current main; keep equivalent local proofs, surviving shared reuse, and main pruning.",
+        "files": [
+          {
+            "path": "src/CompanionTheory/AutomorphicTheory/SchurLimitBounds/SchurOrthogonality/URepBasic.lean",
+            "ours": "ca51460f3f5699275058e49606ba39b32c86efb1",
+            "resolution": "resolutions/54-pruning-compat-0.lean",
+            "review": "All five restored targets were already pruned; retain current API repairs."
+          },
+          {
+            "path": "src/CompanionTheory/ThickeningEstimates/LieGroupReduction/HasDerivAtSchwartzToL2.lean",
+            "ours": "05f6863ab2c7d4aede46e03f6c44298b82feebcb",
+            "resolution": "resolutions/54-pruning-compat-1.lean",
+            "review": "Keep the surviving canonical Schwartz derivative reuse; LD.hasDerivAt was pruned."
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AlgebraMapQuotBijective.lean",
+            "ours": "a620197e983d3f4243d3b6e759f1a9084a4f3958",
+            "resolution": "resolutions/54-pruning-compat-2.lean",
+            "review": "The rank/codimension targets were pruned; retain current Mathlib import."
+          },
+          {
+            "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/GaussianHessianIntegral.lean",
+            "ours": "3a22cb45b456cb7003ad971f35188863564bcf5f",
+            "resolution": "resolutions/54-pruning-compat-3.lean",
+            "review": "The local Gaussian proof is already restored with div\u2080; Hessian declarations stay pruned."
+          },
+          {
+            "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/LemmaEprimeFromSteps.lean",
+            "ours": "70504d6761fdc99bd6328905bf8166897c06303a",
+            "resolution": "resolutions/54-pruning-compat-4.lean",
+            "review": "All restored declarations were pruned; cutBound still reuses the surviving canonical theorem."
+          },
+          {
+            "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/WeightedL2BoundedMul.lean",
+            "ours": "dd786ac2f893ab97745519ff00416f4a0f41b5c3",
+            "resolution": "resolutions/54-pruning-compat-5.lean",
+            "review": "All five necessary local proofs are already restored; preserve current instance budgets and surviving cutTheta reuse."
+          },
+          {
+            "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/PosNear.lean",
+            "ours": "00f6a336d6a7c33446ed19d757c04e2dcd850621",
+            "resolution": "resolutions/54-pruning-compat-6.lean",
+            "review": "Orbit-volume test was pruned; keep current imports."
+          },
+          {
+            "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/Unimod.lean",
+            "ours": "71c15dda908b9163e2554952c0175acc73ff9483",
+            "resolution": "resolutions/54-pruning-compat-7.lean",
+            "review": "The sigma-compactness declaration was pruned; keep current imports."
+          },
+          {
+            "path": "src/Formalism/SatakeDualWeyl/AdelicIwasawaHecke/Levelaf.lean",
+            "ours": "c177188a9efdc2f4e13d236cedbd2edb2af8a308",
+            "resolution": "resolutions/54-pruning-compat-8.lean",
+            "review": "The conjugation declaration was pruned; preserve the surviving shortened index argument."
+          }
+        ]
       }
     ]
   }
